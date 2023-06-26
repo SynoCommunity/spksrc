@@ -1,0 +1,1356 @@
+From e040f074d49fb6fde93112a2350af5462a494c04 Mon Sep 17 00:00:00 2001
+From: Fuqian Huang <huangfq.daxian@gmail.com>
+Date: Fri, 9 Aug 2019 13:35:39 +0800
+Subject: [PATCH 01/24] net: tundra: tsi108: use spin_lock_irqsave instead of
+ spin_lock_irq in IRQ context
+
+[ Upstream commit 8c25d0887a8bd0e1ca2074ac0c6dff173787a83b ]
+
+As spin_unlock_irq will enable interrupts.
+Function tsi108_stat_carry is called from interrupt handler tsi108_irq.
+Interrupts are enabled in interrupt handler.
+Use spin_lock_irqsave/spin_unlock_irqrestore instead of spin_(un)lock_irq
+in IRQ context to avoid this.
+
+Signed-off-by: Fuqian Huang <huangfq.daxian@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/tundra/tsi108_eth.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git drivers/net/ethernet/tundra/tsi108_eth.c drivers/net/ethernet/tundra/tsi108_eth.c
+index 520cf50a3d5a..93fe0da0f15e 100644
+--- drivers/net/ethernet/tundra/tsi108_eth.c
++++ drivers/net/ethernet/tundra/tsi108_eth.c
+@@ -379,9 +379,10 @@ tsi108_stat_carry_one(int carry, int carry_bit, int carry_shift,
+ static void tsi108_stat_carry(struct net_device *dev)
+ {
+ 	struct tsi108_prv_data *data = netdev_priv(dev);
++	unsigned long flags;
+ 	u32 carry1, carry2;
+ 
+-	spin_lock_irq(&data->misclock);
++	spin_lock_irqsave(&data->misclock, flags);
+ 
+ 	carry1 = TSI_READ(TSI108_STAT_CARRY1);
+ 	carry2 = TSI_READ(TSI108_STAT_CARRY2);
+@@ -449,7 +450,7 @@ static void tsi108_stat_carry(struct net_device *dev)
+ 			      TSI108_STAT_TXPAUSEDROP_CARRY,
+ 			      &data->tx_pause_drop);
+ 
+-	spin_unlock_irq(&data->misclock);
++	spin_unlock_irqrestore(&data->misclock, flags);
+ }
+ 
+ /* Read a stat counter atomically with respect to carries.
+-- 
+2.30.2
+
+
+From ffb54f3eae723ca6d7ff34187bdfce91a0d28fce Mon Sep 17 00:00:00 2001
+From: Nathan Chancellor <natechancellor@gmail.com>
+Date: Sun, 11 Aug 2019 20:13:45 -0700
+Subject: [PATCH 02/24] net: tc35815: Explicitly check NET_IP_ALIGN is not zero
+ in tc35815_rx
+
+[ Upstream commit 125b7e0949d4e72b15c2b1a1590f8cece985a918 ]
+
+clang warns:
+
+drivers/net/ethernet/toshiba/tc35815.c:1507:30: warning: use of logical
+'&&' with constant operand [-Wconstant-logical-operand]
+                        if (!HAVE_DMA_RXALIGN(lp) && NET_IP_ALIGN)
+                                                  ^  ~~~~~~~~~~~~
+drivers/net/ethernet/toshiba/tc35815.c:1507:30: note: use '&' for a
+bitwise operation
+                        if (!HAVE_DMA_RXALIGN(lp) && NET_IP_ALIGN)
+                                                  ^~
+                                                  &
+drivers/net/ethernet/toshiba/tc35815.c:1507:30: note: remove constant to
+silence this warning
+                        if (!HAVE_DMA_RXALIGN(lp) && NET_IP_ALIGN)
+                                                 ~^~~~~~~~~~~~~~~
+1 warning generated.
+
+Explicitly check that NET_IP_ALIGN is not zero, which matches how this
+is checked in other parts of the tree. Because NET_IP_ALIGN is a build
+time constant, this check will be constant folded away during
+optimization.
+
+Fixes: 82a9928db560 ("tc35815: Enable StripCRC feature")
+Link: https://github.com/ClangBuiltLinux/linux/issues/608
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/toshiba/tc35815.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git drivers/net/ethernet/toshiba/tc35815.c drivers/net/ethernet/toshiba/tc35815.c
+index 45ac38d29ed8..868fb6306df0 100644
+--- drivers/net/ethernet/toshiba/tc35815.c
++++ drivers/net/ethernet/toshiba/tc35815.c
+@@ -1528,7 +1528,7 @@ tc35815_rx(struct net_device *dev, int limit)
+ 			pci_unmap_single(lp->pci_dev,
+ 					 lp->rx_skbs[cur_bd].skb_dma,
+ 					 RX_BUF_SIZE, PCI_DMA_FROMDEVICE);
+-			if (!HAVE_DMA_RXALIGN(lp) && NET_IP_ALIGN)
++			if (!HAVE_DMA_RXALIGN(lp) && NET_IP_ALIGN != 0)
+ 				memmove(skb->data, skb->data - NET_IP_ALIGN,
+ 					pkt_len);
+ 			data = skb_put(skb, pkt_len);
+-- 
+2.30.2
+
+
+From 5694f0d1cb10e9b9faaf47ba5b21f1d664f3a3ba Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Tue, 9 Jul 2019 15:44:50 -0700
+Subject: [PATCH 03/24] Bluetooth: btqca: Add a short delay before downloading
+ the NVM
+
+[ Upstream commit 8059ba0bd0e4694e51c2ee6438a77b325f06c0d5 ]
+
+On WCN3990 downloading the NVM sometimes fails with a "TLV response
+size mismatch" error:
+
+[  174.949955] Bluetooth: btqca.c:qca_download_firmware() hci0: QCA Downloading qca/crnv21.bin
+[  174.958718] Bluetooth: btqca.c:qca_tlv_send_segment() hci0: QCA TLV response size mismatch
+
+It seems the controller needs a short time after downloading the
+firmware before it is ready for the NVM. A delay as short as 1 ms
+seems sufficient, make it 10 ms just in case. No event is received
+during the delay, hence we don't just silently drop an extra event.
+
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/bluetooth/btqca.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git drivers/bluetooth/btqca.c drivers/bluetooth/btqca.c
+index 4a6208168850..593fc2a5be0f 100644
+--- drivers/bluetooth/btqca.c
++++ drivers/bluetooth/btqca.c
+@@ -363,6 +363,9 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
+ 		return err;
+ 	}
+ 
++	/* Give the controller some time to get ready to receive the NVM */
++	msleep(10);
++
+ 	/* Download NVM configuration */
+ 	config.type = TLV_TYPE_NVM;
+ 	snprintf(config.fwname, sizeof(config.fwname), "qca/nvm_%08x.bin",
+-- 
+2.30.2
+
+
+From da5cc03c7562d25a3b66c748b845d9717d6d22b3 Mon Sep 17 00:00:00 2001
+From: Thomas Falcon <tlfalcon@linux.ibm.com>
+Date: Mon, 12 Aug 2019 16:13:06 -0500
+Subject: [PATCH 04/24] ibmveth: Convert multicast list size for little-endian
+ system
+
+[ Upstream commit 66cf4710b23ab2adda11155684a2c8826f4fe732 ]
+
+The ibm,mac-address-filters property defines the maximum number of
+addresses the hypervisor's multicast filter list can support. It is
+encoded as a big-endian integer in the OF device tree, but the virtual
+ethernet driver does not convert it for use by little-endian systems.
+As a result, the driver is not behaving as it should on affected systems
+when a large number of multicast addresses are assigned to the device.
+
+Reported-by: Hangbin Liu <liuhangbin@gmail.com>
+Signed-off-by: Thomas Falcon <tlfalcon@linux.ibm.com>
+Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/ibm/ibmveth.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git drivers/net/ethernet/ibm/ibmveth.c drivers/net/ethernet/ibm/ibmveth.c
+index 70b3253e7ed5..b46fc37c1a94 100644
+--- drivers/net/ethernet/ibm/ibmveth.c
++++ drivers/net/ethernet/ibm/ibmveth.c
+@@ -1555,7 +1555,7 @@ static int ibmveth_probe(struct vio_dev *dev, const struct vio_device_id *id)
+ 	struct net_device *netdev;
+ 	struct ibmveth_adapter *adapter;
+ 	unsigned char *mac_addr_p;
+-	unsigned int *mcastFilterSize_p;
++	__be32 *mcastFilterSize_p;
+ 	long ret;
+ 	unsigned long ret_attr;
+ 
+@@ -1577,8 +1577,9 @@ static int ibmveth_probe(struct vio_dev *dev, const struct vio_device_id *id)
+ 		return -EINVAL;
+ 	}
+ 
+-	mcastFilterSize_p = (unsigned int *)vio_get_attribute(dev,
+-						VETH_MCAST_FILTER_SIZE, NULL);
++	mcastFilterSize_p = (__be32 *)vio_get_attribute(dev,
++							VETH_MCAST_FILTER_SIZE,
++							NULL);
+ 	if (!mcastFilterSize_p) {
+ 		dev_err(&dev->dev, "Can't find VETH_MCAST_FILTER_SIZE "
+ 			"attribute\n");
+@@ -1595,7 +1596,7 @@ static int ibmveth_probe(struct vio_dev *dev, const struct vio_device_id *id)
+ 
+ 	adapter->vdev = dev;
+ 	adapter->netdev = netdev;
+-	adapter->mcastFilterSize = *mcastFilterSize_p;
++	adapter->mcastFilterSize = be32_to_cpu(*mcastFilterSize_p);
+ 	adapter->pool_config = 0;
+ 
+ 	netif_napi_add(netdev, &adapter->napi, ibmveth_poll, 16);
+-- 
+2.30.2
+
+
+From f46a46a9de0f1e005f64ade70336f9505a067a6e Mon Sep 17 00:00:00 2001
+From: YueHaibing <yuehaibing@huawei.com>
+Date: Wed, 31 Jul 2019 20:38:14 +0800
+Subject: [PATCH 05/24] gpio: Fix build error of function redefinition
+
+[ Upstream commit 68e03b85474a51ec1921b4d13204782594ef7223 ]
+
+when do randbuilding, I got this error:
+
+In file included from drivers/hwmon/pmbus/ucd9000.c:19:0:
+./include/linux/gpio/driver.h:576:1: error: redefinition of gpiochip_add_pin_range
+ gpiochip_add_pin_range(struct gpio_chip *chip, const char *pinctl_name,
+ ^~~~~~~~~~~~~~~~~~~~~~
+In file included from drivers/hwmon/pmbus/ucd9000.c:18:0:
+./include/linux/gpio.h:245:1: note: previous definition of gpiochip_add_pin_range was here
+ gpiochip_add_pin_range(struct gpio_chip *chip, const char *pinctl_name,
+ ^~~~~~~~~~~~~~~~~~~~~~
+
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: 964cb341882f ("gpio: move pincontrol calls to <linux/gpio/driver.h>")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Link: https://lore.kernel.org/r/20190731123814.46624-1-yuehaibing@huawei.com
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/linux/gpio.h | 24 ------------------------
+ 1 file changed, 24 deletions(-)
+
+diff --git include/linux/gpio.h include/linux/gpio.h
+index d12b5d566e4b..11555bd821b7 100644
+--- include/linux/gpio.h
++++ include/linux/gpio.h
+@@ -229,30 +229,6 @@ static inline int irq_to_gpio(unsigned irq)
+ 	return -EINVAL;
+ }
+ 
+-static inline int
+-gpiochip_add_pin_range(struct gpio_chip *chip, const char *pinctl_name,
+-		       unsigned int gpio_offset, unsigned int pin_offset,
+-		       unsigned int npins)
+-{
+-	WARN_ON(1);
+-	return -EINVAL;
+-}
+-
+-static inline int
+-gpiochip_add_pingroup_range(struct gpio_chip *chip,
+-			struct pinctrl_dev *pctldev,
+-			unsigned int gpio_offset, const char *pin_group)
+-{
+-	WARN_ON(1);
+-	return -EINVAL;
+-}
+-
+-static inline void
+-gpiochip_remove_pin_ranges(struct gpio_chip *chip)
+-{
+-	WARN_ON(1);
+-}
+-
+ static inline int devm_gpio_request(struct device *dev, unsigned gpio,
+ 				    const char *label)
+ {
+-- 
+2.30.2
+
+
+From fa6d2679e5cac2fd5ece39c8edb5f503064c5fcd Mon Sep 17 00:00:00 2001
+From: Wenwen Wang <wenwen@cs.uga.edu>
+Date: Tue, 13 Aug 2019 04:18:52 -0500
+Subject: [PATCH 06/24] cxgb4: fix a memory leak bug
+
+[ Upstream commit c554336efa9bbc28d6ec14efbee3c7d63c61a34f ]
+
+In blocked_fl_write(), 't' is not deallocated if bitmap_parse_user() fails,
+leading to a memory leak bug. To fix this issue, free t before returning
+the error.
+
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c
+index 4269944c5db5..129d6095749a 100644
+--- drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c
++++ drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c
+@@ -2673,8 +2673,10 @@ static ssize_t blocked_fl_write(struct file *filp, const char __user *ubuf,
+ 		return -ENOMEM;
+ 
+ 	err = bitmap_parse_user(ubuf, count, t, adap->sge.egr_sz);
+-	if (err)
++	if (err) {
++		kvfree(t);
+ 		return err;
++	}
+ 
+ 	bitmap_copy(adap->sge.blocked_fl, t, adap->sge.egr_sz);
+ 	t4_free_mem(t);
+-- 
+2.30.2
+
+
+From f6f3170c57da89158b1aa920fc547f481d278480 Mon Sep 17 00:00:00 2001
+From: Wenwen Wang <wenwen@cs.uga.edu>
+Date: Wed, 14 Aug 2019 01:38:39 -0500
+Subject: [PATCH 07/24] net: myri10ge: fix memory leaks
+
+[ Upstream commit 20fb7c7a39b5c719e2e619673b5f5729ee7d2306 ]
+
+In myri10ge_probe(), myri10ge_alloc_slices() is invoked to allocate slices
+related structures. Later on, myri10ge_request_irq() is used to get an irq.
+However, if this process fails, the allocated slices related structures are
+not deallocated, leading to memory leaks. To fix this issue, revise the
+target label of the goto statement to 'abort_with_slices'.
+
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/myricom/myri10ge/myri10ge.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git drivers/net/ethernet/myricom/myri10ge/myri10ge.c drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+index 83651ac8ddb9..8ebf3611aba3 100644
+--- drivers/net/ethernet/myricom/myri10ge/myri10ge.c
++++ drivers/net/ethernet/myricom/myri10ge/myri10ge.c
+@@ -4114,7 +4114,7 @@ static int myri10ge_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	 * setup (if available). */
+ 	status = myri10ge_request_irq(mgp);
+ 	if (status != 0)
+-		goto abort_with_firmware;
++		goto abort_with_slices;
+ 	myri10ge_free_irq(mgp);
+ 
+ 	/* Save configuration space to be restored if the
+-- 
+2.30.2
+
+
+From 2d28afe7a79edf0f2afd1005d9c2a83fab1a1ab6 Mon Sep 17 00:00:00 2001
+From: Wenwen Wang <wenwen@cs.uga.edu>
+Date: Wed, 14 Aug 2019 13:03:38 -0500
+Subject: [PATCH 08/24] cx82310_eth: fix a memory leak bug
+
+[ Upstream commit 1eca92eef18719027d394bf1a2d276f43e7cf886 ]
+
+In cx82310_bind(), 'dev->partial_data' is allocated through kmalloc().
+Then, the execution waits for the firmware to become ready. If the firmware
+is not ready in time, the execution is terminated. However, the allocated
+'dev->partial_data' is not deallocated on this path, leading to a memory
+leak bug. To fix this issue, free 'dev->partial_data' before returning the
+error.
+
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/usb/cx82310_eth.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git drivers/net/usb/cx82310_eth.c drivers/net/usb/cx82310_eth.c
+index 947bea81d924..dfbdea22fbad 100644
+--- drivers/net/usb/cx82310_eth.c
++++ drivers/net/usb/cx82310_eth.c
+@@ -175,7 +175,8 @@ static int cx82310_bind(struct usbnet *dev, struct usb_interface *intf)
+ 	}
+ 	if (!timeout) {
+ 		dev_err(&udev->dev, "firmware not ready in time\n");
+-		return -ETIMEDOUT;
++		ret = -ETIMEDOUT;
++		goto err;
+ 	}
+ 
+ 	/* enable ethernet mode (?) */
+-- 
+2.30.2
+
+
+From 1b25f01d604ed86d379420f038c91555faef0afc Mon Sep 17 00:00:00 2001
+From: Wenwen Wang <wenwen@cs.uga.edu>
+Date: Wed, 14 Aug 2019 13:56:43 -0500
+Subject: [PATCH 09/24] net: kalmia: fix memory leaks
+
+[ Upstream commit f1472cb09f11ddb41d4be84f0650835cb65a9073 ]
+
+In kalmia_init_and_get_ethernet_addr(), 'usb_buf' is allocated through
+kmalloc(). In the following execution, if the 'status' returned by
+kalmia_send_init_packet() is not 0, 'usb_buf' is not deallocated, leading
+to memory leaks. To fix this issue, add the 'out' label to free 'usb_buf'.
+
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/usb/kalmia.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git drivers/net/usb/kalmia.c drivers/net/usb/kalmia.c
+index 5662babf0583..d385b67258c7 100644
+--- drivers/net/usb/kalmia.c
++++ drivers/net/usb/kalmia.c
+@@ -117,16 +117,16 @@ kalmia_init_and_get_ethernet_addr(struct usbnet *dev, u8 *ethernet_addr)
+ 	status = kalmia_send_init_packet(dev, usb_buf, sizeof(init_msg_1)
+ 		/ sizeof(init_msg_1[0]), usb_buf, 24);
+ 	if (status != 0)
+-		return status;
++		goto out;
+ 
+ 	memcpy(usb_buf, init_msg_2, 12);
+ 	status = kalmia_send_init_packet(dev, usb_buf, sizeof(init_msg_2)
+ 		/ sizeof(init_msg_2[0]), usb_buf, 28);
+ 	if (status != 0)
+-		return status;
++		goto out;
+ 
+ 	memcpy(ethernet_addr, usb_buf + 10, ETH_ALEN);
+-
++out:
+ 	kfree(usb_buf);
+ 	return status;
+ }
+-- 
+2.30.2
+
+
+From 62b1e22efe3e6eb629d8a7130bf3e69ec86e6293 Mon Sep 17 00:00:00 2001
+From: Wenwen Wang <wenwen@cs.uga.edu>
+Date: Thu, 15 Aug 2019 15:29:51 -0500
+Subject: [PATCH 10/24] wimax/i2400m: fix a memory leak bug
+
+[ Upstream commit 44ef3a03252844a8753479b0cea7f29e4a804bdc ]
+
+In i2400m_barker_db_init(), 'options_orig' is allocated through kstrdup()
+to hold the original command line options. Then, the options are parsed.
+However, if an error occurs during the parsing process, 'options_orig' is
+not deallocated, leading to a memory leak bug. To fix this issue, free
+'options_orig' before returning the error.
+
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/wimax/i2400m/fw.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git drivers/net/wimax/i2400m/fw.c drivers/net/wimax/i2400m/fw.c
+index c9c711dcd0e6..0e6c665a4de8 100644
+--- drivers/net/wimax/i2400m/fw.c
++++ drivers/net/wimax/i2400m/fw.c
+@@ -351,13 +351,15 @@ int i2400m_barker_db_init(const char *_options)
+ 			}
+ 			result = i2400m_barker_db_add(barker);
+ 			if (result < 0)
+-				goto error_add;
++				goto error_parse_add;
+ 		}
+ 		kfree(options_orig);
+ 	}
+ 	return 0;
+ 
++error_parse_add:
+ error_parse:
++	kfree(options_orig);
+ error_add:
+ 	kfree(i2400m_barker_db);
+ 	return result;
+-- 
+2.30.2
+
+
+From bf3583e15956de79e9c37c5ca609434a04f8a224 Mon Sep 17 00:00:00 2001
+From: Tho Vu <tho.vu.wh@rvc.renesas.com>
+Date: Fri, 16 Aug 2019 17:17:02 +0200
+Subject: [PATCH 11/24] ravb: Fix use-after-free ravb_tstamp_skb
+
+[ Upstream commit cfef46d692efd852a0da6803f920cc756eea2855 ]
+
+When a Tx timestamp is requested, a pointer to the skb is stored in the
+ravb_tstamp_skb struct. This was done without an skb_get. There exists
+the possibility that the skb could be freed by ravb_tx_free (when
+ravb_tx_free is called from ravb_start_xmit) before the timestamp was
+processed, leading to a use-after-free bug.
+
+Use skb_get when filling a ravb_tstamp_skb struct, and add appropriate
+frees/consumes when a ravb_tstamp_skb struct is freed.
+
+Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+Signed-off-by: Tho Vu <tho.vu.wh@rvc.renesas.com>
+Signed-off-by: Kazuya Mizuguchi <kazuya.mizuguchi.ks@renesas.com>
+Signed-off-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git drivers/net/ethernet/renesas/ravb_main.c drivers/net/ethernet/renesas/ravb_main.c
+index 29d31eb995d7..fedfd94699cb 100644
+--- drivers/net/ethernet/renesas/ravb_main.c
++++ drivers/net/ethernet/renesas/ravb_main.c
+@@ -1,6 +1,6 @@
+ /* Renesas Ethernet AVB device driver
+  *
+- * Copyright (C) 2014-2015 Renesas Electronics Corporation
++ * Copyright (C) 2014-2019 Renesas Electronics Corporation
+  * Copyright (C) 2015 Renesas Solutions Corp.
+  * Copyright (C) 2015 Cogent Embedded, Inc. <source@cogentembedded.com>
+  *
+@@ -501,7 +501,10 @@ static void ravb_get_tx_tstamp(struct net_device *ndev)
+ 			kfree(ts_skb);
+ 			if (tag == tfa_tag) {
+ 				skb_tstamp_tx(skb, &shhwtstamps);
++				dev_consume_skb_any(skb);
+ 				break;
++			} else {
++				dev_kfree_skb_any(skb);
+ 			}
+ 		}
+ 		ravb_write(ndev, ravb_read(ndev, TCCR) | TCCR_TFR, TCCR);
+@@ -1382,7 +1385,7 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ 					 DMA_TO_DEVICE);
+ 			goto unmap;
+ 		}
+-		ts_skb->skb = skb;
++		ts_skb->skb = skb_get(skb);
+ 		ts_skb->tag = priv->ts_skb_tag++;
+ 		priv->ts_skb_tag &= 0x3ff;
+ 		list_add_tail(&ts_skb->list, &priv->ts_skb_list);
+@@ -1514,6 +1517,7 @@ static int ravb_close(struct net_device *ndev)
+ 	/* Clear the timestamp list */
+ 	list_for_each_entry_safe(ts_skb, ts_skb2, &priv->ts_skb_list, list) {
+ 		list_del(&ts_skb->list);
++		kfree_skb(ts_skb->skb);
+ 		kfree(ts_skb);
+ 	}
+ 
+-- 
+2.30.2
+
+
+From 6442370b5642d38c6f9ae8edb71d514aaa6c3dab Mon Sep 17 00:00:00 2001
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date: Mon, 19 Aug 2019 16:44:09 +0200
+Subject: [PATCH 12/24] Tools: hv: kvp: eliminate 'may be used uninitialized'
+ warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[ Upstream commit 89eb4d8d25722a0a0194cf7fa47ba602e32a6da7 ]
+
+When building hv_kvp_daemon GCC-8.3 complains:
+
+hv_kvp_daemon.c: In function ‘kvp_get_ip_info.constprop’:
+hv_kvp_daemon.c:812:30: warning: ‘ip_buffer’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  struct hv_kvp_ipaddr_value *ip_buffer;
+
+this seems to be a false positive: we only use ip_buffer when
+op == KVP_OP_GET_IP_INFO and it is only unset when op == KVP_OP_ENUMERATE.
+
+Silence the warning by initializing ip_buffer to NULL.
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ tools/hv/hv_kvp_daemon.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git tools/hv/hv_kvp_daemon.c tools/hv/hv_kvp_daemon.c
+index fffc7c418459..834008639c4b 100644
+--- tools/hv/hv_kvp_daemon.c
++++ tools/hv/hv_kvp_daemon.c
+@@ -878,7 +878,7 @@ kvp_get_ip_info(int family, char *if_name, int op,
+ 	int sn_offset = 0;
+ 	int error = 0;
+ 	char *buffer;
+-	struct hv_kvp_ipaddr_value *ip_buffer;
++	struct hv_kvp_ipaddr_value *ip_buffer = NULL;
+ 	char cidr_mask[5]; /* /xyz */
+ 	int weight;
+ 	int i;
+-- 
+2.30.2
+
+
+From bc68ba54a2d32e2e3eaf826159b1dc8878cb109b Mon Sep 17 00:00:00 2001
+From: Wenwen Wang <wenwen@cs.uga.edu>
+Date: Sun, 18 Aug 2019 15:23:01 -0500
+Subject: [PATCH 13/24] IB/mlx4: Fix memory leaks
+
+[ Upstream commit 5c1baaa82cea2c815a5180ded402a7cd455d1810 ]
+
+In mlx4_ib_alloc_pv_bufs(), 'tun_qp->tx_ring' is allocated through
+kcalloc(). However, it is not always deallocated in the following execution
+if an error occurs, leading to memory leaks. To fix this issue, free
+'tun_qp->tx_ring' whenever an error occurs.
+
+Signed-off-by: Wenwen Wang <wenwen@cs.uga.edu>
+Acked-by: Leon Romanovsky <leonro@mellanox.com>
+Link: https://lore.kernel.org/r/1566159781-4642-1-git-send-email-wenwen@cs.uga.edu
+Signed-off-by: Doug Ledford <dledford@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/infiniband/hw/mlx4/mad.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git drivers/infiniband/hw/mlx4/mad.c drivers/infiniband/hw/mlx4/mad.c
+index 199a9cdd0d12..531c985f6fd7 100644
+--- drivers/infiniband/hw/mlx4/mad.c
++++ drivers/infiniband/hw/mlx4/mad.c
+@@ -1526,8 +1526,6 @@ static int mlx4_ib_alloc_pv_bufs(struct mlx4_ib_demux_pv_ctx *ctx,
+ 				    tx_buf_size, DMA_TO_DEVICE);
+ 		kfree(tun_qp->tx_ring[i].buf.addr);
+ 	}
+-	kfree(tun_qp->tx_ring);
+-	tun_qp->tx_ring = NULL;
+ 	i = MLX4_NUM_TUNNEL_BUFS;
+ err:
+ 	while (i > 0) {
+@@ -1536,6 +1534,8 @@ static int mlx4_ib_alloc_pv_bufs(struct mlx4_ib_demux_pv_ctx *ctx,
+ 				    rx_buf_size, DMA_FROM_DEVICE);
+ 		kfree(tun_qp->ring[i].addr);
+ 	}
++	kfree(tun_qp->tx_ring);
++	tun_qp->tx_ring = NULL;
+ 	kfree(tun_qp->ring);
+ 	tun_qp->ring = NULL;
+ 	return -ENOMEM;
+-- 
+2.30.2
+
+
+From 1d86cb8d3204337e1853b84d69ea0f30dc0ba973 Mon Sep 17 00:00:00 2001
+From: Luis Henriques <lhenriques@suse.com>
+Date: Fri, 19 Jul 2019 15:32:20 +0100
+Subject: [PATCH 14/24] ceph: fix buffer free while holding i_ceph_lock in
+ __ceph_setxattr()
+
+[ Upstream commit 86968ef21596515958d5f0a40233d02be78ecec0 ]
+
+Calling ceph_buffer_put() in __ceph_setxattr() may end up freeing the
+i_xattrs.prealloc_blob buffer while holding the i_ceph_lock.  This can be
+fixed by postponing the call until later, when the lock is released.
+
+The following backtrace was triggered by fstests generic/117.
+
+  BUG: sleeping function called from invalid context at mm/vmalloc.c:2283
+  in_atomic(): 1, irqs_disabled(): 0, pid: 650, name: fsstress
+  3 locks held by fsstress/650:
+   #0: 00000000870a0fe8 (sb_writers#8){.+.+}, at: mnt_want_write+0x20/0x50
+   #1: 00000000ba0c4c74 (&type->i_mutex_dir_key#6){++++}, at: vfs_setxattr+0x55/0xa0
+   #2: 000000008dfbb3f2 (&(&ci->i_ceph_lock)->rlock){+.+.}, at: __ceph_setxattr+0x297/0x810
+  CPU: 1 PID: 650 Comm: fsstress Not tainted 5.2.0+ #437
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.1-0-ga5cab58-prebuilt.qemu.org 04/01/2014
+  Call Trace:
+   dump_stack+0x67/0x90
+   ___might_sleep.cold+0x9f/0xb1
+   vfree+0x4b/0x60
+   ceph_buffer_release+0x1b/0x60
+   __ceph_setxattr+0x2b4/0x810
+   __vfs_setxattr+0x66/0x80
+   __vfs_setxattr_noperm+0x59/0xf0
+   vfs_setxattr+0x81/0xa0
+   setxattr+0x115/0x230
+   ? filename_lookup+0xc9/0x140
+   ? rcu_read_lock_sched_held+0x74/0x80
+   ? rcu_sync_lockdep_assert+0x2e/0x60
+   ? __sb_start_write+0x142/0x1a0
+   ? mnt_want_write+0x20/0x50
+   path_setxattr+0xba/0xd0
+   __x64_sys_lsetxattr+0x24/0x30
+   do_syscall_64+0x50/0x1c0
+   entry_SYSCALL_64_after_hwframe+0x49/0xbe
+  RIP: 0033:0x7ff23514359a
+
+Signed-off-by: Luis Henriques <lhenriques@suse.com>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/ceph/xattr.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git fs/ceph/xattr.c fs/ceph/xattr.c
+index b24275ef97f7..22e5f3432abb 100644
+--- fs/ceph/xattr.c
++++ fs/ceph/xattr.c
+@@ -916,6 +916,7 @@ int __ceph_setxattr(struct dentry *dentry, const char *name,
+ 	struct ceph_inode_info *ci = ceph_inode(inode);
+ 	struct ceph_mds_client *mdsc = ceph_sb_to_client(dentry->d_sb)->mdsc;
+ 	struct ceph_cap_flush *prealloc_cf = NULL;
++	struct ceph_buffer *old_blob = NULL;
+ 	int issued;
+ 	int err;
+ 	int dirty = 0;
+@@ -984,13 +985,15 @@ int __ceph_setxattr(struct dentry *dentry, const char *name,
+ 		struct ceph_buffer *blob;
+ 
+ 		spin_unlock(&ci->i_ceph_lock);
+-		dout(" preaallocating new blob size=%d\n", required_blob_size);
++		ceph_buffer_put(old_blob); /* Shouldn't be required */
++		dout(" pre-allocating new blob size=%d\n", required_blob_size);
+ 		blob = ceph_buffer_new(required_blob_size, GFP_NOFS);
+ 		if (!blob)
+ 			goto do_sync_unlocked;
+ 		spin_lock(&ci->i_ceph_lock);
++		/* prealloc_blob can't be released while holding i_ceph_lock */
+ 		if (ci->i_xattrs.prealloc_blob)
+-			ceph_buffer_put(ci->i_xattrs.prealloc_blob);
++			old_blob = ci->i_xattrs.prealloc_blob;
+ 		ci->i_xattrs.prealloc_blob = blob;
+ 		goto retry;
+ 	}
+@@ -1006,6 +1009,7 @@ int __ceph_setxattr(struct dentry *dentry, const char *name,
+ 	}
+ 
+ 	spin_unlock(&ci->i_ceph_lock);
++	ceph_buffer_put(old_blob);
+ 	if (lock_snap_rwsem)
+ 		up_read(&mdsc->snap_rwsem);
+ 	if (dirty)
+-- 
+2.30.2
+
+
+From bce83d9ccca56b9ea9b7cd88499681d10d5062ea Mon Sep 17 00:00:00 2001
+From: Andrew Jones <drjones@redhat.com>
+Date: Thu, 22 Aug 2019 13:03:05 +0200
+Subject: [PATCH 15/24] KVM: arm/arm64: Only skip MMIO insn once
+
+[ Upstream commit 2113c5f62b7423e4a72b890bd479704aa85c81ba ]
+
+If after an MMIO exit to userspace a VCPU is immediately run with an
+immediate_exit request, such as when a signal is delivered or an MMIO
+emulation completion is needed, then the VCPU completes the MMIO
+emulation and immediately returns to userspace. As the exit_reason
+does not get changed from KVM_EXIT_MMIO in these cases we have to
+be careful not to complete the MMIO emulation again, when the VCPU is
+eventually run again, because the emulation does an instruction skip
+(and doing too many skips would be a waste of guest code :-) We need
+to use additional VCPU state to track if the emulation is complete.
+As luck would have it, we already have 'mmio_needed', which even
+appears to be used in this way by other architectures already.
+
+Fixes: 0d640732dbeb ("arm64: KVM: Skip MMIO insn after emulation")
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/arm/kvm/mmio.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git arch/arm/kvm/mmio.c arch/arm/kvm/mmio.c
+index ae61e2ea7255..d2efc033ef8b 100644
+--- arch/arm/kvm/mmio.c
++++ arch/arm/kvm/mmio.c
+@@ -98,6 +98,12 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	unsigned int len;
+ 	int mask;
+ 
++	/* Detect an already handled MMIO return */
++	if (unlikely(!vcpu->mmio_needed))
++		return 0;
++
++	vcpu->mmio_needed = 0;
++
+ 	if (!run->mmio.is_write) {
+ 		len = run->mmio.len;
+ 		if (len > sizeof(unsigned long))
+@@ -206,6 +212,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	run->mmio.is_write	= is_write;
+ 	run->mmio.phys_addr	= fault_ipa;
+ 	run->mmio.len		= len;
++	vcpu->mmio_needed	= 1;
+ 
+ 	if (!ret) {
+ 		/* We handled the access successfully in the kernel. */
+-- 
+2.30.2
+
+
+From c3083eff1b1b3bdae7389ff0e2fb7ae9423561e4 Mon Sep 17 00:00:00 2001
+From: Luis Henriques <lhenriques@suse.com>
+Date: Fri, 19 Jul 2019 15:32:19 +0100
+Subject: [PATCH 16/24] libceph: allow ceph_buffer_put() to receive a NULL
+ ceph_buffer
+
+[ Upstream commit 5c498950f730aa17c5f8a2cdcb903524e4002ed2 ]
+
+Signed-off-by: Luis Henriques <lhenriques@suse.com>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/linux/ceph/buffer.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git include/linux/ceph/buffer.h include/linux/ceph/buffer.h
+index 07ca15e76100..dada47a4360f 100644
+--- include/linux/ceph/buffer.h
++++ include/linux/ceph/buffer.h
+@@ -29,7 +29,8 @@ static inline struct ceph_buffer *ceph_buffer_get(struct ceph_buffer *b)
+ 
+ static inline void ceph_buffer_put(struct ceph_buffer *b)
+ {
+-	kref_put(&b->kref, ceph_buffer_release);
++	if (b)
++		kref_put(&b->kref, ceph_buffer_release);
+ }
+ 
+ extern int ceph_decode_buffer(struct ceph_buffer **b, void **p, void *end);
+-- 
+2.30.2
+
+
+From c99ad4f20c5b4d550745e1beaeaa24ed2cf873ba Mon Sep 17 00:00:00 2001
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 3 May 2018 13:09:44 -0500
+Subject: [PATCH 17/24] spi: bcm2835aux: ensure interrupts are enabled for
+ shared handler
+
+[ Upstream commit bc519d9574618e47a0c788000fb78da95e18d953 ]
+
+The BCM2835 AUX SPI has a shared interrupt line (with AUX UART).
+Downstream fixes this with an AUX irqchip to demux the IRQ sources and a
+DT change which breaks compatibility with older kernels. The AUX irqchip
+was already rejected for upstream[1] and the DT change would break
+working systems if the DTB is updated to a newer one. The latter issue
+was brought to my attention by Alex Graf.
+
+The root cause however is a bug in the shared handler. Shared handlers
+must check that interrupts are actually enabled before servicing the
+interrupt. Add a check that the TXEMPTY or IDLE interrupts are enabled.
+
+[1] https://patchwork.kernel.org/patch/9781221/
+
+Cc: Alexander Graf <agraf@suse.de>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Eric Anholt <eric@anholt.net>
+Cc: Stefan Wahren <stefan.wahren@i2se.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Ray Jui <rjui@broadcom.com>
+Cc: Scott Branden <sbranden@broadcom.com>
+Cc: bcm-kernel-feedback-list@broadcom.com
+Cc: linux-spi@vger.kernel.org
+Cc: linux-rpi-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org
+Signed-off-by: Rob Herring <robh@kernel.org>
+Reviewed-by: Eric Anholt <eric@anholt.net>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/spi/spi-bcm2835aux.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git drivers/spi/spi-bcm2835aux.c drivers/spi/spi-bcm2835aux.c
+index 7de6f8472a81..6f4c6aa801f1 100644
+--- drivers/spi/spi-bcm2835aux.c
++++ drivers/spi/spi-bcm2835aux.c
+@@ -187,6 +187,11 @@ static irqreturn_t bcm2835aux_spi_interrupt(int irq, void *dev_id)
+ 	struct bcm2835aux_spi *bs = spi_master_get_devdata(master);
+ 	irqreturn_t ret = IRQ_NONE;
+ 
++	/* IRQ may be shared, so return if our interrupts are disabled */
++	if (!(bcm2835aux_rd(bs, BCM2835_AUX_SPI_CNTL1) &
++	      (BCM2835_AUX_SPI_CNTL1_TXEMPTY | BCM2835_AUX_SPI_CNTL1_IDLE)))
++		return ret;
++
+ 	/* check if we have data to read */
+ 	while (bs->rx_len &&
+ 	       (!(bcm2835aux_rd(bs, BCM2835_AUX_SPI_STAT) &
+-- 
+2.30.2
+
+
+From 5473cd1dbf972ff06d89400d42973eb31c72dec1 Mon Sep 17 00:00:00 2001
+From: Martin Sperl <kernel@martin.sperl.org>
+Date: Sat, 30 Mar 2019 09:30:58 +0000
+Subject: [PATCH 18/24] spi: bcm2835aux: unifying code between polling and
+ interrupt driven code
+
+[ Upstream commit 7188a6f0eee3f1fae5d826cfc6d569657ff950ec ]
+
+Sharing more code between polling and interrupt-driven mode.
+
+Signed-off-by: Martin Sperl <kernel@martin.sperl.org>
+Acked-by: Stefan Wahren <stefan.wahren@i2se.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/spi/spi-bcm2835aux.c | 51 +++++++++++++-----------------------
+ 1 file changed, 18 insertions(+), 33 deletions(-)
+
+diff --git drivers/spi/spi-bcm2835aux.c drivers/spi/spi-bcm2835aux.c
+index 6f4c6aa801f1..5b2c2b2e1339 100644
+--- drivers/spi/spi-bcm2835aux.c
++++ drivers/spi/spi-bcm2835aux.c
+@@ -181,23 +181,13 @@ static void bcm2835aux_spi_reset_hw(struct bcm2835aux_spi *bs)
+ 		      BCM2835_AUX_SPI_CNTL0_CLEARFIFO);
+ }
+ 
+-static irqreturn_t bcm2835aux_spi_interrupt(int irq, void *dev_id)
++static void bcm2835aux_spi_transfer_helper(struct bcm2835aux_spi *bs)
+ {
+-	struct spi_master *master = dev_id;
+-	struct bcm2835aux_spi *bs = spi_master_get_devdata(master);
+-	irqreturn_t ret = IRQ_NONE;
+-
+-	/* IRQ may be shared, so return if our interrupts are disabled */
+-	if (!(bcm2835aux_rd(bs, BCM2835_AUX_SPI_CNTL1) &
+-	      (BCM2835_AUX_SPI_CNTL1_TXEMPTY | BCM2835_AUX_SPI_CNTL1_IDLE)))
+-		return ret;
+-
+ 	/* check if we have data to read */
+ 	while (bs->rx_len &&
+ 	       (!(bcm2835aux_rd(bs, BCM2835_AUX_SPI_STAT) &
+ 		  BCM2835_AUX_SPI_STAT_RX_EMPTY))) {
+ 		bcm2835aux_rd_fifo(bs);
+-		ret = IRQ_HANDLED;
+ 	}
+ 
+ 	/* check if we have data to write */
+@@ -206,7 +196,6 @@ static irqreturn_t bcm2835aux_spi_interrupt(int irq, void *dev_id)
+ 	       (!(bcm2835aux_rd(bs, BCM2835_AUX_SPI_STAT) &
+ 		  BCM2835_AUX_SPI_STAT_TX_FULL))) {
+ 		bcm2835aux_wr_fifo(bs);
+-		ret = IRQ_HANDLED;
+ 	}
+ 
+ 	/* and check if we have reached "done" */
+@@ -214,8 +203,21 @@ static irqreturn_t bcm2835aux_spi_interrupt(int irq, void *dev_id)
+ 	       (!(bcm2835aux_rd(bs, BCM2835_AUX_SPI_STAT) &
+ 		  BCM2835_AUX_SPI_STAT_BUSY))) {
+ 		bcm2835aux_rd_fifo(bs);
+-		ret = IRQ_HANDLED;
+ 	}
++}
++
++static irqreturn_t bcm2835aux_spi_interrupt(int irq, void *dev_id)
++{
++	struct spi_master *master = dev_id;
++	struct bcm2835aux_spi *bs = spi_master_get_devdata(master);
++
++	/* IRQ may be shared, so return if our interrupts are disabled */
++	if (!(bcm2835aux_rd(bs, BCM2835_AUX_SPI_CNTL1) &
++	      (BCM2835_AUX_SPI_CNTL1_TXEMPTY | BCM2835_AUX_SPI_CNTL1_IDLE)))
++		return IRQ_NONE;
++
++	/* do common fifo handling */
++	bcm2835aux_spi_transfer_helper(bs);
+ 
+ 	/* and if rx_len is 0 then wake up completion and disable spi */
+ 	if (!bs->rx_len) {
+@@ -223,8 +225,7 @@ static irqreturn_t bcm2835aux_spi_interrupt(int irq, void *dev_id)
+ 		complete(&master->xfer_completion);
+ 	}
+ 
+-	/* and return */
+-	return ret;
++	return IRQ_HANDLED;
+ }
+ 
+ static int __bcm2835aux_spi_transfer_one_irq(struct spi_master *master,
+@@ -270,7 +271,6 @@ static int bcm2835aux_spi_transfer_one_poll(struct spi_master *master,
+ {
+ 	struct bcm2835aux_spi *bs = spi_master_get_devdata(master);
+ 	unsigned long timeout;
+-	u32 stat;
+ 
+ 	/* configure spi */
+ 	bcm2835aux_wr(bs, BCM2835_AUX_SPI_CNTL1, bs->cntl[1]);
+@@ -281,24 +281,9 @@ static int bcm2835aux_spi_transfer_one_poll(struct spi_master *master,
+ 
+ 	/* loop until finished the transfer */
+ 	while (bs->rx_len) {
+-		/* read status */
+-		stat = bcm2835aux_rd(bs, BCM2835_AUX_SPI_STAT);
+-
+-		/* fill in tx fifo with remaining data */
+-		if ((bs->tx_len) && (!(stat & BCM2835_AUX_SPI_STAT_TX_FULL))) {
+-			bcm2835aux_wr_fifo(bs);
+-			continue;
+-		}
+ 
+-		/* read data from fifo for both cases */
+-		if (!(stat & BCM2835_AUX_SPI_STAT_RX_EMPTY)) {
+-			bcm2835aux_rd_fifo(bs);
+-			continue;
+-		}
+-		if (!(stat & BCM2835_AUX_SPI_STAT_BUSY)) {
+-			bcm2835aux_rd_fifo(bs);
+-			continue;
+-		}
++		/* do common fifo handling */
++		bcm2835aux_spi_transfer_helper(bs);
+ 
+ 		/* there is still data pending to read check the timeout */
+ 		if (bs->rx_len && time_after(jiffies, timeout)) {
+-- 
+2.30.2
+
+
+From b2f16660fc8687febdc133f9b5082482f2a280fc Mon Sep 17 00:00:00 2001
+From: Martin Sperl <kernel@martin.sperl.org>
+Date: Sat, 30 Mar 2019 09:30:59 +0000
+Subject: [PATCH 19/24] spi: bcm2835aux: remove dangerous uncontrolled read of
+ fifo
+
+[ Upstream commit c7de8500fd8ecbb544846dd5f11dca578c3777e1 ]
+
+This read of the fifo is a potential candidate for a race condition
+as the spi transfer is not necessarily finished and so can lead to
+an early read of the fifo that still misses data.
+
+So it has been removed.
+
+Fixes: 1ea29b39f4c812ec ("spi: bcm2835aux: add bcm2835 auxiliary spi device...")
+Suggested-by: Hubert Denkmair <h.denkmair@intence.de>
+Signed-off-by: Martin Sperl <kernel@martin.sperl.org>
+Acked-by: Stefan Wahren <stefan.wahren@i2se.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/spi/spi-bcm2835aux.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git drivers/spi/spi-bcm2835aux.c drivers/spi/spi-bcm2835aux.c
+index 5b2c2b2e1339..4d233356772a 100644
+--- drivers/spi/spi-bcm2835aux.c
++++ drivers/spi/spi-bcm2835aux.c
+@@ -197,13 +197,6 @@ static void bcm2835aux_spi_transfer_helper(struct bcm2835aux_spi *bs)
+ 		  BCM2835_AUX_SPI_STAT_TX_FULL))) {
+ 		bcm2835aux_wr_fifo(bs);
+ 	}
+-
+-	/* and check if we have reached "done" */
+-	while (bs->rx_len &&
+-	       (!(bcm2835aux_rd(bs, BCM2835_AUX_SPI_STAT) &
+-		  BCM2835_AUX_SPI_STAT_BUSY))) {
+-		bcm2835aux_rd_fifo(bs);
+-	}
+ }
+ 
+ static irqreturn_t bcm2835aux_spi_interrupt(int irq, void *dev_id)
+-- 
+2.30.2
+
+
+From e187a57fc653cfc3016875b80f53f78af4eac172 Mon Sep 17 00:00:00 2001
+From: Martin Sperl <kernel@martin.sperl.org>
+Date: Sat, 30 Mar 2019 09:31:00 +0000
+Subject: [PATCH 20/24] spi: bcm2835aux: fix corruptions for longer spi
+ transfers
+
+[ Upstream commit 73b114ee7db1750c0b535199fae383b109bd61d0 ]
+
+On long running tests with a mcp2517fd can controller it showed that
+on rare occations the data read shows corruptions for longer spi transfers.
+
+Example of a 22 byte transfer:
+
+expected (as captured on logic analyzer):
+FF FF 78 00 00 00 08 06 00 00 91 20 77 56 84 85 86 87 88 89 8a 8b
+
+read by the driver:
+FF FF 78 00 00 00 08 06 00 00 91 20 77 56 84 88 89 8a 00 00 8b 9b
+
+To fix this use BCM2835_AUX_SPI_STAT_RX_LVL to determine when we may
+read data from the fifo reliably without any corruption.
+
+Surprisingly the only values ever empirically read in
+BCM2835_AUX_SPI_STAT_RX_LVL are 0x00, 0x10, 0x20 and 0x30.
+So whenever the mask is not 0 we can read from the fifo in a safe manner.
+
+The patch has now been tested intensively and we are no longer
+able to reproduce the "RX" issue any longer.
+
+Fixes: 1ea29b39f4c812ec ("spi: bcm2835aux: add bcm2835 auxiliary spi device...")
+Reported-by: Hubert Denkmair <h.denkmair@intence.de>
+Signed-off-by: Martin Sperl <kernel@martin.sperl.org>
+Acked-by: Stefan Wahren <stefan.wahren@i2se.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/spi/spi-bcm2835aux.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git drivers/spi/spi-bcm2835aux.c drivers/spi/spi-bcm2835aux.c
+index 4d233356772a..ca655593c5e0 100644
+--- drivers/spi/spi-bcm2835aux.c
++++ drivers/spi/spi-bcm2835aux.c
+@@ -183,12 +183,12 @@ static void bcm2835aux_spi_reset_hw(struct bcm2835aux_spi *bs)
+ 
+ static void bcm2835aux_spi_transfer_helper(struct bcm2835aux_spi *bs)
+ {
++	u32 stat = bcm2835aux_rd(bs, BCM2835_AUX_SPI_STAT);
++
+ 	/* check if we have data to read */
+-	while (bs->rx_len &&
+-	       (!(bcm2835aux_rd(bs, BCM2835_AUX_SPI_STAT) &
+-		  BCM2835_AUX_SPI_STAT_RX_EMPTY))) {
++	for (; bs->rx_len && (stat & BCM2835_AUX_SPI_STAT_RX_LVL);
++	     stat = bcm2835aux_rd(bs, BCM2835_AUX_SPI_STAT))
+ 		bcm2835aux_rd_fifo(bs);
+-	}
+ 
+ 	/* check if we have data to write */
+ 	while (bs->tx_len &&
+-- 
+2.30.2
+
+
+From 94eb5357f6d688b364eaf52d4f7fa187102396a7 Mon Sep 17 00:00:00 2001
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 7 Sep 2019 14:25:54 -0700
+Subject: [PATCH 21/24] Revert "x86/apic: Include the LDR when clearing out
+ APIC registers"
+
+[ Upstream commit 950b07c14e8c59444e2359f15fd70ed5112e11a0 ]
+
+This reverts commit 558682b5291937a70748d36fd9ba757fb25b99ae.
+
+Chris Wilson reports that it breaks his CPU hotplug test scripts.  In
+particular, it breaks offlining and then re-onlining the boot CPU, which
+we treat specially (and the BIOS does too).
+
+The symptoms are that we can offline the CPU, but it then does not come
+back online again:
+
+    smpboot: CPU 0 is now offline
+    smpboot: Booting Node 0 Processor 0 APIC 0x0
+    smpboot: do_boot_cpu failed(-1) to wakeup CPU#0
+
+Thomas says he knows why it's broken (my personal suspicion: our magic
+handling of the "cpu0_logical_apicid" thing), but for 5.3 the right fix
+is to just revert it, since we've never touched the LDR bits before, and
+it's not worth the risk to do anything else at this stage.
+
+[ Hotpluging of the boot CPU is special anyway, and should be off by
+  default. See the "BOOTPARAM_HOTPLUG_CPU0" config option and the
+  cpu0_hotplug kernel parameter.
+
+  In general you should not do it, and it has various known limitations
+  (hibernate and suspend require the boot CPU, for example).
+
+  But it should work, even if the boot CPU is special and needs careful
+  treatment       - Linus ]
+
+Link: https://lore.kernel.org/lkml/156785100521.13300.14461504732265570003@skylake-alporthouse-com/
+Reported-by: Chris Wilson <chris@chris-wilson.co.uk>
+Acked-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Bandan Das <bsd@redhat.com>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/x86/kernel/apic/apic.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git arch/x86/kernel/apic/apic.c arch/x86/kernel/apic/apic.c
+index 80c94fc8ad5a..834d1b5b4355 100644
+--- arch/x86/kernel/apic/apic.c
++++ arch/x86/kernel/apic/apic.c
+@@ -1031,10 +1031,6 @@ void clear_local_APIC(void)
+ 	apic_write(APIC_LVT0, v | APIC_LVT_MASKED);
+ 	v = apic_read(APIC_LVT1);
+ 	apic_write(APIC_LVT1, v | APIC_LVT_MASKED);
+-	if (!x2apic_enabled()) {
+-		v = apic_read(APIC_LDR) & ~APIC_LDR_MASK;
+-		apic_write(APIC_LDR, v);
+-	}
+ 	if (maxlvt >= 4) {
+ 		v = apic_read(APIC_LVTPC);
+ 		apic_write(APIC_LVTPC, v | APIC_LVT_MASKED);
+-- 
+2.30.2
+
+
+From e6198d2b4ff0195ebc228a231f96918855ce722f Mon Sep 17 00:00:00 2001
+From: Feng Sun <loyou85@gmail.com>
+Date: Mon, 26 Aug 2019 14:46:04 +0800
+Subject: [PATCH 22/24] net: fix skb use after free in netpoll
+
+[ Upstream commit 2c1644cf6d46a8267d79ed95cb9b563839346562 ]
+
+After commit baeababb5b85d5c4e6c917efe2a1504179438d3b
+("tun: return NET_XMIT_DROP for dropped packets"),
+when tun_net_xmit drop packets, it will free skb and return NET_XMIT_DROP,
+netpoll_send_skb_on_dev will run into following use after free cases:
+1. retry netpoll_start_xmit with freed skb;
+2. queue freed skb in npinfo->txq.
+queue_process will also run into use after free case.
+
+hit netpoll_send_skb_on_dev first case with following kernel log:
+
+[  117.864773] kernel BUG at mm/slub.c:306!
+[  117.864773] invalid opcode: 0000 [#1] SMP PTI
+[  117.864774] CPU: 3 PID: 2627 Comm: loop_printmsg Kdump: loaded Tainted: P           OE     5.3.0-050300rc5-generic #201908182231
+[  117.864775] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Ubuntu-1.8.2-1ubuntu1 04/01/2014
+[  117.864775] RIP: 0010:kmem_cache_free+0x28d/0x2b0
+[  117.864781] Call Trace:
+[  117.864781]  ? tun_net_xmit+0x21c/0x460
+[  117.864781]  kfree_skbmem+0x4e/0x60
+[  117.864782]  kfree_skb+0x3a/0xa0
+[  117.864782]  tun_net_xmit+0x21c/0x460
+[  117.864782]  netpoll_start_xmit+0x11d/0x1b0
+[  117.864788]  netpoll_send_skb_on_dev+0x1b8/0x200
+[  117.864789]  __br_forward+0x1b9/0x1e0 [bridge]
+[  117.864789]  ? skb_clone+0x53/0xd0
+[  117.864790]  ? __skb_clone+0x2e/0x120
+[  117.864790]  deliver_clone+0x37/0x50 [bridge]
+[  117.864790]  maybe_deliver+0x89/0xc0 [bridge]
+[  117.864791]  br_flood+0x6c/0x130 [bridge]
+[  117.864791]  br_dev_xmit+0x315/0x3c0 [bridge]
+[  117.864792]  netpoll_start_xmit+0x11d/0x1b0
+[  117.864792]  netpoll_send_skb_on_dev+0x1b8/0x200
+[  117.864792]  netpoll_send_udp+0x2c6/0x3e8
+[  117.864793]  write_msg+0xd9/0xf0 [netconsole]
+[  117.864793]  console_unlock+0x386/0x4e0
+[  117.864793]  vprintk_emit+0x17e/0x280
+[  117.864794]  vprintk_default+0x29/0x50
+[  117.864794]  vprintk_func+0x4c/0xbc
+[  117.864794]  printk+0x58/0x6f
+[  117.864795]  loop_fun+0x24/0x41 [printmsg_loop]
+[  117.864795]  kthread+0x104/0x140
+[  117.864795]  ? 0xffffffffc05b1000
+[  117.864796]  ? kthread_park+0x80/0x80
+[  117.864796]  ret_from_fork+0x35/0x40
+
+Signed-off-by: Feng Sun <loyou85@gmail.com>
+Signed-off-by: Xiaojun Zhao <xiaojunzhao141@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ net/core/netpoll.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git net/core/netpoll.c net/core/netpoll.c
+index 440aa9f6e0a8..0d7c2cc1ff09 100644
+--- net/core/netpoll.c
++++ net/core/netpoll.c
+@@ -122,7 +122,7 @@ static void queue_process(struct work_struct *work)
+ 		txq = netdev_get_tx_queue(dev, q_index);
+ 		HARD_TX_LOCK(dev, txq, smp_processor_id());
+ 		if (netif_xmit_frozen_or_stopped(txq) ||
+-		    netpoll_start_xmit(skb, dev, txq) != NETDEV_TX_OK) {
++		    !dev_xmit_complete(netpoll_start_xmit(skb, dev, txq))) {
+ 			skb_queue_head(&npinfo->txq, skb);
+ 			HARD_TX_UNLOCK(dev, txq);
+ 			local_irq_restore(flags);
+@@ -357,7 +357,7 @@ void netpoll_send_skb_on_dev(struct netpoll *np, struct sk_buff *skb,
+ 
+ 				HARD_TX_UNLOCK(dev, txq);
+ 
+-				if (status == NETDEV_TX_OK)
++				if (dev_xmit_complete(status))
+ 					break;
+ 
+ 			}
+@@ -374,7 +374,7 @@ void netpoll_send_skb_on_dev(struct netpoll *np, struct sk_buff *skb,
+ 
+ 	}
+ 
+-	if (status != NETDEV_TX_OK) {
++	if (!dev_xmit_complete(status)) {
+ 		skb_queue_tail(&npinfo->txq, skb);
+ 		schedule_delayed_work(&npinfo->tx_work,0);
+ 	}
+-- 
+2.30.2
+
+
+From 89e0660bc5316acef9a4dc7bf8ec1ffed8a57c8c Mon Sep 17 00:00:00 2001
+From: Chen-Yu Tsai <wens@csie.org>
+Date: Thu, 29 Aug 2019 11:17:24 +0800
+Subject: [PATCH 23/24] net: stmmac: dwmac-rk: Don't fail if phy regulator is
+ absent
+
+[ Upstream commit 3b25528e1e355c803e73aa326ce657b5606cda73 ]
+
+The devicetree binding lists the phy phy as optional. As such, the
+driver should not bail out if it can't find a regulator. Instead it
+should just skip the remaining regulator related code and continue
+on normally.
+
+Skip the remainder of phy_power_on() if a regulator supply isn't
+available. This also gets rid of the bogus return code.
+
+Fixes: 2e12f536635f ("net: stmmac: dwmac-rk: Use standard devicetree property for phy regulator")
+Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+index 398b08e07149..68a58333bd74 100644
+--- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
++++ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+@@ -429,10 +429,8 @@ static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
+ 	int ret;
+ 	struct device *dev = &bsp_priv->pdev->dev;
+ 
+-	if (!ldo) {
+-		dev_err(dev, "no regulator found\n");
+-		return -1;
+-	}
++	if (!ldo)
++		return 0;
+ 
+ 	if (enable) {
+ 		ret = regulator_enable(ldo);
+-- 
+2.30.2
+
+
+From 882f8791e1412d81e5cc7a4c379c73195155b40f Mon Sep 17 00:00:00 2001
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Tue, 10 Sep 2019 10:29:50 +0100
+Subject: [PATCH 24/24] Linux 4.4.192
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git Makefile Makefile
+index 266c3d7e0120..18889fbbebb1 100644
+--- Makefile
++++ Makefile
+@@ -1,6 +1,6 @@
+ VERSION = 4
+ PATCHLEVEL = 4
+-SUBLEVEL = 191
++SUBLEVEL = 192
+ EXTRAVERSION =
+ NAME = Blurry Fish Butt
+ 
+-- 
+2.30.2
+

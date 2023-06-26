@@ -1,0 +1,596 @@
+From 272e1835861ee3d05035ea3cbfc1f225347ed18f Mon Sep 17 00:00:00 2001
+From: Takashi Iwai <tiwai@suse.de>
+Date: Thu, 29 Aug 2019 09:52:02 +0200
+Subject: [PATCH 01/10] ALSA: hda - Fix potential endless loop at applying
+ quirks
+
+commit 333f31436d3db19f4286f8862a00ea1d8d8420a1 upstream.
+
+Since the chained quirks via chained_before flag is applied before the
+depth check, it may lead to the endless recursive calls, when the
+chain were set up incorrectly.  Fix it by moving the depth check at
+the beginning of the loop.
+
+Fixes: 1f57825077dc ("ALSA: hda - Add chained_before flag to the fixup entry")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ sound/pci/hda/hda_auto_parser.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git sound/pci/hda/hda_auto_parser.c sound/pci/hda/hda_auto_parser.c
+index a03cf68d0bcd..12d87204e373 100644
+--- sound/pci/hda/hda_auto_parser.c
++++ sound/pci/hda/hda_auto_parser.c
+@@ -827,6 +827,8 @@ static void apply_fixup(struct hda_codec *codec, int id, int action, int depth)
+ 	while (id >= 0) {
+ 		const struct hda_fixup *fix = codec->fixup_list + id;
+ 
++		if (++depth > 10)
++			break;
+ 		if (fix->chained_before)
+ 			apply_fixup(codec, fix->chain_id, action, depth + 1);
+ 
+@@ -866,8 +868,6 @@ static void apply_fixup(struct hda_codec *codec, int id, int action, int depth)
+ 		}
+ 		if (!fix->chained || fix->chained_before)
+ 			break;
+-		if (++depth > 10)
+-			break;
+ 		id = fix->chain_id;
+ 	}
+ }
+-- 
+2.30.2
+
+
+From 949f4ca254ddb4b080c228ca35c8967ff1dd07e0 Mon Sep 17 00:00:00 2001
+From: Takashi Iwai <tiwai@suse.de>
+Date: Fri, 30 Aug 2019 12:03:38 +0200
+Subject: [PATCH 02/10] ALSA: hda/realtek - Fix overridden device-specific
+ initialization
+
+commit 89781d0806c2c4f29072d3f00cb2dd4274aabc3d upstream.
+
+The recent change to shuffle the codec initialization procedure for
+Realtek via commit 607ca3bd220f ("ALSA: hda/realtek - EAPD turn on
+later") caused the silent output on some machines.  This change was
+supposed to be safe, but it isn't actually; some devices have quirk
+setups to override the EAPD via COEF or BTL in the additional verb
+table, which is applied at the beginning of snd_hda_gen_init().  And
+this EAPD setup is again overridden in alc_auto_init_amp().
+
+For recovering from the regression, tell snd_hda_gen_init() not to
+apply the verbs there by a new flag, then apply the verbs in
+alc_init().
+
+BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=204727
+Fixes: 607ca3bd220f ("ALSA: hda/realtek - EAPD turn on later")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ sound/pci/hda/hda_generic.c   | 3 ++-
+ sound/pci/hda/hda_generic.h   | 1 +
+ sound/pci/hda/patch_realtek.c | 2 ++
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git sound/pci/hda/hda_generic.c sound/pci/hda/hda_generic.c
+index 142549bbeb53..869c322ddae3 100644
+--- sound/pci/hda/hda_generic.c
++++ sound/pci/hda/hda_generic.c
+@@ -5826,7 +5826,8 @@ int snd_hda_gen_init(struct hda_codec *codec)
+ 	if (spec->init_hook)
+ 		spec->init_hook(codec);
+ 
+-	snd_hda_apply_verbs(codec);
++	if (!spec->skip_verbs)
++		snd_hda_apply_verbs(codec);
+ 
+ 	init_multi_out(codec);
+ 	init_extra_out(codec);
+diff --git sound/pci/hda/hda_generic.h sound/pci/hda/hda_generic.h
+index 56e4139b9032..25f2397c29f7 100644
+--- sound/pci/hda/hda_generic.h
++++ sound/pci/hda/hda_generic.h
+@@ -236,6 +236,7 @@ struct hda_gen_spec {
+ 	unsigned int indep_hp_enabled:1; /* independent HP enabled */
+ 	unsigned int have_aamix_ctl:1;
+ 	unsigned int hp_mic_jack_modes:1;
++	unsigned int skip_verbs:1; /* don't apply verbs at snd_hda_gen_init() */
+ 
+ 	/* additional mute flags (only effective with auto_mute_via_amp=1) */
+ 	u64 mute_bits;
+diff --git sound/pci/hda/patch_realtek.c sound/pci/hda/patch_realtek.c
+index 68d96c2e8cde..d5ca16048ce0 100644
+--- sound/pci/hda/patch_realtek.c
++++ sound/pci/hda/patch_realtek.c
+@@ -772,9 +772,11 @@ static int alc_init(struct hda_codec *codec)
+ 	if (spec->init_hook)
+ 		spec->init_hook(codec);
+ 
++	spec->gen.skip_verbs = 1; /* applied in below */
+ 	snd_hda_gen_init(codec);
+ 	alc_fix_pll(codec);
+ 	alc_auto_init_amp(codec, spec->init_amp);
++	snd_hda_apply_verbs(codec); /* apply verbs here after own init */
+ 
+ 	snd_hda_apply_fixup(codec, HDA_FIXUP_ACT_INIT);
+ 
+-- 
+2.30.2
+
+
+From e1b22f7a0b273e2b6ff50afe950f6161ca8e3e58 Mon Sep 17 00:00:00 2001
+From: Cong Wang <xiyou.wangcong@gmail.com>
+Date: Fri, 22 Mar 2019 16:26:19 -0700
+Subject: [PATCH 03/10] xfrm: clean up xfrm protocol checks
+
+commit dbb2483b2a46fbaf833cfb5deb5ed9cace9c7399 upstream.
+
+In commit 6a53b7593233 ("xfrm: check id proto in validate_tmpl()")
+I introduced a check for xfrm protocol, but according to Herbert
+IPSEC_PROTO_ANY should only be used as a wildcard for lookup, so
+it should be removed from validate_tmpl().
+
+And, IPSEC_PROTO_ANY is expected to only match 3 IPSec-specific
+protocols, this is why xfrm_state_flush() could still miss
+IPPROTO_ROUTING, which leads that those entries are left in
+net->xfrm.state_all before exit net. Fix this by replacing
+IPSEC_PROTO_ANY with zero.
+
+This patch also extracts the check from validate_tmpl() to
+xfrm_id_proto_valid() and uses it in parse_ipsecrequest().
+With this, no other protocols should be added into xfrm.
+
+Fixes: 6a53b7593233 ("xfrm: check id proto in validate_tmpl()")
+Reported-by: syzbot+0bf0519d6e0de15914fe@syzkaller.appspotmail.com
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Zubin Mithra <zsm@chromium.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ include/net/xfrm.h    | 17 +++++++++++++++++
+ net/key/af_key.c      |  4 +++-
+ net/xfrm/xfrm_state.c |  2 +-
+ net/xfrm/xfrm_user.c  | 14 +-------------
+ 4 files changed, 22 insertions(+), 15 deletions(-)
+
+diff --git include/net/xfrm.h include/net/xfrm.h
+index 185fb037b332..631614856afc 100644
+--- include/net/xfrm.h
++++ include/net/xfrm.h
+@@ -1301,6 +1301,23 @@ static inline int xfrm_state_kern(const struct xfrm_state *x)
+ 	return atomic_read(&x->tunnel_users);
+ }
+ 
++static inline bool xfrm_id_proto_valid(u8 proto)
++{
++	switch (proto) {
++	case IPPROTO_AH:
++	case IPPROTO_ESP:
++	case IPPROTO_COMP:
++#if IS_ENABLED(CONFIG_IPV6)
++	case IPPROTO_ROUTING:
++	case IPPROTO_DSTOPTS:
++#endif
++		return true;
++	default:
++		return false;
++	}
++}
++
++/* IPSEC_PROTO_ANY only matches 3 IPsec protocols, 0 could match all. */
+ static inline int xfrm_id_proto_match(u8 proto, u8 userproto)
+ {
+ 	return (!userproto || proto == userproto ||
+diff --git net/key/af_key.c net/key/af_key.c
+index 36db179d848e..d2ec620319d7 100644
+--- net/key/af_key.c
++++ net/key/af_key.c
+@@ -1969,8 +1969,10 @@ parse_ipsecrequest(struct xfrm_policy *xp, struct sadb_x_ipsecrequest *rq)
+ 
+ 	if (rq->sadb_x_ipsecrequest_mode == 0)
+ 		return -EINVAL;
++	if (!xfrm_id_proto_valid(rq->sadb_x_ipsecrequest_proto))
++		return -EINVAL;
+ 
+-	t->id.proto = rq->sadb_x_ipsecrequest_proto; /* XXX check proto */
++	t->id.proto = rq->sadb_x_ipsecrequest_proto;
+ 	if ((mode = pfkey_mode_to_xfrm(rq->sadb_x_ipsecrequest_mode)) < 0)
+ 		return -EINVAL;
+ 	t->mode = mode;
+diff --git net/xfrm/xfrm_state.c net/xfrm/xfrm_state.c
+index 13f261feb75c..787f2cac18c5 100644
+--- net/xfrm/xfrm_state.c
++++ net/xfrm/xfrm_state.c
+@@ -2133,7 +2133,7 @@ void xfrm_state_fini(struct net *net)
+ 	unsigned int sz;
+ 
+ 	flush_work(&net->xfrm.state_hash_work);
+-	xfrm_state_flush(net, IPSEC_PROTO_ANY, false);
++	xfrm_state_flush(net, 0, false);
+ 	flush_work(&net->xfrm.state_gc_work);
+ 
+ 	WARN_ON(!list_empty(&net->xfrm.state_all));
+diff --git net/xfrm/xfrm_user.c net/xfrm/xfrm_user.c
+index 8cc2a9df84fd..4dbe6ebeabf8 100644
+--- net/xfrm/xfrm_user.c
++++ net/xfrm/xfrm_user.c
+@@ -1448,20 +1448,8 @@ static int validate_tmpl(int nr, struct xfrm_user_tmpl *ut, u16 family)
+ 			return -EINVAL;
+ 		}
+ 
+-		switch (ut[i].id.proto) {
+-		case IPPROTO_AH:
+-		case IPPROTO_ESP:
+-		case IPPROTO_COMP:
+-#if IS_ENABLED(CONFIG_IPV6)
+-		case IPPROTO_ROUTING:
+-		case IPPROTO_DSTOPTS:
+-#endif
+-		case IPSEC_PROTO_ANY:
+-			break;
+-		default:
++		if (!xfrm_id_proto_valid(ut[i].id.proto))
+ 			return -EINVAL;
+-		}
+-
+ 	}
+ 
+ 	return 0;
+-- 
+2.30.2
+
+
+From 17b919f0e667ea326549e499a3f54433478447c3 Mon Sep 17 00:00:00 2001
+From: Tiwei Bie <tiwei.bie@intel.com>
+Date: Wed, 28 Aug 2019 13:37:00 +0800
+Subject: [PATCH 04/10] vhost/test: fix build for vhost test
+
+commit 264b563b8675771834419057cbe076c1a41fb666 upstream.
+
+Since vhost_exceeds_weight() was introduced, callers need to specify
+the packet weight and byte weight in vhost_dev_init(). Note that, the
+packet weight isn't counted in this patch to keep the original behavior
+unchanged.
+
+Fixes: e82b9b0727ff ("vhost: introduce vhost_exceeds_weight()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/vhost/test.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git drivers/vhost/test.c drivers/vhost/test.c
+index f2882ac98726..6666ca451452 100644
+--- drivers/vhost/test.c
++++ drivers/vhost/test.c
+@@ -23,6 +23,12 @@
+  * Using this limit prevents one virtqueue from starving others. */
+ #define VHOST_TEST_WEIGHT 0x80000
+ 
++/* Max number of packets transferred before requeueing the job.
++ * Using this limit prevents one virtqueue from starving others with
++ * pkts.
++ */
++#define VHOST_TEST_PKT_WEIGHT 256
++
+ enum {
+ 	VHOST_TEST_VQ = 0,
+ 	VHOST_TEST_VQ_MAX = 1,
+@@ -81,10 +87,8 @@ static void handle_vq(struct vhost_test *n)
+ 		}
+ 		vhost_add_used_and_signal(&n->dev, vq, head, 0);
+ 		total_len += len;
+-		if (unlikely(total_len >= VHOST_TEST_WEIGHT)) {
+-			vhost_poll_queue(&vq->poll);
++		if (unlikely(vhost_exceeds_weight(vq, 0, total_len)))
+ 			break;
+-		}
+ 	}
+ 
+ 	mutex_unlock(&vq->mutex);
+@@ -116,7 +120,8 @@ static int vhost_test_open(struct inode *inode, struct file *f)
+ 	dev = &n->dev;
+ 	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
+ 	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
+-	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX);
++	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX,
++		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT);
+ 
+ 	f->private_data = n;
+ 
+-- 
+2.30.2
+
+
+From 7ab6e38aec38e1077679b35d93b28d70b756c853 Mon Sep 17 00:00:00 2001
+From: Nicolas Boichat <drinkcat@chromium.org>
+Date: Thu, 11 Jul 2019 20:52:27 -0700
+Subject: [PATCH 05/10] scripts/decode_stacktrace: match basepath using shell
+ prefix operator, not regex
+
+[ Upstream commit 31013836a71e07751a6827f9d2ad41ef502ddaff ]
+
+The basepath may contain special characters, which would confuse the regex
+matcher.  ${var#prefix} does the right thing.
+
+Link: http://lkml.kernel.org/r/20190518055946.181563-1-drinkcat@chromium.org
+Fixes: 67a28de47faa8358 ("scripts/decode_stacktrace: only strip base path when a prefix of the path")
+Signed-off-by: Nicolas Boichat <drinkcat@chromium.org>
+Reviewed-by: Stephen Boyd <swboyd@chromium.org>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ scripts/decode_stacktrace.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git scripts/decode_stacktrace.sh scripts/decode_stacktrace.sh
+index ffc46c7c3afb..4f5e76f76b9d 100755
+--- scripts/decode_stacktrace.sh
++++ scripts/decode_stacktrace.sh
+@@ -64,7 +64,7 @@ parse_symbol() {
+ 	fi
+ 
+ 	# Strip out the base of the path
+-	code=${code//^$basepath/""}
++	code=${code#$basepath/}
+ 
+ 	# In the case of inlines, move everything to same line
+ 	code=${code//$'\n'/' '}
+-- 
+2.30.2
+
+
+From f935c9418992a865856418619ddd74114218ed01 Mon Sep 17 00:00:00 2001
+From: Nathan Chancellor <natechancellor@gmail.com>
+Date: Thu, 18 Oct 2018 12:13:40 -0700
+Subject: [PATCH 06/10] clk: s2mps11: Add used attribute to s2mps11_dt_match
+
+[ Upstream commit 9c940bbe2bb47e03ca5e937d30b6a50bf9c0e671 ]
+
+Clang warns after commit 8985167ecf57 ("clk: s2mps11: Fix matching when
+built as module and DT node contains compatible"):
+
+drivers/clk/clk-s2mps11.c:242:34: warning: variable 's2mps11_dt_match'
+is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static const struct of_device_id s2mps11_dt_match[] = {
+                                 ^
+1 warning generated.
+
+This warning happens when a variable is used in some construct that
+doesn't require a reference to that variable to be emitted in the symbol
+table; in this case, it's MODULE_DEVICE_TABLE, which only needs to hold
+the data of the variable, not the variable itself.
+
+$ nm -S drivers/clk/clk-s2mps11.o | rg s2mps11_dt_match
+00000078 000003d4 R __mod_of__s2mps11_dt_match_device_table
+
+Normally, with device ID table variables, it means that the variable
+just needs to be tied to the device declaration at the bottom of the
+file, like s2mps11_clk_id:
+
+$ nm -S drivers/clk/clk-s2mps11.o | rg s2mps11_clk_id
+00000000 00000078 R __mod_platform__s2mps11_clk_id_device_table
+00000000 00000078 r s2mps11_clk_id
+
+However, because the comment above this deliberately doesn't want this
+variable added to .of_match_table, we need to mark s2mps11_dt_match as
+__used to silence this warning. This makes it clear to Clang that the
+variable is used for something, even if a reference to it isn't being
+emitted.
+
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+Fixes: 8985167ecf57 ("clk: s2mps11: Fix matching when built as module and DT node contains compatible")
+Signed-off-by: Stephen Boyd <sboyd@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/clk/clk-s2mps11.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git drivers/clk/clk-s2mps11.c drivers/clk/clk-s2mps11.c
+index 785864893f9a..14af5c916c9c 100644
+--- drivers/clk/clk-s2mps11.c
++++ drivers/clk/clk-s2mps11.c
+@@ -307,7 +307,7 @@ MODULE_DEVICE_TABLE(platform, s2mps11_clk_id);
+  * This requires of_device_id table.  In the same time this will not change the
+  * actual *device* matching so do not add .of_match_table.
+  */
+-static const struct of_device_id s2mps11_dt_match[] = {
++static const struct of_device_id s2mps11_dt_match[] __used = {
+ 	{
+ 		.compatible = "samsung,s2mps11-clk",
+ 		.data = (void *)S2MPS11X,
+-- 
+2.30.2
+
+
+From 52b0d2ee55cafcaa7cd4b12cb65fc7432b30dcf6 Mon Sep 17 00:00:00 2001
+From: Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Date: Tue, 16 Jul 2019 21:18:12 +0800
+Subject: [PATCH 07/10] x86, boot: Remove multiple copy of static function
+ sanitize_boot_params()
+
+commit 8c5477e8046ca139bac250386c08453da37ec1ae upstream.
+
+Kernel build warns:
+ 'sanitize_boot_params' defined but not used [-Wunused-function]
+
+at below files:
+  arch/x86/boot/compressed/cmdline.c
+  arch/x86/boot/compressed/error.c
+  arch/x86/boot/compressed/early_serial_console.c
+  arch/x86/boot/compressed/acpi.c
+
+That's becausethey each include misc.h which includes a definition of
+sanitize_boot_params() via bootparam_utils.h.
+
+Remove the inclusion from misc.h and have the c file including
+bootparam_utils.h directly.
+
+Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Link: https://lkml.kernel.org/r/1563283092-1189-1-git-send-email-zhenzhong.duan@oracle.com
+[nc: Fixed conflict around lack of 67b6662559f7f]
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/x86/boot/compressed/misc.c | 1 +
+ arch/x86/boot/compressed/misc.h | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git arch/x86/boot/compressed/misc.c arch/x86/boot/compressed/misc.c
+index 16df89c30c20..1e5b68228aff 100644
+--- arch/x86/boot/compressed/misc.c
++++ arch/x86/boot/compressed/misc.c
+@@ -11,6 +11,7 @@
+ 
+ #include "misc.h"
+ #include "../string.h"
++#include <asm/bootparam_utils.h>
+ 
+ /* WARNING!!
+  * This code is compiled with -fPIC and it is relocated dynamically
+diff --git arch/x86/boot/compressed/misc.h arch/x86/boot/compressed/misc.h
+index 4abb284a5b9c..bce182708814 100644
+--- arch/x86/boot/compressed/misc.h
++++ arch/x86/boot/compressed/misc.h
+@@ -19,7 +19,6 @@
+ #include <asm/page.h>
+ #include <asm/boot.h>
+ #include <asm/bootparam.h>
+-#include <asm/bootparam_utils.h>
+ 
+ #define BOOT_BOOT_H
+ #include "../ctype.h"
+-- 
+2.30.2
+
+
+From 8cc953562e2e293575514c40806eee438a967364 Mon Sep 17 00:00:00 2001
+From: Dave Jones <davej@codemonkey.org.uk>
+Date: Mon, 4 Apr 2016 15:11:50 -0400
+Subject: [PATCH 08/10] af_packet: tone down the Tx-ring unsupported spew.
+
+[ Upstream commit 6ae81ced378820c4c6434b1dedba14a7122df310 ]
+
+Trinity and other fuzzers can hit this WARN on far too easily,
+resulting in a tainted kernel that hinders automated fuzzing.
+
+Replace it with a rate-limited printk.
+
+Signed-off-by: Dave Jones <davej@codemonkey.org.uk>
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/packet/af_packet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git net/packet/af_packet.c net/packet/af_packet.c
+index 5d8988185c59..0dd9fc3f57e8 100644
+--- net/packet/af_packet.c
++++ net/packet/af_packet.c
+@@ -4176,7 +4176,7 @@ static int packet_set_ring(struct sock *sk, union tpacket_req_u *req_u,
+ 
+ 	/* Opening a Tx-ring is NOT supported in TPACKET_V3 */
+ 	if (!closing && tx_ring && (po->tp_version > TPACKET_V2)) {
+-		WARN(1, "Tx-ring is not supported.\n");
++		net_warn_ratelimited("Tx-ring is not supported.\n");
+ 		goto out;
+ 	}
+ 
+-- 
+2.30.2
+
+
+From 35b29a78cc9b2523f6b0c080e6b44d2eeb367023 Mon Sep 17 00:00:00 2001
+From: yongduan <yongduan@tencent.com>
+Date: Wed, 11 Sep 2019 17:44:24 +0800
+Subject: [PATCH 09/10] vhost: make sure log_num < in_num
+
+commit 060423bfdee3f8bc6e2c1bac97de24d5415e2bc4 upstream.
+
+The code assumes log_num < in_num everywhere, and that is true as long as
+in_num is incremented by descriptor iov count, and log_num by 1. However
+this breaks if there's a zero sized descriptor.
+
+As a result, if a malicious guest creates a vring desc with desc.len = 0,
+it may cause the host kernel to crash by overflowing the log array. This
+bug can be triggered during the VM migration.
+
+There's no need to log when desc.len = 0, so just don't increment log_num
+in this case.
+
+Fixes: 3a4d5c94e959 ("vhost_net: a kernel-level virtio server")
+Cc: stable@vger.kernel.org
+Reviewed-by: Lidong Chen <lidongchen@tencent.com>
+Signed-off-by: ruippan <ruippan@tencent.com>
+Signed-off-by: yongduan <yongduan@tencent.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Tyler Hicks <tyhicks@canonical.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/vhost/vhost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git drivers/vhost/vhost.c drivers/vhost/vhost.c
+index 0f653f314876..eb7a4df69e2b 100644
+--- drivers/vhost/vhost.c
++++ drivers/vhost/vhost.c
+@@ -1324,7 +1324,7 @@ static int get_indirect(struct vhost_virtqueue *vq,
+ 		/* If this is an input descriptor, increment that count. */
+ 		if (desc.flags & cpu_to_vhost16(vq, VRING_DESC_F_WRITE)) {
+ 			*in_num += ret;
+-			if (unlikely(log)) {
++			if (unlikely(log && ret)) {
+ 				log[*log_num].addr = vhost64_to_cpu(vq, desc.addr);
+ 				log[*log_num].len = vhost32_to_cpu(vq, desc.len);
+ 				++*log_num;
+@@ -1453,7 +1453,7 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+ 			/* If this is an input descriptor,
+ 			 * increment that count. */
+ 			*in_num += ret;
+-			if (unlikely(log)) {
++			if (unlikely(log && ret)) {
+ 				log[*log_num].addr = vhost64_to_cpu(vq, desc.addr);
+ 				log[*log_num].len = vhost32_to_cpu(vq, desc.len);
+ 				++*log_num;
+-- 
+2.30.2
+
+
+From e19c5132f78a70cc53745558c0e728fecc74030a Mon Sep 17 00:00:00 2001
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Mon, 16 Sep 2019 08:13:37 +0200
+Subject: [PATCH 10/10] Linux 4.4.193
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git Makefile Makefile
+index 18889fbbebb1..34d2be9c8459 100644
+--- Makefile
++++ Makefile
+@@ -1,6 +1,6 @@
+ VERSION = 4
+ PATCHLEVEL = 4
+-SUBLEVEL = 192
++SUBLEVEL = 193
+ EXTRAVERSION =
+ NAME = Blurry Fish Butt
+ 
+-- 
+2.30.2
+
