@@ -15,4 +15,9 @@ LICENSE  = 3-Clause BSD
 
 GNU_CONFIGURE = 1
 
+ifeq ($(findstring $(ARCH),qoriq),$(ARCH)))
+# prefer netinet/tcp.h over linux/tcp.h to ensure 'TCP_USER_TIMEOUT' is declared.
+CONFIGURE_ARGS += ac_cv_header_linux_tcp_h=no
+endif
+
 include ../../mk/spksrc.cross-cc.mk
