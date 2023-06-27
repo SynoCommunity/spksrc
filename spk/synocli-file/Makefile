@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 2.7
-SPK_REV = 19
+SPK_REV = 20
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -16,7 +16,7 @@ OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep c
 OPTIONAL_DEPENDS += cross/bat cross/exa
 OPTIONAL_DEPENDS += cross/nnn
 
-MAINTAINER = SynoCommunity
+MAINTAINER = hgy59
 DISPLAY_NAME = SynoCli File Tools
 
 POST_STRIP_TARGET = synocli-file_extra_install
