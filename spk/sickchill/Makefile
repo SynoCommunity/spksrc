@@ -1,5 +1,5 @@
 SPK_NAME = sickchill
-SPK_VERS = 20230530
+SPK_VERS = 20230627
 SPK_REV = 8
 SPK_ICON = src/sickchill.png
 
