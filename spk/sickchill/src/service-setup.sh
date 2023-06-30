@@ -1,11 +1,15 @@
-PYTHON_DIR="/var/packages/python310/target/bin"
+# Define python binary path
+PYTHON_DIR="/var/packages/python311/target/bin"
+# Add local bin, virtualenv along with python to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
+# Define other locations
 HOME="${SYNOPKG_PKGVAR}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
-SC_BINARY="${SYNOPKG_PKGDEST}/env/bin/SickChill"
+SC_BINARY="${SYNOPKG_PKGDEST}/env/bin/sickchill"
 SC_DATA_DIR="${SYNOPKG_PKGVAR}/data"
 SC_CFG_FILE="${SC_DATA_DIR}/config.ini"
 
+# Set group for DSM6 (historical) as DSM7 is synocommunity
 GROUP="sc-download"
 
 SERVICE_COMMAND="${SC_BINARY} --daemon --nolaunch --pidfile ${PID_FILE} --config ${SC_CFG_FILE} --datadir ${SC_DATA_DIR}"
