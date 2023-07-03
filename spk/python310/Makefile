@@ -130,7 +130,10 @@ WHEELS += src/requirements-crossenv-numpy-armv5.txt
 # [numpy] <= 1.22.4 (armv7l)
 else ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-armv7l.txt
-else
+else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+WHEELS += src/requirements-crossenv-numpy-gcc4.txt
+# [numpy] >= 1.25.0 requires c++17
+else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
 # workaround for compiler bug:
