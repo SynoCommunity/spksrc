@@ -1,7 +1,7 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.11
+SPK_VERS = 3.10.12
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.11"
+CHANGELOG = "1. Update to Python 3.10.12"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -22,7 +22,7 @@ LICENSE  = PSF
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS  = src/requirements-pure.txt
 # Force testing all wheel builds
-WHEELS_TEST_ALL = 0
+WHEELS_TEST_ALL = 1
 # Force compiler LTO optimizations
 ENV += PYTHON_OPTIMIZE=1
 
@@ -113,8 +113,11 @@ include ../../mk/spksrc.spk.mk
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS += src/requirements-crossenv-greenlet.txt
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CPPFLAGS += [greenlet] -std=c++11
+endif
 else
 WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
 endif
