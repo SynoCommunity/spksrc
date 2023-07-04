@@ -6,7 +6,7 @@ PKG_DIST_NAME = $(REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Distrotech/rtmpdump/archive
 PKG_DIR = rtmpdump-$(REAL_NAME)-$(PKG_VERS)/librtmp
 
-DEPENDS = cross/zlib cross/openssl
+DEPENDS = cross/zlib cross/openssl3
 
 HOMEPAGE = https://rtmpdump.mplayerhq.hu/
 COMMENT  = rtmpdump is a toolkit for RTMP streams. All forms of RTMP are supported, including rtmp://, rtmpt://, rtmpe://, rtmpte://, and rtmps://. 
