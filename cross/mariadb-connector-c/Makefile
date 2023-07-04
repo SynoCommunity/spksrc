@@ -16,6 +16,10 @@ CMAKE_DISABLE_EXE_LINKER_FLAGS = 1
 
 include ../../mk/spksrc.cross-cmake.mk
 
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ADDITIONAL_CFLAGS += -std=gnu99
+endif
+
 # MySQL specific:
 CMAKE_ARGS += -DWITH_UNIT_TESTS=OFF
 CMAKE_ARGS += -DDEFAULT_CHARSET=utf8
