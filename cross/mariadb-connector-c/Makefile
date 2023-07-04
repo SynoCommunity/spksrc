@@ -16,7 +16,7 @@ CMAKE_DISABLE_EXE_LINKER_FLAGS = 1
 
 include ../../mk/spksrc.cross-cmake.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 ADDITIONAL_CFLAGS += -std=gnu99
 endif
 
