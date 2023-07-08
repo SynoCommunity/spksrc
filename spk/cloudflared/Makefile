@@ -2,14 +2,13 @@ SPK_NAME = cloudflared
 SPK_VERS = 2023.5.1
 SPK_REV = 8
 SPK_ICON = src/cloudflared.png
-DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/cloudflared
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = karasevm
 DISPLAY_NAME = cloudflared
-DESCRIPTION = Cloudflare Tunnel client (formerly Argo Tunnel).
+DESCRIPTION = "Cloudflare Tunnel client \(formerly Argo Tunnel\)."
 HOMEPAGE = https://github.com/cloudflare/cloudflared
 LICENSE = Apache-2.0
 CHANGELOG = "Update to 2023.5.1"
