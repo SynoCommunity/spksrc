@@ -1,0 +1,37 @@
+<backup id="host1">
+
+  <host
+    name="host1" user="root" nice="0"
+  />
+
+  <!-- location where the backed up data will be stored on the server
+       and for how long (s=sec, m=min, h=hours, D=days, W=weeks, M=months, or Y=years) -->
+  <repo
+    retention="30D"
+    path="/volume1/safekeep/host1"
+  />
+
+  <!--
+  <setup>
+   <script path="client:/usr/sbin/safekeep-client-script.sh" />
+  </setup>
+  -->
+
+  <!-- data to be backed up -->
+  <data exclude-fifos="true" exclude-sockets="true">
+    <!-- each type of tag can be present more than one time -->
+    <!-- if a database dump was created, it must be added in this section -->
+    <exclude path="/etc/.git/"/>
+    <exclude glob="/proc/*"/>
+    <exclude path="/tmp/"/>
+    <exclude path="/var/tmp/"/>
+    <exclude glob="/sys/*"/>
+    <exclude glob="/dev/*"/>
+    <exclude glob="/selinux/*"/>
+    <exclude glob="/cgroups/*"/>
+    <exclude glob="/var/log/*"/>
+
+    <include path="/"/>
+  </data>
+</backup>
+

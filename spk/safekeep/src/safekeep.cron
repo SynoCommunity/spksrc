@@ -1,0 +1,4 @@
+MAILTO=""
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin:/usr/local/sbin:/usr/local/bin
+#minute hour mday month wday who command
+00 01 * * * root /usr/local/bin/safekeep -v --server > /var/log/safekeep.log 2>&1
