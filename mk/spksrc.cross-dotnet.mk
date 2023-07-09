@@ -91,7 +91,7 @@ include ../../mk/spksrc.plist.mk
 
 
 clean:
-	rm -fr work work-*
+	rm -fr work work-* build-*.log
 
 
 all: install plist
