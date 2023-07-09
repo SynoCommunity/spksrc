@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = www.xxhash.com
+HOMEPAGE = https://cyan4973.github.io/xxHash/
 COMMENT  = Extremely fast non-cryptographic hash algorithm.
 LICENSE  = 2-Clause BSD
 

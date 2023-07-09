@@ -10,9 +10,6 @@ DEPENDS = cross/zlib-ng
 
 # unsupported by cross/zlib-ng
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# rust issue with target 'armv5te-unknown-linux-gnueabi'
-# https://github.com/rust-lang/compiler-builtins/issues/420
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 HOMEPAGE = https://the.exa.website/
 COMMENT  = A modern replacement for 'ls'.

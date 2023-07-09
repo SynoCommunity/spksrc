@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 2.7
-SPK_REV = 19
+SPK_REV = 20
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -14,9 +14,9 @@ DEPENDS += cross/dos2unix
 
 OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/sd
 OPTIONAL_DEPENDS += cross/bat cross/exa
-OPTIONAL_DEPENDS += cross/nnn
+OPTIONAL_DEPENDS += cross/nnn cross/nnn_4.0
 
-MAINTAINER = SynoCommunity
+MAINTAINER = hgy59
 DISPLAY_NAME = SynoCli File Tools
 
 POST_STRIP_TARGET = synocli-file_extra_install
@@ -25,9 +25,7 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
 
-# rust issue with target 'armv5te-unknown-linux-gnueabi'
-# https://github.com/rust-lang/compiler-builtins/issues/420
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # build rust tools before packages depending on cross/zlib
 # These tools must use cross/zlib-ng instead of cross/zlib, otherwise will fail to find zlib (x64 only)
 DEPENDS += cross/bat cross/exa
@@ -51,9 +49,23 @@ ifneq ($(call version_lt, ${TCVERSION}, 6.0)$(call version_ge, ${TCVERSION}, 3.0
 # to build rnm, GCC >= 4.8 is required
 DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
-# to build nnn -std=c11 is required
-DEPENDS += cross/nnn
+endif
+endif
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ifneq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+DEPENDS += cross/nnn
+else
+# comcerto2k for DSM>=7
+DEPENDS += cross/nnn_4.0
+endif
+else ifneq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
+DEPENDS += cross/nnn
+else
+# 32-bit archs for DSM<7
+DEPENDS += cross/nnn_4.0
 endif
 endif
 
@@ -78,7 +90,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Update jdupes to support dedupe.<br/>2. Update fzf to v0.35.1.<br/>3. Update less to v608.<br/>4. Update nano to v7.0.<br/>5. Update nnn to v4.7."
+CHANGELOG = "1. Update bat to v0.23.0.<br/>2. Update dos2unix to v7.5.0.<br/>3. Update fzf to v0.40.0.<br/>4. Update gdu to v5.23.0.<br/>5. Update jdupes to v1.26.1.<br/>6. Update jupp to v3.1-41.<br/>7. Update less to v633.<br/>8. Update mc to v4.8.29.<br/>9. Update mg to v3.6.<br/>10. Update nano to v7.2.<br/>11. Update ncdu to v1.18.1.<br/>12. Update nnn to v.4.8, but downgrade nnn to v4.0 for 32-bit archs on DSM<7.<br/>13. Update pcre2 to v10.42.<br/>14. Update tree to v2.1.0."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -110,7 +122,7 @@ SPK_COMMANDS += bin/exa
 SPK_COMMANDS += bin/jmacs bin/joe bin/jpico bin/jstar bin/jupp bin/rjoe
 SPK_COMMANDS += bin/nnn
 SPK_COMMANDS += bin/iconv
-SPK_COMMANDS += bin/dos2unix bin/unix2dos bin/mac2unix bin/unix2mac 
+SPK_COMMANDS += bin/dos2unix bin/unix2dos bin/mac2unix bin/unix2mac
 
 SPK_COMMANDS += bin/rhash
 SPK_COMMANDS += bin/ed2k-link
