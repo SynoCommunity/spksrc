@@ -37,17 +37,20 @@ done
 for package in ${DEPENDENT_PACKAGES}
 do
     echo "===> Searching for dependent package: ${package}"
-    packages=$(echo "${DEPENDENCY_LIST}" | grep -w "${package}" | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
+    packages=$(echo "${DEPENDENCY_LIST}" | grep " ${package} " | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
     echo "===> Found: ${packages}"
     SPK_TO_BUILD+=${packages}
 done
 
 # fix for packages with different names
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPK_TO_BUILD+=" sonarr3"
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "nzbdrone" | tr '\n' ' ')" sonarr3"
 fi
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
-    SPK_TO_BUILD+=" python2"
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "python" | tr '\n' ' ')" python2"
+fi
+if [ "$(echo ${SPK_TO_BUILD} | grep -ow ffmpeg)" != "" ]; then
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')" ffmpeg4"
 fi
 
 # remove duplicate packages
