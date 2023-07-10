@@ -1,5 +1,5 @@
 PKG_NAME = ser2net
-PKG_VERS = 4.3.11
+PKG_VERS = 4.3.12
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cminyard/ser2net/archive
@@ -7,6 +7,9 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/gensio cross/libyaml
+
+# cross/gensio
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://sourceforge.net/projects/ser2net/
 COMMENT  = Serial to network interface, allows TCP/UDP to serial port connections.
