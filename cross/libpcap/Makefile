@@ -5,6 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.tcpdump.org/release
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# this is the latests version that builds for OLD_PPC_ARCHS
+
 DEPENDS =
 
 HOMEPAGE = https://www.tcpdump.org/
