@@ -48,9 +48,6 @@ OPENSSL_PLATFORM = linux-armv4
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 OPENSSL_PLATFORM = linux-aarch64
-ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
-CONFIGURE_ARGS += no-asm
-endif
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 OPENSSL_PLATFORM = linux-ppc
