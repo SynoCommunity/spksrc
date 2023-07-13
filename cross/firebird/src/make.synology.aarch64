@@ -1,0 +1,39 @@
+# vim: syntax=make
+#
+# This file is copied to firebird/builds/posix/ and from there is used by
+# the ./configure --with-cross-build=xxx, where the resulting file name is
+# firebird/builds/posix/make.xxx
+#
+
+export CXX:=$(CROSS_TOOLCHAIN)g++
+export CC:=$(CROSS_TOOLCHAIN)gcc
+export AR:=$(CROSS_TOOLCHAIN)ar
+export AS:=$(CROSS_TOOLCHAIN)as
+export LD:=$(CROSS_TOOLCHAIN)ld
+export NM:=$(CROSS_TOOLCHAIN)nm
+export OBJCOPY:=$(CROSS_TOOLCHAIN)objcopy
+export OBJDUMP:=$(CROSS_TOOLCHAIN)objdump
+export RANLIB:=$(CROSS_TOOLCHAIN)ranlib
+export STRIP:=$(CROSS_TOOLCHAIN)strip
+
+# This file is loaded after makefile.defaults and we can use it to override
+# variables defined therein. The AC_CFLAGS/AC_CXXFLAGS normally contains flags
+# that were present in an environment during the ./configure step, which we
+# do not want here, because the configure flags were for cross1 native step.
+export AC_CFLAGS :=
+export AC_CXXFLAGS :=
+
+COMMON_FLAGS=-ggdb -DFB_SEND_FLAGS=MSG_NOSIGNAL -DLINUX -DARM64 -pipe -MMD \
+             -fPIC -fmessage-length=0 -fsigned-char
+
+OPTIMIZE_FLAGS=-fno-omit-frame-pointer
+WARN_FLAGS=-Wall -Wno-switch -Wno-parentheses -Wno-unknown-pragmas -Wno-unused-variable
+
+PROD_FLAGS=$(COMMON_FLAGS) $(OPTIMIZE_FLAGS)
+DEV_FLAGS=$(COMMON_FLAGS) $(WARN_FLAGS)
+
+CROSS_CONFIG=synology.aarch64.h
+
+.PHONY: prerequisites
+prerequisites:
+
