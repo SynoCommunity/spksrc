@@ -11,7 +11,7 @@ DISPLAY_NAME = cloudflared
 DESCRIPTION = "Cloudflare Tunnel client \(formerly Argo Tunnel\)."
 HOMEPAGE = https://github.com/cloudflare/cloudflared
 LICENSE = Apache-2.0
-CHANGELOG = "Update to 2023.6.1"
+CHANGELOG = "Update to 2023.7.0"
 
 WIZARDS_DIR = src/wizard/
 
