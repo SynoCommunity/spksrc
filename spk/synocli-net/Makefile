@@ -1,15 +1,16 @@
 SPK_NAME = synocli-net
-SPK_VERS = 2.2
-SPK_REV = 16
+SPK_VERS = 2.3
+SPK_REV = 17
 SPK_ICON = src/synocli-net.png
 
-DEPENDS = cross/screen cross/tmux cross/nmap cross/links cross/socat
+DEPENDS = cross/screen cross/tmux cross/links cross/socat
 DEPENDS += cross/rsync cross/autossh cross/arp-scan
 DEPENDS += cross/mtr
 DEPENDS += cross/etherwake
 DEPENDS += cross/inetutils
+DEPENDS += cross/netcat
 
-OPTIONAL_DEPENDS = cross/sshfs2 cross/sshfs3 cross/ser2net cross/bind cross/aria2
+OPTIONAL_DEPENDS = cross/sshfs2 cross/sshfs3 cross/ser2net cross/bind cross/aria2 cross/nmap cross/nmap_7.92
 
 include ../../mk/spksrc.common.mk
 
@@ -20,6 +21,9 @@ DEPENDS += cross/bind
 OPTIONAL_DESC := $(OPTIONAL_DESC)", arpaname, delv, dig, mdig"
 DEPENDS += cross/ser2net
 OPTIONAL_DESC := $(OPTIONAL_DESC)", ser2net"
+DEPENDS += cross/nmap
+else
+DEPENDS += cross/nmap_7.92
 endif
 
 ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_ge,${TCVERSION},3.0),11)
@@ -44,14 +48,14 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, autossh \(including openssh, sftp and scp\), etherwake, telnet, whois, sshfs$(OPTIONAL_DESC)."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Update openssl to v1.1.1t.<br/>2. Update openssh to v9.3p1.<br/>3. Update links to v2.29.<br/>4. Update arp-scan to v1.10.0.<br/>5. Update ser2net to v4.3.11."
+CHANGELOG = "1. Add netcat.<br/>2. Update openssl to v1.1.1u.<br/>3. Update nmap to v7.94 and include ncat (latest nmap for old ppc archs is v7.92).<br/>4. Update ser2net to v4.3.12."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
 
 SPK_COMMANDS = bin/screen
 SPK_COMMANDS += bin/tmux
-SPK_COMMANDS += bin/nmap bin/nping bin/ndiff
+SPK_COMMANDS += bin/nmap bin/nping bin/ndiff bin/ncat
 SPK_COMMANDS += bin/arp-scan bin/arp-fingerprint bin/get-iab bin/get-oui
 SPK_COMMANDS += bin/links
 SPK_COMMANDS += bin/sshfs
@@ -69,5 +73,6 @@ SPK_COMMANDS += bin/etherwake
 SPK_COMMANDS += bin/telnet bin/whois
 SPK_COMMANDS += bin/arpaname bin/delv bin/dig bin/mdig
 SPK_COMMANDS += bin/aria2c
+SPK_COMMANDS += bin/nc bin/netcat
 
 include ../../mk/spksrc.spk.mk

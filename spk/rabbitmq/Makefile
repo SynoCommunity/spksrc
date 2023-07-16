@@ -1,24 +1,24 @@
 SPK_NAME = rabbitmq
-SPK_VERS = 3.8.23
-SPK_REV = 6
+SPK_VERS = 3.9.21
+SPK_REV = 7
 SPK_ICON = src/rabbitmq.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/rabbitmq
 
-SPK_DEPENDS = "erlang<25"
+SPK_DEPENDS = "erlang>23:erlang<24.4"
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = RabbitMQ is one of the most popular open source message brokers. From T-Mobile to Runtastic, RabbitMQ is used worldwide at small startups and large enterprises. RabbitMQ is lightweight and easy to deploy on premises and in the cloud. It supports multiple messaging protocols. RabbitMQ can be deployed in distributed and federated configurations to meet high-scale, high-availability requirements.
-CHANGELOG = "1. Update RabbitMQ to v3.8.23.<br/>2. Update OpenSSL to v1.1.1l."
+CHANGELOG = "1. Update RabbitMQ to v3.9.21.<br/>2. Update OpenSSL to v1.1.1u.<br><br>REMARKS: This is an intermediate version that depends on Erlang 24 (including 24.1) and allows update to Erlang 24.3."
 
 DISPLAY_NAME = RabbitMQ
 
-HOMEPAGE   = https://www.rabbitmq.com
-LICENSE    = MPL 2.0
+HOMEPAGE = https://www.rabbitmq.com
+LICENSE = MPL 2.0
 
-SERVICE_USER   = auto
-SERVICE_SETUP  = src/service-setup.sh
-STARTABLE      = yes
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+STARTABLE = yes
 
 # Service configuration
 CONF_DIR = src/conf/

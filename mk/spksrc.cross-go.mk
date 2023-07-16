@@ -106,7 +106,7 @@ smart-clean:
 	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
 
 clean:
-	rm -fr work work-*
+	rm -fr work work-* build-*.log
 
 
 all: install plist

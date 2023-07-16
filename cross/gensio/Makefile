@@ -1,8 +1,8 @@
 PKG_NAME = gensio
-PKG_VERS = 2.2.9
+PKG_VERS = 2.3.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/cminyard/$(PKG_NAME)/archive
+PKG_DIST_SITE = https://github.com/cminyard/gensio/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
@@ -18,7 +18,10 @@ DEPENDS = cross/openssl
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = gensio_pre_configure
 
-CONFIGURE_ARGS = --with-python=no --with-swig=no
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --with-python=no
+CONFIGURE_ARGS += --with-swig=no
+CONFIGURE_ARGS += --disable-doc
 
 include ../../mk/spksrc.cross-cc.mk
 

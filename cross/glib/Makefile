@@ -24,6 +24,7 @@ else
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS = cross/glib-2.66
 else
+# old compilers do not support glib with meson build
 DEPENDS = cross/glib-2.58
 endif
 endif
