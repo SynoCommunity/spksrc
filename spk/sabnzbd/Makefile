@@ -28,6 +28,9 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8080
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
+# Ensure C++11 compatibility for unrar
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
