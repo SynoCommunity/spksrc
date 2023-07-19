@@ -1,0 +1,4 @@
+rsc:include/tommath.h
+lnk:lib/libtommath.so
+lnk:lib/libtommath.so.1
+lib:lib/libtommath.so.1.2.0
