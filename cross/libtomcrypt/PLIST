@@ -1,0 +1,16 @@
+rsc:include/tomcrypt.h
+rsc:include/tomcrypt_argchk.h
+rsc:include/tomcrypt_cfg.h
+rsc:include/tomcrypt_cipher.h
+rsc:include/tomcrypt_custom.h
+rsc:include/tomcrypt_hash.h
+rsc:include/tomcrypt_mac.h
+rsc:include/tomcrypt_macros.h
+rsc:include/tomcrypt_math.h
+rsc:include/tomcrypt_misc.h
+rsc:include/tomcrypt_pk.h
+rsc:include/tomcrypt_pkcs.h
+rsc:include/tomcrypt_prng.h
+lnk:lib/libtomcrypt.so
+lnk:lib/libtomcrypt.so.1
+lib:lib/libtomcrypt.so.1.0.1
