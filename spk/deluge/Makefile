@@ -1,6 +1,6 @@
 SPK_NAME = deluge
-SPK_VERS = 2.1.1
-SPK_REV = 20
+SPK_VERS = 2.1.1.61
+SPK_REV = 21
 SPK_ICON = src/deluge.png
 
 BUILD_DEPENDS = cross/python311
@@ -15,7 +15,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
 DESCRIPTION_FRE = Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), desservant l\'interface utilisateur web deluge.
 STARTABLE = yes
-CHANGELOG = "1. Update to python 3.11<br/>2. Update to OpenSSL 1.1.1t<br/>Deprecated DSM6 support"
+CHANGELOG = "1. Update to latest github development commit<br/>2. Update to libtorrent 2.0.9<br/>3. Update to OpenSSL 3.1.1"
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
@@ -64,16 +64,6 @@ WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 endif
-
-# [libtorrent]
-# DSM7 only due to c++14 minimal requirement
-# Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
-WHEELS += src/requirements-crossenv-libtorrent.txt
-# Ensure build arguments matches boost_1.78
-WHEELS_CXXFLAGS += [libtorrent]
-WHEELS_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
-WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISNAN
-WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
 
 .NOTPARALLEL:
 .PHONY: deluge_extra_install
