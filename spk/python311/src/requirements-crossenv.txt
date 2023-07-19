@@ -15,7 +15,7 @@ bcrypt==4.0.1
 # https://docs.rs/openssl/latest/openssl/#automatic
 #  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==40.0.2
+cryptography==41.0.1
 
 # Requirement for cryptography
 cffi==1.15.1
@@ -25,12 +25,12 @@ cffi==1.15.1
 # with local python apps requirements
 
 immutables==0.19
-MarkupSafe==2.1.2
+MarkupSafe==2.1.3
 msgpack-python==0.5.6
 netifaces==0.11.0
 psutil==5.9.5
-regex==2023.5.5
-SQLAlchemy==2.0.12
+regex==2023.6.3
+SQLAlchemy==2.0.17
 zope.interface==6.0
 
 # [gevent]
@@ -49,7 +49,7 @@ lxml==4.9.2
 # Require environment variables
 #  MYSQLCLIENT_CFLAGS
 #  MYSQLCLIENT_LDFLAGS
-mysqlclient==2.1.1
+mysqlclient==2.2.0
 
 # [Pillow]
 # Require --global-options arguments
@@ -85,7 +85,7 @@ git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc
 
 # [ujson]
 #   - Require setuptools-scm in cross/python3* crossenv
-ujson==5.7.0
+ujson==5.8.0
 
 # [webrtcvad]
 # webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch

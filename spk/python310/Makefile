@@ -1,7 +1,7 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.11
+SPK_VERS = 3.10.12
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.11"
+CHANGELOG = "1. Update to Python 3.10.12<br/>2. Update to OpenSSL 3.1.1"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -113,10 +113,13 @@ include ../../mk/spksrc.spk.mk
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-WHEELS += src/requirements-crossenv-greenlet.txt
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS += src/requirements-crossenv-greenlet-v2.txt
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CPPFLAGS += [greenlet] -std=c++11
+endif
 else
-WHEELS += src/requirements-crossenv-greenlet-gcc4.txt
+WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
 # [numpy] <= 1.21.6 (armv5)
@@ -127,7 +130,10 @@ WHEELS += src/requirements-crossenv-numpy-armv5.txt
 # [numpy] <= 1.22.4 (armv7l)
 else ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-armv7l.txt
-else
+else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+WHEELS += src/requirements-crossenv-numpy-gcc4.txt
+# [numpy] >= 1.25.0 requires c++17
+else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
 # workaround for compiler bug:

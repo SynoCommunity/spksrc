@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.11
+PKG_VERS = 3.10.12
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -53,7 +53,7 @@ CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptc=no
 CONFIGURE_ARGS += ac_cv_have_long_long_format=yes
 
-DEPENDS += cross/openssl
+DEPENDS += cross/openssl3
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
 DEPENDS += cross/gdbm
@@ -135,13 +135,13 @@ python310_install:
 # wheels to install in crossenv
 CROSSENV_WHEELS  = setuptools-rust==1.6.0
 CROSSENV_WHEELS += setuptools-scm==7.1.0
-CROSSENV_WHEELS += wheel==0.40.0
-CROSSENV_WHEELS += poetry==1.4.2
-CROSSENV_WHEELS += Cython==0.29.34
-CROSSENV_WHEELS += flit==3.8.0
-CROSSENV_WHEELS += cryptography==40.0.2
+CROSSENV_WHEELS += cffi==1.15.1
+CROSSENV_WHEELS += poetry==1.5.1
+CROSSENV_WHEELS += Cython==0.29.35
+CROSSENV_WHEELS += flit==3.9.0
+CROSSENV_WHEELS += cryptography==41.0.1
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-CROSSENV_WHEELS += maturin==0.15.1
+CROSSENV_WHEELS += maturin==1.1.0
 endif
 
 # Create the crossenv in preparation for

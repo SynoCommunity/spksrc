@@ -1,5 +1,5 @@
 PKG_NAME = mariadb-connector-c
-PKG_VERS = 3.3.4
+PKG_VERS = 3.3.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -16,12 +16,16 @@ CMAKE_DISABLE_EXE_LINKER_FLAGS = 1
 
 include ../../mk/spksrc.cross-cmake.mk
 
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+ADDITIONAL_CFLAGS += -std=gnu99
+endif
+
 # MySQL specific:
 CMAKE_ARGS += -DWITH_UNIT_TESTS=OFF
 CMAKE_ARGS += -DDEFAULT_CHARSET=utf8
 CMAKE_ARGS += -DINSTALL_LIBDIR=lib
 
-DEPENDS += cross/openssl
+DEPENDS += cross/openssl3
 CMAKE_ARGS += -DWITH_SSL=ON
 DEPENDS += cross/zlib
 CMAKE_ARGS += -DWITH_EXTERNAL_ZLIB=ON
