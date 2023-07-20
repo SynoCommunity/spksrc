@@ -41,11 +41,7 @@ INSTALL_TARGET           = nop
 
 #####
 
-ifneq ($(KERNEL_TC_VERS),)
-TC ?= syno-$(KERNEL_ARCH)-$(KERNEL_TC_VERS)
-else
 TC ?= syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
-endif
 
 #####
 
