@@ -58,17 +58,16 @@ include ../../mk/spksrc.extract.mk
 patch: extract
 include ../../mk/spksrc.patch.mk
 
-#kernel_configure: patch
-#include ../../mk/spksrc.kernel-configure.mk
+kernel_configure: patch
+include ../../mk/spksrc.kernel-configure.mk
 
-#kernel_module: kernel_configure
-#include ../../mk/spksrc.kernel-module.mk
+kernel_module: kernel_configure
+include ../../mk/spksrc.kernel-module.mk
 
-#install: kernel_module
-#include ../../mk/spksrc.kernel-headers.mk
+install: kernel_module
+include ../../mk/spksrc.kernel-headers.mk
 
-#install: kernel_headers
-install: patch
+install: kernel_headers
 include ../../mk/spksrc.install.mk
 
 plist: install
