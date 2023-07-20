@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 LABEL description="Framework for maintaining and compiling native community packages for Synology devices"
 LABEL maintainer="SynoCommunity <https://github.com/SynoCommunity/spksrc/graphs/contributors>"
 LABEL url="https://synocommunity.com"
@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		gettext \
 		git \
 		gperf \
+		httpie \
 		imagemagick \
 		intltool \
 		jq \
@@ -56,9 +57,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		patchelf \
 		php \
 		pkg-config \
-		python2 \
 		python3 \
 		python3-distutils \
+		python3-pip \
+		python3-virtualenv \
 		rename \
 		rsync \
 		scons \
@@ -75,17 +77,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	adduser user sudo && \
 	echo "%users ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/users
 
-# Install setuptools, wheel and pip for Python2
-RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | python2
-# Install virtualenv and httpie for Python2
-# Use pip2 as default pip -> python3
-RUN pip2 install virtualenv httpie
-
-# Install setuptools, wheel and pip for Python3
-# Default pip -> python3 aware for native python wheels builds
-RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
-# Install meson cross-platform build system
-RUN pip3 install meson==1.0.0
+# https://pypi.org/project/meson/#history
+RUN pip3 install meson==1.0.2
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
