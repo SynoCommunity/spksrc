@@ -1,8 +1,8 @@
 PKG_NAME = cops
-PKG_VERS = 1.1.3
+PKG_VERS = 1.3.6
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/seblucas/cops/releases/download/$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/mikespub-org/seblucas-cops/releases/download/$(PKG_VERS)
 PKG_DIR = 
 
 DEPENDS =

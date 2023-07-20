@@ -5,19 +5,15 @@ PACKAGE_NAME="com.synocommunity.packages.${SYNOPKG_PKGNAME}"
 
 # Others
 CFG_FILE_NAME="config_local.php"
+SECURITY_SETTINGS_FILE_NAME=".htaccess"
 DEFAULT_CFG_FILE="${SYNOPKG_PKGDEST}/${CFG_FILE_NAME}.synology"
-DSM6_WEB_DIR="/var/services/web"
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-   WEB_DIR="/var/services/web_packages"
-else
-   WEB_DIR="${DSM6_WEB_DIR}"
-fi
+
+WEB_DIR="/var/services/web_packages"
+SECURITY_SETTINGS_FILE="${WEB_DIR}/${SYNOPKG_PKGNAME}/${SECURITY_SETTINGS_FILE_NAME}"
 CFG_FILE="${WEB_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}"
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
 USER="http"
 GROUP="http"
-PHP_CONFIG_LOCATION="$([ "${BUILDNUMBER}" -ge "7135" ] && echo -n /usr/local/etc/php56/conf.d || echo -n /etc/php/conf.d)"
 
 service_preinst ()
 {
@@ -31,15 +27,6 @@ service_preinst ()
 
 service_postinst ()
 {
-      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-    
-        # Install the web interface
-        cp -pR "${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}" "${WEB_DIR}"
-    
-        # Configure open_basedir
-        echo -e "[PATH=${WEB_DIR}/${SYNOPKG_PKGNAME}]\nopen_basedir = Null" > "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini"
-      fi
-
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Create a default configuration file
         if [ ! -f "${CFG_FILE}" ]; then
@@ -50,32 +37,6 @@ service_postinst ()
           sed -i -e "s|@use_url_rewriting@|${url_rewriting:=0}|g" ${CFG_FILE}
           chmod ga+w "${CFG_FILE}"
         fi
-
-      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-
-        # Set permissions on directory structure (DSM 5+)
-        set_syno_permissions "${wizard_calibre_dir}" "${GROUP}"
-        # Set permissions on metadata.db
-        if [ ! "`synoacltool -get "${wizard_calibre_dir}/metadata.db"| grep "group:${GROUP}:allow:rwxpdDaARWc."`" ]; then
-            synoacltool -add "${wizard_calibre_dir}/metadata.db" "group:${GROUP}:allow:rwxpdDaARWc:----" > /dev/null 2>&1
-        fi
-      fi
-    fi
-}
-
-service_postuninst ()
-{
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-
-      # Remove link
-      rm -f "${SYNOPKG_PKGDEST}"
-  
-      # Remove open_basedir configuration
-      rm -f "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini"
-  
-      # Remove the web interface
-      rm -fr "${WEB_DIR:?}/${SYNOPKG_PKGNAME}"
-    
     fi
 }
 
@@ -85,9 +46,7 @@ service_preupgrade ()
     rm -fr "${TMP_DIR:?}/${SYNOPKG_PKGNAME}"
     mkdir -p "${TMP_DIR}/${SYNOPKG_PKGNAME}"
     mv "${CFG_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      mv "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
-    fi
+    mv "${SECURITY_SETTINGS_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
 }
 
 service_postupgrade ()
@@ -95,8 +54,7 @@ service_postupgrade ()
       # Restore some stuff
       rm -f "${CFG_FILE}"
       mv "${TMP_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}" "${CFG_FILE}"
-      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-        mv "${TMP_DIR}/${SYNOPKG_PKGNAME}/${PACKAGE_NAME}.ini" "${PHP_CONFIG_LOCATION}/"
-      fi
+      mv "${TMP_DIR}/${SYNOPKG_PKGNAME}/${SECURITY_SETTINGS_FILE_NAME}" "${SECURITY_SETTINGS_FILE}"
+
       rm -fr "${TMP_DIR:?}/${SYNOPKG_PKGNAME}"
 }
