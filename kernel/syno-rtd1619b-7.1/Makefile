@@ -1,10 +1,8 @@
-KERNEL_ARCH = aarch64
+KERNEL_ARCH = rtd1619b
 KERNEL_VERS = 7.1
 KERNEL_BUILD = 42962
-KERNEL_DIST = linux-4.4.x
+KERNEL_DIST = linux-5.10.x
 KERNEL_BASE_ARCH = arm64
-KERNEL_URL_DIR = rtd1296
 KERNEL_URL_VERSION = 7.1.1
-KERNEL_CONFIG = synoconfigs/rtd1296
 
 include ../../mk/spksrc.kernel.mk
