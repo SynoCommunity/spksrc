@@ -34,9 +34,7 @@ endif
 #
 ifeq ($(shell expr "$(KERNEL_BUILD)" \>= 25556),1)
 
-ifneq ($(KERNEL_URL_VERS),)
-KERNEL_URL_VERSION = $(KERNEL_URL_VERS)
-else
+ifeq ($(KERNEL_URL_VERSION),)
 KERNEL_URL_VERSION = $(KERNEL_VERS)
 endif
 
