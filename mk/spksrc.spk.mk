@@ -282,6 +282,9 @@ endif
 # Wizard
 DSM_WIZARDS_DIR = $(WORK_DIR)/WIZARD_UIFILES
 
+ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
+WIZARDS_DIR = $(WORK_DIR)/generated-wizards
+endif
 ifneq ($(WIZARDS_DIR),)
 # export working wizards dir to the shell for use later at compile-time
 export SPKSRC_WIZARDS_DIR=$(WIZARDS_DIR)
@@ -389,6 +392,24 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifeq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
+endif
+ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
+	@$(MSG) "Generate DSM Wizards from templates"
+	@mkdir -p $(WIZARDS_DIR)
+	@for template in `find $(WIZARDS_TEMPLATES_DIR) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print`; do \
+		template_filename="$$(basename $${template})"; \
+		template_name="$${template_filename%.*}"; \
+		if [ "$${template_name}" = "$${template_filename}" ]; then \
+			template_suffix=; \
+		else \
+			template_suffix=".$${template_filename:$${#template_filename} + 1}"; \
+		fi; \
+		for suffix in '' $(patsubst %,_%,$(SUPPORTED_LANGUAGES)) ; do \
+			mustache -e \
+				"$(WIZARDS_TEMPLATES_DIR)/$${template_name}$${suffix}.yml" \
+				"$(WIZARDS_TEMPLATES_DIR)/$${template_filename}" >"$(WIZARDS_DIR)/$${template_name}$${suffix}$${template_suffix}"; \
+		done; \
+	done
 endif
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Create DSM Wizards"
