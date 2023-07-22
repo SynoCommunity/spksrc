@@ -1,8 +1,8 @@
-# Define python310 binary path
-PYTHON_DIR="/var/packages/python310/target/bin"
+# Define python311 binary path
+PYTHON_DIR="/var/packages/python311/target/bin"
 # Define git binary path
 GIT_DIR="/var/packages/git/target/bin"
-# Add local bin, virtualenv along with python310 and git to the default PATH
+# Add local bin, virtualenv along with python311 and git to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${GIT_DIR}:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 GIT="${GIT_DIR}/git"

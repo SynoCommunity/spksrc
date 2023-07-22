@@ -4,7 +4,7 @@ SPK_GIT_HASH = f32c7c5
 SPK_GIT_DATE = 20230408
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 36
+SPK_REV = 37
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -13,7 +13,7 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python311"
 
 WHEELS = src/requirements-pure.txt
 

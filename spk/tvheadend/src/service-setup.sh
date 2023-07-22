@@ -1,8 +1,8 @@
-# Define python310 binary path
-PYTHON_DIR="/var/packages/python310/target/bin"
+# Define python311 binary path
+PYTHON_DIR="/var/packages/python311/target/bin"
 # Define ffmpeg binary path
 FFMPEG_DIR="/var/packages/ffmpeg/target/bin"
-# Add local bin, virtualenv along with ffmpeg and python310 to the default PATH
+# Add local bin, virtualenv along with ffmpeg and python311 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${FFMPEG_DIR}:${PATH}"
 
 # Service configuration. Change http and htsp ports here and in conf/tvheadend.sc for non-standard ports

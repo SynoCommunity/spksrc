@@ -1,5 +1,5 @@
 
-PYTHON_DIR="/var/packages/python310/target/bin"
+PYTHON_DIR="/var/packages/python311/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 service_postinst ()

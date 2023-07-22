@@ -1,10 +1,10 @@
 SPK_NAME = salt-master
 SPK_VERS = 3004
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/salt-master.png
 
-BUILD_DEPENDS = cross/python310
-SPK_DEPENDS = "python310"
+BUILD_DEPENDS = cross/python311
+SPK_DEPENDS = "python311"
 # TODO: Enable as website to provide salt-master status
 DEPENDS = cross/saltgui
 
@@ -21,7 +21,7 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Master
-CHANGELOG    = "1. Update to 3004<br/>2. Migrate to Python 3.10"
+CHANGELOG    = "1. Update to 3004<br/>2. Migrate to Python 3.11"
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache v2

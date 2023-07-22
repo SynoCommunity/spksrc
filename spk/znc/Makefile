@@ -1,18 +1,18 @@
 SPK_NAME = znc
 SPK_VERS = 1.8.2
-SPK_REV = 21
+SPK_REV = 22
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python311"
 
 MAINTAINER = worstje
 DESCRIPTION = Advanced IRC bouncer. An IRC bouncer is nothing more than an IRC proxy. ZNC will always be connected in your chat rooms, and will be the gateway between your clients, and your IRC servers. You can, for instance, consult messages while you were offline or hide your identity.
 DESCRIPTION_FRE = Bouncer IRC avancé. Un bouncer IRC n\’est en fait qu\’un proxy IRC. ZNC restera connecté en permanence à vos salons de discussions et fera office de passerelle entre vos clients et vos serveurs IRC. Vous pourrez, par exemple, consultez des messages diffusés en votre absence ou masquer votre identité.
 DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy para IRC. ZNC estará siempre conectado a tus canales, y hará de puerta de enlace entre tus clientes y tus servidores IRC. Puedes, por ejemplo, consultar mensajes mientras estuviste desconectado o esconder tu identidad.
 DISPLAY_NAME = ZNC
-CHANGELOG = "1. Update OpenSSL to v1.1.1m.<br/>2. Now depends on Python 3.10<br/>3. Fix DSM 7 installer to preserve configuration files on updates."
+CHANGELOG = "1. Update OpenSSL to v3.1.1.<br/>2. Migrate to Python 3.11"
 
 STARTABLE = yes
 HOMEPAGE = https://wiki.znc.in/

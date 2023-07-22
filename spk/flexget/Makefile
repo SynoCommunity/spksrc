@@ -1,10 +1,10 @@
 SPK_NAME = flexget
 SPK_VERS = 3.3.4
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/${SPK_NAME}.png
 
-BUILD_DEPENDS = cross/python310
-SPK_DEPENDS = "python310"
+BUILD_DEPENDS = cross/python311
+SPK_DEPENDS = "python311"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # Required for PyYAML
@@ -13,7 +13,7 @@ DEPENDS += cross/libyaml
 MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-CHANGELOG = "1. Update FlexGet to version 3.3.4.<br/>2. Update to python 3.10"
+CHANGELOG = "1. Update FlexGet to version 3.3.4.<br/>2. Migrate to python 3.11"
 STARTABLE = yes
 
 HOMEPAGE = https://flexget.com/

@@ -1,18 +1,18 @@
 SPK_NAME = mercurial
 SPK_VERS = 6.0
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/mercurial.png
 
-BUILD_DEPENDS = cross/python310
+BUILD_DEPENDS = cross/python311
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python311"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mercurial is a free, distributed source control management tool
 STARTABLE = no
 DISPLAY_NAME = Mercurial
-CHANGELOG = "1. Update mercurial to 6.0<br/>2. Update to Python 3.10"
+CHANGELOG = "1. Update mercurial to 6.0<br/>2. Update to Python 3.11"
 
 HOMEPAGE = https://www.mercurial-scm.org/
 LICENSE  = MPL1.1

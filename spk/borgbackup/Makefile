@@ -1,12 +1,12 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.2.2
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/$(SPK_NAME).png
 
-BUILD_DEPENDS = cross/python310
+BUILD_DEPENDS = cross/python311
 DEPENDS = cross/attr cross/acl cross/openssl cross/lz4 cross/zstd cross/libb2 cross/fuse
 
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python311"
 
 # Requirements file generation
 # - first create borgbackup wheel defined in src/requirements-crossenv.txt
@@ -29,7 +29,7 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borg to v1.2.2<br/>2. Update borgmatic to v1.7.5.<br>/3. Include compiled version of msgpack for enhanced performance.<br/>4. Update emborg to v1.34."
+CHANGELOG = "1. Update borg to v1.2.2<br/>2. Update borgmatic to v1.7.5.<br>/3. Include compiled version of msgpack for enhanced performance.<br/>4. Update emborg to v1.34.<br/>Migrate to python 3.11"
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD

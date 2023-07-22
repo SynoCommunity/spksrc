@@ -1,17 +1,17 @@
 SPK_NAME   = octoprint
 SPK_VERS   = 1.8.7
-SPK_REV    = 10
+SPK_REV    = 11
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
-BUILD_DEPENDS = cross/python310
+BUILD_DEPENDS = cross/python311
 
 # Required for PyYAML
 DEPENDS += cross/libyaml
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python311"
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = The snappy web interface for your 3D printer.
@@ -21,7 +21,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.8.7. Please have a look at the changes in 1.8.3 https://github.com/OctoPrint/OctoPrint/releases/tag/1.8.3 regarding the password hashing change."
+CHANGELOG    = "Update OctoPrint to v1.8.7. Please have a look at the changes in 1.8.3 https://github.com/OctoPrint/OctoPrint/releases/tag/1.8.3 regarding the password hashing change.<br/>Migrate to python 3.11"
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
