@@ -79,24 +79,32 @@ service_postuninst ()
     fi
 }
 
-service_preupgrade ()
+service_save ()
 {
     # Save some stuff
     rm -fr "${TMP_DIR:?}/${SYNOPKG_PKGNAME}"
     mkdir -p "${TMP_DIR}/${SYNOPKG_PKGNAME}"
-    mv "${CFG_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
+    # Save cops configuration file
+    mv -v "${CFG_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
+    # Save .htaccess file
+    mv -v "${SECURITY_SETTINGS_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
       mv "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
     fi
 }
 
-service_postupgrade ()
+service_restore ()
 {
       # Restore some stuff
       rm -f "${CFG_FILE}"
-      mv "${TMP_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}" "${CFG_FILE}"
+      # Restore cops configuration file
+      mv -v "${TMP_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}" "${CFG_FILE}"
+      # Restore .htaccess file
+      mv -v "${TMP_DIR}/${SYNOPKG_PKGNAME}/${SECURITY_SETTINGS_FILE_NAME}" "${SECURITY_SETTINGS_FILE}"
       if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         mv "${TMP_DIR}/${SYNOPKG_PKGNAME}/${PACKAGE_NAME}.ini" "${PHP_CONFIG_LOCATION}/"
+        rm -fr "${TMP_DIR:?}/${SYNOPKG_PKGNAME}"
+      else
+        rm -d "${TMP_DIR}/${SYNOPKG_PKGNAME}" "${TMP_DIR}"
       fi
-      rm -fr "${TMP_DIR:?}/${SYNOPKG_PKGNAME}"
 }
