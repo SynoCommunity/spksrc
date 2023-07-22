@@ -1,0 +1,7 @@
+--- crypto/Makefile.orig	2023-06-30 09:55:43.629438063 +1200
++++ crypto/Makefile	2023-06-30 09:56:13.772771070 +1200
+@@ -103,4 +103,3 @@
+ obj-$(CONFIG_XOR_BLOCKS) += xor.o
+ obj-$(CONFIG_ASYNC_CORE) += async_tx/
+ obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys/
+-obj-$(CONFIG_SYNO_RAMDISK_INTEGRITY_CHECK) += hydrogen/
