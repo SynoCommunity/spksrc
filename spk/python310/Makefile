@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.12<br/>2. Update to OpenSSL 3.1.1<br/>3. Re-include python 1.x until all packages are migrated"
+CHANGELOG = "1. Update to Python 3.10.12<br/>2. Update to OpenSSL 3.1.1<br/>3. Re-include openssl 1.1 until all packages are migrated"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
