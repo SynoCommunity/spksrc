@@ -37,6 +37,8 @@ ARCHS_WITH_GENERIC_SUPPORT = $(sort $(foreach version, $(AVAILABLE_TCVERSIONS), 
 # PPC_ARCHS except qoriq
 OLD_PPC_ARCHS = powerpc ppc824x ppc853x ppc854x
 
+SRM_ARCHS = $(SRM_ARMv7_ARCHS)
+
 # outdated unsupported archs
 DEPRECATED_ARCHS = powerpc ppc824x ppc854x ppc853x
 
