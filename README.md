@@ -61,7 +61,7 @@ sudo apt install autoconf-archive autogen automake autopoint bash bc bison \
                  g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 \
                  libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
                  libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ninja-build \
-                 patchelf php pkg-config python2 python3 python3-distutils rename rsync scons subversion \
+                 patchelf php pkg-config python2 python3 python3-distutils rename ruby-mustache rsync scons subversion \
                  swig texinfo unzip xmlto zlib1g-dev
 wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | sudo python2
 sudo pip2 install wheel httpie
@@ -87,7 +87,7 @@ lxc exec spksrc -- /usr/bin/apt install autoconf-archive autogen automake autopo
                                 g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 \
                                 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
                                 libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ninja-build \
-                                patchelf php pkg-config python2 python3 python3-distutils rename rsync scons subversion \
+                                patchelf php pkg-config python2 python3 python3-distutils rename rsync ruby-mustache scons subversion \
                                 swig texinfo unzip xmlto zlib1g-dev
 ```
 5. Install `python2` wheels:
