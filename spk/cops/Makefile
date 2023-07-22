@@ -29,6 +29,7 @@ REQUIRED_MIN_DSM = 6.0
 
 DSM_UI_CONFIG = src/app/config
 
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
 CONF_DIR = src/conf/
 
 SERVICE_SETUP = src/service-setup.sh
@@ -42,20 +43,6 @@ override ARCH=
 ICON_DIR = $(STAGING_DIR)/$(DSM_UI_DIR)/images
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: customizing-wizards
-customizing-wizards: wizards
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-	@$(MSG) "Adding pre-DSM 7 requirements"
-	jq --slurp "map(.[])" \
-		$(WIZARDS_DIR)/install_uifile \
-		$(WIZARDS_FRAGMENTS_DIR)/php_configuration_requirements.json > $(DSM_WIZARDS_DIR)/install_uifile
-	jq --slurp "map(.[])" \
-		$(WIZARDS_DIR)/install_uifile_fre \
-		$(WIZARDS_FRAGMENTS_DIR)/php_configuration_requirements_fre.json > $(DSM_WIZARDS_DIR)/install_uifile_fre
-endif
-
-$(SPK_FILE_NAME): customizing-wizards
 
 .PHONY: cops_extra_install
 cops_extra_install:

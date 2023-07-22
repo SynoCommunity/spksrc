@@ -1,0 +1,13 @@
+COPS_CONFIGURATION_FIRST_STEP_TITLE: "Configuration de COPS"
+
+EXISTING_CALIBRE_DIRECTORY_DESCRIPTION: "Répertoire existant contenant une bibliothèque Calibre. Attention : doit se terminer par un / et ne jamais utiliser le répertoire web."
+EXISTING_CALIBRE_DIRECTORY_LABEL: "Répertoire contenant Calibre"
+COPS_CATALOG_TITLE_DESCRIPTION: "Titre du catalogue."
+COPS_CATALOG_TITLE_LABEL: "Titre du catalogue"
+
+COPS_CONFIGURATION_SECOND_STEP_TITLE: "Configuration de COPS (suite)"
+DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_DESCRIPTION: "Voulez vous utiliser COPS avec votre liseuse Kobo ?"
+DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_LABEL: "Kobo"
+
+DSM_PERMISSIONS_TITLE: "Attention! DSM Permissions"
+DSM_PERMISSIONS_TEXT: "Les autorisations sont gérées avec le groupe <b>http</b> dans DSM.<br>Le groupe 'utilisateurs' n'est plus utilisé à partir de DSM 6.<br>L'utilisateur du paquet (= sc-cops) n'apparaîtra pas sur la plupart des paramètres d'interface utilisateur. Y compris ce qui suit: <br>- Afficheur d'autorisation de privilège d'application <br>- Sélecteur d'utilisateur chroot FPT <br>- File Stations's- Changer de propriétaire <br>- Shared Links Manager -> Activer le partage sécurisé <br><br>Les seules exceptions sont: <br>- Panneau de configuration> Dossier partagé> Edition> Autorisation> Utilisateur interne du système <br>- Éditeur ACL"
