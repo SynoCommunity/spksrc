@@ -61,7 +61,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		python3-distutils \
 		rename \
 		rsync \
-        ruby-mustache \
+		ruby-mustache \
 		scons \
 		subversion \
 		sudo \
