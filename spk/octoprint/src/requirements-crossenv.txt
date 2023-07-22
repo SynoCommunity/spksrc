@@ -1,11 +1,12 @@
 argon2_cffi_bindings==21.2.0
-# cffi==1.15.1  => python 3.10 package
-charset_normalizer==3.1.0
+# cffi==1.15.1  => python 3.11 package
+charset_normalizer==3.2.0
 frozendict==2.3.8
-MarkupSafe==2.1.2
+MarkupSafe==2.1.3
 netifaces==0.11.0
-psutil==5.9.4
-PyYAML==5.4.1
-regex==2023.3.23
-tornado==6.2
-wrapt==1.14.1
+psutil==5.9.5
+pydantic==1.10.11
+PyYAML==6.0.1
+regex==2023.6.3
+tornado==6.3.2
+wrapt==1.15.0
