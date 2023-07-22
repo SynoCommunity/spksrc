@@ -29,8 +29,7 @@ REQUIRED_MIN_DSM = 7.0
 
 DSM_UI_CONFIG = src/app/config
 
-WIZARDS_DIR = $(WORK_DIR)/generated-wizards
-WIZARDS = install_uifile
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
 CONF_DIR = src/conf/
 
 SERVICE_SETUP = src/service-setup.sh
@@ -40,29 +39,12 @@ POST_STRIP_TARGET = cops_extra_install
 
 SUPPORTED_LANGUAGES = fre
 
-wizards: generated-wizards
-
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
 
 ICON_DIR = $(STAGING_DIR)/$(DSM_UI_DIR)/images
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: generated-wizards
-generated-wizards:
-	@mkdir -p $(WIZARDS_DIR)
-	@for template in $(WIZARDS); do \
-		for suffix in '' $(patsubst %,_%,$(SUPPORTED_LANGUAGES)) ; do \
-			{\
-			  	echo "#!/bin/sh";\
-				echo "";\
-				cat src/wizard_templates/uifile_vars$${suffix} | sed -e 's/\\/\\\\/g' -e 's/\"/\\\"/g' -e 's/^\([^=]*\)=\\"\(.*\)\\"$$/\1="\2"/g';\
-				echo "";\
-				cat src/wizard_templates/$${template}.sh;\
-			}>$(WIZARDS_DIR)/$${template}$${suffix}.sh;\
-		done;\
-	done
 
 .PHONY: cops_extra_install
 cops_extra_install:
