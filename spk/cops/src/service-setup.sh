@@ -40,21 +40,25 @@ service_postinst ()
     fi
 }
 
-service_preupgrade ()
+service_save ()
 {
     # Save some stuff
     rm -fr "${TMP_DIR:?}/${SYNOPKG_PKGNAME}"
     mkdir -p "${TMP_DIR}/${SYNOPKG_PKGNAME}"
-    mv "${CFG_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
-    mv "${SECURITY_SETTINGS_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
+    # Save cops configuration file
+    mv -v "${CFG_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
+    # Save .htaccess file
+    mv -v "${SECURITY_SETTINGS_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
 }
 
-service_postupgrade ()
+service_restore ()
 {
       # Restore some stuff
       rm -f "${CFG_FILE}"
-      mv "${TMP_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}" "${CFG_FILE}"
-      mv "${TMP_DIR}/${SYNOPKG_PKGNAME}/${SECURITY_SETTINGS_FILE_NAME}" "${SECURITY_SETTINGS_FILE}"
-
-      rm -fr "${TMP_DIR:?}/${SYNOPKG_PKGNAME}"
+      # Restore cops configuration file
+      mv -v "${TMP_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}" "${CFG_FILE}"
+      # Restore .htaccess file
+      mv -v "${TMP_DIR}/${SYNOPKG_PKGNAME}/${SECURITY_SETTINGS_FILE_NAME}" "${SECURITY_SETTINGS_FILE}"
+      
+      rm -d "${TMP_DIR}/${SYNOPKG_PKGNAME}" "${TMP_DIR}"
 }
