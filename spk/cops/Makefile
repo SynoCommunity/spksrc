@@ -25,7 +25,7 @@ BETA=1
 HOMEPAGE   = https://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE    = GPL
 
-REQUIRED_MIN_DSM = 7.2
+REQUIRED_MIN_DSM = 7.0
 
 DSM_UI_CONFIG = src/app/config
 
