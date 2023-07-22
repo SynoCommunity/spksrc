@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
 SPK_VERS = 2023.1.7
-SPK_REV = 20
+SPK_REV = 21
 SPK_ICON = src/homeassistant.png
 
 HACS_VERS = 1.31.0
@@ -15,7 +15,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "1. Update homeassistant to 2023.1.7.<br/>2. Update HACS integration to v1.31.0.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "1. Update homeassistant to 2023.1.7.<br/>2. Update HACS integration to v1.31.0.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time.<br/>Update to openssl 3.1.1"
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
@@ -76,9 +76,12 @@ WHEELS_BUILD_ARGS += --enable-freetype
 WHEELS_BUILD_ARGS += --enable-jpeg
 WHEELS_BUILD_ARGS += --enable-zlib
 
-# [cryptography]
+# [bcrypt]
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+
+# [cryptography]
+DEPENDS += cross/cryptography
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares

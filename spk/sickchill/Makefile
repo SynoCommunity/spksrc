@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
 SPK_VERS = 20230627
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/sickchill.png
 
 BUILD_DEPENDS = cross/python311
@@ -19,11 +19,7 @@ DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
 
 # [cryptography]
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# fix for openssl-sys crate (for cryptography >= 40.0.0)
-# https://docs.rs/openssl/latest/openssl/#manual
-ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
+DEPENDS += cross/cryptography
 
 include ../../mk/spksrc.common.mk
 
