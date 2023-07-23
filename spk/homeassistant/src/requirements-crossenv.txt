@@ -24,7 +24,7 @@ ciso8601==2.3.0
 # contourpy==1.0.7                     => fails to build: ModuleNotFoundError: No module named 'pybind11'
 coverage==7.0.5
 crc16==0.1.1
-#cryptography==38.0.3                  => cross/cryptography_38
+# cryptography==38.0.3                 => cross/cryptography_38
 Cython==0.29.33
 dbus_fast==1.82.0
 debugpy==1.6.4
@@ -62,7 +62,7 @@ regex==2021.8.28
 simplejson==3.18.0
 SQLAlchemy==1.4.44
 tornado==6.2
-uamqp==1.6.0
+# uamqp==1.6.0                         => cross/uamqp
 websockets==10.4
 wrapt==1.14.1
 yarl==1.8.1
