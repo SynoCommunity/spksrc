@@ -8,8 +8,11 @@ SPK_ICON = src/bazarr.png
 BUILD_DEPENDS = cross/python311
 
 DEPENDS = cross/$(SPK_NAME)
-DEPENDS += cross/libxml2 cross/libxslt
 DEPENDS += cross/unrar
+
+# [lxml]
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
 
 # [Pillow]
 DEPENDS += cross/freetype cross/libjpeg cross/zlib
@@ -43,23 +46,39 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-# [numpy]
-# gcc-4.6.4 failed with exit status 1
-# https://github.com/numpy/numpy/issues/20664
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 USE_ALTERNATE_TMPDIR = 1
 
 include ../../mk/spksrc.spk.mk
 
-# [numpy]
-# Fix wheel building with older compilers
+# [greenlet]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS += src/requirements-crossenv-greenlet-v2.txt
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS = [numpy] -std=c++0x
+WHEELS_CPPFLAGS += [greenlet] -std=c++11
+endif
+else
+WHEELS += src/requirements-crossenv-greenlet-v1.txt
+endif
+
+# [numpy] <= 1.21.6 (armv5)
+# This version is now unsupported using py311
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+# [numpy] <= 1.22.4 (armv7l)
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-numpy-armv7l.txt
+else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+WHEELS += src/requirements-crossenv-numpy-gcc4.txt
+# [numpy] >= 1.25.0 requires c++17
+else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+WHEELS += src/requirements-crossenv-numpy.txt
+endif
+endif
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
+ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS = [numpy] -O0
+WHEELS_CFLAGS += [numpy] -O0
 endif
 endif
