@@ -97,6 +97,17 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# [rpds-py]
+# maturin canot be built as pre-requisite crossenv
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-rpds-py.txt
+# Mandatory for rustc wheel building
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Requires path to maturin from crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+endif
+
 # WHEELS_TEST_ALL: Force testing all wheel building
 endif
 
