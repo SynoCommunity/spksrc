@@ -4,7 +4,7 @@ SPK_REV = 12
 SPK_ICON = src/salt-master.png
 
 BUILD_DEPENDS = cross/python311
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 # TODO: Enable as website to provide salt-master status
 DEPENDS = cross/saltgui
 

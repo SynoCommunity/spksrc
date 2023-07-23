@@ -11,7 +11,7 @@ DEPENDS += cross/libyaml
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = The snappy web interface for your 3D printer.

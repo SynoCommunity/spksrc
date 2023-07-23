@@ -9,7 +9,7 @@ WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 WHEELS += src/requirements-abi3.txt
 
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.

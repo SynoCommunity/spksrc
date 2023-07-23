@@ -20,7 +20,7 @@ WHEELS_BUILD_ARGS += --enable-freetype
 WHEELS_BUILD_ARGS += --enable-jpeg
 WHEELS_BUILD_ARGS += --enable-zlib
 
-SPK_DEPENDS = "python311:ffmpeg"
+SPK_DEPENDS = "python311>=3.11.4-7:ffmpeg"
 
 MAINTAINER = smaarn
 

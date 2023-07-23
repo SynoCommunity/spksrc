@@ -26,7 +26,7 @@ ENV += SODIUM_INSTALL=system
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-SPK_DEPENDS = "python311:gnupg>=2.1.6"
+SPK_DEPENDS = "python311>=3.11.4-7:gnupg>=2.1.6"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).

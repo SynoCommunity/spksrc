@@ -5,7 +5,7 @@ SPK_ICON = src/sickchill.png
 
 BUILD_DEPENDS = cross/python311
 
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 
 # archs without C++11 support are not supported:
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)

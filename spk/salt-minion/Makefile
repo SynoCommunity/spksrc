@@ -4,7 +4,7 @@ SPK_REV = 4
 SPK_ICON = src/salt-minion.png
 
 BUILD_DEPENDS = cross/python311
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 

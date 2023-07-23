@@ -4,7 +4,7 @@ SPK_REV = 12
 SPK_ICON = src/headphones.png
 
 DEPENDS =
-SPK_DEPENDS = "python311:git"
+SPK_DEPENDS = "python311>=3.11.4-7:git"
 
 MAINTAINER = Diaoul
 DESCRIPTION = Headphones is an automatic NZB and torrent downloader for music. Mark albums as wanted and have them downloaded as soon as they are available. Different quality settings are possible, including lossless. With Headphones you can also manage your music library automatically: move, tag, rename and index for your DiskStation.

@@ -6,7 +6,7 @@ SPK_ICON = src/$(SPK_NAME).png
 BUILD_DEPENDS = cross/python311
 DEPENDS = cross/attr cross/acl cross/openssl cross/lz4 cross/zstd cross/libb2 cross/fuse
 
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 
 # Requirements file generation
 # - first create borgbackup wheel defined in src/requirements-crossenv.txt

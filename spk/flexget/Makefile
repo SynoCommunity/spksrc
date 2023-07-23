@@ -4,7 +4,7 @@ SPK_REV = 13
 SPK_ICON = src/${SPK_NAME}.png
 
 BUILD_DEPENDS = cross/python311
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # Required for PyYAML
