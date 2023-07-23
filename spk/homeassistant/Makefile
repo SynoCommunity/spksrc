@@ -5,7 +5,7 @@ SPK_ICON = src/homeassistant.png
 
 HACS_VERS = 1.31.0
 
-SPK_DEPENDS = "python310"
+SPK_DEPENDS = "python310>=3.10.12-18"
 
 BUILD_DEPENDS = cross/python310
 
