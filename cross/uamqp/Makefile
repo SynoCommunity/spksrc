@@ -18,5 +18,5 @@ include ../../mk/spksrc.python-wheel.mk
 .PHONY: uamqp_post_patch
 # https://github.com/Azure/azure-uamqp-python/issues/276#issuecomment-924890556
 uamqp_post_patch:
-	@$(MSG) Patch CMakeLists.txt files to avoid (deprecation) warnings as errors.
+	@$(MSG) "Patch CMakeLists.txt files to avoid (deprecation) warnings as errors."
 	@$(RUN) ; grep -rl "\-Werror" . | xargs sed -i 's/-Werror//'
