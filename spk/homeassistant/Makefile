@@ -83,6 +83,11 @@ ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # [cryptography]
 DEPENDS += cross/cryptography_38
 
+# [uamqp]
+# ignore deprecation warnings when building with openssl 3
+# "cc1: all warnings being treated as errors"
+WHEELS_CFLAGS = [uamqp] -Wno-deprecated-declarations
+
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
 ENV += GEVENTSETUP_EMBED_CARES=FALSE
