@@ -97,6 +97,19 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# WHEELS_TEST_ALL: Force testing all wheel building
+endif
+
+include ../../mk/spksrc.common.mk
+
+# # Enable debug_info builds for DSM6
+# ifeq ($(call version_lt, ${TCVERSION}, 7),1)
+# GCC_DEBUG_INFO := 1
+# endif
+
+## WHEELS_TEST_ALL: Force testing all wheel building
+ifeq ($(strip $(WHEELS_TEST_ALL)),1)
+
 # [rpds-py]
 # maturin canot be built as pre-requisite crossenv
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
@@ -110,13 +123,6 @@ endif
 
 # WHEELS_TEST_ALL: Force testing all wheel building
 endif
-
-include ../../mk/spksrc.common.mk
-
-# # Enable debug_info builds for DSM6
-# ifeq ($(call version_lt, ${TCVERSION}, 7),1)
-# GCC_DEBUG_INFO := 1
-# endif
 
 include ../../mk/spksrc.spk.mk
 
