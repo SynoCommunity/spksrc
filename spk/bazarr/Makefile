@@ -1,6 +1,6 @@
 SPK_NAME = bazarr
 
-SPK_VERS = 1.2.1
+SPK_VERS = 1.2.4
 SPK_REV = 10
 
 SPK_ICON = src/bazarr.png
@@ -30,7 +30,11 @@ MAINTAINER = smaarn
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
 STARTABLE = yes
-CHANGELOG = "Update to version 1.2.1. <br />See corresponding changelogs <a href=\"https://github.com/morpheus65535/bazarr/releases/tag/v1.2.0\">here</a> and <a href=\"https://github.com/morpheus65535/bazarr/releases/tag/v1.2.1\">here</a> for more details.<br/>Migrate to python 3.11"
+CHANGELOG = "Update to version 1.2.4. <br />See corresponding changelogs <a href=\"https://github.com/morpheus65535/bazarr/releases/tag/v1.2.1\">here</a> and <a href=\"https://github.com/morpheus65535/bazarr/releases/tag/v1.2.4\">here</a> for more details.<br/>Migrate to python 3.11"
+
+# [numpy] <= 1.21.6 (armv5)
+# This version is now unsupported using py311
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 HOMEPAGE = https://www.bazarr.media
 LICENSE = GPLv3
@@ -61,19 +65,15 @@ else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
-# [numpy] <= 1.21.6 (armv5)
-# This version is now unsupported using py311
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # [numpy] <= 1.22.4 (armv7l)
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-armv7l.txt
+# [numpy] <= 1.24.4 last working version with gcc-4.9
 else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy-gcc4.txt
 # [numpy] >= 1.25.0 requires c++17
 else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
-endif
 endif
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
