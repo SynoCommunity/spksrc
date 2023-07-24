@@ -1,5 +1,5 @@
 SPK_NAME = duplicity
-SPK_VERS = 1.0.1
+SPK_VERS = 1.2.3
 SPK_REV = 10
 SPK_ICON = src/duplicity.png
 
@@ -32,7 +32,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Update duplicity to v1.0.1 and duply to v2.4.1<br/>2. Update to openssl 3.1.1<br/>Migrate to python 3.11"
+CHANGELOG = "1. Update duplicity to v1.2.3 and duply to v2.4.3<br/>2. Update to openssl 3.1.1<br/>Migrate to python 3.11"
 
 HOMEPAGE = https://duplicity.gitlab.io/duplicity-web/
 LICENSE  = GPLv2
