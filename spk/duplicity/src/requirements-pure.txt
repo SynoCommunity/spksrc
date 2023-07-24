@@ -31,7 +31,7 @@ dropbox==11.36.2
 ecdsa==0.18.0
 fasteners==0.18
 #filelock                      ==> py311
-uture==0.18.3
+future==0.18.3
 gdata-python3==3.0.1
 gitchangelog==3.0.4
 google-api-core==2.11.1
@@ -46,7 +46,6 @@ idna==3.4
 imagesize==1.4.1
 importlib-metadata==6.8.0
 iniconfig==2.0.0
-Installed modules:
 ip-associations-python-novaclient-ext==0.2
 iso8601==2.0.0
 isodate==0.6.1
