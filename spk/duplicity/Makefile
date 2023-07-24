@@ -24,6 +24,9 @@ DEPENDS += cross/libyaml
 DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
 
+# [protobuf]
+WHEELS_CPPFLAGS = [protobuf] -std=c99
+
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 SPK_DEPENDS = "python311>=3.11.4-7:gnupg>=2.1.6"
