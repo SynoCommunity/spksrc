@@ -4,6 +4,8 @@ SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$
 SPK_REV = 7
 SPK_ICON = src/python3.png
 
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/pip
 

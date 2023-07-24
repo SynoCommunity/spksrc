@@ -6,6 +6,10 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
+# Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
+# CPython core team, see https://peps.python.org/pep-0011/ for more information.
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 BUILD_DEPENDS = native/$(PKG_NAME)
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
@@ -34,19 +38,11 @@ include ../../mk/spksrc.archs.mk
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
 CONFIGURE_ARGS += --enable-optimizations
-# old compilers fail with unrecognized command line options: -flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # Enable Link-Time Optimization
 CONFIGURE_ARGS += --with-lto
-endif
 else
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
-endif
-
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# older gcc does not know -Wno-unused-result
-CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
 endif
 
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
@@ -140,7 +136,7 @@ CROSSENV_WHEELS += poetry==1.5.1
 CROSSENV_WHEELS += Cython==0.29.35
 CROSSENV_WHEELS += flit==3.9.0
 CROSSENV_WHEELS += cryptography==41.0.1
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==1.1.0
 endif
 
