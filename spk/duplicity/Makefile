@@ -6,6 +6,10 @@ SPK_ICON = src/duplicity.png
 BUILD_DEPENDS = cross/python311
 DEPENDS = cross/librsync cross/duply
 
+# protobuf: missing atomics support 
+# /upb/port/atomic.h:35:23: fatal error: stdatomic.h: No such file or directory
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
 # [cryptography]
 DEPENDS += cross/cryptography
 
@@ -35,7 +39,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Update duplicity to v1.2.3 and duply to v2.4.3<br/>2. Update to openssl 3.1.1<br/>Migrate to python 3.11"
+CHANGELOG = "1. Update duplicity to v1.2.3 and duply to v2.4.3<br/>2. Update to openssl 3.1.1<br/>3. Migrate to python 3.11.<br/>4. Drop support for ARMv5 and ARMv7L archs."
 
 HOMEPAGE = https://duplicity.gitlab.io/duplicity-web/
 LICENSE  = GPLv2
