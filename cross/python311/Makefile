@@ -128,14 +128,29 @@ python311_install:
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
-# wheels to install in crossenv
-CROSSENV_WHEELS  = setuptools-rust==1.6.0
-CROSSENV_WHEELS += setuptools-scm==7.1.0
-CROSSENV_WHEELS += cffi==1.15.1
-CROSSENV_WHEELS += poetry==1.5.1
+# default wheels to install in crossenv
+CROSSENV_WHEELS  = cffi==1.15.1
+CROSSENV_WHEELS += cryptography==41.0.2
 CROSSENV_WHEELS += Cython==0.29.35
 CROSSENV_WHEELS += flit==3.9.0
-CROSSENV_WHEELS += cryptography==41.0.1
+CROSSENV_WHEELS += poetry==1.5.1
+CROSSENV_WHEELS += scikit-build==0.17.6
+CROSSENV_WHEELS += setuptools-rust==1.6.0
+CROSSENV_WHEELS += setuptools-scm==7.1.0
+
+# [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
+# [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+# [numpy] <= 1.24.4 last working version with gcc-4.9
+ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+CROSSENV_WHEELS += numpy==1.24.4
+# [numpy] >= 1.25.0 requires c++17
+else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+CROSSENV_WHEELS += numpy==1.25.1
+endif
+endif
+
+# [maturin]
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==1.1.0
 endif
