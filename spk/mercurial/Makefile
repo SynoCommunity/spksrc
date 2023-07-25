@@ -3,10 +3,10 @@ SPK_VERS = 6.5
 SPK_REV = 9
 SPK_ICON = src/mercurial.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-SPK_DEPENDS = "python311>=3.11.4-7"
+SPK_DEPENDS = "$(PYTHON_PACKAGE)>=3.11.4-7"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mercurial is a free, distributed source control management tool
@@ -21,4 +21,4 @@ SERVICE_SETUP = src/service-setup.sh
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/hg
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
