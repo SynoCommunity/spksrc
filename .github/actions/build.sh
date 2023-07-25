@@ -59,7 +59,7 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
 fi
 
 # Build
-PACKAGES_TO_KEEP="ffmpeg4 ffmpeg5 ffmpeg6"
+PACKAGES_TO_KEEP="ffmpeg4 ffmpeg5 ffmpeg6 python310 python311"
 for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"
