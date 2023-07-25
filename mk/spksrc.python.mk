@@ -44,12 +44,21 @@ PYTHON_LIBS += sqlite3.pc
 PYTHON_LIBS += uuid.pc
 PYTHON_LIBS += zlib.pc
 
+PYTHON_BASE_DEPENDS := $(wildcard $(PYTHON_PACKAGE_ROOT)/.libffi-*_done $(PYTHON_PACKAGE_ROOT)/.openssl*_done $(PYTHON_PACKAGE_ROOT)/.$(PYTHON_PACKAGE)-*_done)
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: python_pre_depend
-python_pre_depend:
+python_pre_depend: python_base_depend
 	@$(MSG) Use existing python in $(PYTHON_PACKAGE_ROOT)
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	@$(foreach lib,$(PYTHON_LIBS),ln -sf $(PYTHON_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/python-cc.mk $(WORK_DIR)/python-cc.mk
+
+.PHONY: python_base_depend
+python_base_depend: $(PYTHON_BASE_DEPENDS)
+	@for status_file in $(PYTHON_BASE_DEPENDS) ; \
+	do \
+	   ln -sf $${status_file} $(WORK_DIR) ; \
+	done
