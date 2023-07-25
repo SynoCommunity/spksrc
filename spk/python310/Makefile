@@ -116,7 +116,7 @@ ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS += src/requirements-crossenv-greenlet-v2.txt
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS += [greenlet] -std=c++11
+WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt

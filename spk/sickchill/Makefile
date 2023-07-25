@@ -25,7 +25,7 @@ include ../../mk/spksrc.common.mk
 
 # [greenlet]
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
-WHEELS_CPPFLAGS = [greenlet] -std=c++11
+WHEELS_CPPFLAGS = [greenlet] -std=c++11 -fpermissive
 endif
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
