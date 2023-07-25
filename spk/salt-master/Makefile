@@ -1,27 +1,19 @@
 SPK_NAME = salt-master
-SPK_VERS = 3004
+SPK_VERS = 3006.1
 SPK_REV = 12
 SPK_ICON = src/salt-master.png
 
-BUILD_DEPENDS = cross/python311
-SPK_DEPENDS = "python311>=3.11.4-7"
 # TODO: Enable as website to provide salt-master status
 DEPENDS = cross/saltgui
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
-# Requirements file generation
-# /usr/local/python3/bin/python3 -mvirtualenv --python=python3  salt-env
-# virtualenv --python=python3  salt-env
-# source salt-env/bin/activate
-# pip install salt
-# pip freeze > requirements.txt
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Master
-CHANGELOG    = "1. Update to 3004<br/>2. Migrate to Python 3.11"
+CHANGELOG    = "1. Update to 3006.1<br/>2. Migrate to Python 3.11<br/>3. Migrate to OpenSSL 3.1.1"
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache v2
@@ -46,7 +38,26 @@ SPK_USR_LOCAL_LINKS += bin:env/bin/salt-ssh
 
 USE_ALTERNATE_TMPDIR = 1
 
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# [cryptography]
+DEPENDS += cross/cryptography
+
+# [pydantic_core]
+# Requires path to maturin from crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+
+include ../../mk/spksrc.python.mk
+
 include ../../mk/spksrc.spk.mk
+
+# [pycryptodomex]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pycryptodomex] -std=c11
+else
+WHEELS_CFLAGS += [pycryptodomex] -std=c99
+endif
 
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
