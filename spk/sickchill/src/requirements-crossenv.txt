@@ -1,5 +1,5 @@
 cffi==1.15.1
-#cryptography==40.0.2  ==> cross/cryptography
+# cryptography          ==> cross/cryptography
 greenlet==2.0.2
 lxml==4.9.2
 MarkupSafe==2.1.2
