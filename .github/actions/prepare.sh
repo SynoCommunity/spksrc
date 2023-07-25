@@ -73,7 +73,7 @@ for i in {4..6}; do
 done
 
 # for python (310, 311) find all packages that depend on them
-for py in "python310 python311"; do
+for py in python310 python311; do
     python_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "PYTHON_PACKAGE = ${py}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
     # If packages contain a package that depends on python (or is python), then ensure
