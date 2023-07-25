@@ -22,43 +22,18 @@ else
 BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
 endif
 
-# minimal set of libraries to use
-PYTHON_LIBS  = expat.pc
-PYTHON_LIBS += formw.pc
-PYTHON_LIBS += history.pc
-PYTHON_LIBS += libcrypto.pc
-PYTHON_LIBS += libffi.pc
-PYTHON_LIBS += liblzma.pc
-PYTHON_LIBS += libssl.pc
-PYTHON_LIBS += menuw.pc
-PYTHON_LIBS += ncurses++w.pc
-PYTHON_LIBS += ncursesw.pc
-PYTHON_LIBS += openssl.pc
-PYTHON_LIBS += panelw.pc
-PYTHON_LIBS += python-$(PYTHON_VERSION)-embed.pc
-PYTHON_LIBS += python-$(PYTHON_VERSION).pc
-PYTHON_LIBS += python$(shell echo $(PYTHON_VERSION) | cut -c1)-embed.pc
-PYTHON_LIBS += python$(shell echo $(PYTHON_VERSION) | cut -c1).pc
-PYTHON_LIBS += readline.pc
-PYTHON_LIBS += sqlite3.pc
-PYTHON_LIBS += uuid.pc
-PYTHON_LIBS += zlib.pc
-
-PYTHON_BASE_DEPENDS := $(wildcard $(PYTHON_PACKAGE_ROOT)/.libffi-*_done $(PYTHON_PACKAGE_ROOT)/.openssl*_done $(PYTHON_PACKAGE_ROOT)/.$(PYTHON_PACKAGE)-*_done)
+# Re-use all default python mandatory libraries
+PYTHON_LIBS := $(wildcard $(PYTHON_DIR)/lib/pkgconfig/*.pc)
+# Re-use all python dependencies and mark as already done
+PYTHON_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_ROOT)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(shell pwd)/../../$(pkg_name)/Makefile))),$(wildcard $(PYTHON_PACKAGE_ROOT)/.$(cross)-*_done))
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: python_pre_depend
-python_pre_depend: python_base_depend
+python_pre_depend:
 	@$(MSG) Use existing python in $(PYTHON_PACKAGE_ROOT)
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	@$(foreach lib,$(PYTHON_LIBS),ln -sf $(PYTHON_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+	@$(foreach lib,$(PYTHON_LIBS),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/python-cc.mk $(WORK_DIR)/python-cc.mk
-
-.PHONY: python_base_depend
-python_base_depend: $(PYTHON_BASE_DEPENDS)
-	@for status_file in $(PYTHON_BASE_DEPENDS) ; \
-	do \
-	   ln -sf $${status_file} $(WORK_DIR) ; \
-	done
+	@$(foreach _done,$(PYTHON_DEPENDS), ln -sf $(_done) $(WORK_DIR) ;)
