@@ -10,7 +10,7 @@ MAINTAINER = cytec
 DESCRIPTION = PlexPy Custom allows you to run the fork of your choice of PlexPy. You will be asked for the fork\'s git URL during install.
 DESCRIPTION_FRE = PlexPy Custom vous permet d\'exécuter la variante de PlexPy votre choix. Il vous sera demandé l\'URL git de la variante à l\'installation.
 DISPLAY_NAME = PlexPy Custom
-CHANGELOG = "Migrate to Python3.11"
+CHANGELOG = "1. Migrate to Python 3.11<br/>2. Change download URL to use https"
 
 HOMEPAGE   = https://tautulli.com
 LICENSE    = GPL
