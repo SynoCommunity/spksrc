@@ -9,6 +9,8 @@ PKG_DIR = MPD-$(PKG_VERS)
 # A compiler with support for C++14 language features is required.
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
+OPTIONAL_DEPENDS = cross/libmad
+
 include ../../mk/spksrc.archs.mk
 
 DEPENDS  = cross/glib
