@@ -50,8 +50,6 @@ ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
 
 include ../../mk/spksrc.python.mk
 
-include ../../mk/spksrc.spk.mk
-
 # [pycryptodomex]
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
