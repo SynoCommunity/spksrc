@@ -37,8 +37,8 @@ PYTHON_LIBS += openssl.pc
 PYTHON_LIBS += panelw.pc
 PYTHON_LIBS += python-$(PYTHON_VERSION)-embed.pc
 PYTHON_LIBS += python-$(PYTHON_VERSION).pc
-PYTHON_LIBS += python$(shell echo $${PYTHON_VERSION%??})-embed.pc
-PYTHON_LIBS += python$(shell echo $${PYTHON_VERSION%??}).pc
+PYTHON_LIBS += python$(shell echo $(PYTHON_VERSION) | cut -c1)-embed.pc
+PYTHON_LIBS += python$(shell echo $(PYTHON_VERSION) | cut -c1).pc
 PYTHON_LIBS += readline.pc
 PYTHON_LIBS += sqlite3.pc
 PYTHON_LIBS += uuid.pc
@@ -51,5 +51,5 @@ python_pre_depend:
 	@$(MSG) Use existing python in $(PYTHON_PACKAGE_ROOT)
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	@$(foreach lib,$(PYTHON_LIBS),ln -sf $(PYTHON_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
-	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(STAGING_INSTALL_PREFIX)/crossenv
+	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/python-cc.mk $(WORK_DIR)/python-cc.mk
