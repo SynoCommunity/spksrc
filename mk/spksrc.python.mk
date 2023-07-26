@@ -15,6 +15,8 @@ export PYTHON_DIR = $(realpath $(PYTHON_PACKAGE_ROOT)/install/var/packages/$(PYT
 # set PYTHONPATH for spksrc.python-module.mk
 PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/site-packages/
 
+# set ld flags to rewrite for the library path used to access
+# libraries provided by the python package at destination
 ifneq ($(wildcard $(PYTHON_DIR)),)
 export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(PYTHON_DIR)/lib -Wl,--rpath,/var/packages/$(PYTHON_PACKAGE)/target/lib
 PRE_DEPEND_TARGET = python_pre_depend
@@ -24,6 +26,7 @@ endif
 
 # Re-use all default python mandatory libraries
 PYTHON_LIBS := $(wildcard $(PYTHON_DIR)/lib/pkgconfig/*.pc)
+
 # Re-use all python dependencies and mark as already done
 PYTHON_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_ROOT)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(shell pwd)/../../$(pkg_name)/Makefile))),$(wildcard $(PYTHON_PACKAGE_ROOT)/.$(cross)-*_done))
 
@@ -37,3 +40,5 @@ python_pre_depend:
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/python-cc.mk $(WORK_DIR)/python-cc.mk
 	@$(foreach _done,$(PYTHON_DEPENDS), ln -sf $(_done) $(WORK_DIR) ;)
+	# Ensure zlib is always built locally
+	@rm -f $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/zlib.pc $(WORK_DIR)/.zlib*
