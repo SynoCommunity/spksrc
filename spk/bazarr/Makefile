@@ -1,11 +1,13 @@
 SPK_NAME = bazarr
-
 SPK_VERS = 1.2.4
 SPK_REV = 10
-
 SPK_ICON = src/bazarr.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
+
+SPK_DEPENDS = "python311>=3.11.4-7:ffmpeg"
+
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 DEPENDS = cross/$(SPK_NAME)
 DEPENDS += cross/unrar
@@ -23,14 +25,14 @@ WHEELS_BUILD_ARGS += --enable-freetype
 WHEELS_BUILD_ARGS += --enable-jpeg
 WHEELS_BUILD_ARGS += --enable-zlib
 
-SPK_DEPENDS = "python311>=3.11.4-7:ffmpeg"
-
 MAINTAINER = smaarn
-
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
-STARTABLE = yes
 CHANGELOG = "Update to version 1.2.4. <br />See corresponding changelogs <a href=\"https://github.com/morpheus65535/bazarr/releases/tag/v1.2.1\">here</a> and <a href=\"https://github.com/morpheus65535/bazarr/releases/tag/v1.2.4\">here</a> for more details.<br/>Migrate to python 3.11"
+
+HOMEPAGE  = https://www.bazarr.media/
+LICENSE   = GPL-3.0 license
+STARTABLE = yes
 
 # [numpy] <= 1.21.6 (armv5)
 # This version is now unsupported using py311
@@ -48,12 +50,10 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 USE_ALTERNATE_TMPDIR = 1
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
 
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
