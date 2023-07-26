@@ -4,15 +4,15 @@ feedparser==6.0.10
 configobj==5.0.8
 cheroot==10.0.0
 cherrypy==18.8.0
-jaraco.functools==3.6.0
-jaraco.collections==4.1.0
+jaraco.functools==3.7.0
+jaraco.collections==4.2.0
 jaraco.text==3.8.1 # Newer version introduces irrelevant extra dependencies
 jaraco.classes==3.2.3
 jaraco.context==4.3.0
 more-itertools==9.1.0
 zc.lockfile==3.0.post1
 python-dateutil==2.8.2
-tempora==5.2.2
+tempora==5.3.0
 pytz==2023.3
 sgmllib3k==1.0.0
 portend==3.1.0
