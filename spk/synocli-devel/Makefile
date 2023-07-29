@@ -155,17 +155,22 @@ SPK_COMMANDS += bin/pkg-config
 ##
 ## glibc
 ##
+ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
+OPTIONAL_DESC += ", glibc 2.37"
+else
+OPTIONAL_DESC += ", glibc 2.28"
+endif
 SPK_COMMANDS += bin/gencat
-SPK_COMMANDS += getconf
-SPK_COMMANDS += getent
-SPK_COMMANDS += iconv
-SPK_COMMANDS += ldd
-SPK_COMMANDS += locale
-SPK_COMMANDS += localedef
-SPK_COMMANDS += makedb
-SPK_COMMANDS += mtrace
-SPK_COMMANDS += pcprofiledump
-SPK_COMMANDS += pldd
-SPK_COMMANDS += sotruss
-SPK_COMMANDS += sprof
-SPK_COMMANDS += xtrace
+SPK_COMMANDS += bin/getconf
+SPK_COMMANDS += bin/getent
+SPK_COMMANDS += bin/iconv
+SPK_COMMANDS += bin/ldd
+SPK_COMMANDS += bin/locale
+SPK_COMMANDS += bin/localedef
+SPK_COMMANDS += bin/makedb
+SPK_COMMANDS += bin/mtrace
+SPK_COMMANDS += bin/pcprofiledump
+SPK_COMMANDS += bin/pldd
+SPK_COMMANDS += bin/sotruss
+SPK_COMMANDS += bin/sprof
+SPK_COMMANDS += bin/xtrace
