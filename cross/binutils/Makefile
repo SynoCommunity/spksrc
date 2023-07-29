@@ -1,5 +1,5 @@
 PKG_NAME = binutils
-PKG_VERS = 2.39
+PKG_VERS = 2.40
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/binutils/
