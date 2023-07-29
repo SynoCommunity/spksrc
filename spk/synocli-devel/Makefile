@@ -28,6 +28,7 @@ DEPENDS += cross/automake
 DEPENDS += cross/binutils
 DEPENDS += cross/gdb
 DEPENDS += cross/make
+DEPENDS += cross/glibc
 
 ##
 ## autoconf
