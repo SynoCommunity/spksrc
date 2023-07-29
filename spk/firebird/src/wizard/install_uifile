@@ -1,0 +1,22 @@
+[
+  {
+    "step_title": "Configuration of FirebirdSQL server",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "SYSDBA user",
+        "subitems": [
+          {
+            "key": "wizard_sysdba_password",
+            "desc": "User password",
+            "defaultValue": "masterpassword",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
+
