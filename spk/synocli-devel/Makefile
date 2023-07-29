@@ -1,11 +1,11 @@
 SPK_NAME = synocli-devel
-SPK_VERS = 1.0
-SPK_REV = 1
+SPK_VERS = 1.1
+SPK_REV = 2
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Initial release of synocli-devel"
+CHANGELOG = "1. Update LLVM to version 16.0.6<br/>2. Update gdb to version 13.2<br/>3. Update binutils to version 2.40<br/>4. Include glibc tools version 2.37
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.39$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2.
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2.
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -87,7 +87,7 @@ SPK_COMMANDS += bin/strip
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 OPTIONAL_DESC += ", gdb 7.12.1"
 else
-OPTIONAL_DESC += ", gdb 13.1"
+OPTIONAL_DESC += ", gdb 13.2"
 endif
 
 SPK_COMMANDS += bin/gcore
@@ -104,7 +104,7 @@ include ../../mk/spksrc.spk.mk
 ## LLVM
 ##
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
-OPTIONAL_DESC += ", LLVM 16.0.1"
+OPTIONAL_DESC += ", LLVM 16.0.6"
 SPK_COMMANDS += bin/clang-16
 else
 OPTIONAL_DESC += ", LLVM 9.0.1"
@@ -150,3 +150,21 @@ SPK_COMMANDS += bin/make
 ## pkg-config
 ##
 SPK_COMMANDS += bin/pkg-config
+
+##
+## glibc
+##
+SPK_COMMANDS += bin/gencat
+SPK_COMMANDS += getconf
+SPK_COMMANDS += getent
+SPK_COMMANDS += iconv
+SPK_COMMANDS += ldd
+SPK_COMMANDS += locale
+SPK_COMMANDS += localedef
+SPK_COMMANDS += makedb
+SPK_COMMANDS += mtrace
+SPK_COMMANDS += pcprofiledump
+SPK_COMMANDS += pldd
+SPK_COMMANDS += sotruss
+SPK_COMMANDS += sprof
+SPK_COMMANDS += xtrace
