@@ -2,7 +2,7 @@ SPK_NAME = synocli-devel
 SPK_VERS = 1.1
 SPK_REV = 2
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Update LLVM to version 16.0.6<br/>2. Update gdb to version 13.2<br/>3. Update binutils to version 2.40<br/>4. Include glibc tools version 2.37
+CHANGELOG = "1. Update LLVM to version 16.0.6<br/>2. Update gdb to version 13.2<br/>3. Update binutils to version 2.40<br/>4. Include glibc tools version 2.37"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2.
