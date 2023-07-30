@@ -20,7 +20,6 @@ COMPILE_TARGET = glibc_compile_taget
 INSTALL_TARGET = glibc_install_target
 
 CONFIGURE_ARGS  = --enable-shared
-#CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --enable-kernel=$(word 1,$(subst ., ,$(TC_KERNEL))).$(word 2,$(subst ., ,$(TC_KERNEL)))
 CONFIGURE_ARGS += --disable-timezone-tools
 CONFIGURE_ARGS += --disable-crypt

@@ -20,7 +20,6 @@ COMPILE_TARGET = glibc_compile_taget
 INSTALL_TARGET = glibc_install_target
 
 CONFIGURE_ARGS  = --enable-shared
-#CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --enable-kernel=$(word 1,$(subst ., ,$(TC_KERNEL))).$(word 2,$(subst ., ,$(TC_KERNEL)))
 CONFIGURE_ARGS += --disable-timezone-tools
 CONFIGURE_ARGS += --disable-crypt
@@ -38,7 +37,7 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: glibc_configure_target
 glibc_configure_target:
 	@mkdir $(WORK_DIR)/$(PKG_DIR)-build
-	$(RUN) && cd ../$(PKG_DIR)-build && env $(ENV) ../$(PKG_DIR)/configure $(REAL_CONFIGURE_ARGS)
+	@$(RUN) && cd ../$(PKG_DIR)-build && env $(ENV) ../$(PKG_DIR)/configure $(REAL_CONFIGURE_ARGS)
 
 .PHONY: glibc_compile_taget
 glibc_compile_taget:
