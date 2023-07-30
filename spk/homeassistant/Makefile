@@ -9,6 +9,7 @@ PYTHON_PACKAGE = python311
 SPK_DEPENDS = "$(PYTHON_PACKAGE)>=3.11.4-7"
 
 BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
+OPTIONAL_DEPENDS = cross/libstdc++
 
 # [numpy] > 1.22.4
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
@@ -16,7 +17,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "1. Update homeassistant to 2023.7.3. and depend on Python 3.11 and OpenSSL 3.1.<br/>2. Update HACS integration to v1.32.1.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "1. Update homeassistant to 2023.7.3. and depend on Python 3.11 and OpenSSL 3.1.<br/>2. Update HACS integration to v1.32.1.<br/>3. Add libstdc++ for DSM 6 to fix grpcio dependency.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
@@ -36,6 +37,21 @@ POST_STRIP_TARGET = homeassistant_extra_install
 
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
 WHEELS = src/requirements-abi3.txt src/requirements-crossenv.txt src/requirements-pure.txt
+
+include ../../mk/spksrc.common.mk
+
+# [grpcio]
+# for DSM < 7 with too old libstdc++
+# avoid error: undefined symbol: _ZTVNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEE
+# this is a fix for integrations depending on grpcio (google nest, google generativeai and starlink)
+# the fix requires to additionally set the LD_LIBRARY_PATH to homeassistant/target/lib
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+DEPENDS += cross/libstdc++
+endif
+
+# [voip_utils]
+# for voice over ip integration
+DEPENDS += cross/opus
 
 # definitions and libraries
 # to build wheels of src/requirements-crossenv.txt and src/requirements-abi3.txt
