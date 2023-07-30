@@ -28,7 +28,7 @@ DEPENDS += cross/automake
 DEPENDS += cross/binutils
 DEPENDS += cross/gdb
 DEPENDS += cross/make
-DEPENDS += cross/glibc
+#DEPENDS += cross/glibc
 
 ##
 ## autoconf
@@ -118,8 +118,6 @@ SPK_COMMANDS += bin/clang-cl
 SPK_COMMANDS += bin/clang-cpp
 SPK_COMMANDS += bin/clang-extdef-mapping
 SPK_COMMANDS += bin/clang-format
-SPK_COMMANDS += bin/clang-import-test
-SPK_COMMANDS += bin/clang-offload-bundler
 SPK_COMMANDS += bin/clang-refactor
 SPK_COMMANDS += bin/clang-rename
 SPK_COMMANDS += bin/clang-scan-deps
@@ -137,6 +135,11 @@ SPK_COMMANDS += bin/llvm-objdump
 SPK_COMMANDS += bin/llvm-profdata
 SPK_COMMANDS += bin/llvm-ranlib
 SPK_COMMANDS += bin/llvm-rc
+SPK_COMMANDS += bin/llvm-readelf
+SPK_COMMANDS += bin/llvm-readobj
+SPK_COMMANDS += bin/llvm-size
+SPK_COMMANDS += bin/llvm-strings
+SPK_COMMANDS += bin/llvm-strip
 SPK_COMMANDS += bin/llvm-symbolizer
 SPK_COMMANDS += bin/scan-build
 SPK_COMMANDS += bin/scan-view

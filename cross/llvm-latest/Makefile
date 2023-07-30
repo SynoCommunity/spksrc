@@ -13,6 +13,8 @@ REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) comcerto2k
 CMAKE_USE_NINJA = 1
 
+POST_INSTALL_TARGET = llvm_post_install
+
 # Using LLVM project source need to change to llvm sub-directory
 CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/llvm
 
@@ -79,7 +81,7 @@ include ../../mk/spksrc.common.mk
 #
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=ARM
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;compiler-rt;lld'
+CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
 CMAKE_ARGS += -DCOMPILER_RT_BUILD_BUILTINS=ON
 CMAKE_ARGS += -DCOMPILER_RT_BUILD_PROFILE=OFF
 CMAKE_ARGS += -DCOMPILER_RT_BUILD_SANITIZERS=OFF
@@ -88,22 +90,26 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=ARM
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lld'
+CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=AArch64
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;compiler-rt;lld'
+CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;compiler-rt;lld'
+CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;compiler-rt;lld'
+CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
 endif
 
 include ../../mk/spksrc.cross-cmake.mk
+
+.PHONY: llvm_post_install
+llvm_post_install:
+	$(RUN) && cd $(STAGING_INSTALL_PREFIX)/bin && ln -s llvm-readobj llvm-readelf
