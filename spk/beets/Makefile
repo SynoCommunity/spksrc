@@ -3,7 +3,7 @@ SPK_VERS = 1.6.0
 SPK_REV = 9
 SPK_ICON = src/beets.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 SPK_DEPENDS = "python311>=3.11.4-7"
@@ -39,4 +39,4 @@ STARTABLE = no
 
 SPK_COMMANDS = env/bin/beet
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
