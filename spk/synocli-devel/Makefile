@@ -2,10 +2,10 @@ SPK_NAME = synocli-devel
 SPK_VERS = 1.1
 SPK_REV = 2
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Update LLVM to version 16.0.6<br/>2. Update gdb to version 13.2<br/>3. Update binutils to version 2.40<br/>4. Include libtree 3.3.1 as ldd replacement"
+CHANGELOG = "1. Update LLVM to version 16.0.6<br/>2. Update gdb to version 13.2<br/>3. Update binutils to version 2.40<br/>4. Include libtree 3.3.1 as ldd replacement<br/>Include strace 6.4"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1.
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.4
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -29,6 +29,7 @@ DEPENDS += cross/binutils
 DEPENDS += cross/gdb
 DEPENDS += cross/make
 DEPENDS += cross/libtree
+DEPENDS += cross/strace
 
 ##
 ## autoconf
@@ -159,3 +160,9 @@ SPK_COMMANDS += bin/pkg-config
 ## libtree
 ##
 SPK_COMMANDS += bin/libtree
+
+##
+## strace
+##
+SPK_COMMANDS += bin/strace
+SPK_COMMANDS += bin/strace-log-merge
