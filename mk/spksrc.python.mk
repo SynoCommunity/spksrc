@@ -12,13 +12,15 @@ export PYTHON_DIR = $(realpath $(PYTHON_PACKAGE_ROOT)/install/var/packages/$(PYT
 # get PYTHON_VERSION and other variables
 -include $(PYTHON_PACKAGE_ROOT)/python-cc.mk
 
+ifneq ($(wildcard $(PYTHON_DIR)),)
+# set ld flags to rewrite for the library path used to access
+# libraries provided by the python package at destination
+export ADDITIONAL_LDFLAGS += -Wl,--rpath-link,$(PYTHON_DIR)/lib -Wl,--rpath,/var/packages/$(PYTHON_PACKAGE)/target/lib
+
 # set PYTHONPATH for spksrc.python-module.mk
 PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/site-packages/
 
-# set ld flags to rewrite for the library path used to access
-# libraries provided by the python package at destination
-ifneq ($(wildcard $(PYTHON_DIR)),)
-export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(PYTHON_DIR)/lib -Wl,--rpath,/var/packages/$(PYTHON_PACKAGE)/target/lib
+# call-up pre-depend to prepare the shared python build environment
 PRE_DEPEND_TARGET = python_pre_depend
 else
 BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
