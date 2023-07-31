@@ -2,10 +2,10 @@ SPK_NAME = synocli-devel
 SPK_VERS = 1.1
 SPK_REV = 2
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Update LLVM to version 16.0.6<br/>2. Update gdb to version 13.2<br/>3. Update binutils to version 2.40<br/>4. Include glibc tools version 2.37"
+CHANGELOG = "1. Update LLVM to version 16.0.6<br/>2. Update gdb to version 13.2<br/>3. Update binutils to version 2.40<br/>4. Include libtree 3.3.1 as ldd replacement"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2.
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1.
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -28,7 +28,7 @@ DEPENDS += cross/automake
 DEPENDS += cross/binutils
 DEPENDS += cross/gdb
 DEPENDS += cross/make
-#DEPENDS += cross/glibc
+DEPENDS += cross/libtree
 
 ##
 ## autoconf
@@ -156,24 +156,6 @@ SPK_COMMANDS += bin/make
 SPK_COMMANDS += bin/pkg-config
 
 ##
-## glibc
+## libtree
 ##
-ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
-OPTIONAL_DESC += ", glibc 2.37"
-else
-OPTIONAL_DESC += ", glibc 2.28"
-endif
-SPK_COMMANDS += bin/gencat
-SPK_COMMANDS += bin/getconf
-SPK_COMMANDS += bin/getent
-SPK_COMMANDS += bin/iconv
-SPK_COMMANDS += bin/ldd
-SPK_COMMANDS += bin/locale
-SPK_COMMANDS += bin/localedef
-SPK_COMMANDS += bin/makedb
-SPK_COMMANDS += bin/mtrace
-SPK_COMMANDS += bin/pcprofiledump
-SPK_COMMANDS += bin/pldd
-SPK_COMMANDS += bin/sotruss
-SPK_COMMANDS += bin/sprof
-SPK_COMMANDS += bin/xtrace
+SPK_COMMANDS += bin/libtree
