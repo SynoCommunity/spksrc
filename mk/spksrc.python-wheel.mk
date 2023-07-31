@@ -22,8 +22,17 @@ include ../../mk/spksrc.cross-cc.mk
 # Fetch python variables
 -include $(WORK_DIR)/python-cc.mk
 
+# If using spk.python.mk with PYTHON_DIR defined
+# then redirect STAGING_INSTALL_PREFIX so rust
+# wheels can find openssl and other libraries
+ifneq ($(strip $(PYTHON_DIR)),)
+STAGING_INSTALL_PREFIX := $(PYTHON_DIR)
+endif
+
 # Python module variables
+ifeq ($(strip $(PYTHONPATH)),)
 PYTHONPATH = $(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/
+endif
 
 ## python wheel specific configurations
 include ../../mk/spksrc.wheel-env.mk
