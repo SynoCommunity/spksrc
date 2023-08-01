@@ -14,8 +14,6 @@ bin:bin/gprofng
 bin:bin/ld
 bin:bin/ld.bfd
 bin:bin/ld.gold
-lnk:bin/ld.lld
-lnk:bin/ld64.lld
 bin:bin/nm
 bin:bin/objcopy
 bin:bin/objdump
@@ -25,3 +23,4 @@ bin:bin/size
 bin:bin/strings
 bin:bin/strip
 lib:lib/bfd-plugins/libdep.so
+lib:lib/gprofng/*.so
