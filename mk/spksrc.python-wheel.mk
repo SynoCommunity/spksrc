@@ -25,7 +25,7 @@ include ../../mk/spksrc.cross-cc.mk
 # If using spk.python.mk with PYTHON_DIR defined
 # then redirect STAGING_INSTALL_PREFIX so rust
 # wheels can find openssl and other libraries
-ifneq ($(strip $(PYTHON_DIR)),)
+ifneq ($(wildcard $(PYTHON_DIR)),)
 STAGING_INSTALL_PREFIX := $(PYTHON_DIR)
 endif
 
