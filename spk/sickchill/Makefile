@@ -3,7 +3,7 @@ SPK_VERS = 20230627
 SPK_REV = 9
 SPK_ICON = src/sickchill.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
 
 SPK_DEPENDS = "python311>=3.11.4-7"
 
@@ -55,7 +55,8 @@ USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = sickchill_extra_install
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
+
 # prefere native python tools (pip, maturin, ...)
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/python311/work-native/install/usr/local/bin):$(PATH)
 
