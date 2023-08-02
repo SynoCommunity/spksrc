@@ -54,6 +54,7 @@ python_pre_depend:
 python_pre_depend_debug:
 	@$(MSG) *****************************************************
 	@$(MSG) ******************** DEBUG **************************
+	@$(MSG) *** PYTHON_PACKAGE: $(PYTHON_PACKAGE)
 	@$(MSG) *** PYTHON_PACKAGE_ROOT: $(PYTHON_PACKAGE_ROOT)
 	@$(MSG) *** SHELL: $(shell ls -1d $(PYTHON_PACKAGE_ROOT))
 	@$(MSG) *** PYTHON_DIR: $(PYTHON_DIR)
