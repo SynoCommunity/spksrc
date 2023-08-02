@@ -4,6 +4,8 @@ HOMEPAGE = https://www.gnu.org/software/gdb/
 COMMENT  = The GNU Project Debugger
 LICENSE  = GPLv2/LGPLv2
 
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+
 DOWNLOAD_TARGET = nop
 CHECKSUM_TARGET = nop
 EXTRACT_TARGET = nop
