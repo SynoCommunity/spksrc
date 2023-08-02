@@ -24,6 +24,7 @@ PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_DIR)/l
 PRE_DEPEND_TARGET = python_pre_depend
 else
 BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
+PRE_DEPEND_TARGET = python_pre_depend_debug
 endif
 
 # Re-use all default python mandatory libraries
@@ -36,7 +37,10 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: python_pre_depend
 python_pre_depend:
-	@$(MSG) Use existing python in $(PYTHON_PACKAGE_ROOT)
+	@$(MSG) *****************************************************
+	@$(MSG) *** Use existing shared objects from $(PYTHON_VERSION)
+	@$(MSG) *** PATH: $(PYTHON_PACKAGE_ROOT)
+	@$(MSG) *****************************************************
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	@$(foreach lib,$(PYTHON_LIBS),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
@@ -45,3 +49,17 @@ python_pre_depend:
 	# EXCEPTIONS: Ensure zlib,bzip2 is always built locally
 	@rm -f $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/zlib.pc $(WORK_DIR)/.zlib*
 	@rm -f $(WORK_DIR)/.bzip2*
+
+.PHONY: python_pre_depend_debug
+python_pre_depend_debug:
+	@$(MSG) *****************************************************
+	@$(MSG) ******************** DEBUG **************************
+	@$(MSG) *** PYTHON_PACKAGE_ROOT: $(PYTHON_PACKAGE_ROOT)
+	@$(MSG) *** SHELL: $(shell ls -1d $(PYTHON_PACKAGE_ROOT))
+	@$(MSG) *** PYTHON_DIR: $(PYTHON_DIR)
+	@$(MSG) *** SHELL: $(shell ls -1d $(PYTHON_DIR))
+	@$(MSG) *** PYTHONPATH: $(PYTHONPATH:)
+	@$(MSG) *** PYTHON_LIBS: $(PYTHON_LIBS:)
+	@$(MSG) *** PYTHON_DEPENDS: $(PYTHON_DEPENDS:)
+	@$(MSG) *****************************************************
+	exit 2
