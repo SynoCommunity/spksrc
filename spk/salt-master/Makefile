@@ -4,15 +4,13 @@ SPK_REV = 12
 SPK_ICON = src/salt-master.png
 
 PYTHON_PACKAGE = python311
-
 SPK_DEPENDS = "$(PYTHON_PACKAGE)>=3.11.4-7"
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # TODO: Enable as website to provide salt-master status
 DEPENDS = cross/saltgui
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
-
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
