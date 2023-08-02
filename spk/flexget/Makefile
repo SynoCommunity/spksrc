@@ -3,7 +3,7 @@ SPK_VERS = 3.7.10
 SPK_REV = 13
 SPK_ICON = src/${SPK_NAME}.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.4-7"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -42,7 +42,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 # [PyYAML]
 DEPENDS += cross/libyaml
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
 
 # [greenlet] == 2.0.1
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
