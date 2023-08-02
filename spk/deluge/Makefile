@@ -3,7 +3,7 @@ SPK_VERS = 2.1.1.61
 SPK_REV = 21
 SPK_ICON = src/deluge.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
 
 WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
@@ -45,7 +45,7 @@ DEPENDS += cross/cryptography
 # [rencode]
 PYTHON_LIMITED_API=cp36
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
 
 # [libtorrent]
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
