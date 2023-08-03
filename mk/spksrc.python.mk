@@ -4,7 +4,6 @@
 # Variables:
 #  PYTHON_PACKAGE       Must be set to the python spk folder (python310, python311, ...)
 
-
 # set default spk/python* path to use
 PYTHON_PACKAGE_ROOT = $(realpath $(shell pwd)/../$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 export PYTHON_DIR = $(realpath $(PYTHON_PACKAGE_ROOT)/install/var/packages/$(PYTHON_PACKAGE)/target)
@@ -20,17 +19,18 @@ export ADDITIONAL_LDFLAGS += -Wl,--rpath-link,$(PYTHON_DIR)/lib -Wl,--rpath,/var
 # set PYTHONPATH for spksrc.python-module.mk
 PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/site-packages/
 
-# call-up pre-depend to prepare the shared python build environment
-PRE_DEPEND_TARGET = python_pre_depend
-else
-BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
-endif
-
 # Re-use all default python mandatory libraries
 PYTHON_LIBS := $(wildcard $(PYTHON_DIR)/lib/pkgconfig/*.pc)
 
 # Re-use all python dependencies and mark as already done
 PYTHON_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_ROOT)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(shell pwd)/../../$(pkg_name)/Makefile))),$(wildcard $(PYTHON_PACKAGE_ROOT)/.$(cross)-*_done))
+
+# call-up pre-depend to prepare the shared python build environment
+PRE_DEPEND_TARGET = python_pre_depend
+
+else
+BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
+endif
 
 include ../../mk/spksrc.spk.mk
 

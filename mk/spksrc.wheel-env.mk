@@ -5,6 +5,21 @@
 ##### rust specific configurations
 include ../../mk/spksrc.cross-rust-env.mk
 
+# set PYTHON_DIR if unset (e.g. using spksrc.spk.mk instead of spksrc.python.mk)
+ifeq ($(strip $(PYTHON_DIR)),)
+PYTHON_DIR = $(STAGING_INSTALL_PREFIX)
+endif
+
+# Mandatory for rustc wheel building
+ENV += PYO3_CROSS_LIB_DIR=$(PYTHON_DIR)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(PYTHON_DIR)/include/
+
+# Mandatory of using OPENSSL_*_DIR starting with
+# cryptography version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+ENV += OPENSSL_LIB_DIR=$(PYTHON_DIR)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(PYTHON_DIR)/include/
+
 # Enable pure-python packaging
 ifeq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = FALSE
