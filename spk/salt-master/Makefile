@@ -15,7 +15,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Master
-CHANGELOG    = "1. Update to 3006.1<br/>2. Migrate to Python 3.11<br/>3. Migrate to OpenSSL 3.1.1"
+CHANGELOG    = "1. Update to 3006.1<br/>2. Migrate to Python 3.11<br/>3. Migrate to OpenSSL 3.1.2"
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache v2
