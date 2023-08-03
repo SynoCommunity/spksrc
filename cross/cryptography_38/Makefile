@@ -15,13 +15,10 @@ LICENSE  = BSD/ASL2
 ### This cross/cryptography_38 is needed to generate python-limited abi3 wheels
 ### Ref: https://github.com/pyca/cryptography/issues/7671
 ### 
-### And it is required to link to cross/openssl3 since cryptography < 40 is statically linked to openssl
+### And it is required to link to cross/openssl3 since
+### cryptography < 40 is statically linked to openssl
 ### and prebuilt wheels are linked to openssl 1.1
 
 WHEELS_BUILD_ARGS = --py-limited-api=$(PYTHON_LIMITED_API)
-
-# Mandatory PYO3_* variables for rust cross-compiling
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 include ../../mk/spksrc.python-wheel.mk

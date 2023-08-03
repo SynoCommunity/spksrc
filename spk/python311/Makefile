@@ -46,19 +46,10 @@ ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-abi3.txt
 
-# [bcrypt] and [cryptography]
-# Mandatory for rustc wheel building
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-
 # [cryptography]
 # Use cross/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py311-py311 regular build use src/requirements-crossenv.txt
-#
-# Mandatory mandatory of using OPENSSL_*_DIR starting with version >= 40
-ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 DEPENDS += cross/cryptography
 
 # [gevent]
@@ -116,9 +107,6 @@ ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 # maturin canot be built as pre-requisite crossenv
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-rpds-py.txt
-# Mandatory for rustc wheel building
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # Requires path to maturin from crossenv
 ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
 endif
