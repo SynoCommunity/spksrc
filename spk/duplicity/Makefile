@@ -3,7 +3,10 @@ SPK_VERS = 1.2.3
 SPK_REV = 10
 SPK_ICON = src/duplicity.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
+SPK_DEPENDS = "python311>=3.11.4-7:gnupg>=2.1.6"
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+
 DEPENDS = cross/librsync cross/duply
 
 # protobuf: missing atomics support 
@@ -12,10 +15,6 @@ UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 # [cryptography]
 DEPENDS += cross/cryptography
-
-# [bcrypt]
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # [lxml]
 DEPENDS += cross/libxml2
@@ -30,10 +29,6 @@ ENV += SODIUM_INSTALL=system
 
 # [protobuf]
 WHEELS_CPPFLAGS = [protobuf] -std=c99
-
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-
-SPK_DEPENDS = "python311>=3.11.4-7:gnupg>=2.1.6"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
@@ -54,4 +49,4 @@ SPK_COMMANDS = bin/duply bin/duplicity
 SPK_USR_LOCAL_LINKS  = bin:env/bin/duplicity
 SPK_USR_LOCAL_LINKS += bin:bin/duply
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
