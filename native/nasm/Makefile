@@ -1,8 +1,8 @@
 PKG_NAME = nasm
 PKG_VERS = 2.16.01
-PKG_EXT = tar.gz
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.nasm.us/pub/nasm/releasebuilds/$(PKG_VERS)
+PKG_DIST_SITE = https://fossies.org/linux/misc
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
