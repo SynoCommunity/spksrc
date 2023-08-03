@@ -5,20 +5,25 @@
 ##### rust specific configurations
 include ../../mk/spksrc.cross-rust-env.mk
 
-# set PYTHON_DIR if unset (e.g. using spksrc.spk.mk instead of spksrc.python.mk)
-ifeq ($(strip $(PYTHON_DIR)),)
-PYTHON_DIR = $(STAGING_INSTALL_PREFIX)
+# set PYTHON_PREFIX if unset
+ifeq ($(strip $(PYTHON_PREFIX)),)
+PYTHON_PREFIX = $(STAGING_INSTALL_PREFIX)
+endif
+
+# set PYTHON_PREFIX if unset
+ifeq ($(strip $(OPENSSL_PREFIX)),)
+OPENSSL_PREFIX = $(STAGING_INSTALL_PREFIX)
 endif
 
 # Mandatory for rustc wheel building
-ENV += PYO3_CROSS_LIB_DIR=$(PYTHON_DIR)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(PYTHON_DIR)/include/
+ENV += PYO3_CROSS_LIB_DIR=$(PYTHON_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(PYTHON_PREFIX)/include/
 
 # Mandatory of using OPENSSL_*_DIR starting with
 # cryptography version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
-ENV += OPENSSL_LIB_DIR=$(PYTHON_DIR)/lib/
-ENV += OPENSSL_INCLUDE_DIR=$(PYTHON_DIR)/include/
+ENV += OPENSSL_LIB_DIR=$(OPENSSL_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(OPENSSL_PREFIX)/include/
 
 # Enable pure-python packaging
 ifeq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
