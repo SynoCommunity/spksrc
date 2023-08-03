@@ -22,11 +22,11 @@ include ../../mk/spksrc.cross-cc.mk
 # Fetch python variables
 -include $(WORK_DIR)/python-cc.mk
 
-# If using spk.python.mk with PYTHON_PREFIX defined
+# If using spk.python.mk with PYTHON_STAGING_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
 # wheels can find openssl and other libraries
-ifneq ($(wildcard $(PYTHON_PREFIX)),)
-STAGING_INSTALL_PREFIX := $(PYTHON_PREFIX)
+ifneq ($(wildcard $(PYTHON_STAGING_PREFIX)),)
+STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_PREFIX)
 endif
 
 # Python module variables

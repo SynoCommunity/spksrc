@@ -5,25 +5,27 @@
 ##### rust specific configurations
 include ../../mk/spksrc.cross-rust-env.mk
 
-# set PYTHON_PREFIX if unset
-ifeq ($(strip $(PYTHON_PREFIX)),)
-PYTHON_PREFIX = $(STAGING_INSTALL_PREFIX)
+# set PYTHON_*_PREFIX if unset
+ifeq ($(strip $(PYTHON_STAGING_PREFIX)),)
+PYTHON_STAGING_PREFIX = $(STAGING_INSTALL_PREFIX)
+PYTHON_PREFIX = $(INSTALL_PREFIX)
 endif
 
-# set PYTHON_PREFIX if unset
-ifeq ($(strip $(OPENSSL_PREFIX)),)
-OPENSSL_PREFIX = $(STAGING_INSTALL_PREFIX)
+# set OPENSSL_*_PREFIX if unset
+ifeq ($(strip $(OPENSSL_STAGING_PREFIX)),)
+OPENSSL_STAGING_PREFIX = $(STAGING_INSTALL_PREFIX)
+OPENSSL_PREFIX = $(INSTALL_PREFIX)
 endif
 
 # Mandatory for rustc wheel building
-ENV += PYO3_CROSS_LIB_DIR=$(PYTHON_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(PYTHON_PREFIX)/include/
+ENV += PYO3_CROSS_LIB_DIR=$(PYTHON_STAGING_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(PYTHON_STAGING_PREFIX)/include/
 
 # Mandatory of using OPENSSL_*_DIR starting with
 # cryptography version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
-ENV += OPENSSL_LIB_DIR=$(OPENSSL_PREFIX)/lib/
-ENV += OPENSSL_INCLUDE_DIR=$(OPENSSL_PREFIX)/include/
+ENV += OPENSSL_LIB_DIR=$(OPENSSL_STAGING_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(OPENSSL_STAGING_PREFIX)/include/
 
 # Enable pure-python packaging
 ifeq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
