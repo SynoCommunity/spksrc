@@ -5,7 +5,8 @@ SPK_ICON = src/bazarr.png
 
 PYTHON_PACKAGE = python311
 
-SPK_DEPENDS = "python311>=3.11.4-7:ffmpeg"
+SPK_DEPENDS = "python311>=3.11.4-7"
+#SPK_DEPENDS = "python311>=3.11.4-7:ffmpeg"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
