@@ -6,18 +6,26 @@
 
 # set default spk/python* path to use
 PYTHON_PACKAGE_ROOT = $(realpath $(shell pwd)/../$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
+
+ifneq ($(wildcard $(PYTHON_PACKAGE_ROOT)),)
+
+# set ld flags to rewrite for the library path used to access
+# python libraries provided by the python package at destination
+ifeq ($(strip $(PYTHON_STAGING_PREFIX)),)
 export PYTHON_PREFIX = /var/packages/$(PYTHON_PACKAGE)/target
 export PYTHON_STAGING_PREFIX = $(realpath $(PYTHON_PACKAGE_ROOT)/install/$(PYTHON_PREFIX))
+export ADDITIONAL_LDFLAGS += -Wl,--rpath-link,$(PYTHON_STAGING_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
+endif
+
+ifeq ($(strip $(OPENSSL_STAGING_PREFIX)),)
 export OPENSSL_PREFIX = $(PYTHON_PREFIX)
 export OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_PREFIX)
+else
+export ADDITIONAL_LDFLAGS += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
+endif
 
 # get PYTHON_VERSION and other variables
 -include $(PYTHON_PACKAGE_ROOT)/python-cc.mk
-
-ifneq ($(wildcard $(PYTHON_STAGING_PREFIX)),)
-# set ld flags to rewrite for the library path used to access
-# libraries provided by the python package at destination
-export ADDITIONAL_LDFLAGS += -Wl,--rpath-link,$(PYTHON_STAGING_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
 
 # set PYTHONPATH for spksrc.python-module.mk
 PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages/
