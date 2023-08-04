@@ -17,6 +17,8 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
+POST_INSTALL_TARGET = misc-util-linux_post_install
+
 ADDITIONAL_CFLAGS = -Wno-unused-parameter
 CONFIGURE_ARGS = --without-python
 
@@ -61,11 +63,16 @@ ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-scriptutils
 CONFIGURE_ARGS += --disable-libblkid --disable-blkid
 PLIST_TRANSFORM = sed -e 's|bin/lsblk|d'
-else
-# for lsblk: ncurses must be built with tinfo
+endif
+
+# for lsblk and others: ncurses must be built with tinfo
 # this seems to be a bug in util-linux, as most of other libraries fail to find ncurses/termlib
 # dependencies when ncurses is build with lib tinfo
 export NCURSES_WITH_TINFO=yes
-endif
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: misc-util-linux_post_install
+misc-util-linux_post_install:
+	@$(MSG) Use tools in bin for DSM 7 compatibility
+	@install -m 755 $(STAGING_INSTALL_PREFIX)/sbin/zramctl $(STAGING_INSTALL_PREFIX)/bin/zramctl
