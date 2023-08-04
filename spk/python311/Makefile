@@ -165,6 +165,15 @@ else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
 
+# [pydantic_core]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pydantic_core] -std=c11
+else
+WHEELS_CFLAGS += [pydantic_core] -std=c99
+endif
+# Requires path to maturin from crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+
 # WHEELS_TEST_ALL: Force testing all wheel building
 endif
 

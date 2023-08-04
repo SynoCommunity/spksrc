@@ -38,10 +38,6 @@ DEPENDS += cross/libyaml
 # [cryptography]
 DEPENDS += cross/cryptography
 
-# [pydantic_core]
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
-
 include ../../mk/spksrc.python.mk
 
 # [pycryptodomex]
@@ -50,6 +46,15 @@ WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
+
+# [pydantic_core]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pydantic_core] -std=c11
+else
+WHEELS_CFLAGS += [pydantic_core] -std=c99
+endif
+# Requires path to maturin from crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
 
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
