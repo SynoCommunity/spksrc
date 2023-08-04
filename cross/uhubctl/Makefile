@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://github.com/mvp/uhubctl/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# https://github.com/mvp/uhubctl/archive/refs/tags/v2.5.0.tar.gz
-
 DEPENDS = cross/libusb
 
 HOMEPAGE = https://github.com/mvp/uhubctl
