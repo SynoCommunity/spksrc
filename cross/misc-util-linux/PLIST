@@ -11,6 +11,7 @@ bin:bin/lsirq
 bin:bin/rev
 bin:bin/wall
 bin:bin/whereis
+bin:bin/zramctl
 lnk:lib/libsmartcols.so
 lnk:lib/libsmartcols.so.1
 lib:lib/libsmartcols.so.1.1.0
