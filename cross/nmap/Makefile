@@ -15,7 +15,12 @@ COMMENT  = Nmap ("Network Mapper") is a free and open source utility for network
 LICENSE  = https://svn.nmap.org/nmap/COPYING
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --without-zenmap --with-liblua=included --with-libpcre=included
+CONFIGURE_ARGS  = --without-zenmap
+CONFIGURE_ARGS += --with-liblua=included
+CONFIGURE_ARGS += --with-libpcre=included
+ifneq ($(wildcard $(OPENSSL_STAGING_PREFIX)),)
+CONFIGURE_ARGS += --with-openssl=$(OPENSSL_STAGING_PREFIX)
+endif
 
 ADDITIONAL_CPPFLAGS = -O3
 
