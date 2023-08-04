@@ -1,16 +1,16 @@
 SPK_NAME = synocli-misc
-SPK_VERS = 1.0
-SPK_REV = 2
+SPK_VERS = 1.1
+SPK_REV = 3
 SPK_ICON = src/synocli-misc.png
 
-DEPENDS = cross/bc cross/moreutils cross/misc-util-linux
+DEPENDS = cross/bc cross/moreutils cross/misc-util-linux cross/uhubctl
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli misc. Tools
 
-DESCRIPTION = "SynoCli misc. Tools provide a set of miscellaneous small command-line utilities: bc, errno, ifdata, ifne, isutf8, lckdo, mispipe, parallel, pee, sponge, cal, col, colcrt, colrm, column, hexdump, lscpu, lsipc, lsirq, rev, wall, whereis."
+DESCRIPTION = "SynoCli misc. Tools provide a set of miscellaneous small command-line utilities: bc, errno, ifdata, ifne, isutf8, lckdo, mispipe, parallel, pee, sponge, cal, col, colcrt, colrm, column, hexdump, lsblk, lscpu, lsipc, lsirq, rev, wall, whereis, zramctl, uhubctl."
 STARTABLE = no
-CHANGELOG = "Add lsblk from util-linux."
+CHANGELOG = "1. Add zramctl from util-linux.<br/>2. Add uhubctl."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMisc
 LICENSE  = Each tool is licensed under it's respective license.
@@ -44,5 +44,9 @@ SPK_COMMANDS += bin/lsirq
 SPK_COMMANDS += bin/rev
 SPK_COMMANDS += bin/wall
 SPK_COMMANDS += bin/whereis
+SPK_COMMANDS += bin/zramctl
+
+# uhubctl
+SPK_COMMANDS += bin/uhubctl
 
 include ../../mk/spksrc.spk.mk
