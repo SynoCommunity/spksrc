@@ -7,7 +7,7 @@
 -# /etc/ejabberd/
 -ETCDIR = @sysconfdir@/ejabberd
 +# /etc/ejabberd/ => /var/
-+ETCDIR = @localstatedir@/var
++ETCDIR = @localstatedir@
  
  # /bin/
  BINDIR = @bindir@
