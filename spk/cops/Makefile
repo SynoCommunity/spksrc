@@ -37,8 +37,6 @@ STARTABLE = no
 
 POST_STRIP_TARGET = cops_extra_install
 
-SUPPORTED_LANGUAGES = fre
-
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
 
