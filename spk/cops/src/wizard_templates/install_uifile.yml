@@ -10,4 +10,4 @@ DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_DESCRIPTION: "Do you want to use COPS with a
 DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_LABEL: "Kobo"
 
 DSM_PERMISSIONS_TITLE: "Attention! DSM Permissions"
-DSM_PERMISSIONS_TEXT: "Permissions are managed with the group <b>http</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user (= sc-cops) will not appear on most UI settings.<br>Including the following:<br>- Application privilege's permission viewer<br>- FPT's chroot user selector<br>- File Stations's<br>- Change owner<br>- Shared Links Manager -> Enable secure sharing<br><br>The only exceptions are:<br>- Control Panel > Shared Folder > Edit > Permission > System internal user<br>- ACL editor<br>"
+DSM_PERMISSIONS_TEXT: "Package user and group will not appear on most UI settings. Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
