@@ -7,7 +7,7 @@ PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.4-7"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
@@ -48,11 +48,7 @@ WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
 
 # [pydantic_core]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS_CFLAGS += [pydantic_core] -std=c11
-else
-WHEELS_CFLAGS += [pydantic_core] -std=c99
-endif
 # Requires path to maturin from crossenv
 ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
 
