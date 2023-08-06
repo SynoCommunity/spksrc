@@ -11,12 +11,12 @@ DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre co
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 ADMIN_URL = /cops/
 DISPLAY_NAME = COPS
-CHANGELOG = "1. Upgrade PHP to 7.4.<br />2. Fix OOM issue when serving big files"
+CHANGELOG = "1. Upgrade PHP to 7.4.<br />2. Fix OOM issue when serving big files.<br />3. Fix online viewer"
 
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-SPK_DEPENDS=WebStation:PHP7.4
+SPK_DEPENDS=WebStation:PHP7.4:Apache2.4
 
 SYSTEM_GROUP = http
 
