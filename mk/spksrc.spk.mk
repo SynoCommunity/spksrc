@@ -407,10 +407,17 @@ ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 		template_file_path="$(WIZARDS_TEMPLATES_DIR)/$${template_filename}"; \
 		for suffix in '' $(patsubst %,_%,$(LANGUAGES)) ; do \
 			template_file_localization_data_path="$(WIZARDS_TEMPLATES_DIR)/$${template_name}$${suffix}.yml"; \
+			output_file="$(WIZARDS_DIR)/$${template_name}$${suffix}$${template_suffix}"; \
 			if [ -f "$${template_file_localization_data_path}" ]; then \
 				mustache -e \
 					"$${template_file_localization_data_path}" \
-					"$${template_file_path}" >"$(WIZARDS_DIR)/$${template_name}$${suffix}$${template_suffix}"; \
+					"$${template_file_path}" >"$${output_file}"; \
+				errors=$$(jq . "$${output_file}" 2>&1); \
+				if [ "$$?" != "0" ]; then \
+					echo "Invalid wizard file generated $${output_file}:"; \
+					echo "$${errors}" \
+					exit 1; \
+				fi; \
 			fi; \
 		done; \
 	done
