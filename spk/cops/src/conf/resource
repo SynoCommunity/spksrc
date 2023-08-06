@@ -15,7 +15,8 @@
           "gd",
           "pdo_sqlite",
           "sqlite3",
-          "intl"
+          "intl",
+          "zlib"
         ],
         "user": "sc-cops",
         "group": "http"

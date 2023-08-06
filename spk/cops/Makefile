@@ -11,7 +11,7 @@ DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre co
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 ADMIN_URL = /cops/
 DISPLAY_NAME = COPS
-CHANGELOG = "1. Update to 1.3.6<br />2. Upgrade PHP 8.2 (DSM 7.2+)<br />3. Add .htaccess migration support"
+CHANGELOG = "1. Update to 1.3.6<br />2. Upgrade PHP 8.2 (DSM 7.2+)<br />3. Add .htaccess migration support<br />4. Fixed support of online viewer"
 
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
