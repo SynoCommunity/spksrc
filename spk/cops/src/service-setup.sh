@@ -15,7 +15,7 @@ CFG_FILE="${WEB_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}"
 USER="http"
 GROUP="http"
 
-service_preinst ()
+validate_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         if [ ! -f "${wizard_calibre_dir}/metadata.db" ]; then
