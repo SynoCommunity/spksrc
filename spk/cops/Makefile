@@ -11,7 +11,10 @@ DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre co
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 ADMIN_URL = /cops/
 DISPLAY_NAME = COPS
-CHANGELOG = "1. Update to PHP 7.4.<br />2. Fix OOM issue when serving big files"
+CHANGELOG = "1. Upgrade PHP to 7.4.<br />2. Fix OOM issue when serving big files"
+
+include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.directories.mk
 
 SPK_DEPENDS=WebStation:PHP7.4
 
@@ -24,8 +27,8 @@ LICENSE    = GPL
 
 REQUIRED_MIN_DSM = 6.0
 
-WIZARDS_DIR = src/wizard/
-WIZARDS_FRAGMENTS_DIR = $(WIZARDS_DIR)/fragments
+DSM_UI_CONFIG = src/app/config
+
 CONF_DIR = src/conf/
 
 SERVICE_SETUP = src/service-setup.sh
@@ -39,6 +42,8 @@ POST_STRIP_TARGET = cops_extra_install
 
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
+
+ICON_DIR = $(STAGING_DIR)/$(DSM_UI_DIR)/images
 
 include ../../mk/spksrc.spk.mk
 
