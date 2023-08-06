@@ -5,6 +5,7 @@ SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
+PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.4-7"
 
 MAINTAINER = worstje
@@ -45,7 +46,7 @@ ADMIN_PORT = ${SERVICE_PORT}
 
 POST_STRIP_TARGET = znc_extra_install
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
 
 .PHONY: znc_extra_install
 znc_extra_install:
