@@ -16,7 +16,7 @@ CHANGELOG = "1. Update to 1.3.6<br />2. Upgrade PHP 8.2 (DSM 7.2+)<br />3. Add .
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-SPK_DEPENDS=WebStation:PHP8.2
+SPK_DEPENDS=WebStation:PHP8.2:Apache2.4
 
 SYSTEM_GROUP = http
 
