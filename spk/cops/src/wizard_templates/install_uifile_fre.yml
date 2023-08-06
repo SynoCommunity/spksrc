@@ -10,4 +10,4 @@ DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_DESCRIPTION: "Voulez vous utiliser COPS avec
 DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_LABEL: "Kobo"
 
 DSM_PERMISSIONS_TITLE: "Attention! DSM Permissions"
-DSM_PERMISSIONS_TEXT: "L'utilisateur et le group du package n'apparaîtront pas sur la plupart des UI réglages. Veuillez vous référrer à <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+DSM_PERMISSIONS_TEXT: "L'utilisateur et le group du package n'apparaîtront pas sur la plupart des UI réglages. Veuillez vous référrer à <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\\\">Permission Management</a> pour plus de détails."
