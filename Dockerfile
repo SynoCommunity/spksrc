@@ -76,7 +76,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
 	adduser --disabled-password --gecos '' user && \
 	adduser user sudo && \
-	echo "%users ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/users
+	echo "%user ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/users
 
 # Install setuptools, wheel and pip for Python2
 RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | python2
