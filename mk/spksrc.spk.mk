@@ -404,10 +404,14 @@ ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 		else \
 			template_suffix=".$${template_filename:$${#template_filename} + 1}"; \
 		fi; \
-		for suffix in '' $(patsubst %,_%,$(SUPPORTED_LANGUAGES)) ; do \
-			mustache -e \
-				"$(WIZARDS_TEMPLATES_DIR)/$${template_name}$${suffix}.yml" \
-				"$(WIZARDS_TEMPLATES_DIR)/$${template_filename}" >"$(WIZARDS_DIR)/$${template_name}$${suffix}$${template_suffix}"; \
+		template_file_path="$(WIZARDS_TEMPLATES_DIR)/$${template_filename}"; \
+		for suffix in '' $(patsubst %,_%,$(LANGUAGES)) ; do \
+			template_file_localization_data_path="$(WIZARDS_TEMPLATES_DIR)/$${template_name}$${suffix}.yml"; \
+			if [ -f "$${template_file_localization_data_path}" ]; then \
+				mustache -e \
+					"$${template_file_localization_data_path}" \
+					"$${template_file_path}" >"$(WIZARDS_DIR)/$${template_name}$${suffix}$${template_suffix}"; \
+			fi; \
 		done; \
 	done
 endif
