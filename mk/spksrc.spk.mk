@@ -402,7 +402,7 @@ ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 		if [ "$${template_name}" = "$${template_filename}" ]; then \
 			template_suffix=; \
 		else \
-			template_suffix=".$${template_filename:$${#template_filename} + 1}"; \
+			template_suffix=".$${template_filename##*.}"; \
 		fi; \
 		template_file_path="$(WIZARDS_TEMPLATES_DIR)/$${template_filename}"; \
 		for suffix in '' $(patsubst %,_%,$(LANGUAGES)) ; do \
@@ -412,11 +412,13 @@ ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 				mustache -e \
 					"$${template_file_localization_data_path}" \
 					"$${template_file_path}" >"$${output_file}"; \
-				errors=$$(jq . "$${output_file}" 2>&1); \
-				if [ "$$?" != "0" ]; then \
-					echo "Invalid wizard file generated $${output_file}:"; \
-					echo "$${errors}" \
-					exit 1; \
+				if [ "$${template_suffix}" = "" ]; then \
+					errors=$$(jq . "$${output_file}" 2>&1); \
+					if [ "$$?" != "0" ]; then \
+						echo "Invalid wizard file generated $${output_file}:"; \
+						echo "$${errors}" \
+						exit 1; \
+					fi; \
 				fi; \
 			fi; \
 		done; \
