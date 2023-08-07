@@ -11,12 +11,12 @@ DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre co
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 ADMIN_URL = /cops/
 DISPLAY_NAME = COPS
-CHANGELOG = "1. Update to 1.3.6<br />2. Upgrade PHP 8.2 (DSM 7.2+)<br />3. Add .htaccess migration support<br />4. Fixed support of online viewer"
+CHANGELOG = "1. Update to 1.3.6<br />2. Upgrade PHP 7.4<br />3. Add .htaccess migration support"
 
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-SPK_DEPENDS=WebStation:PHP8.2:Apache2.4
+SPK_DEPENDS=WebStation:PHP7.4:Apache2.4
 
 SYSTEM_GROUP = http
 
@@ -25,7 +25,7 @@ BETA=1
 HOMEPAGE   = https://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE    = GPL
 
-REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_DSM = 6.0
 
 DSM_UI_CONFIG = src/app/config
 
