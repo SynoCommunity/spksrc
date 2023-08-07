@@ -12,9 +12,8 @@ PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 # build instructions:
 # https://openjdk.java.net/groups/build/doc/building.html
 
-BUILD_DEPENDS = native/openjdk-17 native/zip
 # Dependencies required at build time only:
-BUILD_DEPENDS += cross/cups
+BUILD_DEPENDS  = cross/cups
 BUILD_DEPENDS += cross/alsa-lib
 BUILD_DEPENDS += cross/libX11
 BUILD_DEPENDS += cross/libXrender
@@ -28,9 +27,6 @@ DEPENDS += cross/libpng
 DEPENDS += cross/libjpeg
 DEPENDS += cross/giflib
 DEPENDS += cross/lcms2
-
-ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
-ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
 
 HOMEPAGE = https://openjdk.org/projects/jdk/17/
 COMMENT  = OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by JSR 390 in the Java Community Process.
@@ -108,7 +104,7 @@ include ../../mk/spksrc.cross-cc.mk
 # Disable the normal host build target triplets since openjdk uses its own openjdk-target
 # Avoid the use of $(RUN) since configure complains about env variables
 java-17-openjdk_configure:
-	cd $(WORK_DIR)/$(PKG_DIR) && PATH=$$PATH:$(ZIP_BIN_DIR) && bash ./configure $(CONFIGURE_ARGS)
+	cd $(WORK_DIR)/$(PKG_DIR) && bash ./configure $(CONFIGURE_ARGS)
 
 .PHONY: java-17-openjdk_pre_compile
 # As DESTDIR is not supported we must patch the make file for make install.
