@@ -396,6 +396,10 @@ endif
 ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 	@$(MSG) "Generate DSM Wizards from templates"
 	@mkdir -p $(WIZARDS_DIR)
+	$(eval IS_DSM_6_OR_GREATER = $(if $(filter 1,$(call version_gt, $(TCVERSION), 6.0)),true,false))
+	$(eval IS_DSM_7_OR_GREATER = $(if $(filter 1,$(call version_gt, $(TCVERSION), 7.0)),true,false))
+	$(eval IS_DSM_7 = $(IS_DSM_7_OR_GREATER))
+	$(eval IS_DSM_6 = $(if $(filter true,$(IS_DSM_6_OR_GREATER)),$(if $(filter true,$(IS_DSM_7)),false,true),false))
 	@for template in `find $(WIZARDS_TEMPLATES_DIR) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print`; do \
 		template_filename="$$(basename $${template})"; \
 		template_name="$${template_filename%.*}"; \
@@ -410,8 +414,10 @@ ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 			output_file="$(WIZARDS_DIR)/$${template_name}$${suffix}$${template_suffix}"; \
 			if [ -f "$${template_file_localization_data_path}" ]; then \
 				{ \
-					echo "IS_DSM_6_OR_GREATER: $(if $(filter 1,$(call version_gt, $(TCVERSION), 6.0)),true,false)"; \
-					echo "IS_DSM_7_OR_GREATER: $(if $(filter 1,$(call version_gt, $(TCVERSION), 7.0)),true,false)"; \
+					echo "IS_DSM_6_OR_GREATER: $(IS_DSM_6_OR_GREATER)"; \
+					echo "IS_DSM_6: $(IS_DSM_6)"; \
+					echo "IS_DSM_7_OR_GREATER: $(IS_DSM_7_OR_GREATER)"; \
+					echo "IS_DSM_7: $(IS_DSM_7)"; \
 					cat "$${template_file_localization_data_path}"; \
 				} | mustache - "$${template_file_path}" >"$${output_file}"; \
 				if [ "$${template_suffix}" = "" ]; then \
