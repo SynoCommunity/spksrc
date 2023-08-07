@@ -65,18 +65,16 @@ service_postinst ()
 
 service_postuninst ()
 {
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-        # Remove link
-        rm -f "${SYNOPKG_PKGDEST}"
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+      # Remove link
+      rm -f "${SYNOPKG_PKGDEST}"
+  
+      # Remove open_basedir configuration
+      rm -f "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini"
+  
+      # Remove the web interface
+      rm -fr "${WEB_DIR:?}/${SYNOPKG_PKGNAME}"
     
-        # Remove open_basedir configuration
-        rm -f "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini"
-    
-        # Remove the web interface
-        rm -fr "${WEB_DIR:?}/${SYNOPKG_PKGNAME}"
-      
-      fi
     fi
 }
 
