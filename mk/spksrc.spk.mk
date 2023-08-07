@@ -421,10 +421,11 @@ ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 					cat "$${template_file_localization_data_path}"; \
 				} | mustache - "$${template_file_path}" >"$${output_file}"; \
 				if [ "$${template_suffix}" = "" ]; then \
-					errors=$$(jq . "$${output_file}" 2>&1); \
-					if [ "$$?" != "0" ]; then \
+					jq_failed=0; \
+					errors=$$(jq . "$${output_file}" 2>&1) || jq_failed=1; \
+					if [ "$${jq_failed}" != "0" ]; then \
 						echo "Invalid wizard file generated $${output_file}:"; \
-						echo "$${errors}" \
+						echo "$${errors}"; \
 						exit 1; \
 					fi; \
 				fi; \
