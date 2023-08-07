@@ -54,6 +54,8 @@ dsm_permissions() {
 END_OF_STEP
 }
 
+{{^IS_DSM_7_OR_GREATER}}
+{{#IS_DSM_6_OR_GREATER}}
 php_configuration_requirements() {
   cat <<END_OF_STEP
 {
@@ -69,16 +71,20 @@ php_configuration_requirements() {
 }
 END_OF_STEP
 }
+{{/IS_DSM_6_OR_GREATER}}
+{{/IS_DSM_7_OR_GREATER}}
 
 {
   echo "[";
   cops_configuration_first_step;
   echo ","
   cops_configuration_second_step;
-  if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-    echo ",";
-    php_configuration_requirements;
-  fi
+  {{^IS_DSM_7_OR_GREATER}}
+  {{#IS_DSM_6_OR_GREATER}}
+  echo ",";
+  php_configuration_requirements;
+  {{/IS_DSM_6_OR_GREATER}}
+  {{/IS_DSM_7_OR_GREATER}}
   echo ","
   dsm_permissions;
   echo "]";
