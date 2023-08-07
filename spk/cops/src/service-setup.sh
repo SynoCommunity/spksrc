@@ -14,6 +14,7 @@ else
    WEB_DIR="${DSM6_WEB_DIR}"
 fi
 CFG_FILE="${WEB_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}"
+BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
 USER="http"
 GROUP="http"
