@@ -66,7 +66,7 @@ service_postinst ()
 service_postuninst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 -a  ]; then
+      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         # Remove link
         rm -f "${SYNOPKG_PKGDEST}"
     
