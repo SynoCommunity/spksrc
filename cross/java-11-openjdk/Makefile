@@ -12,8 +12,9 @@ PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 # build instructions:
 # https://openjdk.java.net/groups/build/doc/building.html
 
+BUILD_DEPENDS = native/openjdk-11
 # Dependencies are required at build time only.
-BUILD_DEPENDS  = cross/cups
+BUILD_DEPENDS += cross/cups
 BUILD_DEPENDS += cross/alsa-lib
 BUILD_DEPENDS += cross/fontconfig
 BUILD_DEPENDS += cross/libX11 cross/libXext cross/libXrender cross/libXrandr cross/libXtst cross/libXt
