@@ -57,7 +57,7 @@ END_OF_STEP
 php_configuration_requirements() {
   cat <<END_OF_STEP
 {
-    "step_title": "{{{PHP Configuration Requirements}}}",
+    "step_title": "{{{PHP_CONFIGURATION_REQUIREMENTS_TITLE}}}",
     "items": [
         {
             "desc": "{{{PHP_CONFIGURATION_REQUIREMENTS_EXPLANATION}}}"
@@ -82,4 +82,4 @@ END_OF_STEP
   echo ","
   dsm_permissions;
   echo "]";
-}> "{{{SYNOPKG_TEMP_LOGFILE}}}"
+}> "${SYNOPKG_TEMP_LOGFILE}"
