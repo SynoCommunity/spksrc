@@ -409,9 +409,11 @@ ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 			template_file_localization_data_path="$(WIZARDS_TEMPLATES_DIR)/$${template_name}$${suffix}.yml"; \
 			output_file="$(WIZARDS_DIR)/$${template_name}$${suffix}$${template_suffix}"; \
 			if [ -f "$${template_file_localization_data_path}" ]; then \
-				mustache -e \
-					"$${template_file_localization_data_path}" \
-					"$${template_file_path}" >"$${output_file}"; \
+				{ \
+					echo "IS_DSM_6_OR_GREATER: $(if $(filter 1,$(call version_gt, $(TCVERSION), 6.0)),true,false)"; \
+					echo "IS_DSM_7_OR_GREATER: $(if $(filter 1,$(call version_gt, $(TCVERSION), 7.0)),true,false)"; \
+					cat "$${template_file_localization_data_path}"; \
+				} | mustache - "$${template_file_path}" >"$${output_file}"; \
 				if [ "$${template_suffix}" = "" ]; then \
 					errors=$$(jq . "$${output_file}" 2>&1); \
 					if [ "$$?" != "0" ]; then \
