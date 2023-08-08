@@ -39,14 +39,22 @@ endif
 wheel_msg_target:
 	@$(MSG) "Processing wheels of $(NAME)"
 
-# PIP distributions caching requires that the user running it owns the cache directory.
-# PIP_CACHE_OPT is default "--cache-dir $(PIP_DIR)", PIP_DIR defaults to $(DISTRIB_DIR)/pip, so
-# will move if the user chooses a custom persistent distribution dir for caching downloads between
-# containers and builds.
+#
+# PIP_CACHE_OPT defaults to "--cache-dir $(PIP_CACHE_DIR)"
+# PIP_CACHE_DIR defaults to $(WORK_DIR)/pip
+#
+# This allows using "make wheelclean" while keeping a per-arch
+# specific cache of already built wheels thus accelerating
+# subsequent builds.
+#
+# Also this avoid sharing a cache amongst all builds whereas
+# building a wheel for x64-6.2.4 may look successfull while
+# it actually used a cache built from x64-7.1
+#
 pre_wheel_target: wheel_msg_target
 ifneq ($(strip $(WHEELS)),)
 	@if [ -n "$(PIP_CACHE_OPT)" ] ; then \
-	   mkdir -p $(PIP_DIR) ; \
+	   mkdir -p $(PIP_CACHE_DIR) ; \
 	fi; \
 	mkdir -p $(WHEELHOUSE) ; \
 	for wheel in $(WHEELS) ; do \

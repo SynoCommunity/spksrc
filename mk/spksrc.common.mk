@@ -20,7 +20,7 @@ PIP ?= pip
 PIP_SYSTEM = $(shell which pip)
 
 # Why ask for the same thing twice? Always cache downloads
-PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR)
+PIP_CACHE_OPT ?= --cache-dir $(PIP_CACHE_DIR)
 PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
 
 # Available languages
