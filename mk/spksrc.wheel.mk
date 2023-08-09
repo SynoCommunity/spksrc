@@ -35,6 +35,49 @@ else
 $(POST_WHEEL_TARGET): $(WHEEL_TARGET)
 endif
 
+wheeldownload: SHELL:=/bin/bash
+wheeldownload:
+	@mkdir -p $(PIP_DISTRIB_DIR)
+	@if [ -n "$(WHEELS_2_DOWNLOAD)" ] ; then \
+		for wheel in $(WHEELS_2_DOWNLOAD) ; \
+		do \
+			$(MSG) "Downloading wheels from $$wheel ..." ; \
+			# BROKEN: https://github.com/pypa/pip/issues/1884 ; \
+			# xargs -n 1 $(PIP_SYSTEM) $(PIP_DOWNLOAD_ARGS) 2>/dev/null < $$wheel || true ; \
+			while IFS= read -r requirement ; \
+			do \
+				if [ "$$(grep -s egg <<< $${requirement})" ] ; then \
+					name=$$(echo $${requirement#*egg=} | cut -f1 -d=) ; \
+					url=$${requirement} ; \
+				else \
+					name=$${requirement%%[<>=]=*} ; \
+					url="" ; \
+				fi ; \
+				version=$$(echo $${requirement#*[<>=]=} | cut -f1 -d' ') ; \
+				$(MSG) pip download [$${name}], version [$${version}]$$([ "$${url}" ] && echo ", URL: [$${url}] ") ; \
+				if [ "$$(grep -s egg <<< $${requirement})" ] ; then \
+					echo "WARNING: Skipping download URL - Downloaded at build time" ; \
+					# Will be re-downloaded anyway at build time ; \
+					# $(PIP) $(PIP_DOWNLOAD_ARGS) $${requirement} 2>/dev/null ; \
+				else \
+					query="curl -s https://pypi.org/pypi/$${name}/json" ; \
+					query+=" | jq -r '.releases[][]" ; \
+					query+=" | select(.packagetype==\"sdist\")" ; \
+					query+=" | select((.filename|test(\"-$${version}.tar.gz\")) or (.filename|test(\"-$${version}.zip\"))) | .url'" ; \
+					localFile=$$(basename $$(eval $${query} 2>/dev/null) 2</dev/null) ; \
+					if [ "$${localFile}" = "" ]; then \
+						echo "ERROR: Invalid package name [$${name}]" ; \
+					elif [ -s $(PIP_DISTRIB_DIR)/$${localFile} ]; then \
+						echo "INFO: File already exists [$${localFile}]" ; \
+					else \
+						echo "wget --secure-protocol=TLSv1_2 -nv -O $(PIP_DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query})" ; \
+						wget --secure-protocol=TLSv1_2 -nv -O $(PIP_DISTRIB_DIR)/$${localFile}.part -nc $$(eval $${query}) ; \
+						mv $(PIP_DISTRIB_DIR)/$${localFile}.part $(PIP_DISTRIB_DIR)/$${localFile} ; \
+					fi ; \
+				fi ; \
+			done < <(grep -v  -e "^\#" -e "^\$$" $${wheel}) || true ; \
+		done \
+	fi
 
 wheel_msg_target:
 	@$(MSG) "Processing wheels of $(NAME)"
@@ -51,7 +94,7 @@ wheel_msg_target:
 # building a wheel for x64-6.2.4 may look successfull while
 # it actually used a cache built from x64-7.1
 #
-pre_wheel_target: wheel_msg_target
+pre_wheel_target: wheel_msg_target wheeldownload
 ifneq ($(strip $(WHEELS)),)
 	@if [ -n "$(PIP_CACHE_OPT)" ] ; then \
 	   mkdir -p $(PIP_CACHE_DIR) ; \
@@ -151,7 +194,7 @@ cross-compile-wheel-%:
 	$(MSG) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	   $(PIP_CROSSENV) \
-	   $(PIP_WHEEL_ARGS) \
+	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \
 	   $(ABI3) \
@@ -159,7 +202,7 @@ cross-compile-wheel-%:
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	   $(PIP_CROSSENV) \
-	   $(PIP_WHEEL_ARGS) \
+	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \
 	   $(ABI3) \

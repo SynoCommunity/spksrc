@@ -514,6 +514,12 @@ wheelclean: spkclean
 	       work-*/wheelhouse \
 	       work-*/install/var/packages/**/target/share/wheelhouse
 
+wheelcleancache: wheelclean
+	rm -fr work-*/pip
+
+wheelcleanall: wheelcleancache
+	rm -fr ../../distrib/pip
+
 all: package
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
