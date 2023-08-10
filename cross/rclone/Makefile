@@ -1,0 +1,17 @@
+PKG_NAME = rclone
+PKG_VERS = 1.63.1
+PKG_EXT = tar.gz
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/rclone/rclone/archive/refs/tags
+PKG_DIR = $(PKG_NAME)
+
+BUILD_DEPENDS = native/go
+
+HOMEPAGE = https://rclone.org/
+COMMENT  = Rclone is a command-line program to manage files on cloud storage.
+LICENSE  = MIT License
+
+GO_SRC_DIR = $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)
+GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
+
+include ../../mk/spksrc.cross-go.mk
