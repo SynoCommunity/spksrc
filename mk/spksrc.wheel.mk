@@ -39,13 +39,11 @@ wheeldownload: SHELL:=/bin/bash
 wheeldownload:
 	@mkdir -p $(PIP_DISTRIB_DIR)
 	@if [ -n "$(WHEELS_2_DOWNLOAD)" ] ; then \
-		for wheel in $(WHEELS_2_DOWNLOAD) ; \
-		do \
+		for wheel in $(WHEELS_2_DOWNLOAD) ; do \
 			$(MSG) "Downloading wheels from $$wheel ..." ; \
 			# BROKEN: https://github.com/pypa/pip/issues/1884 ; \
 			# xargs -n 1 $(PIP_SYSTEM) $(PIP_DOWNLOAD_ARGS) 2>/dev/null < $$wheel || true ; \
-			while IFS= read -r requirement ; \
-			do \
+			while IFS= read -r requirement ; do \
 				if [ "$$(grep -s egg <<< $${requirement})" ] ; then \
 					name=$$(echo $${requirement#*egg=} | cut -f1 -d=) ; \
 					url=$${requirement} ; \
