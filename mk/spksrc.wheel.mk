@@ -38,7 +38,7 @@ endif
 wheeldownload: SHELL:=/bin/bash
 wheeldownload:
 	@mkdir -p $(PIP_DISTRIB_DIR)
-	@if [ -n "$(WHEELS_2_DOWNLOAD)" ] ; then \
+	@if [ -n "$(WHEELS)" ] ; then \
 		for wheel in $(WHEELS_2_DOWNLOAD) ; do \
 			$(MSG) "Downloading wheels from $$wheel ..." ; \
 			# BROKEN: https://github.com/pypa/pip/issues/1884 ; \
@@ -75,6 +75,8 @@ wheeldownload:
 				fi ; \
 			done < <(grep -v  -e "^\#" -e "^\$$" $${wheel}) || true ; \
 		done \
+	else \
+		$(MSG) "No wheels to download for [$(SPK_NAME)]" ; \
 	fi
 
 wheel_msg_target:
