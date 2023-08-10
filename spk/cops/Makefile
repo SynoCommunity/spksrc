@@ -20,8 +20,6 @@ SPK_DEPENDS=WebStation:PHP7.4:Apache2.4
 
 SYSTEM_GROUP = http
 
-BETA=1
-
 HOMEPAGE   = https://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE    = GPL
 
