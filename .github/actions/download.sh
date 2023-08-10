@@ -30,8 +30,7 @@ build_packages="${NOARCH_PACKAGES} ${ARCH_PACKAGES}"
 if [ -z "${build_packages}" ]; then
     echo "===> No wheels to download. <==="
 else
-    for package in ${build_packages}
-    do
+    for package in ${build_packages}; do
         echo "===> Download wheels: ${package}"
         make -C spk/${package} wheeldownload
     done
