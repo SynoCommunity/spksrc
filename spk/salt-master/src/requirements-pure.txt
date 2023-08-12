@@ -11,7 +11,7 @@ chardet==5.1.0
 cheroot==10.0.0
 CherryPy==18.8.0
 contextvars==2.4
-cryptography==41.0.2
+#cryptography           ==> cross
 distlib==0.3.6
 distro==1.8.0
 filelock==3.12.2
