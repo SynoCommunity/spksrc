@@ -130,7 +130,7 @@ python311_install:
 
 # default wheels to install in crossenv
 CROSSENV_WHEELS  = cffi==1.15.1
-CROSSENV_WHEELS += cryptography==41.0.2
+CROSSENV_WHEELS += cryptography==41.0.3
 CROSSENV_WHEELS += Cython==0.29.35
 CROSSENV_WHEELS += flit==3.9.0
 CROSSENV_WHEELS += poetry==1.5.1
