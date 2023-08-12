@@ -1,7 +1,7 @@
 SPK_NAME = python310
 SPK_VERS = 3.10.12
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 17
+SPK_REV = 18
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.12<br/>2. Update to OpenSSL 3.1.1<br/>3. Re-include openssl 1.1 until all packages are migrated"
+CHANGELOG = "1. Update to Python 3.10.12<br/>2. Update all packages to OpenSSL 3.1.2"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -44,19 +44,10 @@ ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-abi3.txt
 
-# [bcrypt] and [cryptography]
-# Mandatory for rustc wheel building
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-
 # [cryptography]
 # Use cross/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py310-py310 regular build use src/requirements-crossenv.txt
-#
-# Mandatory mandatory of using OPENSSL_*_DIR starting with version >= 40
-ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 DEPENDS += cross/cryptography
 
 # [gevent]
@@ -116,7 +107,7 @@ ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS += src/requirements-crossenv-greenlet-v2.txt
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS += [greenlet] -std=c++11
+WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt

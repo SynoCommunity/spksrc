@@ -1,8 +1,10 @@
 SPK_NAME = python311
 SPK_VERS = 3.11.4
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/python3.png
+
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/pip
@@ -13,7 +15,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.4<br/>2. Update to OpenSSL 3.1.1<br/>3. Re-include openssl 1.1 until all packages are migrated"
+CHANGELOG = "1. Update to Python 3.11.4<br/>2. Update all packages to OpenSSL 3.1.2"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -44,19 +46,10 @@ ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-abi3.txt
 
-# [bcrypt] and [cryptography]
-# Mandatory for rustc wheel building
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-
 # [cryptography]
 # Use cross/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py311-py311 regular build use src/requirements-crossenv.txt
-#
-# Mandatory mandatory of using OPENSSL_*_DIR starting with version >= 40
-ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 DEPENDS += cross/cryptography
 
 # [gevent]
@@ -107,6 +100,20 @@ include ../../mk/spksrc.common.mk
 # GCC_DEBUG_INFO := 1
 # endif
 
+## WHEELS_TEST_ALL: Force testing all wheel building
+ifeq ($(strip $(WHEELS_TEST_ALL)),1)
+
+# [rpds-py]
+# maturin canot be built as pre-requisite crossenv
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-rpds-py.txt
+# Requires path to maturin from crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+endif
+
+# WHEELS_TEST_ALL: Force testing all wheel building
+endif
+
 include ../../mk/spksrc.spk.mk
 
 ## WHEELS_TEST_ALL: Force testing all wheel building
@@ -116,7 +123,7 @@ ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS += src/requirements-crossenv-greenlet-v2.txt
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS += [greenlet] -std=c++11
+WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt
@@ -128,6 +135,7 @@ ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # [numpy] <= 1.22.4 (armv7l)
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-armv7l.txt
+# [numpy] <= 1.24.4 last working version with gcc-4.9
 else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy-gcc4.txt
 # [numpy] >= 1.25.0 requires c++17
@@ -156,6 +164,15 @@ WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
+
+# [pydantic_core]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pydantic_core] -std=c11
+else
+WHEELS_CFLAGS += [pydantic_core] -std=c99
+endif
+# Requires path to maturin from crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
 
 # WHEELS_TEST_ALL: Force testing all wheel building
 endif

@@ -6,7 +6,7 @@
         "subitems": [{
             "key": "wizard_fork_url",
             "desc": "Adresse du dépôt Git",
-            "defaultValue": "git://github.com/Tautulli/Tautulli.git",
+            "defaultValue": "https://github.com/Tautulli/Tautulli.git",
             "validator": {
                 "allowBlank": false
             }

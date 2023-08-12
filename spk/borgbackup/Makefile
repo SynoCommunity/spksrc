@@ -1,17 +1,17 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.2.2
-SPK_REV = 13
+SPK_VERS = 1.2.4
+SPK_REV = 14
 SPK_ICON = src/$(SPK_NAME).png
 
-BUILD_DEPENDS = cross/python310
-DEPENDS = cross/attr cross/acl cross/openssl cross/lz4 cross/zstd cross/libb2 cross/fuse
+PYTHON_PACKAGE = python311
+SPK_DEPENDS = "python311>=3.11.4-7"
 
-SPK_DEPENDS = "python310"
+DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
 
 # Requirements file generation
 # - first create borgbackup wheel defined in src/requirements-crossenv.txt
 # cd src
-# /spksrc/native/python310/work-native/install/usr/local/bin/python3 -m venv borg-env
+# /spksrc/native/python311/work-native/install/usr/local/bin/python3 -m venv borg-env
 # . borg-env/bin/activate
 # pip install ../work-x64-6.1/install/var/packages/borgbackup/target/share/wheelhouse/borgbackup*.whl borgmatic emborg llfuse
 # pip freeze > requirements.txt
@@ -29,7 +29,7 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borg to v1.2.2<br/>2. Update borgmatic to v1.7.5.<br>/3. Include compiled version of msgpack for enhanced performance.<br/>4. Update emborg to v1.34."
+CHANGELOG = "1. Update borg to v1.2.4<br/>2. Update borgmatic to v1.8.0.<br/>3. Update emborg to v1.37.<br/>Migrate to python 3.11"
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
@@ -38,9 +38,21 @@ SERVICE_SETUP = src/service-setup.sh
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
-ENV += BORG_OPENSSL_PREFIX="$(STAGING_INSTALL_PREFIX)"
+# Use OpenSSL path as defined by either
+# spksrc.wheel-env.mk or spksrc.python.mk
+ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.common.mk
+
+# [rpds-py]
+# maturin canot be built as pre-requisite crossenv
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-rpds-py.txt
+# Requires path to maturin from crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+endif
+
+include ../../mk/spksrc.python.mk

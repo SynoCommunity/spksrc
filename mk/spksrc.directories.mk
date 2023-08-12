@@ -12,7 +12,8 @@
 PWD := $(shell pwd)
 
 BASE_DISTRIB_DIR  = $(PWD)/../../distrib
-PIP_DIR = $(BASE_DISTRIB_DIR)/pip
+PIP_DISTRIB_DIR = $(DISTRIB_DIR)/pip
+PIP_CACHE_DIR = $(WORK_DIR)/pip
 TOOLCHAIN_DIR = $(BASE_DISTRIB_DIR)/toolchain
 TOOLKIT_DIR = $(BASE_DISTRIB_DIR)/toolkit
 KERNEL_DIR = $(BASE_DISTRIB_DIR)/kernel

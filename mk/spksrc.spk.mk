@@ -513,6 +513,22 @@ wheelclean: spkclean
 	rm -fr work-*/.wheel_done \
 	       work-*/wheelhouse \
 	       work-*/install/var/packages/**/target/share/wheelhouse
+	@make --no-print-directory dependency-flat | sort -u | grep -v spk/ | while read depend ; do \
+	   makefile="../../$${depend}/Makefile" ; \
+	   if grep -q spksrc.python-wheel.mk $${makefile} ; then \
+	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
+	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
+	      echo "rm -fr work-*/$${pkgname}*\\n       work-*/.$${pkgname}-*" ; \
+	      rm -fr work-*/$${pkgname}* \
+                     work-*/.$${pkgname}-* ; \
+	   fi ; \
+	done
+
+wheelcleancache: wheelclean
+	rm -fr work-*/pip
+
+wheelcleanall: wheelcleancache
+	rm -fr ../../distrib/pip
 
 all: package
 ifneq ($(filter 1 on ON,$(PSTAT)),)

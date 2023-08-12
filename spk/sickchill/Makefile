@@ -1,11 +1,11 @@
 SPK_NAME = sickchill
 SPK_VERS = 20230627
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/sickchill.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
 
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 
 # archs without C++11 support are not supported:
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
@@ -19,17 +19,13 @@ DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
 
 # [cryptography]
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# fix for openssl-sys crate (for cryptography >= 40.0.0)
-# https://docs.rs/openssl/latest/openssl/#manual
-ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
+DEPENDS += cross/cryptography
 
 include ../../mk/spksrc.common.mk
 
 # [greenlet]
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
-WHEELS_CPPFLAGS = [greenlet] -std=c++11
+WHEELS_CPPFLAGS = [greenlet] -std=c++11 -fpermissive
 endif
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
@@ -39,7 +35,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "A wheel based install, git installs are not supported by upstream.<br/>Python update to 3.11 <br/>Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies."
+CHANGELOG = "1. A wheel based install, git installs are not supported by upstream.<br/>2. Python update to 3.11<br/>3. Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies<br/>4. Migrate to OpenSSL 3.1.2"
 
 HOMEPAGE   = https://sickchill.github.io/
 LICENSE    = GPLv3+
@@ -59,7 +55,8 @@ USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = sickchill_extra_install
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
+
 # prefere native python tools (pip, maturin, ...)
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/python311/work-native/install/usr/local/bin):$(PATH)
 

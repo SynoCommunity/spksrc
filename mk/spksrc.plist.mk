@@ -9,13 +9,20 @@ ifeq ($(strip $(PLIST_TRANSFORM)),)
 PLIST_TRANSFORM = cat
 endif
 
+###
+### When processing PLIST entries where we are re-using existing
+### shared object from another spk (ex: python* or ffmpeg),
+### always check that a $(PKG_NAME).plist exists as it won't
+### be created when the shared build environment is being
+### populated with symlinks to $(PKG_NAME)*_done
+###
 .PHONY: cat_PLIST
 cat_PLIST:
 	@for depend in $(DEPENDS) ; \
 	do                          \
 	  $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$$depend cat_PLIST ; \
 	done
-	@if [ -f PLIST ] ; \
+	@if [ -f PLIST ] && [ -f $(WORK_DIR)/$(PKG_NAME).plist ] ; \
 	then \
 	  $(PLIST_TRANSFORM) PLIST ; \
 	# If there is a PLIST.auto file or if parent directory is kernel \

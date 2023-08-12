@@ -6,6 +6,10 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
+# Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
+# CPython core team, see https://peps.python.org/pep-0011/ for more information.
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 BUILD_DEPENDS = native/$(PKG_NAME)
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
@@ -34,19 +38,11 @@ include ../../mk/spksrc.archs.mk
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
 CONFIGURE_ARGS += --enable-optimizations
-# old compilers fail with unrecognized command line options: -flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # Enable Link-Time Optimization
 CONFIGURE_ARGS += --with-lto
-endif
 else
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
-endif
-
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# older gcc does not know -Wno-unused-result
-CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
 endif
 
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
@@ -54,9 +50,7 @@ CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptc=no
 CONFIGURE_ARGS += ac_cv_have_long_long_format=yes
 
-# keep both openssl until all python packages
-# have been republished using openssl3
-DEPENDS += cross/openssl cross/openssl3
+DEPENDS += cross/openssl3
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
 DEPENDS += cross/gdbm
@@ -134,15 +128,30 @@ python311_install:
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
-# wheels to install in crossenv
-CROSSENV_WHEELS  = setuptools-rust==1.6.0
-CROSSENV_WHEELS += setuptools-scm==7.1.0
-CROSSENV_WHEELS += cffi==1.15.1
-CROSSENV_WHEELS += poetry==1.5.1
+# default wheels to install in crossenv
+CROSSENV_WHEELS  = cffi==1.15.1
+CROSSENV_WHEELS += cryptography==41.0.3
 CROSSENV_WHEELS += Cython==0.29.35
 CROSSENV_WHEELS += flit==3.9.0
-CROSSENV_WHEELS += cryptography==41.0.1
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+CROSSENV_WHEELS += poetry==1.5.1
+CROSSENV_WHEELS += scikit-build==0.17.6
+CROSSENV_WHEELS += setuptools-rust==1.6.0
+CROSSENV_WHEELS += setuptools-scm==7.1.0
+
+# [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
+# [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+# [numpy] <= 1.24.4 last working version with gcc-4.9
+ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+CROSSENV_WHEELS += numpy==1.24.4
+# [numpy] >= 1.25.0 requires c++17
+else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+CROSSENV_WHEELS += numpy==1.25.1
+endif
+endif
+
+# [maturin]
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==1.1.0
 endif
 
@@ -152,7 +161,7 @@ endif
 python311_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
-	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $${CC} --cxx $${CXX} --ar $${AR} --sysroot $${SYSROOT} --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
+	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $(TC_PATH)$(TC_PREFIX)gcc --cxx $(TC_PATH)$(TC_PREFIX)c++ --ar $(TC_PATH)$(TC_PREFIX)ar --sysroot $(TC_SYSROOT) --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check

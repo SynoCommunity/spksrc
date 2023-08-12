@@ -53,9 +53,7 @@ CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptc=no
 CONFIGURE_ARGS += ac_cv_have_long_long_format=yes
 
-# keep both openssl until all python packages
-# have been republished using openssl3
-DEPENDS += cross/openssl cross/openssl3
+DEPENDS += cross/openssl3
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
 DEPENDS += cross/gdbm
@@ -138,10 +136,12 @@ python310_install:
 CROSSENV_WHEELS  = setuptools-rust==1.6.0
 CROSSENV_WHEELS += setuptools-scm==7.1.0
 CROSSENV_WHEELS += cffi==1.15.1
-CROSSENV_WHEELS += poetry==1.5.1
 CROSSENV_WHEELS += Cython==0.29.35
 CROSSENV_WHEELS += flit==3.9.0
-CROSSENV_WHEELS += cryptography==41.0.1
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+CROSSENV_WHEELS += cryptography==41.0.3
+CROSSENV_WHEELS += poetry==1.5.1
+endif
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==1.1.0
 endif
@@ -152,7 +152,7 @@ endif
 python310_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
-	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $${CC} --cxx $${CXX} --ar $${AR} --sysroot $${SYSROOT} --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
+	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $(TC_PATH)$(TC_PREFIX)gcc --cxx $(TC_PATH)$(TC_PREFIX)c++ --ar $(TC_PATH)$(TC_PREFIX)ar --sysroot $(TC_SYSROOT) --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check

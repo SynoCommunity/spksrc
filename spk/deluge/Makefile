@@ -3,19 +3,19 @@ SPK_VERS = 2.1.1.61
 SPK_REV = 21
 SPK_ICON = src/deluge.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
 
 WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 WHEELS += src/requirements-abi3.txt
 
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
 DESCRIPTION_FRE = Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), desservant l\'interface utilisateur web deluge.
 STARTABLE = yes
-CHANGELOG = "1. Update to latest github development commit<br/>2. Update to libtorrent 2.0.9<br/>3. Update to OpenSSL 3.1.1"
+CHANGELOG = "1. Update to latest github development commit<br/>2. Update to libtorrent 2.0.9<br/>3. Update to OpenSSL 3.1.2"
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
@@ -45,7 +45,7 @@ DEPENDS += cross/cryptography
 # [rencode]
 PYTHON_LIMITED_API=cp36
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
 
 # [libtorrent]
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)

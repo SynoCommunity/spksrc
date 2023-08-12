@@ -1,11 +1,11 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 4.0.3
-SPK_REV = 63
+SPK_REV = 64
 SPK_ICON = src/sabnzbd.png
 
-BUILD_DEPENDS = cross/python311
+PYTHON_PACKAGE = python311
 DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python311"
+SPK_DEPENDS = "python311>=3.11.4-7"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 4.0.3."
+CHANGELOG = "Update SABnzbd to 4.0.3<br/>Update to OpenSSL 3.1.2"
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -41,7 +41,10 @@ ENV += BUSYBOX_CONFIG="nice ionice"
 
 SPK_COMMANDS = bin/7za
 
-include ../../mk/spksrc.spk.mk
+# [cryptography]
+DEPENDS += cross/cryptography
+
+include ../../mk/spksrc.python.mk
 
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:

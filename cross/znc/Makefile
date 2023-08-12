@@ -5,8 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = cross/python310
-DEPENDS = cross/openssl cross/libicu
+BUILD_DEPENDS = cross/python311
+DEPENDS = cross/openssl3 cross/libicu cross/zlib
 
 # configure: No compiler with C++11 support was found
 # error: Upgrade your compiler. GCC 4.8+ and Clang 3.2+ are known to work.
@@ -17,7 +17,8 @@ COMMENT  = Advanced IRC bouncer
 LICENSE  = Apache 2.0
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-python
+CONFIGURE_ARGS  = --enable-python
+CONFIGURE_ARGS += --enable-openssl
 
 ifneq ($(wildcard modules/*),)
 POST_INSTALL_TARGET = znc_post_install
@@ -57,5 +58,5 @@ znc_post_install:
 	@chmod +x $(WORK_DIR)/$(PKG_DIR)/znc-buildmod
 	@rm -fr $(WORK_DIR)/modules
 	@cp -R modules $(WORK_DIR)/
-	@cd $(WORK_DIR)/modules && PATH=$(WORK_DIR)/$(PKG_DIR) INCLUDES=-I$(STAGING_INSTALL_PREFIX)/include/znc prefix=$(STAGING_INSTALL_PREFIX) znc-buildmod $(EXTRA_MODULES)
+	@cd $(WORK_DIR)/modules && PATH=$(WORK_DIR)/$(PKG_DIR) INCLUDES="-I$(STAGING_INSTALL_PREFIX)/include/znc -I$(OPENSSL_STAGING_PREFIX)/include" prefix=$(STAGING_INSTALL_PREFIX) znc-buildmod $(EXTRA_MODULES)
 	@install -m 644 $(WORK_DIR)/modules/*.so $(STAGING_INSTALL_PREFIX)/lib/znc/

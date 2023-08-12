@@ -1,15 +1,21 @@
-# This file is a copy of the https://raw.githubusercontent.com/Flexget/Flexget/v3.3.4/requirements.txt file
-# including the https://raw.githubusercontent.com/Flexget/Flexget/v3.3.4/requirements.in
-# Additionally added the flexget and the transmission-rpc packages.
-# plumbum and rpyc packages are adjusted as the proposed versions are not accepted.
+# Snapshot from Jul. 23rd 2023
 
 aniso8601==9.0.1
 Brotli==1.0.9
-cffi==1.15.0
-cryptography==3.3.2
-greenlet==1.1.2
-MarkupSafe==2.0.1
-psutil==5.8.0
-pyrsistent==0.18.0
-PyYAML==6.0
-SQLAlchemy==1.4.27
+cffi==1.15.1
+charset-normalizer==2.1.1
+#cryptography                ==> cross/cryptography
+dulwich==0.21.5
+greenlet==2.0.1
+MarkupSafe==2.1.1
+msgpack==1.0.5
+psutil==5.9.4
+pydantic==1.10.2
+pyrsistent==0.19.2
+PyYAML==6.0.1
+SQLAlchemy==2.0.15
+
+# Building will generate a non-optimized build: py3-none-any
+# At installation time it will pip download a c++17 compiled
+# optimized build, in case of failure fall-back on this one.
+rapidfuzz==2.15.1
