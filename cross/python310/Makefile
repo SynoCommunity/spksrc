@@ -136,10 +136,12 @@ python310_install:
 CROSSENV_WHEELS  = setuptools-rust==1.6.0
 CROSSENV_WHEELS += setuptools-scm==7.1.0
 CROSSENV_WHEELS += cffi==1.15.1
-CROSSENV_WHEELS += poetry==1.5.1
 CROSSENV_WHEELS += Cython==0.29.35
 CROSSENV_WHEELS += flit==3.9.0
-CROSSENV_WHEELS += cryptography==41.0.1
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+CROSSENV_WHEELS += cryptography==41.0.3
+CROSSENV_WHEELS += poetry==1.5.1
+endif
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==1.1.0
 endif
