@@ -518,8 +518,8 @@ wheelclean: spkclean
 	   if grep -q spksrc.python-wheel.mk $${makefile} ; then \
 	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
 	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
-	      echo "rm -fr work-*/$${pkgname}\\n       work-*/.$${pkgname}-*" ; \
-	      rm -fr work-*/$${pkgname} \
+	      echo "rm -fr work-*/$${pkgname}*\\n       work-*/.$${pkgname}-*" ; \
+	      rm -fr work-*/$${pkgname}* \
                      work-*/.$${pkgname}-* ; \
 	   fi ; \
 	done
