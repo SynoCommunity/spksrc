@@ -31,3 +31,4 @@ include ../../mk/spksrc.install-resources.mk
 kopia_install:
 	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
 	@$(RUN) ; cp -f $(PKG_NAME) $(STAGING_INSTALL_PREFIX)/bin/
+	@chmod +x $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)
