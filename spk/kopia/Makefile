@@ -20,13 +20,6 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 51515
 ADMIN_PORT = $(SERVICE_PORT)
 
-POST_STRIP_TARGET = kopia_extra_install
-
 SPK_COMMANDS = bin/kopia
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: kopia_extra_install
-kopia_extra_install:
-	@install -d -m 755 $(STAGING_DIR)/var
-	@install -m 644 src/environment-variables $(STAGING_DIR)/var/
