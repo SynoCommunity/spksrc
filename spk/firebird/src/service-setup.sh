@@ -1,11 +1,11 @@
-#!/bin/sh
-
+# Fbguard binary is a wrapper around firebird that allows it to run as
+# a daemon
 FBGUARD_BIN_FILE="${SYNOPKG_PKGDEST}/bin/fbguard"
 
 # We set onetime because we want the systemd to take care about the failures
 SERVICE_COMMAND="${FBGUARD_BIN_FILE} -pidfile ${PID_FILE} -daemon -onetime"
 
-SYSDBA_PASSWORD_FILE="${SYNOPKG_PKGDEST}/SYSDBA.password"
+SYSDBA_PASSWORD_FILE="${SYNOPKG_PKGVAR}/SYSDBA.password"
 
 service_postinst () {
     set -x
