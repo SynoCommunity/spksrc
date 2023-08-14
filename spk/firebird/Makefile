@@ -3,15 +3,11 @@ SPK_VERS = 4.0.3
 SPK_ICON = src/firebird.png
 SPK_REV = 1
 
-BETA = 1
-
 DEPENDS = cross/$(SPK_NAME)
-
-include ../../mk/spksrc.common.mk
 
 DISPLAY_NAME = FirebirdSQL
 DESCRIPTION = Firebird is a relational database with excelent concurrency and high performance.
-CHANGELOG = "Add FirebirdSQL DB server in version 4.0.2"
+CHANGELOG = "Add FirebirdSQL DB server in version 4.0.3"
 HOMEPAGE = https://firebirdsql.org/
 MAINTAINER = vitkabele
 LICENSE  = MPL
