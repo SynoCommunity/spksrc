@@ -4,7 +4,7 @@
     "items": [
       {
         "type": "password",
-        "desc": "SYSDBA user",
+        "desc": "SYSDBA user (the Firebird administrator account)",
         "subitems": [
           {
             "key": "wizard_sysdba_password",
