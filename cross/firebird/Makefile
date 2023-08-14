@@ -38,9 +38,14 @@ COMPILE_TARGET = firebird_compile
 
 INSTALL_TARGET = firebird_install
 
+# We must forward-declare the PKGVAR here as we must compile its value to the
+# binaries. We only support DSM7 so we do not worry about DSM6 compatibility
+SYNOPKG_PKGVAR = /var/packages/$(PKG_NAME)/var
+
 # CXXFLAGS should be set fine by the spksrc for cross-compilation, we will
 # use it in cross2 step CROSS_ENV
-ADDITIONAL_CXXFLAGS = -Wno-invalid-offsetof
+ADDITIONAL_CXXFLAGS = -Wno-invalid-offsetof \
+					  '-DFB_SECDBDIR="\"$(SYNOPKG_PKGVAR)\""'
 
 # Path to the libtool installed in the cross/libtool DEPENDS target
 # We need the native libtool for building libommath/libtomcrypt in cross1 step

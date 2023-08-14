@@ -23,9 +23,6 @@
 /* Define this if paths are case sensitive */
 #define CASE_SENSITIVITY false
 
-/* Define this if OS is DARWIN */
-/* #undef DARWIN */
-
 /* Use binary relocation? */
 #define ENABLE_BINRELOC
 
@@ -93,7 +90,7 @@
 #define FB_SBINDIR ""
 
 /* security database DIR (PREFIX) */
-#define FB_SECDBDIR ""
+/* #define FB_SECDBDIR "" */
 
 /* Inet service name */
 #define FB_SERVICE_NAME "gds_db"
