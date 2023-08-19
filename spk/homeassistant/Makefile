@@ -8,7 +8,6 @@ HACS_VERS = 1.32.1
 PYTHON_PACKAGE = python311
 SPK_DEPENDS = "$(PYTHON_PACKAGE)>=3.11.4-7"
 
-BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
 OPTIONAL_DEPENDS = cross/libstdc++
 
 # [numpy] > 1.22.4
@@ -85,18 +84,11 @@ WHEELS_BUILD_ARGS += --enable-freetype
 WHEELS_BUILD_ARGS += --enable-jpeg
 WHEELS_BUILD_ARGS += --enable-zlib
 
-# [bcrypt]
+# [bcrypt, cryptography]
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # fix for openssl-sys crate (for cryptography >= 40.0.0)
 # https://docs.rs/openssl/latest/openssl/#manual
-ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
-
-# [cryptography]
-DEPENDS += cross/cryptography_38
-
-# [uamqp]
-DEPENDS += cross/uamqp
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
@@ -107,10 +99,9 @@ ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
+include ../../mk/spksrc.python.mk
 
-include ../../mk/spksrc.spk.mk
-
-# prefere native python tools (pip, maturin, ...)
+# prefer native python tools (pip, maturin, ...)
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
 # [greenlet]
