@@ -14,7 +14,7 @@ validate_preupgrade () {
     # If neither of them is present, we don't know how to set the main
     # DB password.
     [ -f "$SYSDBA_PASSWORD_FILE" ] || [ -f "$FB_SECDB" ] || {
-        install_log "Neither SYSDBA.password nor security4.fdb exists.";
+        echo "Neither SYSDBA.password nor security4.fdb exists."
         exit 1;    
     };
 }
