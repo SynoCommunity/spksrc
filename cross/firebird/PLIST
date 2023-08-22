@@ -1,5 +1,5 @@
-rsc:IDPLicense.txt
-rsc:IPLicense.txt
+rsc:var/IDPLicense.txt
+rsc:var/IPLicense.txt
 rsc:bin/fb_config
 bin:bin/build_file
 bin:bin/fb_lock_print
@@ -15,9 +15,9 @@ bin:bin/gstat
 bin:bin/isql
 bin:bin/nbackup
 rsc:bin/registerDatabase.sh
-rsc:databases.conf
-rsc:fbtrace.conf
-rsc:firebird.conf
+rsc:var/databases.conf
+rsc:var/fbtrace.conf
+rsc:var/firebird.conf
 rsc:security4.gbak
 rsc:msg.gbak
 rsc:intl/fbintl
@@ -27,7 +27,7 @@ lnk:lib/libfbclient.so.2
 lib:lib/libfbclient.so.4.0.3
 lib:lib/libib_util.so
 rsc:misc/intl.sql
-rsc:plugins.conf
+rsc:var/plugins.conf
 lib:plugins/libChaCha.so
 lib:plugins/libEngine13.so
 lib:plugins/libLegacy_Auth.so
@@ -38,4 +38,4 @@ lib:plugins/libudr_engine.so
 lib:plugins/udr/libudf_compat.so
 rsc:plugins/udr/udf_compat.sql
 rsc:plugins/udr_engine.conf
-rsc:replication.conf
+rsc:var/replication.conf

@@ -41,11 +41,30 @@ INSTALL_TARGET = firebird_install
 # We must forward-declare the PKGVAR here as we must compile its value to the
 # binaries. We only support DSM7 so we do not worry about DSM6 compatibility
 SYNOPKG_PKGVAR = /var/packages/$(PKG_NAME)/var
+SYNOPKG_PKGDEST = /var/packages/$(PKG_NAME)/target
+
+ADDITIONAL_CFLAGS = '-DFB_PREFIX="\"$(SYNOPKG_PKGDEST)\""' \
+					'-DFB_SECDBDIR="\"$(SYNOPKG_PKGVAR)\""' \
+					'-DFB_GUARDDIR="\"$(SYNOPKG_PKGVAR)\""' \
+					'-DFB_CONFDIR="\"$(SYNOPKG_PKGVAR)\""' \
+					'-DFB_SBINDIR="\"$(SYNOPKG_PKGDEST)/bin\""' \
+					'-DFB_BINDIR="\"$(SYNOPKG_PKGDEST)/bin\""' \
+					'-DFB_DOCDIR="\"$(SYNOPKG_PKGDEST)/doc\""' \
+					'-DFB_HELPDIR="\"$(SYNOPKG_PKGDEST)/help\""' \
+					'-DFB_SAMPLEDIR="\"$(SYNOPKG_PKGDEST)/examples\""' \
+					'-DFB_PLUGDIR="\"$(SYNOPKG_PKGDEST)/plugins\""' \
+					'-DFB_SAMPLEDBDIR="\"$(SYNOPKG_PKGDEST)/examples/empbuild\""' \
+					'-DFB_TZDATADIR="\"$(SYNOPKG_PKGDEST)\""' \
+					'-DFB_MISCDIR="\"$(SYNOPKG_PKGDEST)/misc\""' \
+					'-DFB_MSGDIR="\"$(SYNOPKG_PKGDEST)\""' \
+					'-DFB_INCDIR="\"$(SYNOPKG_PKGDEST)/include\""' \
+					'-DFB_INTLDIR="\"$(SYNOPKG_PKGDEST)/intl\""' \
+					'-DFB_LIBDIR="\"$(SYNOPKG_PKGDEST)/lib\""' \
+					'-DFB_LOGDIR="\"$(SYNOPKG_PKGVAR)\""'
 
 # CXXFLAGS should be set fine by the spksrc for cross-compilation, we will
 # use it in cross2 step CROSS_ENV
-ADDITIONAL_CXXFLAGS = -Wno-invalid-offsetof \
-					  '-DFB_SECDBDIR="\"$(SYNOPKG_PKGVAR)\""'
+ADDITIONAL_CXXFLAGS = -Wno-invalid-offsetof $(ADDITIONAL_CFLAGS)
 
 # Path to the libtool installed in the cross/libtool DEPENDS target
 # We need the native libtool for building libommath/libtomcrypt in cross1 step
@@ -61,7 +80,8 @@ include ../../mk/spksrc.cross-cc.mk
 # termlib and editline are disabled because we don't provide ncurses
 # and editline libraries
 CONFIGURE_ARGS = --without-termlib --with-builtin-tommath --with-builtin-tomcrypt \
-				 --without-editline --with-cross-build=synology.$(ARCH) --prefix=$(INSTALL_PREFIX)
+				 --without-editline --with-cross-build=synology.$(ARCH) --prefix=$(INSTALL_PREFIX) \
+				 --with-fbconf=$(INSTALL_PREFIX)/var
 
 NATIVE_LIBICU_DIR := $(WORK_DIR)/../../../native/libicu/work-native/install/usr/local
 

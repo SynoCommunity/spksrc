@@ -24,64 +24,64 @@
 #define FB_ALIGNMENT 8
 
 /* executables DIR (PREFIX/bin) */
-#define FB_BINDIR ""
+/* #define FB_BINDIR "" */
 
 /* config files DIR (PREFIX) */
-#define FB_CONFDIR ""
+/* #define FB_CONFDIR "" */
 
 /* documentation root DIR (PREFIX/doc) */
-#define FB_DOCDIR ""
+/* #define FB_DOCDIR "" */
 
 /* Alignment of double */
 #define FB_DOUBLE_ALIGN 8
 
 /* guardian lock DIR (PREFIX) */
-#define FB_GUARDDIR ""
+/* #define FB_GUARDDIR "" */
 
 /* QLI help DIR (PREFIX/help) */
-#define FB_HELPDIR ""
+/* #define FB_HELPDIR "" */
 
 /* C/C++ header files DIR (PREFIX/include) */
-#define FB_INCDIR ""
+/* #define FB_INCDIR "" */
 
 /* international DIR (PREFIX/intl) */
-#define FB_INTLDIR ""
+/* #define FB_INTLDIR "" */
 
 /* Local IPC name */
 #define FB_IPC_NAME "FirebirdIPI"
 
 /* object code libraries DIR (PREFIX/lib) */
-#define FB_LIBDIR ""
+/* #define FB_LIBDIR "" */
 
 /* log files DIR (PREFIX) */
-#define FB_LOGDIR ""
+/* #define FB_LOGDIR "" */
 
 /* misc DIR (PREFIX/misc) */
-#define FB_MISCDIR ""
+/* #define FB_MISCDIR "" */
 
 /* message files DIR (PREFIX) */
-#define FB_MSGDIR ""
+/* #define FB_MSGDIR "" */
 
 /* Wnet pipe name */
 #define FB_PIPE_NAME "interbas"
 
 /* plugins DIR (PREFIX) */
-#define FB_PLUGDIR ""
+/* #define FB_PLUGDIR "" */
 
 /* tzdata DIR (PREFIX) */
-#define FB_TZDATADIR ""
+/* #define FB_TZDATADIR "" */
 
 /* Installation path prefix */
-#define FB_PREFIX "/usr/local/firebird"
+/* #define FB_PREFIX "/usr/local/firebird" */
 
 /* examples database DIR (PREFIX/examples/empbuild) */
-#define FB_SAMPLEDBDIR ""
+/* #define FB_SAMPLEDBDIR "" */
 
 /* examples DIR (PREFIX/examples) */
-#define FB_SAMPLEDIR ""
+/* #define FB_SAMPLEDIR "" */
 
 /* system admin executables DIR (PREFIX/bin) */
-#define FB_SBINDIR ""
+/* #define FB_SBINDIR "" */
 
 /* security database DIR (PREFIX) */
 /* #define FB_SECDBDIR "" */
