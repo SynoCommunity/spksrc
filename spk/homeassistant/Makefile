@@ -1,6 +1,6 @@
 SPK_NAME = homeassistant
 SPK_VERS = 2023.7.3
-SPK_REV = 21
+SPK_REV = 22
 SPK_ICON = src/homeassistant.png
 
 HACS_VERS = 1.32.1
@@ -36,6 +36,9 @@ POST_STRIP_TARGET = homeassistant_extra_install
 
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
 WHEELS = src/requirements-abi3.txt src/requirements-crossenv.txt src/requirements-pure.txt
+
+# [DTLSSocket] runtime dependency of [tradfri]
+DEPENDS += cross/dtlssocket
 
 include ../../mk/spksrc.common.mk
 
