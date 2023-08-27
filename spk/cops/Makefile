@@ -1,5 +1,5 @@
 SPK_NAME = cops
-SPK_VERS = 1.3.6
+SPK_VERS = 1.4.2
 SPK_REV = 7
 SPK_ICON = src/cops.png
 DSM_UI_DIR = app
@@ -11,7 +11,7 @@ DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre co
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 ADMIN_URL = /cops/
 DISPLAY_NAME = COPS
-CHANGELOG = "1. Update to 1.3.6<br />2. Upgrade PHP 7.4<br />3. Add .htaccess migration support"
+CHANGELOG = "1. Update to 1.4.2<br />2. Upgrade PHP 7.4<br />3. Add .htaccess migration support"
 
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
