@@ -396,8 +396,8 @@ endif
 ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 	@$(MSG) "Generate DSM Wizards from templates"
 	@mkdir -p $(WIZARDS_DIR)
-	$(eval IS_DSM_6_OR_GREATER = $(if $(filter 1,$(call version_gt, $(TCVERSION), 6.0)),true,false))
-	$(eval IS_DSM_7_OR_GREATER = $(if $(filter 1,$(call version_gt, $(TCVERSION), 7.0)),true,false))
+	$(eval IS_DSM_6_OR_GREATER = $(if $(filter 1,$(call version_ge, $(TCVERSION), 6.0)),true,false))
+	$(eval IS_DSM_7_OR_GREATER = $(if $(filter 1,$(call version_ge, $(TCVERSION), 7.0)),true,false))
 	$(eval IS_DSM_7 = $(IS_DSM_7_OR_GREATER))
 	$(eval IS_DSM_6 = $(if $(filter true,$(IS_DSM_6_OR_GREATER)),$(if $(filter true,$(IS_DSM_7)),false,true),false))
 	@for template in `find $(WIZARDS_TEMPLATES_DIR) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print`; do \

@@ -1,0 +1,16 @@
+COPS_CONFIGURATION_FIRST_STEP_TITLE: "Configuration de COPS"
+
+EXISTING_CALIBRE_DIRECTORY_DESCRIPTION: "Répertoire existant contenant une bibliothèque Calibre. Attention : doit se terminer par un / et ne jamais utiliser le répertoire web."
+EXISTING_CALIBRE_DIRECTORY_LABEL: "Répertoire contenant Calibre"
+COPS_CATALOG_TITLE_DESCRIPTION: "Titre du catalogue."
+COPS_CATALOG_TITLE_LABEL: "Titre du catalogue"
+
+COPS_CONFIGURATION_SECOND_STEP_TITLE: "Configuration de COPS (suite)"
+DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_DESCRIPTION: "Voulez vous utiliser COPS avec votre liseuse Kobo ?"
+DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_LABEL: "Kobo"
+
+DSM_PERMISSIONS_TITLE: "Attention! DSM Permissions"
+DSM_PERMISSIONS_TEXT: "L'utilisateur et le group du package n'apparaîtront pas sur la plupart des UI réglages. Veuillez vous référrer à <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\\\">Permission Management</a> pour plus de détails."
+
+PHP_CONFIGURATION_REQUIREMENTS_TITLE: "Configuration PHP requise"
+PHP_CONFIGURATION_REQUIREMENTS_EXPLANATION: "Vous devriez activer les extensions PHP suivantes (au sein de WebStation):"
