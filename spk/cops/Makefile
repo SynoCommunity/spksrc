@@ -28,6 +28,7 @@ REQUIRED_MIN_DSM = 6.0
 DSM_UI_CONFIG = src/app/config
 
 WIZARDS_TEMPLATES_DIR = src/wizard_templates
+SERVICE_USER = auto
 CONF_DIR = src/conf/
 
 SERVICE_SETUP = src/service-setup.sh
