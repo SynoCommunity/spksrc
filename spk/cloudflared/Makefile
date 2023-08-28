@@ -1,5 +1,5 @@
 SPK_NAME = cloudflared
-SPK_VERS = 2023.8.0
+SPK_VERS = 2023.8.1
 SPK_REV = 11
 SPK_ICON = src/cloudflared.png
 
@@ -11,7 +11,7 @@ DISPLAY_NAME = cloudflared
 DESCRIPTION = "Cloudflare Tunnel client \(formerly Argo Tunnel\)."
 HOMEPAGE = https://github.com/cloudflare/cloudflared
 LICENSE = Apache-2.0
-CHANGELOG = "Update to 2023.8.0"
+CHANGELOG = "Update to 2023.8.1"
 
 WIZARDS_DIR = src/wizard/
 
