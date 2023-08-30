@@ -1,6 +1,6 @@
 SPK_NAME = tt-rss
-SPK_VERS = 20221230
-SPK_REV = 16
+SPK_VERS = 20230828
+SPK_REV = 17
 SPK_ICON = src/tt-rss.png
 DSM_UI_DIR = app
 
@@ -11,19 +11,16 @@ DESCRIPTION = Tiny Tiny RSS is an open source web-based news feed \(RSS/Atom\) r
 DESCRIPTION_FRE = Tiny Tiny RSS est un agrégateur et lecteur web de flux RSS et Atom open source conçu pour vous permettre de lire des nouvelles de n\'importe quel endroit, tout en se sentant aussi proche d\'une application de bureau que possible.
 ADMIN_URL = /tt-rss/
 DISPLAY_NAME = Tiny Tiny RSS
-CHANGELOG = "1. Update Tiny Tiny RSS to Git revision c30b24d09f (20221230) <br /> 2. Fixed broken DSM 7 initial installation procedure. <br /> 3. Upgrade PHP version to 7.4"
+CHANGELOG = "Update Tiny Tiny RSS to Git revision afd04d141c (20230828)"
 
 HOMEPAGE   = https://tt-rss.org/
 LICENSE    = GPL
 
-WIZARDS_DIR = src/wizard/
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
 CONF_DIR = src/conf/
 
 SERVICE_SETUP = src/service-setup.sh
 SYSTEM_GROUP	 = http
-
-INSTALL_DEP_SERVICES = apache-web mysql
-START_DEP_SERVICES = apache-web mysql
 
 SERVICE_COMMAND = $(INSTALL_PREFIX)/bin/tt-rss-daemon
 
@@ -35,7 +32,6 @@ override ARCH=
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_MIN_DSM = 6.0
-INSTUNINST_RESTART_SERVICES = apache-web
 
 SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 

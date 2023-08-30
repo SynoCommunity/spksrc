@@ -1,5 +1,5 @@
 [{
-    "step_title": "Configuration de la base de donnée de tt-rss",
+    "step_title": "{{DB_CONFIGURATION_TITLE}}",
     "items": [{
         "type": "multiselect",
         "subitems": [{
@@ -20,41 +20,41 @@
         }]
     }, {
         "type": "password",
-        "desc": "Saisissez votre mot de passe MySQL.",
+        "desc": "{{ENTER_MYSQL_PASSWORD}}",
         "subitems": [{
             "key": "wizard_mysql_password_root",
-            "desc": "Mot de passe Root"
+            "desc": "{{ROOT_PASSWORD}}"
         }]
     }, {
         "type": "password",
-        "desc": "Un utilisateur et une base de donnée MySQL 'ttrss' vont être créés. Saisissez un mot de passe pour l'utilisateur 'ttrss'.",
+        "desc": "{{ENTER_TTRSS_PASSWORD}}",
         "subitems": [{
             "key": "wizard_mysql_password_ttrss",
-            "desc": "Mot de passe Ttrss"
+            "desc": "{{TT-RSS_PASSWORD_DESCRIPTION}}"
         }]
     }]
 }, {
-    "step_title": "Configuration de tt-rss ",
+    "step_title": "{{TT-RSS_CONFIGURATION_TITLE}}",
     "items": [{
         "type": "textfield",
-        "desc": "Nom de domaine de votre DiskStation. Par exemple : vous.synology.me.",
+        "desc": "{{DOMAIN_NAME_SECTION_LABEL}}",
         "subitems": [{
             "key": "wizard_domain_name",
-            "desc": "Nom de domaine"
+            "desc": "{{DOMAIN_NAME_INPUT_LABEL}}"
         }]
     }, {
         "type": "multiselect",
-        "desc": "Activer le mode utilisateur unique. Si vous n'activez pas ce mode, l'utilisateur par défaut est 'admin' avec le mot de passe 'password'.",
+        "desc": "{{SINGLE_USER_SECTION_LABEL}}",
         "subitems": [{
             "key": "wizard_single_user",
-            "desc": "Utilisateur unique"
+            "desc": "{{SINGLE_USER_CHECKBOX_LABEL}}"
         }]
     }]
-}, {
-    "step_title": "WebStation PHP Configuration",
+}{{#IS_DSM_6}}, {
+    "step_title": "{{WEBSTATION_PHP_PROFILE_TITLE}}",
     "items": [{
-        "desc": "Tiny Tiny RSS requiert que les extensions PHP suivantes soient activ&eacute;es pour le profil PHP courant (configurables dans <code>Web Station</code> &gt; <code>Param&egrave;tres PHP</code> dans l'onglet <code>Param&egrave;tres de serveur par d&eacute;faut</code>):"
+        "desc": "{{WEBSTATION_PHP_PROFILE_DESC}}"
     }, {
         "desc": "<ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
     }]
-}]
+}{{/IS_DSM_6}}]
