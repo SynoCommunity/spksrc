@@ -1,9 +1,12 @@
 SPK_NAME = transmission
 SPK_VERS = 4.0.4
-SPK_REV = 23
+SPK_REV = 24
 SPK_ICON = src/transmission.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/transmission
+
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Transmission is an easy and fast BitTorrent client. You can control it remotely with its web interface or dedicated applications.
@@ -20,10 +23,9 @@ WIZARDS_DIR = src/wizard/
 
 SERVICE_USER = auto
 SERVICE_WIZARD_SHARE = wizard_download_share
-USE_DATA_SHARE_WORKER = yes
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 9091
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_PORT_TITLE = Transmission Web UI
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
