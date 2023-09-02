@@ -1,6 +1,6 @@
 PKG_NAME = pip
 # use the same version in native/python310|311/Makefile (python310|311_native_post_install)
-PKG_VERS = 23.1.2
+PKG_VERS = 23.2.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/$(PKG_NAME)

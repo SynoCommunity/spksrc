@@ -1,7 +1,7 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.4
+SPK_VERS = 3.11.5
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/python3.png
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.4<br/>2. Update all packages to OpenSSL 3.1.2"
+CHANGELOG = "1. Update to Python 3.11.5"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
