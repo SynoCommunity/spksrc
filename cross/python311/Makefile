@@ -131,7 +131,10 @@ python311_install:
 # default wheels to install in crossenv
 CROSSENV_WHEELS  = cffi==1.15.1
 CROSSENV_WHEELS += cryptography==41.0.3
-CROSSENV_WHEELS += Cython==3.0.2
+# Version >= 3.x breaks PyYAML
+# https://github.com/yaml/pyyaml/issues/601
+#CROSSENV_WHEELS += Cython==3.0.2
+CROSSENV_WHEELS += Cython==0.29.36
 CROSSENV_WHEELS += flit==3.9.0
 CROSSENV_WHEELS += poetry==1.6.1
 CROSSENV_WHEELS += scikit-build==0.17.6

@@ -5,6 +5,10 @@ SPK_REV = 8
 SPK_ICON = src/python3.png
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# Missing libatomic for proper openssl >= 3.x support
+# Ref: https://github.com/SynoCommunity/spksrc/issues/5841
+#      https://github.com/SynoCommunity/spksrc/pull/5820#issuecomment-1678221438
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/pip
@@ -22,11 +26,15 @@ LICENSE  = PSF
 
 # Force building pure-python wheels
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
-WHEELS  = src/requirements-pure.txt
+WHEELS = src/requirements-pure.txt
+
 # Force testing all wheel builds
-WHEELS_TEST_ALL = 0
+WHEELS_TEST_ALL = 1
+
 # Force compiler LTO optimizations
+ifeq ($(strip $(WHEELS_TEST_ALL)),0)
 ENV += PYTHON_OPTIMIZE=1
+endif
 
 SERVICE_SETUP = src/service-setup.sh
 

@@ -38,7 +38,7 @@ zope.interface==6.0
 # Require environment variables
 #  GEVENTSETUP_EMBED_CARES=FALSE
 #  GEVENTSETUP_EMBED_LIBEV=FALSE
-gevent==23.9.0
+gevent==23.7.0
 
 # [lxml]
 # Depends: libxml2, libxslt

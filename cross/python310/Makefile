@@ -136,7 +136,10 @@ python310_install:
 CROSSENV_WHEELS  = setuptools-rust==1.7.0
 CROSSENV_WHEELS += setuptools-scm==7.1.0
 CROSSENV_WHEELS += cffi==1.15.1
-CROSSENV_WHEELS += Cython==3.0.2
+# Version >= 3.x breaks PyYAML
+# https://github.com/yaml/pyyaml/issues/601
+#CROSSENV_WHEELS += Cython==3.0.2
+CROSSENV_WHEELS += Cython==0.29.36
 CROSSENV_WHEELS += flit==3.9.0
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += cryptography==41.0.3
