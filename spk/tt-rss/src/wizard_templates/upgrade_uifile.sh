@@ -80,7 +80,7 @@ function without_migration
         "hidden": true
       } ]
     }, {
-      "desc": "{{WEBSTATION_PHP_PROFILE_DESC}}<br /><ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
+      "desc": "{{{WEBSTATION_PHP_PROFILE_DESC}}}<br /><ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
     } ]
 } ]
 EOF
