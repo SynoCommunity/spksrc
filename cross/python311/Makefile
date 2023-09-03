@@ -149,6 +149,9 @@ CROSSENV_WHEELS += poetry==1.6.1
 CROSSENV_WHEELS += scikit-build==0.17.6
 CROSSENV_WHEELS += setuptools-rust==1.7.0
 CROSSENV_WHEELS += setuptools-scm==7.1.0
+# For future usages when building numpy >= 1.26
+#CROSSENV_WHEELS += meson-python==0.13.2
+#CROSSENV_WHEELS += scikit-build-core==0.5.0
 
 # [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
 # [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
@@ -177,8 +180,8 @@ python311_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==68.1.2" "wheel==0.41.2"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==68.1.2" "wheel==0.41.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.41.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.41.2"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
