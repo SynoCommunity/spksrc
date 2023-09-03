@@ -56,6 +56,17 @@ python_pre_depend:
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/python-cc.mk $(WORK_DIR)/python-cc.mk
 	@$(foreach _done,$(PYTHON_DEPENDS), ln -sf $(_done) $(WORK_DIR) ;)
-	# EXCEPTIONS: Ensure zlib,bzip2 is always built locally
+	# EXCEPTION: Ensure zlib,bzip2 is always built locally
 	@rm -f $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/zlib.pc $(WORK_DIR)/.zlib*
 	@rm -f $(WORK_DIR)/.bzip2*
+	# EXCEPTION: Do not symlink cross/* wheel builds
+	@make --no-print-directory dependency-flat | sort -u | grep -v spk/ | while read depend ; do \
+	   makefile="../../$${depend}/Makefile" ; \
+	   if grep -q spksrc.python-wheel.mk $${makefile} ; then \
+	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
+	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
+	      echo "rm -fr work-*/$${pkgname}*\\n       work-*/.$${pkgname}-*" ; \
+	      rm -fr work-*/$${pkgname}* \
+                     work-*/.$${pkgname}-* ; \
+	   fi ; \
+	done
