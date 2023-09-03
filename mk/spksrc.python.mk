@@ -9,19 +9,33 @@ PYTHON_PACKAGE_ROOT = $(realpath $(shell pwd)/../$(PYTHON_PACKAGE)/work-$(ARCH)-
 
 ifneq ($(wildcard $(PYTHON_PACKAGE_ROOT)),)
 
-# set ld flags to rewrite for the library path used to access
-# python libraries provided by the python package at destination
+# Set Python installtion prefix directory variables
 ifeq ($(strip $(PYTHON_STAGING_PREFIX)),)
 export PYTHON_PREFIX = /var/packages/$(PYTHON_PACKAGE)/target
 export PYTHON_STAGING_PREFIX = $(realpath $(PYTHON_PACKAGE_ROOT)/install/$(PYTHON_PREFIX))
-export ADDITIONAL_LDFLAGS += -Wl,--rpath-link,$(PYTHON_STAGING_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
 endif
 
+# Set OpenSSL installtion prefix directory variables
 ifeq ($(strip $(OPENSSL_STAGING_PREFIX)),)
 export OPENSSL_PREFIX = $(PYTHON_PREFIX)
 export OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_PREFIX)
-else
-export ADDITIONAL_LDFLAGS += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
+endif
+
+# set build flags including ld to rewrite for the library path used to
+# access python libraries provided by the python package at destination
+export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+export ADDITIONAL_LDFLAGS  += -L$(PYTHON_STAGING_PREFIX)/lib
+export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(PYTHON_STAGING_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
+
+# likewise for OpenSSL only if different
+ifneq ($(OPENSSL_STAGING_PREFIX),$(PYTHON_STAGING_PREFIX))
+export ADDITIONAL_CFLAGS   += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
+export ADDITIONAL_CPPFLAGS += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
+export ADDITIONAL_CXXFLAGS += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
+export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
 
 # get PYTHON_VERSION and other variables
