@@ -531,8 +531,11 @@ wheelcleanall: wheelcleancache
 	rm -fr ../../distrib/pip
 
 pythonclean: wheelcleanall
-	rm -fr work-*/[Pp]ython* work-*/.python* \
+	rm -fr work-*/.[Pp]ython*-install_done \
 	rm -fr work-*/crossenv
+
+pythoncleanall: pythonclean
+	rm -fr work-*/[Pp]ython* work-*/.python*
 
 all: package
 ifneq ($(filter 1 on ON,$(PSTAT)),)
