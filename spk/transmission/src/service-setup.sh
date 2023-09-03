@@ -1,14 +1,10 @@
+# use system python for DSM7
+PYTHON_BIN_PATHS=""
+
 # Add python to path
 # This gives tranmission the power to execute python scripts on completion (like TorrentToMedia).
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-    # use system python for DSM7
-    PYTHON_BIN_PATHS=""
-else
-    GROUP="sc-download"
-    PYTHON_BIN_PATHS="/var/packages/python310/target/bin:/var/packages/python38/target/bin:/var/packages/python3/target/bin:"
-fi
-
 PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_BIN_PATHS}${PATH}"
+
 CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 export TMP_DIR=${SYNOPKG_PKGTMP}
