@@ -6,6 +6,7 @@ SPK_ICON = src/vim.png
 DEPENDS = cross/$(SPK_NAME)
 PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.5-8"
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Vim is a highly configurable text editor built to enable efficient text editing. It is an improved version of the vi editor distributed with most UNIX systems.
