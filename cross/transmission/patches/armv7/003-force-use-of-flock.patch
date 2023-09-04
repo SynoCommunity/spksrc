@@ -1,0 +1,52 @@
+# Creating locks with fcntl does not work on 32-bit arm models
+# It results in EINVAL (error: invalid argument (22)) and does not lock the file.
+# flock does work (at least for the session-id file).
+# 
+# REMARKS:
+# The numbering scheme of the patches must not change the sequence.
+# 002-fix_empty_blocklist.patch must be applied first, since it modifies the file-posix.cc too
+# and is applied for all archs.
+# The line numbers here (003-*.patch) are taken from the version patched with 002-*.patch
+# 
+--- libtransmission/file-posix.cc.orig	2023-09-04 15:50:24.051131190 +0000
++++ libtransmission/file-posix.cc	2023-09-04 18:02:06.029986405 +0000
+@@ -1003,38 +1006,7 @@
+ 
+     bool ret = false;
+ 
+-#if defined(F_OFD_SETLK)
+-
+-    struct flock fl = {};
+-
+-    switch (operation & (TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_UN))
+-    {
+-    case TR_SYS_FILE_LOCK_SH:
+-        fl.l_type = F_RDLCK;
+-        break;
+-
+-    case TR_SYS_FILE_LOCK_EX:
+-        fl.l_type = F_WRLCK;
+-        break;
+-
+-    case TR_SYS_FILE_LOCK_UN:
+-        fl.l_type = F_UNLCK;
+-        break;
+-    }
+-
+-    fl.l_whence = SEEK_SET;
+-
+-    do
+-    {
+-        ret = fcntl(handle, (operation & TR_SYS_FILE_LOCK_NB) != 0 ? F_OFD_SETLK : F_OFD_SETLKW, &fl) != -1;
+-    } while (!ret && errno == EINTR);
+-
+-    if (!ret && errno == EAGAIN)
+-    {
+-        errno = EWOULDBLOCK;
+-    }
+-
+-#elif defined(HAVE_FLOCK)
++#if defined(HAVE_FLOCK)
+ 
+     int native_operation = 0;
+ 

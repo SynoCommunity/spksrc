@@ -4,7 +4,7 @@
 # The use of sendfile64 might fail with EINVAL (22)
 # This is in addition to the fallback from copy_file_range that might fail with EXDEV (18)
 # Both errors must be considered in the fallback to user-space copy.
---- libtransmission/file-posix.cc.orig	2023-09-04 15:50:24.051131190 +0000
+--- libtransmission/file-posix.cc.orig	2023-08-23 22:56:00.000000000 +0000
 +++ libtransmission/file-posix.cc	2023-09-04 15:50:43.120245644 +0000
 @@ -439,7 +439,10 @@
                  if (copied == -1)
