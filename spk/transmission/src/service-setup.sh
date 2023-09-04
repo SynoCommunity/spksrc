@@ -1,15 +1,9 @@
-# use system python for DSM7
-PYTHON_BIN_PATHS=""
-
-# Add python to path
-# This gives tranmission the power to execute python scripts on completion (like TorrentToMedia).
-PATH="${SYNOPKG_PKGDEST}/bin:${PYTHON_BIN_PATHS}${PATH}"
 
 CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
 export TMP_DIR=${SYNOPKG_PKGTMP}
 
-SERVICE_COMMAND="${TRANSMISSION} -g ${SYNOPKG_PKGVAR} -x ${PID_FILE} -e ${LOG_FILE}"
+SERVICE_COMMAND="${TRANSMISSION} --config-dir ${SYNOPKG_PKGVAR} --pid-file ${PID_FILE} --logfile ${LOG_FILE}"
 
 service_postinst ()
 {
