@@ -20,6 +20,10 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-python
 CONFIGURE_ARGS += --enable-openssl
 
+# For ZNC to build using github-action, enforce adding Python & OpenSSL include directories
+ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+ADDITIONAL_CPPFLAGS += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
+
 ifneq ($(wildcard modules/*),)
 POST_INSTALL_TARGET = znc_post_install
 endif
