@@ -6,8 +6,6 @@ PKG_DIST_SITE = https://ftp.nluug.nl/pub/vim/unix
 SPECIFIC_VERSION=$(subst .,,$(PKG_VERS))
 PKG_DIR = $(PKG_NAME)$(SPECIFIC_VERSION)
 
-PYTHON_PACKAGE = python310
-
 BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
 DEPENDS = cross/ncursesw
 
@@ -33,13 +31,10 @@ ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # With -O2 optimization there is an ICE with older ppc cross compilers
 # usercmd.c:1535: internal compiler error: in set_uids_in_ptset, at tree-ssa-structalias.c:4775
 # bug of GCC 4.2/4.3 in tree-optimization
-   ADDITIONAL_CFLAGS = -O
+   ADDITIONAL_CFLAGS += -O
 else
-   ADDITIONAL_CFLAGS = -O2
+   ADDITIONAL_CFLAGS += -O2
 endif
-
-# Add the Python SPK's installed lib dir to vim's rpath to allow loading of libpython dynamically if it's available
-ADDITIONAL_LDFLAGS = -Wl,--rpath,/var/packages/$(PYTHON_PACKAGE)/target/lib
 
 PLIST_TRANSFORM = sed -e 's%@SPECIFIC_VERSION@%$(SPECIFIC_VERSION)%'
 
