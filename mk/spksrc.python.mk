@@ -21,25 +21,27 @@ export OPENSSL_PREFIX = $(PYTHON_PREFIX)
 export OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_PREFIX)
 endif
 
-# set build flags including ld to rewrite for the library path used to
-# access python libraries provided by the python package at destination
+# set build flags including ld to rewrite for the library path
+# used to access python package provide libraries at destination
 export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_PREFIX)/include
-export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
 export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include
-export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
 export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_PREFIX)/include
-export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
 export ADDITIONAL_LDFLAGS  += -L$(PYTHON_STAGING_PREFIX)/lib
 export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(PYTHON_STAGING_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
 
-# likewise for OpenSSL only if different
+# similarly, ld to rewrite OpenSSL library path if differs
 ifneq ($(OPENSSL_STAGING_PREFIX),$(PYTHON_STAGING_PREFIX))
-export ADDITIONAL_CFLAGS   += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
-export ADDITIONAL_CPPFLAGS += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
-export ADDITIONAL_CXXFLAGS += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
 export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
 export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
+
+# For ZNC to build using github-action, enforce adding Python & OpenSSL include directories
+export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+export ADDITIONAL_CFLAGS   += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
+export ADDITIONAL_CPPFLAGS += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
+export ADDITIONAL_CXXFLAGS += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
 
 # get PYTHON_VERSION and other variables
 -include $(PYTHON_PACKAGE_ROOT)/python-cc.mk
