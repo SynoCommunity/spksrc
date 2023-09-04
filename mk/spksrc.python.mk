@@ -23,8 +23,11 @@ endif
 
 # set build flags including ld to rewrite for the library path used to
 # access python libraries provided by the python package at destination
+export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_PREFIX)/include
 export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include
 export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_PREFIX)/include
 export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
 export ADDITIONAL_LDFLAGS  += -L$(PYTHON_STAGING_PREFIX)/lib
 export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(PYTHON_STAGING_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
@@ -70,9 +73,8 @@ python_pre_depend:
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/python-cc.mk $(WORK_DIR)/python-cc.mk
 	@$(foreach _done,$(PYTHON_DEPENDS), ln -sf $(_done) $(WORK_DIR) ;)
-	# EXCEPTION: Ensure zlib,bzip2 is always built locally
+	# EXCEPTION: Ensure zlib is always built locally
 	@rm -f $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/zlib.pc $(WORK_DIR)/.zlib*
-	@rm -f $(WORK_DIR)/.bzip2*
 	# EXCEPTION: Do not symlink cross/* wheel builds
 	@make --no-print-directory dependency-flat | sort -u | grep -v spk/ | while read depend ; do \
 	   makefile="../../$${depend}/Makefile" ; \
