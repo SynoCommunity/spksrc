@@ -7,6 +7,8 @@
 # set default spk/python* path to use
 PYTHON_PACKAGE_ROOT = $(realpath $(shell pwd)/../$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 
+include ../../mk/spksrc.archs.mk
+
 ifneq ($(wildcard $(PYTHON_PACKAGE_ROOT)),)
 
 # Export the python package variable so it is usable in cross/*
@@ -54,7 +56,9 @@ PYTHON_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-
 PRE_DEPEND_TARGET = python_pre_depend
 
 else
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
+endif
 endif
 
 include ../../mk/spksrc.spk.mk

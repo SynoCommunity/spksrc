@@ -5,8 +5,6 @@ SPK_ICON = src/vim.png
 
 DEPENDS = cross/$(SPK_NAME)
 PYTHON_PACKAGE = python311
-SPK_DEPENDS = "python311>=3.11.5-8"
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Vim is a highly configurable text editor built to enable efficient text editing. It is an improved version of the vi editor distributed with most UNIX systems.
@@ -19,6 +17,10 @@ CHANGELOG = "Update vim to v9.0<br/>2. Migrate to Python 3.11"
 
 HOMEPAGE = https://www.vim.org/
 LICENSE  = Charityware
+
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+SPK_DEPENDS = "python311>=3.11.5-8"
+endif
 
 SPK_COMMANDS = bin/vim bin/vim$(subst .,,$(SPK_VERS)) bin/view bin/vimdiff bin/rvim bin/rview bin/vimtutor
 
