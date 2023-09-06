@@ -22,9 +22,11 @@ include ../../mk/spksrc.archs.mk
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CHANGELOG += "<br/>2. Migrate to Python 3.11"
-CHANGELOG += "<br/><br/>NOTE: You need to install Python 3.11 package to enable Python support."
+DESCRIPTION += "NOTE: You need to install Python 3.11 package to enable Python support."
+else
+CHANGELOG += "<br/>2. Remove  python support"
+DESCRIPTION += "NOTE: This package is built without Python support."
 endif
-
 SPK_COMMANDS = bin/vim bin/vim$(subst .,,$(SPK_VERS)) bin/view bin/vimdiff bin/rvim bin/rview bin/vimtutor
 
 include ../../mk/spksrc.python.mk
