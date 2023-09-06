@@ -1,7 +1,7 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.12
+SPK_VERS = 3.10.13
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 18
+SPK_REV = 19
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
@@ -13,18 +13,22 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.12<br/>2. Update all packages to OpenSSL 3.1.2"
+CHANGELOG = "1. Update to Python 3.10.13"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
 # Force building pure-python wheels
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
-WHEELS  = src/requirements-pure.txt
+WHEELS = src/requirements-pure.txt
+
 # Force testing all wheel builds
 WHEELS_TEST_ALL = 0
+
 # Force compiler LTO optimizations
+ifeq ($(strip $(WHEELS_TEST_ALL)),0)
 ENV += PYTHON_OPTIMIZE=1
+endif
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -114,18 +118,17 @@ WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
 # [numpy] <= 1.21.6 (armv5)
-# gcc-4.6.4 failed with exit status 1
-# https://github.com/numpy/numpy/issues/20664
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-numpy-armv5.txt
+# This version is now unsupported using pip>=23.2.1
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # [numpy] <= 1.22.4 (armv7l)
-else ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-armv7l.txt
 else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy-gcc4.txt
 # [numpy] >= 1.25.0 requires c++17
 else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
+endif
 endif
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622

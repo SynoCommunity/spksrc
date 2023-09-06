@@ -7,21 +7,37 @@
 # set default spk/python* path to use
 PYTHON_PACKAGE_ROOT = $(realpath $(shell pwd)/../$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 
+include ../../mk/spksrc.archs.mk
+
 ifneq ($(wildcard $(PYTHON_PACKAGE_ROOT)),)
 
-# set ld flags to rewrite for the library path used to access
-# python libraries provided by the python package at destination
+# Export the python package variable so it is usable in cross/*
+export PYTHON_PACKAGE
+
+# Set Python installtion prefix directory variables
 ifeq ($(strip $(PYTHON_STAGING_PREFIX)),)
 export PYTHON_PREFIX = /var/packages/$(PYTHON_PACKAGE)/target
 export PYTHON_STAGING_PREFIX = $(realpath $(PYTHON_PACKAGE_ROOT)/install/$(PYTHON_PREFIX))
-export ADDITIONAL_LDFLAGS += -Wl,--rpath-link,$(PYTHON_STAGING_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
 endif
 
+# Set OpenSSL installtion prefix directory variables
 ifeq ($(strip $(OPENSSL_STAGING_PREFIX)),)
 export OPENSSL_PREFIX = $(PYTHON_PREFIX)
 export OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_PREFIX)
-else
-export ADDITIONAL_LDFLAGS += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
+endif
+
+# set build flags including ld to rewrite for the library path
+# used to access python package provide libraries at destination
+export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_PREFIX)/include
+export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include
+export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_PREFIX)/include
+export ADDITIONAL_LDFLAGS  += -L$(PYTHON_STAGING_PREFIX)/lib
+export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(PYTHON_STAGING_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
+
+# similarly, ld to rewrite OpenSSL library path if differs
+ifneq ($(OPENSSL_STAGING_PREFIX),$(PYTHON_STAGING_PREFIX))
+export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
 
 # get PYTHON_VERSION and other variables
@@ -40,7 +56,9 @@ PYTHON_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-
 PRE_DEPEND_TARGET = python_pre_depend
 
 else
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
+endif
 endif
 
 include ../../mk/spksrc.spk.mk
@@ -56,6 +74,16 @@ python_pre_depend:
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/python-cc.mk $(WORK_DIR)/python-cc.mk
 	@$(foreach _done,$(PYTHON_DEPENDS), ln -sf $(_done) $(WORK_DIR) ;)
-	# EXCEPTIONS: Ensure zlib,bzip2 is always built locally
+	# EXCEPTION: Ensure zlib is always built locally
 	@rm -f $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/zlib.pc $(WORK_DIR)/.zlib*
-	@rm -f $(WORK_DIR)/.bzip2*
+	# EXCEPTION: Do not symlink cross/* wheel builds
+	@make --no-print-directory dependency-flat | sort -u | grep -v spk/ | while read depend ; do \
+	   makefile="../../$${depend}/Makefile" ; \
+	   if grep -q spksrc.python-wheel.mk $${makefile} ; then \
+	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
+	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
+	      echo "rm -fr work-*/$${pkgname}*\\n       work-*/.$${pkgname}-*" ; \
+	      rm -fr work-*/$${pkgname}* \
+                     work-*/.$${pkgname}-* ; \
+	   fi ; \
+	done

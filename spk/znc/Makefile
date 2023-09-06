@@ -1,12 +1,12 @@
 SPK_NAME = znc
 SPK_VERS = 1.8.2
-SPK_REV = 22
+SPK_REV = 23
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/$(SPK_NAME)
 PYTHON_PACKAGE = python311
-SPK_DEPENDS = "python311>=3.11.4-7"
+SPK_DEPENDS = "python311>=3.11.5-8"
 
 MAINTAINER = worstje
 DESCRIPTION = Advanced IRC bouncer. An IRC bouncer is nothing more than an IRC proxy. ZNC will always be connected in your chat rooms, and will be the gateway between your clients, and your IRC servers. You can, for instance, consult messages while you were offline or hide your identity.

@@ -530,6 +530,13 @@ wheelcleancache: wheelclean
 wheelcleanall: wheelcleancache
 	rm -fr ../../distrib/pip
 
+pythonclean: wheelcleanall
+	rm -fr work-*/.[Pp]ython*-install_done \
+	rm -fr work-*/crossenv
+
+pythoncleanall: pythonclean
+	rm -fr work-*/[Pp]ython* work-*/.python*
+
 all: package
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)

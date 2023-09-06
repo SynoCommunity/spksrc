@@ -1,5 +1,5 @@
 PKG_NAME = python311
-PKG_VERS = 3.11.4
+PKG_VERS = 3.11.5
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -9,6 +9,10 @@ PKG_DIR = Python-$(PKG_VERS)
 # Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
 # CPython core team, see https://peps.python.org/pep-0011/ for more information.
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# Missing libatomic for proper openssl >= 3.x support
+# Ref: https://github.com/SynoCommunity/spksrc/issues/5841
+#      https://github.com/SynoCommunity/spksrc/pull/5820#issuecomment-1678221438
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 BUILD_DEPENDS = native/$(PKG_NAME)
 
@@ -131,12 +135,23 @@ python311_install:
 # default wheels to install in crossenv
 CROSSENV_WHEELS  = cffi==1.15.1
 CROSSENV_WHEELS += cryptography==41.0.3
-CROSSENV_WHEELS += Cython==0.29.35
+#
+# Cython version >= 3.x breaks PyYAML wheel
+# https://github.com/yaml/pyyaml/issues/601
+#
+# It also breaks numpy at crossenv creation time using github-action
+# https://numpy.org/devdocs/reference/distutils_status_migration.html
+# Python 3.12 considerations: scikit-build-core, meson-python
+#CROSSENV_WHEELS += Cython==3.0.2
+CROSSENV_WHEELS += Cython==0.29.36
 CROSSENV_WHEELS += flit==3.9.0
-CROSSENV_WHEELS += poetry==1.5.1
+CROSSENV_WHEELS += poetry==1.6.1
 CROSSENV_WHEELS += scikit-build==0.17.6
-CROSSENV_WHEELS += setuptools-rust==1.6.0
+CROSSENV_WHEELS += setuptools-rust==1.7.0
 CROSSENV_WHEELS += setuptools-scm==7.1.0
+# For future usages when building numpy >= 1.26
+#CROSSENV_WHEELS += meson-python==0.13.2
+#CROSSENV_WHEELS += scikit-build-core==0.5.0
 
 # [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
 # [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
@@ -146,13 +161,13 @@ ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 CROSSENV_WHEELS += numpy==1.24.4
 # [numpy] >= 1.25.0 requires c++17
 else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-CROSSENV_WHEELS += numpy==1.25.1
+CROSSENV_WHEELS += numpy==1.25.2
 endif
 endif
 
 # [maturin]
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-CROSSENV_WHEELS += maturin==1.1.0
+CROSSENV_WHEELS += maturin==1.2.3
 endif
 
 # Create the crossenv in preparation for
@@ -163,10 +178,10 @@ python311_post_install: $(WORK_DIR)/python-cc.mk
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $(TC_PATH)$(TC_PREFIX)gcc --cxx $(TC_PATH)$(TC_PREFIX)c++ --ar $(TC_PATH)$(TC_PREFIX)ar --sysroot $(TC_SYSROOT) --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.40.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.40.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.41.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.41.2"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))

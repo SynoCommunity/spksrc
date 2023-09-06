@@ -4,9 +4,10 @@ SPK_REV = 5
 SPK_ICON = src/rdiff-backup.png
 
 PYTHON_PACKAGE = python311
+SPK_DEPENDS = "python311>=3.11.5-8"
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
-SPK_DEPENDS = "python311>=3.11.4-7"
 
 DEPENDS = cross/librsync cross/attr cross/acl
 
@@ -17,7 +18,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Reverse differential backup tool, over a network or locally.
 STARTABLE = no
 DISPLAY_NAME = rdiff-backup
-CHANGELOG = "1. Update to v2.2.5<br/>2. Migrate to Python 3.11"
+CHANGELOG = "1. Update to v2.2.5<br/>2. Migrate to Python 3.11<br/>3. Mark ARMv5 as unsupported"
 
 HOMEPAGE = https://rdiff-backup.net/
 LICENSE  = GPLv2
