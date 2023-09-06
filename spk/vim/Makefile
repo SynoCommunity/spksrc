@@ -18,6 +18,8 @@ CHANGELOG = "1. Update vim to v9.0"
 HOMEPAGE = https://www.vim.org/
 LICENSE  = Charityware
 
+include ../../mk/spksrc.archs.mk
+
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CHANGELOG += "<br/>2. Migrate to Python 3.11"
 CHANGELOG += "<br/><br/>NOTE: You need to install Python 3.11 package to enable Python support."
