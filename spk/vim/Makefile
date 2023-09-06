@@ -13,13 +13,14 @@ DESCRIPTION_FRE = Vim est un éditeur de texte avancé basé sur Vi \(unix\) ave
 DISPLAY_NAME = Vim
 STARTABLE = no
 
-CHANGELOG = "Update vim to v9.0<br/>2. Migrate to Python 3.11"
+CHANGELOG = "1. Update vim to v9.0"
 
 HOMEPAGE = https://www.vim.org/
 LICENSE  = Charityware
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-SPK_DEPENDS = "python311>=3.11.5-8"
+CHANGELOG += "<br/>2. Migrate to Python 3.11"
+CHANGELOG += "<br/><br/>NOTE: You need to install Python 3.11 package to enable Python support."
 endif
 
 SPK_COMMANDS = bin/vim bin/vim$(subst .,,$(SPK_VERS)) bin/view bin/vimdiff bin/rvim bin/rview bin/vimtutor
