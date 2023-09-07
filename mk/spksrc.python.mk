@@ -65,25 +65,24 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: python_pre_depend
 python_pre_depend:
-	@$(MSG) *****************************************************
-	@$(MSG) *** Use existing shared objects from python $(PYTHON_VERSION)
-	@$(MSG) *** PATH: $(PYTHON_PACKAGE_ROOT)
-	@$(MSG) *****************************************************
+	@$(MSG) "*****************************************************"
+	@$(MSG) "*** Use existing shared objects from python $(PYTHON_VERSION)"
+	@$(MSG) "*** PATH: $(PYTHON_PACKAGE_ROOT)"
+	@$(MSG) "*****************************************************"
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	@$(foreach lib,$(PYTHON_LIBS),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/python-cc.mk $(WORK_DIR)/python-cc.mk
 	@$(foreach _done,$(PYTHON_DEPENDS), ln -sf $(_done) $(WORK_DIR) ;)
-	# EXCEPTION: Ensure zlib is always built locally
+	@# EXCEPTION: Ensure zlib is always built locally
 	@rm -f $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/zlib.pc $(WORK_DIR)/.zlib*
-	# EXCEPTION: Do not symlink cross/* wheel builds
+	@# EXCEPTION: Do not symlink cross/* wheel builds
 	@make --no-print-directory dependency-flat | sort -u | grep -v spk/ | while read depend ; do \
 	   makefile="../../$${depend}/Makefile" ; \
 	   if grep -q spksrc.python-wheel.mk $${makefile} ; then \
 	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
 	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
-	      echo "rm -fr work-*/$${pkgname}*\\n       work-*/.$${pkgname}-*" ; \
-	      rm -fr work-*/$${pkgname}* \
-                     work-*/.$${pkgname}-* ; \
+	      echo "rm -fr work-*/$${pkgname}* work-*/.$${pkgname}-*" ; \
+	      rm -fr work-*/$${pkgname}* work-*/.$${pkgname}-* ; \
 	   fi ; \
 	done
