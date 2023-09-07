@@ -65,10 +65,10 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: python_pre_depend
 python_pre_depend:
-	@$(MSG) *****************************************************
-	@$(MSG) *** Use existing shared objects from python $(PYTHON_VERSION)
-	@$(MSG) *** PATH: $(PYTHON_PACKAGE_ROOT)
-	@$(MSG) *****************************************************
+	@$(MSG) "*****************************************************"
+	@$(MSG) "*** Use existing shared objects from python $(PYTHON_VERSION)"
+	@$(MSG) "*** PATH: $(PYTHON_PACKAGE_ROOT)"
+	@$(MSG) "*****************************************************"
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	@$(foreach lib,$(PYTHON_LIBS),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
 	@ln -sf $(PYTHON_PACKAGE_ROOT)/crossenv $(WORK_DIR)/crossenv
