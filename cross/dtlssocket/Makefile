@@ -1,8 +1,8 @@
 PKG_NAME = DTLSSocket
-PKG_VERS = 0.1.15
+PKG_VERS = 0.1.16
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://files.pythonhosted.org/packages/72/dc/8171d3106233efbd28620539594ca705f1aa9e140287823e23cd46ca7c42
+PKG_DIST_SITE = https://files.pythonhosted.org/packages/58/42/0a0442118096eb9fbc9dc70b45aee2957f7546b80545e2a05bd839380519
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = cross/cython
