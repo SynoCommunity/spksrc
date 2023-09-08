@@ -30,7 +30,7 @@ echo "Building dependency list..."
 DEPENDENCY_LIST=
 for package in $(find spk/ -maxdepth 1 -type d | cut -c 5- | sort)
 do
-    DEPENDENCY_LIST+=$(make -s -C spk/${package} dependency-list)$'\n'
+    DEPENDENCY_LIST+=$(DEPENDENCY_WALK=1 make -s -C spk/${package} dependency-list 2> /dev/null)$'\n'
 done
 
 # search for dependent spk packages
