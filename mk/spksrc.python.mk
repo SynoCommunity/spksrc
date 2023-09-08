@@ -77,7 +77,7 @@ python_pre_depend:
 	@# EXCEPTION: Ensure zlib is always built locally
 	@rm -f $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/zlib.pc $(WORK_DIR)/.zlib*
 	@# EXCEPTION: Do not symlink cross/* wheel builds
-	@make --no-print-directory dependency-flat | sort -u | grep -v spk/ | while read depend ; do \
+	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
 	   makefile="../../$${depend}/Makefile" ; \
 	   if grep -q spksrc.python-wheel.mk $${makefile} ; then \
 	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
