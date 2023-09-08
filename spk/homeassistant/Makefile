@@ -48,7 +48,10 @@ include ../../mk/spksrc.common.mk
 # this is a fix for integrations depending on grpcio (google nest, google generativeai and starlink)
 # the fix requires to additionally set the LD_LIBRARY_PATH to homeassistant/target/lib
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# libstdc++ is not available for PPC archs
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/libstdc++
+endif
 endif
 
 # [voip_utils]

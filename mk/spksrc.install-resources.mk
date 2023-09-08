@@ -35,6 +35,8 @@ endif
 
 #####
 
+include ../../mk/spksrc.pre-check.mk
+
 include ../../mk/spksrc.cross-env.mk
 
 include ../../mk/spksrc.download.mk
