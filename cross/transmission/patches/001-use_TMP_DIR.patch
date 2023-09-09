@@ -1,0 +1,16 @@
+# if available use TMP_DIR as tmp folder
+# 
+--- libtransmission/platform.cc.orig	2023-04-14 02:22:25.000000000 +0000
++++ libtransmission/platform.cc	2023-09-01 13:16:59.494547485 +0000
+@@ -336,6 +336,11 @@
+ {
+ #ifndef _WIN32
+ 
++    if (auto dir = tr_env_get_string("TMP_DIR"sv); !std::empty(dir))
++    {
++        return dir;
++    }
++
+     return std::string{ "/tmp"sv };
+ 
+ #else

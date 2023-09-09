@@ -1,0 +1,29 @@
+# Fix empty blocklist files in some situations.
+# 
+# ARMv7 archs (and may be other systems with older kernel) fail to fallback from sendfile64 usage to user-space copy
+# The use of sendfile64 might fail with EINVAL (22)
+# This is in addition to the fallback from copy_file_range that might fail with EXDEV (18)
+# Both errors must be considered in the fallback to user-space copy.
+--- libtransmission/file-posix.cc.orig	2023-08-23 22:56:00.000000000 +0000
++++ libtransmission/file-posix.cc	2023-09-04 15:50:43.120245644 +0000
+@@ -439,7 +439,10 @@
+                 if (copied == -1)
+                 {
+                     errno_cpy = errno; /* remember me for later */
+-                    tr_error_set_from_errno(error, errno);
++                    if (errno != EINVAL)
++                    {
++                        tr_error_set_from_errno(error, errno);
++                    }
+                     if (file_size > 0U)
+                     {
+                         file_size = info->size; /* restore file_size for next fallback */
+@@ -460,7 +463,7 @@
+     /* Fallback to user-space copy. */
+     /* if file_size>0 and errno_cpy==0, we probably never entered any copy attempt, also: */
+     /* if we (still) got something to copy and we encountered certain error in previous attempts */
+-    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV))
++    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV || errno_cpy == EINVAL))
+     {
+         static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
+         auto buf = std::vector<char>{};
