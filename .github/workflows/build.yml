@@ -113,6 +113,7 @@ jobs:
           NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
           PUBLISH: ${{ github.event.inputs.publish }}
           API_KEY: ${{ secrets.PUBLISH_API_KEY }}
+          PACKAGE_TO_PUBLISH: ${{ github.event.inputs.package }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
