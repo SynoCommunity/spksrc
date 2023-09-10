@@ -18,8 +18,8 @@ make setup-synocommunity
 DEFAULT_TC=$(grep DEFAULT_TC local.mk | cut -f2 -d= | xargs)
 
 # filter for changes made in the spk directories and take unique package name (without spk folder)
-SPKLIST_TO_BUILD="${SPK_TO_BUILD} "
-SPKLIST_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(spk)/\K[^\/]*" | sort -u | tr '\n' ' ')
+SPK_TO_BUILD+=" "
+SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(spk)/\K[^\/]*" | sort -u | tr '\n' ' ')
 
 # filter for changes made in the cross and native directories and take unique package name (including cross or native folder)
 DEPENDENT_PACKAGES=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(cross|native)/[^\/]*" | sort -u | tr '\n' ' ')
@@ -39,22 +39,22 @@ do
     echo "===> Searching for dependent package: ${package}"
     packages=$(echo "${DEPENDENCY_LIST}" | grep " ${package} " | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
     echo "===> Found: ${packages}"
-    SPKLIST_TO_BUILD+=${packages}
+    SPK_TO_BUILD+=${packages}
 done
 
 # fix for packages with different names
-if [ "$(echo ${SPKLIST_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPKLIST_TO_BUILD=$(echo "${SPKLIST_TO_BUILD}" | tr ' ' '\n' | grep -v "nzbdrone" | tr '\n' ' ')" sonarr3"
+if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "nzbdrone" | tr '\n' ' ')" sonarr3"
 fi
-if [ "$(echo ${SPKLIST_TO_BUILD} | grep -ow python)" != "" ]; then
-    SPKLIST_TO_BUILD=$(echo "${SPKLIST_TO_BUILD}" | tr ' ' '\n' | grep -v "python" | tr '\n' ' ')" python2"
+if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "python" | tr '\n' ' ')" python2"
 fi
-if [ "$(echo ${SPKLIST_TO_BUILD} | grep -ow ffmpeg)" != "" ]; then
-    SPKLIST_TO_BUILD=$(echo "${SPKLIST_TO_BUILD}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')" ffmpeg4"
+if [ "$(echo ${SPK_TO_BUILD} | grep -ow ffmpeg)" != "" ]; then
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')" ffmpeg4"
 fi
 
 # remove duplicate packages
-packages=$(printf %s "${SPKLIST_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
 # for ffmpeg v4-6 find all packages that depend on them
 for i in {4..6}; do
