@@ -66,8 +66,14 @@ do
     echo >build.log
 
     if [ "${GH_ARCH%%-*}" != "noarch" ]; then
-        echo "$ make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
-        make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        # Only publish package requested and not its parent (i.e. python*, ffmpeg*)
+        if [ "${package}" == "${SPK_TO_BUILD}" ]; then
+           echo "$ make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
+           make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        else
+           echo "$ make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
+           make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        fi
     else
         if [ "${GH_ARCH}" = "noarch" ]; then
             TCVERSION=
