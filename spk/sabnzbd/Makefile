@@ -49,6 +49,10 @@ include ../../mk/spksrc.python.mk
 # prefer native python tools (pip, maturin, ...) used for orjson
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
+ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+GCC_DEBUG_INFO := 1
+endif
+
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/scripts
