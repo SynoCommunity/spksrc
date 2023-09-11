@@ -52,6 +52,18 @@ wheeldownload:
 					url="" ; \
 				fi ; \
 				version=$$(echo $${requirement#*[<>=]=} | cut -f1 -d' ') ; \
+	                        # If no version was provided then find the latest version ; \
+	                        if [ "$${version}" == "$${name}" ]; then \
+					query="curl -s https://pypi.org/pypi/$${name}/json" ; \
+					query+=" | jq -r '.releases[][]" ; \
+					query+=" | select(.packagetype==\"sdist\")" ; \
+					query+=" | .filename'" ; \
+					query+=" | sort -V" ; \
+					query+=" | tail -1" ; \
+					query+=" | sed -e 's/.tar.gz//g' -e 's/.zip//g'" ; \
+					query+=" | awk -F'-' '{print \$$2}'" ; \
+	                                version=$$(eval $${query} 2>/dev/null) ; \
+	                        fi ; \
 				$(MSG) pip download [$${name}], version [$${version}]$$([ "$${url}" ] && echo ", URL: [$${url}] ") ; \
 				if [ "$$(grep -s egg <<< $${requirement})" ] ; then \
 					echo "WARNING: Skipping download URL - Downloaded at build time" ; \
