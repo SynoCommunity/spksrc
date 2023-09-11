@@ -107,7 +107,8 @@ DEPENDS += cross/libxslt
 
 include ../../mk/spksrc.python.mk
 
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+# Enable debug_symgols for qoriq (and x64 to reproduce gdb calls)
+ifeq ($(findstring $(ARCH),qoriq $(x64_ARCHS)),$(ARCH))
 GCC_DEBUG_INFO := 1
 endif
 

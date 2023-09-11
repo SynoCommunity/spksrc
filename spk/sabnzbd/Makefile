@@ -49,6 +49,7 @@ include ../../mk/spksrc.python.mk
 # prefer native python tools (pip, maturin, ...) used for orjson
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
+# Enable debug_symgols for qoriq (and x64 to reproduce gdb calls)
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 GCC_DEBUG_INFO := 1
 endif
