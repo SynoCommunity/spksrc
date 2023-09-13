@@ -11,7 +11,8 @@ HOMEPAGE = http://www.libpng.org/pub/png/libpng.html
 COMMENT  = Portable Network Graphics Library
 LICENSE  = http://www.libpng.org/pub/png/src/libpng-LICENSE.txt
 
-CONFIGURE_ARGS = --disable-static
+CMAKE_ARGS += -DPNG_STATIC=OFF
+CMAKE_ARGS += -DHAVE_LD_VERSION_SCRIPT=OFF
 ADDITIONAL_CFLAGS = -O -lm
 
 include ../../mk/spksrc.cross-cmake.mk
