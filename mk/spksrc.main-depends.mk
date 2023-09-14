@@ -1,25 +1,13 @@
-# include this file to install arch independent resources
+# include this file for dummy modules that evaluate dependent packages only
 #
-# packages using this have to:
-# - implement a custom INSTALL_TARGET to copy the required files to the 
-#   target location under $(STAGING_INSTALL_PREFIX)
-# - create a PLIST file to include the target file(s)/folder(s)
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
 # Configure the included makefiles
-URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
-ifneq ($(PKG_DIST_FILE),)
-LOCAL_FILE    = $(PKG_DIST_FILE)
-else
-LOCAL_FILE    = $(PKG_DIST_NAME)
-endif
-DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
@@ -30,33 +18,19 @@ endif
 #####
 
 ifneq ($(REQUIRE_KERNEL),)
-  @$(error install-resources cannot be used when REQUIRE_KERNEL is set)
+  @$(error main-depends cannot be used when REQUIRE_KERNEL is set)
 endif
 
 #####
 
+# to check for supported archs and DSM versions
 include ../../mk/spksrc.pre-check.mk
 
+# for common env variables
 include ../../mk/spksrc.cross-env.mk
 
-include ../../mk/spksrc.download.mk
-
+# for dependency evaluation
 include ../../mk/spksrc.depend.mk
-
-checksum: download
-include ../../mk/spksrc.checksum.mk
-
-extract: checksum depend
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-install: patch
-include ../../mk/spksrc.install.mk
-
-plist: install
-include ../../mk/spksrc.plist.mk
 
 
 ### Clean rules
@@ -65,12 +39,9 @@ smart-clean:
 	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
 
 clean:
-	rm -fr work work-* build-*.log
+	rm -rf work work-* build-*.log
 
-all: install plist
-
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
+all: depend
 
 ### For make dependency-tree
 include ../../mk/spksrc.dependency-tree.mk
