@@ -113,6 +113,18 @@ endif
 endif
 endif
 
+# Force compiler LTO optimizations except:
+#   - when testing all wheels
+#   - when including debug_info symbols
+#   - when using PPC arch (fails on qoriq)
+ifneq ($(strip $(WHEELS_TEST_ALL)),1)
+ifneq ($(strip $(GCC_DEBUG_INFO)),1)
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+ENV += PYTHON_OPTIMIZE=1
+endif
+endif
+endif
+
 ## WHEELS_TEST_ALL: Force testing all wheel building
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 
