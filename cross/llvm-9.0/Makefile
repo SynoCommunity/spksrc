@@ -6,10 +6,10 @@ PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$
 PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS)
 
 HOMEPAGE = https://llvm.org/
-COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies
-LICENSE  = Apache License v2.0 with LLVM Exceptions
+COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
+LICENSE = Apache v2.0 with LLVM Exceptions
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 CMAKE_USE_NINJA = 1
 
 # Using LLVM project source need to change to llvm sub-directory
@@ -121,6 +121,11 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
+CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
+endif
+
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=PowerPC
 CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
 endif
 

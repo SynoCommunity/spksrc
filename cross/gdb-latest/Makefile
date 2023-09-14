@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/zlib cross/libexpat cross/gmp cross/ncursesw cross/mpfr
 
 HOMEPAGE = https://www.gnu.org/software/gdb/
-COMMENT  = The GNU Project Debugger
+COMMENT  = The GNU Project Debugger.
 LICENSE  = GPLv2/LGPLv2
 
 GNU_CONFIGURE = 1
@@ -19,10 +19,12 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Library is not created under armv7
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+# Library is not created for armv5 and armv7
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 PLIST_TRANSFORM = sed -e 's?lib:lib/libinproctrace.so??g'
-# binary only created on armv7
-else
+endif
+
+ifneq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+# binary only created for arm
 PLIST_TRANSFORM = sed -e 's?bin:bin/run??g'
 endif
