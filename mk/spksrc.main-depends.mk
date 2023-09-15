@@ -33,6 +33,12 @@ include ../../mk/spksrc.cross-env.mk
 include ../../mk/spksrc.depend.mk
 
 
+install: depend
+include ../../mk/spksrc.install.mk
+
+plist: install
+include ../../mk/spksrc.plist.mk
+
 ### Clean rules
 smart-clean:
 	rm -rf $(WORK_DIR)/$(PKG_DIR)
@@ -41,7 +47,7 @@ smart-clean:
 clean:
 	rm -rf work work-* build-*.log
 
-all: depend
+all: install plist
 
 ### For make dependency-tree
 include ../../mk/spksrc.dependency-tree.mk
