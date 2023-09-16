@@ -88,14 +88,10 @@ SPK_COMMANDS += bin/strip
 ##
 ## gdb
 ##
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-OPTIONAL_DESC += ", gdb 7.12.1"
-else
-ifeq ($(call version_lt, $(TC_GCC), 4.8),1)
+ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 OPTIONAL_DESC += ", gdb 7.12.1"
 else
 OPTIONAL_DESC += ", gdb 13.2"
-endif
 endif
 SPK_COMMANDS += bin/gcore
 SPK_COMMANDS += bin/gdb
