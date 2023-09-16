@@ -20,7 +20,7 @@ INSTALL_TARGET = gdb_install
 CONFIGURE_ARGS  = --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 
-include ../../mk/spksrc.cross-common.mk
+include ../../mk/spksrc.common.mk
 
 PLIST_TRANSFORM_SED_ARGS =
 

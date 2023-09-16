@@ -15,7 +15,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 
-include ../../mk/spksrc.cross-common.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 UNSUPPORTED_ARCHS = $(ARCHS)
