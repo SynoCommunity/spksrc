@@ -20,18 +20,27 @@ INSTALL_TARGET = gdb_install
 CONFIGURE_ARGS  = --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-common.mk
 
-# Library is not created for armv5 and armv7
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-PLIST_TRANSFORM = sed -e 's?lib:lib/libinproctrace.so??g'
+PLIST_TRANSFORM_SED_ARGS =
+
+# Library is not created for 32-bit non intel archs
+ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+PLIST_TRANSFORM_SED_ARGS += -e 's?lib:lib/libinproctrace.so??g'
+endif
 endif
 
 ifneq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
-# binary only created on arm
-PLIST_TRANSFORM = sed -e 's?bin:bin/run??g'
+# binary only created for arm
+PLIST_TRANSFORM_SED_ARGS += -e 's?bin:bin/run??g'
 endif
 
+ifneq ($(strip $(PLIST_TRANSFORM_SED_ARGS)),)
+PLIST_TRANSFORM = sed $(PLIST_TRANSFORM_SED_ARGS)
+endif
+
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: gdb_configure
 gdb_configure:
@@ -40,8 +49,8 @@ gdb_configure:
 
 .PHONY: gdb_compile
 gdb_compile:
-	@$(RUN) ; cd build ; PATH=$(abspath $(TC_PATH)):$$PATH make
+	@$(RUN) ; cd build ; PATH=$(abspath $(TC_PATH)):$$PATH $(MAKE)
 
 .PHONY: gdb_install
 gdb_install:
-	@$(RUN) ; cd build ; PATH=$(abspath $(TC_PATH)):$$PATH make install DESTDIR=$(INSTALL_DIR)
+	@$(RUN) ; cd build ; PATH=$(abspath $(TC_PATH)):$$PATH $(MAKE) install DESTDIR=$(INSTALL_DIR)
