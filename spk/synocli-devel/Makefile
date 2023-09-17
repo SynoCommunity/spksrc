@@ -1,11 +1,11 @@
 SPK_NAME = synocli-devel
-SPK_VERS = 1.1
-SPK_REV = 2
+SPK_VERS = 1.2
+SPK_REV = 3
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Update LLVM to version 16.0.6<br/>2. Update gdb to version 13.2<br/>3. Update binutils to version 2.40<br/>4. Include libtree 3.3.1 as ldd replacement<br/>5. Include strace 6.4"
+CHANGELOG = "1. Update strace to v6.5.<br/>2. Add support for PPC archs."
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.4
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.5
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -14,13 +14,11 @@ LICENSE  = Each tool is licensed under it\'s respective license.
 
 SPK_DEPENDS = "Perl"
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 OPTIONAL_DEPENDS = cross/llvm
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/llvm
 endif
 
@@ -90,7 +88,7 @@ SPK_COMMANDS += bin/strip
 ##
 ## gdb
 ##
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 OPTIONAL_DESC += ", gdb 7.12.1"
 else
 OPTIONAL_DESC += ", gdb 13.2"
@@ -99,16 +97,14 @@ SPK_COMMANDS += bin/gcore
 SPK_COMMANDS += bin/gdb
 SPK_COMMANDS += bin/gdb-add-index
 SPK_COMMANDS += bin/gdbserver
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 SPK_COMMANDS += bin/run
 endif
-
-include ../../mk/spksrc.spk.mk
 
 ##
 ## LLVM
 ##
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
 OPTIONAL_DESC += ", LLVM 16.0.6"
 SPK_COMMANDS += bin/clang-16
@@ -169,3 +165,6 @@ SPK_COMMANDS += bin/libtree
 ##
 SPK_COMMANDS += bin/strace
 SPK_COMMANDS += bin/strace-log-merge
+
+
+include ../../mk/spksrc.spk.mk

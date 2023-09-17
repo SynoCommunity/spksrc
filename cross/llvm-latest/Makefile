@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS).src
 
 HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies
-LICENSE  = Apache License v2.0 with LLVM Exceptions
+LICENSE = Apache v2.0 with LLVM Exceptions
 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) comcerto2k

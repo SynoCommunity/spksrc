@@ -5,8 +5,7 @@ SPK_REV = 1
 DEPENDS = cross/binutils
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = GNU Binutils
-DISPLAY_NAME = binutils
+DESCRIPTION = GNU Binutils.
 STARTABLE = no
 
 HOMEPAGE = https://www.gnu.org/software/binutils/
