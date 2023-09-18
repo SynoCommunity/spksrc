@@ -107,10 +107,8 @@ DEPENDS += cross/libxslt
 
 include ../../mk/spksrc.python.mk
 
-# Enable debug_symgols for qoriq (and x64 to reproduce gdb calls)
-ifeq ($(findstring $(ARCH),qoriq $(x64_ARCHS)),$(ARCH))
+# Enable debug_info symgols for all archs
 GCC_DEBUG_INFO := 1
-endif
 
 # prefer native python tools (pip, maturin, ...)
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
