@@ -18,7 +18,7 @@ OPTIONAL_DEPENDS = cross/llvm
 
 include ../../mk/spksrc.common.mk
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 DEPENDS += cross/llvm
 endif
 
@@ -104,7 +104,7 @@ endif
 ##
 ## LLVM
 ##
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
 OPTIONAL_DESC += ", LLVM 16.0.6"
 SPK_COMMANDS += bin/clang-16
