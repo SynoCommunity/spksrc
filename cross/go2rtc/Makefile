@@ -1,8 +1,9 @@
 PKG_NAME = go2rtc
 PKG_VERS = 1.6.2
 PKG_EXT = tar.gz
-PKG_DIST_SITE = https://github.com/AlexxIT/go2rtc/archive/refs/tags/v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_FILE = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/AlexxIT/go2rtc/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
