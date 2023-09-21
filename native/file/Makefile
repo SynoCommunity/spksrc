@@ -12,5 +12,9 @@ COMMENT  = The file command is "a file type guesser", that is, a command-line to
 LICENSE  = https://github.com/file/file/blob/master/COPYING
 
 GNU_CONFIGURE = 1
+# force build of static version
+# otherwise magic.mgc fails to build with error:
+# Compiled magic version [545] does not match with shared library magic version [539]
+CONFIGURE_ARGS += --enable-static --disable-shared
 
 include ../../mk/spksrc.native-cc.mk

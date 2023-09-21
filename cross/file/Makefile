@@ -15,29 +15,9 @@ GNU_CONFIGURE = 1
 
 ADDITIONAL_CPPFLAGS = -Os
 
-#COMPILE_TARGET = file_compile
-
-# 
-# file -m /spksrc/native/file/work-native/install/usr/local/share/misc/magic.mgc -C -m magic
-
-
-
-#BIN_PATH = $(abspath $(WORK_DIR)/../../../native/file/work-native/install/usr/local/bin)
-#ENV += PATH:=$(BIN_PATH):$(PATH)
-#MAGIC_FILE = $(abspath $(WORK_DIR)/../../../native/file/work-native/install/usr/local/share/misc/magic.mgc)
-#ENV += NATIVE_MAGIC=$(MAGIC_FILE)
-
-#NATIVE_FILE = $(BIN_PATH)/file
+# Inject native/file into magic/Makefile (by patched Makefile.in)
 NATIVE_FILE = $(abspath $(WORK_DIR)/../../../native/file/work-native/install/usr/local/bin/file)
 ENV += NATIVE_FILE=$(NATIVE_FILE)
-#export PATH:=$(BIN_PATH):$(PATH)
-
-#COMPILE_MAKE_OPTIONS = MAGIC=$(MAGIC_FILE)
 
 include ../../mk/spksrc.cross-cc.mk
-
-
-.PHONY: file_compile
-file_compile:
-	$(RUN) MAGIC=$(MAGIC_FILE) $(MAKE)
 
