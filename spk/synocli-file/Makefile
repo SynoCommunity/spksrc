@@ -87,7 +87,7 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Replace exa by eza v0.13.0.<br/>2. Update dos2unix to v 7.5.1.<br>3. Update file to v5.45.<br/>4. Update jdupes to v1.27.3.<br/>5. Update less to v643.<br/>6. Update Midnight Commander to v4.8.30.<br/>7. Update mg v3.7.<br/>8. Update ncdu to v1.19.<br/>9. Update rhash to v1.4.4.<br/>10. Update tree to v2.1.1.<br/>"
+CHANGELOG = "1. Replace exa by eza v0.13.0.<br/>2. Update dos2unix to v 7.5.1.<br>3. Update file to v5.45.<br/>4. Update fzf to v0.42.0.<br/>5. Update jdupes to v1.27.3.<br/>6. Update less to v643.<br/>7. Update micro to v2.0.12.<br/>8. Update Midnight Commander to v4.8.30.<br/>9. Update mg v3.7.<br/>10. Update ncdu to v1.19.<br/>11. Update rhash to v1.4.4.<br/>12. Update rmlint to v2.10.2.<br/>13. Update tree to v2.1.1.<br/>"
 
 SERVICE_SETUP = src/service-setup.sh
 
