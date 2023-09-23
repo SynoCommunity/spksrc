@@ -15,12 +15,7 @@ CONFIGURE_ARGS  = -Ddoc=disabled
 CONFIGURE_ARGS += -Dtests=disabled
 CONFIGURE_ARGS += -Dcache-build=disabled
 
-ADDITIONAL_CFLAGS = -O
+ADDITIONAL_CFLAGS  = -O
+ADDITIONAL_CFLAGS += -std=c99
 
 include ../../mk/spksrc.cross-meson.mk
-
-ifeq ($(call version_lt, $(TC_GCC), 4.8),1) 
-ADDITIONAL_CFLAGS += -std=c99
-else
-ADDITIONAL_CFLAGS += -std=c11
-endif
