@@ -43,12 +43,6 @@ endif
 # packages depending on cross/zlib
 DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
-# A compiler with support for C++11 language features is required.
-DEPENDS += cross/rnm
-OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
-endif
-
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
@@ -104,7 +98,6 @@ SPK_COMMANDS += bin/file
 SPK_COMMANDS += bin/detox
 SPK_COMMANDS += bin/pcre2grep bin/pcre2test
 SPK_COMMANDS += bin/rmlint
-SPK_COMMANDS += bin/rnm
 SPK_COMMANDS += bin/zstd bin/unzstd bin/zstdcat bin/zstdmt bin/zstdgrep bin/zstdless
 SPK_COMMANDS += bin/lzip bin/plzip
 SPK_COMMANDS += bin/fdupes
@@ -135,6 +128,13 @@ SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
 
 include ../../mk/spksrc.spk.mk
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
+# A compiler with support for C++11 language features is required.
+DEPENDS += cross/rnm
+OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
+SPK_COMMANDS += bin/rnm
+endif
 
 .PHONY: synocli-file_extra_install
 synocli-file_extra_install:
