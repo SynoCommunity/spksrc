@@ -1,6 +1,6 @@
 PKG_NAME = fuse3
 PKG_REAL_NAME = fuse
-PKG_VERS = 3.16.1
+PKG_VERS = 3.12.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libfuse/libfuse/archive/
