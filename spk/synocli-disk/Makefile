@@ -1,6 +1,6 @@
 SPK_NAME = synocli-disk
-SPK_VERS = 3.4
-SPK_REV = 10
+SPK_VERS = 3.5
+SPK_REV = 11
 SPK_ICON = src/synocli-disk.png
 
 DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
@@ -13,9 +13,9 @@ DISPLAY_NAME = SynoCli Disk Tools
 
 OPTIONAL_DESC =
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
 # DAR: archs without C++11 support are not supported
 DEPENDS += cross/dar
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"
@@ -35,7 +35,7 @@ endif
 
 DESCRIPTION = "SynoCli Disk Tools provides a set of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add support for r1000 arch"
+CHANGELOG = "1. Update davfs2 to v1.7.0.<br/>2. Update ddrescue to v1.27.<br/>3. Update dua to v2.20.1.<br/>4. Update e2fsprogs to v1.47.0.<br/>5. Update gdu to v5.25.0.<br/>5. Update ncdu to v1.19.<br/>6. Update ntfs-3g to v2022.10.3."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.
