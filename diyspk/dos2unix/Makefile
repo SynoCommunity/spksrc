@@ -1,5 +1,5 @@
 SPK_NAME = dos2unix
-SPK_VERS = 7.4.3
+SPK_VERS = 7.5.1
 SPK_REV = 1
 
 DEPENDS = cross/dos2unix
