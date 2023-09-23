@@ -7,6 +7,9 @@ PYTHON_PACKAGE = python311
 
 SPK_DEPENDS = "python311>=3.11.5-8"
 
+# archs without C++11 support are not supported:
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
