@@ -150,6 +150,11 @@ ifeq ($(strip $(MAINTAINER)),)
 $(error Add MAINTAINER for '$(SPK_NAME)' in spk Makefile or set default MAINTAINER in local.mk.)
 endif
 
+IS_GITHUB_MAINTAINER = 0
+ifeq ($(shell echo "${MAINTAINER}" | wc -w),1)
+IS_GITHUB_MAINTAINER = 1
+endif
+
 get_github_maintainer_url = $(shell wget --quiet --spider https://github.com/$(1) && echo "https://github.com/$(1)" || echo "")
 get_github_maintainer_name = $(shell curl -s -H application/vnd.github.v3+json https://api.github.com/users/$(1) | jq -r '.name' | sed -e 's|null||g' | sed -e 's|^$$|$(1)|g' )
 
@@ -172,7 +177,11 @@ $(WORK_DIR)/INFO:
             /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
             /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
+ifeq ($(IS_GITHUB_MAINTAINER),1)
 	@echo maintainer=\"$(call get_github_maintainer_name,$(MAINTAINER))\" >> $@
+else
+	@echo maintainer=\"$(MAINTAINER)\" >> $@
+endif
 ifeq ($(strip $(MAINTAINER_URL)),)
 	@echo maintainer_url=\"$(call get_github_maintainer_url,$(MAINTAINER))\" >> $@
 else
