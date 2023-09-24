@@ -1,6 +1,6 @@
 SPK_NAME = dar
-SPK_VERS = 2.5.22
-SPK_REV = 3
+SPK_VERS = 2.7.12
+SPK_REV = 1
 SPK_ICON = src/dar.png
 
 DEPENDS = cross/dar

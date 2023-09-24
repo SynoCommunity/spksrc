@@ -1,5 +1,5 @@
 PKG_NAME = e2fsprogs
-PKG_VERS = 1.46.5
+PKG_VERS = 1.47.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v$(PKG_VERS)
