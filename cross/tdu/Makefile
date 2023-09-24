@@ -14,6 +14,7 @@ LICENSE  = GPLv2
 
 INSTALL_TARGET = tdu_install
 
+GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
 GO_BUILD_ARGS += -ldflags '-s -w'
 
 include ../../mk/spksrc.cross-go.mk
