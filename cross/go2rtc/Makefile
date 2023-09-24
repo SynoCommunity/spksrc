@@ -18,8 +18,6 @@ POST_EXTRACT_TARGET = go2rtc_post_extract
 GO_SRC_DIR = $(EXTRACT_PATH)/$(PKG_NAME)
 GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 
-ENV += CGO_ENABLED=0
-
 GO_BUILD_ARGS = -trimpath
 
 GO_LDFLAGS  = -s -w
