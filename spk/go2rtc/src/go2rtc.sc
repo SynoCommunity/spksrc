@@ -13,3 +13,8 @@ title="go2rtc-webrtc"
 desc="go2rtc WebRTC"
 port_forward="yes"
 dst.ports="8555"
+[go2rtc-srtp]
+title="go2rtc-srtp"
+desc="go2rtc SRTP"
+port_forward="yes"
+dst.ports="18554/udp"

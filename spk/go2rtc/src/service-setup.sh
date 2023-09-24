@@ -12,5 +12,7 @@ SVC_WRITE_PID=y
 
 service_postinst ()
 {
-   echo -e "api:\n  username: ${wizard_root_user}\n  password: ${wizard_root_password}\n" > ${GO2RTC_CFG_FILE}
+   if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+      echo -e "api:\n  username: ${wizard_root_user}\n  password: ${wizard_root_password}\nsrtp:\n  listen: 0.0.0.0:18443" > ${GO2RTC_CFG_FILE}
+   fi
 }
