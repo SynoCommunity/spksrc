@@ -19,7 +19,6 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 include ../../mk/spksrc.common.mk
 
 SERVICE_USER = auto
-# SERVICE_WIZARD_SHARE = wizard_download_share
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8086
 SERVICE_PORT_TITLE = InfluxDB API
