@@ -18,6 +18,8 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
 include ../../mk/spksrc.common.mk
 
+SPK_COMMANDS = bin/influx bin/influxd
+
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8086
