@@ -16,13 +16,15 @@ LICENSE  = Apache-2.0/MIT
 
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
+WIZARDS_DIR = src/wizard/
+
 include ../../mk/spksrc.common.mk
 
 SPK_COMMANDS = bin/influx bin/influxd
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SERVICE_PORT = 8086
+SERVICE_PORT = 8085
 SERVICE_PORT_TITLE = InfluxDB API
 
 # Admin link for in DSM UI
