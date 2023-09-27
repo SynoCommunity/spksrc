@@ -4,7 +4,7 @@ SPK_REV = 65
 SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python311
-DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/par2cmdline-turbo cross/unrar cross/p7zip cross/$(SPK_NAME)
 SPK_DEPENDS = "python311>=3.11.5-8"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
