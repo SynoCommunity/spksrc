@@ -1,10 +1,10 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 4.0.3
-SPK_REV = 65
+SPK_VERS = 4.1.0
+SPK_REV = 66
 SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python311
-DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
+DEPENDS = cross/busybox cross/par2cmdline-turbo cross/unrar cross/p7zip cross/$(SPK_NAME)
 SPK_DEPENDS = "python311>=3.11.5-8"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Update SABnzbd to 4.0.3<br/>2. Update to OpenSSL 3.1.2<br/>3. Fix for newer shared python"
+CHANGELOG = "1. Update SABnzbd to 4.1.0.<br/>2. Use par2cmdline-turbo instead of par2cmdline.<br/>2. Update UnRar to 6.23 (security fixes)."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -45,6 +45,9 @@ SPK_COMMANDS = bin/7za
 DEPENDS += cross/cryptography
 
 include ../../mk/spksrc.python.mk
+
+# prefer native python tools (pip, maturin, ...) used for orjson
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:
