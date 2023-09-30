@@ -1,5 +1,5 @@
 PKG_NAME = go2rtc
-PKG_VERS = 1.6.2
+PKG_VERS = 1.7.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/AlexxIT/go2rtc/archive
@@ -25,8 +25,11 @@ GO_LDFLAGS  = -s -w
 PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-go.mk
+include ../../mk/spksrc.cross-go-env.mk
 
-# rename extracted folder to make imports work when used as GOPATH
-.PHONY: go2rtc_post_extract
+.PHONY:  go2rtc_post_extract
+
 go2rtc_post_extract:
+# rename extracted folder to make imports work when used as GOPATH
 	cd $(EXTRACT_PATH) && [ -d "$(PKG_NAME)-$(PKG_VERS)" ] && mv "$(PKG_NAME)-$(PKG_VERS)" $(PKG_NAME)
+	cd "$(EXTRACT_PATH)/$(PKG_NAME)" && env $(ENV) go mod edit -go=1.20 && env $(ENV) go get github.com/tillberg/autorestart
