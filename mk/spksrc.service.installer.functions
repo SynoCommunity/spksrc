@@ -115,6 +115,7 @@ install_python_wheels ()
 # function to read and export variables from a text file
 # empty lines and lines starting with # are ignored
 # we cannot 'source' the file to load the variables, when values have special characters like <, >, ...
+# already defined variables are not taken from the file (e.g. variables from wizard)
 load_variables_from_file ()
 {
    if [ -n "$1" -a -r "$1" ]; then
@@ -122,7 +123,10 @@ load_variables_from_file ()
         if [ "$(echo ${_line} | grep -v ^[/s]*#)" != "" ]; then
            _key=${_line%%=*}
            _value=${_line#*=}
-           export "${_key}=${_value}"
+           _existing_value=$(eval echo "\$${_key}")
+           if [ -z "${_existing_value}" ]; then
+              export "${_key}=${_value}"
+           fi
         fi
       done < "$1"
    fi
