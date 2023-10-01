@@ -8,7 +8,7 @@ override ARCH=
 MAINTAINER = ymartin59
 DESCRIPTION = Demonstration package to show installer script capabilities when requiring non-root user for background service and show configuration/creation of shared folder for package user.
 DISPLAY_NAME = DemoService
-CHANGELOG = "1. Use redesigned shared folder handling.<br>2. Fix service command to work on SRM and DSM 5 too.<br/>3. User Pyhton 3 when available in path."
+CHANGELOG = "1. Use redesigned shared folder handling.<br>2. Fix service command to work on SRM and DSM 5 too.<br/>3. Use Pyhton 3 when available in path."
 
 LICENSE = GPLv2
 
