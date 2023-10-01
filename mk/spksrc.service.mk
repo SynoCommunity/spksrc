@@ -140,7 +140,7 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARENAME)),)
 	@echo "# DSM name of shared folder from UI if provided" >> $@
 	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARENAME)}" ]; then' >> $@
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@echo '   SHARE_PATH=$$(abspath "/var/packages/$${SYNOPKG_PKGNAME}/shares/$${$(SERVICE_WIZARD_SHARENAME)}")' >> $@
+	@echo '   SHARE_PATH=$$(realpath "/var/packages/$${SYNOPKG_PKGNAME}/shares/$${$(SERVICE_WIZARD_SHARENAME)}" 2> /dev/null)' >> $@
 	@echo '   install_log "SHARE_PATH from share [$${SHARE_PATH}], variable [$(SERVICE_WIZARD_SHARENAME)=$${$(SERVICE_WIZARD_SHARENAME)}]"' >> $@
 else
 	@echo '   if synoshare --get "$${$(SERVICE_WIZARD_SHARENAME)}" &> /dev/null; then ' >> $@
