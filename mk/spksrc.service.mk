@@ -24,16 +24,18 @@
 #  SERVICE_CERT                  (optional) configure DSM certificate management for this service name from the firewall config file (*.sc)
 #  SERVICE_CERT_RELOAD           (optional) package-relative path to a script for reloading the service after certificate changes
 #  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
-#  SERVICE_WIZARD_GROUP          (optional) use name of wizard-variable to define the GROUP
-#  SERVICE_WIZARD_SHARE          (optional) use name of wizard-varible to define folder name of SHARE_PATH (uses DSM data share worker for DSM 7)
-#  USE_DATA_SHARE_WORKER         (optional) use DSM data share worker for SERVICE_WIZARD_SHARE for DSM 6 too
+#  SERVICE_WIZARD_GROUP          (not supported anymore) name of wizard-variable to define the GROUP 
+#                                SERVICE_WIZARD_GROUP is not supported anymore (not compatible with DSM 7 and DSM 6 using resource worker)
+#  SERVICE_WIZARD_SHARENAME      (optional) this is the name of wizard-varible to define folder name of SHARE_PATH (uses DSM data share worker for DSM 6 and DSM 7)
+#  SERVICE_WIZARD_SHARE          (deprecated) name of wizard-varible to define SHARE_PATH
+#  USE_DATA_SHARE_WORKER         (deprecated, optional) use DSM data share worker for SERVICE_WIZARD_SHARE for DSM 6 too
 #  SERVICE_USER                  (optional) runtime user account for generic service support.
 #                                "auto" is the only value supported with DSM 7 and defines sc-${SPK_NAME} as service user.
 #  SPK_GROUP                     (optional) defines the group to use in privilege resource file
 #  SYSTEM_GROUP                  (optional) defines an additional group to join in privilege resource file
 #  STARTABLE                     default = yes, must be "no" for packages that do not create a service (command line tools)
 #  SERVICE_COMMAND               service command, to be used with generic service support
-#  SERVICE_EXE                   (deprecated) service command, implemented with busybox start-stop-daemon
+#  SERVICE_EXE                   (not supported anymore) service command, implemented with busybox start-stop-daemon
 #  SPK_COMMANDS                  (optional) list of "folder/command" to create links for in folder /usr/local
 #  SPK_USR_LOCAL_LINKS           (optional) list of "folder:command" to create links for in folder /usr/local
 #                                           with 'command' in relative folder
@@ -100,9 +102,9 @@ endif
 endif
 
 # Recommend explicit STARTABLE=no
-ifeq ($(strip $(SSS_SCRIPT) $(SERVICE_COMMAND) $(SERVICE_EXE) $(STARTABLE)),)
+ifeq ($(strip $(SSS_SCRIPT) $(SERVICE_COMMAND) $(STARTABLE)),)
 ifeq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
-$(error Set STARTABLE=no or provide either SERVICE_COMMAND, SERVICE_EXE, SSS_SCRIPT, SPK_COMMANDS or SPK_USR_LOCAL_LINKS)
+$(error Set STARTABLE=no or provide either SERVICE_COMMAND, SSS_SCRIPT, SPK_COMMANDS or SPK_USR_LOCAL_LINKS)
 endif
 endif
 
@@ -124,31 +126,32 @@ $(DSM_SCRIPTS_DIR)/service-setup:
 	@echo '' >> $@
 ifneq ($(strip $(SERVICE_USER)),)
 	@echo USER=\"$(SPK_USER)\" >> $@
-ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 	@echo EFF_USER=\"sc-$(SPK_USER)\" >> $@
-else
-	@echo EFF_USER=\"svc-$(SPK_USER)\" >> $@
-endif
 	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_GROUP)),)
-	@echo "# Group name from UI if provided" >> $@
-	@echo 'if [ -n "$${$(SERVICE_WIZARD_GROUP)}" ]; then GROUP="$${$(SERVICE_WIZARD_GROUP)}"; fi' >> $@
-	@echo '' >> $@
+	$(error "SERVICE_WIZARD_GROUP is not supported anymore.")
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 	@echo "# DSM shared folder location from UI if provided" >> $@
-	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE)}" ]; then' >> $@
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@echo '   SHARE_PATH=$$(realpath "/var/packages/$${SYNOPKG_PKGNAME}/shares/$${$(SERVICE_WIZARD_SHARE)}")' >> $@
+	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARE)}" ]; then SHARE_PATH="$${$(SERVICE_WIZARD_SHARE)}"; SHARE_WORKER=0; fi' >> $@
 else
-	@echo '   if synoshare --get "$${$(SERVICE_WIZARD_SHARE)}" &> /dev/null; then ' >> $@
-	@echo '      SHARE_PATH=$$(synoshare --get "$${$(SERVICE_WIZARD_SHARE)}" | awk 'NR==4' | cut -d] -f1 | cut -d[ -f2)' >> $@
-	@echo '      echo "SHARE_PATH from share [$${SHARE_PATH}]"' >> $@
+ifneq ($(strip $(SERVICE_WIZARD_SHARENAME)),)
+	@echo "# DSM name of shared folder from UI if provided" >> $@
+	@echo 'if [ -n "$${$(SERVICE_WIZARD_SHARENAME)}" ]; then' >> $@
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+	@echo '   SHARE_PATH=$$(abspath "/var/packages/$${SYNOPKG_PKGNAME}/shares/$${$(SERVICE_WIZARD_SHARENAME)}")' >> $@
+	@echo '   install_log "SHARE_PATH from share [$${SHARE_PATH}], variable [$(SERVICE_WIZARD_SHARENAME)=$${$(SERVICE_WIZARD_SHARENAME)}]"' >> $@
+else
+	@echo '   if synoshare --get "$${$(SERVICE_WIZARD_SHARENAME)}" &> /dev/null; then ' >> $@
+	@echo '      SHARE_PATH=$$(synoshare --get "$${$(SERVICE_WIZARD_SHARENAME)}" | awk 'NR==4' | cut -d] -f1 | cut -d[ -f2)' >> $@
+	@echo '      install_log "SHARE_PATH from share [$${SHARE_PATH}], variable [$(SERVICE_WIZARD_SHARENAME)=$${$(SERVICE_WIZARD_SHARENAME)}]"' >> $@
 	@echo '   else' >> $@
-	@echo '      SHARE_PATH="$${$(SERVICE_WIZARD_SHARE)}"' >> $@
-	@echo '      echo "SHARE_PATH [$${SHARE_PATH}] is not an existing shared folder"' >> $@
+	@echo '      SHARE_PATH="$${$(SERVICE_WIZARD_SHARENAME)}"' >> $@
+	@echo '      install_log "SHARE_PATH [$${$(SERVICE_WIZARD_SHARENAME)}] does not yet exist."' >> $@
 	@echo '   fi' >> $@
+endif
+	@echo '   SHARE_NAME="$${$(SERVICE_WIZARD_SHARENAME)}"' >> $@
 endif
 	@echo 'fi' >> $@
 	@echo '' >> $@
@@ -182,13 +185,9 @@ ifneq ($(strip $(SERVICE_COMMAND)),)
 	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_EXE)),)
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@echo "${RED}ERROR: SERVICE_EXE (start-stop-daemon) is unsupported in DSM7${NC}"
+	@echo "${RED}ERROR: SERVICE_EXE (start-stop-daemon) is not supported anymore${NC}"
 	@echo "${GREEN}Please migrate to SERVICE_COMMAND=${NC}"
 	@exit 1
-endif
-	@echo "# Service command to execute with start-stop-daemon" >> $@
-	@echo 'SERVICE_EXE="$(SERVICE_EXE)"' >> $@
 ifneq ($(strip $(SERVICE_OPTIONS)),)
 	@echo 'SERVICE_OPTIONS="$(SERVICE_OPTIONS)"' >> $@
 endif
@@ -244,6 +243,14 @@ ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 ifeq ($(strip $(USE_DATA_SHARE_WORKER)),yes)
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
+endif
+else
+ifneq ($(strip $(SERVICE_WIZARD_SHARENAME)),)
+# e.g. SERVICE_WIZARD_SHARENAME=wizard_sharename, for DSM 6 and DSM 7
+ifeq ($(call version_ge, ${TCVERSION}, 6.1),1)
+	@jq --arg share "{{${SERVICE_WIZARD_SHARENAME}}}" --arg user sc-${SPK_USER} \
+		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
+endif
 endif
 endif
 ifneq ($(strip $(SERVICE_CERT)),)
@@ -307,9 +314,6 @@ DSM_SCRIPT_FILES += start-stop-status
 ifeq ($(STARTABLE),no)
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.non-startable
 	@$(dsm_script_copy)
-else ifneq ($(strip $(SERVICE_EXE)),)
-$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-daemon
-	@$(dsm_script_copy)
 else
 $(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-status
 	@$(dsm_script_copy)
@@ -348,15 +352,9 @@ endif
 
 # DSM <= 6 and SERVICE_USER defined
 else ifneq ($(strip $(SERVICE_USER)),)
-ifeq ($(strip $(SERVICE_EXE)),)
 $(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
 	@$(dsm_resource_copy)
 	@$(MSG) "(privilege) spksrc.service.privilege-installasroot"
-else
-$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-startasroot
-	@$(dsm_resource_copy)
-	@$(MSG) "(privilege) spksrc.service.privilege-startasroot"
-endif
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
 	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ | sponge $@
