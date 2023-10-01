@@ -193,8 +193,9 @@ postuninst ()
             find ${SYNOPKG_PKGVAR} -mindepth 1 -delete -print | install_log
         fi
 
-        if [ "$(ls -A /var/packages/${SYNOPKG_PKGNAME}/etc)" != "" ]; then
-            find /var/packages/${SYNOPKG_PKGNAME}/etc -mindepth 1 -delete -print | install_log
+        _etc_path=$(realpath /var/packages/${SYNOPKG_PKGNAME}/etc)
+        if [ "$(ls -A ${_etc_path})" != "" ]; then
+            find ${_etc_path} -mindepth 1 -delete -print | install_log
         fi
     fi
 
