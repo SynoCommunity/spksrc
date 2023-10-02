@@ -1,11 +1,11 @@
 PKG_NAME = urbackup-server
-PKG_VERS = 2.5.25
+PKG_VERS = 2.5.31
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://hndl.urbackup.org/Server/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl cross/zlib cross/zstd cross/cryptopp cross/curl
+DEPENDS = cross/openssl3 cross/zlib cross/zstd cross/cryptopp cross/curl
 
 HOMEPAGE = https://www.urbackup.org/
 COMMENT  = UrBackup is an easy to setup open source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.

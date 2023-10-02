@@ -1,5 +1,5 @@
 SPK_NAME = urbackup
-SPK_VERS = 2.5.25
+SPK_VERS = 2.5.31
 SPK_REV = 1
 SPK_ICON = src/urbackup.png
 DSM_UI_DIR = app
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 MAINTAINER = josef109
 DESCRIPTION = UrBackup is an easy to setup Open Source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.
 DISPLAY_NAME = UrBackup
-CHANGELOG = "Initial package release v2.5 (server v2.5.25, client v2.5.19)."
+CHANGELOG = "Initial package release v2.5 (server v2.5.31, client v2.5.24)."
 
 HOMEPAGE = https://www.urbackup.org/
 LICENSE  = AGPL-3.0
