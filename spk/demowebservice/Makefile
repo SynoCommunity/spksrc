@@ -22,6 +22,7 @@ else
 PHP_VERSION = 7.4
 endif
 
+# omit dependencies for DSM 5 and SRM
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 SPK_DEPENDS = WebStation:PHP$(PHP_VERSION):Apache2.4
 endif
