@@ -1,0 +1,29 @@
+[
+  {
+    "step_title": "Demo Web Service Configuration",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Please specify a shared folder for this package. This share is created at installation when it does not already exist.",
+        "subitems": [
+          {
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared Folder",
+            "defaultValue": "demo-share",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Subdirectories are not supported."
+              }
+            }
+          }
+        ]
+      }, {
+        "desc": ""
+      }, {
+        "desc": "This package runs as internal service user <b>'sc-demowebservice'</b> in DSM. The shared folder above is configured at installation time to be accessible by this user.<p>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      }
+    ]
+  }
+]
