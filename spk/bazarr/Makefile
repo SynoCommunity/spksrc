@@ -1,11 +1,11 @@
 SPK_NAME = bazarr
-SPK_VERS = 1.3.0
-SPK_REV = 12
+SPK_VERS = 1.4.0
+SPK_REV = 13
 SPK_ICON = src/bazarr.png
 
 PYTHON_PACKAGE = python311
 
-SPK_DEPENDS = "python311>=3.11.4-7:ffmpeg"
+SPK_DEPENDS = "python311:ffmpeg"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -28,15 +28,14 @@ WHEELS_BUILD_ARGS += --enable-zlib
 MAINTAINER = smaarn
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
-CHANGELOG = "Update to version 1.3.0.<br />See corresponding changelogs <a href=\"https://github.com/morpheus65535/bazarr/releases/tag/v1.3.0\">here</a> for more details"
+CHANGELOG = '1. Update to <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.4.0">1.4.0</a> (also includes <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.3.1">1.3.1</a>)<br />2. Add back support for ARMv7L architectures'
 
 HOMEPAGE  = https://www.bazarr.media/
 LICENSE   = GPL-3.0 license
 STARTABLE = yes
 
-# [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
-# [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# armv5 no longer supported by Python 3.11
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 HOMEPAGE = https://www.bazarr.media
 LICENSE = GPLv3
