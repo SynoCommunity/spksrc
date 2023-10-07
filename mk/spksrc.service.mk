@@ -152,8 +152,8 @@ else
 	@echo '   fi' >> $@
 endif
 	@echo '   SHARE_NAME="$${$(SERVICE_WIZARD_SHARENAME)}"' >> $@
-endif
 	@echo 'fi' >> $@
+endif
 	@echo '' >> $@
 endif
 ifneq ($(strip $(SERVICE_PORT)),)
