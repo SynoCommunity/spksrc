@@ -5,9 +5,6 @@ SPK_ICON = src/demowebservice.png
 
 DEPENDS =
 
-# for PHP >= 7.4
-REQUIRED_MIN_DSM = 6.1
-
 override ARCH=
 
 MAINTAINER = hgy59
@@ -25,8 +22,9 @@ else
 PHP_VERSION = 7.4
 endif
 
+ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 SPK_DEPENDS = WebStation:PHP$(PHP_VERSION):Apache2.4
-
+endif
 
 WIZARDS_DIR = src/wizard/
 SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name

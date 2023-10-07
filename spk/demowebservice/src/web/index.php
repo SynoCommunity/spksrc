@@ -19,7 +19,13 @@
 
   /* Style tab links */
   .tablink {
-    background-color: #44A;
+<?php 
+if (version_compare(PHP_VERSION, '8.0', '<=')) {
+    print "background-color: #44A;";
+} else {
+    print "background-color: #66F;";
+}
+?>
     color: black;
     float: left;
     border: none;
@@ -31,7 +37,13 @@
   }
 
   .tablink:hover {
-    background-color: #66F;
+<?php 
+if (version_compare(PHP_VERSION, '8.0', '<=')) {
+    print "background-color: #66F;";
+} else {
+    print "background-color: #44A;";
+}
+?>
   }
 
   /* Style the tab content (and add height:100% for full page content) */
@@ -78,17 +90,19 @@ if (version_compare(PHP_VERSION, '8.0', '<=')) {
   <h3>Demo Web Service</h3>
   <p>This is a demo web service package for synology DSM.</p>
   <p>It demonstrates how to build a package to integrate with apache web server and PHP <?php $vers=explode(".",phpversion()); echo $vers[0].'.'.$vers[1]; ?>.</p>
-<?php 
-if (version_compare(PHP_VERSION, '8.0', '<=')) {
-  print "<p>For PHP less than 8.x <pre>phpinfo()</pre> does not support dark mode, so we use light mode for all pages.</p>";
-}
-?>  
   <p>It also shows how to configure and use a shared folder.</p>
 
   <p>The source code is located in the SynoCommunity respository under <a target="_blank" href="https://github.com/SynoCommunity/spksrc/tree/master/spk/demowebservice">demowebservice</a>.</p>
 
   <h4>List of server variables:</h4>
   <p><small><pre><?php foreach($_SERVER as $key_name => $key_value) { print $key_name . " = " . $key_value . "<br>"; } ?></pre></small></p>
+  
+<?php 
+if (version_compare(PHP_VERSION, '8.0', '<=')) {
+  print "<hr><em><p align='center'>on PHP less than 8.x <tt>phpinfo()</tt> does not support dark mode and we use light mode for all pages.</p></em><hr>";
+}
+?>  
+  
 </div>
 
 <div id="phpinfo" class="tabcontent">
@@ -101,19 +115,32 @@ if (version_compare(PHP_VERSION, '8.0', '<=')) {
   <p>Full path of the shared folder is <b><span>@@shared_folder_fullname@@</span></b>.</p>
   
   <p>The following list of files and folders shows that the package has access to this folder.</p>
+
   <h4>Content of the shared folder:</h4>
 <?php
   $path = "@@shared_folder_fullname@@";
-  if (file_exists($path)) {
-    try {
-      print_folder($path);
-    }
-    catch (Exception $e) {
-      echo "<b><p style='color: red;'>ERROR: ".$e->getMessage()."</p></b>";
-    }
+
+  $open_basedir = ini_get('open_basedir');
+  $open_basedirs = explode(":",$open_basedir);
+  if (!empty($open_basedir) && !in_array($path,$open_basedirs))
+  {
+    echo "<b><p style='color: red;'>ERROR: open_basedir restriction in effect. Path (".$path.") is not within the allowed path(s).</p></b>";
+    echo "<p> open_basedir=".ini_get('open_basedir')."</p>";
+    echo "<p>You have to add <b><span>".$path."</span></b> to the php <b><span>open_basedir</span></b> to list the folder content.</p>";
   }
-  else {
-    echo "<b><p style='color: red;'>The folder '".$path."' does not exist.</p></b>";
+  else
+  {
+    if (file_exists($path)) {
+      try {
+        print_folder($path);
+      }
+      catch (Exception $e) {
+        echo "<b><p style='color: red;'>ERROR: ".$e->getMessage()."</p></b>";
+      }
+    }
+    else {
+      echo "<b><p style='color: red;'>The folder '".$path."' does not exist.</p></b>";
+    }
   }
 
   function add_list_element($dom, $parent, $fileinfo)
@@ -186,8 +213,15 @@ if (version_compare(PHP_VERSION, '8.0', '<=')) {
       tablinks[i].style.backgroundColor = "";
     }
     document.getElementById(pageName).style.display = "block";
-    activeTabLink.style.color = 'black';
-    activeTabLink.style.backgroundColor = 'white';
+<?php
+if (version_compare(PHP_VERSION, '8.0', '<=')) {
+    print "activeTabLink.style.color = 'black';";
+    print "activeTabLink.style.backgroundColor = 'white';";
+} else {
+    print "activeTabLink.style.color = 'white';";
+    print "activeTabLink.style.backgroundColor = '#333';";
+}
+?>
   }
 
   // select the element with id="defaultOpen"
