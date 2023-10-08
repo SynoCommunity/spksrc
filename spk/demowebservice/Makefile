@@ -33,6 +33,7 @@ SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SYSTEM_GROUP = http
 
 DSM_UI_DIR = app
+# the app/config file is not used on DSM 7, the app icon is created based on the resources in CONF_DIR only.
 DSM_UI_CONFIG = src/app/config
 
 CONF_DIR = src/conf_php$(PHP_VERSION)/
@@ -51,14 +52,8 @@ POST_ICON_TARGET = demowebservice_post_icon
 include ../../mk/spksrc.spk.mk
 
 .PHONY: demowebservice_install
-# the app/config file must be installed from DSM 6 to show the icon in DSM
-# but it must not exist in DSM 7 packages (System error. Unable to perform this operation. Please try again later.)
 demowebservice_install:
-	@$(MSG) Install app/config and web application
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-	@install -d -m 755 $(STAGING_DIR)/app/
-	@install -m 644 $(DSM_UI_CONFIG) $(STAGING_DIR)/app/config
-endif	
+	@$(MSG) Install the web application
 	@install -d -m 755 $(STAGING_DIR)/web/$(SPK_NAME)/
 	@install -m 755 src/web/index.php $(STAGING_DIR)/web/$(SPK_NAME)/
 

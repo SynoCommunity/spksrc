@@ -3,7 +3,7 @@
         "com.synocommunity.packages.demowebservice": {
             "type": "url",
             "title": "Demo Web Service",
-            "desc": "Web Service Demo Package",
+            "desc": "Web Service Demo Package (Tooltip)",
             "icon": "images/demowebservice-{0}.png",
             "protocol": "http",
             "port": "80",

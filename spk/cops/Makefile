@@ -42,6 +42,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: cops_extra_install
 cops_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	@$(MSG) Install default config file
 	install -m 666 src/config_local.php.synology $(STAGING_DIR)/config_local.php.synology

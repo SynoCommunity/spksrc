@@ -4,10 +4,10 @@
 #   scripts/start-stop-status
 #   scripts/service-setup
 #   conf/privilege         if SERVICE_USER or DSM7
-#   conf/SPK_NAME.sc       if SERVICE_PORT and DSM<7
+#   conf/$(SPK_NAME).sc    if SERVICE_PORT and DSM<7
 #   conf/resource          if SERVICE_CERT or DSM7
-#   app/SPK_NAME.sc        if SERVICE_PORT and DSM7
-#   app/config             if DSM_UI_DIR (may be overwritten by DSM_UI_CONFIG)
+#   app/$(SPK_NAME).sc     if SERVICE_PORT and DSM7
+#   app/config             if SPK_ICON and SERVICE_PORT but not NO_SERVICE_SHORTCUT (may be overwritten by DSM_UI_CONFIG)
 #
 # Targets are executed in the following order:
 #  service_msg_target
@@ -17,18 +17,19 @@
 #
 # Variables:
 #  SERVICE_SETUP                 service-setup script file for generic installer
+#  SERVICE_PORT                  for generation of service port firewall config file (*.sc) and for dsm-ui config file
 #  FWPORTS                       (optional) custom firewall port/rules file
-#  SERVICE_PORT                  service port firewall config file (*.sc) and dsm-ui config file
-#  SERVICE_PORT_PROTOCOL         service port protocol for dsm-ui config file, default = "http"
-#  SERVICE_PORT_ALL_USERS        service port access for all users for dsm-ui config file, default = "true"
+#  DSM_UI_DIR                    defaults to app. May be defined different for custom DSM UI integration
+#  
 #  SERVICE_CERT                  (optional) configure DSM certificate management for this service name from the firewall config file (*.sc)
 #  SERVICE_CERT_RELOAD           (optional) package-relative path to a script for reloading the service after certificate changes
-#  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
-#  SERVICE_WIZARD_GROUP          (not supported anymore) name of wizard-variable to define the GROUP 
-#                                SERVICE_WIZARD_GROUP is not supported anymore (not compatible with DSM 7 and DSM 6 using resource worker)
+#
 #  SERVICE_WIZARD_SHARENAME      (optional) this is the name of wizard-varible to define folder name of SHARE_PATH (uses DSM data share worker for DSM 6 and DSM 7)
 #  SERVICE_WIZARD_SHARE          (deprecated) name of wizard-varible to define SHARE_PATH
 #  USE_DATA_SHARE_WORKER         (deprecated, optional) use DSM data share worker for SERVICE_WIZARD_SHARE for DSM 6 too
+#  SERVICE_WIZARD_GROUP          (not supported anymore) name of wizard-variable to define the GROUP 
+#                                SERVICE_WIZARD_GROUP is not supported anymore (not compatible with DSM 7 and DSM 6 using resource worker)
+# 
 #  SERVICE_USER                  (optional) runtime user account for generic service support.
 #                                "auto" is the only value supported with DSM 7 and defines sc-${SPK_NAME} as service user.
 #  SPK_GROUP                     (optional) defines the group to use in privilege resource file
@@ -43,8 +44,17 @@
 #                                           folder at intallation and runtime.
 #  SSS_SCRIPT                    (optional) custom script file for service start/stop/status when the generic
 #                                           installer generated script (SERVICE_SETUP) is not usable.
-#  NO_SERVICE_SHORTCUT           (optional) do not create an app icon in the DSM desktop
 #  INSTALLER_SCRIPT              (deprecated) installer script file before introduction of generic installer
+# 
+# Variables for the dsm-ui config file (app/config) the definition for the app icon in the DSM UI and its properties.
+#                                The app icon (i.e. the app/config file) is created, when DSM_UI_CONF is defined
+#                                or - when SERVICE_PORT is defined and NO_SERVICE_SHORTCUT is not defined
+#  DSM_UI_CONF                   (optional) custom app/config file (required for web services without SERVICE_PORT)
+#  NO_SERVICE_SHORTCUT           (optional) do not create an app icon when SERVICE_PORT is defined
+#  SERVICE_PORT_PROTOCOL         service port protocol for dsm-ui config file, default = "http"
+#  SERVICE_PORT_ALL_USERS        service port access for all users for dsm-ui config file, default = "true"
+#  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
+#  SERVICE_DESC                  service desc for dsm-ui config file, i.e. the tooltip on the app icon (default = $(DESCRIPTION))
 #
 
 ifeq ($(strip $(PRE_SERVICE_TARGET)),)
@@ -96,8 +106,7 @@ else
 ifeq ($(SERVICE_USER),auto)
 SPK_USER = $(SPK_NAME)
 else ifneq ($(strip $(SERVICE_USER)),)
-$(warning Only 'SERVICE_USER=auto' is compatible with DSM7)
-SPK_USER = $(SERVICE_USER)
+$(error Only 'SERVICE_USER=auto' is supported since DSM7)
 endif
 endif
 
@@ -188,9 +197,9 @@ ifneq ($(strip $(SERVICE_EXE)),)
 	@echo "${RED}ERROR: SERVICE_EXE (start-stop-daemon) is not supported anymore${NC}"
 	@echo "${GREEN}Please migrate to SERVICE_COMMAND=${NC}"
 	@exit 1
+endif
 ifneq ($(strip $(SERVICE_OPTIONS)),)
 	@echo 'SERVICE_OPTIONS="$(SERVICE_OPTIONS)"' >> $@
-endif
 	@echo '' >> $@
 endif
 ifeq ($(strip $(USE_ALTERNATE_TMPDIR)),1)
@@ -407,9 +416,26 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc: $(filter %.sc,$(FWPORTS))
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc
 endif
 
-# Generate DSM UI configuration
+# Generate DSM UI configuration (app/config)
+# prerequisites:
+# - SPK_ICON is required
+# - if DSM_UI_CONFIG is defined, it is used as config file
+# - otherwise the config file is generated when
+#   SERVICE_PORT is defined and NO_SERVICE_SHORTCUT is not defined
+#   - the config file is generated with the SERVICE_PORT and the following variables
+#     - SERVICE_DESC
+#     - SERVICE_URL
+#     - SERVICE_PORT_PROTOCOL
+#     - SERVICE_PORT_ALL_USERS
+#     - SERVICE_TYPE
+# default values are documentent at the top of this file
 ifneq ($(strip $(SPK_ICON)),)
-ifneq ($(strip $(SERVICE_PORT)),)
+ifneq ($(wildcard $(DSM_UI_CONFIG)),)
+$(STAGING_DIR)/$(DSM_UI_DIR)/config:
+	$(create_target_dir)
+	cat $(DSM_UI_CONFIG) > $@
+SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
+else ifneq ($(strip $(SERVICE_PORT)),)
 ifeq ($(strip $(NO_SERVICE_SHORTCUT)),)
 # Set some defaults
 ifeq ($(strip $(SERVICE_URL)),)
@@ -424,15 +450,13 @@ endif
 ifeq ($(strip $(SERVICE_TYPE)),)
 SERVICE_TYPE=url
 endif
-
-DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
+ifeq ($(strip $(SERVICE_DESC)),)
+SERVICE_DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
+endif
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
-ifneq ($(wildcard $(DSM_UI_CONFIG)),)
-	cat $(DSM_UI_CONFIG) > $@
-else
 	@echo '{}' | jq --arg name "${DISPLAY_NAME}" \
-		--arg desc "${DESC}" \
+		--arg desc "${SERVICE_DESC}" \
 		--arg id "com.synocommunity.packages.${SPK_NAME}" \
 		--arg icon "images/${SPK_NAME}-{0}.png" \
 		--arg prot "${SERVICE_PORT_PROTOCOL}" \
@@ -441,7 +465,6 @@ else
 		--arg type "${SERVICE_TYPE}" \
 		--argjson allUsers ${SERVICE_PORT_ALL_USERS} \
 		'{".url":{($$id):{"title":$$name, "desc":$$desc, "icon":$$icon, "type":$$type, "protocol":$$prot, "port":$$port, "url":$$url, "allUsers":$$allUsers, "grantPrivilege":"all", "advanceGrantPrivilege":true}}}' > $@
-endif
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 endif
 endif

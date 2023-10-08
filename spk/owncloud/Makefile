@@ -4,7 +4,7 @@ SPK_REV = 11
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/owncloud
 SPK_DEPENDS = "WebStation:PHP7.4:Apache2.4"
 
 REQUIRED_MIN_DSM = 6.0
@@ -45,8 +45,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: owncloud_extra_install
 owncloud_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app -d $(STAGING_DIR)/bin -d $(STAGING_DIR)/web
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 -d $(STAGING_DIR)/bin -d $(STAGING_DIR)/web
 	install -m 755 src/bin/owncloud-daemon $(STAGING_DIR)/bin/owncloud-daemon
 	install -m 644 src/web/owncloud.conf $(STAGING_DIR)/web/owncloud.conf
 	install -m 644 src/web/owncloud.json $(STAGING_DIR)/web/owncloud.json
