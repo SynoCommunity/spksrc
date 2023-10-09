@@ -18,13 +18,14 @@ include ../../mk/spksrc.common.mk
 # use the latest php version
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 PHP_VERSION = 8.2
-else
-PHP_VERSION = 7.4
 endif
 
-# omit dependencies for DSM 5 and SRM
-ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
+# only for DSM 7 we have dedicated dependencies (must match the configuration in conf/resource)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_DEPENDS = WebStation:PHP$(PHP_VERSION):Apache2.4
+else ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
+# on DSM 6 the default web server and PHP version are used
+SPK_DEPENDS = WebStation
 endif
 
 WIZARDS_DIR = src/wizard/
@@ -33,14 +34,22 @@ SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SYSTEM_GROUP = http
 
 DSM_UI_DIR = app
-# the app/config file is not used on DSM 7, the app icon is created based on the resources in CONF_DIR only.
 DSM_UI_CONFIG = src/app/config
-
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# webservice resource definition is for DSM 7 only
 CONF_DIR = src/conf_php$(PHP_VERSION)/
+# The app/config file is not used on DSM 7 for web services, the app icon is created based on the resources in CONF_DIR only.
+# With app/config on DSM 7 (sometimes) an error occurred: System error. Unable to perform this operation. Please try again later.
+# Disable the creation of app/config file:
+NO_SERVICE_SHORTCUT = y
+endif
 
-INSTALL_DEP_SERVICES = apache-web
-START_DEP_SERVICES = apache-web
-INSTUNINST_RESTART_SERVICES = apache-web
+# apache-web dependency is not used:
+# on DSM 7 the settings are ignored as dependency is defined in conf/resource
+# on DSM 6 the package runs under the active web server (apache or nginx)
+#INSTALL_DEP_SERVICES = apache-web
+#START_DEP_SERVICES = apache-web
+#INSTUNINST_RESTART_SERVICES = apache-web
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh

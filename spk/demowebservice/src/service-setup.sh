@@ -14,6 +14,7 @@ service_postinst ()
 
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         # Install the web interface
+        # only DSM 7+ installs the web service based on the "webservice" resource.
         cp -rp "${SYNOPKG_PKGDEST}/web/${SYNOPKG_PKGNAME}" ${WEB_ROOT}/
     fi
     

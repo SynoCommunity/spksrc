@@ -89,7 +89,7 @@ if (version_compare(PHP_VERSION, '8.0', '<=')) {
 
   <h3>Demo Web Service</h3>
   <p>This is a demo web service package for synology DSM.</p>
-  <p>It demonstrates how to build a package to integrate with apache web server and PHP <?php $vers=explode(".",phpversion()); echo $vers[0].'.'.$vers[1]; ?>.</p>
+  <p>It demonstrates how to build a package to integrate with web server and PHP.</p>
   <p>It also shows how to configure and use a shared folder.</p>
 
   <p>The source code is located in the SynoCommunity respository under <a target="_blank" href="https://github.com/SynoCommunity/spksrc/tree/master/spk/demowebservice">demowebservice</a>.</p>
