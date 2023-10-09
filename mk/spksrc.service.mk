@@ -47,10 +47,10 @@
 #  INSTALLER_SCRIPT              (deprecated) installer script file before introduction of generic installer
 # 
 # Variables for the dsm-ui config file (app/config) the definition for the app icon in the DSM UI and its properties.
-#                                The app icon (i.e. the app/config file) is created, when DSM_UI_CONF is defined
-#                                or - when SERVICE_PORT is defined and NO_SERVICE_SHORTCUT is not defined
+#                                The app icon (i.e. the app/config file) is created, when SERVICE_PORT or DSM_UI_CONF is defined
+#                                and can be disabled by definition of NO_SERVICE_SHORTCUT
 #  DSM_UI_CONF                   (optional) custom app/config file (required for web services without SERVICE_PORT)
-#  NO_SERVICE_SHORTCUT           (optional) do not create an app icon when SERVICE_PORT is defined
+#  NO_SERVICE_SHORTCUT           (optional) do not create an app icon (app/config)
 #  SERVICE_PORT_PROTOCOL         service port protocol for dsm-ui config file, default = "http"
 #  SERVICE_PORT_ALL_USERS        service port access for all users for dsm-ui config file, default = "true"
 #  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
@@ -418,10 +418,9 @@ endif
 
 # Generate DSM UI configuration (app/config)
 # prerequisites:
-# - SPK_ICON is required
+# - SPK_ICON is required and NO_SERVICE_SHORTCUT is not defined
 # - if DSM_UI_CONFIG is defined, it is used as config file
-# - otherwise the config file is generated when
-#   SERVICE_PORT is defined and NO_SERVICE_SHORTCUT is not defined
+# - else SERVICE_PORT is defined:
 #   - the config file is generated with the SERVICE_PORT and the following variables
 #     - SERVICE_DESC
 #     - SERVICE_URL
@@ -430,13 +429,13 @@ endif
 #     - SERVICE_TYPE
 # default values are documentent at the top of this file
 ifneq ($(strip $(SPK_ICON)),)
+ifeq ($(strip $(NO_SERVICE_SHORTCUT)),)
 ifneq ($(wildcard $(DSM_UI_CONFIG)),)
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
 	cat $(DSM_UI_CONFIG) > $@
 SERVICE_FILES += $(STAGING_DIR)/$(DSM_UI_DIR)/config
 else ifneq ($(strip $(SERVICE_PORT)),)
-ifeq ($(strip $(NO_SERVICE_SHORTCUT)),)
 # Set some defaults
 ifeq ($(strip $(SERVICE_URL)),)
 SERVICE_URL=/
