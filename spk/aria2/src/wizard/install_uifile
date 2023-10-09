@@ -5,24 +5,6 @@
         "items": [
             {
                 "type": "textfield",
-                "desc": "Synology DSM Settings",
-                "subitems": [
-                    {
-                        "key": "wizard_group",
-                        "desc": "DSM group",
-                        "defaultValue": "sc-aria2",
-                        "validator": {
-                            "allowBlank": false,
-                            "regex": {
-                                "expr": "/^[^<>:*/?\"]*$/",
-                                "errorText": "Not allowed character in group name"
-                            }
-                        }
-                    }
-                ]
-            },
-            {
-                "type": "textfield",
                 "desc": "Aria2 Settings",
                 "subitems": [
                     {
