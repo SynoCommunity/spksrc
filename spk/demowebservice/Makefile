@@ -42,6 +42,8 @@ CONF_DIR = src/conf_php$(PHP_VERSION)/
 # With app/config on DSM 7 (sometimes) an error occurred: System error. Unable to perform this operation. Please try again later.
 # Disable the creation of app/config file:
 NO_SERVICE_SHORTCUT = y
+# create firewall rules, since we add a port based "Web Portal"
+SERVICE_PORT = 8889
 endif
 
 # apache-web dependency is not used:
