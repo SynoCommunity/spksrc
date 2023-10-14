@@ -69,7 +69,7 @@ fi
 
 
 # Load (wizard) variables stored by postinst
-call_func "load_variables_from_file" install_log ${INST_VARIABLES}
+load_variables_from_file ${INST_VARIABLES}
 
 # init variables either from ${INST_VARIABLES}, from package or from wizard
 call_func "initialize_variables"
@@ -148,14 +148,6 @@ preinst ()
     call_func "validate_preinst"
     call_func "service_preinst" install_log
 
-    # Check volume exists
-    if [ -n "${SHARE_PATH}" ]; then
-        if [ ! -d "${SHARE_VOLUME}" ]; then
-            echo "ERROR: Volume ${SHARE_VOLUME} does not exist." | $TEE 1>&2
-            exit 1
-        fi
-    fi
-
     exit 0
 }
 
@@ -182,6 +174,7 @@ preuninst ()
     log_step "preuninst"
     call_func "validate_preuninst"
     call_func "service_preuninst" install_log
+
     exit 0
 }
 
@@ -200,10 +193,12 @@ postuninst ()
             find ${SYNOPKG_PKGVAR} -mindepth 1 -delete -print | install_log
         fi
 
-        if [ "$(ls -A /var/packages/${SYNOPKG_PKGNAME}/etc)" != "" ]; then
-            find /var/packages/${SYNOPKG_PKGNAME}/etc -mindepth 1 -delete -print | install_log
+        _etc_path=$(realpath /var/packages/${SYNOPKG_PKGNAME}/etc)
+        if [ "$(ls -A ${_etc_path})" != "" ]; then
+            find ${_etc_path} -mindepth 1 -delete -print | install_log
         fi
     fi
+
     exit 0
 }
 
@@ -229,6 +224,7 @@ preupgrade ()
 
     call_func "service_preupgrade" install_log
     call_func "service_save" install_log
+
     exit 0
 }
 

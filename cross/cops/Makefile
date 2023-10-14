@@ -10,7 +10,7 @@ DEPENDS =
 
 HOMEPAGE = https://blog.slucas.fr/en/oss/calibre-opds-php-server
 COMMENT  = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
-LICENSE  = GPL
+LICENSE  = GPLv2
 
 INSTALL_TARGET = cops_install
 

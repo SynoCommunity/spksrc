@@ -1,4 +1,3 @@
-#!/bin/sh
 
 # Package
 PACKAGE_NAME="com.synocommunity.packages.${SYNOPKG_PKGNAME}"
@@ -33,24 +32,24 @@ validate_preinst ()
 
 service_postinst ()
 {
-      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-    
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+
         # Install the web interface
         cp -pR "${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}" "${WEB_DIR}"
-    
+
         # Configure open_basedir
         echo -e "[PATH=${WEB_DIR}/${SYNOPKG_PKGNAME}]\nopen_basedir = Null" > "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini"
-      fi
+    fi
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Create a default configuration file
         if [ ! -f "${CFG_FILE}" ]; then
-          cp "${DEFAULT_CFG_FILE}" "${CFG_FILE}"
-          url_rewriting=$([ "${wizard_use_url_rewriting}" == "true" ] && echo "1" || echo "0")
-          sed -i -e "s|@calibre_dir@|${wizard_calibre_dir:=/volume1/calibre/}|g" ${CFG_FILE}
-          sed -i -e "s|@cops_title@|${wizard_cops_title:=COPS}|g" ${CFG_FILE}
-          sed -i -e "s|@use_url_rewriting@|${url_rewriting:=0}|g" ${CFG_FILE}
-          chmod ga+w "${CFG_FILE}"
+            cp "${DEFAULT_CFG_FILE}" "${CFG_FILE}"
+            url_rewriting=$([ "${wizard_use_url_rewriting}" == "true" ] && echo "1" || echo "0")
+            sed -i -e "s|@calibre_dir@|${wizard_calibre_dir:=/volume1/calibre/}|g" ${CFG_FILE}
+            sed -i -e "s|@cops_title@|${wizard_cops_title:=COPS}|g" ${CFG_FILE}
+            sed -i -e "s|@use_url_rewriting@|${url_rewriting:=0}|g" ${CFG_FILE}
+            chmod ga+w "${CFG_FILE}"
         fi
 
       if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
@@ -58,7 +57,7 @@ service_postinst ()
         # Set permissions on directory structure (DSM 5+)
         set_syno_permissions "${wizard_calibre_dir}" "${GROUP}"
         # Set permissions on metadata.db
-        if [ ! "`synoacltool -get "${wizard_calibre_dir}/metadata.db"| grep "group:${GROUP}:allow:rwxpdDaARWc."`" ]; then
+        if [ ! "$(synoacltool -get ""${wizard_calibre_dir}/metadata.db""| grep group:${GROUP}:allow:rwxpdDaARWc.)" ]; then
             synoacltool -add "${wizard_calibre_dir}/metadata.db" "group:${GROUP}:allow:rwxpdDaARWc:----" > /dev/null 2>&1
         fi
       fi
@@ -68,15 +67,14 @@ service_postinst ()
 service_postuninst ()
 {
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      # Remove link
-      rm -f "${SYNOPKG_PKGDEST}"
+        # Remove link
+        rm -f "${SYNOPKG_PKGDEST}"
   
-      # Remove open_basedir configuration
-      rm -f "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini"
+        # Remove open_basedir configuration
+        rm -f "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini"
   
-      # Remove the web interface
-      rm -fr "${WEB_DIR:?}/${SYNOPKG_PKGNAME}"
-    
+        # Remove the web interface
+        rm -fr "${WEB_DIR:?}/${SYNOPKG_PKGNAME}"
     fi
 }
 
@@ -90,20 +88,20 @@ service_save ()
     # Save .htaccess file
     mv -v "${SECURITY_SETTINGS_FILE}" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      mv -v "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
+        mv -v "${PHP_CONFIG_LOCATION}/${PACKAGE_NAME}.ini" "${TMP_DIR}/${SYNOPKG_PKGNAME}/"
     fi
 }
 
 service_restore ()
 {
-      # Restore some stuff
-      rm -f "${CFG_FILE}"
-      # Restore cops configuration file
-      mv -v "${TMP_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}" "${CFG_FILE}"
-      # Restore .htaccess file
-      mv -v "${TMP_DIR}/${SYNOPKG_PKGNAME}/${SECURITY_SETTINGS_FILE_NAME}" "${SECURITY_SETTINGS_FILE}"
-      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+    # Restore some stuff
+    rm -f "${CFG_FILE}"
+    # Restore cops configuration file
+    mv -v "${TMP_DIR}/${SYNOPKG_PKGNAME}/${CFG_FILE_NAME}" "${CFG_FILE}"
+    # Restore .htaccess file
+    mv -v "${TMP_DIR}/${SYNOPKG_PKGNAME}/${SECURITY_SETTINGS_FILE_NAME}" "${SECURITY_SETTINGS_FILE}"
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         mv "${TMP_DIR}/${SYNOPKG_PKGNAME}/${PACKAGE_NAME}.ini" "${PHP_CONFIG_LOCATION}/"
-      fi
-      rm -d "${TMP_DIR}/${SYNOPKG_PKGNAME}" "${TMP_DIR}"
+    fi
+    rm -d "${TMP_DIR}/${SYNOPKG_PKGNAME}" "${TMP_DIR}"
 }

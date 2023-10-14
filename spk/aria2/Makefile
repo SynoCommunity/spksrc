@@ -29,7 +29,6 @@ WIZARDS_DIR = src/wizard
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER         = auto
-SERVICE_WIZARD_GROUP = wizard_group
 SERVICE_WIZARD_SHARE = wizard_download_dir
 SERVICE_SETUP        = src/service-setup.sh
 
