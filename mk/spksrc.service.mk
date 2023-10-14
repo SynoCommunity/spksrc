@@ -95,19 +95,19 @@ service_msg_target:
 pre_service_target: service_msg_target
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-# always use SPK_USER on DSM >= 7, not only when SERVICE_USER is defined
-SPK_USER = $(SPK_NAME)
+# always use SPK_USER on DSM >= 7
+SERVICE_USER = auto
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 # always use data share worker on DSM >= 7
 USE_DATA_SHARE_WORKER = yes
 endif
-else
+endif
+
 # SERVICE_USER=auto uses SPK_NAME
 ifeq ($(SERVICE_USER),auto)
 SPK_USER = $(SPK_NAME)
 else ifneq ($(strip $(SERVICE_USER)),)
 $(error Only 'SERVICE_USER=auto' is supported since DSM7)
-endif
 endif
 
 # Recommend explicit STARTABLE=no
