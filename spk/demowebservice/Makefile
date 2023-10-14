@@ -53,7 +53,6 @@ endif
 #START_DEP_SERVICES = apache-web
 #INSTUNINST_RESTART_SERVICES = apache-web
 
-SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
 

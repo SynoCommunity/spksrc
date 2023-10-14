@@ -103,6 +103,13 @@ USE_DATA_SHARE_WORKER = yes
 endif
 endif
 
+# we need the service user to define access rights for the shared folder
+ifneq ($(SERVICE_WIZARD_SHARENAME),)
+ifeq ($(SERVICE_USER),)
+SERVICE_USER = auto
+endif
+endif
+
 # SERVICE_USER=auto uses SPK_NAME
 ifeq ($(SERVICE_USER),auto)
 SPK_USER = $(SPK_NAME)
