@@ -11,5 +11,6 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --prefix="$(STAGING_INSTALL_PREFIX)"
+ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk

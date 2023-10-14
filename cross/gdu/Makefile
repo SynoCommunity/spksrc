@@ -1,5 +1,5 @@
 PKG_NAME = gdu
-PKG_VERS = 5.13.2
+PKG_VERS = 5.25.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dundee/gdu/archive

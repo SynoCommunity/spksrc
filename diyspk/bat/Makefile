@@ -1,10 +1,10 @@
 SPK_NAME = bat
-SPK_VERS = 0.22.1
+SPK_VERS = 0.23.0
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/bat
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = A cat(1) clone with wings.

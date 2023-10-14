@@ -21,13 +21,6 @@ ENV += SODIUM_INSTALL=system
 # [cryptography]
 DEPENDS += cross/cryptography
 
-include ../../mk/spksrc.common.mk
-
-# [greenlet]
-ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
-WHEELS_CPPFLAGS = [greenlet] -std=c++11 -fpermissive
-endif
-
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 
@@ -37,8 +30,8 @@ STARTABLE = yes
 DISPLAY_NAME = SickChill
 CHANGELOG = "1. A wheel based install, git installs are not supported by upstream.<br/>2. Python update to 3.11<br/>3. Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies<br/>4. Migrate to OpenSSL 3.1.2<br/>5. Fix for newer shared python"
 
-HOMEPAGE   = https://sickchill.github.io/
-LICENSE    = GPLv3+
+HOMEPAGE = https://sickchill.github.io/
+LICENSE = GPLv3+
 
 SERVICE_USER = auto
 
@@ -57,8 +50,19 @@ POST_STRIP_TARGET = sickchill_extra_install
 
 include ../../mk/spksrc.python.mk
 
+
+ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
+# archs without C++11 support are not supported:
+UNSUPPORTED_ARCHS = $(ARCHS)
+endif
+
+# [greenlet]
+ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
+WHEELS_CPPFLAGS = [greenlet] -std=c++11 -fpermissive
+endif
+
 # prefere native python tools (pip, maturin, ...)
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/python311/work-native/install/usr/local/bin):$(PATH)
+ENV += PATH=$(abspath $(WORK_DIR)/../../../native/python311/work-native/install/usr/local/bin):$(PATH)
 
 .PHONY: sickchill_extra_install
 sickchill_extra_install:

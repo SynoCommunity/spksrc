@@ -1,5 +1,5 @@
 PKG_NAME = rmlint
-PKG_VERS = 2.10.1
+PKG_VERS = 2.10.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sahib/rmlint/archive

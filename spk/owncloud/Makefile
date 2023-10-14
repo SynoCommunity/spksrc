@@ -1,6 +1,6 @@
 SPK_NAME = owncloud
-SPK_VERS = 10.12.2
-SPK_REV = 10
+SPK_VERS = 10.13.1
+SPK_REV = 11
 SPK_ICON = src/owncloud.png
 DSM_UI_DIR = app
 
@@ -11,7 +11,7 @@ REQUIRED_MIN_DSM = 6.0
 
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
-CHANGELOG = "Update ownCloud to 10.12.2."
+CHANGELOG = "Update ownCloud to 10.13.1."
 DISPLAY_NAME = ownCloud
 HOMEPAGE = https://owncloud.org/
 LICENSE = AGPL
