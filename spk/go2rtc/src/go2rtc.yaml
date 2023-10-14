@@ -1,0 +1,6 @@
+api:
+  username: @@root_user@@
+  password: @@root_password@@
+
+srtp:
+  listen: 0.0.0.0:18443
