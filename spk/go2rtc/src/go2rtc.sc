@@ -11,7 +11,7 @@ port_forward="yes"
 dst.ports="8554/tcp"
 
 [go2rtc_webrtc]
-title="go2rtc WebRTC"
+title="go2rtc WebRTC (TCP,UDP)"
 desc="go2rtc WebRTC"
 port_forward="yes"
 dst.ports="8555"

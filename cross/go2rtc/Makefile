@@ -19,17 +19,12 @@ GO_SRC_DIR = $(EXTRACT_PATH)/$(PKG_NAME)
 GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 
 GO_BUILD_ARGS = -trimpath
-
-GO_LDFLAGS  = -s -w
-
-PATCHES_LEVEL = 1
+GO_LDFLAGS = -s -w
 
 include ../../mk/spksrc.cross-go.mk
-include ../../mk/spksrc.cross-go-env.mk
 
 .PHONY:  go2rtc_post_extract
-
 go2rtc_post_extract:
-# rename extracted folder to make imports work when used as GOPATH
+	@$(MSG) Rename extracted folder to make imports work when used as GOPATH
 	cd $(EXTRACT_PATH) && [ -d "$(PKG_NAME)-$(PKG_VERS)" ] && mv "$(PKG_NAME)-$(PKG_VERS)" $(PKG_NAME)
 	cd "$(EXTRACT_PATH)/$(PKG_NAME)" && env $(ENV) go mod edit -go=1.20 && env $(ENV) go get github.com/tillberg/autorestart

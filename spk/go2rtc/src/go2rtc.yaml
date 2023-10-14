@@ -1,6 +1,17 @@
 api:
+  listen: ":1984"
   username: @@root_user@@
   password: @@root_password@@
 
+log:
+  format: "text"
+  level: "info"
+
+rtsp:
+  listen: ":8554"
+
 srtp:
-  listen: 0.0.0.0:18443
+  listen: ":18443"
+
+webrtc:
+  listen: ":8555"
