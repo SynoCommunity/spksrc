@@ -21,7 +21,7 @@ endif
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 DISPLAY_NAME = ownCloud
-CHANGELOG = "Update ownCloud to 10.13.2."
+CHANGELOG = "1. Update ownCloud to 10.13.2.<br/>2. Use new shared folder handling.<br/>3. Package maintenance optimisation."
 HOMEPAGE = https://owncloud.org/
 
 LICENSE = AGPL
