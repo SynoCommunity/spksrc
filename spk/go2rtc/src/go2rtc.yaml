@@ -11,7 +11,8 @@ rtsp:
   listen: ":8554"
 
 srtp:
-  listen: ":18443"
+  # force use of ipv4
+  listen: "0.0.0.0:18443"
 
 webrtc:
   listen: ":8555"
