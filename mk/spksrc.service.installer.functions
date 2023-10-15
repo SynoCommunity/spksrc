@@ -62,7 +62,7 @@ initialize_variables ()
             install_log "SHARE_PATH is absolute path [${SHARE_PATH}]."
         fi
         if [ -z "${SHARE_NAME}" ]; then
-            SHARE_NAME=$(echo $(abspath ${SHARE_PATH}) | awk -F/ '{print $3}')
+            SHARE_NAME=$(echo $(realpath ${SHARE_PATH}) | awk -F/ '{print $3}')
         fi
     fi
 }
