@@ -8,15 +8,7 @@ DEPENDS = cross/owncloud
 override ARCH=
 
 REQUIRED_MIN_DSM = 6.0
-
-include ../../mk/spksrc.common.mk
-# only for DSM 7 we have dedicated dependencies (must match the configuration in conf/resource)
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
-else
-# on DSM 6 the default web server and PHP version are used
-SPK_DEPENDS = WebStation
-endif
 
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
