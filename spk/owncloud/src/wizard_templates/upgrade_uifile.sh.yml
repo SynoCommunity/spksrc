@@ -1,0 +1,8 @@
+OWNCLOUD_INCOMPATIBLE_UPGRADE_STEP_TITLE: "Incompatible upgrade"
+OWNCLOUD_INCOMPATIBLE_UPGRADE_DESCRIPTION: "<strong>NOTICE:</strong> Version ${OC_OLD_VER} of ownCloud cannot be updated to version ${OC_NEW_VER}. Please uninstall the previous version and remember to save your <code>${OCROOT}/data</code> files before doing so."
+
+OWNCLOUD_UPGRADE_LIMITATIONS_STEP_TITLE: "Upgrade limitations"
+OWNCLOUD_UPGRADE_LIMITATIONS_DESCRIPTION: "Please note the following limitations when upgrading the ownCloud package:"
+OWNCLOUD_UPGRADE_LIMITATION_1_TEXT: "Cron jobs cannot be managed during the upgrade process. We recommend that you disable them manually before upgrading."
+OWNCLOUD_UPGRADE_LIMITATION_2_TEXT: "The web server cannot be managed during the upgrade process. While the upgrade is in progress, the web server will be placed in maintenance mode. We recommend stopping Web Station before upgrading."
+OWNCLOUD_UPGRADE_LIMITATION_3_TEXT: "Compatibility of third-party apps cannot be automatically validated during the upgrade process. Please check app compatibility manually before upgrading as apps will be migrated."

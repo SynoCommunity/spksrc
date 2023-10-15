@@ -29,14 +29,14 @@ page_append ()
 
 PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 {
-	"step_title": "Configuration de l'administrateur d'ownCloud",
+	"step_title": "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}",
 	"invalid_next_disabled_v2": true,
 	"items": [{
 		"type": "textfield",
-		"desc": "Connexion de l'administrateur. Par défaut, 'admin'",
+		"desc": "{{{OWNCLOUD_ADMIN_USER_NAME_DESCRIPTION}}}",
 		"subitems": [{
 			"key": "wizard_owncloud_admin_username",
-			"desc": "Nom d'utilisateur",
+			"desc": "{{{OWNCLOUD_ADMIN_USER_NAME_LABEL}}}",
 			"defaultValue": "admin",
 			"validator": {
 				"allowBlank": false
@@ -44,10 +44,10 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 		}]
 	}, {
 		"type": "password",
-		"desc": "Mot de passe de l'administrateur. Par défaut, 'admin'",
+		"desc": "{{{OWNCLOUD_ADMIN_PASSWORD_DESCRIPTION}}}",
 		"subitems": [{
 			"key": "wizard_owncloud_admin_password",
-			"desc": "Mot de passe",
+			"desc": "{{{OWNCLOUD_ADMIN_PASSWORD_LABEL}}}",
 			"defaultValue": "admin",
 			"validator": {
 				"allowBlank": false
@@ -55,16 +55,16 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 		}]
 	}, {
 		"type": "textfield",
-		"desc": "répertoire de données ownCloud",
+		"desc": "{{{OWNCLOUD_DATA_DIRECTORY_DESCRIPTION}}}",
 		"subitems": [{
 			"key": "wizard_data_share",
-			"desc": "Partager le nom",
+			"desc": "{{{OWNCLOUD_DATA_DIRECTORY_LABEL}}}",
 			"defaultValue": "${SHAREDIR}",
 			"validator": {
 				"allowBlank": false,
 				"regex": {
 					"expr": "$(echo ${DIR_VALID} | quote_json)",
-					"errorText": "Les sous-répertoires ne sont pas pris en charge."
+					"errorText": "{{{OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
 				}
 			}
 		}, {
@@ -75,21 +75,21 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 		}]
 	}]
 }, {
-	"step_title": "Domaines de confiance ownCloud",
+	"step_title": "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}",
 	"items": [{
 		"type": "textfield",
-		"desc": "Pour accéder à votre serveur ownCloud, vous devez mettre en liste blanche toutes les URL dans vos paramètres, y compris toutes les URL supplémentaires que vous souhaitez utiliser en plus du nom d'hôte actuel.",
+		"desc": "{{{OWNCLOUD_TRUSTED_DOMAINS_DESCRIPTION}}}",
 		"subitems": [{
 			"key": "wizard_owncloud_trusted_domain_1",
-			"desc": "Domaine ou adresse IP",
+			"desc": "{{{OWNCLOUD_TRUSTED_DOMAIN_1_LABEL}}}",
 			"emptyText": "localhost"
 		}, {
 			"key": "wizard_owncloud_trusted_domain_2",
-			"desc": "Domaine ou adresse IP",
+			"desc": "{{{OWNCLOUD_TRUSTED_DOMAIN_2_LABEL}}}",
 			"emptyText": "server1.example.com"
 		}, {
 			"key": "wizard_owncloud_trusted_domain_3",
-			"desc": "Domaine ou adresse IP",
+			"desc": "{{{OWNCLOUD_TRUSTED_DOMAIN_3_LABEL}}}",
 			"emptyText": "192.168.1.50"
 		}]
 	}]

@@ -42,11 +42,11 @@ is_upgrade_possible ()
 
 PAGE_NO_UPDATE=$(/bin/cat<<EOF
 {
-	"step_title": "Incompatible upgrade",
+	"step_title": "{{{OWNCLOUD_INCOMPATIBLE_UPGRADE_STEP_TITLE}}}",
 	"invalid_next_disabled_v2": true,
 	"items": [{
 		"type": "textfield",
-		"desc": "<strong>NOTICE:</strong> Version ${OC_OLD_VER} of ownCloud cannot be updated to version ${OC_NEW_VER}. Please uninstall the previous version and remember to save your <code>${OCROOT}/data</code> files before doing so.",
+		"desc": "{{{OWNCLOUD_INCOMPATIBLE_UPGRADE_DESCRIPTION}}}",
 		"subitems": [{
 			"hidden": true,
 			"validator": {
@@ -62,15 +62,15 @@ TEXT_LIMITATIONS=$(/bin/cat<<EOF
 <table>
 	<tr>
 		<td valign="top">1.</td>
-		<td valign="top">Cron jobs cannot be managed during the upgrade process. We recommend that you disable them manually before upgrading.</td>
+		<td valign="top">{{{OWNCLOUD_UPGRADE_LIMITATION_1_TEXT}}}</td>
 	</tr>
 	<tr>
 		<td valign="top">2.</td>
-		<td valign="top">The web server cannot be managed during the upgrade process. While the upgrade is in progress, the web server will be placed in maintenance mode. We recommend stopping Web Station before upgrading.</td>
+		<td valign="top">{{{OWNCLOUD_UPGRADE_LIMITATION_2_TEXT}}}</td>
 	</tr>
 	<tr>
 		<td valign="top">3.</td>
-		<td valign="top">Compatibility of third-party apps cannot be automatically validated during the upgrade process. Please check app compatibility manually before upgrading as apps will be migrated.</td>
+		<td valign="top">{{{OWNCLOUD_UPGRADE_LIMITATION_3_TEXT}}}</td>
 	</tr>
 </table>
 EOF
@@ -78,9 +78,9 @@ EOF
 
 PAGE_LIMITATIONS=$(/bin/cat<<EOF
 {
-	"step_title": "Upgrade limitations",
+	"step_title": "{{{OWNCLOUD_UPGRADE_LIMITATIONS_STEP_TITLE}}}",
 	"items": [{
-		"desc": "Please note the following limitations when upgrading the ownCloud package:"
+		"desc": "{{{OWNCLOUD_UPGRADE_LIMITATIONS_DESCRIPTION}}}"
 	}, {
 		"desc": "$(echo $TEXT_LIMITATIONS | quote_json)"
 	}]

@@ -47,7 +47,7 @@ page_append ()
 CHECKBOX1_ID="wizard_export_database"
 CHECKBOX2_ID="wizard_export_configs"
 CHECKBOX3_ID="wizard_export_userdata"
-ERROR_TEXT="Le chemin doit commencer par /volume?/ avec ? le numéro de volume"
+ERROR_TEXT="{{{OWNCLOUD_PATH_VALIDATION_ERROR_TEXT}}}"
 # Calculate size of data directory
 DATADIR="$(exec_occ config:system:get datadirectory)"
 # data directory fail-safe
@@ -91,16 +91,16 @@ EOF
 
 PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 {
-	"step_title": "Sauvegarder le serveur ownCloud",
+	"step_title": "{{{OWNCLOUD_BACKUP_SERVER_STEP_TITLE}}}",
 	"invalid_next_disabled_v2": true,
 	"items": [{
-		"desc": "<strong>AVERTISSEMENT:</strong> La désinstallation du package ownCloud entraînera la suppression du serveur ownCloud, ainsi que de tous les comptes d'utilisateurs, données et configurations associés."
+		"desc": "{{{OWNCLOUD_BACKUP_SERVER_DESCRIPTION}}}"
 	}, {
 		"type": "textfield",
-		"desc": "Avant la désinstallation, si vous souhaitez conserver une sauvegarde de vos données, veuillez spécifier le répertoire vers lequel vous souhaitez exporter. Assurez-vous que l'utilisateur 'sc-owncloud' dispose des autorisations d'écriture dans ce répertoire. Pour ignorer l'exportation, laissez ce champ vide.",
+		"desc": "{{{OWNCLOUD_BACKUP_EXPORT_LOCATION_DESCRIPTION}}}",
 		"subitems": [{
 			"key": "wizard_export_path",
-			"desc": "Emplacement d'exportation",
+			"desc": "{{{OWNCLOUD_BACKUP_EXPORT_LOCATION_LABEL}}}",
 			"emptyText": "${SYNOPKG_PKGDEST_VOL}/backup",
 			"validator": {
 				"allowBlank": true,
@@ -116,20 +116,20 @@ PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 		}]
 	}, {
 		"type": "multiselect",
-		"desc": "Choisissez les éléments que vous souhaitez inclure dans la sauvegarde.",
+		"desc": "{{{OWNCLOUD_BACKUP_ITEMS_DESCRIPTION}}}",
 		"subitems": [{
 			"key": "${CHECKBOX1_ID}",
-			"desc": "Inclure la base de données",
+			"desc": "{{{OWNCLOUD_BACKUP_ITEM_DATABASE_LABEL}}}",
 			"defaultValue": false,
 			"disabled": true
 		}, {
 			"key": "${CHECKBOX2_ID}",
-			"desc": "Inclure les fichiers de configuration",
+			"desc": "{{{OWNCLOUD_BACKUP_ITEM_CONFIGS_LABEL}}}",
 			"defaultValue": false,
 			"disabled": true
 		}, {
 			"key": "${CHECKBOX3_ID}",
-			"desc": "Inclure les données utilisateur (${DATASIZE})",
+			"desc": "{{{OWNCLOUD_BACKUP_ITEM_USERDATA_LABEL}}}",
 			"defaultValue": false,
 			"disabled": true
 		}]
