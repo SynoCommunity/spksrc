@@ -47,7 +47,6 @@ initialize_variables ()
 
     # Extract share volume and share name from share path when provided, and not already defined
     if [ -n "${SHARE_PATH}" ]; then
-        install_log "Evaluate full path for SHARE_NAME [${SHARE_NAME}] and SHARE_PATH [${SHARE_PATH}]"
         # migrate SHARE_PATH that holds the share name only to full share path
         # this is required for installers without resource worker for file share (SRM 1, DSM 5, DSM 6 old packages)
         if [ "$(echo ${SHARE_PATH} | grep ^/)" != "${SHARE_PATH}" ]; then
@@ -58,12 +57,11 @@ initialize_variables ()
             else
                 install_log "SHARE_NAME is not an existing share [${SHARE_PATH}]."
             fi
-        else
-            install_log "SHARE_PATH is absolute path [${SHARE_PATH}]."
         fi
         if [ -z "${SHARE_NAME}" ]; then
-            SHARE_NAME=$(echo $(realpath ${SHARE_PATH}) | awk -F/ '{print $3}')
+            SHARE_NAME=$(basename ${SHARE_PATH})
         fi
+        install_log "Shared folder configured with SHARE_NAME [${SHARE_NAME}] and SHARE_PATH [${SHARE_PATH}]"
     fi
 }
 
