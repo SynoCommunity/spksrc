@@ -5,9 +5,6 @@ WEB_DIR="/var/services/web_packages"
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
     WEB_DIR="/var/services/web"
 fi
-if [ -z "${SYNOPKG_PKGDEST_VOL}" ]; then
-	SYNOPKG_PKGDEST_VOL="/volume1"
-fi
 if [ -z "${SYNOPKG_PKGTMP}" ]; then
     SYNOPKG_PKGTMP="${SYNOPKG_PKGDEST_VOL}/@tmp"
 fi
@@ -139,7 +136,7 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Parse data directory
-        DATA_DIR="${SYNOPKG_PKGDEST_VOL}/${wizard_data_share}/data"
+        DATA_DIR="${SHARE_PATH}/data"
         # Create data directory
         ${MKDIR} "${DATA_DIR}"
 
