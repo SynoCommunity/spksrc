@@ -202,12 +202,12 @@ service_postinst ()
                 /bin/tar -xzvf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
 
                 # Restore configuration files and directories
-                rsync -Aax --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${OCROOT}/" 2>&1
-                rsync -Aax --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/data" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${OCROOT}/" 2>&1
+                rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${OCROOT}/" 2>&1
+                rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/data" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${OCROOT}/" 2>&1
 
                 # Restore user data
                 echo "Restoring user data to ${DATA_DIR}"
-                rsync -Aax --update -I "${TEMPDIR}/data" "${DATA_DIR}/" 2>&1
+                rsync -aX --update -I "${TEMPDIR}/data" "${DATA_DIR}/" 2>&1
 
                 # Place server in maintenance mode
                 exec_occ maintenance:mode --on
@@ -267,12 +267,12 @@ service_preuninst ()
             # Backup Directories
             echo "Copying previous configuration from ${OCROOT}"
             ${MKDIR} "${TEMPDIR}/configs/root"
-            rsync -Aax "${OCROOT}/.user.ini" "${OCROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
-            rsync -Aax "${OCROOT}/config" "${OCROOT}/data" "${OCROOT}/apps" "${OCROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
+            rsync -aX "${OCROOT}/.user.ini" "${OCROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
+            rsync -aX "${OCROOT}/config" "${OCROOT}/data" "${OCROOT}/apps" "${OCROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
 
             # Backup user data
             echo "Copying previous user data from ${DATADIR}"
-            rsync -Aax "${DATADIR}" "${TEMPDIR}/" 2>&1
+            rsync -aX "${DATADIR}" "${TEMPDIR}/" 2>&1
 
             # Disable maintenance mode
             exec_occ maintenance:mode --off
