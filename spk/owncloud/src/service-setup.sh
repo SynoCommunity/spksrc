@@ -217,7 +217,7 @@ service_postinst ()
                 ${SQLITE} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" < "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
 
                 # Update the systems data-fingerprint after a backup is restored
-                exec_occ maintenance:data-fingerprint
+                exec_occ maintenance:data-fingerprint -n
 
                 # Disable maintenance mode
                 exec_occ maintenance:mode --off
@@ -253,7 +253,7 @@ service_preuninst ()
             fi
 
             # Prepare archive structure
-            OCC_VER=$(exec_occ -V | cut -d ' ' -f 3)
+            OCC_VER=$(exec_occ -V | cut -d ' ' -f 2)
             TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
             ${MKDIR} "${TEMPDIR}"
 
