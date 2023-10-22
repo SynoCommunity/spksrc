@@ -22,7 +22,31 @@ page_append ()
 	fi
 }
 
+RESTORE_BACKUP_FILE="wizard_owncloud_restore"
 BACKUP_FILE_PATH="wizard_backup_file"
+ERROR_TEXT="{{{OWNCLOUD_BACKUP_FILE_VALIDATION_ERROR_TEXT}}}"
+
+checkBackupFile()
+{
+	CHECK_BACKUP_FILE=$(/bin/cat<<EOF
+{
+	var backupFileCheck = arguments[0];
+	var step = arguments[2];
+	var fileRestore = step.getComponent("${RESTORE_BACKUP_FILE}");
+	if (fileRestore.checked) {
+		if (backupFileCheck === "") {
+			return "${ERROR_TEXT}";
+		} else {
+			return true;
+		}
+	} else {
+		return true;
+	}
+}
+EOF
+)
+	echo "$CHECK_BACKUP_FILE" | quote_json
+}
 
 getBackupFile()
 {
@@ -33,11 +57,10 @@ getBackupFile()
 	var filePath = step.getComponent("${BACKUP_FILE_PATH}");
 	if (backupFile) {
 		filePath.setDisabled(false);
-		return true;
 	} else {
 		filePath.setDisabled(true);
-		return true;
 	}
+	return true;
 }
 EOF
 )
@@ -45,23 +68,23 @@ EOF
 }
 
 jsFunction=$(/bin/cat<<EOF
-    function findStepByTitle(wizardDialog, title) {
-        for (var i = wizardDialog.customuiIds.length - 1 ; i >= 0 ; i--) {
-            var step = wizardDialog.getStep(wizardDialog.customuiIds[i]);
-            if (title === step.headline) {
-                return step;
-            }
-        }
-        return null;
-    }
-    function isRestoreChecked(wizardDialog) {
-        var restoreStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
-        if (!restoreStep) {
-            return false;
-        } else {
-            return restoreStep.items.items[1].checked;
-        }
-    }
+	function findStepByTitle(wizardDialog, title) {
+		for (var i = wizardDialog.customuiIds.length - 1 ; i >= 0 ; i--) {
+			var step = wizardDialog.getStep(wizardDialog.customuiIds[i]);
+			if (title === step.headline) {
+				return step;
+			}
+		}
+		return null;
+	}
+	function isRestoreChecked(wizardDialog) {
+		var restoreStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
+		if (!restoreStep) {
+			return false;
+		} else {
+			return restoreStep.getComponent("${RESTORE_BACKUP_FILE}").checked;
+		}
+	}
 EOF
 )
 
@@ -69,26 +92,50 @@ getActiveate()
 {
 	ACTIVAETE=$(/bin/cat<<EOF
 {
-    ${jsFunction}
-    var currentStep = arguments[0];
-    var wizardDialog = currentStep.owner;
-    var restoreStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
-    var adminStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}");
-    var domainStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}");
-    var checked = isRestoreChecked(wizardDialog);
-    adminStep.items.items[0].setVisible(!checked);
-    adminStep.items.items[1].setVisible(!checked);
-    domainStep.items.items[0].setVisible(!checked);
+	${jsFunction}
+	var currentStep = arguments[0];
+	var wizardDialog = currentStep.owner;
+	var restoreStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
+	var adminStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}");
+	var domainStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}");
+	var checked = isRestoreChecked(wizardDialog);
+	if (checked) {
+		wizardDialog.goBack(restoreStep.itemId);
+		wizardDialog.goNext("applyStep");
+	}
 }
 EOF
 )
-    echo "$ACTIVAETE" | quote_json
+	echo "$ACTIVAETE" | quote_json
+}
+
+getDeActiveate()
+{
+	DEACTIVAETE=$(/bin/cat<<EOF
+{
+	${jsFunction}
+	var currentStep = arguments[0];
+	var wizardDialog = currentStep.owner;
+	var restoreStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
+	var adminStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}");
+	var domainStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}");
+	var checked = isRestoreChecked(wizardDialog);
+	if (checked) {
+		currentStep.nextId = "applyStep";
+	} else {
+		currentStep.nextId = adminStep.itemId;
+	}
+}
+EOF
+)
+	echo "$DEACTIVAETE" | quote_json
 }
 
 PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 {
 	"step_title": "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}",
 	"invalid_next_disabled_v2": true,
+	"deactivate_v2": "$(getDeActiveate)",
 	"items": [{
 		"type": "singleselect",
 		"desc": "{{{OWNCLOUD_INSTALL_RESTORE_DESCRIPTION}}}",
@@ -97,7 +144,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"desc": "{{{OWNCLOUD_INSTALL_LABEL}}}",
 			"defaultValue": true
 		}, {
-			"key": "wizard_owncloud_restore",
+			"key": "${RESTORE_BACKUP_FILE}",
 			"desc": "{{{OWNCLOUD_RESTORE_LABEL}}}",
 			"defaultValue": false,
 			"validator": {
@@ -113,7 +160,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"disabled": true,
 			"emptyText": "${SYNOPKG_PKGDEST_VOL}/${SYNOPKG_PKGNAME}/backup",
 			"validator": {
-				"allowBlank": true
+				"fn": "$(checkBackupFile)"
 			}
 		}]
 	}, {
@@ -135,7 +182,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 }, {
 	"step_title": "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}",
 	"invalid_next_disabled_v2": true,
-    "activeate": "$(getActiveate)",
+	"activate_v2": "$(getActiveate)",
 	"items": [{
 		"type": "textfield",
 		"desc": "{{{OWNCLOUD_ADMIN_USER_NAME_DESCRIPTION}}}",
@@ -161,7 +208,6 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 	}]
 }, {
 	"step_title": "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}",
-    "activeate": "$(getActiveate)",
 	"items": [{
 		"type": "textfield",
 		"desc": "{{{OWNCLOUD_TRUSTED_DOMAINS_DESCRIPTION}}}",
