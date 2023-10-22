@@ -1,14 +1,5 @@
 #!/bin/bash
 
-WEB_DIR="/var/services/web_packages"
-# for backwards compatability
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-	WEB_DIR="/var/services/web"
-	if [ -z ${SYNOPKG_PKGNAME} ]; then
-		SYNOPKG_PKGNAME="owncloud"
-	fi
-fi
-OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 OC_NEW_VER=$(echo ${SYNOPKG_PKGVER} | cut -d'-' -f1)
 OC_OLD_VER=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d'-' -f1)
 

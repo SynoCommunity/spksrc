@@ -1,9 +1,7 @@
 #!/bin/bash
 
-WEB_DIR="/var/services/web_packages"
 # for backwards compatability
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-	WEB_DIR="/var/services/web"
 	if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
 		SYNOPKG_PKGDEST_VOL="/volume1"
 	fi
@@ -11,23 +9,6 @@ if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
 		SYNOPKG_PKGNAME="owncloud"
 	fi
 fi
-if [ -z ${EFF_USER} ]; then
-	EFF_USER="sc-owncloud"
-fi
-
-OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
-
-exec_occ() {
-	PHP="/usr/local/bin/php74"
-	OCC="${OCROOT}/occ"
-	COMMAND="${PHP} ${OCC} $*"
-	if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-		/bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
-	else
-		$COMMAND
-	fi
-	return $?
-}
 
 quote_json () {
 	sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
@@ -44,43 +25,19 @@ page_append ()
 	fi
 }
 
-CHECKBOX1_ID="wizard_export_database"
-CHECKBOX2_ID="wizard_export_configs"
-CHECKBOX3_ID="wizard_export_userdata"
 ERROR_TEXT="{{{OWNCLOUD_PATH_VALIDATION_ERROR_TEXT}}}"
-# Calculate size of data directory
-DATADIR="$(exec_occ config:system:get datadirectory)"
-# data directory fail-safe
-if [ ! -d "$DATADIR" ]; then
-	echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
-	DATADIR="${OCROOT}/data"
-fi
-DATASIZE="$(/bin/du -sh ${DATADIR} | /bin/cut -f1)"
 
 getValidPath()
 {
 	VALID_PATH=$(/bin/cat<<EOF
 {
 	var exportPath = arguments[0];
-	var step = arguments[2];
-	var checkBox1 = step.getComponent("${CHECKBOX1_ID}");
-	var checkBox2 = step.getComponent("${CHECKBOX2_ID}");
-	var checkBox3 = step.getComponent("${CHECKBOX3_ID}");
 	const pattern = /^\/volume[0-9]+\//;
 	if (exportPath === "") {
-		checkBox1.setDisabled(true);
-		checkBox2.setDisabled(true);
-		checkBox3.setDisabled(true);
 		return true;
 	} else if (pattern.test(exportPath)) {
-		checkBox1.setDisabled(false);
-		checkBox2.setDisabled(false);
-		checkBox3.setDisabled(false);
 		return true;
 	} else {
-		checkBox1.setDisabled(true);
-		checkBox2.setDisabled(true);
-		checkBox3.setDisabled(true);
 		return "${ERROR_TEXT}";
 	}
 }
@@ -101,7 +58,7 @@ PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 		"subitems": [{
 			"key": "wizard_export_path",
 			"desc": "{{{OWNCLOUD_BACKUP_EXPORT_LOCATION_LABEL}}}",
-			"emptyText": "${SYNOPKG_PKGDEST_VOL}/backup",
+			"emptyText": "${SYNOPKG_PKGDEST_VOL}/${SYNOPKG_PKGNAME}/backup",
 			"validator": {
 				"allowBlank": true,
 				"fn": "$(getValidPath)"
@@ -113,25 +70,6 @@ PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 			"key": "wizard_delete_data",
 			"hidden": true,
 			"defaultValue": true
-		}]
-	}, {
-		"type": "multiselect",
-		"desc": "{{{OWNCLOUD_BACKUP_ITEMS_DESCRIPTION}}}",
-		"subitems": [{
-			"key": "${CHECKBOX1_ID}",
-			"desc": "{{{OWNCLOUD_BACKUP_ITEM_DATABASE_LABEL}}}",
-			"defaultValue": false,
-			"disabled": true
-		}, {
-			"key": "${CHECKBOX2_ID}",
-			"desc": "{{{OWNCLOUD_BACKUP_ITEM_CONFIGS_LABEL}}}",
-			"defaultValue": false,
-			"disabled": true
-		}, {
-			"key": "${CHECKBOX3_ID}",
-			"desc": "{{{OWNCLOUD_BACKUP_ITEM_USERDATA_LABEL}}}",
-			"defaultValue": false,
-			"disabled": true
 		}]
 	}]
 }
