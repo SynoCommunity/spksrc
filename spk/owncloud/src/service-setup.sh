@@ -15,7 +15,6 @@ SQLITE="/bin/sqlite3"
 JQ="/bin/jq"
 SED="/bin/sed"
 SYNOSVC="/usr/syno/sbin/synoservice"
-VER_NUM=$(echo ${SYNOPKG_PKGVER} | cut -d'-' -f1)
 
 if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
     GROUP="http"
@@ -254,7 +253,7 @@ service_preuninst ()
             fi
 
             # Prepare archive structure
-            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v$(VER_NUM)_$(date +"%Y%m%d")"
+            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v$(SPK_VERS)_$(date +"%Y%m%d")"
             ${MKDIR} "${TEMPDIR}"
 
             # Place server in maintenance mode
