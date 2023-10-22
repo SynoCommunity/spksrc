@@ -214,7 +214,7 @@ service_postinst ()
 
                 # Restore the Database
                 [ -f "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" ] && ${RM} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db"
-                ${SQLITE} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" < "${TEMPDIR}/database/${SYNOPKG_PKGNAME}.db" 2>&1
+                ${SQLITE} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" < "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
 
                 # Update the systems data-fingerprint after a backup is restored
                 exec_occ maintenance:data-fingerprint
@@ -253,7 +253,8 @@ service_preuninst ()
             fi
 
             # Prepare archive structure
-            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v$(SPK_VERS)_$(date +"%Y%m%d")"
+            OCC_VER=$(exec_occ -V | cut -d ' ' -f 3)
+            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
             ${MKDIR} "${TEMPDIR}"
 
             # Place server in maintenance mode
@@ -262,7 +263,7 @@ service_preuninst ()
             # Backup the Database
             echo "Copying previous database from ${DATADIR}"
             ${MKDIR} "${TEMPDIR}/database"
-            ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" ".backup '${TEMPDIR}/database/${SYNOPKG_PKGNAME}.db'" 2>&1
+            ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
 
             # Backup Directories
             echo "Copying previous configuration from ${OCROOT}"
@@ -358,7 +359,7 @@ validate_preupgrade ()
     # ownCloud upgrades only possible from 8.2.11, 9.0.9, 9.1.X, or 10.X.Y
     is_upgrade_possible="no"
     valid_versions=("8.2.11" "9.0.9" "9.1.*" "10.*.*")
-    previous=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d'-' -f1)
+    previous=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d '-' -f 1)
     for version in "${valid_versions[@]}"; do
         if echo "$previous" | grep -q "$version"; then
             is_upgrade_possible="yes"
@@ -402,7 +403,7 @@ service_save ()
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
     echo "Backup existing server database to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup"
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
-    ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" ".backup '${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak'" 2>&1
+    ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
 }
 
 service_restore ()

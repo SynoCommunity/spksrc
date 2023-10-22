@@ -78,11 +78,11 @@ jsFunction=$(/bin/cat<<EOF
 		return null;
 	}
 	function isRestoreChecked(wizardDialog) {
-		var restoreStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
-		if (!restoreStep) {
+		var typeStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
+		if (!typeStep) {
 			return false;
 		} else {
-			return restoreStep.getComponent("${RESTORE_BACKUP_FILE}").checked;
+			return typeStep.getComponent("${RESTORE_BACKUP_FILE}").checked;
 		}
 	}
 EOF
@@ -95,13 +95,21 @@ getActiveate()
 	${jsFunction}
 	var currentStep = arguments[0];
 	var wizardDialog = currentStep.owner;
-	var restoreStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
+	var typeStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
 	var adminStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}");
 	var domainStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}");
+	var confirmStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}");
 	var checked = isRestoreChecked(wizardDialog);
-	if (checked) {
-		wizardDialog.goBack(restoreStep.itemId);
-		wizardDialog.goNext("applyStep");
+	if (currentStep.headline === "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}") {
+		if (checked) {
+			wizardDialog.goBack(typeStep.itemId);
+			wizardDialog.goNext(confirmStep.itemId);
+		}
+	} else if (currentStep.headline === "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}") {
+		if (!checked) {
+			wizardDialog.goBack(domainStep.itemId);
+			wizardDialog.goNext("applyStep");
+		}
 	}
 }
 EOF
@@ -116,14 +124,18 @@ getDeActiveate()
 	${jsFunction}
 	var currentStep = arguments[0];
 	var wizardDialog = currentStep.owner;
-	var restoreStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
+	var typeStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
 	var adminStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}");
 	var domainStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}");
+	var confirmStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}");
 	var checked = isRestoreChecked(wizardDialog);
-	if (checked) {
-		currentStep.nextId = "applyStep";
-	} else {
-		currentStep.nextId = adminStep.itemId;
+	if (currentStep.headline === "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}") {
+		domainStep.nextId = "applyStep";
+		if (checked) {
+			currentStep.nextId = confirmStep.itemId;
+		} else {
+			currentStep.nextId = adminStep.itemId;
+		}
 	}
 }
 EOF
@@ -224,6 +236,13 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"desc": "{{{OWNCLOUD_TRUSTED_DOMAIN_3_LABEL}}}",
 			"emptyText": "192.168.1.50"
 		}]
+	}]
+}, {
+	"step_title": "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}",
+	"activate_v2": "$(getActiveate)",
+	"items": [{
+		"type": "textfield",
+		"desc": "{{{OWNCLOUD_CONFIRM_RESTORE_DESCRIPTION}}}"
 	}]
 }
 EOF

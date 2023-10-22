@@ -20,3 +20,6 @@ OWNCLOUD_TRUSTED_DOMAINS_DESCRIPTION: "Pour accéder à votre serveur ownCloud, 
 OWNCLOUD_TRUSTED_DOMAIN_1_LABEL: "Domaine ou adresse IP"
 OWNCLOUD_TRUSTED_DOMAIN_2_LABEL: "Domaine ou adresse IP"
 OWNCLOUD_TRUSTED_DOMAIN_3_LABEL: "Domaine ou adresse IP"
+
+OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE: "Confirmer la restauration ownCloud"
+OWNCLOUD_CONFIRM_RESTORE_DESCRIPTION: "L'installation va maintenant se poursuivre et votre configuration précédente sera restaurée à partir de la sauvegarde. Veuillez vous assurer que le chemin du fichier est correct ; sinon, une nouvelle installation sera effectuée."
