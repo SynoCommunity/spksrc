@@ -217,7 +217,7 @@ service_postinst ()
 
                 # Restore user data
                 echo "Restoring user data to ${DATA_DIR}"
-                rsync -aX --update -I "${TEMPDIR}/data" "${DATA_DIR}/" 2>&1
+                rsync -aX --update -I "${TEMPDIR}/data" "${SHARE_PATH}/" 2>&1
 
                 # Place server in maintenance mode
                 exec_occ maintenance:mode --on
