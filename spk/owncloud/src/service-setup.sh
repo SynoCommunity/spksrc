@@ -11,7 +11,6 @@ fi
 
 # Others
 OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
-SQLITE="/bin/sqlite3"
 JQ="/bin/jq"
 SED="/bin/sed"
 SYNOSVC="/usr/syno/sbin/synoservice"
@@ -51,6 +50,17 @@ exec_occ() {
     PHP="/usr/local/bin/php74"
     OCC="${OCROOT}/occ"
     COMMAND="${PHP} ${OCC} $*"
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
+    else
+        $COMMAND
+    fi
+    return $?
+}
+
+exec_sql() {
+    SQLITE="/bin/sqlite3"
+    COMMAND="${SQLITE} $*"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
     else
@@ -214,7 +224,7 @@ service_postinst ()
 
                 # Restore the Database
                 [ -f "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" ] && ${RM} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db"
-                ${SQLITE} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" < "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
+                exec_sql "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" < "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
 
                 # Update the systems data-fingerprint after a backup is restored
                 exec_occ maintenance:data-fingerprint -n
@@ -263,7 +273,7 @@ service_preuninst ()
             # Backup the Database
             echo "Copying previous database from ${DATADIR}"
             ${MKDIR} "${TEMPDIR}/database"
-            ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
+            exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
 
             # Backup Directories
             echo "Copying previous configuration from ${OCROOT}"
@@ -403,7 +413,7 @@ service_save ()
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
     echo "Backup existing server database to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup"
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
-    ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
+    exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
 }
 
 service_restore ()
