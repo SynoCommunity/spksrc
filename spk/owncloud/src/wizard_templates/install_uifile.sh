@@ -107,8 +107,8 @@ getActiveate()
 		}
 	} else if (currentStep.headline === "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}") {
 		if (!checked) {
-			wizardDialog.goBack(domainStep.itemId);
-			wizardDialog.goNext("applyStep");
+			wizardDialog.goBack(typeStep.itemId);
+			wizardDialog.goNext(adminStep.itemId);
 		}
 	}
 }
