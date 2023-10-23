@@ -241,7 +241,6 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 	"step_title": "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}",
 	"activate_v2": "$(getActiveate)",
 	"items": [{
-		"type": "textfield",
 		"desc": "{{{OWNCLOUD_CONFIRM_RESTORE_DESCRIPTION}}}"
 	}]
 }
