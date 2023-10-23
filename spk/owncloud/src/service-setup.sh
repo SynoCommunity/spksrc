@@ -209,7 +209,7 @@ service_postinst ()
                 # Extract archive to temp folder
                 TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
                 ${MKDIR} "${TEMPDIR}"
-                /bin/tar -xzvf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
+                /bin/tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
 
                 # Restore configuration files and directories
                 rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${OCROOT}/" 2>&1
@@ -291,7 +291,7 @@ service_preuninst ()
             # Create backup archive
             archive_name="$(basename "$TEMPDIR").tar.gz"
             echo "Creating compressed archive of ownCloud data in file $archive_name"
-            /bin/tar -C "$TEMPDIR" -czvf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
+            /bin/tar -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
 
             # Move archive to export directory
             ${MKDIR} "${wizard_export_path}"
