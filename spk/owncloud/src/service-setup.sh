@@ -200,7 +200,7 @@ service_postinst ()
         fi
 
         # Check backup file path
-        if [ "${wizard_owncloud_restore}" = true ] && [ -n "${wizard_backup_file}" ] && [ -f "${wizard_backup_file}" ]; then
+        if [ "${wizard_owncloud_restore}" = "true" ] && [ -n "${wizard_backup_file}" ] && [ -f "${wizard_backup_file}" ]; then
             filename=$(basename "${wizard_backup_file}")
             expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
             # Check backup file prefix
