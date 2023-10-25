@@ -44,6 +44,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: owncloud_extra_install
 owncloud_extra_install:
-	install -m 755 -d $(STAGING_DIR)/bin -d $(STAGING_DIR)/web
+	install -m 755 -d $(STAGING_DIR)/web
 	install -m 644 src/web/owncloud.conf $(STAGING_DIR)/web/owncloud.conf
 	install -m 644 src/web/owncloud.json $(STAGING_DIR)/web/owncloud.json
