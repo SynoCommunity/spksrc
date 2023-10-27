@@ -36,12 +36,9 @@ checkBackupFile()
 	if (fileRestore.checked) {
 		if (backupFileCheck === "") {
 			return "${ERROR_TEXT}";
-		} else {
-			return true;
 		}
-	} else {
-		return true;
 	}
+	return true;
 }
 EOF
 )
@@ -97,7 +94,6 @@ getActiveate()
 	var wizardDialog = currentStep.owner;
 	var typeStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
 	var adminStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}");
-	var domainStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}");
 	var confirmStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}");
 	var checked = isRestoreChecked(wizardDialog);
 	if (currentStep.headline === "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}") {
@@ -124,7 +120,6 @@ getDeActiveate()
 	${jsFunction}
 	var currentStep = arguments[0];
 	var wizardDialog = currentStep.owner;
-	var typeStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
 	var adminStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}");
 	var domainStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}");
 	var confirmStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}");
