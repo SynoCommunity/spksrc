@@ -1,5 +1,5 @@
 PKG_NAME = rclone
-PKG_VERS = 1.63.1
+PKG_VERS = 1.64.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rclone/rclone/archive/refs/tags
