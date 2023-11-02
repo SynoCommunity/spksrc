@@ -438,6 +438,9 @@ ifneq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 	@mkdir -p $(DSM_WIZARDS_DIR)
 	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@if [ -f "$(DSM_WIZARDS_DIR)/uninstall_uifile.sh" ] && [ -f "$(DSM_WIZARDS_DIR)/uninstall_uifile" ]; then \
+		rm "$(DSM_WIZARDS_DIR)/uninstall_uifile"; \
+	fi
 	@if [ -d "$(WIZARDS_DIR)$(TCVERSION)" ]; then \
 	    $(MSG) "Create DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"; \
 		find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\

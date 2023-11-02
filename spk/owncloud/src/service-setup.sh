@@ -11,9 +11,9 @@ fi
 
 # Others
 OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
-SQLITE="/bin/sqlite3"
 JQ="/bin/jq"
 SED="/bin/sed"
+TAR="/bin/tar"
 SYNOSVC="/usr/syno/sbin/synoservice"
 
 if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
@@ -59,13 +59,59 @@ exec_occ() {
     return $?
 }
 
-service_prestart ()
+exec_sql() {
+    SQLITE="/bin/sqlite3"
+    COMMAND="${SQLITE} $*"
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
+    else
+        $COMMAND
+    fi
+    return $?
+}
+
+setup_owncloud_instance()
 {
-    # Replace generic service startup, fork process in background
-    echo "Starting owncloud-daemon at ${SYNOPKG_PKGDEST}/bin" >> ${LOG_FILE}
-    COMMAND="${SYNOPKG_PKGDEST}/bin/owncloud-daemon"
-    ${COMMAND} >> ${LOG_FILE} 2>&1 &
-    echo "$!" > "${PID_FILE}"
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        # Setup configuration file
+        exec_occ maintenance:install \
+        --database "sqlite" \
+        --database-name "${SYNOPKG_PKGNAME}" \
+        --data-dir "${DATA_DIR}" \
+        --admin-user "${wizard_owncloud_admin_username}" \
+        --admin-pass "${wizard_owncloud_admin_password}" 2>&1
+
+        # Get the trusted domains
+        DOMAINS="$(exec_occ config:system:get trusted_domains)"
+
+        # Fix trusted domains array
+        line_number=0
+        echo "${DOMAINS}" | while read -r line; do
+            if [ "$(echo "$line" | grep -cE ':5000|:5001')" -gt 0 ]; then
+                # Remove ":5000" or ":5001" from the line and update the trusted_domains array
+                new_line=$(echo "$line" | ${SED} -E 's/(:5000|:5001)//')
+                exec_occ config:system:set trusted_domains $line_number --value="$new_line"
+            fi
+            line_number=$((line_number+1))
+        done
+        # Add user specified trusted domains
+        line_number=$(( $(echo -ne "$DOMAINS" | wc -l) + 1 ))
+        for var in wizard_owncloud_trusted_domain_1 wizard_owncloud_trusted_domain_2 wizard_owncloud_trusted_domain_3; do
+            val="${!var}"
+            if [ -n "$val" ]; then
+                exec_occ config:system:set trusted_domains $line_number --value="$val"
+                line_number=$((line_number+1))
+            fi
+        done
+
+        # Add HTTP to HTTPS redirect to Apache configuration file
+        APACHE_CONF="${OCROOT}/.htaccess"
+        if [ -f "${APACHE_CONF}" ]; then
+            echo "RewriteEngine On" >> ${APACHE_CONF}
+            echo "RewriteCond %{HTTPS} off" >> ${APACHE_CONF}
+            echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]" >> ${APACHE_CONF}
+        fi
+    fi
 }
 
 service_postinst ()
@@ -145,7 +191,7 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Parse data directory
-        DATA_DIR="/volume1/${wizard_data_share}/data"
+        DATA_DIR="${SHARE_PATH}/data"
         # Create data directory
         ${MKDIR} "${DATA_DIR}"
 
@@ -154,43 +200,47 @@ service_postinst ()
             set_owncloud_permissions ${OCROOT} ${DATA_DIR}
         fi
 
-        # Setup configuration file
-        exec_occ maintenance:install \
-        --database "sqlite" \
-        --database-name "${SYNOPKG_PKGNAME}" \
-        --data-dir "${DATA_DIR}" \
-        --admin-user "${wizard_owncloud_admin_username}" \
-        --admin-pass "${wizard_owncloud_admin_password}" 2>&1
+        # Check backup file path
+        if [ "${wizard_owncloud_restore}" = "true" ] && [ -n "${wizard_backup_file}" ] && [ -f "${wizard_backup_file}" ]; then
+            filename=$(basename "${wizard_backup_file}")
+            expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
+            # Check backup file prefix
+            if [[ $filename == ${expected_prefix}* ]]; then
+                echo "The backup filename starts with the expected prefix, performing restore."
+                # Extract archive to temp folder
+                TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
+                ${MKDIR} "${TEMPDIR}"
+                ${TAR} -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
 
-        # Get the trusted domains
-        DOMAINS="$(exec_occ config:system:get trusted_domains)"
+                # Restore configuration files and directories
+                rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${OCROOT}/" 2>&1
+                rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/data" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${OCROOT}/" 2>&1
 
-        # Fix trusted domains array
-        line_number=0
-        echo "${DOMAINS}" | while read -r line; do
-            if [ "$(echo "$line" | grep -cE ':5000|:5001')" -gt 0 ]; then
-                # Remove ":5000" or ":5001" from the line and update the trusted_domains array
-                new_line=$(echo "$line" | ${SED} -E 's/(:5000|:5001)//')
-                exec_occ config:system:set trusted_domains $line_number --value="$new_line"
+                # Restore user data
+                echo "Restoring user data to ${DATA_DIR}"
+                rsync -aX --update -I "${TEMPDIR}/data" "${SHARE_PATH}/" 2>&1
+
+                # Place server in maintenance mode
+                exec_occ maintenance:mode --on
+
+                # Restore the Database
+                [ -f "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" ] && ${RM} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db"
+                exec_sql "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" < "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
+
+                # Update the systems data-fingerprint after a backup is restored
+                exec_occ maintenance:data-fingerprint -n
+
+                # Disable maintenance mode
+                exec_occ maintenance:mode --off
+
+                # Clean-up temporary files
+                ${RM} "${TEMPDIR}"
+            else
+                echo "The backup filename does not start with the expected prefix, performing new install."
+                setup_owncloud_instance
             fi
-            line_number=$((line_number+1))
-        done
-        # Add user specified trusted domains
-        line_number=$(( $(echo -ne "$DOMAINS" | wc -l) + 1 ))
-        for var in wizard_owncloud_trusted_domain_1 wizard_owncloud_trusted_domain_2 wizard_owncloud_trusted_domain_3; do
-            val="${!var}"
-            if [ -n "$val" ]; then
-                exec_occ config:system:set trusted_domains $line_number --value="$val"
-                line_number=$((line_number+1))
-            fi
-        done
-
-        # Add HTTP to HTTPS redirect to Apache configuration file
-        APACHE_CONF="${OCROOT}/.htaccess"
-        if [ -f "${APACHE_CONF}" ]; then
-            echo "RewriteEngine On" >> ${APACHE_CONF}
-            echo "RewriteCond %{HTTPS} off" >> ${APACHE_CONF}
-            echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]" >> ${APACHE_CONF}
+        else
+            setup_owncloud_instance
         fi
 
         # Fix permissions
@@ -214,52 +264,38 @@ service_preuninst ()
             fi
 
             # Prepare archive structure
-            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}-backup_$(date +"%Y%m%d")"
+            OCC_VER=$(exec_occ -V | cut -d ' ' -f 2)
+            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
             ${MKDIR} "${TEMPDIR}"
 
-            # Check database export
-            if [ "${wizard_export_database}" = "true" ]; then
-                echo "Copying previous database from ${DATADIR}"
-                ${MKDIR} "${TEMPDIR}/database"
-                ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" ".backup '${TEMPDIR}/database/${SYNOPKG_PKGNAME}.db'" 2>&1
-            fi
+            # Place server in maintenance mode
+            exec_occ maintenance:mode --on
 
-            # Check configuration export
-            if [ "${wizard_export_configs}" = "true" ]; then
-                echo "Copying previous configuration from ${OCROOT}"
-                ${MKDIR} "${TEMPDIR}/configs"
-                ${CP} "${OCROOT}/.user.ini" "${TEMPDIR}/configs/"
-                ${CP} "${OCROOT}/.htaccess" "${TEMPDIR}/configs/"
-                ${MKDIR} "${TEMPDIR}/configs/config"
-                source="${OCROOT}/config"
-                patterns=(
-                "*config.php"
-                "*.json"
-                )
-                target="${TEMPDIR}/configs/config"
-                # Process each pattern of files in the source directory
-                for pattern in "${patterns[@]}"; do
-                    files=$(find "$source" -type f -name "$pattern")
-                    if [ -n "$files" ]; then
-                        for file in "${files[@]}"; do
-                            ${CP} "$file" "$target/"
-                        done
-                    fi
-                done
-            fi
+            # Backup the Database
+            echo "Copying previous database from ${DATADIR}"
+            ${MKDIR} "${TEMPDIR}/database"
+            exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
 
-            # Check user data export
-            if [ "${wizard_export_userdata}" = "true" ]; then
-                echo "Copying previous user data from ${DATADIR}"
-                ${CP} "${DATADIR}" "${TEMPDIR}/"
-            fi
+            # Backup Directories
+            echo "Copying previous configuration from ${OCROOT}"
+            ${MKDIR} "${TEMPDIR}/configs/root"
+            rsync -aX "${OCROOT}/.user.ini" "${OCROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
+            rsync -aX "${OCROOT}/config" "${OCROOT}/data" "${OCROOT}/apps" "${OCROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
+
+            # Backup user data
+            echo "Copying previous user data from ${DATADIR}"
+            rsync -aX "${DATADIR}" "${TEMPDIR}/" 2>&1
+
+            # Disable maintenance mode
+            exec_occ maintenance:mode --off
 
             # Create backup archive
             archive_name="$(basename "$TEMPDIR").tar.gz"
             echo "Creating compressed archive of ownCloud data in file $archive_name"
-            /bin/tar -czvf "${SYNOPKG_PKGTMP}/$archive_name" "$TEMPDIR" 2>&1
+            ${TAR} -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
 
             # Move archive to export directory
+            ${MKDIR} "${wizard_export_path}"
             if ${RSYNC} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/"; then
                 echo "Backup file copied successfully to ${wizard_export_path}."
             else
@@ -334,7 +370,7 @@ validate_preupgrade ()
     # ownCloud upgrades only possible from 8.2.11, 9.0.9, 9.1.X, or 10.X.Y
     is_upgrade_possible="no"
     valid_versions=("8.2.11" "9.0.9" "9.1.*" "10.*.*")
-    previous=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d'-' -f1)
+    previous=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d '-' -f 1)
     for version in "${valid_versions[@]}"; do
         if echo "$previous" | grep -q "$version"; then
             is_upgrade_possible="yes"
@@ -378,7 +414,7 @@ service_save ()
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
     echo "Backup existing server database to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup"
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
-    ${SQLITE} "${DATADIR}/${SYNOPKG_PKGNAME}.db" ".backup '${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak'" 2>&1
+    exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
 }
 
 service_restore ()
@@ -387,9 +423,8 @@ service_restore ()
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory ]; then
         DATAPATH="$(cat ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory)"
         # Data directory inside owncloud directory and needs to be restored
-        [ -d ${OCROOT}/${DATAPATH} ] && ${RM} ${OCROOT}/${DATAPATH}
         echo "Restore previous data directory from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}"
-        rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${OCROOT}/ 2>&1
+        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${OCROOT}/ 2>&1
         ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory
     fi
 
@@ -406,19 +441,15 @@ service_restore ()
         files=$(find "$source" -type f -name "$pattern")
         if [ -n "$files" ]; then
             for file in "${files[@]}"; do
-                file_name=$(basename "$file")
-                [ -f $target/$file_name ] && ${RM} $target/$file_name
-                rsync -aX "$file" "$target/" 2>&1
+                rsync -aX --update -I "$file" "$target/" 2>&1
             done
         fi
     done
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ]; then
-        [ -f ${OCROOT}/.user.ini ] && ${RM} ${OCROOT}/.user.ini
-        rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${OCROOT}/ 2>&1
+        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${OCROOT}/ 2>&1
     fi
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ]; then
-        [ -f ${OCROOT}/.htaccess ] && ${RM} ${OCROOT}/.htaccess
-        rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${OCROOT}/ 2>&1
+        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${OCROOT}/ 2>&1
     fi
 
     echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
