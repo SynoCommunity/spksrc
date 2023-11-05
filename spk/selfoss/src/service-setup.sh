@@ -12,11 +12,11 @@ fi
 # Others
 SELFOSS_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 JQ="/bin/jq"
-SED="/bin/sed"
 SYNOSVC="/usr/syno/sbin/synoservice"
 
 if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-    GROUP="http"
+    WEB_USER="http"
+    WEB_GROUP="http"
 fi
 
 set_selfoss_permissions ()
@@ -24,14 +24,14 @@ set_selfoss_permissions ()
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         DIRAPP=$1
         echo "Setting the correct ownership and permissions of the files and folders in ${DIRAPP}"
-        # Set the ownership for all files and folders to sc-selfoss:http
-        find -L ${DIRAPP} -type d -print0 | xargs -0 chown ${EFF_USER}:${GROUP} 2>/dev/null
-        find -L ${DIRAPP} -type f -print0 | xargs -0 chown ${EFF_USER}:${GROUP} 2>/dev/null
+        # Set the ownership for all files and folders to http:http
+        find -L ${DIRAPP} -type d -print0 | xargs -0 chown ${WEB_USER}:${WEB_GROUP} 2>/dev/null
+        find -L ${DIRAPP} -type f -print0 | xargs -0 chown ${WEB_USER}:${WEB_GROUP} 2>/dev/null
         # Use chmod on files and directories to set permissions to 0750
         find -L ${DIRAPP} -type f -print0 | xargs -0 chmod 750 2>/dev/null
         find -L ${DIRAPP} -type d -print0 | xargs -0 chmod 750 2>/dev/null
     else
-        echo "Notice: set_selfoss_permissions() is no longer required on DSM7."
+        echo "Notice: set_selfoss_permissions() is no longer required on DSM 7."
     fi
 }
 
@@ -50,8 +50,6 @@ service_postinst ()
         WS_CFG_FILE="WebStation.json"
         PHP_CFG_FILE="PHPSettings.json"
         PHP_PROF_NAME="Default PHP 7.4 Profile"
-        WS_TMPL_PATH="/var/packages/WebStation/target/misc"
-        WS_TMPL_FILE="php74_fpm.mustache"
         WS_BACKEND="$(${JQ} -r '.default.backend' ${WS_CFG_PATH}/${WS_CFG_FILE})"
         WS_PHP="$(${JQ} -r '.default.php' ${WS_CFG_PATH}/${WS_CFG_FILE})"
         CFG_UPDATE="no"
@@ -82,17 +80,6 @@ service_postinst ()
             ${MV} ${WS_CFG_PATH}/${PHP_CFG_FILE} ${WS_CFG_PATH}/${PHP_CFG_FILE}.bak
             rsync -aX ${TEMPDIR}/${PHP_CFG_FILE} ${WS_CFG_PATH}/ 2>&1
             ${RM} ${TEMPDIR}/${PHP_CFG_FILE}
-            CFG_UPDATE="yes"
-        fi
-        # Check for updated PHP template
-        if grep -q -E '^(user|listen\.owner) = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
-            echo "Update PHP template for Selfoss"
-            rsync -aX ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${TEMPDIR}/ 2>&1
-            SUBST_TEXT="{{#fpm_settings.user_selfoss}}sc-selfoss{{/fpm_settings.user_selfoss}}{{^fpm_settings.user_selfoss}}http{{/fpm_settings.user_selfoss}}"
-            ${SED} -i "s|^user = http$|user = ${SUBST_TEXT}|g; s|^listen.owner = http$|listen.owner = ${SUBST_TEXT}|g" "${TEMPDIR}/${WS_TMPL_FILE}"
-            ${MV} ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/${WS_TMPL_FILE}.bak
-            rsync -aX ${TEMPDIR}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/ 2>&1
-            ${RM} ${TEMPDIR}/${WS_TMPL_FILE}
             CFG_UPDATE="yes"
         fi
         # Check for Selfoss Apache config
@@ -129,8 +116,6 @@ service_postuninst ()
         ${MKDIR} ${TEMPDIR}
         WS_CFG_PATH="/usr/syno/etc/packages/WebStation"
         PHP_CFG_FILE="PHPSettings.json"
-        WS_TMPL_PATH="/var/packages/WebStation/target/misc"
-        WS_TMPL_FILE="php74_fpm.mustache"
         CFG_UPDATE="no"
         # Check for Selfoss PHP profile
         if ${JQ} -e '.["com-synocommunity-packages-selfoss"]' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
@@ -141,18 +126,6 @@ service_postuninst ()
             ${RM} ${TEMPDIR}/${PHP_CFG_FILE}
             CFG_UPDATE="yes"
         fi
-        # Check for PHP template defaults
-        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
-            echo "Restore default PHP template"
-            rsync -aX ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${TEMPDIR}/ 2>&1
-            SUBST_TEXT="{{#fpm_settings.user_selfoss}}sc-selfoss{{/fpm_settings.user_selfoss}}{{^fpm_settings.user_selfoss}}http{{/fpm_settings.user_selfoss}}"
-            ${SED} -i "s|^user = ${SUBST_TEXT}$|user = http|g; s|^listen.owner = ${SUBST_TEXT}$|listen.owner = http|g" "${TEMPDIR}/${WS_TMPL_FILE}"
-            ${MV} ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/${WS_TMPL_FILE}.bak
-            rsync -aX ${TEMPDIR}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/ 2>&1
-            ${RM} ${TEMPDIR}/${WS_TMPL_FILE}
-            CFG_UPDATE="yes"
-        fi
-
         # Check for Selfoss Apache config
         if [ -f "/usr/local/etc/apache24/sites-enabled/selfoss.conf" ]; then
             echo "Removing Apache config for Selfoss"
