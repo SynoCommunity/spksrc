@@ -142,6 +142,20 @@ service_postuninst ()
     fi
 }
 
+validate_preinst ()
+{
+    # Check for modification to PHP template defaults on DSM 6
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        WS_TMPL_PATH="/var/packages/WebStation/target/misc"
+        WS_TMPL_FILE="php74_fpm.mustache"
+        # Check for PHP template defaults
+        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
+            echo "PHP template defaults have been modified. Installation is not supported."
+            exit 1
+        fi
+    fi
+}
+
 service_save ()
 {
     # Backup configuration and data
