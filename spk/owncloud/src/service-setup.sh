@@ -15,6 +15,7 @@ JQ="/bin/jq"
 SED="/bin/sed"
 TAR="/bin/tar"
 SYNOSVC="/usr/syno/sbin/synoservice"
+SYNOSHR="/usr/syno/sbin/synoshare"
 
 if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
     WEB_USER="http"
@@ -60,11 +61,34 @@ exec_occ() {
     return $?
 }
 
+exec_eff_occ() {
+    PHP="/usr/local/bin/php74"
+    OCC="${OCROOT}/occ"
+    COMMAND="${PHP} ${OCC} $*"
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
+    else
+        $COMMAND
+    fi
+    return $?
+}
+
 exec_sql() {
     SQLITE="/bin/sqlite3"
     COMMAND="${SQLITE} $*"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         /bin/su "$WEB_USER" -s /bin/sh -c "$COMMAND"
+    else
+        $COMMAND
+    fi
+    return $?
+}
+
+exec_eff_sql() {
+    SQLITE="/bin/sqlite3"
+    COMMAND="${SQLITE} $*"
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
     else
         $COMMAND
     fi
@@ -117,6 +141,7 @@ setup_owncloud_instance()
 
 service_postinst ()
 {
+    # Web interface setup for DSM 6 -- used by INSTALL and UPGRADE
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         # Install the web interface
         echo "Installing web interface"
@@ -199,6 +224,10 @@ service_postinst ()
                 TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
                 ${MKDIR} "${TEMPDIR}"
                 ${TAR} -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
+                # Fix file ownership
+                if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+                    chown -R ${WEB_USER}:${WEB_GROUP} ${TEMPDIR} 2>/dev/null
+                fi
 
                 # Restore configuration files and directories
                 rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${OCROOT}/" 2>&1
@@ -304,8 +333,10 @@ service_preuninst ()
 
 service_postuninst ()
 {
+    # Web interface removal for DSM 6 -- used by UNINSTALL and UPGRADE
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         # Remove the web interface
+        echo "Removing web interface"
         ${RM} ${OCROOT}
 
         # Remove web configurations
@@ -339,34 +370,33 @@ service_postuninst ()
     fi
 }
 
-service_postupgrade() {
-    if [ "${SYNOPKG_PKG_STATUS}" = "UPGRADE" ]; then
-        if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            # Check for modification to PHP template defaults in previous versions
-            TEMPDIR="${SYNOPKG_PKGTMP}/web"
-            ${MKDIR} ${TEMPDIR}
-            WS_TMPL_PATH="/var/packages/WebStation/target/misc"
-            WS_TMPL_FILE="php74_fpm.mustache"
-            CFG_UPDATE="no"
-            # Check for PHP template defaults
-            if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
-                echo "Restore default PHP template"
-                rsync -aX ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${TEMPDIR}/ 2>&1
-                SUBST_TEXT="{{#fpm_settings.user_owncloud}}sc-owncloud{{/fpm_settings.user_owncloud}}{{^fpm_settings.user_owncloud}}http{{/fpm_settings.user_owncloud}}"
-                ${SED} -i "s|^user = ${SUBST_TEXT}$|user = http|g; s|^listen.owner = ${SUBST_TEXT}$|listen.owner = http|g" "${TEMPDIR}/${WS_TMPL_FILE}"
-                ${MV} ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/${WS_TMPL_FILE}.bak
-                rsync -aX ${TEMPDIR}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/ 2>&1
-                ${RM} ${TEMPDIR}/${WS_TMPL_FILE}
-                CFG_UPDATE="yes"
-            fi
-            # Restart Apache if configs have changed
-            if [ "$CFG_UPDATE" = "yes" ]; then
-                echo "Restart Apache to load new configs"
-                ${SYNOSVC} --restart pkgctl-Apache2.4
-            fi
-            # Clean-up temporary files
-            ${RM} ${TEMPDIR}
+service_postupgrade()
+{
+    # Web interface validation for DSM 6 -- Check PHP template defaults for modification
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        TEMPDIR="${SYNOPKG_PKGTMP}/web"
+        ${MKDIR} ${TEMPDIR}
+        WS_TMPL_PATH="/var/packages/WebStation/target/misc"
+        WS_TMPL_FILE="php74_fpm.mustache"
+        CFG_UPDATE="no"
+        # Check for PHP template defaults
+        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
+            echo "Restore default PHP template; remove previous PHP FPM configuration"
+            rsync -aX ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${TEMPDIR}/ 2>&1
+            SUBST_TEXT="{{#fpm_settings.user_owncloud}}sc-owncloud{{/fpm_settings.user_owncloud}}{{^fpm_settings.user_owncloud}}http{{/fpm_settings.user_owncloud}}"
+            ${SED} -i "s|^user = ${SUBST_TEXT}$|user = http|g; s|^listen.owner = ${SUBST_TEXT}$|listen.owner = http|g" "${TEMPDIR}/${WS_TMPL_FILE}"
+            ${MV} ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/${WS_TMPL_FILE}.bak
+            rsync -aX ${TEMPDIR}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/ 2>&1
+            ${RM} ${TEMPDIR}/${WS_TMPL_FILE}
+            CFG_UPDATE="yes"
         fi
+        # Restart Apache if configs have changed
+        if [ "$CFG_UPDATE" = "yes" ]; then
+            echo "Restart Apache to load new configs"
+            ${SYNOSVC} --restart pkgctl-Apache2.4
+        fi
+        # Clean-up temporary files
+        ${RM} ${TEMPDIR}
     fi
 }
 
@@ -392,11 +422,31 @@ validate_preupgrade ()
 
 service_save ()
 {
+    # Initialise save state check for migration of PHP FPM configuration on DSM 6
+    SAVE_STATE="normal"
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        # Check for modification to PHP template defaults from previous versions
+        WS_TMPL_PATH="/var/packages/WebStation/target/misc"
+        WS_TMPL_FILE="php74_fpm.mustache"
+        # Check for PHP template defaults
+        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
+            SAVE_STATE="migrate"
+        fi
+    fi
+
     # Place server in maintenance mode
-    exec_occ maintenance:mode --on
+    if [ "$SAVE_STATE" = "normal" ]; then
+        exec_occ maintenance:mode --on
+    else
+        exec_eff_occ maintenance:mode --on
+    fi
 
     # Identify data directory for restore
-    DATADIR="$(exec_occ config:system:get datadirectory)"
+    if [ "$SAVE_STATE" = "normal" ]; then
+        DATADIR="$(exec_occ config:system:get datadirectory)"
+    else
+        DATADIR="$(exec_eff_occ config:system:get datadirectory)"
+    fi
     # data directory fail-safe
     if [ ! -d "$DATADIR" ]; then
         echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
@@ -419,7 +469,20 @@ service_save ()
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
     echo "Backup existing server database to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup"
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
-    exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
+    if [ "$SAVE_STATE" = "normal" ]; then
+        exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
+    else
+        exec_eff_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
+    fi
+
+    # Fix file ownership
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ] && [ "$SAVE_STATE" != "normal" ]; then
+        echo "Migrate share permissions to user ${WEB_USER}"
+        ${SYNOSHR} --setuser ${SHARE_NAME} RW + ${WEB_USER} >/dev/null 2>&1
+        chown -R ${WEB_USER}:${WEB_GROUP} ${SYNOPKG_TEMP_UPGRADE_FOLDER} 2>/dev/null
+        chown -R ${WEB_USER}:${WEB_GROUP} ${DATADIR} 2>/dev/null
+        ${SYNOSHR} --setuser ${SHARE_NAME} RW - ${EFF_USER} >/dev/null 2>&1
+    fi
 }
 
 service_restore ()
