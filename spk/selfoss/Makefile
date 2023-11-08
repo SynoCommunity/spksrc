@@ -29,6 +29,8 @@ DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
 CONF_DIR = src/conf/
 
+# Set user as 'auto' for DSM 6 privilege
+SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
 
