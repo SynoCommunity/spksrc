@@ -37,6 +37,7 @@ set_selfoss_permissions ()
 
 service_postinst ()
 {
+    # Web interface setup for DSM 6 -- used by INSTALL and UPGRADE
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         # Install the web interface
         echo "Installing web interface"
@@ -107,8 +108,10 @@ service_postinst ()
 
 service_postuninst ()
 {
+    # Web interface removal for DSM 6 -- used by UNINSTALL and UPGRADE
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         # Remove the web interface
+        echo "Removing web interface"
         ${RM} ${SELFOSS_ROOT}
 
         # Remove web configurations
