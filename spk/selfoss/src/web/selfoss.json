@@ -16,8 +16,7 @@
 		"max_spare_servers": 3,
 		"min_spare_servers": 1,
 		"mode": "dynamic",
-		"start_servers": 2,
-		"user_selfoss": true
+		"start_servers": 2
 	},
 	"open_basedir": "",
 	"php_settings": {},
