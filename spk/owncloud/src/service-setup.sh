@@ -195,8 +195,12 @@ service_postinst ()
         fi
         # Restart Apache if configs have changed
         if [ "$CFG_UPDATE" = "yes" ]; then
-            echo "Restart Apache to load new configs"
-            ${SYNOSVC} --restart pkgctl-Apache2.4
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+                echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
+            else
+                echo "Restart Apache to load new configs"
+                ${SYNOSVC} --restart pkgctl-Apache2.4
+            fi
         fi
         # Clean-up temporary files
         ${RM} ${TEMPDIR}
@@ -297,7 +301,7 @@ service_preuninst ()
             echo "Copying previous configuration from ${OCROOT}"
             ${MKDIR} "${TEMPDIR}/configs/root"
             rsync -aX "${OCROOT}/.user.ini" "${OCROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
-            rsync -aX "${OCROOT}/config" "${OCROOT}/data" "${OCROOT}/apps" "${OCROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
+            rsync -aX "${OCROOT}/config" "${OCROOT}/apps" "${OCROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
 
             # Backup user data
             echo "Copying previous user data from ${DATADIR}"
@@ -362,8 +366,12 @@ service_postuninst ()
         fi
         # Restart Apache if configs have changed
         if [ "$CFG_UPDATE" = "yes" ]; then
-            echo "Restart Apache to load new configs"
-            ${SYNOSVC} --restart pkgctl-Apache2.4
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+                echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
+            else
+                echo "Restart Apache to load new configs"
+                ${SYNOSVC} --restart pkgctl-Apache2.4
+            fi
         fi
         # Clean-up temporary files
         ${RM} ${TEMPDIR}
@@ -392,8 +400,12 @@ service_postupgrade()
         fi
         # Restart Apache if configs have changed
         if [ "$CFG_UPDATE" = "yes" ]; then
-            echo "Restart Apache to load new configs"
-            ${SYNOSVC} --restart pkgctl-Apache2.4
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+                echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
+            else
+                echo "Restart Apache to load new configs"
+                ${SYNOSVC} --restart pkgctl-Apache2.4
+            fi
         fi
         # Clean-up temporary files
         ${RM} ${TEMPDIR}
