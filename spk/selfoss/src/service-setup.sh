@@ -91,8 +91,12 @@ service_postinst ()
         fi
         # Restart Apache if configs have changed
         if [ "$CFG_UPDATE" = "yes" ]; then
-            echo "Restart Apache to load new configs"
-            ${SYNOSVC} --restart pkgctl-Apache2.4
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-selfoss")) | length > 0' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+                echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
+            else
+                echo "Restart Apache to load new configs"
+                ${SYNOSVC} --restart pkgctl-Apache2.4
+            fi
         fi
         # Clean-up temporary files
         ${RM} ${TEMPDIR}
@@ -137,8 +141,12 @@ service_postuninst ()
         fi
         # Restart Apache if configs have changed
         if [ "$CFG_UPDATE" = "yes" ]; then
-            echo "Restart Apache to load new configs"
-            ${SYNOSVC} --restart pkgctl-Apache2.4
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-selfoss")) | length > 0' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+                echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
+            else
+                echo "Restart Apache to load new configs"
+                ${SYNOSVC} --restart pkgctl-Apache2.4
+            fi
         fi
         # Clean-up temporary files
         ${RM} ${TEMPDIR}
