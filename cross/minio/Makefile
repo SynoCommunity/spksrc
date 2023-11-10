@@ -23,7 +23,7 @@ GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 
 ENV += GO111MODULE=on
 
-GO_BUILD_ARGS = -tags kqueue
+GO_BUILD_ARGS = -tags kqueue -buildvcs=false
 
 GO_LDFLAGS  = -s -w
 GO_LDFLAGS += -X github.com/minio/minio/cmd.ReleaseTag=$(PKG_RELEASE_TAG)
