@@ -35,7 +35,7 @@ service_postinst ()
     
     mkdir "-p" "${LOGS_DIR}"
 
-    # Setup database and configuration file
+    # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
         ${CP} "${WEB_DIR}/${PACKAGE}/config.php-dist" "${WEB_DIR}/${PACKAGE}/config.php"
