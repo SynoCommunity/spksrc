@@ -14,12 +14,12 @@
 		"desc": "{{DB_EXPORT_DESCRIPTION}}",
 		"subitems": [{
 			"key": "wizard_dbexport_path",
-			"desc": "{{DB_EXPORT_LOCATION_LABEL}}",
+			"desc": "{{{DB_EXPORT_LOCATION_LABEL}}}",
 			"validator": {
 				"allowBlank": true,
 				"regex": {
 					"expr": "/^\\\/volume[0-9]+\\\//",
-					"errorText": "{{DB_EXPORT_LOCATION_FORMAT_ERROR}}"
+					"errorText": "{{{DB_EXPORT_LOCATION_FORMAT_ERROR}}}"
 				}
 			}		
 		}]
