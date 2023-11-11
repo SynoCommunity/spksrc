@@ -37,7 +37,6 @@ service_postinst ()
 
     # Setup database and configuration file
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        "${MYSQL}" -u "${MYSQL_USER}" -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" < "${WEB_DIR}/${PACKAGE}/schema/ttrss_schema_mysql.sql"
         single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
         ${CP} "${WEB_DIR}/${PACKAGE}/config.php-dist" "${WEB_DIR}/${PACKAGE}/config.php"
         {
