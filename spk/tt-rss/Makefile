@@ -35,6 +35,8 @@ REQUIRED_MIN_DSM = 6.0
 
 SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 
+SERVICE_USER = auto
+
 include ../../mk/spksrc.spk.mk
 
 $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini: 
