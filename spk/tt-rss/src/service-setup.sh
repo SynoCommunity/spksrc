@@ -87,16 +87,19 @@ validate_preuninst ()
     fi
 }
 
-service_postuninst ()
+service_preuninst ()
 {
-    # Export and remove database
+    # Export database
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         if [ -n "${wizard_dbexport_path}" ]; then
-            ${MKDIR} ${wizard_dbexport_path}
-            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql
+            ${MKDIR} -p "${wizard_dbexport_path}"
+            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" > "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql"
         fi
-    fi
+    fi  
+}
 
+service_postuninst ()
+{
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
       # Remove the web interface
       ${RM} ${WEB_DIR}/${PACKAGE}
