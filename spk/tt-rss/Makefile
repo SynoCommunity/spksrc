@@ -26,7 +26,7 @@ SERVICE_COMMAND = $(INSTALL_PREFIX)/bin/tt-rss-daemon
 
 POST_STRIP_TARGET = tt-rss_extra_install
 
-PHP_EXTENSIONS = curl gd intl mysqli pdo_mysql posix
+PHP_EXTENSIONS := $(shell jq -r '.webservice.services[0].php.extensions[]' src/conf/resource)
 
 override ARCH=
 
