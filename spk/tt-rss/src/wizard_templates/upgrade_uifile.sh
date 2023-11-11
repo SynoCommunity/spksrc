@@ -48,12 +48,10 @@ function with_migration
        }]
      } ]
   }, {
-    "step_title": "{{WEBSTATION_PHP_PROFILE_TITLE}}",
+    "step_title": "{{UPGRADE_PROCEDURE}}",
     "items": [ {
-        "desc": "{{{WEBSTATION_PHP_PROFILE_DESC}}}"
-    }, {
-        "desc": "<ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
-    } ]
+        "desc": "{{{UPGRADE_PROCEDURE_DESC}}}"
+    }]
   } ]  
 EOF
 }
@@ -61,30 +59,7 @@ EOF
 function without_migration
 {
   cat <<EOF >"${SYNOPKG_TEMP_LOGFILE}"
-[ {
-  "step_title": "{{WEBSTATION_PHP_PROFILE_TITLE}}",
-  "items": [ {
-    "type": "multiselect",
-    "subitems": [ {
-        "key": "wizard_run_migration",
-        "desc": "Run migration",
-        "defaultValue": false,
-        "hidden": true
-      }, {
-        "key": "wizard_create_db",
-        "desc": "Creates initial DB",
-        "defaultValue": false,
-        "hidden": true
-      }, {
-        "key": "mysql_grant_user",
-        "desc": "Initializes user rights",
-        "defaultValue": false,
-        "hidden": true
-      } ]
-    }, {
-      "desc": "{{{WEBSTATION_PHP_PROFILE_DESC}}}<br /><ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
-    } ]
-} ]
+[]
 EOF
 }
 
