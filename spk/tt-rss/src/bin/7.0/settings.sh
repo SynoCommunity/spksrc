@@ -33,6 +33,8 @@ then
     chmod 770 "${LOG_FILE}"
 fi
 
+PHP=/usr/local/bin/php74
+
 php_options()
 {
     for line in $(cat ${INSTALL_DIR}/etc/php/conf.d/com.synocommunity.tt-rss.ini)
@@ -53,5 +55,5 @@ guess_php_configuration_file()
 #   - guess_php
 guess_php()
 {
-    echo -n "/usr/local/bin/php74 -c $(guess_php_configuration_file)"
+    echo -n "${PHP} -c $(guess_php_configuration_file)"
 }
