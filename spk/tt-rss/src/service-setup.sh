@@ -52,145 +52,145 @@ service_prestart ()
 
 service_postinst ()
 {
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      # Install the web interface
-      ${CP} "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
-    fi
-    
-    mkdir "-p" "${LOGS_DIR}"
+  if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+    # Install the web interface
+    ${CP} "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
+  fi
 
-    # Setup database and configuration file
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
-        ${CP} "${WEB_DIR}/${PACKAGE}/config.php-dist" "${WEB_DIR}/${PACKAGE}/config.php"
-        {
-          echo "putenv('TTRSS_DB_TYPE=mysql');";
-          echo "putenv('TTRSS_DB_HOST=localhost');";
-          echo "putenv('TTRSS_DB_USER=${MYSQL_USER}');";
-          echo "putenv('TTRSS_DB_NAME=${MYSQL_DATABASE}');";
-          echo "putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');";
-          echo "putenv('TTRSS_SINGLE_USER_MODE=${single_user_mode}');";
-          echo "putenv('TTRSS_SELF_URL_PATH=http://${wizard_domain_name}/${PACKAGE}/');";
-          echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');";
-          echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');"
-        } >>"${WEB_DIR}/${PACKAGE}/config.php"
-        if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-          touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
-        fi
-    fi
+  mkdir "-p" "${LOGS_DIR}"
 
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      # Fix permissions
-      chown "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/lock";
-      chown "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/feed-icons";
-      chown -R "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/cache";
-      chown -R "${WEB_USER}" "${LOGS_DIR}";
-      chmod +x "${WEB_DIR}/${PACKAGE}/index.php";
+  # Setup database and configuration file
+  if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+    single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
+    ${CP} "${WEB_DIR}/${PACKAGE}/config.php-dist" "${WEB_DIR}/${PACKAGE}/config.php"
+    {
+      echo "putenv('TTRSS_DB_TYPE=mysql');";
+      echo "putenv('TTRSS_DB_HOST=localhost');";
+      echo "putenv('TTRSS_DB_USER=${MYSQL_USER}');";
+      echo "putenv('TTRSS_DB_NAME=${MYSQL_DATABASE}');";
+      echo "putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');";
+      echo "putenv('TTRSS_SINGLE_USER_MODE=${single_user_mode}');";
+      echo "putenv('TTRSS_SELF_URL_PATH=http://${wizard_domain_name}/${PACKAGE}/');";
+      echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');";
+      echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');"
+    } >>"${WEB_DIR}/${PACKAGE}/config.php"
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+      touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
     fi
+  fi
 
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-       exec_update_schema
-    fi
-    return 0
+  if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+    # Fix permissions
+    chown "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/lock";
+    chown "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/feed-icons";
+    chown -R "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/cache";
+    chown -R "${WEB_USER}" "${LOGS_DIR}";
+    chmod +x "${WEB_DIR}/${PACKAGE}/index.php";
+  fi
+
+  if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+    exec_update_schema
+  fi
+  return 0
 }
 
 validate_preuninst ()
 {
-    # Check database
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-        echo "Incorrect MySQL root password"
-        exit 1
-    fi
+  # Check database
+  if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+    echo "Incorrect MySQL root password"
+    exit 1
+  fi
 
-    # Check database export location
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a -n "${wizard_dbexport_path}" ]; then
-        if [ -f "${wizard_dbexport_path}" -o -e "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql" ]; then
-            echo "File ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql already exists. Please remove or choose a different location"
-            exit 1
-        fi
+  # Check database export location
+  if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a -n "${wizard_dbexport_path}" ]; then
+    if [ -f "${wizard_dbexport_path}" -o -e "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql" ]; then
+      echo "File ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql already exists. Please remove or choose a different location"
+      exit 1
     fi
+  fi
 }
 
 service_preuninst ()
 {
-    # Export database
-    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
-        if [ -n "${wizard_dbexport_path}" ]; then
-            ${MKDIR} -p "${wizard_dbexport_path}"
-            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" > "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql"
-        fi
-    fi  
+  # Export database
+  if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+    if [ -n "${wizard_dbexport_path}" ]; then
+      ${MKDIR} -p "${wizard_dbexport_path}"
+      ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" > "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql"
+    fi
+  fi  
 }
 
 service_postuninst ()
 {
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      # Remove the web interface
-      ${RM} ${WEB_DIR}/${PACKAGE}
-    fi
+  if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+    # Remove the web interface
+    ${RM} ${WEB_DIR}/${PACKAGE}
+  fi
 
-    return 0
+  return 0
 }
 
 service_preupgrade ()
 {
-    SOURCE_WEB_DIR="${WEB_DIR}"
-    if [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
-      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-        SOURCE_WEB_DIR="${DSM6_WEB_DIR}"
-      fi
+  SOURCE_WEB_DIR="${WEB_DIR}"
+  if [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+      SOURCE_WEB_DIR="${DSM6_WEB_DIR}"
     fi
-    # Save the configuration file
-    ${MKDIR} "${TMP_DIR}/${PACKAGE}"
-    ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/config.php" "${TMP_DIR}/${PACKAGE}/"
+  fi
+  # Save the configuration file
+  ${MKDIR} "${TMP_DIR}/${PACKAGE}"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/config.php" "${TMP_DIR}/${PACKAGE}/"
 
-    ${MKDIR} "${TMP_DIR}/${PACKAGE}/feed-icons/"
-    ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/feed-icons"/*.ico "${TMP_DIR}/${PACKAGE}/feed-icons/"
+  ${MKDIR} "${TMP_DIR}/${PACKAGE}/feed-icons/"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/feed-icons"/*.ico "${TMP_DIR}/${PACKAGE}/feed-icons/"
 
-    ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/plugins.local" "${TMP_DIR}/${PACKAGE}/"
-    ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/themes.local" "${TMP_DIR}/${PACKAGE}/"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/plugins.local" "${TMP_DIR}/${PACKAGE}/"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/themes.local" "${TMP_DIR}/${PACKAGE}/"
 
-    ${MKDIR} -p "${TMP_DIR}/${PACKAGE}/${VERSION_FILE_DIRECTORY}"
-    echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/" >"${TMP_DIR}/${PACKAGE}/${VERSION_FILE}"
+  ${MKDIR} -p "${TMP_DIR}/${PACKAGE}/${VERSION_FILE_DIRECTORY}"
+  echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/" >"${TMP_DIR}/${PACKAGE}/${VERSION_FILE}"
 
-    return 0
+  return 0
 }
 
 service_postupgrade ()
 {
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-      touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
-    fi
-    # Restore the configuration file
-    ${CP} "${TMP_DIR}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"
-    SPK_REV=$(cat "${TMP_DIR}/${PACKAGE}/${VERSION_FILE}")
-    if [ "${SPK_REV}" -lt "14" ]
-    then
-      # Parse old configuration and save to new config format
-      sed -i -e "s|define('DB_TYPE', '\(.*\)');|putenv('TTRSS_DB_TYPE=\1');|" \
-        -e "s|define('DB_HOST', '\(.*\)');|putenv('TTRSS_DB_HOST=\1');|" \
-        -e "s|define('DB_USER', '\(.*\)');|putenv('TTRSS_DB_USER=\1');|" \
-        -e "s|define('DB_NAME', '\(.*\)');|putenv('TTRSS_DB_NAME=\1');|" \
-        -e "s|define('DB_PASS', '\(.*\)');|putenv('TTRSS_DB_PASS=\1');|" \
-        -e "s|define('SINGLE_USER_MODE', \(.*\));|putenv('TTRSS_SINGLE_USER_MODE=\1');|" \
-        -e "s|define('SELF_URL_PATH', '\(.*\)');|putenv('TTRSS_SELF_URL_PATH=\1');|" \
-        -e "s|define('DB_PORT', '\(.*\)');|putenv('TTRSS_DB_PORT=\1');|" \
-        -e "s|define('PHP_EXECUTABLE', \(.*\));||" \
-        "${WEB_DIR}/${PACKAGE}/config.php"
-      echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');">>"${WEB_DIR}/${PACKAGE}/config.php"
-    fi
-    if [ "${SPK_REV}" -lt "15" ]
-    then
-      sed -i -e "s|putenv('TTRSS_DB_PASS=.*');|putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');|" \
-        "${WEB_DIR}/${PACKAGE}/config.php"
-      echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');">>"${WEB_DIR}/${PACKAGE}/config.php"
-    fi
+  if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
+    touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
+  fi
+  # Restore the configuration file
+  ${CP} "${TMP_DIR}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"
+  SPK_REV=$(cat "${TMP_DIR}/${PACKAGE}/${VERSION_FILE}")
+  if [ "${SPK_REV}" -lt "14" ]
+  then
+    # Parse old configuration and save to new config format
+    sed -i -e "s|define('DB_TYPE', '\(.*\)');|putenv('TTRSS_DB_TYPE=\1');|" \
+      -e "s|define('DB_HOST', '\(.*\)');|putenv('TTRSS_DB_HOST=\1');|" \
+      -e "s|define('DB_USER', '\(.*\)');|putenv('TTRSS_DB_USER=\1');|" \
+      -e "s|define('DB_NAME', '\(.*\)');|putenv('TTRSS_DB_NAME=\1');|" \
+      -e "s|define('DB_PASS', '\(.*\)');|putenv('TTRSS_DB_PASS=\1');|" \
+      -e "s|define('SINGLE_USER_MODE', \(.*\));|putenv('TTRSS_SINGLE_USER_MODE=\1');|" \
+      -e "s|define('SELF_URL_PATH', '\(.*\)');|putenv('TTRSS_SELF_URL_PATH=\1');|" \
+      -e "s|define('DB_PORT', '\(.*\)');|putenv('TTRSS_DB_PORT=\1');|" \
+      -e "s|define('PHP_EXECUTABLE', \(.*\));||" \
+      "${WEB_DIR}/${PACKAGE}/config.php"
+    echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');">>"${WEB_DIR}/${PACKAGE}/config.php"
+  fi
+  if [ "${SPK_REV}" -lt "15" ]
+  then
+    sed -i -e "s|putenv('TTRSS_DB_PASS=.*');|putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');|" \
+      "${WEB_DIR}/${PACKAGE}/config.php"
+    echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');">>"${WEB_DIR}/${PACKAGE}/config.php"
+  fi
 
-    ${MV} "${TMP_DIR}/${PACKAGE}"/feed-icons/*.ico "${WEB_DIR}/${PACKAGE}"/feed-icons/;
-    ${MV} "${TMP_DIR}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/;
-    ${MV} "${TMP_DIR}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/;
+  ${MV} "${TMP_DIR}/${PACKAGE}"/feed-icons/*.ico "${WEB_DIR}/${PACKAGE}"/feed-icons/;
+  ${MV} "${TMP_DIR}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/;
+  ${MV} "${TMP_DIR}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/;
 
-    exec_update_schema;
+  exec_update_schema;
 
-    return 0
+  return 0
 }
