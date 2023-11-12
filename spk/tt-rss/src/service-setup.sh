@@ -60,8 +60,8 @@ service_postinst ()
   mkdir "-p" "${LOGS_DIR}"
 
   # Setup database and configuration file
-  if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-    single_user_mode=$([ "${wizard_single_user}" == "true" ] && echo "true" || echo "false")
+  if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+    single_user_mode=$([ "${wizard_single_user}" = "true" ] && echo "true" || echo "false")
     ${CP} "${WEB_DIR}/${PACKAGE}/config.php-dist" "${WEB_DIR}/${PACKAGE}/config.php"
     {
       echo "putenv('TTRSS_DB_TYPE=mysql');";
@@ -88,7 +88,7 @@ service_postinst ()
     chmod +x "${WEB_DIR}/${PACKAGE}/index.php";
   fi
 
-  if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+  if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
     exec_update_schema
   fi
   return 0
@@ -97,13 +97,13 @@ service_postinst ()
 validate_preuninst ()
 {
   # Check database
-  if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+  if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
     echo "Incorrect MySQL root password"
     exit 1
   fi
 
   # Check database export location
-  if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" -a -n "${wizard_dbexport_path}" ]; then
+  if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" -a -n "${wizard_dbexport_path}" ]; then
     if [ -f "${wizard_dbexport_path}" -o -e "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql" ]; then
       echo "File ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql already exists. Please remove or choose a different location"
       exit 1
@@ -114,7 +114,7 @@ validate_preuninst ()
 service_preuninst ()
 {
   # Export database
-  if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+  if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
     if [ -n "${wizard_dbexport_path}" ]; then
       ${MKDIR} -p "${wizard_dbexport_path}"
       ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" > "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql"
