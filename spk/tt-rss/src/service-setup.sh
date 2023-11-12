@@ -15,6 +15,10 @@ VERSION_FILE_DIRECTORY="var"
 VERSION_FILE="${VERSION_FILE_DIRECTORY}/version.txt"
 
 USER=http
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+  EFF_USER=http
+fi
+
 PHP="${SYNOPKG_PKGDEST}/bin/virtual-php"
 MARIADB_10_INSTALL_DIRECTORY="/var/packages/MariaDB10"
 MARIADB_10_BIN_DIRECTORY="${MARIADB_10_INSTALL_DIRECTORY}/target/usr/local/mariadb10/bin"
