@@ -5,4 +5,10 @@ source "${SCRIPT_DIR}/settings.sh"
 
 TTRSS="${WEB_DIR}/${PACKAGE}/update.php"
 
-exec $(guess_php) $(php_options) ${TTRSS} --daemon >>"${LOGS_DIR}/daemon.log" 2>&1
+if [ "$(whoami)" == "root" ]
+then
+  # tt rss should always be running as http user in pre-DSM 7 context
+  exec sudo -u http exec $(guess_php) $(php_options) ${TTRSS} --daemon >>"${LOGS_DIR}/daemon.log" 2>&1
+else
+  exec $(guess_php) $(php_options) ${TTRSS} --daemon >>"${LOGS_DIR}/daemon.log" 2>&1
+fi
