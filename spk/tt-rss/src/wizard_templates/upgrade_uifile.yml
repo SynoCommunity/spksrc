@@ -2,5 +2,5 @@ DB_MIGRATION_TITLE:                 DB Migration for tt-rss
 ROOT_PASSWORD_INPUT_DESCRIPTIONS:   Enter your respective Maria DB installation root account passwords
 ENTER_TT-RSS_PASSWORD:              A 'ttrss' MySQL user and database will be created. Please enter a password for the 'ttrss' user.
 TT-RSS_PASSWORD_DESCRIPTION:        Ttrss password
-UPGRADE_PROCEDURE:                  Tiny Tiny RSS upgrade
-UPGRADE_PROCEDURE_DESC:             "An automatic upgrade of the Tiny Tiny RSS DB will be launched."
+WEBSTATION_PHP_PROFILE_TITLE:       WebStation PHP Profile
+WEBSTATION_PHP_PROFILE_DESC:        "Tiny Tiny RSS requires the following PHP extensions to be enabled for the current PHP profile (under <code>Web Station</code> &gt; <code>PHP Settings</code> in tab <code>Default Server Settings</code>):"
