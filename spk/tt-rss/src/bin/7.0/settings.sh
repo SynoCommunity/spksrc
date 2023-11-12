@@ -41,21 +41,6 @@ php_options()
     done
 }
 
-# Computes the name of the PHP profile currently being used by the WebStation
-guess_php_profile_name()
-{
-    echo -n "tt-rss"
-}
-
-# Computes the PHP fpm binary executable
-# Examples:
-#   - guess_php_fpm_bin
-#   - guess_php_fpm_bin <profile_name>
-guess_php_fpm_bin()
-{
-    echo -n "/usr/local/bin/php74-fpm"
-}
-
 # Computes the PHP cli configuration file which should be used when running php code
 guess_php_configuration_file()
 {
