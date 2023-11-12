@@ -33,6 +33,7 @@
   "webservice": {
     "services": [{
       "service": "tt-rss",
+      "icon": "app/images/tt-rss-{0}.png",
       "display_name": "Tiny Tiny RSS",
       "type": "apache_php",
       "root": "tt-rss",
