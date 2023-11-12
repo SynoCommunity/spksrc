@@ -29,67 +29,12 @@ MYSQL_DATABASE="ttrss"
 SVC_KEEP_LOG=y
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
-JQ="/bin/jq"
-SYNOSVC="/usr/syno/sbin/synoservice"
 
 service_postinst ()
 {
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
       # Install the web interface
-      ${CP} "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR}
-      
-      TEMPDIR="${SYNOPKG_PKGTMP}/web"
-      ${MKDIR} ${TEMPDIR}
-
-      WS_CFG_PATH="/usr/syno/etc/packages/WebStation"
-      WS_CFG_FILE="WebStation.json"
-      FULL_WS_CFG_FILE="${WS_CFG_PATH}/${WS_CFG_FILE}"
-      TEMP_WS_CFG_FILE="${TEMPDIR}/${WS_CFG_FILE}"
-      PHP_CFG_FILE="PHPSettings.json"
-      PHP_PROF_NAME="Default PHP 7.4 Profile"
-      FULL_PHP_CFG_FILE="${WS_CFG_PATH}/${PHP_CFG_FILE}"
-      TEMP_PHP_CFG_FILE="${TEMPDIR}/${PHP_CFG_FILE}"
-      NEW_WS_CONFIG_FILE_CONTENTS=$(${JQ} "." "${FULL_WS_CFG_FILE}")
-      WS_BACKEND=$(${JQ} -r '.default.backend' "${FULL_WS_CFG_FILE}")
-      WS_PHP=$(${JQ} -r '.default.php' "${FULL_WS_CFG_FILE}")
-      CFG_UPDATE="no"
-      RESTART_APACHE="no"
-      BACKUP_CFG_FILE="yes"
-      RSYNC_ARGS=-b --suffix ".bak"
-      # Check if Apache is the selected back-end
-      if [ ! "$WS_BACKEND" = "2" ]; then
-          echo "Set Apache as the back-end server"
-          ${JQ} '.default.backend = 2' "${FULL_WS_CFG_FILE}" > "${TEMP_WS_CFG_FILE}"
-          rsync -aX ${RSYNC_ARGS} "${TEMP_WS_CFG_FILE}" "${WS_CFG_PATH}/" 2>&1
-          RSYNC_ARGS=
-          ${RM} "${TEMP_WS_CFG_FILE}"
-          RESTART_APACHE="yes"
-      fi
-      # Check if default PHP profile is selected
-      if [ -z "$WS_PHP" ] || [ "$WS_PHP" = "null" ]; then
-          echo "Enable default PHP profile"
-          # Locate default PHP profile
-          PHP_PROF_ID=$(${JQ} -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${FULL_PHP_CFG_FILE}")
-          ${JQ} ".default.php = \"$PHP_PROF_ID\"" > "${TEMP_WS_CFG_FILE}"
-          rsync -aX ${RSYNC_ARGS} "${TEMP_WS_CFG_FILE}" "${WS_CFG_PATH}/" 2>&1
-          ${RM} "${TEMP_WS_CFG_FILE}"
-          RESTART_APACHE="yes"
-      fi
-      # Check for tt-rss PHP profile
-      if ! ${JQ} -e '.["com-synocommunity-packages-tt-rss"]' "${FULL_PHP_CFG_FILE}" >/dev/null; then
-          echo "Add PHP profile for tt-rss"
-          ${JQ} --slurpfile ttRssNode "${SYNOPKG_PKGDEST}/web/tt-rss.json" '.["com-synocommunity-packages-tt-rss"] = $ttRssNode[0]' "${FULL_PHP_CFG_FILE}" > "${TEMP_PHP_CFG_FILE}"
-          rsync -b --suffix ".bak" -aX "${TEMP_PHP_CFG_FILE}" "${WS_CFG_PATH}/" 2>&1
-          ${RM} "${TEMP_PHP_CFG_FILE}"
-          RESTART_APACHE="yes"
-      fi
-      # Restart Apache if required
-      if [ "${RESTART_APACHE}" = "yes" ]; then
-          echo "Restart Apache to load new configs"
-          ${SYNOSVC} --restart pkgctl-Apache2.4
-      fi
-      # Clean-up temporary files
-      ${RM} "${TEMPDIR}"
+      ${CP} "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
     fi
     
     mkdir "-p" "${LOGS_DIR}"

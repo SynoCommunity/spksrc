@@ -55,9 +55,5 @@ tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	install -m 644 src/bin/7.0/settings.sh $(STAGING_DIR)/bin/settings.sh
 else
-#ifeq ($(call version_le, ${TCVERSION}, 6.0), 1)
-	install -m 755 -d "$(STAGING_DIR)/web"
-	jq '.' "src/6.0-/tt-rss.json" $(foreach extension,$(PHP_EXTENSIONS), | jq '.extensions += ["$(extension)"]') > "$(STAGING_DIR)/web/tt-rss.json"
-#endif
 	install -m 644 src/bin/settings.sh $(STAGING_DIR)/bin/settings.sh
 endif
