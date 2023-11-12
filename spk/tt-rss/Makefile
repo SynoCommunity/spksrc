@@ -22,8 +22,6 @@ CONF_DIR = src/conf/
 SERVICE_SETUP = src/service-setup.sh
 SYSTEM_GROUP	 = http
 
-SERVICE_COMMAND = $(INSTALL_PREFIX)/bin/tt-rss-daemon
-
 POST_STRIP_TARGET = tt-rss_extra_install
 
 PHP_EXTENSIONS := $(shell jq -r '.webservice.services[0].php.extensions[]' src/conf/resource)
@@ -47,13 +45,4 @@ $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini:
 .PHONY: tt-rss_extra_install
 tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
 	install -m 755 -d $(STAGING_DIR)/app
-	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 src/bin/tt-rss-daemon $(STAGING_DIR)/bin/tt-rss-daemon
-	install -m 755 src/bin/virtual-php $(STAGING_DIR)/bin/virtual-php
-	install -m 755 src/bin/update-schema $(STAGING_DIR)/bin/update-schema
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	install -m 644 src/bin/7.0/settings.sh $(STAGING_DIR)/bin/settings.sh
-else
-	install -m 644 src/bin/settings.sh $(STAGING_DIR)/bin/settings.sh
-endif

@@ -3,23 +3,19 @@
 PACKAGE="tt-rss"
 
 # Others
-LOGS_DIR="${SYNOPKG_PKGVAR}/logs"
 DSM6_WEB_DIR="/var/services/web"
 if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
   WEB_DIR="/var/services/web_packages"
 else
   WEB_DIR="${DSM6_WEB_DIR}"
 fi
+LOGS_DIR="${WEB_DIR}/${PACKAGE}/logs"
 
 VERSION_FILE_DIRECTORY="var"
 VERSION_FILE="${VERSION_FILE_DIRECTORY}/version.txt"
 
-USER=http
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-  EFF_USER=http
-fi
-
-PHP="${SYNOPKG_PKGDEST}/bin/virtual-php"
+WEB_USER="http"
+PHP="/usr/local/bin/php74"
 MARIADB_10_INSTALL_DIRECTORY="/var/packages/MariaDB10"
 MARIADB_10_BIN_DIRECTORY="${MARIADB_10_INSTALL_DIRECTORY}/target/usr/local/mariadb10/bin"
 MYSQL="${MARIADB_10_BIN_DIRECTORY}/mysql"
@@ -29,6 +25,30 @@ MYSQL_DATABASE="ttrss"
 SVC_KEEP_LOG=y
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
+
+exec_update_schema() {
+  TTRSS="${WEB_DIR}/${PACKAGE}/update.php --update-schema=force-yes"
+  COMMAND="${PHP} ${TTRSS}"
+  if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+      /bin/su "$WEB_USER" -s /bin/sh -c "${COMMAND}"
+  else
+      $COMMAND
+  fi
+  return $?
+}
+
+service_prestart ()
+{
+  TTRSS="${WEB_DIR}/${PACKAGE}/update.php --daemon"
+  LOG_FILE="${LOGS_DIR}/daemon.log"
+  COMMAND="${PHP} ${TTRSS}"
+  if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+      /bin/su "$WEB_USER" -s /bin/sh -c "${COMMAND}" >> ${LOG_FILE} 2>&1 &
+  else
+      $COMMAND >> ${LOG_FILE} 2>&1 &
+  fi
+  echo "$!" > "${PID_FILE}"
+}
 
 service_postinst ()
 {
@@ -61,15 +81,15 @@ service_postinst ()
 
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
       # Fix permissions
-      chown "${USER}" "${WEB_DIR}/${PACKAGE}/lock";
-      chown "${USER}" "${WEB_DIR}/${PACKAGE}/feed-icons";
-      chown -R "${USER}" "${WEB_DIR}/${PACKAGE}/cache";
-      chown -R "${USER}" "${LOGS_DIR}";
+      chown "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/lock";
+      chown "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/feed-icons";
+      chown -R "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/cache";
+      chown -R "${WEB_USER}" "${LOGS_DIR}";
       chmod +x "${WEB_DIR}/${PACKAGE}/index.php";
     fi
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-       "${SYNOPKG_PKGDEST}/bin/update-schema"
+       exec_update_schema
     fi
     return 0
 }
@@ -170,7 +190,7 @@ service_postupgrade ()
     ${MV} "${TMP_DIR}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/;
     ${MV} "${TMP_DIR}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/;
 
-    "${SYNOPKG_PKGDEST}"/bin/update-schema;
+    exec_update_schema;
 
     return 0
 }
