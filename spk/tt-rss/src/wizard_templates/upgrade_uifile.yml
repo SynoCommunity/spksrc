@@ -2,4 +2,4 @@ DB_MIGRATION_TITLE:                 DB Migration for tt-rss
 ROOT_PASSWORD_INPUT_DESCRIPTIONS:   Enter your respective Maria DB installation root account passwords
 ENTER_TT-RSS_PASSWORD:              A 'ttrss' MySQL user and database will be created. Please enter a password for the 'ttrss' user.
 TT-RSS_PASSWORD_DESCRIPTION:        Ttrss password
-NO_DB_MIGRATION_DESCRIPTION:        Database migration is not available for this upgrade.
+NO_DB_MIGRATION_DESCRIPTION:        Database migration is not required for this upgrade.

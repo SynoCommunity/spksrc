@@ -242,7 +242,7 @@ service_postuninst ()
   return 0
 }
 
-service_preupgrade ()
+service_save ()
 {
   SOURCE_WEB_DIR="${WEB_DIR}"
   if [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
@@ -266,7 +266,7 @@ service_preupgrade ()
   return 0
 }
 
-service_postupgrade ()
+service_restore ()
 {
   if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
     touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
