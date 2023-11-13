@@ -217,6 +217,7 @@ service_postuninst ()
         echo "Removing PHP profile for tt-rss"
         ${JQ} 'del(.["com-synocommunity-packages-tt-rss"])' ${FULL_PHP_CFG_FILE} > ${TEMP_PHP_CFG_FILE}
         rsync -aX ${RSYNC_ARCH_ARGS} ${TEMP_PHP_CFG_FILE} ${WS_CFG_PATH}/ 2>&1
+        ${RM} "${WS_CFG_PATH}/php_profile/com-synocommunity-packages-tt-rss"
         RESTART_APACHE="yes"
     fi
     # Check for tt-rss Apache config
@@ -235,7 +236,7 @@ service_postuninst ()
         fi
     fi
     # Clean-up temporary files
-    ${RM} ${TEMPDIR}
+    ${RM} "${TEMPDIR}"
   fi
 
   return 0
