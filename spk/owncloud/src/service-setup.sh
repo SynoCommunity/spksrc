@@ -356,6 +356,7 @@ service_postuninst ()
             ${MV} ${WS_CFG_PATH}/${PHP_CFG_FILE} ${WS_CFG_PATH}/${PHP_CFG_FILE}.bak
             rsync -aX ${TEMPDIR}/${PHP_CFG_FILE} ${WS_CFG_PATH}/ 2>&1
             ${RM} ${TEMPDIR}/${PHP_CFG_FILE}
+            ${RM} "${WS_CFG_PATH}/php_profile/com-synocommunity-packages-owncloud"
             CFG_UPDATE="yes"
         fi
         # Check for ownCloud Apache config
