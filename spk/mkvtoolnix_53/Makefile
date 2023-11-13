@@ -1,13 +1,18 @@
 SPK_NAME = mkvtoolnix
-SPK_VERS = 22.0.0
-SPK_REV = 2
+SPK_VERS = 53.0.0
+SPK_REV = 3
 SPK_ICON = src/mkvtoolnix.png
 
-DEPENDS = cross/mkvtoolnix_22
+DEPENDS = cross/mkvtoolnix_53
+
+# mkvtoolnix > 22.x and < 54.x are DSM 7 only
+REQUIRED_MIN_DSM = 7.0
+# comcerto2k has older toolchain than other DSM 7 archs
+UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = cytec
 DESCRIPTION = MKVToolNix is a set of tools to create, alter and inspect Matroska files.
-CHANGELOG = "Update boost libraries. MKVToolNix v22.0 is the final version that is compatible with DSM 6."
+CHANGELOG = "Update to version 53 (requires DSM 7)."
 DISPLAY_NAME = MKVToolNix
 STARTABLE = no
 

@@ -16,7 +16,7 @@ PRE_COMPILE_TARGET = boost_pre_compile
 COMPILE_TARGET = boost_compile
 INSTALL_TARGET = boost_install
 
-# Build all if not told otherwise (we exclude python library when "all" selected)
+# Build all if not told otherwise (we exclude python library when "all" selected)
 BOOST_LIBRARIES ?= all
 
 # Expect already built python when python library selected
