@@ -47,13 +47,6 @@ function with_migration
          "desc": "{{TT-RSS_PASSWORD_DESCRIPTION}}"
        }]
      } ]
-  }, {
-    "step_title": "{{WEBSTATION_PHP_PROFILE_TITLE}}",
-    "items": [ {
-        "desc": "{{{WEBSTATION_PHP_PROFILE_DESC}}}"
-    }, {
-        "desc": "<ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
-    } ]
   } ]  
 EOF
 }
@@ -62,7 +55,7 @@ function without_migration
 {
   cat <<EOF >"${SYNOPKG_TEMP_LOGFILE}"
 [ {
-  "step_title": "{{WEBSTATION_PHP_PROFILE_TITLE}}",
+  "step_title": "{{DB_MIGRATION_TITLE}}",
   "items": [ {
     "type": "multiselect",
     "subitems": [ {
@@ -82,7 +75,7 @@ function without_migration
         "hidden": true
       } ]
     }, {
-      "desc": "{{{WEBSTATION_PHP_PROFILE_DESC}}}<br /><ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
+      "desc": "{{NO_DB_MIGRATION_DESCRIPTION}}"
     } ]
 } ]
 EOF
