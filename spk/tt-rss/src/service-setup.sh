@@ -16,6 +16,8 @@ VERSION_FILE="${VERSION_FILE_DIRECTORY}/version.txt"
 
 WEB_USER="http"
 PHP="/usr/local/bin/php74"
+JQ="/bin/jq"
+SYNOSVC="/usr/syno/sbin/synoservice"
 MARIADB_10_INSTALL_DIRECTORY="/var/packages/MariaDB10"
 MARIADB_10_BIN_DIRECTORY="${MARIADB_10_INSTALL_DIRECTORY}/target/usr/local/mariadb10/bin"
 MYSQL="${MARIADB_10_BIN_DIRECTORY}/mysql"
