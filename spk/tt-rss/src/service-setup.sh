@@ -87,7 +87,7 @@ service_postinst ()
         echo "Enable default PHP profile"
         # Locate default PHP profile
         PHP_PROF_ID=$(${JQ} -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${FULL_PHP_CFG_FILE}")
-        ${JQ} ".default.php = \"$PHP_PROF_ID\"" > "${TEMP_WS_CFG_FILE}"
+        ${JQ} ".default.php = \"$PHP_PROF_ID\"" "${FULL_WS_CFG_FILE}" > "${TEMP_WS_CFG_FILE}"
         rsync -aX ${RSYNC_ARCH_ARGS} "${TEMP_WS_CFG_FILE}" "${WS_CFG_PATH}/" 2>&1
         RESTART_APACHE="yes"
     fi
