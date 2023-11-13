@@ -19,6 +19,13 @@ LICENSE    = GPL
 WIZARDS_TEMPLATES_DIR = src/wizard_templates
 CONF_DIR = src/conf/
 
+include ../../mk/spksrc.common.mk
+
+# Alternate conf dir for DSM 6
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+CONF_DIR = src/conf_6/
+endif
+
 SERVICE_SETUP = src/service-setup.sh
 SYSTEM_GROUP	 = http
 
@@ -44,5 +51,7 @@ $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini:
 
 .PHONY: tt-rss_extra_install
 tt-rss_extra_install: $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.tt-rss.ini
-	install -m 755 -d $(STAGING_DIR)/app
+	install -m 755 -d $(STAGING_DIR)/app -d $(STAGING_DIR)/web
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 644 src/web/tt-rss.conf $(STAGING_DIR)/web/tt-rss.conf
+	install -m 644 src/web/tt-rss.json $(STAGING_DIR)/web/tt-rss.json

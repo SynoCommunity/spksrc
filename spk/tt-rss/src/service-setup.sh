@@ -54,7 +54,65 @@ service_postinst ()
 {
   if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
     # Install the web interface
-    ${CP} "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR} 
+    ${CP} "${SYNOPKG_PKGDEST}/share/${PACKAGE}" ${WEB_DIR}
+
+    TEMPDIR="${SYNOPKG_PKGTMP}/web"
+    ${MKDIR} ${TEMPDIR}
+
+    WS_CFG_PATH="/usr/syno/etc/packages/WebStation"
+    WS_CFG_FILE="WebStation.json"
+    FULL_WS_CFG_FILE="${WS_CFG_PATH}/${WS_CFG_FILE}"
+    TEMP_WS_CFG_FILE="${TEMPDIR}/${WS_CFG_FILE}"
+    PHP_CFG_FILE="PHPSettings.json"
+    PHP_PROF_NAME="Default PHP 7.4 Profile"
+    FULL_PHP_CFG_FILE="${WS_CFG_PATH}/${PHP_CFG_FILE}"
+    TEMP_PHP_CFG_FILE="${TEMPDIR}/${PHP_CFG_FILE}"
+    NEW_WS_CONFIG_FILE_CONTENTS=$(${JQ} "." "${FULL_WS_CFG_FILE}")
+    WS_BACKEND=$(${JQ} -r '.default.backend' "${FULL_WS_CFG_FILE}")
+    WS_PHP=$(${JQ} -r '.default.php' "${FULL_WS_CFG_FILE}")
+    RESTART_APACHE="no"
+    BACKUP_CFG_FILE="yes"
+    RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
+    # Check if Apache is the selected back-end
+    if [ ! "$WS_BACKEND" = "2" ]; then
+        echo "Set Apache as the back-end server"
+        ${JQ} '.default.backend = 2' "${FULL_WS_CFG_FILE}" > "${TEMP_WS_CFG_FILE}"
+        rsync -aX ${RSYNC_ARCH_ARGS} "${TEMP_WS_CFG_FILE}" "${WS_CFG_PATH}/" 2>&1
+        RESTART_APACHE="yes"
+    fi
+    # Check if default PHP profile is selected
+    if [ -z "$WS_PHP" ] || [ "$WS_PHP" = "null" ]; then
+        echo "Enable default PHP profile"
+        # Locate default PHP profile
+        PHP_PROF_ID=$(${JQ} -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${FULL_PHP_CFG_FILE}")
+        ${JQ} ".default.php = \"$PHP_PROF_ID\"" > "${TEMP_WS_CFG_FILE}"
+        rsync -aX ${RSYNC_ARCH_ARGS} "${TEMP_WS_CFG_FILE}" "${WS_CFG_PATH}/" 2>&1
+        RESTART_APACHE="yes"
+    fi
+    # Check for tt-rss PHP profile
+    if ! ${JQ} -e '.["com-synocommunity-packages-tt-rss"]' "${FULL_PHP_CFG_FILE}" >/dev/null; then
+        echo "Add PHP profile for tt-rss"
+        ${JQ} --slurpfile ttRssNode "${SYNOPKG_PKGDEST}/web/tt-rss.json" '.["com-synocommunity-packages-tt-rss"] = $ttRssNode[0]' "${FULL_PHP_CFG_FILE}" > "${TEMP_PHP_CFG_FILE}"
+        rsync -aX ${RSYNC_ARCH_ARGS} "${TEMP_PHP_CFG_FILE}" "${WS_CFG_PATH}/" 2>&1
+        RESTART_APACHE="yes"
+    fi
+    # Check for tt-rss Apache config
+    if [ ! -f "/usr/local/etc/apache24/sites-enabled/tt-rss.conf" ]; then
+        echo "Add Apache config for tt-rss"
+        rsync -aX ${SYNOPKG_PKGDEST}/web/tt-rss.conf /usr/local/etc/apache24/sites-enabled/ 2>&1
+        CFG_UPDATE="yes"
+    fi
+    # Restart Apache if configs have changed
+    if [ "${RESTART_APACHE}" = "yes" ]; then
+        if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-tt-rss")) | length > 0' "${FULL_PHP_CFG_FILE}" >/dev/null; then
+            echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
+        else
+            echo "Restart Apache to load new configs"
+            ${SYNOSVC} --restart pkgctl-Apache2.4
+        fi
+    fi
+    # Clean-up temporary files
+    ${RM} "${TEMPDIR}"
   fi
 
   mkdir "-p" "${LOGS_DIR}"
@@ -91,7 +149,22 @@ service_postinst ()
   if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
     exec_update_schema
   fi
+
   return 0
+}
+
+validate_preinst ()
+{
+  # Check for modification to PHP template defaults on DSM 6
+  if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+    WS_TMPL_PATH="/var/packages/WebStation/target/misc"
+    WS_TMPL_FILE="php74_fpm.mustache"
+    # Check for PHP template defaults
+    if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
+      echo "PHP template defaults have been modified. Installation is not supported."
+      exit 1
+    fi
+  fi
 }
 
 validate_preuninst ()
@@ -127,6 +200,40 @@ service_postuninst ()
   if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
     # Remove the web interface
     ${RM} ${WEB_DIR}/${PACKAGE}
+
+    # Remove web configurations
+    TEMPDIR="${SYNOPKG_PKGTMP}/web"
+    ${MKDIR} ${TEMPDIR}
+    WS_CFG_PATH="/usr/syno/etc/packages/WebStation"
+    PHP_CFG_FILE="PHPSettings.json"
+    FULL_PHP_CFG_FILE="${WS_CFG_PATH}/${PHP_CFG_FILE}"
+    TEMP_PHP_CFG_FILE="${TEMPDIR}/${PHP_CFG_FILE}"
+    RESTART_APACHE="no"
+    RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
+    # Check for tt-rss PHP profile
+    if ${JQ} -e '.["com-synocommunity-packages-tt-rss"]' "${FULL_PHP_CFG_FILE}" >/dev/null; then
+        echo "Removing PHP profile for tt-rss"
+        ${JQ} 'del(.["com-synocommunity-packages-tt-rss"])' ${FULL_PHP_CFG_FILE} > ${TEMP_PHP_CFG_FILE}
+        rsync -aX ${RSYNC_ARCH_ARGS} ${TEMP_PHP_CFG_FILE} ${WS_CFG_PATH}/ 2>&1
+        RESTART_APACHE="yes"
+    fi
+    # Check for tt-rss Apache config
+    if [ -f "/usr/local/etc/apache24/sites-enabled/tt-rss.conf" ]; then
+        echo "Removing Apache config for tt-rss"
+        ${RM} /usr/local/etc/apache24/sites-enabled/tt-rss.conf
+        RESTART_APACHE="yes"
+    fi
+    # Restart Apache if configs have changed
+    if [ "$RESTART_APACHE" = "yes" ]; then
+        if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-tt-rss")) | length > 0' "${FULL_PHP_CFG_FILE}" >/dev/null; then
+            echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
+        else
+            echo "Restart Apache to load new configs"
+            ${SYNOSVC} --restart pkgctl-Apache2.4
+        fi
+    fi
+    # Clean-up temporary files
+    ${RM} ${TEMPDIR}
   fi
 
   return 0
