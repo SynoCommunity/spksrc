@@ -8,5 +8,3 @@ DOMAIN_NAME_SECTION_LABEL:          "Domain name of your DiskStation. For exampl
 DOMAIN_NAME_INPUT_LABEL:            Domain name
 SINGLE_USER_SECTION_LABEL:          Enable single user mode. If you do not use this mode, default login is 'admin' with password 'password'.
 SINGLE_USER_CHECKBOX_LABEL:         Single user
-WEBSTATION_PHP_PROFILE_TITLE:       WebStation PHP Profile
-WEBSTATION_PHP_PROFILE_DESC:        "Tiny Tiny RSS requires the following PHP extensions to be enabled for the current PHP profile (under <code>Web Station</code> &gt; <code>PHP Settings</code> in tab <code>Default Server Settings</code>):"
