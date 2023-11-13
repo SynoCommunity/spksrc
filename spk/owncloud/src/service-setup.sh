@@ -234,7 +234,7 @@ service_postinst ()
 
                 # Restore configuration files and directories
                 rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${OCROOT}/" 2>&1
-                rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/data" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${OCROOT}/" 2>&1
+                rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${OCROOT}/" 2>&1
 
                 # Restore user data
                 echo "Restoring user data to ${DATA_DIR}"
