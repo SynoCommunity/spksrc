@@ -151,51 +151,50 @@ service_postinst ()
         # Install web configurations
         TEMPDIR="${SYNOPKG_PKGTMP}/web"
         ${MKDIR} ${TEMPDIR}
-        WS_CFG_PATH="/usr/syno/etc/packages/WebStation"
+        WS_CFG_DIR="/usr/syno/etc/packages/WebStation"
         WS_CFG_FILE="WebStation.json"
+        WS_CFG_PATH="${WS_CFG_DIR}/${WS_CFG_FILE}"
+        TMP_WS_CFG_PATH="${TEMPDIR}/${WS_CFG_FILE}"
         PHP_CFG_FILE="PHPSettings.json"
+        PHP_CFG_PATH="${WS_CFG_DIR}/${PHP_CFG_FILE}"
+        TMP_PHP_CFG_PATH="${TEMPDIR}/${PHP_CFG_FILE}"
         PHP_PROF_NAME="Default PHP 7.4 Profile"
-        WS_BACKEND="$(${JQ} -r '.default.backend' ${WS_CFG_PATH}/${WS_CFG_FILE})"
-        WS_PHP="$(${JQ} -r '.default.php' ${WS_CFG_PATH}/${WS_CFG_FILE})"
-        CFG_UPDATE="no"
+        WS_BACKEND="$(${JQ} -r '.default.backend' ${WS_CFG_PATH})"
+        WS_PHP="$(${JQ} -r '.default.php' ${WS_CFG_PATH})"
+        RESTART_APACHE="no"
+        RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
         # Check if Apache is the selected back-end
         if [ ! "$WS_BACKEND" = "2" ]; then
             echo "Set Apache as the back-end server"
-            ${JQ} '.default.backend = 2' ${WS_CFG_PATH}/${WS_CFG_FILE} > ${TEMPDIR}/${WS_CFG_FILE}
-            ${MV} ${WS_CFG_PATH}/${WS_CFG_FILE} ${WS_CFG_PATH}/${WS_CFG_FILE}.bak
-            rsync -aX ${TEMPDIR}/${WS_CFG_FILE} ${WS_CFG_PATH}/ 2>&1
-            ${RM} ${TEMPDIR}/${WS_CFG_FILE}
-            CFG_UPDATE="yes"
+            ${JQ} '.default.backend = 2' ${WS_CFG_PATH} > ${TMP_WS_CFG_PATH}
+            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
+            RESTART_APACHE="yes"
         fi
         # Check if default PHP profile is selected
         if [ -z "$WS_PHP" ] || [ "$WS_PHP" = "null" ]; then
             echo "Enable default PHP profile"
             # Locate default PHP profile
-            PHP_PROF_ID="$(${JQ} -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${WS_CFG_PATH}/${PHP_CFG_FILE}")"
-            ${JQ} ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}/${WS_CFG_FILE}" > ${TEMPDIR}/${WS_CFG_FILE}
-            ${MV} ${WS_CFG_PATH}/${WS_CFG_FILE} ${WS_CFG_PATH}/${WS_CFG_FILE}.bak
-            rsync -aX ${TEMPDIR}/${WS_CFG_FILE} ${WS_CFG_PATH}/ 2>&1
-            ${RM} ${TEMPDIR}/${WS_CFG_FILE}
-            CFG_UPDATE="yes"
+            PHP_PROF_ID="$(${JQ} -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${PHP_CFG_PATH}")"
+            ${JQ} ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}" > ${TMP_WS_CFG_PATH}
+            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
+            RESTART_APACHE="yes"
         fi
         # Check for ownCloud PHP profile
-        if ! ${JQ} -e '.["com-synocommunity-packages-owncloud"]' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+        if ! ${JQ} -e '.["com-synocommunity-packages-owncloud"]' "${PHP_CFG_PATH}" >/dev/null; then
             echo "Add PHP profile for ownCloud"
-            ${JQ} --slurpfile ocNode ${SYNOPKG_PKGDEST}/web/owncloud.json '.["com-synocommunity-packages-owncloud"] = $ocNode[0]' ${WS_CFG_PATH}/${PHP_CFG_FILE} > ${TEMPDIR}/${PHP_CFG_FILE}
-            ${MV} ${WS_CFG_PATH}/${PHP_CFG_FILE} ${WS_CFG_PATH}/${PHP_CFG_FILE}.bak
-            rsync -aX ${TEMPDIR}/${PHP_CFG_FILE} ${WS_CFG_PATH}/ 2>&1
-            ${RM} ${TEMPDIR}/${PHP_CFG_FILE}
-            CFG_UPDATE="yes"
+            ${JQ} --slurpfile ocNode ${SYNOPKG_PKGDEST}/web/owncloud.json '.["com-synocommunity-packages-owncloud"] = $ocNode[0]' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
+            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
+            RESTART_APACHE="yes"
         fi
         # Check for ownCloud Apache config
         if [ ! -f "/usr/local/etc/apache24/sites-enabled/owncloud.conf" ]; then
             echo "Add Apache config for ownCloud"
             rsync -aX ${SYNOPKG_PKGDEST}/web/owncloud.conf /usr/local/etc/apache24/sites-enabled/ 2>&1
-            CFG_UPDATE="yes"
+            RESTART_APACHE="yes"
         fi
         # Restart Apache if configs have changed
-        if [ "$CFG_UPDATE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+        if [ "$RESTART_APACHE" = "yes" ]; then
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
@@ -346,28 +345,29 @@ service_postuninst ()
         # Remove web configurations
         TEMPDIR="${SYNOPKG_PKGTMP}/web"
         ${MKDIR} ${TEMPDIR}
-        WS_CFG_PATH="/usr/syno/etc/packages/WebStation"
+        WS_CFG_DIR="/usr/syno/etc/packages/WebStation"
         PHP_CFG_FILE="PHPSettings.json"
-        CFG_UPDATE="no"
+        PHP_CFG_PATH="${WS_CFG_DIR}/${PHP_CFG_FILE}"
+        TMP_PHP_CFG_PATH="${TEMPDIR}/${PHP_CFG_FILE}"
+        RESTART_APACHE="no"
+        RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
         # Check for ownCloud PHP profile
-        if ${JQ} -e '.["com-synocommunity-packages-owncloud"]' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+        if ${JQ} -e '.["com-synocommunity-packages-owncloud"]' "${PHP_CFG_PATH}" >/dev/null; then
             echo "Removing PHP profile for ownCloud"
-            ${JQ} 'del(.["com-synocommunity-packages-owncloud"])' ${WS_CFG_PATH}/${PHP_CFG_FILE} > ${TEMPDIR}/${PHP_CFG_FILE}
-            ${MV} ${WS_CFG_PATH}/${PHP_CFG_FILE} ${WS_CFG_PATH}/${PHP_CFG_FILE}.bak
-            rsync -aX ${TEMPDIR}/${PHP_CFG_FILE} ${WS_CFG_PATH}/ 2>&1
-            ${RM} ${TEMPDIR}/${PHP_CFG_FILE}
-            ${RM} "${WS_CFG_PATH}/php_profile/com-synocommunity-packages-owncloud"
-            CFG_UPDATE="yes"
+            ${JQ} 'del(.["com-synocommunity-packages-owncloud"])' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
+            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
+            ${RM} "${WS_CFG_DIR}/php_profile/com-synocommunity-packages-owncloud"
+            RESTART_APACHE="yes"
         fi
         # Check for ownCloud Apache config
         if [ -f "/usr/local/etc/apache24/sites-enabled/owncloud.conf" ]; then
             echo "Removing Apache config for ownCloud"
             ${RM} /usr/local/etc/apache24/sites-enabled/owncloud.conf
-            CFG_UPDATE="yes"
+            RESTART_APACHE="yes"
         fi
         # Restart Apache if configs have changed
-        if [ "$CFG_UPDATE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+        if [ "$RESTART_APACHE" = "yes" ]; then
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
@@ -385,23 +385,27 @@ service_postupgrade()
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         TEMPDIR="${SYNOPKG_PKGTMP}/web"
         ${MKDIR} ${TEMPDIR}
-        WS_TMPL_PATH="/var/packages/WebStation/target/misc"
+        WS_CFG_DIR="/usr/syno/etc/packages/WebStation"
+        PHP_CFG_FILE="PHPSettings.json"
+        PHP_CFG_PATH="${WS_CFG_DIR}/${PHP_CFG_FILE}"
+        WS_TMPL_DIR="/var/packages/WebStation/target/misc"
         WS_TMPL_FILE="php74_fpm.mustache"
-        CFG_UPDATE="no"
+        WS_TMPL_PATH="${WS_TMPL_DIR}/${WS_TMPL_FILE}"
+        TMP_WS_TMPL_PATH="${TEMPDIR}/${WS_TMPL_FILE}"
+        RESTART_APACHE="no"
+        RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
         # Check for PHP template defaults
-        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
+        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}"; then
             echo "Restore default PHP template; remove previous PHP FPM configuration"
-            rsync -aX ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${TEMPDIR}/ 2>&1
+            rsync -aX ${WS_TMPL_PATH} ${TEMPDIR}/ 2>&1
             SUBST_TEXT="{{#fpm_settings.user_owncloud}}sc-owncloud{{/fpm_settings.user_owncloud}}{{^fpm_settings.user_owncloud}}http{{/fpm_settings.user_owncloud}}"
-            ${SED} -i "s|^user = ${SUBST_TEXT}$|user = http|g; s|^listen.owner = ${SUBST_TEXT}$|listen.owner = http|g" "${TEMPDIR}/${WS_TMPL_FILE}"
-            ${MV} ${WS_TMPL_PATH}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/${WS_TMPL_FILE}.bak
-            rsync -aX ${TEMPDIR}/${WS_TMPL_FILE} ${WS_TMPL_PATH}/ 2>&1
-            ${RM} ${TEMPDIR}/${WS_TMPL_FILE}
-            CFG_UPDATE="yes"
+            ${SED} -i "s|^user = ${SUBST_TEXT}$|user = http|g; s|^listen.owner = ${SUBST_TEXT}$|listen.owner = http|g" "${TMP_WS_TMPL_PATH}"
+            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_TMPL_PATH} ${WS_TMPL_DIR}/ 2>&1
+            RESTART_APACHE="yes"
         fi
         # Restart Apache if configs have changed
-        if [ "$CFG_UPDATE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${WS_CFG_PATH}/${PHP_CFG_FILE}" >/dev/null; then
+        if [ "$RESTART_APACHE" = "yes" ]; then
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
@@ -439,10 +443,11 @@ service_save ()
     SAVE_STATE="normal"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         # Check for modification to PHP template defaults from previous versions
-        WS_TMPL_PATH="/var/packages/WebStation/target/misc"
+        WS_TMPL_DIR="/var/packages/WebStation/target/misc"
         WS_TMPL_FILE="php74_fpm.mustache"
+        WS_TMPL_PATH="${WS_TMPL_DIR}/${WS_TMPL_FILE}"
         # Check for PHP template defaults
-        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
+        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}"; then
             SAVE_STATE="migrate"
         fi
     fi
