@@ -13,7 +13,7 @@ BUILD_DEPENDS = native/ruby
 DEPENDS = cross/libicu cross/boost_1.70 
 DEPENDS += cross/libogg cross/libvorbis cross/zlib
 DEPENDS += cross/flac cross/file
-DEPENDS += cross/libebml cross/libmatroska
+DEPENDS += cross/libmatroska_1.5
 
 HOMEPAGE = https://mkvtoolnix.download/index.html
 COMMENT  = MKVToolNix is a set of tools to create, alter and inspect Matroska files.
