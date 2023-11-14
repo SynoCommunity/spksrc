@@ -10,7 +10,8 @@ if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
 	fi
 fi
 
-quote_json () {
+quote_json ()
+{
 	sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
 }
 

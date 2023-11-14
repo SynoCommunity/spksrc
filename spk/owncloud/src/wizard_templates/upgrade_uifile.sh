@@ -3,7 +3,8 @@
 OC_NEW_VER=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
 OC_OLD_VER=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d '-' -f 1)
 
-quote_json () {
+quote_json ()
+{
 	sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
 }
 
