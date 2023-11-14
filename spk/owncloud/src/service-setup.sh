@@ -440,7 +440,7 @@ validate_preupgrade ()
 service_save ()
 {
     # Initialise save state check for migration of PHP FPM configuration on DSM 6
-    SAVE_STATE="normal"
+    NORMAL_SAVE="yes"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         # Check for modification to PHP template defaults from previous versions
         WS_TMPL_DIR="/var/packages/WebStation/target/misc"
@@ -448,19 +448,19 @@ service_save ()
         WS_TMPL_PATH="${WS_TMPL_DIR}/${WS_TMPL_FILE}"
         # Check for PHP template defaults
         if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}"; then
-            SAVE_STATE="migrate"
+            NORMAL_SAVE="no"
         fi
     fi
 
     # Place server in maintenance mode
-    if [ "$SAVE_STATE" = "normal" ]; then
+    if [ "$NORMAL_SAVE" = "yes" ]; then
         exec_occ maintenance:mode --on
     else
         exec_eff_occ maintenance:mode --on
     fi
 
     # Identify data directory for restore
-    if [ "$SAVE_STATE" = "normal" ]; then
+    if [ "$NORMAL_SAVE" = "yes" ]; then
         DATADIR="$(exec_occ config:system:get datadirectory)"
     else
         DATADIR="$(exec_eff_occ config:system:get datadirectory)"
@@ -487,14 +487,14 @@ service_save ()
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
     echo "Backup existing server database to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup"
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
-    if [ "$SAVE_STATE" = "normal" ]; then
+    if [ "$NORMAL_SAVE" = "yes" ]; then
         exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
     else
         exec_eff_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
     fi
 
     # Fix file ownership
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ] && [ "$SAVE_STATE" != "normal" ]; then
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ] && [ "$NORMAL_SAVE" != "yes" ]; then
         echo "Migrate share permissions to user ${WEB_USER}"
         ${SYNOSHR} --setuser ${SHARE_NAME} RW + ${WEB_USER} >/dev/null 2>&1
         chown -R ${WEB_USER}:${WEB_GROUP} ${SYNOPKG_TEMP_UPGRADE_FOLDER} 2>/dev/null
