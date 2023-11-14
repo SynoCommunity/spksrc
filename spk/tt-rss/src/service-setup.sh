@@ -161,8 +161,9 @@ validate_preinst ()
   if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
     WS_TMPL_PATH="/var/packages/WebStation/target/misc"
     WS_TMPL_FILE="php74_fpm.mustache"
+    FULL_WS_TMPL_FILE="${WS_TMPL_PATH}/${WS_TMPL_FILE}"
     # Check for PHP template defaults
-    if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}/${WS_TMPL_FILE}"; then
+    if ! grep -q -E '^user = http$' "${FULL_WS_TMPL_FILE}" || ! grep -q -E '^listen\.owner = http$' "${FULL_WS_TMPL_FILE}"; then
       echo "PHP template defaults have been modified. Installation is not supported."
       exit 1
     fi
