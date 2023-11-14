@@ -1,8 +1,6 @@
 [{
-	"step_title": "Suppression de la base de donnée selfoss",
+	"step_title": "Supprimer la base de données Selfoss",
 	"items": [{
-		"desc": "Si vous supprimez la base de donnée selfoss, tous les flux seront supprimées."
-	}, {
-		"desc": "Facultatif: Utilisez la fonction « Exporter les sources » dans « Paramètres » pour conserver une sauvegarde de vos flux."
+		"desc": "Attention : La base de données selfoss sera supprimée lors de la désinstallation du package, entraînant la suppression de tous les flux. Vous pouvez éventuellement sauvegarder vos flux en utilisant la fonction « Exporter les sources » dans le menu « Paramètres » pour créer une sauvegarde."
 	}]
 }]

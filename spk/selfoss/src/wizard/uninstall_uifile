@@ -1,8 +1,6 @@
 [{
 	"step_title": "Remove selfoss database",
 	"items": [{
-		"desc": "Attention: The selfoss database will be removed during package uninstallation. All feeds will be deleted."
-	}, {
-		"desc": "Optional: Use the 'Export sources' function within 'Settings' to keep a backup of your feeds."
+		"desc": "Attention: The selfoss database will be deleted when uninstalling the package, resulting in the removal of all feeds. Optionally, safeguard your feeds by utilizing the 'Export sources' function in the 'Settings' menu to create a backup."
 	}]
 }]
