@@ -256,13 +256,16 @@ service_save ()
   ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/config.php" "${TMP_DIR}/${PACKAGE}/"
 
   ${MKDIR} "${TMP_DIR}/${PACKAGE}/feed-icons/"
-  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/feed-icons"/*.ico "${TMP_DIR}/${PACKAGE}/feed-icons/"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/feed-icons"/*.ico "${TMP_DIR}/${PACKAGE}/feed-icons/" 2>/dev/null
 
-  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/plugins.local" "${TMP_DIR}/${PACKAGE}/"
-  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/themes.local" "${TMP_DIR}/${PACKAGE}/"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/plugins.local" "${TMP_DIR}/${PACKAGE}/" 2>/dev/null
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/themes.local" "${TMP_DIR}/${PACKAGE}/" 2>/dev/null
 
   ${MKDIR} -p "${TMP_DIR}/${PACKAGE}/${VERSION_FILE_DIRECTORY}"
   echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/" >"${TMP_DIR}/${PACKAGE}/${VERSION_FILE}"
+
+  ${MKDIR} -p "${TMP_DIR}/${PACKAGE}/cache/feed-icons/"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/cache/feed-icons"/* "${TMP_DIR}/${PACKAGE}/cache/feed-icons/" 2>/dev/null
 
   return 0
 }
@@ -296,12 +299,27 @@ service_restore ()
       "${WEB_DIR}/${PACKAGE}/config.php"
     echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');">>"${WEB_DIR}/${PACKAGE}/config.php"
   fi
+  # Check config file for legacy PHP exec to migrate
+  php_executable_line="putenv('TTRSS_PHP_EXECUTABLE=${PHP}');"
+  search_pattern="^putenv('TTRSS_PHP_EXECUTABLE="
+  # Check if the line exists in the file
+  if grep -q "$search_pattern" "${WEB_DIR}/${PACKAGE}/config.php"; then
+      current_line=$(grep "$search_pattern" "${WEB_DIR}/${PACKAGE}/config.php")
+      if [ "$current_line" != "$php_executable_line" ]; then
+          # If the line is present but not correct, replace it
+          sed -i "s|$search_pattern.*|$php_executable_line|" "${WEB_DIR}/${PACKAGE}/config.php"
+          echo "Legacy PHP exec config migrated successfully."
+      fi
+  fi
 
-  ${MV} "${TMP_DIR}/${PACKAGE}"/feed-icons/*.ico "${WEB_DIR}/${PACKAGE}"/feed-icons/;
-  ${MV} "${TMP_DIR}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/;
-  ${MV} "${TMP_DIR}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/;
+  ${MV} "${TMP_DIR}/${PACKAGE}"/feed-icons/*.ico "${WEB_DIR}/${PACKAGE}"/feed-icons/ 2>/dev/null
+  ${MV} "${TMP_DIR}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/ 2>/dev/null
+  ${MV} "${TMP_DIR}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/ 2>/dev/null
 
-  exec_update_schema;
+  ${MKDIR} -p "${WEB_DIR}/${PACKAGE}/cache/feed-icons/"
+  ${MV} "${TMP_DIR}/${PACKAGE}"/cache/feed-icons/* "${WEB_DIR}/${PACKAGE}"/cache/feed-icons/ 2>/dev/null
+
+  exec_update_schema
 
   return 0
 }
