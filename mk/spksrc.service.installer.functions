@@ -75,7 +75,10 @@ install_python_virtualenv ()
     python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Update to latest pip package installer
-    python3 -m pip install --upgrade pip
+    if ! python3 -m pip install --upgrade pip; then
+    echo "Error: Python upgrade failed" 1>&2
+        exit 1
+    fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         set_unix_permissions ${SYNOPKG_PKGDEST}/env
@@ -98,7 +101,8 @@ install_python_wheels ()
                    --force-reinstall \
                    --cache-dir ${cachedir} \
                    --find-links ${wheelhouse} \
-                   --requirement ${requirements}
+                   --requirement ${requirements} \
+       || { echo "Error: Python package installation failed" 1>&2; exit 1; }
     fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
