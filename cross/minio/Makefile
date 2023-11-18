@@ -26,9 +26,11 @@ ENV += GO111MODULE=on
 GO_BUILD_ARGS = -tags kqueue -buildvcs=false
 
 GO_LDFLAGS  = -s -w
+GO_LDFLAGS += -X github.com/minio/minio/cmd.Version=$(PKG_VERS)
 GO_LDFLAGS += -X github.com/minio/minio/cmd.ReleaseTag=$(PKG_RELEASE_TAG)
-GO_LDFLAGS += -X github.com/minio/minio/cmd.CopyrightYear=$(firstword $(subst -, ,$(PKG_VERS)))
 GO_LDFLAGS += -X github.com/minio/minio/cmd.CommitID=$(PKG_COMMIT_ID)
+GO_LDFLAGS += -X github.com/minio/minio/cmd.ShortCommitID=$(shell echo $(PKG_COMMIT_ID) | cut -c1-12)
+GO_LDFLAGS += -X github.com/minio/minio/cmd.CopyrightYear=$(firstword $(subst -, ,$(PKG_VERS)))
 
 include ../../mk/spksrc.cross-go.mk
 
