@@ -110,7 +110,7 @@
             "desc": "Because of the complexity and risks involved an automatic upgrade process is not available. The official MinIO documentation provides a guide for doing so called 'Migrate from Gateway or Filesystem Mode'"
          },
          {
-            "desc": "For a regular user it is suggested to run an instance of MinIO on a seperate system and migrate your data to this new instance. This system could be a desktop, single board computer or a server. If possible you can mount the storage from you diskstation over the network and use it directly during the migration process. After a successful migration replace the data of your current MinIO installation on your diskstation. Please stop MinIO before replacing your data and restart it afterwards."
+            "desc": "For a regular user it is suggested to run an instance of MinIO on a separate system and migrate your data to this new instance. This system could be a desktop, single board computer or a server. If possible you can mount the storage from your diskstation over the network and use it directly during the migration process. After a successful migration replace the data of your current MinIO installation on your diskstation. Please stop MinIO before replacing your data and restart it afterwards."
          }
       ]
    }
