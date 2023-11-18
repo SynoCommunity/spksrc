@@ -14,7 +14,11 @@ LOGS_DIR="${WEB_DIR}/${PACKAGE}/logs"
 VERSION_FILE_DIRECTORY="var"
 VERSION_FILE="${VERSION_FILE_DIRECTORY}/version.txt"
 
-WEB_USER="http"
+if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+    WEB_USER="http"
+    WEB_GROUP="http"
+fi
+
 PHP="/usr/local/bin/php74"
 JQ="/bin/jq"
 SYNOSVC="/usr/syno/sbin/synoservice"
@@ -124,14 +128,14 @@ service_postinst ()
     single_user_mode=$([ "${wizard_single_user}" = "true" ] && echo "true" || echo "false")
     ${CP} "${WEB_DIR}/${PACKAGE}/config.php-dist" "${WEB_DIR}/${PACKAGE}/config.php"
     {
-      echo "putenv('TTRSS_DB_TYPE=mysql');";
-      echo "putenv('TTRSS_DB_HOST=localhost');";
-      echo "putenv('TTRSS_DB_USER=${MYSQL_USER}');";
-      echo "putenv('TTRSS_DB_NAME=${MYSQL_DATABASE}');";
-      echo "putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');";
-      echo "putenv('TTRSS_SINGLE_USER_MODE=${single_user_mode}');";
-      echo "putenv('TTRSS_SELF_URL_PATH=http://${wizard_domain_name}/${PACKAGE}/');";
-      echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');";
+      echo "putenv('TTRSS_DB_TYPE=mysql');"
+      echo "putenv('TTRSS_DB_HOST=localhost');"
+      echo "putenv('TTRSS_DB_USER=${MYSQL_USER}');"
+      echo "putenv('TTRSS_DB_NAME=${MYSQL_DATABASE}');"
+      echo "putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');"
+      echo "putenv('TTRSS_SINGLE_USER_MODE=${single_user_mode}');"
+      echo "putenv('TTRSS_SELF_URL_PATH=http://${wizard_domain_name}/${PACKAGE}/');"
+      echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');"
       echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');"
     } >>"${WEB_DIR}/${PACKAGE}/config.php"
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
@@ -141,11 +145,8 @@ service_postinst ()
 
   if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
     # Fix permissions
-    chown "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/lock";
-    chown "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/feed-icons";
-    chown -R "${WEB_USER}" "${WEB_DIR}/${PACKAGE}/cache";
-    chown -R "${WEB_USER}" "${LOGS_DIR}";
-    chmod +x "${WEB_DIR}/${PACKAGE}/index.php";
+    chown -R "${WEB_USER}:${WEB_GROUP}" "${WEB_DIR}/${PACKAGE}"
+    chown -R "${WEB_USER}:${WEB_GROUP}" "${LOGS_DIR}"
   fi
 
   if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
