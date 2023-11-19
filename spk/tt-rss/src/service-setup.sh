@@ -276,8 +276,8 @@ service_restore ()
   fi
   # Restore the configuration file
   ${CP} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"
-  SPK_REV=$(cat "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/${VERSION_FILE}")
-  if [ "${SPK_REV}" -lt "14" ]; then
+  OLD_SPK_REV=$(cat "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/${VERSION_FILE}")
+  if [ "${OLD_SPK_REV}" -lt "14" ]; then
     # Parse old configuration and save to new config format
     sed -i -e "s|define('DB_TYPE', '\(.*\)');|putenv('TTRSS_DB_TYPE=\1');|" \
       -e "s|define('DB_HOST', '\(.*\)');|putenv('TTRSS_DB_HOST=\1');|" \
@@ -291,12 +291,12 @@ service_restore ()
       "${WEB_DIR}/${PACKAGE}/config.php"
     echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');">>"${WEB_DIR}/${PACKAGE}/config.php"
   fi
-  if [ "${SPK_REV}" -lt "15" ]; then
+  if [ "${OLD_SPK_REV}" -lt "15" ]; then
     sed -i -e "s|putenv('TTRSS_DB_PASS=.*');|putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');|" \
       "${WEB_DIR}/${PACKAGE}/config.php"
     echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');">>"${WEB_DIR}/${PACKAGE}/config.php"
   fi
-  if [ "${SPK_REV}" -lt "17" ]; then
+  if [ "${OLD_SPK_REV}" -lt "17" ]; then
     # Check config file for legacy PHP exec to migrate
     PHP_EXEC_LINE="putenv('TTRSS_PHP_EXECUTABLE=${PHP}');"
     SEARCH_PATTERN="^putenv('TTRSS_PHP_EXECUTABLE="
