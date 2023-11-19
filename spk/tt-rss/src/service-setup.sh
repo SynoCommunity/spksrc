@@ -1,6 +1,9 @@
 
 # Package
 PACKAGE="tt-rss"
+SVC_KEEP_LOG=y
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
 
 # Others
 DSM6_WEB_DIR="/var/services/web"
@@ -28,9 +31,6 @@ MYSQL="${MARIADB_10_BIN_DIRECTORY}/mysql"
 MYSQLDUMP="${MARIADB_10_BIN_DIRECTORY}/mysqldump"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
-SVC_KEEP_LOG=y
-SVC_BACKGROUND=y
-SVC_WRITE_PID=y
 
 exec_update_schema() {
   TTRSS="${WEB_DIR}/${PACKAGE}/update.php --update-schema=force-yes"
@@ -73,11 +73,9 @@ service_postinst ()
     PHP_PROF_NAME="Default PHP 7.4 Profile"
     FULL_PHP_CFG_FILE="${WS_CFG_PATH}/${PHP_CFG_FILE}"
     TEMP_PHP_CFG_FILE="${TEMPDIR}/${PHP_CFG_FILE}"
-    NEW_WS_CONFIG_FILE_CONTENTS=$(${JQ} "." "${FULL_WS_CFG_FILE}")
     WS_BACKEND=$(${JQ} -r '.default.backend' "${FULL_WS_CFG_FILE}")
     WS_PHP=$(${JQ} -r '.default.php' "${FULL_WS_CFG_FILE}")
     RESTART_APACHE="no"
-    BACKUP_CFG_FILE="yes"
     RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
     # Check if Apache is the selected back-end
     if [ ! "$WS_BACKEND" = "2" ]; then
@@ -106,7 +104,7 @@ service_postinst ()
     if [ ! -f "/usr/local/etc/apache24/sites-enabled/tt-rss.conf" ]; then
         echo "Add Apache config for tt-rss"
         rsync -aX ${SYNOPKG_PKGDEST}/web/tt-rss.conf /usr/local/etc/apache24/sites-enabled/ 2>&1
-        CFG_UPDATE="yes"
+        RESTART_APACHE="yes"
     fi
     # Restart Apache if configs have changed
     if [ "${RESTART_APACHE}" = "yes" ]; then
@@ -180,8 +178,8 @@ validate_preuninst ()
   fi
 
   # Check database export location
-  if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" -a -n "${wizard_dbexport_path}" ]; then
-    if [ -f "${wizard_dbexport_path}" -o -e "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql" ]; then
+  if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_dbexport_path}" ]; then
+    if [ -f "${wizard_dbexport_path}" ] || [ -e "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql" ]; then
       echo "File ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql already exists. Please remove or choose a different location"
       exit 1
     fi
@@ -253,20 +251,20 @@ service_save ()
     fi
   fi
   # Save the configuration file
-  ${MKDIR} "${TMP_DIR}/${PACKAGE}"
-  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/config.php" "${TMP_DIR}/${PACKAGE}/"
+  ${MKDIR} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/config.php" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/"
 
-  ${MKDIR} "${TMP_DIR}/${PACKAGE}/feed-icons/"
-  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/feed-icons"/*.ico "${TMP_DIR}/${PACKAGE}/feed-icons/" 2>/dev/null
+  ${MKDIR} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/feed-icons/"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/feed-icons"/*.ico "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/feed-icons/" 2>/dev/null
 
-  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/plugins.local" "${TMP_DIR}/${PACKAGE}/" 2>/dev/null
-  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/themes.local" "${TMP_DIR}/${PACKAGE}/" 2>/dev/null
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/plugins.local" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/" 2>/dev/null
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/themes.local" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/" 2>/dev/null
 
-  ${MKDIR} -p "${TMP_DIR}/${PACKAGE}/${VERSION_FILE_DIRECTORY}"
-  echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/" >"${TMP_DIR}/${PACKAGE}/${VERSION_FILE}"
+  ${MKDIR} -p "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/${VERSION_FILE_DIRECTORY}"
+  echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/" >"${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/${VERSION_FILE}"
 
-  ${MKDIR} -p "${TMP_DIR}/${PACKAGE}/cache/feed-icons/"
-  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/cache/feed-icons"/* "${TMP_DIR}/${PACKAGE}/cache/feed-icons/" 2>/dev/null
+  ${MKDIR} -p "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/cache/feed-icons/"
+  ${CP} "${SOURCE_WEB_DIR}/${PACKAGE}/cache/feed-icons"/* "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/cache/feed-icons/" 2>/dev/null
 
   return 0
 }
@@ -277,10 +275,9 @@ service_restore ()
     touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
   fi
   # Restore the configuration file
-  ${CP} "${TMP_DIR}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"
-  SPK_REV=$(cat "${TMP_DIR}/${PACKAGE}/${VERSION_FILE}")
-  if [ "${SPK_REV}" -lt "14" ]
-  then
+  ${CP} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/config.php" "${WEB_DIR}/${PACKAGE}/config.php"
+  SPK_REV=$(cat "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/${VERSION_FILE}")
+  if [ "${SPK_REV}" -lt "14" ]; then
     # Parse old configuration and save to new config format
     sed -i -e "s|define('DB_TYPE', '\(.*\)');|putenv('TTRSS_DB_TYPE=\1');|" \
       -e "s|define('DB_HOST', '\(.*\)');|putenv('TTRSS_DB_HOST=\1');|" \
@@ -294,31 +291,25 @@ service_restore ()
       "${WEB_DIR}/${PACKAGE}/config.php"
     echo "putenv('TTRSS_PHP_EXECUTABLE=${PHP}');">>"${WEB_DIR}/${PACKAGE}/config.php"
   fi
-  if [ "${SPK_REV}" -lt "15" ]
-  then
+  if [ "${SPK_REV}" -lt "15" ]; then
     sed -i -e "s|putenv('TTRSS_DB_PASS=.*');|putenv('TTRSS_DB_PASS=${wizard_mysql_password_ttrss}');|" \
       "${WEB_DIR}/${PACKAGE}/config.php"
     echo "putenv('TTRSS_MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock');">>"${WEB_DIR}/${PACKAGE}/config.php"
   fi
-  # Check config file for legacy PHP exec to migrate
-  php_executable_line="putenv('TTRSS_PHP_EXECUTABLE=${PHP}');"
-  search_pattern="^putenv('TTRSS_PHP_EXECUTABLE="
-  # Check if the line exists in the file
-  if grep -q "$search_pattern" "${WEB_DIR}/${PACKAGE}/config.php"; then
-      current_line=$(grep "$search_pattern" "${WEB_DIR}/${PACKAGE}/config.php")
-      if [ "$current_line" != "$php_executable_line" ]; then
-          # If the line is present but not correct, replace it
-          sed -i "s|$search_pattern.*|$php_executable_line|" "${WEB_DIR}/${PACKAGE}/config.php"
-          echo "Legacy PHP exec config migrated successfully."
-      fi
+  if [ "${SPK_REV}" -lt "17" ]; then
+    # Check config file for legacy PHP exec to migrate
+    PHP_EXEC_LINE="putenv('TTRSS_PHP_EXECUTABLE=${PHP}');"
+    SEARCH_PATTERN="^putenv('TTRSS_PHP_EXECUTABLE="
+    sed -i "s|$SEARCH_PATTERN.*|$PHP_EXEC_LINE|" "${WEB_DIR}/${PACKAGE}/config.php"
+    echo "Legacy PHP exec config migrated successfully."
   fi
 
-  ${MV} "${TMP_DIR}/${PACKAGE}"/feed-icons/*.ico "${WEB_DIR}/${PACKAGE}"/feed-icons/ 2>/dev/null
-  ${MV} "${TMP_DIR}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/ 2>/dev/null
-  ${MV} "${TMP_DIR}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/ 2>/dev/null
+  ${MV} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"/feed-icons/*.ico "${WEB_DIR}/${PACKAGE}"/feed-icons/ 2>/dev/null
+  ${MV} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"/plugins.local/* "${WEB_DIR}/${PACKAGE}"/plugins.local/ 2>/dev/null
+  ${MV} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"/themes.local/* "${WEB_DIR}/${PACKAGE}"/themes.local/ 2>/dev/null
 
   ${MKDIR} -p "${WEB_DIR}/${PACKAGE}/cache/feed-icons/"
-  ${MV} "${TMP_DIR}/${PACKAGE}"/cache/feed-icons/* "${WEB_DIR}/${PACKAGE}"/cache/feed-icons/ 2>/dev/null
+  ${MV} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"/cache/feed-icons/* "${WEB_DIR}/${PACKAGE}"/cache/feed-icons/ 2>/dev/null
 
   exec_update_schema
 
