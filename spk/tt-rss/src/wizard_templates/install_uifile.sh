@@ -16,6 +16,18 @@ page_append ()
     fi
 }
 
+getPasswordValidator()
+{
+    validator=$(/bin/cat<<EOF
+{
+    var password = arguments[0];
+    return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})") && ! password.includes("root");
+}
+EOF
+)
+    echo "$validator" | quote_json
+}
+
 # Check for multiple PHP profiles
 check_php_profiles ()
 {
@@ -32,6 +44,7 @@ check_php_profiles ()
 PAGE_TTRSS_SETUP=$(/bin/cat<<EOF
 {
     "step_title": "{{DB_CONFIGURATION_TITLE}}",
+    "invalid_next_disabled_v2": true,
     "items": [{
         "type": "multiselect",
         "subitems": [{
@@ -55,24 +68,37 @@ PAGE_TTRSS_SETUP=$(/bin/cat<<EOF
         "desc": "{{ENTER_MYSQL_PASSWORD}}",
         "subitems": [{
             "key": "wizard_mysql_password_root",
-            "desc": "{{ROOT_PASSWORD}}"
+            "desc": "{{ROOT_PASSWORD_DESCRIPTION}}",
+            "invalidText": "{{INVALID_ROOT_PASSWORD}}",
+            "validator": {
+                "fn": "$(getPasswordValidator)"
+            }
         }]
     }, {
         "type": "password",
         "desc": "{{ENTER_TTRSS_PASSWORD}}",
         "subitems": [{
             "key": "wizard_mysql_password_ttrss",
-            "desc": "{{TT-RSS_PASSWORD_DESCRIPTION}}"
+            "desc": "{{TT-RSS_PASSWORD_DESCRIPTION}}",
+            "invalidText": "{{INVALID_TT-RSS_PASSWORD}}",
+            "validator": {
+                "fn": "$(getPasswordValidator)"
+            }
         }]
     }]
 }, {
     "step_title": "{{TT-RSS_CONFIGURATION_TITLE}}",
+    "invalid_next_disabled_v2": true,
     "items": [{
         "type": "textfield",
         "desc": "{{DOMAIN_NAME_SECTION_LABEL}}",
         "subitems": [{
             "key": "wizard_domain_name",
-            "desc": "{{DOMAIN_NAME_INPUT_LABEL}}"
+            "desc": "{{DOMAIN_NAME_INPUT_LABEL}}",
+            "invalidText": "{{INVALID_DOMAIN_NAME}}",
+            "validator": {
+                "allowBlank": false
+            }
         }]
     }, {
         "type": "multiselect",
