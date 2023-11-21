@@ -1,6 +1,6 @@
 SPK_NAME = owncloud
 SPK_VERS = 10.13.2
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/owncloud.png
 
 DEPENDS = cross/owncloud
@@ -18,7 +18,7 @@ HOMEPAGE = https://owncloud.org/
 
 LICENSE = AGPL
 
-WIZARDS_TEMPLATES_DIR = src/wizard_templates/
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
 SERVICE_WIZARD_SHARENAME = wizard_data_share
 USE_DATA_SHARE_WORKER = yes
 
@@ -31,6 +31,13 @@ ADMIN_PROTOCOL = https
 DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
 CONF_DIR = src/conf/
+
+include ../../mk/spksrc.common.mk
+
+# Alternate conf dir for DSM 6
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+CONF_DIR = src/conf_6/
+endif
 
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
