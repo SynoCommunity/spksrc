@@ -95,7 +95,6 @@ PAGE_TTRSS_SETUP=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_domain_name",
             "desc": "{{DOMAIN_NAME_INPUT_LABEL}}",
-            "invalidText": "{{INVALID_DOMAIN_NAME}}",
             "validator": {
                 "allowBlank": false
             }

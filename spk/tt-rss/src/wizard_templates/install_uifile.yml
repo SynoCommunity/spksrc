@@ -8,7 +8,6 @@ INVALID_TT-RSS_PASSWORD:            "Invalid password. Please ensure it has at l
 TT-RSS_CONFIGURATION_TITLE:         Tt-rss configuration
 DOMAIN_NAME_SECTION_LABEL:          "Domain name of your DiskStation. For example: you.synology.me."
 DOMAIN_NAME_INPUT_LABEL:            Domain name
-INVALID_DOMAIN_NAME:                Domain name cannot be blank.
 SINGLE_USER_SECTION_LABEL:          Enable single user mode. If you do not use this mode, default login is 'admin' with password 'password'.
 SINGLE_USER_CHECKBOX_LABEL:         Single user
 PHP_PROFILES_TITLE:                 Multiple PHP profiles
