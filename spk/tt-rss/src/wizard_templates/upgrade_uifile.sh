@@ -4,7 +4,7 @@ function with_migration
 {
   cat <<EOF >"${SYNOPKG_TEMP_LOGFILE}"
 [ {
-  "step_title": "DB Migration for tt-rss",
+  "step_title": "{{DB_MIGRATION_TITLE}}",
   "items": [ {
     "type": "multiselect",
     "subitems": [ {
@@ -25,7 +25,7 @@ function with_migration
        } ]
     }, {
       "type": "password",
-      "desc": "Enter your respective Maria DB installation root account passwords",
+      "desc": "{{ROOT_PASSWORD_INPUT_DESCRIPTIONS}}",
       "subitems": [ {
           "key": "wizard_mariadb5_password_root",
           "desc": "Maria DB 5",
@@ -41,17 +41,12 @@ function with_migration
         } ]
     }, {
        "type": "password",
-       "desc": "A new 'ttrss' user will be created. Please enter a password for the 'ttrss' user.",
+       "desc": "{{ENTER_TT-RSS_PASSWORD}}",
        "subitems": [{
          "key": "wizard_mysql_password_ttrss",
-         "desc": "Ttrss password"
+         "desc": "{{TT-RSS_PASSWORD_DESCRIPTION}}"
        }]
      } ]
-  }, {
-    "step_title": "WebStation PHP Profile",
-    "items": [ {
-        "desc": "Tiny Tiny RSS requires the following PHP extensions to be enabled for the current PHP profile (under <code>Web Station</code> &gt; <code>PHP Settings</code> &lt; <code>Default Server Settings</code>):<br /><ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
-    } ]
   } ]  
 EOF
 }
@@ -60,7 +55,7 @@ function without_migration
 {
   cat <<EOF >"${SYNOPKG_TEMP_LOGFILE}"
 [ {
-  "step_title": "WebStation PHP Profile",
+  "step_title": "{{DB_MIGRATION_TITLE}}",
   "items": [ {
     "type": "multiselect",
     "subitems": [ {
@@ -80,7 +75,7 @@ function without_migration
         "hidden": true
       } ]
     }, {
-      "desc": "Tiny Tiny RSS requires the following PHP extensions to be enabled for the current PHP profile (under <code>Web Station</code> &gt; <code>PHP Settings</code> &lt; <code>Default Server Settings</code>):<br /><ul><li><code>curl</code></li><li><code>gd</code></li><li><code>intl</code></li><li><code>mysqli</code></li><li><code>pdo_mysql</code></li></ul>"
+      "desc": "{{NO_DB_MIGRATION_DESCRIPTION}}"
     } ]
 } ]
 EOF

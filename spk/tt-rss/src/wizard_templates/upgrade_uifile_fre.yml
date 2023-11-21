@@ -1,0 +1,5 @@
+DB_MIGRATION_TITLE:                 Migration de la base de donnée de tt-rss
+ROOT_PASSWORD_INPUT_DESCRIPTIONS:   "Saisissez les mot de passes root de vos installations Maria DB:"
+ENTER_TT-RSS_PASSWORD:              Un nouvel utilisateur 'ttrss' va être créé. Saisissez un mot de passe pour l'utilisateur 'ttrss'.
+TT-RSS_PASSWORD_DESCRIPTION:        Mot de passe Ttrss
+NO_DB_MIGRATION_DESCRIPTION:        Votre version actuelle ne requiert pas de migration. Procéder sans étapes de migration.
