@@ -1,7 +1,7 @@
 PKG_NAME = libsigc++-main
 
-# support for c++11/c++17 language features is required
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) $(OLD_PPC_ARCHS)
+# support for c++11 language features is required for libsigc++-2.12
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 OPTIONAL_DEPENDS  = cross/libsigc++-latest
 OPTIONAL_DEPENDS += cross/libsigc++-2.12
