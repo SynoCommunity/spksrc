@@ -24,3 +24,9 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME) (HTTP)
 ADMIN_PORT = $(SERVICE_PORT)
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: gitea_extra_install
+gitea_extra_install:
+	@$(MSG) "Install config.ini file"
+	@install -m 755 -d $(STAGING_DIR)/var
+	@install -m 644 src/config.ini $(STAGING_DIR)/var/config.ini
