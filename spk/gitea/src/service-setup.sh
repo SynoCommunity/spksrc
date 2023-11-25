@@ -13,7 +13,7 @@ SVC_BACKGROUND=y
 service_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        SHARED_FOLDER="${wizard_volume}/${wizard_gitea_dir}"
+        SHARED_FOLDER="${wizard_shared_folder_name}"
         if [ ! -d "${SHARED_FOLDER}" ]; then
             mkdir -p "${SHARED_FOLDER}" || {
                 echo "Failed to create directory \"${SHARED_FOLDER}\"."
@@ -27,7 +27,7 @@ service_preinst ()
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        SHARED_FOLDER="${wizard_volume}/${wizard_gitea_dir}"
+        SHARED_FOLDER="${wizard_shared_folder_name}"
         IP=$(ip route get 1 | awk '{print $(NF);exit}')
         # Default configuration with shared folder
         {

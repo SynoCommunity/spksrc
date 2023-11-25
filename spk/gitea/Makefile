@@ -13,17 +13,14 @@ LICENSE = MIT
 DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "git>=2"
 
-SERVICE_USER         = auto
-SERVICE_SETUP        = src/service-setup.sh
-STARTABLE            = yes
-WIZARDS_DIR          = src/wizard
-SERVICE_WIZARD_SHARE = wizard_gitea_dir
-
-# Use shared folder provided by DSM for DSM 6 too (not only for DSM 7).
-USE_DATA_SHARE_WORKER = yes
+SERVICE_USER         		= auto
+SERVICE_SETUP        		= src/service-setup.sh
+STARTABLE            		= yes
+WIZARDS_DIR          		= src/wizard/
+SERVICE_WIZARD_SHARENAME 	= wizard_shared_folder_name
 
 SERVICE_PORT = 8418
-SERVICE_PORT_TITLE = Gitea (HTTP)
+SERVICE_PORT_TITLE = $(DISPLAY_NAME) (HTTP)
 ADMIN_PORT = $(SERVICE_PORT)
 
 include ../../mk/spksrc.spk.mk
