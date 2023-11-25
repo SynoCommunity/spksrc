@@ -2,9 +2,9 @@ PKG_NAME = libjodycode
 PKG_VERS = 3.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/jbruchon/libjodycode/archive
+PKG_DIST_SITE = https://codeberg.org/jbruchon/libjodycode/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
 
