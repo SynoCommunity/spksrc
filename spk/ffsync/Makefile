@@ -4,7 +4,7 @@ SPK_REV = 4
 SPK_ICON = src/ffsync.png
 
 BUILD_DEPENDS = cross/curl cross/mysql-connector-c
-DEPENDS     = cross/ffsync
+DEPENDS     = cross/syncstorage-rs
 
 PYTHON_PACKAGE = python311
 WHEELS      = src/requirements.txt
