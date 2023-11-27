@@ -3,7 +3,7 @@ REPO_NAME = syncstorage-rs
 PKG_VERS = 0.14.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(REPO_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/mozilla-services/$(REPO_NAME)/archive
+PKG_DIST_SITE = https://github.com/mozilla-services/$(REPO_NAME)/archive/${PKG_VERS}
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
