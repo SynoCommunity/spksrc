@@ -9,6 +9,16 @@ TC_DIST_SITE_PATH = PowerPC%20QorIQ%20Linux%202.6.32
 TC_TARGET = powerpc-e500v2-linux-gnuspe
 TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
-TC_RUSTFLAGS = -C target-cpu=e500 target-feature=-hard-float,-spe
+TC_RUSTFLAGS = -Ctarget-cpu=e500
+
+POST_FIX_TARGET = qoriq_post_fix_target
 
 include ../../mk/spksrc.tc.mk
+
+.PHONY: qoriq_post_fix_target
+qoriq_post_fix_target:
+	@cd $(WORK_DIR)/$(TC_TARGET)/bin ; \
+	for gnutool in $$(ls -1); do \
+	  [ ! -h "powerpc-linux-gnuspe-$${gnutool##*-}" ] && ln -s $${gnutool} "powerpc-linux-gnuspe-$${gnutool##*-}" ; \
+	  [ ! -h "powerpc-unknown-linux-gnuspe-$${gnutool##*-}" ] && ln -s $${gnutool} "powerpc-unknown-linux-gnuspe-$${gnutool##*-}" ; \
+	done
