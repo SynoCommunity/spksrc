@@ -13,9 +13,15 @@ tokenlib==2.0.0
 
 boto==2.49.0
 hawkauthlib==2.0.0
-mysqlclient==2.1.1
 pyramid==2.0.1
 sqlalchemy==1.4.46
 testfixtures
 tokenlib==2.0.0
 PyBrowserID==0.14.0
+
+# [mysqlclient]
+# Depends: mysql-connector-c, mariadb-connector-c
+# Require environment variables
+#  MYSQLCLIENT_CFLAGS
+#  MYSQLCLIENT_LDFLAGS
+mysqlclient==2.1.1
