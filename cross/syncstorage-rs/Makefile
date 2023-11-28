@@ -14,7 +14,8 @@ HOMEPAGE = https://github.com/mozilla-services/syncstorage-rs/
 COMMENT  = Mozilla Sync Storage built with Rust.
 LICENSE  = https://github.com/mozilla-services/syncstorage-rs/blob/master/LICENSE
 
-# install the main server program
-CARGO_BUILD_ARGS += --path ./syncserver --no-default-features --features=syncstorage-db/mysql --locked
+# arguments to install the main server program
+RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/syncserver
+ENV += RUSTFLAGS="--no-default-features --features=syncstorage-db/mysql --locked"
 
 include ../../mk/spksrc.cross-rust.mk
