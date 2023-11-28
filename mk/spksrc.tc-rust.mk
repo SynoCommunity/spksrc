@@ -80,17 +80,17 @@ pre_rustc_target: rustc_msg
 	flock -u 5
 
 rustc_target: $(PRE_RUSTC_TARGET) $(TC_LOCAL_VARS_RUST)
-	@$(MSG) "rustup toolchain install $(RUST_TOOLCHAIN)" ; \
+	@$(MSG) "rustup toolchain install $(RUSTUP_DEFAULT_TOOLCHAIN)" ; \
 	exec 5> /tmp/tc-rustc.lock ; \
 	flock --timeout $(FLOCK_TIMEOUT) --exclusive 5 || exit 1 ; \
 	pid=$$$$ ; \
 	echo "$${pid}" 1>&5 ; \
-	rustup toolchain install $(RUST_TOOLCHAIN) ; \
-	$(MSG) "rustup default $(RUST_TOOLCHAIN)" ; \
-	rustup default $(RUST_TOOLCHAIN) ; \
+	rustup toolchain install $(RUSTUP_DEFAULT_TOOLCHAIN) ; \
+	$(MSG) "rustup default $(RUSTUP_DEFAULT_TOOLCHAIN)" ; \
+	rustup default $(RUSTUP_DEFAULT_TOOLCHAIN) ; \
 	flock -u 5
 	rustup show
-ifneq ($(shell rustup target list 2>&1 | grep $(RUST_TARGET)),)
+ifneq ($(TC_RUSTUP_TOOLCHAIN),stable)
 	@$(MSG) "rustup target add $(RUST_TARGET)"
 	rustup override set stable
 	rustup target add $(RUST_TARGET)

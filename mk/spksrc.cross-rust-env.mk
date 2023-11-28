@@ -8,16 +8,12 @@ export RUSTUP_HOME=$(BASE_DISTRIB_DIR)/rustup
 export PATH:=$(BASE_DISTRIB_DIR)/cargo/bin:$(PATH)
 endif
 
-ifeq ($(RUST_TOOLCHAIN),)
-RUST_TOOLCHAIN = stable
+ifeq ($(RUSTUP_DEFAULT_TOOLCHAIN),)
+RUSTUP_DEFAULT_TOOLCHAIN = stable
 endif
 
-ifeq ($(RUST_TARGET_TOOLCHAIN),)
-ifneq ($(shell rustup target list 2>&1 | grep $(RUST_TARGET) 2>/dev/null),)
-RUST_TARGET_TOOLCHAIN = $(RUST_TOOLCHAIN)
-else
-RUST_TARGET_TOOLCHAIN = $(TC_ARCH)
-endif
+ifeq ($(TC_RUSTUP_TOOLCHAIN),)
+TC_RUSTUP_TOOLCHAIN = $(RUSTUP_DEFAULT_TOOLCHAIN)
 endif
 
 RUST_TARGET =
@@ -43,6 +39,7 @@ RUST_TARGET = aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
 RUST_TARGET = powerpc-unknown-linux-gnuspe
+TC_RUSTUP_TOOLCHAIN = $(TC_ARCH)
 endif
 ifeq ($(RUST_TARGET),)
 $(error Arch $(ARCH) not supported)
