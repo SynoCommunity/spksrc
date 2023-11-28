@@ -90,7 +90,7 @@ rustc_target: $(PRE_RUSTC_TARGET) $(TC_LOCAL_VARS_RUST)
 	rustup default $(RUSTUP_DEFAULT_TOOLCHAIN) ; \
 	flock -u 5
 	rustup show
-ifneq ($(TC_RUSTUP_TOOLCHAIN),stable)
+ifeq ($(TC_RUSTUP_TOOLCHAIN),$(RUSTUP_DEFAULT_TOOLCHAIN))
 	@$(MSG) "rustup target add $(RUST_TARGET)"
 	rustup override set stable
 	rustup target add $(RUST_TARGET)
