@@ -60,9 +60,9 @@ endif
 
 # Default build with rust and install with cargo
 rust_install_target:
-	@echo "  ==> Cargo install rust package $(PKG_NAME) ($(shell rustc --version); $(RUST_TOOLCHAIN))"
-	@$(RUN) cargo +$(RUST_TOOLCHAIN) install $(CARGO_INSTALL_ARGS)
-
+	@echo "  ==> Cargo install rust package $(PKG_NAME) (rustc +$(TC_RUSTUP_TOOLCHAIN) -vV)"
+	@$(RUN) rustc +$(TC_RUSTUP_TOOLCHAIN) -vV
+	@$(RUN) cargo install $(CARGO_INSTALL_ARGS)
 
 #####
 

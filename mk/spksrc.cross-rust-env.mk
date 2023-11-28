@@ -12,6 +12,14 @@ ifeq ($(RUST_TOOLCHAIN),)
 RUST_TOOLCHAIN = stable
 endif
 
+ifeq ($(RUST_TARGET_TOOLCHAIN),)
+ifneq ($(shell rustup target list 2>&1 | grep $(RUST_TARGET) 2>/dev/null),)
+RUST_TARGET_TOOLCHAIN = $(RUST_TOOLCHAIN)
+else
+RUST_TARGET_TOOLCHAIN = $(TC_ARCH)
+endif
+endif
+
 RUST_TARGET =
 # map archs to rust targets
 ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
@@ -34,7 +42,7 @@ ifeq ($(findstring $(ARCH), $(ARMv8_ARCHS)),$(ARCH))
 RUST_TARGET = aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
-RUST_TARGET = powerpc-unknown-linux-gnu
+RUST_TARGET = powerpc-unknown-linux-gnuspe
 endif
 ifeq ($(RUST_TARGET),)
 $(error Arch $(ARCH) not supported)
