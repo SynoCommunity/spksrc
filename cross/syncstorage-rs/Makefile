@@ -16,6 +16,8 @@ LICENSE  = https://github.com/mozilla-services/syncstorage-rs/blob/master/LICENS
 
 # arguments to install the main server program
 RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/syncserver
-ENV += RUSTFLAGS="--no-default-features --features=syncstorage-db/mysql --locked"
+CARGO_BUILD_ARGS += --no-default-features
+CARGO_BUILD_ARGS += --features=syncstorage-db/mysql
+CARGO_BUILD_ARGS += --locked
 
 include ../../mk/spksrc.cross-rust.mk

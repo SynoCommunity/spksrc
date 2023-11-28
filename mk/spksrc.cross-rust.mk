@@ -53,10 +53,14 @@ endif
 CARGO_INSTALL_ARGS += --path $(RUST_SRC_DIR)
 CARGO_INSTALL_ARGS += --root $(STAGING_INSTALL_PREFIX)
 
+ifeq ($(strip $(CARGO_BUILD_ARGS)),)
+CARGO_BUILD_ARGS = 
+endif
+
 # Default build with rust and install with cargo
 rust_install_target:
 	@echo "  ==> Cargo install rust package $(PKG_NAME) ($(shell rustc --version); $(RUST_TOOLCHAIN))"
-	@$(RUN) cargo +$(RUST_TOOLCHAIN) install $(CARGO_INSTALL_ARGS)
+	@$(RUN) cargo +$(RUST_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) $(CARGO_BUILD_ARGS)
 
 
 #####
