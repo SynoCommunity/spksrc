@@ -7,7 +7,7 @@ BUILD_DEPENDS = cross/curl cross/mysql-connector-c
 DEPENDS     = cross/syncstorage-rs
 
 PYTHON_PACKAGE = python311
-WHEELS      = src/requirements.txt
+WHEELS      = src/requirements-crossenv.txt src/requirements-pure.txt
 
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = MariaDB10:python311

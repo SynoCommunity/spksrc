@@ -1,0 +1,14 @@
+# From requirements.txt
+
+pyfxa==0.7.7
+tokenlib==2.0.0
+
+# From tools/tokenserver/requirements.txt
+
+boto==2.49.0
+hawkauthlib==2.0.0
+pyramid==2.0.1
+sqlalchemy==1.4.46
+testfixtures
+tokenlib==2.0.0
+PyBrowserID==0.14.0
