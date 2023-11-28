@@ -5,11 +5,14 @@
 # the cryptography package with Rust results in a segfault, so we need to
 # set the CRYPTOGRAPHY_DONT_BUILD_RUST env var to force the package to build
 # with C instead. This env var is only present in cryptography<3.5.
+
+# [bcrypt] & [cryptography]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 cryptography==3.4.8
 
 # From tools/tokenserver/requirements.txt
-
-sqlalchemy==1.4.46
 
 # [mysqlclient]
 # Depends: mysql-connector-c, mariadb-connector-c
@@ -17,3 +20,5 @@ sqlalchemy==1.4.46
 #  MYSQLCLIENT_CFLAGS
 #  MYSQLCLIENT_LDFLAGS
 mysqlclient==2.1.1
+
+sqlalchemy==1.4.46
