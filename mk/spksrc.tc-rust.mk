@@ -99,7 +99,7 @@ else
 	@$(MSG) "Setting-up toolkit"
 	@$(MAKE) -C ../../toolkit/syno-$(ARCH)-$(TCVERSION)
 	@$(MSG) "Enforce usage of CMake 3.20.0 or higher"
-	@$(MAKE) -C ../../natime/cmake
+	@$(MAKE) -C ../../native/cmake
 	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
 	@(cd $(WORK_DIR)/rust && ./x setup compiler)
