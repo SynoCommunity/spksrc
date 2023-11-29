@@ -14,6 +14,9 @@ endif
 
 ifeq ($(TC_RUSTUP_TOOLCHAIN),)
 TC_RUSTUP_TOOLCHAIN = $(RUSTUP_DEFAULT_TOOLCHAIN)
+else
+USE_NATIVE_CMAKE = 1
+include ../../mk/spksrc.native-cmake-env.mk
 endif
 
 RUST_TARGET =
