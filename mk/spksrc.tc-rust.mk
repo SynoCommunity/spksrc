@@ -106,6 +106,7 @@ else
 	@(cd $(WORK_DIR)/rust && \
 	    CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
 	    CXXFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
+	    LDFLAGS_$(subst -,_,$(RUST_TARGET))="--sysroot=$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)" \
 	    RUST_BACKTRACE=full \
 	    ./x build --config $(TC_LOCAL_VARS_RUST))
 	@rustup toolchain link $(TC_ARCH) $(WORK_DIR)/rust/build/host/stage2
