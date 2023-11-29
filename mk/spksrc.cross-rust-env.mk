@@ -1,5 +1,8 @@
 # Configuration for rust compiler
-# 
+#
+
+# For newer cmake when building tier-3 toolchains
+include ../../mk/spksrc.native-cmake-env.mk
 
 # Add cargo for rust compiler to default PATH
 ifneq ($(BASE_DISTRIB_DIR),)
@@ -16,7 +19,6 @@ ifeq ($(TC_RUSTUP_TOOLCHAIN),)
 TC_RUSTUP_TOOLCHAIN = $(RUSTUP_DEFAULT_TOOLCHAIN)
 else
 USE_NATIVE_CMAKE = 1
-include ../../mk/spksrc.native-cmake-env.mk
 endif
 
 RUST_TARGET =
