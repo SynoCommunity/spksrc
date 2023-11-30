@@ -1,5 +1,5 @@
 SPK_NAME = ffsync
-SPK_VERS = 0.14.1
+SPK_VERS = 0.14.3
 SPK_REV = 4
 SPK_ICON = src/ffsync.png
 
@@ -33,11 +33,6 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 CONF_DIR         = src/conf/
-
-# [mysqlclient]
-DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 POST_STRIP_TARGET = ffsync_extra_install
 
