@@ -93,7 +93,7 @@ else
 	@$(MSG) "Target $(RUST_TARGET) unavailable..."
 	@$(MSG) "Enforce usage of CMake 3.20.0 or higher"
 	@$(MAKE) -C ../../native/cmake
-	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET)"
+	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
 	@(cd $(WORK_DIR)/rust && ./x setup compiler)
 	@(cd $(WORK_DIR)/rust && \
@@ -103,6 +103,9 @@ else
 	    RUST_BACKTRACE=full \
 	    ./x build --config $(TC_LOCAL_VARS_RUST))
 	@rustup toolchain link $(TC_RUSTUP_TOOLCHAIN) $(WORK_DIR)/rust/build/host/stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)
+	@for i in 0 1 2 ; do \
+	   [ $${i} -lt $(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) ] && (cd $(WORK_DIR)/rust && ./x clean --stage $${i}) || true ; \
+	done
 	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET) - stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) complete"
 endif
 	rustup show
