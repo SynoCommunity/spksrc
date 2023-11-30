@@ -5,9 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VERS}
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = cross/python311
-DEPENDS += cross/openssl3 cross/mysql-connector-c
-
 # powerpc archs (except qoriq) are not supported
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
 

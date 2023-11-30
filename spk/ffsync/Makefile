@@ -9,6 +9,8 @@ DEPENDS     = cross/syncstorage-rs
 PYTHON_PACKAGE = python311
 WHEELS      = src/requirements-crossenv.txt src/requirements-pure.txt
 
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
 
@@ -34,11 +36,14 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 CONF_DIR         = src/conf/
 
+# [mysqlclient]
+DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
 POST_STRIP_TARGET = ffsync_extra_install
 
 include ../../mk/spksrc.python.mk
 
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/ffsync.ini $(STAGING_DIR)/var/
