@@ -10,7 +10,7 @@ PYTHON_PACKAGE = python311
 WHEELS      = src/requirements-crossenv.txt src/requirements-pure.txt
 
 REQUIRED_MIN_DSM = 6.0
-SPK_DEPENDS = MariaDB10:python311
+SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
@@ -47,7 +47,7 @@ ENV += CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 POST_STRIP_TARGET = ffsync_extra_install
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
 
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
