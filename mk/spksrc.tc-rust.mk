@@ -102,7 +102,7 @@ else
 	    LDFLAGS_$(subst -,_,$(RUST_TARGET))="--sysroot=$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)" \
 	    RUST_BACKTRACE=full \
 	    ./x build --config $(TC_LOCAL_VARS_RUST))
-	@rustup toolchain link $(TC_ARCH) $(WORK_DIR)/rust/build/host/stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)
+	@rustup toolchain link $(TC_RUSTUP_TOOLCHAIN) $(WORK_DIR)/rust/build/host/stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)
 	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET) - stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) complete"
 endif
 	rustup show

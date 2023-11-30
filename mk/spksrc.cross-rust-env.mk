@@ -45,7 +45,7 @@ RUST_TARGET = aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
 RUST_TARGET = powerpc-unknown-linux-gnuspe
-TC_RUSTUP_TOOLCHAIN = $(TC_ARCH)
+TC_RUSTUP_TOOLCHAIN = $(RUST_TARGET)
 endif
 ifeq ($(RUST_TARGET),)
 $(error Arch $(ARCH) not supported)
