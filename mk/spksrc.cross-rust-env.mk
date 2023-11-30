@@ -14,6 +14,10 @@ ifeq ($(RUSTUP_DEFAULT_TOOLCHAIN),)
 RUSTUP_DEFAULT_TOOLCHAIN = stable
 endif
 
+# When building toolchain Tier-3 arch support
+#   https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html#stage-2-the-truly-current-compiler
+RUSTUP_DEFAULT_TOOLCHAIN_STAGE = 1
+
 ifeq ($(TC_RUSTUP_TOOLCHAIN),)
 TC_RUSTUP_TOOLCHAIN = $(RUSTUP_DEFAULT_TOOLCHAIN)
 endif

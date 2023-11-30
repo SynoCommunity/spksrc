@@ -46,7 +46,7 @@ rust_toml:
 	echo
 	@echo "[build]" ; \
 	echo 'target = ["$(RUST_TARGET)"]' ; \
-	echo "build-stage = 2" ; \
+	echo "build-stage = $(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)" ; \
 	echo "docs = false" ; \
 	echo "docs-minification = false" ; \
 	echo "compiler-docs = false" ; \
@@ -58,11 +58,6 @@ rust_toml:
 	echo 'ranlib = "$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ranlib"' ; \
 	echo 'linker = "$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc"' ; \
 	echo
-	@echo "#[target.'cfg(target_arch = \"$(firstword $(subst -, ,$(RUST_TARGET)))\")']" ; \
-	echo '#rustflags = ["-C", "link-arg=--sysroot=$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)"]' ; \
-	echo '#cflags = "$(TC_EXTRA_CFLAGS)"' ; \
-	echo '#cxxflags = "$(TC_EXTRA_CFLAGS)"' ; \
-	echo '#openssl-dir = "$(abspath $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work/usr/)"'
 
 rustc_msg:
 	@$(MSG) "Installing rustc toolchain for $(NAME)"
@@ -96,8 +91,6 @@ ifeq ($(TC_RUSTUP_TOOLCHAIN),$(RUSTUP_DEFAULT_TOOLCHAIN))
 	rustup target add $(RUST_TARGET)
 else
 	@$(MSG) "Target $(RUST_TARGET) unavailable..."
-	@$(MSG) "Setting-up toolkit"
-	@$(MAKE) -C ../../toolkit/syno-$(ARCH)-$(TCVERSION)
 	@$(MSG) "Enforce usage of CMake 3.20.0 or higher"
 	@$(MAKE) -C ../../native/cmake
 	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET)"
@@ -109,8 +102,8 @@ else
 	    LDFLAGS_$(subst -,_,$(RUST_TARGET))="--sysroot=$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)" \
 	    RUST_BACKTRACE=full \
 	    ./x build --config $(TC_LOCAL_VARS_RUST))
-	@rustup toolchain link $(TC_ARCH) $(WORK_DIR)/rust/build/host/stage2
-	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET) - stage2 complete"
+	@rustup toolchain link $(TC_ARCH) $(WORK_DIR)/rust/build/host/stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)
+	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET) - stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) complete"
 endif
 	rustup show
 
