@@ -24,6 +24,8 @@ CARGO_BUILD_ARGS += --locked
 DEPENDS = cross/openssl3
 # for mysqlclient
 DEPENDS += cross/mysql-connector-c
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 # To find libpython in prebuilt or local built python
 ifneq ($(PYTHON_STAGING_PREFIX),)
