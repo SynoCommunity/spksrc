@@ -36,14 +36,11 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 CONF_DIR         = src/conf/
 
-# [mysqlclient]
-DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
-
 POST_STRIP_TARGET = ffsync_extra_install
 
 include ../../mk/spksrc.python.mk
 
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 644 src/var/local.toml $(STAGING_DIR)/var/

@@ -11,7 +11,7 @@ CFG_FILE="${HOME}/config/local.toml"
 
 SERVICE_COMMAND="${SYNCSERVER} --config=${CFG_FILE}"
 
-service_preinst ()
+validate_preinst ()
 {
     # Check MySQL database
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
@@ -75,29 +75,18 @@ EOF
         # Setup syncserver config file
         MASTER_SECRET="$(cat /dev/urandom | base32 | head -c64)"
         METRICS_HASH_SECRET="$(cat /dev/urandom | base32 | head -c64)"
-        cat > ${CFG_FILE} <<EOF
-master_secret = "${MASTER_SECRET}"
 
-# removing this line will default to moz_json formatted logs
-human_logs = 1
+        # Escape vertical bars in the replacement values
+        WIZARD_PASSWORD=$(echo "${wizard_password_ffsync}" | sed 's/|/\\|/g')
 
-host = "localhost" # default
-port = ${SERVICE_PORT} # SPK default
+        # Copy configuration template into folder
+        ${CP} "${SYNOPKG_PKGDEST}/var/local.toml" "${CFG_FILE}"
 
-syncstorage.database_url = "mysql://${SPK_NAME}:${wizard_password_ffsync}@localhost/syncstorage_rs"
-syncstorage.enable_quota = 0
-syncstorage.enabled = true
-syncstorage.limits.max_total_records = 1666 # See issues #298/#333
-
-# token
-tokenserver.database_url = "mysql://${SPK_NAME}:${wizard_password_ffsync}@localhost/tokenserver_rs"
-tokenserver.enabled = true 
-tokenserver.fxa_email_domain = "api.accounts.firefox.com"
-tokenserver.fxa_metrics_hash_secret = "${METRICS_HASH_SECRET}"
-tokenserver.fxa_oauth_server_url = "https://oauth.accounts.firefox.com"
-tokenserver.fxa_browserid_audience = "https://token.services.mozilla.com"
-tokenserver.fxa_browserid_issuer = "https://api.accounts.firefox.com"
-tokenserver.fxa_browserid_server_url = "https://verifier.accounts.firefox.com/v2"
-EOF
+        # Perform replacements using sed with | as the delimiter
+        sed -i "s|{{MASTER_SECRET}}|${MASTER_SECRET}|g" "${CFG_FILE}"
+        sed -i "s|{{TCP_PORT}}|${SERVICE_PORT}|g" "${CFG_FILE}"
+        sed -i "s|{{SQL_USER}}|${SPK_NAME}|g" "${CFG_FILE}"
+        sed -i "s|{{SQL_PASS}}|${WIZARD_PASSWORD}|g" "${CFG_FILE}"
+        sed -i "s|{{METRICS_HASH_SECRET}}|${METRICS_HASH_SECRET}|g" "${CFG_FILE}"
     fi
 }

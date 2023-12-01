@@ -22,4 +22,8 @@ CARGO_BUILD_ARGS += --no-default-features
 CARGO_BUILD_ARGS += --features=syncstorage-db/mysql
 CARGO_BUILD_ARGS += --locked
 
+# [mysqlclient]
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
 include ../../mk/spksrc.cross-rust.mk
