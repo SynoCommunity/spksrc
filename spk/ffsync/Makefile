@@ -35,6 +35,10 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 CONF_DIR         = src/conf/
 
+# [mysqlclient]
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
 POST_STRIP_TARGET = ffsync_extra_install
 
 include ../../mk/spksrc.python.mk
