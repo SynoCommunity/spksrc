@@ -22,7 +22,12 @@ CARGO_BUILD_ARGS += --no-default-features
 CARGO_BUILD_ARGS += --features=syncstorage-db/mysql
 CARGO_BUILD_ARGS += --locked
 
-# [mysqlclient]
+# only required for build in cross/syncstorage-rs folder (not when using prebuilt spk/python311)
+#BUILD_DEPENDS = cross/python311
+# for openssl-sys
+DEPENDS = cross/openssl3
+# for mysqlclient
+DEPENDS += cross/mysql-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
