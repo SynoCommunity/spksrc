@@ -40,7 +40,7 @@ PAGE_FFSYNC_REMOVE=$(/bin/cat<<EOF
 		"subitems": [{
 			"key": "wizard_mysql_password_root",
 			"desc": "Root password",
-			"invalidText": "Invalid password. Please ensure it has at least one uppercase letter, one lowercase letter, one digit, one special character, a minimum length of 10 characters, and does not contain the word 'root'.",
+			"invalidText": "Password does not meet the current strength rules. The minimum password length is 10 characters and must include mixed case, numeric characters, and special characters; it must also exclude common passwords or using username as password.",
 			"validator": {
 				"fn": "$(getPasswordValidator)"
 			}
