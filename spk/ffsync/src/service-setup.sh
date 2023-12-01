@@ -46,7 +46,7 @@ service_postinst ()
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # login as root sql user using whatever creds you set up for that
         # this sets up a user for sync storage and sets up the databases
-        ${MYSQL} -u root -p ${wizard_mysql_password_root} <<EOF
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" <<EOF
 CREATE USER "${DBUSER}"@"localhost" IDENTIFIED BY "${wizard_password_ffsync}";
 CREATE DATABASE syncstorage_rs;
 CREATE DATABASE tokenserver_rs;
@@ -63,7 +63,8 @@ EOF
             migration --migration-dir tokenserver-db/migrations run
 
         # Add sync endpoint to database
-        ${MYSQL} -u ${DBUSER} -p "$(wizard_password_ffsync)" <<EOF
+        ${MYSQL} -u ${SPK_NAME} -p"${wizard_password_ffsync}" <<EOF
+        ${MYSQL} -u ${DBUSER} -p"$(wizard_password_ffsync)" <<EOF
 USE tokenserver_rs
 INSERT INTO services (id, service, pattern) VALUES
     (1, "sync-1.5", "{node}/1.5/{uid}");
