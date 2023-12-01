@@ -28,7 +28,16 @@ CARGO_BUILD_ARGS += --locked
 DEPENDS = cross/openssl3
 # for mysqlclient
 DEPENDS += cross/mysql-connector-c
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
+# To find libpython in prebuilt or local built python
+ifneq ($(PYTHON_STAGING_PREFIX),)
+# use prebuilt python
+ENV += PYO3_CROSS_LIB_DIR=$(PYTHON_STAGING_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(PYTHON_STAGING_PREFIX)/include/
+else
+# use local python (together with "BUILD_DEPENDS = cross/python311" above)
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+endif
 
 include ../../mk/spksrc.cross-rust.mk
