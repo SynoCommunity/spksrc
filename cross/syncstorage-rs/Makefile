@@ -5,25 +5,25 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VERS}
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# only required for build in cross/syncstorage-rs folder (not when using prebuilt spk/python311)
+#BUILD_DEPENDS = cross/python311
+# for openssl-sys
+DEPENDS = cross/openssl3
+# for mysqlclient-sys
+DEPENDS += cross/mysql-connector-c
+
 # powerpc archs (except qoriq) are not supported
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://github.com/mozilla-services/syncstorage-rs/
 COMMENT  = Mozilla Sync Storage built with Rust.
-LICENSE  = https://github.com/mozilla-services/syncstorage-rs/blob/master/LICENSE
+LICENSE  = MPL 2.0
 
 # arguments to install the main server program
 RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/syncserver
 CARGO_BUILD_ARGS += --no-default-features
 CARGO_BUILD_ARGS += --features=syncstorage-db/mysql
 CARGO_BUILD_ARGS += --locked
-
-# only required for build in cross/syncstorage-rs folder (not when using prebuilt spk/python311)
-#BUILD_DEPENDS = cross/python311
-# for openssl-sys
-DEPENDS = cross/openssl3
-# for mysqlclient
-DEPENDS += cross/mysql-connector-c
 
 # To find libpython in prebuilt or local built python
 ifneq ($(PYTHON_STAGING_PREFIX),)
@@ -35,5 +35,10 @@ else
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 endif
+
+# mysqlclient-sys: to find libmysqlclient
+ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
+# to find dependencies of libmysqlclient (libz)
+ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
 
 include ../../mk/spksrc.cross-rust.mk
