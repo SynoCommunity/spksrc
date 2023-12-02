@@ -40,7 +40,6 @@ ADMIN_PORT = $(SERVICE_PORT)
 # with C instead. This env var is only present in cryptography<3.5.
 ENV += CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
-
 # [mysqlclient]
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"

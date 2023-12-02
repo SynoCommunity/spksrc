@@ -59,6 +59,13 @@ PAGE_FFSYNC_REMOVE=$(/bin/cat<<EOF
 				}
 			}
 		}]
+	}, {
+		"type": "singleselect",
+		"subitems": [{
+			"defaultValue": true,
+			"hidden": true,
+			"key": "wizard_delete_data"
+		}]
 	}]
 }
 EOF

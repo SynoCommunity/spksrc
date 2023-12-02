@@ -12,8 +12,8 @@ DEPENDS = cross/openssl3
 # for mysqlclient-sys
 DEPENDS += cross/mysql-connector-c
 
-# powerpc archs (except qoriq) are not supported
-UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
+# powerpc archs are not supported
+UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 HOMEPAGE = https://github.com/mozilla-services/syncstorage-rs/
 COMMENT  = Mozilla Sync Storage built with Rust.
@@ -44,7 +44,6 @@ ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib -Cli
 POST_INSTALL_TARGET = syncstorage-rs_post_install
 
 include ../../mk/spksrc.cross-rust.mk
-
 
 .PHONY: syncstorage-rs_post_install
 syncstorage-rs_post_install:
