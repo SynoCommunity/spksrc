@@ -5,13 +5,12 @@ SPK_ICON = src/ffsync.png
 
 DEPENDS = cross/syncstorage-rs cross/diesel
 
-PYTHON_PACKAGE = python311
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 REQUIRED_MIN_DSM = 6.0
-SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
+SPK_DEPENDS = MariaDB10:python311
 
 MAINTAINER = SynoCommunity
 DESCRIPTION  = Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
@@ -46,7 +45,7 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 POST_STRIP_TARGET = ffsync_extra_install
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk.mk
 
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
