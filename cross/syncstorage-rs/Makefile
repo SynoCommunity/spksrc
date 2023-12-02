@@ -6,9 +6,9 @@ PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VE
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # only required for build in cross/syncstorage-rs folder (not when using prebuilt spk/python311)
-#BUILD_DEPENDS = cross/python311
+BUILD_DEPENDS = cross/python311
 # for openssl-sys
-DEPENDS = cross/openssl cross/openssl3
+DEPENDS = cross/openssl3
 # for mysqlclient-sys
 DEPENDS += cross/mysql-connector-c
 

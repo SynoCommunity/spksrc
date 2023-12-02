@@ -4,6 +4,7 @@ SPK_REV = 4
 SPK_ICON = src/ffsync.png
 
 DEPENDS = cross/syncstorage-rs cross/diesel
+DEPENDS += cross/openssl
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
