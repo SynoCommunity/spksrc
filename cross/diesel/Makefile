@@ -20,6 +20,11 @@ RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/diesel_cli
 CARGO_BUILD_ARGS += --no-default-features
 CARGO_BUILD_ARGS += --features=mysql
 
+# we support MariaDB 10 only
+# we must define the mysql db socket, since the rust binaries (mysqlclient-sys)
+# do not read settings from bin/mysql_conf
+export "MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock"
+
 # mysqlclient-sys: to find libmysqlclient
 ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
 # to find dependencies of libmysqlclient (libz)

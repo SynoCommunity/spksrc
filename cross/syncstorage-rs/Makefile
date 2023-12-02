@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VE
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # only required for build in cross/syncstorage-rs folder (not when using prebuilt spk/python311)
-BUILD_DEPENDS = cross/python311
+#BUILD_DEPENDS = cross/python311
 # for openssl-sys
 DEPENDS = cross/openssl3
 # for mysqlclient-sys
@@ -24,6 +24,11 @@ RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/syncserver
 CARGO_BUILD_ARGS += --no-default-features
 CARGO_BUILD_ARGS += --features=syncstorage-db/mysql
 CARGO_BUILD_ARGS += --locked
+
+# we support MariaDB 10 only
+# we must define the mysql db socket, since the rust binaries (mysqlclient-sys)
+# do not read settings from bin/mysql_conf
+export MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock
 
 # To find libpython in prebuilt or local built python
 ifneq ($(PYTHON_STAGING_PREFIX),)
