@@ -6,13 +6,13 @@ human_logs = 1
 host = "localhost" # default
 port = {{TCP_PORT}} # SPK default
 
-syncstorage.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@localhost/syncstorage_rs"
+syncstorage.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@{{DB_SERVER}}/syncstorage_rs"
 syncstorage.enable_quota = 0
 syncstorage.enabled = true
 syncstorage.limits.max_total_records = 1666 # See issues #298/#333
 
 # token
-tokenserver.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@localhost/tokenserver_rs"
+tokenserver.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@{{DB_SERVER}}/tokenserver_rs"
 tokenserver.enabled = true 
 tokenserver.fxa_email_domain = "api.accounts.firefox.com"
 tokenserver.fxa_metrics_hash_secret = "{{METRICS_HASH_SECRET}}"
