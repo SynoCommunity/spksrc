@@ -23,6 +23,6 @@ CARGO_BUILD_ARGS += --features=mysql
 # mysqlclient-sys: to find libmysqlclient
 ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
 # to find dependencies of libmysqlclient (libz)
-ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
+ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(STAGING_INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
 
 include ../../mk/spksrc.cross-rust.mk
