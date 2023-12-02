@@ -12,9 +12,15 @@ DIESEL="${SYNOPKG_PKGDEST}/bin/diesel"
 CFG_FILE="${SYNOPKG_PKGVAR}/local.toml"
 
 SERVICE_COMMAND="${SYNCSERVER} --config=${CFG_FILE}"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
+
+# enhance logging
+export RUST_LOG=debug
+export RUST_BACKTRACE=full
 
 DBUSER=ffsync
-DBSERVER="127.0.0.1"
+DBSERVER="localhost"
 
 validate_preinst ()
 {
@@ -39,13 +45,24 @@ validate_preinst ()
 
 service_postinst ()
 {
-    # Create a Python virtualenv
+    separator="===================================================="
+
+    echo "Install Python virtual environment"
     install_python_virtualenv
 
-    # Install wheels
-    install_python_wheels
+    echo ${separator}
+    echo "Install packages from wheelhouse"
+    pip install --disable-pip-version-check --no-deps --no-input --no-index ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
+
+    echo ${separator}
+    echo "Install pure python packages from index"
+    pip install --disable-pip-version-check --no-deps --no-input --requirement ${SYNOPKG_PKGDEST}/share/wheelhouse/requirements-pure.txt
+
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+    
+        echo ${separator}
+        echo "Set up the databases"
         # login as root sql user using whatever creds you set up for that
         # this sets up a user for sync storage and sets up the databases
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" <<EOF
@@ -56,30 +73,35 @@ GRANT ALL PRIVILEGES on syncstorage_rs.* to ${DBUSER}@localhost;
 GRANT ALL PRIVILEGES on tokenserver_rs.* to ${DBUSER}@localhost;
 EOF
 
-        # Run initial database migrations
-        # syncstorage db initialization
+        echo ${separator}
+        echo "Run database migrations"
+
+        echo "Run migrations for syncstorage_rs"
         ${DIESEL} --database-url "mysql://${DBUSER}:${wizard_password_ffsync}@${DBSERVER}/syncstorage_rs" \
             migration --migration-dir ${SYNOPKG_PKGDEST}/syncstorage-mysql/migrations run
-        # tokenserver db initialization
+
+        echo "Run migrations for tokenserver_rs"
         ${DIESEL} --database-url "mysql://${DBUSER}:${wizard_password_ffsync}@${DBSERVER}/tokenserver_rs" \
             migration --migration-dir ${SYNOPKG_PKGDEST}/tokenserver-db/migrations run
 
-        # Add sync endpoint to database
+        echo ${separator}
+        echo "Add sync endpoint to database"
         ${MYSQL} -u ${DBUSER} -p"${wizard_password_ffsync}" <<EOF
 USE tokenserver_rs
 INSERT INTO services (id, service, pattern) VALUES
     (1, "sync-1.5", "{node}/1.5/{uid}");
 EOF
 
-        # Add syncserver node
-        # Add syncserver node
+        echo "Add syncserver node"
         ${MYSQL} -u ${DBUSER} -p"${wizard_password_ffsync}" <<EOF
 USE tokenserver_rs
 INSERT INTO nodes (id, service, node, available, current_load, capacity, downed, backoff) VALUES
     (1, 1, "${wizard_ffsync_public_url}", 1, 0, 4, 0, 0);
 EOF
 
-        # Setup syncserver config file
+        echo ${separator}
+        echo "Setup syncserver config file"
+
         MASTER_SECRET="$(cat /dev/urandom | base32 | head -c64)"
         METRICS_HASH_SECRET="$(cat /dev/urandom | base32 | head -c64)"
 
@@ -123,6 +145,4 @@ service_postuninst ()
         fi
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE syncstorage_rs; DROP DATABASE tokenserver_rs; DROP USER '${DBUSER}'@'localhost';"
     fi
-
-    exit 0
 }
