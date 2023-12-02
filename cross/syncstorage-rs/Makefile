@@ -41,4 +41,17 @@ ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
 # to find dependencies of libmysqlclient (libz)
 ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
 
+POST_INSTALL_TARGET = syncstorage-rs_post_install
+
 include ../../mk/spksrc.cross-rust.mk
+
+
+.PHONY: syncstorage-rs_post_install
+syncstorage-rs_post_install:
+	@$(MSG) Install Tools
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/tools
+	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tools . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tools
+	@$(MSG) Install DB Migration scripts
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations -d $(STAGING_INSTALL_PREFIX)/tokenserver-db/migrations
+	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/syncstorage-mysql/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations
+	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tokenserver-db/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tokenserver-db/migrations

@@ -57,13 +57,12 @@ EOF
         # Run initial database migrations
         # syncstorage db initialization
         ${DIESEL} --database-url "mysql://${DBUSER}:${wizard_password_ffsync}@localhost/syncstorage_rs" \
-            migration --migration-dir syncstorage-mysql/migrations run
+            migration --migration-dir ${SYNOPKG_PKGDEST}/syncstorage-mysql/migrations run
         # tokenserver db initialization
         ${DIESEL} --database-url "mysql://${DBUSER}:${wizard_password_ffsync}@localhost/tokenserver_rs" \
-            migration --migration-dir tokenserver-db/migrations run
+            migration --migration-dir ${SYNOPKG_PKGDEST}/tokenserver-db/migrations run
 
         # Add sync endpoint to database
-        ${MYSQL} -u ${SPK_NAME} -p"${wizard_password_ffsync}" <<EOF
         ${MYSQL} -u ${DBUSER} -p"$(wizard_password_ffsync)" <<EOF
 USE tokenserver_rs
 INSERT INTO services (id, service, pattern) VALUES
@@ -73,7 +72,7 @@ EOF
         # Add syncserver node
         # the 10 is the user capacity.
         SYNC_TOKENSERVER__DATABASE_URL="mysql://${DBUSER}:${wizard_password_ffsync}@localhost/tokenserver_rs" \
-            python3 tools/tokenserver/add_node.py \
+            ${PYTHON} ${SYNOPKG_PKGDEST}/tools/tokenserver/add_node.py \
             ${wizard_ffsync_public_url} 10
 
         # Setup syncserver config file
