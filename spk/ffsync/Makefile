@@ -4,14 +4,14 @@ SPK_REV = 4
 SPK_ICON = src/ffsync.png
 
 DEPENDS = cross/syncstorage-rs cross/diesel
-DEPENDS += cross/openssl
 
+PYTHON_PACKAGE = python311
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 REQUIRED_MIN_DSM = 6.0
-SPK_DEPENDS = MariaDB10:python311
+SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION  = Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
@@ -33,12 +33,11 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 # [cryptography]
-# We pin cryptography to 3.4.8 due to a build error that occurs with the
-# current version (36.0.0 at the time of this commit). In short, building
-# the cryptography package with Rust results in a segfault, so we need to
-# set the CRYPTOGRAPHY_DONT_BUILD_RUST env var to force the package to build
-# with C instead. This env var is only present in cryptography<3.5.
-ENV += CRYPTOGRAPHY_DONT_BUILD_RUST=1
+# Mandatory of using OPENSSL_*_DIR starting with version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+DEPENDS += cross/openssl3
+ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # [mysqlclient]
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
@@ -46,7 +45,7 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 POST_STRIP_TARGET = ffsync_extra_install
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
 
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
