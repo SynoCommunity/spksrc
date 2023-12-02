@@ -29,5 +29,5 @@ sqlalchemy==1.4.46
 # further crossenv dependencies
 cffi==1.16.0
 charset_normalizer==3.3.2
-greenlet==3.0.1
+# greenlet==3.0.1    => supported version depends on gcc version
 zope.interface==6.1
