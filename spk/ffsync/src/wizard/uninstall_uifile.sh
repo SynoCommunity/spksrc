@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# for backwards compatability
+if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
+	if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+		SYNOPKG_PKGDEST_VOL="/volume1"
+	fi
+	if [ -z ${SYNOPKG_PKGNAME} ]; then
+		SYNOPKG_PKGNAME="ffsync"
+	fi
+fi
+
 quote_json ()
 {
 	sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
@@ -16,18 +26,6 @@ page_append ()
 	fi
 }
 
-getPasswordValidator()
-{
-	validator=$(/bin/cat<<EOF
-{
-	var password = arguments[0];
-	return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})") && ! password.includes("root");
-}
-EOF
-)
-	echo "$validator" | quote_json
-}
-
 PAGE_FFSYNC_REMOVE=$(/bin/cat<<EOF
 {
 	"step_title": "Remove Firefox Sync Server 1.5 database",
@@ -40,9 +38,8 @@ PAGE_FFSYNC_REMOVE=$(/bin/cat<<EOF
 		"subitems": [{
 			"key": "wizard_mysql_password_root",
 			"desc": "Root password",
-			"invalidText": "Password does not meet the current strength rules. The minimum password length is 10 characters and must include mixed case, numeric characters, and special characters; it must also exclude common passwords or using username as password.",
 			"validator": {
-				"fn": "$(getPasswordValidator)"
+				"allowBlank": false
 			}
 		}]
 	}, {
@@ -51,6 +48,7 @@ PAGE_FFSYNC_REMOVE=$(/bin/cat<<EOF
 		"subitems": [{
 			"key": "wizard_dbexport_path",
 			"desc": "Database export location",
+			"emptyText": "${SYNOPKG_PKGDEST_VOL}/${SYNOPKG_PKGNAME}/backup",
 			"validator": {
 				"allowBlank": true,
 				"regex": {

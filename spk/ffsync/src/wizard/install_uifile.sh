@@ -16,30 +16,6 @@ page_append ()
     fi
 }
 
-getRootPasswordValidator()
-{
-    validator=$(/bin/cat<<EOF
-{
-    var password = arguments[0];
-    return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})") && ! password.includes("root");
-}
-EOF
-)
-    echo "$validator" | quote_json
-}
-
-getUserPasswordValidator()
-{
-    validator=$(/bin/cat<<EOF
-{
-    var password = arguments[0];
-    return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})") && ! password.includes("ffsync");
-}
-EOF
-)
-    echo "$validator" | quote_json
-}
-
 PAGE_FFSYNC_SETUP=$(/bin/cat<<EOF
 {
     "step_title": "Firefox Sync Server 1.5 database configuration",
@@ -50,20 +26,8 @@ PAGE_FFSYNC_SETUP=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_mysql_password_root",
             "desc": "Root password",
-            "invalidText": "Password does not meet the current strength rules. The minimum password length is 10 characters and must include mixed case, numeric characters, and special characters; it must also exclude common passwords or using username as password.",
             "validator": {
-                "fn": "$(getRootPasswordValidator)"
-            }
-        }]
-    }, {
-        "type": "password",
-        "desc": "A 'ffsync' user and database will be created. Please enter a password for the 'ffsync' user.",
-        "subitems": [{
-            "key": "wizard_password_ffsync",
-            "desc": "ffsync password",
-            "invalidText": "Password does not meet the current strength rules. The minimum password length is 10 characters and must include mixed case, numeric characters, and special characters; it must also exclude common passwords or using username as password.",
-            "validator": {
-                "fn": "$(getUserPasswordValidator)"
+                "allowBlank": false
             }
         }]
     }]
@@ -75,6 +39,7 @@ PAGE_FFSYNC_SETUP=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_ffsync_public_url",
             "desc": "Public URL",
+            "emptyText": "http://hostname.domain:8132",
             "validator": {
                 "allowBlank": false
             }

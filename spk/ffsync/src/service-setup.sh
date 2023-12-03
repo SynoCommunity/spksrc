@@ -60,13 +60,15 @@ service_postinst ()
 
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        # Generate database password for database user
+        DBPASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9!#$%^&*()_+{}<>?=' | fold -w 10 | grep -E '[a-z]' | grep -E '[A-Z]' | grep -E '[0-9]' | grep -E '[!#$%^&*()_+{}<>?=]' | head -n 1)
     
         echo ${separator}
         echo "Set up the databases"
         # login as root sql user using whatever creds you set up for that
         # this sets up a user for sync storage and sets up the databases
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" <<EOF
-CREATE USER "${DBUSER}"@"localhost" IDENTIFIED BY "${wizard_password_ffsync}";
+CREATE USER "${DBUSER}"@"localhost" IDENTIFIED BY "${DBPASS}";
 CREATE DATABASE syncstorage_rs;
 CREATE DATABASE tokenserver_rs;
 GRANT ALL PRIVILEGES on syncstorage_rs.* to ${DBUSER}@localhost;
@@ -77,23 +79,23 @@ EOF
         echo "Run database migrations"
 
         echo "Run migrations for syncstorage_rs"
-        ${DIESEL} --database-url "mysql://${DBUSER}:${wizard_password_ffsync}@${DBSERVER}/syncstorage_rs" \
+        ${DIESEL} --database-url "mysql://${DBUSER}:${DBPASS}@${DBSERVER}/syncstorage_rs" \
             migration --migration-dir ${SYNOPKG_PKGDEST}/syncstorage-mysql/migrations run
 
         echo "Run migrations for tokenserver_rs"
-        ${DIESEL} --database-url "mysql://${DBUSER}:${wizard_password_ffsync}@${DBSERVER}/tokenserver_rs" \
+        ${DIESEL} --database-url "mysql://${DBUSER}:${DBPASS}@${DBSERVER}/tokenserver_rs" \
             migration --migration-dir ${SYNOPKG_PKGDEST}/tokenserver-db/migrations run
 
         echo ${separator}
         echo "Add sync endpoint to database"
-        ${MYSQL} -u ${DBUSER} -p"${wizard_password_ffsync}" <<EOF
+        ${MYSQL} -u ${DBUSER} -p"${DBPASS}" <<EOF
 USE tokenserver_rs
 INSERT INTO services (id, service, pattern) VALUES
     (1, "sync-1.5", "{node}/1.5/{uid}");
 EOF
 
         echo "Add syncserver node"
-        ${MYSQL} -u ${DBUSER} -p"${wizard_password_ffsync}" <<EOF
+        ${MYSQL} -u ${DBUSER} -p"${DBPASS}" <<EOF
 USE tokenserver_rs
 INSERT INTO nodes (id, service, node, available, current_load, capacity, downed, backoff) VALUES
     (1, 1, "${wizard_ffsync_public_url}", 1, 0, 4, 0, 0);
@@ -105,14 +107,11 @@ EOF
         MASTER_SECRET="$(cat /dev/urandom | base64 | head -c64)"
         METRICS_HASH_SECRET="$(cat /dev/urandom | base64 | head -c64)"
 
-        # Escape vertical bars in the replacement values
-        WIZARD_PASSWORD=$(echo "${wizard_password_ffsync}" | sed 's/|/\\|/g')
-
         # Perform replacements using sed with | as the delimiter
         sed -e "s|{{MASTER_SECRET}}|${MASTER_SECRET}|g"             \
             -e "s|{{TCP_PORT}}|${SERVICE_PORT}|g"                   \
             -e "s|{{SQL_USER}}|${DBUSER}|g"                         \
-            -e "s|{{SQL_PASS}}|${WIZARD_PASSWORD}|g"                \
+            -e "s|{{SQL_PASS}}|${DBPASS}|g"                \
             -e "s|{{DB_SERVER}}|${DBSERVER}|g"                      \
             -e "s|{{METRICS_HASH_SECRET}}|${METRICS_HASH_SECRET}|g" \
             -i "${CFG_FILE}"
@@ -126,12 +125,28 @@ validate_preuninst ()
         echo "Incorrect MySQL root password"
         exit 1
     fi
-    # Check database export location
+    # Check if database export path is specified
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_dbexport_path}" ]; then
-        if [ -f "${wizard_dbexport_path}" ] || [ -e "${wizard_dbexport_path}/${DBUSER}.sql" ]; then
-            echo "File ${wizard_dbexport_path}/${DBUSER}.sql already exists. Please remove or choose a different location"
+        if [ ! -d "${wizard_dbexport_path}" ]; then
+            # If the export path directory does not exist, create it
+            mkdir -p "${wizard_dbexport_path}" || {
+                # If mkdir fails, print an error message and exit
+                echo "Error: Unable to create directory ${wizard_dbexport_path}. Check permissions."
+                exit 1
+            }
+        elif [ ! -w "${wizard_dbexport_path}" ]; then
+            # If the export path directory is not writable, print an error message and exit
+            echo "Error: Unable to write to directory ${wizard_dbexport_path}. Check permissions."
             exit 1
         fi
+        if [ -e "$wizard_dbexport_path/syncstorage_rs.sql" ] || [ -e "$wizard_dbexport_path/tokenserver_rs.sql" ]; then
+            # If either syncstorage_rs.sql or tokenserver_rs.sql already exists, print an error message and exit
+            echo "File syncstorage_rs.sql or tokenserver_rs.sql already exists in ${wizard_dbexport_path}. Please remove or choose a different location"
+            exit 1
+        fi
+        # If everything is okay, perform database dumps
+        ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" syncstorage_rs > "${wizard_dbexport_path}/syncstorage_rs.sql"
+        ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" tokenserver_rs > "${wizard_dbexport_path}/tokenserver_rs.sql"
     fi
 }
 
@@ -139,10 +154,6 @@ service_postuninst ()
 {
     # Export and remove database
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
-        if [ -n "${wizard_dbexport_path}" ]; then
-            mkdir -p ${wizard_dbexport_path}
-            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${DBUSER} > ${wizard_dbexport_path}/${DBUSER}.sql
-        fi
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE syncstorage_rs; DROP DATABASE tokenserver_rs; DROP USER '${DBUSER}'@'localhost';"
     fi
 }
