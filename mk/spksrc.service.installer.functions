@@ -75,9 +75,16 @@ install_python_virtualenv ()
     python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # Update pip to match default used by python package
-    # If none found, update pip to latest version
+    # If none found, update pip to latest version online
     read -r -a PIP_VERSION 2>/dev/null <<< $(python3 -m pip --version)
-    [ "${PIP_VERSION[1]}" ] && PIP="pip==${PIP_VERSION[1]}" || PIP="pip"
+    if [ "${PIP_VERSION[1]}" ]; then
+        PIP="pip==${PIP_VERSION[1]}"
+        echo "INFO: Default pip version found ${PIP}"
+    else
+        PIP="pip"
+        echo "WARNING: No pip found, using default online version"
+    fi
+
     if ! python3 -m pip install --upgrade ${PIP}; then
     echo "Error: Python upgrade failed" 1>&2
         exit 1
