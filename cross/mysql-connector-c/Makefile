@@ -26,7 +26,7 @@ ENV += PATH=$(WORK_DIR)/../../../native/libmysqlclient/work-native/install/usr/l
 # on DSM 6 with mariadb 5 and 10
 # /run/mysqld/mysqld.sock (MariaDB 5)
 # /run/mysqld/mysqld10.sock (MariaDB 10)
-ifneq ($(MYSQL_DB_SOCKET),)
+ifeq ($(MYSQL_DB_SOCKET),)
 # default mysql socket for DSM
 MYSQL_DB_SOCKET = /run/mysqld/mysqld.sock
 endif
