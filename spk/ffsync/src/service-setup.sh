@@ -102,8 +102,8 @@ EOF
         echo ${separator}
         echo "Setup syncserver config file"
 
-        MASTER_SECRET="$(cat /dev/urandom | base32 | head -c64)"
-        METRICS_HASH_SECRET="$(cat /dev/urandom | base32 | head -c64)"
+        MASTER_SECRET="$(cat /dev/urandom | base64 | head -c64)"
+        METRICS_HASH_SECRET="$(cat /dev/urandom | base64 | head -c64)"
 
         # Escape vertical bars in the replacement values
         WIZARD_PASSWORD=$(echo "${wizard_password_ffsync}" | sed 's/|/\\|/g')
