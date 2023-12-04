@@ -28,9 +28,9 @@ checkPublicUrl()
     var ipRegex = /^http:\/\/(\d{1,3}\.){3}\d{1,3}:8132$/;
     var domainRegex = /^http:\/\/((?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}):8132$/;
     if (ipRegex.test(publicUrl) || domainRegex.test(publicUrl)) {
-        clientUrl.disabled = false;
-        clientUrl.value = publicUrl + "/token/1.0/sync/1.5";
-        clientUrl.disabled = true;
+        clientUrl.setReadOnly(false);
+        clientUrl.setValue(publicUrl + "/token/1.0/sync/1.5");
+        clientUrl.setReadOnly(true);
     } else {
         return "Invalid URL format. Please provide a valid URL.";
     }
