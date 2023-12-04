@@ -253,6 +253,17 @@ service_postinst ()
                 # Disable maintenance mode
                 exec_occ maintenance:mode --off
 
+                # Extract the version number using awk and cut
+                file_version=$(echo "$filename" | awk -F "${expected_prefix}" '{print $2}' | cut -d '_' -f 1)
+                package_version=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
+                if [ -n "$file_version" ]; then
+                    # Compare the extracted version with package_version using awk
+                    if awk "BEGIN {exit !($file_version < $package_version) }"; then
+                        echo "The archive version ($file_version) is older than the package version ($package_version). Triggering upgrade."
+                        exec_occ upgrade
+                    fi
+                fi
+
                 # Clean-up temporary files
                 ${RM} "${TEMPDIR}"
             else
@@ -275,6 +286,18 @@ service_preuninst ()
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
         # Check export directory
         if [ -n "${wizard_export_path}" ]; then
+            if [ ! -d "${wizard_export_path}" ]; then
+                # If the export path directory does not exist, create it
+                ${MKDIR} "${wizard_export_path}" || {
+                    # If mkdir fails, print an error message and exit
+                    echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
+                    exit 1
+                }
+            elif [ ! -w "${wizard_export_path}" ]; then
+                # If the export path directory is not writable, print an error message and exit
+                echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
+                exit 1
+            fi
             # Get data directory
             DATADIR="$(exec_occ config:system:get datadirectory)"
             # Data directory fail-safe
@@ -315,17 +338,9 @@ service_preuninst ()
             ${TAR} -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
 
             # Move archive to export directory
-            ${MKDIR} "${wizard_export_path}"
-            if ${RSYNC} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/"; then
-                echo "Backup file copied successfully to ${wizard_export_path}."
-            else
-                echo "File copy failed. Trying to copy to alternate location..."
-                if ${RSYNC} "${SYNOPKG_PKGTMP}/$archive_name" "${SYNOPKG_PKGDEST_VOL}/@tmp/"; then
-                    echo "Backup file copied successfully to alternate location (${SYNOPKG_PKGDEST_VOL}/@tmp)."
-                else
-                    echo "File copy failed. Backup of ownCloud data will not be saved."
-                fi
-            fi
+            RSYNC_BAK_ARGS="--backup --suffix=.bak"
+            rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
+            echo "Backup file copied successfully to ${wizard_export_path}."
 
             # Clean-up temporary files
             ${RM} "${TEMPDIR}"

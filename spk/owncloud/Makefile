@@ -1,6 +1,6 @@
 SPK_NAME = owncloud
-SPK_VERS = 10.13.2
-SPK_REV = 13
+SPK_VERS = 10.13.3
+SPK_REV = 14
 SPK_ICON = src/owncloud.png
 
 DEPENDS = cross/owncloud
@@ -13,7 +13,7 @@ SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 DISPLAY_NAME = ownCloud
-CHANGELOG = "1. Update ownCloud to 10.13.2.<br/>2. New backup and restore functions.<br/>3. Use new shared folder handling.<br/>4. Package maintenance optimisation."
+CHANGELOG = "1. Update ownCloud to 10.13.3.<br/>2. Improved backup function."
 HOMEPAGE = https://owncloud.org/
 
 LICENSE = AGPL

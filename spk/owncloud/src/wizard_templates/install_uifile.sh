@@ -56,6 +56,7 @@ getBackupFile()
 	if (backupFile) {
 		filePath.setDisabled(false);
 	} else {
+		filePath.setValue("");
 		filePath.setDisabled(true);
 	}
 	return true;
