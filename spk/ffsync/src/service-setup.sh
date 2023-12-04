@@ -15,6 +15,10 @@ SERVICE_COMMAND="${SYNCSERVER} --config=${CFG_FILE}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
+# enhance logging
+export RUST_LOG=debug
+export RUST_BACKTRACE=full
+
 DBUSER=ffsync
 DBSERVER="localhost"
 
@@ -22,13 +26,16 @@ percent_encode ()
 {
     string="$1"
     result=""
-    for ((i = 0; i < ${#string}; i++)); do
-        char="${string:$i:1}"
-        if [[ "$char" =~ [0-9a-zA-Z] ]]; then
-            result+="$char"
+    len=$(echo "$string" | awk '{print length}')
+    i=1
+    while [ "$i" -le "$len" ]; do
+        char=$(echo "$string" | cut -c "$i")
+        if echo "$char" | grep -qE '[0-9a-zA-Z]'; then
+            result="$result$char"
         else
-            result+="$(printf '%%%02X' "'$char")"
+            result="$result$(printf '%%%02X' "'$char")"
         fi
+        i=$((i + 1))
     done
     echo "$result"
 }
@@ -63,16 +70,16 @@ service_postinst ()
 
     echo ${separator}
     echo "Install packages from wheelhouse"
-    pip install --disable-pip-version-check --no-deps --no-input --no-index ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
+    pip install --disable-pip-version-check --no-deps --no-input --no-index "${SYNOPKG_PKGDEST}/share/wheelhouse"/*.whl
 
     echo ${separator}
     echo "Install pure python packages from index"
-    pip install --disable-pip-version-check --no-deps --no-input --requirement ${SYNOPKG_PKGDEST}/share/wheelhouse/requirements-pure.txt
+    pip install --disable-pip-version-check --no-deps --no-input --requirement "${SYNOPKG_PKGDEST}/share/wheelhouse/requirements-pure.txt"
 
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Generate database password for database user
-        DBPASS_RAW=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&*()_+{}<>?=' | fold -w 10 | grep -E '[a-z]' | grep -E '[A-Z]' | grep -E '[0-9]' | grep -E '[!@#$%^&*()_+{}<>?=]' | head -n 1)
+        DBPASS_RAW=$(tr -dc 'a-zA-Z0-9!@#$%^&*()_+{}<>?=' </dev/urandom | fold -w 10 | grep -E '[a-z]' | grep -E '[A-Z]' | grep -E '[0-9]' | grep -E '[!@#$%^&*()_+{}<>?=]' | head -n 1)
         DBPASS_ENC=$(percent_encode "$DBPASS_RAW")
     
         echo ${separator}
@@ -92,11 +99,11 @@ EOF
 
         echo "Run migrations for syncstorage_rs"
         ${DIESEL} --database-url "mysql://${DBUSER}:${DBPASS_ENC}@${DBSERVER}/syncstorage_rs" \
-            migration --migration-dir ${SYNOPKG_PKGDEST}/syncstorage-mysql/migrations run
+            migration --migration-dir "${SYNOPKG_PKGDEST}/syncstorage-mysql/migrations" run
 
         echo "Run migrations for tokenserver_rs"
         ${DIESEL} --database-url "mysql://${DBUSER}:${DBPASS_ENC}@${DBSERVER}/tokenserver_rs" \
-            migration --migration-dir ${SYNOPKG_PKGDEST}/tokenserver-db/migrations run
+            migration --migration-dir "${SYNOPKG_PKGDEST}/tokenserver-db/migrations" run
 
         echo ${separator}
         echo "Add sync endpoint to database"
@@ -116,8 +123,8 @@ EOF
         echo ${separator}
         echo "Setup syncserver config file"
 
-        MASTER_SECRET="$(cat /dev/urandom | base64 | head -c64)"
-        METRICS_HASH_SECRET="$(cat /dev/urandom | base64 | head -c64)"
+        MASTER_SECRET="$(tr -dc 'A-Z0-9' < /dev/urandom | head -c64)"
+        METRICS_HASH_SECRET="$(tr -dc 'A-Z0-9' < /dev/urandom | head -c64)"
 
         # Perform replacements using sed with | as the delimiter
         sed -e "s|{{MASTER_SECRET}}|${MASTER_SECRET}|g"             \
