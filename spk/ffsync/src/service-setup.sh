@@ -15,12 +15,23 @@ SERVICE_COMMAND="${SYNCSERVER} --config=${CFG_FILE}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
-# enhance logging
-export RUST_LOG=debug
-export RUST_BACKTRACE=full
-
 DBUSER=ffsync
 DBSERVER="localhost"
+
+percent_encode ()
+{
+    string="$1"
+    result=""
+    for ((i = 0; i < ${#string}; i++)); do
+        char="${string:$i:1}"
+        if [[ "$char" =~ [0-9a-zA-Z] ]]; then
+            result+="$char"
+        else
+            result+="$(printf '%%%02X' "'$char")"
+        fi
+    done
+    echo "$result"
+}
 
 validate_preinst ()
 {
@@ -61,14 +72,15 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Generate database password for database user
-        DBPASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9!#$%^&*()_+{}<>?=' | fold -w 10 | grep -E '[a-z]' | grep -E '[A-Z]' | grep -E '[0-9]' | grep -E '[!#$%^&*()_+{}<>?=]' | head -n 1)
+        DBPASS_RAW=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9!@#$%^&*()_+{}<>?=' | fold -w 10 | grep -E '[a-z]' | grep -E '[A-Z]' | grep -E '[0-9]' | grep -E '[!@#$%^&*()_+{}<>?=]' | head -n 1)
+        DBPASS_ENC=$(percent_encode "$DBPASS_RAW")
     
         echo ${separator}
         echo "Set up the databases"
         # login as root sql user using whatever creds you set up for that
         # this sets up a user for sync storage and sets up the databases
         ${MYSQL} -u root -p"${wizard_mysql_password_root}" <<EOF
-CREATE USER "${DBUSER}"@"localhost" IDENTIFIED BY "${DBPASS}";
+CREATE USER "${DBUSER}"@"localhost" IDENTIFIED BY "${DBPASS_RAW}";
 CREATE DATABASE syncstorage_rs;
 CREATE DATABASE tokenserver_rs;
 GRANT ALL PRIVILEGES on syncstorage_rs.* to ${DBUSER}@localhost;
@@ -79,23 +91,23 @@ EOF
         echo "Run database migrations"
 
         echo "Run migrations for syncstorage_rs"
-        ${DIESEL} --database-url "mysql://${DBUSER}:${DBPASS}@${DBSERVER}/syncstorage_rs" \
+        ${DIESEL} --database-url "mysql://${DBUSER}:${DBPASS_ENC}@${DBSERVER}/syncstorage_rs" \
             migration --migration-dir ${SYNOPKG_PKGDEST}/syncstorage-mysql/migrations run
 
         echo "Run migrations for tokenserver_rs"
-        ${DIESEL} --database-url "mysql://${DBUSER}:${DBPASS}@${DBSERVER}/tokenserver_rs" \
+        ${DIESEL} --database-url "mysql://${DBUSER}:${DBPASS_ENC}@${DBSERVER}/tokenserver_rs" \
             migration --migration-dir ${SYNOPKG_PKGDEST}/tokenserver-db/migrations run
 
         echo ${separator}
         echo "Add sync endpoint to database"
-        ${MYSQL} -u ${DBUSER} -p"${DBPASS}" <<EOF
+        ${MYSQL} -u ${DBUSER} -p"${DBPASS_RAW}" <<EOF
 USE tokenserver_rs
 INSERT INTO services (id, service, pattern) VALUES
     (1, "sync-1.5", "{node}/1.5/{uid}");
 EOF
 
         echo "Add syncserver node"
-        ${MYSQL} -u ${DBUSER} -p"${DBPASS}" <<EOF
+        ${MYSQL} -u ${DBUSER} -p"${DBPASS_RAW}" <<EOF
 USE tokenserver_rs
 INSERT INTO nodes (id, service, node, available, current_load, capacity, downed, backoff) VALUES
     (1, 1, "${wizard_ffsync_public_url}", 1, 0, 4, 0, 0);
@@ -111,7 +123,7 @@ EOF
         sed -e "s|{{MASTER_SECRET}}|${MASTER_SECRET}|g"             \
             -e "s|{{TCP_PORT}}|${SERVICE_PORT}|g"                   \
             -e "s|{{SQL_USER}}|${DBUSER}|g"                         \
-            -e "s|{{SQL_PASS}}|${DBPASS}|g"                \
+            -e "s|{{SQL_PASS}}|${DBPASS_ENC}|g"                \
             -e "s|{{DB_SERVER}}|${DBSERVER}|g"                      \
             -e "s|{{METRICS_HASH_SECRET}}|${METRICS_HASH_SECRET}|g" \
             -i "${CFG_FILE}"
