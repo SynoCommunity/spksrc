@@ -253,6 +253,17 @@ service_postinst ()
                 # Disable maintenance mode
                 exec_occ maintenance:mode --off
 
+                # Extract the version number using awk and cut
+                file_version=$(echo "$filename" | awk -F "${expected_prefix}" '{print $2}' | cut -d '_' -f 1)
+                package_version=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
+                if [ -n "$file_version" ]; then
+                    # Compare the extracted version with package_version using awk
+                    if awk "BEGIN {exit !($file_version < $package_version) }"; then
+                        echo "The archive version ($file_version) is older than the package version ($package_version). Triggering upgrade."
+                        exec_occ upgrade
+                    fi
+                fi
+
                 # Clean-up temporary files
                 ${RM} "${TEMPDIR}"
             else
