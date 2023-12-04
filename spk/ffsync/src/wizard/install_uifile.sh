@@ -72,7 +72,7 @@ PAGE_FFSYNC_SETUP=$(/bin/cat<<EOF
         }]
     }, {
         "type": "textfield",
-        "desc": "To configure your Firefox browser, go to <code>about:config</code>. Change <code>identity.sync.tokenserver.uri</code> the following URL:",
+        "desc": "To configure your Firefox browser, go to <code>about:config</code>. Change <code>identity.sync.tokenserver.uri</code> to the following URL:",
         "subitems": [{
             "key": "client_ffsync_public_url",
             "grow": true
