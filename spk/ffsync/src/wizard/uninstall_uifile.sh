@@ -41,7 +41,7 @@ PAGE_FFSYNC_REMOVE=$(/bin/cat<<EOF
 			"validator": {
 				"allowBlank": true,
 				"regex": {
-					"expr": "/^\\\/volume[0-9]+\\\//",
+					"expr": "/^\\\/(volume|volumeUSB)[0-9]+\\\//",
 					"errorText": "Path should begin with /volume?/ with ? the number of the volume"
 				}
 			}
