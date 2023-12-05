@@ -5,7 +5,6 @@ if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
 	SYNOPKG_PKGDEST_VOL="/volume1"
 fi
 SHAREDIR="${SYNOPKG_PKGNAME}"
-DIR_VALID="/^[\\w _-]+$/"
 
 quote_json ()
 {
@@ -195,7 +194,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"validator": {
 				"allowBlank": false,
 				"regex": {
-					"expr": "$(echo ${DIR_VALID} | quote_json)",
+					"expr": "/^[\\w.][\\w. -]{0,30}[\\w.-]\\$?$|^[\\w]$/",
 					"errorText": "{{{OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
 				}
 			}
