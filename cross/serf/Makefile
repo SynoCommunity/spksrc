@@ -1,11 +1,11 @@
 PKG_NAME = serf
-PKG_VERS = 1.3.9
+PKG_VERS = 1.3.10
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://archive.apache.org/dist/serf
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/apr cross/apr-util cross/openssl
+DEPENDS = cross/apr cross/apr-util cross/openssl3
 
 HOMEPAGE = https://serf.apache.org
 COMMENT  = The serf library is a high performance C-based HTTP client library built upon the Apache Portable Runtime (APR) library. Serf is the default client library of Apache Subversion and Apache OpenOffice.
