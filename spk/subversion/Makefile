@@ -16,8 +16,7 @@ LICENSE  = Apache 2.0
 
 SERVICE_PORT = 3691
 WIZARDS_DIR = src/wizard
-SERVICE_WIZARD_SHARE = wizard_repo_directory
-USE_DATA_SHARE_WORKER = yes
+SERVICE_WIZARD_SHARENAME = wizard_repo_directory
 
 STARTABLE = yes
 SERVICE_USER = auto

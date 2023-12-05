@@ -5,9 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://dlcdn.apache.org/subversion
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# http://yylam.blogspot.com/2016/01/cross-compile-subversion-server.html
-
-DEPENDS  = cross/apr
+DEPENDS  = cross/zlib
+DEPENDS += cross/apr
 DEPENDS += cross/apr-util
 DEPENDS += cross/serf
 DEPENDS += cross/sqlite
