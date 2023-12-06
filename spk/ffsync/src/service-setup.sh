@@ -1,3 +1,5 @@
+
+# ffsync service setup
 PYTHON_DIR="/var/packages/python311/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
@@ -130,7 +132,7 @@ EOF
         sed -e "s|{{MASTER_SECRET}}|${MASTER_SECRET}|g"             \
             -e "s|{{TCP_PORT}}|${SERVICE_PORT}|g"                   \
             -e "s|{{SQL_USER}}|${DBUSER}|g"                         \
-            -e "s|{{SQL_PASS}}|${DBPASS_ENC}|g"                \
+            -e "s|{{SQL_PASS}}|${DBPASS_ENC}|g"                     \
             -e "s|{{DB_SERVER}}|${DBSERVER}|g"                      \
             -e "s|{{METRICS_HASH_SECRET}}|${METRICS_HASH_SECRET}|g" \
             -i "${CFG_FILE}"
