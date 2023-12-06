@@ -18,10 +18,10 @@ page_append ()
 
 PAGE_FFSYNC_REMOVE=$(/bin/cat<<EOF
 {
-	"step_title": "Remove Firefox Sync Server 1.5 database",
+	"step_title": "Remove Mozilla Sync Server database",
 	"invalid_next_disabled_v2": true,
 	"items": [{
-		"desc": "Attention: The Firefox Sync Server 1.5 database will be removed during package uninstallation. All users and sync data will be deleted."
+		"desc": "Attention: The Mozilla Sync Server database will be removed during package uninstallation. All users and sync data will be deleted."
 	}, {
 		"type": "password",
 		"desc": "Enter your MySQL password",

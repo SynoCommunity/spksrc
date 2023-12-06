@@ -14,9 +14,9 @@ REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION  = Firefox Sync Server 1.5, used for Firefox 29 and later. You can use Firefox Sync Server to synchronize your bookmarks, passwords, settings, history, add-ons and tabs with Firefox on other computers. The service runs on port 8132.
-DISPLAY_NAME = Firefox Sync Server 1.5
-CHANGELOG = "Inital Mozilla Sync Storage package."
+DESCRIPTION  = "An implementation of the Mozilla Sync-1.5 Server protocol used by the sync service in Firefox 29 and later. You can use Mozilla Sync Server to exchange browser data (bookmarks, history, open tabs, passwords, add-ons, and the like) between 'clients' in a manner that respects a user's security and privacy. The service runs on port 8132."
+DISPLAY_NAME = Mozilla Sync Server
+CHANGELOG = "Inital Mozilla Sync Server package."
 
 HOMEPAGE = https://mozilla-services.readthedocs.io/en/latest/howtos/run-sync-1.5.html
 LICENSE = MPL 2.0

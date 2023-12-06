@@ -43,7 +43,7 @@ EOF
 
 PAGE_FFSYNC_SETUP=$(/bin/cat<<EOF
 {
-    "step_title": "Firefox Sync Server 1.5 database configuration",
+    "step_title": "Mozilla Sync Server database configuration",
     "invalid_next_disabled_v2": true,
     "items": [{
         "type": "password",
