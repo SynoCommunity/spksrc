@@ -19,6 +19,19 @@ include ../../mk/spksrc.cross-cmake.mk
 # give access to comp_err binary on host
 ENV += PATH=$(WORK_DIR)/../../../native/libmysqlclient/work-native/install/usr/local/bin/:$(CMAKE_PATH):$$PATH
 
+# custom mysql socket addr (default is /tmp/mysql.sock)
+# on DSM 7 (only MariaDB 10 available)
+# /run/mysqld/mysqld10.sock  (links to /run/mysqld/mysqld.sock)
+# /run/mysqld/mysqld.sock
+# on DSM 6 with mariadb 5 and 10
+# /run/mysqld/mysqld.sock (MariaDB 5)
+# /run/mysqld/mysqld10.sock (MariaDB 10)
+ifeq ($(MYSQL_DB_SOCKET),)
+# default mysql socket for DSM
+MYSQL_DB_SOCKET = /run/mysqld/mysqld.sock
+endif
+CMAKE_ARGS += -DMYSQL_UNIX_ADDR=$(MYSQL_DB_SOCKET)
+
 # Mandatory for build
 CMAKE_ARGS += -DHAVE_LLVM_LIBCPP_EXITCODE=1 
 CMAKE_ARGS += -DHAVE_CXX_FLOATING_POINT_OPTIMIZATION_PROBLEMS_EXITCODE=1

@@ -1,0 +1,24 @@
+master_secret = "{{MASTER_SECRET}}"
+
+# removing this line will default to moz_json formatted logs
+human_logs = 1
+
+# required to be externally available
+host = "0.0.0.0"
+# defined by SynoCommunity Package
+port = {{TCP_PORT}}
+
+syncstorage.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@{{DB_SERVER}}/syncstorage_rs"
+syncstorage.enable_quota = 0
+syncstorage.enabled = true
+syncstorage.limits.max_total_records = 1666 # See issues #298/#333
+
+# token
+tokenserver.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@{{DB_SERVER}}/tokenserver_rs"
+tokenserver.enabled = true 
+tokenserver.fxa_email_domain = "api.accounts.firefox.com"
+tokenserver.fxa_metrics_hash_secret = "{{METRICS_HASH_SECRET}}"
+tokenserver.fxa_oauth_server_url = "https://oauth.accounts.firefox.com"
+tokenserver.fxa_browserid_audience = "https://token.services.mozilla.com"
+tokenserver.fxa_browserid_issuer = "https://api.accounts.firefox.com"
+tokenserver.fxa_browserid_server_url = "https://verifier.accounts.firefox.com/v2"
