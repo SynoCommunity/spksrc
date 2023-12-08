@@ -17,7 +17,7 @@ CHANGELOG = Update to 1.6.6
 
 HOMEPAGE = https://github.com/mikespub-org/rvolz-BicBucStriim
 LICENSE = MIT
-LICENSE_FILE = $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)/LICENSE
+LICENSE_FILE = $(WORK_DIR)/BicBucStriim-$(SPK_VERS)/LICENSE
 
 # Admin link for in DSM UI
 ADMIN_URL = /bbs/
