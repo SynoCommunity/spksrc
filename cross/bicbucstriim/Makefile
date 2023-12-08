@@ -1,10 +1,10 @@
 PKG_NAME = BicBucStriim
-PKG_VERS = 1.6.6
+PKG_VERS = 1.5.3
 PKG_EXT = zip
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/mikespub-org/rvolz-$(PKG_NAME)/releases/download/v$(PKG_VERS)
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/rvolz/$(PKG_NAME)/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 DEPENDS =
 

@@ -21,8 +21,10 @@
 			"php": {
 				"backend": 8,
 				"extensions": [
+					"gd",
 					"intl",
 					"pdo_sqlite",
+					"sodium",
 					"sqlite3"
 				],
 				"group": "http",

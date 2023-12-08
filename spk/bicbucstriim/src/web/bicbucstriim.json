@@ -5,8 +5,10 @@
     "enable_cache": true,
     "enable_xdebug": false,
     "extensions": [
+        "gd",
         "intl",
         "pdo_sqlite",
+        "sodium",
         "sqlite3"
     ],
     "fpm_settings": {
