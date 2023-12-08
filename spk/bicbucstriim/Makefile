@@ -1,38 +1,39 @@
 SPK_NAME = bicbucstriim
-SPK_VERS = 1.3.6
-SPK_REV = 5
+SPK_VERS = 1.6.6
+SPK_REV = 6
 SPK_ICON = src/bicbucstriim.png
-DSM_UI_DIR = app
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
+# Pure PHP package, make sure ARCH is not defined
+override ARCH=
+
+REQUIRED_MIN_DSM = 6.0
+SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
 
 MAINTAINER = Diaoul
 DESCRIPTION = BicBucStriim streams books, digital books. It fills a gap in the functionality of current NAS devices, which provide access to your collection of music, videos and photos -- but not books. BicBucStriim covers that area and provides web-based access to your e-book collection.
-ADMIN_URL = /bbs/
-STARTABLE = no
 DISPLAY_NAME = BicBucStriim
-CHANGELOG = Update to 1.3.6
+CHANGELOG = Update to 1.6.6
 
-HOMEPAGE   = https://projekte.textmulch.de/bicbucstriim
-LICENSE    = MIT
+HOMEPAGE = https://github.com/mikespub-org/rvolz-BicBucStriim
+LICENSE = MIT
+LICENSE_FILE = $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)/LICENSE
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+# Admin link for in DSM UI
+ADMIN_URL = /bbs/
 
-INSTALL_DEP_SERVICES = apache-web
-START_DEP_SERVICES = apache-web
-INSTUNINST_RESTART_SERVICES = apache-web
+DSM_UI_DIR = app
+DSM_UI_CONFIG = src/app/config
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
-POST_STRIP_TARGET = bicbucstriim_extra_install
+SERVICE_SETUP = src/service-setup.sh
+STARTABLE = no
 
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+POST_STRIP_TARGET = bicbucstriim_extra_install
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: bicbucstriim_extra_install
 bicbucstriim_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	# none
