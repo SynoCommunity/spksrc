@@ -15,9 +15,11 @@ DESCRIPTION = BicBucStriim streams books, digital books. It fills a gap in the f
 DISPLAY_NAME = BicBucStriim
 CHANGELOG = Update to 1.5.3
 
-HOMEPAGE = https://github.com/mikespub-org/rvolz-BicBucStriim
+HOMEPAGE = https://github.com/rvolz/BicBucStriim
 LICENSE = MIT
 LICENSE_FILE = $(WORK_DIR)/BicBucStriim-$(SPK_VERS)/LICENSE
+
+SYSTEM_GROUP = http
 
 # Admin link for in DSM UI
 ADMIN_URL = /bbs/
@@ -25,8 +27,6 @@ ADMIN_URL = /bbs/
 DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
 CONF_DIR = src/conf/
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
