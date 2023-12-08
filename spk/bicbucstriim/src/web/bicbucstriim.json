@@ -6,7 +6,6 @@
     "enable_xdebug": false,
     "extensions": [
         "intl",
-        "mcrypt",
         "pdo_sqlite",
         "sqlite3"
     ],

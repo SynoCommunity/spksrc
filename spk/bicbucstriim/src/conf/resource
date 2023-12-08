@@ -22,7 +22,6 @@
 				"backend": 8,
 				"extensions": [
 					"intl",
-					"mcrypt",
 					"pdo_sqlite",
 					"sqlite3"
 				],
