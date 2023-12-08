@@ -77,9 +77,9 @@ service_postinst ()
             RESTART_APACHE="yes"
         fi
         # Check for PHP profile
-        if ! ${JQ} -e '.["${PACKAGE_NAME}"]' "${PHP_CFG_PATH}" >/dev/null; then
+        if ! ${JQ} -e ".[\"${PACKAGE_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Add PHP profile for ${DNAME}"
-            ${JQ} --slurpfile ocNode ${SYNOPKG_PKGDEST}/web/${PACKAGE}.json '.["${PACKAGE_NAME}"] = $ocNode[0]' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
+            ${JQ} --slurpfile ocNode ${SYNOPKG_PKGDEST}/web/${PACKAGE}.json '.["'"${PACKAGE_NAME}"'"] = $ocNode[0]' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
@@ -91,7 +91,7 @@ service_postinst ()
         fi
         # Restart Apache if configs have changed
         if [ "$RESTART_APACHE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("${SC_PKG_PREFIX}")) and .key != "${PACKAGE_NAME}")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${PACKAGE_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
@@ -125,9 +125,9 @@ service_postuninst ()
         RESTART_APACHE="no"
         RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
         # Check for PHP profile
-        if ${JQ} -e '.["${PACKAGE_NAME}"]' "${PHP_CFG_PATH}" >/dev/null; then
+        if ${JQ} -e ".[\"${PACKAGE_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Removing PHP profile for ${DNAME}"
-            ${JQ} 'del(.["${PACKAGE_NAME}"])' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
+            ${JQ} 'del(.["'"${PACKAGE_NAME}"'"])' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
             ${RM} "${WS_CFG_DIR}/php_profile/${PACKAGE_NAME}"
             RESTART_APACHE="yes"
@@ -140,7 +140,7 @@ service_postuninst ()
         fi
         # Restart Apache if configs have changed
         if [ "$RESTART_APACHE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("${SC_PKG_PREFIX}")) and .key != "${PACKAGE_NAME}")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+            if ${JQ} -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${PACKAGE_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
