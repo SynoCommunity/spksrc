@@ -9,7 +9,7 @@
 		}],
 		"portals": [{
 			"alias": "bbs",
-			"app": "com.synocommunity.packages.bbs",
+			"app": "com.synocommunity.packages.bicbucstriim",
 			"name": "BicBucStriim",
 			"service": "BicBucStriim",
 			"type": "alias"
