@@ -8,10 +8,10 @@
 			"user": "sc-bicbucstriim"
 		}],
 		"portals": [{
-			"alias": "bicbucstriim",
+			"alias": "bbs",
 			"app": "com.synocommunity.packages.bbs",
 			"name": "BicBucStriim",
-			"service": "bicbucstriim",
+			"service": "BicBucStriim",
 			"type": "alias"
 		}],
 		"services": [{
@@ -32,7 +32,7 @@
 				"user": "sc-bicbucstriim"
 			},
 			"root": "bbs",
-			"service": "bicbucstriim",
+			"service": "BicBucStriim",
 			"type": "apache_php"
 		}]
 	}
