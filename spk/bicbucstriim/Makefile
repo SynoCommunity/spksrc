@@ -24,6 +24,7 @@ ADMIN_URL = /bbs/
 
 DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
+CONF_DIR = src/conf/
 
 INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
@@ -36,4 +37,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: bicbucstriim_extra_install
 bicbucstriim_extra_install:
-	# none
+	install -m 755 -d $(STAGING_DIR)/web
+	install -m 644 src/web/bicbucstriim.conf $(STAGING_DIR)/web/bicbucstriim.conf
+	install -m 644 src/web/bicbucstriim.json $(STAGING_DIR)/web/bicbucstriim.json
