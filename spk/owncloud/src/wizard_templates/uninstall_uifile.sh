@@ -33,7 +33,7 @@ getValidPath()
 	VALID_PATH=$(/bin/cat<<EOF
 {
 	var exportPath = arguments[0];
-	const pattern = /^\/volume[0-9]+\//;
+	const pattern = /^\/(volume|volumeUSB)[0-9]+\//;
 	if (exportPath === "") {
 		return true;
 	} else if (pattern.test(exportPath)) {

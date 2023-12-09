@@ -5,7 +5,6 @@ if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
 	SYNOPKG_PKGDEST_VOL="/volume1"
 fi
 SHAREDIR="${SYNOPKG_PKGNAME}"
-DIR_VALID="/^[\\w _-]+$/"
 
 quote_json ()
 {
@@ -144,12 +143,11 @@ EOF
 check_php_profiles ()
 {
 	PHP_CFG_PATH="/usr/syno/etc/packages/WebStation/PHPSettings.json"
-	if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-		if jq -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
-			return 0  # true
-		else
-			return 1  # false
-		fi
+	if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] && \
+		jq -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+		return 0  # true
+	else
+		return 1  # false
 	fi
 }
 
@@ -195,7 +193,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"validator": {
 				"allowBlank": false,
 				"regex": {
-					"expr": "$(echo ${DIR_VALID} | quote_json)",
+					"expr": "/^[\\\w.][\\\w. -]{0,30}[\\\w.-][\\\\$]?$|^[\\\w][\\\\$]?$/",
 					"errorText": "{{{OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
 				}
 			}
