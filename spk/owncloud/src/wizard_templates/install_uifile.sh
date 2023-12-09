@@ -193,7 +193,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"validator": {
 				"allowBlank": false,
 				"regex": {
-					"expr": "/^[\\w.][\\w. -]{0,30}[\\w.-]\\$?$|^[\\w]$/",
+					"expr": "/^[\\\w.][\\\w. -]{0,30}[\\\w.-][\\\\$]?$|^[\\\w][\\\\$]?$/",
 					"errorText": "{{{OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
 				}
 			}
