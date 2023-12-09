@@ -1,6 +1,6 @@
 SPK_NAME = owncloud
 SPK_VERS = 10.13.3
-SPK_REV = 14
+SPK_REV = 15
 SPK_ICON = src/owncloud.png
 
 DEPENDS = cross/owncloud
