@@ -23,12 +23,11 @@ check_php_profiles ()
 	SC_PKG_PREFIX="com-synocommunity-packages-"
 	PACKAGE_NAME="${SC_PKG_PREFIX}${SHORTNAME}"
 	PHP_CFG_PATH="/usr/syno/etc/packages/WebStation/PHPSettings.json"
-	if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-		if jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${PACKAGE_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
-			return 0  # true
-		else
-			return 1  # false
-		fi
+	if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] && \
+		jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${PACKAGE_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+		return 0  # true
+	else
+		return 1  # false
 	fi
 }
 
