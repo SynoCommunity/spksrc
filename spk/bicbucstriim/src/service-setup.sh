@@ -160,6 +160,7 @@ service_save ()
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/data
     rsync -aX ${WEB_ROOT}/data/authors ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/data/ 2>&1
     rsync -aX ${WEB_ROOT}/data/titles ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/data/ 2>&1
+    rsync -aX ${WEB_ROOT}/data/data.db ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/data/ 2>&1
 }
 
 service_restore ()
@@ -168,6 +169,7 @@ service_restore ()
     echo "Restore previous data from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"
     rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/data/authors ${WEB_ROOT}/data/ 2>&1
     rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/data/titles ${WEB_ROOT}/data/ 2>&1
+    rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/data/data.db ${WEB_ROOT}/data/ 2>&1
 
     # Remove upgrade backup files
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}
