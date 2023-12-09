@@ -1,5 +1,7 @@
 #!/bin/bash
 
+INTERNAL_IP=$(ip -4 route get 8.8.8.8 | awk '/8.8.8.8/ && /src/ {print $NF}')
+
 quote_json ()
 {
     sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
@@ -93,6 +95,7 @@ PAGE_TTRSS_SETUP=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_domain_name",
             "desc": "{{DOMAIN_NAME_INPUT_LABEL}}",
+            "defaultValue": "${INTERNAL_IP}",
             "validator": {
                 "allowBlank": false
             }
