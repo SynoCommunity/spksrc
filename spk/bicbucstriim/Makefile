@@ -19,6 +19,8 @@ HOMEPAGE = https://github.com/rvolz/BicBucStriim
 LICENSE = MIT
 LICENSE_FILE = $(WORK_DIR)/BicBucStriim-$(SPK_VERS)/LICENSE
 
+WIZARDS_DIR = src/wizard/
+
 SYSTEM_GROUP = http
 
 # Admin link for in DSM UI
