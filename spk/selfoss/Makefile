@@ -1,6 +1,6 @@
 SPK_NAME = selfoss
 SPK_VERS = 2.19
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/selfoss.png
 
 DEPENDS  = cross/selfoss
