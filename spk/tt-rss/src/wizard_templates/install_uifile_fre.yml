@@ -1,10 +1,9 @@
 DB_CONFIGURATION_TITLE:             Configuration de la base de donnée de tt-rss
 ENTER_MYSQL_PASSWORD:               Saisissez votre mot de passe MySQL.
 ROOT_PASSWORD_DESCRIPTION:          Mot de passe Root
-INVALID_ROOT_PASSWORD:              "Mot de passe invalide. Veuillez vous assurer qu'il comporte au moins une lettre majuscule, une lettre minuscule, un chiffre, un caractère spécial, une longueur minimale de 10 caractères et qu'il ne contient pas le mot 'root'."
 ENTER_TT-RSS_PASSWORD:              Un utilisateur et une base de donnée MySQL 'ttrss' vont être créés. Saisissez un mot de passe pour l'utilisateur 'ttrss'.
 TT-RSS_PASSWORD_DESCRIPTION:        Mot de passe Ttrss
-INVALID_TT-RSS_PASSWORD:            "Mot de passe invalide. Veuillez vous assurer qu'il comporte au moins une lettre majuscule, une lettre minuscule, un chiffre, un caractère spécial, une longueur minimale de 10 caractères et qu'il ne contient pas le mot 'root'."
+INVALID_TT-RSS_PASSWORD:            "Mot de passe invalide. Assurez-vous qu'il comprend au moins une lettre majuscule, une lettre minuscule, un chiffre, un caractère spécial et qu'il a une longueur minimale de 10 caractères."
 TT-RSS_CONFIGURATION_TITLE:         Tt-rss configuration
 DOMAIN_NAME_SECTION_LABEL:          "Nom de domaine de votre DiskStation. Par exemple : vous.synology.me."
 DOMAIN_NAME_INPUT_LABEL:            Nom de domaine
