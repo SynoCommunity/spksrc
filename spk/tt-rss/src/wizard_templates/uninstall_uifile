@@ -1,5 +1,6 @@
 [{
 	"step_title": "{{REMOVE_TT_RSS_TITLE}}",
+	"invalid_next_disabled_v2": true,
 	"items": [{
 		"desc": "{{REMOVE_TT_RSS_DESC}}"
 	}, {
@@ -7,7 +8,10 @@
 		"desc": "{{ENTER_MYSQL_PASSWORD_DESC}}",
 		"subitems": [{
 			"key": "wizard_mysql_password_root",
-			"desc": "{{ROOT_PASSWORD}}"
+			"desc": "{{ROOT_PASSWORD}}",
+			"validator": {
+				"allowBlank": false
+			}
 		}]
 	}, {
 		"type": "textfield",
@@ -18,7 +22,7 @@
 			"validator": {
 				"allowBlank": true,
 				"regex": {
-					"expr": "/^\\\/volume[0-9]+\\\//",
+					"expr": "/^\\\/(volume|volumeUSB)[0-9]+\\\//",
 					"errorText": "{{{DB_EXPORT_LOCATION_FORMAT_ERROR}}}"
 				}
 			}		
