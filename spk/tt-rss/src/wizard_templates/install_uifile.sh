@@ -21,7 +21,7 @@ getPasswordValidator()
     validator=$(/bin/cat<<EOF
 {
     var password = arguments[0];
-    return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})") && ! password.includes("root");
+    return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})");
 }
 EOF
 )
@@ -68,9 +68,8 @@ PAGE_TTRSS_SETUP=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_mysql_password_root",
             "desc": "{{ROOT_PASSWORD_DESCRIPTION}}",
-            "invalidText": "{{INVALID_ROOT_PASSWORD}}",
             "validator": {
-                "fn": "$(getPasswordValidator)"
+                "allowBlank": false
             }
         }]
     }, {
