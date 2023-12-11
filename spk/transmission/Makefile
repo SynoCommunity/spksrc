@@ -20,9 +20,10 @@ HOMEPAGE = https://transmissionbt.com
 LICENSE  = GPLv2/GPLv3
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
 SERVICE_USER = auto
-SERVICE_WIZARD_SHARE = wizard_download_share
+SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 9091
 SERVICE_PORT_TITLE = Transmission Web UI
