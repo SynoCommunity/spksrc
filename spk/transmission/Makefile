@@ -14,7 +14,7 @@ DESCRIPTION_FRE = Transmission est un client BitTorrent simple et rapide. Vous p
 DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes controlarlo remotamente mediante su interfaz web o alguna aplicación dedicada.
 STARTABLE = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "1. Update Transmission to v4.0.5."
+CHANGELOG = "1. Update Transmission to v4.0.5.<br/>2. Use new shared folder handling."
 
 HOMEPAGE = https://transmissionbt.com
 LICENSE  = GPLv2/GPLv3
