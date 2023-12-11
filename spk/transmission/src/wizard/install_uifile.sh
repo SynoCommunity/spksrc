@@ -43,8 +43,6 @@ EOF
     echo "$DOWNLOAD_VOLUME" | quote_json
 }
 
-DIR_VALID="/^[\\w _-]+$/"
-
 PAGE_BASE_CONFIG=$(/bin/cat<<EOF
 {
     "step_title": "Basic configuration",
@@ -91,7 +89,7 @@ PAGE_BASE_CONFIG=$(/bin/cat<<EOF
                     "validator": {
                         "allowBlank": false,
                         "regex": {
-                            "expr": "$(echo ${DIR_VALID} | quote_json)",
+                            "expr": "/^[\\\w.][\\\w. -]{0,30}[\\\w.-][\\\\$]?$|^[\\\w][\\\\$]?$/",
                             "errorText": "Subdirectories are not supported."
                         },
                         "fn": "$(wizard_download_share_validator)"
