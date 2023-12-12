@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SHAREDIR="calibre"
+
 quote_json ()
 {
     sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
@@ -34,13 +36,21 @@ check_php_profiles ()
 PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 {
     "step_title": "{{{COPS_CONFIGURATION_FIRST_STEP_TITLE}}}",
+    "invalid_next_disabled_v2": true,
     "items": [{
         "type": "textfield",
         "desc": "{{{EXISTING_CALIBRE_DIRECTORY_DESCRIPTION}}}",
         "subitems": [{
-            "key": "wizard_calibre_dir",
-            "defaultValue": "/volume1/calibre/",
-            "desc": "{{{EXISTING_CALIBRE_DIRECTORY_LABEL}}}"
+            "key": "wizard_calibre_share",
+            "desc": "{{{EXISTING_CALIBRE_DIRECTORY_LABEL}}}",
+            "defaultValue": "${SHAREDIR}",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^[\\\w.][\\\w. -]{0,30}[\\\w.-][\\\\$]?$|^[\\\w][\\\\$]?$/",
+                    "errorText": "{{{EXISTING_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
+                }
+            }
         }]
     }, {
         "type": "textfield",

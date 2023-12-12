@@ -44,5 +44,14 @@
       "service": "cops",
       "type": "apache_php"
     }]
+  },
+  "data-share": {
+    "shares": [{
+      "name": "{{wizard_calibre_share}}",
+      "permission": {
+        "rw": ["sc-cops"]
+      },
+      "once": true
+    }]
   }
 }
