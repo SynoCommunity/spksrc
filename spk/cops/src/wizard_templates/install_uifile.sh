@@ -1,7 +1,5 @@
 #!/bin/bash
 
-SHAREDIR="calibre"
-
 quote_json ()
 {
     sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
@@ -43,7 +41,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_calibre_share",
             "desc": "{{{EXISTING_CALIBRE_DIRECTORY_LABEL}}}",
-            "defaultValue": "${SHAREDIR}",
+            "defaultValue": "calibre",
             "validator": {
                 "allowBlank": false,
                 "regex": {
@@ -58,7 +56,10 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_cops_title",
             "defaultValue": "COPS",
-            "desc": "{{{COPS_CATALOG_TITLE_LABEL}}}"
+            "desc": "{{{COPS_CATALOG_TITLE_LABEL}}}",
+            "validator": {
+                "allowBlank": false
+            }
         }]
     }]
 },{
