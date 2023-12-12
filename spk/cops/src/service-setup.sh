@@ -6,7 +6,9 @@ SC_PKG_PREFIX="com-synocommunity-packages-"
 PACKAGE_NAME="${SC_PKG_PREFIX}${PACKAGE}"
 
 # Others
+CHMOD="/bin/chmod"
 JQ="/bin/jq"
+SED="/bin/sed"
 SYNOSVC="/usr/syno/sbin/synoservice"
 WEB_DIR="/var/services/web_packages"
 # for backwards compatability
@@ -14,16 +16,6 @@ if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
     WEB_DIR="/var/services/web"
 fi
 WEB_ROOT="${WEB_DIR}/${PACKAGE}"
-
-if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-    WEB_USER="http"
-    WEB_GROUP="http"
-fi
-
-CFG_FILE_NAME="config_local.php"
-CFG_FILE="${WEB_ROOT}/${CFG_FILE_NAME}"
-SECURITY_SETTINGS_FILE_NAME=".htaccess"
-SECURITY_SETTINGS_FILE="${WEB_ROOT}/${SECURITY_SETTINGS_FILE_NAME}"
 
 validate_preinst ()
 {
@@ -104,23 +96,19 @@ service_postinst ()
         fi
         # Clean-up temporary files
         ${RM} ${TEMPDIR}
-
-        # Set permissions on metadata.db
-        if ! synoacltool -get "${SHARE_PATH}/metadata.db" | grep -q "group:${WEB_GROUP}:allow:rwxpdDaARWc."; then
-            synoacltool -add "${SHARE_PATH}/metadata.db" "group:${WEB_GROUP}:allow:rwxpdDaARWc:----" > /dev/null 2>&1
-        fi
     fi
     # Initialize or update configuration file based on user preferences.
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        DEFAULT_CFG_FILE="${SYNOPKG_PKGDEST}/web/${CFG_FILE_NAME}.synology"
+        CFG_FILE="${WEB_ROOT}/config_local.php"
+        DEFAULT_CFG_FILE="${SYNOPKG_PKGDEST}/web/config_local.php.synology"
         # Create a default configuration file
         if [ ! -f "${CFG_FILE}" ]; then
-            cp "${DEFAULT_CFG_FILE}" "${CFG_FILE}"
+            ${CP} "${DEFAULT_CFG_FILE}" "${CFG_FILE}"
             url_rewriting=$([ "${wizard_use_url_rewriting}" = "true" ] && echo "1" || echo "0")
-            sed -i -e "s|@calibre_dir@|${SHARE_PATH:=/volume1/calibre}/|g" ${CFG_FILE}
-            sed -i -e "s|@cops_title@|${wizard_cops_title:=COPS}|g" ${CFG_FILE}
-            sed -i -e "s|@use_url_rewriting@|${url_rewriting:=0}|g" ${CFG_FILE}
-            chmod ga+w "${CFG_FILE}"
+            ${SED} -i -e "s|@calibre_dir@|${SHARE_PATH:=/volume1/calibre}/|g" ${CFG_FILE}
+            ${SED} -i -e "s|@cops_title@|${wizard_cops_title:=COPS}|g" ${CFG_FILE}
+            ${SED} -i -e "s|@use_url_rewriting@|${url_rewriting:=0}|g" ${CFG_FILE}
+            ${CHMOD} ga+w "${CFG_FILE}"
         fi
     fi
 }
@@ -176,20 +164,18 @@ service_save ()
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE} ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}
     echo "Backup existing data to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web
-    # Save cops configuration file
-    rsync -aX ${CFG_FILE} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/ 2>&1
-    # Save .htaccess file
-    rsync -aX ${SECURITY_SETTINGS_FILE} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/ 2>&1
+    # Save cops configuration files
+    rsync -aX ${WEB_ROOT}/config_local.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/ 2>&1
+    rsync -aX ${WEB_ROOT}/.htaccess ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/ 2>&1
 }
 
 service_restore ()
 {
     # Restore some stuff
     echo "Restore previous data from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"
-    # Restore cops configuration file
-    rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/${CFG_FILE_NAME} ${CFG_FILE} 2>&1
-    # Restore .htaccess file
-    rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/${SECURITY_SETTINGS_FILE_NAME} ${SECURITY_SETTINGS_FILE} 2>&1
+    # Restore cops configuration files
+    rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config_local.php ${WEB_ROOT}/config_local.php 2>&1
+    rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/.htaccess ${WEB_ROOT}/.htaccess 2>&1
 
     # Remove upgrade backup files
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}
