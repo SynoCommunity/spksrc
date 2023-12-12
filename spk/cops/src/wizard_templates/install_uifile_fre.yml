@@ -12,5 +12,5 @@ DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_LABEL: "Kobo"
 DSM_PERMISSIONS_TITLE: "Attention! DSM Permissions"
 DSM_PERMISSIONS_TEXT: "L'utilisateur et le group du package n'apparaîtront pas sur la plupart des UI réglages. Veuillez vous référrer à <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\\\">Permission Management</a> pour plus de détails."
 
-PHP_CONFIGURATION_REQUIREMENTS_TITLE: "Configuration PHP requise"
-PHP_CONFIGURATION_REQUIREMENTS_EXPLANATION: "Vous devriez activer les extensions PHP suivantes (au sein de WebStation):"
+PHP_PROFILES_TITLE: "Plusieurs profils PHP"
+PHP_PROFILES_DESCRIPTION: "Attention : Plusieurs profils PHP détectés ; la page Web du package ne s'affichera pas tant qu'un redémarrage de DSM n'aura pas été effectué pour charger de nouvelles configurations."
