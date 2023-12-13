@@ -6,9 +6,6 @@ SC_PKG_PREFIX="com-synocommunity-packages-"
 PACKAGE_NAME="${SC_PKG_PREFIX}${PACKAGE}"
 
 # Others
-CHMOD="/bin/chmod"
-JQ="/bin/jq"
-SED="/bin/sed"
 SYNOSVC="/usr/syno/sbin/synoservice"
 WEB_DIR="/var/services/web_packages"
 # for backwards compatability
@@ -52,14 +49,14 @@ service_postinst ()
         PHP_CFG_PATH="${WS_CFG_DIR}/${PHP_CFG_FILE}"
         TMP_PHP_CFG_PATH="${TEMPDIR}/${PHP_CFG_FILE}"
         PHP_PROF_NAME="Default PHP 7.4 Profile"
-        WS_BACKEND="$(${JQ} -r '.default.backend' ${WS_CFG_PATH})"
-        WS_PHP="$(${JQ} -r '.default.php' ${WS_CFG_PATH})"
+        WS_BACKEND="$(jq -r '.default.backend' ${WS_CFG_PATH})"
+        WS_PHP="$(jq -r '.default.php' ${WS_CFG_PATH})"
         RESTART_APACHE="no"
         RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
         # Check if Apache is the selected back-end
         if [ ! "$WS_BACKEND" = "2" ]; then
             echo "Set Apache as the back-end server"
-            ${JQ} '.default.backend = 2' ${WS_CFG_PATH} > ${TMP_WS_CFG_PATH}
+            jq '.default.backend = 2' ${WS_CFG_PATH} > ${TMP_WS_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
@@ -67,15 +64,15 @@ service_postinst ()
         if [ -z "$WS_PHP" ] || [ "$WS_PHP" = "null" ]; then
             echo "Enable default PHP profile"
             # Locate default PHP profile
-            PHP_PROF_ID="$(${JQ} -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${PHP_CFG_PATH}")"
-            ${JQ} ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}" > ${TMP_WS_CFG_PATH}
+            PHP_PROF_ID="$(jq -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${PHP_CFG_PATH}")"
+            jq ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}" > ${TMP_WS_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
         # Check for PHP profile
-        if ! ${JQ} -e ".[\"${PACKAGE_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
+        if ! jq -e ".[\"${PACKAGE_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Add PHP profile for ${DNAME}"
-            ${JQ} --slurpfile ocNode ${SYNOPKG_PKGDEST}/web/${PACKAGE}.json '.["'"${PACKAGE_NAME}"'"] = $ocNode[0]' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
+            jq --slurpfile ocNode ${SYNOPKG_PKGDEST}/web/${PACKAGE}.json '.["'"${PACKAGE_NAME}"'"] = $ocNode[0]' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
@@ -87,7 +84,7 @@ service_postinst ()
         fi
         # Restart Apache if configs have changed
         if [ "$RESTART_APACHE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${PACKAGE_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+            if jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${PACKAGE_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
@@ -103,12 +100,12 @@ service_postinst ()
         DEFAULT_CFG_FILE="${SYNOPKG_PKGDEST}/web/config_local.php.synology"
         # Create a default configuration file
         if [ ! -f "${CFG_FILE}" ]; then
-            ${CP} "${DEFAULT_CFG_FILE}" "${CFG_FILE}"
+            cp "${DEFAULT_CFG_FILE}" "${CFG_FILE}"
             url_rewriting=$([ "${wizard_use_url_rewriting}" = "true" ] && echo "1" || echo "0")
-            ${SED} -i -e "s|@calibre_dir@|${SHARE_PATH:=/volume1/calibre}/|g" ${CFG_FILE}
-            ${SED} -i -e "s|@cops_title@|${wizard_cops_title:=COPS}|g" ${CFG_FILE}
-            ${SED} -i -e "s|@use_url_rewriting@|${url_rewriting:=0}|g" ${CFG_FILE}
-            ${CHMOD} ga+w "${CFG_FILE}"
+            sed -i -e "s|@calibre_dir@|${SHARE_PATH:=/volume1/calibre}/|g" ${CFG_FILE}
+            sed -i -e "s|@cops_title@|${wizard_cops_title:=COPS}|g" ${CFG_FILE}
+            sed -i -e "s|@use_url_rewriting@|${url_rewriting:=0}|g" ${CFG_FILE}
+            chmod ga+w "${CFG_FILE}"
         fi
     fi
 }
@@ -131,9 +128,9 @@ service_postuninst ()
         RESTART_APACHE="no"
         RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
         # Check for PHP profile
-        if ${JQ} -e ".[\"${PACKAGE_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
+        if jq -e ".[\"${PACKAGE_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Removing PHP profile for ${DNAME}"
-            ${JQ} 'del(.["'"${PACKAGE_NAME}"'"])' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
+            jq 'del(.["'"${PACKAGE_NAME}"'"])' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
             ${RM} "${WS_CFG_DIR}/php_profile/${PACKAGE_NAME}"
             RESTART_APACHE="yes"
@@ -146,7 +143,7 @@ service_postuninst ()
         fi
         # Restart Apache if configs have changed
         if [ "$RESTART_APACHE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${PACKAGE_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+            if jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${PACKAGE_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
