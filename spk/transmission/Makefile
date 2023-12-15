@@ -1,6 +1,6 @@
 SPK_NAME = transmission
-SPK_VERS = 4.0.4
-SPK_REV = 24
+SPK_VERS = 4.0.5
+SPK_REV = 25
 SPK_ICON = src/transmission.png
 
 DEPENDS = cross/transmission
@@ -14,15 +14,16 @@ DESCRIPTION_FRE = Transmission est un client BitTorrent simple et rapide. Vous p
 DESCRIPTION_SPN = Transmission es un cliente BitTorrent simple y rápido. Puedes controlarlo remotamente mediante su interfaz web o alguna aplicación dedicada.
 STARTABLE = yes
 DISPLAY_NAME = Transmission
-CHANGELOG = "1. Update Transmission to v4.0.4.<br/>2. Fix issue with empty blocklist files for 32-bit arm cpu models."
+CHANGELOG = "1. Update Transmission to v4.0.5.<br/>2. Use new shared folder handling."
 
 HOMEPAGE = https://transmissionbt.com
 LICENSE  = GPLv2/GPLv3
 
 WIZARDS_DIR = src/wizard/
+CONF_DIR = src/conf/
 
 SERVICE_USER = auto
-SERVICE_WIZARD_SHARE = wizard_download_share
+SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 9091
 SERVICE_PORT_TITLE = Transmission Web UI
