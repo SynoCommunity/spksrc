@@ -1,15 +1,32 @@
 {
   "webservice": {
+    "migrate": {
+      "root": [{
+        "new": "cops",
+        "old": "cops"
+      }]
+    },
+    "pkg_dir_prepare": [{
+      "group": "http",
+      "mode": "0755",
+      "source": "/var/packages/cops/target/share/cops",
+      "target": "cops",
+      "user": "sc-cops"
+      }],
+    "portals": [
+      {
+        "alias": "cops",
+        "app": "com.synocommunity.packages.cops",
+        "name": "COPS",
+        "service": "cops",
+        "type": "alias"
+      }
+    ],
     "services": [{
-      "service": "cops",
+      "backend": 2,
       "display_name": "COPS",
       "icon": "app/images/cops-{0}.png",
-      "type": "apache_php",
-      "root": "cops",
-      "backend": 2,
       "php": {
-        "profile_name": "cops",
-        "profile_desc": "PHP profile used by cops",
         "backend": 8,
         "extensions": [
           "gd",
@@ -18,31 +35,23 @@
           "intl",
           "zlib"
         ],
-        "user": "sc-cops",
-        "group": "http"
-      }
-    }],
-    "portals": [
-      {
-        "service": "cops",
-        "type": "alias",
-        "name": "COPS",
-        "alias": "cops",
-        "app": "com.synocommunity.packages.cops"
-      }
-    ],
-    "migrate": {
-      "root": [{
-        "old": "cops",
-        "new": "cops"
-      }]
-    },
-    "pkg_dir_prepare": [{
-      "source": "/var/packages/cops/target/share/cops",
-      "target": "cops",
-      "mode": "0755",
-      "user": "sc-cops",
-      "group": "http"
+        "group": "http",
+        "profile_desc": "PHP profile used by cops",
+        "profile_name": "cops",
+        "user": "sc-cops"
+      },
+      "root": "cops",
+      "service": "cops",
+      "type": "apache_php"
+    }]
+  },
+  "data-share": {
+    "shares": [{
+      "name": "{{wizard_calibre_share}}",
+      "permission": {
+        "rw": ["sc-cops"]
+      },
+      "once": true
     }]
   }
 }
