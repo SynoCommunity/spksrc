@@ -124,9 +124,14 @@ getDeActiveate()
 	var adminStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}");
 	var domainStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}");
 	var confirmStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}");
+	var phpStep = findStepByTitle(wizardDialog, "{{{PHP_PROFILES_TITLE}}}");
 	var checked = isRestoreChecked(wizardDialog);
 	if (currentStep.headline === "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}") {
-		domainStep.nextId = "applyStep";
+		if (!phpStep) {
+			domainStep.nextId = "applyStep";
+		} else {
+			domainStep.nextId = phpStep.itemId;
+		}
 		if (checked) {
 			currentStep.nextId = confirmStep.itemId;
 		} else {
@@ -259,9 +264,9 @@ EOF
 
 PAGE_PHP_PROFILES=$(/bin/cat<<EOF
 {
-	"step_title": "{{PHP_PROFILES_TITLE}}",
+	"step_title": "{{{PHP_PROFILES_TITLE}}}",
 	"items": [{
-		"desc": "{{PHP_PROFILES_DESCRIPTION}}"
+		"desc": "{{{PHP_PROFILES_DESCRIPTION}}}"
 	}]
 }
 EOF
