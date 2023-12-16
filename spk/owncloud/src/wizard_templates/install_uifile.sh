@@ -142,9 +142,11 @@ EOF
 # Check for multiple PHP profiles
 check_php_profiles ()
 {
+	SC_PKG_PREFIX="com-synocommunity-packages-"
+	SC_PKG_NAME="${SC_PKG_PREFIX}${SYNOPKG_PKGNAME}"
 	PHP_CFG_PATH="/usr/syno/etc/packages/WebStation/PHPSettings.json"
 	if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] && \
-		jq -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+		jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${SC_PKG_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
 		return 0  # true
 	else
 		return 1  # false

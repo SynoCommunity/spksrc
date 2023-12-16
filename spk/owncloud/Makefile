@@ -20,7 +20,6 @@ LICENSE = AGPL
 
 WIZARDS_TEMPLATES_DIR = src/wizard_templates
 SERVICE_WIZARD_SHARENAME = wizard_data_share
-USE_DATA_SHARE_WORKER = yes
 
 SYSTEM_GROUP = http
 
