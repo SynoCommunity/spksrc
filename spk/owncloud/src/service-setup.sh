@@ -1,5 +1,9 @@
 
 # ownCloud service setup
+SC_DNAME="ownCloud"
+SC_PKG_PREFIX="com-synocommunity-packages-"
+SC_PKG_NAME="${SC_PKG_PREFIX}${SYNOPKG_PKGNAME}"
+
 WEB_DIR="/var/services/web_packages"
 # for backwards compatability
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
@@ -10,10 +14,7 @@ if [ -z "${SYNOPKG_PKGTMP}" ]; then
 fi
 
 # Others
-OCROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
-JQ="/bin/jq"
-SED="/bin/sed"
-TAR="/bin/tar"
+WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 SYNOSVC="/usr/syno/sbin/synoservice"
 SYNOSHR="/usr/syno/sbin/synoshare"
 
@@ -51,7 +52,7 @@ set_owncloud_permissions ()
 
 exec_occ() {
     PHP="/usr/local/bin/php74"
-    OCC="${OCROOT}/occ"
+    OCC="${WEB_ROOT}/occ"
     COMMAND="${PHP} ${OCC} $*"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         /bin/su "$WEB_USER" -s /bin/sh -c "$COMMAND"
@@ -63,7 +64,7 @@ exec_occ() {
 
 exec_eff_occ() {
     PHP="/usr/local/bin/php74"
-    OCC="${OCROOT}/occ"
+    OCC="${WEB_ROOT}/occ"
     COMMAND="${PHP} ${OCC} $*"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
@@ -114,7 +115,7 @@ setup_owncloud_instance()
         echo "${DOMAINS}" | while read -r line; do
             if [ "$(echo "$line" | grep -cE ':5000|:5001')" -gt 0 ]; then
                 # Remove ":5000" or ":5001" from the line and update the trusted_domains array
-                new_line=$(echo "$line" | ${SED} -E 's/(:5000|:5001)//')
+                new_line=$(echo "$line" | sed -E 's/(:5000|:5001)//')
                 exec_occ config:system:set trusted_domains $line_number --value="$new_line"
             fi
             line_number=$((line_number+1))
@@ -130,7 +131,7 @@ setup_owncloud_instance()
         done
 
         # Add HTTP to HTTPS redirect to Apache configuration file
-        APACHE_CONF="${OCROOT}/.htaccess"
+        APACHE_CONF="${WEB_ROOT}/.htaccess"
         if [ -f "${APACHE_CONF}" ]; then
             echo "RewriteEngine On" >> ${APACHE_CONF}
             echo "RewriteCond %{HTTPS} off" >> ${APACHE_CONF}
@@ -145,8 +146,8 @@ service_postinst ()
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         # Install the web interface
         echo "Installing web interface"
-        ${MKDIR} ${OCROOT}
-        rsync -aX ${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}/ ${OCROOT} 2>&1
+        ${MKDIR} ${WEB_ROOT}
+        rsync -aX ${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}/ ${WEB_ROOT} 2>&1
 
         # Install web configurations
         TEMPDIR="${SYNOPKG_PKGTMP}/web"
@@ -159,14 +160,14 @@ service_postinst ()
         PHP_CFG_PATH="${WS_CFG_DIR}/${PHP_CFG_FILE}"
         TMP_PHP_CFG_PATH="${TEMPDIR}/${PHP_CFG_FILE}"
         PHP_PROF_NAME="Default PHP 7.4 Profile"
-        WS_BACKEND="$(${JQ} -r '.default.backend' ${WS_CFG_PATH})"
-        WS_PHP="$(${JQ} -r '.default.php' ${WS_CFG_PATH})"
+        WS_BACKEND="$(jq -r '.default.backend' ${WS_CFG_PATH})"
+        WS_PHP="$(jq -r '.default.php' ${WS_CFG_PATH})"
         RESTART_APACHE="no"
         RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
         # Check if Apache is the selected back-end
         if [ ! "$WS_BACKEND" = "2" ]; then
             echo "Set Apache as the back-end server"
-            ${JQ} '.default.backend = 2' ${WS_CFG_PATH} > ${TMP_WS_CFG_PATH}
+            jq '.default.backend = 2' ${WS_CFG_PATH} > ${TMP_WS_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
@@ -174,27 +175,27 @@ service_postinst ()
         if [ -z "$WS_PHP" ] || [ "$WS_PHP" = "null" ]; then
             echo "Enable default PHP profile"
             # Locate default PHP profile
-            PHP_PROF_ID="$(${JQ} -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${PHP_CFG_PATH}")"
-            ${JQ} ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}" > ${TMP_WS_CFG_PATH}
+            PHP_PROF_ID="$(jq -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${PHP_CFG_PATH}")"
+            jq ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}" > ${TMP_WS_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
-        # Check for ownCloud PHP profile
-        if ! ${JQ} -e '.["com-synocommunity-packages-owncloud"]' "${PHP_CFG_PATH}" >/dev/null; then
-            echo "Add PHP profile for ownCloud"
-            ${JQ} --slurpfile ocNode ${SYNOPKG_PKGDEST}/web/owncloud.json '.["com-synocommunity-packages-owncloud"] = $ocNode[0]' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
+        # Check for PHP profile
+        if ! jq -e ".[\"${SC_PKG_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
+            echo "Add PHP profile for ${SC_DNAME}"
+            jq --slurpfile newProfile ${SYNOPKG_PKGDEST}/web/${SYNOPKG_PKGNAME}.json '.["'"${SC_PKG_NAME}"'"] = $newProfile[0]' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
-        # Check for ownCloud Apache config
-        if [ ! -f "/usr/local/etc/apache24/sites-enabled/owncloud.conf" ]; then
-            echo "Add Apache config for ownCloud"
-            rsync -aX ${SYNOPKG_PKGDEST}/web/owncloud.conf /usr/local/etc/apache24/sites-enabled/ 2>&1
+        # Check for Apache config
+        if [ ! -f "/usr/local/etc/apache24/sites-enabled/${SYNOPKG_PKGNAME}.conf" ]; then
+            echo "Add Apache config for ${SC_DNAME}"
+            rsync -aX ${SYNOPKG_PKGDEST}/web/${SYNOPKG_PKGNAME}.conf /usr/local/etc/apache24/sites-enabled/ 2>&1
             RESTART_APACHE="yes"
         fi
         # Restart Apache if configs have changed
         if [ "$RESTART_APACHE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+            if jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${SC_PKG_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
@@ -213,7 +214,7 @@ service_postinst ()
 
         # Fix permissions
         if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            set_owncloud_permissions ${OCROOT} ${DATA_DIR}
+            set_owncloud_permissions ${WEB_ROOT} ${DATA_DIR}
         fi
 
         # Check backup file path
@@ -226,15 +227,15 @@ service_postinst ()
                 # Extract archive to temp folder
                 TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
                 ${MKDIR} "${TEMPDIR}"
-                ${TAR} -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
+                tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
                 # Fix file ownership
                 if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
                     chown -R ${WEB_USER}:${WEB_GROUP} ${TEMPDIR} 2>/dev/null
                 fi
 
                 # Restore configuration files and directories
-                rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${OCROOT}/" 2>&1
-                rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${OCROOT}/" 2>&1
+                rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${WEB_ROOT}/" 2>&1
+                rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${WEB_ROOT}/" 2>&1
 
                 # Restore user data
                 echo "Restoring user data to ${DATA_DIR}"
@@ -276,7 +277,7 @@ service_postinst ()
 
         # Fix permissions
         if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            set_owncloud_permissions ${OCROOT} ${DATA_DIR}
+            set_owncloud_permissions ${WEB_ROOT} ${DATA_DIR}
         fi
     fi
 }
@@ -303,7 +304,7 @@ service_preuninst ()
             # Data directory fail-safe
             if [ ! -d "$DATADIR" ]; then
                 echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
-                DATADIR="${OCROOT}/data"
+                DATADIR="${WEB_ROOT}/data"
             fi
 
             # Prepare archive structure
@@ -320,10 +321,10 @@ service_preuninst ()
             exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
 
             # Backup Directories
-            echo "Copying previous configuration from ${OCROOT}"
+            echo "Copying previous configuration from ${WEB_ROOT}"
             ${MKDIR} "${TEMPDIR}/configs/root"
-            rsync -aX "${OCROOT}/.user.ini" "${OCROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
-            rsync -aX "${OCROOT}/config" "${OCROOT}/apps" "${OCROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
+            rsync -aX "${WEB_ROOT}/.user.ini" "${WEB_ROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
+            rsync -aX "${WEB_ROOT}/config" "${WEB_ROOT}/apps" "${WEB_ROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
 
             # Backup user data
             echo "Copying previous user data from ${DATADIR}"
@@ -334,8 +335,8 @@ service_preuninst ()
 
             # Create backup archive
             archive_name="$(basename "$TEMPDIR").tar.gz"
-            echo "Creating compressed archive of ownCloud data in file $archive_name"
-            ${TAR} -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
+            echo "Creating compressed archive of ${SC_DNAME} data in file $archive_name"
+            tar -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
 
             # Move archive to export directory
             RSYNC_BAK_ARGS="--backup --suffix=.bak"
@@ -355,7 +356,7 @@ service_postuninst ()
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         # Remove the web interface
         echo "Removing web interface"
-        ${RM} ${OCROOT}
+        ${RM} ${WEB_ROOT}
 
         # Remove web configurations
         TEMPDIR="${SYNOPKG_PKGTMP}/web"
@@ -366,23 +367,23 @@ service_postuninst ()
         TMP_PHP_CFG_PATH="${TEMPDIR}/${PHP_CFG_FILE}"
         RESTART_APACHE="no"
         RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
-        # Check for ownCloud PHP profile
-        if ${JQ} -e '.["com-synocommunity-packages-owncloud"]' "${PHP_CFG_PATH}" >/dev/null; then
-            echo "Removing PHP profile for ownCloud"
-            ${JQ} 'del(.["com-synocommunity-packages-owncloud"])' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
+        # Check for PHP profile
+        if jq -e ".[\"${SC_PKG_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
+            echo "Removing PHP profile for ${SC_DNAME}"
+            jq 'del(.["'"${SC_PKG_NAME}"'"])' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
-            ${RM} "${WS_CFG_DIR}/php_profile/com-synocommunity-packages-owncloud"
+            ${RM} "${WS_CFG_DIR}/php_profile/${SC_PKG_NAME}"
             RESTART_APACHE="yes"
         fi
-        # Check for ownCloud Apache config
-        if [ -f "/usr/local/etc/apache24/sites-enabled/owncloud.conf" ]; then
-            echo "Removing Apache config for ownCloud"
-            ${RM} /usr/local/etc/apache24/sites-enabled/owncloud.conf
+        # Check for Apache config
+        if [ -f "/usr/local/etc/apache24/sites-enabled/${SYNOPKG_PKGNAME}.conf" ]; then
+            echo "Removing Apache config for ${SC_DNAME}"
+            ${RM} /usr/local/etc/apache24/sites-enabled/${SYNOPKG_PKGNAME}.conf
             RESTART_APACHE="yes"
         fi
         # Restart Apache if configs have changed
         if [ "$RESTART_APACHE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+            if jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${SC_PKG_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
@@ -414,13 +415,13 @@ service_postupgrade()
             echo "Restore default PHP template; remove previous PHP FPM configuration"
             rsync -aX ${WS_TMPL_PATH} ${TEMPDIR}/ 2>&1
             SUBST_TEXT="{{#fpm_settings.user_owncloud}}sc-owncloud{{/fpm_settings.user_owncloud}}{{^fpm_settings.user_owncloud}}http{{/fpm_settings.user_owncloud}}"
-            ${SED} -i "s|^user = ${SUBST_TEXT}$|user = http|g; s|^listen.owner = ${SUBST_TEXT}$|listen.owner = http|g" "${TMP_WS_TMPL_PATH}"
+            sed -i "s|^user = ${SUBST_TEXT}$|user = http|g; s|^listen.owner = ${SUBST_TEXT}$|listen.owner = http|g" "${TMP_WS_TMPL_PATH}"
             rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_TMPL_PATH} ${WS_TMPL_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
         # Restart Apache if configs have changed
         if [ "$RESTART_APACHE" = "yes" ]; then
-            if ${JQ} -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-owncloud")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+            if jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${SC_PKG_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
                 echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
             else
                 echo "Restart Apache to load new configs"
@@ -447,7 +448,7 @@ validate_preupgrade ()
 
     # No matching ugrade paths found
     if [ "$is_upgrade_possible" = "no" ]; then
-        echo "Please uninstall previous version, no update possible from v${SYNOPKG_OLD_PKGVER}.<br>Remember to save your ${OCROOT}/data files before uninstalling."
+        echo "Please uninstall previous version, no update possible from v${SYNOPKG_OLD_PKGVER}.<br/>Remember to save your ${WEB_ROOT}/data files before uninstalling."
         exit 1
     fi
 }
@@ -483,11 +484,11 @@ service_save ()
     # data directory fail-safe
     if [ ! -d "$DATADIR" ]; then
         echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
-        DATADIR="${OCROOT}/data"
+        DATADIR="${WEB_ROOT}/data"
     fi
     # Check if data directory inside owncloud directory and flag for restore if true
     DATADIR_REAL=$(realpath "$DATADIR")
-    WEBROOT_REAL=$(realpath "${OCROOT}")
+    WEBROOT_REAL=$(realpath "${WEB_ROOT}")
     if echo "$DATADIR_REAL" | grep -q "^$WEBROOT_REAL"; then
         echo "${DATADIR_REAL#"$WEBROOT_REAL/"}" > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory"
     fi
@@ -496,7 +497,7 @@ service_save ()
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
-    rsync -aX ${OCROOT}/ ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} 2>&1
+    rsync -aX ${WEB_ROOT}/ ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} 2>&1
 
     # Backup server database
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
@@ -525,7 +526,7 @@ service_restore ()
         DATAPATH="$(cat ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory)"
         # Data directory inside owncloud directory and needs to be restored
         echo "Restore previous data directory from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}"
-        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${OCROOT}/ 2>&1
+        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${WEB_ROOT}/ 2>&1
         ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory
     fi
 
@@ -536,7 +537,7 @@ service_restore ()
     "*config.php"
     "*.json"
     )
-    target="${OCROOT}/config"
+    target="${WEB_ROOT}/config"
     # Process each pattern of files in the source directory
     for pattern in "${patterns[@]}"; do
         files=$(find "$source" -type f -name "$pattern")
@@ -547,10 +548,10 @@ service_restore ()
         fi
     done
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ]; then
-        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${OCROOT}/ 2>&1
+        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${WEB_ROOT}/ 2>&1
     fi
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ]; then
-        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${OCROOT}/ 2>&1
+        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${WEB_ROOT}/ 2>&1
     fi
 
     echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
@@ -559,7 +560,7 @@ service_restore ()
     "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps"
     "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps-external"
     )
-    dest="${OCROOT}"
+    dest="${WEB_ROOT}"
     # Process the subdirectories in each of the source directories
     for dir in "${dirs[@]}"; do
         dir_name=$(basename "$dir")
@@ -584,7 +585,7 @@ service_restore ()
 
     # Fix permissions
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        set_owncloud_permissions ${OCROOT}
+        set_owncloud_permissions ${WEB_ROOT}
     fi
 
     # Disable maintenance mode
@@ -597,7 +598,7 @@ service_restore ()
     # Data directory fail-safe
     if [ ! -d "$DATADIR" ]; then
         echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
-        DATADIR="${OCROOT}/data"
+        DATADIR="${WEB_ROOT}/data"
     fi
     # Archive backup server database
     echo "Archive backup server database to ${DATADIR}"
