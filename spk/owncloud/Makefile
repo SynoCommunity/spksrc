@@ -14,9 +14,10 @@ MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 DISPLAY_NAME = ownCloud
 CHANGELOG = "1. Update ownCloud to 10.13.4."
-HOMEPAGE = https://owncloud.org/
+HOMEPAGE = https://owncloud.com/
 
-LICENSE = AGPL
+LICENSE = AGPLv3
+LICENSE_FILE = $(WORK_DIR)/owncloud/COPYING
 
 WIZARDS_TEMPLATES_DIR = src/wizard_templates
 SERVICE_WIZARD_SHARENAME = wizard_data_share
