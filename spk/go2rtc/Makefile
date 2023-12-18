@@ -1,6 +1,6 @@
 SPK_NAME = go2rtc
 SPK_VERS = 1.8.4
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/go2rtc.png
 
 DEPENDS = cross/go2rtc
@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 MAINTAINER = skrashevich
 DESCRIPTION = Ultimate camera streaming application with support RTSP, RTMP, HTTP-FLV, WebRTC, MSE, HLS, MP4, MJPEG, HomeKit, FFmpeg, etc
 DISPLAY_NAME = go2rtc
-CHANGELOG = "Add support ADTS to magic producer. Improve support incoming MJPEG in some cases. Fix https source in some cases. Fix api port for homekit module. Add new GoPro source for streaming from GoPro cameras  Add support unix socket for api module  Add support incoming H264 bitstream Fix https source   Fix support Tapo C210 firmware v1.3.9  Fix homekit source panic on stop producer Fix panic for broken RTP with AAC  Fix digest auth in some cases"
+CHANGELOG = "Enhanced support for various formats and sources, including ADTS, MJPEG, and GoPro streaming.<br/>Fixed numerous issues in https sources, API ports, and RTP handling.<br/>Improved compatibility with specific devices like Tapo C210."
 LICENSE_FILE = $(WORK_DIR)/src/github.com/go2rtc/go2rtc/LICENSE
 HOMEPAGE = https://github.com/AlexxIT/go2rtc
 LICENSE = MIT
