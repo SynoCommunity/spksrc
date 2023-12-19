@@ -22,11 +22,13 @@ PACKAGE_SHARE_PATH=$(grep "^SHARE_PATH=" "$CONFIG_FILE" | cut -d '=' -f 2)
 
 # if SHARE_NAME is empty and SHARE_PATH is not empty and doesn't start with '/volume'
 if [ -z "$PACKAGE_SHARE_NAME" ] && [ -n "$PACKAGE_SHARE_PATH" ] && [[ ! "$PACKAGE_SHARE_PATH" =~ ^/volume ]]; then
-    PACKAGE_SHARE_NAME="$PACKAGE_SHARE_PATH"
-    PACKAGE_SHARE_PATH="$SYNOPKG_PKGDEST_VOL/$PACKAGE_SHARE_PATH"
+	PACKAGE_SHARE_NAME="$PACKAGE_SHARE_PATH"
+	PACKAGE_SHARE_PATH="$SYNOPKG_PKGDEST_VOL/$PACKAGE_SHARE_PATH"
 	# update values in the config file
 	echo "SHARE_NAME=$PACKAGE_SHARE_NAME" >> "$CONFIG_FILE"
 	sed -i "s|^SHARE_PATH=.*|SHARE_PATH=$PACKAGE_SHARE_PATH|" "$CONFIG_FILE"
+elif [ -z "$PACKAGE_SHARE_NAME" ] && [ -z "$PACKAGE_SHARE_PATH" ]; then
+	PACKAGE_SHARE_NAME="downloads"
 fi
 
 PAGE_BASE_CONFIG=$(/bin/cat<<EOF
