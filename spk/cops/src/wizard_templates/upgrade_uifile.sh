@@ -2,7 +2,7 @@
 
 WEB_DIR="/var/services/web_packages"
 # for backwards compatability
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
     WEB_DIR="/var/services/web"
 fi
 
@@ -23,12 +23,13 @@ page_append ()
 }
 
 PHP_FILE="${WEB_DIR}/cops/config_local.php"
-OLD_SHARE_NAME=$(sed -n "s/^\s*\$config\['calibre_directory'\] = '\([^']*\)';/\1/p" "$PHP_FILE" | xargs basename)
+CONFIGURED_SHARE_NAME=$(sed -n "s/^\s*\$config\['calibre_directory'\] = '\([^']*\)';/\1/p" "$PHP_FILE" | xargs basename)
+PACKAGE_SHARE_NAME=$(grep "^SHARE_NAME=" "/var/packages/cops/etc/installer-variables" | cut -d '=' -f 2)
 
 # Check for data share
 check_data_share ()
 {
-    if [ -n "${SHARE_NAME}" ]; then
+    if [ -n "${PACKAGE_SHARE_NAME}" ]; then
         return 0  # true
     else
         return 1  # false
@@ -45,7 +46,7 @@ PAGE_LIBRARY_CONFIG=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_calibre_share",
             "desc": "{{{UPGRADE_CALIBRE_DIRECTORY_LABEL}}}",
-            "defaultValue": "${OLD_SHARE_NAME}",
+            "defaultValue": "${CONFIGURED_SHARE_NAME}",
             "validator": {
                 "allowBlank": false,
                 "regex": {
@@ -62,7 +63,6 @@ EOF
 )
 
 main () {
-	set >> /var/log/packages/cops.log
     local upgrade_page=""
     if ! check_data_share; then
         upgrade_page=$(page_append "$upgrade_page" "$PAGE_LIBRARY_CONFIG")
