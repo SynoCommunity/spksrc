@@ -1,4 +1,13 @@
 {
+  "data-share": {
+    "shares": [{
+      "name": "{{wizard_calibre_share}}",
+      "once": true,
+      "permission": {
+        "rw": ["sc-cops"]
+      }
+    }]
+  },
   "webservice": {
     "migrate": {
       "root": [{
@@ -30,9 +39,9 @@
         "backend": 8,
         "extensions": [
           "gd",
+          "intl",
           "pdo_sqlite",
           "sqlite3",
-          "intl",
           "zlib"
         ],
         "group": "http",
@@ -43,15 +52,6 @@
       "root": "cops",
       "service": "cops",
       "type": "apache_php"
-    }]
-  },
-  "data-share": {
-    "shares": [{
-      "name": "{{wizard_calibre_share}}",
-      "permission": {
-        "rw": ["sc-cops"]
-      },
-      "once": true
     }]
   }
 }

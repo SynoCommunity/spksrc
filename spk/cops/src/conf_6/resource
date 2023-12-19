@@ -2,10 +2,10 @@
 	"data-share": {
 		"shares": [{
 			"name": "{{wizard_calibre_share}}",
+			"once": true,
 			"permission": {
 				"rw": ["http"]
-			},
-			"once": true
+			}
 		}]
 	}
 }
