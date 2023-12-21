@@ -1,7 +1,7 @@
 
 CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
-export TMP_DIR=${SYNOPKG_PKGTMP}
+export TMP_DIR="${SYNOPKG_PKGTMP}"
 
 SERVICE_COMMAND="${TRANSMISSION} --config-dir ${SYNOPKG_PKGVAR} --pid-file ${PID_FILE} --logfile ${LOG_FILE}"
 
