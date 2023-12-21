@@ -20,7 +20,6 @@ HOMEPAGE = https://transmissionbt.com
 LICENSE  = GPLv2/GPLv3
 
 WIZARDS_DIR = src/wizard/
-CONF_DIR = src/conf/
 
 SERVICE_USER = auto
 SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name

@@ -1,9 +1,21 @@
 
 CFG_FILE="${SYNOPKG_PKGVAR}/settings.json"
 TRANSMISSION="${SYNOPKG_PKGDEST}/bin/transmission-daemon"
-export TMP_DIR=${SYNOPKG_PKGTMP}
+export TMP_DIR="${SYNOPKG_PKGTMP}"
 
 SERVICE_COMMAND="${TRANSMISSION} --config-dir ${SYNOPKG_PKGVAR} --pid-file ${PID_FILE} --logfile ${LOG_FILE}"
+
+validate_preupgrade ()
+{
+    SC_INST_VAR="/var/packages/${SYNOPKG_PKGNAME}/etc/installer-variables"
+    if [ -f "$SC_INST_VAR" ]; then
+        PACKAGE_SHARE_PATH=$(grep "^SHARE_PATH=" "$SC_INST_VAR" | cut -d '=' -f 2)
+        # if SHARE_PATH is invalid remove the installer variables file
+        if [ -n "$PACKAGE_SHARE_PATH" ] && [[ ! "$PACKAGE_SHARE_PATH" =~ ^/volume ]]; then
+            ${RM} "$SC_INST_VAR"
+        fi
+    fi
+}
 
 service_postinst ()
 {
