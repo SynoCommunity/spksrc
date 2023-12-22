@@ -1,9 +1,9 @@
 PKG_NAME = influxdb2
-PKG_VERS = 2.7.1
+PKG_VERS = 2.7.4
 PKG_EXT = tar.gz
 PKG_DIST_SITE = https://dl.influxdata.com/influxdb/releases
-PKG_DIR = $(PKG_NAME)_linux_$(PKG_DIST_ARCH)
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)_linux_$(PKG_DIST_ARCH).$(PKG_EXT)
 
 DEPENDS =
 
@@ -30,4 +30,4 @@ include ../../mk/spksrc.install-resources.mk
 .PHONY: influxdb2_install
 influxdb2_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
-	install -m 755 $(WORK_DIR)/$(PKG_DIR)/influxd $(STAGING_INSTALL_PREFIX)/bin
+	install -m 755 $(WORK_DIR)/$(PKG_DIR)/usr/bin/influxd $(STAGING_INSTALL_PREFIX)/bin

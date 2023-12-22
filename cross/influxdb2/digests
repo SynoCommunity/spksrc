@@ -1,6 +1,6 @@
-influxdb2-2.7.1-linux-amd64.tar.gz SHA1 d1ebf025f61fc4a1a12218d16c9ebcd889284e74
-influxdb2-2.7.1-linux-amd64.tar.gz SHA256 e5ecfc15c35af55641ffc92680ad0fb043aa51a942944252e214e2a551c60ebb
-influxdb2-2.7.1-linux-amd64.tar.gz MD5 ca95feb9aa140ba2d857cd9cc0260c04
-influxdb2-2.7.1-linux-arm64.tar.gz SHA1 2554ca92ff7da917d0c544a63ef52f29ca62cb6b
-influxdb2-2.7.1-linux-arm64.tar.gz SHA256 b88989dae0c802fdee499fa07aae837139da3c786293c74e9d7c46b8460510d4
-influxdb2-2.7.1-linux-arm64.tar.gz MD5 85c8dc2d01a8b6eaa9ec06f832f4e694
+influxdb2-2.7.4_linux_amd64.tar.gz SHA1 7990961fc4ca66ad76e4c14798868be308a0a292
+influxdb2-2.7.4_linux_amd64.tar.gz SHA256 2a2ccca52e42fb483c93ac3672cb264ffb804fc0be33209e5d954dd755146288
+influxdb2-2.7.4_linux_amd64.tar.gz MD5 704766d07383e439727f6f6731f2c123
+influxdb2-2.7.4_linux_arm64.tar.gz SHA1 3152e617faf43928889214a192e1a117f2f40d77
+influxdb2-2.7.4_linux_arm64.tar.gz SHA256 bf7386a1279f3d7eb96dd5b54e80c7d2a541facf60689e78913ae2f8f4503616
+influxdb2-2.7.4_linux_arm64.tar.gz MD5 63e8de49918eff95d2a78c3f13e05fa6

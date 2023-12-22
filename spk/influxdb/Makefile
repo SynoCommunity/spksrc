@@ -1,5 +1,5 @@
 SPK_NAME = influxdb
-SPK_VERS = 2.7.1
+SPK_VERS = 2.7.4
 SPK_REV = 1
 SPK_ICON = src/influxdb.png
 
@@ -14,6 +14,7 @@ CHANGELOG = "1. Created initial package"
 HOMEPAGE = https://www.influxdata.com/products/influxdb/
 LICENSE  = Apache-2.0/MIT
 
+# There does not exist a 32 bit package
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
 WIZARDS_DIR = src/wizard/
@@ -24,7 +25,7 @@ SPK_COMMANDS = bin/influx bin/influxd
 
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SERVICE_PORT = 8085
+SERVICE_PORT = 8186
 SERVICE_PORT_TITLE = InfluxDB API
 
 # Admin link for in DSM UI
