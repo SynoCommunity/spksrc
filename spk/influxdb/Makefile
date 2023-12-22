@@ -17,7 +17,7 @@ LICENSE  = Apache-2.0/MIT
 # There does not exist a 32 bit package
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
-WIZARDS_DIR = src/wizard/
+# WIZARDS_DIR = src/wizard/
 
 include ../../mk/spksrc.common.mk
 
