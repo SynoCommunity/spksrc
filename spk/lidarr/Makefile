@@ -1,6 +1,6 @@
 SPK_NAME = lidarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/lidarr.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
@@ -12,7 +12,7 @@ DOTNET_SERVARR_ARCHS = 1
 MAINTAINER = Team Lidarr
 MAINTAINER_URL = https://lidarr.audio/
 DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
-CHANGELOG = "1. Fix dotnet dependencies for DSM 7.2.<br/>2. Update Lidarr to v1.1.4.3027.<br/>3. Fix package update.<br/>4. Add support for x86 (32-bit) architecture."
+CHANGELOG = "1. Update Lidarr to v2.0.7.3849."
 DISPLAY_NAME = Lidarr
 HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3

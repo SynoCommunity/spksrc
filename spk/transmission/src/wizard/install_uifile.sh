@@ -15,93 +15,24 @@ page_append ()
     fi
 }
 
-wizard_download_share_validator()
-{
-    DOWNLOAD_SHARE=$(/bin/cat<<EOF
-{
-    var value = arguments[0];
-    var step = arguments[2];
-    step.items.map['wizard_download_dir'].setValue(step.items.map['wizard_download_volume'].value + '/' + value);
-    return true;
-}
-EOF
-)
-    echo "$DOWNLOAD_SHARE" | quote_json
-}
-
-wizard_download_volume_validator()
-{
-    DOWNLOAD_VOLUME=$(/bin/cat<<EOF
-{
-    var value = arguments[0];
-    var step = arguments[2];
-    step.items.map['wizard_download_dir'].setValue(value + '/' + step.items.map['wizard_download_share'].value);
-    return true;
-}
-EOF
-)
-    echo "$DOWNLOAD_VOLUME" | quote_json
-}
-
-DIR_VALID="/^[\\w _-]+$/"
-
 PAGE_BASE_CONFIG=$(/bin/cat<<EOF
 {
     "step_title": "Basic configuration",
     "invalid_next_disabled_v2": true,
     "items": [{
-            "type": "combobox",
-            "desc": "Please select a volume to use for the download folder",
-            "subitems": [{
-                "key": "wizard_download_volume",
-                "desc": "Volume name",
-                "defaultValue": "volume1",
-                "displayField": "display_name",
-                "valueField": "volume_path",
-                "editable": false,
-                "mode": "remote",
-                "api_store": {
-                    "api": "SYNO.Core.Storage.Volume",
-                    "method": "list",
-                    "version": 1,
-                    "baseParams": {
-                        "limit": -1,
-                        "offset": 0,
-                        "location": "internal"
-                    },
-                    "root": "volumes",
-                    "idProperty": "volume_path",
-                    "fields": [
-                        "display_name",
-                        "volume_path"
-                    ]
-                },
-                "validator": {
-                    "fn": "$(wizard_download_volume_validator)"
-                }
-            }]
-        },
-        {
             "type": "textfield",
-            "desc": "Download shared folder (using the volume chosen above)",
+            "desc": "Please select a shared folder for storing downloads. If this folder doesn't exist at the time of installation, it will be created.",
             "subitems": [{
-                    "key": "wizard_download_share",
-                    "desc": "Download shared folder",
+                    "key": "wizard_shared_folder_name",
+                    "desc": "Shared folder",
                     "defaultValue": "downloads",
                     "validator": {
                         "allowBlank": false,
                         "regex": {
-                            "expr": "$(echo ${DIR_VALID} | quote_json)",
+                            "expr": "/^[\\\w.][\\\w. -]{0,30}[\\\w.-][\\\\$]?$|^[\\\w][\\\\$]?$/",
                             "errorText": "Subdirectories are not supported."
-                        },
-                        "fn": "$(wizard_download_share_validator)"
+                        }
                     }
-                },
-                {
-                    "key": "wizard_download_dir",
-                    "desc": "Full path to the shared download folder",
-                    "defaultValue": "/volume1/downloads",
-                    "hidden": true
                 }
             ]
         }

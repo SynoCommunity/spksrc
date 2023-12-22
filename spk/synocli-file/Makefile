@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 3.1
-SPK_REV = 21
+SPK_VERS = 3.2
+SPK_REV = 22
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -11,6 +11,7 @@ DEPENDS += cross/mg
 DEPENDS += cross/jupp
 DEPENDS += cross/iconv
 DEPENDS += cross/dos2unix
+DEPENDS += cross/lsd
 
 OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/sd
 OPTIONAL_DEPENDS += cross/bat cross/eza
@@ -42,12 +43,6 @@ endif
 
 # packages depending on cross/zlib
 DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
-
-ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
-# A compiler with support for C++11 language features is required.
-DEPENDS += cross/rnm
-OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
-endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
@@ -85,9 +80,9 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools, lsd$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Replace exa by eza v0.13.0.<br/>2. Update dos2unix to v 7.5.1.<br>3. Update file to v5.45.<br/>4. Update fzf to v0.42.0.<br/>5. Update jdupes to v1.27.3.<br/>6. Update less to v643.<br/>7. Update micro to v2.0.12.<br/>8. Update Midnight Commander to v4.8.30.<br/>9. Update mg v3.7.<br/>10. Update ncdu to v1.19.<br/>11. Update rhash to v1.4.4.<br/>12. Update rmlint to v2.10.2.<br/>13. Update tree to v2.1.1.<br/>"
+CHANGELOG = "1. Add lsd v1.0.0.<br/>2. Update bat to v0.24.0.<br/>3. Update eza to v0.16.1.<br/>4. Update fd to v8.7.0.<br/>5. Update fzf to v0.44.1.<br/>6. Update micro to v2.0.13.<br/>7. Update sd to v1.0.0."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -104,7 +99,6 @@ SPK_COMMANDS += bin/file
 SPK_COMMANDS += bin/detox
 SPK_COMMANDS += bin/pcre2grep bin/pcre2test
 SPK_COMMANDS += bin/rmlint
-SPK_COMMANDS += bin/rnm
 SPK_COMMANDS += bin/zstd bin/unzstd bin/zstdcat bin/zstdmt bin/zstdgrep bin/zstdless
 SPK_COMMANDS += bin/lzip bin/plzip
 SPK_COMMANDS += bin/fdupes
@@ -116,6 +110,7 @@ SPK_COMMANDS += bin/sd
 SPK_COMMANDS += bin/mg
 SPK_COMMANDS += bin/bat
 SPK_COMMANDS += bin/eza
+SPK_COMMANDS += bin/lsd
 SPK_COMMANDS += bin/jmacs bin/joe bin/jpico bin/jstar bin/jupp bin/rjoe
 SPK_COMMANDS += bin/nnn
 SPK_COMMANDS += bin/iconv
@@ -135,6 +130,13 @@ SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
 
 include ../../mk/spksrc.spk.mk
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
+# A compiler with support for C++11 language features is required.
+DEPENDS += cross/rnm
+OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
+SPK_COMMANDS += bin/rnm
+endif
 
 .PHONY: synocli-file_extra_install
 synocli-file_extra_install:
