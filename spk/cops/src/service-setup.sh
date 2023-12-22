@@ -168,11 +168,27 @@ service_save ()
 
 service_restore ()
 {
-    # Restore some stuff
-    echo "Restore previous data from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"
-    # Restore cops configuration files
-    rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config_local.php ${WEB_ROOT}/config_local.php 2>&1
-    rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/.htaccess ${WEB_ROOT}/.htaccess 2>&1
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config_local.php" ] && [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/.htaccess" ]; then
+        # Restore some stuff
+        echo "Restore previous data from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"
+        # Restore cops configuration files
+        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config_local.php ${WEB_ROOT}/config_local.php 2>&1
+        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/.htaccess ${WEB_ROOT}/.htaccess 2>&1
+    else
+        # Backup missing, re-initialise default values
+        CFG_FILE="${WEB_ROOT}/config_local.php"
+        DEFAULT_CFG_FILE="${SYNOPKG_PKGDEST}/web/config_local.php.synology"
+        if [ ! -f "${CFG_FILE}" ]; then
+            echo "Backup data missing, re-initialising default values"
+            # Create a default configuration file
+            cp "${DEFAULT_CFG_FILE}" "${CFG_FILE}"
+            url_rewriting=$([ "${wizard_use_url_rewriting}" = "true" ] && echo "1" || echo "0")
+            sed -i -e "s|@calibre_dir@|${SHARE_PATH:=/volume1/calibre}/|g" ${CFG_FILE}
+            sed -i -e "s|@cops_title@|${wizard_cops_title:=COPS}|g" ${CFG_FILE}
+            sed -i -e "s|@use_url_rewriting@|${url_rewriting:=0}|g" ${CFG_FILE}
+            chmod ga+w "${CFG_FILE}"
+        fi
+    fi
 
     # Remove upgrade backup files
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}
