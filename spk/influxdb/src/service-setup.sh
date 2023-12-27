@@ -10,12 +10,10 @@ SVC_CWD="${SYNOPKG_PKGVAR}"
 
 service_postinst ()
 {
-    cat << EOF > "${INFLUXD_CONFIG_PATH}"
-http-bind-address: ":${SERVICE_PORT}"
-reporting-disabled: true
-bolt-path: "${SYNOPKG_PKGVAR}/.influxdbv2/influxd.bolt"
-engine-path: "${SYNOPKG_PKGVAR}/.influxdbv2/engine"
-sqlite-path: "${SYNOPKG_PKGVAR}/.influxdbv2/influxd.sqlite"
-
-EOF
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        # Edit the configuration according to the wizard
+        sed -e "s|@SERVICE_PORT@|${SERVICE_PORT}|g" \
+            -e "s|@SYNOPKG_PKGVAR@|${SYNOPKG_PKGVAR}|g" \
+            -i "${INFLUXD_CONFIG_PATH}"
+    fi
 }

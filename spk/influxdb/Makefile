@@ -31,4 +31,12 @@ SERVICE_PORT_TITLE = InfluxDB API
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+POST_STRIP_TARGET = influxdb_extra_install
+
 include ../../mk/spksrc.spk.mk
+
+# Install src/config.yml to var
+.PHONY: influxdb_extra_install
+influxdb_extra_install:
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 644 src/config.yml $(STAGING_DIR)/var/config.yml

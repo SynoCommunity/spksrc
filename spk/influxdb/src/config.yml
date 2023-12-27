@@ -1,0 +1,5 @@
+http-bind-address: ":@SERVICE_PORT@"
+reporting-disabled: true
+bolt-path: "@SYNOPKG_PKGVAR@/.influxdbv2/influxd.bolt"
+engine-path: "@SYNOPKG_PKGVAR@/.influxdbv2/engine"
+sqlite-path: "@SYNOPKG_PKGVAR@/.influxdbv2/influxd.sqlite"
