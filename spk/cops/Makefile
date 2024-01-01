@@ -1,6 +1,6 @@
 SPK_NAME = cops
 SPK_VERS = 1.5.4
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/cops.png
 
 DEPENDS  = cross/cops
