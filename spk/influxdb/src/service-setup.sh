@@ -7,13 +7,3 @@ SERVICE_COMMAND="${INFLUXD}"
 SVC_BACKGROUND=yes
 SVC_WRITE_PID=yes
 SVC_CWD="${SYNOPKG_PKGVAR}"
-
-service_postinst ()
-{
-    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        # Edit the configuration according to the wizard
-        sed -e "s|@SERVICE_PORT@|${SERVICE_PORT}|g" \
-            -e "s|@SYNOPKG_PKGVAR@|${SYNOPKG_PKGVAR}|g" \
-            -i "${INFLUXD_CONFIG_PATH}"
-    fi
-}
