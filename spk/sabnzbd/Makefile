@@ -23,7 +23,7 @@ LICENSE   = GPL
 WIZARDS_DIR = src/wizard/
 
 SERVICE_USER = auto
-SERVICE_WIZARD_SHARE = wizard_download_dir
+SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8080
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
