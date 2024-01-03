@@ -1,5 +1,5 @@
 # cross-compiled wheels
-cffi==1.15.1
+cffi==1.16.0
 Cheetah3==3.2.6
-sabctools==7.1.2
-orjson==3.9.7
+sabctools==8.1.0
+orjson==3.9.10

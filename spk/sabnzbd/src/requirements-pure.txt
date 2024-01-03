@@ -1,11 +1,11 @@
 # Wheels that absolutely needs
 # to be managed as pure-python
-feedparser==6.0.10
+feedparser==6.0.11
 configobj==5.0.8
 cheroot==10.0.0
-cherrypy==18.8.0
-jaraco.functools==3.9.0
-jaraco.collections==4.3.0
+cherrypy==18.9.0
+jaraco.functools==4.0.0
+jaraco.collections==5.0.0
 jaraco.text==3.8.1 # Newer version introduces irrelevant extra dependencies
 jaraco.classes==3.3.0
 jaraco.context==4.3.0
@@ -19,6 +19,6 @@ portend==3.2.0
 chardet==5.2.0
 PySocks==1.7.1
 puremagic==1.15
-guessit==3.7.1
+guessit==3.8.0
 babelfish==0.6.0
 rebulk==3.2.0
