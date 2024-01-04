@@ -20,13 +20,11 @@
           }
         ]
       }, {
-        "desc": ""
-      }, {
-        "desc": "If you let the installer create the shared folder, it is created under the same volume as the package is installed.<br/>If you want to use a different volume for the share, you must create the shared folder in DSM Control Panel before, and enter the name of the existing share in the field above."
+        "desc": "If you let the installer handle it, the shared folder goes to the package's volume. To use a different volume, create the shared folder in DSM Control Panel before installation and input its name during setup."
       }, {
         "desc": ""
       }, {
-        "desc": "This package runs as internal service user <b>'sc-sabnzbd'</b> in DSM. The shared folder above is configured at installation time to be accessible by this user.<p>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "This package utilizes the internal service user <b>'sc-sabnzbd'</b> in DSM. The shared folder mentioned is set up during installation to be accessible specifically by this user. For more detailed information, please consult the <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> guide."
       }
     ]
   }
