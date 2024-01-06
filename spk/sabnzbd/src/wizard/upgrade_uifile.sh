@@ -34,7 +34,7 @@ check_data_share ()
     if [ -n "${PACKAGE_SHARE_NAME}" ]; then
         return 0  # true
     elif [ -n "$CONFIGURED_SHARE_PATH" ] && [ -n "$PACKAGE_SHARE_PATH" ] && [ "$CONFIGURED_SHARE_PATH" = "$PACKAGE_SHARE_PATH" ]; then
-        # If consistent data share path, arrume share name is correct
+        # If consistent data share path, assume share name is correct
         return 0  # true
     else
         return 1  # false
