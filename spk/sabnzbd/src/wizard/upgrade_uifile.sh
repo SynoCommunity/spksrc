@@ -28,17 +28,13 @@ if [ -z "$PACKAGE_SHARE_NAME" ] && [ -d "/var/packages/${SYNOPKG_PKGNAME}/shares
     PACKAGE_SHARE_NAME=${CONFIGURED_SHARE_NAME}
 fi
 
-WARNING_TEXT="IMPORTANT: If your download folder is not currently located in the specified share, a new share will be created. After the upgrade, you may need to manually update your configuration to reflect this new location."
-
-# If consistent data share path, suppress user warning
-if [ -n "$CONFIGURED_SHARE_PATH" ] && [ -n "$PACKAGE_SHARE_PATH" ] && [ "$CONFIGURED_SHARE_PATH" = "$PACKAGE_SHARE_PATH" ]; then
-    WARNING_TEXT=""
-fi
-
 # Check for data share
 check_data_share ()
 {
     if [ -n "${PACKAGE_SHARE_NAME}" ]; then
+        return 0  # true
+    elif [ -n "$CONFIGURED_SHARE_PATH" ] && [ -n "$PACKAGE_SHARE_PATH" ] && [ "$CONFIGURED_SHARE_PATH" = "$PACKAGE_SHARE_PATH" ]; then
+        # If consistent data share path, arrume share name is correct
         return 0  # true
     else
         return 1  # false
@@ -65,7 +61,7 @@ PAGE_SHARE_UPGRADE=$(/bin/cat<<EOF
             }
         }]
     },{
-        "desc": "${WARNING_TEXT}"
+        "desc": "IMPORTANT: If your download folder is not currently located in the specified share, a new share will be created. After the upgrade, you may need to manually update your configuration to reflect this new location."
     }]
 }
 EOF
@@ -76,6 +72,13 @@ PAGE_DSM_PERMISSIONS=$(/bin/cat<<EOF
     "step_title": "DSM Permissions",
     "items": [{
         "desc": "Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    },{
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_shared_folder_name",
+            "defaultValue": "${CONFIGURED_SHARE_NAME}",
+            "hidden": true
+        }]
     }]
 }
 EOF
@@ -85,8 +88,9 @@ main () {
     local upgrade_page=""
     if ! check_data_share; then
         upgrade_page=$(page_append "$upgrade_page" "$PAGE_SHARE_UPGRADE")
+    else
+        upgrade_page=$(page_append "$upgrade_page" "$PAGE_DSM_PERMISSIONS")
     fi
-    upgrade_page=$(page_append "$upgrade_page" "$PAGE_DSM_PERMISSIONS")
     echo "[$upgrade_page]" > "${SYNOPKG_TEMP_LOGFILE}"
 }
 
