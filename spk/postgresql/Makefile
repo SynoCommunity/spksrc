@@ -1,9 +1,9 @@
 SPK_NAME = postgresql
-SPK_VERS = 11.18
+SPK_VERS = 11.22
 SPK_REV = 3
 SPK_ICON = src/postgresql.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/postgresql
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
