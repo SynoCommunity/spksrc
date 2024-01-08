@@ -1,0 +1,44 @@
+diff --git a/pkg/homekit/helpers.go b/pkg/homekit/helpers.go
+index 89c63dc..0c39e01 100644
+--- a/pkg/homekit/helpers.go
++++ b/pkg/homekit/helpers.go
+@@ -2,7 +2,6 @@ package homekit
+ 
+ import (
+ 	"encoding/hex"
+-	"slices"
+ 
+ 	"github.com/AlexxIT/go2rtc/pkg/aac"
+ 	"github.com/AlexxIT/go2rtc/pkg/core"
+@@ -22,8 +21,8 @@ func videoToMedia(codecs []camera.VideoCodec) *core.Media {
+ 	for _, codec := range codecs {
+ 		for _, param := range codec.CodecParams {
+ 			// get best profile and level
+-			profileID := slices.Max(param.ProfileID)
+-			level := slices.Max(param.Level)
++			profileID := maxByteSlice(param.ProfileID)
++			level := maxByteSlice(param.Level)
+ 			profile := videoProfiles[profileID] + videoLevels[level]
+ 			mediaCodec := &core.Codec{
+ 				Name:      videoCodecs[codec.CodecType],
+@@ -37,6 +36,20 @@ func videoToMedia(codecs []camera.VideoCodec) *core.Media {
+ 	return media
+ }
+ 
++// maxByteSlice returns the maximum value from a byte slice.
++func maxByteSlice(slice []byte) byte {
++	if len(slice) == 0 {
++		return 0 // or an error if you prefer
++	}
++	max := slice[0]
++	for _, value := range slice[1:] {
++		if value > max {
++			max = value
++		}
++	}
++	return max
++}
++
+ var audioCodecs = [...]string{core.CodecPCMU, core.CodecPCMA, core.CodecELD, core.CodecOpus}
+ var audioSampleRates = [...]uint32{8000, 16000, 24000}
+ 
