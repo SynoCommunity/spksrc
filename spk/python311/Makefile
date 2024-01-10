@@ -99,7 +99,7 @@ endif
 include ../../mk/spksrc.common.mk
 
 # Enable debug_info symgols for all archs
-GCC_DEBUG_INFO := 1
+#GCC_DEBUG_INFO := 1
 
 # Force compiler LTO optimizations except:
 #   - when testing all wheels
