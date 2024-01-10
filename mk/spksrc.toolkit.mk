@@ -6,6 +6,7 @@ default: all
 WORK_DIR := $(shell pwd)/work
 include ../../mk/spksrc.directories.mk
 
+include ../../mk/spksrc.common.mk
 
 # Configure the included makefiles
 URLS          = $(TOOLKIT_DIST_SITE)/$(TOOLKIT_DIST_NAME)
@@ -21,7 +22,7 @@ endif
 DISTRIB_DIR   = $(TOOLKIT_DIR)/$(TOOLKIT_VERS)
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(TOOLKIT_EXT)
-EXTRACT_CMD   = $(EXTRACT_CMD.$(DIST_EXT)) --skip-old-files --strip-components=$(TOOLKIT_STRIP) usr/$(TOOLKIT_PREFIX)/$(TOOLKIT_BASE_DIR)/$(TOOLKIT_SYSROOT)
+EXTRACT_CMD   = $(EXTRACT_CMD.$(DIST_EXT)) --skip-old-files --strip-components=$(TOOLKIT_STRIP) usr/$(TOOLKIT_PREFIX)/$(TOOLKIT_BASE_DIR)/$(TOOLKIT_SYSROOT_PATH)
 
 #####
 

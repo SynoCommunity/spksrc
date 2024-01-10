@@ -15,7 +15,7 @@ TOOLKIT_DIST_NAME = $(TOOLKIT_DIST).$(TOOLKIT_EXT)
 endif
 
 ifeq ($(strip $(TOOLKIT_DIST_SITE)),)
-TOOLKIT_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/toolkit/DSM$(TOOLKIT_VERS)
+TOOLKIT_DIST_SITE = https://global.synologydownload.com/download/ToolChain/toolkit/$(TOOLKIT_VERS)/$(TOOLKIT_ARCH)
 endif
 
 ifeq ($(strip $(TOOLKIT_PREFIX)),)
@@ -23,7 +23,7 @@ TOOLKIT_PREFIX = local
 endif
 
 ifeq ($(strip $(TOOLKIT_STRIP)),)
-TOOLKIT_STRIP = 6
+TOOLKIT_STRIP = 5
 endif
 
 ifeq ($(strip $(TOOLKIT_BASE_DIR)),)
@@ -33,7 +33,11 @@ TOOLKIT_BASE_DIR =
 endif
 
 ifeq ($(strip $(TOOLKIT_SYSROOT)),)
-TOOLKIT_SYSROOT ?= $(TOOLKIT_BASE_DIR)/sys-root/usr
-else ifeq ($(strip $(TOOLKIT_SYSROOT)),nop)
-TOOLKIT_SYSROOT = 
+TOOLKIT_SYSROOT = sys-root
+endif
+
+ifeq ($(strip $(TOOLKIT_SYSROOT_PATH)),)
+TOOLKIT_SYSROOT_PATH ?= $(TOOLKIT_BASE_DIR)/$(TOOLKIT_SYSROOT)/usr
+else ifeq ($(strip $(TOOLKIT_SYSROOT_PATH)),nop)
+TOOLKIT_SYSROOT_PATH = 
 endif
