@@ -11,8 +11,8 @@ ENV += KERNEL_ROOT=$(KERNEL_ROOT)
 endif
 
 ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
-TOOLKIT_ROOT = $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
-ENV += TOOLKIT_ROOT=$(TOOLKIT_ROOT)
+TK_ROOT = $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
+ENV += TK_ROOT=$(TK_ROOT)
 endif
 
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
