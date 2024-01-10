@@ -1,5 +1,5 @@
 PKG_NAME = cmake
-PKG_VERS = 3.23.4
+PKG_VERS = 3.28.1
 PKG_EXT = sh
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-linux-x86_64.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Kitware/CMake/releases/download/v$(PKG_VERS)
