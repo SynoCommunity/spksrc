@@ -32,10 +32,6 @@ WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = kavita_extra_install
 
-# use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
-# TMPDIR is used for kavita built in backup and update
-USE_ALTERNATE_TMPDIR = 1
-
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 # dotnet requires libstdc++ version >= 6.0.22
