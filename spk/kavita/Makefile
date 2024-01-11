@@ -28,6 +28,8 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+WIZARDS_DIR = src/wizard/
+
 POST_STRIP_TARGET = kavita_extra_install
 
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
