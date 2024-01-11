@@ -68,25 +68,15 @@ initialize_variables ()
 
 install_python_virtualenv ()
 {
-    # Output Python version (confirming PATH)
+    # Print out default python version found in PATH
     python3 --version
+
+    # Print out default pip version
+    read -r -a PIP_VERSION 2>/dev/null <<< $(python3 -m pip --version)
+    echo "INFO: Default pip version found ${PIP_VERSION[1]}"
 
     # Create a Python virtualenv
     python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env
-
-    # Update pip to match default used by python package
-    # If none found, update pip to latest version online
-    read -r -a PIP_VERSION 2>/dev/null <<< $(python3 -m pip --version)
-    if [ "${PIP_VERSION[1]}" ]; then
-        PIP="pip==${PIP_VERSION[1]}"
-        echo "INFO: Default pip version found ${PIP}"
-    else
-        PIP="pip"
-        echo "WARNING: No pip found, using default online version"
-    fi
-
-    python3 -m pip install --upgrade ${PIP} \
-       || echo "ERROR: Python upgrade failed" 1>&2
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         set_unix_permissions ${SYNOPKG_PKGDEST}/env
