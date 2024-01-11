@@ -19,7 +19,7 @@ service_prestart ()
         COMMAND="env ${KAVITA}"
     fi
     echo "Starting Kavita at ${HOME_DIR}" >> ${LOG_FILE}
-    cd ${HOME_DIR};
+    cd ${HOME_DIR} || exit 1;
     ${COMMAND} >> ${LOG_FILE} 2>&1 &
     echo "$!" > "${PID_FILE}"
 }
