@@ -5,7 +5,7 @@ KAVITA="${SYNOPKG_PKGDEST}/share/Kavita"
 # Kavita uses custom Config and PID directories
 HOME_DIR="${SYNOPKG_PKGDEST}/share"
 CONFIG_DIR="${SYNOPKG_PKGVAR}/config"
-PID_FILE="${CONFIG_DIR}/kavita.pid"
+PID_FILE="${SYNOPKG_PKGVAR}/kavita.pid"
 
 SVC_BACKGROUND=y
 SVC_WAIT_TIMEOUT=90
