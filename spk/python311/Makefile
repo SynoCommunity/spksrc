@@ -31,11 +31,6 @@ WHEELS = src/requirements-pure.txt
 # Force testing all wheel builds
 WHEELS_TEST_ALL = 0
 
-# Force compiler LTO optimizations
-ifeq ($(strip $(WHEELS_TEST_ALL)),0)
-ENV += PYTHON_OPTIMIZE=1
-endif
-
 SERVICE_SETUP = src/service-setup.sh
 
 PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
@@ -103,10 +98,20 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-# # Enable debug_info builds for DSM6
-# ifeq ($(call version_lt, ${TCVERSION}, 7),1)
-# GCC_DEBUG_INFO := 1
-# endif
+# Enable debug_info symgols for all archs
+#GCC_DEBUG_INFO := 1
+
+# Force compiler LTO optimizations except:
+#   - when testing all wheels
+#   - when including debug_info symbols
+#   - when using PPC arch (fails on qoriq)
+ifneq ($(strip $(WHEELS_TEST_ALL)),1)
+ifneq ($(strip $(GCC_DEBUG_INFO)),1)
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ENV += PYTHON_OPTIMIZE=1
+endif
+endif
+endif
 
 ## WHEELS_TEST_ALL: Force testing all wheel building
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
