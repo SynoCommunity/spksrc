@@ -14,10 +14,17 @@ LICENSE  = Apache-2.0
 
 GO_SRC_DIR = $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)
 GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
-COMPILE_TARGET = cloudflared_compile
+COMPILE_TARGET = install-go cloudflared_compile
 
 include ../../mk/spksrc.cross-go.mk
 
 .PHONY: cloudflared_compile
 cloudflared_compile:
-	@$(RUN) $(MAKE) VERSION=$(PKG_VERS) LINK_FLAGS="-s -w" cloudflared
+	@$(RUN) $(MAKE) PATH="/tmp/go/bin:${PATH}" VERSION=$(PKG_VERS) LINK_FLAGS="-s -w" cloudflared
+
+.PHONY: install-go
+install-go:
+ifeq (,$(wildcard /tmp/go))
+	$(RUN) GOARCH= GOOS= GOROOT_BOOTSTRAP=$(WORK_DIR)/../../../native/go/work-native/go/ \
+	$(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)/.teamcity/install-cloudflare-go.sh
+endif
