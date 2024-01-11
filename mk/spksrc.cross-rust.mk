@@ -59,9 +59,12 @@ CARGO_INSTALL_ARGS += $(CARGO_BUILD_ARGS)
 endif
 
 # Default build with rust and install with cargo
+# The cargo call uses tc_vars.mk RUSTUP_TOOLCHAIN variable
+# overriding definition using +stable or +$(RUSTUP_TOOLCHAIN)
+# https://rust-lang.github.io/rustup/environment-variables.html 
 rust_install_target:
-	@echo "  ==> Cargo install rust package $(PKG_NAME) (rustc +$(TC_RUSTUP_TOOLCHAIN) -vV)"
-	@$(RUN) rustc +$(TC_RUSTUP_TOOLCHAIN) -vV
+	@echo "  ==> Cargo install rust package $(PKG_NAME) (rustc +$(RUSTUP_TOOLCHAIN) -vV)"
+	@$(RUN) rustc +$(RUSTUP_TOOLCHAIN) -vV
 	@$(RUN) cargo install $(CARGO_INSTALL_ARGS)
 
 #####
