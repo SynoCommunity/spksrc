@@ -9,6 +9,9 @@ DEPENDS = cross/kavita
 # Arch exclusions for dotnet 6.0
 DOTNET_CORE_ARCHS = 1
 
+# Requires glibc 2.28 which is not in DSM 6 toolchains
+REQUIRED_MIN_DSM = 7.0
+
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION  = Kavita is a fast, feature rich, cross platform reading server. Built with a focus for being a full solution for all your reading needs.
@@ -31,12 +34,6 @@ ADMIN_PORT = $(SERVICE_PORT)
 WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = kavita_extra_install
-
-include ../../mk/spksrc.common.mk
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-# dotnet requires libstdc++ version >= 6.0.22
-DEPENDS += cross/libstdc++
-endif
 
 include ../../mk/spksrc.spk.mk
 
