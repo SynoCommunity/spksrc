@@ -30,7 +30,7 @@ else
 fi
 
 SVC_BACKGROUND=y
-SVC_WAIT_TIMEOUT=90
+SVC_WAIT_TIMEOUT=120
 
 validate_preinst ()
 {
