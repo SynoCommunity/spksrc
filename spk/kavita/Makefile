@@ -3,7 +3,6 @@ SPK_VERS = 0.7.12
 SPK_REV = 1
 SPK_ICON = src/kavita.png
 
-OPTIONAL_DEPENDS = cross/libstdc++
 DEPENDS = cross/kavita
 
 # Arch exclusions for dotnet 6.0
