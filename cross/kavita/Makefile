@@ -1,5 +1,5 @@
 PKG_NAME = kavita
-PKG_VERS = 0.7.11.2
+PKG_VERS = 0.7.12
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Kareadita/Kavita/releases/download/v$(PKG_VERS)

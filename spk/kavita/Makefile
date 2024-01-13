@@ -1,5 +1,5 @@
 SPK_NAME = kavita
-SPK_VERS = 0.7.11.2
+SPK_VERS = 0.7.12
 SPK_REV = 1
 SPK_ICON = src/kavita.png
 
