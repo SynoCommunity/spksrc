@@ -13,14 +13,9 @@ SVC_WAIT_TIMEOUT=90
 service_prestart ()
 {
     # Replace generic service startup, fork process in background
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        COMMAND="env LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${KAVITA}"
-    else
-        COMMAND="env ${KAVITA}"
-    fi
     echo "Starting Kavita at ${HOME_DIR}" >> ${LOG_FILE}
     cd ${HOME_DIR} || exit 1;
-    ${COMMAND} >> ${LOG_FILE} 2>&1 &
+    ${KAVITA} >> ${LOG_FILE} 2>&1 &
     echo "$!" > "${PID_FILE}"
 }
 
