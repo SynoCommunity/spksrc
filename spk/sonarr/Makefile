@@ -3,7 +3,7 @@ SPK_VERS = $(shell date +%Y%m%d)
 SPK_REV = 4
 SPK_ICON = src/sonarr.png
 
-OPTIONAL_DEPENDS = cross/libstdc++
+OPTIONAL_DEPENDS = cross/libstdc++ cross/sqlite
 DEPENDS = cross/sonarr
 
 # Arch exclusions for dotnet 6.0
@@ -42,7 +42,7 @@ USE_ALTERNATE_TMPDIR = 1
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 # dotnet requires libstdc++ version >= 6.0.22
-DEPENDS += cross/libstdc++
+DEPENDS += cross/libstdc++ cross/sqlite
 endif
 
 # replace previous legacy package
