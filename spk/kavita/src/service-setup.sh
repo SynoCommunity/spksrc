@@ -1,23 +1,16 @@
 
 # Kavita service setup
 KAVITA="${SYNOPKG_PKGDEST}/share/Kavita"
-
-# Kavita uses custom Config and PID directories
-HOME_DIR="${SYNOPKG_PKGDEST}/share"
-CONFIG_DIR="${SYNOPKG_PKGVAR}/config"
-PID_FILE="${SYNOPKG_PKGVAR}/kavita.pid"
-
 SVC_BACKGROUND=y
+SVC_WRITE_PID=y
 SVC_WAIT_TIMEOUT=90
 
-service_prestart ()
-{
-    # Replace generic service startup, fork process in background
-    echo "Starting Kavita at ${HOME_DIR}" >> ${LOG_FILE}
-    cd ${HOME_DIR} || exit 1;
-    ${KAVITA} >> ${LOG_FILE} 2>&1 &
-    echo "$!" > "${PID_FILE}"
-}
+# Kavita uses custom Config
+HOME_DIR="${SYNOPKG_PKGDEST}/share"
+CONFIG_DIR="${SYNOPKG_PKGVAR}/config"
+
+SVC_CWD="${HOME_DIR}"
+SERVICE_COMMAND="${KAVITA} >> ${LOG_FILE}"
 
 service_postinst ()
 {
@@ -26,7 +19,7 @@ service_postinst ()
     ${RM} "${HOME_DIR}/config"
     ${LN} "${CONFIG_DIR}" "${HOME_DIR}/config"
 
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         set_unix_permissions "${CONFIG_DIR}"
     fi
 }
