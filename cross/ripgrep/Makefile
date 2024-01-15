@@ -19,4 +19,10 @@ LICENSE  = public domain/Unlicense
 ENV += PCRE2_SYS_STATIC=1
 CARGO_BUILD_ARGS += --features 'pcre2'
 
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, $(TCVERSION), 7),1)
+# upstream/src/pcre2_script_run.c - error: .... only allowed in C99 or C11 mode
+ADDITIONAL_CFLAGS = -std=c99
+endif
+
 include ../../mk/spksrc.cross-rust.mk
