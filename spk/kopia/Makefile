@@ -1,5 +1,5 @@
 SPK_NAME = kopia
-SPK_VERS = 0.13.0
+SPK_VERS = 0.15.0
 SPK_REV = 1
 SPK_ICON = src/kopia.png
 
@@ -20,6 +20,13 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 51515
 ADMIN_PORT = $(SERVICE_PORT)
 
+POST_STRIP_TARGET = kopia_extra_install
+
 SPK_COMMANDS = bin/kopia
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: kopia_extra_install
+kopia_extra_install:
+	@$(MSG) Create config folders under var
+	@install -d $(STAGING_DIR)/var/config $(STAGING_DIR)/var/cache
