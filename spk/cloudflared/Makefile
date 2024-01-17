@@ -1,5 +1,5 @@
 SPK_NAME = cloudflared
-SPK_VERS = 2024.1.2
+SPK_VERS = 2024.1.3
 SPK_REV = 11
 SPK_ICON = src/cloudflared.png
 
@@ -11,7 +11,7 @@ DISPLAY_NAME = cloudflared
 DESCRIPTION = "Cloudflare Tunnel client \(formerly Argo Tunnel\)."
 HOMEPAGE = https://github.com/cloudflare/cloudflared
 LICENSE = Apache-2.0
-CHANGELOG = "Update to 2024.1.2"
+CHANGELOG = "Update to 2024.1.3"
 
 WIZARDS_DIR = src/wizard/
 
