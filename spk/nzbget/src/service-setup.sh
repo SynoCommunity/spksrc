@@ -16,11 +16,11 @@ service_postinst ()
     # Download current NZBGet (stable or testing)
     if [ -n "${wizard_stable_release}" ] && [ "${wizard_stable_release}" = true ]; then
         echo "Download nzbget installer: latest"
-        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-bin-linux.run"
+        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.com/download/nzbget-latest-bin-linux.run"
     fi
     if [ -n "${wizard_testing_release}" ] && [ "${wizard_testing_release}" = true ]; then
         echo "Download nzbget installer: latest-testing"
-        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.net/download/nzbget-latest-testing-bin-linux.run"
+        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.com/download/nzbget-latest-testing-bin-linux.run"
     fi
 
     # Abort if download failed

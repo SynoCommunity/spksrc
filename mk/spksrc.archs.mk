@@ -49,12 +49,12 @@ DEPRECATED_ARCHS = powerpc ppc824x ppc854x ppc853x
 
 # Exclusions for dotnet 6.0 core apps
 ifeq ($(strip $(DOTNET_CORE_ARCHS)),1)
-    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370 alpine alpine4k
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2 armv7-1.2
+    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370 alpine alpine4k comcerto2k
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
 endif
 
 # Exclusions for dotnet 6.0 servarr apps (except x86)
 ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
-    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine alpine4k
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2 armv7-1.2
+    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine alpine4k comcerto2k
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
 endif

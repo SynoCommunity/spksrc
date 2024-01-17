@@ -1,5 +1,5 @@
 PKG_NAME = libewf
-PKG_VERS = 20201230
+PKG_VERS = 20231119
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-experimental-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libyal/libewf/releases/download/$(PKG_VERS)
@@ -12,6 +12,5 @@ COMMENT  = Libewf is a library to access the Expert Witness Compression Format (
 LICENSE  = LGPLv3
 
 GNU_CONFIGURE = 1
-
 
 include ../../mk/spksrc.cross-cc.mk
