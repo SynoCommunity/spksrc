@@ -1,13 +1,15 @@
 PKG_NAME = bind
-PKG_VERS = 9.16.28
+PKG_VERS = 9.16.45
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libuv
-DEPENDS += cross/openssl3 cross/readline
+DEPENDS += cross/openssl3
+DEPENDS += cross/readline
 DEPENDS += cross/jemalloc
+DEPENDS += cross/libxml2
 
 OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
 
@@ -27,10 +29,11 @@ LICENSE  = MPL 2.0
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --without-python
+CONFIGURE_ARGS += --enable-full-report
 # needed for cross compile:
 CONFIGURE_ARGS += BUILD_CC="$(CC)"
-CONFIGURE_ARGS += BUILD_CFLAGS="$(CFLAGS)"
-CONFIGURE_ARGS += BUILD_CPPFLAGS="$(CPPFLAGS) -O"
+CONFIGURE_ARGS += BUILD_CFLAGS="$(CFLAGS) -O2"
+CONFIGURE_ARGS += BUILD_CPPFLAGS="$(CPPFLAGS) -O2"
 CONFIGURE_ARGS += BUILD_LDFLAGS="$(LDFLAGS)"
 CONFIGURE_ARGS += BUILD_LIBS="$(LIBS)"
 
