@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libuv
-DEPENDS += cross/openssl cross/readline
+DEPENDS += cross/openssl3 cross/readline
 DEPENDS += cross/jemalloc
 
 OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51

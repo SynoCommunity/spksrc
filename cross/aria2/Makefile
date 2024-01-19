@@ -1,5 +1,5 @@
 PKG_NAME = aria2
-PKG_VERS = 1.36.0
+PKG_VERS = 1.37.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/aria2/aria2/releases/download/release-$(PKG_VERS)
@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libssh2 cross/gnutls cross/libgcrypt cross/libexpat cross/c-ares cross/sqlite
 
-# archs with too old c++ compiler (c++ 11 is required)
+# A compiler with support for C++11 language features is required.
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.common.mk
