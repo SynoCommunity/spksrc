@@ -14,7 +14,4 @@ LICENSE  = 2-Clause BSD
 
 CONFIGURE_TARGET = nop
 
-# INSTALL_DIR must not be defined for xxHash Makefile to work
-INSTALL_MAKE_OPTIONS = INSTALL_DIR= install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
-
 include ../../mk/spksrc.cross-cc.mk
