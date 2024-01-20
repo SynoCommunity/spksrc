@@ -1,5 +1,5 @@
 SPK_NAME = vaultwarden
-SPK_VERS = 1.28.1
+SPK_VERS = 1.30.1
 SPK_REV = 1
 SPK_ICON = src/vaultwarden.png
 
@@ -9,13 +9,13 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = Hylen
 DESCRIPTION = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
-STARTABLE = yes
 DISPLAY_NAME = vaultwarden
-CHANGELOG = "Initial package release with vaultwarden 1.28.1 and vaultwarden_web 2023.4.2."
+CHANGELOG = "Initial package release with vaultwarden 1.30.1 and vaultwarden_web 2024.1.0."
 
 HOMEPAGE = https://github.com/dani-garcia/vaultwarden
 LICENSE  = GPLv3
 
+STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8180
@@ -29,7 +29,6 @@ POST_STRIP_TARGET = vaultwarden_custom_install
 include ../../mk/spksrc.spk.mk
 
 .PHONY: vaultwarden_custom_install
-# Set library path to find shared libraries and install template files
 vaultwarden_custom_install:
 	@$(MSG) "Set library runpath in vaultwarden executable."
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/vaultwarden

@@ -1,12 +1,12 @@
 PKG_NAME = vaultwarden
-PKG_VERS = 1.28.1
+PKG_VERS = 1.30.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dani-garcia/vaultwarden/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl cross/mysql-connector-c cross/libpq
+DEPENDS = cross/openssl3 cross/mysql-connector-c cross/libpq
 
 # issue with dependent component "ring"
 # https://github.com/briansmith/ring/issues/1424
@@ -37,10 +37,8 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 # fix for build of "libmimalloc-sys v0.1.30"
 ADDITIONAL_CFLAGS = -std=c99
-else
-ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
 ADDITIONAL_CFLAGS = -std=c99
-endif
 endif
 
 include ../../mk/spksrc.cross-rust.mk
