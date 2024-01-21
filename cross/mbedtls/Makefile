@@ -1,5 +1,5 @@
 PKG_NAME = mbedtls
-PKG_VERS = 2.28.4
+PKG_VERS = 2.28.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ARMmbed/mbedtls/archive
