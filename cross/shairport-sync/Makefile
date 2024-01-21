@@ -1,5 +1,5 @@
 PKG_NAME = shairport-sync
-PKG_VERS = 3.3.9
+PKG_VERS = 4.3.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mikebrady/shairport-sync/archive
@@ -25,6 +25,7 @@ CONFIGURE_ARGS += --with-tinysvcmdns
 CONFIGURE_ARGS += --with-external-mdns
 CONFIGURE_ARGS += --with-soxr
 CONFIGURE_ARGS += --with-alsa
+CONFIGURE_ARGS += --with-piddir=$(INSTALL_DIR)/var
 
 include ../../mk/spksrc.archs.mk
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
