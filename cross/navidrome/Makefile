@@ -1,5 +1,5 @@
 PKG_NAME = navidrome
-PKG_VERS = 0.49.3
+PKG_VERS = 0.51.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/navidrome/navidrome/archive
@@ -19,7 +19,7 @@ COMMENT  = ����☁ Modern Music Server and Streamer compatible with Subs
 LICENSE  = GPL-3.0 License
 
 PRE_COMPILE_TARGET = navidrome_pre_compile
-COMPILE_TARGET = navidrome_compile
+COMPILE_MAKE_OPTIONS = buildall
 
 CGO_ENABLED = 1
 GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
@@ -27,7 +27,7 @@ GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
 include ../../mk/spksrc.cross-go.mk
 
 ENV += NPM_CONFIG_USER=root
-PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
+PATH := $(abspath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(PATH)
 
 # avoid webpack error ERR_OSSL_EVP_UNSUPPORTED with nodejs v18
 ENV += NODE_OPTIONS=--openssl-legacy-provider
@@ -35,7 +35,3 @@ ENV += NODE_OPTIONS=--openssl-legacy-provider
 .PHONY: navidrome_pre_compile
 navidrome_pre_compile:
 	@$(RUN) $(MAKE) setup
-
-.PHONY: navidrome_compile
-navidrome_compile:
-	@$(RUN) $(MAKE) buildall

@@ -10,6 +10,6 @@ export LD_LIBRARY_PATH="${SYNOPKG_PKGDEST}/lib"
 service_postinst ()
 {
     # update config with values from wizard variables
-    sed -e "s|@@wizard_music_folder@@|${wizard_music_volume}/${wizard_music_folder}|g" \
+    sed -e "s|@@wizard_music_folder@@|${SHARE_PATH}|g" \
         -i "${CONFIG_FILE}"
 }

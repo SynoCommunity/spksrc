@@ -1,5 +1,5 @@
 SPK_NAME = navidrome
-SPK_VERS = 0.49.3
+SPK_VERS = 0.51.0
 SPK_REV = 1
 SPK_ICON = src/navidrome.png
 
@@ -28,8 +28,7 @@ SERVICE_PORT_TITLE = Navidrome (HTTP)
 ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard
-SERVICE_WIZARD_SHARE = wizard_music_folder
-USE_DATA_SHARE_WORKER = yes
+SERVICE_WIZARD_SHARENAME = wizard_music_folder
 
 POST_STRIP_TARGET = navidrome_extra_install
 
