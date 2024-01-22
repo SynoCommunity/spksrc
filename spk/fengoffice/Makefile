@@ -1,41 +1,49 @@
 SPK_NAME = fengoffice
-SPK_VERS = 2.5.1.2
-SPK_REV = 3
+SPK_VERS = 3.10.8.3
+SPK_REV = 4
 SPK_ICON = src/fengoffice.png
-DSM_UI_DIR = app
 
-DEPENDS  = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/$(SPK_NAME)
+# Pure PHP package, make sure ARCH is not defined
+override ARCH=
+
+# Due to not obvious WebStation handling requirements
+REQUIRED_MIN_DSM = 6.0
+SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 
 MAINTAINER = moneytoo
 DESCRIPTION = Feng Office is a Collaboration Platform and Project Management System.
-ADMIN_URL = /fengoffice/
 DISPLAY_NAME = Feng Office
-CHANGELOG = "1. DSM 5.0 compatibility"
+CHANGELOG = "1. Update to v3.10.8.3."
 
-HOMEPAGE   = https://www.fengoffice.com/
-LICENSE    = AGPL
+HOMEPAGE = https://www.fengoffice.com/
+LICENSE = AGPL
+
+STARTABLE = yes
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+
+ADMIN_URL = /fengoffice/
 
 WIZARDS_DIR = src/wizard/
+SYSTEM_GROUP = http
+
+DSM_UI_DIR = app
+DSM_UI_CONFIG = src/app/config
 CONF_DIR = src/conf/
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+include ../../mk/spksrc.common.mk
 
-INSTALL_DEP_SERVICES = apache-web mysql
-START_DEP_SERVICES = apache-web mysql
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# Alternate conf dir for DSM 6
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+CONF_DIR = src/conf_6/
+endif
 
 POST_STRIP_TARGET = fengoffice_extra_install
-
-BUSYBOX_CONFIG = daemon nice
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: fengoffice_extra_install
 fengoffice_extra_install: 
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 src/fengoffice.sh $(STAGING_DIR)/bin/
 	install -m 755 -d $(STAGING_DIR)/app
 	install -m 644 src/app/config $(STAGING_DIR)/app/config
