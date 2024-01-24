@@ -112,9 +112,7 @@ else
 	@(cd $(WORK_DIR)/rust && ./x setup compiler)
 	(cd $(WORK_DIR)/rust && \
 	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
-	   CPPFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
-	   CXXFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
-	   CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS="-Ctarget-cpu=e500" \
+	   CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS="$(TC_RUSTFLAGS)" \
 	   RUST_BACKTRACE=full \
 	   ./x build --config $(TC_LOCAL_VARS_RUST))
 	rustup toolchain link $(TC_RUSTUP_TOOLCHAIN) $(WORK_DIR)/rust/build/host/stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)
