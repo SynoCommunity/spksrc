@@ -107,10 +107,9 @@ else
 	@$(MSG) "Target $(RUST_TARGET) unavailable..."
 	@$(MSG) "Enforce usage of CMake 3.20.0 or higher"
 	@$(MAKE) -C ../../native/cmake
-	@$(MSG) "Enforce availability of native LLVM"
-	@$(MAKE) -C ../../native/llvm-9.0
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
+	@(cd $(WORK_DIR) && git submodule init && git submodule update --depth 1 src/llvm-project)
 	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
 	(cd $(WORK_DIR)/rust && \
 	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
