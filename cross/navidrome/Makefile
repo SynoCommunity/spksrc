@@ -15,7 +15,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 HOMEPAGE = https://www.navidrome.org/
-COMMENT  = ÔøΩÔøΩÔøΩÔøΩ‚òÅ Modern Music Server and Streamer compatible with Subsonic/Airsonic.
+COMMENT  = Ì†ºÌæß‚òÅ Modern Music Server and Streamer compatible with Subsonic/Airsonic.
 LICENSE  = GPL-3.0 License
 
 PRE_COMPILE_TARGET = navidrome_pre_compile
@@ -27,11 +27,14 @@ GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
 include ../../mk/spksrc.cross-go.mk
 
 ENV += NPM_CONFIG_USER=root
-PATH := $(abspath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(PATH)
+PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 
 # avoid webpack error ERR_OSSL_EVP_UNSUPPORTED with nodejs v18
 ENV += NODE_OPTIONS=--openssl-legacy-provider
 
 .PHONY: navidrome_pre_compile
 navidrome_pre_compile:
+	@$(MSG) Prepare Navidrom build with "make setup"
 	@$(RUN) $(MAKE) setup
+	@$(MSG) Prepare Navidrom build with "make buildjs"
+	@$(RUN) $(MAKE) buildjs
