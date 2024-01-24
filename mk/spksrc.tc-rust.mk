@@ -109,7 +109,7 @@ else
 	@$(MAKE) -C ../../native/cmake
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
-	@(cd $(WORK_DIR)/rust && ./x setup compiler)
+	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
 	(cd $(WORK_DIR)/rust && \
 	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
 	   CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS="$(TC_RUSTFLAGS)" \
