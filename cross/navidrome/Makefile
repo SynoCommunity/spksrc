@@ -24,6 +24,12 @@ COMPILE_MAKE_OPTIONS = buildall
 CGO_ENABLED = 1
 GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
 
+# with parallel make, sometimes the frontent build (make buildjs) fails with:
+# # github.com/navidrome/navidrome/ui
+# ui/embed.go:9:5: embed build/asset-manifest.json: open ui/build/asset-manifest.json: no such file or directory
+# ui/embed.go:9:5: embed build/index.html: open ui/build/index.html: no such file or directory
+.NOTPARALLEL:
+
 include ../../mk/spksrc.cross-go.mk
 
 ENV += NPM_CONFIG_USER=root
@@ -33,6 +39,8 @@ PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 ENV += NODE_OPTIONS=--openssl-legacy-provider
 
 .PHONY: navidrome_pre_compile
+# without "make buildjs" make buildall has warning:
+# WARNING: This command does not build the frontend, it uses the latest built with 'make buildjs'
 navidrome_pre_compile:
 	@$(MSG) Prepare Navidrom build with "make setup"
 	@$(RUN) $(MAKE) setup
