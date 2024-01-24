@@ -8,6 +8,9 @@ CMAKE_PATH = $(abspath $(WORK_DIR)/../../../native/cmake/work-native/install/usr
 export CARGO_HOME=$(BASE_DISTRIB_DIR)/cargo
 export RUSTUP_HOME=$(BASE_DISTRIB_DIR)/rustup
 export PATH:=$(abspath $(BASE_DISTRIB_DIR)/cargo/bin):$(CMAKE_PATH):$(PATH)
+export CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)"
+export CXXFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)"
+export LDFLAGS_$(subst -,_,$(RUST_TARGET))="--sysroot=$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)"
 endif
 
 ifeq ($(RUSTUP_DEFAULT_TOOLCHAIN),)
@@ -15,8 +18,9 @@ RUSTUP_DEFAULT_TOOLCHAIN = stable
 endif
 
 # When building toolchain Tier-3 arch support
+#   While stage-2 is the truly current compiler, stage-1 suffice our needs
 #   https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html#stage-2-the-truly-current-compiler
-RUSTUP_DEFAULT_TOOLCHAIN_STAGE = 2
+RUSTUP_DEFAULT_TOOLCHAIN_STAGE = 1
 
 ifeq ($(TC_RUSTUP_TOOLCHAIN),)
 TC_RUSTUP_TOOLCHAIN = $(RUSTUP_DEFAULT_TOOLCHAIN)
@@ -45,7 +49,7 @@ RUST_TARGET = aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
 RUST_TARGET = powerpc-unknown-linux-gnuspe
-TC_RUSTUP_TOOLCHAIN = $(RUST_TARGET)
+TC_RUSTUP_TOOLCHAIN = stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)-$(RUST_TARGET)
 endif
 ifeq ($(RUST_TARGET),)
 $(error Arch $(ARCH) not supported)

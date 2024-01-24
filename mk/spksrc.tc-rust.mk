@@ -45,11 +45,25 @@ rust_toml:
 	@echo 'profile = "compiler"' ; \
 	echo
 	@echo "[build]" ; \
-	echo 'target = ["$(RUST_TARGET)"]' ; \
+	echo 'target = ["x86_64-unknown-linux-gnu", "$(RUST_TARGET)"]' ; \
 	echo "build-stage = $(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)" ; \
+	echo "doc-stage = 2" ; \
 	echo "docs = false" ; \
 	echo "docs-minification = false" ; \
 	echo "compiler-docs = false" ; \
+	echo
+	@echo "[rust]" ; \
+	echo 'channel = "stable"' ; \
+	echo 'lto = "off"' ; \
+	echo
+	@echo "[llvm]" ; \
+	echo 'download-ci-llvm = "if-unchanged"' ; \
+	echo
+	@echo "[install]" ; \
+	echo
+	@echo "[dist]" ; \
+	echo
+	@echo "[target.x86_64-unknown-linux-gnu]" ; \
 	echo
 	@echo "[target.$(RUST_TARGET)]" ; \
 	echo 'cc = "$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc"' ; \
@@ -96,13 +110,14 @@ else
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
 	@(cd $(WORK_DIR)/rust && ./x setup compiler)
-	@(cd $(WORK_DIR)/rust && \
-	    CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
-	    CXXFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
-	    LDFLAGS_$(subst -,_,$(RUST_TARGET))="--sysroot=$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)" \
-	    RUST_BACKTRACE=full \
-	    ./x build --config $(TC_LOCAL_VARS_RUST))
-	@rustup toolchain link $(TC_RUSTUP_TOOLCHAIN) $(WORK_DIR)/rust/build/host/stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)
+	(cd $(WORK_DIR)/rust && \
+	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
+	   CPPFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
+	   CXXFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
+	   CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS="-Ctarget-cpu=e500" \
+	   RUST_BACKTRACE=full \
+	   ./x build --config $(TC_LOCAL_VARS_RUST))
+	rustup toolchain link $(TC_RUSTUP_TOOLCHAIN) $(WORK_DIR)/rust/build/host/stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)
 	@for i in 0 1 2 ; do \
 	   [ $${i} -lt $(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) ] && (cd $(WORK_DIR)/rust && ./x clean --stage $${i}) || true ; \
 	done
