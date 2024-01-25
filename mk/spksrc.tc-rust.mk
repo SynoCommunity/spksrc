@@ -109,12 +109,12 @@ else
 	@$(MAKE) -C ../../native/cmake
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
-	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
+	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x --build x86_64-unknown-linux-gnu setup compiler)
 	(cd $(WORK_DIR)/rust && \
 	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
 	   CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS="$(TC_RUSTFLAGS)" \
 	   RUST_BACKTRACE=full \
-	   ./x build --config $(TC_LOCAL_VARS_RUST))
+	   ./x --build x86_64-unknown-linux-gnu build --config $(TC_LOCAL_VARS_RUST))
 	rustup toolchain link $(TC_RUSTUP_TOOLCHAIN) $(WORK_DIR)/rust/build/host/stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)
 	@for i in 0 1 2 ; do \
 	   [ $${i} -lt $(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) ] && (cd $(WORK_DIR)/rust && ./x clean --stage $${i}) || true ; \
