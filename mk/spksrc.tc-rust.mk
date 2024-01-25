@@ -56,6 +56,9 @@ rust_toml:
 	echo 'channel = "stable"' ; \
 	echo 'lto = "off"' ; \
 	echo
+	@echo "[llvm]" ; \
+	echo 'download-ci-llvm = "false"' ; \
+	echo
 	@echo "[install]" ; \
 	echo
 	@echo "[dist]" ; \
