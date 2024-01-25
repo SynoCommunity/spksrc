@@ -21,7 +21,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	bison \
 	build-essential \
 	check \
-	clang-13 \
 	cmake \
 	curl \
 	cython3 \
@@ -51,7 +50,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	libssl-dev \
 	libtool \
 	libunistring-dev \
-	llvm-13 \
 	lzip \
 	mercurial \
 	moreutils \
