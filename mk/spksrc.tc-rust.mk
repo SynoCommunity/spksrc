@@ -57,7 +57,6 @@ rust_toml:
 	echo 'lto = "off"' ; \
 	echo
 	@echo "[llvm]" ; \
-	echo 'download-ci-llvm = "if-unchanged"' ; \
 	echo
 	@echo "[install]" ; \
 	echo
