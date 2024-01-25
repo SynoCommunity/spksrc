@@ -15,11 +15,10 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 HOMEPAGE = https://www.navidrome.org/
-COMMENT  = Ì†ºÌæß‚òÅ Modern Music Server and Streamer compatible with Subsonic/Airsonic.
+COMMENT  = üéß‚òÅ Modern Music Server and Streamer compatible with Subsonic/Airsonic.
 LICENSE  = GPL-3.0 License
 
-PRE_COMPILE_TARGET = navidrome_pre_compile
-COMPILE_MAKE_OPTIONS = buildall
+COMPILE_TARGET = navidrome_compile
 
 CGO_ENABLED = 1
 GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
@@ -35,14 +34,14 @@ include ../../mk/spksrc.cross-go.mk
 ENV += NPM_CONFIG_USER=root
 PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 
-# avoid webpack error ERR_OSSL_EVP_UNSUPPORTED with nodejs v18
-ENV += NODE_OPTIONS=--openssl-legacy-provider
-
-.PHONY: navidrome_pre_compile
+.PHONY: navidrome_compile
 # without "make buildjs" make buildall has warning:
 # WARNING: This command does not build the frontend, it uses the latest built with 'make buildjs'
-navidrome_pre_compile:
-	@$(MSG) Prepare Navidrom build with "make setup"
+# therefore split "make buildall" into "make buildjs" and "make build"
+navidrome_compile:
+	@$(MSG) "### Navidrom build prepare (make setup)"
 	@$(RUN) $(MAKE) setup
-	@$(MSG) Prepare Navidrom build with "make buildjs"
+	@$(MSG) "### Navidrom build frontend (make buildjs)"
 	@$(RUN) $(MAKE) buildjs
+	@$(MSG) "### Navidrom build application (make build)"
+	@$(RUN) $(MAKE) build
