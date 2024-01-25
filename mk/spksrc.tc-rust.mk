@@ -45,7 +45,7 @@ rust_toml:
 	@echo 'profile = "compiler"' ; \
 	echo
 	@echo "[build]" ; \
-	echo 'target = ["x86_64-unknown-linux-gnu", "$(RUST_TARGET)"]' ; \
+	echo 'target = ["$(RUST_TARGET)"]' ; \
 	echo "build-stage = $(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)" ; \
 	echo "doc-stage = 2" ; \
 	echo "docs = false" ; \
@@ -56,13 +56,9 @@ rust_toml:
 	echo 'channel = "stable"' ; \
 	echo 'lto = "off"' ; \
 	echo
-	@echo "[llvm]" ; \
-	echo
 	@echo "[install]" ; \
 	echo
 	@echo "[dist]" ; \
-	echo
-	@echo "[target.x86_64-unknown-linux-gnu]" ; \
 	echo
 	@echo "[target.$(RUST_TARGET)]" ; \
 	echo 'cc = "$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc"' ; \
