@@ -65,9 +65,8 @@ service_postinst ()
         cp -pR ${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME} ${WEB_DIR}
     fi
 
-    # Setup database and run installer
+    # Run installer
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_fengoffice:=fengoffice}';"
         cd ${WEB_DIR}/${SYNOPKG_PKGNAME}/public/install/ && QUERY_STRING="script_installer_storage[database_type]=mysql&script_installer_storage[database_host]=localhost&script_installer_storage[database_user]=${MYSQL_USER}&script_installer_storage[database_pass]=${wizard_mysql_password_fengoffice:=fengoffice}&script_installer_storage[database_name]=${MYSQL_DATABASE}&script_installer_storage[database_prefix]=fo_&script_installer_storage[database_engine]=InnoDB&script_installer_storage[absolute_url]=http://${wizard_domain_name:=$(hostname)}/${SYNOPKG_PKGNAME}&script_installer_storage[plugins][]=core_dimensions&script_installer_storage[plugins][]=workspaces&script_installer_storage[plugins][]=mail&submited=submited" php install_helper.php > /dev/null
     fi
 
@@ -99,13 +98,12 @@ service_preuninst ()
 
 service_postuninst ()
 {
-    # Export and remove database
+    # Export database
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
         if [ -n "${wizard_dbexport_path}" ]; then
             mkdir -p ${wizard_dbexport_path}
             ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql
         fi
-        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE}; DROP USER '${MYSQL_USER}'@'localhost';"
     fi
 
     # Remove the web interface
