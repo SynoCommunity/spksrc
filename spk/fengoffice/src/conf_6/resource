@@ -3,15 +3,15 @@
         "admin-account-m10": "root",
         "admin-pw-m10": "{{wizard_mysql_password_root}}",
         "create-db": {
-            "db-collision": "error",
+            "db-collision": "skip",
             "db-name": "fengoffice",
-            "flag": true
+            "flag": "{{wizard_create_db}}"
         },
         "drop-db-uninst": true,
         "drop-user-uninst": true,
         "grant-user": {
             "db-name": "fengoffice",
-            "flag": true,
+            "flag": "{{mysql_grant_user}}",
             "host": "localhost",
             "user-name": "fengoffice",
             "user-pw": "{{wizard_mysql_password_fengoffice}}"

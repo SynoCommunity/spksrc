@@ -24,5 +24,18 @@
             "key": "wizard_domain_name",
             "desc": "Domain name"
         }]
+    }, {
+        "type": "multiselect",
+        "subitems": [{
+            "key": "wizard_create_db",
+            "desc": "Creates initial DB",
+            "defaultValue": true,
+            "hidden": true
+        }, {
+            "key": "mysql_grant_user",
+            "desc": "Configures user rights",
+            "defaultValue": true,
+            "hidden": true
+        }]
     }]
 }]

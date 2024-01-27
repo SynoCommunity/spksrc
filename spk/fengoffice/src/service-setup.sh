@@ -165,9 +165,9 @@ script_installer_storage[database_type]=mysqli\
         cd ${WEB_ROOT}/public/install/ || exit 1
         # Execute based on DSM version
         if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            /bin/su "$WEB_USER" -s /bin/sh -c "${COMMAND}" > /dev/null
+            /bin/su "$WEB_USER" -s /bin/sh -c "${COMMAND}" > /dev/null 2>&1
         else
-            $COMMAND > /dev/null
+            $COMMAND > /dev/null 2>&1
         fi
     fi
 
