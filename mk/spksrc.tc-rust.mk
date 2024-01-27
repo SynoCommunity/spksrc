@@ -103,10 +103,17 @@ ifeq ($(TC_RUSTUP_TOOLCHAIN),$(RUSTUP_DEFAULT_TOOLCHAIN))
 	@$(MSG) "rustup target add $(RUST_TARGET)"
 	rustup override set stable
 	rustup target add $(RUST_TARGET)
+	rustup show
 else
 	@$(MSG) "Target $(RUST_TARGET) unavailable..."
+ifeq ($(RUST_BUILD_TOOLCHAIN),0)
+	@$(MSG) "Install rust target $(RUST_TARGET) from native"
+	@$(MAKE) -C ../../native/rust-qoriq
+else
+	@$(MSG) "Build rust target $(RUST_TARGET) from sources"
 	@$(MSG) "Enforce usage of CMake 3.20.0 or higher"
 	@$(MAKE) -C ../../native/cmake
+	exit 2
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
 	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
@@ -120,8 +127,9 @@ else
 	   [ $${i} -lt $(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) ] && (cd $(WORK_DIR)/rust && ./x clean --stage $${i}) || true ; \
 	done
 	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET) - stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) complete"
-endif
 	rustup show
+endif
+endif
 
 post_rustc_target: $(RUSTC_TARGET)
 
