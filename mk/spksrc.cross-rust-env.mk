@@ -19,40 +19,36 @@ endif
 #   https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html#stage-2-the-truly-current-compiler
 RUSTUP_DEFAULT_TOOLCHAIN_STAGE = 2
 
-# When calling directly from
-# toolchain/syno-<arch>-<vertion>
-# ARCH variable is still unset
-ifeq ($(ARCH),)
-ARCH=$(TC_ARCH)
-endif
+# When calling directly from toolchain/syno-<arch>-<version>
+# ARCH variable is still unset thus using $(or $(ARCH),$(TC_ARCH))
 
 # map archs to rust targets
-ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(ARMv5_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
 RUST_TARGET = armv5te-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS)),$(ARCH))
+ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(ARMv7_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
 RUST_TARGET = armv7-unknown-linux-gnueabihf
 endif
-ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(ARMv7L_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
 RUST_TARGET = armv7-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(ARCH), $(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(ARMv8_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
 RUST_TARGET = aarch64-unknown-linux-gnu
 endif
-ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
-RUST_FORCE_TOOLCHAIN = 0
+ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(PPC_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
+RUST_BUILD_TOOLCHAIN = 0
 RUST_TARGET = powerpc-unknown-linux-gnuspe
 TC_RUSTUP_TOOLCHAIN = stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)-$(RUST_TARGET)
 endif
-ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(x64_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
 RUST_TARGET = x86_64-unknown-linux-gnu
 endif
-ifeq ($(findstring $(ARCH), $(i686_ARCHS)),$(ARCH))
+ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(i686_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
 RUST_TARGET = i686-unknown-linux-gnu
 endif
 
 ifeq ($(RUST_TARGET),)
-$(error Arch $(ARCH) not supported)
+$(error Arch $(or $(ARCH),$(TC_ARCH)) not supported)
 endif
 
 # By default use the default toolchain if unset
