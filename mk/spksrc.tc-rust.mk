@@ -8,7 +8,11 @@
 
 # Define rustc configuration toml file location
 # when rebuilding for unsupported archs (i.e. Tier 3)
+ifeq ($(strip $(TC_NAME)),)
 TC_LOCAL_VARS_RUST = $(WORK_DIR)/$(TC_ARCH).toml
+else
+TC_LOCAL_VARS_RUST = $(WORK_DIR)/$(lastword $(subst -, ,$(TC_NAME))).toml
+endif
 
 # Configure file descriptor lock timeout
 ifeq ($(strip $(FLOCK_TIMEOUT)),)

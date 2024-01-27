@@ -14,41 +14,43 @@ ifeq ($(RUSTUP_DEFAULT_TOOLCHAIN),)
 RUSTUP_DEFAULT_TOOLCHAIN = stable
 endif
 
+# When calling directly from toolchain/syno-<arch>-<version>
+# ARCH variable is still unset thus using $(TC_ARCH) although
+# in generic archs we must rely on $(TC_NANE)
+RUST_ARCH = $(or $(ARCH),$(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))
+
 # When building toolchain Tier-3 arch support
 #   While stage-2 is the truly current compiler, stage-1 suffice our needs
 #   https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html#stage-2-the-truly-current-compiler
 RUSTUP_DEFAULT_TOOLCHAIN_STAGE = 2
 
-# When calling directly from toolchain/syno-<arch>-<version>
-# ARCH variable is still unset thus using $(or $(ARCH),$(TC_ARCH))
-
 # map archs to rust targets
-ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(ARMv5_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
+ifeq ($(findstring $(RUST_ARCH), $(ARMv5_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = armv5te-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(ARMv7_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
+ifeq ($(findstring $(RUST_ARCH), $(ARMv7_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = armv7-unknown-linux-gnueabihf
 endif
-ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(ARMv7L_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
+ifeq ($(findstring $(RUST_ARCH), $(ARMv7L_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = armv7-unknown-linux-gnueabi
 endif
-ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(ARMv8_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
+ifeq ($(findstring $(RUST_ARCH), $(ARMv8_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = aarch64-unknown-linux-gnu
 endif
-ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(PPC_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
+ifeq ($(findstring $(RUST_ARCH), $(PPC_ARCHS)),$(RUST_ARCH))
 RUST_BUILD_TOOLCHAIN = 0
 RUST_TARGET = powerpc-unknown-linux-gnuspe
 TC_RUSTUP_TOOLCHAIN = stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)-$(RUST_TARGET)
 endif
-ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(x64_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
+ifeq ($(findstring $(RUST_ARCH), $(x64_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = x86_64-unknown-linux-gnu
 endif
-ifeq ($(findstring $(or $(ARCH),$(TC_ARCH)), $(i686_ARCHS)),$(or $(ARCH),$(TC_ARCH)))
+ifeq ($(findstring $(RUST_ARCH), $(i686_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = i686-unknown-linux-gnu
 endif
 
 ifeq ($(RUST_TARGET),)
-$(error Arch $(or $(ARCH),$(TC_ARCH)) not supported)
+$(error Arch $(RUST_ARCH) not supported)
 endif
 
 # By default use the default toolchain if unset
