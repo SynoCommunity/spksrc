@@ -44,6 +44,7 @@ POST_STRIP_TARGET = fengoffice_extra_install
 include ../../mk/spksrc.spk.mk
 
 .PHONY: fengoffice_extra_install
-fengoffice_extra_install: 
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
+fengoffice_extra_install:
+	install -m 755 -d $(STAGING_DIR)/web
+	install -m 644 src/web/fengoffice.conf $(STAGING_DIR)/web/fengoffice.conf
+	install -m 644 src/web/fengoffice.json $(STAGING_DIR)/web/fengoffice.json

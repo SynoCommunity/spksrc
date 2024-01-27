@@ -67,7 +67,21 @@ service_postinst ()
 
     # Run installer
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        cd ${WEB_DIR}/${SYNOPKG_PKGNAME}/public/install/ && QUERY_STRING="script_installer_storage[database_type]=mysql&script_installer_storage[database_host]=localhost&script_installer_storage[database_user]=${MYSQL_USER}&script_installer_storage[database_pass]=${wizard_mysql_password_fengoffice:=fengoffice}&script_installer_storage[database_name]=${MYSQL_DATABASE}&script_installer_storage[database_prefix]=fo_&script_installer_storage[database_engine]=InnoDB&script_installer_storage[absolute_url]=http://${wizard_domain_name:=$(hostname)}/${SYNOPKG_PKGNAME}&script_installer_storage[plugins][]=core_dimensions&script_installer_storage[plugins][]=workspaces&script_installer_storage[plugins][]=mail&submited=submited" php install_helper.php > /dev/null
+        # Define the resource file
+        RESOURCE_FILE="${SYNOPKG_PKGDEST}/web/fengoffice.json"
+        # Extract extensions and assign to variable
+        PHP_EXTENSIONS=$(jq -r '.extensions[] | "-dextension=" + . + ".so"' "$RESOURCE_FILE")
+        # Setup parameters for installation script
+        QUERY_STRING="script_installer_storage[database_type]=mysql&script_installer_storage[database_host]=localhost&script_installer_storage[database_user]=${MYSQL_USER}&script_installer_storage[database_pass]=${wizard_mysql_password_fengoffice:=fengoffice}&script_installer_storage[database_name]=${MYSQL_DATABASE}&script_installer_storage[database_prefix]=fo_&script_installer_storage[database_engine]=InnoDB&script_installer_storage[absolute_url]=http://${wizard_domain_name:=$(hostname)}/${SYNOPKG_PKGNAME}&script_installer_storage[plugins][]=core_dimensions&script_installer_storage[plugins][]=workspaces&script_installer_storage[plugins][]=mail&submited=submited"
+        # Prepare environment
+        COMMAND="${PHP} ${PHP_EXTENSIONS} install_helper.php"
+        cd ${WEB_DIR}/${SYNOPKG_PKGNAME}/public/install/ || exit 1
+        # Execute based on DSM version
+        if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+            /bin/su "$WEB_USER" -s /bin/sh -c "${COMMAND}" >> ${LOG_FILE} 2>&1
+        else
+            $COMMAND >> ${LOG_FILE} 2>&1
+        fi
     fi
 
     # Fix permissions
