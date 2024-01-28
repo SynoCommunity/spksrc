@@ -9,10 +9,6 @@ PKG_DIR = Python-$(PKG_VERS)
 # Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
 # CPython core team, see https://peps.python.org/pep-0011/ for more information.
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# Missing libatomic for proper openssl >= 3.x support
-# Ref: https://github.com/SynoCommunity/spksrc/issues/5841
-#      https://github.com/SynoCommunity/spksrc/pull/5820#issuecomment-1678221438
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 BUILD_DEPENDS = native/$(PKG_NAME)
 

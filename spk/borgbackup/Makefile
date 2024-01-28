@@ -5,7 +5,7 @@ SPK_ICON = src/$(SPK_NAME).png
 
 PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.5-8"
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/attr cross/acl cross/openssl cross/lz4 cross/zstd cross/libb2 cross/fuse
 

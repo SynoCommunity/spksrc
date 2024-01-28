@@ -8,7 +8,7 @@ DEPENDS = cross/syncstorage-rs cross/diesel
 PYTHON_PACKAGE = python311
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
