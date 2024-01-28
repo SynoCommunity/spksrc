@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://znc.in/releases/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
-DEPENDS = cross/openssl3 cross/libicu cross/zlib
+DEPENDS = cross/openssl cross/libicu cross/zlib
 
 # configure: No compiler with C++11 support was found
 # error: Upgrade your compiler. GCC 4.8+ and Clang 3.2+ are known to work.

@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://nmap.org/dist
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libpcap cross/openssl3
+DEPENDS = cross/libpcap cross/openssl
 
 # latest version for OLD_PPC_ARCHS is 7.92
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)

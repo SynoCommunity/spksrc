@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://curl.se/download
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/openssl3 cross/c-ares
+DEPENDS = cross/zlib cross/openssl cross/c-ares
 # optional features (see BUILD_CURL_WITH below)
 OPTIONAL_DEPENDS  = cross/libssh2 
 OPTIONAL_DEPENDS += cross/gnutls

@@ -7,7 +7,7 @@ PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.5-8"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
-DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
+DEPENDS = cross/attr cross/acl cross/openssl cross/lz4 cross/zstd cross/libb2 cross/fuse
 
 # Requirements file generation
 # - first create borgbackup wheel defined in src/requirements-crossenv.txt

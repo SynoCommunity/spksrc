@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/u/uamqp
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl3 cross/cffi
+DEPENDS = cross/openssl cross/cffi
 
 HOMEPAGE = https://github.com/Azure/azure-uamqp-python
 COMMENT  = AMQP 1.0 client library for Python.

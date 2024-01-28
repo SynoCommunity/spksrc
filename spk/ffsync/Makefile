@@ -35,7 +35,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 # [cryptography]
 # Mandatory of using OPENSSL_*_DIR starting with version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
-DEPENDS += cross/openssl3
+DEPENDS += cross/openssl
 ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
