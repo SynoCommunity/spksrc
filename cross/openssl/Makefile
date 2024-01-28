@@ -1,53 +1,14 @@
-PKG_NAME = openssl
-PKG_VERS = 1.1.1w
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.openssl.org/source
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = openssl-main
 
-DEPENDS = cross/zlib
+OPTIONAL_DEPENDS  = cross/openssl-latest
+OPTIONAL_DEPENDS += cross/openssl-3.1
+OPTIONAL_DEPENDS += cross/openssl-1.1
 
-HOMEPAGE = https://www.openssl.org
-COMMENT  = TLS/SSL and crypto library.
-LICENSE  = Apache-2.0
+include ../../mk/spksrc.main-depends.mk
 
-CONFIGURE_TARGET = openssl_configure
-
-INSTALL_MAKE_OPTIONS = install_sw DESTDIR=$(INSTALL_DIR)
-
-include ../../mk/spksrc.cross-cc.mk
-
-# Use CA certificates provided by DSM
-# OpenSSL data area, such as openssl.cnf, certificates and keys.
-OPENSSL_DATA_DIR=/etc/ssl
-
-# Map ARCH to arch expected by openssl Configure
-OPENSSL_ARCH =
-
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-OPENSSL_ARCH = linux-x86_64
+# threads need libatomic that is missing in ARMv5 & old PPC toolchain
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS = cross/openssl-1.1
+else
+DEPENDS = cross/openssl-3.1
 endif
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-OPENSSL_ARCH = linux-x86
-endif
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-OPENSSL_ARCH = linux-armv4 -march=armv5
-endif
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-OPENSSL_ARCH = linux-armv4
-endif
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-OPENSSL_ARCH = linux-aarch64
-endif
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-OPENSSL_ARCH = linux-ppc
-endif
-
-ifeq ($(strip $(OPENSSL_ARCH)),)
-# Unexpected CPU architecture. Please add arch to mk/spksrc.archs.mk
-$(error Arch $(ARCH) not expected yet)
-endif
-
-.PHONY: openssl_configure
-openssl_configure:
-	$(RUN) ./Configure --openssldir=$(OPENSSL_DATA_DIR) --prefix=$(INSTALL_PREFIX) $(OPENSSL_ARCH) zlib-dynamic shared threads
