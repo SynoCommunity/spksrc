@@ -12,7 +12,6 @@ MYSQL="/usr/local/mariadb10/bin/mysql"
 MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
 MYSQL_USER="fengoffice"
 MYSQL_DATABASE="fengoffice"
-PHP="/usr/local/bin/php74"
 if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
     WEB_DIR="/var/services/web_packages"
 else
@@ -24,20 +23,38 @@ fi
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 SYNOSVC="/usr/syno/sbin/synoservice"
 
+exec_php() {
+    PHP="/usr/local/bin/php74"
+    # Define the resource file
+    RESOURCE_FILE="${SYNOPKG_PKGDEST}/web/fengoffice.json"
+    # Extract extensions and assign to variable
+    if [ -f "$RESOURCE_FILE" ]; then
+        PHP_SETTINGS=$(jq -r '.extensions | map("-d extension=" + . + ".so") | join(" ")' "$RESOURCE_FILE")
+    else
+        PHP_SETTINGS=""
+    fi
+    # Fix for mysqli default socket on DSM 6
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        PHP_SETTINGS="${PHP_SETTINGS} -d mysqli.default_socket=/run/mysqld/mysqld10.sock"
+    fi
+    COMMAND="${PHP} ${PHP_SETTINGS} $*"
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        /bin/su "$WEB_USER" -s /bin/sh -c "${COMMAND}" >> ${LOG_FILE} 2>&1
+    else
+        $COMMAND >> ${LOG_FILE} 2>&1
+    fi
+    return $?
+}
+
 service_prestart ()
 {
     FENGOFFICE="${WEB_ROOT}/cron.php"
-    COMMAND="${PHP} ${FENGOFFICE}"
     SLEEP_TIME="600"
     # Main loop
     while true; do
         # Update
         echo "Updating..."
-        if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            /bin/su "$WEB_USER" -s /bin/sh -c "${COMMAND}" >> ${LOG_FILE} 2>&1
-        else
-            $COMMAND >> ${LOG_FILE} 2>&1
-        fi
+        exec_php "${FENGOFFICE}"
         # Wait
         echo "Waiting ${SLEEP_TIME} seconds..."
         sleep ${SLEEP_TIME}
@@ -148,14 +165,6 @@ service_postinst ()
 
     # Run installer
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        # Define the resource file
-        RESOURCE_FILE="${SYNOPKG_PKGDEST}/web/fengoffice.json"
-        # Extract extensions and assign to variable
-        PHP_SETTINGS=$(jq -r '.extensions[] | "-d extension=" + . + ".so"' "$RESOURCE_FILE")
-        # Fix for mysqli default socket on DSM 6
-        if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            PHP_SETTINGS="${PHP_SETTINGS} -d mysqli.default_socket=/run/mysqld/mysqld10.sock"
-        fi
         # Setup parameters for installation script
         QUERY_STRING="\
 script_installer_storage[database_type]=mysqli\
@@ -171,14 +180,10 @@ script_installer_storage[database_type]=mysqli\
 &script_installer_storage[plugins][]=workspaces\
 &submited=submited"
         # Prepare environment
-        COMMAND="${PHP} ${PHP_SETTINGS} install_helper.php"
         cd ${WEB_ROOT}/public/install/ || exit 1
         # Execute based on DSM version
-        if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            /bin/su "$WEB_USER" -s /bin/sh -c "${COMMAND}" > /dev/null 2>&1
-        else
-            $COMMAND > /dev/null 2>&1
-        fi
+        echo "Run ${SC_DNAME} installer"
+        exec_php "install_helper.php"
     fi
 }
 
@@ -288,11 +293,6 @@ service_restore ()
     fi
 
     # Run update scripts
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        /bin/su "$WEB_USER" -s /bin/sh -c "${PHP} ${WEB_ROOT}/public/upgrade/console.php ${INSTALLED_VERSION} ${PACKAGE_VERSION}" >> ${LOG_FILE} 2>&1
-        /bin/su "$WEB_USER" -s /bin/sh -c "${PHP} ${WEB_ROOT}/public/install/plugin-console.php update_all" >> ${LOG_FILE} 2>&1
-    else
-        ${PHP} ${WEB_ROOT}/public/upgrade/console.php ${INSTALLED_VERSION} ${PACKAGE_VERSION} >> ${LOG_FILE} 2>&1
-        ${PHP} ${WEB_ROOT}/public/install/plugin-console.php update_all >> ${LOG_FILE} 2>&1
-    fi
+    exec_php "${WEB_ROOT}/public/upgrade/console.php" "${INSTALLED_VERSION}" "${PACKAGE_VERSION}"
+    exec_php "${WEB_ROOT}/public/install/plugin-console.php" "update_all"
 }
