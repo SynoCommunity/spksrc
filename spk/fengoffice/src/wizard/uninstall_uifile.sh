@@ -60,7 +60,7 @@ PAGE_UNINSTALL_CONFIG=$(/bin/cat<<EOF
 		}]
 	}, {
 		"type": "textfield",
-		"desc": "Optional: Provide directory for database export. Leave blank to skip export. The directory will be created if it does not exist",
+		"desc": "Optional: Provide directory for database export. Ensure that the user 'sc-fengoffice' has write permissions to that directory. Leave blank to skip export.",
 		"subitems": [{
 			"key": "wizard_dbexport_path",
 			"desc": "Database export location",

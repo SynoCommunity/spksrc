@@ -52,7 +52,8 @@
                         "mysqli",
                         "pdo_mysql",
                         "xmlrpc",
-                        "zip"
+                        "zip",
+                        "zlib"
                     ],
                     "group": "http",
                     "profile_desc": "PHP Profile for fengoffice",

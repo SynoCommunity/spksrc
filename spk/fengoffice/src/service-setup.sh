@@ -22,6 +22,7 @@ else
     WEB_GROUP="http"
 fi
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
+SYNOSVC="/usr/syno/sbin/synoservice"
 
 service_prestart ()
 {
@@ -140,12 +141,21 @@ service_postinst ()
         ${RM} ${TEMPDIR}
     fi
 
+    # Fix permissions
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        chown -R ${WEB_USER}:${WEB_GROUP} ${WEB_ROOT}
+    fi
+
     # Run installer
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Define the resource file
         RESOURCE_FILE="${SYNOPKG_PKGDEST}/web/fengoffice.json"
         # Extract extensions and assign to variable
-        PHP_EXTENSIONS=$(jq -r '.extensions[] | "-dextension=" + . + ".so"' "$RESOURCE_FILE")
+        PHP_SETTINGS=$(jq -r '.extensions[] | "-d extension=" + . + ".so"' "$RESOURCE_FILE")
+        # Fix for mysqli default socket on DSM 6
+        if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+            PHP_SETTINGS="${PHP_SETTINGS} -d mysqli.default_socket=/run/mysqld/mysqld10.sock"
+        fi
         # Setup parameters for installation script
         QUERY_STRING="\
 script_installer_storage[database_type]=mysqli\
@@ -161,7 +171,7 @@ script_installer_storage[database_type]=mysqli\
 &script_installer_storage[plugins][]=workspaces\
 &submited=submited"
         # Prepare environment
-        COMMAND="${PHP} ${PHP_EXTENSIONS} install_helper.php"
+        COMMAND="${PHP} ${PHP_SETTINGS} install_helper.php"
         cd ${WEB_ROOT}/public/install/ || exit 1
         # Execute based on DSM version
         if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
@@ -169,14 +179,6 @@ script_installer_storage[database_type]=mysqli\
         else
             $COMMAND > /dev/null 2>&1
         fi
-    fi
-
-    # Fix permissions
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        chown -R ${WEB_USER}:${WEB_GROUP} ${WEB_ROOT}/config
-        chown -R ${WEB_USER}:${WEB_GROUP} ${WEB_ROOT}/cache
-        chown -R ${WEB_USER}:${WEB_GROUP} ${WEB_ROOT}/upload
-        chown -R ${WEB_USER}:${WEB_GROUP} ${WEB_ROOT}/tmp
     fi
 }
 
