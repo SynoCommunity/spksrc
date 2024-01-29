@@ -13,7 +13,8 @@
         "mysqli",
         "pdo_mysql",
         "xmlrpc",
-        "zip"
+        "zip",
+        "zlib"
     ],
     "fpm_settings": {
         "max_children": 20,
@@ -23,7 +24,9 @@
         "start_servers": 2
     },
     "open_basedir": "",
-    "php_settings": {},
+    "php_settings": {
+        "mysqli.default_socket": "/run/mysqld/mysqld10.sock"
+    },
     "profile_desc": "PHP Profile for fengoffice",
     "profile_name": "fengoffice Profile"
 }
