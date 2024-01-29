@@ -7,8 +7,6 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 PKG_DIR = src/github.com/$(PKG_NAME)/$(PKG_NAME)
 
-PATCHES_LEVEL = 1
-
 BUILD_DEPENDS = native/go
 
 HOMEPAGE = https://github.com/AlexxIT/go2rtc/
