@@ -80,6 +80,9 @@ all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 
 all-supported: SHELL:=/bin/bash
 all-supported:
+ifeq ($(strip $(SUPPORTED_ARCHS)),)
+	$(MAKE) supported-arch-error
+else
 	@$(MSG) Pre-build native dependencies for parallel build
 	@for depend in $$($(MAKE) dependency-list) ; \
 	do \
@@ -89,10 +92,7 @@ all-supported:
 	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
 	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
 	  fi ; \
-	done
-ifeq ($(strip $(SUPPORTED_ARCHS)),)
-	$(MAKE) supported-arch-error
-else
+	done ; \
 	$(MAKE) $(addprefix supported-arch-,$(SUPPORTED_ARCHS))
 endif
 
