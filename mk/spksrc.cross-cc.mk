@@ -89,17 +89,8 @@ all-supported:
 	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
 	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
 	  fi ; \
-	done
-ifeq ($(strip $(SUPPORTED_ARCHS)),)
-	$(MAKE) supported-arch-error
-else
+	done ; \
 	$(MAKE) $(addprefix supported-arch-,$(SUPPORTED_ARCHS))
-endif
-
-supported-arch-error:
-	@$(MSG) ########################################################
-	@$(MSG) ERROR - Please run make setup from spksrc root directory
-	@$(MSG) ########################################################
 
 supported-arch-%:
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
