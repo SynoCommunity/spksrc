@@ -51,10 +51,6 @@ $(TARGET_TYPE)-arch-% &: pre-build-native
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
 	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee --append build-$*.log
 
-arch-%:
-	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
-	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
-
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: 
 	@$(MSG) Building package for arch $*
@@ -63,5 +59,11 @@ build-arch-%:
 	status=$${PIPESTATUS[0]} ; \
 	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG) ; \
 	[ $${status[0]} -eq 0 ] || false
+
+####
+
+arch-%:
+	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
+	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
 
 ####
