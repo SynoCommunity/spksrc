@@ -6,6 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/phpmemcachedadmin cross/memcached
 
+REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = WebStation:PHP7.4
 
 MAINTAINER = Diaoul
