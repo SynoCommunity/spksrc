@@ -119,13 +119,7 @@ include ../../mk/spksrc.generate-digests.mk
 ### For make dependency-tree
 include ../../mk/spksrc.dependency-tree.mk
 
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
-
-####
-
-arch-%:
-	@$(MSG) Building package for arch $*
-	@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) 2>&1 | tee --append build-$*.log
+### For managing make all-<supported|latest>
+include ../../mk/spksrc.supported.mk
 
 ####
