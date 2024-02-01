@@ -22,7 +22,7 @@ endif
 
 .PHONY: all-$(TARGET_TYPE) pre-build-native
 
-all-$(TARGET_TYPE): | pre-build-native $(addprefix $(TARGET_TYPE)-arch-,$(TARGET_ARCH))
+all-$(TARGET_TYPE): $(addprefix $(TARGET_TYPE)-arch-,$(TARGET_ARCH))
 
 pre-build-native: SHELL:=/bin/bash
 pre-build-native:
@@ -47,7 +47,7 @@ $(TARGET_TYPE)-arch-error:
 	@$(MSG) ERROR - Please run make setup from spksrc root directory
 	@$(MSG) ########################################################
 
-$(TARGET_TYPE)-arch-%:
+$(TARGET_TYPE)-arch-% &: pre-build-native
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
 	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee --append build-$*.log
 
