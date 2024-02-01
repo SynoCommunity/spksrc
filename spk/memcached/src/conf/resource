@@ -13,7 +13,7 @@
             "php": {
                 "profile_name": "php-memcached-admin",
                 "profile_desc": "PHP profile used by phpMemcachedAdmin",
-                "backend": 6,
+                "backend": 8,
                 "extensions": [
                     "gd",
                     "intl",
