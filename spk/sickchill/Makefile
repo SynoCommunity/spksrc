@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
-SPK_VERS = 20230627
-SPK_REV = 10
+SPK_VERS = 20240202
+SPK_REV = 11
 SPK_ICON = src/sickchill.png
 
 PYTHON_PACKAGE = python311
@@ -28,7 +28,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "1. A wheel based install, git installs are not supported by upstream.<br/>2. Python update to 3.11<br/>3. Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies<br/>4. Migrate to OpenSSL 3.1.2<br/>5. Fix for newer shared python"
+CHANGELOG = "1. A wheel based install, git installs not supported by upstream.<br/>2. Python update to 3.11.5, OpenSSL 3.1.2<br/>3. Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies"
 
 HOMEPAGE = https://sickchill.github.io/
 LICENSE = GPLv3+
