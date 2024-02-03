@@ -185,9 +185,5 @@ else
 	@echo TC_KERNEL := $(TC_KERNEL)
 endif
 
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
-
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

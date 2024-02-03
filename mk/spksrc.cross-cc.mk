@@ -53,16 +53,8 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-
-### Clean rules
-smart-clean:
-	rm -rf $(WORK_DIR)/$(PKG_DIR)
-	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
-
-clean:
-	rm -fr work work-* build-*.log
-
 all: install plist
+
 
 ### For make kernel-required (used by spksrc.spk.mk)
 include ../../mk/spksrc.kernel-required.mk

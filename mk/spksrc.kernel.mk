@@ -80,7 +80,4 @@ include ../../mk/spksrc.generate-digests.mk
 kernel_post_extract_target:
 	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/$(PKG_DIR)
 
-clean:
-	rm -fr work work-*
-
 all: install plist

@@ -89,12 +89,8 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-
-clean:
-	rm -fr work work-* build-*.log
-
-
 all: install plist
+
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

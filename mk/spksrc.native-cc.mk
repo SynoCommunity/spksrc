@@ -49,12 +49,8 @@ include ../../mk/spksrc.install.mk
 cat_PLIST:
 	@true
 
-
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
-
 all: install
+
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

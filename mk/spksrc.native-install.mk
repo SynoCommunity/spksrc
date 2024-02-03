@@ -62,11 +62,8 @@ endif
 cat_PLIST:
 	@true
 
-### Clean rules
-clean:
-	rm -fr work work-*
-
 all: install
+
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

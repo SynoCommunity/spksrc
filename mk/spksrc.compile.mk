@@ -31,12 +31,10 @@ endif
 
 compile_msg:
 	@$(MSG) "Compiling for $(NAME)"
-ifneq ($(filter 1 on ON,$(PSTAT)),)
 ifeq ($(filter cross spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(shell basename $(dir $(abspath $(dir $$PWD)))), NAME: $(NAME) >> $(PSTAT_LOG)
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(shell basename $(dir $(abspath $(dir $$PWD)))), NAME: $(NAME) >> $(PSTAT_LOG)
 else
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
-endif
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
 endif
 
 pre_compile_target: compile_msg

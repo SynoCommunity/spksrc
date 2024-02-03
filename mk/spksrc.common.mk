@@ -1,5 +1,19 @@
 # Common definitions, shared by all makefiles
 
+###
+
+clean:
+	rm -fr work work-* build-*.log publish-*.log status-*.log
+
+smart-clean:
+	rm -rf $(WORK_DIR)/$(PKG_DIR)
+	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
+
+changelog:
+	git log --pretty=format:"- %s" -- $(PWD)
+
+###
+
 # all will be the default target, regardless of what is defined in the other
 # makefiles.
 default: all
@@ -110,11 +124,11 @@ endif
 # Always send PSTAT output to proper log file
 # independantly from active Makefile location
 ifeq ($(filter cross diyspk spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
-PSTAT_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build-stats.log
+PSTAT_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/status-build.log
 else ifneq ($(wildcard $(WORK_DIR)),)
-PSTAT_LOG = $(WORK_DIR)/../build-stats.log
+PSTAT_LOG = $(WORK_DIR)/../status-build.log
 else
-PSTAT_LOG = $(shell pwd)/build-stats.log
+PSTAT_LOG = $(shell pwd)/status-build.log
 endif
 
 # Terminal colors

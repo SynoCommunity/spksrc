@@ -1,12 +1,12 @@
 ####
 
 # make all-supported
-ifeq (supported,$(subst all-,,$(firstword $(MAKECMDGOALS))))
+ifeq (supported,$(findstring supported,$(subst -, ,$(firstword $(MAKECMDGOALS)))))
 TARGET_TYPE = supported
 TARGET_ARCH = $(SUPPORTED_ARCHS)
 
 # make all-latest
-else ifeq (latest,$(subst all-,,$(firstword $(MAKECMDGOALS))))
+else ifeq (latest,$(findstring latest,$(subst -, ,$(firstword $(MAKECMDGOALS)))))
 TARGET_TYPE = latest
 TARGET_ARCH = $(LATEST_ARCHS)
 endif
@@ -20,19 +20,28 @@ endif
 
 ####
 
+.PHONY: supported-arch-error
+
+$(ACTION)$(TARGET_TYPE)-arch-error:
+	@$(MSG) ########################################################
+	@$(MSG) ERROR - Please run make setup from spksrc root directory
+	@$(MSG) ########################################################
+
+###
+
 .PHONY: all-$(TARGET_TYPE) pre-build-native
 
 all-$(TARGET_TYPE): $(addprefix $(TARGET_TYPE)-arch-,$(TARGET_ARCH))
 
 pre-build-native: SHELL:=/bin/bash
 pre-build-native:
-	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: n/a [BEGIN] > $(PSTAT_LOG)
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: n/a [BEGIN] >> $(PSTAT_LOG)
 	@$(MSG) Pre-build native dependencies for parallel build [START]
 	@for depend in $$($(MAKE) dependency-list) ; \
 	do \
 	  if [ "$${depend%/*}" = "native" ]; then \
-	    $(MSG) "Pre-processing $${depend}" ; \
-	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
+	    $(MSG) "Pre-processing $${depend}" | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
+	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
 	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
 	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
 	  fi ; \
@@ -41,29 +50,25 @@ pre-build-native:
 	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: n/a [END] >> $(PSTAT_LOG)
 	@$(MSG) PROCESSING archs $(TARGET_ARCH)
 
-.PHONY: supported-arch-error
-$(TARGET_TYPE)-arch-error:
-	@$(MSG) ########################################################
-	@$(MSG) ERROR - Please run make setup from spksrc root directory
-	@$(MSG) ########################################################
-
 $(TARGET_TYPE)-arch-% &: pre-build-native
-	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee --append build-$*.log
+	-@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(PSTAT_TIME) $(MAKE) arch-$*
 
-build-arch-%: SHELL:=/bin/bash
-build-arch-%: 
-	@$(MSG) Building package for arch $*
-	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [BEGIN] >> $(PSTAT_LOG)
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
-	status=$${PIPESTATUS[0]} ; \
-	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG) ; \
-	[ $${status[0]} -eq 0 ] || false
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+arch-% &: kernel-arch-%
+else
+arch-%:
+endif
+	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*)) | tee --append build-$*.log
 
 ####
 
-arch-%:
-	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
-	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+build-arch-%: SHELL:=/bin/bash
+build-arch-%: 
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [BEGIN] >> $(PSTAT_LOG)
+	@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 ; \
+	status=$${PIPESTATUS[0]} ; \
+	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG) ; \
+	[ $${status[0]} -eq 0 ] || false
 
 ####

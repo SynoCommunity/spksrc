@@ -47,9 +47,5 @@ include ../../mk/spksrc.toolkit-fix.mk
 
 all: toolkit_fix
 
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
-
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

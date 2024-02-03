@@ -166,6 +166,7 @@ local.mk:
 	@echo "DISTRIBUTOR_URL =" >> $@
 	@echo "REPORT_URL =" >> $@
 	@echo "DEFAULT_TC =" >> $@
+	@echo "#PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
 
 dsm-%: local.mk

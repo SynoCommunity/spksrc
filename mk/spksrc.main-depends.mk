@@ -39,15 +39,8 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-### Clean rules
-smart-clean:
-	rm -rf $(WORK_DIR)/$(PKG_DIR)
-	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
-
-clean:
-	rm -rf work work-* build-*.log
-
 all: install plist
+
 
 ### For make dependency-tree
 include ../../mk/spksrc.dependency-tree.mk
