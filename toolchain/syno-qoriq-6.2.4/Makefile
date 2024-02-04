@@ -19,6 +19,6 @@ include ../../mk/spksrc.tc.mk
 qoriq_post_fix_target:
 	@cd $(WORK_DIR)/$(TC_TARGET)/bin ; \
 	for gnutool in $$(ls -1); do \
-	  [ ! -h "powerpc-linux-gnuspe-$${gnutool##*-}" ] && ln -s $${gnutool} "powerpc-linux-gnuspe-$${gnutool##*-}" ; \
-	  [ ! -h "powerpc-unknown-linux-gnuspe-$${gnutool##*-}" ] && ln -s $${gnutool} "powerpc-unknown-linux-gnuspe-$${gnutool##*-}" ; \
+	  [ ! -L "powerpc-linux-gnuspe-$${gnutool##*-}" ] && ln -sf $${gnutool} "powerpc-linux-gnuspe-$${gnutool##*-}" ; \
+	  [ ! -L "powerpc-unknown-linux-gnuspe-$${gnutool##*-}" ] && ln -sf $${gnutool} "powerpc-unknown-linux-gnuspe-$${gnutool##*-}" ; \
 	done
