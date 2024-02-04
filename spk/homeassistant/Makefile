@@ -107,9 +107,6 @@ DEPENDS += cross/libxslt
 
 include ../../mk/spksrc.python.mk
 
-# Enable debug_info symgols for all archs
-GCC_DEBUG_INFO := 1
-
 # prefer native python tools (pip, maturin, ...)
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
