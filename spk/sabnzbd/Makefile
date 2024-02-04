@@ -49,9 +49,6 @@ include ../../mk/spksrc.python.mk
 # prefer native python tools (pip, maturin, ...) used for orjson
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
-# Enable debug_info symgols for all archs
-GCC_DEBUG_INFO := 1
-
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/scripts
