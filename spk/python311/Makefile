@@ -104,7 +104,7 @@ include ../../mk/spksrc.common.mk
 # Force compiler LTO optimizations except:
 #   - when testing all wheels
 #   - when including debug_info symbols
-#   - when using PPC arch (fails on qoriq)
+#   - when using OLD_PPC_ARCHS arch
 ifneq ($(strip $(WHEELS_TEST_ALL)),1)
 ifneq ($(strip $(GCC_DEBUG_INFO)),1)
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
