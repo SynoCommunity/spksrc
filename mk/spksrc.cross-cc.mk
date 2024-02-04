@@ -57,7 +57,7 @@ all: install plist
 
 
 ### For make kernel-required (used by spksrc.spk.mk)
-include ../../mk/spksrc.kernel-required.mk
+include ../../mk/spksrc.kernel.mk
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

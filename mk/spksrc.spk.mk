@@ -554,9 +554,9 @@ include ../../mk/spksrc.dependency-tree.mk
 include ../../mk/spksrc.supported.mk
 
 ### For managing make publish-all-<supported|latest>
-include ../../mk/spksrc.spk-publish.mk
+include ../../mk/spksrc.publish.mk
 
 ### For managing make kernel related builds
-include ../../mk/spksrc.spk-kernel.mk
+include ../../mk/spksrc.kernel.mk
 
 ###
