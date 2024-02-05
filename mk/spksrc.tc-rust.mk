@@ -116,7 +116,6 @@ else
 	@$(MSG) "Build rust target $(RUST_TARGET) from sources"
 	@$(MSG) "Enforce usage of CMake 3.20.0 or higher"
 	@$(MAKE) -C ../../native/cmake
-	exit 2
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
 	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
