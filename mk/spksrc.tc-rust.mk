@@ -109,10 +109,7 @@ ifeq ($(TC_RUSTUP_TOOLCHAIN),$(RUSTUP_DEFAULT_TOOLCHAIN))
 	rustup show
 else
 	@$(MSG) "Target $(RUST_TARGET) unavailable..."
-ifeq ($(RUST_BUILD_TOOLCHAIN),0)
-	@$(MSG) "Install rust target $(RUST_TARGET) from native"
-	@$(MAKE) -C ../../native/rust-qoriq
-else
+ifeq ($(RUST_BUILD_TOOLCHAIN),1)
 	@$(MSG) "Build rust target $(RUST_TARGET) from sources"
 	@$(MSG) "Enforce usage of CMake 3.20.0 or higher"
 	@$(MAKE) -C ../../native/cmake
@@ -130,6 +127,9 @@ else
 	done
 	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET) - stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) complete"
 	rustup show
+else
+	@$(MSG) "Install rust target $(RUST_TARGET) from native"
+	@$(MAKE) -C ../../native/rust-qoriq
 endif
 endif
 
