@@ -34,7 +34,7 @@ $(ACTION)$(TARGET_TYPE)-arch-error-api_key:
 publish-all-$(TARGET_TYPE): $(addprefix publish-$(TARGET_TYPE)-arch-,$(TARGET_ARCH))
 
 $(ACTION)$(TARGET_TYPE)-arch-%: $(TARGET_TYPE)-arch-%
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) publish-arch-$*
+	-@MAKEFLAGS= $(MAKE) publish-arch-$*
 
 publish-arch-%:
 	$(MAKE) $(addprefix publish-build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
@@ -44,7 +44,7 @@ publish-arch-%:
 publish-build-arch-%: SHELL:=/bin/bash
 publish-build-arch-%:
 	@$(MSG) PUBLISHING package for arch $* to http://synocommunity.com | tee --append build-$*.log
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish 2>&1 | tee --append publish-$*.log >(grep -e '^http' -e '^{"package":' -e '^{"message":' >> status-publish.log) ; \
+	@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish 2>&1 | tee --append publish-$*.log >(grep -e '^http' -e '^{"package":' -e '^{"message":' >> status-publish.log) ; \
 	status=$${PIPESTATUS[0]} ; \
 	[ $${status[0]} -eq 0 ] || false
 	

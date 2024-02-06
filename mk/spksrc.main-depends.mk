@@ -66,7 +66,7 @@ all-supported:
 
 supported-arch-%:
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee --append build-$*.log
+	-@MAKEFLAGS= $(MAKE) arch-$* 2>&1 | tee --append build-$*.log
 
 arch-%:
 	@$(MSG) Building package for arch $*

@@ -104,9 +104,7 @@ endif
 
 # Enable stats over parallel build mode
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-ifeq ($(call version_lt, $(MAKELEVEL), 2), 1)
 PSTAT_TIME = time -o $(PSTAT_LOG) --append
-endif
 endif
 
 # Always send PSTAT output to proper log file

@@ -75,7 +75,7 @@ else
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	env $(ENV) $(PSTAT_TIME) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
 
 .PHONY: cmake_install_target
 

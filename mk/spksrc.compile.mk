@@ -41,9 +41,9 @@ pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET)
 ifeq ($(filter $(NCPUS),0 1),)
-	@$(RUN) $(PSTAT_TIME) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
 else
-	@$(RUN) $(PSTAT_TIME) $(MAKE) $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS)
 endif
 
 
