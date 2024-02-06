@@ -8,6 +8,11 @@ include ../../mk/spksrc.directories.mk
 
 include ../../mk/spksrc.common.mk
 
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+include ../../mk/spksrc.cross-rust-env.mk
+
 # Include cross-cmake-env.mk to generate its toolchain file
 include ../../mk/spksrc.cross-cmake-env.mk
 

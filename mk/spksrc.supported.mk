@@ -1,5 +1,10 @@
 ####
 
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+###
+
 # make all-supported
 ifeq (supported,$(findstring supported,$(subst -, ,$(firstword $(MAKECMDGOALS)))))
 TARGET_TYPE = supported

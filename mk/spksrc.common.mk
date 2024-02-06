@@ -2,18 +2,6 @@
 
 ###
 
-clean:
-	rm -fr work work-* build-*.log publish-*.log status-*.log
-
-smart-clean:
-	rm -rf $(WORK_DIR)/$(PKG_DIR)
-	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
-
-changelog:
-	git log --pretty=format:"- %s" -- $(PWD)
-
-###
-
 # all will be the default target, regardless of what is defined in the other
 # makefiles.
 default: all
