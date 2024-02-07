@@ -3,10 +3,12 @@ packages
 native/*/work*
 cross/*/work*
 cross/*/build*
+cross/*/status*
 kernel/*/work*
 spk/*/work*
 spk/*/build*
 spk/*/publish*
+spk/*/status*
 diyspk/*/work*
 toolchain/*/work*
 toolchain/*/*_done
