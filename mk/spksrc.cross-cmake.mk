@@ -3,15 +3,32 @@
 # prerequisites:
 # - cross/module depends on cmake
 #
+# remarks:
+# - most content is taken from spksrc.cc.mk and modified for cmake
+#
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-# cmake specific configurations
-include ../../mk/spksrc.cross-cmake-env.mk
+# Configure the included makefiles
+URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
+NAME          = $(PKG_NAME)
+COOKIE_PREFIX = $(PKG_NAME)-
+ifneq ($(PKG_DIST_FILE),)
+LOCAL_FILE    = $(PKG_DIST_FILE)
+else
+LOCAL_FILE    = $(PKG_DIST_NAME)
+endif
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT      = $(PKG_EXT)
 
-####
+ifneq ($(ARCH),)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+TC = syno$(ARCH_SUFFIX)
+endif
+
+###
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)
@@ -34,6 +51,43 @@ ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = cmake_install_target
 endif
 endif
+
+###
+
+# cmake specific configurations
+include ../../mk/spksrc.cross-cmake-env.mk
+
+include ../../mk/spksrc.pre-check.mk
+
+include ../../mk/spksrc.cross-env.mk
+
+include ../../mk/spksrc.download.mk
+
+include ../../mk/spksrc.depend.mk
+
+include ../../mk/spksrc.checksum.mk
+
+extract: checksum depend
+include ../../mk/spksrc.extract.mk
+
+patch: extract
+include ../../mk/spksrc.patch.mk
+
+configure: patch
+include ../../mk/spksrc.configure.mk
+
+compile: configure
+include ../../mk/spksrc.compile.mk
+
+install: compile
+include ../../mk/spksrc.install.mk
+
+plist: install
+include ../../mk/spksrc.plist.mk
+
+all: install plist
+
+###
 
 .PHONY: $(CMAKE_TOOLCHAIN_PKG)
 $(CMAKE_TOOLCHAIN_PKG):
@@ -74,8 +128,6 @@ endif
 	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(abspath $(PKG_CONFIG_LIBDIR))")'
 
 .PHONY: cmake_configure_target
-
-# default cmake configure:
 cmake_configure_target: $(CMAKE_TOOLCHAIN_PKG)
 	@$(MSG) - CMake configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
@@ -118,5 +170,14 @@ else
 endif
 endif
 
-# call-up regular build process
-include ../../mk/spksrc.cross-cc.mk
+### For make kernel-required (used by spksrc.spk.mk)
+include ../../mk/spksrc.kernel.mk
+
+### For make digests
+include ../../mk/spksrc.generate-digests.mk
+
+### For make dependency-tree
+include ../../mk/spksrc.dependency-tree.mk
+
+### For managing make all-<supported|latest>
+include ../../mk/spksrc.supported.mk
