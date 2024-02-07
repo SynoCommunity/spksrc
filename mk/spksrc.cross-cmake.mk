@@ -65,6 +65,7 @@ include ../../mk/spksrc.download.mk
 
 include ../../mk/spksrc.depend.mk
 
+checksum: download
 include ../../mk/spksrc.checksum.mk
 
 extract: checksum depend
