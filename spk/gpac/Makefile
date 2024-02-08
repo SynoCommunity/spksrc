@@ -8,12 +8,12 @@ DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = wmanth
 DISPLAY_NAME = GPAC
-DESCRIPTION = GPAC is an open-source software dedicated to rich-media and broadcast technologies. It features the MP4 reference muxer MP4Box, and many other tools.
+DESCRIPTION = GPAC is an open-source software dedicated to rich-media and broadcast technologies. It features the MP4 reference muxer MP4Box.
 STARTABLE = no
 
 HOMEPAGE = https://gpac.io
 LICENSE  = LGPLv2
 
-SPK_COMMANDS = bin/MP4Box
+SPK_COMMANDS = bin/gpac bin/MP4Box
 
 include ../../mk/spksrc.spk.mk
