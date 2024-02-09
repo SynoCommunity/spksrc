@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/warmcat/libwebsockets/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl3
+DEPENDS = cross/openssl
 
 # ppc except qoriq
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)

@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/nghttp2/nghttp2/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl3
+DEPENDS = cross/openssl
 
 HOMEPAGE = https://nghttp2.org/
 COMMENT  = HTTP/2 C Library and tools.

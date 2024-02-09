@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://mosquitto.org/files/source
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/c-ares
-DEPENDS += cross/openssl3
+DEPENDS += cross/openssl
 DEPENDS += cross/libwebsockets
 DEPENDS += cross/cjson
 

@@ -8,7 +8,7 @@ DEPENDS = cross/syncstorage-rs cross/diesel
 PYTHON_PACKAGE = python311
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
@@ -35,7 +35,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 # [cryptography]
 # Mandatory of using OPENSSL_*_DIR starting with version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
-DEPENDS += cross/openssl3
+DEPENDS += cross/openssl
 ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
