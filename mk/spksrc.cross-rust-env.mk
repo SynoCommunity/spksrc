@@ -1,13 +1,15 @@
 # Configuration for rust compiler
 #
 
-# Add cargo for rust compiler to default PATH
-ifneq ($(BASE_DISTRIB_DIR),)
-# Enforce newer cmake when building tier-3 toolchains
+# Force building from source Tier-3 toolchains (qoriq)
+RUST_BUILD_TOOLCHAIN = 0
+
+# Enforce using newer cmake when building Tier-3 toolchains
+ifeq ($(RUST_BUILD_TOOLCHAIN),1)
 CMAKE_PATH = $(abspath $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin)
-export CARGO_HOME=$(BASE_DISTRIB_DIR)/cargo
-export RUSTUP_HOME=$(BASE_DISTRIB_DIR)/rustup
-export PATH:=$(abspath $(BASE_DISTRIB_DIR)/cargo/bin):$(CMAKE_PATH):$(PATH)
+ifeq ($(findstring cmake,$(subst /,,$(subst :,,$(PATH)))),)
+export PATH:=$(CMAKE_PATH):$(PATH)
+endif
 endif
 
 ifeq ($(RUSTUP_DEFAULT_TOOLCHAIN),)
@@ -38,7 +40,6 @@ ifeq ($(findstring $(RUST_ARCH), $(ARMv8_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(RUST_ARCH), $(PPC_ARCHS)),$(RUST_ARCH))
-RUST_BUILD_TOOLCHAIN = 0
 RUST_TARGET = powerpc-unknown-linux-gnuspe
 TC_RUSTUP_TOOLCHAIN = stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)-$(RUST_TARGET)
 endif

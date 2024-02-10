@@ -81,6 +81,15 @@ ifndef STAGING_INSTALL_WHEELHOUSE
 STAGING_INSTALL_WHEELHOUSE = $(STAGING_INSTALL_PREFIX)/share/wheelhouse
 endif
 
+# Mandatory directories to access rust based toolchain
+CARGO_HOME=$(abspath $(BASE_DISTRIB_DIR)/cargo)
+RUSTUP_HOME=$(abspath $(BASE_DISTRIB_DIR)/rustup)
+export CARGO_HOME
+export RUSTUP_HOME
+ifeq ($(findstring cargo,$(subst /,,$(subst :,,$(PATH)))),)
+export PATH:=$(abspath $(BASE_DISTRIB_DIR)/cargo/bin):$(PATH)
+endif
+
 define create_target_dir
 @mkdir -p $$(dirname $@)
 endef
