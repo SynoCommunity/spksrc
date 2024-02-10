@@ -27,14 +27,13 @@ DIST_EXT      = $(PKG_EXT)
 
 #####
 
-.NOTPARALLEL:
-
-
 ifneq ($(REQUIRE_KERNEL),)
   @$(error native-install cannot be used when REQUIRE_KERNEL is set)
 endif
 
 #####
+
+.NOTPARALLEL:
 
 include ../../mk/spksrc.native-env.mk
 
@@ -64,11 +63,9 @@ cat_PLIST:
 
 all: install
 
-
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
 ####
+
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+###

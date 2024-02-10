@@ -1,7 +1,7 @@
-# Build CMake programs
+# Build native CMake programs
 #
-# prerequisites:
-# - cross/module depends on cmake
+# remarks:
+# - most content is taken from spksrc.native-cc.mk and modified for cmake
 #
 
 # Common makefiles
@@ -25,11 +25,6 @@ DIST_EXT      = $(PKG_EXT)
 
 #####
 
-include ../../mk/spksrc.native-env.mk
-
-# cmake specific configurations
-include ../../mk/spksrc.native-cmake-env.mk
-
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = cmake_configure_target
@@ -51,6 +46,50 @@ ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = cmake_install_target
 endif
 endif
+
+###
+
+.NOTPARALLEL:
+
+include ../../mk/spksrc.native-env.mk
+
+# cmake specific configurations
+include ../../mk/spksrc.native-cmake-env.mk
+
+include ../../mk/spksrc.download.mk
+
+include ../../mk/spksrc.depend.mk
+
+checksum: download
+include ../../mk/spksrc.checksum.mk
+
+extract: checksum depend
+include ../../mk/spksrc.extract.mk
+
+patch: extract
+include ../../mk/spksrc.patch.mk
+
+configure: patch
+include ../../mk/spksrc.configure.mk
+
+compile: configure
+include ../../mk/spksrc.compile.mk
+
+install: compile
+include ../../mk/spksrc.install.mk
+
+.PHONY: cat_PLIST
+cat_PLIST:
+	@true
+
+all: install
+
+###
+
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+###
 
 .PHONY: cmake_configure_target
 
@@ -89,5 +128,4 @@ else
 endif
 endif
 
-# call-up regular build process
-include ../../mk/spksrc.native-cc.mk
+####

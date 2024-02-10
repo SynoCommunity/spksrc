@@ -26,3 +26,16 @@ endif
 .PHONY: rustup
 rustup:
 	@rustup $(RUN_ARGS)
+
+###
+
+### For make dependency-tree
+include ../../mk/spksrc.dependency-tree.mk
+
+### For make digests
+include ../../mk/spksrc.generate-digests.mk
+
+### For make kernel-required
+include ../../mk/spksrc.kernel.mk
+
+###

@@ -4,7 +4,7 @@
 # - cross/module depends on cmake
 #
 # remarks:
-# - most content is taken from spksrc.cc.mk and modified for cmake
+# - most content is taken from spksrc.cross-cc.mk and modified for cmake
 #
 
 # Common makefiles

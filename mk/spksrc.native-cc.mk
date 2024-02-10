@@ -51,11 +51,9 @@ cat_PLIST:
 
 all: install
 
-
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
 ####
+
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+###

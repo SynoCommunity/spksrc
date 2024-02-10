@@ -1,10 +1,5 @@
 ###
 
-### Include common rules
-include ../../mk/spksrc.common-rules.mk
-
-###
-
 PKG_CONFIG_LIBDIR = $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig
 
 INSTALL_DIR = $(WORK_DIR)/install
