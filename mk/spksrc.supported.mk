@@ -3,6 +3,15 @@
 ### Include common rules
 include ../../mk/spksrc.common-rules.mk
 
+### For make dependency-tree
+include ../../mk/spksrc.dependency-tree.mk
+
+### For make digests
+include ../../mk/spksrc.generate-digests.mk
+
+### For make kernel-required (used by spksrc.spk.mk)
+include ../../mk/spksrc.kernel.mk
+
 ###
 
 # make all-supported

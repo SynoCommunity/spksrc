@@ -171,14 +171,6 @@ else
 endif
 endif
 
-### For make kernel-required (used by spksrc.spk.mk)
-include ../../mk/spksrc.kernel.mk
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
-### For managing make all-<supported|latest>
+### For arch-* and all-<supported|latest>
 include ../../mk/spksrc.supported.mk

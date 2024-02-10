@@ -102,13 +102,7 @@ include ../../mk/spksrc.plist.mk
 all: install plist
 
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
-### For managing make all-<supported|latest>
+### For arch-* and all-<supported|latest>
 include ../../mk/spksrc.supported.mk
 
 ####
