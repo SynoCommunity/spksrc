@@ -16,5 +16,3 @@ GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-cmake.mk
 
-https://github.com/libgeos/geos/archive/refs/tags/3.12.1.tar.gz
-
