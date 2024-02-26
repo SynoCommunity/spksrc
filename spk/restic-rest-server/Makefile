@@ -2,7 +2,6 @@ SPK_NAME = restic-rest-server
 SPK_VERS = 0.12.1
 SPK_REV = 1
 SPK_ICON = src/logo.png
-DSM_UI_DIR = app
 
 DEPENDS = cross/restic-rest-server
 
