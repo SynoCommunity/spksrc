@@ -1,9 +1,9 @@
-sickchill==2024.2.17
+sickchill==2024.2.27
 
 appdirs==1.4.4
-attrs==23.1.0
+attrs==23.2.0
 babelfish==0.6.0
-beautifulsoup4==4.12.2
+beautifulsoup4==4.12.3
 beekeeper-alt==2022.9.3
 bencode.py==4.0.0
 CacheControl==0.14.0
@@ -20,8 +20,8 @@ deluge-client==1.10.2
 Deprecated==1.2.14
 dogpile.cache==1.3.1
 enzyme==0.4.1
-flask==3.0.2
-future==0.18.3
+Flask==3.0.2
+future==1.0.0
 gntp==1.0.3
 # greenlet              ==> crossenv
 guessit==3.8.0
@@ -69,7 +69,7 @@ Send2Trash==1.8.2
 # six                   ==> python 3.11
 soupsieve==2.5
 # SQLAlchemy            ==> crossenv
-stevedore==5.1.0
+stevedore==5.2.0
 subliminal==2.1.0
 text-unidecode==1.3
 timeago==1.0.16
