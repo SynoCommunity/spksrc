@@ -28,7 +28,7 @@ WHEELS_BUILD_ARGS += --enable-zlib
 MAINTAINER = smaarn
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
-CHANGELOG = 'Update to <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.4.0">1.4.0</a> (also includes <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.3.1">1.3.1</a>)'
+CHANGELOG = 'Update to <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.4.2">1.4.2</a>'
 
 HOMEPAGE  = https://www.bazarr.media/
 LICENSE   = GPL-3.0 license
