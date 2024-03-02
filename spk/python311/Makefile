@@ -4,12 +4,6 @@ SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$
 SPK_REV = 8
 SPK_ICON = src/python3.png
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# Missing libatomic for proper openssl >= 3.x support
-# Ref: https://github.com/SynoCommunity/spksrc/issues/5841
-#      https://github.com/SynoCommunity/spksrc/pull/5820#issuecomment-1678221438
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
-
 DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/pip
 

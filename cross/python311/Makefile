@@ -6,14 +6,6 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-# Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
-# CPython core team, see https://peps.python.org/pep-0011/ for more information.
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# Missing libatomic for proper openssl >= 3.x support
-# Ref: https://github.com/SynoCommunity/spksrc/issues/5841
-#      https://github.com/SynoCommunity/spksrc/pull/5820#issuecomment-1678221438
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
-
 BUILD_DEPENDS = native/$(PKG_NAME)
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
@@ -39,14 +31,22 @@ CONFIGURE_ARGS += --with-build-python
 
 include ../../mk/spksrc.archs.mk
 
-# optionally generate optimized code
+# optionally generate optimized code (optimizaton is always disabled for OLD_PPC_ARCHS)
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
 CONFIGURE_ARGS += --enable-optimizations
+# Some tests (like test_base64) must find libpython shared library at runtime.
+# python: error while loading shared libraries: libpython3.11.so.1.0: cannot open shared object file: No such file or directory
+ENV += LD_LIBRARY_PATH=$(WORK_DIR)/$(PKG_DIR)
 # Enable Link-Time Optimization
 CONFIGURE_ARGS += --with-lto
 else
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
+endif
+
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+# older gcc does not know -Wno-unused-result
+CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
 endif
 
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
@@ -166,7 +166,7 @@ endif
 endif
 
 # [maturin]
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==1.2.3
 endif
 
