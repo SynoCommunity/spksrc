@@ -52,7 +52,7 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, xxhsum, autossh \(including openssh, sftp and scp\), etherwake, telnet, whois, sshfs$(OPTIONAL_DESC)."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Update aria2 to v1.37.0.<br/>2. Update bind to v9.17.22 (on ARMv5 v9.16.45).<br/>3. Update inetutils (telnet, whois) to v2.5.<br/>4. Update openssl to v3.1.4.<br/>5. Update openssh to v9.6p1.<br/>6. Update screen to v4.9.1.<br/>7. Update ser2net to v4.6.0.<br/>8. Update socat to v1.8.0.0.<br/>9. Add xxHsum tools, bundled with rsync."
+CHANGELOG = "1. Update aria2 to v1.37.0.<br/>2. Update bind to v9.17.22 (on ARMv5 v9.16.45).<br/>3. Update inetutils (telnet, whois) to v2.5.<br/>4. Update openssl to v3.1.5.<br/>5. Update openssh to v9.6p1.<br/>6. Update screen to v4.9.1.<br/>7. Update ser2net to v4.6.0.<br/>8. Update socat to v1.8.0.0.<br/>9. Add xxHsum tools, bundled with rsync."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
