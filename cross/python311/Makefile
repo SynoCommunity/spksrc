@@ -24,7 +24,7 @@ CONFIGURE_ARGS  = --enable-shared
 CONFIGURE_ARGS += --without-static-libpython
 CONFIGURE_ARGS += --enable-ipv6
 # installed pip is not on PATH
-CONFIGURE_ARGS += --with-ensurepip=no
+CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
 CONFIGURE_ARGS += --with-build-python
