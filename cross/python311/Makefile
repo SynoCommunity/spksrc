@@ -6,6 +6,11 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
+# Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
+# CPython core team, see https://peps.python.org/pep-0011/ for more information.
+# And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 BUILD_DEPENDS = native/$(PKG_NAME)
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
@@ -31,7 +36,7 @@ CONFIGURE_ARGS += --with-build-python
 
 include ../../mk/spksrc.archs.mk
 
-# optionally generate optimized code (optimizaton is always disabled for OLD_PPC_ARCHS)
+# optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
 CONFIGURE_ARGS += --enable-optimizations
 # Some tests (like test_base64) must find libpython shared library at runtime.
@@ -42,11 +47,6 @@ CONFIGURE_ARGS += --with-lto
 else
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
-endif
-
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# older gcc does not know -Wno-unused-result
-CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
 endif
 
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
@@ -149,7 +149,7 @@ CROSSENV_WHEELS += poetry==1.6.1
 CROSSENV_WHEELS += scikit-build==0.17.6
 CROSSENV_WHEELS += setuptools-rust==1.7.0
 CROSSENV_WHEELS += setuptools-scm==7.1.0
-# For future usages when building numpy >= 1.26
+# For future use when building numpy >= 1.26
 #CROSSENV_WHEELS += meson-python==0.13.2
 #CROSSENV_WHEELS += scikit-build-core==0.5.0
 
@@ -166,7 +166,7 @@ endif
 endif
 
 # [maturin]
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==1.2.3
 endif
 
@@ -177,7 +177,7 @@ python311_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $(TC_PATH)$(TC_PREFIX)gcc --cxx $(TC_PATH)$(TC_PREFIX)c++ --ar $(TC_PATH)$(TC_PREFIX)ar --sysroot $(TC_SYSROOT) --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.41.2"
