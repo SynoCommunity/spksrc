@@ -166,9 +166,7 @@ endif
 endif
 
 # [maturin]
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += maturin==1.2.3
-endif
 
 # Create the crossenv in preparation for
 # cross-compiling all the necessary wheels
