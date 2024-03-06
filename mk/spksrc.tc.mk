@@ -52,7 +52,7 @@ include ../../mk/spksrc.download.mk
 checksum: download
 include ../../mk/spksrc.checksum.mk
 
-extract: checksum depend
+extract: checksum
 include ../../mk/spksrc.extract.mk
 
 fix: extract
@@ -70,7 +70,7 @@ include ../../mk/spksrc.tc-flags.mk
 rustc: flag
 include ../../mk/spksrc.tc-rust.mk
 
-all: rustc $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON) $(TC_LOCAL_VARS_MK)
+all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON) $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK):
