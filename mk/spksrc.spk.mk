@@ -547,16 +547,10 @@ pythonclean: wheelcleanall
 pythoncleanall: pythonclean
 	rm -fr work-*/[Pp]ython* work-*/.python*
 
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
 ### For managing make all-<supported|latest>
 include ../../mk/spksrc.supported.mk
 
 ### For managing make publish-all-<supported|latest>
 include ../../mk/spksrc.publish.mk
-
-### For managing make kernel related builds
-include ../../mk/spksrc.kernel.mk
 
 ###

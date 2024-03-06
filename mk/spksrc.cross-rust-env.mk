@@ -1,19 +1,23 @@
 # Configuration for rust compiler
 #
 
-# Force building from source Tier-3 toolchains (qoriq)
+ifeq ($(RUSTUP_DEFAULT_TOOLCHAIN),)
+RUSTUP_DEFAULT_TOOLCHAIN = stable
+endif
+
+# Set to 1 to force building from
+# source Tier-3 toolchains (qoriq)
+ifeq ($(RUST_BUILD_TOOLCHAIN),)
 RUST_BUILD_TOOLCHAIN = 0
+endif
 
 # Enforce using newer cmake when building Tier-3 toolchains
 ifeq ($(RUST_BUILD_TOOLCHAIN),1)
+DEPENDS += native/cmake
 CMAKE_PATH = $(abspath $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin)
 ifeq ($(findstring cmake,$(subst /,,$(subst :,,$(PATH)))),)
 export PATH:=$(CMAKE_PATH):$(PATH)
 endif
-endif
-
-ifeq ($(RUSTUP_DEFAULT_TOOLCHAIN),)
-RUSTUP_DEFAULT_TOOLCHAIN = stable
 endif
 
 # When calling directly from toolchain/syno-<arch>-<version>

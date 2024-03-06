@@ -15,7 +15,7 @@ smart-clean:
 changelog:
 	git log --pretty=format:"- %s" -- $(PWD)
 
-# If the first argument is "run"...
+# If the first argument is "rustup"...
 ifeq (rustup,$(firstword $(MAKECMDGOALS)))
   # use the rest as arguments for "run"
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))

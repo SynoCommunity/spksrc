@@ -44,13 +44,15 @@ TC_LOCAL_VARS_MESON = $(WORK_DIR)/tc_vars.meson
 
 RUN = cd $(WORK_DIR)/$(TC_TARGET) && env $(ENV)
 
+include ../../mk/spksrc.depend.mk
+
 download:
 include ../../mk/spksrc.download.mk
 
 checksum: download
 include ../../mk/spksrc.checksum.mk
 
-extract: checksum
+extract: checksum depend
 include ../../mk/spksrc.extract.mk
 
 fix: extract
