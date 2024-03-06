@@ -179,3 +179,6 @@ setup-synocommunity: setup
 		-e "s|DISTRIBUTOR_URL\s*=.*|DISTRIBUTOR_URL = https://synocommunity.com|" \
 		-e "s|REPORT_URL\s*=.*|REPORT_URL = https://github.com/SynoCommunity/spksrc/issues|" \
 		local.mk
+
+# Include framework self-test
+include mk/spksrc.test-rules.mk

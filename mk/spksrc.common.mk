@@ -2,6 +2,13 @@
 
 ###
 
+# Set basedir in case called from spkrc/ or from normal sub-dir
+ifeq ($(BASEDIR),)
+ifneq ($(shell basename $(CURDIR)),spksrc)
+BASEDIR = ../../
+endif
+endif
+
 # all will be the default target, regardless of what is defined in the other
 # makefiles.
 default: all
@@ -37,19 +44,19 @@ PIP_DOWNLOAD_ARGS = download --no-index --find-links $(PIP_DISTRIB_DIR) --disabl
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
 
 # Available toolchains formatted as '{ARCH}-{TC}'
-AVAILABLE_TOOLCHAINS = $(subst syno-,,$(sort $(notdir $(wildcard ../../toolchain/syno-*))))
+AVAILABLE_TOOLCHAINS = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)toolchain/syno-*))))
 AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell echo ${arch} | cut -f2 -d'-')))
 
 # Available toolchains formatted as '{ARCH}-{TC}'
-AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard ../../kernel/syno-*))))
+AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)kernel/syno-*))))
 AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell echo ${arch} | cut -f2 -d'-')))
 SUPPORTED_KERNEL_VERSIONS = 6.2.4 7.0
 
 # Global arch definitions
-include ../../mk/spksrc.archs.mk
+include $(BASEDIR)mk/spksrc.archs.mk
 
 # Load local configuration
-LOCAL_CONFIG_MK = ../../local.mk
+LOCAL_CONFIG_MK = $(BASEDIR)local.mk
 ifneq ($(wildcard $(LOCAL_CONFIG_MK)),)
 include $(LOCAL_CONFIG_MK)
 endif
