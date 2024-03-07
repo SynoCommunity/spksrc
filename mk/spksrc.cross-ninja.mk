@@ -7,31 +7,38 @@
 # Force path to pkg-config for cross-building
 ENV += PKG_CONFIG=/usr/bin/pkg-config
 
+# CMake - begin
+ifeq ($(strip $(CMAKE_USE_NINJA)),1)
+
 # Set default build directory
 ifeq ($(strip $(NINJA_BUILD_DIR)),)
-ifeq ($(strip $(CMAKE_USE_NINJA)),1)
 NINJA_BUILD_DIR = $(CMAKE_BUILD_DIR)
-else
-NINJA_BUILD_DIR = $(MESON_BUILD_DIR)
-endif
 endif
 
 # set default use destdir
 ifeq ($(strip $(NINJA_USE_DESTDIR)),)
 ifneq ($(strip $(CMAKE_USE_DESTDIR)),)
 NINJA_USE_DESTDIR = $(CMAKE_USE_DESTDIR)
-else
-NINJA_USE_DESTDIR = 1
 endif
 endif
 
 # set default destdir directory
 ifeq ($(strip $(NINJA_DESTDIR)),)
-ifeq ($(strip $(CMAKE_USE_NINJA)),1)
 NINJA_DESTDIR = $(CMAKE_DESTDIR)
-else
-NINJA_DESTDIR = $(INSTALL_DIR)
 endif
+
+# CMake - end
+# Meson - begin (default)
+else
+
+# Set default build directory
+NINJA_BUILD_DIR = $(MESON_BUILD_DIR)
+# set default use destdir
+NINJA_USE_DESTDIR = 1
+# set default destdir directory
+NINJA_DESTDIR = $(INSTALL_DIR)
+
+# Meson - end (default)
 endif
 
 # compile
