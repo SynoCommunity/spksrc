@@ -18,8 +18,4 @@ GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --with-curses --enable-static
 
-#ADDITIONAL_CFLAGS = -std=gnu99
-#ADDITIONAL_CPPFLAGS = -std=gnu99
-#ADDITIONAL_CPPFLAGS = -std=gnu++0x
-
 include ../../mk/spksrc.cross-cc.mk
