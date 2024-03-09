@@ -11,6 +11,7 @@ DEPENDS += cross/mg
 DEPENDS += cross/jupp
 DEPENDS += cross/iconv
 DEPENDS += cross/dos2unix
+DEPENDS += cross/patch
 
 OPTIONAL_DEPENDS  = cross/rmlint
 OPTIONAL_DEPENDS += cross/rnm
@@ -100,9 +101,9 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools, patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add xstow.<br/>2. Update dos2unix to v7.5.2.<br/>3. Update eza v0.18.6.<br/>4. Update fd to v9.0.0.<br/>5. Update fzf to v0.46.1.<br/>6. Update lzip to v1.24 and plzip to v1.11.<br/>7. Update ripgrep to v14.1.0."
+CHANGELOG = "1. Add xstow.<br/>2. Add patch.<br/>3. Update dos2unix to v7.5.2.<br/>4. Update eza v0.18.6.<br/>5. Update fd to v9.0.0.<br/>6. Update fzf to v0.46.1.<br/>7. Update lzip to v1.24 and plzip to v1.11.<br/>8. Update ripgrep to v14.1.0."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -150,6 +151,7 @@ SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
 
 SPK_COMMANDS += bin/xstow bin/xstow-static bin/merge-info
+SPK_COMMANDS += bin/patch
 
 include ../../mk/spksrc.spk.mk
 
