@@ -1,6 +1,7 @@
 distrib
 packages
 native/*/work*
+native/*/status*
 cross/*/work*
 cross/*/build*
 cross/*/status*
