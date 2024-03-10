@@ -5,7 +5,7 @@
 #  PYTHON_PACKAGE       Must be set to the python spk folder (python310, python311, ...)
 
 # set default spk/python* path to use
-PYTHON_PACKAGE_ROOT = $(realpath $(CURDIR)/../$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
+PYTHON_PACKAGE_ROOT = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 
 include ../../mk/spksrc.archs.mk
 
