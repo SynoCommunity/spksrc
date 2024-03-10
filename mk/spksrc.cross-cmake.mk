@@ -11,6 +11,9 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
+# cmake specific configurations
+include ../../mk/spksrc.cross-cmake-env.mk
+
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
@@ -36,8 +39,8 @@ CONFIGURE_TARGET = cmake_configure_target
 endif
 
 # install
-ifeq ($(strip $(CMAKE_DIR)),)
-CMAKE_DIR = $(CMAKE_BASE_DIR)
+ifeq ($(strip $(CMAKE_SOURCE_DIR)),)
+CMAKE_SOURCE_DIR = $(CMAKE_BASE_DIR)
 endif
 
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
@@ -54,10 +57,11 @@ INSTALL_TARGET = cmake_install_target
 endif
 endif
 
-###
+ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
+CMAKE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_PKG)
+endif
 
-# cmake specific configurations
-include ../../mk/spksrc.cross-cmake-env.mk
+###
 
 include ../../mk/spksrc.pre-check.mk
 
@@ -140,14 +144,9 @@ cmake_configure_target: $(CMAKE_TOOLCHAIN_PKG)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
-	@$(MSG)    - Path CMAKE_DIR = $(CMAKE_DIR)
+	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
-	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_PKG) $(CMAKE_ARGS) $(CMAKE_DIR)
-else
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(CMAKE_DIR)
-endif
+	$(RUN) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS)
 
 .PHONY: cmake_compile_target
 
@@ -155,7 +154,7 @@ endif
 cmake_compile_target:
 	@$(MSG) - CMake compile
 	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
-	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	$(RUN) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
 
 .PHONY: cmake_install_target
 
@@ -163,9 +162,9 @@ cmake_compile_target:
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install
+	$(RUN) cmake --install $(CMAKE_BUILD_DIR)
 else
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
+	$(RUN) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR)
 endif
 
 

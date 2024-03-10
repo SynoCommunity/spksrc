@@ -60,7 +60,7 @@ ninja_compile_target:
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 endif
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) ninja -C $(NINJA_BUILD_DIR)
+	$(RUN) ninja -C $(NINJA_BUILD_DIR)
 
 .PHONY: ninja_install_target
 
@@ -70,7 +70,7 @@ ninja_install_target:
 	@$(MSG)    - Ninja installation path = $(NINJA_DESTDIR)
 	@$(MSG)    - Ninja use DESTDIR = $(NINJA_USE_DESTDIR)
 ifeq ($(strip $(NINJA_USE_DESTDIR)),0)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) ninja -j $(NCPUS) -C $(NINJA_BUILD_DIR) install
+	$(RUN) ninja -C $(NINJA_BUILD_DIR) install
 else
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) DESTDIR=$(NINJA_DESTDIR) ninja -j $(NCPUS) -C $(NINJA_BUILD_DIR) install
+	$(RUN) DESTDIR=$(NINJA_DESTDIR) ninja -C $(NINJA_BUILD_DIR) install
 endif
