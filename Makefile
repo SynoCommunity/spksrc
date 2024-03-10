@@ -58,9 +58,6 @@ spk-clean:
 %: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE)
 
-%-clean: spk/%/Makefile
-	cd $(dir $^) && env $(MAKE) clean
-
 native-%: native/%/Makefile
 	cd $(dir $^) && env $(MAKE)
 
