@@ -3,7 +3,7 @@
 SHELL := $(SHELL) -e
 default: all
 
-WORK_DIR := $(shell pwd)/work
+WORK_DIR := $(CURDIR)/work
 include ../../mk/spksrc.directories.mk
 
 include ../../mk/spksrc.common.mk

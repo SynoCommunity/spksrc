@@ -13,7 +13,7 @@ smart-clean:
 
 .PHONY: changelog
 changelog:
-	git log --pretty=format:"- %s" -- $(PWD)
+	git log --pretty=format:"- %s" -- $(CURDIR)
 
 # If the first argument is "rustup"...
 ifeq (rustup,$(firstword $(MAKECMDGOALS)))

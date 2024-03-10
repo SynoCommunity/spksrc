@@ -9,6 +9,9 @@ BASEDIR = ../../
 endif
 endif
 
+# For legacy reasons keep $(PWD) call
+PWD := $(CURDIR)
+
 # all will be the default target, regardless of what is defined in the other
 # makefiles.
 default: all
@@ -121,7 +124,7 @@ PSTAT_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/status-b
 else ifneq ($(wildcard $(WORK_DIR)),)
 PSTAT_LOG = $(WORK_DIR)/../status-build.log
 else
-PSTAT_LOG = $(shell pwd)/status-build.log
+PSTAT_LOG = $(CURDIR)/status-build.log
 endif
 
 # Terminal colors

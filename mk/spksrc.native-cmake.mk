@@ -9,7 +9,7 @@ include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
 # Force build in native tool directrory, not cross directory.
-WORK_DIR := $(PWD)/work-native
+WORK_DIR := $(CURDIR)/work-native
 
 # Package dependend
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)

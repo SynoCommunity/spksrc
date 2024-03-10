@@ -41,8 +41,7 @@ include ../../mk/spksrc.plist.mk
 all: install plist
 
 
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
 ### For managing make all-<supported|latest>
 include ../../mk/spksrc.supported.mk
+
+####

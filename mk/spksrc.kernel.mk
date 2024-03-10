@@ -35,13 +35,13 @@ kernel-modules-%:
 	set -e ; \
 	for arch in $${archs2process} ; do \
 	  $(MSG) "Processing $${arch} ARCH" ; \
-	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(PWD)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*-kernel-modules.log ; \
+	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(CURDIR)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*-kernel-modules.log ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
 	  $(MAKE) spkclean ; \
-	  rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
+	  rm -fr $(CURDIR)/work-$*/$(addprefix linux-, $${arch}) ; \
 	  $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
 	done
 
 kernel-arch-%:
 	$(MAKE) $(addprefix kernel-modules-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
-	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $*)
+	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(CURDIR)/work-$* $(addprefix build-arch-, $*)
