@@ -496,6 +496,22 @@ endif
 clean:
 	rm -fr work work-* build-*.log publish-*.log
 
+# Remove work-*/<pkgname>* directories while keeping
+# work-*/.<pkgname>*|<pkgname>.plist status files
+# This is in order to resolve: 
+#    System.IO.IOException: No space left on device
+# when building online thru github-action
+clean-source:
+	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
+	   makefile="../../$${depend}/Makefile" ; \
+	   pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
+	   pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
+	   if [ -d work-*/$${pkgname}-* ] ; then \
+	      printf "rm -fr " && find work-*/$${pkgname}-* -maxdepth 0 -type d ; \
+	      find work-*/$${pkgname}-*/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
+	   fi ; \
+	done
+
 spkclean:
 	rm -fr work-*/.copy_done \
 	       work-*/.depend_done \
