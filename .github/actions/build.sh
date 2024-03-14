@@ -72,6 +72,8 @@ do
         else
             echo "$ make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
             make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+            make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
+            make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} spkclean |& tee >(tail -15 >>build.log)
         fi
     else
         if [ "${GH_ARCH}" = "noarch" ]; then
