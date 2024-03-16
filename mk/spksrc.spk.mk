@@ -500,15 +500,20 @@ clean:
 # work-*/.<pkgname>*|<pkgname>.plist status files
 # This is in order to resolve: 
 #    System.IO.IOException: No space left on device
-# when building online thru github-action
+# when building online thru github-action, in particular
+# for "packages-to-keep" such as python* and ffmpeg*
 clean-source:
 	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
 	   makefile="../../$${depend}/Makefile" ; \
-	   pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
-	   pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
-	   if [ -d work-*/$${pkgname}-* ] ; then \
-	      printf "rm -fr " && find work-*/$${pkgname}-* -maxdepth 0 -type d ; \
-	      find work-*/$${pkgname}-*/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
+	   pkgdirstr=$$(grep ^PKG_DIR $${makefile}) ; \
+	   pkgdir=$$(echo $${pkgdirstr#*=} | cut -f1 -d- | sed -s 's/[\$$\(\)]//g' | xargs) ; \
+	   if [ ! -d work-*/$${pkgdir}-* ] ; then \
+	      pkgdirstr=$$(grep ^$${pkgdir} $${makefile}) ; \
+	      pkgdir=$$(echo $${pkgdirstr#*=} | xargs) ; \
+	   fi ; \
+	   if [ -d work-*/$${pkgdir}-* ] ; then \
+	      printf "rm -fr " && find work-*/$${pkgdir}-* -maxdepth 0 -type d ; \
+	      find work-*/$${pkgdir}-*/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
 	   fi ; \
 	done
 
