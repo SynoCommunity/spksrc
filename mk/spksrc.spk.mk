@@ -517,7 +517,7 @@ clean-source: spkclean
 	   #echo "depend: [$${depend}] - pkgdir: [$${pkgdir}]" ; \
 	   find work-*/$${pkgdir}[-_]* -maxdepth 0 -type d 2>/dev/null | while read sourcedir ; do \
 	      echo "rm -fr $$sourcedir" ; \
-	      #find $${sourcedir}/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
+	      find $${sourcedir}/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
 	   done ; \
 	done
 
