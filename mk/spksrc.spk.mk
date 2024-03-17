@@ -500,16 +500,25 @@ clean:
 # work-*/.<pkgname>*|<pkgname>.plist status files
 # This is in order to resolve: 
 #    System.IO.IOException: No space left on device
-# when building online thru github-action
-clean-source:
+# when building online thru github-action, in particular
+# for "packages-to-keep" such as python* and ffmpeg*
+clean-source: SHELL:=/bin/bash
+clean-source: spkclean
 	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
 	   makefile="../../$${depend}/Makefile" ; \
-	   pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
-	   pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
-	   if [ -d work-*/$${pkgname}-* ] ; then \
-	      printf "rm -fr " && find work-*/$${pkgname}-* -maxdepth 0 -type d ; \
-	      find work-*/$${pkgname}-*/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
+	   pkgdirstr=$$(grep ^PKG_DIR $${makefile} || true) ; \
+	   pkgdir=$$(echo $${pkgdirstr#*=} | cut -f1 -d- | sed -s 's/[\)]/ /g' | sed -s 's/[\$$\(\)]//g' | cut -f1 -d' ' | xargs) ; \
+	   if [ ! "$${pkgdirstr}" ]; then \
+	      continue ; \
+	   elif echo "$${pkgdir}" | grep -Eq '^(PKG_|DIST)'; then \
+	      pkgdirstr=$$(grep ^$${pkgdir} $${makefile}) ; \
+	      pkgdir=$$(echo $${pkgdirstr#*=} | xargs) ; \
 	   fi ; \
+	   #echo "depend: [$${depend}] - pkgdir: [$${pkgdir}]" ; \
+	   find work-*/$${pkgdir}[-_]* -maxdepth 0 -type d 2>/dev/null | while read sourcedir ; do \
+	      echo "rm -fr $$sourcedir" ; \
+	      find $${sourcedir}/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
+	   done ; \
 	done
 
 spkclean:
