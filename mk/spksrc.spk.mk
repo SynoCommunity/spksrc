@@ -502,19 +502,23 @@ clean:
 #    System.IO.IOException: No space left on device
 # when building online thru github-action, in particular
 # for "packages-to-keep" such as python* and ffmpeg*
-clean-source:
+clean-source: SHELL:=/bin/bash
+clean-source: spkclean
 	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
 	   makefile="../../$${depend}/Makefile" ; \
-	   pkgdirstr=$$(grep ^PKG_DIR $${makefile}) ; \
-	   pkgdir=$$(echo $${pkgdirstr#*=} | cut -f1 -d- | sed -s 's/[\$$\(\)]//g' | xargs) ; \
-	   if [ ! -d work-*/$${pkgdir}-* ] ; then \
+	   pkgdirstr=$$(grep ^PKG_DIR $${makefile} || true) ; \
+	   pkgdir=$$(echo $${pkgdirstr#*=} | cut -f1 -d- | sed -s 's/[\)]/ /g' | sed -s 's/[\$$\(\)]//g' | cut -f1 -d' ' | xargs) ; \
+	   if [ ! "$${pkgdirstr}" ]; then \
+	      continue ; \
+	   elif echo "$${pkgdir}" | grep -Eq '^(PKG_|DIST)'; then \
 	      pkgdirstr=$$(grep ^$${pkgdir} $${makefile}) ; \
 	      pkgdir=$$(echo $${pkgdirstr#*=} | xargs) ; \
 	   fi ; \
-	   if [ -d work-*/$${pkgdir}-* ] ; then \
-	      printf "rm -fr " && find work-*/$${pkgdir}-* -maxdepth 0 -type d ; \
-	      find work-*/$${pkgdir}-*/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
-	   fi ; \
+	   #echo "depend: [$${depend}] - pkgdir: [$${pkgdir}]" ; \
+	   find work-*/$${pkgdir}[-_]* -maxdepth 0 -type d 2>/dev/null | while read sourcedir ; do \
+	      echo "rm -fr $$sourcedir" ; \
+	      #find $${sourcedir}/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
+	   done ; \
 	done
 
 spkclean:
