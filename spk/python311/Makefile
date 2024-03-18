@@ -1,7 +1,7 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.5
+SPK_VERS = 3.11.8
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/python3.png
 
 # Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
@@ -18,7 +18,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.5"
+CHANGELOG = "1. Update to Python 3.11.8"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -28,7 +28,7 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS = src/requirements-pure.txt
 
 # Force testing all wheel builds
-WHEELS_TEST_ALL = 0
+WHEELS_TEST_ALL = 1
 
 SERVICE_SETUP = src/service-setup.sh
 
