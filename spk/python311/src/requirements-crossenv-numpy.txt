@@ -8,4 +8,4 @@
 #   - Require Cython in cross/python311 crossenv
 #   - Numpy >= 1.25.x require c++17
 numpy==1.25.2
-numpy==1.26.4
+#numpy==1.26.4
