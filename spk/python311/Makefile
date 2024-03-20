@@ -72,6 +72,7 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 DEPENDS += cross/freetype cross/lcms2 cross/libimagequant cross/libjpeg
 DEPENDS += cross/libraqm cross/libtiff cross/libwebp cross/zlib
 WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += -C platform-guessing=disable
 WHEELS_BUILD_ARGS += -C freetype=enable
 WHEELS_BUILD_ARGS += -C imagequant=enable
 WHEELS_BUILD_ARGS += -C jpeg=enable
