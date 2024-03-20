@@ -40,10 +40,10 @@ If you can't find an answer, or if you want to open a package request, read [CON
 cd spksrc # Go to the cloned repository's root folder.
 
 # If running on Linux:
-docker run -it -v $(pwd):/spksrc -w /spksrc ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc ghcr.io/synocommunity/spksrc /bin/bash
 
 # If running on macOS:
-docker run -it -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 ```
 5. From there, follow the instructions in the [Developers HOW TO].
 
@@ -137,7 +137,7 @@ $ lxc exec spksrc -- su --login root
 # exit
 ```
 
-#### (OPTIONAL) LXC: Shared `spksrc` user 
+#### (OPTIONAL) LXC: Shared `spksrc` user
 You can create a shared user between your Debian/Ubuntu host and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already created a user `spksrc` with uid 1001 in your Debian/Ubuntu host environment and that you which to share its `/home` userspace.
 1. Create a mapping rule between the hosts and the LXC image:
 ```bash
