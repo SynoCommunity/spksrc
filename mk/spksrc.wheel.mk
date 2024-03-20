@@ -159,7 +159,7 @@ ifneq ($(strip $(WHEELS)),)
 	      file=$$(basename $${requirement%%:*}) ; \
 	      [ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
 	      [ "$$(grep -s egg <<< $${wheel})" ] && name=$$(echo $${wheel#*egg=} | cut -f1 -d=) || name=$${wheel%%[<>=]=*} ; \
-	      global_options=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs) ; \
+	      pip_args=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs) ; \
 	      localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	      localLDFLAGS=($$(echo $(WHEELS_LDFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	      localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
@@ -170,7 +170,7 @@ ifneq ($(strip $(WHEELS)),)
 	         $$([ "$$(echo $${localCXXFLAGS[@]})" ] && echo "CXXFLAGS=\"$${localCXXFLAGS[@]}\" ") \
 	         $$([ "$$(echo $${localLDFLAGS[@]})" ] && echo "LDFLAGS=\"$${localLDFLAGS[@]}\" ") \
 	         $$([ "$$(echo $${abi3})" ] && echo "$${abi3} ")" \
-	         $${global_options}" ; \
+	         $${pip_args}" ; \
 	      PIP_CROSSENV=$${crossenvPIP} \
 	         REQUIREMENT=$${wheel} \
 	         ADDITIONAL_CFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
@@ -178,7 +178,7 @@ ifneq ($(strip $(WHEELS)),)
 	         ADDITIONAL_CXXFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCXXFLAGS[@]}" \
 	         ADDITIONAL_LDFLAGS="$${localLDFLAGS[@]}" \
 	         ABI3="$${abi3}" \
-	         PIP_GLOBAL_OPTION="$${global_options}" \
+	         PIP_ARGS="$${pip_args}" \
 	         $(MAKE) \
 	         cross-compile-wheel-$${name} || exit 1 ; \
 	   done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API)) ; \
@@ -199,15 +199,20 @@ endif
 
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
-	@if [ "$(PIP_GLOBAL_OPTION)" ]; then \
-	   pip_global_option=$$(echo $(PIP_GLOBAL_OPTION) | sed 's/=\([^ ]*\)/="\1"/g; s/[^ ]*/--global-option=&/g') ; \
-	   pip_global_option=$${pip_global_option}" --no-use-pep517" ; \
+	@if [ "$(PIP_ARGS)" ]; then \
+	   if echo "$(PIP_ARGS)" | grep -Eq '^(build_ext)'; then \
+	      pip_global_option=$$(echo $(PIP_ARGS) | sed 's/=\([^ ]*\)/="\1"/g; s/[^ ]*/--global-option=&/g') ; \
+	      pip_global_option=$${pip_global_option}" --no-use-pep517" ; \
+	   else \
+	      pip_args="$(PIP_ARGS)" ; \
+	   fi ; \
 	fi ; \
 	$(MSG) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	   $(PIP_CROSSENV) \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
+	   $${pip_args} \
 	   --no-build-isolation \
 	   $(ABI3) \
 	   $(REQUIREMENT) ; \
@@ -216,6 +221,7 @@ cross-compile-wheel-%:
 	   $(PIP_CROSSENV) \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
+	   $${pip_args} \
 	   --no-build-isolation \
 	   $(ABI3) \
 	   $(REQUIREMENT)
