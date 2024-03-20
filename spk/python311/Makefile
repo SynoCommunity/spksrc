@@ -68,20 +68,6 @@ DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
-# [Pillow]
-DEPENDS += cross/freetype cross/lcms2 cross/libimagequant cross/libjpeg
-DEPENDS += cross/libraqm cross/libtiff cross/libwebp cross/zlib
-WHEELS_BUILD_ARGS += [Pillow]
-WHEELS_BUILD_ARGS += -C platform-guessing=disable
-WHEELS_BUILD_ARGS += -C freetype=enable
-WHEELS_BUILD_ARGS += -C imagequant=enable
-WHEELS_BUILD_ARGS += -C jpeg=enable
-WHEELS_BUILD_ARGS += -C lcms=enable
-WHEELS_BUILD_ARGS += -C raqm=enable
-WHEELS_BUILD_ARGS += -C tiff=enable
-WHEELS_BUILD_ARGS += -C webp=enable
-WHEELS_BUILD_ARGS += -C zlib=enable
-
 # [pycares]
 DEPENDS += cross/c-ares
 ENV += PYCARES_USE_SYSTEM_LIB=1
@@ -119,6 +105,23 @@ endif
 
 ## WHEELS_TEST_ALL: Force testing all wheel building
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
+
+# [Pillow]
+DEPENDS += cross/freetype cross/lcms2 cross/libimagequant cross/libjpeg
+DEPENDS += cross/libtiff cross/libwebp cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += -C platform-guessing=disable
+WHEELS_BUILD_ARGS += -C freetype=enable
+WHEELS_BUILD_ARGS += -C imagequant=enable
+WHEELS_BUILD_ARGS += -C jpeg=enable
+WHEELS_BUILD_ARGS += -C lcms=enable
+WHEELS_BUILD_ARGS += -C tiff=enable
+WHEELS_BUILD_ARGS += -C webp=enable
+WHEELS_BUILD_ARGS += -C zlib=enable
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS_BUILD_ARGS += -C raqm=enable
+DEPENDS += cross/libraqm
+endif
 
 # [rpds-py]
 # maturin canot be built as pre-requisite crossenv
