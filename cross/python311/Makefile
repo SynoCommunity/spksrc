@@ -155,13 +155,15 @@ CROSSENV_WHEELS += setuptools-scm==8.0.4
 
 # [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
 # [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
+# [numpy] <= 1.23.5 (any) requires setuptools <= 63.4.3 - unsupported
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 # [numpy] <= 1.24.4 last working version with gcc-4.9
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 CROSSENV_WHEELS += numpy==1.24.4
 # [numpy] >= 1.25.0 requires c++17
 else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-CROSSENV_WHEELS += numpy==1.26.4
+CROSSENV_WHEELS += numpy==1.25.2
+#CROSSENV_WHEELS += numpy==1.26.4
 endif
 endif
 
