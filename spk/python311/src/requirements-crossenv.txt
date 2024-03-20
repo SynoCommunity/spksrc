@@ -54,7 +54,7 @@ mysqlclient==2.2.4
 # [Pillow]
 # Require --global-options arguments
 #  WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
-Pillow==9.5.0
+Pillow==10.2.0
 
 # [pycares]
 # Depends: c-ares
