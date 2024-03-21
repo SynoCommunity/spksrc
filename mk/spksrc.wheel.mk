@@ -142,6 +142,7 @@ build_wheel_target: $(PRE_WHEEL_TARGET)
 ifneq ($(strip $(WHEELS)),)
 	$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e)))
 	@if [ -s $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) -o -s $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ]; then \
+	   . $(WORK_DIR)/crossenv/bin/activate ; \
 	   $(MSG) "Cross-compiling wheels" ; \
 	   crossenvPIP=$(PIP) ; \
 	   if [ -s "$(CROSSENV)" ] ; then \
