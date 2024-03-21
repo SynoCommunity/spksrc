@@ -37,6 +37,11 @@ POST_STRIP_TARGET = homeassistant_extra_install
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
 WHEELS = src/requirements-abi3.txt src/requirements-crossenv.txt src/requirements-pure.txt
 
+# stdc++ bindings for webrtc_noise_gain
+ADDITIONAL_CROSSENV_WHEELS += pybind11==2.11.1
+# for building frozenlist, yarl, ...
+ADDITIONAL_CROSSENV_WHEELS += expandvars==0.12.0
+
 # [DTLSSocket] runtime dependency of [tradfri]
 DEPENDS += cross/dtlssocket
 
@@ -106,9 +111,6 @@ DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
 include ../../mk/spksrc.python.mk
-
-# prefer native python tools (pip, maturin, ...)
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
 # [greenlet]
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
