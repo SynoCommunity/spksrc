@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 3.2
-SPK_REV = 22
+SPK_VERS = 3.3
+SPK_REV = 23
 SPK_ICON = src/synocli-file.png
 
 # packages depending on cross/zlib must be defined later, see below
@@ -11,11 +11,20 @@ DEPENDS += cross/mg
 DEPENDS += cross/jupp
 DEPENDS += cross/iconv
 DEPENDS += cross/dos2unix
-DEPENDS += cross/lsd
+DEPENDS += cross/patch
 
-OPTIONAL_DEPENDS  = cross/rmlint cross/rnm cross/micro cross/fzf cross/ripgrep cross/fd cross/sd
-OPTIONAL_DEPENDS += cross/bat cross/eza
+OPTIONAL_DEPENDS  = cross/rmlint
+OPTIONAL_DEPENDS += cross/rnm
+OPTIONAL_DEPENDS += cross/micro
+OPTIONAL_DEPENDS += cross/fzf
+OPTIONAL_DEPENDS += cross/ripgrep
+OPTIONAL_DEPENDS += cross/fd cross/fd_8.7.0
+OPTIONAL_DEPENDS += cross/sd
+OPTIONAL_DEPENDS += cross/bat
+OPTIONAL_DEPENDS += cross/eza
 OPTIONAL_DEPENDS += cross/nnn cross/nnn_4.0
+OPTIONAL_DEPENDS += cross/lsd
+OPTIONAL_DEPENDS += cross/xstow
 
 MAINTAINER = hgy59
 DISPLAY_NAME = SynoCli File Tools
@@ -67,22 +76,34 @@ DEPENDS += cross/micro cross/fzf
 OPTIONAL_DESC := $(OPTIONAL_DESC)", micro (editor), fzf (fuzzy finder)"
 endif
 
+# OLD_PPC archs are not supported with rust
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += cross/fd_8.7.0
+else
 DEPENDS += cross/fd
+endif
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 DEPENDS += cross/sd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
+DEPENDS += cross/lsd
+OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
+endif
+
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/xstow
+OPTIONAL_DESC := $(OPTIONAL_DESC)", xstow"
 endif
 
 # activate additional features for pcre2grep and pcre2test
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools, lsd$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools, patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add lsd v1.0.0.<br/>2. Update bat to v0.24.0.<br/>3. Update eza to v0.16.1.<br/>4. Update fd to v8.7.0.<br/>5. Update fzf to v0.44.1.<br/>6. Update micro to v2.0.13.<br/>7. Update sd to v1.0.0."
+CHANGELOG = "1. Add xstow.<br/>2. Add patch.<br/>3. Update dos2unix to v7.5.2.<br/>4. Update eza v0.18.6.<br/>5. Update fd to v9.0.0.<br/>6. Update fzf to v0.46.1.<br/>7. Update mc to v4.8.31.<br/>8. Update lzip to v1.24 and plzip to v1.11.<br/>9. Update ripgrep to v14.1.0."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -128,6 +149,9 @@ SPK_COMMANDS += bin/sfv-hash
 SPK_COMMANDS += bin/tiger-hash
 SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
+
+SPK_COMMANDS += bin/xstow bin/xstow-static bin/merge-info
+SPK_COMMANDS += bin/patch
 
 include ../../mk/spksrc.spk.mk
 
