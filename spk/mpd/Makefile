@@ -9,9 +9,9 @@ DEPENDS = cross/mpd
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 
-MAINTAINER = DigitalBox98
+MAINTAINER = hgy59
 DESCRIPTION = Music Player Daemon \(MPD\) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
-CHANGELOG = "Initial package release."
+CHANGELOG = "Update mpd to v0.23.15, available for DSM 7 only."
 
 DISPLAY_NAME = Music Player Daemon
 

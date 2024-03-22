@@ -15,22 +15,30 @@ service_postinst ()
 
 service_preupgrade ()
 {
-    # create file with installer variables on the fly
-    if [ ! -e "${INST_VARIABLES}" ]; then
-        if [ -e "${CFG_FILE}" ]; then
-            if [ -z "${SHARE_PATH}" ]; then
-                SHARE_PATH=$(cat ${CONFIG_FILE} | grep music_directory | awk '{print $2}')
-            fi
+    if [ ! -e "${CFG_FILE}" ]; then
+        echo "WARNING: cannot update ${INST_VARIABLES}. Config not found: ${CFG_FILE}"
+    else
+        if [ ! -e "${INST_VARIABLES}" ]; then
+            # create file with installer variables on the fly
+            SHARE_PATH=$(cat ${CFG_FILE} | grep ^music_directory | awk '{print $2}' | tr -d \")
             if [ -z "${SHARE_NAME}" -a -n "${SHARE_PATH}" ]; then
                 SHARE_NAME=$(basename ${SHARE_PATH})
             fi
             echo "Create ${INST_VARIABLES} [SHARE_PATH=${SHARE_PATH}, SHARE_NAME=${SHARE_NAME}]"
             save_wizard_variables
         else
-            echo "WARNING: cannot create ${INST_VARIABLES}. Config not found: ${CONFIG_FILE}"
+            # fix installer variables of former installation (stored share name as SHARE_PATH)
+            SHARE_PATH=$(echo "${SHARE_PATH}" | grep ^/)
+            if [ -z "${SHARE_PATH}" -o -z "${SHARE_NAME}" ]; then
+                if [ -z "${SHARE_PATH}" ]; then
+                    SHARE_PATH=$(cat ${CFG_FILE} | grep ^music_directory | awk '{print $2}' | tr -d \")
+                fi
+                if [ -z "${SHARE_NAME}" -a -n "${SHARE_PATH}" ]; then
+                    SHARE_NAME=$(basename ${SHARE_PATH})
+                fi
+                echo "Update ${INST_VARIABLES} [SHARE_PATH=${SHARE_PATH}, SHARE_NAME=${SHARE_NAME}]"
+                save_wizard_variables
+            fi
         fi
-    else
-        echo "Installer variables available"
-        cat "${INST_VARIABLES}"
     fi
 }
