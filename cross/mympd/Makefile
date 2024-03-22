@@ -1,12 +1,12 @@
 PKG_NAME = mympd
-PKG_VERS = 10.2.4
+PKG_VERS = 14.1.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jcorporation/myMPD/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = myMPD-$(PKG_VERS)
 
-DEPENDS = cross/libmpdclient cross/openssl cross/pcre2 cross/libid3tag
+DEPENDS = cross/libmpdclient cross/openssl3 cross/pcre2 cross/libid3tag
 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
@@ -28,6 +28,6 @@ mympd_post_install:
 	@install $(WORK_DIR)/$(PKG_DIR)/build/dist/libmympdclient/liblibmympdclient.so   $(STAGING_INSTALL_PREFIX)/lib/
 	@install $(WORK_DIR)/$(PKG_DIR)/build/dist/mjson/libmjson.so                     $(STAGING_INSTALL_PREFIX)/lib/
 	@install $(WORK_DIR)/$(PKG_DIR)/build/dist/mongoose/libmongoose.so               $(STAGING_INSTALL_PREFIX)/lib/
+	@install $(WORK_DIR)/$(PKG_DIR)/build/dist/mpack/libmpack.so                     $(STAGING_INSTALL_PREFIX)/lib/
 	@install $(WORK_DIR)/$(PKG_DIR)/build/dist/rax/librax.so                         $(STAGING_INSTALL_PREFIX)/lib/
 	@install $(WORK_DIR)/$(PKG_DIR)/build/dist/sds/libsds.so                         $(STAGING_INSTALL_PREFIX)/lib/
-	@install $(WORK_DIR)/$(PKG_DIR)/build/dist/tinymt/libtinymt.so                   $(STAGING_INSTALL_PREFIX)/lib/

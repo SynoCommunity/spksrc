@@ -1,6 +1,6 @@
 SPK_NAME = mympd
-SPK_VERS = 10.2.4
-SPK_REV = 1
+SPK_VERS = 14.1.0
+SPK_REV = 2
 SPK_ICON = src/mympd.png
 DSM_UI_DIR = app
 
