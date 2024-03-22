@@ -26,7 +26,7 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 NO_SERVICE_SHORTCUT = yes
 
-SERVICE_WIZARD_SHARE_NAME = wizard_music_folder
+SERVICE_WIZARD_SHARENAME = wizard_music_folder
 FWPORTS = src/mpd.sc
 
 POST_STRIP_TARGET = mpd_extra_install
