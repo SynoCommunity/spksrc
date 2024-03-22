@@ -1,5 +1,5 @@
 PKG_NAME = mpd
-PKG_VERS = 0.23.12
+PKG_VERS = 0.23.15
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MusicPlayerDaemon/MPD/archive
@@ -11,8 +11,6 @@ PKG_DIR = MPD-$(PKG_VERS)
 # GCC version is too old. You need at least version 8.
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
-
-OPTIONAL_DEPENDS = cross/libmad
 
 include ../../mk/spksrc.archs.mk
 
