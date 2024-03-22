@@ -15,8 +15,8 @@ CHANGELOG = "Initial package release."
 
 DISPLAY_NAME = Music Player Daemon
 
-HOMEPAGE   = https://www.musicpd.org/
-LICENSE    = GPLv2
+HOMEPAGE = https://www.musicpd.org/
+LICENSE = GPLv2
 
 WIZARDS_DIR = src/wizards
 
@@ -26,8 +26,7 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 NO_SERVICE_SHORTCUT = yes
 
-SERVICE_WIZARD_SHARE = wizard_music_folder
-USE_DATA_SHARE_WORKER = yes
+SERVICE_WIZARD_SHARE_NAME = wizard_music_folder
 FWPORTS = src/mpd.sc
 
 POST_STRIP_TARGET = mpd_extra_install

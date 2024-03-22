@@ -7,7 +7,7 @@ SVC_WRITE_PID=y
 service_postinst ()
 {
     # Edit the configuration according to the wizard
-    sed -i -e "s|@music_directory@|${wizard_music_volume}/${wizard_music_folder}|g" ${CFG_FILE}
+    sed -i -e "s|@music_directory@|${SHARE_PATH}|g" ${CFG_FILE}
 
     # Create playlists folder
     mkdir -p "${SYNOPKG_PKGVAR}/playlists"
