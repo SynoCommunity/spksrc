@@ -27,7 +27,7 @@ TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
 TC_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
 TC_VARS_MESON = $(WORK_DIR)/tc_vars.meson
 
-# These two variables are needed to build the CFLAGS and LDFLAGS env variables
+# Mandatory to build the CFLAGS and LDFLAGS env variables
 export INSTALL_DIR
 export INSTALL_PREFIX
 

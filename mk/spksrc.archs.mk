@@ -1,5 +1,16 @@
 # Common arch definitions
 
+###
+
+# Set basedir in case called from spkrc/ or from normal sub-dir
+ifeq ($(BASEDIR),)
+ifneq ($(shell basename $(CURDIR)),spksrc)
+BASEDIR = ../../
+endif
+endif
+
+###
+
 # All available CPU architectures
 
 # Distinct SRM and DSM archs to allow handling of different TCVERSION ranges.
@@ -33,7 +44,7 @@ x64_ARCHS = $(GENERIC_x64_ARCH) apollolake avoton braswell broadwell broadwellnk
 
 # Arch groups
 ALL_ARCHS = $(x64_ARCHS) $(i686_ARCHS) $(PPC_ARCHS) $(ARM_ARCHS)
-ARCHS_WITH_GENERIC_SUPPORT = $(sort $(foreach version, $(AVAILABLE_TCVERSIONS), $(foreach arch, $(GENERIC_ARCHS), $(addsuffix -$(version),$(shell sed -n 's/^TC_ARCH = \(.*\)/\1/p' ../../toolchain/syno-$(arch)-$(version)/Makefile 2>/dev/null)))))
+ARCHS_WITH_GENERIC_SUPPORT = $(sort $(foreach version, $(AVAILABLE_TCVERSIONS), $(foreach arch, $(GENERIC_ARCHS), $(addsuffix -$(version),$(shell sed -n 's/^TC_ARCH = \(.*\)/\1/p' $(BASEDIR)toolchain/syno-$(arch)-$(version)/Makefile 2>/dev/null)))))
 # PPC_ARCHS except qoriq
 OLD_PPC_ARCHS = powerpc ppc824x ppc853x ppc854x
 

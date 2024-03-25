@@ -6,6 +6,8 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
+### NOP
+
 # Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
 # CPython core team, see https://peps.python.org/pep-0011/ for more information.
 # And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).

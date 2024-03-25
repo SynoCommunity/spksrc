@@ -11,9 +11,14 @@ TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 TC_RUSTFLAGS = -C target-cpu=e500
 
+OPTIONAL_DEPENDS = native/rust-qoriq
 POST_FIX_TARGET = qoriq_post_fix_target
 
 include ../../mk/spksrc.tc.mk
+
+ifneq ($(RUST_BUILD_TOOLCHAIN),1)
+DEPENDS = native/rust-qoriq
+endif
 
 .PHONY: qoriq_post_fix_target
 qoriq_post_fix_target:

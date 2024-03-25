@@ -58,9 +58,6 @@ spk-clean:
 %: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE)
 
-%-clean: spk/%/Makefile
-	cd $(dir $^) && env $(MAKE) clean
-
 native-%: native/%/Makefile
 	cd $(dir $^) && env $(MAKE)
 
@@ -166,6 +163,7 @@ local.mk:
 	@echo "DISTRIBUTOR_URL =" >> $@
 	@echo "REPORT_URL =" >> $@
 	@echo "DEFAULT_TC =" >> $@
+	@echo "#PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
 
 dsm-%: local.mk
@@ -178,3 +176,6 @@ setup-synocommunity: setup
 		-e "s|DISTRIBUTOR_URL\s*=.*|DISTRIBUTOR_URL = https://synocommunity.com|" \
 		-e "s|REPORT_URL\s*=.*|REPORT_URL = https://github.com/SynoCommunity/spksrc/issues|" \
 		local.mk
+
+# Include framework self-test
+include mk/spksrc.test-rules.mk
