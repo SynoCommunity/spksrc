@@ -1,28 +1,25 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 18
+SPK_REV = 21
 SPK_ICON = src/radarr.png
 
-REQUIRED_MIN_DSM = 5.0
+OPTIONAL_DEPENDS = cross/libstdc++
+DEPENDS = cross/radarr
 
-# .NET is not supported on PPC, ARM5, ARM7L and x86
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS)
-
-DEPENDS = cross/libstdc++ cross/libmediainfo cross/sqlite cross/radarr
+# Arch exclusions for dotnet 6.0
+DOTNET_SERVARR_ARCHS = 1
 
 MAINTAINER = Team Radarr
 MAINTAINER_URL = https://radarr.video/
-HELPURL = https://wiki.servarr.com/Radarr
-SUPPORTURL = https://radarr.video/\#support
-
 DESCRIPTION = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
-STARTABLE = yes
+CHANGELOG = "1. Update Radarr to v5.1.3.8246."
 DISPLAY_NAME = Radarr
-CHANGELOG = "1. Update Radarr to v3.2.2.5080 .NET Core.<br/>2. Use writable temp folder to fix internal updates on DSM >= 7.1.<br/>3. Fix config folder migration for DSM 7."
-
 HOMEPAGE = https://radarr.video/
 LICENSE = GPLv3
+LICENSE_FILE = $(WORK_DIR)/Radarr/LICENSE
+HELPURL = https://wiki.servarr.com/Radarr
 
+STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8310
@@ -36,7 +33,14 @@ WIZARDS_DIR = src/wizard/
 POST_STRIP_TARGET = radarr_extra_install
 
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
+# TMPDIR is used for radarr built in backup and update
 USE_ALTERNATE_TMPDIR = 1
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# dotnet requires libstdc++ version >= 6.0.22
+DEPENDS += cross/libstdc++
+endif
 
 include ../../mk/spksrc.spk.mk
 
@@ -45,6 +49,7 @@ PACKAGE_AUTHOR = [Team Radarr](https://radarr.video)
 
 .PHONY: radarr_extra_install
 radarr_extra_install:
-	@install -m 755 -d $(STAGING_DIR)/app
-	@install -m 644 src/config.xml $(STAGING_DIR)/app/config.xml
+	@$(MSG) "Install config.xml and provide package_info."
+	@install -m 755 -d $(STAGING_DIR)/var/.config/Radarr
+	@install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Radarr/config.xml
 	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Radarr/package_info

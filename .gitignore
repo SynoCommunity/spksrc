@@ -6,6 +6,7 @@ cross/*/build*
 kernel/*/work*
 spk/*/work*
 spk/*/build*
+spk/*/publish*
 diyspk/*/work*
 toolchain/*/work*
 toolchain/*/*_done
@@ -13,3 +14,6 @@ toolkit/*/work*
 local.mk
 *.DS_Store
 *~
+
+# PyCharm project settings
+.idea

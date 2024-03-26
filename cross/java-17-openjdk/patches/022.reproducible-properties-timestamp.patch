@@ -1,0 +1,37 @@
+Description: Makes the timestamp in the properties files header reproducible when SOURCE_DATE_EPOCH is specified
+Author: Emmanuel Bourg <ebourg@apache.org>
+Forwarded: no
+--- a/src/java.base/share/classes/java/util/Properties.java
++++ b/src/java.base/share/classes/java/util/Properties.java
+@@ -903,7 +903,7 @@ public class Properties extends Hashtabl
+         if (comments != null) {
+             writeComments(bw, comments);
+         }
+-        bw.write("#" + new Date().toString());
++        bw.write("#" + getFormattedTimestamp());
+         bw.newLine();
+         synchronized (this) {
+             for (Map.Entry<Object, Object> e : entrySet()) {
+@@ -1555,4 +1555,22 @@ public class Properties extends Hashtabl
+         }
+         this.map = map;
+     }
++
++    /**
++     * Returns a formatted timestamp to be used in the properties file header.
++     * The date used is the current date, unless the SOURCE_DATE_EPOCH
++     * environment variable is specified. In this case the format used is
++     * locale and timezone insensitive to ensure the output is reproducible.
++     */
++    private String getFormattedTimestamp() {
++        if (System.getenv("SOURCE_DATE_EPOCH") == null) {
++            return new Date().toString();
++        } else {
++            // Use the SOURCE_DATE_EPOCH timestamp and make the format locale/timezone insensitive
++            java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", java.util.Locale.ENGLISH);
++            fmt.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
++            Date date = new Date(1000 * Long.parseLong(System.getenv("SOURCE_DATE_EPOCH")));
++            return fmt.format(date);
++        }
++    }
+ }

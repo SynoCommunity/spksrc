@@ -1,5 +1,5 @@
 PKG_NAME = gitea
-PKG_VERS = 1.17.0
+PKG_VERS = 1.21.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/go-gitea/gitea/archive
@@ -17,6 +17,9 @@ ENV += NPM_CONFIG_USER=root
 CGO_ENABLED = 1
 COMPILE_TARGET = gitea_compile_target
 GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
+
+export EXTRA_GOFLAGS=-buildvcs=false
+
 include ../../mk/spksrc.cross-go.mk
 
 # PATH must be defined after include of spksrc.cross-go.mk,

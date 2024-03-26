@@ -1,8 +1,8 @@
 PKG_NAME = arp-scan
-PKG_VERS = 1.9.7
+PKG_VERS = 1.10.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/royhills/$(PKG_NAME)/archive
+PKG_DIST_SITE = https://github.com/royhills/arp-scan/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 

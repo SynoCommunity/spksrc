@@ -22,6 +22,8 @@ CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(INSTALL_PREFIX)/lib
 CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
 CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
 CMAKE_ARGS += -DENABLE_LIBNUMA=OFF
+CMAKE_ARGS += -DENABLE_PIC=ON
+#CMAKE_ARGS += -DENABLE_CLI=OFF
 
 # additional cmake args for the build of 10 and 12 bit depth libraries
 CMAKE_BITLIB_ARGS =
@@ -29,18 +31,7 @@ CMAKE_BITLIB_ARGS =
 # additional cmake args for the final multilib build
 CMAKE_MULTILIB_ARGS =
 
-include ../../mk/spksrc.cross-cc.mk
-
-# gcc version above 4.8 required to support hdr10plus
-PLIST_TRANSFORM = sed -e '/:lib\/libhdr10plus.so/d'
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
-PLIST_TRANSFORM = cat
-endif
-
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-D_GLIBCXX_USE_C99_MATH
-endif
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv5
@@ -51,15 +42,15 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=armv7
 CMAKE_ARGS += -DCROSS_COMPILE_ARM=ON
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC
 CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=aarch64
 CMAKE_ARGS += -DCROSS_COMPILE_ARM=ON
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-fPIC
-CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
+# asm code for HIGH_BIT_DEPTH is not compatible with arm64/aarch64
+# https://bitbucket.org/multicoreware/x265_git/issues/549/fail-to-build-for-aarch64-and-armhf
+CMAKE_BITLIB_ARGS += -DENABLE_ASSEMBLY=OFF
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
@@ -70,23 +61,39 @@ CMAKE_ARGS += -DCPU_POWER8=OFF
 CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
 endif
 
+# Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 BUILD_DEPENDS = native/nasm
-NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
-ENV += PATH=$(NASM_PATH):$$PATH
-ENV += AS=$(NASM_PATH)/nasm
+NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
 CMAKE_ARGS += -DNASM_EXECUTABLE=$(NASM_PATH)/nasm
+ENV += AS=$(NASM_PATH)/nasm
+ENV += PATH=$(NASM_PATH):$$PATH
+endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64 -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
+CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86_64
+CMAKE_ARGS += -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=x86
-# asm code for HIGH_BIT_DEPTH is not compatible with 32 bit arch
+# asm code for HIGH_BIT_DEPTH is not compatible with 32-bit arch
 CMAKE_BITLIB_ARGS += -DENABLE_ASSEMBLY=OFF
 CMAKE_MULTILIB_ARGS += -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
 endif
+
+include ../../mk/spksrc.cross-cc.mk
+
+# gcc version above 4.8 required to support hdr10plus
+ifeq ($(call version_le, $(TC_GCC), 4.8),1)
+PLIST_TRANSFORM = sed -e '/:lib\/libhdr10plus.so/d'
+else
+CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
+PLIST_TRANSFORM = cat
+endif
+
+ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-D_GLIBCXX_USE_C99_MATH
 endif
 
 # For ppc853x-4.3, disable atomics

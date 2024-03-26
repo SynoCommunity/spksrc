@@ -6,7 +6,7 @@
 #
 # Functions:
 # - Evaluate all packages to build depending on files defined in ${GH_FILES}.
-# - ffmpeg is moved to head of packages to built first if triggered by its own or a dependent.
+# - python310, python311, ffmpeg (spk/ffmpeg4), ffmpeg5 and ffmpeg6 are moved to head of packages to build first if triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -19,7 +19,7 @@ DEFAULT_TC=$(grep DEFAULT_TC local.mk | cut -f2 -d= | xargs)
 
 # filter for changes made in the spk directories and take unique package name (without spk folder)
 SPK_TO_BUILD+=" "
-SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(spk)/\K[^\/]*" | sort -u | tr '\n' ' ')
+SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "^spk/\K[^\/]*" | sort -u | tr '\n' ' ')
 
 # filter for changes made in the cross and native directories and take unique package name (including cross or native folder)
 DEPENDENT_PACKAGES=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(cross|native)/[^\/]*" | sort -u | tr '\n' ' ')
@@ -30,44 +30,63 @@ echo "Building dependency list..."
 DEPENDENCY_LIST=
 for package in $(find spk/ -maxdepth 1 -type d | cut -c 5- | sort)
 do
-    DEPENDENCY_LIST+=$(make -s -C spk/${package} dependency-list)$'\n'
+    DEPENDENCY_LIST+=$(DEPENDENCY_WALK=1 make -s -C spk/${package} dependency-list 2> /dev/null)$'\n'
 done
 
 # search for dependent spk packages
 for package in ${DEPENDENT_PACKAGES}
 do
     echo "===> Searching for dependent package: ${package}"
-    packages=$(echo "${DEPENDENCY_LIST}" | grep -w "${package}" | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
+    packages=$(echo "${DEPENDENCY_LIST}" | grep " ${package} " | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
     echo "===> Found: ${packages}"
     SPK_TO_BUILD+=${packages}
 done
 
 # fix for packages with different names
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPK_TO_BUILD+=" sonarr"
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "nzbdrone" | tr '\n' ' ')" sonarr3"
 fi
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
-    SPK_TO_BUILD+=" python2"
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "python" | tr '\n' ' ')" python2"
+fi
+if [ "$(echo ${SPK_TO_BUILD} | grep -ow ffmpeg)" != "" ]; then
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')" ffmpeg4"
 fi
 
 # remove duplicate packages
 packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
+# for ffmpeg v4-6 find all packages that depend on them
+for i in {4..6}; do
+    ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = ${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
-# find all packages that depend on spk/ffmpeg is built before.
-all_ffmpeg_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "export FFMPEG_DIR" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
-
-# if ffmpeg or one of its dependents is to build, ensure
-# ffmpeg is first package in the list of packages to build.
-for package in ${packages}
-do
-    if [ "$(echo ffmpeg ${all_ffmpeg_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')
-        packages="ffmpeg ${packages_without_ffmpeg}"
-        break;
-    fi
+    # If packages contain a package that depends on ffmpeg (or is ffmpeg), then ensure
+    # relevant ffmpeg4|ffmpeg5|ffmpeg6 is first in list
+    for package in ${packages}
+    do
+        if [ "$(echo ffmpeg${i} ${ffmpeg_dependent_packages} | grep -ow ${package})" != "" ]; then
+            packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg${i}" | tr '\n' ' ')
+            packages="ffmpeg${i} ${packages_without_ffmpeg}"
+            break
+        fi
+    done
 done
 
+# for python (310, 311) find all packages that depend on them
+for py in python310 python311; do
+    python_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "PYTHON_PACKAGE = ${py}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+
+    # If packages contain a package that depends on python (or is python), then ensure
+    # relevant python spk is first in list
+    for package in ${packages}
+    do
+        if [ "$(echo ${py} ${python_dependent_packages} | grep -ow ${package})" != "" ]; then
+            packages_without_python=$(echo "${packages}" | tr ' ' '\n' | grep -v "${py}" | tr '\n' ' ')
+            packages="${py} ${packages_without_python}"
+            break
+        fi
+    done
+done
 
 # find all noarch packages
 all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "override ARCH" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
@@ -87,14 +106,14 @@ do
     fi
 done
 
-echo "::set-output name=arch_packages::${arch_packages}"
-echo "::set-output name=noarch_packages::${noarch_packages}"
+echo "arch_packages=${arch_packages}" >> $GITHUB_OUTPUT
+echo "noarch_packages=${noarch_packages}" >> $GITHUB_OUTPUT
 
 echo "::endgroup::"
 
 if [ -z "${packages}" ]; then
     echo "===> No packages to download. <==="
-    echo "::set-output name=download_packages::"
+    echo "download_packages" >> $GITHUB_OUTPUT
 else
     echo "===> PACKAGES to download references for: ${packages}"
     DOWNLOAD_LIST=
@@ -108,5 +127,5 @@ else
     done
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
-    echo "::set-output name=download_packages::${downloads}"
+    echo "download_packages=${downloads}" >> $GITHUB_OUTPUT
 fi

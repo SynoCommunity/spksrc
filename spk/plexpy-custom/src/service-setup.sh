@@ -1,8 +1,8 @@
-# Define python310 binary path
-PYTHON_DIR="/var/packages/python310/target/bin"
+# Define python311 binary path
+PYTHON_DIR="/var/packages/python311/target/bin"
 # Define git binary path
 GIT_DIR="/var/packages/git/target/bin"
-# Add local bin, virtualenv along with python310 and git to the default PATH
+# Add local bin, virtualenv along with python311 and git to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${GIT_DIR}:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
 GIT="${GIT_DIR}/git"
@@ -17,7 +17,7 @@ LEGACY_GROUP="sc-media"
 validate_preinst ()
 {
     # Check fork
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=git://github.com/Tautulli/Tautulli.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && ! ${GIT} ls-remote --heads --exit-code ${wizard_fork_url:=https://github.com/Tautulli/Tautulli.git} ${wizard_fork_branch:=master} > /dev/null 2>&1; then
         echo "Incorrect fork"
         exit 1
     fi
@@ -30,7 +30,7 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Clone the repository
-        ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=git://github.com/Tautulli/Tautulli.git} ${SYNOPKG_PKGVAR}/plexpy
+        ${GIT} clone -q -b ${wizard_fork_branch:=master} ${wizard_fork_url:=https://github.com/Tautulli/Tautulli.git} ${SYNOPKG_PKGVAR}/plexpy
     fi
 }
 

@@ -14,8 +14,9 @@ LICENSE  = LGPLv3 or GPLv2
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --disable-static
-
 # create c++ library of gmp. This is required by cross/rnm
 CONFIGURE_ARGS += --enable-cxx
+
+ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk

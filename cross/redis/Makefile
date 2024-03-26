@@ -1,11 +1,14 @@
 PKG_NAME = redis
-PKG_VERS = 7.0.2
+PKG_VERS = 7.0.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.redis.io/releases
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
+
+# Unable to determine atomic operations for your platform
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://redis.io
 COMMENT  = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.

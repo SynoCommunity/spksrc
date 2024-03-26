@@ -1,0 +1,28 @@
+OWNCLOUD_INSTALL_RESTORE_STEP_TITLE: "Type d'installation d'ownCloud"
+OWNCLOUD_INSTALL_RESTORE_DESCRIPTION: "Pour l'installation, vous avez la possibilité soit de créer une nouvelle instance, soit de restaurer à partir d'une archive de sauvegarde."
+OWNCLOUD_INSTALL_LABEL: "Installer un nouveau déploiement"
+OWNCLOUD_RESTORE_LABEL: "Restaurer à partir d'une archive"
+OWNCLOUD_BACKUP_FILE_LOCATION_DESCRIPTION: "Veuillez fournir le chemin complet de l'archive que vous souhaitez restaurer."
+OWNCLOUD_BACKUP_FILE_LOCATION_LABEL: "Emplacement du fichier de sauvegarde"
+OWNCLOUD_BACKUP_FILE_VALIDATION_ERROR_TEXT: "Un chemin de fichier vide n'est pas autorisé lorsque la restauration est activée."
+OWNCLOUD_DATA_DIRECTORY_DESCRIPTION: "Répertoire de données ownCloud"
+OWNCLOUD_DATA_DIRECTORY_LABEL: "Partager le nom"
+OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT: "Les sous-répertoires ne sont pas pris en charge."
+
+OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE: "Configuration de l'administrateur d'ownCloud"
+OWNCLOUD_ADMIN_USER_NAME_DESCRIPTION: "Connexion de l'administrateur. Par défaut, 'admin'"
+OWNCLOUD_ADMIN_USER_NAME_LABEL: "Nom d'utilisateur"
+OWNCLOUD_ADMIN_PASSWORD_DESCRIPTION: "Mot de passe de l'administrateur. Par défaut, 'admin'"
+OWNCLOUD_ADMIN_PASSWORD_LABEL: "Mot de passe"
+
+OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE: "Domaines de confiance ownCloud"
+OWNCLOUD_TRUSTED_DOMAINS_DESCRIPTION: "Pour accéder à votre serveur ownCloud, vous devez mettre en liste blanche toutes les URL dans vos paramètres, y compris toutes les URL supplémentaires que vous souhaitez utiliser en plus du nom d'hôte actuel."
+OWNCLOUD_TRUSTED_DOMAIN_1_LABEL: "Domaine ou adresse IP"
+OWNCLOUD_TRUSTED_DOMAIN_2_LABEL: "Domaine ou adresse IP"
+OWNCLOUD_TRUSTED_DOMAIN_3_LABEL: "Domaine ou adresse IP"
+
+OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE: "Confirmer la restauration ownCloud"
+OWNCLOUD_CONFIRM_RESTORE_DESCRIPTION: "L'installation va maintenant se poursuivre et votre configuration précédente sera restaurée à partir de la sauvegarde. Veuillez vérifier que le chemin du fichier est exact et que l'utilisateur « sc-owncloud » dispose des autorisations de lecture pour ce chemin ; sinon, une nouvelle installation sera lancée."
+
+PHP_PROFILES_TITLE: "Plusieurs profils PHP"
+PHP_PROFILES_DESCRIPTION: "Attention : Plusieurs profils PHP détectés ; la page Web du package ne s'affichera pas tant qu'un redémarrage de DSM n'aura pas été effectué pour charger de nouvelles configurations."

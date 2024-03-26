@@ -1,5 +1,5 @@
 PKG_NAME = SVT-AV1
-PKG_VERS = 1.0.0-rc2
+PKG_VERS = 1.4.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v$(PKG_VERS)/

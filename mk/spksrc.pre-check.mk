@@ -9,6 +9,9 @@
 #                          use SERVICE_SETUP instead, this includes support for DSM >= 7.
 #
 
+# disable checks for dependency targets
+ifneq ($(DEPENDENCY_WALK),1)
+
 # SPK_FOLDER    
 # name of the spk package folder
 # github status check does not rely on the (SPK) NAME but uses the folder name
@@ -101,4 +104,6 @@ ifneq ($(REQUIRED_MIN_SRM),)
   endif
 endif
 
-endif
+endif # ifneq ($(TCVERSION),)
+
+endif # ifneq ($(DEPENDENCY_WALK),1)

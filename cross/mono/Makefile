@@ -1,17 +1,18 @@
 PKG_NAME = mono
-PKG_VERS = 5.20.1.34
-PKG_EXT = tar.bz2
+PKG_VERS = 6.12.0.182
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.mono-project.com/sources/mono
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/$(PKG_NAME)
+# native/mono must be of the same version
+BUILD_DEPENDS = native/mono
 
 HOMEPAGE = https://www.mono-project.com
 COMMENT  = Cross platform, open source .NET development framework.
 LICENSE  = https://www.mono-project.com/docs/faq/licensing
 
-# Although qoriq can be compiled successfully it won't run as classic floating point unit not available
+# Although qoriq can be compiled successfully it won't run as a classic floating point unit is not available
 # For details see: https://github.com/SynoCommunity/spksrc/issues/3470#issuecomment-469391052
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
@@ -25,33 +26,39 @@ CONFIGURE_ARGS = --disable-mcs-build
 CONFIGURE_ARGS += --enable-btls
 CONFIGURE_ARGS += --disable-dependency-tracking
 CONFIGURE_ARGS += --without-mcs-docs
+CONFIGURE_ARGS += --disable-boehm
+CONFIGURE_ARGS += --without-ikvm-native
+# disable some features
+CONFIGURE_ARGS += --enable-minimal=profiler
 
-# Optimize compilation for size
-ADDITIONAL_CFLAGS = -Os
+# Optimize compilation for minimal size
+ADDITIONAL_CFLAGS  = -Os
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.common.mk
 
 PLIST_TRANSFORM = cat
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
-	PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
+	# enforce build of BTLS library
+	CONFIGURE_ARGS += ac_cv_header_stdalign_h=yes
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 	AG_ARGS = --host=arm-linux
-	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
-		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
-	endif
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	AG_ARGS = --host=aarch64-linux
-	PLIST_TRANSFORM = sed -e '/:bin\/mono-boehm/d' -e '/:lib\/libmonoboehm/d'
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+	# fix for https://github.com/SynoCommunity/spksrc/issues/3666
+	ADDITIONAL_CFLAGS += -fno-split-wide-types
+endif
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-	ifeq ($(findstring $(TCVERSION), "5.0 5.1 5.2"),$(TCVERSION))
-		PLIST_TRANSFORM = sed -e '/:lib\/libmono-btls-shared.so/d'
-	endif
 endif
 AG_ARGS += --disable-mcs-build
+AG_ARGS += --disable-boehm
+AG_ARGS += --without-ikvm-native
+
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: mono_pre_configure
 mono_pre_configure:

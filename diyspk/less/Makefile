@@ -1,6 +1,6 @@
 SPK_NAME = less
-SPK_VERS = 590
-SPK_REV = 2
+SPK_VERS = 643
+SPK_REV = 1
 SPK_ICON = src/gnu-logo.png
 
 DEPENDS = cross/less
@@ -12,7 +12,6 @@ STARTABLE = no
 
 HOMEPAGE   = https://www.gnu.org/software/less/
 LICENSE    = GPLv3
-HELP_URL   = http://www.greenwoodsoftware.com/less/faq.html
 
 SPK_COMMANDS = bin/less bin/lessecho bin/lesskey
 

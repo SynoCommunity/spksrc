@@ -1,15 +1,19 @@
 PKG_NAME = tvheadend
 PKG_VERS = 4.3
 PKG_EXT = tar.gz
-# git hash from April 14th 2022
-PKG_GIT_HASH = 26713c1e451a74dbcc7aaec8427c0356cc2c546f
+# git hash from April 8th 2023
+PKG_GIT_HASH = f32c7c59a19a276648d7b068041738e4e8337638
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
-DEPENDS = cross/openssl cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
+DEPENDS  = cross/openssl cross/gnutls
+DEPENDS += cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
 DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps cross/pngquant
+DEPENDS += cross/curl
+# curl build needs additional configuration for gnutls and libssh2
+export BUILD_CURL_WITH="gnutls libssh2 zstd"
 
 # PPC archs except qoriq are not supported
 # https://tvheadend.org/issues/5060
@@ -23,7 +27,8 @@ GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
 POST_INSTALL_TARGET = tvheadend_post_install
 
-CONFIGURE_ARGS = --enable-imagecache --enable-bundle --enable-trace --release
+CONFIGURE_ARGS  = --python=/usr/bin/python3
+CONFIGURE_ARGS += --enable-imagecache --enable-bundle --enable-trace --release
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 CONFIGURE_ARGS += --enable-dvbcsa --enable-pngquant
 CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
@@ -42,14 +47,17 @@ endif
 
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 ifeq ($(wildcard $(FFMPEG_DIR)),)
-DEPENDS += cross/ffmpeg
+DEPENDS += cross/ffmpeg$(FFMPEG_VERSION)
 endif
 
-include ../../mk/spksrc.cross-cc.mk
-
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+ADDITIONAL_CFLAGS += -std=gnu11
+else
 CONFIGURE_ARGS += --nowerror
+ADDITIONAL_CFLAGS += -std=gnu99
 endif
+
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
@@ -57,6 +65,8 @@ ifeq ($(wildcard $(FFMPEG_DIR)),)
 DEPENDS += cross/libva
 endif
 endif
+
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: tvheadend_pre_configure
 tvheadend_pre_configure:

@@ -35,8 +35,9 @@ endif
 include ../../mk/spksrc.cross-go-env.mk
 
 # avoid run of make configure
+ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = nop
-
+endif
 
 ifeq ($(strip $(COMPILE_TARGET)),)
 ifneq ($(strip $(GO_SRC_DIR)),)
@@ -105,7 +106,7 @@ smart-clean:
 	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
 
 clean:
-	rm -fr work work-*
+	rm -fr work work-* build-*.log
 
 
 all: install plist

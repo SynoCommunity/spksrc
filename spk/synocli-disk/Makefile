@@ -1,6 +1,6 @@
 SPK_NAME = synocli-disk
-SPK_VERS = 3.4
-SPK_REV = 10
+SPK_VERS = 3.6
+SPK_REV = 12
 SPK_ICON = src/synocli-disk.png
 
 DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
@@ -16,12 +16,6 @@ DISPLAY_NAME = SynoCli Disk Tools
 OPTIONAL_DESC =
 
 include ../../mk/spksrc.archs.mk
-
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-# DAR: archs without C++11 support are not supported
-DEPENDS += cross/dar
-OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"
-endif
 
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # Tools built with go are not supported on PPC archs
@@ -58,10 +52,16 @@ SPK_COMMANDS += bin/testdisk bin/photorec bin/fidentify
 SPK_COMMANDS += bin/ncdu
 SPK_COMMANDS += sbin/mount.davfs sbin/umount.davfs
 SPK_COMMANDS += bin/lsscsi
-SPK_COMMANDS += bin/dar bin/dar_cp bin/dar_manager bin/dar_slave bin/dar_split bin/dar_xform
 SPK_COMMANDS += bin/ddrescue bin/ddrescuelog
 SPK_COMMANDS += bin/duf bin/gdu bin/tdu
 SPK_COMMANDS += bin/dua bin/dutree
 SPK_COMMANDS += bin/s3backer
 
 include ../../mk/spksrc.spk.mk
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
+# DAR: archs without C++11 support are not supported
+DEPENDS += cross/dar
+OPTIONAL_DESC := $(OPTIONAL_DESC)", dar"
+SPK_COMMANDS += bin/dar bin/dar_cp bin/dar_manager bin/dar_slave bin/dar_split bin/dar_xform
+endif

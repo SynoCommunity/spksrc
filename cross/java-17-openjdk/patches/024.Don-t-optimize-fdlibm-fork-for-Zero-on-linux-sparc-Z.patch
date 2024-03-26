@@ -1,0 +1,27 @@
+From 7ce2609d6ff5299f2ed3ff6850a3cab4a16125f8 Mon Sep 17 00:00:00 2001
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Date: Fri, 21 Dec 2018 15:18:17 +0300
+Subject: [PATCH] Don't optimize fdlibm-fork for Zero on linux-sparc (Zero)
+
+---
+ make/hotspot/lib/JvmOverrideFiles.gmk | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+--- a/make/hotspot/lib/JvmOverrideFiles.gmk
++++ b/make/hotspot/lib/JvmOverrideFiles.gmk
+@@ -48,6 +48,15 @@ LIBJVM_FDLIBM_COPY_OPT_FLAG := $(CXX_O_F
+ # by using -ffp-contract=off on GCC/Clang platforms.
+ ifneq ($(FDLIBM_CFLAGS), )
+   LIBJVM_FDLIBM_COPY_OPT_FLAG := $(CXX_O_FLAG_NORM)
++  # Don't optimize fdlibm-fork for Zero on Linux sparc
++  # See JDK-XXXX
++  ifeq ($(call check-jvm-feature, zero), true)
++    ifeq ($(OPENJDK_TARGET_OS), linux)
++      ifeq ($(OPENJDK_TARGET_CPU_ARCH), sparc)
++        LIBJVM_FDLIBM_COPY_OPT_FLAG := $(CXX_O_FLAG_NONE)
++      endif
++    endif
++  endif
+ endif
+ 
+ ifeq ($(call isTargetOs, linux), true)

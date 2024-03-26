@@ -4,7 +4,17 @@ lnk:bin/git-receive-pack
 bin:bin/git-shell
 lnk:bin/git-upload-archive
 lnk:bin/git-upload-pack
+bin:bin/scalar
 rsc:etc/gitconfig
+bin:libexec/git-core/git
+bin:libexec/git-core/git-daemon
+bin:libexec/git-core/git-http-fetch
+bin:libexec/git-core/git-http-push
+bin:libexec/git-core/git-imap-send
+bin:libexec/git-core/git-remote-http
+bin:libexec/git-core/git-sh-i18n--envsubst
+bin:libexec/git-core/git-shell
+bin:libexec/git-core/scalar
 rsc:libexec/git-core/
 rsc:share/git-core/
 rsc:share/locale/

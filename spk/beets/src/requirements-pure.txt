@@ -3,44 +3,52 @@ beets==1.6.0
 # Direct dependencies
 # automtically downloaded
 
-confuse>=1.0.0
-jellyfish==0.8.9
-mediafile>=0.2.0
-munkres>=1.0.0
-musicbrainzngs>=0.4
-mutagen>=1.45
-six>=1.9
-Unidecode
+confuse==2.0.1
+mediafile==0.12.0
+munkres==1.1.4
+musicbrainzngs==0.7.1
+mutagen==1.46.0
+# six                              ==> python311
+Unidecode==1.3.6
 
 # Plugin dependencies
-beautifulsoup4==4.10.0
-# certifi==2021.10.8         ==> python310
-chardet==4.0.0
+beautifulsoup4==4.12.2
+# certifi                          ==> python311
+chardet==5.1.0
 discogs-client==2.3.0
 langdetect==1.0.9
-oauthlib==3.1.1
+oauthlib==3.2.2
 pyacoustid==1.2.2
-pylast==4.3.0
-python-mpd2==3.0.4
-pyxdg==0.27
+pylast==5.2.0
+python-mpd2==3.1.0
+pyxdg==0.28
 rarfile==4.0
-requests==2.26.0
-requests-oauthlib==1.3.0
-soupsieve==2.2.1
-soco==0.24.1
-urllib3==1.26.7
-xmltodict==0.12.0
+requests==2.31.0
+requests-oauthlib==1.3.1
+soco==0.29.1
+soupsieve==2.4.1
+urllib3==2.0.4
+xmltodict==0.13.0
 
 # For web plugin
-Flask==2.0.2
-Flask-Cors==3.0.10
-itsdangerous==2.0.1
-Jinja2==3.0.2
-Werkzeug==2.0.2
+Flask==2.3.2
+Flask-Cors==4.0.0
+itsdangerous==2.1.2
+Jinja2==3.1.2
+Werkzeug==2.3.6
 
-# For gmusic plugin
-# Despite installing following wheels 'google' is not found at runtime
-# future==0.18.2
-# gmusicapi==12.1.1
-# decorator==4.4.2
-# google==2.0.3
+# Other indirect dependencies
+anyio==3.7.1
+appdirs==1.4.4
+audioread==3.0.0
+blinker==1.6.2
+click==8.1.6
+h11==0.14.0
+httpcore==0.17.3
+httpx==0.24.1
+idna==3.4
+ifaddr==0.2.0
+sniffio==1.3.0
+
+# The gmusic plugin interfaced beets to Google Play Music.
+# It has been removed after the shutdown of this service.

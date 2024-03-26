@@ -12,5 +12,7 @@ COMMENT  = JPEG library
 LICENSE  = Custom BSD-like (free software)
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-static
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

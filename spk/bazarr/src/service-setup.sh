@@ -1,5 +1,5 @@
 FFMPEG_DIR="/var/packages/ffmpeg/target/bin"
-PYTHON_DIR="/var/packages/python310/target/bin"
+PYTHON_DIR="/var/packages/python311/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${FFMPEG_DIR}:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 LANGUAGE="env LANG=en_US.UTF-8 LC_ALL=en_US.utf8"

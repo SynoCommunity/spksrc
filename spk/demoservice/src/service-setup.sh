@@ -2,19 +2,12 @@
 # Package specific behaviors
 # Sourced script by generic installer and start-stop-status scripts
 
-SERVER_MODULE="SimpleHTTPServer"
-PYTHON_VERSION=$(python --version 2>&1)
-PYTHON_MAJOR_VERSION=$(echo ${PYTHON_VERSION} | cut -d ' ' -f2 | cut -d . -f1)
+# pass variables to service script by env
+export PID_FILE=${PID_FILE}
+export SERVICE_PORT=${SERVICE_PORT}
 
-if [ "${PYTHON_MAJOR_VERSION}" == "3" ]; then
-SERVER_MODULE="http.server"
-fi
-
-
-SERVICE_COMMAND="python -m ${SERVER_MODULE} ${SERVICE_PORT}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/start.sh"
 SVC_CWD="${SYNOPKG_PKGVAR}"
-SVC_BACKGROUND=y
-SVC_WRITE_PID=y
 
 
 # These functions are for demonstration purpose of DSM sequence call
@@ -27,6 +20,11 @@ validate_preinst ()
     # use install_log to write to installer log file.
     install_log "validate_preinst ${SYNOPKG_PKG_STATUS}"
     
+    # variables not available in preinst
+    install_log "Variables:"
+    install_log "SHARE_PATH=${SHARE_PATH}"
+    install_log "SHARE_NAME=${SHARE_NAME}"
+
     # writing to stdout in dsm7 shows "installation error" without exit 1 (this looks like an error of DSM7 beta)
     #echo "preinst validation notification"
     
@@ -37,6 +35,11 @@ validate_preuninst ()
 {
     # use install_log to write to installer log file.
     install_log "validate_preuninst ${SYNOPKG_PKG_STATUS}"
+    
+    # variables not available in preinst
+    install_log "Variables:"
+    install_log "SHARE_PATH=${SHARE_PATH}"
+    install_log "SHARE_NAME=${SHARE_NAME}"
 
     # writing to stdout in dsm7 shows "installation error" without exit 1 (this looks like an error of DSM7 beta)
     #echo "preuninst validation notification"
@@ -49,6 +52,10 @@ validate_preupgrade ()
     # use install_log to write to installer log file.
     install_log "validate_preupgrade ${SYNOPKG_PKG_STATUS}"
 
+    install_log "Variables:"
+    install_log "SHARE_PATH=${SHARE_PATH}"
+    install_log "SHARE_NAME=${SHARE_NAME}"
+
     # writing to stdout in dsm7 shows "installation error" without exit 1 (this looks like an error of DSM7 beta)
     #echo "preupgrade validation notification"
     
@@ -57,49 +64,86 @@ validate_preupgrade ()
 
 service_preinst ()
 {
+    # use echo to write to the installer log file.
     echo "service_preinst ${SYNOPKG_PKG_STATUS}"
     
-    echo "PYTHON_VERSION:       ${PYTHON_VERSION}"
-    echo "PYTHON_MAJOR_VERSION: ${PYTHON_MAJOR_VERSION}"
-    echo "SERVER_MODULE:        ${SERVER_MODULE}"
-    echo "SERVICE_COMMAND:      ${SERVICE_COMMAND}"
-    echo "SYNOPKG_PKGVAR:       ${SYNOPKG_PKGVAR}"
+    echo "Variables:"
+    echo "SHARE_PATH=${SHARE_PATH}"
+    echo "SHARE_NAME=${SHARE_NAME}"
 }
 
 service_postinst ()
 {
+    # use echo to write to the installer log file.
     echo "service_postinst ${SYNOPKG_PKG_STATUS}"
     
-    ln -sf ${INST_LOG} ${SYNOPKG_PKGVAR}/installer.log
+    echo "Variables:"
+    echo "SHARE_PATH=${SHARE_PATH}"
+    echo "SHARE_NAME=${SHARE_NAME}"
+
+    ln -sf ${INST_LOG} ${SYNOPKG_PKGVAR}/${SYNOPKG_PKGNAME}-installer.log
 }
 
 service_preuninst ()
 {
+    # use echo to write to the installer log file.
     echo "service_preuninst ${SYNOPKG_PKG_STATUS}"
+    
+    echo "Variables:"
+    echo "SHARE_PATH=${SHARE_PATH}"
+    echo "SHARE_NAME=${SHARE_NAME}"
 }
 
 service_postuninst ()
 {
+    # use echo to write to the installer log file.
     echo "service_postuninst ${SYNOPKG_PKG_STATUS}"
 }
 
 service_preupgrade ()
 {
+    # use echo to write to the installer log file.
     echo "service_preupgrade ${SYNOPKG_PKG_STATUS}"
+
+    echo "Variables:"
+    echo "SHARE_PATH=${SHARE_PATH}"
+    echo "SHARE_NAME=${SHARE_NAME}"
 }
 
 service_postupgrade ()
 {
+    # use echo to write to the installer log file.
     echo "service_postupgrade ${SYNOPKG_PKG_STATUS}"
+
+    echo "Variables:"
+    echo "SHARE_PATH=${SHARE_PATH}"
+    echo "SHARE_NAME=${SHARE_NAME}"
 }
+
+# REMARKS:
+# installer variables are not available in the context of service start/stop
+# The regular solution is to use configuration files for services
 
 service_prestart ()
 {
-    echo "Before service start"
+    # use echo to write to the service log file.
+    echo "service_prestart: Before service start"
+
+    # This code shows how to load and use the function 'load_variables_from_file'
+    # defined in the script/functions file
+    INST_FUNCTIONS=$(dirname $0)"/functions"
+    if [ -r "${INST_FUNCTIONS}" ]; then
+        . "${INST_FUNCTIONS}"
+        load_variables_from_file ${INST_VARIABLES}
+        echo "Variables read from ${INST_VARIABLES}"
+        echo "SHARE_PATH=${SHARE_PATH}"
+        echo "SHARE_NAME=${SHARE_NAME}"
+    fi
 }
 
 service_poststop ()
 {
-    echo "After service stop"
+    # use echo to write to the service log file.
+    echo "service_poststop: After service stop"
 }
 

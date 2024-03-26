@@ -1,12 +1,11 @@
-# Adjust path of bash and python
---- duply.org	2020-02-24 11:53:51.000000000 +0000
-+++ duply	2020-04-28 23:39:36.695912643 +0000
-@@ -531,7 +531,7 @@
- DEFAULT_GPG='gpg'
- DEFAULT_GPG_KEY='_KEY_ID_'
- DEFAULT_GPG_PW='_GPG_PASSWORD_'
--DEFAULT_PYTHON='python2'
-+DEFAULT_PYTHON='/var/packages/duplicity/target/env/bin/python'
+--- ../duply_2.4.1-orig/duply	2022-09-09 12:46:13.000000000 +0000
++++ duply	2022-10-06 11:19:53.344470242 +0000
+@@ -951,7 +951,7 @@ SOURCE='${DEFAULT_SOURCE}'
  
- # function definitions ##########################
+ # override the python interpreter to execute duplicity, unset by default
+ #  e.g. "python3" or "/usr/bin/python3.8"
+-#PYTHON="python"
++PYTHON="/var/packages/duplicity/target/env/bin/python"
  
+ # exclude folders containing exclusion file (since duplicity 0.5.14)
+ # Uncomment the following two lines to enable this setting.

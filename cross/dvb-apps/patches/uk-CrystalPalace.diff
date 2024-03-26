@@ -1,0 +1,28 @@
+Index: linuxtv-dvb-apps-1.1.1+rev1483/util/scan/dvb-t/uk-CrystalPalace
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1483.orig/util/scan/dvb-t/uk-CrystalPalace	2012-04-11 00:44:06.000000000 +1000
++++ linuxtv-dvb-apps-1.1.1+rev1483/util/scan/dvb-t/uk-CrystalPalace	2012-05-13 20:38:53.000000000 +1000
+@@ -4,14 +4,14 @@
+ #! <w_scan> 20120112 1 0 TERRESTRIAL GB </w_scan>
+ #------------------------------------------------------------------------------
+ # location and provider: Crystal Palace, UK
+-# date (yyyy-mm-dd)    : 2012-02-12
++# date (yyyy-mm-dd)    : 2012-04-18
+ #
+-# T[2] [plp_id] [system_id] <freq> <bw> <fec_hi> <fec_lo> <mod> <tm> <guard> <hi> [# comment]
++# T[2] [plp_id] [system_id] <freq> <bw> <fec_hi> <fec_lo> <mod> <tm> 
++<guard> <hi> [# comment]
+ #------------------------------------------------------------------------------
+-T 481833330 8MHz  2/3 NONE    QAM64   2k 1/32 NONE    # London.
+-T 537833330 8MHz  3/4 NONE    QAM16   2k 1/32 NONE    # London.
+-T 505833330 8MHz  3/4 NONE    QAM16   2k 1/32 NONE    # London.
+-T 561833330 8MHz  2/3 NONE    QAM64   2k 1/32 NONE    # London.
+-T 529833330 8MHz  3/4 NONE    QAM16   2k 1/32 NONE    # London.
+-T 578166670 8MHz  3/4 NONE    QAM16   2k 1/32 NONE    # London.
+-T2 0 16435 554000000 8MHz AUTO AUTO     AUTO AUTO AUTO AUTO    # London.
++T 490000000 8MHz 2/3 NONE QAM64 8k 1/32 NONE # London .
++T 514000000 8MHz 2/3 NONE QAM64 8k 1/32 NONE # London .
++T 545833330 8MHz 2/3 NONE QAM256 AUTO AUTO AUTO # London .
++T 482000000 8MHz 3/4 NONE QAM64 8k 1/32 NONE # London .
++T 506000000 8MHz 3/4 NONE QAM64 8k 1/32 NONE # London .
++T 529833330 8MHz 3/4 NONE QAM64 8k 1/32 NONE # London .

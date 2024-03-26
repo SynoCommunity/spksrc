@@ -1,86 +1,68 @@
-# Home Assistant core
-# requirements are splitted into multiple files
-# - requirements-crossenv.txt             (containing requirements that need cross compilation)
-# - requirements-pure.txt                 (this file, containing pure-python requirements)
-# - postinst_default_requirements.txt     (requirements for default_config)
-# - postinst_integration_requirements.txt (requirements for integrations)
-# postinst requirements must be pure python wheels.
-# To minimize the package size the spk wheelhouse does not contain dependent wheels that are pure python.
+homeassistant==2023.7.3
+home_assistant_frontend==20230705.1
+home_assistant_intents==2023.6.28
+hass_nabucasa==0.69.0
 
-#homeassistant==2021.9.7
-
-# Home Assistant Core
-aiokafka==0.6.0
-# astral==2.2
-# async_timeout==3.0.1
-attrs==21.2.0
-# awesomeversion==21.4.0
-# backports.zoneinfo;python_version<"3.9"   ==> Does not build with python310
-# bcrypt==3.1.7                   ==> crossenv
-# certifi==2021.5.30              ==> python310:pure
-# ciso8601==2.1.3                 ==> crossenv
-# cryptography==3.3.2             ==> crossenv
-# httpx==0.19.0
-idna==3.3
-jinja2==3.0.3
-# numpy==1.21.4                   # requires to be built as cross/numpy
-PyJWT==1.7.1
-# PyNaCl                          ==> crossenv  # for mobile_app
-## pip>=8.0.3,<20.3
-# python-slugify==4.0.1
-# PyYAML==5.4.1                   ==> python310:crossenv:6.0
-requests==2.26.0
-ruamel.yaml==0.15.100
-six==1.16.0
-# voluptuous==0.12.1
-# voluptuous-serialize==2.4.0
-# yarl==1.6.3                     ==> crossenv
-
-# homeassistant.components.frontend
-#home-assistant-frontend==20210830.0
-
-# homeassistant.components.cloud
-#hass-nabucasa==0.46.0
-
-### other default dependencies that need cross compiled wheel
-# MarkupSafe==2.0.1               ==> crossenv
-# aiohttp==3.7.4.post             ==> crossenv
-# cffi==1.14.1                    ==> crossenv
-# greenlet==1.1.1                 ==> crossenv
-# multidict==5.1.0                ==> crossenv
-# sqlalchemy==1.4.23              ==> crossenv
-
-# Requirements for aiohttp==3.7.4.post
-async-timeout==3.0.1
-chardet==4.0.0
-typing-extensions==3.10.0.0
-
-# Failed to build: av clx-sdk-xms homeassistant-pyozw python-twitch-client
-
-### integration dependencies that need cross compiled wheel
-# For Apple TV
-# av==8.0.3  # depends on ffmpeg, PyAV is an FFMPEG wrapper...
-### Could not find libavformat with pkg-config.
-### Could not find libavcodec with pkg-config.
-### Could not find libavdevice with pkg-config.
-### Could not find libavutil with pkg-config.
-### Could not find libavfilter with pkg-config.
-### Could not find libswscale with pkg-config.
-### Could not find libswresample with pkg-config.
-
-
-# ephem==3.7.7.0                  ==> crossenv
-# gevent==21.8.0                  ==> cross/gevent
-# guppy3==3.1.2                   ==> crossenv
-###homeassistant-pyozw==0.1.10    # deprecated open-z-wave, fails to cross compile
-# netifaces==0.11.0               ==> crossenv
-# psutil==5.8.0                   ==> crossenv
-# pyads==3.2.2                    ==> crossenv
-# pycares==4.0.0                  ==> crossenv
-# pybluez==0.22                   # for fjaraskupan fails to build
-# pycocotools==2.0.1              # fails to cross compile (aarch64)
-# pyitachip2ir==0.0.7             ==> crossenv
-# regex==2021.8.3                 ==> crossenv
-# websockets==9.1                 ==> crossenv
-# pandas==1.3.1                   # depends on numpy...
-# wrapt==1.12.1                   ==> crossenv
+acme==1.31.0
+aiodiscover==1.4.16
+aiohttp_cors==0.7.0
+aiosignal==1.3.1
+anyio==3.7.0
+astral==2.2
+async_upnp_client==0.33.2
+atomicwrites_homeassistant==1.4.1
+attrs==22.2.0
+awesomeversion==22.9.0
+bleak_retry_connector==3.0.2
+bluetooth_adapters==0.15.3
+bluetooth_auto_recovery==1.2.0
+boto3==1.20.24
+botocore==1.23.24
+btsocket==0.2.0
+charset_normalizer==3.2.0
+defusedxml==0.7.1
+dnspython==2.4.1
+ecdsa==0.18.0
+envs==1.4
+fnvhash==0.1.0
+gTTS==2.2.4
+h11==0.14.0
+httpcore==0.17.2
+httpx==0.24.1
+idna==3.4
+ifaddr==0.2.0
+Jinja2==3.1.2
+jmespath==0.10.0
+josepy==1.13.0
+mac_vendor_lookup==0.1.12
+mutagen==1.46.0
+psutil_home_assistant==0.0.1
+pyasn1==0.4.8
+pycognito==2022.12.0
+pycparser==2.21
+PyJWT==2.7.0
+pyOpenSSL==23.2.0
+pyRFC3339==1.1
+PyRIC==0.1.6.3
+pyroute2==0.7.5
+pyserial==3.5
+python_dateutil==2.8.2
+python_didl_lite==1.3.2
+python_jose==3.3.0
+python_slugify==4.0.1
+pytz==2023.3
+pyudev==0.23.2
+requests==2.31.0
+requests_toolbelt==1.0.0
+rsa==4.9
+s3transfer==0.5.2
+scapy==2.5.0
+securetar==2023.3.0
+sniffio==1.3.0
+snitun==0.35.0
+text_unidecode==1.3
+typing_extensions==4.7.1
+urllib3==1.26.16
+usb_devices==0.4.1
+voluptuous==0.13.1
+voluptuous_serialize==2.6.0

@@ -1,4 +1,4 @@
 lnk:lib/libvpx.so
-lnk:lib/libvpx.so.7
-lnk:lib/libvpx.so.7.0
-lib:lib/libvpx.so.7.0.0
+lnk:lib/libvpx.so.8
+lnk:lib/libvpx.so.8.0
+lib:lib/libvpx.so.8.0.0

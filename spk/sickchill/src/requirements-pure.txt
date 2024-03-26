@@ -1,85 +1,88 @@
+sickchill==2023.6.27
+
 appdirs==1.4.4
+attrs==22.2.0
 babelfish==0.6.0
-beautifulsoup4==4.10.0
-beekeeper-alt==2021.7.16
+beautifulsoup4==4.12.0
+beekeeper-alt==2022.9.3
 bencode.py==4.0.0
-CacheControl==0.12.9
-#certifi==2021.10.8           ==> python310:pure
-chardet==4.0.0
-charset-normalizer==2.0.7
-click==8.0.3
-cloudscraper==1.2.58
-colorama==0.4.4
-configobj==5.0.6
-decorator==5.1.0
+CacheControl==0.12.11
+cacheyou==23.2
+# certifi               ==> python 3.11
+# cffi                  ==> crossenv
+chardet==5.1.0
+charset-normalizer==3.1.0
+cinemagoer==2022.12.27
+click==8.1.3
+configobj==5.0.8
+# cryptography          ==> cross/cryptography
+decorator==5.1.1
 deluge-client==1.9.0
 Deprecated==1.2.13
-dogpile.cache==1.1.4
+dogpile.cache==1.1.8
 enzyme==0.4.1
-feedparser==6.0.8
-future==0.18.2
+Flask==2.2.3
+future==0.18.3
 gntp==1.0.3
-guessit==3.4.0
-html5lib==1.1
-httplib2==0.20.2
-idna==3.3
-ifaddr==0.1.7
-imagesize==1.2.0
-IMDbPY==2021.4.18
-importlib-metadata==1.7.0
+# greenlet              ==> crossenv
+guessit==3.7.1
+idna==3.4
+ifaddr==0.2.0
+imagesize==1.4.1
+IMDbPY==2022.7.9
 ipaddress==1.0.23
-Js2Py==0.71
-jsonrpclib-pelix==0.4.3.1
-kodipydent-alt==2021.7.16
-Mako==1.1.5
-markdown2==2.4.1
+jsonrpclib-pelix==0.4.3.2
+kodipydent-alt==2022.9.3
+# lxml                  ==> crossenv
+Mako==1.2.4
+markdown2==2.4.8
+# MarkupSafe            ==> crossenv
+mock==5.0.1
+# msgpack               ==> crossenv
 new-rtorrent-python==1.0.1a0
-oauthlib==3.1.1
-packaging==20.9
-pbr==5.7.0
-poetry==1.2.0a2
-poetry-core==1.1.0a6
-poetry-date-version-plugin==2021.7.16-6
+oauthlib==3.2.2
+packaging==23.0
+pbr==5.11.1
+pluggy==1.0.0
 profilehooks==1.12.0
 putio.py==8.7.0
-pycparser==2.20
-pyopenssl==21.0.0
-pyaes==1.6.1
-pygithub==1.55
-pyjsparser==2.7.1
-PyJWT==2.3.0
-pymediainfo==5.1.0
+pycparser==2.21
+PyGithub==1.58.1
+PyJWT==2.6.0
+pymediainfo==6.0.1
+# PyNaCl                ==> crossenv
 PyNMA==1.0
-pyparsing==2.4.7
-pysocks==1.7.1
+pyOpenSSL==23.2.0
+pyparsing==3.0.9
 pysrt==1.1.2
-python3-fanart==2.0.0
+pytest==7.2.2
 python-dateutil==2.8.2
-python-slugify==5.0.2
+python-slugify==8.0.1
 python-twitter==3.5
-pytz==2021.3
-qbittorrent-api==2021.8.23
+python3-fanart==2.0.0
+pytz==2023.2
+qbittorrent-api==2023.3.44
 rarfile==4.0
-rebulk==3.1.0
-requests==2.26.0
-requests-oauthlib==1.3.0
-requests-toolbelt==0.9.1
-send2trash==1.8.0
-six==1.16.0
-sgmllib3k==1.0.0
-soupsieve==2.3
-stevedore==3.5.0
+rebulk==3.2.0
+requests==2.28.2
+requests-oauthlib==1.3.1
+Send2Trash==1.8.0
+# setuptool             ==> python 3.11
+# six                   ==> python 3.11
+soupsieve==2.4
+# SQLAlchemy            ==> crossenv
+stevedore==5.0.0
 subliminal==2.1.0
 text-unidecode==1.3
-timeago==1.0.15
-tmdbsimple==2.8.0
+timeago==1.0.16
+tmdbsimple==2.9.1
+# tornado               ==> crossenv
 tus.py==1.3.4
 tvdbsimple==1.0.6
-tzlocal==4.1
-Unidecode==1.3.2
-urllib3==1.26.7
-validators==0.18.2
-webencodings==0.5.1
+Unidecode==1.3.6
+urllib3==1.26.15
+validators==0.20.0
+# virtualenv            ==> python 3.11
 win-inet-pton==1.1.0
-xmltodict==0.12.0
-zipp==3.6.0
+# wrapt                 ==> crossenv
+xmltodict==0.13.0

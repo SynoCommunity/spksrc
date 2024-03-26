@@ -6,43 +6,56 @@ MESON_BUILD_DIR = builddir
 endif
 
 # Set other build options
+# We normally build regular Release
+ifeq ($(strip $(MESON_BUILD_TYPE)),)
 CONFIGURE_ARGS += -Dbuildtype=release
+else
+CONFIGURE_ARGS += -Dbuildtype=$(MESON_BUILD_TYPE)
+endif
 
-# Use arch specific configuration file
-MESON_CFG_DIR = $(realpath $(WORK_DIR)/../../../mk/meson)
-MESON_CFG_FILE =
+# Configuration for meson build
+MESON_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson
+CONFIGURE_ARGS += --cross-file $(MESON_TOOLCHAIN_WRK)
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-  MESON_CFG_FILE = armv5.cfg
+  MESON_HOST_CPU_FAMILY = arm
+  MESON_HOST_CPU = armv5
+  MESON_HOST_ENDIAN = little
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-  MESON_CFG_FILE = armv7.cfg
+  MESON_BUILTIN_CPP_ARGS = -fPIC
+  MESON_HOST_CPU_FAMILY = arm
+  MESON_HOST_CPU = armv7
+  MESON_HOST_ENDIAN = little
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-  MESON_CFG_FILE = armv7l.cfg
+  MESON_BUILTIN_CPP_ARGS = -fPIC
+  MESON_HOST_CPU_FAMILY = arm
+  MESON_HOST_CPU = armv7l
+  MESON_HOST_ENDIAN = little
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-  MESON_CFG_FILE = aarch64.cfg
+  MESON_BUILTIN_CPP_ARGS = -fPIC
+  MESON_HOST_CPU_FAMILY = aarch64
+  MESON_HOST_CPU = aarch64
+  MESON_HOST_ENDIAN = little
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
-  MESON_CFG_FILE = ppc.cfg
+  MESON_HOST_CPU_FAMILY = ppc
+  MESON_HOST_CPU = ppc
+  MESON_HOST_ENDIAN = big
 endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-  MESON_CFG_FILE = i686.cfg
+  MESON_BUILTIN_C_ARGS = -m32
+  MESON_BUILTIN_C_LINK_ARGS = -m32
+  MESON_BUILTIN_CPP_ARGS = -m32
+  MESON_BUILTIN_CPP_LINK_ARGS = -m32
+  MESON_HOST_CPU_FAMILY = x86
+  MESON_HOST_CPU = i686
+  MESON_HOST_ENDIAN = little
 endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-  MESON_CFG_FILE = x86_64.cfg
+  MESON_HOST_CPU_FAMILY = x86_64
+  MESON_HOST_CPU = x86_64
+  MESON_HOST_ENDIAN = little
 endif
-
-# disable error handling for target dependency-list
-ifneq ($(strip $(DEPENDENCY_WALK)),1)
-  ifeq ($(strip $(MESON_CFG_FILE)),)
-    $(warning No meson config file defined for $(ARCH))
-  else
-    ifeq ($(wildcard $(MESON_CFG_DIR)/$(MESON_CFG_FILE)),)
-      $(warning meson config file not found: $(MESON_CFG_DIR)/$(MESON_CFG_FILE))
-    endif
-  endif
-endif
-
-CONFIGURE_ARGS += --cross-file $(MESON_CFG_DIR)/$(MESON_CFG_FILE)

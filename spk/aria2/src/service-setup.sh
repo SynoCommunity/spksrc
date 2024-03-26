@@ -24,7 +24,6 @@ service_preinst ()
                 exit 1
             }
         fi
-        set_syno_permissions "${wizard_download_dir}" "${wizard_group}"
     fi
 }
 

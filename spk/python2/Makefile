@@ -9,7 +9,7 @@ DEPENDS = cross/busybox cross/python2
 
 # Cross-compiled libraries and tools
 DEPENDS += cross/setuptools_py2 cross/wheel cross/pip_py2
-DEPENDS += cross/cryptography cross/cffi cross/bcrypt
+DEPENDS += cross/cryptography-legacy cross/cffi cross/bcrypt
 
 # Cross-compiled wheels
 DEPENDS += cross/lxml cross/m2crypto cross/msgpack-python cross/pillow_py2

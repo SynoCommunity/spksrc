@@ -36,6 +36,9 @@ ifeq ($(GO_ARCH),)
   $(warning Unsupported ARCH $(ARCH))
 endif
 
+# Use -buildvcs=false to disable VCS stamping.
+GO_BUILD_ARGS += -buildvcs=false
+
 ifeq ($(strip $(GO_STATIC_BINARIES)),1)
   GO_BUILD_ARGS += -no-upgrade
 endif

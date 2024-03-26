@@ -29,6 +29,7 @@ call_func ()
 
 start_daemon ()
 {
+    i=0
     if [ -z "${SVC_QUIET}" ]; then
         if [ -z "${SVC_KEEP_LOG}" ]; then
             date > ${LOG_FILE}
@@ -37,61 +38,67 @@ start_daemon ()
         fi
     fi
     call_func "service_prestart"
-    if [ -z "${SVC_QUIET}" ]; then
-        echo "Starting ${DNAME} command ${SERVICE_COMMAND} " >> ${LOG_FILE}
-    fi
-    if [ -n "${SERVICE_COMMAND}" ]; then
-        if [ -n "${SVC_NO_REDIRECT}" ]; then
-            OUT="/dev/null"
-        else
-            OUT="${LOG_FILE}"
+    printf "%s" "$SERVICE_COMMAND" | while read -r service || [ -n "$service" ]
+    do
+        i=$((i + 1))
+        if [ -z "${SVC_QUIET}" ]; then
+            echo "Starting ${DNAME} command ${service}" >> ${LOG_FILE}
         fi
-        if [ -n "${USER}" -a -n "${SYNOPKG_DSM_VERSION_MAJOR}" -a "$SYNOPKG_DSM_VERSION_MAJOR" -lt 6 ]; then
-            if [ -z "${SVC_CWD}" ]; then
-                SVC_CD=""
+        if [ -n "${service}" ]; then
+            if [ -n "${SVC_NO_REDIRECT}" ]; then
+                OUT="/dev/null"
             else
-                SVC_CD="cd ${SVC_CWD}; "
+                OUT="${LOG_FILE}"
             fi
-            if [ -n "${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-                SU="su ${EFF_USER} -s"
-            else
-                SU=""
-            fi
-            if [ -z "${SVC_BACKGROUND}" ]; then
-                $SU /bin/sh -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1
-            else
-                $SU /bin/sh -c "${SVC_CD}${SERVICE_COMMAND}" >> ${OUT} 2>&1 &
-            fi
+            if [ -n "${USER}" -a -n "${SYNOPKG_DSM_VERSION_MAJOR}" -a "$SYNOPKG_DSM_VERSION_MAJOR" -lt 6 ]; then
+                if [ -z "${SVC_CWD}" ]; then
+                    SVC_CD=""
+                else
+                    SVC_CD="cd ${SVC_CWD}; "
+                fi
+                if [ -n "${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+                    SU="su ${EFF_USER} -s"
+                else
+                    SU=""
+                fi
+                if [ -z "${SVC_BACKGROUND}" ]; then
+                    $SU /bin/sh -c "${SVC_CD}${service}" >> ${OUT} 2>&1
+                else
+                    $SU /bin/sh -c "${SVC_CD}${service}" >> ${OUT} 2>&1 &
+                fi
 
-        else
-            # DSM 6 user is set by conf/privilege
-            if [ -n "${SVC_CWD}" ]; then
-                cd "${SVC_CWD}"
-            fi
-            if [ -z "${SVC_BACKGROUND}" ]; then
-                ${SERVICE_COMMAND} >> ${OUT} 2>&1
             else
-                ${SERVICE_COMMAND} >> ${OUT} 2>&1 &
+                # DSM 6 user is set by conf/privilege
+                if [ -n "${SVC_CWD}" ]; then
+                    cd "${SVC_CWD}"
+                fi
+                if [ -z "${SVC_BACKGROUND}" ]; then
+                    ${service} >> ${OUT} 2>&1
+                else
+                    ${service} >> ${OUT} 2>&1 &
+                fi
+            fi
+            if [ -n "${SVC_WRITE_PID}" -a -n "${SVC_BACKGROUND}" -a -n "${PID_FILE}" ]; then
+                [ $i -eq 1 ] && echo -ne "$!" > ${PID_FILE} || echo -ne " $!" >> ${PID_FILE}
+            else
+                wait_for_status 0 ${SVC_WAIT_TIMEOUT:=20}
             fi
         fi
-        if [ -n "${SVC_WRITE_PID}" -a -n "${SVC_BACKGROUND}" -a -n "${PID_FILE}" ]; then
-            echo "$!" > "${PID_FILE}"
-        else
-            wait_for_status 0 ${SVC_WAIT_TIMEOUT}
-        fi
-    fi
+    done
 }
 
 stop_daemon ()
 {
     if [ -n "${PID_FILE}" -a -r "${PID_FILE}" ]; then
-        PID=$(cat "${PID_FILE}")
-        if [ -z "${SVC_QUIET}" ]; then
-            date >> ${LOG_FILE}
-            echo "Stopping ${DNAME} service ${PID} " >> ${LOG_FILE}
-        fi
-        kill -TERM $PID >> ${LOG_FILE} 2>&1
-        wait_for_status 1 ${SVC_WAIT_TIMEOUT} || kill -KILL $PID >> ${LOG_FILE} 2>&1
+        for pid in $(cat "${PID_FILE}")
+        do
+            if [ -z "${SVC_QUIET}" ]; then
+                date >> ${LOG_FILE}
+                echo "Stopping ${DNAME} service : $(ps -p${pid} -o comm=) (${pid})" >> ${LOG_FILE}
+            fi
+            kill -TERM ${pid} >> ${LOG_FILE} 2>&1
+            wait_for_status 1 ${SVC_WAIT_TIMEOUT:=20} ${pid} || kill -KILL ${pid} >> ${LOG_FILE} 2>&1
+        done
         if [ -f "${PID_FILE}" ]; then
             rm -f "${PID_FILE}" > /dev/null
         fi
@@ -99,32 +106,60 @@ stop_daemon ()
     call_func "service_poststop"
 }
 
+#------------------------------------------------------
+# daemon_status()
+#     $1: PID to check, if empty use ${PID_FILE}
+# status: Keeps track of kill -0 exit status
+#
+# Return 0 when all pid are OK, else return 1
+#------------------------------------------------------
 daemon_status ()
 {
-
-    if [ -n "${PID_FILE}" -a -r "${PID_FILE}" ]; then
-        if kill -0 $(cat "${PID_FILE}") > /dev/null 2>&1; then
-            return
+    status=0
+    [ -z "${1}" ] && pid_list=$(cat ${PID_FILE} 2>/dev/null) || pid_list=${1}
+    if [ -n "${pid_list}" ]; then
+        for pid in ${pid_list}
+        do
+           kill -0 ${pid} > /dev/null 2>&1
+           let status=$status+$?
+        done
+        if [ $status -ne 0 ]; then
+           rm -f "${PID_FILE}" > /dev/null
+           return 1
+        else
+           return 0
         fi
-        rm -f "${PID_FILE}" > /dev/null
+    else
+        return 1
     fi
-    return 1
 }
 
+#------------------------------------------------------
+# wait_for_status()
+#      $1: expected return from daemon_status() call
+#      $2: timeout (e.g. number of loop to be done)
+#      $3: PID to check being passed to daemon_status()
+# counter: Number of 1sec iteration to wait until
+#          the return value from daemon_status()
+#          match expected value
+#
+# Wait for a duration of $counter seconds for the
+# return value from daemon_status().  If it match
+# return 0 else return 1 if wait time is over.
+#------------------------------------------------------
 wait_for_status ()
 {
-    timeout=$2
     # default value: 20 seconds
-    counter=${timeout:=20}
+    counter=${2}
+    counter=${counter:=20}
     while [ ${counter} -gt 0 ]; do
-        daemon_status
+        daemon_status ${3}
         [ $? -eq $1 ] && return
         let counter=counter-1
         sleep 1
     done
     return 1
 }
-
 
 case $1 in
     start)

@@ -5,8 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = cross/python310
-DEPENDS = cross/openssl cross/libicu
+BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
+DEPENDS = cross/openssl3 cross/libicu cross/zlib
 
 # configure: No compiler with C++11 support was found
 # error: Upgrade your compiler. GCC 4.8+ and Clang 3.2+ are known to work.
@@ -17,7 +17,12 @@ COMMENT  = Advanced IRC bouncer
 LICENSE  = Apache 2.0
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --enable-python
+CONFIGURE_ARGS  = --enable-python
+CONFIGURE_ARGS += --enable-openssl
+
+# For ZNC to build using github-action, enforce adding Python & OpenSSL include directories
+ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
+ADDITIONAL_CPPFLAGS += -I$(OPENSSL_STAGING_PREFIX)/include/openssl
 
 ifneq ($(wildcard modules/*),)
 POST_INSTALL_TARGET = znc_post_install
@@ -36,7 +41,6 @@ else
 PLIST_TRANSFORM = sed -e '/:lib\/znc\/push.so/d'
 endif
 EXTRA_MODULES += clientbuffer.cpp
-
 
 # The following extra modules are stored in cross/znc/modules and are built via the znc-buildmod command.
 # Adapt as needed (-O is used to overwrite existing files, and to rename to *.cpp where needed).
@@ -57,5 +61,5 @@ znc_post_install:
 	@chmod +x $(WORK_DIR)/$(PKG_DIR)/znc-buildmod
 	@rm -fr $(WORK_DIR)/modules
 	@cp -R modules $(WORK_DIR)/
-	@cd $(WORK_DIR)/modules && PATH=$(WORK_DIR)/$(PKG_DIR) INCLUDES=-I$(STAGING_INSTALL_PREFIX)/include/znc prefix=$(STAGING_INSTALL_PREFIX) znc-buildmod $(EXTRA_MODULES)
+	@cd $(WORK_DIR)/modules && PATH=$(WORK_DIR)/$(PKG_DIR) prefix=$(STAGING_INSTALL_PREFIX) znc-buildmod $(EXTRA_MODULES)
 	@install -m 644 $(WORK_DIR)/modules/*.so $(STAGING_INSTALL_PREFIX)/lib/znc/

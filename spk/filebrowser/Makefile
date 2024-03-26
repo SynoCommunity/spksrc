@@ -1,9 +1,10 @@
 SPK_NAME = filebrowser
-SPK_VERS = 2.20.1
-SPK_REV = 1
+SPK_VERS = 2.23.0
+SPK_REV = 3
 SPK_ICON = src/filebrowser.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/filebrowser
+
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = publicarray
@@ -11,8 +12,8 @@ DISPLAY_NAME = File Browser
 DESCRIPTION = filebrowser provides a file managing interface within a specified directory and it can be used to upload, delete, preview, rename and edit your files. It allows the creation of multiple users and each user can have its own directory.
 HOMEPAGE = https://filebrowser.org/
 HELPURL = https://github.com/filebrowser/filebrowser/issues
-LICENSE = Apache-2.0
-CHANGELOG = "Initial package release."
+LICENSE = Apache 2.0
+CHANGELOG = "1. Update filebrowser to v2.23.0.<br/>2. Built with go v1.19.5 and node v18.15.0."
 
 GROUP = synocommunity
 

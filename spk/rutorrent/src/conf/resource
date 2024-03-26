@@ -1,8 +1,52 @@
 {
-    "php56": {
-		"php-ini": [{
-			"relpath": "etc/php/conf.d/com.synocommunity.rutorrent.ini",
-			"destpath": "/usr/local/etc/php56/conf.d"
+	"webservice": {
+		"services": [{
+			"service": "rutorrent",
+			"display_name": "ruTorrent",
+			"icon": "app/images/rutorrent-{0}.png",
+			"type": "apache_php",
+			"root": "rutorrent",
+			"backend": 2,
+			"php": {
+				"profile_name": "ruTorrent",
+				"profile_desc": "PHP profile used by ruTorrent",
+				"backend": 8,
+				"extensions": [],
+				"user": "sc-rutorrent",
+				"open_basedir": null,
+				"group": "http"
+			}
+		}],
+		"portals": [
+			{
+				"service": "rutorrent",
+				"type": "alias",
+				"name": "ruTorrent",
+				"alias": "rutorrent",
+				"app": "com.synocommunity.packages.rutorrent"
+			}
+		],
+		"migrate": {
+			"root": [{
+				"old": "rutorrent",
+				"new": "rutorrent"
+			}]
+		},
+		"pkg_dir_prepare": [{
+			"source": "/var/packages/rutorrent/target/share/rutorrent",
+			"target": "rutorrent",
+			"mode": "0755",
+			"user": "sc-rutorrent",
+			"group": "http"
 		}]
-    }
+	},
+	"data-share": {
+		"shares": [
+			{
+				"name": "{{wizard_download_share}}", 
+				"permission":{"rw":["sc-rutorrent"]},
+				"once": true
+			}
+		]
+	}
 }

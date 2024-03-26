@@ -5,24 +5,6 @@
         "items": [
             {
                 "type": "textfield",
-                "desc": "群晖 DSM 设置",
-                "subitems": [
-                    {
-                        "key": "wizard_group",
-                        "desc": "用户组",
-                        "defaultValue": "sc-aria2",
-                        "validator": {
-                            "allowBlank": false,
-                            "regex": {
-                                "expr": "/^[^<>:*/?\"]*$/",
-                                "errorText": "用户组不应含有^[^<>:*/?\"]*等特殊字符"
-                            }
-                        }
-                    }
-                ]
-            },
-            {
-                "type": "textfield",
                 "desc": "Aria2 设置",
                 "subitems": [
                     {

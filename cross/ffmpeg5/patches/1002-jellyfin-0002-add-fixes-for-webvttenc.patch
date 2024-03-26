@@ -1,0 +1,25 @@
+Index: jellyfin-ffmpeg/libavformat/webvttenc.c
+===================================================================
+--- libavformat/webvttenc.c
++++ libavformat/webvttenc.c
+@@ -49,8 +49,8 @@ static int webvtt_write_header(AVFormatC
+     AVCodecParameters *par = ctx->streams[0]->codecpar;
+     AVIOContext *pb = ctx->pb;
+ 
+-    if (ctx->nb_streams != 1 || par->codec_id != AV_CODEC_ID_WEBVTT) {
+-        av_log(ctx, AV_LOG_ERROR, "Exactly one WebVTT stream is needed.\n");
++    if (par->codec_id != AV_CODEC_ID_WEBVTT) {
++        av_log(ctx, AV_LOG_ERROR, "First stream must be WebVTT.\n");
+         return AVERROR(EINVAL);
+     }
+ 
+@@ -68,6 +68,9 @@ static int webvtt_write_packet(AVFormatC
+     int id_size_int, settings_size_int;
+     uint8_t *id, *settings;
+ 
++    if (pkt->stream_index != 0)
++        return 0;
++
+     avio_printf(pb, "\n");
+ 
+     id = av_packet_get_side_data(pkt, AV_PKT_DATA_WEBVTT_IDENTIFIER,

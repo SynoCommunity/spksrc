@@ -1,0 +1,5 @@
+bin:bin/fusermount3
+lnk:lib/libfuse3.so
+lnk:lib/libfuse3.so.3
+lib:lib/libfuse3.so.3.12.0
+bin:sbin/mount.fuse3

@@ -1,130 +1,159 @@
-## --------------------
-## To update this file:
-## --------------------
-## cd ./spksrc/cross/duplicity
-## download current package:
-##   make digests (or make download)
-## extract requirements.txt:
-##   tar -ztvf ../../distrib/duplicity.{PKG_VERS}.tar.gz --no-anchored requirements.txt
-## copy and rename requirements.txt:
-##   cp duplicity-{PKG_VERS}/requirements.txt ./spksrc/spk/duplicity/src/requirements.original.txt
-## create update requirements file for package:
-##   cd ./spksrc/spk/duplicity/src
-##   /spksrc/native/python38/work-native/install/usr/local/bin/python3 -m venv venv
-##   . venv/bin/activate
-##   pip install --upgrade pip
-### make some modification in requirements.original.txt
-### - remove testing dependencies
-### - comment out packages included as cross compiled wheels
-### - comment out unsupported dependencies
-##   pip install -r requirements.original.txt
-##   pip freeze > requirements-pure.txt
-##   deactivate
-## --------------------
-## This content is generated following the instructions above, except
-## that the base and backend requirements are updated separately and
-## the results are merged together.
-## --------------------
-
+# version 1.2.3 snapshot from Jul. 23rd 2023
+2to3==1.0
+alabaster==0.7.13
 args==0.1.0
-arrow==1.2.1
-attrs==21.4.0
-azure-core==1.21.1
-azure-storage-blob==12.9.0
-b2sdk==1.14.0
-Babel==2.9.1
+arrow==1.2.3
+astroid==2.15.6
+attrs==23.1.0
+azure-core==1.28.0
+azure-storage-blob==12.17.0
+b2sdk==1.22.0
+Babel==2.12.1
+#bcrypt                        ==> crossenv
 boto==2.49.0
-boto3==1.20.28
-botocore==1.23.28
-boxsdk==2.14.0
-cachetools==4.2.4
-#certifi
-chardet==4.0.0
-charset-normalizer==2.0.10
+boto3==1.28.9
+botocore==1.31.9
+boxsdk==3.7.3
+cachetools==5.3.1
+#certifi                       ==> py311
+#cffi                          ==> crossenv
+charset-normalizer==3.2.0
 clint==0.5.1
-debtcollector==2.3.0
-dropbox==11.25.0
-ecdsa==0.17.0
-fasteners==0.16.3
-funcsigs==1.0.2
-future==0.18.2
+colorama==0.4.6
+#coverage                      ==> crossenv
+#cryptography                  ==> cross/cryptography
+debtcollector==2.5.0
+dill==0.3.7
+#distlib                       ==> py311
+docutils==0.18.1
+dropbox==11.36.2
+#duplicity                     ==> crossenv
+ecdsa==0.18.0
+fasteners==0.18
+#filelock                      ==> py311
+future==0.18.3
 gdata-python3==3.0.1
-google-api-core==2.3.2
-google-api-python-client==2.33.0
-google-auth==2.3.3
+gitchangelog==3.0.4
+google-api-core==2.11.1
+google-api-python-client==2.94.0
+googleapis-common-protos==1.59.1
+google-auth==2.22.0
 google-auth-httplib2==0.1.0
-google-auth-oauthlib==0.4.6
-googleapis-common-protos==1.54.0
-httplib2==0.20.2
-humanize==3.13.1
-idna==3.3
-importlib-metadata==4.10.0
+google-auth-oauthlib==1.0.0
+httplib2==0.22.0
+humanize==4.7.0
+idna==3.4
+imagesize==1.4.1
+importlib-metadata==6.8.0
+iniconfig==2.0.0
 ip-associations-python-novaclient-ext==0.2
-iso8601==1.0.2
+iso8601==2.0.0
 isodate==0.6.1
-jeepney==0.7.1
-jmespath==0.10.0
+isort==5.12.0
+jaraco.classes==3.3.0
+jeepney==0.8.0
+Jinja2==3.1.2
+jmespath==1.0.1
 jottalib==0.5.1
-keyring==23.5.0
-keystoneauth1==4.4.0
+keyring==24.2.0
+keystoneauth1==2.18.0
+#lazy-object-proxy               ==> crossenv
 logfury==1.0.1
-#mediafire                       ###  Development Status 3 - Alpha: outdated (Nov 2016), not supported by Python >3.4
-mock==4.0.3
+#lxml                            ==> crossenv
+markdown-it-py==3.0.0
+#MarkupSafe                      ==> crossenv
+mccabe==0.7.0
+mdit-py-plugins==0.4.0
+mdurl==0.1.2
+mediafire==0.6.1
+megatools==0.0.4
+mock==5.1.0
 monotonic==1.6
-msrest==0.6.21
+more-itertools==9.1.0
+#msgpack                         ==> crossenv
+#msgpack-python                  ==> crossenv
+msrest==0.7.1
+myst-parser==2.0.0
 netaddr==0.8.0
-oauth2client==4.1.3
-oauthlib==3.1.1
+#netifaces                       ==> crossenv
+oauthlib==3.2.2
 os-diskconfig-python-novaclient-ext==0.1.3
+oslo.config==4.12.0
+oslo.i18n==3.12.0
+oslo.serialization==2.16.1
+oslo.utils==3.22.3
 os-networksv2-python-novaclient-ext==0.26
-os-service-types==1.7.0
 os-virtual-interfacesv2-python-novaclient-ext==0.20
-oslo.config==8.7.1
-oslo.i18n==5.1.0
-oslo.serialization==4.2.0
-oslo.utils==4.12.0
-packaging==21.3
-paramiko==2.9.1
+packaging==23.1
+paramiko==3.2.0
+pbr==1.10.0
 pexpect==4.8.0
-pbr==5.8.0
+#platformdirs                     ==> py311
+pluggy==1.2.0
 ply==3.11
 positional==1.2.1
-prettytable==2.5.0
+prettytable==0.7.2
+#protobuf                         ==> crossenv
+#psutil                           ==> crossenv
 ptyprocess==0.7.0
-pyasn1==0.4.8
-pyasn1-modules==0.2.8
+py==1.11.0
+pyasn1==0.5.0
+pyasn1-modules==0.3.0
+pycodestyle==2.10.0
 pycparser==2.21
-PyDrive==1.3.1
-PyDrive2==1.10.0
-PyJWT==2.3.0
-pyOpenSSL==21.0.0
-pyparsing==3.0.6
-pyrax==1.9.5
+PyDrive2==1.16.1
+Pygments==2.15.1
+PyJWT==2.8.0
+pylint==2.17.4
+#PyNaCl                           ==> crossenv
+pyOpenSSL==23.2.0
+pyparsing==3.1.0
+pyproject-api==1.5.3
+pyrax==1.10.0
+pystache==0.6.0
+pytest==7.4.0
+pytest-cov==4.1.0
+pytest-runner==6.0.0
 python-dateutil==2.8.2
-python-gettext==4.0
-python-keystoneclient==4.3.0
-python-novaclient==17.6.0
-python-swiftclient==3.13.0
-pytz==2021.3
-rackspace-auth-openstack==1.3
+python-gettext==5.0
+python-keystoneclient==3.10.0
+python-novaclient==2.27.0
+python-swiftclient==4.3.0
+pytz==2023.3
+#PyYAML                         ==> crossenv
 rackspace-novaclient==2.1
 rax-default-network-flags-python-novaclient-ext==0.4.0
 rax-scheduled-images-python-novaclient-ext==0.3.1
-requests==2.27.0
-requests-oauthlib==1.3.0
-requests-toolbelt==0.9.1
-rfc3986==1.5.0
-rsa==4.8
-s3transfer==0.5.0
-SecretStorage==3.3.1
-setuptools-scm==6.3.2
-six==1.16.0
-stevedore==3.5.0
-stone==3.2.1
+requests==2.31.0
+requests-oauthlib==1.3.1
+requests-toolbelt==1.0.0
+rfc3986==2.0.0
+rsa==4.9
+s3transfer==0.6.1
+SecretStorage==3.3.3
+setuptools-scm==7.1.0
+#simplejson                     ==> crossenv
+#six                            ==> py311
+snowballstemmer==2.2.0
+Sphinx==6.2.1
+sphinxcontrib-applehelp==1.0.4
+sphinxcontrib-devhelp==1.0.2
+sphinxcontrib-htmlhelp==2.0.1
+sphinxcontrib-jquery==4.1
+sphinxcontrib-jsmath==1.0.1
+sphinxcontrib-qthelp==1.0.3
+sphinxcontrib-serializinghtml==1.1.5
+sphinx-rtd-theme==1.2.2
+stevedore==1.20.1
+stone==3.3.1
 tlslite-ng==0.7.6
-tomli==2.0.0
-tqdm==4.62.3
+tomli==2.0.1
+tomlkit==0.11.8
+tox==4.6.4
+tqdm==4.65.0
+typing_extensions==4.7.1
 uritemplate==4.1.1
-urllib3==1.26.7
-wcwidth==0.2.5
-zipp==3.7.0
+urllib3==1.26.16
+#virtualenv                    ==> py311
+#wrapt                         ==> crossenv
+zipp==3.16.2

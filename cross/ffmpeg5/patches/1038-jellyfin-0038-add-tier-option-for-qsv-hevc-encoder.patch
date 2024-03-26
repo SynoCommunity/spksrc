@@ -1,0 +1,43 @@
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
+===================================================================
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -612,8 +612,11 @@ static int init_video_param(AVCodecConte
+         return AVERROR_BUG;
+     q->param.mfx.CodecId = ret;
+ 
+-    if (avctx->level > 0)
++    if (avctx->level > 0) {
+         q->param.mfx.CodecLevel = avctx->level;
++        if (avctx->codec_id == AV_CODEC_ID_HEVC && avctx->level >= MFX_LEVEL_HEVC_4)
++            q->param.mfx.CodecLevel |= q->tier;
++    }
+ 
+     if (avctx->compression_level == FF_COMPRESSION_DEFAULT) {
+         avctx->compression_level = q->preset;
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.h
+===================================================================
+--- libavcodec/qsvenc.h
++++ libavcodec/qsvenc.h
+@@ -160,6 +160,7 @@ typedef struct QSVEncContext {
+     int async_depth;
+     int idr_interval;
+     int profile;
++    int tier;
+     int preset;
+     int avbr_accuracy;
+     int avbr_convergence;
+Index: jellyfin-ffmpeg/libavcodec/qsvenc_hevc.c
+===================================================================
+--- libavcodec/qsvenc_hevc.c
++++ libavcodec/qsvenc_hevc.c
+@@ -257,6 +257,9 @@ static const AVOption options[] = {
+ #if QSV_VERSION_ATLEAST(1, 32)
+     { "scc",     NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_HEVC_SCC     }, INT_MIN, INT_MAX,     VE, "profile" },
+ #endif
++    { "tier",    "Set the encoding tier (only level >= 4 can support high tier)", OFFSET(qsv.tier), AV_OPT_TYPE_INT, { .i64 = MFX_TIER_HEVC_HIGH }, MFX_TIER_HEVC_MAIN, MFX_TIER_HEVC_HIGH, VE, "tier" },
++    { "main",    NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_TIER_HEVC_MAIN       }, INT_MIN, INT_MAX,     VE, "tier" },
++    { "high",    NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_TIER_HEVC_HIGH       }, INT_MIN, INT_MAX,     VE, "tier" },
+ 
+     { "gpb", "1: GPB (generalized P/B frame); 0: regular P frame", OFFSET(qsv.gpb), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, VE},
+ 

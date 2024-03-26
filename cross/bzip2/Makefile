@@ -12,19 +12,14 @@ COMMENT  = High-quality data compressor.
 LICENSE  = BSD License
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = bzip2_compile
 POST_INSTALL_TARGET = bzip2_post_install
 
 ADDITIONAL_CFLAGS = -fpic -fPIC -O3 -D_FILE_OFFSET_BITS=64
 
+COMPILE_MAKE_OPTIONS = -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
 INSTALL_MAKE_OPTIONS = install PREFIX=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: bzip2_compile
-bzip2_compile:
-	$(RUN) $(MAKE) bzip2 bzip2recover PREFIX=$(INSTALL_PREFIX)
-	$(RUN) $(MAKE) -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
 
 .PHONY: bzip2_post_install
 bzip2_post_install:

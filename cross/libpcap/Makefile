@@ -5,6 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.tcpdump.org/release
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# this is the latests version that builds for OLD_PPC_ARCHS
+
 DEPENDS =
 
 HOMEPAGE = https://www.tcpdump.org/
@@ -12,6 +14,7 @@ COMMENT  = Portable C/C++ library for network traffic capture.
 LICENSE  = BSD
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-pcap=linux
+CONFIGURE_ARGS  = --with-pcap=linux
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

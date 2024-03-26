@@ -1,5 +1,5 @@
 PKG_NAME = mariadb-connector-c
-PKG_VERS = 3.2.6
+PKG_VERS = 3.3.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -10,14 +10,22 @@ HOMEPAGE = https://mariadb.com/kb/en/mariadb-connector-c/
 COMMENT  = MariaDB C Connector
 LICENSE  = LGPL
 
+#USE_NATIVE_CMAKE_LEGACY = 1
+#CMAKE_USE_TOOLCHAIN_FILE = OFF
+CMAKE_DISABLE_EXE_LINKER_FLAGS = 1
+
 include ../../mk/spksrc.cross-cmake.mk
+
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+ADDITIONAL_CFLAGS += -std=gnu99
+endif
 
 # MySQL specific:
 CMAKE_ARGS += -DWITH_UNIT_TESTS=OFF
 CMAKE_ARGS += -DDEFAULT_CHARSET=utf8
 CMAKE_ARGS += -DINSTALL_LIBDIR=lib
 
-DEPENDS += cross/openssl
+DEPENDS += cross/openssl3
 CMAKE_ARGS += -DWITH_SSL=ON
 DEPENDS += cross/zlib
 CMAKE_ARGS += -DWITH_EXTERNAL_ZLIB=ON

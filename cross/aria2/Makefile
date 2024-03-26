@@ -10,6 +10,12 @@ DEPENDS = cross/libssh2 cross/gnutls cross/libgcrypt cross/libexpat cross/c-ares
 # archs with too old c++ compiler (c++ 11 is required)
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
+# compiler too old
+UNSUPPORTED_ARCHS += $(ARCH)
+endif
+
 HOMEPAGE = https://aria2.github.io/
 COMMENT  = aria2 is a lightweight multi-protocol & multi-source command-line download utility. It supports HTTP/HTTPS, FTP, SFTP, BitTorrent and Metalink.
 LICENSE  = GPLv2

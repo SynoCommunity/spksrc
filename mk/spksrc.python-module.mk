@@ -20,8 +20,9 @@ include ../../mk/spksrc.cross-cc.mk
 -include $(WORK_DIR)/python-cc.mk
 
 # Python module variables
+ifneq ($(wildcard $(PYTHONPATH)),)
 PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/
-
+endif
 
 ### Python module rules
 compile_python_module:

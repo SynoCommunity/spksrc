@@ -20,8 +20,16 @@ PIP ?= pip
 PIP_SYSTEM = $(shell which pip)
 
 # Why ask for the same thing twice? Always cache downloads
-PIP_CACHE_OPT ?= --cache-dir $(PIP_DIR)
+PIP_CACHE_OPT ?= --find-links $(PIP_DISTRIB_DIR) --cache-dir $(PIP_CACHE_DIR)
 PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+# Adding --no-index only for crossenv
+# to force using localy downloaded version
+PIP_WHEEL_ARGS_CROSSENV = $(PIP_WHEEL_ARGS) --no-index
+
+# BROKEN: https://github.com/pypa/pip/issues/1884
+# Current implementation is a work-around for the
+# lack of proper source download support from pip
+PIP_DOWNLOAD_ARGS = download --no-index --find-links $(PIP_DISTRIB_DIR) --disable-pip-version-check --no-binary :all: --no-deps --dest $(PIP_DISTRIB_DIR) --no-build-isolation --exists-action w
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
@@ -33,7 +41,7 @@ AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell ech
 # Available toolchains formatted as '{ARCH}-{TC}'
 AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard ../../kernel/syno-*))))
 AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell echo ${arch} | cut -f2 -d'-')))
-SUPPORTED_KERNEL_VERSIONS = 6.1 6.2.4 7.0
+SUPPORTED_KERNEL_VERSIONS = 6.2.4 7.0
 
 # Global arch definitions
 include ../../mk/spksrc.archs.mk
@@ -119,6 +127,3 @@ version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
-
-# GCC version
-version_gcc = $(shell $$(sed -n -e '/TC_ENV += TC_GCC/ s/.*= *//p' $(PWD)/$(subst arch,work,$(MAKECMDGOALS))/tc_vars.mk 2>/dev/null))

@@ -1,0 +1,54 @@
+{
+	"webservice": {
+		"migrate": {
+			"root": [{
+				"new": "selfoss",
+				"old": "selfoss"
+			}]
+		},
+		"pkg_dir_prepare": [{
+			"group": "http",
+			"mode": "0750",
+			"source": "/var/packages/selfoss/target/share/selfoss",
+			"target": "selfoss",
+			"user": "sc-selfoss"
+		}],
+		"portals": [{
+			"alias": "selfoss",
+			"app": "com.synocommunity.packages.selfoss",
+			"display_name": "Selfoss",
+			"name": "Selfoss",
+			"service": "Selfoss",
+			"type": "alias"
+		}],
+		"services": [{
+			"backend": 2,
+			"display_name": "Selfoss",
+			"icon": "app/images/selfoss-{0}.png",
+			"php": {
+				"backend": 8,
+				"connect_timeout": 120,
+				"extensions": [
+					"curl",
+					"gd",
+					"imagick",
+					"openssl",
+					"pdo_sqlite"
+				],
+				"group": "http",
+				"php_settings": {
+					"error_log": "/var/services/web_packages/selfoss/data/logs/php_errors.log",
+					"max_execution_time": "900"
+				},
+				"profile_desc": "PHP Profile for Selfoss",
+				"profile_name": "Selfoss Profile",
+				"user": "sc-selfoss"
+			},
+			"read_timeout": 3600,
+			"root": "selfoss",
+			"send_timeout": 120,
+			"service": "Selfoss",
+			"type": "apache_php"
+		}]
+	}
+}

@@ -1,8 +1,8 @@
 PKG_NAME = rsync
-PKG_VERS = 3.2.3
+PKG_VERS = 3.2.7
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_SITE = https://download.samba.org/pub/$(PKG_NAME)/src
+PKG_DIST_SITE = https://download.samba.org/pub/rsync/src
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 
 DEPENDS = cross/xxhash cross/openssl cross/lz4 cross/zstd

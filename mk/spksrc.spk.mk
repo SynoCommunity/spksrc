@@ -54,19 +54,20 @@ else
 # different noarch packages
 SPK_ARCH = noarch
 SPK_NAME_ARCH = noarch
-ifeq ($(strip $(TCVERSION)),)
-# default: 3.1 .. 5.2
-TCVERSION = 5.2
-endif
+ifneq ($(strip $(TCVERSION)),)
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
 SPK_TCVERS = dsm7
 TC_OS_MIN_VER = 7.0-40000
 else ifeq ($(call version_ge, $(TCVERSION), 6.1),1)
 SPK_TCVERS = dsm6
 TC_OS_MIN_VER = 6.1-15047
-else ifeq ($(call version_lt, $(TCVERSION), 3.0),1)
+else ifeq ($(call version_ge, $(TCVERSION), 3.0),1)
+SPK_TCVERS = all
+TC_OS_MIN_VER = 3.1-1594
+else
 SPK_TCVERS = srm
 TC_OS_MIN_VER = 1.1-6931
+endif
 else
 SPK_TCVERS = all
 TC_OS_MIN_VER = 3.1-1594
@@ -210,6 +211,15 @@ endif
 ifneq ($(strip $(INSTUNINST_RESTART_SERVICES)),)
 	@echo instuninst_restart_services=\"$(INSTUNINST_RESTART_SERVICES)\" >> $@
 endif
+ifneq ($(strip $(INSTALL_REPLACE_PACKAGES)),)
+	@echo install_replace_packages=\"$(INSTALL_REPLACE_PACKAGES)\" >> $@
+endif
+ifneq ($(strip $(USE_DEPRECATED_REPLACE_MECHANISM)),)
+	@echo use_deprecated_replace_mechanism=\"$(USE_DEPRECATED_REPLACE_MECHANISM)\" >> $@
+endif
+ifneq ($(strip $(CHECKPORT)),)
+	@echo checkport=\"$(CHECKPORT)\" >> $@
+endif
 
 # for non startable (i.e. non service, cli tools only)
 # as default is 'yes' we only add this value for 'no'
@@ -272,6 +282,9 @@ endif
 # Wizard
 DSM_WIZARDS_DIR = $(WORK_DIR)/WIZARD_UIFILES
 
+ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
+WIZARDS_DIR = $(WORK_DIR)/generated-wizards
+endif
 ifneq ($(WIZARDS_DIR),)
 # export working wizards dir to the shell for use later at compile-time
 export SPKSRC_WIZARDS_DIR=$(WIZARDS_DIR)
@@ -380,19 +393,62 @@ ifeq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
 endif
+ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
+	@$(MSG) "Generate DSM Wizards from templates"
+	@mkdir -p $(WIZARDS_DIR)
+	$(eval IS_DSM_6_OR_GREATER = $(if $(filter 1,$(call version_ge, $(TCVERSION), 6.0)),true,false))
+	$(eval IS_DSM_7_OR_GREATER = $(if $(filter 1,$(call version_ge, $(TCVERSION), 7.0)),true,false))
+	$(eval IS_DSM_7 = $(IS_DSM_7_OR_GREATER))
+	$(eval IS_DSM_6 = $(if $(filter true,$(IS_DSM_6_OR_GREATER)),$(if $(filter true,$(IS_DSM_7)),false,true),false))
+	@for template in `find $(WIZARDS_TEMPLATES_DIR) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print`; do \
+		template_filename="$$(basename $${template})"; \
+		template_name="$${template_filename%.*}"; \
+		if [ "$${template_name}" = "$${template_filename}" ]; then \
+			template_suffix=; \
+		else \
+			template_suffix=".$${template_filename##*.}"; \
+		fi; \
+		template_file_path="$(WIZARDS_TEMPLATES_DIR)/$${template_filename}"; \
+		for suffix in '' $(patsubst %,_%,$(LANGUAGES)) ; do \
+			template_file_localization_data_path="$(WIZARDS_TEMPLATES_DIR)/$${template_name}$${suffix}.yml"; \
+			output_file="$(WIZARDS_DIR)/$${template_name}$${suffix}$${template_suffix}"; \
+			if [ -f "$${template_file_localization_data_path}" ]; then \
+				{ \
+					echo "IS_DSM_6_OR_GREATER: $(IS_DSM_6_OR_GREATER)"; \
+					echo "IS_DSM_6: $(IS_DSM_6)"; \
+					echo "IS_DSM_7_OR_GREATER: $(IS_DSM_7_OR_GREATER)"; \
+					echo "IS_DSM_7: $(IS_DSM_7)"; \
+					cat "$${template_file_localization_data_path}"; \
+				} | mustache - "$${template_file_path}" >"$${output_file}"; \
+				if [ "$${template_suffix}" = "" ]; then \
+					jq_failed=0; \
+					errors=$$(jq . "$${output_file}" 2>&1) || jq_failed=1; \
+					if [ "$${jq_failed}" != "0" ]; then \
+						echo "Invalid wizard file generated $${output_file}:"; \
+						echo "$${errors}"; \
+						exit 1; \
+					fi; \
+				fi; \
+			fi; \
+		done; \
+	done
+endif
 ifneq ($(strip $(WIZARDS_DIR)),)
 	@$(MSG) "Create DSM Wizards"
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 	@mkdir -p $(DSM_WIZARDS_DIR)
 	@find $${SPKSRC_WIZARDS_DIR} -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@if [ -f "$(DSM_WIZARDS_DIR)/uninstall_uifile.sh" ] && [ -f "$(DSM_WIZARDS_DIR)/uninstall_uifile" ]; then \
+		rm "$(DSM_WIZARDS_DIR)/uninstall_uifile"; \
+	fi
 	@if [ -d "$(WIZARDS_DIR)$(TCVERSION)" ]; then \
 	    $(MSG) "Create DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"; \
 		find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
 	fi
-endif
-ifneq ($(wildcard $(DSM_WIZARDS_DIR)/*),)
-	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \;
-	@find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \;
+	@if [ -d "$(DSM_WIZARDS_DIR)" ]; then \
+		find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \; ;\
+		find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \; ;\
+	fi
 endif
 
 .PHONY: conf
@@ -425,30 +481,89 @@ endif
 ifeq ($(PUBLISH_API_KEY),)
 	$(error Set PUBLISH_API_KEY in local.mk)
 endif
-	http --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME)
+	@response=$$(http --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME) --print=hb); \
+	response_code=$$(echo "$$response" | grep -Fi "HTTP/1.1" | awk '{print $$2}'); \
+	if [ "$$response_code" = "201" ]; then \
+		output=$$(echo "$$response" | awk '/^[[:space:]]*$$/ {p=1;next} p'); \
+		echo "Package published successfully\n$$output" | tee --append publish-$*.log; \
+	else \
+		echo "ERROR: Failed to publish package - HTTP response code $$response_code\n$$response" | tee --append publish-$*.log; \
+		exit 1; \
+	fi
 
 
 ### Clean rules
 clean:
-	rm -fr work work-* build-*.log
+	rm -fr work work-* build-*.log publish-*.log
+
+# Remove work-*/<pkgname>* directories while keeping
+# work-*/.<pkgname>*|<pkgname>.plist status files
+# This is in order to resolve: 
+#    System.IO.IOException: No space left on device
+# when building online thru github-action, in particular
+# for "packages-to-keep" such as python* and ffmpeg*
+clean-source: SHELL:=/bin/bash
+clean-source: spkclean
+	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
+	   makefile="../../$${depend}/Makefile" ; \
+	   pkgdirstr=$$(grep ^PKG_DIR $${makefile} || true) ; \
+	   pkgdir=$$(echo $${pkgdirstr#*=} | cut -f1 -d- | sed -s 's/[\)]/ /g' | sed -s 's/[\$$\(\)]//g' | cut -f1 -d' ' | xargs) ; \
+	   if [ ! "$${pkgdirstr}" ]; then \
+	      continue ; \
+	   elif echo "$${pkgdir}" | grep -Eq '^(PKG_|DIST)'; then \
+	      pkgdirstr=$$(grep ^$${pkgdir} $${makefile}) ; \
+	      pkgdir=$$(echo $${pkgdirstr#*=} | xargs) ; \
+	   fi ; \
+	   #echo "depend: [$${depend}] - pkgdir: [$${pkgdir}]" ; \
+	   find work-*/$${pkgdir}[-_]* -maxdepth 0 -type d 2>/dev/null | while read sourcedir ; do \
+	      echo "rm -fr $$sourcedir" ; \
+	      find $${sourcedir}/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
+	   done ; \
+	done
 
 spkclean:
 	rm -fr work-*/.copy_done \
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
-	       work-*/.wheel_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
 	       work-*/tc_vars.mk \
 	       work-*/tc_vars.cmake \
-	       work-*/wheelhouse \
 	       work-*/package.tgz \
 	       work-*/INFO \
 	       work-*/PLIST \
 	       work-*/PACKAGE_ICON* \
 	       work-*/WIZARD_UIFILES
+
+wheelclean: spkclean
+	rm -fr work-*/.wheel_done \
+	       work-*/wheelhouse \
+	       work-*/install/var/packages/**/target/share/wheelhouse
+	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
+	   makefile="../../$${depend}/Makefile" ; \
+	   if grep -q spksrc.python-wheel.mk $${makefile} ; then \
+	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
+	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
+	      echo "rm -fr work-*/$${pkgname}*\\n       work-*/.$${pkgname}-*" ; \
+	      rm -fr work-*/$${pkgname}* \
+                     work-*/.$${pkgname}-* ; \
+	   fi ; \
+	done
+
+wheelcleancache: wheelclean
+	rm -fr work-*/pip
+
+wheelcleanall: wheelcleancache
+	rm -fr ../../distrib/pip
+
+pythonclean: wheelcleanall
+	rm -fr work-*/.[Pp]ython*-install_done \
+	rm -fr work-*/crossenv
+
+pythoncleanall: pythonclean
+	rm -fr work-*/[Pp]ython* work-*/.python*
 
 all: package
 ifneq ($(filter 1 on ON,$(PSTAT)),)
@@ -526,19 +641,19 @@ supported-arch-error:
 
 supported-arch-%: spk_msg
 	@$(MSG) "BUILDING package for arch $* (all-supported)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix arch-, $*)
+	-@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) $(addprefix arch-, $*)
 
 publish-supported-arch-%: spk_msg
 	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-supported)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix publish-arch-, $*)
+	-@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) $(addprefix publish-arch-, $*)
 
 latest-arch-%: spk_msg
 	@$(MSG) "BUILDING package for arch $* (all-latest)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix arch-, $*)
+	-@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) $(addprefix arch-, $*)
 
 publish-latest-arch-%: spk_msg
 	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-latest)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) $(addprefix publish-arch-, $*)
+	-@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) $(addprefix publish-arch-, $*)
 
 ####
 
@@ -578,6 +693,7 @@ kernel-modules-%:
 	   archs2process=$* ; \
 	fi ; \
 	$(MSG) ARCH to be processed: $${archs2process} ; \
+	set -e ; \
 	for arch in $${archs2process} ; do \
 	  $(MSG) "Processing $${arch} ARCH" ; \
 	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(PWD)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*.log ; \
@@ -603,7 +719,7 @@ build-arch-%: spk_msg
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [BEGIN] >> $(PSTAT_LOG)
 endif
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
+	@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false
 ifneq ($(filter 1 on ON,$(PSTAT)),)
 	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [END] >> $(PSTAT_LOG)
@@ -618,7 +734,7 @@ ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
 else
 	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
 	@$(MSG) BUILDING and PUBLISHING package for arch $*
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish 2>&1 | tee --append build-$*.log ; \
+	@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish 2>&1 | tee --append build-$*.log >(grep -e '^http' -e '^{"package":' -e '^{"message":' >> publish-$*.log) ; \
 	  [ $${PIPESTATUS[0]} -eq 0 ] || false
 endif
 

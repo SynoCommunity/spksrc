@@ -22,8 +22,17 @@ include ../../mk/spksrc.cross-cc.mk
 # Fetch python variables
 -include $(WORK_DIR)/python-cc.mk
 
+# If using spk.python.mk with PYTHON_STAGING_PREFIX defined
+# then redirect STAGING_INSTALL_PREFIX so rust
+# wheels can find openssl and other libraries
+ifneq ($(wildcard $(PYTHON_STAGING_PREFIX)),)
+STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_PREFIX)
+endif
+
 # Python module variables
+ifeq ($(strip $(PYTHONPATH)),)
 PYTHONPATH = $(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/
+endif
 
 ## python wheel specific configurations
 include ../../mk/spksrc.wheel-env.mk
@@ -32,10 +41,10 @@ include ../../mk/spksrc.wheel-env.mk
 build_python_wheel_target:
 ifeq ($(strip $(CROSSENV)),)
 # Python 2 way
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" $(BUILD_ARGS) bdist_wheel -d $(WHEELHOUSE)
+	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" $(BUILD_ARGS) bdist_wheel $(WHEELS_BUILD_ARGS) -d $(WHEELHOUSE)
 else
 # Python 3 case: using crossenv helper
-	@. $(CROSSENV) && $(RUN) PYTHONPATH=$(PYTHONPATH) python -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" $(BUILD_ARGS) bdist_wheel -d $(WHEELHOUSE)
+	@. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) python3 setup.py $(BUILD_ARGS) bdist_wheel $(WHEELS_BUILD_ARGS) -d $(WHEELHOUSE)
 endif
 	@$(RUN) echo "$(PKG_NAME)==$(PKG_VERS)" >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)
 

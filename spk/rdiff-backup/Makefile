@@ -1,20 +1,24 @@
 SPK_NAME = rdiff-backup
-SPK_VERS = 2.0.3
-SPK_REV = 4
+SPK_VERS = 2.2.5
+SPK_REV = 5
 SPK_ICON = src/rdiff-backup.png
 
-BUILD_DEPENDS = cross/python310
+PYTHON_PACKAGE = python311
+SPK_DEPENDS = "python311>=3.11.5-8"
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+
 DEPENDS = cross/librsync cross/attr cross/acl
 
-WHEELS = src/requirements.txt
-
-SPK_DEPENDS = "python310"
+# [PyYAML]
+DEPENDS += cross/libyaml
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Reverse differential backup tool, over a network or locally.
 STARTABLE = no
 DISPLAY_NAME = rdiff-backup
-CHANGELOG = "Update to v2.0.3 and update dependencies for Python 3.10"
+CHANGELOG = "1. Update to v2.2.5.<br/>2. Migrate to Python 3.11."
 
 HOMEPAGE = https://rdiff-backup.net/
 LICENSE  = GPLv2
@@ -23,4 +27,4 @@ SERVICE_SETUP = src/service-setup.sh
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/rdiff-backup bin:env/bin/rdiff-backup-statistics
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk

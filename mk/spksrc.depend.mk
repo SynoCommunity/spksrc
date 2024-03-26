@@ -51,7 +51,8 @@ depend_msg_target:
 pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
-	@for depend in $(BUILD_DEPENDS) $(KERNEL_DEPEND) $(TOOLKIT_DEPEND) $(DEPENDS); \
+	@set -e; \
+	for depend in $(BUILD_DEPENDS) $(KERNEL_DEPEND) $(TOOLKIT_DEPEND) $(DEPENDS); \
 	do                          \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done

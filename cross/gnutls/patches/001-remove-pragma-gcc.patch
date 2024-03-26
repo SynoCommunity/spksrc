@@ -1,0 +1,38 @@
+# remove #pragma GCC diagnostic for older gcc compilers
+# 
+--- src/common.c.orig	2022-09-27 12:42:22.000000000 +0000
++++ src/common.c	2022-12-31 04:31:26.892529262 +0000
+@@ -303,10 +303,6 @@
+ 		return 0;
+ 	}
+ 
+-/* GCC analyzer in 11.2 mishandles reallocarray/free */
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wanalyzer-mismatching-deallocation"
+-
+ 	methods = reallocarray(NULL, n_strings, sizeof(*methods));
+ 	if (!methods) {
+ 		fprintf(stderr, "Could not set certificate compression methods: %s\n",
+@@ -333,8 +329,6 @@
+ cleanup:
+ 	free(methods);
+ 
+-#pragma GCC diagnostic pop
+-
+ 	return ret;
+ }
+ 
+@@ -1339,8 +1333,6 @@
+ 	logfile = file;
+ }
+ 
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wformat-y2k"
+ /* This is very similar to ctime() but it does not force a newline.
+  */
+ char *simple_ctime(const time_t *t, char out[SIMPLE_CTIME_BUF_SIZE])
+@@ -1359,4 +1351,3 @@
+ 	snprintf(out, SIMPLE_CTIME_BUF_SIZE, "[error]");
+ 	return out;
+ }
+-#pragma GCC diagnostic pop

@@ -1,5 +1,5 @@
 PKG_NAME = ripgrep
-PKG_VERS = 13.0.0
+PKG_VERS = 14.1.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/BurntSushi/ripgrep/archive
@@ -18,5 +18,15 @@ LICENSE  = public domain/Unlicense
 # Force static build when pcre2 is detected in synocli-file build environment
 ENV += PCRE2_SYS_STATIC=1
 CARGO_BUILD_ARGS += --features 'pcre2'
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+# upstream/src/pcre2_script_run.c - error: .... only allowed in C99 or C11 mode
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ADDITIONAL_CFLAGS = -std=c99
+else
+ADDITIONAL_CFLAGS = -std=c11
+endif
+endif
 
 include ../../mk/spksrc.cross-rust.mk

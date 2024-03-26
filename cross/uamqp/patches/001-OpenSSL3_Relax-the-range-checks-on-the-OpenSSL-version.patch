@@ -1,0 +1,58 @@
+From: Simon Chopin <simon.chopin@canonical.com>
+Subject: Relax the range checks on the OpenSSL version
+Forwarded: https://github.com/Azure/azure-c-shared-utility/pull/577
+
+OpenSSL 3.0 has a high degree of API compatibility with the 1.1.1
+branch, so the 1.1 code branches are also valid for higher versions.
+
+Note that this patch does not address the deprecation warnings
+introduced by OpenSSL 3.0.
+--- src/vendor/azure-uamqp-c/deps/azure-c-shared-utility/adapters/tlsio_openssl.c
++++ src/vendor/azure-uamqp-c/deps/azure-c-shared-utility/adapters/tlsio_openssl.c
+@@ -953,7 +953,7 @@
+         }
+         else
+         {
+-#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && (OPENSSL_VERSION_NUMBER < 0x20000000L)
++#if (OPENSSL_VERSION_NUMBER >= 0x10100000L)
+             const BIO_METHOD* bio_method;
+ #else
+             BIO_METHOD* bio_method;
+@@ -1052,7 +1052,7 @@
+ 
+     const SSL_METHOD* method = NULL;
+ 
+-#if (OPENSSL_VERSION_NUMBER < 0x10100000L) || (OPENSSL_VERSION_NUMBER >= 0x20000000L)
++#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
+     if (tlsInstance->tls_version == VERSION_1_2)
+     {
+         method = TLSv1_2_method();
+@@ -1248,7 +1248,7 @@
+ 
+ #if   (OPENSSL_VERSION_NUMBER < 0x10000000L)
+     ERR_remove_state(0);
+-#elif (OPENSSL_VERSION_NUMBER < 0x10100000L) || (OPENSSL_VERSION_NUMBER >= 0x20000000L)
++#elif (OPENSSL_VERSION_NUMBER < 0x10100000L)
+     ERR_remove_thread_state(NULL);
+ #endif
+ #if  (OPENSSL_VERSION_NUMBER >= 0x10002000L) &&  (OPENSSL_VERSION_NUMBER < 0x10010000L) && (SSL_COMP_free_compression_methods)
+--- src/vendor/azure-uamqp-c/deps/azure-c-shared-utility/adapters/x509_openssl.c
++++ src/vendor/azure-uamqp-c/deps/azure-c-shared-utility/adapters/x509_openssl.c
+@@ -75,7 +75,7 @@
+                 // certificates.
+ 
+                 /* Codes_SRS_X509_OPENSSL_07_006: [ If successful x509_openssl_add_ecc_credentials shall to import each certificate in the cert chain. ] */
+-#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && (OPENSSL_VERSION_NUMBER < 0x20000000L)
++#if (OPENSSL_VERSION_NUMBER >= 0x10100000L)
+                 SSL_CTX_clear_extra_chain_certs(ssl_ctx);
+ #else
+                 if (ssl_ctx->extra_certs != NULL)
+@@ -345,7 +345,7 @@
+         else
+         {
+             /*Codes_SRS_X509_OPENSSL_02_012: [ x509_openssl_add_certificates shall get the memory BIO method function by calling BIO_s_mem. ]*/
+-#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && (OPENSSL_VERSION_NUMBER < 0x20000000L)
++#if (OPENSSL_VERSION_NUMBER >= 0x10100000L)
+             const BIO_METHOD* bio_method;
+ #else
+             BIO_METHOD* bio_method;

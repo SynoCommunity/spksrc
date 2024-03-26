@@ -1,8 +1,8 @@
 PKG_NAME = openssh
-PKG_VERS = 9.0p1
+PKG_VERS = 9.3p1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.fr.openbsd.org/pub/OpenBSD/OpenSSH/portable
+PKG_DIST_SITE = https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl
@@ -19,6 +19,8 @@ CONFIGURE_ARGS = --with-privsep-path=$(INSTALL_PREFIX)/var/empty
 CONFIGURE_ARGS += --disable-lastlog --disable-strip
 CONFIGURE_ARGS += --disable-utmp --disable-utmpx
 CONFIGURE_ARGS += --disable-wtmp --disable-wtmpx
+# need to disable use of system getentropy for kernels < 3.17
+CONFIGURE_ARGS += ac_cv_func_getentropy=no
 
 include ../../mk/spksrc.cross-cc.mk
 

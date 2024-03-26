@@ -6,9 +6,11 @@
 #
 # Functions:
 # - Download all referenced native and cross source files for packages to build.
+# - Download all referenced python wheels needed to build.
 
 set -o pipefail
 
+# Download regular cross/* sources
 if [ -z "${DOWNLOAD_PACKAGES}" ]; then
     echo "===> No packages to download. <==="
 else
@@ -19,3 +21,19 @@ else
         make -C ${download} download
     done
 fi
+
+echo ""
+
+# Download python wheel sources files
+build_packages="${NOARCH_PACKAGES} ${ARCH_PACKAGES}"
+
+if [ -z "${build_packages}" ]; then
+    echo "===> No wheels to download. <==="
+else
+    for package in ${build_packages}; do
+        echo "===> Download wheels: ${package}"
+        make -C spk/${package} wheeldownload
+    done
+fi
+
+echo ""

@@ -35,6 +35,8 @@ endif
 
 #####
 
+include ../../mk/spksrc.pre-check.mk
+
 include ../../mk/spksrc.cross-env.mk
 
 include ../../mk/spksrc.download.mk
@@ -77,6 +79,24 @@ include ../../mk/spksrc.dependency-tree.mk
 all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
 
 ####
+
+all-supported: SHELL:=/bin/bash
+all-supported:
+	@$(MSG) Pre-build native dependencies for parallel build
+	@for depend in $$($(MAKE) dependency-list) ; \
+	do \
+	  if [ "$${depend%/*}" = "native" ]; then \
+	    $(MSG) "Pre-processing $${depend}" ; \
+	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
+	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
+	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
+	  fi ; \
+	done ; \
+	$(MAKE) $(addprefix supported-arch-,$(SUPPORTED_ARCHS))
+
+supported-arch-%:
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
+	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee --append build-$*.log
 
 arch-%:
 	@$(MSG) Building package for arch $*

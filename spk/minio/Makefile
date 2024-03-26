@@ -1,17 +1,17 @@
 SPK_NAME = minio
-SPK_VERS = 2022.05.19
-SPK_REV = 14
+SPK_VERS = 2022.09.07
+SPK_REV = 15
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/minio cross/minio-client
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = fgma
-DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
+DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs. This Package includes the 'minio-client' \(mc\).
 DISPLAY_NAME = MinIO
-CHANGELOG = "Update to MinIO 2022-04-26T01-20-24Z. Multiple minor feature releases and security releases."
+CHANGELOG = "1. Update to MinIO 2022-09-07T22-25-02Z. Multiple minor feature releases and security releases.<br/>2. Include minio-client (mc) in the package (named 'minio-client' and availalbe in the path, to use the client as 'mc' your have to specify the full path: /var/packages/minio/target/bin/mc).<br/>3. Format of the environment-variables file has changed. Custom variables are exported by default and must not be defined with export anymore."
 LICENSE_FILE = $(WORK_DIR)/src/github.com/minio/minio/LICENSE
 HOMEPAGE = https://min.io/
 LICENSE = AGPLv3.0
@@ -21,7 +21,6 @@ WIZARDS_DIR = src/wizard
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 SERVICE_WIZARD_SHARE = wizard_data_directory
 USE_DATA_SHARE_WORKER = yes
 FWPORTS = src/minio.sc
@@ -29,6 +28,9 @@ FWPORTS = src/minio.sc
 ADMIN_PORT = 9001
 
 POST_STRIP_TARGET = minio_extra_install
+
+# official binary is "mc" not "minio-client", but "mc" is already used for midnight-commander
+SPK_COMMANDS = bin/minio-client
 
 include ../../mk/spksrc.spk.mk
 

@@ -1,5 +1,5 @@
 PKG_NAME = libbluray
-PKG_VERS = 1.3.1
+PKG_VERS = 1.3.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.videolan.org/pub/videolan/libbluray/$(PKG_VERS)
@@ -13,7 +13,11 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS = --disable-examples --disable-doxygen-doc --disable-doxygen-dot --disable-bdjava-jar
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --disable-examples
+CONFIGURE_ARGS += --disable-doxygen-doc
+CONFIGURE_ARGS += --disable-doxygen-dot
+CONFIGURE_ARGS += --disable-bdjava-jar
 
 # For ppc853x-5.2, define GNU_SOURCE
 ifeq ($(findstring $(ARCH)-$(TCVERSION), ppc853x-5.2 qoriq-5.2),$(ARCH)-$(TCVERSION))

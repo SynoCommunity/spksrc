@@ -6,7 +6,7 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 ZNC="${SYNOPKG_PKGDEST}/bin/znc"
 CERT_FILE="${SYNOPKG_PKGVAR}/znc.pem"
-PYTHON3_LIB_PATH="/var/packages/python310/target/lib"
+PYTHON3_LIB_PATH="/var/packages/python311/target/lib"
 SERVICE_COMMAND="env LD_LIBRARY_PATH=${PYTHON3_LIB_PATH} ${ZNC} -d ${SYNOPKG_PKGVAR}"
 SVC_BACKGROUND=yes
 CONF_FILE=${SYNOPKG_PKGVAR}/configs/znc.conf

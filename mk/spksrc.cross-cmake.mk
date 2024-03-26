@@ -18,6 +18,11 @@ ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = cmake_configure_target
 endif
 
+# install
+ifeq ($(strip $(CMAKE_DIR)),)
+CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
+endif
+
 ifneq ($(strip $(CMAKE_USE_NINJA)),1)
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
@@ -40,22 +45,33 @@ cmake_pkg_toolchain:
 	@cat $(CMAKE_TOOLCHAIN_WRK) ; \
 	echo
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	@echo "# set assembly compiler" ; \
 	echo "set(ENABLE_ASSEMBLY $(ENABLE_ASSEMBLY))" ; \
 	echo "set(CMAKE_ASM_COMPILER $(CMAKE_ASM_COMPILER))" ; \
 	echo
 endif
+endif
 	@echo "# set compiler flags for cross-compiling" ; \
 	echo 'set(CMAKE_C_FLAGS "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)")' ; \
 	echo 'set(CMAKE_CPP_FLAGS "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS)")' ; \
-	echo 'set(CMAKE_CXX_FLAGS "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)")' ; \
-	echo 'set(CMAKE_LD_FLAGS "$(LDFLAGS) $(CMAKE_LD_FLAGS) $(ADDITIONAL_LDFLAGS)")' ; \
+	echo 'set(CMAKE_CXX_FLAGS "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)")'
+ifneq ($(strip $(CMAKE_DISABLE_EXE_LINKER_FLAGS)),1)
+	@echo 'set(CMAKE_EXE_LINKER_FLAGS "$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)")'
+endif
+	@echo 'set(CMAKE_SHARED_LINKER_FLAGS "$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)")' ; \
 	echo
+ifneq ($(strip $(BUILD_SHARED_LIBS)),)
+	@echo "# build shared library" ; \
+	echo "set(BUILD_SHARED_LIBS $(BUILD_SHARED_LIBS))"
+endif
 	@echo "# define library rpath" ; \
 	echo "set(CMAKE_INSTALL_RPATH $(subst $() $(),:,$(CMAKE_INSTALL_RPATH)))" ; \
 	echo "set(CMAKE_INSTALL_RPATH_USE_LINK_PATH $(CMAKE_INSTALL_RPATH_USE_LINK_PATH))" ; \
 	echo "set(CMAKE_BUILD_WITH_INSTALL_RPATH $(CMAKE_BUILD_WITH_INSTALL_RPATH))" ; \
 	echo
+	@echo "# set pkg-config path" ; \
+	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(abspath $(PKG_CONFIG_LIBDIR))")'
 
 .PHONY: cmake_configure_target
 
@@ -69,12 +85,13 @@ cmake_configure_target: $(CMAKE_TOOLCHAIN_PKG)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
+	@$(MSG)    - Path CMAKE_DIR = $(CMAKE_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
 ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_PKG) $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_PKG) $(CMAKE_ARGS) $(CMAKE_DIR)
 else
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(WORK_DIR)/$(PKG_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(CMAKE_DIR)
 endif
 
 .PHONY: cmake_compile_target

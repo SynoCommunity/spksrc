@@ -1,0 +1,56 @@
+# adjust Makefile-nolib to build with cross toolchain
+# - use custom CC
+# - use custom LIBS variable
+# - remove hard coded paths to external libraries
+# - adjust install path with $(prefix)
+
+--- Makefile-nolib.orig	2017-01-11 22:51:58.000000000 +0000
++++ Makefile-nolib	2022-11-22 20:16:33.654934987 +0000
+@@ -11,27 +11,27 @@
+ # macros --------------------------------------------------------------------
+ 
+ # uncomment these 2 lines only if you are using an external copy of libpng:
+-PNGINC = /usr/local/include
+-PNGLIB = /usr/local/lib
++#PNGINC = /usr/local/include
++#PNGLIB = /usr/local/lib
+ # uncomment these 2 lines only if you are using an external copy of zlib:
+-ZINC = /usr/local/include
+-ZLIB = /usr/local/lib
++#ZINC = /usr/local/include
++#ZLIB = /usr/local/lib
+ 
+-CC = gcc
++CC ?= gcc
+ LD = $(CC)
+ RM = rm -f
+ 
+-CPPFLAGS = ${OPTIONS} -I$(PNGINC)
++CPPFLAGS ?= ${OPTIONS} -I$(PNGINC)
+ 
+-CFLAGS = -g -O3 -fomit-frame-pointer -Wall
++CFLAGS ?= -g -O3 -fomit-frame-pointer -Wall
+ # [note that -Wall is a gcc-specific compilation flag ("all warnings on")]
+-LDFLAGS =
++#LDFLAGS =
+ O = .o
+ E =
+ 
+ PNGCRUSH  = pngcrush
+ 
+-LIBS = -L$(PNGLIB) -L$(ZLIB) -lpng -lz -lm
++#LIBS = -L$(PNGLIB) -L$(ZLIB) -lpng -lz -lm
+ 
+ OBJS  = pngcrush$(O)
+ 
+@@ -59,7 +59,7 @@
+ 	$(RM) $(EXES) $(OBJS)
+ 
+ install:
+-	mkdir -p $(DESTDIR)/usr/bin/
+-	cp $(PNGCRUSH)$(E) $(DESTDIR)/usr/bin/
+-	chmod 0755 $(DESTDIR)/usr/bin/$(PNGCRUSH)$(E)
++	mkdir -p $(DESTDIR)/$(prefix)/bin/
++	cp $(PNGCRUSH)$(E) $(DESTDIR)/$(prefix)/bin/
++	chmod 0755 $(DESTDIR)/$(prefix)/bin/$(PNGCRUSH)$(E)
+ 

@@ -1,8 +1,10 @@
 SPK_NAME = sd
-SPK_VERS = 0.7.6
+SPK_VERS = 1.0.0
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/sd
+
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Intuitive find & replace CLI (sed alternative).

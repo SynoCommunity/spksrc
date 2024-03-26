@@ -1,5 +1,5 @@
 PKG_NAME = xxHash
-PKG_VERS = 0.8.0
+PKG_VERS = 0.8.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Cyan4973/xxHash/archive
@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = www.xxhash.com
+HOMEPAGE = https://cyan4973.github.io/xxHash/
 COMMENT  = Extremely fast non-cryptographic hash algorithm.
 LICENSE  = 2-Clause BSD
 

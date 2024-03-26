@@ -10,7 +10,8 @@
                 "allowBlank": true
             }
         }]
-    },{
+    },
+    {
         "type": "password",
         "desc": "HTTP password (blank = no authentication)",
         "subitems": [{
@@ -22,6 +23,6 @@
         }]
     },
     {
-        "desc": "<p>The first time SickChill is started it might take a few moments for the interface to become available!</p><p>Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details.</p>"
+        "desc": "<p>The first time SickChill is started it will take a few moments for the interface to become available!</p><p>Permissions for SickChill are user <b>'sc-sickchill'</b> all download-related packages are managed with the group <b>'sc-download (DSM6) and synocommunity (DSM7)'</b>.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details.</p>"
     }]
 }]

@@ -1,31 +1,12 @@
-PKG_NAME = libva
-PKG_VERS = 2.14.0
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/intel/libva/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = libva-main
 
-DEPENDS = cross/libdrm
+OPTIONAL_DEPENDS  = cross/libva-latest
+OPTIONAL_DEPENDS += cross/libva-2.17
 
-HOMEPAGE = https://01.org/vaapi
-COMMENT  = Libva is an implementation for VA-API (Video Acceleration API).
-LICENSE = MIT
+include ../../mk/spksrc.main-depends.mk
 
-CONFIGURE_ARGS = -Ddriverdir=$(INSTALL_PREFIX)/lib
-
-include ../../mk/spksrc.common.mk
-
-# freedreno: All except i686/x86_64
-# intel: i686/x86_64
-# amdgpu+radeon: x86_64
-ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-PLIST_TRANSFORM = grep -v -e libdrm_freedreno.so
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+DEPENDS = cross/libva-latest
 else
-PLIST_TRANSFORM = grep -v -e libdrm_amdgpu.so -e libdrm_intel.so -e libdrm_radeon.so
+DEPENDS = cross/libva-2.17
 endif
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-PLIST_TRANSFORM += -e libdrm_amdgpu.so -e libdrm_radeon.so
-endif
-
-include ../../mk/spksrc.cross-meson.mk

@@ -51,11 +51,6 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_ge, $(call version_gcc), 7.5),1)
-# fix compilation with newer compilers
-ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
-endif
-
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 ADDRESS_MODEL = 64
 else
@@ -63,6 +58,15 @@ ADDRESS_MODEL = 32
 endif
 
 include ../../mk/spksrc.cross-cc.mk
+
+ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
+# fix compilation with newer compilers
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISNAN
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
+else
+ADDITIONAL_CXXFLAGS += -std=c++11
+endif
 
 .PHONY: boost_configure
 boost_configure:
@@ -72,8 +76,8 @@ boost_configure:
 boost_compile:
 	@# Recreate user-config.jam to include python-cc.mk on second run
 	@rm -rf $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-	@echo "using gcc : `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion` : $(TC_PATH)$(TC_PREFIX)g++ : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-ifneq ($(strip $(WITH_PYTHON)),)
+	@echo "using gcc : ${TC_GCC} : ${CXX} : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS) $(ADDITIONAL_CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
+ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 	@echo "using python : $(PYTHON_VERSION) : : $(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 endif
 	@echo "project : requirements <cxxflags>$(OFLAGS) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
