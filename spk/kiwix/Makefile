@@ -1,6 +1,6 @@
 SPK_NAME = kiwix
-SPK_VERS = 3.4.0
-SPK_REV  = 4
+SPK_VERS = 3.5.0
+SPK_REV  = 5
 SPK_ICON = src/kiwix.png
 
 DEPENDS = cross/kiwix-tools
@@ -14,18 +14,17 @@ LICENSE  = GPLv3
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
-CHANGELOG = "Update kiwix to v3.4.0.<br>Fix initialization of empty library file on DSM 7."
+CHANGELOG = "Update kiwix to v3.5.0.<br/>This is the latest version that will be available for DSM 6."
 
 SERVICE_USER = auto
 STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8092
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_PORT_TITLE = Kiwix (http)
 ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard
-SERVICE_WIZARD_SHARE = wizard_data_folder
-USE_DATA_SHARE_WORKER = yes
+SERVICE_WIZARD_SHARENAME = wizard_data_folder
 
 POST_STRIP_TARGET = kiwix_extra_install
 
