@@ -1,0 +1,21 @@
+per_cpu_load_addr is only used for 64-bit relocations, but is declared
+in both configurations of relocs.c - with different types.  This has
+undefined behaviour in general.  GNU ld is documented to use the
+larger size in this case, but other tools may differ and some warn
+about this.
+
+References: https://bugs.debian.org/748577
+Reported-by: Michael Tautschnig <mt@debian.org>
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+
+--- arch/x86/tools/relocs.c.orig	2021-07-01 14:26:53.000000000 +0000
++++ arch/x86/tools/relocs.c	2023-05-24 22:57:21.794016972 +0000
+@@ -695,7 +695,7 @@ static void walk_relocs(int (*process)(s
+  *
+  */
+ static int per_cpu_shndx	= -1;
+-Elf_Addr per_cpu_load_addr;
++static Elf_Addr per_cpu_load_addr;
+ 
+ static void percpu_init(void)
+ {

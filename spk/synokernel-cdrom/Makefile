@@ -23,7 +23,6 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-STRIP_TARGET = nop
 POST_STRIP_TARGET = synokernel-cdrom_extra-install
 
 include ../../mk/spksrc.spk.mk

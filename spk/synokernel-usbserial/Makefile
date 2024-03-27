@@ -18,7 +18,7 @@ MAINTAINER = th0ma7
 DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko"
 CHANGELOG = "1. Synology Kernel USB serial drivers<br/>2. Update kernel module build framework<br/>3. Fixes for many unsupported archs"
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) kvmcloud
 
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB Serial drivers
@@ -28,7 +28,6 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-STRIP_TARGET = nop
 POST_STRIP_TARGET = usbserial_extra_install
 
 include ../../mk/spksrc.spk.mk
