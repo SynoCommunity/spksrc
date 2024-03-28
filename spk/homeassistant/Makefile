@@ -10,7 +10,7 @@ SPK_DEPENDS = "$(PYTHON_PACKAGE)>=3.11.4-7"
 
 OPTIONAL_DEPENDS = cross/libstdc++
 
-# [numpy] > 1.22.4
+# [numpy] <= 1.22.4
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = hgy59
@@ -36,6 +36,11 @@ POST_STRIP_TARGET = homeassistant_extra_install
 
 # Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
 WHEELS = src/requirements-abi3.txt src/requirements-crossenv.txt src/requirements-pure.txt
+
+# stdc++ bindings for webrtc_noise_gain
+ADDITIONAL_CROSSENV_WHEELS += pybind11==2.11.1
+# for building frozenlist, yarl, ...
+ADDITIONAL_CROSSENV_WHEELS += expandvars==0.12.0
 
 # [DTLSSocket] runtime dependency of [tradfri]
 DEPENDS += cross/dtlssocket
@@ -107,16 +112,16 @@ DEPENDS += cross/libxslt
 
 include ../../mk/spksrc.python.mk
 
-# prefer native python tools (pip, maturin, ...)
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
-
 # [greenlet]
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
 WHEELS_CPPFLAGS += [greenlet] -std=c++11
 endif
 
-# [numpy]
+# [numpy] <= 1.23.5 (any) requires setuptools <= 63.4.3
+# no longer supported as python311 now uses setuptools >= 69.x
+#
 # Fix wheel building with older compilers
+# [numpy] <= 1.24.4 last working version with gcc-4.9
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CPPFLAGS += [numpy] -std=c++0x
 # workaround for compiler bug:
