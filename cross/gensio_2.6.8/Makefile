@@ -1,19 +1,21 @@
 PKG_NAME = gensio
-PKG_VERS = 2.8.2
+PKG_VERS = 2.6.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cminyard/gensio/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-HOMEPAGE = https://github.com/cminyard/gensio
-COMMENT  = A library to abstract stream I/O like serial port, TCP, telnet, UDP, SSL, IPMI SOL, etc.
-LICENSE  = GPLv2
+DEPENDS = cross/openssl3
+
+# v2.6.8 is the latest version that is compatible with ARMv5_ARCHS
 
 # qoriq is the only PPC arch that is supported
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-DEPENDS = cross/openssl3
+HOMEPAGE = https://github.com/cminyard/gensio
+COMMENT  = A library to abstract stream I/O like serial port, TCP, telnet, UDP, SSL, IPMI SOL, etc.
+LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = gensio_pre_configure
