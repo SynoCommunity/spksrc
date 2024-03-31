@@ -7,10 +7,12 @@ AVAILABLE_ARCHS = $(notdir $(subst syno-,/,$(AVAILABLE_TCS)))
 SUPPORTED_SPKS = $(sort $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile)))
 
 
+ifneq ($(firstword $(MAKECMDGOALS)),test)
 all: $(SUPPORTED_SPKS)
+endif
 
 all-noarch:
-	@for spk in $(sort $(dir $(wildcard spk/*/Makefile))) ; \
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
 	   grep -q "override ARCH" "$${spk}/Makefile" && $(MAKE) -C $${spk} ; \
 	done
@@ -54,7 +56,7 @@ cross-clean:
 	done
 
 spk-clean:
-	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
 	    $(MAKE) -C $${spk} clean ; \
 	done

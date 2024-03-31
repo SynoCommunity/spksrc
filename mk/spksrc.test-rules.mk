@@ -22,21 +22,27 @@ test:
 ###
 
 TEST_DEFAULT_SPK = spk/demoservice diyspk/tmux
-TEST_DEFAULT = cross/tree
+TEST_DEFAULT = cross/tree cross/libtree cross/zsh
 TEST_RUSTC = cross/bat
 TEST_CMAKE = cross/intel-gmmlib
 TEST_GNUCONFIGURE = cross/ncursesw
 TEST_MESON = cross/libdrm
+TEST_FFMPEG = spk/ffmpeg5
+TEST_FFMPEG_DEP = spk/tvheadend
+TEST_PYTHON = spk/python311
+TEST_PYTHON_DEP = spk/borgbackup
 
-.PHONY: testall
-testall: test-dependency-tree test-dependency-flat test-dependency-list
-testall: test-clean
-testall: test-depend
-testall: test-download test-digests
-testall: test-extract test-patch
-testall: test-compile test-install
-testall: test-toolchain
-testall: test-rustc test-cmake test-gnuconfigure test-meson
+.PHONY: test-all
+test-all: test-dependency-tree test-dependency-flat test-dependency-list
+test-all: test-clean
+test-all: test-depend
+test-all: test-download test-digests
+test-all: test-extract test-patch
+test-all: test-compile test-install
+test-all: test-toolchain
+test-all: test-rustc test-cmake test-gnuconfigure test-meson
+test-all: test-python
+test-all: test-ffmpeg
 
 .PHONY: test-info
 test-info:
@@ -49,9 +55,16 @@ test-info:
 .PHONY: test-%
 test-%: SHELL:=/bin/bash
 test-%:
-	@if echo "$*" | grep -Eq '^(download|digests)'; then \
-	  echo "make -C $(TEST_DEFAULT) $*" ; \
-	  make -C $(TEST_DEFAULT) $* ; \
+	@if echo "$*" | grep -Eq '^(clean|download|digests)'; then \
+	  for do_test in $(TEST_DEFAULT) ; do \
+	    echo "make -C $${do_test} $*" ; \
+	    make -C $${do_test} $* ; \
+	  done ; \
+	elif echo "$*" | grep -Eq '^(dependency-*)'; then \
+	  for do_test in $(TEST_DEFAULT) ; do \
+	    echo "make --no-print-directory -C $${do_test} $*" ; \
+	    make --no-print-directory -C $${do_test} $* ; \
+	  done ; \
 	else \
 	  for arch in $(SUPPORTED_ARCHS) ; do \
 	    for do_test in $(TEST_DEFAULT) ; do \
@@ -90,3 +103,13 @@ test-gnuconfigure:
 .PHONY: test-meson
 test-meson:
 	PARALLEL_MAKE=max make -j2 -C $(TEST_MESON) all-supported
+
+.PHONY: test-ffmpeg
+test-ffmpeg:
+	PARALLEL_MAKE=max make -j2 -C $(TEST_FFMPEG) all-supported
+	PARALLEL_MAKE=max make -j2 -C $(TEST_FFMPEG_DEP) all-supported
+
+.PHONY: test-python
+test-python:
+	PARALLEL_MAKE=max make -j2 -C $(TEST_PYTHON) all-supported
+	PARALLEL_MAKE=max make -j2 -C $(TEST_PYTHON_DEP) all-supported
