@@ -1,5 +1,4 @@
 PKG_NAME = attr
-# newer versions are missing include/xattr.h (required by cross/dar to enable extended attr support)
 PKG_VERS = 2.5.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -14,7 +13,5 @@ LICENSE  = GPLv2+
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static
-
-#INSTALL_MAKE_OPTIONS = install-lib install-dev DIST_ROOT=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
