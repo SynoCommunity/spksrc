@@ -10,6 +10,9 @@ ifeq (test,$(firstword $(MAKECMDGOALS)))
   TEST_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn them into do-nothing targets
   $(eval $(TEST_ARGS):;@:)
+ifeq ($(strip $(TEST_ARGS)),)
+  $(error Argument missing for 'make test')
+endif
 endif
 
 .PHONY: test
@@ -18,7 +21,8 @@ test:
 
 ###
 
-TEST_DEFAULT = cross/tree spk/demoservice diyspk/tmux
+TEST_DEFAULT_SPK = spk/demoservice diyspk/tmux
+TEST_DEFAULT = cross/tree
 TEST_RUSTC = cross/bat
 TEST_CMAKE = cross/intel-gmmlib
 TEST_GNUCONFIGURE = cross/ncursesw
@@ -43,16 +47,25 @@ test-info:
 # Testing against toolchain and simple build use-cases
 # Process 'clean' on toolchains at the end as otherwise rebuilt
 .PHONY: test-%
+test-%: SHELL:=/bin/bash
 test-%:
-	@for arch in $(SUPPORTED_ARCHS) ; do \
-	  for do_test in $(TEST_DEFAULT) ; do \
-	    if [ "$*" = "clean" ]; then \
-	      make -C $${do_test} clean ; \
-	    else \
+	@if echo "$*" | grep -Eq '^(download|digests)'; then \
+	  echo "make -C $(TEST_DEFAULT) $*" ; \
+	  make -C $(TEST_DEFAULT) $* ; \
+	else \
+	  for arch in $(SUPPORTED_ARCHS) ; do \
+	    for do_test in $(TEST_DEFAULT) ; do \
+	      echo "make -C $${do_test} ARCH=$${arch%%-*} TCVERSION=$${arch##*-} $*" ; \
 	      make -C $${do_test} ARCH=$${arch%%-*} TCVERSION=$${arch##*-} $* ; \
-	    fi ; \
+	    done ; \
 	  done ; \
-	done ; \
+	fi
+
+.PHONY: test-clean
+test-clean: native-clean cross-clean spk-clean
+
+.PHONY: test-dependency-%
+test-dependency-%: dependency-$*
 
 .PHONY: test-toolchain
 test-toolchain: $(addprefix test-toolchain-,$(SUPPORTED_ARCHS))
