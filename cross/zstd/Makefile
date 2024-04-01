@@ -11,8 +11,8 @@ HOMEPAGE = https://facebook.github.io/zstd/
 COMMENT  = Zstandard is a fast compression algorithm, providing high compression ratios.
 LICENSE  = GPLv2/BSD
 
-MESON_BUILD_DIR = build/meson
-NINJA_BUILD_DIR = .
+MESON_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)/build/meson
+#CMAKE_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)/build/cmake
 
 include ../../mk/spksrc.common.mk
 
