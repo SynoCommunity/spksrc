@@ -3,8 +3,14 @@ SPK_VERS = 3.3
 SPK_REV = 23
 SPK_ICON = src/synocli-file.png
 
-# some package dependencies are defined later, see below (after rmlint)
-DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/nano cross/file
+# cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
+# otherwise rmlint does not use libblkid and is missing the "Optimize non-rotational disks" feature.
+# - cross/mc depends on cross/libext2fs and when built before cross/libblkid the e2fsprogs source builds 
+#   it's own libblkid and rmlint cannot find the working library of cross/libblkid.
+BUILD_DEPENDS = cross/libblkid
+
+DEPENDS  = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/nano cross/file
+DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/mg
@@ -35,17 +41,6 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
 
-# PPC archs except QorIQ
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# rmlint must be built before "cross/mc cross/pcre2 cross/fdupes cross/zstd"
-# to use libblkid and support reflink
-DEPENDS += cross/rmlint
-OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
-endif
-
-# Dependencies to be built after rmlint
-DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
-
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
@@ -61,6 +56,12 @@ else
 # 32-bit archs for DSM<7
 DEPENDS += cross/nnn_4.0
 endif
+endif
+
+# PPC archs except QorIQ
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/rmlint
+OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
 
 # PPC archs are not supported with golang
