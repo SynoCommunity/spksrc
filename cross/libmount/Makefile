@@ -11,6 +11,9 @@ EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
 DEPENDS =
 
+# libmount/src/context_umount.c:290: error: 'O_PATH' undeclared
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 HOMEPAGE = https://github.com/karelzak/util-linux
 COMMENT  = Random collection of Linux utilities. We use this only to build libblkid out of util-linux.
 LICENSE  = GPLv2

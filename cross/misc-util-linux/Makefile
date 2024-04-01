@@ -47,6 +47,10 @@ CONFIGURE_ARGS += --disable-irqtop
 CONFIGURE_ARGS += --disable-ul
 CONFIGURE_ARGS += --disable-more
 
+# OLD_PPC_ARCHS
+# misc-utils/pipesz.c:128: error: 'F_SETPIPE_SZ' undeclared
+CONFIGURE_ARGS += --disable-pipesz
+
 # fails to build for: hi3535-6.1
 CONFIGURE_ARGS += --disable-schedutils
 
