@@ -1,6 +1,6 @@
 PKG_NAME = misc-util-linux
 PKG_REAL_NAME = util-linux
-PKG_VERS = 2.38.1
+PKG_VERS = 2.39.3
 PKG_VERS_MAJOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -68,7 +68,9 @@ endif
 # for lsblk and others: ncurses must be built with tinfo
 # this seems to be a bug in util-linux, as most of other libraries fail to find ncurses/termlib
 # dependencies when ncurses is build with lib tinfo
-export NCURSES_WITH_TINFO=yes
+# https://github.com/util-linux/util-linux/issues/2416
+# This is a workaround to use ncursesw without tinfo:
+COMPILE_MAKE_OPTIONS = NCURSES_LIBS="-lncursesw"
 
 include ../../mk/spksrc.cross-cc.mk
 
