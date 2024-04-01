@@ -8,6 +8,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
+# even it compiles with native/rust-qoriq, the tool does not run
+# on other PPC archs than qoriq (fails with "Segmentation fault (core dumped)")
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 HOMEPAGE = https://github.com/lsd-rs/lsd
 COMMENT  = The next gen ls command.
 LICENSE  = Apache 2.0

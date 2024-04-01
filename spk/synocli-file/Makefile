@@ -3,7 +3,7 @@ SPK_VERS = 3.3
 SPK_REV = 23
 SPK_ICON = src/synocli-file.png
 
-# packages depending on cross/zlib must be defined later, see below
+# some package dependencies are defined later, see below (after rmlint)
 DEPENDS = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/nano cross/file
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
@@ -35,13 +35,6 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# build rust tools before packages depending on cross/zlib
-# These tools must use cross/zlib-ng instead of cross/zlib, otherwise will fail to find zlib (x64 only)
-DEPENDS += cross/bat cross/eza
-OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, eza"
-endif
-
 # PPC archs except QorIQ
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # rmlint must be built before "cross/mc cross/pcre2 cross/fdupes cross/zstd"
@@ -50,7 +43,7 @@ DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
 
-# packages depending on cross/zlib
+# Dependencies to be built after rmlint
 DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -78,6 +71,8 @@ endif
 
 # OLD_PPC archs are not supported with rust
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/bat cross/eza
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, eza"
 DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
