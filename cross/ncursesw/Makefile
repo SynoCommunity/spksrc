@@ -30,7 +30,6 @@ CONFIGURE_ARGS += --enable-widec
 CONFIGURE_ARGS += --without-normal
 
 # optional create lib tinfow:
-# - this was a fix for cross/misc-util-linux (but not needed anymore)
 ifeq ($(strip $(NCURSES_WITH_TINFO)),yes)
 # create lib tinfo:
 CONFIGURE_ARGS += --with-termlib
