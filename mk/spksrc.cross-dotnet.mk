@@ -89,26 +89,10 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-
-clean:
-	rm -fr work work-* build-*.log
-
-
 all: install plist
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
 
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
-
-####
-
-arch-%:
-	@$(MSG) Building package for arch $*
-	@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) 2>&1 | tee --append build-$*.log
+### For arch-* and all-<supported|latest>
+include ../../mk/spksrc.supported.mk
 
 ####

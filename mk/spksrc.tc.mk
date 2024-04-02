@@ -3,10 +3,15 @@
 SHELL := $(SHELL) -e
 default: all
 
-WORK_DIR := $(shell pwd)/work
+WORK_DIR := $(CURDIR)/work
 include ../../mk/spksrc.directories.mk
 
 include ../../mk/spksrc.common.mk
+
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+include ../../mk/spksrc.cross-rust-env.mk
 
 # Include cross-cmake-env.mk to generate its toolchain file
 include ../../mk/spksrc.cross-cmake-env.mk
@@ -39,6 +44,8 @@ TC_LOCAL_VARS_MESON = $(WORK_DIR)/tc_vars.meson
 
 RUN = cd $(WORK_DIR)/$(TC_TARGET) && env $(ENV)
 
+include ../../mk/spksrc.depend.mk
+
 download:
 include ../../mk/spksrc.download.mk
 
@@ -63,7 +70,7 @@ include ../../mk/spksrc.tc-flags.mk
 rustc: flag
 include ../../mk/spksrc.tc-rust.mk
 
-all: rustc $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON) $(TC_LOCAL_VARS_MK)
+all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON) $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK):
@@ -184,10 +191,6 @@ ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 else
 	@echo TC_KERNEL := $(TC_KERNEL)
 endif
-
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk
