@@ -68,14 +68,15 @@ initialize_variables ()
 
 install_python_virtualenv ()
 {
-    # Output Python version (confirming PATH)
+    # Print out default python version found in PATH
     python3 --version
+
+    # Print out default pip version
+    PIP_VERSION=$(python3 -m pip --version | awk '{print $2}')
+    echo "Default pip version ${PIP_VERSION}"
 
     # Create a Python virtualenv
     python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env
-
-    # Update to latest pip package installer
-    python3 -m pip install --upgrade pip
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         set_unix_permissions ${SYNOPKG_PKGDEST}/env
@@ -95,10 +96,12 @@ install_python_wheels ()
     if [ -s ${requirements} ]; then
        echo "Install packages from wheels [${requirements}]"
        pip install $([ $# -gt 0 ] && echo $*) \
+                   --disable-pip-version-check \
                    --force-reinstall \
                    --cache-dir ${cachedir} \
                    --find-links ${wheelhouse} \
-                   --requirement ${requirements}
+                   --requirement ${requirements} \
+       || echo "ERROR: Python package installation failed" 1>&2
     fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then

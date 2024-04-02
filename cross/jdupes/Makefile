@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS = cross/libjodycode
 
-HOMEPAGE = https://github.com/jbruchon/jdupes
+HOMEPAGE = https://www.jdupes.com/
 COMMENT  = A powerful duplicate file finder and an enhanced fork of fdupes.
 LICENSE  = MIT
 

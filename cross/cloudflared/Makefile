@@ -1,5 +1,5 @@
 PKG_NAME = cloudflared
-PKG_VERS = 2023.7.1
+PKG_VERS = 2024.3.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cloudflare/cloudflared/archive
@@ -20,4 +20,10 @@ include ../../mk/spksrc.cross-go.mk
 
 .PHONY: cloudflared_compile
 cloudflared_compile:
-	@$(RUN) $(MAKE) VERSION=$(PKG_VERS) LINK_FLAGS="-s -w" cloudflared
+ifeq (,$(wildcard /tmp/go))
+	@$(MSG) "   Call install-cloudflare-go.sh"
+	@$(RUN) GOARCH= GOOS= GOROOT_BOOTSTRAP=$(WORK_DIR)/../../../native/go/work-native/go/  \
+        .teamcity/install-cloudflare-go.sh
+endif
+	@$(MSG) "   Build cloudflared"
+	@$(RUN) $(MAKE) PATH="/tmp/go/bin:${PATH}" VERSION=$(PKG_VERS) LINK_FLAGS="-s -w" cloudflared

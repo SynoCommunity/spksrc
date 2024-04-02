@@ -95,7 +95,10 @@ do
 
     if [ "$(echo ${PACKAGES_TO_KEEP} | grep -ow ${package})" = "" ]; then
         # free disk space (but not for packages to keep)
-        make -C ./spk/${package} clean
+        make -C ./spk/${package} clean |& tee >(tail -15 >>build.log)
+    else
+        # free disk space by removing source and staging directories (for packages to keep)
+        make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
     fi
 
     echo "::endgroup::"
