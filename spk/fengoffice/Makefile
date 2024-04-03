@@ -1,5 +1,5 @@
 SPK_NAME = fengoffice
-SPK_VERS = 3.10.8.6
+SPK_VERS = 3.10.8.21
 SPK_REV = 4
 SPK_ICON = src/fengoffice.png
 
@@ -14,7 +14,7 @@ SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 MAINTAINER = moneytoo
 DESCRIPTION = Feng Office is a Collaboration Platform and Project Management System.
 DISPLAY_NAME = Feng Office
-CHANGELOG = "1. Update to v3.10.8.6.<br/>2. Add PHP profiles for DSM 6."
+CHANGELOG = "1. Update to v3.10.8.21.<br/>2. Add PHP profiles for DSM 6."
 
 HOMEPAGE = https://www.fengoffice.com/
 LICENSE = AGPL
