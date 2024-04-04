@@ -11,11 +11,13 @@ HOMEPAGE = http://www.linux-usb.org/
 COMMENT  = Collection of USB tools for use on Linux and BSD systems to query what type of USB devices are connected to the system.
 LICENSE  = GPLv2
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
-DEPENDS = cross/libusb_1.0.23
+DEPENDS += cross/libusb_1.0.23
+else ifeq ($(call version_lt, ${TCVERSION}, 6.0)$(call version_ge, ${TCVERSION}, 3.0),11)
+DEPENDS += cross/libusb_1.0.23
 else
-DEPENDS = cross/libusb
+DEPENDS += cross/libusb
 endif
 
 GNU_CONFIGURE = 1
