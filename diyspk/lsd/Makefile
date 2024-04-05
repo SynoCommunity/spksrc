@@ -4,6 +4,8 @@ SPK_REV = 1
 
 DEPENDS = cross/lsd
 
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = The next gen ls command.
 STARTABLE = no

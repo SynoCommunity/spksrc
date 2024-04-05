@@ -1,14 +1,14 @@
 PKG_NAME = ruby
 PKG_VERS = 3.1.2
-PKG_SHORT_VERS = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://cache.ruby-lang.org/pub/ruby/$(PKG_SHORT_VERS)
+PKG_DIST_SITE = https://cache.ruby-lang.org/pub/ruby/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/ruby
-DEPENDS = cross/openssl cross/readline cross/gdbm cross/berkeleydb
+DEPENDS = cross/openssl3 cross/readline cross/gdbm cross/berkeleydb
 
+# Ruby 3.1.2 is the latest version that compiles without std=c++11 support (ARMv5_ARCHS)
 # even it compiles with older cross/gdbm, ruby crashes at runtime
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
@@ -28,8 +28,7 @@ NATIVE_RUBY = $(realpath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/ins
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-baseruby=$(NATIVE_RUBY) --prefix=$(INSTALL_PREFIX) --disable-install-doc
 
-# avoid warning "_FORTIFY_SOURCE requires compiling with optimization (-O)"
-ADDITIONAL_CFLAGS = -O3
+ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk
 

@@ -1,11 +1,11 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.2.6
 SPK_REV = 14
-SPK_ICON = src/$(SPK_NAME).png
+SPK_ICON = src/borgbackup.png
 
 PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.5-8"
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
 
@@ -30,7 +30,7 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borg to v1.2.6<br/>2. Update borgmatic to v1.8.2.<br/>3. Update emborg to v1.37.<br/>4. Migrate to python 3.11<br/>5. Mark ARMv5 as unsupported"
+CHANGELOG = "1. Update borg to v1.2.6.<br/>2. Update borgmatic to v1.8.2.<br/>3. Update emborg to v1.37.<br/>4. Migrate to python 3.11."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
