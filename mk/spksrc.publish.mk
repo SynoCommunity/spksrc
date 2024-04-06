@@ -42,7 +42,7 @@ publish-arch-%:
 ###
 
 publish-build-arch-%: SHELL:=/bin/bash
-publish-build-arch-%:
+publish-build-arch-%: build-arch-%
 	@$(MSG) PUBLISHING package for arch $* to http://synocommunity.com | tee --append build-$*.log
 	@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) publish 2>&1 | tee --append publish-$*.log >(grep -e '^http' -e '^{"package":' -e '^{"message":' >> status-publish.log) ; \
 	status=$${PIPESTATUS[0]} ; \
