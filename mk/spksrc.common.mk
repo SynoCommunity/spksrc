@@ -4,7 +4,7 @@
 
 # Set basedir in case called from spkrc/ or from normal sub-dir
 ifeq ($(BASEDIR),)
-ifneq ($(shell basename $(CURDIR)),spksrc)
+ifeq ($(filter spksrc workspace,$(shell basename $(CURDIR))),)
 BASEDIR = ../../
 endif
 endif
