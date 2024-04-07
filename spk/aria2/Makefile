@@ -32,7 +32,7 @@ SERVICE_WIZARD_SHARENAME = wizard_download_share
 
 # Service configuration
 SERVICE_PORT = 6800
-SERVICE_PORT_TITLE = Aria2 RPC
+FWPORTS = src/aria2.sc
 NO_SERVICE_SHORTCUT = yes
 
 POST_STRIP_TARGET = aria2_post_install
