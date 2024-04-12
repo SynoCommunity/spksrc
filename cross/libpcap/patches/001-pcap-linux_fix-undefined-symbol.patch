@@ -1,0 +1,17 @@
+# 
+# avoid error: 'NETLINK_GENERIC' undeclared (first use in this function)
+# NETLINK_GENERIC is defined in linux/netlink.h
+# 
+# This error occurred for ARMv5 and PPC archs only,
+# but this patch does not harm other builds.
+#
+--- pcap-linux.c.orig	2023-04-07 16:15:01.000000000 +0000
++++ pcap-linux.c	2024-01-19 11:12:48.897128500 +0000
+@@ -93,6 +93,7 @@
+ #include <netinet/in.h>
+ #include <linux/if_ether.h>
+ #include <linux/if_arp.h>
++#include <linux/netlink.h>
+ #include <poll.h>
+ #include <dirent.h>
+ #include <sys/eventfd.h>

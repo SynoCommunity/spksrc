@@ -1,12 +1,13 @@
 SPK_NAME = kiwix
-SPK_VERS = 3.4.0
-SPK_REV  = 4
+SPK_VERS = 3.7.0
+SPK_REV  = 6
 SPK_ICON = src/kiwix.png
 
 DEPENDS = cross/kiwix-tools
 
 # compiler too old for cross/libzim
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
 
 HOMEPAGE = https://www.kiwix.org/
 DESCRIPTION = Kiwix is an offline reader for online content like Wikipedia, Project Gutenberg, or TED Talks. It makes knowledge available to people with no or limited internet access. The software as well as the content is free to use for anyone.
@@ -14,18 +15,17 @@ LICENSE  = GPLv3
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
-CHANGELOG = "Update kiwix to v3.4.0.<br>Fix initialization of empty library file on DSM 7."
+CHANGELOG = "Update kiwix to v3.7.0."
 
 SERVICE_USER = auto
 STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8092
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_PORT_TITLE = Kiwix (http)
 ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard
-SERVICE_WIZARD_SHARE = wizard_data_folder
-USE_DATA_SHARE_WORKER = yes
+SERVICE_WIZARD_SHARENAME = wizard_data_folder
 
 POST_STRIP_TARGET = kiwix_extra_install
 

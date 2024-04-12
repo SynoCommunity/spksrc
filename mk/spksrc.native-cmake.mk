@@ -1,7 +1,7 @@
-# Build CMake programs
+# Build native CMake programs
 #
-# prerequisites:
-# - cross/module depends on cmake
+# remarks:
+# - most content is taken from spksrc.native-cc.mk and modified for cmake
 #
 
 # Common makefiles
@@ -9,7 +9,7 @@ include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
 # Force build in native tool directrory, not cross directory.
-WORK_DIR := $(PWD)/work-native
+WORK_DIR := $(CURDIR)/work-native
 
 # Package dependend
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -24,11 +24,6 @@ DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 #####
-
-include ../../mk/spksrc.native-env.mk
-
-# cmake specific configurations
-include ../../mk/spksrc.native-cmake-env.mk
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)
@@ -51,6 +46,50 @@ ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = cmake_install_target
 endif
 endif
+
+###
+
+.NOTPARALLEL:
+
+include ../../mk/spksrc.native-env.mk
+
+# cmake specific configurations
+include ../../mk/spksrc.native-cmake-env.mk
+
+include ../../mk/spksrc.download.mk
+
+include ../../mk/spksrc.depend.mk
+
+checksum: download
+include ../../mk/spksrc.checksum.mk
+
+extract: checksum depend
+include ../../mk/spksrc.extract.mk
+
+patch: extract
+include ../../mk/spksrc.patch.mk
+
+configure: patch
+include ../../mk/spksrc.configure.mk
+
+compile: configure
+include ../../mk/spksrc.compile.mk
+
+install: compile
+include ../../mk/spksrc.install.mk
+
+.PHONY: cat_PLIST
+cat_PLIST:
+	@true
+
+all: install
+
+###
+
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+###
 
 .PHONY: cmake_configure_target
 
@@ -75,7 +114,7 @@ else
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	env $(ENV) $(PSTAT_TIME) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
 
 .PHONY: cmake_install_target
 
@@ -89,5 +128,4 @@ else
 endif
 endif
 
-# call-up regular build process
-include ../../mk/spksrc.native-cc.mk
+####

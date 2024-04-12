@@ -26,7 +26,7 @@ cat_PLIST:
 	then \
 	  $(PLIST_TRANSFORM) PLIST ; \
 	# If there is a PLIST.auto file or if parent directory is kernel \
-	elif [ -f PLIST.auto -o $$(basename $$(dirname $$(pwd))) = "kernel" ] ; \
+	elif [ -f PLIST.auto -o $$(basename $$(dirname $(CURDIR))) = "kernel" ] ; \
 	then \
 	  cat $(WORK_DIR)/$(PKG_NAME).plist | sort | while read -r file ; \
 	  do \

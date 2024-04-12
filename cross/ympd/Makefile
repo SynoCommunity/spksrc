@@ -12,6 +12,6 @@ HOMEPAGE = https://ympd.org/
 COMMENT  = Standalone MPD Web GUI written in C, utilizing Websockets and Bootstrap/JS.
 LICENSE  = GPLv2
 
-GNU_CONFIGURE = 1
+CMAKE_USE_TOOLCHAIN_FILE = NO
 
 include ../../mk/spksrc.cross-cmake.mk

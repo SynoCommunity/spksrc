@@ -6,11 +6,20 @@ PKG_DIST_SITE = https://github.com/mvp/uhubctl/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libusb
+OPTIONAL_DEPENDS = cross/libusb cross/libusb_1.0.23
 
 HOMEPAGE = https://github.com/mvp/uhubctl
 COMMENT  = USB hub per-port power control.
 LICENSE  = GPLv2
+
+include ../../mk/spksrc.common.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/libusb_1.0.23
+else ifeq ($(call version_lt, ${TCVERSION}, 6.0)$(call version_ge, ${TCVERSION}, 3.0),11)
+DEPENDS += cross/libusb_1.0.23
+else
+DEPENDS += cross/libusb
+endif
 
 CONFIGURE_TARGET = nop
 POST_INSTALL_TARGET = uhubctl_post_install

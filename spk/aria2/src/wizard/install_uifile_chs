@@ -5,20 +5,24 @@
         "items": [
             {
                 "type": "textfield",
-                "desc": "Aria2 设置",
                 "subitems": [
                     {
-                        "key": "wizard_download_dir",
-                        "desc": "下载路径",
-                        "defaultValue": "/volume1/downloads",
+                        "key": "wizard_download_share",
+                        "desc": "Shared folder for downloads",
+                        "defaultValue": "downloads",
                         "validator": {
                             "allowBlank": false,
                             "regex": {
-                                "expr": "/^\\/volume[0-9]{1,2}\\/[^<>: */?\"]*/",
-                                "errorText": "下载路径应以 /volume?/ 开头，?为存储空间顺序数字"
+                               "expr": "/^[^<>: */?\"]*/",
+                               "errorText": "Share name must be a folder name only. Path separators, spaces and other special chars are not allowed."
                             }
                         }
-                    },
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "subitems": [
                     {
                         "key": "wizard_rpc_secret",
                         "desc": "RPC密钥",
@@ -26,11 +30,16 @@
                         "validator": {
                             "allowBlank": false,
                             "regex": {
-                                "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$/",
+                                "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*#?&]{8,}$/",
                                 "errorText": "最小8个字符，含有至少1个数字、1个小写字母、1个大写字母"
                             }
                         }
-                    },
+                    }
+                ]
+            },            
+            {
+                "type": "textfield",
+                "subitems": [
                     {
                         "key": "wizard_max_concurrent_downloads",
                         "desc": "最大同时下载数",
@@ -102,29 +111,35 @@
                                 "errorText": "使用K/M作为单位 (1K = 1024, 1M = 1024K), 默认 32M"
                             }
                         }
-                    },
+                    }
+                ]
+            },
+            {
+                "type": "combobox",
+                "subitems": [
                     {
                         "key": "wizard_file_allocation",
                         "desc": "文件分配方式",
+                        "editable": false,
                         "defaultValue": "falloc",
+                        "store": [ "none", "prealloc", "trunc", "falloc" ],
                         "validator": {
-                            "allowBlank": false,
-                            "regex": {
-                                "expr": "/^(none|prealloc|trunc|falloc)$/",
-                                "errorText": "可能的取值 none/prealloc/trunc/falloc, 默认 falloc"
-                            }
-                        }
-                    },
+                            "allowBlank": false
+                        }                        
+                    }
+                ]
+            },
+            {
+                "type": "combobox",
+                "subitems": [
                     {
                         "key": "wizard_log_level",
                         "desc": "日志级别",
+                        "editable": false,
                         "defaultValue": "error",
+                        "store": [ "debug", "info", "notice", "warn", "error" ],
                         "validator": {
-                            "allowBlank": false,
-                            "regex": {
-                                "expr": "/^(debug|info|notice|warn|error)$/",
-                                "errorText": "可能的取值 debug/info/notice/warn/error, 默认 error"
-                            }
+                            "allowBlank": false
                         }
                     }
                 ]

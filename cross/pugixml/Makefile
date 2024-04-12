@@ -1,5 +1,5 @@
 PKG_NAME = pugixml
-PKG_VERS = 1.13
+PKG_VERS = 1.14
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/zeux/pugixml/releases/download/v$(PKG_VERS)

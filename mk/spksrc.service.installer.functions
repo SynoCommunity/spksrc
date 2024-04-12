@@ -72,8 +72,8 @@ install_python_virtualenv ()
     python3 --version
 
     # Print out default pip version
-    read -r -a PIP_VERSION 2>/dev/null <<< $(python3 -m pip --version)
-    echo "INFO: Default pip version found ${PIP_VERSION[1]}"
+    PIP_VERSION=$(python3 -m pip --version | awk '{print $2}')
+    echo "Default pip version ${PIP_VERSION}"
 
     # Create a Python virtualenv
     python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env

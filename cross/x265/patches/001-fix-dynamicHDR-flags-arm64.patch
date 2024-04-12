@@ -1,7 +1,7 @@
 # set ARM64 flags the same way as in parent CMakeLists.txt
 # 
---- dynamicHDR10/CMakeLists.txt.orig	2021-03-16 12:53:00.000000000 +0000
-+++ dynamicHDR10/CMakeLists.txt	2022-03-26 13:06:56.201819727 +0000
+--- source/dynamicHDR10/CMakeLists.txt.orig	2021-03-16 12:53:00.000000000 +0000
++++ source/dynamicHDR10/CMakeLists.txt	2022-03-26 13:06:56.201819727 +0000
 @@ -43,7 +43,11 @@
          endif()
      endif()

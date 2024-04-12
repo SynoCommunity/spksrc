@@ -1,0 +1,28 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_README.scan.dpatch by Thomas Schmidt <thomas.schmidt@in.stud.tu-ilmenau.de>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: change Readme to list Debian-specific Paths
+
+@DPATCH@
+diff -urNad linuxtv-dvb-apps-1.1.1+rev1207~/util/scan/README linuxtv-dvb-apps-1.1.1+rev1207/util/scan/README
+--- linuxtv-dvb-apps-1.1.1+rev1207~/util/scan/README	2008-06-17 01:44:38.000000000 +1000
++++ linuxtv-dvb-apps-1.1.1+rev1207/util/scan/README	2008-06-17 20:18:03.000000000 +1000
+@@ -6,13 +6,13 @@
+ feel free to submit it to the linux-dvb mailing list
+ http://www.linuxtv.org/lists.php.
+ 
+-Basic usage: ./dvbscan dvb-s/Astra-19.2E | tee mychannels.conf
+-or           ./atscscan atsc/us-NTSC-center-frequencies-8VSB
++Basic usage: dvbscan dvb-s/Astra-19.2E | tee mychannels.conf
++or           atscscan atsc/us-NTSC-center-frequencies-8VSB
+ 
+ If you want it to check a specific frequency, tune to that frequency
+-(e.g. using szap/tzap/czap/azap) and then use './dvbscan -c' or './atscscan -c'.
++(e.g. using szap/tzap/czap/azap) and then use 'dvbscan -c' or 'atscscan -c'.
+ 
+-For more scan options see ./dvbscan -h or ./atscscan -h
++For more scan options see dvbscan -h or atscscan -h
+ 
+ atscscan is _just_ a copy of dvbscan to not confuse ATSC-user.
+ 

@@ -27,5 +27,27 @@ service_prestart ()
 
 service_postinst ()
 {
-    sed -e "s|@@_wizard_shared_folder_@@|${wizard_data_volume}/${wizard_data_folder}|g" -i "${CONFIG_FILE}"
+    sed -e "s|@@_wizard_shared_folder_@@|${SHARE_PATH}|g" -i "${CONFIG_FILE}"
+}
+
+service_preupgrade ()
+{
+    # create file with installer variables on the fly
+    if [ ! -e "${INST_VARIABLES}" ]; then
+        if [ -e "${CONFIG_FILE}" ]; then
+            if [ -z "${SHARE_PATH}" ]; then
+                SHARE_PATH=$(cat ${CONFIG_FILE} | grep SHARED_ZIM_FOLDER | cut -d= -f2)
+            fi
+            if [ -z "${SHARE_NAME}" -a -n "${SHARE_PATH}" ]; then
+                SHARE_NAME=$(basename ${SHARE_PATH})
+            fi
+            echo "Create ${INST_VARIABLES} [SHARE_PATH=${SHARE_PATH}, SHARE_NAME=${SHARE_NAME}]"
+            save_wizard_variables
+        else
+            echo "WARNING: cannot create ${INST_VARIABLES}. Config not found: ${CONFIG_FILE}"
+        fi
+    else
+        echo "Installer variables available"
+        cat "${INST_VARIABLES}"
+    fi
 }

@@ -1,6 +1,6 @@
 PKG_NAME = moreutils
-PKG_VERS = 0.67
-PKG_EXT = tar.gz
+PKG_VERS = 0.69
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).orig.$(PKG_EXT)
 PKG_DIST_SITE = https://deb.debian.org/debian/pool/main/m/moreutils/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)

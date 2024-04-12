@@ -1,5 +1,5 @@
 PKG_NAME = libffi
-PKG_VERS = 3.4.2
+PKG_VERS = 3.4.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libffi/libffi/releases/download/v$(PKG_VERS)

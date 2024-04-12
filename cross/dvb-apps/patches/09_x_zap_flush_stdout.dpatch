@@ -1,0 +1,36 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+
+## 09_x_zap_flush_stdout.dpatch by Sebastian Schmidt <yath@yath.de>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Make [stc]zap flush stdout after writing status line
+
+@DPATCH@
+Index: linuxtv-dvb-apps-1.1.1+rev1483/util/szap/czap.c
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1483.orig/util/szap/czap.c	2012-04-11 00:44:06.000000000 +1000
++++ linuxtv-dvb-apps-1.1.1+rev1483/util/szap/czap.c	2012-05-13 20:28:36.000000000 +1000
+@@ -229,9 +229,10 @@
+ 		if (status & FE_HAS_LOCK)
+ 			printf("FE_HAS_LOCK");
+ 
+-		usleep(1000000);
+ 
+ 		printf("\n");
++		fflush(stdout);
++		usleep(1000000);
+ 
+ 		if (exit_after_tuning && (status & FE_HAS_LOCK))
+ 			break;
+Index: linuxtv-dvb-apps-1.1.1+rev1483/util/szap/szap.c
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1483.orig/util/szap/szap.c	2012-04-11 00:44:06.000000000 +1000
++++ linuxtv-dvb-apps-1.1.1+rev1483/util/szap/szap.c	2012-05-13 20:28:51.000000000 +1000
+@@ -204,6 +204,7 @@
+ 		if (exit_after_tuning && ((status & FE_HAS_LOCK) || (++timeout >= 10)))
+ 			break;
+ 
++		fflush(stdout);
+ 		usleep(1000000);
+ 	} while (1);
+ 

@@ -4,4 +4,4 @@ lnk:bin/xxh64sum
 bin:bin/xxhsum
 lnk:lib/libxxhash.so
 lnk:lib/libxxhash.so.0
-lib:lib/libxxhash.so.0.8.1
+lib:lib/libxxhash.so.0.8.2

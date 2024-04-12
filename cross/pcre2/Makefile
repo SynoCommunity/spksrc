@@ -1,5 +1,5 @@
 PKG_NAME = pcre2
-PKG_VERS = 10.42
+PKG_VERS = 10.43
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/PhilipHazel/pcre2/releases/download/$(PKG_NAME)-$(PKG_VERS)

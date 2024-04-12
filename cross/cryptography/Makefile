@@ -11,10 +11,6 @@ HOMEPAGE = https://github.com/pyca/cryptography
 COMMENT  = Provide cryptographic recipes and primitives to Python developers
 LICENSE  = BSD/ASL2
 
-# Unsupported due to lack of libatomic
-# being mandatory with OpenSSL >= 3.x
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-
 ###
 ### This cross/cryptography is needed to generate python-limited abi3 wheels
 ### Ref: https://github.com/pyca/cryptography/issues/7671

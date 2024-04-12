@@ -1,0 +1,12 @@
+Author: Tobias Frost <tobi@debian.org>
+Description: fix build with libpng16
+
+--- linuxtv-dvb-apps-1.1.1+rev1500.orig/util/alevt/exp-gfx.c
++++ linuxtv-dvb-apps-1.1.1+rev1500/util/alevt/exp-gfx.c
+@@ -1,5 +1,6 @@
+ /* Copyright 1999 by Paul Ortyl <ortylp@from.pl> */
+ 
++#include <zlib.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>

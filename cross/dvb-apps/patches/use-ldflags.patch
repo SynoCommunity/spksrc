@@ -1,0 +1,50 @@
+Description: Use LDFLAGS passed in from dpkg-buildflags
+ The alevt and lib binaries are not linked with the hardening options
+ provided by dpkg-buildflags because LDFLAGS isn't used there.
+ This patch simple adds the LDFLAGS to the Makefiles.
+Author: Tobias Grimm <etobi@debian.org>
+Date: Thu, 19 Sep 2013 23:04:58 +0200
+
+Index: linuxtv-dvb-apps/util/alevt/Makefile
+===================================================================
+--- linuxtv-dvb-apps.orig/util/alevt/Makefile	2013-09-19 23:00:31.000000000 +0200
++++ linuxtv-dvb-apps/util/alevt/Makefile	2013-09-19 23:00:34.000000000 +0200
+@@ -25,13 +25,13 @@
+ all: alevt alevt-date alevt-cap alevt.1 alevt-date.1 alevt-cap.1
+ 
+ alevt: $(OBJS)
+-	$(CC) $(OPT) $(OBJS) -o alevt -L$(PREFIX)/lib -L$(PREFIX)/lib64 -lX11 $(EXPLIBS)
++	$(CC) $(OPT) $(OBJS) $(LDFLAGS) -o alevt -L$(PREFIX)/lib -L$(PREFIX)/lib64 -lX11 $(EXPLIBS)
+ 
+ alevt-date: $(TOBJS)
+-	$(CC) $(OPT) $(TOBJS) -o alevt-date $(ZVBILIB)
++	$(CC) $(OPT) $(TOBJS) $(LDFLAGS) -o alevt-date $(ZVBILIB)
+ 
+ alevt-cap: $(COBJS)
+-	$(CC) $(OPT) $(COBJS) -o alevt-cap $(EXPLIBS)
++	$(CC) $(OPT) $(COBJS) $(LDFLAGS) -o alevt-cap $(EXPLIBS)
+ 
+ font.o: font1.xbm font2.xbm font3.xbm font4.xbm
+ fontsize.h: font1.xbm font2.xbm font3.xbm font4.xbm
+Index: linuxtv-dvb-apps/Make.rules
+===================================================================
+--- linuxtv-dvb-apps.orig/Make.rules	2013-09-19 23:00:29.000000000 +0200
++++ linuxtv-dvb-apps/Make.rules	2013-09-19 23:00:34.000000000 +0200
+@@ -47,7 +47,7 @@
+ %: %.c
+ 	$(CC) $(CPPFLAGS) $(CFLAGS) -MMD $(LDFLAGS) -o $@ $< $(filter-out %.h %.c,$^) $(LOADLIBES) $(LDLIBS)
+ %.so:
+-	$(CC) -shared -o $@ $^
++	$(CC) -shared $(LDFLAGS) -o $@ $^
+ %.a:
+ 	$(AR) rcs $@ $^
+ clean::
+@@ -82,7 +82,7 @@
+ 	@$(CC) $(CPPFLAGS) $(CFLAGS) -MMD $(LDFLAGS) -o $@ $< $(filter-out %.h %.c,$^) $(LOADLIBES) $(LDLIBS)
+ %.so:
+ 	@echo CC $@
+-	@$(CC) -shared -o $@ $^
++	@$(CC) -shared $(LDFLAGS) -o $@ $^
+ %.a:
+ 	@echo AR $@
+ 	@$(AR) rcs $@ $^

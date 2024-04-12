@@ -1,0 +1,3 @@
+bin:bin/merge-info
+bin:bin/xstow
+bin:bin/xstow-static

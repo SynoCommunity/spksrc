@@ -1,5 +1,5 @@
 SPK_NAME = ser2net
-SPK_VERS = 4.3.12
+SPK_VERS = 4.6.0
 SPK_REV = 1
 SPK_ICON = src/ser2net.png
 
