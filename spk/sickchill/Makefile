@@ -21,6 +21,9 @@ ENV += SODIUM_INSTALL=system
 # [cryptography]
 DEPENDS += cross/cryptography
 
+# [mediainfo]
+DEPENDS += cross/mediainfo
+
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 
