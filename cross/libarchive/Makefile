@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 COMMENT = Multi-format archive and compression library
 HOMEPAGE = https://www.libarchive.org/
-#LICENSE = https://github.com/libarchive/libarchive/blob/master/COPYING
+LICENSE = 3-Clause BSD
 
 BUILD_DEPENDS = cross/openssl3
 
