@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 3.3
-SPK_REV = 23
+SPK_REV = 24
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -13,6 +13,7 @@ DEPENDS  = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/nano 
 DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
+DEPENDS += cross/pixz
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
 DEPENDS += cross/iconv
@@ -118,6 +119,7 @@ SPK_COMMANDS += bin/pcre2grep bin/pcre2test
 SPK_COMMANDS += bin/rmlint
 SPK_COMMANDS += bin/zstd bin/unzstd bin/zstdcat bin/zstdmt bin/zstdgrep bin/zstdless
 SPK_COMMANDS += bin/lzip bin/plzip
+SPK_COMMANDS += bin/pixz
 SPK_COMMANDS += bin/fdupes
 SPK_COMMANDS += bin/micro
 SPK_COMMANDS += bin/fzf
