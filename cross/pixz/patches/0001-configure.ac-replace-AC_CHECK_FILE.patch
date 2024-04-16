@@ -1,0 +1,31 @@
+From 4ddfdca8416a008819d08d14d6a6f4796aef7857 Mon Sep 17 00:00:00 2001
+From: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+Date: Mon, 12 Oct 2020 22:40:13 +0200
+Subject: [PATCH] configure.ac: replace AC_CHECK_FILE
+
+AC_CHECK_FILE can't be used when cross-compiling so replace it by a
+simple test -f
+
+Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 0a19a2a..9773993 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -16,8 +16,8 @@ AC_PROG_CC_STDC
+ # Check for a2x only if the man page is missing, i.e. we are building from git. The release tarballs
+ # are set up to include the man pages. This way, only people creating tarballs via `make dist` and
+ # people building from git need a2x as a dependency.
+-AC_CHECK_FILE(
+-  [src/pixz.1],
++AS_IF(
++  [test -f src/pixz.1],
+   [],
+   [
+     AC_ARG_WITH(
+-- 
+2.43.0
+
