@@ -1,7 +1,3 @@
-bin:bin/bsdcat
-bin:bin/bsdcpio
-bin:bin/bsdtar
-bin:bin/bsdunzip
 lib:lib/libarchive.so
 lib:lib/libarchive.so.13
 lib:lib/libarchive.so.13.7.3
