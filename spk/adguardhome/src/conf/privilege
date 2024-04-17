@@ -7,7 +7,7 @@
         "relpath": "bin/adguardhome",
         "user": "package",
         "group": "package",
-        "capabilities": "cap_net_raw",
+        "capabilities": "cap_net_bind_service,cap_net_raw",
         "permission": "0700"
     }]
 }
