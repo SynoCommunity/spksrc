@@ -10,15 +10,7 @@ COMMENT = Multi-format archive and compression library
 HOMEPAGE = https://www.libarchive.org/
 LICENSE = 3-Clause BSD
 
-# why does it still use only system autoconf?!?
-#BUILD_DEPENDS = cross/autoconf
-
-# why does this still crash building synocli-file with pixz?!?
-#BUILD_DEPENDS = cross/iconv
-# or
-#BUILD_DEPENDS = cross/libiconv
-# above does nothing, must disable iconv below
-
+BUILD_DEPENDS = native/autoconf
 DEPENDS = cross/openssl3
 
 GNU_CONFIGURE = 1
