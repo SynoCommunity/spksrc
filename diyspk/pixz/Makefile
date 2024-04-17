@@ -1,6 +1,6 @@
 SPK_NAME = pixz
 SPK_VERS = 1.0.7
-SPK_REV = 0
+SPK_REV = 1
 #SPK_ICON = src/pixz.png
 
 #DISPLAY_NAME = pixz
