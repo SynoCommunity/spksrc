@@ -1,5 +1,5 @@
 SPK_NAME = synocli-file
-SPK_VERS = 3.3
+SPK_VERS = 3.4
 SPK_REV = 24
 SPK_ICON = src/synocli-file.png
 
@@ -98,7 +98,15 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools, patch$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
+    less, tree, ncdu, jdupes, fdupes, rhash, \
+    mc \(midnight commander\), \
+    mg \(emacs-like text editor\), nano, \
+    jupp \(based on JOE - Joe\'s Own Editor 3.1\), \
+    file, detox, pcre2, zstd, lzip, plzip, \
+    pixz, \
+    detox, iconv, dos2unix tools, \
+    patch$(OPTIONAL_DESC)."
 STARTABLE = no
 CHANGELOG  = "1. Update detox to v2.0.0.<br/>"
 CHANGELOG += "2. Update eza v0.20.0.<br/>"
