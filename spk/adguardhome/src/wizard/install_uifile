@@ -1,0 +1,8 @@
+[{
+    "step_title": "Install Instructions",
+    "items": [{
+        "desc": "Please unselect 'Run after installation', To run adguard you need to rirst run the following command via SSH and everytime there is an update"
+    }, {
+        "desc": "setcap 'CAP_NET_BIND_SERVICE=+eip CAP_NET_RAW=+eip' /var/packages/adguardhome/target/bin/adguardhome"
+    }]
+}]
