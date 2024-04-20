@@ -11,8 +11,8 @@ MAINTAINER = publicarray
 DISPLAY_NAME = AdGuardHome
 DESCRIPTION = "Network-wide ads & trackers blocking DNS server"
 HOMEPAGE = https://adguard.com/en/adguard-home/overview.html
-LICENSE = Apache-2.0
-CHANGELOG = "First Release"
+LICENSE = GPL-3.0
+CHANGELOG = "Initial release"
 
 STARTABLE = yes
 SERVICE_USER = auto
