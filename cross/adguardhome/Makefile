@@ -9,7 +9,7 @@ PKG_DIR = AdGuardHome-$(PKG_VERS)
 BUILD_DEPENDS = native/go native/nodejs
 HOMEPAGE = https://github.com/AdguardTeam/$(PKG_NAME)
 COMMENT  = Network-wide ads & trackers blocking DNS server
-LICENSE  = GPL-3.0 license
+LICENSE  = GPL-3.0
 
 PATCHES_LEVEL = 1
 GO_SRC_DIR = $(WORK_DIR)/AdGuardHome-$(PKG_VERS)
