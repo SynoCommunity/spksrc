@@ -1,5 +1,5 @@
 SPK_NAME = kopia
-SPK_VERS = 0.15.0
+SPK_VERS = 0.17.0
 SPK_REV = 1
 SPK_ICON = src/kopia.png
 
@@ -19,6 +19,7 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 51515
 ADMIN_PORT = $(SERVICE_PORT)
+WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = kopia_extra_install
 

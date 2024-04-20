@@ -1,10 +1,12 @@
-export KOPIA_LOG_DIR=${SYNOPKG_PKGVAR}
-export KOPIA_CACHE_DIR=${SYNOPKG_PKGVAR}
 export XDG_CACHE_HOME=${SYNOPKG_PKGVAR}/cache
-export KOPIA_CONFIG_PATH=${SYNOPKG_PKGVAR}/config
-
-#PASSWORD=${wizard_password}
-PASSWORD=kopia
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/kopia server start --ui --insecure --address=http://0.0.0.0:${SERVICE_PORT} --server-password=${PASSWORD} --legacy-api --grpc --control-api"
+ENV="USER= KOPIA_LOG_DIR=${SYNOPKG_PKGVAR} KOPIA_CACHE_DIR=${SYNOPKG_PKGVAR} KOPIA_CONFIG_PATH=${SYNOPKG_PKGVAR}/config"
+TLS_CONFIG="--tls-generate-cert --tls-cert-file ${SYNOPKG_PKGVAR}/default.crt --tls-key-file ${SYNOPKG_PKGVAR}/default.key"
+KOPIA=${SYNOPKG_PKGDEST}/bin/kopia
+SERVICE_COMMAND="${KOPIA} server start --ui ${TLS_CONFIG} --address=0.0.0.0:${SERVICE_PORT} --grpc --control-api --enable-actions"
 SVC_BACKGROUND=yes
 SVC_WRITE_PID=yes
+
+service_prestart () {
+    call_func "load_variables_from_file"
+    SERVICE_COMMAND+=" --server-username=${wizard_username} --server-password=${wizard_password}"
+}
