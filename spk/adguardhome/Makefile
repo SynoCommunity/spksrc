@@ -5,6 +5,7 @@ SPK_ICON = src/adguardhome.png
 
 DEPENDS = cross/adguardhome
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+SPK_CONFLICT = DNSServer DhcpServer
 
 MAINTAINER = publicarray
 DISPLAY_NAME = AdGuardHome
@@ -25,11 +26,4 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard
 
-POST_STRIP_TARGET = adguardhome_extra_install
-
 include ../../mk/spksrc.spk.mk
-
-.PHONY: adguardhome_extra_install
-adguardhome_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/AdGuardHome.yml $(STAGING_DIR)/var/AdGuardHome.yml

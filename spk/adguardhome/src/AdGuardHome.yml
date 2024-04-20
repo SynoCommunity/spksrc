@@ -1,5 +1,0 @@
-dns:
-  port: 5053
-os:
-  group: "synocommunity"
-  user: "sc-adguardhome"
