@@ -11,7 +11,7 @@
         "desc": "Kopia Settings",
         "subitems": [
           {
-            "key": "wizard_userame",
+            "key": "wizard_username",
             "desc": "Web Username",
             "defaultValue": "kopia",
             "validator": {
