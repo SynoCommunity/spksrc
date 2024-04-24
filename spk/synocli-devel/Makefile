@@ -1,8 +1,8 @@
 SPK_NAME = synocli-devel
-SPK_VERS = 1.2
+SPK_VERS = 1.3
 SPK_REV = 4
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Fix autoconf to use installed m4 command."
+CHANGELOG = "1. Fix autoconf to use installed m4 command.<br/>2. Update autoconf to v2.72.<br/>3. Update binutils to v2.41 for DSM 6 and v2.42 for DSM 7.<br/>4. Update strace to v6.8."
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.5
