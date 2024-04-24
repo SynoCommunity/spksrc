@@ -1,11 +1,12 @@
 SPK_NAME = python310
 SPK_VERS = 3.10.13
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 19
+SPK_REV = 20
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/$(SPK_NAME)
 DEPENDS += cross/pip
+DEPENDS += cross/openssl
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
