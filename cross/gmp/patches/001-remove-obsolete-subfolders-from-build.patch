@@ -1,3 +1,5 @@
+# avoid build of doc, demos and tests
+# 
 --- Makefile.in.orig	2023-07-29 13:42:23.000000000 +0000
 +++ Makefile.in	2024-04-23 19:49:26.598228868 +0000
 @@ -573,7 +573,7 @@
