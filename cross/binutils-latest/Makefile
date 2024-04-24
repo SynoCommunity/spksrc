@@ -27,7 +27,7 @@ include ../../mk/spksrc.archs.mk
 # gprofng fails to build for i686 
 # ./../common/core_pcbe.c:2698:33: error: ‘PERF_COUNT_HW_REF_CPU_CYCLES’ undeclared here
 # gprofng is not built for other 32-bit archs
-ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-gprofng
 PLIST_TRANSFORM = sed -e '/bin\/gprofng/d' -e '/bin\/gp\-/d' -e '/lib\/gprofng/d'
 endif
