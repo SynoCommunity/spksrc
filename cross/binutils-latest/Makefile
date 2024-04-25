@@ -7,9 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/mpfr
 
-# c++11 compiler is required
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
+# c++11 compiler is required (the real check is in cross/binutils/Makefile)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 HOMEPAGE = https://www.gnu.org/software/binutils/
 COMMENT  = GNU Binutils
@@ -34,5 +33,7 @@ endif
 
 # Avoid conflicts with gdb
 CONFIGURE_ARGS += --includedir=$(INSTALL_PREFIX)/include/binutils
+
+ADDITIONAL_CXXFLAGS = -std=c++11
 
 include ../../mk/spksrc.cross-cc.mk
