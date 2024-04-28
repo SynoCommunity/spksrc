@@ -20,6 +20,7 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 51515
 SERVICE_PORT_PROTOCOL = https
 ADMIN_PORT = $(SERVICE_PORT)
+ADMIN_PROTOCOL = https
 WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = kopia_extra_install
