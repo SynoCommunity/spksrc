@@ -577,17 +577,30 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 
 
                     ]
-                }
+				},
+				{
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'FileDialog',
+                            width: 100
+                        },
+                        {
+                            xtype: "syno_button",
+                            text: 'Open file',
+                            handler: this.openFile.bind(this)
+                        }
 
 
-
+                    ]
+				}
             ]
         });
     },
 
     // Handle display for ModalWindow
     onModalButtonClick: function() {
-
         var window = new SYNO.SDS.ModalWindow({
             closeAction: "hide",
             layout: "fit",
@@ -614,15 +627,10 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 
                     xtype: 'syno_displayfield',
                     value: 'Do you want to continue the demo ?',
-
                 }
-
             ],
-
         });
         window.open();
-
-
     },
 
     // Create the content for the ComboBox
@@ -1276,6 +1284,44 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 
     },
 	
+	// Display openFile dialog
+	openFile: function() {
+        (new SYNO.SDS.Utils.FileChooser.Chooser({
+            owner: this.owner,
+            usage: {
+                type: "open",
+                multiple: true
+            },
+            title: "Choose file",
+            height: 500,
+            enumGluster: true,
+            enumCluster: true,
+            enumSnapshot: true,
+            enumC2Share: true,
+            folderToolbar: false,
+            comboOption: [{
+                label: "Filetype",
+                value: "allText",
+                data: [
+                    ["allText", "All text files"],
+                    ["all", "All files"]
+                ]
+            }],
+            getFilterPattern: function(a) {
+                if ("allText" === a[0].value) {
+                    var b = [];
+                    for (var c in SYNO.TextEditor.Utils.TextFileExtensions) {
+                        if (SYNO.TextEditor.Utils.TextFileExtensions.hasOwnProperty(c)) {
+                            b.push(c)
+                        }
+                    }
+                    return b.join()
+                }
+                return ""
+            }
+        })).show()
+    },
+    
     onOpen: function(a) {
         SYNOCOMMUNITY.SimpleExtJSApp.AppWindow.superclass.onOpen.call(this, a);
 
