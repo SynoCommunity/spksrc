@@ -1,6 +1,6 @@
 SPK_NAME = ps3netsrv
-SPK_VERS = 1.47.45
-SPK_REV = 8
+SPK_VERS = 1.47.46
+SPK_REV = 9
 SPK_ICON = src/${SPK_NAME}.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ MAINTAINER = Hirador
 DESCRIPTION = Allows PS3 content to be loaded from network. Please edit the default port “38008” to “14167” in your PS3's webMAN MOD Setup 
 DESCRIPTION_FRE = Fournit l\'accès par le réseau aux contenus pour PS3. Veuillez modifier le port par défaut de "38008" à "14167" dans PS3 webMAN MOD Setup
 DISPLAY_NAME = ps3netsrv
-CHANGELOG = "Update to v1.47.45 with ps3netsrv 20220813."
+CHANGELOG = "Update to v1.47.46b with ps3netsrv 20240210."
 
 HOMEPAGE = https://github.com/aldostools/webMAN-MOD
 LICENSE  = GPLv3
