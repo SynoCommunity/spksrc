@@ -1,8 +1,8 @@
-PYTHON_DIR="/usr/local/python"
-GIT_DIR="/usr/local/git"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}/bin:${GIT_DIR}/bin:${PATH}"
+PYTHON_DIR="/var/packages/python/target/bin"
+GIT_DIR="/var/packages/git/target/bin"
+PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${GIT_DIR}:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python"
-VIRTUALENV="${PYTHON_DIR}/bin/virtualenv"
+VIRTUALENV="${PYTHON_DIR}/virtualenv"
 COUCHPOTATOSERVER="${SYNOPKG_PKGDEST}/share/CouchPotatoServer/CouchPotato.py"
 CFG_FILE="${SYNOPKG_PKGDEST}/var/settings.conf"
 
@@ -14,13 +14,14 @@ SERVICE_COMMAND="${PYTHON} ${COUCHPOTATOSERVER} --daemon --pid_file ${PID_FILE} 
 service_postinst ()
 {
     # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env >> ${INST_LOG} 2>&1
+    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
 
     # If nessecary, add user also to the old group
     syno_user_add_to_legacy_group "${EFF_USER}" "${USER}" "${LEGACY_GROUP}"
 
     # Remove legacy user
     # Commands of busybox from spk/python
-    delgroup "${USER}" "users" >> ${INST_LOG}
-    deluser "${USER}" >> ${INST_LOG}
+    delgroup "${USER}" "users"
+    deluser "${USER}"
 }
+

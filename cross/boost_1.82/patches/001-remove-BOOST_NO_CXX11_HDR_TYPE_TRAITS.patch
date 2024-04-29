@@ -1,0 +1,10 @@
+--- boost/config/stdlib/libstdcpp3.hpp-orig	2021-12-02 06:47:31.000000000 +0000
++++ boost/config/stdlib/libstdcpp3.hpp	2022-06-19 20:47:46.528930819 +0000
+@@ -334,7 +334,6 @@ extern "C" char *gets (char *__s);
+ //  C++0x features in GCC 5.1 and later
+ //
+ #if (BOOST_LIBSTDCXX_VERSION < 50100) || !defined(BOOST_LIBSTDCXX11)
+-#  define BOOST_NO_CXX11_HDR_TYPE_TRAITS
+ #  define BOOST_NO_CXX11_HDR_CODECVT
+ #  define BOOST_NO_CXX11_ATOMIC_SMART_PTR
+ #  define BOOST_NO_CXX11_STD_ALIGN

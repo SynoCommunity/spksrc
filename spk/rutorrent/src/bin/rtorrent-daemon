@@ -1,21 +1,33 @@
 #!/bin/bash
 
-# Package
-PACKAGE="rutorrent"
+# This script starts rtorrent within a screen session
 
-INSTALL_DIR="/var/packages/${PACKAGE}/target"
-WEB_DIR="/var/services/web"
-RTORRENT_RC=${WEB_DIR}/${PACKAGE}/conf/rtorrent.rc
+if [ -z "${RUTORRENT_WEB_DIR}" ]; then
+  echo "This script requires the RUTORRENT_WEB_DIR environment variable to be set"
+  exit 1
+fi
 
-export HOME=${INSTALL_DIR}/var
-export PATH="${INSTALL_DIR}/env/bin:${INSTALL_DIR}/bin:${INSTALL_DIR}/usr/bin:${PATH}"
-export LD_LIBRARY_PATH="${INSTALL_DIR}/lib:${LD_LIBRARY_PATH}"
-RTORRENT="${INSTALL_DIR}/bin/rtorrent"
+if [ -z "${SYNOPKG_PKGVAR}" ]; then
+  echo "This script requires the SYNOPKG_PKGVAR environment variable to be set"
+  exit 1
+fi
+
+if [ -z "${SYNOPKG_PKGDEST}" ]; then
+  echo "This script requires the SYNOPKG_PKGDEST environment variable to be set"
+  exit 1
+fi
+
+RTORRENT_RC=${RUTORRENT_WEB_DIR}/conf/rtorrent.rc
+
+export HOME=${SYNOPKG_PKGVAR}
+export PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PATH}"
+export LD_LIBRARY_PATH="${SYNOPKG_PKGDEST}/lib:${LD_LIBRARY_PATH}"
+RTORRENT="${SYNOPKG_PKGDEST}/bin/rtorrent"
 
 # If default config ($HOME/.rtorrent.rc) is a symlink
 # and package default location file exists, use parameters
 # to force using that config file
-if [ -L ${HOME}/.rtorrent.rc -a -f ${RTORRENT_RC} ]; then
+if [ -L "${HOME}/.rtorrent.rc" ] && [ -f "${RTORRENT_RC}" ]; then
     export RC_PARAM="-n -o import=${RTORRENT_RC}"
 fi
 

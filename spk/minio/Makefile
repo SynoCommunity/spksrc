@@ -1,38 +1,40 @@
 SPK_NAME = minio
-SPK_VERS = 2020-11-25T22-36-25Z
-SPK_REV = 8
+SPK_VERS = 2022.09.07
+SPK_REV = 15
 SPK_ICON = src/minio.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/$(SPK_NAME)
+DEPENDS = cross/minio cross/minio-client
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = fgma
-DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs.
-RELOAD_UI = yes
+DESCRIPTION = MinIO is a high performance object storage server compatible with Amazon S3 APIs. This Package includes the 'minio-client' \(mc\).
 DISPLAY_NAME = MinIO
-CHANGELOG = "Major release, multiple feature and bugfix releases."
+CHANGELOG = "1. Update to MinIO 2022-09-07T22-25-02Z. Multiple minor feature releases and security releases.<br/>2. Include minio-client (mc) in the package (named 'minio-client' and availalbe in the path, to use the client as 'mc' your have to specify the full path: /var/packages/minio/target/bin/mc).<br/>3. Format of the environment-variables file has changed. Custom variables are exported by default and must not be defined with export anymore."
+LICENSE_FILE = $(WORK_DIR)/src/github.com/minio/minio/LICENSE
 HOMEPAGE = https://min.io/
-LICENSE = Apache License 2.0
+LICENSE = AGPLv3.0
+
+WIZARDS_DIR = src/wizard
+
 STARTABLE = yes
-
-WIZARDS_DIR = src/wizard/
-
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SERVICE_PORT = 9000
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 SERVICE_WIZARD_SHARE = wizard_data_directory
+USE_DATA_SHARE_WORKER = yes
+FWPORTS = src/minio.sc
+# Console Port (API Port is 9000)
+ADMIN_PORT = 9001
 
-# Use busybox start-stop-daemon support
-# Options and environment are provided in service-setup.sh
-SERVICE_EXE = $${SYNOPKG_PKGDEST}/bin/minio
+POST_STRIP_TARGET = minio_extra_install
 
-# Admin link for in DSM UI
-ADMIN_PORT = $(SERVICE_PORT)
-
-BUSYBOX_CONFIG = usrmng daemon nice
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+# official binary is "mc" not "minio-client", but "mc" is already used for midnight-commander
+SPK_COMMANDS = bin/minio-client
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: minio_extra_install
+minio_extra_install:
+	@install -d -m 755 $(STAGING_DIR)/var
+	@install -m 644 src/environment-variables $(STAGING_DIR)/var/

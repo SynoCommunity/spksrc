@@ -1,6 +1,6 @@
 ### Toolchain fix rules
 #   Invoke fixes toolchain's libtool files
-# Target are executed in the following order:
+# Targets are executed in the following order:
 #  fix_msg_target
 #  pre_fix_target   (override with PRE_FIX_TARGET)
 #  fix_target       (override with FIX_TARGET)

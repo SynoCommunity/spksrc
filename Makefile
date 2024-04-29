@@ -1,20 +1,26 @@
 
+# Include framework self-test
+include mk/spksrc.test-rules.mk
+
 AVAILABLE_TCS = $(notdir $(wildcard toolchain/syno-*))
 AVAILABLE_ARCHS = $(notdir $(subst syno-,/,$(AVAILABLE_TCS)))
 SUPPORTED_SPKS = $(sort $(patsubst spk/%/Makefile,%,$(wildcard spk/*/Makefile)))
 
 
+ifneq ($(firstword $(MAKECMDGOALS)),test)
 all: $(SUPPORTED_SPKS)
+endif
 
 all-noarch:
-	@for spk in $(sort $(dir $(wildcard spk/*/Makefile))) ; \
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
 	   grep -q "override ARCH" "$${spk}/Makefile" && $(MAKE) -C $${spk} ; \
 	done
 
-
+ifneq ($(firstword $(MAKECMDGOALS)),test)
 clean: $(addsuffix -clean,$(SUPPORTED_SPKS))
 clean: native-clean cross-clean
+endif
 
 dist-clean: clean
 dist-clean: kernel-clean toolchain-clean toolkit-clean
@@ -50,7 +56,7 @@ cross-clean:
 	done
 
 spk-clean:
-	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
 	    $(MAKE) -C $${spk} clean ; \
 	done
@@ -58,27 +64,36 @@ spk-clean:
 %: spk/%/Makefile
 	cd $(dir $^) && env $(MAKE)
 
-%-clean: spk/%/Makefile
-	cd $(dir $^) && env $(MAKE) clean
-
 native-%: native/%/Makefile
 	cd $(dir $^) && env $(MAKE)
 
 native-%-clean: native/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
 
-# build dependency tree for all packages
-# and take the tree output only (starting with a tab)
-dependency-tree:
-	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+# build dependency flat list for all packages
+dependency-flat:
+	@echo $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile)))
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
-	    $(MAKE) -C $${spk} dependency-tree | grep -P "^[\t]" ; \
+	    echo "$(MAKE) -s -C $${spk} dependency-flat" ; \
+	    $(MAKE) -s -C $${spk} dependency-flat ; \
+	done
+
+# build dependency tree for all packages
+dependency-tree:
+	@echo $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile)))
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
+	do \
+	    echo "$(MAKE) --no-print-directory -C $${spk} dependency-tree" ; \
+	    $(MAKE) --no-print-directory -C $${spk} dependency-tree ; \
 	done
 
 # build dependency list for all packages
 dependency-list:
-	@for spk in $(dir $(wildcard spk/*/Makefile)) ; \
+	@echo $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile)))
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
+	    echo "$(MAKE) -s -C $${spk} dependency-list" ; \
 	    $(MAKE) -s -C $${spk} dependency-list ; \
 	done
 
@@ -120,6 +135,12 @@ toolchain-digests:
 	    $(MAKE) -C $${tc} digests ; \
 	done
 
+toolkit-digests:
+	@for tk in $(dir $(wildcard toolkit/*/Makefile)) ; \
+	do \
+	    $(MAKE) -C $${tk} digests ; \
+	done
+
 kernel-digests:
 	@for kernel in $(dir $(wildcard kernel/*/Makefile)) ; \
 	do \
@@ -150,29 +171,26 @@ toolchain-%:
 kernel-%:
 	-@cd kernel/syno-$*/ && MAKEFLAGS= $(MAKE)
 
-setup: local.mk dsm-6.1
+setup: local.mk dsm-6.2.4 dsm-7.1
 
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
-	@echo "PUBLISH_URL=" > $@
-	@echo "PUBLISH_API_KEY=" >> $@
-	@echo "MAINTAINER?=" >> $@
-	@echo "MAINTAINER_URL?=" >> $@
-	@echo "DISTRIBUTOR=" >> $@
-	@echo "DISTRIBUTOR_URL=" >> $@
-	@echo "REPORT_URL=" >> $@
-	@echo "DEFAULT_TC=" >> $@
-	@echo "#PARALLEL_MAKE=max" >> $@
+	@echo "PUBLISH_URL =" > $@
+	@echo "PUBLISH_API_KEY =" >> $@
+	@echo "DISTRIBUTOR =" >> $@
+	@echo "DISTRIBUTOR_URL =" >> $@
+	@echo "REPORT_URL =" >> $@
+	@echo "DEFAULT_TC =" >> $@
+	@echo "#PSTAT = on" >> $@
+	@echo "#PARALLEL_MAKE = max" >> $@
 
 dsm-%: local.mk
 	@echo "Setting default toolchain version to DSM-$*"
-	@sed -i "s|DEFAULT_TC.*|DEFAULT_TC=$*|" local.mk
+	@grep -q "^DEFAULT_TC.*=.*$*.*" local.mk || sed -i "/^DEFAULT_TC =/s/$$/ $*/" local.mk
 
 setup-synocommunity: setup
-	@sed -i -e "s|PUBLISH_URL=.*|PUBLISH_URL=https://api.synocommunity.com|" \
-		-e "s|MAINTAINER?=.*|MAINTAINER?=SynoCommunity|" \
-		-e "s|MAINTAINER_URL?=.*|MAINTAINER_URL?=https://synocommunity.com|" \
-		-e "s|DISTRIBUTOR=.*|DISTRIBUTOR=SynoCommunity|" \
-		-e "s|DISTRIBUTOR_URL=.*|DISTRIBUTOR_URL=https://synocommunity.com|" \
-		-e "s|REPORT_URL=.*|REPORT_URL=https://github.com/SynoCommunity/spksrc/issues|" \
+	@sed -i -e "s|PUBLISH_URL\s*=.*|PUBLISH_URL = https://api.synocommunity.com|" \
+		-e "s|DISTRIBUTOR\s*=.*|DISTRIBUTOR = SynoCommunity|" \
+		-e "s|DISTRIBUTOR_URL\s*=.*|DISTRIBUTOR_URL = https://synocommunity.com|" \
+		-e "s|REPORT_URL\s*=.*|REPORT_URL = https://github.com/SynoCommunity/spksrc/issues|" \
 		local.mk

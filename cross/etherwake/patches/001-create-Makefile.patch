@@ -1,0 +1,31 @@
+--- /dev/null	2021-05-22 18:25:05.160869264 +0000
++++ Makefile	2021-05-22 18:11:27.006079500 +0000
+@@ -0,0 +1,28 @@
++# Makefile by github user @erichschroeter
++# https://gist.github.com/erichschroeter/9884006
++
++.PHONY: clean uninstall
++
++prefix ?= /usr
++exec_prefix ?= $(prefix)
++bindir ?= $(exec_prefix)/bin
++
++ETHERWAKE_src = ether-wake.c
++ETHERWAKE_bin = ether-wake
++ETHERWAKE_tgt = $(DESTDIR)$(bindir)/etherwake
++
++all: $(ETHERWAKE_bin)
++
++$(ETHERWAKE_bin): $(ETHERWAKE_src)
++
++$(ETHERWAKE_tgt): $(ETHERWAKE_bin)
++	install -d $(DESTDIR)$(bindir)
++	install -m 0755 $^ $@
++
++clean:
++	rm $(ETHERWAKE_bin)
++
++install: $(ETHERWAKE_tgt)
++
++uninstall:
++	rm $(ETHERWAKE_tgt)

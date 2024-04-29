@@ -1,0 +1,24 @@
+--- a/make/autoconf/flags.m4
++++ b/make/autoconf/flags.m4
+@@ -263,6 +263,7 @@ AC_DEFUN_ONCE([FLAGS_PRE_TOOLCHAIN],
+         test "x$OPENJDK_TARGET_CPU_ARCH" = xppc; then
+       MACHINE_FLAG="-m${OPENJDK_TARGET_CPU_BITS}"
+     fi
++    case "$host" in *x32) MACHINE_FLAG=;; esac
+   fi
+ 
+   if test "x$OPENJDK_TARGET_OS" = xmacosx; then
+@@ -344,11 +345,8 @@ AC_DEFUN([FLAGS_SETUP_TOOLCHAIN_CONTROL]
+   AC_SUBST(COMPILER_COMMAND_FILE_FLAG)
+   AC_SUBST(COMPILER_BINDCMD_FILE_FLAG)
+ 
+-  # Check that the compiler supports -mX (or -qX on AIX) flags
+-  # Set COMPILER_SUPPORTS_TARGET_BITS_FLAG to 'true' if it does
+-  FLAGS_COMPILER_CHECK_ARGUMENTS(ARGUMENT: [${COMPILER_TARGET_BITS_FLAG}${OPENJDK_TARGET_CPU_BITS}],
+-      IF_TRUE: [COMPILER_SUPPORTS_TARGET_BITS_FLAG=true],
+-      IF_FALSE: [COMPILER_SUPPORTS_TARGET_BITS_FLAG=false])
++  # Don't run the -mX check and set this always to false, or else x32 gets passed -m32
++  COMPILER_SUPPORTS_TARGET_BITS_FLAG=false
+   AC_SUBST(COMPILER_SUPPORTS_TARGET_BITS_FLAG)
+ 
+   if test "x$TOOLCHAIN_TYPE" = xmicrosoft; then

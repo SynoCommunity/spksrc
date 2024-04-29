@@ -1,14 +1,12 @@
 rsc:bin/check_breeze
 rsc:bin/check_clamd
 bin:bin/check_cluster
-rsc:bin/check_dhcp
 bin:bin/check_disk
 rsc:bin/check_disk_smb
 bin:bin/check_dummy
 rsc:bin/check_file_age
 rsc:bin/check_ftp
 bin:bin/check_http
-bin:bin/check_icmp
 bin:bin/check_ide_smart
 rsc:bin/check_ifoperstatus
 rsc:bin/check_ifstatus
@@ -40,6 +38,7 @@ bin:bin/check_tcp
 bin:bin/check_time
 rsc:bin/check_udp
 bin:bin/check_ups
+rsc:bin/check_uptime
 bin:bin/check_users
 rsc:bin/check_wave
 bin:bin/negate

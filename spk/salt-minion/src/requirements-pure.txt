@@ -1,0 +1,60 @@
+# https://github.com/saltstack/salt/blob/master/requirements/static/pkg/py3.11/linux.txt
+
+salt==3006.1
+
+annotated-types==0.5.0
+autocommand==2.2.2
+#certifi                ==> python311
+#cffi                   ==> crossenv
+chardet==5.1.0
+#charset-normalizer     ==> crossenv
+cheroot==10.0.0
+CherryPy==18.8.0
+contextvars==2.4
+#cryptography           ==> cross
+distlib==0.3.6
+distro==1.8.0
+filelock==3.12.2
+idna==3.4
+#immutables             ==> crossenv
+importlib-metadata==6.8.0
+inflect==7.0.0
+jaraco.classes==3.3.0
+jaraco.collections==4.3.0
+jaraco.context==4.3.0
+jaraco.functools==3.8.0
+jaraco.text==3.11.1
+Jinja2==3.1.2
+jmespath==1.0.1
+looseversion==1.3.0
+#MarkupSafe             ==> crossenv
+more-itertools==10.0.0
+#msgpack                ==> crossenv
+packaging==23.1
+platformdirs==3.8.0
+portend==3.2.0
+#psutil                 ==> crossenv
+pycparser==2.21
+#pycryptodomex          ==> crossenv
+pydantic==2.0.3
+#pydantic_core          ==> crossenv
+pyOpenSSL==23.2.0
+python-dateutil==2.8.2
+python-gnupg==0.5.1
+pytz==2023.3
+#PyYAML                 ==> crossenv
+#pyzmq                  ==> crossenv
+requests==2.31.0
+rpm-vercmp==0.1.2
+#setproctitle           ==> crossenv
+#six                    ==> python311
+tempora==5.5.0
+#timelib                ==> crossenv
+typing_extensions==4.7.1
+urllib3==2.0.4
+virtualenv==20.23.1
+zc.lockfile==3.0.post1
+zipp==3.16.2
+
+# To allow patching rsax931.py during service setup 
+patch==1.16

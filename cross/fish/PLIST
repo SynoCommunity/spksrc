@@ -11,4 +11,3 @@ rsc:share/fish/tools/
 rsc:share/fish/vendor_completions.d/
 rsc:share/fish/vendor_conf.d/
 rsc:share/fish/vendor_functions.d/
-rsc:share/locale/

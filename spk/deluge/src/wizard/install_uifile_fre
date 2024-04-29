@@ -1,58 +1,64 @@
-[{
+[
+  {
     "step_title": "Configuration de base",
-    "items": [{
+    "items": [
+      {
+        "type": "combobox",
+        "desc": "Sélectionner le volume à utiliser pour le répertoire de téléchargements",
+        "subitems": [
+          {
+            "key": "wizard_volume",
+            "desc": "Nom du volume",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            },
+            "validator": {
+              "fn": "{console.log(arguments);return true;}"
+            }
+          }
+        ]
+      },
+      {
         "type": "textfield",
-        "desc": "Répertoire de téléchargement. /volume1/downloads par défaut",
-        "subitems": [{
+        "desc": "Répertoire partagé de téléchargements (utilisant le volume sélectionné ci-dessus)",
+        "subitems": [
+          {
             "key": "wizard_download_dir",
-            "desc": "Download directory",
-            "desc": "Répertoire de téléchargement",
-            "defaultValue": "/volume1/downloads",
+            "desc": "Répertoire de téléchargements",
+            "defaultValue": "downloads",
             "validator": {
-                "allowBlank": false,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
-                }
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Sous-répertoires non-supportés."
+              }
             }
-        }]
-    }, {
-        "type": "textfield",
-        "desc": "Surveille les torrents dans un répertoire et les ajoute à transmission automatiquement. Laisser vide pour désactiver",
-        "subitems": [{
-            "key": "wizard_watch_dir",
-            "desc": "Répertoire surveillé",
-            "validator": {
-                "allowBlank": true,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
-                }
-            }
-        }]
-    }, {
-        "type": "textfield",
-        "desc": "Répertoire où deplacer les fichiers de torrent complets. Laisser vide pour désactiver",
-        "subitems": [{
-            "key": "wizard_complete_dir",
-            "desc": "Répertoire de destination",
-            "validator": {
-                "allowBlank": true,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
-                }
-            }
-        }]
-    }]
-}, {
-    "step_title": "Premier login",
-    "items": [{
-        "desc": "Le mot de passe par défaut de l'interface web est 'deluge'.<br><br>L'accès distant est désactivé par défaut. Pour autoriser des clients à se connecter au service, consulter <a target=\"blank\" href=\"https://dev.deluge-torrent.org/wiki/UserGuide/ThinClient\">le guide ThinClient de Deluge</a>."
-    }]
-}, {
-    "step_title": "Attention! Permissions DSM",
-    "items": [{
-         "desc": "Les permissions de toutes les applications de téléchargement sont gérées par le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'users' n'est plus utilisé depuis DSM 6.<br>L'utilisateur spécifique à l'application n'apparaît plus dans la plupart des interfaces de configuration.<br>Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
-    }]
-}]
+          }
+        ]
+      },
+      {
+        "desc": "Si le répertoire partagé est inexistant, il sera créé.  Vous pouvez utiliser un partage existant en spécifiant le nom du répertoire destination."
+      },
+      {
+        "desc": "Le nom d'utilisateur et groupe n'apparaîteront pas dans la plupart des options de configuration de l'interface utilisateur. Prière de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour d'avantage de détails."
+      }
+    ]
+  }
+]

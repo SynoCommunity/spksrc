@@ -11,11 +11,9 @@ HOMEPAGE = https://www.wallabag.org/
 COMMENT  = Wallabag is a self hostable application allowing you to save an offline copy of your favorite articles. Click, save, read it when you can. It extracts content so that you can read it when you have time.
 LICENSE  = MIT
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = wallabag_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: wallabag_install
 wallabag_install:

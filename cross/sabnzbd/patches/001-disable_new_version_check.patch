@@ -1,0 +1,28 @@
+--- interfaces/Config/templates/config_general.tmpl
++++ interfaces/Config/templates/config_general.tmpl
+@@ -165,14 +165,6 @@
+                         <input type="checkbox" name="auto_browser" id="auto_browser" value="1" <!--#if int($auto_browser) > 0 then 'checked="checked"' else ""#--> />
+                         <span class="desc">$T('explain-auto_browser')</span>
+                     </div>
+-                    <div class="field-pair">
+-                        <label class="config" for="check_new_rel">$T('opt-check_new_rel')</label>
+-                        <select name="check_new_rel" id="check_new_rel">
+-                            <option value="0" <!--#if $check_new_rel == 0 then 'selected="selected"' else ""#--> >$T('off')</option>
+-                            <option value="1" <!--#if $check_new_rel == 1 then 'selected="selected"' else ""#--> >$T('on')</option>
+-                            <option value="2" <!--#if $check_new_rel == 2 then 'selected="selected"' else ""#--> >$T('also-test')</option>
+-                        </select>
+-                    </div>
+                     <div class="field-pair advanced-settings">
+                         <label class="config" for="enable_https_verification">$T('opt-enable_https_verification')</label>
+                         <input type="checkbox" name="enable_https_verification" id="enable_https_verification" value="1" <!--#if int($enable_https_verification) > 0 then 'checked="checked"' else ""#--> />
+--- sabnzbd/misc.py
++++ sabnzbd/misc.py
+@@ -470,6 +470,8 @@
+     they are already using an alpha/beta/rc.
+     RC's are valued higher than Beta's, which are valued higher than Alpha's.
+     """
++    logging.info("Version check disabled by SynoCommunity packaging")
++    return
+ 
+     if not cfg.version_check():
+         return

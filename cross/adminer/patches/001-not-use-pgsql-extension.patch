@@ -1,15 +1,15 @@
 # See https://github.com/SynoCommunity/spksrc/issues/2662
 # Remove the extension pgsql because the extension pgsql does not work with the PostgreSQL server from DSM. The Extension pdo_pgsql works perfectly.
---- adminer/drivers/pgsql.inc.php.org	2020-01-31 10:23:04.000000000 +0000
-+++ adminer/drivers/pgsql.inc.php	2020-02-23 16:59:43.482304615 +0000
-@@ -4,146 +4,8 @@
+--- adminer/drivers/pgsql.inc.php.orig	2021-05-14 05:39:59.000000000 +0000
++++ adminer/drivers/pgsql.inc.php	2023-10-07 23:07:43.616901493 +0000
+@@ -3,146 +3,7 @@
+ 
  if (isset($_GET["pgsql"])) {
- 	$possible_drivers = array("PgSQL", "PDO_PgSQL");
  	define("DRIVER", "pgsql");
 -	if (extension_loaded("pgsql")) {
 -		class Min_DB {
 -			var $extension = "PgSQL", $_link, $_result, $_string, $_database = true, $server_info, $affected_rows, $error, $timeout;
- 
+-
 -			function _error($errno, $error) {
 -				if (ini_bool("html_errors")) {
 -					$error = html_entity_decode(strip_tags($error));
@@ -43,7 +43,7 @@
 -			}
 -
 -			function value($val, $field) {
--				return ($field["type"] == "bytea" ? pg_unescape_bytea($val) : $val);
+-				return ($field["type"] == "bytea" && $val !== null ? pg_unescape_bytea($val) : $val);
 -			}
 -
 -			function quoteBinary($string) {

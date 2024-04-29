@@ -8,12 +8,11 @@ DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = "redis"
 
 # toolchains of DSM <=5.2 have outdated compiler (PPC archs except qoriq)
-UNSUPPORTED_ARCHS = $(OLD_PCC_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = ntopng is the next generation version of the original ntop, a network traffic probe that monitors network usage. ntopng is based on libpcap and it has been written in a portable way in order to virtually run on every Unix platform, MacOSX and on Windows as well.
 CHANGELOG = "1. Update to version 4.2<br/>2. Update nDPI to version 3.4"
-RELOAD_UI = yes
 DISPLAY_NAME = ntopng
 
 HELPURL = https://www.ntop.org/guides/ntopng/index.html

@@ -1,14 +1,86 @@
 {
-    "php56": {
-		"php-ini": [{
-			"relpath": "etc/php/conf.d/com.synocommunity.tt-rss.ini",
-			"destpath": "/usr/local/etc/php56/conf.d"
-		}]
+    "mariadb10-db": {
+        "admin-account-m10": "root",
+        "admin-account-m5": "root",
+        "admin-pw-m10": "{{wizard_mysql_password_root}}",
+        "admin-pw-m5": "{{wizard_mariadb5_password_root}}",
+        "create-db": {
+            "db-collision": "skip",
+            "db-name": "ttrss",
+            "flag": "{{wizard_create_db}}"
+        },
+        "drop-db-inst": {
+            "db-name": "ttrss",
+            "flag": "{{wizard_run_migration}}",
+            "ver": "m5"
+        },
+        "drop-db-uninst": true,
+        "drop-user-uninst": true,
+        "grant-user": {
+            "db-name": "ttrss",
+            "flag": "{{mysql_grant_user}}",
+            "host": "localhost",
+            "user-name": "ttrss",
+            "user-pw": "{{wizard_mysql_password_ttrss}}"
+        },
+        "migrate-db": {
+            "db-collision": "replace",
+            "flag": "{{wizard_run_migration}}",
+            "m10-db-name": "ttrss",
+            "m5-db-name": "ttrss"
+        }
     },
-	"php70": {
-		"php-ini": [{
-			"relpath": "etc/php/conf.d/com.synocommunity.tt-rss.ini",
-			"destpath": "/usr/local/etc/php70/conf.d"
-		}]
+    "webservice": {
+        "migrate": {
+            "root": [
+                {
+                    "new": "tt-rss",
+                    "old": "tt-rss"
+                }
+            ]
+        },
+        "pkg_dir_prepare": [
+            {
+                "group": "http",
+                "mode": "0755",
+                "source": "/var/packages/tt-rss/target/share/tt-rss",
+                "target": "tt-rss",
+                "user": "sc-tt-rss"
+            }
+        ],
+        "portals": [
+            {
+                "alias": "tt-rss",
+                "app": "com.synocommunity.packages.tt-rss",
+                "name": "Tiny Tiny RSS",
+                "service": "tt-rss",
+                "type": "alias"
+            }
+        ],
+        "services": [
+            {
+                "backend": 2,
+                "display_name": "Tiny Tiny RSS",
+                "icon": "app/images/tt-rss-{0}.png",
+                "php": {
+                    "backend": 8,
+                    "extensions": [
+                        "curl",
+                        "gd",
+                        "intl",
+                        "mysqli",
+                        "pdo_mysql",
+                        "posix"
+                    ],
+                    "group": "http",
+                    "profile_desc": "PHP Profile for tt-rss",
+                    "profile_name": "tt-rss Profile",
+                    "user": "sc-tt-rss"
+                },
+                "root": "tt-rss",
+                "service": "tt-rss",
+                "type": "apache_php"
+            }
+        ]
     }
 }

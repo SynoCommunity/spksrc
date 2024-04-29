@@ -2,10 +2,10 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-# Force build in native tool directrory, not cross directory.
-WORK_DIR := $(PWD)/work-native
+# Force build in native tool directory, not cross directory.
+WORK_DIR := $(CURDIR)/work-native
 
-# Package dependend
+# Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
@@ -49,17 +49,11 @@ include ../../mk/spksrc.install.mk
 cat_PLIST:
 	@true
 
-
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
-
 all: install
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
 ####
+
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+###

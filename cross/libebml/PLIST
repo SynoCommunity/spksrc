@@ -1,0 +1,3 @@
+lnk:lib/libebml.so
+lnk:lib/libebml.so.5
+lib:lib/libebml.so.5.0.0

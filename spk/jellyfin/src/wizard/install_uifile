@@ -1,0 +1,13 @@
+[
+  {
+    "step_title": "Important information",
+    "items": [
+      {
+        "desc": "Permissions for the package are managed by a \"System internal user\" named <b>sc-jellyfin</b>.<br>For DSM 6 and below you can use the generic <b>sc-media</b> group instead.<br>For DSM 7 you may need to give <b>sc-ffmpeg</b> the same permissions as sc-jellyfin.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      },
+      {
+        "desc": "Information regarding Jellyfin troubleshooting and hardware acceleration support for your NAS can be found <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Jellyfin\">here</a>"
+      }
+    ]
+  }
+]

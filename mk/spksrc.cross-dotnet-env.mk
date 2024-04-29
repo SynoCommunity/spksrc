@@ -10,13 +10,13 @@ DOTNET_OS = linux
 DOTNET_DEFAULT_VERSION = 3.1
 
 ifeq ($(strip $(DOTNET_VERSION)),)
-	DOTNET_VERSION=$(DOTNET_DEFAULT_VERSION)
+	DOTNET_VERSION = $(DOTNET_DEFAULT_VERSION)
 endif
 
 ifeq ($(strip $(DOTNET_FRAMEWORK)),)
-	DOTNET_FRAMEWORK=net$(DOTNET_VERSION)
+	DOTNET_FRAMEWORK = net$(DOTNET_VERSION)
 	ifeq ($(call version_lt, $(DOTNET_VERSION), 5.0),1)
-		DOTNET_FRAMEWORK=netcoreapp$(DOTNET_VERSION)
+		DOTNET_FRAMEWORK = netcoreapp$(DOTNET_VERSION)
 	endif
 endif
 DOTNET_BUILD_ARGS += -f $(DOTNET_FRAMEWORK)
@@ -41,20 +41,20 @@ endif
 
 ifeq ($(strip $(DOTNET_ROOT)),)
 	# dotnet sdk path
-	DOTNET_ROOT=$(WORK_DIR)/../../../native/dotnet-sdk-$(DOTNET_VERSION)/work-native
+	DOTNET_ROOT = $(WORK_DIR)/../../../native/dotnet-sdk-$(DOTNET_VERSION)/work-native
 endif
 
 ifeq ($(strip $(DOTNET_ROOT_X86)),)
 	# dotnet sdk-32bit path
-	DOTNET_ROOT_X86=""
-	# DOTNET_ROOT_X86=$(WORK_DIR)/../../../native/dotnet-x86-sdk-$(DOTNET_VERSION)/work-native
+	DOTNET_ROOT_X86 = ""
+	# DOTNET_ROOT_X86 = $(WORK_DIR)/../../../native/dotnet-x86-sdk-$(DOTNET_VERSION)/work-native
 endif
 
 
 ifeq ($(strip $(NUGET_PACKAGES)),)
 	# cache nuget packages
 	# https://github.com/dotnet/sdk/commit/e5a9249418f8387602ee8a26fef0f1604acf5911
-	NUGET_PACKAGES=$(DISTRIB_DIR)/nuget/packages
+	NUGET_PACKAGES = $(DISTRIB_DIR)/nuget/packages
 endif
 
 ifneq ($(strip $(DOTNET_NOT_RELEASE)),1)
@@ -64,23 +64,26 @@ ifneq ($(strip $(DOTNET_SHARED_FRAMEWORK)),1)
 	# Include .NET Core into package unless DOTNET_SHARED_FRAMEWORK is set to 1
 	# https://docs.microsoft.com/en-us/dotnet/core/deploying/#publish-self-contained
 	DOTNET_BUILD_ARGS += --self-contained
+	DOTNET_BUILD_PROPERTIES += -p:UseAppHost=true
 endif
 
 ifeq ($(strip $(DOTNET_SINGLE_FILE)),1)
 	# package all dlls into a single binary
-	DOTNET_BUILD_PROPERTIES += "-p:PublishSingleFile=true"
+	DOTNET_BUILD_PROPERTIES += -p:PublishSingleFile=true
 endif
 
 DOTNET_BUILD_ARGS += --runtime $(DOTNET_OS)-$(DOTNET_ARCH)
 DOTNET_BUILD_ARGS += --output="$(STAGING_INSTALL_PREFIX)/$(DOTNET_OUTPUT_PATH)"
 
 ifeq ($(strip $(DOTNET_OPTIMIZE)),1)
-# PublishReadyToRun improve the startup time of your .NET Core application
-#   by compiling your application assemblies as ReadyToRun (R2R) format.
-#   R2R is a form of ahead-of-time (AOT) compilation.
-# PublishTrimmed reduce the size of apps by analyzing IL and trimming unused assemblies.
-#   (not aware of reflection, needs testing, shaves ~10mb of binary)
-	DOTNET_BUILD_PROPERTIES += "-p:UseAppHost=true;PublishReadyToRun=true;PublishReadyToRunShowWarnings=true"
+# PublishReadyToRun improves the startup time of your .NET Core application
+#       by compiling your application assemblies as ReadyToRun (R2R) format.
+#       R2R is a form of ahead-of-time (AOT) compilation.
+#       But this almost doubles the size of the binary files.
+    DOTNET_BUILD_PROPERTIES += -p:PublishReadyToRun=true -p:PublishReadyToRunShowWarnings=true
+# DebugSymbols and DebugType
+#       omit the creation of pdb files
+    DOTNET_BUILD_PROPERTIES += -p:DebugSymbols=false -p:DebugType=none
 endif
 
 DOTNET_BUILD_ARGS += $(DOTNET_BUILD_PROPERTIES)

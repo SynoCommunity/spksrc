@@ -1,9 +1,1 @@
-rsc:bin/7z
-rsc:bin/7za
-rsc:bin/7zr
-lib:lib/p7zip/7z
-lib:lib/p7zip/7za
-lib:lib/p7zip/7zCon.sfx
-lib:lib/p7zip/7zr
-lib:lib/p7zip/7z.so
-lib:lib/p7zip/Codecs/Rar.so
+bin:bin/7za

@@ -1,0 +1,3 @@
+lnk:lib/libudev.so
+lnk:lib/libudev.so.1
+lib:lib/libudev.so.1.3.5

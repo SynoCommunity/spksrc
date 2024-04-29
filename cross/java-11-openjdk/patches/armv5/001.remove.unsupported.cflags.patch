@@ -1,0 +1,13 @@
+# remove cflags not supported by older gcc
+# remove -Wno-format-zero-length
+--- openjdk/make/autoconf/flags-cflags.orig.m4	2021-04-09 09:36:58.000000000 +0000
++++ openjdk/make/autoconf/flags-cflags.m4	2021-08-21 13:56:02.077623151 +0000
+@@ -808,7 +808,7 @@
+     FLAGS_SETUP_GCC6_COMPILER_FLAGS($1, $3)
+     $1_TOOLCHAIN_CFLAGS="${$1_GCC6_CFLAGS}"
+ 
+-    $1_WARNING_CFLAGS_JVM="-Wno-format-zero-length -Wtype-limits -Wuninitialized"
++    $1_WARNING_CFLAGS_JVM="-Wtype-limits -Wuninitialized"
+   fi
+ 
+   # Prevent the __FILE__ macro from generating absolute paths into the built

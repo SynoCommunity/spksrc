@@ -1,24 +1,21 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 3.2.0
-SPK_REV = 47
+SPK_VERS = 4.2.3
+SPK_REV = 69
 SPK_ICON = src/sabnzbd.png
 
-BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
-DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python38>=3.8.1-1"
+PYTHON_PACKAGE = python311
+DEPENDS = cross/busybox cross/par2cmdline-turbo cross/unrar cross/p7zip cross/$(SPK_NAME)
+SPK_DEPENDS = "python311>=3.11.5-8"
 
-# To generate full requirements.txt, extend SABnzbd's own
-# requirements.txt with the depedencies of cherrypy and cheroot
-WHEELS = src/requirements.txt
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = Safihre
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
 DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. Vous n\'avez qu\'a ajouter un .nzb, SABnzbd s\'occupera du reste sans aucune intervention de votre part : téléchargement, vérification, réparation, extraction et déplacement.
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
-RELOAD_UI = yes
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.2.0. Requires the Python 3.8 package."
+CHANGELOG = "Update SABnzbd to 4.2.3."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -26,10 +23,13 @@ LICENSE   = GPL
 WIZARDS_DIR = src/wizard/
 
 SERVICE_USER = auto
-SERVICE_WIZARD_SHARE = wizard_download_dir
+SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8080
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+
+# Ensure C++11 compatibility for unrar
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
@@ -39,11 +39,18 @@ POST_STRIP_TARGET = sabnzbd_extra_install
 # Add nice and ionice commands
 ENV += BUSYBOX_CONFIG="nice ionice"
 
-include ../../mk/spksrc.spk.mk
+SPK_COMMANDS = bin/7za
+
+# [cryptography]
+DEPENDS += cross/cryptography
+
+include ../../mk/spksrc.python.mk
+
+# prefer native python tools (pip, maturin, ...) used for orjson
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/scripts
 	install -m 755 src/SabToSyno.py $(STAGING_DIR)/var/scripts/SabToSyno.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini

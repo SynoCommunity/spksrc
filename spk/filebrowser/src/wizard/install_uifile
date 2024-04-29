@@ -1,0 +1,6 @@
+[{
+    "step_title": "Admin Credentials",
+    "items": [{
+        "desc": "The default credentials are: username: <b>admin</b> password: <b>admin</b>.<br><br>NOTE that most files will not be writable and some are not even readable due to the package having inadequate permissions for those actions."
+    }]
+}]

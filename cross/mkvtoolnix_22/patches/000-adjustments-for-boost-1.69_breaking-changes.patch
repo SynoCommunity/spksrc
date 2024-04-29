@@ -1,0 +1,39 @@
+# adjustments for breaking API change in boost v1.69 for boost_logic library (tribool type)
+# https://github.com/boostorg/logic/pull/5
+# 
+--- src/common/debugging.h.orig	2018-04-01 15:27:20.000000000 +0000
++++ src/common/debugging.h	2022-03-31 05:35:32.315755544 +0000
+@@ -60,7 +60,7 @@
+       if (boost::logic::indeterminate(m_requested))
+         m_requested = debugging_c::requested(m_option);
+ 
+-      return m_requested;
++      return static_cast<bool>(m_requested);
+     }
+   };
+ 
+
+--- src/input/r_matroska.cpp.orig	2018-04-01 15:27:20.000000000 +0000
++++ src/input/r_matroska.cpp	2022-03-31 06:46:00.838612609 +0000
+@@ -1660,7 +1660,7 @@
+     PTZR(t->ptzr)->set_track_forced_flag(true);
+ 
+   if (boost::logic::indeterminate(PTZR(t->ptzr)->m_ti.m_enabled_track))
+-    PTZR(t->ptzr)->set_track_enabled_flag(t->enabled_track);
++    PTZR(t->ptzr)->set_track_enabled_flag(static_cast<bool>(t->enabled_track));
+ 
+   if ((0 != t->track_uid) && !PTZR(t->ptzr)->set_uid(t->track_uid))
+     mxwarn(boost::format(Y("matroska_reader: Could not keep the track UID %1% because it is already allocated for the new file.\n")) % t->track_uid);
+
+
+--- src/output/p_avc_es.cpp.orig	2018-04-01 15:27:20.000000000 +0000
++++ src/output/p_avc_es.cpp	2022-03-31 06:47:14.967842094 +0000
+@@ -47,7 +47,7 @@
+   set_codec_id(MKV_V_MPEG4_AVC);
+ 
+   m_parser.set_keep_ar_info(false);
+-  m_parser.set_fix_bitstream_frame_rate(m_ti.m_fix_bitstream_frame_rate);
++  m_parser.set_fix_bitstream_frame_rate(static_cast<bool>(m_ti.m_fix_bitstream_frame_rate));
+ 
+   // If no external timestamp file has been specified then mkvmerge
+   // might have created a factory due to the --default-duration

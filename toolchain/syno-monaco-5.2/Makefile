@@ -1,7 +1,6 @@
 TC_ARCH = monaco
 TC_VERS = 5.2
 TC_KERNEL = 3.10.35
-TC_GCC = 4.8.3
 TC_GLIBC = 2.19
 
 TC_DIST = monaco-gcc483_glibc219_hard-GPL

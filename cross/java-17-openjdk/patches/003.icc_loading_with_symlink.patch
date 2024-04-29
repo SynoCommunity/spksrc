@@ -1,0 +1,12 @@
+--- a/src/java.desktop/share/classes/java/awt/color/ICC_Profile.java
++++ b/src/java.desktop/share/classes/java/awt/color/ICC_Profile.java
+@@ -1327,9 +1327,6 @@ public class ICC_Profile implements Seri
+                 dir = st.nextToken();
+                 fullPath = dir + File.separatorChar + fileName;
+                 f = new File(fullPath);
+-                if (!isChildOf(f, dir)) {
+-                    f = null;
+-                }
+             }
+         }
+ 

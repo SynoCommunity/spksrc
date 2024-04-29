@@ -1,0 +1,3 @@
+#rules for USB ACM serial devices
+KERNEL=="ttyACM*", ACTION=="add", MODE="0666"
+KERNEL=="ttyUSB*", ACTION=="add", MODE="0666"

@@ -1,8 +1,11 @@
 PKG_NAME = libcaca
 PKG_VERS = 0.99.beta19
+# Require autoconf >= 2.71
+#PKG_VERS = 0.99.beta20
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://caca.zoy.org/files/libcaca
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/cacalabs/libcaca/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/imlib2

@@ -1,7 +1,6 @@
 TC_ARCH = armada375
 TC_VERS = 5.2
 TC_KERNEL = 3.2.40
-TC_GCC = 4.6.4
 TC_GLIBC = 2.15
 
 TC_DIST = armada375-gcc464_glibc215_hard_armada-GPL

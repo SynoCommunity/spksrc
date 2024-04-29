@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="800"
+   height="800"
+   id="svg2434"
+   sodipodi:docname="synokernel-usbserial.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   inkscape:export-filename="/home/th0ma7/image/synokernel-usbserial.png"
+   inkscape:export-xdpi="103.74"
+   inkscape:export-ydpi="103.74">
+  <metadata
+     id="metadata11">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2488"
+     inkscape:window-height="1536"
+     id="namedview9"
+     showgrid="false"
+     inkscape:zoom="1.352265"
+     inkscape:cx="203.58399"
+     inkscape:cy="465.93102"
+     inkscape:window-x="72"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0" />
+  <defs
+     id="defs2436" />
+  <g
+     transform="translate(-558.65871,255.34858)"
+     id="layer1">
+    <path
+       d="m 836.72467,-44.263714 c -37.29239,2.3e-5 -65.1369,15.166223 -73.04742,55.351881 -3.59571,18.345653 -1.42314,32.012711 3.71356,43.151144 h 72.41443 C 824.6006,38.623717 809.11746,26.607912 812.71313,8.262259 c 2.15742,-10.8107958 5.72576,-17.0451466 16.20463,-17.0451466 9.55422,1.13e-5 11.61012,6.2343394 9.4527,17.0451466 l -3.67136,18.794523 h 48.36068 L 887.49073,4.5392467 C 894.78484,-32.479617 869.39407,-44.263714 836.72467,-44.263714 Z M 629.01849,-39.91271 610.4085,54.239311 h 48.40287 l 18.56781,-94.152021 z m 74.06021,0 -18.61,94.152021 h 48.40288 l 18.61001,-94.152021 z m 215.5553,0 -18.61001,94.152021 h 109.80321 c 11.609,-9.281993 17.4931,-24.253333 20.6778,-40.414943 10.4789,-53.180485 -21.7838,-53.737078 -62.87732,-53.737078 z m 46.3773,31.5335203 c 19.96162,-0.184352 19.70118,9.05266214 15.65604,29.4253117 -6.57499,33.306041 -16.00472,27.949108 -31.31207,28.931905 l 11.39388,-58.2226431 c 1.51532,-0.095645 2.93137,-0.1223024 4.26215,-0.134494 z M 606.01974,76.487711 598.71922,113.40392 c -5.54763,28.06444 -13.16065,72.53159 46.6305,72.53159 45.20292,-4e-5 64.40148,-20.55168 74.7776,-67.50776 l 8.31331,-41.940039 h -48.36068 l -8.52431,43.151139 c -3.49296,17.69044 -6.09307,30.77098 -19.24299,30.77098 -12.53354,0 -9.9495,-13.08055 -6.45654,-30.77098 l 8.52432,-43.151139 z m 177.2803,0 c 16.43743,17.362833 35.68364,30.064469 30.34148,57.146109 -2.56833,13.10399 -8.33631,16.77601 -16.24683,16.77601 -8.93785,0 -12.02104,-3.67199 -9.45269,-16.77601 l 4.93734,-25.02945 h -48.40288 l -5.52814,27.85535 c -7.49957,38.22007 20.34953,49.47579 51.27245,49.47579 40.47714,-4e-5 65.33511,-19.33409 73.55381,-61.04854 4.00662,-20.52962 0.40279,-35.950437 -6.58313,-48.399259 z m 112.29301,0 -20.71998,105.051949 h 48.99368 c 51.36695,3e-5 73.94061,-2.17822 85.96045,-63.11191 3.2875,-16.81679 5.1734,-32.112029 -0.1688,-41.940039 z m 46.1241,11.16906 c 20.3413,-1.2e-5 25.59416,0.308167 19.3274,31.757809 -4.52033,22.93201 -6.04506,32.87889 -31.52307,30.36727 z"
+       style="fill:#1c4d9c;fill-rule:nonzero;stroke:none;stroke-width:1.26212"
+       id="path4050" />
+    <path
+       d="m 1140.9412,-4.9701558 c -46.8557,0 -92.4987,30.9727308 -106.0052,70.5579428 H 608.17191 l -4.51535,22.472682 h 427.35484 c -0.085,35.431161 29.714,62.174981 72.9208,62.349361 0.1416,5.8e-4 0.2801,0 0.4221,0 h 104.1906 l 40.2584,-155.2454236 -107.7777,-0.134494 c -0.028,-2.27e-5 -0.056,0 -0.084,0 z M 1259.1,17.412818 1230.1088,128.02686 h 77.2674 l 27.0077,-110.614042 z m 21.3529,22.517535 h 18.2724 l -4.8107,21.39615 H 1275.6 Z m -9.748,44.227676 h 18.2724 l -4.8108,21.396151 h -18.3146 z"
+       style="fill:#000000;fill-rule:nonzero;stroke:none;stroke-width:1.26212"
+       id="path4064" />
+    <text
+       xml:space="preserve"
+       style="font-size:82.3639px;line-height:1.25;font-family:sans-serif;word-spacing:0px;stroke-width:1"
+       x="627.74585"
+       y="261.02795"
+       id="text18"
+       transform="scale(0.96994095,1.0309906)"><tspan
+         sodipodi:role="line"
+         id="tspan16"
+         x="627.74585"
+         y="261.02795"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:82.3639px;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold Italic';fill:#ee3d00;fill-opacity:1;stroke-width:1">SERIAL ADAPTERS</tspan></text>
+  </g>
+</svg>

@@ -1,7 +1,6 @@
 TC_ARCH = qoriq
 TC_VERS = 5.2
 TC_KERNEL = 2.6.32
-TC_GCC = 4.3.2
 TC_GLIBC = 2.8
 
 TC_DIST = qoriq-gcc4374_eglibc2874_qoriq-GPL

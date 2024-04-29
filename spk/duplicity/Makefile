@@ -1,29 +1,52 @@
 SPK_NAME = duplicity
-SPK_VERS = 0.7.19
-SPK_REV = 6
+SPK_VERS = 1.2.3
+SPK_REV = 10
 SPK_ICON = src/duplicity.png
 
-BUILD_DEPENDS = cross/python2 cross/setuptools cross/pip_py2 cross/wheel
-BUILD_DEPENDS += cross/$(SPK_NAME)
-DEPENDS = cross/librsync cross/bash cross/duply
-WHEELS = src/requirements.txt
+PYTHON_PACKAGE = python311
+SPK_DEPENDS = "python311>=3.11.4-7:gnupg>=2.1.6"
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-SPK_DEPENDS = "python>=2.7.8-9:gnupg>=2.1.6-1"
+DEPENDS = cross/librsync cross/duply
+
+# protobuf: missing atomics support 
+# /upb/port/atomic.h:35:23: fatal error: stdatomic.h: No such file or directory
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
+# [cryptography]
+DEPENDS += cross/cryptography
+
+# [lxml]
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# [PyNaCl]
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+# [protobuf]
+WHEELS_CPPFLAGS = [protobuf] -std=c99
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm using a command line interface. Also contains duply wrapper script.
+DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = Update to version 0.7.19
+CHANGELOG = "1. Update duplicity to v1.2.3 and duply to v2.4.3<br/>2. Update to OpenSSL 3.1.2<br/>3. Migrate to python 3.11.<br/>4. Drop support for ARMv5 and ARMv7L archs."
 
-HOMEPAGE = http://duplicity.nongnu.org/
-LICENSE  = GNU GPL v2
+HOMEPAGE = https://duplicity.gitlab.io/duplicity-web/
+LICENSE  = GPLv2
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# use alternate TMPDIR as /tmp might be too small.
+USE_ALTERNATE_TMPDIR = 1
 
-SPK_COMMANDS = "env/bin/duplicity share/duply/duply"
+SPK_COMMANDS = bin/duply bin/duplicity
 
-include ../../mk/spksrc.spk.mk
+SPK_USR_LOCAL_LINKS  = bin:env/bin/duplicity
+SPK_USR_LOCAL_LINKS += bin:bin/duply
+
+include ../../mk/spksrc.python.mk

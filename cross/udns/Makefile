@@ -11,8 +11,9 @@ HOMEPAGE = https://www.corpit.ru/mjt/udns.html
 COMMENT  = UDNS is a stub DNS resolver library with ability to perform both syncronous and asyncronous DNS queries. 
 LICENSE  = LGPL
 
+COMPILE_MAKE_OPTIONS += shared
+
 PRE_CONFIGURE_TARGET = udns_pre_configure
-COMPILE_TARGET = udns_compile
 INSTALL_TARGET = udns_install
 
 include ../../mk/spksrc.cross-cc.mk
@@ -20,10 +21,6 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: udns_pre_configure
 udns_pre_configure:
 	@$(RUN) sed -e 's/ac_run() {/ac_run() { return 0/g' -i configure.lib
-
-.PHONY: udns_compile
-udns_compile:
-	$(RUN) $(MAKE) shared
 
 .PHONY: udns_install
 udns_install:

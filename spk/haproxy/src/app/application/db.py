@@ -89,6 +89,7 @@ def default_config():
     session.add(Backend(id=17, name=u'file', servers=u'file localhost:7000 check'))
     session.add(Backend(id=18, name=u'haproxy', servers=u'haproxy localhost:8280 check'))
     session.add(Backend(id=19, name=u'deluge', servers=u'deluge localhost:8112 check'))
+    session.add(Backend(id=20, name=u'sickchill', servers=u'sickchill localhost:8081 check'))
     session.add(Frontend(id=1, name=u'http', binds=u':5080', default_backend_id=1, options=ur'option http-server-close,option forwardfor'))
     session.add(Frontend(id=2, name=u'https', binds=u':5443 ssl crt /usr/local/haproxy/var/crt/default.pem ciphers AESGCM+AES128:AES128:AESGCM+AES256:AES256:RSA+RC4+SHA:!RSA+AES:!CAMELLIA:!aECDH:!3DES:!DSS:!PSK:!SRP:!aNULL no-sslv3', options=ur'option http-server-close,option forwardfor,rspirep ^Location:\ http://(.*)$    Location:\ https://\1, rspadd Strict-Transport-Security:\ max-age=31536000;\ includeSubDomains', default_backend_id=1))
     session.add(Association(frontend_id=2, backend_id=2, condition=u'if { hdr_beg(Host) -i dsm. }'))
@@ -109,4 +110,5 @@ def default_config():
     session.add(Association(frontend_id=2, backend_id=17, condition=u'if { hdr_beg(Host) -i file. }'))
     session.add(Association(frontend_id=2, backend_id=18, condition=u'if { hdr_beg(Host) -i haproxy. }'))
     session.add(Association(frontend_id=2, backend_id=19, condition=u'if { hdr_beg(Host) -i deluge. }'))
+    session.add(Association(frontend_id=2, backend_id=20, condition=u'if { hdr_beg(Host) -i sickchill. }'))
     session.commit()

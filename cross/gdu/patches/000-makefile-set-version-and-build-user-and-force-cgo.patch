@@ -1,0 +1,37 @@
+# - make version configurable to build target from source instead from git clone
+# - set build user to 'SynoCommunity'
+# - revert https://github.com/dundee/gdu/commit/c4db1104dd3c25124a5ea01da91b1400d091ccd7
+#   - build with CGO_ENABLED=1
+#   - remove 'static' linker flag
+# - disable VCS stamping 
+#   - due to nested repos it is not possible to embed vcs info with github build action
+# 
+--- Makefile.orig	2023-06-06 12:48:07.000000000 +0000
++++ Makefile	2023-09-06 19:45:28.769829154 +0000
+@@ -2,14 +2,14 @@
+ MAJOR_VER := v5
+ PACKAGE := github.com/dundee/$(NAME)/$(MAJOR_VER)
+ CMD_GDU := cmd/gdu
+-VERSION := $(shell git describe --tags 2>/dev/null)
++VERSION ?= $(shell git describe --tags 2>/dev/null)
+ NAMEVER := $(NAME)-$(subst v,,$(VERSION))
+ DATE := $(shell date +'%Y-%m-%d')
+ GOFLAGS ?= -buildmode=pie -trimpath -mod=readonly -modcacherw
+ GOFLAGS_STATIC ?= -trimpath -mod=readonly -modcacherw
+-LDFLAGS := -s -w -extldflags '-static' \
++LDFLAGS := -s -w \
+ 	-X '$(PACKAGE)/build.Version=$(VERSION)' \
+-	-X '$(PACKAGE)/build.User=$(shell id -u -n)' \
++	-X '$(PACKAGE)/build.User=SynoCommunity' \
+ 	-X '$(PACKAGE)/build.Time=$(shell LC_ALL=en_US.UTF-8 date)'
+ TAR := tar
+ ifeq ($(shell uname -s),Darwin)
+@@ -31,7 +31,7 @@
+ build:
+ 	@echo "Version: " $(VERSION)
+ 	mkdir -p dist
+-	GOFLAGS="$(GOFLAGS)" CGO_ENABLED=0 go build -ldflags="$(LDFLAGS)" -o dist/$(NAME) $(PACKAGE)/$(CMD_GDU)
++	GOFLAGS="$(GOFLAGS)" CGO_ENABLED=0 go build -buildvcs=false -ldflags="$(LDFLAGS)" -o dist/$(NAME) $(PACKAGE)/$(CMD_GDU)
+ 
+ build-static:
+ 	@echo "Version: " $(VERSION)

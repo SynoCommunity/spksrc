@@ -1,0 +1,16 @@
+# S_ISSOCK and lstat definitions are not taken from <sys/stat.h> of the toolchain
+# as definition of __USE_UNIX98 or __USEBSD did not work.
+# This seams to be a header file problem only, as linking does work with this patch.
+# 
+--- compat/stat.c.orig	2022-01-29 01:38:59.000000000 +0000
++++ compat/stat.c	2022-04-02 21:45:12.038601543 +0000
+@@ -2,6 +2,9 @@
+ #include <sys/stat.h>  /* *stat, S_IS* */
+ #include <sys/types.h> /* mode_t       */
+ 
++#define S_ISSOCK(mode) __S_ISTYPE((mode), __S_IFSOCK)
++extern int lstat (__const char *__restrict __file, struct stat *__restrict __buf) __THROW __nonnull ((1, 2));
++
+ static inline mode_t mode_native_to_git(mode_t native_mode)
+ {
+ 	mode_t perm_bits = native_mode & 07777;
