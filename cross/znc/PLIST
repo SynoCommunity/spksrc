@@ -17,6 +17,7 @@ lib:lib/znc/cert.so
 lib:lib/znc/certauth.so
 lib:lib/znc/chansaver.so
 lib:lib/znc/clearbufferonmsg.so
+lib:lib/znc/clientbuffer.so
 lib:lib/znc/clientnotify.so
 lib:lib/znc/colloquy.so
 lib:lib/znc/controlpanel.so
@@ -37,8 +38,8 @@ lib:lib/znc/log.so
 lib:lib/znc/missingmotd.so
 lib:lib/znc/modpython.so
 lib:lib/znc/modpython/_znc_core.so
-lib:lib/znc/modpython/znc.py
-lib:lib/znc/modpython/znc_core.py
+rsc:lib/znc/modpython/znc.py
+rsc:lib/znc/modpython/znc_core.py
 lib:lib/znc/modules_online.so
 lib:lib/znc/nickserv.so
 lib:lib/znc/notes.so
@@ -48,7 +49,7 @@ lib:lib/znc/perform.so
 lib:lib/znc/playback.so
 lib:lib/znc/privmsg.so
 lib:lib/znc/push.so
-lib:lib/znc/pyeval.py
+rsc:lib/znc/pyeval.py
 lib:lib/znc/raw.so
 lib:lib/znc/route_replies.so
 lib:lib/znc/sample.so

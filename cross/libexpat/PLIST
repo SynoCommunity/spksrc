@@ -1,0 +1,3 @@
+lnk:lib/libexpat.so
+lnk:lib/libexpat.so.1
+lib:lib/libexpat.so.1.9.2

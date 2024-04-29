@@ -1,0 +1,46 @@
+Rename ether-wake to etherwake
+--- ether-wake.c.orig	2005-07-10 18:44:25.000000000 +0000
++++ ether-wake.c	2021-05-22 19:13:54.638754525 +0000
+@@ -3,10 +3,10 @@
+ static char version_msg[] =
+ "ether-wake.c: v1.09 11/12/2003 Donald Becker, http://www.scyld.com/";
+ static char brief_usage_msg[] =
+-"usage: ether-wake [-i <ifname>] [-p aa:bb:cc:dd[:ee:ff]] 00:11:22:33:44:55\n"
++"usage: etherwake [-i <ifname>] [-p aa:bb:cc:dd[:ee:ff]] 00:11:22:33:44:55\n"
+ "   Use '-u' to see the complete set of options.\n";
+ static char usage_msg[] =
+-"usage: ether-wake [-i <ifname>] [-p aa:bb:cc:dd[:ee:ff]] 00:11:22:33:44:55\n"
++"usage: etherwake [-i <ifname>] [-p aa:bb:cc:dd[:ee:ff]] 00:11:22:33:44:55\n"
+ "\n"
+ "	This program generates and transmits a Wake-On-LAN (WOL)\n"
+ "	\"Magic Packet\", used for restarting machines that have been\n"
+@@ -159,9 +159,9 @@
+ #endif
+ 	if (s < 0) {
+ 		if (errno == EPERM)
+-			fprintf(stderr, "ether-wake: This program must be run as root.\n");
++			fprintf(stderr, "etherwake: This program must be run as root.\n");
+ 		else
+-			perror("ether-wake: socket");
++			perror("etherwake: socket");
+ 		perm_failure++;
+ 	}
+ 	/* Don't revert if debugging allows a normal user to get the raw socket. */
+@@ -295,7 +295,7 @@
+ 					hostid, ether_ntoa(eaddr));
+ 	} else {
+ 		(void)fprintf(stderr,
+-					  "ether-wake: The Magic Packet host address must be "
++					  "etherwake: The Magic Packet host address must be "
+ 					  "specified as\n"
+ 					  "  - a station address, 00:11:22:33:44:55, or\n"
+ 					  "  - a hostname with a known 'ethers' entry.\n");
+@@ -383,7 +383,7 @@
+ 
+ /*
+  * Local variables:
+- *  compile-command: "gcc -O -Wall -o ether-wake ether-wake.c"
++ *  compile-command: "gcc -O -Wall -o etherwake ether-wake.c"
+  *  c-indent-level: 4
+  *  c-basic-offset: 4
+  *  c-indent-level: 4

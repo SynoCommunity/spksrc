@@ -10,7 +10,6 @@ DEPENDS  = cross/$(SPK_NAME)
 MAINTAINER = tolkonepiu
 DESCRIPTION = Wallabag is a self hostable application allowing you to save an offline copy of your favorite articles. Click, save, read it when you can. It extracts content so that you can read it when you have time.
 ADMIN_URL = /wallabag/web/
-RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Wallabag
 CHANGELOG = "Update to 2.3.8, Update to generic service script"

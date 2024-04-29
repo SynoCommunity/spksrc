@@ -1,8 +1,8 @@
 PKG_NAME = tt-rss
-PKG_VERS = 328d7b55c8
+PKG_VERS = afd04d141c
 PKG_EXT = tar.gz
 PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 328d7b55c8cb4d56492356a73df19f7c59784d82
+PKG_GIT_HASH = afd04d141c7bd8a1d6732a2a6a4c91c0a9b4cd6b
 PKG_DIST_SITE = https://git.tt-rss.org/fox/tt-rss.git
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
@@ -13,11 +13,11 @@ HOMEPAGE = https://tt-rss.org/
 COMMENT  = Tiny Tiny RSS is an open source web-based news feed (RSS/Atom) reader and aggregator, designed to allow you to read news from any location, while feeling as close to a real desktop application as possible.
 LICENSE  = GPL
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = tt-rss_install
 
-include ../../mk/spksrc.cross-cc.mk
+PATCHES_LEVEL = 1
+
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: tt-rss_install
 tt-rss_install:

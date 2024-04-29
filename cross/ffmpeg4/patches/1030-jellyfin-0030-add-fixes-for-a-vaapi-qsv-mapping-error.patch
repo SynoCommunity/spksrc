@@ -1,0 +1,62 @@
+Index: jellyfin-ffmpeg/libavcodec/qsvenc_hevc.c
+===================================================================
+--- libavcodec/qsvenc_hevc.c
++++ libavcodec/qsvenc_hevc.c
+@@ -260,9 +260,9 @@
+ static const AVCodecDefault qsv_enc_defaults[] = {
+     { "b",         "1M"    },
+     { "refs",      "0"     },
+-    // same as the x264 default
++    // same as the x265 default
+     { "g",         "248"   },
+-    { "bf",        "8"     },
++    { "bf",        "4"     },
+     { "qmin",      "-1"    },
+     { "qmax",      "-1"    },
+     { "trellis",   "-1"    },
+Index: jellyfin-ffmpeg/libavcodec/vaapi_decode.c
+===================================================================
+--- libavcodec/vaapi_decode.c
++++ libavcodec/vaapi_decode.c
+@@ -571,23 +571,24 @@
+                                             *va_config, frames);
+         if (err < 0)
+             goto fail;
+-
+-        frames->initial_pool_size = 1;
+-        // Add per-codec number of surfaces used for storing reference frames.
+-        switch (avctx->codec_id) {
+-        case AV_CODEC_ID_H264:
+-        case AV_CODEC_ID_HEVC:
+-        case AV_CODEC_ID_AV1:
+-            frames->initial_pool_size += 16;
+-            break;
+-        case AV_CODEC_ID_VP9:
+-            frames->initial_pool_size += 8;
+-            break;
+-        case AV_CODEC_ID_VP8:
+-            frames->initial_pool_size += 3;
+-            break;
+-        default:
+-            frames->initial_pool_size += 2;
++        if (!frames->initial_pool_size) {
++            frames->initial_pool_size = 1;
++            // Add per-codec number of surfaces used for storing reference frames.
++            switch (avctx->codec_id) {
++            case AV_CODEC_ID_H264:
++            case AV_CODEC_ID_HEVC:
++            case AV_CODEC_ID_AV1:
++                frames->initial_pool_size += 16;
++                break;
++            case AV_CODEC_ID_VP9:
++                frames->initial_pool_size += 8;
++                break;
++            case AV_CODEC_ID_VP8:
++                frames->initial_pool_size += 3;
++                break;
++            default:
++                frames->initial_pool_size += 2;
++            }
+         }
+     }
+ 

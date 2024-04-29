@@ -9,7 +9,6 @@ SPK_DEPENDS = "python>2.7.3-3:git"
 MAINTAINER = Diaoul
 DESCRIPTION = CouchPotato Custom allows you to run the fork of your choice of CouchPotato. You will be asked for the fork\'s git URL during install.
 DESCRIPTION_FRE = CouchPotato Custom vous permet d\'exécuter le fork de votre choix de CouchPotato. Vous aurez besoin de saisir l\'URL git du fork durant l\'installation.
-RELOAD_UI = yes
 DISPLAY_NAME = CouchPotato Custom
 CHANGELOG = "Fix DSM 6 service start."
 

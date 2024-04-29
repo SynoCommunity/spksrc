@@ -1,4 +1,5 @@
 bin:bin/domoticz
+lib:lib/libminizip.so
 rsc:www
 rsc:Config
 rsc:scripts

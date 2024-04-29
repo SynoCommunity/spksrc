@@ -1,11 +1,20 @@
---- Makefile.orig	2019-01-26 21:44:34.571112711 +0100
-+++ Makefile	2019-01-26 21:44:44.315151754 +0100
+--- Makefile.orig	2023-05-31 20:06:18.000000000 +0000
++++ Makefile	2023-09-19 20:23:34.496980046 +0000
 @@ -18,7 +18,7 @@
  
- prefix = /usr
+ PREFIX=/usr/local
  
 -CC=gcc
 +#CC=gcc
+ INSTALL=install
  
- VERSION=1.8.0
- TREE_DEST=tree
+ VERSION=2.1.1
+@@ -32,7 +32,7 @@
+ # Uncomment options below for your particular OS:
+ 
+ # Linux defaults:
+-CFLAGS+=-ggdb -std=c11 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
++#CFLAGS+=-ggdb -std=c11 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+ #CFLAGS+=-O3 -std=c11 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+ #LDFLAGS+=-s
+ 

@@ -1,0 +1,73 @@
+{
+	"webservice": {
+		"migrate": {
+			"root": [{
+				"new": "owncloud",
+				"old": "owncloud"
+			}]
+		},
+		"pkg_dir_prepare": [{
+			"group": "http",
+			"mode": "0750",
+			"source": "/var/packages/owncloud/target/share/owncloud",
+			"target": "owncloud",
+			"user": "sc-owncloud"
+		}],
+		"portals": [{
+			"alias": "owncloud",
+			"app": "com.synocommunity.packages.owncloud",
+			"display_name": "ownCloud",
+			"name": "ownCloud",
+			"service": "ownCloud",
+			"type": "alias"
+		}],
+		"services": [{
+			"backend": 2,
+			"display_name": "ownCloud",
+			"icon": "app/images/owncloud-{0}.png",
+			"php": {
+				"backend": 8,
+				"connect_timeout": 120,
+				"extensions": [
+					"bcmath",
+					"bz2",
+					"curl",
+					"gd",
+					"gmp",
+					"imagick",
+					"imap",
+					"intl",
+					"ldap",
+					"openssl",
+					"pdo_sqlite",
+					"sqlite3",
+					"ssh2",
+					"zip",
+					"zlib"
+				],
+				"group": "http",
+				"php_settings": {
+					"error_log": "/var/services/web_packages/owncloud/php_errors.log",
+					"max_execution_time": "900"
+				},
+				"profile_desc": "PHP Profile for ownCloud",
+				"profile_name": "ownCloud Profile",
+				"user": "sc-owncloud"
+			},
+			"read_timeout": 3600,
+			"root": "owncloud",
+			"send_timeout": 120,
+			"service": "ownCloud",
+			"type": "apache_php"
+		}]
+	},
+	"data-share": {
+		"shares": [{
+			"name": "{{wizard_data_share}}",
+			"permission": {
+				"rw": ["sc-owncloud"]
+			},
+			"once": true
+		}]
+	}
+}

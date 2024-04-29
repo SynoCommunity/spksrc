@@ -13,6 +13,6 @@ COMMENT  = LIRC daemon decodes infrared signals and provides them on a Unix doma
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-transmitter --with-driver=userspace --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_DIR)
+CONFIGURE_ARGS = --with-transmitter --with-driver=userspace --with-moduledir=$(MOD_DIR) --enable-sandboxed  --with-kerneldir=$(KERNEL_ROOT)
 
 include ../../mk/spksrc.cross-cc.mk

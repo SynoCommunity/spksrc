@@ -7,7 +7,7 @@ FIRMWARE = 4.3-3776
 LIRC_SUPPORTED_DRIVERS =
 
 # Abort for ARCHs that won't compile LIRC cleanly
-UNSUPPORTED_ARCHS = powerpc
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 # include arch definitions
 include ../../mk/spksrc.archs.mk
@@ -23,7 +23,6 @@ OPTIONAL_DEPENDS = cross/lirc-0.8.7
 
 MAINTAINER = bru7us
 DESCRIPTION = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
-RELOAD_UI = no
 DISPLAY_NAME = LIRC
 
 HOMEPAGE = https://www.lirc.org/

@@ -1,0 +1,22 @@
+# enable ncursesw
+# configure shall try to link with ncursesw too
+# 
+--- configure.ac.orig	2021-10-16 23:52:36.000000000 +0000
++++ configure.ac	2022-01-15 20:59:57.510545852 +0000
+@@ -69,10 +69,12 @@
+ 
+ # Check for a termcap compatible library
+ AS_IF([test "x$with_curses" = "xyes" -o "x$with_curses" = "xauto"], [
+-	AC_CHECK_LIB(ncurses, tgoto, , [
+-		AC_CHECK_LIB(curses, tgoto, , [
+-			AC_CHECK_LIB(tinfo, tgoto, , [
+-				AC_CHECK_LIB(termcap, tgoto,, [have_tcap=no])
++	AC_CHECK_LIB(ncursesw, tgoto, , [
++		AC_CHECK_LIB(ncurses, tgoto, , [
++			AC_CHECK_LIB(curses, tgoto, , [
++				AC_CHECK_LIB(tinfo, tgoto, , [
++					AC_CHECK_LIB(termcap, tgoto,, [have_tcap=no])
++				])
+ 			])
+ 		])
+ 	])

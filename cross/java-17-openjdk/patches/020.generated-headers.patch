@@ -1,0 +1,20 @@
+--- a/make/modules/java.desktop/lib/Awt2dLibraries.gmk
++++ b/make/modules/java.desktop/lib/Awt2dLibraries.gmk
+@@ -290,7 +290,7 @@
+     INCLUDE_FILES := $(BUILD_LIBLCMS_INCLUDE_FILES), \
+     OPTIMIZATION := HIGHEST, \
+     CFLAGS := $(CFLAGS_JDKLIB) \
+-        $(LCMS_CFLAGS), \
++        $(LCMS_CFLAGS) -I$(SUPPORT_OUTPUTDIR)/headers/java.desktop, \
+     CFLAGS_windows := -DCMS_IS_WINDOWS_, \
+     EXTRA_HEADER_DIRS := \
+         common/awt/debug \
+@@ -338,7 +338,7 @@
+     NAME := javajpeg, \
+     INCLUDE_FILES := $(BUILD_LIBJAVAJPEG_INCLUDE_FILES), \
+     OPTIMIZATION := HIGHEST, \
+-    CFLAGS := $(CFLAGS_JDKLIB), \
++    CFLAGS := $(CFLAGS_JDKLIB) -I$(SUPPORT_OUTPUTDIR)/headers/java.desktop, \
+     HEADERS_FROM_SRC := $(LIBJPEG_HEADERS_FROM_SRC), \
+     DISABLED_WARNINGS_gcc := clobbered implicit-fallthrough shift-negative-value array-bounds, \
+     LDFLAGS := $(LDFLAGS_JDKLIB) \

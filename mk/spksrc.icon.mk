@@ -11,8 +11,17 @@
 
 ICON_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)icon_done
 
+# Icons are only needed with "DSM UI configuration" (see spksrc.service.mk)
 ifneq ($(strip $(DSM_UI_DIR)),)
+ifneq ($(strip $(SPK_ICON)),)
+ifneq ($(strip $(DSM_UI_CONFIG)),)
 ICON_DIR = $(STAGING_DIR)/$(DSM_UI_DIR)/images
+else ifneq ($(or $(strip $(SERVICE_PORT)), $(strip $(ADMIN_URL))),)
+ifeq ($(strip $(NO_SERVICE_SHORTCUT)),)
+ICON_DIR = $(STAGING_DIR)/$(DSM_UI_DIR)/images
+endif
+endif
+endif
 endif
 
 ifeq ($(strip $(PRE_ICON_TARGET)),)

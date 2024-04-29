@@ -92,7 +92,7 @@ _Linked issues:_ fixed #1234
 The Checklist is for minimal Tests required for new and updated packages.<br>
 - The Build rule `all-supported` builds the currently supported archs with the default toolchain version. All affected archs must successfully build - or be declared as UNSUPPORTED_ARCHS in the spk/ Makefile of the package.
 - Package upgrade must successfully complete for new packages and upgrades. For new packages, the upgrade can be tested by manually install the same version that is already installed. The install wizzard will show `upgrade` in the dialog title, upgrade wizard pages must work (when available) and manually changed configuration files must be preserved.
-- A new installation must succeed. There must not appear error messages while installation or in the install log file found in `/var/packages/{package-name}/target/var/{package-name}_install.log`
+- A new installation must succeed. There must not appear error messages while installation or in the install log file found in `/var/log/packages/{package-name}.og` (for DSM<=5 in `/var/packages/{package-name}/target/var/{package-name}_install.log`).
 
 #### Pull Requests not ready for merging
 Even when your changes are not ready for merging into the production code (master-branch), you can create a Pull Request. This is very useful for discussing implementation details or specific tasks.

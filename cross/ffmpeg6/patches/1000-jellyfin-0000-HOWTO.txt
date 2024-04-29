@@ -1,0 +1,23 @@
+Projet page: https://github.com/jellyfin/jellyfin-ffmpeg
+Patches: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
+
+Extract jellyfin-ffmpeg git repository
+$ git clone https://github.com/jellyfin/jellyfin-ffmpeg.git
+
+Check that current ffmpeg matches jellyfin version
+$ cat jellyfin-ffmpeg/VERSION 
+6.0
+
+Modify patches to be in -p0 mode:
+cd jellyfin-ffmpeg/debian/patches
+$ sed -i -e 's?+++ jellyfin-ffmpeg/?+++ ?1' \
+         -e 's?--- jellyfin-ffmpeg.orig/?--- ?1' \
+         *.patch
+
+Rename the patches:
+$ i=1001 && ls -1 *.patch | while read LINE; do echo $(printf "%04d" $i)-jellyfin-$LINE; mv $LINE $(printf "%04d" $i)-jellyfin-$LINE; let i++; done
+
+Test the patches on a clean ffmpeg tree:
+$ tar -jxvf ffmpeg-6.0.tar.bz2 
+$ cd ffmpeg-6.0/
+$ ls -1d ~/jellyfin-ffmpeg/debian/patches/*.patch | while read LINE; do patch -p0 < $LINE; done

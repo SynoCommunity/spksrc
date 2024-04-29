@@ -1,9 +1,15 @@
 distrib
 packages
 native/*/work*
+native/*/status*
 cross/*/work*
+cross/*/build*
+cross/*/status*
 kernel/*/work*
 spk/*/work*
+spk/*/build*
+spk/*/publish*
+spk/*/status*
 diyspk/*/work*
 toolchain/*/work*
 toolchain/*/*_done
@@ -11,3 +17,6 @@ toolkit/*/work*
 local.mk
 *.DS_Store
 *~
+
+# PyCharm project settings
+.idea

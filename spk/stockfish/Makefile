@@ -11,7 +11,6 @@ DESCRIPTION = Strong open source chess engine. Stockfish is one of the strongest
 CHANGELOG = "Initial package version. With web frontend to play chess against stockfish engine."
 
 DISPLAY_NAME = Stockfish
-RELOAD_UI = yes
 HOMEPAGE = https://stockfishchess.org/
 LICENSE  = GPLv2/GPLv3
 

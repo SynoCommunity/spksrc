@@ -1,7 +1,7 @@
-tsc:bin/taglib-config
+rsc:bin/taglib-config
 lnk:lib/libtag.so
 lnk:lib/libtag.so.1
-lib:lib/libtag.so.1.17.0
+lib:lib/libtag.so.1.18.0
 lnk:lib/libtag_c.so
 lnk:lib/libtag_c.so.0
-llib:lib/libtag_c.so.0.0.0
+lib:lib/libtag_c.so.0.0.0

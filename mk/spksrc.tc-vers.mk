@@ -58,6 +58,18 @@ ifeq ($(TC_VERS),6.2.3)
 TC_BUILD = 25423
 endif
 
+ifeq ($(TC_VERS),6.2.4)
+TC_BUILD = 25556
+endif
+
 ifeq ($(TC_VERS),7.0)
-TC_BUILD = 40000
+TC_BUILD = 41890
+endif
+
+ifeq ($(TC_VERS),7.1)
+TC_BUILD = 42661
+endif
+
+ifeq ($(TC_VERS),7.2)
+TC_BUILD = 63134
 endif

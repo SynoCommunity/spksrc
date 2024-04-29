@@ -1,0 +1,23 @@
+# adjust declaration of strlcpy already declared in toolchain (sysroot/usr/include/string.h)
+# init_sysdeps.c:21:15: error: static declaration of ‘strlcpy’ follows non-static declaration
+# 
+--- alsactl/init_sysdeps.c.orig	2023-05-04 07:16:17.000000000 +0000
++++ alsactl/init_sysdeps.c	2023-08-27 13:59:13.334972759 +0000
+@@ -18,7 +18,7 @@
+  */
+ 
+ #if defined(__GLIBC__) && !(defined(__UCLIBC__) && defined(__USE_BSD))
+-static size_t strlcpy(char *dst, const char *src, size_t size)
++size_t strlcpy(char *dst, const char *src, size_t size)
+ {
+ 	size_t bytes = 0;
+ 	char *q = dst;
+@@ -37,7 +37,7 @@
+ 	return bytes;
+ }
+ 
+-static size_t strlcat(char *dst, const char *src, size_t size)
++size_t strlcat(char *dst, const char *src, size_t size)
+ {
+ 	size_t bytes = 0;
+ 	char *q = dst;

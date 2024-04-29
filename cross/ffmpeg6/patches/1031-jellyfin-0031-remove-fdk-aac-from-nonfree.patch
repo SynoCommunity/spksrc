@@ -1,0 +1,20 @@
+Index: jellyfin-ffmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -1774,7 +1774,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
+ 
+ EXTERNAL_LIBRARY_NONFREE_LIST="
+     decklink
+-    libfdk_aac
+     libtls
+ "
+ 
+@@ -1814,6 +1813,7 @@ EXTERNAL_LIBRARY_LIST="
+     libdav1d
+     libdc1394
+     libdrm
++    libfdk_aac
+     libflite
+     libfontconfig
+     libfreetype

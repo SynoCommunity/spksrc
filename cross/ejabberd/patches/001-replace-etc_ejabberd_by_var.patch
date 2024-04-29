@@ -1,0 +1,13 @@
+--- Makefile.in.orig	2020-12-15 14:40:16.000000000 +0000
++++ Makefile.in	2020-12-26 13:46:43.686744701 +0000
+@@ -8,8 +8,8 @@
+ 
+ DESTDIR =
+ 
+-# /etc/ejabberd/
+-ETCDIR = $(DESTDIR)@sysconfdir@/ejabberd
++# /etc/ejabberd/ => /var/
++ETCDIR = $(DESTDIR)@prefix@/var
+ 
+ # /bin/
+ BINDIR = $(DESTDIR)@bindir@

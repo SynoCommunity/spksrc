@@ -16,5 +16,4 @@ HELP_URL = https://www.gnu.org/software/bc/manual/html_mono/bc.html
 
 SPK_COMMANDS = bin/bc bin/dc
 
-
 include ../../mk/spksrc.spk.mk

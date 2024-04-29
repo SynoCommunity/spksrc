@@ -8,23 +8,23 @@ BACKUP_PORT="10053"
 ## I need root to bind to port 53 see `service_prestart()` below
 #SERVICE_COMMAND="${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} &"
 
-echo "DSM Version: $SYNOPKG_DSM_VERSION_MAJOR.$SYNOPKG_DSM_VERSION_MINOR-$SYNOPKG_DSM_VERSION_BUILD" >> "${INST_LOG}" 2>&1
+echo "DSM Version: $SYNOPKG_DSM_VERSION_MAJOR.$SYNOPKG_DSM_VERSION_MINOR-$SYNOPKG_DSM_VERSION_BUILD"
 # SRM 1.2 example: DSM Version: 5.2-7915
 # DSM 6.2 example: DSM Version: 6.2-23739
 UNAME=$(uname -a)
-echo "uname: $UNAME" >> "${INST_LOG}" 2>&1
+echo "uname: $UNAME"
 # SRM example: Linux {some-name} 4.4.60 #7779 SMP Mon Jan 28 04:30:39 CST 2019 armv7l GNU/Linux synology_ipq806x_rt2600ac
 # DSM example: Linux {some-name} 3.10.105 #23739 SMP Tue Jul 3 19:47:13 CST 2018 x86_64 GNU/Linux synology_bromolow_3615xs
 OS="dsm"
 if echo "$UNAME" | grep -q -i 'rt1900ac\|rt2600ac\|mr2200ac'; then
     OS="srm"
 fi
-echo "OS detected: $OS" >> "${INST_LOG}" 2>&1
+echo "OS detected: $OS"
 
 blocklist_setup () {
     ## https://github.com/jedisct1/dnscrypt-proxy/wiki/Public-blacklists
     ## https://github.com/jedisct1/dnscrypt-proxy/tree/master/utils/generate-domains-blacklists
-    echo "Install/Upgrade generate-domains-blacklist.py (requires python)" >> "${INST_LOG}"
+    echo "Install/Upgrade generate-domains-blacklist.py (requires python)"
     mkdir -p "${SYNOPKG_PKGDEST}/var"
     touch "${SYNOPKG_PKGDEST}"/var/ip-blocklist.txt
     if [ ! -e "${SYNOPKG_PKGDEST}/var/domains-blacklist.conf" ]; then
@@ -40,7 +40,7 @@ blocklist_cron_uninstall () {
     else
         sed -i '/.*update-blocklist.sh/d' /etc/crontab
     fi
-    synoservicectl --restart crond >> "${INST_LOG}" 2>&1
+    synoservicectl --restart crond
 }
 
 pgrep () {
@@ -85,7 +85,7 @@ forward_dns_dhcpd () {
 }
 
 service_prestart () {
-    echo "service_preinst ${SYNOPKG_PKG_STATUS}" >> "${INST_LOG}"
+    echo "service_preinst ${SYNOPKG_PKG_STATUS}"
 
     # Install daily cron job (3 minutes past midnight), to update the block list
     if [ "$OS" = 'dsm' ]; then
@@ -94,7 +94,7 @@ service_prestart () {
     else # RSM
         echo "3       0       *       *       *       root    /var/packages/dnscrypt-proxy/target/var/update-blocklist.sh" >> /etc/crontab
     fi
-    synoservicectl --restart crond >> "${INST_LOG}"
+    synoservicectl --restart crond
 
     # This fixes https://github.com/SynoCommunity/spksrc/issues/3468
     # This can't be done at install time. see:
@@ -117,25 +117,25 @@ service_prestart () {
 }
 
 service_poststop () {
-    echo "After stop (service_poststop)" >> "${INST_LOG}"
+    echo "After stop (service_poststop)"
     blocklist_cron_uninstall
     forward_dns_dhcpd "no"
 }
 
 service_postinst () {
-    echo "Running service_postinst script" >> "${INST_LOG}"
-    mkdir -p "${SYNOPKG_PKGDEST}"/var >> "${INST_LOG}" 2>&1
+    echo "Running service_postinst script"
+    mkdir -p "${SYNOPKG_PKGDEST}"/var
     if [ ! -e "${CFG_FILE}" ]; then
         # shellcheck disable=SC2086
-        cp -f ${EXAMPLE_FILES} "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
-        cp -f "${SYNOPKG_PKGDEST}"/offline-cache/* "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
-        cp -f "${SYNOPKG_PKGDEST}"/blocklist/* "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
+        cp -f ${EXAMPLE_FILES} "${SYNOPKG_PKGDEST}/var/"
+        cp -f "${SYNOPKG_PKGDEST}"/offline-cache/* "${SYNOPKG_PKGDEST}/var/"
+        cp -f "${SYNOPKG_PKGDEST}"/blocklist/* "${SYNOPKG_PKGDEST}/var/"
         # shellcheck disable=SC2231
         for file in ${SYNOPKG_PKGDEST}/var/example-*; do
-            mv "${file}" "${file//example-/}" >> "${INST_LOG}" 2>&1
+            mv "${file}" "${file//example-/}"
         done
 
-        echo "Applying settings from Wizard..." >> "${INST_LOG}"
+        echo "Applying settings from Wizard..."
         ## if empty comment out server list
         wizard_servers=${wizard_servers:-""}
         if [ -z "${wizard_servers// }" ]; then
@@ -144,7 +144,7 @@ service_postinst () {
 
         # Check for dhcp
         if pgrep "dhcpd.conf" || netstat -na | grep ":${SERVICE_PORT} "; then
-            echo "dhcpd is running or port ${SERVICE_PORT} is in use. Switching service port to ${BACKUP_PORT}" >> "${INST_LOG}"
+            echo "dhcpd is running or port ${SERVICE_PORT} is in use. Switching service port to ${BACKUP_PORT}"
             SERVICE_PORT=${BACKUP_PORT}
         fi
 
@@ -161,31 +161,31 @@ service_postinst () {
             -e "s|# log_file = 'dnscrypt-proxy.log'.*|log_file = '${LOG_FILE:-""}'|" \
             -e "s/netprobe_timeout = .*/netprobe_timeout = 2/" \
             -e "s/ipv6_servers = .*/ipv6_servers = ${wizard_ipv6:=false}/" \
-            "${CFG_FILE}" >> "${INST_LOG}" 2>&1
+            "${CFG_FILE}"
     fi
 
-    echo "Fixing permissions for cgi GUI... " >> "${INST_LOG}"
+    echo "Fixing permissions for cgi GUI... "
     # Fixes https://github.com/publicarray/spksrc/issues/3
     # https://originhelp.synology.com/developer-guide/privilege/privilege_specification.html
-    chmod 0777 "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
+    chmod 0777 "${SYNOPKG_PKGDEST}/var/"
 
     blocklist_setup
 
     # shellcheck disable=SC2129
-    echo "Install Help files" >> "${INST_LOG}"
-    pkgindexer_add "${SYNOPKG_PKGDEST}/ui/index.conf" >> "${INST_LOG}" 2>&1
-    pkgindexer_add "${SYNOPKG_PKGDEST}/ui/helptoc.conf" >> "${INST_LOG}" 2>&1
-    # pkgindexer_add "${SYNOPKG_PKGDEST}/ui/helptoc.conf" "${SYNOPKG_PKGDEST}/indexdb/helpindexdb" >> "${INST_LOG}" 2>&1 # DSM 6.0 ?
+    echo "Install Help files"
+    pkgindexer_add "${SYNOPKG_PKGDEST}/ui/index.conf"
+    pkgindexer_add "${SYNOPKG_PKGDEST}/ui/helptoc.conf"
+    # pkgindexer_add "${SYNOPKG_PKGDEST}/ui/helptoc.conf" "${SYNOPKG_PKGDEST}/indexdb/helpindexdb"   # DSM 6.0 ?
 }
 
 service_postuninst () {
-    echo "service_postuninst ${SYNOPKG_PKG_STATUS}" >> "${INST_LOG}"
+    echo "service_postuninst ${SYNOPKG_PKG_STATUS}"
     blocklist_cron_uninstall
 
     # shellcheck disable=SC2129
-    echo "Uninstall Help files" >> "${INST_LOG}"
-    pkgindexer_del "${SYNOPKG_PKGDEST}/ui/helptoc.conf" >> "${INST_LOG}" 2>&1
-    pkgindexer_del "${SYNOPKG_PKGDEST}/ui/index.conf" >> "${INST_LOG}" 2>&1
+    echo "Uninstall Help files"
+    pkgindexer_del "${SYNOPKG_PKGDEST}/ui/helptoc.conf"
+    pkgindexer_del "${SYNOPKG_PKGDEST}/ui/index.conf"
     disable_dhcpd_dns_port "no"
     if [ "$OS" = "dsm" ]; then
         rm -f /etc/dhcpd/dhcpd-dns-dns.conf
@@ -198,5 +198,5 @@ service_postuninst () {
 
 service_postupgrade () {
     # upgrade script when the offline-cache is also updated
-    cp -f "${SYNOPKG_PKGDEST}"/blocklist/generate-domains-blacklist.py "${SYNOPKG_PKGDEST}/var/" >> "${INST_LOG}" 2>&1
+    cp -f "${SYNOPKG_PKGDEST}"/blocklist/generate-domains-blacklist.py "${SYNOPKG_PKGDEST}/var/"
 }

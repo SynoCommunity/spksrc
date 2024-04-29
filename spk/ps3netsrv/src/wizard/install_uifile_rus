@@ -1,19 +1,58 @@
-[{
-    "step_title": "Директория с файлами PS3",
-    "items": [{
-        "type": "textfield",
-        "desc": "Путь к директории с играми и файлами PS3. По умолчанию: /volume1/PS3",
-        "subitems": [{
-            "key": "wizard_dir",
-            "desc": "Директория с играми",
-            "defaultValue": "/volume1/PS3",
+[
+  {
+    "step_title": "Расположение файлов PS3",
+    "items": [
+      {
+        "type": "combobox",
+        "desc": "Выберите том, который будет использоваться для папки файлов PS3.",
+        "subitems": [
+          {
+            "key": "wizard_data_volume",
+            "desc": "Имя тома",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            },
             "validator": {
-                "allowBlank": false,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Путь должен начинаться с /volumename?/ где volumename может быть 'volume' или 'volumeUSB' и ? номер раздела (1-99)."
-                }
+              "fn": "{console.log(arguments);return true;}"
             }
-        }]
-    }]
-}]
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "desc": "Общая папка, содержащая файлы PS3 (используя выбранный выше том)",
+        "subitems": [
+          {
+            "key": "wizard_data_directory",
+            "desc": "Общая папка",
+            "defaultValue": "PS3",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Подкаталоги не поддерживаются."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

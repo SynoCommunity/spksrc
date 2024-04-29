@@ -1,0 +1,13 @@
+# use -std=gnu99 that works for older compilers too.
+# 
+--- Makefile.orig	2023-07-02 14:15:42.000000000 +0000
++++ Makefile	2023-07-03 20:52:16.310724714 +0000
+@@ -21,7 +21,7 @@
+ # Make Configuration
+ COMPILER_OPTIONS = -Wall -Wwrite-strings -Wcast-align -Wstrict-aliasing -Wstrict-prototypes -Wpointer-arith -Wundef
+ COMPILER_OPTIONS += -Wshadow -Wfloat-equal -Waggregate-return -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wformat=2
+-COMPILER_OPTIONS += -std=gnu11 -D_FILE_OFFSET_BITS=64 -fstrict-aliasing -pipe -fPIC
++COMPILER_OPTIONS += -std=gnu99 -D_FILE_OFFSET_BITS=64 -fstrict-aliasing -pipe -fPIC
+ 
+ UNAME_S       = $(shell uname -s)
+ UNAME_M       = $(shell uname -m)

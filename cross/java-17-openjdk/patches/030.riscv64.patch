@@ -1,0 +1,69 @@
+# HG changeset patch
+# User enevill
+# Date 1521985117 -3600
+#      Sun Mar 25 14:38:37 2018 +0100
+# Node ID 7d1ae835ef5194e7ae5b56b51f944029fe602d11
+# Parent  1b1de4b263c81853719f6bb0385fe23bc4e35f6c
+8199138: Add RISC-V support to Zero
+Reviewed-by: aph, erikj, ehelin, ihse
+
+--- a/make/autoconf/build-aux/config.guess
++++ b/make/autoconf/build-aux/config.guess
+@@ -28,6 +28,13 @@
+ # autoconf system (which might easily get lost in a future update), we wrap it
+ # and fix the broken property, if needed.
+ 
++machine=`(uname -m) 2>/dev/null` || UNAME_MACHINE=unknown
++if test $machine = riscv64; then
++  # This is all we need to know for riscv64
++  echo riscv64-unknown-linux-gnu
++  exit
++fi
++
+ DIR=`dirname $0`
+ OUT=`. $DIR/autoconf-config.guess`
+ 
+--- a/make/autoconf/build-aux/config.sub
++++ b/make/autoconf/build-aux/config.sub
+@@ -46,8 +46,8 @@
+     exit
+ fi
+ 
+-# Filter out everything that doesn't begin with "aarch64-"
+-if ! echo $* | grep '^aarch64-' >/dev/null ; then
++# First, filter out everything that doesn't begin with "aarch64-" or "riscv64-"
++if ! echo $* | grep '^aarch64-\|^riscv64-' >/dev/null ; then
+     . $DIR/autoconf-config.sub "$@"
+     # autoconf-config.sub exits, so we never reach here, but just in
+     # case we do:
+@@ -62,6 +62,10 @@
+             config=`echo $1 | sed 's/^aarch64-/arm-/'`
+             sub_args="$sub_args $config"
+             shift; ;;
++        riscv64-* )
++            config=`echo $1 | sed 's/^riscv64-/x86-/'`
++            sub_args="$sub_args $config"
++            shift; ;;
+         - )    # Use stdin as input.
+             sub_args="$sub_args $1"
+             shift; break ;;
+@@ -74,7 +78,7 @@
+ result=`. $DIR/autoconf-config.sub $sub_args "$@"`
+ exitcode=$?
+ 
+-result=`echo $result | sed "s/^arm-/aarch64-/"`
++result=`echo $result | sed "s/^arm-/aarch64-/" | sed "s/^x86-/riscv64-/"`
+ 
+ echo $result
+ exit $exitcode
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -2558,6 +2558,8 @@
+   strncpy(cpuinfo, "IA64", length);
+ #elif defined(PPC)
+   strncpy(cpuinfo, "PPC64", length);
++#elif defined(RISCV)
++  strncpy(cpuinfo, "RISCV", length);
+ #elif defined(S390)
+   strncpy(cpuinfo, "S390", length);
+ #elif defined(SPARC)

@@ -1,7 +1,6 @@
 TC_ARCH = braswell
 TC_VERS = 6.0.2
 TC_KERNEL = 3.10.77
-TC_GCC = 4.9.3
 TC_GLIBC = 2.20
 
 TC_DIST = braswell-gcc493_glibc220_linaro_x86_64-GPL

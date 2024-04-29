@@ -1,5 +1,5 @@
 [{
-    "step_title": "ejabberd configuration",
+    "step_title": "ejabberd Configuration",
     "items": [{
         "type": "textfield",
         "desc": "Administrator account.",
@@ -16,7 +16,8 @@
         "desc": "Administrator's password. Special characters are not supported.",
         "subitems": [{
             "key": "wizard_ejabberd_admin_password",
-            "desc": "Password",
+            "desc": "Password of Administrator (default is admin).",
+            "defaultValue": "admin",
             "validator": {
                 "allowBlank": false
             }
@@ -32,7 +33,7 @@
                 "allowBlank": false
             }
         }]
-	}, {
-        "desc": "Note: To log in, use 'account@domain'"
+    }, {
+        "desc": "Note: To log in, use 'account@domain' (default: admin@localhost)"
     }]
 }]

@@ -1,0 +1,79 @@
+Index: jellyfin-ffmpeg/libavcodec/cuviddec.c
+===================================================================
+--- libavcodec/cuviddec.c
++++ libavcodec/cuviddec.c
+@@ -336,7 +336,8 @@ static int CUDAAPI cuvid_handle_picture_
+ 
+     av_log(avctx, AV_LOG_TRACE, "pfnDecodePicture\n");
+ 
+-    ctx->key_frame[picparams->CurrPicIdx] = picparams->intra_pic_flag;
++    if(picparams->intra_pic_flag)
++        ctx->key_frame[picparams->CurrPicIdx] = picparams->intra_pic_flag;
+ 
+     ctx->internal_error = CHECK_CU(ctx->cvdl->cuvidDecodePicture(ctx->cudecoder, picparams));
+     if (ctx->internal_error < 0)
+@@ -593,6 +594,8 @@ static int cuvid_output_frame(AVCodecCon
+         }
+ 
+         frame->key_frame = ctx->key_frame[parsed_frame.dispinfo.picture_index];
++        ctx->key_frame[parsed_frame.dispinfo.picture_index] = 0;
++
+         frame->width = avctx->width;
+         frame->height = avctx->height;
+         if (avctx->pkt_timebase.num && avctx->pkt_timebase.den)
+Index: jellyfin-ffmpeg/libavcodec/nvenc.c
+===================================================================
+--- libavcodec/nvenc.c
++++ libavcodec/nvenc.c
+@@ -210,8 +210,14 @@ static void nvenc_map_preset(NvencContex
+ 
+ static void nvenc_print_driver_requirement(AVCodecContext *avctx, int level)
+ {
+-#if NVENCAPI_CHECK_VERSION(11, 1)
++#if NVENCAPI_CHECK_VERSION(11, 2)
+     const char *minver = "(unknown)";
++#elif NVENCAPI_CHECK_VERSION(11, 1)
++# if defined(_WIN32) || defined(__CYGWIN__)
++    const char *minver = "471.41";
++# else
++    const char *minver = "470.57.02";
++# endif
+ #elif NVENCAPI_CHECK_VERSION(11, 0)
+ # if defined(_WIN32) || defined(__CYGWIN__)
+     const char *minver = "456.71";
+@@ -1053,7 +1059,7 @@ static av_cold int nvenc_setup_h264_conf
+         || vui->videoFullRangeFlag != 0);
+ 
+     h264->sliceMode = 3;
+-    h264->sliceModeData = 1;
++    h264->sliceModeData = avctx->slices > 0 ? avctx->slices : 1;
+ 
+     h264->disableSPSPPS = (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? 1 : 0;
+     h264->repeatSPSPPS  = (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? 0 : 1;
+@@ -1150,7 +1156,7 @@ static av_cold int nvenc_setup_hevc_conf
+         || vui->videoFullRangeFlag != 0);
+ 
+     hevc->sliceMode = 3;
+-    hevc->sliceModeData = 1;
++    hevc->sliceModeData = avctx->slices > 0 ? avctx->slices : 1;
+ 
+     hevc->disableSPSPPS = (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? 1 : 0;
+     hevc->repeatSPSPPS  = (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? 0 : 1;
+Index: jellyfin-ffmpeg/libavfilter/vf_yadif_cuda.c
+===================================================================
+--- libavfilter/vf_yadif_cuda.c
++++ libavfilter/vf_yadif_cuda.c
+@@ -297,10 +297,9 @@ static int config_output(AVFilterLink *l
+         goto exit;
+     }
+ 
+-    link->time_base.num = ctx->inputs[0]->time_base.num;
+-    link->time_base.den = ctx->inputs[0]->time_base.den * 2;
+-    link->w             = ctx->inputs[0]->w;
+-    link->h             = ctx->inputs[0]->h;
++    link->time_base = av_mul_q(ctx->inputs[0]->time_base, (AVRational){1, 2});
++    link->w         = ctx->inputs[0]->w;
++    link->h         = ctx->inputs[0]->h;
+ 
+     if(y->mode & 1)
+         link->frame_rate = av_mul_q(ctx->inputs[0]->frame_rate,

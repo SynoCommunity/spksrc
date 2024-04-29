@@ -6,5 +6,5 @@ if [ -r "${CFG_FILE}" ]; then
     . "${CFG_FILE}"
 fi
 
-/bin/stdbuf -o L -e L ${BIN_FILE} "${PS3_DIR}" 2>&1 &
+/bin/stdbuf --output=L --error=L ${BIN_FILE} "${PS3_DIR}" "${SERVICE_PORT}" 2>&1 &
 echo "$!" > "${PID_FILE}"

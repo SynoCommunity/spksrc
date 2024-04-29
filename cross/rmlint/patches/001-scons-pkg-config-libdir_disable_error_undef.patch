@@ -1,0 +1,21 @@
+--- SConstruct.orig	2023-08-08 16:19:57.000000000 +0000
++++ SConstruct	2023-09-21 05:46:09.095898401 +0000
+@@ -538,7 +538,7 @@
+     PREFIX=GetOption('prefix'),
+     ENV = dict([ (key, os.environ[key])
+                  for key in os.environ
+-                 if key in ['PATH', 'TERM', 'HOME', 'PKG_CONFIG_PATH']
++                 if key in ['PATH', 'TERM', 'HOME', 'PKG_CONFIG_PATH', 'PKG_CONFIG_LIBDIR']                 
+               ])
+ )
+ 
+@@ -710,9 +710,6 @@
+ if conf.env['HAVE_LIBELF']:
+     conf.env.Append(_LIBFLAGS=['-lelf'])
+ 
+-# NB: After checks so they don't fail
+-conf.env.Append(CCFLAGS=['-Werror=undef'])
+-
+ 
+ if ARGUMENTS.get('GDB') == '1':
+     ARGUMENTS['DEBUG'] = '1'

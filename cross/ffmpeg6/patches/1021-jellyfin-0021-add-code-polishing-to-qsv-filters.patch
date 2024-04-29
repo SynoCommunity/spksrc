@@ -1,0 +1,274 @@
+Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
+===================================================================
+--- libavfilter/qsvvpp.c
++++ libavfilter/qsvvpp.c
+@@ -167,7 +167,7 @@ int ff_qsvvpp_print_warning(void *log_ct
+     const char *desc;
+     int ret;
+     ret = qsv_map_error(err, &desc);
+-    av_log(log_ctx, AV_LOG_WARNING, "%s: %s (%d)\n", warning_string, desc, err);
++    av_log(log_ctx, AV_LOG_VERBOSE, "%s: %s (%d)\n", warning_string, desc, err);
+     return ret;
+ }
+ 
+@@ -900,6 +900,20 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
+         out_frame->frame->pts = av_rescale_q(out_frame->surface.Data.TimeStamp,
+                                              default_tb, outlink->time_base);
+ 
++        /* Copy the color side data */
++        if (in_frame->frame->color_primaries != -1)
++            out_frame->frame->color_primaries = in_frame->frame->color_primaries;
++        if (in_frame->frame->color_trc != -1)
++            out_frame->frame->color_trc = in_frame->frame->color_trc;
++        if (in_frame->frame->colorspace != -1)
++            out_frame->frame->colorspace = in_frame->frame->colorspace;
++        if (in_frame->frame->color_range != -1)
++            out_frame->frame->color_range = in_frame->frame->color_range;
++
++        ret = av_frame_copy_side_data(out_frame->frame, in_frame->frame, 0);
++        if (ret < 0)
++            return ret;
++
+         out_frame->queued++;
+         aframe = (QSVAsyncFrame){ sync, out_frame };
+         av_fifo_write(s->async_fifo, &aframe, 1);
+Index: jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
+===================================================================
+--- libavfilter/vf_overlay_qsv.c
++++ libavfilter/vf_overlay_qsv.c
+@@ -228,40 +228,51 @@ static int config_overlay_input(AVFilter
+ 
+ static int process_frame(FFFrameSync *fs)
+ {
+-    AVFilterContext  *ctx = fs->parent;
+-    QSVVPPContext    *qsv = fs->opaque;
+-    AVFrame        *frame = NULL;
+-    int               ret = 0, i;
+-
+-    for (i = 0; i < ctx->nb_inputs; i++) {
+-        ret = ff_framesync_get_frame(fs, i, &frame, 0);
+-        if (ret == 0)
+-            ret = ff_qsvvpp_filter_frame(qsv, ctx->inputs[i], frame);
+-        if (ret < 0 && ret != AVERROR(EAGAIN))
+-            break;
+-    }
++    AVFilterContext *ctx = fs->parent;
++    QSVVPPContext   *qsv = fs->opaque;
++    AVFilterLink    *in0 = ctx->inputs[0];
++    AVFilterLink    *in1 = ctx->inputs[1];
++    AVFrame        *main = NULL;
++    AVFrame     *overlay = NULL;
++    int              ret = 0;
++
++    ret = ff_framesync_get_frame(fs, 0, &main, 0);
++    if (ret < 0)
++        return ret;
++    ret = ff_framesync_get_frame(fs, 1, &overlay, 0);
++    if (ret < 0)
++        return ret;
++
++    if (!main)
++        return AVERROR_BUG;
+ 
+-    return ret;
++    /* composite main frame */
++    ret = ff_qsvvpp_filter_frame(qsv, in0, main);
++    if (ret < 0 && ret != AVERROR(EAGAIN))
++        return ret;
++
++    /* remove all side data of the overlay frame*/
++    if (overlay)
++        av_frame_remove_all_side_data(overlay);
++
++    /* composite overlay frame */
++    /* or overwrite main frame again if the overlay frame isn't ready yet */
++    return ff_qsvvpp_filter_frame(qsv, overlay ? in1 : in0, overlay ? overlay : main);
+ }
+ 
+ static int init_framesync(AVFilterContext *ctx)
+ {
+-    QSVOverlayContext *s = ctx->priv;
+-    int ret, i;
++    QSVOverlayContext  *s = ctx->priv;
++    AVFilterLink *outlink = ctx->outputs[0];
++    int ret;
+ 
+-    s->fs.on_event = process_frame;
+-    s->fs.opaque   = s;
+-    ret = ff_framesync_init(&s->fs, ctx, ctx->nb_inputs);
++    ret = ff_framesync_init_dualinput(&s->fs, ctx);
+     if (ret < 0)
+         return ret;
+ 
+-    for (i = 0; i < ctx->nb_inputs; i++) {
+-        FFFrameSyncIn *in = &s->fs.in[i];
+-        in->before    = EXT_STOP;
+-        in->after     = EXT_INFINITY;
+-        in->sync      = i ? 1 : 2;
+-        in->time_base = ctx->inputs[i]->time_base;
+-    }
++    s->fs.time_base = outlink->time_base;
++    s->fs.on_event  = process_frame;
++    s->fs.opaque    = s;
+ 
+     return ff_framesync_configure(&s->fs);
+ }
+@@ -282,12 +293,6 @@ static int config_output(AVFilterLink *o
+         return AVERROR(EINVAL);
+     } else if (in0->format == AV_PIX_FMT_QSV) {
+         AVHWFramesContext *hw_frame0 = (AVHWFramesContext *)in0->hw_frames_ctx->data;
+-        AVHWFramesContext *hw_frame1 = (AVHWFramesContext *)in1->hw_frames_ctx->data;
+-
+-        if (hw_frame0->device_ctx != hw_frame1->device_ctx) {
+-            av_log(ctx, AV_LOG_ERROR, "Inputs with different underlying QSV devices are forbidden.\n");
+-            return AVERROR(EINVAL);
+-        }
+         vpp->qsv_param.out_sw_format = hw_frame0->sw_format;
+     }
+ 
+@@ -369,6 +374,7 @@ static int overlay_qsv_query_formats(AVF
+     static const enum AVPixelFormat main_in_fmts[] = {
+         AV_PIX_FMT_YUV420P,
+         AV_PIX_FMT_NV12,
++        AV_PIX_FMT_P010,
+         AV_PIX_FMT_YUYV422,
+         AV_PIX_FMT_RGB32,
+         AV_PIX_FMT_QSV,
+@@ -376,6 +382,7 @@ static int overlay_qsv_query_formats(AVF
+     };
+     static const enum AVPixelFormat out_pix_fmts[] = {
+         AV_PIX_FMT_NV12,
++        AV_PIX_FMT_P010,
+         AV_PIX_FMT_QSV,
+         AV_PIX_FMT_NONE
+     };
+Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
+===================================================================
+--- libavfilter/vf_vpp_qsv.c
++++ libavfilter/vf_vpp_qsv.c
+@@ -344,6 +344,30 @@ static mfxStatus get_mfx_version(const A
+     return MFXQueryVersion(device_hwctx->session, mfx_version);
+ }
+ 
++static mfxStatus get_mfx_platform(const AVFilterContext *ctx, mfxPlatform *mfx_platform)
++{
++    const AVFilterLink *inlink = ctx->inputs[0];
++    AVBufferRef *device_ref;
++    AVHWDeviceContext *device_ctx;
++    AVQSVDeviceContext *device_hwctx;
++
++    if (inlink->hw_frames_ctx) {
++        AVHWFramesContext *frames_ctx = (AVHWFramesContext *)inlink->hw_frames_ctx->data;
++        device_ref = frames_ctx->device_ref;
++    } else if (ctx->hw_device_ctx) {
++        device_ref = ctx->hw_device_ctx;
++    } else {
++        mfx_platform->CodeName = 0;
++        mfx_platform->DeviceId = 0;
++        return MFX_ERR_NONE;
++    }
++
++    device_ctx   = (AVHWDeviceContext *)device_ref->data;
++    device_hwctx = device_ctx->hwctx;
++
++    return MFXVideoCORE_QueryPlatform(device_hwctx->session, mfx_platform);
++}
++
+ static int config_output(AVFilterLink *outlink)
+ {
+     AVFilterContext *ctx = outlink->src;
+@@ -504,12 +528,21 @@ static int config_output(AVFilterLink *o
+ 
+     if (inlink->w != outlink->w || inlink->h != outlink->h || in_format != vpp->out_format) {
+         if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 19)) {
++            mfxPlatform mfx_platform;
++            int compute = 0;
+             int mode = vpp->scale_mode;
++            int vpl = QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 255);
+ 
+-#if QSV_ONEVPL
+-            if (mode > 2)
+-                mode = MFX_SCALING_MODE_VENDOR + mode - 2;
+-#endif
++            /* Compute mode is only available on DG2+ platforms */
++            if (vpl && get_mfx_platform(ctx, &mfx_platform) == MFX_ERR_NONE) {
++                int code_name = mfx_platform.CodeName;
++                compute = code_name >= 45 && code_name != 55 && code_name != 50;
++            }
++
++            if (mode == -1)
++                mode = (vpl && compute) ? 1001 : MFX_SCALING_MODE_DEFAULT;
++            else if (mode > 2)
++                mode = vpl ? (1000 + mode - 2) : MFX_SCALING_MODE_DEFAULT;
+ 
+             INIT_MFX_EXTBUF(scale_conf, MFX_EXTBUFF_VPP_SCALING);
+             SET_MFX_PARAM_FIELD(scale_conf, ScalingMode, mode);
+@@ -602,6 +635,7 @@ not_ready:
+     return FFERROR_NOT_READY;
+ 
+ eof:
++    pts = av_rescale_q(pts, inlink->time_base, outlink->time_base);
+     ff_outlink_set_status(outlink, status, pts);
+     return 0;
+ }
+@@ -685,20 +719,14 @@ static const AVOption vpp_options[] = {
+     { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
+     { "height", "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
+     { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
+-    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, .flags = FLAGS },
+-#if QSV_ONEVPL
+-    { "scale_mode", "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 5, .flags = FLAGS, "scale mode" },
+-#else
+-    { "scale_mode", "scaling & format conversion mode", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = MFX_SCALING_MODE_DEFAULT }, MFX_SCALING_MODE_DEFAULT, MFX_SCALING_MODE_QUALITY, .flags = FLAGS, "scale mode" },
+-#endif
++    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
++    { "scale_mode", "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)", OFFSET(scale_mode), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 5, .flags = FLAGS, "scale mode" },
+     { "auto",      "auto mode",             0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_DEFAULT},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+     { "low_power", "low power mode",        0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_LOWPOWER}, INT_MIN, INT_MAX, FLAGS, "scale mode"},
+     { "hq",        "high quality mode",     0,    AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_QUALITY},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+-#if QSV_ONEVPL
+     { "compute",   "compute",               0,    AV_OPT_TYPE_CONST,  { .i64 = 3},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+     { "vd",        "vd",                    0,    AV_OPT_TYPE_CONST,  { .i64 = 4},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+     { "ve",        "ve",                    0,    AV_OPT_TYPE_CONST,  { .i64 = 5},  INT_MIN, INT_MAX, FLAGS, "scale mode"},
+-#endif
+ 
+     { "rate", "Generate output at frame rate or field rate, available only for deinterlace mode",
+       OFFSET(field_rate), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, FLAGS, "rate" },
+@@ -707,6 +735,7 @@ static const AVOption vpp_options[] = {
+     { "field", "Output at field rate (one frame of output for each field)",
+       0, AV_OPT_TYPE_CONST, { .i64 = 1 }, 0, 0, FLAGS, "rate" },
+ 
++    { "passthrough", "Apply pass through mode if possible.", OFFSET(has_passthrough), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, .flags = FLAGS },
+     { NULL }
+ };
+ 
+@@ -751,19 +780,14 @@ static const AVOption qsvscale_options[]
+     { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str = "ih"   }, .flags = FLAGS },
+     { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
+ 
+-#if QSV_ONEVPL
+-    { "mode",      "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = 0}, 0, 5, FLAGS, "mode"},
+-#else
+-    { "mode",      "scaling & format conversion mode",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = MFX_SCALING_MODE_DEFAULT}, MFX_SCALING_MODE_DEFAULT, MFX_SCALING_MODE_QUALITY, FLAGS, "mode"},
+-#endif
++    { "mode",      "scaling & format conversion mode (mode compute(3), vd(4) and ve(5) are only available on some platforms)",    OFFSET(scale_mode),    AV_OPT_TYPE_INT,    { .i64 = -1}, -1, 5, FLAGS, "mode"},
+     { "low_power", "low power mode",        0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_LOWPOWER}, INT_MIN, INT_MAX, FLAGS, "mode"},
+     { "hq",        "high quality mode",     0,             AV_OPT_TYPE_CONST,  { .i64 = MFX_SCALING_MODE_QUALITY},  INT_MIN, INT_MAX, FLAGS, "mode"},
+-#if QSV_ONEVPL
+     { "compute",   "compute",               0,             AV_OPT_TYPE_CONST,  { .i64 = 3},  INT_MIN, INT_MAX, FLAGS, "mode"},
+     { "vd",        "vd",                    0,             AV_OPT_TYPE_CONST,  { .i64 = 4},  INT_MIN, INT_MAX, FLAGS, "mode"},
+     { "ve",        "ve",                    0,             AV_OPT_TYPE_CONST,  { .i64 = 5},  INT_MIN, INT_MAX, FLAGS, "mode"},
+-#endif
+ 
++    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
+     { NULL },
+ };
+ 
+@@ -788,6 +812,7 @@ static const AVOption qsvdeint_options[]
+     { "bob",   "bob algorithm",                  0, AV_OPT_TYPE_CONST,      {.i64 = MFX_DEINTERLACING_BOB}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
+     { "advanced", "Motion adaptive algorithm",   0, AV_OPT_TYPE_CONST, {.i64 = MFX_DEINTERLACING_ADVANCED}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
+ 
++    { "async_depth", "Internal parallelization depth, the higher the value the higher the latency.", OFFSET(qsv.async_depth), AV_OPT_TYPE_INT, { .i64 = 4 }, 0, INT_MAX, .flags = FLAGS },
+     { NULL },
+ };
+ 

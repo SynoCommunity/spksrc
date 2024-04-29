@@ -1,8 +1,8 @@
 PKG_NAME = libtasn1
-PKG_VERS = 4.16.0
+PKG_VERS = 4.19.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/$(PKG_NAME)
+PKG_DIST_SITE = https://ftp.gnu.org/gnu/libtasn1
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -12,7 +12,7 @@ COMMENT  = ASN.1 library used by GnuTLS, p11-kit and some other packages.
 LICENSE  = LGPLv2.1
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-gcc-warnings --disable-static
-ADDITIONAL_CPPFLAGS = -std=c99
+CONFIGURE_ARGS = --disable-gcc-warnings --disable-static --disable-doc
+ADDITIONAL_CFLAGS = -std=gnu99 -O2
 
 include ../../mk/spksrc.cross-cc.mk

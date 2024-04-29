@@ -2,11 +2,11 @@ PKG_NAME = glib
 PKG_VERS = 2.58.3
 PKG_SHORT_VERS=$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/glib-2.58 cross/libffi cross/pcre cross/zlib
+DEPENDS = cross/libffi cross/pcre cross/zlib
 
 HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library (version for older compilers)
@@ -15,9 +15,6 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-man --disable-libmount --enable-shared=yes --enable-static=no
 CONFIGURE_ARGS += glib_cv_long_long_format=ll glib_cv_stack_grows=no glib_cv_uscore=no ac_cv_func_posix_getpwuid_r=yes ac_cv_func_posix_getgrgid_r=yes
-CONFIGURE_ARGS += GLIB_GENMARSHAL=$(WORK_DIR)/../../../native/glib/work-native/$(PKG_DIR)/gobject/glib-genmarshal
-CONFIGURE_ARGS += GLIB_COMPILE_SCHEMAS=$(WORK_DIR)/../../../native/glib/work-native/$(PKG_DIR)/gio/glib-compile-schemas
-CONFIGURE_ARGS += GLIB_COMPILE_RESOURCES=$(WORK_DIR)/../../../native/glib/work-native/$(PKG_DIR)/gio/glib-compile-resources
 
 ADDITIONAL_CFLAGS = -Wno-unused-value
 

@@ -1,5 +1,5 @@
 bin:bin/cacaclock
-bin:bin/caca-config
+rsc:bin/caca-config
 bin:bin/cacademo
 bin:bin/cacafire
 bin:bin/cacaplay
@@ -10,6 +10,6 @@ lnk:lib/libcaca.so
 lnk:lib/libcaca++.so
 lnk:lib/libcaca.so.0
 lnk:lib/libcaca++.so.0
-lib:lib/libcaca.so.0.99.19
-lib:lib/libcaca++.so.0.99.19
+lib:lib/libcaca.so.0.99.18
+lib:lib/libcaca++.so.0.99.18
 rsc:share/libcaca/caca.txt

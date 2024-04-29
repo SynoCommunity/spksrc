@@ -13,14 +13,12 @@ COMMENT  = Jappix, a full-featured XMPP web-client (Jappix Desktop, Jappix Mobil
 LICENSE  = AGPL
 
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = jappix_install
 
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: jappix_install
 jappix_install:

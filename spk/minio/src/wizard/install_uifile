@@ -1,56 +1,100 @@
 [
-	{
-		"step_title": "MinIO configuration",
-		"items": [
-		  {
-			"type": "textfield",
-			"subitems": [
-			  {
-				"key": "wizard_data_directory",
-				"desc": "Data directory location",
-				"defaultValue": "/volume1/minio",
-				"validator": {
-				  "allowBlank": false,
-				  "regex": {
-					"expr": "/^\\\/volume[0-9]{1,2}\\\/[^<>: */?\"]*/",
-					"errorText": "Path should begin with /volume?/ where ? is volume number (1-99)"
-				  }
-				}
-			  },
-			  {
-				"key": "wizard_access_key",
-				"desc": "MinIO access key",
-				"defaultValue": "",
-				"validator": {
-				  "allowBlank": false,
-				  "minLength": 3,
-				  "regex": {
-					"expr": "/^[^<>:*/?\"|]*$/",
-					"errorText": "Not allowed character in key"
-				  }
-				}
-			  },
-			  {
-				"key": "wizard_secret_key",
-				"desc": "MinIO secret key",
-				"defaultValue": "",
-				"validator": {
-				  "allowBlank": false,
-				  "minLength": 8,
-				  "regex": {
-					"expr": "/^[^\"|]*$/",
-					"errorText": "Not allowed character in key"
-				  }
-				}
-			  }
-			]
-		  }
-		]
-	},
-	{
-		"step_title": "Attention! DSM6 Permissions",
-		"items": [{
-			"desc": "Permissions for this package are handled by the <b>'sc-minio'</b> group. <br>Using File Station, add this group to every folder minio should be allowed to access.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
-		}]
-	}
+   {
+      "step_title": "MinIO configuration",
+      "items": [
+         {
+            "type": "combobox",
+            "desc": "Please select a volume to use for the data folder",
+            "subitems": [
+               {
+                  "key": "wizard_data_volume",
+                  "desc": "Volume name",
+                  "displayField": "display_name",
+                  "valueField": "volume_path",
+                  "editable": false,
+                  "mode": "remote",
+                  "api_store": {
+                     "api": "SYNO.Core.Storage.Volume",
+                     "method": "list",
+                     "version": 1,
+                     "baseParams": {
+                        "limit": -1,
+                        "offset": 0,
+                        "location": "internal"
+                     },
+                     "root": "volumes",
+                     "idProperty": "volume_path",
+                     "fields": [
+                        "display_name",
+                        "volume_path"
+                     ]
+                  },
+                  "validator": {
+                     "fn": "{console.log(arguments);return true;}"
+                  }
+               }
+            ]
+         },
+         {
+            "type": "textfield",
+            "desc": "Data shared folder (using the volume chosen above)",
+            "subitems": [
+               {
+                  "key": "wizard_data_directory",
+                  "desc": "Data shared folder",
+                  "defaultValue": "minio",
+                  "validator": {
+                     "allowBlank": false,
+                     "regex": {
+                        "expr": "/^[\\w _-]+$/",
+                        "errorText": "Subdirectories are not supported."
+                     }
+                  }
+               }
+            ]
+         },
+         {
+            "desc": "The folder will be created on demand as regular DSM shared folder for the service user <b>sc-minio</b>. For details about the DSM permissions see <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a>.<p/>"
+         },
+         {
+            "desc": "Please define the following credentials to access the MinIO services:"
+         },
+         {
+            "type": "textfield",
+            "subitems": [
+               {
+                  "key": "wizard_root_user",
+                  "desc": "MinIO root user",
+                  "defaultValue": "",
+                  "validator": {
+                     "allowBlank": false,
+                     "minLength": 3,
+                     "regex": {
+                        "expr": "/^[^<>:*/?\"|]*$/",
+                        "errorText": "Not allowed character in username"
+                     }
+                  }
+               }
+            ]
+         },
+         {
+            "type": "password",
+            "subitems": [
+               {
+                  "key": "wizard_root_password",
+                  "desc": "MinIO root password",
+                  "defaultValue": "",
+                  "validator": {
+                     "allowBlank": false,
+                     "minLength": 8,
+                     "regex": {
+                        "expr": "/^[^\"|]*$/",
+                        "errorText": "Not allowed character in password"
+                     }
+                  }
+               }
+            ]
+         }
+      ]
+   }
 ]

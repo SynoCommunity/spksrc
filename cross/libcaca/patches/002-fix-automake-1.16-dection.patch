@@ -1,0 +1,11 @@
+--- bootstrap.orig	2013-09-16 07:24:45.000000000 +0000
++++ bootstrap	2022-05-31 14:25:16.727090243 +0000
+@@ -36,7 +36,7 @@ aclocalflags="`sed -ne 's/^[ \t]*ACLOCAL
+ 
+ # Check for automake
+ amvers="no"
+-for v in 13 12 11 10 9 8 7 6 5; do
++for v in 16 15 14 13 12 11 10 9 8 7 6 5; do
+   if automake-1.${v} --version >/dev/null 2>&1; then
+     amvers="-1.${v}"
+     break
