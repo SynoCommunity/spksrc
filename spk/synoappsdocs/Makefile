@@ -1,6 +1,6 @@
 SPK_NAME = synoappsdocs
 SPK_VERS = 1.2
-SPK_REV = 1
+SPK_REV = 3
 SPK_ICON = src/synoappsdocs.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
@@ -22,6 +22,8 @@ ADMIN_URL = /synoappsdocs/
 
 CONF_DIR = src/conf
 SYSTEM_GROUP = http
+
+SERVICE_USER   = auto
 
 include ../../mk/spksrc.spk.mk
 
