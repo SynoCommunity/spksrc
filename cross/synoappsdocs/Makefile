@@ -20,3 +20,6 @@ include ../../mk/spksrc.install-resources.mk
 synoappsdocs_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/web 
 	tar -xvf $(WORK_DIR)/$(PKG_DIR)/docs/synoappsdocs.tar.gz -C $(STAGING_INSTALL_PREFIX)/web/
+	# TODO : to fix 
+	mv $(STAGING_INSTALL_PREFIX)/web/$(PKG_DIR)/* $(STAGING_INSTALL_PREFIX)/web/
+	rmdir $(STAGING_INSTALL_PREFIX)/web/$(PKG_DIR)
