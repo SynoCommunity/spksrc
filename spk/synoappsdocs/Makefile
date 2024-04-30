@@ -23,7 +23,5 @@ ADMIN_URL = /synoappsdocs/
 CONF_DIR = src/conf
 SYSTEM_GROUP = http
 
-SERVICE_USER   = auto
-
 include ../../mk/spksrc.spk.mk
 

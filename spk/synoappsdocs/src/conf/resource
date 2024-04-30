@@ -31,7 +31,7 @@
     ],
     "pkg_dir_prepare": [
       {
-        "source": "/var/packages/synoappsdocs/target/apps/docs/",
+        "source": "/var/packages/synoappsdocs/target/web/docs/",
         "target": "synoappsdocs",
         "mode": "0755",
         "user": "sc-synoappsdocs",
