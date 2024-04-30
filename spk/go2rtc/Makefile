@@ -1,6 +1,6 @@
 SPK_NAME = go2rtc
 SPK_VERS = 1.8.5
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/go2rtc.png
 
 DEPENDS = cross/go2rtc
