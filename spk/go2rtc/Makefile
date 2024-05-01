@@ -1,6 +1,6 @@
 SPK_NAME = go2rtc
-SPK_VERS = 1.8.5
-SPK_REV = 5
+SPK_VERS = 1.9.0
+SPK_REV = 6
 SPK_ICON = src/go2rtc.png
 
 DEPENDS = cross/go2rtc
@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 MAINTAINER = skrashevich
 DESCRIPTION = Ultimate camera streaming application with support RTSP, RTMP, HTTP-FLV, WebRTC, MSE, HLS, MP4, MJPEG, HomeKit, FFmpeg, etc
 DISPLAY_NAME = go2rtc
-CHANGELOG = "Enhanced Rockchip transcoding, OPUS codec support, WebUI log viewer, Tapo and HomeKit source handling. Improved H265, FFmpeg, CORS support. Fixed D-Link SDP, exec source issues, H265 hardware profiles, OPUS audio, mdns log, Aqara G2H compatibility, reconnect panic."
+CHANGELOG = "Dark mode and other UI enhancements. Daemon running mode. H200 hub support. Milestone format. Extended stream feature. Backchannel support for exec source."
 LICENSE_FILE = $(WORK_DIR)/src/github.com/go2rtc/go2rtc/LICENSE
 HOMEPAGE = https://github.com/AlexxIT/go2rtc
 LICENSE = MIT
