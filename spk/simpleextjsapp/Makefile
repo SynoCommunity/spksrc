@@ -23,6 +23,9 @@ SYSTEM_GROUP = http
 SERVICE_USER   = auto
 SERVICE_SETUP  = src/service-setup.sh
 
+# Make sure ARCH is not defined
+override ARCH=
+
 POST_STRIP_TARGET = simpleextjsapp_extra_install
 
 include ../../mk/spksrc.spk.mk
