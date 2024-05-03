@@ -114,20 +114,6 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     hideLabel: true,
                     items: [{
                         xtype: 'syno_displayfield',
-                        value: 'CGI in C :',
-                        width: 140
-                    }, {
-                        xtype: "syno_button",
-                        btnStyle: "green",
-                        text: 'Call C CGI ',
-                        handler: this.onCGIClick.bind(this)
-                    }]
-                },
-                {
-                    xtype: "syno_compositefield",
-                    hideLabel: true,
-                    items: [{
-                        xtype: 'syno_displayfield',
                         value: 'CGI in Perl :',
                         width: 140
                     }, {
@@ -758,30 +744,6 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             }
 
         });
-    },
-    // Call C CGI on click
-    onCGIClick: function() {
-        Ext.Ajax.request({
-            url: '/webman/3rdparty/simpleextjsapp/test.cgi',
-            method: 'GET',
-            timeout: 60000,
-            params: {
-                id: 1 // add params if needed
-            },
-            headers: {
-                'Content-Type': 'text/html'
-            },
-            success: function(response) {
-                var result = response.responseText;
-                window.alert('C CGI called :\n' + result);
-            },
-            failure: function(response) {
-                window.alert('Request Failed.');
-
-            }
-
-        });
-
     },
     // Call Python CGI on click
     onPythonCGIClick: function() {
