@@ -595,6 +595,23 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 
 
                     ]
+				},
+				{
+                    xtype: "syno_compositefield",
+                    hideLabel: true,
+                    items: [{
+                            xtype: 'syno_displayfield',
+                            value: 'AboutWindow',
+                            width: 100
+                        },
+                        {
+                            xtype: "syno_button",
+                            text: 'About',
+                            handler: this.onAbout.bind(this)
+                        }
+
+
+                    ]
 				}
             ]
         });
@@ -714,6 +731,7 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
         });
 
     },
+    // Call MariaDB API on click
     onMariaAPIClick: function() {
         var t = this.getBaseURL({			
             api: "SYNO.MariaDB10.lib",
@@ -1325,6 +1343,17 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
         })).show()
     },
     
+    // Handle display for AboutWindow
+    onAbout: function() {
+        (new SYNO.SDS.AboutWindow({
+                            owner: this,
+                            aboutHeader: "about",
+                            pkgColor: "#1EB9C7",
+                            width: 450,
+                            height: 184
+                        })).show()
+    },
+	
     onOpen: function(a) {
         SYNOCOMMUNITY.SimpleExtJSApp.AppWindow.superclass.onOpen.call(this, a);
 
