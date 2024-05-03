@@ -174,9 +174,9 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
                     text: 'Call API ',
                     handler: this.onAPIClick.bind(this)
                 	}]
-             },
-			 // Core Storage API
-			 {
+             	},
+			 	// Core Storage API
+			 	{
 			                 xtype: "syno_compositefield",
 			                 hideLabel: true,
 			                 items: [{
@@ -189,7 +189,22 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
 			                     text: 'Call API ',
 			                     handler: this.onAPIStorageClick.bind(this)
 			                 	}]
-			              }
+			    },
+ 			 	// MariaDB API
+ 			 	{
+ 			                 xtype: "syno_compositefield",
+ 			                 hideLabel: true,
+ 			                 items: [{
+ 			                     xtype: 'syno_displayfield',
+ 			                     value: 'MariaDB',
+ 			                     width: 140
+ 			                 	}, {
+ 			                     xtype: "syno_button",
+ 			                     btnStyle: "green",
+ 			                     text: 'Call API ',
+ 			                     handler: this.onMariaAPIClick.bind(this)
+ 			                 	}]
+ 			     }
 			]
         });
     },
@@ -691,6 +706,32 @@ Ext.define("SYNOCOMMUNITY.SimpleExtJSApp.AppWindow", {
             },
             success: function(response) {
 				window.alert('API returned raw list  : ' + response.responseText);
+            },
+            failure: function(response) {
+                window.alert('Request Failed.');
+
+            }
+        });
+
+    },
+    onMariaAPIClick: function() {
+        var t = this.getBaseURL({			
+            api: "SYNO.MariaDB10.lib",
+            method: "get_info",
+            version: 1
+        });
+        Ext.Ajax.request({
+            url: t,
+            method: 'GET',
+            timeout: 60000,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            success: function(response) {
+                var data = Ext.decode(response.responseText).data;
+				var db_port = data.port;
+                var db_networking = data.skip_networking;
+                window.alert('API returned info : port = ' + db_port + ', networking = ' + db_networking );
             },
             failure: function(response) {
                 window.alert('Request Failed.');
