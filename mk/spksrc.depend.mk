@@ -36,15 +36,6 @@ else
 TOOLKIT_DEPEND = toolkit/syno-$(ARCH)-$(TCVERSION)
 endif
 
-ifeq ($(strip $(REQUIRE_KERNEL)),)
-KERNEL_DEPEND = 
-else
-KERNEL_DEPEND = kernel/syno-$(ARCH)-$(TCVERSION)
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-KERNEL_MODULE_DEPEND = $(filter-out $(GENERIC_ARCHS),$(addprefix kernel/syno-,$(filter $(addprefix %-,$(filter $(firstword $(subst ., ,$(TCVERSION))).%,$(SUPPORTED_KERNEL_VERSIONS))),$(filter-out $(addsuffix -%,$(UNSUPPORTED_ARCHS)),$(LEGACY_ARCHS)))))
-endif
-endif
-
 depend_msg_target:
 	@$(MSG) "Processing dependencies of $(NAME)"
 
