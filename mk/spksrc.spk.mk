@@ -513,6 +513,7 @@ spkclean:
 	       work-*/staging \
 	       work-*/tc_vars.mk \
 	       work-*/tc_vars.cmake \
+	       work-*/tc_vars.meson \
 	       work-*/package.tgz \
 	       work-*/INFO \
 	       work-*/PLIST \
