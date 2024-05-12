@@ -20,6 +20,6 @@ kernel-modules:
 	          TCVERSION=$$(echo $${depend} | cut -f2 -d-) \
 	          -C ../../kernel/syno-$$depend | tee --append build-$(ARCH)-$(TCVERSION)-kernel-modules-$${depend}.log ; \
 	  $(MSG) "$$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: kernel-modules-$${depend}-$(TCVERSION) [END]" >> $(PSTAT_LOG) ; \
-	  rm -fr work$(ARCH_SUFFIX)/linux-$(KERNEL_DEPEND) ; \
+	  rm -fr $(CURDIR)/work$(ARCH_SUFFIX)/linux-$(KERNEL_DEPEND) ; \
 	done ; \
 	rsync -ah work$(ARCH_SUFFIX)/tc_vars-backup/tc_vars* work$(ARCH_SUFFIX)/.
