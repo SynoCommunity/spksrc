@@ -12,6 +12,9 @@
 #  REQUIRE_TOOLKIT     If set, will download and extract matching toolkit
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
 
+### For managing kernel modules dependent builds
+include ../../mk/spksrc.kernel-modules.mk
+
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
 
 ifeq ($(strip $(PRE_DEPEND_TARGET)),)

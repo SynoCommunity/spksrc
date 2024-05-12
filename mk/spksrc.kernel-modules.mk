@@ -7,6 +7,7 @@ include $(BASEDIR)mk/spksrc.kernel-env.mk
 
 kernel-modules:
 	@set -e; \
+	$(MSG) "kernel-modules archs to be processed: $(KERNEL_DEPEND)" ; \
 	rsync -ah --mkpath work$(ARCH_SUFFIX)/tc_vars* work$(ARCH_SUFFIX)/tc_vars-backup ; \
 	for depend in $(KERNEL_DEPEND); \
 	do                          \
@@ -19,8 +20,6 @@ kernel-modules:
 	          TCVERSION=$$(echo $${depend} | cut -f2 -d-) \
 	          -C ../../kernel/syno-$$depend | tee --append build-$(ARCH)-$(TCVERSION)-kernel-modules-$${depend}.log ; \
 	  $(MSG) "$$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: kernel-modules-$${depend}-$(TCVERSION) [END]" >> $(PSTAT_LOG) ; \
+	  rm -fr work$(ARCH_SUFFIX)/linux-$(KERNEL_DEPEND) ; \
 	done ; \
 	rsync -ah work$(ARCH_SUFFIX)/tc_vars-backup/tc_vars* work$(ARCH_SUFFIX)/.
-
-kernel-arch-%:
-	$(MAKE) $(addprefix kernel-modules-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*)) | tee --append build-$*.log

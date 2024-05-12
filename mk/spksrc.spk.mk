@@ -548,9 +548,6 @@ pythonclean: wheelcleanall
 pythoncleanall: pythonclean
 	rm -fr work-*/[Pp]ython* work-*/.python*
 
-### For managing kernel modules dependent builds
-include ../../mk/spksrc.kernel-modules.mk
-
 ### For managing make all-<supported|latest>
 include ../../mk/spksrc.supported.mk
 

@@ -13,12 +13,6 @@ ENV += REQUIRE_KERNEL_MODULE="$(REQUIRE_KERNEL_MODULE)"
 ifneq ($(findstring $(KO_ARCH),$(GENERIC_ARCHS)),$(KO_ARCH))
 KERNEL_DEPEND = $(KO_ARCH)-$(KO_TCVERSION)
 
-# else it's generic, then find the list of arch to be processed
-# if version needed is part of the default toolchain supported versions
-# then process all matching <arch>-<#>.* archs
-else ifneq ($(filter $(KO_TCVERSION),$(DEFAULT_TC)),)
-KERNEL_DEPEND = $(filter $(addsuffix -$(firstword $(subst ., ,$(KO_TCVERSION))).%,$(filter-out $(UNSUPPORTED_ARCHS),$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$(KO_ARCH)-$(KO_TCVERSION)/Makefile 2>/dev/null))), $(LEGACY_ARCHS))
-
 # else only process matching <arch>-<#>
 else
 KERNEL_DEPEND = $(filter $(addsuffix -$(KO_TCVERSION),$(filter-out $(UNSUPPORTED_ARCHS),$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$(KO_ARCH)-$(KO_TCVERSION)/Makefile 2>/dev/null))), $(LEGACY_ARCHS))
