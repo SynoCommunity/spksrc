@@ -12,11 +12,11 @@ DEPENDS = cross/jellyfin cross/jellyfin-web
 # x64 and armv8 archs are supported only.
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
-MAINTAINER = SynoCommunity
+MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "1. Update jellyfin to 10.9.1<br/>2. Update dotnet to 8.0.4."
+CHANGELOG = "1. Update jellyfin to 10.9.1<br/>2. Update dotnet to 8.0.4.<br/>3.Update nodejs 20.0.0"
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
