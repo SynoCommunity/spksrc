@@ -46,7 +46,10 @@ pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
 ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+# As depend is also ran at toolchain-time, ensure to skip kernel-modules
+ifeq ($(filter toolchain,$(shell basename $(abspath $(CURDIR)/../))),)
 depend_target: kernel-modules
+endif
 endif
 	@set -e; \
 	for depend in $(BUILD_DEPENDS) $(TOOLKIT_DEPEND) $(DEPENDS); \
