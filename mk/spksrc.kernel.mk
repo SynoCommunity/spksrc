@@ -1,3 +1,7 @@
+
+# Constants
+default: all
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.common-rules.mk
