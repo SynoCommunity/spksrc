@@ -44,8 +44,8 @@ pre_kernel_configure_target: kernel_configure_msg
 
 kernel_configure_target:  $(PRE_KERNEL_CONFIGURE_TARGET)
 	@$(MSG) "Updating kernel Makefile"
-	@$(RUN) sed -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' -i.orig Makefile
-	@$(RUN) sed -r 's,^ARCH[^_]\s*.+,ARCH\t\t= $(KERNEL_ARCH),' -i Makefile
+	@$(RUN) sed -r 's,^ARCH[^_]\s*.+,ARCH\t\t= $(KERNEL_ARCH),' -i.ARCH.orig Makefile
+	@$(RUN) sed -r -e '/^ARCH/a\' -e 'CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX)' -i.CROSS_COMPILE.orig Makefile
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 	@$(RUN) sed -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' -i Makefile
