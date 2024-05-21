@@ -1,6 +1,6 @@
 SPK_NAME = simpleextjsapp
-SPK_VERS = 0.72
-SPK_REV = 9
+SPK_VERS = 0.73
+SPK_REV = 10
 SPK_ICON = src/simpleextjsapp.png
 WIZARDS_DIR = WIZARD_UIFILES
 DSM_UI_DIR = app
