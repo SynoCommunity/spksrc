@@ -11,6 +11,7 @@ DEPENDS = cross/jellyfin cross/jellyfin-web
 
 # x64 and armv8 archs are supported only.
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+REQUIRED_MIN_DSM = 7.2
 
 MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
