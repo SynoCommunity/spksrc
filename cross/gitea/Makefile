@@ -6,6 +6,8 @@ PKG_DIST_SITE = https://github.com/go-gitea/gitea/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+
 BUILD_DEPENDS = native/go native/nodejs
 
 HOMEPAGE = https://gitea.io/
