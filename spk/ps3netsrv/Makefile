@@ -10,7 +10,7 @@ MAINTAINER = Hirador
 DESCRIPTION = Allows PS3 content to be loaded from network. Please edit the default port “38008” to “14167” in your PS3's webMAN MOD Setup 
 DESCRIPTION_FRE = Fournit l\'accès par le réseau aux contenus pour PS3. Veuillez modifier le port par défaut de "38008" à "14167" dans PS3 webMAN MOD Setup
 DISPLAY_NAME = ps3netsrv
-CHANGELOG = "Update to v1.47.46b with ps3netsrv 20240210."
+CHANGELOG = "Update to v1.47.46e with ps3netsrv 20240210a."
 
 HOMEPAGE = https://github.com/aldostools/webMAN-MOD
 LICENSE  = GPLv3
