@@ -1,5 +1,5 @@
 PKG_NAME = protobuf-c
-PKG_VERS = 1.4.0
+PKG_VERS = 1.5.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/protobuf-c/protobuf-c/releases/download/v$(PKG_VERS)
