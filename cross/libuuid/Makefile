@@ -1,6 +1,6 @@
 PKG_NAME = libuuid
 PKG_REAL_NAME = util-linux
-PKG_VERS = 2.38.1
+PKG_VERS = 2.40.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/util-linux/v$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
