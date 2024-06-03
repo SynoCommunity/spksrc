@@ -13,7 +13,7 @@ DOTNET_CORE_ARCHS = 1
 
 MAINTAINER = hgy59
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
-CHANGELOG = "Update to dotnet-runtime v8.0.4."
+CHANGELOG = "Update to dotnet-runtime v8.0.6."
 
 STARTABLE = no
 DISPLAY_NAME = .NET 8 runtime

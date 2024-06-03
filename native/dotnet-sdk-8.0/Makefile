@@ -1,5 +1,5 @@
 PKG_NAME = dotnet-sdk-8.0
-# Version 8.0.4, SDK 8.0.204
+# Version 8.0.6, 8.0.301
 # https://dotnet.microsoft.com/download/dotnet/8.0
 PKG_VERS = 8.0.301
 PKG_EXT = tar.gz
