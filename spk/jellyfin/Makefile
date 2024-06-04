@@ -24,7 +24,7 @@ HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
 LICENSE = GPLv2
 LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
-SPK_DEPENDS = "ffmpeg6>=6.0"
+SPK_DEPENDS = "ffmpeg6"
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER = auto
