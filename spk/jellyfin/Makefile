@@ -1,6 +1,6 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
-SPK_VERS = 10.9.4
+SPK_VERS = 10.9.5
 SPK_REV = 14
 SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
@@ -18,7 +18,7 @@ MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "Update jellyfin to 10.9.4<br/>Built with dotnet 8 and nodejs 20."
+CHANGELOG = "Update jellyfin to 10.9.5<br/>Built with dotnet 8 and nodejs 20."
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
