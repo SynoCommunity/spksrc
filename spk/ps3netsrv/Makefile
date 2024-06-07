@@ -22,7 +22,8 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 14167
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
-SERVICE_WIZARD_SHARE = wizard_data_directory
+WIZARDS_DIR = src/wizard/
+SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/ps3netsrv-starter.sh
 NO_SERVICE_SHORTCUT = yes
 
