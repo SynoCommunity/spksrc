@@ -91,15 +91,11 @@ jobs:
 
       - name: Cache toolchains
         uses: actions/cache@v4
+        # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
+        if: contains(${{ matrix.arch }}, 'qoriq') == false
         with:
           path: toolchain/*/work
           key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
-
-      - name: Cache custom rust-qoriq
-        uses: actions/cache@v4
-        with:
-          path: toolchain/syno-qoriq-*-rust/work-native
-          key: toolchain-${{ matrix.arch }}-rust-v3-${{ hashFiles(format('toolchain/syno-{0}-rust/digests',matrix.arch)) }}
 
       - name: Use cache of downloaded files
         uses: actions/cache@v4
