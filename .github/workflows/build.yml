@@ -93,7 +93,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: toolchain/*/work
-          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles('toolchain/*/digests') }}
+          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles('toolchain/syno-${{ matrix.arch }}/digests') }}
 
       - name: Cache custom rust-qoriq
         uses: actions/cache@v4
