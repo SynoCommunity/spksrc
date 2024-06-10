@@ -99,7 +99,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: toolchain/syno-qoriq-*-rust/work-native
-          key: toolchain-${{ matrix.arch }}-rust-v3-${{format('toolchain/syno-{0}-rust/digests',matrix.arch)) }}
+          key: toolchain-${{ matrix.arch }}-rust-v3-${{ hashFiles(format('toolchain/syno-{0}-rust/digests',matrix.arch)) }}
 
       - name: Use cache of downloaded files
         uses: actions/cache@v4
