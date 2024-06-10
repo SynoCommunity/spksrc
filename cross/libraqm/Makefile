@@ -1,6 +1,6 @@
 PKG_NAME = libraqm
-PKG_VERS = 0.7.0
-PKG_EXT = tar.gz
+PKG_VERS = 0.10.1
+PKG_EXT = tar.xz
 PKG_DIST_NAME = raqm-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/HOST-Oman/libraqm/releases/download/v$(PKG_VERS)
 PKG_DIR = raqm-$(PKG_VERS)
@@ -22,7 +22,6 @@ COMMENT  = Raqm is a small library that encapsulates the logic for complex text 
 LICENSE  = MIT
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static
 ADDITIONAL_CFLAGS = -O
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-meson.mk
