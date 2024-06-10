@@ -3,8 +3,6 @@ SPK_VERS = 1.6
 SPK_REV = 8
 SPK_ICON = src/synocli-monitor.png
 
-# change to force build by github
-
 DEPENDS  = cross/nmon cross/njmon
 DEPENDS += cross/iperf2 cross/iperf3
 DEPENDS += cross/busybox
