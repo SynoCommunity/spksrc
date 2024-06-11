@@ -1,5 +1,5 @@
 SPK_NAME = strace
-SPK_VERS = 6.8
+SPK_VERS = 6.9
 SPK_REV = 1
 
 DEPENDS = cross/strace
