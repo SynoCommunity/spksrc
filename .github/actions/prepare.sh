@@ -13,6 +13,10 @@ set -o pipefail
 
 echo "::group:: ---- find dependent packages"
 
+# x64=x86_64, evansport=i686, aarch64=armv8, armv7, hi3535=armv7l, 88f6281=armv5, qoriq=ppc
+# https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures
+export MATRIX_ARCH="noarch, noarch-6.1, noarch-7.0, x64-6.2.4, x64-7.1, evansport-6.2.4, evansport-7.1, aarch64-6.2.4, aarch64-7.1, armv7-6.2.4, armv7-7.1, hi3535-6.2.4, 88f6281-6.2.4, qoriq-6.2.4, comcerto2k-7.1"
+
 # Generate local.mk to capture DEFAULT_TC
 make setup-synocommunity
 DEFAULT_TC=$(grep DEFAULT_TC local.mk | cut -f2 -d= | xargs)
