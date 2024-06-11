@@ -13,10 +13,10 @@ TC_RUSTFLAGS = -C target-cpu=e500
 
 include ../../mk/spksrc.tc.mk
 
-OPTIONAL_DEPENDS = toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust
+OPTIONAL_DEPENDS = native/rust-qoriq
 
 ifneq ($(RUST_BUILD_TOOLCHAIN),1)
-DEPENDS = toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust
+DEPENDS = native/rust-qoriq
 else
 POST_FIX_TARGET = qoriq_post_fix_target
 endif
