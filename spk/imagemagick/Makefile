@@ -10,7 +10,7 @@ DEPENDS += cross/jpegoptim cross/pngcrush
 MAINTAINER = SynoCommunity
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.  This package includes some tools for image compression, that are not part of imagemagick: jpegoptim, a utility to optimize/compress JPEG files; pngcrush an optimizer for png files.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update ImageMagick to v7.1.1-33 and jpegoptim to v1.5.5.<br/>2. Update libraries to current versions (advancecomp, fontconfig, freetype, giflib, libpng, libtiff, libwebp, openjpeg)."
+CHANGELOG = "1. Update ImageMagick to v7.1.1-33 and jpegoptim to v1.5.5.<br/>2. Update libraries to current versions (fontconfig, freetype, giflib, libpng, libtiff, libwebp, openjpeg)."
 
 STARTABLE = no
 
