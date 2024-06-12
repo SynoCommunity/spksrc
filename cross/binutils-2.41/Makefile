@@ -1,14 +1,11 @@
 PKG_NAME = binutils
-PKG_VERS = 2.42
+PKG_VERS = 2.41
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/binutils
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/mpfr
-
-# c++11 compiler is required (the real check is in cross/binutils/Makefile)
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 HOMEPAGE = https://www.gnu.org/software/binutils/
 COMMENT  = GNU Binutils
@@ -23,17 +20,20 @@ CONFIGURE_ARGS += --enable-gold=yes
 
 include ../../mk/spksrc.archs.mk
 
-# gprofng fails to build for i686 
-# ./../common/core_pcbe.c:2698:33: error: ‘PERF_COUNT_HW_REF_CPU_CYCLES’ undeclared here
-# gprofng is not built for other 32-bit archs
-ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
+# embedspu is a tool to "Embed an SPU ELF executable into a PowerPC object file"
+# and hence built only for PPC_ARCHS.
+# gprofng fails to build on i686 and does not build on other 32-bit archs.
+ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
+PLIST_TRANSFORM = sed -e '/bin\/embedspu/d'
+else
 CONFIGURE_ARGS += --disable-gprofng
 PLIST_TRANSFORM = sed -e '/bin\/gprofng/d' -e '/bin\/gp\-/d' -e '/lib\/gprofng/d'
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+PLIST_TRANSFORM += -e '/bin\/embedspu/d'
+endif
 endif
 
 # Avoid conflicts with gdb
 CONFIGURE_ARGS += --includedir=$(INSTALL_PREFIX)/include/binutils
-
-ADDITIONAL_CXXFLAGS = -std=c++11
 
 include ../../mk/spksrc.cross-cc.mk
