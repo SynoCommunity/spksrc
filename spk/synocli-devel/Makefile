@@ -22,14 +22,15 @@ ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 DEPENDS += cross/llvm
 endif
 
-# build pkg-config before autoconf otherwise
-# glib fails on libiconv on some platforms
+# build pkg-config and gdb before autoconf
+# otherwise glib and gdb fail on libiconv on some platforms
 # (to investigate ...)
 DEPENDS += cross/pkg-config
+DEPENDS += cross/gdb
+
 DEPENDS += cross/autoconf
 DEPENDS += cross/automake
 DEPENDS += cross/binutils
-DEPENDS += cross/gdb
 DEPENDS += cross/make
 DEPENDS += cross/libtree
 DEPENDS += cross/strace
