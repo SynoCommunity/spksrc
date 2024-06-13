@@ -36,6 +36,9 @@ CONFIGURE_ARGS = --disable-mpers
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 STRACE_ARCH = powerpc
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+ADDITIONAL_CFLAGS = -DDISABLE_KERNEL_V4L2_HAVE_TIME32
+endif
 endif
 
 ifeq ($(strip $(STRACE_ARCH)),)
