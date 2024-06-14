@@ -70,13 +70,6 @@ native-%: native/%/Makefile
 native-%-clean: native/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
 
-# build dependency flat list for all packages
-dependency-flat:
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
-	do \
-	    $(MAKE) -s -C $${spk} dependency-flat ; \
-	done
-
 # build dependency tree for all packages
 dependency-tree:
 	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
