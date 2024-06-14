@@ -1,5 +1,5 @@
 PKG_NAME = bottom
-PKG_VERS = 0.9.2
+PKG_VERS = 0.9.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ClementTsang/bottom/archive
