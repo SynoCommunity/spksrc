@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/ImageMagick/ImageMagick/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-OPTIONAL_DEPENDS = cross/librsvg cross/libheif cross/libraw cross/openexr cross/libraqm
+OPTIONAL_DEPENDS = cross/libheif cross/libraw cross/openexr cross/libraqm cross/librsvg
 
 DEPENDS  = cross/jemalloc
 DEPENDS += cross/bzip2 
@@ -44,12 +44,12 @@ SUPPORT_CPP11 = 0
 endif
 
 ifeq ($(SUPPORT_CPP11),1)
-DEPENDS += cross/librsvg
-CONFIGURE_ARGS += --with-rsvg
 DEPENDS += cross/libheif
 DEPENDS += cross/libraw
 DEPENDS += cross/openexr
 DEPENDS += cross/libraqm
+DEPENDS += cross/librsvg
+CONFIGURE_ARGS += --with-rsvg
 endif
 
 HOMEPAGE = https://www.imagemagick.org/
