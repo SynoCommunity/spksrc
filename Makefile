@@ -72,18 +72,16 @@ native-%-clean: native/%/Makefile
 
 # build dependency tree for all packages
 # - exclude broken packages
-# - exclude zsh-static (same dependencies as zsh, and make dependency-tree cannot handle include of another spk Makefile)
 dependency-tree:
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)) spk/zsh-static,$(dir $(wildcard spk/*/Makefile))) ; \
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
 	    $(MAKE) --no-print-directory -C $${spk} dependency-tree ; \
 	done
 
 # build dependency list for all packages
 # - exclude broken packages
-# - exclude zsh-static (same dependencies as zsh, and make dependency-list cannot handle include of another spk Makefile)
 dependency-list:
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)) spk/zsh-static,$(dir $(wildcard spk/*/Makefile))) ; \
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
 	    $(MAKE) -s -C $${spk} dependency-list ; \
 	done
