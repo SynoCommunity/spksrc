@@ -44,8 +44,4 @@ dependency-flat:
 	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-flat ; \
 	done
 
-
-.PHONY: dependency-kernel-list
-dependency-kernel-list:
-	@echo -n "$(NAME): "
-	@echo "$(KERNEL_MODULE_DEPEND)"
+### 

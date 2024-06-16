@@ -11,6 +11,7 @@ include ../../mk/spksrc.common.mk
 ### Include common rules
 include ../../mk/spksrc.common-rules.mk
 
+# Include ross-rust-env.mk to generate install its toolchain
 include ../../mk/spksrc.cross-rust-env.mk
 
 # Include cross-cmake-env.mk to generate its toolchain file
@@ -18,9 +19,6 @@ include ../../mk/spksrc.cross-cmake-env.mk
 
 # Include cross-meson-env.mk to generate its toolchain file
 include ../../mk/spksrc.cross-meson-env.mk
-
-##### rust specific configurations
-include ../../mk/spksrc.cross-rust-env.mk
 
 # Configure the included makefiles
 URLS                = $(TC_DIST_SITE)/$(TC_DIST_NAME)

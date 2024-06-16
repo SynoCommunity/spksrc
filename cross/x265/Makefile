@@ -1,5 +1,5 @@
 PKG_NAME = x265
-PKG_VERS = 3.5
+PKG_VERS = 3.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265_git/downloads
