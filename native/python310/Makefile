@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.12
+PKG_VERS = 3.10.14
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -34,10 +34,10 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/loc
 .PHONY: python310_native_post_install
 python310_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing pip
-	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	@$(RUN) $(PYTHON) get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check
+	@$(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
+	@$(RUN) $(PYTHON) get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
 	@$(MSG) Installing setuptools, wheel, cffi and cross env
-	@$(PIP) --disable-pip-version-check install "setuptools==63.4.3" "setuptools-rust==1.6.0" "maturin==1.1.0" "wheel==0.40.0" "cffi==1.15.1" "crossenv==1.4.0"
+	@$(PIP) --disable-pip-version-check install "setuptools==68.1.2" "setuptools-rust==1.7.0" "maturin==1.2.3" "wheel==0.41.2" "cffi==1.15.1" "crossenv==1.4.0"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@

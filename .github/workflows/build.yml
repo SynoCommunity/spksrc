@@ -34,7 +34,7 @@ jobs:
         noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
             fetch-depth: 0
             persist-credentials: false
@@ -61,7 +61,7 @@ jobs:
           SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
       - name: Cache downloaded files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: distrib
           # use run_id in key to cache within workflow only.
@@ -87,16 +87,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Cache toolchains
-        uses: actions/cache@v3
+        uses: actions/cache@v4
+        # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
+        if: ${{ contains(matrix.arch,'qoriq') == false }}
         with:
           path: toolchain/*/work
-          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles('toolchain/*/digests') }}
+          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
 
       - name: Use cache of downloaded files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: distrib
           key: distrib-${{ github.run_id }}
@@ -113,6 +115,7 @@ jobs:
           NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
           PUBLISH: ${{ github.event.inputs.publish }}
           API_KEY: ${{ secrets.PUBLISH_API_KEY }}
+          PACKAGE_TO_PUBLISH: ${{ github.event.inputs.package }}
           # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
           GH_ARCH: ${{ matrix.arch }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
@@ -135,7 +138,7 @@ jobs:
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Packages for ${{ matrix.arch }}
           path: packages/*.spk

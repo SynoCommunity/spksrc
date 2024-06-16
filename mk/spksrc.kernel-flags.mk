@@ -34,7 +34,11 @@ endif
 #
 ifeq ($(shell expr "$(KERNEL_BUILD)" \>= 25556),1)
 
-KERNEL_DIST_SITE = https://global.download.synology.com/download/ToolChain/Synology%20NAS%20GPL%20Source/$(firstword $(subst ., ,$(TC_VERS))).$(word 2,$(subst ., ,$(TC_VERS)))-$(KERNEL_BUILD)/$(KERNEL_URL_DIR)
+ifeq ($(KERNEL_URL_VERSION),)
+KERNEL_URL_VERSION = $(KERNEL_VERS)
+endif
+
+KERNEL_DIST_SITE = https://global.download.synology.com/download/ToolChain/Synology%20NAS%20GPL%20Source/$(KERNEL_URL_VERSION)-$(KERNEL_BUILD)/$(KERNEL_URL_DIR)
 
 ifeq ($(strip $(KERNEL_DIST_NAME)),)
 KERNEL_DIST_NAME = $(KERNEL_DIST).$(KERNEL_EXT)

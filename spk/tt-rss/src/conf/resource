@@ -1,79 +1,86 @@
 {
-  "mariadb10-db": {
-    "migrate-db": {
-      "flag": "{{wizard_run_migration}}",
-      "m5-db-name": "ttrss",
-      "m10-db-name": "ttrss",
-      "db-collision": "replace"
+    "mariadb10-db": {
+        "admin-account-m10": "root",
+        "admin-account-m5": "root",
+        "admin-pw-m10": "{{wizard_mysql_password_root}}",
+        "admin-pw-m5": "{{wizard_mariadb5_password_root}}",
+        "create-db": {
+            "db-collision": "skip",
+            "db-name": "ttrss",
+            "flag": "{{wizard_create_db}}"
+        },
+        "drop-db-inst": {
+            "db-name": "ttrss",
+            "flag": "{{wizard_run_migration}}",
+            "ver": "m5"
+        },
+        "drop-db-uninst": true,
+        "drop-user-uninst": true,
+        "grant-user": {
+            "db-name": "ttrss",
+            "flag": "{{mysql_grant_user}}",
+            "host": "localhost",
+            "user-name": "ttrss",
+            "user-pw": "{{wizard_mysql_password_ttrss}}"
+        },
+        "migrate-db": {
+            "db-collision": "replace",
+            "flag": "{{wizard_run_migration}}",
+            "m10-db-name": "ttrss",
+            "m5-db-name": "ttrss"
+        }
     },
-    "admin-account-m10": "root",
-    "admin-pw-m10": "{{wizard_mysql_password_root}}",
-    "admin-account-m5": "root",
-    "admin-pw-m5": "{{wizard_mariadb5_password_root}}",
-    "create-db": {
-      "flag": "{{wizard_create_db}}",  
-      "db-name": "ttrss",
-      "db-collision": "skip"
-    },
-    "grant-user": {
-      "flag": "{{mysql_grant_user}}",
-      "db-name": "ttrss",
-      "user-name": "ttrss",
-      "host": "localhost",
-      "user-pw": "{{wizard_mysql_password_ttrss}}"
-    },
-    "drop-db-inst": {
-        "flag": "{{wizard_run_migration}}",
-        "ver": "m5",
-        "db-name": "ttrss"
-    },
-    "drop-db-uninst": true,
-    "drop-user-uninst": true
-  },
-  "webservice": {
-    "services": [{
-      "service": "tt-rss",
-      "display_name": "Tiny Tiny RSS",
-      "type": "apache_php",
-      "root": "tt-rss",
-      "backend": 2,
-      "php": {
-        "profile_name": "tt-rss",
-        "profile_desc": "PHP profile used by tt-rss",
-        "backend": 8,
-        "extensions": [
-          "curl",
-          "gd",
-          "intl",
-          "mysqli",
-          "pdo_mysql",
-          "posix"
+    "webservice": {
+        "migrate": {
+            "root": [
+                {
+                    "new": "tt-rss",
+                    "old": "tt-rss"
+                }
+            ]
+        },
+        "pkg_dir_prepare": [
+            {
+                "group": "http",
+                "mode": "0755",
+                "source": "/var/packages/tt-rss/target/share/tt-rss",
+                "target": "tt-rss",
+                "user": "sc-tt-rss"
+            }
         ],
-        "user": "sc-tt-rss",
-        "group": "http"
-      }
-    }],
-    "portals": [
-      {
-        "service": "tt-rss",
-        "type": "alias",
-        "name": "Tiny Tiny RSS",
-        "alias": "tt-rss",
-        "app": "com.synocommunity.packages.tt-rss"
-      }
-    ],
-    "migrate": {
-      "root": [{
-        "old": "tt-rss",
-        "new": "tt-rss"
-      }]
-    },
-    "pkg_dir_prepare": [{
-      "source": "/var/packages/tt-rss/target/share/tt-rss",
-      "target": "tt-rss",
-      "mode": "0755",
-      "user": "sc-tt-rss",
-      "group": "http"
-    }]
-  }
+        "portals": [
+            {
+                "alias": "tt-rss",
+                "app": "com.synocommunity.packages.tt-rss",
+                "name": "Tiny Tiny RSS",
+                "service": "tt-rss",
+                "type": "alias"
+            }
+        ],
+        "services": [
+            {
+                "backend": 2,
+                "display_name": "Tiny Tiny RSS",
+                "icon": "app/images/tt-rss-{0}.png",
+                "php": {
+                    "backend": 8,
+                    "extensions": [
+                        "curl",
+                        "gd",
+                        "intl",
+                        "mysqli",
+                        "pdo_mysql",
+                        "posix"
+                    ],
+                    "group": "http",
+                    "profile_desc": "PHP Profile for tt-rss",
+                    "profile_name": "tt-rss Profile",
+                    "user": "sc-tt-rss"
+                },
+                "root": "tt-rss",
+                "service": "tt-rss",
+                "type": "apache_php"
+            }
+        ]
+    }
 }

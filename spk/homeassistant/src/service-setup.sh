@@ -1,5 +1,5 @@
 
-PYTHON_DIR="/var/packages/python310/target/bin"
+PYTHON_DIR="/var/packages/python311/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 CONFIG_DIR="${SYNOPKG_PKGVAR}/config"
@@ -8,24 +8,25 @@ SVC_WRITE_PID=y
 SVC_BACKGROUND=y
 SVC_CWD="${SYNOPKG_PKGVAR}"
 HOME="${SYNOPKG_PKGVAR}"
-
+# workaround for python modules depending on newer libstdc++ (i.e. grpcio>=1.56.x)
+export LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib
 
 # save and restore the pip-cache on package update
 # ------------------------------------------------
 # Avoid the use of ${SYNOPKG_PKGVAR} folder for the pip cache.
 # Under DSM<7 this folder's ownership will be changed to sc-homeassistant,
-# but the installer runs under root and the cache must be owned by root.
+# but the installer runs under root and the cache must be owned by the same user.
 PIP_CACHE_BACKUP_DIR=${TMP_DIR}/pip-cache
 PIP_CACHE_DIR=${SYNOPKG_PKGDEST}/pip-cache
 export PIP_DOWNLOAD_CACHE=${PIP_CACHE_DIR}
 # avoid installation to user specific site-packages folder
-export PYTHONNOUSERSIZE=1
+export PYTHONNOUSERSITE=1
 
 service_save ()
 {
     if [ -d "${PIP_CACHE_DIR}" ]; then 
         echo "Save pip cache to ${PIP_CACHE_BACKUP_DIR}"
-        $MKDIR ${TMP_DIR}/pip-cache
+        $MKDIR ${PIP_CACHE_BACKUP_DIR}
         $CP ${PIP_CACHE_DIR}/. ${PIP_CACHE_BACKUP_DIR}
     fi
 }
@@ -51,16 +52,12 @@ service_postinst ()
     install_python_virtualenv
     
     echo ${separator}
-    echo "Downgrade pip for homeassistant compatibility"
-    pip install --disable-pip-version-check pip==22.2.2
-
-    echo ${separator}
     echo "Install HACS into: ${CONFIG_DIR}/custom_components/hacs"
     mkdir -p "${CONFIG_DIR}/custom_components/hacs"
     tar -xzf ${SYNOPKG_PKGDEST}/share/hacs.tar.gz -C ${CONFIG_DIR}/custom_components/hacs
 
     echo ${separator}
-    echo "Install packages from wheels"
+    echo "Install packages from wheelhouse"
     pip install --disable-pip-version-check --no-deps --no-input --no-index ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
 
     echo ${separator}
@@ -74,8 +71,8 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UPGRADE" ]; then
         if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
-            # restore custom requirements file
             if [ -f ${TMP_DIR}/requirements-custom.txt ]; then
+                echo "Restore custom requirements file"
                 $CP ${TMP_DIR}/requirements-custom.txt ${SYNOPKG_PKGVAR}/requirements-custom.txt
             fi
         fi
@@ -84,8 +81,6 @@ service_postinst ()
             echo "Install custom packages from index"
             pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGVAR}/requirements-custom.txt
         fi
-    else
-        $MV ${SYNOPKG_PKGVAR}/requirements-custom.txt.new ${SYNOPKG_PKGVAR}/requirements-custom.txt
     fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then

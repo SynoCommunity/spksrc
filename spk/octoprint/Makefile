@@ -1,17 +1,17 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.9.2
-SPK_REV    = 11
+SPK_VERS   = 1.10.1
+SPK_REV    = 12
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
 PYTHON_PACKAGE = python311
-
-# Required for PyYAML
-DEPENDS += cross/libyaml
+SPK_DEPENDS = "python311>=3.11.5-8"
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-SPK_DEPENDS = "$(PYTHON_PACKAGE)>=3.11.4-7"
+# Required for PyYAML
+DEPENDS += cross/libyaml
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = The snappy web interface for your 3D printer.
@@ -21,7 +21,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.9.2 and Python dependency to 3.11."
+CHANGELOG    = "1. Update OctoPrint to v1.10.1.<br/>2. Bring back package for ARMv5."
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes

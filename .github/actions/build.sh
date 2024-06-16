@@ -66,16 +66,27 @@ do
     echo >build.log
 
     if [ "${GH_ARCH%%-*}" != "noarch" ]; then
-        echo "$ make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
-        make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
+            echo "$ make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
+            make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        else
+            echo "$ make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
+            make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        fi
     else
         if [ "${GH_ARCH}" = "noarch" ]; then
             TCVERSION=
         else
             TCVERSION=${GH_ARCH##*-}
         fi
-        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
-        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+        # noarch package must be first built then published
+        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}" >>build.log
+        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} |& tee >(tail -15 >>build.log)
+
+        if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
+            echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
+            make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+        fi
     fi
     result=$?
 
@@ -90,7 +101,10 @@ do
 
     if [ "$(echo ${PACKAGES_TO_KEEP} | grep -ow ${package})" = "" ]; then
         # free disk space (but not for packages to keep)
-        make -C ./spk/${package} clean
+        make -C ./spk/${package} clean |& tee >(tail -15 >>build.log)
+    else
+        # free disk space by removing source and staging directories (for packages to keep)
+        make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
     fi
 
     echo "::endgroup::"

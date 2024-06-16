@@ -1,12 +1,12 @@
 SPK_NAME = micro
-SPK_VERS = 2.0.10
-SPK_REV = 2
+SPK_VERS = 2.0.13
+SPK_REV = 1
 SPK_ICON = src/micro.png
 
 DEPENDS = cross/micro
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = a modern and intuitive terminal-based text editor.
+DESCRIPTION = A modern and intuitive terminal-based text editor.
 DISPLAY_NAME = micro
 STARTABLE = no
 

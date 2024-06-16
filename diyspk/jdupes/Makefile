@@ -1,5 +1,5 @@
 SPK_NAME = jdupes
-SPK_VERS = 1.26.1
+SPK_VERS = 1.27.3
 SPK_REV = 1
 SPK_ICON = src/jdupes.png
 
@@ -11,7 +11,6 @@ STARTABLE = no
 
 HOMEPAGE   = https://github.com/jbruchon/jdupes/
 LICENSE    = MIT
-HELP_URL   = https://github.com/jbruchon/jdupes/README
 
 SPK_COMMANDS = bin/jdupes
 

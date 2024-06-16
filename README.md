@@ -3,23 +3,20 @@ SynoCommunity is now on Discord!
 
 [![Discord](https://img.shields.io/discord/732558169863225384?color=7289DA&label=Discord&logo=Discord&logoColor=white&style=for-the-badge)](https://discord.gg/nnN9fgE7EF)
 
+# spksrc
+spksrc is a cross compilation framework intended to compile and package software for Synology NAS devices. Packages are made available via the [SynoCommunity repository].
+
+
 # DSM 7
 DSM 7 was released on June 29 2021 as Version 7.0.41890.
 
-## In SynoCommunity some packages are available for DSM 7 but some are not.
-* You find the status of the packages in the issue [#4524] **Meta: DSM7 package status**
-* If you are running DSM7, some packages that are not compatible may continue appear in the Package Center of your Disk Station.
-* PLEASE do not create issues saying that package `xy` cannot be installed on DSM 7. All packages not yet ported to DSM 7 will refuse the installation with a message about "package requires root privileges" (or "invalid file format", ...).
-* Please regard all DSM 7 packages as beta versions (the synocommunity package repository is not capable to declare packages as beta only for DSM 7).
+* The main issue we had with our reposity is fixed in [spkrepo](https://github.com/SynoCommunity/spkrepo/pull/112) and online since February 2024
+  - before the repository deliverd DSM 6 packages for Systems with DSM 7, when no DSM 7 package was available
+  - this gave errors like "invalid file format" (or "package requires root privileges")
+  - you still get this error when manually installing a DSM 6 package on DSM 7
+* You find the status of the former packages in the issue [#4524] **Meta: DSM7 package status**
+* New packages support DSM 7 from initial package version (and some require at least DSM 7).
 * **ATTENTION**: As reported, package configuration settings may be lost following the upgrade to DSM 7 and the execution of a Package repair. Make sure to backup your settings and configuration for your SynoCommunity packages before installation of DSM 7 to facilitate restoration if needed.
-* Packages of the following kind will need some time to make DSM 7 compatible
-  * Packages depending on MySQL database must be migrated to MariaDB 10
-  * Packages that use an Installation Wizard to configure a shared folder (all download related packages and others)
-  * Packages that integrate into DSM Webstation
-* As this is a community project where people contribue in their spare time, it may take awhile until packages are ported to DSM 7. (There are still packages here that are not ported from DSM 5 to DSM 6 yet).
-
-# spksrc
-spksrc is a cross compilation framework intended to compile and package software for Synology NAS devices. Packages are made available via the [SynoCommunity repository].
 
 
 ## Contributing
@@ -40,10 +37,10 @@ If you can't find an answer, or if you want to open a package request, read [CON
 cd spksrc # Go to the cloned repository's root folder.
 
 # If running on Linux:
-docker run -it -v $(pwd):/spksrc -w /spksrc ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc ghcr.io/synocommunity/spksrc /bin/bash
 
 # If running on macOS:
-docker run -it -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 ```
 5. From there, follow the instructions in the [Developers HOW TO].
 
@@ -137,7 +134,7 @@ $ lxc exec spksrc -- su --login root
 # exit
 ```
 
-#### (OPTIONAL) LXC: Shared `spksrc` user 
+#### (OPTIONAL) LXC: Shared `spksrc` user
 You can create a shared user between your Debian/Ubuntu host and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already created a user `spksrc` with uid 1001 in your Debian/Ubuntu host environment and that you which to share its `/home` userspace.
 1. Create a mapping rule between the hosts and the LXC image:
 ```bash

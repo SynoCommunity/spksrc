@@ -1,11 +1,11 @@
 SPK_NAME = synocli-devel
-SPK_VERS = 1.1
-SPK_REV = 2
+SPK_VERS = 1.3
+SPK_REV = 4
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Update LLVM to version 16.0.6<br/>2. Update gdb to version 13.2<br/>3. Update binutils to version 2.40<br/>4. Include libtree 3.3.1 as ldd replacement<br/>5. Include strace 6.4"
+CHANGELOG = "1. Fix autoconf to use installed m4 command.<br/>2. Update autoconf to v2.72.<br/>3. Update binutils to v2.42.<br/>4. Update gdb to v14.2.<br/>5. Update strace to v6.9."
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.4
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.5
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -14,27 +14,28 @@ LICENSE  = Each tool is licensed under it\'s respective license.
 
 SPK_DEPENDS = "Perl"
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-
 OPTIONAL_DEPENDS = cross/llvm
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 DEPENDS += cross/llvm
 endif
 
-# build pkg-config before autoconf otherwise
-# glib fails on libiconv on some platforms
-# (to investigate ...)
-DEPENDS += cross/pkg-config
-DEPENDS += cross/autoconf
-DEPENDS += cross/automake
+# build binutils bofore the following
+# otherwise it fails to build for ARMv5
 DEPENDS += cross/binutils
+DEPENDS += cross/pkg-config
 DEPENDS += cross/gdb
 DEPENDS += cross/make
 DEPENDS += cross/libtree
 DEPENDS += cross/strace
+
+# build autotools last
+# otherwise glib and gdb fail on libiconv on some platforms
+# (to investigate ...)
+DEPENDS += cross/autoconf
+DEPENDS += cross/automake
 
 ##
 ## autoconf
@@ -90,7 +91,7 @@ SPK_COMMANDS += bin/strip
 ##
 ## gdb
 ##
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 OPTIONAL_DESC += ", gdb 7.12.1"
 else
 OPTIONAL_DESC += ", gdb 13.2"
@@ -99,16 +100,14 @@ SPK_COMMANDS += bin/gcore
 SPK_COMMANDS += bin/gdb
 SPK_COMMANDS += bin/gdb-add-index
 SPK_COMMANDS += bin/gdbserver
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 SPK_COMMANDS += bin/run
 endif
-
-include ../../mk/spksrc.spk.mk
 
 ##
 ## LLVM
 ##
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
 OPTIONAL_DESC += ", LLVM 16.0.6"
 SPK_COMMANDS += bin/clang-16
@@ -169,3 +168,6 @@ SPK_COMMANDS += bin/libtree
 ##
 SPK_COMMANDS += bin/strace
 SPK_COMMANDS += bin/strace-log-merge
+
+
+include ../../mk/spksrc.spk.mk

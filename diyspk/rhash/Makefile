@@ -1,8 +1,8 @@
 SPK_NAME = rhash
-SPK_VERS = 1.4.3
-SPK_REV = 2
+SPK_VERS = 1.4.4
+SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/rhash
 
 MAINTAINER = Fredrike
 DESCRIPTION = "RHash is a console utility for calculation and verification of magnet links and a wide range of hash sums like CRC32, MD4, MD5, SHA1, SHA256, SHA512, SHA3, AICH, ED2K, Tiger, DC++ TTH, BitTorrent BTIH, GOST R 34.11-94, RIPEMD-160, HAS-160, EDON-R, Whirlpool and Snefru."
@@ -11,8 +11,8 @@ STARTABLE = no
 
 POST_STRIP_TARGET = rhash_extra_install
 
-HOMEPAGE   = http://rhash.sourceforge.net/
-LICENSE    = MIT
+HOMEPAGE = http://rhash.sourceforge.net/
+LICENSE = MIT
 
 SPK_COMMANDS  = bin/rhash
 SPK_COMMANDS += bin/ed2k-link

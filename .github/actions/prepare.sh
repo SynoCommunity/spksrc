@@ -19,7 +19,7 @@ DEFAULT_TC=$(grep DEFAULT_TC local.mk | cut -f2 -d= | xargs)
 
 # filter for changes made in the spk directories and take unique package name (without spk folder)
 SPK_TO_BUILD+=" "
-SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(spk)/\K[^\/]*" | sort -u | tr '\n' ' ')
+SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "^spk/\K[^\/]*" | sort -u | tr '\n' ' ')
 
 # filter for changes made in the cross and native directories and take unique package name (including cross or native folder)
 DEPENDENT_PACKAGES=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(cross|native)/[^\/]*" | sort -u | tr '\n' ' ')
@@ -30,7 +30,7 @@ echo "Building dependency list..."
 DEPENDENCY_LIST=
 for package in $(find spk/ -maxdepth 1 -type d | cut -c 5- | sort)
 do
-    DEPENDENCY_LIST+=$(make -s -C spk/${package} dependency-list)$'\n'
+    DEPENDENCY_LIST+=$(DEPENDENCY_WALK=1 make -s -C spk/${package} dependency-list 2> /dev/null)$'\n'
 done
 
 # search for dependent spk packages

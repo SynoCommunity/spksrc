@@ -3,4 +3,4 @@ bin:bin/getfattr
 bin:bin/setfattr
 lnk:lib/libattr.so
 lnk:lib/libattr.so.1
-lib:lib/libattr.so.1.1.0
+lib:lib/libattr.so.1.1.2502

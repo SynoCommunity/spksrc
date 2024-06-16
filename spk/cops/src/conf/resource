@@ -1,46 +1,55 @@
 {
-  "webservice": {
-    "services": [{
-      "service": "cops",
-      "display_name": "COPS",
-      "type": "apache_php",
-      "root": "cops",
-      "backend": 2,
-      "php": {
-        "profile_name": "cops",
-        "profile_desc": "PHP profile used by cops",
-        "backend": 6,
-        "extensions": [
-          "gd",
-          "pdo_sqlite",
-          "sqlite3",
-          "intl"
-        ],
-        "user": "sc-cops",
-        "group": "http"
-      }
-    }],
-    "portals": [
-      {
-        "service": "cops",
-        "type": "alias",
-        "name": "COPS",
-        "alias": "cops",
-        "app": "com.synocommunity.packages.cops"
-      }
-    ],
-    "migrate": {
-      "root": [{
-        "old": "cops",
-        "new": "cops"
-      }]
-    },
-    "pkg_dir_prepare": [{
-      "source": "/var/packages/cops/target/share/cops",
-      "target": "cops",
-      "mode": "0755",
-      "user": "sc-cops",
-      "group": "http"
-    }]
-  }
+	"data-share": {
+		"shares": [{
+			"name": "{{wizard_calibre_share}}",
+			"once": true,
+			"permission": {
+				"rw": ["sc-cops"]
+			}
+		}]
+	},
+	"webservice": {
+		"migrate": {
+			"root": [{
+				"new": "cops",
+				"old": "cops"
+			}]
+		},
+		"pkg_dir_prepare": [{
+			"group": "http",
+			"mode": "0755",
+			"source": "/var/packages/cops/target/share/cops",
+			"target": "cops",
+			"user": "sc-cops"
+		}],
+		"portals": [{
+			"alias": "cops",
+			"app": "com.synocommunity.packages.cops",
+			"name": "COPS",
+			"service": "cops",
+			"type": "alias"
+		}],
+		"services": [{
+			"backend": 2,
+			"display_name": "COPS",
+			"icon": "app/images/cops-{0}.png",
+			"php": {
+				"backend": 8,
+				"extensions": [
+					"gd",
+					"intl",
+					"pdo_sqlite",
+					"sqlite3",
+					"zlib"
+				],
+				"group": "http",
+				"profile_desc": "PHP profile used by cops",
+				"profile_name": "cops",
+				"user": "sc-cops"
+			},
+			"root": "cops",
+			"service": "cops",
+			"type": "apache_php"
+		}]
+	}
 }

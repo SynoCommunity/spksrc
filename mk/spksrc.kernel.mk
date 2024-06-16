@@ -1,5 +1,10 @@
+
+# Constants
+default: all
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.common-rules.mk
 include ../../mk/spksrc.directories.mk
 
 # Common kernel variables
@@ -59,13 +64,13 @@ patch: extract
 include ../../mk/spksrc.patch.mk
 
 kernel_configure: patch
-include ../../mk/spksrc.kernel-configure.mk
+include ../../mk/spksrc.cross-kernel-configure.mk
 
 kernel_module: kernel_configure
-include ../../mk/spksrc.kernel-module.mk
+include ../../mk/spksrc.cross-kernel-module.mk
 
 install: kernel_module
-include ../../mk/spksrc.kernel-headers.mk
+include ../../mk/spksrc.cross-kernel-headers.mk
 
 install: kernel_headers
 include ../../mk/spksrc.install.mk
@@ -79,8 +84,5 @@ include ../../mk/spksrc.generate-digests.mk
 .PHONY: kernel_post_extract_target
 kernel_post_extract_target:
 	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/$(PKG_DIR)
-
-clean:
-	rm -fr work work-*
 
 all: install plist
