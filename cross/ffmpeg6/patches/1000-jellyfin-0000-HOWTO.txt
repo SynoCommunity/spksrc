@@ -10,8 +10,12 @@ $ cat jellyfin-ffmpeg/VERSION
 
 Modify patches to be in -p0 mode:
 cd jellyfin-ffmpeg/debian/patches
-$ sed -i -e 's?+++ jellyfin-ffmpeg/?+++ ?1' \
-         -e 's?--- jellyfin-ffmpeg.orig/?--- ?1' \
+$ sed -i -e 's?--- jellyfin-ffmpeg.orig/?--- ?1' \
+         -e 's?+++ jellyfin-ffmpeg/?+++ ?1' \
+         -e 's?--- a/?--- ?1' \
+         -e 's?+++ b/?+++ ?1' \
+         -e 's?--- FFmpeg.orig/?--- ?1' \
+         -e 's?+++ FFmpeg/?+++ ?1' \
          *.patch
 
 Rename the patches:

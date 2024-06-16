@@ -4,10 +4,10 @@ The 6.0.1's VT has a broken implementation and handles HEVC in an inefficient wa
 This backport brings full range color and HDR passthrough for VideoToolbox
 
 ---
-diff --git a/tests/fate/hevc.mak b/tests/fate/hevc.mak
+diff --git tests/fate/hevc.mak tests/fate/hevc.mak
 index 20c2e5b..c5df8ea 100644
---- a/tests/fate/hevc.mak
-+++ b/tests/fate/hevc.mak
+--- tests/fate/hevc.mak
++++ tests/fate/hevc.mak
 @@ -222,7 +222,7 @@ FATE_HEVC-$(call ALLYES, HEVC_DEMUXER MOV_DEMUXER HEVC_PARSER HEVC_MP4TOANNEXB_B
  fate-hevc-bsf-mp4toannexb: tests/data/hevc-mp4.mov
  fate-hevc-bsf-mp4toannexb: CMD = md5 -i $(TARGET_PATH)/tests/data/hevc-mp4.mov -c:v copy -fflags +bitexact -f hevc
@@ -23,9 +23,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/libavutil/hwcontext_videotoolbox.h b/libavutil/hwcontext_videotoolbox.h
---- a/libavutil/hwcontext_videotoolbox.h	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
-+++ b/libavutil/hwcontext_videotoolbox.h	(date 1708790792432)
+diff --git libavutil/hwcontext_videotoolbox.h libavutil/hwcontext_videotoolbox.h
+--- libavutil/hwcontext_videotoolbox.h	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
++++ libavutil/hwcontext_videotoolbox.h	(date 1708790792432)
 @@ -39,9 +39,12 @@
   * depending on application usage, so it is preferable to let CoreVideo manage
   * the pool using the default implementation.
@@ -46,9 +46,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/libavutil/hwcontext_videotoolbox.c b/libavutil/hwcontext_videotoolbox.c
---- a/libavutil/hwcontext_videotoolbox.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
-+++ b/libavutil/hwcontext_videotoolbox.c	(date 1708790750454)
+diff --git libavutil/hwcontext_videotoolbox.c libavutil/hwcontext_videotoolbox.c
+--- libavutil/hwcontext_videotoolbox.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
++++ libavutil/hwcontext_videotoolbox.c	(date 1708790750454)
 @@ -43,6 +43,7 @@
      enum AVPixelFormat pix_fmt;
  } cv_pix_fmts[] = {
@@ -143,9 +143,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/libavcodec/videotoolboxenc.c b/libavcodec/videotoolboxenc.c
---- a/libavcodec/videotoolboxenc.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
-+++ b/libavcodec/videotoolboxenc.c	(date 1708796449800)
+diff --git libavcodec/videotoolboxenc.c libavcodec/videotoolboxenc.c
+--- libavcodec/videotoolboxenc.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
++++ libavcodec/videotoolboxenc.c	(date 1708796449800)
 @@ -37,6 +37,7 @@
  #include "encode.h"
  #include "h264.h"
@@ -1309,9 +1309,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/libavcodec/hevc_parser.c b/libavcodec/hevc_parser.c
---- a/libavcodec/hevc_parser.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
-+++ b/libavcodec/hevc_parser.c	(date 1708801757137)
+diff --git libavcodec/hevc_parser.c libavcodec/hevc_parser.c
+--- libavcodec/hevc_parser.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
++++ libavcodec/hevc_parser.c	(date 1708801757137)
 @@ -278,6 +278,8 @@
              (nut >= 41 && nut <= 44) || (nut >= 48 && nut <= 55)) {
              if (pc->frame_start_found) {
@@ -1335,9 +1335,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/libavcodec/videotoolbox.c b/libavcodec/videotoolbox.c
---- a/libavcodec/videotoolbox.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
-+++ b/libavcodec/videotoolbox.c	(date 1708803163338)
+diff --git libavcodec/videotoolbox.c libavcodec/videotoolbox.c
+--- libavcodec/videotoolbox.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
++++ libavcodec/videotoolbox.c	(date 1708803163338)
 @@ -77,8 +77,8 @@
      void *tmp;
 

@@ -5,9 +5,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/configure b/configure
---- a/configure	(revision 6c90fcd9e606c1222271f5f867f761abeafbe51e)
-+++ b/configure	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
+diff --git configure configure
+--- configure	(revision 6c90fcd9e606c1222271f5f867f761abeafbe51e)
++++ configure	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
 @@ -3833,6 +3833,7 @@
  zoompan_filter_deps="swscale"
  zscale_filter_deps="libzimg const_nan"
@@ -21,9 +21,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/doc/filters.texi b/doc/filters.texi
---- a/doc/filters.texi	(revision 6c90fcd9e606c1222271f5f867f761abeafbe51e)
-+++ b/doc/filters.texi	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
+diff --git doc/filters.texi doc/filters.texi
+--- doc/filters.texi	(revision 6c90fcd9e606c1222271f5f867f761abeafbe51e)
++++ doc/filters.texi	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
 @@ -21184,6 +21184,27 @@
  @end example
  @end itemize
@@ -57,9 +57,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/libavfilter/Makefile b/libavfilter/Makefile
---- a/libavfilter/Makefile	(revision 393b03d3db8a085d3b56631b334d474da390cab1)
-+++ b/libavfilter/Makefile	(date 1708782013235)
+diff --git libavfilter/Makefile libavfilter/Makefile
+--- libavfilter/Makefile	(revision 393b03d3db8a085d3b56631b334d474da390cab1)
++++ libavfilter/Makefile	(date 1708782013235)
 @@ -452,6 +452,7 @@
  OBJS-$(CONFIG_SCALE_OPENCL_FILTER)           += vf_scale_opencl.o opencl.o opencl/scale.o scale_eval.o
  OBJS-$(CONFIG_SCALE_QSV_FILTER)              += vf_vpp_qsv.o
@@ -73,9 +73,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
---- a/libavfilter/allfilters.c	(revision 393b03d3db8a085d3b56631b334d474da390cab1)
-+++ b/libavfilter/allfilters.c	(date 1708782072996)
+diff --git libavfilter/allfilters.c libavfilter/allfilters.c
+--- libavfilter/allfilters.c	(revision 393b03d3db8a085d3b56631b334d474da390cab1)
++++ libavfilter/allfilters.c	(date 1708782072996)
 @@ -424,6 +424,7 @@
  extern const AVFilter ff_vf_scale_opencl;
  extern const AVFilter ff_vf_scale_qsv;
@@ -86,10 +86,10 @@ diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
  extern const AVFilter ff_vf_scale2ref;
 Index: libavfilter/vf_scale_vt.c
 ===================================================================
-diff --git a/libavfilter/vf_scale_vt.c b/libavfilter/vf_scale_vt.c
+diff --git libavfilter/vf_scale_vt.c libavfilter/vf_scale_vt.c
 new file mode 100644
 --- /dev/null	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
-+++ b/libavfilter/vf_scale_vt.c	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
++++ libavfilter/vf_scale_vt.c	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
 @@ -0,0 +1,293 @@
 +/*
 + * Copyright (c) 2023 Zhao Zhili <zhilizhao@tencent.com>

@@ -120,10 +120,10 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
  create mode 100644 libavfilter/metal/vf_overlay_videotoolbox.metal
  create mode 100644 libavfilter/vf_overlay_videotoolbox.m
 
-diff --git a/configure b/configure
+diff --git configure configure
 index 23066efa32..a7c349d126 100755
---- a/configure
-+++ b/configure
+--- configure
++++ configure
 @@ -3720,6 +3720,7 @@ overlay_qsv_filter_select="qsvvpp"
  overlay_vaapi_filter_deps="vaapi VAProcPipelineCaps_blend_flags"
  overlay_vulkan_filter_deps="vulkan spirv_compiler"
@@ -132,10 +132,10 @@ index 23066efa32..a7c349d126 100755
  owdenoise_filter_deps="gpl"
  pad_opencl_filter_deps="opencl"
  pan_filter_deps="swresample"
-diff --git a/doc/filters.texi b/doc/filters.texi
+diff --git doc/filters.texi doc/filters.texi
 index e0436a5755..bfb77562cb 100644
---- a/doc/filters.texi
-+++ b/doc/filters.texi
+--- doc/filters.texi
++++ doc/filters.texi
 @@ -19033,6 +19033,58 @@ See @ref{framesync}.
 
  This filter also supports the @ref{framesync} options.
@@ -195,10 +195,10 @@ index e0436a5755..bfb77562cb 100644
  @section owdenoise
 
  Apply Overcomplete Wavelet denoiser.
-diff --git a/libavfilter/Makefile b/libavfilter/Makefile
+diff --git libavfilter/Makefile libavfilter/Makefile
 index f6c1d641d6..ea1389ab57 100644
---- a/libavfilter/Makefile
-+++ b/libavfilter/Makefile
+--- libavfilter/Makefile
++++ libavfilter/Makefile
 @@ -401,6 +401,9 @@ OBJS-$(CONFIG_OVERLAY_OPENCL_FILTER)         += vf_overlay_opencl.o opencl.o \
  OBJS-$(CONFIG_OVERLAY_QSV_FILTER)            += vf_overlay_qsv.o framesync.o
  OBJS-$(CONFIG_OVERLAY_VAAPI_FILTER)          += vf_overlay_vaapi.o framesync.o vaapi_vpp.o
@@ -209,10 +209,10 @@ index f6c1d641d6..ea1389ab57 100644
  OBJS-$(CONFIG_OVERLAY_RKRGA_FILTER)          += vf_overlay_rkrga.o framesync.o
  OBJS-$(CONFIG_OWDENOISE_FILTER)              += vf_owdenoise.o
  OBJS-$(CONFIG_PAD_FILTER)                    += vf_pad.o
-diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
+diff --git libavfilter/allfilters.c libavfilter/allfilters.c
 index 149bf50997..ec9d975ecb 100644
---- a/libavfilter/allfilters.c
-+++ b/libavfilter/allfilters.c
+--- libavfilter/allfilters.c
++++ libavfilter/allfilters.c
 @@ -378,6 +378,7 @@ extern const AVFilter ff_vf_overlay_vaapi;
  extern const AVFilter ff_vf_overlay_vulkan;
  extern const AVFilter ff_vf_overlay_cuda;
@@ -221,20 +221,20 @@ index 149bf50997..ec9d975ecb 100644
  extern const AVFilter ff_vf_owdenoise;
  extern const AVFilter ff_vf_pad;
  extern const AVFilter ff_vf_pad_opencl;
-diff --git a/libavfilter/metal/utils.h b/libavfilter/metal/utils.h
+diff --git libavfilter/metal/utils.h libavfilter/metal/utils.h
 index 7350d42a35..d79c79751c 100644
---- a/libavfilter/metal/utils.h
-+++ b/libavfilter/metal/utils.h
+--- libavfilter/metal/utils.h
++++ libavfilter/metal/utils.h
 @@ -55,5 +55,4 @@ CVMetalTextureRef ff_metal_texture_from_pixbuf(void *avclass,
                                                 int plane,
                                                 MTLPixelFormat format)
                                                 API_AVAILABLE(macos(10.11), ios(8.0));
 -
  #endif /* AVFILTER_METAL_UTILS_H */
-diff --git a/libavfilter/metal/utils.m b/libavfilter/metal/utils.m
+diff --git libavfilter/metal/utils.m libavfilter/metal/utils.m
 index f365d3ceea..db5c5f6f10 100644
---- a/libavfilter/metal/utils.m
-+++ b/libavfilter/metal/utils.m
+--- libavfilter/metal/utils.m
++++ libavfilter/metal/utils.m
 @@ -55,6 +55,9 @@ CVMetalTextureRef ff_metal_texture_from_pixbuf(void *ctx,
  {
      CVMetalTextureRef tex = NULL;
@@ -256,11 +256,11 @@ index f365d3ceea..db5c5f6f10 100644
          plane,
          &tex
      );
-diff --git a/libavfilter/metal/vf_overlay_videotoolbox.metal b/libavfilter/metal/vf_overlay_videotoolbox.metal
+diff --git libavfilter/metal/vf_overlay_videotoolbox.metal libavfilter/metal/vf_overlay_videotoolbox.metal
 new file mode 100644
 index 0000000000..936e57e03e
 --- /dev/null
-+++ b/libavfilter/metal/vf_overlay_videotoolbox.metal
++++ libavfilter/metal/vf_overlay_videotoolbox.metal
 @@ -0,0 +1,58 @@
 +/*
 + * Copyright (C) 2024 Gnattu OC <gnattuoc@me.com>
@@ -325,10 +325,10 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
-diff --git a/libavfilter/vf_overlay_videotoolbox.m b/libavfilter/vf_overlay_videotoolbox.m
+diff --git libavfilter/vf_overlay_videotoolbox.m libavfilter/vf_overlay_videotoolbox.m
 new file mode 100644
 --- /dev/null	(revision 913e5ef1730481306c9607c554aea3043ea0ecd4)
-+++ b/libavfilter/vf_overlay_videotoolbox.m	(revision 913e5ef1730481306c9607c554aea3043ea0ecd4)
++++ libavfilter/vf_overlay_videotoolbox.m	(revision 913e5ef1730481306c9607c554aea3043ea0ecd4)
 @@ -0,0 +1,609 @@
 +/*
 + * Copyright (C) 2024 Gnattu OC <gnattuoc@me.com>

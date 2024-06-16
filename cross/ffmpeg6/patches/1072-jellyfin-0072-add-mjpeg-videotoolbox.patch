@@ -2,8 +2,8 @@ Subject: [PATCH] lavc/videotoolboxenc: add MJPEG support
 ---
 Index: FFmpeg/configure
 ===================================================================
---- FFmpeg.orig/configure
-+++ FFmpeg/configure
+--- configure
++++ configure
 @@ -3347,6 +3347,8 @@ hevc_videotoolbox_encoder_deps="pthreads
  hevc_videotoolbox_encoder_select="atsc_a53 videotoolbox_encoder"
  prores_videotoolbox_encoder_deps="pthreads"
@@ -15,8 +15,8 @@ Index: FFmpeg/configure
  libaom_av1_encoder_select="extract_extradata_bsf"
 Index: FFmpeg/libavcodec/Makefile
 ===================================================================
---- FFmpeg.orig/libavcodec/Makefile
-+++ FFmpeg/libavcodec/Makefile
+--- libavcodec/Makefile
++++ libavcodec/Makefile
 @@ -504,6 +504,7 @@ OBJS-$(CONFIG_MJPEG_CUVID_DECODER)     +
  OBJS-$(CONFIG_MJPEG_QSV_ENCODER)       += qsvenc_jpeg.o
  OBJS-$(CONFIG_MJPEG_RKMPP_ENCODER)     += rkmppenc.o
@@ -27,8 +27,8 @@ Index: FFmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_MMVIDEO_DECODER)         += mmvideo.o
 Index: FFmpeg/libavcodec/allcodecs.c
 ===================================================================
---- FFmpeg.orig/libavcodec/allcodecs.c
-+++ FFmpeg/libavcodec/allcodecs.c
+--- libavcodec/allcodecs.c
++++ libavcodec/allcodecs.c
 @@ -883,6 +883,7 @@ extern const FFCodec ff_mpeg4_mediacodec
  extern const FFCodec ff_mpeg4_omx_encoder;
  extern const FFCodec ff_mpeg4_v4l2m2m_encoder;
@@ -39,8 +39,8 @@ Index: FFmpeg/libavcodec/allcodecs.c
  extern const FFCodec ff_vp8_mediacodec_decoder;
 Index: FFmpeg/libavcodec/videotoolboxenc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/videotoolboxenc.c
-+++ FFmpeg/libavcodec/videotoolboxenc.c
+--- libavcodec/videotoolboxenc.c
++++ libavcodec/videotoolboxenc.c
 @@ -547,6 +547,7 @@ static CMVideoCodecType get_cm_codec_type(AVCodecContext *avctx,
                      else
                          return MKBETAG('a','p','c','n'); // kCMVideoCodecType_AppleProRes422

@@ -6,8 +6,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/libavcodec/libopusenc.c b/libavcodec/libopusenc.c
---- a/libavcodec/libopusenc.c	(revision 38aaefefec762dd185b631298752d489dcf084fe)
-+++ b/libavcodec/libopusenc.c	(revision 104006c9a93f3cd72b21b243884ea91449cbdd10)
+--- libavcodec/libopusenc.c	(revision 38aaefefec762dd185b631298752d489dcf084fe)
++++ libavcodec/libopusenc.c	(revision 104006c9a93f3cd72b21b243884ea91449cbdd10)
 @@ -196,6 +196,10 @@
          av_log(avctx, AV_LOG_WARNING,
                 "No channel layout specified. Opus encoder will use Vorbis "

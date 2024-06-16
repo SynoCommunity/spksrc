@@ -1,7 +1,7 @@
 diff --git a/configure b/configure
 index 3cd3bdfb44..7bf621590e 100755
---- a/configure
-+++ b/configure
+--- configure
++++ configure
 @@ -3751,6 +3751,7 @@ tonemap_opencl_filter_deps="opencl const_nan"
  transpose_opencl_filter_deps="opencl"
  transpose_vaapi_filter_deps="vaapi VAProcPipelineCaps_rotation_flags"
@@ -12,8 +12,8 @@ index 3cd3bdfb44..7bf621590e 100755
  vaguedenoiser_filter_deps="gpl"
 diff --git a/libavfilter/Makefile b/libavfilter/Makefile
 index b3d3d981dd..f4ef8cd062 100644
---- a/libavfilter/Makefile
-+++ b/libavfilter/Makefile
+--- libavfilter/Makefile
++++ libavfilter/Makefile
 @@ -516,6 +516,7 @@ OBJS-$(CONFIG_TRANSPOSE_NPP_FILTER)          += vf_transpose_npp.o
  OBJS-$(CONFIG_TRANSPOSE_OPENCL_FILTER)       += vf_transpose_opencl.o opencl.o opencl/transpose.o
  OBJS-$(CONFIG_TRANSPOSE_VAAPI_FILTER)        += vf_transpose_vaapi.o vaapi_vpp.o
@@ -24,8 +24,8 @@ index b3d3d981dd..f4ef8cd062 100644
  OBJS-$(CONFIG_UNSHARP_FILTER)                += vf_unsharp.o
 diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
 index d7db46c2af..4d95949027 100644
---- a/libavfilter/allfilters.c
-+++ b/libavfilter/allfilters.c
+--- libavfilter/allfilters.c
++++ libavfilter/allfilters.c
 @@ -486,6 +486,7 @@ extern const AVFilter ff_vf_transpose_npp;
  extern const AVFilter ff_vf_transpose_opencl;
  extern const AVFilter ff_vf_transpose_vaapi;
@@ -38,7 +38,7 @@ diff --git a/libavfilter/vf_transpose_vt.m b/libavfilter/vf_transpose_vt.m
 new file mode 100644
 index 0000000000..bc3b727a10
 --- /dev/null
-+++ b/libavfilter/vf_transpose_vt.m
++++ libavfilter/vf_transpose_vt.m
 @@ -0,0 +1,265 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>

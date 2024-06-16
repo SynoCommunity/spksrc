@@ -6,8 +6,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/configure b/configure
---- a/configure	(revision 2e3649a10ff797e360eb9fd5d389dfa6611dea59)
-+++ b/configure	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
+--- configure	(revision 2e3649a10ff797e360eb9fd5d389dfa6611dea59)
++++ configure	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
 @@ -3748,6 +3748,7 @@
  tonemap_filter_deps="const_nan"
  tonemap_vaapi_filter_deps="vaapi VAProcFilterParameterBufferHDRToneMapping"
@@ -22,8 +22,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/libavfilter/Makefile b/libavfilter/Makefile
---- a/libavfilter/Makefile	(revision 2e3649a10ff797e360eb9fd5d389dfa6611dea59)
-+++ b/libavfilter/Makefile	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
+--- libavfilter/Makefile	(revision 2e3649a10ff797e360eb9fd5d389dfa6611dea59)
++++ libavfilter/Makefile	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
 @@ -510,6 +510,9 @@
  OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.ptx.o \
                                                  cuda/host_util.o
@@ -41,8 +41,8 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
---- a/libavfilter/allfilters.c	(revision 2e3649a10ff797e360eb9fd5d389dfa6611dea59)
-+++ b/libavfilter/allfilters.c	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
+--- libavfilter/allfilters.c	(revision 2e3649a10ff797e360eb9fd5d389dfa6611dea59)
++++ libavfilter/allfilters.c	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
 @@ -480,6 +480,7 @@
  extern const AVFilter ff_vf_tonemap_cuda;
  extern const AVFilter ff_vf_tonemap_opencl;
@@ -59,7 +59,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 diff --git a/libavfilter/metal/vf_tonemap_videotoolbox.metal b/libavfilter/metal/vf_tonemap_videotoolbox.metal
 new file mode 100644
 --- /dev/null	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
-+++ b/libavfilter/metal/vf_tonemap_videotoolbox.metal	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
++++ libavfilter/metal/vf_tonemap_videotoolbox.metal	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
 @@ -0,0 +1,688 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
@@ -757,7 +757,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 diff --git a/libavfilter/vf_tonemap_videotoolbox.m b/libavfilter/vf_tonemap_videotoolbox.m
 new file mode 100644
 --- /dev/null	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
-+++ b/libavfilter/vf_tonemap_videotoolbox.m	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
++++ libavfilter/vf_tonemap_videotoolbox.m	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
 @@ -0,0 +1,1106 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
