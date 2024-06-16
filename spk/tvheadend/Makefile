@@ -1,7 +1,7 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = f32c7c5
-SPK_GIT_DATE = 20230408
+SPK_GIT_HASH = 366e562
+SPK_GIT_DATE = 20240615
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
 SPK_REV = 37
@@ -48,7 +48,7 @@ SERVICE_PORT_TITLE = Tvheadend(HTTP)
 ADMIN_PORT = ${SERVICE_PORT}
 
 # Reuse ffmpeg libraries
-export FFMPEG_VERSION = 5
+export FFMPEG_VERSION = 6
 export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg$(subst 4,,$(FFMPEG_VERSION))/target)
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
