@@ -6,7 +6,7 @@ $ git clone https://github.com/jellyfin/jellyfin-ffmpeg.git
 
 Check that current ffmpeg matches jellyfin version
 $ cat jellyfin-ffmpeg/VERSION 
-6.0
+6.0.1
 
 Modify patches to be in -p0 mode:
 cd jellyfin-ffmpeg/debian/patches

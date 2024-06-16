@@ -2,7 +2,19 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
 ===================================================================
 --- libavfilter/vf_overlay_vaapi.c
 +++ libavfilter/vf_overlay_vaapi.c
-@@ -312,8 +312,10 @@ static int overlay_vaapi_config_input_ov
+@@ -236,8 +236,9 @@ static int overlay_vaapi_blend(FFFrameSy
+         blend_state.global_alpha  = ctx->blend_alpha;
+         params[1].blend_state = &blend_state;
+ 
+-        params[1].surface       = (VASurfaceID)(uintptr_t)input_overlay->data[3];
+-        params[1].output_region = &overlay_region;
++        params[1].surface        = (VASurfaceID)(uintptr_t)input_overlay->data[3];
++        params[1].surface_region = NULL;
++        params[1].output_region  = &overlay_region;
+     }
+ 
+     err = ff_vaapi_vpp_render_pictures(avctx, params, input_overlay ? 2 : 1, output);
+@@ -312,8 +313,10 @@ static int overlay_vaapi_config_input_ov
          ctx->blend_alpha  = ctx->alpha;
      }
  
