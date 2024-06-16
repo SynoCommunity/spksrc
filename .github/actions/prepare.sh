@@ -120,10 +120,6 @@ else
     for package in ${packages}
     do
         DOWNLOAD_LIST+=$(echo "${DEPENDENCY_LIST}" | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
-        for version in ${DEFAULT_TC}
-        do
-           DOWNLOAD_LIST+=$(make -C spk/${package} TCVERSION=${version} dependency-kernel-list | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
-        done
     done
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
