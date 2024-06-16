@@ -1,17 +1,16 @@
 PKG_NAME = pngquant
-PKG_VERS = 2.17.0
+PKG_VERS = 2.18.0
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
-PKG_DIST_SITE = http://sources.buildroot.net/pngquant
-# Many connection timed out using official source
-#PKG_DIST_SITE = https://pngquant.org
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/kornelski/pngquant/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpng cross/libimagequant
 
 HOMEPAGE = https://pngquant.org/
 COMMENT  = pngquant is a command-line utility and a library for lossy compression of PNG images.
-LICENSE  = GPL
+LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -O3
