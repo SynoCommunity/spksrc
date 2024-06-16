@@ -10,6 +10,7 @@
 		"curl",
 		"gd",
 		"gmp",
+		"iconv",
 		"imagick",
 		"imap",
 		"intl",

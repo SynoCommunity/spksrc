@@ -4,6 +4,7 @@ KERNEL_BUILD = 25556
 KERNEL_DIST = linux-2.6.32
 KERNEL_CONFIG = synoconfigs/ppcQorIQ
 KERNEL_BASE_ARCH = powerpc
+KERNEL_URL_VERSION = 6.2
 PRE_COMPILE_TARGET = kernel_ppc_premake
 
 include ../../mk/spksrc.kernel.mk
