@@ -9,14 +9,14 @@ PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
-DEPENDS  = cross/openssl3 cross/gnutls
-DEPENDS += cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
-DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps
-
 # WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng)
 # with prebuilt ffmpeg this is not a problem
 # without prebuilt ffmpeg the "DEPENDS += cross/ffmpeg*" must be defined below
-DEPENDS += cross/pngquant
+DEPENDS  = cross/pngquant
+
+DEPENDS += cross/openssl3 cross/gnutls
+DEPENDS += cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
+DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps
 
 DEPENDS += cross/curl
 # curl build needs additional configuration for gnutls and libssh2
