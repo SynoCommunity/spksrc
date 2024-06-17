@@ -9,6 +9,9 @@ HOMEPAGE = https://github.com/vasi/$(SPK_NAME)
 LICENSE = 2-Clause BSD
 MAINTAINER = dotysan
 
+# blindly disabling hi3535-6.2.4 build that fails
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
+
 DEPENDS = cross/$(SPK_NAME)
 
 STARTABLE = no
