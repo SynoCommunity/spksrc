@@ -1,4 +1,4 @@
-Fix undefined reference to `rpl_malloc' when cross-compiling.
+Fix undefined reference to 'rpl_malloc' when cross-compiling.
 
 diff -wpurN pixz-1.0.7/configure.ac pixz-1.0.7.patched/configure.ac
 --- pixz-1.0.7/configure.ac	2024-04-17 12:41:01.040203638 -0700
