@@ -123,8 +123,8 @@ CHANGELOG += "12. Update pcre2 to v10.44.<br/>"
 CHANGELOG += "13. Update ripgrep to v14.1.1.<br/>"
 CHANGELOG += "14. Update tree to v2.1.3.<br/>"
 CHANGELOG += "15. Update zstd to v1.5.6.<br/>"
-CHANGELOG += "16. Update openssl to v3.1.7."
-
+CHANGELOG += "16. Update openssl to v3.1.7.<br/>"
+CHANGELOG += "17. Add pixz."
 
 SERVICE_SETUP = src/service-setup.sh
 
