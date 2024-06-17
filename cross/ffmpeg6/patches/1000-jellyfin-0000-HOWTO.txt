@@ -1,4 +1,4 @@
-Projet page: https://github.com/jellyfin/jellyfin-ffmpeg
+Project page: https://github.com/jellyfin/jellyfin-ffmpeg
 Patches: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
 
 Extract jellyfin-ffmpeg git repository
@@ -9,7 +9,7 @@ $ cat jellyfin-ffmpeg/VERSION
 6.0.1
 
 Modify patches to be in -p0 mode:
-cd jellyfin-ffmpeg/debian/patches
+$ cd jellyfin-ffmpeg/debian/patches
 $ sed -i -e 's?--- jellyfin-ffmpeg.orig/?--- ?1' \
          -e 's?+++ jellyfin-ffmpeg/?+++ ?1' \
          -e 's?--- a/?--- ?1' \
