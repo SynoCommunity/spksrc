@@ -20,6 +20,9 @@ COMMENT = Parallel, indexed xz compressor
 HOMEPAGE = $(PKG_REPO)
 LICENSE = FreeBSD 2-Clause "Simplified"
 
+# blindly disabling hi3535-6.2.4 build that fails
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
+
 DEPENDS =  cross/xz
 DEPENDS += cross/libarchive
 
