@@ -4,7 +4,6 @@ default: all
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.common-rules.mk
 include ../../mk/spksrc.directories.mk
 
 # Common kernel variables
@@ -78,11 +77,11 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
 .PHONY: kernel_post_extract_target
 kernel_post_extract_target:
 	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/$(PKG_DIR)
 
 all: install plist
+
+# Common rules makefiles
+include ../../mk/spksrc.common-rules.mk
