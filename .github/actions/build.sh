@@ -79,8 +79,14 @@ do
         else
             TCVERSION=${GH_ARCH##*-}
         fi
-        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
-        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+        # noarch package must be first built then published
+        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}" >>build.log
+        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} |& tee >(tail -15 >>build.log)
+
+        if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
+            echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
+            make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+        fi
     fi
     result=$?
 
