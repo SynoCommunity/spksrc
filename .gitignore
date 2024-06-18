@@ -11,6 +11,8 @@ spk/*/build*
 spk/*/publish*
 spk/*/status*
 diyspk/*/work*
+diyspk/*/build*
+diyspk/*/status*
 toolchain/*/work*
 toolchain/*/*_done
 toolkit/*/work*
