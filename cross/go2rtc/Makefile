@@ -27,4 +27,3 @@ include ../../mk/spksrc.cross-go.mk
 go2rtc_post_extract:
 	@$(MSG) Rename extracted folder to make imports work when used as GOPATH
 	cd $(EXTRACT_PATH) && [ -d "$(PKG_NAME)-$(PKG_VERS)" ] && mv "$(PKG_NAME)-$(PKG_VERS)" $(PKG_NAME)
-	cd "$(EXTRACT_PATH)/$(PKG_NAME)"
