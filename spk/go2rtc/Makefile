@@ -11,7 +11,7 @@ MAINTAINER = skrashevich
 DESCRIPTION = Ultimate camera streaming application with support RTSP, RTMP, HTTP-FLV, WebRTC, MSE, HLS, MP4, MJPEG, HomeKit, FFmpeg, etc
 DISPLAY_NAME = go2rtc
 CHANGELOG = "go2rtc updated to v1.9.4"
-LICENSE_FILE = $(WORK_DIR)/src/github.com/go2rtc/go2rtc/LICENSE
+LICENSE_FILE = $(WORK_DIR)/src/github.com/go2rtc-$(SPK_VERS)/LICENSE
 HOMEPAGE = https://github.com/AlexxIT/go2rtc
 LICENSE = MIT
 
