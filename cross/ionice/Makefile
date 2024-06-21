@@ -16,8 +16,9 @@ COMMENT  = Random collection of Linux utilities. We use this only to build ionic
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-
-CONFIGURE_ARGS  = --without-python
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --without-ncurses
+CONFIGURE_ARGS += --without-python
 CONFIGURE_ARGS += --disable-asciidoc
 
 include ../../mk/spksrc.archs.mk
@@ -28,5 +29,7 @@ endif
 # build ionice only (schedutils = ionice, chrt, taskset)
 # chrt, taskset and uclampset are disabled by patch to avoid configure error
 CONFIGURE_ARGS += --disable-all-programs --enable-schedutils
+
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
