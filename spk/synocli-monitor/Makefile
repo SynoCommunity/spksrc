@@ -6,6 +6,7 @@ SPK_ICON = src/synocli-monitor.png
 DEPENDS  = cross/nmon cross/njmon
 DEPENDS += cross/iperf2 cross/iperf3
 DEPENDS += cross/busybox
+DEPENDS += cross/ionice
 DEPENDS += cross/lsof
 DEPENDS += cross/htop
 DEPENDS += cross/cpulimit
@@ -14,15 +15,13 @@ DEPENDS += cross/lm-sensors
 
 OPTIONAL_DEPENDS = cross/bandwhich cross/bottom cross/procs
 
-BUSYBOX_CONFIG = ionice
-
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
 # include process utilities including pstree for DSM<6 and DSM>2
-BUSYBOX_CONFIG += procutils.dsm5
+BUSYBOX_CONFIG = procutils.dsm5
 OPTIONAL_DESC = ", and process utilities \(lsof, iostat, pgrep, pmap, pstree, watch\)"
 else
-BUSYBOX_CONFIG += procutils
+BUSYBOX_CONFIG = procutils
 OPTIONAL_DESC = ", and process utilities \(lsof, iostat, pgrep, pmap, watch\)"
 endif
 
@@ -35,7 +34,7 @@ MAINTAINER = hgy59
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "1. Add lm-sensors"
+CHANGELOG = "1. Add lm-sensors<br/>2. Add ionice (util-linux) and drop ionice of busybox."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
