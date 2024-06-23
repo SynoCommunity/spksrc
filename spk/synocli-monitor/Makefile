@@ -34,7 +34,7 @@ MAINTAINER = hgy59
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "1. Add lm-sensors<br/>2. Add ionice (util-linux) and drop ionice of busybox."
+CHANGELOG = "1. Add lm-sensors<br/>2. Add ionice (util-linux) and drop ionice of busybox.<br/>3. Fix net-snmp version number."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
