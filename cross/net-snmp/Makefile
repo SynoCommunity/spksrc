@@ -28,6 +28,10 @@ CONFIGURE_ARGS += --without-sys-location
 CONFIGURE_ARGS += --disable-embedded-perl
 CONFIGURE_ARGS += --without-perl-modules
 
-ADDITIONAL_CFLAGS = -O2
+# enable use of sysctl (with patched configure file)
+CONFIGURE_ARGS += ac_cv_NETSNMP_CAN_USE_SYSCTL=yes
+ADDITIONAL_CFLAGS = -DNETSNMP_CAN_USE_SYSCTL
+
+ADDITIONAL_CFLAGS += -O2
 
 include ../../mk/spksrc.cross-cc.mk

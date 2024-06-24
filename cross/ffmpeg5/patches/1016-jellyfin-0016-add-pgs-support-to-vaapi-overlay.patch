@@ -230,7 +230,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
      output_region = (VARectangle) {
          .x      = 0,
          .y      = 0,
-@@ -260,29 +308,42 @@ static int overlay_vaapi_blend(FFFrameSy
+@@ -260,29 +308,43 @@ static int overlay_vaapi_blend(FFFrameSy
          .height = output->height,
      };
  
@@ -279,15 +279,16 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
 +        subpic_params.blend_state = &blend_state;
  
 -    err = overlay_vaapi_render_picture(avctx, &params, &subpic_params, output);
-+        subpic_params.surface       = (VASurfaceID)(uintptr_t)input_overlay->data[3];
-+        subpic_params.output_region = &overlay_region;
++        subpic_params.surface        = (VASurfaceID)(uintptr_t)input_overlay->data[3];
++        subpic_params.surface_region = NULL;
++        subpic_params.output_region  = &overlay_region;
 +    }
 +
 +    err = overlay_vaapi_render_picture(avctx, &params, input_overlay ? &subpic_params : NULL, output);
      if (err < 0)
          goto fail;
  
-@@ -297,26 +358,69 @@ fail:
+@@ -297,26 +359,69 @@ fail:
      return err;
  }
  
@@ -370,7 +371,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
  }
  
  static int overlay_vaapi_config_output(AVFilterLink *outlink)
-@@ -326,10 +430,7 @@ static int overlay_vaapi_config_output(A
+@@ -326,10 +431,7 @@ static int overlay_vaapi_config_output(A
      VAAPIVPPContext *vpp_ctx = avctx->priv;
      int err;
  
@@ -382,7 +383,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
      vpp_ctx->output_width  = avctx->inputs[0]->w;
      vpp_ctx->output_height = avctx->inputs[0]->h;
  
-@@ -337,10 +438,17 @@ static int overlay_vaapi_config_output(A
+@@ -337,10 +439,17 @@ static int overlay_vaapi_config_output(A
      if (err < 0)
          return err;
  
@@ -400,7 +401,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
      return ff_framesync_configure(&ctx->fs);
  }
  
-@@ -366,37 +474,40 @@ static av_cold void overlay_vaapi_uninit
+@@ -366,37 +475,40 @@ static av_cold void overlay_vaapi_uninit
      OverlayVAAPIContext *ctx = avctx->priv;
  
      ff_framesync_uninit(&ctx->fs);
@@ -455,7 +456,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
      },
  };
  
-@@ -416,8 +527,9 @@ const AVFilter ff_vf_overlay_vaapi = {
+@@ -416,8 +528,9 @@ const AVFilter ff_vf_overlay_vaapi = {
      .init            = &overlay_vaapi_init,
      .uninit          = &overlay_vaapi_uninit,
      .activate        = &overlay_vaapi_activate,

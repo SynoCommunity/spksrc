@@ -203,7 +203,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
      nb_planes = 2;
  
      if (src_fc->initial_pool_size == 0) {
-@@ -2511,7 +2557,7 @@ static void opencl_unmap_from_d3d11(AVHW
+@@ -2511,15 +2557,25 @@ static void opencl_unmap_from_d3d11(AVHW
  {
      AVOpenCLFrameDescriptor    *desc = hwmap->priv;
      OpenCLDeviceContext *device_priv = dst_fc->device_ctx->internal->priv;
@@ -211,9 +211,20 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 +    OpenCLFramesContext *frames_priv = dst_fc->internal->priv;
      cl_event event;
      cl_int cle;
++    const cl_mem *mem_objs;
++    cl_uint num_objs;
++
++    if (!(device_priv->d3d11_map_amd ||
++          device_priv->d3d11_map_intel))
++        return;
++
++    num_objs = device_priv->d3d11_map_amd ? 1 : desc->nb_planes;
++    mem_objs = device_priv->d3d11_map_amd ? &desc->planes[desc->nb_planes - 1]
++                                          : desc->planes;
  
-@@ -2519,7 +2565,7 @@ static void opencl_unmap_from_d3d11(AVHW
-         frames_priv->command_queue, desc->nb_planes, desc->planes,
+     cle = device_priv->clEnqueueReleaseD3D11ObjectsKHR(
+-        frames_priv->command_queue, desc->nb_planes, desc->planes,
++        frames_priv->command_queue, num_objs, mem_objs,
          0, NULL, &event);
      if (cle != CL_SUCCESS) {
 -        av_log(dst_fc, AV_LOG_ERROR, "Failed to release surface "
@@ -221,52 +232,46 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
                 "handle: %d.\n", cle);
      }
  
-@@ -2534,7 +2580,7 @@ static int opencl_map_from_d3d11(AVHWFra
+@@ -2534,7 +2590,9 @@ static int opencl_map_from_d3d11(AVHWFra
      AVOpenCLFrameDescriptor *desc;
      cl_event event;
      cl_int cle;
 -    int err, index, i;
++    const cl_mem *mem_objs;
++    cl_uint num_objs;
 +    int err, index, i, nb_planes;
  
      index = (intptr_t)src->data[1];
      if (index >= frames_priv->nb_mapped_frames) {
-@@ -2548,20 +2594,36 @@ static int opencl_map_from_d3d11(AVHWFra
- 
-     desc = &frames_priv->mapped_frames[index];
- 
--    cle = device_priv->clEnqueueAcquireD3D11ObjectsKHR(
--        frames_priv->command_queue, desc->nb_planes, desc->planes,
--        0, NULL, &event);
--    if (cle != CL_SUCCESS) {
--        av_log(dst_fc, AV_LOG_ERROR, "Failed to acquire surface "
--               "handle: %d.\n", cle);
--        return AVERROR(EIO);
-+    nb_planes = device_priv->d3d11_map_amd ? (desc->nb_planes - 1)
-+                                           : desc->nb_planes;
-+
-+    if (device_priv->d3d11_map_amd) {
-+        cle = device_priv->clEnqueueAcquireD3D11ObjectsKHR(
-+            frames_priv->command_queue, 1, &desc->planes[nb_planes],
-+            0, NULL, &event);
-+        if (cle != CL_SUCCESS) {
-+            av_log(dst_fc, AV_LOG_ERROR, "Failed to acquire texture "
-+                   "handle: %d.\n", cle);
-+            return AVERROR(EIO);
-+        }
-+    } else if (device_priv->d3d11_map_intel) {
-+        cle = device_priv->clEnqueueAcquireD3D11ObjectsKHR(
-+            frames_priv->command_queue, nb_planes, desc->planes,
-+            0, NULL, &event);
-+        if (cle != CL_SUCCESS) {
-+            av_log(dst_fc, AV_LOG_ERROR, "Failed to acquire texture "
-+                   "handle: %d.\n", cle);
-+            return AVERROR(EIO);
-+        }
-+    } else {
-+        return AVERROR(ENOSYS);
+@@ -2543,16 +2601,25 @@ static int opencl_map_from_d3d11(AVHWFra
+         return AVERROR(EINVAL);
      }
  
-     err = opencl_wait_events(dst_fc, &event, 1);
++    if (!(device_priv->d3d11_map_amd ||
++          device_priv->d3d11_map_intel))
++        return AVERROR(ENOSYS);
++
+     av_log(dst_fc, AV_LOG_DEBUG, "Map D3D11 texture %d to OpenCL.\n",
+            index);
+ 
+     desc = &frames_priv->mapped_frames[index];
++    nb_planes = device_priv->d3d11_map_amd ? (desc->nb_planes - 1)
++                                           : desc->nb_planes;
++    num_objs = device_priv->d3d11_map_amd ? 1 : desc->nb_planes;
++    mem_objs = device_priv->d3d11_map_amd ? &desc->planes[nb_planes]
++                                          : desc->planes;
+ 
+     cle = device_priv->clEnqueueAcquireD3D11ObjectsKHR(
+-        frames_priv->command_queue, desc->nb_planes, desc->planes,
++        frames_priv->command_queue, num_objs, mem_objs,
+         0, NULL, &event);
+     if (cle != CL_SUCCESS) {
+-        av_log(dst_fc, AV_LOG_ERROR, "Failed to acquire surface "
++        av_log(dst_fc, AV_LOG_ERROR, "Failed to acquire texture "
+                "handle: %d.\n", cle);
+         return AVERROR(EIO);
+     }
+@@ -2561,7 +2628,7 @@ static int opencl_map_from_d3d11(AVHWFra
      if (err < 0)
          goto fail;
  
@@ -275,11 +280,20 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
          dst->data[i] = (uint8_t*)desc->planes[i];
  
      err = ff_hwframe_map_create(dst->hw_frames_ctx, dst, src,
-@@ -2591,16 +2653,26 @@ static int opencl_frames_derive_from_d3d
+@@ -2576,7 +2643,7 @@ static int opencl_map_from_d3d11(AVHWFra
+ 
+ fail:
+     cle = device_priv->clEnqueueReleaseD3D11ObjectsKHR(
+-        frames_priv->command_queue, desc->nb_planes, desc->planes,
++        frames_priv->command_queue, num_objs, mem_objs,
+         0, NULL, &event);
+     if (cle == CL_SUCCESS)
+         opencl_wait_events(dst_fc, &event, 1);
+@@ -2591,16 +2658,26 @@ static int opencl_frames_derive_from_d3d
      AVD3D11VAFramesContext *src_hwctx = src_fc->hwctx;
      OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->internal->priv;
      OpenCLFramesContext  *frames_priv = dst_fc->internal->priv;
-+    cl_mem planeUI;
++    cl_mem plane_uint;
      cl_mem_flags cl_flags;
      cl_int cle;
      int err, i, p, nb_planes;
@@ -307,7 +321,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
  
      if (src_fc->initial_pool_size == 0) {
          av_log(dst_fc, AV_LOG_ERROR, "Only fixed-size pools are supported "
-@@ -2623,27 +2695,94 @@ static int opencl_frames_derive_from_d3d
+@@ -2623,27 +2700,94 @@ static int opencl_frames_derive_from_d3d
      for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
          AVOpenCLFrameDescriptor *desc = &frames_priv->mapped_frames[i];
          desc->nb_planes = nb_planes;
@@ -338,9 +352,9 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 +                cl_image_format image_fmt;
 +
 +                // get plane from AMD in CL_UNSIGNED_INT8|16 type.
-+                planeUI = device_priv->clGetPlaneFromImageAMD(
++                plane_uint = device_priv->clGetPlaneFromImageAMD(
 +                    dst_dev->context, desc->planes[nb_planes - 1], p, &cle);
-+                if (!planeUI) {
++                if (!plane_uint) {
 +                    av_log(dst_fc, AV_LOG_ERROR, "Failed to create CL image "
 +                           "from plane %d of image created from D3D11 "
 +                           "texture index %d: %d.\n", p, i, cle);
@@ -349,7 +363,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 +                }
 +
 +                cle = clGetImageInfo(
-+                    planeUI, CL_IMAGE_FORMAT, sizeof(cl_image_format), &image_fmt, NULL);
++                    plane_uint, CL_IMAGE_FORMAT, sizeof(cl_image_format), &image_fmt, NULL);
 +                if (cle != CL_SUCCESS) {
 +                    av_log(dst_fc, AV_LOG_ERROR, "Failed to query image format of CL image "
 +                           "from plane %d of image created from D3D11 "
@@ -373,7 +387,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 +
 +                // convert plane from CL_UNSIGNED_INT8|16 to CL_UNORM_INT8|16.
 +                desc->planes[p] = device_priv->clConvertImageAMD(
-+                    dst_dev->context, planeUI, &image_fmt, &cle);
++                    dst_dev->context, plane_uint, &image_fmt, &cle);
 +                if (!desc->planes[p]) {
 +                    av_log(dst_fc, AV_LOG_ERROR, "Failed to convert data type of CL image "
 +                           "from plane %d of image created from D3D11 texture index %d "
@@ -382,7 +396,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 +                    goto fail;
 +                }
 +
-+                clReleaseMemObject(planeUI);
++                clReleaseMemObject(plane_uint);
 +            }
 +        } else if (device_priv->d3d11_map_intel) {
 +            for (p = 0; p < nb_planes; p++) {
@@ -409,8 +423,8 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
      return 0;
  
  fail:
-+    if (planeUI)
-+        clReleaseMemObject(planeUI);
++    if (plane_uint)
++        clReleaseMemObject(plane_uint);
      for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
          AVOpenCLFrameDescriptor *desc = &frames_priv->mapped_frames[i];
          for (p = 0; p < desc->nb_planes; p++) {
