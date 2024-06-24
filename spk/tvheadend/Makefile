@@ -13,7 +13,7 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-SPK_DEPENDS = "python311>=3.11.4-7"
+SPK_DEPENDS = "python311\>=3.11.4-7"
 
 WHEELS = src/requirements-pure.txt
 
