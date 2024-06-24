@@ -4,4 +4,4 @@ bin:bin/ristsender
 bin:bin/ristsrppasswd
 lnk:lib/librist.so
 lnk:lib/librist.so.4
-lib:lib/librist.so.4.2.0
+lib:lib/librist.so.4.3.1
