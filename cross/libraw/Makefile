@@ -1,5 +1,5 @@
 PKG_NAME = LibRaw
-PKG_VERS = 0.20.2
+PKG_VERS = 0.21.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.libraw.org/data
@@ -23,10 +23,4 @@ CONFIGURE_ARGS += --enable-jasper
 CONFIGURE_ARGS += ac_cv_lib_jasper_jas_init=yes
 ADDITIONAL_CXXFLAGS = -O
 
-PRE_CONFIGURE_TARGET = libraw_pre_configure
-
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: libraw_pre_configure
-libraw_pre_configure:
-	$(RUN) aclocal
