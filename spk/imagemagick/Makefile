@@ -3,14 +3,18 @@ SPK_VERS = 7.1.1
 SPK_REV = 11
 SPK_ICON = src/imagemagick.png
 
-DEPENDS = cross/imagemagick
+# WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng)
+# with prebuilt ffmpeg this is not a problem
+# without prebuilt ffmpeg the "DEPENDS += cross/ffmpeg*" must be defined below
+DEPENDS  = cross/pngquant
+DEPENDS += cross/imagemagick
 # additional tools for image compression:
 DEPENDS += cross/jpegoptim cross/pngcrush
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.  This package includes some tools for image compression, that are not part of imagemagick: jpegoptim, a utility to optimize/compress JPEG files; pngcrush an optimizer for png files.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update ImageMagick to v7.1.1-33 and jpegoptim to v1.5.5.<br/>2. Update libraries to current versions (fontconfig, freetype, giflib, libpng, libtiff, libwebp, openjpeg)."
+CHANGELOG = "1. Update ImageMagick to v7.1.1-33 and jpegoptim to v1.5.5.<br/>2. Update libraries to current versions (fontconfig, freetype, giflib, libpng, libtiff, libwebp, openjpeg)<br/>3. Add pngquant."
 
 STARTABLE = no
 
@@ -22,6 +26,7 @@ POST_STRIP_TARGET = imagemagick_extra_install
 SPK_COMMANDS  = bin/magick bin/magick-script bin/animate bin/compare bin/composite bin/conjure
 SPK_COMMANDS += bin/convert bin/display bin/identify bin/import bin/mogrify bin/montage bin/stream
 # additional tools:
+SPK_COMMANDS += bin/pngquant
 SPK_COMMANDS += bin/jpegoptim
 SPK_COMMANDS += bin/pngcrush
 
