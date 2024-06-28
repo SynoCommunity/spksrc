@@ -1,5 +1,5 @@
 PKG_NAME = python311
-PKG_VERS = 3.11.5
+PKG_VERS = 3.11.8
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -37,7 +37,7 @@ python311_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	@$(RUN) $(PYTHON) get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
 	@$(MSG) Installing setuptools, wheel, cffi and cross env
-	@$(PIP) --disable-pip-version-check install "setuptools==68.1.2" "setuptools-rust==1.7.0" "maturin==1.2.3" "wheel==0.41.2" "cffi==1.15.1" "crossenv==1.4.0"
+	@$(PIP) --disable-pip-version-check install "setuptools==69.2.0" "setuptools-rust==1.9.0" "maturin==1.5.0" "wheel==0.43.0" "cffi==1.16.0" "crossenv==1.4.0"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@
