@@ -1,5 +1,5 @@
 PKG_NAME = procs
-PKG_VERS = 0.14.0
+PKG_VERS = 0.14.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dalance/procs/archive

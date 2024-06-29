@@ -21,18 +21,18 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
  } OverlayVulkanContext;
  
  static const char overlay_noalpha[] = {
-@@ -81,6 +86,7 @@ static av_cold int init_filter(AVFilterC
+@@ -80,17 +85,78 @@ static const char overlay_alpha[] = {
+ static av_cold int init_filter(AVFilterContext *ctx)
  {
      int err;
-     FFVkSampler *sampler;
+-    FFVkSampler *sampler;
 +    FFVkSPIRVShader *shd;
      OverlayVulkanContext *s = ctx->priv;
      FFVulkanContext *vkctx = &s->vkctx;
++    FFVkSampler *sampler = ff_vk_init_sampler(vkctx, 1, VK_FILTER_NEAREST);
      const int planes = av_pix_fmt_count_planes(s->vkctx.output_format);
-@@ -91,6 +97,67 @@ static av_cold int init_filter(AVFilterC
-     if (!sampler)
-         return AVERROR_EXTERNAL;
  
+-    ff_vk_qf_init(vkctx, &s->qf, VK_QUEUE_COMPUTE_BIT, 0);
 +    FFVulkanDescriptorSetBinding desc_i[3] = {
 +        {
 +            .name       = "main_img",
@@ -63,6 +63,12 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
 +            .updater    = s->output_images,
 +        },
 +    };
+ 
+-    sampler = ff_vk_init_sampler(vkctx, 1, VK_FILTER_NEAREST);
+     if (!sampler)
+         return AVERROR_EXTERNAL;
+ 
++    ff_vk_qf_init(vkctx, &s->qf, VK_QUEUE_COMPUTE_BIT, 0);
 +
 +    s->pl_pass = ff_vk_create_pipeline(vkctx, &s->qf);
 +    if (!s->pl_pass)
@@ -97,7 +103,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
      s->pl = ff_vk_create_pipeline(vkctx, &s->qf);
      if (!s->pl)
          return AVERROR(ENOMEM);
-@@ -98,37 +165,6 @@ static av_cold int init_filter(AVFilterC
+@@ -98,37 +164,6 @@ static av_cold int init_filter(AVFilterC
      { /* Create the shader */
          const int ialpha = av_pix_fmt_desc_get(s->vkctx.input_format)->flags & AV_PIX_FMT_FLAG_ALPHA;
  
@@ -135,7 +141,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
          FFVulkanDescriptorSetBinding desc_b = {
              .name        = "params",
              .type        = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-@@ -139,8 +175,8 @@ static av_cold int init_filter(AVFilterC
+@@ -139,8 +174,8 @@ static av_cold int init_filter(AVFilterC
              .buf_content = "ivec2 o_offset[3], o_size[3];",
          };
  
@@ -146,7 +152,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
          if (!shd)
              return AVERROR(ENOMEM);
  
-@@ -229,7 +265,7 @@ fail:
+@@ -229,7 +264,7 @@ fail:
  }
  
  static int process_frames(AVFilterContext *avctx, AVFrame *out_f,
@@ -155,7 +161,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
  {
      int err;
      VkCommandBuffer cmd_buf;
-@@ -240,14 +276,20 @@ static int process_frames(AVFilterContex
+@@ -240,14 +275,20 @@ static int process_frames(AVFilterContex
  
      AVVkFrame *out     = (AVVkFrame *)out_f->data[0];
      AVVkFrame *main    = (AVVkFrame *)main_f->data[0];
@@ -179,7 +185,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
  
      /* Update descriptors and init the exec context */
      ff_vk_start_exec_recording(vkctx, s->exec);
-@@ -255,92 +297,128 @@ static int process_frames(AVFilterContex
+@@ -255,92 +296,128 @@ static int process_frames(AVFilterContex
  
      for (int i = 0; i < planes; i++) {
          RET(ff_vk_create_imageview(vkctx, s->exec,
@@ -374,7 +380,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
      ff_vk_add_exec_dep(vkctx, s->exec, out_f, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
  
      err = ff_vk_submit_exec_queue(vkctx, s->exec);
-@@ -358,7 +436,7 @@ fail:
+@@ -358,7 +435,7 @@ fail:
  
  static int overlay_vulkan_blend(FFFrameSync *fs)
  {
@@ -383,7 +389,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
      AVFilterContext *ctx = fs->parent;
      OverlayVulkanContext *s = ctx->priv;
      AVFilterLink *outlink = ctx->outputs[0];
-@@ -371,22 +449,14 @@ static int overlay_vulkan_blend(FFFrameS
+@@ -371,22 +448,14 @@ static int overlay_vulkan_blend(FFFrameS
      if (err < 0)
          goto fail;
  
@@ -411,7 +417,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
  
      out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
      if (!out) {
-@@ -394,7 +464,7 @@ static int overlay_vulkan_blend(FFFrameS
+@@ -394,7 +463,7 @@ static int overlay_vulkan_blend(FFFrameS
          goto fail;
      }
  
@@ -420,7 +426,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
  
      err = av_frame_copy_props(out, input_main);
      if (err < 0)
-@@ -412,6 +482,18 @@ static int overlay_vulkan_config_output(
+@@ -412,6 +481,18 @@ static int overlay_vulkan_config_output(
      int err;
      AVFilterContext *avctx = outlink->src;
      OverlayVulkanContext *s = avctx->priv;
@@ -439,7 +445,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
  
      err = ff_vk_filter_config_output(outlink);
      if (err < 0)
-@@ -421,6 +503,11 @@ static int overlay_vulkan_config_output(
+@@ -421,6 +502,11 @@ static int overlay_vulkan_config_output(
      if (err < 0)
          return err;
  
@@ -451,7 +457,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
      return ff_framesync_configure(&s->fs);
  }
  
-@@ -456,6 +543,14 @@ static void overlay_vulkan_uninit(AVFilt
+@@ -456,6 +542,14 @@ static void overlay_vulkan_uninit(AVFilt
  static const AVOption overlay_vulkan_options[] = {
      { "x", "Set horizontal offset", OFFSET(overlay_x), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, .flags = FLAGS },
      { "y", "Set vertical offset",   OFFSET(overlay_y), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX, .flags = FLAGS },
@@ -493,7 +499,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_vulkan.c
          }
  
          GLSLC(0, }                                                               );
-@@ -305,7 +308,8 @@ static int process_frames(AVFilterContex
+@@ -299,7 +302,8 @@ static int process_frames(AVFilterContex
      AVVkFrame *out = (AVVkFrame *)out_f->data[0];
      VkImageMemoryBarrier barriers[AV_NUM_DATA_POINTERS*2];
      int barrier_count = 0;
@@ -503,7 +509,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_vulkan.c
      const VkFormat *input_formats = av_vkfmt_from_pixfmt(s->vkctx.input_format);
      const VkFormat *output_formats = av_vkfmt_from_pixfmt(s->vkctx.output_format);
  
-@@ -313,24 +317,27 @@ static int process_frames(AVFilterContex
+@@ -307,24 +311,27 @@ static int process_frames(AVFilterContex
      ff_vk_start_exec_recording(vkctx, s->exec);
      cmd_buf = ff_vk_get_exec_buf(s->exec);
  
@@ -534,7 +540,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_vulkan.c
          VkImageMemoryBarrier bar = {
              .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
              .srcAccessMask = 0,
-@@ -351,7 +358,7 @@ static int process_frames(AVFilterContex
+@@ -345,7 +352,7 @@ static int process_frames(AVFilterContex
          in->access[i]  = bar.dstAccessMask;
      }
  

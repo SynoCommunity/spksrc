@@ -1,5 +1,5 @@
 PKG_NAME = intel-gmmlib
-PKG_VERS = 22.3.5
+PKG_VERS = 22.3.20
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/gmmlib/archive

@@ -1,5 +1,5 @@
 ### Download rules
-#   Download $(URLS) from the wild internet, and place them in $(DISTRIB_DIR). 
+#   Download $(URLS) from the wild internet, and place them in $(DISTRIB_DIR).
 # Targets are executed in the following order:
 #  download_msg_target
 #  pre_download_target   (override with PRE_DOWNLOAD_TARGET)
@@ -7,7 +7,12 @@
 #  post_download_target  (override with POST_DOWNLOAD_TARGET)
 # Variables:
 #  URLS:                 List of URL to download
-#  DISTRIB_DIR:          Downloaded files will be placed there.  
+#  DISTRIB_DIR:          Downloaded files will be placed there.
+# Targets:
+# download               Regular target for file download
+# download-all           To additionally download all files when PKG_DIST_ARCH_LIST is defined
+#                        This target is for github prepare action to pre download all sources
+#
 
 # Configure file descriptor lock timeout
 ifeq ($(strip $(FLOCK_TIMEOUT)),)
@@ -175,4 +180,15 @@ $(DOWNLOAD_COOKIE): $(POST_DOWNLOAD_TARGET)
 	@touch -f $@
 else
 download: ;
+endif
+
+
+ifneq ($(strip $(PKG_DIST_ARCH_LIST)),)
+download-all:
+	@for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
+	  rm -f $(DOWNLOAD_COOKIE) ; \
+	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} download ; \
+	done ;
+else
+download-all: download
 endif

@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg6
-SPK_VERS = 6.0
-SPK_REV = 2
+SPK_VERS = 6.0.1
+SPK_REV = 3
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Fix permissions on DSM6<br/>2. Update Jellyfin upstream patches from Apr 13th<br/>3. Update Intel Media Driver 2023Q1 Release (DSM7 only)"
+CHANGELOG = "1. Update to version 6.0.1<br/>2. Update Jellyfin upstream patches<br/>3. Update Intel Media Driver 2024Q1 Release (DSM7 only)<br/>4. Migrate DSM7 from MFX to Intel Video Processing Library (Intel-VPL) "
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -17,7 +17,7 @@ LICENSE  = GPLv3
 
 POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
-SPK_COMMANDS  = bin/ffmpeg
+SPK_COMMANDS  = bin/ffprobe
 SPK_COMMANDS += bin/$(SPK_NAME)
 
 include ../../mk/spksrc.archs.mk

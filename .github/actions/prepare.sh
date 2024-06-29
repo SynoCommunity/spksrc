@@ -44,13 +44,13 @@ done
 
 # fix for packages with different names
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "nzbdrone" | tr '\n' ' ')" sonarr3"
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "nzbdrone" | tr '\n' ' ')" sonarr3"
 fi
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "python" | tr '\n' ' ')" python2"
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "python" | tr '\n' ' ')" python2"
 fi
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow ffmpeg)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')" ffmpeg4"
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "ffmpeg" | tr '\n' ' ')" ffmpeg4"
 fi
 
 # remove duplicate packages
@@ -120,10 +120,6 @@ else
     for package in ${packages}
     do
         DOWNLOAD_LIST+=$(echo "${DEPENDENCY_LIST}" | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
-        for version in ${DEFAULT_TC}
-        do
-           DOWNLOAD_LIST+=$(make -C spk/${package} TCVERSION=${version} dependency-kernel-list | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
-        done
     done
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
