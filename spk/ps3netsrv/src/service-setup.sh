@@ -7,6 +7,6 @@ export CFG_FILE PID_FILE SERVICE_PORT
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        sed -i -e "s|@wizard_dir@|${wizard_data_volume}/${wizard_data_directory}|g" ${CFG_FILE}
+        sed -i -e "s|@share_path@|${SHARE_PATH}|g" ${CFG_FILE}
     fi
 }
