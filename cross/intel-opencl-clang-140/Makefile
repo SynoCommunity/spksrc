@@ -3,10 +3,19 @@ PKG_LLVM_MAJ = 14
 PKG_VERS = $(PKG_LLVM_MAJ)0
 PKG_GIT_BRANCH = ocl-open-$(PKG_VERS)
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_GIT_BRANCH).$(PKG_EXT)
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/opencl-clang/archive
-PKG_DIR = $(PKG_NAME)-$(PKG_GIT_BRANCH)
+
+# ocl-open-140 branch is still receiving updates
+# using latest gis hash to ensure replicable builds
+PKG_GIT_HASH = 58f0c62ea6745f777f2edd91147300b749ca3972
+PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
+
+# use below for direct ocl-open-140 branch
+#PKG_DIST_NAME = $(PKG_GIT_BRANCH).$(PKG_EXT)
+#PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+#PKG_DIR = $(PKG_NAME)-$(PKG_GIT_BRANCH)
 
 REQUIRED_MIN_DSM = 7
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
