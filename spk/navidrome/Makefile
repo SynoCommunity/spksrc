@@ -1,5 +1,5 @@
 SPK_NAME = navidrome
-SPK_VERS = 0.51.1
+SPK_VERS = 0.52.5
 SPK_REV = 1
 SPK_ICON = src/navidrome.png
 
@@ -9,8 +9,6 @@ DEPENDS = cross/navidrome
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 # go does not support ppc archs
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
-
-SPK_DEPENDS = "ffmpeg"
 
 MAINTAINER = hgy59
 HOMEPAGE = https://www.navidrome.org/
