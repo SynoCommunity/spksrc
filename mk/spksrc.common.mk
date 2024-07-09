@@ -3,8 +3,9 @@
 ###
 
 # Set basedir in case called from spkrc/ or from normal sub-dir
+# Note that github-action uses workspace/ in place of spksrc/
 ifeq ($(BASEDIR),)
-ifneq ($(shell basename $(CURDIR)),spksrc)
+ifeq ($(filter spksrc workspace,$(shell basename $(CURDIR))),)
 BASEDIR = ../../
 endif
 endif
@@ -53,7 +54,6 @@ AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell ech
 # Available toolchains formatted as '{ARCH}-{TC}'
 AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)kernel/syno-*))))
 AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell echo ${arch} | cut -f2 -d'-')))
-SUPPORTED_KERNEL_VERSIONS = 6.2.4 7.0
 
 # Global arch definitions
 include $(BASEDIR)mk/spksrc.archs.mk

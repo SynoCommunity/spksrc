@@ -1,16 +1,20 @@
 SPK_NAME = synocli-misc
-SPK_VERS = 1.1
-SPK_REV = 3
+SPK_VERS = 1.2
+SPK_REV = 5
 SPK_ICON = src/synocli-misc.png
 
-DEPENDS = cross/bc cross/moreutils cross/misc-util-linux cross/uhubctl
+DEPENDS  = cross/bc
+DEPENDS += cross/moreutils
+DEPENDS += cross/misc-util-linux
+DEPENDS += cross/uhubctl
+DEPENDS += cross/expect
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli misc. Tools
 
-DESCRIPTION = "SynoCli misc. Tools provide a set of miscellaneous small command-line utilities: bc, errno, ifdata, ifne, isutf8, lckdo, mispipe, parallel, pee, sponge, cal, col, colcrt, colrm, column, hexdump, lsblk, lscpu, lsipc, lsirq, rev, wall, whereis, zramctl, uhubctl."
+DESCRIPTION = "SynoCli misc. Tools provide a set of miscellaneous small command-line utilities: bc, errno, expect, ifdata, ifne, isutf8, lckdo, mispipe, parallel, pee, sponge, cal, col, colcrt, colrm, column, hardlink, hexdump, lsblk, lscpu, lsipc, lsirq, rev, wall, whereis, zramctl, uhubctl."
 STARTABLE = no
-CHANGELOG = "1. Add zramctl from util-linux.<br/>2. Add uhubctl."
+CHANGELOG = "1. Add hardlink command of util-linux.<br/>2. Add expect."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMisc
 LICENSE  = Each tool is licensed under it's respective license.
@@ -35,6 +39,7 @@ SPK_COMMANDS += bin/col
 SPK_COMMANDS += bin/colcrt
 SPK_COMMANDS += bin/colrm
 SPK_COMMANDS += bin/column
+SPK_COMMANDS += bin/hardlink
 SPK_COMMANDS += bin/hexdump
 # lsblk is not included in OLD_PPC_ARCHS
 SPK_COMMANDS += bin/lsblk
@@ -48,5 +53,8 @@ SPK_COMMANDS += bin/zramctl
 
 # uhubctl
 SPK_COMMANDS += bin/uhubctl
+
+# expect
+SPK_COMMANDS += bin/expect
 
 include ../../mk/spksrc.spk.mk

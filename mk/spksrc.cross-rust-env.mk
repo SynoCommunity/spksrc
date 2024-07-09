@@ -32,6 +32,7 @@ RUSTUP_DEFAULT_TOOLCHAIN_STAGE = 2
 
 # map archs to rust targets
 ifeq ($(findstring $(RUST_ARCH), $(ARMv5_ARCHS)),$(RUST_ARCH))
+RUSTUP_DEFAULT_TOOLCHAIN = 1.77.2
 RUST_TARGET = armv5te-unknown-linux-gnueabi
 endif
 ifeq ($(findstring $(RUST_ARCH), $(ARMv7_ARCHS)),$(RUST_ARCH))

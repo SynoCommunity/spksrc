@@ -59,11 +59,7 @@ pre-build-native:
 $(TARGET_TYPE)-arch-% &: pre-build-native
 	-@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) arch-$*
 
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-arch-% &: kernel-arch-%
-else
 arch-%:
-endif
 	$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*)) | tee --append build-$*.log
 
 ####

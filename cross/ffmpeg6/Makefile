@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 6.0
+PKG_VERS = 6.0.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -234,9 +234,10 @@ endif
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
+DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver
 CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-vaapi --enable-libmfx --enable-libdrm
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-vaapi
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
@@ -259,4 +260,20 @@ endif
 ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
 DEPENDS += cross/frei0r
 CONFIGURE_ARGS += --enable-frei0r
+endif
+
+# Newer Intel implementations (oneAPI, level-zero) requires gcc >= 5
+# -->> can not use libmfx and libvpl together
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+DEPENDS += cross/intel-media-driver cross/intel-mediasdk
+
+ifeq ($(call version_lt, ${TC_GCC}, 5),1)
+CONFIGURE_ARGS += --enable-libmfx
+else
+DEPENDS += cross/intel-level-zero
+# Missing intel-graphics-compiler (IGC)
+#CONFIGURE_ARGS += --enable-opencl
+DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
+CONFIGURE_ARGS += --enable-libvpl
+endif
 endif

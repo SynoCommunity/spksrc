@@ -1,13 +1,17 @@
 PKG_NAME = misc-util-linux
 PKG_REAL_NAME = util-linux
-PKG_VERS = 2.38.1
+PKG_VERS = 2.39.3
 PKG_VERS_MAJOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/$(PKG_REAL_NAME)/v$(PKG_VERS_MAJOR)
-# use dedicated folder to build independent of other libraries built from util-linux (i.e. libuuid, libblkid)
+# use dedicated folder to build independent of other libraries built from util-linux (i.e. libuuid, libmount, libblkid)
 PKG_DIR = $(PKG_NAME)/$(PKG_REAL_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
+
+# REMARKS:
+# update to v2.40 is not possible without disabling the build of zramctl (for 32 bit archs)
+# but zramctl was explicitly requested in https://github.com/SynoCommunity/spksrc/issues/5749
 
 DEPENDS = cross/ncursesw
 
@@ -47,6 +51,10 @@ CONFIGURE_ARGS += --disable-irqtop
 CONFIGURE_ARGS += --disable-ul
 CONFIGURE_ARGS += --disable-more
 
+# OLD_PPC_ARCHS
+# misc-utils/pipesz.c:128: error: 'F_SETPIPE_SZ' undeclared
+CONFIGURE_ARGS += --disable-pipesz
+
 # fails to build for: hi3535-6.1
 CONFIGURE_ARGS += --disable-schedutils
 
@@ -68,7 +76,9 @@ endif
 # for lsblk and others: ncurses must be built with tinfo
 # this seems to be a bug in util-linux, as most of other libraries fail to find ncurses/termlib
 # dependencies when ncurses is build with lib tinfo
-export NCURSES_WITH_TINFO=yes
+# https://github.com/util-linux/util-linux/issues/2416
+# This is a workaround to use ncursesw without tinfo:
+COMPILE_MAKE_OPTIONS = NCURSES_LIBS="-lncursesw"
 
 include ../../mk/spksrc.cross-cc.mk
 

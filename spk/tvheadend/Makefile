@@ -1,7 +1,7 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = f32c7c5
-SPK_GIT_DATE = 20230408
+SPK_GIT_HASH = 128d686
+SPK_GIT_DATE = 20240623
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
 SPK_REV = 37
@@ -13,7 +13,7 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-SPK_DEPENDS = "python311>=3.11.4-7"
+SPK_DEPENDS = 'python311>=3.11.4-7'
 
 WHEELS = src/requirements-pure.txt
 
@@ -26,7 +26,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version f32c7c5 as of April 8th 2023<br/>2. Update FFMPEG 5.1.2<br/>3. Update libhdhomerun to version 20230323<br/>4. Migrate to using python 3.11"
+CHANGELOG = "1. Update to latest git version 128d686 as of June 23rd 2024<br/>2. Update to FFMPEG 6.0.1<br/>3. Update libhdhomerun to version 20231214<br/>4. Migrate to using python 3.11 and openssl 3.<br/>5. Update pngquant to v3.0.3."
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
@@ -48,13 +48,13 @@ SERVICE_PORT_TITLE = Tvheadend(HTTP)
 ADMIN_PORT = ${SERVICE_PORT}
 
 # Reuse ffmpeg libraries
-export FFMPEG_VERSION = 5
+export FFMPEG_VERSION = 6
 export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg$(subst 4,,$(FFMPEG_VERSION))/target)
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)
 export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg$(subst 4,,$(FFMPEG_VERSION))/target/lib
 PRE_DEPEND_TARGET = tvheadend_pre_depend
-SPK_DEPENDS := "$(SPK_DEPENDS):ffmpeg$(subst 4,,$(FFMPEG_VERSION))>$(shell sed -n 's/^SPK_VERS = \(.*\)/\1/p' $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/Makefile | cut -c -3)"
+SPK_DEPENDS := $(SPK_DEPENDS)':ffmpeg$(subst 4,,$(FFMPEG_VERSION))>$(shell sed -n 's/^SPK_VERS = \(.*\)/\1/p' $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/Makefile | cut -c -3)'
 endif
 
 include ../../mk/spksrc.spk.mk

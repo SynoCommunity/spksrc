@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg5
-SPK_VERS = 5.1.3
-SPK_REV = 2
+SPK_VERS = 5.1.5
+SPK_REV = 3
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to version 5.1.3<br/>2. Fix permissions on DSM6<br/>3. Update Jellyfin upstream patches from Apr 13th<br/>4. Update Intel Media Driver 2023Q1 Release (DSM7 only)"
+CHANGELOG = "1. Update to version 5.1.5<br/>2. Update Intel Media Driver 2024Q1 Release (DSM7 only)<br/>3. Update jellyfin and libsvtav1 patches along with multiple dependencies"
 
 DEPENDS = cross/$(SPK_NAME)
 

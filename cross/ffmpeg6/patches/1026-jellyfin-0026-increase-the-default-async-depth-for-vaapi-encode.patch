@@ -1,0 +1,13 @@
+Index: jellyfin-ffmpeg/libavcodec/vaapi_encode.h
+===================================================================
+--- libavcodec/vaapi_encode.h
++++ libavcodec/vaapi_encode.h
+@@ -486,7 +486,7 @@ int ff_vaapi_encode_close(AVCodecContext
+       "Increase this to improve single channel performance. This option " \
+       "doesn't work if driver doesn't implement vaSyncBuffer function.", \
+       OFFSET(common.async_depth), AV_OPT_TYPE_INT, \
+-      { .i64 = 2 }, 1, MAX_ASYNC_DEPTH, FLAGS }, \
++      { .i64 = 4 }, 1, MAX_ASYNC_DEPTH, FLAGS }, \
+     { "max_frame_size", \
+       "Maximum frame size (in bytes)",\
+       OFFSET(common.max_frame_size), AV_OPT_TYPE_INT, \
