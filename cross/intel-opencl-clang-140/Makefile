@@ -7,7 +7,7 @@ PKG_DIST_SITE = https://github.com/intel/opencl-clang/archive
 
 # ocl-open-140 branch is still receiving updates
 # using latest gis hash to ensure replicable builds
-PKG_GIT_HASH = 58f0c62ea6745f777f2edd91147300b749ca3972
+PKG_GIT_HASH = 470cf0018e1ef6fc92eda1356f5f31f7da452abc
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
@@ -58,13 +58,6 @@ CMAKE_ARGS += -DLLVM_ENABLE_LIBXML2=ON
 DEPENDS += cross/zlib
 CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 
-# When set to ON it removes many of the LLVM development and
-# testing tools as well as component libraries from the
-# default install target. Including the development tools is
-# not recommended for distributions as many of the LLCM tools
-# are only intended for development and testing use.
-CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
-
 # Assertions are internal checks to help find bugs.
 # They typically slow down LLVM and Clang when enabled
 CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
@@ -82,6 +75,9 @@ CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
 # https://github.com/llvm/llvm-project/issues/54941
 CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
+
+# Fix build failure against DSM-7.2 toolchain
+#CMAKE_ARGS += -DLLVM_OPTIMIZED_TABLEGEN=ON
 
 # intel-opencl-140 specific
 CMAKE_ARGS += -DPREFERRED_LLVM_VERSION= $(PKG_LLVM_MAJ).0.5
