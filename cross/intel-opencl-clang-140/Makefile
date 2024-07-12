@@ -20,9 +20,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 REQUIRED_MIN_DSM = 7
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
-BUILD_DEPENDS  = cross/llvm-140.src cross/clang-140.src
-BUILD_DEPENDS += cross/SPIRV-LLVM-Translator-140.src
-BUILD_DEPENDS += cross/SPIRV-Headers.src
+BUILD_DEPENDS  = cross/llvm-140.src cross/clang-140.src cross/lld-140.src cross/libunwind-140.src
+BUILD_DEPENDS += cross/SPIRV-LLVM-Translator-140.src cross/SPIRV-Headers.src
 DEPENDS += cross/SPIRV-Tools
 
 HOMEPAGE = https://github.com/intel/opencl-clang
@@ -89,7 +88,7 @@ include ../../mk/spksrc.common.mk
 #
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang'
+CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
 CMAKE_ARGS += -DLLVM_SOURCE_DIR=$(WORK_DIR)/llvm
 CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang'
 CMAKE_ARGS += -DLLVM_EXTERNAL_CLANG_SOURCE_DIR=$(WORK_DIR)/clang
