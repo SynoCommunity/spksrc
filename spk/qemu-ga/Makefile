@@ -18,7 +18,9 @@ DESCRIPTION = Support for QMP commands and events that terminate and originate r
 HOMEPAGE = https://wiki.qemu.org/Features/GuestAgent
 LICENSE  = GPLv2
 
-STARTABLE = no
+WIZARDS_DIR = src/wizard/
+SYSTEM_GROUP = system
+STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh
 
 SPK_COMMANDS = bin/qemu-ga

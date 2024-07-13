@@ -1,0 +1,10 @@
+[
+  {
+    "step_title": "Important notes",
+    "items": [
+      {
+        "desc": "This package must run as root, but synology prohibits this. <br/>Please continue until the installation fails. Than you need to ssh into DSM.<br/>As an admin user execute the command:<br/><code>sed -i 's/package/root/g' /var/packages/qemu-ga/conf/privilege</code>.<br/>Then manually start the package with:<br/><code>synopkg start qemu-ga</code>."
+      }
+    ]
+  }
+]
