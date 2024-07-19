@@ -1,58 +1,29 @@
 [
-  {
-    "step_title": "Расположение файлов PS3",
-    "items": [
-      {
-        "type": "combobox",
-        "desc": "Выберите том, который будет использоваться для папки файлов PS3.",
-        "subitems": [
-          {
-            "key": "wizard_data_volume",
-            "desc": "Имя тома",
-            "displayField": "display_name",
-            "valueField": "volume_path",
-            "editable": false,
-            "mode": "remote",
-            "api_store": {
-              "api": "SYNO.Core.Storage.Volume",
-              "method": "list",
-              "version": 1,
-              "baseParams": {
-                "limit": -1,
-                "offset": 0,
-                "location": "internal"
-              },
-              "root": "volumes",
-              "idProperty": "volume_path",
-              "fields": [
-                "display_name",
-                "volume_path"
-              ]
-            },
-            "validator": {
-              "fn": "{console.log(arguments);return true;}"
-            }
-          }
+    {
+        "step_title": "Расположение файлов PS3",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Укажите общую папку для этого пакета. Этот общий ресурс создается при установке, когда он еще не существует.",
+                "subitems": [
+                    {
+                        "key": "wizard_shared_folder_name",
+                        "desc": "Shared Folder",
+                        "defaultValue": "PS3",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[\\w _-]+$/",
+                                "errorText": "Подкаталоги не поддерживаются."              
+                            }
+                        }
+                    }
+                ]
+                }, {
+                    "desc": "Если вы позволите установщику создать общую папку, она будет создана на том же томе, где установлен пакет. Если вы хотите использовать другой том для общей папки, необходимо заранее создать общую папку на панели управления DSM и ввести имя существующей общей папки в поле выше."
+                }, {
+                    "desc": ""
+                }
         ]
-      },
-      {
-        "type": "textfield",
-        "desc": "Общая папка, содержащая файлы PS3 (используя выбранный выше том)",
-        "subitems": [
-          {
-            "key": "wizard_data_directory",
-            "desc": "Общая папка",
-            "defaultValue": "PS3",
-            "validator": {
-              "allowBlank": false,
-              "regex": {
-                "expr": "/^[\\w _-]+$/",
-                "errorText": "Подкаталоги не поддерживаются."
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+    }
 ]
