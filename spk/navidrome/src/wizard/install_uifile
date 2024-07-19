@@ -1,0 +1,26 @@
+[{
+  "step_title": "Basic configuration",
+  "items": [
+     {
+        "type": "textfield",
+        "desc": "Shared music folder. This must be a name for the shared folder only, without any path. This share is created at installation when it does not already exist.",
+        "subitems": [{
+            "key": "wizard_music_folder",
+            "desc": "Shared music folder",
+            "defaultValue": "music",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[^<>: */?\"]*/",
+                "errorText": "Share name must be a folder name only. Path separators, spaces and other special chars are not allowed."
+              }
+            }
+          }
+        ]
+      }, {
+        "desc": ""
+      }, {
+        "desc": "Navidrome runs as internal service user <b>'sc-navidrome'</b> in DSM. The shared music folder above is configured at installation time to be accessible by this user.<p>If you manually change the music folder, make sure 'sc-navidrome' has permissions to access it.<p>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      }
+    ]
+}]
