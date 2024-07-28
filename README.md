@@ -58,10 +58,10 @@ sudo apt install autoconf-archive autogen automake autopoint bash bash-completio
                  g++-multilib gawk gettext git gperf httpie imagemagick intltool jq libbz2-dev \
                  libc6-i386 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev \
                  libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool libunistring-dev \
-                 lzip man-db manpages-dev mercurial meson mlocate moreutils ninja-build \
-                 patchelf php pkg-config python3 python3-distutils python3-pip python3-virtualenv \
+                 lzip man-db manpages-dev mercurial meson mlocate moreutils nasm ninja-build \
+                 patchelf php pkg-config python3 python3-distutils python3-mako python3-pip python3-virtualenv \
                  rename ripgrep ruby-mustache rsync scons subversion \
-                 swig texinfo time tree unzip xmlto zip zlib1g-dev
+                 swig texinfo time tree unzip xmlto yasm zip zlib1g-dev
 ```
 From there, follow the instructions in the [Developers HOW TO].
 
@@ -82,10 +82,10 @@ lxc exec spksrc -- /usr/bin/apt install autoconf-archive autogen automake autopo
                                         g++-multilib gawk gettext git gperf httpie imagemagick intltool jq libbz2-dev \
                                         libc6-i386 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev \
                                         libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool libunistring-dev \
-                                        lzip man-db manpages-dev mercurial meson mlocate moreutils ninja-build \
-                                        patchelf php pkg-config python3 python3-distutils python3-pip python3-virtualenv \
+                                        lzip man-db manpages-dev mercurial meson mlocate moreutils nasm ninja-build \
+                                        patchelf php pkg-config python3 python3-distutils python3-mako python3-pip python3-virtualenv \
                                         rename ripgrep ruby-mustache rsync scons subversion \
-                                        swig texinfo time tree unzip xmlto zip zlib1g-dev
+                                        swig texinfo time tree unzip xmlto yasm zip zlib1g-dev
 ```
 
 #### LXC: `spksrc` user
