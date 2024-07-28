@@ -60,6 +60,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	meson \
 	mlocate \
 	moreutils \
+	nasm \
 	ninja-build \
 	patchelf \
 	php \
@@ -67,6 +68,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	python2 \
 	python3 \
 	python3-distutils \
+	python3-mako \
 	python3-pip \
 	python3-virtualenv \
 	rename \
@@ -82,6 +84,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	tree \
 	unzip \
 	xmlto \
+	yasm \
 	zip \
 	zlib1g-dev && \
 	apt-get clean && \
