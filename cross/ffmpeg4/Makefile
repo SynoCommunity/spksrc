@@ -225,10 +225,10 @@ CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --extra-libs=-latomic
 CONFIGURE_ARGS += --arch=ppc
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --cpu=e500v2
+CONFIGURE_ARGS += --extra-libs=-latomic
 else
 CONFIGURE_ARGS += --cpu=e500 --disable-altivec
 endif
