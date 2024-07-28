@@ -36,7 +36,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	gh \
 	git \
 	gperf \
-	httpie \
 	imagemagick \
 	intltool \
 	jq \
@@ -56,21 +55,12 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	lzip \
 	man-db \
 	manpages-dev \
-	mercurial \
-	meson \
 	mlocate \
 	moreutils \
 	nasm \
-	ninja-build \
 	patchelf \
 	php \
 	pkg-config \
-	python2 \
-	python3 \
-	python3-distutils \
-	python3-mako \
-	python3-pip \
-	python3-virtualenv \
 	rename \
 	ripgrep \
 	rsync \
@@ -86,10 +76,26 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	xmlto \
 	yasm \
 	zip \
-	zlib1g-dev && \
-	apt-get clean && \
+	zlib1g-dev
+
+# Python based apps
+RUN apt-get update && apt-get install --no-install-recommends -y \
+	httpie \
+	mercurial \
+	meson \
+	ninja-build \
+	python3 \
+	python3-distutils \
+	python3-mako \
+	python3-pip \
+	python3-virtualenv
+
+# Clean-up apt db
+RUN apt-get clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-	adduser --disabled-password --gecos '' user && \
+
+# Add user
+RUN adduser --disabled-password --gecos '' user && \
 	adduser user sudo && \
 	echo "%user ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/users
 
