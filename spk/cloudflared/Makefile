@@ -19,4 +19,11 @@ STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 
+POST_STRIP_TARGET = cloudflared_extra_install
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: cloudflared_extra_install
+cloudflared_extra_install:
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 644 src/config.yml $(STAGING_DIR)/var/config.yml
