@@ -23,6 +23,7 @@ service_postupgrade()
 {
     # Migrate from token file if exists
     if [ -e $TOKEN_FILE ]; then
+        echo "Migrate token into ${CONFIG_FILE} and delete ${TOKEN_FILE}"
         CLOUDFLARED_TOKEN="$(cat $TOKEN_FILE)"
         rm -f $TOKEN_FILE
         sed -i -e "s|@token@|${CLOUDFLARED_TOKEN}|g" \
