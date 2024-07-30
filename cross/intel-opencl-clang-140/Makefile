@@ -66,6 +66,8 @@ CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 # as a shared library, you should use the
 # LLVM_BUILD_LLVM_DYLIB option
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
+CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
+CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 
 # Disable third-party benchmarks and unittest
 # as not-included in build and fails
