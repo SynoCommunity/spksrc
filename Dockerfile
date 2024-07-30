@@ -88,7 +88,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	python3-distutils \
 	python3-mako \
 	python3-pip \
-	python3-virtualenv
+	python3-virtualenv \
+	python3-yaml
 
 # Clean-up apt db
 RUN apt-get clean && \
