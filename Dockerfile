@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 LABEL description="Framework for maintaining and compiling native community packages for Synology devices"
 LABEL maintainer="SynoCommunity <https://github.com/SynoCommunity/spksrc/graphs/contributors>"
 LABEL url="https://synocommunity.com"
@@ -33,7 +33,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	g++-multilib \
 	gawk \
 	gettext \
-	gh \
 	git \
 	gperf \
 	imagemagick \
@@ -91,9 +90,18 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	python3-virtualenv \
 	python3-yaml
 
+# Install hg github tool
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
+	echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
+	apt update && \
+	apt install gh
+
 # Clean-up apt db
 RUN apt-get clean && \
-	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Update locate db
+RUN updatedb
 
 # Add user
 RUN adduser --disabled-password --gecos '' user && \
