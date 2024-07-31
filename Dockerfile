@@ -11,7 +11,7 @@ RUN dpkg --add-architecture i386
 
 # Install required packages (in sync with README.rst instructions)
 # ATTENTION: the total length of the following RUN command must not exceed 1024 characters
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt update && apt install --no-install-recommends -y \
 	autoconf-archive \
 	autogen \
 	automake \
@@ -78,7 +78,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	zlib1g-dev
 
 # Python based apps
-RUN apt-get install --no-install-recommends -y \
+RUN apt install --no-install-recommends -y \
 	httpie \
 	mercurial \
 	meson \
@@ -97,7 +97,7 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
 	apt install gh
 
 # Clean-up apt db
-RUN apt-get clean && \
+RUN apt clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Update locate db
