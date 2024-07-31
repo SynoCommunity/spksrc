@@ -78,7 +78,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	zlib1g-dev
 
 # Python based apps
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get install --no-install-recommends -y \
 	httpie \
 	mercurial \
 	meson \
