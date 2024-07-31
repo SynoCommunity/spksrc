@@ -56,7 +56,7 @@ sudo apt update
 sudo apt install autoconf-archive autogen automake autopoint bash \
                  bash-completion bc bison build-essential check cmake \
                  curl cython3 debootstrap ed expect fakeroot flex \
-                 g++-multilib gawk gettext git gperf httpie imagemagick \
+                 g++-multilib gawk gettext gh git gperf httpie imagemagick \
                  intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev \
                  libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
                  libpcre3-dev libssl-dev libtool libunistring-dev lzip \
@@ -83,7 +83,7 @@ A container based on 64-bit version of Debian 12 stable OS is recommended. Non-x
 lxc exec spksrc -- /usr/bin/apt install autoconf-archive autogen automake autopoint bash \
                                         bash-completion bc bison build-essential check cmake \
                                         curl cython3 debootstrap ed expect fakeroot flex \
-                                        g++-multilib gawk gettext git gperf httpie imagemagick \
+                                        g++-multilib gawk gettext gh git gperf httpie imagemagick \
                                         intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev \
                                         libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
                                         libpcre3-dev libssl-dev libtool libunistring-dev lzip \
