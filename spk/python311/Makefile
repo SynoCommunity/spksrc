@@ -1,7 +1,7 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.5
+SPK_VERS = 3.11.8
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/python3.png
 
 # Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
@@ -18,7 +18,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.5"
+CHANGELOG = "1. Update to Python 3.11.8"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -28,7 +28,7 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS = src/requirements-pure.txt
 
 # Force testing all wheel builds
-WHEELS_TEST_ALL = 0
+WHEELS_TEST_ALL = 1
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -68,15 +68,6 @@ DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
-# [Pillow]
-DEPENDS += cross/freetype cross/libjpeg cross/zlib
-WHEELS_BUILD_ARGS += [Pillow]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += --disable-platform-guessing
-WHEELS_BUILD_ARGS += --enable-freetype
-WHEELS_BUILD_ARGS += --enable-jpeg
-WHEELS_BUILD_ARGS += --enable-zlib
-
 # [pycares]
 DEPENDS += cross/c-ares
 ENV += PYCARES_USE_SYSTEM_LIB=1
@@ -115,6 +106,23 @@ endif
 ## WHEELS_TEST_ALL: Force testing all wheel building
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 
+# [Pillow]
+DEPENDS += cross/freetype cross/lcms2 cross/libimagequant cross/libjpeg
+DEPENDS += cross/libtiff cross/libwebp cross/zlib
+WHEELS_BUILD_ARGS += [Pillow]
+WHEELS_BUILD_ARGS += -C platform-guessing=disable
+WHEELS_BUILD_ARGS += -C freetype=enable
+WHEELS_BUILD_ARGS += -C imagequant=enable
+WHEELS_BUILD_ARGS += -C jpeg=enable
+WHEELS_BUILD_ARGS += -C lcms=enable
+WHEELS_BUILD_ARGS += -C tiff=enable
+WHEELS_BUILD_ARGS += -C webp=enable
+WHEELS_BUILD_ARGS += -C zlib=enable
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS_BUILD_ARGS += -C raqm=enable
+DEPENDS += cross/libraqm
+endif
+
 # [rpds-py]
 # maturin canot be built as pre-requisite crossenv
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
@@ -141,14 +149,12 @@ else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
-# [numpy] <= 1.21.6 (armv5)
-# This version is now unsupported using py311
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-# [numpy] <= 1.22.4 (armv7l)
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-numpy-armv7l.txt
+# [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
+# [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
+# [numpy] <= 1.23.5 (any) requires setuptools <= 63.4.3 - unsupported
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 # [numpy] <= 1.24.4 last working version with gcc-4.9
-else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy-gcc4.txt
 # [numpy] >= 1.25.0 requires c++17
 else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
