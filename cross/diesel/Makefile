@@ -18,7 +18,8 @@ LICENSE  = MIT
 # build the cli tool for mysql
 RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/diesel_cli
 CARGO_BUILD_ARGS += --no-default-features
-CARGO_BUILD_ARGS += --features=mysql
+# patch based on https://github.com/diesel-rs/diesel/issues/4056
+CARGO_BUILD_ARGS += --features=mysql,mysqlclient-sys/buildtime_bindgen
 
 # we support MariaDB 10 only
 # we must define the mysql db socket, since the rust binaries (mysqlclient-sys)
