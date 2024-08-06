@@ -1,5 +1,5 @@
 SPK_NAME = cloudflared
-SPK_VERS = 2024.7.3
+SPK_VERS = 2024.8.2
 SPK_REV = 14
 SPK_ICON = src/cloudflared.png
 
@@ -11,7 +11,7 @@ DISPLAY_NAME = Cloudflare Tunnel
 DESCRIPTION = "Cloudflare Tunnel provides you with a secure way to connect your resources to Cloudflare without a publicly routable IP address. With Tunnel, you do not send traffic to an external IP - instead, a lightweight daemon in your infrastructure \('cloudflared'\) creates outbound-only connections to Cloudflare\'s global network. Cloudflare Tunnel can connect HTTP web servers, SSH servers, remote desktops, and other protocols safely to Cloudflare. This way, your origins can serve traffic through Cloudflare without being vulnerable to attacks that bypass Cloudflare."
 HOMEPAGE = https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/
 LICENSE = Apache-2.0
-CHANGELOG = "1.Update to v2024.7.3 <br/>2. Use config.yml instead of passing the token directly<br/>3. Add more options to the install wizard"
+CHANGELOG = "1.Update to v2024.8.2 <br/>2. Use config.yml instead of passing the token directly<br/>3. Add more options to the install wizard"
 
 WIZARDS_DIR = src/wizard/
 
