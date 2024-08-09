@@ -90,6 +90,9 @@ RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
 # Install meson cross-platform build system
 RUN pip3 install meson==1.0.0
 
+# Install mako syntax parser for IGC compiling
+RUN pip3 install Mako
+
 # Volume pointing to spksrc sources
 VOLUME /spksrc
 WORKDIR /spksrc
