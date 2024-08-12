@@ -20,6 +20,4 @@ ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
 CONFIGURE_ARGS += --disable-assembler
 endif
 
-ADDITIONAL_CFLAGS = -O2
-
 include ../../mk/spksrc.cross-cc.mk

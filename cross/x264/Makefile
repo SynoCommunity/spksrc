@@ -18,7 +18,6 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-shared
 CONFIGURE_ARGS += --enable-pic
 CONFIGURE_ARGS += --disable-opencl
-CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --cross-prefix=$(TC_PATH)$(TC_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk

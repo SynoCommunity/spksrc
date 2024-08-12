@@ -30,8 +30,6 @@ CONFIGURE_ARGS += --enable-stack-protector=strong
 CONFIGURE_ARGS += --with-headers=$(TC_SYSROOT)/usr/include
 CONFIGURE_ARGS += ac_cv_prog_MAKEINFO=false
 
-ADDITIONAL_CFLAGS = -O2
-
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: glibc_configure_target

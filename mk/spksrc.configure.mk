@@ -36,12 +36,17 @@ endif
 
 REAL_CONFIGURE_ARGS  =
 ifneq ($(strip $(GNU_CONFIGURE)),)
-REAL_CONFIGURE_ARGS += $(TC_CONFIGURE_ARGS)
-REAL_CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
-# DSM7 appdir
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-REAL_CONFIGURE_ARGS += --localstatedir=$(INSTALL_PREFIX_VAR)
-endif
+  ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+    REAL_CONFIGURE_ARGS += --enable-debug --disable-strip
+  else
+    REAL_CONFIGURE_ARGS += --enable-strip
+  endif
+  REAL_CONFIGURE_ARGS += $(TC_CONFIGURE_ARGS)
+  REAL_CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
+  # DSM7 appdir
+  ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+    REAL_CONFIGURE_ARGS += --localstatedir=$(INSTALL_PREFIX_VAR)
+  endif
 endif
 REAL_CONFIGURE_ARGS += $(CONFIGURE_ARGS)
 

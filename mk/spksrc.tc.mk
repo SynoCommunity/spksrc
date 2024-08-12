@@ -212,12 +212,18 @@ tc_vars: flag
 	echo TC_TARGET := $(TC_TARGET) ; \
 	echo TC_PREFIX := $(TC_PREFIX) ; \
 	echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/ ; \
+<<<<<<< HEAD
 	echo CFLAGS := $(CFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CFLAGS\) ; \
 	echo CPPFLAGS := $(CPPFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CPPFLAGS\) ; \
 	echo CXXFLAGS := $(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	if [ "$$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | tail -n1)" = "$(TC_VERS)" ]; then \
 	   echo FFLAGS := $(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\) ; \
 	fi ; \
+=======
+	echo CFLAGS := $(CFLAGS) $$\(ADDITIONAL_CFLAGS\) ; \
+	echo CPPFLAGS := $(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\) ; \
+	echo CXXFLAGS := $(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\) ; \
+>>>>>>> 5b303d01 (Create proper debug configuration)
 	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
