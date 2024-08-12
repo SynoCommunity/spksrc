@@ -23,6 +23,10 @@ CMAKE_ARGS += -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
 # Fix full lib version:
 CMAKE_ARGS += -DSHARED_LIB_PATCH_VERSION=0
 
+# Disable some warnings
+ADDITIONAL_CFLAGS = -Wno-implicit-fallthrough -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-stringop-overflow
+ADDITIONAL_CXXFLAGS = $(ADDITIONAL_CFLAGS)
+
 include ../../mk/spksrc.native-cmake.mk
 
 .PHONY: libmysqlclient_pre_install
