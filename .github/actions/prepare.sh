@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # Part of github build action
 # 
