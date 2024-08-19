@@ -6,7 +6,7 @@ PKG_EXT = tar.gz
 PKG_DIST_SITE = https://github.com/intel/opencl-clang/archive
 
 # ocl-open-140 branch is still receiving updates
-# using latest gis hash to ensure replicable builds
+# using latest git hash to ensure replicable builds
 PKG_GIT_HASH = 470cf0018e1ef6fc92eda1356f5f31f7da452abc
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
@@ -22,6 +22,7 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 BUILD_DEPENDS  = cross/llvm-140.src cross/clang-140.src cross/lld-140.src cross/libunwind-140.src
 BUILD_DEPENDS += cross/SPIRV-LLVM-Translator-140.src cross/SPIRV-Headers.src
+BUILD_DEPENDS += cross/intel-vc-intrinsics.src
 DEPENDS += cross/SPIRV-Tools
 
 HOMEPAGE = https://github.com/intel/opencl-clang
@@ -83,21 +84,24 @@ CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
 # intel-opencl-140 specific
 CMAKE_ARGS += -DPREFERRED_LLVM_VERSION= $(PKG_LLVM_MAJ).0.5
 
+# intel-vc-intrinsics dependent else error:
+#   Could not find FOUND_VCS using the following files: VersionFromVCS.cmake
+CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/lib/cmake/llvm/VersionFromVCS.cmake
+
 include ../../mk/spksrc.common.mk
 
 #
 # https://github.com/intel/opencl-clang
 #
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
 CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
 CMAKE_ARGS += -DLLVM_SOURCE_DIR=$(WORK_DIR)/llvm
-CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang'
+CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang;vc-intrinsics'
 CMAKE_ARGS += -DLLVM_EXTERNAL_CLANG_SOURCE_DIR=$(WORK_DIR)/clang
 CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
 CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(WORK_DIR)/SPIRV-Headers
+CMAKE_ARGS += -DLLVM_EXTERNAL_VC_INTRINSICS_SOURCE_DIR=$(WORK_DIR)/vc-intrinsics
 CMAKE_ARGS += -DLLVM_EXTERNAL_OPENCL_CLANG_SOURCE_DIR=$(WORK_DIR)/$(PKG_NAME)
-endif
 
 include ../../mk/spksrc.cross-cmake.mk
 
