@@ -83,9 +83,6 @@ CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
 # Fix build failure against DSM-7.2 toolchain
 #CMAKE_ARGS += -DLLVM_OPTIMIZED_TABLEGEN=ON
 
-# intel-opencl-140 specific
-CMAKE_ARGS += -DPREFERRED_LLVM_VERSION='$(PKG_LLVM_MAJ).0.5'
-
 # intel-vc-intrinsics dependent else error:
 #   Could not find FOUND_VCS using the following files: VersionFromVCS.cmake
 CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/lib/cmake/llvm/VersionFromVCS.cmake
