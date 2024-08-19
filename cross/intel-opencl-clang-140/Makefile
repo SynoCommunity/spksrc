@@ -23,6 +23,8 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 BUILD_DEPENDS  = cross/llvm-140.src cross/clang-140.src cross/lld-140.src cross/libunwind-140.src
 BUILD_DEPENDS += cross/SPIRV-LLVM-Translator-140.src cross/SPIRV-Headers.src
 BUILD_DEPENDS += cross/intel-vc-intrinsics.src
+# SPIRV-Tools cannot be built in-tree:
+#   SPIRV-Tools requires C++17 or later, but is configured for C++14
 DEPENDS += cross/SPIRV-Tools
 
 HOMEPAGE = https://github.com/intel/opencl-clang
@@ -82,7 +84,7 @@ CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
 #CMAKE_ARGS += -DLLVM_OPTIMIZED_TABLEGEN=ON
 
 # intel-opencl-140 specific
-CMAKE_ARGS += -DPREFERRED_LLVM_VERSION= $(PKG_LLVM_MAJ).0.5
+CMAKE_ARGS += -DPREFERRED_LLVM_VERSION='$(PKG_LLVM_MAJ).0.5'
 
 # intel-vc-intrinsics dependent else error:
 #   Could not find FOUND_VCS using the following files: VersionFromVCS.cmake
@@ -98,8 +100,8 @@ CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
 CMAKE_ARGS += -DLLVM_SOURCE_DIR=$(WORK_DIR)/llvm
 CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang;vc-intrinsics'
 CMAKE_ARGS += -DLLVM_EXTERNAL_CLANG_SOURCE_DIR=$(WORK_DIR)/clang
-CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
 CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(WORK_DIR)/SPIRV-Headers
+CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
 CMAKE_ARGS += -DLLVM_EXTERNAL_VC_INTRINSICS_SOURCE_DIR=$(WORK_DIR)/vc-intrinsics
 CMAKE_ARGS += -DLLVM_EXTERNAL_OPENCL_CLANG_SOURCE_DIR=$(WORK_DIR)/$(PKG_NAME)
 
