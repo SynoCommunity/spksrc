@@ -35,7 +35,9 @@ ifeq ($(strip $(CMAKE_DIR)),)
 CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 
-ifneq ($(strip $(CMAKE_USE_NINJA)),1)
+ifeq ($(strip $(CMAKE_USE_NINJA)),1)
+include ../../mk/spksrc.cross-ninja.mk
+else
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
 COMPILE_TARGET = cmake_compile_target
@@ -78,16 +80,14 @@ include ../../mk/spksrc.compile.mk
 install: compile
 include ../../mk/spksrc.install.mk
 
-.PHONY: cat_PLIST
-cat_PLIST:
-	@true
-
 all: install
 
 ###
 
-### Include common rules
-include ../../mk/spksrc.common-rules.mk
+# No PLIST to be processed for native
+.PHONY: cat_PLIST
+cat_PLIST:
+	@true
 
 ###
 
@@ -107,10 +107,6 @@ cmake_configure_target:
 
 .PHONY: cmake_compile_target
 
-ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-include ../../mk/spksrc.cross-ninja.mk
-else
-
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
@@ -126,6 +122,10 @@ ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
 else
 	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
 endif
-endif
+
+###
+
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
 
 ####
