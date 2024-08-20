@@ -41,10 +41,6 @@ CMAKE_BUILD_DIR = $(WORK_DIR)/opencl-clang.build
 CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm
 CMAKE_DIR = $(WORK_DIR)/llvm
 
-# Enable building with zlib to support compression/uncompression
-DEPENDS += cross/zlib
-CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
-
 # Indicates whether the LLVM Interpreter will be
 # linked with the Foreign Function Interface library
 # (libffi) in order to enable calling external functions.
@@ -57,6 +53,7 @@ CMAKE_ARGS += -DLLVM_ENABLE_TERMINFO=ON
 DEPENDS += cross/libxml2
 CMAKE_ARGS += -DLLVM_ENABLE_LIBXML2=ON
 
+# Enable building with zlib to support compression/uncompression
 DEPENDS += cross/zlib
 CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 
