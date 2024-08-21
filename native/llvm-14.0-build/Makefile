@@ -44,11 +44,12 @@ include ../../mk/spksrc.native-cmake.mk
 
 .PHONY: llvm_post_install
 llvm_post_install:
+	$(RUN) install -m 755 build/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
+	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf clang-$(PKG_VERS_MAJ) clang-tool
 	$(RUN) install -m 755 build/bin/llvm-config $(STAGING_INSTALL_PREFIX)/bin/llvm-config
 	$(RUN) install -m 755 build/bin/llvm-link $(STAGING_INSTALL_PREFIX)/bin/llvm-link
 	$(RUN) install -m 755 build/bin/llvm-tblgen $(STAGING_INSTALL_PREFIX)/bin/llvm-tblgen
-	$(RUN) install -m 755 build/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
-	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf clang-$(PKG_VERS_MAJ) clang-tool
+	$(RUN) install -m 755 build/bin/opt $(STAGING_INSTALL_PREFIX)/bin/opt
 
 .PHONY: build-archive
 build-archive:
