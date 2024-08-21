@@ -1,5 +1,6 @@
 PKG_NAME = llvm
-PKG_VERS = 14.0.5
+PKG_VERS_MAJ = 14
+PKG_VERS = $(PKG_VERS_MAJ).0.5
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-project-$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)
@@ -44,8 +45,10 @@ include ../../mk/spksrc.native-cmake.mk
 .PHONY: llvm_post_install
 llvm_post_install:
 	$(RUN) install -m 755 build/bin/llvm-config $(STAGING_INSTALL_PREFIX)/bin/llvm-config
+	$(RUN) install -m 755 build/bin/llvm-link $(STAGING_INSTALL_PREFIX)/bin/llvm-link
 	$(RUN) install -m 755 build/bin/llvm-tblgen $(STAGING_INSTALL_PREFIX)/bin/llvm-tblgen
 	$(RUN) install -m 755 build/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
+	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf clang-$(PKG_VERS_MAJ) clang-tool
 
 .PHONY: build-archive
 build-archive:
