@@ -1,7 +1,5 @@
 PKG_NAME = intel-graphics-compiler
 PKG_VERS = 1.0.17384.11
-#PKG_VERS = 1.0.17193.16
-#PKG_VERS = 1.0.15468.40
 PKG_EXT = tar.gz
 PKG_DIST_NAME = igc-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/intel-graphics-compiler/archive
@@ -15,21 +13,23 @@ BUILD_DEPENDS += cross/SPIRV-LLVM-Translator-140.src
 BUILD_DEPENDS += cross/intel-vc-intrinsics.src
 BUILD_DEPENDS += cross/intel-opencl-clang-140.src
 BUILD_DEPENDS += cross/llvm-project-140.src
-#BUILD_DEPENDS += cross/llvm-140.src cross/clang-140.src cross/lld-140.src cross/libunwind-140.src
 DEPENDS += cross/intel-level-zero
 
 HOMEPAGE = https://github.com/oneapi-src/level-zero
 COMMENT  = This project is part of the larger oneAPI project and contains copies of the Level Zero Specification API C/C++ header files, Level Zero Loader, Level Zero Validation Layer and Level Zero Tracing Layer
 LICENSE  = MIT
 
-POST_EXTRACT_TARGET = igc_post_extract_target
-CMAKE_USE_NINJA = 0
-
 # Default version of LLVM used by IGC
 IGC_LLVM_MAJ = 14
 IGC_LLVM_VER = $(IGC_LLVM_MAJ).0.5
 
-# Suppress developer warnings
+POST_EXTRACT_TARGET = igc_post_extract_target
+
+# Fails when built using Ninja and/or requires various CMP0??? such as:
+#   CMAKE_ARGS += -DCMAKE_POLICY_DEFAULT_CMP0116='OLD|NEW'
+CMAKE_USE_NINJA = 0
+
+# Suppress developer warnings (has no effect?)
 CMAKE_ARGS += -Wno-dev
 
 # Using various LLVM project sources needs a top-level master directory
@@ -78,8 +78,9 @@ CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
 
 # [intel-vc-intrinsics] else error:
 #   Could not find FOUND_VCS using the following files: VersionFromVCS.cmake
+CMAKE_ARGS += -DFOUND_VCS=$(WORK_DIR)/llvm-project/llvm/cmake/modules/VersionFromVCS.cmake
 #CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/lib/cmake/llvm/VersionFromVCS.cmake
-CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/IGC/llvm-deps-$(IGC_LLVM_VER)/build/src/lib/cmake/llvm/VersionFromVCS.cmake
+#CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/IGC/llvm-deps-$(IGC_LLVM_VER)/build/src/lib/cmake/llvm/VersionFromVCS.cmake
 #CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/IGC/llvm-deps-$(IGC_LLVM_VER)/build/src/NATIVE/lib/cmake/llvm/VersionFromVCS.cmake
 
 # IGC specific
@@ -134,37 +135,49 @@ CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
 CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Source'
 #CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_SOURCES_DIR=$(WORK_DIR)/vc-intrinsics
 
-#CMAKE_ARGS += -DCMAKE_POLICY_DEFAULT_CMP0079='NEW'
+
+ENV += CXXFLAGS='-I$(WORK_DIR)/SPIRV-LLVM-Translator/include'
 
 # Seems to go further, up to 95%
 ADDITIONAL_CPPFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
 ADDITIONAL_CPPFLAGS += -Wno-error=restrict
 ADDITIONAL_CPPFLAGS += -Wno-error=deprecated-declarations
 
-#ADDITIONAL_CXXFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
-#ADDITIONAL_CXXFLAGS += -Wno-error=restrict
-#ADDITIONAL_CXXFLAGS += -Wno-error=deprecated-declarations
+ADDITIONAL_CXXFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
+ADDITIONAL_CXXFLAGS += -Wno-error=restrict
+ADDITIONAL_CXXFLAGS += -Wno-error=deprecated-declarations
 
 # Fails to access in NATIVE/bin/llvm-tblgen possibly due to parallel compiling
 # Provided thru native/llvm-14.0 instead
 BUILD_DEPENDS += native/llvm-14.0-build
 CMAKE_ARGS += -DLLVM_TABLEGEN=$(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/bin/llvm-tblgen)
 CMAKE_ARGS += -DCLANG_TABLEGEN=$(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/bin/clang-tblgen)
-#CMAKE_ARGS += -DCMAKE_POLICY_DEFAULT_CMP0116='OLD'
-#CMAKE_ARGS += -DCMAKE_POLICY_DEFAULT_CMP0116='NEW'
 
 include ../../mk/spksrc.cross-cmake.mk
 
 # Requires access to build-time
 #   NATIVE tools: IGC/llvm-deps-$(IGC_LLVM_VER)/build/src/NATIVE/bin
-#   llvm-tblgen, clang-tool, llvm-link thru native/llvm-14.0
+#   llvm-tblgen, clang-tool (symlink -> clang-14), llvm-link, opt: native/llvm-14.0
 #   CMCLTranslatorTool (during build time): IGC/Release/CMCLTranslatorTool
 ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/llvm-deps-$(IGC_LLVM_VER)/build/src/NATIVE/bin:$(CMAKE_BUILD_DIR)/IGC/Release:$(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/bin):$$PATH
 
+# Associate external projects to LLVM build, this replaces (and cannot be combined):
+#   -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang;vc-intrinsics'
+#   -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
+#   -DLLVM_EXTERNAL_OPENCL_CLANG_SOURCE_DIR=$(WORK_DIR)/opencl-clang
+#   -DLLVM_EXTERNAL_VC_INTRINSICS_SOURCE_DIR=$(WORK_DIR)/vc-intrinsics
 igc_link_external_project:
 	@cd $(WORK_DIR)/llvm-project/llvm/projects && ln -sf ../../../opencl-clang opencl-clang
 	@cd $(WORK_DIR)/llvm-project/llvm/projects && ln -sf ../../../SPIRV-LLVM-Translator llvm-spirv
 
-igc_post_extract_target: igc_link_external_project
+# When built in-tree intel-opencl-clang thru IGC it can't find llvm-spirv headers
+# Similarly for itself which can find the actual include directory
+# Further, using the following doesn't work (maybe not propagated?):
+#     ADDITIONAL_CPPFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
+igc_intree_copy_llvm-spirv_include: igc_link_external_project
+	@cp $(WORK_DIR)/SPIRV-LLVM-Translator/include/* $(WORK_DIR)/opencl-clang/.
+	@cp $(WORK_DIR)/SPIRV-LLVM-Translator/include/* $(WORK_DIR)/SPIRV-LLVM-Translator/lib/SPIRV/.
+
+igc_post_extract_target: igc_intree_copy_llvm-spirv_include
 	@cd $(WORK_DIR) && ln -sf $(PKG_DIR) $(PKG_NAME)
 	@cd $(WORK_DIR) && ln -sf $(PKG_NAME) igc
