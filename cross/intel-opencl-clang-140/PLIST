@@ -12,3 +12,5 @@ lnk:lib/libopencl-clang.so
 lib:lib/libopencl-clang.so.14
 lnk:lib/libRemarks.so
 lib:lib/libRemarks.so.14
+# intel-vc-intrinsics
+lib:lib/libLLVMGenXIntrinsics.so
