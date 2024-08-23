@@ -1,9 +1,9 @@
 # cross-compiled wheels
-cffi==1.16.0
+cffi==1.17.0
 CT3==3.3.3.post1
-sabctools==8.2.3
-orjson==3.10.3
+sabctools==8.2.5
+orjson==3.10.7
 
 # AppRise/Requests Requirements
-PyYAML==6.0.1
+PyYAML==6.0.2
 charset_normalizer==3.3.2
