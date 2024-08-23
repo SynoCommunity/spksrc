@@ -37,24 +37,15 @@ CMAKE_BUILD_DIR = $(WORK_DIR)/igc.build
 CMAKE_SOURCE_DIR = $(WORK_DIR)/igc
 CMAKE_DIR = $(WORK_DIR)/igc
 
-# Needed for IGC lldELF
-#DEPENDS += cross/protobuf
+DEPENDS += cross/ncursesw
+CMAKE_ARGS += -DLLVM_ENABLE_TERMINFO=ON
 
-# Indicates whether the LLVM Interpreter will be
-# linked with the Foreign Function Interface library
-# (libffi) in order to enable calling external functions.
-#DEPENDS += cross/libffi
-#CMAKE_ARGS += -DLLVM_ENABLE_FFI=ON
-
-#DEPENDS += cross/ncursesw
-#CMAKE_ARGS += -DLLVM_ENABLE_TERMINFO=ON
-
-#DEPENDS += cross/libxml2
-#CMAKE_ARGS += -DLLVM_ENABLE_LIBXML2=ON
+DEPENDS += cross/libxml2
+CMAKE_ARGS += -DLLVM_ENABLE_LIBXML2=ON
 
 # Enable building with zlib to support compression/uncompression
-#DEPENDS += cross/zlib
-#CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
+DEPENDS += cross/zlib
+CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 
 # Assertions are internal checks to help find bugs.
 # They typically slow down LLVM and Clang when enabled
@@ -79,9 +70,6 @@ CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
 # [intel-vc-intrinsics] else error:
 #   Could not find FOUND_VCS using the following files: VersionFromVCS.cmake
 CMAKE_ARGS += -DFOUND_VCS=$(WORK_DIR)/llvm-project/llvm/cmake/modules/VersionFromVCS.cmake
-#CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/lib/cmake/llvm/VersionFromVCS.cmake
-#CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/IGC/llvm-deps-$(IGC_LLVM_VER)/build/src/lib/cmake/llvm/VersionFromVCS.cmake
-#CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/IGC/llvm-deps-$(IGC_LLVM_VER)/build/src/NATIVE/lib/cmake/llvm/VersionFromVCS.cmake
 
 # IGC specific
 CMAKE_ARGS += -DIGC_OPTION__ARCHITECTURE_TARGET='Linux64'
@@ -113,7 +101,7 @@ CMAKE_ARGS += -DDEFAULT_IGC_LLVM_SOURCES_DIR=$(WORK_DIR)/llvm-project
 # Requires conjunction of both to be detected:
 #     -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR
 #     -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
-# Although using local SPIRV-Headers resilts in:
+# Although using local SPIRV-Headers results in:
 #     fatal error: spirv/unified1/spirv.hpp: No such file or directory
 #CMAKE_ARGS += -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
 #CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(WORK_DIR)/SPIRV-Headers
@@ -135,17 +123,11 @@ CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
 CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Source'
 #CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_SOURCES_DIR=$(WORK_DIR)/vc-intrinsics
 
-
-ENV += CXXFLAGS='-I$(WORK_DIR)/SPIRV-LLVM-Translator/include'
-
-# Seems to go further, up to 95%
-ADDITIONAL_CPPFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
-ADDITIONAL_CPPFLAGS += -Wno-error=restrict
-ADDITIONAL_CPPFLAGS += -Wno-error=deprecated-declarations
-
+# Fixes IGC/VectorCompiler/lib/Driver/SPIRVWrapper.cpp
+#       fatal error: LLVMSPIRVLib.h: No such file or directory
+# Further, have a look below at 'igc_intree_copy_llvm-spirv_include'
+# for both opencl-clang and llvm-spirv (SPIRV-LLVM-Translator)
 ADDITIONAL_CXXFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
-ADDITIONAL_CXXFLAGS += -Wno-error=restrict
-ADDITIONAL_CXXFLAGS += -Wno-error=deprecated-declarations
 
 # Fails to access in NATIVE/bin/llvm-tblgen possibly due to parallel compiling
 # Provided thru native/llvm-14.0 instead
@@ -155,16 +137,17 @@ CMAKE_ARGS += -DCLANG_TABLEGEN=$(abspath $(PWD)/../../native/llvm-14.0-build/wor
 
 include ../../mk/spksrc.cross-cmake.mk
 
-# Requires access to build-time
-#   NATIVE tools: IGC/llvm-deps-$(IGC_LLVM_VER)/build/src/NATIVE/bin
-#   llvm-tblgen, clang-tool (symlink -> clang-14), llvm-link, opt: native/llvm-14.0
+# Requires access to:
 #   CMCLTranslatorTool (during build time): IGC/Release/CMCLTranslatorTool
-ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/llvm-deps-$(IGC_LLVM_VER)/build/src/NATIVE/bin:$(CMAKE_BUILD_DIR)/IGC/Release:$(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/bin):$$PATH
+#   llvm-tblgen, clang-tool (symlink -> clang-14), llvm-link, opt: native/llvm-14.0
+ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/Release:$(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/bin):$$PATH
 
 # Associate external projects to LLVM build, this replaces (and cannot be combined):
-#   -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang;vc-intrinsics'
+#   -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang'
 #   -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
 #   -DLLVM_EXTERNAL_OPENCL_CLANG_SOURCE_DIR=$(WORK_DIR)/opencl-clang
+# Note that vc-intrinsics is handled thru IGC, and not LLVM such as:
+#   -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang;vc-intrinsics'
 #   -DLLVM_EXTERNAL_VC_INTRINSICS_SOURCE_DIR=$(WORK_DIR)/vc-intrinsics
 igc_link_external_project:
 	@cd $(WORK_DIR)/llvm-project/llvm/projects && ln -sf ../../../opencl-clang opencl-clang
@@ -172,8 +155,8 @@ igc_link_external_project:
 
 # When built in-tree intel-opencl-clang thru IGC it can't find llvm-spirv headers
 # Similarly for itself which can find the actual include directory
-# Further, using the following doesn't work (maybe not propagated?):
-#     ADDITIONAL_CPPFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
+# Further, using the following doesn't work for these two in particular:
+#     ADDITIONAL_CXXFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
 igc_intree_copy_llvm-spirv_include: igc_link_external_project
 	@cp $(WORK_DIR)/SPIRV-LLVM-Translator/include/* $(WORK_DIR)/opencl-clang/.
 	@cp $(WORK_DIR)/SPIRV-LLVM-Translator/include/* $(WORK_DIR)/SPIRV-LLVM-Translator/lib/SPIRV/.
