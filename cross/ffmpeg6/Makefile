@@ -262,18 +262,20 @@ DEPENDS += cross/frei0r
 CONFIGURE_ARGS += --enable-frei0r
 endif
 
-# Newer Intel implementations (oneAPI, level-zero) requires gcc >= 5
-# -->> can not use libmfx and libvpl together
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
-ifeq ($(call version_lt, ${TC_GCC}, 5),1)
-CONFIGURE_ARGS += --enable-libmfx
-else
+# Newer Intel implementations (oneAPI, level-zero) requires gcc >= 5
+ifeq ($(call version_gt, ${TC_GCC}, 5),1)
 DEPENDS += cross/intel-level-zero
-# Missing intel-graphics-compiler (IGC)
-#CONFIGURE_ARGS += --enable-opencl
+DEPENDS += cross/intel-graphics-compiler
+CONFIGURE_ARGS += --enable-opencl
+
+# Intel MFX and VPL are mutually exclusive
+# -->> can not use libmfx and libvpl together
 DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
 CONFIGURE_ARGS += --enable-libvpl
+else
+CONFIGURE_ARGS += --enable-libmfx
 endif
 endif
