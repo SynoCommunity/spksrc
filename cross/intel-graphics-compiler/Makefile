@@ -8,11 +8,6 @@ PKG_DIR = $(PKG_NAME)-igc-$(PKG_VERS)
 REQUIRED_MIN_DSM = 7
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
-BUILD_DEPENDS += cross/SPIRV-Headers.src
-BUILD_DEPENDS += cross/SPIRV-LLVM-Translator-140.src
-BUILD_DEPENDS += cross/intel-vc-intrinsics.src
-BUILD_DEPENDS += cross/intel-opencl-clang-140.src
-BUILD_DEPENDS += cross/llvm-project-140.src
 DEPENDS += cross/intel-level-zero
 
 HOMEPAGE = https://github.com/oneapi-src/level-zero
@@ -65,69 +60,66 @@ CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
 
 # [intel-opencl-clang-140]
+BUILD_DEPENDS += cross/intel-opencl-clang-140.src
 CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
-
-# [intel-vc-intrinsics] else error:
-#   Could not find FOUND_VCS using the following files: VersionFromVCS.cmake
-CMAKE_ARGS += -DFOUND_VCS=$(WORK_DIR)/llvm-project/llvm/cmake/modules/VersionFromVCS.cmake
 
 # IGC specific
 CMAKE_ARGS += -DIGC_OPTION__ARCHITECTURE_TARGET='Linux64'
 CMAKE_ARGS += -DIGC_OPTION__ARCHITECTURE_HOST='Linux64'
 #CMAKE_ARGS += -DINSTALL_GENX_IR='ON'
 
-# [clang]
-CMAKE_ARGS += -DIGC_OPTION__CLANG_MODE='Source'
-# Has no effect when using llvm-project sources
-#CMAKE_ARGS += -DIGC_OPTION__CLANG_SOURCES_DIR:PATH=$(WORK_DIR)/llvm-project/clang
-CMAKE_ARGS += -DCCLANG_FROM_SYSTEM='OFF'
-
-# [lld]
-CMAKE_ARGS += -DIGC_OPTION__LLD_MODE='Source'
-# Has no effect when using llvm-project sources
-#CMAKE_ARGS += -DIGC_OPTION__lld_SOURCES_DIR:PATH=$(WORK_DIR)/llvm-project/lld
-
-# [llvm]
-CMAKE_ARGS += -DIGC_OPTION__LLVM_MODE='Source'
-CMAKE_ARGS += -DIGC_OPTION__LLVM_STOCK_SOURCES=ON
-CMAKE_ARGS += -DIGC_OPTION__LLVM_SOURCES_DIR=$(WORK_DIR)/llvm-project
-CMAKE_ARGS += -DIGC_OPTION__LLVM_PREFERRED_VERSION='$(IGC_LLVM_VER)'
-
-# [libunwind]
-# Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
-CMAKE_ARGS += -DDEFAULT_IGC_LLVM_SOURCES_DIR=$(WORK_DIR)/llvm-project
-
-# [SPIRV-Headers]
-# Requires conjunction of both to be detected:
-#     -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR
-#     -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
-# Although using local SPIRV-Headers results in:
-#     fatal error: spirv/unified1/spirv.hpp: No such file or directory
-#CMAKE_ARGS += -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
-#CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(WORK_DIR)/SPIRV-Headers
-
-# [SPIRV-LLVM-Translator -> llvm-spirv]
-CMAKE_ARGS += -DIGC_OPTION__LINK_KHRONOS_SPIRV_TRANSLATOR='OFF'
-# Leave in auto-configure as otherwise fails
-#CMAKE_ARGS += -DIGC_OPTION__SPIRV_TRANSLATOR_MODE='Source'
-#CMAKE_ARGS += -DIGC_OPTION__SPIRV_TRANSLATOR_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
-
-# [SPIRV-Tools]
-# cannot be built in-tree: SPIRV-Tools requires C++17 or later, but is configured for C++14
-DEPENDS += cross/SPIRV-Tools
-CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
-
 # [intel-vc-intrinsics]
+BUILD_DEPENDS += cross/intel-vc-intrinsics.src
 # Leaving source directory in auto-configure mode du to CMake Warning:
 #     Manually-specified variables were not used by the project: IGC_OPTION__VC_INTRINSICS_SOURCES_DIR
 CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Source'
 #CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_SOURCES_DIR=$(WORK_DIR)/vc-intrinsics
+#   Could not find FOUND_VCS using the following files: VersionFromVCS.cmake
+CMAKE_ARGS += -DFOUND_VCS=$(WORK_DIR)/llvm-project/llvm/cmake/modules/VersionFromVCS.cmake
 
+# [Khronos-SPIRV-Headers]
+BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
+CMAKE_ARGS += -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
+
+# [Khronos-SPIRV-LLVM-Translator -> llvm-spirv]
+BUILD_DEPENDS += cross/Khronos-SPIRV-LLVM-Translator-140.src
+CMAKE_ARGS += -DIGC_OPTION__LINK_KHRONOS_SPIRV_TRANSLATOR='OFF'
+# Leave in auto-configure as otherwise fails
+#CMAKE_ARGS += -DIGC_OPTION__SPIRV_TRANSLATOR_MODE='Source'
+#CMAKE_ARGS += -DIGC_OPTION__SPIRV_TRANSLATOR_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
 # Fixes IGC/VectorCompiler/lib/Driver/SPIRVWrapper.cpp
 #       fatal error: LLVMSPIRVLib.h: No such file or directory
 # Further, have a look below at 'igc_intree_copy_llvm-spirv_include'
 # for both opencl-clang and llvm-spirv (SPIRV-LLVM-Translator)
 ADDITIONAL_CXXFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
+
+# [Khronos-SPIRV-Tools]
+# Cannot be built in-tree:
+#     SPIRV-Tools requires C++17 or later, but is configured for C++14
+DEPENDS += cross/Khronos-SPIRV-Tools
+CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
+
+# [llvm]
+BUILD_DEPENDS += cross/llvm-project-140.src
+CMAKE_ARGS += -DIGC_OPTION__LLVM_MODE='Source'
+CMAKE_ARGS += -DIGC_OPTION__LLVM_STOCK_SOURCES=ON
+CMAKE_ARGS += -DIGC_OPTION__LLVM_SOURCES_DIR=$(WORK_DIR)/llvm-project
+CMAKE_ARGS += -DIGC_OPTION__LLVM_PREFERRED_VERSION='$(IGC_LLVM_VER)'
+
+# [llvm-clang]
+CMAKE_ARGS += -DIGC_OPTION__CLANG_MODE='Source'
+# Has no effect when using llvm-project sources
+#CMAKE_ARGS += -DIGC_OPTION__CLANG_SOURCES_DIR:PATH=$(WORK_DIR)/llvm-project/clang
+CMAKE_ARGS += -DCCLANG_FROM_SYSTEM='OFF'
+
+# [llvm-lld]
+CMAKE_ARGS += -DIGC_OPTION__LLD_MODE='Source'
+# Has no effect when using llvm-project sources
+#CMAKE_ARGS += -DIGC_OPTION__lld_SOURCES_DIR:PATH=$(WORK_DIR)/llvm-project/lld
+
+# [llvm-libunwind]
+# Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
+CMAKE_ARGS += -DDEFAULT_IGC_LLVM_SOURCES_DIR=$(WORK_DIR)/llvm-project
 
 # Fails to access in NATIVE/bin/llvm-tblgen possibly due to parallel compiling
 # Provided thru native/llvm-14.0 instead
