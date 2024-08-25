@@ -20,12 +20,14 @@ PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 REQUIRED_MIN_DSM = 7
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
-BUILD_DEPENDS  = cross/llvm-140.src cross/clang-140.src cross/lld-140.src cross/libunwind-140.src
-BUILD_DEPENDS += cross/SPIRV-LLVM-Translator-140.src cross/SPIRV-Headers.src
+BUILD_DEPENDS  = cross/llvm-project-140.src
+BUILD_DEPENDS += cross/Khronos-SPIRV-LLVM-Translator-140.src
+BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
+BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
 BUILD_DEPENDS += cross/intel-vc-intrinsics.src
-# SPIRV-Tools cannot be built in-tree:
-#   SPIRV-Tools requires C++17 or later, but is configured for C++14
-DEPENDS += cross/SPIRV-Tools
+# Cannot be built in-tree:
+#     SPIRV-Tools requires C++17 or later, but is configured for C++14
+DEPENDS += cross/Khronos-SPIRV-Tools
 
 HOMEPAGE = https://github.com/intel/opencl-clang
 COMMENT  = opencl-clang is a thin wrapper library around clang. The library has OpenCL-oriented API and is capable to compile OpenCL C kernels to SPIR-V modules.
@@ -38,8 +40,7 @@ CMAKE_ARGS += -Wno-dev
 
 # Using various LLVM project sources needs a top-level master directory
 CMAKE_BUILD_DIR = $(WORK_DIR)/opencl-clang.build
-CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm
-CMAKE_DIR = $(WORK_DIR)/llvm
+CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 
 # Indicates whether the LLVM Interpreter will be
 # linked with the Foreign Function Interface library
@@ -91,10 +92,8 @@ include ../../mk/spksrc.common.mk
 #
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
 CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
-CMAKE_ARGS += -DLLVM_SOURCE_DIR=$(WORK_DIR)/llvm
 CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang;vc-intrinsics'
-CMAKE_ARGS += -DLLVM_EXTERNAL_CLANG_SOURCE_DIR=$(WORK_DIR)/clang
-CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(WORK_DIR)/SPIRV-Headers
+CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(STAGING_INSTALL_PREFIX)/include
 CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
 CMAKE_ARGS += -DLLVM_EXTERNAL_VC_INTRINSICS_SOURCE_DIR=$(WORK_DIR)/vc-intrinsics
 CMAKE_ARGS += -DLLVM_EXTERNAL_OPENCL_CLANG_SOURCE_DIR=$(WORK_DIR)/$(PKG_NAME)
