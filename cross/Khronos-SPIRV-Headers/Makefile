@@ -10,9 +10,6 @@ COMMENT = Machine-readable files for the SPIR-V Registry
 LICENSE = Copyright (c) 2015-2024 The Khronos Group Inc.
 
 POST_EXTRACT_TARGET = SPIRV-Headers_post_extract_target
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
-INSTALL_TARGET = nop
 
 include ../../mk/spksrc.cross-cmake.mk
 

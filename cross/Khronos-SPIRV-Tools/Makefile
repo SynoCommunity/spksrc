@@ -10,7 +10,7 @@ HOMEPAGE = https://github.com/KhronosGroup/SPIRV-Tools
 COMMENT = The SPIR-V Tools project provides an API and commands for processing SPIR-V modules.
 LICENSE = Apache-2.0 license
 
-BUILD_DEPENDS = cross/SPIRV-Headers.src
+BUILD_DEPENDS = cross/Khronos-SPIRV-Headers
 
 POST_EXTRACT_TARGET = SPIRV-Tools_post_extract_target
 
