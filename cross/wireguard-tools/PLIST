@@ -1,0 +1,2 @@
+bin:bin/wg
+rsc:bin/wg-quick
