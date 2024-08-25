@@ -1,8 +1,0 @@
-Following patches where copied over directly from the IGC source corresponding to current LLVM:
-opencl-clang-ocl-open-140/patches/clang
-
-$ sed -i -e 's?--- a/clang/?--- ?1' \
-         -e 's?+++ b/clang/?+++ ?1' \
-         -e 's?--- "a/clang/?--- "?1' \
-         -e 's?+++ "b/clang/?+++ "?1' \
-         *.patch
