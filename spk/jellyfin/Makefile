@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
-SPK_VERS = 10.9.7
-SPK_REV = 15
+SPK_VERS = 10.9.10
+SPK_REV = 16
 SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
@@ -9,7 +9,7 @@ DSM_UI_DIR = app
 DEPENDS = cross/jellyfin cross/jellyfin-web
 
 # GLIBC >= 2.28 required
-REQUIRED_MIN_DSM = 7.2
+REQUIRED_MIN_DSM = 7.1
 
 # x64 and armv8 archs are supported only.
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
@@ -18,7 +18,7 @@ MAINTAINER = stevenliuit
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "Update jellyfin to 10.9.7"
+CHANGELOG = "Update jellyfin to 10.9.10"
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
