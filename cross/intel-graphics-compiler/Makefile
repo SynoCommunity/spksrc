@@ -33,16 +33,6 @@ CMAKE_BUILD_DIR = $(WORK_DIR)/igc.build
 CMAKE_SOURCE_DIR = $(WORK_DIR)/igc
 CMAKE_DIR = $(WORK_DIR)/igc
 
-DEPENDS += cross/ncursesw
-CMAKE_ARGS += -DLLVM_ENABLE_TERMINFO=ON
-
-DEPENDS += cross/libxml2
-CMAKE_ARGS += -DLLVM_ENABLE_LIBXML2=ON
-
-# Enable building with zlib to support compression/uncompression
-DEPENDS += cross/zlib
-CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
-
 # Assertions are internal checks to help find bugs.
 # They typically slow down LLVM and Clang when enabled
 CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
@@ -52,8 +42,6 @@ CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 # as a shared library, you should use the
 # LLVM_BUILD_LLVM_DYLIB option
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
-#CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
-#CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 
 # Disable third-party benchmarks and unittest
 # as not-included in build and fails
@@ -81,6 +69,7 @@ CMAKE_ARGS += -DFOUND_VCS=$(WORK_DIR)/llvm-project/llvm/cmake/modules/VersionFro
 # [Khronos-SPIRV-Headers]
 BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
 CMAKE_ARGS += -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
+CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR:PATH=$(WORK_DIR)/SPIRV-Headers
 
 # [Khronos-SPIRV-LLVM-Translator -> llvm-spirv]
 BUILD_DEPENDS += cross/Khronos-SPIRV-LLVM-Translator-140.src
@@ -99,6 +88,8 @@ ADDITIONAL_CXXFLAGS += -I$(WORK_DIR)/SPIRV-LLVM-Translator/include
 #     SPIRV-Tools requires C++17 or later, but is configured for C++14
 DEPENDS += cross/Khronos-SPIRV-Tools
 CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
+#CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Source'
+#CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_SOURCE_DIR=$(WORK_DIR)/SPIRV-Tools
 
 # [llvm]
 BUILD_DEPENDS += cross/llvm-project-140.src
