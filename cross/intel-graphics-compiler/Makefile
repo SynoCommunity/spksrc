@@ -1,5 +1,6 @@
 PKG_NAME = intel-graphics-compiler
-PKG_VERS = 1.0.17384.11
+#PKG_VERS = 1.0.17537.1
+PKG_VERS = 1.0.17384.12
 PKG_EXT = tar.gz
 PKG_DIST_NAME = igc-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/intel-graphics-compiler/archive
@@ -66,7 +67,7 @@ CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
 # IGC specific
 CMAKE_ARGS += -DIGC_OPTION__ARCHITECTURE_TARGET='Linux64'
 CMAKE_ARGS += -DIGC_OPTION__ARCHITECTURE_HOST='Linux64'
-#CMAKE_ARGS += -DINSTALL_GENX_IR='ON'
+CMAKE_ARGS += -DINSTALL_GENX_IR='ON'
 
 # [intel-vc-intrinsics]
 BUILD_DEPENDS += cross/intel-vc-intrinsics.src
@@ -83,7 +84,7 @@ CMAKE_ARGS += -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
 
 # [Khronos-SPIRV-LLVM-Translator -> llvm-spirv]
 BUILD_DEPENDS += cross/Khronos-SPIRV-LLVM-Translator-140.src
-CMAKE_ARGS += -DIGC_OPTION__LINK_KHRONOS_SPIRV_TRANSLATOR='OFF'
+CMAKE_ARGS += -DIGC_OPTION__LINK_KHRONOS_SPIRV_TRANSLATOR='ON'
 # Leave in auto-configure as otherwise fails
 #CMAKE_ARGS += -DIGC_OPTION__SPIRV_TRANSLATOR_MODE='Source'
 #CMAKE_ARGS += -DIGC_OPTION__SPIRV_TRANSLATOR_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator

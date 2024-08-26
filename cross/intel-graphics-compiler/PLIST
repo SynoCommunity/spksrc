@@ -1,3 +1,5 @@
+bin:bin/iga64
+bin:bin/GenX_IR
 lnk:lib/libiga64.so
 lnk:lib/libiga64.so.1
 lib:lib/libiga64.so.1.0.1
