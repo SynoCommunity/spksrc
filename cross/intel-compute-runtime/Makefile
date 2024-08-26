@@ -16,10 +16,6 @@ CMAKE_USE_NINJA = 0
 DEPENDS  = cross/intel-gmmlib
 DEPENDS += cross/intel-graphics-compiler
 
-#CMAKE_BUILD_DIR = $(WORK_DIR)/igc.build
-#CMAKE_SOURCE_DIR = $(WORK_DIR)/igc
-CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/neo
-
 # [Khronos-OpenCL-Headers]
 BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
 
@@ -27,13 +23,18 @@ BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
 BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
 
 # Requires building mesa to get OpenGL
-#CMAKE_ARGS += -DKHRONOS_GL_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 CMAKE_ARGS += -DKHRONOS_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 CMAKE_ARGS += -DIGC_DIR=$(STAGING_INSTALL_PREFIX)/include
-CMAKE_ARGS += -DNEO_DISABLE_LD_GOLD:BOOL=ON
+CMAKE_ARGS += -DNEO_DISABLE_LD_GOLD:BOOL='ON'
 CMAKE_ARGS += -DSKIP_UNIT_TESTS=1
 
+# Enable verbose build
+#CMAKE_ARGS += -DCMAKE_VERBOSE_MAKEFILE='ON'
+#ADDITIONAL_CMAKE_ARGS = --trace-expand
+
 include ../../mk/spksrc.cross-cmake.mk
+
+ENV += LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib
 
 .PHONY: intel-compute-runtime_post_extract_target
 intel-compute-runtime_post_extract_target:
