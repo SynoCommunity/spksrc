@@ -22,12 +22,11 @@ DEPENDS += cross/intel-graphics-compiler
 
 # [Khronos-OpenCL-Headers]
 BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
+CMAKE_ARGS += -DKHRONOS_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 
 # [Khronos-SPIRV-Headers]
 BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
 
-# Requires building mesa to get OpenGL
-CMAKE_ARGS += -DKHRONOS_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 CMAKE_ARGS += -DIGC_DIR=$(STAGING_INSTALL_PREFIX)
 CMAKE_ARGS += -DNEO_DISABLE_LD_GOLD:BOOL='ON'
 CMAKE_ARGS += -DSKIP_UNIT_TESTS=1
