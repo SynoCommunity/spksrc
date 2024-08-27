@@ -267,15 +267,15 @@ DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
 # Newer Intel implementations (oneAPI, level-zero) requires gcc >= 5
 ifeq ($(call version_gt, ${TC_GCC}, 5),1)
-DEPENDS += cross/intel-level-zero
-DEPENDS += cross/intel-graphics-compiler
+DEPENDS += cross/intel-compute-runtime
+DEPENDS += cross/ocl-icd
 CONFIGURE_ARGS += --enable-opencl
 
 # Intel MFX and VPL are mutually exclusive
 # -->> can not use libmfx and libvpl together
+#      CONFIGURE_ARGS += --enable-libvpl
+# -->> Jellyfin requires QSV provided by libmfx
 DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
-CONFIGURE_ARGS += --enable-libvpl
-else
 CONFIGURE_ARGS += --enable-libmfx
 endif
 endif
