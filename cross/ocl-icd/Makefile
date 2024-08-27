@@ -15,9 +15,15 @@ BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = ocl-icd_pre_configure
+CONFIGURE_ARGS  = --enable-custom-vendordir
+CONFIGURE_ARGS += --enable-custom-layerdir
+
+# This configure option will fail to build in standalone mode
+# Requires vendor files available in the INSTALL_PREFIX/etc/OpenCL/vendors|layers
+CONFIGURE_ARGS += --enable-update-database
 
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: ocl-icd_pre_configure
 ocl-icd_pre_configure:
-	$(RUN) ./bootstrap $(CONFIGURE_ARGS)
+	$(RUN) ./bootstrap
