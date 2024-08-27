@@ -10,6 +10,7 @@ DEPENDS += cross/openssl3
 DEPENDS += cross/libwebsockets
 DEPENDS += cross/cjson
 
+# cross/libwebsockets:
 UNSUPPORETED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.mosquitto.org/
