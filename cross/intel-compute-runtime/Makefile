@@ -6,6 +6,9 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/compute-runtime/archive/refs/tags
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
+
 HOMEPAGE = https://github.com/intel/compute-runtime
 COMMENT = The Intel(R) Graphics Compute Runtime for oneAPI Level Zero and OpenCL(TM) Driver is an open source project providing compute API support (Level Zero, OpenCL) for Intel graphics hardware architectures (HD Graphics, Xe).
 LICENSE = MIT license

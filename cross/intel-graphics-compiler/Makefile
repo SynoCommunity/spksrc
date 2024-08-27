@@ -1,12 +1,11 @@
 PKG_NAME = intel-graphics-compiler
-#PKG_VERS = 1.0.17537.1
 PKG_VERS = 1.0.17384.12
 PKG_EXT = tar.gz
 PKG_DIST_NAME = igc-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/intel-graphics-compiler/archive
 PKG_DIR = $(PKG_NAME)-igc-$(PKG_VERS)
 
-REQUIRED_MIN_DSM = 7
+REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 DEPENDS += cross/intel-level-zero
