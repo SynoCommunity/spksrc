@@ -20,6 +20,7 @@ SERVICE_USER = auto
 VIDEODRIVER = on
 
 SPK_COMMANDS = bin/vainfo
+SPK_COMMANDS = bin/clinfo
 
 DEPENDS  = cross/libva cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
@@ -33,6 +34,7 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.1),1)
 CHANGELOG += " and intel-compute-runtime 24.31.30508.7"
 DEPENDS += cross/intel-compute-runtime
 DEPENDS += cross/ocl-icd
+DEPENDS += cross/clinfo
 endif
 
 include ../../mk/spksrc.spk.mk
