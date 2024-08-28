@@ -1,5 +1,5 @@
 PKG_NAME = python311
-PKG_VERS = 3.11.5
+PKG_VERS = 3.11.9
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -143,13 +143,13 @@ CROSSENV_WHEELS += cryptography==43.0.0
 # https://numpy.org/devdocs/reference/distutils_status_migration.html
 # Python 3.12 considerations: scikit-build-core, meson-python
 #CROSSENV_WHEELS += Cython==3.0.2
-CROSSENV_WHEELS += Cython==0.29.36
+CROSSENV_WHEELS += Cython==0.29.37
 CROSSENV_WHEELS += flit==3.9.0
-CROSSENV_WHEELS += maturin==1.2.3
-CROSSENV_WHEELS += poetry==1.6.1
-CROSSENV_WHEELS += scikit-build==0.17.6
+CROSSENV_WHEELS += maturin==1.7.1
+CROSSENV_WHEELS += poetry==1.8.3
+CROSSENV_WHEELS += scikit-build==0.18.0
 CROSSENV_WHEELS += setuptools-rust==1.7.0
-CROSSENV_WHEELS += setuptools-scm==7.1.0
+CROSSENV_WHEELS += setuptools-scm==8.1.0
 # For future use when building numpy >= 1.26
 #CROSSENV_WHEELS += meson-python==0.13.2
 #CROSSENV_WHEELS += scikit-build-core==0.5.0

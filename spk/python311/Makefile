@@ -1,7 +1,7 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.5
+SPK_VERS = 3.11.9
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/python3.png
 
 # Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
@@ -18,7 +18,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.5"
+CHANGELOG = "1. Update to Python 3.11.9"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -28,7 +28,7 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS = src/requirements-pure.txt
 
 # Force testing all wheel builds
-WHEELS_TEST_ALL = 0
+WHEELS_TEST_ALL = 1
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -64,7 +64,8 @@ DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
 # [mysqlclient]
-DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
+DEPENDS += cross/mysql-connector-c
+DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
@@ -141,20 +142,25 @@ else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
-# [numpy] <= 1.21.6 (armv5)
-# This version is now unsupported using py311
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-# [numpy] <= 1.22.4 (armv7l)
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-numpy-armv7l.txt
-# [numpy] <= 1.24.4 last working version with gcc-4.9
-else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy-gcc4.txt
-# [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+## -->> numpy.distutils is deprecated since NumPy 1.23.0
+## -->> Recommend to use `setuptools < 60.0` for Python >= 3.12
+## -->> *** WILL REQUIRE PER WHEEL SPECIFIC CROSSENV ***
+### [numpy] <= 1.21.6 (armv5)
+### This version is now unsupported using py311
+##ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+### [numpy] <= 1.22.4 (armv7l)
+##ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+##WHEELS += src/requirements-crossenv-numpy-armv7l.txt
+### [numpy] <= 1.24.4 last working version with gcc-4.9
+##else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+##WHEELS += src/requirements-crossenv-numpy-gcc4.txt
+### [numpy] >= 1.25.0 requires c++17
+##else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
-endif
+##endif
+
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)
