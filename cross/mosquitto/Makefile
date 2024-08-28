@@ -1,5 +1,5 @@
 PKG_NAME = mosquitto
-PKG_VERS = 2.0.15
+PKG_VERS = 2.0.18
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mosquitto.org/files/source
@@ -10,6 +10,7 @@ DEPENDS += cross/openssl3
 DEPENDS += cross/libwebsockets
 DEPENDS += cross/cjson
 
+# cross/libwebsockets:
 UNSUPPORETED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.mosquitto.org/
