@@ -151,8 +151,8 @@ CROSSENV_WHEELS += scikit-build==0.18.0
 CROSSENV_WHEELS += setuptools-rust==1.7.0
 CROSSENV_WHEELS += setuptools-scm==8.1.0
 # For future use when building numpy >= 1.26
-#CROSSENV_WHEELS += meson-python==0.13.2
-#CROSSENV_WHEELS += scikit-build-core==0.5.0
+#CROSSENV_WHEELS += meson-python==0.16.0
+#CROSSENV_WHEELS += scikit-build-core==0.10.5
 
 
 # Create the crossenv in preparation for
