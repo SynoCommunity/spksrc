@@ -154,7 +154,7 @@ CROSSENV_WHEELS += setuptools-scm==7.1.0
 #CROSSENV_WHEELS += meson-python==0.13.2
 #CROSSENV_WHEELS += scikit-build-core==0.5.0
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-CROSSENV_WHEELS += cryptography==41.0.3
+CROSSENV_WHEELS += cryptography==43.0.0
 CROSSENV_WHEELS += maturin==1.2.3
 CROSSENV_WHEELS += poetry==1.6.1
 endif
