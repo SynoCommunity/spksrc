@@ -34,6 +34,9 @@ include ../../mk/spksrc.archs.mk
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
 CONFIGURE_ARGS += --enable-optimizations
+# Some tests (like test_base64) must find libpython shared library at runtime.
+# python: error while loading shared libraries: libpython3.11.so.1.0: cannot open shared object file: No such file or directory
+ENV += LD_LIBRARY_PATH=$(WORK_DIR)/$(PKG_DIR)
 # old compilers fail with unrecognized command line options: -flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # Some tests (like test_base64) must find libpython shared library at runtime.
@@ -147,9 +150,9 @@ CROSSENV_WHEELS  = cffi==1.17.0
 #CROSSENV_WHEELS += Cython==3.0.2
 CROSSENV_WHEELS += Cython==0.29.37
 CROSSENV_WHEELS += flit==3.9.0
-CROSSENV_WHEELS += scikit-build==0.17.6
+CROSSENV_WHEELS += scikit-build==0.18.0
 CROSSENV_WHEELS += setuptools-rust==1.7.0
-CROSSENV_WHEELS += setuptools-scm==7.1.0
+CROSSENV_WHEELS += setuptools-scm==8.1.0
 # For future use when building numpy >= 1.26
 #CROSSENV_WHEELS += meson-python==0.13.2
 #CROSSENV_WHEELS += scikit-build-core==0.5.0

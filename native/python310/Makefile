@@ -34,10 +34,10 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/loc
 .PHONY: python310_native_post_install
 python310_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing pip
-	@$(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
-	@$(RUN) $(PYTHON) get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
+	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
+	@$(RUN) $(PYTHON) get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
 	@$(MSG) Installing setuptools, wheel, cffi and cross env
-	@$(PIP) --disable-pip-version-check install "setuptools==68.1.2" "setuptools-rust==1.7.0" "maturin==1.2.3" "wheel==0.41.2" "cffi==1.15.1" "crossenv==1.4.0"
+	@$(PIP) --disable-pip-version-check install "setuptools==69.5.1" "setuptools-rust==1.7.0" "maturin==1.7.1" "wheel==0.44.0" "cffi==1.17.0" "crossenv==1.4.0"
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@

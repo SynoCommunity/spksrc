@@ -15,7 +15,7 @@ bcrypt==4.2.0
 # https://docs.rs/openssl/latest/openssl/#automatic
 #  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==43.0.0
+cryptography==42.0.8
 
 # Requirement for cryptography
 cffi==1.17.0
@@ -75,7 +75,8 @@ pycurl==7.45.3
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-pydantic_core==2.7.0
+# --> maturin error with py310
+#pydantic_core==2.7.0
 
 # [PyNaCl]
 # Depends: cross/libsodium
