@@ -145,7 +145,7 @@ CROSSENV_WHEELS  = cffi==1.17.0
 # https://numpy.org/devdocs/reference/distutils_status_migration.html
 # Python 3.12 considerations: scikit-build-core, meson-python
 #CROSSENV_WHEELS += Cython==3.0.2
-CROSSENV_WHEELS += Cython==0.29.36
+CROSSENV_WHEELS += Cython==0.29.37
 CROSSENV_WHEELS += flit==3.9.0
 CROSSENV_WHEELS += scikit-build==0.17.6
 CROSSENV_WHEELS += setuptools-rust==1.7.0
@@ -155,8 +155,8 @@ CROSSENV_WHEELS += setuptools-scm==7.1.0
 #CROSSENV_WHEELS += scikit-build-core==0.5.0
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CROSSENV_WHEELS += cryptography==43.0.0
-CROSSENV_WHEELS += maturin==1.2.3
-CROSSENV_WHEELS += poetry==1.6.1
+CROSSENV_WHEELS += maturin==1.7.1
+CROSSENV_WHEELS += poetry==1.8.3
 endif
 
 # Create the crossenv in preparation for
