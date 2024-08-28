@@ -142,24 +142,20 @@ else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
-## -->> numpy.distutils is deprecated since NumPy 1.23.0
-## -->> Recommend to use `setuptools < 60.0` for Python >= 3.12
-## -->> *** WILL REQUIRE PER WHEEL SPECIFIC CROSSENV ***
-### [numpy] <= 1.21.6 (armv5)
-### This version is now unsupported using py311
-##ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-### [numpy] <= 1.22.4 (armv7l)
-##ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-##WHEELS += src/requirements-crossenv-numpy-armv7l.txt
-### [numpy] <= 1.24.4 last working version with gcc-4.9
-##else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-##WHEELS += src/requirements-crossenv-numpy-gcc4.txt
-### [numpy] >= 1.25.0 requires c++17
-##else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+# [numpy] <= 1.21.6 (armv5)
+# This version is now unsupported using py311
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+# [numpy] <= 1.22.4 (armv7l)
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-numpy-armv7l.txt
+# [numpy] <= 1.24.4 last working version with gcc-4.9
+else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+WHEELS += src/requirements-crossenv-numpy-gcc4.txt
+# [numpy] >= 1.25.0 requires c++17
+else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
-##endif
+endif
 
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
