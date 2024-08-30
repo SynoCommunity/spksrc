@@ -1,5 +1,5 @@
 PKG_NAME = nDPI
-PKG_VERS = 3.4
+PKG_VERS = 4.10
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ntop/$(PKG_NAME)/archive
@@ -14,6 +14,7 @@ LICENSE  = LGPLv3
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = nDPI_pre_configure
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 
