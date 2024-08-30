@@ -3,11 +3,20 @@
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release
 
-# Use native cmake
+# Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   BUILD_DEPENDS += native/cmake
-  CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin)
+  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
+  export PATH := $(CMAKE_PATH):$(PATH)
+endif
+
+# Use native cmake (Debian 10 "Buster")
+ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
+  BUILD_DEPENDS += native/cmake-legacy
+  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-legacy/work-native/install/usr/local/bin)
+  ENV += PATH=$(CMAKE_PATH):$$PATH
+  export PATH := $(CMAKE_PATH):$(PATH)
 endif
 
 # Use ninja to build
