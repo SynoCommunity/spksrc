@@ -39,6 +39,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	imagemagick \
 	intltool \
 	jq \
+	libtool-bin \
 	libbz2-dev \
 	libc6-i386 \
 	libcppunit-dev \
