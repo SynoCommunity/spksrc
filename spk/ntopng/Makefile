@@ -39,6 +39,7 @@ else
 # Since ntopng must be run as root, the privilege file must be manually
 # patched after installation (and after package update or package repair).
 CONF_DIR = src/conf.dsm7
+WIZARDS_DIR = src/wizard.dsm7/
 endif
 
 POST_STRIP_TARGET = ntopng_extra_install

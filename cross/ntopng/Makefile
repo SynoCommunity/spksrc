@@ -81,7 +81,9 @@ ntopng_pre_configure:
 	@$(RUN) sed "s|PACKAGE_STRING='ntopng .*'|PACKAGE_STRING='ntopng $(PKG_VERS)'|g" -i ./configure
 	@$(RUN) sed 's|GIT_RELEASE=".*"|GIT_RELEASE="$(PKG_VERS)"|g' -i ./configure
 	@$(RUN) sed 's|"https://github.com/ntop/ntopng/commit/"..|"https://github.com/ntop/ntopng/releases/tag/"..|g' -i ./scripts/lua/about.lua
+	@$(RUN) sed 's|"(C) 1998-\(..\) ntop.org"|"(C) 1998-20\1 ntop.org"|g' -i ./include/ntop_defines.h
 	@$(RUN) sed 's|"Welcome to %s %s v.%s - (C) 1998-\(..\) ntop.org"|"Welcome to %s %s v.%s - (C) 1998-20\1 ntop.org"|g' -i ./src/Ntop.cpp
+	@$(RUN) sed 's|copy; 1998-\(..\) - ntop.org"|copy; 1998-20\1 - ntop.org"|g' -i ./src/LuaEngineNtop.cpp.inc
 
 .PHONY: ntopng_pre_compile
 ntopng_pre_compile:
