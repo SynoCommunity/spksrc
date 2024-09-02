@@ -1,5 +1,5 @@
 PKG_NAME = Jackett
-PKG_VERS = 0.20.3990
+PKG_VERS = 0.22.534
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).Binaries.Linux$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Jackett/Jackett/releases/download/v$(PKG_VERS)
