@@ -1,18 +1,18 @@
 SPK_NAME = ntopng
-SPK_VERS = 4.2
-SPK_REV = 4
+SPK_VERS = 6.2
+SPK_REV = 5
 SPK_ICON = src/ntopng.png
 
 DEPENDS = cross/ntopng
 
 SPK_DEPENDS = "redis"
 
-# cross/libcap not supported:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# cross/ndpi and or cross/libcap not supported:
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS) $(ARMv5_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = High-Speed Web-based Traffic Analysis and Flow Collection. ntopng is a network traffic probe that provides 360° Network visibility, with its ability to gather traffic information from traffic mirrors, NetFlow exporters, SNMP devices, Firewall logs, Intrusion Detection systems.  To run ntopng on DSM 7, the installed privileges file must be manually patched after installation or update.
-CHANGELOG = "1. Update to version 4.2<br/>2. Update nDPI to version 3.4<br/>3. Add support for DSM 7."
+CHANGELOG = "1. Update to version 6.2"
 DISPLAY_NAME = ntopng
 
 HELPURL = https://www.ntop.org/guides/ntopng/index.html
@@ -37,7 +37,7 @@ CONF_DIR = src/conf
 else
 # On DSM 7: package must be defined to run as package user to allow installation.
 # Since ntopng must be run as root, the privilege file must be manually
-# patched after installation (and after package update or package repair).
+# patched after installation and update.
 CONF_DIR = src/conf.dsm7
 WIZARDS_DIR = src/wizard.dsm7/
 endif

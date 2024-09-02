@@ -1,6 +1,6 @@
 bin:bin/ndpiReader
 lnk:lib/libndpi.so
-lnk:lib/libndpi.so.3
-lib:lib/libndpi.so.3.4.0
+lnk:lib/libndpi.so.4
+lib:lib/libndpi.so.4.10.0
 rsc:share/ndpi/ndpiCustomCategory.txt
 rsc:share/ndpi/ndpiProtos.txt

@@ -1,18 +1,24 @@
 PKG_NAME = ntopng
-PKG_VERS = 4.2
+PKG_VERS = 6.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ntop/ntopng/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+NODEJS = nodejs_16
+BUILD_DEPENDS = native/$(NODEJS)
+
 DEPENDS  = cross/libcap cross/ndpi cross/curl
 DEPENDS += cross/libmaxminddb cross/sqlite cross/mysql-connector-c
 DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
 DEPENDS += cross/json-c cross/rrdtool cross/lua
+DEPENDS += cross/hiredis
 
+# cross/ndpi not supported:
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
 # cross/libcap not supported:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 HOMEPAGE = https://www.ntop.org/
 COMMENT  = High-Speed Web-based Traffic Analysis and Flow Collection.
@@ -56,6 +62,7 @@ endif
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = ntopng_pre_configure
 PRE_COMPILE_TARGET = ntopng_pre_compile
+PRE_INSTALL_TARGET = ntopng_pre_install
 
 CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-ndpi-includes=$(STAGING_INSTALL_PREFIX)/include/ndpi
@@ -63,8 +70,11 @@ CONFIGURE_ARGS += --with-ndpi-static-lib=$(STAGING_INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += my_cv_rw_locks_supported=$(RW_LOCKS_SUPPORTED)
 
 ENV += DESTDIR=$(INSTALL_DIR)
-# let ./configure find mysql_config (it is a script and works for cross compile)
-ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
+# add install/bin folder to path to let ./configure find mysql_config (it is a script and works for cross compile)
+# add native nodejs and npm to path
+NODE_BIN_FOLDER = $(realpath $(WORK_DIR)/../../../native/$(NODEJS)/work-native/node/bin)
+NPM_BIN_FOLDER = $(realpath $(WORK_DIR)/../../../native/$(NODEJS)/work-native/node/lib/node_modules/npm/bin)
+ENV += "PATH=$(PATH):$(NODE_BIN_FOLDER):$(NPM_BIN_FOLDER):$(STAGING_INSTALL_PREFIX)/bin"
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -72,20 +82,20 @@ include ../../mk/spksrc.cross-cc.mk
 ntopng_pre_configure:
 	@$(MSG) "- RUN autogen to create configure file"
 	@$(RUN) ./autogen.sh
-	@$(MSG) "- PATCH generated configure file to define synology specific package info"
-	@$(RUN) sed 's|#define PACKAGE_OSNAME \\"$${OSNAME}\\"|#define PACKAGE_OSNAME \\"Synology $(SYNOLOGY_OS) $(TCVERSION)+\\"|g' -i ./configure
-	@$(RUN) sed 's|#define PACKAGE_OS \\"$${OS}\\"|#define PACKAGE_OS \\"$(TC_ARCH)\\"|g' -i ./configure
-	@$(RUN) sed 's|#define PACKAGE_MACHINE \\"$$MACHINE\\"|#define PACKAGE_MACHINE \\"$(PACKAGE_MACHINE)\\"|g' -i ./configure
-	@$(MSG) "- PATCH sources to define real version instead of 'major.minor.currentdate', fix github links, reformat copyright date"
-	@$(RUN) sed "s|PACKAGE_VERSION='.*'|PACKAGE_VERSION='$(PKG_VERS)'|g" -i ./configure
-	@$(RUN) sed "s|PACKAGE_STRING='ntopng .*'|PACKAGE_STRING='ntopng $(PKG_VERS)'|g" -i ./configure
-	@$(RUN) sed 's|GIT_RELEASE=".*"|GIT_RELEASE="$(PKG_VERS)"|g' -i ./configure
-	@$(RUN) sed 's|"https://github.com/ntop/ntopng/commit/"..|"https://github.com/ntop/ntopng/releases/tag/"..|g' -i ./scripts/lua/about.lua
-	@$(RUN) sed 's|"(C) 1998-\(..\) ntop.org"|"(C) 1998-20\1 ntop.org"|g' -i ./include/ntop_defines.h
-	@$(RUN) sed 's|"Welcome to %s %s v.%s - (C) 1998-\(..\) ntop.org"|"Welcome to %s %s v.%s - (C) 1998-20\1 ntop.org"|g' -i ./src/Ntop.cpp
-	@$(RUN) sed 's|copy; 1998-\(..\) - ntop.org"|copy; 1998-20\1 - ntop.org"|g' -i ./src/LuaEngineNtop.cpp.inc
+	@$(MSG) "- PATCH sources to fix github links, reformat copyright date and define synology machine and os info"
+	@$(RUN) sed 's|"https://github.com/ntop/ntopng/commit/" |"https://github.com/ntop/ntopng/releases/tag/" |g' -i.orig ./scripts/lua/modules/lua_utils_get.lua
+	@$(RUN) sed 's|"(C) 1998-\(..\) ntop.org"|"(C) 1998-20\1 ntop.org"|g' -i.orig ./include/ntop_defines.h
+	@$(RUN) sed 's|copy; 1998-\(..\) - ntop"|copy; 1998-20\1 - ntop"|g' -i.orig ./src/LuaEngineNtop.cpp
+	@$(RUN) sed 's|, PACKAGE_OS, PACKAGE_MACHINE|, "Synology $(SYNOLOGY_OS) $(TCVERSION)+", "$(PACKAGE_MACHINE)"|g' -i ./src/LuaEngineNtop.cpp
+	@$(RUN) sed 's|PACKAGE_MACHINE|"$(TC_ARCH)"|g' -i ./src/LuaEngineNtop.cpp
+	@$(RUN) sed 's|PACKAGE_OS|"$(SYNOLOGY_OS) $(TCVERSION)+"|g' -i ./src/LuaEngineNtop.cpp
 
 .PHONY: ntopng_pre_compile
 ntopng_pre_compile:
 	@$(MSG) "- PATCH generated Makefile to link with additional (cross/*) libraries"
-	@$(RUN) sed 's| -lssl  *-lssl | -lssl $(ADDITIONAL_LIBRARIES) |g' -i ./Makefile
+	@$(RUN) sed 's| -lssl  *-lssl | -lssl $(ADDITIONAL_LIBRARIES) |g' -i.orig ./Makefile
+
+.PHONY: ntopng_pre_install
+ntopng_pre_install:
+	@$(MSG) "- COMPILE ntopng frontend (shared/ntopng/httpdocs/dist)"
+	@$(RUN) $(MAKE) dist
