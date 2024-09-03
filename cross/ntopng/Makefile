@@ -15,10 +15,8 @@ DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
 DEPENDS += cross/json-c cross/rrdtool cross/lua
 DEPENDS += cross/hiredis
 
-# cross/ndpi not supported:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
-# cross/libcap not supported:
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+# cross/ndpi and or cross/libcap not supported:
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://www.ntop.org/
 COMMENT  = High-Speed Web-based Traffic Analysis and Flow Collection.
