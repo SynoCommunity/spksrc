@@ -148,7 +148,7 @@ CROSSENV_WHEELS += flit==3.9.0
 CROSSENV_WHEELS += maturin==1.7.1
 CROSSENV_WHEELS += poetry==1.8.3
 CROSSENV_WHEELS += scikit-build==0.18.0
-CROSSENV_WHEELS += setuptools-rust==1.7.0
+CROSSENV_WHEELS += setuptools-rust==1.10.1
 CROSSENV_WHEELS += setuptools-scm==8.1.0
 # For future use when building numpy >= 1.26
 #CROSSENV_WHEELS += meson-python==0.16.0
@@ -165,8 +165,8 @@ python311_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==74.0.0" "wheel==0.44.0" "pip-tools==7.4.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==74.0.0" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==74.1.1" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==74.1.1" "wheel==0.44.0" "pip-tools==7.4.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 # [numpy] <= 1.2x.y Must be installed using setuptools < 70.0

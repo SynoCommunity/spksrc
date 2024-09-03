@@ -2,7 +2,7 @@
 #pip==24.2               ==> Always install latest version (service-setup.sh:install_python_virtualenv)
 
 # Always match what's in cross/python310/Makefile
-setuptools==69.5.1
+setuptools==74.1.1
 wheel==0.44.0
 
 # Always use latest version available

@@ -4,7 +4,7 @@
 ## various wheels.  Uncoment to enable.
 ##
 
-# [bcrypt] & [cryptography]
+# [bcrypt]
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
@@ -15,7 +15,7 @@ bcrypt==4.2.0
 # https://docs.rs/openssl/latest/openssl/#automatic
 #  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==42.0.8
+cryptography==43.0.1
 
 # Requirement for cryptography
 cffi==1.17.0
