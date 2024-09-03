@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/libpcap cross/json-c
 
 # cross/libpcap not supported:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.ntop.org/
 COMMENT  = nDPI is an open source LGPLv3 library for deep-packet inspection. Based on OpenDPI it includes ntop extensions. We have tried to push them into the OpenDPI source tree but nobody answered emails so we have decided to create our own source tree.
