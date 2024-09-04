@@ -1,29 +1,27 @@
 PKG_NAME = llvm
-PKG_VERS_MAJ = 14
-PKG_VERS = $(PKG_VERS_MAJ).0.5
+PKG_VERS = 14.0.5
+PKG_VERS_MAJ = $(firstword $(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-project-$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)
-#PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.5/llvm-project-14.0.5.src.tar.xz
 PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS).src
 
 # REMARKS:
-# This was the original native/llvm-9.0/Makefile
 # Since it takes a huge amount of resources to build this, we started to host the 
 # output on https://github.com/SynoCommunity/spksrc/releases/tag/native%2Fllvm
 # 
-# This Makefile is kept to build it again
+# This Makefile is to build the native llvm
 # and has one additional target to build the archive (make build-archive)
 # 
 # The main reason to build llvm from source is, that other prebuilt packages
-# do not contain the binary "clang-tblgen" that is mandatory to build cross/llvm-9.0.
+# do not contain the binary "clang-tblgen" that is mandatory to build cross/llvm-14.0.
 # 
 
 DEPENDS =
 
 HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
-LICENSE  = Apache License v2.0 with LLVM Exceptions
+LICENSE = Apache v2.0 with LLVM Exceptions
 
 POST_INSTALL_TARGET = llvm_post_install
 CMAKE_USE_NINJA = 1
