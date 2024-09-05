@@ -9,7 +9,7 @@ boto==2.49.0
 hawkauthlib==2.0.0
 pyramid==2.0.2
 #sqlalchemy==1.4.46     => crossenv
-testfixtures==7.2.2
+testfixtures==8.3.0
 #tokenlib==2.0.0        => same as above
 PyBrowserID==0.14.0
 datadog==0.50.0
