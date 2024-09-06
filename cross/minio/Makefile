@@ -7,8 +7,8 @@ PKG_DIST_PREFIX = RELEASE.$(PKG_RELEASE_TAG)
 PKG_DIST_NAME = $(PKG_DIST_PREFIX).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/minio/minio/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
-EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
-PKG_DIR = $(PKG_NAME)-$(PKG_DIST_PREFIX)
+PKG_DIR = src/github.com/$(PKG_NAME)
+EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 BUILD_DEPENDS = native/go
 
@@ -35,4 +35,4 @@ include ../../mk/spksrc.cross-go.mk
 # rename extracted folder to make imports work when used as GOPATH
 .PHONY: minio_post_extract
 minio_post_extract:
-	cd $(EXTRACT_PATH) && [ -d $(PKG_DIR) ] && mv $(PKG_DIR) $(PKG_NAME)
+	cd $(EXTRACT_PATH) && [ -d $(PKG_NAME)-$(PKG_DIST_PREFIX) ] && mv $(PKG_NAME)-$(PKG_DIST_PREFIX) $(PKG_NAME)
