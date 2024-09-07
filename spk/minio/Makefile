@@ -21,8 +21,7 @@ WIZARDS_DIR = src/wizard
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SERVICE_WIZARD_SHARE = wizard_data_directory
-USE_DATA_SHARE_WORKER = yes
+SERVICE_WIZARD_SHARENAME = wizard_data_directory
 FWPORTS = src/minio.sc
 # Console Port (API Port is 9000)
 ADMIN_PORT = 9001
