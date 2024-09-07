@@ -1,6 +1,6 @@
 SPK_NAME = comskip
 SPK_VERS = 0.82.010
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/comskip.png
 
 DEPENDS = cross/$(SPK_NAME)
@@ -10,7 +10,7 @@ STARTABLE = no
 MAINTAINER = SynoCommunity
 DESCRIPTION = Comskip is a free mpeg commercial detector. Read the wiki on how to use and configure it.
 DISPLAY_NAME = Comskip
-CHANGELOG = "1. Update to latest git hash from April 7th 2022<br/>2. Migrate to using ffmpeg4 version 4.4.3"
+CHANGELOG = "1. Update to latest git hash from June 7th 2024<br/>2. Migrate to using ffmpeg5 version 5.1.5"
 
 HOMEPAGE = https://www.kaashoek.com/comskip/
 LICENSE = LGPL
@@ -21,7 +21,7 @@ SPK_COMMANDS = bin/comskip
 POST_STRIP_TARGET = comskip_extra_install
 
 # Reuse FFmpeg libraries
-export FFMPEG_VERSION = 4
+export FFMPEG_VERSION = 5
 export FFMPEG_DIR = $(realpath $(shell pwd)/../ffmpeg$(FFMPEG_VERSION)/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg$(subst 4,,$(FFMPEG_VERSION))/target)
 
 ifneq ($(wildcard $(FFMPEG_DIR)),)

@@ -6,7 +6,7 @@
 #
 # Functions:
 # - Evaluate all packages to build depending on files defined in ${GH_FILES}.
-# - python310, python311, ffmpeg (spk/ffmpeg4), ffmpeg5 and ffmpeg6 are moved to head of packages to build first if triggered by its own or a dependent.
+# - python310, python311, ffmpeg5 and ffmpeg6 are moved to head of packages to build first if triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -44,24 +44,21 @@ done
 
 # fix for packages with different names
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "nzbdrone" | tr '\n' ' ')" sonarr3"
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "nzbdrone" | tr '\n' ' ')" sonarr3"
 fi
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "python" | tr '\n' ' ')" python2"
-fi
-if [ "$(echo ${SPK_TO_BUILD} | grep -ow ffmpeg)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')" ffmpeg4"
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "python" | tr '\n' ' ')" python2"
 fi
 
 # remove duplicate packages
 packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
 # for ffmpeg v4-6 find all packages that depend on them
-for i in {4..6}; do
+for i in {5..6}; do
     ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = ${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
     # If packages contain a package that depends on ffmpeg (or is ffmpeg), then ensure
-    # relevant ffmpeg4|ffmpeg5|ffmpeg6 is first in list
+    # relevant ffmpeg5|ffmpeg6 is first in list
     for package in ${packages}
     do
         if [ "$(echo ffmpeg${i} ${ffmpeg_dependent_packages} | grep -ow ${package})" != "" ]; then
@@ -120,10 +117,6 @@ else
     for package in ${packages}
     do
         DOWNLOAD_LIST+=$(echo "${DEPENDENCY_LIST}" | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
-        for version in ${DEFAULT_TC}
-        do
-           DOWNLOAD_LIST+=$(make -C spk/${package} TCVERSION=${version} dependency-kernel-list | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
-        done
     done
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')

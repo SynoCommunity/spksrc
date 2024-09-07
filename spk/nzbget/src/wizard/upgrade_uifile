@@ -1,7 +1,7 @@
 [{
     "step_title": "NZBGet installation",
     "items": [{
-        "desc": "The installer will now download and install the specified version of NZBGet from NZBget.net.<br>In the future you should update from within NZBGet (Config > System)."
+        "desc": "The installer will now download and install the specified version of NZBGet from NZBget.com.<br>In the future you should update from within NZBGet (Config > System)."
       }, {
         "type": "singleselect",
         "desc": "Version to install:",

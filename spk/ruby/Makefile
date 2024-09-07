@@ -1,14 +1,14 @@
 SPK_NAME = ruby
 SPK_VERS = 3.1.2
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/ruby.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/ruby
 
 # even it compiles with older cross/gdbm, ruby crashes at runtime
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-CHANGELOG = "1. Update ruby to v3.1.2.<br/>2. Update openssl to v1.1.1o."
+CHANGELOG = "1. Update openssl to v3.1.4."
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Ruby Programming Language.

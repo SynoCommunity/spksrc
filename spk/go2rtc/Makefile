@@ -1,6 +1,6 @@
 SPK_NAME = go2rtc
-SPK_VERS = 1.8.2
-SPK_REV = 2
+SPK_VERS = 1.9.4
+SPK_REV = 5
 SPK_ICON = src/go2rtc.png
 
 DEPENDS = cross/go2rtc
@@ -10,8 +10,8 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 MAINTAINER = skrashevich
 DESCRIPTION = Ultimate camera streaming application with support RTSP, RTMP, HTTP-FLV, WebRTC, MSE, HLS, MP4, MJPEG, HomeKit, FFmpeg, etc
 DISPLAY_NAME = go2rtc
-CHANGELOG = "Add expr source<br />Add support multiline exec source<br />Add IPv6 support to WebRTC <br />Add more ffmpeg transcoding presets<br />Add support host candidate config<br />Increase buffer for RTP producers<br />Update WebRTC candidates logic <br />Fix pixel format for h264 vaapi hardware transcoding<br />Fix ngrok support<br />Fix wrong SDP for MERCURY camera <br />Fix panic for HomeKit source without SRTP module <br />Fix raw conn for https client (wss transport for rtsp source)<br />Fix memory overflow on bad RTSP sources "
-LICENSE_FILE = $(WORK_DIR)/src/github.com/go2rtc/go2rtc/LICENSE
+CHANGELOG = "go2rtc updated to v1.9.4"
+LICENSE_FILE = $(WORK_DIR)/src/github.com/go2rtc-$(SPK_VERS)/LICENSE
 HOMEPAGE = https://github.com/AlexxIT/go2rtc
 LICENSE = MIT
 

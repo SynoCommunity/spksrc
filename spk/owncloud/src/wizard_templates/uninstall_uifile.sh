@@ -10,7 +10,8 @@ if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
 	fi
 fi
 
-quote_json () {
+quote_json ()
+{
 	sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
 }
 
@@ -32,7 +33,7 @@ getValidPath()
 	VALID_PATH=$(/bin/cat<<EOF
 {
 	var exportPath = arguments[0];
-	const pattern = /^\/volume[0-9]+\//;
+	const pattern = /^\/(volume|volumeUSB)[0-9]+\//;
 	if (exportPath === "") {
 		return true;
 	} else if (pattern.test(exportPath)) {

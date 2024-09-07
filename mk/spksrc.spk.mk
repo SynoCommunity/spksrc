@@ -473,28 +473,35 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons s
 
 package: $(SPK_FILE_NAME)
 
-### Publish rules
-publish: package
-ifeq ($(PUBLISH_URL),)
-	$(error Set PUBLISH_URL in local.mk)
-endif
-ifeq ($(PUBLISH_API_KEY),)
-	$(error Set PUBLISH_API_KEY in local.mk)
-endif
-	@response=$$(http --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME) --print=hb); \
-	response_code=$$(echo "$$response" | grep -Fi "HTTP/1.1" | awk '{print $$2}'); \
-	if [ "$$response_code" = "201" ]; then \
-		output=$$(echo "$$response" | awk '/^[[:space:]]*$$/ {p=1;next} p'); \
-		echo "Package published successfully\n$$output" | tee --append publish-$*.log; \
-	else \
-		echo "ERROR: Failed to publish package - HTTP response code $$response_code\n$$response" | tee --append publish-$*.log; \
-		exit 1; \
-	fi
+all: package
 
 
-### Clean rules
-clean:
-	rm -fr work work-* build-*.log publish-*.log
+### spk-specific clean rules
+
+# Remove work-*/<pkgname>* directories while keeping
+# work-*/.<pkgname>*|<pkgname>.plist status files
+# This is in order to resolve: 
+#    System.IO.IOException: No space left on device
+# when building online thru github-action, in particular
+# for "packages-to-keep" such as python* and ffmpeg*
+clean-source: SHELL:=/bin/bash
+clean-source: spkclean
+	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
+	   makefile="../../$${depend}/Makefile" ; \
+	   pkgdirstr=$$(grep ^PKG_DIR $${makefile} || true) ; \
+	   pkgdir=$$(echo $${pkgdirstr#*=} | cut -f1 -d- | sed -s 's/[\)]/ /g' | sed -s 's/[\$$\(\)]//g' | cut -f1 -d' ' | xargs) ; \
+	   if [ ! "$${pkgdirstr}" ]; then \
+	      continue ; \
+	   elif echo "$${pkgdir}" | grep -Eq '^(PKG_|DIST)'; then \
+	      pkgdirstr=$$(grep ^$${pkgdir} $${makefile}) ; \
+	      pkgdir=$$(echo $${pkgdirstr#*=} | xargs) ; \
+	   fi ; \
+	   #echo "depend: [$${depend}] - pkgdir: [$${pkgdir}]" ; \
+	   find work-*/$${pkgdir}[-_]* -maxdepth 0 -type d 2>/dev/null | while read sourcedir ; do \
+	      echo "rm -fr $$sourcedir" ; \
+	      find $${sourcedir}/. -mindepth 1 -maxdepth 2 -exec rm -fr {} \; 2>/dev/null || true ; \
+	   done ; \
+	done
 
 spkclean:
 	rm -fr work-*/.copy_done \
@@ -506,6 +513,7 @@ spkclean:
 	       work-*/staging \
 	       work-*/tc_vars.mk \
 	       work-*/tc_vars.cmake \
+	       work-*/tc_vars.meson \
 	       work-*/package.tgz \
 	       work-*/INFO \
 	       work-*/PLIST \
@@ -540,187 +548,10 @@ pythonclean: wheelcleanall
 pythoncleanall: pythonclean
 	rm -fr work-*/[Pp]ython* work-*/.python*
 
-all: package
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION) >> $(PSTAT_LOG)
-endif
+### For managing make all-<supported|latest>
+include ../../mk/spksrc.supported.mk
 
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
+### For managing make publish-all-<supported|latest>
+include ../../mk/spksrc.publish.mk
 
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
-
-.PHONY: publish-all-archs
-publish-all-archs: $(addprefix publish-arch-,$(AVAILABLE_TOOLCHAINS))
-
-####
-# make all-supported
-ifeq (supported,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
-ACTION = supported
-# make setup not invoked
-ifeq ($(strip $(SUPPORTED_ARCHS)),)
-ALL_ACTION = error
-else
-ALL_ACTION = $(SUPPORTED_ARCHS)
-endif
-
-# make all-latest
-else ifeq (latest,$(subst all-,,$(subst publish-,,$(firstword $(MAKECMDGOALS)))))
-ACTION = latest
-ALL_ACTION = $(LATEST_ARCHS)
-endif
-
-# make publish-all-supported | make publish-all-latest
-ifeq (publish,$(subst -all-latest,,$(subst -all-supported,,$(firstword $(MAKECMDGOALS)))))
-PUBLISH = publish-
-.NOTPARALLEL:
-endif
-
-KERNEL_REQUIRED = $(MAKE) kernel-required
-ifeq ($(strip $(KERNEL_REQUIRED)),)
-ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT))))))
-endif
-
-####
-
-.PHONY: publish-all-$(ACTION) all-$(ACTION) pre-build-native
-
-pre-build-native: SHELL:=/bin/bash
-pre-build-native:
-	@$(MSG) Pre-build native dependencies for parallel build
-	@for depend in $$($(MAKE) dependency-list) ; \
-	do \
-	  if [ "$${depend%/*}" = "native" ]; then \
-	    $(MSG) "Pre-processing $${depend}" ; \
-	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
-	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
-	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
-	  fi ; \
-	done
-ifneq ($(filter all,$(subst -, ,$(MAKECMDGOALS))),)
-	$(MAKE) $(addprefix $(PUBLISH)$(ACTION)-arch-,$(ALL_ACTION))
-endif
-
-$(PUBLISH)all-$(ACTION): | pre-build-native
-
-spk_msg:
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(MAKECMDGOALS), SPK: $(SPK_NAME) >> $(PSTAT_LOG)
-endif
-
-supported-arch-error:
-	@$(MSG) ########################################################
-	@$(MSG) ERROR - Please run make setup from spksrc root directory
-	@$(MSG) ########################################################
-
-supported-arch-%: spk_msg
-	@$(MSG) "BUILDING package for arch $* (all-supported)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) $(addprefix arch-, $*)
-
-publish-supported-arch-%: spk_msg
-	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-supported)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) $(addprefix publish-arch-, $*)
-
-latest-arch-%: spk_msg
-	@$(MSG) "BUILDING package for arch $* (all-latest)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) $(addprefix arch-, $*)
-
-publish-latest-arch-%: spk_msg
-	@$(MSG) "BUILDING and PUBLISHING package for arch $* (publish-all-latest)" | tee --append build-$*.log
-	-@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) $(addprefix publish-arch-, $*)
-
-####
-
-all-legacy: spk_msg
-	@$(MSG) BUILDING package for legacy DSM and SRM archs
-	$(MAKE) legacy-toolchain-5.2 legacy-toolchain-1.2
-
-publish-all-legacy: spk_msg
-	@$(MSG) BUILDING and PUBLISHING package for legacy DSM archs
-	$(MAKE) publish-legacy-toolchain-5.2
-
-####
-
-legacy-toolchain-%: spk_msg
-	@$(MSG) BUILDING packages for toolchain $*
-	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(LEGACY_ARCHS))))))) ; \
-	do \
-	  $(MAKE) arch-$$arch-$* ; \
-	done \
-
-publish-legacy-toolchain-%: spk_msg
-	@$(MSG) BUILDING and PUBLISHING packages for toolchain $*
-	@for arch in $(sort $(basename $(subst -,.,$(basename $(subst .,,$(filter %$*, $(LEGACY_ARCHS))))))) ; \
-	do \
-	  $(MAKE) publish-arch-$$arch-$* ; \
-	done \
-
-####
-
-kernel-modules-%: SHELL:=/bin/bash
-kernel-modules-%:
-	@if [ "$(filter $(DEFAULT_TC),lastword $(subst -, ,$(MAKECMDGOALS)))" ]; then \
-	   archs2process="$(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
-	elif [ "$(filter $(GENERIC_ARCHS),$(subst -, ,$(MAKECMDGOALS)))" ]; then \
-	   archs2process="$(filter $(addprefix %-,$(lastword $(subst -, ,$(MAKECMDGOALS)))),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
-	else \
-	   archs2process=$* ; \
-	fi ; \
-	$(MSG) ARCH to be processed: $${archs2process} ; \
-	set -e ; \
-	for arch in $${archs2process} ; do \
-	  $(MSG) "Processing $${arch} ARCH" ; \
-	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(PWD)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
-	  $(MAKE) spkclean ; \
-	  rm -fr $(PWD)/work-$*/$(addprefix linux-, $${arch}) ; \
-	  $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
-	done
-
-arch-%: | pre-build-native
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-	$(MAKE) $(addprefix kernel-modules-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
-	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix build-arch-, $*)
-else
-	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
-	@$(MSG) BUILDING package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
-	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
-endif
-
-build-arch-%: SHELL:=/bin/bash
-build-arch-%: spk_msg
-	@$(MSG) BUILDING package for arch $*
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [BEGIN] >> $(PSTAT_LOG)
-endif
-	@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, SPK: $(SPK_NAME) [END] >> $(PSTAT_LOG)
-endif
-
-
-publish-arch-%: SHELL:=/bin/bash
-publish-arch-%: spk_msg
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-	$(MAKE) $(addprefix kernel-modules-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
-	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(PWD)/work-$* $(addprefix publish-arch-, $*)
-else
-	# handle and allow parallel build for:  arch-<arch> | make arch-<arch>-X.Y
-	@$(MSG) BUILDING and PUBLISHING package for arch $*
-	@MAKEFLAGS= $(PSTAT_TIME) GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) publish 2>&1 | tee --append build-$*.log >(grep -e '^http' -e '^{"package":' -e '^{"message":' >> publish-$*.log) ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false
-endif
-
-####
-
-changelog:
-	@echo $(shell git log --pretty=format:"- %s" -- $(PWD))
-
-####
-
-### For make kernel-required
-include ../../mk/spksrc.kernel-required.mk
-
-####
+###

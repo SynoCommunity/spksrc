@@ -1,16 +1,23 @@
 PKG_NAME = tvheadend
 PKG_VERS = 4.3
 PKG_EXT = tar.gz
-# git hash from April 8th 2023
-PKG_GIT_HASH = f32c7c59a19a276648d7b068041738e4e8337638
+# no official release since v4.2.8 (Jan 12, 2019)
+# git hash from June 23rd 2024
+PKG_GIT_HASH = 128d6861fac67ea6638c2956d092a46e23eb8988
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
-DEPENDS  = cross/openssl cross/gnutls
+# WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng)
+# with prebuilt ffmpeg this is not a problem
+# without prebuilt ffmpeg the "DEPENDS += cross/ffmpeg*" must be defined below
+DEPENDS  = cross/pngquant
+
+DEPENDS += cross/openssl3 cross/gnutls
 DEPENDS += cross/uriparser cross/pcre2 cross/libiconv cross/fontconfig
-DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps cross/pngquant
+DEPENDS += cross/libhdhomerun cross/libdvbcsa cross/dvb-apps
+
 DEPENDS += cross/curl
 # curl build needs additional configuration for gnutls and libssh2
 export BUILD_CURL_WITH="gnutls libssh2 zstd"
@@ -21,7 +28,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://tvheadend.org/
 COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
-LICENSE  = GPL v3
+LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure

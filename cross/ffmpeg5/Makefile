@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 5.1.3
+PKG_VERS = 5.1.5
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -224,10 +224,10 @@ CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --extra-libs=-latomic
 CONFIGURE_ARGS += --arch=ppc
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --cpu=e500v2
+CONFIGURE_ARGS += --extra-libs=-latomic
 else
 CONFIGURE_ARGS += --cpu=e500 --disable-altivec
 endif

@@ -3,29 +3,30 @@
 SHELL := $(SHELL) -e
 default: all
 
-WORK_DIR := $(shell pwd)/work
+WORK_DIR := $(CURDIR)/work
 include ../../mk/spksrc.directories.mk
 
+include ../../mk/spksrc.common.mk
 
 # Configure the included makefiles
-URLS          = $(TOOLKIT_DIST_SITE)/$(TOOLKIT_DIST_NAME)
-NAME          = $(TOOLKIT_NAME)
+URLS          = $(TK_DIST_SITE)/$(TK_DIST_NAME)
+NAME          = $(TK_NAME)
 COOKIE_PREFIX = 
-ifneq ($(TOOLKIT_DIST_FILE),)
-LOCAL_FILE    = $(TOOLKIT_DIST_FILE)
+ifneq ($(TK_DIST_FILE),)
+LOCAL_FILE    = $(TK_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
-PKG_DIST_FILE = $(TOOLKIT_DIST_FILE)
+PKG_DIST_FILE = $(TK_DIST_FILE)
 else
-LOCAL_FILE    = $(TOOLKIT_DIST_NAME)
+LOCAL_FILE    = $(TK_DIST_NAME)
 endif
-DISTRIB_DIR   = $(TOOLKIT_DIR)/$(TOOLKIT_VERS)
+DISTRIB_DIR   = $(TOOLKIT_DIR)/$(TK_VERS)
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT      = $(TOOLKIT_EXT)
-EXTRACT_CMD   = $(EXTRACT_CMD.$(DIST_EXT)) --skip-old-files --strip-components=$(TOOLKIT_STRIP) usr/$(TOOLKIT_PREFIX)/$(TOOLKIT_BASE_DIR)/$(TOOLKIT_SYSROOT)
+DIST_EXT      = $(TK_EXT)
+EXTRACT_CMD   = $(EXTRACT_CMD.$(DIST_EXT)) --skip-old-files --strip-components=$(TK_STRIP) usr/$(TK_PREFIX)/$(TK_BASE_DIR)/$(TK_SYSROOT_PATH)
 
 #####
 
-RUN = cd $(WORK_DIR)/$(TOOLKIT_TARGET) && env $(ENV)
+RUN = cd $(WORK_DIR)/$(TK_TARGET) && env $(ENV)
 
 include ../../mk/spksrc.download.mk
 
@@ -45,10 +46,6 @@ toolkit_fix: flags
 include ../../mk/spksrc.toolkit-fix.mk
 
 all: toolkit_fix
-
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

@@ -61,7 +61,7 @@ jobs:
           SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
       - name: Cache downloaded files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: distrib
           # use run_id in key to cache within workflow only.
@@ -90,13 +90,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache toolchains
-        uses: actions/cache@v3
+        uses: actions/cache@v4
+        # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
+        if: ${{ contains(matrix.arch,'qoriq') == false }}
         with:
           path: toolchain/*/work
-          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles('toolchain/*/digests') }}
+          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
 
       - name: Use cache of downloaded files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: distrib
           key: distrib-${{ github.run_id }}
@@ -136,7 +138,7 @@ jobs:
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Packages for ${{ matrix.arch }}
           path: packages/*.spk

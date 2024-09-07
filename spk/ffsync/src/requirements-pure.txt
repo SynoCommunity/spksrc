@@ -1,0 +1,31 @@
+# From requirements.txt
+
+pyfxa==0.7.7
+tokenlib==2.0.0
+
+# From tools/tokenserver/requirements.txt
+
+boto==2.49.0
+hawkauthlib==2.0.0
+pyramid==2.0.2
+#sqlalchemy==1.4.46     => crossenv
+testfixtures==8.3.0
+#tokenlib==2.0.0        => same as above
+PyBrowserID==0.14.0
+datadog==0.50.0
+backoff==2.2.1
+
+
+# further dependencies
+hupper==1.12.1
+idna==3.8
+PasteDeploy==3.1.0
+plaster==1.1.2
+plaster_pastedeploy==1.0.1
+PyJWT==2.9.0
+requests==2.32.3
+translationstring==1.4
+urllib3==2.2.2
+venusian==3.1.0
+WebOb==1.8.8
+zope.deprecation==5.0

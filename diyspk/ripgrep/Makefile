@@ -1,9 +1,11 @@
 SPK_NAME = ripgrep
-SPK_VERS = 13.0.0
+SPK_VERS = 14.1.0
 SPK_REV = 1
 SPK_ICON = src/ripgrep.png
 
-DEPENDS = cross/$(SPK_NAME)
+# simulate existance of pcre2
+DEPENDS  = cross/pcre2
+DEPENDS += cross/ripgrep
 
 # powerpc archs (except qoriq) are not supported
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)

@@ -3,41 +3,32 @@ CONF_FILE="${SYNOPKG_PKGVAR}/conf.ini"
 PATH="/var/packages/git/target/bin:${PATH}"
 
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-    SYNOPKG_PKGHOME="${SYNOPKG_PKGDEST}"
+    SYNOPKG_PKGHOME="${SYNOPKG_PKGVAR}"
 fi
+
 ENV="PATH=${PATH} HOME=${SYNOPKG_PKGHOME}"
 
 SERVICE_COMMAND="env ${ENV} ${GITEA} web --port ${SERVICE_PORT} --pid ${PID_FILE}"
 SVC_BACKGROUND=y
 
-service_preinst ()
-{
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ] && [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-        SHARED_FOLDER="${wizard_volume}/${wizard_gitea_dir}"
-        if [ ! -d "${SHARED_FOLDER}" ]; then
-            mkdir -p "${SHARED_FOLDER}" || {
-                echo "Failed to create directory \"${SHARED_FOLDER}\"."
-                exit 1
-            }
-        fi
-        set_syno_permissions "${SHARED_FOLDER}" "${EFF_USER}"
-    fi
-}
-
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        SHARED_FOLDER="${wizard_volume}/${wizard_gitea_dir}"
         IP=$(ip route get 1 | awk '{print $(NF);exit}')
-        # Default configuration with shared folder
-        {
-            echo "[repository]"
-            echo "ROOT = ${SHARED_FOLDER}/gitea-repositories"
-            echo "[server]"
-            echo "LFS_CONTENT_PATH = ${SHARED_FOLDER}/lfs"
-            echo "SSH_DOMAIN = ${IP:=localhost}"
-            echo "DOMAIN = ${IP:=localhost}"
-            echo "ROOT_URL = http://${IP:=localhost}:${SERVICE_PORT}/"
-        } > "$CONF_FILE"
+
+        sed -i -e "s|@share_path@|${SHARE_PATH}|g" ${CFG_FILE}
+        sed -i -e "s|@ip_address@|${IP:=localhost}|g" ${CFG_FILE}
+        sed -i -e "s|@service_port@|${SERVICE_PORT}|g" ${CFG_FILE}
+    fi
+}
+
+# service_restore is called by post_upgrade before restoring files from ${TMP_DIR}
+service_restore ()
+{
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        # make a copy of the new config file before it gets overwritten by restore
+        # overwrite existing *.new files in ${TMP_DIR}/ as all files in ${TMP_DIR}/
+        # are restored to ${SYNOPKG_PKGVAR}/
+        [ -f "${SYNOPKG_PKGVAR}/conf.ini" ] && cp -f ${SYNOPKG_PKGVAR}/conf.ini ${TMP_DIR}/conf.ini.new
     fi
 }

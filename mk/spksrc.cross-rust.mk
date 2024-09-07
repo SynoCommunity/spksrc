@@ -53,11 +53,20 @@ endif
 CARGO_INSTALL_ARGS += --path $(RUST_SRC_DIR)
 CARGO_INSTALL_ARGS += --root $(STAGING_INSTALL_PREFIX)
 
-# Default build with rust and installation with cargo
-rust_install_target:
-	@echo "  ==> Cargo install rust package $(PKG_NAME)"
-	@$(RUN) cargo +$(RUST_TOOLCHAIN) install $(CARGO_INSTALL_ARGS)
+# Append additional install options if present
+ifneq ($(strip $(CARGO_BUILD_ARGS)),)
+CARGO_INSTALL_ARGS += $(CARGO_BUILD_ARGS)
+endif
 
+# Default build with rust and install with cargo
+# The cargo call uses tc_vars.mk RUSTUP_TOOLCHAIN variable
+# overriding definition using +stable or +$(RUSTUP_TOOLCHAIN)
+# https://rust-lang.github.io/rustup/environment-variables.html 
+rust_install_target:
+	@echo "  ==> Cargo install rust package $(PKG_NAME) (rustc +$(TC_RUSTUP_TOOLCHAIN) -vV)"
+	@$(RUN) rustc +$(TC_RUSTUP_TOOLCHAIN) -vV
+	@$(RUN) echo cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
+	@$(RUN) cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
 
 #####
 
@@ -90,33 +99,10 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-
-### Clean rules
-smart-clean:
-	rm -rf $(WORK_DIR)/$(PKG_DIR)
-	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
-
-clean:
-	rm -fr work work-* build-*.log
-
 all: install plist
 
-### For make kernel-required (used by spksrc.spk.mk)
-include ../../mk/spksrc.kernel-required.mk
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
-
-####
-
-arch-%:
-	@$(MSG) Building package for arch $*
-	@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) 2>&1 | tee --append build-$*.log
+### For arch-* and all-<supported|latest>
+include ../../mk/spksrc.supported.mk
 
 ####

@@ -1,3 +1,3 @@
 lnk:lib/libzim.so
-lnk:lib/libzim.so.8
-lib:lib/libzim.so.8.1.0
+lnk:lib/libzim.so.9
+lib:lib/libzim.so.9.1.0

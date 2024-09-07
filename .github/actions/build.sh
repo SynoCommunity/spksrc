@@ -12,8 +12,8 @@
 # - The build output is structured into log groups by package.
 # - As the disk space in the workflow environment is limitted, we clean the
 #   work folder of each package after build. At 2020.06 this limit is 14GB.
-# - ffmpeg (spk/ffmpeg4), ffmpeg5 and ffmpeg6 are not cleaned to be available for dependents.
-# - Therefore ffmpeg4, ffmpeg5 and ffmpeg6 are built first if triggered by its
+# - ffmpeg5 and ffmpeg6 are not cleaned to be available for dependents.
+# - Therefore ffmpeg5 and ffmpeg6 are built first if triggered by its
 #   own or a dependent (see prepare.sh).
 
 set -o pipefail
@@ -59,7 +59,7 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
 fi
 
 # Build
-PACKAGES_TO_KEEP="ffmpeg4 ffmpeg5 ffmpeg6 python310 python311"
+PACKAGES_TO_KEEP="ffmpeg5 ffmpeg6 python310 python311"
 for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"
@@ -79,8 +79,14 @@ do
         else
             TCVERSION=${GH_ARCH##*-}
         fi
-        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
-        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+        # noarch package must be first built then published
+        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}" >>build.log
+        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} |& tee >(tail -15 >>build.log)
+
+        if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
+            echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
+            make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+        fi
     fi
     result=$?
 
@@ -95,7 +101,10 @@ do
 
     if [ "$(echo ${PACKAGES_TO_KEEP} | grep -ow ${package})" = "" ]; then
         # free disk space (but not for packages to keep)
-        make -C ./spk/${package} clean
+        make -C ./spk/${package} clean |& tee >(tail -15 >>build.log)
+    else
+        # free disk space by removing source and staging directories (for packages to keep)
+        make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
     fi
 
     echo "::endgroup::"

@@ -1,5 +1,17 @@
 # Common arch definitions
 
+###
+
+# Set basedir in case called from spkrc/ or from normal sub-dir
+# Note that github-action uses workspace/ in place of spksrc/
+ifeq ($(BASEDIR),)
+ifeq ($(filter spksrc workspace,$(shell basename $(CURDIR))),)
+BASEDIR = ../../
+endif
+endif
+
+###
+
 # All available CPU architectures
 
 # Distinct SRM and DSM archs to allow handling of different TCVERSION ranges.
@@ -33,39 +45,28 @@ x64_ARCHS = $(GENERIC_x64_ARCH) apollolake avoton braswell broadwell broadwellnk
 
 # Arch groups
 ALL_ARCHS = $(x64_ARCHS) $(i686_ARCHS) $(PPC_ARCHS) $(ARM_ARCHS)
-ARCHS_WITH_GENERIC_SUPPORT = $(sort $(foreach version, $(AVAILABLE_TCVERSIONS), $(foreach arch, $(GENERIC_ARCHS), $(addsuffix -$(version),$(shell sed -n 's/^TC_ARCH = \(.*\)/\1/p' ../../toolchain/syno-$(arch)-$(version)/Makefile 2>/dev/null)))))
+ARCHS_WITH_GENERIC_SUPPORT = $(sort $(foreach version, $(AVAILABLE_TCVERSIONS), $(foreach arch, $(GENERIC_ARCHS), $(addsuffix -$(version),$(shell sed -n 's/^TC_ARCH = \(.*\)/\1/p' $(BASEDIR)toolchain/syno-$(arch)-$(version)/Makefile 2>/dev/null)))))
 # PPC_ARCHS except qoriq
 OLD_PPC_ARCHS = powerpc ppc824x ppc853x ppc854x
 
 # outdated unsupported archs
 DEPRECATED_ARCHS = powerpc ppc824x ppc854x ppc853x
 
-DOTNET_UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) 
-# .NET for x86 (32-bit) is supported on windows only (for linux, it must be built from source)
-DOTNET_UNSUPPORTED_ARCHS += $(i686_ARCHS)
-# ARMv7_ARCHS without full vfpv3 support (having only vfpv3-d16) are not supported
-# issue #5315
-DOTNET_UNSUPPORTED_ARCHS += armada370
-# issue #5302
-DOTNET_UNSUPPORTED_ARCHS += alpine
-# issue #5089
-DOTNET_UNSUPPORTED_ARCHS += monaco
-# issue #4790
-DOTNET_UNSUPPORTED_ARCHS += armadaxp
-# SRM armv7 archs are not supported
-DOTNET_UNSUPPORTED_ARCHS += $(SRM_ARMv7_ARCHS)
-
-# compatibility with .NET not yet confirmed:
-# alpine4k armada375 armada38x comcerto2k
+# Notes for .NET 6 compatibility:
+# 1. dotnet for x86 (32-bit) is unsupported on linux and must be built from source
+# 2. ARMv7_ARCHS without full vfpv3 support (having only vfpv3-d16) are not supported
+# 3. SRM ARMv7 archs are not supported
+# 4. Certain combinations of ARMv7 and DSM are incompatible (issues #4790, #5089, #5302, #5315)
+# 5. Comprehensive ARMv7 testing conducted under issue #5574 resulted in the following exclusions
 
 # Exclusions for dotnet 6.0 core apps
 ifeq ($(strip $(DOTNET_CORE_ARCHS)),1)
-    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370 alpine alpine4k
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-1.2
+    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370 alpine comcerto2k
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
 endif
 
 # Exclusions for dotnet 6.0 servarr apps (except x86)
 ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
-    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine alpine4k
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-1.2
+    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
 endif

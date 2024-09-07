@@ -1,6 +1,6 @@
 SPK_NAME = owncloud
-SPK_VERS = 10.13.2
-SPK_REV = 12
+SPK_VERS = 10.14.0
+SPK_REV = 17
 SPK_ICON = src/owncloud.png
 
 DEPENDS = cross/owncloud
@@ -13,14 +13,14 @@ SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
 MAINTAINER = ymartin59
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 DISPLAY_NAME = ownCloud
-CHANGELOG = "1. Update ownCloud to 10.13.2.<br/>2. New backup and restore functions.<br/>3. Use new shared folder handling.<br/>4. Package maintenance optimisation."
-HOMEPAGE = https://owncloud.org/
+CHANGELOG = "1. Update ownCloud to 10.14.0."
+HOMEPAGE = https://owncloud.com/
 
-LICENSE = AGPL
+LICENSE = AGPLv3
+LICENSE_FILE = $(WORK_DIR)/owncloud/COPYING
 
-WIZARDS_TEMPLATES_DIR = src/wizard_templates/
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
 SERVICE_WIZARD_SHARENAME = wizard_data_share
-USE_DATA_SHARE_WORKER = yes
 
 SYSTEM_GROUP = http
 
@@ -31,6 +31,13 @@ ADMIN_PROTOCOL = https
 DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
 CONF_DIR = src/conf/
+
+include ../../mk/spksrc.common.mk
+
+# Alternate conf dir for DSM 6
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+CONF_DIR = src/conf_6/
+endif
 
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no

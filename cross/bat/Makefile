@@ -1,12 +1,12 @@
 PKG_NAME = bat
-PKG_VERS = 0.23.0
+PKG_VERS = 0.24.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sharkdp/bat/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib-ng
+DEPENDS = cross/zlib
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
