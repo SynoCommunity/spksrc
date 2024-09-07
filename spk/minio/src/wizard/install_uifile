@@ -65,19 +65,16 @@
       ]
    },
    {
-      "step_title": "MinIO - end of life for filesystem mode",
+      "step_title": "MinIO - Migration Notes",
       "items": [
          {
-            "desc": "MinIO removed support for the filesystem mode which is a 1:1 mapping of buckets to files on disk. If your deployment uses filesystem mode you need to manually migrate to single-node single-drive deployment setup. This is the only way to receive future updates of MinIO. A new MinIO package with a different name will be provided in future."
+            "desc": "<b>The following notes apply only in the case where the shared folder already contains a MinIO data structure.</b>"
          },
          {
-            "desc": "To check if you're affected by this change check your buckets manually by looking into each folder on your diskstation. If there is exactly a single file per S3 object you need to migrate your data. Otherwise you're already running a single-node single-drive deployment an can upgrade to the new MinIO package in future without a migration."
+            "desc": "MinIO removed support for the filesystem mode which is a 1:1 mapping of buckets to files on disk. If your deployment uses filesystem mode you need to manually migrate to single-node single-drive deployment setup. Future MinIO packages will support the new format only."
          },
          {
-            "desc": "Because of the complexity and risks involved an automatic upgrade process is not available. The official MinIO documentation provides a guide for doing so called 'Migrate from Gateway or Filesystem Mode'"
-         },
-         {
-            "desc": "For a regular user it is suggested to run an instance of MinIO on a separate system and migrate your data to this new instance. This system could be a desktop, single board computer or a server. If possible you can mount the storage from your diskstation over the network and use it directly during the migration process. After a successful migration replace the data of your current MinIO installation on your diskstation. Please stop MinIO before replacing your data and restart it afterwards."
+            "desc": "Because of the complexity and risks involved, an automatic upgrade process is not available. The official MinIO documentation provides a guide for doing so, see <a target=\"_blank\" href=\"https://min.io/docs/minio/linux/operations/install-deploy-manage/migrate-fs-gateway.html\">Migrate from Gateway or Filesystem Mode</a>."
          }
       ]
    }
