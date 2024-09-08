@@ -15,11 +15,21 @@ if [ -r "${INST_VARIABLES}" ]; then
    done < ${INST_VARIABLES}
 fi
 
+
+# Evaluate the current data path
+FORMER_SHARE_NAME="${SHARE_NAME}"
+FORMER_SHARE_PATH="${SHARE_PATH}"
+if [ -n "${WIZARD_DATA_VOLUME}" -a -n "${WIZARD_DATA_DIRECTORY}" ]; then
+   FORMER_SHARE_NAME="${WIZARD_DATA_DIRECTORY}"
+   FORMER_SHARE_PATH="${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY}"
+fi
+
+
 # Evaluate the current data format
-if [ -d "${SHARE_PATH}" ]; then
-   if [ -d "${SHARE_PATH}/.minio.sys" ]; then
-      if [ -r "${SHARE_PATH}/.minio.sys/format.json" ]; then
-         MINIO_DATA_FORMAT=$(cat "${SHARE_PATH}/.minio.sys/format.json" | jq '.format' | tr -d '"')
+if [ -d "${FORMER_SHARE_PATH}" ]; then
+   if [ -d "${FORMER_SHARE_PATH}/.minio.sys" ]; then
+      if [ -r "${FORMER_SHARE_PATH}/.minio.sys/format.json" ]; then
+         MINIO_DATA_FORMAT=$(cat "${FORMER_SHARE_PATH}/.minio.sys/format.json" | jq '.format' | tr -d '"')
       fi
    fi
 fi
@@ -37,6 +47,7 @@ quote_json ()
    sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
 }
 
+# when leaving step1 set first text in step2
 deactivateFunction ()
 {
    DEACTIVATE=$(/bin/cat<<EOF
@@ -66,7 +77,7 @@ deactivateFunction ()
    }
    function getDataFormat(wizardDialog) {
       var wizard_data_dir = getValue(wizardDialog,"${TITLE_STEP_1}","wizard_data_directory");
-      if (wizard_data_dir === "${SHARE_NAME}") {
+      if (wizard_data_dir === "${FORMER_SHARE_NAME}") {
          return "${MINIO_DATA_FORMAT}";
       } else {
          return "unknown";
@@ -109,7 +120,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                {
                   "key": "wizard_data_directory",
                   "desc": "Data shared folder",
-                  "defaultValue": "${SHARE_NAME}",
+                  "defaultValue": "${FORMER_SHARE_NAME}",
                   "validator": {
                      "allowBlank": false,
                      "regex": {
