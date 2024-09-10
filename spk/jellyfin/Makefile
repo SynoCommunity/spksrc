@@ -9,7 +9,7 @@ DSM_UI_DIR = app
 DEPENDS = cross/jellyfin cross/jellyfin-web
 
 # GLIBC >= 2.28 required
-REQUIRED_MIN_DSM = 7.2
+REQUIRED_MIN_DSM = 7.1
 
 # x64 and armv8 archs are supported only.
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
