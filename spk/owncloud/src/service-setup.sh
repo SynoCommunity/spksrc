@@ -121,13 +121,19 @@ setup_owncloud_instance()
             line_number=$((line_number + 1))
         done
 
+        # Refresh the trusted domains
+        DOMAINS="$(exec_occ config:system:get trusted_domains)"
+
         # Add user-specified trusted domains
         line_number=$(echo "$DOMAINS" | wc -l)
         for var in wizard_owncloud_trusted_domain_1 wizard_owncloud_trusted_domain_2 wizard_owncloud_trusted_domain_3; do
             eval val=\$$var
             if [ -n "$val" ]; then
-                exec_occ config:system:set trusted_domains $line_number --value="$val"
-                line_number=$((line_number + 1))
+                # Check if the domain is already in the trusted domains
+                if ! echo "$DOMAINS" | grep -qx "$val"; then
+                    exec_occ config:system:set trusted_domains $line_number --value="$val"
+                    line_number=$((line_number + 1))
+                fi
             fi
         done
 
