@@ -249,7 +249,7 @@ service_postinst ()
 
         # Check restore action
         if [ "${wizard_owncloud_restore}" = "true" ]; then
-            echo "The backup filename starts with the expected prefix, performing restore."
+            echo "The backup file is valid, performing restore."
             # Extract archive to temp folder
             TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
             ${MKDIR} "${TEMPDIR}"
@@ -280,9 +280,10 @@ service_postinst ()
             # Disable maintenance mode
             exec_occ maintenance:mode --off
 
-            # Extract the version number using awk and cut
+            # Set backup filename and expected prefix
             filename=$(basename "${wizard_backup_file}")
             expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
+            # Extract the version number using awk and cut
             file_version=$(echo "$filename" | awk -F "${expected_prefix}" '{print $2}' | cut -d '_' -f 1)
             package_version=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
             if [ -n "$file_version" ]; then
