@@ -14,7 +14,7 @@ REQUIRED_MIN_DSM = 7.2
 # x64 and armv8 archs are supported only.
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
-MAINTAINER = stevenliuit
+MAINTAINER = SynoCommunity
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
