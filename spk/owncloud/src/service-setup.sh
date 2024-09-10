@@ -165,8 +165,6 @@ validate_preinst ()
             if [ "${filename#"$expected_prefix"}" = "$filename" ]; then
                 echo "The backup filename does not start with the expected prefix."
                 exit 1
-            else
-                backup_prefix_matched=true
             fi
         fi
     fi
@@ -249,8 +247,8 @@ service_postinst ()
             set_owncloud_permissions ${WEB_ROOT} ${DATA_DIR}
         fi
 
-        # Check restore action and backup file prefix
-        if [ "${wizard_owncloud_restore}" = "true" ] && [ "${backup_prefix_matched}" = true ]; then
+        # Check restore action
+        if [ "${wizard_owncloud_restore}" = "true" ]; then
             echo "The backup filename starts with the expected prefix, performing restore."
             # Extract archive to temp folder
             TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
