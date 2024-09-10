@@ -10,7 +10,7 @@ override ARCH=
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
 
-MAINTAINER = ymartin59
+MAINTAINER = SynoCommunity
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 DISPLAY_NAME = ownCloud
 CHANGELOG = "1. Update ownCloud to 10.15.0."
