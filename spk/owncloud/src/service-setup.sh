@@ -113,29 +113,55 @@ setup_owncloud_instance()
         # Fix trusted domains array
         line_number=0
         echo "${DOMAINS}" | while read -r line; do
-            if [ "$(echo "$line" | grep -cE ':5000|:5001')" -gt 0 ]; then
+            if echo "$line" | grep -qE ':5000|:5001'; then
                 # Remove ":5000" or ":5001" from the line and update the trusted_domains array
                 new_line=$(echo "$line" | sed -E 's/(:5000|:5001)//')
                 exec_occ config:system:set trusted_domains $line_number --value="$new_line"
             fi
-            line_number=$((line_number+1))
+            line_number=$((line_number + 1))
         done
-        # Add user specified trusted domains
-        line_number=$(( $(echo -ne "$DOMAINS" | wc -l) + 1 ))
+
+        # Add user-specified trusted domains
+        line_number=$(echo "$DOMAINS" | wc -l)
         for var in wizard_owncloud_trusted_domain_1 wizard_owncloud_trusted_domain_2 wizard_owncloud_trusted_domain_3; do
-            val="${!var}"
+            eval val=\$$var
             if [ -n "$val" ]; then
                 exec_occ config:system:set trusted_domains $line_number --value="$val"
-                line_number=$((line_number+1))
+                line_number=$((line_number + 1))
             fi
         done
 
         # Add HTTP to HTTPS redirect to Apache configuration file
         APACHE_CONF="${WEB_ROOT}/.htaccess"
         if [ -f "${APACHE_CONF}" ]; then
-            echo "RewriteEngine On" >> ${APACHE_CONF}
-            echo "RewriteCond %{HTTPS} off" >> ${APACHE_CONF}
-            echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]" >> ${APACHE_CONF}
+            {
+                echo "RewriteEngine On"
+                echo "RewriteCond %{HTTPS} off"
+                echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]"
+            } >> "${APACHE_CONF}"
+        fi
+    fi
+}
+
+validate_preinst ()
+{
+    # Check for valid backup to restore
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        if [ "${wizard_owncloud_restore}" = "true" ] && [ -n "${wizard_backup_file}" ]; then
+            if [ ! -f "${wizard_backup_file}" ]; then
+                echo "The backup file path specified is incorrect or not accessible."
+                exit 1
+            fi
+            # Check backup file prefix
+            filename=$(basename "${wizard_backup_file}")
+            expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
+            
+            if [ "${filename#"$expected_prefix"}" = "$filename" ]; then
+                echo "The backup filename does not start with the expected prefix."
+                exit 1
+            else
+                backup_prefix_matched=true
+            fi
         fi
     fi
 }
@@ -217,60 +243,52 @@ service_postinst ()
             set_owncloud_permissions ${WEB_ROOT} ${DATA_DIR}
         fi
 
-        # Check backup file path
-        if [ "${wizard_owncloud_restore}" = "true" ] && [ -n "${wizard_backup_file}" ] && [ -f "${wizard_backup_file}" ]; then
-            filename=$(basename "${wizard_backup_file}")
-            expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
-            # Check backup file prefix
-            if [[ $filename == ${expected_prefix}* ]]; then
-                echo "The backup filename starts with the expected prefix, performing restore."
-                # Extract archive to temp folder
-                TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
-                ${MKDIR} "${TEMPDIR}"
-                tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
-                # Fix file ownership
-                if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-                    chown -R ${WEB_USER}:${WEB_GROUP} ${TEMPDIR} 2>/dev/null
-                fi
-
-                # Restore configuration files and directories
-                rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${WEB_ROOT}/" 2>&1
-                rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${WEB_ROOT}/" 2>&1
-
-                # Restore user data
-                echo "Restoring user data to ${DATA_DIR}"
-                rsync -aX --update -I "${TEMPDIR}/data" "${SHARE_PATH}/" 2>&1
-
-                # Place server in maintenance mode
-                exec_occ maintenance:mode --on
-
-                # Restore the Database
-                [ -f "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" ] && ${RM} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db"
-                exec_sql "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" < "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
-
-                # Update the systems data-fingerprint after a backup is restored
-                exec_occ maintenance:data-fingerprint -n
-
-                # Disable maintenance mode
-                exec_occ maintenance:mode --off
-
-                # Extract the version number using awk and cut
-                file_version=$(echo "$filename" | awk -F "${expected_prefix}" '{print $2}' | cut -d '_' -f 1)
-                package_version=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
-                if [ -n "$file_version" ]; then
-                    # Compare the extracted version with package_version using awk
-                    if awk "BEGIN {exit !($file_version < $package_version) }"; then
-                        echo "The archive version ($file_version) is older than the package version ($package_version). Triggering upgrade."
-                        exec_occ upgrade
-                    fi
-                fi
-
-                # Clean-up temporary files
-                ${RM} "${TEMPDIR}"
-            else
-                echo "The backup filename does not start with the expected prefix, performing new install."
-                setup_owncloud_instance
+        # Check restore action and backup file prefix
+        if [ "${wizard_owncloud_restore}" = "true" ] && [ "${backup_prefix_matched}" = true ]; then
+            echo "The backup filename starts with the expected prefix, performing restore."
+            # Extract archive to temp folder
+            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
+            ${MKDIR} "${TEMPDIR}"
+            tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
+            # Fix file ownership
+            if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+                chown -R ${WEB_USER}:${WEB_GROUP} ${TEMPDIR} 2>/dev/null
             fi
+
+            # Restore configuration files and directories
+            rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${WEB_ROOT}/" 2>&1
+            rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${WEB_ROOT}/" 2>&1
+
+            # Restore user data
+            echo "Restoring user data to ${DATA_DIR}"
+            rsync -aX --update -I "${TEMPDIR}/data" "${SHARE_PATH}/" 2>&1
+
+            # Place server in maintenance mode
+            exec_occ maintenance:mode --on
+
+            # Restore the Database
+            [ -f "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" ] && ${RM} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db"
+            exec_sql "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" < "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
+
+            # Update the systems data-fingerprint after a backup is restored
+            exec_occ maintenance:data-fingerprint -n
+
+            # Disable maintenance mode
+            exec_occ maintenance:mode --off
+
+            # Extract the version number using awk and cut
+            file_version=$(echo "$filename" | awk -F "${expected_prefix}" '{print $2}' | cut -d '_' -f 1)
+            package_version=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
+            if [ -n "$file_version" ]; then
+                # Compare the extracted version with package_version using awk
+                if awk "BEGIN {exit !($file_version < $package_version) }"; then
+                    echo "The archive version ($file_version) is older than the package version ($package_version). Triggering upgrade."
+                    exec_occ upgrade
+                fi
+            fi
+
+            # Clean-up temporary files
+            ${RM} "${TEMPDIR}"
         else
             setup_owncloud_instance
         fi
@@ -437,16 +455,17 @@ validate_preupgrade ()
 {
     # ownCloud upgrades only possible from 8.2.11, 9.0.9, 9.1.X, or 10.X.Y
     is_upgrade_possible="no"
-    valid_versions=("8.2.11" "9.0.9" "9.1.*" "10.*.*")
-    previous=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d '-' -f 1)
-    for version in "${valid_versions[@]}"; do
-        if echo "$previous" | grep -q "$version"; then
+    previous=$(echo "${SYNOPKG_OLD_PKGVER}" | cut -d '-' -f 1)
+    
+    # Check against valid versions
+    for version in "8.2.11" "9.0.9" "9.1." "10."; do
+        if echo "$previous" | grep -q "^$version"; then
             is_upgrade_possible="yes"
             break
         fi
     done
 
-    # No matching ugrade paths found
+    # No matching upgrade paths found
     if [ "$is_upgrade_possible" = "no" ]; then
         echo "Please uninstall previous version, no update possible from v${SYNOPKG_OLD_PKGVER}.<br/>Remember to save your ${WEB_ROOT}/data files before uninstalling."
         exit 1
@@ -523,7 +542,7 @@ service_restore ()
 {
     # Validate data directory for restore
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory ]; then
-        DATAPATH="$(cat ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory)"
+        DATAPATH=$(cat ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory)
         # Data directory inside owncloud directory and needs to be restored
         echo "Restore previous data directory from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}"
         rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${WEB_ROOT}/ 2>&1
@@ -533,20 +552,19 @@ service_restore ()
     # Restore the configuration files
     echo "Restore previous configuration from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     source="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config"
-    patterns=(
-    "*config.php"
-    "*.json"
-    )
+    patterns="*config.php *.json"
     target="${WEB_ROOT}/config"
+    
     # Process each pattern of files in the source directory
-    for pattern in "${patterns[@]}"; do
+    for pattern in $patterns; do
         files=$(find "$source" -type f -name "$pattern")
         if [ -n "$files" ]; then
-            for file in "${files[@]}"; do
+            for file in $files; do
                 rsync -aX --update -I "$file" "$target/" 2>&1
             done
         fi
     done
+    
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ]; then
         rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${WEB_ROOT}/ 2>&1
     fi
@@ -556,24 +574,18 @@ service_restore ()
 
     echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     # Migrate manually installed apps from source to destination directories
-    dirs=(
-    "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps"
-    "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps-external"
-    )
+    dirs="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps-external"
     dest="${WEB_ROOT}"
+    
     # Process the subdirectories in each of the source directories
-    for dir in "${dirs[@]}"; do
+    for dir in $dirs; do
         dir_name=$(basename "$dir")
-        sub_dirs=()
-        for item in "$dir"/*; do
-            if [ -d "$item" ]; then
-                sub_dirs+=("$item")
-            fi
-        done
+        sub_dirs=$(find "$dir" -mindepth 1 -maxdepth 1 -type d)
+        
         if [ ! -d "$dest/$dir_name" ]; then
             rsync -aX "$dir" "$dest/" 2>&1
         elif [ -n "$sub_dirs" ]; then
-            for sub_dir in "${sub_dirs[@]}"; do
+            for sub_dir in $sub_dirs; do
                 sub_dir_name=$(basename "$sub_dir")
                 # Check if the subdirectory is missing from the destination
                 if [ ! -d "$dest/$dir_name/$sub_dir_name" ]; then
@@ -594,12 +606,13 @@ service_restore ()
     # Finalize upgrade
     exec_occ upgrade
 
-    DATADIR="$(exec_occ config:system:get datadirectory)"
+    DATADIR=$(exec_occ config:system:get datadirectory)
     # Data directory fail-safe
     if [ ! -d "$DATADIR" ]; then
         echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
         DATADIR="${WEB_ROOT}/data"
     fi
+    
     # Archive backup server database
     echo "Archive backup server database to ${DATADIR}"
     if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ]; then
