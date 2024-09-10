@@ -281,6 +281,8 @@ service_postinst ()
             exec_occ maintenance:mode --off
 
             # Extract the version number using awk and cut
+            filename=$(basename "${wizard_backup_file}")
+            expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
             file_version=$(echo "$filename" | awk -F "${expected_prefix}" '{print $2}' | cut -d '_' -f 1)
             package_version=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
             if [ -n "$file_version" ]; then
