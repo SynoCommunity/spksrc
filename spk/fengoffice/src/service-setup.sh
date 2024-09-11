@@ -231,7 +231,7 @@ script_installer_storage[database_type]=mysqli\
 &script_installer_storage[plugins][]=workspaces\
 &submited=submited"
             # Prepare environment
-            cd ${WEB_ROOT}/public/install/ || exit 1
+            cd ${WEB_ROOT}/public/install/ || return
             # Execute based on DSM version
             echo "Run ${SC_DNAME} installer"
             exec_php "install_helper.php"
@@ -239,58 +239,60 @@ script_installer_storage[database_type]=mysqli\
     fi
 }
 
-service_preuninst ()
+validate_preuninst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
         echo "Incorrect MySQL root password"
         exit 1
     fi
-
-    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
-        # Check export directory
-        if [ -n "${wizard_export_path}" ]; then
-            if [ ! -d "${wizard_export_path}" ]; then
-                # If the export path directory does not exist, create it
-                ${MKDIR} "${wizard_export_path}" || {
-                    # If mkdir fails, print an error message and exit
-                    echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
-                    exit 1
-                }
-            elif [ ! -w "${wizard_export_path}" ]; then
-                # If the export path directory is not writable, print an error message and exit
-                echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
+    # Check export directory
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
+        if [ ! -d "${wizard_export_path}" ]; then
+            # If the export path directory does not exist, create it
+            ${MKDIR} "${wizard_export_path}" || {
+                # If mkdir fails, print an error message and exit
+                echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
                 exit 1
-            fi
-
-            # Prepare archive structure
-            FENG_VER=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/config/installed_version.php | xargs)
-            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${FENG_VER}_$(date +"%Y%m%d")"
-            ${MKDIR} "${TEMPDIR}"
-
-            # Backup Directories
-            echo "Copying previous configuration and data from ${WEB_ROOT}"
-            rsync -aX "${WEB_ROOT}" "${TEMPDIR}/" 2>&1
-
-            # Backup the Database
-            echo "Copying previous database from ${MYSQL_DATABASE}"
-            ${MKDIR} "${TEMPDIR}/database"
-            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
-
-            # Create backup archive
-            archive_name="$(basename "$TEMPDIR").tar.gz"
-            echo "Creating compressed archive of ${SC_DNAME} data in file $archive_name"
-            tar -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
-
-            # Move archive to export directory
-            RSYNC_BAK_ARGS="--backup --suffix=.bak"
-            rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
-            echo "Backup file copied successfully to ${wizard_export_path}"
-
-            # Clean-up temporary files
-            ${RM} "${TEMPDIR}"
-            ${RM} "${SYNOPKG_PKGTMP}/$archive_name"
+            }
+        elif [ ! -w "${wizard_export_path}" ]; then
+            # If the export path directory is not writable, print an error message and exit
+            echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
+            exit 1
         fi
+    fi
+}
+
+service_preuninst ()
+{
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
+        # Prepare archive structure
+        FENG_VER=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/config/installed_version.php | xargs)
+        TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${FENG_VER}_$(date +"%Y%m%d")"
+        ${MKDIR} "${TEMPDIR}"
+
+        # Backup Directories
+        echo "Copying previous configuration and data from ${WEB_ROOT}"
+        rsync -aX "${WEB_ROOT}" "${TEMPDIR}/" 2>&1
+
+        # Backup the Database
+        echo "Copying previous database from ${MYSQL_DATABASE}"
+        ${MKDIR} "${TEMPDIR}/database"
+        ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+
+        # Create backup archive
+        archive_name="$(basename "$TEMPDIR").tar.gz"
+        echo "Creating compressed archive of ${SC_DNAME} data in file $archive_name"
+        tar -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
+
+        # Move archive to export directory
+        RSYNC_BAK_ARGS="--backup --suffix=.bak"
+        rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
+        echo "Backup file copied successfully to ${wizard_export_path}"
+
+        # Clean-up temporary files
+        ${RM} "${TEMPDIR}"
+        ${RM} "${SYNOPKG_PKGTMP}/$archive_name"
     fi
 }
 
