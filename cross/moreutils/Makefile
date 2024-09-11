@@ -24,4 +24,4 @@ moreutils_configure:
 .PHONY: moreutils_install
 moreutils_install:
 	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
-	@$(RUN) install -t $(STAGING_INSTALL_PREFIX)/bin/ isutf8 ifdata ifne pee sponge mispipe lckdo parallel errno   
+	@$(RUN) install -t $(STAGING_INSTALL_PREFIX)/bin/ isutf8 ifdata ifne pee sponge mispipe lckdo parallel errno ts
