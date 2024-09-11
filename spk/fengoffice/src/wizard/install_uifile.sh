@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# for backwards compatability
+if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+	SYNOPKG_PKGDEST_VOL="/volume1"
+fi
 INTERNAL_IP=$(ip -4 route get 8.8.8.8 | awk '/8.8.8.8/ && /src/ {print $NF}')
 
 quote_json ()
@@ -52,7 +56,9 @@ checkDomainName()
 	var step = arguments[2];
 	var domainName = step.getComponent("${DOMAIN_NAME}");
 	if (installNew) {
-		domainName.setValue("${DOMAIN_NAME}");
+		if (domainName.getValue() === "") {
+			domainName.setValue("${INTERNAL_IP}");
+		}
 		domainName.setDisabled(false);
 	} else {
 		domainName.setValue("");
