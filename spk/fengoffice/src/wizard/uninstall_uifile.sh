@@ -60,11 +60,11 @@ PAGE_UNINSTALL_CONFIG=$(/bin/cat<<EOF
 		}]
 	}, {
 		"type": "textfield",
-		"desc": "Optional: Provide directory for database export. Ensure that the user 'sc-fengoffice' has write permissions to that directory. Leave blank to skip export.",
+		"desc": "Before uninstalling, if you want to keep a backup of your data, please specify the directory where you would like to export to. Ensure that the user 'sc-fengoffice' has write permissions to that directory. To skip exporting, leave this field blank.",
 		"subitems": [{
-			"key": "wizard_dbexport_path",
-			"desc": "Database export location",
-			"emptyText": "${SYNOPKG_PKGDEST_VOL}/backup",
+			"key": "wizard_export_path",
+			"desc": "Export location",
+			"emptyText": "${SYNOPKG_PKGDEST_VOL}/${SYNOPKG_PKGNAME}/backup",
 			"validator": {
 				"allowBlank": true,
 				"fn": "$(getValidPath)"

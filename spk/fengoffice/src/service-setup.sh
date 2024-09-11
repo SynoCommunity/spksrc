@@ -23,7 +23,8 @@ fi
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 SYNOSVC="/usr/syno/sbin/synoservice"
 
-exec_php() {
+exec_php ()
+{
     PHP="/usr/local/bin/php74"
     # Define the resource file
     RESOURCE_FILE="${SYNOPKG_PKGDEST}/web/fengoffice.json"
@@ -44,6 +45,26 @@ exec_php() {
         $COMMAND >> ${LOG_FILE} 2>&1
     fi
     return $?
+}
+
+get_installed_version ()
+{
+    PHP="/usr/local/bin/php74"
+    INST_VER="${WEB_ROOT}/config/installed_version.php"
+
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        # Prefix the command to change the running user
+        COMMAND="/bin/su \"$WEB_USER\" -s /bin/sh -c \"${PHP} -r 'echo include \\\"${INST_VER}\\\";'\""
+    else
+        # Run the command directly
+        COMMAND="${PHP} -r 'echo include \"${INST_VER}\";'"
+    fi
+
+    # Execute the command and capture the output
+    INSTALLED_VERSION=$(eval $COMMAND)
+
+    # Output the installed version
+    echo $INSTALLED_VERSION
 }
 
 service_prestart ()
@@ -197,24 +218,47 @@ service_preuninst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
         # Check export directory
-        if [ -n "${wizard_dbexport_path}" ]; then
-            if [ ! -d "${wizard_dbexport_path}" ]; then
+        if [ -n "${wizard_export_path}" ]; then
+            if [ ! -d "${wizard_export_path}" ]; then
                 # If the export path directory does not exist, create it
-                ${MKDIR} "${wizard_dbexport_path}" || {
+                ${MKDIR} "${wizard_export_path}" || {
                     # If mkdir fails, print an error message and exit
-                    echo "Error: Unable to create directory ${wizard_dbexport_path}. Check permissions."
+                    echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
                     exit 1
                 }
-            elif [ ! -w "${wizard_dbexport_path}" ]; then
+            elif [ ! -w "${wizard_export_path}" ]; then
                 # If the export path directory is not writable, print an error message and exit
-                echo "Error: Unable to write to directory ${wizard_dbexport_path}. Check permissions."
-                exit 1
-            elif [ -e "${wizard_dbexport_path}/${MYSQL_DATABASE}.sql" ]; then
-                echo "File ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql already exists. Please remove or choose a different location"
+                echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
                 exit 1
             fi
-            # Export database
-            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${wizard_dbexport_path}/${MYSQL_DATABASE}.sql
+
+            # Prepare archive structure
+            FENG_VER=$(get_installed_version)
+            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${FENG_VER}_$(date +"%Y%m%d")"
+            ${MKDIR} "${TEMPDIR}"
+
+            # Backup Directories
+            echo "Copying previous configuration and data from ${WEB_ROOT}"
+            rsync -aX "${WEB_ROOT}" "${TEMPDIR}/" 2>&1
+
+            # Backup the Database
+            echo "Copying previous database from ${MYSQL_DATABASE}"
+            ${MKDIR} "${TEMPDIR}/database"
+            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+
+            # Create backup archive
+            archive_name="$(basename "$TEMPDIR").tar.gz"
+            echo "Creating compressed archive of ${SC_DNAME} data in file $archive_name"
+            tar -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
+
+            # Move archive to export directory
+            RSYNC_BAK_ARGS="--backup --suffix=.bak"
+            rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
+            echo "Backup file copied successfully to ${wizard_export_path}"
+
+            # Clean-up temporary files
+            ${RM} "${TEMPDIR}"
+            ${RM} "${SYNOPKG_PKGTMP}/$archive_name"
         fi
     fi
 }
