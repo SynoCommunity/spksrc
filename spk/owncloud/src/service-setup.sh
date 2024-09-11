@@ -307,71 +307,75 @@ service_postinst ()
     fi
 }
 
+validate_preuninst ()
+{
+    # Check export directory
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
+        if [ ! -d "${wizard_export_path}" ]; then
+            # If the export path directory does not exist, create it
+            ${MKDIR} "${wizard_export_path}" || {
+                # If mkdir fails, print an error message and exit
+                echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
+                exit 1
+            }
+        elif [ ! -w "${wizard_export_path}" ]; then
+            # If the export path directory is not writable, print an error message and exit
+            echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
+            exit 1
+        fi
+    fi
+}
+
 service_preuninst ()
 {
-    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
-        # Check export directory
-        if [ -n "${wizard_export_path}" ]; then
-            if [ ! -d "${wizard_export_path}" ]; then
-                # If the export path directory does not exist, create it
-                ${MKDIR} "${wizard_export_path}" || {
-                    # If mkdir fails, print an error message and exit
-                    echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
-                    exit 1
-                }
-            elif [ ! -w "${wizard_export_path}" ]; then
-                # If the export path directory is not writable, print an error message and exit
-                echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
-                exit 1
-            fi
-            # Get data directory
-            DATADIR="$(exec_occ config:system:get datadirectory)"
-            # Data directory fail-safe
-            if [ ! -d "$DATADIR" ]; then
-                echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
-                DATADIR="${WEB_ROOT}/data"
-            fi
-
-            # Prepare archive structure
-            OCC_VER=$(exec_occ -V | cut -d ' ' -f 2)
-            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
-            ${MKDIR} "${TEMPDIR}"
-
-            # Place server in maintenance mode
-            exec_occ maintenance:mode --on
-
-            # Backup the Database
-            echo "Copying previous database from ${DATADIR}"
-            ${MKDIR} "${TEMPDIR}/database"
-            exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
-
-            # Backup Directories
-            echo "Copying previous configuration from ${WEB_ROOT}"
-            ${MKDIR} "${TEMPDIR}/configs/root"
-            rsync -aX "${WEB_ROOT}/.user.ini" "${WEB_ROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
-            rsync -aX "${WEB_ROOT}/config" "${WEB_ROOT}/apps" "${WEB_ROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
-
-            # Backup user data
-            echo "Copying previous user data from ${DATADIR}"
-            rsync -aX "${DATADIR}" "${TEMPDIR}/" 2>&1
-
-            # Disable maintenance mode
-            exec_occ maintenance:mode --off
-
-            # Create backup archive
-            archive_name="$(basename "$TEMPDIR").tar.gz"
-            echo "Creating compressed archive of ${SC_DNAME} data in file $archive_name"
-            tar -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
-
-            # Move archive to export directory
-            RSYNC_BAK_ARGS="--backup --suffix=.bak"
-            rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
-            echo "Backup file copied successfully to ${wizard_export_path}."
-
-            # Clean-up temporary files
-            ${RM} "${TEMPDIR}"
-            ${RM} "${SYNOPKG_PKGTMP}/$archive_name"
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
+        # Get data directory
+        DATADIR="$(exec_occ config:system:get datadirectory)"
+        # Data directory fail-safe
+        if [ ! -d "$DATADIR" ]; then
+            echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
+            DATADIR="${WEB_ROOT}/data"
         fi
+
+        # Prepare archive structure
+        OCC_VER=$(exec_occ -V | cut -d ' ' -f 2)
+        TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
+        ${MKDIR} "${TEMPDIR}"
+
+        # Place server in maintenance mode
+        exec_occ maintenance:mode --on
+
+        # Backup the Database
+        echo "Copying previous database from ${DATADIR}"
+        ${MKDIR} "${TEMPDIR}/database"
+        exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
+
+        # Backup Directories
+        echo "Copying previous configuration from ${WEB_ROOT}"
+        ${MKDIR} "${TEMPDIR}/configs/root"
+        rsync -aX "${WEB_ROOT}/.user.ini" "${WEB_ROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
+        rsync -aX "${WEB_ROOT}/config" "${WEB_ROOT}/apps" "${WEB_ROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
+
+        # Backup user data
+        echo "Copying previous user data from ${DATADIR}"
+        rsync -aX "${DATADIR}" "${TEMPDIR}/" 2>&1
+
+        # Disable maintenance mode
+        exec_occ maintenance:mode --off
+
+        # Create backup archive
+        archive_name="$(basename "$TEMPDIR").tar.gz"
+        echo "Creating compressed archive of ${SC_DNAME} data in file $archive_name"
+        tar -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
+
+        # Move archive to export directory
+        RSYNC_BAK_ARGS="--backup --suffix=.bak"
+        rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
+        echo "Backup file copied successfully to ${wizard_export_path}."
+
+        # Clean-up temporary files
+        ${RM} "${TEMPDIR}"
+        ${RM} "${SYNOPKG_PKGTMP}/$archive_name"
     fi
 }
 
