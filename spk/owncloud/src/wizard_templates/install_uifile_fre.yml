@@ -22,7 +22,7 @@ OWNCLOUD_TRUSTED_DOMAIN_2_LABEL: "Domaine ou adresse IP"
 OWNCLOUD_TRUSTED_DOMAIN_3_LABEL: "Domaine ou adresse IP"
 
 OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE: "Confirmer la restauration ownCloud"
-OWNCLOUD_CONFIRM_RESTORE_DESCRIPTION: "L'installation va maintenant se poursuivre et votre configuration précédente sera restaurée à partir de la sauvegarde. Veuillez vérifier que le chemin du fichier est exact et que l'utilisateur « sc-owncloud » dispose des autorisations de lecture pour ce chemin ; sinon, une nouvelle installation sera lancée."
+OWNCLOUD_CONFIRM_RESTORE_DESCRIPTION: "L'installation va maintenant se poursuivre et votre configuration précédente sera restaurée à partir de la sauvegarde. Veuillez vérifier que le chemin du fichier est exact et que l'utilisateur « sc-owncloud » dispose des autorisations de lecture pour ce chemin."
 
 PHP_PROFILES_TITLE: "Plusieurs profils PHP"
 PHP_PROFILES_DESCRIPTION: "Attention : Plusieurs profils PHP détectés ; la page Web du package ne s'affichera pas tant qu'un redémarrage de DSM n'aura pas été effectué pour charger de nouvelles configurations."
