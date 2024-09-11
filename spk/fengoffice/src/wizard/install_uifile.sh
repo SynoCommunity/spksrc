@@ -18,6 +18,92 @@ page_append ()
     fi
 }
 
+RESTORE_BACKUP_FILE="wizard_rengoffice_restore"
+BACKUP_FILE_PATH="wizard_backup_file"
+RESTORE_ERROR_TEXT="An empty file path is not allowed when restore is enabled."
+INSTALL_NEW_INSTANCE="wizard_rengoffice_install"
+DOMAIN_NAME="wizard_domain_name"
+INSTALL_ERROR_TEXT="An empty domain name is not allowed when install is enabled."
+
+checkNewInstall()
+{
+	CHECK_NEW_INSTALL=$(/bin/cat<<EOF
+{
+	var domainName = arguments[0];
+	var step = arguments[2];
+	var installNew = step.getComponent("${INSTALL_NEW_INSTANCE}");
+	if (installNew.checked) {
+		if (domainName === "") {
+			return "${INSTALL_ERROR_TEXT}";
+		}
+	}
+	return true;
+}
+EOF
+)
+	echo "$CHECK_NEW_INSTALL" | quote_json
+}
+
+checkDomainName()
+{
+	CHECK_DOMAIN_NAME=$(/bin/cat<<EOF
+{
+	var installNew = arguments[0];
+	var step = arguments[2];
+	var domainName = step.getComponent("${DOMAIN_NAME}");
+	if (installNew) {
+		domainName.setValue("${DOMAIN_NAME}");
+		domainName.setDisabled(false);
+	} else {
+		domainName.setValue("");
+		domainName.setDisabled(true);
+	}
+	return true;
+}
+EOF
+)
+	echo "$CHECK_DOMAIN_NAME" | quote_json
+}
+
+checkBackupRestore()
+{
+	CHECK_BACKUP_RESTORE=$(/bin/cat<<EOF
+{
+	var backupFilePath = arguments[0];
+	var step = arguments[2];
+	var backupRestore = step.getComponent("${RESTORE_BACKUP_FILE}");
+	if (backupRestore.checked) {
+		if (backupFilePath === "") {
+			return "${RESTORE_ERROR_TEXT}";
+		}
+	}
+	return true;
+}
+EOF
+)
+	echo "$CHECK_BACKUP_RESTORE" | quote_json
+}
+
+checkBackupFile()
+{
+	CHECK_BACKUP_FILE=$(/bin/cat<<EOF
+{
+	var backupRestore = arguments[0];
+	var step = arguments[2];
+	var backupFilePath = step.getComponent("${BACKUP_FILE_PATH}");
+	if (backupRestore) {
+		backupFilePath.setDisabled(false);
+	} else {
+		backupFilePath.setValue("");
+		backupFilePath.setDisabled(true);
+	}
+	return true;
+}
+EOF
+)
+	echo "$CHECK_BACKUP_FILE" | quote_json
+}
+
 getPasswordValidator()
 {
     validator=$(/bin/cat<<EOF
@@ -46,6 +132,51 @@ check_php_profiles ()
 
 PAGE_INSTALL_CONFIG=$(/bin/cat<<EOF
 {
+	"step_title": "Feng Office installation type",
+	"invalid_next_disabled_v2": true,
+	"items": [{
+		"type": "singleselect",
+		"desc": "For the installation, you have the option to either create a new instance or restore from a backup archive.",
+		"subitems": [{
+			"key": "${INSTALL_NEW_INSTANCE}",
+			"desc": "Install new deployment",
+			"defaultValue": true,
+			"validator": {
+				"fn": "$(checkDomainName)"
+			}
+		}, {
+			"key": "${RESTORE_BACKUP_FILE}",
+			"desc": "Restore from archive",
+			"defaultValue": false,
+			"validator": {
+				"fn": "$(checkBackupFile)"
+			}
+		}]
+	}, {
+        "type": "textfield",
+        "desc": "For a new installation, please provide the domain name of your DiskStation (e.g., you.synology.me).",
+        "subitems": [{
+            "key": "${DOMAIN_NAME}",
+            "desc": "Domain name",
+            "emptyText": "${INTERNAL_IP}",
+            "validator": {
+                "fn": "$(checkNewInstall)"
+            }
+        }]
+	}, {
+		"type": "textfield",
+		"desc": "For restoring, please provide the full path to the archive you want to restore.",
+		"subitems": [{
+			"key": "${BACKUP_FILE_PATH}",
+			"desc": "Backup file location",
+			"disabled": true,
+			"emptyText": "${SYNOPKG_PKGDEST_VOL}/${SYNOPKG_PKGNAME}/backup",
+			"validator": {
+				"fn": "$(checkBackupRestore)"
+			}
+		}]
+	}]
+}, {
     "step_title": "Feng Office database configuration",
     "invalid_next_disabled_v2": true,
     "items": [{
@@ -60,28 +191,13 @@ PAGE_INSTALL_CONFIG=$(/bin/cat<<EOF
         }]
     }, {
         "type": "password",
-        "desc": "A 'fengoffice' MySQL user and database will be created. Please enter a password for the 'fengoffice' user.",
+        "desc": "A 'fengoffice' MySQL user and database will be created. Please provide a password for the 'fengoffice' user.",
         "subitems": [{
             "key": "wizard_mysql_password_fengoffice",
             "desc": "fengoffice password",
             "invalidText": "Password is invalid. Ensure it includes at least one uppercase letter, one lowercase letter, one digit, one special character, and has a minimum length of 10 characters.",
             "validator": {
                 "fn": "$(getPasswordValidator)"
-            }
-        }]
-    }]
-}, {
-    "step_title": "Feng Office configuration",
-    "invalid_next_disabled_v2": true,
-    "items": [{
-        "type": "textfield",
-        "desc": "Domain name of your DiskStation. For example: you.synology.me.",
-        "subitems": [{
-            "key": "wizard_domain_name",
-            "desc": "Domain name",
-            "defaultValue": "${INTERNAL_IP}",
-            "validator": {
-                "allowBlank": false
             }
         }]
     }, {

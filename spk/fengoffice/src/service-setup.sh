@@ -47,26 +47,6 @@ exec_php ()
     return $?
 }
 
-get_installed_version ()
-{
-    PHP="/usr/local/bin/php74"
-    INST_VER="${WEB_ROOT}/config/installed_version.php"
-
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        # Prefix the command to change the running user
-        COMMAND="/bin/su \"$WEB_USER\" -s /bin/sh -c \"${PHP} -r 'echo include \\\"${INST_VER}\\\";'\""
-    else
-        # Run the command directly
-        COMMAND="${PHP} -r 'echo include \"${INST_VER}\";'"
-    fi
-
-    # Execute the command and capture the output
-    INSTALLED_VERSION=$(eval $COMMAND)
-
-    # Output the installed version
-    echo $INSTALLED_VERSION
-}
-
 service_prestart ()
 {
     FENGOFFICE="${WEB_ROOT}/cron.php"
@@ -109,6 +89,22 @@ validate_preinst ()
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
             echo "MySQL database ${MYSQL_DATABASE} already exists"
             exit 1
+        fi
+
+        # Check for valid backup to restore
+        if [ "${wizard_fengoffice_restore}" = "true" ] && [ -n "${wizard_backup_file}" ]; then
+            if [ ! -f "${wizard_backup_file}" ]; then
+                echo "The backup file path specified is incorrect or not accessible"
+                exit 1
+            fi
+            # Check backup file prefix
+            filename=$(basename "${wizard_backup_file}")
+            expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
+            
+            if [ "${filename#"$expected_prefix"}" = "$filename" ]; then
+                echo "The backup filename does not start with the expected prefix"
+                exit 1
+            fi
         fi
     fi
 }
@@ -181,13 +177,39 @@ service_postinst ()
 
     # Fix permissions
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        chown -R ${WEB_USER}:${WEB_GROUP} ${WEB_ROOT}
+        chown -R ${WEB_USER}:${WEB_GROUP} ${WEB_ROOT} 2>/dev/null
     fi
 
-    # Run installer
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        # Setup parameters for installation script
-        QUERY_STRING="\
+        # Check restore action
+        if [ "${wizard_rengoffice_restore}" = "true" ]; then
+            echo "The backup file is valid, performing restore"
+            # Extract archive to temp folder
+            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
+            ${MKDIR} "${TEMPDIR}"
+            tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
+            # Fix file ownership
+            if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+                chown -R ${WEB_USER}:${WEB_GROUP} ${TEMPDIR} 2>/dev/null
+            fi
+
+            # Restore configuration and data
+            [ -d ${WEB_DIR}/${SYNOPKG_PKGNAME} ] && ${RM} ${WEB_DIR}/${SYNOPKG_PKGNAME}
+            echo "Restoring configuration and data to ${WEB_DIR}"
+            rsync -aX --update -I "${TEMPDIR}/${SYNOPKG_PKGNAME}" "${WEB_DIR}/" 2>&1
+
+            # Update database password
+            sed -i "s/^\(\s*define('DB_PASS',\s*'\).*\(');*\)$/\1${wizard_mysql_password_fengoffice}\2/" ${WEB_ROOT}/config/config.php
+
+            # Restore the Database
+            echo "Restoring database to ${MYSQL_DATABASE}"
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} < ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+
+            # Clean-up temporary files
+            ${RM} "${TEMPDIR}"
+        else
+            # Setup parameters for installation script
+            QUERY_STRING="\
 script_installer_storage[database_type]=mysqli\
 &script_installer_storage[database_host]=localhost\
 &script_installer_storage[database_user]=${MYSQL_USER}\
@@ -200,11 +222,12 @@ script_installer_storage[database_type]=mysqli\
 &script_installer_storage[plugins][]=mail\
 &script_installer_storage[plugins][]=workspaces\
 &submited=submited"
-        # Prepare environment
-        cd ${WEB_ROOT}/public/install/ || exit 1
-        # Execute based on DSM version
-        echo "Run ${SC_DNAME} installer"
-        exec_php "install_helper.php"
+            # Prepare environment
+            cd ${WEB_ROOT}/public/install/ || exit 1
+            # Execute based on DSM version
+            echo "Run ${SC_DNAME} installer"
+            exec_php "install_helper.php"
+        fi
     fi
 }
 
@@ -233,7 +256,7 @@ service_preuninst ()
             fi
 
             # Prepare archive structure
-            FENG_VER=$(get_installed_version)
+            FENG_VER=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/config/installed_version.php | xargs)
             TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${FENG_VER}_$(date +"%Y%m%d")"
             ${MKDIR} "${TEMPDIR}"
 
