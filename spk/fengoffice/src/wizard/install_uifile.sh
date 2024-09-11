@@ -22,10 +22,10 @@ page_append ()
     fi
 }
 
-RESTORE_BACKUP_FILE="wizard_rengoffice_restore"
+RESTORE_BACKUP_FILE="wizard_fengoffice_restore"
 BACKUP_FILE_PATH="wizard_backup_file"
 RESTORE_ERROR_TEXT="An empty file path is not allowed when restore is enabled."
-INSTALL_NEW_INSTANCE="wizard_rengoffice_install"
+INSTALL_NEW_INSTANCE="wizard_fengoffice_install"
 DOMAIN_NAME="wizard_domain_name"
 INSTALL_ERROR_TEXT="An empty domain name is not allowed when install is enabled."
 

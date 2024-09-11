@@ -182,7 +182,7 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Check restore action
-        if [ "${wizard_rengoffice_restore}" = "true" ]; then
+        if [ "${wizard_fengoffice_restore}" = "true" ]; then
             echo "The backup file is valid, performing restore"
             # Extract archive to temp folder
             TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
@@ -194,16 +194,24 @@ service_postinst ()
             fi
 
             # Restore configuration and data
-            [ -d ${WEB_DIR}/${SYNOPKG_PKGNAME} ] && ${RM} ${WEB_DIR}/${SYNOPKG_PKGNAME}
             echo "Restoring configuration and data to ${WEB_DIR}"
             rsync -aX --update -I "${TEMPDIR}/${SYNOPKG_PKGNAME}" "${WEB_DIR}/" 2>&1
 
             # Update database password
-            sed -i "s/^\(\s*define('DB_PASS',\s*'\).*\(');*\)$/\1${wizard_mysql_password_fengoffice}\2/" ${WEB_ROOT}/config/config.php
+            sed -i "s/^\(\s*define('DB_PASS',\s*'\).*\(');\s*\)$/\1${wizard_mysql_password_fengoffice}\2/" ${WEB_ROOT}/config/config.php
 
             # Restore the Database
             echo "Restoring database to ${MYSQL_DATABASE}"
             ${MYSQL} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} < ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+
+            # Detect package version
+            PACKAGE_VERSION=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
+            # Detect old version
+            INSTALLED_VERSION=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/config/installed_version.php | xargs)
+
+            # Run update scripts
+            exec_php "${WEB_ROOT}/public/upgrade/console.php" "${INSTALLED_VERSION}" "${PACKAGE_VERSION}"
+            exec_php "${WEB_ROOT}/public/install/plugin-console.php" "update_all"
 
             # Clean-up temporary files
             ${RM} "${TEMPDIR}"
