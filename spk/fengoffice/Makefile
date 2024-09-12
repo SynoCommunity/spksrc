@@ -11,7 +11,7 @@ override ARCH=
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 
-MAINTAINER = moneytoo
+MAINTAINER = SynoCommunity
 DESCRIPTION = Feng Office is a Collaboration Platform and Project Management System.
 DISPLAY_NAME = Feng Office
 CHANGELOG = "1. Update to v3.11.1.19.<br/>2. Add PHP profiles for DSM 6."
