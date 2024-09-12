@@ -204,13 +204,8 @@ service_postinst ()
             echo "Restoring database to ${MYSQL_DATABASE}"
             ${MYSQL} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} < ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
 
-            # Detect package version
-            PACKAGE_VERSION=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
-            # Detect old version
-            INSTALLED_VERSION=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/config/installed_version.php | xargs)
-
             # Run update scripts
-            exec_php "${WEB_ROOT}/public/upgrade/console.php" "${INSTALLED_VERSION}" "${PACKAGE_VERSION}"
+            exec_php "${WEB_ROOT}/public/upgrade/console.php"
             exec_php "${WEB_ROOT}/public/install/plugin-console.php" "update_all"
 
             # Clean-up temporary files
@@ -267,7 +262,11 @@ service_preuninst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
         # Prepare archive structure
-        FENG_VER=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/config/installed_version.php | xargs)
+        if [ -f "${WEB_ROOT}/config/installed_version.php" ]; then
+            FENG_VER=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/config/installed_version.php | xargs)
+        else
+            FENG_VER=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/version.php | xargs)
+        fi
         TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${FENG_VER}_$(date +"%Y%m%d")"
         ${MKDIR} "${TEMPDIR}"
 
@@ -347,18 +346,15 @@ service_save ()
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     mkdir -p ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     mv ${WEB_ROOT}/config/config.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/
-    mv ${WEB_ROOT}/config/installed_version.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/
+    if [ -f "${WEB_ROOT}/config/installed_version.php" ]; then
+        mv ${WEB_ROOT}/config/installed_version.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/
+    fi
     mkdir ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload/
     cp -r ${WEB_ROOT}/upload/*/ ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload/
 }
 
 service_restore ()
 {
-    # Detect package version
-    PACKAGE_VERSION=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
-    # Detect old version
-    INSTALLED_VERSION=$(sed -n "s|return '\(.*\)';|\1|p" ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/installed_version.php | xargs)
-
     # Restore configuration
     mv ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config.php ${WEB_ROOT}/config/
     cp -r ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/upload/*/ ${WEB_ROOT}/upload/
@@ -370,6 +366,6 @@ service_restore ()
     fi
 
     # Run update scripts
-    exec_php "${WEB_ROOT}/public/upgrade/console.php" "${INSTALLED_VERSION}" "${PACKAGE_VERSION}"
+    exec_php "${WEB_ROOT}/public/upgrade/console.php"
     exec_php "${WEB_ROOT}/public/install/plugin-console.php" "update_all"
 }
