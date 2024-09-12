@@ -260,12 +260,12 @@ service_postinst ()
             fi
 
             # Restore configuration files and directories
-            rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${WEB_ROOT}/" 2>&1
-            rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${WEB_ROOT}/" 2>&1
+            rsync -aX -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${WEB_ROOT}/" 2>&1
+            rsync -aX -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${WEB_ROOT}/" 2>&1
 
             # Restore user data
             echo "Restoring user data to ${DATA_DIR}"
-            rsync -aX --update -I "${TEMPDIR}/data" "${SHARE_PATH}/" 2>&1
+            rsync -aX -I "${TEMPDIR}/data" "${SHARE_PATH}/" 2>&1
 
             # Place server in maintenance mode
             exec_occ maintenance:mode --on
@@ -556,7 +556,7 @@ service_restore ()
         DATAPATH=$(cat ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory)
         # Data directory inside owncloud directory and needs to be restored
         echo "Restore previous data directory from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}"
-        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${WEB_ROOT}/ 2>&1
+        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${WEB_ROOT}/ 2>&1
         ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory
     fi
 
@@ -571,16 +571,16 @@ service_restore ()
         files=$(find "$source" -type f -name "$pattern")
         if [ -n "$files" ]; then
             for file in $files; do
-                rsync -aX --update -I "$file" "$target/" 2>&1
+                rsync -aX -I "$file" "$target/" 2>&1
             done
         fi
     done
     
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ]; then
-        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${WEB_ROOT}/ 2>&1
+        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${WEB_ROOT}/ 2>&1
     fi
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ]; then
-        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${WEB_ROOT}/ 2>&1
+        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${WEB_ROOT}/ 2>&1
     fi
 
     echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
