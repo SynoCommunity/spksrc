@@ -34,7 +34,7 @@
 			"display_name": "COPS",
 			"icon": "app/images/cops-{0}.png",
 			"php": {
-				"backend": 8,
+				"backend": 11,
 				"extensions": [
 					"gd",
 					"intl",

@@ -1,20 +1,20 @@
 SPK_NAME = cops
-SPK_VERS = 1.5.4
-SPK_REV = 9
+SPK_VERS = 3.2.2
+SPK_REV = 10
 SPK_ICON = src/cops.png
 
 DEPENDS  = cross/cops
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
 
-REQUIRED_MIN_DSM = 6.0
-SPK_DEPENDS=WebStation:PHP7.4:Apache2.4
+REQUIRED_MIN_DSM = 7.0
+SPK_DEPENDS=WebStation:PHP8.2:Apache2.4
 
 MAINTAINER = Diaoul
 DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 DISPLAY_NAME = COPS
-CHANGELOG = "1. Update to 1.5.4"
+CHANGELOG = "1. Update to v3.2.2. \(Requires PHP 8.2\)"
 
 HOMEPAGE = https://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE = GPLv2
