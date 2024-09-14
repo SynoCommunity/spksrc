@@ -1,23 +1,4 @@
-#!/bin/bash
-
-quote_json ()
-{
-    sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
-}
-
-page_append ()
-{
-    if [ -z "$1" ]; then
-        echo "$2"
-    elif [ -z "$2" ]; then
-        echo "$1"
-    else
-        echo "$1,$2"
-    fi
-}
-
-PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
-{
+[{
     "step_title": "{{{COPS_CONFIGURATION_FIRST_STEP_TITLE}}}",
     "invalid_next_disabled_v2": true,
     "items": [{
@@ -30,7 +11,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
             "validator": {
                 "allowBlank": false,
                 "regex": {
-                    "expr": "/^[\\\w.][\\\w. -]{0,30}[\\\w.-][\\\\$]?$|^[\\\w][\\\\$]?$/",
+                    "expr": "/^[\\w.][\\w. -]{0,30}[\\w.-]\\$?$|^[\\w]\\$?$/",
                     "errorText": "{{{EXISTING_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
                 }
             }
@@ -64,14 +45,4 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
             "desc": "{{{DSM_PERMISSIONS_TEXT}}}"
         }
     ]
-}
-EOF
-)
-
-main () {
-    local install_page=""
-    install_page=$(page_append "$install_page" "$PAGE_ADMIN_CONFIG")
-    echo "[$install_page]" > "${SYNOPKG_TEMP_LOGFILE}"
-}
-
-main "$@"
+}]

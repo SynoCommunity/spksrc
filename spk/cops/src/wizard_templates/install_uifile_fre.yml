@@ -2,7 +2,7 @@ COPS_CONFIGURATION_FIRST_STEP_TITLE: "Configuration de COPS"
 
 EXISTING_CALIBRE_DIRECTORY_DESCRIPTION: "Répertoire existant contenant une bibliothèque Calibre."
 EXISTING_CALIBRE_DIRECTORY_LABEL: "Partager le nom"
-EXISTING_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT: "Les sous-répertoires ne sont pas pris en charge."
+EXISTING_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT: "Le nom du dossier partagé contient des caractères non valides ou commence/se termine par un espace."
 COPS_CATALOG_TITLE_DESCRIPTION: "Titre du catalogue."
 COPS_CATALOG_TITLE_LABEL: "Titre du catalogue"
 

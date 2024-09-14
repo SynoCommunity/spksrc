@@ -2,7 +2,7 @@ COPS_CONFIGURATION_FIRST_STEP_TITLE: "COPS configuration"
 
 EXISTING_CALIBRE_DIRECTORY_DESCRIPTION: "Existing Calibre library directory."
 EXISTING_CALIBRE_DIRECTORY_LABEL: "Share name"
-EXISTING_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT: "Subdirectories are not supported."
+EXISTING_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT: "The shared folder name contains invalid characters or starts/ends with a space."
 COPS_CATALOG_TITLE_DESCRIPTION: "Catalog title."
 COPS_CATALOG_TITLE_LABEL: "Catalog title"
 
