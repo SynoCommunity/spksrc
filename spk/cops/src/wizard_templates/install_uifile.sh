@@ -16,21 +16,6 @@ page_append ()
     fi
 }
 
-# Check for multiple PHP profiles
-check_php_profiles ()
-{
-    PACKAGE="cops"
-    SC_PKG_PREFIX="com-synocommunity-packages-"
-    PACKAGE_NAME="${SC_PKG_PREFIX}${PACKAGE}"
-    PHP_CFG_PATH="/usr/syno/etc/packages/WebStation/PHPSettings.json"
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] && \
-        jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${PACKAGE_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
-        return 0  # true
-    else
-        return 1  # false
-    fi
-}
-
 PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 {
     "step_title": "{{{COPS_CONFIGURATION_FIRST_STEP_TITLE}}}",
@@ -83,22 +68,9 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 EOF
 )
 
-PAGE_PHP_PROFILES=$(/bin/cat<<EOF
-{
-    "step_title": "{{{PHP_PROFILES_TITLE}}}",
-    "items": [{
-        "desc": "{{{PHP_PROFILES_DESCRIPTION}}}"
-    }]
-}
-EOF
-)
-
 main () {
     local install_page=""
     install_page=$(page_append "$install_page" "$PAGE_ADMIN_CONFIG")
-    if check_php_profiles; then
-        install_page=$(page_append "$install_page" "$PAGE_PHP_PROFILES")
-    fi
     echo "[$install_page]" > "${SYNOPKG_TEMP_LOGFILE}"
 }
 

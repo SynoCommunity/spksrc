@@ -30,13 +30,6 @@ DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
 CONF_DIR = src/conf/
 
-include ../../mk/spksrc.common.mk
-
-# Alternate conf dir for DSM 6
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-CONF_DIR = src/conf_6/
-endif
-
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
@@ -48,7 +41,5 @@ include ../../mk/spksrc.spk.mk
 .PHONY: cops_extra_install
 cops_extra_install:
 	install -m 755 -d $(STAGING_DIR)/web
-	install -m 644 src/web/cops.conf $(STAGING_DIR)/web/cops.conf
-	install -m 644 src/web/cops.json $(STAGING_DIR)/web/cops.json
 	@$(MSG) Install default config file
 	install -m 666 src/web/config_local.php.synology $(STAGING_DIR)/web/config_local.php.synology
