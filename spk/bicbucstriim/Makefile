@@ -19,8 +19,6 @@ HOMEPAGE = https://github.com/mikespub-org/rvolz-BicBucStriim/
 LICENSE = MIT
 LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)/LICENSE
 
-WIZARDS_DIR = src/wizard/
-
 SYSTEM_GROUP = http
 
 # Admin link for in DSM UI
@@ -35,12 +33,4 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
 
-POST_STRIP_TARGET = bicbucstriim_extra_install
-
 include ../../mk/spksrc.spk.mk
-
-.PHONY: bicbucstriim_extra_install
-bicbucstriim_extra_install:
-	install -m 755 -d $(STAGING_DIR)/web
-	install -m 644 src/web/bicbucstriim.conf $(STAGING_DIR)/web/bicbucstriim.conf
-	install -m 644 src/web/bicbucstriim.json $(STAGING_DIR)/web/bicbucstriim.json
