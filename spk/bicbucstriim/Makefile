@@ -1,5 +1,5 @@
 SPK_NAME = bicbucstriim
-SPK_VERS = 1.7.2
+SPK_VERS = 1.6.6
 SPK_REV = 7
 SPK_ICON = src/bicbucstriim.png
 
@@ -13,7 +13,7 @@ SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
 MAINTAINER = SynoCommunity
 DESCRIPTION = BicBucStriim streams books, digital books. It fills a gap in the functionality of current NAS devices, which provide access to your collection of music, videos and photos -- but not books. BicBucStriim covers that area and provides web-based access to your e-book collection.
 DISPLAY_NAME = BicBucStriim
-CHANGELOG = Update to v1.7.2
+CHANGELOG = Update to v1.6.6
 
 HOMEPAGE = https://github.com/mikespub-org/rvolz-BicBucStriim/
 LICENSE = MIT
