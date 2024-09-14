@@ -10,7 +10,7 @@ override ARCH=
 REQUIRED_MIN_DSM = 7.0
 SPK_DEPENDS=WebStation:PHP8.2:Apache2.4
 
-MAINTAINER = Diaoul
+MAINTAINER = SynoCommunity
 DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 DISPLAY_NAME = COPS
