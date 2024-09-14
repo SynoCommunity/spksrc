@@ -7,7 +7,7 @@ OWNCLOUD_BACKUP_FILE_LOCATION_LABEL: "Backup file location"
 OWNCLOUD_BACKUP_FILE_VALIDATION_ERROR_TEXT: "An empty file path is not allowed when restore is enabled."
 OWNCLOUD_DATA_DIRECTORY_DESCRIPTION: "ownCloud data directory"
 OWNCLOUD_DATA_DIRECTORY_LABEL: "Share name"
-OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT: "Subdirectories are not supported."
+OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT: "The shared folder name contains invalid characters or starts/ends with a space."
 
 OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE: "ownCloud admin configuration"
 OWNCLOUD_ADMIN_USER_NAME_DESCRIPTION: "Administrator's login. Defaults to 'admin'"

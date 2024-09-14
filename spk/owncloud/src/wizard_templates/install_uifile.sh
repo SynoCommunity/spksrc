@@ -24,45 +24,45 @@ page_append ()
 
 RESTORE_BACKUP_FILE="wizard_owncloud_restore"
 BACKUP_FILE_PATH="wizard_backup_file"
-ERROR_TEXT="{{{OWNCLOUD_BACKUP_FILE_VALIDATION_ERROR_TEXT}}}"
+RESTORE_ERROR_TEXT="{{{OWNCLOUD_BACKUP_FILE_VALIDATION_ERROR_TEXT}}}"
 
-checkBackupFile()
+checkBackupRestore()
 {
-	CHECK_BACKUP_FILE=$(/bin/cat<<EOF
+	CHECK_BACKUP_RESTORE=$(/bin/cat<<EOF
 {
-	var backupFileCheck = arguments[0];
+	var backupFilePath = arguments[0];
 	var step = arguments[2];
-	var fileRestore = step.getComponent("${RESTORE_BACKUP_FILE}");
-	if (fileRestore.checked) {
-		if (backupFileCheck === "") {
-			return "${ERROR_TEXT}";
+	var backupRestore = step.getComponent("${RESTORE_BACKUP_FILE}");
+	if (backupRestore.checked) {
+		if (backupFilePath === "") {
+			return "${RESTORE_ERROR_TEXT}";
 		}
 	}
 	return true;
 }
 EOF
 )
-	echo "$CHECK_BACKUP_FILE" | quote_json
+	echo "$CHECK_BACKUP_RESTORE" | quote_json
 }
 
-getBackupFile()
+checkBackupFile()
 {
-	BACKUP_FILE=$(/bin/cat<<EOF
+	CHECK_BACKUP_FILE=$(/bin/cat<<EOF
 {
-	var backupFile = arguments[0];
+	var backupRestore = arguments[0];
 	var step = arguments[2];
-	var filePath = step.getComponent("${BACKUP_FILE_PATH}");
-	if (backupFile) {
-		filePath.setDisabled(false);
+	var backupFilePath = step.getComponent("${BACKUP_FILE_PATH}");
+	if (backupRestore) {
+		backupFilePath.setDisabled(false);
 	} else {
-		filePath.setValue("");
-		filePath.setDisabled(true);
+		backupFilePath.setValue("");
+		backupFilePath.setDisabled(true);
 	}
 	return true;
 }
 EOF
 )
-	echo "$BACKUP_FILE" | quote_json
+	echo "$CHECK_BACKUP_FILE" | quote_json
 }
 
 jsFunction=$(/bin/cat<<EOF
@@ -175,7 +175,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"desc": "{{{OWNCLOUD_RESTORE_LABEL}}}",
 			"defaultValue": false,
 			"validator": {
-				"fn": "$(getBackupFile)"
+				"fn": "$(checkBackupFile)"
 			}
 		}]
 	}, {
@@ -187,7 +187,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"disabled": true,
 			"emptyText": "${SYNOPKG_PKGDEST_VOL}/${SYNOPKG_PKGNAME}/backup",
 			"validator": {
-				"fn": "$(checkBackupFile)"
+				"fn": "$(checkBackupRestore)"
 			}
 		}]
 	}, {
