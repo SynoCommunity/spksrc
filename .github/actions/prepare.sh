@@ -77,9 +77,9 @@ videodrv_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile"
 # then ensure synocli-videodriver spk is first in list
 for package in ${packages}
 do
-    if [ "$(echo synocli-videodriver ${python_dependent_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_python=$(echo "${packages}" | tr ' ' '\n' | grep -v "synocli-videodriver" | tr '\n' ' ')
-        packages="synocli-videodriver ${packages_without_python}"
+    if [ "$(echo synocli-videodriver ${videodrv_dependent_packages} | grep -ow ${package})" != "" ]; then
+        packages_without_videodrv=$(echo "${packages}" | tr ' ' '\n' | grep -v "synocli-videodriver" | tr '\n' ' ')
+        packages="synocli-videodriver ${packages_without_videodrv}"
         break
     fi
 done
