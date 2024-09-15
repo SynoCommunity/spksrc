@@ -1,0 +1,19 @@
+# remove flag -Wno-psabi as it is not known by older compilers
+#
+--- Makefile.am.orig	2023-10-15 19:42:38.000000000 +0200
++++ Makefile.am	2024-01-21 12:29:19.170277164 +0100
+@@ -29,11 +29,11 @@
+   AM_CFLAGS = -Wno-multichar -Wall -Wextra -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
+ else
+ if BUILD_FOR_OPENBSD
+-  AM_CXXFLAGS = -I/usr/local/include -Wno-multichar -Wall -Wextra -Wno-clobbered -Wno-psabi -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
++  AM_CXXFLAGS = -I/usr/local/include -Wno-multichar -Wall -Wextra -Wno-clobbered -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
+   AM_CFLAGS = -Wno-multichar -Wall -Wextra -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
+ else
+-  AM_CXXFLAGS = -fno-common -Wno-multichar -Wall -Wextra -Wno-clobbered -Wno-psabi -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
+-  AM_CFLAGS = -fno-common -Wno-multichar -Wall -Wextra -Wno-clobbered -Wno-psabi -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
++  AM_CXXFLAGS = -fno-common -Wno-multichar -Wall -Wextra -Wno-clobbered -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
++  AM_CFLAGS = -fno-common -Wno-multichar -Wall -Wextra -Wno-clobbered -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
+ endif
+ endif
+ endif
