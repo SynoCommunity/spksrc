@@ -25,7 +25,7 @@ DEPENDS  = cross/libva cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
 DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Enable OpenCL only on DSM >= 7.1
 ifeq ($(call version_ge, ${TCVERSION}, 7.1),1)
