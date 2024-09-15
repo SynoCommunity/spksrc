@@ -4,7 +4,7 @@
 
 # Set videodriver package name
 ifeq ($(strip $(VIDEODRV_PACKAGE)),)
-VIDEODRV_PACKAGE = synocli-videodriver
+export VIDEODRV_PACKAGE = synocli-videodriver
 endif
 
 # set default spk/synocli-videodriver path to use
@@ -22,6 +22,7 @@ endif
 
 # set build flags including ld to rewrite for the library path
 # used to access videodrv package provide libraries at destination
+ifneq ($(strip $(VIDEODRV_STAGING_PREFIX)),)
 export ADDITIONAL_CFLAGS   += -I$(VIDEODRV_STAGING_PREFIX)/include
 export ADDITIONAL_CPPFLAGS += -I$(VIDEODRV_STAGING_PREFIX)/include
 export ADDITIONAL_CXXFLAGS += -I$(VIDEODRV_STAGING_PREFIX)/include
@@ -30,6 +31,7 @@ export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(VIDEODRV_STAGING_PREFIX)/lib -W
 
 # Re-use all default videodrv mandatory libraries
 VIDEODRV_LIBS := $(wildcard $(VIDEODRV_STAGING_PREFIX)/lib/pkgconfig/*.pc)
+endif
 
 # Re-use all videodrv dependencies and mark as already done
 VIDEODRV_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(VIDEODRV_PACKAGE_ROOT)/../) 2>/dev/null | grep ^$(VIDEODRV_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile))),$(wildcard $(VIDEODRV_PACKAGE_ROOT)/.$(cross)-*_done))

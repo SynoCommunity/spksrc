@@ -240,7 +240,7 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 # Dependencies provided by synocli-videodriver
 # If built outside spksrc.videodriver.mk
-ifeq ($(wildcard $(VIDEODRV_PACKAGE_ROOT)),)
+ifeq ($(strip $(VIDEODRV_PACKAGE)),)
 DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
 endif
 CONFIGURE_ARGS += --arch=x86_64
@@ -261,7 +261,7 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 # Dependencies provided by synocli-videodriver
 # If built outside spksrc.videodriver.mk
-ifeq ($(wildcard $(VIDEODRV_PACKAGE_ROOT)),)
+ifeq ($(strip $(VIDEODRV_PACKAGE)),)
 DEPENDS += cross/intel-level-zero
 DEPENDS += cross/intel-graphics-compiler
 DEPENDS += cross/intel-compute-runtime
