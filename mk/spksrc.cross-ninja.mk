@@ -51,6 +51,8 @@ ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = ninja_install_target
 endif
 
+###
+
 .PHONY: ninja_compile_target
 
 # default ninja compile:
