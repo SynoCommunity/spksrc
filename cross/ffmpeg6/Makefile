@@ -267,8 +267,11 @@ DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
 # Newer Intel implementations (oneAPI, level-zero) requires gcc >= 5
 ifeq ($(call version_gt, ${TC_GCC}, 5),1)
+DEPENDS += cross/intel-level-zero
+DEPENDS += cross/intel-graphics-compiler
 DEPENDS += cross/intel-compute-runtime
-DEPENDS += cross/ocl-icd cross/clinfo
+DEPENDS += cross/ocl-icd
+DEPENDS += cross/clinfo
 CONFIGURE_ARGS += --enable-opencl
 
 # Intel MFX and VPL are mutually exclusive
