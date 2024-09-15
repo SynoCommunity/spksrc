@@ -32,7 +32,7 @@ SERVICE_SETUP = src/service-setup.sh
 SPK_COMMANDS += bin/vainfo
 endif
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.videodriver.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:
