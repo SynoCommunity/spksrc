@@ -4,6 +4,7 @@ SPK_REV = 4
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to version 6.0.1<br/>2. Update Jellyfin upstream patches<br/>3. Update Intel Media Driver 2024Q2 Release (DSM7 only)<br/>4. Revert DSM7 to MFX intead of Intel Video Processing Library (Intel-VPL) as unsupported by Jellyfin<br/>5. Enable OpenCL on Intel platforms (DSM7 only)<br/>6. Update to latest version of x264 (fix for \#6176) - SPK_REV 4 UNRELEASED"
 
+SPK_DEPENDS = "synocli-videodriver"
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = th0ma7
