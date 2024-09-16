@@ -133,7 +133,7 @@ python311_install:
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
 # default wheels to install in crossenv
-CROSSENV_WHEELS  = cffi==1.15.1
+CROSSENV_WHEELS  = cffi==1.17.0
 CROSSENV_WHEELS += cryptography==41.0.3
 #
 # Cython version >= 3.x breaks PyYAML wheel
@@ -145,6 +145,7 @@ CROSSENV_WHEELS += cryptography==41.0.3
 #CROSSENV_WHEELS += Cython==3.0.2
 CROSSENV_WHEELS += Cython==0.29.36
 CROSSENV_WHEELS += flit==3.9.0
+CROSSENV_WHEELS += maturin==1.2.3
 CROSSENV_WHEELS += poetry==1.6.1
 CROSSENV_WHEELS += scikit-build==0.17.6
 CROSSENV_WHEELS += setuptools-rust==1.7.0
@@ -153,20 +154,6 @@ CROSSENV_WHEELS += setuptools-scm==7.1.0
 #CROSSENV_WHEELS += meson-python==0.13.2
 #CROSSENV_WHEELS += scikit-build-core==0.5.0
 
-# [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
-# [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-# [numpy] <= 1.24.4 last working version with gcc-4.9
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-CROSSENV_WHEELS += numpy==1.24.4
-# [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-CROSSENV_WHEELS += numpy==1.25.2
-endif
-endif
-
-# [maturin]
-CROSSENV_WHEELS += maturin==1.2.3
 
 # Create the crossenv in preparation for
 # cross-compiling all the necessary wheels
@@ -176,12 +163,30 @@ python311_post_install: $(WORK_DIR)/python-cc.mk
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $(TC_PATH)$(TC_PREFIX)gcc --cxx $(TC_PATH)$(TC_PREFIX)c++ --ar $(TC_PATH)$(TC_PREFIX)ar --sysroot $(TC_SYSROOT) --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.41.2"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.41.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==74.0.0" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==74.0.0" "wheel==0.44.0" "pip-tools==7.4.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
+# [numpy] <= 1.2x.y Must be installed using setuptools < 70.0
+# [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
+# [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==69.5.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==69.5.1"
+# [numpy] <= 1.24.4 last working version with gcc-4.9
+ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "numpy==1.24.4"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "numpy==1.24.4"
+# [numpy] >= 1.25.0 requires c++17
+else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "numpy==1.25.2"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "numpy==1.25.2"
+endif
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==74.0.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==74.0.0"
+endif
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif

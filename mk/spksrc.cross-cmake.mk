@@ -38,7 +38,7 @@ ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = cmake_configure_target
 endif
 
-# install
+# source directory
 ifeq ($(strip $(CMAKE_SOURCE_DIR)),)
 CMAKE_SOURCE_DIR = $(CMAKE_BASE_DIR)
 endif

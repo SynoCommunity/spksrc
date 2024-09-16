@@ -1,0 +1,70 @@
+--- ./glib/gbitlock.c-orig	2021-03-18 13:47:48.316693300 +0000
++++ ./glib/gbitlock.c	2024-09-15 22:38:25.865961409 +0000
+@@ -322,10 +322,10 @@ g_bit_unlock (volatile gint *address,
+               gint           lock_bit)
+ {
+ #ifdef USE_ASM_GOTO
+-  asm volatile ("lock btr %1, (%0)"
+-                : /* no output */
+-                : "r" (address), "r" (lock_bit)
+-                : "cc", "memory");
++  __asm__ volatile ("lock btr %1, (%0)"
++                    : /* no output */
++                    : "r" (address), "r" (lock_bit)
++                    : "cc", "memory");
+ #else
+   guint mask = 1u << lock_bit;
+ 
+@@ -405,12 +405,12 @@ void
+   {
+ #ifdef USE_ASM_GOTO
+  retry:
+-    asm volatile goto ("lock bts %1, (%0)\n"
+-                       "jc %l[contended]"
+-                       : /* no output */
+-                       : "r" (address), "r" ((gsize) lock_bit)
+-                       : "cc", "memory"
+-                       : contended);
++    __asm__ volatile goto ("lock bts %1, (%0)\n"
++                           "jc %l[contended]"
++                           : /* no output */
++                           : "r" (address), "r" ((gsize) lock_bit)
++                           : "cc", "memory"
++                           : contended);
+     return;
+ 
+  contended:
+@@ -477,12 +477,12 @@ gboolean
+ #ifdef USE_ASM_GOTO
+     gboolean result;
+ 
+-    asm volatile ("lock bts %2, (%1)\n"
+-                  "setnc %%al\n"
+-                  "movzx %%al, %0"
+-                  : "=r" (result)
+-                  : "r" (address), "r" ((gsize) lock_bit)
+-                  : "cc", "memory");
++    __asm__ volatile ("lock bts %2, (%1)\n"
++                      "setnc %%al\n"
++                      "movzx %%al, %0"
++                      : "=r" (result)
++                      : "r" (address), "r" ((gsize) lock_bit)
++                      : "cc", "memory");
+ 
+     return result;
+ #else
+@@ -520,10 +520,10 @@ void
+ 
+   {
+ #ifdef USE_ASM_GOTO
+-    asm volatile ("lock btr %1, (%0)"
+-                  : /* no output */
+-                  : "r" (address), "r" ((gsize) lock_bit)
+-                  : "cc", "memory");
++    __asm__ volatile ("lock btr %1, (%0)"
++                      : /* no output */
++                      : "r" (address), "r" ((gsize) lock_bit)
++                      : "cc", "memory");
+ #else
+     volatile gsize *pointer_address = address;
+     gsize mask = 1u << lock_bit;
