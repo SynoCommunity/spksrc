@@ -1,5 +1,5 @@
 PKG_NAME = intel-graphics-compiler
-PKG_VERS = 1.0.17384.12
+PKG_VERS = 1.0.17537.20
 PKG_EXT = tar.gz
 PKG_DIST_NAME = igc-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/intel-graphics-compiler/archive
@@ -62,8 +62,6 @@ BUILD_DEPENDS += cross/intel-vc-intrinsics.src
 #     Manually-specified variables were not used by the project: IGC_OPTION__VC_INTRINSICS_SOURCES_DIR
 CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Source'
 #CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_SOURCES_DIR=$(WORK_DIR)/vc-intrinsics
-#   Could not find FOUND_VCS using the following files: VersionFromVCS.cmake
-CMAKE_ARGS += -DFOUND_VCS=$(WORK_DIR)/llvm-project/llvm/cmake/modules/VersionFromVCS.cmake
 
 # [Khronos-SPIRV-Headers]
 BUILD_DEPENDS += cross/Khronos-SPIRV-Headers

@@ -5,7 +5,7 @@ SPK_ICON = src/SynoPackagegreen-videodriver.png
 CHANGELOG = "Initial version providing Intel Media Driver 2024Q2 Release"
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Provides video driver support for Intel GPU acceleration including OpenCL."
+DESCRIPTION = "Provides video driver support for Intel GPU acceleration including OpenCL \(DSM7\)."
 DISPLAY_NAME = SynoCli Video Drivers
 STARTABLE = no
 
@@ -29,7 +29,7 @@ include ../../mk/spksrc.common.mk
 
 # Enable OpenCL only on DSM >= 7.1
 ifeq ($(call version_ge, ${TCVERSION}, 7.1),1)
-CHANGELOG += "Intel Level-Zero 1.17.28, Intel Graphics Compiler \(IGC\) 1.0.17384.12, Intel Compute Runtime 24.31.30508.7"
+CHANGELOG += "Intel Level-Zero 1.17.42, Intel Graphics Compiler \(IGC\) 1.0.17537.20, Intel Compute Runtime 24.31.30508.7"
 DEPENDS += cross/intel-level-zero
 DEPENDS += cross/intel-graphics-compiler
 DEPENDS += cross/intel-compute-runtime
