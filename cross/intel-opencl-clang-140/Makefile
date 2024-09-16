@@ -35,28 +35,16 @@ LICENSE  = Apache License v2.0 with LLVM Exceptions
 
 POST_EXTRACT_TARGET = opencl-clang_post_extract_target
 
+# Does not fails but when built using Ninja and/or requires various CMP0??? such as:
+#   CMAKE_ARGS += -DCMAKE_POLICY_DEFAULT_CMP0116='OLD|NEW'
+CMAKE_USE_NINJA = 0
+
 # Suppress developer warnings
 CMAKE_ARGS += -Wno-dev
 
 # Using various LLVM project sources needs a top-level master directory
 CMAKE_BUILD_DIR = $(WORK_DIR)/opencl-clang.build
 CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
-
-# Indicates whether the LLVM Interpreter will be
-# linked with the Foreign Function Interface library
-# (libffi) in order to enable calling external functions.
-DEPENDS += cross/libffi
-CMAKE_ARGS += -DLLVM_ENABLE_FFI=ON
-
-DEPENDS += cross/ncursesw
-CMAKE_ARGS += -DLLVM_ENABLE_TERMINFO=ON
-
-DEPENDS += cross/libxml2
-CMAKE_ARGS += -DLLVM_ENABLE_LIBXML2=ON
-
-# Enable building with zlib to support compression/uncompression
-DEPENDS += cross/zlib
-CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 
 # Assertions are internal checks to help find bugs.
 # They typically slow down LLVM and Clang when enabled
@@ -67,8 +55,6 @@ CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 # as a shared library, you should use the
 # LLVM_BUILD_LLVM_DYLIB option
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
-CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
-CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 
 # Disable third-party benchmarks and unittest
 # as not-included in build and fails
@@ -78,12 +64,8 @@ CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
 
-# Fix build failure against DSM-7.2 toolchain
-#CMAKE_ARGS += -DLLVM_OPTIMIZED_TABLEGEN=ON
-
-# intel-vc-intrinsics dependent else error:
-#   Could not find FOUND_VCS using the following files: VersionFromVCS.cmake
-CMAKE_ARGS += -DFOUND_VCS=$(CMAKE_BUILD_DIR)/lib/cmake/llvm/VersionFromVCS.cmake
+# [intel-opencl-clang-140]
+CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
 
 include ../../mk/spksrc.common.mk
 
@@ -98,10 +80,15 @@ CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Trans
 CMAKE_ARGS += -DLLVM_EXTERNAL_VC_INTRINSICS_SOURCE_DIR=$(WORK_DIR)/vc-intrinsics
 CMAKE_ARGS += -DLLVM_EXTERNAL_OPENCL_CLANG_SOURCE_DIR=$(WORK_DIR)/$(PKG_NAME)
 
+# Contrary to IGC does not fail to access in NATIVE/bin/llvm-tblgen but reduces built time and size
+BUILD_DEPENDS += native/llvm-14.0
+CMAKE_ARGS += -DLLVM_TABLEGEN=$(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin/llvm-tblgen)
+CMAKE_ARGS += -DCLANG_TABLEGEN=$(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin/clang-tblgen)
+
 include ../../mk/spksrc.cross-cmake.mk
 
-# Requires access to build-time NATIVE tools
-ENV += PATH=$(CMAKE_BUILD_DIR)/NATIVE/bin:$$PATH
+# Requires access to build-time NATIVE and native/llvm-14.0 tools
+ENV += PATH=$(CMAKE_BUILD_DIR)/NATIVE/bin:$(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin):$$PATH
 
 opencl-clang_post_extract_target:
 	@cd $(WORK_DIR) && ln -s $(PKG_DIR) $(PKG_NAME)
