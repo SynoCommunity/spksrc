@@ -1,6 +1,6 @@
 SPK_NAME = wallabag
-SPK_VERS = 2.3.8
-SPK_REV = 3
+SPK_VERS = 2.6.9
+SPK_REV = 4
 SPK_ICON = src/wallabag.png
 DSM_UI_DIR = app
 BETA = 1
@@ -12,7 +12,7 @@ DESCRIPTION = Wallabag is a self hostable application allowing you to save an of
 ADMIN_URL = /wallabag/web/
 STARTABLE = no
 DISPLAY_NAME = Wallabag
-CHANGELOG = "Update to 2.3.8, Update to generic service script"
+CHANGELOG = "Update to 2.6.9."
 
 HOMEPAGE = https://www.wallabag.org/
 LICENSE  = MIT
