@@ -24,8 +24,8 @@ POST_EXTRACT_TARGET = igc_post_extract_target
 #   CMAKE_ARGS += -DCMAKE_POLICY_DEFAULT_CMP0116='OLD|NEW'
 CMAKE_USE_NINJA = 0
 
-# Suppress developer warnings (has no effect?)
-CMAKE_ARGS += -Wno-dev
+# Limit compile/link-time storage space (and faster build-time)
+GCC_NO_DEBUG_INFO = 1
 
 # Using various LLVM project sources needs a top-level master directory
 CMAKE_BUILD_DIR = $(WORK_DIR)/igc.build

@@ -18,6 +18,9 @@ POST_INSTALL_TARGET = intel-compute-runtime_post_install_target
 CMAKE_USE_NINJA = 0
 CMAKE_USE_DESTDIR = 1
 
+# Limit compile/link-time storage space (and faster build-time)
+GCC_NO_DEBUG_INFO = 1
+
 DEPENDS  = cross/intel-gmmlib
 DEPENDS += cross/intel-graphics-compiler
 
