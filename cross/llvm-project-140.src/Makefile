@@ -9,7 +9,15 @@ HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies
 LICENSE = Apache v2.0 with LLVM Exceptions
 
+# Limit to only needed files to reduce disk space usage
+ADDITIONAL_EXTRACTFLAGS  = $(PKG_DIR)/clang
+ADDITIONAL_EXTRACTFLAGS += $(PKG_DIR)/cmake
+ADDITIONAL_EXTRACTFLAGS += $(PKG_DIR)/libunwind
+ADDITIONAL_EXTRACTFLAGS += $(PKG_DIR)/lld
+ADDITIONAL_EXTRACTFLAGS += $(PKG_DIR)/llvm
+ADDITIONAL_EXTRACTFLAGS += $(PKG_DIR)/third-party
 POST_EXTRACT_TARGET = clang_post_extract_target
+
 CONFIGURE_TARGET = nop
 COMPILE_TARGET = nop
 INSTALL_TARGET = nop
