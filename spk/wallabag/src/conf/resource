@@ -49,6 +49,7 @@
                         "gd",
                         "gettext",
                         "iconv",
+                        "imagick",
                         "intl",
                         "pdo_mysql"
                     ],

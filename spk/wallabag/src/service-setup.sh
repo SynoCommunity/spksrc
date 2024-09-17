@@ -177,24 +177,29 @@ service_postinst ()
 
             # Restore configuration and data
             echo "Restoring configuration and data to ${WEB_DIR}"
-            rsync -aX --update -I "${TEMPDIR}/${SYNOPKG_PKGNAME}" "${WEB_DIR}/" 2>&1
+            rsync -aX -I "${TEMPDIR}/config/parameters.yml" "${CFG_FILE}" 2>&1
+            if [ -d ${TEMPDIR}/images ]; then
+                rsync -aX -I "${TEMPDIR}/images" "${WEB_ROOT}/web/assets/" 2>&1
+            fi
 
             # Update database password
-            sed -i "s/^\(\s*define('DB_PASS',\s*'\).*\(');\s*\)$/\1${wizard_mysql_password_wallabag}\2/" ${WEB_ROOT}/config/config.php
+            sed -i "s/^\(\s*database_password:\s*\).*\(\s*\)$/\1${wizard_mysql_database_password}\2/" ${CFG_FILE}
 
             # Restore the Database
             echo "Restoring database to ${MYSQL_DATABASE}"
             ${MYSQL} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} < ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
 
-            # Run update scripts
-            exec_php "${WEB_ROOT}/public/upgrade/console.php"
-            exec_php "${WEB_ROOT}/public/install/plugin-console.php" "update_all"
+            # migrate database
+            if ! exec_php ${WEB_ROOT}/bin/console doctrine:migrations:migrate --env=prod -n -vvv > ${WEB_ROOT}/migration.log 2>&1; then
+                echo "Unable to migrate database schema. Please check the log: ${WEB_ROOT}/migration.log"
+                return
+            fi
 
             # Clean-up temporary files
             ${RM} "${TEMPDIR}"
         else
             # install config file
-            cp -p ${SYNOPKG_PKGDEST}/web/parameters.yml ${CFG_FILE}
+            rsync -aX -I "${SYNOPKG_PKGDEST}/web/parameters.yml" "${CFG_FILE}" 2>&1
 
             # render properties
             sed -i -e "s|@database_password@|${wizard_mysql_database_password}|g" \
@@ -246,7 +251,11 @@ service_preuninst ()
 
         # Backup Directories
         echo "Copying previous configuration and data from ${WEB_ROOT}"
-        rsync -aX "${WEB_ROOT}" "${TEMPDIR}/" 2>&1
+        ${MKDIR} "${TEMPDIR}/config"
+        rsync -aX "${CFG_FILE}" "${TEMPDIR}/config/" 2>&1
+        if [ -d ${WEB_ROOT}/web/assets/images ]; then
+            rsync -aX "${WEB_ROOT}/web/assets/images" "${TEMPDIR}/" 2>&1
+        fi
 
         # Backup the Database
         echo "Copying previous database from ${MYSQL_DATABASE}"
@@ -318,16 +327,20 @@ service_save ()
 {
     # Save configuration and files
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
-    mkdir -p ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
-    mv ${CFG_FILE} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/
-    mv ${WEB_ROOT}/data/db ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/
+    ${MKDIR} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+    rsync -aX "${CFG_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/" 2>&1
+    if [ -d ${WEB_ROOT}/web/assets/images ]; then
+        rsync -aX "${WEB_ROOT}/web/assets/images" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/" 2>&1
+    fi
 }
 
 service_restore ()
 {
     # Restore configuration
-    mv ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/parameters.yml ${CFG_FILE}
-    mv ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/db ${WEB_ROOT}/data/db
+    rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/parameters.yml" "${CFG_FILE}" 2>&1
+    if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/images ]; then
+        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/images" "${WEB_ROOT}/web/assets/" 2>&1
+    fi
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
 
     # Fix permissions
