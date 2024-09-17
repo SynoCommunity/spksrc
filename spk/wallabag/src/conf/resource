@@ -1,0 +1,66 @@
+{
+    "mariadb10-db": {
+        "admin-account-m10": "root",
+        "admin-pw-m10": "{{wizard_mysql_password_root}}",
+        "create-db": {
+            "db-collision": "skip",
+            "db-name": "wallabag",
+            "flag": "{{wizard_create_db}}"
+        },
+        "drop-db-uninst": true,
+        "drop-user-uninst": true,
+        "grant-user": {
+            "db-name": "wallabag",
+            "flag": "{{mysql_grant_user}}",
+            "host": "localhost",
+            "user-name": "wallabag",
+            "user-pw": "{{wizard_mysql_database_password}}"
+        }
+    },
+    "webservice": {
+        "pkg_dir_prepare": [
+            {
+                "group": "http",
+                "mode": "0755",
+                "source": "/var/packages/wallabag/target/share/wallabag",
+                "target": "wallabag",
+                "user": "sc-wallabag"
+            }
+        ],
+        "portals": [
+            {
+                "alias": "wallabag",
+                "app": "com.synocommunity.packages.wallabag",
+                "name": "Wallabag",
+                "service": "wallabag",
+                "type": "alias"
+            }
+        ],
+        "services": [
+            {
+                "backend": 2,
+                "display_name": "Wallabag",
+                "icon": "app/images/wallabag-{0}.png",
+                "php": {
+                    "backend": 8,
+                    "extensions": [
+                        "bcmath",
+                        "curl",
+                        "gd",
+                        "gettext",
+                        "iconv",
+                        "intl",
+                        "pdo_mysql"
+                    ],
+                    "group": "http",
+                    "profile_desc": "PHP Profile for wallabag",
+                    "profile_name": "wallabag Profile",
+                    "user": "sc-wallabag"
+                },
+                "root": "wallabag",
+                "service": "wallabag",
+                "type": "apache_php"
+            }
+        ]
+    }
+}
