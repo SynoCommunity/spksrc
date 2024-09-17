@@ -1,34 +1,27 @@
 parameters:
     database_driver: pdo_mysql
     database_driver_class: ~
-    database_host: 127.0.0.1
-    database_port: 3306
+    database_host: localhost
+    database_port: ~
     database_name: @database_name@
     database_user: wallabag
     database_password: @database_password@
     # For SQLite, database_path should be "%kernel.project_dir%/data/db/wallabag.sqlite"
     database_path: null
     database_table_prefix: wallabag_
-    database_socket: null
+    database_socket: /run/mysqld/mysqld10.sock
     # with PostgreSQL and SQLite, you must set "utf8"
     database_charset: utf8mb4
 
-    domain_name: @protocoll_and_domain_name@
+    domain_name: '@protocol_and_domain_name@'
+    server_name: 'Your wallabag instance'
 
-    mailer_transport:  smtp
-    mailer_user:       ~
-    mailer_password:   ~
-    mailer_host:       127.0.0.1
-    mailer_port:       false
-    mailer_encryption: ~
-    mailer_auth_mode:  ~
-
+    mailer_dsn: 'smtp://127.0.0.1'
+    
     locale: en
 
     # A secret key that's used to generate certain security-related tokens
     secret: @wallabag_secret@
-    
-    locale: en
 
     # two factor stuff
     twofactor_auth: false

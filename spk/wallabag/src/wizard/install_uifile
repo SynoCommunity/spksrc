@@ -62,7 +62,7 @@
         "desc": "Enter your NAS domain name or IP address. e.g https://192.168.0.2",
         "subitems": [
           {
-            "key": "wizard_protocoll_and_domain_name",
+            "key": "wizard_protocol_and_domain_name",
             "desc": "Protocol and Domain Name",
             "validator": {
               "allowBlank": false,
