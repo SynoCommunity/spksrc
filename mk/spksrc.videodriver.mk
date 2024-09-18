@@ -37,7 +37,10 @@ endif
 VIDEODRV_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(VIDEODRV_PACKAGE_ROOT)/../) 2>/dev/null | grep ^$(VIDEODRV_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile))),$(wildcard $(VIDEODRV_PACKAGE_ROOT)/.$(cross)-*_done))
 
 # call-up pre-depend to prepare the shared videodrv build environment
+
+ifeq ($(strip $(PRE_DEPEND_TARGET)),)
 PRE_DEPEND_TARGET = videodrv_pre_depend
+endif
 
 # end ifeq $(x64_ARCHS)
 endif
