@@ -267,6 +267,9 @@ service_preuninst ()
         echo "Copying previous configuration and data from ${WEB_ROOT}"
         ${MKDIR} "${TEMPDIR}/config"
         rsync -aX "${CFG_FILE}" "${TEMPDIR}/config/" 2>&1
+        if [ -f ${IDX_FILE} ]; then
+            rsync -aX "${IDX_FILE}" "${TEMPDIR}/config/" 2>&1
+        fi
         if [ -d ${WEB_ROOT}/web/assets/images ]; then
             rsync -aX "${WEB_ROOT}/web/assets/images" "${TEMPDIR}/" 2>&1
         fi
@@ -369,11 +372,6 @@ service_restore ()
         rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/images" "${WEB_ROOT}/web/assets/" 2>&1
     fi
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
-
-    # Fix permissions
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        chown -R ${WEB_USER}:${WEB_GROUP} ${WEB_ROOT}/upload
-    fi
 
     # migrate database
     if ! exec_php ${WEB_ROOT}/bin/console doctrine:migrations:migrate --env=prod -n -vvv > ${WEB_ROOT}/migration.log 2>&1; then
