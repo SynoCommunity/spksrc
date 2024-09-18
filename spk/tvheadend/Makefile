@@ -13,7 +13,8 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-SPK_DEPENDS = 'python311>=3.11.4-7:ffmpeg6'
+FFMPEG_PACKAGE = ffmpeg6
+SPK_DEPENDS = 'python311>=3.11.4-7:$(FFMPEG_PACKAGE)'
 
 WHEELS = src/requirements-pure.txt
 

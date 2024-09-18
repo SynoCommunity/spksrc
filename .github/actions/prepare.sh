@@ -56,7 +56,7 @@ packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
 # for ffmpeg v5-6 find all packages that depend on them
 for i in {5..6}; do
-    ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = ${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+    ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_PACKAGE = ffmpeg${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
     # If packages contain a package that depends on ffmpeg (or is ffmpeg),
     # then ensure relevant ffmpeg5|ffmpeg6 is first in list

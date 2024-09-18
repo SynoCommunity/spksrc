@@ -9,6 +9,25 @@ PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
+HOMEPAGE = https://tvheadend.org/
+COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
+LICENSE  = GPLv3
+
+# PPC archs except qoriq are not supported
+# https://tvheadend.org/issues/5060
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
+OPTIONAL_DEPENDS += cross/ffmpeg6
+OPTIONAL_DEPENDS += cross/fdk-aac
+OPTIONAL_DEPENDS += cross/fontconfig
+OPTIONAL_DEPENDS += cross/opus
+OPTIONAL_DEPENDS += cross/pcre2
+OPTIONAL_DEPENDS += cross/libtheora
+OPTIONAL_DEPENDS += cross/libvorbis
+OPTIONAL_DEPENDS += cross/libvpx
+OPTIONAL_DEPENDS += cross/x264
+OPTIONAL_DEPENDS += cross/x265
+
 # WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng)
 # with prebuilt ffmpeg this is not a problem
 # without prebuilt ffmpeg the "DEPENDS += cross/ffmpeg*" must be defined below
@@ -22,14 +41,6 @@ DEPENDS += cross/libhdhomerun
 DEPENDS += cross/curl
 # curl build needs additional configuration for gnutls and libssh2
 export BUILD_CURL_WITH="gnutls libssh2 zstd"
-
-# PPC archs except qoriq are not supported
-# https://tvheadend.org/issues/5060
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
-HOMEPAGE = https://tvheadend.org/
-COMMENT  = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
-LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = tvheadend_pre_configure
