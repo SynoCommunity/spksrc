@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # for backwards compatability
-if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+if [ -z "${SYNOPKG_PKGDEST_VOL}" ]; then
 	SYNOPKG_PKGDEST_VOL="/volume1"
 fi
 INTERNAL_IP=$(ip -4 route get 8.8.8.8 | awk '/8.8.8.8/ && /src/ {print $NF}')
@@ -37,11 +37,12 @@ checkNewInstall()
 	var protoAndDomainName = arguments[0];
 	var step = arguments[2];
 	var installNew = step.getComponent("${INSTALL_NEW_INSTANCE}");
-	var domainRegex = /https?:\/\/.+\..+/i;
+	var ipRegex = /^https?:\/\/(\d{1,3}\.){3}\d{1,3}(:\d+)?$/;
+	var domainRegex = /^https?:\/\/((?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(:\d+)?$/;
 	if (installNew.checked) {
 		if (protoAndDomainName === "") {
 			return "${BLANK_ERROR_TEXT}";
-		} else if (!domainRegex.test(protoAndDomainName)) {
+		} else if (!ipRegex.test(protoAndDomainName) && !domainRegex.test(protoAndDomainName)) {
 			return "${INSTALL_ERROR_TEXT}";
 		}
 	}
