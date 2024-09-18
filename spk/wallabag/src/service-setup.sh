@@ -20,6 +20,7 @@ fi
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 SYNOSVC="/usr/syno/sbin/synoservice"
 CFG_FILE="${WEB_ROOT}/app/config/parameters.yml"
+IDX_FILE="${WEB_ROOT}/index.php"
 
 exec_php ()
 {
@@ -178,6 +179,16 @@ service_postinst ()
             # Restore configuration and data
             echo "Restoring configuration and data to ${WEB_DIR}"
             rsync -aX -I "${TEMPDIR}/config/parameters.yml" "${CFG_FILE}" 2>&1
+            if [ -f ${TEMPDIR}/config/index.php ]; then
+                rsync -aX -I "${TEMPDIR}/config/index.php" "${IDX_FILE}" 2>&1
+            else
+                # rebuild missing index file
+                echo "Rebuilding index redirect file"
+                rsync -aX -I "${SYNOPKG_PKGDEST}/web/index.php" "${IDX_FILE}" 2>&1
+                DOMAIN_NAME=$(grep 'domain_name:' "${CFG_FILE}" | awk '{ print $2 }' | sed "s/'//g")
+                sed -i -e "s|@protocol_and_domain_name@|${DOMAIN_NAME}|g" \
+                    ${IDX_FILE}
+            fi
             if [ -d ${TEMPDIR}/images ]; then
                 rsync -aX -I "${TEMPDIR}/images" "${WEB_ROOT}/web/assets/" 2>&1
             fi
@@ -198,8 +209,9 @@ service_postinst ()
             # Clean-up temporary files
             ${RM} "${TEMPDIR}"
         else
-            # install config file
+            # install config files
             rsync -aX -I "${SYNOPKG_PKGDEST}/web/parameters.yml" "${CFG_FILE}" 2>&1
+            rsync -aX -I "${SYNOPKG_PKGDEST}/web/index.php" "${IDX_FILE}" 2>&1
 
             # render properties
             sed -i -e "s|@database_password@|${wizard_mysql_database_password}|g" \
@@ -207,6 +219,8 @@ service_postinst ()
                 -e "s|@protocol_and_domain_name@|${wizard_protocol_and_domain_name}/wallabag/web|g" \
                 -e "s|@wallabag_secret@|$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 30 | head -n 1)|g" \
                 ${CFG_FILE}
+            sed -i -e "s|@protocol_and_domain_name@|${wizard_protocol_and_domain_name}/wallabag/web|g" \
+                ${IDX_FILE}
 
             # install wallabag
             if ! exec_php ${WEB_ROOT}/bin/console wallabag:install --env=prod --reset -n -vvv > ${WEB_ROOT}/install.log 2>&1; then
@@ -329,6 +343,9 @@ service_save ()
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     ${MKDIR} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     rsync -aX "${CFG_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/" 2>&1
+    if [ -f ${IDX_FILE} ]; then
+        rsync -aX "${IDX_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/" 2>&1
+    fi
     if [ -d ${WEB_ROOT}/web/assets/images ]; then
         rsync -aX "${WEB_ROOT}/web/assets/images" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/" 2>&1
     fi
@@ -338,6 +355,16 @@ service_restore ()
 {
     # Restore configuration
     rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/parameters.yml" "${CFG_FILE}" 2>&1
+    if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/index.php ]; then
+        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/index.php" "${IDX_FILE}" 2>&1
+    else
+        # rebuild missing index file
+        echo "Rebuilding index redirect file"
+        rsync -aX -I "${SYNOPKG_PKGDEST}/web/index.php" "${IDX_FILE}" 2>&1
+        DOMAIN_NAME=$(grep 'domain_name:' "${CFG_FILE}" | awk '{ print $2 }' | sed "s/'//g")
+        sed -i -e "s|@protocol_and_domain_name@|${DOMAIN_NAME}|g" \
+            ${IDX_FILE}
+    fi
     if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/images ]; then
         rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/images" "${WEB_ROOT}/web/assets/" 2>&1
     fi

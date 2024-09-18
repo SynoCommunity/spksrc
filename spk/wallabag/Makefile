@@ -23,7 +23,7 @@ STARTABLE = no
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 
-ADMIN_URL = /wallabag/web/
+ADMIN_URL = /wallabag
 
 WIZARDS_DIR = src/wizard/
 SYSTEM_GROUP = http
@@ -46,6 +46,7 @@ include ../../mk/spksrc.spk.mk
 .PHONY: wallabag_extra_install
 wallabag_extra_install:
 	install -m 755 -d $(STAGING_DIR)/web
+	install -m 644 src/web/index.php $(STAGING_DIR)/web/index.php
 	install -m 644 src/web/parameters.yml $(STAGING_DIR)/web/parameters.yml
 	install -m 644 src/web/wallabag.conf $(STAGING_DIR)/web/wallabag.conf
 	install -m 644 src/web/wallabag.json $(STAGING_DIR)/web/wallabag.json
