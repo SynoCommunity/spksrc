@@ -11,10 +11,10 @@ override ARCH=
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 
-MAINTAINER = tolkonepiu
+MAINTAINER = SynoCommunity
 DESCRIPTION = Wallabag is a self hostable application allowing you to save an offline copy of your favorite articles. Click, save, read it when you can. It extracts content so that you can read it when you have time.
 DISPLAY_NAME = Wallabag
-CHANGELOG = "Update to 2.6.9."
+CHANGELOG = "1. Update to 2.6.9.<br/>2. Add PHP profiles for DSM 6.<br/>3. Add backup and restore functions."
 
 HOMEPAGE = https://www.wallabag.org/
 LICENSE  = MIT
