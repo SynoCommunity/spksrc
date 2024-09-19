@@ -1,7 +1,7 @@
 #!/bin/bash
 
-OC_NEW_VER=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
-OC_OLD_VER=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d '-' -f 1)
+OC_NEW_VER=$(echo "${SYNOPKG_PKGVER}" | cut -d '-' -f 1)
+OC_OLD_VER=$(echo "${SYNOPKG_OLD_PKGVER}" | cut -d '-' -f 1)
 
 quote_json ()
 {
@@ -74,7 +74,7 @@ PAGE_LIMITATIONS=$(/bin/cat<<EOF
 	"items": [{
 		"desc": "{{{OWNCLOUD_UPGRADE_LIMITATIONS_DESCRIPTION}}}"
 	}, {
-		"desc": "$(echo $TEXT_LIMITATIONS | quote_json)"
+		"desc": "$(echo "$TEXT_LIMITATIONS" | quote_json)"
 	}]
 }
 EOF

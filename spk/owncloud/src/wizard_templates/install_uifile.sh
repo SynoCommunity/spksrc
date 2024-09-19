@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # for backwards compatability
-if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+if [ -z "${SYNOPKG_PKGDEST_VOL}" ]; then
 	SYNOPKG_PKGDEST_VOL="/volume1"
 fi
 SHAREDIR="${SYNOPKG_PKGNAME}"
