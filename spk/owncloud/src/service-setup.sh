@@ -55,7 +55,9 @@ exec_occ() {
     OCC="${WEB_ROOT}/occ"
     COMMAND="${PHP} ${OCC} $*"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        /bin/su "$WEB_USER" -s /bin/sh -c "$COMMAND"
+        # Escape backslashes for DSM 6
+        ESCAPED_COMMAND=$(echo "$COMMAND" | sed 's/\\/\\\\/g')
+        /bin/su "$WEB_USER" -s /bin/sh -c "$ESCAPED_COMMAND"
     else
         $COMMAND
     fi
@@ -67,7 +69,9 @@ exec_eff_occ() {
     OCC="${WEB_ROOT}/occ"
     COMMAND="${PHP} ${OCC} $*"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
+        # Escape backslashes for DSM 6
+        ESCAPED_COMMAND=$(echo "$COMMAND" | sed 's/\\/\\\\/g')
+        /bin/su "$EFF_USER" -s /bin/sh -c "$ESCAPED_COMMAND"
     else
         $COMMAND
     fi
@@ -137,8 +141,8 @@ setup_owncloud_instance()
             fi
         done
 
-        # Add HTTP to HTTPS redirect to Apache configuration file
         APACHE_CONF="${WEB_ROOT}/.htaccess"
+        # Configure HTTP to HTTPS redirect
         if [ -f "${APACHE_CONF}" ]; then
             {
                 echo "RewriteEngine On"
@@ -146,6 +150,22 @@ setup_owncloud_instance()
                 echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]"
             } >> "${APACHE_CONF}"
         fi
+
+        # Configure HTTP Strict Transport Security
+        if [ -f "${APACHE_CONF}" ]; then
+            {
+                echo "<IfModule mod_headers.c>"
+                echo "Header always set Strict-Transport-Security \"max-age=15552000; includeSubDomains\""
+                echo "</IfModule>"
+            } >> "${APACHE_CONF}"
+        fi
+
+        # Configure background jobs using cron
+        exec_occ system:cron
+
+        # Configure memory caching
+        MEMCACHE_VAL="\\OC\\Memcache\\APCu"
+        exec_occ config:system:set memcache.local --value="$MEMCACHE_VAL"
     fi
 }
 

@@ -13,7 +13,7 @@ SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
 MAINTAINER = SynoCommunity
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 DISPLAY_NAME = ownCloud
-CHANGELOG = "1. Update ownCloud to 10.15.0.<br/>2. Various script fixes and refinements."
+CHANGELOG = "1. Update ownCloud to 10.15.0.<br/>2. Various script fixes and refinements.<br/>3. Optimise initial ownCloud setup."
 HOMEPAGE = https://owncloud.com/
 
 LICENSE = AGPLv3
