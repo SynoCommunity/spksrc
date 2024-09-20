@@ -21,12 +21,19 @@ TOOLKIT_ROOT = $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
 ENV += TOOLKIT_ROOT=$(TOOLKIT_ROOT)
 endif
 
+ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS))
+ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS))
+ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS))
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-GCC_DEBUG_FLAGS = -O0 -g3
-ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_DEBUG_FLAGS)
-ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_DEBUG_FLAGS)
-ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_DEBUG_FLAGS)
+  # other options to consider: 
+  #GCC_DEBUG_FLAGS += -fsanitize=address -fsanitize=undefined -fstack-protector-all
+  GCC_DEBUG_FLAGS = -ggdb3 -g3
+else
+  GCC_DEBUG_FLAGS = -O3 -fomit-frame-pointer
 endif
+ADDITIONAL_CFLAGS := $(ADDITIONAL_CFLAGS) $(GCC_DEBUG_FLAGS)
+ADDITIONAL_CPPFLAGS := $(ADDITIONAL_CPPFLAGS) $(GCC_DEBUG_FLAGS)
+ADDITIONAL_CXXFLAGS := $(ADDITIONAL_CXXFLAGS) $(GCC_DEBUG_FLAGS)
 
 ifneq ($(strip $(TC)),)
 TC_VARS_MK = $(WORK_DIR)/tc_vars.mk

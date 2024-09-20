@@ -16,6 +16,9 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --disable-examples
 CONFIGURE_ARGS += --disable-spec
-ADDITIONAL_CFLAGS = -O
+
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+  COMPILE_MAKE_OPTIONS = debug
+endif
 
 include ../../mk/spksrc.cross-cc.mk

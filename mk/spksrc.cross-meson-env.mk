@@ -14,9 +14,13 @@ endif
 # Set other build options
 # We normally build regular Release
 ifeq ($(strip $(MESON_BUILD_TYPE)),)
-CONFIGURE_ARGS += -Dbuildtype=release
+  ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+    CONFIGURE_ARGS += -Dbuildtype=debug
+  else
+    CONFIGURE_ARGS += -Dbuildtype=release
+  endif
 else
-CONFIGURE_ARGS += -Dbuildtype=$(MESON_BUILD_TYPE)
+  CONFIGURE_ARGS += -Dbuildtype=$(MESON_BUILD_TYPE)
 endif
 
 # Configuration for meson build
