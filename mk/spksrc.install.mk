@@ -71,6 +71,9 @@ install_target: $(PRE_INSTALL_TARGET)
 	$(RUN) $(MAKE) $(INSTALL_MAKE_OPTIONS)
 
 post_install_target: $(INSTALL_TARGET)
+ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
+	$(RUN) $(MAKE) distclean
+endif
 
 $(INSTALL_PLIST):
 	find $(PLIST_SEARCH_PATH)/ \! -type d -printf '%P\n' | sed 's?^target/??g' | sort | \

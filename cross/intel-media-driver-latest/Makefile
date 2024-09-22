@@ -1,5 +1,5 @@
 PKG_NAME = intel-media
-PKG_VERS = 24.1.5
+PKG_VERS = 24.2.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/media-driver/archive
@@ -21,6 +21,9 @@ COMMENT  = The Intel Media Driver for VAAPI is a new VA-API (Video Acceleration 
 LICENSE  = MIT
 
 CMAKE_USE_DESTDIR = 0
+
+# Limit compile/link-time storage space (and faster build-time)
+GCC_NO_DEBUG_INFO = 1
 
 include ../../mk/spksrc.cross-cmake.mk
 

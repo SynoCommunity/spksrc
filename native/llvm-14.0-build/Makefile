@@ -15,13 +15,12 @@ PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS).src
 # 
 # The main reason to build llvm from source is, that other prebuilt packages
 # do not contain the binary "clang-tblgen" that is mandatory to build cross/llvm-14.0.
-# 
 
 DEPENDS =
 
 HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
-LICENSE = Apache v2.0 with LLVM Exceptions
+LICENSE  = Apache License v2.0 with LLVM Exceptions
 
 POST_INSTALL_TARGET = llvm_post_install
 CMAKE_USE_NINJA = 1
