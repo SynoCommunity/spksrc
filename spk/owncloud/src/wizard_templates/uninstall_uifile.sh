@@ -54,6 +54,16 @@ PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 	"items": [{
 		"desc": "{{{OWNCLOUD_BACKUP_SERVER_DESCRIPTION}}}"
 	}, {
+		"type": "password",
+		"desc": "{{{MYSQL_ROOT_PASSWORD_DESCRIPTION}}}",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "{{{MYSQL_ROOT_PASSWORD_LABEL}}}",
+			"validator": {
+				"allowBlank": false
+			}
+		}]
+	}, {
 		"type": "textfield",
 		"desc": "{{{OWNCLOUD_BACKUP_EXPORT_LOCATION_DESCRIPTION}}}",
 		"subitems": [{

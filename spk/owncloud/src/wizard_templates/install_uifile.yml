@@ -14,6 +14,8 @@ OWNCLOUD_ADMIN_USER_NAME_DESCRIPTION: "Administrator's login. Defaults to 'admin
 OWNCLOUD_ADMIN_USER_NAME_LABEL: "User name"
 OWNCLOUD_ADMIN_PASSWORD_DESCRIPTION: "Administrator's password. Defaults to 'admin'"
 OWNCLOUD_ADMIN_PASSWORD_LABEL: "Password"
+MYSQL_ROOT_PASSWORD_DESCRIPTION: "Enter your MySQL password"
+MYSQL_ROOT_PASSWORD_LABEL: "Root password"
 
 OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE: "ownCloud trusted domains"
 OWNCLOUD_TRUSTED_DOMAINS_DESCRIPTION: "To access your ownCloud server, you must whitelist all URLs in your settings, including any additional URLs you want to use besides the current hostname."

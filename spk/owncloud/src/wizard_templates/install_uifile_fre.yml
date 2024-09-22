@@ -14,6 +14,8 @@ OWNCLOUD_ADMIN_USER_NAME_DESCRIPTION: "Connexion de l'administrateur. Par défau
 OWNCLOUD_ADMIN_USER_NAME_LABEL: "Nom d'utilisateur"
 OWNCLOUD_ADMIN_PASSWORD_DESCRIPTION: "Mot de passe de l'administrateur. Par défaut, 'admin'"
 OWNCLOUD_ADMIN_PASSWORD_LABEL: "Mot de passe"
+MYSQL_ROOT_PASSWORD_DESCRIPTION: "Entrez votre mot de passe MySQL"
+MYSQL_ROOT_PASSWORD_LABEL: "Mot de passe root"
 
 OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE: "Domaines de confiance ownCloud"
 OWNCLOUD_TRUSTED_DOMAINS_DESCRIPTION: "Pour accéder à votre serveur ownCloud, vous devez mettre en liste blanche toutes les URL dans vos paramètres, y compris toutes les URL supplémentaires que vous souhaitez utiliser en plus du nom d'hôte actuel."
