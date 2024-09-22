@@ -8,6 +8,9 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
+# cmake specific configurations
+include ../../mk/spksrc.native-cmake-env.mk
+
 # Force build in native tool directrory, not cross directory.
 WORK_DIR := $(CURDIR)/work-native
 
@@ -53,10 +56,8 @@ endif
 
 .NOTPARALLEL:
 
+# native specific environment
 include ../../mk/spksrc.native-env.mk
-
-# cmake specific configurations
-include ../../mk/spksrc.native-cmake-env.mk
 
 include ../../mk/spksrc.download.mk
 
