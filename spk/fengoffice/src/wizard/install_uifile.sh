@@ -200,7 +200,7 @@ PAGE_INSTALL_CONFIG=$(/bin/cat<<EOF
         "desc": "A 'fengoffice' MySQL user and database will be created. Please provide a password for the 'fengoffice' user.",
         "subitems": [{
             "key": "wizard_mysql_password_fengoffice",
-            "desc": "fengoffice password",
+            "desc": "User password",
             "invalidText": "Password is invalid. Ensure it includes at least one uppercase letter, one lowercase letter, one digit, one special character, and has a minimum length of 10 characters.",
             "validator": {
                 "fn": "$(getPasswordValidator)"
