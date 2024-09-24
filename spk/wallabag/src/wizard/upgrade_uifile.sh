@@ -70,7 +70,7 @@ PAGE_MIGRATE_DATABASE=$(/bin/cat<<EOF
     "step_title": "Wallabag DB migration",
     "invalid_next_disabled_v2": true,
     "items": [{
-        "desc": "Enter your respective Maria DB installation root account passwords",
+        "desc": "Enter your respective Maria DB installation 'root' account passwords",
         "type": "password",
         "subitems": [{
             "key": "wizard_mariadb5_password_root",
@@ -86,11 +86,11 @@ PAGE_MIGRATE_DATABASE=$(/bin/cat<<EOF
             }
         }]
     }, {
-        "desc": "A new 'wallabag' user will be created. Please enter a password for the 'wallabag' user.",
+        "desc": "A new '${SYNOPKG_PKGNAME}' user will be created. Please enter a password for the '${SYNOPKG_PKGNAME}' user.",
         "type": "password",
         "subitems": [{
             "key": "wizard_mysql_database_password",
-            "desc": "User password",
+            "desc": "MySQL '${SYNOPKG_PKGNAME}' password",
             "invalidText": "Password is invalid. Ensure it includes at least one uppercase letter, one lowercase letter, one digit, one special character, and has a minimum length of 10 characters.",
             "validator": {
                 "fn": "$(getPasswordValidator)"

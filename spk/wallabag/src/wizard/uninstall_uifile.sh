@@ -49,16 +49,16 @@ EOF
 
 PAGE_UNINSTALL_CONFIG=$(/bin/cat<<EOF
 {
-	"step_title": "Remove wallabag database",
+	"step_title": "Remove Wallabag database",
 	"invalid_next_disabled_v2": true,
 	"items": [{
-		"desc": "Attention: The wallabag database will be removed during package uninstallation. All users and projects will be deleted."
+		"desc": "Attention: The '${SYNOPKG_PKGNAME}' database will be removed during package uninstallation. All users and projects will be deleted."
 	}, {
 		"type": "password",
-		"desc": "Enter your MySQL password",
+		"desc": "Enter your MySQL superuser account password",
 		"subitems": [{
 			"key": "wizard_mysql_password_root",
-			"desc": "Root password",
+			"desc": "MySQL 'root' password",
 			"validator": {
 				"allowBlank": false
 			}
