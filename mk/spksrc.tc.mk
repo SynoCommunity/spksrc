@@ -95,6 +95,9 @@ else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	@echo "set(ARCH $(CMAKE_ARCH))"
 endif
 	@echo
+	@echo "# Disable developer warnings" ; \
+	echo 'set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "Disable developer warnings")'
+	@echo
 	@echo "# define toolchain location (used with CMAKE_TOOLCHAIN_PKG)" ; \
 	echo "set(_CMAKE_TOOLCHAIN_LOCATION $(_CMAKE_TOOLCHAIN_LOCATION))" ; \
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(_CMAKE_TOOLCHAIN_PREFIX))" ; \

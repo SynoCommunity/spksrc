@@ -12,8 +12,9 @@
 # - The build output is structured into log groups by package.
 # - As the disk space in the workflow environment is limitted, we clean the
 #   work folder of each package after build. At 2020.06 this limit is 14GB.
-# - ffmpeg5 and ffmpeg6 are not cleaned to be available for dependents.
-# - Therefore ffmpeg5 and ffmpeg6 are built first if triggered by its
+# - synocli-videodriver and ffmpeg5-6 are not cleaned to be available for dependents.
+# - Therefore synocli-videodriver is built first if triggered by ffmpeg5-6
+# - Therefore ffmpeg5 and ffmpeg6 are built second if triggered by its
 #   own or a dependent (see prepare.sh).
 
 set -o pipefail
@@ -59,7 +60,7 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
 fi
 
 # Build
-PACKAGES_TO_KEEP="ffmpeg5 ffmpeg6 python310 python311"
+PACKAGES_TO_KEEP="synocli-videodriver ffmpeg5 ffmpeg6 python310 python311"
 for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"

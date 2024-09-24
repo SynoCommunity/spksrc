@@ -51,6 +51,13 @@ ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = ninja_install_target
 endif
 
+# post-install
+ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
+ifeq ($(strip $(POST_INSTALL_TARGET)),)
+POST_INSTALL_TARGET = ninja_post_install_target
+endif
+endif
+
 ###
 
 .PHONY: ninja_compile_target
@@ -76,3 +83,12 @@ ifeq ($(strip $(NINJA_USE_DESTDIR)),0)
 else
 	$(RUN) DESTDIR=$(NINJA_DESTDIR) ninja -C $(NINJA_BUILD_DIR) install
 endif
+
+.PHONY: ninja_post_install_target
+
+# default ninja post-install: clean
+ninja_post_install_target:
+	@$(MSG) - Ninja post-install \(clean\)
+	$(RUN) ninja -C $(NINJA_BUILD_DIR) clean
+	$(RUN) rm -f $(NINJA_BUILD_DIR)/build.ninja
+	$(RUN) rm -f $(NINJA_BUILD_DIR)/compile_commands.json

@@ -1,0 +1,268 @@
+From e9e2434697c3a28f151ce179dd88f0ba73f0f0a0 Mon Sep 17 00:00:00 2001
+From: Haonan Yang <haonan.yang@intel.com>
+Date: Tue, 30 May 2023 09:37:00 +0800
+Subject: [PATCH] Make globals used for array initialization codegen constant
+
+This combines https://reviews.llvm.org/D146211 and https://reviews.llvm.org/D145369
+1. Emit const globals with constexpr destructor as constant LLVM values
+This follows 2b4fa53 which made Clang not emit destructor calls for such
+objects. However, they would still not get emitted as constants since
+CodeGenModule::isTypeConstant() returns false if the destructor is
+constexpr. This change adds a param to make isTypeConstant() ignore the
+dtor, allowing the caller to check it instead.
+2. Make globals used for array initialization codegen constant
+As pointed out in D133835 these globals will never be written to
+(they're only used for trivially copyable types), so they can always be
+constant.
+---
+ clang/lib/CodeGen/CGDecl.cpp                    | 12 ++++++++----
+ clang/lib/CodeGen/CGDeclCXX.cpp                 |  4 +++-
+ clang/lib/CodeGen/CGExpr.cpp                    |  2 +-
+ clang/lib/CodeGen/CGExprAgg.cpp                 |  4 ++--
+ clang/lib/CodeGen/CGExprConstant.cpp            | 12 ++++++------
+ clang/lib/CodeGen/CodeGenModule.cpp             | 16 +++++++++-------
+ clang/lib/CodeGen/CodeGenModule.h               |  2 +-
+ clang/lib/CodeGen/TargetInfo.cpp                |  2 +-
+ clang/test/CodeGen/init.c                       |  2 +-
+ clang/test/CodeGen/label-array-aggregate-init.c |  2 +-
+ clang/test/CodeGenCXX/const-init-cxx2a.cpp      |  4 ++--
+ 11 files changed, 35 insertions(+), 27 deletions(-)
+
+diff --git a/clang/lib/CodeGen/CGDecl.cpp b/clang/lib/CodeGen/CGDecl.cpp
+index 18d658436086..372f392402cf 100644
+--- a/clang/lib/CodeGen/CGDecl.cpp
++++ b/clang/lib/CodeGen/CGDecl.cpp
+@@ -379,13 +379,15 @@ CodeGenFunction::AddInitializerToStaticVarDecl(const VarDecl &D,
+     OldGV->eraseFromParent();
+   }
+ 
+-  GV->setConstant(CGM.isTypeConstant(D.getType(), true));
++  bool NeedsDtor =
++      D.needsDestruction(getContext()) == QualType::DK_cxx_destructor;
++
++  GV->setConstant(CGM.isTypeConstant(D.getType(), true, !NeedsDtor));
+   GV->setInitializer(Init);
+ 
+   emitter.finalize(GV);
+ 
+-  if (D.needsDestruction(getContext()) == QualType::DK_cxx_destructor &&
+-      HaveInsertPoint()) {
++  if (NeedsDtor && HaveInsertPoint()) {
+     // We have a constant initializer, but a nontrivial destructor. We still
+     // need to perform a guarded "initialization" in order to register the
+     // destructor.
+@@ -1470,10 +1472,12 @@ CodeGenFunction::EmitAutoVarAlloca(const VarDecl &D) {
+       // emit it as a global instead.
+       // Exception is if a variable is located in non-constant address space
+       // in OpenCL.
++      bool NeedsDtor =
++          D.needsDestruction(getContext()) == QualType::DK_cxx_destructor;
+       if ((!getLangOpts().OpenCL ||
+            Ty.getAddressSpace() == LangAS::opencl_constant) &&
+           (CGM.getCodeGenOpts().MergeAllConstants && !NRVO &&
+-           !isEscapingByRef && CGM.isTypeConstant(Ty, true))) {
++          !isEscapingByRef && CGM.isTypeConstant(Ty, true, !NeedsDtor))) {
+         EmitStaticVarDecl(D, llvm::GlobalValue::InternalLinkage);
+ 
+         // Signal this condition to later callbacks.
+diff --git a/clang/lib/CodeGen/CGDeclCXX.cpp b/clang/lib/CodeGen/CGDeclCXX.cpp
+index 7b880c1354e1..3dfffdbed8eb 100644
+--- a/clang/lib/CodeGen/CGDeclCXX.cpp
++++ b/clang/lib/CodeGen/CGDeclCXX.cpp
+@@ -213,9 +213,11 @@ void CodeGenFunction::EmitCXXGlobalVarDeclInit(const VarDecl &D,
+           &D, DeclAddr, D.getAttr<OMPThreadPrivateDeclAttr>()->getLocation(),
+           PerformInit, this);
+     }
++    bool NeedsDtor =
++        D.needsDestruction(getContext()) == QualType::DK_cxx_destructor;
+     if (PerformInit)
+       EmitDeclInit(*this, D, DeclAddr);
+-    if (CGM.isTypeConstant(D.getType(), true))
++    if (CGM.isTypeConstant(D.getType(), true, !NeedsDtor))
+       EmitDeclInvariant(*this, D, DeclPtr);
+     else
+       EmitDeclDestroy(*this, D, DeclAddr);
+diff --git a/clang/lib/CodeGen/CGExpr.cpp b/clang/lib/CodeGen/CGExpr.cpp
+index 2a9b108c31bc..86ed8b1892ea 100644
+--- a/clang/lib/CodeGen/CGExpr.cpp
++++ b/clang/lib/CodeGen/CGExpr.cpp
+@@ -390,7 +390,7 @@ static Address createReferenceTemporary(CodeGenFunction &CGF,
+     QualType Ty = Inner->getType();
+     if (CGF.CGM.getCodeGenOpts().MergeAllConstants &&
+         (Ty->isArrayType() || Ty->isRecordType()) &&
+-        CGF.CGM.isTypeConstant(Ty, true))
++        CGF.CGM.isTypeConstant(Ty, true, false))
+       if (auto Init = ConstantEmitter(CGF).tryEmitAbstract(Inner, Ty)) {
+         auto AS = CGF.CGM.GetGlobalConstantAddressSpace();
+         auto *GV = new llvm::GlobalVariable(
+diff --git a/clang/lib/CodeGen/CGExprAgg.cpp b/clang/lib/CodeGen/CGExprAgg.cpp
+index 73b05690537d..4f5b5b4cdef3 100644
+--- a/clang/lib/CodeGen/CGExprAgg.cpp
++++ b/clang/lib/CodeGen/CGExprAgg.cpp
+@@ -506,8 +506,8 @@ void AggExprEmitter::EmitArrayInit(Address DestPtr, llvm::ArrayType *AType,
+     if (llvm::Constant *C = Emitter.tryEmitForInitializer(E, AS, ArrayQTy)) {
+       auto GV = new llvm::GlobalVariable(
+           CGM.getModule(), C->getType(),
+-          CGM.isTypeConstant(ArrayQTy, /* ExcludeCtorDtor= */ true),
+-          llvm::GlobalValue::PrivateLinkage, C, "constinit",
++          /* isConstant= */ true, llvm::GlobalValue::PrivateLinkage, C,
++          "constinit",
+           /* InsertBefore= */ nullptr, llvm::GlobalVariable::NotThreadLocal,
+           CGM.getContext().getTargetAddressSpace(AS));
+       Emitter.finalize(GV);
+diff --git a/clang/lib/CodeGen/CGExprConstant.cpp b/clang/lib/CodeGen/CGExprConstant.cpp
+index ac4b4d1308ab..64129b64e272 100644
+--- a/clang/lib/CodeGen/CGExprConstant.cpp
++++ b/clang/lib/CodeGen/CGExprConstant.cpp
+@@ -913,12 +913,12 @@ static ConstantAddress tryEmitGlobalCompoundLiteral(CodeGenModule &CGM,
+     return ConstantAddress::invalid();
+   }
+ 
+-  auto GV = new llvm::GlobalVariable(CGM.getModule(), C->getType(),
+-                                     CGM.isTypeConstant(E->getType(), true),
+-                                     llvm::GlobalValue::InternalLinkage,
+-                                     C, ".compoundliteral", nullptr,
+-                                     llvm::GlobalVariable::NotThreadLocal,
+-                    CGM.getContext().getTargetAddressSpace(addressSpace));
++  auto GV = new llvm::GlobalVariable(
++      CGM.getModule(), C->getType(),
++      CGM.isTypeConstant(E->getType(), true, false),
++      llvm::GlobalValue::InternalLinkage, C, ".compoundliteral", nullptr,
++      llvm::GlobalVariable::NotThreadLocal,
++      CGM.getContext().getTargetAddressSpace(addressSpace));
+   emitter.finalize(GV);
+   GV->setAlignment(Align.getAsAlign());
+   CGM.setAddrOfConstantCompoundLiteral(E, GV);
+diff --git a/clang/lib/CodeGen/CodeGenModule.cpp b/clang/lib/CodeGen/CodeGenModule.cpp
+index 2777fc22600d..c88228090c17 100644
+--- a/clang/lib/CodeGen/CodeGenModule.cpp
++++ b/clang/lib/CodeGen/CodeGenModule.cpp
+@@ -2826,7 +2826,7 @@ bool CodeGenModule::MayBeEmittedEagerly(const ValueDecl *Global) {
+   // codegen for global variables, because they may be marked as threadprivate.
+   if (LangOpts.OpenMP && LangOpts.OpenMPUseTLS &&
+       getContext().getTargetInfo().isTLSSupported() && isa<VarDecl>(Global) &&
+-      !isTypeConstant(Global->getType(), false) &&
++      !isTypeConstant(Global->getType(), false, false) &&
+       !OMPDeclareTargetDeclAttr::isDeclareTargetDeclaration(Global))
+     return false;
+ 
+@@ -3988,8 +3988,9 @@ CodeGenModule::CreateRuntimeFunction(llvm::FunctionType *FTy, StringRef Name,
+ ///
+ /// If ExcludeCtor is true, the duration when the object's constructor runs
+ /// will not be considered. The caller will need to verify that the object is
+-/// not written to during its construction.
+-bool CodeGenModule::isTypeConstant(QualType Ty, bool ExcludeCtor) {
++/// not written to during its construction. ExcludeDtor works similarly.
++bool CodeGenModule::isTypeConstant(QualType Ty, bool ExcludeCtor,
++                                   bool ExcludeDtor) {
+   if (!Ty.isConstant(Context) && !Ty->isReferenceType())
+     return false;
+ 
+@@ -3997,7 +3998,7 @@ bool CodeGenModule::isTypeConstant(QualType Ty, bool ExcludeCtor) {
+     if (const CXXRecordDecl *Record
+           = Context.getBaseElementType(Ty)->getAsCXXRecordDecl())
+       return ExcludeCtor && !Record->hasMutableFields() &&
+-             Record->hasTrivialDestructor();
++             (Record->hasTrivialDestructor() || ExcludeDtor);
+   }
+ 
+   return true;
+@@ -4108,7 +4109,7 @@ CodeGenModule::GetOrCreateLLVMGlobal(StringRef MangledName, llvm::Type *Ty,
+ 
+     // FIXME: This code is overly simple and should be merged with other global
+     // handling.
+-    GV->setConstant(isTypeConstant(D->getType(), false));
++    GV->setConstant(isTypeConstant(D->getType(), false, false));
+ 
+     GV->setAlignment(getContext().getDeclAlign(D).getAsAlign());
+ 
+@@ -4642,7 +4643,7 @@ void CodeGenModule::EmitGlobalVarDefinition(const VarDecl *D,
+ 
+   // If it is safe to mark the global 'constant', do so now.
+   GV->setConstant(!NeedsGlobalCtor && !NeedsGlobalDtor &&
+-                  isTypeConstant(D->getType(), true));
++                  isTypeConstant(D->getType(), true, true));
+ 
+   // If it is in a read-only section, mark it 'constant'.
+   if (const SectionAttr *SA = D->getAttr<SectionAttr>()) {
+@@ -5703,7 +5704,8 @@ ConstantAddress CodeGenModule::GetAddrOfGlobalTemporary(
+     emitter.emplace(*this);
+     InitialValue = emitter->emitForInitializer(*Value, AddrSpace,
+                                                MaterializedType);
+-    Constant = isTypeConstant(MaterializedType, /*ExcludeCtor*/Value);
++    Constant = isTypeConstant(MaterializedType, /*ExcludeCtor*/ Value,
++                              /*ExcludeDtor*/ false);
+     Type = InitialValue->getType();
+   } else {
+     // No initializer, the initialization will be provided when we
+diff --git a/clang/lib/CodeGen/CodeGenModule.h b/clang/lib/CodeGen/CodeGenModule.h
+index a8a63c8da57f..28ea927c448d 100644
+--- a/clang/lib/CodeGen/CodeGenModule.h
++++ b/clang/lib/CodeGen/CodeGenModule.h
+@@ -765,7 +765,7 @@ public:
+     return getTBAAAccessInfo(AccessType);
+   }
+ 
+-  bool isTypeConstant(QualType QTy, bool ExcludeCtorDtor);
++  bool isTypeConstant(QualType QTy, bool ExcludeCtor, bool ExcludeDtor);
+ 
+   bool isPaddedAtomicType(QualType type);
+   bool isPaddedAtomicType(const AtomicType *type);
+diff --git a/clang/lib/CodeGen/TargetInfo.cpp b/clang/lib/CodeGen/TargetInfo.cpp
+index d83bc9e529a6..672ca38c6803 100644
+--- a/clang/lib/CodeGen/TargetInfo.cpp
++++ b/clang/lib/CodeGen/TargetInfo.cpp
+@@ -9440,7 +9440,7 @@ AMDGPUTargetCodeGenInfo::getGlobalVarAddressSpace(CodeGenModule &CGM,
+     return AddrSpace;
+ 
+   // Only promote to address space 4 if VarDecl has constant initialization.
+-  if (CGM.isTypeConstant(D->getType(), false) &&
++  if (CGM.isTypeConstant(D->getType(), false, false) &&
+       D->hasConstantInitialization()) {
+     if (auto ConstAS = CGM.getTarget().getConstantAddressSpace())
+       return ConstAS.getValue();
+diff --git a/clang/test/CodeGen/init.c b/clang/test/CodeGen/init.c
+index a21b5f4c09f5..93859924349b 100644
+--- a/clang/test/CodeGen/init.c
++++ b/clang/test/CodeGen/init.c
+@@ -10,7 +10,7 @@ unsigned v2[2][3] = {[0 ... 1][0 ... 1] = 2222, 3333};
+ 
+ // CHECK-DAG: [1 x %struct.M] [%struct.M { [2 x %struct.I] [%struct.I { [3 x i32] [i32 4, i32 4, i32 0] }, %struct.I { [3 x i32] [i32 4, i32 4, i32 5] }] }],
+ // CHECK-DAG: [2 x [3 x i32]] {{[[][[]}}3 x i32] [i32 2222, i32 2222, i32 0], [3 x i32] [i32 2222, i32 2222, i32 3333]],
+-// CHECK-DAG: [[INIT14:.*]] = private global [16 x i32] [i32 0, i32 0, i32 0, i32 0, i32 0, i32 17, i32 17, i32 17, i32 17, i32 17, i32 17, i32 17, i32 0, i32 0, i32 0, i32 0], align 4
++// CHECK-DAG: [[INIT14:.*]] = private constant [16 x i32] [i32 0, i32 0, i32 0, i32 0, i32 0, i32 17, i32 17, i32 17, i32 17, i32 17, i32 17, i32 17, i32 0, i32 0, i32 0, i32 0], align 4
+ 
+ void f1() {
+   // Scalars in braces.
+diff --git a/clang/test/CodeGen/label-array-aggregate-init.c b/clang/test/CodeGen/label-array-aggregate-init.c
+index 5cefd8d270c0..3175c2a6a292 100644
+--- a/clang/test/CodeGen/label-array-aggregate-init.c
++++ b/clang/test/CodeGen/label-array-aggregate-init.c
+@@ -1,6 +1,6 @@
+ // RUN: %clang -cc1 -triple x86_64-windows-msvc -emit-llvm %s -o - | FileCheck %s
+ 
+-// CHECK: @constinit = private global [3 x i8*] [i8* blockaddress(@main, %L), i8* null, i8* null]
++// CHECK: @constinit = private constant [3 x i8*] [i8* blockaddress(@main, %L), i8* null, i8* null]
+ 
+ void receivePtrs(void **);
+ 
+diff --git a/clang/test/CodeGenCXX/const-init-cxx2a.cpp b/clang/test/CodeGenCXX/const-init-cxx2a.cpp
+index 3eafef094387..3c83a9c94ade 100644
+--- a/clang/test/CodeGenCXX/const-init-cxx2a.cpp
++++ b/clang/test/CodeGenCXX/const-init-cxx2a.cpp
+@@ -11,10 +11,10 @@ struct B {
+   constexpr ~B() { n *= 5; }
+   int n = 123;
+ };
+-// CHECK: @b ={{.*}} global {{.*}} i32 123
++// CHECK: @b ={{.*}} constant {{.*}} i32 123
+ extern constexpr B b = B();
+ 
+-// CHECK: @_ZL1c = internal global {{.*}} i32 123
++// CHECK: @_ZL1c = internal constant {{.*}} i32 123
+ const B c;
+ int use_c() { return c.n; }
+ 
+-- 
+2.31.1
+

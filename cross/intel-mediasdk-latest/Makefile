@@ -19,4 +19,3 @@ include ../../mk/spksrc.cross-cmake.mk
 CMAKE_ARGS += -DMFX_PLUGINS_DIR=$(INSTALL_PREFIX)/lib
 CMAKE_ARGS += -DBUILD_SAMPLES=OFF
 CMAKE_ARGS += -DBUILD_TUTORIALS=OFF
-CMAKE_ARGS += -Wno-dev

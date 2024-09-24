@@ -28,6 +28,23 @@ ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_DEBUG_FLAGS
 ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_DEBUG_FLAGS)
 endif
 
+# gcc:
+#  -g0 deactivates debug information generation
+#  -Os enable some optimizations while avoiding those that increases space
+#  -flto enable optimization at link time (Link Time Optimization)
+#  -ffunction-sections -fdata-sections allows placing functions in their own ELF section
+# ld:
+#  -Wl,--gc-sections allows removing unused functions set previously (-f*-sections)
+#  -w omits the DWARF symbol table removing debugging information
+#  -s strips the symbol table and debug information from the binary
+ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
+GCC_NO_DEBUG_FLAGS = -g0 -Os -ffunction-sections -fdata-sections -fvisibility=hidden
+ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_NO_DEBUG_FLAGS)
+ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_NO_DEBUG_FLAGS)
+ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_NO_DEBUG_FLAGS)
+ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) -w -s -Wl,--gc-sections
+endif
+
 ifneq ($(strip $(TC)),)
 TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
 TC_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake

@@ -1,0 +1,28 @@
+From bb273d139a624bfe2db3d1cd2dd1397cabdfa0e4 Mon Sep 17 00:00:00 2001
+From: Victor Mustya <victor.mustya@intel.com>
+Date: Tue, 22 Aug 2023 11:10:30 -0700
+Subject: [PATCH] Don't emit bitreverse or bswap intrinsics of illegal bit
+ width during instcombine
+
+---
+ llvm/lib/Transforms/Utils/Local.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/llvm/lib/Transforms/Utils/Local.cpp b/llvm/lib/Transforms/Utils/Local.cpp
+index 1c350a258..9ba4f128c 100644
+--- a/llvm/lib/Transforms/Utils/Local.cpp
++++ b/llvm/lib/Transforms/Utils/Local.cpp
+@@ -3178,6 +3178,10 @@ bool llvm::recognizeBSwapOrBitReverseIdiom(
+   if (DemandedBW > ITy->getScalarSizeInBits())
+     return false;
+ 
++  auto &DL = I->getModule()->getDataLayout();
++  if (DL.isIllegalInteger(DemandedBW))
++    return false;
++
+   // Now, is the bit permutation correct for a bswap or a bitreverse? We can
+   // only byteswap values with an even number of bytes.
+   APInt DemandedMask = APInt::getAllOnes(DemandedBW);
+-- 
+2.34.1
+

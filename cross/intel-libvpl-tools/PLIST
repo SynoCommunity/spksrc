@@ -7,6 +7,7 @@ bin:bin/system_analyzer
 bin:bin/val-surface-sharing
 bin:bin/vpl-import-export
 bin:bin/vpl-inspect
-lib:lib/libcttmetrics.so
+lnk:lib/libcttmetrics.so
+lib:lib/libcttmetrics.so.1.0.0
 rsc:share/vpl-tools/licensing/third-party-programs.txt
 rsc:share/vpl-tools/licensing/license.txt
