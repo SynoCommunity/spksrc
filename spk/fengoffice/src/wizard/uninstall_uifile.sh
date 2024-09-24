@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # for backwards compatability
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-	if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+	if [ -z "${SYNOPKG_PKGDEST_VOL}" ]; then
 		SYNOPKG_PKGDEST_VOL="/volume1"
 	fi
-	if [ -z ${SYNOPKG_PKGNAME} ]; then
+	if [ -z "${SYNOPKG_PKGNAME}" ]; then
 		SYNOPKG_PKGNAME="fengoffice"
 	fi
 fi
@@ -49,16 +49,16 @@ EOF
 
 PAGE_UNINSTALL_CONFIG=$(/bin/cat<<EOF
 {
-	"step_title": "Remove fengoffice database",
+	"step_title": "Remove Feng Office database",
 	"invalid_next_disabled_v2": true,
 	"items": [{
-		"desc": "Attention: The fengoffice database will be removed during package uninstallation. All users and projects will be deleted."
+		"desc": "Attention: The '${SYNOPKG_PKGNAME}' database will be removed during package uninstallation. All users and projects will be deleted."
 	}, {
 		"type": "password",
-		"desc": "Enter your MySQL password",
+		"desc": "Enter your MySQL superuser account password",
 		"subitems": [{
 			"key": "wizard_mysql_password_root",
-			"desc": "Root password",
+			"desc": "MySQL 'root' password",
 			"validator": {
 				"allowBlank": false
 			}

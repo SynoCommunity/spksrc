@@ -10,8 +10,8 @@ SVC_WRITE_PID=y
 # Others
 MYSQL="/usr/local/mariadb10/bin/mysql"
 MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
-MYSQL_USER="fengoffice"
-MYSQL_DATABASE="fengoffice"
+MYSQL_USER="${SYNOPKG_PKGNAME}"
+MYSQL_DATABASE="${SYNOPKG_PKGNAME}"
 if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
     WEB_DIR="/var/services/web_packages"
 else
@@ -79,15 +79,15 @@ validate_preinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-            echo "Incorrect MySQL root password"
+            echo "Incorrect MySQL 'root' password"
             exit 1
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
-            echo "MySQL user ${MYSQL_USER} already exists"
+            echo "MySQL user '${MYSQL_USER}' already exists"
             exit 1
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
-            echo "MySQL database ${MYSQL_DATABASE} already exists"
+            echo "MySQL database '${MYSQL_DATABASE}' already exists"
             exit 1
         fi
 
@@ -216,7 +216,7 @@ service_postinst ()
 script_installer_storage[database_type]=mysqli\
 &script_installer_storage[database_host]=localhost\
 &script_installer_storage[database_user]=${MYSQL_USER}\
-&script_installer_storage[database_pass]=${wizard_mysql_password_fengoffice:=fengoffice}\
+&script_installer_storage[database_pass]=${wizard_mysql_password_fengoffice:=${SYNOPKG_PKGNAME}}\
 &script_installer_storage[database_name]=${MYSQL_DATABASE}\
 &script_installer_storage[database_prefix]=fo_\
 &script_installer_storage[database_engine]=InnoDB\
@@ -238,7 +238,7 @@ validate_preuninst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-        echo "Incorrect MySQL root password"
+        echo "Incorrect MySQL 'root' password"
         exit 1
     fi
     # Check export directory

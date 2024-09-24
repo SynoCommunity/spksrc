@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # for backwards compatability
-if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+if [ -z "${SYNOPKG_PKGDEST_VOL}" ]; then
 	SYNOPKG_PKGDEST_VOL="/volume1"
 fi
 INTERNAL_IP=$(ip -4 route get 8.8.8.8 | awk '/8.8.8.8/ && /src/ {print $NF}')
@@ -187,20 +187,20 @@ PAGE_INSTALL_CONFIG=$(/bin/cat<<EOF
     "invalid_next_disabled_v2": true,
     "items": [{
         "type": "password",
-        "desc": "Enter your MySQL password.",
+        "desc": "Enter your MySQL superuser account password",
         "subitems": [{
             "key": "wizard_mysql_password_root",
-            "desc": "Root password",
+            "desc": "MySQL 'root' password",
             "validator": {
                 "allowBlank": false
             }
         }]
     }, {
         "type": "password",
-        "desc": "A 'fengoffice' MySQL user and database will be created. Please provide a password for the 'fengoffice' user.",
+        "desc": "A '${SYNOPKG_PKGNAME}' MySQL user and database will be created. Please provide a password for the '${SYNOPKG_PKGNAME}' user.",
         "subitems": [{
             "key": "wizard_mysql_password_fengoffice",
-            "desc": "User password",
+            "desc": "MySQL '${SYNOPKG_PKGNAME}' password",
             "invalidText": "Password is invalid. Ensure it includes at least one uppercase letter, one lowercase letter, one digit, one special character, and has a minimum length of 10 characters.",
             "validator": {
                 "fn": "$(getPasswordValidator)"
