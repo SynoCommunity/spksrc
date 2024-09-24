@@ -19,5 +19,18 @@
     "step_title": "First login",
     "items": [{
         "desc": "The default account name is 'administrator' with password 'root'."
+    }, {
+        "type": "multiselect",
+        "subitems": [{
+            "key": "wizard_create_db",
+            "desc": "Creates initial DB",
+            "defaultValue": true,
+            "hidden": true
+        }, {
+            "key": "mysql_grant_user",
+            "desc": "Configures user rights",
+            "defaultValue": true,
+            "hidden": true
+        }]
     }]
 }]
