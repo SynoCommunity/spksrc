@@ -168,15 +168,15 @@ validate_preinst ()
         MYSQL_USER="oc_${wizard_owncloud_admin_username}"
         # Check database
         if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-            echo "Incorrect MySQL root password"
+            echo "Incorrect MySQL 'root' password"
             exit 1
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
-            echo "MySQL user ${MYSQL_USER} already exists"
+            echo "MySQL user '${MYSQL_USER}' already exists"
             exit 1
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
-            echo "MySQL database ${MYSQL_DATABASE} already exists"
+            echo "MySQL database '${MYSQL_DATABASE}' already exists"
             exit 1
         fi
 
@@ -357,7 +357,7 @@ validate_preuninst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-        echo "Incorrect MySQL root password"
+        echo "Incorrect MySQL 'root' password"
         exit 1
     fi
     # Check export directory
