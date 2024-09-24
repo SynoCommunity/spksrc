@@ -1,5 +1,5 @@
 SPK_NAME = rutorrent
-SPK_VERS = 4.3.6
+SPK_VERS = 4.3.7
 SPK_REV = 17
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 MAINTAINER = smaarn
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Upgrade rutorrent to 4.3.6"
+CHANGELOG = "1. Upgrade rutorrent to 4.3.7"
 
 # newer libtorrent-rakshasa requires C++14 support
 REQUIRED_MIN_DSM = 7.0
