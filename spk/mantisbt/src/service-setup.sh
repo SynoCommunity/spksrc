@@ -178,16 +178,18 @@ service_postinst ()
             # Restore configuration
             echo "Restoring configuration to ${WEB_DIR}/config"
             # Restore the configuration file
-            rsync -aX -I ${TEMPDIR}/${SYNOPKG_PKGNAME}/config_inc.php ${WEB_ROOT}/config/ 2>&1
+            rsync -aX -I ${TEMPDIR}/config/config_inc.php ${WEB_ROOT}/config/ 2>&1
             # Restore custom files
-            for file in "${TEMPDIR}/${SYNOPKG_PKGNAME}"/custom*
+            for file in "${TEMPDIR}"/config/custom*
             do
-                rsync -aX -I $file ${WEB_ROOT}/config/ 2>&1
+                if [ -f "$file" ]; then
+                    rsync -aX -I $file ${WEB_ROOT}/config/ 2>&1
+                fi
             done
 
             # Update database password
             MARIADB_PASSWORD_ESCAPED=$(printf '%s' "${wizard_mysql_password_mantisbt}" | sed 's/[&/\]/\\&/g')
-            sed -i "s|^\(\s*\$g_db_password\s*=\s*'\).*\(';\s*\)$|\1${MARIADB_PASSWORD_ESCAPED}\2|" ${CFG_FILE}
+            sed -i "s|\(\$g_db_password[ \t]*=[ \t]*'\)[^']*\(';\)|\1${MARIADB_PASSWORD_ESCAPED}\2|" "${CFG_FILE}"
 
             # Restore the Database
             echo "Restoring database to ${MYSQL_DATABASE}"
@@ -195,7 +197,10 @@ service_postinst ()
 
             # Run update scripts
             sed -i -e "s/gpc_get_int( 'install', 0 );/gpc_get_int( 'install', 2 );/g" ${WEB_ROOT}/admin/install.php
-            exec_php ${WEB_ROOT}/admin/install.php
+            exec_php ${WEB_ROOT}/admin/install.php > /dev/null
+
+            # Remove admin directory
+            rm -fr ${WEB_ROOT}/admin/
 
             # Clean-up temporary files
             ${RM} "${TEMPDIR}"
@@ -204,10 +209,11 @@ service_postinst ()
             rsync -aX -I "${SYNOPKG_PKGDEST}/web/config_inc.php" "${CFG_FILE}" 2>&1
 
             # Setup configuration file
-            sed -i -e "s/@password@/${wizard_mysql_password_mantisbt:=mantisbt}/g" ${CFG_FILE}
+            MARIADB_PASSWORD_ESCAPED=$(printf '%s' "${wizard_mysql_password_mantisbt}" | sed 's/[&/\]/\\&/g')
+            sed -i -e "s/@password@/${MARIADB_PASSWORD_ESCAPED:=mantisbt}/g" ${CFG_FILE}
             RAND_STR=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 64)
             sed -i -e "s/@rand_str@/${RAND_STR}/g" ${CFG_FILE}
-            sed -i -e "s/@web_url@/${wizard_install_url}/g" ${CFG_FILE}
+            sed -i -e "s#@web_url@#${wizard_install_url}#g" ${CFG_FILE}
             
             # Install/upgrade database
             echo "Run ${SC_DNAME} installer"
@@ -262,7 +268,9 @@ service_preuninst ()
         # Backup custom files
         for file in "${WEB_ROOT}/config"/custom*
         do
-            rsync -aX $file "${TEMPDIR}/config/" 2>&1
+            if [ -f "$file" ]; then
+                rsync -aX $file "${TEMPDIR}/config/" 2>&1
+            fi
         done
 
         # Backup the Database
@@ -343,7 +351,9 @@ service_save ()
     # Save custom files
     for file in "${WEB_ROOT}/config"/custom*
     do
-        rsync -aX $file ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/ 2>&1
+        if [ -f "$file" ]; then
+            rsync -aX $file ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/ 2>&1
+        fi
     done
 }
 
@@ -355,7 +365,9 @@ service_restore ()
     # Restore custom files
     for file in "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"/custom*
     do
-        rsync -aX -I $file ${WEB_ROOT}/config/ 2>&1
+        if [ -f "$file" ]; then
+            rsync -aX -I $file ${WEB_ROOT}/config/ 2>&1
+        fi
     done
 
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
