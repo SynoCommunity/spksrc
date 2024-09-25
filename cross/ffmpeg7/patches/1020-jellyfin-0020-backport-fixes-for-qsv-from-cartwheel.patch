@@ -1,0 +1,343 @@
+Index: FFmpeg/libavcodec/qsv_internal.h
+===================================================================
+--- libavcodec/qsv_internal.h
++++ libavcodec/qsv_internal.h
+@@ -56,6 +56,8 @@
+ 
+ #define QSV_MAX_FRAME_EXT_PARAMS 4
+ 
++#define QSV_PAYLOAD_SIZE 1024
++
+ #define QSV_VERSION_ATLEAST(MAJOR, MINOR)   \
+     (MFX_VERSION_MAJOR > (MAJOR) ||         \
+      MFX_VERSION_MAJOR == (MAJOR) && MFX_VERSION_MINOR >= (MINOR))
+Index: FFmpeg/libavcodec/qsvdec.c
+===================================================================
+--- libavcodec/qsvdec.c
++++ libavcodec/qsvdec.c
+@@ -43,13 +43,16 @@
+ #include "libavutil/film_grain_params.h"
+ #include "libavutil/mastering_display_metadata.h"
+ #include "libavutil/avassert.h"
++#include "libavutil/stereo3d.h"
+ 
+ #include "avcodec.h"
+ #include "codec_internal.h"
+ #include "internal.h"
+ #include "decode.h"
+ #include "hwconfig.h"
++#include "get_bits.h"
+ #include "qsv.h"
++#include "h264_sei.h"
+ #include "qsv_internal.h"
+ #include "refstruct.h"
+ 
+@@ -111,8 +114,13 @@ typedef struct QSVContext {
+ 
+     char *load_plugins;
+ 
++    mfxPayload payload;
++
+     mfxExtBuffer **ext_buffers;
+     int         nb_ext_buffers;
++
++    H264SEIContext sei;
++    H264ParamSets ps;
+ } QSVContext;
+ 
+ static const AVCodecHWConfigInternal *const qsv_hw_configs[] = {
+@@ -784,6 +792,147 @@ static int qsv_export_hdr_side_data_av1(
+ 
+ #endif
+ 
++static int h264_decode_fpa(H2645SEIFramePacking *fpa, AVFrame *frame)
++{
++    if (!fpa || !frame) {
++        return AVERROR(EINVAL);
++    }
++
++    if (!fpa->arrangement_cancel_flag &&
++        fpa->arrangement_type <= 6 &&
++        fpa->content_interpretation_type > 0 &&
++        fpa->content_interpretation_type < 3) {
++        AVStereo3D *stereo = av_stereo3d_create_side_data(frame);
++        if (stereo) {
++            switch (fpa->arrangement_type) {
++            case 0:
++                stereo->type = AV_STEREO3D_CHECKERBOARD;
++                break;
++            case 1:
++                stereo->type = AV_STEREO3D_COLUMNS;
++                break;
++            case 2:
++                stereo->type = AV_STEREO3D_LINES;
++                break;
++            case 3:
++                if (fpa->quincunx_sampling_flag)
++                    stereo->type = AV_STEREO3D_SIDEBYSIDE_QUINCUNX;
++                else
++                    stereo->type = AV_STEREO3D_SIDEBYSIDE;
++                break;
++            case 4:
++                stereo->type = AV_STEREO3D_TOPBOTTOM;
++                break;
++            case 5:
++                stereo->type = AV_STEREO3D_FRAMESEQUENCE;
++                if (fpa->current_frame_is_frame0_flag)
++                    stereo->view = AV_STEREO3D_VIEW_LEFT;
++                else
++                    stereo->view = AV_STEREO3D_VIEW_RIGHT;
++                break;
++            case 6:
++                stereo->type = AV_STEREO3D_2D;
++                break;
++            }
++
++            if (fpa->content_interpretation_type == 2)
++                stereo->flags = AV_STEREO3D_FLAG_INVERT;
++        }
++    }
++    return 0;
++}
++
++static int h264_parse_side_data(AVCodecContext *avctx, QSVContext *q, AVFrame *frame)
++{
++    GetBitContext gb_payload;
++    uint8_t *sei_buffer;
++    int sei_buffer_index;
++    int ret;
++
++    /* remove emulation prevention bytes */
++    sei_buffer = (uint8_t *)av_mallocz(q->payload.NumBit / 8);
++    if (!sei_buffer) {
++        av_freep(&sei_buffer);
++        return AVERROR(ENOMEM);
++    }
++    sei_buffer_index = 0;
++    for (int i = 0; i < q->payload.NumBit / 8; i++) {
++        if (q->payload.Data[i] == 3)
++            i++;
++        sei_buffer[sei_buffer_index] = q->payload.Data[i];
++        sei_buffer_index += 1;
++    }
++
++    ret = init_get_bits8(&gb_payload, sei_buffer, sei_buffer_index+1);
++    if (ret < 0) {
++        av_freep(&sei_buffer);
++        return ret;
++    }
++
++    ret = ff_h264_sei_decode(&q->sei, &gb_payload, &q->ps, avctx);
++    if (ret < 0) {
++        av_freep(&sei_buffer);
++        return ret;
++    }
++
++    switch (q->payload.Type) {
++    case SEI_TYPE_FRAME_PACKING_ARRANGEMENT:
++        ret = h264_decode_fpa(&q->sei.common.frame_packing, frame);
++        break;
++    default:
++        break;
++    }
++
++    av_freep(&sei_buffer);
++    return ret;
++}
++
++static int extract_frame_side_data(AVCodecContext *avctx, QSVContext *q, AVFrame *frame)
++{
++    mfxU64 ts;
++    mfxStatus sts;
++    int ret = 0;
++
++    if (q->payload.BufSize == 0) {
++        q->payload.Data = av_mallocz(QSV_PAYLOAD_SIZE);
++        if (!q->payload.Data) {
++            av_freep(&q->payload.Data);
++            return AVERROR(ENOMEM);
++        }
++        q->payload.BufSize = QSV_PAYLOAD_SIZE;
++    }
++
++    sts = MFX_ERR_NONE;
++    while (sts == MFX_ERR_NONE) {
++
++        sts = MFXVideoDECODE_GetPayload(q->session, &ts, &q->payload);
++
++        if (sts == MFX_ERR_NOT_ENOUGH_BUFFER) {
++            av_log(avctx, AV_LOG_VERBOSE, "Space for SEI is not enough. One SEI will be skipped\n");
++            continue;
++        } else if (sts != MFX_ERR_NONE || q->payload.NumBit == 0) {
++            break;
++        }
++
++        if (q->payload.Type != SEI_TYPE_FRAME_PACKING_ARRANGEMENT)
++            continue;
++
++        switch (avctx->codec_id) {
++        case AV_CODEC_ID_H264:
++            ret = h264_parse_side_data(avctx, q, frame);
++            break;
++        default:
++            break;
++        }
++
++        if (ret < 0) {
++            av_log(avctx, AV_LOG_VERBOSE, "parse side data failed\n");
++            break;
++        }
++    }
++    return ret;
++}
++
+ static int qsv_decode(AVCodecContext *avctx, QSVContext *q,
+                       AVFrame *frame, int *got_frame,
+                       const AVPacket *avpkt)
+@@ -895,6 +1044,10 @@ static int qsv_decode(AVCodecContext *av
+ 
+         outsurf = &aframe.frame->surface;
+ 
++        ret = extract_frame_side_data(avctx, q, frame);
++        if (ret < 0)
++            av_log(avctx, AV_LOG_WARNING, "Extracting side from packet failed\n");
++
+         frame->pts = MFX_PTS_TO_PTS(outsurf->Data.TimeStamp, avctx->pkt_timebase);
+ #if QSV_VERSION_ATLEAST(1, 34)
+         if ((avctx->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN) &&
+@@ -985,6 +1138,8 @@ static void qsv_decode_close_qsvcontext(
+     av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
+     ff_refstruct_unref(&q->frames_ctx.mids);
+     av_buffer_pool_uninit(&q->pool);
++
++    av_freep(&q->payload.Data);
+ }
+ 
+ static int qsv_process_data(AVCodecContext *avctx, QSVContext *q,
+Index: FFmpeg/libavcodec/qsvenc.c
+===================================================================
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -205,6 +205,7 @@ static void dump_video_param(AVCodecCont
+ #endif
+ 
+     const char *tmp_str = NULL;
++    mfxExtHEVCParam *exthevcparam = NULL;
+ 
+     if (q->co2_idx > 0)
+         co2 = (mfxExtCodingOption2*)coding_opts[q->co2_idx];
+@@ -220,6 +221,8 @@ static void dump_video_param(AVCodecCont
+         exthypermodeparam = (mfxExtHyperModeParam *)coding_opts[q->exthypermodeparam_idx];
+ #endif
+ 
++    if (q->exthevcparam_idx > 0)
++        exthevcparam = (mfxExtHEVCParam *)coding_opts[q->exthevcparam_idx];
+     av_log(avctx, AV_LOG_VERBOSE, "profile: %s; level: %"PRIu16"\n",
+            print_profile(avctx->codec_id, info->CodecProfile), info->CodecLevel);
+ 
+@@ -400,6 +403,11 @@ static void dump_video_param(AVCodecCont
+         av_log(avctx, AV_LOG_VERBOSE, "\n");
+     }
+ #endif
++    if (exthevcparam &&
++        exthevcparam->GeneralConstraintFlags == MFX_HEVC_CONSTR_REXT_ONE_PICTURE_ONLY &&
++        avctx->codec_id == AV_CODEC_ID_HEVC &&
++        info->CodecProfile == MFX_PROFILE_HEVC_MAIN10)
++        av_log(avctx, AV_LOG_VERBOSE, "Main10sp (Main10 profile and one_pic_only flag): enable\n");
+ }
+ 
+ static void dump_video_vp9_param(AVCodecContext *avctx, QSVEncContext *q,
+@@ -1211,6 +1219,18 @@ static int init_video_param(AVCodecConte
+         q->extparam_internal[q->nb_extparam_internal++] = (mfxExtBuffer *)&q->exthevctiles;
+     }
+ 
++    if (avctx->codec_id == AV_CODEC_ID_HEVC && q->main10sp) {
++        if (QSV_RUNTIME_VERSION_ATLEAST(q->ver, 2, 0)) {
++            q->param.mfx.CodecProfile = MFX_PROFILE_HEVC_MAIN10;
++            q->exthevcparam.Header.BufferId = MFX_EXTBUFF_HEVC_PARAM;
++            q->exthevcparam.Header.BufferSz = sizeof(q->exthevcparam);
++            q->exthevcparam.GeneralConstraintFlags = MFX_HEVC_CONSTR_REXT_ONE_PICTURE_ONLY;
++            q->extparam_internal[q->nb_extparam_internal++] = (mfxExtBuffer *)&q->exthevcparam;
++        } else
++            av_log(avctx, AV_LOG_WARNING,
++                   "This version of runtime doesn't support 10bit single still picture\n");
++    }
++
+     q->extvsi.VideoFullRange = (avctx->color_range == AVCOL_RANGE_JPEG);
+     q->extvsi.ColourDescriptionPresent = 0;
+ 
+@@ -1463,12 +1483,17 @@ static int qsv_retrieve_enc_params(AVCod
+     };
+ #endif
+ 
+-    mfxExtBuffer *ext_buffers[6 + QSV_HAVE_HE];
++    mfxExtHEVCParam hevc_param_buf = {
++        .Header.BufferId = MFX_EXTBUFF_HEVC_PARAM,
++        .Header.BufferSz = sizeof(hevc_param_buf),
++    };
+ 
++    mfxExtBuffer *ext_buffers[7 + QSV_HAVE_HE];
+     int need_pps = avctx->codec_id != AV_CODEC_ID_MPEG2VIDEO;
+     int ret, ext_buf_num = 0, extradata_offset = 0;
+ 
+     q->co2_idx = q->co3_idx = q->exthevctiles_idx = q->exthypermodeparam_idx = -1;
++    q->exthevcparam_idx = -1;
+     ext_buffers[ext_buf_num++] = (mfxExtBuffer*)&extradata;
+     ext_buffers[ext_buf_num++] = (mfxExtBuffer*)&co;
+ 
+@@ -1496,6 +1521,10 @@ static int qsv_retrieve_enc_params(AVCod
+         ext_buffers[ext_buf_num++] = (mfxExtBuffer*)&hyper_mode_param_buf;
+     }
+ #endif
++    if (avctx->codec_id == AV_CODEC_ID_HEVC && QSV_RUNTIME_VERSION_ATLEAST(q->ver, 2, 0)) {
++        q->exthevcparam_idx = ext_buf_num;
++        ext_buffers[ext_buf_num++] = (mfxExtBuffer*)&hevc_param_buf;
++    }
+ 
+     q->param.ExtParam    = ext_buffers;
+     q->param.NumExtParam = ext_buf_num;
+Index: FFmpeg/libavcodec/qsvenc.h
+===================================================================
+--- libavcodec/qsvenc.h
++++ libavcodec/qsvenc.h
+@@ -177,6 +177,7 @@ typedef struct QSVEncContext {
+     mfxExtMultiFrameControl extmfc;
+ #endif
+     mfxExtHEVCTiles exthevctiles;
++    mfxExtHEVCParam exthevcparam;
+     mfxExtVP9Param  extvp9param;
+ #if QSV_HAVE_EXT_AV1_PARAM
+     mfxExtAV1TileParam extav1tileparam;
+@@ -193,7 +194,7 @@ typedef struct QSVEncContext {
+ 
+     mfxExtVideoSignalInfo extvsi;
+ 
+-    mfxExtBuffer  *extparam_internal[5 + (QSV_HAVE_MF * 2) + (QSV_HAVE_EXT_AV1_PARAM * 2) + QSV_HAVE_HE];
++    mfxExtBuffer  *extparam_internal[6 + (QSV_HAVE_MF * 2) + (QSV_HAVE_EXT_AV1_PARAM * 2) + QSV_HAVE_HE];
+     int         nb_extparam_internal;
+ 
+     mfxExtBuffer  **extparam_str;
+@@ -321,6 +322,9 @@ typedef struct QSVEncContext {
+     int dual_gfx;
+ 
+     AVDictionary *qsv_params;
++    int exthevcparam_idx;
++    int main10sp;
++
+ } QSVEncContext;
+ 
+ int ff_qsv_enc_init(AVCodecContext *avctx, QSVEncContext *q);
+Index: FFmpeg/libavcodec/qsvenc_hevc.c
+===================================================================
+--- libavcodec/qsvenc_hevc.c
++++ libavcodec/qsvenc_hevc.c
+@@ -363,6 +363,9 @@ static const AVOption options[] = {
+     { "int_ref_qp_delta",   "QP difference for the refresh MBs",                 OFFSET(qsv.int_ref_qp_delta),        AV_OPT_TYPE_INT, { .i64 = INT16_MIN }, INT16_MIN,  INT16_MAX, VE },
+     { "int_ref_cycle_dist",   "Distance between the beginnings of the intra-refresh cycles in frames",  OFFSET(qsv.int_ref_cycle_dist),      AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT16_MAX, VE },
+ 
++#if QSV_ONEVPL
++    { "main10sp", "This profile allow to encode 10 bit single still picture", OFFSET(qsv.main10sp), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE},
++#endif
+     { NULL },
+ };
+ 
