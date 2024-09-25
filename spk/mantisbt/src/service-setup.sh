@@ -197,9 +197,10 @@ service_postinst ()
             rsync -aX -I "${SYNOPKG_PKGDEST}/web/config_inc.php" "${CFG_FILE}" 2>&1
             # Setup configuration file
             sed -i -e "s/@password@/${wizard_mysql_password_mantisbt:=mantisbt}/g" ${CFG_FILE}
-            # Generate random string
             RAND_STR=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 64)
+            INTERNAL_IP=$(ip -4 route get 8.8.8.8 | awk '/8.8.8.8/ && /src/ {print $NF}')
             sed -i -e "s/@rand_str@/${RAND_STR}/g" ${CFG_FILE}
+            sed -i -e "s/@web_url@/http:\/\/${INTERNAL_IP}\/mantisbt\//g" ${CFG_FILE}
             # Install/upgrade database
             echo "Run ${SC_DNAME} installer"
             sed -i -e "s/gpc_get_int( 'install', 0 );/gpc_get_int( 'install', 2 );/g" ${WEB_ROOT}/admin/install.php
