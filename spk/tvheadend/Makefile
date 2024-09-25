@@ -16,6 +16,9 @@ export TVH_VERS
 FFMPEG_PACKAGE = ffmpeg7
 SPK_DEPENDS = 'python311>=3.11.4-7:$(FFMPEG_PACKAGE)'
 
+# ffmpeg7 requires c11 support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
 WHEELS = src/requirements-pure.txt
 
 DEPENDS = cross/$(SPK_NAME)

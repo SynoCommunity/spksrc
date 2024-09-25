@@ -7,6 +7,9 @@ FFMPEG_PACKAGE = ffmpeg7
 DEPENDS = cross/$(SPK_NAME)
 SPK_DEPENDS = $(FFMPEG_PACKAGE)
 
+# ffmpeg7 requires c11 support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
 STARTABLE = no
 
 MAINTAINER = ymartin59

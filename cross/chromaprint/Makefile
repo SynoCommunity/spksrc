@@ -17,7 +17,7 @@ LICENSE  = LGPL2.1+
 
 OPTIONAL_DEPENDS = cross/ffmpeg7
 
-# compiler too old
+# ffmpeg7 requires c11 support
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 CMAKE_ARGS += -DBUILD_TOOLS=ON
