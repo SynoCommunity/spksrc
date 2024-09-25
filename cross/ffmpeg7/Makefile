@@ -93,9 +93,6 @@ CONFIGURE_ARGS += --enable-libmp3lame
 DEPENDS += cross/libbluray
 CONFIGURE_ARGS += --enable-libbluray
 
-DEPENDS += cross/libssh2
-CONFIGURE_ARGS += --enable-libssh
-
 DEPENDS += cross/speex
 CONFIGURE_ARGS += --enable-libspeex
 

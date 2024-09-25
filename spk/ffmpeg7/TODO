@@ -13,6 +13,7 @@ Potential candidates for enablement:
   --enable-libflite 
   --enable-libgme 
   --enable-libgsm 
+  --enable-libssh
   --enable-libmysofa 
   --enable-libopenmpt 
   --enable-librubberband 
