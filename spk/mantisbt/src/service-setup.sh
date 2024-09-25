@@ -175,12 +175,19 @@ service_postinst ()
                 chown -R ${WEB_USER}:${WEB_GROUP} ${TEMPDIR} 2>/dev/null
             fi
 
-            # Restore configuration and data
-            echo "Restoring configuration and data to ${WEB_DIR}"
-            rsync -aX -I "${TEMPDIR}/${SYNOPKG_PKGNAME}" "${WEB_DIR}/" 2>&1
+            # Restore configuration
+            echo "Restoring configuration to ${WEB_DIR}/config"
+            # Restore the configuration file
+            rsync -aX -I ${TEMPDIR}/${SYNOPKG_PKGNAME}/config_inc.php ${WEB_ROOT}/config/ 2>&1
+            # Restore custom files
+            for file in "${TEMPDIR}/${SYNOPKG_PKGNAME}"/custom*
+            do
+                rsync -aX -I $file ${WEB_ROOT}/config/ 2>&1
+            done
 
             # Update database password
-            sed -i "s/^\(\s*\$g_db_password\s*=\s*'\).*\(';\s*\)$/\1${wizard_mysql_password_mantisbt}\2/" ${CFG_FILE}
+            MARIADB_PASSWORD_ESCAPED=$(printf '%s' "${wizard_mysql_password_mantisbt}" | sed 's/[&/\]/\\&/g')
+            sed -i "s|^\(\s*\$g_db_password\s*=\s*'\).*\(';\s*\)$|\1${MARIADB_PASSWORD_ESCAPED}\2|" ${CFG_FILE}
 
             # Restore the Database
             echo "Restoring database to ${MYSQL_DATABASE}"
@@ -195,16 +202,21 @@ service_postinst ()
         else
             # Install config file
             rsync -aX -I "${SYNOPKG_PKGDEST}/web/config_inc.php" "${CFG_FILE}" 2>&1
+
             # Setup configuration file
             sed -i -e "s/@password@/${wizard_mysql_password_mantisbt:=mantisbt}/g" ${CFG_FILE}
             RAND_STR=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 64)
             INTERNAL_IP=$(ip -4 route get 8.8.8.8 | awk '/8.8.8.8/ && /src/ {print $NF}')
             sed -i -e "s/@rand_str@/${RAND_STR}/g" ${CFG_FILE}
             sed -i -e "s/@web_url@/http:\/\/${INTERNAL_IP}\/mantisbt\//g" ${CFG_FILE}
+            
             # Install/upgrade database
             echo "Run ${SC_DNAME} installer"
             sed -i -e "s/gpc_get_int( 'install', 0 );/gpc_get_int( 'install', 2 );/g" ${WEB_ROOT}/admin/install.php
-            exec_php ${WEB_ROOT}/admin/install.php
+            exec_php ${WEB_ROOT}/admin/install.php > /dev/null
+
+            # Remove admin directory
+            rm -fr ${WEB_ROOT}/admin/
         fi
     fi
 }
@@ -237,17 +249,22 @@ service_preuninst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
         # Prepare archive structure
-        if [ -f "${WEB_ROOT}/config/installed_version.php" ]; then
-            FENG_VER=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/config/installed_version.php | xargs)
-        else
-            FENG_VER=$(sed -n "s|return '\(.*\)';|\1|p" ${WEB_ROOT}/version.php | xargs)
+        if [ -f "${WEB_ROOT}/core/constant_inc.php" ]; then
+            MANTIS_VER=$(sed -n "s|define[ \t]*([ \t]*'MANTIS_VERSION'[ \t]*,[ \t]*'\(.*\)'[ \t]*);|\1|p" ${WEB_ROOT}/core/constant_inc.php | xargs)
         fi
-        TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${FENG_VER}_$(date +"%Y%m%d")"
+        TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${MANTIS_VER}_$(date +"%Y%m%d")"
         ${MKDIR} "${TEMPDIR}"
 
-        # Backup Directories
-        echo "Copying previous configuration and data from ${WEB_ROOT}"
-        rsync -aX "${WEB_ROOT}" "${TEMPDIR}/" 2>&1
+        # Backup the configuration file
+        echo "Copying previous configuration and data from ${WEB_ROOT}/config"
+        ${MKDIR} "${TEMPDIR}/config"
+        rsync -aX ${WEB_ROOT}/config/config_inc.php "${TEMPDIR}/config/" 2>&1
+
+        # Backup custom files
+        for file in "${WEB_ROOT}/config"/custom*
+        do
+            rsync -aX $file "${TEMPDIR}/config/" 2>&1
+        done
 
         # Backup the Database
         echo "Copying previous database from ${MYSQL_DATABASE}"
@@ -319,27 +336,27 @@ service_save ()
 {
     # Prepare temp folder
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
-    mkdir -p ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
+    ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     
     # Save the configuration file
-    mv ${WEB_ROOT}/config/config_inc.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/
+    rsync -aX ${WEB_ROOT}/config/config_inc.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/ 2>&1
 
     # Save custom files
-    for file in ${WEB_ROOT}/custom*
+    for file in "${WEB_ROOT}/config"/custom*
     do
-        mv $file ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/
+        rsync -aX $file ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/ 2>&1
     done
 }
 
 service_restore ()
 {
     # Restore the configuration file
-    mv ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config_inc.php ${WEB_ROOT}/config/
+    rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config_inc.php ${WEB_ROOT}/config/ 2>&1
 
     # Restore custom files
-    for file in ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/custom*
+    for file in "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"/custom*
     do
-        mv $file ${WEB_ROOT}/
+        rsync -aX -I $file ${WEB_ROOT}/config/ 2>&1
     done
 
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
