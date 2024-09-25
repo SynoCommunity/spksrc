@@ -232,6 +232,7 @@ endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
+CONFIGURE_ARGS += --disable-avx
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
@@ -241,6 +242,7 @@ ifeq ($(strip $(VIDEODRV_PACKAGE)),)
 DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
 endif
 CONFIGURE_ARGS += --arch=x86_64
+CONFIGURE_ARGS += --disable-avx
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-libmfx
 CONFIGURE_ARGS += --enable-vaapi
