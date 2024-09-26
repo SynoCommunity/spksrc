@@ -15,7 +15,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Mantis is an easily deployable, web based bugtracker to aid product bug tracking. It requires PHP, MySQL and a web server. It is simpler than Bugzilla and easily editable.
 DESCRIPTION_FRE = Mantis est un bugtracker web aisément déployable pour faciliter le suivi des bogues. Il nécessite PHP, MySQL et un serveur web. Il est plus simple d\'accès que Bugzilla et facilement modifiable.
 DISPLAY_NAME = MantisBT
-CHANGELOG = Fix issue where new installs on DSM6 did not work
+CHANGELOG = "1. Update to v2.26.3.<br/>2. Add PHP profiles for DSM 6.<br/>3. Add backup and restore functions."
 
 HOMEPAGE   = https://www.mantisbt.org
 LICENSE    = GPL
