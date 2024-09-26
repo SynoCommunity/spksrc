@@ -31,7 +31,7 @@
             {
                 "alias": "mantisbt",
                 "app": "com.synocommunity.packages.mantisbt",
-                "name": "Feng Office",
+                "name": "MantisBT",
                 "service": "mantisbt",
                 "type": "alias"
             }
@@ -39,7 +39,7 @@
         "services": [
             {
                 "backend": 2,
-                "display_name": "Feng Office",
+                "display_name": "MantisBT",
                 "icon": "app/images/mantisbt-{0}.png",
                 "php": {
                     "backend": 8,
