@@ -16,8 +16,12 @@ export TVH_VERS
 FFMPEG_PACKAGE = ffmpeg7
 SPK_DEPENDS = 'python311>=3.11.4-7:$(FFMPEG_PACKAGE)'
 
+# PPC archs except qoriq are not supported
+# https://tvheadend.org/issues/5060
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 # ffmpeg7 requires c11 support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+
 
 WHEELS = src/requirements-pure.txt
 
@@ -33,10 +37,6 @@ STARTABLE = yes
 CHANGELOG = "1. Update to latest git version 55404da as of Sept. 20th 2024<br/>2. Update to FFMPEG 7.0.2"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
-
-# PPC archs except qoriq are not supported
-# https://tvheadend.org/issues/5060
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 CONF_DIR = src/conf/
 
