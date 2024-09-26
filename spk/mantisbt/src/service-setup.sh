@@ -200,7 +200,7 @@ service_postinst ()
             exec_php ${WEB_ROOT}/admin/install.php > /dev/null
 
             # Remove admin directory
-            rm -fr ${WEB_ROOT}/admin/
+            ${RM} "${WEB_ROOT}/admin"
 
             # Clean-up temporary files
             ${RM} "${TEMPDIR}"
@@ -221,7 +221,7 @@ service_postinst ()
             exec_php ${WEB_ROOT}/admin/install.php > /dev/null
 
             # Remove admin directory
-            rm -fr ${WEB_ROOT}/admin/
+            ${RM} "${WEB_ROOT}/admin"
         fi
     fi
 }
@@ -369,6 +369,11 @@ service_restore ()
             rsync -aX -I $file ${WEB_ROOT}/config/ 2>&1
         fi
     done
+
+    # Remove admin directory
+    if [ -d "${WEB_ROOT}/admin" ]; then
+        ${RM} "${WEB_ROOT}/admin"
+    fi
 
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
 }
