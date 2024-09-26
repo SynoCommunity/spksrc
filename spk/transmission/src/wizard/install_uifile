@@ -1,22 +1,4 @@
-#!/bin/bash
-
-quote_json () {
-    sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
-}
-
-page_append ()
-{
-    if [ -z "$1" ]; then
-        echo "$2"
-    elif [ -z "$2" ]; then
-        echo "$1"
-    else
-        echo "$1,$2"
-    fi
-}
-
-PAGE_BASE_CONFIG=$(/bin/cat<<EOF
-{
+[{
     "step_title": "Basic configuration",
     "invalid_next_disabled_v2": true,
     "items": [{
@@ -29,8 +11,8 @@ PAGE_BASE_CONFIG=$(/bin/cat<<EOF
                     "validator": {
                         "allowBlank": false,
                         "regex": {
-                            "expr": "/^[\\\w.][\\\w. -]{0,30}[\\\w.-][\\\\$]?$|^[\\\w][\\\\$]?$/",
-                            "errorText": "Subdirectories are not supported."
+                            "expr": "/^[\\w.][\\w. -]{0,30}[\\w.-]\\$?$|^[\\w]\\$?$/",
+                            "errorText": "The shared folder name contains invalid characters or starts/ends with a space."
                         }
                     }
                 }
@@ -63,14 +45,4 @@ PAGE_BASE_CONFIG=$(/bin/cat<<EOF
     "items": [{
         "desc": "Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
     }]
-}
-EOF
-)
-
-main () {
-    local install_page=""
-    install_page=$(page_append "$install_page" "$PAGE_BASE_CONFIG")
-    echo "[$install_page]" > "${SYNOPKG_TEMP_LOGFILE}"
-}
-
-main "$@"
+}]
