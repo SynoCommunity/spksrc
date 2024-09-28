@@ -177,7 +177,7 @@ service_postinst ()
 
             # Restore configuration file
             echo "Restoring configuration to ${WEB_DIR}/config"
-            rsync -aX -I ${TEMPDIR}/config.inc.php ${CFG_FILE} 2>&1
+            rsync -aX -I ${TEMPDIR}/config/config.inc.php ${CFG_FILE} 2>&1
 
             # Restore user installed plugins
             if [ -n "$(find "${TEMPDIR}/plugins" -maxdepth 0 -type d -not -empty 2>/dev/null)" ]; then
@@ -205,7 +205,7 @@ service_postinst ()
 
             # Update database password
             MARIADB_PASSWORD_ESCAPED=$(printf '%s' "${wizard_mysql_password_roundcube}" | sed 's/[&/\]/\\&/g')
-            sed -i "s|\(\$config\['db_dsnw'\] = 'mysql://roundcube:\)[^@]*\(@unix(/run/mysqld/mysqld10.sock)/roundcube';\)|\1${MARIADB_PASSWORD_ESCAPED}\2|" "${CFG_FILE}"
+            sed -i "s|\(\$config\['db_dsnw'\] = 'mysqli://roundcube:\)[^@]*\(@unix(/run/mysqld/mysqld10.sock)/roundcube';\)|\1${MARIADB_PASSWORD_ESCAPED}\2|" "${CFG_FILE}"
 
             # Restore the Database
             echo "Restoring database to ${MYSQL_DATABASE}"
