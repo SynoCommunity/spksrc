@@ -143,6 +143,18 @@ EOF
     echo "$DEACTIVAETE" | quote_json
 }
 
+getPasswordValidator()
+{
+    validator=$(/bin/cat<<EOF
+{
+    var password = arguments[0];
+    return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})");
+}
+EOF
+)
+    echo "$validator" | quote_json
+}
+
 # Check for multiple PHP profiles
 check_php_profiles ()
 {
@@ -236,14 +248,14 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
         "type": "textfield",
         "desc": "Log-in IMAP server. Leave blank to show a textbox at login. (Sample usage: 'ssl://imap.gmail.com:993', 'localhost', or blank)",
         "subitems": [{
-            "key": "wizard_roundcube_default_host",
+            "key": "wizard_roundcube_imap_host",
             "desc": "Default host"
         }]
     }, {
         "type": "textfield",
-        "desc": "SMTP server. (Sample usage: 'ssl://smtp.gmail.com', 'localhost', or blank for PHP mail() function)",
+        "desc": "SMTP server. (Sample usage: 'ssl://smtp.gmail.com:465', 'localhost', or blank for PHP mail() function)",
         "subitems": [{
-            "key": "wizard_roundcube_smtp_server",
+            "key": "wizard_roundcube_smtp_host",
             "desc": "SMTP server",
             "defaultValue": "localhost"
         }]
@@ -252,17 +264,6 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
     "step_title": "${SMTP_STEP_TITLE}",
     "invalid_next_disabled_v2": true,
     "items": [{
-        "type": "textfield",
-        "desc": "SMTP port (default is 25; 465 for SSL; 587 for submission)",
-        "subitems": [{
-            "key": "wizard_roundcube_smtp_port",
-            "desc": "SMTP port",
-            "defaultValue": "25",
-            "validator": {
-                "allowBlank": false
-            }
-        }]
-    }, {
         "type": "textfield",
         "desc": "SMTP username (if required)",
         "subitems": [{

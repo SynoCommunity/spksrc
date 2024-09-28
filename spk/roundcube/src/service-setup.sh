@@ -219,9 +219,8 @@ service_postinst ()
 
             # Setup configuration file
             sed -e "s|^\(\$config\['db_dsnw'\] =\).*$|\1 \'mysqli://roundcube:${wizard_mysql_password_roundcube}@unix(/run/mysqld/mysqld10.sock)/roundcube\';|" \
-                -e "s|^\(\$config\['default_host'\] =\).*$|\1 \'${wizard_roundcube_default_host}\';|" \
-                -e "s|^\(\$config\['smtp_server'\] =\).*$|\1 \'${wizard_roundcube_smtp_server}\';|" \
-                -e "s|^\(\$config\['smtp_port'\] =\).*$|\1 \'${wizard_roundcube_smtp_port:=25}\';|" \
+                -e "s|^\(\$config\['imap_host'\] =\).*$|\1 \'${wizard_roundcube_imap_host}\';|" \
+                -e "s|^\(\$config\['smtp_host'\] =\).*$|\1 \'${wizard_roundcube_smtp_host}\';|" \
                 -e "s|^\(\$config\['smtp_user'\] =\).*$|\1 \'${wizard_roundcube_smtp_user}\';|" \
                 -e "s|^\(\$config\['smtp_pass'\] =\).*$|\1 \'${wizard_roundcube_smtp_pass}\';|" \
                 ${WEB_ROOT}/config/config.inc.php.sample > ${CFG_FILE}
