@@ -180,24 +180,28 @@ service_postinst ()
             rsync -aX -I ${TEMPDIR}/config.inc.php ${CFG_FILE} 2>&1
 
             # Restore user installed plugins
-            echo "Restoring user installed plugins to ${WEB_DIR}/plugins"
-            for plugin in "${TEMPDIR}/plugins"/*/
-            do
-                dir=$(basename $plugin)
-                if [ ! -d ${WEB_ROOT}/plugins/${dir} ]; then
-                    rsync -aX -I ${TEMPDIR}/plugins/${dir} ${WEB_ROOT}/plugins/ 2>&1
-                fi
-            done
+            if [ -n "$(find "${TEMPDIR}/plugins" -maxdepth 0 -type d -not -empty 2>/dev/null)" ]; then
+                echo "Restoring user installed plugins to ${WEB_DIR}/plugins"
+                for plugin in "${TEMPDIR}/plugins"/*/
+                do
+                    dir=$(basename $plugin)
+                    if [ ! -d "${WEB_ROOT}/plugins/${dir}" ]; then
+                        rsync -aX -I ${TEMPDIR}/plugins/${dir} ${WEB_ROOT}/plugins/ 2>&1
+                    fi
+                done
+            fi
 
             # Restore user installed skins
-            echo "Restoring user installed skins to ${WEB_DIR}/skins"
-            for skin in "${TEMPDIR}/skin"/*/
-            do
-                dir=$(basename $skin)
-                if [ ! -d ${WEB_ROOT}/skins/${dir} ]; then
-                    rsync -aX -I ${TEMPDIR}/skins/${dir} ${WEB_ROOT}/skins/ 2>&1
-                fi
-            done
+            if [ -n "$(find "${TEMPDIR}/skins" -maxdepth 0 -type d -not -empty 2>/dev/null)" ]; then
+                echo "Restoring user installed skins to ${WEB_DIR}/skins"
+                for skin in "${TEMPDIR}/skins"/*/
+                do
+                    dir=$(basename $skin)
+                    if [ ! -d "${WEB_ROOT}/skins/${dir}" ]; then
+                        rsync -aX -I ${TEMPDIR}/skins/${dir} ${WEB_ROOT}/skins/ 2>&1
+                    fi
+                done
+            fi
 
             # Update database password
             MARIADB_PASSWORD_ESCAPED=$(printf '%s' "${wizard_mysql_password_roundcube}" | sed 's/[&/\]/\\&/g')
@@ -364,8 +368,12 @@ service_save ()
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     
     # Save pre 1.0.0 configuration files
-    rsync -aX ${WEB_ROOT}/config/db.inc.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/ 2>&1
-    rsync -aX ${WEB_ROOT}/config/main.inc.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/ 2>&1
+    if [ -f "${WEB_ROOT}/config/db.inc.php" ]; then
+        rsync -aX ${WEB_ROOT}/config/db.inc.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/ 2>&1
+    fi
+    if [ -f "${WEB_ROOT}/config/main.inc.php" ]; then
+        rsync -aX ${WEB_ROOT}/config/main.inc.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/ 2>&1
+    fi
 
     # Save configuration files for version >= 1.0.0
     rsync -aX ${CFG_FILE} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/ 2>&1
@@ -394,29 +402,37 @@ service_save ()
 service_restore ()
 {
     # Restore pre 1.0.0 configuration files, still 1.0.0 compatible
-    rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/db.inc.php ${WEB_ROOT}/config/db.inc.php 2>&1
-    rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/main.inc.php ${WEB_ROOT}/config/main.inc.php 2>&1
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/db.inc.php" ]; then
+        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/db.inc.php ${WEB_ROOT}/config/db.inc.php 2>&1
+    fi
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/main.inc.php" ]; then
+        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/main.inc.php ${WEB_ROOT}/config/main.inc.php 2>&1
+    fi
 
     # Restore configuration files for version >= 1.0.0
     rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config.inc.php ${CFG_FILE} 2>&1
 
     # Restore user installed plugins
-    for plugin in "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/plugins"/*/
-    do
-        dir=$(basename $plugin)
-        if [ ! -d ${WEB_ROOT}/plugins/${dir} ]; then
-            rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/plugins/${dir} ${WEB_ROOT}/plugins/ 2>&1
-        fi
-    done
+    if [ -n "$(find "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/plugins" -maxdepth 0 -type d -not -empty 2>/dev/null)" ]; then
+        for plugin in "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/plugins"/*/
+        do
+            dir=$(basename $plugin)
+            if [ ! -d "${WEB_ROOT}/plugins/${dir}" ]; then
+                rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/plugins/${dir} ${WEB_ROOT}/plugins/ 2>&1
+            fi
+        done
+    fi
 
     # Restore user installed skins
-    for skin in "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/skin"/*/
-    do
-        dir=$(basename $skin)
-        if [ ! -d ${WEB_ROOT}/skins/${dir} ]; then
-            rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/skins/${dir} ${WEB_ROOT}/skins/ 2>&1
-        fi
-    done
+    if [ -n "$(find "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/skins" -maxdepth 0 -type d -not -empty 2>/dev/null)" ]; then
+        for skin in "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/skins"/*/
+        do
+            dir=$(basename $skin)
+            if [ ! -d "${WEB_ROOT}/skins/${dir}" ]; then
+                rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/skins/${dir} ${WEB_ROOT}/skins/ 2>&1
+            fi
+        done
+    fi
 
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
 }
