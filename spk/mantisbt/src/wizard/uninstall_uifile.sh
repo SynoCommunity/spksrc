@@ -52,7 +52,7 @@ PAGE_UNINSTALL_CONFIG=$(/bin/cat<<EOF
 	"step_title": "Remove MantisBT database",
 	"invalid_next_disabled_v2": true,
 	"items": [{
-		"desc": "Attention: The '${SYNOPKG_PKGNAME}' database will be removed during package uninstallation. All users and projects will be deleted."
+		"desc": "Attention: The '${SYNOPKG_PKGNAME}' database will be removed during package uninstallation. All bug reports will be deleted."
 	}, {
 		"type": "password",
 		"desc": "Enter your MySQL superuser account password",
