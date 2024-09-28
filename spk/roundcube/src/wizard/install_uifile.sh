@@ -21,10 +21,12 @@ page_append ()
     fi
 }
 
+TYPE_STEP_TITLE="Roundcube Webmail installation type"
 DATABASE_STEP_TITLE="Roundcube Webmail database configuration"
 HOST_STEP_TITLE="Roundcube Webmail hosts configuration"
-CONFIRM_STEP_TITLE="Roundcube Webmail confirm restore"
 SMTP_STEP_TITLE="Roundcube Webmail SMTP configuration"
+CONFIRM_STEP_TITLE="Roundcube Webmail confirm restore"
+PHP_STEP_TITLE="Multiple PHP profiles"
 RESTORE_BACKUP_FILE="wizard_roundcube_restore"
 BACKUP_FILE_PATH="wizard_backup_file"
 RESTORE_ERROR_TEXT="An empty file path is not allowed when restore is enabled."
@@ -79,7 +81,7 @@ jsFunction=$(/bin/cat<<EOF
         return null;
     }
     function isRestoreChecked(wizardDialog) {
-        var typeStep = findStepByTitle(wizardDialog, "Roundcube Webmail installation type");
+        var typeStep = findStepByTitle(wizardDialog, "${TYPE_STEP_TITLE}");
         if (!typeStep) {
             return false;
         } else {
@@ -128,9 +130,14 @@ getDeActiveate()
     var hostStep = findStepByTitle(wizardDialog, "${HOST_STEP_TITLE}");
     var smtpStep = findStepByTitle(wizardDialog, "${SMTP_STEP_TITLE}");
     var confirmStep = findStepByTitle(wizardDialog, "${CONFIRM_STEP_TITLE}");
+    var phpStep = findStepByTitle(wizardDialog, "${PHP_STEP_TITLE}");
     var restoreChecked = isRestoreChecked(wizardDialog);
-    if (currentStep.headline === "Roundcube Webmail installation type") {
-        smtpStep.nextId = "applyStep";
+    if (currentStep.headline === "${TYPE_STEP_TITLE}") {
+        if (!phpStep) {
+            smtpStep.nextId = "applyStep";
+        } else {
+            smtpStep.nextId = phpStep.itemId;
+        }
         if (restoreChecked) {
             dbStep.nextId = confirmStep.itemId;
         } else {
@@ -171,7 +178,7 @@ check_php_profiles ()
 
 PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 {
-    "step_title": "Roundcube Webmail installation type",
+    "step_title": "${TYPE_STEP_TITLE}",
     "invalid_next_disabled_v2": true,
     "deactivate_v2": "$(getDeActiveate)",
     "items": [{
@@ -291,7 +298,7 @@ EOF
 
 PAGE_PHP_PROFILES=$(/bin/cat<<EOF
 {
-    "step_title": "Multiple PHP profiles",
+    "step_title": "${PHP_STEP_TITLE}",
     "items": [{
         "desc": "Attention: Multiple PHP profiles detected; the package webpage will not display until a DSM restart is performed to load new configurations."
     }]
@@ -301,10 +308,9 @@ EOF
 
 main () {
     local install_page=""
+    install_page=$(page_append "$install_page" "$PAGE_ADMIN_CONFIG")
     if check_php_profiles; then
         install_page=$(page_append "$install_page" "$PAGE_PHP_PROFILES")
-    else
-        install_page=$(page_append "$install_page" "$PAGE_ADMIN_CONFIG")
     fi
     echo "[$install_page]" > "${SYNOPKG_TEMP_LOGFILE}"
 }
