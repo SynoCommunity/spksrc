@@ -16,4 +16,10 @@ CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --without-x
 ADDITIONAL_CFLAGS = -O
 
+include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ADDITIONAL_LDFLAGS = -lrt 
+endif
+
 include ../../mk/spksrc.cross-cc.mk
