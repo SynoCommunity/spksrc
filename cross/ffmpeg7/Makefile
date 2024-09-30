@@ -17,6 +17,7 @@ CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include
 CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
 CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl -lm" --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
+CONFIGURE_ARGS += --enable-lto
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --disable-debug
@@ -238,7 +239,10 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 # Dependencies provided by synocli-videodriver
 # If built outside spksrc.videodriver.mk
 ifeq ($(strip $(VIDEODRV_PACKAGE)),)
-DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
+DEPENDS += cross/libva cross/libva-utils
+DEPENDS += cross/intel-vaapi-driver
+DEPENDS += cross/intel-media-driver cross/intel-mediasdk
+DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
 endif
 CONFIGURE_ARGS += --arch=x86_64
 CONFIGURE_ARGS += --enable-libdrm
@@ -249,7 +253,7 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 ##
-## GCC SPECIFIC
+## x64  & GCC SPECIFIC
 ##
 
 # OpenCL acceleration
@@ -268,6 +272,10 @@ endif
 CONFIGURE_ARGS += --enable-opencl
 endif
 endif
+
+##
+## GCC SPECIFIC
+##
 
 # libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
 ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
