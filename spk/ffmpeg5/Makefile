@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg5
-SPK_VERS = 5.1.5
-SPK_REV = 5
+SPK_VERS = 5.1.6
+SPK_REV = 6
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to version 5.1.5<br/>2. Update Jellyfin upstream patches<br/>3. Update Intel Media Driver 2024Q2 Release (DSM7 only)<br/>4. Enable OpenCL on Intel platforms (DSM7 only)<br/>5. Update to latest version of x264 (fix for \#6176)<br/>6. Now using new synocli-videodriver package"
+CHANGELOG = "1. Update to version 5.1.6"
 
 DEPENDS = cross/$(SPK_NAME)
 
