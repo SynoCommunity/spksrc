@@ -20,7 +20,7 @@ POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 SPK_COMMANDS  = bin/ffmpeg
 SPK_COMMANDS += bin/$(SPK_NAME)
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
 SERVICE_USER = auto
