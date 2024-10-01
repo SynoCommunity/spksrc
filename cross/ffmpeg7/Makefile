@@ -17,7 +17,6 @@ CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include
 CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
 CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl -lm" --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
-CONFIGURE_ARGS += --enable-lto
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --disable-debug
@@ -145,7 +144,6 @@ CONFIGURE_ARGS += --enable-libtwolame
 DEPENDS += cross/zvbi
 CONFIGURE_ARGS += --enable-libzvbi
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
 
@@ -158,10 +156,6 @@ CONFIGURE_ARGS += --enable-libvpx
 DEPENDS += cross/shine
 CONFIGURE_ARGS += --enable-libshine
 
-# end ifneq $(OLD_PPC_ARCHS)
-endif
-
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/chromaprint-fftw
 CONFIGURE_ARGS += --enable-chromaprint
 
@@ -176,9 +170,6 @@ CONFIGURE_ARGS += --enable-libzimg
 
 DEPENDS += cross/snappy
 CONFIGURE_ARGS += --enable-libsnappy
-
-# end ifneq $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-endif
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
@@ -206,33 +197,37 @@ endif
 ## ARCH SPECIFIC
 ##
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --disable-neon
-endif
-
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --enable-neon
+CONFIGURE_ARGS += --enable-thumb
+CONFIGURE_ARGS += --enable-lto
+CONFIGURE_ARGS += --disable-armv5te
+CONFIGURE_ARGS += --disable-armv6
+CONFIGURE_ARGS += --disable-armv6t2
+CONFIGURE_ARGS += --disable-vfp
 ifneq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb
+CONFIGURE_ARGS += --arch=arm64
+CONFIGURE_ARGS += --enable-neon
+CONFIGURE_ARGS += --enable-thumb
+CONFIGURE_ARGS += --enable-lto
 endif
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=ppc
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
-else
-CONFIGURE_ARGS += --cpu=e500 --disable-altivec
-endif
+CONFIGURE_ARGS += --enable-lto
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-CONFIGURE_ARGS += --arch=x86 --cpu=atom
+CONFIGURE_ARGS += --arch=x86
+CONFIGURE_ARGS += --cpu=atom
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
@@ -245,6 +240,7 @@ DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
 endif
 CONFIGURE_ARGS += --arch=x86_64
+CONFIGURE_ARGS += --enable-lto
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-libmfx
 CONFIGURE_ARGS += --enable-vaapi
