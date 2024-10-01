@@ -1,9 +1,0 @@
-bin:bin/lsgpu
-bin:bin/gputop
-bin:bin/intel_gpu_top
-lnk:lib/libigt.so
-lib:lib/libigt.so.0
-lnk:lib/libi915_perf.so
-lib:lib/libi915_perf.so.1.5
-lnk:lib/libxe_oa.so
-lib:lib/libxe_oa.so.1.5
