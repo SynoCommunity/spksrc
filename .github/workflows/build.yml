@@ -15,26 +15,10 @@ on:
         options:
           - 'true'
           - 'false'
-      add_srm12_builds:
-        description: 'Include SRM 1.2 archs'
+      add_dsm72_builds:
+        description: 'Include DSM 7.2 archs'
         required: false
         default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
-      add_dsm52_builds:
-        description: 'Include DSM 5.2 archs'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
-      add_dsm62_builds:
-        description: 'Include DSM 6.2 archs'
-        required: false
-        default: 'true'
         type: choice
         options:
           - 'true'
@@ -47,8 +31,24 @@ on:
         options:
           - 'true'
           - 'false'
-      add_dsm72_builds:
-        description: 'Include DSM 7.2 archs'
+      add_dsm62_builds:
+        description: 'Include DSM 6.2 archs'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      add_dsm52_builds:
+        description: 'Include DSM 5.2 archs'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      add_srm12_builds:
+        description: 'Include SRM 1.2 archs'
         required: false
         default: 'false'
         type: choice
