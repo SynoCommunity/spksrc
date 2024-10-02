@@ -2,8 +2,8 @@ PKG_NAME = tvheadend
 PKG_VERS = 4.3
 PKG_EXT = tar.gz
 # no official release since v4.2.8 (Jan 12, 2019)
-# git hash from Sept 4th 2024
-PKG_GIT_HASH = 9ac57a0c1a4551012260008cfca6bfc2386f6dcf
+# git hash from Sept 28th 2024
+PKG_GIT_HASH = 28de5c092c657ffbbffa422c2ca3c07ba513c567
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
@@ -16,8 +16,10 @@ LICENSE  = GPLv3
 # PPC archs except qoriq are not supported
 # https://tvheadend.org/issues/5060
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# ffmpeg7 requires c11 support
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
-OPTIONAL_DEPENDS += cross/ffmpeg6
+OPTIONAL_DEPENDS += cross/ffmpeg7
 OPTIONAL_DEPENDS += cross/fdk-aac
 OPTIONAL_DEPENDS += cross/fontconfig
 OPTIONAL_DEPENDS += cross/opus
@@ -88,7 +90,7 @@ MEDIA_LIBS += x264.pc
 MEDIA_LIBS += x265.pc
 
 else
-DEPENDS += cross/ffmpeg6
+DEPENDS += cross/ffmpeg7
 DEPENDS += cross/fdk-aac
 DEPENDS += cross/fontconfig
 DEPENDS += cross/opus

@@ -29,15 +29,35 @@ export ADDITIONAL_CXXFLAGS += -I$(VIDEODRV_STAGING_PREFIX)/include
 export ADDITIONAL_LDFLAGS  += -L$(VIDEODRV_STAGING_PREFIX)/lib
 export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(VIDEODRV_STAGING_PREFIX)/lib -Wl,--rpath,$(VIDEODRV_PREFIX)/lib
 
-# Re-use all default videodrv mandatory libraries
-VIDEODRV_LIBS := $(wildcard $(VIDEODRV_STAGING_PREFIX)/lib/pkgconfig/*.pc)
+# videodrv library to share with other packages
+VIDEODRV_PKGCFG  = igc-opencl.pc
+VIDEODRV_PKGCFG += igdgmm.pc
+VIDEODRV_PKGCFG += igfxcmrt.pc
+VIDEODRV_PKGCFG += level-zero.pc
+VIDEODRV_PKGCFG += libdrm_amdgpu.pc
+VIDEODRV_PKGCFG += libdrm_intel.pc
+VIDEODRV_PKGCFG += libdrm.pc
+VIDEODRV_PKGCFG += libdrm_radeon.pc
+VIDEODRV_PKGCFG += libmfxhw64.pc
+VIDEODRV_PKGCFG += libmfx.pc
+VIDEODRV_PKGCFG += libva-drm.pc
+VIDEODRV_PKGCFG += libva.pc
+VIDEODRV_PKGCFG += libze_loader.pc
+VIDEODRV_PKGCFG += mfx.pc
+VIDEODRV_PKGCFG += ocl-icd.pc
+VIDEODRV_PKGCFG += OpenCL.pc
+VIDEODRV_PKGCFG += pciaccess.pc
+VIDEODRV_PKGCFG += SPIRV-Tools.pc
+VIDEODRV_PKGCFG += SPIRV-Tools-shared.pc
+VIDEODRV_PKGCFG += vpl.pc
+
+# Re-use a default subset of videodrv mandatory libraries
+# This avoids sharing other built-in such as zlib and al
+# To share everything: $(wildcard $(VIDEODRV_STAGING_PREFIX)/lib/pkgconfig/*.pc)
+VIDEODRV_LIBS := $(wildcard $(patsubst %.pc,$(VIDEODRV_STAGING_PREFIX)/lib/pkgconfig/%.pc, $(VIDEODRV_PKGCFG)))
 endif
 
-# Re-use all videodrv dependencies and mark as already done
-VIDEODRV_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(VIDEODRV_PACKAGE_ROOT)/../) 2>/dev/null | grep ^$(VIDEODRV_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile))),$(wildcard $(VIDEODRV_PACKAGE_ROOT)/.$(cross)-*_done))
-
 # call-up pre-depend to prepare the shared videodrv build environment
-
 ifeq ($(strip $(PRE_DEPEND_TARGET)),)
 PRE_DEPEND_TARGET = videodrv_pre_depend
 endif
@@ -54,5 +74,5 @@ videodrv_pre_depend:
 	@$(MSG) "*** PATH: $(VIDEODRV_PACKAGE_ROOT)"
 	@$(MSG) "*****************************************************"
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
+	$(MSG) VIDEODRV_LIBS: $(VIDEODRV_LIBS)
 	@$(foreach lib,$(VIDEODRV_LIBS),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
-	@$(foreach _done,$(VIDEODRV_DEPENDS), ln -sf $(_done) $(WORK_DIR) ;)
