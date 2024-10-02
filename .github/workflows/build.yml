@@ -31,8 +31,8 @@ on:
         options:
           - 'true'
           - 'false'
-      add_dsm624_builds:
-        description: 'Include DSM 6.2.4 archs'
+      add_dsm62_builds:
+        description: 'Include DSM 6.2 archs'
         required: false
         default: 'true'
         type: choice
@@ -138,7 +138,7 @@ jobs:
             matrix+='{"arch": "88f6281-5.2"},'
             matrix+='{"arch": "ppc853x-5.2"},'
           fi
-          if [ "${{ github.event.inputs.add_dsm624_builds }}" == "true" ]; then
+          if [ "${{ github.event.inputs.add_dsm62_builds }}" == "true" ]; then
             matrix+='{"arch": "x64-6.2.4"},'
             matrix+='{"arch": "aarch64-6.2.4"},'
             matrix+='{"arch": "evansport-6.2.4"},'
