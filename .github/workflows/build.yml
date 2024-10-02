@@ -11,22 +11,38 @@ on:
         description: 'Publish to repository'
         required: false
         default: 'false'
-      include_optional_arch:
-        description: 'Include dsm 7.2 archs'
+      add_srm12_builds:
+        description: 'Include SRM 1.2 archs'
+        required: false
+        default: 'false'
+      add_dsm52_builds:
+        description: 'Include DSM 5.2 archs'
+        required: false
+        default: 'false'
+      add_dsm62_builds:
+        description: 'Include DSM 6.2 archs'
+        required: false
+        default: 'true'
+      add_dsm71_builds:
+        description: 'Include DSM 7.1 archs'
+        required: false
+        default: 'true'
+      add_dsm72_builds:
+        description: 'Include DSM 7.2 archs'
         required: false
         default: 'false'
   pull_request:
     paths:
-    - 'spk/**'
-    - 'cross/**'
-    - 'native/**'
+      - 'spk/**'
+      - 'cross/**'
+      - 'native/**'
   push:
     branches:
       - "**"
     paths:
-    - 'spk/**'
-    - 'cross/**'
-    - 'native/**'
+      - 'spk/**'
+      - 'cross/**'
+      - 'native/**'
 
 jobs:
   prepare:
@@ -34,14 +50,14 @@ jobs:
     runs-on: ubuntu-latest
     # provide results to other jobs
     outputs:
-        arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
-        noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
+      arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
+      noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0
-            persist-credentials: false
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Get changed files for pull request
         if: github.event_name == 'pull_request'
@@ -78,36 +94,62 @@ jobs:
           ARCH_PACKAGES: ${{ needs.prepare.outputs.arch_packages }}
           NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
 
+  generate_matrix:
+    name: Prepare Architectures
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          # Start with the noarch architectures at the top
+          matrix='{"include": ['
+          matrix+='{"arch": "noarch"},'
+          matrix+='{"arch": "noarch-6.1"},'
+          matrix+='{"arch": "noarch-7.0"},'
+
+          # Add other architectures based on input flags
+          if [ "${{ github.event.inputs.add_dsm52_builds }}" == "true" ]; then
+            matrix+='{"arch": "x86-5.2"},'
+            matrix+='{"arch": "88f6281-5.2"},'
+            matrix+='{"arch": "ppc853x-5.2"},'
+          fi
+          if [ "${{ github.event.inputs.add_dsm62_builds }}" == "true" ]; then
+            matrix+='{"arch": "x64-6.2.4"},'
+            matrix+='{"arch": "aarch64-6.2.4"},'
+            matrix+='{"arch": "evansport-6.2.4"},'
+            matrix+='{"arch": "armv7-6.2.4"},'
+            matrix+='{"arch": "hi3535-6.2.4"},'
+            matrix+='{"arch": "88f6281-6.2.4"},'
+            matrix+='{"arch": "qoriq-6.2.4"},'
+          fi
+          if [ "${{ github.event.inputs.add_dsm71_builds }}" == "true" ]; then
+            matrix+='{"arch": "x64-7.1"},'
+            matrix+='{"arch": "aarch64-7.1"},'
+            matrix+='{"arch": "evansport-7.1"},'
+            matrix+='{"arch": "armv7-7.1"},'
+            matrix+='{"arch": "comcerto2k-7.1"},'
+          fi
+          if [ "${{ github.event.inputs.add_dsm72_builds }}" == "true" ]; then
+            matrix+='{"arch": "x64-7.2"},'
+            matrix+='{"arch": "aarch64-7.2"},'
+          fi
+          if [ "${{ github.event.inputs.add_srm12_builds }}" == "true" ]; then
+            matrix+='{"arch": "armv7-1.2"},'
+          fi
+
+          # Remove trailing comma and close the matrix
+          matrix=$(echo $matrix | sed 's/,$//')
+          matrix+=']}'
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
   build:
     name: Build
-    needs: prepare
+    needs: [prepare, generate_matrix]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        # x64=x86_64, evansport=i686, aarch64=armv8, armv7, hi3535=armv7l, 88f6281=armv5, qoriq=ppc
-        # https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures
-        include:
-          - arch: noarch
-          - arch: noarch-6.1
-          - arch: noarch-7.0
-          - arch: x64-6.2.4
-          - arch: x64-7.1
-          - arch: x64-7.2
-            optional: ${{ github.event.inputs.include_optional_arch == 'true' }}
-          - arch: aarch64-6.2.4
-          - arch: aarch64-7.1
-          - arch: aarch64-7.2
-            optional: ${{ github.event.inputs.include_optional_arch == 'true' }}
-          - arch: evansport-6.2.4
-          - arch: evansport-7.1
-          - arch: armv7-6.2.4
-          - arch: armv7-7.1
-          - arch: hi3535-6.2.4
-          - arch: 88f6281-6.2.4
-          - arch: qoriq-6.2.4
-          - arch: comcerto2k-7.1
-
+      matrix: ${{ fromJSON(needs.generate_matrix.outputs.matrix) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -145,7 +187,6 @@ jobs:
           BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
-          INCLUDE_OPTIONAL_ARCH: ${{ github.event.inputs.include_optional_arch }}
 
       - name: Build Status
         id: build_status
