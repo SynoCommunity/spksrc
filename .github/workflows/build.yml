@@ -11,6 +11,10 @@ on:
         description: 'Publish to repository'
         required: false
         default: 'false'
+      include_optional_arch:
+        description: 'Include dsm 7.2 archs'
+        required: false
+        default: 'false'
   pull_request:
     paths:
     - 'spk/**'
@@ -83,7 +87,26 @@ jobs:
       matrix:
         # x64=x86_64, evansport=i686, aarch64=armv8, armv7, hi3535=armv7l, 88f6281=armv5, qoriq=ppc
         # https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures
-        arch: [noarch, noarch-6.1, noarch-7.0, x64-6.2.4, x64-7.1, evansport-6.2.4, evansport-7.1, aarch64-6.2.4, aarch64-7.1, armv7-6.2.4, armv7-7.1, hi3535-6.2.4, 88f6281-6.2.4, qoriq-6.2.4, comcerto2k-7.1]
+        include:
+          - arch: noarch
+          - arch: noarch-6.1
+          - arch: noarch-7.0
+          - arch: x64-6.2.4
+          - arch: x64-7.1
+          - arch: x64-7.2
+            optional: ${{ github.event.inputs.include_optional_arch == 'true' }}
+          - arch: aarch64-6.2.4
+          - arch: aarch64-7.1
+          - arch: aarch64-7.2
+            optional: ${{ github.event.inputs.include_optional_arch == 'true' }}
+          - arch: evansport-6.2.4
+          - arch: evansport-7.1
+          - arch: armv7-6.2.4
+          - arch: armv7-7.1
+          - arch: hi3535-6.2.4
+          - arch: 88f6281-6.2.4
+          - arch: qoriq-6.2.4
+          - arch: comcerto2k-7.1
 
     steps:
       - name: Checkout repository
@@ -122,6 +145,7 @@ jobs:
           BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+          INCLUDE_OPTIONAL_ARCH: ${{ github.event.inputs.include_optional_arch }}
 
       - name: Build Status
         id: build_status
