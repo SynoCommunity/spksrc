@@ -1,0 +1,21 @@
+--- admin/install.php.orig	2024-08-25 04:18:40
++++ admin/install.php	2024-09-25 21:53:15
+@@ -478,7 +478,9 @@
+ 		Checking URL to installation
+ 	</td>
+ 	<?php
+-		$t_url_check = '';
++		$t_url_check = 'GOOD';
++		$t_hard_fail = false;
++/*
+ 		if( !$f_path ) {
+ 			# Empty URL - warn admin about security risk
+ 			$t_url_check = "Using an empty path is a security risk, as MantisBT "
+@@ -503,6 +505,7 @@
+ 			}
+ 			$t_hard_fail = true;
+ 		}
++*/
+ 
+ 		print_test_result( $t_url_check ? BAD : GOOD, $t_hard_fail, $t_url_check );
+ 	?>
