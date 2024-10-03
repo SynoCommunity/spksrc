@@ -126,19 +126,18 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          # Start with the noarch architectures at the top
+          # Create a matrix as a JSON object
           matrix='{"include": ['
-          matrix+='{"arch": "noarch"},'
-          matrix+='{"arch": "noarch-6.1"},'
-          matrix+='{"arch": "noarch-7.0"},'
 
-          # Add other architectures based on input flags
+          # Add architectures based on input flags
           if [ "${{ github.event.inputs.add_dsm52_builds }}" == "true" ]; then
+            matrix+='{"arch": "noarch"},'
             matrix+='{"arch": "x86-5.2"},'
             matrix+='{"arch": "88f6281-5.2"},'
             matrix+='{"arch": "ppc853x-5.2"},'
           fi
           if [ "${{ github.event.inputs.add_dsm62_builds }}" == "true" ]; then
+            matrix+='{"arch": "noarch-6.1"},'
             matrix+='{"arch": "x64-6.2.4"},'
             matrix+='{"arch": "aarch64-6.2.4"},'
             matrix+='{"arch": "evansport-6.2.4"},'
@@ -148,6 +147,7 @@ jobs:
             matrix+='{"arch": "qoriq-6.2.4"},'
           fi
           if [ "${{ github.event.inputs.add_dsm71_builds }}" == "true" ]; then
+            matrix+='{"arch": "noarch-7.0"},'
             matrix+='{"arch": "x64-7.1"},'
             matrix+='{"arch": "aarch64-7.1"},'
             matrix+='{"arch": "evansport-7.1"},'
@@ -155,6 +155,7 @@ jobs:
             matrix+='{"arch": "comcerto2k-7.1"},'
           fi
           if [ "${{ github.event.inputs.add_dsm72_builds }}" == "true" ]; then
+            matrix+='{"arch": "noarch-7.0"},'
             matrix+='{"arch": "x64-7.2"},'
             matrix+='{"arch": "aarch64-7.2"},'
           fi
