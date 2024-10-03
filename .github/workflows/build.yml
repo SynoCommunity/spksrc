@@ -128,7 +128,6 @@ jobs:
         run: |
           # Start with the noarch architectures at the top
           matrix='{"include": ['
-          matrix+='{"arch": "noarch"},'
           matrix+='{"arch": "noarch-6.1"},'
           matrix+='{"arch": "noarch-7.0"},'
 
