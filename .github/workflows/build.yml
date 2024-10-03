@@ -137,7 +137,7 @@ jobs:
           # Create a matrix as a JSON object
           matrix='{"include": ['
           
-          if [ "${{ github.event.inputs.add_noarch_builds }}" == "true" ]; then
+          if [ "${{ github.event.inputs.add_noarch_builds }}" == "true" -o "${{ github.event.inputs.add_noarch_builds }}" == "" ]; then
             matrix+='{"arch": "noarch-1.1"},'
             matrix+='{"arch": "noarch-3.1"},'
             matrix+='{"arch": "noarch-6.1"},'
@@ -147,14 +147,14 @@ jobs:
             matrix+='{"arch": "x64-7.2"},'
             matrix+='{"arch": "aarch64-7.2"},'
           fi
-          if [ "${{ github.event.inputs.add_dsm71_builds }}" == "true" ]; then
+          if [ "${{ github.event.inputs.add_dsm71_builds }}" == "true" -o "${{ github.event.inputs.add_dsm71_builds }}" == "" ]; then
             matrix+='{"arch": "x64-7.1"},'
             matrix+='{"arch": "aarch64-7.1"},'
             matrix+='{"arch": "evansport-7.1"},'
             matrix+='{"arch": "armv7-7.1"},'
             matrix+='{"arch": "comcerto2k-7.1"},'
           fi
-          if [ "${{ github.event.inputs.add_dsm62_builds }}" == "true" ]; then
+          if [ "${{ github.event.inputs.add_dsm62_builds }}" == "true" -o "${{ github.event.inputs.add_dsm62_builds }}" == "" ]; then
             matrix+='{"arch": "x64-6.2.4"},'
             matrix+='{"arch": "aarch64-6.2.4"},'
             matrix+='{"arch": "evansport-6.2.4"},'
