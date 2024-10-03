@@ -15,6 +15,14 @@ on:
         options:
           - 'true'
           - 'false'
+      add_noarch_builds:
+        description: 'Include noarch packages'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
       add_dsm72_builds:
         description: 'Include DSM 7.2 archs'
         required: false
@@ -126,17 +134,25 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          # Start with the noarch architectures at the top
+          # Create a matrix as a JSON object
           matrix='{"include": ['
-          matrix+='{"arch": "noarch"},'
-          matrix+='{"arch": "noarch-6.1"},'
-          matrix+='{"arch": "noarch-7.0"},'
-
-          # Add other architectures based on input flags
-          if [ "${{ github.event.inputs.add_dsm52_builds }}" == "true" ]; then
-            matrix+='{"arch": "x86-5.2"},'
-            matrix+='{"arch": "88f6281-5.2"},'
-            matrix+='{"arch": "ppc853x-5.2"},'
+          
+          if [ "${{ github.event.inputs.add_noarch_builds }}" == "true" ]; then
+            matrix+='{"arch": "noarch-1.1"},'
+            matrix+='{"arch": "noarch-3.1"},'
+            matrix+='{"arch": "noarch-6.1"},'
+            matrix+='{"arch": "noarch-7.0"},'
+          fi
+          if [ "${{ github.event.inputs.add_dsm72_builds }}" == "true" ]; then
+            matrix+='{"arch": "x64-7.2"},'
+            matrix+='{"arch": "aarch64-7.2"},'
+          fi
+          if [ "${{ github.event.inputs.add_dsm71_builds }}" == "true" ]; then
+            matrix+='{"arch": "x64-7.1"},'
+            matrix+='{"arch": "aarch64-7.1"},'
+            matrix+='{"arch": "evansport-7.1"},'
+            matrix+='{"arch": "armv7-7.1"},'
+            matrix+='{"arch": "comcerto2k-7.1"},'
           fi
           if [ "${{ github.event.inputs.add_dsm62_builds }}" == "true" ]; then
             matrix+='{"arch": "x64-6.2.4"},'
@@ -147,16 +163,10 @@ jobs:
             matrix+='{"arch": "88f6281-6.2.4"},'
             matrix+='{"arch": "qoriq-6.2.4"},'
           fi
-          if [ "${{ github.event.inputs.add_dsm71_builds }}" == "true" ]; then
-            matrix+='{"arch": "x64-7.1"},'
-            matrix+='{"arch": "aarch64-7.1"},'
-            matrix+='{"arch": "evansport-7.1"},'
-            matrix+='{"arch": "armv7-7.1"},'
-            matrix+='{"arch": "comcerto2k-7.1"},'
-          fi
-          if [ "${{ github.event.inputs.add_dsm72_builds }}" == "true" ]; then
-            matrix+='{"arch": "x64-7.2"},'
-            matrix+='{"arch": "aarch64-7.2"},'
+          if [ "${{ github.event.inputs.add_dsm52_builds }}" == "true" ]; then
+            matrix+='{"arch": "x86-5.2"},'
+            matrix+='{"arch": "88f6281-5.2"},'
+            matrix+='{"arch": "ppc853x-5.2"},'
           fi
           if [ "${{ github.event.inputs.add_srm12_builds }}" == "true" ]; then
             matrix+='{"arch": "armv7-1.2"},'

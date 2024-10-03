@@ -27,8 +27,10 @@ DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
+ifneq ($(ARCH),noarch)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
+endif
 endif
 
 ###
