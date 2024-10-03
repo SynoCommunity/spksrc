@@ -82,6 +82,13 @@ endif
 
 # Check minimum DSM requirements of package
 ifneq ($(REQUIRED_MIN_DSM),)
+  # Check if ARCH is noarch and TCVERSION is empty
+  ifeq ($(ARCH),noarch)
+    ifeq ($(TCVERSION),)
+      TCVERSION=3.1
+    endif
+  endif
+
   ifeq (,$(findstring $(ARCH),$(SRM_ARCHS)))
     ifneq ($(REQUIRED_MIN_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_DSM))))
       ifneq (,$(BUILD_UNSUPPORTED_FILE))
