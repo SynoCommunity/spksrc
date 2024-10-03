@@ -1,10 +1,6 @@
 #!/bin/bash
 
 WEB_DIR="/var/services/web_packages"
-# for backwards compatability
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-    WEB_DIR="/var/services/web"
-fi
 
 quote_json ()
 {
