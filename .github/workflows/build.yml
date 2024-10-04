@@ -84,6 +84,12 @@ jobs:
     outputs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
       noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
+      add_noarch_builds: ${{ steps.set-defaults.outputs.add_noarch_builds }}
+      add_dsm72_builds: ${{ steps.set-defaults.outputs.add_dsm72_builds }}
+      add_dsm71_builds: ${{ steps.set-defaults.outputs.add_dsm71_builds }}
+      add_dsm62_builds: ${{ steps.set-defaults.outputs.add_dsm62_builds }}
+      add_dsm52_builds: ${{ steps.set-defaults.outputs.add_dsm52_builds }}
+      add_srm12_builds: ${{ steps.set-defaults.outputs.add_srm12_builds }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -112,6 +118,16 @@ jobs:
           GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
           SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
+      # Set default values for all builds (manual or automated)
+      - id: set-defaults
+        run: |
+          echo "add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'true' }}" >> $GITHUB_OUTPUT
+          echo "add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || 'false' }}" >> $GITHUB_OUTPUT
+          echo "add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'true' }}" >> $GITHUB_OUTPUT
+          echo "add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'true' }}" >> $GITHUB_OUTPUT
+          echo "add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}" >> $GITHUB_OUTPUT
+          echo "add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}" >> $GITHUB_OUTPUT
+
       - name: Cache downloaded files
         uses: actions/cache@v4
         with:
@@ -128,33 +144,42 @@ jobs:
 
   generate_matrix:
     name: Prepare Architectures
+    needs: prepare
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: set-matrix
         run: |
+          # Use the default values passed from the prepare step
+          add_noarch_builds=${{ needs.prepare.outputs.add_noarch_builds }}
+          add_dsm72_builds=${{ needs.prepare.outputs.add_dsm72_builds }}
+          add_dsm71_builds=${{ needs.prepare.outputs.add_dsm71_builds }}
+          add_dsm62_builds=${{ needs.prepare.outputs.add_dsm62_builds }}
+          add_dsm52_builds=${{ needs.prepare.outputs.add_dsm52_builds }}
+          add_srm12_builds=${{ needs.prepare.outputs.add_srm12_builds }}
+
           # Create a matrix as a JSON object
           matrix='{"include": ['
           
-          if [ "${{ github.event.inputs.add_noarch_builds }}" == "true" -o "${{ github.event.inputs.add_noarch_builds }}" == "" ]; then
+          if [ "$add_noarch_builds" == "true" ]; then
             matrix+='{"arch": "noarch-1.1"},'
             matrix+='{"arch": "noarch-3.1"},'
             matrix+='{"arch": "noarch-6.1"},'
             matrix+='{"arch": "noarch-7.0"},'
           fi
-          if [ "${{ github.event.inputs.add_dsm72_builds }}" == "true" ]; then
+          if [ "$add_dsm72_builds" == "true" ]; then
             matrix+='{"arch": "x64-7.2"},'
             matrix+='{"arch": "aarch64-7.2"},'
           fi
-          if [ "${{ github.event.inputs.add_dsm71_builds }}" == "true" -o "${{ github.event.inputs.add_dsm71_builds }}" == "" ]; then
+          if [ "$add_dsm71_builds" == "true" ]; then
             matrix+='{"arch": "x64-7.1"},'
             matrix+='{"arch": "aarch64-7.1"},'
             matrix+='{"arch": "evansport-7.1"},'
             matrix+='{"arch": "armv7-7.1"},'
             matrix+='{"arch": "comcerto2k-7.1"},'
           fi
-          if [ "${{ github.event.inputs.add_dsm62_builds }}" == "true" -o "${{ github.event.inputs.add_dsm62_builds }}" == "" ]; then
+          if [ "$add_dsm62_builds" == "true" ]; then
             matrix+='{"arch": "x64-6.2.4"},'
             matrix+='{"arch": "aarch64-6.2.4"},'
             matrix+='{"arch": "evansport-6.2.4"},'
@@ -163,12 +188,12 @@ jobs:
             matrix+='{"arch": "88f6281-6.2.4"},'
             matrix+='{"arch": "qoriq-6.2.4"},'
           fi
-          if [ "${{ github.event.inputs.add_dsm52_builds }}" == "true" ]; then
+          if [ "$add_dsm52_builds" == "true" ]; then
             matrix+='{"arch": "x86-5.2"},'
             matrix+='{"arch": "88f6281-5.2"},'
             matrix+='{"arch": "ppc853x-5.2"},'
           fi
-          if [ "${{ github.event.inputs.add_srm12_builds }}" == "true" ]; then
+          if [ "$add_srm12_builds" == "true" ]; then
             matrix+='{"arch": "armv7-1.2"},'
           fi
 
