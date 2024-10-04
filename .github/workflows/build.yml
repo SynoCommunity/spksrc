@@ -143,7 +143,7 @@ jobs:
           NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
 
   generate_matrix:
-    name: Prepare Architectures
+    name: Generate Matrix
     needs: prepare
     runs-on: ubuntu-latest
     outputs:
