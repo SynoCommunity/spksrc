@@ -143,7 +143,6 @@ echo "arch_packages=${arch_packages}" >> $GITHUB_OUTPUT
 echo "noarch_packages=${noarch_packages}" >> $GITHUB_OUTPUT
 echo "has_arch_packages=${has_arch_packages}" >> $GITHUB_OUTPUT
 echo "has_noarch_packages=${has_noarch_packages}" >> $GITHUB_OUTPUT
-echo "min_dsm72_packages=${min_dsm72_packages}" >> $GITHUB_OUTPUT
 echo "has_min_dsm72_packages=${has_min_dsm72_packages}" >> $GITHUB_OUTPUT
 
 echo "::endgroup::"
