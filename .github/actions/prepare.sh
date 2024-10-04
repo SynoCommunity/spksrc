@@ -122,10 +122,29 @@ do
     fi
 done
 
+# evaluate packages that require DSM 7.2
+min_dsm72_packages=
+has_min_dsm72_packages='false'
+for package in ${packages}
+do
+    if [ -f "./spk/${package}/Makefile" ]; then
+        if [ "$(grep REQUIRED_MIN_DSM ./spk/${package}/Makefile | cut -d= -f2 | xargs)" = "7.2" ]; then
+            min_dsm72_packages+="${package} "
+            has_min_dsm72_packages='true'
+        fi
+    fi
+done
+
+if [ "${has_min_dsm72_packages}" = "true" ]; then
+    echo "===> Min DSM 7.2 packages found: ${min_dsm72_packages}"
+fi
+
 echo "arch_packages=${arch_packages}" >> $GITHUB_OUTPUT
 echo "noarch_packages=${noarch_packages}" >> $GITHUB_OUTPUT
 echo "has_arch_packages=${has_arch_packages}" >> $GITHUB_OUTPUT
 echo "has_noarch_packages=${has_noarch_packages}" >> $GITHUB_OUTPUT
+echo "min_dsm72_packages=${min_dsm72_packages}" >> $GITHUB_OUTPUT
+echo "has_min_dsm72_packages=${has_min_dsm72_packages}" >> $GITHUB_OUTPUT
 
 echo "::endgroup::"
 

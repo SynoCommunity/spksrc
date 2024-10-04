@@ -122,7 +122,7 @@ jobs:
       - id: set-defaults
         run: |
           echo "add_noarch_builds=${{ github.event.inputs.add_noarch_builds || steps.dependencies.outputs.has_noarch_packages }}" >> $GITHUB_OUTPUT
-          echo "add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || 'false' }}" >> $GITHUB_OUTPUT
+          echo "add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || steps.dependencies.outputs.has_min_dsm72_packages }}" >> $GITHUB_OUTPUT
           echo "add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || steps.dependencies.outputs.has_arch_packages }}" >> $GITHUB_OUTPUT
           echo "add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || steps.dependencies.outputs.has_arch_packages }}" >> $GITHUB_OUTPUT
           echo "add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}" >> $GITHUB_OUTPUT
@@ -159,7 +159,7 @@ jobs:
           add_dsm52_builds=${{ needs.prepare.outputs.add_dsm52_builds }}
           add_srm12_builds=${{ needs.prepare.outputs.add_srm12_builds }}
 
-          # Create a matrix as a JSON object
+          # Create matrix as a JSON object
           matrix='{"include": ['
           
           if [ "$add_noarch_builds" == "true" ]; then
