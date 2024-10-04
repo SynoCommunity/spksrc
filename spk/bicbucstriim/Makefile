@@ -4,8 +4,8 @@ SPK_REV = 7
 SPK_ICON = src/bicbucstriim.png
 
 DEPENDS = cross/$(SPK_NAME)
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 REQUIRED_MIN_DSM = 7.0
 SPK_DEPENDS = WebStation:PHP8.2:Apache2.4
