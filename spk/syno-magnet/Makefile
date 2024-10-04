@@ -34,8 +34,8 @@ URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 
 COPY_TARGET = syno_magnet_copy
 
-# Pure web package, make sure ARCH is not defined
-override ARCH =
+# Pure web package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 
