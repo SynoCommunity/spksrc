@@ -4,8 +4,8 @@ SPK_REV = 18
 SPK_ICON = src/owncloud.png
 
 DEPENDS = cross/owncloud
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = WebStation:PHP7.4:MariaDB10:Apache2.4:redis
