@@ -12,7 +12,9 @@
         "iconv",
         "imagick",
         "intl",
-        "pdo_mysql"
+        "openssl",
+        "pdo_mysql",
+        "zlib"
     ],
     "fpm_settings": {
         "max_children": 20,
