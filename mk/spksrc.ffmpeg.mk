@@ -45,7 +45,7 @@ endif
 PRE_DEPEND_TARGET = ffmpeg_pre_depend
 
 else
-BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
+BUILD_DEPENDS += cross/$(FFMPEG_PACKAGE)
 CMAKE_RPATH =
 endif
 
