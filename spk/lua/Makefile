@@ -3,7 +3,7 @@ SPK_VERS = 5.4.4
 SPK_REV = 4
 SPK_ICON = src/lua.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/lua
 
 MAINTAINER = eelcohn
 MAINTAINER_URL = https://www.lua.org/

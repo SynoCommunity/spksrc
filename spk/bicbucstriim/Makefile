@@ -3,7 +3,7 @@ SPK_VERS = 3.4.2
 SPK_REV = 7
 SPK_ICON = src/bicbucstriim.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/bicbucstriim
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 

@@ -10,7 +10,7 @@ ifeq ($(strip $(PYTHON_PACKAGE)),)
 PYTHON_PACKAGE = python311
 endif
 
-OPTIONAL_DEPENDS = cross/$(PYTHON_PACKAGE)
+OPTIONAL_DEPENDS = cross/python311
 DEPENDS = cross/ncursesw
 
 HOMEPAGE = https://www.vim.org/
@@ -26,7 +26,7 @@ CONFIGURE_ARGS += vim_cv_getcwd_broken=yes vim_cv_stat_ignores_slash=yes vim_cv_
 include ../../mk/spksrc.archs.mk
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
+BUILD_DEPENDS = cross/python311
 CONFIGURE_ARGS += --enable-python3interp=dynamic --with-python3-command=$(HOSTPYTHON) 
 CONFIGURE_ARGS += vi_cv_path_python3_conf=$(PYTHON_CFG_PATH)
 CONFIGURE_ARGS += vi_cv_path_python3_pfx=$(PYTHON_PREFIX)

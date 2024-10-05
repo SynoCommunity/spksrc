@@ -3,7 +3,7 @@ SPK_VERS = 2.6.9
 SPK_REV = 4
 SPK_ICON = src/wallabag.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/wallabag
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 

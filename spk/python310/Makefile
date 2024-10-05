@@ -4,7 +4,7 @@ SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$
 SPK_REV = 20
 SPK_ICON = src/python3.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/python310
 DEPENDS += cross/pip
 
 MAINTAINER = SynoCommunity

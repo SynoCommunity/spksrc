@@ -25,7 +25,7 @@ UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 WHEELS = src/requirements-pure.txt
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/tvheadend
 DEPENDS += cross/dtv-scan-tables
 DEPENDS += cross/zap2epg cross/docker-tvheadend
 

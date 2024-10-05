@@ -5,7 +5,7 @@ PKG_DIST_NAME = icu4c-$(subst .,_,$(PKG_VERS))-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/unicode-org/icu/releases/download/release-$(subst .,-,$(PKG_VERS))
 PKG_DIR = icu/source
 
-BUILD_DEPENDS = native/$(PKG_NAME)
+BUILD_DEPENDS = native/libicu
 
 HOMEPAGE = http://site.icu-project.org/home
 COMMENT  = International Components for Unicode.

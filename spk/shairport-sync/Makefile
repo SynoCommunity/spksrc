@@ -3,7 +3,7 @@ SPK_VERS = 2.3.11
 SPK_REV = 2
 SPK_ICON = src/shairport-sync.png
 
-DEPENDS =  cross/busybox cross/$(SPK_NAME)
+DEPENDS =  cross/busybox cross/shairport-sync
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Use Synology NAS as an AirPlay receiver. Requires USB soundcard or speakers.
