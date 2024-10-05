@@ -6,7 +6,7 @@ on:
       package:
         description: 'Package to build'
         required: true
-        default: 'syno-magnet'
+        default: 'adminer'
       publish:
         description: 'Publish to repository'
         required: false
