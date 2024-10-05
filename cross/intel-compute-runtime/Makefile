@@ -15,7 +15,6 @@ LICENSE = MIT license
 
 POST_EXTRACT_TARGET = intel-compute-runtime_post_extract_target
 CMAKE_USE_NINJA = 0
-CMAKE_USE_DESTDIR = 1
 
 DEPENDS  = cross/intel-gmmlib
 DEPENDS += cross/intel-graphics-compiler
