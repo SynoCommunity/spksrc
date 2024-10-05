@@ -33,9 +33,9 @@ exec_php ()
     else
         PHP_SETTINGS=""
     fi
-    # Fix for mysqli default socket on DSM 6
+    # Fix for pdo_mysql default socket on DSM 6
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        PHP_SETTINGS="${PHP_SETTINGS} -d mysqli.default_socket=/run/mysqld/mysqld10.sock"
+        PHP_SETTINGS="${PHP_SETTINGS} -d pdo_mysql.default_socket=/run/mysqld/mysqld10.sock"
     fi
     COMMAND="${PHP} ${PHP_SETTINGS} $*"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then

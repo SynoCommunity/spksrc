@@ -69,6 +69,10 @@
                         "zlib"
                     ],
                     "group": "http",
+                    "php_settings": {
+                        "error_log": "/var/services/web_packages/wallabag/php_errors.log",
+                        "pdo_mysql.default_socket": "/run/mysqld/mysqld10.sock"
+                    },    
                     "profile_desc": "PHP Profile for wallabag",
                     "profile_name": "wallabag Profile",
                     "user": "sc-wallabag"
