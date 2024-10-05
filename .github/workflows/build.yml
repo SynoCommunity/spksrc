@@ -119,7 +119,8 @@ jobs:
           SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
       # Set default values for all builds (manual or automated)
-      - id: set-defaults
+      - name: Set default values for generate matrix
+        id: set-defaults
         run: |
           echo "add_noarch_builds=${{ github.event.inputs.add_noarch_builds || steps.dependencies.outputs.has_noarch_packages }}" >> $GITHUB_OUTPUT
           echo "add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || steps.dependencies.outputs.has_min_dsm72_packages }}" >> $GITHUB_OUTPUT
