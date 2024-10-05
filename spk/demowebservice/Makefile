@@ -5,7 +5,7 @@ SPK_ICON = src/demowebservice.png
 
 DEPENDS =
 
-override ARCH=
+override ARCH=noarch
 
 MAINTAINER = hgy59
 DESCRIPTION = Demopackage to show how to create a web service \(web application\)

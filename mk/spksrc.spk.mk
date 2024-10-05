@@ -2,7 +2,7 @@
 #   Most of the rules are imported from spksrc.*.mk files
 #
 # Variables:
-#  ARCH                         A dedicated arch, a generic arch or empty for arch independent packages
+#  ARCH                         A dedicated arch, a generic arch or 'noarch' for arch independent packages
 #  SPK_NAME                     Package name
 #  MAINTAINER                   Package maintainer (mandatory)
 #  MAINTAINER_URL               URL of package maintainer (optional when MAINTAINER is a valid github user)
@@ -34,6 +34,7 @@ include ../../mk/spksrc.directories.mk
 NAME = $(SPK_NAME)
 
 ifneq ($(ARCH),)
+ifneq ($(ARCH),noarch)
 # arch specific packages
 ifneq ($(SPK_PACKAGE_ARCHS),)
 SPK_ARCH = $(SPK_PACKAGE_ARCHS)
@@ -50,11 +51,14 @@ endif
 SPK_TCVERS = $(TCVERSION)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
-else
+endif
+endif
+
+ifeq ($(ARCH),noarch)
+ifneq ($(strip $(TCVERSION)),)
 # different noarch packages
 SPK_ARCH = noarch
 SPK_NAME_ARCH = noarch
-ifneq ($(strip $(TCVERSION)),)
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
 SPK_TCVERS = dsm7
 TC_OS_MIN_VER = 7.0-40000
@@ -68,11 +72,8 @@ else
 SPK_TCVERS = srm
 TC_OS_MIN_VER = 1.1-6931
 endif
-else
-SPK_TCVERS = all
-TC_OS_MIN_VER = 3.1-1594
-endif
 ARCH_SUFFIX = -$(SPK_TCVERS)
+endif
 endif
 
 ifeq ($(call version_lt, ${TC_OS_MIN_VER}, 6.1)$(call version_ge, ${TC_OS_MIN_VER}, 3.0),11)
@@ -157,9 +158,14 @@ $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
 	@if [ -z "$(SPK_ARCH)" ]; then \
-	   echo "ERROR: Arch '$(ARCH)' is not a supported architecture" ; \
-	   echo " - There is no remaining arch in '$(TC_ARCH)' for unsupported archs '$(UNSUPPORTED_ARCHS)'"; \
-	   exit 1; \
+	   if [ "$(ARCH)" = "noarch" ]; then \
+	      echo "ERROR: 'noarch' package without TCVERSION is not supported" ; \
+	      exit 1; \
+           else \
+	      echo "ERROR: Arch '$(ARCH)' is not a supported architecture" ; \
+	      echo " - There is no remaining arch in '$(TC_ARCH)' for unsupported archs '$(UNSUPPORTED_ARCHS)'"; \
+	      exit 1; \
+           fi; \
 	fi
 	@echo package=\"$(SPK_NAME)\" > $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@

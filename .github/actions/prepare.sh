@@ -59,7 +59,7 @@ for i in {5..7}; do
     ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_PACKAGE = ffmpeg${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
     # If packages contain a package that depends on ffmpeg (or is ffmpeg),
-    # then ensure relevant ffmpeg5|ffmpeg6 is first in list
+    # then ensure relevant ffmpeg spk is first in list
     for package in ${packages}
     do
         if [ "$(echo ffmpeg${i} ${ffmpeg_dependent_packages} | grep -ow ${package})" != "" ]; then
@@ -107,19 +107,43 @@ all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "
 # and filter out packages that are removed or do not exist (e.g. nzbdrone)
 arch_packages=
 noarch_packages=
+has_arch_packages='false'
+has_noarch_packages='false'
 for package in ${packages}
 do
     if [ -f "./spk/${package}/Makefile" ]; then
         if [ "$(echo ${all_noarch} | grep -ow ${package})" = "" ]; then
             arch_packages+="${package} "
+            has_arch_packages='true'
         else
             noarch_packages+="${package} "
+            has_noarch_packages='true'
         fi
     fi
 done
 
+# evaluate packages that require DSM 7.2
+min_dsm72_packages=
+has_min_dsm72_packages='false'
+for package in ${packages}
+do
+    if [ -f "./spk/${package}/Makefile" ]; then
+        if [ "$(grep REQUIRED_MIN_DSM ./spk/${package}/Makefile | cut -d= -f2 | xargs)" = "7.2" ]; then
+            min_dsm72_packages+="${package} "
+            has_min_dsm72_packages='true'
+        fi
+    fi
+done
+
+if [ "${has_min_dsm72_packages}" = "true" ]; then
+    echo "===> Min DSM 7.2 packages found: ${min_dsm72_packages}"
+fi
+
 echo "arch_packages=${arch_packages}" >> $GITHUB_OUTPUT
 echo "noarch_packages=${noarch_packages}" >> $GITHUB_OUTPUT
+echo "has_arch_packages=${has_arch_packages}" >> $GITHUB_OUTPUT
+echo "has_noarch_packages=${has_noarch_packages}" >> $GITHUB_OUTPUT
+echo "has_min_dsm72_packages=${has_min_dsm72_packages}" >> $GITHUB_OUTPUT
 
 echo "::endgroup::"
 

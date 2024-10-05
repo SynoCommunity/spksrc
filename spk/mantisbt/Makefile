@@ -4,8 +4,8 @@ SPK_REV = 6
 SPK_ICON = src/mantisbt.png
 
 DEPENDS  = cross/$(SPK_NAME)
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_MIN_DSM = 6.0
