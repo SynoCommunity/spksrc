@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
 SPK_VERS = 10.9.11
-SPK_REV = 16
+SPK_REV = 17
 SPK_ICON = src/jellyfin.png
 WIZARDS_DIR = src/wizard/
 DSM_UI_DIR = app
@@ -18,7 +18,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
 STARTABLE = yes
-CHANGELOG = "1. Update jellyfin to 10.9.11<br/>2. Migrate to ffmpeg7"
+CHANGELOG = "1. Update jellyfin to 10.9.11<br/>2. Update dotnet to 8.0.8<br/>3. Migrate to ffmpeg7"
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
