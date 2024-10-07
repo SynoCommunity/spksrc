@@ -1,7 +1,10 @@
-# Configuration for CMake build
+# Configuration for CMake build of native packages
 #
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release
+# CMAKE_SYSTEM_NAME soll nicht gesetzt werden, sonst wird cross compiling angenommen...
+#CMAKE_SYSTEM_NAME = Linux
+#CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=$(CMAKE_SYSTEM_NAME)
 
 # Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
@@ -14,7 +17,7 @@ endif
 # Use native cmake (Debian 10 "Buster")
 ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
   BUILD_DEPENDS += native/cmake-legacy
-  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-legacy/work-native/install/usr/local/bin)
+  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-3.2.6/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
@@ -29,12 +32,13 @@ endif
 
 # set default ASM build environment
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
-  DEPENDS += native/nasm
-  NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
-  ENV += PATH=$(NASM_PATH):$$PATH
-  ENV += AS=$(NASM_PATH)/nasm
+  NASM_BINARY = $(shell which nasm)
+  ifeq ($(NASM_BINARY),)
+    $(error nasm not found. Please install NASM assembler for CMAKE_USE_NASM=1)
+  endif
+  ENV += AS=$(NASM_BINARY)
   CMAKE_ARGS += -DENABLE_ASSEMBLY=ON
-  CMAKE_ARGS += -DCMAKE_ASM_COMPILER=$(NASM_PATH)/nasm
+  CMAKE_ARGS += -DCMAKE_ASM_COMPILER=$(NASM_BINARY)
 else
   CMAKE_USE_NASM = 0
 endif

@@ -7,7 +7,6 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
-OPTIONAL_DEPENDS = native/nasm
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
@@ -48,10 +47,11 @@ endif
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
-ENV += AS=$(NASM_PATH)/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
+NASM_BINARY = $(shell which nasm)
+ifeq ($(NASM_BINARY),)
+$(error nasm not found. Please install NASM assembler)
+endif
+ENV += AS=$(NASM_BINARY)
 CONFIGURE_ARGS += --as=nasm
 CONFIGURE_ARGS += --disable-sse4_1
 endif

@@ -36,8 +36,7 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
 include ../../mk/spksrc.common.mk
 
-OPTIONAL_DEPENDS  = native/nasm
-OPTIONAL_DEPENDS += cross/chromaprint-fftw
+OPTIONAL_DEPENDS  = cross/chromaprint-fftw
 OPTIONAL_DEPENDS += cross/dav1d
 OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
@@ -59,10 +58,11 @@ OPTIONAL_DEPENDS += cross/shine
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
-ENV += AS=$(NASM_PATH)/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
+NASM_BINARY = $(shell which nasm)
+ifeq ($(NASM_BINARY),)
+$(error nasm not found. Please intall NASM assembler)
+endif
+ENV += AS=$(NASM_BINARY)
 CONFIGURE_ARGS += --x86asmexe=nasm
 
 # Allow ASM on aarch64, disable on all others

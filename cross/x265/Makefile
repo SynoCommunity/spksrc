@@ -5,8 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265_git/downloads
 PKG_DIR = $(PKG_NAME)_$(PKG_VERS)
 
-OPTIONAL_DEPENDS = native/nasm
-
 HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPL
