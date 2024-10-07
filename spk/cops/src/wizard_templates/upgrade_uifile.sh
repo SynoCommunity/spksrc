@@ -21,6 +21,7 @@ page_append ()
 PHP_FILE="${WEB_DIR}/cops/config_local.php"
 CONFIGURED_SHARE_NAME=$(sed -n "s/^\s*\$config\['calibre_directory'\] = '\([^']*\)';/\1/p" "$PHP_FILE" | xargs basename)
 PACKAGE_SHARE_NAME=$(grep "^SHARE_NAME=" "/var/packages/cops/etc/installer-variables" | cut -d '=' -f 2)
+SHARE_ERROR_TEXT="{{{UPGRADE_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
 
 # Check for data share
 check_data_share ()
@@ -30,6 +31,22 @@ check_data_share ()
     else
         return 1  # false
     fi
+}
+
+checkShareName()
+{
+	CHECK_SHARE_NAME=$(/bin/cat<<EOF
+{
+	var shareName = arguments[0];
+	const shareRegex = /^[\w.][\w. -]{0,30}[\w.-]\\\$?$|^[\w]\\\$?$/;
+	if (!shareRegex.test(shareName)) {
+		return "${SHARE_ERROR_TEXT}";
+	}
+	return true;
+}
+EOF
+)
+	echo "$CHECK_SHARE_NAME" | quote_json
 }
 
 PAGE_LIBRARY_CONFIG=$(/bin/cat<<EOF
@@ -45,10 +62,7 @@ PAGE_LIBRARY_CONFIG=$(/bin/cat<<EOF
             "defaultValue": "${CONFIGURED_SHARE_NAME}",
             "validator": {
                 "allowBlank": false,
-                "regex": {
-                    "expr": "/^[\\\w.][\\\w. -]{0,30}[\\\w.-][\\\\$]?$|^[\\\w][\\\\$]?$/",
-                    "errorText": "{{{UPGRADE_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
-                }
+                "fn": "$(checkShareName)"
             }
         }]
     },{
