@@ -28,21 +28,13 @@ DEPENDENT_PACKAGES=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(cross|native)
 # get dependency list
 # dependencies in this list include the cross or native folder (i.e. native/python cross/glib)
 echo "Building dependency list..."
-echo "pwd: $(pwd)"
-echo "packages: $(find spk/ -maxdepth 1 -type d | cut -c 5- | sort)"
 DEPENDENCY_LIST=
 for package in $(find spk/ -maxdepth 1 -type d | cut -c 5- | sort)
 do
     if [ ! -f "./spk/${package}/BROKEN" ]; then
         DEPENDENCY_LIST+=$(DEPENDENCY_WALK=1 make -s -C spk/${package} dependency-list 2> /dev/null)$'\n'
-    else
-        echo "broken package ${package}, skip dependency-list entry"
     fi
 done
-
-echo "dependency list:"
-echo "${DEPENDENCY_LIST}"
-
 
 # search for dependent spk packages
 for package in ${DEPENDENT_PACKAGES}
