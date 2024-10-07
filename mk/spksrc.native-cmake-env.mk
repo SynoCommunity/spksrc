@@ -2,9 +2,6 @@
 #
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release
-# CMAKE_SYSTEM_NAME soll nicht gesetzt werden, sonst wird cross compiling angenommen...
-#CMAKE_SYSTEM_NAME = Linux
-#CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=$(CMAKE_SYSTEM_NAME)
 
 # Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
@@ -17,7 +14,7 @@ endif
 # Use native cmake (Debian 10 "Buster")
 ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
   BUILD_DEPENDS += native/cmake-legacy
-  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-3.2.6/work-native/install/usr/local/bin)
+  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-legacy/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
