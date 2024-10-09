@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
 SPK_VERS = 2.4
-SPK_REV = 18
+SPK_REV = 19
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/links cross/socat
@@ -52,15 +52,15 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, xxhsum, autossh \(including openssh, sftp and scp\), etherwake, telnet, whois, sshfs$(OPTIONAL_DESC)."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Update aria2 to v1.37.0.<br/>2. Update bind to v9.17.22 (on ARMv5 v9.16.45).<br/>3. Update inetutils (telnet, whois) to v2.5.<br/>4. Update openssl to v3.1.5.<br/>5. Update openssh to v9.6p1.<br/>6. Update screen to v4.9.1.<br/>7. Update ser2net to v4.6.0.<br/>8. Update socat to v1.8.0.0.<br/>9. Add xxHsum tools, bundled with rsync."
+CHANGELOG = "1. Update aria2 to v1.37.0.<br/>2. Update bind to v9.17.22 (on ARMv5 v9.16.45).<br/>3. Update inetutils (telnet, whois) to v2.5.<br/>4. Update openssl to v3.1.7.<br/>5. Update openssh to v9.6p1.<br/>6. Update screen to v4.9.1.<br/>7. Update ser2net to v4.6.0.<br/>8. Update socat to v1.8.0.1.<br/>9. Add xxHsum tools, bundled with rsync.<br/>10. Fix nmap for ARMv5 archs."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
 
 SPK_COMMANDS = bin/screen
 SPK_COMMANDS += bin/tmux
-SPK_COMMANDS += bin/nmap bin/nping bin/ndiff bin/ncat
-SPK_COMMANDS += bin/arp-scan bin/arp-fingerprint bin/get-iab bin/get-oui
+SPK_COMMANDS += bin/nmap bin/nping bin/ncat
+SPK_COMMANDS += bin/arp-scan bin/arp-fingerprint
 SPK_COMMANDS += bin/links
 SPK_COMMANDS += bin/sshfs
 SPK_COMMANDS += bin/fusermount bin/fusermount3
