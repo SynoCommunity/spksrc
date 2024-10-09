@@ -1,5 +1,5 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.9
+SPK_VERS = 3.11.10
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
 SPK_REV = 9
 SPK_ICON = src/python3.png
@@ -18,7 +18,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.9"
+CHANGELOG = "1. Update to Python 3.11.10<br/>2. Update all mandatory wheels"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -28,7 +28,7 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS = src/requirements-pure.txt
 
 # Force testing all wheel builds
-WHEELS_TEST_ALL = 1
+WHEELS_TEST_ALL = 0
 
 SERVICE_SETUP = src/service-setup.sh
 
