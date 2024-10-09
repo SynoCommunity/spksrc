@@ -7,3 +7,4 @@ bin:bin/mispipe
 bin:bin/parallel
 bin:bin/pee
 bin:bin/sponge
+rsc:bin/ts
