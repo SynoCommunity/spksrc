@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Initial release of version 7 release"
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/ffmpeg7
 
 # requires c11 support
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)

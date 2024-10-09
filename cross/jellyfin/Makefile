@@ -11,7 +11,7 @@ COMMENT  = The Free Software Media System. It is an alternative to the proprieta
 LICENSE  = GPLv2
 
 DOTNET_VERSION = 8.0
-BUILD_DEPENDS = native/dotnet-sdk-$(DOTNET_VERSION)
+BUILD_DEPENDS = native/dotnet-sdk-8.0
 
 DOTNET_OUTPUT_PATH = share
 DOTNET_PACKAGE_NAME = Jellyfin.Server

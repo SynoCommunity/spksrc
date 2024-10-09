@@ -4,7 +4,7 @@ SPK_REV = 1
 
 SPK_ICON = src/gpac.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/gpac
 
 MAINTAINER = wmanth
 DISPLAY_NAME = GPAC

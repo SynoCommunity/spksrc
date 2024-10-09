@@ -3,7 +3,7 @@ SPK_VERS = 21.09
 SPK_REV = 13
 SPK_ICON = src/mediainfo.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/mediainfo
 
 MAINTAINER = ymartin59
 DESCRIPTION = "MediaInfo is a convenient unified display of the most relevant technical and tag data for video and audio files."
