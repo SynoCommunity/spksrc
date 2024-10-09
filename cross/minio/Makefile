@@ -1,7 +1,7 @@
 PKG_NAME = minio
-PKG_VERS = 2022-09-07T22-25-02Z
+PKG_VERS = 2022-10-24T18-35-07Z
 PKG_RELEASE_TAG = $(subst :,-,$(PKG_VERS))
-PKG_COMMIT_ID = bb855499e1519f31c03c9b91c0f9f10cb6439253
+PKG_COMMIT_ID = fc6c7949727ec261cd57fbdb02fa7575d0fd8e61
 PKG_EXT = tar.gz
 PKG_DIST_PREFIX = RELEASE.$(PKG_RELEASE_TAG)
 PKG_DIST_NAME = $(PKG_DIST_PREFIX).$(PKG_EXT)
@@ -23,12 +23,14 @@ GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 
 ENV += GO111MODULE=on
 
-GO_BUILD_ARGS = -tags kqueue
+GO_BUILD_ARGS = -tags kqueue -buildvcs=false
 
 GO_LDFLAGS  = -s -w
+GO_LDFLAGS += -X github.com/minio/minio/cmd.Version=$(PKG_VERS)
 GO_LDFLAGS += -X github.com/minio/minio/cmd.ReleaseTag=$(PKG_RELEASE_TAG)
-GO_LDFLAGS += -X github.com/minio/minio/cmd.CopyrightYear=$(firstword $(subst -, ,$(PKG_VERS)))
 GO_LDFLAGS += -X github.com/minio/minio/cmd.CommitID=$(PKG_COMMIT_ID)
+GO_LDFLAGS += -X github.com/minio/minio/cmd.ShortCommitID=$(shell echo $(PKG_COMMIT_ID) | cut -c1-12)
+GO_LDFLAGS += -X github.com/minio/minio/cmd.CopyrightYear=$(firstword $(subst -, ,$(PKG_VERS)))
 
 include ../../mk/spksrc.cross-go.mk
 
