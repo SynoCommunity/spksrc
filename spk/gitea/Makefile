@@ -1,6 +1,6 @@
 SPK_NAME = gitea
 SPK_VERS = 1.22.3
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/gitea.png
 
 MAINTAINER = wkobiela
