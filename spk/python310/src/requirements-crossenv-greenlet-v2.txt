@@ -6,4 +6,4 @@
 
 # [greenlet]
 #   - Mandatory require full c++11 support
-greenlet==2.0.2
+greenlet==3.0.3

@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.14
+PKG_VERS = 3.10.15
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -144,19 +144,19 @@ CROSSENV_WHEELS  = cffi==1.17.0
 # It also breaks numpy at crossenv creation time using github-action
 # https://numpy.org/devdocs/reference/distutils_status_migration.html
 # Python 3.12 considerations: scikit-build-core, meson-python
-#CROSSENV_WHEELS += Cython==3.0.2
-CROSSENV_WHEELS += Cython==0.29.36
+CROSSENV_WHEELS += Cython==3.0.2
+#CROSSENV_WHEELS += Cython==0.29.37
 CROSSENV_WHEELS += flit==3.9.0
-CROSSENV_WHEELS += scikit-build==0.17.6
-CROSSENV_WHEELS += setuptools-rust==1.7.0
-CROSSENV_WHEELS += setuptools-scm==7.1.0
+CROSSENV_WHEELS += scikit-build==0.18.1
+CROSSENV_WHEELS += setuptools-rust==1.10.2
+CROSSENV_WHEELS += setuptools-scm==8.1.0
 # For future use when building numpy >= 1.26
-#CROSSENV_WHEELS += meson-python==0.13.2
-#CROSSENV_WHEELS += scikit-build-core==0.5.0
+#CROSSENV_WHEELS += meson-python==1.5.2
+#CROSSENV_WHEELS += scikit-build-core==0.10.7
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-CROSSENV_WHEELS += cryptography==41.0.3
-CROSSENV_WHEELS += maturin==1.2.3
-CROSSENV_WHEELS += poetry==1.6.1
+CROSSENV_WHEELS += cryptography==43.0.1
+CROSSENV_WHEELS += maturin==1.7.4
+CROSSENV_WHEELS += poetry==1.8.3
 endif
 
 # Create the crossenv in preparation for
@@ -169,28 +169,10 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==74.0.0" "wheel==0.44.0" "pip-tools==7.4.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==74.0.0" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==75.1.0" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==75.1.0" "wheel==0.44.0" "pip-tools==7.4.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
-# [numpy] <= 1.2x.y Must be installed using setuptools < 70.0
-# [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
-# [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==69.5.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==69.5.1"
-# [numpy] <= 1.24.4 last working version with gcc-4.9
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "numpy==1.24.4"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "numpy==1.24.4"
-# [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "numpy==1.25.2"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "numpy==1.25.2"
-endif
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==74.0.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==74.0.0"
-endif
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif

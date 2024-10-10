@@ -1,7 +1,7 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.5
+SPK_VERS = 3.11.10
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/python3.png
 
 # Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
@@ -18,7 +18,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.5"
+CHANGELOG = "1. Update to Python 3.11.10<br/>2. Update all mandatory wheels"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -64,7 +64,8 @@ DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
 # [mysqlclient]
-DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
+DEPENDS += cross/mysql-connector-c
+DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
@@ -155,6 +156,7 @@ else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
 endif
+
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)
