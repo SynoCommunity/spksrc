@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # for backwards compatability
-if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+if [ -z "${SYNOPKG_PKGDEST_VOL}" ]; then
 	SYNOPKG_PKGDEST_VOL="/volume1"
 fi
 SHAREDIR="${SYNOPKG_PKGNAME}"
@@ -24,45 +24,46 @@ page_append ()
 
 RESTORE_BACKUP_FILE="wizard_owncloud_restore"
 BACKUP_FILE_PATH="wizard_backup_file"
-ERROR_TEXT="{{{OWNCLOUD_BACKUP_FILE_VALIDATION_ERROR_TEXT}}}"
+RESTORE_ERROR_TEXT="{{{OWNCLOUD_BACKUP_FILE_VALIDATION_ERROR_TEXT}}}"
+SHARE_ERROR_TEXT="{{{OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
 
-checkBackupFile()
+checkBackupRestore()
 {
-	CHECK_BACKUP_FILE=$(/bin/cat<<EOF
+	CHECK_BACKUP_RESTORE=$(/bin/cat<<EOF
 {
-	var backupFileCheck = arguments[0];
+	var backupFilePath = arguments[0];
 	var step = arguments[2];
-	var fileRestore = step.getComponent("${RESTORE_BACKUP_FILE}");
-	if (fileRestore.checked) {
-		if (backupFileCheck === "") {
-			return "${ERROR_TEXT}";
+	var backupRestore = step.getComponent("${RESTORE_BACKUP_FILE}");
+	if (backupRestore.checked) {
+		if (backupFilePath === "") {
+			return "${RESTORE_ERROR_TEXT}";
 		}
 	}
 	return true;
 }
 EOF
 )
-	echo "$CHECK_BACKUP_FILE" | quote_json
+	echo "$CHECK_BACKUP_RESTORE" | quote_json
 }
 
-getBackupFile()
+checkBackupFile()
 {
-	BACKUP_FILE=$(/bin/cat<<EOF
+	CHECK_BACKUP_FILE=$(/bin/cat<<EOF
 {
-	var backupFile = arguments[0];
+	var backupRestore = arguments[0];
 	var step = arguments[2];
-	var filePath = step.getComponent("${BACKUP_FILE_PATH}");
-	if (backupFile) {
-		filePath.setDisabled(false);
+	var backupFilePath = step.getComponent("${BACKUP_FILE_PATH}");
+	if (backupRestore) {
+		backupFilePath.setDisabled(false);
 	} else {
-		filePath.setValue("");
-		filePath.setDisabled(true);
+		backupFilePath.setValue("");
+		backupFilePath.setDisabled(true);
 	}
 	return true;
 }
 EOF
 )
-	echo "$BACKUP_FILE" | quote_json
+	echo "$CHECK_BACKUP_FILE" | quote_json
 }
 
 jsFunction=$(/bin/cat<<EOF
@@ -86,6 +87,22 @@ jsFunction=$(/bin/cat<<EOF
 EOF
 )
 
+checkShareName()
+{
+	CHECK_SHARE_NAME=$(/bin/cat<<EOF
+{
+	var shareName = arguments[0];
+	const shareRegex = /^[\w.][\w. -]{0,30}[\w.-]\\\$?$|^[\w]\\\$?$/;
+	if (!shareRegex.test(shareName)) {
+		return "${SHARE_ERROR_TEXT}";
+	}
+	return true;
+}
+EOF
+)
+	echo "$CHECK_SHARE_NAME" | quote_json
+}
+
 getActiveate()
 {
 	ACTIVAETE=$(/bin/cat<<EOF
@@ -96,14 +113,14 @@ getActiveate()
 	var typeStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}");
 	var adminStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}");
 	var confirmStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}");
-	var checked = isRestoreChecked(wizardDialog);
+	var restoreChecked = isRestoreChecked(wizardDialog);
 	if (currentStep.headline === "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}") {
-		if (checked) {
+		if (restoreChecked) {
 			wizardDialog.goBack(typeStep.itemId);
 			wizardDialog.goNext(confirmStep.itemId);
 		}
 	} else if (currentStep.headline === "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}") {
-		if (!checked) {
+		if (!restoreChecked) {
 			wizardDialog.goBack(typeStep.itemId);
 			wizardDialog.goNext(adminStep.itemId);
 		}
@@ -125,14 +142,14 @@ getDeActiveate()
 	var domainStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}");
 	var confirmStep = findStepByTitle(wizardDialog, "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}");
 	var phpStep = findStepByTitle(wizardDialog, "{{{PHP_PROFILES_TITLE}}}");
-	var checked = isRestoreChecked(wizardDialog);
+	var restoreChecked = isRestoreChecked(wizardDialog);
 	if (currentStep.headline === "{{{OWNCLOUD_INSTALL_RESTORE_STEP_TITLE}}}") {
 		if (!phpStep) {
 			domainStep.nextId = "applyStep";
 		} else {
 			domainStep.nextId = phpStep.itemId;
 		}
-		if (checked) {
+		if (restoreChecked) {
 			currentStep.nextId = confirmStep.itemId;
 		} else {
 			currentStep.nextId = adminStep.itemId;
@@ -175,7 +192,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"desc": "{{{OWNCLOUD_RESTORE_LABEL}}}",
 			"defaultValue": false,
 			"validator": {
-				"fn": "$(getBackupFile)"
+				"fn": "$(checkBackupFile)"
 			}
 		}]
 	}, {
@@ -187,7 +204,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"disabled": true,
 			"emptyText": "${SYNOPKG_PKGDEST_VOL}/${SYNOPKG_PKGNAME}/backup",
 			"validator": {
-				"fn": "$(checkBackupFile)"
+				"fn": "$(checkBackupRestore)"
 			}
 		}]
 	}, {
@@ -199,10 +216,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"defaultValue": "${SHAREDIR}",
 			"validator": {
 				"allowBlank": false,
-				"regex": {
-					"expr": "/^[\\\w.][\\\w. -]{0,30}[\\\w.-][\\\\$]?$|^[\\\w][\\\\$]?$/",
-					"errorText": "{{{OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
-				}
+				"fn": "$(checkShareName)"
 			}
 		}]
 	}]
@@ -232,6 +246,16 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 				"allowBlank": false
 			}
 		}]
+	}, {
+		"type": "password",
+		"desc": "{{{MYSQL_ROOT_PASSWORD_DESCRIPTION}}}",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "{{{MYSQL_ROOT_PASSWORD_LABEL}}}",
+			"validator": {
+				"allowBlank": false
+			}
+		}]
 	}]
 }, {
 	"step_title": "{{{OWNCLOUD_TRUSTED_DOMAINS_STEP_TITLE}}}",
@@ -254,9 +278,20 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 	}]
 }, {
 	"step_title": "{{{OWNCLOUD_CONFIRM_RESTORE_STEP_TITLE}}}",
+	"invalid_next_disabled_v2": true,
 	"activate_v2": "$(getActiveate)",
 	"items": [{
 		"desc": "{{{OWNCLOUD_CONFIRM_RESTORE_DESCRIPTION}}}"
+	}, {
+		"type": "password",
+		"desc": "{{{MYSQL_ROOT_PASSWORD_DESCRIPTION}}}",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "{{{MYSQL_ROOT_PASSWORD_LABEL}}}",
+			"validator": {
+				"allowBlank": false
+			}
+		}]
 	}]
 }
 EOF
