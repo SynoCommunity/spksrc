@@ -1,9 +1,9 @@
 lnk:lib/libbrotlicommon.so
 lnk:lib/libbrotlicommon.so.1
-lib:lib/libbrotlicommon.so.1.0.9
+lib:lib/libbrotlicommon.so.1.1.0
 lnk:lib/libbrotlidec.so
 lnk:lib/libbrotlidec.so.1
-lib:lib/libbrotlidec.so.1.0.9
+lib:lib/libbrotlidec.so.1.1.0
 lnk:lib/libbrotlienc.so
 lnk:lib/libbrotlienc.so.1
-lib:lib/libbrotlienc.so.1.0.9
+lib:lib/libbrotlienc.so.1.1.0
