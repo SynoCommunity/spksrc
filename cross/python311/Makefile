@@ -142,8 +142,8 @@ CROSSENV_WHEELS += cryptography==43.0.1
 # It also breaks numpy at crossenv creation time using github-action
 # https://numpy.org/devdocs/reference/distutils_status_migration.html
 # Python 3.12 considerations: scikit-build-core, meson-python
-CROSSENV_WHEELS += Cython==3.0.2
-#CROSSENV_WHEELS += Cython==0.29.37
+#CROSSENV_WHEELS += Cython==3.0.2
+CROSSENV_WHEELS += Cython==0.29.37
 CROSSENV_WHEELS += flit==3.9.0
 CROSSENV_WHEELS += maturin==1.7.4
 CROSSENV_WHEELS += poetry==1.8.3
@@ -153,6 +153,8 @@ CROSSENV_WHEELS += setuptools-scm==8.1.0
 # For future use when building numpy >= 1.26
 #CROSSENV_WHEELS += meson-python==1.5.2
 #CROSSENV_WHEELS += scikit-build-core==0.10.7
+# For pydantic_core==2.23.0: (typing-extensions >=4.6.0,!=4.7.0)
+CROSSENV_WHEELS += typing_extensions==4.12.2
 
 
 # Create the crossenv in preparation for
@@ -165,8 +167,8 @@ python311_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==75.1.0" "wheel==0.44.0" "pip-tools==7.4.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==75.1.0" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==68.1.2" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==68.1.2" "wheel==0.44.0" "pip-tools==7.4.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
