@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# latest version for OLD_PPC_ARCHS adn ARMv5 is 1.9.1
+# latest version for OLD_PPC_ARCHS and ARMv5 is 1.9.1
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 # latest version for ARMv7L is 1.10.4
 UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
