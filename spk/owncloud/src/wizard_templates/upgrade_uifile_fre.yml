@@ -1,6 +1,10 @@
 OWNCLOUD_INCOMPATIBLE_UPGRADE_STEP_TITLE: "Mise à jour incompatible"
 OWNCLOUD_INCOMPATIBLE_UPGRADE_DESCRIPTION: "<strong>AVIS:</strong> La version ${OC_OLD_VER} de ownCloud ne peut pas être mise à jour vers la version ${OC_NEW_VER}. Veuillez désinstaller la version précédente et n'oubliez pas de sauvegarder vos fichiers <code>${OCROOT}/data</code> avant de le faire."
 
+OWNCLOUD_MIGRATE_DATABASE_STEP_TITLE: "Migrer la base de données vers MariaDB"
+OWNCLOUD_MIGRATE_DATABASE_DESCRIPTION: "<strong>AVIS:</strong> le processus de mise à niveau ne prend en charge que les bases de données MySQL. Veuillez migrer votre base de données actuelle vers MariaDB avant de procéder à la mise à niveau, puis réessayez."
+OWNCLOUD_MIGRATE_DATABASE_DETAILS: "Veuillez suivre les étapes manuelles fournies sur cette page Web: <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/ownCloud-Database-Migration\\\">Migration de base de données ownCloud</a>."
+
 OWNCLOUD_UPGRADE_LIMITATIONS_STEP_TITLE: "Limitations de la mise à niveau"
 OWNCLOUD_UPGRADE_LIMITATIONS_DESCRIPTION: "Veuillez noter les limitations suivantes lors de la mise à jour du package ownCloud:"
 OWNCLOUD_UPGRADE_LIMITATION_1_TEXT: "Les tâches cron ne peuvent pas être gérées pendant le processus de mise à niveau. Nous vous recommandons de les désactiver manuellement avant la mise à niveau."

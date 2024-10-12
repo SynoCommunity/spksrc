@@ -40,17 +40,13 @@
 					"intl",
 					"ldap",
 					"openssl",
-					"pdo_sqlite",
-					"sqlite3",
+					"pdo_mysql",
+					"redis",
 					"ssh2",
 					"zip",
 					"zlib"
 				],
 				"group": "http",
-				"php_settings": {
-					"error_log": "/var/services/web_packages/owncloud/php_errors.log",
-					"max_execution_time": "900"
-				},
 				"profile_desc": "PHP Profile for ownCloud",
 				"profile_name": "ownCloud Profile",
 				"user": "sc-owncloud"
