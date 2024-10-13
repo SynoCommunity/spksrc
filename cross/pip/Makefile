@@ -1,5 +1,6 @@
 PKG_NAME = pip
-# use the same version in native/python310|311/Makefile (python310|311_native_post_install)
+# used to be the same version in native/python310|311/Makefile (python310|311_native_post_install)
+# but this is now the last version of pip that can be installed using legacy setup.py
 PKG_VERS = 23.2.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
