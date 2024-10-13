@@ -26,6 +26,7 @@ RESTORE_BACKUP_FILE="wizard_owncloud_restore"
 BACKUP_FILE_PATH="wizard_backup_file"
 RESTORE_ERROR_TEXT="{{{OWNCLOUD_BACKUP_FILE_VALIDATION_ERROR_TEXT}}}"
 SHARE_ERROR_TEXT="{{{OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
+MYSQL_ROOT_PASSWORD="wizard_mysql_password_root"
 
 checkBackupRestore()
 {
@@ -155,6 +156,13 @@ getDeActiveate()
 			currentStep.nextId = adminStep.itemId;
 		}
 	}
+	if (currentStep.headline === "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}") {
+		var getRootPassword = adminStep.getComponent("${MYSQL_ROOT_PASSWORD}");
+		var confirmRootPassword = confirmStep.getComponent("${MYSQL_ROOT_PASSWORD}");
+		if (confirmRootPassword.getValue() === "") {
+			confirmRootPassword.setValue(getRootPassword.getValue());
+		}
+	}
 }
 EOF
 )
@@ -224,6 +232,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 	"step_title": "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}",
 	"invalid_next_disabled_v2": true,
 	"activate_v2": "$(getActiveate)",
+	"deactivate_v2": "$(getDeActiveate)",
 	"items": [{
 		"type": "textfield",
 		"desc": "{{{OWNCLOUD_ADMIN_USER_NAME_DESCRIPTION}}}",
@@ -250,7 +259,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 		"type": "password",
 		"desc": "{{{MYSQL_ROOT_PASSWORD_DESCRIPTION}}}",
 		"subitems": [{
-			"key": "wizard_mysql_password_root",
+			"key": "${MYSQL_ROOT_PASSWORD}",
 			"desc": "{{{MYSQL_ROOT_PASSWORD_LABEL}}}",
 			"validator": {
 				"allowBlank": false
@@ -286,7 +295,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 		"type": "password",
 		"desc": "{{{MYSQL_ROOT_PASSWORD_DESCRIPTION}}}",
 		"subitems": [{
-			"key": "wizard_mysql_password_root",
+			"key": "${MYSQL_ROOT_PASSWORD}",
 			"desc": "{{{MYSQL_ROOT_PASSWORD_LABEL}}}",
 			"validator": {
 				"allowBlank": false
