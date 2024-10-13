@@ -157,10 +157,10 @@ getDeActiveate()
 		}
 	}
 	if (currentStep.headline === "{{{OWNCLOUD_ADMIN_CONFIGURATION_STEP_TITLE}}}") {
-		var getRootPassword = adminStep.getComponent("${MYSQL_ROOT_PASSWORD}");
+		var setRootPassword = adminStep.getComponent("${MYSQL_ROOT_PASSWORD}");
 		var confirmRootPassword = confirmStep.getComponent("${MYSQL_ROOT_PASSWORD}");
-		if (confirmRootPassword.getValue() === "") {
-			confirmRootPassword.setValue(getRootPassword.getValue());
+		if (!restoreChecked) {
+			confirmRootPassword.setValue(setRootPassword.getValue());
 		}
 	}
 }
