@@ -9,7 +9,7 @@ SPK_ICON = src/python3.png
 # And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/python313
 DEPENDS += cross/pip
 
 MAINTAINER = SynoCommunity
@@ -22,6 +22,9 @@ CHANGELOG = "1. Initial Python 3.13.0 package release"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
+
+# Force compiler LTO optimizations
+ENV += PYTHON_OPTIMIZE=1
 
 # Force building pure-python wheels
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
@@ -39,7 +42,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: python313_extra_install
 python313_extra_install:
-	@$(MSG) - Remove test folder
-	rm -rf $(STAGING_DIR)/$(PYTHON_LIB_DIR)/test/
 	@$(MSG) - Remove compiled files from __pycache__
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' -delete

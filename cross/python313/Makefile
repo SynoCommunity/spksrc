@@ -34,6 +34,7 @@ CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
 CONFIGURE_ARGS += --with-build-python
 CONFIGURE_ARGS += --with-readline=readline
+CONFIGURE_ARGS += --disable-test-modules
 
 include ../../mk/spksrc.archs.mk
 
@@ -66,7 +67,6 @@ CONFIGURE_ARGS += --with-system-expat
 
 # libffi is no longer bundled with python
 DEPENDS += cross/libffi
-CONFIGURE_ARGS += --with-system-ffi
 
 # Mandatory PYO3_* variables for rust cross-compiling
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
