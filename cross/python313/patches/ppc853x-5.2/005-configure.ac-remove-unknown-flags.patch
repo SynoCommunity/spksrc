@@ -1,0 +1,24 @@
+# remove flags unknown by gcc 4.3.2 (lto optimization is disabled at all for ppc853x arch)
+# - remove -fprofile-correction
+# - replace -std=c11 by -std=c99
+#
+--- configure.ac.orig	2023-08-24 12:09:18.000000000 +0000
++++ configure.ac	2024-03-02 20:17:15.812508858 +0000
+@@ -1989,7 +1989,7 @@
+         ;;
+       *)
+         PGO_PROF_GEN_FLAG="-fprofile-generate"
+-        PGO_PROF_USE_FLAG="-fprofile-use -fprofile-correction"
++        PGO_PROF_USE_FLAG="-fprofile-use"
+         LLVM_PROF_MERGER="true"
+         LLVM_PROF_FILE=""
+         ;;
+@@ -2195,7 +2195,7 @@
+ # tweak BASECFLAGS based on compiler and platform
+ case $GCC in
+ yes)
+-    CFLAGS_NODIST="$CFLAGS_NODIST -std=c11"
++    CFLAGS_NODIST="$CFLAGS_NODIST -std=c99"
+ 
+     PY_CHECK_CC_WARNING([enable], [extra], [if we can add -Wextra])
+     AS_VAR_IF([ac_cv_enable_extra_warning], [yes],
