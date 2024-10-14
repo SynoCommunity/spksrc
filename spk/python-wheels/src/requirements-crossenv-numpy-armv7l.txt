@@ -1,0 +1,12 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
+# [numpy]
+#   - armv7L (hi3535-6.1) Last known working version
+#   - Require Cython in cross/python311 crossenv
+#   - numpy.distutils is deprecated since NumPy 1.23.0
+#     Recommend to use `setuptools < 60.0` for Python >= 3.12
+numpy==1.22.4

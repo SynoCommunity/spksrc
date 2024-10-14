@@ -1,0 +1,31 @@
+# basic default wheels
+# ==> Always install latest version (service-setup.sh:install_python_virtualenv)
+pip==24.2
+
+# Always match what's in cross/python311/Makefile
+setuptools==68.1.2
+wheel==0.44.0
+
+# Always use latest version available
+# certifi==2024.8.30
+certifi
+
+# Mandatory for python application
+# to create their local virtualenv
+# in order to install wheels within
+# their running environment
+virtualenv==20.26.6
+
+# Other mandatory wheels that
+# gets install by default as
+# basic dependencies of above
+distlib==0.3.8
+filelock==3.16.1
+platformdirs==4.3.6
+six==1.16.0
+
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
