@@ -17,6 +17,7 @@ fi
 MYSQL="/usr/local/mariadb10/bin/mysql"
 MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
 MYSQL_DATABASE="${SYNOPKG_PKGNAME}"
+MYSQL_USER="oc_${wizard_owncloud_admin_username}"
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 SYNOSVC="/usr/syno/sbin/synoservice"
 
@@ -76,13 +77,16 @@ exec_occ() {
 setup_owncloud_instance()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        # Setup database
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_owncloud}';"
+
         # Setup configuration file
         exec_occ maintenance:install \
         --database "mysql" \
-        --database-name "${SYNOPKG_PKGNAME}" \
+        --database-name "${MYSQL_DATABASE}" \
         --database-host "localhost:/run/mysqld/mysqld10.sock" \
-        --database-user "root" \
-        --database-pass "${wizard_mysql_password_root}" \
+        --database-user "${MYSQL_USER}" \
+        --database-pass "${wizard_mysql_password_owncloud}" \
         --admin-user "${wizard_owncloud_admin_username}" \
         --admin-pass "${wizard_owncloud_admin_password}" \
         --data-dir "${DATA_DIR}" 2>&1
@@ -165,7 +169,6 @@ validate_preinst ()
     fi
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        MYSQL_USER="oc_${wizard_owncloud_admin_username}"
         # Check database
         if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
             echo "Incorrect MySQL 'root' password"
