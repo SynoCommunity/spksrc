@@ -23,6 +23,9 @@ CHANGELOG = "1. Update to Python 3.11.10<br/>2. Update all mandatory wheels"
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
+# Force compiler LTO optimizations
+ENV += PYTHON_OPTIMIZE=1
+
 # Force building pure-python wheels
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS = src/requirements-pure.txt
