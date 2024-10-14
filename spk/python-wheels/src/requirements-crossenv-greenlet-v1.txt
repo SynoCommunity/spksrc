@@ -1,0 +1,9 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
+# [greenlet]
+#   - gcc < 5.0 (DSM6) Last known working version
+greenlet==1.1.3
