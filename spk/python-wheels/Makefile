@@ -22,14 +22,20 @@ CHANGELOG = "1. Initial package"
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
-# Enable debug_info symgols for all archs
+# Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
-# Force building pure-python wheels
-WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
-WHEELS = src/requirements-pure.txt
-WHEELS += src/requirements-crossenv.txt
+WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-abi3.txt
+
+# [borgbackup]
+# Use OpenSSL path as defined by either
+# spksrc.wheel-env.mk or spksrc.python.mk
+ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
+ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
+DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
 
 # [cryptography]
 # Use cross/cryptography to generate py36-abi3 limited API
@@ -77,21 +83,6 @@ ENV += SODIUM_INSTALL=system
 DEPENDS += cross/libyaml
 
 include ../../mk/spksrc.common.mk
-
-# Force compiler LTO optimizations except:
-#   - when testing all wheels
-#   - when including debug_info symbols
-#   - when using OLD_PPC_ARCHS arch
-ifneq ($(strip $(WHEELS_TEST_ALL)),1)
-ifneq ($(strip $(GCC_DEBUG_INFO)),1)
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-ENV += PYTHON_OPTIMIZE=1
-endif
-endif
-endif
-
-## WHEELS_TEST_ALL: Force testing all wheel building
-ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 
 # [rpds-py]
 # maturin canot be built as pre-requisite crossenv
@@ -156,5 +147,9 @@ WHEELS_CFLAGS += [pydantic_core] -std=c11
 else
 WHEELS_CFLAGS += [pydantic_core] -std=c99
 endif
+# Requires path to maturin from crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+
+# [rpds-py]
 # Requires path to maturin from crossenv
 ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
