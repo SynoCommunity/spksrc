@@ -32,7 +32,6 @@ COMMENT  = BIND (Berkeley Internet Name Domain) is a complete, highly portable i
 LICENSE  = MPL 2.0
 
 GNU_CONFIGURE = 1
-PRE_CONFIGURE_TARGET = bind_pre_configure
 PRE_COMPILE_TARGET = bind_pre_compile
 
 ADDITIONAL_CFLAGS = -O2
@@ -47,12 +46,6 @@ CONFIGURE_ARGS += BUILD_LDFLAGS="$(LDFLAGS)"
 CONFIGURE_ARGS += BUILD_LIBS="$(LIBS)"
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: bind_pre_configure
-bind_pre_configure:
-	@$(MSG) Install libtool binary
-	sudo apt-get update
-	sudo apt-get install -y libtool-bin
 
 .PHONY: bind_pre_compile
 # libns and libisccfg must be available in the install location at compile time
