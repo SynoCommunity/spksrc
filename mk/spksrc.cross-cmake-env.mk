@@ -102,18 +102,13 @@ endif
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
   # Define x86asm
   ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-    HOST_NASM = $(shell command -v nasm 2>/dev/null)
-    ENABLE_ASSEMBLY = ON
-    ifneq ($(HOST_NASM),)
-      ENV += AS=$(HOST_NASM)
-      CMAKE_ASM_COMPILER = $(HOST_NASM)
-    else
-      DEPENDS += native/nasm
-      NASM_PATH = $(abspath $(CURDIR)/../../native/nasm/work-native/install/usr/local/bin)
-      ENV += PATH=$(NASM_PATH):$$PATH
-      ENV += AS=$(NASM_PATH)/nasm
-      CMAKE_ASM_COMPILER = $(NASM_PATH)/nasm
+    NASM_BINARY = $(shell which nasm)
+    ifeq ($(NASM_BINARY),)
+      $(error nasm not found. Please install NASM assembler for CMAKE_USE_NASM=1)
     endif
+    ENABLE_ASSEMBLY = ON
+    ENV += AS=$(NASM_BINARY)
+    CMAKE_ASM_COMPILER = $(NASM_BINARY)
   endif
 else
   CMAKE_USE_NASM = 0

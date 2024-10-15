@@ -1,4 +1,4 @@
-# Configuration for CMake build
+# Configuration for CMake build of native packages
 #
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release
@@ -29,12 +29,13 @@ endif
 
 # set default ASM build environment
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
-  DEPENDS += native/nasm
-  NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
-  ENV += PATH=$(NASM_PATH):$$PATH
-  ENV += AS=$(NASM_PATH)/nasm
+  NASM_BINARY = $(shell which nasm)
+  ifeq ($(NASM_BINARY),)
+    $(error nasm not found. Please install NASM assembler for CMAKE_USE_NASM=1)
+  endif
+  ENV += AS=$(NASM_BINARY)
   CMAKE_ARGS += -DENABLE_ASSEMBLY=ON
-  CMAKE_ARGS += -DCMAKE_ASM_COMPILER=$(NASM_PATH)/nasm
+  CMAKE_ARGS += -DCMAKE_ASM_COMPILER=$(NASM_BINARY)
 else
   CMAKE_USE_NASM = 0
 endif
