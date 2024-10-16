@@ -3,7 +3,7 @@ SPK_VERS = 2.1.3
 SPK_REV = 2
 SPK_ICON = src/curaengine.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/curaengine
 
 # c++11 compiler required
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)

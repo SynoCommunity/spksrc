@@ -2,7 +2,7 @@ SPK_NAME = duf
 SPK_VERS = 0.8.1
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/duf
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 

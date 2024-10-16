@@ -2,7 +2,7 @@ SPK_NAME = mtr
 SPK_VERS = 0.95
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/mtr
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = mtr \(My traceroute\) combines the functionality of the 'traceroute' and 'ping' programs in a single network diagnostic tool.

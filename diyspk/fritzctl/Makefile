@@ -1,9 +1,9 @@
 SPK_NAME = fritzctl
 SPK_VERS = 1.4.23
 SPK_REV = 1
-SPK_ICON = src/$(SPK_NAME).png
+SPK_ICON = src/fritzctl.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/fritzctl
 
 MAINTAINER = bpicode
 DESCRIPTION = A lightweight, easy to use console client for the AVM FRITZ!Box Home Automation.

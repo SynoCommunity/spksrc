@@ -11,7 +11,7 @@ PKG_DIR = Python-$(PKG_VERS)
 # And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-BUILD_DEPENDS = native/$(PKG_NAME)
+BUILD_DEPENDS = native/python311
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
 # required for Sleepycat^WOracle Berkeley DB interface

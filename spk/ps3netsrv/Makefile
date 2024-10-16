@@ -3,7 +3,7 @@ SPK_VERS = 1.47.46
 SPK_REV = 9
 SPK_ICON = src/${SPK_NAME}.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/ps3netsrv
 
 MAINTAINER = Hirador
 # webMAN MOD is a homebrew plugin for PlayStation®3 forked from the original webMAN/sMAN by DeanK with many features added.

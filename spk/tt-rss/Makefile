@@ -3,7 +3,7 @@ SPK_VERS = 20230828
 SPK_REV = 18
 SPK_ICON = src/tt-rss.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/tt-rss
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 

@@ -3,7 +3,7 @@ SPK_VERS = 2.26.3
 SPK_REV = 6
 SPK_ICON = src/mantisbt.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/mantisbt
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
