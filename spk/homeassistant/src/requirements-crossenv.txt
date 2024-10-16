@@ -28,7 +28,7 @@ miniaudio==1.59
 msgpack==1.0.5
 multidict==6.0.4
 netifaces==0.11.0
-numpy==1.23.2
+numpy==1.24.4
 orjson==3.9.1
 # pandas==2.0.3         # depends on installed numpy wheel ?...
 Pillow==9.5.0
