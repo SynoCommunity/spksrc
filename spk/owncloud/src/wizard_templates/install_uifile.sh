@@ -24,6 +24,7 @@ page_append ()
 
 RESTORE_BACKUP_FILE="wizard_owncloud_restore"
 BACKUP_FILE_PATH="wizard_backup_file"
+RESTORE_BLANK_TEXT="{{{OWNCLOUD_BACKUP_FILE_VALIDATION_BLANK_TEXT}}}"
 RESTORE_ERROR_TEXT="{{{OWNCLOUD_BACKUP_FILE_VALIDATION_ERROR_TEXT}}}"
 SHARE_ERROR_TEXT="{{{OWNCLOUD_DATA_DIRECTORY_VALIDATION_ERROR_TEXT}}}"
 MYSQL_ROOT_PASSWORD="wizard_mysql_password_root"
@@ -35,8 +36,13 @@ checkBackupRestore()
 	var backupFilePath = arguments[0];
 	var step = arguments[2];
 	var backupRestore = step.getComponent("${RESTORE_BACKUP_FILE}");
+	const backupFileRegex = /^\/(volume|volumeUSB)[0-9]+\/([^\/]+\/)*owncloud_backup_v\d+\.\d+\.\d+_\d{8}\.tar\.gz$/;
 	if (backupRestore.checked) {
 		if (backupFilePath === "") {
+			return "${RESTORE_BLANK_TEXT}";
+		} else if (backupFileRegex.test(backupFilePath)) {
+			return true;
+		} else {
 			return "${RESTORE_ERROR_TEXT}";
 		}
 	}
@@ -169,6 +175,18 @@ EOF
 	echo "$DEACTIVAETE" | quote_json
 }
 
+getPasswordValidator()
+{
+	validator=$(/bin/cat<<EOF
+{
+	var password = arguments[0];
+	return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})");
+}
+EOF
+)
+	echo "$validator" | quote_json
+}
+
 # Check for multiple PHP profiles
 check_php_profiles ()
 {
@@ -210,7 +228,7 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"key": "${BACKUP_FILE_PATH}",
 			"desc": "{{{OWNCLOUD_BACKUP_FILE_LOCATION_LABEL}}}",
 			"disabled": true,
-			"emptyText": "${SYNOPKG_PKGDEST_VOL}/${SYNOPKG_PKGNAME}/backup",
+			"emptyText": "${SYNOPKG_PKGDEST_VOL}/backup/${SYNOPKG_PKGNAME}_backup_v10.15.0_20241015.tar.gz",
 			"validator": {
 				"fn": "$(checkBackupRestore)"
 			}
@@ -253,6 +271,17 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 			"defaultValue": "admin",
 			"validator": {
 				"allowBlank": false
+			}
+		}]
+	}, {
+		"type": "password",
+		"desc": "{{{MYSQL_OWNCLOUD_PASSWORD_DESCRIPTION}}}",
+		"subitems": [{
+			"key": "wizard_mysql_password_owncloud",
+			"desc": "{{{MYSQL_OWNCLOUD_PASSWORD_LABEL}}}",
+			"invalidText": "{{{MYSQL_OWNCLOUD_PASSWORD_VALIDATION_ERROR_TEXT}}}",
+			"validator": {
+				"fn": "$(getPasswordValidator)"
 			}
 		}]
 	}, {
