@@ -1,8 +1,8 @@
 PKG_NAME = minio-client
 REAL_PKG_NAME = mc
-PKG_VERS = 2022-08-28T20-08-11Z
+PKG_VERS = 2022-12-13T00-23-28Z
 PKG_RELEASE_TAG = $(subst :,-,$(PKG_VERS))
-PKG_COMMIT_ID = a64491e101feeaf68735a20c204d06993ba531e5
+PKG_COMMIT_ID = 4b4cab0441f000db100c5b5d9329221181bf61f2
 PKG_EXT = tar.gz
 PKG_DIST_PREFIX = RELEASE.$(PKG_RELEASE_TAG)
 PKG_DIST_NAME = $(PKG_DIST_PREFIX).$(PKG_EXT)
@@ -25,12 +25,13 @@ GO_BIN_DIR = $(GO_SRC_DIR)/$(REAL_PKG_NAME)
 
 ENV += GO111MODULE=on
 
-GO_BUILD_ARGS = -tags kqueue
+GO_BUILD_ARGS = -tags kqueue -buildvcs=false
 
 GO_LDFLAGS  = -s -w
+GO_LDFLAGS += -X github.com/minio/mc/cmd.Version=$(PKG_VERS)
 GO_LDFLAGS += -X github.com/minio/mc/cmd.ReleaseTag=$(PKG_RELEASE_TAG)
-GO_LDFLAGS += -X github.com/minio/mc/cmd.CopyrightYear=$(firstword $(subst -, ,$(PKG_VERS)))
 GO_LDFLAGS += -X github.com/minio/mc/cmd.CommitID=$(PKG_COMMIT_ID)
+GO_LDFLAGS += -X github.com/minio/mc/cmd.CopyrightYear=$(firstword $(subst -, ,$(PKG_VERS)))
 
 include ../../mk/spksrc.cross-go.mk
 
