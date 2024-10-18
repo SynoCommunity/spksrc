@@ -1,5 +1,5 @@
 SPK_NAME = lsd
-SPK_VERS = 1.0.0
+SPK_VERS = 1.1.5
 SPK_REV = 1
 
 DEPENDS = cross/lsd
