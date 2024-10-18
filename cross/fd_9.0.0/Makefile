@@ -1,5 +1,5 @@
 PKG_NAME = fd
-PKG_VERS = 10.2.0
+PKG_VERS = 9.0.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sharkdp/fd/archive
@@ -15,8 +15,6 @@ UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
 # powerpc archs (except qoriq) are not supported
 # undefined reference to 'pipe2'
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
-# as long as rustc for qoriq is < 1.77.2
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 # This is still an issue with rustc 1.77.2 (25ef9e3d8 2024-04-09):
