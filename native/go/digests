@@ -1,3 +1,3 @@
-go1.22.6.linux-amd64.tar.gz SHA1 88b22631c5d902eacdf73dd5a852c861824c6509
-go1.22.6.linux-amd64.tar.gz SHA256 999805bed7d9039ec3da1a53bfbcafc13e367da52aa823cb60b68ba22d44c616
-go1.22.6.linux-amd64.tar.gz MD5 1011ed6d7feda478d4c45ea5a2a63444
+go1.23.2.linux-amd64.tar.gz SHA1 682ecb2fe66c54019f96eb81c4327bf278ce185d
+go1.23.2.linux-amd64.tar.gz SHA256 542d3c1705f1c6a1c5a80d5dc62e2e45171af291e755d591c5e6531ef63b454e
+go1.23.2.linux-amd64.tar.gz MD5 cefc091ace139627c04dbda518e5b67f
