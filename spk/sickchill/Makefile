@@ -31,7 +31,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "1. A wheel based install, git installs not supported by upstream.<br/>2. Python update to 3.11.5, OpenSSL 3.1.2<br/>3. Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies"
+CHANGELOG = "1. A wheel based install, git installs not supported by upstream.<br/>2. Python update to 3.11.10, OpenSSL 3.1.2<br/>3. Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies"
 
 HOMEPAGE = https://sickchill.github.io/
 LICENSE = GPLv3+
