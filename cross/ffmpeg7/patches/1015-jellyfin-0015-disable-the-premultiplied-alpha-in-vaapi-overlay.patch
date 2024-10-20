@@ -1,0 +1,17 @@
+Index: FFmpeg/libavfilter/vf_overlay_vaapi.c
+===================================================================
+--- libavfilter/vf_overlay_vaapi.c
++++ libavfilter/vf_overlay_vaapi.c
+@@ -311,8 +311,12 @@ static int overlay_vaapi_config_input_ov
+         ctx->blend_alpha  = ctx->alpha;
+     }
+ 
++    // VA_BLEND_PREMULTIPLIED_ALPHA may cause issues in
++    // per-pixel alpha case, disable it to align with MSDK.
++#if 0
+     if (have_alpha_planar(inlink))
+         ctx->blend_flags |= VA_BLEND_PREMULTIPLIED_ALPHA;
++#endif
+ 
+     return 0;
+ }

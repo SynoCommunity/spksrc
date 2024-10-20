@@ -1,9 +1,9 @@
 SPK_NAME = iperf2
-SPK_VERS = 2.1.4
-SPK_REV = 3
+SPK_VERS = 2.2.0
+SPK_REV = 1
 SPK_ICON = src/iperf2.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/iperf2
 
 MAINTAINER = hgy59
 DESCRIPTION = A tool for measuring TCP and UDP network performance, based on iperf 2.0.5.

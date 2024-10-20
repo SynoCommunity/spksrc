@@ -57,7 +57,7 @@ rust_toml:
 	echo "compiler-docs = false" ; \
 	echo
 	@echo "[rust]" ; \
-	echo 'channel = "stable"' ; \
+	echo 'channel = "$(RUSTUP_DEFAULT_TOOLCHAIN)"' ; \
 	echo 'lto = "off"' ; \
 	echo
 	@echo "[llvm]" ; \
@@ -104,7 +104,7 @@ rustc_target: $(PRE_RUSTC_TARGET) $(TC_LOCAL_VARS_RUST)
 	flock -u 5
 ifeq ($(TC_RUSTUP_TOOLCHAIN),$(RUSTUP_DEFAULT_TOOLCHAIN))
 	@$(MSG) "rustup target add $(RUST_TARGET)"
-	rustup override set stable
+	rustup override set $(RUSTUP_DEFAULT_TOOLCHAIN)
 	rustup target add $(RUST_TARGET)
 	rustup show
 else

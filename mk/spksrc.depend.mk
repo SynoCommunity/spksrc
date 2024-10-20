@@ -12,6 +12,9 @@
 #  REQUIRE_TOOLKIT     If set, will download and extract matching toolkit
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
 
+### For managing kernel modules dependent builds
+include ../../mk/spksrc.kernel-modules.mk
+
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
 
 ifeq ($(strip $(PRE_DEPEND_TARGET)),)
@@ -36,23 +39,20 @@ else
 TOOLKIT_DEPEND = toolkit/syno-$(ARCH)-$(TCVERSION)
 endif
 
-ifeq ($(strip $(REQUIRE_KERNEL)),)
-KERNEL_DEPEND = 
-else
-KERNEL_DEPEND = kernel/syno-$(ARCH)-$(TCVERSION)
-ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-KERNEL_MODULE_DEPEND = $(filter-out $(GENERIC_ARCHS),$(addprefix kernel/syno-,$(filter $(addprefix %-,$(filter $(firstword $(subst ., ,$(TCVERSION))).%,$(SUPPORTED_KERNEL_VERSIONS))),$(filter-out $(addsuffix -%,$(UNSUPPORTED_ARCHS)),$(LEGACY_ARCHS)))))
-endif
-endif
-
 depend_msg_target:
 	@$(MSG) "Processing dependencies of $(NAME)"
 
 pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+# As depend is also ran at toolchain-time, ensure to skip kernel-modules
+ifeq ($(filter toolchain,$(shell basename $(abspath $(CURDIR)/../))),)
+depend_target: kernel-modules
+endif
+endif
 	@set -e; \
-	for depend in $(BUILD_DEPENDS) $(KERNEL_DEPEND) $(TOOLKIT_DEPEND) $(DEPENDS); \
+	for depend in $(BUILD_DEPENDS) $(TOOLKIT_DEPEND) $(DEPENDS); \
 	do                          \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done

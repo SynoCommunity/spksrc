@@ -1,8 +1,8 @@
 PKG_NAME = libimagequant
-PKG_VERS = 2.17.0
+PKG_VERS = 2.18.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/ImageOptim/$(PKG_NAME)/archive
+PKG_DIST_SITE = https://github.com/ImageOptim/libimagequant/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 

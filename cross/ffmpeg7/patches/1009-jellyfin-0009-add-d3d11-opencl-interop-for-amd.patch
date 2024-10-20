@@ -1,0 +1,393 @@
+Index: FFmpeg/libavutil/hwcontext_opencl.c
+===================================================================
+--- libavutil/hwcontext_opencl.c
++++ libavutil/hwcontext_opencl.c
+@@ -64,6 +64,16 @@
+ #if HAVE_OPENCL_D3D11
+ #include <CL/cl_d3d11.h>
+ #include "hwcontext_d3d11va.h"
++
++// From cl_amd_planar_yuv; unfortunately no header is provided.
++typedef CL_API_ENTRY cl_mem(CL_API_CALL *clGetPlaneFromImageAMD_fn)(
++    cl_context context, cl_mem mem, cl_uint plane,
++    cl_int *errcode_ret);
++
++typedef CL_API_ENTRY cl_mem(CL_API_CALL *clConvertImageAMD_fn)(
++    cl_context context, cl_mem image, const cl_image_format *image_format,
++    cl_int *errcode_ret);
++
+ #endif
+ 
+ #if HAVE_OPENCL_DRM_ARM
+@@ -129,12 +139,18 @@ typedef struct OpenCLDeviceContext {
+ 
+ #if HAVE_OPENCL_D3D11
+     int d3d11_mapping_usable;
++    int d3d11_map_amd;
++    int d3d11_map_intel;
+     clCreateFromD3D11Texture2DKHR_fn
+         clCreateFromD3D11Texture2DKHR;
+     clEnqueueAcquireD3D11ObjectsKHR_fn
+         clEnqueueAcquireD3D11ObjectsKHR;
+     clEnqueueReleaseD3D11ObjectsKHR_fn
+         clEnqueueReleaseD3D11ObjectsKHR;
++    clGetPlaneFromImageAMD_fn
++        clGetPlaneFromImageAMD;
++    clConvertImageAMD_fn
++        clConvertImageAMD;
+ #endif
+ 
+ #if HAVE_OPENCL_DRM_ARM
+@@ -512,8 +528,10 @@ static int opencl_device_create_internal
+     cl_uint      nb_platforms;
+     cl_platform_id *platforms = NULL;
+     cl_platform_id  platform_id;
++    cl_platform_id  platform_id_default;
+     cl_uint      nb_devices;
+     cl_device_id   *devices = NULL;
++    cl_device_id    device_id_default;
+     AVOpenCLDeviceContext *hwctx = hwdev->hwctx;
+     cl_int cle;
+     cl_context_properties default_props[3];
+@@ -592,6 +610,11 @@ static int opencl_device_create_internal
+             ++found;
+             platform_id      = platforms[p];
+             hwctx->device_id = devices[d];
++
++            if (p == 0 && d == 0) {
++                platform_id_default = platforms[0];
++                device_id_default   = devices[0];
++            }
+         }
+ 
+         av_freep(&devices);
+@@ -603,9 +626,10 @@ static int opencl_device_create_internal
+         goto fail;
+     }
+     if (found > 1) {
+-        av_log(hwdev, AV_LOG_ERROR, "More than one matching device found.\n");
+-        err = AVERROR(ENODEV);
+-        goto fail;
++        av_log(hwdev, AV_LOG_WARNING, "More than one matching device found. "
++               "Default to the first one.\n");
++        platform_id      = platform_id_default;
++        hwctx->device_id = device_id_default;
+     }
+ 
+     if (!props) {
+@@ -841,17 +865,25 @@ static int opencl_device_init(AVHWDevice
+ #if HAVE_OPENCL_D3D11
+     {
+         const char *d3d11_ext = "cl_khr_d3d11_sharing";
+-        const char *nv12_ext  = "cl_intel_d3d11_nv12_media_sharing";
++        const char *amd_ext   = "cl_amd_planar_yuv";
++        const char *intel_ext = "cl_intel_d3d11_nv12_media_sharing";
+         int fail = 0;
+ 
+         if (!opencl_check_extension(hwdev, d3d11_ext)) {
+             av_log(hwdev, AV_LOG_VERBOSE, "The %s extension is "
+                    "required for D3D11 to OpenCL mapping.\n", d3d11_ext);
+             fail = 1;
+-        } else if (!opencl_check_extension(hwdev, nv12_ext)) {
+-            av_log(hwdev, AV_LOG_VERBOSE, "The %s extension may be "
+-                   "required for D3D11 to OpenCL mapping.\n", nv12_ext);
+-            // Not fatal.
++        } else {
++            if (opencl_check_extension(hwdev, amd_ext)) {
++                priv->d3d11_map_amd = 1;
++            } else if (opencl_check_extension(hwdev, intel_ext)) {
++                priv->d3d11_map_intel = 1;
++            } else {
++                av_log(hwdev, AV_LOG_VERBOSE, "One of the %s or %s "
++                       "extensions are required for D3D11 to OpenCL "
++                       "mapping.\n", amd_ext, intel_ext);
++                fail = 1;
++            }
+         }
+ 
+         CL_FUNC(clCreateFromD3D11Texture2DKHR,
+@@ -861,6 +893,13 @@ static int opencl_device_init(AVHWDevice
+         CL_FUNC(clEnqueueReleaseD3D11ObjectsKHR,
+                 "D3D11 in OpenCL release");
+ 
++        if (priv->d3d11_map_amd) {
++            CL_FUNC(clGetPlaneFromImageAMD,
++                    "D3D11 to OpenCL image planar mapping on AMD");
++            CL_FUNC(clConvertImageAMD,
++                    "D3D11 to OpenCL image data type converting on AMD");
++        }
++
+         if (fail) {
+             av_log(hwdev, AV_LOG_WARNING, "D3D11 to OpenCL mapping "
+                    "not usable.\n");
+@@ -1263,7 +1302,7 @@ static int opencl_device_derive(AVHWDevi
+                 CL_CONTEXT_VA_API_DISPLAY_INTEL,
+                 (intptr_t)src_hwctx->display,
+                 CL_CONTEXT_INTEROP_USER_SYNC,
+-                CL_FALSE,
++                CL_TRUE,
+                 0,
+             };
+             OpenCLDeviceSelector selector = {
+@@ -1302,11 +1341,13 @@ static int opencl_device_derive(AVHWDevi
+                                                     device_handle,
+                                                     &device, FALSE);
+             if (SUCCEEDED(hr)) {
+-                cl_context_properties props[5] = {
++                cl_context_properties props[7] = {
+                     CL_CONTEXT_PLATFORM,
+                     0,
+                     CL_CONTEXT_ADAPTER_D3D9EX_KHR,
+                     (intptr_t)device,
++                    CL_CONTEXT_INTEROP_USER_SYNC,
++                    CL_TRUE,
+                     0,
+                 };
+                 OpenCLDeviceSelector selector = {
+@@ -1339,11 +1380,13 @@ static int opencl_device_derive(AVHWDevi
+     case AV_HWDEVICE_TYPE_D3D11VA:
+         {
+             AVD3D11VADeviceContext *src_hwctx = src_ctx->hwctx;
+-            cl_context_properties props[5] = {
++            cl_context_properties props[7] = {
+                 CL_CONTEXT_PLATFORM,
+                 0,
+                 CL_CONTEXT_D3D11_DEVICE_KHR,
+                 (intptr_t)src_hwctx->device,
++                CL_CONTEXT_INTEROP_USER_SYNC,
++                CL_TRUE,
+                 0,
+             };
+             OpenCLDeviceSelector selector = {
+@@ -2461,8 +2504,9 @@ static int opencl_frames_derive_from_dxv
+     cl_int cle;
+     int err, i, p, nb_planes;
+ 
+-    if (src_fc->sw_format != AV_PIX_FMT_NV12) {
+-        av_log(dst_fc, AV_LOG_ERROR, "Only NV12 textures are supported "
++    if (src_fc->sw_format != AV_PIX_FMT_NV12 &&
++        src_fc->sw_format != AV_PIX_FMT_P010) {
++        av_log(dst_fc, AV_LOG_ERROR, "Only NV12 and P010 textures are supported "
+                "for DXVA2 to OpenCL mapping.\n");
+         return AVERROR(EINVAL);
+     }
+@@ -2536,12 +2580,22 @@ static void opencl_unmap_from_d3d11(AVHW
+     OpenCLFramesContext *frames_priv = dst_fc->hwctx;
+     cl_event event;
+     cl_int cle;
++    const cl_mem *mem_objs;
++    cl_uint num_objs;
++
++    if (!(device_priv->d3d11_map_amd ||
++          device_priv->d3d11_map_intel))
++        return;
++
++    num_objs = device_priv->d3d11_map_amd ? 1 : desc->nb_planes;
++    mem_objs = device_priv->d3d11_map_amd ? &desc->planes[desc->nb_planes - 1]
++                                          : desc->planes;
+ 
+     cle = device_priv->clEnqueueReleaseD3D11ObjectsKHR(
+-        frames_priv->command_queue, desc->nb_planes, desc->planes,
++        frames_priv->command_queue, num_objs, mem_objs,
+         0, NULL, &event);
+     if (cle != CL_SUCCESS) {
+-        av_log(dst_fc, AV_LOG_ERROR, "Failed to release surface "
++        av_log(dst_fc, AV_LOG_ERROR, "Failed to release texture "
+                "handle: %d.\n", cle);
+     }
+ 
+@@ -2556,7 +2610,9 @@ static int opencl_map_from_d3d11(AVHWFra
+     AVOpenCLFrameDescriptor *desc;
+     cl_event event;
+     cl_int cle;
+-    int err, index, i;
++    const cl_mem *mem_objs;
++    cl_uint num_objs;
++    int err, index, i, nb_planes;
+ 
+     index = (intptr_t)src->data[1];
+     if (index >= frames_priv->nb_mapped_frames) {
+@@ -2565,16 +2621,25 @@ static int opencl_map_from_d3d11(AVHWFra
+         return AVERROR(EINVAL);
+     }
+ 
++    if (!(device_priv->d3d11_map_amd ||
++          device_priv->d3d11_map_intel))
++        return AVERROR(ENOSYS);
++
+     av_log(dst_fc, AV_LOG_DEBUG, "Map D3D11 texture %d to OpenCL.\n",
+            index);
+ 
+     desc = &frames_priv->mapped_frames[index];
++    nb_planes = device_priv->d3d11_map_amd ? (desc->nb_planes - 1)
++                                           : desc->nb_planes;
++    num_objs = device_priv->d3d11_map_amd ? 1 : desc->nb_planes;
++    mem_objs = device_priv->d3d11_map_amd ? &desc->planes[nb_planes]
++                                          : desc->planes;
+ 
+     cle = device_priv->clEnqueueAcquireD3D11ObjectsKHR(
+-        frames_priv->command_queue, desc->nb_planes, desc->planes,
++        frames_priv->command_queue, num_objs, mem_objs,
+         0, NULL, &event);
+     if (cle != CL_SUCCESS) {
+-        av_log(dst_fc, AV_LOG_ERROR, "Failed to acquire surface "
++        av_log(dst_fc, AV_LOG_ERROR, "Failed to acquire texture "
+                "handle: %d.\n", cle);
+         return AVERROR(EIO);
+     }
+@@ -2583,7 +2648,7 @@ static int opencl_map_from_d3d11(AVHWFra
+     if (err < 0)
+         goto fail;
+ 
+-    for (i = 0; i < desc->nb_planes; i++)
++    for (i = 0; i < nb_planes; i++)
+         dst->data[i] = (uint8_t*)desc->planes[i];
+ 
+     err = ff_hwframe_map_create(dst->hw_frames_ctx, dst, src,
+@@ -2598,7 +2663,7 @@ static int opencl_map_from_d3d11(AVHWFra
+ 
+ fail:
+     cle = device_priv->clEnqueueReleaseD3D11ObjectsKHR(
+-        frames_priv->command_queue, desc->nb_planes, desc->planes,
++        frames_priv->command_queue, num_objs, mem_objs,
+         0, NULL, &event);
+     if (cle == CL_SUCCESS)
+         opencl_wait_events(dst_fc, &event, 1);
+@@ -2613,16 +2678,25 @@ static int opencl_frames_derive_from_d3d
+     OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->hwctx;
+     AVOpenCLDeviceContext    *dst_dev = &device_priv->p;
+     OpenCLFramesContext  *frames_priv = dst_fc->hwctx;
++    cl_mem plane_uint;
+     cl_mem_flags cl_flags;
+     cl_int cle;
+     int err, i, p, nb_planes;
+ 
+-    if (src_fc->sw_format != AV_PIX_FMT_NV12) {
+-        av_log(dst_fc, AV_LOG_ERROR, "Only NV12 textures are supported "
+-               "for D3D11 to OpenCL mapping.\n");
+-        return AVERROR(EINVAL);
++    // both AMD and Intel supports NV12 and P010,
++    // but Intel requires D3D11_RESOURCE_MISC_SHARED.
++    if (device_priv->d3d11_map_amd ||
++        device_priv->d3d11_map_intel) {
++        if (src_fc->sw_format != AV_PIX_FMT_NV12 &&
++            src_fc->sw_format != AV_PIX_FMT_P010) {
++            av_log(dst_fc, AV_LOG_ERROR, "Only NV12 and P010 textures are "
++                   "supported with AMD and Intel for D3D11 to OpenCL mapping.\n");
++            return AVERROR(EINVAL);
++        }
++    } else {
++        return AVERROR(ENOSYS);
+     }
+-    nb_planes = 2;
++    nb_planes = device_priv->d3d11_map_amd ? 3 : 2;
+ 
+     if (src_fc->initial_pool_size == 0) {
+         av_log(dst_fc, AV_LOG_ERROR, "Only fixed-size pools are supported "
+@@ -2645,27 +2719,94 @@ static int opencl_frames_derive_from_d3d
+     for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
+         AVOpenCLFrameDescriptor *desc = &frames_priv->mapped_frames[i];
+         desc->nb_planes = nb_planes;
+-        for (p = 0; p < nb_planes; p++) {
+-            UINT subresource = 2 * i + p;
+-
+-            desc->planes[p] =
+-                device_priv->clCreateFromD3D11Texture2DKHR(
+-                    dst_dev->context, cl_flags, src_hwctx->texture,
+-                    subresource, &cle);
+-            if (!desc->planes[p]) {
+-                av_log(dst_fc, AV_LOG_ERROR, "Failed to create CL "
+-                       "image from plane %d of D3D texture "
+-                       "index %d (subresource %u): %d.\n",
+-                       p, i, (unsigned int)subresource, cle);
++        if (device_priv->d3d11_map_amd) {
++            // put the multiple-plane AMD shared image at the end.
++            desc->planes[nb_planes - 1] = device_priv->clCreateFromD3D11Texture2DKHR(
++                dst_dev->context, cl_flags, src_hwctx->texture, i, &cle);
++            if (!desc->planes[nb_planes - 1]) {
++                av_log(dst_fc, AV_LOG_ERROR, "Failed to create CL image "
++                       "from D3D11 texture index %d: %d.\n", i, cle);
+                 err = AVERROR(EIO);
+                 goto fail;
+             }
++
++            for (p = 0; p < nb_planes - 1; p++) {
++                cl_image_format image_fmt;
++
++                // get plane from AMD in CL_UNSIGNED_INT8|16 type.
++                plane_uint = device_priv->clGetPlaneFromImageAMD(
++                    dst_dev->context, desc->planes[nb_planes - 1], p, &cle);
++                if (!plane_uint) {
++                    av_log(dst_fc, AV_LOG_ERROR, "Failed to create CL image "
++                           "from plane %d of image created from D3D11 "
++                           "texture index %d: %d.\n", p, i, cle);
++                    err = AVERROR(EIO);
++                    goto fail;
++                }
++
++                cle = clGetImageInfo(
++                    plane_uint, CL_IMAGE_FORMAT, sizeof(cl_image_format), &image_fmt, NULL);
++                if (cle != CL_SUCCESS) {
++                    av_log(dst_fc, AV_LOG_ERROR, "Failed to query image format of CL image "
++                           "from plane %d of image created from D3D11 "
++                           "texture index %d: %d.\n", p, i, cle);
++                    err = AVERROR_UNKNOWN;
++                    goto fail;
++                }
++
++                switch (image_fmt.image_channel_data_type) {
++                case CL_UNSIGNED_INT8:
++                    image_fmt.image_channel_data_type = CL_UNORM_INT8; break;
++                case CL_UNSIGNED_INT16:
++                    image_fmt.image_channel_data_type = CL_UNORM_INT16; break;
++                default:
++                    av_log(dst_fc, AV_LOG_ERROR, "The data type of CL image "
++                           "from plane %d of image created from D3D11 texture index %d "
++                           "isn't a CL_UNSIGNED_INT8|16 type.\n", p, i);
++                    err = AVERROR(EIO);
++                    goto fail;
++                }
++
++                // convert plane from CL_UNSIGNED_INT8|16 to CL_UNORM_INT8|16.
++                desc->planes[p] = device_priv->clConvertImageAMD(
++                    dst_dev->context, plane_uint, &image_fmt, &cle);
++                if (!desc->planes[p]) {
++                    av_log(dst_fc, AV_LOG_ERROR, "Failed to convert data type of CL image "
++                           "from plane %d of image created from D3D11 texture index %d "
++                           "to CL_UNORM_INT8|16 type: %d.\n", p, i, cle);
++                    err = AVERROR(EIO);
++                    goto fail;
++                }
++
++                clReleaseMemObject(plane_uint);
++            }
++        } else if (device_priv->d3d11_map_intel) {
++            for (p = 0; p < nb_planes; p++) {
++                UINT subresource = 2 * i + p;
++
++                desc->planes[p] =
++                    device_priv->clCreateFromD3D11Texture2DKHR(
++                        dst_dev->context, cl_flags, src_hwctx->texture,
++                        subresource, &cle);
++                if (!desc->planes[p]) {
++                    av_log(dst_fc, AV_LOG_ERROR, "Failed to create CL "
++                           "image from plane %d of D3D11 texture "
++                           "index %d (subresource %u): %d.\n",
++                           p, i, (unsigned int)subresource, cle);
++                    err = AVERROR(EIO);
++                    goto fail;
++                }
++            }
++        } else {
++            return AVERROR(ENOSYS);
+         }
+     }
+ 
+     return 0;
+ 
+ fail:
++    if (plane_uint)
++        clReleaseMemObject(plane_uint);
+     for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
+         AVOpenCLFrameDescriptor *desc = &frames_priv->mapped_frames[i];
+         for (p = 0; p < desc->nb_planes; p++) {

@@ -1,5 +1,5 @@
 PKG_NAME = aspnetcore-runtime
-PKG_VERS = 6.0.26
+PKG_VERS = 6.0.29
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://download.visualstudio.microsoft.com/download/pr/$(PKG_DIST_FOLDER)
@@ -11,10 +11,9 @@ include ../../mk/spksrc.archs.mk
 # use digests with multiple files and individual dist names
 # both lists must have the same order
 PKG_DIST_ARCH_LIST = linux-x64 linux-arm linux-arm64
-PKG_DIST_SITE_LIST  = https://download.visualstudio.microsoft.com/download/pr/b63daa46-51f4-480e-ad03-ef2c5a6a2885/ae059763456991305109bf98b3a67640/$(PKG_NAME)-$(PKG_VERS)-linux-x64.$(PKG_EXT)
-PKG_DIST_SITE_LIST += https://download.visualstudio.microsoft.com/download/pr/c1d42ac0-cd0c-4188-b260-1667a7443534/f0d1a0b4b88432f1c8d31b467d8548f0/$(PKG_NAME)-$(PKG_VERS)-linux-arm.$(PKG_EXT)
-PKG_DIST_SITE_LIST += https://download.visualstudio.microsoft.com/download/pr/cfc40e77-a6de-481f-812d-6867289e2d8b/eeedeebccc412fd01110d8b59050754d/$(PKG_NAME)-$(PKG_VERS)-linux-arm64.$(PKG_EXT)
-
+PKG_DIST_SITE_LIST  = https://download.visualstudio.microsoft.com/download/pr/70ddd1ed-776d-41d2-b192-f02436ef3ca6/337d6dd35177408acb9889289a7743a7/$(PKG_NAME)-$(PKG_VERS)-linux-x64.$(PKG_EXT)
+PKG_DIST_SITE_LIST += https://download.visualstudio.microsoft.com/download/pr/57510d35-63b1-4535-bf83-e10deb8a3b78/b052a4381befd434cbe8da36ab937ff8/$(PKG_NAME)-$(PKG_VERS)-linux-arm.$(PKG_EXT)
+PKG_DIST_SITE_LIST += https://download.visualstudio.microsoft.com/download/pr/094fe5d6-0520-4c0a-9edf-b53d269f8b20/8c5e69ed04787815037ae373ffb77466/$(PKG_NAME)-$(PKG_VERS)-linux-arm64.$(PKG_EXT)
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = $(word 1,$(PKG_DIST_ARCH_LIST))

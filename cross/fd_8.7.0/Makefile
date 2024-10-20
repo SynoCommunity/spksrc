@@ -7,6 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # PKG_VERS = 8.7.1 fails to build for RUST_TARGET = armv7-unknown-linux-gnueabi $(ARMv7L_ARCHS)
+# PKG_VERS <= 8.7.0 fails with newer rustc 1.80.1 - rust version to 1.77.2 for hi3535
 # see: https://github.com/sharkdp/fd/issues/1428
 
 # powerpc archs (except qoriq) are not supported

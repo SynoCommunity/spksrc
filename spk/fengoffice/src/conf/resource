@@ -1,0 +1,69 @@
+{
+    "mariadb10-db": {
+        "admin-account-m10": "root",
+        "admin-pw-m10": "{{wizard_mysql_password_root}}",
+        "create-db": {
+            "db-collision": "skip",
+            "db-name": "fengoffice",
+            "flag": "{{wizard_create_db}}"
+        },
+        "drop-db-uninst": true,
+        "drop-user-uninst": true,
+        "grant-user": {
+            "db-name": "fengoffice",
+            "flag": "{{mysql_grant_user}}",
+            "host": "localhost",
+            "user-name": "fengoffice",
+            "user-pw": "{{wizard_mysql_password_fengoffice}}"
+        }
+    },
+    "webservice": {
+        "pkg_dir_prepare": [
+            {
+                "group": "http",
+                "mode": "0755",
+                "source": "/var/packages/fengoffice/target/share/fengoffice",
+                "target": "fengoffice",
+                "user": "sc-fengoffice"
+            }
+        ],
+        "portals": [
+            {
+                "alias": "fengoffice",
+                "app": "com.synocommunity.packages.fengoffice",
+                "name": "Feng Office",
+                "service": "fengoffice",
+                "type": "alias"
+            }
+        ],
+        "services": [
+            {
+                "backend": 2,
+                "display_name": "Feng Office",
+                "icon": "app/images/fengoffice-{0}.png",
+                "php": {
+                    "backend": 8,
+                    "extensions": [
+                        "curl",
+                        "gd",
+                        "imagick",
+                        "imap",
+                        "intl",
+                        "mysqli",
+                        "pdo_mysql",
+                        "xmlrpc",
+                        "zip",
+                        "zlib"
+                    ],
+                    "group": "http",
+                    "profile_desc": "PHP Profile for fengoffice",
+                    "profile_name": "fengoffice Profile",
+                    "user": "sc-fengoffice"
+                },
+                "root": "fengoffice",
+                "service": "fengoffice",
+                "type": "apache_php"
+            }
+        ]
+    }
+}

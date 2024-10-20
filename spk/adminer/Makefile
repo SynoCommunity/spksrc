@@ -40,8 +40,8 @@ WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = adminer_extra_install
 
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

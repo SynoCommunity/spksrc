@@ -2,5 +2,7 @@ OWNCLOUD_PATH_VALIDATION_ERROR_TEXT: "Path should begin with /volume?/ with ? th
 
 OWNCLOUD_BACKUP_SERVER_STEP_TITLE: "Backup ownCloud server"
 OWNCLOUD_BACKUP_SERVER_DESCRIPTION: "<strong>WARNING:</strong> Uninstalling the ownCloud package will result in the removal of the ownCloud server, along with all associated user accounts, data, and configurations."
+MYSQL_ROOT_PASSWORD_DESCRIPTION: "Enter your MySQL superuser account password"
+MYSQL_ROOT_PASSWORD_LABEL: "MySQL 'root' password"
 OWNCLOUD_BACKUP_EXPORT_LOCATION_DESCRIPTION: "Before uninstalling, if you want to keep a backup of your data, please specify the directory where you would like to export to. Ensure that the user 'sc-owncloud' has write permissions to that directory. To skip exporting, leave this field blank."
 OWNCLOUD_BACKUP_EXPORT_LOCATION_LABEL: "Export location"

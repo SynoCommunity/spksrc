@@ -27,8 +27,10 @@ DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
+ifneq ($(ARCH),noarch)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
+endif
 endif
 
 ###
@@ -38,7 +40,7 @@ ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = cmake_configure_target
 endif
 
-# install
+# source directory
 ifeq ($(strip $(CMAKE_SOURCE_DIR)),)
 CMAKE_SOURCE_DIR = $(CMAKE_BASE_DIR)
 endif
@@ -54,6 +56,13 @@ endif
 # install
 ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = cmake_install_target
+endif
+
+# post-install
+ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
+ifeq ($(strip $(POST_INSTALL_TARGET)),)
+POST_INSTALL_TARGET = cmake_post_install_target
+endif
 endif
 endif
 
@@ -147,7 +156,7 @@ cmake_configure_target: $(CMAKE_TOOLCHAIN_PKG)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
-	$(RUN) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS)
+	$(RUN) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
 
@@ -167,6 +176,14 @@ ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
 else
 	$(RUN) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR)
 endif
+
+.PHONY: cmake_post_install_target
+
+# default post-install: clean
+# only called when GCC_NO_DEBUG_INFO=1
+cmake_post_install_target:
+	@$(MSG) - CMake post-install \(clean\)
+	$(RUN) cmake --build $(CMAKE_BUILD_DIR) --target clean
 
 
 ### For arch-* and all-<supported|latest>

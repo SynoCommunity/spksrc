@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/royhills/arp-scan/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-OPTIONAL_DEPENDS = cross/libpcap cross/libpcap_1.9
+DEPENDS = cross/libpcap
 
 HOMEPAGE = https://www.royhills.co.uk/wiki/index.php/Arp-scan_User_Guide
 COMMENT  = Command-line tool for system discovery and fingerprinting. It constructs and sends ARP requests to the specified IP addresses, and displays any responses that are received. 
@@ -21,13 +21,6 @@ CONFIGURE_ARGS = pgac_cv_snprintf_long_long_int_format="%lld"
 ADDITIONAL_CPPFLAGS = -O3
 
 include ../../mk/spksrc.cross-cc.mk
-
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS = cross/libpcap_1.9
-else
-DEPENDS = cross/libpcap
-endif
-
 
 .PHONY: arp-scan_pre_configure
 arp-scan_pre_configure:

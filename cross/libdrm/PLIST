@@ -1,12 +1,12 @@
 lnk:lib/libdrm.so
 lnk:lib/libdrm.so.2
-lib:lib/libdrm.so.2.4.0
+lib:lib/libdrm.so.2.123.0
 lnk:lib/libdrm_amdgpu.so
 lnk:lib/libdrm_amdgpu.so.1
-lib:lib/libdrm_amdgpu.so.1.0.0
+lib:lib/libdrm_amdgpu.so.1.123.0
 lnk:lib/libdrm_intel.so
 lnk:lib/libdrm_intel.so.1
-lib:lib/libdrm_intel.so.1.0.0
+lib:lib/libdrm_intel.so.1.123.0
 lnk:lib/libdrm_radeon.so
 lnk:lib/libdrm_radeon.so.1
-lib:lib/libdrm_radeon.so.1.0.1
+lib:lib/libdrm_radeon.so.1.123.0

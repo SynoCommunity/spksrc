@@ -1,0 +1,3 @@
+bin:bin/expect
+lib:lib/expect5.45.4/libexpect5.45.4.so
+rsc:lib/expect5.45.4/pkgIndex.tcl

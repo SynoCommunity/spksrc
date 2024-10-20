@@ -13,8 +13,8 @@ STARTABLE = no
 HOMEPAGE = http://fonts.google.com/
 LICENSE  = Most of the fonts in the collection use the SIL Open Font License, v1.1. Some fonts use the Apache 2 license. The Ubuntu fonts use the Ubuntu Font License v1.0.
 
-# Pure package, make sure ARCH is not defined
-override ARCH=
+# Pure package, make sure ARCH is noarch
+override ARCH=noarch
 
 WIZARDS_DIR = src/wizard
 SERVICE_SETUP = src/service-setup.sh

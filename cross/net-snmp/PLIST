@@ -8,6 +8,7 @@ bin:bin/snmpgetnext
 lnk:bin/snmpinform
 bin:bin/snmpnetstat
 bin:bin/snmpping
+bin:bin/snmpps
 bin:bin/snmpset
 bin:bin/snmpstatus
 bin:bin/snmptable
@@ -19,5 +20,5 @@ bin:bin/snmpvacm
 bin:bin/snmpwalk
 lnk:lib/libnetsnmp.so
 lnk:lib/libnetsnmp.so.40
-lib:lib/libnetsnmp.so.40.2.0
+lib:lib/libnetsnmp.so.40.2.1
 rsc:share/snmp/mibs/

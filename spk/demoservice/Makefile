@@ -3,7 +3,7 @@ SPK_VERS = 1.2
 SPK_REV = 8
 SPK_ICON = src/demoservice.png
 
-override ARCH=
+override ARCH=noarch
 
 MAINTAINER = ymartin59
 DESCRIPTION = Demonstration package to show installer script capabilities when requiring non-root user for background service and show configuration/creation of shared folder for package user.

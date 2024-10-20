@@ -1,0 +1,144 @@
+Index: FFmpeg/fftools/ffmpeg.c
+===================================================================
+--- fftools/ffmpeg.c
++++ fftools/ffmpeg.c
+@@ -116,6 +116,9 @@ typedef struct BenchmarkTimeStamps {
+ 
+ static BenchmarkTimeStamps get_benchmark_time_stamps(void);
+ static int64_t getmaxrss(void);
++static int64_t gettime_relative_minus_pause(void);
++static void pause_transcoding(void);
++static void unpause_transcoding(void);
+ 
+ atomic_uint nb_output_dumped = 0;
+ 
+@@ -134,6 +137,9 @@ int        nb_filtergraphs;
+ Decoder     **decoders;
+ int        nb_decoders;
+ 
++int64_t paused_start = 0;
++int64_t paused_time = 0;
++
+ #if HAVE_TERMIOS_H
+ 
+ /* init terminal so that we can grab keys */
+@@ -773,12 +779,28 @@ static void set_tty_echo(int on)
+ #endif
+ }
+ 
++static void pause_transcoding(void)
++{
++    if (!paused_start)
++        paused_start = av_gettime_relative();
++}
++
++static void unpause_transcoding(void)
++{
++    if (paused_start) {
++        paused_time += av_gettime_relative() - paused_start;
++        paused_start = 0;
++    }
++}
++
+ static int check_keyboard_interaction(int64_t cur_time)
+ {
+     int i, key;
+     static int64_t last_time;
+-    if (received_nb_signals)
++    if (received_nb_signals) {
++        unpause_transcoding();
+         return AVERROR_EXIT;
++    }
+     /* read_key() returns 0 on EOF */
+     if (cur_time - last_time >= 100000) {
+         key =  read_key();
+@@ -791,6 +813,11 @@ static int check_keyboard_interaction(in
+     }
+     if (key == '+') av_log_set_level(av_log_get_level()+10);
+     if (key == '-') av_log_set_level(av_log_get_level()-10);
++    if (key == 'u' || key != -1) unpause_transcoding();
++    if (key == 'p'){
++        pause_transcoding();
++        fprintf(stderr, "\nTranscoding is paused. Press [u] to resume.\n");
++    }
+     if (key == 'c' || key == 'C'){
+         char buf[4096], target[64], command[256], arg[256] = {0};
+         double time;
+@@ -825,7 +852,9 @@ static int check_keyboard_interaction(in
+                         "c      Send command to first matching filter supporting it\n"
+                         "C      Send/Queue command to all matching filters\n"
+                         "h      dump packets/hex press to cycle through the 3 states\n"
++                        "p      pause transcoding\n"
+                         "q      quit\n"
++                        "u      unpause transcoding\n"
+                         "s      Show QP histogram\n"
+         );
+     }
+@@ -855,12 +884,15 @@ static int transcode(Scheduler *sch)
+     timer_start = av_gettime_relative();
+ 
+     while (!sch_wait(sch, stats_period, &transcode_ts)) {
+-        int64_t cur_time= av_gettime_relative();
++        int64_t cur_time= gettime_relative_minus_pause();
+ 
+         /* if 'q' pressed, exits */
+-        if (stdin_interaction)
+-            if (check_keyboard_interaction(cur_time) < 0)
++        if (stdin_interaction) {
++            if (check_keyboard_interaction(av_gettime_relative()) < 0) {
++                paused_start = 0; // unpausing the input thread on exit
+                 break;
++            }
++        }
+ 
+         /* dump report by using the output first video and audio streams */
+         print_report(0, timer_start, cur_time, transcode_ts);
+@@ -877,11 +909,17 @@ static int transcode(Scheduler *sch)
+     term_exit();
+ 
+     /* dump report by using the first video and audio streams */
+-    print_report(1, timer_start, av_gettime_relative(), transcode_ts);
++    print_report(1, timer_start, gettime_relative_minus_pause(), transcode_ts);
+ 
+     return ret;
+ }
+ 
++static int64_t gettime_relative_minus_pause(void)
++{
++    return av_gettime_relative() - paused_time -
++            (paused_start ? av_gettime_relative() - paused_start : 0);
++}
++
+ static BenchmarkTimeStamps get_benchmark_time_stamps(void)
+ {
+     BenchmarkTimeStamps time_stamps = { av_gettime_relative() };
+Index: FFmpeg/fftools/ffmpeg.h
+===================================================================
+--- fftools/ffmpeg.h
++++ fftools/ffmpeg.h
+@@ -667,6 +667,9 @@ extern int recast_media;
+ 
+ extern FILE *vstats_file;
+ 
++extern int64_t paused_start;
++extern int64_t paused_time;
++
+ void term_init(void);
+ void term_exit(void);
+ 
+Index: FFmpeg/fftools/ffmpeg_demux.c
+===================================================================
+--- fftools/ffmpeg_demux.c
++++ fftools/ffmpeg_demux.c
+@@ -699,6 +699,11 @@ static int input_thread(void *arg)
+         DemuxStream *ds;
+         unsigned send_flags = 0;
+ 
++        if (paused_start) {
++            av_usleep(1000); // pausing the input thread
++            continue;
++        }
++
+         ret = av_read_frame(f->ctx, dt.pkt_demux);
+ 
+         if (ret == AVERROR(EAGAIN)) {

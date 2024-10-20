@@ -1,8 +1,9 @@
 PKG_NAME = roundcubemail
-PKG_VERS = 1.1.4
+PKG_VERS = 1.6.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-complete.$(PKG_EXT)
-PKG_DIST_SITE = https://downloads.sourceforge.net/project/roundcubemail/roundcubemail/$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/roundcube/${PKG_NAME}/releases/download/${PKG_VERS}
+
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

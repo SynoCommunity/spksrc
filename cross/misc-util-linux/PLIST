@@ -3,6 +3,7 @@ bin:bin/col
 bin:bin/colcrt
 bin:bin/colrm
 bin:bin/column
+bin:bin/hardlink
 bin:bin/hexdump
 bin:bin/lsblk
 bin:bin/lscpu

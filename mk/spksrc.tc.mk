@@ -11,6 +11,7 @@ include ../../mk/spksrc.common.mk
 ### Include common rules
 include ../../mk/spksrc.common-rules.mk
 
+# Include ross-rust-env.mk to generate install its toolchain
 include ../../mk/spksrc.cross-rust-env.mk
 
 # Include cross-cmake-env.mk to generate its toolchain file
@@ -18,9 +19,6 @@ include ../../mk/spksrc.cross-cmake-env.mk
 
 # Include cross-meson-env.mk to generate its toolchain file
 include ../../mk/spksrc.cross-meson-env.mk
-
-##### rust specific configurations
-include ../../mk/spksrc.cross-rust-env.mk
 
 # Configure the included makefiles
 URLS                = $(TC_DIST_SITE)/$(TC_DIST_NAME)
@@ -96,6 +94,9 @@ ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	@echo "set(ARCH $(CMAKE_ARCH))"
 endif
+	@echo
+	@echo "# Disable developer warnings" ; \
+	echo 'set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "Disable developer warnings")'
 	@echo
 	@echo "# define toolchain location (used with CMAKE_TOOLCHAIN_PKG)" ; \
 	echo "set(_CMAKE_TOOLCHAIN_LOCATION $(_CMAKE_TOOLCHAIN_LOCATION))" ; \

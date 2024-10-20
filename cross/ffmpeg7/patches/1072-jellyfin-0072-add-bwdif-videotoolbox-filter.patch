@@ -1,0 +1,765 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -3821,6 +3821,7 @@ boxblur_opencl_filter_deps="opencl gpl"
+ bs2b_filter_deps="libbs2b"
+ bwdif_cuda_filter_deps="ffnvcodec"
+ bwdif_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
++bwdif_videotoolbox_filter_deps="metal corevideo videotoolbox"
+ bwdif_vulkan_filter_deps="vulkan spirv_compiler"
+ chromaber_vulkan_filter_deps="vulkan spirv_compiler"
+ color_vulkan_filter_deps="vulkan spirv_compiler"
+Index: FFmpeg/libavfilter/Makefile
+===================================================================
+--- libavfilter/Makefile
++++ libavfilter/Makefile
+@@ -218,6 +218,10 @@ OBJS-$(CONFIG_BOXBLUR_OPENCL_FILTER)
+ OBJS-$(CONFIG_BWDIF_FILTER)                  += vf_bwdif.o bwdifdsp.o yadif_common.o
+ OBJS-$(CONFIG_BWDIF_CUDA_FILTER)             += vf_bwdif_cuda.o vf_bwdif_cuda.ptx.o \
+                                                 yadif_common.o
++OBJS-$(CONFIG_BWDIF_VIDEOTOOLBOX_FILTER)     += vf_bwdif_videotoolbox.o \
++                                                metal/vf_bwdif_videotoolbox.metallib.o \
++                                                metal/utils.o \
++                                                yadif_common.o
+ OBJS-$(CONFIG_BWDIF_VULKAN_FILTER)           += vf_bwdif_vulkan.o yadif_common.o vulkan.o vulkan_filter.o
+ OBJS-$(CONFIG_CAS_FILTER)                    += vf_cas.o
+ OBJS-$(CONFIG_CCREPACK_FILTER)               += vf_ccrepack.o
+Index: FFmpeg/libavfilter/allfilters.c
+===================================================================
+--- libavfilter/allfilters.c
++++ libavfilter/allfilters.c
+@@ -201,6 +201,7 @@ extern const AVFilter ff_vf_boxblur;
+ extern const AVFilter ff_vf_boxblur_opencl;
+ extern const AVFilter ff_vf_bwdif;
+ extern const AVFilter ff_vf_bwdif_cuda;
++extern const AVFilter ff_vf_bwdif_videotoolbox;
+ extern const AVFilter ff_vf_bwdif_vulkan;
+ extern const AVFilter ff_vf_cas;
+ extern const AVFilter ff_vf_ccrepack;
+Index: FFmpeg/libavfilter/metal/vf_bwdif_videotoolbox.metal
+===================================================================
+--- /dev/null
++++ libavfilter/metal/vf_bwdif_videotoolbox.metal
+@@ -0,0 +1,271 @@
++/* bwdif.metal
++
++   Copyright (c) 2003-2024 HandBrake Team
++   Copyright (c) 2019 Philip Langdale <philipl@overt.org>
++
++   port of FFmpeg vf_bwdif_cuda.
++
++   This file is part of the HandBrake source code
++   Homepage: <http://handbrake.fr/>.
++   It may be used under the terms of the GNU General Public License v2.
++   For full terms see the file COPYING file or visit http://www.gnu.org/licenses/gpl-2.0.html
++ */
++
++#include <metal_stdlib>
++#include <metal_integer>
++#include <metal_texture>
++
++using namespace metal;
++
++/*
++ * Parameters
++ */
++
++
++struct params {
++    uint channels;
++    uint parity;
++    uint tff;
++    bool is_second_field;
++    bool skip_spatial_check;
++    bool is_field_end;
++};
++
++/*
++ * Texture access helpers
++ */
++
++#define accesstype access::sample
++constexpr sampler s(coord::pixel);
++
++template <typename T>
++T tex2D(texture2d<float, access::sample> tex, int x, int y)
++{
++    return tex.sample(s, float2(x, y)).x;
++}
++
++template <>
++float2 tex2D<float2>(texture2d<float, access::sample> tex, int x, int y)
++{
++    return tex.sample(s, float2(x, y)).xy;
++}
++
++template <typename T>
++T tex2D(texture2d<float, access::read> tex, uint x, uint y)
++{
++    return tex.read(uint2(x, y)).x;
++}
++
++template <>
++float2 tex2D<float2>(texture2d<float, access::read> tex, uint x, uint y)
++{
++    return tex.read(uint2(x, y)).xy;
++}
++
++/*
++ * Bwdiff helpers
++ */
++
++constant static const float coef_lf[2] = { 4309, 213 };
++constant static const float coef_hf[3] = { 5570, 3801, 1016 };
++constant static const float coef_sp[2] = { 5077, 981 };
++
++template<typename T>
++T filter_intra(T cur_prefs3, T cur_prefs,
++               T cur_mrefs, T cur_mrefs3)
++{
++    T final = (coef_sp[0] * (cur_mrefs + cur_prefs) -
++                 coef_sp[1] * (cur_mrefs3 + cur_prefs3)) / (1 << 13);
++    return saturate(final);
++}
++
++template<typename T>
++T filter_temp(T cur_prefs3, T cur_prefs, T cur_mrefs, T cur_mrefs3,
++              T prev2_prefs4, T prev2_prefs2, T prev2_0, T prev2_mrefs2, T prev2_mrefs4,
++              T prev_prefs, T prev_mrefs, T next_prefs, T next_mrefs,
++              T next2_prefs4, T next2_prefs2, T next2_0, T next2_mrefs2, T next2_mrefs4)
++{
++    T final;
++
++    T c = cur_mrefs;
++    T d = (prev2_0 + next2_0) / 2;
++    T e = cur_prefs;
++
++    T temporal_diff0 = abs(prev2_0 - next2_0);
++    T temporal_diff1 = (abs(prev_mrefs - c) + abs(prev_prefs - e)) / 2;
++    T temporal_diff2 = (abs(next_mrefs - c) + abs(next_prefs - e)) / 2;
++    T diff = max3(temporal_diff0 / 2, temporal_diff1, temporal_diff2);
++
++    if (!diff) {
++        final = d;
++    } else {
++        T b = ((prev2_mrefs2 + next2_mrefs2) / 2) - c;
++        T f = ((prev2_prefs2 + next2_prefs2) / 2) - e;
++        T dc = d - c;
++        T de = d - e;
++        T mmax = max3(de, dc, min(b, f));
++        T mmin = min3(de, dc, max(b, f));
++        diff = max3(diff, mmin, -mmax);
++
++        float interpol;
++        if (abs(c - e) > temporal_diff0) {
++            interpol = (((coef_hf[0] * (prev2_0 + next2_0)
++                - coef_hf[1] * (prev2_mrefs2 + next2_mrefs2 + prev2_prefs2 + next2_prefs2)
++                + coef_hf[2] * (prev2_mrefs4 + next2_mrefs4 + prev2_prefs4 + next2_mrefs4)) / 4)
++                + coef_lf[0] * (c + e) - coef_lf[1] * (cur_mrefs3 + cur_prefs3)) / (1 << 13);
++        } else {
++            interpol = (coef_sp[0] * (c + e) - coef_sp[1] * (cur_mrefs3 + cur_prefs3)) / (1 << 13);
++        }
++
++        if (interpol > d + diff) {
++            interpol = d + diff;
++        } else if (interpol < d - diff) {
++            interpol = d - diff;
++        }
++        final = saturate(interpol);
++    }
++
++    return final;
++}
++
++template<typename T>
++T bwdif_single(texture2d<float, access::write> dst,
++               texture2d<float, accesstype> prev,
++               texture2d<float, accesstype> cur,
++               texture2d<float, accesstype> next,
++               int parity, int tff,
++               bool is_field_end, bool is_second_field,
++               ushort2 pos)
++{
++    // Don't modify the primary field
++    if (pos.y % 2 == parity) {
++        return tex2D<T>(cur, pos.x, pos.y);
++    }
++
++    T cur_prefs3 = tex2D<T>(cur, pos.x, pos.y + 3);
++    T cur_prefs  = tex2D<T>(cur, pos.x, pos.y + 1);
++    T cur_mrefs  = tex2D<T>(cur, pos.x, pos.y - 1);
++    T cur_mrefs3 = tex2D<T>(cur, pos.x, pos.y - 3);
++
++    if (is_field_end) {
++        return filter_intra(cur_prefs3, cur_prefs, cur_mrefs, cur_mrefs3);
++    }
++
++    // Calculate temporal prediction
++    texture2d<float, accesstype> prev2 = prev;
++    texture2d<float, accesstype> prev1 = is_second_field ? cur : prev;
++    texture2d<float, accesstype> next1 = is_second_field ? next : cur;
++    texture2d<float, accesstype> next2 = next;
++
++    T prev2_prefs4 = tex2D<T>(prev2, pos.x, pos.y+ 4);
++    T prev2_prefs2 = tex2D<T>(prev2, pos.x, pos.y + 2);
++    T prev2_0 = tex2D<T>(prev2, pos.x, pos.y + 0);
++    T prev2_mrefs2 = tex2D<T>(prev2, pos.x, pos.y - 2);
++    T prev2_mrefs4 = tex2D<T>(prev2, pos.x, pos.y - 4);
++    T prev_prefs = tex2D<T>(prev1, pos.x, pos.y + 1);
++    T prev_mrefs = tex2D<T>(prev1, pos.x, pos.y - 1);
++    T next_prefs = tex2D<T>(next1, pos.x, pos.y + 1);
++    T next_mrefs = tex2D<T>(next1, pos.x, pos.y - 1);
++    T next2_prefs4 = tex2D<T>(next2, pos.x, pos.y + 4);
++    T next2_prefs2 = tex2D<T>(next2, pos.x, pos.y + 2);
++    T next2_0 = tex2D<T>(next2, pos.x, pos.y + 0);
++    T next2_mrefs2 = tex2D<T>(next2, pos.x, pos.y - 2);
++    T next2_mrefs4 = tex2D<T>(next2, pos.x, pos.y - 4);
++
++    return filter_temp(cur_prefs3, cur_prefs, cur_mrefs, cur_mrefs3,
++                       prev2_prefs4, prev2_prefs2, prev2_0, prev2_mrefs2, prev2_mrefs4,
++                       prev_prefs, prev_mrefs, next_prefs, next_mrefs,
++                       next2_prefs4, next2_prefs2, next2_0, next2_mrefs2, next2_mrefs4);
++}
++
++template<typename T>
++T bwdif_double(texture2d<float, access::write> dst,
++               texture2d<float, accesstype> prev,
++               texture2d<float, accesstype> cur,
++               texture2d<float, accesstype> next,
++               int parity, int tff,
++               bool is_field_end, bool is_second_field,
++               ushort2 pos)
++{
++    // Don't modify the primary field
++    if (pos.y % 2 == parity) {
++        return tex2D<T>(cur, pos.x, pos.y);
++    }
++
++    T cur_prefs3 = tex2D<T>(cur, pos.x, pos.y + 3);
++    T cur_prefs  = tex2D<T>(cur, pos.x, pos.y + 1);
++    T cur_mrefs  = tex2D<T>(cur, pos.x, pos.y - 1);
++    T cur_mrefs3 = tex2D<T>(cur, pos.x, pos.y - 3);
++
++    if (is_field_end) {
++        T final;
++        final.x = filter_intra(cur_prefs3.x, cur_prefs.x, cur_mrefs.x, cur_mrefs3.x);
++        final.y = filter_intra(cur_prefs3.y, cur_prefs.y, cur_mrefs.y, cur_mrefs3.y);
++        return final;
++    }
++
++    // Calculate temporal prediction
++    texture2d<float, accesstype> prev2 = prev;
++    texture2d<float, accesstype> prev1 = is_second_field ? cur : prev;
++    texture2d<float, accesstype> next1 = is_second_field ? next : cur;
++    texture2d<float, accesstype> next2 = next;
++
++    T prev2_prefs4 = tex2D<T>(prev2, pos.x, pos.y+ 4);
++    T prev2_prefs2 = tex2D<T>(prev2, pos.x, pos.y + 2);
++    T prev2_0 = tex2D<T>(prev2, pos.x, pos.y + 0);
++    T prev2_mrefs2 = tex2D<T>(prev2, pos.x, pos.y - 2);
++    T prev2_mrefs4 = tex2D<T>(prev2, pos.x, pos.y - 4);
++    T prev_prefs = tex2D<T>(prev1, pos.x, pos.y + 1);
++    T prev_mrefs = tex2D<T>(prev1, pos.x, pos.y - 1);
++    T next_prefs = tex2D<T>(next1, pos.x, pos.y + 1);
++    T next_mrefs = tex2D<T>(next1, pos.x, pos.y - 1);
++    T next2_prefs4 = tex2D<T>(next2, pos.x, pos.y + 4);
++    T next2_prefs2 = tex2D<T>(next2, pos.x, pos.y + 2);
++    T next2_0 = tex2D<T>(next2, pos.x, pos.y + 0);
++    T next2_mrefs2 = tex2D<T>(next2, pos.x, pos.y - 2);
++    T next2_mrefs4 = tex2D<T>(next2, pos.x, pos.y - 4);
++
++    T final;
++    final.x = filter_temp(cur_prefs3.x, cur_prefs.x, cur_mrefs.x, cur_mrefs3.x,
++                          prev2_prefs4.x, prev2_prefs2.x, prev2_0.x, prev2_mrefs2.x, prev2_mrefs4.x,
++                          prev_prefs.x, prev_mrefs.x, next_prefs.x, next_mrefs.x,
++                          next2_prefs4.x, next2_prefs2.x, next2_0.x, next2_mrefs2.x, next2_mrefs4.x);
++    final.y = filter_temp(cur_prefs3.y, cur_prefs.y, cur_mrefs.y, cur_mrefs3.y,
++                          prev2_prefs4.y, prev2_prefs2.y, prev2_0.y, prev2_mrefs2.y, prev2_mrefs4.y,
++                          prev_prefs.y, prev_mrefs.y, next_prefs.y, next_mrefs.y,
++                          next2_prefs4.y, next2_prefs2.y, next2_0.y, next2_mrefs2.y, next2_mrefs4.y);
++    return final;
++}
++
++
++/*
++ * Kernel dispatch
++ */
++
++kernel void deint(
++    texture2d<float, access::write> dst [[texture(0)]],
++    texture2d<float, accesstype> prev [[texture(1)]],
++    texture2d<float, accesstype> cur  [[texture(2)]],
++    texture2d<float, accesstype> next [[texture(3)]],
++    constant params& p [[buffer(0)]],
++    ushort2 pos [[thread_position_in_grid]])
++{
++    if ((pos.x >= dst.get_width()) || (pos.y >= dst.get_height())) {
++        return;
++    }
++
++    float2 pred;
++    if (p.channels == 1) {
++        pred = float2(bwdif_single<float>(dst, prev, cur, next,
++                                   p.parity, p.tff,
++                                   p.is_field_end, p.is_second_field,
++                                   pos));
++    } else {
++        pred = bwdif_double<float2>(dst, prev, cur, next,
++                                    p.parity, p.tff,
++                                    p.is_field_end, p.is_second_field,
++                                    pos);
++    }
++    dst.write(pred.xyyy, pos);
++}
++
+Index: FFmpeg/libavfilter/vf_bwdif_videotoolbox.m
+===================================================================
+--- /dev/null
++++ libavfilter/vf_bwdif_videotoolbox.m
+@@ -0,0 +1,445 @@
++/*
++ * Copyright (C) 2018 Philip Langdale <philipl@overt.org>
++ *               2020 Aman Karmani <aman@tmm1.net>
++ *               2024 Gnattu OC
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include "internal.h"
++#include "metal/utils.h"
++#include "yadif.h"
++#include "libavutil/avassert.h"
++#include "libavutil/hwcontext.h"
++#include "libavutil/hwcontext_videotoolbox.h"
++#include "libavutil/objc.h"
++
++#include <assert.h>
++
++extern char ff_vf_bwdif_videotoolbox_metallib_data[];
++extern unsigned int ff_vf_bwdif_videotoolbox_metallib_len;
++
++typedef struct API_AVAILABLE(macos(10.11), ios(8.0)) BWDIFVTContext {
++    YADIFContext yadif;
++
++    AVBufferRef       *device_ref;
++    AVBufferRef       *input_frames_ref;
++    AVHWFramesContext *input_frames;
++
++    id<MTLDevice> mtlDevice;
++    id<MTLLibrary> mtlLibrary;
++    id<MTLCommandQueue> mtlQueue;
++    id<MTLComputePipelineState> mtlPipeline;
++    id<MTLFunction> mtlFunction;
++    id<MTLBuffer> mtlParamsBuffer;
++
++    CVMetalTextureCacheRef textureCache;
++} BWDIFVTContext API_AVAILABLE(macos(10.11), ios(8.0));
++
++// Using sizeof(BWDIFVTContext) outside of an availability check will error
++// if we're targeting an older OS version, so we need to calculate the size ourselves
++// (we'll statically verify it's correct in bwdif_videotoolbox_init behind a check)
++#define BWDIF_VT_CTX_SIZE (sizeof(YADIFContext) + sizeof(void*) * 10)
++
++struct mtlBwdifParams {
++    uint channels;
++    uint parity;
++    uint tff;
++    bool is_second_field;
++    bool skip_spatial_check;
++    bool is_field_end;
++};
++
++static void call_kernel(AVFilterContext *ctx,
++                        id<MTLTexture> dst,
++                        id<MTLTexture> prev,
++                        id<MTLTexture> cur,
++                        id<MTLTexture> next,
++                        int channels,
++                        int parity,
++                        int tff) API_AVAILABLE(macos(10.11), ios(8.0))
++{
++    BWDIFVTContext *s = ctx->priv;
++    YADIFContext *y = &s->yadif;
++    bool is_field_end = y->current_field == YADIF_FIELD_END;
++    id<MTLCommandBuffer> buffer = s->mtlQueue.commandBuffer;
++    id<MTLComputeCommandEncoder> encoder = buffer.computeCommandEncoder;
++    struct mtlBwdifParams *params = (struct mtlBwdifParams *)s->mtlParamsBuffer.contents;
++    *params = (struct mtlBwdifParams){
++        .channels = channels,
++        .parity = parity,
++        .tff = tff,
++        .is_second_field = !(parity ^ tff),
++        .skip_spatial_check = s->yadif.mode&2,
++        .is_field_end = is_field_end
++    };
++
++    [encoder setTexture:dst  atIndex:0];
++    [encoder setTexture:prev atIndex:1];
++    [encoder setTexture:cur  atIndex:2];
++    [encoder setTexture:next atIndex:3];
++    [encoder setBuffer:s->mtlParamsBuffer offset:0 atIndex:4];
++    ff_metal_compute_encoder_dispatch(s->mtlDevice, s->mtlPipeline, encoder, dst.width, dst.height);
++    [encoder endEncoding];
++
++    [buffer commit];
++    [buffer waitUntilCompleted];
++}
++
++static void filter(AVFilterContext *ctx, AVFrame *dst,
++                   int parity, int tff) API_AVAILABLE(macos(10.11), ios(8.0))
++{
++    BWDIFVTContext *s = ctx->priv;
++    YADIFContext *y = &s->yadif;
++    int i;
++
++    for (i = 0; i < y->csp->nb_components; i++) {
++        int pixel_size, channels;
++        const AVComponentDescriptor *comp = &y->csp->comp[i];
++        CVMetalTextureRef prev, cur, next, dest;
++        id<MTLTexture> tex_prev, tex_cur, tex_next, tex_dest;
++        MTLPixelFormat format;
++
++        if (comp->plane < i) {
++            // We process planes as a whole, so don't reprocess
++            // them for additional components
++            continue;
++        }
++
++        pixel_size = (comp->depth + comp->shift) / 8;
++        channels = comp->step / pixel_size;
++        if (pixel_size > 2 || channels > 2) {
++            av_log(ctx, AV_LOG_ERROR, "Unsupported pixel format: %s\n", y->csp->name);
++            goto exit;
++        }
++        switch (pixel_size) {
++        case 1:
++            format = channels == 1 ? MTLPixelFormatR8Unorm : MTLPixelFormatRG8Unorm;
++            break;
++        case 2:
++            format = channels == 1 ? MTLPixelFormatR16Unorm : MTLPixelFormatRG16Unorm;
++            break;
++        default:
++            av_log(ctx, AV_LOG_ERROR, "Unsupported pixel format: %s\n", y->csp->name);
++            goto exit;
++        }
++
++        av_log(ctx, AV_LOG_TRACE,
++               "Deinterlacing plane %d: pixel_size: %d channels: %d\n",
++               comp->plane, pixel_size, channels);
++
++        prev = ff_metal_texture_from_pixbuf(ctx, s->textureCache, (CVPixelBufferRef)y->prev->data[3], i, format);
++        cur  = ff_metal_texture_from_pixbuf(ctx, s->textureCache, (CVPixelBufferRef)y->cur->data[3], i, format);
++        next = ff_metal_texture_from_pixbuf(ctx, s->textureCache, (CVPixelBufferRef)y->next->data[3], i, format);
++        dest = ff_metal_texture_from_pixbuf(ctx, s->textureCache, (CVPixelBufferRef)dst->data[3], i, format);
++
++        tex_prev = CVMetalTextureGetTexture(prev);
++        tex_cur  = CVMetalTextureGetTexture(cur);
++        tex_next = CVMetalTextureGetTexture(next);
++        tex_dest = CVMetalTextureGetTexture(dest);
++
++        call_kernel(ctx, tex_dest, tex_prev, tex_cur, tex_next,
++                         channels, parity, tff);
++
++        CFRelease(prev);
++        CFRelease(cur);
++        CFRelease(next);
++        CFRelease(dest);
++    }
++
++    CVBufferPropagateAttachments((CVPixelBufferRef)y->cur->data[3], (CVPixelBufferRef)dst->data[3]);
++
++    if (y->current_field == YADIF_FIELD_END) {
++        y->current_field = YADIF_FIELD_NORMAL;
++    }
++
++exit:
++    return;
++}
++
++static av_cold void do_uninit(AVFilterContext *ctx) API_AVAILABLE(macos(10.11), ios(8.0))
++{
++    BWDIFVTContext *s = ctx->priv;
++
++    ff_yadif_uninit(ctx);
++
++    av_buffer_unref(&s->device_ref);
++    av_buffer_unref(&s->input_frames_ref);
++    s->input_frames = NULL;
++
++    ff_objc_release(&s->mtlParamsBuffer);
++    ff_objc_release(&s->mtlFunction);
++    ff_objc_release(&s->mtlPipeline);
++    ff_objc_release(&s->mtlQueue);
++    ff_objc_release(&s->mtlLibrary);
++    ff_objc_release(&s->mtlDevice);
++
++    if (s->textureCache) {
++        CFRelease(s->textureCache);
++        s->textureCache = NULL;
++    }
++}
++
++
++static av_cold void bwdif_videotoolbox_uninit(AVFilterContext *ctx)
++{
++    if (@available(macOS 10.11, iOS 8.0, *)) {
++        do_uninit(ctx);
++    }
++}
++
++static av_cold int do_init(AVFilterContext *ctx) API_AVAILABLE(macos(10.11), ios(8.0))
++{
++    BWDIFVTContext *s = ctx->priv;
++    NSError *err = nil;
++    CVReturn ret;
++    dispatch_data_t libData;
++
++    s->mtlDevice = MTLCreateSystemDefaultDevice();
++    if (!s->mtlDevice) {
++        av_log(ctx, AV_LOG_ERROR, "Unable to find Metal device\n");
++        goto fail;
++    }
++
++    av_log(ctx, AV_LOG_INFO, "Using Metal device: %s\n", s->mtlDevice.name.UTF8String);
++
++    libData = dispatch_data_create(
++        ff_vf_bwdif_videotoolbox_metallib_data,
++        ff_vf_bwdif_videotoolbox_metallib_len,
++        nil,
++        nil);
++    s->mtlLibrary = [s->mtlDevice newLibraryWithData:libData error:&err];
++    dispatch_release(libData);
++    libData = nil;
++    if (err) {
++        av_log(ctx, AV_LOG_ERROR, "Failed to load Metal library: %s\n", err.description.UTF8String);
++        goto fail;
++    }
++
++    s->mtlFunction = [s->mtlLibrary newFunctionWithName:@"deint"];
++    if (!s->mtlFunction) {
++        av_log(ctx, AV_LOG_ERROR, "Failed to create Metal function!\n");
++        goto fail;
++    }
++
++    s->mtlQueue = s->mtlDevice.newCommandQueue;
++    if (!s->mtlQueue) {
++        av_log(ctx, AV_LOG_ERROR, "Failed to create Metal command queue!\n");
++        goto fail;
++    }
++
++    s->mtlPipeline = [s->mtlDevice
++        newComputePipelineStateWithFunction:s->mtlFunction
++        error:&err];
++    if (err) {
++        av_log(ctx, AV_LOG_ERROR, "Failed to create Metal compute pipeline: %s\n", err.description.UTF8String);
++        goto fail;
++    }
++
++    s->mtlParamsBuffer = [s->mtlDevice
++        newBufferWithLength:sizeof(struct mtlBwdifParams)
++        options:MTLResourceStorageModeShared];
++    if (!s->mtlParamsBuffer) {
++        av_log(ctx, AV_LOG_ERROR, "Failed to create Metal buffer for parameters\n");
++        goto fail;
++    }
++
++    ret = CVMetalTextureCacheCreate(
++        NULL,
++        NULL,
++        s->mtlDevice,
++        NULL,
++        &s->textureCache
++    );
++    if (ret != kCVReturnSuccess) {
++        av_log(ctx, AV_LOG_ERROR, "Failed to create CVMetalTextureCache: %d\n", ret);
++        goto fail;
++    }
++
++    return 0;
++fail:
++    bwdif_videotoolbox_uninit(ctx);
++    return AVERROR_EXTERNAL;
++}
++
++static av_cold int bwdif_videotoolbox_init(AVFilterContext *ctx)
++{
++    if (@available(macOS 10.11, iOS 8.0, *)) {
++        // Ensure we calculated BWDIF_VT_CTX_SIZE correctly
++        static_assert(BWDIF_VT_CTX_SIZE == sizeof(BWDIFVTContext), "Incorrect BWDIF_VT_CTX_SIZE value!");
++        return do_init(ctx);
++    } else {
++        av_log(ctx, AV_LOG_ERROR, "Metal is not available on this OS version\n");
++        return AVERROR(ENOSYS);
++    }
++}
++
++static int do_config_input(AVFilterLink *inlink) API_AVAILABLE(macos(10.11), ios(8.0))
++{
++    AVFilterContext *ctx = inlink->dst;
++    BWDIFVTContext *s = ctx->priv;
++
++    if (!inlink->hw_frames_ctx) {
++        av_log(ctx, AV_LOG_ERROR, "A hardware frames reference is "
++               "required to associate the processing device.\n");
++        return AVERROR(EINVAL);
++    }
++
++    s->input_frames_ref = av_buffer_ref(inlink->hw_frames_ctx);
++    if (!s->input_frames_ref) {
++        av_log(ctx, AV_LOG_ERROR, "A input frames reference create "
++               "failed.\n");
++        return AVERROR(ENOMEM);
++    }
++    s->input_frames = (AVHWFramesContext*)s->input_frames_ref->data;
++
++    return 0;
++}
++
++static int config_input(AVFilterLink *inlink)
++{
++    AVFilterContext *ctx = inlink->dst;
++    if (@available(macOS 10.11, iOS 8.0, *)) {
++        return do_config_input(inlink);
++    } else {
++        av_log(ctx, AV_LOG_ERROR, "Metal is not available on this OS version\n");
++        return AVERROR(ENOSYS);
++    }
++}
++
++static int do_config_output(AVFilterLink *link) API_AVAILABLE(macos(10.11), ios(8.0))
++{
++    AVHWFramesContext *output_frames, *input_frames;
++    AVFilterContext *ctx = link->src;
++    AVFilterLink *inlink = link->src->inputs[0];
++    BWDIFVTContext *s = ctx->priv;
++    YADIFContext *y = &s->yadif;
++    int ret = 0;
++
++    av_assert0(s->input_frames);
++    s->device_ref = av_buffer_ref(s->input_frames->device_ref);
++    if (!s->device_ref) {
++        av_log(ctx, AV_LOG_ERROR, "A device reference create "
++               "failed.\n");
++        return AVERROR(ENOMEM);
++    }
++
++    link->hw_frames_ctx = av_hwframe_ctx_alloc(s->device_ref);
++    if (!link->hw_frames_ctx) {
++        av_log(ctx, AV_LOG_ERROR, "Failed to create HW frame context "
++               "for output.\n");
++        ret = AVERROR(ENOMEM);
++        goto exit;
++    }
++
++    input_frames = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
++    output_frames = (AVHWFramesContext*)link->hw_frames_ctx->data;
++
++    output_frames->format    = AV_PIX_FMT_VIDEOTOOLBOX;
++    output_frames->sw_format = s->input_frames->sw_format;
++    output_frames->width     = ctx->inputs[0]->w;
++    output_frames->height    = ctx->inputs[0]->h;
++    ((AVVTFramesContext *)output_frames->hwctx)->color_range = ((AVVTFramesContext *)input_frames->hwctx)->color_range;
++
++    ret = ff_filter_init_hw_frames(ctx, link, 10);
++    if (ret < 0)
++        goto exit;
++
++    ret = av_hwframe_ctx_init(link->hw_frames_ctx);
++    if (ret < 0) {
++        av_log(ctx, AV_LOG_ERROR, "Failed to initialise VideoToolbox frame "
++               "context for output: %d\n", ret);
++        goto exit;
++    }
++
++    ret = ff_yadif_config_output_common(link);
++    if (ret < 0)
++        goto exit;
++
++    y->csp = av_pix_fmt_desc_get(output_frames->sw_format);
++    y->filter = filter;
++
++exit:
++    return ret;
++}
++
++static int config_output(AVFilterLink *link)
++{
++    AVFilterContext *ctx = link->src;
++    if (@available(macOS 10.11, iOS 8.0, *)) {
++        return do_config_output(link);
++    } else {
++        av_log(ctx, AV_LOG_ERROR, "Metal is not available on this OS version\n");
++        return AVERROR(ENOSYS);
++    }
++}
++
++#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
++#define CONST(name, help, val, unit) { name, help, 0, AV_OPT_TYPE_CONST, {.i64=val}, INT_MIN, INT_MAX, FLAGS, unit }
++
++static const AVOption bwdif_videotoolbox_options[] = {
++    #define OFFSET(x) offsetof(YADIFContext, x)
++    { "mode",   "specify the interlacing mode", OFFSET(mode), AV_OPT_TYPE_INT, {.i64=YADIF_MODE_SEND_FRAME}, 0, 1, FLAGS, .unit = "mode"},
++    CONST("send_frame",           "send one frame for each frame",                                     YADIF_MODE_SEND_FRAME,           "mode"),
++    CONST("send_field",           "send one frame for each field",                                     YADIF_MODE_SEND_FIELD,           "mode"),
++
++    { "parity", "specify the assumed picture field parity", OFFSET(parity), AV_OPT_TYPE_INT, {.i64=YADIF_PARITY_AUTO}, -1, 1, FLAGS, .unit = "parity" },
++    CONST("tff",  "assume top field first",    YADIF_PARITY_TFF,  "parity"),
++    CONST("bff",  "assume bottom field first", YADIF_PARITY_BFF,  "parity"),
++    CONST("auto", "auto detect parity",        YADIF_PARITY_AUTO, "parity"),
++
++    { "deint", "specify which frames to deinterlace", OFFSET(deint), AV_OPT_TYPE_INT, {.i64=YADIF_DEINT_ALL}, 0, 1, FLAGS, .unit = "deint" },
++    CONST("all",        "deinterlace all frames",                       YADIF_DEINT_ALL,        "deint"),
++    CONST("interlaced", "only deinterlace frames marked as interlaced", YADIF_DEINT_INTERLACED, "deint"),
++    #undef OFFSET
++
++    { NULL }
++};
++
++AVFILTER_DEFINE_CLASS(bwdif_videotoolbox);
++
++static const AVFilterPad bwdif_videotoolbox_inputs[] = {
++    {
++        .name          = "default",
++        .type          = AVMEDIA_TYPE_VIDEO,
++        .filter_frame  = ff_yadif_filter_frame,
++        .config_props  = config_input,
++    },
++};
++
++static const AVFilterPad bwdif_videotoolbox_outputs[] = {
++    {
++        .name          = "default",
++        .type          = AVMEDIA_TYPE_VIDEO,
++        .request_frame = ff_yadif_request_frame,
++        .config_props  = config_output,
++    },
++};
++
++const AVFilter ff_vf_bwdif_videotoolbox = {
++    .name           = "bwdif_videotoolbox",
++    .description    = NULL_IF_CONFIG_SMALL("BWDIF for VideoToolbox frames using Metal compute"),
++    .priv_size      = BWDIF_VT_CTX_SIZE,
++    .priv_class     = &bwdif_videotoolbox_class,
++    .init           = bwdif_videotoolbox_init,
++    .uninit         = bwdif_videotoolbox_uninit,
++    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_VIDEOTOOLBOX),
++    FILTER_INPUTS(bwdif_videotoolbox_inputs),
++    FILTER_OUTPUTS(bwdif_videotoolbox_outputs),
++    .flags          = AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
++    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
++};

@@ -1,0 +1,11 @@
+Following patches where copied over directly from the IGC source corresponding to current LLVM:
+intel-graphics-compiler-igc-1.0.16695.4/external/llvm/releases/14.0.0/patches_external/*
+
+Latest versions of the patches available by cloning the git repository
+$ git clone https://github.com/intel/intel-graphics-compiler.git
+
+Change to the patch directory
+$ cd intel-graphics-compiler/external/llvm/releases/14.0.0/patches_external
+
+Renumber the patches:
+$ i=1001 && ls -1 *.patch | while read LINE; do echo $(printf "%04d" $i)-igc-$LINE; mv $LINE $(printf "%04d" $i)-igc-$LINE; let i++; done

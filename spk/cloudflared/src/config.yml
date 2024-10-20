@@ -1,0 +1,5 @@
+token: "@token@"
+no-autoupdate: true
+management-diagnostics: @management-diagnostics@
+post-quantum: @post-quantum@
+edge-ip-version: "@edge-ip-version@"

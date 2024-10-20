@@ -214,12 +214,12 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/colorspace_common.cl
 +
 +// linearizer for HLG/ARIB-B67
 +float eotf_arib_b67(float x) {
-+    return ootf_1_2(inverse_oetf_arib_b67(x));
++    return ootf_1_2(inverse_oetf_arib_b67(x)) * 5.0f;
 +}
 +
 +// delinearizer for HLG/ARIB-B67
 +float inverse_eotf_arib_b67(float x) {
-+    return oetf_arib_b67(inverse_ootf_1_2(x));
++    return oetf_arib_b67(inverse_ootf_1_2(x / 5.0f));
  }
  
 -float inverse_eotf_bt1886(float c) {
@@ -1476,13 +1476,11 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      av_log(avctx, AV_LOG_DEBUG, "Generated OpenCL header:\n%s\n", header.str);
      opencl_sources[0] = header.str;
-@@ -254,46 +586,170 @@ static int tonemap_opencl_init(AVFilterC
+@@ -254,46 +586,171 @@ static int tonemap_opencl_init(AVFilterC
      CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create OpenCL "
                       "command queue %d.\n", cle);
  
 +    if (ctx->in_desc->comp[0].depth > ctx->out_desc->comp[0].depth) {
-+        av_assert0(sizeof(ff_fruit_dither_matrix) == sizeof(ff_fruit_dither_matrix[0]) * ff_fruit_dither_size * ff_fruit_dither_size);
-+
 +        cl_image_format image_format = {
 +            .image_channel_data_type = CL_UNORM_INT16,
 +            .image_channel_order     = CL_R,
@@ -1493,6 +1491,8 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 +            .image_height    = ff_fruit_dither_size,
 +            .image_row_pitch = 0,
 +        };
++
++        av_assert0(sizeof(ff_fruit_dither_matrix) == sizeof(ff_fruit_dither_matrix[0]) * ff_fruit_dither_size * ff_fruit_dither_size);
 +
 +        ctx->dither_image = clCreateImage(ctx->ocf.hwctx->context, CL_MEM_READ_ONLY,
 +                                          &image_format, &image_desc, NULL, &cle);
@@ -1523,9 +1523,10 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 -                       (2 * DETECTION_FRAMES + 7) * sizeof(unsigned),
 -                       NULL, &cle);
 -    CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create util buffer: %d.\n", cle);
-+    if (ctx->dovi)
++    if (ctx->dovi) {
 +        CL_CREATE_BUFFER_FLAGS(ctx, dovi_buf, dovi_buf_flags,
 +                               3*(params_sz+pivots_sz+coeffs_sz+mmr_sz), NULL);
++    }
  
      ctx->initialised = 1;
      return 0;
@@ -1666,7 +1667,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      ret = ff_opencl_filter_config_output(outlink);
      if (ret < 0)
          return ret;
-@@ -308,13 +764,42 @@ static int launch_kernel(AVFilterContext
+@@ -308,13 +765,46 @@ static int launch_kernel(AVFilterContext
      size_t global_work[2];
      size_t local_work[2];
      cl_int cle;
@@ -1695,23 +1696,27 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 -    CL_SET_KERNEL_ARG(kernel, 5, cl_float, &peak);
 +
 +    idx_arg = 4;
-+    if (ctx->out_planes > 2)
++    if (ctx->out_planes > 2) {
 +        CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_mem, &output->data[2]);
++    }
 +
-+    if (ctx->in_planes > 2)
++    if (ctx->in_planes > 2) {
 +        CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_mem, &input->data[2]);
++    }
 +
-+    if (ctx->dither_image)
++    if (ctx->dither_image) {
 +        CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_mem, &ctx->dither_image);
++    }
 +
-+    if (ctx->dovi_buf)
++    if (ctx->dovi_buf) {
 +        CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_mem, &ctx->dovi_buf);
++    }
 +
 +    CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_float, &peak);
  
      local_work[0]  = 16;
      local_work[1]  = 16;
-@@ -338,13 +823,10 @@ static int tonemap_opencl_filter_frame(A
+@@ -338,13 +828,10 @@ static int tonemap_opencl_filter_frame(A
      AVFilterContext    *avctx = inlink->dst;
      AVFilterLink     *outlink = avctx->outputs[0];
      TonemapOpenCLContext *ctx = avctx->priv;
@@ -1726,7 +1731,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      av_log(ctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
             av_get_pix_fmt_name(input->format),
-@@ -363,9 +845,6 @@ static int tonemap_opencl_filter_frame(A
+@@ -363,9 +850,6 @@ static int tonemap_opencl_filter_frame(A
      if (err < 0)
          goto fail;
  
@@ -1736,7 +1741,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      if (ctx->trc != -1)
          output->color_trc = ctx->trc;
      if (ctx->primaries != -1)
-@@ -385,72 +864,92 @@ static int tonemap_opencl_filter_frame(A
+@@ -385,72 +869,92 @@ static int tonemap_opencl_filter_frame(A
      ctx->range_out = output->color_range;
      ctx->chroma_loc = output->chroma_location;
  
@@ -1869,7 +1874,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      av_frame_free(&input);
      av_frame_free(&output);
      return err;
-@@ -458,24 +957,9 @@ fail:
+@@ -458,24 +962,9 @@ fail:
  
  static av_cold void tonemap_opencl_uninit(AVFilterContext *avctx)
  {
@@ -1896,7 +1901,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      ff_opencl_filter_uninit(avctx);
  }
-@@ -483,37 +967,47 @@ static av_cold void tonemap_opencl_unini
+@@ -483,37 +972,47 @@ static av_cold void tonemap_opencl_unini
  #define OFFSET(x) offsetof(TonemapOpenCLContext, x)
  #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
  static const AVOption tonemap_opencl_options[] = {

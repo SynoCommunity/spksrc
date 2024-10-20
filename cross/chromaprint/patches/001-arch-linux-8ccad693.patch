@@ -1,0 +1,777 @@
+From 8ccad6937177b1b92e40ab8f4447ea27bac009a7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Lalinsk=C3=BD?= <lalinsky@gmail.com>
+Date: Fri, 4 Nov 2022 21:47:38 +0100
+Subject: [PATCH] Use FFmpeg 5.x (#120)
+
+* Use FFmpeg 5.1.2 for CI builds
+
+* Build on Ubuntu 20.04
+
+* Upgrade code to FFmpeg 5.x APIs
+
+* Only set FFmpeg include dirs if building tools
+
+* No longer needed
+
+* Use ubuntu 20.04
+---
+ .github/workflows/build.yml                   |   6 +-
+ CMakeLists.txt                                |  16 --
+ package/build.sh                              |   4 +-
+ src/audio/ffmpeg_audio_processor.h            |   2 -
+ src/audio/ffmpeg_audio_processor_avresample.h |  72 -------
+ src/audio/ffmpeg_audio_processor_swresample.h |  18 +-
+ src/audio/ffmpeg_audio_reader.h               | 197 +++++++++---------
+ tests/CMakeLists.txt                          |   6 +
+ 8 files changed, 122 insertions(+), 199 deletions(-)
+ delete mode 100644 src/audio/ffmpeg_audio_processor_avresample.h
+
+diff -uprN ../chromaprint-1.5.1-orig/CMakeLists.txt ./CMakeLists.txt
+--- ../chromaprint-1.5.1-orig/CMakeLists.txt	2021-12-23 05:57:54.000000000 +0000
++++ ./CMakeLists.txt	2024-09-18 00:40:00.177326496 +0000
+@@ -82,9 +82,6 @@ find_package(FFmpeg)
+ if(FFMPEG_LIBRARIES)
+ 	cmake_push_check_state(RESET)
+ 	set(CMAKE_REQUIRED_LIBRARIES ${FFMPEG_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} -lm)
+-	check_function_exists(av_packet_unref HAVE_AV_PACKET_UNREF)
+-	check_function_exists(av_frame_alloc HAVE_AV_FRAME_ALLOC)
+-	check_function_exists(av_frame_free HAVE_AV_FRAME_FREE)
+ 	cmake_pop_check_state()
+ endif()
+ 
+@@ -161,30 +158,17 @@ message(STATUS "Using ${FFT_LIB} for FFT
+ if(NOT AUDIO_PROCESSOR_LIB)
+ 	if(FFMPEG_LIBSWRESAMPLE_FOUND)
+ 		set(AUDIO_PROCESSOR_LIB "swresample")
+-	elseif(FFMPEG_LIBAVRESAMPLE_FOUND)
+-		set(AUDIO_PROCESSOR_LIB "avresample")
+ 	endif()
+ endif()
+ 
+ if(AUDIO_PROCESSOR_LIB STREQUAL "swresample")
+ 	if(FFMPEG_LIBSWRESAMPLE_FOUND)
+-		set(USE_AVRESAMPLE OFF)
+ 		set(USE_SWRESAMPLE ON)
+ 		set(AUDIO_PROCESSOR_LIBRARIES ${FFMPEG_LIBSWRESAMPLE_LIBRARIES})
+ 		set(AUDIO_PROCESSOR_INCLUDE_DIRS ${FFMPEG_LIBSWRESAMPLE_INCLUDE_DIRS})
+ 	else()
+ 		message(FATAL_ERROR "Selected ${AUDIO_PROCESSOR_LIB} for audio processing, but the library is not found")
+ 	endif()
+-	message(STATUS "Using ${AUDIO_PROCESSOR_LIB} for audio conversion")
+-elseif(AUDIO_PROCESSOR_LIB STREQUAL "avresample")
+-	if(FFMPEG_LIBAVRESAMPLE_FOUND)
+-		set(USE_AVRESAMPLE ON)
+-		set(USE_SWRESAMPLE OFF)
+-		set(AUDIO_PROCESSOR_LIBRARIES ${FFMPEG_LIBAVRESAMPLE_LIBRARIES})
+-		set(AUDIO_PROCESSOR_INCLUDE_DIRS ${FFMPEG_LIBAVRESAMPLE_INCLUDE_DIRS})
+-	else()
+-		message(FATAL_ERROR "Selected ${AUDIO_PROCESSOR_LIB} for audio processing, but the library is not found")
+-	endif()
+ 	message(STATUS "Using ${AUDIO_PROCESSOR_LIB} for audio conversion")
+ else()
+ 	message(STATUS "Building without audio conversion support, please install FFmpeg with libswresample")
+diff -uprN ../chromaprint-1.5.1-orig/CMakeLists.txt.orig ./CMakeLists.txt.orig
+--- ../chromaprint-1.5.1-orig/CMakeLists.txt.orig	1970-01-01 00:00:00.000000000 +0000
++++ ./CMakeLists.txt.orig	2021-12-23 05:57:54.000000000 +0000
+@@ -0,0 +1,231 @@
++cmake_minimum_required(VERSION 3.3)
++
++set(chromaprint_VERSION_MAJOR 1)
++set(chromaprint_VERSION_MINOR 5)
++set(chromaprint_VERSION_PATCH 1)
++set(chromaprint_VERSION "${chromaprint_VERSION_MAJOR}.${chromaprint_VERSION_MINOR}.${chromaprint_VERSION_PATCH}")
++
++project(chromaprint LANGUAGES C CXX VERSION "${chromaprint_VERSION}")
++
++set(chromaprint_SOVERSION 1)
++
++set(AUDIO_PROCESSOR_LIB CACHE STRING "Library to use for audio processing")
++set_property(CACHE AUDIO_PROCESSOR_LIB PROPERTY STRINGS avresample swresample)
++
++set(FFT_LIB CACHE STRING "Library to use for FFT calculations")
++set_property(CACHE FFT_LIB PROPERTY STRINGS avfft fftw3 fftw3f kissfft vdsp)
++
++include(CMakePushCheckState)
++include(CheckFunctionExists)
++include(CheckSymbolExists)
++include(CheckCXXCompilerFlag)
++
++find_package(Threads)
++
++option(BUILD_SHARED_LIBS "Build shared libraries" ON)
++
++set(CMAKE_CXX_STANDARD 11)
++
++if(BUILD_SHARED_LIBS)
++	set(CMAKE_C_VISIBILITY_PRESET hidden)
++	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
++	set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
++endif()
++
++if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "Debug")
++	add_definitions(-D_GLIBCXX_DEBUG)
++endif()
++
++cmake_push_check_state(RESET)
++set(CMAKE_REQUIRED_LIBRARIES -lm)
++check_symbol_exists(lrintf math.h HAVE_LRINTF)
++check_symbol_exists(round math.h HAVE_ROUND)
++cmake_pop_check_state()
++
++add_definitions(
++	-DHAVE_CONFIG_H
++	-D_SCL_SECURE_NO_WARNINGS
++	-D_USE_MATH_DEFINES
++	-D__STDC_LIMIT_MACROS
++	-D__STDC_CONSTANT_MACROS
++)
++
++set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
++set(EXEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "Installation prefix for executables and object code libraries" FORCE)
++set(BIN_INSTALL_DIR ${EXEC_INSTALL_PREFIX}/bin CACHE PATH "Installation prefix for user executables" FORCE)
++set(LIB_INSTALL_DIR ${EXEC_INSTALL_PREFIX}/lib${LIB_SUFFIX} CACHE PATH  "Installation prefix for object code libraries" FORCE)
++set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include CACHE PATH "Installation prefix for C header files" FORCE)
++
++if(APPLE)
++	option(BUILD_FRAMEWORK "Build an OS X framework" OFF)
++	set(FRAMEWORK_INSTALL_DIR "/Library/Frameworks" CACHE STRING "Directory to install frameworks to")
++endif()
++
++option(BUILD_TOOLS "Build command line tools" OFF)
++option(BUILD_TESTS "Build test suite" ON)
++
++if(CMAKE_COMPILER_IS_GNUCXX)
++	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
++	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
++endif()
++
++if(NOT BUILD_SHARED_LIBS)
++	add_definitions(-DCHROMAPRINT_NODLL)
++endif()
++
++set(TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests/)
++
++set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
++
++find_package(FFmpeg)
++
++if(FFMPEG_LIBRARIES)
++	cmake_push_check_state(RESET)
++	set(CMAKE_REQUIRED_LIBRARIES ${FFMPEG_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} -lm)
++	check_function_exists(av_packet_unref HAVE_AV_PACKET_UNREF)
++	check_function_exists(av_frame_alloc HAVE_AV_FRAME_ALLOC)
++	check_function_exists(av_frame_free HAVE_AV_FRAME_FREE)
++	cmake_pop_check_state()
++endif()
++
++if(NOT FFT_LIB OR FFT_LIB STREQUAL "fftw3" OR FFT_LIB STREQUAL "fftw3f")
++	find_package(FFTW3)
++endif()
++
++if(APPLE)
++	if(NOT FFT_LIB OR FFT_LIB STREQUAL "vdsp")
++		find_library(ACCELERATE_LIBRARIES Accelerate)
++	endif()
++endif()
++
++if(NOT FFT_LIB OR FFT_LIB STREQUAL "kissfft")
++	find_package(KissFFT)
++endif()
++
++set(USE_VDSP OFF)
++set(USE_AVFFT OFF)
++set(USE_FFTW3 OFF)
++set(USE_FFTW3F OFF)
++set(USE_KISSFFT OFF)
++
++if(NOT FFT_LIB)
++	if(APPLE AND ACCELERATE_LIBRARIES)
++		set(FFT_LIB "vdsp")
++	elseif(FFMPEG_LIBAVCODEC_FFT_FOUND)
++		set(FFT_LIB "avfft")
++	elseif(FFTW3_LIBRARIES)
++		set(FFT_LIB "fftw3")
++	elseif(FFTW3_FFTWF_LIBRARY)
++		set(FFT_LIB "fftw3f")
++	elseif(KISSFFT_FOUND)
++		set(FFT_LIB "kissfft")
++	endif()
++endif()
++
++if(FFT_LIB STREQUAL "vdsp")
++	if(ACCELERATE_LIBRARIES)
++		set(USE_VDSP ON)
++	else()
++		message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
++	endif()
++elseif(FFT_LIB STREQUAL "avfft")
++	if(FFMPEG_LIBAVCODEC_FFT_FOUND)
++		set(USE_AVFFT ON)
++	else()
++		message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
++	endif()
++elseif(FFT_LIB STREQUAL "fftw3")
++	if(FFTW3_LIBRARIES)
++		set(USE_FFTW3 ON)
++	else()
++		message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
++	endif()
++elseif(FFT_LIB STREQUAL "fftw3f")
++	if(FFTW3_FFTWF_LIBRARY)
++		set(USE_FFTW3F ON)
++	else()
++		message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
++	endif()
++elseif(FFT_LIB STREQUAL "kissfft")
++	if(KISSFFT_FOUND)
++		set(USE_KISSFFT ON)
++	else()
++		message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
++	endif()
++else()
++	message(FATAL_ERROR "No FFT library found")
++endif()
++
++message(STATUS "Using ${FFT_LIB} for FFT calculations")
++
++if(NOT AUDIO_PROCESSOR_LIB)
++	if(FFMPEG_LIBSWRESAMPLE_FOUND)
++		set(AUDIO_PROCESSOR_LIB "swresample")
++	elseif(FFMPEG_LIBAVRESAMPLE_FOUND)
++		set(AUDIO_PROCESSOR_LIB "avresample")
++	endif()
++endif()
++
++if(AUDIO_PROCESSOR_LIB STREQUAL "swresample")
++	if(FFMPEG_LIBSWRESAMPLE_FOUND)
++		set(USE_AVRESAMPLE OFF)
++		set(USE_SWRESAMPLE ON)
++		set(AUDIO_PROCESSOR_LIBRARIES ${FFMPEG_LIBSWRESAMPLE_LIBRARIES})
++		set(AUDIO_PROCESSOR_INCLUDE_DIRS ${FFMPEG_LIBSWRESAMPLE_INCLUDE_DIRS})
++	else()
++		message(FATAL_ERROR "Selected ${AUDIO_PROCESSOR_LIB} for audio processing, but the library is not found")
++	endif()
++	message(STATUS "Using ${AUDIO_PROCESSOR_LIB} for audio conversion")
++elseif(AUDIO_PROCESSOR_LIB STREQUAL "avresample")
++	if(FFMPEG_LIBAVRESAMPLE_FOUND)
++		set(USE_AVRESAMPLE ON)
++		set(USE_SWRESAMPLE OFF)
++		set(AUDIO_PROCESSOR_LIBRARIES ${FFMPEG_LIBAVRESAMPLE_LIBRARIES})
++		set(AUDIO_PROCESSOR_INCLUDE_DIRS ${FFMPEG_LIBAVRESAMPLE_INCLUDE_DIRS})
++	else()
++		message(FATAL_ERROR "Selected ${AUDIO_PROCESSOR_LIB} for audio processing, but the library is not found")
++	endif()
++	message(STATUS "Using ${AUDIO_PROCESSOR_LIB} for audio conversion")
++else()
++	message(STATUS "Building without audio conversion support, please install FFmpeg with libswresample")
++endif()
++
++if(NOT BUILD_FRAMEWORK)
++	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libchromaprint.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc)
++	install(
++        FILES ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc
++        DESTINATION ${LIB_INSTALL_DIR}/pkgconfig
++        COMPONENT chromaprint)
++endif()
++
++configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
++
++include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src)
++add_definitions(
++	-DHAVE_CONFIG_H
++	-D_SCL_SECURE_NO_WARNINGS
++	-D_USE_MATH_DEFINES
++	-D__STDC_LIMIT_MACROS
++	-D__STDC_CONSTANT_MACROS
++)
++
++if(UNIX)
++	link_libraries(m)
++endif()
++
++add_subdirectory(src)
++
++if(BUILD_TESTS)
++	add_subdirectory(tests)
++endif(BUILD_TESTS)
++
++configure_file(
++	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
++	"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
++	IMMEDIATE @ONLY)
++
++add_custom_target(uninstall
++	COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
++
++configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
++add_custom_target(docs doxygen)
+diff -uprN ../chromaprint-1.5.1-orig/src/audio/ffmpeg_audio_processor_avresample.h ./src/audio/ffmpeg_audio_processor_avresample.h
+--- ../chromaprint-1.5.1-orig/src/audio/ffmpeg_audio_processor_avresample.h	2021-12-23 05:57:54.000000000 +0000
++++ ./src/audio/ffmpeg_audio_processor_avresample.h	1970-01-01 00:00:00.000000000 +0000
+@@ -1,72 +0,0 @@
+-// Copyright (C) 2016  Lukas Lalinsky
+-// Distributed under the MIT license, see the LICENSE file for details.
+-
+-#ifndef CHROMAPRINT_AUDIO_FFMPEG_AUDIO_PROCESSOR_AVRESAMPLE_H_
+-#define CHROMAPRINT_AUDIO_FFMPEG_AUDIO_PROCESSOR_AVRESAMPLE_H_
+-
+-extern "C" {
+-#include <libavresample/avresample.h>
+-}
+-
+-namespace chromaprint {
+-
+-class FFmpegAudioProcessor {
+-public:
+-	FFmpegAudioProcessor() {
+-		m_resample_ctx = avresample_alloc_context();
+-	}
+-
+-	~FFmpegAudioProcessor() {
+-		avresample_free(&m_resample_ctx);
+-	}
+-
+-	void SetCompatibleMode() {
+-		av_opt_set_int(m_resample_ctx, "filter_size", 16, 0);
+-		av_opt_set_int(m_resample_ctx, "phase_shift", 8, 0);
+-		av_opt_set_int(m_resample_ctx, "linear_interp", 1, 0);
+-		av_opt_set_double(m_resample_ctx, "cutoff", 0.8, 0);
+-	}
+-
+-	void SetInputChannelLayout(int64_t channel_layout) {
+-		av_opt_set_int(m_resample_ctx, "in_channel_layout", channel_layout, 0);
+-	}
+-
+-	void SetInputSampleFormat(AVSampleFormat sample_format) {
+-		av_opt_set_int(m_resample_ctx, "in_sample_fmt", sample_format, 0);
+-	}
+-
+-	void SetInputSampleRate(int sample_rate) {
+-		av_opt_set_int(m_resample_ctx, "in_sample_rate", sample_rate, 0);
+-	}
+-
+-	void SetOutputChannelLayout(int64_t channel_layout) {
+-		av_opt_set_int(m_resample_ctx, "out_channel_layout", channel_layout, 0);
+-	}
+-
+-	void SetOutputSampleFormat(AVSampleFormat sample_format) {
+-		av_opt_set_int(m_resample_ctx, "out_sample_fmt", sample_format, 0);
+-	}
+-
+-	void SetOutputSampleRate(int sample_rate) {
+-		av_opt_set_int(m_resample_ctx, "out_sample_fmt", sample_rate, 0);
+-	}
+-
+-	int Init() {
+-		return avresample_open(m_resample_ctx);
+-	}
+-
+-	int Convert(uint8_t **out, int out_count, const uint8_t **in, int in_count) {
+-		return avresample_convert(m_resample_ctx, out, 0, out_count, (uint8_t **) in, 0, in_count);
+-	}
+-
+-	int Flush(uint8_t **out, int out_count) {
+-		return avresample_read(m_resample_ctx, out, out_count);
+-	}
+-
+-private:
+-	AVAudioResampleContext *m_resample_ctx = nullptr;
+-};
+-
+-}; // namespace chromaprint
+-
+-#endif
+diff -uprN ../chromaprint-1.5.1-orig/src/audio/ffmpeg_audio_processor.h ./src/audio/ffmpeg_audio_processor.h
+--- ../chromaprint-1.5.1-orig/src/audio/ffmpeg_audio_processor.h	2021-12-23 05:57:54.000000000 +0000
++++ ./src/audio/ffmpeg_audio_processor.h	2024-09-18 00:40:00.178326509 +0000
+@@ -10,8 +10,6 @@
+ 
+ #if defined(USE_SWRESAMPLE)
+ #include "audio/ffmpeg_audio_processor_swresample.h"
+-#elif defined(USE_AVRESAMPLE)
+-#include "audio/ffmpeg_audio_processor_avresample.h"
+ #else
+ #error "no audio processing library"
+ #endif
+diff -uprN ../chromaprint-1.5.1-orig/src/audio/ffmpeg_audio_processor_swresample.h ./src/audio/ffmpeg_audio_processor_swresample.h
+--- ../chromaprint-1.5.1-orig/src/audio/ffmpeg_audio_processor_swresample.h	2021-12-23 05:57:54.000000000 +0000
++++ ./src/audio/ffmpeg_audio_processor_swresample.h	2024-09-18 00:40:00.178326509 +0000
+@@ -28,30 +28,28 @@ public:
+ 		av_opt_set_double(m_swr_ctx, "cutoff", 0.8, 0);
+ 	}
+ 
+-	void SetInputChannelLayout(int64_t channel_layout) {
+-		av_opt_set_int(m_swr_ctx, "icl", channel_layout, 0);
+-		av_opt_set_int(m_swr_ctx, "ich", av_get_channel_layout_nb_channels(channel_layout), 0);
++	void SetInputChannelLayout(AVChannelLayout *channel_layout) {
++		av_opt_set_int(m_swr_ctx, "in_channel_layout", channel_layout->u.mask, 0);
+ 	}
+ 
+ 	void SetInputSampleFormat(AVSampleFormat sample_format) {
+-		av_opt_set_int(m_swr_ctx, "isf", sample_format, 0);
++		av_opt_set_sample_fmt(m_swr_ctx, "in_sample_fmt", sample_format, 0);
+ 	}
+ 
+ 	void SetInputSampleRate(int sample_rate) {
+-		av_opt_set_int(m_swr_ctx, "isr", sample_rate, 0);
++		av_opt_set_int(m_swr_ctx, "in_sample_rate", sample_rate, 0);
+ 	}
+ 
+-	void SetOutputChannelLayout(int64_t channel_layout) {
+-		av_opt_set_int(m_swr_ctx, "ocl", channel_layout, 0);
+-		av_opt_set_int(m_swr_ctx, "och", av_get_channel_layout_nb_channels(channel_layout), 0);
++	void SetOutputChannelLayout(AVChannelLayout *channel_layout) {
++		av_opt_set_int(m_swr_ctx, "out_channel_layout", channel_layout->u.mask, 0);
+ 	}
+ 
+ 	void SetOutputSampleFormat(AVSampleFormat sample_format) {
+-		av_opt_set_int(m_swr_ctx, "osf", sample_format, 0);
++		av_opt_set_sample_fmt(m_swr_ctx, "out_sample_fmt", sample_format, 0);
+ 	}
+ 
+ 	void SetOutputSampleRate(int sample_rate) {
+-		av_opt_set_int(m_swr_ctx, "osr", sample_rate, 0);
++		av_opt_set_int(m_swr_ctx, "out_sample_rate", sample_rate, 0);
+ 	}
+ 
+ 	int Init() {
+diff -uprN ../chromaprint-1.5.1-orig/src/audio/ffmpeg_audio_reader.h ./src/audio/ffmpeg_audio_reader.h
+--- ../chromaprint-1.5.1-orig/src/audio/ffmpeg_audio_reader.h	2021-12-23 05:57:54.000000000 +0000
++++ ./src/audio/ffmpeg_audio_reader.h	2024-09-18 00:40:00.178326509 +0000
+@@ -62,7 +62,7 @@ public:
+ 	bool Read(const int16_t **data, size_t *size);
+ 
+ 	bool IsOpen() const { return m_opened; }
+-	bool IsFinished() const { return m_finished && !m_got_frame; }
++	bool IsFinished() const { return !m_has_more_packets && !m_has_more_frames; }
+ 
+ 	std::string GetError() const { return m_error; }
+ 	int GetErrorCode() const { return m_error_code; }
+@@ -74,20 +74,19 @@ private:
+ 	uint8_t *m_convert_buffer[1] = { nullptr };
+ 	int m_convert_buffer_nb_samples = 0;
+ 
+-	AVInputFormat *m_input_fmt = nullptr;
++	const AVInputFormat *m_input_fmt = nullptr;
+ 	AVDictionary *m_input_opts = nullptr;
+ 
+ 	AVFormatContext *m_format_ctx = nullptr;
+ 	AVCodecContext *m_codec_ctx = nullptr;
+-	AVFrame *m_frame = nullptr;
+ 	int m_stream_index = -1;
+ 	std::string m_error;
+ 	int m_error_code = 0;
+-	bool m_finished = false;
+ 	bool m_opened = false;
+-	int m_got_frame = 0;
+-	AVPacket m_packet;
+-	AVPacket m_packet0;
++	bool m_has_more_packets = true;
++	bool m_has_more_frames = true;
++	AVPacket *m_packet = nullptr;
++	AVFrame *m_frame = nullptr;
+ 
+ 	int m_output_sample_rate = 0;
+ 	int m_output_channels = 0;
+@@ -98,19 +97,12 @@ private:
+ 
+ inline FFmpegAudioReader::FFmpegAudioReader() {
+ 	av_log_set_level(AV_LOG_QUIET);
+-
+-	av_init_packet(&m_packet);
+-	m_packet.data = nullptr;
+-	m_packet.size = 0;
+-
+-	m_packet0 = m_packet;
+ }
+ 
+ inline FFmpegAudioReader::~FFmpegAudioReader() {
+ 	Close();
+ 	av_dict_free(&m_input_opts);
+ 	av_freep(&m_convert_buffer[0]);
+-	av_packet_unref(&m_packet0);
+ }
+ 
+ inline bool FFmpegAudioReader::SetInputFormat(const char *name) {
+@@ -135,11 +127,10 @@ inline bool FFmpegAudioReader::Open(cons
+ 
+ 	Close();
+ 
+-    av_init_packet(&m_packet);
+-	m_packet.data = nullptr;
+-	m_packet.size = 0;
+-
+-	m_packet0 = m_packet;
++	m_packet = av_packet_alloc();
++	if (!m_packet) {
++		return false;
++	}
+ 
+ 	ret = avformat_open_input(&m_format_ctx, file_name.c_str(), m_input_fmt, &m_input_opts);
+ 	if (ret < 0) {
+@@ -153,26 +144,31 @@ inline bool FFmpegAudioReader::Open(cons
+ 		return false;
+ 	}
+ 
+-	AVCodec *codec;
++	const AVCodec *codec;
+ 	ret = av_find_best_stream(m_format_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
+ 	if (ret < 0) {
+ 		SetError("Could not find any audio stream in the file", ret);
+ 		return false;
+ 	}
+ 	m_stream_index = ret;
++	auto stream = m_format_ctx->streams[m_stream_index];
+ 
+-	m_codec_ctx = m_format_ctx->streams[m_stream_index]->codec;
++	m_codec_ctx = avcodec_alloc_context3(codec);
+ 	m_codec_ctx->request_sample_fmt = AV_SAMPLE_FMT_S16;
+ 
++	ret = avcodec_parameters_to_context(m_codec_ctx, stream->codecpar);
++	if (ret < 0) {
++		SetError("Could not copy the stream parameters", ret);
++		return false;
++	}
++
+ 	ret = avcodec_open2(m_codec_ctx, codec, nullptr);
+ 	if (ret < 0) {
+ 		SetError("Could not open the codec", ret);
+ 		return false;
+ 	}
+ 
+-	if (!m_codec_ctx->channel_layout) {
+-		m_codec_ctx->channel_layout = av_get_default_channel_layout(m_codec_ctx->channels);
+-	}
++	av_dump_format(m_format_ctx, 0, "foo", 0);
+ 
+ 	m_frame = av_frame_alloc();
+ 	if (!m_frame) {
+@@ -183,19 +179,23 @@ inline bool FFmpegAudioReader::Open(cons
+ 		m_output_sample_rate = m_codec_ctx->sample_rate;
+ 	}
+ 
+-	if (!m_output_channels) {
+-		m_output_channels = m_codec_ctx->channels;
++	AVChannelLayout output_channel_layout;
++	if (m_output_channels) {
++		av_channel_layout_default(&output_channel_layout, m_output_channels);
++	} else {
++		m_output_channels = m_codec_ctx->ch_layout.nb_channels;
++		av_channel_layout_default(&output_channel_layout, m_output_channels);
+ 	}
+ 
+-	if (m_codec_ctx->sample_fmt != AV_SAMPLE_FMT_S16 || m_codec_ctx->channels != m_output_channels || m_codec_ctx->sample_rate != m_output_sample_rate) {
++	if (m_codec_ctx->sample_fmt != AV_SAMPLE_FMT_S16 || m_codec_ctx->ch_layout.nb_channels != m_output_channels || m_codec_ctx->sample_rate != m_output_sample_rate) {
+ 		m_converter.reset(new FFmpegAudioProcessor());
+ 		m_converter->SetCompatibleMode();
+ 		m_converter->SetInputSampleFormat(m_codec_ctx->sample_fmt);
+ 		m_converter->SetInputSampleRate(m_codec_ctx->sample_rate);
+-		m_converter->SetInputChannelLayout(m_codec_ctx->channel_layout);
++		m_converter->SetInputChannelLayout(&(m_codec_ctx->ch_layout));
+ 		m_converter->SetOutputSampleFormat(AV_SAMPLE_FMT_S16);
+ 		m_converter->SetOutputSampleRate(m_output_sample_rate);
+-		m_converter->SetOutputChannelLayout(av_get_default_channel_layout(m_output_channels));
++		m_converter->SetOutputChannelLayout(&output_channel_layout);
+ 		auto ret = m_converter->Init();
+ 		if (ret != 0) {
+ 			SetError("Could not create an audio converter instance", ret);
+@@ -203,10 +203,11 @@ inline bool FFmpegAudioReader::Open(cons
+ 		}
+ 	}
+ 
++	av_channel_layout_uninit(&output_channel_layout);
++
+ 	m_opened = true;
+-	m_finished = false;
+-	m_got_frame = 0;
+-	m_nb_packets = 0;
++	m_has_more_packets = true;
++	m_has_more_frames = true;
+ 	m_decode_error = 0;
+ 
+ 	return true;
+@@ -214,6 +215,7 @@ inline bool FFmpegAudioReader::Open(cons
+ 
+ inline void FFmpegAudioReader::Close() {
+ 	av_frame_free(&m_frame);
++	av_packet_free(&m_packet);
+ 
+ 	m_stream_index = -1;
+ 
+@@ -252,91 +254,98 @@ inline bool FFmpegAudioReader::Read(cons
+ 		return false;
+ 	}
+ 
++	*data = nullptr;
++	*size = 0;
++
+ 	int ret;
++	bool needs_packet = false;
+ 	while (true) {
+-		while (m_packet.size <= 0) {
+-			av_packet_unref(&m_packet0);
+-			av_init_packet(&m_packet);
+-			m_packet.data = nullptr;
+-			m_packet.size = 0;
+-			ret = av_read_frame(m_format_ctx, &m_packet);
++		while (needs_packet && m_packet->size == 0) {
++			ret = av_read_frame(m_format_ctx, m_packet);
+ 			if (ret < 0) {
+ 				if (ret == AVERROR_EOF) {
+-					m_finished = true;
++					needs_packet = false;
++					m_has_more_packets = false;
+ 					break;
+-				} else {
++				}
++				SetError("Error reading from the audio source", ret);
++				return false;
++			}
++			if (m_packet->stream_index == m_stream_index) {
++				needs_packet = false;
++			} else {
++				av_packet_unref(m_packet);
++			}
++		}
++
++		if (m_packet->size != 0) {
++			ret = avcodec_send_packet(m_codec_ctx, m_packet);
++			if (ret < 0) {
++				if (ret != AVERROR(EAGAIN)) {
+ 					SetError("Error reading from the audio source", ret);
+ 					return false;
+ 				}
+-			}
+-			m_packet0 = m_packet;
+-			if (m_packet.stream_index != m_stream_index) {
+-				m_packet.data = nullptr;
+-				m_packet.size = 0;
+ 			} else {
+-				m_nb_packets++;
++				av_packet_unref(m_packet);
+ 			}
+ 		}
+ 
+-		ret = avcodec_decode_audio4(m_codec_ctx, m_frame, &m_got_frame, &m_packet);
++		ret = avcodec_receive_frame(m_codec_ctx, m_frame);
+ 		if (ret < 0) {
+-			if (m_decode_error) {
+-				SetError("Error decoding audio frame", m_decode_error);
+-				return false;
++			if (ret == AVERROR_EOF) {
++				m_has_more_frames = false;
++			} else if (ret == AVERROR(EAGAIN)) {
++				if (m_has_more_packets) {
++					needs_packet = true;
++					continue;
++				} else {
++					m_has_more_frames = false;
++				}
+ 			}
+-			m_decode_error = ret;
+-			m_packet.data = nullptr;
+-			m_packet.size = 0;
+-			continue;
++			SetError("Error decoding the audio source", ret);
++			return false;
+ 		}
+ 
+-		break;
+-	}
+-
+-	m_decode_error = 0;
+-
+-	const int decoded = std::min(ret, m_packet.size);
+-	m_packet.data += decoded;
+-	m_packet.size -= decoded;
+-
+-	if (m_got_frame) {
+-		if (m_converter) {
+-			if (m_frame->nb_samples > m_convert_buffer_nb_samples) {
+-				int linsize;
+-				av_freep(&m_convert_buffer[0]);
+-				m_convert_buffer_nb_samples = std::max(1024 * 8, m_frame->nb_samples);
+-				ret = av_samples_alloc(m_convert_buffer, &linsize, m_codec_ctx->channels, m_convert_buffer_nb_samples, AV_SAMPLE_FMT_S16, 1);
+-				if (ret < 0) {
+-					SetError("Couldn't allocate audio converter buffer", ret);
++		if (m_frame->nb_samples > 0) {
++			if (m_converter) {
++				if (m_frame->nb_samples > m_convert_buffer_nb_samples) {
++					int linsize;
++					av_freep(&m_convert_buffer[0]);
++					m_convert_buffer_nb_samples = std::max(1024 * 8, m_frame->nb_samples);
++					ret = av_samples_alloc(m_convert_buffer, &linsize, m_codec_ctx->ch_layout.nb_channels, m_convert_buffer_nb_samples, AV_SAMPLE_FMT_S16, 1);
++					if (ret < 0) {
++						SetError("Couldn't allocate audio converter buffer", ret);
++						return false;
++					}
++				}
++				auto nb_samples = m_converter->Convert(m_convert_buffer, m_convert_buffer_nb_samples, (const uint8_t **) m_frame->data, m_frame->nb_samples);
++				if (nb_samples < 0) {
++					SetError("Couldn't convert audio", ret);
+ 					return false;
+ 				}
+-			}
+-			auto nb_samples = m_converter->Convert(m_convert_buffer, m_convert_buffer_nb_samples, (const uint8_t **) m_frame->data, m_frame->nb_samples);
+-			if (nb_samples < 0) {
+-				SetError("Couldn't convert audio", ret);
+-				return false;
+-			}
+-			*data = (const int16_t *) m_convert_buffer[0];
+-			*size = nb_samples;
+-		} else {
+-			*data = (const int16_t *) m_frame->data[0];
+-			*size = m_frame->nb_samples;
+-		}
+-	} else {
+-		if (m_finished && m_converter) {
+-			auto nb_samples = m_converter->Flush(m_convert_buffer, m_convert_buffer_nb_samples);
+-			if (nb_samples < 0) {
+-				SetError("Couldn't convert audio", ret);
+-				return false;
+-			} else if (nb_samples > 0) {
+-				m_got_frame = 1;
+ 				*data = (const int16_t *) m_convert_buffer[0];
+ 				*size = nb_samples;
++			} else {
++				*data = (const int16_t *) m_frame->data[0];
++				*size = m_frame->nb_samples;
++			}
++		} else {
++			if (m_converter) {
++				if (IsFinished()) {
++					auto nb_samples = m_converter->Flush(m_convert_buffer, m_convert_buffer_nb_samples);
++					if (nb_samples < 0) {
++						SetError("Couldn't convert audio", ret);
++						return false;
++					} else if (nb_samples > 0) {
++						*data = (const int16_t *) m_convert_buffer[0];
++						*size = nb_samples;
++					}
++				}
+ 			}
+ 		}
+-	}
+ 
+-	return true;
++		return true;
++	}
+ }
+ 
+ inline void FFmpegAudioReader::SetError(const char *message, int errnum) {
+diff -uprN ../chromaprint-1.5.1-orig/tests/CMakeLists.txt ./tests/CMakeLists.txt
+--- ../chromaprint-1.5.1-orig/tests/CMakeLists.txt	2021-12-23 05:57:54.000000000 +0000
++++ ./tests/CMakeLists.txt	2024-09-18 00:40:00.179326521 +0000
+@@ -38,6 +38,12 @@ set(SRCS
+ 
+ if(BUILD_TOOLS)
+ 	set(SRCS ${SRCS} ../src/audio/ffmpeg_audio_reader_test.cpp)
++    include_directories(
++        ${FFMPEG_LIBAVFORMAT_INCLUDE_DIRS}
++        ${FFMPEG_LIBAVCODEC_INCLUDE_DIRS}
++        ${FFMPEG_LIBAVUTIL_INCLUDE_DIRS}
++        ${AUDIO_PROCESSOR_INCLUDE_DIRS}
++    )
+ 	link_libraries(fpcalc_libs)
+ endif()
+ 

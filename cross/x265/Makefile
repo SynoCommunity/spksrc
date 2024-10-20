@@ -1,5 +1,5 @@
 PKG_NAME = x265
-PKG_VERS = 3.5
+PKG_VERS = 3.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265_git/downloads
@@ -14,7 +14,6 @@ LICENSE  = GPL
 PRE_CONFIGURE_TARGET = x265_pre_configure
 PRE_COMPILE_TARGET = x265_pre_compile
 
-CMAKE_USE_NINJA = 1
 CMAKE_USE_NASM = 1
 CMAKE_SOURCE_DIR = source
 

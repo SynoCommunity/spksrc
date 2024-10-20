@@ -1,0 +1,24 @@
+#
+# Disable build of man pages
+# - the creation of man pages needs soelim that is not installed
+#
+--- Makefile.in.orig	2023-12-24 02:15:55.000000000 +0000
++++ Makefile.in	2024-05-12 18:57:33.882105829 +0000
+@@ -1251,7 +1251,7 @@
+ tests_LTunix_CFLAGS = @LSOF_TEST_CFLAGS@ -I$(top_srcdir)/include
+ tests_LTbasic2_CFLAGS = -I$(top_srcdir)/include
+ tests_LTbasic2_LDADD = liblsof.la
+-man8_MANS = lsof.man
++man8_MANS =
+ all: config.h
+ 	$(MAKE) $(AM_MAKEFLAGS) all-am
+ 
+@@ -4670,7 +4670,7 @@
+ 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+ 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
+ check: check-am
+-all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(MANS) $(HEADERS) \
++all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(HEADERS) \
+ 		config.h
+ install-binPROGRAMS: install-libLTLIBRARIES
+ 

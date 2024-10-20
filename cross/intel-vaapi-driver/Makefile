@@ -16,6 +16,9 @@ PRE_CONFIGURE_TARGET = intel_vaapi_driver_configure
 
 GNU_CONFIGURE = 1
 
+# Limit compile/link-time storage space (and faster build-time)
+GCC_NO_DEBUG_INFO = 1
+
 include ../../mk/spksrc.cross-cc.mk
 
 # Enforce install prefix because of make install DESTDIR

@@ -1,5 +1,5 @@
 PKG_NAME = gmp
-PKG_VERS = 6.2.1
+PKG_VERS = 6.3.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/gmp

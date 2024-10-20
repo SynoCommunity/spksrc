@@ -23,4 +23,4 @@ PRE_CONFIGURE_TARGET = inotify_pre_configure
 include ../../mk/spksrc.cross-cc.mk
 
 inotify_pre_configure:
-	$(RUN) ./autogen.sh 
+	$(RUN) ./autogen.sh

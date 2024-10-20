@@ -1,5 +1,5 @@
 PKG_NAME = dav1d
-PKG_VERS = 1.1.0
+PKG_VERS = 1.4.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.videolan.org/pub/videolan/dav1d/$(PKG_VERS)

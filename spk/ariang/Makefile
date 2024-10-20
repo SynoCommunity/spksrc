@@ -19,7 +19,7 @@ LICENSE  = MIT
 CONF_DIR = src/conf
 STARTABLE = no
 
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk

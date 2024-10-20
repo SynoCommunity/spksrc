@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 5.1.3
+PKG_VERS = 5.1.6
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -35,8 +35,7 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
 include ../../mk/spksrc.common.mk
 
-OPTIONAL_DEPENDS  = native/nasm
-OPTIONAL_DEPENDS += cross/chromaprint-fftw
+OPTIONAL_DEPENDS  = cross/chromaprint-fftw
 OPTIONAL_DEPENDS += cross/dav1d
 OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
@@ -51,6 +50,11 @@ OPTIONAL_DEPENDS += cross/libva-utils
 OPTIONAL_DEPENDS += cross/intel-vaapi-driver
 OPTIONAL_DEPENDS += cross/intel-media-driver
 OPTIONAL_DEPENDS += cross/intel-mediasdk
+OPTIONAL_DEPENDS += cross/intel-level-zero
+OPTIONAL_DEPENDS += cross/intel-graphics-compiler
+OPTIONAL_DEPENDS += cross/intel-compute-runtime
+OPTIONAL_DEPENDS += cross/ocl-icd
+OPTIONAL_DEPENDS += cross/clinfo
 OPTIONAL_DEPENDS += cross/twolame
 OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
@@ -58,10 +62,6 @@ OPTIONAL_DEPENDS += cross/shine
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
-ENV += AS=$(NASM_PATH)/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --x86asmexe=nasm
 
 # Allow ASM on aarch64, disable on all others
@@ -224,23 +224,29 @@ CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --extra-libs=-latomic
 CONFIGURE_ARGS += --arch=ppc
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --cpu=e500v2
+CONFIGURE_ARGS += --extra-libs=-latomic
 else
 CONFIGURE_ARGS += --cpu=e500 --disable-altivec
 endif
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
-CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-vaapi --enable-libmfx --enable-libdrm
-endif
-
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
 CONFIGURE_ARGS += --arch=x86 --cpu=atom
+endif
+
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+# Dependencies provided by synocli-videodriver
+# If built outside spksrc.videodriver.mk
+ifeq ($(strip $(VIDEODRV_PACKAGE)),)
+DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
+endif
+CONFIGURE_ARGS += --arch=x86_64
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-libmfx
+CONFIGURE_ARGS += --enable-vaapi
 endif
 
 include ../../mk/spksrc.cross-cc.mk
@@ -248,6 +254,23 @@ include ../../mk/spksrc.cross-cc.mk
 ##
 ## GCC SPECIFIC
 ##
+
+# OpenCL acceleration
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+# Newer Intel implementations (oneAPI, level-zero) requires gcc >= 5
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
+# Dependencies provided by synocli-videodriver
+# If built outside spksrc.videodriver.mk
+ifeq ($(strip $(VIDEODRV_PACKAGE)),)
+DEPENDS += cross/intel-level-zero
+DEPENDS += cross/intel-graphics-compiler
+DEPENDS += cross/intel-compute-runtime
+DEPENDS += cross/ocl-icd
+DEPENDS += cross/clinfo
+endif
+CONFIGURE_ARGS += --enable-opencl
+endif
+endif
 
 # libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
 ifeq ($(call version_ge, $(TC_GCC), 4.8),1)

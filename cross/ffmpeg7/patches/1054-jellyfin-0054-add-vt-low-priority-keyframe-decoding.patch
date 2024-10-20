@@ -1,0 +1,58 @@
+Index: FFmpeg/libavcodec/avcodec.h
+===================================================================
+--- libavcodec/avcodec.h
++++ libavcodec/avcodec.h
+@@ -2174,6 +2174,13 @@ typedef struct AVHWAccel {
+ #define AV_HWACCEL_FLAG_UNSAFE_OUTPUT (1 << 3)
+ 
+ /**
++ * Some hardware decoders (like VideoToolbox) supports decode session priority
++ * that run decode pipeline at a lower priority than is used for realtime decoding.
++ * This will be useful for background processing without interrupting normal playback.
++ */
++#define AV_HWACCEL_FLAG_LOW_PRIORITY (1 << 4)
++
++/**
+  * @}
+  */
+ 
+Index: FFmpeg/libavcodec/options_table.h
+===================================================================
+--- libavcodec/options_table.h
++++ libavcodec/options_table.h
+@@ -407,6 +407,7 @@ static const AVOption avcodec_options[]
+     {"mastering_display_metadata",  .default_val.i64 = AV_PKT_DATA_MASTERING_DISPLAY_METADATA,  .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
+     {"content_light_level",         .default_val.i64 = AV_PKT_DATA_CONTENT_LIGHT_LEVEL,         .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
+     {"icc_profile",                 .default_val.i64 = AV_PKT_DATA_ICC_PROFILE,                 .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
++{"low_priority", "attempt to run decode pipeline at a lower priority than is used for realtime decoding", 0, AV_OPT_TYPE_CONST, {.i64 = AV_HWACCEL_FLAG_LOW_PRIORITY }, INT_MIN, INT_MAX, V | D, .unit = "hwaccel_flags"},
+ {NULL},
+ };
+ 
+Index: FFmpeg/libavcodec/videotoolbox.c
+===================================================================
+--- libavcodec/videotoolbox.c
++++ libavcodec/videotoolbox.c
+@@ -984,6 +984,23 @@ static int videotoolbox_start(AVCodecCon
+         av_log(avctx, AV_LOG_VERBOSE, "VideoToolbox reported invalid data.\n");
+         return AVERROR_INVALIDDATA;
+     case 0:
++        if (avctx->skip_frame >= AVDISCARD_NONKEY) {
++            status = VTSessionSetProperty(videotoolbox->session,
++                                          kVTDecompressionPropertyKey_OnlyTheseFrames,
++                                          kVTDecompressionProperty_OnlyTheseFrames_KeyFrames);
++            if (status) {
++                av_log(avctx, AV_LOG_WARNING, "kVTDecompressionProperty_OnlyTheseFrames_KeyFrames is not supported on this device. Ignoring.\n");
++            }
++        }
++        if (avctx->hwaccel_flags & AV_HWACCEL_FLAG_LOW_PRIORITY) {
++            status = VTSessionSetProperty(videotoolbox->session,
++                                          kVTDecompressionPropertyKey_RealTime,
++                                          kCFBooleanFalse);
++            av_log(avctx, AV_LOG_INFO, "Decoder running at lower priority.\n");
++            if (status) {
++                av_log(avctx, AV_LOG_WARNING, "kVTDecompressionPropertyKey_RealTime is not supported on this device. Ignoring.\n");
++            }
++        }
+         return 0;
+     default:
+         av_log(avctx, AV_LOG_VERBOSE, "Unknown VideoToolbox session creation error %d\n", (int)status);

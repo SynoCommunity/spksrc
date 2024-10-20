@@ -1,0 +1,19 @@
+diff -uprN ../chromaprint-1.5.1-8ccad693/src/audio/ffmpeg_audio_reader.h ./src/audio/ffmpeg_audio_reader.h
+--- ../chromaprint-1.5.1-8ccad693/src/audio/ffmpeg_audio_reader.h	2024-09-18 00:40:00.178326509 +0000
++++ ./src/audio/ffmpeg_audio_reader.h	2024-09-18 00:41:08.043183176 +0000
+@@ -118,8 +118,13 @@ inline bool FFmpegAudioReader::SetInputS
+ 
+ inline bool FFmpegAudioReader::SetInputChannels(int channels) {
+ 	char buf[64];
+-	sprintf(buf, "%d", channels);
+-	return av_dict_set(&m_input_opts, "channels", buf, 0) >= 0;
++    if (channels == 1)
++        sprintf(buf, "%s", "mono");
++    else if (channels == 2)
++        sprintf(buf, "%s", "stereo");
++    else
++        return false;
++	return av_dict_set(&m_input_opts, "ch_layout", buf, 0) >= 0;
+ }
+ 
+ inline bool FFmpegAudioReader::Open(const std::string &file_name) {

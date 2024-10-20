@@ -1,0 +1,13 @@
+bin:bin/metrics_monitor
+bin:bin/sample_decode
+bin:bin/sample_encode
+bin:bin/sample_multi_transcode
+bin:bin/sample_vpp
+bin:bin/system_analyzer
+bin:bin/val-surface-sharing
+bin:bin/vpl-import-export
+bin:bin/vpl-inspect
+lnk:lib/libcttmetrics.so
+lib:lib/libcttmetrics.so.1.0.0
+rsc:share/vpl-tools/licensing/third-party-programs.txt
+rsc:share/vpl-tools/licensing/license.txt

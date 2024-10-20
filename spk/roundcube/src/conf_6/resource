@@ -1,0 +1,20 @@
+{
+    "mariadb10-db": {
+        "admin-account-m10": "root",
+        "admin-pw-m10": "{{wizard_mysql_password_root}}",
+        "create-db": {
+            "db-collision": "skip",
+            "db-name": "roundcube",
+            "flag": "{{wizard_create_db}}"
+        },
+        "drop-db-uninst": true,
+        "drop-user-uninst": true,
+        "grant-user": {
+            "db-name": "roundcube",
+            "flag": "{{mysql_grant_user}}",
+            "host": "localhost",
+            "user-name": "roundcube",
+            "user-pw": "{{wizard_mysql_password_roundcube}}"
+        }
+    }
+}

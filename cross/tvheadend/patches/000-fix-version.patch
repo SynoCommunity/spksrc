@@ -1,5 +1,5 @@
---- support/version.orig	2019-07-29 14:53:41.000000000 -0400
-+++ support/version	2019-08-06 21:05:00.135025823 -0400
+--- support/version.orig	2024-06-15 07:32:43.000000000 +0000
++++ support/version	2024-06-17 00:29:53.191178427 +0000
 @@ -7,7 +7,9 @@
  FILE=$1
  
@@ -8,6 +8,6 @@
 +if [ "$TVH_VERS" ]; then
 +  VER="$TVH_VERS"
 +elif [ -d ".git" ]; then
+   DIRTYHASH=$(echo -n "$NODIRTY" | sha512sum - | awk '{print $1}')
    VER=$(cd "$(dirname "$0")"/..; git describe --dirty --match "v*" 2> /dev/null)
-   if [ $? -ne 0 ]; then
-     # Git describe failed, maybe "--dirty" option is not available
+   if [ $? -ne 0 ] || [ "$DIRTYHASH" = "a70f88117be8b5c1ade69df0096182da65d877c37e375ed1f22c7225c321405eb89e40f36cf696906d48c73545f771f8eb5d4bbb7507200608f66990d8d96430" ]; then

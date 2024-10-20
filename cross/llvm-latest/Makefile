@@ -37,7 +37,7 @@ CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 # linked with the Foreign Function Interface library
 # (libffi) in order to enable calling external functions.
 DEPENDS += cross/libffi
-CMAKE_ARGS += LLVM_ENABLE_FFI=ON
+CMAKE_ARGS += -DLLVM_ENABLE_FFI=ON
 
 DEPENDS += cross/ncursesw
 CMAKE_ARGS += -DLLVM_ENABLE_TERMINFO=ON

@@ -1,0 +1,118 @@
+Index: FFmpeg/libavutil/hwcontext_vulkan.c
+===================================================================
+--- libavutil/hwcontext_vulkan.c
++++ libavutil/hwcontext_vulkan.c
+@@ -950,7 +950,7 @@ static const char *vk_dev_type(enum VkPh
+ static int find_device(AVHWDeviceContext *ctx, VulkanDeviceSelection *select)
+ {
+     int err = 0, choice = -1;
+-    uint32_t num;
++    uint32_t num, api = 0;
+     VkResult ret;
+     VulkanDevicePriv *p = ctx->hwctx;
+     AVVulkanDeviceContext *hwctx = &p->p;
+@@ -1017,63 +1017,78 @@ static int find_device(AVHWDeviceContext
+ 
+     if (select->has_uuid) {
+         for (int i = 0; i < num; i++) {
+-            if (!strncmp(idp[i].deviceUUID, select->uuid, VK_UUID_SIZE)) {
++            if (!strncmp(idp[i].deviceUUID, select->uuid, VK_UUID_SIZE)
++                && prop[i].properties.apiVersion > api) {
+                 choice = i;
+-                goto end;
+-             }
++                api = prop[i].properties.apiVersion;
++            }
++        }
++        if (choice == -1) {
++            av_log(ctx, AV_LOG_ERROR, "Unable to find device by given UUID!\n");
++            err = AVERROR(ENODEV);
+         }
+-        av_log(ctx, AV_LOG_ERROR, "Unable to find device by given UUID!\n");
+-        err = AVERROR(ENODEV);
+         goto end;
+     } else if ((p->vkctx.extensions & FF_VK_EXT_DEVICE_DRM) && select->has_drm) {
+         for (int i = 0; i < num; i++) {
+             if ((select->drm_major == drm_prop[i].primaryMajor &&
+                  select->drm_minor == drm_prop[i].primaryMinor) ||
+                 (select->drm_major == drm_prop[i].renderMajor &&
+-                 select->drm_minor == drm_prop[i].renderMinor)) {
++                 select->drm_minor == drm_prop[i].renderMinor)
++                && prop[i].properties.apiVersion > api) {
+                 choice = i;
+-                goto end;
+-             }
++                api = prop[i].properties.apiVersion;
++            }
++        }
++        if (choice == -1) {
++            av_log(ctx, AV_LOG_ERROR, "Unable to find device by given DRM node numbers %i:%i!\n",
++                   select->drm_major, select->drm_minor);
++            err = AVERROR(ENODEV);
+         }
+-        av_log(ctx, AV_LOG_ERROR, "Unable to find device by given DRM node numbers %i:%i!\n",
+-               select->drm_major, select->drm_minor);
+-        err = AVERROR(ENODEV);
+         goto end;
+     } else if (select->name) {
+         av_log(ctx, AV_LOG_VERBOSE, "Requested device: %s\n", select->name);
+         for (int i = 0; i < num; i++) {
+-            if (strstr(prop[i].properties.deviceName, select->name)) {
++            if (strstr(prop[i].properties.deviceName, select->name)
++                && prop[i].properties.apiVersion > api) {
+                 choice = i;
+-                goto end;
++                api = prop[i].properties.apiVersion;
+              }
+         }
+-        av_log(ctx, AV_LOG_ERROR, "Unable to find device \"%s\"!\n",
+-               select->name);
+-        err = AVERROR(ENODEV);
++        if (choice == -1) {
++            av_log(ctx, AV_LOG_ERROR, "Unable to find device \"%s\"!\n",
++                   select->name);
++            err = AVERROR(ENODEV);
++        }
+         goto end;
+     } else if (select->pci_device) {
+         av_log(ctx, AV_LOG_VERBOSE, "Requested device: 0x%x\n", select->pci_device);
+         for (int i = 0; i < num; i++) {
+-            if (select->pci_device == prop[i].properties.deviceID) {
++            if (select->pci_device == prop[i].properties.deviceID
++                && prop[i].properties.apiVersion > api) {
+                 choice = i;
+-                goto end;
++                api = prop[i].properties.apiVersion;
+             }
+         }
+-        av_log(ctx, AV_LOG_ERROR, "Unable to find device with PCI ID 0x%x!\n",
+-               select->pci_device);
+-        err = AVERROR(EINVAL);
++        if (choice == -1) {
++            av_log(ctx, AV_LOG_ERROR, "Unable to find device with PCI ID 0x%x!\n",
++                   select->pci_device);
++            err = AVERROR(EINVAL);
++        }
+         goto end;
+     } else if (select->vendor_id) {
+         av_log(ctx, AV_LOG_VERBOSE, "Requested vendor: 0x%x\n", select->vendor_id);
+         for (int i = 0; i < num; i++) {
+-            if (select->vendor_id == prop[i].properties.vendorID) {
++            if (select->vendor_id == prop[i].properties.vendorID
++                && prop[i].properties.apiVersion > api) {
+                 choice = i;
+-                goto end;
++                api = prop[i].properties.apiVersion;
+             }
+         }
+-        av_log(ctx, AV_LOG_ERROR, "Unable to find device with Vendor ID 0x%x!\n",
+-               select->vendor_id);
+-        err = AVERROR(ENODEV);
++        if (choice == -1) {
++            av_log(ctx, AV_LOG_ERROR, "Unable to find device with Vendor ID 0x%x!\n",
++                   select->vendor_id);
++            err = AVERROR(ENODEV);
++        }
+         goto end;
+     } else {
+         if (select->index < num) {

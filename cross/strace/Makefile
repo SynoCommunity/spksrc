@@ -1,5 +1,5 @@
 PKG_NAME = strace
-PKG_VERS = 6.5
+PKG_VERS = 6.9
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/strace/strace/releases/download/v$(PKG_VERS)
@@ -36,6 +36,9 @@ CONFIGURE_ARGS = --disable-mpers
 endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 STRACE_ARCH = powerpc
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+ADDITIONAL_CFLAGS = -DDISABLE_KERNEL_V4L2_HAVE_TIME32
+endif
 endif
 
 ifeq ($(strip $(STRACE_ARCH)),)

@@ -1,0 +1,19 @@
+[
+  {
+    "step_title": "Important update notes",
+    "items": [
+      {
+        "desc": "This package must be run as root, but Synology prohibits this for packages that have not been verified by them."
+      },
+      {
+        "desc": "Please continue the update until the package fails to start and shows 'Manually Stopped' in the Package Center."
+      },
+      {
+        "desc": "Than you need to ssh into DSM and execute the command:<br/><code>sudo sed -i 's/package/root/g' /var/packages/ntopng/conf/privilege</code>"
+      },
+      {
+        "desc": "Finally press <strong>Run</strong> in the Package Center, or manually start the package in the ssh session with:<br/><code>sudo synopkg start ntopng</code>"
+      }
+    ]
+  }
+]

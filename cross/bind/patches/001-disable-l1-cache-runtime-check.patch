@@ -1,0 +1,26 @@
+# Disable L1 cache alignment runtime check
+# 
+# on most Synology systems the sysconf function returns 0 
+# instead of ISC_OS_CACHELINE_SIZE (64)
+# only on x64 systems the value is 64 (cpuinfo: "cache_alignment : 64")
+# 
+# The first attempt was to disable the definition of HAVE_SYSCONF
+# by CONFIGURE_ARGS += ac_cv_func_sysconf=no, but this did not work 
+# (HAVE_SYSCONF must be defined elsewhere)
+# 
+# So far remove the runtime check for sysconf(_SC_LEVEL1_DCACHE_LINESIZE) only,
+# and keep the sysconf call to evaluate the number of cpus in os.c
+#
+--- lib/isc/os.c.orig	2022-01-12 12:04:23.274225500 +0100
++++ lib/isc/os.c	2024-10-14 23:18:34.813233430 +0200
+@@ -80,8 +80,8 @@
+ isc__os_initialize(void) {
+ 	ncpus_initialize();
+ #if defined(HAVE_SYSCONF) && defined(_SC_LEVEL1_DCACHE_LINESIZE)
+-	long s = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+-	RUNTIME_CHECK((size_t)s == (size_t)ISC_OS_CACHELINE_SIZE);
++//	long s = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
++//	RUNTIME_CHECK((size_t)s == (size_t)ISC_OS_CACHELINE_SIZE);
+ #endif
+ }
+ 

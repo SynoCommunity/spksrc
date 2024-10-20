@@ -1,0 +1,32 @@
+# enable ionice only for enable-schedutils
+# 
+# 
+--- configure.orig	2024-05-06 08:20:58.337712600 +0000
++++ configure	2024-06-21 19:41:48.828192227 +0000
+@@ -41220,7 +41220,7 @@
+ 
+ 
+ 
+-  enable_taskset=$enable_schedutils
++  enable_taskset=no
+ 
+ 
+ 
+@@ -41376,7 +41376,7 @@
+ 
+ 
+ 
+-  enable_chrt=$enable_schedutils
++  enable_chrt=no
+ 
+ 
+ 
+@@ -41505,7 +41505,7 @@
+ 
+ 
+ 
+-  enable_uclampset=$enable_schedutils
++  enable_uclampset=no
+ 
+ 
+ 

@@ -1,19 +1,19 @@
 SPK_NAME = owncloud
-SPK_VERS = 10.13.4
-SPK_REV = 16
+SPK_VERS = 10.15.0
+SPK_REV = 20
 SPK_ICON = src/owncloud.png
 
 DEPENDS = cross/owncloud
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 REQUIRED_MIN_DSM = 6.0
-SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
+SPK_DEPENDS = WebStation:PHP7.4:MariaDB10:Apache2.4:redis
 
-MAINTAINER = ymartin59
+MAINTAINER = SynoCommunity
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 DISPLAY_NAME = ownCloud
-CHANGELOG = "1. Update ownCloud to 10.13.4."
+CHANGELOG = "1. Update ownCloud to 10.15.0.<br/>2. Use recommended MariaDB database.<br/>3. Optimise initial ownCloud setup.<br/>4. Various script fixes and refinements."
 HOMEPAGE = https://owncloud.com/
 
 LICENSE = AGPLv3

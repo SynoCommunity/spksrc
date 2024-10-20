@@ -4,7 +4,6 @@ bin:bin/as
 bin:bin/c++filt
 bin:bin/dwp
 bin:bin/elfedit
-bin:bin/embedspu
 bin:bin/gp-archive
 bin:bin/gp-collect-app
 rsc:bin/gp-display-html

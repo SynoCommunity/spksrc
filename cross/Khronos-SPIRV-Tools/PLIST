@@ -1,0 +1,17 @@
+bin:bin/spirv-as
+bin:bin/spirv-cfg
+bin:bin/spirv-dis
+rsc:bin/spirv-lesspipe.sh
+bin:bin/spirv-link
+bin:bin/spirv-lint
+bin:bin/spirv-objdump
+bin:bin/spirv-opt
+bin:bin/spirv-reduce
+bin:bin/spirv-val
+lib:lib/libSPIRV-Tools-diff.so
+lib:lib/libSPIRV-Tools-link.so
+lib:lib/libSPIRV-Tools-lint.so
+lib:lib/libSPIRV-Tools-opt.so
+lib:lib/libSPIRV-Tools-reduce.so
+lib:lib/libSPIRV-Tools-shared.so
+lib:lib/libSPIRV-Tools.so

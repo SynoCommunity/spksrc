@@ -1,5 +1,5 @@
 PKG_NAME = zimg
-PKG_VERS = 3.0.4
+PKG_VERS = 3.0.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = release-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sekrit-twc/zimg/archive/refs/tags

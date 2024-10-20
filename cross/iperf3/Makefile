@@ -1,23 +1,15 @@
-PKG_NAME = iperf3
-PKG_VERS = 3.13
-PKG_EXT = tar.gz
-PKG_NAME_REAL = iperf
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/esnet/iperf/archive
-PKG_DIST_FILE = $(PKG_NAME_REAL)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME_REAL)-$(PKG_VERS)
+PKG_NAME = iperf3-main
 
-DEPENDS = cross/openssl
+# libatomics is required for iperf3 >= 3.16
+OPTIONAL_DEPENDS  = cross/iperf3-latest
+OPTIONAL_DEPENDS += cross/iperf3-3.15
 
-HOMEPAGE = https://software.es.net/iperf/
-COMMENT  = The iperf series of tools perform active measurements to determine the maximum achievable bandwidth on IP networks. It supports tuning of various parameters related to timing, protocols, and buffers. For each test it reports the measured throughput, loss, and other parameters.
-LICENSE  = 3-Clause BSD
+include ../../mk/spksrc.main-depends.mk
 
-GNU_CONFIGURE = 1
-
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
-# prefer netinet/tcp.h over linux/tcp.h to ensure 'TCP_USER_TIMEOUT' is declared.
-CONFIGURE_ARGS += ac_cv_header_linux_tcp_h=no
+ifeq ($(call version_lt, ${TCVERSION}, 6.0)$(call version_ge, ${TCVERSION}, 3.0),11)
+DEPENDS = cross/iperf3-3.15
+else ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+DEPENDS = cross/iperf3-3.15
+else
+DEPENDS = cross/iperf3-latest
 endif
-
-include ../../mk/spksrc.cross-cc.mk

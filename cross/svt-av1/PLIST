@@ -1,8 +1,4 @@
-bin:bin/SvtAv1DecApp
 bin:bin/SvtAv1EncApp
-lib:lib/libSvtAv1Dec.so.0.8.7
-lnk:lib/libSvtAv1Dec.so.0
-lnk:lib/libSvtAv1Dec.so
-lib:lib/libSvtAv1Enc.so.1.4.1
-lnk:lib/libSvtAv1Enc.so.1
+lib:lib/libSvtAv1Enc.so.2.2.0
+lnk:lib/libSvtAv1Enc.so.2
 lnk:lib/libSvtAv1Enc.so

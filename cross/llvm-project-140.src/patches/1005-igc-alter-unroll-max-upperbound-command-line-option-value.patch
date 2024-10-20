@@ -1,0 +1,39 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2021-2023 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+/*========================== begin_copyright_notice ============================
+
+Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+See https://llvm.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 with LLVM-exception
+
+============================= end_copyright_notice ===========================*/
+
+diff --git a/llvm/lib/Transforms/Scalar/LoopUnrollPass.cpp b/llvm/lib/Transforms/Scalar/LoopUnrollPass.cpp
+index 9beb2281c..a3cc73ca5 100644
+--- a/llvm/lib/Transforms/Scalar/LoopUnrollPass.cpp
++++ b/llvm/lib/Transforms/Scalar/LoopUnrollPass.cpp
+@@ -968,7 +968,7 @@ bool llvm::computeUnrollCount(
+   // cost of exact full unrolling.  As such, if we have an exact count and
+   // found it unprofitable, we'll never chose to bounded unroll.
+   if (!TripCount && MaxTripCount && (UP.UpperBound || MaxOrZero) &&
+-      MaxTripCount <= UnrollMaxUpperBound) {
++      MaxTripCount < std::max(16U, UnrollMaxUpperBound.getValue())) {
+     UP.Count = MaxTripCount;
+     if (auto UnrollFactor = shouldFullUnroll(L, TTI, DT, SE, EphValues,
+                                              MaxTripCount, UCE, UP)) {
+@@ -1042,7 +1042,8 @@ bool llvm::computeUnrollCount(
+   }
+
+   // Don't unroll a small upper bound loop unless user or TTI asked to do so.
+-  if (MaxTripCount && !UP.Force && MaxTripCount < UnrollMaxUpperBound) {
++  if (MaxTripCount && !UP.Force &&
++      MaxTripCount < std::max(16U, UnrollMaxUpperBound.getValue())) {
+     UP.Count = 0;
+     return false;
+   }

@@ -1,0 +1,56 @@
+#
+# Enable overwrite of some hard coded variables.
+# 
+--- Makefile.orig	2019-10-17 15:43:18.000000000 +0000
++++ Makefile	2024-04-27 08:47:02.186270689 +0000
+@@ -39,17 +39,17 @@
+ 
+ # If you want to install at some other place then at from which you will run
+ # everything, set DESTDIR to the extra prefix.
+-DESTDIR :=
++DESTDIR ?=
+ 
+ # This is the prefix that will be used for almost all directories below.
+-PREFIX := /usr/local
++PREFIX ?= /usr/local
+ 
+ # Your C compiler
+-CC := gcc
++CC ?= gcc
+ 
+ # This is the directory where sensors3.conf will be installed, if no other
+ # configuration file is found
+-ETCDIR := /etc
++ETCDIR ?= /etc
+ 
+ # You should not need to change this. It is the directory into which the
+ # library files (both static and shared) will be installed.
+@@ -77,13 +77,13 @@
+ # manual pages will be installed.
+ MANDIR := $(PREFIX)/man
+ 
+-ARCH := $(firstword $(subst -, ,$(shell $(CC) -dumpmachine)))
++ARCH ?= $(firstword $(subst -, ,$(shell $(CC) -dumpmachine)))
+ 
+ # Extra non-default programs to build; e.g., sensord
+ #PROG_EXTRA := sensord
+ 
+ # Build and install static library
+-BUILD_STATIC_LIB := 1
++BUILD_STATIC_LIB ?= 1
+ 
+ # Set these to add preprocessor or compiler flags, or use
+ # environment variables
+@@ -119,9 +119,9 @@
+ RMDIR := rmdir
+ RM := rm -f
+ MV := mv -f
+-BISON := bison
+-FLEX := flex
+-AR := ar
++BISON ?= bison
++FLEX ?= flex
++AR ?= ar
+ INSTALL := install
+ LN := ln -sf
+ GREP := grep

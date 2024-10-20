@@ -1,0 +1,80 @@
+Index: jellyfin-ffmpeg/fftools/Makefile
+===================================================================
+--- fftools/Makefile
++++ fftools/Makefile
+@@ -17,6 +17,9 @@ OBJS-ffmpeg +=                  \
+ 
+ define DOFFTOOL
+ OBJS-$(1) += fftools/cmdutils.o fftools/opt_common.o fftools/$(1).o $(OBJS-$(1)-yes)
++ifdef HAVE_GNU_WINDRES
++OBJS-$(1) += fftools/fftoolsres.o
++endif
+ $(1)$(PROGSSUF)_g$(EXESUF): $$(OBJS-$(1))
+ $$(OBJS-$(1)): | fftools
+ $$(OBJS-$(1)): CFLAGS  += $(CFLAGS-$(1))
+@@ -27,6 +30,12 @@ endef
+ 
+ $(foreach P,$(AVPROGS-yes),$(eval $(call DOFFTOOL,$(P))))
+ 
++ifdef HAVE_GNU_WINDRES
++ifneq (,$(wildcard fftools/fftools.ico))
++CC_DEPFLAGS += -DHAVE_FFTOOLS_ICO
++endif
++endif
++
+ all: $(AVPROGS)
+ 
+ fftools/ffprobe.o fftools/cmdutils.o: libavutil/ffversion.h | fftools
+Index: jellyfin-ffmpeg/fftools/fftools.manifest
+===================================================================
+--- /dev/null
++++ fftools/fftools.manifest
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
++<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
++  <asmv3:application>
++    <asmv3:windowsSettings>
++      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true</dpiAware>
++      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2</dpiAwareness>
++    </asmv3:windowsSettings>
++  </asmv3:application>
++</assembly>
+Index: jellyfin-ffmpeg/fftools/fftoolsres.rc
+===================================================================
+--- /dev/null
++++ fftools/fftoolsres.rc
+@@ -0,0 +1,34 @@
++#include <windows.h>
++#include "libavutil/version.h"
++#include "libavutil/ffversion.h"
++#include "config.h"
++
++1 RT_MANIFEST fftools.manifest
++
++#ifdef HAVE_FFTOOLS_ICO
++1 ICON fftools.ico
++#endif
++
++1 VERSIONINFO
++FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
++FILEOS          VOS_NT_WINDOWS32
++FILETYPE        VFT_APP
++{
++    BLOCK "StringFileInfo"
++    {
++        BLOCK "040904B0"
++        {
++            VALUE "CompanyName",      "FFmpeg Project"
++            VALUE "FileDescription",  "FFmpeg command-line tools"
++            VALUE "FileVersion",      FFMPEG_VERSION
++            VALUE "LegalCopyright",   "Copyright (C) " AV_STRINGIFY(CONFIG_THIS_YEAR) " FFmpeg Project"
++            VALUE "ProductName",      "FFmpeg"
++            VALUE "ProductVersion",   FFMPEG_VERSION
++        }
++    }
++
++    BLOCK "VarFileInfo"
++    {
++        VALUE "Translation", 0x0409, 0x04B0
++    }
++}

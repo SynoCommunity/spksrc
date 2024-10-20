@@ -1,11 +1,11 @@
 PKG_NAME = net-snmp
-PKG_VERS = 5.9.3
+PKG_VERS = 5.9.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/net-snmp/files/net-snmp/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl
+DEPENDS = cross/openssl3
 
 HOMEPAGE = http://www.net-snmp.org/
 COMMENT  = Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
@@ -28,6 +28,10 @@ CONFIGURE_ARGS += --without-sys-location
 CONFIGURE_ARGS += --disable-embedded-perl
 CONFIGURE_ARGS += --without-perl-modules
 
-ADDITIONAL_CFLAGS = -O2
+# enable use of sysctl (with patched configure file)
+CONFIGURE_ARGS += ac_cv_NETSNMP_CAN_USE_SYSCTL=yes
+ADDITIONAL_CFLAGS = -DNETSNMP_CAN_USE_SYSCTL
+
+ADDITIONAL_CFLAGS += -O2
 
 include ../../mk/spksrc.cross-cc.mk

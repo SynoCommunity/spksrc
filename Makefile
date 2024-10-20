@@ -70,30 +70,19 @@ native-%: native/%/Makefile
 native-%-clean: native/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
 
-# build dependency flat list for all packages
-dependency-flat:
-	@echo $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile)))
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
-	do \
-	    echo "$(MAKE) -s -C $${spk} dependency-flat" ; \
-	    $(MAKE) -s -C $${spk} dependency-flat ; \
-	done
-
 # build dependency tree for all packages
+# - exclude broken packages
 dependency-tree:
-	@echo $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile)))
 	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
-	    echo "$(MAKE) --no-print-directory -C $${spk} dependency-tree" ; \
 	    $(MAKE) --no-print-directory -C $${spk} dependency-tree ; \
 	done
 
 # build dependency list for all packages
+# - exclude broken packages
 dependency-list:
-	@echo $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile)))
 	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
-	    echo "$(MAKE) -s -C $${spk} dependency-list" ; \
 	    $(MAKE) -s -C $${spk} dependency-list ; \
 	done
 

@@ -1,9 +1,10 @@
 PKG_NAME = x264
-PKG_VERS = 20230123-stable
+PKG_VERS = 20240512-stable
 PKG_EXT = tar.gz
-PKG_GIT_HASH = eaa68fad9e5d201d42fde51665f2d137ae96baf0
-PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/mirror/x264/archive
+PKG_GIT_HASH = 4613ac3c15fd75cebc4b9f65b7fb95e70a3acce1
+PKG_DIST_NAME = $(PKG_NAME)-master.$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_GIT_HASH).$(PKG_EXT)
+PKG_DIST_SITE = https://code.videolan.org/videolan/x264/-/archive/$(PKG_GIT_HASH)
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 

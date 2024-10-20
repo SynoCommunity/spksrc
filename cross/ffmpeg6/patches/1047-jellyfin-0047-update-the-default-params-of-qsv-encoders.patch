@@ -2,15 +2,17 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc_av1.c
 ===================================================================
 --- libavcodec/qsvenc_av1.c
 +++ libavcodec/qsvenc_av1.c
-@@ -130,7 +130,7 @@ static const AVClass class = {
+@@ -130,8 +130,8 @@ static const AVClass class = {
  
  static const FFCodecDefault qsv_enc_defaults[] = {
      { "b",         "1M"   },
 -    { "g",         "-1"   },
+-    { "bf",        "-1"   },
 +    { "g",         "250"  },
-     { "bf",        "-1"   },
++    { "bf",        "3"    },
      { "refs",      "0"    },
      { NULL },
+ };
 Index: jellyfin-ffmpeg/libavcodec/qsvenc_h264.c
 ===================================================================
 --- libavcodec/qsvenc_h264.c

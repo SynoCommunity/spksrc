@@ -17,6 +17,7 @@ LICENSE  = GPLv3
 # myMPD was originally a fork of ympd, but it has evolved into a much more comprehensive MPD client.
 
 CMAKE_USE_TOOLCHAIN_FILE = NO
+CMAKE_USE_NINJA = 0
 
 POST_INSTALL_TARGET = mympd_post_install
 

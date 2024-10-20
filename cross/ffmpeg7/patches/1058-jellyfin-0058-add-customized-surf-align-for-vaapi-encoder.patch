@@ -1,0 +1,59 @@
+Index: FFmpeg/libavcodec/vaapi_encode.c
+===================================================================
+--- libavcodec/vaapi_encode.c
++++ libavcodec/vaapi_encode.c
+@@ -2728,6 +2728,17 @@ static av_cold int vaapi_encode_create_r
+     av_log(avctx, AV_LOG_DEBUG, "Using %s as format of "
+            "reconstructed frames.\n", av_get_pix_fmt_name(recon_format));
+ 
++    if (constraints->width_align || constraints->height_align) {
++        if (constraints->width_align) {
++            ctx->surface_width = FFALIGN(avctx->width, constraints->width_align);
++        }
++        if (constraints->height_align) {
++            ctx->surface_height = FFALIGN(avctx->height, constraints->height_align);
++        }
++        av_log(avctx, AV_LOG_VERBOSE, "Using customized alignment size "
++               "[%dx%d].\n", constraints->width_align, constraints->height_align);
++    }
++
+     if (ctx->surface_width  < constraints->min_width  ||
+         ctx->surface_height < constraints->min_height ||
+         ctx->surface_width  > constraints->max_width ||
+Index: FFmpeg/libavutil/hwcontext.h
+===================================================================
+--- libavutil/hwcontext.h
++++ libavutil/hwcontext.h
+@@ -467,6 +467,13 @@ typedef struct AVHWFramesConstraints {
+      */
+     int max_width;
+     int max_height;
++
++    /**
++     * The frame width/height alignment when available
++     * (Zero is not applied, use the default value.)
++     */
++    int width_align;
++    int height_align;
+ } AVHWFramesConstraints;
+ 
+ /**
+Index: FFmpeg/libavutil/hwcontext_vaapi.c
+===================================================================
+--- libavutil/hwcontext_vaapi.c
++++ libavutil/hwcontext_vaapi.c
+@@ -297,6 +297,14 @@ static int vaapi_frames_get_constraints(
+             case VASurfaceAttribMaxHeight:
+                 constraints->max_height = attr_list[i].value.value.i;
+                 break;
++#if VA_CHECK_VERSION(1, 21, 0)
++            case VASurfaceAttribAlignmentSize:
++                if (attr_list[i].value.value.i) {
++                    constraints->width_align  = 1 << (attr_list[i].value.value.i & 0xf);
++                    constraints->height_align = 1 << ((attr_list[i].value.value.i & 0xf0) >> 4);
++                }
++                break;
++#endif
+             }
+         }
+         if (pix_fmt_count == 0) {
