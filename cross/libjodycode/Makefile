@@ -1,5 +1,5 @@
 PKG_NAME = libjodycode
-PKG_VERS = 3.1
+PKG_VERS = 3.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://codeberg.org/jbruchon/libjodycode/archive

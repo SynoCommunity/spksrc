@@ -1,6 +1,6 @@
 PKG_NAME = tree
-PKG_VERS = 2.1.1
-PKG_EXT = tgz
+PKG_VERS = 2.1.3
+PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://fossies.org/linux/misc
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)

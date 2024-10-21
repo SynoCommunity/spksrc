@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 3.3
-SPK_REV = 23
+SPK_REV = 24
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -24,7 +24,7 @@ OPTIONAL_DEPENDS += cross/rnm
 OPTIONAL_DEPENDS += cross/micro
 OPTIONAL_DEPENDS += cross/fzf
 OPTIONAL_DEPENDS += cross/ripgrep
-OPTIONAL_DEPENDS += cross/fd cross/fd_8.7.0
+OPTIONAL_DEPENDS += cross/fd cross/fd_9.0.0 cross/fd_8.7.0
 OPTIONAL_DEPENDS += cross/sd
 OPTIONAL_DEPENDS += cross/bat
 OPTIONAL_DEPENDS += cross/eza
@@ -78,6 +78,9 @@ DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd_8.7.0
+else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+# qoriq with rustc == 1.77.0
+DEPENDS += cross/fd_9.0.0
 else
 DEPENDS += cross/fd
 endif
@@ -99,7 +102,23 @@ export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: less, tree, ncdu, jdupes, fdupes, rhash, mc \(midnight commander\), mg \(emacs-like text editor\), nano, jupp \(based on JOE - Joe\'s Own Editor 3.1\), file, detox, pcre2, zstd, lzip, plzip, detox, iconv, dos2unix tools, patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add xstow.<br/>2. Add patch.<br/>3. Update dos2unix to v7.5.2.<br/>4. Update eza v0.18.6.<br/>5. Update fd to v9.0.0.<br/>6. Update fzf to v0.46.1.<br/>7. Update mc to v4.8.31.<br/>8. Update lzip to v1.24 and plzip to v1.11.<br/>9. Update ripgrep to v14.1.0."
+CHANGELOG  = "1. Update detox to v2.0.0.<br/>"
+CHANGELOG += "2. Update eza v0.20.0.<br/>"
+CHANGELOG += "3. Update fd to v10.2.0.<br/>"
+CHANGELOG += "4. Update fdupes to v2.3.2 and add sqlite for optional caches.<br/>"
+CHANGELOG += "5. Update jdupes to v1.28.0.<br/>"
+CHANGELOG += "6. Update less to v661.<br/>"
+CHANGELOG += "7. Update lsd to v1.1.5.<br/>"
+CHANGELOG += "8. Update lzip to v1.24.1.<br/>"
+CHANGELOG += "9. Update mc to v4.8.32.<br/>"
+CHANGELOG += "10. Update micro to v2.0.14.<br/>"
+CHANGELOG += "11. Update nano to v8.2.<br/>"
+CHANGELOG += "12. Update pcre2 to v10.44.<br/>"
+CHANGELOG += "13. Update ripgrep to v14.1.1.<br/>"
+CHANGELOG += "14. Update tree to v2.1.3.<br/>"
+CHANGELOG += "15. Update zstd to v1.5.6.<br/>"
+CHANGELOG += "16. Update openssl to v3.1.7."
+
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -162,3 +181,5 @@ endif
 synocli-file_extra_install:
 	@$(MSG) "Set library runpath in rhash executable."
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/rhash
+
+

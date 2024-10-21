@@ -1,5 +1,5 @@
 SPK_NAME = lzip
-SPK_VERS = 1.23
+SPK_VERS = 1.24.1
 SPK_REV = 1
 SPK_ICON = src/lzip.png
 

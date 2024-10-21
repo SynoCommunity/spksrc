@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # REMARKGS:
 # currently stay on version 4.8
-# version 4.9 fails with the error for all DSM 6 (even 64 bit):
+# versions 4.9 adn 5.0 fail with the following error for all DSM 6 (even 64 bit):
 # error "<fts.h> cannot be used with -D_FILE_OFFSET_BITS==64"
 # we will have to decide whether we 
 # - fall back to version 4.0 for all packages with DSM < 7
