@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.jellyseerr": {
+            "title": "Jellyseerr",
+            "desc": "Jellyseerr Web UI",
+            "icon": "images/jellyseerr-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "5055",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
