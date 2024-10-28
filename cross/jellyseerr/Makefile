@@ -23,7 +23,9 @@ PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 jellyseerr_install:
 	$(RUN) npm install -g pnpm
 	install -m 755 -d $(WORK_DIR)/$(PKG_DIR)/.git
-	$(RUN) CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile
+	$(RUN) CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile  --shamefully-hoist
 	$(RUN) pnpm build
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/web
 	cp -R $(WORK_DIR)/$(PKG_DIR)/dist/* $(STAGING_INSTALL_PREFIX)/web/
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/web/node_modules
+	cp -RL $(WORK_DIR)/$(PKG_DIR)/node_modules/* $(STAGING_INSTALL_PREFIX)/web/node_modules/
