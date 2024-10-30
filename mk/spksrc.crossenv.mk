@@ -121,10 +121,10 @@ build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 	                        --env LIBRARY_PATH= \
 	                        --manylinux manylinux2014 \
 	                        "$(CROSSENV_PATH)"
-	. $(CROSSENV_PATH)/bin/activate && wget --no-verbose https://bootstrap.pypa.io/get-pip.py
+	@. $(CROSSENV_PATH)/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
 	@. $(CROSSENV_PATH)/bin/activate ; \
-	    build-python get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
-	    python get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check
+	    $(RUN) build-python get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
+	    $(RUN) python get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	    build-pip --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
 	    pip --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL)
@@ -134,6 +134,9 @@ build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 	       build-pip --disable-pip-version-check install $${requirement} ; \
 	       pip --disable-pip-version-check install $${requirement} ; \
 	    done < <(grep -sv  -e "^\#" -e "^\$$" $(CROSSENV_BUILD_REQUIREMENTS))
+	@. $(CROSSENV_PATH)/bin/activate ; \
+	    $(MSG) "Package list for $(CROSSENV_PATH):" ; \
+	    pip freeze
 #ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 #	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 #endif
@@ -153,8 +156,7 @@ $(CROSSENV_PATH)/build/python-cc.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@
 	@echo CROSS_COMPILE_WHEELS=1 >> $@
 	@echo ADDITIONAL_WHEEL_BUILD_ARGS=--no-build-isolation >> $@
-	@echo CROSSENV_DEFAULT_PIP = $(CROSSENV_DEFAULT_PIP) >> $@
-	@echo CROSSENV_DEFAULT_SETUPTOOLS = $(CROSSENV_DEFAULT_SETUPTOOLS) >> $@
-	@echo CROSSENV_DEFAULT_WHEEL = $(CROSSENV_DEFAULT_WHEEL) >> $@
-	@echo TATA = $(TATA) >> $@
-	@echo TOTO = $(TOTO) >> $@
+	@echo CROSSENV_BUILD_REQUIREMENTS=$(CROSSENV_BUILD_REQUIREMENTS) >> $@
+	@echo CROSSENV_DEFAULT_PIP=$(CROSSENV_DEFAULT_PIP_VERSION) >> $@
+	@echo CROSSENV_DEFAULT_SETUPTOOLS=$(CROSSENV_DEFAULT_SETUPTOOLS_VERSION) >> $@
+	@echo CROSSENV_DEFAULT_WHEEL=$(CROSSENV_DEFAULT_WHEEL_VERSION) >> $@
