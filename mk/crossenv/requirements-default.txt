@@ -1,0 +1,17 @@
+pip==24.3.1
+pip-tools==7.4.1
+setuptools==75.3.0
+wheel==0.44.0
+#
+cffi==1.17.1
+cryptography==43.0.1
+Cython==3.0.11
+flit==3.9.0
+maturin==1.7.4
+meson-python==0.17.1
+poetry==1.8.4
+scikit-build==0.18.1
+scikit-build-core==0.10.7
+setuptools-rust==1.10.2
+setuptools-scm==8.1.0
+typing_extensions==4.12.2

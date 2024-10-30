@@ -1,0 +1,7 @@
+pip==23.2.1
+pip-tools==7.4.1
+setuptools==63.4.3
+wheel==0.41.2
+#
+cffi==1.17.1
+Cython==0.29.37
