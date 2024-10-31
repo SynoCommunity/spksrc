@@ -8,6 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # PKG_VERS = 8.7.1 fails to build for RUST_TARGET = armv7-unknown-linux-gnueabi $(ARMv7L_ARCHS)
 # PKG_VERS >= 9 still fails for$(ARMv7L_ARCHS)
+# PKG_VERS <= 8.7.0 fails with newer rustc 1.80.1
 # see: https://github.com/sharkdp/fd/issues/1428
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
 # powerpc archs (except qoriq) are not supported

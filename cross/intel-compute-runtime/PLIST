@@ -1,0 +1,6 @@
+bin:bin/ocloc-24.31
+lib:lib/libocloc.so
+lnk:lib/libze_intel_gpu.so.1
+lnk:lib/libze_intel_gpu.so.1.3.30508
+lib:lib/intel-opencl/libigdrcl.so
+rsc:etc/OpenCL/vendors/intel.icd

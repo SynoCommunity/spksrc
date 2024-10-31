@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg6
 SPK_VERS = 6.0.1
-SPK_REV = 3
+SPK_REV = 5
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to version 6.0.1<br/>2. Update Jellyfin upstream patches<br/>3. Update Intel Media Driver 2024Q1 Release (DSM7 only)<br/>4. Migrate DSM7 from MFX to Intel Video Processing Library (Intel-VPL) "
+CHANGELOG = "1. Update to version 6.0.1<br/>2. Update Jellyfin upstream patches<br/>3. Update Intel Media Driver 2024Q2 Release (DSM7 only)<br/>4. Revert DSM7 to MFX intead of Intel Video Processing Library (Intel-VPL) as unsupported by Jellyfin<br/>5. Enable OpenCL on Intel platforms (DSM7 only)<br/>6. Update to latest version of x264 (fix for \#6176)<br/>6. Now using new synocli-videodriver package"
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -20,7 +20,7 @@ POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 SPK_COMMANDS  = bin/ffprobe
 SPK_COMMANDS += bin/$(SPK_NAME)
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
 SERVICE_USER = auto
@@ -28,11 +28,11 @@ VIDEODRIVER = on
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+SPK_DEPENDS = "synocli-videodriver"
 SERVICE_SETUP = src/service-setup.sh
-SPK_COMMANDS += bin/vainfo
 endif
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.videodriver.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:

@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg5
-SPK_VERS = 5.1.5
-SPK_REV = 3
+SPK_VERS = 5.1.6
+SPK_REV = 6
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to version 5.1.5<br/>2. Update Intel Media Driver 2024Q1 Release (DSM7 only)<br/>3. Update jellyfin and libsvtav1 patches along with multiple dependencies"
+CHANGELOG = "1. Update to version 5.1.6"
 
 DEPENDS = cross/$(SPK_NAME)
 
@@ -20,7 +20,7 @@ POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 SPK_COMMANDS  = bin/ffmpeg
 SPK_COMMANDS += bin/$(SPK_NAME)
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
 SERVICE_USER = auto
@@ -28,11 +28,10 @@ VIDEODRIVER = on
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-SERVICE_SETUP = src/service-setup.sh
-SPK_COMMANDS += bin/vainfo
+SPK_DEPENDS = "synocli-videodriver"
 endif
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.videodriver.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:

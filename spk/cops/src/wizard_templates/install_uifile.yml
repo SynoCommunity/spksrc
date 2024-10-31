@@ -2,7 +2,7 @@ COPS_CONFIGURATION_FIRST_STEP_TITLE: "COPS configuration"
 
 EXISTING_CALIBRE_DIRECTORY_DESCRIPTION: "Existing Calibre library directory."
 EXISTING_CALIBRE_DIRECTORY_LABEL: "Share name"
-EXISTING_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT: "Subdirectories are not supported."
+EXISTING_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT: "The shared folder name contains invalid characters or starts/ends with a space."
 COPS_CATALOG_TITLE_DESCRIPTION: "Catalog title."
 COPS_CATALOG_TITLE_LABEL: "Catalog title"
 
@@ -12,6 +12,3 @@ DO_YOU_WANT_TO_USE_COPS_WITH_A_KOBO_LABEL: "Kobo"
 
 DSM_PERMISSIONS_TITLE: "Attention! DSM Permissions"
 DSM_PERMISSIONS_TEXT: "Package user and group will not appear on most UI settings. Please read <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\\\">Permission Management</a> for details."
-
-PHP_PROFILES_TITLE: "Multiple PHP profiles"
-PHP_PROFILES_DESCRIPTION: "Attention: Multiple PHP profiles detected; the package webpage will not display until a DSM restart is performed to load new configurations."

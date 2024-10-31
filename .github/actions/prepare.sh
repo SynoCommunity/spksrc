@@ -6,7 +6,8 @@
 #
 # Functions:
 # - Evaluate all packages to build depending on files defined in ${GH_FILES}.
-# - python310, python311, ffmpeg (spk/ffmpeg4), ffmpeg5 and ffmpeg6 are moved to head of packages to build first if triggered by its own or a dependent.
+# - synocli-videodriver is moved to head of packages to build first if triggered by its ffmpeg5-7
+# - python310-311 and ffmpeg5-7 are moved to head of remaining packages to build when triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -30,7 +31,9 @@ echo "Building dependency list..."
 DEPENDENCY_LIST=
 for package in $(find spk/ -maxdepth 1 -type d | cut -c 5- | sort)
 do
-    DEPENDENCY_LIST+=$(DEPENDENCY_WALK=1 make -s -C spk/${package} dependency-list 2> /dev/null)$'\n'
+    if [ ! -f "./spk/${package}/BROKEN" ]; then
+        DEPENDENCY_LIST+=$(DEPENDENCY_WALK=1 make -s -C spk/${package} dependency-list 2> /dev/null)$'\n'
+    fi
 done
 
 # search for dependent spk packages
@@ -49,19 +52,16 @@ fi
 if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
     SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "python" | tr '\n' ' ')" python2"
 fi
-if [ "$(echo ${SPK_TO_BUILD} | grep -ow ffmpeg)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "ffmpeg" | tr '\n' ' ')" ffmpeg4"
-fi
 
 # remove duplicate packages
 packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
-# for ffmpeg v4-6 find all packages that depend on them
-for i in {4..6}; do
-    ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_VERSION = ${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+# for ffmpeg v5-7 find all packages that depend on them
+for i in {5..7}; do
+    ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_PACKAGE = ffmpeg${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
-    # If packages contain a package that depends on ffmpeg (or is ffmpeg), then ensure
-    # relevant ffmpeg4|ffmpeg5|ffmpeg6 is first in list
+    # If packages contain a package that depends on ffmpeg (or is ffmpeg),
+    # then ensure relevant ffmpeg spk is first in list
     for package in ${packages}
     do
         if [ "$(echo ffmpeg${i} ${ffmpeg_dependent_packages} | grep -ow ${package})" != "" ]; then
@@ -70,6 +70,20 @@ for i in {4..6}; do
             break
         fi
     done
+done
+
+# for synocli-videodriver that ffmpeg v5-7 depends on
+videodrv_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "spksrc.videodriver.mk" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+
+# If packages contain a package that depends on spksrc.videodriver.mk,
+# then ensure synocli-videodriver spk is first in list
+for package in ${packages}
+do
+    if [ "$(echo synocli-videodriver ${videodrv_dependent_packages} | grep -ow ${package})" != "" ]; then
+        packages_without_videodrv=$(echo "${packages}" | tr ' ' '\n' | grep -v "synocli-videodriver" | tr '\n' ' ')
+        packages="synocli-videodriver ${packages_without_videodrv}"
+        break
+    fi
 done
 
 # for python (310, 311) find all packages that depend on them
@@ -95,19 +109,43 @@ all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "
 # and filter out packages that are removed or do not exist (e.g. nzbdrone)
 arch_packages=
 noarch_packages=
+has_arch_packages='false'
+has_noarch_packages='false'
 for package in ${packages}
 do
     if [ -f "./spk/${package}/Makefile" ]; then
         if [ "$(echo ${all_noarch} | grep -ow ${package})" = "" ]; then
             arch_packages+="${package} "
+            has_arch_packages='true'
         else
             noarch_packages+="${package} "
+            has_noarch_packages='true'
         fi
     fi
 done
 
+# evaluate packages that require DSM 7.2
+min_dsm72_packages=
+has_min_dsm72_packages='false'
+for package in ${packages}
+do
+    if [ -f "./spk/${package}/Makefile" ]; then
+        if [ "$(grep REQUIRED_MIN_DSM ./spk/${package}/Makefile | cut -d= -f2 | xargs)" = "7.2" ]; then
+            min_dsm72_packages+="${package} "
+            has_min_dsm72_packages='true'
+        fi
+    fi
+done
+
+if [ "${has_min_dsm72_packages}" = "true" ]; then
+    echo "===> Min DSM 7.2 packages found: ${min_dsm72_packages}"
+fi
+
 echo "arch_packages=${arch_packages}" >> $GITHUB_OUTPUT
 echo "noarch_packages=${noarch_packages}" >> $GITHUB_OUTPUT
+echo "has_arch_packages=${has_arch_packages}" >> $GITHUB_OUTPUT
+echo "has_noarch_packages=${has_noarch_packages}" >> $GITHUB_OUTPUT
+echo "has_min_dsm72_packages=${has_min_dsm72_packages}" >> $GITHUB_OUTPUT
 
 echo "::endgroup::"
 

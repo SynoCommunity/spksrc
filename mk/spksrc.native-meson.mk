@@ -83,7 +83,7 @@ include ../../mk/spksrc.common-rules.mk
 meson_configure_target:
 	@$(MSG) - Meson configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
-	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(MESON_BUILD_DIR)
+	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
 	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
 	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)

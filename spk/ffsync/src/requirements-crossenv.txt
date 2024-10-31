@@ -1,19 +1,11 @@
 # From requirements.txt
 
-# original dependency does not work with openssl3:
-# We pin cryptography to 3.4.8 due to a build error that occurs with the
-# current version (36.0.0 at the time of this commit). In short, building
-# the cryptography package with Rust results in a segfault, so we need to
-# set the CRYPTOGRAPHY_DONT_BUILD_RUST env var to force the package to build
-# with C instead. This env var is only present in cryptography<3.5.
-#cryptography==3.4.8
-
 # [cryptography]
 # Mandatory of using OPENSSL_*_DIR starting with version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
 #  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==41.0.3
+cryptography==42.0.8
 
 # From tools/tokenserver/requirements.txt
 
@@ -27,7 +19,7 @@ mysqlclient==2.1.1
 sqlalchemy==1.4.46
 
 # further crossenv dependencies
-cffi==1.16.0
+cffi==1.17.1
 charset_normalizer==3.3.2
-# greenlet==3.0.1    => supported version depends on gcc version
-zope.interface==6.1
+# greenlet==3.0.3    => supported version depends on gcc version
+zope.interface==7.0.3

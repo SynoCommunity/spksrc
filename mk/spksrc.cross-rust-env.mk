@@ -23,7 +23,9 @@ endif
 # When calling directly from toolchain/syno-<arch>-<version>
 # ARCH variable is still unset thus using $(TC_ARCH) although
 # in generic archs we must rely on $(TC_NANE)
+ifneq ($(ARCH),noarch)
 RUST_ARCH = $(or $(ARCH),$(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))
+endif
 
 # When building toolchain Tier-3 arch support
 #   While stage-2 is the truly current compiler, stage-1 suffice our needs
@@ -39,6 +41,7 @@ ifeq ($(findstring $(RUST_ARCH), $(ARMv7_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = armv7-unknown-linux-gnueabihf
 endif
 ifeq ($(findstring $(RUST_ARCH), $(ARMv7L_ARCHS)),$(RUST_ARCH))
+RUSTUP_DEFAULT_TOOLCHAIN = 1.77.2
 RUST_TARGET = armv7-unknown-linux-gnueabi
 endif
 ifeq ($(findstring $(RUST_ARCH), $(ARMv8_ARCHS)),$(RUST_ARCH))

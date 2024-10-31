@@ -1,0 +1,509 @@
+From f72d0efc9f42802ccf0e3ffcd6ae26ba4dfc8529 Mon Sep 17 00:00:00 2001
+From: "Yang, Haonan" <haonan.yang@intel.com>
+Date: Thu, 6 Jun 2024 10:15:54 +0800
+Subject: [PATCH] [clang][Sema] check default argument promotions for printf
+
+cherry pick https://github.com/llvm/llvm-project/commit/e3bd67eddf65b20956513e91715b1f997dae2690
+
+The main focus of this patch is to make ArgType::matchesType check for
+possible default parameter promotions when the argType is not a pointer.
+If so, no warning will be given for `int`, `unsigned int` types as
+corresponding arguments to %hhd and %hd. However, the usage of %hhd
+corresponding to short is relatively rare, and it is more likely to be a
+misuse. This patch keeps the original behavior of clang like this as
+much as possible, while making it more convenient to consider the
+default arguments promotion.
+
+Fixes https://github.com/llvm/llvm-project/issues/57102
+
+Reviewed By: aaron.ballman, nickdesaulniers, #clang-language-wg
+
+Differential Revision: https://reviews.llvm.org/D132568
+
+cherry pick https://github.com/llvm/llvm-project/commit/04e6178ae932c9a1d939dcfe3ef1189f4bbb21aa
+
+[Sema] tolerate more promotion matches in format string checking
+It's been reported that when using __attribute__((format)) on non-variadic
+functions, certain values that normally get promoted when passed as variadic
+arguments now unconditionally emit a diagnostic:
+
+```c
+void foo(const char *fmt, float f) __attribute__((format(printf, 1, 2)));
+void bar(void) {
+	foo("%g", 123.f);
+	//   ^ format specifies type 'double' but the argument has type 'float'
+}
+```
+
+This is normally not an issue because float values get promoted to doubles when
+passed as variadic arguments, but needless to say, variadic argument promotion
+does not apply to non-variadic arguments.
+
+While this can be fixed by adjusting the prototype of `foo`, this is sometimes
+undesirable in C (for instance, if `foo` is ABI). In C++, using variadic
+templates, this might instead require call-site fixing, which is tedious and
+arguably needless work:
+
+```c++
+template<typename... Args>
+void foo(const char *fmt, Args &&...args) __attribute__((format(printf, 1, 2)));
+void bar(void) {
+	foo("%g", 123.f);
+	//   ^ format specifies type 'double' but the argument has type 'float'
+}
+```
+
+To address this issue, we teach FormatString about a few promotions that have
+always been around but that have never been exercised in the direction that
+FormatString checks for:
+
+* `char`, `unsigned char` -> `int`, `unsigned`
+* `half`, `float16`, `float` -> `double`
+
+This addresses issue https://github.com/llvm/llvm-project/issues/59824
+---
+ clang/docs/ReleaseNotes.rst              |  10 ++
+ clang/include/clang/AST/FormatString.h   |   8 +-
+ clang/lib/AST/FormatString.cpp           | 121 +++++++++++++++++++----
+ clang/lib/Sema/SemaChecking.cpp          |  44 ++++++---
+ clang/test/Sema/format-strings-freebsd.c |   4 +-
+ clang/test/Sema/format-strings-scanf.c   |  52 ++++++++++
+ clang/test/Sema/format-strings.c         |  54 ++++++++++
+ 7 files changed, 259 insertions(+), 34 deletions(-)
+
+diff --git a/clang/docs/ReleaseNotes.rst b/clang/docs/ReleaseNotes.rst
+index 0c50e168bf48..a46949dcdc76 100644
+--- a/clang/docs/ReleaseNotes.rst
++++ b/clang/docs/ReleaseNotes.rst
+@@ -173,6 +173,13 @@ New Pragmas in Clang
+ Attribute Changes in Clang
+ --------------------------
+ 
++- When a non-variadic function is decorated with the ``format`` attribute,
++  Clang now checks that the format string would match the function's parameters'
++  types after default argument promotion. As a result, it's no longer an
++  automatic diagnostic to use parameters of types that the format style
++  supports but that are never the result of default argument promotion, such as
++  ``float``. (`#59824: <https://github.com/llvm/llvm-project/issues/59824>`_)
++
+ - Attributes loaded as clang plugins which are sensitive to LangOpts must
+   now override ``acceptsLangOpts`` instead of ``diagLangOpts``.
+   Returning false will produce a generic "attribute ignored" diagnostic, as
+@@ -223,6 +230,9 @@ Windows Support
+ 
+ C Language Changes in Clang
+ ---------------------------
++- Adjusted ``-Wformat`` warnings according to `WG14 N2562 <https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2562.pdf>`_.
++  Clang will now consider default argument promotions in printf, and remove unnecessary warnings.
++  Especially ``int`` argument with specifier ``%hhd`` and ``%hd``.
+ 
+ - The value of ``__STDC_VERSION__`` has been bumped to ``202000L`` when passing
+   ``-std=c2x`` so that it can be distinguished from C17 mode. This value is
+diff --git a/clang/include/clang/AST/FormatString.h b/clang/include/clang/AST/FormatString.h
+index d7933382f13d..60849bd7f9d3 100644
+--- a/clang/include/clang/AST/FormatString.h
++++ b/clang/include/clang/AST/FormatString.h
+@@ -257,8 +257,14 @@ public:
+     /// instance, "%d" and float.
+     NoMatch = 0,
+     /// The conversion specifier and the argument type are compatible. For
+-    /// instance, "%d" and _Bool.
++    /// instance, "%d" and int.
+     Match = 1,
++    /// The conversion specifier and the argument type are compatible because of
++    /// default argument promotions. For instance, "%hhd" and int.
++    MatchPromotion,
++    /// The conversion specifier and the argument type are compatible but still
++    /// seems likely to be an error. For instanace, "%hhd" and short.
++    NoMatchPromotionTypeConfusion,
+     /// The conversion specifier and the argument type are disallowed by the C
+     /// standard, but are in practice harmless. For instance, "%p" and int*.
+     NoMatchPedantic,
+diff --git a/clang/lib/AST/FormatString.cpp b/clang/lib/AST/FormatString.cpp
+index 102bcca96a38..df7917b15810 100644
+--- a/clang/lib/AST/FormatString.cpp
++++ b/clang/lib/AST/FormatString.cpp
+@@ -342,7 +342,7 @@ ArgType::matchesType(ASTContext &C, QualType argTy) const {
+       return Match;
+ 
+     case AnyCharTy: {
+-      if (const EnumType *ETy = argTy->getAs<EnumType>()) {
++      if (const auto *ETy = argTy->getAs<EnumType>()) {
+         // If the enum is incomplete we know nothing about the underlying type.
+         // Assume that it's 'int'.
+         if (!ETy->getDecl()->isComplete())
+@@ -350,17 +350,34 @@ ArgType::matchesType(ASTContext &C, QualType argTy) const {
+         argTy = ETy->getDecl()->getIntegerType();
+       }
+ 
+-      if (const BuiltinType *BT = argTy->getAs<BuiltinType>())
++      if (const auto *BT = argTy->getAs<BuiltinType>()) {
++        // The types are perfectly matched?
+         switch (BT->getKind()) {
++        default:
++          break;
++        case BuiltinType::Char_S:
++        case BuiltinType::SChar:
++        case BuiltinType::UChar:
++        case BuiltinType::Char_U:
++        case BuiltinType::Bool:
++          return Match;
++        }
++        // "Partially matched" because of promotions?
++        if (!Ptr) {
++          switch (BT->getKind()) {
+           default:
+             break;
+-          case BuiltinType::Char_S:
+-          case BuiltinType::SChar:
+-          case BuiltinType::UChar:
+-          case BuiltinType::Char_U:
+-          case BuiltinType::Bool:
+-            return Match;
++          case BuiltinType::Int:
++          case BuiltinType::UInt:
++            return MatchPromotion;
++          case BuiltinType::Short:
++          case BuiltinType::UShort:
++          case BuiltinType::WChar_S:
++          case BuiltinType::WChar_U:
++            return NoMatchPromotionTypeConfusion;
++          }
+         }
++      }
+       return NoMatch;
+     }
+ 
+@@ -377,8 +394,9 @@ ArgType::matchesType(ASTContext &C, QualType argTy) const {
+ 
+       if (T == argTy)
+         return Match;
+-      // Check for "compatible types".
+-      if (const BuiltinType *BT = argTy->getAs<BuiltinType>())
++      if (const auto *BT = argTy->getAs<BuiltinType>()) {
++        // Check if the only difference between them is signed vs unsigned
++        // if true, we consider they are compatible.
+         switch (BT->getKind()) {
+           default:
+             break;
+@@ -389,25 +407,88 @@ ArgType::matchesType(ASTContext &C, QualType argTy) const {
+           case BuiltinType::Bool:
+             if (T == C.UnsignedShortTy || T == C.ShortTy)
+               return NoMatchTypeConfusion;
+-            return T == C.UnsignedCharTy || T == C.SignedCharTy ? Match
+-                                                                : NoMatch;
++            if (T == C.UnsignedCharTy || T == C.SignedCharTy)
++              return Match;
++            break;
+           case BuiltinType::Short:
+-            return T == C.UnsignedShortTy ? Match : NoMatch;
++            if (T == C.UnsignedShortTy)
++              return Match;
++            break;
+           case BuiltinType::UShort:
+-            return T == C.ShortTy ? Match : NoMatch;
++            if (T == C.ShortTy)
++              return Match;
++            break;
+           case BuiltinType::Int:
+-            return T == C.UnsignedIntTy ? Match : NoMatch;
++            if (T == C.UnsignedIntTy)
++              return Match;
++            break;
+           case BuiltinType::UInt:
+-            return T == C.IntTy ? Match : NoMatch;
++            if (T == C.IntTy)
++              return Match;
++            break;
+           case BuiltinType::Long:
+-            return T == C.UnsignedLongTy ? Match : NoMatch;
++            if (T == C.UnsignedLongTy)
++              return Match;
++            break;
+           case BuiltinType::ULong:
+-            return T == C.LongTy ? Match : NoMatch;
++            if (T == C.LongTy)
++              return Match;
++            break;
+           case BuiltinType::LongLong:
+-            return T == C.UnsignedLongLongTy ? Match : NoMatch;
++            if (T == C.UnsignedLongLongTy)
++              return Match;
++            break;
+           case BuiltinType::ULongLong:
+-            return T == C.LongLongTy ? Match : NoMatch;
++            if (T == C.LongLongTy)
++              return Match;
++            break;
+         }
++        // "Partially matched" because of promotions?
++          if (!Ptr) {
++            switch (BT->getKind()) {
++            default:
++              break;
++            case BuiltinType::Bool:
++              if (T == C.IntTy || T == C.UnsignedIntTy)
++                return MatchPromotion;
++              break;
++            case BuiltinType::Int:
++            case BuiltinType::UInt:
++              if (T == C.SignedCharTy || T == C.UnsignedCharTy ||
++                  T == C.ShortTy || T == C.UnsignedShortTy || T == C.WCharTy ||
++                  T == C.WideCharTy)
++                return MatchPromotion;
++              break;
++            case BuiltinType::Char_U:
++              if (T == C.UnsignedIntTy)
++                return MatchPromotion;
++              if (T == C.UnsignedShortTy)
++                return NoMatchPromotionTypeConfusion;
++              break;
++            case BuiltinType::Char_S:
++              if (T == C.IntTy)
++                return MatchPromotion;
++              if (T == C.ShortTy)
++                return NoMatchPromotionTypeConfusion;
++              break;
++            case BuiltinType::Half:
++            case BuiltinType::Float16:
++            case BuiltinType::Float:
++              if (T == C.DoubleTy)
++                return MatchPromotion;
++              break;
++            case BuiltinType::Short:
++            case BuiltinType::UShort:
++              if (T == C.SignedCharTy || T == C.UnsignedCharTy)
++                return NoMatchPromotionTypeConfusion;
++              break;
++            case BuiltinType::WChar_U:
++            case BuiltinType::WChar_S:
++              if (T != C.WCharTy && T != C.WideCharTy)
++                return NoMatchPromotionTypeConfusion;
++            }
++          }
++      }
+       return NoMatch;
+     }
+ 
+diff --git a/clang/lib/Sema/SemaChecking.cpp b/clang/lib/Sema/SemaChecking.cpp
+index 69dcc3aaaaf3..1ed01cb7dd9a 100644
+--- a/clang/lib/Sema/SemaChecking.cpp
++++ b/clang/lib/Sema/SemaChecking.cpp
+@@ -9557,10 +9557,14 @@ CheckPrintfHandler::checkFormatExpr(const analyze_printf::PrintfSpecifier &FS,
+     return true;
+   }
+ 
+-  analyze_printf::ArgType::MatchKind Match = AT.matchesType(S.Context, ExprTy);
+-  if (Match == analyze_printf::ArgType::Match)
++  ArgType::MatchKind ImplicitMatch = ArgType::NoMatch;
++  ArgType::MatchKind Match = AT.matchesType(S.Context, ExprTy);
++  if (Match == ArgType::Match)
+     return true;
+ 
++  // NoMatchPromotionTypeConfusion should be only returned in ImplictCastExpr
++  assert(Match != ArgType::NoMatchPromotionTypeConfusion);
++
+   // Look through argument promotions for our error message's reported type.
+   // This includes the integral and floating promotions, but excludes array
+   // and function pointer decay (seeing that an argument intended to be a
+@@ -9577,13 +9581,9 @@ CheckPrintfHandler::checkFormatExpr(const analyze_printf::PrintfSpecifier &FS,
+       if (ICE->getType() == S.Context.IntTy ||
+           ICE->getType() == S.Context.UnsignedIntTy) {
+         // All further checking is done on the subexpression
+-        const analyze_printf::ArgType::MatchKind ImplicitMatch =
+-            AT.matchesType(S.Context, ExprTy);
+-        if (ImplicitMatch == analyze_printf::ArgType::Match)
++        ImplicitMatch = AT.matchesType(S.Context, ExprTy);
++        if (ImplicitMatch == ArgType::Match)
+           return true;
+-        if (ImplicitMatch == ArgType::NoMatchPedantic ||
+-            ImplicitMatch == ArgType::NoMatchTypeConfusion)
+-          Match = ImplicitMatch;
+       }
+     }
+   } else if (const CharacterLiteral *CL = dyn_cast<CharacterLiteral>(E)) {
+@@ -9594,10 +9594,29 @@ CheckPrintfHandler::checkFormatExpr(const analyze_printf::PrintfSpecifier &FS,
+     // modifier is provided.
+     if (ExprTy == S.Context.IntTy &&
+         FS.getLengthModifier().getKind() != LengthModifier::AsChar)
+-      if (llvm::isUIntN(S.Context.getCharWidth(), CL->getValue()))
++      if (llvm::isUIntN(S.Context.getCharWidth(), CL->getValue())) {
+         ExprTy = S.Context.CharTy;
++        // To improve check results, we consider a character literal in C
++        // to be a 'char' rather than an 'int'. 'printf("%hd", 'a');' is
++        // more likely a type confusion situation, so we will suggest to
++        // use '%hhd' instead by discarding the MatchPromotion.
++        if (Match == ArgType::MatchPromotion)
++          Match = ArgType::NoMatch;
++      }
+   }
+-
++  if (Match == ArgType::MatchPromotion) {
++    // WG14 N2562 only clarified promotions in *printf
++    // For NSLog in ObjC, just preserve -Wformat behavior
++    if (!S.getLangOpts().ObjC &&
++        ImplicitMatch != ArgType::NoMatchPromotionTypeConfusion &&
++        ImplicitMatch != ArgType::NoMatchTypeConfusion)
++      return true;
++    Match = ArgType::NoMatch;
++  }
++  if (ImplicitMatch == ArgType::NoMatchPedantic ||
++      ImplicitMatch == ArgType::NoMatchTypeConfusion)
++    Match = ImplicitMatch;
++  assert(Match != ArgType::MatchPromotion);
+   // Look through enums to their underlying type.
+   bool IsEnum = false;
+   if (auto EnumTy = ExprTy->getAs<EnumType>()) {
+@@ -9670,7 +9689,10 @@ CheckPrintfHandler::checkFormatExpr(const analyze_printf::PrintfSpecifier &FS,
+     if (IntendedTy == ExprTy && !ShouldNotPrintDirectly) {
+       unsigned Diag;
+       switch (Match) {
+-      case ArgType::Match: llvm_unreachable("expected non-matching");
++      case ArgType::Match:
++      case ArgType::MatchPromotion:
++      case ArgType::NoMatchPromotionTypeConfusion:
++        llvm_unreachable("expected non-matching");
+       case ArgType::NoMatchPedantic:
+         Diag = diag::warn_format_conversion_argument_type_mismatch_pedantic;
+         break;
+diff --git a/clang/test/Sema/format-strings-freebsd.c b/clang/test/Sema/format-strings-freebsd.c
+index 965d7c287be6..f49dea00c876 100644
+--- a/clang/test/Sema/format-strings-freebsd.c
++++ b/clang/test/Sema/format-strings-freebsd.c
+@@ -34,9 +34,9 @@ void check_freebsd_kernel_extensions(int i, long l, char *s, short h)
+   freebsd_kernel_printf("%lr", l); // no-warning
+ 
+   // h modifier expects a short
+-  freebsd_kernel_printf("%hr", i); // expected-warning{{format specifies type 'short' but the argument has type 'int'}}
++  freebsd_kernel_printf("%hr", i); // no-warning
+   freebsd_kernel_printf("%hr", h); // no-warning
+-  freebsd_kernel_printf("%hy", i); // expected-warning{{format specifies type 'short' but the argument has type 'int'}}
++  freebsd_kernel_printf("%hy", i); // no-warning
+   freebsd_kernel_printf("%hy", h); // no-warning
+ 
+   // %y expects an int
+diff --git a/clang/test/Sema/format-strings-scanf.c b/clang/test/Sema/format-strings-scanf.c
+index b7cdd7dd4a9a..61d20b482c38 100644
+--- a/clang/test/Sema/format-strings-scanf.c
++++ b/clang/test/Sema/format-strings-scanf.c
+@@ -241,3 +241,55 @@ void check_conditional_literal(char *s, int *i) {
+   scanf(i ? "%d" : "%d", i, s); // expected-warning{{data argument not used}}
+   scanf(i ? "%s" : "%d", s); // expected-warning{{format specifies type 'int *'}}
+ }
++
++void test_promotion(void) {
++  // No promotions for *scanf pointers clarified in N2562
++  // https://github.com/llvm/llvm-project/issues/57102
++  // N2562: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2562.pdf
++  int i;
++  signed char sc;
++  unsigned char uc;
++  short ss;
++  unsigned short us;
++
++  // pointers could not be "promoted"
++  scanf("%hhd", &i); // expected-warning{{format specifies type 'char *' but the argument has type 'int *'}}
++  scanf("%hd", &i); // expected-warning{{format specifies type 'short *' but the argument has type 'int *'}}
++  scanf("%d", &i); // no-warning
++  // char & uchar
++  scanf("%hhd", &sc); // no-warning
++  scanf("%hhd", &uc); // no-warning
++  scanf("%hd", &sc); // expected-warning{{format specifies type 'short *' but the argument has type 'signed char *'}}
++  scanf("%hd", &uc); // expected-warning{{format specifies type 'short *' but the argument has type 'unsigned char *'}}
++  scanf("%d", &sc); // expected-warning{{format specifies type 'int *' but the argument has type 'signed char *'}}
++  scanf("%d", &uc); // expected-warning{{format specifies type 'int *' but the argument has type 'unsigned char *'}}
++  // short & ushort
++  scanf("%hhd", &ss); // expected-warning{{format specifies type 'char *' but the argument has type 'short *'}}
++  scanf("%hhd", &us); // expected-warning{{format specifies type 'char *' but the argument has type 'unsigned short *'}}
++  scanf("%hd", &ss); // no-warning
++  scanf("%hd", &us); // no-warning
++  scanf("%d", &ss); // expected-warning{{format specifies type 'int *' but the argument has type 'short *'}}
++  scanf("%d", &us); // expected-warning{{format specifies type 'int *' but the argument has type 'unsigned short *'}}
++
++  // long types
++  scanf("%ld", &i); // expected-warning{{format specifies type 'long *' but the argument has type 'int *'}}
++  scanf("%lld", &i); // expected-warning{{format specifies type 'long long *' but the argument has type 'int *'}}
++  scanf("%ld", &sc); // expected-warning{{format specifies type 'long *' but the argument has type 'signed char *'}}
++  scanf("%lld", &sc); // expected-warning{{format specifies type 'long long *' but the argument has type 'signed char *'}}
++  scanf("%ld", &uc); // expected-warning{{format specifies type 'long *' but the argument has type 'unsigned char *'}}
++  scanf("%lld", &uc); // expected-warning{{format specifies type 'long long *' but the argument has type 'unsigned char *'}}
++  scanf("%llx", &i); // expected-warning{{format specifies type 'unsigned long long *' but the argument has type 'int *'}}
++
++  // ill-formed floats
++  scanf("%hf", // expected-warning{{length modifier 'h' results in undefined behavior or no effect with 'f' conversion specifier}}
++  &sc);
++
++  // pointers in scanf
++  scanf("%s", i); // expected-warning{{format specifies type 'char *' but the argument has type 'int'}}
++
++  // FIXME: does this match what the C committee allows or should it be pedantically warned on?
++  char c;
++  void *vp;
++  scanf("%hhd", &c); // Pedantic warning?
++  scanf("%hhd", vp); // expected-warning{{format specifies type 'char *' but the argument has type 'void *'}}
++}
+diff --git a/clang/test/Sema/format-strings.c b/clang/test/Sema/format-strings.c
+index bb5c4c4d1de7..d9154b6d30f9 100644
+--- a/clang/test/Sema/format-strings.c
++++ b/clang/test/Sema/format-strings.c
+@@ -823,3 +823,57 @@ void test_block() {
+   printf_arg2("foo", "%s string %i\n", "aaa", 123);
+   printf_arg2("%s string\n", "foo", "bar"); // expected-warning{{data argument not used by format string}}
+ }
++
++void test_promotion(void) {
++  // Default argument promotions for *printf in N2562
++  // https://github.com/llvm/llvm-project/issues/57102
++  // N2562: https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2562.pdf
++  int i;
++  signed char sc;
++  unsigned char uc;
++  char c;
++  short ss;
++  unsigned short us;
++
++  printf("%hhd %hd %d %hhd %hd %d", i, i, i, sc, sc, sc); // no-warning
++  printf("%hhd %hd %d %hhd %hd %d", uc, uc, uc, c, c, c); // no-warning
++
++  // %ld %lld %llx
++  printf("%ld", i); // expected-warning{{format specifies type 'long' but the argument has type 'int'}}
++  printf("%lld", i); // expected-warning{{format specifies type 'long long' but the argument has type 'int'}}
++  printf("%ld", sc); // expected-warning{{format specifies type 'long' but the argument has type 'signed char'}}
++  printf("%lld", sc); // expected-warning{{format specifies type 'long long' but the argument has type 'signed char'}}
++  printf("%ld", uc); // expected-warning{{format specifies type 'long' but the argument has type 'unsigned char'}}
++  printf("%lld", uc); // expected-warning{{format specifies type 'long long' but the argument has type 'unsigned char'}}
++  printf("%llx", i); // expected-warning{{format specifies type 'unsigned long long' but the argument has type 'int'}}
++
++  // ill formed spec for floats
++  printf("%hf", // expected-warning{{length modifier 'h' results in undefined behavior or no effect with 'f' conversion specifier}}
++  sc); // expected-warning{{format specifies type 'double' but the argument has type 'signed char'}}
++
++  // for %hhd and `short` they are compatible by promotions but more likely misuse
++  printf("%hd", ss); // no-warning
++  printf("%hhd", ss); // expected-warning{{format specifies type 'char' but the argument has type 'short'}}
++  printf("%hu", us); // no-warning
++  printf("%hhu", ss); // expected-warning{{format specifies type 'unsigned char' but the argument has type 'short'}}
++
++  // floats & integers are not compatible
++  printf("%f", i); // expected-warning{{format specifies type 'double' but the argument has type 'int'}}
++  printf("%f", sc); // expected-warning{{format specifies type 'double' but the argument has type 'signed char'}}
++  printf("%f", uc); // expected-warning{{format specifies type 'double' but the argument has type 'unsigned char'}}
++  printf("%f", c); // expected-warning{{format specifies type 'double' but the argument has type 'char'}}
++  printf("%f", ss); // expected-warning{{format specifies type 'double' but the argument has type 'short'}}
++  printf("%f", us); // expected-warning{{format specifies type 'double' but the argument has type 'unsigned short'}}
++
++  // character literals
++  // In C language engineering practice, printing a character literal with %hhd or %d is common, but %hd may be misuse.
++  printf("%hhu", 'a'); // no-warning
++  printf("%hhd", 'a'); // no-warning
++  printf("%hd", 'a'); // expected-warning{{format specifies type 'short' but the argument has type 'char'}}
++  printf("%hu", 'a'); // expected-warning{{format specifies type 'unsigned short' but the argument has type 'char'}}
++  printf("%d", 'a'); // no-warning
++  printf("%u", 'a'); // no-warning
++
++  // pointers
++  printf("%s", i); // expected-warning{{format specifies type 'char *' but the argument has type 'int'}}
++}
+-- 
+2.31.1
+
