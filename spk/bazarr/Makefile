@@ -9,7 +9,7 @@ SPK_DEPENDS = "python311:ffmpeg7"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/bazarr
 DEPENDS += cross/unrar
 
 # [lxml]
