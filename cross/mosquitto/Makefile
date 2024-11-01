@@ -22,4 +22,10 @@ CMAKE_ARGS += -DWITH_SRV=ON
 CMAKE_ARGS += -DDOCUMENTATION=OFF
 CMAKE_USE_TOOLCHAIN_FILE = OFF
 
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+# use clock_gettime of librt
+ADDITIONAL_LDFLAGS += -lrt
+endif
+
 include ../../mk/spksrc.cross-cmake.mk
