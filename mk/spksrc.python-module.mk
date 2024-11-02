@@ -16,32 +16,28 @@ endif
 # Resume with standard spksrc.cross-cc.mk
 include ../../mk/spksrc.cross-cc.mk
 
-# Fetch python variables
--include $(WORK_DIR)/python-cc.mk
+# Define where is located the crossenv
+CROSSENV_MODULE_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)==$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
 
-# Python module variables
-ifneq ($(wildcard $(PYTHONPATH)),)
-PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/
-endif
+### Prepare crossenv
+build_crossenv_module:
+	WHEEL="$(PKG_NAME)==$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
 
 ### Python module rules
-compile_python_module:
-ifeq ($(strip $(CROSSENV)),)
-# Python 2 way
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py build_ext -I $(STAGING_INSTALL_PREFIX)/include -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
-else
-# Python 3 case: using crossenv helper
-	@. $(CROSSENV) && $(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py build_ext -I $(STAGING_INSTALL_PREFIX)/include -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
-endif
+compile_python_module: build_crossenv_module
+	$(foreach e,$(shell cat $(CROSSENV_MODULE_PATH)/build/python-cc.mk),$(eval $(e)))
+	$(eval PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/)
+	@$(MSG) "CROSSENV: $(CROSSENV)"
+	@. $(CROSSENV) ; \
+	$(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py build_ext \
+	       -I $(STAGING_INSTALL_PREFIX)/include \
+	       -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
 
 install_python_module:
-ifeq ($(strip $(CROSSENV)),)
-# Python 2 way
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
-else
-# Python 3 case: using crossenv helper
-	@. $(CROSSENV) && $(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py install --root $(INSTALL_DIR) --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
-endif
+	@. $(CROSSENV) ; \
+	$(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py install \
+	       --root $(INSTALL_DIR) \
+	       --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
 
 fix_shebang_python_module:
 	@cat PLIST | sed 's/:/ /' | while read type file ; do \
@@ -55,3 +51,7 @@ fix_shebang_python_module:
 
 all: install fix_shebang_python_module
 
+###
+
+# Allow generating per-wheel crossenv
+include ../../mk/spksrc.crossenv.mk
