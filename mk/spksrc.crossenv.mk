@@ -8,31 +8,17 @@ CROSSENV_CONFIG_PATH = $(abspath $(WORK_DIR)/../../../mk/crossenv)
 CROSSENV_CONFIG_DEFAULT = $(CROSSENV_CONFIG_PATH)/requirements-default.txt
 CROSSENV_PATH = $(abspath $(WORK_DIR)/crossenv-$(CROSSENV_BUILD_WHEEL)/)
 
-ifeq ($(strip $(WHEEL)),)
-CROSSENV_BUILD_WHEEL = default
-CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_DEFAULT)
-else ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt),)
+# Check for wheel==x.y, then wheel, then default
+ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt),)
 CROSSENV_BUILD_WHEEL = $(WHEEL)
 CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt
 else ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(shell echo $${WHEEL%%[<>=]=*}).txt),)
 CROSSENV_BUILD_WHEEL = $(shell echo $${WHEEL%%[<>=]=*})
 CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_PATH)/requirements-$(shell echo $${WHEEL%%[<>=]=*}).txt
 else
-CROSSENV_BUILD_WHEEL = error-crossenv_build_wheel
+CROSSENV_BUILD_WHEEL = default
+CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_DEFAULT)
 endif
-
-
-####
-
-.PHONY: error-crossenv_build_wheel
-error-crossenv_build_wheel:
-	@$(MSG) ########################################################
-	@$(MSG) ERROR - No definition for:
-	@$(MSG)         mk/crossenv/requirements-$(WHEEL).txt
-ifneq ($(WHEEL),$(shell echo $${WHEEL%%[<>=]=*}))
-	@$(MSG)         mk/crossenv/requirements-$(shell echo $${WHEEL%%[<>=]=*}).txt
-endif
-	@$(MSG) ########################################################
 
 ###
 
@@ -99,6 +85,10 @@ PYTHON_INC_DIR = include/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
 # Create the crossenv in preparation for
 # cross-compiling all the necessary wheels
 .PHONY: crossenv
+ifneq ($(wildcard $(CROSSENV_PATH)),)
+build-crossenv:
+	@$(MSG) Reusing existing crossenv $(CROSSENV_PATH)
+else
 build-crossenv: SHELL:=/bin/bash
 build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 	@$(MSG) crossenv wheel packages: $(CROSSENV_DEFAULT_PIP), $(CROSSENV_DEFAULT_SETUPTOOLS), $(CROSSENV_DEFAULT_WHEEL)
@@ -121,6 +111,10 @@ build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 	                        --env LIBRARY_PATH= \
 	                        --manylinux manylinux2014 \
 	                        "$(CROSSENV_PATH)"
+ifeq ($(CROSSENV_BUILD_WHEEL),default)
+	@$(MSG) Setting default crossenv $(CROSSENV_PATH)
+	@$(RUN) ln -s crossenv-default crossenv
+endif
 	@. $(CROSSENV_PATH)/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	    $(RUN) build-python get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
@@ -140,11 +134,13 @@ build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 #ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 #	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 #endif
+endif
 
 $(CROSSENV_PATH)/build/python-cc.mk:
 	mkdir -p $(CROSSENV_PATH)/build
+	@echo CROSSENV_PATH=$(CROSSENV_PATH) > $@
 	@echo CROSSENV=$(CROSSENV_PATH)/bin/activate >> $@
-	@echo HOSTPYTHON=$(HOSTPYTHON) > $@
+	@echo HOSTPYTHON=$(HOSTPYTHON) >> $@
 	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
 	@echo PYTHON_LIB_NATIVE=$(PYTHON_LIB_NATIVE) >> $@
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
