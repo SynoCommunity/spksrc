@@ -4,7 +4,7 @@ SPK_GIT_HASH = 28de5c0
 SPK_GIT_DATE = 20240928
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 39
+SPK_REV = 40
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -25,7 +25,7 @@ UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 WHEELS = src/requirements-pure.txt
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/tvheadend
 DEPENDS += cross/dtv-scan-tables
 DEPENDS += cross/zap2epg cross/docker-tvheadend
 
@@ -46,7 +46,7 @@ SERVICE_SETUP = src/service-setup.sh
 
 # Service configuration
 SERVICE_PORT = 9981
-SERVICE_PORT_TITLE = Tvheadend(HTTP)
+SERVICE_PORT_TITLE = Tvheadend (HTTP)
 
 # Admin link
 ADMIN_PORT = ${SERVICE_PORT}
