@@ -1,13 +1,13 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.2.6
-SPK_REV = 14
+SPK_VERS = 1.4.0
+SPK_REV = 15
 SPK_ICON = src/borgbackup.png
 
 PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.5-8"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
+DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse cross/xxhash
 
 # Requirements file generation
 # - first create borgbackup wheel defined in src/requirements-crossenv.txt
@@ -45,6 +45,8 @@ ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 
 include ../../mk/spksrc.common.mk
 
