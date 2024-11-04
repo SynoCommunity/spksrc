@@ -5,7 +5,7 @@ appdirs==1.4.4
 arrow==1.2.3
 attrs==23.1.0
 #borgbackup                            ==> crossenv
-borgmatic==1.8.2
+borgmatic==1.9.0
 #certifi                               ==> python311:pure
 #charset-normalizer                    ==> crossenv
 colorama==0.4.6
