@@ -64,7 +64,13 @@ endif
 ####
 
 # python-cc.mk
-PYTHON_PKG_VERS = $(lastword $(subst -, ,$(wildcard $(WORK_DIR)/Python-*)))
+PYTHON_WORK_DIR = $(wildcard $(or $(PYTHON_PACKAGE_ROOT),$(WORK_DIR)))
+ifneq ($(PYTHON_PACKAGE),)
+PYTHON_INSTALL_PREFIX = $(subst $(SPK_NAME),$(PYTHON_PACKAGE),$(INSTALL_PREFIX))
+else
+PYTHON_INSTALL_PREFIX = $(INSTALL_PREFIX)
+endif
+PYTHON_PKG_VERS = $(lastword $(subst -, ,$(wildcard $(PYTHON_WORK_DIR)/Python-*)))
 PYTHON_PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PYTHON_PKG_VERS))).$(word 2,$(subst ., ,$(PYTHON_PKG_VERS)))
 PYTHON_PKG_NAME = python$(subst .,,$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_PKG_DIR = Python-$(PYTHON_PKG_VERS)
@@ -72,9 +78,9 @@ HOST_ARCH = $(shell uname -m)
 BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
 PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/python3)
 PIP_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/pip)
-HOSTPYTHON = $(abspath $(WORK_DIR)/$(PYTHON_PKG_DIR)/hostpython)
+HOSTPYTHON = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/hostpython)
 HOSTPYTHON_LIB_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/$(PYTHON_PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
-PYTHON_LIB_NATIVE = $(abspath $(WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
+PYTHON_LIB_NATIVE = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_SITE_PACKAGES_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages)
 PYTHON_LIB_CROSS = $(CROSSENV_PATH)/build/lib.linux-$(BUILD_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR)
 PYTHON_LIB_DIR = lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
@@ -95,7 +101,7 @@ build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 	@$(MSG) crossenv requirements file = $(CROSSENV_BUILD_REQUIREMENTS)
 	mkdir -p "$(PYTHON_LIB_CROSS)"
 	cp -RL $(HOSTPYTHON_LIB_NATIVE) "$(abspath $(PYTHON_LIB_CROSS)/../)"
-	@echo $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR) \
+	@echo $(PYTHON_NATIVE) -m crossenv $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR) \
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
 	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
@@ -103,7 +109,7 @@ build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 	                        --env LIBRARY_PATH= \
 	                        --manylinux manylinux2014 \
 	                        "$(CROSSENV_PATH)"
-	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR) \
+	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR) \
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
 	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
