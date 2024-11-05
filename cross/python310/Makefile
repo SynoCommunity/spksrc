@@ -28,23 +28,20 @@ CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
 CONFIGURE_ARGS += --with-build-python
+CONFIGURE_ARGS += --disable-test-modules
 
 include ../../mk/spksrc.archs.mk
 
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
-CONFIGURE_ARGS += --enable-optimizations
-# old compilers fail with unrecognized command line options: -flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# Some tests (like test_base64) must find libpython shared library at runtime.
-# python: error while loading shared libraries: libpython3.10.so.1.0: cannot open shared object file: No such file or directory
-ENV += LD_LIBRARY_PATH=$(WORK_DIR)/$(PKG_DIR)
+#
 # Enable Link-Time Optimization
 CONFIGURE_ARGS += --with-lto
-endif
-else
-# test modules are required for optimization only
-CONFIGURE_ARGS += --disable-test-modules
+#
+# pgo optimization can only be run native platform and now
+# exit on errors which had no impact (and effects) previously.
+#    https://github.com/python/cpython/pull/111950
+#CONFIGURE_ARGS += --enable-optimizations
 endif
 
 # older gcc does not know -Wno-unused-result
