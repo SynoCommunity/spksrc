@@ -149,11 +149,10 @@ ifneq ($(strip $(WHEELS)),)
 	      wheel=$${requirement#*:} ; \
 	      file=$$(basename $${requirement%%:*}) ; \
 	      [ "$$(grep -s egg <<< $${wheel})" ] && name=$$(echo $${wheel#*egg=} | cut -f1 -d=) || name=$${wheel%%[<>=]=*} ; \
-	      echo "WHEEL=\"$${wheel}\" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)" ; \
-	      WHEEL="$${wheel}" $(MAKE) crossenv-$(ARCH)-$(TCVERSION) ; \
-	      for crossenv in $(WORK_DIR)/crossenv-$${wheel} $(WORK_DIR)/crossenv-$${name} $(WORK_DIR)/crossenv ; do \
-	         echo "DIR CHECK EN COURS: $${crossenv}" ; \
-	         echo "ACTIVATE EN COURS: $${crossenv}/build/python-cc.mk" ; \
+	      version=$$(echo $${requirement#*[<>=]=} | cut -f1 -d' ') ; \
+	      echo "WHEEL=\"$${name}-$${version}\" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)" ; \
+	      WHEEL="$${name}-$${version}" $(MAKE) crossenv-$(ARCH)-$(TCVERSION) ; \
+	      for crossenv in $(WORK_DIR)/crossenv-$${name}-$${version} $(WORK_DIR)/crossenv-$${name} $(WORK_DIR)/crossenv ; do \
 	         [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
 	      done ; \
 	      crossenvPIP=$(PIP) ; \

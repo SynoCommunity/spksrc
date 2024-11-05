@@ -17,11 +17,11 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 # Define where is located the crossenv
-CROSSENV_MODULE_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)==$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
+CROSSENV_MODULE_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
 
 ### Prepare crossenv
 build_crossenv_module:
-	WHEEL="$(PKG_NAME)==$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
+	WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
 
 ### Python module rules
 compile_python_module: build_crossenv_module
