@@ -30,7 +30,7 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgmatic to v1.9.0.<br/>"
+CHANGELOG = "1. Update borgmatic to v1.9.0.<br/>2. Update borg to v1.4.0.<br/>3. Update emborg to v1.40."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
