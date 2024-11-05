@@ -44,6 +44,7 @@ endif
 $(TC_LOCAL_VARS_RUST):
 	env $(MAKE) --no-print-directory rust_toml > $@ 2>/dev/null;
 
+# https://github.com/rust-lang/rust/blob/master/config.example.toml
 .PHONY: rust_toml
 rust_toml:
 	@echo 'profile = "compiler"' ; \
@@ -112,7 +113,7 @@ else
 ifeq ($(RUST_BUILD_TOOLCHAIN),1)
 	@$(MSG) "Build rust target $(RUST_TARGET) from sources"
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
-	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
+	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 -b $(RUSTUP_DEFAULT_TOOLCHAIN) https://github.com/rust-lang/rust.git || true)
 	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
 	(cd $(WORK_DIR)/rust && \
 	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
