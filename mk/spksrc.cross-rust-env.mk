@@ -9,7 +9,7 @@ endif
 # source Tier-3 toolchains (qoriq)
 # ref: https://rustc-dev-guide.rust-lang.org/building/how-to-build-and-run.html
 ifeq ($(RUST_BUILD_TOOLCHAIN),)
-RUST_BUILD_TOOLCHAIN = 1
+RUST_BUILD_TOOLCHAIN = 0
 endif
 
 # Versions available: https://releases.rs/docs/

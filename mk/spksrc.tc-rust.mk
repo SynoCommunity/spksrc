@@ -115,7 +115,7 @@ ifeq ($(RUST_BUILD_TOOLCHAIN),1)
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
 ifneq ($(RUST_BUILD_VERSION),)
 	@$(MSG) "Checkout rust tag $(RUST_BUILD_VERSION)"
-	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 -b $(RUST_BUILD_VERSION) https://github.com/rust-lang/rust.git || true)
+	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 --branch $(RUST_BUILD_VERSION) https://github.com/rust-lang/rust.git || true)
 else
 	@$(MSG) "Build latests release (current HEAD)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)

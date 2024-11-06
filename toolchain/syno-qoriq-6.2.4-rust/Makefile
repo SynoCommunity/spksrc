@@ -2,9 +2,9 @@ PKG_ARCH = qoriq
 PKG_NAME = rust-$(PKG_ARCH)
 PKG_VERS = 1.82.0
 PKG_EXT = txz
-PKG_DIST_TARGET = powerpc-unknown-linux-gnuspe
-PKG_DIST_NAME = $(PKG_DIST_TARGET)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/toolchains%2Frust
+PKG_DIST_TARGET = $(PKG_VERS)-powerpc-unknown-linux-gnuspe
+PKG_DIST_NAME = $(PKG_DIST_TARGET).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/rust/qoriq
 EXTRACT_PATH = $(INSTALL_DIR)/$(INSTALL_PREFIX)
 
 DEPENDS = 
@@ -24,8 +24,9 @@ include ../../mk/spksrc.native-install.mk
 
 .PHONY: rust-qoriq-postinstall
 rust-qoriq-postinstall:
-	export PATH="$(CARGO_PATH):$${PATH}" ; \
+	@$(MSG) "Rustup $(PKG_DIST_TARGET)"
+	@export PATH="$(CARGO_PATH):$${PATH}" ; \
 	export RUSTUP_HOME="$(RUSTUP_HOME)" ; \
 	which rustup ; \
-	rustup toolchain link $(PKG_VERS)-$(PKG_DIST_TARGET) $(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)) ; \
+	rustup toolchain link $(PKG_DIST_TARGET) $(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)) ; \
 	rustup show
