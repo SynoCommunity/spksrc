@@ -113,7 +113,13 @@ else
 ifeq ($(RUST_BUILD_TOOLCHAIN),1)
 	@$(MSG) "Build rust target $(RUST_TARGET) from sources"
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
-	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 -b $(RUSTUP_DEFAULT_TOOLCHAIN) https://github.com/rust-lang/rust.git || true)
+ifneq ($(RUST_BUILD_VERSION),)
+	@$(MSG) "Checkout rust tag $(RUST_BUILD_VERSION)"
+	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 -b $(RUST_BUILD_VERSION) https://github.com/rust-lang/rust.git || true)
+else
+	@$(MSG) "Build latests release (current HEAD)"
+	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
+endif
 	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
 	(cd $(WORK_DIR)/rust && \
 	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \

@@ -12,6 +12,11 @@ ifeq ($(RUST_BUILD_TOOLCHAIN),)
 RUST_BUILD_TOOLCHAIN = 1
 endif
 
+# Versions available: https://releases.rs/docs/
+ifeq ($(RUST_BUILD_VERSION),)
+RUST_BUILD_VERSION = 1.82.0
+endif
+
 # Enforce using newer cmake when building Tier-3 toolchains
 ifeq ($(RUST_BUILD_TOOLCHAIN),1)
 DEPENDS += native/cmake
@@ -49,9 +54,8 @@ ifeq ($(findstring $(RUST_ARCH), $(ARMv8_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(RUST_ARCH), $(PPC_ARCHS)),$(RUST_ARCH))
-RUSTUP_DEFAULT_TOOLCHAIN = 1.80.1
 RUST_TARGET = powerpc-unknown-linux-gnuspe
-TC_RUSTUP_TOOLCHAIN = stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)-$(RUST_TARGET)
+TC_RUSTUP_TOOLCHAIN = $(RUST_BUILD_VERSION)-$(RUST_TARGET)
 endif
 ifeq ($(findstring $(RUST_ARCH), $(x64_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = x86_64-unknown-linux-gnu
