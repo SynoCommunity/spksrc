@@ -3,7 +3,7 @@
 pip==24.2
 
 # Always match what's in cross/python310/Makefile
-setuptools==75.1.0
+setuptools==68.1.2
 wheel==0.44.0
 
 # Always use latest version available

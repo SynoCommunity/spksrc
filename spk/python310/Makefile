@@ -23,7 +23,7 @@ WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS = src/requirements-pure.txt
 
 # Force testing all wheel builds
-WHEELS_TEST_ALL = 0
+WHEELS_TEST_ALL = 1
 
 # Force compiler LTO optimizations
 ifeq ($(strip $(WHEELS_TEST_ALL)),0)
@@ -107,6 +107,10 @@ include ../../mk/spksrc.spk.mk
 
 ## WHEELS_TEST_ALL: Force testing all wheel building
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
+
+# let it find maturin in crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+
 
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
