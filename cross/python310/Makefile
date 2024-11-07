@@ -144,8 +144,8 @@ CROSSENV_WHEELS  = cffi==1.17.0
 # It also breaks numpy at crossenv creation time using github-action
 # https://numpy.org/devdocs/reference/distutils_status_migration.html
 # Python 3.12 considerations: scikit-build-core, meson-python
-CROSSENV_WHEELS += Cython==3.0.2
-#CROSSENV_WHEELS += Cython==0.29.37
+#CROSSENV_WHEELS += Cython==3.0.2
+CROSSENV_WHEELS += Cython==0.29.37
 CROSSENV_WHEELS += flit==3.9.0
 CROSSENV_WHEELS += scikit-build==0.18.1
 CROSSENV_WHEELS += setuptools-rust==1.10.2
@@ -169,8 +169,8 @@ python310_post_install: $(WORK_DIR)/python-cc.mk
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==75.1.0" "wheel==0.44.0" "pip-tools==7.4.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==75.1.0" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==68.1.2" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==68.1.2" "wheel==0.44.0" "pip-tools==7.4.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
