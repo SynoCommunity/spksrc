@@ -4,7 +4,7 @@ SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$
 SPK_REV = 21
 SPK_ICON = src/python3.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/python310
 DEPENDS += cross/pip
 
 MAINTAINER = SynoCommunity
@@ -107,6 +107,10 @@ include ../../mk/spksrc.spk.mk
 
 ## WHEELS_TEST_ALL: Force testing all wheel building
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
+
+# let it find maturin in crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+
 
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)

@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
-SPK_VERS = 10.10.0
-SPK_REV = 18
+SPK_VERS = 10.10.1
+SPK_REV = 19
 SPK_ICON = src/jellyfin.png
 
 DEPENDS = cross/jellyfin cross/jellyfin-web
@@ -16,7 +16,7 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 MAINTAINER = SynoCommunity
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
-CHANGELOG = "1. Update jellyfin to 10.10.0<br/>2. Built with dotnet 8.0.10 and nodejs 20.18.0"
+CHANGELOG = "1. Update jellyfin to 10.10.1<br/>2. Built with dotnet 8.0.10 and nodejs 20.18.0"
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
