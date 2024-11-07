@@ -1,13 +1,13 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.2.6
-SPK_REV = 14
+SPK_VERS = 1.4.0
+SPK_REV = 15
 SPK_ICON = src/borgbackup.png
 
 PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.5-8"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
+DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse cross/xxhash
 
 # Requirements file generation
 # - first create borgbackup wheel defined in src/requirements-crossenv.txt
@@ -30,7 +30,7 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borg to v1.2.6.<br/>2. Update borgmatic to v1.8.2.<br/>3. Update emborg to v1.37.<br/>4. Migrate to python 3.11."
+CHANGELOG = "1. Update borgmatic to v1.9.0.<br/>2. Update borg to v1.4.0.<br/>3. Update emborg to v1.40.<br/>4. Add ARMv5 again."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
@@ -45,6 +45,8 @@ ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 
 include ../../mk/spksrc.common.mk
 
