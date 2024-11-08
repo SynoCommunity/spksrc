@@ -21,7 +21,6 @@ ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd_8.7.0
 SPK_VERS = 8.7.0
 else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-# qoriq has rust 1.77.0
 DEPENDS += cross/fd_9.0.0
 SPK_VERS = 9.0.0
 else
