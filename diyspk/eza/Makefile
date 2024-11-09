@@ -1,5 +1,5 @@
 SPK_NAME = eza
-SPK_VERS = 0.20.0
+SPK_VERS = 0.20.7
 SPK_REV = 1
 
 DEPENDS = cross/eza

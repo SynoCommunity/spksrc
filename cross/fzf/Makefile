@@ -1,5 +1,5 @@
 PKG_NAME = fzf
-PKG_VERS = 0.55.0
+PKG_VERS = 0.56.0
 PKG_EXT = tar.gz
 PKG_REVISION = $(shell date +%m/%d/%Y)
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
@@ -9,7 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/go
 
-HOMEPAGE = https://github.com/junegunn/fzf
+HOMEPAGE = https://junegunn.github.io/fzf/
 COMMENT  = A command-line fuzzy finder.
 LICENSE  = MIT
 
