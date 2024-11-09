@@ -25,4 +25,6 @@ ADDITIONAL_CFLAGS = -std=c11
 endif
 endif
 
+CARGO_BUILD_ARGS = --features pcre2
+
 include ../../mk/spksrc.cross-rust.mk
