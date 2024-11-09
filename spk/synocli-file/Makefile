@@ -24,7 +24,7 @@ OPTIONAL_DEPENDS += cross/rnm
 OPTIONAL_DEPENDS += cross/micro
 OPTIONAL_DEPENDS += cross/fzf
 OPTIONAL_DEPENDS += cross/ripgrep
-OPTIONAL_DEPENDS += cross/fd cross/fd_9.0.0 cross/fd_8.7.0
+OPTIONAL_DEPENDS += cross/fd cross/fd_8.7.0
 OPTIONAL_DEPENDS += cross/sd
 OPTIONAL_DEPENDS += cross/bat
 OPTIONAL_DEPENDS += cross/eza
@@ -78,9 +78,6 @@ DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd_8.7.0
-else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-# qoriq with rustc == 1.77.0
-DEPENDS += cross/fd_9.0.0
 else
 DEPENDS += cross/fd
 endif
