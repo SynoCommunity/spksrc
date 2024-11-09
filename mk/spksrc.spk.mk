@@ -151,8 +151,13 @@ ifeq ($(strip $(MAINTAINER)),)
 $(error Add MAINTAINER for '$(SPK_NAME)' in spk Makefile or set default MAINTAINER in local.mk.)
 endif
 
+ifeq ($(strip $(DISABLE_GITHUB_MAINTAINER)),)
 get_github_maintainer_url = $(shell wget --quiet --spider https://github.com/$(1) && echo "https://github.com/$(1)" || echo "")
 get_github_maintainer_name = $(shell curl -s -H application/vnd.github.v3+json https://api.github.com/users/$(1) | jq -r '.name' | sed -e 's|null||g' | sed -e 's|^$$|$(1)|g' )
+else
+get_github_maintainer_url = "https://github.com/SynoCommunity"
+get_github_maintainer_name = $(MAINTAINER)
+endif
 
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
