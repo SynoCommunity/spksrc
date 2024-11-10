@@ -16,7 +16,7 @@ MAINTAINER = th0ma7
 DESCRIPTION = "Provides Synology kernel CD-ROM drivers cdrom.ko and sr_mod.ko"
 CHANGELOG = "1. Support DSM-7.1 and DSM-7.2"
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) epyc7002
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) epyc7002 rtd1619b
 
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB CD-ROM drivers
