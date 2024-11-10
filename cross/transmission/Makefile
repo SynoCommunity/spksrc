@@ -1,8 +1,8 @@
 PKG_NAME = transmission
-PKG_VERS = 4.0.5
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/transmission/transmission/releases/download/$(PKG_VERS)
+PKG_VERS = 4.0.6
+PKG_EXT = tar.gz
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-with-submodules.$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/transmission
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/curl

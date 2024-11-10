@@ -1,0 +1,17 @@
+Build fix for x64 (and presumably others) for DSM-7.2.
+Has no impacts on DSM-7.1 builds.
+
+  undefined reference to `minor'
+  undefined reference to `major'
+  undefined reference to `makedev'
+
+--- src/shared/macro.h.orig	2015-02-16 20:55:07.000000000 +0000
++++ src/shared/macro.h	2024-10-01 23:29:07.479848724 +0000
+@@ -23,6 +23,7 @@
+ 
+ #include <assert.h>
+ #include <sys/param.h>
++#include <sys/sysmacros.h>
+ #include <sys/types.h>
+ #include <sys/uio.h>
+ #include <inttypes.h>

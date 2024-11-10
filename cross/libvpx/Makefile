@@ -1,5 +1,5 @@
 PKG_NAME = libvpx
-PKG_VERS = 1.13.0
+PKG_VERS = 1.14.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/webmproject/libvpx/archive
@@ -53,6 +53,7 @@ NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin
 ENV += AS=$(NASM_PATH)/nasm
 ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --as=nasm
+CONFIGURE_ARGS += --disable-sse4_1
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

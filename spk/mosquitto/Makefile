@@ -1,6 +1,6 @@
 SPK_NAME = mosquitto
-SPK_VERS = 2.0.15
-SPK_REV = 14
+SPK_VERS = 2.0.20
+SPK_REV = 16
 SPK_ICON = src/mosquitto.png
 
 DEPENDS = cross/mosquitto
@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 MAINTAINER = SynoCommunity
 DESCRIPTION = Eclipse Mosquitto is an open source \(EPL/EDL licensed\) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
 DISPLAY_NAME = Mosquitto
-CHANGELOG = "1. Update mosquitto to v2.0.15.<br/>2. Update openssl to v3.1.1."
+CHANGELOG = "Update mosquitto to v2.0.20. Update libwebsockets to v4.3.3."
 HOMEPAGE = https://www.mosquitto.org/
 LICENSE  = EPL/EDL
 

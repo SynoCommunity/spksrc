@@ -1,5 +1,5 @@
 PKG_NAME = libva-utils
-PKG_VERS = 2.18.1
+PKG_VERS = 2.22.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/libva-utils/archive
@@ -13,7 +13,5 @@ COMMENT = Libva-utils is a collection of tests for VA-API (Video Acceleration AP
 LICENSE = MIT
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
-ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-meson.mk

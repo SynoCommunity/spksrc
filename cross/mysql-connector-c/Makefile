@@ -13,6 +13,9 @@ COMMENT  = MySQL C API (libmysqlclient)
 LICENSE  = GNU GPLv2
 
 USE_NATIVE_CMAKE_LEGACY = 1
+CMAKE_USE_NINJA = 1
+
+POST_INSTALL_TARGET = mysql-connector-c_post_install
 
 include ../../mk/spksrc.cross-cmake.mk
 
@@ -59,3 +62,8 @@ CMAKE_ARGS += -DWITH_ZLIB=system
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),)
 CMAKE_ARGS += -DHAVE_GCC_ATOMIC_BUILTINS=1
 endif
+
+.PHONY: mysql-connector-c_post_install
+mysql-connector-c_post_install:
+	@$(MSG) Fix for mysql_config --libs 
+	@$(RUN) sed 's|"$$libs -l "|"$$libs -lmysqlclient "|g' -i $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/mysql_config

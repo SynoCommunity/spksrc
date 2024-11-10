@@ -1,0 +1,13 @@
+Index: FFmpeg/libavfilter/buffersrc.c
+===================================================================
+--- libavfilter/buffersrc.c
++++ libavfilter/buffersrc.c
+@@ -75,7 +75,7 @@ typedef struct BufferSourceContext {
+     c->prev_delta = c->prev_w != width || c->prev_h != height || c->prev_pix_fmt != format ||\
+                     c->prev_color_space != csp || c->prev_color_range != range;\
+     if (c->link_delta) {\
+-        int loglevel = c->prev_delta ? AV_LOG_WARNING : AV_LOG_DEBUG;\
++        int loglevel = c->prev_delta ? AV_LOG_VERBOSE : AV_LOG_DEBUG;\
+         av_log(s, loglevel, "Changing video frame properties on the fly is not supported by all filters.\n");\
+         av_log(s, loglevel, "filter context - w: %d h: %d fmt: %d csp: %s range: %s, incoming frame - w: %d h: %d fmt: %d csp: %s range: %s pts_time: %s\n",\
+                c->w, c->h, c->pix_fmt, av_color_space_name(c->color_space), av_color_range_name(c->color_range),\

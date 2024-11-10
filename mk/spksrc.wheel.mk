@@ -122,7 +122,7 @@ ifneq ($(strip $(WHEELS)),)
 	         sed -e '/^pure:\|^#\|^$$/d' -e /^cross:/s/^cross://g $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
 	      elif [ $$(basename $$wheel) = $(WHEELS_LIMITED_API) ]; then \
 	         $(MSG) "Adding existing $$wheel file as ABI-limited" ; \
-	         cat $$wheel >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
+	         sed -e '/^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
 	      else \
 	         $(MSG) "Adapting existing $$wheel file" ; \
 	         sed -rn /^pure:/s/^pure://gp $$wheel         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \

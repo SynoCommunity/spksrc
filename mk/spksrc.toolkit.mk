@@ -3,7 +3,7 @@
 SHELL := $(SHELL) -e
 default: all
 
-WORK_DIR := $(shell pwd)/work
+WORK_DIR := $(CURDIR)/work
 include ../../mk/spksrc.directories.mk
 
 include ../../mk/spksrc.common.mk
@@ -46,10 +46,6 @@ toolkit_fix: flags
 include ../../mk/spksrc.toolkit-fix.mk
 
 all: toolkit_fix
-
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

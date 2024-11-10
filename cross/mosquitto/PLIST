@@ -6,8 +6,8 @@ bin:bin/mosquitto_rr
 bin:bin/mosquitto_sub
 lnk:lib/libmosquitto.so
 lnk:lib/libmosquitto.so.1
-lib:lib/libmosquitto.so.2.0.15
+lib:lib/libmosquitto.so.2.0.20
 lnk:lib/libmosquittopp.so
 lnk:lib/libmosquittopp.so.1
-lib:lib/libmosquittopp.so.2.0.15
+lib:lib/libmosquittopp.so.2.0.20
 lib:lib/mosquitto_dynamic_security.so

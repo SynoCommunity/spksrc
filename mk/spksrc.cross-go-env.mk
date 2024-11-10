@@ -56,6 +56,9 @@ ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 ENV += GOARCH=$(GO_ARCH)
 ENV += GOOS=$(GOOS)
 
+# Ensure downloaded mod are u+rw
+ENV += GOFLAGS=-modcacherw
+
 ifneq ($(strip $(GO_BIN_DIR)),)
   GO_BUILD_ARGS := -o $(GO_BIN_DIR) $(GO_BUILD_ARGS)
 endif

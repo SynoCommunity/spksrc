@@ -1,0 +1,17 @@
+Index: FFmpeg/libavcodec/nvdec.c
+===================================================================
+--- libavcodec/nvdec.c
++++ libavcodec/nvdec.c
+@@ -299,8 +299,10 @@ static int nvdec_init_hwframes(AVCodecCo
+     frames_ctx = (AVHWFramesContext*)(*out_frames_ref)->data;
+ 
+     if (dummy) {
+-        // Copied from ff_decode_get_hw_frames_ctx for compatibility
+-        frames_ctx->initial_pool_size += 3;
++        // The function above guarantees 1 work surface, We must guarantee 4 work surfaces.
++        // (the absolute minimum), so add the missing count without exceeding the maximum
++        // recommended for nvdec.
++        frames_ctx->initial_pool_size = FFMIN(frames_ctx->initial_pool_size + 3, 32);
+ 
+         frames_ctx->free = nvdec_free_dummy;
+         frames_ctx->pool = av_buffer_pool_init(0, nvdec_alloc_dummy);

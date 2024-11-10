@@ -4,8 +4,8 @@ SPK_REV = 8
 SPK_ICON = src/selfoss.png
 
 DEPENDS  = cross/selfoss
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = WebStation:PHP7.4:Apache2.4

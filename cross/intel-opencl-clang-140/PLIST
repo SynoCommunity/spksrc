@@ -1,0 +1,11 @@
+lnk:lib/libclang.so
+lnk:lib/libclang.so.13
+lib:lib/libclang.so.14.0.5
+lnk:lib/libclang-cpp.so
+lib:lib/libclang-cpp.so.14
+lnk:lib/libLTO.so
+lib:lib/libLTO.so.14
+lnk:lib/libopencl-clang.so
+lib:lib/libopencl-clang.so.14
+lnk:lib/libRemarks.so
+lib:lib/libRemarks.so.14

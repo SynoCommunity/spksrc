@@ -1,3 +1,10 @@
+###
+
+KERNEL_REQUIRED = $(MAKE) kernel-required
+ifeq ($(strip $(KERNEL_REQUIRED)),)
+ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT))))))
+endif
+
 #### used as subroutine to test whether any dependency has REQUIRE_KERNEL defined
 
 .PHONY: kernel-required
@@ -13,3 +20,4 @@ kernel-required:
 	  fi ; \
 	done
 
+####

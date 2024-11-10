@@ -8,7 +8,7 @@ JELLYFIN_ARGS="--service \
  -c ${SYNOPKG_PKGVAR}/config \
  -l ${SYNOPKG_PKGVAR}/log \
  -w ${SYNOPKG_PKGDEST}/web \
- --ffmpeg /var/packages/ffmpeg/target/bin/ffmpeg"
+ --ffmpeg /var/packages/ffmpeg7/target/bin/ffmpeg"
 
 SERVICE_COMMAND="${SYNOPKG_PKGDEST}/share/jellyfin ${JELLYFIN_ARGS}"
 

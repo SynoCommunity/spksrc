@@ -44,6 +44,7 @@ endif
 $(TC_LOCAL_VARS_RUST):
 	env $(MAKE) --no-print-directory rust_toml > $@ 2>/dev/null;
 
+# https://github.com/rust-lang/rust/blob/master/config.example.toml
 .PHONY: rust_toml
 rust_toml:
 	@echo 'profile = "compiler"' ; \
@@ -57,7 +58,7 @@ rust_toml:
 	echo "compiler-docs = false" ; \
 	echo
 	@echo "[rust]" ; \
-	echo 'channel = "stable"' ; \
+	echo 'channel = "$(RUSTUP_DEFAULT_TOOLCHAIN)"' ; \
 	echo 'lto = "off"' ; \
 	echo
 	@echo "[llvm]" ; \
@@ -104,17 +105,21 @@ rustc_target: $(PRE_RUSTC_TARGET) $(TC_LOCAL_VARS_RUST)
 	flock -u 5
 ifeq ($(TC_RUSTUP_TOOLCHAIN),$(RUSTUP_DEFAULT_TOOLCHAIN))
 	@$(MSG) "rustup target add $(RUST_TARGET)"
-	rustup override set stable
+	rustup override set $(RUSTUP_DEFAULT_TOOLCHAIN)
 	rustup target add $(RUST_TARGET)
 	rustup show
 else
 	@$(MSG) "Target $(RUST_TARGET) unavailable..."
 ifeq ($(RUST_BUILD_TOOLCHAIN),1)
 	@$(MSG) "Build rust target $(RUST_TARGET) from sources"
-	@$(MSG) "Enforce usage of CMake 3.20.0 or higher"
-	@$(MAKE) -C ../../native/cmake
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
+ifneq ($(RUST_BUILD_VERSION),)
+	@$(MSG) "Checkout rust tag $(RUST_BUILD_VERSION)"
+	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 --branch $(RUST_BUILD_VERSION) https://github.com/rust-lang/rust.git || true)
+else
+	@$(MSG) "Build latests release (current HEAD)"
 	@(cd $(WORK_DIR) && [ ! -d rust ] && git clone --depth 1 https://github.com/rust-lang/rust.git || true)
+endif
 	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
 	(cd $(WORK_DIR)/rust && \
 	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
@@ -127,9 +132,6 @@ ifeq ($(RUST_BUILD_TOOLCHAIN),1)
 	done
 	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET) - stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) complete"
 	rustup show
-else
-	@$(MSG) "Install rust target $(RUST_TARGET) from native"
-	@$(MAKE) -C ../../native/rust-qoriq
 endif
 endif
 
