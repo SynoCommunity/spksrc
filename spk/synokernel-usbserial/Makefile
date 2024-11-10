@@ -5,6 +5,9 @@ SPK_ICON = src/$(SPK_NAME).png
 
 DEPENDS = 
 
+# trigger the build for DSM 7.2 
+REQUIRED_MIN_DSM = 7.2
+
 REQUIRE_KERNEL ?= 1
 REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL_OPTION:drivers/usb/serial:usbserial
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_CH341:drivers/usb/serial:ch341
