@@ -172,6 +172,7 @@ jobs:
           if [ "$add_dsm72_builds" == "true" ]; then
             matrix+='{"arch": "x64-7.2"},'
             matrix+='{"arch": "aarch64-7.2"},'
+            matrix+='{"arch": "armv7-7.2"},'
           fi
           if [ "$add_dsm71_builds" == "true" ]; then
             matrix+='{"arch": "x64-7.1"},'
