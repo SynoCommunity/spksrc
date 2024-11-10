@@ -92,6 +92,7 @@ python_pre_depend:
 
 .PHONY: python_post_depend
 python_post_depend:
+	@$(MSG) "Install to crossenv: $(ADDITIONAL_CROSSENV_WHEELS)"
 	@. $(WORK_DIR)/crossenv/bin/activate ; \
 	$(RUN) build-pip --disable-pip-version-check install $(ADDITIONAL_CROSSENV_WHEELS) ; \
 	$(RUN) pip --disable-pip-version-check install $(ADDITIONAL_CROSSENV_WHEELS)

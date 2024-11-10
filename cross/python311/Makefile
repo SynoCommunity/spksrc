@@ -150,7 +150,6 @@ CROSSENV_WHEELS += poetry==1.8.3
 CROSSENV_WHEELS += scikit-build==0.18.1
 CROSSENV_WHEELS += setuptools-rust==1.10.2
 CROSSENV_WHEELS += setuptools-scm==8.1.0
-CROSSENV_WHEELS += expandvars==0.12.0
 # For future use when building numpy >= 1.26
 #CROSSENV_WHEELS += meson-python==1.5.2
 #CROSSENV_WHEELS += scikit-build-core==0.10.7
