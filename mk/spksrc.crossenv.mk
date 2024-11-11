@@ -121,25 +121,31 @@ ifeq ($(CROSSENV_BUILD_WHEEL),default)
 	@$(MSG) Setting default crossenv $(CROSSENV_PATH)
 	@$(RUN) ln -s crossenv-default crossenv
 endif
-	@. $(CROSSENV_PATH)/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
+	@$(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py --directory-prefix=$(CROSSENV_PATH)/build ; \
+	   $(RUN) chmod 755 $(CROSSENV_PATH)/build/get-pip.py
 	@. $(CROSSENV_PATH)/bin/activate ; \
-	    $(RUN) build-python get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
-	    $(RUN) python get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check
+	   $(MSG) $$(which build-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
+	   $(RUN) $$(which build-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
+	   $(MSG) $$(which python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
+	   $(RUN) $$(which python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check
 	@. $(CROSSENV_PATH)/bin/activate ; \
-	    build-pip --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
-	    pip --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL)
+	   $(MSG) $$(which build-pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
+	   $(RUN) $$(which build-pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
+	   $(MSG) $$(which pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
+	   $(RUN) $$(which pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL)
+	@$(MSG) [$(CROSSENV_PATH)] Processing $(CROSSENV_BUILD_REQUIREMENTS)
 	@. $(CROSSENV_PATH)/bin/activate ; \
-	    while IFS= read -r requirement ; do \
-	       $(MSG) [$(CROSSENV_PATH)] Processing $${requirement} ; \
-	       build-pip --disable-pip-version-check install $${requirement} ; \
-	       pip --disable-pip-version-check install $${requirement} ; \
-	    done < <(grep -sv  -e "^\#" -e "^\$$" $(CROSSENV_BUILD_REQUIREMENTS))
-	@. $(CROSSENV_PATH)/bin/activate ; \
-	    $(MSG) "Package list for $(CROSSENV_PATH):" ; \
-	    pip freeze
+	   $(MSG) $$(which build-pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
+	   $(RUN) $$(which build-pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
+	   $(MSG) $$(which pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
+	   $(RUN) $$(which pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS)
 #ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 #	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 #endif
+	@. $(CROSSENV_PATH)/bin/activate ; \
+	   $(MSG) "Package list for $(CROSSENV_PATH):" ; \
+	   $(MSG) $$(which pip) freeze ; \
+	   $(RUN) $$(which pip) freeze
 endif
 
 $(CROSSENV_PATH)/build/python-cc.mk:
