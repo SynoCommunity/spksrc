@@ -40,6 +40,15 @@ export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
 export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
 
+# Mandatory PYO3_* variables for rust cross-compiling
+export PYO3_CROSS_LIB_DIR = $(STAGING_INSTALL_PREFIX)/lib/
+export PYO3_CROSS_INCLUDE_DIR = $(STAGING_INSTALL_PREFIX)/include/
+# Mandatory of using OPENSSL_*_DIR starting with
+# cryptography version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+export OPENSSL_LIB_DIR = $(STAGING_INSTALL_PREFIX)/lib/
+export OPENSSL_INCLUDE_DIR = $(STAGING_INSTALL_PREFIX)/include/
+
 # set PYTHONPATH for spksrc.python-module.mk
 PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages/
 
