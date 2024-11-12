@@ -22,10 +22,11 @@ include ../../mk/spksrc.archs.mk
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
-ENV += AS=$(NASM_PATH)/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
+NASM_BINARY = $(shell which nasm)
+ifeq ($(NASM_BINARY),)
+$(error nasm not found. Please install NASM assembler)
+endif
+ENV += AS=$(NASM_BINARY)
 CONFIGURE_ARGS += -Denable_asm=true
 
 # Allow ASM on aarch64, disable on all others

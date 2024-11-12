@@ -6,7 +6,7 @@ PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cisco/openh264/archive/refs/tags
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS =
 
 HOMEPAGE = http://www.openh264.org/
 COMMENT  = OpenH264 is a codec library which supports H.264 encoding and decoding. It is suitable for use in real time applications such as WebRTC.
@@ -18,10 +18,11 @@ CONFIGURE_ARGS += -Dtests=disabled
 
 POST_INSTALL_TARGET = openh264-post_install
 
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
-ENV += PATH=$(NASM_PATH):$$PATH
-ENV += AS=$(NASM_PATH)/nasm
+NASM_BINARY = $(shell which nasm)
+ifeq ($(NASM_BINARY),)
+$(error nasm not found. Please install NASM assembler)
+endif
+ENV += AS=$(NASM_BINARY)
 
 include ../../mk/spksrc.cross-meson.mk
 
