@@ -557,6 +557,9 @@ wheelcleancache: wheelclean
 wheelcleanall: wheelcleancache
 	rm -fr ../../distrib/pip
 
+crossenvclean: wheelcleanall
+	rm -fr work-*/crossenv*
+
 pythonclean: wheelcleanall
 	rm -fr work-*/.[Pp]ython*-install_done \
 	rm -fr work-*/crossenv
