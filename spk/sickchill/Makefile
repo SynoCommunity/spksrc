@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
-SPK_VERS = 20230627
-SPK_REV = 10
+SPK_VERS = 20240301
+SPK_REV = 11
 SPK_ICON = src/sickchill.png
 
 PYTHON_PACKAGE = python311
@@ -8,7 +8,7 @@ PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.5-8"
 
 # archs without C++11 support are not supported:
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
 
 # [lxml]
 DEPENDS += cross/libxml2
@@ -21,6 +21,9 @@ ENV += SODIUM_INSTALL=system
 # [cryptography]
 DEPENDS += cross/cryptography
 
+# [mediainfo]
+DEPENDS += cross/mediainfo
+
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 
@@ -28,7 +31,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "1. A wheel based install, git installs are not supported by upstream.<br/>2. Python update to 3.11<br/>3. Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies<br/>4. Migrate to OpenSSL 3.1.2<br/>5. Fix for newer shared python"
+CHANGELOG = "1. A wheel based install, git installs not supported by upstream.<br/>2. Python update to 3.11.10, OpenSSL 3.1.2<br/>3. Deprecated ARMv5/7 as no compiler support for updated dependencies"
 
 HOMEPAGE = https://sickchill.github.io/
 LICENSE = GPLv3+
