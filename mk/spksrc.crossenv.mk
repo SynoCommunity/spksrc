@@ -74,8 +74,8 @@ PYTHON_INSTALL_PREFIX = $(INSTALL_PREFIX)
 endif
 
 # Equivalent to STAGING_INSTALL_PREFIX relative to found python install
-ifeq ($(PYTHON_STAGING_PREFIX),)
-PYTHON_STAGING_PREFIX = $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)
+ifeq ($(PYTHON_STAGING_INSTALL_PREFIX),)
+PYTHON_STAGING_INSTALL_PREFIX = $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)
 endif
 
 ##
@@ -97,8 +97,18 @@ PYTHON_SITE_PACKAGES_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG
 PYTHON_LIB_DIR = lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
 PYTHON_INC_DIR = include/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
 
+# Mandatory for rustc wheel building within crossenv
+# --> Using python-cc.mk defined variable for cross-compiling wheels
+export PYO3_CROSS_LIB_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/lib/
+export PYO3_CROSS_INCLUDE_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/include/
+# Mandatory of using OPENSSL_*_DIR starting with
+# cryptography version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+export OPENSSL_LIB_DIR = $(OPENSSL_STAGING_PREFIX)/lib/
+export OPENSSL_INCLUDE_DIR = $(OPENSSL_STAGING_PREFIX)/include/
+
 # set PYTHONPATH for spksrc.python-module.mk
-export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_PREFIX)/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages/
+export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages/
 
 # Required so native python and maturin binaries can always be found
 export PATH := $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)
@@ -186,10 +196,10 @@ $(CROSSENV_PATH)/build/python-cc.mk:
 	@echo PYTHON_VERSION=$(PYTHON_PKG_VERS_MAJOR_MINOR) >> $@
 	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
 	@echo PYTHON_INC_DIR=$(PYTHON_INC_DIR) >> $@
-	@echo PYO3_CROSS_LIB_DIR=$(abspath $(PYTHON_STAGING_PREFIX)/lib) >> $@
-	@echo PYO3_CROSS_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_PREFIX)/include) >> $@
-	@echo OPENSSL_LIB_DIR=$(abspath $(PYTHON_STAGING_PREFIX)/lib) >> $@
-	@echo OPENSSL_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_PREFIX)/include) >> $@
+	@echo PYO3_CROSS_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
+	@echo PYO3_CROSS_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
+	@echo OPENSSL_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
+	@echo OPENSSL_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
 	@echo PIP=$(PIP_NATIVE) >> $@
 	@echo CROSS_COMPILE_WHEELS=1 >> $@
 	@echo ADDITIONAL_WHEEL_BUILD_ARGS=--no-build-isolation >> $@
