@@ -15,36 +15,36 @@ ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
 export PYTHON_PACKAGE
 
 # Set Python installtion prefix directory variables
-ifeq ($(strip $(PYTHON_STAGING_PREFIX)),)
+ifeq ($(strip $(PYTHON_STAGING_INSTALL_PREFIX)),)
 export PYTHON_PREFIX = /var/packages/$(PYTHON_PACKAGE)/target
-export PYTHON_STAGING_PREFIX = $(realpath $(PYTHON_PACKAGE_WORK_DIR)/install/$(PYTHON_PREFIX))
+export PYTHON_STAGING_INSTALL_PREFIX = $(realpath $(PYTHON_PACKAGE_WORK_DIR)/install/$(PYTHON_PREFIX))
 endif
 
 # Set OpenSSL installtion prefix directory variables
 ifeq ($(strip $(OPENSSL_STAGING_PREFIX)),)
 export OPENSSL_PREFIX = $(PYTHON_PREFIX)
-export OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_PREFIX)
+export OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_INSTALL_PREFIX)
 endif
 
 # set build flags including ld to rewrite for the library path
 # used to access python package provide libraries at destination
-export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_PREFIX)/include
-export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include
-export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_PREFIX)/include
-export ADDITIONAL_LDFLAGS  += -L$(PYTHON_STAGING_PREFIX)/lib
-export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(PYTHON_STAGING_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
+export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_LDFLAGS  += -L$(PYTHON_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(PYTHON_STAGING_INSTALL_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
 
 # similarly, ld to rewrite OpenSSL library path if differs
-ifneq ($(OPENSSL_STAGING_PREFIX),$(PYTHON_STAGING_PREFIX))
+ifneq ($(OPENSSL_STAGING_PREFIX),$(PYTHON_STAGING_INSTALL_PREFIX))
 export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
 export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
 
 # set PYTHONPATH for spksrc.python-module.mk
-#PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages/
+#PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages/
 
 # Re-use all default python mandatory libraries
-PYTHON_LIBS := $(wildcard $(PYTHON_STAGING_PREFIX)/lib/pkgconfig/*.pc)
+PYTHON_LIBS := $(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc)
 
 # Re-use all python dependencies and mark as already done
 PYTHON_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile))),$(wildcard $(PYTHON_PACKAGE_WORK_DIR)/.$(cross)-*_done))
