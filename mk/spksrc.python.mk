@@ -54,6 +54,9 @@ PYTHON_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-
 
 # call-up pre-depend to prepare the shared python build environment
 PRE_DEPEND_TARGET = python_pre_depend
+ifneq ($(strip $(ADDITIONAL_CROSSENV_WHEELS)),)
+POST_DEPEND_TARGET = python_post_depend
+endif
 
 else
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
@@ -86,3 +89,10 @@ python_pre_depend:
 	      rm -fr work-*/$${pkgname}* work-*/.$${pkgname}-* ; \
 	   fi ; \
 	done
+
+.PHONY: python_post_depend
+python_post_depend:
+	@$(MSG) "Install to crossenv: $(ADDITIONAL_CROSSENV_WHEELS)"
+	@. $(WORK_DIR)/crossenv/bin/activate ; \
+	$(RUN) build-pip --disable-pip-version-check install $(ADDITIONAL_CROSSENV_WHEELS) ; \
+	$(RUN) pip --disable-pip-version-check install $(ADDITIONAL_CROSSENV_WHEELS)
