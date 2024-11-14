@@ -63,13 +63,24 @@ endif
 
 ####
 
-# python-cc.mk
-PYTHON_WORK_DIR = $(wildcard $(or $(PYTHON_PACKAGE_ROOT),$(WORK_DIR)))
+# Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
+PYTHON_WORK_DIR = $(wildcard $(or $(PYTHON_PACKAGE_WORK_DIR),$(WORK_DIR)))
+
+# Defined using current install prefix by replacing package name using PYTHON_PACKAGE from spksrc.python.mk, else use local install prefix
 ifneq ($(PYTHON_PACKAGE),)
 PYTHON_INSTALL_PREFIX = $(subst $(SPK_NAME),$(PYTHON_PACKAGE),$(INSTALL_PREFIX))
 else
 PYTHON_INSTALL_PREFIX = $(INSTALL_PREFIX)
 endif
+
+# Equivalent to STAGING_INSTALL_PREFIX relative to found python install
+ifeq ($(PYTHON_STAGING_PREFIX),)
+PYTHON_STAGING_PREFIX = $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)
+endif
+
+##
+## python-cc.mk
+##
 PYTHON_PKG_VERS = $(lastword $(subst -, ,$(wildcard $(PYTHON_WORK_DIR)/Python-*)))
 PYTHON_PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PYTHON_PKG_VERS))).$(word 2,$(subst ., ,$(PYTHON_PKG_VERS)))
 PYTHON_PKG_NAME = python$(subst .,,$(PYTHON_PKG_VERS_MAJOR_MINOR))
@@ -81,15 +92,28 @@ PIP_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-nativ
 HOSTPYTHON = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/hostpython)
 HOSTPYTHON_LIB_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/$(PYTHON_PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_LIB_NATIVE = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
+PYTHON_LIB_CROSS = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_SITE_PACKAGES_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages)
-PYTHON_LIB_CROSS = $(CROSSENV_PATH)/build/lib.linux-$(BUILD_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR)
 PYTHON_LIB_DIR = lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
 PYTHON_INC_DIR = include/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
+
+# set PYTHONPATH for spksrc.python-module.mk
+export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_PREFIX)/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages/
+
+# Required so native python and maturin binaries can always be found
+export PATH := $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)
+export LD_LIBRARY_PATH := $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)
 
 ###
 
 # Create the crossenv in preparation for
 # cross-compiling all the necessary wheels
+#
+# To validate crossenv parameters:
+#    $ work-<arch>-<version>/crossenv/cross/bin/python
+#    >>> import sys
+#    >>> sys.path
+#
 .PHONY: crossenv
 ifneq ($(wildcard $(CROSSENV_PATH)),)
 build-crossenv:
@@ -99,9 +123,9 @@ build-crossenv: SHELL:=/bin/bash
 build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 	@$(MSG) crossenv wheel packages: $(CROSSENV_DEFAULT_PIP), $(CROSSENV_DEFAULT_SETUPTOOLS), $(CROSSENV_DEFAULT_WHEEL)
 	@$(MSG) crossenv requirements file = $(CROSSENV_BUILD_REQUIREMENTS)
-	mkdir -p "$(PYTHON_LIB_CROSS)"
-	cp -RL $(HOSTPYTHON_LIB_NATIVE) "$(abspath $(PYTHON_LIB_CROSS)/../)"
-	@echo $(PYTHON_NATIVE) -m crossenv $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR) \
+	mkdir -p $(PYTHON_LIB_CROSS)
+	cp -RL $(HOSTPYTHON_LIB_NATIVE) $(abspath $(PYTHON_LIB_CROSS)/../)
+	@echo $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
 	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
@@ -109,7 +133,7 @@ build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 	                        --env LIBRARY_PATH= \
 	                        --manylinux manylinux2014 \
 	                        "$(CROSSENV_PATH)"
-	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR) \
+	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
 	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
@@ -119,33 +143,34 @@ build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
 	                        "$(CROSSENV_PATH)"
 ifeq ($(CROSSENV_BUILD_WHEEL),default)
 	@$(MSG) Setting default crossenv $(CROSSENV_PATH)
-	@$(RUN) ln -s crossenv-default crossenv
+	@$(MSG) ln -sf crossenv-default $(WORK_DIR)/crossenv
+	@$(RUN) ln -sf crossenv-default $(WORK_DIR)/crossenv
 endif
 	@$(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py --directory-prefix=$(CROSSENV_PATH)/build ; \
 	   $(RUN) chmod 755 $(CROSSENV_PATH)/build/get-pip.py
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	   $(MSG) $$(which build-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
 	   $(RUN) $$(which build-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
-	   $(MSG) $$(which python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
-	   $(RUN) $$(which python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check
+	   $(MSG) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
+	   $(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	   $(MSG) $$(which build-pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
 	   $(RUN) $$(which build-pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
-	   $(MSG) $$(which pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
-	   $(RUN) $$(which pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL)
+	   $(MSG) $$(which cross-pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
+	   $(RUN) $$(which cross-pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL)
 	@$(MSG) [$(CROSSENV_PATH)] Processing $(CROSSENV_BUILD_REQUIREMENTS)
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	   $(MSG) $$(which build-pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
 	   $(RUN) $$(which build-pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
-	   $(MSG) $$(which pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
-	   $(RUN) $$(which pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS)
+	   $(MSG) $$(which cross-pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
+	   $(RUN) $$(which cross-pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS)
 #ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 #	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 #endif
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	   $(MSG) "Package list for $(CROSSENV_PATH):" ; \
-	   $(MSG) $$(which pip) freeze ; \
-	   $(RUN) $$(which pip) freeze
+	   $(MSG) $$(which cross-pip) list ; \
+	   $(RUN) $$(which cross-pip) list
 endif
 
 $(CROSSENV_PATH)/build/python-cc.mk:
@@ -157,10 +182,14 @@ $(CROSSENV_PATH)/build/python-cc.mk:
 	@echo PYTHON_LIB_NATIVE=$(PYTHON_LIB_NATIVE) >> $@
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
 	@echo PYTHON_SITE_PACKAGES_NATIVE=$(PYTHON_SITE_PACKAGES_NATIVE) >> $@
-	@echo PYTHON_INTERPRETER=$(INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR) >> $@
+	@echo PYTHON_INTERPRETER=$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR) >> $@
 	@echo PYTHON_VERSION=$(PYTHON_PKG_VERS_MAJOR_MINOR) >> $@
 	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
 	@echo PYTHON_INC_DIR=$(PYTHON_INC_DIR) >> $@
+	@echo PYO3_CROSS_LIB_DIR=$(abspath $(PYTHON_STAGING_PREFIX)/lib) >> $@
+	@echo PYO3_CROSS_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_PREFIX)/include) >> $@
+	@echo OPENSSL_LIB_DIR=$(abspath $(PYTHON_STAGING_PREFIX)/lib) >> $@
+	@echo OPENSSL_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_PREFIX)/include) >> $@
 	@echo PIP=$(PIP_NATIVE) >> $@
 	@echo CROSS_COMPILE_WHEELS=1 >> $@
 	@echo ADDITIONAL_WHEEL_BUILD_ARGS=--no-build-isolation >> $@

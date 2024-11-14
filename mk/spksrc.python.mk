@@ -5,11 +5,11 @@
 #  PYTHON_PACKAGE       Must be set to the python spk folder (python310, python311, ...)
 
 # set default spk/python* path to use
-PYTHON_PACKAGE_ROOT = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
+PYTHON_PACKAGE_WORK_DIR = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 
 include ../../mk/spksrc.archs.mk
 
-ifneq ($(wildcard $(PYTHON_PACKAGE_ROOT)),)
+ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
 
 # Export the python package variable so it is usable in cross/*
 export PYTHON_PACKAGE
@@ -17,7 +17,7 @@ export PYTHON_PACKAGE
 # Set Python installtion prefix directory variables
 ifeq ($(strip $(PYTHON_STAGING_PREFIX)),)
 export PYTHON_PREFIX = /var/packages/$(PYTHON_PACKAGE)/target
-export PYTHON_STAGING_PREFIX = $(realpath $(PYTHON_PACKAGE_ROOT)/install/$(PYTHON_PREFIX))
+export PYTHON_STAGING_PREFIX = $(realpath $(PYTHON_PACKAGE_WORK_DIR)/install/$(PYTHON_PREFIX))
 endif
 
 # Set OpenSSL installtion prefix directory variables
@@ -40,23 +40,14 @@ export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
 export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
 
-# Mandatory PYO3_* variables for rust cross-compiling
-export PYO3_CROSS_LIB_DIR = $(STAGING_INSTALL_PREFIX)/lib/
-export PYO3_CROSS_INCLUDE_DIR = $(STAGING_INSTALL_PREFIX)/include/
-# Mandatory of using OPENSSL_*_DIR starting with
-# cryptography version >= 40
-# https://docs.rs/openssl/latest/openssl/#automatic
-export OPENSSL_LIB_DIR = $(STAGING_INSTALL_PREFIX)/lib/
-export OPENSSL_INCLUDE_DIR = $(STAGING_INSTALL_PREFIX)/include/
-
 # set PYTHONPATH for spksrc.python-module.mk
-PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages/
+#PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages/
 
 # Re-use all default python mandatory libraries
 PYTHON_LIBS := $(wildcard $(PYTHON_STAGING_PREFIX)/lib/pkgconfig/*.pc)
 
 # Re-use all python dependencies and mark as already done
-PYTHON_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_ROOT)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile))),$(wildcard $(PYTHON_PACKAGE_ROOT)/.$(cross)-*_done))
+PYTHON_DEPENDS := $(foreach cross,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile))),$(wildcard $(PYTHON_PACKAGE_WORK_DIR)/.$(cross)-*_done))
 
 # call-up pre-depend to prepare the shared python build environment
 PRE_DEPEND_TARGET = python_pre_depend
@@ -76,7 +67,7 @@ include ../../mk/spksrc.spk.mk
 python_pre_depend:
 	@$(MSG) "*****************************************************"
 	@$(MSG) "*** Use existing shared objects from python $(PYTHON_VERSION)"
-	@$(MSG) "*** PATH: $(PYTHON_PACKAGE_ROOT)"
+	@$(MSG) "*** PATH: $(PYTHON_PACKAGE_WORK_DIR)"
 	@$(MSG) "*****************************************************"
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	@$(foreach lib,$(PYTHON_LIBS),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
