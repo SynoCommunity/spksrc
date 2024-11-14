@@ -557,7 +557,10 @@ wheelcleancache: wheelclean
 wheelcleanall: wheelcleancache
 	rm -fr ../../distrib/pip
 
-crossenvclean: wheelcleanall
+crossenvclean: wheelclean
+	rm -fr work-*/crossenv*
+
+crossenvcleanall: wheelcleanall
 	rm -fr work-*/crossenv*
 
 pythonclean: wheelcleanall
