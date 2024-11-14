@@ -55,6 +55,14 @@ on:
         options:
           - 'true'
           - 'false'
+      add_srm13_builds:
+        description: 'Include SRM 1.3 archs'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
       add_srm12_builds:
         description: 'Include SRM 1.2 archs'
         required: false
@@ -89,6 +97,7 @@ jobs:
       add_dsm71_builds: ${{ steps.set-defaults.outputs.add_dsm71_builds }}
       add_dsm62_builds: ${{ steps.set-defaults.outputs.add_dsm62_builds }}
       add_dsm52_builds: ${{ steps.set-defaults.outputs.add_dsm52_builds }}
+      add_srm13_builds: ${{ steps.set-defaults.outputs.add_srm13_builds }}
       add_srm12_builds: ${{ steps.set-defaults.outputs.add_srm12_builds }}
     steps:
       - name: Checkout repository
@@ -127,6 +136,7 @@ jobs:
           echo "add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || steps.dependencies.outputs.has_arch_packages }}" >> $GITHUB_OUTPUT
           echo "add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || steps.dependencies.outputs.has_arch_packages }}" >> $GITHUB_OUTPUT
           echo "add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}" >> $GITHUB_OUTPUT
+          echo "add_srm13_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}" >> $GITHUB_OUTPUT
           echo "add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}" >> $GITHUB_OUTPUT
 
       - name: Cache downloaded files
@@ -158,6 +168,7 @@ jobs:
           add_dsm71_builds=${{ needs.prepare.outputs.add_dsm71_builds }}
           add_dsm62_builds=${{ needs.prepare.outputs.add_dsm62_builds }}
           add_dsm52_builds=${{ needs.prepare.outputs.add_dsm52_builds }}
+          add_srm13_builds=${{ needs.prepare.outputs.add_srm13_builds }}
           add_srm12_builds=${{ needs.prepare.outputs.add_srm12_builds }}
 
           # Create matrix as a JSON object
@@ -194,6 +205,10 @@ jobs:
             matrix+='{"arch": "x86-5.2"},'
             matrix+='{"arch": "88f6281-5.2"},'
             matrix+='{"arch": "ppc853x-5.2"},'
+          fi
+          if [ "$add_srm13_builds" == "true" ]; then
+            matrix+='{"arch": "aarch64-1.3"},'
+            matrix+='{"arch": "armv7-1.3"},'
           fi
           if [ "$add_srm12_builds" == "true" ]; then
             matrix+='{"arch": "armv7-1.2"},'
