@@ -1,0 +1,4 @@
+# [greenlet]
+#   - Mandatory require full c++11 support
+#   - latest version supported by ARMv7L (arch-hi3535)
+greenlet==3.1.0

@@ -1,10 +1,9 @@
-cffi==1.17.0
+cffi==1.17.1
+charset_normalizer==3.4.0
 # cryptography          ==> cross/cryptography
-greenlet==3.0.3
+#greenlet==3.1.1     ==> dedicated requirements file
 lxml==5.3.0
-MarkupSafe==2.1.5
-msgpack==1.0.7
-PyNaCl==1.5.0
-SQLAlchemy==2.0.32
-tornado==6.4
-wrapt==1.16.0
+MarkupSafe==3.0.2
+msgpack==1.1.0
+SQLAlchemy==2.0.36
+tornado==6.4.1

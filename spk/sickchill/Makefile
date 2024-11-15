@@ -7,22 +7,15 @@ PYTHON_PACKAGE = python311
 
 SPK_DEPENDS = "python311>=3.11.5-8"
 
-# archs without C++11 support are not supported:
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
+# archs without C++11 support are not supported [greenlet]
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
-# [PyNaCl]
-DEPENDS += cross/libsodium
-ENV += SODIUM_INSTALL=system
-
 # [cryptography]
 DEPENDS += cross/cryptography
-
-# [mediainfo]
-DEPENDS += cross/mediainfo
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -31,7 +24,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "1. A wheel based install, git installs not supported by upstream.<br/>2. Python update to 3.11.10, OpenSSL 3.1.2<br/>3. Deprecated ARMv5/7 as no compiler support for updated dependencies"
+CHANGELOG = "1. A wheel based install, git installs not supported by upstream.<br/>2. Python update to 3.11.10, OpenSSL 3.1.7<br/>3. Deprecated ARMv5 (88f628x) as no compiler support for updated dependencies"
 
 HOMEPAGE = https://sickchill.github.io/
 LICENSE = GPLv3+
@@ -55,13 +48,17 @@ include ../../mk/spksrc.python.mk
 
 
 ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
-# archs without C++11 support are not supported:
-UNSUPPORTED_ARCHS = $(ARCHS)
+# archs without C++11 support are not supported [greenlet]
+UNSUPPORTED_ARCHS = $(ARCH)
 endif
 
 # [greenlet]
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
 WHEELS_CPPFLAGS = [greenlet] -std=c++11 -fpermissive
+# supported version <=3.1.0
+WHEELS += src/requirements-crossenv-greenlet-v3.txt
+else
+WHEELS += src/requirements-crossenv-greenlet-latest.txt
 endif
 
 # prefere native python tools (pip, maturin, ...)
