@@ -109,7 +109,7 @@ wheel_msg_target:
 # building a wheel for x64-6.2.4 may look successfull while
 # it actually used a cache built from x64-7.1
 #
-pre_wheel_target: build-crossenv wheel_msg_target wheeldownload
+pre_wheel_target: wheel_msg_target wheeldownload
 ifneq ($(strip $(WHEELS)),)
 	@if [ -n "$(PIP_CACHE_OPT)" ] ; then \
 	   mkdir -p $(PIP_CACHE_DIR) ; \
@@ -150,13 +150,13 @@ ifneq ($(strip $(WHEELS)),)
 	      file=$$(basename $${requirement%%:*}) ; \
 	      [ "$$(grep -s egg <<< $${wheel})" ] && name=$$(echo $${wheel#*egg=} | cut -f1 -d=) || name=$${wheel%%[<>=]=*} ; \
 	      version=$$(echo $${requirement#*[<>=]=} | cut -f1 -d' ') ; \
-	      echo "WHEEL=\"$${name}-$${version}\" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)" ; \
+	      $(MSG) "WHEEL=\"$${name}-$${version}\" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)" ; \
 	      WHEEL="$${name}-$${version}" $(MAKE) crossenv-$(ARCH)-$(TCVERSION) ; \
 	      for crossenv in $(WORK_DIR)/crossenv-$${name}-$${version} $(WORK_DIR)/crossenv-$${name} $(WORK_DIR)/crossenv ; do \
 	         [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
 	      done ; \
 	      crossenvPIP=$(PIP) ; \
-	      echo "CROSSENV: $${CROSSENV}" ; \
+	      $(MSG) "activate crossenv found: $${CROSSENV}" ; \
 	      if [ -s "$${CROSSENV}" ] ; then \
 	         crossenvPIP=$$(. $${CROSSENV} && which pip) ; \
 	         $(MSG) "Python crossenv found: [$${CROSSENV}]" ; \

@@ -1,14 +1,55 @@
+### crossenv rules
+#   Creates a crossenv for cross-compiling wheels.
+#   Uses "default" as fallback and create a symlink
+#   between $(WORK_DIR)/crossenv -> crossenv-default.
+#   Otherwise uses wheel <name>-<version>, then
+#   fallback to wheel <name> only.
+#   It also generates a crossenv specific python-cc.mk
+#   located under $(WORK_DIR)/crossenv-<wheel>/build.
+
+# Targets are executed in the following order:
+#  crossenv_msg_target
+#  pre_crossenv_target   (override with PRE_CROSSENV_TARGET)
+#  build_crossenv_target (override with CROSSENV_TARGET)
+#  post_crossenv_target  (override with POST_CROSSENV_TARGET)
+# Variables:
+#  WHEELS             List of wheels to go through
+
 # Set default sheel to bash
 SHELL = /bin/bash
 
-###
+# Python spk/python* related variables
+PYTHON_PKG_VERS             = $(or $(lastword $(subst -, ,$(wildcard $(PYTHON_WORK_DIR)/Python-*))),$(SPK_VERS))
+PYTHON_PKG_VERS_MAJOR_MINOR = $(or $(word 1,$(subst ., ,$(PYTHON_PKG_VERS))).$(word 2,$(subst ., ,$(PYTHON_PKG_VERS))),$(SPK_VERS_MAJOR_MINOR))
+PYTHON_PKG_NAME             = python$(subst .,,$(PYTHON_PKG_VERS_MAJOR_MINOR))
+PYTHON_PKG_DIR              = Python-$(PYTHON_PKG_VERS)
 
-# where the wheel crossenv definitions are located
+# wheel crossenv definitions
 CROSSENV_CONFIG_PATH = $(abspath $(WORK_DIR)/../../../mk/crossenv)
 CROSSENV_CONFIG_DEFAULT = $(CROSSENV_CONFIG_PATH)/requirements-default.txt
 CROSSENV_PATH = $(abspath $(WORK_DIR)/crossenv-$(CROSSENV_BUILD_WHEEL)/)
 
-# Check for wheel==x.y, then wheel, then default
+###
+
+ifeq ($(strip $(PRE_CROSSENV_TARGET)),)
+PRE_CROSSENV_TARGET = pre_crossenv_target
+else
+$(PRE_CROSSENV_TARGET): crossenv_msg_target
+endif
+ifeq ($(strip $(CROSSENV_TARGET)),)
+CROSSENV_TARGET = build_crossenv_target
+else
+$(CROSSENC_TARGET): $(CROSSENV_WHEEL_TARGET)
+endif
+ifeq ($(strip $(POST_CROSSENV_TARGET)),)
+POST_CROSSENV_TARGET = post_crossenv_target
+else
+$(POST_CROSSENV_TARGET): $(CROSSENV_TARGET)
+endif
+
+###
+
+# Check for wheel==x.y, then fallback to wheel, then default
 ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt),)
 CROSSENV_BUILD_WHEEL = $(WHEEL)
 CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt
@@ -20,12 +61,8 @@ CROSSENV_BUILD_WHEEL = default
 CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_DEFAULT)
 endif
 
-###
-
-.PHONY: crossenv_msg_target
-
-crossenv_msg_target:
-	@$(MSG) "Preparing crossenv for $(NAME)"
+# Completion status file
+CROSSENV_COOKIE = $(WORK_DIR)/.crossenv-$(CROSSENV_BUILD_WHEEL)_done
 
 ###
 
@@ -54,11 +91,22 @@ endif
 
 ###
 
+crossenv_msg_target:
+	@$(MSG) "Preparing crossenv for $(NAME)"
+
+pre_crossenv_target: crossenv_msg_target
+
+post_crossenv_target: $(CROSSENV_TARGET)
+
+###
+
 crossenv-%:
 ifneq ($(filter error-%, $(CROSSENV_BUILD_WHEEL)),)
-	$(MAKE) $(CROSSENV_BUILD_WHEEL)
+	@$(MSG) $(MAKE) $(CROSSENV_BUILD_WHEEL)
+	@$(MAKE) $(CROSSENV_BUILD_WHEEL)
 else
-	$(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) build-crossenv
+	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv
+	@$(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv
 endif
 
 ####
@@ -75,7 +123,7 @@ endif
 
 # Equivalent to STAGING_INSTALL_PREFIX relative to found python install
 ifeq ($(PYTHON_STAGING_INSTALL_PREFIX),)
-PYTHON_STAGING_INSTALL_PREFIX = $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)
+PYTHON_STAGING_INSTALL_PREFIX = $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX))
 endif
 
 # set OPENSSL_*_PREFIX if unset
@@ -87,10 +135,6 @@ endif
 ##
 ## python-cc.mk
 ##
-PYTHON_PKG_VERS = $(lastword $(subst -, ,$(wildcard $(PYTHON_WORK_DIR)/Python-*)))
-PYTHON_PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PYTHON_PKG_VERS))).$(word 2,$(subst ., ,$(PYTHON_PKG_VERS)))
-PYTHON_PKG_NAME = python$(subst .,,$(PYTHON_PKG_VERS_MAJOR_MINOR))
-PYTHON_PKG_DIR = Python-$(PYTHON_PKG_VERS)
 HOST_ARCH = $(shell uname -m)
 BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
 PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/python3)
@@ -130,13 +174,8 @@ export LD_LIBRARY_PATH := $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAM
 #    >>> import sys
 #    >>> sys.path
 #
-.PHONY: crossenv
-ifneq ($(wildcard $(CROSSENV_PATH)),)
-build-crossenv:
-	@$(MSG) Reusing existing crossenv $(CROSSENV_PATH)
-else
-build-crossenv: SHELL:=/bin/bash
-build-crossenv: $(CROSSENV_PATH)/build/python-cc.mk
+build_crossenv_target: SHELL:=/bin/bash
+build_crossenv_target: $(CROSSENV_PATH)/build/python-cc.mk
 	@$(MSG) crossenv wheel packages: $(CROSSENV_DEFAULT_PIP), $(CROSSENV_DEFAULT_SETUPTOOLS), $(CROSSENV_DEFAULT_WHEEL)
 	@$(MSG) crossenv requirements file = $(CROSSENV_BUILD_REQUIREMENTS)
 	mkdir -p $(PYTHON_LIB_CROSS)
@@ -187,10 +226,10 @@ endif
 	   $(MSG) "Package list for $(CROSSENV_PATH):" ; \
 	   $(MSG) $$(which cross-pip) list ; \
 	   $(RUN) $$(which cross-pip) list
-endif
 
 $(CROSSENV_PATH)/build/python-cc.mk:
-	mkdir -p $(CROSSENV_PATH)/build
+	@$(MSG) "crossenv environment definition: $@"
+	@mkdir -p $(CROSSENV_PATH)/build
 	@echo CROSSENV_PATH=$(CROSSENV_PATH) > $@
 	@echo CROSSENV=$(CROSSENV_PATH)/bin/activate >> $@
 	@echo HOSTPYTHON=$(HOSTPYTHON) >> $@
@@ -213,3 +252,13 @@ $(CROSSENV_PATH)/build/python-cc.mk:
 	@echo CROSSENV_DEFAULT_PIP=$(CROSSENV_DEFAULT_PIP_VERSION) >> $@
 	@echo CROSSENV_DEFAULT_SETUPTOOLS=$(CROSSENV_DEFAULT_SETUPTOOLS_VERSION) >> $@
 	@echo CROSSENV_DEFAULT_WHEEL=$(CROSSENV_DEFAULT_WHEEL_VERSION) >> $@
+
+ifeq ($(wildcard $(CROSSENV_COOKIE)),)
+crossenv: $(CROSSENV_COOKIE)
+
+$(CROSSENV_COOKIE): $(POST_CROSSENV_TARGET)
+	$(create_target_dir)
+	@touch -f $@
+else
+crossenv: ;
+endif
