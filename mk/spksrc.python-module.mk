@@ -21,13 +21,14 @@ CROSSENV_MODULE_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$
 
 ### Prepare crossenv
 build_crossenv_module:
-	WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
+	@$(MSG) WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
+	@WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
 
 ### Python module rules
 compile_python_module: build_crossenv_module
 	$(foreach e,$(shell cat $(CROSSENV_MODULE_PATH)/build/python-cc.mk),$(eval $(e)))
 	$(eval PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/)
-	@$(MSG) "CROSSENV: $(CROSSENV)"
+	@$(MSG) "activate crossenv found: $(CROSSENV)"
 	@. $(CROSSENV) ; \
 	$(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py build_ext \
 	       -I $(STAGING_INSTALL_PREFIX)/include \
