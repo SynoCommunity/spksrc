@@ -9,6 +9,7 @@ Cython==3.0.11
 flit==3.10.1
 maturin==1.7.4
 #meson-python==0.17.1
+msgpack==1.0.5
 poetry==1.8.4
 scikit-build==0.18.1
 #scikit-build-core==0.10.7
