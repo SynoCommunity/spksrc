@@ -559,9 +559,9 @@ wheelcleanall: wheelcleancache
 
 crossenvclean: wheelclean
 	rm -fr work-*/crossenv*
+	rm -fr work-*/.crossenv-*_done
 
-crossenvcleanall: wheelcleanall
-	rm -fr work-*/crossenv*
+crossenvcleanall: wheelcleanall crossenvclean
 
 pythonclean: wheelcleanall
 	rm -fr work-*/.[Pp]ython*-install_done \
