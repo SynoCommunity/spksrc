@@ -11,8 +11,10 @@ include ../../mk/spksrc.archs.mk
 
 ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
 
-# Export the python package variable so it is usable in cross/*
+# Export variables so to be usable in crossenv and cross/*
 export PYTHON_PACKAGE
+export PYTHON_PACKAGE_WORK_DIR
+export SPK_NAME
 
 # Set Python installtion prefix directory variables
 ifeq ($(strip $(PYTHON_STAGING_INSTALL_PREFIX)),)
