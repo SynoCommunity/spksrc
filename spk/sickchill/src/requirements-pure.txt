@@ -5,7 +5,7 @@ babelfish==0.6.1
 beautifulsoup4==4.12.3
 beekeeper-alt==2022.9.3
 bencode.py==4.0.0
-CacheControl==0.14.1
+cachecontrol==0.14.1
 # certifi               ==> python 3.11
 # cffi                  ==> crossenv
 chardet==5.2.0
@@ -73,3 +73,12 @@ validators==0.22.0
 # virtualenv            ==> python 3.11
 win-inet-pton==1.1.0
 xmltodict==0.14.2
+
+
+# requirements for optional "speedups" feature
+html5lib==1.1
+Js2Py==0.74
+pyjsparser==2.7.1
+pymediainfo==6.1.0
+tzlocal==5.2
+webencodings==0.5.1
