@@ -50,6 +50,11 @@ CONFIGURE_ARGS += --with-lto
 #CONFIGURE_ARGS += --enable-optimizations
 endif
 
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+# for qoriq
+ADDITIONAL_LDFLAGS = -latomic
+endif
+
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptc=no
