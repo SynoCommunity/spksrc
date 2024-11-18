@@ -20,7 +20,7 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 # Fetch python variables
--include $(WORK_DIR)/python-cc.mk
+-include $(WORK_DIR)/crossenv/build/python-cc.mk
 
 # If using spk.python.mk with PYTHON_STAGING_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
@@ -39,13 +39,9 @@ include ../../mk/spksrc.wheel-env.mk
 
 ### Python wheel rules
 build_python_wheel_target:
-ifeq ($(strip $(CROSSENV)),)
-# Python 2 way
-	@$(RUN) PYTHONPATH=$(PYTHONPATH) $(HOSTPYTHON) -c "import setuptools;__file__='setup.py';exec(compile(open(__file__).read().replace('\r\n', '\n'), __file__, 'exec'))" $(BUILD_ARGS) bdist_wheel $(WHEELS_BUILD_ARGS) -d $(WHEELHOUSE)
-else
-# Python 3 case: using crossenv helper
-	@. $(CROSSENV) && $(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) python3 setup.py $(BUILD_ARGS) bdist_wheel $(WHEELS_BUILD_ARGS) -d $(WHEELHOUSE)
-endif
+	@$(MSG) "activate crossenv found: $(CROSSENV)"
+	@. $(CROSSENV) ; \
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) python3 setup.py $(BUILD_ARGS) bdist_wheel $(WHEELS_BUILD_ARGS) -d $(WHEELHOUSE)
 	@$(RUN) echo "$(PKG_NAME)==$(PKG_VERS)" >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)
 
 post_install_python_wheel_target: $(WHEEL_TARGET) install_python_wheel
