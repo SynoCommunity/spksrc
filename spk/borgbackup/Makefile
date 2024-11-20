@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.4.0
-SPK_REV = 16
+SPK_REV = 15
 SPK_ICON = src/borgbackup.png
 
 PYTHON_PACKAGE = python311
