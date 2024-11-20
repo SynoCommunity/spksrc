@@ -1,5 +1,5 @@
 PKG_NAME = diesel
-PKG_VERS = 2.2.4
+PKG_VERS = 2.1.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/diesel-rs/diesel/archive
@@ -18,7 +18,7 @@ LICENSE  = MIT
 # build the cli tool for mysql
 RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/diesel_cli
 CARGO_BUILD_ARGS += --no-default-features
-CARGO_BUILD_ARGS += --features=mysql,mysqlclient-sys/buildtime_bindgen
+CARGO_BUILD_ARGS += --features=mysql
 
 # we support MariaDB 10 only
 # we must define the mysql db socket, since the rust binaries (mysqlclient-sys)
