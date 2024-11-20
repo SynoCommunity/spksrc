@@ -39,11 +39,17 @@ include ../../mk/spksrc.wheel-env.mk
 
 ### Python wheel rules
 build_python_wheel_target:
-	@$(MSG) "activate crossenv found: $(CROSSENV)"
-	@. $(CROSSENV) ; \
-	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) python3 setup.py $(BUILD_ARGS) bdist_wheel $(WHEELS_BUILD_ARGS) -d $(WHEELHOUSE)
+	@$(MSG) "PYTHON WHEEL: activate crossenv found: $(CROSSENV)"
+	@$(MSG) "CROSSENV_PATH = $(CROSSENV_PATH)"
+	@. $(CROSSENV_PATH)/bin/activate ; \
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) python3 -m build $(BUILD_ARGS) --wheel $(WHEELS_BUILD_ARGS) --outdir $(WHEELHOUSE)
 	@$(RUN) echo "$(PKG_NAME)==$(PKG_VERS)" >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)
 
 post_install_python_wheel_target: $(WHEEL_TARGET) install_python_wheel
 
 all: install
+
+###
+
+# Use crossenv
+include ../../mk/spksrc.crossenv.mk

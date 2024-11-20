@@ -156,7 +156,7 @@ ifneq ($(strip $(WHEELS)),)
 	         [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
 	      done ; \
 	      crossenvPIP=$(PIP) ; \
-	      $(MSG) "activate crossenv found: $${CROSSENV}" ; \
+	      $(MSG) "WHEEL: activate crossenv found: $${CROSSENV}" ; \
 	      if [ -s "$${CROSSENV}" ] ; then \
 	         crossenvPIP=$$(. $${CROSSENV} && which pip) ; \
 	         $(MSG) "Python crossenv found: [$${CROSSENV}]" ; \
