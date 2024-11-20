@@ -37,4 +37,3 @@ include ../../mk/spksrc.spk.mk
 ombi_patch_target:
 	@$(MSG) "Set library runpath in ombi executables."
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/shared/Ombi
-	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/shared/Ombi.Updater
