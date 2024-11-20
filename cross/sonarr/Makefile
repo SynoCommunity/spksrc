@@ -1,5 +1,5 @@
 PKG_NAME = Sonarr
-PKG_VERS = 4.0.0.748
+PKG_VERS = 4.0.10.2544
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).main.$(PKG_VERS).linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://download.sonarr.tv/v4/main/$(PKG_VERS)
