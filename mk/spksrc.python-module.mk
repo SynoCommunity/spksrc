@@ -1,5 +1,5 @@
 ### Python module rules
-#   Invoke make to (cross-) compile a python module. 
+#   Invoke make to (cross-) compile a python extension module. 
 # You can do some customization through python-cc.mk
 
 # Python module targets
@@ -24,11 +24,11 @@ build_crossenv_module:
 	@$(MSG) WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
 	@WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
 
-### Python module rules
+### Python extension module rules
 compile_python_module: build_crossenv_module
 	$(foreach e,$(shell cat $(CROSSENV_MODULE_PATH)/build/python-cc.mk),$(eval $(e)))
 	$(eval PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/)
-	@$(MSG) "activate crossenv found: $(CROSSENV)"
+	@$(MSG) "PYTHON MODULE: activate crossenv found: $(CROSSENV)"
 	@. $(CROSSENV) ; \
 	$(RUN) PYTHONPATH=$(PYTHONPATH) python setup.py build_ext \
 	       -I $(STAGING_INSTALL_PREFIX)/include \
