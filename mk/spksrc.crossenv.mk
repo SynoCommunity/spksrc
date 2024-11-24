@@ -19,7 +19,7 @@
 SHELL = /bin/bash
 
 # Python spk/python* related variables
-PYTHON_PKG_VERS             = $(or $(lastword $(subst -, ,$(wildcard $(PYTHON_WORK_DIR)/Python-*))),$(SPK_VERS))
+PYTHON_PKG_VERS             = $(or $(lastword $(subst -, ,$(dir $(wildcard $(PYTHON_WORK_DIR)/Python-*/hostpython)))),$(SPK_VERS))
 PYTHON_PKG_VERS_MAJOR_MINOR = $(or $(word 1,$(subst ., ,$(PYTHON_PKG_VERS))).$(word 2,$(subst ., ,$(PYTHON_PKG_VERS))),$(SPK_VERS_MAJOR_MINOR))
 PYTHON_PKG_NAME             = python$(subst .,,$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_PKG_DIR              = Python-$(PYTHON_PKG_VERS)
