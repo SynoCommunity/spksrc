@@ -1,0 +1,126 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -3488,6 +3488,8 @@ h264_videotoolbox_encoder_deps="pthreads
+ h264_videotoolbox_encoder_select="atsc_a53 videotoolbox_encoder"
+ hevc_videotoolbox_encoder_deps="pthreads"
+ hevc_videotoolbox_encoder_select="atsc_a53 videotoolbox_encoder"
++mjpeg_videotoolbox_encoder_deps="pthreads"
++mjpeg_videotoolbox_encoder_select="videotoolbox_encoder"
+ prores_videotoolbox_encoder_deps="pthreads"
+ prores_videotoolbox_encoder_select="videotoolbox_encoder"
+ libaom_av1_decoder_deps="libaom"
+Index: FFmpeg/libavcodec/Makefile
+===================================================================
+--- libavcodec/Makefile
++++ libavcodec/Makefile
+@@ -508,6 +508,7 @@ OBJS-$(CONFIG_MJPEG_CUVID_DECODER)     +
+ OBJS-$(CONFIG_MJPEG_QSV_ENCODER)       += qsvenc_jpeg.o
+ OBJS-$(CONFIG_MJPEG_RKMPP_ENCODER)     += rkmppenc.o
+ OBJS-$(CONFIG_MJPEG_VAAPI_ENCODER)     += vaapi_encode_mjpeg.o
++OBJS-$(CONFIG_MJPEG_VIDEOTOOLBOX_ENCODER) += videotoolboxenc.o
+ OBJS-$(CONFIG_MLP_DECODER)             += mlpdec.o mlpdsp.o
+ OBJS-$(CONFIG_MLP_ENCODER)             += mlpenc.o mlp.o
+ OBJS-$(CONFIG_MMVIDEO_DECODER)         += mmvideo.o
+Index: FFmpeg/libavcodec/allcodecs.c
+===================================================================
+--- libavcodec/allcodecs.c
++++ libavcodec/allcodecs.c
+@@ -876,6 +876,7 @@ extern const FFCodec ff_mjpeg_qsv_encode
+ extern const FFCodec ff_mjpeg_qsv_decoder;
+ extern const FFCodec ff_mjpeg_rkmpp_encoder;
+ extern const FFCodec ff_mjpeg_vaapi_encoder;
++extern const FFCodec ff_mjpeg_videotoolbox_encoder;
+ extern const FFCodec ff_mp3_mf_encoder;
+ extern const FFCodec ff_mpeg1_cuvid_decoder;
+ extern const FFCodec ff_mpeg2_cuvid_decoder;
+Index: FFmpeg/libavcodec/videotoolboxenc.c
+===================================================================
+--- libavcodec/videotoolboxenc.c
++++ libavcodec/videotoolboxenc.c
+@@ -545,6 +545,7 @@ static CMVideoCodecType get_cm_codec_typ
+             else
+                 return MKBETAG('a','p','c','n'); // kCMVideoCodecType_AppleProRes422
+         }
++    case AV_CODEC_ID_MJPEG: return kCMVideoCodecType_JPEG;
+     default:               return 0;
+     }
+ }
+@@ -1238,7 +1239,7 @@ static int vtenc_create_encoder(AVCodecC
+                                       kVTCompressionPropertyKey_Quality,
+                                       quality_num);
+         CFRelease(quality_num);
+-    } else if (avctx->codec_id != AV_CODEC_ID_PRORES) {
++    } else if (avctx->codec_id != AV_CODEC_ID_PRORES && avctx->codec_id != AV_CODEC_ID_MJPEG) {
+         bit_rate_num = CFNumberCreate(kCFAllocatorDefault,
+                                       kCFNumberSInt32Type,
+                                       &bit_rate);
+@@ -1352,7 +1353,7 @@ static int vtenc_create_encoder(AVCodecC
+         }
+     }
+ 
+-    if (avctx->gop_size > 0 && avctx->codec_id != AV_CODEC_ID_PRORES) {
++    if (avctx->gop_size > 0 && avctx->codec_id != AV_CODEC_ID_PRORES && avctx->codec_id != AV_CODEC_ID_MJPEG) {
+         CFNumberRef interval = CFNumberCreate(kCFAllocatorDefault,
+                                               kCFNumberIntType,
+                                               &avctx->gop_size);
+@@ -1501,7 +1502,7 @@ static int vtenc_create_encoder(AVCodecC
+         }
+     }
+ 
+-    if (!vtctx->has_b_frames && avctx->codec_id != AV_CODEC_ID_PRORES) {
++    if (!vtctx->has_b_frames && avctx->codec_id != AV_CODEC_ID_PRORES && avctx->codec_id != AV_CODEC_ID_MJPEG) {
+         status = VTSessionSetProperty(vtctx->session,
+                                       kVTCompressionPropertyKey_AllowFrameReordering,
+                                       kCFBooleanFalse);
+@@ -2870,6 +2871,13 @@ static const enum AVPixelFormat prores_p
+     AV_PIX_FMT_NONE
+ };
+ 
++static const enum AVPixelFormat mjpeg_pix_fmts[] = {
++    AV_PIX_FMT_VIDEOTOOLBOX,
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_YUV420P,
++    AV_PIX_FMT_NONE
++};
++
+ #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
+ #define COMMON_OPTIONS \
+     { "allow_sw", "Allow software encoding", OFFSET(allow_sw), AV_OPT_TYPE_BOOL, \
+@@ -3039,4 +3047,35 @@ const FFCodec ff_prores_videotoolbox_enc
+     .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
+     .p.wrapper_name   = "videotoolbox",
+     .hw_configs       = vt_encode_hw_configs,
++};
++
++static const AVOption mjpeg_options[] = {
++    { "allow_sw", "Allow software encoding", OFFSET(allow_sw), AV_OPT_TYPE_BOOL,{ .i64 = 0 }, 0, 1, VE },
++    { NULL },
++};
++
++static const AVClass mjpeg_videotoolbox_class = {
++    .class_name = "mjpeg_videotoolbox",
++    .item_name  = av_default_item_name,
++    .option     = mjpeg_options,
++    .version    = LIBAVUTIL_VERSION_INT,
++};
++
++const FFCodec ff_mjpeg_videotoolbox_encoder = {
++    .p.name           = "mjpeg_videotoolbox",
++    CODEC_LONG_NAME("VideoToolbox MJPEG Encoder"),
++    .p.type           = AVMEDIA_TYPE_VIDEO,
++    .p.id             = AV_CODEC_ID_MJPEG,
++    .p.capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
++                        AV_CODEC_CAP_HARDWARE,
++    .priv_data_size   = sizeof(VTEncContext),
++    .p.pix_fmts       = mjpeg_pix_fmts,
++    .defaults         = vt_defaults,
++    .init             = vtenc_init,
++    FF_CODEC_ENCODE_CB(vtenc_frame),
++    .close            = vtenc_close,
++    .p.priv_class     = &mjpeg_videotoolbox_class,
++    .caps_internal    = FF_CODEC_CAP_INIT_CLEANUP,
++    .p.wrapper_name   = "videotoolbox",
++    .hw_configs       = vt_encode_hw_configs,
+ };

@@ -1,5 +1,5 @@
 SPK_NAME = socat
-SPK_VERS = 1.7.4.4
+SPK_VERS = 1.8.0.1
 SPK_REV = 1
 
 DEPENDS = cross/socat
@@ -13,6 +13,7 @@ STARTABLE = no
 HOMEPAGE = http://www.dest-unreach.org/socat/
 LICENSE = GPLv2
 
-SPK_COMMANDS = bin/socat bin/filan bin/procan
+SPK_COMMANDS = bin/socat bin/socat1 bin/filan bin/procan
+SPK_COMMANDS += bin/socat-broker.sh bin/socat-chain.sh bin/socat-mux.sh
 
 include ../../mk/spksrc.spk.mk

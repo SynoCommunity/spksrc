@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # for backwards compatability
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
-	if [ -z ${SYNOPKG_PKGDEST_VOL} ]; then
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+	if [ -z "${SYNOPKG_PKGDEST_VOL}" ]; then
 		SYNOPKG_PKGDEST_VOL="/volume1"
 	fi
-	if [ -z ${SYNOPKG_PKGNAME} ]; then
+	if [ -z "${SYNOPKG_PKGNAME}" ]; then
 		SYNOPKG_PKGNAME="owncloud"
 	fi
 fi
@@ -33,7 +33,7 @@ getValidPath()
 	VALID_PATH=$(/bin/cat<<EOF
 {
 	var exportPath = arguments[0];
-	const pattern = /^\/volume[0-9]+\//;
+	const pattern = /^\/(volume|volumeUSB)[0-9]+\//;
 	if (exportPath === "") {
 		return true;
 	} else if (pattern.test(exportPath)) {
@@ -53,6 +53,16 @@ PAGE_DATA_BACKUP=$(/bin/cat<<EOF
 	"invalid_next_disabled_v2": true,
 	"items": [{
 		"desc": "{{{OWNCLOUD_BACKUP_SERVER_DESCRIPTION}}}"
+	}, {
+		"type": "password",
+		"desc": "{{{MYSQL_ROOT_PASSWORD_DESCRIPTION}}}",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "{{{MYSQL_ROOT_PASSWORD_LABEL}}}",
+			"validator": {
+				"allowBlank": false
+			}
+		}]
 	}, {
 		"type": "textfield",
 		"desc": "{{{OWNCLOUD_BACKUP_EXPORT_LOCATION_DESCRIPTION}}}",

@@ -1,10 +1,10 @@
 SPK_NAME = sonarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 5
 SPK_ICON = src/sonarr.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
-DEPENDS = cross/sonarr
+DEPENDS = cross/sonarr cross/sqlite
 
 # Arch exclusions for dotnet 6.0
 DOTNET_CORE_ARCHS = 1
@@ -14,7 +14,7 @@ MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION = Sonarr is a PVR for newsgroup and torrent users. It can monitor multiple RSS feeds for new episodes of your favourite shows and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
 DESCRIPTION_FRE = Sonarr est un PVR pour les utilisateurs de groupes de discussion et torrents. Il peut surveiller plusieurs flux RSS pour les nouveaux épisodes de vos séries préférées et saisira, sortes et les renomme. Il peut également être configuré pour mettre à jour automatiquement la qualité des fichiers déjà téléchargés si un meilleur format de qualité devient disponible.
 DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias y torrents. Se puede controlar múltiples canales RSS para nuevos episodios de sus programas favoritos y se agarra, tipo y les cambia el nombre. También puede ser configurado para actualizar automáticamente la calidad de los archivos ya descargados si un formato de mejor calidad disponible.
-CHANGELOG = "1. Update Sonarr to v4.0.0.733."
+CHANGELOG = "1. Update Sonarr to v4.0.10.2544."
 DISPLAY_NAME = Sonarr v4
 HOMEPAGE = https://sonarr.tv
 LICENSE  = GPLv3

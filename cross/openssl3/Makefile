@@ -1,5 +1,5 @@
 PKG_NAME = openssl3
-PKG_VERS = 3.1.4
+PKG_VERS = 3.1.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = openssl-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.openssl.org/source
@@ -40,8 +40,6 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 OPENSSL_PLATFORM = linux-armv4
 CONFIGURE_ARGS += -march=armv5
-# threads need libatomic that is missing in ARMv5 toolchain
-CONFIGURE_ARGS += no-threads
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 OPENSSL_PLATFORM = linux-armv4
@@ -52,10 +50,15 @@ endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 OPENSSL_PLATFORM = linux-ppc
 CONFIGURE_ARGS += no-asm
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# threads need libatomic that is missing in OLD_PPC_ARCHS toolchains
-CONFIGURE_ARGS += no-threads
 endif
+
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+# threads need libatomic that is missing in ARMv5_ARCHS and OLD_PPC_ARCHS toolchains
+#CONFIGURE_ARGS += no-threads
+# BUT the following packages require OpenSSL with threads support (OPENSSL_THREADS)
+# - python311	#error "OPENSSL_THREADS is not defined, Python requires thread-safe OpenSSL"
+# - stunnel		#error OpenSSL library compiled without thread support
+# A first approach is to avoid the need of libatomic (see patches/*/001-avoid-the-use-of-libatomic.patch)
 endif
 
 ifeq ($(strip $(OPENSSL_PLATFORM)),)

@@ -18,6 +18,8 @@ TAR="/bin/tar"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
+# DSM7 only
+INST_SHARES="/var/packages/${SYNOPKG_PKGNAME}/shares"
 
 if [ -z "${SYNOPKG_PKGVAR}" ]; then
     # define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
@@ -51,10 +53,20 @@ initialize_variables ()
         # this is required for installers without resource worker for file share (SRM 1, DSM 5, DSM 6 old packages)
         if [ "$(echo ${SHARE_PATH} | grep ^/)" != "${SHARE_PATH}" ]; then
             SHARE_NAME=${SHARE_PATH}
-            if synoshare --get "${SHARE_NAME}" &> /dev/null; then
-                SHARE_PATH=$(synoshare --get "${SHARE_NAME}" | awk 'NR==4' | cut -d] -f1 | cut -d[ -f2)
-                install_log "Path of existing share [${SHARE_NAME}] is [${SHARE_PATH}]"
+            if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+                if synoshare --get "${SHARE_NAME}" &> /dev/null; then
+                    SHARE_PATH=$(synoshare --get "${SHARE_NAME}" | awk 'NR==4' | cut -d] -f1 | cut -d[ -f2)
+                    install_log "Path of existing share [${SHARE_NAME}] is [${SHARE_PATH}]"
+                fi
             else
+                # synoshare fails on DSM 7 (at least on 7.2.1) with "Permission denied"
+                # but DSM 7 links package specific shares to the package installation folder
+                if [ -d ${INST_SHARES}/${SHARE_NAME} ]; then
+                    SHARE_PATH=$(realpath ${INST_SHARES}/${SHARE_NAME})
+                    install_log "Path of existing share [${SHARE_NAME}] is [${SHARE_PATH}]"
+                fi
+            fi
+            if [ ! -d "${SHARE_PATH}" ]; then
                 install_log "SHARE_NAME is not an existing share [${SHARE_PATH}]."
             fi
         fi
@@ -68,14 +80,15 @@ initialize_variables ()
 
 install_python_virtualenv ()
 {
-    # Output Python version (confirming PATH)
+    # Print out default python version found in PATH
     python3 --version
+
+    # Print out default pip version
+    PIP_VERSION=$(python3 -m pip --version | awk '{print $2}')
+    echo "Default pip version ${PIP_VERSION}"
 
     # Create a Python virtualenv
     python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env
-
-    # Update to latest pip package installer
-    python3 -m pip install --upgrade pip
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         set_unix_permissions ${SYNOPKG_PKGDEST}/env
@@ -95,10 +108,12 @@ install_python_wheels ()
     if [ -s ${requirements} ]; then
        echo "Install packages from wheels [${requirements}]"
        pip install $([ $# -gt 0 ] && echo $*) \
+                   --disable-pip-version-check \
                    --force-reinstall \
                    --cache-dir ${cachedir} \
                    --find-links ${wheelhouse} \
-                   --requirement ${requirements}
+                   --requirement ${requirements} \
+       || echo "ERROR: Python package installation failed" 1>&2
     fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then

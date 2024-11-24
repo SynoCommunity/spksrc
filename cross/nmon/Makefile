@@ -1,5 +1,5 @@
 PKG_NAME = nmon
-PKG_VERS = 16n
+PKG_VERS = 16q
 PKG_EXT = c
 PKG_DIST_NAME = lmon$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/nmon/files

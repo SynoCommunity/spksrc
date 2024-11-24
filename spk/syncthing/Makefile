@@ -1,6 +1,6 @@
 SPK_NAME = syncthing
-SPK_VERS = 1.23.4
-SPK_REV = 29
+SPK_VERS = 1.27.2
+SPK_REV = 30
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
-CHANGELOG = "1. Update syncthing to v1.23.4.<br/>2. Include next gen gui (path: /tech-ui)."
+CHANGELOG = "Update syncthing to v1.27.2."
 HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+INTERNAL_IP=$(ip -4 route get 8.8.8.8 | awk '/8.8.8.8/ && /src/ {print $NF}')
+
 quote_json ()
 {
     sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
@@ -21,7 +23,7 @@ getPasswordValidator()
     validator=$(/bin/cat<<EOF
 {
     var password = arguments[0];
-    return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})") && ! password.includes("root");
+    return -1 !== password.search("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{10,})");
 }
 EOF
 )
@@ -32,12 +34,11 @@ EOF
 check_php_profiles ()
 {
     PHP_CFG_PATH="/usr/syno/etc/packages/WebStation/PHPSettings.json"
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-        if jq -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-tt-rss")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
-            return 0  # true
-        else
-            return 1  # false
-        fi
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] && \
+        jq -e 'to_entries | map(select((.key | startswith("com-synocommunity-packages-")) and .key != "com-synocommunity-packages-tt-rss")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
+        return 0  # true
+    else
+        return 1  # false
     fi
 }
 
@@ -69,9 +70,8 @@ PAGE_TTRSS_SETUP=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_mysql_password_root",
             "desc": "{{ROOT_PASSWORD_DESCRIPTION}}",
-            "invalidText": "{{INVALID_ROOT_PASSWORD}}",
             "validator": {
-                "fn": "$(getPasswordValidator)"
+                "allowBlank": false
             }
         }]
     }, {
@@ -95,6 +95,7 @@ PAGE_TTRSS_SETUP=$(/bin/cat<<EOF
         "subitems": [{
             "key": "wizard_domain_name",
             "desc": "{{DOMAIN_NAME_INPUT_LABEL}}",
+            "defaultValue": "${INTERNAL_IP}",
             "validator": {
                 "allowBlank": false
             }

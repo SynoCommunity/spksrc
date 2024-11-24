@@ -1,6 +1,6 @@
 SPK_NAME = ombi
-SPK_VERS = 4.43.5
-SPK_REV = 3
+SPK_VERS = 4.44.1
+SPK_REV = 4
 SPK_ICON = src/ombi.png
 
 # Arch exclusions for dotnet 6.0
@@ -13,7 +13,7 @@ MAINTAINER = hgy59
 DISPLAY_NAME = Ombi
 HOMEPAGE = https://ombi.io/
 DESCRIPTION = Ombi is a self-hosted web application that automatically gives your shared Plex or Emby users the ability to request content by themselves! Ombi can be linked to multiple TV Show and Movie DVR tools to create a seamless end-to-end experience for your users.
-CHANGELOG = "Update Ombi to v4.43.5."
+CHANGELOG = "Update Ombi to v4.44.1."
 LICENSE  = GPLv2
 
 SERVICE_USER = auto
@@ -37,4 +37,3 @@ include ../../mk/spksrc.spk.mk
 ombi_patch_target:
 	@$(MSG) "Set library runpath in ombi executables."
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/shared/Ombi
-	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/shared/Ombi.Updater

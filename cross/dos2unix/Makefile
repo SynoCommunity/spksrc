@@ -1,5 +1,5 @@
 PKG_NAME = dos2unix
-PKG_VERS = 7.5.1
+PKG_VERS = 7.5.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://waterlan.home.xs4all.nl/dos2unix

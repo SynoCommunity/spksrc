@@ -315,11 +315,23 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/scale.cl
 +#endif
 +}
 +#endif
+Index: jellyfin-ffmpeg/libavfilter/opencl_source.h
+===================================================================
+--- libavfilter/opencl_source.h
++++ libavfilter/opencl_source.h
+@@ -27,6 +27,7 @@ extern const char *ff_opencl_source_desh
+ extern const char *ff_opencl_source_neighbor;
+ extern const char *ff_opencl_source_nlmeans;
+ extern const char *ff_opencl_source_overlay;
++extern const char *ff_opencl_source_scale;
+ extern const char *ff_opencl_source_pad;
+ extern const char *ff_opencl_source_remap;
+ extern const char *ff_opencl_source_tonemap;
 Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
 ===================================================================
 --- /dev/null
 +++ libavfilter/vf_scale_opencl.c
-@@ -0,0 +1,770 @@
+@@ -0,0 +1,776 @@
 +/*
 + * Copyright (c) 2018 Gabriel Machado
 + * Copyright (c) 2021 NyanMisaka
@@ -664,8 +676,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
 +    }
 +
 +    if (ctx->in_desc->comp[0].depth > ctx->out_desc->comp[0].depth) {
-+        av_assert0(sizeof(ff_fruit_dither_matrix) == sizeof(ff_fruit_dither_matrix[0]) * ff_fruit_dither_size * ff_fruit_dither_size);
-+
 +        cl_image_format image_format = {
 +            .image_channel_data_type = CL_UNORM_INT16,
 +            .image_channel_order     = CL_R,
@@ -676,6 +686,8 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
 +            .image_height    = ff_fruit_dither_size,
 +            .image_row_pitch = 0,
 +        };
++
++        av_assert0(sizeof(ff_fruit_dither_matrix) == sizeof(ff_fruit_dither_matrix[0]) * ff_fruit_dither_size * ff_fruit_dither_size);
 +
 +        ctx->dither_image = clCreateImage(ctx->ocf.hwctx->context, CL_MEM_READ_ONLY,
 +                                          &image_format, &image_desc, NULL, &cle);
@@ -796,8 +808,8 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
 +    ff_scale_adjust_dimensions(inlink, &ctx->dst_w, &ctx->dst_h,
 +                               ctx->force_original_aspect_ratio, ctx->force_divisible_by);
 +
-+    if (((int64_t)(ctx->dst_h * inlink->w)) > INT_MAX  ||
-+        ((int64_t)(ctx->dst_w * inlink->h)) > INT_MAX)
++    if (((int64_t)ctx->dst_h * inlink->w) > INT_MAX ||
++        ((int64_t)ctx->dst_w * inlink->h) > INT_MAX)
 +        av_log(ctx, AV_LOG_ERROR, "Rescaled value for width or height is too big.\n");
 +
 +    ctx->src_w = inlink->w;
@@ -894,12 +906,15 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
 +        CL_SET_KERNEL_ARG(ctx->kernel, 3, cl_mem, &input->data[1]);
 +
 +        idx_arg1 = 4;
-+        if (ctx->out_planes > 2)
++        if (ctx->out_planes > 2) {
 +            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg1++, cl_mem, &output->data[2]);
-+        if (ctx->in_planes > 2)
++        }
++        if (ctx->in_planes > 2) {
 +            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg1++, cl_mem, &input->data[2]);
-+        if (ctx->dither_image)
++        }
++        if (ctx->dither_image) {
 +            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg1++, cl_mem, &ctx->dither_image);
++        }
 +
 +        // conv_yuv
 +        global_work[0] = output->width / x_subsample;
@@ -917,14 +932,17 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
 +        CL_SET_KERNEL_ARG(ctx->kernel_uv, 1, cl_mem, &input->data[1]);
 +
 +        idx_arg1 = 2;
-+        if (ctx->out_planes > 2)
++        if (ctx->out_planes > 2) {
 +            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &output->data[2]);
-+        if (ctx->in_planes > 2)
++        }
++        if (ctx->in_planes > 2) {
 +            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &input->data[2]);
++        }
 +
 +        idx_arg2 = 2;
-+        if (ctx->dither_image)
++        if (ctx->dither_image) {
 +            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_mem, &ctx->dither_image);
++        }
 +        if (ctx->algorithm != F_NEIGHBOR) {
 +            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_mem, &ctx->cx);
 +            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_mem, &ctx->cy);
@@ -1090,15 +1108,3 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
 +    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_OPENCL),
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};
-Index: jellyfin-ffmpeg/libavfilter/opencl_source.h
-===================================================================
---- libavfilter/opencl_source.h
-+++ libavfilter/opencl_source.h
-@@ -27,6 +27,7 @@ extern const char *ff_opencl_source_desh
- extern const char *ff_opencl_source_neighbor;
- extern const char *ff_opencl_source_nlmeans;
- extern const char *ff_opencl_source_overlay;
-+extern const char *ff_opencl_source_scale;
- extern const char *ff_opencl_source_pad;
- extern const char *ff_opencl_source_remap;
- extern const char *ff_opencl_source_tonemap;

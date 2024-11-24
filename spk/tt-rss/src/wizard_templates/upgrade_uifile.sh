@@ -5,6 +5,7 @@ function with_migration
   cat <<EOF >"${SYNOPKG_TEMP_LOGFILE}"
 [ {
   "step_title": "{{DB_MIGRATION_TITLE}}",
+  "invalid_next_disabled_v2": true,
   "items": [ {
     "type": "multiselect",
     "subitems": [ {
@@ -18,11 +19,11 @@ function with_migration
         "defaultValue": false,
         "hidden": true
       }, {
-         "key": "mysql_grant_user",
-         "desc": "Initializes user rights",
-         "defaultValue": true,
-         "hidden": true
-       } ]
+        "key": "mysql_grant_user",
+        "desc": "Initializes user rights",
+        "defaultValue": true,
+        "hidden": true
+      } ]
     }, {
       "type": "password",
       "desc": "{{ROOT_PASSWORD_INPUT_DESCRIPTIONS}}",
@@ -40,13 +41,13 @@ function with_migration
           }
         } ]
     }, {
-       "type": "password",
-       "desc": "{{ENTER_TT-RSS_PASSWORD}}",
-       "subitems": [{
-         "key": "wizard_mysql_password_ttrss",
-         "desc": "{{TT-RSS_PASSWORD_DESCRIPTION}}"
-       }]
-     } ]
+      "type": "password",
+      "desc": "{{ENTER_TT-RSS_PASSWORD}}",
+      "subitems": [{
+        "key": "wizard_mysql_password_ttrss",
+        "desc": "{{TT-RSS_PASSWORD_DESCRIPTION}}"
+      }]
+    } ]
   } ]  
 EOF
 }

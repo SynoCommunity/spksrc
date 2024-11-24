@@ -1,5 +1,5 @@
 PKG_NAME = Readarr
-PKG_VERS = 0.1.4.1596
+PKG_VERS = 0.4.1.2648
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).develop.$(PKG_VERS).linux-core-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Readarr/Readarr/releases/download/v$(PKG_VERS)

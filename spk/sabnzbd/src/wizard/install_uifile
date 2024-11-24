@@ -1,48 +1,15 @@
 [
   {
-    "step_title": "Basic configuration",
+    "step_title": "Basic Configuration",
     "items": [
       {
-        "type": "combobox",
-        "desc": "Please select a volume to use for the download folder",
-        "subitems": [
-          {
-            "key": "wizard_volume",
-            "desc": "volume name",
-            "displayField": "display_name",
-            "valueField": "volume_path",
-            "editable": false,
-            "mode": "remote",
-            "api_store": {
-              "api": "SYNO.Core.Storage.Volume",
-              "method": "list",
-              "version": 1,
-              "baseParams": {
-                "limit": -1,
-                "offset": 0,
-                "location": "internal"
-              },
-              "root": "volumes",
-              "idProperty": "volume_path",
-              "fields": [
-                "display_name",
-                "volume_path"
-              ]
-            },
-            "validator": {
-              "fn": "{console.log(arguments);return true;}"
-            }
-          }
-        ]
-      },
-      {
         "type": "textfield",
-        "desc": "Download shared folder (using the volume chosen above)",
+        "desc": "Please specify a download folder for this package. This share is created at installation when it does not already exist.",
         "subitems": [
           {
-            "key": "wizard_download_dir",
-            "desc": "Download location",
-            "defaultValue": "downloads",
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared Folder",
+            "defaultValue": "Downloads",
             "validator": {
               "allowBlank": false,
               "regex": {
@@ -52,12 +19,12 @@
             }
           }
         ]
-      },
-      {
-        "desc": "If the specified share does not exist, it will be created. You can use an existing share by specifying the name of the folder."
-      },
-      {
-        "desc": "Package user and group will not appear on most UI settings.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      }, {
+        "desc": "If you let the installer handle it, the shared folder goes to the package's volume. To use a different volume, create the shared folder in DSM Control Panel before installation and input its name during setup."
+      }, {
+        "desc": ""
+      }, {
+        "desc": "This package utilizes the internal service user <b>'sc-sabnzbd'</b> in DSM. The shared folder mentioned is set up during installation to be accessible specifically by this user. For more detailed information, please consult the <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> guide."
       }
     ]
   }

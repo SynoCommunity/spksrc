@@ -38,14 +38,10 @@ dependency-list:
 
 .PHONY: dependency-flat
 dependency-flat:
-	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|native|diyspk)/.*"
+	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|native|diyspk|toolchain)/.*"
 	@for depend in $$(echo "$(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)" | tr ' ' '\n' | sort -u | tr '\n' ' ') ; \
 	do \
-	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-flat ; \
+	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-flat | sort -u ; \
 	done
 
-
-.PHONY: dependency-kernel-list
-dependency-kernel-list:
-	@echo -n "$(NAME): "
-	@echo "$(KERNEL_MODULE_DEPEND)"
+### 

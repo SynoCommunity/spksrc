@@ -7,7 +7,7 @@ duplicity==1.2.3
 # Using launchpad source as alternate
 #https://launchpad.net/duplicity/0.8-series/0.8.23/+download/duplicity-0.8.23.tar.gz#egg=duplicity==0.8.23
 
-bcrypt==4.0.1
+bcrypt==4.1.1
 cffi==1.15.1
 coverage==7.2.7
 #cryptography               ==> cross/cryptography
@@ -20,6 +20,6 @@ netifaces==0.11.0
 protobuf==4.23.4
 psutil==5.9.5
 PyNaCl==1.5.0
-PyYAML==6.0.1
+PyYAML==6.0.2
 simplejson==3.19.1
 wrapt==1.15.0

@@ -31,21 +31,19 @@ endif
 
 compile_msg:
 	@$(MSG) "Compiling for $(NAME)"
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-ifeq ($(filter cross spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(shell basename $(dir $(abspath $(dir $$PWD)))), NAME: $(NAME) >> $(PSTAT_LOG)
+ifeq ($(filter cross spk,$(shell basename $(dir $(abspath $(CURDIR))))),)
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(shell basename $(CURDIR)), NAME: $(NAME) >> $(PSTAT_LOG)
 else
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
-endif
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
 endif
 
 pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET)
 ifeq ($(filter $(NCPUS),0 1),)
-	@$(RUN) $(PSTAT_TIME) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
 else
-	@$(RUN) $(PSTAT_TIME) $(MAKE) $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS)
 endif
 
 
