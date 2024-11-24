@@ -1,5 +1,5 @@
 SPK_NAME = subversion
-SPK_VERS = 1.14.2
+SPK_VERS = 1.14.4
 SPK_REV = 1
 SPK_ICON = src/subversion.png
 
