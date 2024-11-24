@@ -2,7 +2,7 @@ PKG_NAME = subversion
 PKG_VERS = 1.14.4
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://dlcdn.apache.org/subversion
+PKG_DIST_SITE = https://archive.apache.org/dist/subversion
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/zlib
