@@ -7,6 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libcap cross/libxml2 cross/readline
 
+# cross/libcap
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+
 HOMEPAGE = https://lldpd.github.io
 COMMENT  = lldpd is a 802.1AB implementation (LLDP) to help you locate neighbors of all your equipments.
 LICENSE  = ISC

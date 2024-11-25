@@ -3,6 +3,8 @@ SPK_VERS = 1.0.18
 SPK_REV = 1
 SPK_ICON = src/lldpd.png
 
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+
 DEPENDS = cross/lldpd
 
 MAINTAINER = SynoCommunity
