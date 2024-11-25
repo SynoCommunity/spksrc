@@ -1,10 +1,15 @@
 PKG_NAME = python311
-PKG_VERS = 3.11.1
+PKG_VERS = 3.11.10
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
+
+# Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
+# CPython core team, see https://peps.python.org/pep-0011/ for more information.
+# And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 BUILD_DEPENDS = native/$(PKG_NAME)
 
@@ -24,7 +29,7 @@ CONFIGURE_ARGS  = --enable-shared
 CONFIGURE_ARGS += --without-static-libpython
 CONFIGURE_ARGS += --enable-ipv6
 # installed pip is not on PATH
-CONFIGURE_ARGS += --with-ensurepip=no
+CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
 CONFIGURE_ARGS += --with-build-python
@@ -34,19 +39,14 @@ include ../../mk/spksrc.archs.mk
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
 CONFIGURE_ARGS += --enable-optimizations
-# old compilers fail with unrecognized command line options: -flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+# Some tests (like test_base64) must find libpython shared library at runtime.
+# python: error while loading shared libraries: libpython3.11.so.1.0: cannot open shared object file: No such file or directory
+ENV += LD_LIBRARY_PATH=$(WORK_DIR)/$(PKG_DIR)
 # Enable Link-Time Optimization
 CONFIGURE_ARGS += --with-lto
-endif
 else
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
-endif
-
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-# older gcc does not know -Wno-unused-result
-CONFIGURE_ARGS += ac_cv_disable_unused_result_warning=no
 endif
 
 CONFIGURE_ARGS += ac_cv_buggy_getaddrinfo=no
@@ -54,7 +54,7 @@ CONFIGURE_ARGS += ac_cv_file__dev_ptmx=no
 CONFIGURE_ARGS += ac_cv_file__dev_ptc=no
 CONFIGURE_ARGS += ac_cv_have_long_long_format=yes
 
-DEPENDS += cross/openssl
+DEPENDS += cross/openssl3
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
 DEPENDS += cross/gdbm
@@ -67,10 +67,14 @@ CONFIGURE_ARGS += --with-system-expat
 DEPENDS += cross/libffi
 CONFIGURE_ARGS += --with-system-ffi
 
-# PYO3 variable for cross-compiling
-# cryptography through rustc
+# Mandatory PYO3_* variables for rust cross-compiling
 ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Mandatory of using OPENSSL_*_DIR starting with
+# cryptography version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
@@ -128,19 +132,30 @@ python311_install:
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
-# wheels to install in crossenv
-CROSSENV_WHEELS  = setuptools==63.4.3
-CROSSENV_WHEELS += setuptools-rust==1.5.2
-CROSSENV_WHEELS += setuptools-scm==7.1.0
-CROSSENV_WHEELS += wheel==0.38.4
-CROSSENV_WHEELS += cffi==1.15.1
-CROSSENV_WHEELS += poetry==1.3.1
-CROSSENV_WHEELS += Cython==0.29.32
-CROSSENV_WHEELS += flit==3.8.0
-CROSSENV_WHEELS += cryptography==38.0.4
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-CROSSENV_WHEELS += maturin==0.14.6
-endif
+# default wheels to install in crossenv
+CROSSENV_WHEELS  = cffi==1.17.1
+CROSSENV_WHEELS += cryptography==43.0.1
+#
+# Cython version >= 3.x breaks PyYAML wheel
+# https://github.com/yaml/pyyaml/issues/601
+#
+# It also breaks numpy at crossenv creation time using github-action
+# https://numpy.org/devdocs/reference/distutils_status_migration.html
+# Python 3.12 considerations: scikit-build-core, meson-python
+#CROSSENV_WHEELS += Cython==3.0.2
+CROSSENV_WHEELS += Cython==0.29.37
+CROSSENV_WHEELS += flit==3.9.0
+CROSSENV_WHEELS += maturin==1.7.4
+CROSSENV_WHEELS += poetry==1.8.3
+CROSSENV_WHEELS += scikit-build==0.18.1
+CROSSENV_WHEELS += setuptools-rust==1.10.2
+CROSSENV_WHEELS += setuptools-scm==8.1.0
+# For future use when building numpy >= 1.26
+#CROSSENV_WHEELS += meson-python==1.5.2
+#CROSSENV_WHEELS += scikit-build-core==0.10.7
+# For pydantic_core==2.23.0: (typing-extensions >=4.6.0,!=4.7.0)
+CROSSENV_WHEELS += typing_extensions==4.12.2
+
 
 # Create the crossenv in preparation for
 # cross-compiling all the necessary wheels
@@ -148,10 +163,12 @@ endif
 python311_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
-	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $${CC} --cxx $${CXX} --ar $${AR} --sysroot $${SYSROOT} --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==22.3.1" --no-setuptools --no-wheel --disable-pip-version-check
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==22.3.1" --no-setuptools --no-wheel --disable-pip-version-check
+	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $(TC_PATH)$(TC_PREFIX)gcc --cxx $(TC_PATH)$(TC_PREFIX)c++ --ar $(TC_PATH)$(TC_PREFIX)ar --sysroot $(TC_SYSROOT) --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==24.2" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==68.1.2" "wheel==0.44.0" "pip-tools==7.4.1"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==68.1.2" "wheel==0.44.0" "pip-tools==7.4.1"
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))

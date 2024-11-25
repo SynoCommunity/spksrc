@@ -1,5 +1,5 @@
 PKG_NAME = pixman
-PKG_VERS = 0.40.0
+PKG_VERS = 0.42.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.cairographics.org/releases/

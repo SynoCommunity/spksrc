@@ -33,7 +33,11 @@ CMAKE_FIND_ROOT_PATH_MODE_INCLUDE = ONLY
 CMAKE_INSTALL_RPATH = $(INSTALL_PREFIX)/lib
 CMAKE_INSTALL_RPATH_USE_LINK_PATH = TRUE
 CMAKE_BUILD_WITH_INSTALL_RPATH = TRUE
+
+# Allow building shared libraries to be manually set
+ifeq ($(filter -DBUILD_SHARED_LIBS%,$(CMAKE_ARGS)),)
 BUILD_SHARED_LIBS = ON
+endif
 
 # Configuration for CMake build
 CMAKE_TOOLCHAIN_NAME = $(ARCH)-toolchain.cmake
@@ -65,7 +69,7 @@ endif
 # Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   BUILD_DEPENDS += native/cmake
-  CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin)
+  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
@@ -73,30 +77,44 @@ endif
 # Use native cmake (Debian 10 "Buster")
 ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
   BUILD_DEPENDS += native/cmake-legacy
-  CMAKE_PATH = $(realpath $(WORK_DIR)/../../../native/cmake-legacy/work-native/install/usr/local/bin)
+  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-legacy/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
 
 # Use ninja to build
 ifeq ($(strip $(CMAKE_USE_NINJA)),)
-  CMAKE_USE_NINJA = 0
+  CMAKE_USE_NINJA = 1
 endif
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
   CMAKE_ARGS += -G Ninja
 endif
 
-# Set default ASM build environment
+# Set default X86ASM build environment
 # At toolchain step variables are not yet evaluated
 # resulting in inability to set in toolchain file
+#
+# ARM architecture may expect to be assembled with a C compiler as frontend:
+#    .s is raw assembly passed to as
+#    .S is assembly which expects to be preprocessed by a cpp then fed to assembler
+# Setting the following for ARM may help:
+#    ENV += AS=$(abspath $(CURDIR)/../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
-  DEPENDS += native/nasm
-  NASM_PATH = $(realpath $(WORK_DIR)/../../../native/nasm/work-native/install/usr/local/bin)
-  ENV += PATH=$(NASM_PATH):$$PATH
-  ENV += AS=$(NASM_PATH)/nasm
-  export PATH := $(NASM_PATH):$(PATH)
-  ENABLE_ASSEMBLY = ON
-  CMAKE_ASM_COMPILER = $(NASM_PATH)/nasm
+  # Define x86asm
+  ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+    HOST_NASM = $(shell command -v nasm 2>/dev/null)
+    ENABLE_ASSEMBLY = ON
+    ifneq ($(HOST_NASM),)
+      ENV += AS=$(HOST_NASM)
+      CMAKE_ASM_COMPILER = $(HOST_NASM)
+    else
+      DEPENDS += native/nasm
+      NASM_PATH = $(abspath $(CURDIR)/../../native/nasm/work-native/install/usr/local/bin)
+      ENV += PATH=$(NASM_PATH):$$PATH
+      ENV += AS=$(NASM_PATH)/nasm
+      CMAKE_ASM_COMPILER = $(NASM_PATH)/nasm
+    endif
+  endif
 else
   CMAKE_USE_NASM = 0
 endif
@@ -111,9 +129,13 @@ ifeq ($(strip $(CMAKE_DESTDIR)),)
   CMAKE_DESTDIR = $(INSTALL_DIR)
 endif
 
+ifeq ($(strip $(CMAKE_BASE_DIR)),)
+  CMAKE_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)
+endif
+
 # set default build directory
 ifeq ($(strip $(CMAKE_BUILD_DIR)),)
-  CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)/build
+  CMAKE_BUILD_DIR = $(CMAKE_BASE_DIR)/build
 endif
 
 # Define per arch specific common options

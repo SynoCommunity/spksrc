@@ -1,9 +1,17 @@
-# Pending final 1.2 release:
-#   Ref: https://github.com/borgbackup/borg/issues/6105
-#   Ref: https://github.com/borgbackup/borg/commit/e41d8e82863bac17d0b64e2091a2fe14f0ffb776
-# git+https://github.com/borgbackup/borg@e41d8e82863bac17d0b64e2091a2fe14f0ffb776#egg=borgbackup==1.2.0
-borgbackup==1.2.1
+# requirements that need crossenv to build wheel for
 
-pyrsistent==0.18.1
-ruamel.yaml.clib==0.2.6
-llfuse==1.4.1
+borgbackup==1.4.0
+
+charset-normalizer==3.4.0
+llfuse==1.5.0
+msgpack==1.1.0              # used compiled verrsion for performance
+pyrsistent==0.19.3
+ruamel.yaml.clib==0.2.12
+
+# [rpds-py]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Requires path to maturin from crossenv
+#  ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+rpds-py==0.20.1

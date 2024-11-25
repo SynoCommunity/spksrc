@@ -1,19 +1,15 @@
-PKG_NAME = libsigc++
-PKG_SHORT_VERS = 2.10
-PKG_VERS = $(PKG_SHORT_VERS).6
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.gnome.org/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = libsigc++-main
 
-# support for C++11 language features is required
-# Last supported version 2.4.1
-UNSUPPORTED_ARCHS = 88f6281
+# support for c++11 language features is required for libsigc++-2.12
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-DEPENDS =
+OPTIONAL_DEPENDS  = cross/libsigc++-latest
+OPTIONAL_DEPENDS += cross/libsigc++-2.12
 
-HOMEPAGE = http://libsigc.sourceforge.net/
-COMMENT  = libsigc++ implements a typesafe callback system for standard C++
-LICENSE  = LGPL
+include ../../mk/spksrc.main-depends.mk
 
-include ../../mk/spksrc.cross-meson.mk
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS = cross/libsigc++-latest
+else
+DEPENDS = cross/libsigc++-2.12
+endif

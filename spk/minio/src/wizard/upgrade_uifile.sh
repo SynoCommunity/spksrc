@@ -5,12 +5,13 @@ INST_VARIABLES="${INST_ETC}/installer-variables"
 
 # Reload wizard variables stored by postinst
 if [ -r "${INST_VARIABLES}" ]; then
-    # we cannot source the file to reload the variables, when values have special characters like <, >, ...
-    for _line in $(cat "${INST_VARIABLES}"); do
-        _key="$(echo ${_line} | awk -F'=' '{print $1}')"
-        _value="$(echo ${_line} | awk -F'=' '{print $2}')"
-        declare "${_key}=${_value}"
-    done
+    # we cannot source the file to reload variables, when values have special characters.
+    # This works even with following characers (e.g. for passwords): " ' < \ > :space: = $ | ...
+    while read -r _line; do
+        _key="$(echo ${_line} | cut --fields=1 --delimiter='=')"
+        _value="$(echo ${_line} | cut --fields=2- --delimiter='=')"
+        declare -g "${_key}=${_value}"
+    done < ${INST_VARIABLES}
 fi
 
 cat <<EOF > $SYNOPKG_TEMP_LOGFILE
@@ -82,7 +83,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                {
                   "key": "wizard_root_user",
                   "desc": "MinIO root user",
-                  "defaultValue": "${WIZARD_ROOT_USER}",
+                  "defaultValue": "${MINIO_ROOT_USER}",
                   "validator": {
                      "allowBlank": false,
                      "minLength": 3,
@@ -100,7 +101,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
                {
                   "key": "wizard_root_password",
                   "desc": "MinIO root password",
-                  "defaultValue": "${WIZARD_ROOT_PASSWORD}",
+                  "defaultValue": "${MINIO_ROOT_PASSWORD}",
                   "validator": {
                      "allowBlank": false,
                      "minLength": 8,

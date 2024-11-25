@@ -1,0 +1,13 @@
+Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
+===================================================================
+--- libavutil/hwcontext_vaapi.c
++++ libavutil/hwcontext_vaapi.c
+@@ -1711,7 +1711,7 @@ static int vaapi_device_create(AVHWDevic
+                 if (priv->drm_fd < 0) {
+                     av_log(ctx, AV_LOG_VERBOSE, "Cannot open "
+                            "DRM render node for device %d.\n", n);
+-                    break;
++                    continue;
+                 }
+ #if CONFIG_LIBDRM
+                 info = drmGetVersion(priv->drm_fd);

@@ -1,26 +1,26 @@
 SPK_NAME = nzbdrone
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 21
+SPK_REV = 22
 SPK_ICON = src/sonarr.png
+
+DEPENDS = cross/curl cross/mediainfo cross/sqlite cross/sonarr3
+SPK_DEPENDS = "mono>=5.8"
 
 # Mono is not supported on ppc platforms. See cross/mono/Makefile for details.
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-DEPENDS = cross/curl cross/mediainfo cross/sqlite cross/sonarr3
-
-SPK_DEPENDS = "mono>=5.8"
-
 MAINTAINER = SynoCommunity
+MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION = Sonarr is a PVR for newsgroup and torrent users. It can monitor multiple RSS feeds for new episodes of your favourite shows and will grab, sorts and rename them. It can also be configured to automatically upgrade the quality of files already downloaded if a better quality format becomes available.
 DESCRIPTION_FRE = Sonarr est un PVR pour les utilisateurs de groupes de discussion et torrents. Il peut surveiller plusieurs flux RSS pour les nouveaux épisodes de vos séries préférées et saisira, sortes et les renomme. Il peut également être configuré pour mettre à jour automatiquement la qualité des fichiers déjà téléchargés si un meilleur format de qualité devient disponible.
 DESCRIPTION_SPN = Sonarr es un PVR para los usuarios de grupos de noticias y torrents. Se puede controlar múltiples canales RSS para nuevos episodios de sus programas favoritos y se agarra, tipo y les cambia el nombre. También puede ser configurado para actualizar automáticamente la calidad de los archivos ya descargados si un formato de mejor calidad disponible.
+CHANGELOG = "1. Update package name to 'Sonarr v3'.<br/>2. Upgrade to Sonarr 3.0.9.1549.<br/>3. Enlarge the service start/stop timeout to 90 seconds.<br/>4. Avoid Sonarr downgrade on package update.<br/>5. Fix usage of TMPDIR and remove obsolete folders."
 DISPLAY_NAME = Sonarr v3
-STARTABLE = yes
-CHANGELOG = "1. Update package name to 'Sonarr v3'.<br>2. Upgrade to Sonarr 3.0.9.1549.<br/>3. Enlarge the service start/stop timeout to 90 seconds.<br>4. Avoid Sonarr downgrade on package update.<br>5. Fix usage of TMPDIR and remove obsolete folders."
-
 HOMEPAGE = https://sonarr.tv
 LICENSE  = GPLv3
+HELPURL = https://wiki.servarr.com/sonarr/troubleshooting
 
+STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8989

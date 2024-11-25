@@ -1,0 +1,71 @@
+{
+    "mariadb10-db": {
+        "admin-account-m10": "root",
+        "admin-pw-m10": "{{wizard_mysql_password_root}}",
+        "create-db": {
+            "db-collision": "skip",
+            "db-name": "roundcube",
+            "flag": "{{wizard_create_db}}"
+        },
+        "drop-db-uninst": true,
+        "drop-user-uninst": true,
+        "grant-user": {
+            "db-name": "roundcube",
+            "flag": "{{mysql_grant_user}}",
+            "host": "localhost",
+            "user-name": "roundcube",
+            "user-pw": "{{wizard_mysql_password_roundcube}}"
+        }
+    },
+    "webservice": {
+        "pkg_dir_prepare": [
+            {
+                "group": "http",
+                "mode": "0755",
+                "source": "/var/packages/roundcube/target/share/roundcube",
+                "target": "roundcube",
+                "user": "sc-roundcube"
+            }
+        ],
+        "portals": [
+            {
+                "alias": "roundcube",
+                "app": "com.synocommunity.packages.roundcube",
+                "name": "Roundcube Webmail",
+                "service": "roundcube",
+                "type": "alias"
+            }
+        ],
+        "services": [
+            {
+                "backend": 2,
+                "display_name": "Roundcube Webmail",
+                "icon": "app/images/roundcube-{0}.png",
+                "php": {
+                    "backend": 8,
+                    "extensions": [
+                        "curl",
+                        "exif",
+                        "gd",
+                        "iconv",
+                        "imagick",
+                        "intl",
+                        "ldap",
+                        "mysqli",
+                        "openssl",
+                        "pdo_mysql",
+                        "sockets",
+                        "zip"
+                    ],
+                    "group": "http",
+                    "profile_desc": "PHP Profile for roundcube",
+                    "profile_name": "roundcube Profile",
+                    "user": "sc-roundcube"
+                },
+                "root": "roundcube",
+                "service": "roundcube",
+                "type": "apache_php"
+            }
+        ]
+    }
+}

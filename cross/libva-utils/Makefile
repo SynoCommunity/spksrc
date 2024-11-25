@@ -1,19 +1,12 @@
-PKG_NAME = libva-utils
-PKG_VERS = 2.16.0
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/intel/libva-utils/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = libva-utils-main
 
-DEPENDS = cross/libva
+OPTIONAL_DEPENDS  = cross/libva-utils-latest
+OPTIONAL_DEPENDS += cross/libva-utils-2.17
 
-HOMEPAGE = https://01.org/linuxmedia
-COMMENT = Libva-utils is a collection of tests for VA-API (Video Acceleration API).
-LICENSE = MIT
+include ../../mk/spksrc.main-depends.mk
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
-ADDITIONAL_CFLAGS = -O
-
-include ../../mk/spksrc.cross-meson.mk
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+DEPENDS = cross/libva-utils-latest
+else
+DEPENDS = cross/libva-utils-2.17
+endif

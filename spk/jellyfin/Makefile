@@ -1,31 +1,37 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
-SPK_VERS = 10.8.5
-SPK_REV = 8
+SPK_VERS = 10.10.3
+SPK_REV = 20
 SPK_ICON = src/jellyfin.png
-WIZARDS_DIR = src/wizard/
-DSM_UI_DIR = app
 
-DEPENDS = cross/libstdc++ cross/jellyfin cross/jellyfin-web
+DEPENDS = cross/jellyfin cross/jellyfin-web
 
-UNSUPPORTED_ARCHS = $(DOTNET_UNSUPPORTED_ARCHS)
+# GLIBC >= 2.28 required
+REQUIRED_MIN_DSM = 7.2
+SPK_DEPENDS = "ffmpeg7"
 
-MAINTAINER = stevenliuit
+# x64 and armv8 archs are supported only.
+UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+
+MAINTAINER = SynoCommunity
 DESCRIPTION = "The Free Software Media System. It is an alternative to the proprietary Emby and Plex."
 DISPLAY_NAME = Jellyfin
-STARTABLE = yes
-CHANGELOG = "1. Update jellyfin to 10.8.5 2.update dotnet 6.0.401"
+CHANGELOG = "1. Update jellyfin to 10.10.3<br/>2. Built with dotnet 8.0.11 and nodejs 20.18.0"
 HOMEPAGE = https://jellyfin.org
 HELPURL = https://jellyfin.org/docs/general/server/settings.html
 SUPPORTURL = https://jellyfin.org/docs/general/getting-help.html
+
 LICENSE = GPLv2
 LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
-SPK_DEPENDS = "ffmpeg>=4.2"
+
+WIZARDS_DIR = src/wizard/
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
+STARTABLE = yes
 
+DSM_UI_DIR = app
 CONF_DIR = src/conf
 
 # Service configuration

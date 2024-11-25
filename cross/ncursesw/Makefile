@@ -1,9 +1,9 @@
 PKG_NAME = ncursesw
 DIST_NAME = ncurses
-PKG_VERS = 6.3
+PKG_VERS = 6.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(DIST_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/pub/gnu/$(DIST_NAME)
+PKG_DIST_SITE = https://ftp.gnu.org/pub/gnu/ncurses
 PKG_DIR = $(DIST_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -19,6 +19,7 @@ CONFIGURE_ARGS += --with-terminfo-dirs=$(INSTALL_PREFIX)/share/terminfo
 CONFIGURE_ARGS += --with-pkg-config-libdir=$(INSTALL_PREFIX)/lib/pkgconfig
 CONFIGURE_ARGS += --without-manpages
 CONFIGURE_ARGS += --without-tests
+CONFIGURE_ARGS += --without-debug
 CONFIGURE_ARGS += --enable-rpath
 CONFIGURE_ARGS += --enable-overwrite
 CONFIGURE_ARGS += --enable-pc-files
@@ -27,6 +28,14 @@ CONFIGURE_ARGS += --disable-home-terminfo
 # Specific for ncursesw
 CONFIGURE_ARGS += --enable-widec
 CONFIGURE_ARGS += --without-normal
+
+# optional create lib tinfow:
+ifeq ($(strip $(NCURSES_WITH_TINFO)),yes)
+# create lib tinfo:
+CONFIGURE_ARGS += --with-termlib
+else
+PLIST_TRANSFORM = sed -e '/libtinfow/d'
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 

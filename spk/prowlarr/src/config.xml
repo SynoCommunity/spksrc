@@ -1,8 +1,7 @@
 <Config>
-  <Branch>develop</Branch>
-  <UpdateMechanism>BuiltIn</UpdateMechanism>
-  <UpdateAutomatically>True</UpdateAutomatically>
+  <Branch>master</Branch>
   <LaunchBrowser>False</LaunchBrowser>
-  <LogLevel>info</LogLevel>
   <Port>9696</Port>
+  <UpdateAutomatically>True</UpdateAutomatically>
+  <UpdateMechanism>BuiltIn</UpdateMechanism>
 </Config>

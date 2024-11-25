@@ -1,22 +1,19 @@
-PKG_NAME = glib
-PKG_VERS = 2.66.8
-PKG_EXT = tar.xz
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.gnome.org/sources/glib/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
+PKG_NAME = glib-main
 
-DEPENDS = cross/libffi cross/pcre cross/zlib
+OPTIONAL_DEPENDS  = cross/glib-latest
+OPTIONAL_DEPENDS += cross/glib-2.66
+OPTIONAL_DEPENDS += cross/glib-2.58
 
-HOMEPAGE = https://developer.gnome.org/glib/
-COMMENT  = General-purpose utility library.
-LICENSE  = LGPLv2.1+
+include ../../mk/spksrc.main-depends.mk
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
-# https://docs.gtk.org/glib/building.html
-CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false
-CONFIGURE_ARGS += -Dlibmount=disabled
-CONFIGURE_ARGS += -Ddefault_library=shared
-CONFIGURE_ARGS += -Dselinux=disabled
-
-include ../../mk/spksrc.cross-meson.mk
+# If kernel >= 3.10 && gcc >= 7.5
+ifeq ($(call version_ge, $(TC_KERNEL), 3.10)$(call version_ge, $(TC_GCC), 7.5),11)
+DEPENDS = cross/glib-latest
+else
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS = cross/glib-2.66
+else
+# old compilers do not support glib with meson build
+DEPENDS = cross/glib-2.58
+endif
+endif

@@ -6,7 +6,6 @@ rsc:etc/mc/
 rsc:libexec/mc/cons.saver
 rsc:libexec/mc/ext.d/
 rsc:libexec/mc/extfs.d/
-rsc:libexec/mc/fish/
 rsc:libexec/mc/mc.csh
 rsc:libexec/mc/mc.sh
 rsc:libexec/mc/mc-wrapper.csh

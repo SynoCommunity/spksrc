@@ -1,6 +1,7 @@
-# remove lto optimization flags unknown by ARMv5 gcc
+# remove flags unknown by gcc 4.6.4 of ARMv5 toolchain
 # - remove -ffat-lto-objects
-
+# - replace -std=c11 by -std=c99
+#
 --- configure.ac.orig	2022-06-06 11:53:30.000000000 +0000
 +++ configure.ac	2022-06-19 15:36:23.019811638 +0000
 @@ -1872,7 +1872,7 @@ if test "$Py_LTO" = 'true' ; then

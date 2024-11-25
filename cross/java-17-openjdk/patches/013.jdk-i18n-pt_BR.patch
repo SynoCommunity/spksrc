@@ -1,0 +1,13 @@
+Index: b/src/java.desktop/share/classes/sun/awt/resources/awt_pt_BR.properties
+===================================================================
+--- a/src/java.desktop/share/classes/sun/awt/resources/awt_pt_BR.properties
++++ b/src/java.desktop/share/classes/sun/awt/resources/awt_pt_BR.properties
+@@ -38,7 +38,7 @@ AWT.altGraph=Alt Graph
+ # Key names
+ AWT.enter=Enter
+ AWT.backSpace=Backspace
+-AWT.tab=Guia
++AWT.tab=Tab
+ AWT.cancel=Cancelar
+ AWT.clear=Limpar
+ AWT.pause=Pausar

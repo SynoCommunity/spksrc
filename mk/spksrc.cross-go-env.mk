@@ -36,6 +36,9 @@ ifeq ($(GO_ARCH),)
   $(warning Unsupported ARCH $(ARCH))
 endif
 
+# Use -buildvcs=false to disable VCS stamping.
+GO_BUILD_ARGS += -buildvcs=false
+
 ifeq ($(strip $(GO_STATIC_BINARIES)),1)
   GO_BUILD_ARGS += -no-upgrade
 endif
@@ -52,6 +55,9 @@ ENV += CGO_ENABLED=$(CGO_ENABLED)
 ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 ENV += GOARCH=$(GO_ARCH)
 ENV += GOOS=$(GOOS)
+
+# Ensure downloaded mod are u+rw
+ENV += GOFLAGS=-modcacherw
 
 ifneq ($(strip $(GO_BIN_DIR)),)
   GO_BUILD_ARGS := -o $(GO_BIN_DIR) $(GO_BUILD_ARGS)

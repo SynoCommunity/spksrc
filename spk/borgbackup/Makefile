@@ -1,20 +1,25 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.2.1
-SPK_REV = 12
-SPK_ICON = src/$(SPK_NAME).png
+SPK_VERS = 1.4.0
+SPK_REV = 15
+SPK_ICON = src/borgbackup.png
 
-BUILD_DEPENDS = cross/python310
-DEPENDS = cross/attr cross/acl cross/openssl cross/lz4 cross/zstd cross/libb2 cross/fuse
+PYTHON_PACKAGE = python311
+SPK_DEPENDS = "python311>=3.11.5-8"
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-SPK_DEPENDS = "python310"
+DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse cross/xxhash
 
 # Requirements file generation
+# - first create borgbackup wheel defined in src/requirements-crossenv.txt
 # cd src
-# /spksrc/native/python310/work-native/install/usr/local/bin/python3 -m venv borg-env
+# /spksrc/native/python311/work-native/install/usr/local/bin/python3 -m venv borg-env
 # . borg-env/bin/activate
-# pip install  ../work-x64-6.1/install/var/packages/borgbackup/target/share/wheelhouse/borgbackup*.whl borgmatic
+# pip install ../work-x64-6.1/install/var/packages/borgbackup/target/share/wheelhouse/borgbackup*.whl borgmatic emborg llfuse
 # pip freeze > requirements.txt
 # deactivate
+# # evaluate which dependencies are cross wheels:
+# find env/lib/python3.10/site-packages/ -name WHEEL -exec grep -iH pure {} \; | grep false
+# # finally divide requirements into *-crossenv.txt and *-pure.txt
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # Force building pure-python wheels (issue #5204)
@@ -25,19 +30,28 @@ DESCRIPTION = Deduplicating backup program with compression and authenticated en
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Add emborg 1.32.0<br/>2. Update borgmatic to v1.6.3<br/>3. Update borg to 1.2.1<br/>"
+CHANGELOG = "1. Update borgmatic to v1.9.0.<br/>2. Update borg to v1.4.0.<br/>3. Update emborg to v1.40.<br/>4. Add ARMv5 again."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
-LICENSE  = BSD-3-Clause
-#LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
+LICENSE  = 3-Clause BSD
 
 SERVICE_SETUP = src/service-setup.sh
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
-ENV += BORG_OPENSSL_PREFIX="$(STAGING_INSTALL_PREFIX)"
+# Use OpenSSL path as defined by either
+# spksrc.wheel-env.mk or spksrc.python.mk
+ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.common.mk
+
+# [rpds-py]
+# Requires path to maturin from crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+
+include ../../mk/spksrc.python.mk

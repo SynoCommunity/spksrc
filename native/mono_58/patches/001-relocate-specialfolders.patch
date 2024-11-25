@@ -5,7 +5,7 @@
  				return ReadXdgUserDir (config, home, "XDG_VIDEOS_DIR", "Videos");
  			case SpecialFolder.CommonTemplates:
 -				return "/usr/share/templates";
-+				return "/var/packages/mono/target/var/templates";
++				return "/var/packages/mono/var/templates";
  			case SpecialFolder.Fonts:
  				if (Platform == PlatformID.MacOSX)
  					return Path.Combine (home, "Library", "Fonts");
@@ -14,7 +14,7 @@
  			// This is where data common to all users goes
  			case SpecialFolder.CommonApplicationData:
 -				return "/usr/share";
-+				return "/var/packages/mono/target/var";
++				return "/var/packages/mono/var";
  			default:
  				throw new ArgumentException ("Invalid SpecialFolder");
  			}
@@ -26,8 +26,8 @@
              {
 -                case SpecialFolder.CommonApplicationData: return "/usr/share";
 -                case SpecialFolder.CommonTemplates: return "/usr/share/templates";
-+                case SpecialFolder.CommonApplicationData: return "/var/packages/mono/target/var";
-+                case SpecialFolder.CommonTemplates: return "/var/packages/mono/target/var/templates";
++                case SpecialFolder.CommonApplicationData: return "/var/packages/mono/var";
++                case SpecialFolder.CommonTemplates: return "/var/packages/mono/var/templates";
              }
              if (IsMac)
              {

@@ -1,0 +1,86 @@
+{
+    "mariadb10-db": {
+        "admin-account-m10": "root",
+        "admin-account-m5": "root",
+        "admin-pw-m10": "{{wizard_mysql_password_root}}",
+        "admin-pw-m5": "{{wizard_mariadb5_password_root}}",
+        "create-db": {
+            "db-collision": "skip",
+            "db-name": "wallabag",
+            "flag": "{{wizard_create_db}}"
+        },
+        "drop-db-inst": {
+            "db-name": "wallabag",
+            "flag": "{{wizard_run_migration}}",
+            "ver": "m5"
+        },
+        "drop-db-uninst": true,
+        "drop-user-uninst": true,
+        "grant-user": {
+            "db-name": "wallabag",
+            "flag": "{{mysql_grant_user}}",
+            "host": "localhost",
+            "user-name": "wallabag",
+            "user-pw": "{{wizard_mysql_database_password}}"
+        },
+        "migrate-db": {
+            "db-collision": "replace",
+            "flag": "{{wizard_run_migration}}",
+            "m10-db-name": "wallabag",
+            "m5-db-name": "wallabag"
+        }
+    },
+    "webservice": {
+        "pkg_dir_prepare": [
+            {
+                "group": "http",
+                "mode": "0755",
+                "source": "/var/packages/wallabag/target/share/wallabag",
+                "target": "wallabag",
+                "user": "sc-wallabag"
+            }
+        ],
+        "portals": [
+            {
+                "alias": "wallabag",
+                "app": "com.synocommunity.packages.wallabag",
+                "name": "Wallabag",
+                "service": "wallabag",
+                "type": "alias"
+            }
+        ],
+        "services": [
+            {
+                "backend": 2,
+                "display_name": "Wallabag",
+                "icon": "app/images/wallabag-{0}.png",
+                "php": {
+                    "backend": 8,
+                    "extensions": [
+                        "bcmath",
+                        "curl",
+                        "gd",
+                        "gettext",
+                        "iconv",
+                        "imagick",
+                        "intl",
+                        "openssl",
+                        "pdo_mysql",
+                        "zlib"
+                    ],
+                    "group": "http",
+                    "php_settings": {
+                        "error_log": "/var/services/web_packages/wallabag/php_errors.log",
+                        "pdo_mysql.default_socket": "/run/mysqld/mysqld10.sock"
+                    },    
+                    "profile_desc": "PHP Profile for wallabag",
+                    "profile_name": "wallabag Profile",
+                    "user": "sc-wallabag"
+                },
+                "root": "wallabag",
+                "service": "wallabag",
+                "type": "apache_php"
+            }
+        ]
+    }
+}

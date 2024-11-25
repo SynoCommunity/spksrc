@@ -6,4 +6,4 @@ lib:lib/mariadb/plugin/client_ed25519.so
 lib:lib/mariadb/plugin/dialog.so
 lib:lib/mariadb/plugin/mysql_clear_password.so
 lib:lib/mariadb/plugin/remote_io.so
-lib:lib/mariadb/plugin/remote_io.so
+lib:lib/mariadb/plugin/sha256_password.so

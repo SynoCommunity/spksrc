@@ -1,26 +1,26 @@
---- ../libtorrent-0.13.8-old/configure	2020-10-07 00:04:23.116018099 +0000
-+++ configure	2020-10-07 00:05:20.380336668 +0000
-@@ -17271,7 +17271,7 @@ else
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking the byte alignment" >&5
- $as_echo_n "checking the byte alignment... " >&6; }
+--- configure-ORIG	2024-08-30 11:34:24.394575860 +0000
++++ configure	2024-08-30 11:37:24.038698880 +0000
+@@ -18196,7 +18196,7 @@ else $as_nop
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking the byte alignment" >&5
+ printf %s "checking the byte alignment... " >&6; }
  
--  if test "$cross_compiling" = yes; then :
-+  if test "$cross_compiling" = maybe; then :
-   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
- $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
- as_fn_error $? "cannot run test program while cross compiling
-@@ -18234,7 +18234,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+-  if test "$cross_compiling" = yes
++  if test "$cross_compiling" = maybe
+ then :
+   { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+ printf "%s\n" "$as_me: error: in \`$ac_pwd':" >&2;}
+@@ -19209,7 +19209,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
  
  
          tmp_CXXFLAGS=$CXXFLAGS
 -        CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
 +        CXXFLAGS="$CXXFLAGS"
  
- 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if compiler supports __attribute__((visibility(\"default\")))" >&5
- $as_echo_n "checking if compiler supports __attribute__((visibility(\"default\")))... " >&6; }
-@@ -18270,7 +18270,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if compiler supports __attribute__((visibility(\"default\")))" >&5
+ printf %s "checking if compiler supports __attribute__((visibility(\"default\")))... " >&6; }
+@@ -19247,7 +19247,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
  
- $as_echo "#define SUPPORT_ATTRIBUTE_VISIBILITY 1" >>confdefs.h
+ printf "%s\n" "#define SUPPORT_ATTRIBUTE_VISIBILITY 1" >>confdefs.h
  
 -                CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
 +                CXXFLAGS="$CXXFLAGS"

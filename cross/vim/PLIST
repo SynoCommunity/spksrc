@@ -2,9 +2,9 @@ lnk:bin/ex
 lnk:bin/rview
 lnk:bin/rvim
 lnk:bin/view
-lnk:bin/vimdiff
 bin:bin/vim
 lnk:bin/vim@SPECIFIC_VERSION@
-bin:bin/xxd
+lnk:bin/vimdiff
 rsc:bin/vimtutor
+bin:bin/xxd
 rsc:share/vim

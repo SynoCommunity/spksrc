@@ -29,7 +29,7 @@ call_func ()
 
 start_daemon ()
 {
-    declare -i i=0
+    i=0
     if [ -z "${SVC_QUIET}" ]; then
         if [ -z "${SVC_KEEP_LOG}" ]; then
             date > ${LOG_FILE}
@@ -38,9 +38,9 @@ start_daemon ()
         fi
     fi
     call_func "service_prestart"
-    for service in "${SERVICE_COMMAND[@]}"
+    printf "%s" "$SERVICE_COMMAND" | while read -r service || [ -n "$service" ]
     do
-        let i=i+1
+        i=$((i + 1))
         if [ -z "${SVC_QUIET}" ]; then
             echo "Starting ${DNAME} command ${service}" >> ${LOG_FILE}
         fi
