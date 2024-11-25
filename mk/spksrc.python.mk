@@ -77,7 +77,7 @@ python_pre_depend:
 	   if grep -q spksrc.python-wheel.mk $${makefile} ; then \
 	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
 	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
-	      echo "rm -fr work-*/$${pkgname}* work-*/.$${pkgname}-*" ; \
-	      rm -fr work-*/$${pkgname}* work-*/.$${pkgname}-* ; \
+	      echo "rm -fr work-$(ARCH)-$(TCVERSION)/$${pkgname}* work-$(ARCH)-$(TCVERSION)/.$${pkgname}-*" ; \
+	      rm -fr work-$(ARCH)-$(TCVERSION)/$${pkgname}* work-$(ARCH)-$(TCVERSION)/.$${pkgname}-* ; \
 	   fi ; \
 	done
