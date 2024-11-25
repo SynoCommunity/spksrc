@@ -176,6 +176,7 @@ export LD_LIBRARY_PATH := $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAM
 #
 build_crossenv_target: SHELL:=/bin/bash
 build_crossenv_target: $(CROSSENV_PATH)/build/python-cc.mk
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), CROSSENV: $(WHEEL) >> $(PSTAT_LOG)
 	@$(MSG) crossenv wheel packages: $(CROSSENV_DEFAULT_PIP), $(CROSSENV_DEFAULT_SETUPTOOLS), $(CROSSENV_DEFAULT_WHEEL)
 	@$(MSG) CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_BUILD_REQUIREMENTS)
 	@$(MSG) CROSSENV_BUILD_WHEEL = $(CROSSENV_BUILD_WHEEL)
