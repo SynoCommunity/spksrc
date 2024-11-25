@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/c/cryptography
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl3 cross/cffi
+DEPENDS = cross/openssl3 cross/libffi
 
 HOMEPAGE = https://github.com/pyca/cryptography
 COMMENT  = Provide cryptographic recipes and primitives to Python developers
