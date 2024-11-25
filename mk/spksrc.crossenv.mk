@@ -18,8 +18,11 @@
 # Set default sheel to bash
 SHELL = /bin/bash
 
-# Python spk/python* related variables
-PYTHON_PKG_VERS             = $(or $(lastword $(subst -, ,$(dir $(wildcard $(PYTHON_WORK_DIR)/Python-*/hostpython)))),$(SPK_VERS))
+# Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
+PYTHON_WORK_DIR = $(or $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(wildcard $(WORK_DIR)))
+
+# Other Python spk/python* related variables
+PYTHON_PKG_VERS             = $(or $(lastword $(subst -, ,$(notdir $(patsubst %/,%,$(wildcard $(PYTHON_WORK_DIR)/Python-[0-9]*))))),$(SPK_VERS))
 PYTHON_PKG_VERS_MAJOR_MINOR = $(or $(word 1,$(subst ., ,$(PYTHON_PKG_VERS))).$(word 2,$(subst ., ,$(PYTHON_PKG_VERS))),$(SPK_VERS_MAJOR_MINOR))
 PYTHON_PKG_NAME             = python$(subst .,,$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_PKG_DIR              = Python-$(PYTHON_PKG_VERS)
@@ -111,9 +114,6 @@ endif
 
 ####
 
-# Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
-PYTHON_WORK_DIR = $(wildcard $(or $(PYTHON_PACKAGE_WORK_DIR),$(WORK_DIR)))
-
 # Defined using current install prefix by replacing package name using PYTHON_PACKAGE from spksrc.python.mk, else use local install prefix
 ifneq ($(PYTHON_PACKAGE),)
 PYTHON_INSTALL_PREFIX = $(subst $(SPK_NAME),$(PYTHON_PACKAGE),$(INSTALL_PREFIX))
@@ -182,7 +182,7 @@ build_crossenv_target: $(CROSSENV_PATH)/build/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	@$(MSG) PYTHON_PKG_VERS_MAJOR_MINOR: [$(PYTHON_PKG_VERS_MAJOR_MINOR)]
 	@$(MSG) PYTHON_PKG_VERS: [$(PYTHON_PKG_VERS)]
-	@$(MSG) wildcard PYTHON_WORK_DIR: [$(wildcard $(PYTHON_WORK_DIR)/Python-*)]
+	@$(MSG) wildcard PYTHON_WORK_DIR/Python-*: [$(wildcard $(PYTHON_WORK_DIR)/Python-*)]
 	@$(MSG) SPK_VERS: [$(SPK_VERS)]
 	@$(MSG) PYTHON_PKG_NAME: [$(PYTHON_PKG_NAME)]
 	@$(MSG) PYTHON_PKG_DIR: [$(PYTHON_PKG_DIR)]
