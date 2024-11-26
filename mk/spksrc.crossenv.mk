@@ -119,7 +119,8 @@ endif
 
 ####
 
-# Defined using current install prefix by replacing package name using PYTHON_PACKAGE from spksrc.python.mk, else use local install prefix
+# Defined using current install prefix by replacing package name using
+# PYTHON_PACKAGE from spksrc.python.mk, else use local install prefix
 ifneq ($(PYTHON_PACKAGE),)
 PYTHON_INSTALL_PREFIX = $(subst $(SPK_NAME),$(PYTHON_PACKAGE),$(INSTALL_PREFIX))
 else
@@ -152,12 +153,11 @@ PYTHON_SITE_PACKAGES_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG
 PYTHON_LIB_DIR = lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
 PYTHON_INC_DIR = include/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
 
-# Mandatory for rustc wheel building within crossenv
-# --> Using python-cc.mk defined variable for cross-compiling wheels
+# Mandatory for rustc wheel building at crossenv preparation time
+# --> Using python-cc.mk defined variable when cross-compiling wheels at subsequent steps!
 export PYO3_CROSS_LIB_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/lib/
 export PYO3_CROSS_INCLUDE_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/include/
-# Mandatory of using OPENSSL_*_DIR starting with
-# cryptography version >= 40
+# Mandatory of using OPENSSL_*_DIR starting with cryptography version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
 export OPENSSL_LIB_DIR = $(OPENSSL_STAGING_PREFIX)/lib/
 export OPENSSL_INCLUDE_DIR = $(OPENSSL_STAGING_PREFIX)/include/
@@ -182,19 +182,10 @@ export LD_LIBRARY_PATH := $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAM
 build_crossenv_target: SHELL:=/bin/bash
 build_crossenv_target: $(CROSSENV_PATH)/build/python-cc.mk
 	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), CROSSENV: $(WHEEL) >> $(PSTAT_LOG)
+	@$(MSG) Python sources: $(wildcard $(PYTHON_WORK_DIR)/Python-[0-9]*)
 	@$(MSG) crossenv wheel packages: $(CROSSENV_DEFAULT_PIP), $(CROSSENV_DEFAULT_SETUPTOOLS), $(CROSSENV_DEFAULT_WHEEL)
-	@$(MSG) CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_BUILD_REQUIREMENTS)
-	@$(MSG) CROSSENV_BUILD_WHEEL = $(CROSSENV_BUILD_WHEEL)
+	@$(MSG) crossenv requirement definition: $(CROSSENV_BUILD_REQUIREMENTS)
 	mkdir -p $(PYTHON_LIB_CROSS)
-	@$(MSG) PYTHON_PKG_VERS_MAJOR_MINOR: [$(PYTHON_PKG_VERS_MAJOR_MINOR)]
-	@$(MSG) PYTHON_PKG_VERS: [$(PYTHON_PKG_VERS)]
-	@$(MSG) wildcard PYTHON_WORK_DIR/Python-*: [$(wildcard $(PYTHON_WORK_DIR)/Python-*)]
-	@$(MSG) SPK_VERS: [$(SPK_VERS)]
-	@$(MSG) PYTHON_PKG_NAME: [$(PYTHON_PKG_NAME)]
-	@$(MSG) PYTHON_PKG_DIR: [$(PYTHON_PKG_DIR)]
-	@$(MSG) PYTHON_WORK_DIR: [$(PYTHON_WORK_DIR)]
-	@$(MSG) PYTHON_PACKAGE_WORK_DIR: [$(PYTHON_PACKAGE_WORK_DIR)]
-	@$(MSG) WORK_DIR: [$(WORK_DIR)]
 	cp -RL $(HOSTPYTHON_LIB_NATIVE) $(abspath $(PYTHON_LIB_CROSS)/../)
 	@echo $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
@@ -235,9 +226,6 @@ endif
 	   $(RUN) $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
 	   $(MSG) cross-pip Install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
 	   $(RUN) $$(which cross-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS)
-#ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
-#	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
-#endif
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	   $(MSG) "Package list for $(CROSSENV_PATH):" ; \
 	   $(RUN) $$(which cross-pip) list
