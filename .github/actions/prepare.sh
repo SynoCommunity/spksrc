@@ -5,9 +5,10 @@
 # Evaluate packages to build and referenced source files to download.
 #
 # Functions:
-# - Evaluate all packages to build depending on files defined in ${GH_FILES}.
+# - Build all packages defined by ${USER_SPK_TO_BUILD} and ${GH_SPK_PACKAGES}
+# - Evaluate additional packages to build depending on changed folders defined in ${GH_DEPENDENT_PACKAGES}.
 # - synocli-videodriver is moved to head of packages to build first if triggered by its ffmpeg5-7
-# - python310-311 and ffmpeg5-7 are moved to head of remaining packages to build when triggered by its own or a dependent.
+# - python310-313 and ffmpeg5-7 are moved to head of remaining packages to build when triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -18,12 +19,8 @@ echo "::group:: ---- find dependent packages"
 make setup-synocommunity
 DEFAULT_TC=$(grep DEFAULT_TC local.mk | cut -f2 -d= | xargs)
 
-# filter for changes made in the spk directories and take unique package name (without spk folder)
-SPK_TO_BUILD+=" "
-SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "^spk/\K[^\/]*" | sort -u | tr '\n' ' ')
-
-# filter for changes made in the cross and native directories and take unique package name (including cross or native folder)
-DEPENDENT_PACKAGES=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(cross|native)/[^\/]*" | sort -u | tr '\n' ' ')
+# all packages to build from changes or manual definition
+SPK_TO_BUILD="${USER_SPK_TO_BUILD} ${GH_SPK_PACKAGES}"
 
 # get dependency list
 # dependencies in this list include the cross or native folder (i.e. native/python cross/glib)
@@ -37,7 +34,7 @@ do
 done
 
 # search for dependent spk packages
-for package in ${DEPENDENT_PACKAGES}
+for package in ${GH_DEPENDENT_PACKAGES}
 do
     echo "===> Searching for dependent package: ${package}"
     packages=$(echo "${DEPENDENCY_LIST}" | grep " ${package} " | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
@@ -86,8 +83,8 @@ do
     fi
 done
 
-# for python (310, 311) find all packages that depend on them
-for py in python310 python311; do
+# for python (310, 311, 313) find all packages that depend on them
+for py in python310 python311 python313; do
     python_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "PYTHON_PACKAGE = ${py}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
     # If packages contain a package that depends on python (or is python), then ensure

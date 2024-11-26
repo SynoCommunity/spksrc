@@ -84,26 +84,31 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Get changed files for pull request
+      - name: Get changed spk_packages and dependency_folders for pull request
         if: github.event_name == 'pull_request'
-        id: getfile_pr
+        id: getchanges_pr
         run: |
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs
-          echo "files=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
+          echo "spk_packages=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
-      - name: Get changed files for push
+      - name: Get changed spk_packages and dependency_folders of last commit for push
         if: github.event_name == 'push'
-        id: getfile
+        id: getchanges_push
         run: |
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs
-          echo "files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
+          echo "spk_packages=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Evaluate dependencies
         id: dependencies
         run: ./.github/actions/prepare.sh
         env:
-          GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
-          SPK_TO_BUILD: ${{ github.event.inputs.package }}
+          GH_SPK_PACKAGES: ${{ steps.getchanges_push.outputs.spk_packages }} ${{ steps.getchanges_pr.outputs.spk_packages }}
+          GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges_push.outputs.dependency_folders }} ${{ steps.getchanges_pr.outputs.dependency_folders }}
+          USER_SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
       - name: Cache downloaded files
         uses: actions/cache@v4
