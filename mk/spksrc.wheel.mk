@@ -167,7 +167,7 @@ ifneq ($(strip $(WHEELS)),)
 	      else \
 	         $(MSG) "Python $${PYTHON_VERSION} uses pip: $${crossenvPIP}" ; \
 	      fi ; \
-	      $(MSG) "Cross-compiling [$${wheel}] wheel using $${CROSSENV_PATH}" ; \
+	      $(MSG) "Cross-compiling [$${wheel%% *}] wheel using $${CROSSENV_PATH}" ; \
 	      [ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
 	      global_options=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs) ; \
 	      localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
@@ -182,7 +182,7 @@ ifneq ($(strip $(WHEELS)),)
 	         $$([ "$$(echo $${abi3})" ] && echo "$${abi3} ")" \
 	         $${global_options}" ; \
 	      PIP_CROSSENV=$${crossenvPIP} \
-	         REQUIREMENT=$${wheel} \
+	         REQUIREMENT=$$(echo $${wheel%% *}) \
 	         ADDITIONAL_CFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
 	         ADDITIONAL_CPPFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCPPFLAGS[@]}" \
 	         ADDITIONAL_CXXFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCXXFLAGS[@]}" \
