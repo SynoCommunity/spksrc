@@ -20,7 +20,7 @@ make setup-synocommunity
 DEFAULT_TC=$(grep DEFAULT_TC local.mk | cut -f2 -d= | xargs)
 
 # all packages to build from changes or manual definition
-SPK_TO_BUILD="${USER_SPK_TO_BUILD} ${GH_SPK_PACKAGES}"
+SPK_TO_BUILD="${USER_SPK_TO_BUILD} ${GH_SPK_PACKAGES} "
 
 # get dependency list
 # dependencies in this list include the cross or native folder (i.e. native/python cross/glib)
