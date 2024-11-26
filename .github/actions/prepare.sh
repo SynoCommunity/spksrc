@@ -94,7 +94,6 @@ for py in python310 python311 python313; do
         if [ "$(echo ${py} ${python_dependent_packages} | grep -ow ${package})" != "" ]; then
             packages_without_python=$(echo "${packages}" | tr ' ' '\n' | grep -v "${py}" | tr '\n' ' ')
             packages="${py} ${packages_without_python}"
-            break
         fi
     done
 done
