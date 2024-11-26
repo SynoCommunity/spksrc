@@ -34,7 +34,7 @@ do
 done
 
 # search for dependent spk packages
-for package in ${GH_DEPENDENT_PACKAGES}
+for package in ${GH_DEPENDENCY_FOLDERS}
 do
     echo "===> Searching for dependent package: ${package}"
     packages=$(echo "${DEPENDENCY_LIST}" | grep " ${package} " | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
