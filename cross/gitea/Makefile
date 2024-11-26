@@ -1,5 +1,5 @@
 PKG_NAME = gitea
-PKG_VERS = 1.22.3
+PKG_VERS = 1.22.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/go-gitea/gitea/archive
