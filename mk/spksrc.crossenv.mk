@@ -97,7 +97,12 @@ endif
 crossenv_msg_target:
 	@$(MSG) "Preparing crossenv for $(NAME)"
 
+# Create per-arch caching directory:
+# PIP_CACHE_DIR defaults to $(WORK_DIR)/pip
 pre_crossenv_target: crossenv_msg_target
+	@if [ -n "$(PIP_CACHE_OPT)" ] ; then \
+	   mkdir -p $(PIP_CACHE_DIR) ; \
+	fi; \
 
 post_crossenv_target: $(CROSSENV_TARGET)
 
@@ -221,15 +226,15 @@ endif
 	   $(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_DEFAULT_PIP) --no-setuptools --no-wheel --disable-pip-version-check
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	   $(MSG) build-pip Install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
-	   $(RUN) $$(which build-pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
+	   $(RUN) $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
 	   $(MSG) cross-pip Install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL) ; \
-	   $(RUN) $$(which cross-pip) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL)
+	   $(RUN) $$(which cross-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(CROSSENV_DEFAULT_SETUPTOOLS) $(CROSSENV_DEFAULT_WHEEL)
 	@$(MSG) [$(CROSSENV_PATH)] Processing $(CROSSENV_BUILD_REQUIREMENTS)
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	   $(MSG) build-pip install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
-	   $(RUN) $$(which build-pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
+	   $(RUN) $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
 	   $(MSG) cross-pip Install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
-	   $(RUN) $$(which cross-pip) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS)
+	   $(RUN) $$(which cross-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS)
 #ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 #	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 #endif
