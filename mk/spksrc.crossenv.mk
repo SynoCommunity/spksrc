@@ -15,7 +15,7 @@
 # Variables:
 #  WHEELS             List of wheels to go through
 
-# Set default sheel to bash
+# Set default shell to bash
 SHELL = /bin/bash
 
 # Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
