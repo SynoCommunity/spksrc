@@ -36,8 +36,23 @@ CMAKE_ARGS += -DWITH_UNIT_TESTS=OFF
 CMAKE_ARGS += -DDEFAULT_CHARSET=utf8
 CMAKE_ARGS += -DINSTALL_LIBDIR=lib
 
+# Creates the following two synlinks:
+#   - libmysqlclient.so -> libmariadb.so.3
+#   - libmysqlclient_r.so -> libmariadb.so.3
+# Which in turns conflict with mysql-connector-c
+#CMAKE_ARGS += -DWITH_MYSQLCOMPAT=ON
+
+# Does not handle pkgconfig well and fails to
+# find openssl3 include and libraries using
+# spksrc.python.mk thus using OPENSSL_STAGING_PREFIX
 DEPENDS += cross/openssl3
 CMAKE_ARGS += -DWITH_SSL=ON
+ifneq ($(wildcard $(OPENSSL_STAGING_PREFIX)),)
+CMAKE_ARGS += -DOPENSSL_CRYPTO_LIBRARY:FILEPATH=$(OPENSSL_STAGING_PREFIX)/lib/libcrypto.so
+CMAKE_ARGS += -DOPENSSL_SSL_LIBRARY:FILEPATH=$(OPENSSL_STAGING_PREFIX)/lib/libssl.so
+CMAKE_ARGS += -DOPENSSL_INCLUDE_DIR:PATH=$(OPENSSL_STAGING_PREFIX)/include
+endif
+
 DEPENDS += cross/zlib
 CMAKE_ARGS += -DWITH_EXTERNAL_ZLIB=ON
 DEPENDS += cross/libiconv
