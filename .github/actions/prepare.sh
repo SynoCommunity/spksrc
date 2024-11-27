@@ -62,7 +62,7 @@ for i in {5..7}; do
     for package in ${packages}
     do
         if [ "$(echo ffmpeg${i} ${ffmpeg_dependent_packages} | grep -ow ${package})" != "" ]; then
-            packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg${i}" | tr '\n' ' ')
+            packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "^ffmpeg${i}\$" | tr '\n' ' ')
             packages="ffmpeg${i} ${packages_without_ffmpeg}"
             break
         fi
@@ -77,7 +77,7 @@ videodrv_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile"
 for package in ${packages}
 do
     if [ "$(echo synocli-videodriver ${videodrv_dependent_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_videodrv=$(echo "${packages}" | tr ' ' '\n' | grep -v "synocli-videodriver" | tr '\n' ' ')
+        packages_without_videodrv=$(echo "${packages}" | tr ' ' '\n' | grep -v "^synocli-videodriver\$" | tr '\n' ' ')
         packages="synocli-videodriver ${packages_without_videodrv}"
         break
     fi
@@ -92,7 +92,7 @@ for py in python310 python311 python312 python313; do
     for package in ${packages}
     do
         if [ "$(echo ${py} ${python_dependent_packages} | grep -ow ${package})" != "" ]; then
-            packages_without_python=$(echo "${packages}" | tr ' ' '\n' | grep -v "${py}" | tr '\n' ' ')
+            packages_without_python=$(echo "${packages}" | tr ' ' '\n' | grep -v "^${py}\$" | tr '\n' ' ')
             packages="${py} ${packages_without_python}"
             break
         fi
