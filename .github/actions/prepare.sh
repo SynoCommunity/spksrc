@@ -39,15 +39,15 @@ do
     echo "===> Searching for dependent package: ${package}"
     packages=$(echo "${DEPENDENCY_LIST}" | grep " ${package} " | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
     echo "===> Found: ${packages}"
-    SPK_TO_BUILD+=${packages}
+    SPK_TO_BUILD+=" ${packages}"
 done
 
 # fix for packages with different names
-if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "nzbdrone" | tr '\n' ' ')" sonarr3"
+if [ "$(echo ${SPK_TO_BUILD} | grep -o ' nzbdrone ')" != "" ]; then
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "^nzbdrone$" | tr '\n' ' ')" sonarr3"
 fi
-if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "python" | tr '\n' ' ')" python2"
+if [ "$(echo ${SPK_TO_BUILD} | grep -o ' python ')" != "" ]; then
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "^python$" | tr '\n' ' ')" python2"
 fi
 
 # remove duplicate packages
@@ -83,8 +83,8 @@ do
     fi
 done
 
-# for python (310, 311, 313) find all packages that depend on them
-for py in python310 python311 python313; do
+# for python (310, 311, 312, 313) find all packages that depend on them
+for py in python310 python311 python312 python313; do
     python_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "PYTHON_PACKAGE = ${py}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
     # If packages contain a package that depends on python (or is python), then ensure
@@ -94,6 +94,7 @@ for py in python310 python311 python313; do
         if [ "$(echo ${py} ${python_dependent_packages} | grep -ow ${package})" != "" ]; then
             packages_without_python=$(echo "${packages}" | tr ' ' '\n' | grep -v "${py}" | tr '\n' ' ')
             packages="${py} ${packages_without_python}"
+            break
         fi
     done
 done
