@@ -31,11 +31,11 @@ PYTHON = $(WORK_DIR)/install/usr/local/bin/python3
 PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
-PIP_VERSION = "24.2"
-PIP_WHEELS  = setuptools==75.1.0
+PIP_VERSION = "24.3.1"
+PIP_WHEELS  = setuptools==75.4.0
 PIP_WHEELS += setuptools-rust==1.10.2
 PIP_WHEELS += maturin==1.7.4
-PIP_WHEELS += wheel==0.44.0
+PIP_WHEELS += wheel==0.45.0
 PIP_WHEELS += cffi==1.17.1
 PIP_WHEELS += crossenv==1.5.0
 
