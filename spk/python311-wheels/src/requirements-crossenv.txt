@@ -48,7 +48,6 @@ gevent==24.2.1
 
 # [lxml]
 # Depends: libxml2, libxslt
-lxml==4.9.3
 lxml==5.3.0
 
 # [mysqlclient]

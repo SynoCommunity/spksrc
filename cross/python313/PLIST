@@ -4,8 +4,6 @@ lnk:bin/pydoc3
 rsc:bin/pydoc3.13
 lnk:bin/python3
 bin:bin/python3.13
-rsc:bin/python3.13-config
-lnk:bin/python3-config
 rsc:etc/mime.types
 rsc:include/python3.13/pyconfig.h
 lnk:lib/libpython3.13.so
