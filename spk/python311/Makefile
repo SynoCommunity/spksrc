@@ -9,7 +9,7 @@ SPK_ICON = src/python3.png
 # And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/python311
 DEPENDS += cross/pip
 
 MAINTAINER = SynoCommunity
