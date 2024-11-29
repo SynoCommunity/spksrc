@@ -164,6 +164,7 @@ get_github_maintainer_url = "https://github.com/SynoCommunity"
 get_github_maintainer_name = $(MAINTAINER)
 endif
 
+$(WORK_DIR)/INFO: SHELL:=/bin/sh
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
 	@$(MSG) "Creating INFO file for $(SPK_NAME)"
@@ -171,11 +172,11 @@ $(WORK_DIR)/INFO:
 	   if [ "$(ARCH)" = "noarch" ]; then \
 	      echo "ERROR: 'noarch' package without TCVERSION is not supported" ; \
 	      exit 1; \
-           else \
+	   else \
 	      echo "ERROR: Arch '$(ARCH)' is not a supported architecture" ; \
 	      echo " - There is no remaining arch in '$(TC_ARCH)' for unsupported archs '$(UNSUPPORTED_ARCHS)'"; \
 	      exit 1; \
-           fi; \
+	   fi; \
 	fi
 	@echo package=\"$(SPK_NAME)\" > $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
@@ -183,10 +184,10 @@ $(WORK_DIR)/INFO:
 	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
 	@echo "\"" >> $@
 	@echo $(foreach LANGUAGE, $(LANGUAGES), \
-          $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
-            /bin/echo -n "description_$(LANGUAGE)=\\\"" && \
-            /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
-            /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
+	  $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+	    /bin/echo -n "description_$(LANGUAGE)=\\\"" && \
+	    /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
+	    /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
 	@echo maintainer=\"$(call get_github_maintainer_name,$(MAINTAINER))\" >> $@
 ifeq ($(strip $(MAINTAINER_URL)),)
@@ -416,7 +417,7 @@ ifneq ($(strip $(WIZARDS_TEMPLATES_DIR)),)
 	$(eval IS_DSM_7_OR_GREATER = $(if $(filter 1,$(call version_ge, $(TCVERSION), 7.0)),true,false))
 	$(eval IS_DSM_7 = $(IS_DSM_7_OR_GREATER))
 	$(eval IS_DSM_6 = $(if $(filter true,$(IS_DSM_6_OR_GREATER)),$(if $(filter true,$(IS_DSM_7)),false,true),false))
-	@for template in `find $(WIZARDS_TEMPLATES_DIR) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print`; do \
+	@for template in $(shell find $(WIZARDS_TEMPLATES_DIR) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print); do \
 		template_filename="$$(basename $${template})"; \
 		template_name="$${template_filename%.*}"; \
 		if [ "$${template_name}" = "$${template_filename}" ]; then \
@@ -458,12 +459,12 @@ ifneq ($(strip $(WIZARDS_DIR)),)
 		rm "$(DSM_WIZARDS_DIR)/uninstall_uifile"; \
 	fi
 	@if [ -d "$(WIZARDS_DIR)$(TCVERSION)" ]; then \
-	    $(MSG) "Create DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"; \
-		find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
+	   $(MSG) "Create DSM Version specific Wizards: $(WIZARDS_DIR)$(TCVERSION)"; \
+	   find $${SPKSRC_WIZARDS_DIR}$(TCVERSION) -maxdepth 1 -type f -and \( $(WIZARD_FILE_NAMES) \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \; ;\
 	fi
 	@if [ -d "$(DSM_WIZARDS_DIR)" ]; then \
-		find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \; ;\
-		find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \; ;\
+	   find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -not -name "*.sh" -print -exec chmod 0644 {} \; ;\
+	   find $(DSM_WIZARDS_DIR) -maxdepth 1 -type f -name "*.sh" -print -exec chmod 0755 {} \; ;\
 	fi
 endif
 
