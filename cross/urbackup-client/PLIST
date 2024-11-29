@@ -1,0 +1,12 @@
+bin:bin/blockalign
+lnk:bin/urbackupclientbackend
+bin:bin/urbackupclientctl
+rsc:etc/urbackup/mariadbdump.conf
+rsc:etc/urbackup/mariadbxtrabackup.conf
+rsc:etc/urbackup/postgresbase.conf
+rsc:etc/urbackup/postgresqldump.conf
+bin:sbin/urbackupclientbackend
+rsc:share/urbackup/scripts/
+rsc:share/urbackup/updates_h.dat
+rsc:share/urbackup/urbackup_ecdsa409k1.pub
+rsc:var/urbackup/version.txt
