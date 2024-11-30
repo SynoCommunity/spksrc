@@ -132,7 +132,8 @@ jobs:
         id: set-defaults
         run: |
           echo "add_noarch_builds=${{ github.event.inputs.add_noarch_builds || steps.dependencies.outputs.has_noarch_packages }}" >> $GITHUB_OUTPUT
-          echo "add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || steps.dependencies.outputs.has_min_dsm72_packages }}" >> $GITHUB_OUTPUT
+          echo "add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || (steps.dependencies.outputs.has_noarch_packages && steps.dependencies.outputs.has_min_dsm72_packages) }}" >> $GITHUB_OUTPUT
+          echo "add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || (steps.dependencies.outputs.has_arch_packages && steps.dependencies.outputs.has_min_dsm72_packages) }}" >> $GITHUB_OUTPUT
           echo "add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || steps.dependencies.outputs.has_arch_packages }}" >> $GITHUB_OUTPUT
           echo "add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || steps.dependencies.outputs.has_arch_packages }}" >> $GITHUB_OUTPUT
           echo "add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}" >> $GITHUB_OUTPUT
