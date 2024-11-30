@@ -23,6 +23,14 @@ on:
         options:
           - 'true'
           - 'false'
+      add_noarch_dsm72_builds:
+        description: 'Include noarch DSM 7.2 packages'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
       add_dsm72_builds:
         description: 'Include DSM 7.2 archs'
         required: false
@@ -85,6 +93,7 @@ jobs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
       noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
       add_noarch_builds: ${{ steps.set-defaults.outputs.add_noarch_builds }}
+      add_noarch_dsm72_builds: ${{ steps.set-defaults.outputs.add_noarch_dsm72_builds }}
       add_dsm72_builds: ${{ steps.set-defaults.outputs.add_dsm72_builds }}
       add_dsm71_builds: ${{ steps.set-defaults.outputs.add_dsm71_builds }}
       add_dsm62_builds: ${{ steps.set-defaults.outputs.add_dsm62_builds }}
@@ -154,6 +163,7 @@ jobs:
         run: |
           # Use the default values passed from the prepare step
           add_noarch_builds=${{ needs.prepare.outputs.add_noarch_builds }}
+          add_noarch_dsm72_builds=${{ needs.prepare.outputs.add_noarch_dsm72_builds }}
           add_dsm72_builds=${{ needs.prepare.outputs.add_dsm72_builds }}
           add_dsm71_builds=${{ needs.prepare.outputs.add_dsm71_builds }}
           add_dsm62_builds=${{ needs.prepare.outputs.add_dsm62_builds }}
@@ -168,6 +178,9 @@ jobs:
             matrix+='{"arch": "noarch-3.1"},'
             matrix+='{"arch": "noarch-6.1"},'
             matrix+='{"arch": "noarch-7.0"},'
+            if [ "$add_noarch_dsm72_builds" == "true" ]; then
+              matrix+='{"arch": "noarch-7.2"},'
+            fi
           fi
           if [ "$add_dsm72_builds" == "true" ]; then
             matrix+='{"arch": "x64-7.2"},'
