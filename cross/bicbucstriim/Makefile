@@ -1,9 +1,9 @@
-PKG_NAME = BicBucStriim
+PKG_NAME = bicbucstriim
 PKG_VERS = 3.5.2
 PKG_EXT = zip
-PKG_DIST_NAME = bicbucstriim-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/mikespub-org/rvolz-$(PKG_NAME)/releases/download/v$(PKG_VERS)
-PKG_DIR = bicbucstriim
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-php82.$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/mikespub-org/rvolz-BicBucStriim/releases/download/v$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 DEPENDS =
@@ -18,5 +18,5 @@ include ../../mk/spksrc.install-resources.mk
 
 .PHONY: bicbucstriim_install
 bicbucstriim_install:
-	mkdir -p $(STAGING_INSTALL_PREFIX)/share/bbs
-	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/bbs
+	@mkdir -p $(STAGING_INSTALL_PREFIX)/share/bbs
+	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/bbs

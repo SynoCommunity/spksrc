@@ -8,7 +8,7 @@ DEPENDS  = cross/cops
 override ARCH=noarch
 
 REQUIRED_MIN_DSM = 7.2
-SPK_DEPENDS=WebStation:PHP8.2:Apache2.4
+SPK_DEPENDS = WebStation:PHP8.2:Apache2.4
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
@@ -30,7 +30,6 @@ DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
 CONF_DIR = src/conf/
 
-SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
 
