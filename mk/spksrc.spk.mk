@@ -60,8 +60,13 @@ ifneq ($(strip $(TCVERSION)),)
 SPK_ARCH = noarch
 SPK_NAME_ARCH = noarch
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
+ifeq ($(call version_ge, $(TCVERSION), 7.2),1)
+SPK_TCVERS = dsm72
+TC_OS_MIN_VER = 7.2-63134
+else
 SPK_TCVERS = dsm7
 TC_OS_MIN_VER = 7.0-40000
+endif
 else ifeq ($(call version_ge, $(TCVERSION), 6.1),1)
 SPK_TCVERS = dsm6
 TC_OS_MIN_VER = 6.1-15047
