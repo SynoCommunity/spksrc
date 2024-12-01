@@ -172,9 +172,11 @@ jobs:
             add_to_matrix "noarch-3.1"
             add_to_matrix "noarch-6.1"
             add_to_matrix "noarch-7.0"
-            if [ "$add_noarch_dsm72_builds" == "true" ]; then
-              add_to_matrix "noarch-7.2"
-            fi
+          fi
+
+          # Add noarch DSM 7.2 builds
+          if [ "$add_noarch_dsm72_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
+            add_to_matrix "noarch-7.2"
           fi
 
           # Add DSM 7.2 builds
