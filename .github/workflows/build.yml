@@ -262,11 +262,11 @@ jobs:
 
   build:
     name: Build
-    needs: [prepare, generate_matrix]
+    needs: [prepare, set-defaults, generate-matrix]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.generate_matrix.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
