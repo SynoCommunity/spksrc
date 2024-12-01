@@ -10,67 +10,43 @@ on:
       publish:
         description: 'Publish to repository'
         required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: false
+        type: boolean
       add_noarch_builds:
         description: 'Include noarch packages'
         required: false
-        default: 'true'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: true
+        type: boolean
       add_noarch_dsm72_builds:
         description: 'Include noarch DSM 7.2 packages'
         required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: false
+        type: boolean
       add_dsm72_builds:
         description: 'Include DSM 7.2 archs'
         required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: true
+        type: boolean
       add_dsm71_builds:
         description: 'Include DSM 7.1 archs'
         required: false
-        default: 'true'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: false
+        type: boolean
       add_dsm62_builds:
         description: 'Include DSM 6.2 archs'
         required: false
-        default: 'true'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: false
+        type: boolean
       add_dsm52_builds:
         description: 'Include DSM 5.2 archs'
         required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: false
+        type: boolean
       add_srm12_builds:
         description: 'Include SRM 1.2 archs'
         required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: false
+        type: boolean
   pull_request:
     paths:
       - 'spk/**'
