@@ -118,7 +118,7 @@ ifneq ($(filter error-%, $(CROSSENV_BUILD_WHEEL)),)
 	@$(MAKE) $(CROSSENV_BUILD_WHEEL)
 else
 	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv
-	@$(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv
 endif
 
 ####
