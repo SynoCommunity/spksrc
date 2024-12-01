@@ -151,7 +151,7 @@ ifneq ($(strip $(WHEELS)),)
 	      [ "$$(grep -s egg <<< $${wheel})" ] && name=$$(echo $${wheel#*egg=} | cut -f1 -d=) || name=$${wheel%%[<>=]=*} ; \
 	      version=$$(echo $${requirement#*[<>=]=} | cut -f1 -d' ') ; \
 	      $(MSG) "WHEEL=\"$${name}-$${version}\" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)" ; \
-	      WHEEL="$${name}-$${version}" $(MAKE) crossenv-$(ARCH)-$(TCVERSION) ; \
+	      MAKEFLAGS= WHEEL="$${name}-$${version}" $(MAKE) crossenv-$(ARCH)-$(TCVERSION) ; \
 	      for crossenv in $(WORK_DIR)/crossenv-$${name}-$${version} $(WORK_DIR)/crossenv-$${name} $(WORK_DIR)/crossenv ; do \
 	         [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
 	      done ; \
