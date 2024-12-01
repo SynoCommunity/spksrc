@@ -162,7 +162,7 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          # Retrieve values from the prepare step, including boolean preprocessing
+          # Retrieve values from the prepare step
           add_noarch_builds=${{ needs.prepare.outputs.add_noarch_builds }}
           add_noarch_dsm72_builds=${{ needs.prepare.outputs.add_noarch_dsm72_builds }}
           add_dsm72_builds=${{ needs.prepare.outputs.add_dsm72_builds }}
@@ -170,56 +170,68 @@ jobs:
           add_dsm62_builds=${{ needs.prepare.outputs.add_dsm62_builds }}
           add_dsm52_builds=${{ needs.prepare.outputs.add_dsm52_builds }}
           add_srm12_builds=${{ needs.prepare.outputs.add_srm12_builds }}
-
-          # Directly evaluate noarch_packages and arch_packages
           has_noarch_packages=$([ -n "${{ needs.prepare.outputs.noarch_packages }}" ] && echo "true" || echo "false")
           has_arch_packages=$([ -n "${{ needs.prepare.outputs.arch_packages }}" ] && echo "true" || echo "false")
-  
-          # Create matrix as a JSON object
-          matrix='{"include": ['
-          
+
+          # Initialize an empty matrix using jq
+          matrix=$(jq -n '{"include": []}')
+
+          # Helper function to add entries to the matrix
+          add_to_matrix() {
+            matrix=$(echo "$matrix" | jq --arg arch "$1" '.include += [{"arch": $arch}]')
+          }
+
+          # Add noarch builds
           if [ "$add_noarch_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
-            matrix+='{"arch": "noarch-1.1"},'
-            matrix+='{"arch": "noarch-3.1"},'
-            matrix+='{"arch": "noarch-6.1"},'
-            matrix+='{"arch": "noarch-7.0"},'
+            add_to_matrix "noarch-1.1"
+            add_to_matrix "noarch-3.1"
+            add_to_matrix "noarch-6.1"
+            add_to_matrix "noarch-7.0"
             if [ "$add_noarch_dsm72_builds" == "true" ]; then
-              matrix+='{"arch": "noarch-7.2"},'
+              add_to_matrix "noarch-7.2"
             fi
           fi
+
+          # Add DSM 7.2 builds
           if [ "$add_dsm72_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
-            matrix+='{"arch": "x64-7.2"},'
-            matrix+='{"arch": "aarch64-7.2"},'
-            matrix+='{"arch": "armv7-7.2"},'
-          fi
-          if [ "$add_dsm71_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
-            matrix+='{"arch": "x64-7.1"},'
-            matrix+='{"arch": "aarch64-7.1"},'
-            matrix+='{"arch": "evansport-7.1"},'
-            matrix+='{"arch": "armv7-7.1"},'
-            matrix+='{"arch": "comcerto2k-7.1"},'
-          fi
-          if [ "$add_dsm62_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
-            matrix+='{"arch": "x64-6.2.4"},'
-            matrix+='{"arch": "aarch64-6.2.4"},'
-            matrix+='{"arch": "evansport-6.2.4"},'
-            matrix+='{"arch": "armv7-6.2.4"},'
-            matrix+='{"arch": "hi3535-6.2.4"},'
-            matrix+='{"arch": "88f6281-6.2.4"},'
-            matrix+='{"arch": "qoriq-6.2.4"},'
-          fi
-          if [ "$add_dsm52_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
-            matrix+='{"arch": "x86-5.2"},'
-            matrix+='{"arch": "88f6281-5.2"},'
-            matrix+='{"arch": "ppc853x-5.2"},'
-          fi
-          if [ "$add_srm12_builds" == "true" ]; then
-            matrix+='{"arch": "armv7-1.2"},'
+            add_to_matrix "x64-7.2"
+            add_to_matrix "aarch64-7.2"
+            add_to_matrix "armv7-7.2"
           fi
 
-          # Remove trailing comma and close the matrix
-          matrix=$(echo $matrix | sed 's/,$//')
-          matrix+=']}'
+          # Add DSM 7.1 builds
+          if [ "$add_dsm71_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x64-7.1"
+            add_to_matrix "aarch64-7.1"
+            add_to_matrix "evansport-7.1"
+            add_to_matrix "armv7-7.1"
+            add_to_matrix "comcerto2k-7.1"
+          fi
+
+          # Add DSM 6.2 builds
+          if [ "$add_dsm62_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x64-6.2.4"
+            add_to_matrix "aarch64-6.2.4"
+            add_to_matrix "evansport-6.2.4"
+            add_to_matrix "armv7-6.2.4"
+            add_to_matrix "hi3535-6.2.4"
+            add_to_matrix "88f6281-6.2.4"
+            add_to_matrix "qoriq-6.2.4"
+          fi
+
+          # Add DSM 5.2 builds
+          if [ "$add_dsm52_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x86-5.2"
+            add_to_matrix "88f6281-5.2"
+            add_to_matrix "ppc853x-5.2"
+          fi
+
+          # Add SRM 1.2 builds
+          if [ "$add_srm12_builds" == "true" ]; then
+            add_to_matrix "armv7-1.2"
+          fi
+
+          # Output the final matrix
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
   build:
