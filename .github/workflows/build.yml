@@ -232,7 +232,7 @@ jobs:
           fi
 
           # Output the final matrix
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo "matrix=$(echo $matrix | jq -c)" >> $GITHUB_OUTPUT
 
   build:
     name: Build
