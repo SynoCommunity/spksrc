@@ -223,7 +223,7 @@ jobs:
 
   build:
     name: Build
-    needs: set-defaults
+    needs: [prepare, set-defaults]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
