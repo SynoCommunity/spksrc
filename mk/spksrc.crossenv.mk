@@ -26,6 +26,10 @@ PYTHON_PKG_VERS             = $(or $(lastword $(subst -, ,$(notdir $(patsubst %/
 PYTHON_PKG_VERS_MAJOR_MINOR = $(or $(word 1,$(subst ., ,$(PYTHON_PKG_VERS))).$(word 2,$(subst ., ,$(PYTHON_PKG_VERS))),$(SPK_VERS_MAJOR_MINOR))
 PYTHON_PKG_NAME             = python$(subst .,,$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_PKG_DIR              = Python-$(PYTHON_PKG_VERS)
+#
+PYTHON_NATIVE               = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/python3)
+PYTHON_LIB_NATIVE           = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
+PYTHON_LIB_CROSS            = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 
 # wheel crossenv definitions
 CROSSENV_CONFIG_PATH = $(abspath $(WORK_DIR)/../../../mk/crossenv)
@@ -138,21 +142,6 @@ OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_INSTALL_PREFIX)
 OPENSSL_PREFIX = $(PYTHON_INSTALL_PREFIX)
 endif
 
-##
-## python-cc.mk
-##
-HOST_ARCH = $(shell uname -m)
-BUILD_ARCH = $(shell expr "$(TC_TARGET)" : '\([^-]*\)' )
-PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/python3)
-PIP_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/pip)
-HOSTPYTHON = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/hostpython)
-HOSTPYTHON_LIB_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/$(PYTHON_PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
-PYTHON_LIB_NATIVE = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
-PYTHON_LIB_CROSS = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
-PYTHON_SITE_PACKAGES_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages)
-PYTHON_LIB_DIR = lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
-PYTHON_INC_DIR = include/python$(PYTHON_PKG_VERS_MAJOR_MINOR)
-
 # Mandatory for rustc wheel building at crossenv preparation time
 # --> Using python-cc.mk defined variable when cross-compiling wheels at subsequent steps!
 export PYO3_CROSS_LIB_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/lib/
@@ -230,25 +219,30 @@ endif
 	   $(MSG) "Package list for $(CROSSENV_PATH):" ; \
 	   $(RUN) $$(which cross-pip) list
 
+##
+## python-cc.mk
+##
 $(CROSSENV_PATH)/build/python-cc.mk:
 	@$(MSG) "crossenv environment definition: $@"
 	@mkdir -p $(CROSSENV_PATH)/build
-	@echo CROSSENV_PATH=$(CROSSENV_PATH) > $@
+	@echo BUILD_ARCH=$(shell expr "$(TC_TARGET)" : '\([^-]*\)' ) > $@
+	@echo HOST_ARCH=$(shell uname -m) >> @@
+	@echo CROSSENV_PATH=$(CROSSENV_PATH) >> $@
 	@echo CROSSENV=$(CROSSENV_PATH)/bin/activate >> $@
-	@echo HOSTPYTHON=$(HOSTPYTHON) >> $@
-	@echo HOSTPYTHON_LIB_NATIVE=$(HOSTPYTHON_LIB_NATIVE) >> $@
+	@echo HOSTPYTHON=$(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/hostpython) >> $@
+	@echo HOSTPYTHON_LIB_NATIVE=$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell uname -m)-$(PYTHON_PKG_VERS_MAJOR_MINOR)) >> $@
 	@echo PYTHON_LIB_NATIVE=$(PYTHON_LIB_NATIVE) >> $@
 	@echo PYTHON_LIB_CROSS=$(PYTHON_LIB_CROSS) >> $@
-	@echo PYTHON_SITE_PACKAGES_NATIVE=$(PYTHON_SITE_PACKAGES_NATIVE) >> $@
+	@echo PYTHON_SITE_PACKAGES_NATIVE=$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages) >> $@
 	@echo PYTHON_INTERPRETER=$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR) >> $@
 	@echo PYTHON_VERSION=$(PYTHON_PKG_VERS_MAJOR_MINOR) >> $@
-	@echo PYTHON_LIB_DIR=$(PYTHON_LIB_DIR) >> $@
-	@echo PYTHON_INC_DIR=$(PYTHON_INC_DIR) >> $@
+	@echo PYTHON_LIB_DIR=lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR) >> $@
+	@echo PYTHON_INC_DIR=include/python$(PYTHON_PKG_VERS_MAJOR_MINOR) >> $@
 	@echo PYO3_CROSS_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
 	@echo PYO3_CROSS_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
 	@echo OPENSSL_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
 	@echo OPENSSL_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
-	@echo PIP=$(PIP_NATIVE) >> $@
+	@echo PIP=$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/pip) >> $@
 	@echo CROSS_COMPILE_WHEELS=1 >> $@
 	@echo ADDITIONAL_WHEEL_BUILD_ARGS=--no-build-isolation >> $@
 	@echo CROSSENV_BUILD_REQUIREMENTS=$(CROSSENV_BUILD_REQUIREMENTS) >> $@
