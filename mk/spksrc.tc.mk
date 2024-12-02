@@ -129,19 +129,37 @@ endif
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY $(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY))" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))"
 
+
+
 .PHONY: meson_vars
 meson_vars:
+	@echo "[host_machine]" ; \
+	echo "system = 'linux'" ; \
+	echo "cpu_family = '$(MESON_HOST_CPU_FAMILY)'" ; \
+	echo "cpu = '$(MESON_HOST_CPU)'" ; \
+	echo "endian = '$(MESON_HOST_ENDIAN)'"
+	@echo
+	@echo "[binaries]" ; \
+	for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "cpp" ]; then \
+	    echo "#$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)cpp'" ; \
+	  else \
+	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	  fi ; \
+	done
+	@echo
+	@echo "[properties]" ; \
+	echo "sys_root = '$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)'"
+	@echo
 	@echo "[built-in]" ; \
 	echo "c_args = ['$(MESON_BUILTIN_C_ARGS)']" ; \
 	echo "c_link_args = ['$(MESON_BUILTIN_C_LINK_ARGS)']" ; \
 	echo "cpp_args = ['$(MESON_BUILTIN_CPP_ARGS)']" ; \
 	echo "cpp_link_args = ['$(MESON_BUILTIN_CPP_LINK_ARGS)']"
 	@echo
-	@echo "[host_machine]" ; \
-	echo "system = 'linux'" ; \
-	echo "cpu_family = '$(MESON_HOST_CPU_FAMILY)'" ; \
-	echo "cpu = '$(MESON_HOST_CPU)'" ; \
-	echo "endian = '$(MESON_HOST_ENDIAN)'"
 
 .PHONY: tc_vars
 tc_vars: flag
