@@ -9,6 +9,8 @@
 #   - Numpy 1.25.x require c++17
 #   - Numpy 1.26.x requires:
 #           c++17, meson-python, scikit-build-core
-#numpy==1.25.2
-#   - Temp. reverted to 1.24.x
 numpy==1.24.4
+numpy==1.25.1
+numpy==1.26.4
+numpy==2.0.2
+numpy==2.1.3
