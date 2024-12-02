@@ -4,10 +4,8 @@ SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$
 SPK_REV = 1
 SPK_ICON = src/python3-pip.png
 
-# Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
-# CPython core team, see https://peps.python.org/pep-0011/ for more information.
-# And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# Compiler must support std=c++11
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 PYTHON_PACKAGE = python312
 
