@@ -20,6 +20,12 @@ include ../../mk/spksrc.wheel-env.mk
 ## python wheel specific configurations
 include ../../mk/spksrc.crossenv.mk
 
+## meson specific configurations
+include ../../mk/spksrc.cross-cmake-env.mk
+
+## meson specific configurations
+include ../../mk/spksrc.cross-meson-env.mk
+
 ##
 
 ifeq ($(strip $(PRE_WHEEL_TARGET)),)
@@ -215,6 +221,7 @@ cross-compile-wheel-%:
 	fi ; \
 	$(MSG) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+	   MESON_CROSS_FILE="$(MESON_TOOLCHAIN_WRK)" \
 	   $(PIP_CROSSENV) \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
@@ -223,6 +230,7 @@ cross-compile-wheel-%:
 	   $(REQUIREMENT) ; \
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+	   MESON_CROSS_FILE="$(MESON_TOOLCHAIN_WRK)" \
 	   $(PIP_CROSSENV) \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
