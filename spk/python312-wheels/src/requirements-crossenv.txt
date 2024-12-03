@@ -15,10 +15,12 @@ bcrypt==4.2.0
 # https://docs.rs/openssl/latest/openssl/#automatic
 #  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==43.0.1
+cryptography==43.0.3
+cryptography==44.0.0
 
 # Requirement for cryptography
-cffi==1.17.0
+cffi==1.15.1
+cffi==1.17.1
 
 # commonly used cross-compiled wheels
 # All tested and can be enabled but may conflict
