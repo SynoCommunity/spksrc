@@ -29,8 +29,8 @@ PYTHON_PKG_DIR              = Python-$(PYTHON_PKG_VERS)
 #
 HOSTPYTHON_LIB_NATIVE       = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell uname -m)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_NATIVE               = $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/python3)
-PYTHON_LIB_NATIVE           = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(HOST_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
-PYTHON_LIB_CROSS            = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(BUILD_ARCH)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
+PYTHON_LIB_NATIVE           = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell uname -m)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
+PYTHON_LIB_CROSS            = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell expr "$(TC_TARGET)" : '\([^-]*\)' )-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 
 # wheel crossenv definitions
 CROSSENV_CONFIG_PATH = $(abspath $(WORK_DIR)/../../../mk/crossenv)
@@ -227,7 +227,7 @@ $(CROSSENV_PATH)/build/python-cc.mk:
 	@$(MSG) "crossenv environment definition: $@"
 	@mkdir -p $(CROSSENV_PATH)/build
 	@echo BUILD_ARCH=$(shell expr "$(TC_TARGET)" : '\([^-]*\)' ) > $@
-	@echo HOST_ARCH=$(shell uname -m) >> @@
+	@echo HOST_ARCH=$(shell uname -m) >> $@
 	@echo CROSSENV_PATH=$(CROSSENV_PATH) >> $@
 	@echo CROSSENV=$(CROSSENV_PATH)/bin/activate >> $@
 	@echo HOSTPYTHON=$(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/hostpython) >> $@
