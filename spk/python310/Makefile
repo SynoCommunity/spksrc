@@ -1,7 +1,7 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.15
+SPK_VERS = 3.10.16
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 21
+SPK_REV = 22
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/python310
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.15<br/>2. Update all mandatory wheels"
+CHANGELOG = "1. Update to Python 3.10.16<br/>2. Update all mandatory wheels"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
