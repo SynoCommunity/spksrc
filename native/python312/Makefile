@@ -23,7 +23,7 @@ CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
 COMPILE_MAKE_OPTIONS += all
 
-POST_INSTALL_TARGET = python311_native_post_install
+POST_INSTALL_TARGET = python312_native_post_install
 
 include ../../mk/spksrc.native-cc.mk
 
@@ -32,15 +32,15 @@ PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
 PIP_VERSION = "24.3.1"
-PIP_WHEELS  = setuptools==75.4.0
+PIP_WHEELS  = setuptools==75.6.0
 PIP_WHEELS += setuptools-rust==1.10.2
-PIP_WHEELS += maturin==1.7.4
-PIP_WHEELS += wheel==0.45.0
+PIP_WHEELS += maturin==1.7.7
+PIP_WHEELS += wheel==0.45.1
 PIP_WHEELS += cffi==1.17.1
 PIP_WHEELS += crossenv==1.5.0
 
-.PHONY: python311_native_post_install
-python311_native_post_install: $(WORK_DIR)/python-native.mk
+.PHONY: python312_native_post_install
+python312_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(MSG) Installing pip
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
 	@$(RUN) $(PYTHON) get-pip.py "pip==$(PIP_VERSION)" --no-setuptools --no-wheel --disable-pip-version-check
