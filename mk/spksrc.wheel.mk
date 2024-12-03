@@ -142,6 +142,9 @@ ifneq ($(strip $(WHEELS)),)
 	      $(MSG) "ERROR: File $$wheel does not exist" ; \
 	   fi ; \
 	done
+	@for file in $$(ls -1 $(WHEELHOUSE)/requirements-*.txt) ; do \
+	   sort -u -o $${file}{,} ; \
+	done
 endif
 
 # Build cross compiled wheels first, to fail fast.
