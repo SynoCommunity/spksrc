@@ -42,14 +42,11 @@ export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
 export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
 
-# set PYTHONPATH for spksrc.python-module.mk
-#PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages/
+# Re-use all default python mandatory libraries (with exception of xz, zlib)
+PYTHON_LIBS := $(filter-out %lzma.pc %zlib.pc,$(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc))
 
-# Re-use all default python mandatory libraries (with exception of zlib)
-PYTHON_LIBS := $(filter-out %zlib.pc,$(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc))
-
-# Re-use all python dependencies and mark as already done (with exceltion of zlib)
-PYTHON_DEPENDS := $(foreach cross,$(filter-out zlib,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $(PYTHON_PACKAGE_WORK_DIR)/.$(cross)-*_done))
+# Re-use all python dependencies and mark as already done (with exceltion of xz, zlib)
+PYTHON_DEPENDS := $(foreach cross,$(filter-out xz zlib,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $(PYTHON_PACKAGE_WORK_DIR)/.$(cross)-*_done))
 
 # call-up pre-depend to prepare the shared python build environment
 PRE_DEPEND_TARGET = python_pre_depend
