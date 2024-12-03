@@ -43,10 +43,12 @@ export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl
 endif
 
 # Re-use all default python mandatory libraries (with exception of xz, zlib)
-PYTHON_LIBS := $(filter-out %lzma.pc %zlib.pc,$(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc))
+PYTHON_LIBS_EXCLUDE = %lzma.pc %zlib.pc
+PYTHON_LIBS := $(filter-out $(PYTHON_LIBS_EXCLUDE),$(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc))
 
 # Re-use all python dependencies and mark as already done (with exceltion of xz, zlib)
-PYTHON_DEPENDS := $(foreach cross,$(filter-out xz zlib,$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $(PYTHON_PACKAGE_WORK_DIR)/.$(cross)-*_done))
+PYTHON_DEPENDS_EXCLUDE = xz zlib
+PYTHON_DEPENDS := $(foreach cross,$(filter-out $(PYTHON_DEPENDS_EXCLUDE),$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $(PYTHON_PACKAGE_WORK_DIR)/.$(cross)-*_done))
 
 # call-up pre-depend to prepare the shared python build environment
 PRE_DEPEND_TARGET = python_pre_depend
