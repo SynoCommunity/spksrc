@@ -11,4 +11,6 @@
 numpy==2.1.3
 numpy==2.0.2
 numpy==1.26.4
-numpy==1.25.1
+
+# unsupported
+#numpy==1.25.2
