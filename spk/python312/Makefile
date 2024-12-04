@@ -1,5 +1,5 @@
 SPK_NAME = python312
-SPK_VERS = 3.12.7
+SPK_VERS = 3.12.8
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
 SPK_REV = 1
 SPK_ICON = src/python3.png
@@ -16,7 +16,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.12
-CHANGELOG = "1. Initial Python 3.12.7 package release"
+CHANGELOG = "1. Initial Python 3.12.8 package release"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
