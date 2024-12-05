@@ -215,7 +215,9 @@ else
 endif
 endif
 
-
+# PATH modified to access native/python* linked to crossenv-<wheel>/build/bin
+#      this also provide access to maturin and its dependencies needed for building wheels
+# LD_LIBRARY_PATH modified to access native/python libraries so related binary works
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
 	@if [ "$(PIP_GLOBAL_OPTION)" ]; then \
@@ -224,6 +226,8 @@ cross-compile-wheel-%:
 	fi ; \
 	$(MSG) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+	   PATH="$(CROSSENV_PATH)/build/bin:$(PATH)" \
+	   LD_LIBRARY_PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)" \
 	   MESON_CROSS_FILE="$(MESON_TOOLCHAIN_WRK)" \
 	   $(PIP_CROSSENV) \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
@@ -233,6 +237,8 @@ cross-compile-wheel-%:
 	   $(REQUIREMENT) ; \
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+	   PATH="$(CROSSENV_PATH)/build/bin:$(PATH)" \
+	   LD_LIBRARY_PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)" \
 	   MESON_CROSS_FILE="$(MESON_TOOLCHAIN_WRK)" \
 	   $(PIP_CROSSENV) \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
