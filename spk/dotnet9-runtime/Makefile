@@ -1,19 +1,19 @@
-SPK_NAME = dotnet-9-runtime
+SPK_NAME = dotnet9-runtime
 SPK_VERS = 9.0.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/dotnet.png
 
-OPTIONAL_DEPENDS = cross/libstdc++
-DEPENDS = cross/libicu cross/dotnet-9-runtime
+OPTIONAL_DEPENDS = 
+DEPENDS = cross/dotnet9-runtime
 
-REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_DSM = 7.1
 
 # Arch exclusions for dotnet
 DOTNET_CORE_ARCHS = 1
 
 MAINTAINER = brice.fromentin
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
-CHANGELOG = "dotnet-runtime v9.0.0 release."
+CHANGELOG = "Initial release of dotnet-runtime v9.0.0."
 
 STARTABLE = no
 DISPLAY_NAME = .NET 9 runtime
@@ -25,7 +25,7 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 # we do not only need the updated libstdc++ library, we also need to
 # adjust the library search path for dotnet to use this version.
-DEPENDS += cross/libstdc++
+DEPENDS += 
 POST_STRIP_TARGET = dotnet_patch_target
 endif
 
