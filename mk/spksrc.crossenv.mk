@@ -155,10 +155,6 @@ export OPENSSL_INCLUDE_DIR = $(OPENSSL_STAGING_PREFIX)/include/
 # set PYTHONPATH for spksrc.python-module.mk
 export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages/
 
-# Required so native python and maturin binaries can always be found
-export PATH := $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)
-export LD_LIBRARY_PATH := $(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)
-
 ###
 
 # Create the crossenv in preparation for
