@@ -1,12 +1,12 @@
 SPK_NAME = dotnet9-runtime
 SPK_VERS = 9.0.0
-SPK_REV = 2
+SPK_REV = 1
 SPK_ICON = src/dotnet.png
 
 OPTIONAL_DEPENDS = 
 DEPENDS = cross/dotnet9-runtime
 
-REQUIRED_MIN_DSM = 7.1
+REQUIRED_MIN_DSM = 7.0
 
 # Arch exclusions for dotnet
 DOTNET_CORE_ARCHS = 1
