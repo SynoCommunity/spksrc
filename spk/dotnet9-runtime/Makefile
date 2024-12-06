@@ -3,7 +3,6 @@ SPK_VERS = 9.0.0
 SPK_REV = 1
 SPK_ICON = src/dotnet.png
 
-OPTIONAL_DEPENDS = 
 DEPENDS = cross/dotnet9-runtime
 
 REQUIRED_MIN_DSM = 7.0
