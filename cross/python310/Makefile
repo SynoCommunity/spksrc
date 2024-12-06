@@ -6,7 +6,7 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-BUILD_DEPENDS = native/$(PKG_NAME)
+BUILD_DEPENDS = native/python310
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
 # required for Sleepycat^WOracle Berkeley DB interface
@@ -27,7 +27,7 @@ CONFIGURE_ARGS += --enable-ipv6
 CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
-CONFIGURE_ARGS += --with-build-python=$(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python$(PKG_VERS_MAJOR_MINOR))
+CONFIGURE_ARGS += --with-build-python
 CONFIGURE_ARGS += --disable-test-modules
 
 include ../../mk/spksrc.archs.mk
@@ -78,6 +78,8 @@ include ../../mk/spksrc.cross-cc.mk
 
 PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python3)
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
+# Required to find build-python and to generate-posix-vars
+PATH := $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin):$(PATH)
 
 .PHONY: python310_post_patch
 python310_post_patch:
