@@ -16,8 +16,6 @@ CONFIGURE_ARGS += --without-static-libpython
 CONFIGURE_ARGS += --with-ensurepip=no
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
-# Uses system default libffi-dev
-CONFIGURE_ARGS += --with-system-ffi
 # Uses system default libssl-dev
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
