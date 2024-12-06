@@ -80,8 +80,6 @@ PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/in
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 # Required to find build-python and to generate-posix-vars
 PATH := $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin):$(PATH)
-# Required for python to find ssl libraries to download sources from pypi
-export LD_LIBRARY_PATH:=$(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)
 
 .PHONY: python311_post_patch
 python311_post_patch:
