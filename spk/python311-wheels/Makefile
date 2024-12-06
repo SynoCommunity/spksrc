@@ -10,13 +10,14 @@ SPK_ICON = src/python3-pip.png
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 PYTHON_PACKAGE = python311
+SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION =  Collection of programs for the Python programming language.
-DESCRIPTION_FRE = Collection of programs for the Python programming language.
-DESCRIPTION_SPN = Colección de programas para el lenguaje de programación Python.
+DESCRIPTION =  Collection of programs for the Python 3.11 programming language.
+DESCRIPTION_FRE = Collection of programs for the Python 3.11 programming language.
+DESCRIPTION_SPN = Colección de programas para el lenguaje de programación Python 3.11.
 STARTABLE = no
-DISPLAY_NAME = Python Wheels Collection
+DISPLAY_NAME = Python 3.11 Wheels Collection
 CHANGELOG = "1. Initial package"
 
 HOMEPAGE = https://www.python.org
