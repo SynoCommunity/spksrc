@@ -152,7 +152,6 @@ endif
 build_wheel_target: SHELL:=/bin/bash
 build_wheel_target: $(PRE_WHEEL_TARGET)
 ifneq ($(strip $(WHEELS)),)
-#	$(foreach e,$(shell cat $(WORK_DIR)/python-cc.mk),$(eval $(e)))
 	@if [ -s $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) -o -s $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ]; then \
 	   while IFS= read -r requirement ; do \
 	      wheel=$${requirement#*:} ; \
@@ -208,7 +207,7 @@ ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	@if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
 	   $(MSG) "Building pure-python" ; \
 	   export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= OBJCOPY= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
-	      $(RUN) $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+	      $(RUN) PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)" $(PIP) $(PIP_WHEEL_ARGS) --requirement $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 	fi
 else
 	@$(MSG) "[SKIP] Building pure-python"
@@ -216,7 +215,7 @@ endif
 endif
 
 # PATH modified to access native/python* linked to crossenv-<wheel>/build/bin
-#      this also provide access to maturin and its dependencies needed for building wheels
+#      this also provides access to maturin and its dependencies needed for building wheels
 # LD_LIBRARY_PATH modified to access native/python libraries so related binary works
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
