@@ -6,7 +6,7 @@ SPK_ICON = src/${SPK_NAME}.jpg
 REQUIRED_MIN_DSM = 5.2
 BETA = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/mtproxy
 
 MAINTAINER = Anonym-tsk
 # From TelegramMessenger/MTProxy

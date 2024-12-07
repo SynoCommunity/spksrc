@@ -9,7 +9,7 @@ ifeq ($(strip $(PYTHON_PACKAGE)),)
 PYTHON_PACKAGE = python311
 endif
 
-BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
+BUILD_DEPENDS = cross/python311
 DEPENDS = cross/openssl3 cross/libicu cross/zlib
 
 # configure: No compiler with C++11 support was found

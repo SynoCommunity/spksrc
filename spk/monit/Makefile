@@ -4,7 +4,7 @@ SPK_REV = 10
 SPK_ICON = src/monit.png
 DSM_UI_DIR = app
 
-DEPENDS =  cross/$(SPK_NAME)
+DEPENDS =  cross/monit
 
 UNSUPPORTED_ARCHS = PPC_ARCHS
 

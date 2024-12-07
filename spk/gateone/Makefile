@@ -4,7 +4,7 @@ SPK_REV = 9
 SPK_ICON = src/gateone.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/busybox cross/dtach cross/$(SPK_NAME)
+DEPENDS  = cross/busybox cross/dtach cross/gateone
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>=2.7.11-15"
 

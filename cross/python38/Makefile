@@ -6,7 +6,7 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-BUILD_DEPENDS = native/$(PKG_NAME)
+BUILD_DEPENDS = native/python38
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
 # required for uuid module

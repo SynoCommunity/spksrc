@@ -4,7 +4,7 @@ SPK_REV = 5
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/adminer
 
 MAINTAINER = piwi82
 DESCRIPTION = Adminer is a full-featured database management tool available for MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.
