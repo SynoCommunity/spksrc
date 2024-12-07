@@ -4,7 +4,7 @@ SPK_REV = 3
 SPK_ICON = src/dotnet.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
-DEPENDS = cross/libicu cross/dotnet8-runtime
+DEPENDS = cross/dotnet8-runtime
 
 REQUIRED_MIN_DSM = 6.0
 
