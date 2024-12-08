@@ -4,10 +4,9 @@ SPK_VERS = 10.10.3
 SPK_REV = 20
 SPK_ICON = src/jellyfin.png
 
-DEPENDS = cross/jellyfin cross/jellyfin-web
+OPTIONAL_DEPENDS = cross/libstdc++
+DEPENDS = cross/jellyfin cross/jellyfin-web cross/libe_sqlite3
 
-# GLIBC >= 2.28 required
-REQUIRED_MIN_DSM = 7.2
 SPK_DEPENDS = "ffmpeg7"
 
 # x64 and armv8 archs are supported only.
@@ -41,4 +40,26 @@ SERVICE_PORT_TITLE = Jellyfin (HTTP)
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
 
+POST_STRIP_TARGET = jellyfin_custom_libe_sqlite3
+
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# we do not only need the updated libstdc++ library, we also need to
+# adjust the library search path for jellyfin to use this version.
+DEPENDS += cross/libstdc++
+POST_STRIP_TARGET += jellyfin_patch_target
+endif
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: jellyfin_custom_libe_sqlite3
+jellyfin_custom_libe_sqlite3:
+	@$(MSG) "Replace libe_sqlite3 with version built for DSM"
+	mv -f $(STAGING_DIR)/lib/libe_sqlite3.so $(STAGING_DIR)/share/libe_sqlite3.so
+
+
+.PHONY: jellyfin_patch_target
+# Set library path to use bundled libstdc++
+jellyfin_patch_target:
+	@$(MSG) "Set library runpath in jellyfin executable."
+	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/share/$(SPK_NAME)
