@@ -33,11 +33,7 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 # [cryptography]
-# Mandatory of using OPENSSL_*_DIR starting with version >= 40
-# https://docs.rs/openssl/latest/openssl/#automatic
 DEPENDS += cross/openssl3
-ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # [mysqlclient]
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
