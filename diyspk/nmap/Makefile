@@ -16,10 +16,11 @@ LICENSE  = https://svn.nmap.org/nmap/LICENSE
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS = cross/nmap_7.92
+SPK_VERS = 7.92
 else
 DEPENDS = cross/nmap
 endif
 
-SPK_COMMANDS = bin/ncat bin/nmap bin/nping bin/ndiff
+SPK_COMMANDS = bin/ncat bin/nmap bin/nping
 
 include ../../mk/spksrc.spk.mk

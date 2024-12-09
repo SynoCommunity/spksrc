@@ -1,5 +1,5 @@
 PKG_NAME = vc-intrinsics
-PKG_VERS = 0.20.0
+PKG_VERS = 0.20.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = vc-intrinsics-$(PKG_VERS).$(PKG_EXT)

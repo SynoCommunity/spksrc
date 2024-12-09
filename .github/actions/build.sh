@@ -9,6 +9,7 @@
 # - Build for arch defined by ${GH_ARCH} (e.g. x64-6.1, noarch, ...).
 # - Successfully built packages are logged to $BUILD_SUCCESS_FILE.
 # - Failed builds are logged to ${BUILD_ERROR_FILE} and annotated as error.
+# - For failed builds, the make command and the latest 15 lines of the build output are written to ${BUILD_ERROR_LOGFILE}
 # - The build output is structured into log groups by package.
 # - As the disk space in the workflow environment is limitted, we clean the
 #   work folder of each package after build. At 2020.06 this limit is 14GB.

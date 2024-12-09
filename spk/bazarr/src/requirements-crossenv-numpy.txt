@@ -7,4 +7,6 @@
 # [numpy]
 #   - Require Cython in cross/python311 crossenv
 #   - Numpy 1.25.x require c++17
-numpy==1.25.1
+#numpy==1.25.1
+#   - Temp. reverted to 1.24.x
+numpy==1.24.4

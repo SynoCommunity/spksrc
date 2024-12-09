@@ -14,14 +14,24 @@ if [ -z "${SYNOPKG_PKGTMP}" ]; then
 fi
 
 # Others
+MYSQL="/usr/local/mariadb10/bin/mysql"
+MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
+MYSQL_DATABASE="${SYNOPKG_PKGNAME}"
+MYSQL_USER="oc_${wizard_owncloud_admin_username}"
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 SYNOSVC="/usr/syno/sbin/synoservice"
-SYNOSHR="/usr/syno/sbin/synoshare"
 
 if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
     WEB_USER="http"
     WEB_GROUP="http"
 fi
+
+# Function to compare two version numbers
+version_greater_equal() {
+    v1=$(echo "$1" | awk -F. '{ printf "%d%03d%03d\n", $1, $2, $3 }')
+    v2=$(echo "$2" | awk -F. '{ printf "%d%03d%03d\n", $1, $2, $3 }')
+    [ "$v1" -ge "$v2" ]
+}
 
 set_owncloud_permissions ()
 {
@@ -55,41 +65,9 @@ exec_occ() {
     OCC="${WEB_ROOT}/occ"
     COMMAND="${PHP} ${OCC} $*"
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        /bin/su "$WEB_USER" -s /bin/sh -c "$COMMAND"
-    else
-        $COMMAND
-    fi
-    return $?
-}
-
-exec_eff_occ() {
-    PHP="/usr/local/bin/php74"
-    OCC="${WEB_ROOT}/occ"
-    COMMAND="${PHP} ${OCC} $*"
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
-    else
-        $COMMAND
-    fi
-    return $?
-}
-
-exec_sql() {
-    SQLITE="/bin/sqlite3"
-    COMMAND="${SQLITE} $*"
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        /bin/su "$WEB_USER" -s /bin/sh -c "$COMMAND"
-    else
-        $COMMAND
-    fi
-    return $?
-}
-
-exec_eff_sql() {
-    SQLITE="/bin/sqlite3"
-    COMMAND="${SQLITE} $*"
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        /bin/su "$EFF_USER" -s /bin/sh -c "$COMMAND"
+        # Escape backslashes for DSM 6
+        ESCAPED_COMMAND=$(echo "$COMMAND" | sed 's/\\/\\\\/g')
+        /bin/su "$WEB_USER" -s /bin/sh -c "$ESCAPED_COMMAND"
     else
         $COMMAND
     fi
@@ -99,13 +77,19 @@ exec_eff_sql() {
 setup_owncloud_instance()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        # Setup database
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_owncloud}';"
+
         # Setup configuration file
         exec_occ maintenance:install \
-        --database "sqlite" \
-        --database-name "${SYNOPKG_PKGNAME}" \
-        --data-dir "${DATA_DIR}" \
+        --database "mysql" \
+        --database-name "${MYSQL_DATABASE}" \
+        --database-host "localhost:/run/mysqld/mysqld10.sock" \
+        --database-user "${MYSQL_USER}" \
+        --database-pass "${wizard_mysql_password_owncloud}" \
         --admin-user "${wizard_owncloud_admin_username}" \
-        --admin-pass "${wizard_owncloud_admin_password}" 2>&1
+        --admin-pass "${wizard_owncloud_admin_password}" \
+        --data-dir "${DATA_DIR}" 2>&1
 
         # Get the trusted domains
         DOMAINS="$(exec_occ config:system:get trusted_domains)"
@@ -113,29 +97,113 @@ setup_owncloud_instance()
         # Fix trusted domains array
         line_number=0
         echo "${DOMAINS}" | while read -r line; do
-            if [ "$(echo "$line" | grep -cE ':5000|:5001')" -gt 0 ]; then
+            if echo "$line" | grep -qE ':5000|:5001'; then
                 # Remove ":5000" or ":5001" from the line and update the trusted_domains array
                 new_line=$(echo "$line" | sed -E 's/(:5000|:5001)//')
                 exec_occ config:system:set trusted_domains $line_number --value="$new_line"
             fi
-            line_number=$((line_number+1))
+            line_number=$((line_number + 1))
         done
-        # Add user specified trusted domains
-        line_number=$(( $(echo -ne "$DOMAINS" | wc -l) + 1 ))
+
+        # Refresh the trusted domains
+        DOMAINS="$(exec_occ config:system:get trusted_domains)"
+
+        # Add user-specified trusted domains
+        line_number=$(echo "$DOMAINS" | wc -l)
         for var in wizard_owncloud_trusted_domain_1 wizard_owncloud_trusted_domain_2 wizard_owncloud_trusted_domain_3; do
-            val="${!var}"
+            eval val=\$$var
             if [ -n "$val" ]; then
-                exec_occ config:system:set trusted_domains $line_number --value="$val"
-                line_number=$((line_number+1))
+                # Check if the domain is already in the trusted domains
+                if ! echo "$DOMAINS" | grep -qx "$val"; then
+                    exec_occ config:system:set trusted_domains $line_number --value="$val"
+                    line_number=$((line_number + 1))
+                fi
             fi
         done
 
-        # Add HTTP to HTTPS redirect to Apache configuration file
         APACHE_CONF="${WEB_ROOT}/.htaccess"
+        # Configure HTTP to HTTPS redirect
         if [ -f "${APACHE_CONF}" ]; then
-            echo "RewriteEngine On" >> ${APACHE_CONF}
-            echo "RewriteCond %{HTTPS} off" >> ${APACHE_CONF}
-            echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]" >> ${APACHE_CONF}
+            {
+                echo "RewriteEngine On"
+                echo "RewriteCond %{HTTPS} off"
+                echo "RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]"
+            } >> "${APACHE_CONF}"
+        fi
+
+        # Configure HTTP Strict Transport Security
+        if [ -f "${APACHE_CONF}" ]; then
+            {
+                echo "<IfModule mod_headers.c>"
+                echo "Header always set Strict-Transport-Security \"max-age=15552000; includeSubDomains\""
+                echo "</IfModule>"
+            } >> "${APACHE_CONF}"
+        fi
+
+        # Configure background jobs
+        exec_occ system:cron
+
+        # Configure memory caching
+        MEMCACHE_LOCAL_VAL="\\OC\\Memcache\\APCu"
+        exec_occ config:system:set memcache.local --value="$MEMCACHE_LOCAL_VAL"
+
+        # Configure file locking
+        MEMCACHE_LOCKING_VAL="\\OC\\Memcache\\Redis"
+        exec_occ config:system:set memcache.locking --value="$MEMCACHE_LOCKING_VAL"
+        exec_occ config:system:set filelocking.enabled --value="true"
+    fi
+}
+
+validate_preinst ()
+{
+    # Check for modification to PHP template defaults on DSM 6
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        WS_TMPL_DIR="/var/packages/WebStation/target/misc"
+        WS_TMPL_FILE="php74_fpm.mustache"
+        WS_TMPL_PATH="${WS_TMPL_DIR}/${WS_TMPL_FILE}"
+        # Check for PHP template defaults
+        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}"; then
+            echo "PHP template defaults have been modified. Installation is not supported."
+            exit 1
+        fi
+    fi
+
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        # Check database
+        if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+            echo "Incorrect MySQL 'root' password"
+            exit 1
+        fi
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
+            echo "MySQL user '${MYSQL_USER}' already exists"
+            exit 1
+        fi
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
+            echo "MySQL database '${MYSQL_DATABASE}' already exists"
+            exit 1
+        fi
+
+        # Check for valid backup to restore
+        if [ "${wizard_owncloud_restore}" = "true" ] && [ -n "${wizard_backup_file}" ]; then
+            if [ ! -f "${wizard_backup_file}" ]; then
+                echo "The backup file path specified is incorrect or not accessible."
+                exit 1
+            fi
+            # Check backup file prefix
+            filename=$(basename "${wizard_backup_file}")
+            expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
+            
+            if [ "${filename#"$expected_prefix"}" = "$filename" ]; then
+                echo "The backup filename does not start with the expected prefix."
+                exit 1
+            fi
+            # Check the minimum required version
+            backup_version=$(echo "$filename" | sed -n "s/${expected_prefix}\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/p")
+            min_version="10.15.0"
+            if ! version_greater_equal "$backup_version" "$min_version"; then
+                echo "The backup version is too old. Minimum required version is $min_version."
+                exit 1
+            fi
         fi
     fi
 }
@@ -206,72 +274,78 @@ service_postinst ()
         ${RM} ${TEMPDIR}
     fi
 
+    # Fix permissions
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        set_owncloud_permissions ${WEB_ROOT}
+    fi
+
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Parse data directory
         DATA_DIR="${SHARE_PATH}/data"
         # Create data directory
         ${MKDIR} "${DATA_DIR}"
-
         # Fix permissions
         if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            set_owncloud_permissions ${WEB_ROOT} ${DATA_DIR}
+            chown -R ${WEB_USER}:${WEB_GROUP} ${DATA_DIR} 2>/dev/null
         fi
 
-        # Check backup file path
-        if [ "${wizard_owncloud_restore}" = "true" ] && [ -n "${wizard_backup_file}" ] && [ -f "${wizard_backup_file}" ]; then
+        # Check restore action
+        if [ "${wizard_owncloud_restore}" = "true" ]; then
+            echo "The backup file is valid, performing restore."
+            # Extract archive to temp folder
+            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
+            ${MKDIR} "${TEMPDIR}"
+            tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
+            # Fix file ownership
+            if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+                chown -R ${WEB_USER}:${WEB_GROUP} ${TEMPDIR} 2>/dev/null
+            fi
+
+            # Restore configuration files and directories
+            rsync -aX -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${WEB_ROOT}/" 2>&1
+            rsync -aX -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${WEB_ROOT}/" 2>&1
+
+            # Restore user data
+            echo "Restoring user data to ${DATA_DIR}"
+            rsync -aX -I "${TEMPDIR}/data" "${SHARE_PATH}/" 2>&1
+
+            # Restore the Database
+            db_user=$(grep "'dbuser'" "${WEB_ROOT}/config/config.php" | sed -n "s/.*'dbuser' => '\(.*\)'.*/\1/p")
+            db_password=$(grep "'dbpassword'" "${WEB_ROOT}/config/config.php" | sed -n "s/.*'dbpassword' => '\(.*\)'.*/\1/p")
+
+            echo "Creating database ${MYSQL_DATABASE} and access"
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${db_user}'@'localhost' IDENTIFIED BY '${db_password}';" 2>&1
+
+            echo "Restoring database ${MYSQL_DATABASE} from backup"
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} < ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+
+            # Update the systems data-fingerprint after a backup is restored
+            exec_occ maintenance:data-fingerprint -n
+
+            # Disable maintenance mode
+            exec_occ maintenance:mode --off
+
+            # Set backup filename and expected prefix
             filename=$(basename "${wizard_backup_file}")
             expected_prefix="${SYNOPKG_PKGNAME}_backup_v"
-            # Check backup file prefix
-            if [[ $filename == ${expected_prefix}* ]]; then
-                echo "The backup filename starts with the expected prefix, performing restore."
-                # Extract archive to temp folder
-                TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}"
-                ${MKDIR} "${TEMPDIR}"
-                tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
-                # Fix file ownership
-                if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-                    chown -R ${WEB_USER}:${WEB_GROUP} ${TEMPDIR} 2>/dev/null
+            # Extract the version number using awk and cut
+            file_version=$(echo "$filename" | awk -F "${expected_prefix}" '{print $2}' | cut -d '_' -f 1)
+            package_version=$(echo "${SYNOPKG_PKGVER}" | cut -d '-' -f 1)
+            # Compare the extracted version with package_version using the version_greater_equal function
+            if [ -n "$file_version" ]; then
+                if ! version_greater_equal "$file_version" "$package_version"; then
+                    echo "The archive version ($file_version) is older than the package version ($package_version). Triggering upgrade."
+                    exec_occ upgrade
                 fi
-
-                # Restore configuration files and directories
-                rsync -aX --update -I "${TEMPDIR}/configs/root/.user.ini" "${TEMPDIR}/configs/root/.htaccess" "${WEB_ROOT}/" 2>&1
-                rsync -aX --update -I "${TEMPDIR}/configs/config" "${TEMPDIR}/configs/apps" "${TEMPDIR}/configs/apps-external" "${WEB_ROOT}/" 2>&1
-
-                # Restore user data
-                echo "Restoring user data to ${DATA_DIR}"
-                rsync -aX --update -I "${TEMPDIR}/data" "${SHARE_PATH}/" 2>&1
-
-                # Place server in maintenance mode
-                exec_occ maintenance:mode --on
-
-                # Restore the Database
-                [ -f "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" ] && ${RM} "${DATA_DIR}/${SYNOPKG_PKGNAME}.db"
-                exec_sql "${DATA_DIR}/${SYNOPKG_PKGNAME}.db" < "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
-
-                # Update the systems data-fingerprint after a backup is restored
-                exec_occ maintenance:data-fingerprint -n
-
-                # Disable maintenance mode
-                exec_occ maintenance:mode --off
-
-                # Extract the version number using awk and cut
-                file_version=$(echo "$filename" | awk -F "${expected_prefix}" '{print $2}' | cut -d '_' -f 1)
-                package_version=$(echo ${SYNOPKG_PKGVER} | cut -d '-' -f 1)
-                if [ -n "$file_version" ]; then
-                    # Compare the extracted version with package_version using awk
-                    if awk "BEGIN {exit !($file_version < $package_version) }"; then
-                        echo "The archive version ($file_version) is older than the package version ($package_version). Triggering upgrade."
-                        exec_occ upgrade
-                    fi
-                fi
-
-                # Clean-up temporary files
-                ${RM} "${TEMPDIR}"
-            else
-                echo "The backup filename does not start with the expected prefix, performing new install."
-                setup_owncloud_instance
             fi
+
+            # Configure background jobs
+            exec_occ system:cron
+
+            # Clean-up temporary files
+            ${RM} "${TEMPDIR}"
         else
+            echo "Run ${SC_DNAME} installer"
             setup_owncloud_instance
         fi
 
@@ -282,71 +356,96 @@ service_postinst ()
     fi
 }
 
+validate_preuninst ()
+{
+    # Check database
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+        echo "Incorrect MySQL 'root' password"
+        exit 1
+    fi
+    # Check export directory
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
+        if [ ! -d "${wizard_export_path}" ]; then
+            # If the export path directory does not exist, create it
+            ${MKDIR} "${wizard_export_path}" || {
+                # If mkdir fails, print an error message and exit
+                echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
+                exit 1
+            }
+        elif [ ! -w "${wizard_export_path}" ]; then
+            # If the export path directory is not writable, print an error message and exit
+            echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
+            exit 1
+        fi
+    fi
+}
+
 service_preuninst ()
 {
-    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
-        # Check export directory
-        if [ -n "${wizard_export_path}" ]; then
-            if [ ! -d "${wizard_export_path}" ]; then
-                # If the export path directory does not exist, create it
-                ${MKDIR} "${wizard_export_path}" || {
-                    # If mkdir fails, print an error message and exit
-                    echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
-                    exit 1
-                }
-            elif [ ! -w "${wizard_export_path}" ]; then
-                # If the export path directory is not writable, print an error message and exit
-                echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
-                exit 1
-            fi
-            # Get data directory
-            DATADIR="$(exec_occ config:system:get datadirectory)"
-            # Data directory fail-safe
-            if [ ! -d "$DATADIR" ]; then
-                echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
-                DATADIR="${WEB_ROOT}/data"
-            fi
-
-            # Prepare archive structure
-            OCC_VER=$(exec_occ -V | cut -d ' ' -f 2)
-            TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
-            ${MKDIR} "${TEMPDIR}"
-
-            # Place server in maintenance mode
-            exec_occ maintenance:mode --on
-
-            # Backup the Database
-            echo "Copying previous database from ${DATADIR}"
-            ${MKDIR} "${TEMPDIR}/database"
-            exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${TEMPDIR}/database/${SYNOPKG_PKGNAME}-dbbackup.bak" 2>&1
-
-            # Backup Directories
-            echo "Copying previous configuration from ${WEB_ROOT}"
-            ${MKDIR} "${TEMPDIR}/configs/root"
-            rsync -aX "${WEB_ROOT}/.user.ini" "${WEB_ROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
-            rsync -aX "${WEB_ROOT}/config" "${WEB_ROOT}/apps" "${WEB_ROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
-
-            # Backup user data
-            echo "Copying previous user data from ${DATADIR}"
-            rsync -aX "${DATADIR}" "${TEMPDIR}/" 2>&1
-
-            # Disable maintenance mode
-            exec_occ maintenance:mode --off
-
-            # Create backup archive
-            archive_name="$(basename "$TEMPDIR").tar.gz"
-            echo "Creating compressed archive of ${SC_DNAME} data in file $archive_name"
-            tar -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
-
-            # Move archive to export directory
-            RSYNC_BAK_ARGS="--backup --suffix=.bak"
-            rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
-            echo "Backup file copied successfully to ${wizard_export_path}."
-
-            # Clean-up temporary files
-            ${RM} "${TEMPDIR}"
-            ${RM} "${SYNOPKG_PKGTMP}/$archive_name"
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
+        # Get data directory
+        DATADIR="$(exec_occ config:system:get datadirectory)"
+        # Data directory fail-safe
+        if [ ! -d "$DATADIR" ]; then
+            echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
+            DATADIR="${WEB_ROOT}/data"
         fi
+
+        # Prepare archive structure
+        OCC_VER=$(exec_occ -V | cut -d ' ' -f 2)
+        TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
+        ${MKDIR} "${TEMPDIR}"
+
+        # Place server in maintenance mode
+        exec_occ maintenance:mode --on
+
+        # Backup the Database
+        echo "Copying previous database from ${MYSQL_DATABASE}"
+        ${MKDIR} "${TEMPDIR}/database"
+        ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+
+        # Backup Directories
+        echo "Copying previous configuration from ${WEB_ROOT}"
+        ${MKDIR} "${TEMPDIR}/configs/root"
+        rsync -aX "${WEB_ROOT}/.user.ini" "${WEB_ROOT}/.htaccess" "${TEMPDIR}/configs/root/" 2>&1
+        rsync -aX "${WEB_ROOT}/config" "${WEB_ROOT}/apps" "${WEB_ROOT}/apps-external" "${TEMPDIR}/configs/" 2>&1
+
+        # Backup user data
+        echo "Copying previous user data from ${DATADIR}"
+        rsync -aX "${DATADIR}" "${TEMPDIR}/" 2>&1
+
+        # Disable maintenance mode
+        exec_occ maintenance:mode --off
+
+        # Create backup archive
+        archive_name="$(basename "$TEMPDIR").tar.gz"
+        echo "Creating compressed archive of ${SC_DNAME} data in file $archive_name"
+        tar -C "$TEMPDIR" -czf "${SYNOPKG_PKGTMP}/$archive_name" . 2>&1
+
+        # Move archive to export directory
+        RSYNC_BAK_ARGS="--backup --suffix=.bak"
+        rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
+        echo "Backup file copied successfully to ${wizard_export_path}."
+
+        # Clean-up temporary files
+        ${RM} "${TEMPDIR}"
+        ${RM} "${SYNOPKG_PKGTMP}/$archive_name"
+    fi
+
+    # Remove database
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
+        MYSQL_USER="$(exec_occ config:system:get dbuser)"
+
+        echo "Dropping database: ${MYSQL_DATABASE}"
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "DROP DATABASE ${MYSQL_DATABASE};"
+        
+        # Fetch users matching MYSQL_USER and drop them
+        ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SELECT User, Host FROM mysql.user;" | grep "${MYSQL_USER}" | while read -r user host; do
+            # Construct the DROP USER command
+            drop_command="DROP USER '${user}'@'${host}';"
+            echo "Dropping user: ${user}@${host}"
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "$drop_command"
+        done
     fi
 }
 
@@ -395,92 +494,41 @@ service_postuninst ()
     fi
 }
 
-service_postupgrade()
-{
-    # Web interface validation for DSM 6 -- Check PHP template defaults for modification
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        TEMPDIR="${SYNOPKG_PKGTMP}/web"
-        ${MKDIR} ${TEMPDIR}
-        WS_CFG_DIR="/usr/syno/etc/packages/WebStation"
-        PHP_CFG_FILE="PHPSettings.json"
-        PHP_CFG_PATH="${WS_CFG_DIR}/${PHP_CFG_FILE}"
-        WS_TMPL_DIR="/var/packages/WebStation/target/misc"
-        WS_TMPL_FILE="php74_fpm.mustache"
-        WS_TMPL_PATH="${WS_TMPL_DIR}/${WS_TMPL_FILE}"
-        TMP_WS_TMPL_PATH="${TEMPDIR}/${WS_TMPL_FILE}"
-        RESTART_APACHE="no"
-        RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
-        # Check for PHP template defaults
-        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}"; then
-            echo "Restore default PHP template; remove previous PHP FPM configuration"
-            rsync -aX ${WS_TMPL_PATH} ${TEMPDIR}/ 2>&1
-            SUBST_TEXT="{{#fpm_settings.user_owncloud}}sc-owncloud{{/fpm_settings.user_owncloud}}{{^fpm_settings.user_owncloud}}http{{/fpm_settings.user_owncloud}}"
-            sed -i "s|^user = ${SUBST_TEXT}$|user = http|g; s|^listen.owner = ${SUBST_TEXT}$|listen.owner = http|g" "${TMP_WS_TMPL_PATH}"
-            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_TMPL_PATH} ${WS_TMPL_DIR}/ 2>&1
-            RESTART_APACHE="yes"
-        fi
-        # Restart Apache if configs have changed
-        if [ "$RESTART_APACHE" = "yes" ]; then
-            if jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${SC_PKG_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
-                echo " [WARNING] Multiple PHP profiles detected, will require restart of DSM to load new configs"
-            else
-                echo "Restart Apache to load new configs"
-                ${SYNOSVC} --restart pkgctl-Apache2.4
-            fi
-        fi
-        # Clean-up temporary files
-        ${RM} ${TEMPDIR}
-    fi
-}
-
 validate_preupgrade ()
 {
     # ownCloud upgrades only possible from 8.2.11, 9.0.9, 9.1.X, or 10.X.Y
     is_upgrade_possible="no"
-    valid_versions=("8.2.11" "9.0.9" "9.1.*" "10.*.*")
-    previous=$(echo ${SYNOPKG_OLD_PKGVER} | cut -d '-' -f 1)
-    for version in "${valid_versions[@]}"; do
-        if echo "$previous" | grep -q "$version"; then
+    previous=$(echo "${SYNOPKG_OLD_PKGVER}" | cut -d '-' -f 1)
+    
+    # Check against valid versions
+    for version in "8.2.11" "9.0.9" "9.1." "10."; do
+        if echo "$previous" | grep -q "^$version"; then
             is_upgrade_possible="yes"
             break
         fi
     done
 
-    # No matching ugrade paths found
+    # No matching upgrade paths found
     if [ "$is_upgrade_possible" = "no" ]; then
         echo "Please uninstall previous version, no update possible from v${SYNOPKG_OLD_PKGVER}.<br/>Remember to save your ${WEB_ROOT}/data files before uninstalling."
+        exit 1
+    fi
+
+    # ownCloud upgrades only possible from mySQL instances
+    DATABASE_TYPE="$(exec_occ config:system:get dbtype)"
+    if [ "$DATABASE_TYPE" != "mysql" ]; then
+        echo "Please migrate your previous database from ${DATABASE_TYPE} to mysql before performing upgrade."
         exit 1
     fi
 }
 
 service_save ()
 {
-    # Initialise save state check for migration of PHP FPM configuration on DSM 6
-    NORMAL_SAVE="yes"
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        # Check for modification to PHP template defaults from previous versions
-        WS_TMPL_DIR="/var/packages/WebStation/target/misc"
-        WS_TMPL_FILE="php74_fpm.mustache"
-        WS_TMPL_PATH="${WS_TMPL_DIR}/${WS_TMPL_FILE}"
-        # Check for PHP template defaults
-        if ! grep -q -E '^user = http$' "${WS_TMPL_PATH}" || ! grep -q -E '^listen\.owner = http$' "${WS_TMPL_PATH}"; then
-            NORMAL_SAVE="no"
-        fi
-    fi
-
     # Place server in maintenance mode
-    if [ "$NORMAL_SAVE" = "yes" ]; then
-        exec_occ maintenance:mode --on
-    else
-        exec_eff_occ maintenance:mode --on
-    fi
+    exec_occ maintenance:mode --on
 
     # Identify data directory for restore
-    if [ "$NORMAL_SAVE" = "yes" ]; then
-        DATADIR="$(exec_occ config:system:get datadirectory)"
-    else
-        DATADIR="$(exec_eff_occ config:system:get datadirectory)"
-    fi
+    DATADIR="$(exec_occ config:system:get datadirectory)"
     # data directory fail-safe
     if [ ! -d "$DATADIR" ]; then
         echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
@@ -498,82 +546,56 @@ service_save ()
     echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     rsync -aX ${WEB_ROOT}/ ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} 2>&1
-
-    # Backup server database
-    [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
-    echo "Backup existing server database to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup"
-    ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
-    if [ "$NORMAL_SAVE" = "yes" ]; then
-        exec_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
-    else
-        exec_eff_sql "${DATADIR}/${SYNOPKG_PKGNAME}.db" .dump > "${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup/${SYNOPKG_PKGNAME}-dbbackup_$(date +"%Y%m%d").bak" 2>&1
-    fi
-
-    # Fix file ownership
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ] && [ "$NORMAL_SAVE" != "yes" ]; then
-        echo "Migrate share permissions to user ${WEB_USER}"
-        ${SYNOSHR} --setuser ${SHARE_NAME} RW + ${WEB_USER} >/dev/null 2>&1
-        chown -R ${WEB_USER}:${WEB_GROUP} ${SYNOPKG_TEMP_UPGRADE_FOLDER} 2>/dev/null
-        chown -R ${WEB_USER}:${WEB_GROUP} ${DATADIR} 2>/dev/null
-        ${SYNOSHR} --setuser ${SHARE_NAME} RW - ${EFF_USER} >/dev/null 2>&1
-    fi
 }
 
 service_restore ()
 {
     # Validate data directory for restore
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory ]; then
-        DATAPATH="$(cat ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory)"
+        DATAPATH=$(cat ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory)
         # Data directory inside owncloud directory and needs to be restored
         echo "Restore previous data directory from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}"
-        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${WEB_ROOT}/ 2>&1
+        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${WEB_ROOT}/ 2>&1
         ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory
     fi
 
     # Restore the configuration files
     echo "Restore previous configuration from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     source="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config"
-    patterns=(
-    "*config.php"
-    "*.json"
-    )
+    patterns="*config.php *.json"
     target="${WEB_ROOT}/config"
+    
     # Process each pattern of files in the source directory
-    for pattern in "${patterns[@]}"; do
+    for pattern in $patterns; do
         files=$(find "$source" -type f -name "$pattern")
         if [ -n "$files" ]; then
-            for file in "${files[@]}"; do
-                rsync -aX --update -I "$file" "$target/" 2>&1
+            for file in $files; do
+                rsync -aX -I "$file" "$target/" 2>&1
             done
         fi
     done
+    
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ]; then
-        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${WEB_ROOT}/ 2>&1
+        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${WEB_ROOT}/ 2>&1
     fi
     if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ]; then
-        rsync -aX --update -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${WEB_ROOT}/ 2>&1
+        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${WEB_ROOT}/ 2>&1
     fi
 
     echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     # Migrate manually installed apps from source to destination directories
-    dirs=(
-    "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps"
-    "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps-external"
-    )
+    dirs="${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps-external"
     dest="${WEB_ROOT}"
+    
     # Process the subdirectories in each of the source directories
-    for dir in "${dirs[@]}"; do
+    for dir in $dirs; do
         dir_name=$(basename "$dir")
-        sub_dirs=()
-        for item in "$dir"/*; do
-            if [ -d "$item" ]; then
-                sub_dirs+=("$item")
-            fi
-        done
+        sub_dirs=$(find "$dir" -mindepth 1 -maxdepth 1 -type d)
+        
         if [ ! -d "$dest/$dir_name" ]; then
             rsync -aX "$dir" "$dest/" 2>&1
         elif [ -n "$sub_dirs" ]; then
-            for sub_dir in "${sub_dirs[@]}"; do
+            for sub_dir in $sub_dirs; do
                 sub_dir_name=$(basename "$sub_dir")
                 # Check if the subdirectory is missing from the destination
                 if [ ! -d "$dest/$dir_name/$sub_dir_name" ]; then
@@ -594,31 +616,13 @@ service_restore ()
     # Finalize upgrade
     exec_occ upgrade
 
-    DATADIR="$(exec_occ config:system:get datadirectory)"
+    DATADIR=$(exec_occ config:system:get datadirectory)
     # Data directory fail-safe
     if [ ! -d "$DATADIR" ]; then
         echo "Invalid data directory '$DATADIR'. Using the default data directory instead."
         DATADIR="${WEB_ROOT}/data"
     fi
-    # Archive backup server database
-    echo "Archive backup server database to ${DATADIR}"
-    if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ]; then
-        if [ -d ${DATADIR}/db_backup ]; then
-            i=1
-            while [ -d "${DATADIR}/db_backup.${i}" ]; do
-                i=$((i+1))
-            done
-            while [ $i -gt 1 ]; do
-                j=$((i-1))
-                ${MV} "${DATADIR}/db_backup.${j}" "${DATADIR}/db_backup.${i}"
-                i=$j
-            done
-            ${MV} "${DATADIR}/db_backup" "${DATADIR}/db_backup.1"
-        fi
-        rsync -aX ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup ${DATADIR}/ 2>&1
-    fi
-
+    
     # Remove upgrade backup files
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
-    ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/db_backup
 }
