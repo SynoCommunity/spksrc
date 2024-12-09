@@ -2,7 +2,7 @@ SPK_NAME = bottom
 SPK_VERS = 0.6.8
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/bottom
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 

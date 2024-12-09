@@ -4,7 +4,7 @@ SPK_REV = 22
 SPK_ICON = src/chromaprint.png
 
 FFMPEG_PACKAGE = ffmpeg7
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/chromaprint
 SPK_DEPENDS = $(FFMPEG_PACKAGE)
 
 # ffmpeg7 requires c11 support
