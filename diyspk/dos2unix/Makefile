@@ -1,5 +1,5 @@
 SPK_NAME = dos2unix
-SPK_VERS = 7.5.1
+SPK_VERS = 7.5.2
 SPK_REV = 1
 
 DEPENDS = cross/dos2unix
@@ -9,7 +9,7 @@ DESCRIPTION = Convert text files with DOS or Mac line breaks to Unix line breaks
 STARTABLE = no
 
 HOMEPAGE = https://waterlan.home.xs4all.nl/dos2unix.html
-LICENSE  = FreeBSD style
+LICENSE = FreeBSD style
 
 SPK_COMMANDS = bin/dos2unix bin/unix2dos bin/mac2unix bin/unix2mac 
 

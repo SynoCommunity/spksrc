@@ -1,5 +1,5 @@
 PKG_NAME = detox
-PKG_VERS = 1.4.5
+PKG_VERS = 2.0.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dharple/detox/releases/download/v$(PKG_VERS)
@@ -12,5 +12,6 @@ COMMENT  = detox is a program that renames files to make them easier to work wit
 LICENSE  = 3-clause BSD
 
 GNU_CONFIGURE = 1
+ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk

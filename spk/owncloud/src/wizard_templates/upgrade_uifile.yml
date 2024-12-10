@@ -1,6 +1,10 @@
 OWNCLOUD_INCOMPATIBLE_UPGRADE_STEP_TITLE: "Incompatible upgrade"
 OWNCLOUD_INCOMPATIBLE_UPGRADE_DESCRIPTION: "<strong>NOTICE:</strong> Version ${OC_OLD_VER} of ownCloud cannot be updated to version ${OC_NEW_VER}. Please uninstall the previous version and remember to save your <code>${OCROOT}/data</code> files before doing so."
 
+OWNCLOUD_MIGRATE_DATABASE_STEP_TITLE: "Migrate database to MariaDB"
+OWNCLOUD_MIGRATE_DATABASE_DESCRIPTION: "<strong>NOTICE:</strong> The upgrade process only supports MySQL databases. Please migrate your current database to MariaDB before proceeding with the upgrade, and then try again."
+OWNCLOUD_MIGRATE_DATABASE_DETAILS: "Please follow the manual steps provided on this webpage: <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/ownCloud-Database-Migration\\\">ownCloud Database Migration</a>."
+
 OWNCLOUD_UPGRADE_LIMITATIONS_STEP_TITLE: "Upgrade limitations"
 OWNCLOUD_UPGRADE_LIMITATIONS_DESCRIPTION: "Please note the following limitations when upgrading the ownCloud package:"
 OWNCLOUD_UPGRADE_LIMITATION_1_TEXT: "Cron jobs cannot be managed during the upgrade process. We recommend that you disable them manually before upgrading."

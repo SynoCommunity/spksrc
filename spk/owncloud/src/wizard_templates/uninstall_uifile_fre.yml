@@ -2,5 +2,7 @@ OWNCLOUD_PATH_VALIDATION_ERROR_TEXT: "Le chemin doit commencer par /volume?/ ave
 
 OWNCLOUD_BACKUP_SERVER_STEP_TITLE: "Sauvegarder le serveur ownCloud"
 OWNCLOUD_BACKUP_SERVER_DESCRIPTION: "<strong>AVERTISSEMENT:</strong> La désinstallation du package ownCloud entraînera la suppression du serveur ownCloud, ainsi que de tous les comptes d'utilisateurs, données et configurations associés."
+MYSQL_ROOT_PASSWORD_DESCRIPTION: "Entrez le mot de passe de votre compte superutilisateur MySQL"
+MYSQL_ROOT_PASSWORD_LABEL: "Mot de passe « root » de MySQL"
 OWNCLOUD_BACKUP_EXPORT_LOCATION_DESCRIPTION: "Avant la désinstallation, si vous souhaitez conserver une sauvegarde de vos données, veuillez spécifier le répertoire vers lequel vous souhaitez exporter. Assurez-vous que l'utilisateur 'sc-owncloud' dispose des autorisations d'écriture dans ce répertoire. Pour ignorer l'exportation, laissez ce champ vide."
 OWNCLOUD_BACKUP_EXPORT_LOCATION_LABEL: "Emplacement d'exportation"

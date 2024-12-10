@@ -1,5 +1,5 @@
 SPK_NAME = eza
-SPK_VERS = 0.16.1
+SPK_VERS = 0.20.7
 SPK_REV = 1
 
 DEPENDS = cross/eza
@@ -7,7 +7,7 @@ DEPENDS = cross/eza
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = A modern replacement for ‘ls’.
+DESCRIPTION = A modern replacement for 'ls'.
 STARTABLE = no
 
 HOMEPAGE = https://eza.rocks/

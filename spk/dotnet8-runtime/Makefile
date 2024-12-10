@@ -1,10 +1,10 @@
 SPK_NAME = dotnet8-runtime
-SPK_VERS = 8.0.4
-SPK_REV = 2
+SPK_VERS = 8.0.11
+SPK_REV = 3
 SPK_ICON = src/dotnet.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
-DEPENDS = cross/libicu cross/dotnet8-runtime
+DEPENDS = cross/dotnet8-runtime
 
 REQUIRED_MIN_DSM = 6.0
 
@@ -13,7 +13,7 @@ DOTNET_CORE_ARCHS = 1
 
 MAINTAINER = hgy59
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
-CHANGELOG = "Update to dotnet-runtime v8.0.4."
+CHANGELOG = "Update to dotnet-runtime v8.0.11."
 
 STARTABLE = no
 DISPLAY_NAME = .NET 8 runtime

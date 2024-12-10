@@ -1,0 +1,4 @@
+lnk:lib/libvpl.so
+lnk:lib/libvpl.so.2
+lib:lib/libvpl.so.2.13
+rsc:etc/vpl/vars.sh

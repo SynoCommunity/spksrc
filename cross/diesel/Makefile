@@ -1,5 +1,5 @@
 PKG_NAME = diesel
-PKG_VERS = 2.1.4
+PKG_VERS = 2.1.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/diesel-rs/diesel/archive
@@ -25,8 +25,8 @@ CARGO_BUILD_ARGS += --features=mysql
 # do not read settings from bin/mysql_conf
 export "MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock"
 
-# mysqlclient-sys: to find libmysqlclient
-ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
+# let ./configure find mysql_config (it is a script and works for cross compile)
+ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
 # to find dependencies of libmysqlclient (libz)
 ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
 

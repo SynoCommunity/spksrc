@@ -62,6 +62,9 @@ $(TARGET_TYPE)-arch-% &: pre-build-native
 arch-%:
 	$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*)) | tee --append build-$*.log
 
+noarch-%:
+	$(PSTAT_TIME) $(MAKE) $(addprefix build-noarch-, $(filter $*, $(AVAILABLE_TCVERSIONS) 3.1)) | tee --append build-$@.log
+
 ####
 
 build-arch-%: SHELL:=/bin/bash
@@ -71,6 +74,14 @@ build-arch-%:
 	@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 ; \
 	status=$${PIPESTATUS[0]} ; \
 	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG) ; \
+	[ $${status[0]} -eq 0 ] || false
+
+build-noarch-%: SHELL:=/bin/bash
+build-noarch-%: 
+	@$(MSG) BUILDING noarch package for TCVERSION $*
+	@MAKEFLAGS= $(MAKE) TCVERSION=$* 2>&1 ; \
+	status=$${PIPESTATUS[0]} ; \
+	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), TCVERSION: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG) ; \
 	[ $${status[0]} -eq 0 ] || false
 
 ####

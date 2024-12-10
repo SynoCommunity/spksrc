@@ -1,10 +1,9 @@
 PKG_NAME = xz
-PKG_VERS = 5.6.1+really5.4.5
+PKG_VERS = 5.6.3
 PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-utils_$(PKG_VERS).orig.$(PKG_EXT)
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://deb.debian.org/debian/pool/main/x/xz-utils/
-PKG_DIR = $(PKG_NAME)-5.4.5
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/tukaani-project/xz/releases/download/v$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
