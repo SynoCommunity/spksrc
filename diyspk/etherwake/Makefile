@@ -2,7 +2,7 @@ SPK_NAME = etherwake
 SPK_VERS = 1.09
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/etherwake
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Generate and transmit a Wake-On-LAN (WOL) Magic Packet

@@ -4,7 +4,7 @@ SPK_REV = 23
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/znc
 PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.5-8"
 
