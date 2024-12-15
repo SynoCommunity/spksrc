@@ -1,5 +1,5 @@
 PKG_NAME = syncstorage-rs
-PKG_VERS = 0.17.3
+PKG_VERS = 0.17.15
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VERS}

@@ -1,6 +1,6 @@
 SPK_NAME = kopia
-SPK_VERS = 0.17.0
-SPK_REV = 1
+SPK_VERS = 0.18.2
+SPK_REV = 2
 SPK_ICON = src/kopia.png
 
 DEPENDS = cross/kopia
@@ -12,7 +12,7 @@ DISPLAY_NAME = Kopia
 DESCRIPTION = Kopia is a fast and secure open-source backup/restore tool that allows you to create encrypted snapshots of your data and save the snapshots to remote or cloud storage of your choice, to network-attached storage or server, or locally on your machine.
 HOMEPAGE = https://kopia.io/
 LICENSE = Apache 2.0
-CHANGELOG = "Initial package release"
+CHANGELOG = "Kopia updated to v0.18.2<br/>Changelog: <a target=\"_blank\" href=\"https://github.com/kopia/kopia/releases/tag/v0.18.2\">https://github.com/kopia/kopia/releases/tag/v0.18.2</a>"
 
 STARTABLE = yes
 SERVICE_USER = auto

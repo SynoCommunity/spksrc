@@ -12,7 +12,7 @@ msgpack==1.0.5
 psutil==5.9.4
 pydantic==1.10.2
 pyrsistent==0.19.2
-PyYAML==6.0.1
+PyYAML==6.0.2
 SQLAlchemy==2.0.15
 
 # Building will generate a non-optimized build: py3-none-any

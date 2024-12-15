@@ -60,8 +60,13 @@ ifneq ($(strip $(TCVERSION)),)
 SPK_ARCH = noarch
 SPK_NAME_ARCH = noarch
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
+ifeq ($(call version_ge, $(TCVERSION), 7.2),1)
+SPK_TCVERS = dsm72
+TC_OS_MIN_VER = 7.2-63134
+else
 SPK_TCVERS = dsm7
 TC_OS_MIN_VER = 7.0-40000
+endif
 else ifeq ($(call version_ge, $(TCVERSION), 6.1),1)
 SPK_TCVERS = dsm6
 TC_OS_MIN_VER = 6.1-15047
@@ -151,8 +156,13 @@ ifeq ($(strip $(MAINTAINER)),)
 $(error Add MAINTAINER for '$(SPK_NAME)' in spk Makefile or set default MAINTAINER in local.mk.)
 endif
 
+ifeq ($(strip $(DISABLE_GITHUB_MAINTAINER)),)
 get_github_maintainer_url = $(shell wget --quiet --spider https://github.com/$(1) && echo "https://github.com/$(1)" || echo "")
 get_github_maintainer_name = $(shell curl -s -H application/vnd.github.v3+json https://api.github.com/users/$(1) | jq -r '.name' | sed -e 's|null||g' | sed -e 's|^$$|$(1)|g' )
+else
+get_github_maintainer_url = "https://github.com/SynoCommunity"
+get_github_maintainer_name = $(MAINTAINER)
+endif
 
 $(WORK_DIR)/INFO:
 	$(create_target_dir)
