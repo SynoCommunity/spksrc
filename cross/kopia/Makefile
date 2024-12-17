@@ -1,5 +1,5 @@
 PKG_NAME = kopia
-PKG_VERS = 0.17.0
+PKG_VERS = 0.18.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/kopia/kopia/releases/download/v$(PKG_VERS)

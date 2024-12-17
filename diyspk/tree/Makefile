@@ -1,5 +1,5 @@
 SPK_NAME = tree
-SPK_VERS = 2.1.1
+SPK_VERS = 2.1.3
 SPK_REV = 1
 
 DEPENDS = cross/tree

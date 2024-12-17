@@ -1,5 +1,5 @@
 SPK_NAME = rhash
-SPK_VERS = 1.4.4
+SPK_VERS = 1.4.5
 SPK_REV = 1
 
 DEPENDS = cross/rhash

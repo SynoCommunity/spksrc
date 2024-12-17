@@ -1,6 +1,6 @@
 SPK_NAME = wallabag
 SPK_VERS = 2.6.9
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/wallabag.png
 
 DEPENDS  = cross/$(SPK_NAME)

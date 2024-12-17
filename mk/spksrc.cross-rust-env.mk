@@ -7,8 +7,14 @@ endif
 
 # Set to 1 to force building from
 # source Tier-3 toolchains (qoriq)
+# ref: https://rustc-dev-guide.rust-lang.org/building/how-to-build-and-run.html
 ifeq ($(RUST_BUILD_TOOLCHAIN),)
 RUST_BUILD_TOOLCHAIN = 0
+endif
+
+# Versions available: https://releases.rs/docs/
+ifeq ($(RUST_BUILD_VERSION),)
+RUST_BUILD_VERSION = 1.82.0
 endif
 
 # Enforce using newer cmake when building Tier-3 toolchains
@@ -49,7 +55,7 @@ RUST_TARGET = aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(RUST_ARCH), $(PPC_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = powerpc-unknown-linux-gnuspe
-TC_RUSTUP_TOOLCHAIN = stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)-$(RUST_TARGET)
+TC_RUSTUP_TOOLCHAIN = $(RUST_BUILD_VERSION)-$(RUST_TARGET)
 endif
 ifeq ($(findstring $(RUST_ARCH), $(x64_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = x86_64-unknown-linux-gnu

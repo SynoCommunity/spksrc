@@ -28,7 +28,7 @@ miniaudio==1.59
 msgpack==1.0.5
 multidict==6.0.4
 netifaces==0.11.0
-numpy==1.23.2
+numpy==1.24.4
 orjson==3.9.1
 # pandas==2.0.3         # depends on installed numpy wheel ?...
 Pillow==9.5.0
@@ -41,7 +41,7 @@ pycrc16==0.1.2
 pydantic==1.10.12
 pyitachip2ir==0.0.7
 PyNaCl==1.5.0
-PyYAML==6.0.1
+PyYAML==6.0.2
 regex==2021.8.28
 rpds_py==0.9.2
 simplejson==3.19.1

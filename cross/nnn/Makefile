@@ -5,15 +5,15 @@ PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jarun/nnn/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# REMARKGS:
+# REMARKS:
 # currently stay on version 4.8
-# version 4.9 fails with the error for all DSM 6 (even 64 bit):
+# versions 4.9 and 5.0 fail with the following error for all DSM 6 (even 64 bit):
 # error "<fts.h> cannot be used with -D_FILE_OFFSET_BITS==64"
 # we will have to decide whether we 
 # - fall back to version 4.0 for all packages with DSM < 7
 # - keep nnn version 4.8 for DSM 6 and x64, x86 and aarch64
 # - patch version > 4.8 for DSM 6 and x64, x86 and aarch64 to remove the definition of _FILE_OFFSET_BITS==64
-#   (but we have to verify that 64 bit/largefile support is working when built without -D_FILE_OFFSET_BITS==64)
+#   (we would have to verify that 64 bit/largefile support is working when built without -D_FILE_OFFSET_BITS==64)
 # 
 
 DEPENDS = cross/ncursesw cross/readline

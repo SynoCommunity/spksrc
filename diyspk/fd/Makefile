@@ -1,5 +1,5 @@
 SPK_NAME = fd
-SPK_VERS = 8.7.0
+SPK_VERS = 10.2.0
 SPK_REV = 1
 
 DEPENDS = cross/fd
@@ -16,3 +16,14 @@ LICENSE = Apache 2.0 / MIT
 SPK_COMMANDS = bin/fd
 
 include ../../mk/spksrc.spk.mk
+
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += cross/fd_8.7.0
+SPK_VERS = 8.7.0
+else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/fd_9.0.0
+SPK_VERS = 9.0.0
+else
+DEPENDS += cross/fd
+endif
+

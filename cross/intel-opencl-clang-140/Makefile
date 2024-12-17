@@ -17,6 +17,15 @@ PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 #PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 #PKG_DIR = $(PKG_NAME)-$(PKG_GIT_BRANCH)
 
+###
+### This serves as test the sub-component builds
+### needed in order to compile in-tree IGC needed
+### dependencies.
+###
+### Optionally next iteration may use out-of-tree
+### builds of IGC for easier management of dependendices
+###
+
 REQUIRED_MIN_DSM = 7
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
@@ -24,7 +33,6 @@ BUILD_DEPENDS  = cross/llvm-project-140.src
 BUILD_DEPENDS += cross/Khronos-SPIRV-LLVM-Translator-140.src
 BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
 BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
-BUILD_DEPENDS += cross/intel-vc-intrinsics.src
 # Cannot be built in-tree:
 #     SPIRV-Tools requires C++17 or later, but is configured for C++14
 DEPENDS += cross/Khronos-SPIRV-Tools
@@ -74,11 +82,21 @@ include ../../mk/spksrc.common.mk
 #
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
 CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
-CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang;vc-intrinsics'
 CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(STAGING_INSTALL_PREFIX)/include
 CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
-CMAKE_ARGS += -DLLVM_EXTERNAL_VC_INTRINSICS_SOURCE_DIR=$(WORK_DIR)/vc-intrinsics
 CMAKE_ARGS += -DLLVM_EXTERNAL_OPENCL_CLANG_SOURCE_DIR=$(WORK_DIR)/$(PKG_NAME)
+
+# Allow vc-intrinsics to be built out-of-tree from intel-opencl-clang
+ifeq ($(strip $(VC_INTRINSICS_IN_TREE_INSTALL)),FALSE)
+CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang'
+
+# Allow vc-intrinsics to be built in-tree from intel-opencl-clang
+else
+BUILD_DEPENDS += cross/intel-vc-intrinsics.src
+CMAKE_ARGS += -DLLVM_EXTERNAL_VC_INTRINSICS_SOURCE_DIR=$(WORK_DIR)/vc-intrinsics
+CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang;vc-intrinsics'
+CMAKE_ARGS += -DLLVM_GENX_INTRINSICS_IN_TREE_INSTALL=TRUE
+endif
 
 # Contrary to IGC does not fail to access in NATIVE/bin/llvm-tblgen but reduces built time and size
 BUILD_DEPENDS += native/llvm-14.0

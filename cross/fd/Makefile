@@ -1,5 +1,5 @@
 PKG_NAME = fd
-PKG_VERS = 9.0.0
+PKG_VERS = 10.2.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sharkdp/fd/archive
@@ -16,7 +16,7 @@ UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
-# This is still an issue with rustc 1.76.0 (07dca489a 2024-02-04):
+# This is still an issue with rustc 1.77.2 (25ef9e3d8 2024-04-09):
 # issue with ARMv5: https://github.com/sharkdp/fd/issues/1049#issue-1283491635
 # workaround for: https://github.com/rust-lang/compiler-builtins/issues/420
 # fix documented in comment: https://github.com/rust-lang/compiler-builtins/issues/420#issuecomment-1335159456
