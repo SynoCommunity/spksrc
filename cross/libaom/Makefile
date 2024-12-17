@@ -11,14 +11,12 @@ DEPENDS =
 
 HOMEPAGE = https://aomedia.googlesource.com/aom/
 COMMENT  = AOMedia Video 1 (AV1) is an open, royalty-free video coding format designed for video transmissions over the Internet.
-LICENSE  = Royalty-free
+LICENSE  = 2-Clause BSD and Alliance for Open Media Patent License 1.0
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 # Set working directory
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
-
-CMAKE_USE_NASM = 1
 
 # libaom specific cmake options
 CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1

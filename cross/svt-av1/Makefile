@@ -13,8 +13,6 @@ LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
-CMAKE_USE_NASM = 1
-
 include ../../mk/spksrc.cross-cmake.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))

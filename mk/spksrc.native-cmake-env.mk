@@ -27,19 +27,6 @@ ifeq ($(strip $(CMAKE_USE_NINJA)),1)
   CMAKE_ARGS += -G Ninja
 endif
 
-# set default ASM build environment
-ifeq ($(strip $(CMAKE_USE_NASM)),1)
-  NASM_BINARY = $(shell which nasm)
-  ifeq ($(NASM_BINARY),)
-    $(error nasm not found. Please install NASM assembler for CMAKE_USE_NASM=1)
-  endif
-  ENV += AS=$(NASM_BINARY)
-  CMAKE_ARGS += -DENABLE_ASSEMBLY=ON
-  CMAKE_ARGS += -DCMAKE_ASM_COMPILER=$(NASM_BINARY)
-else
-  CMAKE_USE_NASM = 0
-endif
-
 # set default use destdir
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),)
   CMAKE_USE_DESTDIR = 1

@@ -90,30 +90,6 @@ ifeq ($(strip $(CMAKE_USE_NINJA)),1)
   CMAKE_ARGS += -G Ninja
 endif
 
-# Set default X86ASM build environment
-# At toolchain step variables are not yet evaluated
-# resulting in inability to set in toolchain file
-#
-# ARM architecture may expect to be assembled with a C compiler as frontend:
-#    .s is raw assembly passed to as
-#    .S is assembly which expects to be preprocessed by a cpp then fed to assembler
-# Setting the following for ARM may help:
-#    ENV += AS=$(abspath $(CURDIR)/../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)
-ifeq ($(strip $(CMAKE_USE_NASM)),1)
-  # Define x86asm
-  ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-    NASM_BINARY = $(shell which nasm)
-    ifeq ($(NASM_BINARY),)
-      $(error nasm not found. Please install NASM assembler for CMAKE_USE_NASM=1)
-    endif
-    ENABLE_ASSEMBLY = ON
-    ENV += AS=$(NASM_BINARY)
-    CMAKE_ASM_COMPILER = $(NASM_BINARY)
-  endif
-else
-  CMAKE_USE_NASM = 0
-endif
-
 # set default use destdir
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),)
   CMAKE_USE_DESTDIR = 1
