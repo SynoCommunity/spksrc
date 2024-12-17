@@ -1,9 +1,9 @@
 PKG_NAME = openh264
 PKG_VERS = 2.4.1
 PKG_EXT = tar.gz
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/cisco/openh264/archive/refs/tags
+PKG_DIST_SITE = https://github.com/cisco/openh264/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -15,14 +15,9 @@ LICENSE  = BSD
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 CONFIGURE_ARGS += -Dtests=disabled
+ADDITIONAL_CPPFLAGS = -O
 
 POST_INSTALL_TARGET = openh264-post_install
-
-NASM_BINARY = $(shell which nasm)
-ifeq ($(NASM_BINARY),)
-$(error nasm not found. Please install NASM assembler)
-endif
-ENV += AS=$(NASM_BINARY)
 
 include ../../mk/spksrc.cross-meson.mk
 
