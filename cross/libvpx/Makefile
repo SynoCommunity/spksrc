@@ -16,7 +16,10 @@ LICENSE = https://raw.githubusercontent.com/webmproject/libvpx/master/LICENSE
 
 INSTALL_TARGET = libvpx_install
 
-CONFIGURE_ARGS += --disable-static --enable-shared --prefix=$(INSTALL_PREFIX)
+# configure does not work with GNU_CONFIGURE = 1 (Unknown option "--host=x86_64-pc-linux-gnu")
+CONFIGURE_ARGS = --prefix=$(INSTALL_PREFIX)
+
+CONFIGURE_ARGS += --disable-static --enable-shared
 CONFIGURE_ARGS += --enable-vp8 --enable-vp9 --disable-examples --disable-docs --disable-unit_tests
 CONFIGURE_ARGS += --enable-postproc --enable-vp9-postproc --enable-pic
 CONFIGURE_ARGS += --enable-vp9-highbitdepth --enable-better-hw-compatibility
@@ -27,41 +30,33 @@ include ../../mk/spksrc.archs.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
-ADDITIONAL_CPPFLAGS = -std=c++0x
 ADDITIONAL_CXXFLAGS = -std=c++0x
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=armv7-linux-gcc
-CONFIGURE_ARGS += --disable-neon
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu
 endif
 
-# neon_asm does not work under armv8/arm64
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=armv8-linux-gcc
 endif
 
-# Define x86asm
-ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-NASM_BINARY = $(shell which nasm)
-ifeq ($(NASM_BINARY),)
-$(error nasm not found. Please install NASM assembler)
-endif
-ENV += AS=$(NASM_BINARY)
-CONFIGURE_ARGS += --as=nasm
-CONFIGURE_ARGS += --disable-sse4_1
-endif
-
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=x86-linux-gcc
+# --as=auto: prefers yasm over nasm
+CONFIGURE_ARGS += --as=auto
+CONFIGURE_ARGS += --disable-sse4_1
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=x86_64-linux-gcc
+# --as=auto: prefers yasm over nasm
+CONFIGURE_ARGS += --as=auto
+CONFIGURE_ARGS += --disable-sse4_1
 endif
 
 include ../../mk/spksrc.cross-cc.mk
