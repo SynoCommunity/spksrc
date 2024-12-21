@@ -18,6 +18,8 @@ STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8094
+# There is no web app on service port:
+NO_SERVICE_SHORTCUT = true
 
 SPK_COMMANDS = bin/ntfy
 
