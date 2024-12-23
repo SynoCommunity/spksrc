@@ -1,11 +1,11 @@
 PKG_NAME = igt-gpu-tools
-PKG_VERS = 1.29
+PKG_VERS = 1.30
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gitlab.freedesktop.org/drm/igt-gpu-tools/-/archive/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
 
-DEPENDS  = cross/libdrm cross/libkmod cross/procps-ng cross/elfutils
+DEPENDS  = cross/libdrm cross/libkmod cross/libproc2 cross/elfutils
 DEPENDS += cross/pixman cross/cairo
 DEPENDS += cross/libudev_219
 
