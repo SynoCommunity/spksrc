@@ -24,4 +24,6 @@ CONFIGURE_ARGS += -Dman=disabled
 CONFIGURE_ARGS += -Dtestplan=disabled
 CONFIGURE_ARGS += -Dtests=disabled
 
+ADDITIONAL_CFLAGS = -O
+
 include ../../mk/spksrc.cross-meson.mk
