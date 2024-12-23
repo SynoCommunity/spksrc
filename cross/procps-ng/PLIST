@@ -1,3 +1,6 @@
+bin:bin/pgrep
+bin:bin/pmap
+bin:bin/watch
 lib:lib/libproc2.so
-lib:lib/libproc2.so.0
-lib:lib/libproc2.so.0.0.2
+lib:lib/libproc2.so.1
+lib:lib/libproc2.so.1.0.0
