@@ -18,6 +18,9 @@ BUILD_DEPENDS += cross/cups
 BUILD_DEPENDS += cross/alsa-lib
 BUILD_DEPENDS += cross/libX11
 BUILD_DEPENDS += cross/libXrender
+BUILD_DEPENDS += cross/libXrandr
+BUILD_DEPENDS += cross/libXtst
+BUILD_DEPENDS += cross/libXt
 
 # Dependencies used as system dependencies:
 DEPENDS  = cross/alsa-lib
@@ -52,8 +55,6 @@ CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-zlib=system
 CONFIGURE_ARGS += --with-libjpeg=system
 CONFIGURE_ARGS += --with-giflib=system
-CONFIGURE_ARGS += --with-libpng=system
-CONFIGURE_ARGS += --with-lcms=system
 CONFIGURE_ARGS += --with-alsa=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-stdc++lib=dynamic
 CONFIGURE_ARGS += --disable-javac-server
@@ -97,6 +98,8 @@ ADDITIONAL_CFLAGS = -O2
 # Use make JOBS=N to set number of CPU's in this package
 DISABLE_PARALLEL_MAKE = 1
 COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
+
+NM = $(TC_PATH)/$(TC_PREFIX)nm
 
 include ../../mk/spksrc.cross-cc.mk
 
