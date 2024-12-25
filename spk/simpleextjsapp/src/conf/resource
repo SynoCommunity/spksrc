@@ -1,0 +1,40 @@
+{
+  "webservice": {
+    "services": [
+      {
+        "service": "simpleextjsapp",
+        "display_name": "SimpleExtJSApp",
+        "type": "static",
+        "root": "simpleextjsapp",
+        "backend": 2,
+        "icon": "app/images/simpleextjsapp-{0}.png"
+      }
+    ],
+    "migrate": {
+      "root": [
+        {
+          "old": "simpleextjsapp",
+          "new": "simpleextjsapp"
+        }
+      ]
+    },
+    "portals": [
+      {
+        "service": "simpleextjsapp",
+        "type": "alias",
+        "name": "SynoExtJS API Docs",
+        "alias": "simpleextjsapp",
+        "app": "com.synocommunity.packages.simpleextjsapp"
+      }
+    ],
+    "pkg_dir_prepare": [
+      {
+        "source": "/var/packages/simpleextjsapp/target/web/docs/",
+        "target": "simpleextjsapp",
+        "mode": "0755",
+        "user": "sc-simpleextjsapp",
+        "group": "http"
+      }
+    ]
+  }
+}
