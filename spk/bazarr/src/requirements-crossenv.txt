@@ -4,4 +4,4 @@ lxml==4.9.3
 
 Pillow==9.5.0
 
-webcrtcvad-wheels==2.0.14
+webrtcvad-wheels==2.0.14
