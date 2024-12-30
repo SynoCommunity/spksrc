@@ -48,7 +48,7 @@ RUST_TARGET = armv7-unknown-linux-gnueabihf
 endif
 ifeq ($(findstring $(RUST_ARCH), $(ARMv7L_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = armv7-unknown-linux-gnueabi
-TC_RUSTUP_TOOLCHAIN = $(RUST_BUILD_VERSION)-$(RUST_TARGET)
+TC_RUSTUP_TOOLCHAIN = $(RUST_BUILD_VERSION)-armv7l-unknown-linux-gnueabi
 endif
 ifeq ($(findstring $(RUST_ARCH), $(ARMv8_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = aarch64-unknown-linux-gnu
