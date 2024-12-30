@@ -9,7 +9,7 @@ endif
 # source Tier-3 toolchains (qoriq)
 # ref: https://rustc-dev-guide.rust-lang.org/building/how-to-build-and-run.html
 ifeq ($(RUST_BUILD_TOOLCHAIN),)
-RUST_BUILD_TOOLCHAIN = 0
+RUST_BUILD_TOOLCHAIN = 1
 endif
 
 # Versions available: https://releases.rs/docs/
@@ -40,15 +40,15 @@ RUSTUP_DEFAULT_TOOLCHAIN_STAGE = 2
 
 # map archs to rust targets
 ifeq ($(findstring $(RUST_ARCH), $(ARMv5_ARCHS)),$(RUST_ARCH))
-RUSTUP_DEFAULT_TOOLCHAIN = 1.77.2
 RUST_TARGET = armv5te-unknown-linux-gnueabi
+TC_RUSTUP_TOOLCHAIN = $(RUST_BUILD_VERSION)-$(RUST_TARGET)
 endif
 ifeq ($(findstring $(RUST_ARCH), $(ARMv7_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = armv7-unknown-linux-gnueabihf
 endif
 ifeq ($(findstring $(RUST_ARCH), $(ARMv7L_ARCHS)),$(RUST_ARCH))
-RUSTUP_DEFAULT_TOOLCHAIN = 1.77.2
 RUST_TARGET = armv7-unknown-linux-gnueabi
+TC_RUSTUP_TOOLCHAIN = $(RUST_BUILD_VERSION)-$(RUST_TARGET)
 endif
 ifeq ($(findstring $(RUST_ARCH), $(ARMv8_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = aarch64-unknown-linux-gnu
