@@ -125,6 +125,7 @@ jobs:
     needs: prepare
     outputs:
       matrix: ${{ steps.defaults.outputs.matrix }}
+      has_entries: ${{ steps.defaults.outputs.has_entries }}
     steps:
       - id: defaults
         run: |
@@ -221,10 +222,14 @@ jobs:
           # Output the final matrix
           echo "matrix=$(echo $matrix | jq -c)" >> $GITHUB_OUTPUT
 
+          # Output if the matrix has entries
+          echo "has_entries=$(jq -e '.include | length > 0' <<< "$matrix" > /dev/null && echo true || echo false)" >> $GITHUB_OUTPUT
+
   build:
     name: Build
     needs: [prepare, set-defaults]
     runs-on: ubuntu-latest
+    if: ${{ needs.set-defaults.outputs.has_entries == 'true' }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}
