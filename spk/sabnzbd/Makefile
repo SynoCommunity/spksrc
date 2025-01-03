@@ -5,8 +5,8 @@ SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python311
 
-DEPENDS = cross/busybox cross/par2cmdline-turbo cross/sabnzbd
-OPTIONAL_DEPENDS = cross/unrar7 cross/7za cross/unrar cross/p7zip
+DEPENDS = cross/busybox cross/par2cmdline-turbo cross/7za cross/sabnzbd
+OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
 
 # python311 not supported
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
@@ -43,21 +43,12 @@ ADMIN_PORT = $(SERVICE_PORT)
 SPK_COMMANDS = bin/unrar bin/7za
 
 include ../../mk/spksrc.common.mk
-
 ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
 DEPENDS += cross/unrar
 else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
 DEPENDS += cross/unrar
 else
 DEPENDS += cross/unrar7
-endif
-
-ifeq ($(call version_lt, $(TCVERSION), 7.1),1)
-DEPENDS += cross/p7zip
-else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-DEPENDS += cross/p7zip
-else
-DEPENDS += cross/7za
 endif
 
 POST_STRIP_TARGET = sabnzbd_extra_install
