@@ -46,11 +46,15 @@ include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
 DEPENDS += cross/unrar
+else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+DEPENDS += cross/unrar
 else
 DEPENDS += cross/unrar7
 endif
 
 ifeq ($(call version_lt, $(TCVERSION), 7.1),1)
+DEPENDS += cross/p7zip
+else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
 DEPENDS += cross/p7zip
 else
 DEPENDS += cross/7za
