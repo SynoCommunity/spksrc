@@ -1,7 +1,7 @@
-PKG_NAME = 7z
+PKG_NAME = 7zz
 PKG_VERS = 24.09
 PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)$(subst .,,$(PKG_VERS))-src.$(PKG_EXT)
+PKG_DIST_NAME = 7z$(subst .,,$(PKG_VERS))-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ip7z/7zip/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)/CPP/7zip/Bundles/Alone2
 
