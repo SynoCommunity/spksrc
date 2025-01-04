@@ -30,7 +30,7 @@ CONFIGURE_ARGS += --enable-ipv6
 CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
-CONFIGURE_ARGS += --with-build-python=$(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python$(PKG_VERS_MAJOR_MINOR))
+CONFIGURE_ARGS += --with-build-python=$(PYTHON_NATIVE)
 CONFIGURE_ARGS += --with-readline=readline
 CONFIGURE_ARGS += --disable-test-modules
 
@@ -79,7 +79,7 @@ INSTALL_TARGET       = python313_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python3)
+PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python$(PKG_VERS_MAJOR_MINOR))
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 
 .PHONY: python313_post_patch
