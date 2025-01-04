@@ -3,23 +3,15 @@ name: Build
 on:
   workflow_dispatch:
     inputs:
-      package:
-        description: 'Package to build'
-        required: true
-        default: 'adminer'
       publish:
         description: 'Publish to repository'
         required: false
         default: false
         type: boolean
-      # Add a separator as a non-input description
-      build_settings_description:
-        description: 'Build Settings (archs to include):'
-        required: false
-        default: ''
-        type: choice
-        options:
-          - '---'
+      package:
+        description: 'Package to build'
+        required: true
+        default: 'adminer'
       add_noarch_builds:
         description: 'Include noarch packages'
         required: false
