@@ -209,9 +209,15 @@ endif
 	@$(MSG) [$(CROSSENV_PATH)] Processing $(CROSSENV_BUILD_REQUIREMENTS)
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	   $(MSG) build-pip install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
-	   $(RUN) $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
+	   $(RUN) \
+	     PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)" \
+	     LD_LIBRARY_PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)" \
+	     $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
 	   $(MSG) cross-pip Install -r $(CROSSENV_BUILD_REQUIREMENTS) ; \
-	   $(RUN) $$(which cross-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS)
+	   $(RUN) \
+	     PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)" \
+	     LD_LIBRARY_PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)" \
+	     $$(which cross-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install -r $(CROSSENV_BUILD_REQUIREMENTS)
 	@. $(CROSSENV_PATH)/bin/activate ; \
 	   $(MSG) "Package list for $(CROSSENV_PATH):" ; \
 	   $(RUN) $$(which cross-pip) list
