@@ -26,8 +26,11 @@ LICENSE  = PSF
 # Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
-WHEELS  = src/requirements-crossenv.txt
-WHEELS += src/requirements-abi3.txt
+WHEELS  = src/requirements-abi3.txt
+WHEELS += src/requirements-crossenv.txt
+WHEELS += src/requirements-pure.txt
+
+include ../../mk/spksrc.common.mk
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
@@ -83,8 +86,6 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
-include ../../mk/spksrc.common.mk
-
 # [rpds-py]
 # maturin canot be built as pre-requisite crossenv
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
@@ -92,6 +93,13 @@ WHEELS += src/requirements-crossenv-rpds-py.txt
 # Requires path to maturin from crossenv
 ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
 endif
+
+##
+## Addition of requirements files beyond spksrc.python.mk
+## will not be taken into consideration for processing
+## unless WHEELS has been previously populated. This is due to
+## the makefile analysis phase which discard ifeq instructions.
+##
 
 include ../../mk/spksrc.python.mk
 
@@ -148,9 +156,5 @@ WHEELS_CFLAGS += [pydantic_core] -std=c11
 else
 WHEELS_CFLAGS += [pydantic_core] -std=c99
 endif
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
-
-# [rpds-py]
 # Requires path to maturin from crossenv
 ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
