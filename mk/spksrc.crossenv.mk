@@ -15,9 +15,6 @@
 # Variables:
 #  WHEELS             List of wheels to go through
 
-# Set default shell to bash
-SHELL = /bin/bash
-
 # Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
 PYTHON_WORK_DIR = $(or $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(wildcard $(WORK_DIR)))
 
@@ -33,7 +30,7 @@ PYTHON_LIB_NATIVE           = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/bui
 PYTHON_LIB_CROSS            = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell expr "$(TC_TARGET)" : '\([^-]*\)' )-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 
 # wheel crossenv definitions
-CROSSENV_CONFIG_PATH = $(abspath $(WORK_DIR)/../../../mk/crossenv)
+CROSSENV_CONFIG_PATH = $(abspath $(PYTHON_WORK_DIR)/../crossenv)
 CROSSENV_CONFIG_DEFAULT = $(CROSSENV_CONFIG_PATH)/requirements-default.txt
 CROSSENV_PATH = $(abspath $(WORK_DIR)/crossenv-$(CROSSENV_BUILD_WHEEL)/)
 
@@ -75,9 +72,11 @@ CROSSENV_COOKIE = $(WORK_DIR)/.crossenv-$(CROSSENV_BUILD_WHEEL)_done
 ###
 
 # default wheel packages to install in crossenv
-CROSSENV_DEFAULT_PIP_VERSION = $(shell read version < <(grep -hnm 1 '^pip[<>=]=' $(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)) | head -1) && echo $${version#*[<>=]=})
-CROSSENV_DEFAULT_SETUPTOOLS_VERSION = $(shell read version < <(grep -hnm 1 '^setuptools[<>=]=' $(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)) | head -1) && echo $${version#*[<>=]=})
-CROSSENV_DEFAULT_WHEEL_VERSION = $(shell read version < <(grep -hnm 1 '^wheel[<>=]=' $(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)) | head -1) && echo $${version#*[<>=]=})
+ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)),)
+CROSSENV_DEFAULT_PIP_VERSION = $(shell grep -h -E "^pip[<>=]=" $(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)) | head -1 | sed -E 's/.*[<>=]=//')
+CROSSENV_DEFAULT_SETUPTOOLS_VERSION = $(shell grep -h -E "^setuptools[<>=]=" $(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)) | head -1 | sed -E 's/.*[<>=]=//')
+CROSSENV_DEFAULT_WHEEL_VERSION = $(shell grep -h -E "^wheel[<>=]=" $(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)) | head -1 | sed -E 's/.*[<>=]=//')
+endif
 
 ifneq ($(CROSSENV_DEFAULT_PIP_VERSION),)
 CROSSENV_DEFAULT_PIP = pip==$(CROSSENV_DEFAULT_PIP_VERSION)
