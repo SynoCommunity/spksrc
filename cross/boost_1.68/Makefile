@@ -2,7 +2,7 @@ PKG_NAME = boost
 PKG_VERS = 1.68.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
-PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
+PKG_DIST_SITE = https://archives.boost.io/release/$(PKG_VERS)/source
 PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 
 DEPENDS = cross/bzip2 cross/zlib
@@ -18,7 +18,7 @@ CONFIGURE_TARGET = boost_configure
 COMPILE_TARGET = boost_compile
 INSTALL_TARGET = boost_install
 
-# Build all if not told otherwise (we exclude python library when "all" selected)
+# Build all if not told otherwise (we exclude python library when "all" selected)
 BOOST_LIBRARIES ?= all
 
 # Expect already built python when python library selected
