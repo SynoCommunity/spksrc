@@ -26,8 +26,8 @@ CONFIGURE_ARGS += --enable-ipv6
 # installed pip is not on PATH
 CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
+CONFIGURE_ARGS += --with-build-python
 CONFIGURE_ARGS += --with-computed-gotos=yes
-CONFIGURE_ARGS += --with-build-python=$(PYTHON_NATIVE)
 CONFIGURE_ARGS += --disable-test-modules
 
 include ../../mk/spksrc.archs.mk
@@ -78,6 +78,11 @@ include ../../mk/spksrc.cross-cc.mk
 
 PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python$(PKG_VERS_MAJOR_MINOR))
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
+
+# Required to find build-python and to generate-posix-vars
+PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin:$(PATH)
+LD_LIBRARY_PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib:$(LD_LIBRARY_PATH)
+export PATH LD_LIBRARY_PATH
 
 .PHONY: python310_post_patch
 python310_post_patch:
