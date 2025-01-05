@@ -81,7 +81,7 @@ DEPENDS += cross/eza
 OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
 DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 endif
@@ -110,7 +110,7 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Remove fd (fd-find) for VS and NVR models (ARMv7L archs). <br/>"
+CHANGELOG  = "1. Remove fd (fd-find) v8.7.0 used for VS and NVR models (ARMv7L archs) and for ARMv5 archs. <br/>"
 CHANGELOG += "2. Update eza to v0.20.15. <br/>"
 CHANGELOG += "3. Update file to v5.46. <br/>"
 CHANGELOG += "4. Update fzf to v0.57.0. <br/>"
