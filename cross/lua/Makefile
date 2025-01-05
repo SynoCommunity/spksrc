@@ -1,5 +1,5 @@
 PKG_NAME = lua
-PKG_VERS = 5.4.4
+PKG_VERS = 5.4.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.lua.org/ftp
