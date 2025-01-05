@@ -44,9 +44,23 @@ else
 $(POST_WHEEL_TARGET): $(WHEEL_TARGET)
 endif
 
+wheel_msg_target:
+	@$(MSG) "Processing wheels of $(NAME)"
+
 wheeldownload: SHELL:=/bin/bash
 wheeldownload:
+ifeq ($(wildcard $(PIP_DISTRIB_DIR)),)
+	@$(MSG) Creating pip download directory: $(PIP_DISTRIB_DIR)
 	@mkdir -p $(PIP_DISTRIB_DIR)
+else
+	@$(MSG) Using existing pip download directory: $(PIP_DISTRIB_DIR)
+endif
+ifeq ($(wildcard $(PIP_CACHE_DIR)),)
+	@$(MSG) Creating pip caching directory: $(PIP_CACHE_DIR)
+	@mkdir -p $(PIP_CACHE_DIR)
+else
+	@$(MSG) Using existing pip cache directory: $(PIP_CACHE_DIR)
+endif
 	@if [ -n "$(WHEELS)" ] ; then \
 		for wheel in $(WHEELS_2_DOWNLOAD) ; do \
 			$(MSG) "Downloading wheels from $$wheel ..." ; \
@@ -100,9 +114,6 @@ wheeldownload:
 		$(MSG) "No wheels to download for [$(SPK_NAME)]" ; \
 	fi
 
-wheel_msg_target:
-	@$(MSG) "Processing wheels of $(NAME)"
-
 #
 # PIP_CACHE_OPT defaults to "--cache-dir $(PIP_CACHE_DIR)"
 # PIP_CACHE_DIR defaults to $(WORK_DIR)/pip
@@ -116,31 +127,28 @@ wheel_msg_target:
 # it actually used a cache built from x64-7.1
 #
 pre_wheel_target: wheel_msg_target wheeldownload
-ifneq ($(strip $(WHEELS)),)
-	@if [ -n "$(PIP_CACHE_OPT)" ] ; then \
-	   mkdir -p $(PIP_CACHE_DIR) ; \
-	fi; \
-	mkdir -p $(WHEELHOUSE) ; \
-	for wheel in $(WHEELS) ; do \
-	   if [ -f $$wheel ] ; then \
-	      if [ $$(basename $$wheel) = $(WHEELS_PURE_PYTHON) ]; then \
-	         $(MSG) "Adding existing $$wheel file as pure-python (discarding any cross-compiled)" ; \
-	         sed -e '/^cross:\|^#\|^$$/d' -e /^pure:/s/^pure://g $$wheel  >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-	      elif [ $$(basename $$wheel) = $(WHEELS_CROSSENV_COMPILE) ]; then \
-	         $(MSG) "Adding existing $$wheel file as cross-compiled (discarding any pure-python)" ; \
-	         sed -e '/^pure:\|^#\|^$$/d' -e /^cross:/s/^cross://g $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
-	      elif [ $$(basename $$wheel) = $(WHEELS_LIMITED_API) ]; then \
-	         $(MSG) "Adding existing $$wheel file as ABI-limited" ; \
-	         sed -e '/^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
-	      else \
-	         $(MSG) "Adapting existing $$wheel file" ; \
-	         sed -rn /^pure:/s/^pure://gp $$wheel         >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-	         sed -rn /^cross:/s/^cross://gp $$wheel       >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
-	         sed -e '/^pure:\|^cross:\|^#\|^$$/d' $$wheel >> $(WHEELHOUSE)/$(WHEELS_DEFAULT_REQUIREMENT) ; \
-	      fi ;\
+ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
+ifeq ($(wildcard $(WHEELHOUSE)),)
+	@$(MSG) Creating wheelhouse directory: $(WHEELHOUSE)
+	@mkdir -p $(WHEELHOUSE)
+else
+	@$(MSG) Using existing wheelhouse directory: $(WHEELHOUSE)
+endif
+	@$(MSG) Processing requirement files:
+	@for wheel in $(WHEELS) ; do \
+	   if [ $$(basename $$wheel) = $(WHEELS_PURE_PYTHON) ]; then \
+	      echo "===>      Adding $$wheel as pure-python (wheelhouse/$(WHEELS_PURE_PYTHON))" ; \
+	      sed -e '/^[[:blank:]]*$$\|^#/d' $$wheel  >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+	   elif [ $$(basename $$wheel) = $(WHEELS_CROSSENV_COMPILE) ]; then \
+	      echo "===>      Adding $$wheel as cross-compiled (wheelhouse/$(WHEELS_CROSSENV_COMPILE))" ; \
+	      sed -e '/^[[:blank:]]*$$\|^#/d' $$wheel >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
+	   elif [ $$(basename $$wheel) = $(WHEELS_LIMITED_API) ]; then \
+	      echo "===>      Adding $$wheel as ABI-limited (wheelhouse/$(WHEELS_LIMITED_API))" ; \
+	      sed -e '/^[[:blank:]]*$$\|^#/d' $$wheel >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
 	   else \
-	      $(MSG) "ERROR: File $$wheel does not exist" ; \
-	   fi ; \
+	      echo "===>      Adding $$wheel to default (wheelhouse/$(WHEELS_DEFAULT_REQUIREMENT))" ; \
+	      sed -e '/^[[:blank:]]*$$\|^#/d' $$wheel >> $(WHEELHOUSE)/$(WHEELS_DEFAULT_REQUIREMENT) ; \
+	   fi ;\
 	done
 	@for file in $$(ls -1 $(WHEELHOUSE)/requirements-*.txt) ; do \
 	   sort -u -o $${file}{,} ; \
@@ -148,61 +156,59 @@ ifneq ($(strip $(WHEELS)),)
 endif
 
 # Build cross compiled wheels first, to fail fast.
-# There might be an issue with some pure python wheels when built after that.
 build_wheel_target: SHELL:=/bin/bash
 build_wheel_target: $(PRE_WHEEL_TARGET)
-ifneq ($(strip $(WHEELS)),)
-	@if [ -s $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) -o -s $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ]; then \
-	   while IFS= read -r requirement ; do \
-	      wheel=$${requirement#*:} ; \
-	      file=$$(basename $${requirement%%:*}) ; \
-	      [ "$$(grep -s egg <<< $${wheel})" ] && name=$$(echo $${wheel#*egg=} | cut -f1 -d=) || name=$${wheel%%[<>=]=*} ; \
-	      version=$$(echo $${requirement#*[<>=]=} | cut -f1 -d' ') ; \
-	      $(MSG) "WHEEL=\"$${name}-$${version}\" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)" ; \
-	      MAKEFLAGS= WHEEL="$${name}-$${version}" $(MAKE) crossenv-$(ARCH)-$(TCVERSION) ; \
-	      for crossenv in $(WORK_DIR)/crossenv-$${name}-$${version} $(WORK_DIR)/crossenv-$${name} $(WORK_DIR)/crossenv ; do \
-	         [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
-	      done ; \
-	      crossenvPIP=$(PIP) ; \
-	      $(MSG) "WHEEL: activate crossenv found: $${CROSSENV}" ; \
-	      if [ -s "$${CROSSENV}" ] ; then \
-	         crossenvPIP=$$(. $${CROSSENV} && which pip) ; \
-	         $(MSG) "Python crossenv found: [$${CROSSENV}]" ; \
-	         $(MSG) "pip crossenv found: [$${crossenvPIP}]" ; \
-	      elif [ "$${PYTHON_VERSION}" != "2.7" ] ; then \
-	         $(MSG) "WARNING: Python crossenv NOT found!" ; \
-	         $(MSG) "WARNING: pip crossenv NOT found!" ; \
-	      else \
-	         $(MSG) "Python $${PYTHON_VERSION} uses pip: $${crossenvPIP}" ; \
-	      fi ; \
-	      $(MSG) "Cross-compiling [$${wheel%% *}] wheel using $${CROSSENV_PATH}" ; \
-	      [ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
-	      global_options=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs) ; \
-	      localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	      localLDFLAGS=($$(echo $(WHEELS_LDFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	      localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	      localCXXFLAGS=($$(echo $(WHEELS_CXXFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	      $(MSG) [$${name}] \
-	         $$([ "$$(echo $${localCFLAGS[@]})" ] && echo "CFLAGS=\"$${localCFLAGS[@]}\" ") \
-	         $$([ "$$(echo $${localCPPFLAGS[@]})" ] && echo "CPPFLAGS=\"$${localCPPFLAGS[@]}\" ") \
-	         $$([ "$$(echo $${localCXXFLAGS[@]})" ] && echo "CXXFLAGS=\"$${localCXXFLAGS[@]}\" ") \
-	         $$([ "$$(echo $${localLDFLAGS[@]})" ] && echo "LDFLAGS=\"$${localLDFLAGS[@]}\" ") \
-	         $$([ "$$(echo $${abi3})" ] && echo "$${abi3} ")" \
-	         $${global_options}" ; \
-	      PIP_CROSSENV=$${crossenvPIP} \
-	         REQUIREMENT=$$(echo $${wheel%% *}) \
-	         ADDITIONAL_CFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
-	         ADDITIONAL_CPPFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCPPFLAGS[@]}" \
-	         ADDITIONAL_CXXFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCXXFLAGS[@]}" \
-	         ADDITIONAL_LDFLAGS="$${localLDFLAGS[@]}" \
-	         ABI3="$${abi3}" \
-	         PIP_GLOBAL_OPTION="$${global_options}" \
-	         $(MAKE) \
-	         cross-compile-wheel-$${name} || exit 1 ; \
-	   done < <(grep -svH  -e "^\#" -e "^\$$" $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) $(WHEELHOUSE)/$(WHEELS_LIMITED_API)) ; \
-	else \
-	   $(MSG) "[SKIP] Cross-compiling wheels" ; \
-	fi
+ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(patsubst %-pure.txt,,$(WHEELS))))),)
+	@while IFS= read -r requirement ; do \
+	   wheel=$${requirement#*:} ; \
+	   file=$$(basename $${requirement%%:*}) ; \
+	   [ "$$(grep -s egg <<< $${wheel})" ] && name=$$(echo $${wheel#*egg=} | cut -f1 -d=) || name=$${wheel%%[<>=]=*} ; \
+	   version=$$(echo $${requirement#*[<>=]=} | cut -f1 -d' ') ; \
+	   $(MSG) "WHEEL=\"$${name}-$${version}\" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)" ; \
+	   MAKEFLAGS= WHEEL="$${name}-$${version}" $(MAKE) crossenv-$(ARCH)-$(TCVERSION) ; \
+	   for crossenv in $(WORK_DIR)/crossenv-$${name}-$${version} $(WORK_DIR)/crossenv-$${name} $(WORK_DIR)/crossenv ; do \
+	      [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
+	   done ; \
+	   crossenvPIP=$(PIP) ; \
+	   $(MSG) "WHEEL: activate crossenv found: $${CROSSENV}" ; \
+	   if [ -s "$${CROSSENV}" ] ; then \
+	      crossenvPIP=$$(. $${CROSSENV} && which pip) ; \
+	      $(MSG) "Python crossenv found: [$${CROSSENV}]" ; \
+	      $(MSG) "pip crossenv found: [$${crossenvPIP}]" ; \
+	   elif [ "$${PYTHON_VERSION}" != "2.7" ] ; then \
+	      $(MSG) "WARNING: Python crossenv NOT found!" ; \
+	      $(MSG) "WARNING: pip crossenv NOT found!" ; \
+	   else \
+	      $(MSG) "Python $${PYTHON_VERSION} uses pip: $${crossenvPIP}" ; \
+	   fi ; \
+	   $(MSG) "Cross-compiling [$${wheel%% *}] wheel using $${CROSSENV_PATH}" ; \
+	   [ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
+	   global_options=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs) ; \
+	   localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+	   localLDFLAGS=($$(echo $(WHEELS_LDFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+	   localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+	   localCXXFLAGS=($$(echo $(WHEELS_CXXFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
+	   $(MSG) [$${name}] \
+	      $$([ "$$(echo $${localCFLAGS[@]})" ] && echo "CFLAGS=\"$${localCFLAGS[@]}\" ") \
+	      $$([ "$$(echo $${localCPPFLAGS[@]})" ] && echo "CPPFLAGS=\"$${localCPPFLAGS[@]}\" ") \
+	      $$([ "$$(echo $${localCXXFLAGS[@]})" ] && echo "CXXFLAGS=\"$${localCXXFLAGS[@]}\" ") \
+	      $$([ "$$(echo $${localLDFLAGS[@]})" ] && echo "LDFLAGS=\"$${localLDFLAGS[@]}\" ") \
+	      $$([ "$$(echo $${abi3})" ] && echo "$${abi3} ")" \
+	      $${global_options}" ; \
+	   PIP_CROSSENV=$${crossenvPIP} \
+	      REQUIREMENT=$$(echo $${wheel%% *}) \
+	      ADDITIONAL_CFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
+	      ADDITIONAL_CPPFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCPPFLAGS[@]}" \
+	      ADDITIONAL_CXXFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCXXFLAGS[@]}" \
+	      ADDITIONAL_LDFLAGS="$${localLDFLAGS[@]}" \
+	      ABI3="$${abi3}" \
+	      PIP_GLOBAL_OPTION="$${global_options}" \
+	      $(MAKE) \
+	      cross-compile-wheel-$${name} || exit 1 ; \
+	done < <(grep -svH  -e "^\#" -e "^\$$" $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(patsubst %-pure.txt,,$(WHEELS))))))
+else
+	@$(MSG) "[SKIP] Cross-compiling wheels"
+endif
 ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	@if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
 	   $(MSG) "Building pure-python" ; \
@@ -214,7 +220,6 @@ ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	fi
 else
 	@$(MSG) "[SKIP] Building pure-python"
-endif
 endif
 
 # PATH modified to access native/python* linked to crossenv-<wheel>/build/bin
