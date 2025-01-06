@@ -3,7 +3,7 @@ SPK_VERS = 3.11.4.14
 SPK_REV = 5
 SPK_ICON = src/fengoffice.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/fengoffice
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
