@@ -124,7 +124,12 @@ else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy-gcc4.txt
 # [numpy] >= 1.25.0 requires c++17
 else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+# BUG numpy==1.25.2 only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-numpy-gcc85-x64.txt
+else
 WHEELS += src/requirements-crossenv-numpy.txt
+endif
 endif
 endif
 
