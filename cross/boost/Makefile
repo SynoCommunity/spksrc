@@ -24,7 +24,7 @@ WITH_PYTHON_LIBRARY =
 ifneq ($(findstring python,$(BOOST_LIBRARIES)),)
 WITH_PYTHON_LIBRARY = 1
 # The packages depending on boost with python, must build python before.
-include $(WORK_DIR)/python-cc.mk
+include $(or $(wildcard $(WORK_DIR)/crossenv/build/python-cc.mk), $(wildcard $(PYTHON_PACKAGE_WORK_DIR)/crossenv/build/python-cc.mk))
 PYTHON_NAME = $(basename $(notdir $(PYTHON_INTERPRETER)))
 else ifneq ($(findstring $(BOOST_LIBRARIES), all),)
 # exclude python library if "all" selected
