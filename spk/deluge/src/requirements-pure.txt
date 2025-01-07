@@ -5,22 +5,22 @@
 #deluge==2.1.1      ==> Using crossenv when building dev version
 
 # Other requirements
-attrs==23.1.0
-Automat==22.10.0
-chardet==5.1.0
-constantly==15.1.0
-#distlib==0.3.4     ==> python311
-#filelock==3.6.0    ==> python311
+attrs==24.3.0
+Automat==24.8.1
+chardet==5.2.0
+constantly==23.10.4
+#distlib            ==> python311
+#filelock           ==> python311
 hyperlink==21.0.0
-idna==3.4
-incremental==22.10.0
-Mako==1.2.4
-pyasn1==0.5.0
-pyasn1-modules==0.3.0
-pycparser==2.21
-pyOpenSSL==23.2.0
+idna==3.10
+incremental==24.7.2
+Mako==1.3.8
+pyasn1==0.6.1
+pyasn1-modules==0.4.1
+pycparser==2.22
+pyOpenSSL==24.3.0
 pyxdg==0.28
-service-identity==23.1.0
-#six==1.16.0        ==> python311
-Twisted==22.10.0
-typing_extensions==4.7.1
+service-identity==24.2.0
+#six                ==> python311
+Twisted==24.11.0
+typing_extensions==4.12.2
