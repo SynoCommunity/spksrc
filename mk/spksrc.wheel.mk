@@ -165,45 +165,30 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(patsubst %-pure.txt,,$
 	   [ "$$(grep -s egg <<< $${wheel})" ] && name=$$(echo $${wheel#*egg=} | cut -f1 -d=) || name=$${wheel%%[<>=]=*} ; \
 	   version=$$(echo $${requirement#*[<>=]=} | cut -f1 -d' ') ; \
 	   $(MSG) "WHEEL=\"$${name}-$${version}\" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)" ; \
-	   MAKEFLAGS= WHEEL="$${name}-$${version}" $(MAKE) crossenv-$(ARCH)-$(TCVERSION) ; \
-	   for crossenv in $(WORK_DIR)/crossenv-$${name}-$${version} $(WORK_DIR)/crossenv-$${name} $(WORK_DIR)/crossenv ; do \
-	      [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
-	   done ; \
-	   crossenvPIP=$(PIP) ; \
-	   $(MSG) "WHEEL: activate crossenv found: $${CROSSENV}" ; \
-	   if [ -s "$${CROSSENV}" ] ; then \
-	      crossenvPIP=$$(. $${CROSSENV} && which pip) ; \
-	      $(MSG) "Python crossenv found: [$${CROSSENV}]" ; \
-	      $(MSG) "pip crossenv found: [$${crossenvPIP}]" ; \
-	   elif [ "$${PYTHON_VERSION}" != "2.7" ] ; then \
-	      $(MSG) "WARNING: Python crossenv NOT found!" ; \
-	      $(MSG) "WARNING: pip crossenv NOT found!" ; \
-	   else \
-	      $(MSG) "Python $${PYTHON_VERSION} uses pip: $${crossenvPIP}" ; \
-	   fi ; \
-	   $(MSG) "Cross-compiling [$${wheel%% *}] wheel using $${CROSSENV_PATH}" ; \
+	   MAKEFLAGS= WHEEL="$${name}-$${version}" $(MAKE) crossenv-$(ARCH)-$(TCVERSION) --no-print-directory ; \
 	   [ "$${file}" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
 	   global_options=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs) ; \
 	   localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	   localLDFLAGS=($$(echo $(WHEELS_LDFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	   localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
 	   localCXXFLAGS=($$(echo $(WHEELS_CXXFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $${name} | cut -f2 -d] | xargs)) ; \
-	   $(MSG) [$${name}] \
+	   $(MSG) pip build [$${name}], version: [$${version}] \
 	      $$([ "$$(echo $${localCFLAGS[@]})" ] && echo "CFLAGS=\"$${localCFLAGS[@]}\" ") \
 	      $$([ "$$(echo $${localCPPFLAGS[@]})" ] && echo "CPPFLAGS=\"$${localCPPFLAGS[@]}\" ") \
 	      $$([ "$$(echo $${localCXXFLAGS[@]})" ] && echo "CXXFLAGS=\"$${localCXXFLAGS[@]}\" ") \
 	      $$([ "$$(echo $${localLDFLAGS[@]})" ] && echo "LDFLAGS=\"$${localLDFLAGS[@]}\" ") \
 	      $$([ "$$(echo $${abi3})" ] && echo "$${abi3} ")" \
 	      $${global_options}" ; \
-	   PIP_CROSSENV=$${crossenvPIP} \
-	      REQUIREMENT=$$(echo $${wheel%% *}) \
+	   REQUIREMENT=$$(echo $${wheel%% *}) \
+	      WHEEL_NAME=$${name} \
+	      WHEEL_VERSION=$${version} \
 	      ADDITIONAL_CFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
 	      ADDITIONAL_CPPFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCPPFLAGS[@]}" \
 	      ADDITIONAL_CXXFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCXXFLAGS[@]}" \
 	      ADDITIONAL_LDFLAGS="$${localLDFLAGS[@]}" \
 	      ABI3="$${abi3}" \
 	      PIP_GLOBAL_OPTION="$${global_options}" \
-	      $(MAKE) \
+	      $(MAKE) --no-print-directory \
 	      cross-compile-wheel-$${name} || exit 1 ; \
 	done < <(grep -svH  -e "^\#" -e "^\$$" $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(patsubst %-pure.txt,,$(WHEELS))))))
 else
@@ -224,14 +209,34 @@ endif
 
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
-	@if [ "$(PIP_GLOBAL_OPTION)" ]; then \
+	@for crossenv in $(WORK_DIR)/crossenv-$(WHEEL_NAME)-$(WHEEL_VERSION) $(WORK_DIR)/crossenv-$(WHEEL_NAME) $(WORK_DIR)/crossenv ; do \
+	   [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
+	done ; \
+	if [ -s "$${CROSSENV}" ] ; then \
+	   . $${CROSSENV} ; \
+	   $(MSG) "crossenv: [$${CROSSENV}]" ; \
+	   $(MSG) "PATH = [$${PATH}]" ; \
+	   $(MSG) "pip: [$$(which pip)]" ; \
+	   $(MSG) "maturin: [$$(which maturin)]" ; \
+	else \
+	   echo "ERROR: crossenv not found!" ; \
+	   exit 2 ; \
+	fi ; \
+	if [ "$(PIP_GLOBAL_OPTION)" ]; then \
 	   pip_global_option=$$(echo $(PIP_GLOBAL_OPTION) | sed 's/=\([^ ]*\)/="\1"/g; s/[^ ]*/--global-option=&/g') ; \
 	   pip_global_option=$${pip_global_option}" --no-use-pep517" ; \
 	fi ; \
 	$(MSG) \
-	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
-	   MESON_CROSS_FILE="$(MESON_TOOLCHAIN_WRK)" \
-	   $(PIP_CROSSENV) \
+	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
+	   PATH=$(subst PATH=,,$(subst $(PATH),,$(filter PATH=%,$(ENV))))$${PATH} \
+	   CFLAGS=\"$(CFLAGS)\" \
+	   CPPFLAGS=\"$(CPPFLAGS)\" \
+	   CXXFLAGS=\"$(CXXFLAGS)\" \
+	   LDFLAGS=\"$(LDFLAGS)\" \
+	   LDFLAGS=\"$(LDFLAGS)\" \
+	   CMAKE_TOOLCHAIN_FILE=$${CMAKE_TOOLCHAIN_FILE} \
+	   MESON_CROSS_FILE=$${MESON_CROSS_FILE} \
+	   $$(which pip) \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \
@@ -239,8 +244,15 @@ cross-compile-wheel-%:
 	   $(REQUIREMENT) ; \
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
-	   MESON_CROSS_FILE="$(MESON_TOOLCHAIN_WRK)" \
-	   $(PIP_CROSSENV) \
+	   PATH=$(subst PATH=,,$(subst $(PATH),,$(filter PATH=%,$(ENV))))$${PATH} \
+	   CFLAGS="$(CFLAGS)" \
+	   CPPFLAGS="$(CPPFLAGS)" \
+	   CXXFLAGS="$(CXXFLAGS)" \
+	   LDFLAGS="$(LDFLAGS)" \
+	   LDFLAGS="$(LDFLAGS)" \
+	   CMAKE_TOOLCHAIN_FILE=$${CMAKE_TOOLCHAIN_FILE} \
+	   MESON_CROSS_FILE=$${MESON_CROSS_FILE} \
+	   $$(which pip) \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \

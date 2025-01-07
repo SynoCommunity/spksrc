@@ -115,10 +115,10 @@ post_crossenv_target: $(CROSSENV_TARGET)
 crossenv-%:
 ifneq ($(filter error-%, $(CROSSENV_BUILD_WHEEL)),)
 	@$(MSG) $(MAKE) $(CROSSENV_BUILD_WHEEL)
-	@$(MAKE) $(CROSSENV_BUILD_WHEEL)
+	@$(MAKE) $(CROSSENV_BUILD_WHEEL) --no-print-directory
 else
 	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv
-	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv --no-print-directory
 endif
 
 ####
@@ -242,6 +242,8 @@ $(CROSSENV_PATH)/build/python-cc.mk:
 	@echo PYTHON_INC_DIR=include/python$(PYTHON_PKG_VERS_MAJOR_MINOR) >> $@
 	@echo PYO3_CROSS_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
 	@echo PYO3_CROSS_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
+	@echo CMAKE_TOOLCHAIN_FILE=$(abspath $(CMAKE_TOOLCHAIN_WRK)) >> $@
+	@echo MESON_CROSS_FILE=$(abspath $(MESON_TOOLCHAIN_WRK)) >> $@
 	@echo OPENSSL_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
 	@echo OPENSSL_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
 	@echo PIP=$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/pip) >> $@
