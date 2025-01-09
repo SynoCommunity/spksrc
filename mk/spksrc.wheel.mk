@@ -207,16 +207,23 @@ else
 	@$(MSG) "[SKIP] Building pure-python"
 endif
 
+##
+## crossenv PATH environment requires a combination of:
+##   1) unique PATH variable from $(ENV) -> using merge + dedup macros
+##         Note: Multiple declarations of ENV += PATH=bla creates confusion in its interpretation.
+##               Solution implemented fetches all PATH from ENV and combine them in reversed order.
+##   2) access to maturin from native/python<version>/.../bin -> ${PYTHON_NATIVE_PATH}/bin
+##   3) access to crossenv/bin/cross* tools, mainly cross-pip -> ${CROSSENV_PATH}/bin
+##
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
 	@for crossenv in $(WORK_DIR)/crossenv-$(WHEEL_NAME)-$(WHEEL_VERSION) $(WORK_DIR)/crossenv-$(WHEEL_NAME) $(WORK_DIR)/crossenv ; do \
 	   [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
 	done ; \
-	if [ -s "$${CROSSENV}" ] ; then \
-	   . $${CROSSENV} ; \
-	   $(MSG) "crossenv: [$${CROSSENV}]" ; \
-	   $(MSG) "PATH = [$${PATH}]" ; \
-	   $(MSG) "pip: [$$(which pip)]" ; \
+	if [ -d "$${CROSSENV_PATH}" ] ; then \
+	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$${PYTHON_NATIVE_PATH}:$${CROSSENV_PATH}/bin:$${PATH} ; \
+	   $(MSG) "crossenv: [$${CROSSENV_PATH}]" ; \
+	   $(MSG) "pip: [$$(which cross-pip)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
@@ -226,17 +233,12 @@ cross-compile-wheel-%:
 	   pip_global_option=$$(echo $(PIP_GLOBAL_OPTION) | sed 's/=\([^ ]*\)/="\1"/g; s/[^ ]*/--global-option=&/g') ; \
 	   pip_global_option=$${pip_global_option}" --no-use-pep517" ; \
 	fi ; \
-	$(MSG) \
+	$(RUN) $(MSG) \
 	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
-	   PATH=$(subst PATH=,,$(subst $(PATH),,$(filter PATH=%,$(ENV))))$${PATH} \
-	   CFLAGS=\"$(CFLAGS)\" \
-	   CPPFLAGS=\"$(CPPFLAGS)\" \
-	   CXXFLAGS=\"$(CXXFLAGS)\" \
-	   LDFLAGS=\"$(LDFLAGS)\" \
-	   LDFLAGS=\"$(LDFLAGS)\" \
+	   PATH=$${PATH} \
 	   CMAKE_TOOLCHAIN_FILE=$${CMAKE_TOOLCHAIN_FILE} \
 	   MESON_CROSS_FILE=$${MESON_CROSS_FILE} \
-	   $$(which pip) \
+	   cross-pip \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \
@@ -244,15 +246,10 @@ cross-compile-wheel-%:
 	   $(REQUIREMENT) ; \
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
-	   PATH=$(subst PATH=,,$(subst $(PATH),,$(filter PATH=%,$(ENV))))$${PATH} \
-	   CFLAGS="$(CFLAGS)" \
-	   CPPFLAGS="$(CPPFLAGS)" \
-	   CXXFLAGS="$(CXXFLAGS)" \
-	   LDFLAGS="$(LDFLAGS)" \
-	   LDFLAGS="$(LDFLAGS)" \
+	   PATH=$${PATH} \
 	   CMAKE_TOOLCHAIN_FILE=$${CMAKE_TOOLCHAIN_FILE} \
 	   MESON_CROSS_FILE=$${MESON_CROSS_FILE} \
-	   $$(which pip) \
+	   cross-pip \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \
