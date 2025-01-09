@@ -151,9 +151,6 @@ meson_vars:
 	  fi ; \
 	done
 	@echo
-	@echo "[properties]" ; \
-	echo "sys_root = '$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)'"
-	@echo
 	@echo "[built-in]" ; \
 	echo "c_args = ['$(MESON_BUILTIN_C_ARGS)']" ; \
 	echo "c_link_args = ['$(MESON_BUILTIN_C_LINK_ARGS)']" ; \
