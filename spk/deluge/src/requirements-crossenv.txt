@@ -2,29 +2,27 @@
 ## required wheels that need cross compilation
 ##
 
-#deluge==2.1.1        ==> pure
-
 # [deluge]
-#deluge==2.1.1
+#deluge==2.1.1        ==> pure
 # Latest commit on develop branch
 #git+https://github.com/deluge-torrent/deluge.git@develop#egg=deluge==2.1.1
-# Commit from May30th on develop branch
-git+https://github.com/deluge-torrent/deluge.git@8001110625dd95c188c7425d0d95f93abe65f03c#egg=deluge==2.1.1.dev61
+# Commit from August 27th 2024 on develop branch
+git+https://github.com/deluge-torrent/deluge.git@8df36c454be320571005231a1c77cedb656557e1#egg=deluge==2.1.1.dev127
 
 # [rencode] 1.0.6     ==> abi3
 
-cffi==1.15.1
-#cryptography==41.0.1 ==> cross/cryptography (py36-abi3)
+cffi==1.17.1
+cryptography==44.0.0
 GeoIP==1.3.2
-MarkupSafe==2.1.3
-zope.interface==6.0
+MarkupSafe==3.0.2
+zope.interface==7.2
 
-# [libtorrent] 2.0.9
-# Depends: openssl, boost 1.82, geoip
+# [libtorrent] 2.0.10
+# Depends: openssl3, boost 1.82, geoip
 # Require environment variables
 #  BOOST_LIBRARIES
 #  BOOST_BUILD_PATH
 # Only supported on DSM7 armv7, aarch64, x64
-git+https://github.com/arvidn/libtorrent.git@v2.0.9#egg=libtorrent==2.0.9
+git+https://github.com/arvidn/libtorrent.git@v2.0.10#egg=libtorrent==2.0.10
 # Use RC_2_0 for latest development snapshots
-# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.9
+# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.10

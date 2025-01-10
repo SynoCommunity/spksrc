@@ -15,21 +15,29 @@ bcrypt==4.2.0
 # https://docs.rs/openssl/latest/openssl/#automatic
 #  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==43.0.1
+cryptography==43.0.3
+cryptography==44.0.0
 
 # Requirement for cryptography
-cffi==1.17.0
+cffi==1.15.1
+cffi==1.17.1
 
 # commonly used cross-compiled wheels
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
+borgbackup==1.2.6
+charset-normalizer==3.2.0
 immutables==0.20
+llfuse==1.5.0
 MarkupSafe==2.1.5
+msgpack==1.0.5              # used compiled verrsion for performance
 msgpack-python==0.5.6
 netifaces==0.11.0
 psutil==6.0.0
+pyrsistent==0.19.3
 regex==2024.7.24
+ruamel.yaml.clib==0.2.7
 SQLAlchemy==2.0.32
 zope.interface==7.0.2
 
@@ -91,6 +99,14 @@ PyYAML==6.0.2
 # Updated fork of the project
 # rencode==1.0.6 <<-- unsupported
 git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7
+
+# [rpds-py]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Requires path to maturin from crossenv
+#  ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+rpds-py==0.10.2
 
 # [ujson]
 #   - Require setuptools-scm in cross/python3* crossenv
