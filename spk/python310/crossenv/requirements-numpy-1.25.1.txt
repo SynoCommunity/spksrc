@@ -1,0 +1,14 @@
+pip==23.2.1
+setuptools==63.4.3
+wheel==0.41.2
+#
+cffi==1.15.1
+cryptography==41.0.3
+Cython==0.29.36
+flit==3.9.0
+maturin==1.2.3
+msgpack==1.0.5
+poetry==1.6.1
+scikit-build==0.17.6
+setuptools-rust==1.7.0
+setuptools-scm==7.1.0

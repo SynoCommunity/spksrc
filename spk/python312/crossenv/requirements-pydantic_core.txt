@@ -1,0 +1,10 @@
+pip==24.3.1
+pip-tools==7.4.1
+setuptools==75.4.0
+build==1.2.2
+wheel==0.45.0
+#
+# [pydantic_core] depends on Cython < 3.x
+Cython==0.29.37
+maturin==1.7.4
+typing_extensions==4.12.2
