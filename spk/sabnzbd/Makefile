@@ -39,9 +39,6 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
-
-SPK_COMMANDS = bin/unrar bin/7za
-
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
 DEPENDS += cross/unrar
@@ -55,6 +52,8 @@ POST_STRIP_TARGET = sabnzbd_extra_install
 
 # Add nice and ionice commands
 ENV += BUSYBOX_CONFIG="nice ionice"
+
+SPK_COMMANDS = bin/7za
 
 # [cryptography]
 DEPENDS += cross/cryptography
