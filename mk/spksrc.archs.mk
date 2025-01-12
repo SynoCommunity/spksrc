@@ -18,6 +18,9 @@ endif
 # SRM - Synology Router Manager
 SRM_ARMv7_ARCHS = northstarplus ipq806x dakota hawkeye
 SRM_ARMv8_ARCHS = cypress
+# required in spksrc.pre-check.mk
+SRM_ARCHS = $(SRM_ARMv7_ARCHS) $(SRM_ARMv8_ARCHS)
+
 # DSM - all ARMv7 except SRM specific archs
 DSM_ARMv7_ARCHS = alpine alpine4k armada370 armada375 armada38x armadaxp monaco
 # comcerto2k is the only ARMv7 arch that uses an GCC (4.9.3) and GLIBC (2.20)
