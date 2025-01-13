@@ -13,7 +13,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 # unrar not supported
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
-SPK_DEPENDS = "python311>=3.11.5-8"
+SPK_DEPENDS = $(PYTHON_PACKAGE)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -23,7 +23,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Update SABnzbd to 4.4.1. <br/>2. Update 7za to v24.09. <br/>3. Update unrar to v7.1.2 (DSM 7 only)."
+CHANGELOG = "1. Update SABnzbd to 4.4.1. <br/>2. Update 7za to v24.09. <br/>3. Update unrar to v7.1.2 (DSM 7 only). <br/>4. Update par2cmdline-turbo to v1.2.0."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
