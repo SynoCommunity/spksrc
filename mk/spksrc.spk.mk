@@ -539,6 +539,7 @@ spkclean:
 
 wheelclean: spkclean
 	rm -fr work-*/.wheel_done \
+	       work-*/.wheel_*_done \
 	       work-*/wheelhouse \
 	       work-*/install/var/packages/**/target/share/wheelhouse
 	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
