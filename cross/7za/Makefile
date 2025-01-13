@@ -57,4 +57,4 @@ endif
 7z_install:
 	@$(MSG) Install target file
 	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
-	@install -m 644 $(WORK_DIR)/$(PKG_DIR)/_o/7za $(STAGING_INSTALL_PREFIX)/bin
+	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/_o/7za $(STAGING_INSTALL_PREFIX)/bin
