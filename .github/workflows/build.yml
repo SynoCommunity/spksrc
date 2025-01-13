@@ -3,23 +3,15 @@ name: Build
 on:
   workflow_dispatch:
     inputs:
-      package:
-        description: 'Package to build'
-        required: true
-        default: 'adminer'
       publish:
         description: 'Publish to repository'
         required: false
         default: false
         type: boolean
-      # Add a separator as a non-input description
-      build_settings_description:
-        description: 'Build Settings (archs to include):'
-        required: false
-        default: ''
-        type: choice
-        options:
-          - '---'
+      package:
+        description: 'Package to build'
+        required: true
+        default: 'adminer'
       add_noarch_builds:
         description: 'Include noarch packages'
         required: false
@@ -47,6 +39,11 @@ on:
         type: boolean
       add_dsm52_builds:
         description: 'Include DSM 5.2 archs'
+        required: false
+        default: false
+        type: boolean
+      add_srm13_builds:
+        description: 'Include SRM 1.3 archs'
         required: false
         default: false
         type: boolean
@@ -141,6 +138,7 @@ jobs:
           add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
+          add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           has_noarch_packages=$([ -n "${{ needs.prepare.outputs.noarch_packages }}" ] && echo "true" || echo "false")
           has_arch_packages=$([ -n "${{ needs.prepare.outputs.arch_packages }}" ] && echo "true" || echo "false")
@@ -217,6 +215,12 @@ jobs:
             add_to_matrix "x86-5.2"
             add_to_matrix "88f6281-5.2"
             add_to_matrix "ppc853x-5.2"
+          fi
+
+          # Add SRM 1.3 builds
+          if [ "$add_srm13_builds" == "true" ]; then
+            add_to_matrix "aarch64-1.3"
+            add_to_matrix "armv7-1.3"
           fi
 
           # Add SRM 1.2 builds
