@@ -1,8 +1,8 @@
 ### Wheel rules
-#   Create wheel for modules listed in WHEELS. 
+#   Create wheels for modules listed in WHEELS. 
 #   If CROSS_COMPILE_WHEELS is set via python-cc.mk,
-#   wheel are cross-compiled. If not, pure-python 
-#   wheel are created.
+#   wheels are cross-compiled. If not, pure-python 
+#   wheels are created.
 
 # Targets are executed in the following order:
 #  wheel_msg_target
@@ -94,6 +94,18 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 	      name=$$(echo $${wheel%%[<>=]=*} | sed -E "s/^(abi3|crossenv|pure)://") ; \
 	   fi ; \
 	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
+	   if [ ! "$${version}" ]; then \
+	      $(MSG) Fetching latest version available ; \
+	      query="curl -s https://pypi.org/pypi/$${name}/json" ; \
+	      query+=" | jq -r '.releases[][]" ; \
+	      query+=" | select(.packagetype==\"sdist\")" ; \
+	      query+=" | .filename'" ; \
+	      query+=" | sort -V" ; \
+	      query+=" | tail -1" ; \
+	      query+=" | sed -e 's/.tar.gz//g' -e 's/.zip//g'" ; \
+	      query+=" | awk -F'-' '{print \$$2}'" ; \
+	      version=$$(eval $${query} 2>/dev/null) ; \
+	   fi ; \
 #	   $(MSG) requirement: [$${requirement}] ; \
 #	   $(MSG) file: [$${file}] ; \
 #	   $(MSG) wheel: [$${wheel}] ; \
@@ -120,6 +132,18 @@ ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $
 	      name=$$(echo $${wheel%%[<>=]=*} | sed -E "s/^(abi3|crossenv|pure)://") ; \
 	   fi ; \
 	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
+	   if [ ! "$${version}" ]; then \
+	      $(MSG) Fetching latest version available ; \
+	      query="curl -s https://pypi.org/pypi/$${name}/json" ; \
+	      query+=" | jq -r '.releases[][]" ; \
+	      query+=" | select(.packagetype==\"sdist\")" ; \
+	      query+=" | .filename'" ; \
+	      query+=" | sort -V" ; \
+	      query+=" | tail -1" ; \
+	      query+=" | sed -e 's/.tar.gz//g' -e 's/.zip//g'" ; \
+	      query+=" | awk -F'-' '{print \$$2}'" ; \
+	      version=$$(eval $${query} 2>/dev/null) ; \
+	   fi ; \
 #	   $(MSG) requirement: [$${requirement}] ; \
 #	   $(MSG) wheel: [$${wheel}] ; \
 #	   $(MSG) name: [$${name}] ; \

@@ -58,35 +58,20 @@ ifeq ($(wildcard $(WHEELHOUSE)),)
 	@$(MSG) Creating wheelhouse directory: $(WHEELHOUSE)
 	@mkdir -p $(WHEELHOUSE)
 endif
-	@if [ ! "$(WHEEL_VERSION)" ]; then \
-	   $(MSG) Fetching latest version available ; \
-	   query="curl -s https://pypi.org/pypi/$(WHEEL_NAME)/json" ; \
-	   query+=" | jq -r '.releases[][]" ; \
-	   query+=" | select(.packagetype==\"sdist\")" ; \
-	   query+=" | .filename'" ; \
-	   query+=" | sort -V" ; \
-	   query+=" | tail -1" ; \
-	   query+=" | sed -e 's/.tar.gz//g' -e 's/.zip//g'" ; \
-	   query+=" | awk -F'-' '{print \$$2}'" ; \
-	   version=$$(eval $${query} 2>/dev/null) ; \
-	else \
-	   version=$(WHEEL_VERSION) ; \
-	fi ; \
+	@$(MSG) Downloading wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)] ; \
 #	$(MSG) requirement: [$(REQUIREMENT)] ; \
 #	$(MSG) requirement-grep-egg: [$$(grep -s egg <<< $(REQUIREMENT))] ; \
 #	$(MSG) name: [$(WHEEL_NAME)] ; \
 #	$(MSG) type: [$(WHEEL_TYPE)] ; \
-#	$(MSG) version-shell: [$${version}] ; \
-#	$(MSG) version-make: [$(WHEEL_VERSION)] ; \
+#	$(MSG) version: [$(WHEEL_VERSION)] ; \
 #	$(MSG) type: [$(WHEEL_TYPE)] ; \
-	$(MSG) Downloading wheel [$(WHEEL_NAME)], version [$${version}] ; \
 	if [ "$$(grep -s egg <<< $(REQUIREMENT))" ] ; then \
 	   echo "WARNING: Skipping download URL - Downloaded at build time" ; \
 	else \
 	   query="curl -s https://pypi.org/pypi/$(WHEEL_NAME)/json" ; \
 	   query+=" | jq -r '.releases[][]" ; \
 	   query+=" | select(.packagetype==\"sdist\")" ; \
-	   query+=" | select((.filename|test(\"-$${version}.tar.gz\")) or (.filename|test(\"-$${version}.zip\"))) | .url'" ; \
+	   query+=" | select((.filename|test(\"-$(WHEEL_VERSION).tar.gz\")) or (.filename|test(\"-$(WHEEL_VERSION).zip\"))) | .url'" ; \
 	   outFile=$$(basename $$(eval $${query} 2>/dev/null) 2</dev/null) ; \
 	   if [ "$${outFile}" = "" ]; then \
 	      echo "ERROR: Invalid package name [$(WHEEL_NAME)]" ; \
@@ -99,14 +84,14 @@ endif
 	   fi ; \
 	fi ; \
 	case $(WHEEL_TYPE) in \
-	       abi3) $(MSG) Adding $(WHEEL_NAME)==$${version} to wheelhouse/$(WHEELS_LIMITED_API) ; \
-	             echo $(WHEEL_NAME)==$${version} | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
+	       abi3) $(MSG) Adding $(WHEEL_NAME)==$$(WHEEL_VERSION) to wheelhouse/$(WHEELS_LIMITED_API) ; \
+	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
 	             ;; \
-	   crossenv) $(MSG) Adding $(WHEEL_NAME)==$${version} to wheelhouse/$(WHEELS_CROSSENV_COMPILE) ; \
-	             echo $(WHEEL_NAME)==$${version} | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
+	   crossenv) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_CROSSENV_COMPILE) ; \
+	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
 	             ;; \
-	       pure) $(MSG) Adding $(WHEEL_NAME)==$${version} to wheelhouse/$(WHEELS_PURE_PYTHON) ; \
-	             echo $(WHEEL_NAME)==$${version} | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+	       pure) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_PURE_PYTHON) ; \
+	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 	             ;; \
 	          *) $(MSG) No type found for wheel [$(REQUIREMENT)] ; \
 	             ;; \
