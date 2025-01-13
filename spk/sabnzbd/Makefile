@@ -5,7 +5,7 @@ SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python311
 
-DEPENDS = cross/busybox cross/par2cmdline-turbo cross/7za cross/sabnzbd
+DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7za cross/sabnzbd
 OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
 
 # python311 not supported
@@ -49,9 +49,6 @@ DEPENDS += cross/unrar7
 endif
 
 POST_STRIP_TARGET = sabnzbd_extra_install
-
-# Add nice and ionice commands
-ENV += BUSYBOX_CONFIG="nice ionice"
 
 SPK_COMMANDS = bin/7za
 
