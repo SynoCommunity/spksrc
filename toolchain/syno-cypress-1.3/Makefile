@@ -1,7 +1,6 @@
 TC_ARCH = cypress
 TC_VERS = 1.3
 TC_TYPE = SRM
-# TODO: validate kernel version
 TC_KERNEL = 4.4.60
 TC_GLIBC = 2.32
 
