@@ -5,7 +5,7 @@ SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python311
 
-DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7za cross/sabnzbd
+DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
 OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
 
 # python311 not supported
@@ -23,7 +23,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Update SABnzbd to 4.4.1. <br/>2. Update 7za to v24.09. <br/>3. Update unrar to v7.1.2 (DSM 7 only). <br/>4. Update par2cmdline-turbo to v1.2.0."
+CHANGELOG = "1. Update SABnzbd to 4.4.1. <br/>2. Replace 7za by 7zz v24.09. <br/>3. Update unrar to v7.1.2 (DSM 7 only). <br/>4. Update par2cmdline-turbo to v1.2.0."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -50,7 +50,7 @@ endif
 
 POST_STRIP_TARGET = sabnzbd_extra_install
 
-SPK_COMMANDS = bin/7za
+SPK_COMMANDS = bin/7zz
 
 # [cryptography]
 DEPENDS += cross/cryptography
