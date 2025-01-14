@@ -553,10 +553,15 @@ wheelclean: spkclean
 	   fi ; \
 	done
 
-wheelcleancache: wheelclean
+wheelclean-%: spkclean
+	rm -f work-*/.wheel_done \
+	      work-*/wheelhouse/$*-*.whl
+	find work-* -type f -regex '.*\.wheel_\(download\|compile\|install\)-$*_done' -exec rm -f {} \;
+
+wheelcleancache:
 	rm -fr work-*/pip
 
-wheelcleanall: wheelcleancache
+wheelcleanall: wheelcleancache wheelclean
 	rm -fr ../../distrib/pip
 
 crossenvclean: wheelclean
