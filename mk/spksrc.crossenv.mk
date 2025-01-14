@@ -166,7 +166,7 @@ export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/py
 #    >>> sys.path
 #
 build_crossenv_target: SHELL:=/bin/bash
-build_crossenv_target: $(CROSSENV_PATH)/build/python-cc.mk
+build_crossenv_target: pre_crossenv_target $(CROSSENV_PATH)/build/python-cc.mk
 	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), CROSSENV: $(WHEEL) >> $(PSTAT_LOG)
 	@$(MSG) Python sources: $(wildcard $(PYTHON_WORK_DIR)/Python-[0-9]*)
 	@$(MSG) crossenv wheel packages: $(CROSSENV_DEFAULT_PIP), $(CROSSENV_DEFAULT_SETUPTOOLS), $(CROSSENV_DEFAULT_WHEEL)
