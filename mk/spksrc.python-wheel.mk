@@ -39,6 +39,10 @@ build_crossenv_module:
 
 ### Python wheel rules
 build_python_wheel_target: build_crossenv_module
+ifeq ($(wildcard $(WHEELHOUSE)),)
+	@$(MSG) Creating wheelhouse directory: $(WHEELHOUSE)
+	@mkdir -p $(WHEELHOUSE)
+endif
 	$(foreach e,$(shell cat $(CROSSENV_MODULE_PATH)/build/python-cc.mk),$(eval $(e)))
 	@. $(CROSSENV) ; \
 	$(MSG) _PYTHON_HOST_PLATFORM=$(TC_TARGET) cross-python3 -m build $(BUILD_ARGS) --wheel $(WHEELS_BUILD_ARGS) --outdir $(WHEELHOUSE) ; \
