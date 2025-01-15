@@ -1,9 +1,9 @@
 ### Wheel rules
-#   Create wheels for modules listed in WHEELS. 
-#   If CROSS_COMPILE_WHEELS is set via python-cc.mk,
-#   wheels are cross-compiled. If not, pure-python 
-#   wheels are created.
-
+# Process wheels for modules listed in WHEELS. 
+#   1. wheel_download
+#   2. wheel_compile
+#   3. wheel_install
+#
 # Targets are executed in the following order:
 #  wheel_msg_target
 #  pre_wheel_target   (override with PRE_WHEEL_TARGET)
@@ -29,21 +29,16 @@ include ../../mk/spksrc.cross-meson-env.mk
 
 include ../../mk/spksrc.wheel-download.mk
 
-#wheel_configure: wheel_download
-#include ../../mk/spksrc.wheel-configure.mk
-#
-#wheel_compile: wheel_configure
-#include ../../mk/spksrc.wheel-compile.mk
-#
-#wheel_install: wheel_compile
-#include ../../mk/spksrc.wheel-install.mk
-#
-#all: wheel_install
+wheel_compile: wheel_download
+include ../../mk/spksrc.wheel-compile.mk
+
+wheel_install: wheel_compile
+include ../../mk/spksrc.wheel-install.mk
 
 ##
 
 ifneq ($(strip $(REQUIREMENT)),)
-wheel: wheel_download
+wheel: wheel_install
 else
 
 ifeq ($(strip $(PRE_WHEEL_TARGET)),)

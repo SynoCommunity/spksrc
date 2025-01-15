@@ -1,0 +1,78 @@
+### Wheel rules
+# Install wheels for modules listed in WHEELS. 
+#
+# Targets are executed in the following order:
+#  wheel_install_msg_target
+#  pre_wheel_install_target   (override with PRE_WHEEL_INSTALL_TARGET)
+#  wheel_install_target       (override with WHEEL_INSTALL_TARGET)
+#  post_wheel_install_target  (override with POST_WHEEL_INSTALL_TARGET)
+# Variables:
+#  REQUIREMENT             Requirement formatted wheel information
+#  WHEEL_NAME              Name of wheel to process
+#  WHEEL_VERSION           Version of wheel to process (can be empty)
+#  WHEEL_TYPE              Type of wheel to process (abi3, crossenv, pure)
+
+ifeq ($(WHEEL_VERSION),)
+WHEEL_INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_install-$(WHEEL_NAME)_done
+else
+WHEEL_INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_install-$(WHEEL_NAME)-$(WHEEL_VERSION)_done
+endif
+
+##
+
+ifeq ($(strip $(PRE_WHEEL_INSTALL_TARGET)),)
+PRE_WHEEL_INSTALL_TARGET = pre_wheel_install_target
+else
+$(PRE_WHEEL_INSTALL_TARGET): wheel_install_msg_target
+endif
+ifeq ($(strip $(WHEEL_INSTALL_TARGET)),)
+WHEEL_INSTALL_TARGET = wheel_install_target
+else
+$(WHEEL_INSTALL_TARGET): $(BUILD_WHEEL_INSTALL_TARGET)
+endif
+ifeq ($(strip $(POST_WHEEL_INSTALL_TARGET)),)
+POST_WHEEL_INSTALL_TARGET = post_wheel_install_target
+else
+$(POST_WHEEL_INSTALL_TARGET): $(WHEEL_INSTALL_TARGET)
+endif
+
+wheel_install_msg_target:
+	@$(MSG) "Processing wheels of $(NAME)"
+
+pre_wheel_install_target: wheel_install_msg_target
+
+wheel_install_target: SHELL:=/bin/bash
+wheel_install_target:
+ifeq ($(wildcard $(WHEELHOUSE)),)
+	@$(MSG) Creating wheelhouse directory: $(WHEELHOUSE)
+	@mkdir -p $(WHEELHOUSE)
+endif
+	@$(MSG) Installing wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)] ; \
+	case $(WHEEL_TYPE) in \
+	       abi3) $(MSG) Adding $(WHEEL_NAME)==$$(WHEEL_VERSION) to wheelhouse/$(WHEELS_LIMITED_API) ; \
+	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
+	             ;; \
+	   crossenv) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_CROSSENV_COMPILE) ; \
+	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
+	             ;; \
+	       pure) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_PURE_PYTHON) ; \
+	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
+	             ;; \
+	          *) $(MSG) No type found for wheel [$(REQUIREMENT)] ; \
+	             ;; \
+	esac
+	@for file in $$(ls -1 $(WHEELHOUSE)/requirements-*.txt) ; do \
+	   sort -u -o $${file}{,} ; \
+	done
+
+post_wheel_install_target: $(WHEEL_INSTALL_TARGET)
+
+ifeq ($(wildcard $(WHEEL_INSTALL_COOKIE)),)
+wheel_install: $(WHEEL_INSTALL_COOKIE)
+
+$(WHEEL_INSTALL_COOKIE): $(POST_WHEEL_INSTALL_TARGET)
+	$(create_target_dir)
+	@touch -f $@
+else
+wheel_install: ;
+endif

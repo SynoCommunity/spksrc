@@ -1,9 +1,6 @@
 ### Wheel rules
-#   Create wheels for modules listed in WHEELS. 
-#   If CROSS_COMPILE_WHEELS is set via python-cc.mk,
-#   wheels are cross-compiled. If not, pure-python 
-#   wheels are created.
-
+# Download wheels for modules listed in WHEELS. 
+#
 # Targets are executed in the following order:
 #  wheel_download_msg_target
 #  pre_wheel_download_target   (override with PRE_WHEEL_DOWNLOAD_TARGET)
@@ -54,10 +51,6 @@ ifeq ($(wildcard $(PIP_CACHE_DIR)),)
 	@$(MSG) Creating pip caching directory: $(PIP_CACHE_DIR)
 	@mkdir -p $(PIP_CACHE_DIR)
 endif
-ifeq ($(wildcard $(WHEELHOUSE)),)
-	@$(MSG) Creating wheelhouse directory: $(WHEELHOUSE)
-	@mkdir -p $(WHEELHOUSE)
-endif
 	@$(MSG) Downloading wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)] ; \
 #	$(MSG) requirement: [$(REQUIREMENT)] ; \
 #	$(MSG) requirement-grep-egg: [$$(grep -s egg <<< $(REQUIREMENT))] ; \
@@ -67,7 +60,7 @@ endif
 #	$(MSG) type: [$(WHEEL_TYPE)] ; \
 	if [ "$$(grep -s egg <<< $(REQUIREMENT))" ] ; then \
 	   echo "WARNING: Skipping download URL - Downloaded at build time" ; \
-	elif [ "$(WHEEL_TYPE)" = "pure" ] && [ "$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)" = "1" ]; then \
+	elif [ "$(WHEEL_TYPE)" = "pure" ] && [ ! "$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)" = "1" ]; then \
 	   echo "WARNING: Skipping download - pure python packaging disabled" ; \
 	else \
 	   query="curl -s https://pypi.org/pypi/$(WHEEL_NAME)/json" ; \
@@ -84,26 +77,9 @@ endif
 	      wget --secure-protocol=TLSv1_2 -nv -O $(PIP_DISTRIB_DIR)/$${outFile}.part -nc $$(eval $${query}) ; \
 	      mv $(PIP_DISTRIB_DIR)/$${outFile}.part $(PIP_DISTRIB_DIR)/$${outFile} ; \
 	   fi ; \
-	fi ; \
-	case $(WHEEL_TYPE) in \
-	       abi3) $(MSG) Adding $(WHEEL_NAME)==$$(WHEEL_VERSION) to wheelhouse/$(WHEELS_LIMITED_API) ; \
-	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
-	             ;; \
-	   crossenv) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_CROSSENV_COMPILE) ; \
-	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \
-	             ;; \
-	       pure) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_PURE_PYTHON) ; \
-	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
-	             ;; \
-	          *) $(MSG) No type found for wheel [$(REQUIREMENT)] ; \
-	             ;; \
-	esac
-	@for file in $$(ls -1 $(WHEELHOUSE)/requirements-*.txt) ; do \
-	   sort -u -o $${file}{,} ; \
-	done
+	fi
 
 post_wheel_download_target: $(WHEEL_DOWNLOAD_TARGET)
-
 
 ifeq ($(wildcard $(WHEEL_DOWNLOAD_COOKIE)),)
 wheel_download: $(WHEEL_DOWNLOAD_COOKIE)
