@@ -1,6 +1,6 @@
 SPK_NAME = bazarr
 SPK_VERS = 1.4.5
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/bazarr.png
 
 PYTHON_PACKAGE = python311
