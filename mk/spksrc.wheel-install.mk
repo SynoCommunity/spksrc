@@ -43,14 +43,13 @@ pre_wheel_install_target: wheel_install_msg_target
 
 wheel_install_target: SHELL:=/bin/bash
 wheel_install_target:
-ifeq ($(wildcard $(WHEELHOUSE)),)
-	@$(MSG) Creating wheelhouse directory: $(WHEELHOUSE)
-	@mkdir -p $(WHEELHOUSE)
-endif
 	@$(MSG) Installing wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)] ; \
 	case $(WHEEL_TYPE) in \
 	       abi3) $(MSG) Adding $(WHEEL_NAME)==$$(WHEEL_VERSION) to wheelhouse/$(WHEELS_LIMITED_API) ; \
 	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
+	             ;; \
+	      cross) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_CROSS_COMPILE) ; \
+	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE) ; \
 	             ;; \
 	   crossenv) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_CROSSENV_COMPILE) ; \
 	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_CROSSENV_COMPILE) ; \

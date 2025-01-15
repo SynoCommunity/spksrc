@@ -34,6 +34,9 @@ endif
 ifeq ($(strip $(WHEELS_PURE_PYTHON)),)
 WHEELS_PURE_PYTHON = requirements-pure.txt
 endif
+ifeq ($(strip $(WHEELS_CROSS_COMPILE)),)
+WHEELS_CROSS_COMPILE = requirements-cross.txt
+endif
 ifeq ($(strip $(WHEELS_CROSSENV_COMPILE)),)
 WHEELS_CROSSENV_COMPILE = requirements-crossenv.txt
 endif

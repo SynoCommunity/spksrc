@@ -29,9 +29,6 @@ ifneq ($(wildcard $(PYTHON_STAGING_PREFIX)),)
 STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_PREFIX)
 endif
 
-## python wheel specific configurations
-include ../../mk/spksrc.wheel-env.mk
-
 ### Prepare crossenv
 build_crossenv_module:
 	@$(MSG) WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
@@ -39,15 +36,12 @@ build_crossenv_module:
 
 ### Python wheel rules
 build_python_wheel_target: build_crossenv_module
-ifeq ($(wildcard $(WHEELHOUSE)),)
-	@$(MSG) Creating wheelhouse directory: $(WHEELHOUSE)
-	@mkdir -p $(WHEELHOUSE)
-endif
 	$(foreach e,$(shell cat $(CROSSENV_MODULE_PATH)/build/python-cc.mk),$(eval $(e)))
 	@. $(CROSSENV) ; \
 	$(MSG) _PYTHON_HOST_PLATFORM=$(TC_TARGET) cross-python3 -m build $(BUILD_ARGS) --wheel $(WHEELS_BUILD_ARGS) --outdir $(WHEELHOUSE) ; \
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) cross-python3 -m build $(BUILD_ARGS) --wheel $(WHEELS_BUILD_ARGS) --outdir $(WHEELHOUSE)
-	@$(RUN) echo "$(PKG_NAME)==$(PKG_VERS)" >> $(WHEELHOUSE)/$(WHEELS_CROSS_COMPILE)
+	@$(MSG) $(MAKE) REQUIREMENT=\"$(PKG_NAME)==$(PKG_VERS)\" WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" WHEEL_TYPE=\"cross\" wheel_install
+	-@MAKEFLAGS= $(MAKE) REQUIREMENT="$(PKG_NAME)==$(PKG_VERS)" WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" WHEEL_TYPE="cross" --no-print-directory wheel_install
 
 post_install_python_wheel_target: $(WHEEL_TARGET) install_python_wheel
 
@@ -57,3 +51,9 @@ all: install
 
 # Use crossenv
 include ../../mk/spksrc.crossenv.mk
+
+## python wheel specific configurations
+include ../../mk/spksrc.wheel-env.mk
+
+## install wheel specific routines
+include ../../mk/spksrc.wheel-install.mk
