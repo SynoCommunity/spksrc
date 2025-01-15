@@ -86,30 +86,3 @@ endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 PYTHON_ARCH = i686
 endif
-
-install_python_wheel:
-	@if [ -d "$(WHEELHOUSE)" ] ; then \
-		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
-		cd $(WHEELHOUSE) ; \
-		if stat -t requirements*.txt >/dev/null 2>&1; then \
-			$(MSG) Copying $(WHEELS_DEFAULT) to wheelhouse ; \
-			cp requirements*.txt $(STAGING_INSTALL_WHEELHOUSE) ; \
-			cat requirements*.txt >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
-			sed -i -e '/^#/! s/^.*egg=//g' $(STAGING_INSTALL_WHEELHOUSE)/requirements*.txt ; \
-			sort -u -o $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
-		else \
-			$(MSG) [SKIP] Copying $(WHEELS_DEFAULT) to wheelhouse ; \
-		fi ; \
-		if stat -t *.whl >/dev/null 2>&1; then \
-			for w in *.whl; do \
-				if echo $${w} | grep -iq "-none-any\.whl" ; then \
-					_new_name=$$(echo $$w | cut -d"-" -f -3)-none-any.whl ; \
-				else \
-					_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
-				fi ; \
-				$(MSG) Copying to wheelhouse: $$_new_name ; \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$_new_name ; \
-			done ; \
-		fi ; \
-	fi
-
