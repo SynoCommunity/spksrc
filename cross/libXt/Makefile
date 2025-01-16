@@ -11,12 +11,18 @@ HOMEPAGE = https://www.x.org
 COMMENT  = X.Org X11 libXt runtime library.
 LICENSE  = GPLv2/GPLv3
 
+POST_CONFIGURE_TARGET = libXt_post_configure_target
+
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --datarootdir=$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --enable-malloc0returnsnull
 CONFIGURE_ARGS += --without-xmlto
 CONFIGURE_ARGS += --without-fop
 CONFIGURE_ARGS += --disable-static
-PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: libXt_post_configure_target
+libXt_post_configure_target:
+	@$(MSG) "Avoid invalid CPPFLAGS (for 32-bit ARM archs) in util folder"
+	@$(RUN) sed -e 's,^CPPFLAGS =.*,CPPFLAGS =,g' -i.bak util/Makefile
