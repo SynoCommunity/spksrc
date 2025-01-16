@@ -12,9 +12,6 @@ PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 # build instructions:
 # https://openjdk.java.net/groups/build/doc/building.html
 
-# debian patches
-# https://udd.debian.org/patches.cgi?src=openjdk-21&version=21.0.5%2B11-1
-
 BUILD_DEPENDS = native/openjdk-21
 # Dependencies required at build time only:
 BUILD_DEPENDS += cross/cups
@@ -45,7 +42,7 @@ LICENSE  = GPLv2 with the Classpath Exception
 
 PRE_CONFIGURE_TARGET = java-21-openjdk_pre_configure
 PRE_COMPILE_TARGET = java-21-openjdk_pre_compile
-POST_INSTALL_TARGET = java-21-openjdk_post_compile
+POST_INSTALL_TARGET = java-21-openjdk_post_install
 
 CONFIGURE_ARGS  = --openjdk-target=$(TC_TARGET)
 CONFIGURE_ARGS += --with-boot-jdk=$(WORK_DIR)/../../../native/openjdk-21/work-native/jdk-21
@@ -93,6 +90,8 @@ CONFIGURE_ARGS += OBJDUMP=$(OBJDUMP)
 # Build images twice, second time with newly built JDK
 COMPILE_MAKE_OPTIONS += product-images
 
+# debian patches
+# https://udd.debian.org/patches.cgi?src=openjdk-21&version=21.0.5%2B11-1
 PATCHES_LEVEL = 1
 
 # Filter out any -jN since java's configure will autodetect number of CPU's
@@ -102,9 +101,14 @@ COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+# force cross compilation
+CONFIGURE_ARGS += --build=x86_64-pc-linux-gnu
+PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
+
 # ABI profile for ARM builds:
 #   arm-vfp-sflt, arm-vfp-hflt, arm-sflt, armv5-vfp-sflt, armv6-vfp-hflt, aarch64
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=aarch64
 PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d'
 else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
@@ -122,8 +126,8 @@ java-21-openjdk_pre_compile:
 	@$(MSG) "- Force openjdk to install into the package install folder"
 	@sed -i -e "s|\$$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g" $(WORK_DIR)/$(PKG_DIR)/make/Install.gmk
 
-.PHONY: java-21-openjdk_post_compile
-java-21-openjdk_post_compile:
+.PHONY: java-21-openjdk_post_install
+java-21-openjdk_post_install:
 	@$(MSG) "- Link binaries into bin folder"
 	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
 	@$(MSG) "- Add license files"
