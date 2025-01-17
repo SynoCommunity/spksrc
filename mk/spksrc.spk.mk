@@ -330,7 +330,7 @@ $(DSM_LICENSE_FILE): $(LICENSE_FILE)
 $(WORK_DIR)/package.tgz: icon service
 	$(create_target_dir)
 	@[ -f $@ ] && rm $@ || true
-	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | $(TAR_CMD) cpzf $@ --owner=root --group=root --files-from=/dev/stdin)
+	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | tar cpzf $@ --owner=root --group=root --files-from=/dev/stdin)
 
 DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
 
@@ -486,7 +486,7 @@ endif
 
 $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
 	$(create_target_dir)
-	(cd $(WORK_DIR) && $(TAR_CMD) cpf $@ --group=root --owner=root $(SPK_CONTENT))
+	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
 package: $(SPK_FILE_NAME)
 
