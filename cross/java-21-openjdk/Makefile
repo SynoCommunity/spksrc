@@ -118,7 +118,7 @@ endif
 
 .PHONY: java-21-openjdk_pre_configure
 java-21-openjdk_pre_configure:
-	@$(MSG) "- Set exe flag on configure script"
+	@$(MSG) "- Make configure script executable"
 	@cd $(WORK_DIR)/$(PKG_DIR) && chmod +x ./configure
 
 .PHONY: java-21-openjdk_pre_compile
