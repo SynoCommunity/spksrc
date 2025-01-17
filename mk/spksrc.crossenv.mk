@@ -13,7 +13,8 @@
 #  build_crossenv_target (override with CROSSENV_TARGET)
 #  post_crossenv_target  (override with POST_CROSSENV_TARGET)
 # Variables:
-#  WHEELS             List of wheels to go through
+#  WHEEL_NAME              Name of wheel to process
+#  WHEEL_VERSION           Version of wheel to process (can be empty)
 
 # Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
 PYTHON_WORK_DIR = $(or $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(wildcard $(WORK_DIR)))
@@ -55,13 +56,13 @@ endif
 
 ###
 
-# Check for wheel==x.y, then fallback to wheel, then default
-ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt),)
-CROSSENV_BUILD_WHEEL = $(WHEEL)
+# Check for <wheel>-<x.y>, then fallback to <wheel>, then default
+ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL_NAME)-$(WHEEL_VERSION).txt),)
+CROSSENV_BUILD_WHEEL = $(WHEEL_NAME)-$(WHEEL_VERSION)
 CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_PATH)/requirements-$(CROSSENV_BUILD_WHEEL).txt
-else ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(firstword $(subst -, ,$(WHEEL))).txt),)
-CROSSENV_BUILD_WHEEL = $(firstword $(subst -, ,$(WHEEL)))
-CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_PATH)/requirements-$(CROSSENV_BUILD_WHEEL).txt
+else ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL_NAME).txt),)
+CROSSENV_BUILD_WHEEL = $(WHEEL_NAME)
+CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL_NAME).txt
 else
 CROSSENV_BUILD_WHEEL = default
 CROSSENV_BUILD_REQUIREMENTS = $(CROSSENV_CONFIG_DEFAULT)
@@ -73,10 +74,10 @@ CROSSENV_COOKIE = $(WORK_DIR)/.crossenv-$(CROSSENV_BUILD_WHEEL)_done
 ###
 
 # default wheel packages to install in crossenv
-ifneq ($(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)),)
-CROSSENV_DEFAULT_PIP_VERSION = $(shell grep -h -E "^pip[<>=]=" $(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)) | head -1 | sed -E 's/.*[<>=]=//')
-CROSSENV_DEFAULT_SETUPTOOLS_VERSION = $(shell grep -h -E "^setuptools[<>=]=" $(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)) | head -1 | sed -E 's/.*[<>=]=//')
-CROSSENV_DEFAULT_WHEEL_VERSION = $(shell grep -h -E "^wheel[<>=]=" $(wildcard $(CROSSENV_CONFIG_PATH)/requirements-$(WHEEL).txt $(CROSSENV_CONFIG_DEFAULT)) | head -1 | sed -E 's/.*[<>=]=//')
+ifneq ($(wildcard $(CROSSENV_BUILD_REQUIREMENTS) $(CROSSENV_CONFIG_DEFAULT)),)
+CROSSENV_DEFAULT_PIP_VERSION = $(shell grep -h -E "^pip[<>=]=" $(wildcard $(CROSSENV_BUILD_REQUIREMENTS) $(CROSSENV_CONFIG_DEFAULT)) | head -1 | sed -E 's/.*[<>=]=//')
+CROSSENV_DEFAULT_SETUPTOOLS_VERSION = $(shell grep -h -E "^setuptools[<>=]=" $(wildcard $(CROSSENV_BUILD_REQUIREMENTS) $(CROSSENV_CONFIG_DEFAULT)) | head -1 | sed -E 's/.*[<>=]=//')
+CROSSENV_DEFAULT_WHEEL_VERSION = $(shell grep -h -E "^wheel[<>=]=" $(wildcard $(CROSSENV_BUILD_REQUIREMENTS) $(CROSSENV_CONFIG_DEFAULT)) | head -1 | sed -E 's/.*[<>=]=//')
 endif
 
 ifneq ($(CROSSENV_DEFAULT_PIP_VERSION),)
@@ -114,13 +115,8 @@ post_crossenv_target: $(CROSSENV_TARGET)
 ###
 
 crossenv-%:
-ifneq ($(filter error-%, $(CROSSENV_BUILD_WHEEL)),)
-	@$(MSG) $(MAKE) $(CROSSENV_BUILD_WHEEL)
-	@$(MAKE) $(CROSSENV_BUILD_WHEEL) --no-print-directory
-else
-	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv
-	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL=$(CROSSENV_BUILD_WHEEL) crossenv --no-print-directory
-endif
+	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL_NAME=$(WHEEL_NAME) WHEEL_VERSION=$(WHEEL_VERSION) crossenv
+	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL_NAME=$(WHEEL_NAME) WHEEL_VERSION=$(WHEEL_VERSION) crossenv --no-print-directory
 
 ####
 
@@ -167,7 +163,7 @@ export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/py
 #
 build_crossenv_target: SHELL:=/bin/bash
 build_crossenv_target: pre_crossenv_target $(CROSSENV_PATH)/build/python-cc.mk
-	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), CROSSENV: $(WHEEL) >> $(PSTAT_LOG)
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), CROSSENV: $(CROSSENV_BUILD_WHEEL) >> $(PSTAT_LOG)
 	@$(MSG) Python sources: $(wildcard $(PYTHON_WORK_DIR)/Python-[0-9]*)
 	@$(MSG) crossenv wheel packages: $(CROSSENV_DEFAULT_PIP), $(CROSSENV_DEFAULT_SETUPTOOLS), $(CROSSENV_DEFAULT_WHEEL)
 	@$(MSG) crossenv requirement definition: $(CROSSENV_BUILD_REQUIREMENTS)
