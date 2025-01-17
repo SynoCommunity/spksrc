@@ -1,7 +1,7 @@
 # Define python311 binary path
 PYTHON_DIR="/var/packages/python311/target/bin"
 # Define ffmpeg binary path
-FFMPEG_DIR="/var/packages/ffmpeg/target/bin"
+FFMPEG_DIR="/var/packages/ffmpeg7/target/bin"
 # Add local bin, virtualenv along with ffmpeg and python311 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${FFMPEG_DIR}:${PATH}"
 
@@ -34,7 +34,7 @@ service_postupgrade ()
     for file in ${UPGRADE_CFG_DIR}/*
     do
         DVR_DIR=$(grep -e 'storage\":' ${file} | awk -F'"' '{print $4}')
-        # Exclude directories in @appstore as ACL permissions srew up package installations
+        # Exclude directories in @appstore as ACL permissions skew up package installations
         TRUNC_DIR=$(echo "$(realpath ${DVR_DIR})" | awk -F/ '{print "/"$3}')
         if [ "${TRUNC_DIR}" = "/@appstore" ]; then
             echo "Skip: ${DVR_DIR} (system directory)"
@@ -45,7 +45,7 @@ service_postupgrade ()
     done
 
     # For backwards compatibility, restore ownership of package system directories
-    if [ $SYNOPKG_DSM_VERSION_MAJOR == 6 ]; then
+    if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then
         echo "Restore '${EFF_USER}' unix permissions on package system directories"
         chown ${EFF_USER}:${USER} "${SYNOPKG_PKGDEST}"
         set_unix_permissions "${SYNOPKG_PKGVAR}"

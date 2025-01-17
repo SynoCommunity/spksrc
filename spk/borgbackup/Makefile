@@ -26,11 +26,11 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Deduplicating backup program with compression and authenticated encryption.
+DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Optionally, it supports compression and authenticated encryption. This package includes emborg \(a Borg frontend\) and borgmatic \(simple, configuration-driven backup software for servers and workstations\).
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgmatic to v1.9.0.<br/>2. Update borg to v1.4.0.<br/>3. Update emborg to v1.40.<br/>4. Add ARMv5 again."
+CHANGELOG = "1. Update borgmatic to v1.9.5. <br/>2. Update emborg to v1.41."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
