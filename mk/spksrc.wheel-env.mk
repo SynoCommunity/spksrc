@@ -43,7 +43,10 @@ endif
 
 ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),)
 # If no ARCH then pure by default
-ifeq ($(strip $(ARCH)),)
+# unless called using download-wheels
+ifeq ($(MAKECMDGOALS),download-wheels)
+WHEEL_DEFAULT_PREFIX = crossenv
+else ifeq ($(strip $(ARCH)),)
 WHEEL_DEFAULT_PREFIX = pure
 else
 WHEEL_DEFAULT_PREFIX = crossenv

@@ -38,6 +38,7 @@ include ../../mk/spksrc.wheel-install.mk
 ##
 
 ifneq ($(strip $(REQUIREMENT)),)
+download-wheels: wheel_download
 wheel: wheel_install
 else
 
@@ -107,8 +108,8 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 #	   $(MSG) name: [$${name}] ; \
 #	   $(MSG) version: [$${version}] ; \
 #	   $(MSG) type: [$${type}] ; \
-	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" wheel ; \
-	   $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" wheel --no-print-directory ; \
+	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(MAKECMDGOALS) ; \
+	   $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(MAKECMDGOALS) --no-print-directory ; \
 	done < <(grep -svH  -e "^\#" -e "^\$$" $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) | sed 's/\s* #.*//')
 endif
 ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))))),$(WHEELS)),)
@@ -143,11 +144,13 @@ ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $
 #	   $(MSG) wheel: [$${wheel}] ; \
 #	   $(MSG) name: [$${name}] ; \
 #	   $(MSG) version: [$${version}] ; \
-#	   $(MSG) type: [$${type}] ; \
-	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" wheel ; \
-	   $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" wheel --no-print-directory ; \
+#	   $(MSG) type: [$${type}]; \
+	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(MAKECMDGOALS) ; \
+	   $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(MAKECMDGOALS) --no-print-directory ; \
 	done
 endif
+
+download-wheels: $(WHEEL_TARGET)
 
 post_wheel_target: $(WHEEL_TARGET) install_python_wheel
 
