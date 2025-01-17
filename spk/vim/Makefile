@@ -1,9 +1,9 @@
 SPK_NAME = vim
-SPK_VERS = 9.0
-SPK_REV = 6
+SPK_VERS = 9.1
+SPK_REV = 7
 SPK_ICON = src/vim.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/vim
 PYTHON_PACKAGE = python311
 
 MAINTAINER = SynoCommunity
@@ -13,20 +13,19 @@ DESCRIPTION_FRE = Vim est un éditeur de texte avancé basé sur Vi \(unix\) ave
 DISPLAY_NAME = Vim
 STARTABLE = no
 
-CHANGELOG = "1. Update vim to v9.0"
+CHANGELOG = "1. Update vim to v9.1"
 
 HOMEPAGE = https://www.vim.org/
 LICENSE  = Charityware
 
+SPK_COMMANDS = bin/vim bin/vim$(subst .,,$(SPK_VERS)) bin/view bin/vimdiff bin/rvim bin/rview bin/vimtutor
+
 include ../../mk/spksrc.archs.mk
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-CHANGELOG += "<br/>2. Migrate to Python 3.11"
 DESCRIPTION += "NOTE: You need to install Python 3.11 package to enable Python support."
-else
-CHANGELOG += "<br/>2. Remove  python support"
-DESCRIPTION += "NOTE: This package is built without Python support."
-endif
-SPK_COMMANDS = bin/vim bin/vim$(subst .,,$(SPK_VERS)) bin/view bin/vimdiff bin/rvim bin/rview bin/vimtutor
-
 include ../../mk/spksrc.python.mk
+else
+DESCRIPTION += "NOTE: This package is built without Python support."
+include ../../mk/spksrc.spk.mk
+endif

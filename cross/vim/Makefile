@@ -1,16 +1,17 @@
 PKG_NAME = vim
-PKG_VERS = 9.0
-PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.nluug.nl/pub/vim/unix
-SPECIFIC_VERSION=$(subst .,,$(PKG_VERS))
-PKG_DIR = $(PKG_NAME)$(SPECIFIC_VERSION)
+PKG_VERS = 9.1.0
+PKG_EXT = tar.gz
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/vim/vim/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+SPECIFIC_VERSION=91
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 ifeq ($(strip $(PYTHON_PACKAGE)),)
 PYTHON_PACKAGE = python311
 endif
 
-OPTIONAL_DEPENDS = cross/$(PYTHON_PACKAGE)
+OPTIONAL_DEPENDS = cross/python311
 DEPENDS = cross/ncursesw
 
 HOMEPAGE = https://www.vim.org/
@@ -19,14 +20,20 @@ LICENSE  = Charityware
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --with-compiledby=SynoCommunity
-CONFIGURE_ARGS += --with-features=huge --with-tlib=ncursesw
-CONFIGURE_ARGS += vim_cv_toupper_broken=no vim_cv_terminfo=yes vim_cv_tgetent=zero vim_cv_tty_group=world
-CONFIGURE_ARGS += vim_cv_getcwd_broken=yes vim_cv_stat_ignores_slash=yes vim_cv_memmove_handles_overlap=yes
+CONFIGURE_ARGS += --with-features=huge
+CONFIGURE_ARGS += --with-tlib=ncursesw
+CONFIGURE_ARGS += vim_cv_toupper_broken=no
+CONFIGURE_ARGS += vim_cv_terminfo=yes
+CONFIGURE_ARGS += vim_cv_tgetent=zero
+CONFIGURE_ARGS += vim_cv_tty_group=world
+CONFIGURE_ARGS += vim_cv_getcwd_broken=yes
+CONFIGURE_ARGS += vim_cv_stat_ignores_slash=yes
+CONFIGURE_ARGS += vim_cv_memmove_handles_overlap=yes
 
 include ../../mk/spksrc.archs.mk
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
+BUILD_DEPENDS = cross/python311
 CONFIGURE_ARGS += --enable-python3interp=dynamic --with-python3-command=$(HOSTPYTHON) 
 CONFIGURE_ARGS += vi_cv_path_python3_conf=$(PYTHON_CFG_PATH)
 CONFIGURE_ARGS += vi_cv_path_python3_pfx=$(PYTHON_PREFIX)
@@ -53,6 +60,7 @@ POST_INSTALL_TARGET = vim_post_install
 include ../../mk/spksrc.cross-cc.mk
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+
 # Only trigger building of dependencies (for the Python config) for targets where it's used
 ifeq ($(strip $(filter-out configure compile install plist all,$(MAKECMDGOALS))),)
 $(WORK_DIR)/python-cc.mk: depend ;
@@ -70,4 +78,4 @@ endif
 .PHONY: vim_post_install
 vim_post_install:
 	@install -m 644 src/vimrc $(STAGING_INSTALL_PREFIX)/share/vim/vimrc
-	cd $(STAGING_INSTALL_PREFIX)/bin; ln -sf vim vim$(SPECIFIC_VERSION)
+	@cd $(STAGING_INSTALL_PREFIX)/bin; ln -sf vim vim$(SPECIFIC_VERSION)
