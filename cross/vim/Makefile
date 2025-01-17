@@ -4,7 +4,7 @@ PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/vim/vim/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-SPECIFIC_VERSION=91
+SPECIFIC_VERSION=$(firstword $(subst ., ,$(PKG_VERS)))
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw
