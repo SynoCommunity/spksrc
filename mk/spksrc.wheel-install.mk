@@ -45,7 +45,7 @@ wheel_install_target: SHELL:=/bin/bash
 wheel_install_target:
 	@$(MSG) Installing wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)] ; \
 	case $(WHEEL_TYPE) in \
-	       abi3) $(MSG) Adding $(WHEEL_NAME)==$$(WHEEL_VERSION) to wheelhouse/$(WHEELS_LIMITED_API) ; \
+	       abi3) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_LIMITED_API) ; \
 	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
 	             ;; \
 	      cross) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_CROSS_COMPILE) ; \
@@ -72,7 +72,6 @@ install_python_wheel:
 			$(MSG) Copying $(WHEELS_DEFAULT) to wheelhouse ; \
 			cp requirements*.txt $(STAGING_INSTALL_WHEELHOUSE) ; \
 			cat requirements*.txt >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
-			sed -i -e '/^#/! s/^.*egg=//g' $(STAGING_INSTALL_WHEELHOUSE)/requirements*.txt ; \
 			sort -u -o $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
 		else \
 			$(MSG) [SKIP] Copying $(WHEELS_DEFAULT) to wheelhouse ; \

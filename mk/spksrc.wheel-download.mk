@@ -52,7 +52,7 @@ ifeq ($(wildcard $(PIP_CACHE_DIR)),)
 	@mkdir -p $(PIP_CACHE_DIR)
 endif
 	@$(MSG) Downloading wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)] ; \
-	if [ "$$(grep -s egg <<< $(REQUIREMENT))" ] ; then \
+	if [ "$$(grep -Eo 'http://|https://' <<< $(REQUIREMENT))" ] ; then \
 	   echo "WARNING: Skipping download URL - Downloaded at build time" ; \
 	elif [ "$(WHEEL_TYPE)" = "pure" ] && [ ! "$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)" = "1" ]; then \
 	   echo "WARNING: Skipping download - pure python packaging disabled" ; \
@@ -63,7 +63,7 @@ endif
 	   query+=" | select((.filename|test(\"-$(WHEEL_VERSION).tar.gz\")) or (.filename|test(\"-$(WHEEL_VERSION).zip\"))) | .url'" ; \
 	   outFile=$$(basename $$(eval $${query} 2>/dev/null) 2</dev/null) ; \
 	   if [ "$${outFile}" = "" ]; then \
-	      echo "ERROR: Invalid package name [$(WHEEL_NAME)]" ; \
+	      echo "ERROR: Unable to find version on pypi.org for [$(WHEEL_NAME)]" ; \
 	   elif [ -s $(PIP_DISTRIB_DIR)/$${outFile} ]; then \
 	      echo "INFO: File already exists [$${outFile}]" ; \
 	   else \

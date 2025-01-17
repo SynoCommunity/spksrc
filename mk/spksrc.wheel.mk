@@ -84,12 +84,13 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 	           requirements-abi3.txt) type=abi3 ;; \
 	                               *) type=$(WHEEL_DEFAULT_PREFIX) ;; \
 	   esac ; \
+	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
 	   if [ "$$(grep -s egg <<< $${wheel})" ]; then \
 	      name=$$(echo $${wheel#*egg=} | cut -f1 -d=) ; \
+	      wheel=$$(echo $${wheel%%#egg=*}) ; \
 	   else \
 	      name=$$(echo $${wheel%%[<>=]=*} | sed -E "s/^(abi3|crossenv|pure)://") ; \
 	   fi ; \
-	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
 	   if [ ! "$${version}" ]; then \
 	      $(MSG) Fetching latest version available ; \
 	      query="curl -s https://pypi.org/pypi/$${name}/json" ; \
@@ -116,12 +117,13 @@ ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $
 	          pure:*) type=pure ;; \
 	               *) type=$(WHEEL_DEFAULT_PREFIX) ;; \
 	   esac ; \
+	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
 	   if [ "$$(grep -s egg <<< $${requirement})" ]; then \
 	      name=$$(echo $${wheel#*egg=} | cut -f1 -d=) ; \
+	      wheel=$$(echo $${wheel%%#egg=*}) ; \
 	   else \
 	      name=$$(echo $${wheel%%[<>=]=*} | sed -E "s/^(abi3|crossenv|pure)://") ; \
 	   fi ; \
-	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
 	   if [ ! "$${version}" ]; then \
 	      $(MSG) Fetching latest version available ; \
 	      query="curl -s https://pypi.org/pypi/$${name}/json" ; \
