@@ -52,12 +52,6 @@ ifeq ($(wildcard $(PIP_CACHE_DIR)),)
 	@mkdir -p $(PIP_CACHE_DIR)
 endif
 	@$(MSG) Downloading wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)] ; \
-#	$(MSG) requirement: [$(REQUIREMENT)] ; \
-#	$(MSG) requirement-grep-egg: [$$(grep -s egg <<< $(REQUIREMENT))] ; \
-#	$(MSG) name: [$(WHEEL_NAME)] ; \
-#	$(MSG) type: [$(WHEEL_TYPE)] ; \
-#	$(MSG) version: [$(WHEEL_VERSION)] ; \
-#	$(MSG) type: [$(WHEEL_TYPE)] ; \
 	if [ "$$(grep -s egg <<< $(REQUIREMENT))" ] ; then \
 	   echo "WARNING: Skipping download URL - Downloaded at build time" ; \
 	elif [ "$(WHEEL_TYPE)" = "pure" ] && [ ! "$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)" = "1" ]; then \

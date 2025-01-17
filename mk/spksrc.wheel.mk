@@ -102,12 +102,6 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 	      query+=" | awk -F'-' '{print \$$2}'" ; \
 	      version=$$(eval $${query} 2>/dev/null) ; \
 	   fi ; \
-#	   $(MSG) requirement: [$${requirement}] ; \
-#	   $(MSG) file: [$${file}] ; \
-#	   $(MSG) wheel: [$${wheel}] ; \
-#	   $(MSG) name: [$${name}] ; \
-#	   $(MSG) version: [$${version}] ; \
-#	   $(MSG) type: [$${type}] ; \
 	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(MAKECMDGOALS) ; \
 	   $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(MAKECMDGOALS) --no-print-directory ; \
 	done < <(grep -svH  -e "^\#" -e "^\$$" $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) | sed 's/\s* #.*//')
@@ -140,11 +134,6 @@ ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $
 	      query+=" | awk -F'-' '{print \$$2}'" ; \
 	      version=$$(eval $${query} 2>/dev/null) ; \
 	   fi ; \
-#	   $(MSG) requirement: [$${requirement}] ; \
-#	   $(MSG) wheel: [$${wheel}] ; \
-#	   $(MSG) name: [$${name}] ; \
-#	   $(MSG) version: [$${version}] ; \
-#	   $(MSG) type: [$${type}]; \
 	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(MAKECMDGOALS) ; \
 	   $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(MAKECMDGOALS) --no-print-directory ; \
 	done
