@@ -35,4 +35,5 @@ include ../../mk/spksrc.install-resources.mk
 .PHONY: dotnet_runtime_custom_install
 dotnet_runtime_custom_install:
 	mkdir -p "$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/dotnet/"
-	tar -cf - -C $(EXTRACT_PATH) . | tar -xf - -C "$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/dotnet/"
+	$(TAR_CMD) -cf - -C $(EXTRACT_PATH) . | $(TAR_CMD) -xf - -C "$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/dotnet/"
+	
