@@ -32,15 +32,23 @@ USE_ALTERNATE_TMPDIR = 1
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/flexget bin:env/bin/flexget-headless
 
-# [greenlet] == 3.1.1
-# gcc < 4.9 only supports greenlet v1.x
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
-
 include ../../mk/spksrc.python.mk
 
-# [greenlet] == 3.1.1
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+# [greenlet]
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+WHEELS += src/requirements-crossenv-greenlet-v3.txt
+else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
+WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
+else
+WHEELS += src/requirements-crossenv-greenlet-v1.txt
+endif
+
+# [pendulum]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pendulum] -std=c11
+else
+WHEELS_CFLAGS += [pendulum] -std=c99
 endif
 
 .PHONY: flexget_extra_install
