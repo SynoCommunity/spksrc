@@ -3,7 +3,7 @@ SPK_VERS = 9.0
 SPK_REV = 6
 SPK_ICON = src/vim.png
 
-DEPENDS = cross/vim
+DEPENDS = cross/$(SPK_NAME)
 PYTHON_PACKAGE = python311
 
 MAINTAINER = SynoCommunity
