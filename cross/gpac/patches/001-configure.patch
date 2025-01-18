@@ -1,3 +1,5 @@
+# prefere tools defined as environment variables
+# 
 --- configure
 +++ configure
 @@ -48,13 +48,13 @@ if test "$cxx_orig" = "" ; then
