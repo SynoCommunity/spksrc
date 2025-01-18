@@ -36,11 +36,36 @@ function get_spk_name ()
    fi
 }
 
+# evaluate python dependency in an spk Makefile
+# param1: spk package folder (like spk/{name})
+function get_python_dependency ()
+{
+   if [ -f ${1}/Makefile -a "$(grep ^include.*\/spksrc\.python\.mk ${1}/Makefile)" ]; then
+      local dep=$(grep "PYTHON_PACKAGE\s*=" ${1}/Makefile | cut -d= -f2 | xargs)
+      echo "cross/${dep} "
+   fi
+}
+
+# evaluate ffmpeg dependency in an spk Makefile
+# param1: spk package folder (like spk/{name})
+function get_ffmpeg_dependency ()
+{
+   if [ -f ${1}/Makefile -a "$(grep ^include.*\/spksrc\.ffmpeg\.mk ${1}/Makefile)" ]; then
+      local dep=$(grep "FFMPEG_PACKAGE\s*=" ${1}/Makefile | cut -d= -f2 | xargs)
+      echo "cross/${dep} "
+   fi
+}
+
+
 # evaluates all dependencies in a single Makefile
 # param1: folder (like spk/{name}, cross/{name}, native/{name})
 function get_file_dependencies ()
 {
    if [ -f ${1}/Makefile ]; then
+      if [ "$(dirname ${1})" = "spk" ]; then
+         get_python_dependency ${1}
+         get_ffmpeg_dependency ${1}
+      fi
       grep "^DEPENDS\|^NATIVE_DEPENDS\|^BUILD_DEPENDS" ${1}/Makefile | cut -d= -f2 | sort -u | tr '\n' ' '
    fi
 }
@@ -87,11 +112,11 @@ function get_spk_dependencies ()
 }
 
 # get the dependency list for a package
-# param1: package name
+# param1: spk package folder (like spk/{name})
 function get_dependency_list ()
 {
-   local spk_name=$(get_spk_name spk/${package})
-   local toplevel_dependencies=$(get_file_dependencies spk/${package})
+   local spk_name=$(get_spk_name ${1})
+   local toplevel_dependencies=$(get_file_dependencies ${1})
    local spk_dependencies=$(get_spk_dependencies "${toplevel_dependencies}")
    echo "${spk_name}: ${spk_dependencies}"
 }
