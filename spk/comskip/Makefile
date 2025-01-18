@@ -4,7 +4,7 @@ SPK_REV = 12
 SPK_ICON = src/comskip.png
 
 FFMPEG_PACKAGE = ffmpeg5
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/comskip
 SPK_DEPENDS = $(FFMPEG_PACKAGE)
 
 STARTABLE = no
