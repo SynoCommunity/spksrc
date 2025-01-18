@@ -18,8 +18,9 @@ DEPENDS = cross/zlib
 
 GNU_CONFIGURE = 1
 
-# suppress some compiler warnings
-CONFIGURE_ARGS = --extra-cflags="-Wno-pointer-sign -Wno-array-bounds -Wno-maybe-uninitialized"
+CONFIGURE_ARGS = --enable-pic
+# suppress some compiler warnings:
+CONFIGURE_ARGS += --extra-cflags="-Wno-pointer-sign -Wno-array-bounds -Wno-maybe-uninitialized"
 
 PRE_COMPILE_TARGET = gpac_pre_compile
 
