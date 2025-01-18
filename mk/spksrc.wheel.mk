@@ -12,6 +12,12 @@
 # Variables:
 #  WHEELS             List of wheels to go through
 
+# When wheel is called from:
+#                  spksrc.spk.mk: MAKECMDGOALS is empty (needs to be set to wheel)
+# make wheel-<arch>-<tcversion> : MAKECMDGOALS is wheel
+#          make download-wheels : MAKECMDGOALS is download-wheels
+WHEEL_GOAL := $(if $(MAKECMDGOALS),$(MAKECMDGOALS),wheel)
+
 # Completion status file
 WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
 
@@ -103,8 +109,8 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 	      query+=" | awk -F'-' '{print \$$2}'" ; \
 	      version=$$(eval $${query} 2>/dev/null) ; \
 	   fi ; \
-	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(MAKECMDGOALS) ; \
-	   $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(MAKECMDGOALS) --no-print-directory ; \
+	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(WHEEL_GOAL) ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory ; \
 	done < <(grep -svH  -e "^\#" -e "^\$$" $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) | sed 's/\s* #.*//')
 endif
 ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))))),$(WHEELS)),)
@@ -136,8 +142,8 @@ ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $
 	      query+=" | awk -F'-' '{print \$$2}'" ; \
 	      version=$$(eval $${query} 2>/dev/null) ; \
 	   fi ; \
-	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(MAKECMDGOALS) ; \
-	   $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(MAKECMDGOALS) --no-print-directory ; \
+	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(WHEEL_GOAL) ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory ; \
 	done
 endif
 
