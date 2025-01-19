@@ -30,14 +30,17 @@ STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_PREFIX)
 endif
 
 ### Prepare crossenv
-build_crossenv_module:
+prepare_crossenv:
 	@$(MSG) WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
 	@WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
 
 ### Python wheel rules
-build_python_wheel_target: build_crossenv_module
+build_python_wheel_target: prepare_crossenv
 	$(foreach e,$(shell cat $(CROSSENV_MODULE_PATH)/build/python-cc.mk),$(eval $(e)))
-	@. $(CROSSENV) ; \
+	@PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$(PYTHON_NATIVE_PATH):$(CROSSENV_PATH)/bin:$${PATH} ; \
+	$(MSG) "crossenv: [$(CROSSENV_PATH)]" ; \
+	$(MSG) "pip: [$$(which cross-pip)]" ; \
+	$(MSG) "maturin: [$$(which maturin)]" ; \
 	$(MSG) _PYTHON_HOST_PLATFORM=$(TC_TARGET) cross-python3 -m build $(BUILD_ARGS) --wheel $(WHEELS_BUILD_ARGS) --outdir $(WHEELHOUSE) ; \
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) cross-python3 -m build $(BUILD_ARGS) --wheel $(WHEELS_BUILD_ARGS) --outdir $(WHEELHOUSE)
 	@$(MSG) $(MAKE) REQUIREMENT=\"$(PKG_NAME)==$(PKG_VERS)\" WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" WHEEL_TYPE=\"cross\" wheel_install
