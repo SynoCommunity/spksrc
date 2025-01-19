@@ -13,7 +13,7 @@ CHANGELOG = "1. Upgrade rutorrent to 5.1.5. <br/>2. Update rtorrent to v0.15.1. 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 
-SPK_DEPENDS = "WebStation:python311:PHP8.2:Apache2.4"
+SPK_DEPENDS = "WebStation:python311:PHP7.4:Apache2.4"
 WHEELS = src/requirements-pure.txt
 
 # Must be done prior to busybox (aarch64)
