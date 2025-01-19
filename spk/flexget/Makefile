@@ -32,6 +32,9 @@ USE_ALTERNATE_TMPDIR = 1
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/flexget bin:env/bin/flexget-headless
 
+# Needs atomic to build
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+
 include ../../mk/spksrc.python.mk
 
 # [greenlet]
@@ -44,12 +47,8 @@ else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
-# [pendulum]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-WHEELS_CFLAGS += [pendulum] -std=c11
-else
-WHEELS_CFLAGS += [pendulum] -std=c99
-endif
+# [Pendulum]
+DEPENDS += cross/pendulum
 
 .PHONY: flexget_extra_install
 flexget_extra_install:
