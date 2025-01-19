@@ -20,6 +20,11 @@ endif
 
 ##
 
+# Define where is located the crossenv
+CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
+
+##
+
 ifeq ($(strip $(PRE_WHEEL_COMPILE_TARGET)),)
 PRE_WHEEL_COMPILE_TARGET = pre_wheel_compile_target
 else
@@ -96,11 +101,9 @@ endif
 ##
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
-	@for crossenv in $(WORK_DIR)/crossenv-$(WHEEL_NAME)-$(WHEEL_VERSION) $(WORK_DIR)/crossenv-$(WHEEL_NAME) $(WORK_DIR)/crossenv ; do \
-	   [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
-	done ; \
-	if [ -d "$${CROSSENV_PATH}" ] ; then \
-	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$${PYTHON_NATIVE_PATH}:$${CROSSENV_PATH}/bin:$${PATH} ; \
+	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
+	@if [ -d "$(CROSSENV_PATH)" ] ; then \
+	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$(PYTHON_NATIVE_PATH):$(CROSSENV_PATH)/bin:$${PATH} ; \
 	   $(MSG) "crossenv: [$${CROSSENV_PATH}]" ; \
 	   $(MSG) "pip: [$$(which cross-pip)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
