@@ -9,7 +9,7 @@ backports.tarfile==1.2.0
 beautifulsoup4==4.12.3
 blinker==1.9.0
 #Brotli                             ==> crossenv
-certifi==2024.12.14
+#certifi                            ==> py311
 #charset-normalizer                 ==> crossenv
 cheroot==10.0.1
 CherryPy==18.10.0
@@ -60,7 +60,7 @@ rich==13.9.4
 rpyc==6.0.1
 setuptools==75.7.0
 sgmllib3k==1.0.0
-six==1.17.0
+#six                                ==> py311
 soupsieve==2.6
 #SQLAlchemy                         ==> crossenv
 tempora==5.8.0
