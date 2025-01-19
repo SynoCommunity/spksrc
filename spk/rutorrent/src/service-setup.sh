@@ -7,11 +7,7 @@ PYTHON_DIR="/var/packages/python311/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 # Others
 DSM6_WEB_DIR="/var/services/web"
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-  WEB_DIR="/var/services/web_packages"
-else
-  WEB_DIR="${DSM6_WEB_DIR}"
-fi
+WEB_DIR="/var/services/web_packages"
 
 APACHE_USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
 APACHE_GROUP=${APACHE_USER}
@@ -33,19 +29,6 @@ LOG_FILE="${SYNOPKG_PKGVAR}/rtorrent.log"
 SVC_WRITE_PID=y
 
 SERVICE_COMMAND="env RUTORRENT_WEB_DIR=${RUTORRENT_WEB_DIR} SYNOPKG_PKGVAR=${SYNOPKG_PKGVAR} SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST} ${SERVICE_COMMAND}"
-
-check_acl()
-{
-    acl_path=$1
-    acl_user=$2
-    acl_permissions=$(synoacltool -get-perm "${acl_path}" "${acl_user}" | awk -F'Final permission: ' 'NF > 1  {print $2}' | tr -d '[] ')
-    if [ -z "${acl_permissions}" -o "${acl_permissions}" = "-------------" ]; then
-        return 1
-    else
-        synoacltool -get-perm "${acl_path}" "${acl_user}"
-        return 0
-    fi
-}
 
 fix_shared_folders_rights()
 {
@@ -83,28 +66,9 @@ service_postinst ()
     # Install busybox stuff
     "${SYNOPKG_PKGDEST}/bin/busybox" --install "${SYNOPKG_PKGDEST}/bin"
 
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-  
-      syno_user_add_to_legacy_group "${EFF_USER}" "${LEGACY_USER}" "${LEGACY_GROUP}"
-  
-      # Install the web interface
-      cp -pR -t "${WEB_DIR}" "${SYNOPKG_PKGDEST}/share/${PACKAGE}"
-    fi
-
     # Allow direct-user access to rtorrent configuration file
     mv "${SYNOPKG_PKGVAR}/rtorrent.rc" "${RTORRENT_RC}"
     ln -s -T -f "${RTORRENT_RC}" "${SYNOPKG_PKGVAR}/.rtorrent.rc"
-
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      # Configure open_basedir
-      if [ "${APACHE_USER}" == "nobody" ]; then
-          echo -e "<Directory \"${RUTORRENT_WEB_DIR}\">\nphp_admin_value open_basedir none\n</Directory>" > /usr/syno/etc/sites-enabled-user/${PACKAGE}.conf
-      else
-          if [ -d "/etc/php/conf.d/" ]; then
-              echo -e "[PATH=${RUTORRENT_WEB_DIR}]\nopen_basedir = Null" > /etc/php/conf.d/com.synocommunity.packages.${PACKAGE}.ini
-          fi
-      fi
-    fi
 
     # Configure files
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
@@ -137,19 +101,6 @@ service_postinst ()
         else
             sed -i -e "/@watch_dir@/d" ${RTORRENT_RC}
         fi
-
-        if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-          if [ "${wizard_disable_openbasedir}" == "true" ] && [ "${APACHE_USER}" == "http" ]; then
-              if [ -f "/etc/php/conf.d/user-settings.ini" ]; then
-                  sed -i -e "s|^open_basedir.*|open_basedir = none|g" /etc/php/conf.d/user-settings.ini
-                  initctl restart php-fpm > /dev/null 2>&1
-              fi
-          fi
-          # Permissions handling
-          if [ "${BUILDNUMBER}" -ge "4418" ]; then
-              set_syno_permissions "${wizard_download_volume:=/volume1}/${wizard_download_share:=downloads}" "${GROUP}"
-          fi
-        fi
     fi
 
     # Setup a virtual environment with cloudscraper
@@ -162,14 +113,6 @@ service_postinst ()
     mkdir -p "${SYNOPKG_PKGDEST}/tmp"
 
     fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
-
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      # Allow passing through ${WEB_DIR} for sc-rutorrent user (#4295)
-      echo "Fixing shared folder access for ${WEB_DIR}"
-      check_acl "${WEB_DIR}" "${EFF_USER}"
-      [ $? -eq 1 ] \
-         && synoacltool -add "${WEB_DIR}" "user:${EFF_USER}:allow:--x----------:---n"
-    fi
     
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
       mkdir -p "${RUTORRENT_WEB_DIR}/share"
@@ -177,9 +120,7 @@ service_postinst ()
       # Allow read/write/execute over the share web/rutorrent/share directory
       fix_shared_folders_rights "${RUTORRENT_WEB_DIR}/share"
 
-      if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-        touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
-      fi
+      touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
     fi
 
     return 0
@@ -187,11 +128,6 @@ service_postinst ()
 
 service_postuninst ()
 {
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      # Remove the web interface
-      log_step "Removing web interface"
-      rm -fr "${RUTORRENT_WEB_DIR}"
-    fi
 
     return 0
 }
@@ -199,7 +135,7 @@ service_postuninst ()
 service_save ()
 {
     local source_directory="${RUTORRENT_WEB_DIR}"
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ] && [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
+    if [ -d "${DSM6_WEB_DIR}/${PACKAGE}" ] && [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
       source_directory="${DSM6_WEB_DIR}/${PACKAGE}"
     fi
     local ruTorrentConfigFile="${source_directory}/conf/config.php"
@@ -383,8 +319,8 @@ service_restore ()
     if is_not_defined_external_program 'php'; then
         define_external_program 'php' '/bin/php' '/usr/bin/php'
     fi
-    
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 -a ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
+
+    if [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
       touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
     fi
 
