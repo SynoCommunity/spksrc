@@ -32,6 +32,10 @@ WHEELS += src/requirements-pure.txt
 
 include ../../mk/spksrc.common.mk
 
+# [Pendulum] python-wheel
+DEPENDS += cross/pendulum 
+
+
 # [borgbackup]
 # Use OpenSSL path as defined by either
 # spksrc.wheel-env.mk or spksrc.python.mk
