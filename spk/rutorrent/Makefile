@@ -7,7 +7,7 @@ DSM_UI_DIR = app
 MAINTAINER = smaarn
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Upgrade rutorrent to 5.1.5. <br/>2. Update rtorrent to v0.15.1. <br/>3. Update libtorrent to v0.15.1."
+CHANGELOG = "1. Upgrade rutorrent to 5.1.5. <br/>2. Update rtorrent to v0.15.1. <br/>3. Update libtorrent to v0.15.1. <br/>4. Update screen to v5.0.0."
 
 # libtorrent-rakshasa requires C++14 support
 REQUIRED_MIN_DSM = 7.0
@@ -28,7 +28,7 @@ DEPENDS += cross/curl
 export CURL_INCLUDE_EXECUTABLE=1
 
 # Remaining dependencies
-DEPENDS += cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/sox cross/unzip
+DEPENDS += cross/mediainfo cross/rtorrent cross/rutorrent cross/screen5 cross/sox cross/unzip
 
 ADMIN_URL = /rutorrent/
 STARTABLE = yes
