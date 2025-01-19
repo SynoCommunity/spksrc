@@ -2,7 +2,7 @@ SPK_NAME = tdu
 SPK_VERS = 1.36
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/tdu
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 

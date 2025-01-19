@@ -4,8 +4,4 @@ lib:lib/gpac/gm_validator.so
 lnk:lib/libgpac.so
 lnk:lib/libgpac.so.12
 lib:lib/libgpac.so.12.10.1
-lnk:lib/libz.so
-lnk:lib/libz.so.1
-lib:lib/libz.so.1.2.13
 rsc:share/gpac/
-rsc:share/man/

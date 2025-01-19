@@ -3,7 +3,7 @@ SPK_VERS = 1.6.9
 SPK_REV = 5
 SPK_ICON = src/roundcube.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/roundcube
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 

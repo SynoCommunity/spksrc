@@ -538,7 +538,8 @@ spkclean:
 	       work-*/WIZARD_UIFILES
 
 wheelclean: spkclean
-	rm -fr work-*/.wheel_done \
+	rm -fr work*/.wheel_done \
+	       work*/.wheel_*_done \
 	       work-*/wheelhouse \
 	       work-*/install/var/packages/**/target/share/wheelhouse
 	@make --no-print-directory dependency-flat | sort -u | grep cross/ | while read depend ; do \
@@ -552,10 +553,15 @@ wheelclean: spkclean
 	   fi ; \
 	done
 
-wheelcleancache: wheelclean
+wheelclean-%: spkclean
+	rm -f work-*/.wheel_done \
+	      work-*/wheelhouse/$*-*.whl
+	find work-* -type f -regex '.*\.wheel_\(download\|compile\|install\)-$*_done' -exec rm -f {} \;
+
+wheelcleancache:
 	rm -fr work-*/pip
 
-wheelcleanall: wheelcleancache
+wheelcleanall: wheelcleancache wheelclean
 	rm -fr ../../distrib/pip
 
 crossenvclean: wheelclean
