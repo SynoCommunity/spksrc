@@ -21,8 +21,8 @@ CROSSENV_MODULE_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$
 
 ### Prepare crossenv
 build_crossenv_module:
-	@$(MSG) WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
-	-@MAKEFLAGS= WHEEL="$(PKG_NAME)-$(PKG_VERS)" $(MAKE) crossenv-$(ARCH)-$(TCVERSION)
+	@$(MSG) $(MAKE) WHEEL_NAME=\"$(PKG_VERS)\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
+	-@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_VERS)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION)
 
 ### Python extension module rules
 compile_python_module: build_crossenv_module

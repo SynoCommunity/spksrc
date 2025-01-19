@@ -33,7 +33,7 @@ if [ -z "${build_packages}" ]; then
 else
     for package in ${build_packages}; do
         echo "===> Download wheels: ${package}"
-        make -C spk/${package} wheeldownload
+        make -C spk/${package} download-wheels
     done
 fi
 
