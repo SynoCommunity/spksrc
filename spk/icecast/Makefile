@@ -4,7 +4,7 @@ SPK_REV = 7
 SPK_ICON = src/icecast.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/icecast
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icecast is a streaming media server which currently supports Ogg \(Vorbis and Theora\), Opus, WebM and MP3 audio streams. It can be used to create an Internet radio station or a privately running jukebox and many things in between. It is very versatile in that new formats can be added relatively easily and supports open standards for communication and interaction. This package includes Ezstream, a command line source client for Icecast media streaming servers.

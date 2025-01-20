@@ -3,23 +3,15 @@ name: Build
 on:
   workflow_dispatch:
     inputs:
-      package:
-        description: 'Package to build'
-        required: true
-        default: 'adminer'
       publish:
         description: 'Publish to repository'
         required: false
         default: false
         type: boolean
-      # Add a separator as a non-input description
-      build_settings_description:
-        description: 'Build Settings (archs to include):'
-        required: false
-        default: ''
-        type: choice
-        options:
-          - '---'
+      package:
+        description: 'Package to build'
+        required: true
+        default: 'adminer'
       add_noarch_builds:
         description: 'Include noarch packages'
         required: false
@@ -47,6 +39,11 @@ on:
         type: boolean
       add_dsm52_builds:
         description: 'Include DSM 5.2 archs'
+        required: false
+        default: false
+        type: boolean
+      add_srm13_builds:
+        description: 'Include SRM 1.3 archs'
         required: false
         default: false
         type: boolean
@@ -84,26 +81,31 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Get changed files for pull request
+      - name: Get changed spk_packages and dependency_folders for pull request
         if: github.event_name == 'pull_request'
-        id: getfile_pr
+        id: getchanges_pr
         run: |
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs
-          echo "files=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
+          echo "spk_packages=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
-      - name: Get changed files for push
+      - name: Get changed spk_packages and dependency_folders of last commit for push
         if: github.event_name == 'push'
-        id: getfile
+        id: getchanges_push
         run: |
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs
-          echo "files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
+          echo "spk_packages=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Evaluate dependencies
         id: dependencies
         run: ./.github/actions/prepare.sh
         env:
-          GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
-          SPK_TO_BUILD: ${{ github.event.inputs.package }}
+          GH_SPK_PACKAGES: ${{ steps.getchanges_push.outputs.spk_packages }} ${{ steps.getchanges_pr.outputs.spk_packages }}
+          GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges_push.outputs.dependency_folders }} ${{ steps.getchanges_pr.outputs.dependency_folders }}
+          USER_SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
       - name: Cache downloaded files
         uses: actions/cache@v4
@@ -125,6 +127,7 @@ jobs:
     needs: prepare
     outputs:
       matrix: ${{ steps.defaults.outputs.matrix }}
+      has_entries: ${{ steps.defaults.outputs.has_entries }}
     steps:
       - id: defaults
         run: |
@@ -135,6 +138,7 @@ jobs:
           add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
+          add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           has_noarch_packages=$([ -n "${{ needs.prepare.outputs.noarch_packages }}" ] && echo "true" || echo "false")
           has_arch_packages=$([ -n "${{ needs.prepare.outputs.arch_packages }}" ] && echo "true" || echo "false")
@@ -213,6 +217,12 @@ jobs:
             add_to_matrix "ppc853x-5.2"
           fi
 
+          # Add SRM 1.3 builds
+          if [ "$add_srm13_builds" == "true" ]; then
+            add_to_matrix "aarch64-1.3"
+            add_to_matrix "armv7-1.3"
+          fi
+
           # Add SRM 1.2 builds
           if [ "$add_srm12_builds" == "true" ]; then
             add_to_matrix "armv7-1.2"
@@ -221,10 +231,14 @@ jobs:
           # Output the final matrix
           echo "matrix=$(echo $matrix | jq -c)" >> $GITHUB_OUTPUT
 
+          # Output if the matrix has entries
+          echo "has_entries=$(jq -e '.include | length > 0' <<< "$matrix" > /dev/null && echo true || echo false)" >> $GITHUB_OUTPUT
+
   build:
     name: Build
     needs: [prepare, set-defaults]
     runs-on: ubuntu-latest
+    if: ${{ needs.set-defaults.outputs.has_entries == 'true' }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}

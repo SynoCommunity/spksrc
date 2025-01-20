@@ -7,4 +7,4 @@ lnk:bin/vim@SPECIFIC_VERSION@
 lnk:bin/vimdiff
 rsc:bin/vimtutor
 bin:bin/xxd
-rsc:share/vim
+rsc:share/vim/

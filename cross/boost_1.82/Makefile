@@ -2,7 +2,7 @@ PKG_NAME = boost
 PKG_VERS = 1.82.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
-PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
+PKG_DIST_SITE = https://archives.boost.io/release/$(PKG_VERS)/source
 PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 
 DEPENDS = cross/bzip2 cross/zlib
@@ -16,7 +16,7 @@ PRE_COMPILE_TARGET = boost_pre_compile
 COMPILE_TARGET = boost_compile
 INSTALL_TARGET = boost_install
 
-# Build all if not told otherwise (we exclude python library when "all" selected)
+# Build all if not told otherwise (we exclude python library when "all" selected)
 BOOST_LIBRARIES ?= all
 
 # Expect already built python when python library selected
@@ -24,7 +24,7 @@ WITH_PYTHON_LIBRARY =
 ifneq ($(findstring python,$(BOOST_LIBRARIES)),)
 WITH_PYTHON_LIBRARY = 1
 # The packages depending on boost with python, must build python before.
-include $(WORK_DIR)/python-cc.mk
+include $(or $(wildcard $(WORK_DIR)/crossenv/build/python-cc.mk), $(wildcard $(PYTHON_PACKAGE_WORK_DIR)/crossenv/build/python-cc.mk))
 PYTHON_NAME = $(basename $(notdir $(PYTHON_INTERPRETER)))
 else ifneq ($(findstring $(BOOST_LIBRARIES), all),)
 # exclude python library if "all" selected
@@ -43,7 +43,7 @@ ADDITIONAL_CXXFLAGS = -Wno-deprecated-declarations
 
 ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/$(PYTHON_NAME)/work-native/install/usr/local/bin/$(PYTHON_NAME)
-ADDITIONAL_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -fpermissive
+ADDITIONAL_CXXFLAGS += -I$(or $(PYTHON_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/$(PYTHON_INC_DIR) -fpermissive
 endif
 
 include ../../mk/spksrc.common.mk
@@ -75,7 +75,7 @@ boost_pre_compile:
 	@rm -rf $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 	@echo "using gcc : ${TC_GCC} : ${CXX} : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS) $(ADDITIONAL_CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
-	@echo "using python : $(PYTHON_VERSION) : : $(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
+	@echo "using python : $(PYTHON_VERSION) : : $(or $(PYTHON_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 endif
 	@echo "project : requirements <cxxflags>$(OFLAGS) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 

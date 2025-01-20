@@ -6,8 +6,8 @@
 include ../../mk/spksrc.cross-rust-env.mk
 
 # set PYTHON_*_PREFIX if unset
-ifeq ($(strip $(PYTHON_STAGING_PREFIX)),)
-PYTHON_STAGING_PREFIX = $(STAGING_INSTALL_PREFIX)
+ifeq ($(strip $(PYTHON_STAGING_INSTALL_PREFIX)),)
+PYTHON_STAGING_INSTALL_PREFIX = $(STAGING_INSTALL_PREFIX)
 PYTHON_PREFIX = $(INSTALL_PREFIX)
 endif
 
@@ -16,16 +16,6 @@ ifeq ($(strip $(OPENSSL_STAGING_PREFIX)),)
 OPENSSL_STAGING_PREFIX = $(STAGING_INSTALL_PREFIX)
 OPENSSL_PREFIX = $(INSTALL_PREFIX)
 endif
-
-# Mandatory for rustc wheel building
-ENV += PYO3_CROSS_LIB_DIR=$(PYTHON_STAGING_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(PYTHON_STAGING_PREFIX)/include/
-
-# Mandatory of using OPENSSL_*_DIR starting with
-# cryptography version >= 40
-# https://docs.rs/openssl/latest/openssl/#automatic
-ENV += OPENSSL_LIB_DIR=$(OPENSSL_STAGING_PREFIX)/lib/
-ENV += OPENSSL_INCLUDE_DIR=$(OPENSSL_STAGING_PREFIX)/include/
 
 # Enable pure-python packaging
 ifeq ($(strip $(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
@@ -53,10 +43,13 @@ endif
 
 ifeq ($(strip $(WHEEL_DEFAULT_PREFIX)),)
 # If no ARCH then pure by default
-ifeq ($(strip $(ARCH)),)
+# unless called using download-wheels
+ifeq ($(MAKECMDGOALS),download-wheels)
+WHEEL_DEFAULT_PREFIX = crossenv
+else ifeq ($(strip $(ARCH)),)
 WHEEL_DEFAULT_PREFIX = pure
 else
-WHEEL_DEFAULT_PREFIX = cross
+WHEEL_DEFAULT_PREFIX = crossenv
 endif
 endif
 
@@ -67,9 +60,9 @@ WHEELS_DEFAULT_REQUIREMENT = $(WHEELS_CROSSENV_COMPILE)
 endif
 
 # For generating abi3 wheels with limited
-# python API (e.g cp36 = Python 3.6)
+# python API (e.g cp37 = Python 3.7)
 ifeq ($(strip $(PYTHON_LIMITED_API)),)
-PYTHON_LIMITED_API = cp36
+PYTHON_LIMITED_API = cp37
 endif
 
 #
@@ -99,30 +92,3 @@ endif
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 PYTHON_ARCH = i686
 endif
-
-install_python_wheel:
-	@if [ -d "$(WHEELHOUSE)" ] ; then \
-		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
-		cd $(WHEELHOUSE) ; \
-		if stat -t requirements*.txt >/dev/null 2>&1; then \
-			$(MSG) Copying $(WHEELS_DEFAULT) to wheelhouse ; \
-			cp requirements*.txt $(STAGING_INSTALL_WHEELHOUSE) ; \
-			cat requirements*.txt >> $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
-			sed -i -e '/^#/! s/^.*egg=//g' $(STAGING_INSTALL_WHEELHOUSE)/requirements*.txt ; \
-			sort -u -o $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) $(STAGING_INSTALL_WHEELHOUSE)/$(WHEELS_DEFAULT) ; \
-		else \
-			$(MSG) [SKIP] Copying $(WHEELS_DEFAULT) to wheelhouse ; \
-		fi ; \
-		if stat -t *.whl >/dev/null 2>&1; then \
-			for w in *.whl; do \
-				if echo $${w} | grep -iq "-none-any\.whl" ; then \
-					_new_name=$$(echo $$w | cut -d"-" -f -3)-none-any.whl ; \
-				else \
-					_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
-				fi ; \
-				$(MSG) Copying to wheelhouse: $$_new_name ; \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$_new_name ; \
-			done ; \
-		fi ; \
-	fi
-
