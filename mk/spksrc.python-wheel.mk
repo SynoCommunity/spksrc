@@ -39,7 +39,7 @@ build_python_wheel_target: prepare_crossenv
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@if [ -d "$(CROSSENV_PATH)" ] ; then \
 	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$(PYTHON_NATIVE_PATH):$(CROSSENV_PATH)/bin:$${PATH} ; \
-	   $(MSG) "crossenv: [$${CROSSENV_PATH}]" ; \
+	   $(MSG) "crossenv: [$(CROSSENV_PATH)]" ; \
 	   $(MSG) "pip: [$$(which cross-pip)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \

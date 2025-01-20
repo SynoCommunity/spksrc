@@ -30,7 +30,7 @@ compile_python_module: prepare_crossenv
 	$(eval PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/)
 	@if [ -d "$(CROSSENV_PATH)" ] ; then \
 	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$(PYTHON_NATIVE_PATH):$(CROSSENV_PATH)/bin:$${PATH} ; \
-	   $(MSG) "crossenv: [$${CROSSENV_PATH}]" ; \
+	   $(MSG) "crossenv: [$(CROSSENV_PATH)]" ; \
 	   $(MSG) "pip: [$$(which cross-pip)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \

@@ -18,9 +18,6 @@
 #          make download-wheels : MAKECMDGOALS is download-wheels
 WHEEL_GOAL := $(if $(MAKECMDGOALS),$(MAKECMDGOALS),wheel)
 
-# Completion status file
-WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
-
 ## python wheel specific configurations
 include ../../mk/spksrc.wheel-env.mk
 
@@ -151,15 +148,7 @@ download-wheels: $(WHEEL_TARGET)
 
 post_wheel_target: $(WHEEL_TARGET) install_python_wheel
 
-ifeq ($(wildcard $(WHEEL_COOKIE)),)
-wheel: $(WHEEL_COOKIE)
-
-$(WHEEL_COOKIE): $(POST_WHEEL_TARGET)
-	$(create_target_dir)
-	@touch -f $@
-else
-wheel: ;
-endif
+wheel: post_wheel_target
 
 # endif REQUIREMENT non-empty
 endif
