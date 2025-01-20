@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.webmproject.org/code/
 COMMENT  = WebM VP8/VP9 Codec.
-LICENSE = 3-Clause BSD
+LICENSE  = 3-Clause BSD
 
 # configure does not work with GNU_CONFIGURE = 1 (Unknown option "--host=x86_64-pc-linux-gnu")
 # we have to configure with targets known by this library
@@ -60,7 +60,7 @@ endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Disable NEON on armv7/armv7l/armv8 when using gcc-4.9 or lower
+# NEON on armv7/armv7l/armv8 is enabled by default, but fails with gcc-4.9 or lower
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS)),$(ARCH))
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 CONFIGURE_ARGS += --disable-neon
