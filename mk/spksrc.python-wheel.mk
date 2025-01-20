@@ -20,7 +20,7 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 # Define where is located the crossenv
-CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
+CROSSENV_WHEEL_PATH := $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
 
 # If using spksrc.python.mk with PYTHON_STAGING_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
