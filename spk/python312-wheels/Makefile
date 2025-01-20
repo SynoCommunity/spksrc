@@ -95,6 +95,13 @@ ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
 
+# [Pendulum]
+# Needs atomic to build
+# Serves as maturin type python-wheel.mk example
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += cross/pendulum
+endif
+
 # [Pillow]
 DEPENDS += cross/freetype cross/libjpeg cross/zlib
 WHEELS_BUILD_ARGS += [Pillow]

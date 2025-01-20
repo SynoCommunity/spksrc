@@ -32,10 +32,6 @@ WHEELS += src/requirements-pure.txt
 
 include ../../mk/spksrc.common.mk
 
-# [Pendulum] python-wheel
-DEPENDS += cross/pendulum 
-
-
 # [borgbackup]
 # Use OpenSSL path as defined by either
 # spksrc.wheel-env.mk or spksrc.python.mk
@@ -65,6 +61,13 @@ DEPENDS += cross/mysql-connector-c
 DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
+# [Pendulum]
+# Needs atomic to build
+# Serves as maturin type python-wheel.mk example
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += cross/pendulum
+endif
 
 # [Pillow]
 DEPENDS += cross/freetype cross/libimagequant cross/libjpeg
