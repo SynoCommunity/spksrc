@@ -21,7 +21,7 @@ endif
 ##
 
 # Define where is located the crossenv
-CROSSENV_WHEEL_PATH := $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
+CROSSENV_WHEEL_PATH := $(firstword $(wildcard $(WORK_DIR)/crossenv-$(WHEEL_NAME)-$(WHEEL_VERSION) $(WORK_DIR)/crossenv-$(WHEEL_NAME) $(WORK_DIR)/crossenv-default))
 
 ##
 
