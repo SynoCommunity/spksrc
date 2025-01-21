@@ -24,8 +24,9 @@ LICENSE  = PSF
 # Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
-WHEELS  = src/requirements-crossenv.txt
-WHEELS += src/requirements-abi3.txt
+WHEELS  = src/requirements-abi3.txt
+WHEELS += src/requirements-crossenv.txt
+WHEELS += src/requirements-pure.txt
 
 include ../../mk/spksrc.common.mk
 
@@ -86,11 +87,7 @@ DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
-# [numpy] <= 1.21.6 (armv5)
-# [numpy] <= 1.22.4 (armv7l)
-# [numpy] <= 1.24.4 last working version with gcc-4.9
-# These versions are now unsupported using py312
-# [numpy] >= 1.25.0 requires c++17
+# [numpy]
 ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
@@ -98,17 +95,21 @@ endif
 # [Pendulum]
 # Needs atomic to build
 # Serves as maturin type python-wheel.mk example
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/pendulum
 endif
 
 # [Pillow]
-DEPENDS += cross/freetype cross/libjpeg cross/zlib
+DEPENDS += cross/freetype cross/libimagequant cross/libjpeg
+DEPENDS += cross/libtiff cross/libwebp cross/zlib
 WHEELS_BUILD_ARGS += [Pillow]
 WHEELS_BUILD_ARGS += build_ext
 WHEELS_BUILD_ARGS += --disable-platform-guessing
 WHEELS_BUILD_ARGS += --enable-freetype
+WHEELS_BUILD_ARGS += --enable-imagequant
 WHEELS_BUILD_ARGS += --enable-jpeg
+WHEELS_BUILD_ARGS += --enable-tiff
+WHEELS_BUILD_ARGS += --enable-webp
 WHEELS_BUILD_ARGS += --enable-zlib
 
 # [pycares]
@@ -130,7 +131,6 @@ DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
 # [pydantic_core]
-# Requires path to maturin from crossenv
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pydantic_core] -std=c11
 endif
@@ -147,8 +147,11 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
 endif
 
-# [rpds-py], [pydantic_core]
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+##
+## Addition of requirements files beyond spksrc.python.mk
+## will not be taken into consideration for processing
+## unless WHEELS has been previously populated. This is due to
+## the makefile analysis phase which discard ifeq instructions.
+##
 
 include ../../mk/spksrc.python.mk

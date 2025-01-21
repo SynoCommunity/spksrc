@@ -6,7 +6,6 @@
 
 # [pycryptodome] + [pycryptodomex]
 # Require:
-#    - CFLAGS=-sdt=c99 <  gcc-4.9
-#    - CFLAGS=-sdt=c11 >= gcc-4.9
-pycryptodome==3.20.0
-pycryptodomex==3.20.0
+#    - CFLAGS=-sdt=c11 <= gcc-5.0
+pycryptodome==3.21.0
+pycryptodomex==3.21.0
