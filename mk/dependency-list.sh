@@ -91,7 +91,7 @@ function contains ()
 function get_dependencies ()
 {
    local dependencies=
-   for dep in "${1}"; do
+   for dep in ${1}; do
       dependencies+="${dep} "
       dependencies+="$(get_file_dependencies ${dep}) "
    done
