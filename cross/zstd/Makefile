@@ -12,14 +12,13 @@ COMMENT  = Zstandard is a fast compression algorithm, providing high compression
 LICENSE  = GPLv2/BSD
 
 MESON_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)/build/meson
+#CMAKE_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)/build/cmake
 
 include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_lt, ${TC_GCC}, 5),1)  
 ADDITIONAL_CFLAGS = -std=gnu99
 endif
-
-ADDITIONAL_CFLAGS += -O
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 ADDITIONAL_LDFLAGS = -lrt 
