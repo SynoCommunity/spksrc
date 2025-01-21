@@ -11,6 +11,9 @@ HOMEPAGE = https://pendulum.eustace.io
 COMMENT  = Python datetimes made easy.
 LICENSE  = MIT
 
+# toolchains lacking atomic support
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+
 PATCHES_LEVEL = 1
 
 include ../../mk/spksrc.common.mk
