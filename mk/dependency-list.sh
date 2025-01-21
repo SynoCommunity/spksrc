@@ -106,7 +106,7 @@ function get_spk_dependencies ()
    local cumulated_dependencies=$(get_dependencies "${dependencies}")
    while [ "${cumulated_dependencies}" != "${dependencies}" ]; do
       dependencies=${cumulated_dependencies}
-      cumulated_dependencies=$(get_dependencies "${dependencies}")
+      cumulated_dependencies=$(get_dependencies "${dependencies}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
    done
    echo ${cumulated_dependencies} | tr ' ' '\n' | sort -u | tr '\n' ' '
 }
