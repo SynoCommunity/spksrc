@@ -98,11 +98,8 @@ ENV += SODIUM_INSTALL=system
 DEPENDS += cross/libyaml
 
 # [rpds-py]
-# maturin canot be built as pre-requisite crossenv
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-rpds-py.txt
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
 endif
 
 ##
@@ -172,5 +169,3 @@ WHEELS_CFLAGS += [pydantic_core] -std=c11
 else
 WHEELS_CFLAGS += [pydantic_core] -std=c99
 endif
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
