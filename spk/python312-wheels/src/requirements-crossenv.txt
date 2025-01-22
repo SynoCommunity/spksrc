@@ -82,7 +82,7 @@ pycurl==7.45.4
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-pydantic_core==2.27.2
+#pydantic_core==2.27.2
 
 # [PyNaCl]
 # Depends: cross/libsodium
