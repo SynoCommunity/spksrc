@@ -20,7 +20,7 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 # Define where is located the crossenv
-CROSSENV_WHEEL_PATH := $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
+CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
 
 # If using spksrc.python.mk with PYTHON_STAGING_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
@@ -32,7 +32,7 @@ endif
 ### Prepare crossenv
 prepare_crossenv:
 	@$(MSG) $(MAKE) WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
-	-@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION)
+	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
 ### Python wheel rules
 build_python_wheel_target: prepare_crossenv
@@ -57,7 +57,7 @@ build_python_wheel_target: prepare_crossenv
 	                WHEEL_VERSION=\"$(PKG_VERS)\" \
 	                WHEEL_TYPE=\"cross\" \
 	                wheel_install
-	-@MAKEFLAGS= $(MAKE) REQUIREMENT="$(PKG_NAME)==$(PKG_VERS)" \
+	@MAKEFLAGS= $(MAKE) REQUIREMENT="$(PKG_NAME)==$(PKG_VERS)" \
 	                WHEEL_NAME="$(PKG_NAME)" \
 	                WHEEL_VERSION="$(PKG_VERS)" \
 	                WHEEL_TYPE="cross" \

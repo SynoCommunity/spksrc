@@ -115,8 +115,8 @@ post_crossenv_target: $(CROSSENV_TARGET)
 ###
 
 crossenv-%:
-	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL_NAME=$(WHEEL_NAME) WHEEL_VERSION=$(WHEEL_VERSION) crossenv
-	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEEL_NAME=$(WHEEL_NAME) WHEEL_VERSION=$(WHEEL_VERSION) crossenv --no-print-directory
+	@$(MSG) $(MAKE) ARCH=\"$(firstword $(subst -, ,$*))\" TCVERSION=\"$(lastword $(subst -, ,$*))\" WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" crossenv
+	@MAKEFLAGS= $(MAKE) ARCH="$(firstword $(subst -, ,$*))" TCVERSION="$(lastword $(subst -, ,$*))" WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" crossenv --no-print-directory
 
 ####
 
