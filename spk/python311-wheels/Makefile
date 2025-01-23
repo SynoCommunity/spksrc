@@ -90,6 +90,9 @@ ENV += PYCARES_USE_SYSTEM_LIB=1
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
+# [pydantic-core]
+DEPENDS += cross/pydantic-core
+
 # [PyNaCl]
 DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
@@ -161,11 +164,4 @@ ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
-endif
-
-# [pydantic_core]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-WHEELS_CFLAGS += [pydantic_core] -std=c11
-else
-WHEELS_CFLAGS += [pydantic_core] -std=c99
 endif

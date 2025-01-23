@@ -32,7 +32,6 @@ MarkupSafe==3.0.2
 msgpack==1.1.0              # used compiled verrsion for performance
 msgpack_python==0.5.6
 netifaces==0.11.0
-#poetry==2.0.1 # fails
 psutil==6.1.1
 pyrsistent==0.20.0
 regex==2024.11.6
@@ -74,15 +73,6 @@ pycares==4.5.0
 # Require environment variables
 #  PYCURL_CURL_CONFIG
 pycurl==7.45.4
-
-# [pydantic_core]
-# Requires path to maturin from crossenv
-# Requires WHEELS_CFLAGS = -std=c11 for = gcc-4.9
-# Requires WHEELS_CFLAGS = -std=c99 for < gcc-4.9
-# Require environment variables
-#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-#pydantic_core==2.27.2
 
 # [PyNaCl]
 # Depends: cross/libsodium

@@ -132,10 +132,8 @@ endif
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
-# [pydantic_core]
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [pydantic_core] -std=c11
-endif
+# [pydantic-core] 
+DEPENDS += cross/pydantic-core
 
 # [PyNaCl]
 DEPENDS += cross/libsodium
