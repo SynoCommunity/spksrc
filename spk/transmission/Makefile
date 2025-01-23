@@ -1,5 +1,5 @@
 SPK_NAME = transmission
-SPK_VERS = 4.1.0-beta.1
+SPK_VERS = 4.1.0
 SPK_REV = 28
 SPK_ICON = src/transmission.png
 
