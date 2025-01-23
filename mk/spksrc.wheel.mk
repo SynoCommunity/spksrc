@@ -77,7 +77,8 @@ endif
 build_wheel_target: SHELL:=/bin/bash
 build_wheel_target: pre_wheel_target
 ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
-	@while IFS= read -r requirement ; do \
+	@set -e ; \
+	while IFS= read -r requirement ; do \
 	   $(MSG) Processing requirement [$${requirement}] ; \
 	   wheel=$${requirement#*requirements-*.txt:} ; \
 	   file=$$(basename $${requirement%%:*}) ; \
@@ -107,7 +108,7 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 	      version=$$(eval $${query} 2>/dev/null) ; \
 	   fi ; \
 	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(WHEEL_GOAL) ; \
-	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory || exit 1 ; \
 	done < <(grep -svH  -e "^\#" -e "^\$$" $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) | sed 's/\s* #.*//')
 endif
 ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))))),$(WHEELS)),)
@@ -140,7 +141,7 @@ ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $
 	      version=$$(eval $${query} 2>/dev/null) ; \
 	   fi ; \
 	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(WHEEL_GOAL) ; \
-	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory || exit 2 ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory ; \
 	done
 endif
 
