@@ -1,10 +1,10 @@
 PKG_NAME = transmission
 PKG_VERS = 4.1.0-beta.1
-PKG_REV = +rc3a8106077
+PKG_REVISION = rc3a8106077
 PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)$(PKG_REV).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)+$(PKG_REVISION).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/transmission/transmission/releases/download/$(PKG_VERS)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)+$(PKG_REVISION)
 
 DEPENDS = cross/curl
 
