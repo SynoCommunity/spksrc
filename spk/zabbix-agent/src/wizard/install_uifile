@@ -1,0 +1,25 @@
+[{
+    "step_title": "Zabbix Server Configuration",
+    "items": [
+        {
+            "desc": "Please configure at least one Zabbix Server or Proxy for this Agent."
+        },
+        {
+            "desc": "Enter a list of comma delimited IP addresses, optionally in CIDR notation, or DNS names of Zabbix servers and Zabbix proxies. <br/>Incoming connections will be accepted only from the hosts listed here."
+        },
+        {
+            "desc": "This Agent provides IPv6 support, so <code>127.0.0.1</code>, <code>::127.0.0.1</code>, <code>::ffff:127.0.0.1</code> are treated equally and <code>::/0</code> will allow any IPv4 or IPv6 address. <code>0.0.0.0/0</code> can be used to allow any IPv4 address."
+        },
+        {
+            "type": "textfield",
+            "desc": "Example: 127.0.0.1,192.168.1.0/24,::1,2001:db8::/32,zabbix.example.com",
+            "subitems": [{
+                "key": "wizard_Server",
+                "desc": "Zabbix Server",
+                "defaultValue": "",
+                "validator": {
+                    "allowBlank": false
+                }
+        }]
+    }]
+}]
