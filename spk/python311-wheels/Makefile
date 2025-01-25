@@ -70,17 +70,7 @@ DEPENDS += cross/pendulum
 endif
 
 # [Pillow]
-DEPENDS += cross/freetype cross/libimagequant cross/libjpeg
-DEPENDS += cross/libtiff cross/libwebp cross/zlib
-WHEELS_BUILD_ARGS += [Pillow]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += --disable-platform-guessing
-WHEELS_BUILD_ARGS += --enable-freetype
-WHEELS_BUILD_ARGS += --enable-imagequant
-WHEELS_BUILD_ARGS += --enable-jpeg
-WHEELS_BUILD_ARGS += --enable-tiff
-WHEELS_BUILD_ARGS += --enable-webp
-WHEELS_BUILD_ARGS += --enable-zlib
+DEPENDS += cross/pillow
 
 # [pycares]
 DEPENDS += cross/c-ares
