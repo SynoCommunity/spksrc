@@ -132,6 +132,12 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# [rpds-py]
+# Version >= 0.22.3 requires rustc >= 1.80
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-rpds-py.txt
+endif
+
 # [ruamel.yaml.clib]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11

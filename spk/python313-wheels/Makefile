@@ -59,11 +59,8 @@ WHEELS_CFLAGS += [gevent] -std=c11
 endif
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-greenlet-v3.txt
-else
-WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
-WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
 # [llfuse]
@@ -131,6 +128,12 @@ ENV += SODIUM_INSTALL=system
 
 # [PyYAML]
 DEPENDS += cross/libyaml
+
+# [rpds-py]
+# Version >= 0.22.3 requires rustc >= 1.80
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-rpds-py.txt
+endif
 
 # [ruamel.yaml.clib]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
