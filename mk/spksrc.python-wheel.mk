@@ -10,10 +10,10 @@ ifeq ($(strip $(COMPILE_TARGET)),)
 COMPILE_TARGET = build_python_wheel_target
 endif
 ifeq ($(strip $(INSTALL_TARGET)),)
-INSTALL_TARGET = nop
+INSTALL_TARGET = install_python_wheel_target
 endif
 ifeq ($(strip $(POST_INSTALL_TARGET)),)
-POST_INSTALL_TARGET = post_install_python_wheel_target
+POST_INSTALL_TARGET = install_python_wheel
 endif
 
 # Resume with standard spksrc.cross-cc.mk
@@ -34,7 +34,6 @@ prepare_crossenv:
 	@$(MSG) $(MAKE) WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
 	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
-### Python wheel rules
 build_python_wheel_target: prepare_crossenv
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@if [ -d "$(CROSSENV_PATH)" ] ; then \
@@ -52,6 +51,8 @@ build_python_wheel_target: prepare_crossenv
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) cross-python3 -m build $(BUILD_ARGS) \
 	          --wheel $(WHEELS_BUILD_ARGS) \
 	          --outdir $(WHEELHOUSE)
+
+install_python_wheel_target: 
 	@$(MSG) $(MAKE) REQUIREMENT=\"$(PKG_NAME)==$(PKG_VERS)\" \
 	                WHEEL_NAME=\"$(PKG_NAME)\" \
 	                WHEEL_VERSION=\"$(PKG_VERS)\" \
@@ -64,10 +65,6 @@ build_python_wheel_target: prepare_crossenv
 	                --no-print-directory \
 	                wheel_install
 
-post_install_python_wheel_target: $(WHEEL_TARGET) install_python_wheel
-
-all: install
-
 ###
 
 # Use crossenv
@@ -78,3 +75,25 @@ include ../../mk/spksrc.wheel-env.mk
 
 ## install wheel specific routines
 include ../../mk/spksrc.wheel-install.mk
+
+###
+
+post_compile_target: $(COMPILE_TARGET)
+
+# Call spksrc.compile.mk cookie creation recipe
+ifeq ($(wildcard $(COMPILE_COOKIE)),)
+compile: $(COMPILE_COOKIE)
+endif
+
+###
+
+post_install_target: $(INSTALL_TARGET)
+
+# Call spksrc.install.mk cookie creation recipe
+ifeq ($(wildcard $(INSTALL_COOKIE)),)
+install: $(INSTALL_COOKIE)
+
+$(INSTALL_COOKIE):
+	$(create_target_dir)
+	@touch -f $@
+endif
