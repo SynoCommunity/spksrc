@@ -525,6 +525,7 @@ spkclean:
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
+	       work-*/.wheel_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
