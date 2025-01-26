@@ -6,7 +6,6 @@ PKG_DIST_SITE = https://download.oracle.com/berkeley-db
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 SRC_DIR = build_unix
 
-# changed to trigger build
 DEPENDS =
 
 HOMEPAGE = https://www.oracle.com/technetwork/database/database-technologies/berkeleydb/downloads/index.html
