@@ -21,7 +21,7 @@ Flask-Compress==1.17
 Flask-Cors==5.0.0
 Flask-Login==0.6.3
 flask-restx==1.3.0
-FlexGet==3.13.16
+FlexGet==3.13.25
 #greenlet                           ==> crossenv
 guessit==3.8.0
 html5lib==1.1
