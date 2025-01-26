@@ -4,8 +4,6 @@
 ## various wheels.  Uncoment to enable.
 ##
 
-# [pycryptodome] + [pycryptodomex]
-# Require:
-#    - CFLAGS=-sdt=c11 <= gcc-5.0
-pycryptodome==3.21.0
-pycryptodomex==3.21.0
+# [greenlet]
+#   - Mandatory require full c++11 support
+greenlet==3.0.3

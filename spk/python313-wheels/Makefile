@@ -1,4 +1,4 @@
-SPK_NAME = python312-wheels
+SPK_NAME = python313-wheels
 SPK_VERS = 1.0
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
 SPK_REV = 1
@@ -7,15 +7,15 @@ SPK_ICON = src/python3-pip.png
 # Compiler must support std=c++11
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python313
 SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION =  Collection of programs for the Python 3.12 programming language.
-DESCRIPTION_FRE = Collection of programs for the Python 3.12 programming language.
-DESCRIPTION_SPN = Colección de programas para el lenguaje de programación Python 3.12.
+DESCRIPTION =  Collection of programs for the Python 3.13 programming language.
+DESCRIPTION_FRE = Collection of programs for the Python 3.13 programming language.
+DESCRIPTION_SPN = Colección de programas para el lenguaje de programación Python 3.13.
 STARTABLE = no
-DISPLAY_NAME = Python 3.12 Wheels Collection
+DISPLAY_NAME = Python 3.13 Wheels Collection
 CHANGELOG = "1. Initial package"
 
 HOMEPAGE = https://www.python.org
@@ -59,11 +59,8 @@ WHEELS_CFLAGS += [gevent] -std=c11
 endif
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-greenlet-v3.txt
-else
-WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
-WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
 # [llfuse]

@@ -18,9 +18,6 @@
 #          make download-wheels : MAKECMDGOALS is download-wheels
 WHEEL_GOAL := $(if $(MAKECMDGOALS),$(MAKECMDGOALS),wheel)
 
-# Completion status file
-WHEEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_done
-
 ## python wheel specific configurations
 include ../../mk/spksrc.wheel-env.mk
 
@@ -72,7 +69,7 @@ pre_wheel_target: wheel_msg_target
 wheel-%:
 ifneq ($(strip $(WHEELS)),)
 	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS=\"$(WHEELS)\" wheel
-	-@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS="$(WHEELS)" wheel --no-print-directory
+	@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS="$(WHEELS)" wheel --no-print-directory
 else
 	$(error No wheel to process)
 endif
@@ -80,7 +77,8 @@ endif
 build_wheel_target: SHELL:=/bin/bash
 build_wheel_target: pre_wheel_target
 ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
-	@while IFS= read -r requirement ; do \
+	@set -e ; \
+	while IFS= read -r requirement ; do \
 	   $(MSG) Processing requirement [$${requirement}] ; \
 	   wheel=$${requirement#*requirements-*.txt:} ; \
 	   file=$$(basename $${requirement%%:*}) ; \
@@ -110,7 +108,7 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 	      version=$$(eval $${query} 2>/dev/null) ; \
 	   fi ; \
 	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(WHEEL_GOAL) ; \
-	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory || exit 1 ; \
 	done < <(grep -svH  -e "^\#" -e "^\$$" $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) | sed 's/\s* #.*//')
 endif
 ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))))),$(WHEELS)),)
@@ -151,15 +149,7 @@ download-wheels: $(WHEEL_TARGET)
 
 post_wheel_target: $(WHEEL_TARGET) install_python_wheel
 
-ifeq ($(wildcard $(WHEEL_COOKIE)),)
-wheel: $(WHEEL_COOKIE)
-
-$(WHEEL_COOKIE): $(POST_WHEEL_TARGET)
-	$(create_target_dir)
-	@touch -f $@
-else
-wheel: ;
-endif
+wheel: post_wheel_target
 
 # endif REQUIREMENT non-empty
 endif

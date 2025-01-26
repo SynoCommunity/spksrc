@@ -20,6 +20,11 @@ endif
 
 ##
 
+# Define where is located the crossenv
+CROSSENV_WHEEL_PATH := $(firstword $(wildcard $(WORK_DIR)/crossenv-$(WHEEL_NAME)-$(WHEEL_VERSION) $(WORK_DIR)/crossenv-$(WHEEL_NAME) $(WORK_DIR)/crossenv-default))
+
+##
+
 ifeq ($(strip $(PRE_WHEEL_COMPILE_TARGET)),)
 PRE_WHEEL_COMPILE_TARGET = pre_wheel_compile_target
 else
@@ -49,8 +54,8 @@ ifeq ($(wildcard $(WHEELHOUSE)),)
 endif
 	@$(MSG) Compiling wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)]
 ifneq ($(WHEEL_TYPE),pure)
-	@$(MSG) $(MAKE) WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" crossenv-$(ARCH)-$(TCVERSION) ; \
-	MAKEFLAGS= $(MAKE) WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
+	@$(MSG) $(MAKE) WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" crossenv-$(ARCH)-$(TCVERSION)
+	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 	@[ "$(WHEEL_TYPE)" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
 	global_options=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs) ; \
 	localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs)) ; \
@@ -74,7 +79,7 @@ ifneq ($(WHEEL_TYPE),pure)
 	   ABI3="$${abi3}" \
 	   PIP_GLOBAL_OPTION="$${global_options}" \
 	   $(MAKE) --no-print-directory \
-	   cross-compile-wheel-$(WHEEL_NAME) || exit 1
+	   cross-compile-wheel-$(WHEEL_NAME)-$(WHEEL_VERSION)
 else ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	@if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
 	   export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= OBJCOPY= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
@@ -96,12 +101,10 @@ endif
 ##
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
-	@for crossenv in $(WORK_DIR)/crossenv-$(WHEEL_NAME)-$(WHEEL_VERSION) $(WORK_DIR)/crossenv-$(WHEEL_NAME) $(WORK_DIR)/crossenv ; do \
-	   [ -d $${crossenv} ] && . $${crossenv}/build/python-cc.mk && break ; \
-	done ; \
-	if [ -d "$${CROSSENV_PATH}" ] ; then \
-	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$${PYTHON_NATIVE_PATH}:$${CROSSENV_PATH}/bin:$${PATH} ; \
-	   $(MSG) "crossenv: [$${CROSSENV_PATH}]" ; \
+	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
+	@if [ -d "$(CROSSENV_PATH)" ] ; then \
+	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$(PYTHON_NATIVE_PATH):$(CROSSENV_PATH)/bin:$${PATH} ; \
+	   $(MSG) "crossenv: [$(CROSSENV_PATH)]" ; \
 	   $(MSG) "pip: [$$(which cross-pip)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
