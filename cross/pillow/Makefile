@@ -8,10 +8,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS  = cross/freetype cross/libimagequant cross/libjpeg
 DEPENDS += cross/libtiff cross/libwebp cross/zlib
 
-HOMEPAGE = https://github.com/pyca/cryptography
-COMMENT  = Provide cryptographic recipes and primitives to Python developers
-LICENSE  = BSD/ASL2
-
+HOMEPAGE = https://python-pillow.github.io/
+COMMENT  = Python Imaging Library (Fork).
+LICENSE  = MIT-CMU
 WHEELS_BUILD_ARGS  = -C platform-guessing=disable
 WHEELS_BUILD_ARGS += -C freetype=enable
 WHEELS_BUILD_ARGS += -C imagequant=enable
