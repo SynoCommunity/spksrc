@@ -3,7 +3,7 @@ SPK_VERS = 6.9.1
 SPK_REV = 10
 SPK_ICON = src/mercurial.png
 
-PYTHON_PACKAGE = python311
+PYTHON_PACKAGE = python312
 SPK_DEPENDS = "python312"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
