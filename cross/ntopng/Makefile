@@ -6,8 +6,8 @@ PKG_DIST_SITE = https://github.com/ntop/ntopng/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-NODEJS = nodejs_16
-BUILD_DEPENDS = native/$(NODEJS)
+# Remarks: BUILD_DEPENDS is additionally used to add native node and npm to PATH
+BUILD_DEPENDS = native/nodejs_16
 
 DEPENDS  = cross/libcap cross/ndpi cross/curl
 DEPENDS += cross/libmaxminddb cross/sqlite cross/mysql-connector-c
@@ -69,9 +69,9 @@ CONFIGURE_ARGS += my_cv_rw_locks_supported=$(RW_LOCKS_SUPPORTED)
 
 ENV += DESTDIR=$(INSTALL_DIR)
 # add install/bin folder to path to let ./configure find mysql_config (it is a script and works for cross compile)
-# add native nodejs and npm to path
-NODE_BIN_FOLDER = $(realpath $(WORK_DIR)/../../../native/$(NODEJS)/work-native/node/bin)
-NPM_BIN_FOLDER = $(realpath $(WORK_DIR)/../../../native/$(NODEJS)/work-native/node/lib/node_modules/npm/bin)
+# add native node and npm commands to path
+NODE_BIN_FOLDER = $(realpath $(WORK_DIR)/../../../$(BUILD_DEPENDS)/work-native/node/bin)
+NPM_BIN_FOLDER = $(realpath $(WORK_DIR)/../../../$(BUILD_DEPENDS)/work-native/node/lib/node_modules/npm/bin)
 ENV += "PATH=$(PATH):$(NODE_BIN_FOLDER):$(NPM_BIN_FOLDER):$(STAGING_INSTALL_PREFIX)/bin"
 
 include ../../mk/spksrc.cross-cc.mk
