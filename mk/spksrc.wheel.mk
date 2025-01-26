@@ -91,7 +91,6 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
 	   if [ "$$(grep -s egg <<< $${wheel})" ]; then \
 	      name=$$(echo $${wheel#*egg=} | cut -f1 -d=) ; \
-	      wheel=$$(echo $${wheel%%#egg=*}) ; \
 	   else \
 	      name=$$(echo $${wheel%%[<>=]=*} | sed -E "s/^(abi3|crossenv|pure)://") ; \
 	   fi ; \
@@ -124,7 +123,6 @@ ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $
 	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
 	   if [ "$$(grep -s egg <<< $${requirement})" ]; then \
 	      name=$$(echo $${wheel#*egg=} | cut -f1 -d=) ; \
-	      wheel=$$(echo $${wheel%%#egg=*}) ; \
 	   else \
 	      name=$$(echo $${wheel%%[<>=]=*} | sed -E "s/^(abi3|crossenv|pure)://") ; \
 	   fi ; \
