@@ -3,7 +3,7 @@ SPK_VERS = 2.1.1.127
 SPK_REV = 24
 SPK_ICON = src/deluge.png
 
-PYTHON_PACKAGE = python311
+PYTHON_PACKAGE = python312
 
 WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
