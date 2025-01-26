@@ -1,6 +1,3 @@
-rsc:include/X11/extensions/XInput2.h
-rsc:include/X11/extensions/XInput.h
 lnk:lib/libXi.so
 lnk:lib/libXi.so.6
 lib:lib/libXi.so.6.1.0
-rsc:lib/pkgconfig/xi.pc

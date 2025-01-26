@@ -1,0 +1,22 @@
+https://sources.debian.org/src/openjdk-21/21.0.5+11-1/debian/patches/jdk-8329983.patch
+
+Description: remove declaration of _Copy_conjoint_bytes
+ JDK-8142362 removed implementation of _Copy_conjoint_bytes
+ but left the symbol declaration in for armhf.
+ This causes link failure against libjvm.so.
+Author: Vladimir Petko <vladimir.petko@canonical.com>
+Bug: https://bugs.openjdk.org/browse/JDK-8329983
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/collectd/+bug/2058966
+Last-Update: 2024-04-10
+
+--- a/src/hotspot/os_cpu/linux_arm/linux_arm_32.S
++++ b/src/hotspot/os_cpu/linux_arm/linux_arm_32.S
+@@ -28,8 +28,6 @@
+ 	# point or use it in the same manner as does the server
+ 	# compiler.
+ 
+-        .globl _Copy_conjoint_bytes
+-	.type _Copy_conjoint_bytes, %function
+         .globl _Copy_arrayof_conjoint_bytes
+ 	.type _Copy_arrayof_conjoint_bytes, %function
+ 	.globl _Copy_disjoint_words

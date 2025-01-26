@@ -1,0 +1,83 @@
+https://sources.debian.org/src/openjdk-21/21.0.5+11-1/debian/patches/jdk-8307977-proposed.patch
+
+Description: attach in linux hangs due to permission denied accessing /proc/pid/root
+  The attach API uses /proc/pid/root in order to support containers.
+  Dereferencing this symlink is governed by ptrace access mode PTRACE_MODE_READ_FSCREDS
+  which may not succeed when running as the user running the JRE.
+  This breaks running jcmd and jmap as the same user the JVM is running as.
+  Use tmpdir when pid matches ns_pid.
+Author: Sebastian Lövdahl <sebastian.lovdahl@hibox.tv>
+Bug: https://bugs.openjdk.org/browse/JDK-8307977
+Bug: https://bugs.openjdk.org/browse/JDK-8226919
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1034601
+Last-Update: 2023-04-18
+
+From 36b554e2de46d77898be4d0feae0ee2171b445bc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20L=C3=B6vdahl?= <sebastian.lovdahl@hibox.tv>
+Date: Tue, 18 Apr 2023 12:50:32 +0300
+Subject: [PATCH] 8226919: Fix dynamic attach in Linux for non-container
+ environments
+
+---
+ .../sun/tools/attach/VirtualMachineImpl.java  | 37 ++++++++++++-------
+ 1 file changed, 23 insertions(+), 14 deletions(-)
+
+--- a/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java
++++ b/src/jdk.attach/linux/classes/sun/tools/attach/VirtualMachineImpl.java
+@@ -210,11 +210,8 @@ public class VirtualMachineImpl extends
+     }
+ 
+     // Return the socket file for the given process.
+-    private File findSocketFile(int pid, int ns_pid) {
+-        // A process may not exist in the same mount namespace as the caller.
+-        // Instead, attach relative to the target root filesystem as exposed by
+-        // procfs regardless of namespaces.
+-        String root = "/proc/" + pid + "/root/" + tmpdir;
++    private File findSocketFile(int pid, int ns_pid) throws IOException {
++        String root = findTargetProcessTmpDirectory(pid, ns_pid);
+         return new File(root, ".java_pid" + ns_pid);
+     }
+ 
+@@ -230,21 +227,33 @@ public class VirtualMachineImpl extends
+             // Do not canonicalize the file path, or we will fail to attach to a VM in a container.
+             f.createNewFile();
+         } catch (IOException x) {
+-            String root;
+-            if (pid != ns_pid) {
+-                // A process may not exist in the same mount namespace as the caller.
+-                // Instead, attach relative to the target root filesystem as exposed by
+-                // procfs regardless of namespaces.
+-                root = "/proc/" + pid + "/root/" + tmpdir;
+-            } else {
+-                root = tmpdir;
+-            }
++            String root = findTargetProcessTmpDirectory(pid, ns_pid);
+             f = new File(root, fn);
+             f.createNewFile();
+         }
+         return f;
+     }
+ 
++    private String findTargetProcessTmpDirectory(int pid, int ns_pid) throws IOException {
++        String root;
++        if (pid != ns_pid) {
++            // A process may not exist in the same mount namespace as the caller.
++            // Instead, attach relative to the target root filesystem as exposed by
++            // procfs regardless of namespaces.
++            String procRootDirectory = "/proc/" + pid + "/root";
++            if (!Files.isReadable(Path.of(procRootDirectory))) {
++                throw new IOException(
++                        String.format("Unable to access root directory %s " +
++                          "of target process %d", procRootDirectory, pid));
++            }
++
++            root = procRootDirectory + "/" + tmpdir;
++        } else {
++            root = tmpdir;
++        }
++        return root;
++    }
++
+     /*
+      * Write/sends the given to the target VM. String is transmitted in
+      * UTF-8 encoding.
