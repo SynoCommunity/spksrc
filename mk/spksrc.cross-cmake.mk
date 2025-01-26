@@ -114,14 +114,6 @@ $(CMAKE_TOOLCHAIN_PKG):
 cmake_pkg_toolchain:
 	@cat $(CMAKE_TOOLCHAIN_WRK) ; \
 	echo
-ifeq ($(strip $(CMAKE_USE_NASM)),1)
-ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-	@echo "# set assembly compiler" ; \
-	echo "set(ENABLE_ASSEMBLY $(ENABLE_ASSEMBLY))" ; \
-	echo "set(CMAKE_ASM_COMPILER $(CMAKE_ASM_COMPILER))" ; \
-	echo
-endif
-endif
 	@echo "# set compiler flags for cross-compiling" ; \
 	echo 'set(CMAKE_C_FLAGS "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)")' ; \
 	echo 'set(CMAKE_CPP_FLAGS "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS)")' ; \
@@ -149,7 +141,6 @@ cmake_configure_target: $(CMAKE_TOOLCHAIN_PKG)
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Optional Dependencies = $(OPTIONAL_DEPENDS)
 	@$(MSG)    - Use Toolchain File = $(CMAKE_USE_TOOLCHAIN_FILE) [$(CMAKE_TOOLCHAIN_PKG)]
-	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - CMake = $(shell which cmake) [$(shell cmake --version | head -1 | awk '{print $$NF}')]
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
