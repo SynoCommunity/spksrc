@@ -8,7 +8,7 @@ DEPENDS = cross/syncstorage-rs cross/diesel
 PYTHON_PACKAGE = python312
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)
 
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
@@ -36,7 +36,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 DEPENDS += cross/openssl3
 
 # [mysqlclient]
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 POST_STRIP_TARGET = ffsync_extra_install
@@ -44,13 +44,11 @@ POST_STRIP_TARGET = ffsync_extra_install
 include ../../mk/spksrc.python.mk
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-WHEELS += src/requirements-crossenv-greenlet-v2.txt
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
-endif
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+WHEELS += src/requirements-crossenv-greenlet-v3.txt
 else
-WHEELS += src/requirements-crossenv-greenlet-v1.txt
+WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
+WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
 
