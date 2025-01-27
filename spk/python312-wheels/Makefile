@@ -28,7 +28,7 @@ WHEELS  = src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.python.mk
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
@@ -149,5 +149,3 @@ endif
 ## unless WHEELS has been previously populated. This is due to
 ## the makefile analysis phase which discard ifeq instructions.
 ##
-
-include ../../mk/spksrc.python.mk
