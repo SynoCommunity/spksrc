@@ -3,7 +3,7 @@
 apprise==1.9.2
 babelfish==0.6.1
 blinker==1.9.0
-#certifi                        ==> python311
+#certifi                        ==> python312
 chardet==5.2.0
 cheroot==10.0.1
 CherryPy==18.10.0
@@ -22,7 +22,7 @@ more_itertools==10.6.0
 notify2==0.3.1
 oauthlib==3.2.2
 paho_mqtt==1.6.1
-#pip                            ==> python311
+#pip                            ==> python312
 portend==3.2.0
 puremagic==1.28
 pycparser==2.22
@@ -33,9 +33,9 @@ pytz==2025.1
 rebulk==3.2.0
 requests==2.32.3
 requests_oauthlib==2.0.0
-#setuptools                     ==> python311
+#setuptools                     ==> python312
 sgmllib3k==1.0.0
-#six                            ==> python311
+#six                            ==> python312
 tempora==5.8.0
 urllib3==2.3.0
 zc.lockfile==3.0.post1
