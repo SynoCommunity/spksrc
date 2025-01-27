@@ -6,7 +6,7 @@ SPK_ICON = src/zabbix.png
 DEPENDS = cross/zabbix-agent
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Monitor anything - networks, cloud, websites, IoT, and more.
+DESCRIPTION = Monitor anything - networks, cloud, websites, IoT, and more. Zabbix Agnet is a Zabbix daemon for monitoring of various server parameters.
 DISPLAY_NAME = Zabbix Agent
 
 CHANGELOG = "Initial package release."
@@ -32,5 +32,5 @@ include ../../mk/spksrc.spk.mk
 .PHOHNY: zabbix-agent_extra_install
 zabbix-agent_extra_install:
 	@$(MSG) "Add configuration file"
-	@install -d -m 755 $(STAGING_DIR)/var
+	@install -d -m 755 $(STAGING_DIR)/var/zabbix_agentd.conf.d
 	@install -m 644 src/zabbix_agentd.conf  $(STAGING_DIR)/var/zabbix_agentd.conf
