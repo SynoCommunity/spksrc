@@ -7,7 +7,12 @@
 # set default spk/python* path to use
 PYTHON_PACKAGE_WORK_DIR = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
+
+# armv5 no longer supported with python >= 3.12
+ifeq ($(call version_ge, $(subst python,,$(PYTHON_PACKAGE)), 312), 1)
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+endif
 
 ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
 
