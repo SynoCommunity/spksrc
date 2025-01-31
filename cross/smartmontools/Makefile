@@ -21,4 +21,11 @@ CONFIGURE_ARGS += --sysconfdir=$(INSTALL_PREFIX_VAR)
 
 ADDITIONAL_CPPFLAGS = -O
 
+POST_INSTALL_TARGET = smartmontools_post_install
+
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: smartmontools_post_install
+smartmontools_post_install:
+	@$(MSG) Create link smartctl7
+	@cd $(STAGING_INSTALL_PREFIX)/sbin && ln -sf smartctl smartctl7

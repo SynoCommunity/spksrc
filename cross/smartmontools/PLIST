@@ -1,3 +1,4 @@
+lnk:sbin/smartctl7
 bin:sbin/smartctl
 bin:sbin/smartd
 rsc:sbin/update-smart-drivedb
