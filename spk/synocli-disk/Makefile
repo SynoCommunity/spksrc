@@ -37,7 +37,7 @@ endif
 
 DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure, s3backer$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add smartmontools 7.4. <br/>2. Remove dua for ARMv5 (88f628x cpu). <br/>3. Update dar to v2.7.16. <br/>4. Update davfs2 to v1.7.1."
+CHANGELOG = "1. Add smartmontools 7.4. <br/>2. Remove dua for ARMv5 (88f628x cpu). <br/>3. Update dar to v2.7.16. <br/>4. Update davfs2 to v1.7.1. <br/>5. Update ddrescue to v1.29. <br/>6. Update e2fsprogs to v1.47.1."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.

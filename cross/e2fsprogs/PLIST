@@ -4,7 +4,7 @@ bin:bin/lsattr
 rsc:bin/mk_cmds
 rsc:etc/e2scrub.conf
 rsc:etc/mke2fs.conf
-rsc:lib/e2fsprogs/e2scrub_all_cron
+rsc:libexec/e2fsprogs/e2scrub_all_cron
 lib:lib/e2initrd_helper
 lnk:lib/libblkid.so
 lnk:lib/libblkid.so.1
