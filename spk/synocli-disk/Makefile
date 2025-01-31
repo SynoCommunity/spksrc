@@ -1,6 +1,6 @@
 SPK_NAME = synocli-disk
-SPK_VERS = 3.6
-SPK_REV = 12
+SPK_VERS = 4.0
+SPK_REV = 13
 SPK_ICON = src/synocli-disk.png
 
 DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
@@ -9,6 +9,7 @@ DEPENDS += cross/s3backer
 
 OPTIONAL_DEPENDS  = cross/dar cross/duf cross/gdu cross/tdu
 OPTIONAL_DEPENDS += cross/dua cross/dutree
+OPTIONAL_DEPENDS += cross/smartmontools
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli Disk Tools
@@ -23,15 +24,20 @@ DEPENDS += cross/duf cross/gdu cross/tdu
 OPTIONAL_DESC := $(OPTIONAL_DESC)", duf, gdu, tdu"
 endif
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # not supported on old PPC archs
 DEPENDS += cross/dua cross/dutree
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dua, dutree"
 endif
 
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/smartmontools
+OPTIONAL_DESC := $(OPTIONAL_DESC)", smartmontools \(smartctl\)"
+endif
+
 DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure, s3backer$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG = "1. Add s3backer.<br/>2. Update dar to v2.7.14 and add all supported features.<br/>3. Update ddcrescue to v1.28.<br/>4. Update dua to v2.29.0.<br/>5. Update ncdu to v1.19."
+CHANGELOG = "1. Add smartmontools 7.4. <br/>2. Remove dua for ARMv5 (88f628x cpu)."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -56,6 +62,12 @@ SPK_COMMANDS += bin/ddrescue bin/ddrescuelog
 SPK_COMMANDS += bin/duf bin/gdu bin/tdu
 SPK_COMMANDS += bin/dua bin/dutree
 SPK_COMMANDS += bin/s3backer
+
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+# smartctl of this package will not be found by path, because /bin/smartctl is found first
+# you have to use /usr/local/bin/smartctl (or /var/packages/synocli-disk/target/sbin/smartctl)
+SPK_COMMANDS += sbin/smartctl sbin/smartd sbin/update-smart-drivedb
+endif
 
 include ../../mk/spksrc.spk.mk
 
