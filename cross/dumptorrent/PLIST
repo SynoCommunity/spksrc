@@ -1,2 +1,2 @@
-bin:dumptorrent
-bin:scrapec
+bin:bin/dumptorrent
+bin:bin/scrapec
