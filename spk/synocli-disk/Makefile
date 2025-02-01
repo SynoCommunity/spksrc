@@ -44,7 +44,8 @@ CHANGELOG += "4. Update davfs2 to v1.7.1. <br/>"
 CHANGELOG += "5. Update ddrescue to v1.29. <br/>"
 CHANGELOG += "6. Update dua to v2.30.0. <br/>"
 CHANGELOG += "7. Update e2fsprogs to v1.47.2. <br/>"
-CHANGELOG += "8. Update gdu to v5.30.1."
+CHANGELOG += "8. Update gdu to v5.30.1. <br/>"
+CHANGELOG += "9. Update ncdu to v1.21."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.
