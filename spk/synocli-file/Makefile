@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 4.0
-SPK_REV = 25
+SPK_REV = 26
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -9,7 +9,7 @@ SPK_ICON = src/synocli-file.png
 #   it's own libblkid and rmlint cannot find the working library of cross/libblkid.
 BUILD_DEPENDS = cross/libblkid
 
-DEPENDS  = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/nano cross/file
+DEPENDS  = cross/less cross/tree cross/jdupes cross/rhash cross/nano cross/file
 DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
@@ -101,7 +101,7 @@ PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
-    less, tree, ncdu, jdupes, fdupes, rhash, \
+    less, tree, jdupes, fdupes, rhash, \
     mc \(midnight commander\), \
     mg \(emacs-like text editor\), nano, \
     jupp \(based on JOE - Joe\'s Own Editor 3.1\), \
@@ -110,13 +110,17 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Remove fd (fd-find) v8.7.0 used for VS and NVR models (ARMv7L archs) and for ARMv5 archs. <br/>"
-CHANGELOG += "2. Update eza to v0.20.15. <br/>"
-CHANGELOG += "3. Update file to v5.46. <br/>"
-CHANGELOG += "4. Update fzf to v0.57.0. <br/>"
-CHANGELOG += "5. Update nano to v8.3. <br/>"
-CHANGELOG += "6. Update nnn to v5.0 (DSM 7 only). <br/>"
-CHANGELOG += "7. Update tree to v2.2.1."
+CHANGELOG  = "1. Remove fd (fd-find) for VS and NVR models (ARMv7L archs) and for ARMv5 archs. <br/>"
+CHANGELOG += "2. Remove ncdu (ncdu is part of synocli-disk). <br/>"
+CHANGELOG += "3. Update bat to v0.250. <br/>"
+CHANGELOG += "4. Update eza to v0.20.18. <br/>"
+CHANGELOG += "5. Update file to v5.46. <br/>"
+CHANGELOG += "6. Update fzf to v0.58.0. <br/>"
+CHANGELOG += "7. Update mc to v4.8.33. <br/>"
+CHANGELOG += "8. Update nano to v8.3. <br/>"
+CHANGELOG += "9. Update nnn to v5.0 (DSM 7 only). <br/>"
+CHANGELOG += "10. Update plzip to v1,12. <br/>"
+CHANGELOG += "11. Update tree to v2.2.1."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -125,7 +129,6 @@ LICENSE  = Each tool is licensed under it's respective license.
 
 SPK_COMMANDS  = bin/less bin/lessecho bin/lesskey
 SPK_COMMANDS += bin/tree
-SPK_COMMANDS += bin/ncdu
 SPK_COMMANDS += bin/jdupes
 SPK_COMMANDS += bin/mc bin/mcdiff bin/mcview bin/mcedit
 SPK_COMMANDS += bin/nano bin/rnano

@@ -1,5 +1,5 @@
 SPK_NAME = bat
-SPK_VERS = 0.24.0
+SPK_VERS = 0.25.0
 SPK_REV = 1
 
 DEPENDS = cross/bat
