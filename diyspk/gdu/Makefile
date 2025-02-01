@@ -1,5 +1,5 @@
 SPK_NAME = gdu
-SPK_VERS = 5.25.0
+SPK_VERS = 5.30.1
 SPK_REV = 1
 
 DEPENDS = cross/gdu
