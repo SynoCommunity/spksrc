@@ -1,5 +1,5 @@
 SPK_NAME = dua
-SPK_VERS = 2.29.0
+SPK_VERS = 2.30.0
 SPK_REV = 1
 
 DEPENDS = cross/dua
