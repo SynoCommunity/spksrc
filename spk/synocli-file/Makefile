@@ -110,7 +110,7 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Remove fd (fd-find) v8.7.0 used for VS and NVR models (ARMv7L archs) and for ARMv5 archs. <br/>"
+CHANGELOG  = "1. Remove fd (fd-find) for VS and NVR models (ARMv7L archs) and for ARMv5 archs. <br/>"
 CHANGELOG += "2. Remove ncdu (ncdu is part of synocli-disk). <br/>"
 CHANGELOG += "3. Update bat to v0.250. <br/>"
 CHANGELOG += "4. Update eza to v0.20.18. <br/>"
