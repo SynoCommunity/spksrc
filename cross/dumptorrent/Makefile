@@ -15,12 +15,12 @@ INSTALL_TARGET = install-binaries
 
 include ../../mk/spksrc.cross-cc.mk
 
-install-binaries: $(INSTALL_DIR)/$(INSTALL_PREFIX)/dumptorrent $(INSTALL_DIR)/$(INSTALL_PREFIX)/scrapec
+install-binaries: $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/dumptorrent $(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/scrapec
 
-$(INSTALL_DIR)/$(INSTALL_PREFIX)/dumptorrent:
+$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/dumptorrent:
 	cp -p $(WORK_DIR)/$(PKG_DIR)/dumptorrent $@
 	chmod +x $@
 
-$(INSTALL_DIR)/$(INSTALL_PREFIX)/scrapec: 
+$(INSTALL_DIR)/$(INSTALL_PREFIX)/bin/scrapec: 
 	cp -p $(WORK_DIR)/$(PKG_DIR)/scrapec $@
 	chmod +x $@
