@@ -1,5 +1,5 @@
 SPK_NAME = mc
-SPK_VERS = 4.8.32
+SPK_VERS = 4.8.33
 SPK_REV = 1
 SPK_ICON = src/mc.png
 
