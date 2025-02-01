@@ -29,6 +29,7 @@ export CURL_INCLUDE_EXECUTABLE=1
 
 # Remaining dependencies
 DEPENDS += cross/mediainfo cross/rtorrent cross/rutorrent cross/screen5 cross/sox cross/unzip
+DEPENDS += cross/dumptorrent
 
 ADMIN_URL = /rutorrent/
 STARTABLE = yes

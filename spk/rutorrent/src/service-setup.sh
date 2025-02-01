@@ -87,6 +87,7 @@ service_postinst ()
                -e "s|\"id\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"id\"\1=>\2'/bin/id'\3,\4|g" \
                -e "s|\"gzip\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"gzip\"\1=>\2'/bin/gzip'\3,\4|g" \
                -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'/bin/php'\3,\4|g" \
+               -e "s|\"dumptorrent\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"dumptorrent\"\1=>\2'${SYNOPKG_PKGDEST}/bin/dumptorrent'\3,\4|g" \
                "${RUTORRENT_WEB_DIR}/conf/config.php"
 
         sed -i -e "s|@download_dir@|${wizard_download_dir}|g" \
