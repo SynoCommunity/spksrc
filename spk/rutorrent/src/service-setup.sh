@@ -104,6 +104,9 @@ service_postinst ()
         fi
     fi
 
+    sed -i -e "s|\$pathToExternals\['dumptorrent'\] = '';|\$pathToExternals['dumptorrent'] = '${SYNOPKG_PKGDEST}/bin/dumptorrent';|g" \
+           "${RUTORRENT_WEB_DIR}/plugins/dump/conf.php"
+
     # Setup a virtual environment with cloudscraper
     # Create a Python virtualenv
     install_python_virtualenv
