@@ -208,29 +208,6 @@ is_not_defined_external_program()
     return $?
 }
 
-is_not_defined_variable()
-{
-    local variable_name="$1"
-    php -r "require_once('${RUTORRENT_WEB_DIR}/conf/config.php'); if (isset(\$${variable_name})) { exit(1); } else { exit(0); }"
-    return $?
-}
-
-define_variable()
-{
-    local variable_name="$1"
-    shift
-    local value="$1"
-    shift
-    local comment="$1"
-    shift
-    echo "\$${variable_name} = ${value}; // ${comment}" \
-        >> "${RUTORRENT_WEB_DIR}/conf/config.php"
-    while [ "$#" -ne 0 ]; do
-      echo "// $1" >> "${RUTORRENT_WEB_DIR}/conf/config.php"
-      shift
-    done
-}
-
 define_external_program()
 {
     program=$1
