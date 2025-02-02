@@ -41,9 +41,6 @@ fix_shared_folders_rights()
     # Set default user to sc-rutorrent and group to http
     chown -R "${EFF_USER}:${APACHE_USER}" "${folder}"
 
-    # Ensure the default group used for resources created under this directory should be http
-    chmod g+s "${folder}"
-
     echo "Fixing shared folder access for everyone"
     synoacltool -add "${folder}" "everyone:*:allow:r-x----------:fd--"
 
