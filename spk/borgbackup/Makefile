@@ -1,13 +1,13 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.4.0
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/borgbackup.png
 
-PYTHON_PACKAGE = python311
-SPK_DEPENDS = "python311>=3.11.5-8"
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "$(PYTHON_PACKAGE)"
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
-DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse cross/xxhash
+DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/libb2 cross/fuse cross/xxhash cross/zstd
 
 # Requirements file generation
 # - first create borgbackup wheel defined in src/requirements-crossenv.txt
@@ -30,7 +30,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgmatic to v1.9.5. <br/>2. Update emborg to v1.41."
+CHANGELOG = "1. Update borgmatic to v1.9.8. <br/>2. Update emborg to v1.41. <br/>3. Migrate to Python 3.12."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
@@ -39,19 +39,32 @@ SERVICE_SETUP = src/service-setup.sh
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
+include ../../mk/spksrc.python.mk
+
+# [borgbackup]
 # Use OpenSSL path as defined by either
 # spksrc.wheel-env.mk or spksrc.python.mk
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
-ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
-ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
-ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
-ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [borgbackup] -std=c11
+endif
 
-include ../../mk/spksrc.common.mk
+# [llfuse]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [llfuse] -std=gnu11
+endif
 
-# [rpds-py]
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+# [msgpack]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [msgpack] -std=c11
+endif
 
-include ../../mk/spksrc.python.mk
+# [ruamel.yaml.clib]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
+endif
