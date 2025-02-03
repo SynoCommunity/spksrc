@@ -1,6 +1,3 @@
-rsc:include/X11/extensions/record.h
-rsc;include/X11/extensions/XTest.h
 lnk:lib/libXtst.so
 lnk:lib/libXtst.so.6
 lib:lib/libXtst.so.6.1.0
-rsc:lib/pkgconfig/xtst.pc
