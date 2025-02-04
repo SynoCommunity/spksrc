@@ -102,9 +102,6 @@ include ../../mk/spksrc.cross-env.mk
 
 include ../../mk/spksrc.depend.mk
 
-## python wheel requirement processing
-include ../../mk/spksrc.python-requirement.mk
-
 copy: depend
 include ../../mk/spksrc.wheel.mk
 
