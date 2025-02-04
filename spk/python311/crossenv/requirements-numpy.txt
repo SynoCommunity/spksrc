@@ -1,6 +1,6 @@
-build:pip==23.2.1
-build:setuptools==59.8.0
-build:wheel==0.41.2
+pip==23.2.1
+setuptools==59.8.0
+wheel==0.41.2
 #
 build:Cython==0.29.36
 build:meson-python==0.17.1
