@@ -6,11 +6,12 @@
 #  pre_wheel_install_target   (override with PRE_WHEEL_INSTALL_TARGET)
 #  wheel_install_target       (override with WHEEL_INSTALL_TARGET)
 #  post_wheel_install_target  (override with POST_WHEEL_INSTALL_TARGET)
+#
 # Variables:
-#  REQUIREMENT             Requirement formatted wheel information
 #  WHEEL_NAME              Name of wheel to process
-#  WHEEL_VERSION           Version of wheel to process (can be empty)
 #  WHEEL_TYPE              Type of wheel to process (abi3, crossenv, pure)
+#  WHEEL_URL               URL usually of type git+https://
+#  WHEEL_VERSION           Version of wheel to process (can be empty)
 
 ifeq ($(WHEEL_VERSION),)
 WHEEL_INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_install-$(WHEEL_NAME)_done
@@ -57,7 +58,7 @@ wheel_install_target:
 	       pure) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_PURE_PYTHON) ; \
 	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_PURE_PYTHON) ; \
 	             ;; \
-	          *) $(MSG) No type found for wheel [$(REQUIREMENT)] ; \
+	          *) $(MSG) No type found for wheel [$(WHEEL_NAME)==$(WHEEL_VERSION)] ; \
 	             ;; \
 	esac
 	@for file in $$(ls -1 $(WHEELHOUSE)/requirements-*.txt) ; do \

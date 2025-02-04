@@ -24,9 +24,6 @@ WHEEL_COOKIE = $(WORK_DIR)/.wheel_done
 ## python wheel specific configurations
 include ../../mk/spksrc.wheel-env.mk
 
-## requirement processing routines
-include ../../mk/spksrc.requirement.mk
-
 ## python wheel specific configurations
 include ../../mk/spksrc.crossenv.mk
 
@@ -46,7 +43,7 @@ include ../../mk/spksrc.wheel-install.mk
 
 ##
 
-ifneq ($(strip $(REQUIREMENT)),)
+ifneq ($(and $(WHEEL_NAME),$(or (WHEEL_VERISON),$(WHEEL_URL))),)
 download-wheels: wheel_download
 wheel: wheel_install
 else
@@ -111,5 +108,5 @@ else
 wheel: ;
 endif
 
-# endif REQUIREMENT non-empty
+# endif $(and $(WHEEL_NAME),$(or (WHEEL_VERISON),$(WHEEL_URL))) non-empty
 endif

@@ -1,16 +1,20 @@
 ### Wheel rules
-# Download wheels for modules listed in WHEELS. 
+# Download wheels for modules listed in WHEELS.
+# These are being pre-processed thru spksrc.wheel.mk
+# along with spksrc.requirement.mk so 1 wheel at
+# a time gets submitted to download.
 #
 # Targets are executed in the following order:
 #  wheel_download_msg_target
 #  pre_wheel_download_target   (override with PRE_WHEEL_DOWNLOAD_TARGET)
 #  wheel_download_target       (override with WHEEL_DOWNLOAD_TARGET)
 #  post_wheel_download_target  (override with POST_WHEEL_DOWNLOAD_TARGET)
+#
 # Variables:
-#  REQUIREMENT             Requirement formatted wheel information
 #  WHEEL_NAME              Name of wheel to process
-#  WHEEL_VERSION           Version of wheel to process (can be empty)
 #  WHEEL_TYPE              Type of wheel to process (abi3, crossenv, pure)
+#  WHEEL_URL               URL usually of type git+https://
+#  WHEEL_VERSION           Version of wheel to process (can be empty)
 
 ifeq ($(WHEEL_VERSION),)
 WHEEL_DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_download-$(WHEEL_NAME)_done
@@ -52,7 +56,7 @@ ifeq ($(wildcard $(PIP_CACHE_DIR)),)
 	@mkdir -p $(PIP_CACHE_DIR)
 endif
 	@$(MSG) Downloading wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)] ; \
-	if [ "$$(grep -Eo 'http://|https://' <<< $(REQUIREMENT))" ] ; then \
+	if [ "$(WHEEL_URL)" ] ; then \
 	   echo "WARNING: Skipping download URL - Downloaded at build time" ; \
 	elif [ "$(WHEEL_TYPE)" = "pure" ] && [ ! "$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)" = "1" ]; then \
 	   echo "WARNING: Skipping download - pure python packaging disabled" ; \

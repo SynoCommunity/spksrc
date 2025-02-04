@@ -6,11 +6,12 @@
 #  pre_wheel_compile_target   (override with PRE_WHEEL_COMPILE_TARGET)
 #  wheel_compile_target       (override with WHEEL_COMPILE_TARGET)
 #  post_wheel_compile_target  (override with POST_WHEEL_COMPILE_TARGET)
+#
 # Variables:
-#  REQUIREMENT             Requirement formatted wheel information
 #  WHEEL_NAME              Name of wheel to process
-#  WHEEL_VERSION           Version of wheel to process (can be empty)
 #  WHEEL_TYPE              Type of wheel to process (abi3, crossenv, pure)
+#  WHEEL_URL               URL usually of type git+https://
+#  WHEEL_VERSION           Version of wheel to process (can be empty)
 
 ifeq ($(WHEEL_VERSION),)
 WHEEL_COMPILE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_compile-$(WHEEL_NAME)_done
@@ -69,7 +70,7 @@ ifneq ($(WHEEL_TYPE),pure)
 	   $$([ "$$(echo $${localLDFLAGS[@]})" ] && echo "LDFLAGS=\"$${localLDFLAGS[@]}\" ") \
 	   $$([ "$$(echo $${abi3})" ] && echo "$${abi3} ")" \
 	   $${global_options}" ; \
-	REQUIREMENT=$(REQUIREMENT) \
+	REQUIREMENT=$(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) \
 	   WHEEL_NAME=$(WHEEL_NAME) \
 	   WHEEL_VERSION=$(WHEEL_VERSION) \
 	   ADDITIONAL_CFLAGS="-I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) $${localCFLAGS[@]}" \
@@ -86,8 +87,8 @@ else ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	      $(RUN) \
 	      PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)" \
 	      LD_LIBRARY_PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)" \
-	      $(MSG) $(PIP_NATIVE) $(PIP_WHEEL_ARGS) $(REQUIREMENT) ; \
-	      $(PIP_NATIVE) $(PIP_WHEEL_ARGS) $(REQUIREMENT) ; \
+	      $(MSG) $(PIP_NATIVE) $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
+	      $(PIP_NATIVE) $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
 	fi
 endif
 
