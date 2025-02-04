@@ -73,7 +73,7 @@ else
 	         cross:*) type=cross ;; \
 	      crossenv:*) type=crossenv ;; \
 	          pure:*) type=pure ;; \
-	               *) type=$(WHEEL_DEFAULT_PREFIX) ;; \
+	               *) [[ "$(REQUIREMENT_GOAL)" == crossenv-install-* ]] && type=cross || type=$(WHEEL_DEFAULT_PREFIX) ;; \
 	   esac ; \
 	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
 	   if [ "$$(grep -s egg <<< $${requirement})" ]; then \

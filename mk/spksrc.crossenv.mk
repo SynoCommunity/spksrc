@@ -197,21 +197,22 @@ endif
 	@$(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" requirement ; \
 	MAKEFLAGS= $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT="$(CROSSENV_REQUIREMENTS)" REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" requirement
 
-### TRAITER le % en $*
-### TRAITER le cas de requirement avec juste pip au lien de build:pip
-### SI appel via arch-<arch>-<tcversion> fail - doit probablement necessiter d'ajouter spksrc.requirement.mk en qque part
-### Si cross alors faudrait apeller wheel_download et pointer vers link machin destination
+
+### 
+### crossenv-install-<crossenv>
+###    <crossenv> = $(lastword $(subst -, ,$*)) being <wheel>-<version>, <wheel> or default
+###
 crossenv-install-%:
-	@$(MSG) CROSSENV_PATH: $(CROSSENV_PATH)
+	@$(MSG) CROSSENV_PATH: $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))
 ifeq ($(WHEEL_TYPE),build)
-	@. $(CROSSENV_PATH)/bin/activate ; \
+	@. $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate ; \
 	   $(MSG) build-pip install $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
 	   $(RUN) \
 	     PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)" \
 	     LD_LIBRARY_PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)" \
 	     $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(WHEEL_NAME)==$(WHEEL_VERSION)
 else ifeq ($(WHEEL_TYPE),cross)
-	@. $(CROSSENV_PATH)/bin/activate ; \
+	@. $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate ; \
 	   $(MSG) cross-pip install $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
 	   $(RUN) \
 	     PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)" \
@@ -220,6 +221,7 @@ else ifeq ($(WHEEL_TYPE),cross)
 else
 	$(error Wheel type [$(WHEEL_TYPE)] not recognized)
 endif
+
 
 ##
 ## python-cc.mk
