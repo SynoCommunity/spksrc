@@ -28,28 +28,30 @@ prepare_crossenv:
 compile_python_module: prepare_crossenv
 	$(foreach e,$(shell cat $(CROSSENV_MODULE_PATH)/build/python-cc.mk),$(eval $(e)))
 	$(eval PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/)
-	@if [ -d "$(CROSSENV_PATH)" ] ; then \
-	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$(PYTHON_NATIVE_PATH):$(CROSSENV_PATH)/bin:$${PATH} ; \
+	@. $(CROSSENV) ; \
+	if [ -e "$(CROSSENV)" ] ; then \
+	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
 	   $(MSG) "crossenv: [$(CROSSENV_PATH)]" ; \
-	   $(MSG) "pip: [$$(which cross-pip)]" ; \
+	   $(MSG) "python3: [$$(which cross-python3)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
-	$(MSG) PYTHONPATH=$(PYTHONPATH) cross-python3 setup.py build_ext \
+	$(MSG) PYTHONPATH=$(PYTHONPATH) $$(which cross-python3) setup.py build_ext \
 	       -I $(STAGING_INSTALL_PREFIX)/include \
 	       -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS) ; \
-	$(RUN) PYTHONPATH=$(PYTHONPATH) cross-python3 setup.py build_ext \
+	$(RUN) PYTHONPATH=$(PYTHONPATH) $$(which cross-python3) setup.py build_ext \
 	       -I $(STAGING_INSTALL_PREFIX)/include \
 	       -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
 
 install_python_module:
-	@PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$(PYTHON_NATIVE_PATH):$(CROSSENV_PATH)/bin:$${PATH} ; \
-	$(MSG) PYTHONPATH=$(PYTHONPATH) cross-python3 setup.py install \
+	@. $(CROSSENV) ; \
+	export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
+	$(MSG) PYTHONPATH=$(PYTHONPATH) $$(which cross-python3) setup.py install \
 	       --root $(INSTALL_DIR) \
 	       --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS) ; \
-	$(RUN) PYTHONPATH=$(PYTHONPATH) cross-python3 setup.py install \
+	$(RUN) PYTHONPATH=$(PYTHONPATH) $$(which cross-python3) setup.py install \
 	       --root $(INSTALL_DIR) \
 	       --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
 
@@ -69,3 +71,6 @@ all: install fix_shebang_python_module
 
 # Allow generating per-wheel crossenv
 include ../../mk/spksrc.crossenv.mk
+
+## python wheel specific configurations
+include ../../mk/spksrc.wheel-env.mk

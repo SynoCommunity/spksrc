@@ -103,10 +103,11 @@ endif
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
-	@if [ -d "$(CROSSENV_PATH)" ] ; then \
-	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$(PYTHON_NATIVE_PATH):$(CROSSENV_PATH)/bin:$${PATH} ; \
-	   $(MSG) "crossenv: [$(CROSSENV_PATH)]" ; \
-	   $(MSG) "pip: [$$(which cross-pip)]" ; \
+	@. $(CROSSENV) ; \
+	if [ -e "$(CROSSENV)" ] ; then \
+	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
+	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
+	   $(MSG) "python3: [$$(which cross-python3)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
@@ -119,9 +120,9 @@ cross-compile-wheel-%:
 	$(RUN) $(MSG) \
 	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
 	   PATH=$${PATH} \
-	   CMAKE_TOOLCHAIN_FILE=$${CMAKE_TOOLCHAIN_FILE} \
-	   MESON_CROSS_FILE=$${MESON_CROSS_FILE} \
-	   cross-pip \
+	   CMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) \
+	   MESON_CROSS_FILE=$(MESON_CROSS_FILE) \
+	   $$(which cross-python3) -m pip \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \
@@ -130,9 +131,9 @@ cross-compile-wheel-%:
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	   PATH=$${PATH} \
-	   CMAKE_TOOLCHAIN_FILE=$${CMAKE_TOOLCHAIN_FILE} \
-	   MESON_CROSS_FILE=$${MESON_CROSS_FILE} \
-	   cross-pip \
+	   CMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) \
+	   MESON_CROSS_FILE=$(MESON_CROSS_FILE) \
+	   $$(which cross-python3) -m pip \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \
