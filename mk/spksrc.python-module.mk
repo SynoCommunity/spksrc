@@ -32,26 +32,26 @@ compile_python_module: prepare_crossenv
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
 	   $(MSG) "crossenv: [$(CROSSENV_PATH)]" ; \
-	   $(MSG) "python3: [$$(which cross-python3)]" ; \
+	   $(MSG) "python: [$$(which cross-python)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
-	$(MSG) PYTHONPATH=$(PYTHONPATH) $$(which cross-python3) setup.py build_ext \
+	$(MSG) PYTHONPATH=$(PYTHONPATH) $$(which cross-python) setup.py build_ext \
 	       -I $(STAGING_INSTALL_PREFIX)/include \
 	       -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS) ; \
-	$(RUN) PYTHONPATH=$(PYTHONPATH) $$(which cross-python3) setup.py build_ext \
+	$(RUN) PYTHONPATH=$(PYTHONPATH) $$(which cross-python) setup.py build_ext \
 	       -I $(STAGING_INSTALL_PREFIX)/include \
 	       -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
 
 install_python_module:
 	@. $(CROSSENV) ; \
 	export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
-	$(MSG) PYTHONPATH=$(PYTHONPATH) $$(which cross-python3) setup.py install \
+	$(MSG) PYTHONPATH=$(PYTHONPATH) $$(which cross-python) setup.py install \
 	       --root $(INSTALL_DIR) \
 	       --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS) ; \
-	$(RUN) PYTHONPATH=$(PYTHONPATH) $$(which cross-python3) setup.py install \
+	$(RUN) PYTHONPATH=$(PYTHONPATH) $$(which cross-python) setup.py install \
 	       --root $(INSTALL_DIR) \
 	       --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
 

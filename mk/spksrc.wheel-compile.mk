@@ -82,13 +82,20 @@ ifneq ($(WHEEL_TYPE),pure)
 	   $(MAKE) --no-print-directory \
 	   cross-compile-wheel-$(WHEEL_NAME)-$(WHEEL_VERSION)
 else ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
+	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
-	   export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= OBJCOPY= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= && \
-	      $(RUN) \
-	      PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)" \
-	      LD_LIBRARY_PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)" \
-	      $(MSG) $(PIP_NATIVE) $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
-	      $(PIP_NATIVE) $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
+	   . $(CROSSENV) ; \
+	   if [ -e "$(CROSSENV)" ] ; then \
+	      export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= OBJCOPY= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= ; \
+	      export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
+	      $(MSG) "crossenv: [$(CROSSENV)]" ; \
+	      $(MSG) "pip: [$$(which build-pip)]" ; \
+	   else \
+	      echo "ERROR: crossenv not found!" ; \
+	      exit 2 ; \
+	   fi ; \
+	   $(MSG) $$(which build-pip) $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
+	   $(RUN) $$(which build-pip) $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
 	fi
 endif
 
@@ -107,7 +114,7 @@ cross-compile-wheel-%:
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
-	   $(MSG) "python3: [$$(which cross-python3)]" ; \
+	   $(MSG) "python: [$$(which cross-python)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
@@ -122,7 +129,7 @@ cross-compile-wheel-%:
 	   PATH=$${PATH} \
 	   CMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) \
 	   MESON_CROSS_FILE=$(MESON_CROSS_FILE) \
-	   $$(which cross-python3) -m pip \
+	   $$(which cross-python) -m pip \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \
@@ -133,7 +140,7 @@ cross-compile-wheel-%:
 	   PATH=$${PATH} \
 	   CMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) \
 	   MESON_CROSS_FILE=$(MESON_CROSS_FILE) \
-	   $$(which cross-python3) -m pip \
+	   $$(which cross-python) -m pip \
 	   $(PIP_WHEEL_ARGS_CROSSENV) \
 	   $${pip_global_option} \
 	   --no-build-isolation \

@@ -40,16 +40,16 @@ build_python_wheel_target: prepare_crossenv
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
-	   $(MSG) "python3: [$$(which cross-python3)]" ; \
+	   $(MSG) "python: [$$(which cross-python)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
-	$(MSG) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $$(which cross-python3) -m build $(BUILD_ARGS) \
+	$(MSG) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $$(which cross-python) -m build $(BUILD_ARGS) \
 	          --wheel $(WHEELS_BUILD_ARGS) \
 	          --outdir $(WHEELHOUSE) ; \
-	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $$(which cross-python3) -m build $(BUILD_ARGS) \
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $$(which cross-python) -m build $(BUILD_ARGS) \
 	          --wheel $(WHEELS_BUILD_ARGS) \
 	          --outdir $(WHEELHOUSE)
 

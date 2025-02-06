@@ -209,24 +209,17 @@ endif
 ###    <crossenv> = $(lastword $(subst -, ,$*)) being <wheel>-<version>, <wheel> or default
 ###
 crossenv-install-%:
-	@$(MSG) CROSSENV_PATH: $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))
-ifeq ($(WHEEL_TYPE),build)
 	@. $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate ; \
-	   $(MSG) build-pip install $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
-	   $(RUN) \
-	     PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)" \
-	     LD_LIBRARY_PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)" \
-	     $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(WHEEL_NAME)==$(WHEEL_VERSION)
-else ifeq ($(WHEEL_TYPE),cross)
-	@. $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate ; \
-	   $(MSG) cross-pip install $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
-	   $(RUN) \
-	     PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin):$(PATH)" \
-	     LD_LIBRARY_PATH="$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/lib):$(LD_LIBRARY_PATH)" \
-	     $$(which cross-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(WHEEL_NAME)==$(WHEEL_VERSION)
-else
-	$(error Wheel type [$(WHEEL_TYPE)] not recognized)
-endif
+	if [ -e "$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate" ] ; then \
+	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/build/bin ; \
+	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate]" ; \
+	   $(MSG) "pip: [$$(which $(WHEEL_TYPE)-pip)]" ; \
+	else \
+	   echo "ERROR: crossenv not found!" ; \
+	   exit 2 ; \
+	fi ; \
+	$(MSG) $$(which $(WHEEL_TYPE)-pip) install $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
+	$(RUN) $$(which $(WHEEL_TYPE)-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(WHEEL_NAME)==$(WHEEL_VERSION)
 
 
 ##
