@@ -63,7 +63,7 @@ ifneq ($(WHEEL_TYPE),pure)
 	localLDFLAGS=($$(echo $(WHEELS_LDFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs)) ; \
 	localCPPFLAGS=($$(echo $(WHEELS_CPPFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs)) ; \
 	localCXXFLAGS=($$(echo $(WHEELS_CXXFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs)) ; \
-	$(MSG) pip build [$(WHEEL_NAME)], version: [$(WHEEL_VERSION)] \
+	$(MSG) python -m pip build [$(WHEEL_NAME)], version: [$(WHEEL_VERSION)] \
 	   $$([ "$$(echo $${localCFLAGS[@]})" ] && echo "CFLAGS=\"$${localCFLAGS[@]}\" ") \
 	   $$([ "$$(echo $${localCPPFLAGS[@]})" ] && echo "CPPFLAGS=\"$${localCPPFLAGS[@]}\" ") \
 	   $$([ "$$(echo $${localCXXFLAGS[@]})" ] && echo "CXXFLAGS=\"$${localCXXFLAGS[@]}\" ") \
@@ -89,13 +89,13 @@ else ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
 	      export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= OBJCOPY= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= ; \
 	      export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
 	      $(MSG) "crossenv: [$(CROSSENV)]" ; \
-	      $(MSG) "pip: [$$(which build-pip)]" ; \
+	      $(MSG) "python: [$$(which build-python)]" ; \
 	   else \
 	      echo "ERROR: crossenv not found!" ; \
 	      exit 2 ; \
 	   fi ; \
-	   $(MSG) $$(which build-pip) $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
-	   $(RUN) $$(which build-pip) $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
+	   $(MSG) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
+	   $(RUN) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
 	fi
 endif
 
@@ -112,7 +112,8 @@ cross-compile-wheel-%:
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
-	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
+	   export PATH=$$(echo $${PATH}:$(call merge, $(ENV), PATH, :):$(CROSSENV_PATH)/build/bin | awk -v RS=':' '!seen[$$0]++' | paste -sd ':') ; \
+	   $(MSG) "PATH: [$${PATH}]" ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
 	   $(MSG) "python: [$$(which cross-python)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
@@ -124,7 +125,7 @@ cross-compile-wheel-%:
 	   pip_global_option=$$(echo $(PIP_GLOBAL_OPTION) | sed 's/=\([^ ]*\)/="\1"/g; s/[^ ]*/--global-option=&/g') ; \
 	   pip_global_option=$${pip_global_option}" --no-use-pep517" ; \
 	fi ; \
-	$(RUN) $(MSG) \
+	$(MSG) \
 	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
 	   PATH=$${PATH} \
 	   CMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) \

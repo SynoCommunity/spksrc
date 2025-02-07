@@ -213,13 +213,20 @@ crossenv-install-%:
 	if [ -e "$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate" ] ; then \
 	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/build/bin ; \
 	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate]" ; \
-	   $(MSG) "pip: [$$(which $(WHEEL_TYPE)-pip)]" ; \
+	   $(MSG) "python: [$$(which $(WHEEL_TYPE)-python)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
-	$(MSG) $$(which $(WHEEL_TYPE)-pip) install $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
-	$(RUN) $$(which $(WHEEL_TYPE)-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(WHEEL_NAME)==$(WHEEL_VERSION)
+	$(MSG) \
+	   $$(which $(WHEEL_TYPE)-python) -m pip \
+	   install $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
+	$(RUN) \
+	   PATH=$${PATH} \
+	   $$(which $(WHEEL_TYPE)-python) -m pip \
+	   --cache-dir $(PIP_CACHE_DIR) \
+	   --disable-pip-version-check \
+	   install $(WHEEL_NAME)==$(WHEEL_VERSION)
 
 
 ##
