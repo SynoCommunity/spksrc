@@ -113,7 +113,7 @@ endif
 
 # [llfuse]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [llfuse] -std=c11
+WHEELS_CFLAGS += [llfuse] -std=gnu11
 endif
 
 # [lxml]
