@@ -26,6 +26,9 @@ LICENSE  = PSF
 # Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
+# IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
+# later additions are ok, but WHEELS must not be empty at this point,
+# otherwise the build of WHEELS is skipped
 WHEELS  = src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
@@ -94,13 +97,6 @@ DEPENDS += cross/libyaml
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-rpds-py.txt
 endif
-
-##
-## Addition of requirements files beyond spksrc.python.mk
-## will not be taken into consideration for processing
-## unless WHEELS has been previously populated. This is due to
-## the makefile analysis phase which discard ifeq instructions.
-##
 
 include ../../mk/spksrc.python.mk
 
