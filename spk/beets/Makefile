@@ -1,10 +1,10 @@
 SPK_NAME = beets
 SPK_VERS = 2.2.0
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/beets.png
 
-PYTHON_PACKAGE = python311
-SPK_DEPENDS = "python311>=3.11.5-8"
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
@@ -14,7 +14,7 @@ DESCRIPTION = "Beets is the media library management system for obsessive music 
 
 DISPLAY_NAME = beets
 STARTABLE = no
-CHANGELOG = "1. Upgrade beets to 2.2.0.<br/>2. Update to all wheels."
+CHANGELOG = "1. Migrate to Python 3.12."
 
 HOMEPAGE = http://beets.io/
 LICENSE  = GPL
@@ -22,10 +22,6 @@ LICENSE  = GPL
 SERVICE_SETUP = src/service-setup.sh
 
 SPK_COMMANDS = env/bin/beet
-
-# [lxml]
-DEPENDS += cross/libxml2
-DEPENDS += cross/libxslt
 
 # [Pillow]
 DEPENDS += cross/pillow
@@ -36,7 +32,28 @@ DEPENDS += cross/libyaml
 # NOTE: Built with support for the following plugins:
 # aura, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, mpdstats, plexupdate, scrub, sonosupdate, thumbnails, web.
 
-# NOTE: The following plugins are currently unsupported due to dependency issues:
+include ../../mk/spksrc.python.mk
+
+# [lxml]
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [lxml] -std=c11
+endif
+
+# TODO: The following plugins are currently unsupported due to dependency issues:
 # autobpm, bpd, metasync, and replaygain.
 
-include ../../mk/spksrc.python.mk
+# [dbus_python]
+#DEPENDS += cross/dbus					# expat not found!
+
+# [llvmlite]
+#DEPENDS += cross/llvm
+
+# [msgpack]
+#ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+#WHEELS_CFLAGS += [msgpack] -std=c11
+#endif
+
+# [pycairo]
+#DEPENDS += cross/cairo					# Could not invoke sanity test executable
