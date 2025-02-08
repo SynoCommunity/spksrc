@@ -3,9 +3,9 @@ SPK_VERS = 1.5.1
 SPK_REV = 16
 SPK_ICON = src/bazarr.png
 
-PYTHON_PACKAGE = python311
+PYTHON_PACKAGE = python312
 
-SPK_DEPENDS = "python311:ffmpeg7"
+SPK_DEPENDS = "python312:ffmpeg7"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -28,7 +28,7 @@ WHEELS_BUILD_ARGS += --enable-zlib
 MAINTAINER = smaarn
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
-CHANGELOG = '1. Update to 1.5.1. <br>See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.0">1.5.0</a> and <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.1">1.5.1</a> for more details.'
+CHANGELOG = '1. Update to 1.5.1. <br>See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.0">1.5.0</a> and <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.1">1.5.1</a> for more details. <br />2. Update to python 3.12'
 
 HOMEPAGE  = https://www.bazarr.media/
 LICENSE   = GPLv3
