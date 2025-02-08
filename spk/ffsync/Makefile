@@ -1,6 +1,6 @@
 SPK_NAME = ffsync
-SPK_VERS = 0.17.15
-SPK_REV = 3
+SPK_VERS = 0.18.2
+SPK_REV = 4
 SPK_ICON = src/ffsync.png
 
 DEPENDS = cross/syncstorage-rs cross/diesel
@@ -16,7 +16,7 @@ SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
 MAINTAINER = SynoCommunity
 DESCRIPTION = An implementation of the Mozilla Sync-1.5 Server protocol used by the sync service in Firefox 29 and later. You can use Mozilla Sync Server to exchange browser data \(bookmarks, history, open tabs, passwords, add-ons, and the like\) between \'clients\' in a manner that respects a user\'s security and privacy. The service runs on port 8132.
 DISPLAY_NAME = Mozilla Sync Server
-CHANGELOG = "Update Mozilla Sync Server package to v0.17.15."
+CHANGELOG = "Update Mozilla Sync Server package to v0.18.2."
 
 HOMEPAGE = https://mozilla-services.readthedocs.io/en/latest/howtos/run-sync-1.5.html
 LICENSE = MPL 2.0
@@ -33,11 +33,7 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 ADMIN_PORT = $(SERVICE_PORT)
 
 # [cryptography]
-# Mandatory of using OPENSSL_*_DIR starting with version >= 40
-# https://docs.rs/openssl/latest/openssl/#automatic
 DEPENDS += cross/openssl3
-ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 # [mysqlclient]
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"

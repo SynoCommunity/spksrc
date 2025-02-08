@@ -1,0 +1,99 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.
+##
+
+# [bcrypt]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+bcrypt==4.2.1
+
+# [cryptography]
+# Mandatory of using OPENSSL_*_DIR starting with version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+#  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+cryptography==44.0.0
+
+# Requirement for cryptography
+cffi==1.17.1
+
+# commonly used cross-compiled wheels
+# All tested and can be enabled but may conflict
+# with local python apps requirements
+
+borgbackup==1.4.0
+charset_normalizer==3.4.1
+immutables==0.21
+### llfuse==1.5.0 # fails to find "clock_gettime"
+MarkupSafe==3.0.2
+msgpack==1.1.0              # used compiled verrsion for performance
+msgpack_python==0.5.6
+netifaces==0.11.0
+psutil==6.1.1
+pyrsistent==0.20.0
+regex==2024.11.6
+ruamel.yaml.clib==0.2.12
+SQLAlchemy==2.0.37
+zope.interface==7.2
+
+# [gevent]
+# Depends: libev, c-ares
+# Require environment variables
+#  GEVENTSETUP_EMBED_CARES=FALSE
+#  GEVENTSETUP_EMBED_LIBEV=FALSE
+gevent==24.11.1
+
+# [lxml]
+# Depends: libxml2, libxslt
+lxml==5.3.0
+
+# [mysqlclient]
+# Depends: mysql-connector-c, mariadb-connector-c
+# Require environment variables
+#  MYSQLCLIENT_CFLAGS
+#  MYSQLCLIENT_LDFLAGS
+mysqlclient==2.2.7
+
+# [pycares]
+# Depends: c-ares
+# Require environment variables
+#  PYCARES_USE_SYSTEM_LIB=1
+pycares==4.5.0
+
+# [pycurl]
+# Depends: curl
+# Require environment variables
+#  PYCURL_CURL_CONFIG
+pycurl==7.45.4
+
+# [PyNaCl]
+# Depends: cross/libsodium
+# Require environment variables
+#  SODIUM_INSTALL=system
+PyNaCl==1.5.0
+
+# [PyYAML]
+# Depends: libyaml
+PyYAML==6.0.2
+
+# [rencode]
+# Updated fork of the project
+# rencode==1.0.6 <<-- unsupported
+git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc1f#egg=rencode==1.0.7
+
+# [rpds-py]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+rpds_py==0.21.0
+
+# [ujson]
+#   - Require setuptools-scm in cross/python3* crossenv
+ujson==5.10.0
+
+# [webrtcvad]
+# webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
+git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad==2.0.10

@@ -1,0 +1,21 @@
+pip==24.3.1
+pip-tools==7.4.1
+setuptools==75.8.0
+build==1.2.2
+wheel==0.45.1
+#
+# keep older version for gcc <= 4.9.x
+msgpack==1.0.5
+#
+cffi==1.17.1
+cryptography==44.0.0
+Cython==3.0.11
+flit==3.10.1
+maturin==1.8.1
+meson-python==0.17.1
+poetry==1.8.5
+scikit-build==0.18.1
+scikit-build-core==0.10.7
+setuptools-rust==1.10.2
+setuptools-scm==8.1.0
+typing_extensions==4.12.2

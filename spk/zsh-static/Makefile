@@ -4,6 +4,9 @@ SPK_REV = 10
 
 export ZSH_STATIC_MODULES=true
 
+# need to define dependencies for dependency-list creation by script
+DEPENDS = cross/zsh
+
 # Reuse targets from zsh.
 include ../zsh/Makefile
 

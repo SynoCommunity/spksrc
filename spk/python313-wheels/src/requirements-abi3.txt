@@ -1,0 +1,11 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
+# [pycryptodome] + [pycryptodomex]
+# Require:
+#    - CFLAGS=-sdt=c11 <= gcc-5.0
+pycryptodome==3.21.0
+pycryptodomex==3.21.0

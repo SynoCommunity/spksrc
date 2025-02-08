@@ -40,7 +40,4 @@ service_postinst ()
             mkdir -p "$(dirname ${LOG_FILE})"
         fi
     fi
-
-    # Install nice/ionice
-    ${BIN}/busybox --install ${BIN}
 }
