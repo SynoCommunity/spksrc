@@ -1,5 +1,5 @@
 PKG_NAME = libexpat
-PKG_VERS = 2.5.0
+PKG_VERS = 2.6.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = expat-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libexpat/libexpat/releases/download/R_$(subst .,_,$(PKG_VERS))

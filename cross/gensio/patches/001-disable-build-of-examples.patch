@@ -1,0 +1,31 @@
+# disable build of examples
+# the build of examples fails to find libgensiomdns.so.6
+# so simply remove the examples subdir from Mafiles
+# 
+--- Makefile.am.orig	2023-11-30 23:04:46.000000000 +0000
++++ Makefile.am	2024-01-19 10:04:39.041933898 +0000
+@@ -2,12 +2,12 @@
+ ACLOCAL_AMFLAGS = -I m4
+ 
+ SUBDIRS = lib $(SWIG_DIR) $(CPLUSPLUS_DIR) include $(GLIB_DIR) $(TCL_DIR) \
+-	tests tools examples
++	tools
+ if INSTALL_DOC
+ SUBDIRS += man
+ endif
+ 
+-DIST_SUBDIRS = lib swig c++ include glib tcl tests tools examples man
++DIST_SUBDIRS = lib swig c++ include glib tcl tools man
+ 
+ EXTRA_DIST = README.rst reconf ISSUES TODO
+
+--- c++/Makefile.am.orig	2023-11-30 23:04:46.000000000 +0000
++++ c++/Makefile.am	2024-01-19 10:13:23.806611625 +0000
+@@ -1,4 +1,4 @@
+ 
+-SUBDIRS = include lib $(SWIG_CPP_DIR) tests examples
++SUBDIRS = include lib $(SWIG_CPP_DIR) tests
+ 
+-DIST_SUBDIRS = include lib swig tests examples
++DIST_SUBDIRS = include lib swig tests
+ 

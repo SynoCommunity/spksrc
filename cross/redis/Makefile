@@ -1,5 +1,5 @@
 PKG_NAME = redis
-PKG_VERS = 7.0.11
+PKG_VERS = 7.0.15
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.redis.io/releases

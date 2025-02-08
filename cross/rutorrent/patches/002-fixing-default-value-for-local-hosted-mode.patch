@@ -1,0 +1,19 @@
+Subject: [PATCH] Change default localHostedMode
+---
+Index: conf/config.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/conf/config.php b/conf/config.php
+--- conf/config.php.orig	(revision 48933089370b667e8d3b19fb8f9b92bc6db5409d)
++++ conf/config.php	(date 1683473924000)
+@@ -63,7 +63,7 @@
+		"mediainfo"	=> '',			// Something like /usr/bin/mediainfo. If empty, will be found in PATH
+ 	);
+ 
+-	$localHostedMode = false;		// Set to true if rTorrent is hosted on the SAME machine as ruTorrent
++	$localHostedMode = true;		// Set to false if rTorrent is NOT hosted on the SAME machine as ruTorrent
+ 	
+ 	$cachedPluginLoading = false;		// Set to true to enable rapid cached loading of ruTorrent plugins
+ 										// Required to clear web browser cache when upgrading versions	

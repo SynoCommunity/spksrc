@@ -1,9 +1,9 @@
 PKG_NAME = wallabag
-PKG_VERS = 2.3.8
+PKG_VERS = 2.6.10
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-release-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://static.wallabag.org/releases
-PKG_DIR = $(PKG_VERS)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/wallabag/$(PKG_NAME)/releases/download/$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 

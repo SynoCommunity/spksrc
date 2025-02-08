@@ -1,12 +1,10 @@
 PKG_NAME = libmpdclient
-PKG_VERS = 2.20
+PKG_VERS = 2.22
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MusicPlayerDaemon/libmpdclient/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-
-# https://github.com/MusicPlayerDaemon/libmpdclient/archive/refs/tags/v2.20.tar.gz
 
 DEPENDS =
 

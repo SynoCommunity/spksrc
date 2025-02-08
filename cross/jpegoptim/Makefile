@@ -1,5 +1,5 @@
 PKG_NAME = jpegoptim
-PKG_VERS = 1.5.0
+PKG_VERS = 1.5.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tjko/jpegoptim/archive

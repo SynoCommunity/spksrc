@@ -1,14 +1,13 @@
 SPK_NAME = gdu
-SPK_VERS = 5.13.2
+SPK_VERS = 5.30.1
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/gdu
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Fast disk usage analyzer with console interface written in Go.
-DISPLAY_NAME = $(SPK_NAME)
 STARTABLE = no
 
 HOMEPAGE = https://github.com/dundee/gdu

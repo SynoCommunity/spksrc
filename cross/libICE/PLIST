@@ -1,10 +1,3 @@
-rsc:include/X11/ICE/ICEconn.h
-rsc:include/X11/ICE/ICE.h
-rsc:include/X11/ICE/ICElib.h
-rsc:include/X11/ICE/ICEmsg.h
-rsc:include/X11/ICE/ICEproto.h
-rsc:include/X11/ICE/ICEutil.h
 lnk:lib/libICE.so
 lnk:lib/libICE.so.6
 lib:lib/libICE.so.6.3.0
-rsc:lib/pkgconfig/ice.pc

@@ -2,7 +2,7 @@ SPK_NAME = dutree
 SPK_VERS = 0.2.18
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/dutree
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 

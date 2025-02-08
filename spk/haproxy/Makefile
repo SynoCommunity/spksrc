@@ -5,7 +5,7 @@ SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 DSM_APP_NAME = SYNOCOMMUNITY.HAProxy.AppInstance
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/haproxy
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>2.7.18-25"
 

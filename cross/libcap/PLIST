@@ -1,6 +1,6 @@
 lnk:lib/libcap.so
 lnk:lib/libcap.so.2
-lib:lib/libcap.so.2.66
+lib:lib/libcap.so.2.70
 lnk:lib/libpsx.so
 lnk:lib/libpsx.so.2
-lib:lib/libpsx.so.2.66
+lib:lib/libpsx.so.2.70

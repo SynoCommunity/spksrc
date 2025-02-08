@@ -1,9 +1,8 @@
 PKG_NAME = htop
-PKG_VERS = 3.1.2
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/htop-dev/htop/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_VERS = 3.3.0
+PKG_EXT = tar.xz
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/htop-dev/htop/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = powerpc ppc824x
@@ -15,10 +14,8 @@ COMMENT  = An interactive process viewer for Linux. The package is intended for 
 LICENSE  = GPLv2+
 
 GNU_CONFIGURE = 1
-PRE_CONFIGURE_TARGET = htop_pre_configure
 
-CONFIGURE_ARGS  = --enable-unicode
-CONFIGURE_ARGS += --disable-dependency-tracking
+CONFIGURE_ARGS = --enable-unicode
 
 include ../../mk/spksrc.archs.mk
 
@@ -28,7 +25,3 @@ ADDITIONAL_LDFLAGS = -lrt
 endif
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: htop_pre_configure
-htop_pre_configure:
-	@$(RUN) ./autogen.sh

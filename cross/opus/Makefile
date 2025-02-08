@@ -14,9 +14,6 @@ LICENSE  = BSD
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --disable-doc --disable-extra-programs
-
-ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-ADDITIONAL_CFLAGS = -D_FORTIFY_SOURCE=0
-endif
+ADDITIONAL_CPPFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk

@@ -1,15 +1,13 @@
-# This file is a copy of the https://raw.githubusercontent.com/Flexget/Flexget/v3.3.4/requirements.txt file
-# including the https://raw.githubusercontent.com/Flexget/Flexget/v3.3.4/requirements.in
-# Additionally added the flexget and the transmission-rpc packages.
-# plumbum and rpyc packages are adjusted as the proposed versions are not accepted.
+# Snapshot from Jan. 18th 2025
 
-aniso8601==9.0.1
-Brotli==1.0.9
-cffi==1.15.0
-cryptography==3.3.2
-greenlet==1.1.2
-MarkupSafe==2.0.1
-psutil==5.8.0
-pyrsistent==0.18.0
-PyYAML==6.0
-SQLAlchemy==1.4.27
+Brotli==1.1.0
+charset-normalizer==3.4.1
+#greenlet==3.1.1                    => supported version depends on gcc version
+MarkupSafe==3.0.2
+#pendulum==3.0.0                    => cross/pendulum
+psutil==6.1.1
+PyYAML==6.0.2
+rpds-py==0.22.3
+SQLAlchemy==2.0.37
+time-machine==2.16.0
+zstandard==0.23.0

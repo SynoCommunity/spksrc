@@ -1,0 +1,607 @@
+Index: FFmpeg/libavcodec/vaapi_av1.c
+===================================================================
+--- libavcodec/vaapi_av1.c
++++ libavcodec/vaapi_av1.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "libavutil/frame.h"
++#include "libavutil/mem.h"
+ #include "hwaccel_internal.h"
+ #include "vaapi_decode.h"
+ #include "internal.h"
+@@ -42,6 +43,9 @@ typedef struct VAAPIAV1DecContext {
+     */
+     VAAPIAV1FrameRef ref_tab[AV1_NUM_REF_FRAMES];
+     AVFrame *tmp_frame;
++
++    int nb_slice_params;
++    VASliceParameterBufferAV1 *slice_params;
+ } VAAPIAV1DecContext;
+ 
+ static VASurfaceID vaapi_av1_surface_id(AV1Frame *vf)
+@@ -97,6 +101,8 @@ static int vaapi_av1_decode_uninit(AVCod
+     for (int i = 0; i < FF_ARRAY_ELEMS(ctx->ref_tab); i++)
+         av_frame_free(&ctx->ref_tab[i].frame);
+ 
++    av_freep(&ctx->slice_params);
++
+     return ff_vaapi_decode_uninit(avctx);
+ }
+ 
+@@ -393,13 +399,25 @@ static int vaapi_av1_decode_slice(AVCode
+ {
+     const AV1DecContext *s = avctx->priv_data;
+     VAAPIDecodePicture *pic = s->cur_frame.hwaccel_picture_private;
+-    VASliceParameterBufferAV1 slice_param;
+-    int err = 0;
++    VAAPIAV1DecContext *ctx = avctx->internal->hwaccel_priv_data;
++    int err, nb_params;
+ 
+-    for (int i = s->tg_start; i <= s->tg_end; i++) {
+-        memset(&slice_param, 0, sizeof(VASliceParameterBufferAV1));
++    nb_params = s->tg_end - s->tg_start + 1;
++    if (ctx->nb_slice_params < nb_params) {
++        VASliceParameterBufferAV1 *tmp = av_realloc_array(ctx->slice_params,
++                                                          nb_params,
++                                                          sizeof(*ctx->slice_params));
++        if (!tmp) {
++            ctx->nb_slice_params = 0;
++            err = AVERROR(ENOMEM);
++            goto fail;
++        }
++        ctx->slice_params    = tmp;
++        ctx->nb_slice_params = nb_params;
++    }
+ 
+-        slice_param = (VASliceParameterBufferAV1) {
++    for (int i = s->tg_start; i <= s->tg_end; i++) {
++        ctx->slice_params[i - s->tg_start] = (VASliceParameterBufferAV1) {
+             .slice_data_size   = s->tile_group_info[i].tile_size,
+             .slice_data_offset = s->tile_group_info[i].tile_offset,
+             .slice_data_flag   = VA_SLICE_DATA_FLAG_ALL,
+@@ -408,18 +426,20 @@ static int vaapi_av1_decode_slice(AVCode
+             .tg_start          = s->tg_start,
+             .tg_end            = s->tg_end,
+         };
+-
+-        err = ff_vaapi_decode_make_slice_buffer(avctx, pic, &slice_param,
+-                                                sizeof(VASliceParameterBufferAV1),
+-                                                buffer,
+-                                                size);
+-        if (err) {
+-            ff_vaapi_decode_cancel(avctx, pic);
+-            return err;
+-        }
+     }
+ 
++    err = ff_vaapi_decode_make_slice_buffer(avctx, pic, ctx->slice_params, nb_params,
++                                            sizeof(VASliceParameterBufferAV1),
++                                            buffer,
++                                            size);
++    if (err)
++        goto fail;
++
+     return 0;
++
++fail:
++    ff_vaapi_decode_cancel(avctx, pic);
++    return err;
+ }
+ 
+ const FFHWAccel ff_av1_vaapi_hwaccel = {
+Index: FFmpeg/libavcodec/vaapi_decode.c
+===================================================================
+--- libavcodec/vaapi_decode.c
++++ libavcodec/vaapi_decode.c
+@@ -62,6 +62,7 @@ int ff_vaapi_decode_make_param_buffer(AV
+ int ff_vaapi_decode_make_slice_buffer(AVCodecContext *avctx,
+                                       VAAPIDecodePicture *pic,
+                                       const void *params_data,
++                                      int nb_params,
+                                       size_t params_size,
+                                       const void *slice_data,
+                                       size_t slice_size)
+@@ -72,13 +73,14 @@ int ff_vaapi_decode_make_slice_buffer(AV
+ 
+     av_assert0(pic->nb_slices <= pic->slices_allocated);
+     if (pic->nb_slices == pic->slices_allocated) {
+-        pic->slice_buffers =
++        VABufferID *tmp =
+             av_realloc_array(pic->slice_buffers,
+                              pic->slices_allocated ? pic->slices_allocated * 2 : 64,
+                              2 * sizeof(*pic->slice_buffers));
+-        if (!pic->slice_buffers)
++        if (!tmp)
+             return AVERROR(ENOMEM);
+ 
++        pic->slice_buffers    = tmp;
+         pic->slices_allocated = pic->slices_allocated ? pic->slices_allocated * 2 : 64;
+     }
+     av_assert0(pic->nb_slices + 1 <= pic->slices_allocated);
+@@ -87,7 +89,7 @@ int ff_vaapi_decode_make_slice_buffer(AV
+ 
+     vas = vaCreateBuffer(ctx->hwctx->display, ctx->va_context,
+                          VASliceParameterBufferType,
+-                         params_size, 1, (void*)params_data,
++                         params_size, nb_params, (void*)params_data,
+                          &pic->slice_buffers[index]);
+     if (vas != VA_STATUS_SUCCESS) {
+         av_log(avctx, AV_LOG_ERROR, "Failed to create slice "
+@@ -155,6 +157,11 @@ int ff_vaapi_decode_issue(AVCodecContext
+     VAStatus vas;
+     int err;
+ 
++    if (pic->nb_slices <= 0) {
++        err = AVERROR(EINVAL);
++        goto fail;
++    }
++
+     av_log(avctx, AV_LOG_DEBUG, "Decode to surface %#x.\n",
+            pic->output_surface);
+ 
+@@ -598,22 +605,26 @@ static int vaapi_decode_make_config(AVCo
+         if (err < 0)
+             goto fail;
+ 
+-        frames->initial_pool_size = 1;
+-        // Add per-codec number of surfaces used for storing reference frames.
+-        switch (avctx->codec_id) {
+-        case AV_CODEC_ID_H264:
+-        case AV_CODEC_ID_HEVC:
+-        case AV_CODEC_ID_AV1:
+-            frames->initial_pool_size += 16;
+-            break;
+-        case AV_CODEC_ID_VP9:
+-            frames->initial_pool_size += 8;
+-            break;
+-        case AV_CODEC_ID_VP8:
+-            frames->initial_pool_size += 3;
+-            break;
+-        default:
+-            frames->initial_pool_size += 2;
++        if (CONFIG_VAAPI_1)
++            frames->initial_pool_size = 0;
++        else {
++            frames->initial_pool_size = 1;
++            // Add per-codec number of surfaces used for storing reference frames.
++            switch (avctx->codec_id) {
++            case AV_CODEC_ID_H264:
++            case AV_CODEC_ID_HEVC:
++            case AV_CODEC_ID_AV1:
++                frames->initial_pool_size += 16;
++                break;
++            case AV_CODEC_ID_VP9:
++                frames->initial_pool_size += 8;
++                break;
++            case AV_CODEC_ID_VP8:
++                frames->initial_pool_size += 3;
++                break;
++            default:
++                frames->initial_pool_size += 2;
++            }
+         }
+     }
+ 
+Index: FFmpeg/libavcodec/vaapi_decode.h
+===================================================================
+--- libavcodec/vaapi_decode.h
++++ libavcodec/vaapi_decode.h
+@@ -73,6 +73,7 @@ int ff_vaapi_decode_make_param_buffer(AV
+ int ff_vaapi_decode_make_slice_buffer(AVCodecContext *avctx,
+                                       VAAPIDecodePicture *pic,
+                                       const void *params_data,
++                                      int nb_params,
+                                       size_t params_size,
+                                       const void *slice_data,
+                                       size_t slice_size);
+Index: FFmpeg/libavcodec/vaapi_encode_av1.c
+===================================================================
+--- libavcodec/vaapi_encode_av1.c
++++ libavcodec/vaapi_encode_av1.c
+@@ -23,6 +23,7 @@
+ 
+ #include "libavutil/pixdesc.h"
+ #include "libavutil/opt.h"
++#include "libavutil/mastering_display_metadata.h"
+ 
+ #include "cbs_av1.h"
+ #include "put_bits.h"
+@@ -41,6 +42,8 @@ typedef struct VAAPIEncodeAV1Context {
+     VAAPIEncodeContext common;
+     AV1RawOBU sh; /**< sequence header.*/
+     AV1RawOBU fh; /**< frame header.*/
++    AV1RawOBU mh[4]; /**< metadata header.*/
++    int nb_mh;
+     CodedBitstreamContext *cbc;
+     CodedBitstreamFragment current_obu;
+     VAConfigAttribValEncAV1 attr;
+@@ -155,6 +158,8 @@ static av_cold int vaapi_encode_av1_conf
+         priv->q_idx_idr = priv->q_idx_p = priv->q_idx_b = 128;
+     }
+ 
++    ctx->roi_quant_range = AV1_MAX_QUANT;
++
+     return 0;
+ }
+ 
+@@ -657,6 +662,68 @@ static int vaapi_encode_av1_init_picture
+                                                2 : 1));
+     }
+ 
++    priv->nb_mh = 0;
++
++    if (pic->type == PICTURE_TYPE_IDR) {
++        AVFrameSideData *sd =
++            av_frame_get_side_data(pic->input_image,
++                                   AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
++        if (sd) {
++            AVMasteringDisplayMetadata *mdm =
++                (AVMasteringDisplayMetadata *)sd->data;
++            if (mdm->has_primaries && mdm->has_luminance) {
++                AV1RawOBU              *obu = &priv->mh[priv->nb_mh++];
++                AV1RawMetadata          *md = &obu->obu.metadata;
++                AV1RawMetadataHDRMDCV *mdcv = &md->metadata.hdr_mdcv;
++                const int        chroma_den = 1 << 16;
++                const int      max_luma_den = 1 << 8;
++                const int      min_luma_den = 1 << 14;
++
++                memset(obu, 0, sizeof(*obu));
++                obu->header.obu_type = AV1_OBU_METADATA;
++                md->metadata_type = AV1_METADATA_TYPE_HDR_MDCV;
++
++                for (i = 0; i < 3; i++) {
++                    mdcv->primary_chromaticity_x[i] =
++                        av_rescale(mdm->display_primaries[i][0].num, chroma_den,
++                                   mdm->display_primaries[i][0].den);
++                    mdcv->primary_chromaticity_y[i] =
++                        av_rescale(mdm->display_primaries[i][1].num, chroma_den,
++                                   mdm->display_primaries[i][1].den);
++                }
++
++                mdcv->white_point_chromaticity_x =
++                    av_rescale(mdm->white_point[0].num, chroma_den,
++                               mdm->white_point[0].den);
++                mdcv->white_point_chromaticity_y =
++                    av_rescale(mdm->white_point[1].num, chroma_den,
++                               mdm->white_point[1].den);
++
++                mdcv->luminance_max =
++                    av_rescale(mdm->max_luminance.num, max_luma_den,
++                               mdm->max_luminance.den);
++                mdcv->luminance_min =
++                    av_rescale(mdm->min_luminance.num, min_luma_den,
++                               mdm->min_luminance.den);
++            }
++        }
++
++        sd = av_frame_get_side_data(pic->input_image,
++                                    AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
++        if (sd) {
++            AVContentLightMetadata *cllm = (AVContentLightMetadata *)sd->data;
++            AV1RawOBU               *obu = &priv->mh[priv->nb_mh++];
++            AV1RawMetadata           *md = &obu->obu.metadata;
++            AV1RawMetadataHDRCLL    *cll = &md->metadata.hdr_cll;
++
++            memset(obu, 0, sizeof(*obu));
++            obu->header.obu_type = AV1_OBU_METADATA;
++            md->metadata_type    = AV1_METADATA_TYPE_HDR_CLL;
++            cll->max_cll         = cllm->MaxCLL;
++            cll->max_fall        = cllm->MaxFALL;
++        }
++    }
++
+ end:
+     ff_cbs_fragment_reset(obu);
+     return ret;
+@@ -733,6 +800,39 @@ end:
+     return ret;
+ }
+ 
++static int vaapi_encode_av1_write_extra_header(AVCodecContext *avctx,
++                                               VAAPIEncodePicture *pic,
++                                               int index, int *type,
++                                               char *data, size_t *data_len)
++{
++    VAAPIEncodeAV1Context  *priv = avctx->priv_data;
++    CodedBitstreamFragment *obu  = &priv->current_obu;
++    AV1RawOBU *mh_obu;
++    char mh_data[MAX_PARAM_BUFFER_SIZE];
++    size_t mh_data_len;
++    int ret = 0;
++
++    if (index >= priv->nb_mh)
++        return AVERROR_EOF;
++
++    mh_obu = &priv->mh[index];
++    ret = vaapi_encode_av1_add_obu(avctx, obu, AV1_OBU_METADATA, mh_obu);
++    if (ret < 0)
++        goto end;
++
++    ret = vaapi_encode_av1_write_obu(avctx, mh_data, &mh_data_len, obu);
++    if (ret < 0)
++        goto end;
++
++    memcpy(data, mh_data, MAX_PARAM_BUFFER_SIZE * sizeof(char));
++    *data_len = mh_data_len;
++    *type = VAEncPackedHeaderRawData;
++
++end:
++    ff_cbs_fragment_reset(obu);
++    return ret;
++}
++
+ static const VAAPIEncodeProfile vaapi_encode_av1_profiles[] = {
+     { AV_PROFILE_AV1_MAIN,  8, 3, 1, 1, VAProfileAV1Profile0 },
+     { AV_PROFILE_AV1_MAIN, 10, 3, 1, 1, VAProfileAV1Profile0 },
+@@ -760,6 +860,8 @@ static const VAAPIEncodeType vaapi_encod
+ 
+     .slice_params_size = sizeof(VAEncTileGroupBufferAV1),
+     .init_slice_params = &vaapi_encode_av1_init_slice_params,
++
++    .write_extra_header     = &vaapi_encode_av1_write_extra_header,
+ };
+ 
+ static av_cold int vaapi_encode_av1_init(AVCodecContext *avctx)
+@@ -774,7 +876,8 @@ static av_cold int vaapi_encode_av1_init
+ 
+     ctx->desired_packed_headers =
+         VA_ENC_PACKED_HEADER_SEQUENCE |
+-        VA_ENC_PACKED_HEADER_PICTURE;
++        VA_ENC_PACKED_HEADER_PICTURE |
++        VA_ENC_PACKED_HEADER_MISC;      // Metadata
+ 
+     if (avctx->profile == AV_PROFILE_UNKNOWN)
+         avctx->profile = priv->profile;
+Index: FFmpeg/libavcodec/vaapi_encode_h264.c
+===================================================================
+--- libavcodec/vaapi_encode_h264.c
++++ libavcodec/vaapi_encode_h264.c
+@@ -759,7 +759,7 @@ static int vaapi_encode_h264_init_pictur
+     vpic->frame_num = hpic->frame_num;
+ 
+     vpic->pic_fields.bits.idr_pic_flag       = (pic->type == PICTURE_TYPE_IDR);
+-    vpic->pic_fields.bits.reference_pic_flag = (pic->type != PICTURE_TYPE_B);
++    vpic->pic_fields.bits.reference_pic_flag = pic->is_reference;
+ 
+     return 0;
+ }
+Index: FFmpeg/libavcodec/vaapi_encode_h265.c
+===================================================================
+--- libavcodec/vaapi_encode_h265.c
++++ libavcodec/vaapi_encode_h265.c
+@@ -945,26 +945,23 @@ static int vaapi_encode_h265_init_pictur
+ 
+     vpic->nal_unit_type = hpic->slice_nal_unit;
+ 
++    vpic->pic_fields.bits.reference_pic_flag = pic->is_reference;
+     switch (pic->type) {
+     case PICTURE_TYPE_IDR:
+         vpic->pic_fields.bits.idr_pic_flag       = 1;
+         vpic->pic_fields.bits.coding_type        = 1;
+-        vpic->pic_fields.bits.reference_pic_flag = 1;
+         break;
+     case PICTURE_TYPE_I:
+         vpic->pic_fields.bits.idr_pic_flag       = 0;
+         vpic->pic_fields.bits.coding_type        = 1;
+-        vpic->pic_fields.bits.reference_pic_flag = 1;
+         break;
+     case PICTURE_TYPE_P:
+         vpic->pic_fields.bits.idr_pic_flag       = 0;
+         vpic->pic_fields.bits.coding_type        = 2;
+-        vpic->pic_fields.bits.reference_pic_flag = 1;
+         break;
+     case PICTURE_TYPE_B:
+         vpic->pic_fields.bits.idr_pic_flag       = 0;
+         vpic->pic_fields.bits.coding_type        = 3;
+-        vpic->pic_fields.bits.reference_pic_flag = 0;
+         break;
+     default:
+         av_assert0(0 && "invalid picture type");
+Index: FFmpeg/libavcodec/vaapi_h264.c
+===================================================================
+--- libavcodec/vaapi_h264.c
++++ libavcodec/vaapi_h264.c
+@@ -93,14 +93,19 @@ typedef struct DPB {
+  */
+ static int dpb_add(DPB *dpb, const H264Picture *pic)
+ {
+-    int i;
++    int i, pic_frame_idx, merged = 0;
+ 
+     if (dpb->size >= dpb->max_size)
+         return -1;
+ 
++    pic_frame_idx = pic->long_ref ? pic->pic_id : pic->frame_num;
++
+     for (i = 0; i < dpb->size; i++) {
+         VAPictureH264 * const va_pic = &dpb->va_pics[i];
+-        if (va_pic->picture_id == ff_vaapi_get_surface_id(pic->f)) {
++        int va_pic_long_ref = !!(va_pic->flags & VA_PICTURE_H264_LONG_TERM_REFERENCE);
++        if (va_pic->picture_id == ff_vaapi_get_surface_id(pic->f) &&
++            va_pic_long_ref == pic->long_ref &&
++            va_pic->frame_idx == pic_frame_idx) {
+             VAPictureH264 temp_va_pic;
+             fill_vaapi_pic(&temp_va_pic, pic, 0);
+ 
+@@ -112,11 +117,14 @@ static int dpb_add(DPB *dpb, const H264P
+                 } else {
+                     va_pic->BottomFieldOrderCnt = temp_va_pic.BottomFieldOrderCnt;
+                 }
++                merged = 1;
+             }
+-            return 0;
+         }
+     }
+ 
++    if (merged)
++        return 0;
++
+     fill_vaapi_pic(&dpb->va_pics[dpb->size++], pic, 0);
+     return 0;
+ }
+@@ -375,7 +383,7 @@ static int vaapi_h264_decode_slice(AVCod
+                                        slice_param.chroma_offset_l1);
+ 
+     err = ff_vaapi_decode_make_slice_buffer(avctx, pic,
+-                                            &slice_param, sizeof(slice_param),
++                                            &slice_param, 1, sizeof(slice_param),
+                                             buffer, size);
+     if (err) {
+         ff_vaapi_decode_cancel(avctx, pic);
+Index: FFmpeg/libavcodec/vaapi_hevc.c
+===================================================================
+--- libavcodec/vaapi_hevc.c
++++ libavcodec/vaapi_hevc.c
+@@ -353,7 +353,7 @@ static int vaapi_hevc_end_frame(AVCodecC
+     if (pic->last_size) {
+         last_slice_param->LongSliceFlags.fields.LastSliceOfPic = 1;
+         ret = ff_vaapi_decode_make_slice_buffer(avctx, &pic->pic,
+-                                                &pic->last_slice_param, slice_param_size,
++                                                &pic->last_slice_param, 1, slice_param_size,
+                                                 pic->last_buffer, pic->last_size);
+         if (ret < 0)
+             goto fail;
+@@ -471,7 +471,7 @@ static int vaapi_hevc_decode_slice(AVCod
+ 
+     if (!sh->first_slice_in_pic_flag) {
+         err = ff_vaapi_decode_make_slice_buffer(avctx, &pic->pic,
+-                                                &pic->last_slice_param, slice_param_size,
++                                                &pic->last_slice_param, 1, slice_param_size,
+                                                 pic->last_buffer, pic->last_size);
+         pic->last_buffer = NULL;
+         pic->last_size   = 0;
+Index: FFmpeg/libavcodec/vaapi_mjpeg.c
+===================================================================
+--- libavcodec/vaapi_mjpeg.c
++++ libavcodec/vaapi_mjpeg.c
+@@ -131,7 +131,7 @@ static int vaapi_mjpeg_decode_slice(AVCo
+         sp.components[i].ac_table_selector  = s->ac_index[i];
+     }
+ 
+-    err = ff_vaapi_decode_make_slice_buffer(avctx, pic, &sp, sizeof(sp), buffer, size);
++    err = ff_vaapi_decode_make_slice_buffer(avctx, pic, &sp, 1, sizeof(sp), buffer, size);
+     if (err)
+         goto fail;
+ 
+Index: FFmpeg/libavcodec/vaapi_mpeg2.c
+===================================================================
+--- libavcodec/vaapi_mpeg2.c
++++ libavcodec/vaapi_mpeg2.c
+@@ -162,7 +162,7 @@ static int vaapi_mpeg2_decode_slice(AVCo
+     };
+ 
+     err = ff_vaapi_decode_make_slice_buffer(avctx, pic,
+-                                            &slice_param, sizeof(slice_param),
++                                            &slice_param, 1, sizeof(slice_param),
+                                             buffer, size);
+     if (err < 0) {
+         ff_vaapi_decode_cancel(avctx, pic);
+Index: FFmpeg/libavcodec/vaapi_mpeg4.c
+===================================================================
+--- libavcodec/vaapi_mpeg4.c
++++ libavcodec/vaapi_mpeg4.c
+@@ -169,7 +169,7 @@ static int vaapi_mpeg4_decode_slice(AVCo
+     };
+ 
+     err = ff_vaapi_decode_make_slice_buffer(avctx, pic,
+-                                            &slice_param, sizeof(slice_param),
++                                            &slice_param, 1, sizeof(slice_param),
+                                             buffer, size);
+     if (err < 0) {
+         ff_vaapi_decode_cancel(avctx, pic);
+Index: FFmpeg/libavcodec/vaapi_vc1.c
+===================================================================
+--- libavcodec/vaapi_vc1.c
++++ libavcodec/vaapi_vc1.c
+@@ -489,7 +489,7 @@ static int vaapi_vc1_decode_slice(AVCode
+     };
+ 
+     err = ff_vaapi_decode_make_slice_buffer(avctx, pic,
+-                                            &slice_param, sizeof(slice_param),
++                                            &slice_param, 1, sizeof(slice_param),
+                                             buffer, size);
+     if (err < 0) {
+         ff_vaapi_decode_cancel(avctx, pic);
+Index: FFmpeg/libavcodec/vaapi_vp8.c
+===================================================================
+--- libavcodec/vaapi_vp8.c
++++ libavcodec/vaapi_vp8.c
+@@ -209,7 +209,7 @@ static int vaapi_vp8_decode_slice(AVCode
+     for (i = 0; i < 8; i++)
+         sp.partition_size[i+1] = s->coeff_partition_size[i];
+ 
+-    err = ff_vaapi_decode_make_slice_buffer(avctx, pic, &sp, sizeof(sp), data, data_size);
++    err = ff_vaapi_decode_make_slice_buffer(avctx, pic, &sp, 1, sizeof(sp), data, data_size);
+     if (err)
+         goto fail;
+ 
+Index: FFmpeg/libavcodec/vaapi_vp9.c
+===================================================================
+--- libavcodec/vaapi_vp9.c
++++ libavcodec/vaapi_vp9.c
+@@ -158,7 +158,7 @@ static int vaapi_vp9_decode_slice(AVCode
+     }
+ 
+     err = ff_vaapi_decode_make_slice_buffer(avctx, pic,
+-                                            &slice_param, sizeof(slice_param),
++                                            &slice_param, 1, sizeof(slice_param),
+                                             buffer, size);
+     if (err) {
+         ff_vaapi_decode_cancel(avctx, pic);
+Index: FFmpeg/libavfilter/vaapi_vpp.c
+===================================================================
+--- libavfilter/vaapi_vpp.c
++++ libavfilter/vaapi_vpp.c
+@@ -203,7 +203,10 @@ int ff_vaapi_vpp_config_output(AVFilterL
+     output_frames->width     = ctx->output_width;
+     output_frames->height    = ctx->output_height;
+ 
+-    output_frames->initial_pool_size = 4;
++    if (CONFIG_VAAPI_1)
++        output_frames->initial_pool_size = 0;
++    else
++        output_frames->initial_pool_size = 4;
+ 
+     err = ff_filter_init_hw_frames(avctx, outlink, 10);
+     if (err < 0)
+@@ -219,6 +222,8 @@ int ff_vaapi_vpp_config_output(AVFilterL
+     va_frames = output_frames->hwctx;
+ 
+     av_assert0(ctx->va_context == VA_INVALID_ID);
++    av_assert0(output_frames->initial_pool_size ||
++               (va_frames->surface_ids == NULL && va_frames->nb_surfaces == 0));
+     vas = vaCreateContext(ctx->hwctx->display, ctx->va_config,
+                           ctx->output_width, ctx->output_height,
+                           VA_PROGRESSIVE,
+Index: FFmpeg/libavutil/hwcontext_vaapi.c
+===================================================================
+--- libavutil/hwcontext_vaapi.c
++++ libavutil/hwcontext_vaapi.c
+@@ -809,6 +809,9 @@ static int vaapi_map_frame(AVHWFramesCon
+     VAStatus vas;
+     void *address = NULL;
+     int err, i;
++#if VA_CHECK_VERSION(1, 21, 0)
++    uint32_t vaflags = 0;
++#endif
+ 
+     surface_id = (VASurfaceID)(uintptr_t)src->data[3];
+     av_log(hwfc, AV_LOG_DEBUG, "Map surface %#x.\n", surface_id);
+@@ -892,7 +895,16 @@ static int vaapi_map_frame(AVHWFramesCon
+         }
+     }
+ 
++#if VA_CHECK_VERSION(1, 21, 0)
++    if (flags & AV_HWFRAME_MAP_READ)
++        vaflags |= VA_MAPBUFFER_FLAG_READ;
++    if (flags & AV_HWFRAME_MAP_WRITE)
++        vaflags |= VA_MAPBUFFER_FLAG_WRITE;
++    // On drivers not implementing vaMapBuffer2 libva calls vaMapBuffer instead.
++    vas = vaMapBuffer2(hwctx->display, map->image.buf, &address, vaflags);
++#else
+     vas = vaMapBuffer(hwctx->display, map->image.buf, &address);
++#endif
+     if (vas != VA_STATUS_SUCCESS) {
+         av_log(hwfc, AV_LOG_ERROR, "Failed to map image from surface "
+                "%#x: %d (%s).\n", surface_id, vas, vaErrorStr(vas));

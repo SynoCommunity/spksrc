@@ -1,16 +1,15 @@
 SPK_NAME = jackett
-SPK_VERS = 0.20.3990
-SPK_REV = 17
+SPK_VERS = 0.22.534
+SPK_REV = 18
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
-OPTIONAL_DEPENDS = cross/libstdc++ cross/curl cross/$(SPK_NAME)-mono
-DEPENDS = cross/$(SPK_NAME)
+OPTIONAL_DEPENDS = cross/jackett cross/jackett-mono cross/libstdc++ cross/curl 
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping and translation logic - removing the burden from other apps."
-CHANGELOG = "1. Update Jackett to 0.20.3990.<br/>2. Fix dotnet dependencies for DSM 7.2."
+CHANGELOG = "1. Update Jackett to 0.22.534."
 DISPLAY_NAME = Jackett
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
@@ -23,30 +22,37 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 # Service configuration
 SERVICE_PORT = 9117
-SERVICE_PORT_TITLE = Jackett(HTTP)
+SERVICE_PORT_TITLE = Jackett (HTTP)
 
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+DSM7_ARMv7_ARCHS_DEPENDING_ON_MONO = armada370 alpine alpine4k
 
-# Mono build for unsupported .NET archs
+# Use Mono for unsupported .NET archs
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)),$(ARCH))
+DEPENDS = cross/curl cross/jackett-mono
+SERVICE_SETUP = src/service-setup-mono.sh
+SPK_DEPENDS = "mono>=5.8"
+else
+DEPENDS = cross/jackett
 # dotnet requires libstdc++ version >= 6.0.22
 DEPENDS += cross/libstdc++
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)),$(ARCH))
-DEPENDS = cross/curl cross/$(SPK_NAME)-mono
-SERVICE_SETUP = src/service-setup-mono.sh
-SPK_DEPENDS = "mono>=5.8"
 endif
 else
-ifeq ($(findstring $(ARCH),$(i686_ARCHS) armada370 alpine alpine4k),$(ARCH))
-DEPENDS = cross/curl cross/$(SPK_NAME)-mono
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(DSM7_ARMv7_ARCHS_DEPENDING_ON_MONO)),$(ARCH))
+DEPENDS = cross/curl cross/jackett-mono
 SERVICE_SETUP = src/service-setup-mono.sh
 SPK_DEPENDS = "mono>=5.8"
+# create one package for all ARMv7 archs that depend on mono
+SPK_PACKAGE_ARCHS = $(DSM7_ARMv7_ARCHS_DEPENDING_ON_MONO)
 else
-UNSUPPORTED_ARCHS += armada370 alpine alpine4k
+DEPENDS = cross/jackett
+# exclude archs that depend on mono from generic package for ARMv7
+UNSUPPORTED_ARCHS += $(DSM7_ARMv7_ARCHS_DEPENDING_ON_MONO)
 endif
 endif
 

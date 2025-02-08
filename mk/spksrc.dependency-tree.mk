@@ -23,7 +23,7 @@
 .PHONY: dependency-tree
 dependency-tree:
 	@echo $$(perl -e 'print "\\\t" x $(MAKELEVEL),"\n"')+ $(NAME) $(PKG_VERS)
-	@for depend in $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS) ; \
+	@for depend in $$(echo "$(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)" | tr ' ' '\n' | sort -u | tr '\n' ' ') ; \
 	do \
 	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-tree ; \
 	done
@@ -38,14 +38,10 @@ dependency-list:
 
 .PHONY: dependency-flat
 dependency-flat:
-	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|native|diyspk)/.*"
-	@for depend in $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS) ; \
+	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|native|diyspk|toolchain)/.*"
+	@for depend in $$(echo "$(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)" | tr ' ' '\n' | sort -u | tr '\n' ' ') ; \
 	do \
-	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-flat ; \
+	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-flat | sort -u ; \
 	done
 
-
-.PHONY: dependency-kernel-list
-dependency-kernel-list:
-	@echo -n "$(NAME): "
-	@echo "$(KERNEL_MODULE_DEPEND)"
+### 

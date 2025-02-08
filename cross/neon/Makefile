@@ -1,12 +1,12 @@
 PKG_NAME = neon
-PKG_VERS = 0.31.2
+PKG_VERS = 0.33.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/notroj/neon/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libxml2 cross/zlib cross/openssl
+DEPENDS = cross/libxml2 cross/zlib cross/openssl3
 
 HOMEPAGE = https://notroj.github.io/neon/
 COMMENT  = Neon is an HTTP and WebDAV client library, with a C interface.

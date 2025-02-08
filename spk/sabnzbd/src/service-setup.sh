@@ -23,8 +23,7 @@ service_postinst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Edit the configuration according to the wizard
-        shared_folder="${wizard_volume:=/volume1}/${wizard_download_dir:=downloads}"
-        sed -i -e "s|@shared_folder@|${shared_folder}|g" ${CFG_FILE}
+        sed -i -e "s|@shared_folder@|${SHARE_PATH}|g" ${CFG_FILE}
         sed -i -e "s|@script_dir@|${SYNOPKG_PKGVAR}/scripts|g" ${CFG_FILE}
 
         if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
@@ -33,15 +32,12 @@ service_postinst ()
         else
             # DSM6: Create folders with right permissions
             # DSM7: Let SABnzbd create them on first start
-            install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/incomplete"
-            install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/complete"
-            install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${shared_folder}/watch"
+            install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${SHARE_PATH}/incomplete"
+            install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${SHARE_PATH}/complete"
+            install -m 0775 -o ${EFF_USER} -g ${GROUP} -d "${SHARE_PATH}/watch"
 
             # Create logs directory, otherwise it does not start due to permissions errors
             mkdir -p "$(dirname ${LOG_FILE})"
         fi
     fi
-
-    # Install nice/ionice
-    ${BIN}/busybox --install ${BIN}
 }

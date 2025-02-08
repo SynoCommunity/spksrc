@@ -177,7 +177,19 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
  static int config_output(AVFilterLink *outlink)
  {
      AVFilterContext *ctx = outlink->src;
-@@ -504,12 +528,21 @@ static int config_output(AVFilterLink *o
+@@ -358,7 +382,10 @@ static int config_output(AVFilterLink *o
+     outlink->w          = vpp->out_width;
+     outlink->h          = vpp->out_height;
+     outlink->frame_rate = vpp->framerate;
+-    outlink->time_base  = av_inv_q(vpp->framerate);
++    if (vpp->framerate.num == 0 || vpp->framerate.den == 0)
++        outlink->time_base = inlink->time_base;
++    else
++        outlink->time_base = av_inv_q(vpp->framerate);
+ 
+     param.filter_frame  = NULL;
+     param.num_ext_buf   = 0;
+@@ -504,12 +531,21 @@ static int config_output(AVFilterLink *o
  
      if (inlink->w != outlink->w || inlink->h != outlink->h || in_format != vpp->out_format) {
          if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 19)) {
@@ -203,15 +215,19 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
  
              INIT_MFX_EXTBUF(scale_conf, MFX_EXTBUFF_VPP_SCALING);
              SET_MFX_PARAM_FIELD(scale_conf, ScalingMode, mode);
-@@ -602,6 +635,7 @@ not_ready:
-     return FFERROR_NOT_READY;
+@@ -582,6 +618,11 @@ static int activate(AVFilterContext *ctx
+             if (in->pts != AV_NOPTS_VALUE)
+                 in->pts = av_rescale_q(in->pts, inlink->time_base, outlink->time_base);
  
- eof:
-+    pts = av_rescale_q(pts, inlink->time_base, outlink->time_base);
-     ff_outlink_set_status(outlink, status, pts);
-     return 0;
- }
-@@ -685,20 +719,14 @@ static const AVOption vpp_options[] = {
++            if (outlink->frame_rate.num && outlink->frame_rate.den)
++                in->duration = av_rescale_q(1, av_inv_q(outlink->frame_rate), outlink->time_base);
++            else
++                in->duration = 0;
++
+             ret = ff_filter_frame(outlink, in);
+             if (ret < 0)
+                 return ret;
+@@ -686,20 +727,14 @@ static const AVOption vpp_options[] = {
      { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
      { "height", "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str="w*ch/cw" }, 0, 255, .flags = FLAGS },
      { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
@@ -234,7 +250,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
  
      { "rate", "Generate output at frame rate or field rate, available only for deinterlace mode",
        OFFSET(field_rate), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, FLAGS, "rate" },
-@@ -707,6 +735,7 @@ static const AVOption vpp_options[] = {
+@@ -708,6 +743,7 @@ static const AVOption vpp_options[] = {
      { "field", "Output at field rate (one frame of output for each field)",
        0, AV_OPT_TYPE_CONST, { .i64 = 1 }, 0, 0, FLAGS, "rate" },
  
@@ -242,7 +258,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
      { NULL }
  };
  
-@@ -751,19 +780,14 @@ static const AVOption qsvscale_options[]
+@@ -752,19 +788,14 @@ static const AVOption qsvscale_options[]
      { "h",      "Output video height(0=input video height, -1=keep input video aspect)", OFFSET(oh), AV_OPT_TYPE_STRING, { .str = "ih"   }, .flags = FLAGS },
      { "format", "Output pixel format", OFFSET(output_format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
  
@@ -264,7 +280,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
      { NULL },
  };
  
-@@ -788,6 +812,7 @@ static const AVOption qsvdeint_options[]
+@@ -789,6 +820,7 @@ static const AVOption qsvdeint_options[]
      { "bob",   "bob algorithm",                  0, AV_OPT_TYPE_CONST,      {.i64 = MFX_DEINTERLACING_BOB}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
      { "advanced", "Motion adaptive algorithm",   0, AV_OPT_TYPE_CONST, {.i64 = MFX_DEINTERLACING_ADVANCED}, MFX_DEINTERLACING_BOB, MFX_DEINTERLACING_ADVANCED, FLAGS, "mode"},
  

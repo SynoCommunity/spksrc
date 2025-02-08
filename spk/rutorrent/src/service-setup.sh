@@ -1,9 +1,9 @@
 # Package
 PACKAGE="rutorrent"
 
-# Define python310 binary path
-PYTHON_DIR="/var/packages/python310/target/bin"
-# Add local bin, virtualenv along with python310 to the default PATH
+# Define python311 binary path
+PYTHON_DIR="/var/packages/python311/target/bin"
+# Add local bin, virtualenv along with python311 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 # Others
 DSM6_WEB_DIR="/var/services/web"
@@ -202,14 +202,37 @@ service_save ()
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ] && [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
       source_directory="${DSM6_WEB_DIR}/${PACKAGE}"
     fi
+    local ruTorrentConfigFile="${source_directory}/conf/config.php"
 
     # Revision 8 introduces backward incompatible changes
     if [ `echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
         sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${RTORRENT_RC}
     fi
 
+    # Revision 15 introduces backward incompatible changes in the configuration
+    if [ `echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/"` -lt 15 ]; then
+        sed -i -E -e "s/@define\(\s*'HTTP_USER_AGENT'\s*,\s*'(.*)'\s*(,\s*(true|false)\s*)?\)/\$httpUserAgent = '\\1'/g" \
+              -e "s/@define\(\s*'HTTP_TIME_OUT'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$httpTimeOut = \\1/g" \
+              -e "s/@define\(\s*'HTTP_USE_GZIP'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$httpUseGzip = \\1/g" \
+              -e "s/@define\(\s*'RPC_TIME_OUT'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$rpcTimeOut = \\1/g" \
+              -e "s/@define\(\s*'LOG_RPC_CALLS'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$rpcLogCalls = \\1/g" \
+              -e "s/@define\(\s*'LOG_RPC_FAULTS'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$rpcLogFaults = \\1/g" \
+              -e "s/@define\(\s*'PHP_USE_GZIP'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$phpUseGzip = \\1/g" \
+              -e "s/@define\(\s*'PHP_GZIP_LEVEL'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$phpGzipLevel = \\1/g" \
+              -e "s|\\\$profilePath(\s*)=(\s*)'\\.\\./share'|\\\$profilePath\\1=\\2'../../share'|g" \
+          "${ruTorrentConfigFile}"
+        echo '  $throttleMaxSpeed = 327625*1024;	// DO NOT EDIT THIS LINE!!! DO NOT COMMENT THIS LINE!!!'  >> "${ruTorrentConfigFile}"
+        echo "  // Can't be greater then 327625*1024 due to limitation in libtorrent ResourceManager::set_max_upload_unchoked function." >> "${ruTorrentConfigFile}"
+        echo "  \$al_diagnostic = true; // Diagnose auto-loader. Set to \"false\" to make composer plugins work." >> "${ruTorrentConfigFile}"
+        echo "  \$localHostedMode = true;		// Set to false if rTorrent is NOT hosted on the SAME machine as ruTorrent" >> "${ruTorrentConfigFile}"
+        echo "  \$cachedPluginLoading = false;		// Set to true to enable rapid cached loading of ruTorrent plugins" >> "${ruTorrentConfigFile}"
+        echo "  \$enableCSRFCheck = false;		// If true then Origin and Referer will be checked" >> "${ruTorrentConfigFile}"
+	      echo "  \$enabledOrigins = array();		// List of enabled domains for CSRF check (only hostnames, without protocols, port etc.)." >> "${ruTorrentConfigFile}"
+        echo "  // If empty, then will retrieve domain from HTTP_HOST / HTTP_X_FORWARDED_HOST" >> "${ruTorrentConfigFile}"
+    fi
+
     # Save the configuration file
-    cp -ap -t "${TMP_DIR}" "${source_directory}/conf/config.php"
+    cp -ap -t "${TMP_DIR}" "${ruTorrentConfigFile}"
     if [ -f "${source_directory}/.htaccess" ]; then
         cp -ap -t "${TMP_DIR}" "${source_directory}/.htaccess"
     fi
@@ -240,6 +263,29 @@ is_not_defined_external_program()
     program=$1
     php -r "require_once('${RUTORRENT_WEB_DIR}/conf/config.php'); if (isset(\$pathToExternals['${program}']) && !empty(\$pathToExternals['${program}'])) { exit(1); } else { exit(0); }"
     return $?
+}
+
+is_not_defined_variable()
+{
+    local variable_name="$1"
+    php -r "require_once('${RUTORRENT_WEB_DIR}/conf/config.php'); if (isset(\$${variable_name})) { exit(1); } else { exit(0); }"
+    return $?
+}
+
+define_variable()
+{
+    local variable_name="$1"
+    shift
+    local value="$1"
+    shift
+    local comment="$1"
+    shift
+    echo "\$${variable_name} = ${value}; // ${comment}" \
+        >> "${RUTORRENT_WEB_DIR}/conf/config.php"
+    while [ "$#" -ne 0 ]; do
+      echo "// $1" >> "${RUTORRENT_WEB_DIR}/conf/config.php"
+      shift
+    done
 }
 
 define_external_program()
@@ -337,7 +383,7 @@ service_restore ()
     if is_not_defined_external_program 'php'; then
         define_external_program 'php' '/bin/php' '/usr/bin/php'
     fi
-
+    
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 -a ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
       touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
     fi

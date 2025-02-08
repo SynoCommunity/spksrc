@@ -1,0 +1,66 @@
+{
+    "mariadb10-db": {
+        "admin-account-m10": "root",
+        "admin-pw-m10": "{{wizard_mysql_password_root}}",
+        "create-db": {
+            "db-collision": "skip",
+            "db-name": "mantisbt",
+            "flag": "{{wizard_create_db}}"
+        },
+        "drop-db-uninst": true,
+        "drop-user-uninst": true,
+        "grant-user": {
+            "db-name": "mantisbt",
+            "flag": "{{mysql_grant_user}}",
+            "host": "localhost",
+            "user-name": "mantisbt",
+            "user-pw": "{{wizard_mysql_password_mantisbt}}"
+        }
+    },
+    "webservice": {
+        "pkg_dir_prepare": [
+            {
+                "group": "http",
+                "mode": "0755",
+                "source": "/var/packages/mantisbt/target/share/mantisbt",
+                "target": "mantisbt",
+                "user": "sc-mantisbt"
+            }
+        ],
+        "portals": [
+            {
+                "alias": "mantisbt",
+                "app": "com.synocommunity.packages.mantisbt",
+                "name": "MantisBT",
+                "service": "mantisbt",
+                "type": "alias"
+            }
+        ],
+        "services": [
+            {
+                "backend": 2,
+                "display_name": "MantisBT",
+                "icon": "app/images/mantisbt-{0}.png",
+                "php": {
+                    "backend": 8,
+                    "extensions": [
+                        "curl",
+                        "gd",
+                        "ldap",
+                        "mysqli",
+                        "pdo_mysql",
+                        "soap",
+                        "zlib"
+                    ],
+                    "group": "http",
+                    "profile_desc": "PHP Profile for mantisbt",
+                    "profile_name": "mantisbt Profile",
+                    "user": "sc-mantisbt"
+                },
+                "root": "mantisbt",
+                "service": "mantisbt",
+                "type": "apache_php"
+            }
+        ]
+    }
+}

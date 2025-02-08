@@ -1,11 +1,15 @@
 PKG_NAME = libicu
-PKG_VERS = 71.1
+PKG_VERS = 74.2
 PKG_EXT = tgz
 PKG_DIST_NAME = icu4c-$(subst .,_,$(PKG_VERS))-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/unicode-org/icu/releases/download/release-$(subst .,-,$(PKG_VERS))
 PKG_DIR = icu/source
 
-BUILD_DEPENDS = native/$(PKG_NAME)
+# Remarks:
+# libicu 74 is the latest version that builds for DSM 6
+# libicu >= 75 requires compiler with c++17
+
+BUILD_DEPENDS = native/libicu
 
 HOMEPAGE = http://site.icu-project.org/home
 COMMENT  = International Components for Unicode.
@@ -63,8 +67,6 @@ CONFIGURE_ARGS += --disable-tools
 CONFIGURE_ARGS += --disable-tests
 
 ADDITIONAL_CFLAGS = -O3
-ADDITIONAL_CPPFLAGS = -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
-ADDITIONAL_CXXFLAGS = $(ADDITIONAL_CPPFLAGS)
 
 include ../../mk/spksrc.cross-cc.mk
 

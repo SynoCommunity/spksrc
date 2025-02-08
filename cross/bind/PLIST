@@ -2,3 +2,15 @@ bin:bin/arpaname
 bin:bin/delv
 bin:bin/dig
 bin:bin/mdig
+lnk:lib/libbind9-9.17.22.so
+lib:lib/libbind9.so
+lnk:lib/libdns-9.17.22.so
+lib:lib/libdns.so
+lnk:lib/libirs-9.17.22.so
+lib:lib/libirs.so
+lnk:lib/libisc-9.17.22.so
+lib:lib/libisc.so
+lnk:lib/libisccfg-9.17.22.so
+lib:lib/libisccfg.so
+lnk:lib/libns-9.17.22.so
+lib:lib/libns.so

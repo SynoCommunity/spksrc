@@ -1391,7 +1391,16 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
  static int config_output(AVFilterLink *outlink)
  {
      AVFilterContext *ctx = outlink->src;
-@@ -335,7 +382,6 @@ static int config_output(AVFilterLink *o
+@@ -330,12 +377,14 @@ static int config_output(AVFilterLink *o
+     outlink->w          = vpp->out_width;
+     outlink->h          = vpp->out_height;
+     outlink->frame_rate = vpp->framerate;
+-    outlink->time_base  = inlink->time_base;
++    if (vpp->framerate.num == 0 || vpp->framerate.den == 0)
++        outlink->time_base = inlink->time_base;
++    else
++        outlink->time_base = av_inv_q(vpp->framerate);
+ 
      param.filter_frame  = NULL;
      param.num_ext_buf   = 0;
      param.ext_buf       = ext_buf;
@@ -1399,7 +1408,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
  
      if (get_mfx_version(ctx, &mfx_version) != MFX_ERR_NONE) {
          av_log(ctx, AV_LOG_ERROR, "Failed to query mfx version.\n");
-@@ -365,53 +411,46 @@ static int config_output(AVFilterLink *o
+@@ -365,53 +414,46 @@ static int config_output(AVFilterLink *o
          param.crop     = &crop;
      }
  
@@ -1480,7 +1489,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
      }
  
      if (vpp->transpose >= 0) {
-@@ -458,18 +497,14 @@ static int config_output(AVFilterLink *o
+@@ -458,18 +500,14 @@ static int config_output(AVFilterLink *o
  
      if (vpp->rotate) {
          if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 17)) {
@@ -1501,7 +1510,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
          } else {
              av_log(ctx, AV_LOG_WARNING, "The QSV VPP rotate option is "
                     "not supported with this MSDK version.\n");
-@@ -479,12 +514,8 @@ static int config_output(AVFilterLink *o
+@@ -479,12 +517,8 @@ static int config_output(AVFilterLink *o
  
      if (vpp->hflip) {
          if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 19)) {
@@ -1516,7 +1525,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
          } else {
              av_log(ctx, AV_LOG_WARNING, "The QSV VPP hflip option is "
                     "not supported with this MSDK version.\n");
-@@ -494,22 +525,38 @@ static int config_output(AVFilterLink *o
+@@ -494,22 +528,38 @@ static int config_output(AVFilterLink *o
  
      if (inlink->w != outlink->w || inlink->h != outlink->h) {
          if (QSV_RUNTIME_VERSION_ATLEAST(mfx_version, 1, 19)) {
@@ -1562,7 +1571,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
          av_log(ctx, AV_LOG_VERBOSE, "qsv vpp pass through mode.\n");
          if (inlink->hw_frames_ctx)
              outlink->hw_frames_ctx = av_buffer_ref(inlink->hw_frames_ctx);
-@@ -522,29 +569,27 @@ static int activate(AVFilterContext *ctx
+@@ -522,29 +572,27 @@ static int activate(AVFilterContext *ctx
  {
      AVFilterLink *inlink = ctx->inputs[0];
      AVFilterLink *outlink = ctx->outputs[0];
@@ -1597,7 +1606,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
              ret = ff_qsvvpp_filter_frame(qsv, inlink, in);
              av_frame_free(&in);
              if (ret == AVERROR(EAGAIN))
-@@ -552,7 +597,7 @@ static int activate(AVFilterContext *ctx
+@@ -552,7 +600,7 @@ static int activate(AVFilterContext *ctx
              else if (ret < 0)
                  return ret;
  
@@ -1606,7 +1615,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
                  goto eof;
  
              if (qsv->got_frame) {
-@@ -561,6 +606,7 @@ static int activate(AVFilterContext *ctx
+@@ -561,6 +609,7 @@ static int activate(AVFilterContext *ctx
              }
          }
      } else {
@@ -1614,7 +1623,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
          if (in) {
              if (in->pts != AV_NOPTS_VALUE)
                  in->pts = av_rescale_q(in->pts, inlink->time_base, outlink->time_base);
-@@ -569,7 +615,7 @@ static int activate(AVFilterContext *ctx
+@@ -569,7 +618,7 @@ static int activate(AVFilterContext *ctx
              if (ret < 0)
                  return ret;
  
@@ -1623,7 +1632,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
                  goto eof;
  
              return 0;
-@@ -577,7 +623,7 @@ static int activate(AVFilterContext *ctx
+@@ -577,7 +626,7 @@ static int activate(AVFilterContext *ctx
      }
  
  not_ready:
@@ -1632,7 +1641,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
          goto eof;
  
      FF_FILTER_FORWARD_WANTED(outlink, inlink);
-@@ -585,11 +631,101 @@ not_ready:
+@@ -585,11 +634,101 @@ not_ready:
      return FFERROR_NOT_READY;
  
  eof:
@@ -1735,7 +1744,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
  {
      int ret;
      static const enum AVPixelFormat in_pix_fmts[] = {
-@@ -615,46 +751,79 @@ static int query_formats(AVFilterContext
+@@ -615,46 +754,79 @@ static int query_formats(AVFilterContext
                            &ctx->outputs[0]->incfg.formats);
  }
  

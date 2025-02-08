@@ -1,4 +1,4 @@
-PYTHON_DIR="/var/packages/python310/target/bin"
+PYTHON_DIR="/var/packages/python311/target/bin"
 GIT_DIR="/var/packages/git/target/bin"
 PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${GIT_DIR}:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"

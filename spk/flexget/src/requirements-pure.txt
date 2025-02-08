@@ -1,103 +1,76 @@
-# This file is a copy of the https://raw.githubusercontent.com/Flexget/Flexget/v3.3.4/requirements.txt file
-# including the https://raw.githubusercontent.com/Flexget/Flexget/v3.3.4/requirements.in
-# Additionally added the flexget and the transmission-rpc packages.
-# plumbum and rpyc packages are adjusted as the proposed versions are not accepted.
+# Snapshot from Jan. 18th 2025
 
-#aniso8601==9.0.1            ==> crossenv
-APScheduler==3.8.1
-attrs==21.2.0
-babelfish==0.6.0
-beautifulsoup4==4.10.0
-#Brotli==1.0.9               ==> crossenv
-CacheControl==0.12.10
-cachy==0.3.0
-#certifi==2021.10.8          ==> python 3.10
-#cffi==1.15.0                ==> crossenv
-chardet==4.0.0
-charset-normalizer==2.0.7
-cheroot==8.5.2
-CherryPy==18.6.1
-cleo==0.8.1
-click==8.0.3
-clikit==0.6.2
-colorama==0.4.4
-colorclass==2.2.2
-commonmark==0.9.1
-crashtest==0.3.1
-#cryptography==3.3.2         ==> python310
-#distlib==0.3.4              ==> python310
-feedparser==6.0.8
-#filelock==3.6.0             ==> python310
-flask==2.0.2
-flask-compress==1.10.1
-flask-cors==3.0.10
-flask-login==0.5.0
-flask-restful==0.3.9
-flask-restx==0.5.1
-FlexGet==3.3.4
-#greenlet==1.1.2             ==> crossenv
-guessit==3.4.3
+aniso8601==10.0.0
+APScheduler==3.11.0
+attrs==24.3.0
+autocommand==2.2.2
+babelfish==0.6.1
+backports.tarfile==1.2.0
+beautifulsoup4==4.12.3
+blinker==1.9.0
+#Brotli                             ==> crossenv
+#certifi                            ==> py311
+#charset-normalizer                 ==> crossenv
+cheroot==10.0.1
+CherryPy==18.10.0
+click==8.1.8
+colorama==0.4.6
+feedparser==6.0.11
+Flask==3.1.0
+Flask-Compress==1.17
+Flask-Cors==5.0.0
+Flask-Login==0.6.3
+flask-restx==1.3.0
+FlexGet==3.13.16
+#greenlet                           ==> crossenv
+guessit==3.8.0
 html5lib==1.1
-idna==3.3
-importlib-metadata==4.11.3
-itsdangerous==2.0.1
-jaraco.classes==3.2.1
-jaraco.collections==3.4.0
-jaraco.functools==3.3.0
-jaraco.text==3.5.1
-jeepney==0.7.1
-Jinja2==3.0.3
-jsonschema==3.2.0
-keyring==23.5.0
-lockfile==0.12.2
-loguru==0.5.3
-#Markupsafe==2.0.1           ==> crossenv
-more-itertools==8.12.0
-msgpack==1.0.3
-packaging==20.9
-pastel==0.2.1
-pexpect==4.8.0
-pkginfo==1.8.2
-platformdirs==2.5.1
-plumbum==1.7.0
-poetry==1.1.13
-poetry-core==1.0.8
-portend==3.0.0
-progressbar==2.5
-#psutil==5.8.0               ==> crossenv
-ptyprocess==0.7.0
-pycparser==2.21
-pygments==2.10.0
-pylev==1.4.0
+idna==3.10
+importlib_resources==6.5.2
+itsdangerous==2.2.0
+jaraco.collections==5.1.0
+jaraco.context==6.0.1
+jaraco.functools==4.1.0
+jaraco.text==4.0.0
+Jinja2==3.1.5
+jsonschema==4.23.0
+jsonschema-specifications==2024.10.1
+loguru==0.7.3
+markdown-it-py==3.0.0
+#MarkupSafe                         ==> crossenv
+mdurl==0.1.2
+more-itertools==10.6.0
+packaging==24.2
+#pendulum                           ==> crossenv
+plumbum==1.9.0
+portend==3.2.0
+#psutil                             ==> crossenv
+Pygments==2.19.1
 pynzb==0.1.0
-pyparsing==2.4.7
-#pyrsistent==0.18.0          ==> crossenv
+pyparsing==3.2.1
 PyRSS2Gen==1.1
-python-dateutil==2.8.2
-pytz==2021.3
-#PyYAML==6.0                 ==> crossenv
-rebulk==3.1.0
-requests==2.26.0
-requests-toolbelt==0.9.1
-rich==10.15.0
-rpyc==5.0.1
-#setuptools                  ==> python310
-SecretStorage==3.3.1
+python-dateutil==2.9.0.post0
+pytz==2024.2
+#PyYAML                             ==> crossenv
+rebulk==3.2.0
+referencing==0.36.1
+requests==2.32.3
+rich==13.9.4
+#rpds-py                            ==> crossenv
+rpyc==6.0.1
+setuptools==75.7.0
 sgmllib3k==1.0.0
-shellingham==1.4.0
-#six==1.16.0                 ==> python310
-soupsieve==2.2.1
-#SQLAlchemy==1.4.27          ==> crossenv
-tempora==4.1.2
-terminaltables==3.1.10
-tomlkit==0.10.0
-transmission-rpc==3.3.0
-typing-extensions==3.10.0.2
-tzlocal==2.1
-urllib3==1.26.7
-#virtualenv                  ==> python310
+#six                                ==> py311
+soupsieve==2.6
+#SQLAlchemy                         ==> crossenv
+tempora==5.8.0
+#time-machine                       ==> crossenv
+typing_extensions==4.12.2
+tzdata==2024.2
+tzlocal==5.2
+urllib3==1.26.20
 webencodings==0.5.1
-Werkzeug==2.0.2
-zc.lockfile==2.0
-zipp==3.7.0
-zxcvbn-python==4.4.24
+Werkzeug==3.1.3
+zc.lockfile==3.0.post1
+#zstandard                          ==> crossenv
+zxcvbn==4.4.28
