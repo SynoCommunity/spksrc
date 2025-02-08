@@ -16,8 +16,8 @@ CHANGELOG = "Initial package hosted by SynoCommunity<br/>For full changelog see 
 HOMEPAGE = https://github.com/schmidhorst/synology-autorun
 LICENSE  = 3-clause BSD
 
-# Pure script package, make sure ARCH is not defined
-override ARCH=
+# Pure script package, make sure ARCH is noarch
+override ARCH=noarch
 
 CONF_DIR = $(STAGING_INSTALL_PREFIX)/synology-autorun/conf
 WIZARDS_DIR = $(STAGING_INSTALL_PREFIX)/synology-autorun/WIZARD_UIFILES
