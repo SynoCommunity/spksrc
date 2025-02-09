@@ -36,6 +36,7 @@ PIP_WHEELS += maturin==1.8.1
 PIP_WHEELS += wheel==0.45.1
 PIP_WHEELS += cffi==1.17.1
 PIP_WHEELS += crossenv==1.5.0
+PIP_WHEELS += cython==0.29.37
 
 .PHONY: python312_native_post_install
 python312_native_post_install: $(WORK_DIR)/python-native.mk
