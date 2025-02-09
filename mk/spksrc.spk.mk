@@ -15,6 +15,8 @@
 #  CONF_DIR                     (optional) To provide a package specific conf folder with files (e.g. privilege file)
 #  LICENSE_FILE                 (optional) Add licence from given file
 #  DSM_APP_NAME                 (optional) To use custom dsmappname (default: com.synocommunity.packages.$(SPK_NAME))
+#  WIZARDS_TARGET               (optional) To override the default wizards target
+#  SCRIPTS_TARGET               (optional) To override the default target to generate the script files
 # 
 # Internal variables used in this file:
 #  NAME                         The internal name of the package.
@@ -93,6 +95,12 @@ endif
 endif
 
 SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
+
+ifeq ($(strip $(WIZARDS_TARGET)),)
+WIZARDS_TARGET = wizards
+endif
+
+
 
 #####
 
@@ -343,7 +351,9 @@ $(WORK_DIR)/package.tgz: icon service
 	@[ -f $@ ] && rm $@ || true
 	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | tar cpzf $@ --owner=root --group=root --files-from=/dev/stdin)
 
-DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
+ifeq ($(strip $(SCRIPTS_TARGET)),)
+SCRIPTS_TARGET = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
+endif
 
 define dsm_script_redirect
 $(create_target_dir)
@@ -495,7 +505,7 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(SCRIPTS_TARGET) $(WIZARDS_TARGET) $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
