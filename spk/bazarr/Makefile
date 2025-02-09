@@ -53,26 +53,7 @@ USE_ALTERNATE_TMPDIR = 1
 include ../../mk/spksrc.python.mk
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS += src/requirements-crossenv-greenlet-v3.txt
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
-endif
-else
-WHEELS += src/requirements-crossenv-greenlet-v1.txt
-endif
 
-# [numpy] <= 1.24.4 last working version with gcc-4.9
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy-gcc4.txt
-# [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+# [numpy] >= 1.25.0 requires c++17 and 1.26 is required to support Python 3.12
 WHEELS += src/requirements-crossenv-numpy.txt
-endif
-# workaround for compiler bug:
-# https://github.com/numpy/numpy/issues/13622
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS += [numpy] -O0
-endif
-endif
