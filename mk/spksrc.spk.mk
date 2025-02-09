@@ -6,6 +6,10 @@
 #  SPK_NAME                     Package name
 #  MAINTAINER                   Package maintainer (mandatory)
 #  MAINTAINER_URL               URL of package maintainer (optional when MAINTAINER is a valid github user)
+#  DISPLAY_NAME                 package name as shown in DSM and SynoCommunity Repository
+#  DESCRIPTION                  package description
+#  DISPLAY_NAME_%               language specific display name, all upper case (available languages are defined as LANGUAGES in spksrc.common.mk)
+#  DESCRIPTION_%                language specific description, all upper case (available languages are defined as LANGUAGES in spksrc.common.mk)
 #  SPK_NAME_ARCH                (optional) arch specific spk file name (default: $(ARCH))
 #  SPK_PACKAGE_ARCHS            (optional) list of archs in the spk file (default: $(ARCH) or list of archs when generic arch)
 #  UNSUPPORTED_ARCHS            (optional) Unsupported archs are removed from gemeric arch list (ignored when SPK_PACKAGE_ARCHS is used)
@@ -199,14 +203,23 @@ $(WORK_DIR)/INFO:
 	fi
 	@echo package=\"$(SPK_NAME)\" > $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
+
+ifneq ($(strip $(DISPLAY_NAME)),)
+	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
+endif
 	@/bin/echo -n "description=\"" >> $@
 	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
 	@echo "\"" >> $@
-	@echo $(foreach LANGUAGE, $(LANGUAGES), \
-	  $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+	@echo -n $(foreach LANGUAGE, $(LANGUAGES), \
+	  $(shell [ -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
 	    /bin/echo -n "description_$(LANGUAGE)=\\\"" && \
-	    /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
-	    /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
+	    /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" | sed -e 's/"/\\\\\\"/g' && \
+	    /bin/echo -n "\\\"\\\n") \
+	  $(shell [ -n "$(DISPLAY_NAME_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+	    /bin/echo -n "displayname_$(LANGUAGE)=\\\"" && \
+	    /bin/echo -n "$(DISPLAY_NAME_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" | sed -e 's/"/\\\\\\"/g' && \
+	    /bin/echo -n "\\\"\\\n") \
+	  ) | sed -e 's/^ //g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
 ifeq ($(IS_GITHUB_MAINTAINER),1)
 	@echo maintainer=\"$(call get_github_maintainer_name,$(MAINTAINER))\" >> $@
@@ -271,9 +284,6 @@ else
 endif
 endif
 
-ifneq ($(strip $(DISPLAY_NAME)),)
-	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
-endif
 ifneq ($(strip $(DSM_UI_DIR)),)
 	@[ -d $(STAGING_DIR)/$(DSM_UI_DIR) ] && echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@ || true
 endif
