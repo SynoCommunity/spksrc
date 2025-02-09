@@ -459,16 +459,11 @@ endif
 ifeq ($(strip $(SERVICE_DESC)),)
 SERVICE_DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
 endif
-ifneq ($(strip $(DSM_APP_NAME)),)
-SPK_APPNAME = $(DSM_APP_NAME)
-else
-SPK_APPNAME = com.synocommunity.packages.$(SPK_NAME)
-endif
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
 	@echo '{}' | jq --arg name "${DISPLAY_NAME}" \
 		--arg desc "${SERVICE_DESC}" \
-		--arg id "${SPK_APPNAME}" \
+		--arg id "${DSM_APP_NAME}" \
 		--arg icon "images/${SPK_NAME}-{0}.png" \
 		--arg prot "${SERVICE_PORT_PROTOCOL}" \
 		--arg port "${SERVICE_PORT}" \

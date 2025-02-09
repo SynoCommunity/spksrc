@@ -14,6 +14,7 @@
 #  INSTALLER_SCRIPT             (optional) Use installer script from given file
 #  CONF_DIR                     (optional) To provide a package specific conf folder with files (e.g. privilege file)
 #  LICENSE_FILE                 (optional) Add licence from given file
+#  DSM_APP_NAME                 (optional) To use custom dsmappname (default: com.synocommunity.packages.$(SPK_NAME))
 # 
 # Internal variables used in this file:
 #  NAME                         The internal name of the package.
@@ -144,6 +145,11 @@ ifneq ($(CONF_DIR),)
 SPK_CONF_DIR = $(CONF_DIR)
 endif
 
+ifeq ($(strip $(DSM_APP_NAME)),)
+DSM_APP_NAME=com.synocommunity.packages.$(SPK_NAME)
+endif
+
+
 # Generic service scripts
 include ../../mk/spksrc.service.mk
 
@@ -263,11 +269,7 @@ endif
 ifneq ($(strip $(DSM_UI_DIR)),)
 	@[ -d $(STAGING_DIR)/$(DSM_UI_DIR) ] && echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@ || true
 endif
-ifneq ($(strip $(DSM_APP_NAME)),)
 	@echo dsmappname=\"$(DSM_APP_NAME)\" >> $@
-else
-	@echo dsmappname=\"com.synocommunity.packages.$(SPK_NAME)\" >> $@
-endif
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifneq ($(strip $(DSM_APP_PAGE)),)
 	@echo dsmapppage=\"$(DSM_APP_PAGE)\" >> $@
