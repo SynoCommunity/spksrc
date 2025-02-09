@@ -1,0 +1,5 @@
+rsc:CHANGELOG
+rsc:README.*
+rsc:WIZARD_UIFILES/
+rsc:conf/
+rsc:package/

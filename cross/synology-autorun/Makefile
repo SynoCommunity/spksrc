@@ -1,5 +1,5 @@
 PKG_NAME = synology-autorun
-PKG_VERS = 1.10.0
+PKG_VERS = 1.10.0.0011
 PKG_EXT = tar.gz
 PKG_DIST_NAME = V$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/schmidhorst/synology-autorun/archive
@@ -19,5 +19,4 @@ include ../../mk/spksrc.install-resources.mk
 .PHONY: synology-autorun_install
 synology-autorun_install:
 	@$(MSG) Extract the whole package
-	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/$(PKG_NAME)
-	tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/$(PKG_NAME)
+	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR) . | tar -xf - -C $(STAGING_INSTALL_PREFIX)
