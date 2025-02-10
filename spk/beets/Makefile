@@ -25,6 +25,9 @@ SPK_COMMANDS = env/bin/beet
 
 include ../../mk/spksrc.python.mk
 
+# NOTE: The following plugins were excluded due to being broken or deprecated:
+# absubmit, docs, import, reflink
+
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
@@ -34,16 +37,6 @@ endif
 
 # [Pillow]
 DEPENDS += cross/pillow
-
-# [pycryptodomex]
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [pycryptodomex] -std=c11
-endif
-
-# [pyppmd]
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [pyppmd] -std=gnu11
-endif
 
 # [PyYAML]
 DEPENDS += cross/libyaml
