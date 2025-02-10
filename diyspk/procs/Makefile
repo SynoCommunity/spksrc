@@ -2,7 +2,7 @@ SPK_NAME = procs
 SPK_VERS = 0.12.3
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/procs
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 

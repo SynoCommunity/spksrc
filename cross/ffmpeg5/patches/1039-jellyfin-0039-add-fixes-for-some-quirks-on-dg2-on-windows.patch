@@ -90,16 +90,3 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
  } AVD3D11VADeviceContext;
  
  /**
-Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
-===================================================================
---- libavutil/hwcontext_opencl.c
-+++ libavutil/hwcontext_opencl.c
-@@ -1380,7 +1380,7 @@ static int opencl_device_derive(AVHWDevi
-                 CL_CONTEXT_D3D11_DEVICE_KHR,
-                 (intptr_t)src_hwctx->device,
-                 CL_CONTEXT_INTEROP_USER_SYNC,
--                CL_TRUE,
-+                (src_hwctx->device_desc.VendorId != 0x8086 || src_hwctx->is_uma),
-                 0,
-             };
-             OpenCLDeviceSelector selector = {

@@ -1,21 +1,13 @@
-# Snapshot from Jul. 23rd 2023
+# Snapshot from Jan. 18th 2025
 
-aniso8601==9.0.1
-Brotli==1.0.9
-cffi==1.15.1
-charset-normalizer==2.1.1
-#cryptography                ==> cross/cryptography
-dulwich==0.21.5
-greenlet==2.0.1
-MarkupSafe==2.1.1
-msgpack==1.0.5
-psutil==5.9.4
-pydantic==1.10.2
-pyrsistent==0.19.2
-PyYAML==6.0.1
-SQLAlchemy==2.0.15
-
-# Building will generate a non-optimized build: py3-none-any
-# At installation time it will pip download a c++17 compiled
-# optimized build, in case of failure fall-back on this one.
-rapidfuzz==2.15.1
+Brotli==1.1.0
+charset-normalizer==3.4.1
+#greenlet==3.1.1                    => supported version depends on gcc version
+MarkupSafe==3.0.2
+#pendulum==3.0.0                    => cross/pendulum
+psutil==6.1.1
+PyYAML==6.0.2
+rpds-py==0.22.3
+SQLAlchemy==2.0.37
+time-machine==2.16.0
+zstandard==0.23.0

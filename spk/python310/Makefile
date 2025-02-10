@@ -1,10 +1,10 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.13
+SPK_VERS = 3.10.16
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 19
+SPK_REV = 22
 SPK_ICON = src/python3.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/python310
 DEPENDS += cross/pip
 
 MAINTAINER = SynoCommunity
@@ -13,7 +13,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.13"
+CHANGELOG = "1. Update to Python 3.10.16<br/>2. Update all mandatory wheels"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -64,7 +64,8 @@ DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
 # [mysqlclient]
-DEPENDS += cross/mysql-connector-c cross/mariadb-connector-c
+DEPENDS += cross/mysql-connector-c
+DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
@@ -107,6 +108,10 @@ include ../../mk/spksrc.spk.mk
 ## WHEELS_TEST_ALL: Force testing all wheel building
 ifeq ($(strip $(WHEELS_TEST_ALL)),1)
 
+# let it find maturin in crossenv
+ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+
+
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS += src/requirements-crossenv-greenlet-v2.txt
@@ -130,6 +135,7 @@ else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
 endif
+
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)
@@ -157,7 +163,5 @@ endif
 
 .PHONY: python310_extra_install
 python310_extra_install:
-	@$(MSG) - Remove test folder
-	rm -rf $(STAGING_DIR)/$(PYTHON_LIB_DIR)/test/
 	@$(MSG) - Remove compiled files from __pycache__
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' -delete

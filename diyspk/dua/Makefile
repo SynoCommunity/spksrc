@@ -1,10 +1,10 @@
 SPK_NAME = dua
-SPK_VERS = 2.20.1
+SPK_VERS = 2.30.0
 SPK_REV = 1
 
 DEPENDS = cross/dua
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = A tool to conveniently learn about the disk usage of directories, fast!

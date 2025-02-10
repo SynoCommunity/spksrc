@@ -1,5 +1,5 @@
 PKG_NAME = e2fsprogs
-PKG_VERS = 1.47.0
+PKG_VERS = 1.47.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v$(PKG_VERS)
@@ -12,7 +12,8 @@ COMMENT  = Ext2/3/4 filesystem userspace utilities.
 LICENSE  = GPL
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS  = --enable-elf-shlibs
+CONFIGURE_ARGS = --enable-elf-shlibs
+CONFIGURE_ARGS += --disable-uuidd
 
 include ../../mk/spksrc.archs.mk
 

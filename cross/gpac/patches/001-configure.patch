@@ -1,0 +1,24 @@
+# prefere tools defined as environment variables
+# 
+--- configure
++++ configure
+@@ -48,13 +48,13 @@ if test "$cxx_orig" = "" ; then
+ cxx_orig="g++"
+ fi
+ 
+-ar="ar"
+-ranlib="ranlib"
+-make="make"
+-strip="strip"
++ar="${AR:=ar}"
++ranlib="${RANLIB:=ranlib}"
++make="${MAKE:=make}"
++strip="${STRIP:=strip}"
+ pkg_config="pkg-config"
+-windres="windres"
+-readelf="readelf"
++windres="${WINDRES:=windres}"
++readelf="${READELF:=readelf}"
+ install="${INSTALL:=install}"
+ instflags="${INSTFLAGS:=-p}"
+ cpu=`uname -m`

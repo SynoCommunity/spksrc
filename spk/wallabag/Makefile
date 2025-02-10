@@ -1,41 +1,52 @@
 SPK_NAME = wallabag
-SPK_VERS = 2.3.8
-SPK_REV = 3
+SPK_VERS = 2.6.10
+SPK_REV = 6
 SPK_ICON = src/wallabag.png
-DSM_UI_DIR = app
-BETA = 1
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/wallabag
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
-MAINTAINER = tolkonepiu
+# Due to not obvious WebStation handling requirements
+REQUIRED_MIN_DSM = 6.0
+SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
+
+MAINTAINER = SynoCommunity
 DESCRIPTION = Wallabag is a self hostable application allowing you to save an offline copy of your favorite articles. Click, save, read it when you can. It extracts content so that you can read it when you have time.
-ADMIN_URL = /wallabag/web/
-STARTABLE = no
 DISPLAY_NAME = Wallabag
-CHANGELOG = "Update to 2.3.8, Update to generic service script"
+CHANGELOG = "1. Update to v2.6.10."
 
 HOMEPAGE = https://www.wallabag.org/
 LICENSE  = MIT
 
-WIZARDS_DIR = src/wizard/
-SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
 
-INSTALL_DEP_SERVICES = apache-web mysql
-START_DEP_SERVICES = apache-web mysql
-INSTUNINST_RESTART_SERVICES = apache-web
+ADMIN_URL = /wallabag
 
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+WIZARDS_DIR = src/wizard/
+SYSTEM_GROUP = http
+
+DSM_UI_DIR = app
+DSM_UI_CONFIG = src/app/config
+CONF_DIR = src/conf/
+
+include ../../mk/spksrc.common.mk
+
+# Alternate conf dir for DSM 6
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+CONF_DIR = src/conf_6/
+endif
 
 POST_STRIP_TARGET = wallabag_extra_install
-
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: wallabag_extra_install
 wallabag_extra_install:
-	install -m 644 src/parameters.yml $(STAGING_DIR)/share/${SPK_NAME}/app/config/parameters.yml
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 -d $(STAGING_DIR)/web
+	install -m 644 src/web/index.php $(STAGING_DIR)/web/index.php
+	install -m 644 src/web/parameters.yml $(STAGING_DIR)/web/parameters.yml
+	install -m 644 src/web/wallabag.conf $(STAGING_DIR)/web/wallabag.conf
+	install -m 644 src/web/wallabag.json $(STAGING_DIR)/web/wallabag.json

@@ -1,12 +1,12 @@
 # requirements that need crossenv to build wheel for
 
-borgbackup==1.2.6
+borgbackup==1.4.0
 
-charset-normalizer==3.2.0
-llfuse==1.5.0
-msgpack==1.0.5              # used compiled verrsion for performance
+charset-normalizer==3.4.1
+llfuse==1.5.1
+msgpack==1.1.0              # used compiled verrsion for performance
 pyrsistent==0.19.3
-ruamel.yaml.clib==0.2.7
+ruamel.yaml.clib==0.2.12
 
 # [rpds-py]
 # Require environment variables
@@ -14,4 +14,6 @@ ruamel.yaml.clib==0.2.7
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # Requires path to maturin from crossenv
 #  ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
-rpds-py==0.10.2
+# rpds-py==0.21.0 is the latest version that builds with rust 1.77.2 (ARMv5, ARMv7L)
+# supporting carco lock version 3 (but not version 4)
+rpds-py==0.21.0

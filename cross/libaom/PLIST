@@ -2,4 +2,4 @@ bin:bin/aomdec
 bin:bin/aomenc
 lnk:lib/libaom.so
 lnk:lib/libaom.so.3
-lib:lib/libaom.so.3.5.0
+lib:lib/libaom.so.3.8.3

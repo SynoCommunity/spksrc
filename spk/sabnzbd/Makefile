@@ -1,11 +1,19 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 4.1.0
-SPK_REV = 66
+SPK_VERS = 4.4.1
+SPK_REV = 73
 SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python311
-DEPENDS = cross/busybox cross/par2cmdline-turbo cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python311>=3.11.5-8"
+
+DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
+OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
+
+# python311 not supported
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# unrar not supported
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+
+SPK_DEPENDS = $(PYTHON_PACKAGE)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -15,7 +23,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Update SABnzbd to 4.1.0.<br/>2. Use par2cmdline-turbo instead of par2cmdline.<br/>2. Update UnRar to 6.23 (security fixes)."
+CHANGELOG = "1. Update SABnzbd to 4.4.1. <br/>2. Replace 7za by 7zz v24.09. <br/>3. Update unrar to v7.1.2 (DSM 7 only). <br/>4. Update par2cmdline-turbo to v1.2.0."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -23,23 +31,26 @@ LICENSE   = GPL
 WIZARDS_DIR = src/wizard/
 
 SERVICE_USER = auto
-SERVICE_WIZARD_SHARE = wizard_download_dir
+SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8080
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-# Ensure C++11 compatibility for unrar
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
+DEPENDS += cross/unrar
+else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+DEPENDS += cross/unrar
+else
+DEPENDS += cross/unrar7
+endif
+
 POST_STRIP_TARGET = sabnzbd_extra_install
 
-# Add nice and ionice commands
-ENV += BUSYBOX_CONFIG="nice ionice"
-
-SPK_COMMANDS = bin/7za
+SPK_COMMANDS = bin/7zz
 
 # [cryptography]
 DEPENDS += cross/cryptography

@@ -1,9 +1,9 @@
 SPK_NAME = testdisk
 SPK_VERS = 7.1
-SPK_REV = 4
+SPK_REV = 1
 SPK_ICON = src/testdisk.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS = cross/testdisk
 
 MAINTAINER = hgy59
 DESCRIPTION = "TestDisk is powerful free data recovery software."

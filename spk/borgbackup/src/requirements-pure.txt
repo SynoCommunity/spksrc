@@ -1,36 +1,36 @@
-# Wheels that absolutely needs
-# to be managed as pure-python
+# pure-python wheels
 
 appdirs==1.4.4
-arrow==1.2.3
-attrs==23.1.0
+arrow==1.3.0
+attrs==24.3.0
 #borgbackup                            ==> crossenv
-borgmatic==1.8.2
+borgmatic==1.9.5
 #certifi                               ==> python311:pure
 #charset-normalizer                    ==> crossenv
 colorama==0.4.6
 #distlib                               ==> python311:pure
 docopt==0.6.2
-emborg==1.37
+emborg==1.41
 #filelock                              ==> python311:pure
-idna==3.4
-inform==1.28
-jsonschema==4.19.0
-jsonschema-specifications==2023.7.1
+idna==3.10
+inform==1.33
+jsonschema==4.23.0
+jsonschema-specifications==2024.10.1
 #llfuse                                ==> crossenv
 #msgpack                               ==> crossenv
-nestedtext==3.6
-packaging==23.1
+nestedtext==3.7
+packaging==24.1
 #platformdirs                          ==> python311:pure
 pyparsing==3.1.1
 #pyrsistent                            ==> crossenv
-python-dateutil==2.8.2
-quantiphy==2.19
-referencing==0.30.2
-requests==2.31.0
+python-dateutil==2.9.0.post0
+quantiphy==2.20
+referencing==0.35.1
+requests==2.32.3
 #rpds-py                               ==> crossenv
-ruamel.yaml==0.17.32
+ruamel.yaml==0.18.8
 #ruamel.yaml.clib                      ==> crossenv
 #six                                   ==> python311:pure
-urllib3==2.0.4
+types_python_dateutil==2.9.0.20241206
+urllib3==2.3.0
 #virtualenv                            ==> python311:pure

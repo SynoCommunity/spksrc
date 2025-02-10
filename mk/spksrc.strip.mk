@@ -27,9 +27,7 @@ else
 $(PRE_STRIP_TARGET): strip_msg
 endif
 ifeq ($(strip $(STRIP_TARGET)),)
-ifneq ($(strip $(GCC_DEBUG_INFO)),1)
 STRIP_TARGET = strip_target
-endif
 else
 $(STRIP_TARGET): $(PRE_STRIP_TARGET)
 endif
@@ -48,26 +46,53 @@ strip_msg:
 	@$(MSG) "Stripping binaries and libraries of $(NAME)"
 
 include_libatomic:
-	@cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; \
-	do \
+	@for tclib in libatomic\.so; do \
+	echo  "===> SEARCHING for $${tclib}" ; \
+	cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; do \
 	  case $${type} in \
 	    lib|bin) \
-	      if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep NEEDED | grep libatomic\.so)" ]; then \
-	        _libatomic_="$$(readlink $(TC_LIBRARY_PATH)/libatomic.so)" ; \
-	        echo  "===>  Add libatomic from toolchain ($${_libatomic_})" ; \
-	        install -d -m 755 $(STAGING_DIR)/lib ; \
-	        install -m 644 $(TC_LIBRARY_PATH)/$${_libatomic_} $(STAGING_DIR)/lib/ ; \
-	        cd $(STAGING_DIR)/lib/ && ln -sf $${_libatomic_} libatomic.so.1 ; \
-	        cd $(STAGING_DIR)/lib/ && ln -sf $${_libatomic_} libatomic.so ; \
-	        break ; \
-	      fi \
-	    ;; \
+	         if [ "$$(objdump -p $(STAGING_DIR)/$${file} 2>/dev/null | grep NEEDED | grep $${tclib})" ]; then \
+	            echo  "===>  Found in $${file} for library dependency from toolchain ($${tclib})" ; \
+	            _tclib_=$$(realpath $$(find $(TC_LIBRARY_PATH)/../. -name $${tclib})) ; \
+	            echo  "===>      Add library from toolchain ($$(basename $${_tclib_}))" ; \
+	            install -d -m 755 $(STAGING_DIR)/lib ; \
+	            install -m 644 $${_tclib_} $(STAGING_DIR)/lib/ ; \
+	            symlinks=$$(find $(TC_LIBRARY_PATH)/. -type l -name "$${tclib}*" -printf '%f ' | xargs) ; \
+	            echo  "===>      Add symlink from toolchain ($${symlinks})" ; \
+	            for _link_ in $${symlinks} ; do \
+	               (cd $(STAGING_DIR)/lib/ && ln -sf $$(basename $${_tclib_}) $${_link_}) ; \
+	            done ; \
+	            break 2 ; \
+	         fi ;; \
 	  esac ; \
+	done ; \
+	for wheel in $(WORK_DIR)/wheelhouse/*.whl ; do \
+	   for shlib in $$(zipinfo -1 $${wheel} *.so 2>/dev/null) ; do \
+	      _tmp_=$$(mktemp -d -p $(WORK_DIR)/wheelhouse) ; \
+	      unzip -qq -d $${_tmp_} $${wheel} $${shlib} ; \
+	      if [ "$$(objdump -p $${_tmp_}/$${shlib} 2>/dev/null | grep NEEDED | grep $${tclib})" ]; then \
+	         echo  "===>  Found in $$(basename $${wheel}) for library dependency from toolchain ($${tclib})" ; \
+	         _tclib_=$$(realpath $$(find $(TC_LIBRARY_PATH)/../. -name $${tclib})) ; \
+	         echo  "===>      Add library from toolchain ($$(basename $${_tclib_}))" ; \
+	         install -d -m 755 $(STAGING_DIR)/lib ; \
+	         install -m 644 $${_tclib_} $(STAGING_DIR)/lib/ ; \
+	         symlinks=$$(find $(TC_LIBRARY_PATH)/. -type l -name "$${tclib}*" -printf '%f ' | xargs) ; \
+	         echo  "===>      Add symlink from toolchain ($${symlinks})" ; \
+	         for _link_ in $${symlinks} ; do \
+	            (cd $(STAGING_DIR)/lib/ && ln -sf $$(basename $${_tclib_}) $${_link_}) ; \
+	         done ; \
+	         rm -fr $${_tmp_} ; \
+	         break 2 ; \
+	      fi ; \
+	      rm -fr $${_tmp_} ; \
+	   done ; \
+	done ; \
 	done
 
 pre_strip_target: strip_msg
 
 strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST) include_libatomic
+ifneq ($(strip $(GCC_DEBUG_INFO)),1)
 	@cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; \
 	do \
 	  case $${type} in \
@@ -78,6 +103,9 @@ strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST) include_libatomic
 	      ;; \
 	  esac ; \
 	done
+else
+	@$(MSG) GCC_DEBUG_INFO enabled: Skipping strip_target
+endif
 
 post_strip_target: $(STRIP_TARGET)
 

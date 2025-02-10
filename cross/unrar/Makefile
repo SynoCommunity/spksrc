@@ -1,5 +1,5 @@
 PKG_NAME = unrar
-PKG_VERS = 6.2.10
+PKG_VERS = 6.2.12
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)src-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.rarlab.com/rar

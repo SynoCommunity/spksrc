@@ -1,7 +1,7 @@
-diff -uprN ../rtorrent-0.9.8-old/src/Makefile.am ./src/Makefile.am
---- ../rtorrent-0.9.8-old/src/Makefile.am	2019-07-19 11:38:33.000000000 +0000
-+++ ./src/Makefile.am	2020-10-07 00:30:17.409997779 +0000
-@@ -29,6 +29,7 @@ libsub_root_a_SOURCES = \
+diff -uprN ../rtorrent-eacf9798e2787df7dd4d5c800a46bac7931ac41c-orig/src/Makefile.am ./src/Makefile.am
+--- ../rtorrent-eacf9798e2787df7dd4d5c800a46bac7931ac41c-orig/src/Makefile.am	2024-08-20 17:56:03.000000000 +0000
++++ ./src/Makefile.am	2024-08-30 12:25:51.533847996 +0000
+@@ -181,6 +181,7 @@ libsub_root_a_SOURCES = \
  	control.h \
  	globals.cc \
  	globals.h \
@@ -9,10 +9,19 @@ diff -uprN ../rtorrent-0.9.8-old/src/Makefile.am ./src/Makefile.am
  	option_parser.cc \
  	option_parser.h \
  	signal_handler.cc \
-diff -uprN ../rtorrent-0.9.8-old/src/Makefile.in ./src/Makefile.in
---- ../rtorrent-0.9.8-old/src/Makefile.in	2020-10-07 00:30:12.573969139 +0000
-+++ ./src/Makefile.in	2020-10-07 00:30:17.405997755 +0000
-@@ -444,6 +444,7 @@ libsub_root_a_SOURCES = \
+diff -uprN ../rtorrent-eacf9798e2787df7dd4d5c800a46bac7931ac41c-orig/src/Makefile.in ./src/Makefile.in
+--- ../rtorrent-eacf9798e2787df7dd4d5c800a46bac7931ac41c-orig/src/Makefile.in	2024-08-30 12:25:15.881424928 +0000
++++ ./src/Makefile.in	2024-08-30 12:28:12.033508331 +0000
+@@ -433,7 +433,7 @@ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+ noinst_LIBRARIES = libsub_root.a
+-rtorrent_LDADD = libsub_root.a @PTHREAD_LIBS@
++rtorrent_LDADD = libsub_root.a .libs/liblinux-atomic.a @PTHREAD_LIBS@
+ rtorrent_SOURCES = main.cc
+ libsub_root_a_SOURCES = \
+ 	core/curl_get.cc \
+@@ -612,6 +612,7 @@ libsub_root_a_SOURCES = \
  	control.h \
  	globals.cc \
  	globals.h \
@@ -20,15 +29,7 @@ diff -uprN ../rtorrent-0.9.8-old/src/Makefile.in ./src/Makefile.in
  	option_parser.cc \
  	option_parser.h \
  	signal_handler.cc \
-@@ -461,6 +462,7 @@ rtorrent_LDADD = \
- 	input/libsub_input.a \
- 	rpc/libsub_rpc.a \
- 	utils/libsub_utils.a \
-+	.libs/liblinux-atomic.a \
- 	@PTHREAD_LIBS@
- 
- rtorrent_SOURCES = \
-@@ -604,6 +606,9 @@ am--depfiles: $(am__depfiles_remade)
+@@ -1004,6 +1005,9 @@ am--depfiles: $(am__depfiles_remade)
  @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
  @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
  
@@ -36,5 +37,5 @@ diff -uprN ../rtorrent-0.9.8-old/src/Makefile.in ./src/Makefile.in
 +@am__fastdepCXX_TRUE@	$(LTCOMPILE) -c -o $@ $<
 +
  .cc.obj:
- @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
- @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+ @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+ @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\

@@ -1,10 +1,12 @@
 PKG_NAME = gitea
-PKG_VERS = 1.17.3
+PKG_VERS = 1.23.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/go-gitea/gitea/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
 BUILD_DEPENDS = native/go native/nodejs
 

@@ -1,6 +1,6 @@
 PKG_NAME = moreutils
-PKG_VERS = 0.67
-PKG_EXT = tar.gz
+PKG_VERS = 0.69
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).orig.$(PKG_EXT)
 PKG_DIST_SITE = https://deb.debian.org/debian/pool/main/m/moreutils/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
@@ -24,4 +24,4 @@ moreutils_configure:
 .PHONY: moreutils_install
 moreutils_install:
 	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
-	@$(RUN) install -t $(STAGING_INSTALL_PREFIX)/bin/ isutf8 ifdata ifne pee sponge mispipe lckdo parallel errno   
+	@$(RUN) install -t $(STAGING_INSTALL_PREFIX)/bin/ isutf8 ifdata ifne pee sponge mispipe lckdo parallel errno ts

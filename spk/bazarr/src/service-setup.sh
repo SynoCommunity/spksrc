@@ -1,4 +1,4 @@
-FFMPEG_DIR="/var/packages/ffmpeg/target/bin"
+FFMPEG_DIR="/var/packages/ffmpeg7/target/bin"
 PYTHON_DIR="/var/packages/python311/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${FFMPEG_DIR}:${PATH}"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"

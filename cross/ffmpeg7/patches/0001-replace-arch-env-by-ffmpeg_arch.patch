@@ -1,0 +1,73 @@
+diff -uprN ../ffmpeg-7.0.2-orig/configure ./configure
+--- ../ffmpeg-7.0.2-orig/configure	2024-08-02 22:55:25.000000000 +0000
++++ ./configure	2024-09-26 23:24:05.795747855 +0000
+@@ -8006,7 +8006,7 @@ ifndef MAIN_MAKEFILE
+ SRC_PATH:=\$(SRC_PATH:.%=..%)
+ endif
+ CC_IDENT=$cc_ident
+-ARCH=$arch
++FFMPEG_ARCH=$arch
+ INTRINSICS=$intrinsics
+ EXTERN_PREFIX=$extern_prefix
+ CC=$cc
+diff -uprN ../ffmpeg-7.0.2-orig/ffbuild/common.mak ./ffbuild/common.mak
+--- ../ffmpeg-7.0.2-orig/ffbuild/common.mak	2024-08-02 22:55:21.000000000 +0000
++++ ./ffbuild/common.mak	2024-09-26 23:24:05.795747855 +0000
+@@ -186,8 +186,8 @@ DEP_LIBS := $(foreach lib,$(FFLIBS),$(ca
+ STATIC_DEP_LIBS := $(foreach lib,$(FFLIBS),$(call PATH_LIBNAME,$(lib)))
+ 
+ SRC_DIR    := $(SRC_PATH)/lib$(NAME)
+-ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(ARCH)/*.h))
+-SKIPHEADERS += $(ARCH_HEADERS:%=$(ARCH)/%) $(SKIPHEADERS-)
++ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(FFMPEG_ARCH)/*.h))
++SKIPHEADERS += $(ARCH_HEADERS:%=$(FFMPEG_ARCH)/%) $(SKIPHEADERS-)
+ SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
+ HOBJS        = $(filter-out $(SKIPHEADERS:.h=.h.o),$(ALLHEADERS:.h=.h.o))
+ PTXOBJS      = $(filter %.ptx.o,$(OBJS))
+diff -uprN ../ffmpeg-7.0.2-orig/ffbuild/library.mak ./ffbuild/library.mak
+--- ../ffmpeg-7.0.2-orig/ffbuild/library.mak	2024-08-01 23:22:48.000000000 +0000
++++ ./ffbuild/library.mak	2024-09-26 23:25:34.213947849 +0000
+@@ -75,7 +75,7 @@ endif
+ 
+ clean::
+ 	$(RM) $(addprefix $(SUBDIR),$(CLEANFILES) $(CLEANSUFFIXES) $(LIBSUFFIXES)) \
+-	    $(CLEANSUFFIXES:%=$(SUBDIR)$(ARCH)/%) $(CLEANSUFFIXES:%=$(SUBDIR)tests/%)
++	    $(CLEANSUFFIXES:%=$(SUBDIR)$(FFMPEG_ARCH)/%) $(CLEANSUFFIXES:%=$(SUBDIR)tests/%)
+ 
+ install-lib$(NAME)-shared: $(SUBDIR)$(SLIBNAME)
+ 	$(Q)mkdir -p "$(SHLIBDIR)"
+diff -uprN ../ffmpeg-7.0.2-orig/libavcodec/Makefile ./libavcodec/Makefile
+--- ../ffmpeg-7.0.2-orig/libavcodec/Makefile	2024-08-02 22:55:21.000000000 +0000
++++ ./libavcodec/Makefile	2024-09-26 23:26:30.196700774 +0000
+@@ -64,7 +64,7 @@ OBJS = ac3_parser.o
+ 
+ # subsystems
+ include $(SRC_PATH)/libavcodec/vvc/Makefile
+--include $(SRC_PATH)/libavcodec/$(ARCH)/vvc/Makefile
++-include $(SRC_PATH)/libavcodec/$(FFMPEG_ARCH)/vvc/Makefile
+ OBJS-$(CONFIG_AANDCTTABLES)            += aandcttab.o
+ OBJS-$(CONFIG_AC3DSP)                  += ac3dsp.o ac3.o ac3tab.o
+ OBJS-$(CONFIG_ADTS_HEADER)             += adts_header.o mpeg4audio_sample_rates.o
+diff -uprN ../ffmpeg-7.0.2-orig/Makefile ./Makefile
+--- ../ffmpeg-7.0.2-orig/Makefile	2024-08-02 22:55:21.000000000 +0000
++++ ./Makefile	2024-09-26 23:24:05.796747868 +0000
+@@ -110,7 +110,7 @@ define DOSUBDIR
+ $(foreach V,$(SUBDIR_VARS),$(eval $(call RESET,$(V))))
+ SUBDIR := $(1)/
+ include $(SRC_PATH)/$(1)/Makefile
+--include $(SRC_PATH)/$(1)/$(ARCH)/Makefile
++-include $(SRC_PATH)/$(1)/$(FFMPEG_ARCH)/Makefile
+ -include $(SRC_PATH)/$(1)/$(INTRINSICS)/Makefile
+ include $(SRC_PATH)/ffbuild/library.mak
+ endef
+diff -uprN ../ffmpeg-7.0.2-orig/tests/checkasm/Makefile ./tests/checkasm/Makefile
+--- ../ffmpeg-7.0.2-orig/tests/checkasm/Makefile	2024-08-02 22:55:22.000000000 +0000
++++ ./tests/checkasm/Makefile	2024-09-26 23:27:28.687482467 +0000
+@@ -101,6 +101,6 @@ checkasm: $(CHECKASM)
+ testclean:: checkasmclean
+ 
+ checkasmclean:
+-	$(RM) $(CHECKASM) $(CLEANSUFFIXES:%=tests/checkasm/%) $(CLEANSUFFIXES:%=tests/checkasm/$(ARCH)/%)
++	$(RM) $(CHECKASM) $(CLEANSUFFIXES:%=tests/checkasm/%) $(CLEANSUFFIXES:%=tests/checkasm/$(FFMPEG_ARCH)/%)
+ 
+ .PHONY: checkasm

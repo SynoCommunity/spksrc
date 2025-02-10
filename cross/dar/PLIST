@@ -6,5 +6,5 @@ bin:bin/dar_split
 bin:bin/dar_xform
 rsc:etc/darrc
 lnk:lib/libdar64.so
-lnk:lib/libdar64.so.5000
-lib:lib/libdar64.so.5000.13.5
+lnk:lib/libdar64.so.6000
+lib:lib/libdar64.so.6000.8.0

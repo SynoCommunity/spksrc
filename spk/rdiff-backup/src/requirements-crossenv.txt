@@ -1,18 +1,17 @@
-rdiff-backup==2.2.5
+rdiff-backup==2.2.6
 
-aiohttp==3.8.5
-charset-normalizer==3.2.0
-coverage==7.2.7
-frozenlist==1.4.0
-multidict==6.0.4
+aiohttp==3.10.10
+charset-normalizer==3.4.0
+coverage==7.6.3
+frozenlist==1.5.0
+multidict==6.1.0
 pylibacl==0.7.0
 pyxattr==0.8.1
-yarl==1.9.2
+yarl==1.15.3
 
 # [psutil]
-# Last known version to build on armv5/ppc
-psutil==5.9.1
+psutil==5.9.8
 
 # [PyYAML]
 # Depends: libyaml
-PyYAML==6.0.1
+PyYAML==6.0.2

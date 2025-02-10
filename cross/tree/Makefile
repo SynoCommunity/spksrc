@@ -1,13 +1,14 @@
 PKG_NAME = tree
-PKG_VERS = 2.1.1
-PKG_EXT = tgz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://mama.indstate.edu/users/ice/tree/src
+PKG_VERS = 2.2.1
+PKG_EXT = tar.gz
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/Old-Man-Programmer/tree/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = http://mama.indstate.edu/users/ice/tree/
+HOMEPAGE = https://oldmanprogrammer.net/source.php?dir=projects/tree
 COMMENT  = Tree is a recursive directory listing command that produces a depth indented listing of files, which is colorized ala dircolors if the LS_COLORS environment variable is set and output is to tty.
 LICENSE  = GPLv2
 

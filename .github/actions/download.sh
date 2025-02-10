@@ -7,6 +7,7 @@
 # Functions:
 # - Download all referenced native and cross source files for packages to build.
 # - Download all referenced python wheels needed to build.
+# - use download-all target to get all files when package has multiple (arch specific) files.
 
 set -o pipefail
 
@@ -17,8 +18,8 @@ else
     echo "===> Download packages: ${DOWNLOAD_PACKAGES}"
     for download in ${DOWNLOAD_PACKAGES}
     do
-        echo "$ make -c ${download} download"
-        make -C ${download} download
+        echo "$ make -c ${download} download-all"
+        make -C ${download} download-all
     done
 fi
 
@@ -32,7 +33,7 @@ if [ -z "${build_packages}" ]; then
 else
     for package in ${build_packages}; do
         echo "===> Download wheels: ${package}"
-        make -C spk/${package} wheeldownload
+        make -C spk/${package} download-wheels
     done
 fi
 

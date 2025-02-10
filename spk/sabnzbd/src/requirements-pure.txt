@@ -1,24 +1,39 @@
 # Wheels that absolutely needs
 # to be managed as pure-python
-feedparser==6.0.10
-configobj==5.0.8
-cheroot==10.0.0
-cherrypy==18.8.0
-jaraco.functools==3.9.0
-jaraco.collections==4.3.0
+pycparser==2.22
+feedparser==6.0.11
+configobj==5.0.9
+cheroot==10.0.1
+cherrypy==18.10.0
+jaraco.functools==4.1.0
+jaraco.collections==5.0.0
 jaraco.text==3.8.1 # Newer version introduces irrelevant extra dependencies
-jaraco.classes==3.3.0
+jaraco.classes==3.4.0
 jaraco.context==4.3.0
-more-itertools==10.1.0
+more-itertools==10.4.0
 zc.lockfile==3.0.post1
-python-dateutil==2.8.2
-tempora==5.5.0
-pytz==2023.3.post1
+python-dateutil==2.9.0.post0
+tempora==5.7.0
+pytz==2024.2
 sgmllib3k==1.0.0
 portend==3.2.0
 chardet==5.2.0
 PySocks==1.7.1
-puremagic==1.15
-guessit==3.7.1
-babelfish==0.6.0
+puremagic==1.28
+guessit==3.8.0
+babelfish==0.6.1
 rebulk==3.2.0
+
+# Apprise Requirements
+apprise==1.9.0
+requests==2.32.3
+requests-oauthlib==2.0.0
+markdown==3.7
+paho-mqtt==1.6.1 # Pinned, newer versions don't work with AppRise yet
+
+# Requests Requirements
+idna==3.10
+urllib3==2.2.3
+oauthlib==3.2.2
+PyJWT==2.10.1
+blinker==1.9.0

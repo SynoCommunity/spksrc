@@ -3,26 +3,67 @@ name: Build
 on:
   workflow_dispatch:
     inputs:
-      package:
-        description: 'Package to build'
-        required: true
-        default: 'syno-magnet'
       publish:
         description: 'Publish to repository'
         required: false
-        default: 'false'
+        default: false
+        type: boolean
+      package:
+        description: 'Package to build'
+        required: true
+        default: 'adminer'
+      add_noarch_builds:
+        description: 'Include noarch packages'
+        required: false
+        default: true
+        type: boolean
+      add_noarch_dsm72_builds:
+        description: 'Include noarch DSM 7.2 packages'
+        required: false
+        default: false
+        type: boolean
+      add_dsm72_builds:
+        description: 'Include DSM 7.2 archs'
+        required: false
+        default: false
+        type: boolean
+      add_dsm71_builds:
+        description: 'Include DSM 7.1 archs'
+        required: false
+        default: true
+        type: boolean
+      add_dsm62_builds:
+        description: 'Include DSM 6.2 archs'
+        required: false
+        default: true
+        type: boolean
+      add_dsm52_builds:
+        description: 'Include DSM 5.2 archs'
+        required: false
+        default: false
+        type: boolean
+      add_srm13_builds:
+        description: 'Include SRM 1.3 archs'
+        required: false
+        default: false
+        type: boolean
+      add_srm12_builds:
+        description: 'Include SRM 1.2 archs'
+        required: false
+        default: false
+        type: boolean
   pull_request:
     paths:
-    - 'spk/**'
-    - 'cross/**'
-    - 'native/**'
+      - 'spk/**'
+      - 'cross/**'
+      - 'native/**'
   push:
     branches:
       - "**"
     paths:
-    - 'spk/**'
-    - 'cross/**'
-    - 'native/**'
+      - 'spk/**'
+      - 'cross/**'
+      - 'native/**'
 
 jobs:
   prepare:
@@ -30,38 +71,44 @@ jobs:
     runs-on: ubuntu-latest
     # provide results to other jobs
     outputs:
-        arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
-        noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
+      arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
+      noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
+      has_min_dsm72_packages: ${{ steps.dependencies.outputs.has_min_dsm72_packages }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0
-            persist-credentials: false
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Get changed files for pull request
+      - name: Get changed spk_packages and dependency_folders for pull request
         if: github.event_name == 'pull_request'
-        id: getfile_pr
+        id: getchanges_pr
         run: |
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs
-          echo "files=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
+          echo "spk_packages=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
-      - name: Get changed files for push
+      - name: Get changed spk_packages and dependency_folders of last commit for push
         if: github.event_name == 'push'
-        id: getfile
+        id: getchanges_push
         run: |
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs
-          echo "files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
+          echo "spk_packages=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Evaluate dependencies
         id: dependencies
         run: ./.github/actions/prepare.sh
         env:
-          GH_FILES: ${{ steps.getfile.outputs.files }} ${{ steps.getfile_pr.outputs.files }}
-          SPK_TO_BUILD: ${{ github.event.inputs.package }}
+          GH_SPK_PACKAGES: ${{ steps.getchanges_push.outputs.spk_packages }} ${{ steps.getchanges_pr.outputs.spk_packages }}
+          GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges_push.outputs.dependency_folders }} ${{ steps.getchanges_pr.outputs.dependency_folders }}
+          USER_SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
       - name: Cache downloaded files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: distrib
           # use run_id in key to cache within workflow only.
@@ -74,29 +121,141 @@ jobs:
           ARCH_PACKAGES: ${{ needs.prepare.outputs.arch_packages }}
           NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
 
+  set-defaults:
+    name: Set Defaults
+    runs-on: ubuntu-latest
+    needs: prepare
+    outputs:
+      matrix: ${{ steps.defaults.outputs.matrix }}
+      has_entries: ${{ steps.defaults.outputs.has_entries }}
+    steps:
+      - id: defaults
+        run: |
+          # Retrieve inputs and package availability
+          add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
+          add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
+          add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || 'false' }}
+          add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
+          add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
+          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
+          add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
+          add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
+          has_noarch_packages=$([ -n "${{ needs.prepare.outputs.noarch_packages }}" ] && echo "true" || echo "false")
+          has_arch_packages=$([ -n "${{ needs.prepare.outputs.arch_packages }}" ] && echo "true" || echo "false")
+          has_min_dsm72_packages=${{ needs.prepare.outputs.has_min_dsm72_packages || 'false' }}
+
+          # Dynamic logic for automatic builds
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            # Enable noarch builds if noarch packages exist
+            add_noarch_builds=$([ "$has_noarch_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable noarch DSM 7.2 builds if noarch packages exist and minimum DSM 7.2 requirements are met
+            add_noarch_dsm72_builds=$([ "$has_noarch_packages" == "true" ] && [ "$has_min_dsm72_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable DSM 7.2 builds if arch packages exist and minimum DSM 7.2 requirements are met
+            add_dsm72_builds=$([ "$has_arch_packages" == "true" ] && [ "$has_min_dsm72_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable DSM 7.1 builds if arch packages exist
+            add_dsm71_builds=$([ "$has_arch_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable DSM 6.2 builds if arch packages exist
+            add_dsm62_builds=$([ "$has_arch_packages" == "true" ] && echo "true" || echo "false")
+          fi
+
+          # Build matrix
+          matrix=$(jq -n '{"include": []}')
+
+          # Helper function to add entries to the matrix
+          add_to_matrix() {
+            matrix=$(echo "$matrix" | jq --arg arch "$1" '.include += [{"arch": $arch}]')
+          }
+
+          # Add noarch builds
+          if [ "$add_noarch_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
+            add_to_matrix "noarch-1.1"
+            add_to_matrix "noarch-3.1"
+            add_to_matrix "noarch-6.1"
+            add_to_matrix "noarch-7.0"
+          fi
+
+          # Add noarch DSM 7.2 builds
+          if [ "$add_noarch_dsm72_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
+            add_to_matrix "noarch-7.2"
+          fi
+
+          # Add DSM 7.2 builds
+          if [ "$add_dsm72_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x64-7.2"
+            add_to_matrix "aarch64-7.2"
+            add_to_matrix "armv7-7.2"
+          fi
+
+          # Add DSM 7.1 builds
+          if [ "$add_dsm71_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x64-7.1"
+            add_to_matrix "aarch64-7.1"
+            add_to_matrix "evansport-7.1"
+            add_to_matrix "armv7-7.1"
+            add_to_matrix "comcerto2k-7.1"
+          fi
+
+          # Add DSM 6.2 builds
+          if [ "$add_dsm62_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x64-6.2.4"
+            add_to_matrix "aarch64-6.2.4"
+            add_to_matrix "evansport-6.2.4"
+            add_to_matrix "armv7-6.2.4"
+            add_to_matrix "hi3535-6.2.4"
+            add_to_matrix "88f6281-6.2.4"
+            add_to_matrix "qoriq-6.2.4"
+          fi
+
+          # Add DSM 5.2 builds
+          if [ "$add_dsm52_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x86-5.2"
+            add_to_matrix "88f6281-5.2"
+            add_to_matrix "ppc853x-5.2"
+          fi
+
+          # Add SRM 1.3 builds
+          if [ "$add_srm13_builds" == "true" ]; then
+            add_to_matrix "aarch64-1.3"
+            add_to_matrix "armv7-1.3"
+          fi
+
+          # Add SRM 1.2 builds
+          if [ "$add_srm12_builds" == "true" ]; then
+            add_to_matrix "armv7-1.2"
+          fi
+
+          # Output the final matrix
+          echo "matrix=$(echo $matrix | jq -c)" >> $GITHUB_OUTPUT
+
+          # Output if the matrix has entries
+          echo "has_entries=$(jq -e '.include | length > 0' <<< "$matrix" > /dev/null && echo true || echo false)" >> $GITHUB_OUTPUT
+
   build:
     name: Build
-    needs: prepare
+    needs: [prepare, set-defaults]
     runs-on: ubuntu-latest
+    if: ${{ needs.set-defaults.outputs.has_entries == 'true' }}
     strategy:
       fail-fast: false
-      matrix:
-        # x64=x86_64, evansport=i686, aarch64=armv8, armv7, hi3535=armv7l, 88f6281=armv5, qoriq=ppc
-        # https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures
-        arch: [noarch, noarch-6.1, noarch-7.0, x64-6.2.4, x64-7.1, evansport-6.2.4, evansport-7.1, aarch64-6.2.4, aarch64-7.1, armv7-6.2.4, armv7-7.1, hi3535-6.2.4, 88f6281-6.2.4, qoriq-6.2.4, comcerto2k-7.1]
-
+      matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Cache toolchains
-        uses: actions/cache@v3
+        uses: actions/cache@v4
+        # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
+        if: ${{ contains(matrix.arch,'qoriq') == false }}
         with:
           path: toolchain/*/work
-          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles('toolchain/*/digests') }}
+          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
 
       - name: Use cache of downloaded files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: distrib
           key: distrib-${{ github.run_id }}
@@ -136,7 +295,7 @@ jobs:
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Packages for ${{ matrix.arch }}
           path: packages/*.spk

@@ -1,6 +1,6 @@
 SPK_NAME = prowlarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/prowlarr.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
@@ -12,7 +12,7 @@ DOTNET_SERVARR_ARCHS = 1
 MAINTAINER = Team Prowlarr
 MAINTAINER_URL = https://prowlarr.com/
 DESCRIPTION = Prowlarr is an indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps. Prowlarr supports management of both Torrent Trackers and Usenet Indexers. It integrates seamlessly with Lidarr, Mylar3, Radarr, Readarr, and Sonarr offering complete management of your indexers with no per app Indexer setup required \(we do it all\).
-CHANGELOG = "1. Fix dotnet dependencies for DSM 7.2.<br/>2. Update Prowlarr to v1.3.2.3006."
+CHANGELOG = "1. Update Prowlarr to v1.24.3.4754."
 DISPLAY_NAME = Prowlarr
 HOMEPAGE = https://prowlarr.com/
 LICENSE  = GPLv3

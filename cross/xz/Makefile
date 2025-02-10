@@ -1,8 +1,8 @@
 PKG_NAME = xz
-PKG_VERS = 5.2.6
+PKG_VERS = 5.6.3
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://tukaani.org/xz
+PKG_DIST_SITE = https://github.com/tukaani-project/xz/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

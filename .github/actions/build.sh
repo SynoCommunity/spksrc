@@ -9,11 +9,13 @@
 # - Build for arch defined by ${GH_ARCH} (e.g. x64-6.1, noarch, ...).
 # - Successfully built packages are logged to $BUILD_SUCCESS_FILE.
 # - Failed builds are logged to ${BUILD_ERROR_FILE} and annotated as error.
+# - For failed builds, the make command and the latest 15 lines of the build output are written to ${BUILD_ERROR_LOGFILE}
 # - The build output is structured into log groups by package.
 # - As the disk space in the workflow environment is limitted, we clean the
 #   work folder of each package after build. At 2020.06 this limit is 14GB.
-# - ffmpeg (spk/ffmpeg4), ffmpeg5 and ffmpeg6 are not cleaned to be available for dependents.
-# - Therefore ffmpeg4, ffmpeg5 and ffmpeg6 are built first if triggered by its
+# - synocli-videodriver and ffmpeg5-7 are not cleaned to be available for dependents.
+# - Therefore synocli-videodriver is built first if triggered by ffmpeg5-7
+# - Therefore ffmpeg5 and ffmpeg7 are built second if triggered by its
 #   own or a dependent (see prepare.sh).
 
 set -o pipefail
@@ -59,7 +61,7 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
 fi
 
 # Build
-PACKAGES_TO_KEEP="ffmpeg4 ffmpeg5 ffmpeg6 python310 python311"
+PACKAGES_TO_KEEP="synocli-videodriver ffmpeg5 ffmpeg7 python310 python311 python312  python313"
 for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"
@@ -79,8 +81,14 @@ do
         else
             TCVERSION=${GH_ARCH##*-}
         fi
-        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
-        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+        # noarch package must be first built then published
+        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}" >>build.log
+        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} |& tee >(tail -15 >>build.log)
+
+        if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
+            echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
+            make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+        fi
     fi
     result=$?
 
@@ -95,7 +103,10 @@ do
 
     if [ "$(echo ${PACKAGES_TO_KEEP} | grep -ow ${package})" = "" ]; then
         # free disk space (but not for packages to keep)
-        make -C ./spk/${package} clean
+        make -C ./spk/${package} clean |& tee >(tail -15 >>build.log)
+    else
+        # free disk space by removing source and staging directories (for packages to keep)
+        make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
     fi
 
     echo "::endgroup::"

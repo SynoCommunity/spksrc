@@ -5,7 +5,11 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = cross/$(PYTHON_PACKAGE)
+ifeq ($(strip $(PYTHON_PACKAGE)),)
+PYTHON_PACKAGE = python311
+endif
+
+BUILD_DEPENDS = cross/python311
 DEPENDS = cross/openssl3 cross/libicu cross/zlib
 
 # configure: No compiler with C++11 support was found

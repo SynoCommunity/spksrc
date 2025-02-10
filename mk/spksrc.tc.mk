@@ -3,19 +3,22 @@
 SHELL := $(SHELL) -e
 default: all
 
-WORK_DIR := $(shell pwd)/work
+WORK_DIR := $(CURDIR)/work
 include ../../mk/spksrc.directories.mk
 
 include ../../mk/spksrc.common.mk
+
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+# Include ross-rust-env.mk to generate install its toolchain
+include ../../mk/spksrc.cross-rust-env.mk
 
 # Include cross-cmake-env.mk to generate its toolchain file
 include ../../mk/spksrc.cross-cmake-env.mk
 
 # Include cross-meson-env.mk to generate its toolchain file
 include ../../mk/spksrc.cross-meson-env.mk
-
-##### rust specific configurations
-include ../../mk/spksrc.cross-rust-env.mk
 
 # Configure the included makefiles
 URLS                = $(TC_DIST_SITE)/$(TC_DIST_NAME)
@@ -38,6 +41,8 @@ TC_LOCAL_VARS_MESON = $(WORK_DIR)/tc_vars.meson
 #####
 
 RUN = cd $(WORK_DIR)/$(TC_TARGET) && env $(ENV)
+
+include ../../mk/spksrc.depend.mk
 
 download:
 include ../../mk/spksrc.download.mk
@@ -63,7 +68,7 @@ include ../../mk/spksrc.tc-flags.mk
 rustc: flag
 include ../../mk/spksrc.tc-rust.mk
 
-all: rustc $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON) $(TC_LOCAL_VARS_MK)
+all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON) $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK):
@@ -89,6 +94,9 @@ ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	@echo "set(ARCH $(CMAKE_ARCH))"
 endif
+	@echo
+	@echo "# Disable developer warnings" ; \
+	echo 'set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "Disable developer warnings")'
 	@echo
 	@echo "# define toolchain location (used with CMAKE_TOOLCHAIN_PKG)" ; \
 	echo "set(_CMAKE_TOOLCHAIN_LOCATION $(_CMAKE_TOOLCHAIN_LOCATION))" ; \
@@ -121,19 +129,34 @@ endif
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY $(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY))" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))"
 
+
+
 .PHONY: meson_vars
 meson_vars:
+	@echo "[host_machine]" ; \
+	echo "system = 'linux'" ; \
+	echo "cpu_family = '$(MESON_HOST_CPU_FAMILY)'" ; \
+	echo "cpu = '$(MESON_HOST_CPU)'" ; \
+	echo "endian = '$(MESON_HOST_ENDIAN)'"
+	@echo
+	@echo "[binaries]" ; \
+	for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "cpp" ]; then \
+	    echo "#$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)cpp'" ; \
+	  else \
+	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	  fi ; \
+	done
+	@echo
 	@echo "[built-in]" ; \
 	echo "c_args = ['$(MESON_BUILTIN_C_ARGS)']" ; \
 	echo "c_link_args = ['$(MESON_BUILTIN_C_LINK_ARGS)']" ; \
 	echo "cpp_args = ['$(MESON_BUILTIN_CPP_ARGS)']" ; \
 	echo "cpp_link_args = ['$(MESON_BUILTIN_CPP_LINK_ARGS)']"
 	@echo
-	@echo "[host_machine]" ; \
-	echo "system = 'linux'" ; \
-	echo "cpu_family = '$(MESON_HOST_CPU_FAMILY)'" ; \
-	echo "cpu = '$(MESON_HOST_CPU)'" ; \
-	echo "endian = '$(MESON_HOST_ENDIAN)'"
 
 .PHONY: tc_vars
 tc_vars: flag
@@ -154,9 +177,11 @@ tc_vars: flag
 	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
 	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
+	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
 	echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
 	echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_SYSROOT := $(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
@@ -182,10 +207,6 @@ ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 else
 	@echo TC_KERNEL := $(TC_KERNEL)
 endif
-
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

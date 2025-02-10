@@ -1,40 +1,39 @@
-# Snapshot using python 3.11 on Jul 22nd 2023
+# Snapshot using python 3.11 on Nov 10th 2024
 #aiohttp                     ==> crossenv
 aiosignal==1.3.1
-async-timeout==4.0.2
-attrs==23.1.0
-cachetools==5.3.1
+async-timeout==5.0.1
+attrs==24.2.0
+cachetools==5.5.0
 #certifi                     ==> py311
-chardet==5.1.0
+chardet==5.2.0
 colorama==0.4.6
 #coverage                    ==> crossenv
 #distlib                     ==> py311
 #filelock                    ==> py311
-flake8==6.0.0
+flake8==7.1.1
 #frozenlist                  ==> crossenv
-idna==3.4
+idna==3.10
 mccabe==0.7.0
 #multidict                   ==> crossenv
-packaging==23.1
+packaging==24.2
 #platformdirs                ==> py311
-pluggy==1.2.0
+pluggy==1.5.0
 #psutil                      ==> crossenv
 py==1.11.0
-pycodestyle==2.10.0
-pyflakes==3.0.1
+pycodestyle==2.12.1
+pyflakes==3.2.0
 #pylibacl                    ==> crossenv
-pyparsing==3.1.0
-pyproject-api==1.5.3
+pyparsing==3.2.0
+pyproject_api==1.8.0
 #pyxattr                     ==> crossenv
 #PyYAML                      ==> crossenv
 #rdiff-backup                ==> crossenv
-requests==2.31.0
-rqdb==1.0.11
-setuptools-scm==7.1.0
+requests==2.32.3
+rqdb==1.6.1
 #six                         ==> py311
-tomli==2.0.1
-tox==4.6.4
-typing_extensions==4.7.1
-urllib3==2.0.4
+tomli==2.0.2
+tox==4.23.2
+typing_extensions==4.12.2
+urllib3==2.2.3
 #virtualenv                  ==> py311
 #yarl                        ==> crossenv

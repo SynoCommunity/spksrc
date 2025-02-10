@@ -1,0 +1,15 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
+# [numpy]
+#   - Require Cython in crossenv
+#   - Numpy >= 1.26.x requires:
+#           c++17, meson-python, scikit-build-core
+#   - Older version <= 1.25.x no longer supported
+numpy==2.2.2
+numpy==2.1.3
+numpy==2.0.2
+numpy==1.26.4

@@ -1,8 +1,8 @@
 PKG_NAME = lz4
-PKG_VERS = 1.9.4
+PKG_VERS = 1.10.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/lz4/lz4/archive/
+PKG_DIST_SITE = https://github.com/lz4/lz4/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)/build/cmake
 
@@ -13,3 +13,8 @@ COMMENT  = LZ4 is lossless compression algorithm, providing compression speed at
 LICENSE  = BSD
 
 include ../../mk/spksrc.cross-cmake.mk
+
+include ../../mk/spksrc.archs.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ADDITIONAL_LDFLAGS += -lrt
+endif

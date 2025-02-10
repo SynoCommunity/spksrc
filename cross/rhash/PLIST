@@ -12,4 +12,4 @@ lnk:bin/tth-hash
 lnk:bin/whirlpool-hash
 rsc:etc/rhashrc
 lnk:lib/librhash.so.1
-lib:lib/librhash.so.1.4.4
+lib:lib/librhash.so.1.4.5
