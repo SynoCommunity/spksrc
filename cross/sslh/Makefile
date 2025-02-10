@@ -34,6 +34,6 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: sslh_install
 sslh_install:
 	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
-	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/sslh-fork $(STAGING_INSTALL_PREFIX)/bin/sslh
+	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/sslh-fork $(STAGING_INSTALL_PREFIX)/bin/
 	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/sslh-select $(STAGING_INSTALL_PREFIX)/bin/
 	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/sslh-ev $(STAGING_INSTALL_PREFIX)/bin/
