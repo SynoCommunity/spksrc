@@ -30,3 +30,4 @@ include ../../mk/spksrc.spk.mk
 sslh_extra_install:
 	@install -m 755 -d $(STAGING_DIR)/var
 	@install -m 644 src/sslh.cfg $(STAGING_DIR)/var/sslh.cfg
+	@install -m 644 src/example.cfg $(STAGING_DIR)/var/example.cfg
