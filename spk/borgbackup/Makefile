@@ -9,17 +9,28 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 DEPENDS = cross/attr cross/acl cross/openssl3 cross/lz4 cross/libb2 cross/fuse cross/xxhash cross/zstd
 
-# Requirements file generation
-# - first create borgbackup wheel defined in src/requirements-crossenv.txt
-# cd src
-# /spksrc/native/python311/work-native/install/usr/local/bin/python3 -m venv borg-env
-# . borg-env/bin/activate
-# pip install ../work-x64-6.1/install/var/packages/borgbackup/target/share/wheelhouse/borgbackup*.whl borgmatic emborg llfuse
-# pip freeze > requirements.txt
-# deactivate
-# # evaluate which dependencies are cross wheels:
-# find env/lib/python3.10/site-packages/ -name WHEEL -exec grep -iH pure {} \; | grep false
-# # finally divide requirements into *-crossenv.txt and *-pure.txt
+# # Generate Requirements File
+# 
+# # 1. Set up the development environment
+# # If you don't have an spksrc environment set up, run the following in your target folder:
+# git clone https://github.com/SynoCommunity/spksrc.git
+# 
+# # 2. Install required dependencies for Borg
+# sudo apt-get update
+# sudo apt-get install build-essential liblz4-dev libzstd-dev libxxhash-dev acl-dev libfuse-dev
+# 
+# # 3. Prepare the requirements generation script
+# cd spksrc/spk/borgbackup/
+# curl -O https://gist.githubusercontent.com/hgy59/6676a55ea8b0b0264af7f23850f5e7c8/raw/8d0a3912069c746d1a1fb1d23ca9d650e2ec331d/generate_requirements.sh
+# sudo chmod +x generate_requirements.sh
+# 
+# # 4. Generate the requirements file
+# ./generate_requirements.sh "borgbackup borgmatic emborg llfuse" 312
+# 
+# # 5. Post-generation
+# # The script will create three files (pure, cross, and combined) for the Borg deployment
+# # with Python 3.12. Use the pure and cross requirement files as the base for your PR.
+
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # Force building pure-python wheels (issue #5204)
@@ -30,7 +41,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgmatic to v1.9.8. <br/>2. Update emborg to v1.41. <br/>3. Migrate to Python 3.12."
+CHANGELOG = "1. Update borgmatic to v1.9.10. <br/>2. Update emborg to v1.41. <br/>3. Migrate to Python 3.12."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
