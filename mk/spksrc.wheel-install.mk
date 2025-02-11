@@ -79,13 +79,15 @@ install_python_wheel:
 		fi ; \
 		if stat -t *.whl >/dev/null 2>&1; then \
 			for w in *.whl; do \
-				if echo $${w} | grep -iq "-none-any\.whl" ; then \
+				if echo $${w} | grep -Eiq 'manylinux.*\.whl' ; then \
+					_new_name=$${w} ; \
+				elif echo $${w} | grep -iq "-none-any\.whl" ; then \
 					_new_name=$$(echo $$w | cut -d"-" -f -3)-none-any.whl ; \
 				else \
 					_new_name=$$(echo $$w | sed -E "s/(.*-).*(linux_).*(\.whl)/\1\2$(PYTHON_ARCH)\3/") ; \
 				fi ; \
-				$(MSG) Copying to wheelhouse: $$_new_name ; \
-				cp -f $$w $(STAGING_INSTALL_WHEELHOUSE)/$$_new_name ; \
+				$(MSG) "Copying to wheelhouse: $${w} -> share/wheelhouse/$${_new_name}" ; \
+				cp -f $${w} $(STAGING_INSTALL_WHEELHOUSE)/$${_new_name} ; \
 			done ; \
 		fi ; \
 	fi

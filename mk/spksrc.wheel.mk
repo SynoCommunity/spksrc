@@ -72,7 +72,7 @@ pre_wheel_target: wheel_msg_target
 wheel-%:
 ifneq ($(strip $(WHEELS)),)
 	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS=\"$(WHEELS)\" wheel
-	@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS="$(WHEELS)" wheel --no-print-directory
+	@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS="$(WHEELS)" wheel --no-print-directory | tee --append $(CURDIR)/wheel-$(firstword $(subst -, ,$*))-$(lastword $(subst -, ,$*)).log
 else
 	$(error No python wheel to process)
 endif

@@ -54,9 +54,9 @@ ifeq ($(wildcard $(WHEELHOUSE)),)
 	@mkdir -p $(WHEELHOUSE)
 endif
 	@$(MSG) Compiling wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)]
-ifneq ($(WHEEL_TYPE),pure)
 	@$(MSG) $(MAKE) WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" crossenv-$(ARCH)-$(TCVERSION)
 	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
+ifneq ($(WHEEL_TYPE),pure)
 	@[ "$(WHEEL_TYPE)" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
 	global_options=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs) ; \
 	localCFLAGS=($$(echo $(WHEELS_CFLAGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs)) ; \

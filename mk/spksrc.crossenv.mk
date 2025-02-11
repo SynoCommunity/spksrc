@@ -42,6 +42,11 @@ CROSSENV_CONFIG_PATH = $(abspath $(PYTHON_WORK_DIR)/../crossenv)
 CROSSENV_CONFIG_DEFAULT = $(CROSSENV_CONFIG_PATH)/requirements-default.txt
 CROSSENV_PATH = $(abspath $(WORK_DIR)/crossenv-$(CROSSENV_WHEEL)/)
 
+# manylinux2014 enablement for older archs
+ifneq ($(or $(findstring $(ARCH),comcerto2k), $(findstring 1,$(call version_lt, $(TCVERSION), 7.0))),)
+MANYLINUX = --manylinux manylinux2014
+endif
+
 ###
 
 ifeq ($(strip $(PRE_CROSSENV_TARGET)),)
@@ -100,7 +105,11 @@ CROSSENV_CROSS_WHEEL ?= wheel$(if $(CROSSENV_CROSS_WHEEL_VERSION),==$(CROSSENV_C
 ###
 
 crossenv_msg_target:
+ifneq ($(WHEEL_NAME),)
 	@$(MSG) "Preparing crossenv for $(NAME) - [$(WHEEL_NAME)==$(WHEEL_VERSION)]"
+else
+	@$(MSG) "Preparing crossenv for $(NAME) - [default]"
+endif
 
 # Create per-arch caching directory:
 # PIP_CACHE_DIR defaults to $(WORK_DIR)/pip
@@ -113,7 +122,7 @@ pre_crossenv_target: crossenv_msg_target
 
 crossenv-%:
 	@$(MSG) $(MAKE) ARCH=\"$(firstword $(subst -, ,$*))\" TCVERSION=\"$(lastword $(subst -, ,$*))\" WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv
-	@MAKEFLAGS= $(MAKE) ARCH="$(firstword $(subst -, ,$*))" TCVERSION="$(lastword $(subst -, ,$*))" WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv --no-print-directory
+	@MAKEFLAGS= $(MAKE) ARCH="$(firstword $(subst -, ,$*))" TCVERSION="$(lastword $(subst -, ,$*))" WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv --no-print-directory | tee --append $(CURDIR)/crossenv-$(firstword $(subst -, ,$*))-$(lastword $(subst -, ,$*)).log
 
 ####
 
@@ -171,7 +180,7 @@ build_crossenv_target: pre_crossenv_target
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
 	                        --sysroot $(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
-	                        --manylinux manylinux2014 \
+	                        $(MANYLINUX) \
 	                        "$(CROSSENV_PATH)"
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
@@ -179,7 +188,7 @@ build_crossenv_target: pre_crossenv_target
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
 	                        --sysroot $(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
-	                        --manylinux manylinux2014 \
+	                        $(MANYLINUX) \
 	                        "$(CROSSENV_PATH)"
 ifeq ($(CROSSENV_WHEEL),default)
 	@$(MSG) Setting default crossenv $(CROSSENV_PATH)
