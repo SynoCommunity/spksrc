@@ -1,6 +1,6 @@
 SPK_NAME = dotnet9-runtime
-SPK_VERS = 9.0.1
-SPK_REV = 2
+SPK_VERS = 9.0.2
+SPK_REV = 3
 SPK_ICON = src/dotnet.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
