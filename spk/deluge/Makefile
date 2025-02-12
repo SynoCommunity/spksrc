@@ -1,6 +1,6 @@
 SPK_NAME = deluge
 SPK_VERS = 2.1.1.127
-SPK_REV = 25
+SPK_REV = 24
 SPK_ICON = src/deluge.png
 
 PYTHON_PACKAGE = python311
