@@ -44,7 +44,8 @@ pre_wheel_install_target: wheel_install_msg_target
 
 wheel_install_target: SHELL:=/bin/bash
 wheel_install_target:
-	@$(MSG) Installing wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)] ; \
+	@set -o pipefail; { \
+	$(MSG) Installing wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)] ; \
 	case $(WHEEL_TYPE) in \
 	       abi3) $(MSG) Adding $(WHEEL_NAME)==$(WHEEL_VERSION) to wheelhouse/$(WHEELS_LIMITED_API) ; \
 	             echo $(WHEEL_NAME)==$(WHEEL_VERSION) | sed -e '/^[[:blank:]]*$$\|^#/d' >> $(WHEELHOUSE)/$(WHEELS_LIMITED_API) ; \
@@ -60,13 +61,16 @@ wheel_install_target:
 	             ;; \
 	          *) $(MSG) No type found for wheel [$(WHEEL_NAME)==$(WHEEL_VERSION)] ; \
 	             ;; \
-	esac
-	@for file in $$(ls -1 $(WHEELHOUSE)/requirements-*.txt) ; do \
+	esac ; \
+	for file in $$(ls -1 $(WHEELHOUSE)/requirements-*.txt) ; do \
 	   sort -u -o $${file}{,} ; \
-	done
+	done ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
+install_python_wheel: SHELL:=/bin/bash
 install_python_wheel:
-	@if [ -d "$(WHEELHOUSE)" ] ; then \
+	@set -o pipefail; { \
+	if [ -d "$(WHEELHOUSE)" ] ; then \
 		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
 		cd $(WHEELHOUSE) ; \
 		if stat -t requirements*.txt >/dev/null 2>&1; then \
@@ -88,7 +92,8 @@ install_python_wheel:
 				cp -f $${w} $(STAGING_INSTALL_WHEELHOUSE)/$${_new_name} ; \
 			done ; \
 		fi ; \
-	fi
+	fi ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 
 post_wheel_install_target: $(WHEEL_INSTALL_TARGET)

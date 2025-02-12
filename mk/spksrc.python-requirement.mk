@@ -94,8 +94,40 @@ else
 	      query+=" | awk -F'-' '{print \$$2}'" ; \
 	      version=$$(eval $${query} 2>/dev/null) ; \
 	   fi ; \
-	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$(or $(WHEEL_TYPE),$${type})\" WHEEL_URL=\"$${wheel_url}\" $(REQUIREMENT_GOAL) ; \
-	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$(or $(WHEEL_TYPE),$${type})" WHEEL_URL="$${wheel_url}" $(REQUIREMENT_GOAL) --no-print-directory ; \
+	   if [ "$(REQUIREMENT_GOAL)" = "wheel" ]; then \
+	      $(MSG) $(MAKE) ARCH=\"$(ARCH)\" \
+	                     TCVERSION=\"$(TCVERSION)\" \
+	                     WHEEL_NAME=\"$${name}\" \
+	                     WHEEL_VERSION=\"$${version}\" \
+	                     WHEEL_TYPE=\"$(or $(WHEEL_TYPE),$${type})\" \
+	                     WHEEL_URL=\"$${wheel_url}\" \
+	                     $(REQUIREMENT_GOAL) | tee --append $(WHEEL_LOG) ; \
+	      MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" \
+	                     TCVERSION="$(TCVERSION)" \
+	                     WHEEL_NAME="$${name}" \
+	                     WHEEL_VERSION="$${version}" \
+	                     WHEEL_TYPE="$(or $(WHEEL_TYPE),$${type})" \
+	                     WHEEL_URL="$${wheel_url}" \
+	                     $(REQUIREMENT_GOAL) \
+	                     --no-print-directory | tee --append $(WHEEL_LOG) ; \
+	                     [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
+	   else \
+	      $(MSG) $(MAKE) ARCH=\"$(ARCH)\" \
+	                     TCVERSION=\"$(TCVERSION)\" \
+	                     WHEEL_NAME=\"$${name}\" \
+	                     WHEEL_VERSION=\"$${version}\" \
+	                     WHEEL_TYPE=\"$(or $(WHEEL_TYPE),$${type})\" \
+	                     WHEEL_URL=\"$${wheel_url}\" \
+	                     $(REQUIREMENT_GOAL) ; \
+	      MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" \
+	                     TCVERSION="$(TCVERSION)" \
+	                     WHEEL_NAME="$${name}" \
+	                     WHEEL_VERSION="$${version}" \
+	                     WHEEL_TYPE="$(or $(WHEEL_TYPE),$${type})" \
+	                     WHEEL_URL="$${wheel_url}" \
+	                     $(REQUIREMENT_GOAL) \
+	                     --no-print-directory ; \
+	   fi ; \
 	done
 endif
 

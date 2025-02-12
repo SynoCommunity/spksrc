@@ -25,10 +25,12 @@ prepare_crossenv:
 	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
 ### Python extension module rules
+compile_python_module: SHELL:=/bin/bash
 compile_python_module: prepare_crossenv
 	$(foreach e,$(shell cat $(CROSSENV_MODULE_PATH)/build/python-cc.mk),$(eval $(e)))
 	$(eval PYTHONPATH = $(PYTHON_SITE_PACKAGES_NATIVE):$(PYTHON_LIB_NATIVE):$(INSTALL_DIR)$(INSTALL_PREFIX)/$(PYTHON_LIB_DIR)/site-packages/)
-	@. $(CROSSENV) ; \
+	@set -o pipefail; { \
+	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
 	   $(MSG) "crossenv: [$(CROSSENV_PATH)]" ; \
@@ -43,27 +45,34 @@ compile_python_module: prepare_crossenv
 	       -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS) ; \
 	$(RUN) PYTHONPATH=$(PYTHONPATH) $$(which cross-python) setup.py build_ext \
 	       -I $(STAGING_INSTALL_PREFIX)/include \
-	       -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS)
+	       -L $(STAGING_INSTALL_PREFIX)/lib $(BUILD_ARGS) ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
+install_python_module: SHELL:=/bin/bash
 install_python_module:
-	@. $(CROSSENV) ; \
+	@set -o pipefail; { \
+	. $(CROSSENV) ; \
 	export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
 	$(MSG) PYTHONPATH=$(PYTHONPATH) $$(which cross-python) setup.py install \
 	       --root $(INSTALL_DIR) \
 	       --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS) ; \
 	$(RUN) PYTHONPATH=$(PYTHONPATH) $$(which cross-python) setup.py install \
 	       --root $(INSTALL_DIR) \
-	       --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS)
+	       --prefix $(INSTALL_PREFIX) $(INSTALL_ARGS) ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
+fix_shebang_python_module: SHELL:=/bin/bash
 fix_shebang_python_module:
-	@cat PLIST | sed 's/:/ /' | while read type file ; do \
+	@set -o pipefail; { \
+	cat PLIST | sed 's/:/ /' | while read type file ; do \
 	  for script in $(INSTALL_DIR)$(INSTALL_PREFIX)/$${file} ; do \
 	    if file $${script} | grep -iq "python script" ; then \
 	        echo -n "Fixing shebang for $${script} ... " ; \
 	        sed -i -e '1 s|^#!.*$$|#!$(PYTHON_INTERPRETER)|g' $${script} > /dev/null 2>&1 && echo "ok" || echo "failed!" ; \
 	    fi ; \
 	  done ; \
-	done
+	done ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 all: install fix_shebang_python_module
 

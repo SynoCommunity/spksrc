@@ -71,8 +71,8 @@ pre_wheel_target: wheel_msg_target
 
 wheel-%:
 ifneq ($(strip $(WHEELS)),)
-	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS=\"$(WHEELS)\" wheel
-	@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS="$(WHEELS)" wheel --no-print-directory | tee --append $(CURDIR)/wheel-$(firstword $(subst -, ,$*))-$(lastword $(subst -, ,$*)).log
+	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS=\"$(WHEELS)\" wheel | tee --append $(WHEEL_LOG)
+	@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS="$(WHEELS)" wheel --no-print-directory || false
 else
 	$(error No python wheel to process)
 endif
@@ -83,13 +83,13 @@ ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 	@set -e ; \
 	for requirement in $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) ; do \
 	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${requirement}\" REQUIREMENT_GOAL=\"$(WHEEL_GOAL)\" requirement ; \
-	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${requirement}" REQUIREMENT_GOAL="$(WHEEL_GOAL)" requirement --no-print-directory || exit 1 ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${requirement}" REQUIREMENT_GOAL="$(WHEEL_GOAL)" requirement --no-print-directory || false ; \
 	done
 else
 	@set -e ; \
 	for requirement in $(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))))),$(WHEELS)) ; do \
 	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${requirement}\" REQUIREMENT_GOAL=\"$(WHEEL_GOAL)\" requirement ; \
-	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${requirement}" REQUIREMENT_GOAL="$(WHEEL_GOAL)" requirement --no-print-directory || exit 1 ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${requirement}" REQUIREMENT_GOAL="$(WHEEL_GOAL)" requirement --no-print-directory || false ; \
 	done
 endif
 

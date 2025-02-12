@@ -115,9 +115,11 @@ pre_crossenv_target: crossenv_msg_target
 
 ###
 
+crossenv-%: SHELL:=/bin/bash
 crossenv-%:
-	@$(MSG) $(MAKE) ARCH=\"$(firstword $(subst -, ,$*))\" TCVERSION=\"$(lastword $(subst -, ,$*))\" WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv
-	@MAKEFLAGS= $(MAKE) ARCH="$(firstword $(subst -, ,$*))" TCVERSION="$(lastword $(subst -, ,$*))" WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv --no-print-directory | tee --append $(CURDIR)/crossenv-$(firstword $(subst -, ,$*))-$(lastword $(subst -, ,$*)).log
+	@$(MSG) $(MAKE) ARCH=\"$(firstword $(subst -, ,$*))\" TCVERSION=\"$(lastword $(subst -, ,$*))\" WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv | tee --append $(CROSSENV_LOG)
+	@MAKEFLAGS= $(MAKE) ARCH="$(firstword $(subst -, ,$*))" TCVERSION="$(lastword $(subst -, ,$*))" WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv --no-print-directory | tee --append $(CROSSENV_LOG) ; \
+	[ $${PIPESTATUS[0]} -eq 0 ] || false
 
 ####
 
