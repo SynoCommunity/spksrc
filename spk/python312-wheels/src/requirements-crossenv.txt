@@ -24,6 +24,13 @@ cffi==1.17.1
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+atom==0.10.5
+atom==0.11.0
+
 borgbackup==1.4.0
 charset_normalizer==3.4.1
 immutables==0.21
