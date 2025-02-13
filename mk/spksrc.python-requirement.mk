@@ -65,7 +65,7 @@ ifneq ($(wildcard $(REQUIREMENT)),)
 	done < <(grep -svH  -e "^\#" -e "^\$$" $(wildcard $(REQUIREMENT)) | sed 's/\s* #.*//')
 else
 	@for requirement in $(REQUIREMENT) ; do \
-	   $(MSG) Processing requirement unit [$${requirement}] ; \
+	   $(MSG) Processing requirement [$${requirement}] ; \
 	   wheel=$$(echo $${requirement} | sed -E "s/^(abi3|build|cross|crossenv|pure)://") ; \
 	   case $${requirement} in \
 	          abi3:*) type=abi3 ;; \

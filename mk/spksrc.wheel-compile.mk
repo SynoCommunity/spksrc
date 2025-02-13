@@ -46,16 +46,15 @@ wheel_compile_msg_target:
 	@$(MSG) "Processing wheels of $(NAME)"
 
 pre_wheel_compile_target: wheel_compile_msg_target
-
-wheel_compile_target: SHELL:=/bin/bash
-wheel_compile_target:
 ifeq ($(wildcard $(WHEELHOUSE)),)
 	@$(MSG) Creating wheelhouse directory: $(WHEELHOUSE)
 	@mkdir -p $(WHEELHOUSE)
 endif
-	@$(MSG) Compiling wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)]
 	@$(MSG) $(MAKE) WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" crossenv-$(ARCH)-$(TCVERSION)
 	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
+
+wheel_compile_target: SHELL:=/bin/bash
+wheel_compile_target: pre_wheel_compile_target
 ifneq ($(WHEEL_TYPE),pure)
 	@[ "$(WHEEL_TYPE)" = "$(WHEELS_LIMITED_API)" ] && abi3="--build-option=--py-limited-api=$(PYTHON_LIMITED_API)" || abi3="" ; \
 	global_options=$$(echo $(WHEELS_BUILD_ARGS) | sed -e 's/ \[/\n\[/g' | grep -i $(WHEEL_NAME) | cut -f2 -d] | xargs) ; \
@@ -82,33 +81,26 @@ ifneq ($(WHEEL_TYPE),pure)
 	   $(MAKE) --no-print-directory \
 	   cross-compile-wheel-$(WHEEL_NAME)-$(WHEEL_VERSION)
 else ifneq ($(filter 1 ON TRUE,$(WHEELS_PURE_PYTHON_PACKAGING_ENABLE)),)
-	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
-	@if [ -s "$(WHEELHOUSE)/$(WHEELS_PURE_PYTHON)" ]; then \
-	   . $(CROSSENV) ; \
-	   if [ -e "$(CROSSENV)" ] ; then \
-	      export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= OBJCOPY= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= ; \
-	      export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
-	      $(MSG) "crossenv: [$(CROSSENV)]" ; \
-	      $(MSG) "python: [$$(which build-python)]" ; \
-	   else \
-	      echo "ERROR: crossenv not found!" ; \
-	      exit 2 ; \
-	   fi ; \
-	   $(MSG) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
-	   $(RUN) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
-	fi
+	@REQUIREMENT=$(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) \
+	   WHEEL_NAME=$(WHEEL_NAME) \
+	   WHEEL_VERSION=$(WHEEL_VERSION) \
+	   $(MAKE) --no-print-directory \
+	   pure-build-wheel-$(WHEEL_NAME)-$(WHEEL_VERSION)
+else
+	$(error No wheel to process)
 endif
 
 ##
 ## crossenv PATH environment requires a combination of:
-##   1) unique PATH variable from $(ENV) -> using merge + dedup macros
+##   1) unique PATH variable from $(ENV) -> using merge macro + awk to dedup
 ##         Note: Multiple declarations of ENV += PATH=bla creates confusion in its interpretation.
 ##               Solution implemented fetches all PATH from ENV and combine them in reversed order.
-##   2) access to maturin from native/python<version>/.../bin -> ${PYTHON_NATIVE_PATH}/bin
+##   2) access to maturin from crossenv/build/bin -> ${CROSSENV_PATH}/build/bin
 ##   3) access to crossenv/bin/cross* tools, mainly cross-pip -> ${CROSSENV_PATH}/bin
 ##
 cross-compile-wheel-%: SHELL:=/bin/bash
 cross-compile-wheel-%:
+	@$(MSG) Cross-compiling Python wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)]
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
@@ -147,6 +139,23 @@ cross-compile-wheel-%:
 	   --no-build-isolation \
 	   $(ABI3) \
 	   $(REQUIREMENT)
+
+pure-build-wheel-%: SHELL:=/bin/bash
+pure-build-wheel-%:
+	@$(MSG) Building pure Python wheel [$(WHEEL_NAME)], version [$(WHEEL_VERSION)], type [$(WHEEL_TYPE)]
+	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
+	@. $(CROSSENV) ; \
+	if [ -e "$(CROSSENV)" ] ; then \
+	   export LD= LDSHARED= CPP= NM= CC= AS= RANLIB= CXX= AR= STRIP= OBJDUMP= OBJCOPY= READELF= CFLAGS= CPPFLAGS= CXXFLAGS= LDFLAGS= ; \
+	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
+	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
+	   $(MSG) "python: [$$(which build-python)]" ; \
+	else \
+	   echo "ERROR: crossenv not found!" ; \
+	   exit 2 ; \
+	fi ; \
+	$(MSG) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
+	$(RUN) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION))
 
 post_wheel_compile_target: $(WHEEL_COMPILE_TARGET)
 
