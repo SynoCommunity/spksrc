@@ -28,7 +28,6 @@ cffi==1.17.1
 # Requires
 #  - build:setuptools-scm
 #  - cross:cppy
-atom==0.10.5
 atom==0.11.0
 
 borgbackup==1.4.0
