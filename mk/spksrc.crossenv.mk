@@ -177,7 +177,7 @@ build_crossenv_target: pre_crossenv_target
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
 	                        --sysroot $(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
-	                        --machine $(PYTHON_ARCH)-linux-gnu \
+	                        --machine $(TC_TARGET) \
 	                        "$(CROSSENV_PATH)"
 	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
@@ -185,7 +185,7 @@ build_crossenv_target: pre_crossenv_target
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
 	                        --sysroot $(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
-	                        --machine $(PYTHON_ARCH)-linux-gnu \
+	                        --machine $(TC_TARGET) \
 	                        "$(CROSSENV_PATH)"
 ifeq ($(CROSSENV_WHEEL),default)
 	@$(MSG) Setting default crossenv $(CROSSENV_PATH)
