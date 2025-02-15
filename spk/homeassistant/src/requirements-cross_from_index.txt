@@ -1,0 +1,14 @@
+# wheels that need cross compilation
+# but fail to build with spksrc framework
+# are downloaded from index at package installation
+
+av==13.1.0
+awscrt==0.23.5
+deebot_client==11.0.0
+grpcio==1.67.1
+# isal fails to cross compile...
+isal==1.7.1
+# numpy not yet supported by spksrc framework
+numpy==2.2.0
+# pandas: maturin error
+pandas==2.2.3
