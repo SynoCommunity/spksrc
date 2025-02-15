@@ -34,36 +34,43 @@ prepare_crossenv:
 	@$(MSG) $(MAKE) WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
 	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
+build_python_wheel_target: SHELL:=/bin/bash
 build_python_wheel_target: prepare_crossenv
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
-	@if [ -d "$(CROSSENV_PATH)" ] ; then \
-	   PATH=$(call dedup, $(call merge, $(ENV), PATH, :), :):$(PYTHON_NATIVE_PATH):$(CROSSENV_PATH)/bin:$${PATH} ; \
-	   $(MSG) "crossenv: [$(CROSSENV_PATH)]" ; \
-	   $(MSG) "pip: [$$(which cross-pip)]" ; \
+	@set -o pipefail; { \
+	. $(CROSSENV) ; \
+	if [ -e "$(CROSSENV)" ] ; then \
+	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
+	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
+	   $(MSG) "python: [$$(which cross-python)]" ; \
 	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
-	$(MSG) _PYTHON_HOST_PLATFORM=$(TC_TARGET) cross-python3 -m build $(BUILD_ARGS) \
+	$(MSG) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $$(which cross-python) -m build $(BUILD_ARGS) \
 	          --wheel $(WHEELS_BUILD_ARGS) \
 	          --outdir $(WHEELHOUSE) ; \
-	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) cross-python3 -m build $(BUILD_ARGS) \
+	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $$(which cross-python) -m build $(BUILD_ARGS) \
 	          --wheel $(WHEELS_BUILD_ARGS) \
-	          --outdir $(WHEELHOUSE)
+	          --outdir $(WHEELHOUSE) ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
-install_python_wheel_target: 
-	@$(MSG) $(MAKE) REQUIREMENT=\"$(PKG_NAME)==$(PKG_VERS)\" \
+install_python_wheel_target: SHELL:=/bin/bash
+install_python_wheel_target:
+	@set -o pipefail; { \
+	$(MSG) $(MAKE) REQUIREMENT=\"$(PKG_NAME)==$(PKG_VERS)\" \
 	                WHEEL_NAME=\"$(PKG_NAME)\" \
 	                WHEEL_VERSION=\"$(PKG_VERS)\" \
 	                WHEEL_TYPE=\"cross\" \
-	                wheel_install
-	@MAKEFLAGS= $(MAKE) REQUIREMENT="$(PKG_NAME)==$(PKG_VERS)" \
+	                wheel_install ; \
+	MAKEFLAGS= $(MAKE) REQUIREMENT="$(PKG_NAME)==$(PKG_VERS)" \
 	                WHEEL_NAME="$(PKG_NAME)" \
 	                WHEEL_VERSION="$(PKG_VERS)" \
 	                WHEEL_TYPE="cross" \
 	                --no-print-directory \
-	                wheel_install
+	                wheel_install ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 ###
 
