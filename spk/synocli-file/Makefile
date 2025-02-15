@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 4.0
-SPK_REV = 26
+SPK_VERS = 4.0.1
+SPK_REV = 27
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -183,5 +183,3 @@ endif
 synocli-file_extra_install:
 	@$(MSG) "Set library runpath in rhash executable."
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/rhash
-
-
