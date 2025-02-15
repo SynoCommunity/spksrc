@@ -3,7 +3,7 @@ PKG_NAME = DTLSSocket
 PKG_VERS = 0.1.19
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://files.pythonhosted.org/packages/28/f5/44bed0f32678b4c6d3f956e94c6162598b884f0d96e00cdd22ccb56ac50
+PKG_DIST_SITE = https://files.pythonhosted.org/packages/28/f5/44bed0f32678b4c6d3f956e94c6162598b884f0d96e00cdd22ccb56ac50b
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 HOMEPAGE = https://git.fslab.de/jkonra2m/tinydtls-cython
