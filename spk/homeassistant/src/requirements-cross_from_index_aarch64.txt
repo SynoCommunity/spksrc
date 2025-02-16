@@ -10,7 +10,5 @@ awscrt==0.23.5
 grpcio==1.67.1
 # isal fails to cross compile...
 isal==1.7.1
-# numpy not yet supported by spksrc framework
-numpy==2.2.0
 # pandas: maturin error
 pandas==2.2.3

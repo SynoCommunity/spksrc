@@ -11,6 +11,8 @@ SPK_DEPENDS = $(PYTHON_PACKAGE)
 # unsupported wheels: deebot_client, numpy, pymicro_vad, pyspeex_noise, and others
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+# numpy==2.2.0 not yet supported
+UNSUPPORTED_ARCHS += $(ARMv7_ARCHS) $(i686_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
@@ -79,27 +81,11 @@ include ../../mk/spksrc.python.mk
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [lxml] -std=c11
-endif
 
 # [pycryptodome] [pycryptodomex] [ciso8601]
 WHEELS_CFLAGS += [pycryptodome] -std=c11
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 WHEELS_CFLAGS += [ciso8601] -std=c11
-
-# [aiohttp] [aiokafka] [frozenlist] [guppy3] [msgpack] [propcache] [protobuf] [yarl]
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [aiohttp] -std=c11
-WHEELS_CFLAGS += [aiokafka] -std=c11
-WHEELS_CFLAGS += [frozenlist] -std=c11
-WHEELS_CFLAGS += [guppy3] -std=c11
-WHEELS_CFLAGS += [msgpack] -std=c11
-WHEELS_CFLAGS += [propcache] -std=c11
-WHEELS_CFLAGS += [protobuf] -std=c99
-WHEELS_CFLAGS += [yarl] -std=c11
-endif
-
 
 # use python arch specific requirements file to download cross wheels from index
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
@@ -111,7 +97,6 @@ REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_i686.txt
 else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_armv7l.txt
 endif
-
 
 # target to download and prepare hacs after changing HACS_VERS above
 # usage:

@@ -10,7 +10,5 @@ av==13.1.0
 grpcio==1.67.1
 # isal fails to cross compile...
 ###isal==1.7.1                  not available for i686, limited compression support
-# numpy not yet supported by spksrc framework
-###numpy==2.2.0                 not available for i686, mandatory for homeassistant
 # pandas: maturin error
 ###pandas==2.2.3                not available for i686, '???' component not supported
