@@ -36,8 +36,8 @@ DIST_FILE                  = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT                   = $(TC_EXT)
 TC_LOCAL_VARS_MK           = $(WORK_DIR)/tc_vars.mk
 TC_LOCAL_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
-TC_LOCAL_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.cross-meson
-TC_LOCAL_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.native-meson
+TC_LOCAL_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
+TC_LOCAL_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 
 #####
 
@@ -169,13 +169,26 @@ meson_cross_vars:
 ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 	@echo "longdouble_format = 'IEEE_DOUBLE_BE'"
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-	@echo "longdouble_format = 'IEEE_DOUBLE_BE'"
+	@echo "longdouble_format = 'IEEE_DOUBLE_LE'"
 endif
 
 .PHONY: meson_native_vars
+meson_native_vars: SHELL:=/bin/bash
 meson_native_vars:
-	@echo "[properties]" ; \
-	echo "needs_exe_wrapper = false"
+	@echo "[binaries]"
+	@for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "cc" ]; then \
+	    echo "c = '$$(which $${source})'" ; \
+	    echo "$${target} = '$$(which $${source})'" ; \
+	  elif [ "$${target}" = "ldshared" ]; then \
+	    echo "$${target} = '$$(which gcc) -shared'" ; \
+	  else \
+	    echo "$${target} = '$$(which $${source})'" ; \
+	  fi ; \
+	done
 
 .PHONY: tc_vars
 tc_vars: flag

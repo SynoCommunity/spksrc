@@ -20,9 +20,9 @@ CONFIGURE_ARGS += -Dbuildtype=$(MESON_BUILD_TYPE)
 endif
 
 # Configuration for meson build
-MESON_CROSS_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.cross-meson
+MESON_CROSS_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson-cross
 CONFIGURE_ARGS += --cross-file $(MESON_CROSS_TOOLCHAIN_WRK)
-MESON_NATIVE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.native-meson
+MESON_NATIVE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson-native
 # To be tested beyond meson python wheel
 #CONFIGURE_ARGS += --native-file $(MESON_NATIVE_TOOLCHAIN_WRK)
 
@@ -68,3 +68,10 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
   MESON_HOST_CPU = x86_64
   MESON_HOST_ENDIAN = little
 endif
+
+#.PHONY: meson_pkg_toolchain
+#meson_pkg_toolchain:
+#	@cat $(MESON_TOOLCHAIN_WRK) ; \
+#	echo
+#	@echo "# set compiler flags for cross-compiling" ; \
+#	echo
