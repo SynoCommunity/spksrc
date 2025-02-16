@@ -130,7 +130,8 @@ endif
 
 # [numpy]
 ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy.txt
+#WHEELS += src/requirements-crossenv-numpy.txt
+DEPENDS += cross/numpy
 endif
 
 # [pycryptodome]
