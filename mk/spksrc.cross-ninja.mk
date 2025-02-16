@@ -59,6 +59,22 @@ endif
 endif
 
 ###
+#
+# python wheel using meson use-case
+ifeq ($(strip $(MESON_PYTHON)),1)
+
+# Define where is located the crossenv
+CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
+
+# If using spksrc.python.mk with PYTHON_STAGING_PREFIX defined
+# then redirect STAGING_INSTALL_PREFIX so rust
+# wheels can find openssl and other libraries
+ifneq ($(wildcard $(PYTHON_STAGING_PREFIX)),)
+STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_PREFIX)
+endif
+endif
+
+###
 
 .PHONY: ninja_compile_target
 
@@ -69,7 +85,22 @@ ninja_compile_target:
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 endif
+ifeq ($(strip $(MESON_CROSSENV)),1)
+	@$(MSG)    - Python wheel = $(MESON_CROSSENV)
+	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
+	@. $(CROSSENV) ; \
+	if [ -e "$(CROSSENV)" ] ; then \
+	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
+	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
+	   $(MSG) "cython: [$$(which cython)]" ; \
+	else \
+	   echo "ERROR: crossenv not found!" ; \
+	   exit 2 ; \
+	fi ; \
+	$(RUN) PATH=$${PATH} ninja -C $(NINJA_BUILD_DIR)
+else
 	$(RUN) ninja -C $(NINJA_BUILD_DIR)
+endif
 
 .PHONY: ninja_install_target
 

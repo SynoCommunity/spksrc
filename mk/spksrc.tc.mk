@@ -21,22 +21,23 @@ include ../../mk/spksrc.cross-cmake-env.mk
 include ../../mk/spksrc.cross-meson-env.mk
 
 # Configure the included makefiles
-URLS                = $(TC_DIST_SITE)/$(TC_DIST_NAME)
-NAME                = $(TC_NAME)
-COOKIE_PREFIX       = 
+URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
+NAME                       = $(TC_NAME)
+COOKIE_PREFIX              = 
 ifneq ($(TC_DIST_FILE),)
-LOCAL_FILE          = $(TC_DIST_FILE)
+LOCAL_FILE                 = $(TC_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
-PKG_DIST_FILE       = $(TC_DIST_FILE)
+PKG_DIST_FILE              = $(TC_DIST_FILE)
 else
-LOCAL_FILE          = $(TC_DIST_NAME)
+LOCAL_FILE                 = $(TC_DIST_NAME)
 endif
-DISTRIB_DIR         = $(TOOLCHAIN_DIR)/$(TC_VERS)
-DIST_FILE           = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT            = $(TC_EXT)
-TC_LOCAL_VARS_MK    = $(WORK_DIR)/tc_vars.mk
-TC_LOCAL_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
-TC_LOCAL_VARS_MESON = $(WORK_DIR)/tc_vars.meson
+DISTRIB_DIR                = $(TOOLCHAIN_DIR)/$(TC_VERS)
+DIST_FILE                  = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT                   = $(TC_EXT)
+TC_LOCAL_VARS_MK           = $(WORK_DIR)/tc_vars.mk
+TC_LOCAL_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
+TC_LOCAL_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.cross-meson
+TC_LOCAL_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.native-meson
 
 #####
 
@@ -68,7 +69,7 @@ include ../../mk/spksrc.tc-flags.mk
 rustc: flag
 include ../../mk/spksrc.tc-rust.mk
 
-all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON) $(TC_LOCAL_VARS_MK)
+all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON_CROSS) $(TC_LOCAL_VARS_MESON_NATIVE) $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK):
@@ -78,9 +79,13 @@ $(TC_LOCAL_VARS_MK):
 $(TC_LOCAL_VARS_CMAKE): 
 	env $(MAKE) --no-print-directory cmake_vars > $@ 2>/dev/null;
 
-.PHONY: $(TC_LOCAL_VARS_MESON)
-$(TC_LOCAL_VARS_MESON): 
-	env $(MAKE) --no-print-directory meson_vars > $@ 2>/dev/null;
+.PHONY: $(TC_LOCAL_VARS_MESON_CROSS)
+$(TC_LOCAL_VARS_MESON_CROSS): 
+	env $(MAKE) --no-print-directory meson_cross_vars > $@ 2>/dev/null;
+
+.PHONY: $(TC_LOCAL_VARS_MESON_NATIVE)
+$(TC_LOCAL_VARS_MESON_NATIVE): 
+	env $(MAKE) --no-print-directory meson_native_vars > $@ 2>/dev/null;
 
 .PHONY: cmake_vars
 cmake_vars:
@@ -129,10 +134,8 @@ endif
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY $(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY))" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))"
 
-
-
-.PHONY: meson_vars
-meson_vars:
+.PHONY: meson_cross_vars
+meson_cross_vars:
 	@echo "[host_machine]" ; \
 	echo "system = 'linux'" ; \
 	echo "cpu_family = '$(MESON_HOST_CPU_FAMILY)'" ; \
@@ -146,6 +149,10 @@ meson_vars:
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "#$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)cpp'" ; \
+	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
+	  elif [ "$${target}" = "cc" ]; then \
+	    echo "c = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  else \
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  fi ; \
@@ -157,6 +164,18 @@ meson_vars:
 	echo "cpp_args = ['$(MESON_BUILTIN_CPP_ARGS)']" ; \
 	echo "cpp_link_args = ['$(MESON_BUILTIN_CPP_LINK_ARGS)']"
 	@echo
+	@echo "[properties]" ; \
+	echo "needs_exe_wrapper = false"
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+	@echo "longdouble_format = 'IEEE_DOUBLE_BE'"
+else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+	@echo "longdouble_format = 'IEEE_DOUBLE_BE'"
+endif
+
+.PHONY: meson_native_vars
+meson_native_vars:
+	@echo "[properties]" ; \
+	echo "needs_exe_wrapper = false"
 
 .PHONY: tc_vars
 tc_vars: flag
