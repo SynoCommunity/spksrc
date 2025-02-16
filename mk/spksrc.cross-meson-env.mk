@@ -20,8 +20,11 @@ CONFIGURE_ARGS += -Dbuildtype=$(MESON_BUILD_TYPE)
 endif
 
 # Configuration for meson build
-MESON_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson
-CONFIGURE_ARGS += --cross-file $(MESON_TOOLCHAIN_WRK)
+MESON_CROSS_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.cross-meson
+CONFIGURE_ARGS += --cross-file $(MESON_CROSS_TOOLCHAIN_WRK)
+MESON_NATIVE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.native-meson
+# To be tested beyond meson python wheel
+#CONFIGURE_ARGS += --native-file $(MESON_NATIVE_TOOLCHAIN_WRK)
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
   MESON_HOST_CPU_FAMILY = arm
