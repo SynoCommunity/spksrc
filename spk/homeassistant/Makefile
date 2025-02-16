@@ -101,6 +101,18 @@ WHEELS_CFLAGS += [yarl] -std=c11
 endif
 
 
+# use python arch specific requirements file to download cross wheels from index
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_x64.txt
+else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_aarch64.txt
+else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_i686.txt
+else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_armv7l.txt
+endif
+
+
 # target to download and prepare hacs after changing HACS_VERS above
 # usage:
 # make get_hacs
@@ -117,7 +129,7 @@ get_hacs:
 .PHONY: homeassistant_extra_install
 homeassistant_extra_install:
 	@install -m 755 -d $(STAGING_DIR)/share $(STAGING_DIR)/var
-	@install -m 644 src/requirements-cross_from_index.txt $(STAGING_DIR)/share/
+	@install -m 644 src/$(REQUIREMENTS_FROM_INDEX) $(STAGING_DIR)/share/requirements-cross_from_index.txt
 	@install -m 644 src/requirements-pure.txt $(STAGING_DIR)/share/
 	@install -m 644 src/hacs.tar.gz $(STAGING_DIR)/share/
 	@install -m 644 src/requirements-custom.txt $(STAGING_DIR)/var/
