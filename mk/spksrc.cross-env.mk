@@ -48,8 +48,8 @@ endif
 ifneq ($(strip $(TC)),)
 TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
 TC_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
-TC_VARS_MESON_CROSS = $(WORK_DIR)/tc_vars.cross-meson
-TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.native-meson
+TC_VARS_MESON_CROSS = $(WORK_DIR)/tc_vars.meson-cross
+TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 
 # Mandatory to build the CFLAGS and LDFLAGS env variables
 export INSTALL_DIR
