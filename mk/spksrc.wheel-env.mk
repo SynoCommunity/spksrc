@@ -2,9 +2,6 @@
 # Configuration for python wheel build
 #
 
-### python wheel requirement processing
-include ../../mk/spksrc.python-requirement.mk
-
 ##### rust specific configurations
 include ../../mk/spksrc.cross-rust-env.mk
 

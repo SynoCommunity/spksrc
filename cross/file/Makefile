@@ -1,5 +1,4 @@
 PKG_NAME = file
-# IMPORTANT: native/file must be of the same version
 PKG_VERS = 5.46
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -21,3 +20,4 @@ NATIVE_FILE = $(abspath $(WORK_DIR)/../../../native/file/work-native/install/usr
 ENV += NATIVE_FILE=$(NATIVE_FILE)
 
 include ../../mk/spksrc.cross-cc.mk
+
