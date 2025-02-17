@@ -7,7 +7,7 @@
 # Targets are executed in the following order:
 #  wheel_msg_target
 #  pre_wheel_target   (override with PRE_WHEEL_TARGET)
-#  build_wheel_target (override with WHEEL_TARGET)
+#  wheel_target (override with WHEEL_TARGET)
 #  post_wheel_target  (override with POST_WHEEL_TARGET)
 # Variables:
 #  WHEELS             List of wheels to go through
@@ -43,7 +43,7 @@ include ../../mk/spksrc.wheel-install.mk
 
 ##
 
-ifneq ($(strip $(REQUIREMENT)),)
+ifneq ($(and $(WHEEL_NAME),$(or (WHEEL_VERISON),$(WHEEL_URL))),)
 download-wheels: wheel_download
 wheel: wheel_install
 else
@@ -54,7 +54,7 @@ else
 $(PRE_WHEEL_TARGET): wheel_msg_target
 endif
 ifeq ($(strip $(WHEEL_TARGET)),)
-WHEEL_TARGET = build_wheel_target
+WHEEL_TARGET = wheel_target
 else
 $(WHEEL_TARGET): $(BUILD_WHEEL_TARGET)
 endif
@@ -71,80 +71,25 @@ pre_wheel_target: wheel_msg_target
 
 wheel-%:
 ifneq ($(strip $(WHEELS)),)
-	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS=\"$(WHEELS)\" wheel
-	@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS="$(WHEELS)" wheel --no-print-directory
+	@$(MSG) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS=\"$(WHEELS)\" wheel | tee --append $(WHEEL_LOG)
+	@MAKEFLAGS= $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) WHEELS="$(WHEELS)" wheel --no-print-directory || false
 else
-	$(error No wheel to process)
+	$(error No python wheel to process)
 endif
 
-build_wheel_target: SHELL:=/bin/bash
-build_wheel_target: pre_wheel_target
+wheel_target: SHELL:=/bin/bash
+wheel_target: pre_wheel_target
 ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
 	@set -e ; \
-	while IFS= read -r requirement ; do \
-	   $(MSG) Processing requirement [$${requirement}] ; \
-	   wheel=$${requirement#*requirements-*.txt:} ; \
-	   file=$$(basename $${requirement%%:*}) ; \
-	   case $${file} in \
-	           requirements-pure.txt) type=pure ;; \
-	      requirements-crossenv*.txt) type=crossenv ;; \
-	           requirements-abi3.txt) type=abi3 ;; \
-	                               *) type=$(WHEEL_DEFAULT_PREFIX) ;; \
-	   esac ; \
-	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
-	   if [ "$$(grep -s egg <<< $${wheel})" ]; then \
-	      name=$$(echo $${wheel#*egg=} | cut -f1 -d=) ; \
-	      wheel=$$(echo $${wheel%%#egg=*}) ; \
-	   else \
-	      name=$$(echo $${wheel%%[<>=]=*} | sed -E "s/^(abi3|crossenv|pure)://") ; \
-	   fi ; \
-	   if [ ! "$${version}" ]; then \
-	      $(MSG) Fetching latest version available ; \
-	      query="curl -s https://pypi.org/pypi/$${name}/json" ; \
-	      query+=" | jq -r '.releases[][]" ; \
-	      query+=" | select(.packagetype==\"sdist\")" ; \
-	      query+=" | .filename'" ; \
-	      query+=" | sort -V" ; \
-	      query+=" | tail -1" ; \
-	      query+=" | sed -e 's/.tar.gz//g' -e 's/.zip//g'" ; \
-	      query+=" | awk -F'-' '{print \$$2}'" ; \
-	      version=$$(eval $${query} 2>/dev/null) ; \
-	   fi ; \
-	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(WHEEL_GOAL) ; \
-	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory || exit 1 ; \
-	done < <(grep -svH  -e "^\#" -e "^\$$" $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) | sed 's/\s* #.*//')
-endif
-ifneq ($(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))))),$(WHEELS)),)
-	@for requirement in $(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))))),$(WHEELS)) ; do \
-	   $(MSG) Processing requirement [$${requirement}] ; \
-	   wheel=$$(echo $${requirement} | sed -E "s/^(abi3|crossenv|pure)://") ; \
-	   case $${requirement} in \
-	          abi3:*) type=abi3 ;; \
-	      crossenv:*) type=crossenv ;; \
-	          pure:*) type=pure ;; \
-	               *) type=$(WHEEL_DEFAULT_PREFIX) ;; \
-	   esac ; \
-	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \
-	   if [ "$$(grep -s egg <<< $${requirement})" ]; then \
-	      name=$$(echo $${wheel#*egg=} | cut -f1 -d=) ; \
-	      wheel=$$(echo $${wheel%%#egg=*}) ; \
-	   else \
-	      name=$$(echo $${wheel%%[<>=]=*} | sed -E "s/^(abi3|crossenv|pure)://") ; \
-	   fi ; \
-	   if [ ! "$${version}" ]; then \
-	      $(MSG) Fetching latest version available ; \
-	      query="curl -s https://pypi.org/pypi/$${name}/json" ; \
-	      query+=" | jq -r '.releases[][]" ; \
-	      query+=" | select(.packagetype==\"sdist\")" ; \
-	      query+=" | .filename'" ; \
-	      query+=" | sort -V" ; \
-	      query+=" | tail -1" ; \
-	      query+=" | sed -e 's/.tar.gz//g' -e 's/.zip//g'" ; \
-	      query+=" | awk -F'-' '{print \$$2}'" ; \
-	      version=$$(eval $${query} 2>/dev/null) ; \
-	   fi ; \
-	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${wheel}\" WHEEL_NAME=\"$${name}\" WHEEL_VERSION=\"$${version}\" WHEEL_TYPE=\"$${type}\" $(WHEEL_GOAL) ; \
-	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${wheel}" WHEEL_NAME="$${name}" WHEEL_VERSION="$${version}" WHEEL_TYPE="$${type}" $(WHEEL_GOAL) --no-print-directory ; \
+	for requirement in $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) ; do \
+	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${requirement}\" REQUIREMENT_GOAL=\"$(WHEEL_GOAL)\" requirement ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${requirement}" REQUIREMENT_GOAL="$(WHEEL_GOAL)" requirement --no-print-directory || false ; \
+	done
+else
+	@set -e ; \
+	for requirement in $(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))))),$(WHEELS)) ; do \
+	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${requirement}\" REQUIREMENT_GOAL=\"$(WHEEL_GOAL)\" requirement ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${requirement}" REQUIREMENT_GOAL="$(WHEEL_GOAL)" requirement --no-print-directory || false ; \
 	done
 endif
 
@@ -163,5 +108,5 @@ else
 wheel: ;
 endif
 
-# endif REQUIREMENT non-empty
+# endif $(and $(WHEEL_NAME),$(or (WHEEL_VERISON),$(WHEEL_URL))) non-empty
 endif

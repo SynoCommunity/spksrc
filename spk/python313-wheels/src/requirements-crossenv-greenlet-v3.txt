@@ -5,7 +5,6 @@
 ##
 
 # [greenlet]
-#   - Mandatory require full c++11 support
-greenlet==3.0.3
+#   - v3.0 no longer builds with python 3.13
 #   - Mandatory require full c++20 support added with gcc >= 8
 greenlet==3.1.1

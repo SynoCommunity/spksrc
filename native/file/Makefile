@@ -1,5 +1,5 @@
 PKG_NAME = file
-PKG_VERS = 5.45
+PKG_VERS = 5.46
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://ftp.astron.com/pub/file
@@ -14,7 +14,7 @@ LICENSE  = https://github.com/file/file/blob/master/COPYING
 GNU_CONFIGURE = 1
 # force build of static version
 # otherwise magic.mgc fails to build with error:
-# Compiled magic version [545] does not match with shared library magic version [539]
+# Compiled magic version [546] does not match with shared library magic version [544]
 CONFIGURE_ARGS += --enable-static --disable-shared
 
 include ../../mk/spksrc.native-cc.mk

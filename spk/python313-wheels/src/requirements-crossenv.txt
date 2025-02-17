@@ -24,10 +24,16 @@ cffi==1.17.1
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+atom==0.11.0
+
 borgbackup==1.4.0
 charset_normalizer==3.4.1
 immutables==0.21
-### llfuse==1.5.0 # fails to find "clock_gettime"
+### llfuse==1.5.0
 MarkupSafe==3.0.2
 msgpack==1.1.0              # used compiled verrsion for performance
 msgpack_python==0.5.6
