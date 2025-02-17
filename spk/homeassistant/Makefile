@@ -12,7 +12,7 @@ SPK_DEPENDS = $(PYTHON_PACKAGE)
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 # numpy==2.2.0 not yet supported
-UNSUPPORTED_ARCHS += $(ARMv7_ARCHS) $(i686_ARCHS)
+UNSUPPORTED_ARCHS += $(ARMv7_ARCHS) $(ARMv8_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
