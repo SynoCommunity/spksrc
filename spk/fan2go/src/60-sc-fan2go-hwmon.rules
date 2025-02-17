@@ -1,0 +1,3 @@
+#author: SynoCommunity Team
+
+SUBSYSTEM=="hwmon", GROUP="hwmon", MODE="0666"

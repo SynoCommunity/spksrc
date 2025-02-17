@@ -1,0 +1,182 @@
+# The path of the database file
+dbPath: "/var/packages/fan2go/var/fan2go.db"
+
+# Allow the fan initialization sequence to run in parallel for all configured fans
+runFanInitializationInParallel: false
+# The maximum difference between consecutive RPM measurements to
+# consider a fan speed "settled"
+# Note: This parameter is only used for initial analysis of fan curve
+#       and has no effect during normal operation
+maxRpmDiffForSettledFan: 20
+# The time in seconds to wait before checking that a fan has responded to a control change
+# Note: This parameter is only used for initial analysis of fan curve
+#       and has no effect during normal operation
+fanResponseDelay: 2
+
+# The rate to poll temperature sensors at
+tempSensorPollingRate: 200ms
+# The number of temp sensor values to keep in a rolling window array
+tempRollingWindowSize: 10
+
+# The rate to poll fan RPM input sensors at
+rpmPollingRate: 1s
+# The number of rpm sensor values to keep in a rolling window array
+rpmRollingWindowSize: 10
+
+# The rate to update fan speed targets at
+controllerAdjustmentTickRate: 200ms
+
+# A list of fans to control
+fans:
+  # A user defined ID.
+  # Used for logging only
+  - id: cpu
+    # The type of fan configuration
+    hwmon:
+      # The platform of the controller which is
+      # connected to this fan (see sensor.platform below)
+      platform: nct6798-isa-0
+      # The channel of this fan's RPM sensor as displayed by `fan2go detect`
+      rpmChannel: 1
+      # The pwm channel that controls this fan; fan2go defaults to same channel number as fan RPM
+      pwmChannel: 1
+    # Indicates whether this fan should never stop rotating, regardless of
+    # how low the curve value is
+    neverStop: true
+    # The curve ID (defined above) that should be used to determine the
+    # speed of this fan
+    curve: cpu_curve
+    # (Optional) The algorithm how the target speed, determined by the curve is approached.
+    #   direct: the target value will be directly applied to the fan
+    #   pid: uses a PID loop with default tuning variables
+    controlAlgorithm:
+      direct:
+        # together with maxPwmChangePerCycle, fan speeds will approach target value
+        # with the given max speed.
+        maxPwmChangePerCycle: 10
+    # (Optional) Override for the lowest PWM value at which the
+    # fan is able to maintain rotation if it was spinning previously.
+    minPwm: 30
+    # (Optional) Override for the lowest PWM value at which the
+    # fan will still be able to start rotating.
+    # Note: Settings this to a value that is too small
+    #       may damage your fans. Use at your own risk!
+    startPwm: 30
+    # (Optional) Override for the highest PWM value which still yields
+    # an increased rotational speed compared to lower values.
+    # Note: you can also use this to limit the max speed of a fan.
+    maxPwm: 255
+    # (Optional) Override for the PWM map used by fan2go for
+    # mapping the expected [0..255] value range to values actually supported by this fan.
+    # This can be used to compensate for fans with a very limited set of supported values
+    # (f.ex. off, low, high). If not set manually, fan2go will try to compute this mapping
+    # automatically during fan initialization. This process is not perfect though and may
+    # result in suboptimal fan control.
+    # Note: The mapping must be strictly monotonically increasing and its Key-Set should cover the full
+    # range of values from 0 to 255. If keys are missing, fan2go will select a key that most closely
+    # matches the required target value during operation.
+    pwmMap:
+      0: 0
+      64: 128
+      192: 255
+
+  - id: in_front
+    hwmon:
+      platform: it8620
+      rpmChannel: 4
+    controlAlgorithm: direct
+    neverStop: true
+    curve: case_avg_curve
+
+  - id: out_back
+    hwmon:
+      platform: it8620
+      rpmChannel: 5
+    neverStop: true
+    curve: case_avg_curve
+
+# A list of sensors to monitor
+sensors:
+  # A user defined ID, which is used to reference
+  # a sensor in a curve configuration (see below)
+  - id: cpu_package
+    # The type of sensor configuration
+    hwmon:
+      # A regex matching a controller platform displayed by `fan2go detect`, f.ex.:
+      # "nouveau", "coretemp", "it8620", "corsaircpro-*" etc.
+      platform: coretemp
+      # The index of this sensor as displayed by `fan2go detect`
+      index: 1
+
+  - id: mainboard
+    hwmon:
+      platform: it8620
+      index: 3
+
+  - id: sata_ssd
+    hwmon:
+      platform: acpitz
+      index: 1
+
+# A list of control curves which can be utilized by fans
+# or other curves
+curves:
+  # A user defined ID, which is used to reference
+  # a curve in a fan configuration (see above)
+  - id: cpu_curve
+    # The type of curve configuration, one of: linear | function
+    linear:
+      # The sensor ID to use as a temperature input
+      sensor: cpu_package
+      # Steps to define a section-wise defined speed curve function
+      steps:
+        # Sensor value -> Speed (0-255)
+        - 40: 0
+        - 50: 50
+        - 80: 255
+
+  - id: mainboard_curve
+    linear:
+      sensor: mainboard
+      # Sensor input value at which the curve is at minimum speed
+      min: 40
+      # Sensor input value at which the curve is at maximum speed
+      max: 80
+
+  - id: ssd_curve
+    linear:
+      sensor: sata_ssd
+      min: 40
+      max: 70
+
+  - id: case_avg_curve
+    function:
+      # Type of aggregation function to use, on of: minimum | maximum | average | delta | sum | difference
+      type: average
+      # A list of curve IDs to use
+      curves:
+        - cpu_curve
+        - mainboard_curve
+        - ssd_curve
+
+statistics:
+  # Whether to enable the prometheus exporter or not
+  enabled: false
+  # The port to expose the exporter on
+  port: 19000
+
+api:
+  # Whether to enable the API or not
+  enabled: false
+  # The host to listen for connections
+  host: localhost
+  # The port to listen for connections
+  port: 19001
+
+profiling:
+  # Whether to enable the profiling webserver
+  enabled: false
+  # The host to listen for connections
+  host: localhost
+  # The port to listen for connections
+  port: 16060
