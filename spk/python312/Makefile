@@ -1,7 +1,7 @@
 SPK_NAME = python312
-SPK_VERS = 3.12.8
+SPK_VERS = 3.12.9
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/python3.png
 
 # Compiler must support std=c++11
