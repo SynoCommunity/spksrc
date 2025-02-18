@@ -100,7 +100,13 @@ post_wheel_target: $(WHEEL_TARGET) install_python_wheel
 ifeq ($(wildcard $(WHEEL_COOKIE)),)
 wheel: $(WHEEL_COOKIE)
 
+# If WHEELS is empty then skip processing and
+# mark as completed using status cookie
+ifeq ($(strip $(WHEELS)),)
+$(WHEEL_COOKIE):
+else
 $(WHEEL_COOKIE): $(POST_WHEEL_TARGET)
+endif
 	$(create_target_dir)
 	@touch -f $@
 
