@@ -22,7 +22,6 @@ clean: $(addsuffix -clean,$(SUPPORTED_SPKS))
 clean: native-clean cross-clean
 endif
 
-all-clean: cross-clean kernel-clean native-clean spk-clean toolchain-clean toolkit-clean  
 dist-clean: clean
 dist-clean: kernel-clean toolchain-clean toolkit-clean
 
