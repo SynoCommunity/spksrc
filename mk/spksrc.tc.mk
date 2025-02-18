@@ -157,23 +157,8 @@ meson_cross_vars:
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  fi ; \
 	done
-	@echo
-	@echo "[built-in]" ; \
-	echo "c_args = ['$(MESON_BUILTIN_C_ARGS)']" ; \
-	echo "c_link_args = ['$(MESON_BUILTIN_C_LINK_ARGS)']" ; \
-	echo "cpp_args = ['$(MESON_BUILTIN_CPP_ARGS)']" ; \
-	echo "cpp_link_args = ['$(MESON_BUILTIN_CPP_LINK_ARGS)']"
-	@echo
-	@echo "[properties]" ; \
-	echo "needs_exe_wrapper = false"
-ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
-	@echo "longdouble_format = 'IEEE_DOUBLE_BE'"
-else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-	@echo "longdouble_format = 'IEEE_DOUBLE_LE'"
-endif
 
 .PHONY: meson_native_vars
-meson_native_vars: SHELL:=/bin/bash
 meson_native_vars:
 	@echo "[binaries]"
 	@for tool in $(TOOLS) ; \

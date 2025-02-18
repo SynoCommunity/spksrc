@@ -20,10 +20,11 @@ CONFIGURE_ARGS += -Dbuildtype=$(MESON_BUILD_TYPE)
 endif
 
 # Configuration for meson build
+MESON_TOOLCHAIN_NAME = $(ARCH)-toolchain.meson
 MESON_CROSS_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson-cross
-CONFIGURE_ARGS += --cross-file $(MESON_CROSS_TOOLCHAIN_WRK)
+MESON_CROSS_TOOLCHAIN_PKG = $(WORK_DIR)/$(PKG_DIR)/$(MESON_TOOLCHAIN_NAME)
 MESON_NATIVE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson-native
-# To be tested beyond meson python wheel
+CONFIGURE_ARGS += --cross-file $(MESON_CROSS_TOOLCHAIN_PKG)
 #CONFIGURE_ARGS += --native-file $(MESON_NATIVE_TOOLCHAIN_WRK)
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
@@ -69,9 +70,52 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
   MESON_HOST_ENDIAN = little
 endif
 
-#.PHONY: meson_pkg_toolchain
-#meson_pkg_toolchain:
-#	@cat $(MESON_TOOLCHAIN_WRK) ; \
-#	echo
-#	@echo "# set compiler flags for cross-compiling" ; \
-#	echo
+.PHONY: $(MESON_CROSS_TOOLCHAIN_PKG)
+$(MESON_CROSS_TOOLCHAIN_PKG):
+	@$(MSG) Generating $(MESON_TOOLCHAIN_PKG)
+	env $(MAKE) --no-print-directory meson_pkg_toolchain > $(MESON_CROSS_TOOLCHAIN_PKG) 2>/dev/null;
+
+.PHONY: meson_pkg_toolchain
+meson_pkg_toolchain: SHELL:=/bin/bash
+meson_pkg_toolchain:
+	@cat $(MESON_CROSS_TOOLCHAIN_WRK)
+	@echo
+	@echo "[properties]" ; \
+	echo "needs_exe_wrapper = false"
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+	@echo "longdouble_format = 'IEEE_DOUBLE_BE'"
+else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+	@echo "longdouble_format = 'IEEE_DOUBLE_LE'"
+endif
+	@echo
+	@echo "[built-in]" ; \
+	echo "c_args = ["
+ifneq ($(strip $(MESON_BUILTIN_C_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_C_ARGS)',\n"
+endif
+	@echo $(CFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t]\n"
+	@echo
+	@echo "c_link_args = ["
+ifneq ($(strip $(MESON_BUILTIN_C_LINK_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_C_LINK_ARGS)',\n"
+endif
+	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t]\n"
+	@echo
+	@echo "cpp_args = ["
+ifneq ($(strip $(MESON_BUILTIN_CPP_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_CPP_ARGS)',\n"
+endif
+	@echo $(CPPFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t]\n"
+	@echo "cpp_link_args = ["
+ifneq ($(strip $(MESON_BUILTIN_CPP_LINK_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_CPP_LINK_ARGS)',\n"
+endif
+	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t]\n"
+	@echo
+	@echo "cxx_args = ["
+	@echo $(CXXFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t]\n"

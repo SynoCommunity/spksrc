@@ -47,7 +47,7 @@ prepare_crossenv:
 
 # default meson python configure:
 meson_python_configure_target: SHELL:=/bin/bash
-meson_python_configure_target: prepare_crossenv
+meson_python_configure_target: prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@$(MSG) INSTALL_TARGET: [$(INSTALL_TARGET)]
 	@$(MSG) - Meson configure
