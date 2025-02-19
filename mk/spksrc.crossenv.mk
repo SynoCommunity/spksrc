@@ -20,7 +20,7 @@
 include ../../mk/spksrc.cross-cmake-env.mk
 
 # include meson definitions
-include ../../mk/spksrc.cross-meson-env.mk
+#include ../../mk/spksrc.cross-meson-env.mk
 
 # Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
 PYTHON_WORK_DIR = $(or $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(wildcard $(WORK_DIR)))

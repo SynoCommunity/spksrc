@@ -50,26 +50,23 @@ meson_python_configure_target: SHELL:=/bin/bash
 meson_python_configure_target: prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@$(MSG) INSTALL_TARGET: [$(INSTALL_TARGET)]
-	@$(MSG) - Meson configure
-	@$(MSG)    - Dependencies = $(DEPENDS)
-	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
-	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
-	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
+	@$(MSG)    - Dependencies: [$(DEPENDS)]
+	@$(MSG)    - Build path: [$(MESON_BUILD_DIR)]
+	@$(MSG)    - Configure ARGS: [$(CONFIGURE_ARGS)]
+	@$(MSG)    - Install prefix: [$(INSTALL_PREFIX)]
+	@$(MSG)    - Cross-file: [$(MESON_CROSS_TOOLCHAIN_PKG)]
 	@. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$(CROSSENV_PATH)/build/bin:$${PATH} ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
 	   $(MSG) "meson: [$$(which meson)]" ; \
-	   $(MSG) "MESON_NATIVE_FILE: [$(MESON_NATIVE_FILE)]" ; \
-	   $(MSG) "MESON_CROSS_FILE: [$(MESON_CROSS_FILE)]" ; \
+	   $(MSG) "cython: [$$(which cython || echo n/a)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
-	$(MSG) PATH=$${PATH} $$(which build-python) $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) --native-file $(MESON_NATIVE_FILE) ; \
-#	$(RUN) PATH=$${PATH} $$(which build-python) $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) --native-file $(MESON_NATIVE_FILE) ; \
-#	cd $(MESON_BASE_DIR) && env $(ENV) PATH=$${PATH} $$(which build-python) $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) ; \
-	cd $(MESON_BASE_DIR) && env $(ENV) PATH=$${PATH} $$(which build-python) $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) --native-file $(MESON_NATIVE_FILE)
+	$(MSG) PATH=$${PATH} $$(which build-python) $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) ; \
+	cd $(MESON_BASE_DIR) && PATH=$${PATH} $$(which build-python) $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
 .PHONY: install_python_wheel_target
 

@@ -31,7 +31,7 @@ include ../../mk/spksrc.crossenv.mk
 include ../../mk/spksrc.cross-cmake-env.mk
 
 ## meson specific configurations
-include ../../mk/spksrc.cross-meson-env.mk
+#include ../../mk/spksrc.cross-meson-env.mk
 
 include ../../mk/spksrc.wheel-download.mk
 

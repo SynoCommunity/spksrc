@@ -85,7 +85,7 @@ ninja_compile_target:
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 endif
-ifeq ($(strip $(MESON_CROSSENV)),1)
+ifeq ($(strip $(MESON_PYTHON)),1)
 	@$(MSG)    - Python wheel = $(MESON_CROSSENV)
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@. $(CROSSENV) ; \
