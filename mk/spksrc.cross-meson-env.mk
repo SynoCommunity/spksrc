@@ -82,9 +82,9 @@ meson_pkg_toolchain:
 	@echo
 	@echo "[properties]" ; \
 	echo "needs_exe_wrapper = false"
-ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	@echo "longdouble_format = 'IEEE_DOUBLE_BE'"
-else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+else ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 	@echo "longdouble_format = 'IEEE_DOUBLE_LE'"
 endif
 	@echo
