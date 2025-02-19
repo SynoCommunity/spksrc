@@ -31,7 +31,7 @@ include ../../mk/spksrc.crossenv.mk
 include ../../mk/spksrc.cross-cmake-env.mk
 
 ## meson specific configurations
-include ../../mk/spksrc.cross-meson-env.mk
+#include ../../mk/spksrc.cross-meson-env.mk
 
 include ../../mk/spksrc.wheel-download.mk
 
@@ -100,7 +100,13 @@ post_wheel_target: $(WHEEL_TARGET) install_python_wheel
 ifeq ($(wildcard $(WHEEL_COOKIE)),)
 wheel: $(WHEEL_COOKIE)
 
+# If WHEELS is empty then skip processing and
+# mark as completed using status cookie
+ifeq ($(strip $(WHEELS)),)
+$(WHEEL_COOKIE):
+else
 $(WHEEL_COOKIE): $(POST_WHEEL_TARGET)
+endif
 	$(create_target_dir)
 	@touch -f $@
 
