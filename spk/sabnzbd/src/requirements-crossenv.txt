@@ -1,9 +1,10 @@
 # cross-compiled wheels
 cffi==1.17.1
+#cryptography   ==> cross/cryptography
 CT3==3.4.0
+orjson==3.10.15
 sabctools==8.2.5
-orjson==3.10.12
 
 # AppRise/Requests Requirements
+charset_normalizer==3.4.1
 PyYAML==6.0.2
-charset_normalizer==3.4.0
