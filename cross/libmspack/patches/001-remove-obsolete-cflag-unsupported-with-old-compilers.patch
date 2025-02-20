@@ -1,0 +1,13 @@
+# remove -Wno-unused-result from CFLAGS as obsolete and not supported by old compilers
+# 
+--- Makefile.am.orig	2019-03-04 00:53:58.000000000 +0000
++++ Makefile.am	2022-05-11 18:19:51.738646328 +0000
+@@ -7,7 +7,7 @@
+ AM_CFLAGS =
+ # add "-DMSPACK_NO_DEFAULT_SYSTEM" to remove default mspack_system
+ if GCC
+-AM_CFLAGS +=            -Wall -Wextra -Wno-unused-parameter -Wno-unused-result
++AM_CFLAGS +=            -Wall -Wextra -Wno-unused-parameter
+ endif
+ AM_CPPFLAGS =           -I$(srcdir)/mspack -I$(srcdir)/test
+ 
