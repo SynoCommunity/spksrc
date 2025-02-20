@@ -1,38 +1,39 @@
 PKG_NAME = sslh
-PKG_VERS = 1.22c
+PKG_VERS = 2.1.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/yrutschle/sslh/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libconfig cross/pcre2 cross/tcp_wrappers
+DEPENDS = cross/libconfig
+DEPENDS += cross/pcre2
+DEPENDS += cross/tcp_wrappers
 DEPENDS += cross/libcap
+DEPENDS += cross/libev
 
-# compiller must support -std=c11
+# compiler must support -std=c11
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://www.rutschle.net/tech/sslh/README.html
 COMMENT  = Applicative Protocol Multiplexer (e.g. share SSH and HTTPS on the same port).
 LICENSE  = GPLv2
 
-CONFIGURE_TARGET = sslh_configure
+GNU_CONFIGURE = 1
+
 INSTALL_TARGET = sslh_install
-COMPILE_MAKE_OPTIONS = USELIBWRAP=1
+COMPILE_MAKE_OPTIONS = USELIBWRAP=1 USELIBCAP=1
 
 ADDITIONAL_CFLAGS = -std=c11
-# use misc of netdb.h in toolchain to define NI_MAXHOST, NI_MAXSERV, ...
-ADDITIONAL_CFLAGS += -D__USE_MISC
-ADDITIONAL_CFLAGS += -DNI_MAXHOST=1025
-ADDITIONAL_CFLAGS += -DNI_MAXSERV=32
+# force definition of __USE_MISC to define NI_MAXHOST, NI_MAXSERV, ... in netdb.h of toolchain
+# __USE_MISC is defined in features.h when _DEFAULT_SOURCE is defined (otherwise __USE_MISC is undefined)
+ADDITIONAL_CFLAGS += -D_DEFAULT_SOURCE
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: sslh_configure
-sslh_configure:
-	@$(RUN) sed -i -e '/^USELIBCAP=/s/=.*/=1/' $(WORK_DIR)/$(PKG_DIR)/Makefile 
-
 .PHONY: sslh_install
 sslh_install:
-	@$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/bin
-	@$(RUN) cp $(WORK_DIR)/$(PKG_DIR)/sslh-fork $(STAGING_INSTALL_PREFIX)/bin/sslh
+	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
+	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/sslh-fork $(STAGING_INSTALL_PREFIX)/bin/
+	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/sslh-select $(STAGING_INSTALL_PREFIX)/bin/
+	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/sslh-ev $(STAGING_INSTALL_PREFIX)/bin/
