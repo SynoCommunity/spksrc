@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.gerrit": {
+            "title": "Gerrit",
+            "desc": "Gerrit Web UI",
+            "icon": "images/gerrit-{0}.png",
+            "type": "url",
+            "protocol": "https",
+            "port": "8091",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
