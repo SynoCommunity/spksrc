@@ -25,7 +25,7 @@ include ../../mk/spksrc.common.mk
 #     -fno-tree-loop-vectorize (less impactfull on optizations)
 ifeq ($(call version_le, $(TCVERSION), 7.1),1)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-ADDITIONAL_CFLAGS = -DNPY_HAVE_NEON_VFPV4=0 -DNPY_HAVE_NEON_FP16=0 -DNPY_HAVE_NEON=0 -DNPY_HAVE_ASIMD=0
+#ADDITIONAL_CFLAGS = -DNPY_HAVE_NEON_VFPV4=0 -DNPY_HAVE_NEON_FP16=0 -DNPY_HAVE_NEON=0 -DNPY_HAVE_ASIMD=0
 #ADDITIONAL_CFLAGS = -march=armv8-a+nosimd
 #ADDITIONAL_CFLAGS = -DNPY_DISABLE_CPU_FEATURES=ASIMD,NEON
 #ADDITIONAL_CFLAGS = -mno-neon -mno-simd
@@ -33,7 +33,7 @@ ADDITIONAL_CFLAGS = -DNPY_HAVE_NEON_VFPV4=0 -DNPY_HAVE_NEON_FP16=0 -DNPY_HAVE_NE
 #ADDITIONAL_CFLAGS = -DVQSORT_ENABLED=0
 #ADDITIONAL_CFLAGS = -mno-outline-atomics
 #ADDITIONAL_CFLAGS = -O0 -fno-fast-math -fno-tree-vectorize
-#ADDITIONAL_CFLAGS = -fno-tree-loop-vectorize
+ADDITIONAL_CFLAGS = -fno-tree-loop-vectorize
 #ADDITIONAL_CXXFLAGS = -fno-tree-loop-vectorize
 #ADDITIONAL_CPPFLAGS = -fno-tree-loop-vectorize
 #ADDITIONAL_CFLAGS = -O3 -fno-fast-math -fno-tree-vectorize
