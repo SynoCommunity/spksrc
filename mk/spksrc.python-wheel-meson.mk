@@ -17,9 +17,9 @@ CONFIGURE_TARGET = meson_python_configure_target
 endif
 
 # install using python
-ifeq ($(strip $(INSTALL_TARGET)),)
-INSTALL_TARGET = install_python_wheel_target
-endif
+#ifeq ($(strip $(INSTALL_TARGET)),)
+#INSTALL_TARGET = install_python_wheel_target
+#endif
 
 # call-up ninja build process
 include ../../mk/spksrc.cross-ninja.mk
@@ -65,8 +65,34 @@ meson_python_configure_target: prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
-	$(MSG) PATH=$${PATH} $$(which build-python) $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) ; \
-	cd $(MESON_BASE_DIR) && PATH=$${PATH} $$(which build-python) $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	$(MSG) \
+	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
+	   PATH=$${PATH} \
+	   $$(which cross-python) -m pip wheel . \
+	   --config-settings=setup-args="--cross-file=$(MESON_CROSS_TOOLCHAIN_PKG)" \
+	   --config-settings=setup-args="--native-file=$(MESON_NATIVE_FILE)" \
+	   --config-settings=install-args="--tags=runtime,python-runtime" \
+	   --config-settings=build-dir="$(MESON_BUILD_DIR)" \
+	   --no-build-isolation \
+	   --wheel-dir $(WHEELHOUSE) ; \
+	$(RUN) \
+	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
+	   PATH=$${PATH} \
+	   $$(which cross-python) -m pip wheel . \
+	   --config-settings=setup-args="--cross-file=$(MESON_CROSS_TOOLCHAIN_PKG)" \
+	   --config-settings=setup-args="--native-file=$(MESON_NATIVE_FILE)" \
+	   --config-settings=install-args="--tags=runtime,python-runtime" \
+	   --config-settings=build-dir="$(MESON_BUILD_DIR)" \
+	   --no-build-isolation \
+	   --wheel-dir $(WHEELHOUSE)
+
+# aarch64 tests
+#--config-settings=setup-args=-Dcpu_baseline=none
+#--config-settings=setup-args=-Dcpu_baseline="none" \
+#--config-settings=setup-args=-Ddisable-asmid=true \
+#--config-settings=setup-args=-Ddisable-neon=true \
+#NPY_DISABLE_CPU_FEATURES="NEON ASIMD" \
+#NPY_DISABLE_CPU_FEATURES=\"NEON ASIMD\" \
 
 .PHONY: install_python_wheel_target
 
@@ -81,25 +107,35 @@ install_python_wheel_target:
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
-	   $(MSG) "python: [$$(which build-python)]" ; \
+	   $(MSG) "python: [$$(which cross-python)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
 	$(MSG) \
+	   PATH=$${PATH} \
+	   $$(which cross-python) \
+	   $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py install -C $(MESON_BUILD_DIR) \
+	   --destdir $(MESON_BUILD_DIR)/../destdir ; \
+	cd $(MESON_BASE_DIR) && \
+	   PATH=$${PATH} \
+	   $$(which cross-python) \
+	   $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py install -C $(MESON_BUILD_DIR) \
+	   --destdir $(MESON_BUILD_DIR)/../destdir ; \
+	$(MSG) \
 	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
 	   PATH=$${PATH} \
-	   $$(which build-python) -m pip \
-	   $(PIP_WHEEL_ARGS) \
-	   --no-build-isolation \
-	   $(WORK_DIR)/$(PKG_DIR) ; \
+	   $$(which cross-python) -m pip wheel \
+	   $(MESON_BUILD_DIR)/../destdir \
+	   --no-deps \
+	   --wheel-dir $(WHEELHOUSE) ; \
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	   PATH=$${PATH} \
-	   $$(which build-python) -m pip \
-	   $(PIP_WHEEL_ARGS) \
-	   --no-build-isolation \
-	   $(WORK_DIR)/$(PKG_DIR)
+	   $$(which cross-python) -m pip wheel \
+	   $(MESON_BUILD_DIR)/../destdir \
+	   --no-deps \
+	   --wheel-dir $(WHEELHOUSE)
 
 ###
 
