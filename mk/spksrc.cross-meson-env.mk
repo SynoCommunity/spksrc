@@ -84,7 +84,7 @@ meson_pkg_toolchain:
 	echo "needs_exe_wrapper = false"
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	@echo "longdouble_format = 'IEEE_DOUBLE_BE'"
-else ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	@echo "longdouble_format = 'IEEE_DOUBLE_LE'"
 endif
 	@echo
