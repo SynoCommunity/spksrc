@@ -54,18 +54,17 @@ prepare_crossenv:
 meson_python_configure_target: SHELL:=/bin/bash
 meson_python_configure_target: prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
-	@$(MSG) INSTALL_TARGET: [$(INSTALL_TARGET)]
-	@$(MSG)    - Dependencies: [$(DEPENDS)]
-	@$(MSG)    - Build path: [$(MESON_BUILD_DIR)]
-	@$(MSG)    - Configure ARGS: [$(CONFIGURE_ARGS)]
-	@$(MSG)    - Install prefix: [$(INSTALL_PREFIX)]
-	@$(MSG)    - Cross-file: [$(MESON_CROSS_TOOLCHAIN_PKG)]
-	@. $(CROSSENV) ; \
+	@set -o pipefail; { \
+	$(MSG) "- Build path: [$(MESON_BUILD_DIR)]" ; \
+	$(MSG) "- Configure ARGS: [$(CONFIGURE_ARGS)]" ; \
+	$(MSG) "- Install prefix: [$(INSTALL_PREFIX)]" ; \
+	$(MSG) "- Cross-file: [$(MESON_CROSS_TOOLCHAIN_PKG)]" ; \
+	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$(CROSSENV_PATH)/build/bin:$${PATH} ; \
-	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
-	   $(MSG) "meson: [$$(which meson)]" ; \
-	   $(MSG) "cython: [$$(which cython || echo n/a)]" ; \
+	   $(MSG) "- crossenv: [$(CROSSENV)]" ; \
+	   $(MSG) "- meson: [$$(which meson)]" ; \
+	   $(MSG) "- cython: [$$(which cython)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
@@ -82,22 +81,20 @@ meson_python_configure_target: prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
 	   $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup \
 	   $(MESON_BUILD_DIR) \
 	   -Dprefix=$(INSTALL_PREFIX) \
-	   $(CONFIGURE_ARGS)
+	   $(CONFIGURE_ARGS) ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 .PHONY: install_python_wheel_target
 
+install_python_wheel_target: SHELL:=/bin/bash
 install_python_wheel_target:
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
-	@$(MSG) - Meson configure
-	@$(MSG)    - Dependencies = $(DEPENDS)
-	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
-	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
-	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	@. $(CROSSENV) ; \
+	@set -o pipefail; { \
+	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
-	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
-	   $(MSG) "python: [$$(which cross-python)]" ; \
+	   $(MSG) "- crossenv: [$(CROSSENV)]" ; \
+	   $(MSG) "- python: [$$(which cross-python)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
@@ -106,10 +103,10 @@ install_python_wheel_target:
 	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
 	   PATH=$${PATH} \
 	   $$(which cross-python) -m pip wheel . \
-	   --config-settings=setup-args="--cross-file=$(MESON_CROSS_TOOLCHAIN_PKG)" \
-	   --config-settings=setup-args="--native-file=$(MESON_NATIVE_FILE)" \
-	   --config-settings=install-args="--tags=runtime,python-runtime" \
-	   --config-settings=build-dir="$(MESON_BUILD_DIR)" \
+	   --config-settings=setup-args=\"--cross-file=$(MESON_CROSS_TOOLCHAIN_PKG)\" \
+	   --config-settings=setup-args=\"--native-file=$(MESON_NATIVE_FILE)\" \
+	   --config-settings=install-args=\"--tags=runtime,python-runtime\" \
+	   --config-settings=build-dir=\"$(MESON_BUILD_DIR)\" \
 	   --no-build-isolation \
 	   --wheel-dir $(WHEELHOUSE) ; \
 	$(RUN) \
@@ -121,7 +118,8 @@ install_python_wheel_target:
 	   --config-settings=install-args="--tags=runtime,python-runtime" \
 	   --config-settings=build-dir="$(MESON_BUILD_DIR)" \
 	   --no-build-isolation \
-	   --wheel-dir $(WHEELHOUSE)
+	   --wheel-dir $(WHEELHOUSE) ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 ###
 
