@@ -79,16 +79,19 @@ endif
 .PHONY: ninja_compile_target
 
 # default ninja compile:
+ninja_compile_target: SHELL:=/bin/bash
 ninja_compile_target:
-	@$(MSG) - Ninja compile
-	@$(MSG)    - Ninja build path = $(WORK_DIR)/$(PKG_DIR)/$(NINJA_BUILD_DIR)
+	@$(MSG) Ninja compile
+	@$(MSG) "- Ninja build path: [$(WORK_DIR)/$(PKG_DIR)/$(NINJA_BUILD_DIR)]"
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
+	@$(MSG) "- Use NASM: [$(CMAKE_USE_NASM)]"
 endif
 ifeq ($(strip $(MESON_PYTHON)),1)
-	@$(MSG)    - Python wheel = $(MESON_CROSSENV)
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
-	@. $(CROSSENV) ; \
+	@set -o pipefail; { \
+	$(MSG) "- meson-python" ; \
+	$(MSG) "- crossenv: [$(CROSSENV)]" ; \
+	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
@@ -97,7 +100,8 @@ ifeq ($(strip $(MESON_PYTHON)),1)
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
-	$(RUN) PATH=$${PATH} ninja -C $(NINJA_BUILD_DIR)
+	$(RUN) PATH=$${PATH} ninja -C $(NINJA_BUILD_DIR) ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 else
 	$(RUN) ninja -C $(NINJA_BUILD_DIR)
 endif
