@@ -1,6 +1,5 @@
-PKG_SHORT_NAME = numpy
-PKG_SHORT_VERS = v2
-PKG_NAME = $(PKG_SHORT_NAME)_$(PKG_SHORT_VERS)
+PKG_NAME = numpy_v2
+PKG_SHORT_NAME = $(firstword $(subst _, ,$(PKG_NAME)))
 PKG_VERS = 2.2.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_SHORT_NAME)-$(PKG_VERS).$(PKG_EXT)
