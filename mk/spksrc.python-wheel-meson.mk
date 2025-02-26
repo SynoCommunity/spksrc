@@ -21,6 +21,11 @@ ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = install_python_wheel_target
 endif
 
+###
+
+# Define meson-python use-case
+MESON_PYTHON = 1
+
 # call-up ninja build process
 include ../../mk/spksrc.cross-ninja.mk
 
@@ -78,14 +83,6 @@ meson_python_configure_target: prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
 	   $(MESON_BUILD_DIR) \
 	   -Dprefix=$(INSTALL_PREFIX) \
 	   $(CONFIGURE_ARGS)
-
-# aarch64 tests
-#--config-settings=setup-args=-Dcpu_baseline=none
-#--config-settings=setup-args=-Dcpu_baseline="none" \
-#--config-settings=setup-args=-Ddisable-asmid=true \
-#--config-settings=setup-args=-Ddisable-neon=true \
-#NPY_DISABLE_CPU_FEATURES="NEON ASIMD" \
-#NPY_DISABLE_CPU_FEATURES=\"NEON ASIMD\" \
 
 .PHONY: install_python_wheel_target
 
