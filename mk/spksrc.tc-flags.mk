@@ -1,4 +1,8 @@
+ifeq ($(strip $(firstword $(subst ., ,$(TC_VERS)))),7)
+TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ fc:gfortran ar strip objdump objcopy readelf
+else
 TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump objcopy readelf
+endif
 
 ifeq ($(strip $(TC_NAME)),)
 TC_NAME = syno-$(TC_ARCH)
@@ -52,6 +56,11 @@ CPPFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 
 CXXFLAGS += -I$(abspath $(WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_CFLAGS)
 CXXFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
+
+ifeq ($(strip $(firstword $(subst ., ,$(TC_VERS)))),7)
+FFLAGS += -I$(abspath $(WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_FFLAGS)
+FFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
+endif
 
 LDFLAGS += -L$(abspath $(WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY)) $(TC_EXTRA_CFLAGS)
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)

@@ -34,18 +34,21 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
   MESON_BUILTIN_CPP_ARGS = -fPIC
+  MESON_BUILTIN_FC_ARGS = -fPIC
   MESON_HOST_CPU_FAMILY = arm
   MESON_HOST_CPU = armv7
   MESON_HOST_ENDIAN = little
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
   MESON_BUILTIN_CPP_ARGS = -fPIC
+  MESON_BUILTIN_FC_ARGS = -fPIC
   MESON_HOST_CPU_FAMILY = arm
   MESON_HOST_CPU = armv7l
   MESON_HOST_ENDIAN = little
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
   MESON_BUILTIN_CPP_ARGS = -fPIC
+  MESON_BUILTIN_FC_ARGS = -fPIC
   MESON_HOST_CPU_FAMILY = aarch64
   MESON_HOST_CPU = aarch64
   MESON_HOST_ENDIAN = little
@@ -60,6 +63,8 @@ ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
   MESON_BUILTIN_C_LINK_ARGS = -m32
   MESON_BUILTIN_CPP_ARGS = -m32
   MESON_BUILTIN_CPP_LINK_ARGS = -m32
+  MESON_BUILTIN_FC_ARGS = -m32
+  MESON_BUILTIN_FC_LINK_ARGS = -m32
   MESON_HOST_CPU_FAMILY = x86
   MESON_HOST_CPU = i686
   MESON_HOST_ENDIAN = little
@@ -109,6 +114,7 @@ ifneq ($(strip $(MESON_BUILTIN_CPP_ARGS)),)
 endif
 	@echo $(CPPFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
+	@echo
 	@echo "cpp_link_args = ["
 ifneq ($(strip $(MESON_BUILTIN_CPP_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_LINK_ARGS)',\n"
@@ -118,4 +124,18 @@ endif
 	@echo
 	@echo "cxx_args = ["
 	@echo $(CXXFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t]\n"
+	@echo
+	@echo "fc_args = ["
+ifneq ($(strip $(MESON_BUILTIN_FC_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_FC_ARGS)',\n"
+endif
+	@echo $(FFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t]\n"
+	@echo
+	@echo "fc_link_args = ["
+ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_FC_LINK_ARGS)',\n"
+endif
+	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
