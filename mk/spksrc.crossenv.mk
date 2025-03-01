@@ -215,6 +215,30 @@ endif
 ###    <crossenv> = $(lastword $(subst -, ,$*)) being <wheel>-<version>, <wheel> or default
 ###
 crossenv-install-%:
+ifeq ($(WHEEL_TYPE),wheelhouse)
+	@. $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate ; \
+	if [ -e "$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate" ] ; then \
+	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/build/bin ; \
+	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate]" ; \
+	   $(MSG) "python: [$$(which cross-python)]" ; \
+	else \
+	   echo "ERROR: crossenv not found!" ; \
+	   exit 2 ; \
+	fi ; \
+	$(MSG) \
+	   $$(which cross-python) -m pip install \
+	   --cache-dir $(PIP_CACHE_DIR) \
+	   --find-links file://$(WHEELHOUSE) \
+	   --disable-pip-version-check \
+	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
+	$(RUN) \
+	   PATH=$${PATH} \
+	   $$(which cross-python) -m pip install \
+	   --cache-dir $(PIP_CACHE_DIR) \
+	   --find-links file://$(WHEELHOUSE) \
+	   --disable-pip-version-check \
+	   $(WHEEL_NAME)==$(WHEEL_VERSION)
+else
 	@. $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate ; \
 	if [ -e "$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate" ] ; then \
 	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/build/bin ; \
@@ -225,14 +249,17 @@ crossenv-install-%:
 	   exit 2 ; \
 	fi ; \
 	$(MSG) \
-	   $$(which $(WHEEL_TYPE)-python) -m pip \
-	   install $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
-	$(RUN) \
-	   PATH=$${PATH} \
-	   $$(which $(WHEEL_TYPE)-python) -m pip \
+	   $$(which $(WHEEL_TYPE)-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
 	   --disable-pip-version-check \
-	   install $(WHEEL_NAME)==$(WHEEL_VERSION)
+	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
+	$(RUN) \
+	   PATH=$${PATH} \
+	   $$(which $(WHEEL_TYPE)-python) -m pip install \
+	   --cache-dir $(PIP_CACHE_DIR) \
+	   --disable-pip-version-check \
+	   $(WHEEL_NAME)==$(WHEEL_VERSION)
+endif
 
 
 ##
