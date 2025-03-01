@@ -190,11 +190,11 @@ tc_vars: flag
 	done ; \
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
-	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\)\"
-ifeq ($(strip $(firstword $(subst ., ,$(TC_VERS)))),7)
-	@echo TC_ENV += FFLAGS=\"$(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\)\"
-endif
-	@echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
+	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
+	if [ $$(echo "$(TC_VERS) >= 7" | bc) -eq 1 ]; then \
+	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\)\" ; \
+	fi ; \
+	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
 	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
@@ -210,11 +210,11 @@ endif
 	echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/ ; \
 	echo CFLAGS := $(CFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CFLAGS\) ; \
 	echo CPPFLAGS := $(CPPFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CPPFLAGS\) ; \
-	echo CXXFLAGS := $(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\)
-ifeq ($(strip $(firstword $(subst ., ,$(TC_VERS)))),7)
-	@echo FFLAGS := $(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\)
-endif
-	@echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
+	echo CXXFLAGS := $(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\) ; \
+	if [ $$(echo "$(TC_VERS) >= 7" | bc) -eq 1 ]; then \
+	   echo FFLAGS := $(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\) ; \
+	fi ; \
+	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
