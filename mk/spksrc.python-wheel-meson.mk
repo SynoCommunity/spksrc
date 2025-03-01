@@ -11,9 +11,20 @@ include ../../mk/spksrc.directories.mk
 # meson specific configurations
 include ../../mk/spksrc.cross-meson-env.mk
 
+# If using a local meson from package
+# use direct meson+ninja build
+ifneq ($(strip $(VENDOR_MESON)),)
+
 # configure using meson
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = meson_python_configure_target
+endif
+
+# Else using default through pip
+else
+PRE_CONFIGURE_TARGET = $(MESON_CROSS_TOOLCHAIN_PKG)
+CONFIGURE_TARGET = prepare_crossenv
+COMPILE_TARGET = nop
 endif
 
 # install using python
@@ -63,22 +74,26 @@ meson_python_configure_target: prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$(CROSSENV_PATH)/build/bin:$${PATH} ; \
 	   $(MSG) "- crossenv: [$(CROSSENV)]" ; \
-	   $(MSG) "- meson: [$$(which meson)]" ; \
 	   $(MSG) "- cython: [$$(which cython)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
+	if [ "$(VENDOR_MESON)" ] ; then \
+	   meson="$$(which build-python) $(VENDOR_MESON)" ; \
+	else \
+	   meson="$$(which meson)" ; \
+	fi ; \
+	$(MSG) "- meson: [$${meson}]" ; \
 	$(MSG) \
 	   PATH=$${PATH} \
-	   $$(which cross-python) \
-	   $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup \
+	   $${meson} setup \
 	   $(MESON_BUILD_DIR) \
-	   -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) ; \
+	   -Dprefix=$(INSTALL_PREFIX) \
+	   $(CONFIGURE_ARGS) ; \
 	cd $(MESON_BASE_DIR) && \
 	   PATH=$${PATH} \
-	   $$(which cross-python) \
-	   $(WORK_DIR)/$(PKG_DIR)/vendored-meson/meson/meson.py setup \
+	   $${meson} setup \
 	   $(MESON_BUILD_DIR) \
 	   -Dprefix=$(INSTALL_PREFIX) \
 	   $(CONFIGURE_ARGS) ; \
@@ -92,8 +107,9 @@ install_python_wheel_target:
 	@set -o pipefail; { \
 	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
-	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
+	   export PATH=$(CROSSENV_PATH)/build/bin:$${PATH} ; \
 	   $(MSG) "- crossenv: [$(CROSSENV)]" ; \
+	   $(MSG) "- meson: [$$(which meson)]" ; \
 	   $(MSG) "- python: [$$(which cross-python)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
