@@ -31,6 +31,9 @@ WHEELS  = src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
+OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy
+
 include ../../mk/spksrc.common.mk
 
 # [cryptography]
@@ -78,6 +81,9 @@ DEPENDS += cross/libyaml
 ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-rpds-py.txt
 endif
+
+# [scikit-learn]
+#DEPENDS += python/scikit-learn
 
 include ../../mk/spksrc.python.mk
 
@@ -129,6 +135,8 @@ WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
 # [numpy]
+# gcc-8.4 is the minimal version to build numpy
+# gcc-8.5 hapens to be the default version for DSM-7.1
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
