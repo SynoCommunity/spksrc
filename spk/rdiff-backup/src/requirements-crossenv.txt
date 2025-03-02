@@ -1,9 +1,5 @@
 # Generated using the requirements script on March 2, 2025
 
-cffi==1.17.1
-charset_normalizer==3.4.1
-cryptography==44.0.2
-nh3==0.2.21
 psutil==7.0.0
 pylibacl==0.7.2
 pyxattr==0.8.1
