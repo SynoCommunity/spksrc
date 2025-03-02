@@ -72,7 +72,7 @@ meson_python_configure_target: prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
 	$(MSG) "- Cross-file: [$(MESON_CROSS_TOOLCHAIN_PKG)]" ; \
 	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
-	   export PATH=$(CROSSENV_PATH)/build/bin:$${PATH} ; \
+	   export PATH=$(call dedup,$(CROSSENV_PATH)/cross/bin:$(CROSSENV_PATH)/build/bin:$${PATH}, :) ; \
 	   $(MSG) "- crossenv: [$(CROSSENV)]" ; \
 	   $(MSG) "- cython: [$$(which cython)]" ; \
 	else \
@@ -107,7 +107,7 @@ install_python_wheel_target:
 	@set -o pipefail; { \
 	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
-	   export PATH=$(CROSSENV_PATH)/build/bin:$${PATH} ; \
+	   export PATH=$(call dedup,$(CROSSENV_PATH)/cross/bin:$(CROSSENV_PATH)/build/bin:$(CROSSENV_PATH)/bin:$${PATH}, :) ; \
 	   $(MSG) "- crossenv: [$(CROSSENV)]" ; \
 	   $(MSG) "- meson: [$$(which meson)]" ; \
 	   $(MSG) "- python: [$$(which cross-python)]" ; \
