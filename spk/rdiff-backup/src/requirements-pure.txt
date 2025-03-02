@@ -1,39 +1,31 @@
-# Snapshot using python 3.11 on Nov 10th 2024
-#aiohttp                     ==> crossenv
-aiosignal==1.3.1
-async-timeout==5.0.1
-attrs==24.2.0
-cachetools==5.5.0
-#certifi                     ==> py311
-chardet==5.2.0
-colorama==0.4.6
-#coverage                    ==> crossenv
-#distlib                     ==> py311
-#filelock                    ==> py311
-flake8==7.1.1
-#frozenlist                  ==> crossenv
+# Generated using the requirements script on March 2, 2025
+
+build==1.2.2.post1
+#certifi                    ==> py312
+docutils==0.21.2
+id==1.5.0
 idna==3.10
-mccabe==0.7.0
-#multidict                   ==> crossenv
+jaraco.classes==3.4.0
+jaraco.context==6.0.1
+jaraco.functools==4.1.0
+jeepney==0.9.0
+keyring==25.6.0
+markdown_it_py==3.0.0
+mdurl==0.1.2
+more_itertools==10.6.0
 packaging==24.2
-#platformdirs                ==> py311
-pluggy==1.5.0
-#psutil                      ==> crossenv
-py==1.11.0
-pycodestyle==2.12.1
-pyflakes==3.2.0
-#pylibacl                    ==> crossenv
-pyparsing==3.2.0
-pyproject_api==1.8.0
-#pyxattr                     ==> crossenv
-#PyYAML                      ==> crossenv
-#rdiff-backup                ==> crossenv
+#pip                        ==> py312
+pycparser==2.22
+pygments==2.19.1
+pyproject_hooks==1.2.0
+readme_renderer==44.0
 requests==2.32.3
-rqdb==1.6.1
-#six                         ==> py311
-tomli==2.0.2
-tox==4.23.2
-typing_extensions==4.12.2
-urllib3==2.2.3
-#virtualenv                  ==> py311
-#yarl                        ==> crossenv
+requests_toolbelt==1.0.0
+rfc3986==2.0.0
+rich==13.9.4
+SecretStorage==3.3.3
+#setuptools                 ==> py312
+setuptools_scm==8.2.0
+twine==6.1.0
+urllib3==2.3.0
+#wheel                      ==> py312
