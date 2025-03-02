@@ -12,6 +12,7 @@ COMMENT  = OpenBLAS is an optimized BLAS (Basic Linear Algebra Subprograms) libr
 LICENSE  = BSD-3-Clause license
 
 REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = comcerto2k
 
 CMAKE_ARGS  = -DNO_LAPACKE=1
 CMAKE_ARGS += -DNO_AFFINITY=1
@@ -47,9 +48,9 @@ CMAKE_ARGS += -DTARGET=ATOM
 endif
 
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += -DBINARY=64
+CMAKE_ARGS += -DBINARY=64
 else
-CONFIGURE_ARGS += -DBINARY=32
+CMAKE_ARGS += -DBINARY=32
 endif
 
 include ../../mk/spksrc.cross-cmake.mk
