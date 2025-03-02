@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
 SPK_VERS = 10.10.6
-SPK_REV = 23
+SPK_REV = 24
 SPK_ICON = src/jellyfin.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
@@ -50,6 +50,8 @@ DEPENDS += cross/libstdc++
 POST_STRIP_TARGET += jellyfin_patch_target
 endif
 
+POST_STRIP_TARGET += jellyfin_extra_install
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: jellyfin_custom_libe_sqlite3
@@ -57,9 +59,14 @@ jellyfin_custom_libe_sqlite3:
 	@$(MSG) "Replace libe_sqlite3 with version built for DSM"
 	mv -f $(STAGING_DIR)/lib/libe_sqlite3.so $(STAGING_DIR)/share/libe_sqlite3.so
 
-
 .PHONY: jellyfin_patch_target
 # Set library path to use bundled libstdc++
 jellyfin_patch_target:
 	@$(MSG) "Set library runpath in jellyfin executable."
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/share/$(SPK_NAME)
+
+.PHONY: jellyfin_extra_install
+jellyfin_extra_install:
+	@$(MSG) "Install font configuration."
+	@install -m 755 -d $(STAGING_DIR)/var/fonts
+	@install -m 644 src/fonts/fonts.conf $(STAGING_DIR)/var/fonts/fonts.conf
