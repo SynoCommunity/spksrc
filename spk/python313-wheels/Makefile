@@ -126,8 +126,9 @@ WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
 # [numpy]
-ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy.txt
+ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy
 endif
 
 # [pycryptodome]
