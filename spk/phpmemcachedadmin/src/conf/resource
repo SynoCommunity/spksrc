@@ -1,14 +1,11 @@
 {
-    "port-config": {
-        "protocol-file": "app/memcached.sc"
-    },
     "webservice": {
         "services": [{
             "service": "phpMemcachedAdmin",
             "display_name": "phpMemcachedAdmin",
             "type": "apache_php",
             "root": "phpMemcachedAdmin",
-            "icon": "app/images/memcached-{0}.png",
+            "icon": "app/images/phpmemcachedadmin-{0}.png",
             "backend": 2,
             "php": {
                 "profile_name": "php-memcached-admin",
@@ -19,7 +16,7 @@
                     "intl",
                     "zip"
                 ],
-                "user": "sc-memcached",
+                "user": "sc-phpmemcachedadmin",
                 "group": "http"
             }
         }],
@@ -29,7 +26,7 @@
                 "type": "alias",
                 "name": "PHP Memcached Admin",
                 "alias": "phpMemcachedAdmin",
-                "app": "com.synocommunity.packages.memcached"
+                "app": "com.synocommunity.packages.phpmemcachedadmin"
             }
         ],
         "migrate": {
@@ -39,10 +36,10 @@
             }]
         },
         "pkg_dir_prepare": [{
-            "source": "/var/packages/memcached/target/share/phpMemcachedAdmin",
+            "source": "/var/packages/phpmemcachedadmin/target/share/phpMemcachedAdmin",
             "target": "phpMemcachedAdmin",
             "mode": "0755",
-            "user": "sc-memcached",
+            "user": "sc-phpmemcachedadmin",
             "group": "http"
         }]
     }

@@ -1,9 +1,9 @@
 {
     ".url" : {
-        "com.synocommunity.packages.memcached" : {
+        "com.synocommunity.packages.phpmemcachedadmin" : {
             "title": "phpMemcachedAdmin",
             "desc": "PHPMemcachedAdmin - memcached admin interface",
-            "icon": "images/memcached-{0}.png",
+            "icon": "images/phpmemcachedadmin-{0}.png",
             "protocol": "http",
             "type": "url",
             "url": "/phpMemcachedAdmin",
