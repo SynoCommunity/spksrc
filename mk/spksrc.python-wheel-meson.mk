@@ -8,37 +8,30 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-# meson specific configurations
-include ../../mk/spksrc.cross-meson-env.mk
-
-# If using a local meson from package
-# use direct meson+ninja build
-ifneq ($(strip $(VENDOR_MESON)),)
-
-# configure using meson
-ifeq ($(strip $(CONFIGURE_TARGET)),)
-CONFIGURE_TARGET = meson_python_configure_target
-endif
-
-# Else using default through pip
-else
-PRE_CONFIGURE_TARGET = $(MESON_CROSS_TOOLCHAIN_PKG)
-CONFIGURE_TARGET = prepare_crossenv
-COMPILE_TARGET = nop
-endif
-
-# install using python
-ifeq ($(strip $(INSTALL_TARGET)),)
-INSTALL_TARGET = install_python_wheel_target
-endif
-
 ###
 
 # Define meson-python use-case
 MESON_PYTHON = 1
 
-# call-up ninja build process
-include ../../mk/spksrc.cross-ninja.mk
+# meson specific configurations
+include ../../mk/spksrc.cross-meson-env.mk
+
+# configure part of the pip wheel process using:
+#   --config-settings=setup-args='<value>'
+ifeq ($(strip $(CONFIGURE_TARGET)),)
+CONFIGURE_TARGET = prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
+endif
+
+# compile part of the pip wheel process, no config-settings available
+ifeq ($(strip $(COMPILE_TARGET)),)
+COMPILE_TARGET = nop
+endif
+
+# install using python pip wheel process using:
+#   --config-settings=install-args='<value>'
+ifeq ($(strip $(INSTALL_TARGET)),)
+INSTALL_TARGET = install_python_wheel_target
+endif
 
 ###
 
@@ -59,46 +52,6 @@ prepare_crossenv:
 	@$(MSG) $(MAKE) WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
 	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
-.PHONY: meson_python_configure_target
-
-# default meson python configure:
-meson_python_configure_target: SHELL:=/bin/bash
-meson_python_configure_target: prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
-	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
-	@set -o pipefail; { \
-	$(MSG) "- Build path: [$(MESON_BUILD_DIR)]" ; \
-	$(MSG) "- Configure ARGS: [$(CONFIGURE_ARGS)]" ; \
-	$(MSG) "- Install prefix: [$(INSTALL_PREFIX)]" ; \
-	$(MSG) "- Cross-file: [$(MESON_CROSS_TOOLCHAIN_PKG)]" ; \
-	. $(CROSSENV) ; \
-	if [ -e "$(CROSSENV)" ] ; then \
-	   export PATH=$(call dedup,$(CROSSENV_PATH)/cross/bin:$(CROSSENV_PATH)/build/bin:$${PATH}, :) ; \
-	   $(MSG) "- crossenv: [$(CROSSENV)]" ; \
-	   $(MSG) "- cython: [$$(which cython)]" ; \
-	else \
-	   echo "ERROR: crossenv not found!" ; \
-	   exit 2 ; \
-	fi ; \
-	if [ "$(VENDOR_MESON)" ] ; then \
-	   meson="$$(which build-python) $(VENDOR_MESON)" ; \
-	else \
-	   meson="$$(which meson)" ; \
-	fi ; \
-	$(MSG) "- meson: [$${meson}]" ; \
-	$(MSG) \
-	   PATH=$${PATH} \
-	   $${meson} setup \
-	   $(MESON_BUILD_DIR) \
-	   -Dprefix=$(INSTALL_PREFIX) \
-	   $(CONFIGURE_ARGS) ; \
-	cd $(MESON_BASE_DIR) && \
-	   PATH=$${PATH} \
-	   $${meson} setup \
-	   $(MESON_BUILD_DIR) \
-	   -Dprefix=$(INSTALL_PREFIX) \
-	   $(CONFIGURE_ARGS) ; \
-	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
-
 .PHONY: install_python_wheel_target
 
 install_python_wheel_target: SHELL:=/bin/bash
@@ -108,6 +61,7 @@ install_python_wheel_target:
 	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$(call dedup,$(CROSSENV_PATH)/cross/bin:$(CROSSENV_PATH)/build/bin:$(CROSSENV_PATH)/bin:$${PATH}, :) ; \
+	   export PKG_CONFIG_PATH=$(STAGING_INSTALL_PREFIX)/lib/pkgconfig ; \
 	   $(MSG) "- crossenv: [$(CROSSENV)]" ; \
 	   $(MSG) "- meson: [$$(which meson)]" ; \
 	   $(MSG) "- python: [$$(which cross-python)]" ; \
@@ -119,22 +73,22 @@ install_python_wheel_target:
 	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
 	   PATH=$${PATH} \
 	   $$(which cross-python) -m pip wheel . \
-	   --config-settings=setup-args=\"--cross-file=$(MESON_CROSS_TOOLCHAIN_PKG)\" \
-	   --config-settings=setup-args=\"--native-file=$(MESON_NATIVE_FILE)\" \
-	   --config-settings=install-args=\"--tags=runtime,python-runtime\" \
+	   $(foreach arg,$(CONFIGURE_ARGS),--config-settings=setup-args=\"$(arg)\" ) \
+	   $(foreach arg,$(INSTALL_ARGS),--config-settings=install-args=\"$(arg)\" ) \
 	   --config-settings=build-dir=\"$(MESON_BUILD_DIR)\" \
 	   --no-build-isolation \
-	   --wheel-dir $(WHEELHOUSE) ; \
+	   --wheel-dir $(WHEELHOUSE) \
+	   --verbose ; \
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	   PATH=$${PATH} \
 	   $$(which cross-python) -m pip wheel . \
-	   --config-settings=setup-args="--cross-file=$(MESON_CROSS_TOOLCHAIN_PKG)" \
-	   --config-settings=setup-args="--native-file=$(MESON_NATIVE_FILE)" \
-	   --config-settings=install-args="--tags=runtime,python-runtime" \
+	   $(foreach arg,$(CONFIGURE_ARGS),--config-settings=setup-args="$(arg)" ) \
+	   $(foreach arg,$(INSTALL_ARGS),--config-settings=install-args="$(arg)" ) \
 	   --config-settings=build-dir="$(MESON_BUILD_DIR)" \
 	   --no-build-isolation \
-	   --wheel-dir $(WHEELHOUSE) ; \
+	   --wheel-dir $(WHEELHOUSE) \
+	   --verbose ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 ###
