@@ -24,8 +24,8 @@ MESON_TOOLCHAIN_NAME = $(ARCH)-toolchain.meson
 MESON_CROSS_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson-cross
 MESON_CROSS_TOOLCHAIN_PKG = $(WORK_DIR)/$(PKG_DIR)/$(MESON_TOOLCHAIN_NAME)
 MESON_NATIVE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson-native
-CONFIGURE_ARGS += --cross-file $(MESON_CROSS_TOOLCHAIN_PKG)
-#CONFIGURE_ARGS += --native-file $(MESON_NATIVE_TOOLCHAIN_WRK)
+CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_TOOLCHAIN_PKG)
+#CONFIGURE_ARGS += --native-file=$(MESON_NATIVE_TOOLCHAIN_WRK)
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
   MESON_HOST_CPU_FAMILY = arm
@@ -84,14 +84,21 @@ $(MESON_CROSS_TOOLCHAIN_PKG):
 meson_pkg_toolchain: SHELL:=/bin/bash
 meson_pkg_toolchain:
 	@cat $(MESON_CROSS_TOOLCHAIN_WRK)
+ifeq ($(strip $(MESON_PYTHON)),1)
+	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
+	@. $(CROSSENV) ; \
+	export PATH=$(call dedup,$(CROSSENV_PATH)/cross/bin:$(CROSSENV_PATH)/build/bin:$(CROSSENV_PATH)/bin:$${PATH}, :) ; \
+	echo "cython = '$$(which cython)'" ; \
+	echo "meson = '$$(which meson)'" ; \
+	echo "pkg-config = '$$(which pkg-config)'" ; \
+	echo "python = '$$(which cross-python)'"
+endif
+	@echo
+	@echo "[built-in options]" ; \
+	echo "prefix = '$(STAGING_INSTALL_PREFIX)'"
 	@echo
 	@echo "[properties]" ; \
-	echo "needs_exe_wrapper = false"
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-	@echo "longdouble_format = 'IEEE_DOUBLE_BE'"
-else ifeq ($(findstring $(ARCH),$(ARM_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-	@echo "longdouble_format = 'IEEE_DOUBLE_LE'"
-endif
+	echo "pkg_config_path = '$(abspath $(PKG_CONFIG_LIBDIR))'"
 	@echo
 	@echo "[built-in]" ; \
 	echo "c_args = ["
