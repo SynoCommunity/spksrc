@@ -13,8 +13,8 @@ SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Graphic stand-alone administration for memcached to monitor and debug purpose.
-ADMIN_URL = /phpMemcachedAdmin/
-DISPLAY_NAME = PHPMemcachedAdmin
+ADMIN_URL = /phpmemcachedadmin/
+DISPLAY_NAME = PHP Memcached Admin
 CHANGELOG = "1. Initial release of PHPMemcachedAdmin."
 
 HOMEPAGE = https://github.com/elijaa/phpmemcachedadmin
@@ -34,5 +34,6 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: phpmemcachedadmin_extra_install
 phpmemcachedadmin_extra_install:
-	@install -m 755 -d $(STAGING_DIR)/app
-	@install -m 644 src/app/config $(STAGING_DIR)/app/config
+	@install -m 755 -d $(STAGING_DIR)/web
+	@install -m 644 src/web/phpmemcachedadmin.conf $(STAGING_DIR)/web/phpmemcachedadmin.conf
+	@install -m 644 src/web/phpmemcachedadmin.json $(STAGING_DIR)/web/phpmemcachedadmin.json
