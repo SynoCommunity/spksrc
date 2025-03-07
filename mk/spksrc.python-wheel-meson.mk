@@ -75,7 +75,7 @@ install_python_wheel_target:
 	   $$(which cross-python) -m pip wheel . \
 	   $(foreach arg,$(CONFIGURE_ARGS),--config-settings=setup-args=\"$(arg)\" ) \
 	   $(foreach arg,$(INSTALL_ARGS),--config-settings=install-args=\"$(arg)\" ) \
-	   --config-settings=build-dir=\"$(MESON_BUILD_DIR)\" \
+	   --config-settings=builddir=\"$(MESON_BUILD_DIR)\" \
 	   --no-build-isolation \
 	   --wheel-dir $(WHEELHOUSE) \
 	   --verbose ; \
@@ -85,7 +85,7 @@ install_python_wheel_target:
 	   $$(which cross-python) -m pip wheel . \
 	   $(foreach arg,$(CONFIGURE_ARGS),--config-settings=setup-args="$(arg)" ) \
 	   $(foreach arg,$(INSTALL_ARGS),--config-settings=install-args="$(arg)" ) \
-	   --config-settings=build-dir="$(MESON_BUILD_DIR)" \
+	   --config-settings=builddir="$(MESON_BUILD_DIR)" \
 	   --no-build-isolation \
 	   --wheel-dir $(WHEELHOUSE) \
 	   --verbose ; \
