@@ -139,6 +139,7 @@ endif
 # gcc-8.5 hapens to be the default version for DSM-7.1
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
 DEPENDS += python/numpy
 endif
 
