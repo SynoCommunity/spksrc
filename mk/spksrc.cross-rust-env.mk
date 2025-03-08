@@ -54,7 +54,7 @@ RUST_TARGET = aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(RUST_ARCH), $(PPC_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = powerpc-unknown-linux-gnuspe
-TC_RUSTUP_TOOLCHAIN = $(RUST_BUILD_VERSION)-$(RUST_TARGET)
+TC_RUSTUP_TOOLCHAIN = stable-$(RUST_BUILD_VERSION)-$(RUST_TARGET)
 endif
 ifeq ($(findstring $(RUST_ARCH), $(x64_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = x86_64-unknown-linux-gnu
