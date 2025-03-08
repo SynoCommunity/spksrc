@@ -24,9 +24,9 @@ include ../../mk/spksrc.native-install.mk
 
 .PHONY: rust-qoriq-postinstall
 rust-qoriq-postinstall:
-	@$(MSG) "Rustup $(PKG_DIST_TARGET)"
+	@$(MSG) "Rustup stable-$(PKG_DIST_TARGET)"
 	@export PATH="$(CARGO_PATH):$${PATH}" ; \
 	export RUSTUP_HOME="$(RUSTUP_HOME)" ; \
 	which rustup ; \
-	rustup toolchain link $(PKG_DIST_TARGET) $(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)) ; \
+	rustup toolchain link stable-$(PKG_DIST_TARGET) $(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)) ; \
 	rustup show
