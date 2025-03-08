@@ -1,0 +1,13 @@
+{
+    ".url" : {
+        "com.synocommunity.packages.phpmemcachedadmin" : {
+            "title": "PHP Memcached Admin",
+            "desc": "PHPMemcachedAdmin - memcached admin interface",
+            "icon": "images/phpmemcachedadmin-{0}.png",
+            "protocol": "http",
+            "type": "url",
+            "url": "/phpmemcachedadmin",
+            "port": "80"
+        }
+    }
+}
