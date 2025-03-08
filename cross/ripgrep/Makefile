@@ -6,6 +6,8 @@ PKG_DIST_SITE = https://github.com/BurntSushi/ripgrep/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# changed to trigger build
+
 DEPENDS = cross/pcre
 
 # powerpc archs (except qoriq) are not supported
