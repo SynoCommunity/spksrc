@@ -1,5 +1,5 @@
 
-PYTHON_DIR="/var/packages/python311/target/bin"
+PYTHON_DIR="/var/packages/python312/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 CONFIG_DIR="${SYNOPKG_PKGVAR}/config"
@@ -61,12 +61,12 @@ service_postinst ()
     pip install --disable-pip-version-check --no-deps --no-input --no-index ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
 
     echo ${separator}
-    echo "Install pure python packages from index"
-    pip install --disable-pip-version-check --no-deps --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGDEST}/share/wheelhouse/requirements-pure.txt
+    echo "Install cross python packages from index"
+    pip install --disable-pip-version-check --no-deps --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGDEST}/share/requirements-cross_from_index.txt
 
     echo ${separator}
-    echo "Install packages for homeassistant.components from index"
-    pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGDEST}/share/postinst_components_requirements.txt
+    echo "Install pure python packages from index"
+    pip install --disable-pip-version-check --no-deps --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGDEST}/share/requirements-pure.txt
 
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UPGRADE" ]; then
