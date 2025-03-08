@@ -19,7 +19,7 @@ include ../../mk/spksrc.spk.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 DEPENDS += cross/bind_9.16
-SPK_VERS = 9.16.45
+SPK_VERS = 9.16.50
 else
 DEPENDS += cross/bind
 endif

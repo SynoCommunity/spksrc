@@ -11,9 +11,6 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 DEPENDS = cross/librsync cross/attr cross/acl
 
-# required to build frozenlist and yarl
-ADDITIONAL_CROSSENV_WHEELS = expandvars==0.12.0
-
 # [PyYAML]
 DEPENDS += cross/libyaml
 

@@ -1,5 +1,5 @@
 PKG_NAME = bind
-PKG_VERS = 9.16.45
+PKG_VERS = 9.16.50
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)
@@ -47,7 +47,7 @@ CONFIGURE_ARGS += BUILD_LIBS="$(LIBS)"
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: bind_pre_compile
+# compile gen tool with host compiler to run in build environment
 bind_pre_compile:
 	@$(MSG) Build gen tool for host
-	# compile gen tool with host compiler to run in build environment
 	cd $(WORK_DIR)/$(PKG_DIR)/lib/dns; gcc -I../../lib/isc/include -o gen ./gen.c

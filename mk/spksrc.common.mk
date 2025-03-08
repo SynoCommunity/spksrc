@@ -32,6 +32,9 @@ PIP ?= pip
 # System default pip outside from build environment
 PIP_SYSTEM = $(shell which pip)
 
+# System default pip outside from build environment
+PIP_NATIVE = $(WORK_DIR)/../../../native/$(or $(PYTHON_PACKAGE),$(SPK_NAME))/work-native/install/usr/local/bin/pip
+
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --find-links $(PIP_DISTRIB_DIR) --cache-dir $(PIP_CACHE_DIR)
 PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
@@ -120,11 +123,17 @@ endif
 # Always send PSTAT output to proper log file
 # independantly from active Makefile location
 ifeq ($(filter cross diyspk spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
+CROSSENV_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build-$(ARCH)-$(TCVERSION)-crossenv.log
 PSTAT_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/status-build.log
+WHEEL_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build-$(ARCH)-$(TCVERSION)-wheel.log
 else ifneq ($(wildcard $(WORK_DIR)),)
+CROSSENV_LOG = $(WORK_DIR)/../build-$(ARCH)-$(TCVERSION)-crossenv.log
 PSTAT_LOG = $(WORK_DIR)/../status-build.log
+WHEEL_LOG = $(WORK_DIR)/../build-$(ARCH)-$(TCVERSION)-wheel.log
 else
+CROSSENV_LOG = $(CURDIR)/build-$(ARCH)-$(TCVERSION)-crossenv.log
 PSTAT_LOG = $(CURDIR)/status-build.log
+WHEEL_LOG = $(CURDIR)/build-$(ARCH)-$(TCVERSION)-wheel.log
 endif
 
 # Terminal colors
@@ -132,8 +141,36 @@ RED=$$(tput setaf 1)
 GREEN=$$(tput setaf 2)
 NC=$$(tput sgr0)
 
-# Version Comparison
+# Macro: Version Comparison
 version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
+
+# Macro: dedup
+#        removes duplicate entries from a specified delimiter,
+#        preserving the order of unique elements.
+dedup = $(shell /bin/bash -c '\
+    input="$$(echo "$1" | xargs)"; \
+    delimiter="$$(echo "$2" | xargs)"; \
+    echo "$$input" | \
+    tr "$$delimiter" "\n" | \
+    awk '\''!seen[$$0]++ {print $$0}'\'' | \
+    tr "\n" "$$delimiter" | \
+    sed "s/$$delimiter$$//" \
+')
+
+# Macro: merge
+#        merges multiple environment variable values from a given input string,
+#        inverting their order and separating them with a specified delimiter
+merge = $(shell /bin/bash -c '\
+    input="$$(echo "$1" | xargs)"; \
+    var_name="$$(echo "$2" | xargs)"; \
+    delimiter="$$(echo "$3" | xargs)"; \
+    echo "$$input" | \
+    grep -o "$$var_name=[^ ]*" | \
+    tac | \
+    sed "s/^$$var_name=//" | \
+    tr "\n" "$$delimiter" | \
+    sed "s/$$delimiter$$//" \
+')

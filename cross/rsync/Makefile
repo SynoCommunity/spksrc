@@ -1,5 +1,5 @@
 PKG_NAME = rsync
-PKG_VERS = 3.2.7
+PKG_VERS = 3.4.1
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_SITE = https://download.samba.org/pub/rsync/src

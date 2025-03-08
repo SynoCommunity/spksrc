@@ -1,5 +1,5 @@
 PKG_NAME = git-lfs
-PKG_VERS = 3.5.1
+PKG_VERS = 3.6.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/git-lfs/git-lfs/archive

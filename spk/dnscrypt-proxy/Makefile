@@ -3,7 +3,7 @@ SPK_VERS = 2.0.44
 SPK_REV = 5
 SPK_ICON = src/dnscrypt-proxy.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/dnscrypt-proxy
 SPK_CONFLICT = DNSServer
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 

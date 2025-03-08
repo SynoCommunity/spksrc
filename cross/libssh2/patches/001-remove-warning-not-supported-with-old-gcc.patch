@@ -1,0 +1,12 @@
+# remove -Wtrampolines not supported by gcc v4.3.2 of ppc853x-5.2
+# 
+--- cmake/PickyWarnings.cmake.orig	2024-10-16 08:03:21.000000000 +0000
++++ cmake/PickyWarnings.cmake	2025-01-05 19:21:34.842788054 +0000
+@@ -176,7 +176,6 @@
+           -Wmissing-parameter-type         #             gcc  4.3
+           -Wold-style-declaration          #             gcc  4.3
+           -Wstrict-aliasing=3              #             gcc  4.0
+-          -Wtrampolines                    #             gcc  4.3
+         )
+       endif()
+       if(NOT CMAKE_C_COMPILER_VERSION VERSION_LESS 4.5 AND MINGW)

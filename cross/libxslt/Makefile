@@ -1,9 +1,8 @@
 PKG_NAME = libxslt
 PKG_VERS = 1.1.42
-PKG_EXT = tar.gz
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/GNOME/libxslt/archive/refs/tags
+PKG_EXT = tar.xz
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://download.gnome.org/sources/libxslt/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/libgcrypt
@@ -14,8 +13,10 @@ LICENSE  = MIT
 
 CMAKE_ARGS  = -DLIBXSLT_WITH_PYTHON=OFF
 CMAKE_ARGS += -DLIBXSLT_WITH_TESTS=OFF
+CMAKE_ARGS += -DLIBXSLT_WITH_DEBUGGER=OFF
+CMAKE_ARGS += -DLIBXSLT_WITH_XSLT_DEBUG=OFF
 
-# if for libgcrypt, replace the -config path with abspath
+# adjust prefix in xslt-config (initialy added for libgcrypt)
 POST_INSTALL_TARGET = libxslt_post_install
 
 include ../../mk/spksrc.cross-cmake.mk

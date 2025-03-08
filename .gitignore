@@ -8,8 +8,10 @@ cross/*/status*
 kernel/*/work*
 spk/*/work*
 spk/*/build*
+spk/*/crossenv*
 spk/*/publish*
 spk/*/status*
+spk/*/wheel*
 diyspk/*/work*
 diyspk/*/build*
 diyspk/*/status*

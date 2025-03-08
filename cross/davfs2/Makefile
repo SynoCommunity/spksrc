@@ -1,9 +1,9 @@
 PKG_NAME = davfs2
-PKG_VERS = 1.7.0
+PKG_VERS = 1.7.1
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.savannah.gnu.org/releases/davfs2
+PKG_DIST_SITE = https://github.com/alisarctl/davfs2/releases/download/rel-$(subst .,-,$(PKG_VERS))
 
 DEPENDS = cross/neon cross/libtool
 
@@ -32,4 +32,5 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: davfs2_post_configure
 davfs2_post_configure:
+	@$(MSG) Patch Makefile.in for older gcc
 	@$(RUN) sed -e "s#-fstack-protector-strong#-fstack-protector-all#g" -i src/Makefile.in
