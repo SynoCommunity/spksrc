@@ -8,8 +8,6 @@ SVC_WRITE_PID=y
 SVC_BACKGROUND=y
 SVC_CWD="${SYNOPKG_PKGVAR}"
 HOME="${SYNOPKG_PKGVAR}"
-# workaround for python modules depending on newer libstdc++ (i.e. grpcio>=1.56.x)
-export LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib
 
 # save and restore the pip-cache on package update
 # ------------------------------------------------
@@ -70,21 +68,10 @@ service_postinst ()
 
 
     if [ "${SYNOPKG_PKG_STATUS}" == "UPGRADE" ]; then
-        if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
-            if [ -f ${TMP_DIR}/requirements-custom.txt ]; then
-                echo "Restore custom requirements file"
-                $CP ${TMP_DIR}/requirements-custom.txt ${SYNOPKG_PKGVAR}/requirements-custom.txt
-            fi
-        fi
         if [ -e ${SYNOPKG_PKGVAR}/requirements-custom.txt ]; then
             echo ${separator}
             echo "Install custom packages from index"
             pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGVAR}/requirements-custom.txt
         fi
-    fi
-
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        # ensure package user has access to the virtual env packages, installed as root
-        set_unix_permissions ${SYNOPKG_PKGDEST}/env
     fi
 }
