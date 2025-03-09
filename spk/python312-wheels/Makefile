@@ -32,7 +32,9 @@ WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy_ha
 OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
 
@@ -141,6 +143,9 @@ ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy_ha
 DEPENDS += python/numpy
+
+# [scipy] - depends on numpy
+DEPENDS += python/scipy
 endif
 
 # [pycryptodome]
