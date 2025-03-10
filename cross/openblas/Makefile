@@ -50,7 +50,7 @@ CMAKE_ARGS += -DTARGET=ARMV8
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-# Options are: HASWELL (recent), SANDYBRIDGE (older), NEHALEM (most compatible)
+# Options are: HASWELL (recent), SANDYBRIDGE (older), NEHALEM (oldest and most compatible)
 CMAKE_ARGS += -DTARGET=SANDYBRIDGE
 endif
 

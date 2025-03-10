@@ -25,6 +25,15 @@ LICENSE  = NumPy Developers
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
 
+include ../../mk/spksrc.common.mk
+
+# numpy badly detects CPU on x86_64
+# CPU flags below are "sandybridge" compatible
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += -Dcpu-baseline="sse2,sse3,ssse3,sse41,sse42,avx"
+CONFIGURE_ARGS += -Dcpu-dispatch="popcnt"
+endif
+
 include ../../mk/spksrc.python-wheel-meson.mk
 
 .PHONY: numpy_post_configure
