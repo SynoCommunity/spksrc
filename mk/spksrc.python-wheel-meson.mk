@@ -72,22 +72,20 @@ install_python_wheel_target:
 	$(MSG) \
 	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
 	   PATH=$${PATH} \
-	   $$(which cross-python) -m pip wheel . \
-	   $(foreach arg,$(CONFIGURE_ARGS),--config-settings=setup-args=\"$(arg)\" ) \
-	   $(foreach arg,$(INSTALL_ARGS),--config-settings=install-args=\"$(arg)\" ) \
-	   --config-settings=builddir=\"$(MESON_BUILD_DIR)\" \
-	   --no-build-isolation \
-	   --wheel-dir $(WHEELHOUSE) \
+	   $$(which cross-python) -m build -w -n -x . \
+	   $(foreach arg,$(CONFIGURE_ARGS),-Csetup-args=\"$(arg)\" ) \
+	   $(foreach arg,$(INSTALL_ARGS),-Cinstall-args=\"$(arg)\" ) \
+	   -Cbuilddir=\"$(MESON_BUILD_DIR)\" \
+	   --outdir $(WHEELHOUSE) \
 	   --verbose ; \
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	   PATH=$${PATH} \
-	   $$(which cross-python) -m pip wheel . \
-	   $(foreach arg,$(CONFIGURE_ARGS),--config-settings=setup-args="$(arg)" ) \
-	   $(foreach arg,$(INSTALL_ARGS),--config-settings=install-args="$(arg)" ) \
-	   --config-settings=builddir="$(MESON_BUILD_DIR)" \
-	   --no-build-isolation \
-	   --wheel-dir $(WHEELHOUSE) \
+	   $$(which cross-python) -m build -w -n -x . \
+	   $(foreach arg,$(CONFIGURE_ARGS),-Csetup-args="$(arg)" ) \
+	   $(foreach arg,$(INSTALL_ARGS),-Cinstall-args="$(arg)" ) \
+	   -Cbuilddir="$(MESON_BUILD_DIR)" \
+	   --outdir $(WHEELHOUSE) \
 	   --verbose ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
