@@ -8,6 +8,8 @@ SVC_WRITE_PID=y
 SVC_BACKGROUND=y
 SVC_CWD="${SYNOPKG_PKGVAR}"
 HOME="${SYNOPKG_PKGVAR}"
+# required for native libraries in the package (like cross/opus for voip-utils)
+export LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib
 
 # save and restore the pip-cache on package update
 # ------------------------------------------------
