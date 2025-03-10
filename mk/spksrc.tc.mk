@@ -191,7 +191,7 @@ tc_vars: flag
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
 	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
-	if [ "$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | head -n1)" = "7" ]; then \
+	if [ "$$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | tail -n1)" = "$(TC_VERS)" ]; then \
 	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\)\" ; \
 	fi ; \
 	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
@@ -211,7 +211,7 @@ tc_vars: flag
 	echo CFLAGS := $(CFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CFLAGS\) ; \
 	echo CPPFLAGS := $(CPPFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CPPFLAGS\) ; \
 	echo CXXFLAGS := $(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\) ; \
-	if [ "$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | head -n1)" = "7" ]; then \
+	if [ "$$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | tail -n1)" = "$(TC_VERS)" ]; then \
 	   echo FFLAGS := $(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\) ; \
 	fi ; \
 	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
