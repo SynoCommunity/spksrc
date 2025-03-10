@@ -21,9 +21,6 @@ CONFIGURE_ARGS  = --cross-file=$(WORK_DIR)/$(PKG_DIR)/scipy.meson
 
 POST_CONFIGURE_TARGET = scipy_post_configure
 
-#ENV += SCIPY_USE_G77_ABI_WRAPPER=1
-#export SCIPY_USE_G77_ABI_WRAPPER=1
-
 include ../../mk/spksrc.python-wheel-meson.mk
 
 .PHONY: scipy_post_configure
@@ -33,7 +30,6 @@ scipy_post_configure:
 	@echo "[properties]" > $(WORK_DIR)/$(PKG_DIR)/scipy.meson
 	@echo "numpy-include-dir = '$(CROSSENV_PATH)/cross/$(PYTHON_LIB_DIR)/site-packages/numpy/_core/include'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
 	@echo "pythran-include-dir = '$(CROSSENV_PATH)/build/$(PYTHON_LIB_DIR)/site-packages/pythran'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
-#	@echo "pythran-include-dir = '$(CROSSENV_PATH)/cross/$(PYTHON_LIB_DIR)/site-packages/pythran'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
 	@echo "build-python-path = '$(CROSSENV_PATH)/bin/build-python'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
 	@echo "build-python-version = '$(PYTHON_VERSION)'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
 	@echo "host-python-path = '$(CROSSENV_PATH)/bin/cross-python'" >>  $(WORK_DIR)/$(PKG_DIR)/scipy.meson
