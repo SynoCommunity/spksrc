@@ -50,8 +50,8 @@ CMAKE_ARGS += -DTARGET=ARMV8
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-# Options are: HASWELL (recent), SANDYBRIDGE (older), NEHALEM (oldest and most compatible)
-CMAKE_ARGS += -DTARGET=SANDYBRIDGE
+# most of the x64 ARCHS are atom SoC types (Pineview, Cedarview, Braswell, Denverton, Apollolake)
+CMAKE_ARGS += -DTARGET=ATOM
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

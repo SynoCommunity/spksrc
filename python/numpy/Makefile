@@ -28,9 +28,9 @@ UNSUPPORTED_ARCHS = comcerto2k
 include ../../mk/spksrc.common.mk
 
 # numpy badly detects CPU on x86_64
-# CPU flags below are "sandybridge" compatible
+# CPU flags below are "apollolake" compatible
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += -Dcpu-baseline="sse2,sse3,ssse3,sse41,sse42,avx"
+CONFIGURE_ARGS += -Dcpu-baseline="sse2,ssse3,sse41,sse42"
 CONFIGURE_ARGS += -Dcpu-dispatch="popcnt"
 endif
 
