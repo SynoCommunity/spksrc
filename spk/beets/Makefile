@@ -1,5 +1,5 @@
 SPK_NAME = beets
-SPK_VERS = 1.6.0
+SPK_VERS = 2.2.0
 SPK_REV = 9
 SPK_ICON = src/beets.png
 
