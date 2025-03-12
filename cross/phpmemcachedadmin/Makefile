@@ -1,4 +1,4 @@
-PKG_NAME = phpMemcachedAdmin
+PKG_NAME = phpmemcachedadmin
 PKG_EXT = tar.gz
 PKG_GIT_HASH = aaf3d16a2a1e3dff72dd358f1758d96f0f174cb3
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
