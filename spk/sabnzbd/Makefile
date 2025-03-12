@@ -53,7 +53,7 @@ POST_STRIP_TARGET = sabnzbd_extra_install
 SPK_COMMANDS = bin/7zz
 
 # [cryptography]
-DEPENDS += cross/cryptography
+DEPENDS += cross/openssl3
 
 include ../../mk/spksrc.python.mk
 

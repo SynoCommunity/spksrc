@@ -1,10 +1,10 @@
-# cross-compiled wheels
+# Generated using the requirements script on March 12, 2025
+
 cffi==1.17.1
-#cryptography   ==> cross/cryptography
+charset_normalizer==3.4.1
+cryptography==44.0.2
 CT3==3.4.0
 orjson==3.10.15
-sabctools==8.2.5
-
-# AppRise/Requests Requirements
-charset_normalizer==3.4.1
 PyYAML==6.0.2
+sabctools==8.2.5
+ujson==5.10.0
