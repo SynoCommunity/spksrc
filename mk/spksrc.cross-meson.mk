@@ -28,7 +28,8 @@ meson_configure_target: $(MESON_CROSS_TOOLCHAIN_PKG)
 	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
 	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	cd $(MESON_BASE_DIR) && env $(ENV) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	@$(MSG) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	@cd $(MESON_BASE_DIR) && env $(ENV) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
 # call-up regular build process
 include ../../mk/spksrc.cross-cc.mk

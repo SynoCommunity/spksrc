@@ -78,7 +78,7 @@ install_python_wheel_target:
 	   -Cbuilddir=\"$(MESON_BUILD_DIR)\" \
 	   --outdir $(WHEELHOUSE) \
 	   --verbose ; \
-	$(RUN) \
+	cd $(MESON_BASE_DIR) && \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	   PATH=$${PATH} \
 	   $$(which cross-python) -m build -w -n -x . \

@@ -27,6 +27,9 @@ MESON_NATIVE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson-native
 CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_TOOLCHAIN_PKG)
 #CONFIGURE_ARGS += --native-file=$(MESON_NATIVE_TOOLCHAIN_WRK)
 
+# Enforce unsetting all flags as using cross-file
+ENV := -u AR -u AS -u CC -u CPP -u CXX -u LD -u NM -u OBJDUMP -u RANLIB -u READELF -u STRIP -u CFLAGS -u CPPFLAGS -u CXXFLAGS -u LDFLAGS $(ENV)
+
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
   MESON_HOST_CPU_FAMILY = arm
   MESON_HOST_CPU = armv5
@@ -84,21 +87,24 @@ $(MESON_CROSS_TOOLCHAIN_PKG):
 meson_pkg_toolchain: SHELL:=/bin/bash
 meson_pkg_toolchain:
 	@cat $(MESON_CROSS_TOOLCHAIN_WRK)
+	@echo "pkgconfig = '$$(which pkg-config)'"
+	@echo "pkg-config = '$$(which pkg-config)'"
 ifeq ($(strip $(MESON_PYTHON)),1)
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@. $(CROSSENV) ; \
 	export PATH=$(call dedup,$(CROSSENV_PATH)/cross/bin:$(CROSSENV_PATH)/build/bin:$(CROSSENV_PATH)/bin:$${PATH}, :) ; \
 	echo "cython = '$$(which cython)'" ; \
 	echo "meson = '$$(which meson)'" ; \
-	echo "pkg-config = '$$(which pkg-config)'" ; \
 	echo "python = '$$(which cross-python)'"
 endif
 	@echo
 	@echo "[built-in options]" ; \
-	echo "prefix = '$(STAGING_INSTALL_PREFIX)'"
+	echo "prefix = '$(INSTALL_PREFIX)'"
 	@echo
 	@echo "[properties]" ; \
-	echo "pkg_config_path = '$(abspath $(PKG_CONFIG_LIBDIR))'"
+	echo "pkg_config_path = '$(abspath $(PKG_CONFIG_LIBDIR))'" ; \
+	echo "build_rpath = '"$$(echo $(LDFLAGS) | grep -oP '(?<=-Wl,--rpath-link,)[^ ]+' | tr '\n' ':' | sed 's/:$$//')"'" ; \
+	echo "install_rpath = '"$$(echo $(LDFLAGS) | grep -oP '(?<=-Wl,--rpath,)[^ ]+' | tr '\n' ':' | sed 's/:$$//')"'"
 	@echo
 	@echo "[built-in]" ; \
 	echo "c_args = ["
@@ -112,7 +118,7 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_C_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "cpp_args = ["
@@ -126,7 +132,7 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_CPP_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "cxx_args = ["
@@ -144,5 +150,5 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_FC_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"

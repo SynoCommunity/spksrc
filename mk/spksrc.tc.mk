@@ -150,6 +150,9 @@ meson_cross_vars:
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "#$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)cpp'" ; \
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
+	  elif [ "$${target}" = "fc" ]; then \
+	    echo "fortran = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
 	    echo "c = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
