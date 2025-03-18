@@ -27,8 +27,17 @@ MESON_NATIVE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.meson-native
 CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_TOOLCHAIN_PKG)
 #CONFIGURE_ARGS += --native-file=$(MESON_NATIVE_TOOLCHAIN_WRK)
 
-# Enforce unsetting all flags as using cross-file
-ENV := -u AR -u AS -u CC -u CPP -u CXX -u LD -u NM -u OBJDUMP -u RANLIB -u READELF -u STRIP -u CFLAGS -u CPPFLAGS -u CXXFLAGS -u LDFLAGS $(ENV)
+# Enforce unsetting all flags as using cross-file with the
+# exception of PKG_CONFIG_LIBDIR to force default pkgconfig.
+# Also due to meson bug, keep LDFLAGS for rpath management.
+# Ref: https://github.com/mesonbuild/meson/issues/14354
+#      https://github.com/mesonbuild/meson/issues/6541
+ENV_MESON  = -u AR -u AS -u CC -u CPP -u CXX -u LD -u LDSHARED
+ENV_MESON += -u OBJCOPY -u OBJDUMP -u RANLIB -u READELF -u STRIP
+ENV_MESON += -u CFLAGS -u CPPFLAGS -u CXXFLAGS -u FFLAGS
+#ENV_MESON += -u CFLAGS -u CPPFLAGS -u CXXFLAGS -u FFLAGS -u LDFLAGS
+ENV_MESON += -u ADDITIONAL_CFLAGS -u ADDITIONAL_CPPFLAGS -u ADDITIONAL_CXXFLAGS -u ADDITIONAL_FFLAGS -u ADDITIONAL_LDFLAGS
+ENV_MESON += -u PKG_CONFIG_PATH -u SYSROOT
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
   MESON_HOST_CPU_FAMILY = arm
@@ -102,7 +111,8 @@ endif
 	echo "prefix = '$(INSTALL_PREFIX)'"
 	@echo
 	@echo "[properties]" ; \
-	echo "pkg_config_path = '$(abspath $(PKG_CONFIG_LIBDIR))'" ; \
+	echo "# pkg_config_path not needed due to PKG_CONFIG_LIBDIR" ; \
+	echo "#pkg_config_path = '$(abspath $(PKG_CONFIG_LIBDIR))'" ; \
 	echo "build_rpath = '"$$(echo $(LDFLAGS) | grep -oP '(?<=-Wl,--rpath-link,)[^ ]+' | tr '\n' ':' | sed 's/:$$//')"'" ; \
 	echo "install_rpath = '"$$(echo $(LDFLAGS) | grep -oP '(?<=-Wl,--rpath,)[^ ]+' | tr '\n' ':' | sed 's/:$$//')"'"
 	@echo
@@ -119,6 +129,7 @@ ifneq ($(strip $(MESON_BUILTIN_C_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_LINK_ARGS)',\n"
 endif
 	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t'-Wl,--strip-all'\n" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "cpp_args = ["
@@ -133,6 +144,7 @@ ifneq ($(strip $(MESON_BUILTIN_CPP_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_LINK_ARGS)',\n"
 endif
 	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t'-Wl,--strip-all'\n" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "cxx_args = ["
@@ -151,4 +163,5 @@ ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_FC_LINK_ARGS)',\n"
 endif
 	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	echo -ne "\t'-Wl,--strip-all'\n" ; \
 	echo -ne "\t]\n"
