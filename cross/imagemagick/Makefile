@@ -28,6 +28,7 @@ DEPENDS += cross/djvulibre
 DEPENDS += cross/libtool
 DEPENDS += cross/libfpx
 DEPENDS += cross/fftw
+DEPENDS += cross/liblqr
 
 CONFIGURE_ARGS  = --disable-installed --disable-docs --disable-static
 CONFIGURE_ARGS += --without-perl --without-x
