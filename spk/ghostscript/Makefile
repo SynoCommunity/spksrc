@@ -7,7 +7,7 @@ DEPENDS = cross/ghostscript
 
 UNSUPPORTED_ARCHS = comcerto2k
 
-MAINTAINER = SynoCommunity
+MAINTAINER = hgy59
 DESCRIPTION = Ghostscript is an interpreter for the PostScript® language and PDF files.
 DISPLAY_NAME = ghostscript
 CHANGELOG = "Initial package release."

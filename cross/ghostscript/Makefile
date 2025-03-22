@@ -30,4 +30,3 @@ CONFIGURE_ARGS += --build=x86_64-pc-linux-gnu
 endif
 
 include ../../mk/spksrc.cross-cc.mk
-
