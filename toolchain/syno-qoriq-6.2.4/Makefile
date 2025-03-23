@@ -13,8 +13,6 @@ TC_RUSTFLAGS = -C target-cpu=e500
 
 include ../../mk/spksrc.tc.mk
 
-OPTIONAL_DEPENDS = toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust
-
 ifneq ($(RUST_BUILD_TOOLCHAIN),1)
 DEPENDS = toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust
 else

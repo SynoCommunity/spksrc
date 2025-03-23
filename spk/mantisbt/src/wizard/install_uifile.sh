@@ -194,20 +194,20 @@ PAGE_INSTALL_CONFIG=$(/bin/cat<<EOF
     "invalid_next_disabled_v2": true,
     "items": [{
         "type": "password",
-        "desc": "Enter your MySQL superuser account password.",
+        "desc": "Enter your MariaDB superuser account password.",
         "subitems": [{
             "key": "wizard_mysql_password_root",
-            "desc": "MySQL 'root' password",
+            "desc": "MariaDB 'root' password",
             "validator": {
                 "allowBlank": false
             }
         }]
     }, {
         "type": "password",
-        "desc": "A '${SYNOPKG_PKGNAME}' MySQL user and database will be created. Please provide a password for the '${SYNOPKG_PKGNAME}' user.",
+        "desc": "A '${SYNOPKG_PKGNAME}' MariaDB user and database will be created. Please provide a password for the '${SYNOPKG_PKGNAME}' user.",
         "subitems": [{
             "key": "wizard_mysql_password_mantisbt",
-            "desc": "MySQL '${SYNOPKG_PKGNAME}' password",
+            "desc": "MariaDB '${SYNOPKG_PKGNAME}' password",
             "invalidText": "Password is invalid. Ensure it includes at least one uppercase letter, one lowercase letter, one digit, one special character, and has a minimum length of 10 characters.",
             "validator": {
                 "fn": "$(getPasswordValidator)"
