@@ -13,3 +13,5 @@ dht.mode.set = auto
 dht.port.set = 6881
 protocol.pex.set= yes
 port_range = 6881-6999
+schedule2 = session_save, 1200, 3600, ((session.save))
+method.set_key = event.download.inserted, 2_save_session, ((d.save_full_session))
