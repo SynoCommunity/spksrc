@@ -11,7 +11,6 @@ python/*/build*
 python/*/status*
 spk/*/work*
 spk/*/build*
-spk/*/crossenv*
 spk/*/publish*
 spk/*/status*
 spk/*/wheel*
