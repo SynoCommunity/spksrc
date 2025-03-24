@@ -8,3 +8,17 @@ lxml==5.3.1
 MarkupSafe==3.0.2
 #pillow                         ==> cross/pillow
 PyYAML==6.0.2
+
+# TODO: The following plugins are currently unsupported due to dependency issues:
+# autobpm, bpd, metasync, and replaygain.
+
+#dbus_python==1.3.2                     # Dependency "dbus-1" not found
+#llvmlite==0.44.0                       # Could not find a `llvm-config` binary
+#msgpack==1.1.0
+#numba==0.61.0                          # ModuleNotFoundError: No module named 'numpy'
+#numpy==2.1.3                           # NumPy requires Cython >= 3.0.6
+#pycairo==1.27.0                        # Dependency "cairo" not found
+#pygobject==3.50.0                      # Dependency 'gobject-introspection-1.0' is required but not found
+#scikit_learn==1.6.1                    # Meson version is 1.0.1 but project requires >= 1.1.0
+#scipy==1.15.1                          # Meson version is 1.0.1 but project requires >= 1.5.0
+#soxr==0.5.0.post1                      # Could not find a package configuration file provided by "nanobind"
