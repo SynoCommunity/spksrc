@@ -1,6 +1,6 @@
 SPK_NAME = beets
 SPK_VERS = 2.2.0
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/beets.png
 
 PYTHON_PACKAGE = python311
@@ -34,9 +34,16 @@ DEPENDS += cross/pillow
 DEPENDS += cross/libyaml
 
 # NOTE: Built with support for the following plugins:
-# aura, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, mpdstats, plexupdate, scrub, sonosupdate, thumbnails, web.
+# absubmit, aura, beatport, chroma, discogs, docs, embedart, embyupdate, fetchart, import, kodiupdate, lastgenre, lastimport, lyrics, mpdstats, plexupdate, reflink, scrub, sonosupdate, thumbnails, web.
 
 # NOTE: The following plugins are currently unsupported due to dependency issues:
 # autobpm, bpd, metasync, and replaygain.
 
 include ../../mk/spksrc.python.mk
+
+# [pycryptodomex]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pycryptodomex] -std=c11
+else
+WHEELS_CFLAGS += [pycryptodomex] -std=c99
+endif
