@@ -1,5 +1,5 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2025.1.4
+SPK_VERS = 2024.12.5
 SPK_REV = 24
 SPK_ICON = src/homeassistant.png
 
@@ -17,7 +17,7 @@ UNSUPPORTED_ARCHS += $(ARMv7_ARCHS)
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "1. Update homeassistant to 2025.1.4 and depend on Python 3.12. <br/>2. Update HACS integration to v2.0.5. <br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "1. Update homeassistant to 2024.12.5 and depend on Python 3.12. <br/>2. Update HACS integration to v2.0.5. <br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/

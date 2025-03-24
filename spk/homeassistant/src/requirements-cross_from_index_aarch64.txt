@@ -5,8 +5,8 @@
 # wheels for python arch aarch64
 
 av==13.1.0
-awscrt==0.23.5
-###deebot_client==11.0.0        not available for aarch64, 'ecovacs' component not supported
+awscrt==0.24.1
+###deebot_client==9.4.0         not available for aarch64, 'ecovacs' component not supported
 grpcio==1.67.1
 # isal fails to cross compile...
 isal==1.7.1
@@ -14,4 +14,4 @@ isal==1.7.1
 pandas==2.2.3
 
 # temp take numpy from index
-numpy==2.2.0
+numpy==2.1.3

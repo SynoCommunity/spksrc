@@ -1,2 +1,2 @@
 # temp for x64 and evansport, until numpy is generally supported
-numpy==2.2.0
+numpy==2.1.3

@@ -1,25 +1,28 @@
-homeassistant==2025.1.4
-home_assistant_frontend==20250109.2
-home_assistant_intents==2025.1.1
-hass_nabucasa==0.87.0
+homeassistant==2024.12.5
+home_assistant_intents==2024.12.9
+hass_nabucasa==0.86.0
+
+# additionally installed to avoid conflicting versions
+construct==2.10.68      # avoid version 2.10.70, incompatible with some dependecies
+rich==10.16.2           # avoid version >= 11.0.0, incompatible with surepy==0.9.0
+tenacity==8.5.0         # avoid version 9.0.0, incompatible with some dependecies
 
 acme==3.0.1
 aiodiscover==2.1.0
 aiodns==3.2.0
 aiofiles==24.1.0
-aiohappyeyeballs==2.4.6
-aiohasupervisor==0.2.2b5
+aiohappyeyeballs==2.6.1
+aiohasupervisor==0.2.1
 aiohttp_cors==0.7.0
 aiohttp_fast_zlib==0.2.0
 aiomqtt==2.0.1
-aiooui==0.1.9
+aiooui==0.1.7
 aiosignal==1.3.2
 aiozoneinfo==0.2.1
-anyio==4.7.0
 astral==2.2
 async_interrupt==1.2.0
 async_timeout==4.0.3
-async_upnp_client==0.42.0
+async_upnp_client==0.41.0
 atomicwrites_homeassistant==1.4.1
 attrs==24.2.0
 awesomeversion==24.6.0
@@ -29,14 +32,14 @@ bluetooth_auto_recovery==1.4.2
 boto3==1.34.131
 botocore==1.34.131
 btsocket==0.3.0
-cachetools==5.5.1
+cachetools==5.5.2
 chacha20poly1305==0.0.3
 chacha20poly1305_reuseable==0.13.2
 charset_normalizer==3.4.0
 cronsim==2.6
 defusedxml==0.7.1
 dnspython==2.7.0
-ecdsa==0.19.0
+ecdsa==0.19.1
 envs==1.4
 fnvhash==0.1.0
 gTTS==2.2.4
@@ -46,7 +49,7 @@ httpcore==1.0.5
 httpx==0.27.2
 idna==3.10
 ifaddr==0.2.0
-jinja2==3.1.5
+jinja2==3.1.4
 jmespath==1.0.1
 josepy==1.15.0
 mac_vendor_lookup==0.1.12
@@ -55,18 +58,18 @@ mutagen==1.47.0
 noiseprotocol==0.3.1
 packaging==24.2
 psutil_home_assistant==0.0.1
-pyasn1==0.6.1
+pyasn1==0.4.8
 pycognito==2024.5.1
 pycparser==2.22
 PyJWT==2.10.1
-pyOpenSSL==24.3.0
+pyOpenSSL==24.2.1
 pyRFC3339==2.0.1
 PyRIC==0.1.6.3
 pyroute2==0.7.5
 pyserial==3.5
 python_dateutil==2.9.0.post0
 python_didl_lite==1.4.1
-python_jose==3.3.0
+python_jose==3.4.0
 python_slugify==8.0.4
 pytz==2025.1
 pyudev==0.24.1
@@ -78,10 +81,10 @@ scapy==2.6.1
 securetar==2024.11.0
 sniffio==1.3.1
 snitun==0.39.1
-svg_py==1.5.0
+svg.py==1.6.0
 text_unidecode==1.3
 typing_extensions==4.12.2
-uart_devices==0.1.0
+uart_devices==0.1.1
 urllib3==1.26.20
 usb_devices==0.4.5
 voluptuous==0.15.2
