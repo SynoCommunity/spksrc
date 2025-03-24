@@ -47,3 +47,8 @@ WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
+
+# [pyppmd]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [pyppmd] -std=gnu11
+endif
