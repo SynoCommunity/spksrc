@@ -280,8 +280,6 @@ $(CROSSENV_PATH)/build/python-cc.mk:
 	@echo PYO3_CROSS_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
 	@echo PYO3_CROSS_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
 	@echo CMAKE_TOOLCHAIN_FILE=$(abspath $(CMAKE_TOOLCHAIN_WRK)) >> $@
-	@echo MESON_CROSS_FILE=$(abspath $(MESON_CROSS_TOOLCHAIN_WRK)) >> $@
-	@echo MESON_NATIVE_FILE=$(abspath $(MESON_NATIVE_TOOLCHAIN_WRK)) >> $@
 	@echo OPENSSL_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
 	@echo OPENSSL_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
 	@echo PIP=$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/pip) >> $@
