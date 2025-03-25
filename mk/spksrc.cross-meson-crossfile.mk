@@ -1,7 +1,7 @@
 # meson cross-file definitions
 
 # Per-dependency configuration for meson build
-MESON_CROSS_FILE_NAME = $(ARCH)-toolchain.meson
+MESON_CROSS_FILE_NAME = $(ARCH)-crossfile.meson
 MESON_CROSS_FILE_PKG = $(WORK_DIR)/$(PKG_DIR)/$(MESON_CROSS_FILE_NAME)
 CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_FILE_PKG)
 
@@ -36,13 +36,13 @@ ENV_MESON += -u PKG_CONFIG_PATH -u SYSROOT
 
 .PHONY: $(MESON_CROSS_FILE_PKG)
 $(MESON_CROSS_FILE_PKG):
-	@$(MSG) Generating $(MESON_TOOLCHAIN_PKG)
-	env $(MAKE) --no-print-directory meson_pkg_toolchain > $(MESON_CROSS_FILE_PKG) 2>/dev/null;
+	@$(MSG) Generating $(MESON_CROSS_FILE_PKG)
+	env $(MAKE) --no-print-directory generate_meson_crossfile_pkg > $(MESON_CROSS_FILE_PKG) 2>/dev/null;
 
-.PHONY: meson_pkg_toolchain
-meson_pkg_toolchain: SHELL:=/bin/bash
-meson_pkg_toolchain:
-	@cat $(MESON_CROSS_TOOLCHAIN_WRK)
+.PHONY: generate_meson_crossfile_pkg
+generate_meson_crossfile_pkg: SHELL:=/bin/bash
+generate_meson_crossfile_pkg:
+	@cat $(MESON_CROSS_FILE_WRK)
 	@echo "pkgconfig = '$$(which pkg-config)'"
 	@echo "pkg-config = '$$(which pkg-config)'"
 ifeq ($(strip $(MESON_PYTHON)),1)
