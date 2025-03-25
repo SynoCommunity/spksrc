@@ -60,9 +60,6 @@ endif
 	@echo "[properties]" ; \
 	echo "# Not needed due to PKG_CONFIG_LIBDIR" ; \
 	echo "#pkg_config_path = '$(abspath $(PKG_CONFIG_LIBDIR))'" ; \
-	echo "# Not needed due to rpath and rpath-link defined in LDFLAGS" ; \
-	echo "#build_rpath = '"$$(echo $(LDFLAGS) | grep -oP '(?<=-Wl,--rpath-link,)[^ ]+' | tr '\n' ':' | sed 's/:$$//')"'" ; \
-	echo "#install_rpath = '"$$(echo $(LDFLAGS) | grep -oP '(?<=-Wl,--rpath,)[^ ]+' | tr '\n' ':' | sed 's/:$$//')"'"
 	@echo
 	@echo "[built-in]" ; \
 	echo "c_args = ["
