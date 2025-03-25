@@ -97,6 +97,8 @@ build_meson_python_wheel:
 	   --verbose ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
+.PHONY: install_meson_python_wheel
+
 install_meson_python_wheel: SHELL:=/bin/bash
 install_meson_python_wheel:
 	@set -o pipefail; { \
