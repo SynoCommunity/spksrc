@@ -1,7 +1,15 @@
-# Build Meson programs
+# python-meson wheel build
 #
-# prerequisites:
-# - cross/module depends on meson + ninja + python -m pip build
+# By default uses $(CROSSENV)/bin/cross-python -m build
+# Although can also work using $(CROSSENV)/cross-python -m pip
+#
+# configure part of the wheel process uses:
+#     pip: --config-settings=setup-args='<value>'
+#   build: -Csetup-args='<value>'
+#
+# install using python wheel process uses:
+#     pip: --config-settings=install-args='<value>'
+#   build: -Cinstall-args='<value>'
 #
 
 # Common makefiles
@@ -19,23 +27,18 @@ include ../../mk/spksrc.cross-meson-env.mk
 # meson cross-file usage definition
 include ../../mk/spksrc.cross-meson-crossfile.mk
 
-# configure part of the pip wheel process using:
-#     pip: --config-settings=setup-args='<value>'
-#   build: -Csetup-args='<value>'
+# 1- Prepare the crossenv
+# 2- Generate the per-dependency cross-file definition
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = prepare_crossenv $(MESON_CROSS_FILE_PKG)
 endif
 
-# compile part of the pip wheel process, no config-settings available
 ifeq ($(strip $(COMPILE_TARGET)),)
-COMPILE_TARGET = nop
+COMPILE_TARGET = build_meson_python_wheel
 endif
 
-# install using python pip wheel process using:
-#     pip: --config-settings=install-args='<value>'
-#   build: -Cinstall-args='<value>'
 ifeq ($(strip $(INSTALL_TARGET)),)
-INSTALL_TARGET = install_python_wheel_target
+INSTALL_TARGET = install_meson_python_wheel
 endif
 
 ###
@@ -57,10 +60,10 @@ prepare_crossenv:
 	@$(MSG) $(MAKE) WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
 	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
-.PHONY: install_python_wheel_target
+.PHONY: build_meson_python_wheel
 
-install_python_wheel_target: SHELL:=/bin/bash
-install_python_wheel_target:
+build_meson_python_wheel: SHELL:=/bin/bash
+build_meson_python_wheel:
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@set -o pipefail; { \
 	. $(CROSSENV) ; \
@@ -92,6 +95,22 @@ install_python_wheel_target:
 	   -Cbuilddir="$(MESON_BUILD_DIR)" \
 	   --outdir $(WHEELHOUSE) \
 	   --verbose ; \
+	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
+
+install_meson_python_wheel: SHELL:=/bin/bash
+install_meson_python_wheel:
+	@set -o pipefail; { \
+	$(MSG) $(MAKE) REQUIREMENT=\"$(PKG_NAME)==$(PKG_VERS)\" \
+	               WHEEL_NAME=\"$(PKG_NAME)\" \
+	               WHEEL_VERSION=\"$(PKG_VERS)\" \
+	               WHEEL_TYPE=\"cross\" \
+	               wheel_install ; \
+	MAKEFLAGS= $(MAKE) REQUIREMENT="$(PKG_NAME)==$(PKG_VERS)" \
+	                   WHEEL_NAME="$(PKG_NAME)" \
+	                   WHEEL_VERSION="$(PKG_VERS)" \
+	                   WHEEL_TYPE="cross" \
+	                   --no-print-directory \
+	                   wheel_install ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 ###
