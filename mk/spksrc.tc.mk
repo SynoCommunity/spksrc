@@ -148,7 +148,7 @@ meson_cross_vars:
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  if [ "$${target}" = "cpp" ]; then \
-	    echo "#$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)cpp'" ; \
+	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
 	    echo "fortran = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
