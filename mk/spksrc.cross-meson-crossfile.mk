@@ -59,7 +59,7 @@ endif
 	@echo
 	@echo "[properties]" ; \
 	echo "# Not needed due to PKG_CONFIG_LIBDIR" ; \
-	echo "#pkg_config_path = '$(abspath $(PKG_CONFIG_LIBDIR))'" ; \
+	echo "#pkg_config_path = '$(abspath $(PKG_CONFIG_LIBDIR))'"
 	@echo
 	@echo "[built-in]" ; \
 	echo "c_args = ["
