@@ -1,7 +1,7 @@
 # Build Meson programs
 #
 # prerequisites:
-# - cross/module depends on meson + ninja + python -m pip wheel
+# - cross/module depends on meson + ninja + python -m pip build
 #
 
 # Common makefiles
@@ -10,16 +10,20 @@ include ../../mk/spksrc.directories.mk
 
 ###
 
-# Define meson-python use-case
+# Define meson-python specific use-case
 MESON_PYTHON = 1
 
 # meson specific configurations
 include ../../mk/spksrc.cross-meson-env.mk
 
+# meson cross-file usage definition
+include ../../mk/spksrc.cross-meson-crossfile.mk
+
 # configure part of the pip wheel process using:
-#   --config-settings=setup-args='<value>'
+#     pip: --config-settings=setup-args='<value>'
+#   build: -Csetup-args='<value>'
 ifeq ($(strip $(CONFIGURE_TARGET)),)
-CONFIGURE_TARGET = prepare_crossenv $(MESON_CROSS_TOOLCHAIN_PKG)
+CONFIGURE_TARGET = prepare_crossenv $(MESON_CROSS_FILE_PKG)
 endif
 
 # compile part of the pip wheel process, no config-settings available
@@ -28,7 +32,8 @@ COMPILE_TARGET = nop
 endif
 
 # install using python pip wheel process using:
-#   --config-settings=install-args='<value>'
+#     pip: --config-settings=install-args='<value>'
+#   build: -Cinstall-args='<value>'
 ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = install_python_wheel_target
 endif

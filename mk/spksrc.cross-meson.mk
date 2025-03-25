@@ -11,6 +11,9 @@ include ../../mk/spksrc.directories.mk
 # meson specific configurations
 include ../../mk/spksrc.cross-meson-env.mk
 
+# meson cross-file usage definition
+include ../../mk/spksrc.cross-meson-crossfile.mk
+
 # configure using meson
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = meson_configure_target
@@ -22,7 +25,7 @@ include ../../mk/spksrc.cross-ninja.mk
 .PHONY: meson_configure_target
 
 # default meson configure:
-meson_configure_target: $(MESON_CROSS_TOOLCHAIN_PKG)
+meson_configure_target: $(MESON_CROSS_FILE_PKG)
 	@$(MSG) - Meson configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
