@@ -14,7 +14,7 @@ deprecation==2.1.0
 ecdsa==0.19.1
 executing==2.2.0
 home_assistant_chip_clusters==2024.11.4
-#home_assistant_chip_core==2024.11.4             # replaced by home_assistant_chip_core==2025.3.dev1801
+#home_assistant_chip_core==2024.11.4             # replaced by custom build of same version
 humanfriendly==10.0
 idna==3.10
 ifaddr==0.2.0
@@ -34,7 +34,7 @@ ptyprocess==0.7.0
 pure_eval==0.2.3
 pycparser==2.22
 pygments==2.19.1
-#python_matter_server==7.0.1                    # user cross/python-matter-server that references custom home_assistant_chip_core
+python_matter_server==7.0.1
 rich==13.9.4
 six==1.17.0
 stack_data==0.6.3
