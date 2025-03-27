@@ -2,7 +2,7 @@ aiohttp==3.11.11
 cffi==1.17.1
 cryptography==44.0.0
 frozenlist==1.5.0
-#home_assistant_chip_core==2024.11.4    # no source available, moved to requirements-pure to download from index
+#home_assistant_chip_core==2024.11.4             # no source available, prebuilt custom version added to package
 multidict==6.1.0
 orjson==3.10.13
 propcache==0.3.0

@@ -14,7 +14,6 @@ deprecation==2.1.0
 ecdsa==0.19.1
 executing==2.2.0
 home_assistant_chip_clusters==2024.11.4
-#home_assistant_chip_core==2024.11.4             # replaced by custom build of same version
 humanfriendly==10.0
 idna==3.10
 ifaddr==0.2.0
