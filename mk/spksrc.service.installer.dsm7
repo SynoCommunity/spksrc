@@ -186,16 +186,16 @@ postuninst ()
     if [ "$wizard_delete_data" = "true" ]; then
         echo "Removing files..." | install_log
         if [ "$(ls -A ${SYNOPKG_PKGHOME})" != "" ]; then
-            find ${SYNOPKG_PKGHOME} -mindepth 1 -delete -print | install_log
+            find ${SYNOPKG_PKGHOME} -mindepth 1 -delete | install_log
         fi
 
         if [ "$(ls -A ${SYNOPKG_PKGVAR})" != "" ]; then
-            find ${SYNOPKG_PKGVAR} -mindepth 1 -delete -print | install_log
+            find ${SYNOPKG_PKGVAR} -mindepth 1 -delete | install_log
         fi
 
         _etc_path=$(realpath /var/packages/${SYNOPKG_PKGNAME}/etc)
         if [ "$(ls -A ${_etc_path})" != "" ]; then
-            find ${_etc_path} -mindepth 1 -delete -print | install_log
+            find ${_etc_path} -mindepth 1 -delete | install_log
         fi
     fi
 
