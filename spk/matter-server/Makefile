@@ -7,6 +7,11 @@ SPK_ICON = src/matter.png
 # and therefore home-assistant-chip-core is only available for x64 and aarch64
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
+# define custom home_assistant_chip_core version to be used in in python-matter-server
+HOMEASSISTANT_CHIP_CORE_VERSION = 2025.3.dev1801
+ENV += HOMEASSISTANT_CHIP_CORE_VERSION=$(HOMEASSISTANT_CHIP_CORE_VERSION)
+DEPENDS = cross/python-matter-server
+
 # home-assistant-chip-core requires glibc >= 2.34
 # despite home-assistant-chip-core wheel is provided as manylinux_2_31, it requires glibc 2.34 and not 2.31
 REQUIRED_MIN_DSM = 7.2
@@ -26,6 +31,7 @@ STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh
 
 FWPORTS = src/matter-server.sc
+ADMIN_PORT = 5580
 
 USE_ALTERNATE_TMPDIR = 1
 
@@ -39,13 +45,13 @@ DEPENDS += cross/libyaml
 include ../../mk/spksrc.python.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-CUSTOM_CHIP_LIBRARY = src/custom_chip_library/x64/_ChipDeviceCtrl.so
+CUSTOM_CHIP_WHEEL = src/custom_wheels/home_assistant_chip_core-$(HOMEASSISTANT_CHIP_CORE_VERSION)-cp37-abi3-manylinux_2_31_x86_64.whl
 else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-CUSTOM_CHIP_LIBRARY = src/custom_chip_library/aarch64/_ChipDeviceCtrl.so
+CUSTOM_CHIP_WHEEL = src/custom_wheels/home_assistant_chip_core-$(HOMEASSISTANT_CHIP_CORE_VERSION)-cp37-abi3-manylinux_2_31_aarch64.whl
 endif
 
 .PHONY: matter-server_extra_install
 matter-server_extra_install:
-	@install -m 755 -d $(STAGING_DIR)/share $(STAGING_DIR)/custom_chip_library
+	@install -m 755 -d $(STAGING_DIR)/share/wheelhouse
 	@install -m 644 src/requirements-pure.txt $(STAGING_DIR)/share/
-	@install -m 644 $(CUSTOM_CHIP_LIBRARY) $(STAGING_DIR)/custom_chip_library/
+	@install -m 644 $(CUSTOM_CHIP_WHEEL) $(STAGING_DIR)/share/wheelhouse/

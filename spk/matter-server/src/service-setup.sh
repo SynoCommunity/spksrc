@@ -1,4 +1,3 @@
-
 PYTHON_VER=python3.12
 PYTHON_DIR="/var/packages/python312/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
@@ -15,26 +14,22 @@ SVC_BACKGROUND=y
 
 service_postinst ()
 {
-    separator="===================================================="
+   separator="===================================================="
 
-    echo ${separator}
-    echo "Install Python virtual environment"
-    install_python_virtualenv
-    
-    echo ${separator}
-    echo "Install packages from wheelhouse"
-    pip install --disable-pip-version-check --no-deps --no-input --no-index ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
-    
-    echo ${separator}
-    echo "Install python packages from index"
-    pip install --disable-pip-version-check --no-deps --no-input --requirement ${SYNOPKG_PKGDEST}/share/requirements-pure.txt
-    
-    echo ${separator}
-    echo "create special folders"
-    mkdir -p ${DATA_PATH}
-    mkdir -p ${OTA_PROVIDER_DIR}
+   echo ${separator}
+   echo "Install Python virtual environment"
+   install_python_virtualenv
 
-    echo ${separator}
-    echo "use custom chip library in home_assistant_chip_core"
-    install -m 644 ${SYNOPKG_PKGDEST}/custom_chip_library/_ChipDeviceCtrl.so ${SYNOPKG_PKGDEST}/env/lib/${PYTHON_VER}/site-packages/chip/
+   echo ${separator}
+   echo "Install packages from wheelhouse"
+   pip install --disable-pip-version-check --no-deps --no-input --no-index ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
+    
+   echo ${separator}
+   echo "Install python packages from index"
+   pip install --disable-pip-version-check --no-deps --no-input --requirement ${SYNOPKG_PKGDEST}/share/requirements-pure.txt
+    
+   echo ${separator}
+   echo "create special folders"
+   mkdir -p ${DATA_PATH}
+   mkdir -p ${OTA_PROVIDER_DIR}
 }

@@ -14,8 +14,7 @@ deprecation==2.1.0
 ecdsa==0.19.1
 executing==2.2.0
 home_assistant_chip_clusters==2024.11.4
-# chip library for home_assistant_chip_core will be replaced by a custom version by package installer to support custom config path
-home_assistant_chip_core==2024.11.4             # cross wheel downloaded from index
+#home_assistant_chip_core==2024.11.4             # replaced by home_assistant_chip_core==2025.3.dev1801
 humanfriendly==10.0
 idna==3.10
 ifaddr==0.2.0
@@ -35,7 +34,7 @@ ptyprocess==0.7.0
 pure_eval==0.2.3
 pycparser==2.22
 pygments==2.19.1
-python_matter_server==7.0.1
+#python_matter_server==7.0.1                    # user cross/python-matter-server that references custom home_assistant_chip_core
 rich==13.9.4
 six==1.17.0
 stack_data==0.6.3
