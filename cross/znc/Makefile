@@ -1,15 +1,15 @@
 PKG_NAME = znc
-PKG_VERS = 1.8.2
+PKG_VERS = 1.9.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 ifeq ($(strip $(PYTHON_PACKAGE)),)
-PYTHON_PACKAGE = python311
+PYTHON_PACKAGE = python312
 endif
 
-BUILD_DEPENDS = cross/python311
+BUILD_DEPENDS = cross/python312
 DEPENDS = cross/openssl3 cross/libicu cross/zlib
 
 # configure: No compiler with C++11 support was found
