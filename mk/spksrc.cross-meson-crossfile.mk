@@ -31,7 +31,7 @@ ENV_MESON += -u CFLAGS -u ADDITIONAL_CFLAGS
 ENV_MESON += -u CPPFLAGS -u ADDITIONAL_CPPFLAGS
 ENV_MESON += -u CXXFLAGS -u ADDITIONAL_CXXFLAGS
 ENV_MESON += -u FFLAGS -u ADDITIONAL_FFLAGS
-ENV_MESON += -u LDFLAGS -u ADDITIONAL_LDFLAGS
+#ENV_MESON += -u LDFLAGS -u ADDITIONAL_LDFLAGS
 ENV_MESON += -u PKG_CONFIG_PATH -u SYSROOT
 
 .PHONY: $(MESON_CROSS_FILE_PKG)
@@ -73,7 +73,7 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_C_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "cpp_args = ["
@@ -87,7 +87,7 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_CPP_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "cxx_args = ["
@@ -105,5 +105,5 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_FC_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
