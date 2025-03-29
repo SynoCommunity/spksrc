@@ -31,6 +31,13 @@ WHEELS  = src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
+SERVICE_SETUP = src/service-setup.sh
+
+OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy_ha
+OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/scipy
+
 include ../../mk/spksrc.common.mk
 
 # [cryptography]
@@ -106,6 +113,9 @@ endif
 # [greenlet]
 ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-greenlet-v3.txt
+else
+WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
+WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
 # [llfuse]
@@ -126,9 +136,15 @@ WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
 # [numpy]
+# gcc-8.4 is the minimal version to build numpy
+# gcc-8.5 hapens to be the default version for DSM-7.1
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
 DEPENDS += python/numpy
+
+# [scipy] - depends on numpy
+DEPENDS += python/scipy
 endif
 
 # [pycryptodome]
