@@ -11,7 +11,7 @@ if [ -r "${CONFIG_FILE}" ]; then
 fi
 
 LIBRARY_FILE="${SHARED_ZIM_FOLDER}/library.xml"
-SERVICE_COMMAND="${KIWIX_SERVE} --port=${SERVICE_PORT} --library ${LIBRARY_FILE}"
+SERVICE_COMMAND="${KIWIX_SERVE} --port=${SERVICE_PORT} --library ${LIBRARY_FILE} --monitorLibrary"
 
 service_prestart ()
 {
