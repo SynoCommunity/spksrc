@@ -4,6 +4,13 @@
 ## various wheels.  Uncoment to enable.
 ##
 
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+atom==0.10.5
+atom==0.11.0
+
 # [bcrypt]
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
