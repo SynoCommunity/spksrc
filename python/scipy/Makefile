@@ -11,6 +11,8 @@ HOMEPAGE = https://scipy.org/
 COMMENT  = SciPy provides algorithms for optimization, integration, interpolation, eigenvalue problems, algebraic equations, differential equations, statistics and many other classes of problems.
 LICENSE  = 3-Clause BSD license
 
+# Documentation:  https://docs.scipy.org/doc/scipy/building/cross_compilation.html
+
 # Requires gcc>=8.4 to build sucesfully
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
