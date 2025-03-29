@@ -6,9 +6,11 @@ cross/*/work*
 cross/*/build*
 cross/*/status*
 kernel/*/work*
+python/*/work*
+python/*/build*
+python/*/status*
 spk/*/work*
 spk/*/build*
-spk/*/crossenv*
 spk/*/publish*
 spk/*/status*
 spk/*/wheel*

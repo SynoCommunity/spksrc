@@ -31,7 +31,7 @@ endif
 
 compile_msg:
 	@$(MSG) "Compiling for $(NAME)"
-ifeq ($(filter cross spk,$(shell basename $(dir $(abspath $(CURDIR))))),)
+ifeq ($(filter cross spk python,$(shell basename $(dir $(abspath $(CURDIR))))),)
 	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(shell basename $(CURDIR)), NAME: $(NAME) >> $(PSTAT_LOG)
 else
 	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)

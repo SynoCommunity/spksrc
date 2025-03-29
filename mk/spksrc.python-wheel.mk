@@ -60,16 +60,16 @@ install_python_wheel_target: SHELL:=/bin/bash
 install_python_wheel_target:
 	@set -o pipefail; { \
 	$(MSG) $(MAKE) REQUIREMENT=\"$(PKG_NAME)==$(PKG_VERS)\" \
-	                WHEEL_NAME=\"$(PKG_NAME)\" \
-	                WHEEL_VERSION=\"$(PKG_VERS)\" \
-	                WHEEL_TYPE=\"cross\" \
-	                wheel_install ; \
+	               WHEEL_NAME=\"$(PKG_NAME)\" \
+	               WHEEL_VERSION=\"$(PKG_VERS)\" \
+	               WHEEL_TYPE=\"cross\" \
+	               wheel_install ; \
 	MAKEFLAGS= $(MAKE) REQUIREMENT="$(PKG_NAME)==$(PKG_VERS)" \
-	                WHEEL_NAME="$(PKG_NAME)" \
-	                WHEEL_VERSION="$(PKG_VERS)" \
-	                WHEEL_TYPE="cross" \
-	                --no-print-directory \
-	                wheel_install ; \
+	                   WHEEL_NAME="$(PKG_NAME)" \
+	                   WHEEL_VERSION="$(PKG_VERS)" \
+	                   WHEEL_TYPE="cross" \
+	                   --no-print-directory \
+	                   wheel_install ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 ###
