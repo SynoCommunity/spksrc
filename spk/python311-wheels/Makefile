@@ -33,6 +33,8 @@ WHEELS  = src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
+SERVICE_SETUP = src/service-setup.sh
+
 include ../../mk/spksrc.common.mk
 
 # [borgbackup]
