@@ -93,6 +93,12 @@ CROSSENV_CROSS_WHEEL ?= wheel$(if $(CROSSENV_CROSS_WHEEL_VERSION),==$(CROSSENV_C
 
 ###
 
+ifeq ($(WHEEL_TYPE),wheelhouse)
+EXTRA_PIP_ARGS = --find-links file://$(WHEELHOUSE)
+endif
+
+###
+
 crossenv_msg_target:
 ifneq ($(WHEEL_NAME),)
 	@$(MSG) "Preparing crossenv for $(NAME) - [$(WHEEL_NAME)==$(WHEEL_VERSION)]"
@@ -209,11 +215,10 @@ endif
 ###    <crossenv> = $(lastword $(subst -, ,$*)) being <wheel>-<version>, <wheel> or default
 ###
 crossenv-install-%:
-ifeq ($(WHEEL_TYPE),wheelhouse)
-	@. $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate ; \
-	if [ -e "$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate" ] ; then \
-	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/build/bin ; \
-	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate]" ; \
+	@. $(abspath $(WORK_DIR)/crossenv-$*)/bin/activate ; \
+	if [ -e "$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate" ] ; then \
+	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$*)/build/bin ; \
+	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate]" ; \
 	   $(MSG) "python: [$$(which cross-python)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
@@ -222,39 +227,16 @@ ifeq ($(WHEEL_TYPE),wheelhouse)
 	$(MSG) \
 	   $$(which cross-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
-	   --find-links file://$(WHEELHOUSE) \
+	   $(EXTRA_PIP_ARGS) \
 	   --disable-pip-version-check \
 	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
 	$(RUN) \
 	   PATH=$${PATH} \
 	   $$(which cross-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
-	   --find-links file://$(WHEELHOUSE) \
+	   $(EXTRA_PIP_ARGS) \
 	   --disable-pip-version-check \
 	   $(WHEEL_NAME)==$(WHEEL_VERSION)
-else
-	@. $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate ; \
-	if [ -e "$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate" ] ; then \
-	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/build/bin ; \
-	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate]" ; \
-	   $(MSG) "python: [$$(which $(WHEEL_TYPE)-python)]" ; \
-	else \
-	   echo "ERROR: crossenv not found!" ; \
-	   exit 2 ; \
-	fi ; \
-	$(MSG) \
-	   $$(which $(WHEEL_TYPE)-python) -m pip install \
-	   --cache-dir $(PIP_CACHE_DIR) \
-	   --disable-pip-version-check \
-	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
-	$(RUN) \
-	   PATH=$${PATH} \
-	   $$(which $(WHEEL_TYPE)-python) -m pip install \
-	   --cache-dir $(PIP_CACHE_DIR) \
-	   --disable-pip-version-check \
-	   $(WHEEL_NAME)==$(WHEEL_VERSION)
-endif
-
 
 ##
 ## python-cc.mk
