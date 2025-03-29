@@ -86,9 +86,6 @@ ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-rpds-py.txt
 endif
 
-# [scikit-learn]
-#DEPENDS += python/scikit-learn
-
 include ../../mk/spksrc.python.mk
 
 # [borgbackup]
