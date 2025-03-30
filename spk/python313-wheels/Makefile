@@ -27,7 +27,7 @@ LICENSE  = PSF
 # IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
 # later additions are ok, but WHEELS must not be empty at this point,
 # otherwise the build of WHEELS is skipped
-WHEELS  = src/requirements-abi3.txt
+WHEELS += src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
