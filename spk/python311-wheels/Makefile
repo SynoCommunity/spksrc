@@ -102,6 +102,15 @@ endif
 
 include ../../mk/spksrc.python.mk
 
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+WHEELS += atom==0.10.5
+WHEELS += atom==0.11.0
+endif
+
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-greenlet-v3.txt
