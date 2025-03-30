@@ -113,9 +113,6 @@ endif
 # [greenlet]
 ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-greenlet-v3.txt
-else
-WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
-WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
 # [llfuse]
