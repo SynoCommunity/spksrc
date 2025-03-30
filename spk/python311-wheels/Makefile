@@ -35,6 +35,11 @@ WHEELS += src/requirements-pure.txt
 
 SERVICE_SETUP = src/service-setup.sh
 
+OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy_ha
+OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/scipy
+
 include ../../mk/spksrc.common.mk
 
 # [borgbackup]
