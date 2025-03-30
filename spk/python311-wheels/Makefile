@@ -29,7 +29,7 @@ LICENSE  = PSF
 # IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
 # later additions are ok, but WHEELS must not be empty at this point,
 # otherwise the build of WHEELS is skipped
-WHEELS  = src/requirements-abi3.txt
+WHEELS += src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
@@ -106,7 +106,7 @@ include ../../mk/spksrc.python.mk
 # Requires
 #  - build:setuptools-scm
 #  - cross:cppy
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
 WHEELS += atom==0.10.5
 WHEELS += atom==0.11.0
 endif
