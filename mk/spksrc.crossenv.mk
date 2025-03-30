@@ -215,28 +215,30 @@ endif
 ###    <crossenv> = $(lastword $(subst -, ,$*)) being <wheel>-<version>, <wheel> or default
 ###
 crossenv-install-%:
-	@. $(abspath $(WORK_DIR)/crossenv-$*)/bin/activate ; \
+	@set -o pipefail; { \
+	. $(abspath $(WORK_DIR)/crossenv-$*)/bin/activate ; \
 	if [ -e "$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate" ] ; then \
 	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$*)/build/bin ; \
 	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate]" ; \
-	   $(MSG) "python: [$$(which cross-python)]" ; \
+	   $(MSG) "python: [$$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
 	$(MSG) \
-	   $$(which cross-python) -m pip install \
+	   $$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
 	   $(EXTRA_PIP_ARGS) \
 	   --disable-pip-version-check \
 	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
 	$(RUN) \
 	   PATH=$${PATH} \
-	   $$(which cross-python) -m pip install \
+	   $$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
 	   $(EXTRA_PIP_ARGS) \
 	   --disable-pip-version-check \
-	   $(WHEEL_NAME)==$(WHEEL_VERSION)
+	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
+	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 ##
 ## python-cc.mk
