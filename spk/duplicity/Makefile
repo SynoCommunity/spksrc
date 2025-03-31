@@ -50,3 +50,8 @@ ENV += SODIUM_INSTALL=system
 DEPENDS += cross/libyaml
 
 include ../../mk/spksrc.python.mk
+
+# [duplicity]
+ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
+WHEELS_CFLAGS += [duplicity] -std=gnu11
+endif
