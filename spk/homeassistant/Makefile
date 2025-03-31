@@ -11,8 +11,6 @@ SPK_DEPENDS = $(PYTHON_PACKAGE)
 # unsupported wheels: deebot_client, numpy, pymicro_vad, pyspeex_noise, and others
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
-# numpy==2.2.0 not yet supported
-UNSUPPORTED_ARCHS += $(ARMv7_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
@@ -47,6 +45,8 @@ DEPENDS += cross/pillow_ha
 # [DTLSSocket] runtime dependency of [tradfri]
 DEPENDS += cross/dtlssocket_ha
 
+# [numpy]
+DEPENDS += python/numpy_ha
 
 # definitions and libraries
 # to build wheels of src/requirements-crossenv.txt and src/requirements-abi3.txt
@@ -89,12 +89,10 @@ WHEELS_CFLAGS += [ciso8601] -std=c11
 
 # use python arch specific requirements file to download cross wheels from index
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-WHEELS += src/requirements-numpy.txt
 REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_x64.txt
 else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_aarch64.txt
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-WHEELS += src/requirements-numpy.txt
 REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_i686.txt
 else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_armv7l.txt

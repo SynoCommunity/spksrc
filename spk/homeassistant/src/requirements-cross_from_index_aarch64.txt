@@ -12,6 +12,3 @@ grpcio==1.67.1
 isal==1.7.1
 # pandas: maturin error
 pandas==2.2.3
-
-# temp take numpy from index
-numpy==2.1.3
