@@ -29,9 +29,16 @@ LICENSE  = PSF
 # IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
 # later additions are ok, but WHEELS must not be empty at this point,
 # otherwise the build of WHEELS is skipped
-WHEELS  = src/requirements-abi3.txt
+WHEELS += src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
+
+SERVICE_SETUP = src/service-setup.sh
+
+OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy_ha
+OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
 
@@ -100,6 +107,15 @@ endif
 
 include ../../mk/spksrc.python.mk
 
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+WHEELS += atom==0.10.5
+WHEELS += atom==0.11.0
+endif
+
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-greenlet-v3.txt
@@ -120,13 +136,23 @@ WHEELS += src/requirements-crossenv-numpy-armv7l.txt
 else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy-gcc4.txt
 # [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+
+# [numpy] = 1.25.x
 # BUG numpy==1.25.2 only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-gcc85-x64.txt
 else
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
+
+# [numpy] >= 1.26|2.x
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
+DEPENDS += python/numpy
+
+# [scipy] - depends on numpy 
+DEPENDS += python/scipy
 endif
 endif
 
