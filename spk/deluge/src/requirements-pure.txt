@@ -5,7 +5,7 @@
 #deluge==2.1.1      ==> Using crossenv when building dev version
 
 # Other requirements
-attrs==25.1.0
+attrs==25.3.0
 Automat==24.8.1
 chardet==5.2.0
 constantly==23.10.4
@@ -14,13 +14,13 @@ constantly==23.10.4
 hyperlink==21.0.0
 idna==3.10
 incremental==24.7.2
-Mako==1.3.8
+Mako==1.3.9
 pyasn1==0.6.1
-pyasn1-modules==0.4.1
+pyasn1-modules==0.4.2
 pycparser==2.22
 pyOpenSSL==25.0.0
 pyxdg==0.28
 service-identity==24.2.0
 #six                ==> python311
 Twisted==24.11.0
-typing_extensions==4.12.2
+typing_extensions==4.13.0
