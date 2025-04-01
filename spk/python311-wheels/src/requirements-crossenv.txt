@@ -59,11 +59,6 @@ lxml==5.3.0
 #  MYSQLCLIENT_LDFLAGS
 mysqlclient==2.2.4
 
-# [Pillow]
-# Require --global-options arguments
-#  WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
-Pillow==9.5.0
-
 # [pycares]
 # Depends: c-ares
 # Require environment variables
@@ -75,15 +70,6 @@ pycares==4.4.0
 # Require environment variables
 #  PYCURL_CURL_CONFIG
 pycurl==7.45.3
-
-# [pydantic_core]
-# Requires path to maturin from crossenv
-# Requires WHEELS_CFLAGS = -std=c11 for = gcc-4.9
-# Requires WHEELS_CFLAGS = -std=c99 for < gcc-4.9
-# Require environment variables
-#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-pydantic_core==2.23.0
 
 # [PyNaCl]
 # Depends: cross/libsodium

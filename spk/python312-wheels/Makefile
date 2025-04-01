@@ -24,28 +24,83 @@ LICENSE  = PSF
 # Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
-WHEELS  = src/requirements-crossenv.txt
+# IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
+# later additions are ok, but WHEELS must not be empty at this point,
+# otherwise the build of WHEELS is skipped
 WHEELS += src/requirements-abi3.txt
+WHEELS += src/requirements-crossenv.txt
+WHEELS += src/requirements-pure.txt
+
+SERVICE_SETUP = src/service-setup.sh
+
+OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy_ha
+OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
-
-# [borgbackup]
-# Use OpenSSL path as defined by either
-# spksrc.wheel-env.mk or spksrc.python.mk
-ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
-ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
-ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
-ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
-DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [borgbackup] -std=c11
-endif
 
 # [cryptography]
 # Use cross/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py311-py311 regular build use src/requirements-crossenv.txt
 DEPENDS += cross/cryptography
+
+# [mysqlclient]
+DEPENDS += cross/mysql-connector-c
+DEPENDS += cross/mariadb-connector-c
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
+# [Pendulum]
+# Needs atomic to build
+# Serves as maturin type python-wheel.mk example
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += cross/pendulum
+endif
+
+# [Pillow]
+DEPENDS += cross/pillow
+
+# [pycares]
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
+
+# [pycurl]
+DEPENDS += cross/curl
+ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+
+# [pydantic-core] 
+DEPENDS += cross/pydantic-core
+
+# [PyNaCl]
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# [rpds-py]
+# Version >= 0.22.3 requires rustc >= 1.80
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-rpds-py.txt
+endif
+
+include ../../mk/spksrc.python.mk
+
+# [borgbackup]
+# Use OpenSSL path as defined by either
+# spksrc.wheel-env.mk or spksrc.python.mk
+ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
+ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
+DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/libb2 cross/fuse cross/xxhash cross/zstd
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [borgbackup] -std=c11
+endif
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
@@ -65,7 +120,7 @@ endif
 
 # [llfuse]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [llfuse] -std=c11
+WHEELS_CFLAGS += [llfuse] -std=gnu11
 endif
 
 # [lxml]
@@ -80,33 +135,17 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
-# [mysqlclient]
-DEPENDS += cross/mysql-connector-c
-DEPENDS += cross/mariadb-connector-c
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+# [numpy]
+# gcc-8.4 is the minimal version to build numpy
+# gcc-8.5 hapens to be the default version for DSM-7.1
+ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
+DEPENDS += python/numpy
 
-# [numpy] <= 1.21.6 (armv5)
-# [numpy] <= 1.22.4 (armv7l)
-# [numpy] <= 1.24.4 last working version with gcc-4.9
-# These versions are now unsupported using py312
-# [numpy] >= 1.25.0 requires c++17
-ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy.txt
+# [scipy] - depends on numpy
+DEPENDS += python/scipy
 endif
-
-# [Pillow]
-DEPENDS += cross/freetype cross/libjpeg cross/zlib
-WHEELS_BUILD_ARGS += [Pillow]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += --disable-platform-guessing
-WHEELS_BUILD_ARGS += --enable-freetype
-WHEELS_BUILD_ARGS += --enable-jpeg
-WHEELS_BUILD_ARGS += --enable-zlib
-
-# [pycares]
-DEPENDS += cross/c-ares
-ENV += PYCARES_USE_SYSTEM_LIB=1
 
 # [pycryptodome]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
@@ -118,30 +157,7 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 endif
 
-# [pycurl]
-DEPENDS += cross/curl
-ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
-
-# [pydantic_core]
-# Requires path to maturin from crossenv
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [pydantic_core] -std=c11
-endif
-
-# [PyNaCl]
-DEPENDS += cross/libsodium
-ENV += SODIUM_INSTALL=system
-
-# [PyYAML]
-DEPENDS += cross/libyaml
-
 # [ruamel.yaml.clib]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
 endif
-
-# [rpds-py], [pydantic_core]
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
-
-include ../../mk/spksrc.python.mk

@@ -1,5 +1,0 @@
-Cython==3.0.11
-meson-python==0.17.1
-scikit-build==0.18.1
-scikit-build-core==0.10.7
-setuptools-scm==8.1.0

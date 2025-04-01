@@ -1,5 +1,5 @@
 PKG_NAME = gdu
-PKG_VERS = 5.25.0
+PKG_VERS = 5.30.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dundee/gdu/archive
@@ -19,7 +19,7 @@ include ../../mk/spksrc.cross-go.mk
 
 .PHONY: gdu_compile
 gdu_compile:
-	$(RUN) VERSION=$(PKG_VERS) $(MAKE) build
+	@$(RUN) VERSION=$(PKG_VERS) $(MAKE) build
 
 .PHONY: gdu_install
 gdu_install:

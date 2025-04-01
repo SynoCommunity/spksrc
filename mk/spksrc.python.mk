@@ -7,7 +7,12 @@
 # set default spk/python* path to use
 PYTHON_PACKAGE_WORK_DIR = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
+
+# armv5 no longer supported with python >= 3.12
+ifeq ($(call version_ge, $(subst python,,$(PYTHON_PACKAGE)), 312), 1)
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+endif
 
 ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
 
@@ -42,12 +47,12 @@ export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
 export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
 
-# Re-use all default python mandatory libraries (with exception of xz, zlib)
-PYTHON_LIBS_EXCLUDE = %lzma.pc %zlib.pc
+# Re-use all default python mandatory libraries (with exception of bzip2, xz, zlib)
+PYTHON_LIBS_EXCLUDE = %bzip2.pc %lzma.pc %zlib.pc
 PYTHON_LIBS := $(filter-out $(PYTHON_LIBS_EXCLUDE),$(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc))
 
-# Re-use all python dependencies and mark as already done (with exceltion of xz, zlib)
-PYTHON_DEPENDS_EXCLUDE = xz zlib
+# Re-use all python dependencies and mark as already done (with exceltion of bzip2, xz, zlib)
+PYTHON_DEPENDS_EXCLUDE = bzip2 xz zlib
 PYTHON_DEPENDS := $(foreach cross,$(filter-out $(PYTHON_DEPENDS_EXCLUDE),$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $(PYTHON_PACKAGE_WORK_DIR)/.$(cross)-*_done))
 
 # call-up pre-depend to prepare the shared python build environment
@@ -76,7 +81,6 @@ python_pre_depend:
 	   if grep -q spksrc.python-wheel.mk $${makefile} ; then \
 	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
 	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
-	      echo "rm -fr work-$(ARCH)-$(TCVERSION)/$${pkgname}* work-$(ARCH)-$(TCVERSION)/.$${pkgname}-*" ; \
-	      rm -fr work-$(ARCH)-$(TCVERSION)/$${pkgname}* work-$(ARCH)-$(TCVERSION)/.$${pkgname}-* ; \
+	      find $(WORK_DIR)/$${pkgname}* $(WORK_DIR)/.$${pkgname}* -maxdepth 0 -type l -exec rm -fr {} \; 2>/dev/null || true ; \
 	   fi ; \
 	done

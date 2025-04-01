@@ -26,9 +26,19 @@ LICENSE  = PSF
 # Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
-WHEELS  = src/requirements-abi3.txt
+# IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
+# later additions are ok, but WHEELS must not be empty at this point,
+# otherwise the build of WHEELS is skipped
+WHEELS += src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
+
+SERVICE_SETUP = src/service-setup.sh
+
+OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy_ha
+OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
 
@@ -62,18 +72,15 @@ DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
+# [Pendulum]
+# Needs atomic to build
+# Serves as maturin type python-wheel.mk example
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += cross/pendulum
+endif
+
 # [Pillow]
-DEPENDS += cross/freetype cross/libimagequant cross/libjpeg
-DEPENDS += cross/libtiff cross/libwebp cross/zlib
-WHEELS_BUILD_ARGS += [Pillow]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += --disable-platform-guessing
-WHEELS_BUILD_ARGS += --enable-freetype
-WHEELS_BUILD_ARGS += --enable-imagequant
-WHEELS_BUILD_ARGS += --enable-jpeg
-WHEELS_BUILD_ARGS += --enable-tiff
-WHEELS_BUILD_ARGS += --enable-webp
-WHEELS_BUILD_ARGS += --enable-zlib
+DEPENDS += cross/pillow
 
 # [pycares]
 DEPENDS += cross/c-ares
@@ -83,6 +90,9 @@ ENV += PYCARES_USE_SYSTEM_LIB=1
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
+# [pydantic-core]
+DEPENDS += cross/pydantic-core
+
 # [PyNaCl]
 DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
@@ -91,21 +101,20 @@ ENV += SODIUM_INSTALL=system
 DEPENDS += cross/libyaml
 
 # [rpds-py]
-# maturin canot be built as pre-requisite crossenv
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-rpds-py.txt
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
 endif
 
-##
-## Addition of requirements files beyond spksrc.python.mk
-## will not be taken into consideration for processing
-## unless WHEELS has been previously populated. This is due to
-## the makefile analysis phase which discard ifeq instructions.
-##
-
 include ../../mk/spksrc.python.mk
+
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+WHEELS += atom==0.10.5
+WHEELS += atom==0.11.0
+endif
 
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
@@ -127,13 +136,23 @@ WHEELS += src/requirements-crossenv-numpy-armv7l.txt
 else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy-gcc4.txt
 # [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+
+# [numpy] = 1.25.x
 # BUG numpy==1.25.2 only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-gcc85-x64.txt
 else
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
+
+# [numpy] >= 1.26|2.x
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
+DEPENDS += python/numpy
+
+# [scipy] - depends on numpy 
+DEPENDS += python/scipy
 endif
 endif
 
@@ -158,12 +177,3 @@ WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
-
-# [pydantic_core]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-WHEELS_CFLAGS += [pydantic_core] -std=c11
-else
-WHEELS_CFLAGS += [pydantic_core] -std=c99
-endif
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)

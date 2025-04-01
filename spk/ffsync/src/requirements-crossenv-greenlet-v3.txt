@@ -1,0 +1,9 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##
+
+# [greenlet]
+#   - Mandatory require full c++20 support added with gcc >= 8
+greenlet==3.1.1
