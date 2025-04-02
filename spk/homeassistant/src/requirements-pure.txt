@@ -7,6 +7,10 @@ construct==2.10.68      # avoid version 2.10.70, incompatible with some dependec
 rich==10.16.2           # avoid version >= 11.0.0, incompatible with surepy==0.9.0
 tenacity==8.5.0         # avoid version 9.0.0, incompatible with some dependecies
 
+# additionally installed to fix restfull integrations
+asyncio==3.4.3
+
+
 acme==3.0.1
 aiodiscover==2.1.0
 aiodns==3.2.0
