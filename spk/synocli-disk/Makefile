@@ -44,12 +44,15 @@ endif
 DEPENDS += cross/fuse
 DEPENDS += cross/s3backer
 
+WIKI_URL = "\<a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk\"\>FAQ SynoCliDisk\</a\>"
 
-DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure, s3backer$(OPTIONAL_DESC). For package details and specific licences see <a href="https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk">FAQ SynoCliDisk</a>."
+# Remarks: html in DESCRIPTION is not supported
+DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure, s3backer$(OPTIONAL_DESC)."
 STARTABLE = no
 CHANGELOG  = "1. Add mergerfs. <br/>"
 CHANGELOG += "2. Update dar to v2.7.17. <br/>"
-CHANGELOG += "3. Update ncdu to v1.22."
+CHANGELOG += "3. Update ncdu to v1.22. <br/>"
+CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.
