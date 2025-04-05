@@ -13,6 +13,7 @@ COMMENT  = mergerfs - a featureful union filesystem.
 LICENSE  = ISC
 
 CONFIGURE_TARGET = nop
+PRE_COMPILE_TARGET = mergerfs_pre_compile
 
 # needs uppercase PREFIX
 INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
@@ -27,3 +28,8 @@ ifneq ($(wildcard $(STAGING_INSTALL_PREFIX)/include/fuse.h),)
 $(error "mergerfs fails to build when cross/fuse is built before.")
 endif
 endif
+
+.PHONY: mergerfs_pre_compile
+mergerfs_pre_compile:
+	@$(MSG) "Create version file"
+	@echo "$(PKG_VERS)" > $(WORK_DIR)/$(PKG_DIR)/VERSION 
