@@ -10,7 +10,7 @@ DEPENDS += cross/etherwake
 DEPENDS += cross/inetutils
 DEPENDS += cross/netcat
 
-OPTIONAL_DEPENDS = cross/sshfs2 cross/sshfs3 cross/ser2net cross/bind cross/bind_9.16 cross/aria2 cross/nmap cross/nmap_7.92
+OPTIONAL_DEPENDS = cross/sshfs2 cross/sshfs3 cross/ser2net cross/bind cross/bind_9.16 cross/aria2 cross/nmap cross/nmap_7.92 cross/rclone
 
 include ../../mk/spksrc.common.mk
 
@@ -47,6 +47,11 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", aria2c"
 endif
 endif
 
+# PPC archs are not supported with golang
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/rclone
+OPTIONAL_DESC := $(OPTIONAL_DESC)", rclone"
+endif
 
 MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, xxhsum, autossh \(including openssh, sftp and scp\), etherwake, telnet, whois, sshfs$(OPTIONAL_DESC)."
@@ -86,5 +91,6 @@ SPK_COMMANDS += bin/telnet bin/whois
 SPK_COMMANDS += bin/arpaname bin/delv bin/dig bin/mdig
 SPK_COMMANDS += bin/aria2c
 SPK_COMMANDS += bin/nc bin/netcat
+SPK_COMMANDS += bin/rclone
 
 include ../../mk/spksrc.spk.mk
