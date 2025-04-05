@@ -1,5 +1,5 @@
 SPK_NAME = rclone
-SPK_VERS = 1.64.2
+SPK_VERS = 1.69.1
 SPK_REV = 1
 SPK_ICON = src/logo.png
 
