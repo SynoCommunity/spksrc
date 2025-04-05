@@ -5,7 +5,9 @@ SPK_ICON = src/logo.png
 
 DEPENDS = cross/$(SPK_NAME)
 
-MAINTAINER = fgma
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+
+MAINTAINER = dotwee
 DESCRIPTION = Rclone is a command-line program to manage files on cloud storage. It is a feature-rich alternative to cloud vendors' web storage interfaces.
 DISPLAY_NAME = rclone
 STARTABLE = no
@@ -13,6 +15,8 @@ STARTABLE = no
 CHANGELOG = "Initial release."
 
 HOMEPAGE = https://rclone.org/
+HELPURL = https://rclone.org/docs/
+
 LICENSE  = MIT License
 LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/COPYING
 
