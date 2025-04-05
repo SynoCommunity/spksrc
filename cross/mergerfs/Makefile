@@ -19,8 +19,11 @@ INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
 
+# when package is not already built:
+ifeq ($(wildcard $(COMPILE_COOKIE)),)
 # mergerfs comes with its own (statically linked) libfuse, and fails to build
 # while using the installed fuse.h (of different version)
 ifneq ($(wildcard $(STAGING_INSTALL_PREFIX)/include/fuse.h),)
 $(error "mergerfs fails to build when cross/fuse is built before.")
+endif
 endif
