@@ -6,7 +6,7 @@ SPK_ICON = src/logo.png
 DEPENDS = cross/$(SPK_NAME)
 
 MAINTAINER = fgma
-DESCRIPTION = Rclone is a command-line program to manage files on cloud storage.
+DESCRIPTION = Rclone is a command-line program to manage files on cloud storage. It is a feature-rich alternative to cloud vendors' web storage interfaces.
 DISPLAY_NAME = rclone
 STARTABLE = no
 
