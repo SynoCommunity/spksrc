@@ -76,7 +76,7 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 # Needs atomic to build
 # Serves as maturin type python-wheel.mk example
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/pendulum
+DEPENDS += python/pendulum
 endif
 
 # [Pillow]
