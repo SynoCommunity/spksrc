@@ -16,4 +16,6 @@ BUILD_DEPENDS = native/go
 GO_SRC_DIR = $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)
 GO_BIN_DIR = $(GO_SRC_DIR)/$(PKG_NAME)
 
+GO_BUILD_ARGS += -ldflags "-s -X github.com/rclone/rclone/fs.Version=v$(PKG_VERS)"
+
 include ../../mk/spksrc.cross-go.mk
