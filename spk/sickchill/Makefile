@@ -52,7 +52,7 @@ WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 else ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
 # archs without C++11 support are not supported:
-UNSUPPORTED_ARCHS = $(ARCHS)
+UNSUPPORTED_ARCHS += $(ARCH)
 endif
 
 # prefer native python tools (pip, maturin, ...)
