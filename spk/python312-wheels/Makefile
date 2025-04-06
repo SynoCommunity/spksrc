@@ -60,7 +60,7 @@ DEPENDS += python/pendulum
 endif
 
 # [Pillow]
-DEPENDS += cross/pillow
+DEPENDS += python/pillow
 
 # [pycares]
 DEPENDS += cross/c-ares
