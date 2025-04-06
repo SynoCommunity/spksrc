@@ -91,7 +91,7 @@ DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
 # [pydantic-core]
-DEPENDS += cross/pydantic-core
+DEPENDS += python/pydantic-core
 
 # [PyNaCl]
 DEPENDS += cross/libsodium
