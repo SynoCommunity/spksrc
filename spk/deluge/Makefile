@@ -3,19 +3,18 @@ SPK_VERS = 2.1.1.127
 SPK_REV = 24
 SPK_ICON = src/deluge.png
 
-PYTHON_PACKAGE = python311
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "python312"
 
 WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 WHEELS += src/requirements-abi3.txt
 
-SPK_DEPENDS = "python311>=3.11.5-8"
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
 DESCRIPTION_FRE = Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), desservant l\'interface utilisateur web deluge.
 STARTABLE = yes
-CHANGELOG = "1. Update to latest github development commit<br/>2. Update to libtorrent 2.0.10<br/>3. Update all other wheels"
+CHANGELOG = "1. Update to latest github development commit<br/>2. Update to libtorrent 2.0.11<br/>3. Update all other wheels<br/>Migrate to python 3.12"
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
@@ -45,8 +44,8 @@ UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl3
 DEPENDS += cross/geoip
 DEPENDS += cross/libiconv
-DEPENDS += cross/boost_1.82
-BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_82_0
+DEPENDS += cross/boost_1.86
+BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_86_0
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
