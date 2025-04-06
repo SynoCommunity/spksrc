@@ -6,7 +6,7 @@ charset_normalizer==3.4.1
 jellyfish==1.2.0
 lxml==5.3.2
 MarkupSafe==3.0.2
-#pillow                         ==> cross/pillow
+#pillow                         ==> python/pillow
 PyYAML==6.0.2
 
 # TODO: The following plugins are currently unsupported due to dependency issues:

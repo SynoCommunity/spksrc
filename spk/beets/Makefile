@@ -24,7 +24,7 @@ SERVICE_SETUP = src/service-setup.sh
 SPK_COMMANDS = env/bin/beet
 
 # [Pillow]
-DEPENDS += cross/pillow
+DEPENDS += python/pillow
 
 # [PyYAML]
 DEPENDS += cross/libyaml
