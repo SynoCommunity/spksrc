@@ -75,10 +75,8 @@ wheel_install_target:
 	done ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
-install_python_wheel: SHELL:=/bin/bash
 install_python_wheel:
-	@set -o pipefail; { \
-	if [ -d "$(WHEELHOUSE)" ] ; then \
+	@if [ -d "$(WHEELHOUSE)" ] ; then \
 		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
 		cd $(WHEELHOUSE) ; \
 		if stat -t requirements*.txt >/dev/null 2>&1; then \
@@ -100,8 +98,7 @@ install_python_wheel:
 				cp -f $${w} $(STAGING_INSTALL_WHEELHOUSE)/$${_new_name} ; \
 			done ; \
 		fi ; \
-	fi ; \
-	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
+	fi
 
 
 post_wheel_install_target: $(WHEEL_INSTALL_TARGET)

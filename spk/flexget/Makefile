@@ -46,7 +46,7 @@ WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
 # [Pendulum]
-DEPENDS += cross/pendulum
+DEPENDS += python/pendulum
 
 .PHONY: flexget_extra_install
 flexget_extra_install:
