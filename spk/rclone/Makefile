@@ -3,7 +3,7 @@ SPK_VERS = 1.69.1
 SPK_REV = 1
 SPK_ICON = src/logo.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/rclone
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
