@@ -66,13 +66,14 @@ ifneq ($(wildcard $(REQUIREMENT)),)
 else
 	@for requirement in $(REQUIREMENT) ; do \
 	   $(MSG) Processing requirement [$${requirement}] ; \
-	   wheel=$$(echo $${requirement} | sed -E "s/^(abi3|build|cross|crossenv|pure)://") ; \
+	   wheel=$$(echo $${requirement} | sed -E "s/^(abi3|build|cross|crossenv|pure|wheelhouse)://") ; \
 	   case $${requirement} in \
 	          abi3:*) type=abi3 ;; \
 	         build:*) type=build ;; \
 	         cross:*) type=cross ;; \
 	      crossenv:*) type=crossenv ;; \
 	          pure:*) type=pure ;; \
+	    wheelhouse:*) type=wheelhouse ;; \
 	               *) [[ "$(REQUIREMENT_GOAL)" == crossenv-install-* ]] && type=build || type=$(WHEEL_DEFAULT_PREFIX) ;; \
 	   esac ; \
 	   version=$$(echo $${wheel} | grep -oP '(?<=([<>=]=))[^ ]*' || echo "") ; \

@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 4.4.1
-SPK_REV = 73
+SPK_VERS = 4.5.0
+SPK_REV = 75
 SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python311
@@ -23,7 +23,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Update SABnzbd to 4.4.1. <br/>2. Replace 7za by 7zz v24.09. <br/>3. Update unrar to v7.1.2 (DSM 7 only). <br/>4. Update par2cmdline-turbo to v1.2.0."
+CHANGELOG = "1. Update SABnzbd to 4.5.0.<br/>2. Fix virtualization detection."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -53,7 +53,7 @@ POST_STRIP_TARGET = sabnzbd_extra_install
 SPK_COMMANDS = bin/7zz
 
 # [cryptography]
-DEPENDS += cross/cryptography
+DEPENDS += cross/openssl3
 
 include ../../mk/spksrc.python.mk
 

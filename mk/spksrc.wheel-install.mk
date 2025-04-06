@@ -1,5 +1,13 @@
 ### Wheel rules
-# Install wheels for modules listed in WHEELS. 
+# Install wheels for modules listed in WHEELS.
+#    1) Add $(WHEEL_NAME)==$(WHEEL_VERSION) to related $(WHEELHOUSE)/requirements-$(WHEEL_TYPE).txt file
+#   2a) Copy all $(WHEELHOUSE)/requirements-$(WHEEL_TYPE).txt files to $(STAGING_INSTALL_WHEELHOUSE) directory
+#   2b) Generate a generic $(STAGING_INSTALL_WHEELHOUSE)/requirements.txt file
+#   2c) Copy all $(WHEELHOUSE)/*.whl to $(STAGING_INSTALL_WHEELHOUSE) directory
+#
+# Note: Code can be improved to avoid doing step 2a-b-c) for every wheel.
+#       May be possible to move this last step into spksrc.wheel.mk + .wheel_install-done
+#       OR by checking if wheel_compile-done exists only then do the copying (or similar check)
 #
 # Targets are executed in the following order:
 #  wheel_install_msg_target
@@ -9,7 +17,7 @@
 #
 # Variables:
 #  WHEEL_NAME              Name of wheel to process
-#  WHEEL_TYPE              Type of wheel to process (abi3, crossenv, pure)
+#  WHEEL_TYPE              Type of wheel to process (abi3, cross, crossenv, pure)
 #  WHEEL_URL               URL usually of type git+https://
 #  WHEEL_VERSION           Version of wheel to process (can be empty)
 
@@ -67,10 +75,8 @@ wheel_install_target:
 	done ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
-install_python_wheel: SHELL:=/bin/bash
 install_python_wheel:
-	@set -o pipefail; { \
-	if [ -d "$(WHEELHOUSE)" ] ; then \
+	@if [ -d "$(WHEELHOUSE)" ] ; then \
 		mkdir -p $(STAGING_INSTALL_WHEELHOUSE) ; \
 		cd $(WHEELHOUSE) ; \
 		if stat -t requirements*.txt >/dev/null 2>&1; then \
@@ -92,8 +98,7 @@ install_python_wheel:
 				cp -f $${w} $(STAGING_INSTALL_WHEELHOUSE)/$${_new_name} ; \
 			done ; \
 		fi ; \
-	fi ; \
-	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
+	fi
 
 
 post_wheel_install_target: $(WHEEL_INSTALL_TARGET)

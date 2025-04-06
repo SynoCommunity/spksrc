@@ -1,9 +1,11 @@
+lib:lib/libeverest.so
 lnk:lib/libmbedcrypto.so
-lib:lib/libmbedcrypto.so.2.28.6
-lnk:lib/libmbedcrypto.so.7
+lnk:lib/libmbedcrypto.so.16
+lib:lib/libmbedcrypto.so.3.6.3
 lnk:lib/libmbedtls.so
-lnk:lib/libmbedtls.so.14
-lib:lib/libmbedtls.so.2.28.6
+lnk:lib/libmbedtls.so.21
+lib:lib/libmbedtls.so.3.6.3
 lnk:lib/libmbedx509.so
-lib:lib/libmbedx509.so.1
-lib:lib/libmbedx509.so.2.28.6
+lnk:lib/libmbedx509.so.7
+lib:lib/libmbedx509.so.3.6.3
+lib:lib/libp256m.so

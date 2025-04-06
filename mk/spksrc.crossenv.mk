@@ -16,12 +16,6 @@
 #  WHEEL_NAME              Name of wheel to process
 #  WHEEL_VERSION           Version of wheel to process (can be empty)
 
-# include cmake definitions
-include ../../mk/spksrc.cross-cmake-env.mk
-
-# include meson definitions
-include ../../mk/spksrc.cross-meson-env.mk
-
 # Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
 PYTHON_WORK_DIR = $(or $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(wildcard $(WORK_DIR)))
 
@@ -99,6 +93,12 @@ CROSSENV_CROSS_WHEEL ?= wheel$(if $(CROSSENV_CROSS_WHEEL_VERSION),==$(CROSSENV_C
 
 ###
 
+ifeq ($(WHEEL_TYPE),wheelhouse)
+EXTRA_PIP_ARGS = --find-links file://$(WHEELHOUSE)
+endif
+
+###
+
 crossenv_msg_target:
 ifneq ($(WHEEL_NAME),)
 	@$(MSG) "Preparing crossenv for $(NAME) - [$(WHEEL_NAME)==$(WHEEL_VERSION)]"
@@ -117,9 +117,8 @@ pre_crossenv_target: crossenv_msg_target
 
 crossenv-%: SHELL:=/bin/bash
 crossenv-%:
-	@$(MSG) $(MAKE) ARCH=\"$(firstword $(subst -, ,$*))\" TCVERSION=\"$(lastword $(subst -, ,$*))\" WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv | tee --append $(CROSSENV_LOG)
-	@MAKEFLAGS= $(MAKE) ARCH="$(firstword $(subst -, ,$*))" TCVERSION="$(lastword $(subst -, ,$*))" WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv --no-print-directory | tee --append $(CROSSENV_LOG) ; \
-	[ $${PIPESTATUS[0]} -eq 0 ] || false
+	@$(MSG) $(MAKE) ARCH=\"$(firstword $(subst -, ,$*))\" TCVERSION=\"$(lastword $(subst -, ,$*))\" WHEEL_NAME=\"$(WHEEL_NAME)\" WHEEL_VERSION=\"$(WHEEL_VERSION)\" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv
+	@MAKEFLAGS= $(MAKE) ARCH="$(firstword $(subst -, ,$*))" TCVERSION="$(lastword $(subst -, ,$*))" WHEEL_NAME="$(WHEEL_NAME)" WHEEL_VERSION="$(WHEEL_VERSION)" WHEEL_DEPENDENCY=\"$(WHEEL_DEPENDENCY)\" crossenv --no-print-directory
 
 ####
 
@@ -166,48 +165,50 @@ export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/py
 #
 build_crossenv_target: SHELL:=/bin/bash
 build_crossenv_target: pre_crossenv_target
-	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), CROSSENV: $(CROSSENV_WHEEL) >> $(PSTAT_LOG)
-	@$(MSG) Python sources: $(wildcard $(PYTHON_WORK_DIR)/Python-[0-9]*)
-	@$(MSG) crossenv requirement definition: $(CROSSENV_REQUIREMENTS)
-	mkdir -p $(PYTHON_LIB_CROSS)
-	cp -RL $(HOSTPYTHON_LIB_NATIVE) $(abspath $(PYTHON_LIB_CROSS)/../)
-	@echo $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
+	@set -o pipefail; { \
+	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), CROSSENV: $(CROSSENV_WHEEL) >> $(PSTAT_LOG) ; \
+	$(MSG) Python sources: $(wildcard $(PYTHON_WORK_DIR)/Python-[0-9]*) ; \
+	$(MSG) crossenv requirement definition: $(CROSSENV_REQUIREMENTS) ; \
+	mkdir -p $(PYTHON_LIB_CROSS) ; \
+	cp -RL $(HOSTPYTHON_LIB_NATIVE) $(abspath $(PYTHON_LIB_CROSS)/../) ; \
+	echo $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
 	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
 	                        --sysroot $(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
 	                        --machine $(TC_TARGET) \
-	                        "$(CROSSENV_PATH)"
-	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
+	                        "$(CROSSENV_PATH)" ; \
+	$(RUN) $(PYTHON_NATIVE) -m crossenv $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX)/bin/python$(PYTHON_PKG_VERS_MAJOR_MINOR)) \
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
 	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
 	                        --sysroot $(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
 	                        --machine $(TC_TARGET) \
-	                        "$(CROSSENV_PATH)"
+	                        "$(CROSSENV_PATH)" ; \
+	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 ifeq ($(CROSSENV_WHEEL),default)
-	@$(MSG) Setting default crossenv $(CROSSENV_PATH)
-	@$(MSG) ln -sf crossenv-default $(WORK_DIR)/crossenv
-	@$(RUN) ln -sf crossenv-default $(WORK_DIR)/crossenv
+	@set -o pipefail; { \
+	$(MSG) Setting default crossenv $(CROSSENV_PATH) ; \
+	$(MSG) ln -sf crossenv-default $(WORK_DIR)/crossenv ; \
+	$(RUN) rm -f $(WORK_DIR)/crossenv ; \
+	$(RUN) ln -sf crossenv-default $(WORK_DIR)/crossenv ; \
+	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 endif
-	@$(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py --directory-prefix=$(CROSSENV_PATH)/build ; \
-	   $(RUN) chmod 755 $(CROSSENV_PATH)/build/get-pip.py
-	@$(MSG) crossenv-$(CROSSENV_WHEEL)/build default packages: $(CROSSENV_BUILD_PIP), $(CROSSENV_BUILD_SETUPTOOLS), $(CROSSENV_BUILD_WHEEL)
-	@. $(CROSSENV_PATH)/bin/activate ; \
-	   $(MSG) $$(which build-python) install $(CROSSENV_BUILD_PIP) ; \
-	   $(RUN) $(CROSSENV_PATH)/bin/build-python $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_BUILD_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
-	   $(MSG) build-pip Install $(CROSSENV_BUILD_SETUPTOOLS) $(CROSSENV_BUILD_WHEEL) ; \
-	   $(RUN) $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(CROSSENV_BUILD_SETUPTOOLS) $(CROSSENV_BUILD_WHEEL)
-	@$(MSG) crossenv-$(CROSSENV_WHEEL)/cross default packages: $(CROSSENV_CROSS_PIP), $(CROSSENV_CROSS_SETUPTOOLS), $(CROSSENV_CROSS_WHEEL)
-	@. $(CROSSENV_PATH)/bin/activate ; \
-	   $(MSG) cross-python Install $(CROSSENV_CROSS_PIP) ; \
-	   $(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_CROSS_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
-	   $(MSG) cross-pip Install $(CROSSENV_CROSS_SETUPTOOLS) $(CROSSENV_CROSS_WHEEL) ; \
-	   $(RUN) $$(which cross-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(CROSSENV_CROSS_SETUPTOOLS) $(CROSSENV_CROSS_WHEEL)
-	@$(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" requirement ; \
-	MAKEFLAGS= $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT="$(CROSSENV_REQUIREMENTS)" REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" requirement
+	@set -o pipefail; { \
+	$(RUN) wget --no-verbose https://bootstrap.pypa.io/get-pip.py --directory-prefix=$(CROSSENV_PATH)/build ; \
+	$(RUN) chmod 755 $(CROSSENV_PATH)/build/get-pip.py ; \
+	. $(CROSSENV_PATH)/bin/activate ; \
+	$(MSG) crossenv-$(CROSSENV_WHEEL)/build default packages: $(CROSSENV_BUILD_PIP), $(CROSSENV_BUILD_SETUPTOOLS), $(CROSSENV_BUILD_WHEEL) ; \
+	$(RUN) $$(which build-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_BUILD_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
+	$(RUN) $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(CROSSENV_BUILD_SETUPTOOLS) $(CROSSENV_BUILD_WHEEL) ; \
+	$(MSG) crossenv-$(CROSSENV_WHEEL)/cross default packages: $(CROSSENV_CROSS_PIP), $(CROSSENV_CROSS_SETUPTOOLS), $(CROSSENV_CROSS_WHEEL) ; \
+	$(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_CROSS_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
+	$(RUN) $$(which cross-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(CROSSENV_CROSS_SETUPTOOLS) $(CROSSENV_CROSS_WHEEL) ; \
+	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
+	@$(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" requirement
+	@MAKEFLAGS= $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT="$(CROSSENV_REQUIREMENTS)" REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" requirement
 
 
 ### 
@@ -215,25 +216,30 @@ endif
 ###    <crossenv> = $(lastword $(subst -, ,$*)) being <wheel>-<version>, <wheel> or default
 ###
 crossenv-install-%:
-	@. $(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate ; \
-	if [ -e "$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate" ] ; then \
-	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/build/bin ; \
-	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$(lastword $(subst -, ,$*)))/bin/activate]" ; \
-	   $(MSG) "python: [$$(which $(WHEEL_TYPE)-python)]" ; \
+	@set -o pipefail; { \
+	. $(abspath $(WORK_DIR)/crossenv-$*)/bin/activate ; \
+	if [ -e "$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate" ] ; then \
+	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$*)/build/bin ; \
+	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate]" ; \
+	   $(MSG) "python: [$$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
 	$(MSG) \
-	   $$(which $(WHEEL_TYPE)-python) -m pip \
-	   install $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
+	   $$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python) -m pip install \
+	   --cache-dir $(PIP_CACHE_DIR) \
+	   $(EXTRA_PIP_ARGS) \
+	   --disable-pip-version-check \
+	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
 	$(RUN) \
 	   PATH=$${PATH} \
-	   $$(which $(WHEEL_TYPE)-python) -m pip \
+	   $$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
+	   $(EXTRA_PIP_ARGS) \
 	   --disable-pip-version-check \
-	   install $(WHEEL_NAME)==$(WHEEL_VERSION)
-
+	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
+	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 ##
 ## python-cc.mk
@@ -259,7 +265,6 @@ $(CROSSENV_PATH)/build/python-cc.mk:
 	@echo PYO3_CROSS_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
 	@echo PYO3_CROSS_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
 	@echo CMAKE_TOOLCHAIN_FILE=$(abspath $(CMAKE_TOOLCHAIN_WRK)) >> $@
-	@echo MESON_CROSS_FILE=$(abspath $(MESON_TOOLCHAIN_WRK)) >> $@
 	@echo OPENSSL_LIB_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/lib) >> $@
 	@echo OPENSSL_INCLUDE_DIR=$(abspath $(PYTHON_STAGING_INSTALL_PREFIX)/include) >> $@
 	@echo PIP=$(abspath $(WORK_DIR)/../../../native/$(PYTHON_PKG_NAME)/work-native/install/usr/local/bin/pip) >> $@
