@@ -44,8 +44,8 @@ UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS += cross/openssl3
 DEPENDS += cross/geoip
 DEPENDS += cross/libiconv
-DEPENDS += cross/boost_1.82
-BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_82_0
+DEPENDS += cross/boost_1.86
+BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_86_0
 BOOST_LIBRARIES += system python chrono random
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
