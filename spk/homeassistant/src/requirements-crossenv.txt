@@ -21,7 +21,7 @@ cryptography==43.0.1
 dbus_fast==2.24.3
 debugpy==1.8.8
 ### deebot_client==9.4.0        # install from index (available for x86_64 only)
-### DTLSSocket==0.1.19          # pip wheel fails to cross compile, use cross/dtlssocket_ha
+### DTLSSocket==0.1.19          # pip wheel fails to cross compile, use python/dtlssocket
 ephem==4.1.6
 faust_cchardet==2.1.19
 fnv_hash_fast==1.0.2
@@ -44,7 +44,7 @@ netifaces==0.11.0
 #numpy==2.1.3                   # temp. moved to requirements-numpy.txt
 orjson==3.10.12
 ### pandas==2.2.3               # maturin error, install from index (available for x86_64, aarch64)
-### pillow==11.0.0              # use cross/pillow_ha
+### pillow==11.0.0              # use python/pillow_ha
 propcache==0.2.1
 protobuf==5.28.3
 psutil==6.1.0
