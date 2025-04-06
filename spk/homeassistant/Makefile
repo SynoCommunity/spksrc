@@ -43,7 +43,7 @@ WHEELS = src/requirements-abi3.txt src/requirements-crossenv.txt
 DEPENDS += cross/pillow_ha
 
 # [DTLSSocket] runtime dependency of [tradfri]
-DEPENDS += cross/dtlssocket_ha
+DEPENDS += python/dtlssocket
 
 # [numpy]
 DEPENDS += python/numpy_ha
