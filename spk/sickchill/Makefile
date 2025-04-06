@@ -7,7 +7,7 @@ PYTHON_PACKAGE = python311
 SPK_DEPENDS = "python311>=3.11.5-8"
 
 # archs without C++11 support are not supported [greenlet]
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
