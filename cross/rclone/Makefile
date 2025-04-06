@@ -9,7 +9,7 @@ BUILD_DEPENDS = native/go
 
 HOMEPAGE = https://rclone.org/
 COMMENT  = Rclone is a command-line program to manage files on cloud storage. It is a feature-rich alternative to cloud vendors' web storage interfaces.
-LICENSE  = MIT License
+LICENSE  = MIT
 
 BUILD_DEPENDS = native/go
 

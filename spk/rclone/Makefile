@@ -17,8 +17,7 @@ CHANGELOG = "Initial release."
 HOMEPAGE = https://rclone.org/
 HELPURL = https://rclone.org/docs/
 
-LICENSE  = MIT License
-LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/COPYING
+LICENSE  = MIT
 
 SPK_COMMANDS = bin/rclone
 
