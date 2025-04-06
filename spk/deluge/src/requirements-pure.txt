@@ -23,4 +23,4 @@ pyxdg==0.28
 service-identity==24.2.0
 #six                ==> python311
 Twisted==24.11.0
-typing_extensions==4.13.0
+typing_extensions==4.13.1

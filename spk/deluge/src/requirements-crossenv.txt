@@ -6,8 +6,8 @@
 #deluge==2.1.1        ==> pure
 # Latest commit on develop branch
 #git+https://github.com/deluge-torrent/deluge.git@develop#egg=deluge==2.1.1
-# Commit from August 27th 2024 on develop branch
-git+https://github.com/deluge-torrent/deluge.git@8df36c454be320571005231a1c77cedb656557e1#egg=deluge==2.1.1.dev127
+# Commit from March 1st 2025 on develop branch
+git+https://github.com/deluge-torrent/deluge.git@0b5addf58eac1f379ee1af83247d8dee0c1eae78#egg=deluge==2.1.1.dev136
 
 # [rencode] 1.0.6     ==> abi3
 
@@ -25,4 +25,4 @@ zope.interface==7.2
 # Only supported on DSM7 armv7, aarch64, x64
 git+https://github.com/arvidn/libtorrent.git@v2.0.11#egg=libtorrent==2.0.11
 # Use RC_2_0 for latest development snapshots
-# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.10
+# git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.11
