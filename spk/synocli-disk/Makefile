@@ -87,7 +87,7 @@ SPK_COMMANDS += bin/ddrescue bin/ddrescuelog
 SPK_COMMANDS += bin/disktype
 SPK_COMMANDS += bin/s3backer
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 SPK_COMMANDS += bin/duf bin/gdu bin/tdu
 endif
 
