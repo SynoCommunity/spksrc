@@ -19,12 +19,12 @@ download_package() {
     
     echo "===> Attempting to download: ${package_dir}"
     if ! make -C "${package_dir}" "${target}"; then
-        echo "Error: Failed to download ${package_dir}. Exiting." >&2
+        echo "::error::Failed to download ${package_dir}. Exiting."
         exit 1
     fi
     # Verify checksum after download
     if ! make -C "${package_dir}" checksum; then
-        echo "Error: Checksum verification failed for ${package_dir}. Exiting." >&2
+        echo "::error::Checksum verification failed for ${package_dir}. Exiting."
         exit 1
     fi
     echo "===> Successfully downloaded: ${package_dir}"
