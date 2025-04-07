@@ -1,5 +1,5 @@
 PKG_NAME = libicu
-PKG_VERS = 74.2
+PKG_VERS = 77.1
 PKG_EXT = tgz
 PKG_DIST_NAME = icu4c-$(subst .,_,$(PKG_VERS))-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/unicode-org/icu/releases/download/release-$(subst .,-,$(PKG_VERS))
@@ -59,10 +59,12 @@ ifeq ($(strip $(DATA_PACKAGING)),"files")
 # needs a custom install target to successfully build.
 INSTALL_TARGET = libicu_install_with_data_files
 endif
+POST_INSTALL_TARGET = libicu_post_install
 
 CONFIGURE_ARGS += --with-cross-build=$(NATIVE_BUILD_DIR) 
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --disable-samples
+prefix = /var/packages/znc/target
 CONFIGURE_ARGS += --disable-tools
 CONFIGURE_ARGS += --disable-tests
 
@@ -73,3 +75,7 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: libicu_install_with_data_files
 libicu_install_with_data_files:
 	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) ICUPKGDATA_DIR=$(INSTALL_PREFIX)/share install PREFIX=$(INSTALL_PREFIX)
+
+.PHONY: libicu_post_install
+libicu_post_install:
+	$(RUN) sed -i 's|$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/icu-*.pc
