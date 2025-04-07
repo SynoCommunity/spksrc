@@ -43,6 +43,7 @@ build_packages="${NOARCH_PACKAGES} ${ARCH_PACKAGES}"
 if [ -z "${build_packages}" ]; then
     echo "===> No wheels to download. <==="
 else
+    echo "===> Download wheels: ${build_packages}"
     for package in ${build_packages}; do
         download_package "spk/${package}" "download-wheels"
     done
