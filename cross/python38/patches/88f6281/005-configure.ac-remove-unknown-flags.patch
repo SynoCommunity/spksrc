@@ -1,0 +1,14 @@
+# remove lto optimization flags unknown by ARMv5 gcc
+# - remove -ffat-lto-objects
+
+--- configure.ac.orig	2022-03-16 12:22:54.000000000 +0000
++++ configure.ac	2022-06-19 22:19:13.177517577 +0000
+@@ -1401,7 +1401,7 @@
+           LTOFLAGS="-flto -Wl,-export_dynamic"
+           ;;
+         *)
+-          LTOFLAGS="-flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none"
++          LTOFLAGS="-flto -fuse-linker-plugin -flto-partition=none"
+           ;;
+       esac
+       ;;
