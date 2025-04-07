@@ -10,7 +10,7 @@ duplicity==1.2.3
 bcrypt==4.1.1
 cffi==1.15.1
 coverage==7.2.7
-#cryptography               ==> cross/cryptography
+#cryptography               ==> python/cryptography
 lazy-object-proxy==1.9.0
 lxml==4.9.3
 MarkupSafe==2.1.3

@@ -10,7 +10,7 @@ SPK_ICON = src/python3.png
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS  = cross/python311
-DEPENDS += cross/pip
+DEPENDS += python/pip
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
