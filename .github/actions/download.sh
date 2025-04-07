@@ -22,15 +22,12 @@ download_package() {
         echo "Error: Failed to download ${package_dir}. Exiting." >&2
         exit 1
     fi
-    echo "===> Successfully downloaded: ${package_dir}"
-
     # Verify checksum after download
-    echo "===> Verifying checksum for: ${package_dir}"
     if ! make -C "${package_dir}" checksum; then
         echo "Error: Checksum verification failed for ${package_dir}. Exiting." >&2
         exit 1
     fi
-    echo "===> Checksum verified: ${package_dir}"
+    echo "===> Successfully downloaded: ${package_dir}"
 }
 
 # Download regular cross/* sources
