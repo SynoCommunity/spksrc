@@ -1,0 +1,38 @@
+# Adjust Makefile options
+# - allow ENV variables for installation paths (DESTDIR, PREFIX)
+# - force installation of mount.mergerfs into package sbin folder
+# - avoid run of chown (DSM installer will change ownership to package user anyway)
+# - avoid strip (cross build needs strip command from toolchain; we strip at package build anyway)
+# 
+--- libfuse/Makefile.orig	2024-02-29 23:33:57.000000000 +0000
++++ libfuse/Makefile	2025-04-04 09:20:57.602740485 +0000
+@@ -21,13 +21,13 @@
+ LTO_FLAGS :=
+ endif
+ 
+-DESTDIR       =
+-PREFIX        = /usr/local
++DESTDIR       ?=
++PREFIX        ?= /usr/local
+ EXEC_PREFIX   = $(PREFIX)
+ DATAROOTDIR   = $(PREFIX)/share
+ DATADIR       = $(DATAROOTDIR)
+ BINDIR        = $(EXEC_PREFIX)/bin
+-SBINDIR       = /sbin
++SBINDIR       = $(EXEC_PREFIX)/sbin
+ MANDIR        = $(DATAROOTDIR)/man
+ MAN1DIR       = $(MANDIR)/man1
+ 
+@@ -133,10 +133,10 @@
+ 	strip --strip-all build/mount.mergerfs
+ 	strip --strip-all build/mergerfs-fusermount
+ 
+-install-utils: mergerfs-fusermount mount.mergerfs strip
++install-utils: mergerfs-fusermount mount.mergerfs
+ 	install -D build/mergerfs-fusermount "$(INSTALLBINDIR)/mergerfs-fusermount"
+ 	install -D build/mount.mergerfs "$(INSTALLSBINDIR)/mount.mergerfs"
+-	chown root "$(INSTALLBINDIR)/mergerfs-fusermount"
++	#chown root "$(INSTALLBINDIR)/mergerfs-fusermount"
+ 	chmod u+s "$(INSTALLBINDIR)/mergerfs-fusermount"
+ 
+ install: $(INSTALLUTILS)

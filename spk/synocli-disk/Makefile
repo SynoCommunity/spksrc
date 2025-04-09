@@ -1,15 +1,20 @@
 SPK_NAME = synocli-disk
-SPK_VERS = 4.0
-SPK_REV = 13
+SPK_VERS = 4.1
+SPK_REV = 14
 SPK_ICON = src/synocli-disk.png
 
-DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/fuse cross/testdisk
+# ATTENTION: build order of dependent packages matters
+# more DEPENDS further down...
+DEPENDS  = cross/ntfs-3g_ntfsprogs cross/e2fsprogs cross/testdisk
 DEPENDS += cross/ncdu cross/davfs2 cross/lsscsi cross/ddrescue
-DEPENDS += cross/s3backer
+DEPENDS += cross/disktype
 
-OPTIONAL_DEPENDS  = cross/dar cross/duf cross/gdu cross/tdu
+OPTIONAL_DEPENDS  = cross/duf cross/gdu cross/tdu
 OPTIONAL_DEPENDS += cross/dua cross/dutree
 OPTIONAL_DEPENDS += cross/smartmontools
+OPTIONAL_DEPENDS += cross/mergerfs
+OPTIONAL_DEPENDS += cross/gpart
+OPTIONAL_DEPENDS += cross/dar
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli Disk Tools
@@ -28,25 +33,36 @@ ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # not supported on old PPC archs
 DEPENDS += cross/dua cross/dutree
 OPTIONAL_DESC := $(OPTIONAL_DESC)", dua, dutree"
-endif
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/smartmontools
 OPTIONAL_DESC := $(OPTIONAL_DESC)", smartmontools \(smartctl\)"
 endif
 
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/mergerfs
+OPTIONAL_DESC := $(OPTIONAL_DESC)", mergerfs"
+endif
+
+# IMPORTANT: fuse (v 2.x) (and thus s3backer) must be built after mergerfs 
+DEPENDS += cross/fuse
+DEPENDS += cross/s3backer
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/gpart
+OPTIONAL_DESC := $(OPTIONAL_DESC)", gpart"
+endif
+
+WIKI_URL = "\<a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk\"\>FAQ SynoCliDisk\</a\>"
+
+# Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, fuse, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure, s3backer$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Add smartmontools 7.4. <br/>"
-CHANGELOG += "2. Remove dua for ARMv5 (88f628x cpu). <br/>"
-CHANGELOG += "3. Update dar to v2.7.16. <br/>"
-CHANGELOG += "4. Update davfs2 to v1.7.1. <br/>"
-CHANGELOG += "5. Update ddrescue to v1.29. <br/>"
-CHANGELOG += "6. Update dua to v2.30.0. <br/>"
-CHANGELOG += "7. Update e2fsprogs to v1.47.2. <br/>"
-CHANGELOG += "8. Update gdu to v5.30.1. <br/>"
-CHANGELOG += "9. Update ncdu to v1.21. <br/>"
-CHANGELOG += "10. Update s3backer to v2.1.3."
+CHANGELOG  = "1. Add mergerfs. <br/>"
+CHANGELOG += "2. Add disktype. <br/>"
+CHANGELOG += "3. Add gpart. <br/>"
+CHANGELOG += "4. Update dar to v2.7.17. <br/>"
+CHANGELOG += "5. Update ncdu to v1.22. <br/>"
+CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -68,14 +84,26 @@ SPK_COMMANDS += bin/ncdu
 SPK_COMMANDS += sbin/mount.davfs sbin/umount.davfs
 SPK_COMMANDS += bin/lsscsi
 SPK_COMMANDS += bin/ddrescue bin/ddrescuelog
-SPK_COMMANDS += bin/duf bin/gdu bin/tdu
-SPK_COMMANDS += bin/dua bin/dutree
+SPK_COMMANDS += bin/disktype
 SPK_COMMANDS += bin/s3backer
 
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+SPK_COMMANDS += bin/duf bin/gdu bin/tdu
+endif
+
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+SPK_COMMANDS += bin/dua bin/dutree
 # smartctl of this package will not be found by path, because /bin/smartctl is found first
 # you have to use smartctl7 (or /usr/local/bin/smartctl or /var/packages/synocli-disk/target/sbin/smartctl)
 SPK_COMMANDS += sbin/smartctl7 sbin/smartctl sbin/smartd sbin/update-smart-drivedb
+endif
+
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+SPK_COMMANDS += bin/mergerfs bin/mergerfs-fusermount sbin/mount.mergerfs
+endif
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+SPK_COMMANDS += sbin/gpart
 endif
 
 include ../../mk/spksrc.spk.mk

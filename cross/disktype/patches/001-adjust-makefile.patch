@@ -1,0 +1,27 @@
+# Adjust Makefile to use toolchain settings
+# - allow CC and flags from ENV variables
+# 
+--- Makefile.orig	2006-01-12 17:55:15.000000000 +0000
++++ Makefile	2025-04-05 18:57:54.544648874 +0000
+@@ -3,7 +3,7 @@
+ ###
+ 
+ RM = rm -f
+-CC = gcc
++CC ?= gcc
+ 
+ OBJS   = main.o lib.o \
+          buffer.o file.o cdaccess.o cdimage.o vpc.o compressed.o \
+@@ -13,9 +13,9 @@
+ 
+ TARGET = disktype
+ 
+-CPPFLAGS = -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+-CFLAGS   = -Wall
+-LDFLAGS  =
++CPPFLAGS ?= -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
++CFLAGS   ?= -Wall
++LDFLAGS  ?=
+ LIBS     =
+ 
+ ifeq ($(NOSYS),)
