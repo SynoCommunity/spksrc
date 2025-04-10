@@ -5,6 +5,11 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
+# noting to download
+download:
+download-all:
+checksum:
+
 # Configure the included makefiles
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
