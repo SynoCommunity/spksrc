@@ -1,5 +1,5 @@
 SPK_NAME = salt-minion
-SPK_VERS = 3006.1
+SPK_VERS = 3007.1
 SPK_REV = 5
 SPK_ICON = src/salt-minion.png
 
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Minion
-CHANGELOG    = "1. Update to 3006.1<br/>2. Migrate to Python 3.11<br/>3. Migrate to OpenSSL 3.1.2"
+CHANGELOG    = "1. Update to 3007.1<br/>2. Migrate to Python 3.11"
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache
@@ -32,11 +32,11 @@ SPK_USR_LOCAL_LINKS += bin:env/bin/spm
 
 USE_ALTERNATE_TMPDIR = 1
 
+# [cryptography]
+DEPENDS += cross/openssl3
+
 # [PyYAML]
 DEPENDS += cross/libyaml
-
-# [cryptography]
-DEPENDS += python/cryptography
 
 include ../../mk/spksrc.python.mk
 
@@ -49,8 +49,6 @@ endif
 
 # [pydantic_core]
 WHEELS_CFLAGS += [pydantic_core] -std=c11
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
 
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
