@@ -4,3 +4,5 @@ web_server:
     web_ui: yes
 
 tasks: {}
+
+schedules: no
