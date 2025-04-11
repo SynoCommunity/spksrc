@@ -1,16 +1,16 @@
 SPK_NAME = flexget
-SPK_VERS = 3.13.25
+SPK_VERS = 3.15.31
 SPK_REV = 15
 SPK_ICON = src/${SPK_NAME}.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "python312"
+SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-CHANGELOG = "1. Update FlexGet to version 3.13.25.<br/>2. Update to Python 3.12."
+CHANGELOG = "1. Update FlexGet to v3.15.31.<br/>2. Migrate to Python 3.12."
 STARTABLE = yes
 
 HOMEPAGE = https://flexget.com/
@@ -35,6 +35,24 @@ SPK_USR_LOCAL_LINKS = bin:env/bin/flexget bin:env/bin/flexget-headless
 # Needs atomic to build
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
+include ../../mk/spksrc.common.mk
+
+# [Pendulum]
+# Needs atomic to build
+# Serves as maturin type python-wheel.mk example
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += python/pendulum
+endif
+
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# [rpds-py]
+# Version >= 0.22.3 requires rustc >= 1.80
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-rpds-py.txt
+endif
+
 include ../../mk/spksrc.python.mk
 
 # [greenlet]
@@ -44,9 +62,6 @@ else
 WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
-
-# [Pendulum]
-DEPENDS += python/pendulum
 
 .PHONY: flexget_extra_install
 flexget_extra_install:
