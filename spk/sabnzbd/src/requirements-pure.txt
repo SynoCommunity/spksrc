@@ -1,6 +1,6 @@
-# Generated using the requirements script on March 31, 2025
+# Generated using the requirements script on April 11, 2025
 
-apprise==1.9.2
+apprise==1.9.3
 babelfish==0.6.1
 blinker==1.9.0
 #certifi                        ==> python312
@@ -29,7 +29,7 @@ pycparser==2.22
 PyJWT==2.10.1
 PySocks==1.7.1
 python_dateutil==2.9.0.post0
-pytz==2025.1
+pytz==2025.2
 rebulk==3.2.0
 requests==2.32.3
 requests_oauthlib==2.0.0
