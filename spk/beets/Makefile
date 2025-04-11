@@ -28,7 +28,7 @@ DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
 # [Pillow]
-DEPENDS += cross/pillow
+DEPENDS += python/pillow
 
 # [PyYAML]
 DEPENDS += cross/libyaml
