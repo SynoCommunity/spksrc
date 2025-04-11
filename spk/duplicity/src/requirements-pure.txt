@@ -21,7 +21,7 @@ charset-normalizer==3.2.0
 clint==0.5.1
 colorama==0.4.6
 #coverage                      ==> crossenv
-#cryptography                  ==> cross/cryptography
+#cryptography                  ==> python/cryptography
 debtcollector==2.5.0
 dill==0.3.7
 #distlib                       ==> py311
