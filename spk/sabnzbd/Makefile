@@ -1,6 +1,6 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 4.5.1
-SPK_REV = 77
+SPK_REV = 76
 SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python312
