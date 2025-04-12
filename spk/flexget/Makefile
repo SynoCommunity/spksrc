@@ -48,7 +48,7 @@ WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
 # [Pendulum]
-DEPENDS += cross/pendulum
+DEPENDS += python/pendulum
 
 .PHONY: flexget_extra_install
 flexget_extra_install:
