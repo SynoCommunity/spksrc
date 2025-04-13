@@ -1,37 +1,42 @@
 #!/bin/bash
-
-# Part of github build action
 #
-# Download source files.
+# Part of GitHub build action.
+# This script downloads source files for cross and python packages as part of our build process.
 #
 # Functions:
-# - Download all referenced native and cross source files for packages to build.
+# - Download all referenced native and cross source files for packages.
 # - Download all referenced python wheels needed to build.
-# - use download-all target to get all files when package has multiple (arch specific) files.
+# - Use "download-all" target to get all files when a package has multiple (architecture-specific) files.
 
-set -o pipefail
-set -e  # Exit on any command failure
+set -euo pipefail
 
-# Function to download a package and handle errors
+# Function to print an error message and exit.
+fail() {
+    echo "::error::$*" >&2
+    exit 1
+}
+
+# Check for required commands.
+command -v make >/dev/null 2>&1 || fail "make is not installed"
+
+# Function to download a package and verify its checksum.
 download_package() {
     local package_dir="$1"
     local target="$2"
-    
+
     echo "===> Attempting to download: ${package_dir}"
     if ! make -C "${package_dir}" "${target}"; then
-        echo "::error::Failed to download ${package_dir}. Exiting."
-        exit 1
+        fail "Failed to download ${package_dir}."
     fi
-    # Verify checksum after download
+    # Verify checksum after download.
     if ! make -C "${package_dir}" checksum; then
-        echo "::error::Checksum verification failed for ${package_dir}. Exiting."
-        exit 1
+        fail "Checksum verification failed for ${package_dir}."
     fi
     echo "===> Successfully downloaded: ${package_dir}"
 }
 
-# Download regular cross/* sources
-if [ -z "${DOWNLOAD_PACKAGES}" ]; then
+# Download regular cross/* sources.
+if [ -z "${DOWNLOAD_PACKAGES:-}" ]; then
     echo "===> No packages to download. <==="
 else
     echo "===> Download packages: ${DOWNLOAD_PACKAGES}"
@@ -42,9 +47,8 @@ fi
 
 echo ""
 
-# Download python wheel sources files
-build_packages="${NOARCH_PACKAGES} ${ARCH_PACKAGES}"
-
+# Download python wheel source files.
+build_packages="${NOARCH_PACKAGES:-} ${ARCH_PACKAGES:-}"
 if [ -z "${build_packages}" ]; then
     echo "===> No wheels to download. <==="
 else
