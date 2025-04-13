@@ -13,7 +13,7 @@ boto3==1.37.24
 botocore==1.37.24
 boxsdk==3.13.0
 cachetools==5.5.2
-#certifi                                                        ==> python311
+#certifi                                                        ==> python312
 chardet==5.2.0
 clint==0.5.1
 debtcollector==3.0.0
@@ -61,7 +61,7 @@ os_virtual_interfacesv2_python_novaclient_ext==0.20
 paramiko==3.5.1
 pbr==1.10.0
 pexpect==4.9.0
-#pip                                                            ==> python311
+#pip                                                            ==> python312
 ply==3.11
 positional==1.2.1
 prettytable==0.7.2
@@ -92,8 +92,8 @@ rfc3986==2.0.0
 rsa==4.9
 s3transfer==0.11.4
 SecretStorage==3.3.3
-#setuptools                                                     ==> python311
-#six                                                            ==> python311
+#setuptools                                                     ==> python312
+#six                                                            ==> python312
 stevedore==1.20.1
 stone==3.3.1
 tlslite_ng==0.8.2

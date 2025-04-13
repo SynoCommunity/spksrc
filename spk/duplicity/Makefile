@@ -7,8 +7,8 @@ SPK_ICON = src/duplicity.png
 # /upb/port/atomic.h:35:23: fatal error: stdatomic.h: No such file or directory
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-PYTHON_PACKAGE = python311
-SPK_DEPENDS = "python311>=3.11.4-7:gnupg>=2.1.6"
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "python312:gnupg>=2.1.6"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 DEPENDS = cross/librsync cross/duply
@@ -17,7 +17,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Update duplicity to v3.0.4.0 and duply to v2.5.5.<br/>2. Update to OpenSSL 3.1.7."
+CHANGELOG = "1. Update duplicity to v3.0.4.0 and duply to v2.5.5.<br/>2. Migrate to python 3.12.<br/>3. Update to OpenSSL 3.1.7."
 
 HOMEPAGE = https://duplicity.gitlab.io/duplicity-web/
 LICENSE  = GPLv2
@@ -52,6 +52,7 @@ DEPENDS += cross/libyaml
 include ../../mk/spksrc.python.mk
 
 # [duplicity]
-ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
-WHEELS_CFLAGS += [duplicity] -std=gnu11
-endif
+DEPENDS = python/duplicity
+#ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
+#WHEELS_CFLAGS += [duplicity] -std=gnu11
+#endif
