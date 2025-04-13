@@ -1,19 +1,18 @@
-# Generated using the requirements script on March 31, 2025
+# Generated using the requirements script on April 13, 2025
 
 annotated_types==0.7.0
 argparse==1.4.0
 args==0.1.0
 attrs==25.3.0
-azure_core==1.32.0
+azure_core==1.33.0
 azure_storage_blob==12.25.1
 b2sdk==2.8.0
 babel==2.17.0
-backports.tarfile==1.2.0
-boto3==1.37.24
-botocore==1.37.24
-boxsdk==3.13.0
+boto3==1.37.33
+botocore==1.37.33
+boxsdk==3.14.0
 cachetools==5.5.2
-#certifi                                                        ==> python312
+#certifi                                                    ==> python312
 chardet==5.2.0
 clint==0.5.1
 debtcollector==3.0.0
@@ -30,7 +29,6 @@ google_auth_oauthlib==1.2.1
 httplib2==0.22.0
 humanize==4.12.2
 idna==3.10
-importlib_metadata==8.6.1
 ip_associations_python_novaclient_ext==0.2
 iso8601==2.1.0
 isodate==0.7.2
@@ -61,7 +59,7 @@ os_virtual_interfacesv2_python_novaclient_ext==0.20
 paramiko==3.5.1
 pbr==1.10.0
 pexpect==4.9.0
-#pip                                                            ==> python312
+#pip                                                        ==> python312
 ply==3.11
 positional==1.2.1
 prettytable==0.7.2
@@ -92,12 +90,11 @@ rfc3986==2.0.0
 rsa==4.9
 s3transfer==0.11.4
 SecretStorage==3.3.3
-#setuptools                                                     ==> python312
-#six                                                            ==> python312
+#setuptools                                                 ==> python312
+#six                                                        ==> python312
 stevedore==1.20.1
 stone==3.3.1
 tlslite_ng==0.8.2
-typing_extensions==4.13.0
+typing_extensions==4.13.2
 uritemplate==4.1.1
-urllib3==2.3.0
-zipp==3.21.0
+urllib3==2.4.0

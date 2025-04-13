@@ -17,7 +17,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Update duplicity to v3.0.4.0 and duply to v2.5.5.<br/>2. Migrate to python 3.12.<br/>3. Update to OpenSSL 3.1.7."
+CHANGELOG = "1. Update duplicity to v3.0.4.0 and duply to v2.5.5.<br/>2. Migrate to Python 3.12."
 
 HOMEPAGE = https://duplicity.gitlab.io/duplicity-web/
 LICENSE  = GPLv2
