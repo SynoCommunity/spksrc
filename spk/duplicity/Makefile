@@ -22,6 +22,7 @@ CHANGELOG = "1. Update duplicity to v3.0.4.0 and duply to v2.5.5.<br/>2. Migrate
 HOMEPAGE = https://duplicity.gitlab.io/duplicity-web/
 LICENSE  = GPLv2
 
+SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 
 # use alternate TMPDIR as /tmp might be too small.
