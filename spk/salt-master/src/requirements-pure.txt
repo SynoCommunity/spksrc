@@ -28,7 +28,7 @@ packaging==23.1
 #pip                            ==> python312
 portend==3.1.0
 pycparser==2.21
-pydantic==2.6.4
+pydantic==2.7.2                 # Bump from 2.6.4 to build
 pyOpenSSL==24.0.0
 python_dateutil==2.8.2
 python_gnupg==0.5.2

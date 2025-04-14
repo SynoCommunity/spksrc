@@ -45,6 +45,11 @@ DEPENDS += cross/libyaml
 
 include ../../mk/spksrc.python.mk
 
+# [aiohttp]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [aiohttp] -std=c11
+endif
+
 # [msgpack]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=c11
@@ -56,7 +61,9 @@ WHEELS_CFLAGS += [pycryptodomex] -std=c11
 endif
 
 # [pydantic_core]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pydantic_core] -std=c11
+endif
 
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
