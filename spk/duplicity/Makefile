@@ -35,9 +35,6 @@ SPK_USR_LOCAL_LINKS += bin:bin/duply
 # [cryptography]
 DEPENDS += cross/openssl3
 
-# [protobuf]
-WHEELS_CPPFLAGS = [protobuf] -std=c99
-
 # [PyNaCl]
 DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
@@ -52,6 +49,11 @@ DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [lxml] -std=c11
+endif
+
+# [protobuf]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CPPFLAGS = [protobuf] -std=c11
 endif
 
 # [duplicity]
