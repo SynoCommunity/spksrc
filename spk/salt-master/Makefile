@@ -71,6 +71,11 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pydantic_core] -std=c11
 endif
 
+# [pyzmq]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [pyzmq] -std=c11
+endif
+
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
 	install -m 644 src/app/rsax931.py.patch $(STAGING_DIR)/share
