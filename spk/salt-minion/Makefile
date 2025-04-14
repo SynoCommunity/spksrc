@@ -3,8 +3,8 @@ SPK_VERS = 3007.1
 SPK_REV = 5
 SPK_ICON = src/salt-minion.png
 
-PYTHON_PACKAGE = python311
-SPK_DEPENDS = "python311>=3.11.4-7"
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Minion
-CHANGELOG    = "1. Update to 3007.1<br/>2. Migrate to Python 3.11"
+CHANGELOG    = "1. Update to 3007.1<br/>2. Migrate to Python 3.12"
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache
@@ -40,11 +40,14 @@ DEPENDS += cross/libyaml
 
 include ../../mk/spksrc.python.mk
 
+# [msgpack]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [msgpack] -std=c11
+endif
+
 # [pycryptodomex]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
-else
-WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
 
 # [pydantic_core]

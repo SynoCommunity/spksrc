@@ -5,7 +5,7 @@
                      lib = glob.glob("/opt/freeware/lib/libcrypto.so*")
                  lib = lib[0] if lib else None
 +            else:
-+                lib = glob.glob("/var/packages/python311/target/lib/libcrypto.so*")
++                lib = glob.glob("/var/packages/python312/target/lib/libcrypto.so*")
 +                lib = lib[0] if lib else None
      if not lib:
          raise OSError("Cannot locate OpenSSL libcrypto")

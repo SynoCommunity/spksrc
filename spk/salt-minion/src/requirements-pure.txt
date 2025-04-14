@@ -1,11 +1,12 @@
-# Generated using the requirements script on April 8, 2025
-# https://github.com/saltstack/salt/blob/master/requirements/static/pkg/py3.11/linux.txt
+# Generated using the requirements script on April 14, 2025
+# https://github.com/saltstack/salt/blob/master/requirements/static/pkg/py3.12/linux.txt
 
 aiosignal==1.3.1
 annotated_types==0.6.0
 attrs==23.2.0
 autocommand==2.2.2
-#certifi                        ==> python311
+#certifi                        ==> python312
+charset_normalizer==3.2.0
 cheroot==10.0.0
 CherryPy==18.8.0
 contextvars==2.4
@@ -24,7 +25,7 @@ looseversion==1.3.0
 more_itertools==5.0.0
 networkx==3.1
 packaging==23.1
-#pip                            ==> python311
+#pip                            ==> python312
 portend==3.1.0
 pycparser==2.21
 pydantic==2.6.4
@@ -35,8 +36,8 @@ pytz==2024.1
 requests==2.32.3
 rpm_vercmp==0.1.2
 salt==3007.1
-#setuptools                     ==> python311
-#six                            ==> python311
+#setuptools                     ==> python312
+#six                            ==> python312
 tempora==5.3.0
 typing_extensions==4.8.0
 urllib3==1.26.18
