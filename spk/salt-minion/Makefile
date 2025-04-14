@@ -45,6 +45,11 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [aiohttp] -std=c11
 endif
 
+# [frozenlist]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [frozenlist] -std=c11
+endif
+
 # [msgpack]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=c11
