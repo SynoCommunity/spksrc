@@ -16,8 +16,8 @@ service_postinst ()
     install_python_wheels
 
     # patch rsax931.py file to find libcrypto lib provided by python312
-    # (rely on patch==1.16 included in requirements-pure.txt)
-    python ${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/patch.py \
+    # (rely on patch-ng==1.18.1 included in requirements-pure.txt)
+    python ${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/patch_ng.py \
            --directory=${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/salt/utils \
            ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
 
