@@ -1,17 +1,7 @@
-rdiff-backup==2.2.6
+# Generated using the requirements script on March 2, 2025
 
-aiohttp==3.10.10
-charset-normalizer==3.4.0
-coverage==7.6.3
-frozenlist==1.5.0
-multidict==6.1.0
-pylibacl==0.7.0
+psutil==7.0.0
+pylibacl==0.7.2
 pyxattr==0.8.1
-yarl==1.15.3
-
-# [psutil]
-psutil==5.9.8
-
-# [PyYAML]
-# Depends: libyaml
 PyYAML==6.0.2
+rdiff_backup==2.2.6
