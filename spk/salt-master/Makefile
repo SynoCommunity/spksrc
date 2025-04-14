@@ -24,7 +24,8 @@ POST_STRIP_TARGET = salt-master_extra_install
 SERVICE_USER       = auto
 SERVICE_SETUP      = src/service-setup.sh
 STARTABLE          = yes
-FWPORTS            = src/conf/salt-master.sc
+FWPORTS            = src/app/salt-master.sc
+CONF_DIR           = src/conf/
 
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-cp
@@ -67,8 +68,8 @@ endif
 
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
-	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
-	install -m 644 src/master $(STAGING_DIR)/share
+	install -m 644 src/app/rsax931.py.patch $(STAGING_DIR)/share
+	install -m 644 src/app/master $(STAGING_DIR)/share
 	install -m 755 -d $(STAGING_DIR)/share/extensions
 	install -m 755 -d $(STAGING_DIR)/share/extensions/auth
-	install -m 644 src/synology.py $(STAGING_DIR)/share/extensions/auth/synology.py
+	install -m 644 src/app/synology.py $(STAGING_DIR)/share/extensions/auth/synology.py

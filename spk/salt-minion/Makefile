@@ -62,6 +62,6 @@ endif
 
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
-	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
-	install -m 644 src/minion $(STAGING_DIR)/share
-	install -m 644 src/proxy $(STAGING_DIR)/share
+	install -m 644 src/app/rsax931.py.patch $(STAGING_DIR)/share
+	install -m 644 src/app/minion $(STAGING_DIR)/share
+	install -m 644 src/app/proxy $(STAGING_DIR)/share
