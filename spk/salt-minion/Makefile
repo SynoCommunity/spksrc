@@ -70,6 +70,11 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pyzmq] -std=c11
 endif
 
+# [timelib]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [timelib] -std=c11
+endif
+
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
 	install -m 644 src/app/rsax931.py.patch $(STAGING_DIR)/share
