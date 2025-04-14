@@ -24,6 +24,7 @@ POST_STRIP_TARGET = salt-minion_extra_install
 SERVICE_USER  = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE     = yes
+CONF_DIR      = src/conf/
 
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt-call
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-minion
