@@ -25,7 +25,12 @@ SERVICE_USER       = auto
 SERVICE_SETUP      = src/service-setup.sh
 STARTABLE          = yes
 FWPORTS            = src/app/salt-master.sc
+
+include ../../mk/spksrc.common.mk
+
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 CONF_DIR           = src/conf/
+endif
 
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-cp
