@@ -3,7 +3,7 @@ SPK_VERS = 1.5.1
 SPK_REV = 16
 SPK_ICON = src/bazarr.png
 
-PYTHON_PACKAGE = python311
+PYTHON_PACKAGE = python312
 
 SPK_DEPENDS = "${PYTHON_PACKAGE}:ffmpeg7"
 
@@ -15,15 +15,16 @@ DEPENDS += cross/unrar
 MAINTAINER = smaarn
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
-CHANGELOG = '1. Update bazarr to 1.5.1. <br/>See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.1">1.5.1</a> and <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.0">1.5.0</a> for more details.'
+CHANGELOG = '1. Update bazarr to 1.5.1. <br/>See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.1">1.5.1</a> and <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.0">1.5.0</a> for more details. <br/>2. Migrate to Python 3.12.'
 
 HOMEPAGE  = https://www.bazarr.media/
 LICENSE   = GPLv3
 STARTABLE = yes
 
-# [numpy] <= 1.21.6 (armv5)
-# This version is now unsupported using py311
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+# [numpy_v1]
+# Requires gcc>=8.4 to build succesfully
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = comcerto2k
 
 SERVICE_USER  = auto
 SERVICE_SETUP = src/service-setup.sh
@@ -37,27 +38,21 @@ ADMIN_PORT = $(SERVICE_PORT)
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 USE_ALTERNATE_TMPDIR = 1
 
-# [lxml]
-DEPENDS += cross/libxml2
-DEPENDS += cross/libxslt
-
 # [Pillow]
-DEPENDS += cross/pillow
+DEPENDS += python/pillow
 
 include ../../mk/spksrc.python.mk
 
-# [numpy] <= 1.22.4 (armv7l)
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-numpy-armv7l.txt
-# [numpy] <= 1.24.4 last working version with gcc-4.9
-else
-WHEELS += src/requirements-crossenv-numpy-gcc4.txt
+# [lxml]
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [lxml] -std=c11
 endif
 
-# workaround for compiler bug:
-# https://github.com/numpy/numpy/issues/13622
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS += [numpy] -O0
-endif
+# [numpy]
+# gcc-8.4 is the minimal version to build numpy
+# gcc-8.5 hapens to be the default version for DSM-7.1
+ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy_1.26
 endif
