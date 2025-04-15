@@ -21,7 +21,7 @@ HOMEPAGE  = https://www.bazarr.media/
 LICENSE   = GPLv3
 STARTABLE = yes
 
-# [numpy_v1]
+# [numpy]
 # Requires gcc>=8.4 to build succesfully
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
@@ -54,5 +54,5 @@ endif
 # gcc-8.4 is the minimal version to build numpy
 # gcc-8.5 hapens to be the default version for DSM-7.1
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
-DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy
 endif
