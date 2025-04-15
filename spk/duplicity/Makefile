@@ -14,7 +14,7 @@ DEPENDS = cross/librsync cross/duply
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 # [cryptography]
-DEPENDS += cross/cryptography
+DEPENDS += python/cryptography
 
 # [lxml]
 DEPENDS += cross/libxml2

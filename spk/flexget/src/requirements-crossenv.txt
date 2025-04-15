@@ -1,13 +1,13 @@
-# Snapshot from Jan. 18th 2025
+# Generated using the requirements script on April 11, 2025
 
 Brotli==1.1.0
-charset-normalizer==3.4.1
-#greenlet==3.1.1                    => supported version depends on gcc version
+charset_normalizer==3.4.1
+#greenlet                           ==> supported version depends on gcc version
 MarkupSafe==3.0.2
-#pendulum==3.0.0                    => cross/pendulum
-psutil==6.1.1
+#pendulum                           ==> python/pendulum
+psutil==7.0.0
 PyYAML==6.0.2
-rpds-py==0.22.3
-SQLAlchemy==2.0.37
-time-machine==2.16.0
+#rpds_py                            ==> supported version depends on rustc version
+sqlalchemy==2.0.40
+time_machine==2.16.0
 zstandard==0.23.0

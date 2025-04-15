@@ -36,7 +36,7 @@ USE_ALTERNATE_TMPDIR = 1
 DEPENDS += cross/libyaml
 
 # [cryptography]
-DEPENDS += cross/cryptography
+DEPENDS += python/cryptography
 
 include ../../mk/spksrc.python.mk
 
