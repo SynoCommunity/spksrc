@@ -66,4 +66,8 @@ service_postinst ()
             pip install --disable-pip-version-check --no-input --cache-dir ${PIP_CACHE_DIR} --requirement ${SYNOPKG_PKGVAR}/requirements-custom.txt
         fi
     fi
+
+    echo ${separator}
+    echo "Installed modules:"
+    pip freeze
 }
