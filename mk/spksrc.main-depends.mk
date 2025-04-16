@@ -5,7 +5,7 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-# noting to download
+# nothing to download
 download:
 download-all:
 checksum:
