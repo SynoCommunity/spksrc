@@ -1,0 +1,63 @@
+[
+  {
+    "step_title": "Zabbix Server Configuration",
+    "items": [
+      {
+        "desc": "Please configure at least one Zabbix Server or Proxy for this Agent."
+      },
+      {
+        "desc": "Enter a list of comma delimited IP addresses, optionally in CIDR notation, or DNS names of Zabbix servers and Zabbix proxies. <br/>Incoming connections will be accepted only from the hosts listed here.<br/>This Agent provides IPv6 support, so <code>127.0.0.1</code>, <code>::127.0.0.1</code>, <code>::ffff:127.0.0.1</code> are treated equally and <code>::/0</code> will allow any IPv4 or IPv6 address. <code>0.0.0.0/0</code> can be used to allow any IPv4 address."
+      },
+      {
+        "type": "textfield",
+        "desc": "<b>Option: Server</b><br/>IP address or DNS name (address:port) or cluster (address:port;address2:port) of Zabbix server to get configuration data from and send data to.<br/>Cluster nodes need to be separated by semicolon.<br/>Example: 127.0.0.1,192.168.1.0/24,::1,2001:db8::/32,zabbix.example.com",
+        "subitems": [
+          {
+            "key": "wizard_Server",
+            "desc": "Server",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "step_title": "Zabbix Active Checks Configuration",
+    "items": [
+      {
+        "desc": "Optionally configure active checks and Hostname."
+      },
+      {
+        "type": "textfield",
+        "desc": "<b>Option: ServerActive</b><br/>Zabbix server/proxy address or cluster configuration to get active checks from.<br/>Server/proxy address is IP address or DNS name and optional port separated by colon.<br/>Example: 127.0.0.1:10051",
+        "subitems": [
+          {
+            "key": "wizard_ServerActive",
+            "desc": "ServerActive",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": true
+            }
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "desc": "<b>Option: Hostname</b><br/>List of comma delimited unique, case sensitive hostnames.<br/>Required for active checks and must match hostnames as configured on the server.<br/>Example: Zabbix server",
+        "subitems": [
+          {
+            "key": "wizard_Hostname",
+            "desc": "Hostname",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": true
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
