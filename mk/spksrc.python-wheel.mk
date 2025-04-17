@@ -60,12 +60,12 @@ install_python_wheel_target: SHELL:=/bin/bash
 install_python_wheel_target:
 	@set -o pipefail; { \
 	$(MSG) $(MAKE) REQUIREMENT=\"$(PKG_NAME)==$(PKG_VERS)\" \
-	               WHEEL_NAME=\"$(PKG_NAME)\" \
+	               WHEEL_NAME=\"$(or $(WHEEL_NAME),$(PKG_NAME))\" \
 	               WHEEL_VERSION=\"$(PKG_VERS)\" \
 	               WHEEL_TYPE=\"cross\" \
 	               wheel_install ; \
 	MAKEFLAGS= $(MAKE) REQUIREMENT="$(PKG_NAME)==$(PKG_VERS)" \
-	                   WHEEL_NAME="$(PKG_NAME)" \
+	                   WHEEL_NAME="$(or $(WHEEL_NAME),$(PKG_NAME))" \
 	                   WHEEL_VERSION="$(PKG_VERS)" \
 	                   WHEEL_TYPE="cross" \
 	                   --no-print-directory \
