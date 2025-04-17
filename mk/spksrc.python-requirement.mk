@@ -98,14 +98,14 @@ else
 	   if [ "$(REQUIREMENT_GOAL)" = "wheel" ]; then \
 	      $(MSG) $(MAKE) ARCH=\"$(ARCH)\" \
 	                     TCVERSION=\"$(TCVERSION)\" \
-	                     WHEEL_NAME=\"$${name}\" \
+	                     WHEEL_NAME="$(if $(PKG_REAL_NAME),$(PKG_REAL_NAME),$${name})" \
 	                     WHEEL_VERSION=\"$${version}\" \
 	                     WHEEL_TYPE=\"$(or $(WHEEL_TYPE),$${type})\" \
 	                     WHEEL_URL=\"$${wheel_url}\" \
 	                     $(REQUIREMENT_GOAL) | tee --append $(WHEEL_LOG) ; \
 	      MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" \
 	                     TCVERSION="$(TCVERSION)" \
-	                     WHEEL_NAME="$${name}" \
+	                     WHEEL_NAME="$(if $(PKG_REAL_NAME),$(PKG_REAL_NAME),$${name})" \
 	                     WHEEL_VERSION="$${version}" \
 	                     WHEEL_TYPE="$(or $(WHEEL_TYPE),$${type})" \
 	                     WHEEL_URL="$${wheel_url}" \
