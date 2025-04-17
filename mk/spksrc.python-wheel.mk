@@ -31,8 +31,8 @@ endif
 
 ### Prepare crossenv
 prepare_crossenv:
-	@$(MSG) $(MAKE) WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
-	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
+	@$(MSG) $(MAKE) WHEEL_NAME=\"$(or $(WHEEL_NAME),$(PKG_NAME))\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
+	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(or $(WHEEL_NAME),$(PKG_NAME))" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
 build_python_wheel_target: SHELL:=/bin/bash
 build_python_wheel_target: prepare_crossenv
