@@ -98,7 +98,7 @@ else
 	   if [ "$(REQUIREMENT_GOAL)" = "wheel" ]; then \
 	      $(MSG) $(MAKE) ARCH=\"$(ARCH)\" \
 	                     TCVERSION=\"$(TCVERSION)\" \
-	                     WHEEL_NAME="$(or $(WHEEL_NAME),$${name})" \
+	                     WHEEL_NAME=\"$(or $(WHEEL_NAME),$${name})\" \
 	                     WHEEL_VERSION=\"$${version}\" \
 	                     WHEEL_TYPE=\"$(or $(WHEEL_TYPE),$${type})\" \
 	                     WHEEL_URL=\"$${wheel_url}\" \
