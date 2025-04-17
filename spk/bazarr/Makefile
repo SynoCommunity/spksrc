@@ -38,8 +38,6 @@ ADMIN_PORT = $(SERVICE_PORT)
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 USE_ALTERNATE_TMPDIR = 1
 
-POST_STRIP_TARGET = bazarr_extra_install
-
 # [Pillow]
 DEPENDS += python/pillow
 
@@ -58,8 +56,3 @@ endif
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy
 endif
-
-.PHONY: bazarr_extra_install
-bazarr_extra_install:
-	install -m 755 -d $(STAGING_DIR)/share/tools
-	install -m 644 src/tools/fix_requirements.py $(STAGING_DIR)/share/tools/fix_requirements.py

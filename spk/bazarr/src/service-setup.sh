@@ -14,11 +14,6 @@ service_postinst ()
 {
     # Create a Python virtualenv
     install_python_virtualenv
-    
-    # Fix requirements file
-    ${PYTHON} ${SYNOPKG_PKGDEST}/share/tools/fix_requirements.py \
-        "${SYNOPKG_PKGDEST}/share/wheelhouse" \
-        "${SYNOPKG_PKGDEST}/share/wheelhouse/requirements.txt"
 
     # Install the wheels (using virtual env through PATH)
     install_python_wheels
