@@ -1,0 +1,4 @@
+bin:bin/mergerfs
+bin:bin/mergerfs-fusermount
+lib:lib/mergerfs/preload.so
+bin:sbin/mount.mergerfs
