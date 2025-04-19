@@ -1,5 +1,5 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.4.0
+SPK_VERS = 1.4.1
 SPK_REV = 18
 SPK_ICON = src/borgbackup.png
 
@@ -26,7 +26,7 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # 
 # # 4. Generate the requirements file, restricting version of rpds-py for compatibility
 # # rpds-py >= 0.22.3 requires rustc >= 1.80
-# ./generate_requirements.sh "borgbackup borgmatic emborg llfuse rpds-py==0.22.3" 312
+# ./generate_requirements.sh "borgbackup[llfuse] borgmatic emborg rpds-py==0.22.3" 312
 # 
 # # 5. Post-generation
 # # The script will create three files (pure, cross, and combined) for the Borg deployment
@@ -42,7 +42,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Migrate to Python 3.12."
+CHANGELOG = "1. Update borg to v1.4.1.<br/>2. Update borgmatic to v2.0.3.<br/>3. Update emborg to v1.41.<br/>4. Migrate to Python 3.12."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
