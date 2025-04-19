@@ -1,11 +1,11 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.4.0
-SPK_REV = 17
+SPK_VERS = 1.4.1
+SPK_REV = 18
 SPK_ICON = src/borgbackup.png
 
-PYTHON_PACKAGE = python311
-SPK_DEPENDS = "python311>=3.11.5-8"
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "$(PYTHON_PACKAGE)"
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 cross/xxhash cross/zstd
 
@@ -25,13 +25,12 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # sudo chmod +x generate_requirements.sh
 # 
 # # 4. Generate the requirements file, restricting version of rpds-py for compatibility
-# # rpds-py==0.21.0 is the latest version that builds with rust 1.77.2 (ARMv5, ARMv7L)
-# # supporting cargo lock version 3 (but not version 4)
-# ./generate_requirements.sh "borgbackup borgmatic emborg llfuse rpds-py==0.21.0" 311
+# # rpds-py >= 0.22.3 requires rustc >= 1.80
+# ./generate_requirements.sh "borgbackup[llfuse] borgmatic emborg rpds-py==0.22.3" 312
 # 
 # # 5. Post-generation
 # # The script will create three files (pure, cross, and combined) for the Borg deployment
-# # with Python 3.11. Use the pure and cross requirement files as the base for your PR.
+# # with Python 3.12. Use the pure and cross requirement files as the base for your PR.
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -43,7 +42,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgmatic to v1.9.14."
+CHANGELOG = "1. Update borg to v1.4.1.<br/>2. Update borgmatic to v2.0.3.<br/>3. Update emborg to v1.41.<br/>4. Migrate to Python 3.12."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
@@ -52,7 +51,7 @@ SERVICE_SETUP = src/service-setup.sh
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.python.mk
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
@@ -63,9 +62,21 @@ ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [borgbackup] -std=c11
+endif
 
-# [rpds-py]
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+# [llfuse]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [llfuse] -std=gnu11
+endif
 
-include ../../mk/spksrc.python.mk
+# [msgpack]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [msgpack] -std=c11
+endif
+
+# [ruamel.yaml.clib]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
+endif
