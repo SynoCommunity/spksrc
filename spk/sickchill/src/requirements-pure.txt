@@ -1,12 +1,12 @@
-# Generated using the requirements script on April 6, 2025
+# Generated using the requirements script on April 20, 2025
 
 appdirs==1.4.4
 babelfish==0.6.1
-beautifulsoup4==4.13.3
+beautifulsoup4==4.13.4
 beekeeper_alt==2022.9.3
 bencode.py==4.0.0
 cachecontrol==0.14.2
-#certifi                            ==> python311
+#certifi                            ==> python312
 chardet==5.2.0
 cinemagoer==2023.5.1
 click==8.1.8
@@ -26,13 +26,13 @@ ipaddress==1.0.23
 Js2Py==0.74
 jsonrpclib_pelix==0.4.3.4
 kodipydent_alt==2022.9.3
-Mako==1.3.9
+mako==1.3.10
 markdown2==2.5.3
 new_rtorrent_python==1.0.1a0
 oauthlib==3.2.2
 packaging==23.2
 pbr==6.1.1
-#pip                                ==> python311
+#pip                                ==> python312
 profilehooks==1.13.0
 putio_py==8.8.0
 pycparser==2.22
@@ -52,9 +52,9 @@ rebulk==3.2.0
 requests==2.32.3
 requests_oauthlib==2.0.0
 Send2Trash==1.8.3
-#setuptools                         ==> python311
+#setuptools                         ==> python312
 sickchill==2024.3.1
-#six                                ==> python311
+#six                                ==> python312
 soupsieve==2.6
 stevedore==5.4.1
 subliminal==2.1.0
@@ -63,10 +63,10 @@ timeago==1.0.16
 tmdbsimple==2.9.1
 tus_py==1.3.4
 tvdbsimple==1.0.6
-typing_extensions==4.13.1
+typing_extensions==4.13.2
 tzlocal==5.3.1
 Unidecode==1.3.8
-urllib3==2.3.0
+urllib3==2.4.0
 validators==0.22.0
 webencodings==0.5.1
 win_inet_pton==1.1.0
