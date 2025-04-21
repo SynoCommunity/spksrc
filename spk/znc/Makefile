@@ -15,15 +15,13 @@ DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy p
 DISPLAY_NAME = ZNC
 CHANGELOG = "1. Update to ZNC 1.91.1.<br/>2. Migrate to Python 3.12<br/>3. Updated version only supported on DSM7 and newer"
 
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
-
 STARTABLE = yes
 HOMEPAGE = https://wiki.znc.in/
 LICENSE  = Apache License 2.0
 
 # Ensure C++11 compatibility
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 

@@ -12,9 +12,8 @@ endif
 BUILD_DEPENDS = cross/python312
 DEPENDS = cross/openssl3 cross/libicu cross/zlib cross/argon2
 
-# configure: No compiler with C++11 support was found
-# error: Upgrade your compiler. GCC 4.8+ and Clang 3.2+ are known to work.
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# Ensure C++11 compatibility
+UNSUPPORTED_ARCHS = comcerto2k $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
