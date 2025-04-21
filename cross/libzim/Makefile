@@ -16,10 +16,12 @@ HOMEPAGE = https://www.kiwix.org/
 COMMENT  = Reference implementation of the ZIM specification.
 LICENSE  = GPLv2
 
-GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = -Dexamples=false
 CONFIGURE_ARGS += -Ddoc=false
 CONFIGURE_ARGS += -Dtest_data_dir=none
-ADDITIONAL_LDFLAGS = -licui18n -licuuc -licudata
+
+# Using patches/001-Fix-build-with-ICU-77.patch
+# instead of passing additional LD flags
+#ADDITIONAL_LDFLAGS = -licui18n -licuuc -licudata
 
 include ../../mk/spksrc.cross-meson.mk
