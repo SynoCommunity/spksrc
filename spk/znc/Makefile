@@ -21,7 +21,7 @@ LICENSE  = Apache License 2.0
 
 # Ensure C++11 compatibility
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = comcerto2k
 
 include ../../mk/spksrc.archs.mk
 
