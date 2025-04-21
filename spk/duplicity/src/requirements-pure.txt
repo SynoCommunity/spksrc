@@ -1,159 +1,100 @@
-# version 1.2.3 snapshot from Jul. 23rd 2023
-2to3==1.0
-alabaster==0.7.13
+# Generated using the requirements script on April 13, 2025
+
+annotated_types==0.7.0
+argparse==1.4.0
 args==0.1.0
-arrow==1.2.3
-astroid==2.15.6
-attrs==23.1.0
-azure-core==1.28.0
-azure-storage-blob==12.17.0
-b2sdk==1.22.0
-Babel==2.12.1
-#bcrypt                        ==> crossenv
-boto==2.49.0
-boto3==1.28.9
-botocore==1.31.9
-boxsdk==3.7.3
-cachetools==5.3.1
-#certifi                       ==> py311
-#cffi                          ==> crossenv
-charset-normalizer==3.2.0
+attrs==25.3.0
+azure_core==1.33.0
+azure_storage_blob==12.25.1
+b2sdk==2.8.0
+babel==2.17.0
+boto3==1.37.33
+botocore==1.37.33
+boxsdk==3.14.0
+cachetools==5.5.2
+#certifi                                                    ==> python312
+chardet==5.2.0
 clint==0.5.1
-colorama==0.4.6
-#coverage                      ==> crossenv
-#cryptography                  ==> cross/cryptography
-debtcollector==2.5.0
-dill==0.3.7
-#distlib                       ==> py311
-docutils==0.18.1
-dropbox==11.36.2
-#duplicity                     ==> crossenv
-ecdsa==0.18.0
-fasteners==0.18
-#filelock                      ==> py311
-future==0.18.3
-gdata-python3==3.0.1
-gitchangelog==3.0.4
-google-api-core==2.11.1
-google-api-python-client==2.94.0
-googleapis-common-protos==1.59.1
-google-auth==2.22.0
-google-auth-httplib2==0.1.0
-google-auth-oauthlib==1.0.0
+debtcollector==3.0.0
+dropbox==12.0.2
+ecdsa==0.19.1
+fasteners==0.19
+gdata_python3==3.0.1
+google_api_core==2.24.2
+google_api_python_client==2.166.0
+googleapis_common_protos==1.69.2
+google_auth==2.38.0
+google_auth_httplib2==0.2.0
+google_auth_oauthlib==1.2.1
 httplib2==0.22.0
-humanize==4.7.0
-idna==3.4
-imagesize==1.4.1
-importlib-metadata==6.8.0
-iniconfig==2.0.0
-ip-associations-python-novaclient-ext==0.2
-iso8601==2.0.0
-isodate==0.6.1
-isort==5.12.0
-jaraco.classes==3.3.0
-jeepney==0.8.0
-Jinja2==3.1.2
+humanize==4.12.2
+idna==3.10
+ip_associations_python_novaclient_ext==0.2
+iso8601==2.1.0
+isodate==0.7.2
+jaraco.classes==3.4.0
+jaraco.context==6.0.1
+jaraco.functools==4.1.0
+jeepney==0.9.0
 jmespath==1.0.1
 jottalib==0.5.1
-keyring==24.2.0
+keyring==25.6.0
 keystoneauth1==2.18.0
-#lazy-object-proxy               ==> crossenv
 logfury==1.0.1
-#lxml                            ==> crossenv
-markdown-it-py==3.0.0
-#MarkupSafe                      ==> crossenv
-mccabe==0.7.0
-mdit-py-plugins==0.4.0
-mdurl==0.1.2
 mediafire==0.6.1
 megatools==0.0.4
-mock==5.1.0
+mock==5.2.0
 monotonic==1.6
-more-itertools==9.1.0
-#msgpack                         ==> crossenv
-#msgpack-python                  ==> crossenv
-msrest==0.7.1
-myst-parser==2.0.0
-netaddr==0.8.0
-#netifaces                       ==> crossenv
+more_itertools==10.6.0
+netaddr==1.3.0
+oauth2client==4.1.3
 oauthlib==3.2.2
-os-diskconfig-python-novaclient-ext==0.1.3
+os_diskconfig_python_novaclient_ext==0.1.3
 oslo.config==4.12.0
 oslo.i18n==3.12.0
 oslo.serialization==2.16.1
 oslo.utils==3.22.3
-os-networksv2-python-novaclient-ext==0.26
-os-virtual-interfacesv2-python-novaclient-ext==0.20
-packaging==23.1
-paramiko==3.2.0
+os_networksv2_python_novaclient_ext==0.26
+os_virtual_interfacesv2_python_novaclient_ext==0.20
+paramiko==3.5.1
 pbr==1.10.0
-pexpect==4.8.0
-#platformdirs                     ==> py311
-pluggy==1.2.0
+pexpect==4.9.0
+#pip                                                        ==> python312
 ply==3.11
 positional==1.2.1
 prettytable==0.7.2
-#protobuf                         ==> crossenv
-#psutil                           ==> crossenv
+proto_plus==1.26.1
 ptyprocess==0.7.0
-py==1.11.0
-pyasn1==0.5.0
-pyasn1-modules==0.3.0
-pycodestyle==2.10.0
-pycparser==2.21
-PyDrive2==1.16.1
-Pygments==2.15.1
-PyJWT==2.8.0
-pylint==2.17.4
-#PyNaCl                           ==> crossenv
-pyOpenSSL==23.2.0
-pyparsing==3.1.0
-pyproject-api==1.5.3
+pyasn1==0.6.1
+pyasn1_modules==0.4.2
+pycparser==2.22
+PyDrive2==1.21.3
+PyJWT==2.10.1
+pyOpenSSL==24.2.1
+pyparsing==3.2.3
 pyrax==1.10.0
-pystache==0.6.0
-pytest==7.4.0
-pytest-cov==4.1.0
-pytest-runner==6.0.0
-python-dateutil==2.8.2
-python-gettext==5.0
-python-keystoneclient==3.10.0
-python-novaclient==2.27.0
-python-swiftclient==4.3.0
-pytz==2023.3
-#PyYAML                         ==> crossenv
-rackspace-novaclient==2.1
-rax-default-network-flags-python-novaclient-ext==0.4.0
-rax-scheduled-images-python-novaclient-ext==0.3.1
-requests==2.31.0
-requests-oauthlib==1.3.1
-requests-toolbelt==1.0.0
+python_dateutil==2.9.0.post0
+python_gettext==5.0
+python_keystoneclient==3.10.0
+python_novaclient==2.27.0
+python_swiftclient==4.7.0
+pytz==2025.2
+rackspace_auth_openstack==1.3
+rackspace_novaclient==2.1
+rax_default_network_flags_python_novaclient_ext==0.4.0
+rax_scheduled_images_python_novaclient_ext==0.3.1
+requests==2.32.3
+requests_oauthlib==2.0.0
+requests_toolbelt==1.0.0
 rfc3986==2.0.0
 rsa==4.9
-s3transfer==0.6.1
+s3transfer==0.11.4
 SecretStorage==3.3.3
-setuptools-scm==7.1.0
-#simplejson                     ==> crossenv
-#six                            ==> py311
-snowballstemmer==2.2.0
-Sphinx==6.2.1
-sphinxcontrib-applehelp==1.0.4
-sphinxcontrib-devhelp==1.0.2
-sphinxcontrib-htmlhelp==2.0.1
-sphinxcontrib-jquery==4.1
-sphinxcontrib-jsmath==1.0.1
-sphinxcontrib-qthelp==1.0.3
-sphinxcontrib-serializinghtml==1.1.5
-sphinx-rtd-theme==1.2.2
+#setuptools                                                 ==> python312
+#six                                                        ==> python312
 stevedore==1.20.1
 stone==3.3.1
-tlslite-ng==0.7.6
-tomli==2.0.1
-tomlkit==0.11.8
-tox==4.6.4
-tqdm==4.65.0
-typing_extensions==4.7.1
+tlslite_ng==0.8.2
+typing_extensions==4.13.2
 uritemplate==4.1.1
-urllib3==1.26.16
-#virtualenv                    ==> py311
-#wrapt                         ==> crossenv
-zipp==3.16.2
+urllib3==2.4.0
