@@ -37,7 +37,7 @@ CMAKE_ARGS = -DWITH_GETTEXT=OFF
 # direct builds with cargo/rust (using spksrc.cross-rust.mk) create
 # experimental static versions without data files
 
-# keep cross tools in ENV for cargo to find CC and LN of toolchain
+# keep cross tools in ENV for cargo to find CC and LD of toolchain
 CMAKE_USE_TOOLCHAIN_FILE = OFF
 
 # define RUST_TARGET similar to spksrc.cross-rust-env.mk
