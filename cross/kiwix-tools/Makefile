@@ -15,8 +15,4 @@ HOMEPAGE = https://www.kiwix.org/
 COMMENT  = Command line Kiwix tools: kiwix-serve, kiwix-manage, ...
 LICENSE  = GPLv3
 
-GNU_CONFIGURE = 1
-
-CMAKE_USE_NINJA = 0
-
 include ../../mk/spksrc.cross-meson.mk
