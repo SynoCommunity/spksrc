@@ -1,5 +1,5 @@
 PKG_NAME = libzim
-PKG_VERS = 9.2.3
+PKG_VERS = 9.3.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/openzim/libzim/archive
@@ -20,5 +20,6 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = -Dexamples=false
 CONFIGURE_ARGS += -Ddoc=false
 CONFIGURE_ARGS += -Dtest_data_dir=none
+ADDITIONAL_LDFLAGS = -licui18n -licuuc -licudata
 
 include ../../mk/spksrc.cross-meson.mk
