@@ -25,7 +25,7 @@ HOMEPAGE = https://gi.readthedocs.io/
 COMMENT  = GObject introspection is a middleware layer between C libraries (using GObject) and language bindings.
 LICENSE  = LGPLv2+
 
-include ../../mk/spksrc.python-wheel-meson.mk
+include ../../mk/spksrc.cross-meson.mk
 
 .PHONY: gi_post_configure
 
