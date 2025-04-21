@@ -1,5 +1,5 @@
 PKG_NAME = fish
-PKG_VERS = 4.0.1
+PKG_VERS = 4.0.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/fish-shell/fish-shell/releases/download/$(PKG_VERS)
@@ -9,6 +9,8 @@ DEPENDS =
 
 # requirements: C++11 compiler (g++ 4.8 or later, or clang 3.3 or later)
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# build with custom qoriq rust_target fails to build in spk folder (but not in cross/fish)
+UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 HOMEPAGE = https://fishshell.com
 COMMENT = fish is a smart and user-friendly command line shell for Linux, macOS, and the rest of the family.
