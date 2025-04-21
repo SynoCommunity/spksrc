@@ -15,6 +15,9 @@ PKG_DIST_SITE = https://gitlab.gnome.org/GNOME/$(PKG_NAME)/-/archive/$(PKG_VERS)
 
 DEPENDS = cross/cairo
 
+# only required for build in cross/gobject-introspection folder (not when using prebuilt spk/python311)
+BUILD_DEPENDS = cross/python311
+
 POST_CONFIGURE_TARGET = gi_post_configure
 CONFIGURE_ARGS += --cross-file=$(WORK_DIR)/$(PKG_DIR)/gi.meson
 
