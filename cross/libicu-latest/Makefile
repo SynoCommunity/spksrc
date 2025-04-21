@@ -64,7 +64,6 @@ POST_INSTALL_TARGET = libicu_post_install
 CONFIGURE_ARGS += --with-cross-build=$(NATIVE_BUILD_DIR) 
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --disable-samples
-prefix = /var/packages/znc/target
 CONFIGURE_ARGS += --disable-tools
 CONFIGURE_ARGS += --disable-tests
 
