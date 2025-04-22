@@ -13,6 +13,9 @@ PKG_DIST_SITE = https://gitlab.gnome.org/GNOME/$(PKG_NAME)/-/archive/$(PKG_VERS)
 #     python3-markdown python3-distutils meson build-essential \
 #     gtk-doc-tools
 
+# Ensure all Meson‐built tools load our staged GLib
+export LD_LIBRARY_PATH := $(STAGING_INSTALL_PREFIX)/lib:$(LD_LIBRARY_PATH)
+
 DEPENDS = cross/glib cross/libffi cross/python311 cross/cairo
 
 # generate gi.meson before Meson runs
