@@ -13,10 +13,13 @@ PKG_DIST_SITE = https://gitlab.gnome.org/GNOME/$(PKG_NAME)/-/archive/$(PKG_VERS)
 #     python3-markdown python3-distutils meson build-essential \
 #     gtk-doc-tools
 
-DEPENDS = cross/glib cross/libffi cross/python311 cross/cairo
+DEPENDS = cross/glib cross/libffi cross/cairo
+
+# only required for build in cross/gobject-introspection folder (not when using prebuilt spk/python311)
+BUILD_DEPENDS = cross/python311
 
 # generate gi.meson before Meson runs
-CONFIGURE_TARGET := gi_post_configure meson_configure_target
+CONFIGURE_TARGET = gi_post_configure meson_configure_target
 
 # supply Meson with your custom cross‑file
 CONFIGURE_ARGS += --cross-file=$(WORK_DIR)/$(PKG_DIR)/gi.meson
@@ -31,4 +34,4 @@ include ../../mk/spksrc.cross-meson.mk
 
 gi_post_configure:
 	@echo "[properties]" > $(WORK_DIR)/$(PKG_DIR)/gi.meson
-	@echo "needs_exe_wrapper = false" >> $(WORK_DIR)/$(PKG_DIR)/gi.meson
+	@echo "add_rpath = true" >> $(WORK_DIR)/$(PKG_DIR)/gi.meson
