@@ -31,4 +31,4 @@ include ../../mk/spksrc.cross-meson.mk
 
 gi_post_configure:
 	@echo "[properties]" > $(WORK_DIR)/$(PKG_DIR)/gi.meson
-	@echo "needs_exe_wrapper = true" >> $(WORK_DIR)/$(PKG_DIR)/gi.meson
+	@echo "needs_exe_wrapper = false" >> $(WORK_DIR)/$(PKG_DIR)/gi.meson
