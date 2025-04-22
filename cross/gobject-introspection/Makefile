@@ -13,10 +13,7 @@ PKG_DIST_SITE = https://gitlab.gnome.org/GNOME/$(PKG_NAME)/-/archive/$(PKG_VERS)
 #     python3-markdown python3-distutils meson build-essential \
 #     gtk-doc-tools
 
-DEPENDS = cross/cairo
-
-# only required for build in cross/gobject-introspection folder (not when using prebuilt spk/python311)
-BUILD_DEPENDS = cross/python311
+DEPENDS = cross/glib cross/libffi cross/python311 cross/cairo
 
 # generate gi.meson before Meson runs
 CONFIGURE_TARGET := gi_post_configure meson_configure_target
