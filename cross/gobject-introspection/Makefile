@@ -13,22 +13,24 @@ PKG_DIST_SITE = https://gitlab.gnome.org/GNOME/$(PKG_NAME)/-/archive/$(PKG_VERS)
 #     python3-markdown python3-distutils meson build-essential \
 #     gtk-doc-tools
 
-# 1) Run our patch right after Meson config but before Ninja
-CONFIGURE_TARGET = gi_post_configure meson_configure_target patch_gir_wrapper
+# 1) Generate cross-file, then configure Meson as usual
+CONFIGURE_TARGET = gi_post_configure meson_configure_target
 
-.PHONY: patch_gir_wrapper
-patch_gir_wrapper:
-	@echo "Patching g-ir-scanner wrapper to load staged GLib…" ; \
-	SCRIPT="$(MESON_BUILD_DIR)/tools/g-ir-scanner" ; \
-	[ -f $$SCRIPT ] || { echo "↳ wrapper not found at $$SCRIPT"; exit 1; } ; \
-	# insert LD_LIBRARY_PATH export just after the shebang
-	sed -i '1a export LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib:$$LD_LIBRARY_PATH' $$SCRIPT ; \
-	chmod +x $$SCRIPT
+# 2) After configure but before Ninja build, patch the scanner
+COMPILE_TARGET = patch_gir_wrapper ninja_compile_target
 
-.PHONY: gi_post_configure
+.PHONY: gi_post_configure patch_gir_wrapper
+
 gi_post_configure:
 	@echo "[properties]" > $(WORK_DIR)/$(PKG_DIR)/gi.meson
 	@echo "add_rpath = true" >> $(WORK_DIR)/$(PKG_DIR)/gi.meson
+
+patch_gir_wrapper:
+	@echo "Patching g-ir-scanner to load staged GLib…" ; \
+	SCRIPT="$(MESON_BUILD_DIR)/tools/g-ir-scanner" ; \
+	[ -f $$SCRIPT ] || { echo "❌ wrapper not found at $$SCRIPT"; exit 1; } ; \
+	sed -i '1a export LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib:$$LD_LIBRARY_PATH' $$SCRIPT ; \
+	chmod +x $$SCRIPT
 
 DEPENDS = cross/glib cross/libffi cross/cairo
 
