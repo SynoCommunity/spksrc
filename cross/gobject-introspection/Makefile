@@ -22,6 +22,7 @@ COMPILE_TARGET = patch_gir_wrapper ninja_compile_target
 .PHONY: gi_post_configure patch_gir_wrapper
 
 gi_post_configure:
+	@mkdir -p $(WORK_DIR)/$(PKG_DIR)
 	@echo "[properties]" > $(WORK_DIR)/$(PKG_DIR)/gi.meson
 	@echo "add_rpath = true" >> $(WORK_DIR)/$(PKG_DIR)/gi.meson
 
