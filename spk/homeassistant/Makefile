@@ -12,6 +12,12 @@ SPK_DEPENDS = $(PYTHON_PACKAGE)
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 
+# mandatory wheel not available (av):
+# It is possible to build for armv7, but av==13.1.0 is not available, and the
+# basic system component 'anthemav' (aka. "Stream Domain") is not supported.
+# For such builds the requirements-cross_from_index_armv7l.txt is still supported.
+UNSUPPORTED_ARCHS += $(ARMv7_ARCHS)
+
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
