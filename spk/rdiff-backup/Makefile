@@ -18,7 +18,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Reverse differential backup tool, over a network or locally.
 STARTABLE = no
 DISPLAY_NAME = rdiff-backup
-CHANGELOG = "1. Update to v2.2.6.<br/>2. Use alternate tmp dir.<br/>3. Migrate to Python 3.12."
+CHANGELOG = "1. Migrate to Python 3.12."
 
 HOMEPAGE = https://rdiff-backup.net/
 LICENSE  = GPLv2
