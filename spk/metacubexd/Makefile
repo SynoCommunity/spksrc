@@ -7,10 +7,12 @@ DEPENDS = cross/metacubexd
 
 override ARCH=noarch
 
-MAINTAINER = MetaCubeX
+MAINTAINER = wangbin1989
+MAINTAINER_URL = https://github.com/wangbin1989
+
 DESCRIPTION = Mihomo Dashboard, The Official One, XD
-DISPLAY_NAME = "METACUBE, XD"
-CHANGELOG = "update to version 1.186.1"
+DISPLAY_NAME = "MetaCubeXD"
+CHANGELOG = "Initial package release."
 
 LICENSE = GPLv3
 

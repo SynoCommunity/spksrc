@@ -3,7 +3,7 @@
 		"services": [
 			{
 				"service": "metacubexd",
-				"display_name": "METACUBE, XD",
+				"display_name": "MetaCubeXD",
 				"icon": "app/images/metacubexd-{0}.png",
 				"type": "static",
 				"root": "metacubexd"
@@ -13,7 +13,7 @@
 			{
 				"service": "metacubexd",
 				"name": "metacubexd",
-				"display_name":"METACUBE, XD",
+				"display_name":"MetaCubeXD",
 				"type": "alias",
 				"alias": "metacubexd",
 				"app": "com.synocommunity.packages.metacubexd"

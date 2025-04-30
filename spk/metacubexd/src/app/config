@@ -3,7 +3,7 @@
         "com.synocommunity.packages.metacubexd": {
             "type": "url",
             "icon": "images/metacubexd-{0}.png",
-            "title": "METACUBE, XD",
+            "title": "MetaCubeXD",
             "url": "/metacubexd",
             "allUsers": true
         }
