@@ -11,8 +11,6 @@ HOMEPAGE = https://github.com/MetaCubeX/metacubexd
 COMMENT  = Mihomo Dashboard, The Official One, XD
 LICENSE  = GPLv3
 
-REQUIRED_MIN_DSM = 7
-
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 INSTALL_TARGET = metacubexd_custom_install
