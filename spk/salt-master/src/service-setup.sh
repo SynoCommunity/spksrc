@@ -7,17 +7,20 @@ SYNOPKG_PKGETC=/var/packages/${SYNOPKG_PKGNAME}/etc
 
 service_prestart ()
 {
-    # Define log files and commands
+    # Define variables and commands
     LOG_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master.log"
     LOG_FILE_API="${SYNOPKG_PKGVAR}/salt-api.log"
-    COMMAND_MASTER="salt-master -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_MASTER} -d"
-    COMMAND_API="salt-api -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_API} -d"
+    PID_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master-runtime.pid"
+    PID_FILE_API="${SYNOPKG_PKGVAR}/salt-api-runtime.pid"
+    COMMAND_MASTER="salt-master --pid-file ${PID_FILE_MASTER} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_MASTER} -d"
+    COMMAND_API="salt-api --pid-file ${PID_FILE_API} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_API} -d"
     # Execute salt-master command
-    $COMMAND_MASTER >> ${LOG_FILE_MASTER} 2>&1 &
-    echo "$!" >> "${PID_FILE}"
+    $COMMAND_MASTER >> ${LOG_FILE_MASTER} 2>&1
     # Execute salt-api command
-    $COMMAND_API >> ${LOG_FILE_API} 2>&1 &
-    echo "$!" >> "${PID_FILE}"
+    $COMMAND_API >> ${LOG_FILE_API} 2>&1
+    # Combine PID files
+    cat "${PID_FILE_MASTER}" >> "${PID_FILE}"
+    cat "${PID_FILE_API}" >> "${PID_FILE}"
 }
 
 service_postinst ()
