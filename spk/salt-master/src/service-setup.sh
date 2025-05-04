@@ -15,12 +15,37 @@ service_prestart ()
     COMMAND_MASTER="salt-master --pid-file ${PID_FILE_MASTER} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_MASTER} -d"
     COMMAND_API="salt-api --pid-file ${PID_FILE_API} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_API} -d"
     # Execute salt-master command
-    $COMMAND_MASTER >> ${LOG_FILE_MASTER} 2>&1
+    $COMMAND_MASTER >> "${LOG_FILE_MASTER}" 2>&1
+    # Wait until salt-master is populated
+    i=0
+    while [ $i -lt 10 ]; do
+        [ -s "${PID_FILE_MASTER}" ] && break
+        sleep 1
+        i=$((i + 1))
+    done
     # Execute salt-api command
-    $COMMAND_API >> ${LOG_FILE_API} 2>&1
+    $COMMAND_API >> "${LOG_FILE_API}" 2>&1
+    # Wait until salt-api is populated
+    i=0
+    while [ $i -lt 10 ]; do
+        [ -s "${PID_FILE_API}" ] && break
+        sleep 1
+        i=$((i + 1))
+    done
     # Combine PID files
-    cat "${PID_FILE_MASTER}" >> "${PID_FILE}"
-    cat "${PID_FILE_API}" >> "${PID_FILE}"
+    : > "${PID_FILE}"
+    [ -s "${PID_FILE_API}" ] && echo "$(cat "${PID_FILE_API}")" >> "${PID_FILE}"
+    [ -s "${PID_FILE_MASTER}" ] && echo "$(cat "${PID_FILE_MASTER}")" >> "${PID_FILE}"
+}
+
+service_poststop ()
+{
+    # Define variables
+    PID_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master-runtime.pid"
+    PID_FILE_API="${SYNOPKG_PKGVAR}/salt-api-runtime.pid"
+    # Remove any runtime PID files
+    [ -f "${PID_FILE_API}" ] && rm -f "${PID_FILE_API}"
+    [ -f "${PID_FILE_MASTER}" ] && rm -f "${PID_FILE_MASTER}"
 }
 
 service_postinst ()
