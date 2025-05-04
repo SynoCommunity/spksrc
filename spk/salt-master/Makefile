@@ -27,6 +27,11 @@ SERVICE_USER       = auto
 SERVICE_SETUP      = src/service-setup.sh
 STARTABLE          = yes
 FWPORTS            = src/app/salt-master.sc
+SERVICE_PORT       = 8282
+SERVICE_PORT_TITLE = Salt Master UI
+
+# Admin link for in DSM UI
+ADMIN_PORT = $(SERVICE_PORT)
 
 include ../../mk/spksrc.common.mk
 

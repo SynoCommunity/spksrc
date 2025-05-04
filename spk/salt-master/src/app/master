@@ -742,6 +742,9 @@ rest_cherrypy:
   port: 8282
   # listen on all interfaces
   host: 0.0.0.0
+  app: /var/packages/salt-master/var/saltgui/index.html
+  static: /var/packages/salt-master/var/saltgui/static
+  static_path: /static
   disable_ssl: true
   thread_pool: 30
   socket_queue_size: 10
@@ -752,9 +755,3 @@ netapi_enable_clients:
   - local_async
   - wheel
   - runner
-
-# mount the SaltGUI static and template dirs
-static:
-  /saltgui: /var/packages/salt-master/var/saltgui/saltgui/static
-
-templates: /var/packages/salt-master/var/saltgui/saltgui/templates
