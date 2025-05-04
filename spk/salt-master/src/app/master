@@ -740,8 +740,21 @@ external_auth:
 ######################################
 rest_cherrypy:
   port: 8282
-  host: 127.0.0.1
+  # listen on all interfaces
+  host: 0.0.0.0
   disable_ssl: true
   thread_pool: 30
   socket_queue_size: 10
 
+# since Salt 3006, must explicitly allow these clients for SaltGUI
+netapi_enable_clients:
+  - local
+  - local_async
+  - wheel
+  - runner
+
+# mount the SaltGUI static and template dirs
+static:
+  /saltgui: /var/packages/salt-master/var/saltgui/saltgui/static
+
+templates: /var/packages/salt-master/var/saltgui/saltgui/templates
