@@ -25,12 +25,6 @@ SERVICE_USER  = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE     = yes
 
-include ../../mk/spksrc.common.mk
-
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-CONF_DIR      = src/conf/
-endif
-
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt-call
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-minion
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-proxy

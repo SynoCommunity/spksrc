@@ -33,12 +33,6 @@ SERVICE_PORT_TITLE = Salt Master UI
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
-include ../../mk/spksrc.common.mk
-
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-CONF_DIR           = src/conf/
-endif
-
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-cp
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-key

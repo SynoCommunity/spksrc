@@ -5,7 +5,20 @@ PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 LANGUAGE="env LANG=en_US.UTF-8"
 SYNOPKG_PKGETC=/var/packages/${SYNOPKG_PKGNAME}/etc
 
-SERVICE_COMMAND="salt-master --pid-file ${PID_FILE} -c ${SYNOPKG_PKGETC} -d & salt-api -c ${SYNOPKG_PKGETC} --log-file=${SYNOPKG_PKGVAR}/salt-api.log -d"
+service_prestart ()
+{
+    # Define log files and commands
+    LOG_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master.log"
+    LOG_FILE_API="${SYNOPKG_PKGVAR}/salt-api.log"
+    COMMAND_MASTER="salt-master -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_MASTER} -d"
+    COMMAND_API="salt-api -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_API} -d"
+    # Execute salt-master command
+    $COMMAND_MASTER >> ${LOG_FILE_MASTER} 2>&1 &
+    echo "$!" >> "${PID_FILE}"
+    # Execute salt-api command
+    $COMMAND_API >> ${LOG_FILE_API} 2>&1 &
+    echo "$!" >> "${PID_FILE}"
+}
 
 service_postinst ()
 {
