@@ -15,7 +15,7 @@ service_prestart ()
     COMMAND_MASTER="salt-master --pid-file ${PID_FILE_MASTER} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_MASTER} -d"
     COMMAND_API="salt-api --pid-file ${PID_FILE_API} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_API} -d"
     # Execute salt-master command
-    $COMMAND_MASTER >> "${LOG_FILE_MASTER}" 2>&1
+    $COMMAND_MASTER
     # Wait until salt-master is populated
     i=0
     while [ $i -lt 10 ]; do
@@ -24,7 +24,7 @@ service_prestart ()
         i=$((i + 1))
     done
     # Execute salt-api command
-    $COMMAND_API >> "${LOG_FILE_API}" 2>&1
+    $COMMAND_API
     # Wait until salt-api is populated
     i=0
     while [ $i -lt 10 ]; do
