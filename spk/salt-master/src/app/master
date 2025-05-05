@@ -275,7 +275,7 @@ extension_modules: /var/packages/salt-master/target/share/extensions
 #      - test.*
 external_auth:
   synology:
-    admin:
+    administrators%:
       - .*
       - '@runner'
       - '@wheel'

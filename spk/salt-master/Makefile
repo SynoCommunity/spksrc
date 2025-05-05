@@ -7,9 +7,9 @@ PYTHON_PACKAGE = python312
 SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
-
 DEPENDS = cross/saltgui
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
@@ -34,14 +34,13 @@ SERVICE_PORT_TITLE = Salt Master UI
 ADMIN_PORT = $(SERVICE_PORT)
 
 SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-api
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-cp
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-key
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-master
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-run
-SPK_USR_LOCAL_LINKS += bin:env/bin/salt-unity
-SPK_USR_LOCAL_LINKS += bin:env/bin/spm
 SPK_USR_LOCAL_LINKS += bin:env/bin/salt-ssh
-SPK_USR_LOCAL_LINKS += bin:env/bin/salt-api
+SPK_USR_LOCAL_LINKS += bin:env/bin/spm
 
 USE_ALTERNATE_TMPDIR = 1
 
@@ -100,3 +99,5 @@ salt-master_extra_install:
 	install -m 755 -d $(STAGING_DIR)/share/extensions
 	install -m 755 -d $(STAGING_DIR)/share/extensions/auth
 	install -m 644 src/app/synology.py $(STAGING_DIR)/share/extensions/auth/synology.py
+	install -m 750 -d $(STAGING_INSTALL_PREFIX)/var
+	install -m 644 src/app/salt-auth.txt $(STAGING_INSTALL_PREFIX)/var/salt-auth.txt
