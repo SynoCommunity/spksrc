@@ -9,7 +9,7 @@ DEPENDS = cross/zlib cross/utfcpp
 
 # requires "CMAKE_CXX_STANDARD 17"
 REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS += concerto2k
+UNSUPPORTED_ARCHS = comcerto2k
 
 
 HOMEPAGE = https://taglib.org/

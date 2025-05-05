@@ -11,7 +11,7 @@ DEPENDS = cross/taglib2
 
 # taglib2:
 REQUIRED_MIN_DSM = 7.1
-UNSUPPORTED_ARCHS += concerto2k
+UNSUPPORTED_ARCHS = comcerto2k
 
 HOMEPAGE = https://www.navidrome.org/
 COMMENT  = 🎧☁ Modern Music Server and Streamer compatible with Subsonic/Airsonic.
