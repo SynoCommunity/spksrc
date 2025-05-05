@@ -99,5 +99,3 @@ salt-master_extra_install:
 	install -m 755 -d $(STAGING_DIR)/share/extensions
 	install -m 755 -d $(STAGING_DIR)/share/extensions/auth
 	install -m 644 src/app/synology.py $(STAGING_DIR)/share/extensions/auth/synology.py
-	install -m 750 -d $(STAGING_INSTALL_PREFIX)/var
-	install -m 644 src/app/salt-auth.txt $(STAGING_INSTALL_PREFIX)/var/salt-auth.txt

@@ -20,3 +20,4 @@ include ../../mk/spksrc.install-resources.mk
 saltgui_install:
 	install -m 750 -d $(STAGING_INSTALL_PREFIX)/var
 	rsync -avh --ignore-existing $(WORK_DIR)/$(PKG_DIR)/saltgui $(STAGING_INSTALL_PREFIX)/var/
+	install -m 644 src/salt-auth.txt $(STAGING_INSTALL_PREFIX)/var/saltgui/static/salt-auth.txt
