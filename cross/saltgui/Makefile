@@ -1,5 +1,5 @@
 PKG_NAME = saltgui
-PKG_VERS = 1.27.0
+PKG_VERS = 1.31.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/erwindon/SaltGUI/archive
@@ -20,3 +20,4 @@ include ../../mk/spksrc.install-resources.mk
 saltgui_install:
 	install -m 750 -d $(STAGING_INSTALL_PREFIX)/var
 	rsync -avh --ignore-existing $(WORK_DIR)/$(PKG_DIR)/saltgui $(STAGING_INSTALL_PREFIX)/var/
+	install -m 644 src/salt-auth.txt $(STAGING_INSTALL_PREFIX)/var/saltgui/static/salt-auth.txt
