@@ -38,15 +38,6 @@ DEPENDS += cross/smartmontools
 OPTIONAL_DESC := $(OPTIONAL_DESC)", smartmontools \(smartctl\)"
 endif
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/mergerfs
-OPTIONAL_DESC := $(OPTIONAL_DESC)", mergerfs"
-endif
-
-# IMPORTANT: fuse (v 2.x) (and thus s3backer) must be built after mergerfs 
-DEPENDS += cross/fuse
-DEPENDS += cross/s3backer
-
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/gpart
 OPTIONAL_DESC := $(OPTIONAL_DESC)", gpart"
@@ -98,15 +89,23 @@ SPK_COMMANDS += bin/dua bin/dutree
 SPK_COMMANDS += sbin/smartctl7 sbin/smartctl sbin/smartd sbin/update-smart-drivedb
 endif
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-SPK_COMMANDS += bin/mergerfs bin/mergerfs-fusermount sbin/mount.mergerfs
-endif
-
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 SPK_COMMANDS += sbin/gpart
 endif
 
 include ../../mk/spksrc.spk.mk
+
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/mergerfs
+OPTIONAL_DESC := $(OPTIONAL_DESC)", mergerfs"
+SPK_COMMANDS += bin/mergerfs bin/mergerfs-fusermount sbin/mount.mergerfs
+endif
+endif
+
+# IMPORTANT: fuse (v 2.x) (and thus s3backer) must be built after mergerfs 
+DEPENDS += cross/fuse
+DEPENDS += cross/s3backer
 
 ifeq ($(call version_ge, $(TC_GCC), 4.9.3),1)
 # DAR: Only archs with C++ compiler support for c++14 standard are supported
