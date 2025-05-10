@@ -1,5 +1,5 @@
 PKG_NAME = openssl3
-PKG_VERS = 3.1.7
+PKG_VERS = 3.1.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = openssl-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.openssl.org/source
