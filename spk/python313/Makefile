@@ -4,8 +4,6 @@ SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$
 SPK_REV = 3
 SPK_ICON = src/python3.png
 
-# change to trigger build
-
 # Compiler must support std=c++11
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
