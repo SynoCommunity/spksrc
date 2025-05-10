@@ -15,7 +15,7 @@ LICENSE  = MIT
 
 # Disable build isolation for cryptography < 45.x
 ifeq ($(WHEEL_NAME),cryptography)
-  EXTRA_PIP_ARGS += --no-build-isolation
+EXTRA_PIP_ARGS += --no-build-isolation
 endif
 
 include ../../mk/spksrc.python-module.mk
