@@ -7,6 +7,8 @@ SPK_ICON = src/python3.png
 # Compiler must support std=c++11
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
+# test change to trigger build
+
 DEPENDS  = cross/python312
 DEPENDS += python/pip
 
