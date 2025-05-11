@@ -49,9 +49,11 @@ build_python_wheel_target: prepare_crossenv
 	   exit 2 ; \
 	fi ; \
 	$(MSG) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $$(which cross-python) -m build $(BUILD_ARGS) \
+	          --no-isolation \
 	          --wheel $(WHEELS_BUILD_ARGS) \
 	          --outdir $(WHEELHOUSE) ; \
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $$(which cross-python) -m build $(BUILD_ARGS) \
+	          --no-isolation \
 	          --wheel $(WHEELS_BUILD_ARGS) \
 	          --outdir $(WHEELHOUSE) ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
