@@ -3,6 +3,8 @@ SPK_VERS = 3.0.4.0
 SPK_REV = 11
 SPK_ICON = src/duplicity.png
 
+# change to trigger build
+
 # protobuf: missing atomics support 
 # /upb/port/atomic.h:35:23: fatal error: stdatomic.h: No such file or directory
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
