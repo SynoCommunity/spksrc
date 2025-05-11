@@ -2,10 +2,11 @@ PKG_NAME = metacubexd
 PKG_VERS = 1.186.1
 PKG_EXT = tgz
 PKG_DIST_NAME = compressed-dist.$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/MetaCubeX/metacubexd/releases/download/v$(PKG_VERS)/
+PKG_DIST_SITE = https://github.com/MetaCubeX/metacubexd/releases/download/v$(PKG_VERS)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS =
 
 HOMEPAGE = https://github.com/MetaCubeX/metacubexd
 COMMENT  = Mihomo Dashboard, The Official One, XD
