@@ -1,6 +1,6 @@
 # basic default wheels
 # ==> Always install latest version (service-setup.sh:install_python_virtualenv)
-pip==24.3.1
+#pip==25.0.1    # we use module ensurepip to install latest version included
 setuptools==78.1.0
 wheel==0.45.1
 
@@ -22,7 +22,6 @@ platformdirs==4.3.7
 six==1.17.0
 
 ##
-## All configurations below are optional and
-## are provided to demonstrate how to build
-## various wheels.  Uncoment to enable.
+## Former additional configurations to demonstrate how to build various wheels
+## are moved to spk/python312-wheels
 ##
