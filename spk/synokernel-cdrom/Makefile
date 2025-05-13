@@ -3,9 +3,7 @@ SPK_VERS = 1.3
 SPK_REV = 3
 SPK_ICON = src/$(SPK_NAME).png
 
-# Change to trigger build
-
-DEPENDS = 
+DEPENDS =
 
 REQUIRE_KERNEL ?= 1
 REQUIRE_KERNEL_MODULE  = CONFIG_CDROM_PKTCDVD:drivers/cdrom:cdrom
