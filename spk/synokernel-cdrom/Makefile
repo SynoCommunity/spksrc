@@ -3,6 +3,8 @@ SPK_VERS = 1.3
 SPK_REV = 3
 SPK_ICON = src/$(SPK_NAME).png
 
+# Change to trigger build
+
 DEPENDS = 
 
 REQUIRE_KERNEL ?= 1
