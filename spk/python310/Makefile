@@ -5,7 +5,6 @@ SPK_REV = 22
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/python310
-DEPENDS += python/pip
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
