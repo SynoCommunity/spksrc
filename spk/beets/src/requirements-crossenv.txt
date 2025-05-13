@@ -1,8 +1,10 @@
-# Cross-compiled Dependencies
+# Generated using the requirements script on March 23, 2025
+# NOTE: The following plugins were excluded due to being broken or deprecated:
+# absubmit, docs, import, reflink
 
-charset_normalizer==3.2.0
-jellyfish==0.10.0
-lxml==4.9.3
-MarkupSafe==2.1.3
-Pillow==9.5.0
+charset_normalizer==3.4.1
+jellyfish==1.1.3
+lxml==5.3.1
+MarkupSafe==3.0.2
+#pillow                         ==> python/pillow
 PyYAML==6.0.2

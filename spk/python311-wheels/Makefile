@@ -29,9 +29,16 @@ LICENSE  = PSF
 # IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
 # later additions are ok, but WHEELS must not be empty at this point,
 # otherwise the build of WHEELS is skipped
-WHEELS  = src/requirements-abi3.txt
+WHEELS += src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
+
+SERVICE_SETUP = src/service-setup.sh
+
+OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy_ha
+OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
 
@@ -45,10 +52,10 @@ ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
 DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
 
 # [cryptography]
-# Use cross/cryptography to generate py36-abi3 limited API
+# Use python/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py311-py311 regular build use src/requirements-crossenv.txt
-DEPENDS += cross/cryptography
+DEPENDS += python/cryptography
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
@@ -69,11 +76,11 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 # Needs atomic to build
 # Serves as maturin type python-wheel.mk example
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/pendulum
+DEPENDS += python/pendulum
 endif
 
 # [Pillow]
-DEPENDS += cross/pillow
+DEPENDS += python/pillow
 
 # [pycares]
 DEPENDS += cross/c-ares
@@ -84,7 +91,7 @@ DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
 # [pydantic-core]
-DEPENDS += cross/pydantic-core
+DEPENDS += python/pydantic-core
 
 # [PyNaCl]
 DEPENDS += cross/libsodium
@@ -99,6 +106,15 @@ WHEELS += src/requirements-crossenv-rpds-py.txt
 endif
 
 include ../../mk/spksrc.python.mk
+
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+WHEELS += atom==0.10.5
+WHEELS += atom==0.11.0
+endif
 
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
@@ -120,13 +136,23 @@ WHEELS += src/requirements-crossenv-numpy-armv7l.txt
 else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy-gcc4.txt
 # [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
+else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+
+# [numpy] = 1.25.x
 # BUG numpy==1.25.2 only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-numpy-gcc85-x64.txt
 else
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
+
+# [numpy] >= 1.26|2.x
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
+DEPENDS += python/numpy
+
+# [scipy] - depends on numpy 
+DEPENDS += python/scipy
 endif
 endif
 

@@ -1,10 +1,10 @@
 pip==24.3.1
-setuptools==75.8.0
+setuptools==78.1.0
 wheel==0.45.1
 #
-build:build==1.2.2
 build:Cython==3.0.11
 build:maturin==1.8.1
+build:meson==1.7.0
 build:meson-python==0.17.1
 build:pip-tools==7.4.1
 build:poetry==1.8.5
@@ -13,6 +13,7 @@ build:scikit-build-core==0.10.7
 build:setuptools-rust==1.10.2
 build:setuptools-scm==8.1.0
 #
+cross:build==1.2.2
 cross:cffi==1.17.1
 cross:cryptography==44.0.0
 cross:flit==3.10.1

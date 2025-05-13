@@ -45,8 +45,8 @@ TC_LIBRARY_PATH = $(realpath $(TC_PATH)..)/$(TC_LIBRARY)
 strip_msg:
 	@$(MSG) "Stripping binaries and libraries of $(NAME)"
 
-include_libatomic:
-	@for tclib in libatomic\.so; do \
+include_toolchain_specific_libraries:
+	@for tclib in libatomic\.so libquadmath\.so libgfortran\.so; do \
 	echo  "===> SEARCHING for $${tclib}" ; \
 	cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; do \
 	  case $${type} in \
@@ -91,7 +91,7 @@ include_libatomic:
 
 pre_strip_target: strip_msg
 
-strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST) include_libatomic
+strip_target: $(PRE_STRIP_TARGET) $(INSTALL_PLIST) include_toolchain_specific_libraries
 ifneq ($(strip $(GCC_DEBUG_INFO)),1)
 	@cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; \
 	do \
