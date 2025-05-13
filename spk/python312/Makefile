@@ -1,14 +1,13 @@
 SPK_NAME = python312
-SPK_VERS = 3.12.9
+SPK_VERS = 3.12.10
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 2
+SPK_REV = 4
 SPK_ICON = src/python3.png
 
 # Compiler must support std=c++11
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 DEPENDS  = cross/python312
-DEPENDS += python/pip
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -16,7 +15,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.12
-CHANGELOG = "1. Initial Python 3.12.8 package release"
+CHANGELOG = "1. Update to Python 3.12.10. <br/>2. Install pip with python module ensurepip."
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
