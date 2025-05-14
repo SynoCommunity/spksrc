@@ -1,5 +1,5 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.11.0
+SPK_VERS   = 1.11.1
 SPK_REV    = 13
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
@@ -21,7 +21,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "1. Update OctoPrint to v1.11.0 and depend on Python 3.12."
+CHANGELOG    = "1. Update OctoPrint to v1.11.1 and depend on Python 3.12."
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
