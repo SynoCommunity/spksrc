@@ -1,7 +1,7 @@
 PKG_NAME = dotnet-sdk-8.0
-# Version 8.0.15, SDK 8.0.408
+# Version 8.0.16, SDK 8.0.409
 # https://dotnet.microsoft.com/download/dotnet/8.0
-PKG_VERS = 8.0.408
+PKG_VERS = 8.0.409
 PKG_EXT = tar.gz
 PKG_DIST_NAME = dotnet-sdk-$(PKG_VERS)-linux-x64.$(PKG_EXT)
 PKG_DIST_SITE = https://builds.dotnet.microsoft.com/dotnet/Sdk/${PKG_VERS}
