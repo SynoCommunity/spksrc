@@ -19,7 +19,7 @@
       }, {
         "desc": ""
       }, {
-        "desc": "Der Urbackup Server wird unter DSM unter dem internern service user <b>'sc-urbackup-server'</b> ausgeführt. Dieser user erhält durch die Installation die nötigen Berechtgungen auf den hier konfigurierten Gemeinsamen Ordner. Wenn der Backup Pfad später geändert wird, muss sichergestellt werden, dass 'sc-urbackup-server' darauf zugreifen kann.<br>Bitte <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> für entsprechende Detailinformationen beachten."
+        "desc": "Der Urbackup Server wird unter DSM unter dem internern service user <b>'sc-urbackup-server'</b> ausgeführt. Dieser user erhält durch die Installation die nötigen Berechtigungen auf den hier konfigurierten Gemeinsamen Ordner. Wenn der Backup Pfad später geändert wird, muss sichergestellt werden, dass 'sc-urbackup-server' darauf zugreifen kann.<br>Bitte <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> für entsprechende Detailinformationen beachten."
       }
     ]
   }
