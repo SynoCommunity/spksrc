@@ -1,6 +1,6 @@
 SPK_NAME = ffsync
 SPK_VERS = 0.18.2
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/ffsync.png
 
 DEPENDS = cross/syncstorage-rs cross/diesel
@@ -36,7 +36,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 DEPENDS += cross/openssl3
 
 # [mysqlclient]
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 POST_STRIP_TARGET = ffsync_extra_install
@@ -44,11 +44,11 @@ POST_STRIP_TARGET = ffsync_extra_install
 include ../../mk/spksrc.python.mk
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-WHEELS += src/requirements-crossenv-greenlet-v2.txt
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+WHEELS += src/requirements-crossenv-greenlet-v3.txt
+else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
+WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
-endif
 else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif

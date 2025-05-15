@@ -1,20 +1,18 @@
 SPK_NAME = imagemagick
 SPK_VERS = 7.1.1
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/imagemagick.png
 
 # WARNING: pngquant will fail when built after cross/zlib (i.e. cross/libpng)
-# with prebuilt ffmpeg this is not a problem
-# without prebuilt ffmpeg the "DEPENDS += cross/ffmpeg*" must be defined below
 DEPENDS  = cross/pngquant
 DEPENDS += cross/imagemagick
 # additional tools for image compression:
 DEPENDS += cross/jpegoptim cross/pngcrush
 
-MAINTAINER = SynoCommunity
+MAINTAINER = hgy59
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.  This package includes some tools for image compression, that are not part of imagemagick: jpegoptim, a utility to optimize/compress JPEG files; pngcrush an optimizer for png files.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update ImageMagick to v7.1.1-33 and jpegoptim to v1.5.5.<br/>2. Update libraries to current versions (fontconfig, freetype, giflib, libpng, libtiff, libwebp, openjpeg)<br/>3. Add pngquant."
+CHANGELOG = "1. Update ImageMagick to v7.1.1-33 and jpegoptim to v1.5.5. <br/>2. Support Liquid Rescale (add liblqr). <br/>3. Update libraries to current versions (fontconfig, freetype, giflib, libpng, libtiff, libwebp, openjpeg). <br/>4. Add pngquant."
 
 STARTABLE = no
 
@@ -56,7 +54,8 @@ imagemagick_extra_install: imagemagick_patch_rpath
 	@install -m 644 src/type-dejavu.xml $(STAGING_DIR)/etc/ImageMagick-7/
 	@install -m 644 src/type-windows.xml $(STAGING_DIR)/etc/ImageMagick-7/
 	@install -m 644 src/type-urw-base35.xml $(STAGING_DIR)/etc/ImageMagick-7/
-	@$(MSG) Adjust included libtool files.
-	@for la_file in $(wildcard $(STAGING_DIR)/lib/ImageMagick-7.1.0/modules-Q16HDRI/*/*.la) ; do \
-	  sed -i -e 's#$(INSTALL_DIR)##g' $${la_file} ; \
+	@$(MSG) "Adjust included libtool files (remove $(INSTALL_DIR) in paths)"
+	@for la_file in $(wildcard $(STAGING_DIR)/lib/ImageMagick-${SPK_VERS}/modules-Q16HDRI/*/*.la) ; do \
+	  sed -e 's#$(INSTALL_DIR)//#/#g' -i $${la_file} ; \
+	  sed -e 's#$(INSTALL_DIR)##g' -i $${la_file} ; \
 	done

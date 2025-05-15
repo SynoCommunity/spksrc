@@ -1,0 +1,50 @@
+From 82781d02cd3063d071a501218297a90bde9a314f Mon Sep 17 00:00:00 2001
+From: Marshal Walker <CatmanIX@gmail.com>
+Date: Thu, 8 Dec 2022 11:53:58 -0500
+Subject: [PATCH] ffmpeg5 fix for issue #122
+
+tested on Arch Linux, needs testing on win/mac/etc (should be fine tho)
+---
+ src/audio/ffmpeg_audio_processor_swresample.h | 4 ++--
+ src/audio/ffmpeg_audio_reader.h               | 5 +++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/src/audio/ffmpeg_audio_processor_swresample.h b/src/audio/ffmpeg_audio_processor_swresample.h
+index b1d4bea..e8fcb3f 100644
+--- src/audio/ffmpeg_audio_processor_swresample.h
++++ src/audio/ffmpeg_audio_processor_swresample.h
+@@ -29,7 +29,7 @@ class FFmpegAudioProcessor {
+ 	}
+ 
+ 	void SetInputChannelLayout(AVChannelLayout *channel_layout) {
+-		av_opt_set_int(m_swr_ctx, "in_channel_layout", channel_layout->u.mask, 0);
++		av_opt_set_chlayout(m_swr_ctx, "in_chlayout", channel_layout, 0);
+ 	}
+ 
+ 	void SetInputSampleFormat(AVSampleFormat sample_format) {
+@@ -41,7 +41,7 @@ class FFmpegAudioProcessor {
+ 	}
+ 
+ 	void SetOutputChannelLayout(AVChannelLayout *channel_layout) {
+-		av_opt_set_int(m_swr_ctx, "out_channel_layout", channel_layout->u.mask, 0);
++		av_opt_set_chlayout(m_swr_ctx, "out_chlayout", channel_layout, 0);
+ 	}
+ 
+ 	void SetOutputSampleFormat(AVSampleFormat sample_format) {
+diff --git a/src/audio/ffmpeg_audio_reader.h b/src/audio/ffmpeg_audio_reader.h
+index 1c6b346..35b2934 100644
+--- src/audio/ffmpeg_audio_reader.h
++++ src/audio/ffmpeg_audio_reader.h
+@@ -301,9 +301,10 @@ inline bool FFmpegAudioReader::Read(const int16_t **data, size_t *size) {
+ 				} else {
+ 					m_has_more_frames = false;
+ 				}
++			} else {
++				SetError("Error decoding the audio source", ret);
++				return false;
+ 			}
+-			SetError("Error decoding the audio source", ret);
+-			return false;
+ 		}
+ 
+ 		if (m_frame->nb_samples > 0) {

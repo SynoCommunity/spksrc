@@ -21,14 +21,72 @@ CHANGELOG = "1. Initial package"
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
-# Enable debug_info symgols
+# Enable debug_info symbols
 #GCC_DEBUG_INFO := 1
 
-WHEELS  = src/requirements-abi3.txt
+# IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
+# later additions are ok, but WHEELS must not be empty at this point,
+# otherwise the build of WHEELS is skipped
+WHEELS += src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
+SERVICE_SETUP = src/service-setup.sh
+
+OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy_ha
+OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/scipy
+
 include ../../mk/spksrc.common.mk
+
+# [cryptography]
+# Use python/cryptography to generate py36-abi3 limited API
+# NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
+#       To generate py311-py311 regular build use src/requirements-crossenv.txt
+DEPENDS += python/cryptography
+
+# [mysqlclient]
+DEPENDS += cross/mysql-connector-c
+DEPENDS += cross/mariadb-connector-c
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
+# [Pendulum]
+# Needs atomic to build
+# Serves as maturin type python-wheel.mk example
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += python/pendulum
+endif
+
+# [Pillow]
+DEPENDS += python/pillow
+
+# [pycares]
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
+
+# [pycurl]
+DEPENDS += cross/curl
+ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+
+# [pydantic-core] 
+DEPENDS += python/pydantic-core
+
+# [PyNaCl]
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# [rpds-py]
+# Version >= 0.22.3 requires rustc >= 1.80
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-rpds-py.txt
+endif
+
+include ../../mk/spksrc.python.mk
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
@@ -43,12 +101,6 @@ DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/libb2 cross/fuse 
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [borgbackup] -std=c11
 endif
-
-# [cryptography]
-# Use cross/cryptography to generate py36-abi3 limited API
-# NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
-#       To generate py311-py311 regular build use src/requirements-crossenv.txt
-DEPENDS += cross/cryptography
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
@@ -65,7 +117,7 @@ endif
 
 # [llfuse]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [llfuse] -std=c11
+WHEELS_CFLAGS += [llfuse] -std=gnu11
 endif
 
 # [lxml]
@@ -80,30 +132,17 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
-# [mysqlclient]
-DEPENDS += cross/mysql-connector-c
-DEPENDS += cross/mariadb-connector-c
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
-
 # [numpy]
-ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy.txt
+# gcc-8.4 is the minimal version to build numpy
+# gcc-8.5 happens to be the default version for DSM-7.1
+ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
+DEPENDS += python/numpy
+
+# [scipy] - depends on numpy
+DEPENDS += python/scipy
 endif
-
-# [Pendulum]
-# Needs atomic to build
-# Serves as maturin type python-wheel.mk example
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/pendulum
-endif
-
-# [Pillow]
-DEPENDS += cross/pillow
-
-# [pycares]
-DEPENDS += cross/c-ares
-ENV += PYCARES_USE_SYSTEM_LIB=1
 
 # [pycryptodome]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
@@ -115,36 +154,7 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 endif
 
-# [pycurl]
-DEPENDS += cross/curl
-ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
-
-# [pydantic-core] 
-DEPENDS += cross/pydantic-core
-
-# [PyNaCl]
-DEPENDS += cross/libsodium
-ENV += SODIUM_INSTALL=system
-
-# [PyYAML]
-DEPENDS += cross/libyaml
-
-# [rpds-py]
-# Version >= 0.22.3 requires rustc >= 1.80
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-rpds-py.txt
-endif
-
 # [ruamel.yaml.clib]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
 endif
-
-##
-## Addition of requirements files beyond spksrc.python.mk
-## will not be taken into consideration for processing
-## unless WHEELS has been previously populated. This is due to
-## the makefile analysis phase which discard ifeq instructions.
-##
-
-include ../../mk/spksrc.python.mk

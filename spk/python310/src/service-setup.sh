@@ -2,6 +2,12 @@ PATH="${SYNOPKG_PKGDEST}/bin:$PATH"
 
 service_postinst ()
 {
+    echo "Install pip"
+    # use --default-pip to install 'pip' too (not only pip3 and pip 3.10)
+    # required for packages published with former version of 'install_python_wheels'
+    # that still call pip and not pip3
+    ${SYNOPKG_PKGDEST}/bin/python3 -m ensurepip --default-pip
+    
     # Install the wheels
     install_python_wheels
 
