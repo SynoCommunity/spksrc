@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/openssl3 cross/zlib cross/zstd cross/cryptopp cross/curl
 
-# compiler too old, errors in WebSocketPipe.h
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# compiler too old (urbackupcommon/WebSocketPipe.h)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5-ARCHS)
 
 HOMEPAGE = https://www.urbackup.org/
 COMMENT  = UrBackup is an easy to setup open source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.
