@@ -6,7 +6,7 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/urbackup-server
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5-ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = UrBackup is an easy to setup Open Source client/server backup system, that through a combination of image and file backups accomplishes both data safety and a fast restoration time.
