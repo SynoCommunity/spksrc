@@ -1,61 +1,47 @@
 #!/bin/bash
-#
+
 # Part of GitHub build action.
 # This script downloads source files for cross and python packages as part of our build process.
 #
 # Functions:
-# - Download all referenced native and cross source files for packages.
-# - Download all referenced python wheels needed to build.
-# - Use "download-all" target to get all files when a package has multiple (architecture-specific) files.
-
+#  - Download all referenced native and cross source files for packages.
+#  - Download all referenced python wheels needed to build.
+#  - Use the “download-all” target when a package has multiple (arch-specific) files.
+#
 set -euo pipefail
+# Report any error (with line and package context) and exit.
+trap 'echo "::error::Error on line ${LINENO} while processing ${current:-<none>}"; exit 1' ERR
 
-# Function to print an error message and exit.
-fail() {
-    echo "::error::$*" >&2
-    exit 1
-}
+# Ensure required tooling is present.
+command -v make >/dev/null 2>&1 || { echo "::error::make is not installed"; exit 1; }
 
-# Check for required commands.
-command -v make >/dev/null 2>&1 || fail "make is not installed"
-
-# Function to download a package and verify its checksum.
-download_package() {
-    local package_dir="$1"
-    local target="$2"
-
-    echo "===> Attempting to download: ${package_dir}"
-    if ! make -C "${package_dir}" "${target}"; then
-        fail "Failed to download ${package_dir}."
-    fi
-    # Verify checksum after download.
-    if ! make -C "${package_dir}" checksum; then
-        fail "Checksum verification failed for ${package_dir}."
-    fi
-    echo "===> Successfully downloaded: ${package_dir}"
-}
-
-# Download regular cross/* sources.
+echo ""
+# 1) Download native / cross-compiled sources.
 if [ -z "${DOWNLOAD_PACKAGES:-}" ]; then
-    echo "===> No packages to download. <==="
+  echo "===> No packages to download. <==="
 else
-    echo "===> Download packages: ${DOWNLOAD_PACKAGES}"
-    for download in ${DOWNLOAD_PACKAGES}; do
-        download_package "${download}" "download-all"
-    done
+  echo "===> Downloading packages: ${DOWNLOAD_PACKAGES}"
+  for current in ${DOWNLOAD_PACKAGES}; do
+    echo "  → ${current}: download-all then checksum"
+    # download-all pulls down all sources; checksum verifies them.
+    make -C "${current}" download-all checksum
+  done
 fi
 
 echo ""
-
-# Download python wheel source files.
-build_packages="${NOARCH_PACKAGES:-} ${ARCH_PACKAGES:-}"
-if [ -z "${build_packages}" ]; then
-    echo "===> No wheels to download. <==="
+# 2) Download Python wheel source files.
+build_pkgs=( ${NOARCH_PACKAGES:-} ${ARCH_PACKAGES:-} )
+if [ ${#build_pkgs[@]} -eq 0 ]; then
+  echo "===> No wheels to download. <==="
 else
-    echo "===> Download wheels: ${build_packages}"
-    for package in ${build_packages}; do
-        download_package "spk/${package}" "download-wheels"
-    done
+  echo "===> Downloading wheels: ${build_pkgs[*]}"
+  for pkg in "${build_pkgs[@]}"; do
+    current="spk/${pkg}"
+    echo "  → ${current}: download-wheels then checksum"
+    # download-wheels grabs all needed .whl files; checksum verifies them.
+    make -C "${current}" download-wheels checksum
+  done
 fi
 
+echo ""
 echo "===> All downloads completed successfully."
