@@ -1,8 +1,10 @@
 SPK_NAME = flexget
 SPK_VERS = 3.15.31
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/${SPK_NAME}.png
 
+# Needs atomic to build
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
@@ -10,7 +12,7 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-CHANGELOG = "1. Update FlexGet to v3.15.31.<br/>2. Migrate to Python 3.12."
+CHANGELOG = "1. Update FlexGet to v3.15.31. <br/>2. Migrate to Python 3.12. <br/>3. Avoid config overwrite on package update."
 STARTABLE = yes
 
 HOMEPAGE = https://flexget.com/
@@ -23,7 +25,7 @@ POST_STRIP_TARGET = flexget_extra_install
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8290
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_PORT_TITLE = Flexget web ui
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
@@ -32,10 +34,7 @@ USE_ALTERNATE_TMPDIR = 1
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/flexget bin:env/bin/flexget-headless
 
-# Needs atomic to build
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
-
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
 # [Pendulum]
 # Needs atomic to build
@@ -65,4 +64,5 @@ endif
 
 .PHONY: flexget_extra_install
 flexget_extra_install:
-	install -m 644 src/config.yml $(STAGING_DIR)/share/
+	install -m 755 -d $(STAGING_DIR)/var
+	install -m 644 src/config.yml $(STAGING_DIR)/var/
