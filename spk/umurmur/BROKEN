@@ -1,4 +1,0 @@
-umurmur needs update to >= 0.3.0
-for compatibility with mbedtls 3.x
-
-see https://github.com/umurmur/umurmur/issues/180
