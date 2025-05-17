@@ -16,7 +16,10 @@ HOMEPAGE = https://www.kiwix.org/
 COMMENT  = Common code base for all Kiwix ports.
 LICENSE  = GPLv3
 
-GNU_CONFIGURE = 1
 CONFIGURE_ARGS = -Dwerror=false
+
+# Using patches/001-Fix-build-with-ICU-77.patch
+# instead of passing additional LD flags
+#ADDITIONAL_LDFLAGS = -licui18n -licuuc -licudata
 
 include ../../mk/spksrc.cross-meson.mk
