@@ -23,9 +23,4 @@ service_postinst ()
 
     # Install the wheels
     install_python_wheels
-
-    # Copy "config.yml" file to the "var/" folder
-    mkdir -p ${SYNOPKG_PKGVAR}
-    cp -f ${SYNOPKG_PKGDEST}/share/config.yml ${SYNOPKG_PKGVAR}/
 }
-
