@@ -153,7 +153,6 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        localFile=$$(basename $${url}) ; \
 	      fi ; \
 	      url=$$(echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#') ; \
-	      url=$$(echo $${url} | sed -e 's#https://download\.gnome\.org/sources#https://cdimage.debian.org/mirror/gnome.org/sources#') ; \
 	      exec 9> /tmp/wget.$${localFile}.lock ; \
 	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 9 || exit 1 ; \
 	      pid=$$$$ ; \

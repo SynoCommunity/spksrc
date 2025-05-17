@@ -1,60 +1,73 @@
-aiohttp==3.8.5
-bcrypt==4.1.1
-bitstruct==8.17.0
-bluetooth_data_tools==1.3.0
-Brotli==1.0.9
-cbor2==5.4.6
-cffi==1.15.1
-chacha20poly1305_reuseable==0.4.1
-ciso8601==2.3.0
-coverage==7.2.7
+aioesphomeapi==28.0.0
+aiohttp==3.11.11
+aiokafka==0.10.0
+apischema==0.19.0
+### av==13.1.0                  # install from index (available for x86_64, aarch64, i686)
+### awscrt==0.24.1              # install from index (available for x86_64, aarch64)
+bcrypt==4.2.0
+bitarray==2.9.3
+bitstruct==8.20.0
+bluetooth_data_tools==1.20.0
+Brotli==1.1.0
+cached_ipaddress==0.8.0
+caio==0.9.21
+cbor2==5.6.5
+cffi==1.17.1
+ciso8601==2.3.1
+convertertools==0.6.1
+coverage==7.7.1
 crcmod==1.7
-cryptography==41.0.3
-dbus_fast==1.86.0
-ephem==4.1.2
-faust_cchardet==2.1.18
-fnv_hash_fast==0.3.1
-frozenlist==1.4.0
-greenlet==2.0.2
-# grpcio==1.51.1        # fails to build, but grpcio==1.56.x successfully installs as dependency
-guppy3==3.1.3
-#ha_av==10.1.0          # fails to build, depends on libav from ffmpeg, but successfully installs as dependency
-home_assistant_bluetooth==1.10.0
-kasa_crypt==0.3.0
-lru_dict==1.2.0
-lxml==4.9.1
-MarkupSafe==2.1.3
-miniaudio==1.59
-msgpack==1.0.5
-multidict==6.0.4
+cryptography==43.0.1
+dbus_fast==2.24.3
+debugpy==1.8.8
+### deebot_client==9.4.0        # install from index (available for x86_64 only)
+### DTLSSocket==0.1.19          # pip wheel fails to cross compile, use python/dtlssocket
+ephem==4.1.6
+faust_cchardet==2.1.19
+fnv_hash_fast==1.0.2
+frozenlist==1.5.0
+greenlet==3.1.1
+### grpcio==1.67.1              # install from index
+guppy3==3.1.4.post1
+habluetooth==3.6.0
+ijson==3.3.0
+### isal==1.7.1                 # fails to cross compile: install from index (available for x86_64, aarch64)
+jiter==0.9.0
+kasa_crypt==0.6.1
+lru_dict==1.3.0
+lxml==5.3.0
+MarkupSafe==3.0.2
+miniaudio==1.61
+msgpack==1.1.0
+multidict==6.2.0
 netifaces==0.11.0
-numpy==1.24.4
-orjson==3.9.1
-# pandas==2.0.3         # depends on installed numpy wheel ?...
-Pillow==9.5.0
-protobuf==4.23.1
-psutil==5.9.5
-pycares==4.3.0
+#numpy==2.1.3                   # temp. moved to requirements-numpy.txt
+orjson==3.10.12
+### pandas==2.2.3               # maturin error, install from index (available for x86_64, aarch64)
+### pillow==11.0.0              # use python/pillow_ha
+propcache==0.2.1
+protobuf==5.28.3
+psutil==6.1.0
+pyads==3.4.0
+pycares==4.5.0
 pycrc16==0.1.2
-#pycryptodome==3.18.0   => abi3
-#pycryptodomex==3.18.0  => abi3
-pydantic==1.10.12
+#pycryptodome==3.22.0   => abi3
+#pycryptodomex==3.22.0  => abi3
+pydantic_core==2.32.0
 pyitachip2ir==0.0.7
+pymicro_vad==1.0.1
 PyNaCl==1.5.0
+pyspeex_noise==1.0.2
 PyYAML==6.0.2
-regex==2021.8.28
-rpds_py==0.9.2
-simplejson==3.19.1
-SQLAlchemy==2.0.15
-tornado==6.3.2
-ulid_transform==0.7.2
-
-# [webrtcvad]
-# webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
-git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad==2.0.10
-
-websockets==11.0.3
-wrapt==1.15.0
-yarl==1.9.2
-zeroconf==0.70.0
-zope.interface==6.0
+regex==2024.11.6
+rpds_py==0.21.0
+simplejson==3.20.1
+SQLAlchemy==2.0.36
+tokenizers==0.21.1
+ujson==5.10.0
+ulid_transform==1.0.2
+uv==0.5.4
+websockets==15.0.1
+wrapt==1.17.2
+yarl==1.18.3
+zeroconf==0.136.2

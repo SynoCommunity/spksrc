@@ -1,10 +1,10 @@
 PKG_NAME = dotnet-sdk-6.0
-# Version 6.0.29, SDK 6.0.421
+# Version 6.0.36, SDK 6.0.428 (final version, EOL since November 12, 2024)
 # https://dotnet.microsoft.com/download/dotnet/6.0
-PKG_VERS = 6.0.421
+PKG_VERS = 6.0.428
 PKG_EXT = tar.gz
 PKG_DIST_NAME = dotnet-sdk-$(PKG_VERS)-linux-x64.$(PKG_EXT)
-PKG_DIST_SITE = https://dotnetcli.azureedge.net/dotnet/Sdk/${PKG_VERS}
+PKG_DIST_SITE = https://builds.dotnet.microsoft.com/dotnet/Sdk/${PKG_VERS}
 
 HOMEPAGE = https://dotnet.microsoft.com/
 COMMENT  = A developer platform for building apps.

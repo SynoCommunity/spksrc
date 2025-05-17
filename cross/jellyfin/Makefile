@@ -1,10 +1,13 @@
 PKG_NAME = jellyfin
-PKG_VERS = 10.10.3
+PKG_VERS = 10.10.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jellyfin/jellyfin/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+# font for library thumbnail
+DEPENDS += cross/dejavu
 
 HOMEPAGE = https://jellyfin.org
 COMMENT  = The Free Software Media System. It is an alternative to the proprietary Emby and Plex.

@@ -1,10 +1,14 @@
 SPK_NAME = comskip
-SPK_VERS = 0.82.010
-SPK_REV = 12
+SPK_VERS = 0.83
+SPK_REV = 13
 SPK_ICON = src/comskip.png
 
-FFMPEG_PACKAGE = ffmpeg5
-DEPENDS = cross/$(SPK_NAME)
+FFMPEG_PACKAGE = ffmpeg7
+
+# ffmpeg7 no longer support armv5
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
+DEPENDS = cross/comskip
 SPK_DEPENDS = $(FFMPEG_PACKAGE)
 
 STARTABLE = no
@@ -12,7 +16,7 @@ STARTABLE = no
 MAINTAINER = SynoCommunity
 DESCRIPTION = Comskip is a free mpeg commercial detector. Read the wiki on how to use and configure it.
 DISPLAY_NAME = Comskip
-CHANGELOG = "1. Update to latest git hash from June 7th 2024<br/>2. Migrate to using ffmpeg5 version 5.1.5 using new synocli-videodriver package"
+CHANGELOG = "1. Update to version 0.83<br/>2. Migrate to using ffmpeg7"
 
 HOMEPAGE = https://www.kaashoek.com/comskip/
 LICENSE = LGPL

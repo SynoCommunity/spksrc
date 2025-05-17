@@ -1,39 +1,41 @@
-# Wheels that absolutely needs
-# to be managed as pure-python
-pycparser==2.22
-feedparser==6.0.11
-configobj==5.0.8
-cheroot==10.0.1
-cherrypy==18.10.0
-jaraco.functools==4.0.2
-jaraco.collections==5.0.0
-jaraco.text==3.8.1 # Newer version introduces irrelevant extra dependencies
-jaraco.classes==3.4.0
-jaraco.context==4.3.0
-more-itertools==10.4.0
-zc.lockfile==3.0.post1
-python-dateutil==2.9.0.post0
-tempora==5.7.0
-pytz==2024.1
-sgmllib3k==1.0.0
-portend==3.2.0
-chardet==5.2.0
-PySocks==1.7.1
-puremagic==1.27
-guessit==3.8.0
+# Generated using the requirements script on April 11, 2025
+
+apprise==1.9.3
 babelfish==0.6.1
-rebulk==3.2.0
-
-# Apprise Requirements
-apprise==1.8.1
-requests==2.32.3
-requests-oauthlib==2.0.0
-markdown==3.6
-paho-mqtt==1.6.1 # Pinned, newer versions don't work with AppRise yet
-
-# Requests Requirements
-idna==3.7
-urllib3==2.2.2
+blinker==1.9.0
+#certifi                        ==> python312
+chardet==5.2.0
+cheroot==10.0.1
+CherryPy==18.10.0
+click==8.1.8
+configobj==5.0.9
+feedparser==6.0.11
+guessit==3.8.0
+idna==3.10
+jaraco.classes==3.4.0
+jaraco.collections==5.0.0
+jaraco.context==4.3.0
+jaraco.functools==4.1.0
+jaraco.text==3.8.1
+Markdown==3.7
+more_itertools==10.6.0
+notify2==0.3.1
 oauthlib==3.2.2
-PyJWT==2.9.0
-blinker==1.8.2
+paho_mqtt==1.6.1
+#pip                            ==> python312
+portend==3.2.0
+puremagic==1.28
+pycparser==2.22
+PyJWT==2.10.1
+PySocks==1.7.1
+python_dateutil==2.9.0.post0
+pytz==2025.2
+rebulk==3.2.0
+requests==2.32.3
+requests_oauthlib==2.0.0
+#setuptools                     ==> python312
+sgmllib3k==1.0.0
+#six                            ==> python312
+tempora==5.8.0
+urllib3==2.3.0
+zc.lockfile==3.0.post1

@@ -1,11 +1,10 @@
 SPK_NAME = python310
-SPK_VERS = 3.10.15
+SPK_VERS = 3.10.16
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 21
+SPK_REV = 22
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/python310
-DEPENDS += cross/pip
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -13,7 +12,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.10
-CHANGELOG = "1. Update to Python 3.10.15<br/>2. Update all mandatory wheels"
+CHANGELOG = "1. Update to Python 3.10.16<br/>2. Update all mandatory wheels"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -49,10 +48,10 @@ WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-abi3.txt
 
 # [cryptography]
-# Use cross/cryptography to generate py36-abi3 limited API
+# Use python/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py310-py310 regular build use src/requirements-crossenv.txt
-DEPENDS += cross/cryptography
+DEPENDS += python/cryptography
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
@@ -163,7 +162,5 @@ endif
 
 .PHONY: python310_extra_install
 python310_extra_install:
-	@$(MSG) - Remove test folder
-	rm -rf $(STAGING_DIR)/$(PYTHON_LIB_DIR)/test/
 	@$(MSG) - Remove compiled files from __pycache__
 	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' -delete

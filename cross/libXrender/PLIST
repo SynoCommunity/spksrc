@@ -1,5 +1,3 @@
-rsc:include/X11/extensions/Xrender.h
 lnk:lib/libXrender.so
 lnk:lib/libXrender.so.1
 lib:lib/libXrender.so.1.3.0
-rsc:lib/pkgconfig/xrender.pc

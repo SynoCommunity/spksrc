@@ -3,7 +3,7 @@ SPK_VERS = 1.2
 SPK_REV = 9
 SPK_ICON = src/$(SPK_NAME).png
 
-DEPENDS = 
+DEPENDS =
 
 REQUIRE_KERNEL ?= 1
 REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL_OPTION:drivers/usb/serial:usbserial

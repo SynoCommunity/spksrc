@@ -1,5 +1,5 @@
 PKG_NAME = mantisbt
-PKG_VERS = 2.26.3
+PKG_VERS = 2.27.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/$(PKG_NAME)/files/mantis-stable/$(PKG_VERS)

@@ -1,11 +1,19 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 4.3.3
-SPK_REV = 71
+SPK_VERS = 4.5.1
+SPK_REV = 76
 SPK_ICON = src/sabnzbd.png
 
-PYTHON_PACKAGE = python311
-DEPENDS = cross/busybox cross/par2cmdline-turbo cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python311>=3.11.5-8"
+PYTHON_PACKAGE = python312
+
+DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
+OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
+
+# python311 not supported
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# unrar not supported
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+
+SPK_DEPENDS = $(PYTHON_PACKAGE)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -15,7 +23,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 4.3.3."
+CHANGELOG = "1. Update to SABnzbd 4.5.1.<br/>2. Migrate to Python 3.12."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -28,21 +36,24 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8080
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-# Ensure C++11 compatibility for unrar
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
+DEPENDS += cross/unrar
+else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+DEPENDS += cross/unrar
+else
+DEPENDS += cross/unrar7
+endif
+
 POST_STRIP_TARGET = sabnzbd_extra_install
 
-# Add nice and ionice commands
-ENV += BUSYBOX_CONFIG="nice ionice"
-
-SPK_COMMANDS = bin/7za
+SPK_COMMANDS = bin/7zz
 
 # [cryptography]
-DEPENDS += cross/cryptography
+DEPENDS += cross/openssl3
 
 include ../../mk/spksrc.python.mk
 

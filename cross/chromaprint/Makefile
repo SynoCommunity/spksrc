@@ -1,9 +1,9 @@
 PKG_NAME = chromaprint
 PKG_VERS = 1.5.1
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/acoustid/chromaprint/archive
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/acoustid/chromaprint/archive/refs/tags
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 #PKG_GIT_HASH = aa67c95b9e486884a6d3ee8b0c91207d8c2b0551

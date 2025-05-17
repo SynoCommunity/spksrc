@@ -1,6 +1,6 @@
 SPK_NAME = kavita
-SPK_VERS = 0.8.3.2
-SPK_REV = 7
+SPK_VERS = 0.8.6.2
+SPK_REV = 10
 SPK_ICON = src/kavita.png
 
 DEPENDS = cross/kavita
@@ -14,7 +14,7 @@ REQUIRED_MIN_DSM = 7.0
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION  = Kavita is a fast, feature rich, cross platform reading server. Built with a focus for being a full solution for all your reading needs.
-CHANGELOG = "Update Kavita to v0.8.3.2"
+CHANGELOG = "Update Kavita to v0.8.6.2"
 DISPLAY_NAME = Kavita
 HOMEPAGE = https://www.kavitareader.com/
 LICENSE  = GPLv3

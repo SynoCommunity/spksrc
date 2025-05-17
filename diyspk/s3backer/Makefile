@@ -1,5 +1,5 @@
 SPK_NAME = s3backer
-SPK_VERS = 2.1.1
+SPK_VERS = 2.1.3
 SPK_REV = 1
 
 DEPENDS = cross/s3backer

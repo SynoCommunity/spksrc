@@ -1,5 +1,5 @@
 PKG_NAME = cloudflared
-PKG_VERS = 2024.10.1
+PKG_VERS = 2025.4.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cloudflare/cloudflared/archive
@@ -23,7 +23,7 @@ GOROOT_BOOTSTRAP=$(WORK_DIR)/../../../native/go/work-native/go/
 .PHONY: cloudflared_compile
 cloudflared_compile:
 ifeq (,$(wildcard /tmp/go))
-	@$(MSG) "- Call install-cloudflare-go.sh"
+	@$(MSG) "- Install cloudflare go toolchain"
 	@$(RUN) GOARCH= GOOS= GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP) .teamcity/install-cloudflare-go.sh
 endif
 	@$(MSG) "- Build cloudflared"

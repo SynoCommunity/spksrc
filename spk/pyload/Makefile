@@ -4,7 +4,7 @@ SPK_REV = 4
 SPK_ICON = src/pyload.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/pyload
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
