@@ -12,7 +12,7 @@ endif
 BUILD_DEPENDS = cross/python312
 DEPENDS = cross/openssl3 cross/libicu cross/zlib cross/argon2
 
-# Ensure C++11 compatibility
+# Ensure C++17 compatibility
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 
