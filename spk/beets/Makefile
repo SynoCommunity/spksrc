@@ -1,11 +1,13 @@
 SPK_NAME = beets
-SPK_VERS = 2.2.0
+SPK_VERS = 2.3.1
 SPK_REV = 11
 SPK_ICON = src/beets.png
 
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "$(PYTHON_PACKAGE)"
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = comcerto2k $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -14,7 +16,7 @@ DESCRIPTION = "Beets is the media library management system for obsessive music 
 
 DISPLAY_NAME = beets
 STARTABLE = no
-CHANGELOG = "1. Migrate to Python 3.12."
+CHANGELOG = "1. Update beets to 2.3.1.<br/>2. Migrate to Python 3.12."
 
 HOMEPAGE = http://beets.io/
 LICENSE  = GPL
@@ -23,35 +25,28 @@ SERVICE_SETUP = src/service-setup.sh
 
 SPK_COMMANDS = env/bin/beet
 
+# NOTE: Built with support for the following plugins:
+# aura, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, mpdstats, plexupdate, scrub, sonosupdate, thumbnails, web.
+
+# [lxml]
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+
 # [Pillow]
 DEPENDS += python/pillow
 
 # [PyYAML]
 DEPENDS += cross/libyaml
 
-# NOTE: Built with support for the following plugins:
-# aura, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, mpdstats, plexupdate, scrub, sonosupdate, thumbnails, web.
-
-include ../../mk/spksrc.python.mk
-
-# [lxml]
-DEPENDS += cross/libxml2
-DEPENDS += cross/libxslt
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [lxml] -std=c11
-endif
-
 # [numpy]
 # gcc-8.4 is the minimal version to build numpy
 # gcc-8.5 happens to be the default version for DSM-7.1
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy
-endif
 
 # [scipy] - depends on numpy
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/scipy
-endif
+
+include ../../mk/spksrc.python.mk
 
 # TODO: The following plugins are currently unsupported due to dependency issues:
 # autobpm, bpd, metasync, and replaygain.
@@ -61,11 +56,6 @@ endif
 
 # [llvmlite]
 #DEPENDS += cross/llvm
-
-# [msgpack]
-#ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-#WHEELS_CFLAGS += [msgpack] -std=c11
-#endif
 
 # [pycairo]
 #DEPENDS += cross/cairo					# Could not invoke sanity test executable
