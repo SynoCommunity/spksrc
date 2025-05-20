@@ -41,6 +41,18 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [lxml] -std=c11
 endif
 
+# [numpy]
+# gcc-8.4 is the minimal version to build numpy
+# gcc-8.5 happens to be the default version for DSM-7.1
+ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy
+endif
+
+# [scipy] - depends on numpy
+ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/scipy
+endif
+
 # TODO: The following plugins are currently unsupported due to dependency issues:
 # autobpm, bpd, metasync, and replaygain.
 
