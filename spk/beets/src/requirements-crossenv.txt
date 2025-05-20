@@ -14,10 +14,10 @@ PyYAML==6.0.2
 # TODO: The following plugins are currently unsupported due to dependency issues:
 # autobpm, bpd, metasync, and replaygain.
 
-#cffi==1.17.1
+cffi==1.17.1
 #dbus_python==1.4.0             # Dependency "dbus-1" not found
 #llvmlite==0.44.0               # Could not find a `llvm-config` binary
-#msgpack==1.1.0
+msgpack==1.1.0
 #numba==0.61.2                  # ModuleNotFoundError: No module named 'numpy'
 #pycairo==1.28.0                # Dependency "cairo" not found
 #pygobject==3.52.3              # Dependency 'gobject-introspection-1.0' is required but not found
