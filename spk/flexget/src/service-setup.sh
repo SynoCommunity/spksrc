@@ -1,4 +1,4 @@
-PYTHON_DIR="/var/packages/python311/target/bin"
+PYTHON_DIR="/var/packages/python312/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 CONFIG_FILE="${SYNOPKG_PKGVAR}/config.yml"
@@ -23,9 +23,4 @@ service_postinst ()
 
     # Install the wheels
     install_python_wheels
-
-    # Copy "config.yml" file to the "var/" folder
-    mkdir -p ${SYNOPKG_PKGVAR}
-    cp -f ${SYNOPKG_PKGDEST}/share/config.yml ${SYNOPKG_PKGVAR}/
 }
-

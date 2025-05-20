@@ -21,7 +21,7 @@ CHANGELOG = "1. Initial package"
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
-# Enable debug_info symgols
+# Enable debug_info symbols
 #GCC_DEBUG_INFO := 1
 
 # IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
@@ -41,10 +41,10 @@ OPTIONAL_DEPENDS += python/scipy
 include ../../mk/spksrc.common.mk
 
 # [cryptography]
-# Use cross/cryptography to generate py36-abi3 limited API
+# Use python/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py311-py311 regular build use src/requirements-crossenv.txt
-DEPENDS += cross/cryptography
+DEPENDS += python/cryptography
 
 # [mysqlclient]
 DEPENDS += cross/mysql-connector-c
@@ -137,7 +137,7 @@ endif
 
 # [numpy]
 # gcc-8.4 is the minimal version to build numpy
-# gcc-8.5 hapens to be the default version for DSM-7.1
+# gcc-8.5 happens to be the default version for DSM-7.1
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy_ha

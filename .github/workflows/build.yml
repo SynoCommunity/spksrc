@@ -56,6 +56,7 @@ on:
     paths:
       - 'spk/**'
       - 'cross/**'
+      - 'python/**'
       - 'native/**'
   push:
     branches:
@@ -63,6 +64,7 @@ on:
     paths:
       - 'spk/**'
       - 'cross/**'
+      - 'python/**'
       - 'native/**'
 
 jobs:
@@ -87,8 +89,8 @@ jobs:
         run: |
           git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
           echo "spk_packages=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Get changed spk_packages and dependency_folders of last commit for push
         if: github.event_name == 'push'
@@ -96,8 +98,8 @@ jobs:
         run: |
           git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
           echo "spk_packages=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Evaluate dependencies
         id: dependencies

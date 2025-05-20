@@ -5,7 +5,6 @@ SPK_REV = 22
 SPK_ICON = src/python3.png
 
 DEPENDS  = cross/python310
-DEPENDS += cross/pip
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -49,10 +48,10 @@ WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-abi3.txt
 
 # [cryptography]
-# Use cross/cryptography to generate py36-abi3 limited API
+# Use python/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py310-py310 regular build use src/requirements-crossenv.txt
-DEPENDS += cross/cryptography
+DEPENDS += python/cryptography
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
