@@ -11,4 +11,6 @@ HOMEPAGE = https://gitlab.freedesktop.org/xorg/lib/libpciaccess
 COMMENT  = Generic PCI access library.
 LICENSE  = https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/blob/master/COPYING
 
+ADDITIONAL_CFLAGS = -O
+
 include ../../mk/spksrc.cross-meson.mk
