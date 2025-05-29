@@ -21,6 +21,7 @@ lib:lib/znc/clientbuffer.so
 lib:lib/znc/clientnotify.so
 lib:lib/znc/colloquy.so
 lib:lib/znc/controlpanel.so
+lib:lib/znc/corecaps.so
 lib:lib/znc/crypt.so
 lib:lib/znc/ctcpflood.so
 lib:lib/znc/dcc.so

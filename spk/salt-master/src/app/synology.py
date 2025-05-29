@@ -4,7 +4,7 @@ import os
 import pwd
 import subprocess
 
-from salt.utils import get_group_list
+from salt.utils.user import get_group_list
 
 
 def auth(username, password):
