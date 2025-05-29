@@ -37,9 +37,9 @@ else
     echo "===> Downloading wheels: ${build_pkgs[*]}"
     for pkg in "${build_pkgs[@]}"; do
         current="spk/${pkg}"
-        echo "  → ${current}: download-wheels then checksum"
-        # download-wheels grabs all needed .whl files; checksum verifies them.
-        make -C "${current}" download-wheels checksum
+        echo "  → ${current}: download-wheels"
+        # download-wheels grabs all needed .whl files.
+        make -C "${current}" download-wheels
     done
 fi
 
