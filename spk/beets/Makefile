@@ -1,11 +1,13 @@
 SPK_NAME = beets
-SPK_VERS = 2.2.0
-SPK_REV = 10
+SPK_VERS = 2.3.1
+SPK_REV = 11
 SPK_ICON = src/beets.png
 
-PYTHON_PACKAGE = python311
-SPK_DEPENDS = "python311>=3.11.5-8"
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "$(PYTHON_PACKAGE)"
+
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = comcerto2k $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -14,7 +16,7 @@ DESCRIPTION = "Beets is the media library management system for obsessive music 
 
 DISPLAY_NAME = beets
 STARTABLE = no
-CHANGELOG = "1. Upgrade beets to 2.2.0.<br/>2. Update to all wheels."
+CHANGELOG = "1. Update beets to 2.3.1.<br/>2. Migrate to Python 3.12."
 
 HOMEPAGE = http://beets.io/
 LICENSE  = GPL
@@ -22,6 +24,12 @@ LICENSE  = GPL
 SERVICE_SETUP = src/service-setup.sh
 
 SPK_COMMANDS = env/bin/beet
+
+# NOTE: Built with support for the following plugins:
+# aura, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, mpdstats, plexupdate, scrub, sonosupdate, thumbnails, web.
+
+# [lap]
+DEPENDS += python/lap
 
 # [lxml]
 DEPENDS += cross/libxml2
@@ -33,10 +41,24 @@ DEPENDS += python/pillow
 # [PyYAML]
 DEPENDS += cross/libyaml
 
-# NOTE: Built with support for the following plugins:
-# aura, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, mpdstats, plexupdate, scrub, sonosupdate, thumbnails, web.
+# [numpy]
+# gcc-8.4 is the minimal version to build numpy
+# gcc-8.5 happens to be the default version for DSM-7.1
+DEPENDS += python/numpy
 
-# NOTE: The following plugins are currently unsupported due to dependency issues:
-# autobpm, bpd, metasync, and replaygain.
+# [scipy] - depends on numpy
+DEPENDS += python/scipy
 
 include ../../mk/spksrc.python.mk
+
+# TODO: The following plugins are currently unsupported due to dependency issues:
+# autobpm, bpd, metasync, and replaygain.
+
+# [dbus_python]
+#DEPENDS += cross/dbus					# expat not found!
+
+# [llvmlite]
+#DEPENDS += cross/llvm
+
+# [pycairo]
+#DEPENDS += cross/cairo					# Could not invoke sanity test executable
