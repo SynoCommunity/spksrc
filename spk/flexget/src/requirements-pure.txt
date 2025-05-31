@@ -43,7 +43,7 @@ markdown_it_py==3.0.0
 mdurl==0.1.2
 more_itertools==10.7.0
 packaging==25.0
-pip==24.3.1
+#pip==24.3.1                            ==> python312
 plumbum==1.9.0
 portend==3.2.1
 pygments==2.19.1
