@@ -22,16 +22,11 @@ DEPENDS = cross/zlib
 DEPENDS += cross/openssl3
 CMAKE_ARGS += -DWANT_OPENSSL=true
 
-##DEPENDS += cross/libiconv
-##DEPENDS += cross/boost_1.86
-##CMAKE_ARGS += -DWANT_I18N=true
-###export BOOST_BUILD_PATH="$(WORK_DIR)/boost_1_86_0"
-###export BOOST_LIBRARIES="system python chrono random"
-##BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_86_0
-##BOOST_LIBRARIES += system python chrono random
-##ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
-##ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
-##ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
+#DEPENDS += cross/boost_1.86
+CMAKE_ARGS += -DWANT_I18N=true
+#export BOOST_BUILD_PATH="$(WORK_DIR)/boost_1_86_0"
+#export BOOST_LIBRARIES="locale"
+#ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
 
 DEPENDS += cross/argon2
 CMAKE_ARGS += -DWANT_ARGON=true
