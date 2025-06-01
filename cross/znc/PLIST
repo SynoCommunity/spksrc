@@ -1,4 +1,7 @@
 bin:bin/znc
+rsc:bin/znc-buildmod
+lnk:lib/libboost_locale.so
+lib:lib/libboost_locale.so.1.86.0
 lib:lib/znc/admindebug.so
 lib:lib/znc/adminlog.so
 lib:lib/znc/alias.so
