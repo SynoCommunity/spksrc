@@ -7,7 +7,7 @@ OPTIONAL_DEPENDS = cross/libstdc++
 DEPENDS = cross/radarr
 
 # Arch exclusions for dotnet 6.0
-DOTNET_SERVARR_ARCHS = 1
+DOTNET_SERVARR_ARCHS = 2
 
 MAINTAINER = Team Radarr
 MAINTAINER_URL = https://radarr.video/

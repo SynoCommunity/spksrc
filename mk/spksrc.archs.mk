@@ -74,3 +74,10 @@ ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k
     UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
 endif
+
+# Exclusions for dotnet 6.0 servarr apps (except x86)
+# ARMv7 incompatibility — see: https://github.com/dotnet/runtime/issues/109739
+ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),2)
+    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k $(ARMv7_ARCHS)
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
+endif
