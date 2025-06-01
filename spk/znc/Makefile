@@ -1,14 +1,13 @@
 SPK_NAME = znc
 SPK_VERS = 1.9.1
-SPK_REV = 24
+SPK_REV = 25
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/znc
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "python312"
 
-MAINTAINER = worstje
+MAINTAINER = SynoCommunity
 DESCRIPTION = Advanced IRC bouncer. An IRC bouncer is nothing more than an IRC proxy. ZNC will always be connected in your chat rooms, and will be the gateway between your clients, and your IRC servers. You can, for instance, consult messages while you were offline or hide your identity.
 DESCRIPTION_FRE = Bouncer IRC avancé. Un bouncer IRC n\’est en fait qu\’un proxy IRC. ZNC restera connecté en permanence à vos salons de discussions et fera office de passerelle entre vos clients et vos serveurs IRC. Vous pourrez, par exemple, consultez des messages diffusés en votre absence ou masquer votre identité.
 DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy para IRC. ZNC estará siempre conectado a tus canales, y hará de puerta de enlace entre tus clientes y tus servidores IRC. Puedes, por ejemplo, consultar mensajes mientras estuviste desconectado o esconder tu identidad.
@@ -22,14 +21,6 @@ LICENSE  = Apache License 2.0
 # Ensure C++11 compatibility
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
-
-include ../../mk/spksrc.archs.mk
-
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-# bugfix for libicudata error, solution proposed by Steven R. Loomis
-# in https://sourceforge.net/p/icu/mailman/message/36666855/
-export LIBICU_DATA_PACKAGING_MODE=files
-endif
 
 WIZARDS_DIR = src/wizard
 CONF_DIR = src/conf
@@ -46,6 +37,25 @@ SERVICE_PORT_TITLE = ZNC(HTTP)
 ADMIN_PORT = ${SERVICE_PORT}
 
 POST_STRIP_TARGET = znc_extra_install
+
+DEPENDS = cross/boost_1.86
+export BOOST_BUILD_PATH="$(WORK_DIR)/boost_1_86_0"
+export BOOST_LIBRARIES="locale"
+#BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_86_0
+#BOOST_LIBRARIES += locale
+#ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+#ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
+ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
+
+DEPENDS += cross/znc
+
+include ../../mk/spksrc.archs.mk
+
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+# bugfix for libicudata error, solution proposed by Steven R. Loomis
+# in https://sourceforge.net/p/icu/mailman/message/36666855/
+export LIBICU_DATA_PACKAGING_MODE=files
+endif
 
 include ../../mk/spksrc.python.mk
 

@@ -5,13 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-ifeq ($(strip $(PYTHON_PACKAGE)),)
-PYTHON_PACKAGE = python312
-endif
-
-BUILD_DEPENDS = cross/python312
-DEPENDS = cross/openssl3 cross/libicu cross/zlib cross/argon2
-
 # Ensure C++17 compatibility
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
@@ -20,9 +13,38 @@ HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
 LICENSE  = Apache 2.0
 
-CMAKE_ARGS  = -DWANT_ARGON=YES
-CMAKE_ARGS += -DWANT_OPENSSL=YES
-CMAKE_ARGS += -DWANT_PYTHON=YES
+#ifeq ($(strip $(PYTHON_PACKAGE)),)
+#BUILD_DEPENDS = cross/python312
+#endif
+CMAKE_ARGS = -DWANT_PYTHON=true
+DEPENDS = cross/zlib
+
+DEPENDS += cross/openssl3
+CMAKE_ARGS += -DWANT_OPENSSL=true
+
+##DEPENDS += cross/libiconv
+##DEPENDS += cross/boost_1.86
+##CMAKE_ARGS += -DWANT_I18N=true
+###export BOOST_BUILD_PATH="$(WORK_DIR)/boost_1_86_0"
+###export BOOST_LIBRARIES="system python chrono random"
+##BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_86_0
+##BOOST_LIBRARIES += system python chrono random
+##ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
+##ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
+##ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
+
+DEPENDS += cross/argon2
+CMAKE_ARGS += -DWANT_ARGON=true
+
+DEPENDS += cross/libicu
+CMAKE_ARGS += -DWANT_ICU=true
+
+DEPENDS += cross/cyrus-sasl
+CMAKE_ARGS += -DWANT_CYRUS=true
+
+CMAKE_ARGS += -DWANT_SYSTEMD=false
+CMAKE_ARGS += -DWANT_TCL=false
+CMAKE_ARGS += -DWANT_PERL=false
 CMAKE_ARGS += -DOPENSSL_INCLUDE_DIR=$(OPENSSL_STAGING_PREFIX)/include
 CMAKE_ARGS += -DOPENSSL_SSL_LIBRARY=$(OPENSSL_STAGING_PREFIX)/lib/libssl.so
 CMAKE_ARGS += -DOPENSSL_CRYPTO_LIBRARY=$(OPENSSL_STAGING_PREFIX)/lib/libcrypto.so

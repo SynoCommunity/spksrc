@@ -24,6 +24,7 @@ lib:lib/znc/controlpanel.so
 lib:lib/znc/corecaps.so
 lib:lib/znc/crypt.so
 lib:lib/znc/ctcpflood.so
+lib:lib/znc/cyrusauth.so
 lib:lib/znc/dcc.so
 lib:lib/znc/disconkick.so
 lib:lib/znc/fail2ban.so
