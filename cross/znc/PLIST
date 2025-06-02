@@ -70,3 +70,4 @@ lib:lib/znc/stripcontrols.so
 lib:lib/znc/watch.so
 lib:lib/znc/webadmin.so
 rsc:share/znc
+rsc:share/locale
