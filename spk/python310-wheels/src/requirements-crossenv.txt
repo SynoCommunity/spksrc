@@ -1,44 +1,44 @@
 ##
 ## All configurations below are optional and are provided to demonstrate 
 ## how to build various wheels.
-## Define WHEELS_TEST_ALL = 0 to enable.
+## Define WHEELS_TEST_ALL = 1 to enable.
 ##
 
 # [bcrypt]
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-bcrypt==4.2.0
+bcrypt==4.2.1
 
 # [cryptography]
 # Mandatory of using OPENSSL_*_DIR starting with version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
 #  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==43.0.1
+cryptography==43.0.3
 
 # Requirement for cryptography
-cffi==1.17.0
+cffi==1.17.1
 
 # commonly used cross-compiled wheels
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
-immutables==0.20
-MarkupSafe==2.1.5
+immutables==0.21
+MarkupSafe==3.0.2
 msgpack-python==0.5.6
 netifaces==0.11.0
-psutil==6.0.0
-regex==2024.7.24
-SQLAlchemy==2.0.32
-zope.interface==7.0.2
+psutil==6.1.1
+regex==2024.11.6
+SQLAlchemy==2.0.37
+zope.interface==7.2
 
 # [gevent]
 # Depends: libev, c-ares
 # Require environment variables
 #  GEVENTSETUP_EMBED_CARES=FALSE
 #  GEVENTSETUP_EMBED_LIBEV=FALSE
-gevent==24.2.1
+gevent==24.11.1
 
 # [lxml]
 # Depends: libxml2, libxslt
@@ -49,7 +49,7 @@ lxml==5.3.0
 # Require environment variables
 #  MYSQLCLIENT_CFLAGS
 #  MYSQLCLIENT_LDFLAGS
-mysqlclient==2.2.4
+mysqlclient==2.2.7
 
 # [Pillow]
 # Require --global-options arguments
@@ -60,13 +60,13 @@ Pillow==9.5.0
 # Depends: c-ares
 # Require environment variables
 #  PYCARES_USE_SYSTEM_LIB=1
-pycares==4.4.0
+pycares==4.5.0
 
 # [pycurl]
 # Depends: curl
 # Require environment variables
 #  PYCURL_CURL_CONFIG
-pycurl==7.45.3
+pycurl==7.45.4
 
 # [pydantic_core]
 # Requires path to maturin from crossenv
