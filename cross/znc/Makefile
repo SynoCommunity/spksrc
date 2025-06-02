@@ -13,36 +13,38 @@ HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
 LICENSE  = Apache 2.0
 
-#ifeq ($(strip $(PYTHON_PACKAGE)),)
-#BUILD_DEPENDS = cross/python312
-#endif
+ifeq ($(strip $(PYTHON_PACKAGE)),)
+BUILD_DEPENDS = cross/python312
+endif
 CMAKE_ARGS = -DWANT_PYTHON=true
 DEPENDS = cross/zlib
 
 DEPENDS += cross/openssl3
 CMAKE_ARGS += -DWANT_OPENSSL=true
 
-#DEPENDS += cross/boost_1.86
-CMAKE_ARGS += -DWANT_I18N=true
-#export BOOST_BUILD_PATH="$(WORK_DIR)/boost_1_86_0"
-#export BOOST_LIBRARIES="locale"
-#ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
+DEPENDS += cross/libicu
+CMAKE_ARGS += -DWANT_ICU=true
 
 DEPENDS += cross/argon2
 CMAKE_ARGS += -DWANT_ARGON=true
 
-DEPENDS += cross/libicu
-CMAKE_ARGS += -DWANT_ICU=true
-
 DEPENDS += cross/cyrus-sasl
 CMAKE_ARGS += -DWANT_CYRUS=true
+
+# Boost mandatory for i18n and
+# can only be built from spk
+ifneq ($(strip $(BOOST_BUILD_PATH)),)
+CMAKE_ARGS += -DWANT_I18N=true
+endif
 
 CMAKE_ARGS += -DWANT_SYSTEMD=false
 CMAKE_ARGS += -DWANT_TCL=false
 CMAKE_ARGS += -DWANT_PERL=false
+ifneq ($(wildcard $(OPENSSL_STAGING_PREFIX)),)
 CMAKE_ARGS += -DOPENSSL_INCLUDE_DIR=$(OPENSSL_STAGING_PREFIX)/include
 CMAKE_ARGS += -DOPENSSL_SSL_LIBRARY=$(OPENSSL_STAGING_PREFIX)/lib/libssl.so
 CMAKE_ARGS += -DOPENSSL_CRYPTO_LIBRARY=$(OPENSSL_STAGING_PREFIX)/lib/libcrypto.so
+endif
 
 # For ZNC to build using github-action, enforce adding Python & OpenSSL include directories
 ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
