@@ -36,7 +36,9 @@ include ../../mk/spksrc.archs.mk
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
 #
 # Enable Link-Time Optimization
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-lto
+endif
 #
 # pgo optimization can only be run native platform and now
 # exit on errors which had no impact (and effects) previously.
