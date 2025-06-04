@@ -3,7 +3,7 @@ PKG_VERS = 4.3
 PKG_EXT = tar.gz
 # no official release since v4.2.8 (Jan 12, 2019)
 # git hash from June 4th 2025
-PKG_GIT_HASH = 0f74b0ab0a3b96d87da04d9c778142ecfb370a1d
+PKG_GIT_HASH = 808a87a6aa6eeabd4be3a024e4eea023aaf00cf6
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
