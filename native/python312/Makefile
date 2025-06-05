@@ -30,7 +30,7 @@ PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
 PIP_VERSION = "24.3.1"
-PIP_WHEELS  = setuptools==78.1.0
+PIP_WHEELS  = setuptools==80.9.0
 PIP_WHEELS += wheel==0.45.1
 PIP_WHEELS += crossenv==1.5.0
 
