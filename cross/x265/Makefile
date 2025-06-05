@@ -40,6 +40,13 @@ ifeq ($(findstring $(ARCH),$(ARM_ARCHS) $(PPC_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
 endif
 
+# Fixes:
+#    https://github.com/SynoCommunity/spksrc/issues/5314
+#    https://github.com/SynoCommunity/spksrc/issues/6597
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+CMAKE_ARGS += -DENABLE_PIC=ON
+endif
+
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
 endif
