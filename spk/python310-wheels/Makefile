@@ -1,23 +1,18 @@
-SPK_NAME = python311-wheels
+SPK_NAME = python310-wheels
 SPK_VERS = 1.0
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
 SPK_REV = 1
 SPK_ICON = src/python3-pip.png
 
-# Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
-# CPython core team, see https://peps.python.org/pep-0011/ for more information.
-# And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
-PYTHON_PACKAGE = python311
+PYTHON_PACKAGE = python310
 SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 MAINTAINER = SynoCommunity
-DESCRIPTION =  Collection of programs for the Python 3.11 programming language.
-DESCRIPTION_FRE = Collection of programs for the Python 3.11 programming language.
-DESCRIPTION_SPN = Colección de programas para el lenguaje de programación Python 3.11.
+DESCRIPTION =  Collection of programs for the Python 3.10 programming language.
+DESCRIPTION_FRE = Collection of programs for the Python 3.10 programming language.
+DESCRIPTION_SPN = Colección de programas para el lenguaje de programación Python 3.10.
 STARTABLE = no
-DISPLAY_NAME = Python 3.11 Wheels Collection
+DISPLAY_NAME = Python 3.10 Wheels Collection
 CHANGELOG = "1. Initial package"
 
 HOMEPAGE = https://www.python.org
@@ -54,7 +49,7 @@ DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 
 # [cryptography]
 # Use python/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
-#       To generate py311-py311 regular build use src/requirements-crossenv.txt
+#       To generate py310-py310 regular build use src/requirements-crossenv.txt
 DEPENDS += python/cryptography
 
 # [gevent]
@@ -120,11 +115,15 @@ endif
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-greenlet-v3.txt
 else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
+WHEELS += src/requirements-crossenv-greenlet-v2.txt
 WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 else
 WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
+
+# >> [numpy] and [scipy] unsupported with old PPC arch
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 
 # [numpy] <= 1.21.6 (armv5)
 # This version is now unsupported using pip>=23.2.1
@@ -165,6 +164,9 @@ DEPENDS += python/numpy
 
 # [scipy] - depends on numpy
 DEPENDS += python/scipy
+endif
+
+# >> [numpy] and [scipy] unsupported with old PPC arch
 endif
 
 # [pycryptodome]
