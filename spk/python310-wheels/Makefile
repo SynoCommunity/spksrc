@@ -156,15 +156,18 @@ endif
 endif
 
 # [numpy] >= 1.26|2.x
+# Requires gcc>=8.4 to build sucesfully
+ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy_ha
 DEPENDS += python/numpy
 
-# >> [numpy] and [scipy] unsupported with old PPC arch
+# [scipy] - depends on numpy
+DEPENDS += python/scipy
 endif
 
-# [scipy] - depends on numpy 
-DEPENDS += python/scipy
+# >> [numpy] and [scipy] unsupported with old PPC arch
+endif
 
 # [pycryptodome]
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
