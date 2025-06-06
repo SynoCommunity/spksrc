@@ -1,0 +1,6 @@
+lnk:lib/libtag.so
+lnk:lib/libtag.so.2
+lib:lib/libtag.so.2.0.2
+lnk:lib/libtag_c.so
+lnk:lib/libtag_c.so.2
+lib:lib/libtag_c.so.2.0.2
