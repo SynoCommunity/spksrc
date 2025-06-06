@@ -9,7 +9,7 @@ DEPENDS  = cross/cairo
 
 HOMEPAGE = https://pycairo.readthedocs.io/en/latest/
 COMMENT  = Pycairo is a Python module providing bindings for the cairo graphics library.
-LICENSE  = 3-Clause BSD license
+LICENSE  = LGPL-2.1-only OR MPL-1.1
 
 CONFIGURE_ARGS  = --cross-file=$(WORK_DIR)/$(PKG_DIR)/pycairo.meson
 
