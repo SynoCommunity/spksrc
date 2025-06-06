@@ -35,6 +35,9 @@ DEPENDS += cross/libxslt
 # [Pillow]
 DEPENDS += python/pillow
 
+# [pycairo]
+DEPENDS += python/pycairo
+
 # [PyYAML]
 DEPENDS += cross/libyaml
 
@@ -59,6 +62,3 @@ include ../../mk/spksrc.python.mk
 
 # [llvmlite]
 #DEPENDS += cross/llvm
-
-# [pycairo]
-#DEPENDS += cross/cairo					# Could not invoke sanity test executable
