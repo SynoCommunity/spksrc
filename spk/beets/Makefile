@@ -28,6 +28,9 @@ SPK_COMMANDS = env/bin/beet
 # NOTE: Built with support for the following plugins:
 # aura, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, mpdstats, plexupdate, scrub, sonosupdate, thumbnails, web.
 
+# [dbus-python]
+DEPENDS += python/dbus-python
+
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
