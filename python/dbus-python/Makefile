@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/d/dbus-python
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS  = cross/dbus
+DEPENDS  = cross/dbus cross/glib
 
 HOMEPAGE = https://gitlab.freedesktop.org/dbus/dbus-python/
 COMMENT  = Python bindings for D-Bus
