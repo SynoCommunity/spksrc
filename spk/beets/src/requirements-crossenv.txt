@@ -2,31 +2,18 @@
 # NOTE: The following plugins were excluded due to being broken or deprecated:
 # absubmit, docs, import, reflink
 
-cffi==1.17.1
 charset_normalizer==3.4.2
-#dbus_python==1.4.0             ==> python/dbus-python
+#dbus_python                    ==> python/dbus-python
 jellyfish==1.2.0
 #lap                            ==> python/lap
 lxml==5.4.0
 MarkupSafe==3.0.2
-msgpack==1.1.0
 #numpy                          ==> python/numpy
 #pillow                         ==> python/pillow
 #pycairo                        ==> python/pycairo
 PyYAML==6.0.2
-#scipy                          ==> python/scipy
 
 # TODO: The following plugins are currently unsupported due to dependency issues:
 # bpd, metasync, and replaygain.
 
 #pygobject==3.52.3              # Dependency 'gobject-introspection-1.0' is required but not found
-#scikit_learn==1.6.1            # Meson version is 1.0.1 but project requires >= 1.1.0
-#soxr==0.5.0.post1              # Could not find a package configuration file provided by "nanobind"
-
-###
-### Do not enable
-###
-
-# Depends on LLVM
-#llvmlite==0.44.0               # Could not find a `llvm-config` binary
-#numba==0.61.2                  # ModuleNotFoundError: No module named 'numpy'
