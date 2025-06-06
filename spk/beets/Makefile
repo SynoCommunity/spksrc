@@ -28,9 +28,6 @@ SPK_COMMANDS = env/bin/beet
 # NOTE: Built with support for the following plugins:
 # aura, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, mpdstats, plexupdate, scrub, sonosupdate, thumbnails, web.
 
-# [lap]
-DEPENDS += python/lap
-
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
@@ -46,7 +43,10 @@ DEPENDS += cross/libyaml
 # gcc-8.5 happens to be the default version for DSM-7.1
 DEPENDS += python/numpy
 
-# [scipy] - depends on numpy
+# [lap] - depends on [numpy]
+DEPENDS += python/lap
+
+# [scipy] - depends on [numpy]
 DEPENDS += python/scipy
 
 include ../../mk/spksrc.python.mk
