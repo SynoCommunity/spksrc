@@ -1,5 +1,5 @@
 SPK_NAME = zabbix-agent
-SPK_VERS = 7.2.2
+SPK_VERS = 7.2.7
 SPK_REV = 1
 SPK_ICON = src/zabbix.png
 
@@ -33,4 +33,4 @@ include ../../mk/spksrc.spk.mk
 zabbix-agent_extra_install:
 	@$(MSG) "Add configuration file"
 	@install -d -m 755 $(STAGING_DIR)/var/zabbix_agentd.conf.d
-	@install -m 644 src/zabbix_agentd.conf  $(STAGING_DIR)/var/zabbix_agentd.conf
+	@install -m 644 src/zabbix_agentd.conf $(STAGING_DIR)/var/zabbix_agentd.conf
