@@ -1,12 +1,12 @@
 PKG_NAME = filebrowser
-PKG_VERS = 2.30.0
+PKG_VERS = 2.32.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/filebrowser/filebrowser/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go native/nodejs
+BUILD_DEPENDS = native/go native/nodejs native/pnpm
 
 HOMEPAGE = https://github.com/filebrowser/filebrowser
 COMMENT  = Web File Browser.
@@ -20,7 +20,7 @@ PRE_COMPILE_TARGET = filebrowser_pre_compile
 
 include ../../mk/spksrc.cross-go.mk
 
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(realpath $(WORK_DIR)/../../../native/go/work-native/go/bin):$(PATH)
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(realpath $(WORK_DIR)/../../../native/pnpm/work-native/bin):$(realpath $(WORK_DIR)/../../../native/go/work-native/go/bin):$(PATH)
 
 # avoid webpack error ERR_OSSL_EVP_UNSUPPORTED with nodejs 18
 ENV += NODE_OPTIONS=--openssl-legacy-provider

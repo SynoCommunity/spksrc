@@ -1,0 +1,67 @@
+# Ignore whether SO_REUSEPORT is defined
+# 
+# SO_REUSEPORT is not supported in all ARMv7 cpu toolchains 
+# provided in toolchain .../usr/include/asm-generic/socket.h
+# 
+# see issue https://github.com/SynoCommunity/spksrc/issues/6441
+# 
+--- lib/isc/netmgr/netmgr-int.h.orig	2022-01-12 11:04:23.274225500 +0000
++++ lib/isc/netmgr/netmgr-int.h	2025-02-05 20:16:57.328212185 +0000
+@@ -72,10 +72,6 @@
+  */
+ #define NM_BIG_BUF (65535 + 2) * 2
+ 
+-#if defined(SO_REUSEPORT_LB) || (defined(SO_REUSEPORT) && defined(__linux__))
+-#define HAVE_SO_REUSEPORT_LB 1
+-#endif
+-
+ /*
+  * Define NETMGR_TRACE to activate tracing of handles and sockets.
+  * This will impair performance but enables us to quickly determine,
+
+--- lib/isc/netmgr/netmgr.c.orig	2022-01-12 11:04:23.274225500 +0000
++++ lib/isc/netmgr/netmgr.c	2025-02-05 20:31:37.852710033 +0000
+@@ -3086,20 +3086,8 @@
+ 	 * by another socket.
+ 	 */
+ 
+-#if defined(SO_REUSEPORT) && !defined(__linux__)
+-	if (setsockopt_on(fd, SOL_SOCKET, SO_REUSEPORT) == -1) {
+-		return (ISC_R_FAILURE);
+-	}
+-	return (ISC_R_SUCCESS);
+-#elif defined(SO_REUSEADDR)
+-	if (setsockopt_on(fd, SOL_SOCKET, SO_REUSEADDR) == -1) {
+-		return (ISC_R_FAILURE);
+-	}
+-	return (ISC_R_SUCCESS);
+-#else
+ 	UNUSED(fd);
+ 	return (ISC_R_NOTIMPLEMENTED);
+-#endif
+ }
+ 
+ isc_result_t
+@@ -3114,22 +3102,8 @@
+ 	 *
+ 	 * On Linux, the same thing is achieved simply with SO_REUSEPORT.
+ 	 */
+-#if defined(SO_REUSEPORT_LB)
+-	if (setsockopt_on(fd, SOL_SOCKET, SO_REUSEPORT_LB) == -1) {
+-		return (ISC_R_FAILURE);
+-	} else {
+-		return (ISC_R_SUCCESS);
+-	}
+-#elif defined(SO_REUSEPORT) && defined(__linux__)
+-	if (setsockopt_on(fd, SOL_SOCKET, SO_REUSEPORT) == -1) {
+-		return (ISC_R_FAILURE);
+-	} else {
+-		return (ISC_R_SUCCESS);
+-	}
+-#else
+ 	UNUSED(fd);
+ 	return (ISC_R_NOTIMPLEMENTED);
+-#endif
+ }
+ 
+ isc_result_t

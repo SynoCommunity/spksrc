@@ -1,5 +1,5 @@
 PKG_NAME = python311
-PKG_VERS = 3.11.11
+PKG_VERS = 3.11.12
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -30,11 +30,8 @@ PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
 PIP_VERSION = "24.3.1"
-PIP_WHEELS  = setuptools==75.6.0
-PIP_WHEELS += setuptools-rust==1.10.2
-PIP_WHEELS += maturin==1.7.7
+PIP_WHEELS  = setuptools==75.8.0
 PIP_WHEELS += wheel==0.45.1
-PIP_WHEELS += cffi==1.17.1
 PIP_WHEELS += crossenv==1.5.0
 
 .PHONY: python311_native_post_install

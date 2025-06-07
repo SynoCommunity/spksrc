@@ -62,10 +62,6 @@ function get_ffmpeg_dependency ()
 function get_file_dependencies ()
 {
    if [ -f ${1}/Makefile ]; then
-      if [ "$(dirname ${1})" = "spk" ]; then
-         get_python_dependency ${1}
-         get_ffmpeg_dependency ${1}
-      fi
       grep "^DEPENDS\|^NATIVE_DEPENDS\|^BUILD_DEPENDS" ${1}/Makefile | cut -d= -f2 | sort -u | tr '\n' ' '
    fi
 }
@@ -91,7 +87,7 @@ function contains ()
 function get_dependencies ()
 {
    local dependencies=
-   for dep in "${1}"; do
+   for dep in ${1}; do
       dependencies+="${dep} "
       dependencies+="$(get_file_dependencies ${dep}) "
    done
@@ -108,7 +104,7 @@ function get_spk_dependencies ()
       dependencies=${cumulated_dependencies}
       cumulated_dependencies=$(get_dependencies "${dependencies}")
    done
-   echo ${cumulated_dependencies} | tr ' ' '\n' | sort -u | tr '\n' ' '
+   echo ${cumulated_dependencies}
 }
 
 # get the dependency list for a package
@@ -116,7 +112,7 @@ function get_spk_dependencies ()
 function get_dependency_list ()
 {
    local spk_name=$(get_spk_name ${1})
-   local toplevel_dependencies=$(get_file_dependencies ${1})
+   local toplevel_dependencies="$(get_file_dependencies ${1}) $(get_python_dependency ${1}) $(get_ffmpeg_dependency ${1})"
    local spk_dependencies=$(get_spk_dependencies "${toplevel_dependencies}")
    echo "${spk_name}: ${spk_dependencies}"
 }

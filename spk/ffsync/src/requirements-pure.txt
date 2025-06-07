@@ -1,31 +1,31 @@
-# From requirements.txt
+# Generated using the requirements script on May 15, 2025
 
-pyfxa==0.7.7
-tokenlib==2.0.0
-
-# From tools/tokenserver/requirements.txt
-
-boto==2.49.0
-hawkauthlib==2.0.0
-pyramid==2.0.2
-#sqlalchemy==1.4.46     => crossenv
-testfixtures==8.3.0
-#tokenlib==2.0.0        => same as above
-PyBrowserID==0.14.0
-datadog==0.50.0
 backoff==2.2.1
-
-
-# further dependencies
+boto==2.49.0
+#certifi                    ==> python312
+datadog==0.51.0
+hawkauthlib==2.0.0
 hupper==1.12.1
-idna==3.8
+idna==3.10
+iniconfig==2.1.0
+packaging==25.0
 PasteDeploy==3.1.0
+#pip                        ==> python312
 plaster==1.1.2
 plaster_pastedeploy==1.0.1
-PyJWT==2.9.0
+pluggy==1.6.0
+PyBrowserID==0.14.0
+pycparser==2.22
+pyfxa==0.8.1
+PyJWT==2.10.1
+pyramid==2.0.2
+pytest==8.3.5
 requests==2.32.3
+#setuptools                 ==> python312
+testfixtures==8.3.0
+tokenlib==2.0.0
 translationstring==1.4
-urllib3==2.2.2
-venusian==3.1.0
-WebOb==1.8.8
-zope.deprecation==5.0
+urllib3==2.4.0
+venusian==3.1.1
+WebOb==1.8.9
+zope.deprecation==5.1

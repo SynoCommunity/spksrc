@@ -6,8 +6,8 @@
 # - disable VCS stamping 
 #   - due to nested repos it is not possible to embed vcs info with github build action
 # 
---- Makefile.orig	2023-06-06 12:48:07.000000000 +0000
-+++ Makefile	2023-09-06 19:45:28.769829154 +0000
+--- Makefile.orig	2024-12-30 21:17:23.000000000 +0000
++++ Makefile	2025-01-31 23:59:33.718505394 +0000
 @@ -2,14 +2,14 @@
  MAJOR_VER := v5
  PACKAGE := github.com/dundee/$(NAME)/$(MAJOR_VER)
@@ -16,8 +16,8 @@
 +VERSION ?= $(shell git describe --tags 2>/dev/null)
  NAMEVER := $(NAME)-$(subst v,,$(VERSION))
  DATE := $(shell date +'%Y-%m-%d')
- GOFLAGS ?= -buildmode=pie -trimpath -mod=readonly -modcacherw
- GOFLAGS_STATIC ?= -trimpath -mod=readonly -modcacherw
+ GOFLAGS ?= -buildmode=pie -trimpath -mod=readonly -modcacherw -pgo=default.pgo
+ GOFLAGS_STATIC ?= -trimpath -mod=readonly -modcacherw -pgo=default.pgo
 -LDFLAGS := -s -w -extldflags '-static' \
 +LDFLAGS := -s -w \
  	-X '$(PACKAGE)/build.Version=$(VERSION)' \

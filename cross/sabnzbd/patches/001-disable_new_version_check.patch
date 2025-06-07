@@ -17,7 +17,7 @@
                          <input type="checkbox" name="enable_https_verification" id="enable_https_verification" value="1" <!--#if int($enable_https_verification) > 0 then 'checked="checked"' else ""#--> />
 --- sabnzbd/misc.py
 +++ sabnzbd/misc.py
-@@ -470,6 +470,8 @@
+@@ -483,6 +483,8 @@
      they are already using an alpha/beta/rc.
      RC's are valued higher than Beta's, which are valued higher than Alpha's.
      """

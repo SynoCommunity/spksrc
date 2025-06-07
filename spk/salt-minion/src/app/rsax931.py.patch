@@ -1,0 +1,12 @@
+--- rsax931.py.orig	2025-04-09 14:34:29
++++ rsax931.py	2025-04-09 14:40:36
+@@ -106,6 +106,9 @@
+                 else:
+                     lib = glob.glob("/opt/freeware/lib/libcrypto.so*")
+                 lib = lib[0] if lib else None
++            else:
++                lib = glob.glob("/var/packages/python312/target/lib/libcrypto.so*")
++                lib = lib[0] if lib else None
+     if not lib:
+         raise OSError("Cannot locate OpenSSL libcrypto")
+     return lib

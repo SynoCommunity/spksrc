@@ -1,52 +1,59 @@
 ##
 ## All configurations below are optional and
 ## are provided to demonstrate how to build
-## various wheels.  Uncoment to enable.
+## various wheels.
 ##
+
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+atom==0.10.5
+atom==0.11.0
 
 # [bcrypt]
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-bcrypt==4.2.0
+bcrypt==4.2.1
 
 # [cryptography]
 # Mandatory of using OPENSSL_*_DIR starting with version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
 #  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==43.0.3
 cryptography==44.0.0
 
 # Requirement for cryptography
-cffi==1.15.1
 cffi==1.17.1
 
 # commonly used cross-compiled wheels
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
-borgbackup==1.2.6
-charset_normalizer==3.2.0
-immutables==0.20
-### llfuse==1.5.0 # fails to find "clock_gettime"
-MarkupSafe==2.1.5
-msgpack==1.0.5              # used compiled verrsion for performance
+borgbackup==1.4.0
+charset_normalizer==3.4.1
+immutables==0.21
+# [llfuse]
+# gcc < 5 requires -std=gnu11 to find "clock_gettime"
+llfuse==1.5.0
+MarkupSafe==3.0.2
+msgpack==1.1.0              # used compiled verrsion for performance
 msgpack_python==0.5.6
 netifaces==0.11.0
-psutil==6.0.0
-pyrsistent==0.19.3
-regex==2024.7.24
+psutil==6.1.1
+pyrsistent==0.20.0
+regex==2024.11.6
 ruamel.yaml.clib==0.2.12
-SQLAlchemy==2.0.32
-zope.interface==7.0.2
+SQLAlchemy==2.0.37
+zope.interface==7.2
 
 # [gevent]
 # Depends: libev, c-ares
 # Require environment variables
 #  GEVENTSETUP_EMBED_CARES=FALSE
 #  GEVENTSETUP_EMBED_LIBEV=FALSE
-gevent==24.2.1
+gevent==24.11.1
 
 # [lxml]
 # Depends: libxml2, libxslt
@@ -57,33 +64,19 @@ lxml==5.3.0
 # Require environment variables
 #  MYSQLCLIENT_CFLAGS
 #  MYSQLCLIENT_LDFLAGS
-mysqlclient==2.2.4
-
-# [Pillow]
-# Require --global-options arguments
-#  WHEELS_BUILD_ARGS = [Pillow] build_ext --disable-platform-guessing
-Pillow==9.5.0
+mysqlclient==2.2.7
 
 # [pycares]
 # Depends: c-ares
 # Require environment variables
 #  PYCARES_USE_SYSTEM_LIB=1
-pycares==4.4.0
+pycares==4.5.0
 
 # [pycurl]
 # Depends: curl
 # Require environment variables
 #  PYCURL_CURL_CONFIG
-pycurl==7.45.3
-
-# [pydantic_core]
-# Requires path to maturin from crossenv
-# Requires WHEELS_CFLAGS = -std=c11 for = gcc-4.9
-# Requires WHEELS_CFLAGS = -std=c99 for < gcc-4.9
-# Require environment variables
-#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-pydantic_core==2.23.0
+pycurl==7.45.4
 
 # [PyNaCl]
 # Depends: cross/libsodium
@@ -104,9 +97,7 @@ git+https://github.com/totaam/rencode.git@f6254ab26161f90b9c5e97915b9193fee805fc
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# Requires path to maturin from crossenv
-#  ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
-rpds_py==0.20.0
+rpds_py==0.21.0
 
 # [ujson]
 #   - Require setuptools-scm in cross/python3* crossenv

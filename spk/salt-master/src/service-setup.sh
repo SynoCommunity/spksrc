@@ -1,11 +1,52 @@
-# Define python311 binary path
-PYTHON_DIR="/var/packages/python311/target/bin"
-# Add local bin, virtualenv along with python311 to the default PATH
+# Define python312 binary path
+PYTHON_DIR="/var/packages/python312/target/bin"
+# Add local bin, virtualenv along with python312 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 LANGUAGE="env LANG=en_US.UTF-8"
 SYNOPKG_PKGETC=/var/packages/${SYNOPKG_PKGNAME}/etc
 
-SERVICE_COMMAND="salt-master --pid-file ${PID_FILE} -c ${SYNOPKG_PKGETC} -d"
+service_prestart ()
+{
+    # Define variables and commands
+    LOG_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master.log"
+    LOG_FILE_API="${SYNOPKG_PKGVAR}/salt-api.log"
+    PID_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master-runtime.pid"
+    PID_FILE_API="${SYNOPKG_PKGVAR}/salt-api-runtime.pid"
+    COMMAND_MASTER="salt-master --pid-file ${PID_FILE_MASTER} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_MASTER} -d"
+    COMMAND_API="salt-api --pid-file ${PID_FILE_API} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_API} -d"
+    # Execute salt-master command
+    $COMMAND_MASTER
+    # Wait until salt-master is populated
+    i=0
+    while [ $i -lt 10 ]; do
+        [ -s "${PID_FILE_MASTER}" ] && break
+        sleep 1
+        i=$((i + 1))
+    done
+    # Execute salt-api command
+    $COMMAND_API
+    # Wait until salt-api is populated
+    i=0
+    while [ $i -lt 10 ]; do
+        [ -s "${PID_FILE_API}" ] && break
+        sleep 1
+        i=$((i + 1))
+    done
+    # Combine PID files
+    : > "${PID_FILE}"
+    [ -s "${PID_FILE_API}" ] && echo "$(cat "${PID_FILE_API}")" >> "${PID_FILE}"
+    [ -s "${PID_FILE_MASTER}" ] && echo "$(cat "${PID_FILE_MASTER}")" >> "${PID_FILE}"
+}
+
+service_poststop ()
+{
+    # Define variables
+    PID_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master-runtime.pid"
+    PID_FILE_API="${SYNOPKG_PKGVAR}/salt-api-runtime.pid"
+    # Remove any runtime PID files
+    [ -f "${PID_FILE_API}" ] && rm -f "${PID_FILE_API}"
+    [ -f "${PID_FILE_MASTER}" ] && rm -f "${PID_FILE_MASTER}"
+}
 
 service_postinst ()
 {
@@ -15,10 +56,10 @@ service_postinst ()
     # Install wheels
     install_python_wheels
 
-    # patch rsax931.py file to find libcrypto lib provided by python311
-    # (rely on patch==1.16 included in requirements-pure.txt)
-    python ${SYNOPKG_PKGDEST}/env/lib/python3.11/site-packages/patch.py \
-           --directory=${SYNOPKG_PKGDEST}/env/lib/python3.11/site-packages/salt/utils \
+    # patch rsax931.py file to find libcrypto lib provided by python312
+    # (rely on patch-ng==1.18.1 included in requirements-pure.txt)
+    python ${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/patch_ng.py \
+           --directory=${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/salt/utils \
            ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
 
     # Prepare salt-master config in /var/packages/salt-master/target/etc
