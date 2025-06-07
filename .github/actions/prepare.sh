@@ -25,13 +25,14 @@ SPK_TO_BUILD="${USER_SPK_TO_BUILD} ${GH_SPK_PACKAGES} "
 # get dependency list
 # dependencies in this list include the cross or native folder (i.e. native/python cross/glib)
 echo "Building dependency list..."
-DEPENDENCY_LIST=$(make dependency-list 2> /dev/null)
+DEPENDENCY_LIST=./dependency-list.txt
+make dependency-list 2> /dev/null > ${DEPENDENCY_LIST}
 
 # search for dependent spk packages
 for package in ${GH_DEPENDENCY_FOLDERS}
 do
     echo "===> Searching for dependent package: ${package}"
-    packages=$(echo "${DEPENDENCY_LIST}" | grep " ${package} " | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
+    packages=$(cat "${DEPENDENCY_LIST}" | grep -w "${package}" | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
     echo "===> Found: ${packages}"
     SPK_TO_BUILD+=" ${packages}"
 done
@@ -148,7 +149,7 @@ else
     DOWNLOAD_LIST=
     for package in ${packages}
     do
-        DOWNLOAD_LIST+=$(echo "${DEPENDENCY_LIST}" | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
+        DOWNLOAD_LIST+=$(cat "${DEPENDENCY_LIST}" | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
     done
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')

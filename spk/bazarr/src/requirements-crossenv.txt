@@ -1,8 +1,6 @@
-# [lxml]
-# Depends: libxml2, libxslt
-lxml==4.9.3
+# Generated using the requirements script on June 1, 2025
 
-Pillow==9.5.0
-
-# webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
-git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad==2.0.10
+lxml==5.4.0
+#numpy                      ==> python/numpy
+#pillow                     ==> python/pillow
+webrtcvad_wheels==2.0.14

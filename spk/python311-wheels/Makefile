@@ -52,10 +52,10 @@ ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
 DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
 
 # [cryptography]
-# Use cross/cryptography to generate py36-abi3 limited API
+# Use python/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py311-py311 regular build use src/requirements-crossenv.txt
-DEPENDS += cross/cryptography
+DEPENDS += python/cryptography
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
@@ -76,11 +76,11 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 # Needs atomic to build
 # Serves as maturin type python-wheel.mk example
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/pendulum
+DEPENDS += python/pendulum
 endif
 
 # [Pillow]
-DEPENDS += cross/pillow
+DEPENDS += python/pillow
 
 # [pycares]
 DEPENDS += cross/c-ares
@@ -91,7 +91,7 @@ DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
 # [pydantic-core]
-DEPENDS += cross/pydantic-core
+DEPENDS += python/pydantic-core
 
 # [PyNaCl]
 DEPENDS += cross/libsodium
@@ -127,7 +127,7 @@ WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
 # [numpy] <= 1.21.6 (armv5)
-# This version is now unsupported using py311
+# This version is now unsupported using pip>=23.2.1
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # [numpy] <= 1.22.4 (armv7l)
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
@@ -145,14 +145,6 @@ WHEELS += src/requirements-crossenv-numpy-gcc85-x64.txt
 else
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
-
-# [numpy] >= 1.26|2.x
-DEPENDS += python/numpy_1.26
-DEPENDS += python/numpy_ha
-DEPENDS += python/numpy
-
-# [scipy] - depends on numpy 
-DEPENDS += python/scipy
 endif
 endif
 
@@ -162,6 +154,17 @@ ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 WHEELS_CFLAGS += [numpy] -O0
 endif
+endif
+
+# [numpy] >= 1.26|2.x
+# Requires gcc>=8.4 to build sucesfully
+ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
+DEPENDS += python/numpy
+
+# [scipy] - depends on numpy
+DEPENDS += python/scipy
 endif
 
 # [pycryptodome]
