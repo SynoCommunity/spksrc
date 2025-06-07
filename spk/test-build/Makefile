@@ -2,10 +2,21 @@ SPK_NAME = test-build
 SPK_VERS = 1.0
 SPK_REV = 1
 
-DEPENDS = cross/gobject-introspection
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "$(PYTHON_PACKAGE)"
+
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k evansport
+
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+
+# [pycairo]
+DEPENDS += python/pycairo
+
+# [pygobject] - depends on [pycairo]
+DEPENDS = python/pygobject
 
 MAINTAINER = mreid-tt
 STARTABLE = no
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
