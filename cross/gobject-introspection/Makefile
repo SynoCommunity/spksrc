@@ -12,13 +12,10 @@ HOMEPAGE = https://gi.readthedocs.io/
 COMMENT  = GObject introspection is a middleware layer between C libraries (using GObject) and language bindings.
 LICENSE  = LGPLv2+
 
-include ../../mk/spksrc.main-depends.mk
-
 # Dependency glib-2.0 needs: '>=2.78.0'
 # Requires kernel >= 3.10 && gcc >= 7.5 to build successfully
-ifneq ($(call version_ge, $(TC_KERNEL), 3.10)$(call version_ge, $(TC_GCC), 7.5),11)
-UNSUPPORTED_ARCHS = $(ARCH)
-endif
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k evansport
 
 CONFIGURE_ARGS += -Dbuild_introspection_data=false
 
