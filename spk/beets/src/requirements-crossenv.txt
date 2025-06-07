@@ -11,9 +11,5 @@ MarkupSafe==3.0.2
 #numpy                          ==> python/numpy
 #pillow                         ==> python/pillow
 #pycairo                        ==> python/pycairo
+#pygobject                      ==> python/pygobject
 PyYAML==6.0.2
-
-# TODO: The following plugins are currently unsupported due to dependency issues:
-# bpd, metasync, and replaygain.
-
-#pygobject==3.52.3              # Dependency 'gobject-introspection-1.0' is required but not found
