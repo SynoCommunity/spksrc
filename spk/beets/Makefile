@@ -56,7 +56,7 @@ ifneq ($(findstring $(ARCH),evansport),$(ARCH))
 # [pycairo]
 DEPENDS += python/pycairo
 # [pygobject] - depends on [pycairo]
-DEPENDS = python/pygobject
+DEPENDS += python/pygobject
 endif
 
 include ../../mk/spksrc.python.mk
