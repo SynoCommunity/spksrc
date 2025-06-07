@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = comcerto2k
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = ymartin59
-DESCRIPTION = "Beets is the media library management system for obsessive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AutoBPM; \(and BPD, ReplayGain on Evansport\)."
+DESCRIPTION = Beets is the media library management system for obsessive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AutoBPM; \(and BPD, ReplayGain on Evansport\).
 
 DISPLAY_NAME = beets
 STARTABLE = no
