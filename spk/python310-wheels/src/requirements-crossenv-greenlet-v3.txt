@@ -5,5 +5,7 @@
 ##
 
 # [greenlet]
-#   - gcc < 5.0 (DSM6) Last known working version
-greenlet==1.1.3
+#   - Mandatory require full c++11 support
+greenlet==3.0.3
+#   - Mandatory require full c++20 support added with gcc >= 8
+greenlet==3.1.1

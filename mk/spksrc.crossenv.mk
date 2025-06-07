@@ -230,6 +230,7 @@ crossenv-install-%:
 	   $$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
 	   $(EXTRA_PIP_ARGS) \
+	   --no-build-isolation \
 	   --disable-pip-version-check \
 	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
 	$(RUN) \
@@ -237,6 +238,7 @@ crossenv-install-%:
 	   $$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
 	   $(EXTRA_PIP_ARGS) \
+	   --no-build-isolation \
 	   --disable-pip-version-check \
 	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
 	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false

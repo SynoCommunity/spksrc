@@ -1,10 +1,10 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = 653bd04
-SPK_GIT_DATE = 20241111
+SPK_GIT_HASH = 808a87a
+SPK_GIT_DATE = 20250604
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 41
+SPK_REV = 43
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
@@ -34,7 +34,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 653bd04 as of Nov. 11th 2024. <br/>2. Migrate to python 3.12."
+CHANGELOG = "1. Update to latest git version 20250604 as of June 4th 2025"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 

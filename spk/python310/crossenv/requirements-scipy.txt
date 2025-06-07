@@ -1,0 +1,15 @@
+pip==24.3.1
+setuptools==75.8.0
+wheel==0.45.1
+#
+build:Cython==3.0.11
+build:markupsafe==3.0.2
+build:meson==1.7.0
+build:meson-python==0.17.1
+build:pythran==0.17.0
+#
+wheelhouse:numpy==2.2.4
+cross:build==1.2.2
+cross:mako==1.3.9
+cross:pybind11==2.13.6
+cross:sympy==1.13.3

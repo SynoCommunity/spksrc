@@ -1,7 +1,7 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.11
+SPK_VERS = 3.11.12
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 10
+SPK_REV = 12
 SPK_ICON = src/python3.png
 
 # Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
@@ -10,7 +10,6 @@ SPK_ICON = src/python3.png
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS  = cross/python311
-DEPENDS += python/pip
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Python Programming Language.
@@ -18,7 +17,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.11<br/>2. Update all mandatory wheels"
+CHANGELOG = "1. Update to Python 3.11.12"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
