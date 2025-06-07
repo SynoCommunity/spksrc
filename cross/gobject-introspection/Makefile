@@ -18,7 +18,7 @@ include ../../mk/spksrc.main-depends.mk
 
 # Dependency glib-2.0 needs: '>=2.78.0'
 # Requires kernel >= 3.10 && gcc >= 7.5 to build successfully
-ifeq ($(call version_ge, $(TC_KERNEL), 3.10)$(call version_ge, $(TC_GCC), 7.5),11)
+ifneq ($(call version_ge, $(TC_KERNEL), 3.10)$(call version_ge, $(TC_GCC), 7.5),11)
 UNSUPPORTED_ARCHS = $(ARCH)
 endif
 
