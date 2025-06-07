@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = comcerto2k
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = ymartin59
-DESCRIPTION = Beets is the media library management system for obsessive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AutoBPM; \(and BPD, ReplayGain on Evansport\).
+DESCRIPTION = Beets is the media library management system for obsessive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AutoBPM; \(and BPD, ReplayGain on Linux kernel < 3.10\).
 
 DISPLAY_NAME = beets
 STARTABLE = no
@@ -52,8 +52,9 @@ DEPENDS += python/lap
 
 include ../../mk/spksrc.common.mk
 
+GI_OLD_LINUX_KERNEL = armada370 armada375 armadaxp comcerto2k evansport
 # [pygobject] - depends on [pycairo]
-ifneq ($(findstring $(ARCH),evansport),$(ARCH))
+ifneq ($(findstring $(ARCH),$(GI_OLD_LINUX_KERNEL)),$(ARCH))
 DEPENDS += python/pycairo
 DEPENDS += python/pygobject
 endif

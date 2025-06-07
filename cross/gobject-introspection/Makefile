@@ -12,11 +12,9 @@ HOMEPAGE = https://gi.readthedocs.io/
 COMMENT  = GObject introspection is a middleware layer between C libraries (using GObject) and language bindings.
 LICENSE  = LGPLv2+
 
-# gobject-introspection requires glib-2.0 ≥ 2.78.0 (the current cross/glib-latest build is 2.78.4).
-# cross/glib 2.78.4 in turn needs a Linux kernel ≥ 3.10, but the Evansport platform is limited to 3.2.101.
-# As a result, Evansport is not supported.
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k evansport
+# cross/glib >= 2.78.4 requires kernel >= 3.10
+UNSUPPORTED_ARCHS = armada370 armada375 armadaxp comcerto2k evansport
 
 CONFIGURE_ARGS += -Dbuild_introspection_data=false
 

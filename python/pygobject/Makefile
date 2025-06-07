@@ -14,7 +14,7 @@ LICENSE  = LGPLv2.1+
 # GObject Introspection >= 1.79.0 requires GLib >= 2.79
 
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k evansport
+UNSUPPORTED_ARCHS = armada370 armada375 armadaxp comcerto2k evansport
 
 DEPENDS  = cross/gobject-introspection
 DEPENDS += python/pycairo
