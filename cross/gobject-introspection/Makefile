@@ -17,6 +17,6 @@ LICENSE  = LGPLv2+
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k evansport
 
-#CONFIGURE_ARGS += -Dbuild_introspection_data=false
+CONFIGURE_ARGS += -Dbuild_introspection_data=false
 
 include ../../mk/spksrc.cross-meson.mk
