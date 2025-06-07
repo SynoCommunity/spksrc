@@ -52,10 +52,9 @@ DEPENDS += python/lap
 
 include ../../mk/spksrc.common.mk
 
-ifneq ($(findstring $(ARCH),evansport),$(ARCH))
-# [pycairo]
-DEPENDS += python/pycairo
 # [pygobject] - depends on [pycairo]
+ifneq ($(findstring $(ARCH),evansport),$(ARCH))
+DEPENDS += python/pycairo
 DEPENDS += python/pygobject
 endif
 
