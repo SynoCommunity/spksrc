@@ -1,6 +1,6 @@
 SPK_NAME = flexget
-SPK_VERS = 3.15.42
-SPK_REV = 16
+SPK_VERS = 3.16.3
+SPK_REV = 17
 SPK_ICON = src/flexget.png
 
 # Python 3.12 not supported for:
@@ -15,7 +15,7 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
 DISPLAY_NAME = FlexGet
-CHANGELOG = "1. Update FlexGet to v3.15.42. <br/>2. Avoid config overwrite on package update."
+CHANGELOG = "1. Update FlexGet to v3.16.3."
 STARTABLE = yes
 
 HOMEPAGE = https://flexget.com/

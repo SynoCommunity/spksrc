@@ -127,7 +127,7 @@ WHEELS += src/requirements-crossenv-greenlet-v1.txt
 endif
 
 # [numpy] <= 1.21.6 (armv5)
-# This version is now unsupported using py311
+# This version is now unsupported using pip>=23.2.1
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # [numpy] <= 1.22.4 (armv7l)
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
@@ -145,14 +145,6 @@ WHEELS += src/requirements-crossenv-numpy-gcc85-x64.txt
 else
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
-
-# [numpy] >= 1.26|2.x
-DEPENDS += python/numpy_1.26
-DEPENDS += python/numpy_ha
-DEPENDS += python/numpy
-
-# [scipy] - depends on numpy 
-DEPENDS += python/scipy
 endif
 endif
 
@@ -162,6 +154,17 @@ ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 WHEELS_CFLAGS += [numpy] -O0
 endif
+endif
+
+# [numpy] >= 1.26|2.x
+# Requires gcc>=8.4 to build sucesfully
+ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
+DEPENDS += python/numpy
+
+# [scipy] - depends on numpy
+DEPENDS += python/scipy
 endif
 
 # [pycryptodome]
