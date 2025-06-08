@@ -50,7 +50,7 @@ DEPENDS += python/numpy
 # [lap] - depends on [numpy]
 DEPENDS += python/lap
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.archs.mk
 
 # [pygobject] - depends on [pycairo]
 ifneq ($(findstring $(ARCH),$(DSM_ARMv7_ARCHS) $(i686_ARCHS)),$(ARCH))
