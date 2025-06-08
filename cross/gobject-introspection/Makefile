@@ -1,9 +1,9 @@
 PKG_NAME = gobject-introspection
 PKG_VERS = 1.78.1
-PKG_EXT = tar.gz
+PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://gitlab.gnome.org/GNOME/$(PKG_NAME)/-/archive/$(PKG_VERS)
+PKG_DIST_SITE = https://download.gnome.org/sources/gobject-introspection/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 
 DEPENDS = cross/glib cross/libffi cross/cairo
 BUILD_DEPENDS = cross/python311
