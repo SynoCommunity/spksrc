@@ -59,6 +59,9 @@ endif
 # [Pillow]
 DEPENDS += python/pillow
 
+# [rencode]
+DEPENDS += python/rencode
+
 .NOTPARALLEL:
 .PHONY: deluge_extra_install
 deluge_extra_install:
