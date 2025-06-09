@@ -100,6 +100,9 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# [rencode]
+DEPENDS += python/rencode
+
 # [rpds-py]
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += src/requirements-crossenv-rpds-py.txt

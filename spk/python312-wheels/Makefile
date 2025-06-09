@@ -82,6 +82,9 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# [rencode]
+DEPENDS += python/rencode
+
 # [rpds-py]
 # Version >= 0.22.3 requires rustc >= 1.80
 ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
