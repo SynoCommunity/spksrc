@@ -37,7 +37,6 @@ netifaces==0.11.0
 psutil==6.1.1
 pyrsistent==0.19.3
 regex==2024.11.6
-rencode==1.0.8
 ruamel.yaml.clib==0.2.7
 SQLAlchemy==2.0.32
 zope.interface==7.0.2
