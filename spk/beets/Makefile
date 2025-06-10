@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = comcerto2k
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = ymartin59
-DESCRIPTION = Beets is the media library management system for obsessive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AutoBPM; \(and BPD, ReplayGain on ARMv7 and i686\).
+DESCRIPTION = Beets is the media library management system for obsessive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AutoBPM.
 
 DISPLAY_NAME = beets
 STARTABLE = no
@@ -26,8 +26,7 @@ SERVICE_SETUP = src/service-setup.sh
 SPK_COMMANDS = env/bin/beet
 
 # NOTE: Built with support for the following plugins:
-# aura, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, metasync, mpdstats, plexupdate, scrub, sonosupdate, thumbnails, web.
-# bpd and replaygain are only supported on non-evansport arch.
+# aura, bpd, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, metasync, mpdstats, plexupdate, replaygain, scrub, sonosupdate, thumbnails, web.
 
 # [dbus-python]
 DEPENDS += python/dbus-python
@@ -50,12 +49,10 @@ DEPENDS += python/numpy
 # [lap] - depends on [numpy]
 DEPENDS += python/lap
 
-include ../../mk/spksrc.archs.mk
+# [pycairo]
+DEPENDS += python/pycairo
 
 # [pygobject] - depends on [pycairo]
-ifneq ($(findstring $(ARCH),$(DSM_ARMv7_ARCHS) $(i686_ARCHS)),$(ARCH))
-DEPENDS += python/pycairo
 DEPENDS += python/pygobject
-endif
 
 include ../../mk/spksrc.python.mk
