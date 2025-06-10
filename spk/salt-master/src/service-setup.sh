@@ -62,7 +62,7 @@ service_postinst ()
            --directory=${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/salt/utils \
            ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
 
-    # Prepare salt-master config in /var/packages/salt-master/target/etc
+    # Prepare salt-master config in /var/packages/salt-master/etc
     test -d ${SYNOPKG_PKGETC}/master.d || install -m 755 -d ${SYNOPKG_PKGETC}/master.d
     test -f ${SYNOPKG_PKGETC}/master || install -m 644 ${SYNOPKG_PKGDEST}/share/master ${SYNOPKG_PKGETC}/master
     test -f ${SYNOPKG_PKGETC}/master.d/01_pidfile.conf || echo "pidfile: run" > ${SYNOPKG_PKGETC}/master.d/01_pidfile.conf
@@ -72,4 +72,5 @@ service_postinst ()
     test -f ${SYNOPKG_PKGETC}/master.d/05_loglevel.conf || echo "log_level_logfile: info" >> ${SYNOPKG_PKGETC}/master.d/05_loglevel.conf
     test -f ${SYNOPKG_PKGETC}/master.d/06_pkidir.conf || echo "pki_dir: pki/master" > ${SYNOPKG_PKGETC}/master.d/06_pkidir.conf
     test -f ${SYNOPKG_PKGETC}/master.d/07_rootdir.conf || echo "root_dir: ${SYNOPKG_PKGVAR}" > ${SYNOPKG_PKGETC}/master.d/07_rootdir.conf
+    test -f ${SYNOPKG_PKGETC}/master.d/08_extmodsdir.conf || echo "extension_modules: extensions" > ${SYNOPKG_PKGETC}/master.d/08_extmodsdir.conf
 }

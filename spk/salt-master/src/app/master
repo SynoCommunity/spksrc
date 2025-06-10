@@ -63,7 +63,6 @@ worker_threads: 3
 # sock_dir, log_file, autosign_file, autoreject_file, extension_modules,
 # key_logfile, pidfile:
 #root_dir: /
-root_dir: /usr/local/salt-master
 
 # Directory used to store public key data:
 #pki_dir: /etc/salt/pki/master
@@ -75,7 +74,6 @@ root_dir: /usr/local/salt-master
 # each of Salt's module types such as "runners", "output", "wheel", "modules",
 # "states", "returners", etc.
 #extension_modules: <no default>
-extension_modules: ../share/extensions
 
 # Directory for custom modules. This directory can contain subdirectories for
 # each of Salt's module types such as "runners", "output", "wheel", "modules",

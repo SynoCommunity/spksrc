@@ -1,4 +1,4 @@
-# Generated using the requirements script on May 17, 2025
+# Generated using the requirements script on June 10, 2025
 # https://github.com/saltstack/salt/blob/master/requirements/static/pkg/py3.12/linux.txt
 
 aiohttp==3.9.5
