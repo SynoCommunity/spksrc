@@ -17,12 +17,22 @@ HOMEPAGE = https://harfbuzz.github.io/
 COMMENT  = HarfBuzz is a text shaping library. Using the HarfBuzz library allows programs to convert a sequence of Unicode input into properly formatted and positioned glyph output—for any writing system and language.
 LICENSE  = Old MIT
 
-GNU_CONFIGURE = 1
 CONFIGURE_ARGS = -Dtests=disabled
 
 include ../../mk/spksrc.common.mk
+
 ifeq ($(call version_lt, $(TCVERSION), 7),1)
-ADDITIONAL_CFLAGS  = -std=c11
+ADDITIONAL_CXXFLAGS += -std=c++11
+endif
+
+ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+#DEPENDS += cross/gobject-introspection
+#CONFIGURE_ARGS += -Dintrospection=disabled
+CONFIGURE_ARGS += -Dgobject=disabled
+ADDITIONAL_CXXFLAGS += -fpermissive
+ADDITIONAL_CXXFLAGS += -Wno-parentheses
+ADDITIONAL_CXXFLAGS += -Wno-unused-parameter
+ADDITIONAL_CXXFLAGS += -Wno-unused-but-set-variable
 endif
 
 # let it find glib-mkenums
