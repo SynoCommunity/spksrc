@@ -5,10 +5,10 @@
 charset_normalizer==3.4.2
 #dbus_python                    ==> python/dbus-python
 jellyfish==1.2.0
-#lap                            ==> python/lap
+#lap>=0.5.12                    ==> python/lap
 lxml==5.4.0
 MarkupSafe==3.0.2
-#numpy                          ==> python/numpy
+#numpy>=1.24.4                  ==> python/numpy
 #pillow                         ==> python/pillow
 #pycairo                        ==> python/pycairo
 #pygobject                      ==> python/pygobject
