@@ -91,6 +91,5 @@ endif
 salt-master_extra_install:
 	install -m 644 src/app/rsax931.py.patch $(STAGING_DIR)/share
 	install -m 644 src/app/master $(STAGING_DIR)/share
-	install -m 755 -d $(STAGING_DIR)/var/extensions
 	install -m 755 -d $(STAGING_DIR)/var/extensions/auth
 	install -m 644 src/app/synology.py $(STAGING_DIR)/var/extensions/auth/synology.py
