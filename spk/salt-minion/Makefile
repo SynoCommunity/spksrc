@@ -1,6 +1,6 @@
 SPK_NAME = salt-minion
-SPK_VERS = 3007.2
-SPK_REV = 5
+SPK_VERS = 3007.3
+SPK_REV = 6
 SPK_ICON = src/salt-minion.png
 
 PYTHON_PACKAGE = python312
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Minion
-CHANGELOG    = "1. Update to 3007.2<br/>2. Migrate to Python 3.12"
+CHANGELOG    = "1. Update to 3007.3"
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache
