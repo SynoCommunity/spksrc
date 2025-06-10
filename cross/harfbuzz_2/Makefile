@@ -18,6 +18,7 @@ COMMENT  = HarfBuzz is a text shaping library. Using the HarfBuzz library allows
 LICENSE  = Old MIT
 
 CONFIGURE_ARGS = -Dtests=disabled
+POST_INSTALL_TARGET = harfbuzz-post-install-target
 
 include ../../mk/spksrc.common.mk
 
@@ -39,3 +40,7 @@ endif
 ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
 
 include ../../mk/spksrc.cross-meson.mk
+
+.PHONY: harfbuzz-post-install-target
+harfbuzz-post-install-target:
+	$(RUN) sed -i 's|$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/harfbuzz*.pc
