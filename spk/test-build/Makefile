@@ -5,9 +5,6 @@ SPK_REV = 1
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k evansport
-
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # [pycairo]
