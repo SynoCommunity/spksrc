@@ -21,7 +21,7 @@ service_postinst ()
            --directory=${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/salt/utils \
            ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
 
-    # Prepare salt-minion config in /var/packages/salt-minion/target/etc
+    # Prepare salt-minion config in /var/packages/salt-minion/etc
     test -d ${SYNOPKG_PKGETC}/minion.d || install -m 755 -d ${SYNOPKG_PKGETC}/minion.d
     test -f ${SYNOPKG_PKGETC}/minion || install -m 644 ${SYNOPKG_PKGDEST}/share/minion ${SYNOPKG_PKGETC}/minion
     test -f ${SYNOPKG_PKGETC}/proxy || install -m 644 ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGETC}/proxy
