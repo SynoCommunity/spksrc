@@ -15,7 +15,7 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 # DEPENDS += python/pycairo
 
 # [pygobject] - depends on [pycairo]
-DEPENDS = python/pygobject
+DEPENDS += python/pygobject
 
 MAINTAINER = mreid-tt
 STARTABLE = no

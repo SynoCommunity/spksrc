@@ -5,7 +5,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.gnome.org/sources/gobject-introspection/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 
-DEPENDS = cross/cairo cross/glib cross/libffi
+DEPENDS = cross/glib cross/libffi
 BUILD_DEPENDS = native/python312
 
 HOMEPAGE = https://gi.readthedocs.io/
