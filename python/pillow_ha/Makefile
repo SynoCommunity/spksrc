@@ -1,9 +1,10 @@
-PKG_NAME = pillow
+PKG_NAME = pillow_ha
+PKG_REAL_NAME = pillow
 PKG_VERS = 11.0.0
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/pillow
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/freetype cross/libimagequant cross/libjpeg
 DEPENDS += cross/libtiff cross/libwebp cross/zlib
