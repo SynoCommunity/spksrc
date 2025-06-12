@@ -1,7 +1,7 @@
 PKG_NAME = numpy_$(PKG_VERS)
 PKG_REAL_NAME = numpy
 # Reminder to update wheelhouse:numpy==<version>
-# in python312/crossenv/requirements-scipy.txt
+# in python31*/crossenv/requirements-scipy.txt
 PKG_VERS = 2.2.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
