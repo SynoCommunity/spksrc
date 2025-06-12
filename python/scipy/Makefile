@@ -1,7 +1,7 @@
 PKG_NAME = scipy
 # Version >= 1.14.x requires gcc>=9.1 -> DSM-7.2+
 # Or using patch to enforce lower minimal gcc-8.5
-PKG_VERS = 1.15.2
+PKG_VERS = 1.15.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/s/scipy
