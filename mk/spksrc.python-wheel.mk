@@ -31,8 +31,8 @@ endif
 
 ### Prepare crossenv
 prepare_crossenv:
-	@$(MSG) $(MAKE) WHEEL_NAME=\"$(or $(WHEEL_NAME),$(or $(PKG_REAL_NAME),$(PKG_NAME)))\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
-	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(or $(WHEEL_NAME),$(or $(PKG_REAL_NAME),$(PKG_NAME)))" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
+	@$(MSG) $(MAKE) WHEEL_NAME=\"$(or $(PKG_REAL_NAME),$(PKG_NAME))\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
+	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(or $(PKG_REAL_NAME),$(PKG_NAME))" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
 build_python_wheel_target: SHELL:=/bin/bash
 build_python_wheel_target: prepare_crossenv
@@ -62,12 +62,12 @@ install_python_wheel_target: SHELL:=/bin/bash
 install_python_wheel_target:
 	@set -o pipefail; { \
 	$(MSG) $(MAKE) REQUIREMENT=\"$(or $(PKG_REAL_NAME),$(PKG_NAME))==$(PKG_VERS)\" \
-	               WHEEL_NAME=\"$(or $(WHEEL_NAME),$(or $(PKG_REAL_NAME),$(PKG_NAME)))\" \
+	               WHEEL_NAME=\"$(or $(PKG_REAL_NAME),$(PKG_NAME))\" \
 	               WHEEL_VERSION=\"$(PKG_VERS)\" \
 	               WHEEL_TYPE=\"cross\" \
 	               wheel_install ; \
 	MAKEFLAGS= $(MAKE) REQUIREMENT="$(or $(PKG_REAL_NAME),$(PKG_NAME))==$(PKG_VERS)" \
-	                   WHEEL_NAME="$(or $(WHEEL_NAME),$(or $(PKG_REAL_NAME),$(PKG_NAME)))" \
+	                   WHEEL_NAME="$(or $(PKG_REAL_NAME),$(PKG_NAME))" \
 	                   WHEEL_VERSION="$(PKG_VERS)" \
 	                   WHEEL_TYPE="cross" \
 	                   --no-print-directory \
