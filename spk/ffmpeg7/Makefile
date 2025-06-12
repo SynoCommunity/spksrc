@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg7
 SPK_VERS = 7.0.2
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Initial release of version 7 release"
+CHANGELOG = "1. Fix issue on ppc-qoriq arch"
 
 DEPENDS = cross/ffmpeg7
 
