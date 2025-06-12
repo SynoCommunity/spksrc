@@ -1,4 +1,4 @@
-PKG_NAME = pillow_ha
+PKG_NAME = pillow_$(PKG_VERS)
 PKG_REAL_NAME = pillow
 PKG_VERS = 11.0.0
 PKG_EXT = tar.gz
