@@ -19,6 +19,6 @@ ENV += LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += -Dbuild_introspection_data=false
 
 # 'Path or name of the Python interpreter to build for'
-CONFIGURE_ARGS += -Dpython=$(WORK_DIR)/../../../native/python312/work-native/install/usr/local/bin/python3
+CONFIGURE_ARGS += -Dpython=$(STAGING_INSTALL_PREFIX)/bin/python3
 
 include ../../mk/spksrc.cross-meson.mk
