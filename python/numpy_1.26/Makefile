@@ -1,4 +1,4 @@
-PKG_NAME = numpy_v1
+PKG_NAME = numpy_$(PKG_VERS)
 PKG_REAL_NAME = numpy
 PKG_VERS = 1.26.4
 PKG_EXT = tar.gz
