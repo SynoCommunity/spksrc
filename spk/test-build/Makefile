@@ -11,10 +11,9 @@ UNSUPPORTED_ARCHS = comcerto2k
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 # [pycairo]
-# --- Removed as a test ---
-# DEPENDS += python/pycairo
+DEPENDS += python/pycairo
 
-# [pygobject] - depends on [pycairo]
+# [pygobject]
 DEPENDS += python/pygobject
 
 MAINTAINER = mreid-tt

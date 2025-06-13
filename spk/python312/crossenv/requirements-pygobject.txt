@@ -4,6 +4,4 @@ wheel==0.45.1
 #
 build:meson-python==0.17.1
 #
-# --- Removed as a test ---
-# wheelhouse:pycairo==1.28.0
 cross:build==1.2.2
