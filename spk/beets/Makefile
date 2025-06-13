@@ -49,10 +49,10 @@ DEPENDS += python/numpy
 # [lap] - depends on [numpy]
 DEPENDS += python/lap
 
+# [pygobject]
+DEPENDS += python/pygobject
+
 # [pycairo]
 DEPENDS += python/pycairo
-
-# [pygobject] - depends on [pycairo]
-DEPENDS += python/pygobject
 
 include ../../mk/spksrc.python.mk
