@@ -38,6 +38,12 @@ DEPENDS += cross/libxslt
 # [Pillow]
 DEPENDS += python/pillow
 
+# [pycairo]
+DEPENDS += python/pycairo
+
+# [pygobject]
+DEPENDS += python/pygobject
+
 # [PyYAML]
 DEPENDS += cross/libyaml
 
@@ -48,11 +54,5 @@ DEPENDS += python/numpy
 
 # [lap] - depends on [numpy]
 DEPENDS += python/lap
-
-# [pygobject]
-DEPENDS += python/pygobject
-
-# [pycairo]
-DEPENDS += python/pycairo
 
 include ../../mk/spksrc.python.mk
