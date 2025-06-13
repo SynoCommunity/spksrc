@@ -4,5 +4,4 @@ wheel==0.45.1
 #
 build:meson-python==0.17.1
 #
-wheelhouse:pycairo==1.28.0
 cross:build==1.2.2
