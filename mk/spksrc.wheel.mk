@@ -31,7 +31,7 @@ include ../../mk/spksrc.crossenv.mk
 include ../../mk/spksrc.cross-cmake-env.mk
 
 ## meson specific configurations
-include ../../mk/spksrc.cross-meson-env.mk
+#include ../../mk/spksrc.cross-meson-env.mk
 
 include ../../mk/spksrc.wheel-download.mk
 
@@ -77,21 +77,19 @@ else
 	$(error No python wheel to process)
 endif
 
+# 1) Loop over direct requirements in $(WHEELS)
+# 2) Loop over each requirement files in $(WHEELS)
 wheel_target: SHELL:=/bin/bash
 wheel_target: pre_wheel_target
-ifneq ($(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))),)
-	@set -e ; \
-	for requirement in $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) ; do \
-	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${requirement}\" REQUIREMENT_GOAL=\"$(WHEEL_GOAL)\" requirement ; \
-	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${requirement}" REQUIREMENT_GOAL="$(WHEEL_GOAL)" requirement --no-print-directory || false ; \
-	done
-else
 	@set -e ; \
 	for requirement in $(filter-out $(addprefix src/,$(notdir $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))))),$(WHEELS)) ; do \
 	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${requirement}\" REQUIREMENT_GOAL=\"$(WHEEL_GOAL)\" requirement ; \
 	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${requirement}" REQUIREMENT_GOAL="$(WHEEL_GOAL)" requirement --no-print-directory || false ; \
+	done ; \
+	for requirement in $(wildcard $(abspath $(addprefix $(WORK_DIR)/../,$(WHEELS)))) ; do \
+	   $(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$${requirement}\" REQUIREMENT_GOAL=\"$(WHEEL_GOAL)\" requirement ; \
+	   MAKEFLAGS= $(MAKE) ARCH="$(ARCH)" TCVERSION="$(TCVERSION)" REQUIREMENT="$${requirement}" REQUIREMENT_GOAL="$(WHEEL_GOAL)" requirement --no-print-directory || false ; \
 	done
-endif
 
 download-wheels: $(WHEEL_TARGET)
 

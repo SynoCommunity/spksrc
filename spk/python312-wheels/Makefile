@@ -21,23 +21,30 @@ CHANGELOG = "1. Initial package"
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
 
-# Enable debug_info symgols
+# Enable debug_info symbols
 #GCC_DEBUG_INFO := 1
 
 # IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
 # later additions are ok, but WHEELS must not be empty at this point,
 # otherwise the build of WHEELS is skipped
-WHEELS  = src/requirements-abi3.txt
+WHEELS += src/requirements-abi3.txt
 WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
+
+SERVICE_SETUP = src/service-setup.sh
+
+OPTIONAL_DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy_ha
+OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
 
 # [cryptography]
-# Use cross/cryptography to generate py36-abi3 limited API
+# Use python/cryptography to generate py36-abi3 limited API
 # NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
 #       To generate py311-py311 regular build use src/requirements-crossenv.txt
-DEPENDS += cross/cryptography
+DEPENDS += python/cryptography
 
 # [mysqlclient]
 DEPENDS += cross/mysql-connector-c
@@ -49,11 +56,11 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 # Needs atomic to build
 # Serves as maturin type python-wheel.mk example
 ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/pendulum
+DEPENDS += python/pendulum
 endif
 
 # [Pillow]
-DEPENDS += cross/pillow
+DEPENDS += python/pillow
 
 # [pycares]
 DEPENDS += cross/c-ares
@@ -64,7 +71,7 @@ DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
 # [pydantic-core] 
-DEPENDS += cross/pydantic-core
+DEPENDS += python/pydantic-core
 
 # [PyNaCl]
 DEPENDS += cross/libsodium
@@ -129,8 +136,15 @@ WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
 # [numpy]
-ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy.txt
+# gcc-8.4 is the minimal version to build numpy
+# gcc-8.5 happens to be the default version for DSM-7.1
+ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy_ha
+DEPENDS += python/numpy
+
+# [scipy] - depends on numpy
+DEPENDS += python/scipy
 endif
 
 # [pycryptodome]

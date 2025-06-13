@@ -1,5 +1,5 @@
 PKG_NAME = cops
-PKG_VERS = 3.5.7
+PKG_VERS = 3.6.5
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-php82.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mikespub-org/seblucas-cops/releases/download/$(PKG_VERS)

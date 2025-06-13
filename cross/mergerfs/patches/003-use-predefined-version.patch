@@ -1,0 +1,16 @@
+# Always use version from VERSION file
+# - disable git: avoid version from git repository
+# 
+--- buildtools/update-version.orig	2024-02-29 23:33:57.000000000 +0000
++++ buildtools/update-version	2025-04-05 13:44:27.510252982 +0000
+@@ -1,9 +1,6 @@
+ #!/bin/sh
+ 
+-VERSION=$(git describe --always --tags --dirty)
+-if [ $? -ne 0 ]; then
+-    VERSION=$(cat VERSION)
+-fi
++VERSION=$(cat VERSION)
+ 
+ if [ "${VERSION}" = "" ]; then
+     VERSION="unknown"

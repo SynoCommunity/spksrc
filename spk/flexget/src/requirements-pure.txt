@@ -1,30 +1,33 @@
-# Snapshot from Jan. 18th 2025
+# Generated using the requirements script on May 31, 2025
 
-aniso8601==10.0.0
+aniso8601==10.0.1
+anyio==4.9.0
 APScheduler==3.11.0
-attrs==24.3.0
+attrs==25.3.0
 autocommand==2.2.2
 babelfish==0.6.1
-backports.tarfile==1.2.0
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.4
 blinker==1.9.0
-#Brotli                             ==> crossenv
-#certifi                            ==> py311
-#charset-normalizer                 ==> crossenv
+#certifi==2025.4.26                     ==> python312
 cheroot==10.0.1
 CherryPy==18.10.0
-click==8.1.8
-colorama==0.4.6
+click==8.2.1
+deluge_client==1.10.2
 feedparser==6.0.11
-Flask==3.1.0
-Flask-Compress==1.17
-Flask-Cors==5.0.0
-Flask-Login==0.6.3
-flask-restx==1.3.0
-FlexGet==3.13.16
-#greenlet                           ==> crossenv
+flask==3.1.1
+Flask_Compress==1.17
+flask_cors==6.0.0
+Flask_Login==0.6.3
+flask_restx==1.3.0
+flexget==3.16.3
 guessit==3.8.0
+h11==0.16.0
+h2==4.2.0
+hpack==4.1.0
 html5lib==1.1
+httpcore==1.0.9
+httpx==0.28.1
+hyperframe==6.1.0
 idna==3.10
 importlib_resources==6.5.2
 itsdangerous==2.2.0
@@ -32,45 +35,43 @@ jaraco.collections==5.1.0
 jaraco.context==6.0.1
 jaraco.functools==4.1.0
 jaraco.text==4.0.0
-Jinja2==3.1.5
-jsonschema==4.23.0
-jsonschema-specifications==2024.10.1
+jinja2==3.1.6
+jsonschema==4.24.0
+jsonschema_specifications==2025.4.1
 loguru==0.7.3
-markdown-it-py==3.0.0
-#MarkupSafe                         ==> crossenv
+markdown_it_py==3.0.0
 mdurl==0.1.2
-more-itertools==10.6.0
-packaging==24.2
-#pendulum                           ==> crossenv
+more_itertools==10.7.0
+packaging==25.0
+#pip==24.3.1                            ==> python312
 plumbum==1.9.0
-portend==3.2.0
-#psutil                             ==> crossenv
-Pygments==2.19.1
+portend==3.2.1
+pygments==2.19.1
 pynzb==0.1.0
-pyparsing==3.2.1
-PyRSS2Gen==1.1
-python-dateutil==2.9.0.post0
-pytz==2024.2
-#PyYAML                             ==> crossenv
+pyparsing==3.2.3
+pyrss2gen==1.1
+python_dateutil==2.9.0.post0
+python_telegram_bot==22.0
+pytz==2025.2
+qbittorrent_api==2025.5.0
 rebulk==3.2.0
-referencing==0.36.1
+referencing==0.36.2
 requests==2.32.3
-rich==13.9.4
-#rpds-py                            ==> crossenv
-rpyc==6.0.1
-setuptools==75.7.0
+rich==14.0.0
+rpyc==6.0.2
+#setuptools==80.9.0                     ==> python312
 sgmllib3k==1.0.0
-#six                                ==> py311
-soupsieve==2.6
-#SQLAlchemy                         ==> crossenv
+#six==1.17.0                            ==> python312
+sniffio==1.3.1
+socksio==1.0.0
+soupsieve==2.7
 tempora==5.8.0
-#time-machine                       ==> crossenv
-typing_extensions==4.12.2
-tzdata==2024.2
-tzlocal==5.2
+transmission_rpc==7.0.11
+typing_extensions==4.13.2
+tzdata==2025.2
+tzlocal==5.3.1
 urllib3==1.26.20
 webencodings==0.5.1
-Werkzeug==3.1.3
+werkzeug==3.1.3
 zc.lockfile==3.0.post1
-#zstandard                          ==> crossenv
-zxcvbn==4.4.28
+zxcvbn==4.5.0

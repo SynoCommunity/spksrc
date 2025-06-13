@@ -1,8 +1,8 @@
-# Generated using the requirements script on March 23, 2025
+# Generated using the requirements script on April 18, 2025
 
-borgbackup==1.4.0
+borgbackup==1.4.1
 charset_normalizer==3.4.1
 llfuse==1.5.1
 msgpack==1.1.0
-rpds_py==0.21.0
+rpds_py==0.22.3
 ruamel.yaml.clib==0.2.12
