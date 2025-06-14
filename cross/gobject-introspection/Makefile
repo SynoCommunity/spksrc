@@ -13,7 +13,7 @@ COMMENT  = GObject introspection is a middleware layer between C libraries (usin
 LICENSE  = LGPLv2+
 
 # let meson use libglib in install folder
-ENV += LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib
+# ENV += LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib
 
 # disable 'Install g-ir-doc-tool and run related tests'
 CONFIGURE_ARGS  = -Ddoctool=disabled
