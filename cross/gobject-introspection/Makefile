@@ -24,7 +24,4 @@ CONFIGURE_ARGS += -Dcairo=disabled
 # data creation fails when cross compiling (we don't have exe wrappers)
 CONFIGURE_ARGS += -Dbuild_introspection_data=false
 
-# 'Path or name of the Python interpreter to build for'
-# CONFIGURE_ARGS += -Dpython=$(WORK_DIR)/../../../native/python312/work-native/install/usr/local/bin/python3
-
 include ../../mk/spksrc.cross-meson.mk
