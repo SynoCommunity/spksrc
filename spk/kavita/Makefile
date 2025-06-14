@@ -1,9 +1,9 @@
 SPK_NAME = kavita
 SPK_VERS = 0.8.6.2
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/kavita.png
 
-DEPENDS = cross/kavita
+DEPENDS = cross/kavita cross/libe_sqlite3
 
 # Arch exclusions for dotnet 6.0
 DOTNET_CORE_ARCHS = 1
@@ -32,9 +32,14 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard/
 
-POST_STRIP_TARGET = kavita_extra_install
+POST_STRIP_TARGET = kavita_custom_libe_sqlite3 kavita_extra_install
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: kavita_custom_libe_sqlite3
+kavita_custom_libe_sqlite3:
+	@$(MSG) "Replace libe_sqlite3 with version built for DSM"
+	mv -f $(STAGING_DIR)/lib/libe_sqlite3.so $(STAGING_DIR)/share/libe_sqlite3.so
 
 .PHONY: kavita_extra_install
 kavita_extra_install:
