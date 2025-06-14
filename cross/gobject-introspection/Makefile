@@ -20,7 +20,7 @@ CONFIGURE_ARGS  = -Ddoctool=disabled
 # disable 'Use cairo for tests'
 CONFIGURE_ARGS += -Dcairo=disabled
 # disable 'Build and run tests'
-CONFIGURE_ARGS += -Dtests=false
+# CONFIGURE_ARGS += -Dtests=false
 # data creation fails when cross compiling (we don't have exe wrappers)
 CONFIGURE_ARGS += -Dbuild_introspection_data=false
 
