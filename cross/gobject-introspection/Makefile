@@ -24,6 +24,12 @@ CONFIGURE_ARGS += -Dtests=false
 # data creation fails when cross compiling (we don't have exe wrappers)
 CONFIGURE_ARGS += -Dbuild_introspection_data=false
 
+# test of cross use prebuilt gi
+CONFIGURE_ARGS += -Dgi_cross_use_prebuilt_gi=true
+
+# test of cross binary wrapper
+# CONFIGURE_ARGS += -Dgi_cross_binary_wrapper=enabled
+
 # 'Path or name of the Python interpreter to build for'
 CONFIGURE_ARGS += -Dpython=$(WORK_DIR)/../../../native/python312/work-native/install/usr/local/bin/python3
 
