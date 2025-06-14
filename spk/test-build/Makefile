@@ -21,4 +21,5 @@ DEPENDS = cross/gobject-introspection
 MAINTAINER = mreid-tt
 STARTABLE = no
 
-include ../../mk/spksrc.python.mk
+# include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk.mk
