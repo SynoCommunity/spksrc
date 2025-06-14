@@ -1,5 +1,5 @@
 PKG_NAME = gobject-introspection
-PKG_VERS = 1.84.0
+PKG_VERS = 1.78.1
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
