@@ -16,9 +16,9 @@ LICENSE  = LGPLv2+
 # ENV += LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib
 
 # disable 'Install g-ir-doc-tool and run related tests'
-CONFIGURE_ARGS  = -Ddoctool=disabled
+# CONFIGURE_ARGS  = -Ddoctool=disabled
 # disable 'Use cairo for tests'
-CONFIGURE_ARGS += -Dcairo=disabled
+# CONFIGURE_ARGS += -Dcairo=disabled
 # disable 'Build and run tests'
 # CONFIGURE_ARGS += -Dtests=false
 # data creation fails when cross compiling (we don't have exe wrappers)
