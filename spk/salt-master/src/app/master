@@ -63,7 +63,6 @@ worker_threads: 3
 # sock_dir, log_file, autosign_file, autoreject_file, extension_modules,
 # key_logfile, pidfile:
 #root_dir: /
-root_dir: /usr/local/salt-master
 
 # Directory used to store public key data:
 #pki_dir: /etc/salt/pki/master
@@ -75,7 +74,6 @@ root_dir: /usr/local/salt-master
 # each of Salt's module types such as "runners", "output", "wheel", "modules",
 # "states", "returners", etc.
 #extension_modules: <no default>
-extension_modules: /share/extensions
 
 # Directory for custom modules. This directory can contain subdirectories for
 # each of Salt's module types such as "runners", "output", "wheel", "modules",
@@ -275,7 +273,7 @@ extension_modules: /share/extensions
 #      - test.*
 external_auth:
   synology:
-    admin:
+    administrators%:
       - .*
       - '@runner'
       - '@wheel'
@@ -740,8 +738,18 @@ external_auth:
 ######################################
 rest_cherrypy:
   port: 8282
-  host: 127.0.0.1
+  # listen on all interfaces
+  host: 0.0.0.0
+  app: /var/packages/salt-master/var/saltgui/index.html
+  static: /var/packages/salt-master/var/saltgui/static
+  static_path: /static
   disable_ssl: true
   thread_pool: 30
   socket_queue_size: 10
 
+# since Salt 3006, must explicitly allow these clients for SaltGUI
+netapi_enable_clients:
+  - local
+  - local_async
+  - wheel
+  - runner

@@ -1,0 +1,16 @@
+--- ./src/fix_get_types.py-orig	2021-09-07 11:48:35.000000000 +0000
++++ ./src/fix_get_types.py	2025-06-09 23:46:41.381892662 +0000
+@@ -8,8 +8,12 @@ parser.add_argument ('input')
+ parser.add_argument ('output')
+ args = parser.parse_args ()
+ 
++seen = set()
++
+ with open (args.input, 'r') as inp, open (args.output, 'w') as out:
+     for l in inp.readlines ():
+         l = re.sub ('_t_get_type', '_get_type', l)
+         l = re.sub ('_T \(', ' (', l)
+-        out.write (l)
++        if l not in seen:
++            out.write (l)
++            seen.add (l)

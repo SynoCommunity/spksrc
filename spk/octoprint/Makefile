@@ -1,11 +1,11 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.10.1
-SPK_REV    = 12
+SPK_VERS   = 1.11.1
+SPK_REV    = 13
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
-PYTHON_PACKAGE = python311
-SPK_DEPENDS = "python311>=3.11.5-8"
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
@@ -21,7 +21,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "1. Update OctoPrint to v1.10.1.<br/>2. Bring back package for ARMv5."
+CHANGELOG    = "1. Update OctoPrint to v1.11.1 and depend on Python 3.12."
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes

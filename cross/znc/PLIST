@@ -1,4 +1,7 @@
 bin:bin/znc
+rsc:bin/znc-buildmod
+lnk:lib/libboost_locale.so
+lib:lib/libboost_locale.so.1.86.0
 lib:lib/znc/admindebug.so
 lib:lib/znc/adminlog.so
 lib:lib/znc/alias.so
@@ -21,8 +24,10 @@ lib:lib/znc/clientbuffer.so
 lib:lib/znc/clientnotify.so
 lib:lib/znc/colloquy.so
 lib:lib/znc/controlpanel.so
+lib:lib/znc/corecaps.so
 lib:lib/znc/crypt.so
 lib:lib/znc/ctcpflood.so
+lib:lib/znc/cyrusauth.so
 lib:lib/znc/dcc.so
 lib:lib/znc/disconkick.so
 lib:lib/znc/fail2ban.so
@@ -65,3 +70,4 @@ lib:lib/znc/stripcontrols.so
 lib:lib/znc/watch.so
 lib:lib/znc/webadmin.so
 rsc:share/znc
+rsc:share/locale
