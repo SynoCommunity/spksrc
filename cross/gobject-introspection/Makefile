@@ -16,7 +16,7 @@ LICENSE  = LGPLv2+
 # ENV += LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib
 
 # disable 'Install g-ir-doc-tool and run related tests'
-# CONFIGURE_ARGS  = -Ddoctool=disabled
+# CONFIGURE_ARGS += -Ddoctool=disabled
 # disable 'Use cairo for tests'
 # CONFIGURE_ARGS += -Dcairo=disabled
 # disable 'Build and run tests'
@@ -25,6 +25,7 @@ LICENSE  = LGPLv2+
 CONFIGURE_ARGS += -Dbuild_introspection_data=false
 
 # 'Path or name of the Python interpreter to build for'
-CONFIGURE_ARGS += -Dpython=$(WORK_DIR)/../../../native/python311/work-native/install/usr/local/bin/python3
+#CONFIGURE_ARGS += -Dpython=$(WORK_DIR)/../../../native/python312/work-native/install/usr/local/bin/python3
+CONFIGURE_ARGS += -Dpython=/usr/bin/python3
 
 include ../../mk/spksrc.cross-meson.mk
