@@ -10,11 +10,6 @@ COMMENT  = PyGObject is a Python package which provides bindings for GObject bas
 LICENSE  = LGPLv2.1+
 
 DEPENDS = cross/gobject-introspection
-
-# disable 'build with pycairo integration'
-CONFIGURE_ARGS += -Dpycairo=disabled
-
-# disable 'build unit tests'
-CONFIGURE_ARGS += -Dtests=false
+DEPENDS += python/pycairo
 
 include ../../mk/spksrc.python-wheel-meson.mk

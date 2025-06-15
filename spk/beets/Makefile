@@ -13,7 +13,7 @@ UNSUPPORTED_ARCHS = comcerto2k
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = ymartin59
-DESCRIPTION = Beets is the media library management system for obsessive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music. Plugins not available due to lacking dependencies: AutoBPM.
+DESCRIPTION = Beets is the media library management system for obsessive music geeks. The purpose of beets is to get your music collection right once and for all. It catalogs your collection, automatically improving its metadata as it goes. It then provides a bouquet of tools for manipulating and accessing your music.
 
 DISPLAY_NAME = beets
 STARTABLE = no
@@ -28,7 +28,9 @@ SPK_COMMANDS = env/bin/beet
 SPK_COMMANDS += bin/mp3gain
 
 # NOTE: Built with support for the following plugins:
-# aura, beatport, bpd, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, metasync, mpdstats, plexupdate, replaygain, scrub, sonosupdate, thumbnails, web.
+# beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, metasync, plexupdate, replaygain, scrub, sonosupdate.
+
+# NOTE: Plugins not available due to lacking dependencies: AutoBPM.
 
 ### dependencies for plugins:
 ### -------------------------
@@ -42,14 +44,15 @@ DEPENDS += python/dbus-python
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
-### plugins: aura, embedart, fetchart, thumbnails
+### plugins: embedart, fetchart
 # [Pillow]
 DEPENDS += python/pillow
 
-### plugins: bpd, replaygain
+### plugin: replaygain
 # [pycairo]
 DEPENDS += python/pycairo
-# [pygobject]
+
+# [pygobject] - depends on [pycairo]
 DEPENDS += python/pygobject
 
 ### plugin: replaygain
