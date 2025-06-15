@@ -29,24 +29,26 @@ SPK_COMMANDS = env/bin/beet
 # NOTE: Built with support for the following plugins:
 # aura, beatport, bpd, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, metasync, mpdstats, plexupdate, replaygain, scrub, sonosupdate, thumbnails, web.
 
+### dependencies for plugins:
+### -------------------------
+
+### plugin: metasync
 # [dbus-python]
 DEPENDS += python/dbus-python
 
+### plugin: sonosupdate
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
+### plugins: aura, embedart, fetchart, thumbnails
 # [Pillow]
 DEPENDS += python/pillow
 
-# [pycairo]
-DEPENDS += python/pycairo
-
-### dependencies for plugins:
-### -------------------------
-
 ### plugin: replaygain
 DEPENDS += cross/mp3gain
+
+### plugins: bpd, replaygain
 # [pygobject]
 DEPENDS += python/pygobject
 
