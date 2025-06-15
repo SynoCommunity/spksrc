@@ -47,8 +47,6 @@ DEPENDS += cross/libxslt
 DEPENDS += python/pillow
 
 ### plugins: bpd, replaygain
-# [pycairo]
-DEPENDS += python/pycairo
 # [pygobject]
 DEPENDS += python/pygobject
 
