@@ -9,9 +9,7 @@ jellyfish==1.2.0
 lxml==5.4.0
 MarkupSafe==3.0.2
 #numpy>=1.24.4                  ==> python/numpy
+#pycairo                        ==> python/pycairo
 #pillow                         ==> python/pillow
 #pygobject                      ==> python/pygobject
 PyYAML==6.0.2
-
-# NOTE: bpd and replaygain use PyGObject but do not import gi.repository.Cairo,
-# so we omit python/pycairo here.

@@ -25,6 +25,7 @@ LICENSE  = GPL
 SERVICE_SETUP = src/service-setup.sh
 
 SPK_COMMANDS = env/bin/beet
+SPK_COMMANDS += bin/mp3gain
 
 # NOTE: Built with support for the following plugins:
 # aura, beatport, bpd, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, metasync, mpdstats, plexupdate, replaygain, scrub, sonosupdate, thumbnails, web.
@@ -45,12 +46,14 @@ DEPENDS += cross/libxslt
 # [Pillow]
 DEPENDS += python/pillow
 
-### plugin: replaygain
-DEPENDS += cross/mp3gain
-
 ### plugins: bpd, replaygain
+# [pycairo]
+DEPENDS += python/pycairo
 # [pygobject]
 DEPENDS += python/pygobject
+
+### plugin: replaygain
+DEPENDS += cross/mp3gain
 
 ### -------------------------
 
