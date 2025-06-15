@@ -3,7 +3,7 @@ SPK_VERS = 11.3.5
 SPK_REV = 1
 SPK_ICON = src/open-vm-tools.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/open-vm-tools
 
 # even some archs might sucessfully build, only x86_64 does support VMware virtualization.
 UNSUPPORTED_ARCHS = $(i686_ARCHS) $(PPC_ARCHS) $(ARM_ARCHS)
