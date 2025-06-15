@@ -11,10 +11,10 @@ LICENSE  = LGPLv2.1+
 
 DEPENDS = cross/gobject-introspection
 
-# disable build with pycairo integration 
+# disable 'build with pycairo integration'
 CONFIGURE_ARGS += -Dpycairo=disabled
 
-# disable build of unit tests
+# disable 'build unit tests'
 CONFIGURE_ARGS += -Dtests=false
 
 include ../../mk/spksrc.python-wheel-meson.mk

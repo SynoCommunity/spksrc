@@ -27,7 +27,7 @@ SERVICE_SETUP = src/service-setup.sh
 SPK_COMMANDS = env/bin/beet
 
 # NOTE: Built with support for the following plugins:
-# aura, bpd, beatport, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, metasync, mpdstats, plexupdate, replaygain, scrub, sonosupdate, thumbnails, web.
+# aura, beatport, bpd, chroma, discogs, embedart, embyupdate, fetchart, kodiupdate, lastgenre, lastimport, lyrics, metasync, mpdstats, plexupdate, replaygain, scrub, sonosupdate, thumbnails, web.
 
 # [dbus-python]
 DEPENDS += python/dbus-python
