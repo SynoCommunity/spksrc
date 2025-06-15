@@ -6,6 +6,7 @@ SPK_ICON = src/beets.png
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
+# numpy, pygobject
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
 
@@ -41,15 +42,20 @@ DEPENDS += python/pillow
 # [pycairo]
 DEPENDS += python/pycairo
 
+### dependencies for plugins:
+### -------------------------
+
+### plugin: replaygain
+DEPENDS += cross/mp3gain
 # [pygobject]
 DEPENDS += python/pygobject
+
+### -------------------------
 
 # [PyYAML]
 DEPENDS += cross/libyaml
 
 # [numpy]
-# gcc-8.4 is the minimal version to build numpy
-# gcc-8.5 happens to be the default version for DSM-7.1
 DEPENDS += python/numpy
 
 # [lap] - depends on [numpy]
