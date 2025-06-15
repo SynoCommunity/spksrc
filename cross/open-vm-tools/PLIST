@@ -23,6 +23,7 @@ lib:lib/libvmtools.so.0.0.0
 lib:lib/open-vm-tools/plugins/common/libhgfsServer.so
 lib:lib/open-vm-tools/plugins/common/libvix.so
 lib:lib/open-vm-tools/plugins/vmsvc/libappInfo.so
+lib:lib/open-vm-tools/plugins/vmsvc/libcomponentMgr.so
 lib:lib/open-vm-tools/plugins/vmsvc/libdeployPkgPlugin.so
 lib:lib/open-vm-tools/plugins/vmsvc/libgdp.so
 lib:lib/open-vm-tools/plugins/vmsvc/libguestInfo.so

@@ -8,7 +8,7 @@ SERVICE_COMMAND="${VMTOOLS_DAEMON} -b ${PID_FILE} -c ${CONF_FILE}"
 
 service_postinst ()
 {
-    # create link for etc and lib
+    # create links for etc and lib
     [ -e /etc/vmware-tools ] || ln -s ${SYNOPKG_PKGDEST}/etc/vmware-tools /etc/vmware-tools
     [ -e /lib/open-vm-tools ] || ln -s ${SYNOPKG_PKGDEST}/lib/open-vm-tools /lib/open-vm-tools
     if [ ! -e /lib/udev/rules.d/99-vmware-scsi-udev.rules ]; then
@@ -24,7 +24,7 @@ EOF
 
 service_postuninst ()
 {
-    # Remove link for etc and lib
+    # Remove links for etc and lib
     [ -L /etc/vmware-tools ] && rm -f /etc/vmware-tools
     [ -L /lib/open-vm-tools ] && rm -f /lib/open-vm-tools
     if [ -L /lib/udev/rules.d/99-vmware-scsi-udev.rules ]; then

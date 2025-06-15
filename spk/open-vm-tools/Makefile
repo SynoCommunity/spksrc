@@ -1,5 +1,5 @@
 SPK_NAME = open-vm-tools
-SPK_VERS = 11.3.5
+SPK_VERS = 12.5.2
 SPK_REV = 1
 SPK_ICON = src/open-vm-tools.png
 
@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(i686_ARCHS) $(PPC_ARCHS) $(ARM_ARCHS)
 MAINTAINER = SynoCommunity
 DESCRIPTION = open-vm-tools is a set of services and modules that enable several features in VMware products for better management of, and seamless user interactions with, guests.
 DISPLAY_NAME = VMware Tools
-CHANGELOG = "Initial package release (v11.3.5-18557794)."
+CHANGELOG = "Initial package release (v12.5.2-24697584)."
 
 HOMEPAGE = https://github.com/vmware/open-vm-tools
 LICENSE  = GPLv2/LGPLv2.1
