@@ -1,5 +1,5 @@
 PKG_NAME = elixir
-PKG_VERS = 1.12.3
+PKG_VERS = 1.14.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/elixir-lang/elixir/archive
@@ -15,15 +15,11 @@ LICENSE = Apache 2.0
 ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
 
 CONFIGURE_TARGET = nop
-COMPILE_TARGET = elixir_compile
-INSTALL_TARGET = elixir_install
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+
+# REMARKS: 
+# build fails in native/elixir folder due to ERLANG_BIN_DIR, 
+# but succeeds in dependencies folders (i.e. cross/rabbitmq and spk/rabbitmq)
+ENV += PATH=$$PATH:$(ERLANG_BIN_DIR)
 
 include ../../mk/spksrc.native-cc.mk
-
-.PHONY: elixir_compile
-elixir_compile:
-	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) $(MAKE_COMPILE_OPTIONS)
-
-.PHONY: elixir_install
-elixir_install:
-	$(RUN) PATH=$$PATH:$(ERLANG_BIN_DIR) $(MAKE) DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) install

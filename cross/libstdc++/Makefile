@@ -2,7 +2,7 @@ PKG_NAME = libstdc++6
 PKG_VERS = 6.3.0-18+deb9u1
 PKG_EXT = deb
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS)_$(PKG_DIST_ARCH).$(PKG_EXT)
-PKG_DIST_SITE = http://http.us.debian.org/debian/pool/main/g/gcc-6/
+PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 

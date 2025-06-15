@@ -1,8 +1,8 @@
 PKG_NAME = slang
-PKG_VERS = 2.3.1
+PKG_VERS = 2.3.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.jedsoft.org/releases/$(PKG_NAME)/old
+PKG_DIST_SITE = https://www.jedsoft.org/releases/slang
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/libpng cross/pcre

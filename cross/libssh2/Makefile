@@ -1,17 +1,19 @@
 PKG_NAME = libssh2
-PKG_VERS = 1.10.0
-PKG_EXT = tar.gz
+PKG_VERS = 1.11.1
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.libssh2.org/download
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl
+DEPENDS = cross/openssl3
 
 HOMEPAGE = https://www.libssh2.org
 COMMENT  = libssh2 is a client-side C library implementing the SSH2 protocol.
-LICENSE  = https://www.libssh2.org/license.html
+LICENSE  = 3-Clause BSD
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-examples-build
+CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
+CMAKE_ARGS += -DBUILD_STATIC_LIBS=OFF
+CMAKE_ARGS += -DBUILD_EXAMPLES=OFF
+CMAKE_ARGS += -DBUILD_TESTING=OFF
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-cmake.mk

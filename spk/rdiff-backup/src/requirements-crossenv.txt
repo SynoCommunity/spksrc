@@ -1,0 +1,7 @@
+# Generated using the requirements script on March 2, 2025
+
+psutil==7.0.0
+pylibacl==0.7.2
+pyxattr==0.8.1
+PyYAML==6.0.2
+rdiff_backup==2.2.6

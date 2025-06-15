@@ -1,12 +1,18 @@
 PKG_NAME = gnupg
-PKG_VERS = 2.2.27
+PKG_VERS = 2.4.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/$(PKG_NAME)
+PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/gnupg
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS  = cross/libgpg-error cross/libgcrypt cross/gnutls cross/libassuan
-DEPENDS += cross/libksba cross/npth cross/pinentry
+DEPENDS  = cross/libgpg-error
+DEPENDS += cross/libgcrypt
+DEPENDS += cross/gnutls
+DEPENDS += cross/libassuan
+DEPENDS += cross/libksba
+DEPENDS += cross/npth
+DEPENDS += cross/pinentry
+DEPENDS += cross/bzip2
 
 HOMEPAGE = https://www.gnupg.org/
 COMMENT  = GnuPG allows to encrypt and sign your data and communication, features a versatile key management system as well as access modules for all kinds of public key directories.

@@ -9,7 +9,7 @@ INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
 # Optional FWPORTS file
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/target/app/${SYNOPKG_PKGNAME}.sc"
 
-# Only DSM 5 has this temp upgrade folder
+# Only DSM > 5 have this temp upgrade folder variable
 TMP_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER}/var"
 
 
@@ -35,33 +35,42 @@ call_func ()
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
         install_log "Begin ${FUNC}"
         LOG=$2
+        ARG=$3
         if [ -z "${LOG}" ]; then
-            eval ${FUNC}
+            if [ -z "${ARG}" ]; then
+                eval ${FUNC}
+            else
+                eval ${FUNC} ${ARG}
+            fi
         else
-            eval ${FUNC} 2>&1 | ${LOG}
+            if [ -z "${ARG}" ]; then
+                eval ${FUNC} 2>&1 | ${LOG}
+            else
+                eval ${FUNC} ${ARG} 2>&1 | ${LOG}
+            fi
         fi
         install_log "End ${FUNC}"
     fi
 }
 
 # Source installer variables and functions
-INST_FUNCTIONS=`dirname $0`"/functions"
+INST_FUNCTIONS=$(dirname $0)"/functions"
 if [ -r "${INST_FUNCTIONS}" ]; then
     . "${INST_FUNCTIONS}"
 fi
 
 
 # Source package specific variables and functions
-SVC_SETUP=`dirname $0`"/service-setup"
+SVC_SETUP=$(dirname $0)"/service-setup"
 if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi
 
 
-# Reload wizard variables stored by postinst
-call_func "reload_inst_variables"
+# Load (wizard) variables stored by postinst
+load_variables_from_file ${INST_VARIABLES}
 
-# init variables either reloaded, from package or from wizard
+# init variables either from ${INST_VARIABLES}, from package or from wizard
 call_func "initialize_variables"
 
 
@@ -131,17 +140,17 @@ syno_user_add_to_group ()
 # Usage: set_syno_permissions "${SHARE_FOLDER}" "${GROUP}"
 set_syno_permissions ()
 {
-    DIRNAME=`realpath "${1}"`
+    DIRNAME=$(realpath "${1}")
     GROUP="${2}"
 
     VOLUME=$(echo "${DIRNAME}" | awk -F/ '{print "/"$2}')
 
     # Ensure directory resides in /volumeX before setting GROUP permissions
-    if [ "`echo ${VOLUME} | cut -c2-7`" = "volume" ]; then
+    if [ "$(echo ${VOLUME} | cut -c2-7)" = "volume" ]; then
         # Set read/write permissions for GROUP for folder and subfolders
-        if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:rwxpdDaARWcC-:fd--\"`" ]; then
+        if [ ! "$(synoacltool -get ${DIRNAME} | grep ""group:${GROUP}:allow:rwxpdDaARWcC-:fd--"")" ]; then
             # First Unix permissions, but only if it's in Linux mode
-            if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
+            if [ "$(synoacltool -get ${DIRNAME} | grep -i 'Linux mode')" ]; then
                 set_unix_permissions "${DIRNAME}"
                 # If it is linux mode (due to old package) we need to add "administrators"-group,
                 # otherwise the folder is not accessible from File Station anymore!
@@ -156,9 +165,9 @@ set_syno_permissions ()
 
         # Walk up the tree and set traverse execute permissions for GROUP up to VOLUME
         while [ "${DIRNAME}" != "${VOLUME}" ]; do
-            if [ ! "`synoacltool -get \"${DIRNAME}\"| grep \"group:${GROUP}:allow:r.x\"`" ]; then
+            if [ ! "$(synoacltool -get ""${DIRNAME}"" | grep ""group:${GROUP}:allow:r.x"")" ]; then
                 # Here we also need to make sure the admin can access data via File Station
-                if [ "`synoacltool -get \"${DIRNAME}\"| grep \"Linux mode\"`" ]; then
+                if [ "$(synoacltool -get ""${DIRNAME}"" | grep -i 'Linux mode')" ]; then
                     synoacltool -add "${DIRNAME}" "group:administrators:allow:rwxpdDaARWc--:fd--"
                 fi
                 # Add the new group permissions
@@ -178,8 +187,8 @@ set_unix_permissions ()
     DIRNAME=$1
     if [ -n "${EFF_USER}" ]; then
         echo "Granting '${EFF_USER}' unix ownership on ${DIRNAME}"
-        if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 6 ]; then
-            chown -R ${EFF_USER}:root "${DIRNAME}"
+        if [ -n "${GROUP}" ]; then
+            chown -R ${EFF_USER}:${GROUP} "${DIRNAME}"
         else
             chown -R ${EFF_USER}:${USER} "${DIRNAME}"
         fi
@@ -215,26 +224,12 @@ preinst ()
     call_func "validate_preinst"
     call_func "service_preinst" install_log
 
-    # Check volume exists
-    if [ -n "${SHARE_PATH}" ]; then
-        if [ ! -d "${SHARE_VOLUME}" ]; then
-            echo "ERROR: Volume ${SHARE_VOLUME} does not exist." | $TEE 1>&2
-            exit 1
-        fi
-    fi
-
     exit 0
 }
 
 postinst ()
 {
     log_step "postinst"
-    call_func "save_wizard_variables" install_log
-    # Restrict permissions to protect sensitive options
-    if [ -e "${INST_VARIABLES}" ]; then
-        chmod go-rwx ${INST_VARIABLES}
-        chown ${EFF_USER} ${INST_VARIABLES}
-    fi
 
     # Link for backward compatibility of binaries location
     $LN "${SYNOPKG_PKGDEST}" "/usr/local/${SYNOPKG_PKGNAME}" 2>&1 | install_log
@@ -264,33 +259,60 @@ postinst ()
         synogroup --rebuild all 2>&1 | install_log
     fi
 
-    # Share management
+    # Share management (can be removed when SERVICE_WIZARD_SHARE is not used anymore)
     if [ -n "${SHARE_PATH}" ]; then
-        install_log "Configuring ${SHARE_PATH}"
-        # Create share if does not exist
-        #  !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
-        if ! synoshare --get "${SHARE_NAME}" &> /dev/null; then
-            synoshare --add "${SHARE_NAME}" "${SHARE_DESC}" "${SHARE_PATH}" "" "" "" 1 0 2>&1 | install_log
-        fi
+        if [ "${SHARE_WORKER}" != "0" ]; then
+            install_log "Shared folder [${SHARE_PATH}] will be created by DSM."
+        else
+            # Create share if it does not exist
+            # invalid characters: !"#$%&’()*+,/:;<=>?@[]nˆ`{} |
+            if ! synoshare --get "${SHARE_NAME}" > /dev/null 2>&1; then
+                SHARE_PATH=${SYNOPKG_PKGDEST_VOL}/${SHARE_NAME}
+                install_log "Create share SHARE_NAME=${SHARE_NAME}, SHARE_PATH=${SHARE_PATH}"
+                # mandatory arguments: 
+                # name desc path na rw ro browseable adv_privilege 
+                # na, rw and ro are list of user(s) and/or group(s), separated by comma
+                synoshare --add "${SHARE_NAME}" "Share created for package ${SYNOPKG_PKGNAME}" "${SHARE_PATH}" "" "" "" 1 0 2>&1 | install_log
+            else
+                install_log "Share already exists SHARE_NAME=${SHARE_NAME}, SHARE_PATH=${SHARE_PATH}"
+            fi
 
-        # Add user permission if no GROUP is set in UI
-        # GROUP permission will be added in set_syno_permissions
-        if [ -z "$GROUP" ] && [ -n "${EFF_USER}" ]; then
-            synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" 2>&1 | install_log
-        fi
-        synoshare --build 2>&1 | install_log
+            # Add user permission if no GROUP is set in service-setup
+            # GROUP permission will be added in set_syno_permissions
+            if [ -z "$GROUP" ] && [ -n "${EFF_USER}" ]; then
+                # check whether user is already added to RW users
+                _synoshare_parameter="--getmap"
+                if synoshare --getmap "${SHARE_NAME}" | grep "ACL.*\[yes\]" > /dev/null 2>&1; then
+                    _synoshare_parameter="--list_acl"
+                fi
+                if synoshare ${_synoshare_parameter} "${SHARE_NAME}" | grep "RW list" | grep -o "\[.*\]"  | sed  's/[\[,]/ /g' | sed 's/\]/ /g' | grep -q " ${EFF_USER} " > /dev/null 2>&1; then
+                    install_log "User has already RW access to share: SHARE_NAME=${SHARE_NAME}, EFF_USER=${EFF_USER}"
+                else
+                    install_log "Set user for share: SHARE_NAME=${SHARE_NAME}, EFF_USER=${EFF_USER}"
+                    synoshare --setuser "${SHARE_NAME}" RW + "${EFF_USER}" 2>&1 | install_log
+                fi
+            fi
+            synoshare --build 2>&1 | install_log
 
-        $MKDIR "${SHARE_PATH}"
-
-        # Permissions for folder, up to volume
-        if [ -n "$GROUP" ]; then
-            set_syno_permissions "${SHARE_PATH}" "${GROUP}" 2>&1 | install_log
+            # Permissions for folder, up to volume
+            if [ -n "$GROUP" ]; then
+                install_log "Set group for share: SHARE_PATH=${SHARE_PATH}, GROUP=${GROUP}"
+                set_syno_permissions "${SHARE_PATH}" "${GROUP}" 2>&1 | install_log
+            fi
         fi
     fi
 
     $MKDIR "${SYNOPKG_PKGVAR}" 2>&1 | install_log
 
+    call_func "save_wizard_variables" install_log
+    # Restrict permissions to protect sensitive options
+    if [ -e "${INST_VARIABLES}" ]; then
+        chmod go-rwx ${INST_VARIABLES}
+        chown ${EFF_USER} ${INST_VARIABLES}
+    fi
+
     call_func "service_postinst" install_log
+
     call_func "service_clean_tmpdir" install_log
 
     if [ -n "${LOG_FILE}" ]; then
@@ -308,6 +330,7 @@ preuninst ()
     log_step "preuninst"
     call_func "validate_preuninst"
     call_func "service_preuninst" install_log
+
     exit 0
 }
 
@@ -331,6 +354,7 @@ postuninst ()
     if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
         $RM "${INST_VARIABLES}" 2>&1 | install_log
     fi
+
     exit 0
 }
 
@@ -349,6 +373,7 @@ preupgrade ()
     # Beware of /. outside the quotes
     # Needed to copy all files including hidden ones
     $CP "${SYNOPKG_PKGVAR}"/. "$TMP_DIR" 2>&1 | install_log
+
     exit 0
 }
 

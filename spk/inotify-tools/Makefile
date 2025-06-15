@@ -1,9 +1,13 @@
 SPK_NAME = inotify-tools
-SPK_VERS = 3.20.11.0
-SPK_REV = 2
-SPK_ICON = src/$(SPK_NAME).png
+SPK_VERS = 3.22.6.0
+SPK_REV = 3
+SPK_ICON = src/inotify-tools.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/inotify-tools
+
+# archs/toolchains lacking support for fanotify
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+
 
 MAINTAINER = cyc1ingsir
 DESCRIPTION = inotify-tools is a C library and a set of command-line programs for Linux providing a simple interface to inotify.

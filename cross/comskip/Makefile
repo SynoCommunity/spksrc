@@ -1,25 +1,24 @@
-PKG_NAME = comskip
-PKG_VERS = 0.82.010
+PKG_NAME = Comskip
+PKG_VERS = 0.83
 PKG_EXT = tar.gz
-PKG_DOWNLOAD_METHOD = git
-PKG_GIT_HASH = 84fcd7388394c95fc8a7e558642bbadb43134507
-PKG_DIST_SITE = https://github.com/erikkaashoek/Comskip.git
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-git$(PKG_GIT_HASH)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = V$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/erikkaashoek/Comskip/archive
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/argtable
-OPTIONAL_DEPENDS = cross/ffmpeg
+OPTIONAL_DEPENDS = cross/ffmpeg7
 
 HOMEPAGE = https://www.kaashoek.com/comskip
 COMMENT  = Commercial detector
 LICENSE  = GNU/LGPL
 
-ifeq ($(wildcard $(FFMPEG_DIR)),)
-DEPENDS += cross/ffmpeg
-endif
-
 PRE_CONFIGURE_TARGET = comskip_pre_configure
 GNU_CONFIGURE = 1
+
+ifeq ($(wildcard $(FFMPEG_PACKAGE_ROOT)),)
+DEPENDS = cross/ffmpeg7
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 

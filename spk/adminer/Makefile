@@ -4,7 +4,7 @@ SPK_REV = 5
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/adminer
 
 MAINTAINER = piwi82
 DESCRIPTION = Adminer is a full-featured database management tool available for MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.
@@ -14,7 +14,7 @@ DISPLAY_NAME = Adminer
 CHANGELOG = "1. Update to v4.8.1<br/>This package depends on Apache 2.4 and PHP 7.4 (except for DSM < 6)."
 
 HOMEPAGE = https://www.adminer.org
-LICENSE  = Apache License 2.0 or GPL 2
+LICENSE  = Apache 2.0 or GPLv2
 
 include ../../mk/spksrc.common.mk
 ##
@@ -35,19 +35,17 @@ START_DEP_SERVICES = apache-web
 INSTUNINST_RESTART_SERVICES = apache-web
 
 SERVICE_SETUP = src/service-setup.sh
-# we need a nop sss script to avoid creation of service control.
-SSS_SCRIPT = src/dsm-control.sh
+STARTABLE = no
 WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = adminer_extra_install
 
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: adminer_extra_install
 adminer_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var $(STAGING_DIR)/app $(STAGING_DIR)/web
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
+	install -m 755 -d $(STAGING_DIR)/web
 	install -m 644 src/dot-htaccess-apache$(APACHE_VERSION) $(STAGING_DIR)/web/.htaccess

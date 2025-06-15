@@ -1,6 +1,6 @@
---- common/cpu.cpp-orig	2019-12-10 22:31:19.000525673 -0500
-+++ common/cpu.cpp	2019-12-10 22:28:41.983368481 -0500
-@@ -110,6 +110,11 @@ const cpu_name_t cpu_names[] =
+--- source/common/cpu.cpp.orig	2024-04-04 09:39:50.000000000 +0000
++++ source/common/cpu.cpp	2024-06-15 07:20:37.644785266 +0000
+@@ -122,6 +122,11 @@
      { "", 0 },
  };
  
@@ -12,7 +12,7 @@
  #if X265_ARCH_X86
  
  extern "C" {
-@@ -123,11 +128,6 @@ uint64_t PFX(cpu_xgetbv)(int xcr);
+@@ -135,11 +140,6 @@
  #pragma warning(disable: 4309) // truncation of constant value
  #endif
  

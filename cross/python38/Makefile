@@ -1,12 +1,12 @@
 PKG_NAME = python38
-PKG_VERS = 3.8.12
+PKG_VERS = 3.8.16
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-BUILD_DEPENDS = native/$(PKG_NAME)
+BUILD_DEPENDS = native/python38
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
 # required for uuid module
@@ -20,6 +20,7 @@ GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS  = --enable-shared
 CONFIGURE_ARGS += --enable-ipv6
+# installed pip is not on PATH
 CONFIGURE_ARGS += --without-ensurepip
 CONFIGURE_ARGS += --enable-loadable-sqlite-extensions
 CONFIGURE_ARGS += --with-computed-gotos=yes
@@ -28,18 +29,12 @@ include ../../mk/spksrc.archs.mk
 
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
-
-# old compilers fail with: unrecognized command line option "-fprofile-correction"
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-optimizations
-endif
-
 # old compilers fail with unrecognized command line options: -flto -fuse-linker-plugin -ffat-lto-objects -flto-partition=none
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # Enable Link-Time Optimization
 CONFIGURE_ARGS += --with-lto
 endif
-
 endif
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
@@ -64,6 +59,15 @@ CONFIGURE_ARGS += --with-system-expat
 # libffi is no longer bundled with python
 DEPENDS += cross/libffi
 CONFIGURE_ARGS += --with-system-ffi
+
+# Mandatory PYO3_* variables for rust cross-compiling
+ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Mandatory of using OPENSSL_*_DIR starting with
+# cryptography version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
@@ -96,8 +100,6 @@ PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bi
 LD_LIBRARY_PATH := $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/lib:$(LD_LIBRARY_PATH)
 export PATH LD_LIBRARY_PATH
 
-ENV += LIBFFI_INCLUDEDIR=$(STAGING_INSTALL_PREFIX)/include/
-
 .PHONY: python38_post_patch
 python38_post_patch:
 	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
@@ -124,26 +126,33 @@ python38_install:
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
+
+# wheels to install in crossenv
+CROSSENV_WHEELS  = setuptools-rust==1.6.0
+CROSSENV_WHEELS += setuptools-scm==7.1.0
+CROSSENV_WHEELS += wheel==0.40.0
+CROSSENV_WHEELS += poetry==1.4.2
+CROSSENV_WHEELS += Cython==0.29.34
+CROSSENV_WHEELS += flit==3.8.0
+CROSSENV_WHEELS += cryptography==40.0.2
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+CROSSENV_WHEELS += maturin==0.15.1
+endif
+
 # Create the crossenv in preparation for
 # cross-compiling all the necessary wheels
 .PHONY: python38_post_install
 python38_post_install: $(WORK_DIR)/python-cc.mk
 	mkdir -p $(PYTHON_LIB_CROSS)
 	cp -R $(HOSTPYTHON_LIB_NATIVE) $(PYTHON_LIB_CROSS)/../
-	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) $(WORK_DIR)/crossenv/
+	@$(RUN) $(PYTHON_NATIVE) -m crossenv $(STAGING_INSTALL_PREFIX)/bin/python$(PKG_VERS_MAJOR_MINOR) --cc $${CC} --cxx $${CXX} --ar $${AR} --sysroot $${SYSROOT} --env LIBRARY_PATH= --manylinux manylinux2014 $(WORK_DIR)/crossenv/
 	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==21.3.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==21.3.1"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "setuptools==58.3.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "setuptools==58.3.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "wheel==0.37.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "wheel==0.37.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cffi==1.15.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cffi==1.15.0"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "cryptography==3.3.2"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "cryptography==3.3.2"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip install "poetry==1.1.11"
-	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip install "poetry==1.1.11"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) python get-pip.py "pip==23.1.2" --no-setuptools --no-wheel --disable-pip-version-check
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.40.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install "setuptools==63.4.3" "wheel==0.40.0"
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) build-pip --disable-pip-version-check install $(CROSSENV_WHEELS)
+	. $(WORK_DIR)/crossenv/bin/activate && $(RUN) pip --disable-pip-version-check install $(CROSSENV_WHEELS)
 ifneq ($(PYTHON_LIB_NATIVE),$(PYTHON_LIB_CROSS))
 	cp $(PYTHON_LIB_CROSS)/_sysconfigdata_*.py $(PYTHON_LIB_NATIVE)/_sysconfigdata.py
 endif

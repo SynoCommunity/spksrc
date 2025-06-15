@@ -7,7 +7,7 @@
             "type": "url",
             "protocol": "http",
             "port": "80",
-            "url": "/wallabag/web",
+            "url": "/wallabag",
             "allUsers": true,
             "grantPrivilege": "local"
         }

@@ -1,6 +1,6 @@
 SPK_NAME = fdupes
-SPK_VERS = 2.1.2
-SPK_REV = 3
+SPK_VERS = 2.3.2
+SPK_REV = 1
 SPK_ICON = src/fdupes.png
 
 DEPENDS = cross/fdupes
@@ -10,9 +10,9 @@ DESCRIPTION = FDUPES is a program for identifying or deleting duplicate files re
 DISPLAY_NAME = FDUPES
 STARTABLE = no
 
-HOMEPAGE   = https://github.com/adrianlopezroche/fdupes/
-LICENSE    = MIT
-HELP_URL   = https://github.com/adrianlopezroche/fdupes/wiki
+HOMEPAGE = https://github.com/adrianlopezroche/fdupes/
+LICENSE = MIT
+HELP_URL = https://github.com/adrianlopezroche/fdupes/wiki
 
 SPK_COMMANDS = bin/fdupes
 

@@ -1,0 +1,10 @@
+--- a/make/Main.gmk
++++ b/make/Main.gmk
+@@ -1196,6 +1196,7 @@ ALL_TARGETS += default jdk images docs b
+ 
+ # Aliases used for running tests.
+ 
++$(call PrintVar, ALL_NAMED_TESTS)
+ # Let "run-test" be an alias for "test"
+ $(foreach t, $(ALL_NAMED_TESTS), $(eval run-test-$t: test-$t))
+ RUN_TEST_TARGETS := $(addprefix run-test-, $(ALL_NAMED_TESTS))

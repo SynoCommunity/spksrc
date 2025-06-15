@@ -1,42 +1,34 @@
 # avoid build errors by disabling parallel make
 # 
 
---- autoconf/Makefile.in.orig	2016-10-31 00:40:01.000000000 +0000
-+++ autoconf/Makefile.in	2021-10-31 14:46:03.728190100 +0000
+--- autoconf/Makefile.in.orig	2018-03-04 23:16:36.000000000 +0000
++++ autoconf/Makefile.in	2022-06-25 13:23:46.988110010 +0000
 @@ -107,3 +107,5 @@
  #
  .PHONY: all help static elf install clean check install-elf install-static makefiles install-pkgconfig
  #
++
 +.NOTPARALLEL:
-+#
-
---- src/Makefile.in.orig	2016-10-31 00:40:01.000000000 +0000
-+++ src/Makefile.in	2021-10-31 15:14:36.379668098 +0000
-@@ -260,3 +260,6 @@
+--- slsh/Makefile.in.orig	2018-03-04 23:16:36.000000000 +0000
++++ slsh/Makefile.in	2022-06-25 13:23:23.287540065 +0000
+@@ -200,3 +200,4 @@
+   install_docs install-static static install_common \
+   install_slsh install_static_slsh install_slshrc
+ 
++.NOTPARALLEL:
+--- src/Makefile.in.orig	2018-03-04 23:16:36.000000000 +0000
++++ src/Makefile.in	2022-06-25 13:23:01.777510398 +0000
+@@ -260,3 +260,5 @@
  #---------------------------------------------------------------------------
  # Object Rules : These are created from the configure script (hopefully)
  #---------------------------------------------------------------------------
 +
 +.NOTPARALLEL:
-+
-
---- slsh/Makefile.in.orig	2016-10-31 00:40:01.000000000 +0000
-+++ slsh/Makefile.in	2021-10-31 15:14:47.577393277 +0000
-@@ -199,4 +199,6 @@
-   install_lib_files install_rline_files install_scripts install_help \
-   install_docs install-static static install_common \
-   install_slsh install_static_slsh install_slshrc
--
-+
-+.NOTPARALLEL:
-+
-
---- modules/Makefile.in.orig	2016-10-31 00:40:01.000000000 +0000
-+++ modules/Makefile.in	2021-10-31 15:15:00.703056492 +0000
-@@ -210,3 +210,6 @@
+--- modules/Makefile.in.orig	2018-03-04 23:16:36.000000000 +0000
++++ modules/Makefile.in	2022-06-25 13:23:36.322155457 +0000
+@@ -219,3 +219,5 @@
  	-/bin/rm -f Makefile $(OBJDIR)/Makefile $(CONFIG_H)
  
  .PHONY: clean distclean all install runtests
 +
 +.NOTPARALLEL:
-+

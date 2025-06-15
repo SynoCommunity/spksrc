@@ -1,7 +1,9 @@
 PKG_NAME = nodejs
-# https://nodejs.org/en/about/releases/
-# v16 is Active LTS Version "Gallium" from 2021-10-26 to 2022-10-18 with EOL at 2024-04-30
-PKG_VERS = 16.13.2
+# https://github.com/nodejs/release#release-schedule
+# v18 is Maintenance Version "Hydrogen" since 2023-10-18 with EOL at 2025-04-30
+# v20 is Maintenance Version "Iron" since 2024-10-22 with EOL at 2026-04-30
+# v22 is LTS Version "Jod" from 2024-10-29 to 2025-10-21 with EOL at 2027-04-30
+PKG_VERS = 22.16.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = node-v$(PKG_VERS)-linux-x64.$(PKG_EXT)
 PKG_DIST_SITE = https://nodejs.org/dist/v$(PKG_VERS)

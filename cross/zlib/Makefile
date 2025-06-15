@@ -1,5 +1,5 @@
 PKG_NAME = zlib
-PKG_VERS = 1.2.12
+PKG_VERS = 1.3.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://zlib.net/fossils
@@ -13,4 +13,8 @@ LICENSE  = zlib-license
 
 ADDITIONAL_CFLAGS = -Os -fPIC
 
-include ../../mk/spksrc.cross-cc.mk
+# create pkgconfig file in lib/pkgconfig (instead of share/pkgconfig)
+CMAKE_ARGS += -DINSTALL_PKGCONFIG_DIR=$(INSTALL_PREFIX)/lib/pkgconfig
+CMAKE_ARGS += -DZLIB_BUILD_EXAMPLES=OFF
+
+include ../../mk/spksrc.cross-cmake.mk

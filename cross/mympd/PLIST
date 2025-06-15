@@ -1,0 +1,7 @@
+bin:bin/mympd
+lib:lib/liblibmympdclient.so
+lib:lib/libmjson.so
+lib:lib/libmongoose.so
+lib:lib/libmpack.so
+lib:lib/librax.so
+lib:lib/libsds.so

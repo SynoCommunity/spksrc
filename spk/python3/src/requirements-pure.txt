@@ -1,8 +1,0 @@
-# Wheels that absolutely needs
-# to be managed as pure-python
-filelock==3.0.12
-importlib-resources==5.2.2
-importlib-metadata==4.8.1
-platformdirs==2.4.0
-virtualenv==20.4.6
-zipp==3.6.0

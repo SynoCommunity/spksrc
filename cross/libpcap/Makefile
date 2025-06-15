@@ -1,17 +1,12 @@
-PKG_NAME = libpcap
-PKG_VERS = 1.9.1
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.tcpdump.org/release
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = libpcap-main
 
-DEPENDS =
+OPTIONAL_DEPENDS  = cross/libpcap-latest
+OPTIONAL_DEPENDS += cross/libpcap-1.9
 
-HOMEPAGE = https://www.tcpdump.org/
-COMMENT  = Portable C/C++ library for network traffic capture.
-LICENSE  = BSD
+include ../../mk/spksrc.main-depends.mk
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --with-pcap=linux
-
-include ../../mk/spksrc.cross-cc.mk
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS = cross/libpcap-1.9
+else
+DEPENDS = cross/libpcap-latest
+endif

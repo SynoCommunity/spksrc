@@ -1,9 +1,9 @@
 SPK_NAME = synokernel-usbserial
-SPK_VERS = 1.0
-SPK_REV = 7
+SPK_VERS = 1.2
+SPK_REV = 9
 SPK_ICON = src/$(SPK_NAME).png
 
-DEPENDS = 
+DEPENDS =
 
 REQUIRE_KERNEL ?= 1
 REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL_OPTION:drivers/usb/serial:usbserial
@@ -16,11 +16,10 @@ REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_TI:drivers/usb/serial:ti_usb_3410_505
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko"
-CHANGELOG = "1. Synology Kernel USB serial drivers"
+CHANGELOG = "1. Support DSM-7.1 and DSM-7.2"
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) epyc7002 rtd1619b
 
-RELOAD_UI = no
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB Serial drivers
 

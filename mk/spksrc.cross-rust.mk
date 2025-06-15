@@ -26,99 +26,49 @@ DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
+ifneq ($(ARCH),noarch)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
+endif
 
 ##### rust specific configurations
+include ../../mk/spksrc.cross-rust-env.mk
 
 # configure is used to install rust targets
-CONFIGURE_TARGET = install_rust_target
+CONFIGURE_TARGET = nop
 
-# skip compile_target if not used by module
 ifeq ($(strip $(COMPILE_TARGET)),)
 COMPILE_TARGET = nop
 endif
 
-RUST_TOOLCHAIN ?= stable
-
-RUST_TARGET =
-# map archs to rust targets
-ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
-RUST_TARGET=x86_64-unknown-linux-gnu
+ifeq ($(strip $(INSTALL_TARGET)),)
+INSTALL_TARGET = rust_install_target
 endif
-ifeq ($(findstring $(ARCH), $(i686_ARCHS)),$(ARCH))
-RUST_TARGET=i686-unknown-linux-gnu
-endif
-ifeq ($(findstring $(ARCH), $(ARMv5_ARCHS)),$(ARCH))
-# may be not supported for cargo
-RUST_TARGET=armv5te-unknown-linux-gnueabi
-endif
-ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS)),$(ARCH))
-RUST_TARGET=armv7-unknown-linux-gnueabihf
-endif
-ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
-RUST_TARGET=armv7-unknown-linux-gnueabi
-endif
-ifeq ($(findstring $(ARCH), $(ARMv8_ARCHS)),$(ARCH))
-RUST_TARGET=aarch64-unknown-linux-gnu
-endif
-ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
-RUST_TARGET=powerpc-unknown-linux-gnu
-endif
-ifeq ($(RUST_TARGET),)
-$(error Arch $(ARCH) not supported)
-endif
-
-# Use distrib folder as cargo download cache
-CARGO_HOME_PATH=/spksrc/distrib/cargo
-ENV += CARGO_HOME=$(CARGO_HOME_PATH)
-ENV += PATH=:$(CARGO_HOME_PATH)/bin/:$(PATH)
-
-ifeq (,$(shell $(ENV) which rustup))
-install_rustup:
-	@echo "  ==> install rustup" ; \
-	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
-	        CARGO_HOME=$(CARGO_HOME_PATH) sh -s -- -y
-else
-install_rustup:
-	@echo "  ==> rustup already installed" ;
-endif
-
-install_rust_toolchain: install_rustup
-	@echo "  ==> install rust toolchain [$(RUST_TOOLCHAIN)]" ; \
-	env $(ENV) rustup toolchain install $(RUST_TOOLCHAIN) ;
-	env $(ENV) rustup default $(RUST_TOOLCHAIN) ;
-
-# Install rust target on demand:
-install_rust_target: install_rust_toolchain
-	@echo "  ==> install rust target [$(RUST_TARGET)]" ; \
-	env $(ENV) rustup target install $(RUST_TARGET) ;
 
 # Set default RUST_SRC_DIR
 ifeq ($(strip $(RUST_SRC_DIR)),)
 RUST_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 
-# Set linker environment variable
-RUST_LINKER_ENV=CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER
-CARGO_ENV=$(RUST_LINKER_ENV)=$(TC_PATH)$(TC_PREFIX)gcc
+# Set the cargo install parameters
+CARGO_INSTALL_ARGS += --path $(RUST_SRC_DIR)
+CARGO_INSTALL_ARGS += --root $(STAGING_INSTALL_PREFIX)
 
-# Set the cargo parameters
-CARGO_BUILD_ARGS += --target=$(RUST_TARGET)
-CARGO_BUILD_ARGS += --path $(RUST_SRC_DIR)
-CARGO_BUILD_ARGS += --root $(STAGING_INSTALL_PREFIX)
-
-
-ifeq ($(strip $(INSTALL_TARGET)),)
-INSTALL_TARGET = rust_build_and_install_target
+# Append additional install options if present
+ifneq ($(strip $(CARGO_BUILD_ARGS)),)
+CARGO_INSTALL_ARGS += $(CARGO_BUILD_ARGS)
 endif
 
-# Default rust build and installation with cargo
-rust_build_and_install_target:
-	@echo "  ==> Cargo install rust package $(PKG_NAME)"
-	$(ENV) $(CARGO_ENV) cargo install $(CARGO_BUILD_ARGS)
-
+# Default build with rust and install with cargo
+# The cargo call uses tc_vars.mk RUSTUP_TOOLCHAIN variable
+# overriding definition using +stable or +$(RUSTUP_TOOLCHAIN)
+# https://rust-lang.github.io/rustup/environment-variables.html 
+rust_install_target:
+	@echo "  ==> Cargo install rust package $(PKG_NAME) (rustc +$(TC_RUSTUP_TOOLCHAIN) -vV)"
+	@$(RUN) rustc +$(TC_RUSTUP_TOOLCHAIN) -vV
+	@$(RUN) echo cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
+	@$(RUN) cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
 
 #####
 
@@ -151,32 +101,10 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-### Clean rules
-smart-clean:
-	rm -rf $(WORK_DIR)/$(PKG_DIR)
-	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
-
-clean:
-	rm -fr work work-*
-
 all: install plist
 
-### For make kernel-required (used by spksrc.spk.mk)
-include ../../mk/spksrc.kernel-required.mk
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
-
-####
-
-arch-%:
-	@$(MSG) Building package for arch $*
-	@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+### For arch-* and all-<supported|latest>
+include ../../mk/spksrc.supported.mk
 
 ####

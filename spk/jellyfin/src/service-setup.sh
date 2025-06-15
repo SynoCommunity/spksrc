@@ -1,5 +1,8 @@
-# https://github.com/dotnet/core/issues/4011
-[ -z "$DOTNET_BUNDLE_EXTRACT_BASE_DIR" ] && export DOTNET_BUNDLE_EXTRACT_BASE_DIR="${XDG_CACHE_HOME:-"/var/packages/jellyfin/target/var/"}/dotnet_bundle_extract"
+# configure font variables
+export FONTCONFIG_PATH="${SYNOPKG_PKGVAR}/fonts"
+export XDG_CACHE_HOME="${SYNOPKG_PKGVAR}/fonts"
+export XDG_CONFIG_HOME="${SYNOPKG_PKGDEST}/share/dejavu"
+export XDG_DATA_HOME="${SYNOPKG_PKGDEST}/share/dejavu"
 
 JELLYFIN_ARGS="--service \
  --package-name synology \
@@ -8,9 +11,9 @@ JELLYFIN_ARGS="--service \
  -c ${SYNOPKG_PKGVAR}/config \
  -l ${SYNOPKG_PKGVAR}/log \
  -w ${SYNOPKG_PKGDEST}/web \
- --ffmpeg /var/packages/ffmpeg/target/bin/ffmpeg"
+ --ffmpeg /var/packages/ffmpeg7/target/bin/ffmpeg"
 
-SERVICE_COMMAND="env LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${SYNOPKG_PKGDEST}/share/jellyfin ${JELLYFIN_ARGS}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/share/jellyfin ${JELLYFIN_ARGS}"
 
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y

@@ -12,21 +12,17 @@ COMMENT  = High-quality data compressor.
 LICENSE  = BSD License
 
 CONFIGURE_TARGET = nop
-POST_COMPILE_TARGET = bzip2_post_compile
-INSTALL_TARGET = bzip2_install
+POST_INSTALL_TARGET = bzip2_post_install
 
 ADDITIONAL_CFLAGS = -fpic -fPIC -O3 -D_FILE_OFFSET_BITS=64
-COMPILE_MAKE_OPTIONS += bzip2 bzip2recover PREFIX=$(INSTALL_PREFIX)
+
+COMPILE_MAKE_OPTIONS = -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
+INSTALL_MAKE_OPTIONS = install PREFIX=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: bzip2_post_compile
-bzip2_post_compile:
-	$(RUN) $(MAKE) -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
-
-.PHONY: bzip2_install
-bzip2_install:
-	@$(RUN) $(MAKE) PREFIX=$(STAGING_INSTALL_PREFIX) install
+.PHONY: bzip2_post_install
+bzip2_post_install:
 	ln -sf bzip2 $(STAGING_INSTALL_PREFIX)/bin/bunzip2
 	ln -sf bzip2 $(STAGING_INSTALL_PREFIX)/bin/bzcat
 	ln -sf bzdiff $(STAGING_INSTALL_PREFIX)/bin/bzcmp
@@ -35,3 +31,7 @@ bzip2_install:
 	ln -sf bzmore $(STAGING_INSTALL_PREFIX)/bin/bzless
 	@$(RUN) cp libbz2.so.$(PKG_VERS) $(STAGING_INSTALL_PREFIX)/lib/
 	ln -sf libbz2.so.$(PKG_VERS) $(STAGING_INSTALL_PREFIX)/lib/libbz2.so.1.0
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/lib/pkgconfig
+	@install -m 644 src/bzip2.pc $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
+	@sed -i 's%@PREFIX@%$(STAGING_INSTALL_PREFIX)%g' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/bzip2.pc
+	@sed -i 's%@VERSION@%$(PKG_VERS)%g' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/bzip2.pc

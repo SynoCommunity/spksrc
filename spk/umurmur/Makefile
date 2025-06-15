@@ -1,16 +1,16 @@
 SPK_NAME = umurmur
-SPK_VERS = 0.2.20
-SPK_REV = 8
+SPK_VERS = 0.3.1
+SPK_REV = 10
 SPK_ICON = src/umurmur.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/umurmur
 
 MAINTAINER = Diaoul
 DESCRIPTION = uMurmur is a minimalistic VoIP server based on the open source software Mumble. It allows simultaneous communications between multiple users. Its low latency makes it especially suitable for communications during online gaming. The Mumble client is available at https://dl.mumble.info/stable/ \(Windows, Mac, Linux and iOS\).
 DESCRIPTION_FRE = uMurmur est un serveur minimaliste de voix sur IP basé sur le logiciel libre Mumble. Il rend possible la communication entre plusieurs interlocuteurs de manière simultanée. Sa faible latence le rend particulièrement adapté aux communications pendant les parties de jeux en réseau. Le client Mumble est téléchargeable à l\'adresse https://dl.mumble.info/stable/ \(Windows, Mac, Linux et iOS\).
 DESCRIPTION_SPN = uMurmur es un servidor VoIP minimalista basado en el software de codigo abierto Mumble. Permite comunicaciones simultáneas entre múltiples usuarios. Su baja latencia lo hace especialmente adecuado para comunicarse durante un juego en linea. El cliente Mumble está disponible en https://dl.mumble.info/stable/ \(Windows, Mac, Linux and iOS\).
 DISPLAY_NAME = uMurmur
-CHANGELOG = "1. Update uMurmur to v0.2.20<br/>2. Use mbedtls instead of openssl.<br/>3. Update for DSM 7 compatibility."
+CHANGELOG = "1. Update uMurmur to v0.3.1. <br/>2. Update mbedtls to v3"
 
 STARTABLE = yes
 SERVICE_USER = auto

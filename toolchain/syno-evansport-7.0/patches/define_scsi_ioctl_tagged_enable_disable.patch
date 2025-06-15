@@ -1,0 +1,22 @@
+#---
+#
+# Solves build issue when compiling a LLVM or GCC compiler:
+#
+# sanitizer_platform_limits_posix.cc:874:46: error: ‘SCSI_IOCTL_TAGGED_DISABLE’ was not declared in this scope
+# unsigned IOCTL_SCSI_IOCTL_TAGGED_DISABLE = SCSI_IOCTL_TAGGED_DISABLE;
+# sanitizer_platform_limits_posix.cc:875:45: error: ‘SCSI_IOCTL_TAGGED_ENABLE’ was not declared in this scope
+# unsigned IOCTL_SCSI_IOCTL_TAGGED_ENABLE = SCSI_IOCTL_TAGGED_ENABLE;
+#
+#----
+diff -uprN ../../work/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/include/scsi/scsi.h ./i686-pc-linux-gnu/sys-root/usr/include/scsi/scsi.h
+--- ../../work/i686-pc-linux-gnu/i686-pc-linux-gnu/sys-root/usr/include/scsi/scsi.h	2017-08-02 22:33:56.000000000 +0000
++++ ./i686-pc-linux-gnu/sys-root/usr/include/scsi/scsi.h	2023-03-08 23:59:38.080468616 +0000
+@@ -517,6 +517,8 @@ static __inline__ int scsi_is_wlun(unsig
+ #define SCSI_IOCTL_GET_IDLUN		0x5382
+ 
+ /* 0x5383 and 0x5384 were used for SCSI_IOCTL_TAGGED_{ENABLE,DISABLE} */
++#define SCSI_IOCTL_TAGGED_ENABLE		0x5383
++#define SCSI_IOCTL_TAGGED_DISABLE		0x5384
+ 
+ /* Used to obtain the host number of a device. */
+ #define SCSI_IOCTL_PROBE_HOST		0x5385

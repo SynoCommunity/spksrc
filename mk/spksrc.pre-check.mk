@@ -9,6 +9,9 @@
 #                          use SERVICE_SETUP instead, this includes support for DSM >= 7.
 #
 
+# disable checks for dependency targets
+ifneq ($(DEPENDENCY_WALK),1)
+
 # SPK_FOLDER    
 # name of the spk package folder
 # github status check does not rely on the (SPK) NAME but uses the folder name
@@ -22,7 +25,7 @@ ifneq ($(wildcard BROKEN),)
   @$(error $(NAME): Broken package)
 endif
 
-# Check for build for generic archs, these are not supporting by default `require kernel`.
+# Check for build for generic archs, these are not supporting by default 'require kernel'.
 # Unless building kernel modules where a package will contain multiple kernel sub-architectures and versions.
 ifneq ($(REQUIRE_KERNEL),)
   ifeq ($(REQUIRE_KERNEL_MODULE),)
@@ -46,6 +49,15 @@ ifneq ($(UNSUPPORTED_ARCHS),)
 endif
 
 ifneq ($(TCVERSION),)
+
+ifneq ($(UNSUPPORTED_ARCHS_TCVERSION),)
+  ifneq (,$(findstring $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)))
+    ifneq (,$(BUILD_UNSUPPORTED_FILE))
+      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Arch '$(ARCH)-$(TCVERSION)' is not a supported architecture >> $(BUILD_UNSUPPORTED_FILE))
+    endif
+    @$(error Arch '$(ARCH)-$(TCVERSION)' is not a supported architecture)
+  endif
+endif
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
   ifneq ($(strip $(INSTALLER_SCRIPT)),)
@@ -92,4 +104,6 @@ ifneq ($(REQUIRED_MIN_SRM),)
   endif
 endif
 
-endif
+endif # ifneq ($(TCVERSION),)
+
+endif # ifneq ($(DEPENDENCY_WALK),1)

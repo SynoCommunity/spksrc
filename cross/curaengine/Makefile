@@ -1,30 +1,28 @@
 PKG_NAME = curaengine
-PKG_VERS = 15.04
+PKG_VERS = 2.1.3
 PKG_EXT = tar.gz
-PKG_DIST_SITE = https://github.com/Ultimaker/CuraEngine/archive
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/Ultimaker/CuraEngine/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = CuraEngine-$(PKG_VERS)
 
-DEPENDS = 
+DEPENDS = cross/libarcus
 
-HOMEPAGE = https://ultimaker.com
-COMMENT  = CuraEngine is a powerful, fast and robust engine for processing 3D models into 3D printing instruction for Ultimaker and other GCode based 3D printers.
+# c++11 compiler required
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+
+HOMEPAGE = https://ultimaker.com/software/ultimaker-cura
+COMMENT  = CuraEngine is a Powerful, fast and robust engine for converting 3D models into g-code instructions for 3D printers. It is part of the larger open source project Cura.
 LICENSE  = AGPLv3
 
-POST_EXTRACT_TARGET = myPostExtract
-CONFIGURE_TARGET = nope
-INSTALL_TARGET = myInstall
+POST_INSTALL_TARGET = curaengine_post_install
 
-PATCHES_LEVEL = 1
+ADDITIONAL_CXXFLAGS = -fPIC
 
-include ../../mk/spksrc.cross-cc.mk
+ENV += PATH=$(WORK_DIR)/../../../native/protoc/work-native/bin:$$PATH  
 
-.PHONY: myPostExtract
-myPostExtract:
-	sed -i "s/\r//" $(EXTRACT_PATH)/$(PKG_DIR)/src/utils/gettime.h
+include ../../mk/spksrc.cross-cmake.mk
 
-.PHONY: myInstall
-myInstall:
-	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
-	install -m 755 $(WORK_DIR)/$(PKG_DIR)/build/CuraEngine $(STAGING_INSTALL_PREFIX)/bin/
+.PHONY: curaengine_post_install
+curaengine_post_install:
+	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/build/lib_CuraEngine.so $(STAGING_INSTALL_PREFIX)/lib/

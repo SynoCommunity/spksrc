@@ -1,5 +1,3 @@
-bin:bin/rhash
-rsc:etc/rhashrc
 lnk:bin/ed2k-link
 lnk:bin/edonr256-hash
 lnk:bin/edonr512-hash
@@ -7,7 +5,11 @@ lnk:bin/gost12-256-hash
 lnk:bin/gost12-512-hash
 lnk:bin/has160-hash
 lnk:bin/magnet-link
+bin:bin/rhash
 lnk:bin/sfv-hash
 lnk:bin/tiger-hash
 lnk:bin/tth-hash
 lnk:bin/whirlpool-hash
+rsc:etc/rhashrc
+lnk:lib/librhash.so.1
+lib:lib/librhash.so.1.4.5

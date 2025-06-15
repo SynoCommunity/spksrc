@@ -1,19 +1,18 @@
 SPK_NAME = bat
-SPK_VERS = 13.0.0
+SPK_VERS = 0.25.0
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/bat
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = A cat(1) clone with wings.
-DISPLAY_NAME = bat
 STARTABLE = no
-
-SPK_COMMANDS = bin/bat
 
 HOMEPAGE = https://github.com/sharkdp/bat
 LICENSE  = MIT or Apache 2.0
+
+SPK_COMMANDS = bin/bat
 
 include ../../mk/spksrc.spk.mk

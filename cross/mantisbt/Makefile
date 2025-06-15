@@ -1,5 +1,5 @@
 PKG_NAME = mantisbt
-PKG_VERS = 1.2.19
+PKG_VERS = 2.27.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/$(PKG_NAME)/files/mantis-stable/$(PKG_VERS)
@@ -12,14 +12,13 @@ COMMENT  = Mantis is an easily deployable, web based bugtracker to aid product b
 LICENSE  = GPL
 
 EXTRACT_PATH = $(WORK_DIR)
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
+
 INSTALL_TARGET = mantisbt_install
 
 # Pure PHP package, make sure ARCH is not defined
 override ARCH=
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
 .PHONY: mantisbt_install
 mantisbt_install:

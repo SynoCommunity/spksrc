@@ -3,7 +3,7 @@ SPK_VERS = 1.0.3
 SPK_REV  = 2
 SPK_ICON = src/HE853.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/he853
 REQUIRED_MIN_DSM = 5.0
 
 MAINTAINER = ymartin59

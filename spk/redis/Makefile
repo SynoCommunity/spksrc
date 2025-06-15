@@ -1,26 +1,31 @@
 SPK_NAME = redis
-SPK_VERS = 6.2.7
-SPK_REV = 10
+SPK_VERS = 7.0.15
+SPK_REV = 15
 SPK_ICON = src/redis.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/redis
 
-MAINTAINER = DigitalBox98
+# Unable to determine atomic operations for your platform
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+
+MAINTAINER = hgy59
 DESCRIPTION = Redis is an open source, advanced key-value store. It is often referred to as a data structure server since keys can contain strings, hashes, lists, sets and sorted sets.
 
 DISPLAY_NAME = redis
 
-CHANGELOG = "Update redis to v6.2.7 (bugfix release and security updates for CVE-2022-24736 and CVE-2022-24735)."
-
-# atomic operations are not supported on ARMv5 and PPC archs except qoriq.
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+CHANGELOG = "Update redis to v7.0.15 (CVE-2023-41056, CVE-2023-45145, CVE-2023-41053, CVE-2022-24834, CVE-2023-36824 and other fixes)."
 
 HOMEPAGE = https://redis.io
 LICENSE  = 3-clause BSD
 
+WIZARDS_DIR = src/wizard/
+
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 6379
+SERVICE_PORT_TITLE = redis TCP
+NO_SERVICE_SHORTCUT = yes
 
 POST_STRIP_TARGET = redis_extra_install
 

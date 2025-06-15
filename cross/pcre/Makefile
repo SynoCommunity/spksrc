@@ -18,7 +18,7 @@ LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 # enable UTF-8 support
-# pcre is used by glib and dependents: mc, sshfs, irssi, bitlbee, museek-plus, rmlint
+# pcre is used by glib-2.58 and dependents: mc, sshfs2, irssi, rmlint
 CONFIGURE_ARGS = --enable-utf
 CONFIGURE_ARGS += --enable-unicode-properties
 CONFIGURE_ARGS += --disable-static

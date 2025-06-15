@@ -51,5 +51,7 @@
         <insecureAllowOldTLSVersions>false</insecureAllowOldTLSVersions>
     </options>
     <defaults>
+        <folder ignorePerms="true" path="">
+        </folder>
     </defaults>
 </configuration>

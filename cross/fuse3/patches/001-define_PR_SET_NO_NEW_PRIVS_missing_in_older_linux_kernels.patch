@@ -1,0 +1,17 @@
+# define PR_SET_NO_NEW_PRIVS missing in older linux kernels
+# 
+--- util/mount.fuse.c.orig	2022-09-08 10:02:45.000000000 +0000
++++ util/mount.fuse.c	2022-12-04 07:51:57.272147293 +0000
+@@ -137,6 +137,12 @@
+ }
+ 
+ #ifdef linux
++
++#ifndef PR_SET_NO_NEW_PRIVS
++// define PR_SET_NO_NEW_PRIVS missing in older linux kernel headers (defined in kernel >= 3.5)
++# define PR_SET_NO_NEW_PRIVS 38 /* from <linux/prctl.h> */
++#endif
++
+ static uint64_t get_capabilities(void)
+ {
+ 	/*

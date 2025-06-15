@@ -22,8 +22,10 @@ DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
+ifneq ($(ARCH),noarch)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
+endif
 endif
 
 
@@ -34,6 +36,8 @@ ifneq ($(REQUIRE_KERNEL),)
 endif
 
 #####
+
+include ../../mk/spksrc.pre-check.mk
 
 include ../../mk/spksrc.cross-env.mk
 
@@ -56,30 +60,10 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-
-### Clean rules
-smart-clean:
-	rm -rf $(WORK_DIR)/$(PKG_DIR)
-	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
-
-clean:
-	rm -fr work work-* build-*.log
-
 all: install plist
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
 
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
-
-####
-
-arch-%:
-	@$(MSG) Building package for arch $*
-	@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+### For arch-* and all-<supported|latest>
+include ../../mk/spksrc.supported.mk
 
 ####

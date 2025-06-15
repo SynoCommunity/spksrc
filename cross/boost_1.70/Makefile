@@ -2,7 +2,7 @@ PKG_NAME = boost
 PKG_VERS = 1.70.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
-PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
+PKG_DIST_SITE = https://archives.boost.io/release/$(PKG_VERS)/source
 PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 
 DEPENDS = cross/bzip2 cross/zlib
@@ -19,7 +19,7 @@ CONFIGURE_TARGET = boost_configure
 COMPILE_TARGET = boost_compile
 INSTALL_TARGET = boost_install
 
-# Build all if not told otherwise (we exclude python library when "all" selected)
+# Build all if not told otherwise (we exclude python library when "all" selected)
 BOOST_LIBRARIES ?= all
 
 # Expect already built python when python library selected
@@ -27,7 +27,7 @@ WITH_PYTHON_LIBRARY =
 ifneq ($(findstring python,$(BOOST_LIBRARIES)),)
 WITH_PYTHON_LIBRARY = 1
 # The packages depending on boost with python, must build python before.
-include $(WORK_DIR)/python-cc.mk
+include $(or $(wildcard $(WORK_DIR)/crossenv/build/python-cc.mk), $(wildcard $(PYTHON_PACKAGE_WORK_DIR)/crossenv/build/python-cc.mk))
 PYTHON_NAME = $(basename $(notdir $(PYTHON_INTERPRETER)))
 else ifneq ($(findstring $(BOOST_LIBRARIES), all),)
 # exclude python library if "all" selected
@@ -51,11 +51,6 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-# fix compilation with newer compilers
-ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH -D_GLIBCXX_HAVE_OBSOLETE_ISNAN -D_GLIBCXX_HAVE_OBSOLETE_ISINF
-endif
-
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 ADDRESS_MODEL = 64
 else
@@ -63,6 +58,15 @@ ADDRESS_MODEL = 32
 endif
 
 include ../../mk/spksrc.cross-cc.mk
+
+ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
+# fix compilation with newer compilers
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISNAN
+ADDITIONAL_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
+else
+ADDITIONAL_CXXFLAGS += -std=c++11
+endif
 
 .PHONY: boost_configure
 boost_configure:
@@ -72,8 +76,8 @@ boost_configure:
 boost_compile:
 	@# Recreate user-config.jam to include python-cc.mk on second run
 	@rm -rf $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-	@echo "using gcc : `$(TC_PATH)$(TC_PREFIX)gcc -dumpversion` : $(TC_PATH)$(TC_PREFIX)g++ : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-ifneq ($(strip $(WITH_PYTHON)),)
+	@echo "using gcc : ${TC_GCC} : ${CXX} : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS) $(ADDITIONAL_CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
+ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 	@echo "using python : $(PYTHON_VERSION) : : $(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 endif
 	@echo "project : requirements <cxxflags>$(OFLAGS) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam

@@ -3,23 +3,20 @@ SynoCommunity is now on Discord!
 
 [![Discord](https://img.shields.io/discord/732558169863225384?color=7289DA&label=Discord&logo=Discord&logoColor=white&style=for-the-badge)](https://discord.gg/nnN9fgE7EF)
 
+# spksrc
+spksrc is a cross compilation framework intended to compile and package software for Synology NAS devices. Packages are made available via the [SynoCommunity repository].
+
+
 # DSM 7
 DSM 7 was released on June 29 2021 as Version 7.0.41890.
 
-## In SynoCommunity some packages are available for DSM 7 but some are not.
-* You find the status of the packages in the issue [#4524] **Meta: DSM7 package status**
-* Despite you see packages of SynoCommunity in the Package Center of your Diskstation with DSM 7, some of the packages are not compatible with DSM 7.
-* PLEASE do not create issues saying that package `xy` cannot be installed on DSM 7. All packages not yet ported to DSM 7 will refuse the installation with a message about "package requires root privileges" (or "invalid file format", ...).
-* Please regard all DSM 7 packages as beta versions (the synocommunity package repository is not capable to declare packages as beta only for DSM 7).
+* The main issue we had with our reposity is fixed in [spkrepo](https://github.com/SynoCommunity/spkrepo/pull/112) and online since February 2024
+  - before the repository deliverd DSM 6 packages for Systems with DSM 7, when no DSM 7 package was available
+  - this gave errors like "invalid file format" (or "package requires root privileges")
+  - you still get this error when manually installing a DSM 6 package on DSM 7
+* You find the status of the former packages in the issue [#4524] **Meta: DSM7 package status**
+* New packages support DSM 7 from initial package version (and some require at least DSM 7).
 * **ATTENTION**: As reported, package configuration settings may be lost following the upgrade to DSM 7 and the execution of a Package repair. Make sure to backup your settings and configuration for your SynoCommunity packages before installation of DSM 7 to facilitate restoration if needed.
-* Packages of the following kind will need some time to make DSM 7 compatible
-  * Packages depending MySQL database must be migrated to MariaDB 10
-  * Packages with installation Wizard to configure a shared folder (all download related packages and others)
-  * Packages that integrate into DSM webstation
-* As this is a community project where people spend there spare time for contribution, it may take a long time until most of the packages are ported to DSM 7. (There are still packages here that are not ported from DSM 5 to DSM 6 yet).
-
-# spksrc
-spksrc is a cross compilation framework intended to compile and package software for Synology NAS devices. Packages are made available via the [SynoCommunity repository].
 
 
 ## Contributing
@@ -40,104 +37,114 @@ If you can't find an answer, or if you want to open a package request, read [CON
 cd spksrc # Go to the cloned repository's root folder.
 
 # If running on Linux:
-docker run -it -v $(pwd):/spksrc ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc ghcr.io/synocommunity/spksrc /bin/bash
 
 # If running on macOS:
-docker run -it -v $(pwd):/spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 ```
 5. From there, follow the instructions in the [Developers HOW TO].
 
+
+
+### Virtual machine
+A virtual machine based on an 64-bit version of Debian 12 stable OS is recommended. Non-x86 architectures are not supported.
+
+Install the requirements (in sync with `Dockerfile`):
+```bash
+sudo dpkg --add-architecture i386 && sudo apt-get update
+sudo apt update
+sudo apt install autoconf-archive autogen automake autopoint bash \
+                 bash-completion bc bison build-essential check cmake \
+                 curl cython3 debootstrap ed expect fakeroot flex \
+                 g++-multilib gawk gettext gh git gperf httpie imagemagick \
+                 intltool jq libtool-bin libbz2-dev libc6-i386 libcppunit-dev libffi-dev \
+                 libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
+                 libpcre3-dev libssl-dev libtool libunistring-dev lzip \
+                 man-db manpages-dev mercurial meson mlocate moreutils nasm \
+                 ninja-build patchelf php pkg-config python3 python3-distutils \
+                 python3-mako python3-pip python3-virtualenv python3-yaml \
+                 rename ripgrep ruby-mustache rsync scons subversion \
+                 swig texinfo time tree unzip xmlto yasm zip zlib1g-dev
+```
+From there, follow the instructions in the [Developers HOW TO].
+
+* You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.
+* Some older toolchains may require 32-bit development versions of packages, e.g. `zlib1g-dev:i386`
+
+
+
 ### LXC
-A container based on 64-bit version of Debian 10 stable OS is recommended. Non-x86 architectures are not supported.  The following assumes your `lxd` environment is already initiated (e.g. `lxc init`) and you have minimal LXD/LXC knowledge :
-1. Create a new container (will use x864_64/amd64 arch by default): `lxc launch images:debian/10 spksrc`
+A container based on 64-bit version of Debian 12 stable OS is recommended. Non-x86 architectures are not supported.  The following assumes your LXD/LXC environment is already initiated (e.g. `lxc init`) and you have minimal LXD/LXC basic knowledge :
+1. Create a new container (will use x86_64/amd64 arch by default): `lxc launch images:debian/12 spksrc`
 2. Enable i386 arch: `lxc exec spksrc -- /usr/bin/dpkg --add-architecture i386`
 3. Update apt channels: `lxc exec spksrc -- /usr/bin/apt update`
 4. Install all required packages:
-```
-lxc exec spksrc -- /usr/bin/apt install autogen autoconf-archive automake autopoint bc bison build-essential check \
-                                cmake curl cython debootstrap ed expect flex g++-multilib gawk gettext git gperf \
-                                imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev \
-                                libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev \
-                                libtool libunistring-dev lzip mercurial moreutils ncurses-dev ninja-build php \
-                                pkg-config python3 python3-distutils rename scons subversion swig texinfo unzip \
-                                xmlto zlib1g-dev
-```
-5. Install `python2` wheels:
-```
-lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python2"
-lxc exec spksrc -- /bin/bash -c "pip2 install virtualenv httpie"
-```
-6. Install `python3` wheels:
-```
-lxc exec spksrc -- /bin/bash -c "wget https://bootstrap.pypa.io/get-pip.py -O - | python3"
-lxc exec spksrc -- /bin/bash -c "pip3 install virtualenv httpie"
-```
-7. Install `meson` (requires `autoconf-archive`):
-```lxc exec spksrc -- /bin/bash -c "pip3 install meson==0.56.0"```
-8. (OPTIONAL) Install misc base tools:
-```
-lxc exec spksrc -- /usr/bin/apt install bash-completion man-db manpages-dev mlocate ripgrep rsync tree time
-lxc exec spksrc -- /usr/bin/updatedb
+```bash
+lxc exec spksrc -- /usr/bin/apt install autoconf-archive autogen automake autopoint bash \
+                                        bash-completion bc bison build-essential check cmake \
+                                        curl cython3 debootstrap ed expect fakeroot flex \
+                                        g++-multilib gawk gettext gh git gperf httpie imagemagick \
+                                        intltool jq libtool-bin libbz2-dev libc6-i386 libcppunit-dev libffi-dev \
+                                        libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
+                                        libpcre3-dev libssl-dev libtool libunistring-dev lzip \
+                                        man-db manpages-dev mercurial meson mlocate moreutils nasm \
+                                        ninja-build patchelf php pkg-config python3 python3-distutils \
+                                        python3-mako python3-pip python3-virtualenv python3-yaml \
+                                        rename ripgrep ruby-mustache rsync scons subversion \
+                                        swig texinfo time tree unzip xmlto yasm zip zlib1g-dev
 ```
 
-#### LXC: Shared `spksrc` user (OPTIONAL)
-You can create a shared user between your Ubuntu and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already create a user `spksrc` with uid 1001 in your Ubuntu environment and that you which to share its `/home` userspace.
-1. Create the `spksrc` user: `lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc`
-2. Create a mapping rule between the hosts and the LXC image:
+#### LXC: `spksrc` user
+8. By default it is assumed that you will be running as `spksrc` user into the LXC container.  Such user needs to be created into the default container image:
+```bash
+lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc
 ```
+9. Setup a default shell environment:
+```bash
+lxc exec spksrc --user 1001 -- cp /etc/skel/.profile /etc/skel/.bashrc ~spksrc/.
+```
+
+From there you can connect to your container as `spksrc` and follow the instructions in the [Developers HOW TO].
+```bash
+lxc exec spksrc -- su --login spksrc
+spksrc@spksrc:~$
+```
+
+#### (OPTIONAL) LXC: Shared `spksrc` user
+You can create a shared user between your Debian/Ubuntu host and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already created a user `spksrc` with uid 1001 in your Debian/Ubuntu host environment and that you which to share its `/home` userspace.
+1. Create a mapping rule between the hosts and the LXC image:
+```bash
 lxc config set spksrc raw.idmap "both 1001 1001"
 lxc restart spksrc
 Remapping container filesystem
 ```
-3. Add `/home/spksrc` from the hsot to the LXC container:
-```
+2. Add `/home/spksrc` from the hsot to the LXC container:
+```bash
 lxc config device add spksrc home disk path=/home/spksrc source=/home/spksrc
 Device home added to spksrc
 ```
-4. Connect as `spksrc` user:
-```
+3. Connect as `spksrc` user:
+```bash
 lxc exec spksrc -- su --login spksrc
 spksrc@spksrc:~$
 ```
-5. Set a defualt shell environment:
-```
-lxc exec spksrc -- su --login spksrc
-spksrc@spksrc:~$ cp /etc/skel/.profile /etc/skel/.bashrc .
-```
+
 #### LXC: Proxy (OPTIONAL)
 The following assume you have a running proxy on your LAN setup at IP 192.168.1.1 listening on port 3128 that will allow caching files.
 1. Enforce using a proxy:
-```
+```bash
 lxc config set spksrc environment.http_proxy http://192.168.1.1:3128
 lxc config set spksrc environment.https_proxy http://192.168.1.1:3128
 ```
 2. Enforce using a proxy with `wget` in the spksrc container user account:
-```
-lxc exec spksrc -- su --login spksrc
-spksrc@spksrc:~$ cat << EOF > $HOME/.wgetrc
+```bash
+lxc exec spksrc --user $(id -u spksrc) -- bash -c "cat << EOF > ~spksrc/.wgetrc
 use_proxy = on
 http_proxy = http://192.168.1.1:3128/
 https_proxy = http://192.168.1.1:3128/
 ftp_proxy = http://192.168.1.1:3128/
-EOF
+EOF"
 ```
-
-
-### Virtual machine
-A virtual machine based on an 64-bit version of Debian 10 stable OS is recommended. Non-x86 architectures are not supported.
-
-* Install the requirements (in sync with Dockerfile):
-```bash
-sudo dpkg --add-architecture i386 && sudo apt-get update
-sudo apt update
-sudo apt install autoconf-archive autogen automake bc bison build-essential check cmake curl cython debootstrap ed expect fakeroot flex g++-multilib gawk gettext git gperf imagemagick intltool jq libbz2-dev libc6-i386 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool libunistring-dev lzip mercurial moreutils ncurses-dev ninja-build php pkg-config python3 python3-distutils rename scons subversion sudo swig texinfo unzip xmlto zlib1g-dev
-wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | sudo python2
-sudo pip2 install wheel httpie
-wget https://bootstrap.pypa.io/get-pip.py -O - | sudo python3
-sudo pip3 install meson==0.56.0
-```
-* You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.
-* Some older toolchains may require 32-bit development versions of packages, e.g. `zlib1g-dev:i386`
 
 
 ## Usage

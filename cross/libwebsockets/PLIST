@@ -1,7 +1,2 @@
-bin:bin/libwebsockets-test-client
-bin:bin/libwebsockets-test-lejp
-bin:bin/libwebsockets-test-server
-bin:bin/libwebsockets-test-server-extpoll
 lnk:lib/libwebsockets.so
-lib:lib/libwebsockets.so.15
-rsc:share/libwebsockets-test-server
+lib:lib/libwebsockets.so.19

@@ -1,0 +1,28 @@
+# basic default wheels
+# ==> Always install latest version (service-setup.sh:install_python_virtualenv)
+pip==24.3.1
+setuptools==78.1.0
+wheel==0.45.1
+
+# Always use latest version available
+certifi==2025.1.31
+
+# Mandatory for python application
+# to create their local virtualenv
+# in order to install wheels within
+# their running environment
+virtualenv==20.30.0
+
+# Other mandatory wheels that
+# gets install by default as
+# basic dependencies of above
+distlib==0.3.9
+filelock==3.18.0
+platformdirs==4.3.7
+six==1.17.0
+
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.  Uncoment to enable.
+##

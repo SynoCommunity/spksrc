@@ -1,6 +1,5 @@
 TC_ARCH = bromolow
 TC_VERS = 7.0
-TC_BUILD = 41890
 TC_KERNEL = 3.10.108
 TC_GLIBC = 2.26
 

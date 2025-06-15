@@ -1,0 +1,3 @@
+lnk:lib/libcares.so
+lnk:lib/libcares.so.2
+lib:lib/libcares.so.2.13.1

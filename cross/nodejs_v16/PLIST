@@ -1,3 +1,4 @@
+rsc:bin/corepack
 bin:bin/node
 rsc:bin/npm
 rsc:bin/npx

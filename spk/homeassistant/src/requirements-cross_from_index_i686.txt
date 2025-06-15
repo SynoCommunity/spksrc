@@ -1,0 +1,14 @@
+# wheels that need cross compilation
+# but fail to build with spksrc framework
+# are downloaded from index at package installation
+
+# wheels for python arch i686
+
+av==13.1.0
+###awscrt==0.24.1               not available for i686, 'lg_thinq'  component not supported
+###deebot_client==9.4.0         not available for i686, 'ecovacs' component not supported
+grpcio==1.67.1
+# isal fails to cross compile...
+###isal==1.7.1                  not available for i686, 'isal' component not supported: limited compression support (falling back to zlib, performance will be degraded)
+# pandas: maturin error
+###pandas==2.2.3                not available for i686, 'kraken', 'ezviz' and 'environment_canada' components not supported

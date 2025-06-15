@@ -1,11 +1,19 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 3.5.3
-SPK_REV = 55
+SPK_VERS = 4.5.1
+SPK_REV = 76
 SPK_ICON = src/sabnzbd.png
 
-BUILD_DEPENDS = cross/python310
-DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python310"
+PYTHON_PACKAGE = python312
+
+DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
+OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
+
+# python311 not supported
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# unrar not supported
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+
+SPK_DEPENDS = $(PYTHON_PACKAGE)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -15,7 +23,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Update SABnzbd to 3.5.3."
+CHANGELOG = "1. Update to SABnzbd 4.5.1.<br/>2. Migrate to Python 3.12."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -23,7 +31,7 @@ LICENSE   = GPL
 WIZARDS_DIR = src/wizard/
 
 SERVICE_USER = auto
-SERVICE_WIZARD_SHARE = wizard_download_dir
+SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8080
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
@@ -31,12 +39,26 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
+DEPENDS += cross/unrar
+else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+DEPENDS += cross/unrar
+else
+DEPENDS += cross/unrar7
+endif
+
 POST_STRIP_TARGET = sabnzbd_extra_install
 
-# Add nice and ionice commands
-ENV += BUSYBOX_CONFIG="nice ionice"
+SPK_COMMANDS = bin/7zz
 
-include ../../mk/spksrc.spk.mk
+# [cryptography]
+DEPENDS += cross/openssl3
+
+include ../../mk/spksrc.python.mk
+
+# prefer native python tools (pip, maturin, ...) used for orjson
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:

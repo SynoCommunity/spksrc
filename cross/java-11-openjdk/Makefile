@@ -12,7 +12,7 @@ PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 # build instructions:
 # https://openjdk.java.net/groups/build/doc/building.html
 
-BUILD_DEPENDS = native/openjdk-11 native/zip
+BUILD_DEPENDS = native/openjdk-11
 # Dependencies are required at build time only.
 BUILD_DEPENDS += cross/cups
 BUILD_DEPENDS += cross/alsa-lib
@@ -25,9 +25,6 @@ DEPENDS += cross/libpng
 DEPENDS += cross/libjpeg
 DEPENDS += cross/giflib
 DEPENDS += cross/lcms2
-
-ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
-ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
 
 HOMEPAGE = http://openjdk.java.net/
 COMMENT  = OpenJDK 11 is the open-source reference implementation of version 11 of the Java SE Platform as specified by by JSR 384 in the Java Community Process.
@@ -63,6 +60,8 @@ CONFIGURE_ARGS += --disable-warnings-as-errors
 CONFIGURE_ARGS += --with-x=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-cups=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-freetype-include=$(INSTALL_DIR)/$(INSTALL_PREFIX)/include/freetype2
+CONFIGURE_ARGS += --with-freetype-lib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"

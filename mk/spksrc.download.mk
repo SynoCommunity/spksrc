@@ -1,5 +1,5 @@
 ### Download rules
-#   Download $(URLS) from the wild internet, and place them in $(DISTRIB_DIR). 
+#   Download $(URLS) from the wild internet, and place them in $(DISTRIB_DIR).
 # Targets are executed in the following order:
 #  download_msg_target
 #  pre_download_target   (override with PRE_DOWNLOAD_TARGET)
@@ -7,7 +7,12 @@
 #  post_download_target  (override with POST_DOWNLOAD_TARGET)
 # Variables:
 #  URLS:                 List of URL to download
-#  DISTRIB_DIR:          Downloaded files will be placed there.  
+#  DISTRIB_DIR:          Downloaded files will be placed there.
+# Targets:
+# download               Regular target for file download
+# download-all           To additionally download all files when PKG_DIST_ARCH_LIST is defined
+#                        This target is for github prepare action to pre download all sources
+#
 
 # Configure file descriptor lock timeout
 ifeq ($(strip $(FLOCK_TIMEOUT)),)
@@ -86,7 +91,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      ;; \
 	    svn) \
 	      if [ "$(PKG_SVN_REV)" = "HEAD" ]; then \
-	        rev=`svn info --xml $${url} | xmllint --xpath 'string(/info/entry/@revision)' -` ; \
+	        rev=$$(svn info --xml $${url} | xmllint --xpath 'string(/info/entry/@revision)' -) ; \
 	      else \
 	        rev=$(PKG_SVN_REV) ; \
 	      fi ; \
@@ -115,7 +120,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      ;; \
 	    hg) \
 	      if [ "$(PKG_HG_REV)" = "tip" ]; then \
-	        rev=`hg identify -r "tip" $${url}` ; \
+	        rev=$$(hg identify -r "tip" $${url}) ; \
 	      else \
 	        rev=$(PKG_HG_REV) ; \
 	      fi ; \
@@ -145,9 +150,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	    *) \
 	      localFile=$(PKG_DIST_FILE) ; \
 	      if [ -z "$${localFile}" ]; then \
-	        localFile=`basename $${url}` ; \
+	        localFile=$$(basename $${url}) ; \
 	      fi ; \
-	      url=`echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#'` ; \
+	      url=$$(echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#') ; \
 	      exec 9> /tmp/wget.$${localFile}.lock ; \
 	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 9 || exit 1 ; \
 	      pid=$$$$ ; \
@@ -155,9 +160,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      if [ -f $${localFile} ]; then \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
 	      else \
-	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 --waitretry=0 --tries=5 -nv $${url}" ; \
+	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 -nv $${url}" ; \
 	        rm -f $${localFile}.part ; \
-	        wget --secure-protocol=TLSv1_2 --timeout=30 --waitretry=0 --tries=5 -nv -O $${localFile}.part -nc $${url} ; \
+	        wget --secure-protocol=TLSv1_2 --timeout=30 -nv -O $${localFile}.part -nc $${url} ; \
 	        mv $${localFile}.part $${localFile} ; \
 	      fi ; \
 	      flock -u 9 ; \
@@ -175,4 +180,15 @@ $(DOWNLOAD_COOKIE): $(POST_DOWNLOAD_TARGET)
 	@touch -f $@
 else
 download: ;
+endif
+
+
+ifneq ($(strip $(PKG_DIST_ARCH_LIST)),)
+download-all:
+	@for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
+	  rm -f $(DOWNLOAD_COOKIE) ; \
+	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} download ; \
+	done ;
+else
+download-all: download
 endif

@@ -14,7 +14,7 @@ $(DIGESTS_FILE): download
 	    SHA256)   tool=sha256sum ;; \
 	    MD5)      tool=md5sum ;; \
 	  esac ; \
-	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
+	  echo "$(LOCAL_FILE) $$type $$($$tool $(DIST_FILE) | cut -d' ' -f1)" >> $@ ; \
 	done
 
 else
@@ -29,7 +29,7 @@ digests-%:
 	    SHA256)   tool=sha256sum ;; \
 	    MD5)      tool=md5sum ;; \
 	  esac ; \
-	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $(DIGESTS_FILE) ; \
+	  echo "$(LOCAL_FILE) $${type} $$($${tool} $(DIST_FILE) | cut -d' ' -f1)" >> $(DIGESTS_FILE) ; \
 	done
 
 
