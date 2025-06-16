@@ -248,8 +248,14 @@ service_restore ()
     rm "${TMP_DIR}/plugins.ini"
 
     echo "Restoring rutorrent custom plugins ${RUTORRENT_WEB_DIR}/plugins"
-    cp -apu -t "${RUTORRENT_WEB_DIR}" "${TMP_DIR}/plugins"
-    fix_unix_permissions "${RUTORRENT_WEB_DIR}/plugins"
+    for src in "${TMP_DIR}/plugins"/*; do
+        plugin=$(basename "$src")
+        dest="${RUTORRENT_WEB_DIR}/plugins/${plugin}"
+        if [ ! -e "$dest" ]; then
+            cp -ap "$src" "${RUTORRENT_WEB_DIR}/plugins/"
+            fix_unix_permissions "${dest}"
+        fi
+    done
     rm -rf "${TMP_DIR}/plugins"
 
     echo "Restoring rutorrent global configuration ${RUTORRENT_WEB_DIR}/conf/config.php"
