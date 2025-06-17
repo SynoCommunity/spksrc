@@ -1,8 +1,8 @@
 PKG_NAME = libtorrent
-PKG_VERS = 0.15.4
+PKG_VERS = 0.14.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/releases/download/v$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/releases/download/v0.10.0
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib cross/openssl3 cross/libsigc++
