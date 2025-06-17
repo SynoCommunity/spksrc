@@ -21,7 +21,6 @@ CONFIGURE_ARGS = --with-xmlrpc-c=$(STAGING_INSTALL_PREFIX)/bin/xmlrpc-c-config
 # let it find xml2-config (referenced in xmlrpc-c-config)
 ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
 
-Add commentMore actions
 # disable some compiler warnings:
 ADDITIONAL_CXXFLAGS = -Wno-deprecated-declarations -Wno-unused-parameter -Wno-terminate -Wno-sign-compare -Wno-class-memaccess
 
