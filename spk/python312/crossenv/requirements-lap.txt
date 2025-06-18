@@ -3,7 +3,8 @@ setuptools==78.1.0
 wheel==0.45.1
 #
 build:Cython==3.0.11
-build:numpy==2.2.4
+# numpy is required in build env too (brings libraries like libgfortran):
+build:numpy==2.2.6
 #
-wheelhouse:numpy==2.2.4
+wheelhouse:numpy==2.2.6
 cross:build==1.2.2
