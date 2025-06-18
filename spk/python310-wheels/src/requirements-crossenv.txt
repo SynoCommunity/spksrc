@@ -29,7 +29,7 @@ charset-normalizer==3.2.0
 immutables==0.21
 llfuse==1.5.0
 MarkupSafe==3.0.2
-msgpack==1.0.5              # used compiled verrsion for performance
+msgpack==1.0.5              # used compiled verrsion for performance - keep older version for gcc <= 4.9.x
 msgpack-python==0.5.6
 netifaces==0.11.0
 psutil==6.1.1
