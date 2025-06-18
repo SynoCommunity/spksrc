@@ -26,4 +26,6 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 55414
 SERVICE_PORT_TITLE = UrBackup Web UI
 
+SPK_COMMANDS = bin/urbackupsrv
+
 include ../../mk/spksrc.spk.mk
