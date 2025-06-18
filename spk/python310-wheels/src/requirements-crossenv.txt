@@ -25,7 +25,6 @@ cffi==1.17.1
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
-borgbackup==1.2.6
 charset-normalizer==3.2.0
 immutables==0.21
 llfuse==1.5.0
