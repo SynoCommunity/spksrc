@@ -2,7 +2,7 @@ pip==24.3.1
 setuptools==80.9.0
 wheel==0.45.1
 #
-build:Cython==3.1.2
+build:Cython==3.0.12                     # keep older version for gcc <= 4.9.x
 build:maturin==1.8.7
 build:meson==1.8.2
 build:meson-python==0.18.0
