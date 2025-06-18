@@ -93,6 +93,14 @@ RUN apt install --no-install-recommends -y \
 	python3-virtualenv \
 	python3-yaml
 
+# Add backport channel
+RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/backports.list && \
+    echo "Package: *\nPin: release a=bookworm-backports\nPin-Priority: 100" > /etc/apt/preferences.d/99-backports
+
+# Update package list & install needed package from backport
+RUN apt-get update && \
+    apt-get install -y -t bookworm-backports meson
+
 # Clean-up apt db
 RUN apt clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

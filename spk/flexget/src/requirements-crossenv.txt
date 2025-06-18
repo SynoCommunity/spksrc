@@ -1,13 +1,15 @@
-# Generated using the requirements script on April 11, 2025
+# Generated using the requirements script on May 31, 2025
 
 Brotli==1.1.0
-charset_normalizer==3.4.1
-#greenlet                           ==> supported version depends on gcc version
+charset_normalizer==3.4.2
+#greenlet==3.2.2                    ==> supported version depends on gcc version
 MarkupSafe==3.0.2
-#pendulum                           ==> python/pendulum
+#pendulum==3.1.0                    ==> python/pendulum
 psutil==7.0.0
 PyYAML==6.0.2
-#rpds_py                            ==> supported version depends on rustc version
-sqlalchemy==2.0.40
-time_machine==2.16.0
+# rpds_py==0.25.1: "rpds@1.1.1 requires rustc 1.85.0"
+# rpds_py==0.24.0 is the latest version that builds with rustc 1.82.0 (for qoriq)
+# jsonschema requires rpds-py>=0.7.1
+rpds_py==0.24.0
+sqlalchemy==2.0.41
 zstandard==0.23.0

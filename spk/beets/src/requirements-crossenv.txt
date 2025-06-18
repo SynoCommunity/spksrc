@@ -1,10 +1,18 @@
-# Generated using the requirements script on March 23, 2025
+# Generated using the requirements script on June 15, 2025
+
 # NOTE: The following plugins were excluded due to being broken or deprecated:
 # absubmit, docs, import, reflink
 
-charset_normalizer==3.4.1
-jellyfish==1.1.3
-lxml==5.3.1
-MarkupSafe==3.0.2
-#pillow                         ==> python/pillow
+# NOTE: Excluded plugins that require background services or desktop environments:
+# aura, bpd, mpdstats, thumbnails, web
+
+charset_normalizer==3.4.2
+#dbus_python                    ==> python/dbus-python          for plugins: metasync
+jellyfish==1.2.0
+#lap>=0.5.12                    ==> python/lap
+lxml==5.4.0
+#numpy>=1.24.4                  ==> python/numpy
+#pillow                         ==> python/pillow               for plugins: embedart, fetchart
+#pycairo                        ==> python/pycairo
+#pygobject                      ==> python/pygobject            for plugins: replaygain
 PyYAML==6.0.2
