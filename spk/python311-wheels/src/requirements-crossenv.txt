@@ -15,8 +15,7 @@ bcrypt==4.2.1
 # https://docs.rs/openssl/latest/openssl/#automatic
 #  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==43.0.3
-cryptography==44.0.0
+cryptography==45.0.4
 
 # Requirement for cryptography
 cffi==1.15.1
