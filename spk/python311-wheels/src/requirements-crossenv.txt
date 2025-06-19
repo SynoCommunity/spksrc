@@ -1,14 +1,14 @@
 ##
 ## All configurations below are optional and
 ## are provided to demonstrate how to build
-## various wheels.  Uncoment to enable.
+## various wheels.
 ##
 
 # [bcrypt]
 # Require environment variables
 #  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-bcrypt==4.2.1
+bcrypt==4.3.0
 
 # [cryptography]
 # Mandatory of using OPENSSL_*_DIR starting with version >= 40
@@ -18,37 +18,38 @@ bcrypt==4.2.1
 cryptography==45.0.4
 
 # Requirement for cryptography
-cffi==1.15.1
 cffi==1.17.1
 
 # commonly used cross-compiled wheels
 # All tested and can be enabled but may conflict
 # with local python apps requirements
 
-charset-normalizer==3.2.0
+charset_normalizer==3.4.2
 immutables==0.21
-llfuse==1.5.0
+# [llfuse]
+# gcc < 5 requires -std=gnu11 to find "clock_gettime"
+llfuse==1.5.1
 MarkupSafe==3.0.2
 msgpack==1.0.5              # used compiled verrsion for performance - keep older version for gcc <= 4.9.x
-msgpack-python==0.5.6
+msgpack_python==0.5.6
 netifaces==0.11.0
-psutil==6.1.1
-pyrsistent==0.19.3
+psutil==7.0.0
+pyrsistent==0.20.0
 regex==2024.11.6
-ruamel.yaml.clib==0.2.7
-SQLAlchemy==2.0.32
-zope.interface==7.0.2
+ruamel.yaml.clib==0.2.12
+SQLAlchemy==2.0.41
+zope.interface==7.2
 
 # [gevent]
 # Depends: libev, c-ares
 # Require environment variables
 #  GEVENTSETUP_EMBED_CARES=FALSE
 #  GEVENTSETUP_EMBED_LIBEV=FALSE
-gevent==24.11.1
+gevent==25.5.1
 
 # [lxml]
 # Depends: libxml2, libxslt
-lxml==5.3.0
+lxml==5.4.0
 
 # [mysqlclient]
 # Depends: mysql-connector-c, mariadb-connector-c
@@ -61,13 +62,13 @@ mysqlclient==2.2.7
 # Depends: c-ares
 # Require environment variables
 #  PYCARES_USE_SYSTEM_LIB=1
-pycares==4.5.0
+pycares==4.9.0
 
 # [pycurl]
 # Depends: curl
 # Require environment variables
 #  PYCURL_CURL_CONFIG
-pycurl==7.45.4
+pycurl==7.45.6
 
 # [PyNaCl]
 # Depends: cross/libsodium
@@ -78,14 +79,6 @@ PyNaCl==1.5.0
 # [PyYAML]
 # Depends: libyaml
 PyYAML==6.0.2
-
-# [rpds-py]
-# Require environment variables
-#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# Requires path to maturin from crossenv
-#  ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
-rpds-py==0.10.2
 
 # [ujson]
 #   - Require setuptools-scm in cross/python3* crossenv
