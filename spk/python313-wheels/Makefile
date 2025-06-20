@@ -34,9 +34,7 @@ WHEELS += src/requirements-pure.txt
 SERVICE_SETUP = src/service-setup.sh
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
-OPTIONAL_DEPENDS += python/numpy_ha
 OPTIONAL_DEPENDS += python/numpy
-OPTIONAL_DEPENDS += python/numpy-latest
 OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
@@ -62,7 +60,6 @@ endif
 
 # [Pillow]
 DEPENDS += python/pillow
-DEPENDS += python/pillow_ha
 
 # [pycares]
 DEPENDS += cross/c-ares
@@ -155,7 +152,6 @@ endif
 # gcc-8.5 happens to be the default version for DSM-7.1
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
-DEPENDS += python/numpy_ha
 DEPENDS += python/numpy
 # gcc-9.3 is the minimal version to build numpy>=2.3.x
 # gcc-12.2 is the default version for DSM-7.2

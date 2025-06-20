@@ -36,7 +36,6 @@ WHEELS += src/requirements-pure.txt
 SERVICE_SETUP = src/service-setup.sh
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
-OPTIONAL_DEPENDS += python/numpy_ha
 OPTIONAL_DEPENDS += python/numpy
 OPTIONAL_DEPENDS += python/scipy
 
@@ -181,7 +180,6 @@ endif
 # Requires gcc>=8.4 to build sucesfully
 ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
-DEPENDS += python/numpy_ha
 DEPENDS += python/numpy
 
 # [scipy] - depends on numpy
