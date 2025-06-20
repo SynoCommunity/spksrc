@@ -135,13 +135,16 @@ WHEELS += atom==0.11.0
 endif
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-greenlet-v3.txt
+# version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
+# version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Mandatory require full c++11 support
+# version  = 1.x: gcc <  4.9 (DSM5, DSM6) Last known working version (armv5, hi3535)
+ifeq ($(call version_ge, $(TC_GCC), 8),1)
+WHEELS += greenlet==3.2.3
 else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
-WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
+WHEELS += greenlet==3.0.3
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 else
-WHEELS += src/requirements-crossenv-greenlet-v1.txt
+WHEELS += greenlet==1.1.3
 endif
 
 # [numpy] <= 1.21.6 (armv5)
