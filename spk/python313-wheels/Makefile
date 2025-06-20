@@ -85,13 +85,13 @@ DEPENDS += cross/libyaml
 # [rencode]
 DEPENDS += python/rencode
 
-# [rpds-py]
-# Version <= 0.21.0 requires rustc
-# Version >= 0.22.3 requires rustc >= 1.80
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-rpds-py-rust179.txt
+# [rpds-py] 
+# Version = 0.24 requires rustc >= 1.82 (qoriq)
+# Version = 0.25 requires rustc >= 1.85
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += rpds_py==0.24.0
 else
-WHEELS += src/requirements-crossenv-rpds-py.txt
+WHEELS += rpds_py==0.25.1
 endif
 
 include ../../mk/spksrc.python.mk
