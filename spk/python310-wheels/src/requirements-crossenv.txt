@@ -40,13 +40,6 @@ ruamel.yaml.clib==0.2.12
 SQLAlchemy==2.0.41
 zope.interface==7.2
 
-# [gevent]
-# Depends: libev, c-ares
-# Require environment variables
-#  GEVENTSETUP_EMBED_CARES=FALSE
-#  GEVENTSETUP_EMBED_LIBEV=FALSE
-gevent==25.5.1
-
 # [lxml]
 # Depends: libxml2, libxslt
 lxml==5.4.0

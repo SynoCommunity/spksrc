@@ -85,7 +85,10 @@ DEPENDS += cross/libyaml
 # [rencode]
 DEPENDS += python/rencode
 
-# [rpds-py] 
+# [rpds-py]
+# Require environment variables
+#   PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#   PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # Version = 0.24 requires rustc >= 1.82 (qoriq)
 # Version = 0.25 requires rustc >= 1.85
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
@@ -114,6 +117,11 @@ endif
 DEPENDS += cross/libev cross/c-ares
 ENV += GEVENTSETUP_EMBED_CARES=FALSE
 ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
+WHEELS += gevent==24.11.1
+else
+WHEELS += gevent==25.5.1
+endif
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [gevent] -std=c11
 endif

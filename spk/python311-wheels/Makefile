@@ -61,6 +61,11 @@ DEPENDS += python/cryptography
 DEPENDS += cross/libev cross/c-ares
 ENV += GEVENTSETUP_EMBED_CARES=FALSE
 ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
+WHEELS += gevent==24.11.1
+else
+WHEELS += gevent==25.5.1
+endif
 
 # [lxml]
 DEPENDS += cross/libxml2
@@ -104,6 +109,9 @@ DEPENDS += cross/libyaml
 DEPENDS += python/rencode
 
 # [rpds-py]
+# Require environment variables
+#   PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#   PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
 # Version = 0.21 requires rustc >= 1.77 (armv5)
 # Version = 0.24 requires rustc >= 1.82 (qoriq)
 # Version = 0.25 requires rustc >= 1.85
