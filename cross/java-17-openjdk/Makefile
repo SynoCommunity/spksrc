@@ -98,6 +98,11 @@ COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+# "Intel Short Vector Math Library (SVML)" is built for x64 only
+PLIST_TRANSFORM = sed -e '/lib\/libjsvml.so/d'
+endif
+
 .PHONY: java-17-openjdk_configure
 # Use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS to ignore TC_CONFIGURE_ARGS
 # Disable the normal host build target triplets since openjdk uses its own openjdk-target
@@ -112,7 +117,9 @@ java-17-openjdk_pre_compile:
 
 .PHONY: java-17-openjdk_post_compile
 java-17-openjdk_post_compile:
+	@$(MSG) Link binaries into version independent bin folder
 	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
+	@$(MSG) Install license files
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/LICENSE                   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ADDITIONAL_LICENSE_INFO   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ASSEMBLY_EXCEPTION        $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
