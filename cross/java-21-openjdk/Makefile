@@ -69,8 +69,8 @@ CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) -fno-stack-protector -Wno-depre
 CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
 CONFIGURE_ARGS += --disable-manpages
-# point configure at our generated PKCS#12 store
-CONFIGURE_ARGS += --with-cacerts-file=$(WORK_DIR)/cacerts.p12
+CONFIGURE_ARGS += --with-cacerts-file=/etc/ssl/certs/ca-certificates.crt
+CONFIGURE_ARGS += --with-cacerts-src=/etc/ssl/certs
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
 # customize for SynoCommunity
@@ -120,15 +120,6 @@ endif
 java-21-openjdk_pre_configure:
 	@$(MSG) "- Make configure script executable"
 	@cd $(WORK_DIR)/$(PKG_DIR) && chmod +x ./configure
-	@$(MSG) "- Generate PKCS#12 truststore from system CAs"
-	@BOOT_JDK=$(WORK_DIR)/../../../native/openjdk-21/work-native/jdk-21 ;\
-	$$BOOT_JDK/bin/keytool -importcert -v \
-		-file /etc/ssl/certs/ca-certificates.crt \
-		-keystore $(WORK_DIR)/cacerts.p12 \
-		-storetype PKCS12 \
-		-storepass changeit \
-		-alias system-cacerts \
-		-noprompt
 
 .PHONY: java-21-openjdk_pre_compile
 java-21-openjdk_pre_compile:
