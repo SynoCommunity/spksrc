@@ -1,6 +1,6 @@
 SPK_NAME = cops
-SPK_VERS = 3.5.7
-SPK_REV = 15
+SPK_VERS = 3.6.5
+SPK_REV = 16
 SPK_ICON = src/cops.png
 
 DEPENDS  = cross/cops
@@ -14,7 +14,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 DISPLAY_NAME = COPS
-CHANGELOG = "1. Update to v3.5.7. (Requires PHP 8.2 and DSM 7.2)"
+CHANGELOG = "1. Update to v3.6.5. (Requires PHP 8.2 and DSM 7.2)"
 
 HOMEPAGE = https://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE = GPLv2
