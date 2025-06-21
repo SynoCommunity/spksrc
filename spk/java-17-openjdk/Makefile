@@ -7,7 +7,7 @@ SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 SPK_REV = 2
 SPK_ICON = src/java-openjdk.png
 
-DEPENDS = cross/java-17-openjdk_update
+DEPENDS = cross/java-17-openjdk
 
 # gcc >= 5.0 required
 REQUIRED_MIN_DSM = 7.0
