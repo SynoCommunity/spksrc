@@ -123,11 +123,3 @@ java-17-openjdk_post_compile:
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/LICENSE                   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ADDITIONAL_LICENSE_INFO   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ASSEMBLY_EXCEPTION        $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
-	@$(MSG) "- Generating PKCS#12 truststore from DSM CA bundle"
-	@/usr/bin/openssl pkcs12 -export \
-		-in /etc/ssl/certs/ca-certificates.crt \
-		-nokeys \
-		-chain \
-		-name system-cacerts \
-		-out $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/lib/security/cacerts \
-		-passout pass:changeit
