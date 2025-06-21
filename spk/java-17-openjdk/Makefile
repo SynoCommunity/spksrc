@@ -4,7 +4,7 @@ JAVA_NAME = jdk
 JAVA_RELEASE = 10
 JAVA_VERSION = 17.0.6
 SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-17-openjdk
@@ -18,7 +18,7 @@ DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 17 is the
 
 STARTABLE = no
 DISPLAY_NAME = Java 17 OpenJDK
-CHANGELOG = "Initial Java 17 package release"
+CHANGELOG = "Embed system CAs as a PKCS\#12 truststore to fix SSLContext loading errors."
 
 HOMEPAGE = https://openjdk.org/projects/jdk/17/
 LICENSE_FILE = src/LICENSE
