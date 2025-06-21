@@ -33,8 +33,6 @@ HOMEPAGE = https://openjdk.org/projects/jdk/17/
 COMMENT  = OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by JSR 390 in the Java Community Process.
 LICENSE  = GPLv2 with the Classpath Exception
 
-PRE_CONFIGURE_TARGET = java-17-openjdk_pre_configure
-
 # Use our own configure since the one supplied by openjdk has no shebang
 CONFIGURE_TARGET = java-17-openjdk_configure
 
@@ -70,8 +68,6 @@ CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-d
 CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
 CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --disable-manpages
-# embed our generated PKCS#12 store instead of raw PEM
-CONFIGURE_ARGS += --with-cacerts-file=$(WORK_DIR)/cacerts.p12
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
 # customize for SynoCommunity
@@ -102,18 +98,6 @@ COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: java-17-openjdk_pre_configure
-# Before running ./configure, generate a proper PKCS#12 truststore
-java-17-openjdk_pre_configure:
-	@BOOT_JDK=$(WORK_DIR)/../../../native/openjdk-17/work-native/jdk-17; \
-	$$BOOT_JDK/bin/keytool -importcert -v \
-		-file /etc/ssl/certs/ca-certificates.crt \
-		-keystore $(WORK_DIR)/cacerts.p12 \
-		-storetype PKCS12 \
-		-storepass changeit \
-		-alias system-cacerts \
-		-noprompt
-
 .PHONY: java-17-openjdk_configure
 # Use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS to ignore TC_CONFIGURE_ARGS
 # Disable the normal host build target triplets since openjdk uses its own openjdk-target
@@ -132,3 +116,11 @@ java-17-openjdk_post_compile:
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/LICENSE                   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ADDITIONAL_LICENSE_INFO   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ASSEMBLY_EXCEPTION        $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
+	@$(MSG) "- Generating PKCS#12 truststore from DSM CA bundle"
+	@/usr/bin/openssl pkcs12 -export \
+		-in /etc/ssl/certs/ca-certificates.crt \
+		-nokeys \
+		-chain \
+		-name system-cacerts \
+		-out $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/lib/security/cacerts \
+		-passout pass:changeit

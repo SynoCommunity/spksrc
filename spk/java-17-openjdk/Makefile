@@ -18,7 +18,7 @@ DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 17 is the
 
 STARTABLE = no
 DISPLAY_NAME = Java 17 OpenJDK
-CHANGELOG = "1. Update to v17.0.16+7. <br/>2. Embed system CAs as a PKCS\#12 truststore to fix SSLContext loading errors."
+CHANGELOG = "1. Update to v17.0.16+7. <br/>2. Generate cacerts PKC\#12 truststore on DSM install via OpenSSL."
 
 HOMEPAGE = https://openjdk.org/projects/jdk/17/
 LICENSE_FILE = src/LICENSE
