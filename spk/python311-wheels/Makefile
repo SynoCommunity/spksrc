@@ -146,43 +146,30 @@ else
 WHEELS += greenlet==1.1.3
 endif
 
-# [numpy] <= 1.21.6 (armv5)
-# This version is now unsupported using pip>=23.2.1
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-# [numpy] <= 1.22.4 (armv7l)
+# [numpy]
+# version <= 1.21 (armv5)  Requires python '<3.11,>=3.7' *** unsupported ***
+# version <= 1.22 (armv7l) Last working version
+# version <= 1.24 (DSM6, comcerto2k) Last working version with gcc-4.9
+# version >= 1.25 (DSM7)   Mandatory requires c++17
+# version == 1.25.2        BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
+# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
+# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-numpy-armv7l.txt
-# [numpy] <= 1.24.4 last working version with gcc-4.9
+WHEELS += numpy==1.22.4
 else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy-gcc4.txt
-# [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
-
-# [numpy] = 1.25.x
-# BUG numpy==1.25.2 only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-numpy-gcc85-x64.txt
-else
-WHEELS += src/requirements-crossenv-numpy.txt
-endif
-endif
-endif
-
+WHEELS += numpy==1.24.4
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 WHEELS_CFLAGS += [numpy] -O0
 endif
-endif
-
-# [numpy] >= 1.26|2.x
-# Requires gcc>=8.4 to build sucesfully
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
+endif
 
-# [scipy] - depends on numpy
+# [scipy] - depends on numpy >= 2.x
+ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
 DEPENDS += python/scipy
 endif
 

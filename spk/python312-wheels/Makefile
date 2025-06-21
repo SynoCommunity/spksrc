@@ -152,16 +152,26 @@ WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
 # [numpy]
-# gcc-8.4 is the minimal version to build numpy<=2.2.x
-# gcc-8.5 happens to be the default version for DSM-7.1
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+# version <= 1.22 (armv7l) Last working version *** unsupported ***
+# version <= 1.24 (DSM6, comcerto2k) Last working version with gcc-4.9
+# version >= 1.25 (DSM7)   Mandatory requires c++17
+# version == 1.25.2        BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
+# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
+# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
+ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+WHEELS += numpy==1.24.4
+# workaround for compiler bug:
+# https://github.com/numpy/numpy/issues/13622
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS += [numpy] -O0
+endif
+else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
-# gcc-9.3 is the minimal version to build numpy>=2.3.x
-# gcc-12.2 is the default version for DSM-7.2
-# DEPENDS += python/numpy-latest
+endif
 
-# [scipy] - depends on numpy
+# [scipy] - depends on numpy >= 2.x
+ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
 DEPENDS += python/scipy
 endif
 
