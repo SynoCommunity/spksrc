@@ -154,6 +154,7 @@ endif
 # version == 1.25.2        BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
 # version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
 # version >= 2.3  (DSM7.2) Requires gcc >= 9.4
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 WHEELS += numpy==1.24.4
 # workaround for compiler bug:
@@ -164,6 +165,7 @@ endif
 else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
+endif
 endif
 
 # [scipy] - depends on numpy >= 2.x

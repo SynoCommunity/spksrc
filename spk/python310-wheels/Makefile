@@ -154,7 +154,7 @@ ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # version == 1.25.2        BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
 # version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
 # version >= 2.3  (DSM7.2) Requires gcc >= 9.4
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += numpy==1.21.6
 else ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += numpy==1.22.4
