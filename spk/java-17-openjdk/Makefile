@@ -1,10 +1,10 @@
 SPK_NAME = java-17-openjdk
 JAVA_REPO_NAME = jdk17u
 JAVA_NAME = jdk
-JAVA_RELEASE = 10
-JAVA_VERSION = 17.0.6
+JAVA_RELEASE = 7
+JAVA_VERSION = 17.0.16
 SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-17-openjdk
@@ -18,7 +18,7 @@ DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 17 is the
 
 STARTABLE = no
 DISPLAY_NAME = Java 17 OpenJDK
-CHANGELOG = "Initial Java 17 package release"
+CHANGELOG = "Update to v17.0.16+7."
 
 HOMEPAGE = https://openjdk.org/projects/jdk/17/
 LICENSE_FILE = src/LICENSE
@@ -35,6 +35,7 @@ SPK_COMMANDS += bin/jdb
 SPK_COMMANDS += bin/jdeprscan
 SPK_COMMANDS += bin/jdeps
 SPK_COMMANDS += bin/jfr
+SPK_COMMANDS += bin/jhsdb
 SPK_COMMANDS += bin/jimage
 SPK_COMMANDS += bin/jinfo
 SPK_COMMANDS += bin/jlink

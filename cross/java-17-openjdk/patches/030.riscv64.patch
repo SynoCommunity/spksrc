@@ -56,14 +56,3 @@ Reviewed-by: aph, erikj, ehelin, ihse
  
  echo $result
  exit $exitcode
---- a/src/hotspot/os/linux/os_linux.cpp
-+++ b/src/hotspot/os/linux/os_linux.cpp
-@@ -2558,6 +2558,8 @@
-   strncpy(cpuinfo, "IA64", length);
- #elif defined(PPC)
-   strncpy(cpuinfo, "PPC64", length);
-+#elif defined(RISCV)
-+  strncpy(cpuinfo, "RISCV", length);
- #elif defined(S390)
-   strncpy(cpuinfo, "S390", length);
- #elif defined(SPARC)
