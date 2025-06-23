@@ -8,7 +8,6 @@ SPK_DEPENDS = "${PYTHON_PACKAGE}"
 
 WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
-WHEELS += src/requirements-abi3.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
@@ -59,6 +58,9 @@ endif
 
 # [Pillow]
 DEPENDS += python/pillow
+
+# [rencode]
+DEPENDS += python/rencode
 
 .NOTPARALLEL:
 .PHONY: deluge_extra_install

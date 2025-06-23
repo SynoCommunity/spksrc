@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.16
+PKG_VERS = 3.10.18
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -36,7 +36,9 @@ include ../../mk/spksrc.archs.mk
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
 #
 # Enable Link-Time Optimization
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-lto
+endif
 #
 # pgo optimization can only be run native platform and now
 # exit on errors which had no impact (and effects) previously.

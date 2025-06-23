@@ -5,13 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-ifeq ($(strip $(PYTHON_PACKAGE)),)
-PYTHON_PACKAGE = python312
-endif
-
-BUILD_DEPENDS = cross/python312
-DEPENDS = cross/openssl3 cross/libicu cross/zlib cross/argon2
-
 # Ensure C++17 compatibility
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
@@ -20,12 +13,38 @@ HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
 LICENSE  = Apache 2.0
 
-CMAKE_ARGS  = -DWANT_ARGON=YES
-CMAKE_ARGS += -DWANT_OPENSSL=YES
-CMAKE_ARGS += -DWANT_PYTHON=YES
+ifeq ($(strip $(PYTHON_PACKAGE)),)
+BUILD_DEPENDS = cross/python312
+endif
+CMAKE_ARGS = -DWANT_PYTHON=true
+DEPENDS = cross/zlib
+
+DEPENDS += cross/openssl3
+CMAKE_ARGS += -DWANT_OPENSSL=true
+
+DEPENDS += cross/libicu
+CMAKE_ARGS += -DWANT_ICU=true
+
+DEPENDS += cross/argon2
+CMAKE_ARGS += -DWANT_ARGON=true
+
+DEPENDS += cross/cyrus-sasl
+CMAKE_ARGS += -DWANT_CYRUS=true
+
+# Boost mandatory for i18n and
+# can only be built from spk
+ifneq ($(strip $(BOOST_BUILD_PATH)),)
+CMAKE_ARGS += -DWANT_I18N=true
+endif
+
+CMAKE_ARGS += -DWANT_SYSTEMD=false
+CMAKE_ARGS += -DWANT_TCL=false
+CMAKE_ARGS += -DWANT_PERL=false
+ifneq ($(wildcard $(OPENSSL_STAGING_PREFIX)),)
 CMAKE_ARGS += -DOPENSSL_INCLUDE_DIR=$(OPENSSL_STAGING_PREFIX)/include
 CMAKE_ARGS += -DOPENSSL_SSL_LIBRARY=$(OPENSSL_STAGING_PREFIX)/lib/libssl.so
 CMAKE_ARGS += -DOPENSSL_CRYPTO_LIBRARY=$(OPENSSL_STAGING_PREFIX)/lib/libcrypto.so
+endif
 
 # For ZNC to build using github-action, enforce adding Python & OpenSSL include directories
 ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))

@@ -36,7 +36,6 @@ WHEELS += src/requirements-pure.txt
 SERVICE_SETUP = src/service-setup.sh
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
-OPTIONAL_DEPENDS += python/numpy_ha
 OPTIONAL_DEPENDS += python/numpy
 OPTIONAL_DEPENDS += python/scipy
 
@@ -61,6 +60,11 @@ DEPENDS += python/cryptography
 DEPENDS += cross/libev cross/c-ares
 ENV += GEVENTSETUP_EMBED_CARES=FALSE
 ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
+WHEELS += gevent==24.11.1
+else
+WHEELS += gevent==25.5.1
+endif
 
 # [lxml]
 DEPENDS += cross/libxml2
@@ -100,9 +104,22 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# [rencode]
+DEPENDS += python/rencode
+
 # [rpds-py]
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-rpds-py.txt
+# Require environment variables
+#   PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#   PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Version = 0.21 requires rustc >= 1.77 (armv5)
+# Version = 0.24 requires rustc >= 1.82 (qoriq)
+# Version = 0.25 requires rustc >= 1.85
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS += rpds_py==0.21.0
+else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += rpds_py==0.24.0
+else
+WHEELS += rpds_py==0.25.1
 endif
 
 include ../../mk/spksrc.python.mk
@@ -117,51 +134,45 @@ WHEELS += atom==0.11.0
 endif
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-greenlet-v3.txt
+# version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
+# version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Mandatory require full c++11 support
+# version  = 1.x: gcc <  4.9 (DSM5, DSM6) Last known working version (armv5, hi3535)
+ifeq ($(call version_ge, $(TC_GCC), 8),1)
+WHEELS += greenlet==3.2.3
 else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
-WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
+WHEELS += greenlet==3.0.3
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 else
-WHEELS += src/requirements-crossenv-greenlet-v1.txt
+WHEELS += greenlet==1.1.3
 endif
 
-# [numpy] <= 1.21.6 (armv5)
-# This version is now unsupported using py311
+# [numpy]
+# version <= 1.21 (armv5)  Requires python '<3.11,>=3.7' *** unsupported ***
+# version <= 1.22 (armv7l) Last working version
+# version <= 1.24 (DSM6, comcerto2k) Last working version with gcc-4.9
+# version >= 1.25 (DSM7)   Mandatory requires c++17
+# version == 1.25.2        BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
+# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
+# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-# [numpy] <= 1.22.4 (armv7l)
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-numpy-armv7l.txt
-# [numpy] <= 1.24.4 last working version with gcc-4.9
+WHEELS += numpy==1.22.4
 else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy-gcc4.txt
-# [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
-
-# [numpy] = 1.25.x
-# BUG numpy==1.25.2 only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-numpy-gcc85-x64.txt
-else
-WHEELS += src/requirements-crossenv-numpy.txt
-endif
-
-# [numpy] >= 1.26|2.x
-DEPENDS += python/numpy_1.26
-DEPENDS += python/numpy_ha
-DEPENDS += python/numpy
-
-# [scipy] - depends on numpy 
-DEPENDS += python/scipy
-endif
-endif
-
+WHEELS += numpy==1.24.4
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 WHEELS_CFLAGS += [numpy] -O0
 endif
+else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy
+endif
+endif
+
+# [scipy] - depends on numpy >= 2.x
+ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+DEPENDS += python/scipy
 endif
 
 # [pycryptodome]

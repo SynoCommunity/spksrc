@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.16
+PKG_VERS = 3.10.18
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -16,8 +16,6 @@ CONFIGURE_ARGS += --without-static-libpython
 CONFIGURE_ARGS += --with-ensurepip=no
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
-# Uses system default libffi-dev
-CONFIGURE_ARGS += --with-system-ffi
 # Uses system default libssl-dev
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
@@ -32,7 +30,7 @@ PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
 PIP_VERSION = "24.3.1"
-PIP_WHEELS  = setuptools==75.6.0
+PIP_WHEELS  = setuptools==80.9.0
 PIP_WHEELS += wheel==0.45.1
 PIP_WHEELS += crossenv==1.5.0
 
