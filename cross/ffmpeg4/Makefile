@@ -36,8 +36,7 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
 include ../../mk/spksrc.common.mk
 
-OPTIONAL_DEPENDS  = native/nasm
-OPTIONAL_DEPENDS += cross/chromaprint-fftw
+OPTIONAL_DEPENDS  = cross/chromaprint-fftw
 OPTIONAL_DEPENDS += cross/dav1d
 OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libass
@@ -59,10 +58,6 @@ OPTIONAL_DEPENDS += cross/shine
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
-ENV += AS=$(NASM_PATH)/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --x86asmexe=nasm
 
 # Allow ASM on aarch64, disable on all others
@@ -186,13 +181,13 @@ endif
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),comcerto2k $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
 
 # Add SVT-AV1 codec to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),comcerto2k $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
@@ -215,9 +210,6 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te
-ifneq ($(findstring $(ARCH),alpine),$(ARCH))
-CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
-endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
