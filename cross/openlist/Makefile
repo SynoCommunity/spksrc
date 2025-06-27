@@ -1,46 +1,43 @@
-PKG_NAME = openlist
+PKG_NAME = OpenList
 PKG_VERS = 4.0.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/OpenListTeam/OpenList/archive/refs/tags
+PKG_DIST_SITE = https://github.com/OpenListTeam/OpenList/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = OpenList-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/nodejs native/go
+BUILD_DEPENDS = native/nodejs native/go
 
-COMPILE_TARGET = openlist_build
-INSTALL_TARGET   = openlist_install
+# lacking support for atomics
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+# not supported by go
+UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
+HOMEPAGE = https://docs.oplist.org/
+COMMENT  = A file list program that supports multiple storages, powered by Gin and SolidJS, fork of AList.
+LICENSE = AGPL-3.0
 
-include ../../mk/spksrc.cross-go.mk
+PRE_COMPILE_TARGET = openlist_pre_compile
+
+WEB_VERSION = dev
+NODE_BIN = $(realpath $(WORK_DIR)/../../../native/nodejs/work-native/install/usr/local/bin)
+ENV += PATH="$(PATH):$(NODE_BIN)"
 
 BUILD_DATE = $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 
-NODE_BIN = $(realpath $(WORK_DIR)/../../../native/nodejs/work-native/install/usr/local/bin)
-GO_BIN = $(realpath $(WORK_DIR)/../../../native/go/work-native/go/bin)
-
-
-GO_SRC_PATH = github.com/OpenListTeam/OpenList
+CGO_ENABLED = 1
+GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
+GO_BIN_DIR = $(GO_SRC_DIR)/openlist
 GO_LDFLAGS = \
-  -X '$(GO_SRC_PATH)/internal/conf.BuiltAt=$(BUILD_DATE)' \
-  -X '$(GO_SRC_PATH)/internal/conf.GitAuthor=OpenList' \
-  -X '$(GO_SRC_PATH)/internal/conf.GitCommit=$(PKG_VERS)' \
-  -X '$(GO_SRC_PATH)/internal/conf.Version=$(PKG_VERS)' \
-  -X '$(GO_SRC_PATH)/internal/conf.WebVersion=dev'
+  -X 'github.com/OpenListTeam/OpenList/internal/conf.BuiltAt=$(BUILD_DATE)' \
+  -X 'github.com/OpenListTeam/OpenList/internal/conf.GitAuthor=OpenList' \
+  -X 'github.com/OpenListTeam/OpenList/internal/conf.GitCommit=$(PKG_VERS)' \
+  -X 'github.com/OpenListTeam/OpenList/internal/conf.Version=$(PKG_VERS)' \
+  -X 'github.com/OpenListTeam/OpenList/internal/conf.WebVersion=$(WEB_VERSION)'
 
-.PHONY: openlist_build
-openlist_build:
-	@$(MSG) "Building web frontend…"
-	cd $(WORK_DIR)/$(PKG_DIR) && env PATH="$(PATH):$(NODE_BIN)" bash build.sh dev web
-	@$(MSG) "Building Go binary…"
-	cd $(WORK_DIR)/$(PKG_DIR) && \
-	  env PATH="$(PATH):$(GO_BIN)" GOARCH=$(GO_ARCH) CGO_ENABLED=1 go build \
-	    -ldflags "$(GO_LDFLAGS)" \
-	    -o openlist .
+include ../../mk/spksrc.cross-go.mk
 
-.PHONY: openlist_install
-openlist_install:
-	@$(MSG) "Installing openlist to staging…"
-	install -d $(STAGING_INSTALL_PREFIX)/bin
-	install -m 755 $(WORK_DIR)/$(PKG_DIR)/openlist \
-	                $(STAGING_INSTALL_PREFIX)/bin/
+.PHONY: openlist_pre_compile
+openlist_pre_compile:
+	@$(MSG) "- Build web frontend"
+	@$(RUN) ; bash build.sh $(WEB_VERSION) web
