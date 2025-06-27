@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# 定义变量
+NAME="openlist"
+DAEMON="${SYNOPKG_PKGDEST}/bin/openlist"
+DATA_DIR="${SYNOPKG_PKGDEST}/var"
+PID_FILE="/var/run/${NAME}.pid"
+LOG_FILE="/var/log/${NAME}.log"
+
+# 定义启动命令
+COMMAND="server --data ${DATA_DIR}"
+
+start_daemon ()
+{
+    # 启动程序，并记录PID
+    ${DAEMON} ${COMMAND} >> ${LOG_FILE} 2>&1 &
+    echo $! > ${PID_FILE}
+}
+
+stop_daemon ()
+{
+    # 停止程序
+    kill `cat ${PID_FILE}`
+    wait_for_status 1 20 || kill -15 `cat ${PID_FILE}`
+    rm -f ${PID_FILE}
+}
+
+daemon_status ()
+{
+    if [ -f ${PID_FILE} ] && kill -0 `cat ${PID_FILE}` > /dev/null 2>&1; then
+        return
+    fi
+    rm -f ${PID_FILE}
+    return 1
+}
+
+case $1 in
+    start)
+        syno_pkg_is_run ${PID_FILE} || {
+            echo "Starting ${NAME}..."
+            start_daemon
+        }
+        ;;
+    stop)
+        if daemon_status; then
+            echo "Stopping ${NAME} ..."
+            stop_daemon
+        else
+            echo "${NAME} is not running"
+        fi
+        ;;
+    status)
+        if daemon_status; then
+            echo "${NAME} is running"
+            exit 0
+        else
+            echo "${NAME} is not running"
+            exit 1
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status}"
+        exit 1
+        ;;
+esac

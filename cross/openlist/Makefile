@@ -8,9 +8,6 @@ PKG_DIR = OpenList-$(PKG_VERS)
 
 DEPENDS = native/nodejs native/go
 
-# No way to know why it's not possible to build packages for arm
-#UNSUPPORTED_ARCHS = $(ARM_ARCHS)
-
 COMPILE_TARGET = openlist_build
 INSTALL_TARGET   = openlist_install
 
