@@ -8,8 +8,11 @@ PKG_DIR = OpenList-$(PKG_VERS)
 
 DEPENDS = native/nodejs native/go
 
-COMPILE_TARGET = build_all
-INSTALL_TARGET   = install_all
+# No way to know why it's not possible to build packages for arm
+#UNSUPPORTED_ARCHS = $(ARM_ARCHS)
+
+COMPILE_TARGET = openlist_build
+INSTALL_TARGET   = openlist_install
 
 
 include ../../mk/spksrc.cross-go.mk
@@ -28,8 +31,8 @@ GO_LDFLAGS = \
   -X '$(GO_SRC_PATH)/internal/conf.Version=$(PKG_VERS)' \
   -X '$(GO_SRC_PATH)/internal/conf.WebVersion=dev'
 
-.PHONY: build_all
-build_all:
+.PHONY: openlist_build
+openlist_build:
 	@$(MSG) "Building web frontend…"
 	cd $(WORK_DIR)/$(PKG_DIR) && env PATH="$(PATH):$(NODE_BIN)" bash build.sh dev web
 	@$(MSG) "Building Go binary…"
@@ -38,8 +41,8 @@ build_all:
 	    -ldflags "$(GO_LDFLAGS)" \
 	    -o openlist .
 
-.PHONY: install_all
-install_all:
+.PHONY: openlist_install
+openlist_install:
 	@$(MSG) "Installing openlist to staging…"
 	install -d $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/openlist \
