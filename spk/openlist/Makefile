@@ -9,7 +9,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 # not supported by go:
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
-MAINTAINER = gao
+MAINTAINER = GrandDuke1106
 DESCRIPTION = A file list program that supports multiple storages, powered by Gin and SolidJS, fork of AList.
 DISPLAY_NAME = OpenList
 CHANGELOG = "Initial package release."
@@ -26,8 +26,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = openlist_extra_install
 
-# TODO: add installation wizard if share is required
-#SERVICE_WIZARD_SHARE = wizard_download_dir
+# TODO: add installation to define admin password
 #WIZARDS_DIR = src/wizard
 
 include ../../mk/spksrc.spk.mk

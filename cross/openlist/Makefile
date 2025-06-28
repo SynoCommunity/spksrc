@@ -23,15 +23,19 @@ WEB_VERSION = dev
 NODE_BIN = $(realpath $(WORK_DIR)/../../../native/nodejs/work-native/install/usr/local/bin)
 ENV += PATH="$(PATH):$(NODE_BIN)"
 
-BUILD_DATE = $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
+BUILT_AT = $(shell date +'%F %T %z')
+# set SynoCommunity as git author
+GIT_AUTHOR = "SynoCommunity/spksrc"
+# git commit of SynoCommunity/spksrc repo
+GIT_COMMIT = $(shell git log --pretty=format:"%h" -1)
 
 CGO_ENABLED = 1
 GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
 GO_BIN_DIR = $(GO_SRC_DIR)/openlist
-GO_LDFLAGS = \
-  -X 'github.com/OpenListTeam/OpenList/internal/conf.BuiltAt=$(BUILD_DATE)' \
-  -X 'github.com/OpenListTeam/OpenList/internal/conf.GitAuthor=OpenList' \
-  -X 'github.com/OpenListTeam/OpenList/internal/conf.GitCommit=$(PKG_VERS)' \
+GO_LDFLAGS = -w -s \
+  -X 'github.com/OpenListTeam/OpenList/internal/conf.BuiltAt=$(BUILT_AT)' \
+  -X 'github.com/OpenListTeam/OpenList/internal/conf.GitAuthor=$(GIT_AUTHOR)' \
+  -X 'github.com/OpenListTeam/OpenList/internal/conf.GitCommit=$(GIT_COMMIT)' \
   -X 'github.com/OpenListTeam/OpenList/internal/conf.Version=$(PKG_VERS)' \
   -X 'github.com/OpenListTeam/OpenList/internal/conf.WebVersion=$(WEB_VERSION)'
 
