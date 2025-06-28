@@ -1,5 +1,5 @@
 SPK_NAME = openlist
-SPK_VERS = 4.0.3
+SPK_VERS = 4.0.4
 SPK_REV = 1
 SPK_ICON = src/openlist.png
 
@@ -26,8 +26,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = openlist_extra_install
 
-# TODO: add installation to define admin password
-#WIZARDS_DIR = src/wizard
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
 
 include ../../mk/spksrc.spk.mk
 

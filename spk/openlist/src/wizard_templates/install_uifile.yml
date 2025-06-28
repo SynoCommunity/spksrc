@@ -1,0 +1,8 @@
+CONFIGURATION_TITLE: "Server Configuration"
+
+ADMIN_PASSWORD_DESCRIPTION: "Initial Password for user 'admin'"
+ADMIN_PASSWORD_LABEL:       "Password (default: admin)"
+
+PERMISSIONS_TITLE:          "<b>Permissions</b><br/>"
+PERMISSIONS_TEXT1:          "This package runs as internal service user <b>sc-openlist</b> in DSM. If you want to configure local folders as OpenList storage, you must ensure that this user has the required permissions. <br/>"
+PERMISSIONS_TEXT2:          "Please read <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\\\">Permission Management</a> for details."
