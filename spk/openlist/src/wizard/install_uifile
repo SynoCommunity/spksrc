@@ -1,0 +1,81 @@
+[
+  {
+    "step_title": "Web Configuration",
+    "fields": [
+      {
+        "type": "textfield",
+        "desc": "Please enter your site URL (without trailing slash):",
+        "key": "site_url",
+        "defaultValue": "https://example.com",
+        "validator": {
+          "allowBlank": false
+        }
+      },
+      {
+        "type": "password",
+        "desc": "Admin password (leave empty for random):",
+        "key": "admin_pass",
+        "validator": {
+          "allowBlank": false
+        }
+      }
+    ]
+  },
+  {
+    "step_title": "Database Configuration",
+    "fields": [
+      {
+        "type": "combobox",
+        "desc": "Select database type:",
+        "key": "db_type",
+        "defaultValue": "sqlite3",
+        "validator": {
+          "allowBlank": false
+        }
+      },
+      {
+        "type": "textfield",
+        "desc": "Database host (leave empty for SQLite3):",
+        "key": "db_host"
+      },
+      {
+        "type": "textfield",
+        "desc": "Database port (set to 0 for SQLite3):",
+        "key": "db_port",
+        "validator": {
+          "expr": "^[0-9]+$",
+          "errorText": "Port must be a number"
+        }
+      },
+      {
+        "type": "textfield",
+        "desc": "Database user (leave empty for SQLite3):",
+        "key": "db_user"
+      },
+      {
+        "type": "password",
+        "desc": "Database password (leave empty for SQLite3):",
+        "key": "db_password"
+      },
+      {
+        "type": "textfield",
+        "desc": "Database name (leave empty for SQLite3):",
+        "key": "db_name"
+      }
+    ]
+  },
+  {
+    "step_title": "Installation Notes",
+    "items": [
+      {
+        "desc": "The configuration file can be found in the <code>/var/packages/openlist/var</code> directory after the installation is complete. You can further configure the options."
+      },
+      {
+        "desc": "After the installation is complete, please use the username \"admin\" and the password you just set to enter the administration interface, you can change the username yourself. </br>If you have not set an admin password, find the <code>log.log</code> file in the <code>/var/packages/openlist/var/log</code> directory after the first boot, which records a random password."
+      },
+      {
+        "desc": "Please refer to the official documentation(https://docs.oplist.org/) for the complete configuration."
+      }
+    ]
+  }
+]

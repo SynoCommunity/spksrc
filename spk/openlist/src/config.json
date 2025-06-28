@@ -1,17 +1,19 @@
+config.json
+
 {
   "force": false,
-  "site_url": "",
+  "site_url": "%site_url%",
   "cdn": "",
-  "jwt_secret": "random_generated",
+  "jwt_secret": "%jwt_secret%",
   "token_expires_in": 48,
   "database": {
-    "type": "sqlite3",
-    "host": "",
-    "port": 0,
-    "user": "",
-    "password": "",
-    "name": "",
-    "db_file": "/var/packages/openlist/var/data.db",
+    "type": "%db_type%",
+    "host": "%db_host%",
+    "port": %db_port%,
+    "user": "%db_user%",
+    "password": "%db_password%",
+    "name": "%db_name%",
+    "db_file": "%data%/data.db",
     "table_prefix": "x_",
     "ssl_mode": "",
     "dsn": ""
@@ -32,12 +34,12 @@
     "unix_file_perm": "",
     "enable_h2c": false
   },
-  "temp_dir": "/var/packages/openlist/var/temp",
-  "bleve_dir": "/var/packages/openlist/var/bleve",
+  "temp_dir": "%data%/temp",
+  "bleve_dir": "%data%/bleve",
   "dist_dir": "",
   "log": {
     "enable": true,
-    "name": "/var/packages/openlist/var/log/openlist.log",
+    "name": "%data%/log/log.log",
     "max_size": 50,
     "max_backups": 30,
     "max_age": 28,
@@ -64,6 +66,11 @@
       "task_persistant": false
     },
     "copy": {
+      "workers": 5,
+      "max_retry": 2,
+      "task_persistant": false
+    },
+    "move": {
       "workers": 5,
       "max_retry": 2,
       "task_persistant": false
