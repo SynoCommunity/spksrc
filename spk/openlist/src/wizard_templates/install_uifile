@@ -1,6 +1,18 @@
 [{
     "step_title": "{{{CONFIGURATION_TITLE}}}",
     "items": [{
+        "type": "textfield",
+        "desc": "{{{SITE_URL_DESCRIPTION}}}",
+        "subitems": [{
+            "key": "wizard_site_url",
+            "defaultValue": "https://example.com",
+            "desc": "{{{SITE_URL_LABEL}}}",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      },{
         "type": "password",
         "desc": "{{{ADMIN_PASSWORD_DESCRIPTION}}}",
         "subitems": [{
@@ -12,6 +24,16 @@
             }
           }
         ]
+      }
+    ]
+  },{
+    "step_title": "{{{INSTALLATION_NOTES_TITLE}}}",
+    "items": [{
+        "desc": "{{{INSTALLATION_NOTES_TEXT1}}}"
+      }, {
+        "desc": "{{{INSTALLATION_NOTES_TEXT2}}}"
+      }, {
+        "desc": "{{{INSTALLATION_NOTES_TEXT3}}}"
       }, {
         "desc": ""
       }, {

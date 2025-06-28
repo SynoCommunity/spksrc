@@ -26,9 +26,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = openlist_extra_install
 
-#WIZARDS_TEMPLATES_DIR = src/wizard_templates
-
-WIZARDS_DIR = src/wizard
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
 
 include ../../mk/spksrc.spk.mk
 
