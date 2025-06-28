@@ -1,5 +1,3 @@
-config.json
-
 {
   "force": false,
   "site_url": "%site_url%",
