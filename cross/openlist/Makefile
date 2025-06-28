@@ -8,6 +8,7 @@ PKG_DIST_SITE = https://github.com/OpenListTeam/OpenList/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+BUILD_DEPENDS = native/go
 DEPENDS = cross/openlist-frontend
 
 # lacking support for atomics
