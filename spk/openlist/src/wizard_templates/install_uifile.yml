@@ -8,7 +8,7 @@ ADMIN_PASSWORD_LABEL:       "Password (default: admin)"
 INSTALLATION_NOTES_TITLE: "Installation Notes"
 INSTALLATION_NOTES_TEXT1: "The configuration file can be found in the <code>/var/packages/openlist/var</code> directory after the installation is complete. You can further configure the options."
 INSTALLATION_NOTES_TEXT2:  "After the installation is complete, please use the username \\\"admin\\\" and the password you just set to enter the administration interface, you can change the username yourself."
-INSTALLATION_NOTES_TEXT3:  "Please refer to the <a target=\\\"_blank\\\" href=\\\"https://docs.oplist.org/\\\">official documentation</a> for the complete configuration."
+INSTALLATION_NOTES_TEXT3:  "Please refer to the <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/OpenList\\\">SynoCommunity wiki</a> for installation tips and the <a target=\\\"_blank\\\" href=\\\"https://docs.oplist.org/\\\">official OpenList documentation</a> for a complete configuration."
 
 
 PERMISSIONS_TITLE:          "<b>Permissions</b><br/>"

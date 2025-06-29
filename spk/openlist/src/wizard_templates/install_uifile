@@ -5,11 +5,7 @@
         "desc": "{{{SITE_URL_DESCRIPTION}}}",
         "subitems": [{
             "key": "wizard_site_url",
-            "defaultValue": "https://example.com",
-            "desc": "{{{SITE_URL_LABEL}}}",
-            "validator": {
-              "allowBlank": false
-            }
+            "desc": "{{{SITE_URL_LABEL}}}"
           }
         ]
       },{

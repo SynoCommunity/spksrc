@@ -8,7 +8,7 @@
     "type": "sqlite3",
     "host": "",
     "port": 0,
-    "user": "%",
+    "user": "",
     "password": "",
     "name": "",
     "db_file": "%data%/data.db",
