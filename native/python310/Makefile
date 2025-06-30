@@ -30,12 +30,18 @@ PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
 REQUIREMENTS = src/requirements.txt
+PIP_WHEEL = $(shell grep -h -E "(^pip|^)[<>=]=" $(wildcard $(REQUIREMENTS)))
 
 .PHONY: python310_native_post_install
 python310_native_post_install: $(WORK_DIR)/python-native.mk
-	@$(MSG) Installing latest pip
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
+ifeq ($(PIP_WHEEL),)
+	@$(MSG) Installing latest pip
 	@$(RUN) $(PYTHON) get-pip.py --no-setuptools --no-wheel --disable-pip-version-check
+else
+	@$(MSG) Installing $(PIP_WHEEL)
+	@$(RUN) $(PYTHON) get-pip.py "$(PIP_WHEEL)" --no-setuptools --no-wheel --disable-pip-version-check
+endif
 	@$(MSG) Installing wheels from requirements file
 	@$(PIP) --disable-pip-version-check install -r $(REQUIREMENTS)
 
