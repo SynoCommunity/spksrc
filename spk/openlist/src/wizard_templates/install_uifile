@@ -5,6 +5,7 @@
         "desc": "{{{SITE_URL_DESCRIPTION}}}",
         "subitems": [{
             "key": "wizard_site_url",
+            "emptyText": "https://example.com",
             "desc": "{{{SITE_URL_LABEL}}}"
           }
         ]
