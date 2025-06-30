@@ -54,6 +54,9 @@ spksrc_root = repo_root
 #     else:
 #         print(f"❌ Missing directory: {test_path}")
 
+# Configuration
+IGNORED_PACKAGES = ["pip", "Cython", "msgpack"]
+
 globs = [
     "spk/python*/crossenv/requirements-default.txt",
     "spk/python*/src/requirements-abi3.txt",
@@ -95,6 +98,14 @@ for req_file in paths:
     # print(f"   Directory (absolute): {os.path.dirname(req_file)}")
     # print(f"   Filename: {filename}")
 
+    # Créer la liste des packages à ignorer
+    ignore_list = []
+    for package in IGNORED_PACKAGES:
+        ignore_list.append({
+            "dependency-name": package,
+            "update-types": ["version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch"]
+        })
+
     updates.append({
         "package-ecosystem": "pip",
         "directory": os.path.dirname(req_file),
@@ -106,7 +117,8 @@ for req_file in paths:
             "all-python-deps": {
                 "patterns": ["*"]
             }
-        }
+        },
+        "ignore": ignore_list
     })
 
 # Debug information
