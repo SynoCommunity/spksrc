@@ -6,6 +6,7 @@ on:
     - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC (optional)
   push:
     paths:
+      - 'spk/python*/crossenv/requirements-default.txt'
       - 'spk/python*/src/requirements-*.txt'
       - 'native/python*/src/requirements.txt'
       - '.github/actions/generate_dependabot.py'
