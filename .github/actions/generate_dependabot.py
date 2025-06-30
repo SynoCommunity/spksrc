@@ -41,20 +41,21 @@ repo_root = find_repo_root(script_dir)
 spksrc_root = repo_root
 
 # Debug information
-print(f"🔍 Script location: {script_dir}")
-print(f"🔍 Repository root: {repo_root}")
-print(f"🔍 spksrc root: {spksrc_root}")
+# print(f"🔍 Script location: {script_dir}")
+# print(f"🔍 Repository root: {repo_root}")
+# print(f"🔍 spksrc root: {spksrc_root}")
 
 # Verify key directories exist
-test_dirs = ["spk", "native"]
-for test_dir in test_dirs:
-    test_path = os.path.join(spksrc_root, test_dir)
-    if os.path.isdir(test_path):
-        print(f"✅ Found directory: {test_path}")
-    else:
-        print(f"❌ Missing directory: {test_path}")
+# test_dirs = ["spk", "native"]
+# for test_dir in test_dirs:
+#     test_path = os.path.join(spksrc_root, test_dir)
+#     if os.path.isdir(test_path):
+#         print(f"✅ Found directory: {test_path}")
+#     else:
+#         print(f"❌ Missing directory: {test_path}")
 
 globs = [
+    "spk/python*/crossenv/requirements-default.txt",
     "spk/python*/src/requirements-abi3.txt",
     "spk/python*/src/requirements-crossenv.txt", 
     "spk/python*/src/requirements-pure.txt",
@@ -62,19 +63,19 @@ globs = [
 ]
 
 # Test glob patterns to see what they find
-print(f"\n🔍 Testing glob patterns:")
-for pattern in globs:
-    full_pattern = os.path.join(spksrc_root, pattern)
-    matches = glob.glob(full_pattern)
-    print(f"   Pattern: {pattern}")
-    print(f"   Full path: {full_pattern}")
-    print(f"   Matches: {len(matches)}")
-    if matches:
-        for match in matches[:3]:  # Show first 3 matches
-            print(f"      - {match}")
-        if len(matches) > 3:
-            print(f"      ... and {len(matches) - 3} more")
-    print()
+# print(f"\n🔍 Testing glob patterns:")
+# for pattern in globs:
+#     full_pattern = os.path.join(spksrc_root, pattern)
+#     matches = glob.glob(full_pattern)
+#     print(f"   Pattern: {pattern}")
+#     print(f"   Full path: {full_pattern}")
+#     print(f"   Matches: {len(matches)}")
+#     if matches:
+#         for match in matches[:3]:  # Show first 3 matches
+#             print(f"      - {match}")
+#         if len(matches) > 3:
+#             print(f"      ... and {len(matches) - 3} more")
+#     print()
 
 # Iterate on each glob patterns based on spksrc_root
 paths = itertools.chain.from_iterable(
@@ -82,16 +83,21 @@ paths = itertools.chain.from_iterable(
 )
 
 updates = []
-found_files = []  # For debugging
+# found_files = []  # For debugging
 
 for req_file in paths:
-    found_files.append(req_file)
-    rel_dir = os.path.dirname(os.path.relpath(req_file, repo_root)).replace(os.sep, "/")
+    # found_files.append(req_file)
     filename = os.path.basename(req_file)
     
+    # Debug: show path calculation
+    # print(f"🔍 Processing: {req_file}")
+    # print(f"   Relative to repo_root: {os.path.relpath(req_file, repo_root)}")
+    # print(f"   Directory (absolute): {os.path.dirname(req_file)}")
+    # print(f"   Filename: {filename}")
+
     updates.append({
         "package-ecosystem": "pip",
-        "directory": f"/{rel_dir}",
+        "directory": os.path.dirname(req_file),
         "requirements-file": filename,
         "schedule": {
             "interval": "weekly"
@@ -104,11 +110,11 @@ for req_file in paths:
     })
 
 # Debug information
-print(f"🔍 Found {len(found_files)} requirements files:")
-for file in found_files:
-    print(f"   - {file}")
+# print(f"🔍 Found {len(found_files)} requirements files:")
+# for file in found_files:
+#     print(f"   - {file}")
 
-print(f"🔍 Generated {len(updates)} dependabot updates")
+# print(f"🔍 Generated {len(updates)} dependabot updates")
 
 dependabot_config = {
     "version": 2,
@@ -126,9 +132,9 @@ with open(output_path, "w") as f:
 print(f"✅ dependabot.yml generated at: {output_path}")
 
 # Show a preview of the generated content
-print("\n📋 Generated content preview:")
-print("=" * 50)
-with open(output_path, "r") as f:
-    content = f.read()
-    print(content[:500] + ("..." if len(content) > 500 else ""))
-print("=" * 50)
+# print("\n📋 Generated content preview:")
+# print("=" * 50)
+# with open(output_path, "r") as f:
+#     content = f.read()
+#     print(content[:500] + ("..." if len(content) > 500 else ""))
+# print("=" * 50)
