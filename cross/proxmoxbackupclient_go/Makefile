@@ -6,8 +6,10 @@ PKG_DIST_SITE = https://github.com/tizbac/proxmoxbackupclient_go/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+# golang not supported
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 # lacking support for atomics
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 BUILD_DEPENDS = native/go
 

@@ -5,6 +5,8 @@ SPK_ICON = src/proxmox.png
 
 DEPENDS = cross/proxmoxbackupclient_go
 
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+
 MAINTAINER = hgy59
 DISPLAY_NAME = Proxmox Backup Client
 DESCRIPTION = Proxmox backup client written in golang \(under development\).
