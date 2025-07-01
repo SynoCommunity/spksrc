@@ -21,20 +21,10 @@
             }
           }
         ]
-      }
-    ]
-  },{
-    "step_title": "{{{INSTALLATION_NOTES_TITLE}}}",
-    "items": [{
-        "desc": "{{{INSTALLATION_NOTES_TEXT1}}}"
-      }, {
-        "desc": "{{{INSTALLATION_NOTES_TEXT2}}}"
-      }, {
-        "desc": "{{{INSTALLATION_NOTES_TEXT3}}}"
-      }, {
+      },{
         "desc": ""
-      }, {
-        "desc": "{{{PERMISSIONS_TITLE}}}{{{PERMISSIONS_TEXT1}}}{{{PERMISSIONS_TEXT2}}}"
+      },{
+        "desc": "{{{INSTALLATION_NOTES_TITLE}}}{{{INSTALLATION_NOTES_TEXT1}}}"
       }
     ]
   }

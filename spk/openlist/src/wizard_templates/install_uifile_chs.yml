@@ -1,15 +1,9 @@
 CONFIGURATION_TITLE:      "基本服务设置"
-SITE_URL_DESCRIPTION:     "OpenList 服务器的URL，例如 https://example.com。 (不要带尾部斜杠)"
+SITE_URL_DESCRIPTION:     "OpenList 服务器的URL，例如 https://example.com。 (不要带尾部斜杠)。如果您使用反向代理等功能，则需要此项 (可选)。"
 SITE_URL_LABEL:           "站点 URL"
 
 ADMIN_PASSWORD_DESCRIPTION: "默认用户 \\\"admin\\\" 的初始密码"
 ADMIN_PASSWORD_LABEL:       "密码 (默认: admin)"
 
-INSTALLATION_NOTES_TITLE: "安装说明"
-INSTALLATION_NOTES_TEXT1: "安装完成后，配置文件可以在 <code>/var/packages/openlist/var</code> 目录中找到。您可以进一步配置选项，如配置数据库等。"
-INSTALLATION_NOTES_TEXT2:  "安装完成后，请使用用户名 \\\"admin\\\" 和您刚设置的密码登录管理界面，在管理界面可以自行更改用户名。"
-INSTALLATION_NOTES_TEXT3:  "请参考 <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/OpenList\\\">SynoCommunity wiki</a> 获取安装提示，并查阅<a target=\\\"_blank\\\" href=\\\"https://docs.oplist.org/\\\">官方 OpenList 文档</a>以获取完整配置说明。"
-
-PERMISSIONS_TITLE:          "<b>权限说明</b><br/>"
-PERMISSIONS_TEXT1:          "此软件包在 DSM 中作为内部服务用户 <b>sc-openlist</b> 运行。如果您想将本地文件夹配置为 OpenList 存储，您必须确保该用户具有所需的权限。<br/>"
-PERMISSIONS_TEXT2:          "请阅读 <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\\\">SynoCommunity权限管理</a> 以获取详细信息。"
+INSTALLATION_NOTES_TITLE: "<b>安装说明</b><br/>"
+INSTALLATION_NOTES_TEXT1: "请参阅 <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/OpenList\\\">SynoCommunity OpenList wiki 页面</a>以获取更多信息及官方文档的链接。"
