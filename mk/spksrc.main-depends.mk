@@ -3,7 +3,6 @@
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
 
 # nothing to download
 download:
@@ -20,6 +19,9 @@ ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 endif
+
+# Common directories (must be set after ARCH_SUFFIX)
+include ../../mk/spksrc.directories.mk
 
 #####
 

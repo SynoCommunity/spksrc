@@ -11,7 +11,6 @@
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -31,6 +30,9 @@ ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 endif
+
+# Common directories (must be set after ARCH_SUFFIX)
+include ../../mk/spksrc.directories.mk
 
 ##### rust specific configurations
 include ../../mk/spksrc.cross-rust-env.mk
