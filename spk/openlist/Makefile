@@ -1,5 +1,5 @@
 SPK_NAME = openlist
-SPK_VERS = 4.0.5
+SPK_VERS = 4.0.7
 SPK_REV = 1
 SPK_ICON = src/openlist.png
 
