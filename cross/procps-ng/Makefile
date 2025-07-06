@@ -14,9 +14,10 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = procps_pre_configure
 
-# only build dedicated tools
+# Build dedicated tools only
 CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --disable-pidof
+# Disable pidwait (fails to detect pidfd_open, previous patch no longer applicable)
 CONFIGURE_ARGS += --disable-pidwait
 CONFIGURE_ARGS += --disable-kill
 CONFIGURE_ARGS += --disable-w
@@ -28,4 +29,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: procps_pre_configure
 procps_pre_configure:
-	$(RUN) ./autogen.sh
+	@$(RUN) ./autogen.sh
