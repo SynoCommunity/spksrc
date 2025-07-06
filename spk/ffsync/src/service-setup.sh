@@ -1,6 +1,6 @@
 
 # ffsync service setup
-PYTHON_DIR="/var/packages/python311/target/bin"
+PYTHON_DIR="/var/packages/python312/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 MARIADB_10_INSTALL_DIRECTORY="/var/packages/MariaDB10"
@@ -44,19 +44,19 @@ percent_encode ()
 
 validate_preinst ()
 {
-    # Check MySQL database
+    # Check database
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         if [ -n "${wizard_mysql_password_root}" ]; then
             if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-                echo "Incorrect MySQL root password"
+                echo "Incorrect MariaDB root password"
                 exit 1
             fi
             if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${DBUSER}$ > /dev/null 2>&1; then
-                echo "MySQL user ${DBUSER} already exists"
+                echo "MariaDB user ${DBUSER} already exists"
                 exit 1
             fi
             if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep -E '^(syncstorage_rs|tokenserver_rs)$' > /dev/null 2>&1; then
-                echo "MySQL database(s) for ${DBUSER} already exist(s)"
+                echo "MariaDB database(s) for ${DBUSER} already exist(s)"
                 exit 1
             fi
         fi
@@ -143,7 +143,7 @@ validate_preuninst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-        echo "Incorrect MySQL root password"
+        echo "Incorrect MariaDB root password"
         exit 1
     fi
     # Check if database export path is specified

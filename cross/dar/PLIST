@@ -7,4 +7,4 @@ bin:bin/dar_xform
 rsc:etc/darrc
 lnk:lib/libdar64.so
 lnk:lib/libdar64.so.6000
-lib:lib/libdar64.so.6000.7.2
+lib:lib/libdar64.so.6000.8.1

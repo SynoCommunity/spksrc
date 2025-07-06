@@ -1,5 +1,5 @@
 PKG_NAME = libicu
-PKG_VERS = 71.1
+PKG_VERS = 74.2
 PKG_EXT = tgz
 PKG_DIST_NAME = icu4c-$(subst .,_,$(PKG_VERS))-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/unicode-org/icu/releases/download/release-$(subst .,-,$(PKG_VERS))

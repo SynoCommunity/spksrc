@@ -1,7 +1,7 @@
 PKG_NAME = zap2epg
 PKG_VERS = 3.1
 PKG_EXT = tar.gz
-PKG_GIT_HASH = 3c4aa1ab6a19ba6b4608ba5a3140b3c5ca5a941c
+PKG_GIT_HASH = 12a9f832c98fa75969afc848bc4e4a607d736ef0
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/th0ma7/script.module.zap2epg/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)

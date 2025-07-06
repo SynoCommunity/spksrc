@@ -13,3 +13,5 @@ dht.mode.set = auto
 dht.port.set = 6881
 protocol.pex.set= yes
 port_range = 6881-6999
+
+execute2 = {sh,-c,/var/packages/PHP7.4/target/usr/local/bin/php74 /var/services/web_packages/rutorrent/php/initplugins.php ratio}

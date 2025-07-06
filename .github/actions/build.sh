@@ -61,7 +61,7 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
 fi
 
 # Build
-PACKAGES_TO_KEEP="synocli-videodriver ffmpeg5 ffmpeg7 python310 python311"
+PACKAGES_TO_KEEP="synocli-videodriver ffmpeg5 ffmpeg7 python310 python311 python312  python313"
 for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"

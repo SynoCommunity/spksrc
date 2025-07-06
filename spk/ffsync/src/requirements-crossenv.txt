@@ -1,25 +1,9 @@
-# From requirements.txt
+# Generated using the requirements script on May 15, 2025
 
-# [cryptography]
-# Mandatory of using OPENSSL_*_DIR starting with version >= 40
-# https://docs.rs/openssl/latest/openssl/#automatic
-#  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-#  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-cryptography==42.0.8
-
-# From tools/tokenserver/requirements.txt
-
-# [mysqlclient]
-# Depends: mysql-connector-c, mariadb-connector-c
-# Require environment variables
-#  MYSQLCLIENT_CFLAGS
-#  MYSQLCLIENT_LDFLAGS
-mysqlclient==2.1.1
-
-sqlalchemy==1.4.46
-
-# further crossenv dependencies
 cffi==1.17.1
-charset_normalizer==3.3.2
-# greenlet==3.0.3    => supported version depends on gcc version
-zope.interface==7.0.3
+charset_normalizer==3.4.2
+cryptography==44.0.2
+#greenlet                   ==> supported version depends on gcc version
+mysqlclient==2.1.1
+SQLAlchemy==1.4.46
+zope.interface==7.2

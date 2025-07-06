@@ -1,9 +1,9 @@
 SPK_NAME = wallabag
-SPK_VERS = 2.6.9
-SPK_REV = 5
+SPK_VERS = 2.6.12
+SPK_REV = 7
 SPK_ICON = src/wallabag.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/wallabag
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
@@ -14,7 +14,7 @@ SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 MAINTAINER = SynoCommunity
 DESCRIPTION = Wallabag is a self hostable application allowing you to save an offline copy of your favorite articles. Click, save, read it when you can. It extracts content so that you can read it when you have time.
 DISPLAY_NAME = Wallabag
-CHANGELOG = "1. Update to 2.6.9.<br/>2. Add PHP profiles for DSM 6.<br/>3. Add backup and restore functions."
+CHANGELOG = "1. Update to v2.6.12."
 
 HOMEPAGE = https://www.wallabag.org/
 LICENSE  = MIT

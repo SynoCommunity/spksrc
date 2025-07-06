@@ -4,7 +4,9 @@ SPK_REV = 1
 
 SPK_ICON = src/gpac.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/gpac
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = wmanth
 DISPLAY_NAME = GPAC

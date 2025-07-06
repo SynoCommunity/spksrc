@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
-SPK_VERS = 2.4
-SPK_REV = 19
+SPK_VERS = 2.5
+SPK_REV = 20
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/links cross/socat
@@ -52,7 +52,13 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, xxhsum, autossh \(including openssh, sftp and scp\), etherwake, telnet, whois, sshfs$(OPTIONAL_DESC)."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Update aria2 to v1.37.0.<br/>2. Update bind to v9.17.22 (on ARMv5 v9.16.45).<br/>3. Update inetutils (telnet, whois) to v2.5.<br/>4. Update openssl to v3.1.7.<br/>5. Update openssh to v9.6p1.<br/>6. Update screen to v4.9.1.<br/>7. Update ser2net to v4.6.0.<br/>8. Update socat to v1.8.0.1.<br/>9. Add xxHsum tools, bundled with rsync.<br/>10. Fix nmap for ARMv5 archs."
+CHANGELOG = "1. Fix bind tools for ARMv7 archs. <br/>"
+CHANGELOG += "2. Update links to v2.30. <br/>"
+CHANGELOG += "3. Update namp to v7.95. <br/>"
+CHANGELOG += "4. Update rsync to v3.4.1. <br/>"
+CHANGELOG += "5. Update ser2net to v4.6.3. <br/>"
+CHANGELOG += "6. Update socat to v1.8.0.2. <br/>"
+CHANGELOG += "7. Update tmux to v3.5a"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.

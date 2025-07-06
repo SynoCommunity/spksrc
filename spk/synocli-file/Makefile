@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 3.4
-SPK_REV = 24
+SPK_VERS = 4.0.1
+SPK_REV = 27
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -9,7 +9,7 @@ SPK_ICON = src/synocli-file.png
 #   it's own libblkid and rmlint cannot find the working library of cross/libblkid.
 BUILD_DEPENDS = cross/libblkid
 
-DEPENDS  = cross/less cross/tree cross/ncdu cross/jdupes cross/rhash cross/nano cross/file
+DEPENDS  = cross/less cross/tree cross/jdupes cross/rhash cross/nano cross/file
 DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
@@ -25,11 +25,11 @@ OPTIONAL_DEPENDS += cross/rnm
 OPTIONAL_DEPENDS += cross/micro
 OPTIONAL_DEPENDS += cross/fzf
 OPTIONAL_DEPENDS += cross/ripgrep
-OPTIONAL_DEPENDS += cross/fd cross/fd_8.7.0
+OPTIONAL_DEPENDS += cross/fd
 OPTIONAL_DEPENDS += cross/sd
 OPTIONAL_DEPENDS += cross/bat
 OPTIONAL_DEPENDS += cross/eza
-OPTIONAL_DEPENDS += cross/nnn cross/nnn_4.0
+OPTIONAL_DEPENDS += cross/nnn cross/nnn_4.8 cross/nnn_4.0
 OPTIONAL_DEPENDS += cross/lsd
 OPTIONAL_DEPENDS += cross/xstow
 
@@ -51,8 +51,8 @@ else
 # comcerto2k for DSM>=7
 DEPENDS += cross/nnn_4.0
 endif
-else ifneq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
-DEPENDS += cross/nnn
+else ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
+DEPENDS += cross/nnn_4.8
 else
 # 32-bit archs for DSM<7
 DEPENDS += cross/nnn_4.0
@@ -73,16 +73,18 @@ endif
 
 # OLD_PPC archs are not supported with rust
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/bat cross/eza
-OPTIONAL_DESC := $(OPTIONAL_DESC)", bat, eza"
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+DEPENDS += cross/bat
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
+endif
+DEPENDS += cross/eza
+OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
 DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/fd_8.7.0
-else
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd
-endif
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
+endif
 DEPENDS += cross/sd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
 DEPENDS += cross/lsd
@@ -99,7 +101,7 @@ PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
-    less, tree, ncdu, jdupes, fdupes, rhash, \
+    less, tree, jdupes, fdupes, rhash, \
     mc \(midnight commander\), \
     mg \(emacs-like text editor\), nano, \
     jupp \(based on JOE - Joe\'s Own Editor 3.1\), \
@@ -108,25 +110,17 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Update detox to v2.0.0. <br/>"
-CHANGELOG += "2. Update eza to v0.20.7. <br/>"
-CHANGELOG += "3. Update fd to v10.2.0. <br/>"
-CHANGELOG += "4. Update fdupes to v2.3.2 and add sqlite for optional caches. <br/>"
-CHANGELOG += "5. Update jdupes to v1.28.0. <br/>"
-CHANGELOG += "6. Update fzf to v0.56.0. <br/>"
-CHANGELOG += "7. Update less to v668. <br/>"
-CHANGELOG += "8. Update lsd to v1.1.5. <br/>"
-CHANGELOG += "9. Update lzip to v1.24.1. <br/>"
-CHANGELOG += "10. Update mc to v4.8.32. <br/>"
-CHANGELOG += "11. Update micro to v2.0.14. <br/>"
-CHANGELOG += "12. Update nano to v8.2. <br/>"
-CHANGELOG += "13. Update pcre2 to v10.44. <br/>"
-CHANGELOG += "14. Update rhash to v1.4.5. <br/>"
-CHANGELOG += "15. Update ripgrep to v14.1.1. <br/>"
-CHANGELOG += "16. Update tree to v2.1.3. <br/>"
-CHANGELOG += "17. Update zstd to v1.5.6. <br/>"
-CHANGELOG += "18. Update openssl to v3.1.7. <br/>"
-CHANGELOG += "19. Add pixz v1.0.7."
+CHANGELOG  = "1. Remove fd (fd-find) for VS and NVR models (ARMv7L archs) and for ARMv5 archs. <br/>"
+CHANGELOG += "2. Remove ncdu (ncdu is part of synocli-disk). <br/>"
+CHANGELOG += "3. Update bat to v0.250. <br/>"
+CHANGELOG += "4. Update eza to v0.20.18. <br/>"
+CHANGELOG += "5. Update file to v5.46. <br/>"
+CHANGELOG += "6. Update fzf to v0.58.0. <br/>"
+CHANGELOG += "7. Update mc to v4.8.33. <br/>"
+CHANGELOG += "8. Update nano to v8.3. <br/>"
+CHANGELOG += "9. Update nnn to v5.0 (DSM 7 only). <br/>"
+CHANGELOG += "10. Update plzip to v1,12. <br/>"
+CHANGELOG += "11. Update tree to v2.2.1."
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -135,7 +129,6 @@ LICENSE  = Each tool is licensed under it's respective license.
 
 SPK_COMMANDS  = bin/less bin/lessecho bin/lesskey
 SPK_COMMANDS += bin/tree
-SPK_COMMANDS += bin/ncdu
 SPK_COMMANDS += bin/jdupes
 SPK_COMMANDS += bin/mc bin/mcdiff bin/mcview bin/mcedit
 SPK_COMMANDS += bin/nano bin/rnano
@@ -190,5 +183,3 @@ endif
 synocli-file_extra_install:
 	@$(MSG) "Set library runpath in rhash executable."
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/rhash
-
-

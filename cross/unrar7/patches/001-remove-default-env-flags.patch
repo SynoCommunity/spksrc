@@ -1,0 +1,19 @@
+--- makefile.orig	2024-08-19 08:26:32.000000000 +0000
++++ makefile	2024-12-25 09:47:18.884839597 +0000
+@@ -5,12 +5,12 @@
+ # 2024.08.19: -march=native isn't recognized on some platforms such as RISCV64.
+ # Thus we removed it. Clang ARM users can add -march=armv8-a+crypto to enable
+ # ARM NEON crypto.
+-CXX=c++
+-CXXFLAGS=-O2 -std=c++11 -Wno-logical-op-parentheses -Wno-switch -Wno-dangling-else
++#CXX=c++
++CXXFLAGS=-O2 -std=c++11
+ LIBFLAGS=-fPIC
+ DEFINES=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DRAR_SMP
+-STRIP=strip
+-AR=ar
++#STRIP=strip
++#AR=ar
+ LDFLAGS=-pthread
+ DESTDIR=/usr
+ 

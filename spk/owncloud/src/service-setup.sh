@@ -171,15 +171,15 @@ validate_preinst ()
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Check database
         if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-            echo "Incorrect MySQL 'root' password"
+            echo "Incorrect MariaDB 'root' password"
             exit 1
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
-            echo "MySQL user '${MYSQL_USER}' already exists"
+            echo "MariaDB user '${MYSQL_USER}' already exists"
             exit 1
         fi
         if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
-            echo "MySQL database '${MYSQL_DATABASE}' already exists"
+            echo "MariaDB database '${MYSQL_DATABASE}' already exists"
             exit 1
         fi
 
@@ -360,7 +360,7 @@ validate_preuninst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-        echo "Incorrect MySQL 'root' password"
+        echo "Incorrect MariaDB 'root' password"
         exit 1
     fi
     # Check export directory
@@ -514,10 +514,10 @@ validate_preupgrade ()
         exit 1
     fi
 
-    # ownCloud upgrades only possible from mySQL instances
+    # ownCloud upgrades only possible from MySQL instances
     DATABASE_TYPE="$(exec_occ config:system:get dbtype)"
     if [ "$DATABASE_TYPE" != "mysql" ]; then
-        echo "Please migrate your previous database from ${DATABASE_TYPE} to mysql before performing upgrade."
+        echo "Please migrate your previous database from ${DATABASE_TYPE} to mariadb (mysql) before performing upgrade."
         exit 1
     fi
 }

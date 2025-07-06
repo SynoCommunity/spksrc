@@ -3,7 +3,7 @@ SPK_VERS = 40
 SPK_REV = 2
 SPK_ICON = src/jupp.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/jupp
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = text editor jupp comes with the editor flavours known from joe, specifically, jmacs, joe, jpico, jstar, and rjoe.

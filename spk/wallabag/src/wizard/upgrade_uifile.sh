@@ -90,7 +90,7 @@ PAGE_MIGRATE_DATABASE=$(/bin/cat<<EOF
         "type": "password",
         "subitems": [{
             "key": "wizard_mysql_database_password",
-            "desc": "MySQL '${SYNOPKG_PKGNAME}' password",
+            "desc": "MariaDB '${SYNOPKG_PKGNAME}' password",
             "invalidText": "Password is invalid. Ensure it includes at least one uppercase letter, one lowercase letter, one digit, one special character, and has a minimum length of 10 characters.",
             "validator": {
                 "fn": "$(getPasswordValidator)"

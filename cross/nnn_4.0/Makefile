@@ -5,8 +5,8 @@ PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jarun/nnn/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# PKG_VERS 4.0 is the latest version for DSM<7 and comcerto2k
-
+# REMARKS:
+# nnn version 4.0 is the latest version for 32-bit archs on DSM 6 and for comcerto2k
 DEPENDS = cross/ncursesw cross/readline
 
 # compiler too old (-std=c11 required)

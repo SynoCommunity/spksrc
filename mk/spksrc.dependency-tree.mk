@@ -32,13 +32,13 @@ dependency-tree:
 .PHONY: dependency-list
 dependency-list:
 	@echo -n "$(NAME): "
-	@$(MAKE) -s dependency-flat | grep -P "^(cross|native)" | sort -u | tr '\n' ' \0'
+	@$(MAKE) -s dependency-flat | grep -P "^(cross|python|native)" | sort -u | tr '\n' ' \0'
 	@echo ""
 
 
 .PHONY: dependency-flat
 dependency-flat:
-	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|native|diyspk|toolchain)/.*"
+	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|python|native|diyspk|toolchain)/.*"
 	@for depend in $$(echo "$(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)" | tr ' ' '\n' | sort -u | tr '\n' ' ') ; \
 	do \
 	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-flat | sort -u ; \

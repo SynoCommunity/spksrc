@@ -1,22 +1,27 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2023.7.3
-SPK_REV = 22
+SPK_VERS = 2024.12.5
+SPK_REV = 24
 SPK_ICON = src/homeassistant.png
 
-HACS_VERS = 1.32.1
+HACS_VERS = 2.0.5
 
-PYTHON_PACKAGE = python311
-SPK_DEPENDS = "$(PYTHON_PACKAGE)>=3.11.4-7"
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = $(PYTHON_PACKAGE)
 
-OPTIONAL_DEPENDS = cross/libstdc++
+# unsupported wheels: deebot_client, numpy, pymicro_vad, pyspeex_noise, and others
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
 
-# [numpy] > 1.22.4
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) $(ARMv7L_ARCHS)
+# mandatory wheel not available (av):
+# It is possible to build for armv7, but av==13.1.0 is not available, and the
+# basic system component 'anthemav' (aka. "Stream Domain") is not supported.
+# For such builds the requirements-cross_from_index_armv7l.txt is still supported.
+UNSUPPORTED_ARCHS += $(ARMv7_ARCHS)
 
 MAINTAINER = hgy59
 DESCRIPTION = "Home Assistant is an open-source home automation platform running on Python 3. Track and control all devices at home and automate control."
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "1. Update homeassistant to 2023.7.3. and depend on Python 3.11 and OpenSSL 3.1.<br/>2. Update HACS integration to v1.32.1.<br/>3. Add libstdc++ for DSM 6 to fix grpcio dependency.<br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
+CHANGELOG = "1. Update homeassistant to 2024.12.5 and depend on Python 3.12. <br/>2. Update HACS integration to v2.0.5. <br/><br/>REMARKS: Only arch specific python modules are included in the package. Other modules are downloaded at installation time."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/
@@ -34,33 +39,29 @@ USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = homeassistant_extra_install
 
-# Include cross compiled wheels only, the package installer downloads pure python wheels at installation time.
-WHEELS = src/requirements-abi3.txt src/requirements-crossenv.txt src/requirements-pure.txt
+# Include cross compiled wheels only
+# The package adds additional wheels from the index at installation time (requirements-cross_from_index.txt, requirements-pure.txt)
+WHEELS = src/requirements-abi3.txt src/requirements-crossenv.txt
+
+# python modules
+
+# [Pillow]
+DEPENDS += python/pillow_ha
 
 # [DTLSSocket] runtime dependency of [tradfri]
-DEPENDS += cross/dtlssocket
+DEPENDS += python/dtlssocket
 
-include ../../mk/spksrc.common.mk
+# [numpy]
+DEPENDS += python/numpy_ha
 
-# [grpcio]
-# for DSM < 7 with too old libstdc++
-# avoid error: undefined symbol: _ZTVNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEE
-# this is a fix for integrations depending on grpcio (google nest, google generativeai and starlink)
-# the fix requires to additionally set the LD_LIBRARY_PATH to homeassistant/target/lib
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-# libstdc++ is not available for PPC archs
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/libstdc++
-endif
-endif
+# definitions and libraries
+# to build wheels of src/requirements-crossenv.txt and src/requirements-abi3.txt
+# and runtime dependencies of pure python wheels
+# ------------------------
 
 # [voip_utils]
 # for voice over ip integration
 DEPENDS += cross/opus
-
-# definitions and libraries
-# to build wheels of src/requirements-crossenv.txt and src/requirements-abi3.txt
-# ------------------------
 
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
@@ -81,65 +82,26 @@ ENV += SODIUM_INSTALL=system
 DEPENDS += cross/c-ares
 ENV += PYCARES_USE_SYSTEM_LIB=1
 
-# [Pillow]
-DEPENDS += cross/freetype cross/libjpeg cross/zlib
-WHEELS_BUILD_ARGS += [Pillow]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += --disable-platform-guessing
-WHEELS_BUILD_ARGS += --enable-freetype
-WHEELS_BUILD_ARGS += --enable-jpeg
-WHEELS_BUILD_ARGS += --enable-zlib
-
-# [bcrypt, cryptography]
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# fix for openssl-sys crate (for cryptography >= 40.0.0)
-# https://docs.rs/openssl/latest/openssl/#manual
-
-# [gevent]
-DEPENDS += cross/libev cross/c-ares
-ENV += GEVENTSETUP_EMBED_CARES=FALSE
-ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+include ../../mk/spksrc.python.mk
 
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 
-include ../../mk/spksrc.python.mk
-
-# prefer native python tools (pip, maturin, ...)
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
-
-# [greenlet]
-ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
-WHEELS_CPPFLAGS += [greenlet] -std=c++11
-endif
-
-# [numpy]
-# Fix wheel building with older compilers
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS += [numpy] -std=c++0x
-# workaround for compiler bug:
-# https://github.com/numpy/numpy/issues/13622
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS += [numpy] -O0
-endif
-endif
-
-# [protobuf]
-ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
-WHEELS_CFLAGS += [protobuf] -std=c99
-endif
-
 # [pycryptodome] [pycryptodomex] [ciso8601]
-ifeq ($(call version_ge, ${TC_GCC}, 4.9),1)
 WHEELS_CFLAGS += [pycryptodome] -std=c11
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 WHEELS_CFLAGS += [ciso8601] -std=c11
-else
-WHEELS_CFLAGS += [pycryptodome] -std=c99
-WHEELS_CFLAGS += [pycryptodomex] -std=c99
-WHEELS_CFLAGS += [ciso8601] -std=c99
+
+# use python arch specific requirements file to download cross wheels from index
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_x64.txt
+else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_aarch64.txt
+else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_i686.txt
+else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+REQUIREMENTS_FROM_INDEX = requirements-cross_from_index_armv7l.txt
 endif
 
 # target to download and prepare hacs after changing HACS_VERS above
@@ -147,17 +109,18 @@ endif
 # make get_hacs
 .PHONY: get_hacs
 get_hacs:
-	wget https://github.com/hacs/integration/releases/download/$(HACS_VERS)/hacs.zip
-	rm -rf hacs.tmp
-	mkdir hacs.tmp
-	unzip -d hacs.tmp hacs.zip
-	tar -czf src/hacs.tar.gz -C hacs.tmp .
-	rm -rf hacs.tmp
-
+	@$(MSG) Download HACS $(HACS_VERS) and create src/hacs.tar.gz
+	@wget https://github.com/hacs/integration/releases/download/$(HACS_VERS)/hacs.zip
+	@rm -rf hacs.tmp
+	@mkdir hacs.tmp
+	@unzip -d hacs.tmp hacs.zip
+	@tar -czf src/hacs.tar.gz -C hacs.tmp .
+	@rm -rf hacs.tmp
 
 .PHONY: homeassistant_extra_install
 homeassistant_extra_install:
 	@install -m 755 -d $(STAGING_DIR)/share $(STAGING_DIR)/var
-	@install -m 644 src/postinst_components_requirements.txt $(STAGING_DIR)/share/
+	@install -m 644 src/$(REQUIREMENTS_FROM_INDEX) $(STAGING_DIR)/share/requirements-cross_from_index.txt
+	@install -m 644 src/requirements-pure.txt $(STAGING_DIR)/share/
 	@install -m 644 src/hacs.tar.gz $(STAGING_DIR)/share/
-	@install -m 644 src/requirements-custom.txt $(STAGING_DIR)/var/requirements-custom.txt
+	@install -m 644 src/requirements-custom.txt $(STAGING_DIR)/var/

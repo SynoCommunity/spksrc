@@ -4,7 +4,7 @@ PKG_NAME = dotnet-sdk-3.1
 PKG_VERS = 3.1.410
 PKG_EXT = tar.gz
 PKG_DIST_NAME = dotnet-sdk-$(PKG_VERS)-linux-x64.$(PKG_EXT)
-PKG_DIST_SITE = https://dotnetcli.azureedge.net/dotnet/Sdk/${PKG_VERS}
+PKG_DIST_SITE = https://builds.dotnet.microsoft.com/dotnet/Sdk/${PKG_VERS}
 
 HOMEPAGE = https://dotnet.microsoft.com/
 COMMENT  = A developer platform for building apps.

@@ -1,5 +1,5 @@
 PKG_NAME = dar
-PKG_VERS = 2.7.14
+PKG_VERS = 2.7.17
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/dar/files/dar/$(PKG_VERS)
