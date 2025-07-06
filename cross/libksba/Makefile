@@ -1,8 +1,8 @@
 PKG_NAME = libksba
-PKG_VERS = 1.5.1
+PKG_VERS = 1.6.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/$(PKG_NAME)
+PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/libksba
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libgpg-error

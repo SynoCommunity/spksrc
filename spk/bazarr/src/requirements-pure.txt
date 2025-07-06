@@ -1,0 +1,4 @@
+# Generated using the requirements script on June 1, 2025
+
+#pip                        ==> python312
+#setuptools                 ==> python312

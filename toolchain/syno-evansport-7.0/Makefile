@@ -1,7 +1,6 @@
 TC_ARCH = evansport
 TC_VERS = 7.0
 TC_KERNEL = 3.2.101
-TC_GCC = 7.5.0
 TC_GLIBC = 2.26
 
 TC_DIST = evansport-gcc750_glibc226_i686-GPL

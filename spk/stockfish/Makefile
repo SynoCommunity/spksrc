@@ -4,14 +4,13 @@ SPK_REV = 3
 SPK_ICON= src/stockfish.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME) cross/stockfish-webgui
+DEPENDS = cross/stockfish cross/stockfish-webgui
 
 MAINTAINER = mayweed
 DESCRIPTION = Strong open source chess engine. Stockfish is one of the strongest chess engines in the world. It is also much stronger than the best human chess grandmasters.
 CHANGELOG = "Initial package version. With web frontend to play chess against stockfish engine."
 
 DISPLAY_NAME = Stockfish
-RELOAD_UI = yes
 HOMEPAGE = https://stockfishchess.org/
 LICENSE  = GPLv2/GPLv3
 

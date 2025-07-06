@@ -1,8 +1,9 @@
 PKG_NAME = mediainfo
-PKG_VERS = 21.03
+PKG_VERS = 21.09
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/MediaArea/MediaInfo/archive/v$(PKG_VERS)
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/MediaArea/MediaInfo/archive
+PKG_DIST_FILE = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = MediaInfo-$(PKG_VERS)/Project/GNU/CLI
 
 DEPENDS = cross/libmediainfo
@@ -18,5 +19,6 @@ CONFIGURE_ARGS = --enable-shared
 
 include ../../mk/spksrc.cross-cc.mk
 
+.PHONY: mediainfo_pre_configure
 mediainfo_pre_configure:
 	$(RUN) ; ./autogen.sh

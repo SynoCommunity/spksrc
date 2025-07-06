@@ -1,38 +1,24 @@
 SPK_NAME = memcached
-SPK_VERS = 1.4.15
-SPK_REV = 2
+SPK_VERS = 1.6.38
+SPK_REV = 8
 SPK_ICON = src/memcached.png
-DSM_UI_DIR = app
 
-DEPENDS = cross/busybox cross/phpmemcachedadmin cross/$(SPK_NAME)
+DEPENDS = cross/memcached
 
-MAINTAINER = Diaoul
-DESCRIPTION = Free \& open source, high-performance, distributed memory object caching system, generic in nature, but intended for use in speeding up dynamic web applications by alleviating database load. It comes with phpMemcachedAdmin, a graphic stand-alone administration for memcached to monitor and debug purpose.
-ADMIN_URL = /phpMemcachedAdmin/
-RELOAD_UI = yes
+MAINTAINER = SynoCommunity
+DESCRIPTION = Memcached is a high-performance, distributed memory object caching system, generic in nature, but originally intended for use in speeding up dynamic web applications by alleviating database load.
 DISPLAY_NAME = Memcached
-CHANGELOG = "1. Use 64-bit toolchains for bromolow, cedarview and x86"
+CHANGELOG = "1. Update Memcached to v1.6.38.<br/>2. Move PHPMemcachedAdmin to separate package."
 
 HOMEPAGE = https://memcached.org/
-LICENSE  =
+LICENSE  = 3-Clause BSD
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-CONF_DIR         = src/conf/
+SERVICE_USER = auto
+SERVICE_PORT = 11211
+NO_SERVICE_SHORTCUT = true
 
-INSTALL_DEP_SERVICES = apache-web
-START_DEP_SERVICES = apache-web
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
-
-POST_STRIP_TARGET = memcached_extra_install
-
-BUSYBOX_CONFIG = usrmng
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
+# SERVICE_COMMAND is defined in service setup script
+STARTABLE = yes
+SERVICE_SETUP = src/service-setup.sh
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: memcached_extra_install
-memcached_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config

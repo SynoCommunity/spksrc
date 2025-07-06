@@ -1,6 +1,9 @@
 PKG_NAME = nodejs
-# Current LTS Version: 14.17.1 (includes npm 6.14.13)
-PKG_VERS = 14.17.1
+# https://github.com/nodejs/release#release-schedule
+# v18 is Maintenance Version "Hydrogen" since 2023-10-18 with EOL at 2025-04-30
+# v20 is Maintenance Version "Iron" since 2024-10-22 with EOL at 2026-04-30
+# v22 is LTS Version "Jod" from 2024-10-29 to 2025-10-21 with EOL at 2027-04-30
+PKG_VERS = 22.16.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = node-v$(PKG_VERS)-linux-x64.$(PKG_EXT)
 PKG_DIST_SITE = https://nodejs.org/dist/v$(PKG_VERS)
@@ -16,4 +19,4 @@ include ../../mk/spksrc.native-install.mk
 
 .PHONY: nodejs-install
 nodejs-install:
-	mv -f $(WORK_DIR)/$(PKG_DIR)/ $(WORK_DIR)/node/
+	@mv -f $(WORK_DIR)/$(PKG_DIR)/ $(WORK_DIR)/node/

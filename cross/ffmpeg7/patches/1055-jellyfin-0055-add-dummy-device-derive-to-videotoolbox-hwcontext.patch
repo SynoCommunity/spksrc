@@ -1,0 +1,27 @@
+Index: FFmpeg/libavutil/hwcontext_videotoolbox.c
+===================================================================
+--- libavutil/hwcontext_videotoolbox.c
++++ libavutil/hwcontext_videotoolbox.c
+@@ -825,6 +825,14 @@ static int vt_device_create(AVHWDeviceCo
+     return 0;
+ }
+ 
++static int vt_device_derive(AVHWDeviceContext *device_ctx,
++                            AVHWDeviceContext *src_ctx, AVDictionary *opts,
++                            int flags)
++{
++    // There is no context to be setup with VT, just return.
++    return 0;
++}
++
+ const HWContextType ff_hwcontext_type_videotoolbox = {
+     .type                 = AV_HWDEVICE_TYPE_VIDEOTOOLBOX,
+     .name                 = "videotoolbox",
+@@ -832,6 +840,7 @@ const HWContextType ff_hwcontext_type_vi
+     .frames_hwctx_size    = sizeof(VTFramesContext),
+ 
+     .device_create        = vt_device_create,
++    .device_derive        = vt_device_derive,
+     .frames_init          = vt_frames_init,
+     .frames_get_buffer    = vt_get_buffer,
+     .frames_get_constraints = vt_frames_get_constraints,

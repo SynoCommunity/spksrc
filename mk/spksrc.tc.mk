@@ -3,33 +3,49 @@
 SHELL := $(SHELL) -e
 default: all
 
-WORK_DIR := $(shell pwd)/work
+WORK_DIR := $(CURDIR)/work
 include ../../mk/spksrc.directories.mk
 
 include ../../mk/spksrc.common.mk
 
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+# Include ross-rust-env.mk to generate install its toolchain
+include ../../mk/spksrc.cross-rust-env.mk
+
+# Include cross-cmake-env.mk to generate its toolchain file
+include ../../mk/spksrc.cross-cmake-env.mk
+
+# Include cross-meson-env.mk to generate its toolchain file
+include ../../mk/spksrc.cross-meson-env.mk
 
 # Configure the included makefiles
-URLS             = $(TC_DIST_SITE)/$(TC_DIST_NAME)
-NAME             = $(TC_NAME)
-COOKIE_PREFIX    = 
+URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
+NAME                       = $(TC_NAME)
+COOKIE_PREFIX              = 
 ifneq ($(TC_DIST_FILE),)
-LOCAL_FILE       = $(TC_DIST_FILE)
+LOCAL_FILE                 = $(TC_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
-PKG_DIST_FILE    = $(TC_DIST_FILE)
+PKG_DIST_FILE              = $(TC_DIST_FILE)
 else
-LOCAL_FILE       = $(TC_DIST_NAME)
+LOCAL_FILE                 = $(TC_DIST_NAME)
 endif
-DISTRIB_DIR      = $(TOOLCHAIN_DIR)/$(TC_VERS)
-DIST_FILE        = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT         = $(TC_EXT)
-TC_LOCAL_VARS_MK = $(WORK_DIR)/tc_vars.mk
+DISTRIB_DIR                = $(TOOLCHAIN_DIR)/$(TC_VERS)
+DIST_FILE                  = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT                   = $(TC_EXT)
+TC_LOCAL_VARS_MK           = $(WORK_DIR)/tc_vars.mk
+TC_LOCAL_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
+TC_LOCAL_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
+TC_LOCAL_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 
 #####
 
 RUN = cd $(WORK_DIR)/$(TC_TARGET) && env $(ENV)
-MSG = echo "===>   "
 
+include ../../mk/spksrc.depend.mk
+
+download:
 include ../../mk/spksrc.download.mk
 
 checksum: download
@@ -38,7 +54,10 @@ include ../../mk/spksrc.checksum.mk
 extract: checksum
 include ../../mk/spksrc.extract.mk
 
-patch: extract
+fix: extract
+include ../../mk/spksrc.tc-fix.mk
+
+patch: fix
 include ../../mk/spksrc.patch.mk
 
 vers: patch
@@ -47,57 +66,173 @@ include ../../mk/spksrc.tc-vers.mk
 flag: vers
 include ../../mk/spksrc.tc-flags.mk
 
-fix: flag
-include ../../mk/spksrc.tc-fix.mk
+rustc: flag
+include ../../mk/spksrc.tc-rust.mk
 
-all: $(TC_LOCAL_VARS_MK)
+all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON_CROSS) $(TC_LOCAL_VARS_MESON_NATIVE) $(TC_LOCAL_VARS_MK)
 
 .PHONY: $(TC_LOCAL_VARS_MK)
-$(TC_LOCAL_VARS_MK): fix
+$(TC_LOCAL_VARS_MK):
 	env $(MAKE) --no-print-directory tc_vars > $@ 2>/dev/null;
 
-.PHONY: tc_vars
-tc_vars: fix
-	@echo TC_ENV :=
+.PHONY: $(TC_LOCAL_VARS_CMAKE)
+$(TC_LOCAL_VARS_CMAKE): 
+	env $(MAKE) --no-print-directory cmake_vars > $@ 2>/dev/null;
+
+.PHONY: $(TC_LOCAL_VARS_MESON_CROSS)
+$(TC_LOCAL_VARS_MESON_CROSS): 
+	env $(MAKE) --no-print-directory meson_cross_vars > $@ 2>/dev/null;
+
+.PHONY: $(TC_LOCAL_VARS_MESON_NATIVE)
+$(TC_LOCAL_VARS_MESON_NATIVE): 
+	env $(MAKE) --no-print-directory meson_native_vars > $@ 2>/dev/null;
+
+.PHONY: cmake_vars
+cmake_vars:
+	@echo "# the name of the target operating system" ; \
+	echo "set(CMAKE_SYSTEM_NAME $(CMAKE_SYSTEM_NAME))" ; \
+	echo
+	@echo "# define target processor" ; \
+	echo "set(CMAKE_SYSTEM_PROCESSOR $(CMAKE_SYSTEM_PROCESSOR))"
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+	@echo "set(CROSS_COMPILE_ARM $(CROSS_COMPILE_ARM))"
+else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+	@echo "set(ARCH $(CMAKE_ARCH))"
+endif
+	@echo
+	@echo "# Disable developer warnings" ; \
+	echo 'set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "Disable developer warnings")'
+	@echo
+	@echo "# define toolchain location (used with CMAKE_TOOLCHAIN_PKG)" ; \
+	echo "set(_CMAKE_TOOLCHAIN_LOCATION $(_CMAKE_TOOLCHAIN_LOCATION))" ; \
+	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(_CMAKE_TOOLCHAIN_PREFIX))" ; \
+	echo
+	@echo "# define compilers and tools to use" ; \
+	for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "CC" ] ; then \
+	    echo "set(CMAKE_C_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
+	    echo "set(CMAKE_$${target}_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	  elif [ "$${target}" = "LD" ] ; then \
+	    echo "set(CMAKE_LINKER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	  else \
+	    echo "set(CMAKE_$${target} $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	  fi ; \
+	done ; \
+	echo
+	@echo "# where is the target environment located" ; \
+	echo "set(CMAKE_FIND_ROOT_PATH $(CMAKE_FIND_ROOT_PATH))" ; \
+	echo ; \
+	echo "# adjust the default behavior of the FIND_XXX() commands:" ; \
+	echo "# search programs in the host environment" ; \
+	echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM $(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM))" ; \
+	echo ; \
+	echo "# search headers and libraries in the target environment" ; \
+	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY $(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY))" ; \
+	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))"
+
+.PHONY: meson_cross_vars
+meson_cross_vars:
+	@echo "[host_machine]" ; \
+	echo "system = 'linux'" ; \
+	echo "cpu_family = '$(MESON_HOST_CPU_FAMILY)'" ; \
+	echo "cpu = '$(MESON_HOST_CPU)'" ; \
+	echo "endian = '$(MESON_HOST_ENDIAN)'"
+	@echo
+	@echo "[binaries]" ; \
+	for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "cpp" ]; then \
+	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
+	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
+	  elif [ "$${target}" = "fc" ]; then \
+	    echo "fortran = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	  elif [ "$${target}" = "cc" ]; then \
+	    echo "c = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	  else \
+	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	  fi ; \
+	done
+
+.PHONY: meson_native_vars
+meson_native_vars:
+	@echo "[binaries]"
 	@for tool in $(TOOLS) ; \
 	do \
-	  target=`echo $${tool} | sed 's/\(.*\):\(.*\)/\1/'` ; \
-	  source=`echo $${tool} | sed 's/\(.*\):\(.*\)/\2/'` ; \
-	  echo TC_ENV += `echo $${target} | tr [:lower:] [:upper:] `=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "cc" ]; then \
+	    echo "c = '$$(which $${source})'" ; \
+	    echo "$${target} = '$$(which $${source})'" ; \
+	  elif [ "$${target}" = "ldshared" ]; then \
+	    echo "$${target} = '$$(which gcc) -shared'" ; \
+	  else \
+	    echo "$${target} = '$$(which $${source})'" ; \
+	  fi ; \
 	done
-	@echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(ADDITIONAL_CFLAGS\)\"
-	@echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)\"
-	@echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)\"
-	@echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\"
-	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux
-	@echo TC_TYPE := $(TC_TYPE)
-	@echo TC_TARGET := $(TC_TARGET)
-	@echo TC_PREFIX := $(TC_PREFIX)
-	@echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/
-	@echo CFLAGS := $(CFLAGS) $$\(ADDITIONAL_CFLAGS\)
-	@echo CPPFLAGS := $(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)
-	@echo CXXFLAGS := $(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)
-	@echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)
-	@echo TC_LIBRARY := $(TC_LIBRARY)
-	@echo TC_INCLUDE := $(TC_INCLUDE)
-	@echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS)
-	@echo TC_VERS := $(TC_VERS)
-	@echo TC_BUILD := $(TC_BUILD)
-	@echo TC_OS_MIN_VER := $(TC_OS_MIN_VER)
-	@echo TC_ARCH := $(TC_ARCH)
+
+.PHONY: tc_vars
+tc_vars: flag
+	@echo TC_ENV := ; \
+	echo TC_ENV += SYSROOT=\"$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)\" ; \
+	for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  echo TC_ENV += $${target}=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
+	  if [ "$${target}" = "CC" ] ; then \
+	    gcc_version=$$(eval $$(echo $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
+	  fi ; \
+	done ; \
+	echo TC_ENV += CFLAGS=\"$(CFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CFLAGS\)\" ; \
+	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
+	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
+	if [ "$$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | tail -n1)" = "$(TC_VERS)" ]; then \
+	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\)\" ; \
+	fi ; \
+	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
+	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
+	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
+	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
+	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
+	echo TC_TYPE := $(TC_TYPE) ; \
+	echo TC_SYSROOT := $(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
+	echo TC_TARGET := $(TC_TARGET) ; \
+	echo TC_PREFIX := $(TC_PREFIX) ; \
+	echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/ ; \
+	echo CFLAGS := $(CFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CFLAGS\) ; \
+	echo CPPFLAGS := $(CPPFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CPPFLAGS\) ; \
+	echo CXXFLAGS := $(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\) ; \
+	if [ "$$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | tail -n1)" = "$(TC_VERS)" ]; then \
+	   echo FFLAGS := $(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\) ; \
+	fi ; \
+	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
+	echo TC_INCLUDE := $(TC_INCLUDE) ; \
+	echo TC_LIBRARY := $(TC_LIBRARY) ; \
+	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
+	echo TC_VERS := $(TC_VERS) ; \
+	echo TC_BUILD := $(TC_BUILD) ; \
+	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
+	echo TC_ARCH := $(TC_ARCH) ; \
+	echo TC_GCC := $${gcc_version} ; \
+	echo TC_GLIBC := $(TC_GLIBC)
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 	@echo TC_KERNEL := $(TC_KERNEL)+
 else
 	@echo TC_KERNEL := $(TC_KERNEL)
 endif
-	@echo TC_GCC := $(TC_GCC)
-	@echo TC_GLIBC := $(TC_GLIBC)
-
-
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
 
 ### For make digests
 include ../../mk/spksrc.generate-digests.mk

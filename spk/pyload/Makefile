@@ -4,12 +4,11 @@ SPK_REV = 4
 SPK_ICON = src/pyload.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/pyload
 SPK_DEPENDS = "python>2.7.3-3"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = pyLoad is a fast, lightweight and full featured download manager for many One-Click-Hoster, container formats like DLC, video sites or just plain http/ftp links.
-RELOAD_UI = yes
 DISPLAY_NAME = pyLoad
 CHANGELOG = "1. Update to 0.4.20<br>2. Use generic service approach"
 

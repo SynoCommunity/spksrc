@@ -12,12 +12,11 @@ HOMEPAGE = https://github.com/tesseract-ocr/tessdata/
 COMMENT  = Tesseract is probably the most accurate open source OCR engine available. English langpack.
 LICENSE  = Apache License 2.0
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
-INSTALL_TARGET = myInstall
+INSTALL_TARGET = tessdata-eng_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.install-resources.mk
 
-myInstall:
+.PHONY: tessdata-eng_install
+tessdata-eng_install:
 	mkdir -p $(STAGING_INSTALL_PREFIX)/share/tessdata
 	cp $(WORK_DIR)/$(PKG_DIR)/eng.* $(STAGING_INSTALL_PREFIX)/share/tessdata

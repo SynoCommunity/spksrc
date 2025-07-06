@@ -1,0 +1,11 @@
+# Generated using the requirements script on April 20, 2025
+
+cffi==1.17.1
+charset_normalizer==3.4.1
+cryptography==44.0.2
+#greenlet                       ==> supported version depends on gcc version
+lxml==5.3.2
+MarkupSafe==3.0.2
+msgpack==1.1.0
+sqlalchemy==2.0.40
+tornado==6.4.2

@@ -1,5 +1,5 @@
 SPK_NAME = ejabberd
-SPK_VERS = 21.01
+SPK_VERS = 21.07
 SPK_REV = 2
 SPK_ICON = src/ejabberd.png
 DSM_UI_DIR = app
@@ -20,19 +20,13 @@ HELPURL  = https://docs.ejabberd.im/admin/guide
 
 WIZARDS_DIR = src/wizard
 
+SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 # custom start-stop-status script is required, 
 # as SERVICE_COMMAND is not a single command
 SSS_SCRIPT = src/service-start-stop.sh
 
 FWPORTS = src/${SPK_NAME}.sc
-
-include ../../mk/spksrc.common.mk
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-CONF_DIR = src/conf.dsm7
-else
-CONF_DIR = src/conf.dsm6
-endif
 
 SPK_COMMANDS = bin/ejabberdctl
 

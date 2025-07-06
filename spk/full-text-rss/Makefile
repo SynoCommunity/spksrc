@@ -9,7 +9,6 @@ DEPENDS  =
 MAINTAINER = moneytoo
 DESCRIPTION = Create full-text feed from feed or webpage URL.
 ADMIN_URL = /full-text-rss/
-RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Full-Text RSS
 CHANGELOG = "1. Add site config files"
@@ -27,8 +26,8 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 COPY_TARGET = nop
 POST_STRIP_TARGET = full-text-rss_extra_install
 
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

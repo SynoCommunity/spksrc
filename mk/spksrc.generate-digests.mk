@@ -14,7 +14,7 @@ $(DIGESTS_FILE): download
 	    SHA256)   tool=sha256sum ;; \
 	    MD5)      tool=md5sum ;; \
 	  esac ; \
-	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $@ ; \
+	  echo "$(LOCAL_FILE) $$type $$($$tool $(DIST_FILE) | cut -d' ' -f1)" >> $@ ; \
 	done
 
 else
@@ -29,9 +29,13 @@ digests-%:
 	    SHA256)   tool=sha256sum ;; \
 	    MD5)      tool=md5sum ;; \
 	  esac ; \
-	  echo "$(LOCAL_FILE) $$type `$$tool $(DIST_FILE) | cut -d\" \" -f1`" >> $(DIGESTS_FILE) ; \
+	  echo "$(LOCAL_FILE) $${type} $$($${tool} $(DIST_FILE) | cut -d' ' -f1)" >> $(DIGESTS_FILE) ; \
 	done
 
+
+ifeq ($(strip $(PKG_DIST_SITE_LIST)),)
+
+# download with individual dist archs
 $(DIGESTS_FILE): download
 	@for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
 	  rm $(DOWNLOAD_COOKIE) ; \
@@ -41,5 +45,20 @@ $(DIGESTS_FILE): download
 	for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
 	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} digests-$${pkg_arch} ; \
 	done ; \
+
+else
+
+# download with individual dist sites
+$(DIGESTS_FILE): download
+	@for pkg_dist_url in $(PKG_DIST_SITE_LIST); do \
+	  rm $(DOWNLOAD_COOKIE) ; \
+	  $(MAKE) -s URLS=$${pkg_dist_url} download ; \
+	done ; \
+	rm -f $(DIGESTS_FILE) && touch -f $(DIGESTS_FILE) ; \
+	for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
+	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} digests-$${pkg_arch} ; \
+	done ; \
+
+endif
 
 endif

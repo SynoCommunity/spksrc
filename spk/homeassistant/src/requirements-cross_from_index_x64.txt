@@ -1,0 +1,14 @@
+# wheels that need cross compilation
+# but fail to build with spksrc framework
+# are downloaded from index at package installation
+
+# wheels for python arch x86_64
+
+av==13.1.0
+awscrt==0.24.1
+deebot_client==9.4.0
+grpcio==1.67.1
+# isal fails to cross compile...
+isal==1.7.1
+# pandas: maturin error
+pandas==2.2.3

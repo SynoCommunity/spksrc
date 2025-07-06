@@ -1,0 +1,12 @@
+--- a/make/autoconf/flags-cflags.m4
++++ b/make/autoconf/flags-cflags.m4
+@@ -735,6 +735,9 @@
+       fi
+     elif test "x$FLAGS_CPU" = xs390x; then
+       $1_CFLAGS_CPU="-mbackchain -march=z10"
++      if test "x$VENDOR_FLAGS_CPU" != x; then
++        $1_CFLAGS_CPU="-mbackchain $VENDOR_FLAGS_CPU"
++      fi
+     fi
+ 
+     if test "x$FLAGS_CPU_ARCH" != xarm &&  test "x$FLAGS_CPU_ARCH" != xppc; then

@@ -1,0 +1,3 @@
+lnk:lib/libnghttp3.so
+lnk:lib/libnghttp3.so.9
+lib:lib/libnghttp3.so.9.0.0

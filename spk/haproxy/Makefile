@@ -5,7 +5,7 @@ SPK_ICON = src/haproxy.png
 DSM_UI_DIR = app
 DSM_APP_NAME = SYNOCOMMUNITY.HAProxy.AppInstance
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/haproxy
 WHEELS = src/requirements.txt
 SPK_DEPENDS = "python>2.7.18-25"
 
@@ -13,7 +13,6 @@ MAINTAINER = Diaoul
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
 DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet la haute disponibilité, la répartition de charge et le proxy de services TCP ou HTTP.
 ADMIN_PORT = 8280
-RELOAD_UI = yes
 DISPLAY_NAME = HAProxy
 CHANGELOG = "1. Update haproxy 2.2.4.<br/>2. Update openssl to 1.1."
 

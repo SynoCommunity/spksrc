@@ -1,7 +1,6 @@
 TC_ARCH = bromolow
 TC_VERS = 7.0
 TC_KERNEL = 3.10.108
-TC_GCC = 7.5.0
 TC_GLIBC = 2.26
 
 TC_DIST = bromolow-gcc750_glibc226_x86_64-GPL

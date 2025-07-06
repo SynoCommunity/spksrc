@@ -1,0 +1,7 @@
+bin:bin/rist2rist
+bin:bin/ristreceiver
+bin:bin/ristsender
+bin:bin/ristsrppasswd
+lnk:lib/librist.so
+lnk:lib/librist.so.4
+lib:lib/librist.so.4.3.1

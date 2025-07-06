@@ -7,23 +7,22 @@ FIRMWARE = 4.3-3776
 LIRC_SUPPORTED_DRIVERS =
 
 # Abort for ARCHs that won't compile LIRC cleanly
-UNSUPPORTED_ARCHS = powerpc
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 # include arch definitions
 include ../../mk/spksrc.archs.mk
 
 # Use older LIRC build for ARCHs with kernel < 2.6.36
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),)
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 SPK_VERS = 0.8.7
+DEPENDS = cross/lirc-0.8.7
 LIRC_SUPPORTED_DRIVERS = mceusb uirt uirt2
+else
+DEPENDS = cross/lirc-0.9.0
 endif
-
-DEPENDS = cross/$(SPK_NAME)-$(SPK_VERS)
-OPTIONAL_DEPENDS = cross/lirc-0.8.7
 
 MAINTAINER = bru7us
 DESCRIPTION = LIRC daemon decodes infrared signals and provides them on a Unix domain socket
-RELOAD_UI = no
 DISPLAY_NAME = LIRC
 
 HOMEPAGE = https://www.lirc.org/

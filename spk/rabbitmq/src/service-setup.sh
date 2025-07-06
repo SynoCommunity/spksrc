@@ -1,5 +1,11 @@
 
-RABBITMQ_SBIN=${SYNOPKG_PKGDEST}/lib/rabbitmq_server-3.8.16/sbin
+
+# evaluate version dependent path (do it /bin/sh compatible)
+for config_dir in ${SYNOPKG_PKGDEST}/lib/rabbitmq_server-*/sbin; do
+    RABBITMQ_SBIN=${config_dir}
+    break
+done
+
 SERVICE_COMMAND="${RABBITMQ_SBIN}/rabbitmq-server"
 SVC_CWD="${SYNOPKG_PKGDEST}"
 SVC_BACKGROUND=y
@@ -10,6 +16,7 @@ export HOME=${SYNOPKG_PKGDEST}
 
 service_postinst ()
 {
+    echo "Set SYS_PREFIX=${SYNOPKG_PKGDEST} in ${RABBITMQ_SBIN}/rabbitmq-defaults"
     sed -i "s%SYS_PREFIX=%SYS_PREFIX=${SYNOPKG_PKGDEST}%g" ${RABBITMQ_SBIN}/rabbitmq-defaults
 }
 

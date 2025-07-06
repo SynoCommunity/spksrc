@@ -1,5 +1,6 @@
 bin:bin/fusermount
 bin:bin/ulockmgr_server
+bin:sbin/mount.fuse
 lnk:lib/libfuse.so
 lnk:lib/libfuse.so.2
 lib:lib/libfuse.so.2.9.9

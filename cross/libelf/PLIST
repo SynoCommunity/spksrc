@@ -1,0 +1,3 @@
+lnk:lib/libelf.so
+lnk:lib/libelf.so.0
+lib:lib/libelf.so.0.8.13

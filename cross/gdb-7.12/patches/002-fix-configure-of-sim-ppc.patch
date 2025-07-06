@@ -1,0 +1,14 @@
+# fix configure for sim/ppc
+# - avoid the use of target CPPFLAGS for build
+# 
+--- sim/ppc/configure.orig	2016-08-01 15:50:21.000000000 +0000
++++ sim/ppc/configure	2023-09-13 10:14:14.609339863 +0000
+@@ -7707,7 +7707,7 @@
+   *) realsrcdir=../${srcdir};;
+   esac
+   saved_CFLAGS="${CFLAGS}"
+-  CC="${CC_FOR_BUILD}" CFLAGS="${CFLAGS_FOR_BUILD}" \
++  CC="${CC_FOR_BUILD}" CFLAGS="${CFLAGS_FOR_BUILD}" CPPFLAGS="" \
+   LDFLAGS="${LDFLAGS_FOR_BUILD}" \
+   ${realsrcdir}/configure \
+     --enable-languages=${enable_languages-all} \

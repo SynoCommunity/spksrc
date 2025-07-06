@@ -1,0 +1,184 @@
+Index: FFmpeg/libavcodec/qsv_internal.h
+===================================================================
+--- libavcodec/qsv_internal.h
++++ libavcodec/qsv_internal.h
+@@ -100,6 +100,7 @@ typedef struct QSVFrame {
+ 
+     int queued;
+     int used;
++    int external_frame;
+ 
+     struct QSVFrame *next;
+ } QSVFrame;
+Index: FFmpeg/libavcodec/qsvenc.c
+===================================================================
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -1900,6 +1900,10 @@ static void clear_unused_frames(QSVEncCo
+             memset(&cur->enc_ctrl, 0, sizeof(cur->enc_ctrl));
+             cur->enc_ctrl.Payload = cur->payloads;
+             cur->enc_ctrl.ExtParam = cur->extparam;
++            if (cur->external_frame) {
++                av_freep(&cur->surface.Data.MemId);
++                cur->external_frame = 0;
++            }
+             if (cur->frame->format == AV_PIX_FMT_QSV) {
+                 av_frame_unref(cur->frame);
+             }
+@@ -2071,6 +2075,16 @@ static int submit_frame(QSVEncContext *q
+         return ret;
+ 
+     if (frame->format == AV_PIX_FMT_QSV) {
++        AVHWFramesContext *frames_ctx = NULL;
++        AVQSVFramesContext *frames_hwctx = NULL;
++        int is_fixed_pool = 0;
++
++        if (q->avctx->hw_frames_ctx) {
++            frames_ctx    = (AVHWFramesContext *)q->avctx->hw_frames_ctx->data;
++            frames_hwctx  = frames_ctx->hwctx;
++            is_fixed_pool = frames_hwctx->nb_surfaces > 0;
++        }
++
+         ret = av_frame_ref(qf->frame, frame);
+         if (ret < 0)
+             return ret;
+@@ -2079,10 +2093,19 @@ static int submit_frame(QSVEncContext *q
+ 
+         if (q->frames_ctx.mids) {
+             ret = ff_qsv_find_surface_idx(&q->frames_ctx, qf);
+-            if (ret < 0)
++            if (ret < 0 && !is_fixed_pool)
+                 return ret;
+-
+-            qf->surface.Data.MemId = &q->frames_ctx.mids[ret];
++            if (ret >= 0)
++                qf->surface.Data.MemId = &q->frames_ctx.mids[ret];
++        }
++        if (is_fixed_pool && (!q->frames_ctx.mids || ret < 0)) {
++            QSVMid *mid = NULL;
++            mid = (QSVMid *)av_mallocz(sizeof(*mid));
++            if (!mid)
++                return AVERROR(ENOMEM);
++            mid->handle_pair = (mfxHDLPair *)qf->surface.Data.MemId;
++            qf->surface.Data.MemId = mid;
++            qf->external_frame = 1;
+         }
+     } else {
+         /* make a copy if the input is not padded as libmfx requires */
+Index: FFmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -2142,11 +2142,25 @@ static int qsv_frames_derive_to(AVHWFram
+     }
+ }
+ 
++#if CONFIG_VAAPI
++static void qsv_fixed_pool_unmap_from_vaapi(AVHWFramesContext *dst_fc,
++                                            HWMapDescriptor *hwmap)
++{
++    mfxFrameSurface1 *new_sur = (mfxFrameSurface1 *)hwmap->priv;
++    mfxHDLPair *hdlpair = (mfxHDLPair *)new_sur->Data.MemId;
++    av_freep(&hdlpair->first);
++    av_freep(&new_sur->Data.MemId);
++    av_freep(&new_sur);
++}
++#endif
++
+ static int qsv_fixed_pool_map_to(AVHWFramesContext *dst_ctx,
+                                  AVFrame *dst, const AVFrame *src, int flags)
+ {
+     AVQSVFramesContext *hwctx = dst_ctx->hwctx;
+     int i, err, index = -1;
++    mfxFrameSurface1 *new_sur = NULL;
++    mfxHDLPair *new_hdlpair = NULL;
+ 
+     for (i = 0; i < hwctx->nb_surfaces && index < 0; i++) {
+         switch(src->format) {
+@@ -2185,21 +2199,77 @@ static int qsv_fixed_pool_map_to(AVHWFra
+         }
+     }
+     if (index < 0) {
+-        av_log(dst_ctx, AV_LOG_ERROR, "Trying to map from a surface which "
+-               "is not in the mapped frames context.\n");
+-        return AVERROR(EINVAL);
+-    }
++        switch (src->format) {
++#if CONFIG_VAAPI
++        case AV_PIX_FMT_VAAPI:
++        {
++            new_sur = (mfxFrameSurface1 *)av_mallocz(sizeof(*new_sur));
++            if (!new_sur) {
++                err = AVERROR(ENOMEM);
++                goto qsv_map_to_err;
++            }
++            err = qsv_init_surface(dst_ctx, new_sur);
++            if (err < 0)
++                goto qsv_map_to_err;
++
++            new_hdlpair = (mfxHDLPair *)av_mallocz(sizeof(*new_hdlpair));
++            if (!new_hdlpair) {
++                err = AVERROR(ENOMEM);
++                goto qsv_map_to_err;
++            }
++            new_hdlpair->first = (VASurfaceID *)av_mallocz(sizeof(VASurfaceID));
++            if (!new_hdlpair->first) {
++                err = AVERROR(ENOMEM);
++                goto qsv_map_to_err;
++            }
++            *(VASurfaceID*)(new_hdlpair->first) = (VASurfaceID)(uintptr_t)src->data[3];
++            new_sur->Data.MemId = new_hdlpair;
+ 
+-    err = ff_hwframe_map_create(dst->hw_frames_ctx,
+-                                dst, src, NULL, NULL);
+-    if (err)
+-        return err;
++            err = ff_hwframe_map_create(dst->hw_frames_ctx, dst, src,
++                                        &qsv_fixed_pool_unmap_from_vaapi,
++                                        (void*)new_sur);
++            if (err)
++                goto qsv_map_to_err;
++
++            av_log(dst_ctx, AV_LOG_DEBUG, "Trying to map from a surface which "
++                "is not in the mapped frames context, so create a new surface\n");
++        }
++        break;
++#endif
++#if CONFIG_DXVA2
++        case AV_PIX_FMT_DXVA2_VLD:
++        {
++            av_log(dst_ctx, AV_LOG_ERROR, "Trying to map from a surface which "
++                "is not in the mapped frames context.\n");
++            return AVERROR(EINVAL);
++        }
++        break;
++#endif
++        default:
++            return AVERROR(ENOSYS);
++        }
++    } else {
++        err = ff_hwframe_map_create(dst->hw_frames_ctx,
++                                    dst, src, NULL, NULL);
++        if (err)
++            goto qsv_map_to_err;
++    }
+ 
+     dst->width   = src->width;
+     dst->height  = src->height;
+-    dst->data[3] = (uint8_t*)&hwctx->surfaces[index];
++    dst->data[3] = (uint8_t*)((index == -1) ? new_sur : &hwctx->surfaces[index]);
+ 
+     return 0;
++
++qsv_map_to_err:
++    if (new_sur)
++        av_freep(&new_sur);
++    if (new_hdlpair) {
++        if (new_hdlpair->first)
++            av_freep(&new_hdlpair->first);
++        av_freep(&new_hdlpair);
++    }
++    return err;
+ }
+ 
+ static void qsv_dynamic_pool_unmap(AVHWFramesContext *ctx, HWMapDescriptor *hwmap)

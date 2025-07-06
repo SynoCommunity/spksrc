@@ -1,0 +1,22 @@
+--- a/make/RunTests.gmk
++++ b/make/RunTests.gmk
+@@ -880,7 +880,7 @@
+ 
+   $1_COMMAND_LINE := \
+       $$(JTREG_JAVA) $$($1_JTREG_LAUNCHER_OPTIONS) \
+-          -Dprogram=jtreg -jar $$(JT_HOME)/lib/jtreg.jar \
++          -Dprogram=jtreg -jar $$(if $$(wildcard $$(JT_HOME)/lib/jtreg.jar),$$(JT_HOME)/lib/jtreg.jar,$$(JT_HOME)/share/java/jtreg.jar) \
+           $$($1_JTREG_BASIC_OPTIONS) \
+           -testjdk:$$(JDK_UNDER_TEST) \
+           -dir:$$(JTREG_TOPDIR) \
+--- a/make/test/BuildFailureHandler.gmk
++++ b/make/test/BuildFailureHandler.gmk
+@@ -38,7 +38,7 @@
+ FH_SUPPORT := $(SUPPORT_OUTPUTDIR)/test/failure_handler
+ FH_JAR := $(FH_SUPPORT)/jtregFailureHandler.jar
+ 
+-JTREG_JAR := $(JT_HOME)/lib/jtreg.jar
++JTREG_JAR := $(if $(wildcard $(JT_HOME)/lib/jtreg.jar),$(JT_HOME)/lib/jtreg.jar,$(JT_HOME)/share/java/jtreg.jar)
+ ifeq ($(wildcard $(JTREG_JAR)), )
+   $(error Cannot build failure handler without jtreg)
+ endif

@@ -29,4 +29,3 @@ service_clean_tmpdir ()
     fi
   fi
 }
-

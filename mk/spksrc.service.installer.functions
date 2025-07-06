@@ -1,0 +1,163 @@
+### common installer functions and variables for synocommunity generic service installer
+# 
+# functions are common for all DSM versions
+#
+# The script must be sh/ash compatible and not use bash syntax.
+# SRM and DSM < 6.0 have only the busybox built-in shell an not bash
+# 
+
+# Tools shortcuts
+MV="/bin/mv -f"
+RM="/bin/rm -rf"
+CP="/bin/cp -rfp"
+MKDIR="/bin/mkdir -p"
+LN="/bin/ln -nsf"
+TEE="/usr/bin/tee -a"
+RSYNC="/bin/rsync -avh"
+TAR="/bin/tar"
+
+INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
+INST_VARIABLES="${INST_ETC}/installer-variables"
+# DSM7 only
+INST_SHARES="/var/packages/${SYNOPKG_PKGNAME}/shares"
+
+if [ -z "${SYNOPKG_PKGVAR}" ]; then
+    # define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
+    SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
+fi
+
+
+### Functions library
+
+log_step ()
+{
+    install_log "===> Step $1. STATUS=${SYNOPKG_PKG_STATUS} USER=$USER GROUP=$GROUP SHARE_PATH=${SHARE_PATH}"
+}
+
+
+initialize_variables ()
+{
+    # Expect user to be set from package specific variables
+    if [ -n "${USER}" -a -z "${USER_DESC}" ]; then
+        USER_DESC="User running $SYNOPKG_PKGNAME"
+    fi
+
+    # Default description if group name provided by UI
+    if [ -n "${GROUP}" -a -z "${GROUP_DESC}" ]; then
+        GROUP_DESC="SynoCommunity Package Group"
+    fi
+
+    # Extract share volume and share name from share path when provided, and not already defined
+    if [ -n "${SHARE_PATH}" ]; then
+        # migrate SHARE_PATH that holds the share name only to full share path
+        # this is required for installers without resource worker for file share (SRM 1, DSM 5, DSM 6 old packages)
+        if [ "$(echo ${SHARE_PATH} | grep ^/)" != "${SHARE_PATH}" ]; then
+            SHARE_NAME=${SHARE_PATH}
+            if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+                if synoshare --get "${SHARE_NAME}" &> /dev/null; then
+                    SHARE_PATH=$(synoshare --get "${SHARE_NAME}" | awk 'NR==4' | cut -d] -f1 | cut -d[ -f2)
+                    install_log "Path of existing share [${SHARE_NAME}] is [${SHARE_PATH}]"
+                fi
+            else
+                # synoshare fails on DSM 7 (at least on 7.2.1) with "Permission denied"
+                # but DSM 7 links package specific shares to the package installation folder
+                if [ -d ${INST_SHARES}/${SHARE_NAME} ]; then
+                    SHARE_PATH=$(realpath ${INST_SHARES}/${SHARE_NAME})
+                    install_log "Path of existing share [${SHARE_NAME}] is [${SHARE_PATH}]"
+                fi
+            fi
+            if [ ! -d "${SHARE_PATH}" ]; then
+                install_log "SHARE_NAME is not an existing share [${SHARE_PATH}]."
+            fi
+        fi
+        if [ -z "${SHARE_NAME}" ]; then
+            SHARE_NAME=$(basename ${SHARE_PATH})
+        fi
+        install_log "Shared folder configured with SHARE_NAME [${SHARE_NAME}] and SHARE_PATH [${SHARE_PATH}]"
+    fi
+}
+
+
+install_python_virtualenv ()
+{
+    # Print out default python version found in PATH
+    python3 --version
+
+    # Print out default pip version
+    PIP_VERSION=$(python3 -m pip --version | awk '{print $2}')
+    echo "Default pip version ${PIP_VERSION}"
+
+    # Create a Python virtualenv
+    python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env
+
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        set_unix_permissions ${SYNOPKG_PKGDEST}/env
+    fi
+}
+
+
+install_python_wheels ()
+{
+    # default PATH to wheelhouse
+    cachedir=${SYNOPKG_PKGVAR}/pip-cache
+    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
+    requirements=${wheelhouse}/requirements.txt
+
+    # Install the wheels
+    echo "Install packages from wheels"
+    if [ -s ${requirements} ]; then
+       echo "Install packages from wheels [${requirements}]"
+       pip3 install $([ $# -gt 0 ] && echo $*) \
+                   --disable-pip-version-check \
+                   --force-reinstall \
+                   --cache-dir ${cachedir} \
+                   --find-links ${wheelhouse} \
+                   --requirement ${requirements} \
+       || echo "ERROR: Python package installation failed" 1>&2
+    fi
+
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+        set_unix_permissions ${SYNOPKG_PKGDEST}/env
+    fi
+
+    echo "Installed modules:"
+    pip3 freeze
+}
+
+
+# function to read and export variables from a text file
+# empty lines and lines starting with # are ignored
+# we cannot 'source' the file to load the variables, when values have special characters like <, >, ...
+# already defined variables are not taken from the file (e.g. variables from wizard)
+load_variables_from_file ()
+{
+   if [ -n "$1" -a -r "$1" ]; then
+      while read -r _line; do
+        if [ "$(echo ${_line} | grep -v ^[/s]*#)" != "" ]; then
+           _key=${_line%%=*}
+           _value=${_line#*=}
+           _existing_value=$(eval echo "\$${_key}")
+           if [ -z "${_existing_value}" ]; then
+              export "${_key}=${_value}"
+           fi
+        fi
+      done < "$1"
+   fi
+}
+
+
+save_wizard_variables ()
+{
+    if [ -e "${INST_VARIABLES}" -a -n "${GROUP}${SHARE_PATH}${SHARE_NAME}" ]; then
+        $RM "${INST_VARIABLES}"
+    fi
+    if [ -n "${GROUP}" ]; then
+        echo "GROUP=${GROUP}" >> ${INST_VARIABLES}
+    fi
+    if [ -n "${SHARE_PATH}" ]; then
+        echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
+    fi
+    if [ -n "${SHARE_NAME}" ]; then
+        echo "SHARE_NAME=${SHARE_NAME}" >> ${INST_VARIABLES}
+    fi
+}

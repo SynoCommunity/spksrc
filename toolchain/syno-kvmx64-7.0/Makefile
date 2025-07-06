@@ -1,7 +1,6 @@
 TC_ARCH = kvmx64
 TC_VERS = 7.0
 TC_KERNEL = 4.4.180
-TC_GCC = 7.5.0
 TC_GLIBC = 2.26
 
 TC_DIST = kvmx64-gcc750_glibc226_x86_64-GPL

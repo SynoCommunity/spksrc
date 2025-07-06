@@ -9,7 +9,7 @@ include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
 # Force build in native tool directrory, not cross directory.
-WORK_DIR := $(PWD)/work-native
+WORK_DIR := $(CURDIR)/work-native
 
 # Package dependend
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -25,28 +25,19 @@ DIST_EXT      = $(PKG_EXT)
 
 #####
 
+# configure using meson
+ifeq ($(strip $(CONFIGURE_TARGET)),)
+CONFIGURE_TARGET = meson_configure_target
+endif
+
+###
+
 .NOTPARALLEL:
 
 include ../../mk/spksrc.native-env.mk
 
 # meson specific configurations
 include ../../mk/spksrc.native-meson-env.mk
-
-# configure using meson
-ifeq ($(strip $(CONFIGURE_TARGET)),)
-CONFIGURE_TARGET = meson_configure_target
-endif
-
-.PHONY: meson_configure_target
-
-# default meson configure:
-meson_configure_target:
-	@$(MSG) - Meson configure
-	@$(MSG)    - Dependencies = $(DEPENDS)
-	@$(MSG)    - Build path = $(WORK_DIR)/$(PKG_DIR)/$(MESON_BUILD_DIR)
-	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
-	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
 # call-up ninja build process
 include ../../mk/spksrc.cross-ninja.mk
@@ -77,16 +68,24 @@ include ../../mk/spksrc.install.mk
 cat_PLIST:
 	@true
 
-### Clean rules
-clean:
-	rm -fr $(WORK_DIR)
-
 all: install
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
+###
 
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
 
-####
+###
+
+.PHONY: meson_configure_target
+
+# default meson configure:
+meson_configure_target:
+	@$(MSG) - Meson configure
+	@$(MSG)    - Dependencies = $(DEPENDS)
+	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
+	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
+	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+
+###

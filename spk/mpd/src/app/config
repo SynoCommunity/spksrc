@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.mpd": {
+            "title": "MPD",
+            "desc": "MPD",
+            "icon": "images/mpd-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "6600",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

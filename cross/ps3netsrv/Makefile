@@ -1,31 +1,23 @@
 PKG_NAME = ps3netsrv
-PKG_VERS = 1.47.26
+PKG_VERS = 20240709
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/aldostools/webMAN-MOD/archive
+PKG_DIST_SITE = https://github.com/aldostools/ps3netsrv/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = webMAN-MOD-$(PKG_VERS)/_Projects_/$(PKG_NAME)
+PKG_DIR = ps3netsrv-$(PKG_VERS)/
 
-DEPENDS = 
+DEPENDS =
 
 HOMEPAGE = https://github.com/aldostools/webMAN-MOD
-COMMENT = Allows PS3 content to be loaded from network
-LICENSE = GPL
-
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS =
+COMMENT = Allows PlayStation®3 content to be loaded from network.
+LICENSE = GPLv3
 
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = ps3netsrv_install
 
-PRE_COMPILE_TARGET = ps3netsrv_pre_compile
 COMPILE_MAKE_OPTIONS = -f Makefile.linux
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PNONY: ps3netsrv_pre_compile
-ps3netsrv_pre_compile:
-		@$(RUN) $(MAKE) -C polarssl-1.3.2/library
 
 .PHONY: ps3netsrv_install
 ps3netsrv_install:

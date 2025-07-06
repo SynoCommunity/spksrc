@@ -1,0 +1,7 @@
+REMOVE_TT_RSS_TITLE:				Suppression de la base de donnée ttrss
+REMOVE_TT_RSS_DESC:					"Si vous supprimez la base de donnée ttrss, tous les flux seront supprimées."
+ENTER_MYSQL_PASSWORD_DESC:			"Saisissez votre mot de passe MySQL"
+ROOT_PASSWORD:						Mot de passe Root
+DB_EXPORT_DESCRIPTION:				"Facultatif: Fournir répertoire pour l'exportation de base de données. Laissez vide pour sauter à l'exportation. Le répertoire sera créé s'il n'existe pas"
+DB_EXPORT_LOCATION_LABEL:			L'emplacement de base de données à l'exportation
+DB_EXPORT_LOCATION_FORMAT_ERROR:	Chemin doit commencer avec /volume?/ avec ? le numéro du volume

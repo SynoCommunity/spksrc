@@ -1,0 +1,10 @@
+# Generated using the requirements script on April 11, 2025
+
+cffi==1.17.1
+charset_normalizer==3.4.1
+cryptography==44.0.2
+CT3==3.4.0
+orjson==3.10.16
+PyYAML==6.0.2
+sabctools==8.2.5
+ujson==5.10.0

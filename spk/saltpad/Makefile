@@ -13,7 +13,6 @@ DESCRIPTION = A gui and cli to manage saltstack deployments
 CHANGELOG = "1. Use saltpad_v1 branch \(latest python version\)<br/>2. Update dependencies"
 
 ADMIN_PORT = 8283
-RELOAD_UI = yes
 DISPLAY_NAME = SaltPad
 START_DEP_SERVICES = salt-master
 
@@ -27,8 +26,8 @@ CONF_DIR         = src/conf/
 
 POST_STRIP_TARGET = saltpad_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+# Pure Python package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

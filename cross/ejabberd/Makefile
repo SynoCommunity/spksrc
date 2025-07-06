@@ -1,12 +1,12 @@
 PKG_NAME = ejabberd
-PKG_VERS = 21.01
+PKG_VERS = 21.07
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://static.process-one.net/ejabberd/downloads/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/erlang 
-DEPENDS = cross/ncurses cross/erlang cross/expat cross/zlib cross/openssl cross/libyaml
+BUILD_DEPENDS = native/erlang
+DEPENDS = cross/ncursesw cross/erlang cross/libexpat cross/zlib cross/openssl cross/libyaml
 
 # PPC archs except qoriq have compiler errors with 64 bit values
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
@@ -45,7 +45,7 @@ ejabberd_pre_configure:
 
 .PHONY: ejabberd_post_install
 # patch the generated ejabberdctl script
-# and link bin/ejabberdctl (DSM7 does not support executables in sbin folders).
+# and link sbin/ejabberdctl into bin (as DSM7 does not support executables in sbin folders).
 ejabberd_post_install:
 	sed -e "s#$(INSTALL_DIR)##g" 										\
 		 -e "s#$(NATIVE_ERLANG_BIN)#$(INSTALL_PREFIX)/bin#g"	\
@@ -54,4 +54,4 @@ ejabberd_post_install:
 		 -e "s#/var/lib/ejabberd\"#/var/lib\"#g"					\
 		 -e "s#/var/log/ejabberd\"#/var/log\"#g"					\
 		 -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	cd $(STAGING_INSTALL_PREFIX)/bin && ln -s ../sbin/ejabberdctl .
+	cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../sbin/ejabberdctl .

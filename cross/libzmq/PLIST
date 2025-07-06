@@ -7,4 +7,4 @@ bin:bin/remote_lat
 bin:bin/remote_thr
 lnk:lib/libzmq.so
 lnk:lib/libzmq.so.5
-lib:lib/libzmq.so.5.2.3
+lib:lib/libzmq.so.5.2.4

@@ -1,0 +1,3 @@
+lnk:lib/librabbitmq.so
+lib:lib/librabbitmq.so.0.15.0
+lnk:lib/librabbitmq.so.4

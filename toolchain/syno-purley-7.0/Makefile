@@ -1,7 +1,6 @@
 TC_ARCH = purley
 TC_VERS = 7.0
-TC_KERNEL = 4.4.180+
-TC_GCC = 7.5.0
+TC_KERNEL = 4.4.180
 TC_GLIBC = 2.26
 
 TC_DIST = purley-gcc750_glibc226_x86_64-GPL

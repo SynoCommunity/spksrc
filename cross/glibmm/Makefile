@@ -1,17 +1,14 @@
-PKG_NAME = glibmm
-PKG_SHORT_VERS = 2.64
-PKG_VERS = $(PKG_SHORT_VERS).5
-PKG_EXT = tar.xz
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnome.org/pub/GNOME/sources/$(PKG_NAME)/$(PKG_SHORT_VERS)
+PKG_NAME = glibmm-main
 
-DEPENDS = cross/libsigc++ cross/glib
+OPTIONAL_DEPENDS  = cross/glibmm-latest
+OPTIONAL_DEPENDS += cross/glibmm-2.66
 
-HOMEPAGE = https://www.gtkmm.org/en/
-COMMENT  = GLib is a low-level general-purpose library used mainly by GTK+/GNOME applications, but is useful for other programs as well. glibmm is the C++ wrapper for GLib.
-LICENSE  = LGPLv2.1
+include ../../mk/spksrc.main-depends.mk
 
-CONFIGURE_ARGS += -Dman=false -Ddefault_library=shared
-
-include ../../mk/spksrc.cross-meson.mk
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+# Requires libsigc++ >= 3.x
+DEPENDS += cross/glibmm-latest
+else
+# Last version require libsigc++ 2.x
+DEPENDS += cross/glibmm-2.66
+endif

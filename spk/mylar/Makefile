@@ -9,7 +9,6 @@ SPK_DEPENDS = "python>2.7.3-3:git"
 MAINTAINER = Diaoul
 DESCRIPTION = Mylar is an automatic Comic Book downloader \(cbr/cbz\)
 DESCRIPTION_FRE = Mylar permet le téléchargement automatique de Comic Book \(cbr/cbz\)
-RELOAD_UI = yes
 DISPLAY_NAME = Mylar
 CHANGELOG = "Fix DSM 6 service start."
 
@@ -30,8 +29,8 @@ WIZARDS_DIR = src/wizard/
 COPY_TARGET = nop
 POST_STRIP_TARGET = mylar_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+# Pure Python package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

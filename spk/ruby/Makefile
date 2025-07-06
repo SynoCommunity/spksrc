@@ -1,14 +1,14 @@
 SPK_NAME = ruby
-SPK_VERS = 3.0.1
-SPK_REV = 8
+SPK_VERS = 3.1.2
+SPK_REV = 12
 SPK_ICON = src/ruby.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/ruby
 
 # even it compiles with older cross/gdbm, ruby crashes at runtime
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-CHANGELOG = "Update ruby to v3.0.1."
+CHANGELOG = "1. Update openssl to v3.1.4."
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Ruby Programming Language.
@@ -21,6 +21,6 @@ HOMEPAGE = http://www.ruby-lang.org/
 LICENSE  = 2-clause BSDL
 
 SPK_COMMANDS  = bin/bundle bin/bundler bin/erb bin/gem bin/irb bin/racc
-SPK_COMMANDS += bin/rake bin/rbs bin/rdoc bin/ri bin/ruby bin/typeprof
+SPK_COMMANDS += bin/rake bin/rbs bin/rdbg bin/rdoc bin/ri bin/ruby bin/typeprof
 
 include ../../mk/spksrc.spk.mk

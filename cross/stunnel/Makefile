@@ -1,8 +1,8 @@
 PKG_NAME = stunnel
-PKG_VERS = 5.57
+PKG_VERS = 5.60
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.stunnel.org/downloads
+PKG_DIST_SITE = https://www.usenix.org.uk/mirrors/stunnel/archive/5.x
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/tcp_wrappers cross/openssl

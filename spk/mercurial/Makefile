@@ -1,19 +1,19 @@
 SPK_NAME = mercurial
-SPK_VERS = 5.7.1
-SPK_REV = 7
+SPK_VERS = 7.0
+SPK_REV = 10
 SPK_ICON = src/mercurial.png
 
-BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
-BUILD_DEPENDS += cross/$(SPK_NAME)
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "python312"
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-WHEELS = src/requirements.txt
-SPK_DEPENDS = "python38"
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-MAINTAINER = Dr-Bean
+MAINTAINER = SynoCommunity
 DESCRIPTION = Mercurial is a free, distributed source control management tool
 STARTABLE = no
 DISPLAY_NAME = Mercurial
-CHANGELOG = Update mercurial to 5.7.1 with python 3.8
+CHANGELOG = "1. Update mercurial to 7.0.<br/>2. Update to Python 3.12."
 
 HOMEPAGE = https://www.mercurial-scm.org/
 LICENSE  = MPL1.1
@@ -22,4 +22,4 @@ SERVICE_SETUP = src/service-setup.sh
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/hg
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.python.mk
