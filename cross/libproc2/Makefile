@@ -4,7 +4,9 @@ PKG_VERS = 4.0.4
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_REALNAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gitlab.com/procps-ng/procps/-/archive/v$(PKG_VERS)
-PKG_DIR = $(PKG_REALNAME)-v$(PKG_VERS)
+# use dedicated folder to build independent of other tools/libraries built from procps (e.d. cross/procps-ng)
+PKG_DIR = $(PKG_NAME)/$(PKG_REALNAME)-v$(PKG_VERS)
+EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
 # NOTE:
 # PKG_VERS = 4.0.5 does not require the patch for x64-7.2, but breaks the build of cross/intel-gpu-tools (igt-gpu-tools v1.29 and v1.30)
@@ -32,7 +34,7 @@ CONFIGURE_ARGS += --disable-kill
 CONFIGURE_ARGS += --disable-w
 CONFIGURE_ARGS += --disable-modern-top
 # Disable tools needing ncurses (hugetop, slabtop, top, watch)
-CONFIGURE_ARGS +=--without-ncurses
+CONFIGURE_ARGS += --without-ncurses
 
 ADDITIONAL_CFLAGS = -O
 
@@ -40,4 +42,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: procps_pre_configure
 procps_pre_configure:
-	$(RUN) ./autogen.sh
+	@$(RUN) ./autogen.sh
