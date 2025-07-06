@@ -17,10 +17,6 @@ INSTALL_TARGET = lua_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-ADDITIONAL_CFLAGS = -DLUA_USE_C89
-endif
-
 .PHONY: lua_compile
 lua_compile:
 	@$(RUN) $(MAKE) linux-readline \
@@ -29,7 +25,7 @@ lua_compile:
 		AR="$(TC_PATH)$(TC_PREFIX)ar rcu \$$(ALLFLAGS)" \
 		RANLIB="$(TC_PATH)$(TC_PREFIX)ranlib \$$(ALLFLAGS)" \
 		CPPFLAGS="$(CPPFLAGS)" \
-		LDFLAGS="$(LDFLAGS)" \
+		LDFLAGS="$(LDFLAGS) -Wl,--rpath,$(INSTALL_PREFIX)/lib" \
 		MYLIBS="-lncursesw"
 
 .PHONY: lua_install
