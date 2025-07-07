@@ -7,7 +7,7 @@ DSM_APP_NAME = SYNOCOMMUNITY.HAProxy.AppInstance
 
 DEPENDS = cross/haproxy
 WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>2.7.18-25"
+SPK_DEPENDS = "python>=2.7.18-25"
 
 MAINTAINER = Diaoul
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
