@@ -1,7 +1,6 @@
 bin:bin/free
-bin:bin/kill
+bin:bin/hugetop
 bin:bin/pgrep
-bin:bin/pidof
 bin:bin/pkill
 bin:bin/pmap
 bin:bin/ps
@@ -11,8 +10,8 @@ bin:bin/tload
 bin:bin/top
 bin:bin/uptime
 bin:bin/vmstat
-bin:bin/w
 bin:bin/watch
-lib:lib/libproc2.so
-lib:lib/libproc2.so.0
-lib:lib/libproc2.so.0.0.2
+lnk:lib/libproc2.so
+lnk:lib/libproc2.so.1
+lib:lib/libproc2.so.1.0.0
+bin:sbin/sysctl
