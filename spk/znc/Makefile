@@ -14,6 +14,9 @@ DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy p
 DISPLAY_NAME = ZNC
 CHANGELOG = "1. Update to ZNC 1.10.1.<br/>2. Migrate to Python 3.12<br/>3. Updated version only supported on DSM7 and newer<br/>4. Enablement of i18n+boost, icu and cyrus-sasl"
 
+# DEBUG
+export GCC_DEBUG_INFO = 1
+
 STARTABLE = yes
 HOMEPAGE = https://wiki.znc.in/
 LICENSE  = Apache License 2.0
