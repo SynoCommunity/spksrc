@@ -92,7 +92,3 @@ znc_post_install:
 	@cd $(WORK_DIR)/modules && CMAKE_PREFIX_PATH=$(STAGING_INSTALL_PREFIX) $(CMAKE_BUILD_DIR)/znc-buildmod $(EXTRA_MODULES)
 	$(RUN) sed -i 's|$(STAGING_INSTALL_PREFIX)|$(INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
 	@install -m 644 $(WORK_DIR)/modules/*.so $(STAGING_INSTALL_PREFIX)/lib/znc/
-ifneq ($(strip $(PYTHON_PACKAGE)),)
-	@$(MSG) "Patching libraries for multiple rpath"
-	@$(RUN) find $(STAGING_INSTALL_PREFIX)/lib/znc -name "*.so" -exec patchelf --set-rpath "$(INSTALL_PREFIX)/lib:$(PYTHON_PREFIX)/lib" {} \;
-endif
