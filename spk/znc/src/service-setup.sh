@@ -15,6 +15,10 @@ OID_FILE=${SYNOPKG_PKGVAR}/configs/oidentd.conf
 export ZNC_DEBUG_MODULES=1
 export ZNC_DEBUG_SSL=1
 
+# Disable SHA-NI hardware encryption as celeron CPU models does not support it
+# https://github.com/SynoCommunity/spksrc/issues/6640
+export OPENSSL_ia32cap=":~0x20000000"
+
 service_postinst ()
 {
     # Edit the configuration according to the wizard
