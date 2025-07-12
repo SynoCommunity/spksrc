@@ -1,11 +1,11 @@
-# Generated using the requirements script on June 20, 2025
+# Generated using the requirements script on July 12, 2025
 
 bcrypt==4.3.0
 cffi==1.17.1
 charset_normalizer==3.4.2
 cryptography==43.0.3
 #duplicity                          ==> python/duplicity
-lxml==5.4.0
+lxml==6.0.0
 msgpack_python==0.5.6
 netifaces==0.11.0
 protobuf==6.31.1
