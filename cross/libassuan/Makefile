@@ -1,5 +1,5 @@
 PKG_NAME = libassuan
-PKG_VERS = 2.5.5
+PKG_VERS = 3.0.2
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.gnupg.org/ftp/gcrypt/libassuan
