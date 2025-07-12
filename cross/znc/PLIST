@@ -59,6 +59,7 @@ lib:lib/znc/raw.so
 lib:lib/znc/route_replies.so
 lib:lib/znc/sample.so
 lib:lib/znc/samplewebapi.so
+lib:lib/znc/saslplainauth.so
 lib:lib/znc/sasl.so
 lib:lib/znc/savebuff.so
 lib:lib/znc/schat.so

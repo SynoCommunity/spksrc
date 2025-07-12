@@ -6,11 +6,18 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 ZNC="${SYNOPKG_PKGDEST}/bin/znc"
 CERT_FILE="${SYNOPKG_PKGVAR}/znc.pem"
-PYTHON3_LIB_PATH="/var/packages/python312/target/lib"
-SERVICE_COMMAND="env LD_LIBRARY_PATH=${PYTHON3_LIB_PATH} ${ZNC} -d ${SYNOPKG_PKGVAR}"
+SERVICE_COMMAND="strace -o ${SYNOPKG_PKGVAR}/znc-strace.log ${ZNC} -d ${SYNOPKG_PKGVAR} --debug --foreground"
 SVC_BACKGROUND=yes
 CONF_FILE=${SYNOPKG_PKGVAR}/configs/znc.conf
 OID_FILE=${SYNOPKG_PKGVAR}/configs/oidentd.conf
+
+# DEBUG
+export ZNC_DEBUG_MODULES=1
+export ZNC_DEBUG_SSL=1
+
+# Disable SHA-NI hardware encryption as celeron CPU models does not support it
+# https://github.com/SynoCommunity/spksrc/issues/6640
+export OPENSSL_ia32cap=":~0x20000000"
 
 service_postinst ()
 {
