@@ -23,7 +23,8 @@ include ../../mk/spksrc.common.mk
 
 # To ensure compatibility with Denverton CPU
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-ADDITIONAL_CFLAGS += -mno-avx -mno-avx2 -mno-sse4.1 -mno-sse4.2
+ADDITIONAL_CFLAGS += -mno-avx -mno-avx2 -mno-sse4.1 -mno-sse4.2 -mno-bmi2
+ADDITIONAL_CFLAGS += -DARGON2_NO_INTRINSICS -DBLAKE2_USE_PORTABLE
 endif
 
 include ../../mk/spksrc.cross-cc.mk
