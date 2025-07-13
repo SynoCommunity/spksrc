@@ -6,14 +6,15 @@
 PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 ZNC="${SYNOPKG_PKGDEST}/bin/znc"
 CERT_FILE="${SYNOPKG_PKGVAR}/znc.pem"
-SERVICE_COMMAND="strace -o ${SYNOPKG_PKGVAR}/znc-strace.log ${ZNC} -d ${SYNOPKG_PKGVAR} --debug --foreground"
+SERVICE_COMMAND="${ZNC} -d ${SYNOPKG_PKGVAR}"
 SVC_BACKGROUND=yes
 CONF_FILE=${SYNOPKG_PKGVAR}/configs/znc.conf
 OID_FILE=${SYNOPKG_PKGVAR}/configs/oidentd.conf
 
 # DEBUG
-export ZNC_DEBUG_MODULES=1
-export ZNC_DEBUG_SSL=1
+#SERVICE_COMMAND="strace -o ${SYNOPKG_PKGVAR}/znc-strace.log ${ZNC} -d ${SYNOPKG_PKGVAR} --debug --foreground"
+#export ZNC_DEBUG_MODULES=1
+#export ZNC_DEBUG_SSL=1
 
 # Disable SHA-NI hardware encryption as celeron CPU models does not support it
 # https://github.com/SynoCommunity/spksrc/issues/6640
