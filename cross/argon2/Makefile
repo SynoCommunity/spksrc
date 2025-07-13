@@ -21,10 +21,12 @@ ENV += LIBRARY_REL=lib
 
 include ../../mk/spksrc.common.mk
 
-# To ensure compatibility with Denverton CPU
+# To ensure compatibility with Denverton celeron CPU
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-ADDITIONAL_CFLAGS += -mno-avx -mno-avx2 -mno-sse4.1 -mno-sse4.2 -mno-bmi2
+ADDITIONAL_CFLAGS += -mno-avx -mno-avx2 -mno-sse4.1 -mno-sse4.2
+ADDITIONAL_CFLAGS += -mno-bmi -mno-bmi2
 ADDITIONAL_CFLAGS += -DARGON2_NO_INTRINSICS -DBLAKE2_USE_PORTABLE
+ADDITIONAL_CFLAGS += -march=core2 -mtune=core2
 endif
 
 include ../../mk/spksrc.cross-cc.mk
