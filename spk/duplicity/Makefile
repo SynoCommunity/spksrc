@@ -1,6 +1,6 @@
 SPK_NAME = duplicity
-SPK_VERS = 3.0.5
-SPK_REV = 12
+SPK_VERS = 3.0.5.1
+SPK_REV = 13
 SPK_ICON = src/duplicity.png
 
 # protobuf: missing atomics support 
@@ -17,7 +17,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Encrypted bandwidth-efficient backup using the rsync algorithm. Also contains duply wrapper script (duply is supported only for DSM >= 6.0).
 STARTABLE = no
 DISPLAY_NAME = Duplicity
-CHANGELOG = "1. Update duplicity to v3.0.5."
+CHANGELOG = "1. Update duplicity to v3.0.5.1."
 
 HOMEPAGE = https://duplicity.gitlab.io/duplicity-web/
 LICENSE  = GPLv2
