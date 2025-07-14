@@ -8,7 +8,7 @@
 # Variables:
 #  DEPENDS             List of dependencies to go through
 #  REQUIRE_KERNEL      If set, will compile kernel modules and allow
-#                      use of KERNEL_DIR
+#                      use of KERNEL_DISTRIB_DIR
 #  REQUIRE_TOOLKIT     If set, will download and extract matching toolkit
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
 

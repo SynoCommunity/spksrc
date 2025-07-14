@@ -14,7 +14,7 @@ PIP_DISTRIB_DIR = $(abspath $(DISTRIB_DIR)/pip)
 PIP_CACHE_DIR = $(WORK_DIR)/pip
 TOOLCHAIN_DIR = $(BASE_DISTRIB_DIR)/toolchain
 TOOLKIT_DIR = $(BASE_DISTRIB_DIR)/toolkit
-KERNEL_DIR = $(BASE_DISTRIB_DIR)/kernel
+KERNEL_DISTRIB_DIR = $(BASE_DISTRIB_DIR)/kernel
 PACKAGES_DIR = $(CURDIR)/../../packages
 # Default download location, see spksrc.download.mk
 ifeq ($(strip $(DISTRIB_DIR)),)
