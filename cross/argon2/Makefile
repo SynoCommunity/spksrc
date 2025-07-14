@@ -29,4 +29,11 @@ ADDITIONAL_CFLAGS += -DARGON2_NO_INTRINSICS -DBLAKE2_USE_PORTABLE
 ADDITIONAL_CFLAGS += -march=core2 -mtune=core2
 endif
 
+# To ensure compatibility with Evansport i686 CPU
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+ADDITIONAL_CFLAGS += -mno-sse4.1 -mno-sse4.2
+ADDITIONAL_CFLAGS += -DARGON2_NO_INTRINSICS -DBLAKE2_USE_PORTABLE
+ADDITIONAL_CFLAGS += -march=core2 -mtune=core2
+endif
+
 include ../../mk/spksrc.cross-cc.mk
