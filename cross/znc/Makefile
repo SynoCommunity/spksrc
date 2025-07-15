@@ -1,5 +1,5 @@
 PKG_NAME = znc
-PKG_VERS = 1.9.1
+PKG_VERS = 1.10.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://znc.in/releases/archive
@@ -16,7 +16,7 @@ LICENSE  = Apache 2.0
 ifeq ($(strip $(PYTHON_PACKAGE)),)
 BUILD_DEPENDS = cross/python312
 endif
-CMAKE_ARGS = -DWANT_PYTHON=true
+CMAKE_ARGS += -DWANT_PYTHON=true
 DEPENDS = cross/zlib
 
 DEPENDS += cross/openssl3
