@@ -6,8 +6,7 @@ SPK_ICON = src/$(SPK_NAME).png
 DEPENDS =
 
 REQUIRE_KERNEL ?= 1
-REQUIRE_KERNEL_MODULE  = CONFIG_CDROM_PKTCDVD:drivers/cdrom:cdrom
-REQUIRE_KERNEL_MODULE += CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
+REQUIRE_KERNEL_MODULE = CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides Synology kernel CD-ROM drivers cdrom.ko and sr_mod.ko"
@@ -27,6 +26,12 @@ STRIP_TARGET = nop
 POST_STRIP_TARGET = synokernel-cdrom_extra-install
 
 include ../../mk/spksrc.spk.mk
+
+ifeq ($(call version_ge, ${TC_KERNEL}, 5),1)
+REQUIRE_KERNEL_MODULE += CONFIG_CDROM:drivers/cdrom:cdrom
+else
+REQUIRE_KERNEL_MODULE += CONFIG_CDROM_PKTCDVD:drivers/cdrom:cdrom
+endif
 
 .PHONY: synokernel-cdrom_extra-install
 synokernel-cdrom_extra-install:
