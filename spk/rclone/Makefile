@@ -1,5 +1,5 @@
 SPK_NAME = rclone
-SPK_VERS = 1.70.2
+SPK_VERS = 1.70.3
 SPK_REV = 2
 SPK_ICON = src/logo.png
 
@@ -12,7 +12,7 @@ DESCRIPTION = Rclone is a command-line program to manage files on cloud storage.
 DISPLAY_NAME = rclone
 STARTABLE = no
 
-CHANGELOG = "Update to v1.70.2."
+CHANGELOG = "Update to v1.70.3."
 
 HOMEPAGE = https://rclone.org/
 HELPURL = https://rclone.org/docs/
