@@ -9,10 +9,6 @@
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
-
-# cmake specific configurations
-include ../../mk/spksrc.cross-cmake-env.mk
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -33,7 +29,13 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
+# Common directories (must be set after ARCH_SUFFIX)
+include ../../mk/spksrc.directories.mk
+
 ###
+
+# cmake specific configurations
+include ../../mk/spksrc.cross-cmake-env.mk
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)

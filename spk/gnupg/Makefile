@@ -1,6 +1,6 @@
 SPK_NAME = gnupg
-SPK_VERS = 2.4.2
-SPK_REV = 6
+SPK_VERS = 2.4.8
+SPK_REV = 7
 SPK_ICON = src/gnupg.png
 
 DEPENDS = cross/gnupg
@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = GnuPG allows to encrypt and sign your data and communication, features a versatile key management system as well as access modules for all kinds of public key directories.
 STARTABLE = no
 DISPLAY_NAME = GnuPG
-CHANGELOG = "1. Update gnupg to 2.4.2<br/>2. Update shared libraries.<br/>3. Fix key generation for aarch64 on DSM 6."
+CHANGELOG = "1. Update gnupg to 2.4.8<br/>2. Update shared libraries."
 
 HOMEPAGE = https://www.gnupg.org/
 LICENSE  = GPLv3
