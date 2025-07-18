@@ -11,7 +11,7 @@ rsc:bin/rdoc
 rsc:bin/ri
 rsc:bin/ruby
 rsc:bin/typeprof
-rsc:lib/ruby/3.1.0
+rsc:lib/ruby/3.4.0
 rsc:lib/ruby/gems
 lib:lib/ruby/*/*/*.so
 lib:lib/ruby/*/*/*/*.so
