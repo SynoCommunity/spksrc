@@ -55,6 +55,15 @@ endif
 	@$(RUN) $(MAKE) mrproper
 	@$(MSG) "Applying $(KERNEL_CONFIG) configuration"
 	@$(RUN) cp $(KERNEL_CONFIG) .config
+ifeq ($(call version_ge, ${TC_KERNEL}, 5),1)
+	@$(MSG) "Disable: CONFIG_UNWINDER_ORC"
+	@$(RUN) sed -i 's/^CONFIG_UNWINDER_ORC=y/# CONFIG_UNWINDER_ORC is not set/' .config
+	@$(RUN) sed -i 's/^# CONFIG_UNWINDER_FRAME_POINTER is not set/CONFIG_UNWINDER_FRAME_POINTER=y/' .config
+	@$(MSG) "Disable: CONFIG_STACK_VALIDATION"
+	@$(RUN) sed -i 's/^CONFIG_STACK_VALIDATION=y/# CONFIG_STACK_VALIDATION is not set/' .config
+	@$(MSG) "Disable: CONFIG_DEBUG_INFO_BTF"
+	@$(RUN) sed -i 's/^CONFIG_DEBUG_INFO_BTF=y/# CONFIG_DEBUG_INFO_BTF is not set/' .config
+endif
 	@$(MSG) "Set any new symbols to their default value"
 # olddefconfig is not available < 3.8
 ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
