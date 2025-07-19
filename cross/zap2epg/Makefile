@@ -1,11 +1,10 @@
 PKG_NAME = zap2epg
-PKG_VERS = 3.1
+PKG_VERS = 3.3
 PKG_EXT = tar.gz
-PKG_GIT_HASH = 12a9f832c98fa75969afc848bc4e4a607d736ef0
-PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/th0ma7/script.module.zap2epg/archive
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = script.module.zap2epg-$(PKG_GIT_HASH)
+PKG_DIST_SITE = https://github.com/th0ma7/tv_grab_zap2epg/archive/refs/tags
+PKG_DIR = tv_grab_zap2epg-$(PKG_VERS)
 
 DEPENDS =
 
@@ -22,4 +21,4 @@ zap2epg_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
 	install -m 755 $(WORK_DIR)/$(PKG_DIR)/tv_grab_zap2epg $(STAGING_INSTALL_PREFIX)/bin
 	install -m 750 -d $(STAGING_INSTALL_PREFIX)/var/epggrab/conf
-	install -m 640 $(WORK_DIR)/$(PKG_DIR)/epggrab/conf/zap2epg.xml $(STAGING_INSTALL_PREFIX)/var/epggrab/conf
+	install -m 640 $(WORK_DIR)/$(PKG_DIR)/zap2epg.xml $(STAGING_INSTALL_PREFIX)/var/epggrab/conf
