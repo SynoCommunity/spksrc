@@ -15,7 +15,7 @@ LICENSE  = GPLv3
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
-CHANGELOG = "1. Update multiple dependencies."
+CHANGELOG = "1. Update multiple dependencies"
 
 SERVICE_USER = auto
 STARTABLE = yes
