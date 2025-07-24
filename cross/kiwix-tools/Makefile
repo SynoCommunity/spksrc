@@ -15,4 +15,8 @@ HOMEPAGE = https://www.kiwix.org/
 COMMENT  = Command line Kiwix tools: kiwix-serve, kiwix-manage, ...
 LICENSE  = GPLv3
 
+# debian patches
+# https://udd.debian.org/patches.cgi?src=openjdk-21&version=21.0.5%2B11-1
+PATCHES_LEVEL = 1
+
 include ../../mk/spksrc.cross-meson.mk
