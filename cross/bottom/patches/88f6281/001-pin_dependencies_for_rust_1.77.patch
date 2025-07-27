@@ -1,0 +1,12 @@
+--- Cargo.toml.orig	2024-08-06 00:28:17.000000000 +0000
++++ Cargo.toml	2025-07-27 10:48:09.721653792 +0000
+@@ -80,7 +80,8 @@
+ 
+ [dependencies]
+ anyhow = "1.0.86"
+-backtrace = "0.3.73"
++# pinned for Rust 1.77.2
++backtrace = "=0.3.74"
+ cfg-if = "1.0.0"
+ clap = { version = "4.5.13", features = ["default", "cargo", "wrap_help", "derive"] }
+ concat-string = "1.0.1"
