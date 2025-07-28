@@ -24,18 +24,16 @@ CONFIGURE_ARGS += ac_cv_snprintf_returns_bogus=no
 ADDITIONAL_CPPFLAGS  = -std=gnu99
 ADDITIONAL_CPPFLAGS += -O
 
-# Version 2.50.0 uses CSPRNG_METHOD="getrandom" for all Linux targers,
+# Version 2.50.0 uses CSPRNG_METHOD="getrandom" for all Linux targets,
 # ignoring whether getrandom method (and sys/random.h) is available.
 # We could either patch "config.mak.uname" or overwrite CSPRNG_METHOD
-# Since getrandom is supported with DSM 7 toolchains (except for comcerto2k),
-# we use getrandom for those and set CSPRNG_METHOD="" for other toolchains
-# to use "/dev/urandom" that was the default for git < 2.50.0
+# getrandom is supported with DSM 7 toolchains (except for comcerto2k),
+# but at runtime we get 
+# "error: unable to get random bytes for temporary file: Function not implemented"
+# on DSM 7, so define CSPRNG_METHOD="" to use "/dev/urandom" as in git < 2.50.0
 include ../../mk/spksrc.common.mk
-ADDITIONAL_MAKE_OPTIONS =
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-# avoid CSPRNG_METHOD="getrandom" when sys/random.h is lacking in the toolchain
+# avoid CSPRNG_METHOD="getrandom"
 ADDITIONAL_MAKE_OPTIONS = CSPRNG_METHOD=""
-endif
 
 PRE_CONFIGURE_TARGET = git_pre_configure
 POST_INSTALL_TARGET = git_post_install
