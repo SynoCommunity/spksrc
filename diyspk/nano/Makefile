@@ -1,5 +1,5 @@
 SPK_NAME = nano
-SPK_VERS = 8.3
+SPK_VERS = 8.5
 SPK_REV = 1
 SPK_ICON = src/nano.png
 
