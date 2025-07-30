@@ -25,7 +25,7 @@ include ../../mk/spksrc.cross-go.mk
 
 .PHONY: ddns-go_compile_target
 ddns-go_compile_target:
-	@$(RUN) $(MAKE) VERSION=$(shell git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null || git rev-parse --short HEAD) BUILD_TIME="$$(date -u +'%Y-%m-%dT%H:%M:%SZ')" build
+	@$(RUN) $(MAKE) VERSION=v$(PKG_VERS) BUILD_TIME="$$(date -u +'%Y-%m-%dT%H:%M:%SZ')" build
 
 .PHONY: ddns-go_install
 ddns-go_install:
