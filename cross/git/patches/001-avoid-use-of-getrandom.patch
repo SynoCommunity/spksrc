@@ -1,0 +1,20 @@
+# git version 2.50.0 uses CSPRNG_METHOD="getrandom" for all Linux targets,
+# ignoring whether getrandom method (and sys/random.h) is available.
+#
+# getrandom is supported with DSM 7 toolchains (except for comcerto2k),
+# but at runtime we get:
+# "error: unable to get random bytes for temporary file: Function not implemented" too.
+#
+# So define CSPRNG_METHOD="" to use "/dev/urandom" as in git < 2.50.0
+# 
+--- config.mak.uname.orig	2025-06-16 05:11:33.000000000 +0000
++++ config.mak.uname	2025-07-30 21:17:45.169947443 +0000
+@@ -50,7 +50,7 @@
+ 	HAVE_ALLOCA_H = YesPlease
+ 	# override in config.mak if you have glibc >= 2.38
+ 	NO_STRLCPY = YesPlease
+-	CSPRNG_METHOD = getrandom
++	CSPRNG_METHOD = 
+ 	HAVE_PATHS_H = YesPlease
+ 	LIBC_CONTAINS_LIBINTL = YesPlease
+ 	HAVE_DEV_TTY = YesPlease

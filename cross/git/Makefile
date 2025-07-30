@@ -24,22 +24,10 @@ CONFIGURE_ARGS += ac_cv_snprintf_returns_bogus=no
 ADDITIONAL_CPPFLAGS  = -std=gnu99
 ADDITIONAL_CPPFLAGS += -O
 
-# Version 2.50.0 uses CSPRNG_METHOD="getrandom" for all Linux targets,
-# ignoring whether getrandom method (and sys/random.h) is available.
-# We could either patch "config.mak.uname" or overwrite CSPRNG_METHOD
-# getrandom is supported with DSM 7 toolchains (except for comcerto2k),
-# but at runtime we get 
-# "error: unable to get random bytes for temporary file: Function not implemented"
-# on DSM 7, so define CSPRNG_METHOD="" to use "/dev/urandom" as in git < 2.50.0
-include ../../mk/spksrc.common.mk
-# avoid CSPRNG_METHOD="getrandom"
-ADDITIONAL_MAKE_OPTIONS = CSPRNG_METHOD=""
-
 PRE_CONFIGURE_TARGET = git_pre_configure
 POST_INSTALL_TARGET = git_post_install
 
-COMPILE_MAKE_OPTIONS = $(ADDITIONAL_MAKE_OPTIONS)
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX) $(ADDITIONAL_MAKE_OPTIONS)
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 # compiling needs access to curl-config from cross/curl
 ENV += PATH=$$PATH:$(STAGING_INSTALL_PREFIX)/bin
