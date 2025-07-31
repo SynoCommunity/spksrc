@@ -1,4 +1,4 @@
-DDNS_GO="${SYNOPKG_PKGDEST}/bin/ddns-go -l :9876 -f 60 -cacheTimes 180"
+DDNS_GO="${SYNOPKG_PKGDEST}/bin/ddns-go -l :${SERVICE_PORT} -f 60 -cacheTimes 180"
 CONFIG_FILE="${SYNOPKG_PKGVAR}/config.yaml"
 
 SERVICE_COMMAND="${DDNS_GO} -c ${CONFIG_FILE}"
