@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
-SPK_VERS = 2.5
-SPK_REV = 20
+SPK_VERS = 2.6
+SPK_REV = 21
 SPK_ICON = src/synocli-net.png
 
 DEPENDS = cross/screen cross/tmux cross/links cross/socat
@@ -9,6 +9,7 @@ DEPENDS += cross/mtr
 DEPENDS += cross/etherwake
 DEPENDS += cross/inetutils
 DEPENDS += cross/netcat
+DEPENDS += cross/imapfilter
 
 OPTIONAL_DEPENDS = cross/sshfs2 cross/sshfs3 cross/ser2net cross/bind cross/bind_9.16 cross/aria2 cross/nmap cross/nmap_7.92
 
@@ -49,16 +50,10 @@ endif
 
 
 MAINTAINER = ymartin59
-DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, xxhsum, autossh \(including openssh, sftp and scp\), etherwake, telnet, whois, sshfs$(OPTIONAL_DESC)."
+DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, xxhsum, autossh \(including openssh, sftp and scp\), etherwake, telnet, whois, sshfs, IMAPFilter$(OPTIONAL_DESC)."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG = "1. Fix bind tools for ARMv7 archs. <br/>"
-CHANGELOG += "2. Update links to v2.30. <br/>"
-CHANGELOG += "3. Update namp to v7.95. <br/>"
-CHANGELOG += "4. Update rsync to v3.4.1. <br/>"
-CHANGELOG += "5. Update ser2net to v4.6.3. <br/>"
-CHANGELOG += "6. Update socat to v1.8.0.2. <br/>"
-CHANGELOG += "7. Update tmux to v3.5a"
+CHANGELOG = "1. Add IMAPFilter v2.8.3."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
 LICENSE  = Each tool is licensed under it\'s respective license.
@@ -86,5 +81,6 @@ SPK_COMMANDS += bin/telnet bin/whois
 SPK_COMMANDS += bin/arpaname bin/delv bin/dig bin/mdig
 SPK_COMMANDS += bin/aria2c
 SPK_COMMANDS += bin/nc bin/netcat
+SPK_COMMANDS += bin/imapfilter
 
 include ../../mk/spksrc.spk.mk
