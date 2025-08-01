@@ -1,5 +1,5 @@
 PKG_NAME = ddns-go
-PKG_VERS = 6.12.0
+PKG_VERS = 6.12.1
 WEB_VERSION = $(PKG_VERS)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
