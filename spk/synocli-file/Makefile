@@ -9,7 +9,7 @@ SPK_ICON = src/synocli-file.png
 #   it's own libblkid and rmlint cannot find the working library of cross/libblkid.
 BUILD_DEPENDS = cross/libblkid
 
-DEPENDS  = cross/less cross/tree cross/jdupes cross/rhash cross/nano cross/file
+DEPENDS  = cross/less cross/tree cross/jdupes cross/nano cross/file
 DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
@@ -20,7 +20,8 @@ DEPENDS += cross/iconv
 DEPENDS += cross/dos2unix
 DEPENDS += cross/patch
 
-OPTIONAL_DEPENDS  = cross/rmlint
+OPTIONAL_DEPENDS  = cross/rhash cross/rhash_1.4.5
+OPTIONAL_DEPENDS += cross/rmlint
 OPTIONAL_DEPENDS += cross/rnm
 OPTIONAL_DEPENDS += cross/micro
 OPTIONAL_DEPENDS += cross/fzf
@@ -41,6 +42,12 @@ POST_STRIP_TARGET = synocli-file_extra_install
 OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/rhash_1.4.5
+else
+DEPENDS += cross/rhash
+endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
@@ -125,7 +132,7 @@ CHANGELOG += "6. Update nano from v8.3 to v8.5. <br/>"
 CHANGELOG += "7. Update nnn from v5.0 to v5.1 (DSM 7 only). <br/>"
 CHANGELOG += "8. Update patch from v2.7.6 to v2.8. <br/>"
 CHANGELOG += "9. Update pcre2 from v10.44 to v10.45. <br/>"
-CHANGELOG += "10. Update rhash from v1.4.5 to v1.4.6. <br/>"
+CHANGELOG += "10. Update rhash from v1.4.5 to v1.4.6 (except for old pcc archs). <br/>"
 CHANGELOG += "11. Update rmlint from v2.10.2 to v2.10.3. <br/>"
 CHANGELOG += "12. Update zstd from v1.5.6 to v1.5.7."
 
