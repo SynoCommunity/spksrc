@@ -1,0 +1,9 @@
+CONFIGURATION_TITLE:      "基本服务设置"
+SITE_URL_DESCRIPTION:     "OpenList 服务器的URL，例如 https://example.com。 (不要带尾部斜杠)。如果您使用反向代理等功能，则需要此项 (可选)。"
+SITE_URL_LABEL:           "站点 URL"
+
+ADMIN_PASSWORD_DESCRIPTION: "默认用户 \\\"admin\\\" 的初始密码"
+ADMIN_PASSWORD_LABEL:       "密码 (默认: admin)"
+
+INSTALLATION_NOTES_TITLE: "<b>安装说明</b><br/>"
+INSTALLATION_NOTES_TEXT1: "请参阅 <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/OpenList\\\">SynoCommunity OpenList wiki 页面</a>以获取更多信息及官方文档的链接。"
