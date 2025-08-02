@@ -18,7 +18,7 @@ DEPENDS += cross/imapfilter
 OPTIONAL_DEPENDS  = cross/screen cross/screen5
 OPTIONAL_DEPENDS += cross/sshfs2 cross/sshfs3 
 OPTIONAL_DEPENDS += cross/ser2net
-OPTIONAL_DEPENDS += cross/bind cross/bind_9.16
+OPTIONAL_DEPENDS += cross/bind_9.20 cross/bind_9.18 cross/bind_9.16
 OPTIONAL_DEPENDS += cross/aria2
 OPTIONAL_DEPENDS += cross/nmap cross/nmap_7.92
 
@@ -34,17 +34,35 @@ else
 DEPENDS += cross/screen5
 endif
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+# tools of cross/bind (v9.16, v9.18, v9.20)
+OPTIONAL_DESC := $(OPTIONAL_DESC)", arpaname, delv, dig, mdig"
+ifeq ($(call version_ge,${TCVERSION},7.0),1)
+# DSM 7
+ifneq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+DEPENDS += cross/bind_9.20
+else
+DEPENDS += cross/bind_9.18
+SPK_VERS = 9.18.38
+endif
+else
+# DSM 6
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/bind_9.16
+SPK_VERS = 9.16.50
 else ifeq ($(ARCH)-$(TCVERSION),x86-5.2)
 DEPENDS += cross/bind_9.16
+SPK_VERS = 9.16.50
 else
-DEPENDS += cross/bind
+DEPENDS += cross/bind_9.18
+SPK_VERS = 9.18.38
 endif
-# tools of cross/bind:
-OPTIONAL_DESC := $(OPTIONAL_DESC)", arpaname, delv, dig, mdig"
+endif
+endif
+
+
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 
 DEPENDS += cross/ser2net
 OPTIONAL_DESC := $(OPTIONAL_DESC)", ser2net"
@@ -77,7 +95,7 @@ DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilit
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
 CHANGELOG  = "1. Add IMAPFilter v2.8.3. <br/>"
-CHANGELOG += "2. Update bind to v9.18.38 (v9.16.50 for armv5 and armv7l archs). <br/>"
+CHANGELOG += "2. Update bind to v9.20.11 (DSM 7); v9.18.38 (DSM 6); v9.16.50 (armv5 and armv7l). <br/>"
 CHANGELOG += "3. Update inetutils from v2.5 to v2.6. <br/>"
 CHANGELOG += "4. Update mtr from v0.95 to v0.96. <br/>"
 CHANGELOG += "5. Update nmap from v7.95 to v7.97. <br/>"

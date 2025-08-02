@@ -1,3 +1,22 @@
+# Ignore whether SO_REUSEPORT is defined
+# 
+# SO_REUSEPORT is not supported in all ARMv7 cpu toolchains 
+# provided in toolchain .../usr/include/asm-generic/socket.h
+# 
+# see issue https://github.com/SynoCommunity/spksrc/issues/6441
+# 
+--- lib/isc/include/isc/netmgr.h.orig	2025-07-04 09:46:42.142971900 +0000
++++ lib/isc/include/isc/netmgr.h	2025-08-02 07:21:31.655085696 +0000
+@@ -24,9 +24,6 @@
+ #include <sys/socket.h>
+ #include <sys/types.h>
+ 
+-#if defined(SO_REUSEPORT_LB) || (defined(SO_REUSEPORT) && defined(__linux__))
+-#define HAVE_SO_REUSEPORT_LB 1
+-#endif
+ 
+ /*
+  * Replacement for isc_sockettype_t provided by socket.h.
 --- lib/isc/netmgr/netmgr.c.orig	2025-07-04 09:46:42.149972100 +0000
 +++ lib/isc/netmgr/netmgr.c	2025-08-02 12:02:00.105189149 +0000
 @@ -265,11 +265,7 @@
