@@ -1,31 +1,22 @@
 PKG_NAME = bind
-PKG_VERS = 9.17.22
+PKG_VERS = 9.18.38
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# to update bind to >= 9.18.x is a mess
-# - depends on cross/liburcu (does not build for evansport, and aarch64 has compiler issue for DSM <7)
-
-DEPENDS = cross/libuv
+DEPENDS  = cross/libuv
+DEPENDS += cross/liburcu
 DEPENDS += cross/openssl3
 DEPENDS += cross/readline
 DEPENDS += cross/jemalloc
 DEPENDS += cross/libxml2
 DEPENDS += cross/nghttp2
-
-OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
-
-# by cross/libuv
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
-include ../../mk/spksrc.archs.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-DEPENDS += cross/libcap_2.51
-else
 DEPENDS += cross/libcap
-endif
+
+# lacking support for atomics:
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+
 
 HOMEPAGE = https://www.isc.org/
 COMMENT  = BIND (Berkeley Internet Name Domain) is a complete, highly portable implementation of the DNS (Domain Name System) protocol.

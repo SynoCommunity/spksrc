@@ -1,5 +1,5 @@
 SPK_NAME = bind
-SPK_VERS = 9.17.22
+SPK_VERS = 9.18.38
 SPK_REV = 1
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
@@ -17,7 +17,10 @@ SPK_COMMANDS = bin/arpaname bin/delv bin/dig bin/mdig
 
 include ../../mk/spksrc.spk.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += cross/bind_9.16
+SPK_VERS = 9.16.50
+else ifeq ($(ARCH)-$(TCVERSION),x86-5.2)
 DEPENDS += cross/bind_9.16
 SPK_VERS = 9.16.50
 else
