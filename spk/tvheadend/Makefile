@@ -27,7 +27,8 @@ WHEELS = src/requirements-pure.txt
 
 DEPENDS = cross/tvheadend
 DEPENDS += cross/dtv-scan-tables
-DEPENDS += cross/zap2epg cross/docker-tvheadend
+DEPENDS += cross/docker-tvheadend
+DEPENDS += cross/gracenote2epg cross/zap2epg
 
 MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
