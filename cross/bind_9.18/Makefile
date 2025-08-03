@@ -1,29 +1,27 @@
 PKG_NAME = bind
-PKG_VERS = 9.16.50
+PKG_VERS = 9.18.38
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# This is the latest version that builds for ARMv5_ARCHS, ARMv7L_ARCHS and x86-5.2
+# REMARKS:
+# BIND 9:
+# Even version numbers are stable versions (9.16, 9.18, 9.20) with support until EOL
+# Odd version numbers are development versions (9.17, 9.19, 9.21)
 
-DEPENDS  = cross/libuv_1.34
+DEPENDS  = cross/libuv
+DEPENDS += cross/liburcu
 DEPENDS += cross/openssl3
 DEPENDS += cross/readline
 DEPENDS += cross/jemalloc
 DEPENDS += cross/libxml2
-
-OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
-
-# by cross/libuv
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
-include ../../mk/spksrc.archs.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-DEPENDS += cross/libcap_2.51
-else
+DEPENDS += cross/nghttp2
 DEPENDS += cross/libcap
-endif
+
+# lacking support for atomics:
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+
 
 HOMEPAGE = https://www.isc.org/
 COMMENT  = BIND (Berkeley Internet Name Domain) is a complete, highly portable implementation of the DNS (Domain Name System) protocol.
@@ -35,8 +33,7 @@ PRE_COMPILE_TARGET = bind_pre_compile
 ADDITIONAL_CFLAGS = -O2
 ADDITIONAL_CPPFLAGS = -O2
 
-CONFIGURE_ARGS  = --without-python
-CONFIGURE_ARGS += --enable-full-report
+CONFIGURE_ARGS  = --enable-full-report
 # needed for cross compile:
 CONFIGURE_ARGS += BUILD_CC="$(CC)"
 CONFIGURE_ARGS += BUILD_CFLAGS="$(CFLAGS) $(ADDITIONAL_CFLAGS)"
@@ -47,7 +44,13 @@ CONFIGURE_ARGS += BUILD_LIBS="$(LIBS)"
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: bind_pre_compile
-# compile gen tool with host compiler to run in build environment
+# libns and libisccfg must be available in the install location at compile time
+# otherwise the compilation of some binaries (rndc, dig, tools, ...) fails
+# This is a workaround, since the solution with --rpath and --rpath-link did not work.
 bind_pre_compile:
-	@$(MSG) Build gen tool for host
-	cd $(WORK_DIR)/$(PKG_DIR)/lib/dns; gcc -I../../lib/isc/include -o gen ./gen.c
+	@$(MSG) PRE-Compile start
+	@$(MSG) Compile and install required libraries first
+	@$(RUN) $(MAKE) -C lib
+	@$(RUN) cp -f lib/ns/.libs/libns*.so $(STAGING_INSTALL_PREFIX)/lib/
+	@$(RUN) cp -f lib/isccfg/.libs/libisccfg*.so $(STAGING_INSTALL_PREFIX)/lib/
+	@$(MSG) PRE-Compile done

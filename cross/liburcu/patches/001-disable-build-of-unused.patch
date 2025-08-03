@@ -1,0 +1,13 @@
+# Exclude folders of unused parts (doc, tests, extras)
+# 
+--- Makefile.in.orig	2024-08-28 19:20:38.000000000 +0000
++++ Makefile.in	2025-08-01 11:46:53.738220521 +0000
+@@ -387,7 +387,7 @@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+ ACLOCAL_AMFLAGS = -I m4
+-SUBDIRS = include src doc tests extras
++SUBDIRS = include src
+ dist_doc_DATA = LICENSE \
+ 		README.md
+ 
