@@ -6,7 +6,7 @@ PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://lttng.org/files/urcu/
 PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
-# liburcu v0.13.4 it the latest version supported by OLD_PPC_ARCHS and ARMv5_ARCHS
+# liburcu v0.13.4 is the latest version supported by OLD_PPC_ARCHS and ARMv5_ARCHS
 
 DEPENDS =
 

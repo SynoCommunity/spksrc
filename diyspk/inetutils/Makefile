@@ -2,7 +2,7 @@ SPK_NAME = inetutils
 SPK_VERS = 2.6
 SPK_REV = 1
 
-DEPENDS = cross/inetutils_update
+DEPENDS = cross/inetutils
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = GNU network utilities.
