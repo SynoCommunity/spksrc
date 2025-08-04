@@ -1,0 +1,13 @@
+--- Cargo.toml.orig	2025-01-27 08:53:38.000000000 +0000
++++ Cargo.toml	2025-07-28 08:47:24.069857125 +0000
+@@ -62,6 +62,10 @@
+ log-panics = { version = "2", features = ["with-backtrace"] }
+ crossbeam = "0.8"
+ 
++# Dependencies pinned for Rust 1.77.2
++home = "=0.5.9"
++backtrace = "=0.3.74"
++
+ [[bin]]
+ name = "dua"
+ path = "src/main.rs"
