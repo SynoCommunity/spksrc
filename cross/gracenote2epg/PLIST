@@ -1,4 +1,4 @@
-lnk:bin/tv_grab_zap2epg
+lnk:bin/tv_grab_gracenote2epg
 rsc:bin/gracenote2epg.py
 rsc:bin/gracenote2epg/*.py
 rsc:var/epggrab/gracenote2epg/conf/gracenote2epg.xml
