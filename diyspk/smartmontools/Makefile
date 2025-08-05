@@ -1,5 +1,5 @@
 SPK_NAME = smartmontools
-SPK_VERS = 7.4
+SPK_VERS = 7.5
 SPK_REV = 1
 
 DEPENDS = cross/smartmontools
