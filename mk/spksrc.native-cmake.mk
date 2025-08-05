@@ -98,7 +98,6 @@ cat_PLIST:
 cmake_configure_target:
 	@$(MSG) - CMake configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
-	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
