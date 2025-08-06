@@ -24,4 +24,13 @@ SERVICE_USER = auto
 SERVICE_PORT = 9876
 ADMIN_PORT = $(SERVICE_PORT)
 
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
+
+POST_STRIP_TARGET = ddns_go_extra_install
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: ddns_go_extra_install
+ddns_go_extra_install:
+	@install -d -m 755 $(STAGING_DIR)/var
+	@install -m 644 src/environment-variables $(STAGING_DIR)/var/

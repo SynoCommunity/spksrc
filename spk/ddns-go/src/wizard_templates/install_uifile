@@ -1,0 +1,34 @@
+[{
+    "step_title": "{{{CONFIGURATION_TITLE}}}",
+    "items": [{
+        "type": "textfield",
+        "desc": "{{{FREQUENCY_DESCRIPTION}}}",
+        "subitems": [{
+            "key": "wizard_frequency",
+            "defaultValue": "300",
+            "desc": "{{{FREQUENCY_LABEL}}}",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      },{
+        "type": "textfield",
+        "desc": "{{{CACHETIMES_DESCRIPTION}}}",
+        "subitems": [{
+            "key": "wizard_cachetimes",
+            "defaultValue": "5",
+            "desc": "{{{CACHETIMES_LABEL}}}",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      },{
+        "desc": ""
+      },{
+        "desc": "{{{INSTALLATION_NOTES_TITLE}}}{{{INSTALLATION_NOTES_TEXT1}}}{{{INSTALLATION_NOTES_TEXT2}}}"
+      }
+    ]
+  }
+]
