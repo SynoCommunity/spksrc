@@ -7,4 +7,4 @@ CACHETIMES_LABEL:       "缓存次数"
 
 INSTALLATION_NOTES_TITLE: "<b>注意事项</b><br/>"
 INSTALLATION_NOTES_TEXT1: "尽管使用 <code>cachetimes</code> 参数可以避免DNS服务提供商施加的流量限制，但如果您通过接口获取IP地址，则需注意接口的流量限制。<br/>"
-INSTALLATION_NOTES_TEXT2: "如果想在安装完成后更改启动参数，可以在/var/packages/ddns-go/var/environment-variables这个文件修改参数。"
+INSTALLATION_NOTES_TEXT2: "如果想在安装完成后更改启动参数，可以在 <code>/var/packages/ddns-go/var/environment-variables</code> 这个文件修改参数。"

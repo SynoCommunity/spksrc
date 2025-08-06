@@ -7,4 +7,4 @@ CACHETIMES_LABEL:       "Cache times"
 
 INSTALLATION_NOTES_TITLE: "<b>Notes</b><br/>"
 INSTALLATION_NOTES_TEXT1: "Although using the <code>cachetimes</code> parameter can avoid traffic restrictions imposed by DNS service providers, if you obtain IP addresses via API, you need to be aware of traffic restrictions on the API end.<br/>"
-INSTALLATION_NOTES_TEXT2: "If you want to change the startup parameters after installation, you can modify the parameters in the file /var/packages/ddns-go/var/environment-variables."
+INSTALLATION_NOTES_TEXT2: "If you want to change the startup parameters after installation, you can modify the parameters in the file <code>/var/packages/ddns-go/var/environment-variables</code>."
