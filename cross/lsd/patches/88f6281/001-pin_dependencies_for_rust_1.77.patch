@@ -1,0 +1,14 @@
+--- Cargo.toml.orig	2024-08-20 16:25:29.000000000 +0000
++++ Cargo.toml	2025-07-28 00:21:57.412763864 +0000
+@@ -47,6 +47,11 @@
+ vsort = "0.2"
+ xdg = "2.5"
+ 
++# Dependencies pinned for Rust 1.77.2
++idna_adapter = "=1.2.0"
++litemap = "=0.7.4"
++zerofrom = "=0.1.5"
++
+ [target."cfg(not(all(windows, target_arch = \"x86\", target_env = \"gnu\")))".dependencies]
+ # if ssl feature is enabled compilation will fail on arm-unknown-linux-gnueabihf and i686-pc-windows-gnu
+ git2 = { version = "0.18", optional = true, default-features = false }
