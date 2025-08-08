@@ -11,8 +11,10 @@ ENV_VARIABLES="${SYNOPKG_PKGVAR}/environment-variables"
 
 service_postinst ()
 {
-   echo DDNS_GO_FREQUENCY="${wizard_frequency}"           >> ${INST_VARIABLES}
-   echo DDNS_GO_CACHETIMES="${wizard_cachetimes}"         >> ${INST_VARIABLES}
+    if [ -n "${wizard_frequency}" ] && [ -n "${wizard_cachetimes}" ]; then
+        echo "DDNS_GO_FREQUENCY=${wizard_frequency}" > ${INST_VARIABLES}
+        echo "DDNS_GO_CACHETIMES=${wizard_cachetimes}" >> ${INST_VARIABLES}
+    fi
 }
 
 export_variables_from_file ()

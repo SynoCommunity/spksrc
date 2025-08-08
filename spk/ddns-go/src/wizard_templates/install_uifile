@@ -8,7 +8,11 @@
             "defaultValue": "300",
             "desc": "{{{FREQUENCY_LABEL}}}",
             "validator": {
-              "allowBlank": false
+              "allowBlank": false,
+              "regex":{
+                "expr": "/^\\d+$/",
+                "errorText": "{{{FREQUENCY_ERRORTEXT}}}"
+              }
             }
           }
         ]
@@ -20,7 +24,11 @@
             "defaultValue": "5",
             "desc": "{{{CACHETIMES_LABEL}}}",
             "validator": {
-              "allowBlank": false
+              "allowBlank": false,
+              "regex":{
+                "expr": "/^\\d+$/",
+                "errorText": "{{{CACHETIMES_ERRORTEXT}}}"
+              }
             }
           }
         ]
