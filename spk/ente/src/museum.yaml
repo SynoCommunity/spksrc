@@ -1,0 +1,97 @@
+# Ente Museum Configuration for Synology NAS
+# Based on official configuration structure from https://help.ente.io/self-hosting/installation/config
+
+# HTTP server configuration
+http:
+    bind-address: "127.0.0.1"
+    # Port will be set in credentials.yaml based on installation wizard
+
+# S3 configuration for object storage
+s3:
+    # Enable local bucket mode for MinIO/filesystem storage
+    are_local_buckets: true
+    use_path_style_urls: true
+    
+    # Primary storage bucket - MinIO configuration
+    # Note: NAS_IP will be replaced with your NAS IP during installation
+    b2-eu-cen:
+        key: minioadmin
+        secret: minioadmin 
+        endpoint: http://ENTE_NAS_IP_PLACEHOLDER:9000
+        region: us-east-1
+        bucket: ente-data
+
+# Security keys (will be randomly generated during installation)
+key:
+    encryption: "ENTE_ENCRYPTION_KEY_PLACEHOLDER"
+    hash: "ENTE_HASH_KEY_PLACEHOLDER"
+
+# JWT configuration for authentication
+jwt:
+    secret: "ENTE_JWT_SECRET_PLACEHOLDER"
+
+# Email configuration (optional - for user notifications)
+# smtp:
+#     host: "smtp.gmail.com"
+#     port: 587
+#     username: ""
+#     password: ""
+#     from: "photos@yourdomain.com"
+
+# WebP conversion settings
+webp:
+    # Enable WebP conversion for better compression
+    enabled: true
+    # Quality setting (0-100)
+    quality: 75
+
+# Background job configuration
+jobs:
+    # Disable cron-based cleanup jobs for small installations
+    cron:
+        skip: true
+    # Enable background processing
+    background:
+        enabled: true
+
+# Machine learning features (optional)
+ml:
+    # Disable ML features to reduce resource usage
+    enabled: false
+
+# Replication settings (for multi-instance setups)
+replication:
+    enabled: false
+
+# Internal server settings
+internal:
+    # Enable logging for debugging
+    silent: false
+    # Allow new user registration
+    disable-registration: false
+    # Maximum file size (in bytes) - 100MB default
+    max-file-size: 104857600
+    
+# Rate limiting
+rate-limit:
+    # Requests per minute per IP
+    requests-per-minute: 100
+
+# CORS settings for web interface
+cors:
+    # Allow requests from web interface
+    allowed-origins:
+        - "https://localhost"
+        - "http://localhost"
+    # Allow credentials
+    allow-credentials: true
+
+# Feature flags
+feature-flags:
+    # Enable two-factor authentication
+    two-factor: true
+    # Enable face recognition (requires ML)
+    face-recognition: false
+    # Enable magic links for login
+    magic-links: true
+
