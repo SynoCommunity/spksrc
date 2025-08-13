@@ -14,6 +14,7 @@ INSTALL_TARGET = autobrr_install
 # download prebuilt binaries
 # supported archs are x64, ARMv7 and AARCH64
 PKG_DIST_ARCH_LIST = x86_64 arm arm64
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))

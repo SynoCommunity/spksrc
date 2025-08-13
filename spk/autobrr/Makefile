@@ -5,6 +5,8 @@ SPK_ICON = src/autobrr.png
 
 DEPENDS = cross/autobrr
 
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = Modern, easy to use download automation for torrents and usenet.
 DISPLAY_NAME = autobrr
