@@ -45,6 +45,4 @@ SPK_COMMANDS += bin/$(SPK_NAME)-status-detail
 SPK_COMMANDS += bin/$(SPK_NAME)-ugraph
 SPK_COMMANDS += bin/$(SPK_NAME)-ulevel
 
-SPK_DEPENDS = "synocli-net"
-
 include ../../mk/spksrc.spk.mk
