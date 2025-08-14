@@ -8,7 +8,6 @@ PKG_DIR       = $(PKG_NAME)-$(PKG_VERS)
 HOMEPAGE      = https://byobu.org/
 COMMENT       = Byobu is a GPLv3 open source text-based window manager and terminal multiplexer. It was originally designed to provide elegant enhancements to the otherwise functional, plain, practical GNU Screen, for the Ubuntu server distribution. Byobu now includes an enhanced profiles, convenient keybindings, configuration utilities, and toggle-able system status notifications for both the GNU Screen window manager and the more modern Tmux terminal multiplexer, and works on most Linux, BSD, and Mac distributions.
 LICENSE       = GPLv3
-DEPENDS = cross/tmux cross/screen5
 
 include ../../mk/spksrc.common.mk
 
