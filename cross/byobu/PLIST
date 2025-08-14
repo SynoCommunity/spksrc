@@ -1,3 +1,6 @@
 bin:bin/*
 lib:lib/byobu/*
-lib:share/*
+lib:share/byobu/*
+rsc:share/appdata/*
+rsc:share/doc/byobu/*
+rsc:share/man/man1/*
