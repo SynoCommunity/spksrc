@@ -1,0 +1,3 @@
+bin:bin/*
+lib:lib/byobu/*
+lib:share/*
