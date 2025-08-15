@@ -5,8 +5,6 @@ SPK_ICON = src/byobu.png
 
 DEPENDS = cross/byobu
 
-include ../../mk/spksrc.common.mk
-
 MAINTAINER = tofuhero
 DESCRIPTION = Byobu is a GPLv3 open source text-based window manager and terminal multiplexer. It was originally designed to provide elegant enhancements to the otherwise functional, plain, practical GNU Screen, for the Ubuntu server distribution. Byobu now includes an enhanced profiles, convenient keybindings, configuration utilities, and toggle-able system status notifications for both the GNU Screen window manager and the more modern Tmux terminal multiplexer, and works on most Linux, BSD, and Mac distributions.
 DISPLAY_NAME = byobu
@@ -16,34 +14,32 @@ CHANGELOG = "Initial package release."
 LICENSE  = GPLv3
 HOMEPAGE = https://www.byobu.org/
 
-SERVICE_USER = auto
-
-SPK_COMMANDS  = bin/$(SPK_NAME)
-SPK_COMMANDS += bin/$(SPK_NAME)-ctrl-a
-SPK_COMMANDS += bin/$(SPK_NAME)-disable
-SPK_COMMANDS += bin/$(SPK_NAME)-disable-prompt
-SPK_COMMANDS += bin/$(SPK_NAME)-enable
-SPK_COMMANDS += bin/$(SPK_NAME)-enable-prompt
-SPK_COMMANDS += bin/$(SPK_NAME)-export
-SPK_COMMANDS += bin/$(SPK_NAME)-janitor
-SPK_COMMANDS += bin/$(SPK_NAME)-launch
-SPK_COMMANDS += bin/$(SPK_NAME)-launcher
-SPK_COMMANDS += bin/$(SPK_NAME)-launcher-install
-SPK_COMMANDS += bin/$(SPK_NAME)-launcher-uninstall
-SPK_COMMANDS += bin/$(SPK_NAME)-layout
-SPK_COMMANDS += bin/$(SPK_NAME)-prompt
-SPK_COMMANDS += bin/$(SPK_NAME)-quiet
-SPK_COMMANDS += bin/$(SPK_NAME)-reconnect-sockets
-SPK_COMMANDS += bin/$(SPK_NAME)-select-backend
-SPK_COMMANDS += bin/$(SPK_NAME)-select-profile
-SPK_COMMANDS += bin/$(SPK_NAME)-select-session
-SPK_COMMANDS += bin/$(SPK_NAME)-shell
-SPK_COMMANDS += bin/$(SPK_NAME)-silent
-SPK_COMMANDS += bin/$(SPK_NAME)-status
-SPK_COMMANDS += bin/$(SPK_NAME)-status-detail
-SPK_COMMANDS += bin/$(SPK_NAME)-ugraph
-SPK_COMMANDS += bin/$(SPK_NAME)-ulevel
-SPK_COMMANDS += bin/$(SPK_NAME)-screen
-SPK_COMMANDS += bin/$(SPK_NAME)-tmux
+SPK_COMMANDS  = bin/byobu
+SPK_COMMANDS += bin/byobu-ctrl-a
+SPK_COMMANDS += bin/byobu-disable
+SPK_COMMANDS += bin/byobu-disable-prompt
+SPK_COMMANDS += bin/byobu-enable
+SPK_COMMANDS += bin/byobu-enable-prompt
+SPK_COMMANDS += bin/byobu-export
+SPK_COMMANDS += bin/byobu-janitor
+SPK_COMMANDS += bin/byobu-launch
+SPK_COMMANDS += bin/byobu-launcher
+SPK_COMMANDS += bin/byobu-launcher-install
+SPK_COMMANDS += bin/byobu-launcher-uninstall
+SPK_COMMANDS += bin/byobu-layout
+SPK_COMMANDS += bin/byobu-prompt
+SPK_COMMANDS += bin/byobu-quiet
+SPK_COMMANDS += bin/byobu-reconnect-sockets
+SPK_COMMANDS += bin/byobu-screen
+SPK_COMMANDS += bin/byobu-select-backend
+SPK_COMMANDS += bin/byobu-select-profile
+SPK_COMMANDS += bin/byobu-select-session
+SPK_COMMANDS += bin/byobu-shell
+SPK_COMMANDS += bin/byobu-silent
+SPK_COMMANDS += bin/byobu-status
+SPK_COMMANDS += bin/byobu-status-detail
+SPK_COMMANDS += bin/byobu-tmux
+SPK_COMMANDS += bin/byobu-ugraph
+SPK_COMMANDS += bin/byobu-ulevel
 
 include ../../mk/spksrc.spk.mk
