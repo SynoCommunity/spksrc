@@ -19,7 +19,6 @@ HOMEPAGE = https://www.byobu.org/
 SERVICE_USER = auto
 
 SPK_COMMANDS  = bin/$(SPK_NAME)
-SPK_COMMANDS += bin/$(SPK_NAME)-config
 SPK_COMMANDS += bin/$(SPK_NAME)-ctrl-a
 SPK_COMMANDS += bin/$(SPK_NAME)-disable
 SPK_COMMANDS += bin/$(SPK_NAME)-disable-prompt
@@ -44,5 +43,7 @@ SPK_COMMANDS += bin/$(SPK_NAME)-status
 SPK_COMMANDS += bin/$(SPK_NAME)-status-detail
 SPK_COMMANDS += bin/$(SPK_NAME)-ugraph
 SPK_COMMANDS += bin/$(SPK_NAME)-ulevel
+SPK_COMMANDS += bin/$(SPK_NAME)-screen
+SPK_COMMANDS += bin/$(SPK_NAME)-tmux
 
 include ../../mk/spksrc.spk.mk
