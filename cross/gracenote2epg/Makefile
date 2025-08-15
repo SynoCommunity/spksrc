@@ -1,5 +1,5 @@
 PKG_NAME = gracenote2epg
-PKG_VERS = 1.2
+PKG_VERS = 1.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -23,5 +23,11 @@ gracenote2epg_install:
 	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf $(PKG_NAME).py tv_grab_$(PKG_NAME)
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)
 	install -m 644 $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)/*.py $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)/locales
+	install -m 644 $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)/locales/gracenote2epg.pot $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)/locales
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)/locales/es/LC_MESSAGES
+	install -m 644 $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)/locales/es/LC_MESSAGES/gracenote2epg.po $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)/locales/es/LC_MESSAGES
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)/locales/fr/LC_MESSAGES
+	install -m 644 $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)/locales/fr/LC_MESSAGES/gracenote2epg.po $(STAGING_INSTALL_PREFIX)/bin/$(PKG_NAME)/locales/fr/LC_MESSAGES
 	install -m 750 -d $(STAGING_INSTALL_PREFIX)/var/epggrab/$(PKG_NAME)/conf
 	install -m 640 $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME).xml $(STAGING_INSTALL_PREFIX)/var/epggrab/$(PKG_NAME)/conf

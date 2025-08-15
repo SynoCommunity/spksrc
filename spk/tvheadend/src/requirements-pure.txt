@@ -1,5 +1,6 @@
 #certifi                    ==> python312
 charset-normalizer==3.4.2
 langdetect==1.0.9
+polib==1.2.0
 requests==2.32.4
 urllib3==2.5.0
