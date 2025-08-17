@@ -1,4 +1,5 @@
 rsc:bin/byobu
+rsc:bin/byobu-config
 rsc:bin/byobu-ctrl-a
 rsc:bin/byobu-disable
 rsc:bin/byobu-disable-prompt
