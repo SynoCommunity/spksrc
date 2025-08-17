@@ -21,8 +21,6 @@ CHANGELOG = "Initial package release."
 LICENSE  = GPLv3
 HOMEPAGE = https://www.byobu.org/
 
-POST_STRIP_TARGET = byobu_extra_install
-
 SPK_COMMANDS  = bin/byobu
 SPK_COMMANDS += bin/byobu-config
 SPK_COMMANDS += bin/byobu-ctrl-a
@@ -53,9 +51,3 @@ SPK_COMMANDS += bin/byobu-ugraph
 SPK_COMMANDS += bin/byobu-ulevel
 
 include ../../mk/spksrc.python.mk
-
-.PHONY: byobu_extra_install
-byobu_extra_install:
-	@$(MSG) Install initialization script
-	@install -d -m 755 $(STAGING_DIR)/var
-	@install -m 755 src/initialize-byobu-config.sh $(STAGING_DIR)/var/
