@@ -1,6 +1,6 @@
 SPK_NAME = adminer
-SPK_VERS = 4.8.1
-SPK_REV = 5
+SPK_VERS = 5.3.0
+SPK_REV = 6
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
@@ -11,21 +11,22 @@ DESCRIPTION = Adminer is a full-featured database management tool available for 
 DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet disponible pour MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, ElasticSearch et MongoDB.
 ADMIN_URL = /adminer/
 DISPLAY_NAME = Adminer
-CHANGELOG = "1. Update to v4.8.1<br/>This package depends on Apache 2.4 and PHP 7.4 (except for DSM < 6)."
+CHANGELOG = "1. Update to v5.3.0. <br/>This package depends on Apache 2.4 and PHP 7.4 (except for DSM < 6)."
 
 HOMEPAGE = https://www.adminer.org
 LICENSE  = Apache 2.0 or GPLv2
 
 include ../../mk/spksrc.common.mk
 ##
-## This package can be built for DSM <6.0, DSM >=6.0;<7.0 and DSM >=7.0
+## This package can be built for SRM 1.1, DSM <6.0, DSM >=6.1;<7.0 and DSM >=7.0
 ## To build all versions call:
-## make && make TCVERSION=6.0 && make TCVERSION=7.0 
+## make noarch-1.1 && noarch-3.1 && make noarch-6.1 && make noarch-7.0
 ##
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 SPK_DEPENDS = "WebStation>=2.1.0:PHP7.4>=7.4.0:Apache2.4>=2.4.0"
 CONF_DIR = src/conf
 APACHE_VERSION = 2.4
+SYSTEM_GROUP = http
 else
 APACHE_VERSION = 2.2
 endif
