@@ -11,7 +11,7 @@ DESCRIPTION = Adminer is a full-featured database management tool available for 
 DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet disponible pour MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, ElasticSearch et MongoDB.
 ADMIN_URL = /adminer/
 DISPLAY_NAME = Adminer
-CHANGELOG = "1. Update to v5.3.0. <br/>This package depends on Apache 2.4 and PHP 7.4 (except for DSM < 6)."
+CHANGELOG = "1. Update to v5.3.0. <br/>This package depends on Apache 2.4 (DSM >= 6) and PHP 8.2 (DSM 7) or PHP 7.4 (DSM 6)."
 
 HOMEPAGE = https://www.adminer.org
 LICENSE  = Apache 2.0 or GPLv2
@@ -23,8 +23,13 @@ include ../../mk/spksrc.common.mk
 ## make noarch-1.1 && noarch-3.1 && make noarch-6.1 && make noarch-7.0
 ##
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
-SPK_DEPENDS = "WebStation>=2.1.0:PHP7.4>=7.4.0:Apache2.4>=2.4.0"
-CONF_DIR = src/conf
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+SPK_DEPENDS = "WebStation:PHP8.2:Apache2.4"
+CONF_DIR = src/conf_dsm7
+else
+SPK_DEPENDS = "WebStation:PHP7.4:Apache2.4"
+CONF_DIR = src/conf_dsm6
+endif
 APACHE_VERSION = 2.4
 SYSTEM_GROUP = http
 else
