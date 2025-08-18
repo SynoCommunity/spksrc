@@ -33,6 +33,7 @@ include ../../mk/spksrc.common.mk
 NAME = $(SPK_NAME)
 
 ifneq ($(ARCH),)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 ifneq ($(ARCH),noarch)
 # arch specific packages
 ifneq ($(SPK_PACKAGE_ARCHS),)
@@ -48,7 +49,6 @@ ifeq ($(SPK_NAME_ARCH),)
 SPK_NAME_ARCH = $(ARCH)
 endif
 SPK_TCVERS = $(TCVERSION)
-ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 endif
@@ -79,7 +79,6 @@ else
 SPK_TCVERS = srm
 TC_OS_MIN_VER = 1.1-6931
 endif
-ARCH_SUFFIX = -$(SPK_TCVERS)
 endif
 endif
 
