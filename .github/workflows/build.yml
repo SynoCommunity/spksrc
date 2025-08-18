@@ -78,7 +78,7 @@ jobs:
       has_min_dsm72_packages: ${{ steps.dependencies.outputs.has_min_dsm72_packages }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -246,7 +246,7 @@ jobs:
       matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Cache toolchains
         uses: actions/cache@v4
