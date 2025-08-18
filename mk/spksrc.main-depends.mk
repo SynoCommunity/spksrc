@@ -14,8 +14,8 @@ NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
 
 ifneq ($(ARCH),)
-ifneq ($(ARCH),noarch)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+ifneq ($(ARCH),noarch)
 TC = syno$(ARCH_SUFFIX)
 endif
 endif
