@@ -56,7 +56,7 @@ PYTHON_DEPENDS_EXCLUDE = bzip2 xz zlib
 PYTHON_DEPENDS := $(foreach cross,$(filter-out $(PYTHON_DEPENDS_EXCLUDE),$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $(PYTHON_PACKAGE_WORK_DIR)/.$(cross)-*_done))
 
 # call-up pre-depend to prepare the shared python build environment
-PRE_DEPEND_TARGET = python_pre_depend
+PRE_DEPEND_TARGET += python_pre_depend
 
 else
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
@@ -64,7 +64,11 @@ BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
 endif
 endif
 
+ifneq ($(FFMPEG_PACKAGE),)
+include ../../mk/spksrc.ffmpeg.mk
+else
 include ../../mk/spksrc.spk.mk
+endif
 
 .PHONY: python_pre_depend
 python_pre_depend:
