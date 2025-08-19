@@ -1,2 +1,0 @@
-# gracenote2epg v1.4
-git+https://github.com/th0ma7/tv_grab_gracenote2epg.git@v1.4#egg=gracenote2epg==1.4

@@ -14,6 +14,7 @@ DSM_UI_DIR = app
 export TVH_VERS
 
 FFMPEG_PACKAGE = ffmpeg7
+PYTHON_PACKAGE = python312
 SPK_DEPENDS = 'python312:$(FFMPEG_PACKAGE)'
 
 # PPC archs except qoriq are not supported
@@ -23,7 +24,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 # Force building pure-python wheels to include gracenote2epg
-WHEELS  = src/requirements-crossenv.txt
+WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
 WHEELS += src/requirements-pure.txt
 
 DEPENDS = cross/tvheadend
@@ -53,4 +54,4 @@ SERVICE_PORT_TITLE = Tvheadend (HTTP)
 # Admin link
 ADMIN_PORT = ${SERVICE_PORT}
 
-include ../../mk/spksrc.ffmpeg.mk
+include ../../mk/spksrc.python.mk
