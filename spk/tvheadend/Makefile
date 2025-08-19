@@ -23,8 +23,8 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 # Force building pure-python wheels to include gracenote2epg
-WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
-WHEELS = src/requirements-pure.txt
+WHEELS  = src/requirements-crossenv.txt
+WHEELS += src/requirements-pure.txt
 
 DEPENDS = cross/tvheadend
 DEPENDS += cross/dtv-scan-tables
