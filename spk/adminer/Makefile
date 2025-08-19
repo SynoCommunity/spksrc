@@ -11,20 +11,23 @@ DESCRIPTION = Adminer is a full-featured database management tool available for 
 DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet disponible pour MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, ElasticSearch et MongoDB.
 ADMIN_URL = /adminer/
 DISPLAY_NAME = Adminer
-CHANGELOG = "1. Update to v5.3.0. <br/>This package depends on Apache 2.4 (DSM >= 6) and PHP 8.2 (DSM 7) or PHP 7.4 (DSM 6)."
+CHANGELOG = "1. Update to v5.3.0. <br/>This package depends on Apache 2.4 (DSM >= 6) and PHP 8.2 (DSM 7.2) or PHP 8.0 (DSM 7.0-7.1) or PHP 7.4 (DSM 6)."
 
 HOMEPAGE = https://www.adminer.org
 LICENSE  = Apache 2.0 or GPLv2
 
 include ../../mk/spksrc.common.mk
 ##
-## This package can be built for SRM 1.1, DSM <6.0, DSM >=6.1;<7.0 and DSM >=7.0
+## This package can be built for SRM 1.1, DSM <6.0, DSM >=6.1;<7.0, DSM >=7.0;<7.2 and DSM >=7.2
 ## To build all versions call:
-## make noarch-1.1 && noarch-3.1 && make noarch-6.1 && make noarch-7.0
+## make noarch-1.1 && noarch-3.1 && make noarch-6.1 && make noarch-7.0 && make noarch-7.2
 ##
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-SPK_DEPENDS = "WebStation:PHP8.2:Apache2.4"
+ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
+SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4"
+CONF_DIR = src/conf_dsm72
+else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4"
 CONF_DIR = src/conf_dsm7
 else
 SPK_DEPENDS = "WebStation:PHP7.4:Apache2.4"
