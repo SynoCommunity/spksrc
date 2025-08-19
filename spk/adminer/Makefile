@@ -25,13 +25,15 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
 SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4"
+# DSM >= 7.2
 CONF_DIR = src/conf_dsm72
 else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4"
+# DSM 7.0 and 7.1
 CONF_DIR = src/conf_dsm7
 else
+# DSM 6
 SPK_DEPENDS = "WebStation:PHP7.4:Apache2.4"
-CONF_DIR = src/conf_dsm6
 endif
 APACHE_VERSION = 2.4
 SYSTEM_GROUP = http
@@ -45,7 +47,11 @@ INSTUNINST_RESTART_SERVICES = apache-web
 
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+WIZARDS_DIR = src/wizard7/
+else
 WIZARDS_DIR = src/wizard/
+endif
 
 POST_STRIP_TARGET = adminer_extra_install
 
