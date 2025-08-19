@@ -6,6 +6,9 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/adminer
 
+# SRM is lacking webstation and php
+UNSUPPORTED_ARCHS_TCVERSION = noarch-1.1
+
 MAINTAINER = piwi82
 DESCRIPTION = Adminer is a full-featured database management tool available for MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.
 DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet disponible pour MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, ElasticSearch et MongoDB.
