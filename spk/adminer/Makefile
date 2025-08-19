@@ -18,9 +18,9 @@ LICENSE  = Apache 2.0 or GPLv2
 
 include ../../mk/spksrc.common.mk
 ##
-## This package can be built for SRM 1.1, DSM <6.0, DSM >=6.1;<7.0, DSM >=7.0;<7.2 and DSM >=7.2
+## This package can be built for DSM <6.0, DSM >=6.1;<7.0, DSM >=7.0;<7.2 and DSM >=7.2
 ## To build all versions call:
-## make noarch-1.1 && noarch-3.1 && make noarch-6.1 && make noarch-7.0 && make noarch-7.2
+## noarch-3.1 && make noarch-6.1 && make noarch-7.0 && make noarch-7.2
 ##
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
