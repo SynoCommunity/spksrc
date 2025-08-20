@@ -5,5 +5,5 @@ polib==1.2.0
 requests==2.32.4
 urllib3==2.5.0
 
-# gracenote2epg v1.4
-git+https://github.com/th0ma7/tv_grab_gracenote2epg.git@v1.4#egg=gracenote2epg==1.4
+# gracenote2epg v1.4.1
+git+https://github.com/th0ma7/gracenote2epg.git@v1.4.1#egg=gracenote2epg==1.4.1
