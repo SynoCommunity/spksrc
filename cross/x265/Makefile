@@ -5,8 +5,6 @@ PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265_git/downloads
 PKG_DIR = $(PKG_NAME)_$(PKG_VERS)
 
-OPTIONAL_DEPENDS = native/nasm
-
 HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPL
@@ -14,7 +12,6 @@ LICENSE  = GPL
 PRE_CONFIGURE_TARGET = x265_pre_configure
 PRE_COMPILE_TARGET = x265_pre_compile
 
-CMAKE_USE_NASM = 1
 CMAKE_SOURCE_DIR = source
 
 # Build directories for default, 12 and 10 bit depth
@@ -68,12 +65,6 @@ endif
 
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-D_GLIBCXX_USE_C99_MATH
-endif
-
-# For ppc853x-4.3, disable atomics
-ifeq ($(ARCH)-$(TCVERSION), ppc853x-4.3)
-CMAKE_ARGS += -DNO_ATOMICS=ON
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-DSPKSRC_FIX_PPC853X_4_3"
 endif
 
 .PHONY: x265_pre_configure
