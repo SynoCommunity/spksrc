@@ -1,20 +1,19 @@
 --- Cargo.toml.orig	2025-01-07 19:05:49.000000000 +0000
-+++ Cargo.toml	2025-07-27 12:26:48.357870510 +0000
-@@ -69,6 +69,18 @@
++++ Cargo.toml	2025-08-21 21:48:34.998188150 +0000
+@@ -69,6 +69,17 @@
  execute = { version = "0.2.13", optional = true }
  terminal-colorsaurus = "0.4"
  
 +# Dependencies pinned for Rust 1.77.2
-+#backtrace = "=0.3.74"
 +icu_normalizer = "=1.5.0"
-+#icu_normalizer_data = "=1.5.0"
 +icu_properties_data = "=1.5.1"
 +yoke = "=0.7.5"
 +idna_adapter = "=1.2.0"
 +home = "=0.5.9"
 +litemap = "=0.7.4"
 +zerofrom = "=0.1.5"
-+
++rayon = "=1.10.0"
++rayon-core = "=1.12.1"
 +
  [dependencies.git2]
  version = "0.19"
