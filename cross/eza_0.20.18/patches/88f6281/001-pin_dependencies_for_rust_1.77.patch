@@ -1,5 +1,14 @@
---- Cargo.toml.orig	2025-07-27 13:16:12.629030085 +0000
-+++ Cargo.toml	2025-07-27 13:38:09.220908144 +0000
+--- Cargo.toml.orig	2025-01-23 06:22:45.000000000 +0000
++++ Cargo.toml	2025-08-21 22:16:34.503432392 +0000
+@@ -84,7 +84,7 @@
+ 
+ 
+ [dependencies]
+-rayon = "1.10.0"
++rayon = "=1.10.0"
+ chrono = { version = "0.4.34", default-features = false, features = ["clock"] }
+ nu-ansi-term = { version = "0.50.1", features = [
+   "serde",
 @@ -111,7 +111,16 @@
  serde = { version = "1.0.215", features = ["derive"] }
  dirs = "5.0.1"
@@ -14,7 +23,7 @@
 +potential_utf = "=0.1.0"
 +litemap = "=0.7.4"
 +zerofrom = "=0.1.5"
-+
++rayon-core = "=1.12.1"
  
  [dependencies.git2]
  version = "0.20"
