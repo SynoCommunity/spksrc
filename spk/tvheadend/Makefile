@@ -37,7 +37,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version ec0469c1 as of August 20th 2025 \(Includes season and episode number to filename formatting, Add scene markers to recordings, Add age ratings on XMLTV\)<br/>2. Update zap2epg to version 4.1<br/> 3. Include new gracenote2epg grabber v1.4.1"
+CHANGELOG = "1. Update to latest git version ec0469c1 as of August 20th 2025 \(Includes season and episode number to filename formatting, Add scene markers to recordings, Add age ratings on XMLTV\)<br/>2. Update zap2epg to version 4.1<br/> 3. Include new gracenote2epg grabber v1.5"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
