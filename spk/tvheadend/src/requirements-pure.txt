@@ -1,9 +1,7 @@
 #certifi                    ==> python312
 charset-normalizer==3.4.2
+gracenote2epg==1.5.1
 langdetect==1.0.9
 polib==1.2.0
 requests==2.32.4
 urllib3==2.5.0
-
-# gracenote2epg v1.5
-git+https://github.com/th0ma7/gracenote2epg.git@v1.5#egg=gracenote2epg==1.5
