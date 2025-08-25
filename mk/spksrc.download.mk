@@ -152,7 +152,7 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      if [ -z "$${localFile}" ]; then \
 	        localFile=$$(basename $${url}) ; \
 	      fi ; \
-	      url=$$(echo $${url} | sed -e '#^\(http://sourceforge\.net/.*\)$#\1?use_mirror=autoselect#') ; \
+	      url=$$(echo $${url} | sed -e 's#//ftp.gnu.org/#//ftpmirror.gnu.org/#g') ; \
 	      exec 9> /tmp/wget.$${localFile}.lock ; \
 	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 9 || exit 1 ; \
 	      pid=$$$$ ; \
