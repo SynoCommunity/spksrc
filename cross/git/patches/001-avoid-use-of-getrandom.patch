@@ -1,4 +1,4 @@
-# git version 2.50.0 uses CSPRNG_METHOD="getrandom" for all Linux targets,
+# git version >= 2.50.0 uses CSPRNG_METHOD="getrandom" for all Linux targets,
 # ignoring whether getrandom method (and sys/random.h) is available.
 #
 # getrandom is supported with DSM 7 toolchains (except for comcerto2k),
