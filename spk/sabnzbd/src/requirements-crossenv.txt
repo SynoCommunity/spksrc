@@ -4,7 +4,7 @@ cffi==1.17.1
 charset_normalizer==3.4.3
 cryptography==45.0.6
 CT3==3.4.0
-orjson==3.11.2
+#orjson==3.11.2             ==> supported version depends on rust version
 PyYAML==6.0.2
 sabctools==8.2.6
 ujson==5.10.0

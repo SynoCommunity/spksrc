@@ -55,6 +55,15 @@ SPK_COMMANDS = bin/7zz
 # [cryptography]
 DEPENDS += cross/openssl3
 
+# [orjson]
+# Version = 3.11.1 requires rustc >= 1.82 (qoriq)
+# Version = 3.11.2 requires rustc >= 1.85
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += orjson==3.11.1
+else
+WHEELS += orjson==3.11.2
+endif
+
 include ../../mk/spksrc.python.mk
 
 # prefer native python tools (pip, maturin, ...) used for orjson
