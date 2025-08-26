@@ -1,6 +1,6 @@
-# Generated using the requirements script on July 11, 2025
+# Generated using the requirements script on August 25, 2025
 
-apprise==1.9.3
+apprise==1.9.4
 babelfish==0.6.1
 blinker==1.9.0
 #certifi                        ==> python312
