@@ -1,0 +1,40 @@
+{
+	"webservice": {
+		"pkg_dir_prepare": [{
+			"group": "http",
+			"mode": "0755",
+			"source": "/var/packages/bicbucstriim/target/share/bbs",
+			"target": "bbs",
+			"user": "sc-bicbucstriim"
+		}],
+		"portals": [{
+			"alias": "bbs",
+			"app": "com.synocommunity.packages.bicbucstriim",
+			"name": "BicBucStriim",
+			"service": "BicBucStriim",
+			"type": "alias"
+		}],
+		"services": [{
+			"backend": 2,
+			"display_name": "BicBucStriim",
+			"icon": "app/images/bicbucstriim-{0}.png",
+			"php": {
+				"backend": 11,
+				"extensions": [
+					"gd",
+					"intl",
+					"pdo_sqlite",
+					"sodium",
+					"sqlite3"
+				],
+				"group": "http",
+				"profile_desc": "PHP Profile for bicbucstriim",
+				"profile_name": "bicbucstriim Profile",
+				"user": "sc-bicbucstriim"
+			},
+			"root": "bbs",
+			"service": "BicBucStriim",
+			"type": "apache_php"
+		}]
+	}
+}

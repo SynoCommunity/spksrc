@@ -1,6 +1,6 @@
 SPK_NAME = nano
-SPK_VERS = 7.0
-SPK_REV = 9
+SPK_VERS = 8.3
+SPK_REV = 1
 SPK_ICON = src/nano.png
 
 DEPENDS = cross/nano
@@ -10,8 +10,8 @@ DESCRIPTION = nano is a text editor for Unix-like computing systems or operating
 DESCRIPTION_GER = nano ist ein einfacher Editor, der die Bearbeitung von Dateien in einem Terminal bzw. auf der Konsole erlaubt.
 STARTABLE = no
 
-HOMEPAGE   = http://www.nano-editor.org
-LICENSE    = GPLv2
+HOMEPAGE = http://www.nano-editor.org
+LICENSE = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
 

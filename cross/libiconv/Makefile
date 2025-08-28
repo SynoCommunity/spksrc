@@ -2,7 +2,7 @@ PKG_NAME = libiconv
 PKG_VERS = 1.17
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/pub/gnu/libiconv
+PKG_DIST_SITE = https://ftp.gnu.org/gnu/libiconv
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

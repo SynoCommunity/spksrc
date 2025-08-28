@@ -1,11 +1,11 @@
 PKG_NAME = openldap
-PKG_VERS = 2.6.3
+PKG_VERS = 2.6.4
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.openldap.org/software/download/OpenLDAP/openldap-release
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl
+DEPENDS = cross/openssl3
 
 HOMEPAGE = https://www.openldap.org
 COMMENT  = OpenLDAP Software is an open source implementation of the Lightweight Directory Access Protocol.

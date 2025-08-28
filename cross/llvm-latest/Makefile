@@ -1,5 +1,5 @@
 PKG_NAME = llvm
-PKG_VERS = 16.0.1
+PKG_VERS = 16.0.6
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-project-$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)
@@ -7,11 +7,13 @@ PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS).src
 
 HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies
-LICENSE  = Apache License v2.0 with LLVM Exceptions
+LICENSE = Apache v2.0 with LLVM Exceptions
 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) comcerto2k
 CMAKE_USE_NINJA = 1
+
+POST_INSTALL_TARGET = llvm_post_install
 
 # Using LLVM project source need to change to llvm sub-directory
 CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/llvm
@@ -35,7 +37,7 @@ CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 # linked with the Foreign Function Interface library
 # (libffi) in order to enable calling external functions.
 DEPENDS += cross/libffi
-CMAKE_ARGS += LLVM_ENABLE_FFI=ON
+CMAKE_ARGS += -DLLVM_ENABLE_FFI=ON
 
 DEPENDS += cross/ncursesw
 CMAKE_ARGS += -DLLVM_ENABLE_TERMINFO=ON
@@ -107,3 +109,7 @@ CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
 endif
 
 include ../../mk/spksrc.cross-cmake.mk
+
+.PHONY: llvm_post_install
+llvm_post_install:
+	$(RUN) && cd $(STAGING_INSTALL_PREFIX)/bin && ln -s llvm-readobj llvm-readelf

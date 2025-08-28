@@ -1,0 +1,21 @@
+Subject: [PATCH] avcodec/libopusenc: Allow 5.1(side) channel inputs
+---
+Index: libavcodec/libopusenc.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/libavcodec/libopusenc.c b/libavcodec/libopusenc.c
+--- libavcodec/libopusenc.c	(revision 38aaefefec762dd185b631298752d489dcf084fe)
++++ libavcodec/libopusenc.c	(revision 104006c9a93f3cd72b21b243884ea91449cbdd10)
+@@ -196,6 +196,10 @@
+         av_log(avctx, AV_LOG_WARNING,
+                "No channel layout specified. Opus encoder will use Vorbis "
+                "channel layout for %d channels.\n", avctx->ch_layout.nb_channels);
++    } else if (av_channel_layout_compare(&avctx->ch_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_5POINT1) == 0) {
++        av_log(avctx, AV_LOG_WARNING,
++               "Input channel layout 5.1(side) detected, side channels will be mapped to back channels.\n");
++        return 0;
+     } else if (av_channel_layout_compare(&avctx->ch_layout, &ff_vorbis_ch_layouts[avctx->ch_layout.nb_channels - 1])) {
+         char name[32];
+

@@ -1,5 +1,18 @@
-# Cross-compiled Dependencies
+# Generated using the requirements script on June 15, 2025
 
-MarkupSafe==2.0.1
-PyYAML==6.0
-# Pillow               ==> Makefile
+# NOTE: The following plugins were excluded due to being broken or deprecated:
+# absubmit, docs, import, reflink
+
+# NOTE: Excluded plugins that require background services or desktop environments:
+# aura, bpd, mpdstats, thumbnails, web
+
+charset_normalizer==3.4.2
+#dbus_python                    ==> python/dbus-python          for plugins: metasync
+jellyfish==1.2.0
+#lap>=0.5.12                    ==> python/lap
+lxml==5.4.0
+#numpy>=1.24.4                  ==> python/numpy
+#pillow                         ==> python/pillow               for plugins: embedart, fetchart
+#pycairo                        ==> python/pycairo
+#pygobject                      ==> python/pygobject            for plugins: replaygain
+PyYAML==6.0.2

@@ -1,23 +1,13 @@
 SPK_NAME = sickchill
-SPK_VERS = 20221013
-SPK_REV = 6
+SPK_VERS = 20240301
+SPK_REV = 12
 SPK_ICON = src/sickchill.png
 
-BUILD_DEPENDS = cross/python310
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "${PYTHON_PACKAGE}"
 
-SPK_DEPENDS = "python310"
-
-# [lxml]
-DEPENDS += cross/libxml2
-DEPENDS += cross/libxslt
-
-# [PyNaCl]
-DEPENDS += cross/libsodium
-ENV += SODIUM_INSTALL=system
-
-# [cryptography]
-ENV += PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-ENV += PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# archs without C++11 support are not supported [greenlet]
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
@@ -25,10 +15,10 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "Switched to a wheel based install, as source and git installs are no longer supported by upstream."
+CHANGELOG = "1. Migrate to Python 3.12."
 
-HOMEPAGE   = https://sickchill.github.io/
-LICENSE    = GPLv3+
+HOMEPAGE = https://sickchill.github.io/
+LICENSE = GPLv3+
 
 SERVICE_USER = auto
 
@@ -45,7 +35,30 @@ USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = sickchill_extra_install
 
-include ../../mk/spksrc.spk.mk
+# [cryptography]
+DEPENDS += cross/openssl3
+
+include ../../mk/spksrc.python.mk
+
+# [greenlet]
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+WHEELS += src/requirements-crossenv-greenlet-v3.txt
+else
+WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
+WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
+endif
+
+# [lxml]
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [lxml] -std=c11
+endif
+
+# [msgpack]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [msgpack] -std=c11
+endif
 
 .PHONY: sickchill_extra_install
 sickchill_extra_install:

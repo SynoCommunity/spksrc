@@ -1,12 +1,12 @@
 PKG_NAME = ImageMagick
-PKG_VERS = 7.1.0-52
+PKG_VERS = 7.1.1-33
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ImageMagick/ImageMagick/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-OPTIONAL_DEPENDS = cross/libheif cross/libraw cross/openexr cross/libraqm  cross/librsvg
+OPTIONAL_DEPENDS = cross/libheif cross/libraw cross/openexr cross/libraqm cross/librsvg
 
 DEPENDS  = cross/jemalloc
 DEPENDS += cross/bzip2 
@@ -28,6 +28,12 @@ DEPENDS += cross/djvulibre
 DEPENDS += cross/libtool
 DEPENDS += cross/libfpx
 DEPENDS += cross/fftw
+DEPENDS += cross/liblqr
+
+CONFIGURE_ARGS  = --disable-installed --disable-docs --disable-static
+CONFIGURE_ARGS += --without-perl --without-x
+# magick *++* files fail to add to package by PLIST
+CONFIGURE_ARGS += --without-magick-plus-plus
 
 include ../../mk/spksrc.common.mk
 SUPPORT_CPP11 = 1
@@ -37,12 +43,14 @@ endif
 ifeq ($(call version_lt, $(TCVERSION), 6.0)$(call version_ge, $(TCVERSION), 3.0),11)
 SUPPORT_CPP11 = 0
 endif
+
 ifeq ($(SUPPORT_CPP11),1)
 DEPENDS += cross/libheif
 DEPENDS += cross/libraw
 DEPENDS += cross/openexr
 DEPENDS += cross/libraqm
 DEPENDS += cross/librsvg
+CONFIGURE_ARGS += --with-rsvg
 endif
 
 HOMEPAGE = https://www.imagemagick.org/
@@ -51,13 +59,8 @@ LICENSE  = Apache 2.0
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS  = --disable-installed --disable-docs --disable-static
-CONFIGURE_ARGS += --without-perl --without-x
-CONFIGURE_ARGS += --with-rsvg
 CONFIGURE_ARGS += --with-fpx
 CONFIGURE_ARGS += --with-fftw
-# magick *++* files fail to add to package by PLIST
-CONFIGURE_ARGS += --without-magick-plus-plus
 CONFIGURE_ARGS += --with-jemalloc
 CONFIGURE_ARGS += --with-modules
 CONFIGURE_ARGS += --with-dejavu-font-dir=$(INSTALL_PREFIX)/share/dejavu/fonts

@@ -1,6 +1,6 @@
-bin:bin/gcore
+rsc:bin/gcore
 bin:bin/gdb
-bin:bin/gdb-add-index
+rsc:bin/gdb-add-index
 bin:bin/gdbserver
 bin:bin/run
 lib:lib/libinproctrace.so

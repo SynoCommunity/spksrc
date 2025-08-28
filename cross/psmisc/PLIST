@@ -1,6 +1,5 @@
-bin:bin/pstree
-bin:bin/pslog
-bin:bin/prtstat
-bin:bin/peekfd
-bin:bin/killall
 bin:bin/fuser
+bin:bin/peekfd
+bin:bin/prtstat
+bin:bin/pslog
+bin:bin/pstree

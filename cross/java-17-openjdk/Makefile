@@ -1,8 +1,8 @@
 PKG_NAME = java-17-openjdk
 JAVA_REPO_NAME = jdk17u
 JAVA_NAME = jdk
-JAVA_RELEASE = 10
-JAVA_VERSION = 17.0.6
+JAVA_RELEASE = 7
+JAVA_VERSION = 17.0.16
 PKG_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
@@ -12,7 +12,7 @@ PKG_DIR = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 # build instructions:
 # https://openjdk.java.net/groups/build/doc/building.html
 
-BUILD_DEPENDS = native/openjdk-17 native/zip
+BUILD_DEPENDS = native/openjdk-17
 # Dependencies required at build time only:
 BUILD_DEPENDS += cross/cups
 BUILD_DEPENDS += cross/alsa-lib
@@ -28,9 +28,6 @@ DEPENDS += cross/libpng
 DEPENDS += cross/libjpeg
 DEPENDS += cross/giflib
 DEPENDS += cross/lcms2
-
-ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
-ENV += PATH=$$PATH:$(ZIP_BIN_DIR)
 
 HOMEPAGE = https://openjdk.org/projects/jdk/17/
 COMMENT  = OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by JSR 390 in the Java Community Process.
@@ -71,8 +68,6 @@ CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-d
 CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
 CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --disable-manpages
-CONFIGURE_ARGS += --with-cacerts-file=/etc/ssl/certs/ca-certificates.crt
-CONFIGURE_ARGS += --with-cacerts-src=/etc/ssl/certs
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
 # customize for SynoCommunity
@@ -103,12 +98,17 @@ COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
+ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+# "Intel Short Vector Math Library (SVML)" is built for x64 only
+PLIST_TRANSFORM = sed -e '/lib\/libjsvml.so/d'
+endif
+
 .PHONY: java-17-openjdk_configure
 # Use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS to ignore TC_CONFIGURE_ARGS
 # Disable the normal host build target triplets since openjdk uses its own openjdk-target
 # Avoid the use of $(RUN) since configure complains about env variables
 java-17-openjdk_configure:
-	cd $(WORK_DIR)/$(PKG_DIR) && PATH=$$PATH:$(ZIP_BIN_DIR) && bash ./configure $(CONFIGURE_ARGS)
+	cd $(WORK_DIR)/$(PKG_DIR) && bash ./configure $(CONFIGURE_ARGS)
 
 .PHONY: java-17-openjdk_pre_compile
 # As DESTDIR is not supported we must patch the make file for make install.
@@ -117,7 +117,9 @@ java-17-openjdk_pre_compile:
 
 .PHONY: java-17-openjdk_post_compile
 java-17-openjdk_post_compile:
+	@$(MSG) Link binaries into version independent bin folder
 	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../jvm/openjdk-$(JAVA_VERSION)/bin/* .
+	@$(MSG) Install license files
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/LICENSE                   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ADDITIONAL_LICENSE_INFO   $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -pf $(WORK_DIR)/$(PKG_DIR)/ASSEMBLY_EXCEPTION        $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/

@@ -1,20 +1,22 @@
 SPK_NAME = dotnet-runtime
-SPK_VERS = 6.0.14
-SPK_REV = 4
+SPK_VERS = 6.0.36
+SPK_REV = 7
 SPK_ICON = src/dotnet.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
-DEPENDS = cross/libicu cross/dotnet-runtime
+DEPENDS = cross/dotnet-runtime
 
-# Arch exclusions for dotnet 6.0
+REQUIRED_MIN_DSM = 6.0
+
+# Arch exclusions for dotnet core
 DOTNET_CORE_ARCHS = 1
 
 MAINTAINER = hgy59
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
-CHANGELOG = "1. Update to dotnet-runtime v6.0.14 (security patches).<br/>2. Remove unsupported armv7 archs from provided packages."
+CHANGELOG = "Update to dotnet-runtime v6.0.36 (final dotnet 6 release)."
 
 STARTABLE = no
-DISPLAY_NAME = .NET 6.0 runtime
+DISPLAY_NAME = .NET 6 runtime
 
 HOMEPAGE = https://dotnet.microsoft.com/
 LICENSE  = MIT

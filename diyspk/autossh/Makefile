@@ -1,9 +1,8 @@
 SPK_NAME = autossh
 SPK_VERS = 1.4g
-SPK_REV = 2
-CHANGELOG = "1. Update OpenSSL to v1.1.<br/>2. Update OpenSSH to v8.4."
+SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/autossh
 
 MAINTAINER = chrisellsworth
 DESCRIPTION = Automatically restart SSH sessions and tunnels. autossh is a program to start a copy of ssh and monitor it, restarting it as necessary should it die or stop passing traffic. The idea is from rstunnel (Reliable SSH Tunnel), but implemented in C.

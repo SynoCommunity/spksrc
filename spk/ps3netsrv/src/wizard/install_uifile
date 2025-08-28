@@ -1,58 +1,29 @@
 [
-  {
-    "step_title": "PS3 files location",
-    "items": [
-      {
-        "type": "combobox",
-        "desc": "Please select a volume to use for the PS3 files folder",
-        "subitems": [
-          {
-            "key": "wizard_data_volume",
-            "desc": "Volume name",
-            "displayField": "display_name",
-            "valueField": "volume_path",
-            "editable": false,
-            "mode": "remote",
-            "api_store": {
-              "api": "SYNO.Core.Storage.Volume",
-              "method": "list",
-              "version": 1,
-              "baseParams": {
-                "limit": -1,
-                "offset": 0,
-                "location": "internal"
-              },
-              "root": "volumes",
-              "idProperty": "volume_path",
-              "fields": [
-                "display_name",
-                "volume_path"
-              ]
-            },
-            "validator": {
-              "fn": "{console.log(arguments);return true;}"
-            }
-          }
+    {
+        "step_title": "PS3 files location",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Please specify a shared folder for this package. This share is created at installation when it does not already exist.",
+                "subitems": [
+                    {
+                        "key": "wizard_shared_folder_name",
+                        "desc": "Shared Folder",
+                        "defaultValue": "PS3",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[\\w _-]+$/",
+                                "errorText": "Subdirectories are not supported."              
+                            }
+                        }
+                    }
+                ]
+                }, {
+                    "desc": "If you let the installer create the shared folder, it is created under the same volume as the package is installed. If you want to use a different volume for the share, you must create the shared folder in DSM Control Panel before, and enter the name of the existing share in the field above."
+                }, {
+                    "desc": ""
+                }
         ]
-      },
-      {
-        "type": "textfield",
-        "desc": "Shared folder containing PS3 files (using the volume chosen above)",
-        "subitems": [
-          {
-            "key": "wizard_data_directory",
-            "desc": "Shared folder",
-            "defaultValue": "PS3",
-            "validator": {
-              "allowBlank": false,
-              "regex": {
-                "expr": "/^[\\w _-]+$/",
-                "errorText": "Subdirectories are not supported."
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+    }
 ]

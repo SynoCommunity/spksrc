@@ -16,6 +16,6 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --disable-examples
 CONFIGURE_ARGS += --disable-spec
-ADDITIONAL_CFLAGS = -O
+ADDITIONAL_CFLAGS = -Os
 
 include ../../mk/spksrc.cross-cc.mk

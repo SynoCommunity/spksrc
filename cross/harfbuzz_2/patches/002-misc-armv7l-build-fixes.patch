@@ -1,0 +1,158 @@
+diff -uprN ../harfbuzz-2.9.1-orig/src/hb-cff-interp-common.hh ./src/hb-cff-interp-common.hh
+--- ../harfbuzz-2.9.1-orig/src/hb-cff-interp-common.hh	2021-09-07 11:48:35.000000000 +0000
++++ ./src/hb-cff-interp-common.hh	2025-06-10 00:14:58.828385615 +0000
+@@ -540,7 +540,7 @@ struct op_serializer_t
+ 
+     HBUINT8 *d = c->allocate_size<HBUINT8> (opstr.str.length);
+     if (unlikely (!d)) return_trace (false);
+-    memcpy (d, &opstr.str[0], opstr.str.length);
++    memcpy (d, &opstr.str.operator[](0), opstr.str.length);
+     return_trace (true);
+   }
+ };
+diff -uprN ../harfbuzz-2.9.1-orig/src/hb-iter.hh ./src/hb-iter.hh
+--- ../harfbuzz-2.9.1-orig/src/hb-iter.hh	2021-09-07 11:48:35.000000000 +0000
++++ ./src/hb-iter.hh	2025-06-10 00:10:55.561580338 +0000
+@@ -196,7 +196,7 @@ struct hb_iter_fallback_mixin_t
+   public:
+ 
+   /* Access: Implement __item__(), or __item_at__() if random-access. */
+-  item_t __item__ () const { return (*thiz())[0]; }
++  item_t __item__ () const { return thiz()->operator[](0); }
+   item_t __item_at__ (unsigned i) const { return *(*thiz() + i); }
+ 
+   /* Termination: Implement __more__(), or __len__() if random-access. */
+diff -uprN ../harfbuzz-2.9.1-orig/src/hb-ot-cff2-table.hh ./src/hb-ot-cff2-table.hh
+--- ../harfbuzz-2.9.1-orig/src/hb-ot-cff2-table.hh	2021-09-07 11:48:35.000000000 +0000
++++ ./src/hb-ot-cff2-table.hh	2025-06-10 00:39:03.510889510 +0000
+@@ -464,7 +464,7 @@ struct cff2
+ 	privateDicts[i].init ();
+ 	if (unlikely (!priv_interp.interpret (privateDicts[i]))) { fini (); return; }
+ 
+-	privateDicts[i].localSubrs = &StructAtOffsetOrNull<CFF2Subrs> (&privDictStr[0], privateDicts[i].subrsOffset);
++	privateDicts[i].localSubrs = &StructAtOffsetOrNull<CFF2Subrs> (privDictStr.arrayZ, privateDicts[i].subrsOffset);
+ 	if (privateDicts[i].localSubrs != &Null (CFF2Subrs) &&
+ 	  unlikely (!privateDicts[i].localSubrs->sanitize (&sc)))
+ 	{ fini (); return; }
+diff -uprN ../harfbuzz-2.9.1-orig/src/hb-ot-color-colr-table.hh ./src/hb-ot-color-colr-table.hh
+--- ../harfbuzz-2.9.1-orig/src/hb-ot-color-colr-table.hh	2021-09-07 11:48:35.000000000 +0000
++++ ./src/hb-ot-color-colr-table.hh	2025-06-10 00:14:33.884242757 +0000
+@@ -924,7 +924,7 @@ struct COLR
+     auto glyph_layers = (this+layersZ).as_array (numLayers).sub_array (record->firstLayerIdx,
+ 								       record->numLayers);
+     if (!glyph_layers.length) return;
+-    related_ids->add_array (&glyph_layers[0].glyphId, glyph_layers.length, LayerRecord::min_size);
++    related_ids->add_array (&glyph_layers.operator[](0).glyphId, glyph_layers.length, LayerRecord::min_size);
+   }
+ 
+   void closure_V0palette_indices (const hb_set_t *glyphs,
+diff -uprN ../harfbuzz-2.9.1-orig/src/hb-ot-glyf-table.hh ./src/hb-ot-glyf-table.hh
+--- ../harfbuzz-2.9.1-orig/src/hb-ot-glyf-table.hh	2021-09-07 11:48:35.000000000 +0000
++++ ./src/hb-ot-glyf-table.hh	2025-06-10 00:13:35.369703643 +0000
+@@ -796,10 +796,10 @@ struct glyf
+ 	int v_orig  = (int) header->yMax + glyf_accelerator.vmtx->get_side_bearing (gid);
+ 	unsigned h_adv = glyf_accelerator.hmtx->get_advance (gid);
+ 	unsigned v_adv = glyf_accelerator.vmtx->get_advance (gid);
+-	phantoms[PHANTOM_LEFT].x = h_delta;
+-	phantoms[PHANTOM_RIGHT].x = h_adv + h_delta;
+-	phantoms[PHANTOM_TOP].y = v_orig;
+-	phantoms[PHANTOM_BOTTOM].y = v_orig - (int) v_adv;
++	phantoms.operator[](PHANTOM_LEFT).x = h_delta;
++	phantoms.operator[](PHANTOM_RIGHT).x = h_adv + h_delta;
++	phantoms.operator[](PHANTOM_TOP).y = v_orig;
++	phantoms.operator[](PHANTOM_BOTTOM).y = v_orig - (int) v_adv;
+       }
+ 
+ #ifndef HB_NO_VAR
+@@ -865,7 +865,7 @@ struct glyf
+ 	 * Shift points horizontally by the updated left side bearing
+ 	 */
+ 	contour_point_t delta;
+-	delta.init (-phantoms[PHANTOM_LEFT].x, 0.f);
++	delta.init (-phantoms.operator[](PHANTOM_LEFT).x, 0.f);
+ 	if (delta.x) all_points.translate (delta);
+       }
+ 
+diff -uprN ../harfbuzz-2.9.1-orig/src/hb-ot-var-hvar-table.hh ./src/hb-ot-var-hvar-table.hh
+--- ../harfbuzz-2.9.1-orig/src/hb-ot-var-hvar-table.hh	2021-09-07 11:48:35.000000000 +0000
++++ ./src/hb-ot-var-hvar-table.hh	2025-06-10 00:41:55.044942016 +0000
+@@ -269,8 +269,8 @@ struct hvarvvar_subset_plan_t
+     if (unlikely (!index_map_plans.length || !inner_sets.length || !inner_maps.length)) return;
+ 
+     bool retain_adv_map = false;
+-    index_map_plans[0].init (*index_maps[0], outer_map, inner_sets, plan);
+-    if (index_maps[0] == &Null (DeltaSetIndexMap))
++    index_map_plans[0].init (*(index_maps.arrayZ[0]), outer_map, inner_sets, plan);
++    if (index_maps.arrayZ[0] == &Null (DeltaSetIndexMap))
+     {
+       retain_adv_map = plan->flags & HB_SUBSET_FLAGS_RETAIN_GIDS;
+       outer_map.add (0);
+@@ -365,17 +365,17 @@ struct HVARVVAR
+ 			     const hb_array_t<index_map_subset_plan_t> &im_plans)
+   {
+     TRACE_SERIALIZE (this);
+-    if (im_plans[index_map_subset_plan_t::ADV_INDEX].is_identity ())
++    if (im_plans.operator[](index_map_subset_plan_t::ADV_INDEX).is_identity ())
+       advMap = 0;
+-    else if (unlikely (!advMap.serialize_serialize (c, im_plans[index_map_subset_plan_t::ADV_INDEX])))
++    else if (unlikely (!advMap.serialize_serialize (c, im_plans.operator[](index_map_subset_plan_t::ADV_INDEX))))
+       return_trace (false);
+-    if (im_plans[index_map_subset_plan_t::LSB_INDEX].is_identity ())
++    if (im_plans.operator[](index_map_subset_plan_t::LSB_INDEX).is_identity ())
+       lsbMap = 0;
+-    else if (unlikely (!lsbMap.serialize_serialize (c, im_plans[index_map_subset_plan_t::LSB_INDEX])))
++    else if (unlikely (!lsbMap.serialize_serialize (c, im_plans.operator[](index_map_subset_plan_t::LSB_INDEX))))
+       return_trace (false);
+-    if (im_plans[index_map_subset_plan_t::RSB_INDEX].is_identity ())
++    if (im_plans.operator[](index_map_subset_plan_t::RSB_INDEX).is_identity ())
+       rsbMap = 0;
+-    else if (unlikely (!rsbMap.serialize_serialize (c, im_plans[index_map_subset_plan_t::RSB_INDEX])))
++    else if (unlikely (!rsbMap.serialize_serialize (c, im_plans.operator[](index_map_subset_plan_t::RSB_INDEX))))
+       return_trace (false);
+ 
+     return_trace (true);
+@@ -466,9 +466,9 @@ struct VVAR : HVARVVAR {
+     TRACE_SERIALIZE (this);
+     if (unlikely (!HVARVVAR::serialize_index_maps (c, im_plans)))
+       return_trace (false);
+-    if (!im_plans[index_map_subset_plan_t::VORG_INDEX].get_map_count ())
++    if (!im_plans.operator[](index_map_subset_plan_t::VORG_INDEX).get_map_count ())
+       vorgMap = 0;
+-    else if (unlikely (!vorgMap.serialize_serialize (c, im_plans[index_map_subset_plan_t::VORG_INDEX])))
++    else if (unlikely (!vorgMap.serialize_serialize (c, im_plans.operator[](index_map_subset_plan_t::VORG_INDEX))))
+       return_trace (false);
+ 
+     return_trace (true);
+diff -uprN ../harfbuzz-2.9.1-orig/src/hb-subset-cff-common.hh ./src/hb-subset-cff-common.hh
+--- ../harfbuzz-2.9.1-orig/src/hb-subset-cff-common.hh	2021-09-07 11:48:35.000000000 +0000
++++ ./src/hb-subset-cff-common.hh	2025-06-10 00:37:56.675265445 +0000
+@@ -120,7 +120,7 @@ struct str_encoder_t
+       set_error ();
+       return;
+     }
+-    memcpy (&buff[offset], &str[0], str.length);
++    memcpy (&buff[offset], str.arrayZ, str.length);
+   }
+ 
+   bool is_error () const { return error; }
+@@ -190,7 +190,7 @@ struct cff_font_dict_op_serializer_t : o
+     {
+       HBUINT8 *d = c->allocate_size<HBUINT8> (opstr.str.length);
+       if (unlikely (!d)) return_trace (false);
+-      memcpy (d, &opstr.str[0], opstr.str.length);
++      memcpy (d, opstr.str.arrayZ, opstr.str.length);
+     }
+     return_trace (true);
+   }
+diff -uprN ../harfbuzz-2.9.1-orig/src/hb-subset-input.cc ./src/hb-subset-input.cc
+--- ../harfbuzz-2.9.1-orig/src/hb-subset-input.cc	2021-09-07 11:48:35.000000000 +0000
++++ ./src/hb-subset-input.cc	2025-06-10 00:42:48.635766571 +0000
+@@ -352,7 +352,7 @@ hb_subset_input_drop_tables_set (hb_subs
+ HB_EXTERN hb_set_t *
+ hb_subset_input_set (hb_subset_input_t *input, hb_subset_sets_t set_type)
+ {
+-  return input->sets_iter () [set_type];
++  return input->sets_iter ().arrayZ[set_type];
+ }
+ 
+ /**

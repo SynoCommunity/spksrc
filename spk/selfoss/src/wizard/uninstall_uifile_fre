@@ -1,27 +1,6 @@
 [{
-	"step_title": "Suppression de la base de donnée selfoss",
+	"step_title": "Supprimer la base de données Selfoss",
 	"items": [{
-		"desc": "Si vous supprimez la base de donnée selfoss, tous les flux seront supprimées."
-	}, {
-		"type": "password",
-		"desc": "Saisissez votre mot de passe MySQL",
-		"subitems": [{
-			"key": "wizard_mysql_password_root",
-			"desc": "Mot de passe Root"
-		}]
-	}, {
-		"type": "textfield",
-		"desc": "Facultatif: Fournir répertoire pour l'exportation de base de données. Laissez vide pour sauter à l'exportation. Le répertoire sera créé s'il n'existe pas",
-		"subitems": [{
-			"key": "wizard_dbexport_path",
-			"desc": "L'emplacement de base de données à l'exportation",
-			"validator": {
-				"allowBlank": true,
-				"regex": {
-					"expr": "/^\\\/volume[0-9]+\\\//",
-					"errorText": "Chemin doit commencer avec /volume?/ avec ? le numéro du volume"
-				}
-			}
-		}]
+		"desc": "Attention : La base de données selfoss sera supprimée lors de la désinstallation du package, entraînant la suppression de tous les flux. Vous pouvez éventuellement sauvegarder vos flux en utilisant la fonction « Exporter les sources » dans le menu « Paramètres » pour créer une sauvegarde."
 	}]
 }]

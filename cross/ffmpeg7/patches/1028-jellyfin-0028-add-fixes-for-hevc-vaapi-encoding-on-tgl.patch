@@ -1,0 +1,16 @@
+Index: FFmpeg/libavcodec/vaapi_encode_h265.c
+===================================================================
+--- libavcodec/vaapi_encode_h265.c
++++ libavcodec/vaapi_encode_h265.c
+@@ -452,8 +452,9 @@ static int vaapi_encode_h265_init_sequen
+     sps->log2_min_luma_transform_block_size_minus2   = 0;
+     sps->log2_diff_max_min_luma_transform_block_size = 3;
+     // Full transform hierarchy allowed (2-5).
+-    sps->max_transform_hierarchy_depth_inter = 3;
+-    sps->max_transform_hierarchy_depth_intra = 3;
++    // Default to 2 based on Programmer's Reference Manuals of Intel graphics.
++    sps->max_transform_hierarchy_depth_inter = 2;
++    sps->max_transform_hierarchy_depth_intra = 2;
+     // AMP works.
+     sps->amp_enabled_flag = 1;
+     // SAO and temporal MVP do not work.

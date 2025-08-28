@@ -1,5 +1,5 @@
 PKG_NAME = rmlint
-PKG_VERS = 2.10.1
+PKG_VERS = 2.10.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sahib/rmlint/archive
@@ -19,6 +19,7 @@ COMMENT = rmlint finds space waste and other broken things on your filesystem an
 LICENSE = GPLv3
 
 # PPC archs except QorIQ are not supported
+# missing some features due to glib-2.58.3 (and pcre instead of pcre2)
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 CONFIGURE_TARGET = nop

@@ -1,0 +1,32 @@
+From 52fc8d7dc229c68b87f7dba8be84ade0f0eb430a Mon Sep 17 00:00:00 2001
+From: Victor Mustya <victor.mustya@intel.com>
+Date: Mon, 31 Oct 2022 13:27:02 -0700
+Subject: =?UTF-8?q?[Backport]=20When=20creating=20a=20stack=20space=20for?=
+ =?UTF-8?q?=20inlined=20byval=20args,=0A=20use=20the=20same=20addrspace=20?=
+ =?UTF-8?q?as=20the=20original=20argument.?=
+
+From: Chang-Sun Lin Jr <chang-sun.lin.jr@intel.com>
+---
+ llvm/lib/Transforms/Utils/InlineFunction.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/llvm/lib/Transforms/Utils/InlineFunction.cpp b/llvm/lib/Transforms/Utils/InlineFunction.cpp
+index 923bcc781e47..1d6dca24a4ad 100644
+--- a/llvm/lib/Transforms/Utils/InlineFunction.cpp
++++ b/llvm/lib/Transforms/Utils/InlineFunction.cpp
+@@ -1429,6 +1429,12 @@ static Value *HandleByValArgument(Type *ByValType, Value *Arg,
+                      Arg->getName(), &*Caller->begin()->begin());
+   IFI.StaticAllocas.push_back(cast<AllocaInst>(NewAlloca));
+ 
++  // If the byval was in a different address space, add a cast.
++  if (DL.getAllocaAddrSpace() != Arg->getType()->getPointerAddressSpace()) {
++    NewAlloca = new AddrSpaceCastInst(
++        NewAlloca, Arg->getType(), "",
++        cast<Instruction>(NewAlloca)->getNextNonDebugInstruction());
++  }
+   // Uses of the argument in the function should use our new alloca
+   // instead.
+   return NewAlloca;
+-- 
+2.34.1
+
