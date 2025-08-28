@@ -1,0 +1,15 @@
+# fix mdns_init:
+# - fix error handling when avahi is not available.
+# this is fixed for owntone >= 28.4 (https://github.com/owntone/owntone-server/pull/1479)
+# 
+--- src/mdns_avahi.c.orig	2021-05-21 21:42:05.000000000 +0000
++++ src/mdns_avahi.c	2022-05-22 18:05:20.678625353 +0000
+@@ -1044,7 +1044,7 @@
+ 				 client_callback, NULL, &error);
+   if (!mdns_client)
+     {
+-      DPRINTF(E_WARN, L_MDNS, "mdns_init: Could not create Avahi client: %s\n", MDNSERR);
++      DPRINTF(E_WARN, L_MDNS, "mdns_init: Could not create Avahi client: %s\n", avahi_strerror(error));
+ 
+       return -1;
+     }
