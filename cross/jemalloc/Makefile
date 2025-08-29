@@ -1,5 +1,5 @@
 PKG_NAME = jemalloc
-PKG_VERS = 5.2.1
+PKG_VERS = 5.3.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jemalloc/jemalloc/releases/download/$(PKG_VERS)
