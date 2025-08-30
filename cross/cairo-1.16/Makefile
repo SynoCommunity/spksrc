@@ -7,6 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpng cross/freetype cross/pixman cross/fontconfig cross/glib
 
+# v1.16.0 is the latest version that builds for OLD_PPC and ARMv5 archs
+
 HOMEPAGE = https://www.cairographics.org
 COMMENT  = Cairo is a 2D graphics library with support for multiple output devices.
 LICENSE  = GPLv2
