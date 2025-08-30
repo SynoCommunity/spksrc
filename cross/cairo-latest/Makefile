@@ -7,6 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpng cross/freetype cross/pixman cross/fontconfig cross/glib
 
+# ERROR: Could not get define '__FLOAT_WORD_ORDER__'
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://www.cairographics.org
