@@ -185,13 +185,13 @@ endif
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),comcerto2k $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
 
 # Add SVT-AV1 codec to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),comcerto2k $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
@@ -214,9 +214,6 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te
-ifneq ($(findstring $(ARCH),alpine),$(ARCH))
-CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
-endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))

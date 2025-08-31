@@ -66,9 +66,6 @@ endif
 ninja_compile_target:
 	@$(MSG) - Ninja compile
 	@$(MSG)    - Ninja build path = $(WORK_DIR)/$(PKG_DIR)/$(NINJA_BUILD_DIR)
-ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
-endif
 	$(RUN) ninja -C $(NINJA_BUILD_DIR)
 
 .PHONY: ninja_install_target
