@@ -252,6 +252,9 @@ CONFIGURE_ARGS += --enable-libmfx
 CONFIGURE_ARGS += --enable-vaapi
 endif
 
+# Evaluation of TC_GCC works only after the following include
+include ../../mk/spksrc.cross-cc.mk
+
 ##
 ## x64  & GCC SPECIFIC
 ##
@@ -282,5 +285,3 @@ ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
 DEPENDS += cross/frei0r
 CONFIGURE_ARGS += --enable-frei0r
 endif
-
-include ../../mk/spksrc.cross-cc.mk
