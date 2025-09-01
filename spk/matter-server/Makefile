@@ -1,5 +1,5 @@
 SPK_NAME = matter-server
-SPK_VERS = 8.0.0
+SPK_VERS = 8.1.0
 SPK_REV = 1
 SPK_ICON = src/matter.png
 
@@ -17,7 +17,7 @@ SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 MAINTAINER = SynoCommunity
 DESCRIPTION = The Open Home Foundation Matter Server is an officially certified Software Component to create a Matter controller. It serves as the foundation to provide Matter support to Home Assistant but its universal approach makes it suitable to be used in other projects too. This package conains a custom library for home-assistant-chip-core to allow definition of config data path.
 DISPLAY_NAME = Python Matter Server
-CHANGELOG = "1. Initial package with custom build of home_assistant_chip_core==2025.4.0"
+CHANGELOG = "1. Initial package with custom build of home_assistant_chip_core==2025.7.0"
 
 HOMEPAGE = https://github.com/home-assistant-libs/python-matter-server
 LICENSE  = Apache 2.0
@@ -26,7 +26,7 @@ STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh
 
 FWPORTS = src/matter-server.sc
-ADMIN_PORT = 5580
+SERVICE_PORT = 5580
 
 USE_ALTERNATE_TMPDIR = 1
 

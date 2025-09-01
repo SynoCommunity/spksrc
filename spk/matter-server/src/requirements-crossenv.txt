@@ -1,10 +1,10 @@
-aiohttp==3.12.12
+aiohttp==3.12.15
 cffi==1.17.1
-cryptography==45.0.4
+cryptography==45.0.7
 frozenlist==1.7.0
-#home_assistant_chip_core==2025.4.0     # no source available, prebuilt custom version added to package
-multidict==6.4.4
-orjson==3.10.18
+#home_assistant_chip_core==2025.7.0     # no source available, prebuilt custom version added to package
+multidict==6.6.4
+orjson==3.11.3
 propcache==0.3.2
 PyYAML==6.0.2
 yarl==1.20.1
