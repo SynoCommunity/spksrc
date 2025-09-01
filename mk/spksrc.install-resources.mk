@@ -7,7 +7,6 @@
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -22,12 +21,14 @@ DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
-ifneq ($(ARCH),noarch)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+ifneq ($(ARCH),noarch)
 TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
+# Common directories (must be set after ARCH_SUFFIX)
+include ../../mk/spksrc.directories.mk
 
 #####
 

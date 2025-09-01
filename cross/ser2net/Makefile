@@ -1,5 +1,5 @@
 PKG_NAME = ser2net
-PKG_VERS = 4.6.3
+PKG_VERS = 4.6.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cminyard/ser2net/archive
@@ -23,7 +23,7 @@ POST_INSTALL_TARGET = ser2net_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/gensio_2.6.8
 else ifeq ($(call version_lt, ${TCVERSION}, 6.0)$(call version_ge, ${TCVERSION}, 3.0),11)
 DEPENDS += cross/gensio_2.6.8

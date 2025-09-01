@@ -2,7 +2,7 @@ SPK_NAME = java-21-openjdk
 JAVA_RELEASE = 11
 JAVA_VERSION = 21.0.5
 SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-21-openjdk
@@ -16,7 +16,7 @@ DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 21 is the
 
 STARTABLE = no
 DISPLAY_NAME = Java 21 OpenJDK
-CHANGELOG = "Initial Java 21 package release."
+CHANGELOG = "Removed cacerts-file/src flags — now using default PKCS\#12 truststore."
 
 HOMEPAGE = https://openjdk.org/projects/jdk/21/
 LICENSE_FILE = src/LICENSE

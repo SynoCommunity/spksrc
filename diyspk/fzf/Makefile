@@ -3,7 +3,7 @@ SPK_VERS = 0.58.0
 SPK_REV = 1
 SPK_ICON = src/fzf.png
 
-DEPENDS = cross/fzf_update
+DEPENDS = cross/fzf
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 

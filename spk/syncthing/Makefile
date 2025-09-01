@@ -1,11 +1,10 @@
 SPK_NAME = syncthing
-SPK_VERS = 1.27.2
-SPK_REV = 30
+SPK_VERS = 1.30.0
+SPK_REV = 31
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 
 DEPENDS  = cross/syncthing
-DEPENDS += cross/syncthing-tech-ui
 
 # archs not supported by go
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
@@ -14,7 +13,7 @@ MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
-CHANGELOG = "Update syncthing to v1.27.2."
+CHANGELOG = "1. Update syncthing to v1.30.0 to support new DSM models released in 2025.<br/>2. Remove tech-ui as not supported anymore.<br/><br/>REMARKS: New packages are rarely created because syncthing's automatic package updater is used."
 HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes
@@ -28,10 +27,10 @@ SERVICE_PORT_TITLE = Syncthing Web GUI
 SERVICE_CERT = syncthing_webui
 SERVICE_CERT_RELOAD = tools/ca_reloader.sh
 
-# Admin link for in DSM UI
+# Admin link for in DSM Package Center
 ADMIN_PORT = $(SERVICE_PORT)
 
-FWPORTS = src/${SPK_NAME}.sc
+FWPORTS = src/syncthing.sc
 
 POST_STRIP_TARGET = syncthing_extra_install
 

@@ -1,5 +1,5 @@
 PKG_NAME = gnupg
-PKG_VERS = 2.4.2
+PKG_VERS = 2.4.8
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/gnupg
@@ -24,6 +24,7 @@ CONFIGURE_ARGS += --with-libgcrypt-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-libassuan-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-ksba-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-npth-prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += GPGRT_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/gpgrt-config
 
 ADDITIONAL_CPPFLAGS = -O
 

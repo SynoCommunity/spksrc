@@ -1,5 +1,5 @@
 PKG_NAME = nmap
-PKG_VERS = 7.95
+PKG_VERS = 7.97
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://nmap.org/dist
@@ -16,6 +16,7 @@ LICENSE  = https://svn.nmap.org/nmap/COPYING
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --without-zenmap
+CONFIGURE_ARGS += --without-ndiff
 CONFIGURE_ARGS += --with-liblua=included
 CONFIGURE_ARGS += --with-libpcre=included
 ifneq ($(wildcard $(OPENSSL_STAGING_PREFIX)),)

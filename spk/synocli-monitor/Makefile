@@ -1,6 +1,6 @@
 SPK_NAME = synocli-monitor
 SPK_VERS = 1.7
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/synocli-monitor.png
 
 DEPENDS  = cross/nmon cross/njmon
@@ -34,7 +34,15 @@ MAINTAINER = hgy59
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "1. Add lm-sensors<br/>2. Add ionice (util-linux) and drop ionice of busybox.<br/>3. Fix net-snmp version number."
+CHANGELOG  = "1. Update bandwhich from v0.22.2 to v0.23.1 <br/>"
+CHANGELOG += "2. Update bottom from v0.9.6 to v0.10.2 <br/>"
+CHANGELOG += "3. Update htop from v3.3.0 to v3.4.1 <br/>"
+CHANGELOG += "4. Update ionice from v2.40.1 to v2.41.1 <br/>"
+CHANGELOG += "5. Update iperf2 from v2.2.0 to v2.2.1 <br/>"
+CHANGELOG += "6. Update iperf3 from v3.17.1 to v3.19.1 (some archs support v3.15 only) <br/>"
+CHANGELOG += "7. Update lsof from v4.99.3 to v4.99.5 <br/>"
+CHANGELOG += "8. Update njmon from v81 to v84 <br/>"
+CHANGELOG += "9. Update procs from v0.14.5 to v0.14.10"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.

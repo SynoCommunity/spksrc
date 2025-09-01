@@ -5,9 +5,9 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# This is the latest version that builds for ARMv5 archs.
+# This is the latest version that builds for ARMv5_ARCHS, ARMv7L_ARCHS and x86-5.2
 
-DEPENDS = cross/libuv
+DEPENDS  = cross/libuv_1.34
 DEPENDS += cross/openssl3
 DEPENDS += cross/readline
 DEPENDS += cross/jemalloc

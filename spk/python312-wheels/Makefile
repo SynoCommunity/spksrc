@@ -34,7 +34,6 @@ WHEELS += src/requirements-pure.txt
 SERVICE_SETUP = src/service-setup.sh
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
-OPTIONAL_DEPENDS += python/numpy_ha
 OPTIONAL_DEPENDS += python/numpy
 OPTIONAL_DEPENDS += python/scipy
 
@@ -80,10 +79,19 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# [rencode]
+DEPENDS += python/rencode
+
 # [rpds-py]
-# Version >= 0.22.3 requires rustc >= 1.80
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-rpds-py.txt
+# Require environment variables
+#   PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#   PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Version = 0.24 requires rustc >= 1.82 (qoriq)
+# Version = 0.25 requires rustc >= 1.85
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += rpds_py==0.24.0
+else
+WHEELS += rpds_py==0.25.1
 endif
 
 include ../../mk/spksrc.python.mk
@@ -106,15 +114,23 @@ endif
 DEPENDS += cross/libev cross/c-ares
 ENV += GEVENTSETUP_EMBED_CARES=FALSE
 ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
+ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
+WHEELS += gevent==24.11.1
+else
+WHEELS += gevent==25.5.1
+endif
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [gevent] -std=c11
 endif
 
 # [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-greenlet-v3.txt
-else
-WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
+# version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
+# version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Mandatory require full c++11 support
+# version  = 1.x: gcc <  4.9 (DSM5, DSM6) Last known working version (armv5, hi3535) *** unsupported ***
+ifeq ($(call version_ge, $(TC_GCC), 8),1)
+WHEELS += greenlet==3.2.3
+else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
+WHEELS += greenlet==3.0.3
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
@@ -136,14 +152,16 @@ WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
 # [numpy]
-# gcc-8.4 is the minimal version to build numpy
-# gcc-8.5 happens to be the default version for DSM-7.1
+# version <= 1.25          Mandatory requires c++17, distutils now deprecated *** unsupported ***
+# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
+# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
-DEPENDS += python/numpy_ha
 DEPENDS += python/numpy
+endif
 
-# [scipy] - depends on numpy
+# [scipy] - depends on numpy >= 2.x
+ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
 DEPENDS += python/scipy
 endif
 

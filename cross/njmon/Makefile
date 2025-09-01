@@ -1,7 +1,7 @@
 PKG_NAME = njmon
-PKG_VERS = v81
+PKG_VERS = v84
 PKG_EXT = zip
-PKG_DIST_NAME = $(PKG_NAME)_linux_code_$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)_linux_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/nmon/files
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
@@ -19,12 +19,12 @@ INSTALL_TARGET = njmon_install
 FILE = njmon_linux_$(PKG_VERS).c
 ADDITIONAL_CFLAGS = -g -O4 -lm -o $(PKG_NAME)
 # provide custom info for version string
-VERSION_CFLAGS = -DOSNAME=\"Synology\" -DOSVERSION=\"$(TC_VERS)\" -DHW=\"$(ARCH)\"
+VERSION_CFLAGS = -DOSNAME=\"Synology\" -DOSVERSION=\"$(TC_VERS)\" -DHW=\"$(ARCH)\" -DNJMONVERSION=\"$(subst v,,$(PKG_VERS))\"
 
 include ../../mk/spksrc.cross-cc.mk
 
 # HINT:
-# When building in spksrc/cross/njmon, the variable $(CC) might evaluate to "cc" instead ofthe cross compiler 
+# When building in spksrc/cross/njmon, the variable $(CC) might evaluate to "cc" instead of the cross compiler 
 # of the toolchain.
 # You will get compiler errors about invalid flags (like cc: error: unrecognized command-line option ‘-mfloat-abi=hard’ for comcerto2k-7.1)
 # or targets are built for x86_64.

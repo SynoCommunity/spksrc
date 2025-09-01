@@ -1,13 +1,13 @@
-# Generated using the requirements script on April 11, 2025
+# Generated using the requirements script on August 25, 2025
 
-apprise==1.9.3
+apprise==1.9.4
 babelfish==0.6.1
 blinker==1.9.0
 #certifi                        ==> python312
 chardet==5.2.0
 cheroot==10.0.1
 CherryPy==18.10.0
-click==8.1.8
+click==8.2.1
 configobj==5.0.9
 feedparser==6.0.11
 guessit==3.8.0
@@ -15,27 +15,27 @@ idna==3.10
 jaraco.classes==3.4.0
 jaraco.collections==5.0.0
 jaraco.context==4.3.0
-jaraco.functools==4.1.0
+jaraco_functools==4.2.1
 jaraco.text==3.8.1
-Markdown==3.7
-more_itertools==10.6.0
+markdown==3.8.2
+more_itertools==10.7.0
 notify2==0.3.1
-oauthlib==3.2.2
+oauthlib==3.3.1
 paho_mqtt==1.6.1
 #pip                            ==> python312
-portend==3.2.0
-puremagic==1.28
+portend==3.2.1
+puremagic==1.30
 pycparser==2.22
 PyJWT==2.10.1
 PySocks==1.7.1
 python_dateutil==2.9.0.post0
 pytz==2025.2
 rebulk==3.2.0
-requests==2.32.3
+requests==2.32.4
 requests_oauthlib==2.0.0
 #setuptools                     ==> python312
 sgmllib3k==1.0.0
 #six                            ==> python312
-tempora==5.8.0
-urllib3==2.3.0
+tempora==5.8.1
+urllib3==2.5.0
 zc.lockfile==3.0.post1

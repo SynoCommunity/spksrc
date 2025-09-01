@@ -1,5 +1,5 @@
 SPK_NAME = bottom
-SPK_VERS = 0.6.8
+SPK_VERS = 0.10.2
 SPK_REV = 1
 
 DEPENDS = cross/bottom

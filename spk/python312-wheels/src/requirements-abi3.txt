@@ -7,5 +7,5 @@
 # [pycryptodome] + [pycryptodomex]
 # Require:
 #    - CFLAGS=-sdt=c11 <= gcc-5.0
-pycryptodome==3.21.0
-pycryptodomex==3.21.0
+pycryptodome==3.23.0
+pycryptodomex==3.23.0
