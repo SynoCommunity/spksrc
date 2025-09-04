@@ -1,0 +1,21 @@
+--- Cargo.toml.orig	2023-11-08 02:19:46.000000000 +0000
++++ Cargo.toml	2025-08-22 09:18:17.858361401 +0000
+@@ -28,7 +28,6 @@
+ 
+ [dependencies]
+ regex = "1.10.2"
+-rayon = "1.8.0"
+ unescape = "0.1.0"
+ memmap2 = "0.9.0"
+ tempfile = "3.8.0"
+@@ -37,6 +36,10 @@
+ is-terminal = "0.4.9"
+ clap.workspace = true
+ 
++# Dependencies pinned for Rust 1.77.2
++rayon = "=1.10.0"
++rayon-core = "=1.12.1"
++
+ [dev-dependencies]
+ assert_cmd = "2.0.12"
+ anyhow = "1.0.75"
