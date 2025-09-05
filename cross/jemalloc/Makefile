@@ -7,6 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+
 # jemalloc is a development tool, replacing standard allocator to diagnose memory leaks.
 # It is not included in any package, except to produce test packages for troubleshooting.
 
