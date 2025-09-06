@@ -15,6 +15,8 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 # https://docs.gtk.org/glib/building.html
 CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false
+CONFIGURE_ARGS += -Dtests=false
+CONFIGURE_ARGS += -Dglib_debug=disabled
 CONFIGURE_ARGS += -Dlibmount=disabled
 CONFIGURE_ARGS += -Ddefault_library=shared
 CONFIGURE_ARGS += -Dselinux=disabled
