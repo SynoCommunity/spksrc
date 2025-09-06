@@ -1,5 +1,5 @@
 PKG_NAME = glib
-PKG_VERS = 2.66.8
+PKG_VERS = 2.62.6
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -11,7 +11,7 @@ HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library.
 LICENSE  = LGPLv2.1+
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+REQUIRED_MIN_DSM = 7.1
 
 # https://docs.gtk.org/glib/building.html
 CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false
