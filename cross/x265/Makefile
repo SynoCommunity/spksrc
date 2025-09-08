@@ -32,22 +32,20 @@ ADDITIONAL_CMAKE_ARGS += -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DENABLE_SHARED=ON
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-# asm code is not compatible with arm64/aarch64
+ifeq ($(call version_ge, $(TCVERSION), 7.1),1)
+# asm code is now compatible with arm64/aarch64 for DSM >= 7.1 (except i8mm instructions)
+CMAKE_ARGS += -DENABLE_NEON_I8MM=OFF
+else
+# https://bitbucket.org/multicoreware/x265_git/issues/549/fail-to-build-for-aarch64-and-armhf
 CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
-else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-# asm code for HIGH_BIT_DEPTH is not compatible with 32-bit arch
+endif
+endif
+
+ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
+# asm code for HIGH_BIT_DEPTH is not compatible with 32-bit archs
 CMAKE_ARGS_BITLIB += -DENABLE_ASSEMBLY=OFF
 endif
 
-
-### ifeq ($(findstring $(ARCH),$(ARM_ARCHS) $(PPC_ARCHS)),$(ARCH))
-### # asm code for HIGH_BIT_DEPTH is not compatible with arm64/aarch64
-### # https://bitbucket.org/multicoreware/x265_git/issues/549/fail-to-build-for-aarch64-and-armhf
-### CMAKE_ARGS_BITLIB += -DENABLE_ASSEMBLY=OFF
-### else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-### # asm code for HIGH_BIT_DEPTH is not compatible with 32-bit arch
-### CMAKE_ARGS_BITLIB += -DENABLE_ASSEMBLY=OFF
-### endif
 
 # Fixes:
 #    https://github.com/SynoCommunity/spksrc/issues/5314
