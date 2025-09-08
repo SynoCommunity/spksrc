@@ -1,5 +1,5 @@
 PKG_NAME = harfbuzz
-PKG_VERS = 10.4.0
+PKG_VERS = 11.4.5
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/harfbuzz/harfbuzz/releases/download/$(PKG_VERS)
@@ -7,8 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/freetype cross/glib cross/cairo cross/fontconfig
 
-# Toolchains lacking c++11 compiler ar not
-# supported neither are compiliers <= 4.9
+# Toolchains lacking c++11 compiler are not supported
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 UNSUPPORTED_ARCHS_TCVERSION = x86-5.2
 
