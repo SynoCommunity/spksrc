@@ -1,0 +1,12 @@
+CONFIGURATION_TITLE: "参数配置"
+FREQUENCY_DESCRIPTION:     "获取并检查IP地址是否发生变化的频率。（单位：秒）"
+FREQUENCY_LABEL:          "频率"
+FREQUENCY_ERRORTEXT:    "仅可输入数字"
+
+CACHETIMES_DESCRIPTION: "缓存次数（cachetimes）定义了当IP地址未改变时，跳过与DNS服务提供商比较的次数。"
+CACHETIMES_LABEL:       "缓存次数"
+CACHETIMES_ERRORTEXT:    "仅可输入数字"
+
+INSTALLATION_NOTES_TITLE: "<b>注意事项</b><br/>"
+INSTALLATION_NOTES_TEXT1: "尽管使用 <code>cachetimes</code> 参数可以避免DNS服务提供商施加的流量限制，但如果您通过接口获取IP地址，则需注意接口的流量限制。<br/>"
+INSTALLATION_NOTES_TEXT2: "如果想在安装完成后更改启动参数，可以在 <code>/var/packages/ddns-go/var/environment-variables</code> 这个文件修改。"
