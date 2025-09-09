@@ -24,7 +24,7 @@ include ../../mk/spksrc.cross-meson-env.mk
 URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
 NAME                       = $(TC_NAME)
 COOKIE_PREFIX              = 
-ifneq ($(TC_DIST_FILE),)
+ifneq ($(strip $(TC_DIST_FILE)),)
 LOCAL_FILE                 = $(TC_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
 PKG_DIST_FILE              = $(TC_DIST_FILE)
@@ -94,9 +94,10 @@ cmake_vars:
 	echo
 	@echo "# define target processor" ; \
 	echo "set(CMAKE_SYSTEM_PROCESSOR $(CMAKE_SYSTEM_PROCESSOR))"
-ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+ifneq ($(strip $(CROSS_COMPILE_ARM)),)
 	@echo "set(CROSS_COMPILE_ARM $(CROSS_COMPILE_ARM))"
-else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+endif
+ifneq ($(strip $(CMAKE_ARCH)),)
 	@echo "set(ARCH $(CMAKE_ARCH))"
 endif
 	@echo

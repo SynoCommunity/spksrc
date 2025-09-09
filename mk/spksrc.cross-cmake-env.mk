@@ -150,7 +150,6 @@ ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
   CMAKE_SYSTEM_PROCESSOR = aarch64
-  CROSS_COMPILE_ARM = ON
   CMAKE_CXX_FLAGS += -fPIC
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
