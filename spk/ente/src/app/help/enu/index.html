@@ -1,0 +1,100 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Ente</title>
+        <link href="/webman/help/help.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <h1>Ente</h1>
+        <p><a href="https://ente.io/">Ente</a> is an end-to-end encrypted platform for
+            photos and authenticators. It provides a self-hosted alternative to Google Photos
+            with privacy-first design, allowing you to store and sync your photos securely
+            on your own NAS.</p>
+
+        <h3>Prerequisites</h3>
+        <p><b>⚠️ Important:</b> Ente requires manual setup of PostgreSQL and MinIO before use.</p>
+        <p>You must create a PostgreSQL database first:</p>
+        <ol>
+            <li>SSH into your NAS as admin user</li>
+            <li>Run this one-liner:
+                <br><code>sudo -u postgres createdb sc-ente && sudo -u postgres psql -c "GRANT ALL ON DATABASE \"sc-ente\" TO \"sc-ente\";"</code>
+            </li>
+        </ol>
+        <p><b>Note:</b> This creates a database named <code>sc-ente</code> that matches the service user name, using PostgreSQL's secure peer authentication (no passwords required).</p>
+
+        <h3>Installation</h3>
+        <p>Once you have set up PostgreSQL:</p>
+        <ol>
+            <li>Install Ente through Package Center</li>
+            <li>MinIO will be automatically installed as a dependency</li>
+            <li>The service will be available on port 8097</li>
+            <li>Security keys will be automatically generated during installation</li>
+        </ol>
+        <p>After installation, you'll need to manually create the MinIO storage bucket.</p>
+
+        <h3>Configuration</h3>
+        <p><b>Good news:</b> Most configuration is automatic!</p>
+
+        <h4>Database Settings</h4>
+        <p><b>Automatic:</b> Database connection is pre-configured using Unix socket authentication.</p>
+        <ul>
+            <li>Database: <code>sc-ente</code></li>
+            <li>User: <code>sc-ente</code> (service user)</li>
+            <li>Authentication: Unix socket (no passwords needed)</li>
+            <li>Connection: <code>/run/postgresql</code></li>
+        </ul>
+
+        <h4>Security Keys</h4>
+        <p><b>Automatic:</b> Security keys are automatically generated during installation!</p>
+        <ul>
+            <li>Fresh cryptographic keys created for each installation</li>
+            <li>No manual key generation needed</li>
+            <li>Keys stored securely in <code>/var/packages/ente/var/museum.yaml</code></li>
+        </ul>
+
+        <h3>Usage</h3>
+        <p>After configuration:</p>
+        <ol>
+            <li>Start the service in Package Center</li>
+            <li>Access the web interface at: <code>http://your-nas-ip:8097</code></li>
+            <li>Create an account and start uploading photos</li>
+            <li>Use official Ente mobile apps and configure them to connect to your NAS</li>
+        </ol>
+
+        <h3>Storage Management</h3>
+        <p>Ente uses MinIO for S3-compatible local storage:</p>
+        <ol>
+            <li>Access MinIO web interface: <code>http://your-nas-ip:9001</code></li>
+            <li>Login with default credentials: username <code>minioadmin</code>, password <code>minioadmin</code></li>
+            <li>Create a bucket named <code>ente-data</code></li>
+            <li>Set the bucket policy to allow public read access if needed</li>
+        </ol>
+        <p>Photos will be stored in the <code>ente-data</code> bucket, and you can monitor storage usage through the MinIO interface.</p>
+
+        <h3>Troubleshooting</h3>
+        <p>If you experience issues:</p>
+        <ul>
+            <li>Check service logs at <code>/var/packages/ente/var/data/museum.log</code></li>
+            <li>Verify PostgreSQL database connectivity</li>
+            <li>Ensure MinIO service is running</li>
+            <li>Check that the configured port (8097) is not blocked by firewall</li>
+            <li>Verify storage bucket <code>ente-data</code> exists in MinIO</li>
+        </ul>
+
+        <h3>Security Notes</h3>
+        <ul>
+            <li>Always change default security keys before production use</li>
+            <li>Consider enabling HTTPS for production deployments</li>
+            <li>Regularly backup your PostgreSQL database</li>
+            <li>Keep the package updated</li>
+        </ul>
+
+        <h3>Support</h3>
+        <p>For additional help:</p>
+        <ul>
+            <li><a href="https://help.ente.io/self-hosting">Official Ente self-hosting documentation</a></li>
+            <li><a href="https://github.com/SynoCommunity/spksrc/discussions">SynoCommunity forums</a></li>
+            <li><a href="https://github.com/ente-io/ente">Ente GitHub repository</a></li>
+        </ul>
+    </body>
+</html>
