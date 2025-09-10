@@ -15,7 +15,7 @@ KERNEL_DEPEND = $(KO_ARCH)-$(KO_TCVERSION)
 
 # else only process matching <arch>-<#>
 else
-KERNEL_DEPEND = $(filter $(addsuffix -$(KO_TCVERSION),$(filter-out $(UNSUPPORTED_ARCHS),$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$(KO_ARCH)-$(KO_TCVERSION)/Makefile 2>/dev/null))), $(LEGACY_ARCHS))
+KERNEL_DEPEND = $(subst ../../kernel/syno-,,$(wildcard $(addprefix ../../kernel/syno-,$(filter $(addsuffix -$(KO_TCVERSION),$(filter-out $(UNSUPPORTED_ARCHS),$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$(KO_ARCH)-$(KO_TCVERSION)/Makefile 2>/dev/null))), $(LEGACY_ARCHS)))))
 endif
 
 # end REQUIRE_KERNEL_MODULE
