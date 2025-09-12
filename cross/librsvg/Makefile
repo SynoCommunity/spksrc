@@ -7,6 +7,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/pango cross/libcroco cross/libxml2 cross/gdk-pixbuf
 
+# pango
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS_TCVERSION = x86-5.2
+
 HOMEPAGE = https://wiki.gnome.org/Projects/LibRsvg
 COMMENT  = A library to render SVG images to Cairo surfaces.
 LICENSE  = LGPLv2.1

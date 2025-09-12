@@ -1,5 +1,5 @@
 PKG_NAME = jasper
-PKG_VERS = 3.0.6
+PKG_VERS = 4.2.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jasper-software/jasper/releases/download/version-$(PKG_VERS)
@@ -18,11 +18,10 @@ CMAKE_ARGS += -DJAS_ENABLE_PROGRAMS=OFF
 CMAKE_ARGS += -DJAS_STDC_VERSION=199901L
 CMAKE_ARGS += -DCMAKE_C_FLAGS_RELEASE="-O"
 
-PRE_CONFIGURE_TARGET = jasper_pre_configure
-
 include ../../mk/spksrc.cross-cmake.mk
 
-.PHONY: jasper_pre_configure
-# avoid error as build wants to create $(CMAKE_BUILD_DIR)/build folder
-jasper_pre_configure:
-	mv $(CMAKE_BUILD_DIR)/build $(CMAKE_BUILD_DIR)/build.sh
+# Avoid build dir within source:
+# The useof an in-source build is not officially supported and is 
+# therefore disallowed by default. 
+CMAKE_BUILD_DIR = $(CMAKE_BASE_DIR)/../jasper.build
+CMAKE_ARGS += -B$(CMAKE_BUILD_DIR)

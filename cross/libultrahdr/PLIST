@@ -1,0 +1,3 @@
+lnk:lib/libuhdr.so
+lnk:lib/libuhdr.so.1
+lib:lib/libuhdr.so.1.4.0
