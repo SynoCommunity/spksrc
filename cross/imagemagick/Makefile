@@ -54,12 +54,6 @@ DEPENDS += cross/librsvg
 CONFIGURE_ARGS += --with-rsvg
 endif
 
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
-DEPENDS += cross/libjxl
-DEPENDS += cross/libultrahdr
-CONFIGURE_ARGS += --with-uhdr
-endif
-
 HOMEPAGE = https://www.imagemagick.org/
 COMMENT  = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.
 LICENSE  = Apache 2.0
@@ -88,3 +82,9 @@ endif
 ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk
+
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
+DEPENDS += cross/libjxl
+DEPENDS += cross/libultrahdr
+CONFIGURE_ARGS += --with-uhdr
+endif
