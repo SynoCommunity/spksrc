@@ -12,7 +12,7 @@ DEPENDS += cross/jpegoptim cross/pngcrush
 MAINTAINER = hgy59
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.  This package includes some tools for image compression, that are not part of imagemagick: jpegoptim, a utility to optimize/compress JPEG files; pngcrush an optimizer for png files.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update ImageMagick to v7.1.2-3. <br/>2. Update libraries (cairo, giflib, harfbuzz, jasper, libde265, libpng, libraqm, libraw, libtiff, libwebp, openexr, openjpeg, pixman, x265)."
+CHANGELOG = "1. Update ImageMagick to v7.1.2-3. <br/>2. Add support for JPEG XL and UHDR formats (DSM 7 only). <br/>3. Update libraries (cairo, giflib, harfbuzz, jasper, libde265, libpng, libraqm, libraw, libtiff, libwebp, openexr, openjpeg, pixman, x265)."
 
 STARTABLE = no
 

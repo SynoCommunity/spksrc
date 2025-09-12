@@ -1,0 +1,3 @@
+lnk:lib/libjpeg.so
+lnk:lib/libjpeg.so.9
+lib:lib/libjpeg.so.9.6.0

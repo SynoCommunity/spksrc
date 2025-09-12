@@ -8,6 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 OPTIONAL_DEPENDS = cross/libheif cross/libraw cross/openexr cross/libraqm cross/librsvg
 OPTIONAL_DEPENDS += cross/jemalloc cross/jemalloc_5.2
+OPTIONAL_DEPENDS += cross/libjxl
 
 DEPENDS  = cross/bzip2 
 DEPENDS += cross/xz
@@ -29,6 +30,7 @@ DEPENDS += cross/libtool
 DEPENDS += cross/libfpx
 DEPENDS += cross/fftw
 DEPENDS += cross/liblqr
+DEPENDS += cross/sjpeg
 
 CONFIGURE_ARGS  = --disable-installed --disable-docs --disable-static
 CONFIGURE_ARGS += --without-perl --without-x
@@ -50,6 +52,12 @@ DEPENDS += cross/openexr
 DEPENDS += cross/libraqm
 DEPENDS += cross/librsvg
 CONFIGURE_ARGS += --with-rsvg
+endif
+
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
+DEPENDS += cross/libjxl
+DEPENDS += cross/libultrahdr
+CONFIGURE_ARGS += --with-uhdr
 endif
 
 HOMEPAGE = https://www.imagemagick.org/
