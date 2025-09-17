@@ -11,6 +11,8 @@ LICENSE = Apache v2.0 with LLVM Exceptions
 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) comcerto2k
+REQUIRED_MIN_SRM = 1.3
+
 CMAKE_USE_NINJA = 1
 
 POST_INSTALL_TARGET = llvm_post_install

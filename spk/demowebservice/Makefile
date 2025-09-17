@@ -5,6 +5,9 @@ SPK_ICON = src/demowebservice.png
 
 DEPENDS =
 
+# SRM is not supported due lacking webstation package
+REQUIRED_MIN_SRM = 3.0
+
 override ARCH=noarch
 
 MAINTAINER = hgy59

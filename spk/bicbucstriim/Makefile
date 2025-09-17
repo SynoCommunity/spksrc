@@ -9,6 +9,8 @@ override ARCH=noarch
 
 REQUIRED_MIN_DSM = 7.2
 SPK_DEPENDS = WebStation:PHP8.2:Apache2.4
+# SRM is not supported due lacking php and apache packages
+REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = BicBucStriim streams books, digital books. It fills a gap in the functionality of current NAS devices, which provide access to your collection of music, videos and photos -- but not books. BicBucStriim covers that area and provides web-based access to your e-book collection.
