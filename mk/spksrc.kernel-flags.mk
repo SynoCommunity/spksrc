@@ -123,6 +123,41 @@ endif
 #
 else ifeq ($(strip $(TC_TYPE)),SRM)
 
+#
+# For SRM version >= 1.3
+#
+ifeq ($(shell expr "$(KERNEL_BUILD)" \>= 9346),1)
+
+ifeq ($(KERNEL_URL_VERSION),)
+KERNEL_URL_VERSION = $(KERNEL_VERS)
+endif
+
+ifeq ($(strip $(KERNEL_DIST_SITE)),)
+KERNEL_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/kernels/srm1.3
+endif
+
+ifeq ($(strip $(KERNEL_DIST_NAME)),)
+KERNEL_DIST_NAME = $(KERNEL_ARCH)-$(KERNEL_DIST).$(KERNEL_EXT)
+endif
+
+ifeq ($(strip $(KERNEL_URL_DIR)),)
+KERNEL_URL_DIR = $(KERNEL_ARCH)
+endif
+
+ifeq ($(strip $(KERNEL_PREFIX)),)
+KERNEL_PREFIX = $(KERNEL_DIST)
+endif
+
+ifeq ($(strip $(KERNEL_STRIP)),)
+KERNEL_STRIP = 0
+endif
+
+
+#
+# For SRM version >= 1.2
+#
+else ifeq ($(shell expr "$(KERNEL_BUILD)" \>= 7742),1)
+
 ifeq ($(strip $(KERNEL_DIST_SITE)),)
 KERNEL_DIST_SITE = https://sourceforge.net/projects/dsgpl/files/Synology%20Router%20GPL%20Source/$(KERNEL_BUILD)branch/$(KERNEL_URL_DIR)
 endif
@@ -143,3 +178,5 @@ ifeq ($(strip $(KERNEL_STRIP)),)
 KERNEL_STRIP = 1
 endif
 endif
+
+endif  # For SRM
