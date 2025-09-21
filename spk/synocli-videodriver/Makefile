@@ -8,6 +8,8 @@ DESCRIPTION = "Provides video driver support for Intel GPU acceleration includin
 DISPLAY_NAME = SynoCli Video Drivers
 STARTABLE = no
 
+GCC_DEBUG_INFO := 1
+
 HOMEPAGE = https://github.com/intel/compute-runtime
 LICENSE  = MIT license
 

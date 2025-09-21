@@ -13,6 +13,8 @@ DSM_UI_DIR = app
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
+GCC_DEBUG_INFO := 1
+
 FFMPEG_PACKAGE = ffmpeg7
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = 'python312:$(FFMPEG_PACKAGE)'
