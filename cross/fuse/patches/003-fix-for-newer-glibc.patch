@@ -1,0 +1,42 @@
+# util/ulockmgr_server.c: conditionally define closefrom (fix glibc-2.34+)
+# origin: https://github.com/libfuse/libfuse/pull/619/files
+# 
+--- configure.ac.orig	2019-01-04 13:38:34.000000000 +0000
++++ configure.ac	2025-09-22 20:50:55.284892241 +0000
+@@ -55,6 +55,7 @@
+ 
+ AC_CHECK_FUNCS([fork setxattr fdatasync splice vmsplice utimensat])
+ AC_CHECK_FUNCS([posix_fallocate])
++AC_CHECK_FUNCS([closefrom])
+ AC_CHECK_MEMBERS([struct stat.st_atim])
+ AC_CHECK_MEMBERS([struct stat.st_atimespec])
+ 
+--- util/ulockmgr_server.c.orig	2019-01-04 13:38:34.000000000 +0000
++++ util/ulockmgr_server.c	2025-09-22 20:58:31.306592559 +0000
+@@ -22,6 +22,10 @@
+ #include <sys/socket.h>
+ #include <sys/wait.h>
+ 
++#ifdef HAVE_CONFIG_H
++	#include "config.h"
++#endif
++
+ struct message {
+ 	unsigned intr : 1;
+ 	unsigned nofd : 1;
+@@ -124,6 +128,7 @@
+ 	return res;
+ }
+ 
++#if !defined(HAVE_CLOSEFROM)
+ static int closefrom(int minfd)
+ {
+ 	DIR *dir = opendir("/proc/self/fd");
+@@ -141,6 +146,7 @@
+ 	}
+ 	return 0;
+ }
++#endif
+ 
+ static void send_reply(int cfd, struct message *msg)
+ {
