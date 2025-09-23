@@ -27,6 +27,12 @@ CMAKE_USE_NINJA = 0
 # Limit compile/link-time storage space (and faster build-time)
 GCC_NO_DEBUG_INFO = 1
 
+# Disabling problematic assertions whith build-type Debug
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+  CMAKE_ARGS += -DCMAKE_CXX_FLAGS_DEBUG="$(GCC_DEBUG_FLAGS) -DNDEBUG"
+  CMAKE_ARGS += -DCMAKE_C_FLAGS_DEBUG="$(GCC_DEBUG_FLAGS) -DNDEBUG"
+endif
+
 # Using various LLVM project sources needs a top-level master directory
 CMAKE_BUILD_DIR = $(WORK_DIR)/igc.build
 CMAKE_SOURCE_DIR = $(WORK_DIR)/igc
