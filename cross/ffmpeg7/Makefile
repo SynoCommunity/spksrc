@@ -15,13 +15,19 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include"
 CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
-CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl -lm" --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
+CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl -lm"
+CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
+CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
-CONFIGURE_ARGS += --disable-debug
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+  CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --disable-optimizations --assert-level=2 --enable-ftrapv
+else
+  CONFIGURE_ARGS += --disable-debug
+endif
 
 # Must match $(SPK_REV) from spk/ffmpeg7/Makefile
 CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg7/Makefile)
