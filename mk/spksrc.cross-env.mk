@@ -21,37 +21,6 @@ TOOLKIT_ROOT = $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
 ENV += TOOLKIT_ROOT=$(TOOLKIT_ROOT)
 endif
 
-ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS))
-ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS))
-ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS))
-ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-  # other options to consider: 
-  #GCC_DEBUG_FLAGS += -fsanitize=address -fsanitize=undefined -fstack-protector-all
-  GCC_DEBUG_FLAGS = -ggdb3 -g3
-else
-  GCC_DEBUG_FLAGS = -O3 -fomit-frame-pointer
-endif
-ADDITIONAL_CFLAGS := $(ADDITIONAL_CFLAGS) $(GCC_DEBUG_FLAGS)
-ADDITIONAL_CPPFLAGS := $(ADDITIONAL_CPPFLAGS) $(GCC_DEBUG_FLAGS)
-ADDITIONAL_CXXFLAGS := $(ADDITIONAL_CXXFLAGS) $(GCC_DEBUG_FLAGS)
-
-# gcc:
-#  -g0 deactivates debug information generation
-#  -Os enable some optimizations while avoiding those that increases space
-#  -flto enable optimization at link time (Link Time Optimization)
-#  -ffunction-sections -fdata-sections allows placing functions in their own ELF section
-# ld:
-#  -Wl,--gc-sections allows removing unused functions set previously (-f*-sections)
-#  -w omits the DWARF symbol table removing debugging information
-#  -s strips the symbol table and debug information from the binary
-ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
-GCC_NO_DEBUG_FLAGS = -g0 -Os -ffunction-sections -fdata-sections -fvisibility=hidden
-ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_NO_DEBUG_FLAGS)
-ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_NO_DEBUG_FLAGS)
-ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_NO_DEBUG_FLAGS)
-ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) -w -s -Wl,--gc-sections
-endif
-
 ifneq ($(strip $(TC)),)
 TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
 TC_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
@@ -93,6 +62,42 @@ ifneq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
+endif
+
+# Debug flags:
+#  -ggdb3 generates extensive debug info optimized for GDB
+#  -g3 includes macro definitions in debug info
+#  -O0 disables optimizations for predictable debugging
+#  -gz compresses debug sections to reduce file size (60-80% smaller)
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+  GCC_DEBUG_FLAGS = -ggdb3 -g3 -O0
+
+  # Check compression support and add to flags
+  GCC_SUPPORTS_GZ := $(shell echo | $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -gz -E - 2>/dev/null 1>&2 && echo yes)
+  ifeq ($(strip $(GCC_SUPPORTS_GZ)),yes)
+    GCC_DEBUG_FLAGS += -gz
+  endif
+
+  ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_DEBUG_FLAGS)
+  ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_DEBUG_FLAGS)
+  ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_DEBUG_FLAGS)
+endif
+
+# gcc:
+#  -g0 deactivates debug information generation
+#  -Os enable some optimizations while avoiding those that increases space
+#  -flto enable optimization at link time (Link Time Optimization)
+#  -ffunction-sections -fdata-sections allows placing functions in their own ELF section
+# ld:
+#  -Wl,--gc-sections allows removing unused functions set previously (-f*-sections)
+#  -w omits the DWARF symbol table removing debugging information
+#  -s strips the symbol table and debug information from the binary
+ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
+  GCC_NO_DEBUG_FLAGS = -g0 -Os -ffunction-sections -fdata-sections -fvisibility=hidden
+  ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_NO_DEBUG_FLAGS)
+  ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_NO_DEBUG_FLAGS)
+  ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_NO_DEBUG_FLAGS)
+  ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) -w -s -Wl,--gc-sections
 endif
 
 # Allow toolchain mandatory variables to

@@ -7,12 +7,12 @@ endif
 # We normally build regular Release
 ifeq ($(strip $(CMAKE_BUILD_TYPE)),)
   ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-    CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Debug
+    CMAKE_BUILD_TYPE = Debug
+  else
+    CMAKE_BUILD_TYPE = Release
   endif
-  CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release
-else
-  CMAKE_ARGS += -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
 endif
+CMAKE_ARGS += -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
 
 # Set the default install prefix
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
