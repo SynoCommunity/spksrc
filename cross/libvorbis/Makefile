@@ -14,8 +14,4 @@ LICENSE  = BSD
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static
 
-ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-  COMPILE_MAKE_OPTIONS = debug
-endif
-
 include ../../mk/spksrc.cross-cc.mk
