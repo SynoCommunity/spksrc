@@ -218,7 +218,7 @@ CONFIGURE_ARGS += --disable-armv5te
 CONFIGURE_ARGS += --disable-armv6
 CONFIGURE_ARGS += --disable-armv6t2
 CONFIGURE_ARGS += --disable-vfp
-ifneq ($(findstring $(ARCH),alpine),$(ARCH))
+ifeq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
 endif
