@@ -13,9 +13,6 @@ LICENSE  = GPLv2
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include"
-CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
-CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl -lm"
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic

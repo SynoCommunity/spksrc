@@ -10,18 +10,17 @@ COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and 
 LICENSE  = GPLv2
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
-# no own pkg-config in toolchain:
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
+CONFIGURE_ARGS += --disable-static
+CONFIGURE_ARGS += --disable-doc
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
   CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --disable-optimizations --assert-level=2 --enable-ftrapv
 else
-  CONFIGURE_ARGS += --disable-debug --enable-stripping
+  CONFIGURE_ARGS += --disable-debug
 endif
-CONFIGURE_ARGS += --disable-static
-CONFIGURE_ARGS += --disable-doc
 
 # Must match $(SPK_REV) from spk/ffmpeg6/Makefile
 CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg6/Makefile)
@@ -217,7 +216,7 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te
-ifeq ($(findstring alpine,$(ARCH)),alpine)
+ifeq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
 endif
