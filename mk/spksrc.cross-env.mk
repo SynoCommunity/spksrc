@@ -81,7 +81,6 @@ ifeq ($(strip $(GCC_DEBUG_INFO)),1)
   ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS))
   ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS))
   ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS))
-endif
 
 # gcc:
 #  -g0 deactivates debug information generation
@@ -92,7 +91,7 @@ endif
 #  -Wl,--gc-sections allows removing unused functions set previously (-f*-sections)
 #  -w omits the DWARF symbol table removing debugging information
 #  -s strips the symbol table and debug information from the binary
-ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
+else ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
   GCC_NO_DEBUG_FLAGS = -g0 -Os -ffunction-sections -fdata-sections -fvisibility=hidden
   ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_NO_DEBUG_FLAGS)
   ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_NO_DEBUG_FLAGS)
