@@ -124,10 +124,16 @@ ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	echo
 endif
 endif
-	@echo "# set compiler flags for cross-compiling" ; \
+	@echo "# set default (Release) compiler flags for cross-compiling" ; \
 	echo 'set(CMAKE_C_FLAGS "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)")' ; \
 	echo 'set(CMAKE_CPP_FLAGS "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS)")' ; \
 	echo 'set(CMAKE_CXX_FLAGS "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)")'
+ifeq ($(GCC_DEBUG_INFO),1)
+	@echo "# set Debug compiler flags for cross-compiling" ; \
+	echo 'set(CMAKE_C_FLAGS_DEBUG "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS) $(GCC_DEBUG_FLAGS)")' ; \
+	echo 'set(CMAKE_CPP_FLAGS_DEBUG "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS) $(GCC_DEBUG_FLAGS)")' ; \
+	echo 'set(CMAKE_CXX_FLAGS_DEBUG "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS) $(GCC_DEBUG_FLAGS)")'
+endif
 ifneq ($(strip $(CMAKE_DISABLE_EXE_LINKER_FLAGS)),1)
 	@echo 'set(CMAKE_EXE_LINKER_FLAGS "$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)")'
 endif

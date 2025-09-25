@@ -64,7 +64,7 @@ ENV += $(TC_ENV)
 endif
 endif
 
-# Debug flags:
+# Debug flags (remove any other -O%):
 #  -ggdb3 generates extensive debug info optimized for GDB
 #  -g3 includes macro definitions in debug info
 #  -O0 disables optimizations for predictable debugging
@@ -78,9 +78,9 @@ ifeq ($(strip $(GCC_DEBUG_INFO)),1)
     GCC_DEBUG_FLAGS += -gz
   endif
 
-  ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_DEBUG_FLAGS)
-  ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_DEBUG_FLAGS)
-  ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_DEBUG_FLAGS)
+  ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS))
+  ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS))
+  ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS))
 endif
 
 # gcc:

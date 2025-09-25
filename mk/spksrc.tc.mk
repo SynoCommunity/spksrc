@@ -192,11 +192,11 @@ tc_vars: flag
 	    gcc_version=$$(eval $$(echo $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
 	  fi ; \
 	done ; \
-	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(ADDITIONAL_CFLAGS\)\" ; \
-	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
-	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
+	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
+	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
+	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
 	if [ "$$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | tail -n1)" = "$(TC_VERS)" ]; then \
-	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $$\(ADDITIONAL_FFLAGS\)\" ; \
+	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
 	fi ; \
 	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
 	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
@@ -212,11 +212,11 @@ tc_vars: flag
 	echo TC_TARGET := $(TC_TARGET) ; \
 	echo TC_PREFIX := $(TC_PREFIX) ; \
 	echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/ ; \
-	echo CFLAGS := $(CFLAGS) $$\(ADDITIONAL_CFLAGS\) ; \
-	echo CPPFLAGS := $(CPPFLAGS) $$\(ADDITIONAL_CPPFLAGS\) ; \
-	echo CXXFLAGS := $(CXXFLAGS) $$\(ADDITIONAL_CXXFLAGS\) ; \
+	echo CFLAGS := $(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
+	echo CPPFLAGS := $(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\) ; \
+	echo CXXFLAGS := $(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	if [ "$$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | tail -n1)" = "$(TC_VERS)" ]; then \
-	   echo FFLAGS := $(FFLAGS) $$\(ADDITIONAL_FFLAGS\) ; \
+	   echo FFLAGS := $(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\) ; \
 	fi ; \
 	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
