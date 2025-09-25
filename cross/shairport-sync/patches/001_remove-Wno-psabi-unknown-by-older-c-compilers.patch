@@ -1,7 +1,7 @@
 # remove flag -Wno-psabi as it is not known by older compilers
 #
---- Makefile.am.orig	2023-10-15 19:42:38.000000000 +0200
-+++ Makefile.am	2024-01-21 12:29:19.170277164 +0100
+--- Makefile.am.orig	2025-01-31 14:57:31.000000000 +0000
++++ Makefile.am	2025-09-25 22:15:28.644179313 +0000
 @@ -29,11 +29,11 @@
    AM_CFLAGS = -Wno-multichar -Wall -Wextra -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
  else
@@ -14,6 +14,6 @@
 -  AM_CFLAGS = -fno-common -Wno-multichar -Wall -Wextra -Wno-clobbered -Wno-psabi -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
 +  AM_CXXFLAGS = -fno-common -Wno-multichar -Wall -Wextra -Wno-clobbered -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
 +  AM_CFLAGS = -fno-common -Wno-multichar -Wall -Wextra -Wno-clobbered -pthread -DSYSCONFDIR=\"$(sysconfdir)\"
- endif
+   shairport_sync_SOURCES += scripts/shairport-sync.service scripts/shairport-sync.service-avahi scripts/shairport-sync
  endif
  endif

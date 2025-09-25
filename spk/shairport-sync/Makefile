@@ -1,5 +1,5 @@
 SPK_NAME = shairport-sync
-SPK_VERS = 4.3.2
+SPK_VERS = 4.3.7
 SPK_REV = 3
 SPK_ICON = src/shairport-sync.png
 
@@ -8,7 +8,7 @@ DEPENDS = cross/shairport-sync
 MAINTAINER = SynoCommunity
 DESCRIPTION = AirPlay audio player. Shairport Sync adds multi-room capability with Audio Synchronisation. Requires USB soundcard or speakers.
 DISPLAY_NAME = Shairport Sync
-CHANGELOG = "1. Update to v4.3.2.<br/>2. Update for DSM 7 compatibility.<br/>3. Fix DSM 6 service installation.<br/>4. Add soxr support.<br/>5. Add convolution filter support except for limitted CPUs."
+CHANGELOG = "1. Update to v4.3.7. <br/>2. Update for DSM 7 compatibility. <br/>3. Fix DSM 6 service installation. <br/>4. Add soxr support.<br/> 5. Add convolution filter support except for limitted CPUs."
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
 LICENSE  = Please refer to the individual source files for licenses.
