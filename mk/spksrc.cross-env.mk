@@ -58,11 +58,16 @@ else
 endif
 
 -include $(TC_VARS_MK)
-ifneq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
-endif
+
+# Allow toolchain mandatory variables to
+# be available at all build stages in
+# particular for dependencies (spksrc.depends.mk)
+ENV += TC_GCC=$$(eval $$(echo $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -dumpversion) 2>/dev/null || true)
+ENV += TC_GLIBC=$(TC_GLIBC)
+ENV += TC_KERNEL=$(TC_KERNEL)
 
 # Debug flags (remove any other -O%):
 #  -ggdb3 generates extensive debug info optimized for GDB
@@ -98,10 +103,3 @@ else ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
   ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_NO_DEBUG_FLAGS)
   ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) -w -s -Wl,--gc-sections
 endif
-
-# Allow toolchain mandatory variables to
-# be available at all build stages in
-# particular for dependencies (spksrc.depends.mk)
-ENV += TC_GCC=$$(eval $$(echo $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -dumpversion) 2>/dev/null || true)
-ENV += TC_GLIBC=$(TC_GLIBC)
-ENV += TC_KERNEL=$(TC_KERNEL)

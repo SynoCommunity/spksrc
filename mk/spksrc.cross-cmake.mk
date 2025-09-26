@@ -119,7 +119,7 @@ cmake_configure_target: $(CMAKE_TOOLCHAIN_FILE_PKG)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
 	@$(RUN) rm -rf CMakeCache.txt CMakeFiles
-	@$(RUN_CMAKE) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS) $(CMAKE_DIR)
+	$(RUN_CMAKE) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
 
@@ -127,7 +127,7 @@ cmake_configure_target: $(CMAKE_TOOLCHAIN_FILE_PKG)
 cmake_compile_target:
 	@$(MSG) - CMake compile
 	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
-	@$(RUN_CMAKE) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	$(RUN_CMAKE) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
 
 .PHONY: cmake_install_target
 
@@ -135,9 +135,9 @@ cmake_compile_target:
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
-	@$(RUN_CMAKE) cmake --install $(CMAKE_BUILD_DIR)
+	$(RUN_CMAKE) cmake --install $(CMAKE_BUILD_DIR)
 else
-	@$(RUN_CMAKE) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR)
+	$(RUN_CMAKE) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR)
 endif
 
 .PHONY: cmake_post_install_target
@@ -146,7 +146,7 @@ endif
 # only called when GCC_NO_DEBUG_INFO=1
 cmake_post_install_target:
 	@$(MSG) - CMake post-install \(clean\)
-	@$(RUN_CMAKE) cmake --build $(CMAKE_BUILD_DIR) --target clean
+	$(RUN_CMAKE) cmake --build $(CMAKE_BUILD_DIR) --target clean
 
 
 ### For arch-* and all-<supported|latest>
