@@ -18,6 +18,7 @@ ENV_FILTERED = $(shell env -i $(ENV) sh -c 'env' | \
     awk -F'=' '{if($$2 ~ / /) print $$1"=\""$$2"\""; else print $$0}' | \
     tr '\n' ' ')
 ENV_MESON = $(addprefix -u ,$(VARS_TO_CLEAN)) $(ENV_FILTERED)
+RUN_MESON = cd $(MESON_BASE_DIR) && env $(ENV_MESON)
 
 .PHONY: $(MESON_CROSS_FILE_PKG)
 $(MESON_CROSS_FILE_PKG):
