@@ -119,6 +119,8 @@ endif
 	    echo "set(CMAKE_$${target}_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
 	  elif [ "$${target}" = "LD" ] ; then \
 	    echo "set(CMAKE_LINKER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	  elif [ "$${target}" = "LDSHARED" ] ; then \
+	    echo "set(CMAKE_SHARED_LINKER_FLAGS $$(echo $${source} | cut -f2 -d' '))" ; \
 	  else \
 	    echo "set(CMAKE_$${target} $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
 	  fi ; \
