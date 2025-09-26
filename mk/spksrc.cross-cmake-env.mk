@@ -42,11 +42,6 @@ ifeq ($(filter -DBUILD_SHARED_LIBS%,$(CMAKE_ARGS)),)
 BUILD_SHARED_LIBS = ON
 endif
 
-# Configuration for CMake build
-CMAKE_TOOLCHAIN_NAME = $(ARCH)-toolchain.cmake
-CMAKE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.cmake
-CMAKE_TOOLCHAIN_PKG = $(WORK_DIR)/$(PKG_DIR)/$(CMAKE_TOOLCHAIN_NAME)
-
 # Ensure to unset cross-compiler target toolchain
 # so host toolset can be available to CMAKE
 ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
