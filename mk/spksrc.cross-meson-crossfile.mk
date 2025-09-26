@@ -5,18 +5,8 @@ MESON_CROSS_FILE_NAME = $(ARCH)-crossfile.meson
 MESON_CROSS_FILE_PKG = $(WORK_DIR)/$(PKG_DIR)/$(MESON_CROSS_FILE_NAME)
 CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_FILE_PKG)
 
-# Enforce unsetting all flags as using cross-file with the
-# exception of PKG_CONFIG_LIBDIR to force default pkgconfig.
-empty :=
-space := $(empty) $(empty)
-VARS_TO_CLEAN = AR AS CC CPP CXX LD LDSHARED OBJCOPY OBJDUMP RANLIB READELF STRIP \
-                CFLAGS ADDITIONAL_CFLAGS CPPFLAGS ADDITIONAL_CPPFLAGS \
-                CXXFLAGS ADDITIONAL_CXXFLAGS FFLAGS ADDITIONAL_FFLAGS \
-                LDFLAGS ADDITIONAL_LDFLAGS PKG_CONFIG_PATH SYSROOT
-ENV_FILTERED = $(shell env -i $(ENV) sh -c 'env' | \
-    grep -v -E '^($(subst $(space),|,$(VARS_TO_CLEAN)))=' | \
-    awk -F'=' '{if($$2 ~ / /) print $$1"=\""$$2"\""; else print $$0}' | \
-    tr '\n' ' ')
+# Enforce running in a clean environement to avoid
+# issues between 'build' and 'host' environments
 ENV_MESON = $(addprefix -u ,$(VARS_TO_CLEAN)) $(ENV_FILTERED)
 RUN_MESON = cd $(MESON_BASE_DIR) && env $(ENV_MESON)
 
