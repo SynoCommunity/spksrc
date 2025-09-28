@@ -40,6 +40,7 @@ postinst ()
     if [ "${BUILDNUMBER}" -lt "7321" ]; then
         adduser -h ${INSTALL_DIR}/var -g "${DNAME} User" -G ${LEGACY_GROUP} -s /bin/sh -S -D ${LEGACY_USER}
     fi
+    synouser --add "${USER}" "" "User running haproxy" 0 "" ""
 
     # Edit the configuration according to the wizard
     sed -i -e "s/@user@/${wizard_user:=admin}/g" ${TPL_FILE}
@@ -85,6 +86,7 @@ preuninst ()
 
     if [ "${SYNOPKG_PKG_STATUS}" != "UPGRADE" ]; then
         # Remove the user (if not upgrading)
+        synouser --del "${USER}"
         delgroup ${LEGACY_USER} ${LEGACY_GROUP}
         deluser ${USER}
 
