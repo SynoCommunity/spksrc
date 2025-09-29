@@ -76,8 +76,8 @@ endif
 # cairo is dependency of harfbuzz, dependency of libass
 DEPENDS = cross/cairo
 
-#DEPENDS += cross/codec2
-#CONFIGURE_ARGS += --enable-libcodec2
+DEPENDS += cross/codec2
+CONFIGURE_ARGS += --enable-libcodec2
 
 DEPENDS += cross/libxml2
 CONFIGURE_ARGS += --enable-libxml2
