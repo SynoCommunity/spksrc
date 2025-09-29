@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 7.0.2
+PKG_VERS = 7.0.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -76,8 +76,8 @@ endif
 # cairo is dependency of harfbuzz, dependency of libass
 DEPENDS = cross/cairo
 
-DEPENDS += cross/codec2
-CONFIGURE_ARGS += --enable-libcodec2
+#DEPENDS += cross/codec2
+#CONFIGURE_ARGS += --enable-libcodec2
 
 DEPENDS += cross/libxml2
 CONFIGURE_ARGS += --enable-libxml2

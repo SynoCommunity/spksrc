@@ -949,25 +949,19 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +        light = av_content_light_metadata_create_side_data(frame);
 +    if (!light)
 +        return AVERROR(ENOMEM);
-+
-+    light->MaxCLL  = mpp_light.MaxCLL;
-+    light->MaxFALL = mpp_light.MaxFALL;
  
 -    mpp_frame_deinit(&framecontext->frame);
 -    av_buffer_unref(&framecontext->decoder_ref);
 -    av_buffer_unref(&framecontextref);
-+    return 0;
-+}
++    light->MaxCLL  = mpp_light.MaxCLL;
++    light->MaxFALL = mpp_light.MaxFALL;
  
 -    av_free(desc);
-+static void rkmpp_free_mpp_frame(void *opaque, uint8_t *data)
-+{
-+    MppFrame mpp_frame = (MppFrame)opaque;
-+    mpp_frame_deinit(&mpp_frame);
++    return 0;
  }
  
 -static int rkmpp_retrieve_frame(AVCodecContext *avctx, AVFrame *frame)
-+static void rkmpp_free_drm_desc(void *opaque, uint8_t *data)
++static void rkmpp_free_mpp_frame(void *opaque, uint8_t *data)
  {
 -    RKMPPDecodeContext *rk_context = avctx->priv_data;
 -    RKMPPDecoder *decoder = (RKMPPDecoder *)rk_context->decoder_ref->data;
@@ -977,6 +971,12 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 -    MppFrame mppframe = NULL;
 -    MppBuffer buffer = NULL;
 -    AVDRMFrameDescriptor *desc = NULL;
++    MppFrame mpp_frame = (MppFrame)opaque;
++    mpp_frame_deinit(&mpp_frame);
++}
++
++static void rkmpp_free_drm_desc(void *opaque, uint8_t *data)
++{
 +    AVRKMPPDRMFrameDescriptor *drm_desc = (AVRKMPPDRMFrameDescriptor *)opaque;
 +    av_free(drm_desc);
 +}
@@ -1258,8 +1258,8 @@ Index: FFmpeg/libavcodec/rkmppdec.c
  
 -            frame->hw_frames_ctx = av_buffer_ref(decoder->frames_ref);
 -            if (!frame->hw_frames_ctx) {
--                ret = AVERROR(ENOMEM);
--                goto fail;
+-                av_frame_unref(frame);
+-                return AVERROR(ENOMEM);
 -            }
 +static int rkmpp_get_frame(AVCodecContext *avctx, AVFrame *frame, int timeout)
 +{
