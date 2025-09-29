@@ -1,7 +1,5 @@
 PKG_NAME = libaom
-# Max version compatible due to >= 3.9.0
-# CHANGELOG: Documented minimum required SIMD support: SSE4.1 on x86
-PKG_VERS = 3.8.3
+PKG_VERS = 3.13.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://storage.googleapis.com/aom-releases
@@ -18,8 +16,6 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 # Set working directory
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
 
-CMAKE_USE_NASM = 1
-
 # libaom specific cmake options
 CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1
 
@@ -27,6 +23,12 @@ CMAKE_ARGS += -DENABLE_TESTS=0
 CMAKE_ARGS += -DENABLE_DOCS=0
 CMAKE_ARGS += -DAOM_EXTRA_C_FLAGS=-O
 CMAKE_ARGS += -DAOM_EXTRA_CXX_FLAGS=-O
+
+# Adjusting debug flags for libaom compatibility
+# Debug mode with -O0 fails to build neon and x86 asm
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+  GCC_DEBUG_FLAGS = -ggdb3 -g3 -O1 -gz
+endif
 
 include ../../mk/spksrc.common.mk
 
@@ -54,10 +56,12 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=x86_64
+CMAKE_ARGS += -DENABLE_NASM=ON
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=x86
+CMAKE_ARGS += -DENABLE_NASM=ON
 endif
 
 include ../../mk/spksrc.cross-cmake.mk
