@@ -34,12 +34,14 @@ endif
 	@echo "# set default compiler flags for cross-compiling" ; \
 	echo 'set(CMAKE_C_FLAGS $(strip "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)"))' ; \
 	echo 'set(CMAKE_CPP_FLAGS $(strip "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS)"))' ; \
-	echo 'set(CMAKE_CXX_FLAGS $(strip "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)"))'
+	echo 'set(CMAKE_CXX_FLAGS $(strip "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)"))' ; \
+	echo
 ifeq ($(GCC_DEBUG_INFO),1)
 	@echo "# set Debug compiler extra flags for cross-compiling (and deactivate C/C++ assert)" ; \
-	echo 'set(CMAKE_C_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG"))' ; \
-	echo 'set(CMAKE_CPP_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG"))' ; \
-	echo 'set(CMAKE_CXX_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG"))'
+	echo 'set(CMAKE_C_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug C flags" FORCE)' ; \
+	echo 'set(CMAKE_CPP_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug CPP flags" FORCE)' ; \
+	echo 'set(CMAKE_CXX_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug CXX flags" FORCE)' ; \
+	echo
 endif
 ifneq ($(strip $(CMAKE_DISABLE_EXE_LINKER_FLAGS)),1)
 	@echo 'set(CMAKE_EXE_LINKER_FLAGS $(strip "$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)"))'

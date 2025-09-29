@@ -75,12 +75,14 @@ ENV += TC_KERNEL=$(TC_KERNEL)
 #  -O0 disables optimizations for predictable debugging
 #  -gz compresses debug sections to reduce file size (60-80% smaller)
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-  GCC_DEBUG_FLAGS = -ggdb3 -g3 -O0
+  ifeq ($(strip $(GCC_DEBUG_FLAGS)),)
+    GCC_DEBUG_FLAGS = -ggdb3 -g3 -O0
 
-  # Check compression support and add to flags
-  GCC_SUPPORTS_GZ := $(shell echo | $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -gz -E - 2>/dev/null 1>&2 && echo yes)
-  ifeq ($(strip $(GCC_SUPPORTS_GZ)),yes)
-    GCC_DEBUG_FLAGS += -gz
+    # Check compression support and add to flags
+    GCC_SUPPORTS_GZ := $(shell echo | $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -gz -E - 2>/dev/null 1>&2 && echo yes)
+    ifeq ($(strip $(GCC_SUPPORTS_GZ)),yes)
+      GCC_DEBUG_FLAGS += -gz
+    endif
   endif
 
   ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS))

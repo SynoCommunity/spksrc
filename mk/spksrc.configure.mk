@@ -46,7 +46,7 @@ ifneq ($(strip $(GNU_CONFIGURE)),)
 
   # Enable debug
   ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-    REAL_CONFIGURE_ARGS += --enable-debug --disable-strip
+    REAL_CONFIGURE_ARGS += --enable-debug
   endif
 endif
 REAL_CONFIGURE_ARGS += $(CONFIGURE_ARGS)

@@ -104,25 +104,47 @@ endif
 	@echo "# Disable developer warnings" ; \
 	echo 'set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "Disable developer warnings")'
 	@echo
-	@echo "# define toolchain location (used with CMAKE_TOOLCHAIN_PKG)" ; \
+	@echo "# define toolchain location (used with CMAKE_TOOLCHAIN_FILE_PKG)" ; \
 	echo "set(_CMAKE_TOOLCHAIN_LOCATION $(_CMAKE_TOOLCHAIN_LOCATION))" ; \
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(_CMAKE_TOOLCHAIN_PREFIX))" ; \
 	echo
-	@echo "# define compilers and tools to use" ; \
+	@echo "# define cross-compilers and tools to use" ; \
 	for tool in $(TOOLS) ; \
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  if [ "$${target}" = "CC" ] ; then \
-	    echo "set(CMAKE_C_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
-	    echo "set(CMAKE_$${target}_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LD" ] ; then \
-	    echo "set(CMAKE_LINKER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	    printf "set(%-25s %s)\n" CMAKE_LINKER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LDSHARED" ] ; then \
-	    echo "set(CMAKE_SHARED_LINKER_FLAGS $$(echo $${source} | cut -f2 -d' '))" ; \
+	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS $$(echo $${source} | cut -f2 -d' ') ; \
+	  elif [ "$${target}" = "FC" ] ; then \
+	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
 	  else \
-	    echo "set(CMAKE_$${target} $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target} $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	  fi ; \
+	done ; \
+	echo
+	@echo "# define 'build' compilers and tools to use" ; \
+	for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "CC" ] ; then \
+	    printf "set(%-35s %s)\n" CMAKE_C_COMPILER_FOR_BUILD $$(which $${source}) ; \
+	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
+	    printf "set(%-35s %s)\n" CMAKE_$${target}_COMPILER_FOR_BUILD $$(which $${source}) ; \
+	  elif [ "$${target}" = "LD" ] ; then \
+	    printf "set(%-35s %s)\n" CMAKE_LINKER_FOR_BUILD $$(which $${source}) ; \
+	  elif [ "$${target}" = "LDSHARED" ] ; then \
+	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS_FOR_BUILD $$(echo $${source} | cut -f2 -d' ') ; \
+	  elif [ "$${target}" = "FC" ] ; then \
+	    printf "set(%-35s %s)\n" CMAKE_Fortran_COMPILER_FOR_BUILD $$(which $${source}) ; \
+	  else \
+	    printf "set(%-35s %s)\n" CMAKE_$${target}_FOR_BUILD $$(which $${source}) ; \
 	  fi ; \
 	done ; \
 	echo
