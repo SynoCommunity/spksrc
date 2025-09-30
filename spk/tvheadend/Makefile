@@ -63,6 +63,6 @@ endif
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-#GCC_DEBUG_INFO := 1
+GCC_DEBUG_INFO := 1
 
 include ../../mk/spksrc.python.mk
