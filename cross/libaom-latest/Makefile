@@ -11,14 +11,14 @@ HOMEPAGE = https://aomedia.googlesource.com/aom/
 COMMENT  = AOMedia Video 1 (AV1) is an open, royalty-free video coding format designed for video transmissions over the Internet.
 LICENSE  = Royalty-free
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
 
 # Set working directory
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build
 
 # libaom specific cmake options
 CMAKE_ARGS += -DCONFIG_AV1_ENCODER=1
-
 CMAKE_ARGS += -DENABLE_TESTS=0
 CMAKE_ARGS += -DENABLE_DOCS=0
 CMAKE_ARGS += -DAOM_EXTRA_C_FLAGS=-O
@@ -32,26 +32,13 @@ endif
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DAOM_TARGET_CPU=arm
-endif
-
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=arm
 CMAKE_ARGS += -DENABLE_NEON=OFF
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DAOM_TARGET_CPU=arm64
-ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
-CMAKE_ARGS += -DENABLE_NEON=OFF
-endif
-endif
-
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DAOM_TARGET_CPU=ppc
-# avoid error: AltiVec and SPE instructions cannot coexist
-CMAKE_ARGS += -DENABLE_VSX=0
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
