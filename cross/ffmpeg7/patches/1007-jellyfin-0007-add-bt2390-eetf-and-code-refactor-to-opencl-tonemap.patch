@@ -1922,7 +1922,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
  
      local_work[0]  = 16;
      local_work[1]  = 16;
-@@ -338,13 +854,10 @@ static int tonemap_opencl_filter_frame(A
+@@ -338,10 +854,10 @@ static int tonemap_opencl_filter_frame(A
      AVFilterContext    *avctx = inlink->dst;
      AVFilterLink     *outlink = avctx->outputs[0];
      TonemapOpenCLContext *ctx = avctx->priv;
@@ -1931,12 +1931,9 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
      cl_int cle;
      int err;
 -    double peak = ctx->peak;
--
--    AVHWFramesContext *input_frames_ctx =
--        (AVHWFramesContext*)input->hw_frames_ctx->data;
  
-     av_log(ctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
-            av_get_pix_fmt_name(input->format),
+     AVHWFramesContext *input_frames_ctx;
+ 
 @@ -363,9 +876,6 @@ static int tonemap_opencl_filter_frame(A
      if (err < 0)
          goto fail;

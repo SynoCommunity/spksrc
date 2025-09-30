@@ -23,7 +23,7 @@ CMAKE_BUILD_10B = $(WORK_DIR)/$(PKG_DIR)/build10bit
 CMAKE_ARGS_BITLIB += -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF
 CMAKE_ARGS_BITLIB += -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LINK_FLAGS="-ldl"
 # provide cmake toolchain path when building bitlibs
-CMAKE_ARGS_BITLIB += -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_PKG)
+CMAKE_ARGS_BITLIB += -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE_PKG)
 
 # additional cmake args for the final multilib build
 ADDITIONAL_CMAKE_ARGS += -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-ldl -L."
@@ -70,11 +70,11 @@ PLIST_TRANSFORM = cat
 endif
 
 .PHONY: x265_pre_configure
-x265_pre_configure: $(CMAKE_TOOLCHAIN_PKG)
+x265_pre_configure: $(CMAKE_TOOLCHAIN_FILE_PKG)
 	@$(MSG) Configure 12BIT libraries
-	$(RUN) cmake -S $(WORK_DIR)/$(PKG_DIR)/source -B $(CMAKE_BUILD_12B) $(CMAKE_ARGS) $(CMAKE_ARGS_BITLIB) -DMAIN12=ON -G Ninja
+	$(RUN_CMAKE) cmake -S $(WORK_DIR)/$(PKG_DIR)/source -B $(CMAKE_BUILD_12B) $(CMAKE_ARGS) $(CMAKE_ARGS_BITLIB) -DMAIN12=ON -G Ninja
 	@$(MSG) Configure 10BIT libraries
-	$(RUN) cmake -S $(WORK_DIR)/$(PKG_DIR)/source -B $(CMAKE_BUILD_10B) $(CMAKE_ARGS) $(CMAKE_ARGS_BITLIB) -G Ninja
+	$(RUN_CMAKE) cmake -S $(WORK_DIR)/$(PKG_DIR)/source -B $(CMAKE_BUILD_10B) $(CMAKE_ARGS) $(CMAKE_ARGS_BITLIB) -G Ninja
 
 .PHONY: x265_pre_compile
 x265_pre_compile:
