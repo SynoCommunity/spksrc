@@ -47,10 +47,6 @@ ruamel.yaml.clib==0.2.12
 SQLAlchemy==2.0.41
 zope.interface==7.2
 
-# [lxml]
-# Depends: libxml2, libxslt
-lxml==5.4.0
-
 # [mysqlclient]
 # Depends: mysql-connector-c, mariadb-connector-c
 # Require environment variables
