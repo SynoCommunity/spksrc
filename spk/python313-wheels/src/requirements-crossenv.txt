@@ -33,9 +33,6 @@ cffi==2.0.0
 
 charset_normalizer==3.4.3
 immutables==0.21
-# [llfuse]
-# gcc < 5 requires -std=gnu11 to find "clock_gettime"
-### llfuse==1.5.1
 MarkupSafe==3.0.3
 msgpack==1.0.5              # used compiled verrsion for performance - keep older version for gcc <= 4.9.x
 msgpack_python==0.5.6
@@ -46,6 +43,10 @@ regex==2025.9.18
 ruamel.yaml.clib==0.2.14
 SQLAlchemy==2.0.43
 zope.interface==8.0.1
+
+# [llfuse] ** Does not build on py313 **
+# gcc < 5 requires -std=gnu11 to find "clock_gettime"
+### llfuse==1.5.1
 
 # [mysqlclient]
 # Depends: mysql-connector-c, mariadb-connector-c
