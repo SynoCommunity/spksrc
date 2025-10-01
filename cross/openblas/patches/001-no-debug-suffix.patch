@@ -1,0 +1,16 @@
+--- CMakeLists.txt-orig	2025-01-12 14:02:02.000000000 +0000
++++ CMakeLists.txt	2025-10-01 00:24:15.822271736 +0000
+@@ -303,7 +303,12 @@ endif()
+ 
+ # Set output for libopenblas
+ set_target_properties( ${OpenBLAS_LIBS} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+-set_target_properties( ${OpenBLAS_LIBS} PROPERTIES LIBRARY_OUTPUT_NAME_DEBUG "${OpenBLAS_LIBNAME}_d")
++option(OPENBLAS_DEBUG_SUFFIX "Append _d to library name for Debug builds" ON)
++if(OPENBLAS_DEBUG_SUFFIX)
++  set_target_properties( ${OpenBLAS_LIBS} PROPERTIES LIBRARY_OUTPUT_NAME_DEBUG "${OpenBLAS_LIBNAME}_d")
++else()
++  set_target_properties( ${OpenBLAS_LIBS} PROPERTIES LIBRARY_OUTPUT_NAME_DEBUG "${OpenBLAS_LIBNAME}")
++endif()
+ set_target_properties( ${OpenBLAS_LIBS} PROPERTIES EXPORT_NAME "OpenBLAS")
+ 
+ foreach (OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
