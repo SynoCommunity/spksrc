@@ -65,7 +65,10 @@ endif
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+ifeq ($(call version_lt, $(TC_GCC), 4.8),1)
+WHEELS_CFLAGS += [lxml] -std=gnu99
+WHEELS += lxml==5.4.0
+else ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [lxml] -std=c11
 WHEELS += lxml==5.4.0
 else
