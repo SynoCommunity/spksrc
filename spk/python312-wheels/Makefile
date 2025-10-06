@@ -156,9 +156,9 @@ WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
 # [numpy]
-# version <= 1.25          Mandatory requires c++17, distutils now deprecated *** unsupported ***
-# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
-# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
+# version <= 1.25 -> NOT SUPPORTED WITH PYTHON 3.12
+# version == 1.26 -> Requires gcc >= 8.4 -> DSM-7.1
+# version >= 2.3  -> Requires gcc >= 9.4 -> DSM-7.2
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy

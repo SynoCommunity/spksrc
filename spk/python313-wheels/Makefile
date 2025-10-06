@@ -33,7 +33,6 @@ WHEELS += src/requirements-pure.txt
 
 SERVICE_SETUP = src/service-setup.sh
 
-OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
 OPTIONAL_DEPENDS += python/pandas
 OPTIONAL_DEPENDS += python/scipy
@@ -152,16 +151,15 @@ WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
 # [numpy]
-# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
-# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
+# version == 1.26 -> NOT SUPPORTED WITH PYTHON 3.13
+# version >= 2.3  -> Requires gcc >= 9.4 -> DSM-7.2
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
-DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
 
 # [scipy] - depends on numpy >= 2.x
 DEPENDS += python/scipy
 
-# [scipy] - depends on numpy >= 1.26
+# [scipy] - depends on numpy >= 2.x
 DEPENDS += python/pandas
 endif
 
