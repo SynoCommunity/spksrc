@@ -33,8 +33,8 @@ WHEELS += src/requirements-pure.txt
 
 SERVICE_SETUP = src/service-setup.sh
 
-OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/pandas
 OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
@@ -140,6 +140,9 @@ DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [lxml] -std=c11
+WHEELS += lxml==5.4.0
+else
+WHEELS += lxml==6.0.2
 endif
 
 # [msgpack]
@@ -148,16 +151,16 @@ WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
 # [numpy]
-# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
-# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
+# version == 1.26 -> NOT SUPPORTED WITH PYTHON 3.13
+# version >= 2.3  -> Requires gcc >= 9.4 -> DSM-7.2
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
-DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
-endif
 
 # [scipy] - depends on numpy >= 2.x
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
 DEPENDS += python/scipy
+
+# [scipy] - depends on numpy >= 2.x
+DEPENDS += python/pandas
 endif
 
 # [pycryptodome]
