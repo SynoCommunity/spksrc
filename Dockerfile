@@ -35,6 +35,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	gawk \
 	gettext \
 	git \
+	gobject-introspection \
 	gperf \
 	imagemagick \
 	intltool \
