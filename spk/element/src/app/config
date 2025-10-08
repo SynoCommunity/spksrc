@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.element": {
+            "title": "Element",
+            "desc": "A glossy Matrix collaboration client for the web.",
+            "icon": "images/element-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/element",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}
