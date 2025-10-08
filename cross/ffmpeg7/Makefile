@@ -12,6 +12,8 @@ LICENSE  = GPLv2
 # requires c11 support
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
+include ../../mk/spksrc.common.mk
+
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
@@ -21,8 +23,16 @@ CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-  CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --disable-optimizations --assert-level=2 --enable-ftrapv
+  ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+    # Workaround for gcc-4.8.3 internal compilier bug in debug mode
+    CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2
+    CONFIGURE_ARGS += --extra-cflags=-O1
+  else
+    CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
+  endif
 else
+  # Synology default optimization
+  CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
 endif
 
@@ -31,15 +41,10 @@ CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WO
 
 # Enable Synology specific -hls_seek_time option and other optimizations
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
-
 # Compiler workaround to enable DTS-HD MA stream decoding
 CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
-# Synology default optimization
-CONFIGURE_ARGS += --extra-cflags=-O3
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
-
-include ../../mk/spksrc.common.mk
 
 # ARCH specific
 OPTIONAL_DEPENDS  = cross/openh264
