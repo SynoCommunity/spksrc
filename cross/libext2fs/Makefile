@@ -1,6 +1,6 @@
 PKG_NAME = libext2fs
 # use the same source as for cross/e2fsprogs, but include the shared libraries only.
-PKG_VERS = 1.46.5
+PKG_VERS = 1.47.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = e2fsprogs-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v$(PKG_VERS)
