@@ -76,7 +76,11 @@ ENV += TC_KERNEL=$(TC_KERNEL)
 #  -gz compresses debug sections to reduce file size (60-80% smaller)
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
   ifeq ($(strip $(GCC_DEBUG_FLAGS)),)
-    GCC_DEBUG_FLAGS = -ggdb3 -g3 -O0
+    ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
+      GCC_DEBUG_FLAGS = -ggdb3 -g3 -O1 -fno-omit-frame-pointer
+    else
+      GCC_DEBUG_FLAGS = -ggdb3 -g3 -O0
+    endif
 
     # Check compression support and add to flags
     GCC_SUPPORTS_GZ := $(shell echo | $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -gz -E - 2>/dev/null 1>&2 && echo yes)

@@ -39,17 +39,9 @@ endif
 ifeq ($(GCC_DEBUG_INFO),1)
 	@echo "debug = 'true'" ; \
 	echo "b_ndebug = 'true'" ; \
-	echo "optimization = '0'" ; \
+	echo "optimization = '$(strip $(patsubst -O%,%,$(filter -O%,$(GCC_DEBUG_FLAGS))))'" ; \
 	echo
 endif
-#	@echo "install_rpath = [" ; \
-#	echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | grep '^-Wl,--rpath,' | sed -e "s/^-Wl,--rpath,//" -e "s/^/\t'/" -e "s/$$/',/" ; \
-#	echo -ne "\t]\n" ; \
-#	echo
-#	@echo "runtime_rpath = [" ; \
-#	echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | grep '^-Wl,--rpath,' | sed -e "s/^-Wl,--rpath,//" -e "s/^/\t'/" -e "s/$$/',/" ; \
-#	echo -ne "\t]\n" ; \
-#	echo
 	@echo "c_args = ["
 ifneq ($(strip $(MESON_BUILTIN_C_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_ARGS)',\n"
