@@ -14,7 +14,7 @@ LICENSE  = GPLv3
 INSTALL_TARGET = prowlarr_install
 
 # use digests with multiple files
-PKG_DIST_ARCH_LIST = x86 x64 arm arm64
+PKG_DIST_ARCH_LIST = x64 arm arm64
 
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
