@@ -6,7 +6,7 @@ SPK_ICON = src/prowlarr.png
 OPTIONAL_DEPENDS = cross/libstdc++
 DEPENDS = cross/prowlarr
 
-# Arch exclusions for dotnet 6.0
+# Arch exclusions for dotnet
 DOTNET_CORE_ARCHS = 1
 
 MAINTAINER = Team Prowlarr
