@@ -31,9 +31,9 @@ ifeq ($(strip $(GCC_DEBUG_INFO)),1)
     CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
   endif
 else
-  # Synology default optimization
   CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
+  CONFIGURE_ARGS += --enable-lto
 endif
 
 # Must match $(SPK_REV) from spk/ffmpeg7/Makefile
@@ -215,7 +215,6 @@ ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
 CONFIGURE_ARGS += --enable-thumb
-CONFIGURE_ARGS += --enable-lto
 CONFIGURE_ARGS += --disable-armv5te
 CONFIGURE_ARGS += --disable-armv6
 CONFIGURE_ARGS += --disable-armv6t2
@@ -229,14 +228,12 @@ ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm64
 CONFIGURE_ARGS += --enable-neon
 CONFIGURE_ARGS += --enable-thumb
-CONFIGURE_ARGS += --enable-lto
 endif
 
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
-CONFIGURE_ARGS += --enable-lto
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
@@ -254,7 +251,6 @@ DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
 endif
 CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-lto
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-libmfx
 CONFIGURE_ARGS += --enable-vaapi
