@@ -74,12 +74,21 @@ ENV += TC_KERNEL=$(TC_KERNEL)
 #  -g3 includes macro definitions in debug info
 #  -O0 disables optimizations for predictable debugging
 #  -gz compresses debug sections to reduce file size (60-80% smaller)
+#
+# PowerPC e500v2 (qoriq): Use -O1 to avoid stack frame offset limitations
+# (e500v2 has 248-byte max offset for certain load/store instructions)
+#
+# GCC 4.8.3 (hi3535/armv7l) with old binutils cannot handle compressed
+# debug sections from -g3. Use -g (level 2) instead which generates
+# less debug info and avoids compression
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
   ifeq ($(strip $(GCC_DEBUG_FLAGS)),)
     ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
       GCC_DEBUG_FLAGS = -ggdb3 -g3 -O1 -fno-omit-frame-pointer
+    else ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+      GCC_DEBUG_FLAGS = -ggdb3 -g3 -O1 -fno-omit-frame-pointer
     else
-      GCC_DEBUG_FLAGS = -ggdb3 -g3 -O0
+      GCC_DEBUG_FLAGS = -ggdb3 -g -O0
     endif
 
     # Check compression support and add to flags
