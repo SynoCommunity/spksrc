@@ -11,6 +11,7 @@ SPK_DEPENDS = $(PYTHON_PACKAGE)
 # unsupported wheels: deebot_client, numpy, pymicro_vad, pyspeex_noise, and others
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 # mandatory wheel not available (av):
 # It is possible to build for armv7, but av==13.1.0 is not available, and the

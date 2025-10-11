@@ -9,6 +9,7 @@ DEPENDS = cross/ncursesw cross/readline
 
 REQUIRED_MIN_DSM = 7
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://github.com/jarun/nnn
 COMMENT  = n³ The unorthodox terminal file manager.

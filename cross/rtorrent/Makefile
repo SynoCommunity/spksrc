@@ -14,6 +14,7 @@ LICENSE  = GPL
 # Requires compiler with C++14 support
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = rtorrent_pre_configure

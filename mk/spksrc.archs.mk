@@ -63,21 +63,20 @@ DEPRECATED_ARCHS = powerpc ppc824x ppc854x ppc853x
 # 4. Certain combinations of ARMv7 and DSM are incompatible (issues #4790, #5089, #5302, #5315)
 # 5. Comprehensive ARMv7 testing conducted under issue #5574 resulted in the following exclusions
 
-# Exclusions for dotnet 6.0 core apps
+# Exclusions for dotnet core apps
 ifeq ($(strip $(DOTNET_CORE_ARCHS)),1)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) armada370 alpine comcerto2k
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.2.4 armv7-1.2 armv7-1.3
 endif
 
 # Exclusions for dotnet 6.0 servarr apps (except x86)
 ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.2.4 armv7-1.2 armv7-1.3
 endif
 
 # Exclusions for dotnet 6.0 servarr apps (except x86)
 # ARMv7 incompatibility — see: https://github.com/dotnet/runtime/issues/109739
 ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),2)
-    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k $(ARMv7_ARCHS)
-    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
+    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)
 endif

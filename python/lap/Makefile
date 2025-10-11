@@ -12,6 +12,7 @@ LICENSE  = BSD-2-Clause license
 # Requires gcc>=8.4 to build sucesfully
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 DEPENDS  = python/numpy
 
