@@ -15,7 +15,7 @@ DEPENDS += cross/unrar
 MAINTAINER = smaarn
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
-CHANGELOG = 'Update bazarr to 1.5.3. <br/>See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.3">1.5.3</a> for more details.'
+CHANGELOG = '1. Update bazarr to 1.5.3 See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.3">1.5.3</a> for more details.<br />2. upgrade lxml 5.4.0 =&gt; 6.0.2'
 
 HOMEPAGE  = https://www.bazarr.media/
 LICENSE   = GPLv3

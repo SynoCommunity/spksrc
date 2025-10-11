@@ -1,6 +1,6 @@
 # Generated using the requirements script on June 1, 2025
 
-lxml==5.4.0
+lxml==6.0.2
 #numpy                      ==> python/numpy
 #pillow                     ==> python/pillow
 webrtcvad_wheels==2.0.14
