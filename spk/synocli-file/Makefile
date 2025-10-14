@@ -126,19 +126,20 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Update detox from v2.0.0 to v3.0.1. <br/>"
-CHANGELOG += "2. Update eza from v0.20.18 to v0.23.0 (except for ARMv5). <br/>"
-CHANGELOG += "3. Update fdupes from v2.3.2 to v2.4.0. <br/>"
-CHANGELOG += "4. Update fzf from v0.58.0 to v0.65.0. <br/>"
-CHANGELOG += "5. Update less from v668 to v679. <br/>"
-CHANGELOG += "6. Update lzip from v1.24.1 to v1.25. <br/>"
-CHANGELOG += "7. Update nano from v8.3 to v8.5. <br/>"
-CHANGELOG += "8. Update nnn from v5.0 to v5.1 (DSM 7 only). <br/>"
-CHANGELOG += "9. Update patch from v2.7.6 to v2.8. <br/>"
-CHANGELOG += "10. Update pcre2 from v10.44 to v10.45. <br/>"
-CHANGELOG += "11. Update rhash from v1.4.5 to v1.4.6 (except for old pcc archs). <br/>"
-CHANGELOG += "12. Update rmlint from v2.10.2 to v2.10.3. <br/>"
-CHANGELOG += "13. Update zstd from v1.5.6 to v1.5.7."
+CHANGELOG  = "1. Remove xstow-static (keep dynamic version only). <br/>"
+CHANGELOG += "2. Update detox from v2.0.0 to v3.0.1. <br/>"
+CHANGELOG += "3. Update eza from v0.20.18 to v0.23.0 (except for ARMv5). <br/>"
+CHANGELOG += "4. Update fdupes from v2.3.2 to v2.4.0. <br/>"
+CHANGELOG += "5. Update fzf from v0.58.0 to v0.65.0. <br/>"
+CHANGELOG += "6. Update less from v668 to v679. <br/>"
+CHANGELOG += "7. Update lzip from v1.24.1 to v1.25. <br/>"
+CHANGELOG += "8. Update nano from v8.3 to v8.5. <br/>"
+CHANGELOG += "9. Update nnn from v5.0 to v5.1 (DSM 7 only). <br/>"
+CHANGELOG += "10. Update patch from v2.7.6 to v2.8. <br/>"
+CHANGELOG += "11. Update pcre2 from v10.44 to v10.45. <br/>"
+CHANGELOG += "12. Update rhash from v1.4.5 to v1.4.6 (except for old pcc archs). <br/>"
+CHANGELOG += "13. Update rmlint from v2.10.2 to v2.10.3. <br/>"
+CHANGELOG += "14. Update zstd from v1.5.6 to v1.5.7."
 CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
@@ -186,7 +187,7 @@ SPK_COMMANDS += bin/tiger-hash
 SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
 
-SPK_COMMANDS += bin/xstow bin/xstow-static bin/merge-info
+SPK_COMMANDS += bin/xstow bin/merge-info
 SPK_COMMANDS += bin/patch
 
 include ../../mk/spksrc.spk.mk
