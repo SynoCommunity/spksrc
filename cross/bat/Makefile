@@ -14,4 +14,6 @@ HOMEPAGE = https://github.com/sharkdp/bat
 COMMENT = A cat(1) clone with wings.
 LICENSE = MIT or Apache 2.0
 
+CARGO_BUILD_ARGS = --locked
+
 include ../../mk/spksrc.cross-rust.mk

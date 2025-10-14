@@ -17,4 +17,6 @@ HOMEPAGE = https://eza.rocks/
 COMMENT  = A modern replacement for 'ls'.
 LICENSE  = MIT
 
+CARGO_BUILD_ARGS = --locked
+
 include ../../mk/spksrc.cross-rust.mk
