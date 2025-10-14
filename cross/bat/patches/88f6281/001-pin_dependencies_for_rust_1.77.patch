@@ -1,6 +1,6 @@
 --- Cargo.toml.orig	2025-01-07 19:05:49.000000000 +0000
-+++ Cargo.toml	2025-08-21 21:48:34.998188150 +0000
-@@ -69,6 +69,17 @@
++++ Cargo.toml	2025-10-14 16:49:22.457664380 +0000
+@@ -69,13 +69,25 @@
  execute = { version = "0.2.13", optional = true }
  terminal-colorsaurus = "0.4"
  
@@ -14,7 +14,25 @@
 +zerofrom = "=0.1.5"
 +rayon = "=1.10.0"
 +rayon-core = "=1.12.1"
++time = "=0.3.41"
 +
  [dependencies.git2]
  version = "0.19"
  optional = true
+ default-features = false
+ 
+ [dependencies.syntect]
+-version = "5.2.0"
++version = "=5.2.0"
+ default-features = false
+ features = ["parsing"]
+ 
+@@ -86,7 +98,7 @@
+ 
+ [target.'cfg(target_os = "macos")'.dependencies]
+ home = "0.5.9"
+-plist = "1.7.0"
++plist = "=1.7.4"
+ 
+ [dev-dependencies]
+ assert_cmd = "2.0.12"
