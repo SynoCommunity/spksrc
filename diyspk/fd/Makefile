@@ -1,5 +1,5 @@
 SPK_NAME = fd
-SPK_VERS = 10.2.0
+SPK_VERS = 10.3.0
 SPK_REV = 1
 
 DEPENDS = cross/fd
