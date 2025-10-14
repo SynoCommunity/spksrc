@@ -6,6 +6,27 @@
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
+
+# Configure the included makefiles
+URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
+NAME          = $(PKG_NAME)
+COOKIE_PREFIX = $(PKG_NAME)-
+ifneq ($(PKG_DIST_FILE),)
+LOCAL_FILE    = $(PKG_DIST_FILE)
+else
+LOCAL_FILE    = $(PKG_DIST_NAME)
+endif
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT      = $(PKG_EXT)
+
+ifneq ($(ARCH),)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+ifneq ($(ARCH),noarch)
+TC = syno$(ARCH_SUFFIX)
+endif
+endif
+
+# Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
 
 # meson specific configurations
@@ -32,7 +53,7 @@ meson_configure_target: $(MESON_CROSS_FILE_PKG)
 	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
 	@$(MSG) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
-	@cd $(MESON_BASE_DIR) && env $(ENV_MESON) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	$(RUN_MESON) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
 # call-up regular build process
 include ../../mk/spksrc.cross-cc.mk

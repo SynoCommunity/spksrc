@@ -24,7 +24,7 @@ include ../../mk/spksrc.cross-meson-env.mk
 URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
 NAME                       = $(TC_NAME)
 COOKIE_PREFIX              = 
-ifneq ($(TC_DIST_FILE),)
+ifneq ($(strip $(TC_DIST_FILE)),)
 LOCAL_FILE                 = $(TC_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
 PKG_DIST_FILE              = $(TC_DIST_FILE)
@@ -94,32 +94,57 @@ cmake_vars:
 	echo
 	@echo "# define target processor" ; \
 	echo "set(CMAKE_SYSTEM_PROCESSOR $(CMAKE_SYSTEM_PROCESSOR))"
-ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+ifneq ($(strip $(CROSS_COMPILE_ARM)),)
 	@echo "set(CROSS_COMPILE_ARM $(CROSS_COMPILE_ARM))"
-else ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+endif
+ifneq ($(strip $(CMAKE_ARCH)),)
 	@echo "set(ARCH $(CMAKE_ARCH))"
 endif
 	@echo
 	@echo "# Disable developer warnings" ; \
 	echo 'set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "Disable developer warnings")'
 	@echo
-	@echo "# define toolchain location (used with CMAKE_TOOLCHAIN_PKG)" ; \
+	@echo "# define toolchain location (used with CMAKE_TOOLCHAIN_FILE_PKG)" ; \
 	echo "set(_CMAKE_TOOLCHAIN_LOCATION $(_CMAKE_TOOLCHAIN_LOCATION))" ; \
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(_CMAKE_TOOLCHAIN_PREFIX))" ; \
 	echo
-	@echo "# define compilers and tools to use" ; \
+	@echo "# define cross-compilers and tools to use" ; \
 	for tool in $(TOOLS) ; \
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  if [ "$${target}" = "CC" ] ; then \
-	    echo "set(CMAKE_C_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
-	    echo "set(CMAKE_$${target}_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LD" ] ; then \
-	    echo "set(CMAKE_LINKER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	    printf "set(%-25s %s)\n" CMAKE_LINKER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	  elif [ "$${target}" = "LDSHARED" ] ; then \
+	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS $$(echo $${source} | cut -f2 -d' ') ; \
+	  elif [ "$${target}" = "FC" ] ; then \
+	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
 	  else \
-	    echo "set(CMAKE_$${target} $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source})" ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target} $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	  fi ; \
+	done ; \
+	echo
+	@echo "# define 'build' compilers and tools to use" ; \
+	for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "CC" ] ; then \
+	    printf "set(%-35s %s)\n" CMAKE_C_COMPILER_FOR_BUILD $$(which $${source}) ; \
+	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
+	    printf "set(%-35s %s)\n" CMAKE_$${target}_COMPILER_FOR_BUILD $$(which $${source}) ; \
+	  elif [ "$${target}" = "LD" ] ; then \
+	    printf "set(%-35s %s)\n" CMAKE_LINKER_FOR_BUILD $$(which $${source}) ; \
+	  elif [ "$${target}" = "LDSHARED" ] ; then \
+	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS_FOR_BUILD $$(echo $${source} | cut -f2 -d' ') ; \
+	  elif [ "$${target}" = "FC" ] ; then \
+	    printf "set(%-35s %s)\n" CMAKE_Fortran_COMPILER_FOR_BUILD $$(which $${source}) ; \
+	  else \
+	    printf "set(%-35s %s)\n" CMAKE_$${target}_FOR_BUILD $$(which $${source}) ; \
 	  fi ; \
 	done ; \
 	echo
@@ -191,11 +216,11 @@ tc_vars: flag
 	    gcc_version=$$(eval $$(echo $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
 	  fi ; \
 	done ; \
-	echo TC_ENV += CFLAGS=\"$(CFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CFLAGS\)\" ; \
-	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
-	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
+	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
+	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
+	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
 	if [ "$$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | tail -n1)" = "$(TC_VERS)" ]; then \
-	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\)\" ; \
+	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
 	fi ; \
 	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
 	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
@@ -211,11 +236,11 @@ tc_vars: flag
 	echo TC_TARGET := $(TC_TARGET) ; \
 	echo TC_PREFIX := $(TC_PREFIX) ; \
 	echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/ ; \
-	echo CFLAGS := $(CFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CFLAGS\) ; \
-	echo CPPFLAGS := $(CPPFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CPPFLAGS\) ; \
-	echo CXXFLAGS := $(CXXFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_CXXFLAGS\) ; \
+	echo CFLAGS := $(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
+	echo CPPFLAGS := $(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\) ; \
+	echo CXXFLAGS := $(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	if [ "$$(printf '%s\n' "7" "$(TC_VERS)" | sort -V | tail -n1)" = "$(TC_VERS)" ]; then \
-	   echo FFLAGS := $(FFLAGS) $(GCC_DEBUG) $$\(ADDITIONAL_FFLAGS\) ; \
+	   echo FFLAGS := $(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\) ; \
 	fi ; \
 	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \

@@ -1,5 +1,5 @@
 PKG_NAME = git
-PKG_VERS = 2.50.1
+PKG_VERS = 2.51.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://kernel.org/pub/software/scm/git
@@ -24,24 +24,10 @@ CONFIGURE_ARGS += ac_cv_snprintf_returns_bogus=no
 ADDITIONAL_CPPFLAGS  = -std=gnu99
 ADDITIONAL_CPPFLAGS += -O
 
-# Version 2.50.0 uses CSPRNG_METHOD="getrandom" for all Linux targers,
-# ignoring whether getrandom method (and sys/random.h) is available.
-# We could either patch "config.mak.uname" or overwrite CSPRNG_METHOD
-# Since getrandom is supported with DSM 7 toolchains (except for comcerto2k),
-# we use getrandom for those and set CSPRNG_METHOD="" for other toolchains
-# to use "/dev/urandom" that was the default for git < 2.50.0
-include ../../mk/spksrc.common.mk
-ADDITIONAL_MAKE_OPTIONS =
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-# avoid CSPRNG_METHOD="getrandom" when sys/random.h is lacking in the toolchain
-ADDITIONAL_MAKE_OPTIONS = CSPRNG_METHOD=""
-endif
-
 PRE_CONFIGURE_TARGET = git_pre_configure
 POST_INSTALL_TARGET = git_post_install
 
-COMPILE_MAKE_OPTIONS = $(ADDITIONAL_MAKE_OPTIONS)
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX) $(ADDITIONAL_MAKE_OPTIONS)
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 # compiling needs access to curl-config from cross/curl
 ENV += PATH=$$PATH:$(STAGING_INSTALL_PREFIX)/bin

@@ -1,5 +1,5 @@
 PKG_NAME = python313
-PKG_VERS = 3.13.5
+PKG_VERS = 3.13.7
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -32,7 +32,7 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/loc
 PIP_VERSION = "24.3.1"
 PIP_WHEELS  = setuptools==80.9.0
 PIP_WHEELS += wheel==0.45.1
-PIP_WHEELS += crossenv==1.5.0
+PIP_WHEELS += crossenv==1.6.0
 
 .PHONY: python313_native_post_install
 python313_native_post_install: $(WORK_DIR)/python-native.mk

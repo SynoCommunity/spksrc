@@ -1,6 +1,6 @@
---- source/common/cpu.cpp.orig	2024-04-04 09:39:50.000000000 +0000
-+++ source/common/cpu.cpp	2024-06-15 07:20:37.644785266 +0000
-@@ -122,6 +122,11 @@
+--- source/common/cpu.cpp.orig	2024-11-22 13:07:34.000000000 +0100
++++ source/common/cpu.cpp	2025-09-07 16:26:25.649990913 +0200
+@@ -128,6 +128,11 @@
      { "", 0 },
  };
  
@@ -12,7 +12,7 @@
  #if X265_ARCH_X86
  
  extern "C" {
-@@ -135,11 +140,6 @@
+@@ -141,11 +146,6 @@
  #pragma warning(disable: 4309) // truncation of constant value
  #endif
  
