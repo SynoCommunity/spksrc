@@ -13,7 +13,10 @@ service_postinst ()
     # Edit .htaccess according to the wizard
     sed -e "s|@@_wizard_htaccess_allowed_from_@@|${wizard_htaccess_allowed_from}|g" -i ${HTACCESS_SOURCE_FILE}
 
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ];then
+    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -ge 7 ];then
+        # Edit .htaccess according to the wizard
+        sed -e "s|@@_wizard_htaccess_allowed_from_@@|${wizard_htaccess_allowed_from}|g" -i ${HTACCESS_TARGET_FILE}
+    else
         # Install the web interface
         cp -pR ${SOURCE_WEB_DIR} ${DSM6_WEB_DIR}
     fi
@@ -30,7 +33,7 @@ service_postuninst ()
 service_postupgrade ()
 {
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -ge 7 ];then
-        # Edit .htaccess according to the wizard
+        # Update .htaccess according to the wizard
         sed -e "s|@@_wizard_htaccess_allowed_from_@@|${wizard_htaccess_allowed_from}|g" -i ${HTACCESS_TARGET_FILE}
     fi
 }
