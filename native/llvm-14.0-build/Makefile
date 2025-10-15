@@ -1,6 +1,5 @@
 PKG_NAME = llvm
-PKG_LLVM_MAJ = 14
-PKG_VERS = $(PKG_LLVM_MAJ).0.5
+PKG_VERS = 14.0.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/refs/tags
