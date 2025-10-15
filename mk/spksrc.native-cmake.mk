@@ -6,13 +6,6 @@
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
-
-# cmake specific configurations
-include ../../mk/spksrc.native-cmake-env.mk
-
-# Force build in native tool directrory, not cross directory.
-WORK_DIR := $(CURDIR)/work-native
 
 # Package dependend
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -26,11 +19,22 @@ endif
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
+# Setup common directories
+include ../../mk/spksrc.directories.mk
+
+# cmake specific configurations
+include ../../mk/spksrc.native-cmake-env.mk
+
 #####
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = cmake_configure_target
+endif
+
+# source directory
+ifeq ($(strip $(CMAKE_SOURCE_DIR)),)
+CMAKE_SOURCE_DIR = $(CMAKE_BASE_DIR)
 endif
 
 # install
@@ -53,8 +57,6 @@ endif
 endif
 
 ###
-
-.NOTPARALLEL:
 
 # native specific environment
 include ../../mk/spksrc.native-env.mk
@@ -102,9 +104,10 @@ cmake_configure_target:
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
+	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(CMAKE_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
 

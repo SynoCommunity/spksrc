@@ -1,9 +1,5 @@
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
-
-# Force build in native tool directory, not cross directory.
-WORK_DIR := $(CURDIR)/work-native
 
 # Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -17,10 +13,12 @@ endif
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
+# Setup common directories
+include ../../mk/spksrc.directories.mk
+
 #####
 
-.NOTPARALLEL:
-
+# native specific environment
 include ../../mk/spksrc.native-env.mk
 
 include ../../mk/spksrc.download.mk

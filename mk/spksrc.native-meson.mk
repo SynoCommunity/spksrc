@@ -6,10 +6,6 @@
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
-
-# Force build in native tool directrory, not cross directory.
-WORK_DIR := $(CURDIR)/work-native
 
 # Package dependend
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -23,6 +19,9 @@ endif
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
+# Setup common directories
+include ../../mk/spksrc.directories.mk
+
 #####
 
 # configure using meson
@@ -31,8 +30,6 @@ CONFIGURE_TARGET = meson_configure_target
 endif
 
 ###
-
-.NOTPARALLEL:
 
 include ../../mk/spksrc.native-env.mk
 
