@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)/src
 
 DEPENDS =
 
-CONFIGURE_TARGET = nop
+CONFIGURE_TARGET = cpulimit_configure
 INSTALL_TARGET = cpulimit_install
 
 HOMEPAGE = https://github.com/opsengine/cpulimit
@@ -16,6 +16,13 @@ COMMENT  = CPU usage limiter for Linux.
 LICENSE  = GPLv2+
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: cpulimit_configure
+cpulimit_configure:
+	@$(MSG) "Add header files missing in some toolchains (DSM 7.2, SRM 1.3)"
+	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/include/sys $(STAGING_INSTALL_PREFIX)/include/bits
+	@install -m 755 src/sys/sysctl.h $(STAGING_INSTALL_PREFIX)/include/sys/
+	@install -m 755 src/bits/sysctl.h $(STAGING_INSTALL_PREFIX)/include/bits/
 
 .PHONY: cpulimit_install
 cpulimit_install:

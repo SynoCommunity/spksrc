@@ -8,6 +8,7 @@ DEPENDS = cross/mympd
 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = hgy59
 DESCRIPTION = myMPD is a standalone and mobile friendly web mpd client with a tiny footprint and advanced features.
