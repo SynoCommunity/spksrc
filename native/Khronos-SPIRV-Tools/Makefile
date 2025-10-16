@@ -18,18 +18,9 @@ CMAKE_ARGS += -DSPIRV_WERROR=OFF
 CMAKE_ARGS += -DSPIRV_TOOLS_BUILD_STATIC=OFF
 CMAKE_ARGS += -DSPIRV-Headers_SOURCE_DIR=$(STAGING_INSTALL_PREFIX)
 
-PRE_DEPEND_TARGET = pre_toto
-POST_DEPEND_TARGET = post_toto
-
-#include ../../mk/spksrc.native-cc.mk
 include ../../mk/spksrc.native-cmake.mk
 
 .PHONY: SPIRV-Tools_post_extract_target
+
 SPIRV-Tools_post_extract_target:
 	@cd $(WORK_DIR) && ln -s $(PKG_DIR) $(PKG_NAME)
-
-pre_toto:
-	@$(MSG) pre-WORK_DIR: $(WORK_DIR)
-
-post_toto:
-	@$(MSG) post-WORK_DIR: $(WORK_DIR)
