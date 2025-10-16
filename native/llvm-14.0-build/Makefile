@@ -1,4 +1,5 @@
 PKG_NAME = llvm
+PKG_LLVM_MAJ = 14
 PKG_VERS = 14.0.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
@@ -27,6 +28,7 @@ BUILD_DEPENDS += native/Khronos-SPIRV-Headers
 DEPENDS = native/Khronos-SPIRV-Tools
 
 POST_EXTRACT_TARGET = llvm_post_extract_target
+POST_INSTALL_TARGET = llvm_post_install_target
 
 # Using various LLVM project sources needs a top-level master directory
 CMAKE_BUILD_DIR = $(WORK_DIR)/llvm.build
@@ -49,7 +51,6 @@ CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Trans
 CMAKE_ARGS += -DLLVM_INSTALL_UTILS=ON
 CMAKE_ARGS += -DLLVM_BUILD_TOOLS=ON
 CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=OFF
-CMAKE_ARGS += -DCLANG_INSTALL_TABLEGEN=ON
 
 # Assertions are internal checks to help find bugs
 CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
@@ -77,12 +78,16 @@ NATIVE_CXXFLAGS += -Wno-uninitialized
 
 include ../../mk/spksrc.native-cmake.mk
 
+.PHONY: llvm_post_extract_target llvm_post_install_target build-archive
+
 # Create symlink for LLVM to find the translator
 llvm_post_extract_target:
 	@cd $(WORK_DIR) && ln -sf SPIRV-LLVM-Translator-$(PKG_VERS) SPIRV-LLVM-Translator
 	@cd $(WORK_DIR)/llvm-project/llvm/projects && ln -sf ../../../$(PKG_DIR) llvm-spirv
 
-.PHONY: build-archive
+llvm_post_install_target:
+	$(RUN) install -m 755 build/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
+
 build-archive:
 	@$(MSG) "Build archive of install folder"
 ifeq ($(wildcard work-native/install/usr/local/bin/*),)
