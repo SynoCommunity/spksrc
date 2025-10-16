@@ -1,10 +1,10 @@
-SPK_NAME = dotnet9-runtime
-SPK_VERS = 9.0.10
-SPK_REV = 11
+SPK_NAME = dotnet10-runtime
+SPK_VERS = 10.0.0-rc.2
+SPK_REV = 0
 SPK_ICON = src/dotnet.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
-DEPENDS = cross/dotnet9-runtime
+DEPENDS = cross/dotnet10-runtime
 
 REQUIRED_MIN_DSM = 6.0
 
@@ -13,10 +13,10 @@ DOTNET_CORE_ARCHS = 1
 
 MAINTAINER = brice-fromentin
 DESCRIPTION = Free. Cross-platform. Open source. A developer platform for building all apps. This package installs the dotnet runtime and the asp.net.core runtime.
-CHANGELOG = "Update to dotnet-runtime v9.0.10."
+CHANGELOG = "First releases for dotnet-runtime v10.0.0-rc.2"
 
 STARTABLE = no
-DISPLAY_NAME = .NET 9 runtime
+DISPLAY_NAME = .NET 10 runtime
 
 HOMEPAGE = https://dotnet.microsoft.com/
 LICENSE  = MIT
