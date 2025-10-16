@@ -83,8 +83,6 @@ include ../../mk/spksrc.compile.mk
 install: compile
 include ../../mk/spksrc.install.mk
 
-all: install
-
 ###
 
 # No PLIST to be processed for native
@@ -93,6 +91,27 @@ cat_PLIST:
 	@true
 
 ###
+
+# Define _all as a real target that does the work
+.PHONY: _all
+_all: install
+
+# all wraps _all with logging
+.PHONY: all
+.DEFAULT_GOAL := all
+
+all:
+	@mkdir -p $(WORK_DIR)
+	@bash -o pipefail -c ' \
+		{ \
+			echo "[build] START: $$(date +%Y%m%d-%H%M%S)" | tee -a $(PSTAT_LOG); \
+			$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all; \
+			echo "[build] END: $$(date +%Y%m%d-%H%M%S)" | tee -a $(PSTAT_LOG); \
+		} > >(tee -a $(WORK_DIR)/../build-native-$(PKG_NAME).log) 2>&1; \
+		[ $${PIPESTATUS[0]} -eq 0 ] || (echo "[build] FAILED" | tee -a $(PSTAT_LOG); exit 1) \
+	'
+
+####
 
 .PHONY: cmake_configure_target
 
