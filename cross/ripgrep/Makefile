@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/BurntSushi/ripgrep/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/pcre
+DEPENDS = cross/pcre2
 
 # powerpc archs (except qoriq) are not supported
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
@@ -25,7 +25,9 @@ ADDITIONAL_CFLAGS = -std=c11
 endif
 endif
 
-CARGO_BUILD_ARGS = --features pcre2
+CARGO_BUILD_ARGS = --locked
+CARGO_BUILD_ARGS += --features pcre2
+
 # let rg find libpcre2-* at runtime
 ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"  
 

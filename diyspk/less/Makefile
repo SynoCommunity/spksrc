@@ -1,5 +1,5 @@
 SPK_NAME = less
-SPK_VERS = 668
+SPK_VERS = 679
 SPK_REV = 1
 SPK_ICON = src/gnu-logo.png
 
