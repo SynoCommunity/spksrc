@@ -15,4 +15,6 @@ HOMEPAGE = https://ownyourbits.com/2018/03/25/analyze-disk-usage-with-dutree/
 COMMENT  = A tool to analyze file system usage written in Rust.
 LICENSE  = GPLv3
 
+CARGO_BUILD_ARGS = --locked
+
 include ../../mk/spksrc.cross-rust.mk
