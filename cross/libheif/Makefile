@@ -1,28 +1,15 @@
-PKG_NAME = libheif
-PKG_VERS = 1.18.2
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/strukturag/libheif/releases/download/v$(PKG_VERS)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = libheif-main
 
-DEPENDS  = cross/libjpeg
-DEPENDS += cross/libpng
-DEPENDS += cross/libde265
-DEPENDS += cross/x265
-# libwebp for libsharpyuv:
-DEPENDS += cross/libwebp
-DEPENDS += cross/gdk-pixbuf
+OPTIONAL_DEPENDS  = cross/libheif-latest
+OPTIONAL_DEPENDS += cross/libheif-1.18
 
-# ARMv5 and OLD_PPC_ARCHS fail on cross/libde265
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-HOMEPAGE = http://www.libheif.org
-COMMENT  = libheif is a ISO/IEC 23008-12:2017 HEIF file format decoder and encoder.
-LICENSE  = LGPLv3
+include ../../mk/spksrc.main-depends.mk
 
-CMAKE_ARGS += -DWITH_EXAMPLES=OFF
-CMAKE_ARGS += -DBUILD_TESTING=OFF
-
-ADDITIONAL_CXXFLAGS = -O
-
-include ../../mk/spksrc.cross-cmake.mk
+# support for C++20
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
+DEPENDS = cross/libheif-latest
+else
+DEPENDS = cross/libheif-1.18
+endif
