@@ -48,6 +48,7 @@ sarge==0.1.7.post1
 semantic_version==2.10.0
 sentry_sdk==2.37.1
 typing_extensions==4.15.0
+typing_inspection==0.4.2
 Unidecode==1.4.0
 urllib3==2.5.0
 webassets==3.0.0
@@ -55,3 +56,4 @@ websocket_client==1.8.0
 Werkzeug==3.0.6
 wheel==0.45.1
 zipstream_ng==1.9.0
+zope_dottedname==7.0
