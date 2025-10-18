@@ -22,7 +22,12 @@ DISTRIB_DIR = $(BASE_DISTRIB_DIR)
 endif
 
 ifndef WORK_DIR
+ifndef ARCH_SUFFIX
+WORK_DIR := $(CURDIR)/work-native
+else
 WORK_DIR := $(CURDIR)/work$(ARCH_SUFFIX)
+endif
+export WORK_DIR
 endif
 
 ifndef INSTALL_DIR

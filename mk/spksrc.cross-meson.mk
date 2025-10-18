@@ -1,4 +1,6 @@
-# Build CMake programs
+# Build Meson programs
+#
+# This makefile extends spksrc.cross-cc.mk with Meson-specific functionality
 #
 # prerequisites:
 # - cross/module depends on meson + ninja
@@ -29,6 +31,8 @@ endif
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
 
+###
+
 # meson specific configurations
 include ../../mk/spksrc.cross-meson-env.mk
 
@@ -41,8 +45,11 @@ CONFIGURE_TARGET = meson_configure_target
 endif
 
 # call-up ninja build process
-include ../../mk/spksrc.cross-ninja.mk
+include ../../mk/spksrc.ninja.mk
 
+###
+
+# Meson specific targets
 .PHONY: meson_configure_target
 
 # default meson configure:
@@ -55,5 +62,7 @@ meson_configure_target: $(MESON_CROSS_FILE_PKG)
 	@$(MSG) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 	$(RUN_MESON) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
-# call-up regular build process
+###
+
+# Include base cross-cc makefile for common functionality
 include ../../mk/spksrc.cross-cc.mk

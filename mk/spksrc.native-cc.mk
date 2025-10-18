@@ -1,9 +1,5 @@
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
-
-# Force build in native tool directory, not cross directory.
-WORK_DIR := $(CURDIR)/work-native
 
 # Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -17,11 +13,16 @@ endif
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
+# Setup common directories
+include ../../mk/spksrc.directories.mk
+
 #####
 
-.NOTPARALLEL:
-
+# native specific environment
 include ../../mk/spksrc.native-env.mk
+
+# Build system specific configurations (can be overridden by including makefiles)
+# This section can be extended by cmake/meson specific makefiles before including this file
 
 include ../../mk/spksrc.download.mk
 
@@ -45,11 +46,31 @@ include ../../mk/spksrc.compile.mk
 install: compile
 include ../../mk/spksrc.install.mk
 
+###
+
 .PHONY: cat_PLIST
 cat_PLIST:
 	@true
 
-all: install
+###
+
+# Define _all as a real target that does the work
+.PHONY: _all
+_all: install
+
+# all wraps _all with logging
+.PHONY: all
+.DEFAULT_GOAL := all
+
+all:
+	@mkdir -p $(WORK_DIR)
+	@bash -o pipefail -c ' \
+		{ \
+			$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) | tee -a $(PSTAT_LOG) ; \
+			$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all; \
+		} > >(tee -a $(WORK_DIR)/../build-native-$(PKG_NAME).log) 2>&1; \
+		[ ! $${PIPESTATUS[0]} -eq 0 ] && ($(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) - FAILED | tee -a $(PSTAT_LOG); exit 1) || true \
+	'
 
 ####
 

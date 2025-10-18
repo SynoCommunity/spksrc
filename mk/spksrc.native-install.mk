@@ -9,9 +9,6 @@
 include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.directories.mk
 
-# Force build in native tool directory, not cross directory.
-WORK_DIR := $(CURDIR)/work-native
-
 # Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
@@ -32,8 +29,6 @@ ifneq ($(REQUIRE_KERNEL),)
 endif
 
 #####
-
-.NOTPARALLEL:
 
 include ../../mk/spksrc.native-env.mk
 

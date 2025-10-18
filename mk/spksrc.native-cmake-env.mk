@@ -49,6 +49,10 @@ ifeq ($(strip $(CMAKE_DESTDIR)),)
   CMAKE_DESTDIR = $(INSTALL_DIR)
 endif
 
+ifeq ($(strip $(CMAKE_BASE_DIR)),)
+  CMAKE_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)
+endif
+
 # set default build directory
 ifeq ($(strip $(CMAKE_BUILD_DIR)),)
   CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)/build

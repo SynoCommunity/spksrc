@@ -57,8 +57,27 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-all: install plist
+###
 
+# Define _all as a real target that does the work
+.PHONY: _all
+_all: install plist
+
+# all wraps _all with logging
+.PHONY: all
+.DEFAULT_GOAL := all
+
+all:
+	@mkdir -p $(WORK_DIR)
+	@bash -o pipefail -c ' \
+		{ \
+			$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TC_VERS), NAME: $(NAME) | tee -a $(PSTAT_LOG) ; \
+			$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all; \
+		} > >(tee -a $(WORK_DIR)/../build-$(ARCH)-$(TC_VERS).log) 2>&1; \
+		[ ! $${PIPESTATUS[0]} -eq 0 ] && ($(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TC_VERS), NAME: $(NAME) - FAILED | tee -a $(PSTAT_LOG); exit 1) || true \
+	'
+
+####
 
 ### For arch-* and all-<supported|latest>
 include ../../mk/spksrc.supported.mk
