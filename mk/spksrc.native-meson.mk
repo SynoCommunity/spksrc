@@ -1,4 +1,6 @@
-# Build CMake programs
+# Build native Meson programs
+#
+# This makefile extends spksrc.native-cc.mk with Meson-specific functionality
 #
 # prerequisites:
 # - native/module depends on meson + ninja
@@ -7,7 +9,7 @@
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
-# Package dependend
+# Package dependent (same as native-cc.mk)
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
@@ -29,72 +31,18 @@ ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = meson_configure_target
 endif
 
-###
-
+# Load native environment before meson-specific configs
 include ../../mk/spksrc.native-env.mk
 
 # meson specific configurations
 include ../../mk/spksrc.native-meson-env.mk
 
 # call-up ninja build process
-include ../../mk/spksrc.cross-ninja.mk
+include ../../mk/spksrc.ninja.mk
 
-include ../../mk/spksrc.download.mk
+#####
 
-include ../../mk/spksrc.depend.mk
-
-checksum: download
-include ../../mk/spksrc.checksum.mk
-
-extract: checksum depend
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-configure: patch
-include ../../mk/spksrc.configure.mk
-
-compile: configure
-include ../../mk/spksrc.compile.mk
-
-install: compile
-include ../../mk/spksrc.install.mk
-
-###
-
-.PHONY: cat_PLIST
-cat_PLIST:
-	@true
-
-###
-
-# Define _all as a real target that does the work
-.PHONY: _all
-_all: install
-
-# all wraps _all with logging
-.PHONY: all
-.DEFAULT_GOAL := all
-
-all:
-	@mkdir -p $(WORK_DIR)
-	@bash -o pipefail -c ' \
-		{ \
-			echo "[build] START: $$(date +%Y%m%d-%H%M%S)" | tee -a $(PSTAT_LOG); \
-			$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all; \
-			echo "[build] END: $$(date +%Y%m%d-%H%M%S)" | tee -a $(PSTAT_LOG); \
-		} > >(tee -a $(WORK_DIR)/../build-native-$(PKG_NAME).log) 2>&1; \
-		[ $${PIPESTATUS[0]} -eq 0 ] || (echo "[build] FAILED" | tee -a $(PSTAT_LOG); exit 1) \
-	'
-
-###
-
-### Include common rules
-include ../../mk/spksrc.common-rules.mk
-
-###
-
+# Meson specific targets
 .PHONY: meson_configure_target
 
 # default meson configure:
@@ -106,4 +54,7 @@ meson_configure_target:
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
 	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
-###
+#####
+
+# Include base native-cc makefile for common functionality
+include ../../mk/spksrc.native-cc.mk

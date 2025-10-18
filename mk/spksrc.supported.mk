@@ -41,7 +41,7 @@ all-$(TARGET_TYPE): $(addprefix $(TARGET_TYPE)-arch-,$(TARGET_ARCH))
 
 pre-build-native: SHELL:=/bin/bash
 pre-build-native:
-	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: n/a [BEGIN] >> $(PSTAT_LOG)
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: n/a [BEGIN] | tee -a $(PSTAT_LOG)
 	@$(MSG) Pre-build native dependencies for parallel build [START]
 	@for depend in $$($(MAKE) dependency-list) ; \
 	do \
@@ -53,14 +53,14 @@ pre-build-native:
 	  fi ; \
 	done ; \
 	$(MSG) Pre-build native dependencies for parallel build [END] ; \
-	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: n/a [END] >> $(PSTAT_LOG)
+	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: n/a [END] | tee -a $(PSTAT_LOG)
 	@$(MSG) PROCESSING archs $(TARGET_ARCH)
 
 $(TARGET_TYPE)-arch-% &: pre-build-native
 	-@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) arch-$*
 
 arch-%:
-	$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*)) | tee --append build-$*.log
+	$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
 
 noarch-%:
 	$(PSTAT_TIME) $(MAKE) $(addprefix build-noarch-, $(filter $*, $(AVAILABLE_TCVERSIONS) 3.1)) | tee --append build-$@.log
@@ -70,10 +70,10 @@ noarch-%:
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: 
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [BEGIN] >> $(PSTAT_LOG)
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [BEGIN] | tee -a $(PSTAT_LOG)
 	@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 ; \
 	status=$${PIPESTATUS[0]} ; \
-	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG) ; \
+	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [END] | tee -a $(PSTAT_LOG) ; \
 	[ $${status[0]} -eq 0 ] || false
 
 build-noarch-%: SHELL:=/bin/bash
@@ -81,7 +81,7 @@ build-noarch-%:
 	@$(MSG) BUILDING noarch package for TCVERSION $*
 	@MAKEFLAGS= $(MAKE) TCVERSION=$* 2>&1 ; \
 	status=$${PIPESTATUS[0]} ; \
-	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), TCVERSION: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG) ; \
+	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), TCVERSION: $*, NAME: $(NAME) [END] | tee -a $(PSTAT_LOG) ; \
 	[ $${status[0]} -eq 0 ] || false
 
 ####

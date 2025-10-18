@@ -21,6 +21,9 @@ include ../../mk/spksrc.directories.mk
 # native specific environment
 include ../../mk/spksrc.native-env.mk
 
+# Build system specific configurations (can be overridden by including makefiles)
+# This section can be extended by cmake/meson specific makefiles before including this file
+
 include ../../mk/spksrc.download.mk
 
 include ../../mk/spksrc.depend.mk
@@ -63,11 +66,10 @@ all:
 	@mkdir -p $(WORK_DIR)
 	@bash -o pipefail -c ' \
 		{ \
-			echo "[build] START: $$(date +%Y%m%d-%H%M%S)" | tee -a $(PSTAT_LOG); \
+			$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) | tee -a $(PSTAT_LOG) ; \
 			$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all; \
-			echo "[build] END: $$(date +%Y%m%d-%H%M%S)" | tee -a $(PSTAT_LOG); \
 		} > >(tee -a $(WORK_DIR)/../build-native-$(PKG_NAME).log) 2>&1; \
-		[ $${PIPESTATUS[0]} -eq 0 ] || (echo "[build] FAILED" | tee -a $(PSTAT_LOG); exit 1) \
+		[ ! $${PIPESTATUS[0]} -eq 0 ] && ($(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) - FAILED | tee -a $(PSTAT_LOG); exit 1) || true \
 	'
 
 ####

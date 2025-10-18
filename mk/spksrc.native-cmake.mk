@@ -1,13 +1,12 @@
 # Build native CMake programs
 #
-# remarks:
-# - most content is taken from spksrc.native-cc.mk and modified for cmake
+# This makefile extends spksrc.native-cc.mk with CMake-specific functionality
 #
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
-# Package dependend
+# Package dependent (same as native-cc.mk)
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
@@ -43,7 +42,7 @@ CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-include ../../mk/spksrc.cross-ninja.mk
+include ../../mk/spksrc.ninja.mk
 else
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
@@ -56,63 +55,9 @@ INSTALL_TARGET = cmake_install_target
 endif
 endif
 
-###
+#####
 
-# native specific environment
-include ../../mk/spksrc.native-env.mk
-
-include ../../mk/spksrc.download.mk
-
-include ../../mk/spksrc.depend.mk
-
-checksum: download
-include ../../mk/spksrc.checksum.mk
-
-extract: checksum depend
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-configure: patch
-include ../../mk/spksrc.configure.mk
-
-compile: configure
-include ../../mk/spksrc.compile.mk
-
-install: compile
-include ../../mk/spksrc.install.mk
-
-###
-
-# No PLIST to be processed for native
-.PHONY: cat_PLIST
-cat_PLIST:
-	@true
-
-###
-
-# Define _all as a real target that does the work
-.PHONY: _all
-_all: install
-
-# all wraps _all with logging
-.PHONY: all
-.DEFAULT_GOAL := all
-
-all:
-	@mkdir -p $(WORK_DIR)
-	@bash -o pipefail -c ' \
-		{ \
-			echo "[build] START: $$(date +%Y%m%d-%H%M%S)" | tee -a $(PSTAT_LOG); \
-			$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all; \
-			echo "[build] END: $$(date +%Y%m%d-%H%M%S)" | tee -a $(PSTAT_LOG); \
-		} > >(tee -a $(WORK_DIR)/../build-native-$(PKG_NAME).log) 2>&1; \
-		[ $${PIPESTATUS[0]} -eq 0 ] || (echo "[build] FAILED" | tee -a $(PSTAT_LOG); exit 1) \
-	'
-
-####
-
+# CMake specific targets
 .PHONY: cmake_configure_target
 
 # default cmake configure:
@@ -146,9 +91,7 @@ else
 	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
 endif
 
-###
+#####
 
-### Include common rules
-include ../../mk/spksrc.common-rules.mk
-
-####
+# Include base native-cc makefile for common functionality
+include ../../mk/spksrc.native-cc.mk
