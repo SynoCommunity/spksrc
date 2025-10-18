@@ -1,5 +1,5 @@
 PKG_NAME = detox
-PKG_VERS = 2.0.0
+PKG_VERS = 3.0.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dharple/detox/releases/download/v$(PKG_VERS)

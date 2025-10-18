@@ -56,14 +56,14 @@ sudo apt update
 sudo apt install autoconf-archive autogen automake autopoint bash \
                  bash-completion bc bison build-essential check cmake \
                  curl cython3 debootstrap ed expect fakeroot flex \
-                 g++-multilib gawk gettext gh git gperf httpie imagemagick \
-                 intltool jq libtool-bin libbz2-dev libc6-i386 libcppunit-dev libffi-dev \
-                 libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
-                 libpcre3-dev libssl-dev libtool libunistring-dev lzip \
-                 man-db manpages-dev mercurial meson mlocate moreutils nasm \
-                 ninja-build patchelf php pkg-config python3 python3-distutils \
-                 python3-mako python3-pip python3-virtualenv python3-yaml \
-                 rename ripgrep ruby-mustache rsync scons subversion \
+                 g++-multilib gawk gettext gh git gobject-introspection gperf \
+                 httpie imagemagick intltool jq libtool-bin libbz2-dev libc6-i386 \
+                 libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev \
+                 libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool \
+                 libunistring-dev lzip man-db manpages-dev mercurial meson mlocate \
+                 moreutils nasm ninja-build patchelf php pkg-config python3 \
+                 python3-distutils python3-mako python3-pip python3-virtualenv \
+                 python3-yaml rename ripgrep ruby-mustache rsync scons subversion \
                  swig texinfo time tree unzip xmlto yasm zip zlib1g-dev
 ```
 From there, follow the instructions in the [Developers HOW TO].
@@ -83,14 +83,14 @@ A container based on 64-bit version of Debian 12 stable OS is recommended. Non-x
 lxc exec spksrc -- /usr/bin/apt install autoconf-archive autogen automake autopoint bash \
                                         bash-completion bc bison build-essential check cmake \
                                         curl cython3 debootstrap ed expect fakeroot flex \
-                                        g++-multilib gawk gettext gh git gperf httpie imagemagick \
-                                        intltool jq libtool-bin libbz2-dev libc6-i386 libcppunit-dev libffi-dev \
-                                        libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
-                                        libpcre3-dev libssl-dev libtool libunistring-dev lzip \
-                                        man-db manpages-dev mercurial meson mlocate moreutils nasm \
-                                        ninja-build patchelf php pkg-config python3 python3-distutils \
-                                        python3-mako python3-pip python3-virtualenv python3-yaml \
-                                        rename ripgrep ruby-mustache rsync scons subversion \
+                                        g++-multilib gawk gettext gh git gobject-introspection gperf \
+                                        httpie imagemagick intltool jq libtool-bin libbz2-dev libc6-i386 \
+                                        libcppunit-dev libffi-dev libgc-dev libgmp3-dev libltdl-dev \
+                                        libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool \
+                                        libunistring-dev lzip man-db manpages-dev mercurial meson mlocate \
+                                        moreutils nasm ninja-build patchelf php pkg-config python3 \
+                                        python3-distutils python3-mako python3-pip python3-virtualenv \
+                                        python3-yaml rename ripgrep ruby-mustache rsync scons subversion \
                                         swig texinfo time tree unzip xmlto yasm zip zlib1g-dev
 ```
 

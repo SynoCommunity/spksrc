@@ -1,8 +1,9 @@
 # See https://github.com/SynoCommunity/spksrc/issues/2662
-# Remove the extension pgsql because the extension pgsql does not work with the PostgreSQL server from DSM. The Extension pdo_pgsql works perfectly.
---- adminer/drivers/pgsql.inc.php.orig	2025-05-04 16:30:08.000000000 +0000
-+++ adminer/drivers/pgsql.inc.php	2025-08-18 19:44:01.107881881 +0000
-@@ -6,139 +6,7 @@
+# Remove the extension pgsql because the extension pgsql does not work with the
+# PostgreSQL server from DSM. The Extension pdo_pgsql works perfectly.
+--- adminer/drivers/pgsql.inc.php.orig	2025-09-26 15:38:02.000000000 +0000
++++ adminer/drivers/pgsql.inc.php	2025-10-15 20:58:08.384842825 +0000
+@@ -6,140 +6,7 @@
  if (isset($_GET["pgsql"])) {
  	define('Adminer\DRIVER', "pgsql");
  
@@ -20,10 +21,11 @@
 -				$this->error = $error;
 -			}
 -
--			function attach(?string $server, string $username, string $password): string {
+-			function attach(string $server, string $username, string $password): string {
 -				$db = adminer()->database();
 -				set_error_handler(array($this, '_error'));
--				$this->string = "host='" . str_replace(":", "' port='", addcslashes($server, "'\\")) . "' user='" . addcslashes($username, "'\\") . "' password='" . addcslashes($password, "'\\") . "'";
+-				list($host, $port) = host_port(addcslashes($server, "'\\"));
+-				$this->string = "host='$host'" . ($port ? " port='$port'" : "") . " user='" . addcslashes($username, "'\\") . "' password='" . addcslashes($password, "'\\") . "'";
 -				$ssl = adminer()->connectSsl();
 -				if (isset($ssl["mode"])) {
 -					$this->string .= " sslmode='" . $ssl["mode"] . "'";
