@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 4.0.1
-SPK_REV = 27
+SPK_REV = 28
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -9,7 +9,7 @@ SPK_ICON = src/synocli-file.png
 #   it's own libblkid and rmlint cannot find the working library of cross/libblkid.
 BUILD_DEPENDS = cross/libblkid
 
-DEPENDS  = cross/less cross/tree cross/jdupes cross/rhash cross/nano cross/file
+DEPENDS  = cross/less cross/tree cross/jdupes cross/nano cross/file
 DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
@@ -20,7 +20,8 @@ DEPENDS += cross/iconv
 DEPENDS += cross/dos2unix
 DEPENDS += cross/patch
 
-OPTIONAL_DEPENDS  = cross/rmlint
+OPTIONAL_DEPENDS  = cross/rhash cross/rhash_1.4.5
+OPTIONAL_DEPENDS += cross/rmlint
 OPTIONAL_DEPENDS += cross/rnm
 OPTIONAL_DEPENDS += cross/micro
 OPTIONAL_DEPENDS += cross/fzf
@@ -28,8 +29,8 @@ OPTIONAL_DEPENDS += cross/ripgrep
 OPTIONAL_DEPENDS += cross/fd
 OPTIONAL_DEPENDS += cross/sd
 OPTIONAL_DEPENDS += cross/bat
-OPTIONAL_DEPENDS += cross/eza
-OPTIONAL_DEPENDS += cross/nnn cross/nnn_4.8 cross/nnn_4.0
+OPTIONAL_DEPENDS += cross/eza cross/eza_0.20.18
+OPTIONAL_DEPENDS += cross/nnn cross/nnn_4.8 cross/nnn_4.0
 OPTIONAL_DEPENDS += cross/lsd
 OPTIONAL_DEPENDS += cross/xstow
 
@@ -41,6 +42,12 @@ POST_STRIP_TARGET = synocli-file_extra_install
 OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/rhash_1.4.5
+else
+DEPENDS += cross/rhash
+endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
@@ -73,18 +80,24 @@ endif
 
 # OLD_PPC archs are not supported with rust
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 DEPENDS += cross/bat
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
-endif
+
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 DEPENDS += cross/eza
+else
+DEPENDS += cross/eza_0.20.18
+endif
 OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
+
 DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
+
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 endif
+
 DEPENDS += cross/sd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
 DEPENDS += cross/lsd
@@ -100,6 +113,9 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
+WIKI_URL = "\<a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile\"\>FAQ SynoCliFile\</a\>"
+
+# Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
     less, tree, jdupes, fdupes, rhash, \
     mc \(midnight commander\), \
@@ -110,17 +126,23 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Remove fd (fd-find) for VS and NVR models (ARMv7L archs) and for ARMv5 archs. <br/>"
-CHANGELOG += "2. Remove ncdu (ncdu is part of synocli-disk). <br/>"
-CHANGELOG += "3. Update bat to v0.250. <br/>"
-CHANGELOG += "4. Update eza to v0.20.18. <br/>"
-CHANGELOG += "5. Update file to v5.46. <br/>"
-CHANGELOG += "6. Update fzf to v0.58.0. <br/>"
-CHANGELOG += "7. Update mc to v4.8.33. <br/>"
-CHANGELOG += "8. Update nano to v8.3. <br/>"
-CHANGELOG += "9. Update nnn to v5.0 (DSM 7 only). <br/>"
-CHANGELOG += "10. Update plzip to v1,12. <br/>"
-CHANGELOG += "11. Update tree to v2.2.1."
+CHANGELOG  = "1. Remove xstow-static (keep dynamic version only). <br/>"
+CHANGELOG += "2. Update detox from v2.0.0 to v3.0.1. <br/>"
+CHANGELOG += "3. Update eza from v0.20.18 to v0.23.4 (except for ARMv5). <br/>"
+CHANGELOG += "4. Update fd from v10.2.0 to v10.3.0. <br/>"
+CHANGELOG += "5. Update fdupes from v2.3.2 to v2.4.0. <br/>"
+CHANGELOG += "6. Update fzf from v0.58.0 to v0.66.0. <br/>"
+CHANGELOG += "7. Update jdupes from v1.28.0 to v1.30.0. <br/>"
+CHANGELOG += "8. Update less from v668 to v679. <br/>"
+CHANGELOG += "9. Update lzip from v1.24.1 to v1.25. <br/>"
+CHANGELOG += "10. Update nano from v8.3 to v8.6. <br/>"
+CHANGELOG += "11. Update nnn from v5.0 to v5.1 (DSM 7 only). <br/>"
+CHANGELOG += "12. Update patch from v2.7.6 to v2.8. <br/>"
+CHANGELOG += "13. Update pcre2 from v10.44 to v10.46. <br/>"
+CHANGELOG += "14. Update rhash from v1.4.5 to v1.4.6 (except for old ppc archs). <br/>"
+CHANGELOG += "15. Update rmlint from v2.10.2 to v2.10.3. <br/>"
+CHANGELOG += "16. Update zstd from v1.5.6 to v1.5.7. <br/>"
+CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -167,7 +189,7 @@ SPK_COMMANDS += bin/tiger-hash
 SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
 
-SPK_COMMANDS += bin/xstow bin/xstow-static bin/merge-info
+SPK_COMMANDS += bin/xstow bin/merge-info
 SPK_COMMANDS += bin/patch
 
 include ../../mk/spksrc.spk.mk

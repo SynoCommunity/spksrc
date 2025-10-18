@@ -1,12 +1,12 @@
 PKG_NAME = ntopng
-PKG_VERS = 6.2
+PKG_VERS = 6.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ntop/ntopng/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# Remarks: BUILD_DEPENDS is additionally used to add native node and npm to PATH
+# Remarks: BUILD_DEPENDS variable is additionally used to add native node and npm to PATH
 BUILD_DEPENDS = native/nodejs_16
 
 DEPENDS  = cross/libcap cross/ndpi cross/curl
@@ -15,7 +15,7 @@ DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
 DEPENDS += cross/json-c cross/rrdtool cross/lua
 DEPENDS += cross/hiredis
 
-# cross/ndpi and or cross/libcap not supported:
+# cross/rrdtool:
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://www.ntop.org/

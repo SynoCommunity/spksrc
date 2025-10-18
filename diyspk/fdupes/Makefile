@@ -1,5 +1,5 @@
 SPK_NAME = fdupes
-SPK_VERS = 2.3.2
+SPK_VERS = 2.4.0
 SPK_REV = 1
 SPK_ICON = src/fdupes.png
 

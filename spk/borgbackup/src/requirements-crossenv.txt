@@ -1,7 +1,7 @@
-# Generated using the requirements script on April 18, 2025
+# Generated using the requirements script on September 10, 2025
 
 borgbackup==1.4.1
-charset_normalizer==3.4.1
+charset_normalizer==3.4.3
 llfuse==1.5.1
 msgpack==1.1.0
 rpds_py==0.22.3

@@ -19,7 +19,8 @@ LICENSE  = MIT License
 
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS)
 
-CONFIGURE_ARGS  = -Ddocs=disabled
+CONFIGURE_ARGS  = -Db_ndebug=false
+CONFIGURE_ARGS += -Ddocs=disabled
 CONFIGURE_ARGS += -Dman=disabled
 CONFIGURE_ARGS += -Dtestplan=disabled
 CONFIGURE_ARGS += -Dtests=disabled
