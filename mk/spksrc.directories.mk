@@ -28,11 +28,14 @@ BUILD_TYPE_DIR := $(notdir $(patsubst %/,%,$(dir $(CURDIR))))
 ifeq ($(BUILD_TYPE_DIR),native)
 # Native builds always use work-native
 WORK_DIR := $(CURDIR)/work-native
+else ifeq ($(strip $(word 2,$(subst -, ,$(MAKECMDGOALS)))),)
+WORK_DIR := work
 else ifeq ($(ARCH),noarch)
 WORK_DIR := $(CURDIR)/work-$(lastword $(subst -, ,$(MAKECMDGOALS)))
 else
 WORK_DIR := $(CURDIR)/work-$(word 2,$(subst -, ,$(MAKECMDGOALS)))-$(lastword $(subst -, ,$(MAKECMDGOALS)))
 endif
+
 export WORK_DIR
 endif
 
