@@ -64,13 +64,17 @@ _all: install
 
 all:
 	@mkdir -p $(WORK_DIR)
-	@bash -o pipefail -c ' \
-		{ \
-			$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) | tee -a $(PSTAT_LOG) ; \
-			$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all; \
-		} > >(tee -a $(WORK_DIR)/../build-native-$(PKG_NAME).log) 2>&1; \
-		[ ! $${PIPESTATUS[0]} -eq 0 ] && ($(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) - FAILED | tee -a $(PSTAT_LOG); exit 1) || true \
-	'
+	@if [ -z "$$LOGGING_ENABLED" ]; then \
+	   export LOGGING_ENABLED=1 ; \
+	   bash -o pipefail -c ' \
+	      { \
+	         $(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) | tee -a $(PSTAT_LOG) ; \
+	         $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	      } > >(tee -a $(WORK_DIR)/../build-native-$(PKG_NAME).log) 2>&1 ; \
+	      [ ! $${PIPESTATUS[0]} -eq 0 ] && ($(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) - FAILED | tee -a $(PSTAT_LOG); exit 1) || true' ; \
+	else \
+	   $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	fi
 
 ####
 
