@@ -39,7 +39,7 @@ MAINTAINER = hgy59
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "Update bottom from v0.10.2 to v0.11.2 (except for ARMv5 and qoriq archs)."
+CHANGELOG = "1. Update bottom from v0.10.2 to v0.11.2 (except for ARMv5 and qoriq archs). <br/>2. Update ionice (util-linux) from v2.41.1 to 2.41.2."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
