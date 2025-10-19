@@ -25,11 +25,12 @@ ifndef WORK_DIR
 # Detect build type from current directory
 BUILD_TYPE_DIR := $(notdir $(patsubst %/,%,$(dir $(CURDIR))))
 
+ifeq ($(strip $(MAKECMDGOALS)),)
 ifeq ($(BUILD_TYPE_DIR),native)
-# Native builds always use work-native
 WORK_DIR := $(CURDIR)/work-native
+endif
 else ifeq ($(strip $(word 2,$(subst -, ,$(MAKECMDGOALS)))),)
-WORK_DIR := work
+WORK_DIR := $(CURDIR)/work
 else ifeq ($(ARCH),noarch)
 WORK_DIR := $(CURDIR)/work-$(lastword $(subst -, ,$(MAKECMDGOALS)))
 else

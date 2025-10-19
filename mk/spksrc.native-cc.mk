@@ -32,7 +32,7 @@ checksum: download
 include ../../mk/spksrc.checksum.mk
 
 extract: checksum depend
-	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) | tee -a $(PSTAT_LOG)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "native" "$(NAME)") | tee --append $(PSTAT_LOG)
 include ../../mk/spksrc.extract.mk
 
 patch: extract
@@ -70,12 +70,12 @@ all:
 	      export LOGGING_ENABLED=1 ; \
 	      { \
 	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	      } > >(tee -a $(WORK_DIR)/../build-native-$(PKG_NAME).log) 2>&1 ; \
+	      } > >(tee --append $(WORK_DIR)/../build-native-$(PKG_NAME).log) 2>&1 ; \
 	   else \
 	      $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
 	   fi \
 	' || { \
-	   $(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) - FAILED | tee -a $(PSTAT_LOG) ; \
+	   $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "native" "$(NAME)") | tee --append $(PSTAT_LOG) ; \
 	   exit 1 ; \
 	}
 
