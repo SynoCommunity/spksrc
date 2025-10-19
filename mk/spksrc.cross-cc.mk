@@ -69,17 +69,20 @@ _all: install plist
 
 all:
 	@mkdir -p $(WORK_DIR)
-	@if [ -z "$$LOGGING_ENABLED" ]; then \
-	   export LOGGING_ENABLED=1 ; \
-	   bash -o pipefail -c ' \
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TC_VERS), NAME: $(NAME) | tee -a $(PSTAT_LOG)
+	@bash -o pipefail -c ' \
+	   if [ -z "$$LOGGING_ENABLED" ]; then \
+	      export LOGGING_ENABLED=1 ; \
 	      { \
-	         $(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TC_VERS), NAME: $(NAME) | tee -a $(PSTAT_LOG) ; \
-	         $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
 	      } > >(tee -a $(WORK_DIR)/../build-$(ARCH)-$(TC_VERS).log) 2>&1 ; \
-	      [ ! $${PIPESTATUS[0]} -eq 0 ] && ($(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TC_VERS), NAME: $(NAME) - FAILED | tee -a $(PSTAT_LOG); exit 1) || true' ; \
-	else \
-	   $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	fi
+	   else \
+	      $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	   fi \
+	' || { \
+	   $(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TC_VERS), NAME: $(NAME) - FAILED | tee -a $(PSTAT_LOG) ; \
+	   exit 1 ; \
+	}
 
 ####
 
