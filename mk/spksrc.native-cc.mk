@@ -32,6 +32,7 @@ checksum: download
 include ../../mk/spksrc.checksum.mk
 
 extract: checksum depend
+	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) | tee -a $(PSTAT_LOG)
 include ../../mk/spksrc.extract.mk
 
 patch: extract
@@ -64,7 +65,6 @@ _all: install
 
 all:
 	@mkdir -p $(WORK_DIR)
-	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: native, NAME: $(NAME) | tee -a $(PSTAT_LOG)
 	@bash -o pipefail -c ' \
 	   if [ -z "$$LOGGING_ENABLED" ]; then \
 	      export LOGGING_ENABLED=1 ; \
