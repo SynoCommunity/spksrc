@@ -1,7 +1,7 @@
 PKG_NAME = llvm
 PKG_VERS = 14.0.5
 PKG_VERS_MAJ = $(firstword $(subst ., ,$(PKG_VERS)))
-PKG_EXT = tar.gz
+PKG_EXT = txz
 PKG_DIST_NAME = native-$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/native%2Fllvm
 EXTRACT_PATH = $(WORK_DIR)
