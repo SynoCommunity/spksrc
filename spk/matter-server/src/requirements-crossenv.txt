@@ -1,11 +1,11 @@
-aiohttp==3.12.15
-cffi==1.17.1
-cryptography==45.0.7
-frozenlist==1.7.0
+aiohttp==3.13.1
+cffi==2.0.0
+cryptography==46.0.3
+frozenlist==1.8.0
 #home_assistant_chip_core==2025.7.0     # no source available, prebuilt custom version added to package
-multidict==6.6.4
+multidict==6.7.0
 orjson==3.11.3
-propcache==0.3.2
-PyYAML==6.0.2
-yarl==1.20.1
-zeroconf==0.147.0                       # requirement not found with generate requirements script
+propcache==0.4.1
+PyYAML==6.0.3
+yarl==1.22.0
+zeroconf==0.148.0                       # requirement not found with generate requirements script

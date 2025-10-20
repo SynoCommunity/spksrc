@@ -1,5 +1,5 @@
 SPK_NAME = matter-server
-SPK_VERS = 8.1.0
+SPK_VERS = 8.1.1
 SPK_REV = 1
 SPK_ICON = src/matter.png
 
