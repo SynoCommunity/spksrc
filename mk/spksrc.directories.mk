@@ -22,22 +22,7 @@ DISTRIB_DIR = $(BASE_DISTRIB_DIR)
 endif
 
 ifndef WORK_DIR
-# Detect build type from current directory
-BUILD_TYPE_DIR := $(notdir $(patsubst %/,%,$(dir $(CURDIR))))
-
-ifeq ($(strip $(MAKECMDGOALS)),)
-ifeq ($(BUILD_TYPE_DIR),native)
-WORK_DIR := $(CURDIR)/work-native
-endif
-else ifeq ($(strip $(word 2,$(subst -, ,$(MAKECMDGOALS)))),)
-WORK_DIR := $(CURDIR)/work
-else ifeq ($(ARCH),noarch)
-WORK_DIR := $(CURDIR)/work-$(lastword $(subst -, ,$(MAKECMDGOALS)))
-else
-WORK_DIR := $(CURDIR)/work-$(word 2,$(subst -, ,$(MAKECMDGOALS)))-$(lastword $(subst -, ,$(MAKECMDGOALS)))
-endif
-
-export WORK_DIR
+WORK_DIR = $(CURDIR)/work$(ARCH_SUFFIX)
 endif
 
 ifndef INSTALL_DIR

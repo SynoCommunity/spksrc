@@ -12,6 +12,7 @@ LOCAL_FILE    = $(PKG_DIST_NAME)
 endif
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
+ARCH_SUFFIX   = '-native'
 
 # Setup common directories
 include ../../mk/spksrc.directories.mk
@@ -24,6 +25,10 @@ include ../../mk/spksrc.native-env.mk
 # Build system specific configurations (can be overridden by including makefiles)
 # This section can be extended by cmake/meson specific makefiles before including this file
 
+status:
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "native" "$(NAME)") | tee --append $(PSTAT_LOG)
+
+download: status
 include ../../mk/spksrc.download.mk
 
 include ../../mk/spksrc.depend.mk
@@ -32,7 +37,6 @@ checksum: download
 include ../../mk/spksrc.checksum.mk
 
 extract: checksum depend
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "native" "$(NAME)") | tee --append $(PSTAT_LOG)
 include ../../mk/spksrc.extract.mk
 
 patch: extract

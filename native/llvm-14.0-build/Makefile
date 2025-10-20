@@ -23,9 +23,9 @@ HOMEPAGE = https://github.com/KhronosGroup/SPIRV-LLVM-Translator
 COMMENT  = Tool and library for translation between LLVM IR and SPIR-V
 LICENSE  = Apache-2.0 with LLVM-exception
 
-BUILD_DEPENDS  = cross/llvm-project-140.src
-BUILD_DEPENDS += native/Khronos-SPIRV-Headers
-DEPENDS = native/Khronos-SPIRV-Tools
+NATIVE_DEPENDS  = cross/llvm-project-140.src
+NATIVE_DEPENDS += native/Khronos-SPIRV-Headers
+NATIVE_DEPENDS += native/Khronos-SPIRV-Tools
 
 POST_EXTRACT_TARGET = llvm_post_extract_target
 POST_INSTALL_TARGET = llvm_post_install_target

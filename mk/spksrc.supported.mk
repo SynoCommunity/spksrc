@@ -42,7 +42,7 @@ all-$(TARGET_TYPE): $(addprefix $(TARGET_TYPE)-arch-,$(TARGET_ARCH))
 pre-build-native: SHELL:=/bin/bash
 pre-build-native:
 	@set -o pipefail; { \
-	$(MSG) Pre-build native dependencies for parallel build [START]  ; \
+	$(MSG) Pre-build native dependencies for parallel build [START] ; \
 	for depend in $$($(MAKE) dependency-list) ; \
 	do \
 	  if [ "$${depend%/*}" = "native" ]; then \
@@ -73,8 +73,8 @@ build-arch-%:
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [BEGIN]\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") | tee --append $(PSTAT_LOG)
 	@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 ; \
 	status=$${PIPESTATUS[0]} ; \
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [END]\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") | tee --append $(PSTAT_LOG) ; \
 	[ $${status[0]} -eq 0 ] || false
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [END]\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") | tee --append $(PSTAT_LOG) ; \
 
 build-noarch-%: SHELL:=/bin/bash
 build-noarch-%: 
