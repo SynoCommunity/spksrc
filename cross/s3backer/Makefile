@@ -1,5 +1,5 @@
 PKG_NAME = s3backer
-PKG_VERS = 2.1.5
+PKG_VERS = 2.1.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/archiecobbs/s3backer/archive
@@ -17,6 +17,8 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = s3backer_pre_configure
+
+CONFIGURE_ARGS = --disable-static
 
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))

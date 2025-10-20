@@ -1,6 +1,6 @@
 SPK_NAME = synocli-disk
 SPK_VERS = 4.1
-SPK_REV = 15
+SPK_REV = 16
 SPK_ICON = src/synocli-disk.png
 
 # ATTENTION: build order of dependent packages matters
@@ -77,13 +77,11 @@ WIKI_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliDisk\</a\>"
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Update dar from v2.7.17 to v2.7.19. <br/>"
-CHANGELOG += "2. Update dua from v2.30.0 to v2.31.0 (except for ARMv5 and qoriq). <br/>"
-CHANGELOG += "3. Update e2fsprogs from v1.47.2 to v1.47.3. <br/>"
-CHANGELOG += "4. Update fuse v2.9.9 to fuse3 v3.16.2. <br/>"
-CHANGELOG += "5. Update gdu from v5.30.1 to v5.31.0. <br/>"
-CHANGELOG += "6. Update s3backer from v2.1.3 to v2.1.5 (requires fuse3). <br/>"
-CHANGELOG += "7. Update smartmontools from v7.4 to v7.5. <br/>"
+CHANGELOG  = "1. Update dar from v2.7.19 to v2.8.1 and add SFTP repository support. <br/>"
+CHANGELOG += "2. Update davfs2 from v1.7.1 to v1.7.2. <br/>"
+CHANGELOG += "3. Update dua from v2.31.0 to v2.32.0 (except for ARMv5 and qoriq). <br/>"
+CHANGELOG += "4. Update duf from v0.8.1 to v0.9.1. <br/>"
+CHANGELOG += "5. Update s3backer from v2.1.5 to v2.1.6. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 
