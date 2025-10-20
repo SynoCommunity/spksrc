@@ -13,8 +13,8 @@ HOMEPAGE = https://jellyfin.org
 COMMENT  = The Free Software Media System. It is an alternative to the proprietary Emby and Plex.
 LICENSE  = GPLv2
 
-DOTNET_VERSION = 8.0
-BUILD_DEPENDS = native/dotnet-sdk-8.0
+DOTNET_VERSION = 9.0
+BUILD_DEPENDS = native/dotnet-sdk-9.0
 
 DOTNET_OUTPUT_PATH = share
 DOTNET_PACKAGE_NAME = Jellyfin.Server
