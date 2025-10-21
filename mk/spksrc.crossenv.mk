@@ -166,7 +166,7 @@ export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/py
 build_crossenv_target: SHELL:=/bin/bash
 build_crossenv_target: pre_crossenv_target
 	@set -o pipefail; { \
-	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), CROSSENV: $(CROSSENV_WHEEL) >> $(PSTAT_LOG) ; \
+	$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), CROSSENV: $(CROSSENV_WHEEL) >> $(STATUS_LOG) ; \
 	$(MSG) Python sources: $(wildcard $(PYTHON_WORK_DIR)/Python-[0-9]*) ; \
 	$(MSG) crossenv requirement definition: $(CROSSENV_REQUIREMENTS) ; \
 	mkdir -p $(PYTHON_LIB_CROSS) ; \

@@ -54,7 +54,7 @@ endif
 	@set -e; \
 	for native in $(filter native/%,$(BUILD_DEPENDS) $(TOOLKIT_DEPEND) $(DEPENDS)); \
 	do                          \
-	  env $(ENV) WORK_DIR= $(MAKE) -C ../../$$native ; \
+	  env $(ENV) WORK_DIR= LOGGING_ENABLED= $(MAKE) -C ../../$$native ; \
 	done
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \

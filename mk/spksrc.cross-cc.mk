@@ -30,7 +30,7 @@ include ../../mk/spksrc.directories.mk
 
 status:
 ifneq ($(wildcard $(WORK_DIR)/.$(NAME)-depend_done)),)
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") | tee --append $(PSTAT_LOG)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") | tee --append $(STATUS_LOG)
 endif
 
 #####
@@ -81,12 +81,12 @@ all:
 	      export LOGGING_ENABLED=1 ; \
 	      { \
 	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	      } > >(tee --append $(WORK_DIR)/../build-$(ARCH)-$(TC_VERS).log) 2>&1 ; \
+	      } > >(tee --append $(DEFAULT_LOG)) 2>&1 ; \
 	   else \
 	      $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
 	   fi \
 	' || { \
-	   $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") | tee --append $(PSTAT_LOG) ; \
+	   $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") | tee --append $(STATUS_LOG) ; \
 	   exit 1 ; \
 	}
 
