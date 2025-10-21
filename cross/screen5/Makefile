@@ -10,6 +10,7 @@ DEPENDS = cross/ncursesw cross/linux-pam
 # Compiler with support for std=c17 required
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://www.gnu.org/software/screen/
 COMMENT  = Screen is a full-screen window manager that multiplexes a physical terminal between several processes, typically interactive shells.

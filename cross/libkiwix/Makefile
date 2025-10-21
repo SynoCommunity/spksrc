@@ -9,6 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # compiler too old for cross/libzim
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 DEPENDS = cross/libzim cross/pugixml cross/curl cross/libmicrohttpd cross/mustache
 

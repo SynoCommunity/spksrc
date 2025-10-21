@@ -9,6 +9,7 @@ DEPENDS = cross/mkvtoolnix
 REQUIRED_MIN_DSM = 7.1
 # comcerto2k has older toolchain than other DSM 7 archs
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = cytec
 DESCRIPTION = MKVToolNix - Ultimate Tool for Editing and Merging MKV Files. MKVToolNix is a powerful tool for editing, merging, and splitting MKV files. Easily manage video, audio, and subtitles, extract tracks, and modify metadata.

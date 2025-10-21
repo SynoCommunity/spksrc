@@ -87,7 +87,6 @@ libudev_post_configure:
 	@$(RUN) sed -i.bak ":1;/lookup_syscall/{n;s/unsigned int/size_t/;b1}" $(WORK_DIR)/$(PKG_DIR)/src/core/syscall-list.c
 	@$(RUN) sed -i.bak -e "/load_fragment_gperf_lookup/s/unsigned/size_t/" $(WORK_DIR)/$(PKG_DIR)/src/core/load-fragment.h
 	@$(RUN) sed -i.bak -e "/logind_gperf_lookup/s/unsigned/size_t/" $(WORK_DIR)/$(PKG_DIR)/src/login/logind.h
-	@$(RUN) sed -i.bak -e "s/SG_FLAG_LUN_INHIBIT/SG_FLAG_UNUSED_LUN_INHIBIT/g" $(WORK_DIR)/$(PKG_DIR)/src/udev/cdrom_id/cdrom_id.c
 	@$(RUN) sed -i.bak -e "/lookup_key/s/unsigned int/size_t/" $(WORK_DIR)/$(PKG_DIR)/src/udev/keymap/keymap.c
 	@$(RUN) sed -i.bak -e "/mtd-user.h/i\$\\#ifndef u_int32_t\ntypedef unsigned int u_int32_t;\n#endif" -e "/mtd-user.h/a\$\\#include <stdint.h>" $(WORK_DIR)/$(PKG_DIR)/src/udev/mtd_probe/mtd_probe.h
 

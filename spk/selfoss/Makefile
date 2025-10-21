@@ -9,11 +9,13 @@ override ARCH=noarch
 
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = WebStation:PHP7.4:Apache2.4
+# SRM is not supported due lacking webstation, php and apache packages
+REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = moneytoo
 DESCRIPTION = The new multipurpose rss reader, live stream, mashup, aggregation web application.
 DISPLAY_NAME = Selfoss
-CHANGELOG = "1. Update Selfoss to 2.19.<br/>2. Use faster SQLite database."
+CHANGELOG = "1. Update Selfoss to 2.19. <br/>2. Use faster SQLite database."
 HOMEPAGE   = https://selfoss.aditu.de/
 
 LICENSE    = GPLv3
