@@ -19,16 +19,15 @@ include ../../mk/spksrc.directories.mk
 
 #####
 
-# native specific environment
+status:
+ifneq ($(wildcard $(WORK_DIR)/.$(NAME)-depend_done)),)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "native" "$(NAME)") | tee --append $(PSTAT_LOG)
+endif
+
+#####
+
 include ../../mk/spksrc.native-env.mk
 
-# Build system specific configurations (can be overridden by including makefiles)
-# This section can be extended by cmake/meson specific makefiles before including this file
-
-status:
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "native" "$(NAME)") | tee --append $(PSTAT_LOG)
-
-download: status
 include ../../mk/spksrc.download.mk
 
 include ../../mk/spksrc.depend.mk
@@ -36,7 +35,7 @@ include ../../mk/spksrc.depend.mk
 checksum: download
 include ../../mk/spksrc.checksum.mk
 
-extract: checksum depend
+extract: checksum depend status
 include ../../mk/spksrc.extract.mk
 
 patch: extract
