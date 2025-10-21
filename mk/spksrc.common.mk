@@ -138,7 +138,7 @@ endif
 
 # Always send PSTAT output to proper log file
 # independantly from active Makefile location
-ifeq ($(filter cross diyspk spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
+ifeq ($(filter cross diyspk native spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
 CROSSENV_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build-$(ARCH)-$(TCVERSION)-crossenv.log
 PSTAT_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/status-build.log
 WHEEL_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build-$(ARCH)-$(TCVERSION)-wheel.log
