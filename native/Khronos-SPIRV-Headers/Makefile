@@ -15,4 +15,4 @@ include ../../mk/spksrc.native-cmake.mk
 
 .PHONY: SPIRV-Headers_post_extract_target
 SPIRV-Headers_post_extract_target:
-	@cd $(WORK_DIR) && ln -s $(PKG_DIR) $(PKG_NAME)
+	@cd $(WORK_DIR) && ln -sf $(PKG_DIR) $(PKG_NAME)
