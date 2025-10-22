@@ -1,5 +1,6 @@
-# Common makefiles
-include ../../mk/spksrc.common.mk
+#
+# Default NATIVE make programs
+#
 
 # Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -12,10 +13,13 @@ LOCAL_FILE    = $(PKG_DIST_NAME)
 endif
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
-ARCH_SUFFIX   = '-native'
+ARCH_SUFFIX  := -native
 
 # Setup common directories
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 

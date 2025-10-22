@@ -39,6 +39,28 @@ else
 TOOLKIT_DEPEND = toolkit/syno-$(ARCH)-$(TCVERSION)
 endif
 
+native-depend_msg_target:
+	@$(MSG) "Processing NATIVE dependencies of $(NAME)"
+
+# Called for 'make all-supported' prior to
+# parallalizing build for every arch targets
+native-depend: native-depend_msg_target
+	@set -e; \
+	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
+	do                          \
+	  env $(ENV) WORK_DIR= LOGGING_ENABLED=1 $(MAKE) -C ../../$$native ; \
+	done
+	@set -e; \
+	for depend in $(NATIVE_DEPENDS); \
+	do                          \
+	  env $(ENV) WORK_DIR=$(WORK_DIR) $(MAKE) -C ../../$$depend ; \
+	done
+	@set -e; \
+	for depend in $(filter-out native/%,$(BUILD_DEPENDS) $(OPTIONAL_DEPENDS) $(DEPENDS)); \
+	do                          \
+	  env $(ENV) $(MAKE) -C ../../$$depend native-depend; \
+	done
+
 depend_msg_target:
 	@$(MSG) "Processing dependencies of $(NAME)"
 
@@ -52,7 +74,7 @@ depend_target: kernel-modules
 endif
 endif
 	@set -e; \
-	for native in $(filter native/%,$(BUILD_DEPENDS) $(TOOLKIT_DEPEND) $(DEPENDS)); \
+	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do                          \
 	  env $(ENV) WORK_DIR= LOGGING_ENABLED= $(MAKE) -C ../../$$native ; \
 	done
