@@ -14,9 +14,6 @@
 #    aka don't use 'bin' for the PLIST use 'rsc' instead.
 #    It *will* break the program.
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
@@ -38,6 +35,9 @@ endif
 
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 ##### dotnet specific configurations
 include ../../mk/spksrc.cross-dotnet-env.mk

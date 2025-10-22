@@ -5,9 +5,6 @@
 # - implement a custom INSTALL_TARGET to copy the required files to the 
 #   target location under $(STAGING_INSTALL_PREFIX)
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-
 # Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
@@ -22,6 +19,9 @@ DIST_EXT      = $(PKG_EXT)
 
 # Setup common directories
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 

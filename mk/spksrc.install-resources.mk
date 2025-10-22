@@ -7,9 +7,6 @@
 #   target location under $(STAGING_INSTALL_PREFIX)
 # - create a PLIST file to include the target file(s)/folder(s)
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
@@ -31,6 +28,9 @@ endif
 
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 

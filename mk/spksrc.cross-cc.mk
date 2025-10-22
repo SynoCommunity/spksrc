@@ -1,8 +1,6 @@
+#
 # Default make programs
 #
-
-# Common makefiles
-include ../../mk/spksrc.common.mk
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -25,6 +23,9 @@ endif
 
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 

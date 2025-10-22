@@ -3,9 +3,6 @@
 # This makefile extends spksrc.native-cc.mk with CMake-specific functionality
 #
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-
 # Package dependent (same as native-cc.mk)
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
@@ -20,6 +17,9 @@ DIST_EXT      = $(PKG_EXT)
 
 # Setup common directories
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 # cmake specific configurations
 include ../../mk/spksrc.native-cmake-env.mk
