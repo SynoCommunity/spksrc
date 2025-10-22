@@ -22,8 +22,7 @@ if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
     GROUP=sc-media
 fi
 
-service_postinst ()
-{
+service_postinst() {
     if [ "$SYNOPKG_DSM_VERSION_MAJOR" -ge 7 ]; then
         mkdir -p --mode=0777 "${SYNOPKG_PKGVAR}/data/transcodes"
     fi
@@ -104,4 +103,96 @@ service_restore() {
         fi
     fi
     return 0
+}
+
+validate_preuninst() {
+    sc_backup="${SYNOPKG_PKGVAR}/sc_backup"
+    pkg="${SYNOPKG_PKGNAME:-jellyfin}"
+    expected_prefix="${pkg}_backup_v10.10.7_"
+
+    # If no backup folder, proceed normally
+    [ -d "${sc_backup}" ] || return 0
+
+    # Look for a matching backup file (e.g., jellyfin_backup_v10.10.7_YYYYMMDD.tar.gz)
+    set -- "${sc_backup}/${expected_prefix}"*.tar.gz
+
+    # If no matching file found, just continue uninstall
+    [ -e "$1" ] || return 0
+
+    # Optional: detect multiple matches
+    [ -e "${2-}" ] && { install_log "WARNING: Multiple backups found, using the first match."; }
+
+    # Valid backup found — mark for restore
+    SC_RESTORE_CONFIG=y
+    SC_BACKUP_FILE="$1"
+    export SC_RESTORE_CONFIG SC_BACKUP_FILE
+
+    install_log "Backup found: ${SC_BACKUP_FILE}"
+    return 0
+}
+
+service_preuninst() {
+    if [ "${wizard_restore_data}" = "true" ]; then
+        if [ "$SC_RESTORE_CONFIG" = "y" ] && [ -f "$SC_BACKUP_FILE" ]; then
+            pkg="${SYNOPKG_PKGNAME:-jellyfin}"
+            SC_TEMP_FOLDER="/volume1/@tmp"
+            SC_TEMP_UNINSTALL_FOLDER="${SC_TEMP_FOLDER}/${pkg}.tmp"
+            marker="${SC_TEMP_UNINSTALL_FOLDER}/.backupfile"
+
+            # Ensure temp dir is writable
+            [ -w "${SC_TEMP_FOLDER}" ] || { echo "ERROR: Not writable: ${SC_TEMP_FOLDER}"; return 1; }
+
+            mkdir -p "${SC_TEMP_UNINSTALL_FOLDER}" || {
+                echo "ERROR: Failed to create ${SC_TEMP_UNINSTALL_FOLDER}"; return 1; }
+
+            base="$(basename "$SC_BACKUP_FILE")"
+            new_path="${SC_TEMP_UNINSTALL_FOLDER}/${base}"
+
+            echo "Staging backup → ${new_path}"
+            mv -f -- "$SC_BACKUP_FILE" "$new_path" || {
+                echo "ERROR: Failed to move backup to temp location"; return 1; }
+
+            # Persist the staged path for post-uninstall/restore steps
+            printf '%s\n' "$new_path" > "${marker}" || {
+                echo "ERROR: Could not write marker ${marker}"; return 1; }
+        fi
+        return 0
+    fi
+}
+
+service_postuninst() {
+    if [ "${wizard_restore_data}" = "true" ]; then
+        pkg="${SYNOPKG_PKGNAME:-jellyfin}"
+        SC_TEMP_FOLDER="/volume1/@tmp"
+        SC_TEMP_UNINSTALL_FOLDER="${SC_TEMP_FOLDER}/${pkg}.tmp"
+        marker="${SC_TEMP_UNINSTALL_FOLDER}/.backupfile"
+
+        if [ -f "${marker}" ]; then
+            # Read path from marker
+            IFS= read -r SC_BACKUP_FILE < "${marker}"
+
+            if [ -f "${SC_BACKUP_FILE}" ]; then
+                echo "Restoring backup from ${SC_BACKUP_FILE} → ${SYNOPKG_PKGVAR}"
+
+                # Clear old data safely
+                if [ -d "${SYNOPKG_PKGVAR}" ]; then
+                    rm -rf "${SYNOPKG_PKGVAR:?}/"* || {
+                        echo "ERROR: Failed to clear ${SYNOPKG_PKGVAR}"
+                        return 1
+                    }
+                fi
+
+                # Extract backup
+                tar -xzf "${SC_BACKUP_FILE}" -C "${SYNOPKG_PKGVAR}" || {
+                    echo "ERROR: Failed to extract backup archive"
+                    return 1
+                }
+
+                # Clean up temp uninstall folder
+                rm -rf -- "${SC_TEMP_UNINSTALL_FOLDER}"
+                echo "Backup restored successfully."
+            fi
+        fi
+        return 0
+    fi
 }
