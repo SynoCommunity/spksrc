@@ -106,33 +106,35 @@ service_restore() {
 }
 
 validate_preuninst() {
-    sc_backup="${SYNOPKG_PKGVAR}/sc_backup"
-    pkg="${SYNOPKG_PKGNAME:-jellyfin}"
-    expected_prefix="${pkg}_backup_v10.10.7_"
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
+        sc_backup="${SYNOPKG_PKGVAR}/sc_backup"
+        pkg="${SYNOPKG_PKGNAME:-jellyfin}"
+        expected_prefix="${pkg}_backup_v10.10.7_"
 
-    # If no backup folder, proceed normally
-    [ -d "${sc_backup}" ] || return 0
+        # If no backup folder, proceed normally
+        [ -d "${sc_backup}" ] || return 0
 
-    # Look for a matching backup file (e.g., jellyfin_backup_v10.10.7_YYYYMMDD.tar.gz)
-    set -- "${sc_backup}/${expected_prefix}"*.tar.gz
+        # Look for a matching backup file (e.g., jellyfin_backup_v10.10.7_YYYYMMDD.tar.gz)
+        set -- "${sc_backup}/${expected_prefix}"*.tar.gz
 
-    # If no matching file found, just continue uninstall
-    [ -e "$1" ] || return 0
+        # If no matching file found, just continue uninstall
+        [ -e "$1" ] || return 0
 
-    # Optional: detect multiple matches
-    [ -e "${2-}" ] && { install_log "WARNING: Multiple backups found, using the first match."; }
+        # Optional: detect multiple matches
+        [ -e "${2-}" ] && { install_log "WARNING: Multiple backups found, using the first match."; }
 
-    # Valid backup found — mark for restore
-    SC_RESTORE_CONFIG=y
-    SC_BACKUP_FILE="$1"
-    export SC_RESTORE_CONFIG SC_BACKUP_FILE
+        # Valid backup found — mark for restore
+        SC_RESTORE_CONFIG=y
+        SC_BACKUP_FILE="$1"
+        export SC_RESTORE_CONFIG SC_BACKUP_FILE
 
-    install_log "Backup found: ${SC_BACKUP_FILE}"
-    return 0
+        install_log "Backup found: ${SC_BACKUP_FILE}"
+        return 0
+    fi
 }
 
 service_preuninst() {
-    if [ "${wizard_restore_data}" = "true" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ "${wizard_restore_data}" = "true" ]; then
         if [ "$SC_RESTORE_CONFIG" = "y" ] && [ -f "$SC_BACKUP_FILE" ]; then
             pkg="${SYNOPKG_PKGNAME:-jellyfin}"
             SC_TEMP_FOLDER="/volume1/@tmp"
@@ -161,7 +163,7 @@ service_preuninst() {
 }
 
 service_postuninst() {
-    if [ "${wizard_restore_data}" = "true" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ "${wizard_restore_data}" = "true" ]; then
         pkg="${SYNOPKG_PKGNAME:-jellyfin}"
         SC_TEMP_FOLDER="/volume1/@tmp"
         SC_TEMP_UNINSTALL_FOLDER="${SC_TEMP_FOLDER}/${pkg}.tmp"
