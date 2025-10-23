@@ -42,6 +42,9 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = jellyfin_custom_libe_sqlite3
 
+# use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
+USE_ALTERNATE_TMPDIR = 1
+
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 # we do not only need the updated libstdc++ library, we also need to
