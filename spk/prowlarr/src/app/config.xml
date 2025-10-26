@@ -3,5 +3,6 @@
   <LaunchBrowser>False</LaunchBrowser>
   <Port>9696</Port>
   <UpdateAutomatically>True</UpdateAutomatically>
-  <UpdateMechanism>BuiltIn</UpdateMechanism>
+  <UpdateMechanism>Script</UpdateMechanism>
+  <UpdateScriptPath>/var/packages/prowlarr/target/share/Prowlarr/servarr_spk_upgrade.sh</UpdateScriptPath>
 </Config>

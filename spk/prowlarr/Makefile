@@ -53,6 +53,7 @@ include ../../mk/spksrc.spk.mk
 
 PACKAGE_VERSION = $(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV)
 PACKAGE_AUTHOR = [Team Prowlarr](https://prowlarr.com)
+UPDATE_METHOD = External
 
 .PHONY: prowlarr_custom_libe_sqlite3
 prowlarr_custom_libe_sqlite3:
@@ -63,5 +64,6 @@ prowlarr_custom_libe_sqlite3:
 prowlarr_extra_install:
 	@$(MSG) "Install config.xml and provide package_info."
 	@install -m 755 -d $(STAGING_DIR)/var/.config/Prowlarr
-	@install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Prowlarr/config.xml
-	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Prowlarr/package_info
+	@install -m 644 src/app/config.xml $(STAGING_DIR)/var/.config/Prowlarr/config.xml
+	@install -m 744 src/app/servarr_spk_upgrade.sh $(STAGING_DIR)/share/Prowlarr/servarr_spk_upgrade.sh
+	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)\nUpdateMethod=$(UPDATE_METHOD)" > $(STAGING_DIR)/share/Prowlarr/package_info
