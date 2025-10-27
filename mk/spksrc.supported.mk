@@ -42,19 +42,10 @@ all-$(TARGET_TYPE): $(addprefix $(TARGET_TYPE)-arch-,$(TARGET_ARCH))
 pre-build-native: SHELL:=/bin/bash
 pre-build-native:
 	@set -o pipefail; { \
-	$(MSG) Pre-build native dependencies for parallel build [START] ; \
-	for depend in $$($(MAKE) dependency-list) ; \
-	do \
-	  if [ "$${depend%/*}" = "native" ]; then \
-	    $(MSG) "Pre-processing $${depend}" ; \
-	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
-	    env $(ENV) WORK_DIR= LOGGING_ENABLED=1 $(MAKE) -C ../../$$depend 2>&1 ; \
-	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
-	  fi ; \
-	done ; \
-	$(MSG) Pre-build native dependencies for parallel build [END] ; \
-	$(MSG) PROCESSING archs $(TARGET_ARCH) ; \
-	} > >(tee --append build-$${depend%/*}-$${depend#*/}.log 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
+	   $(MSG) Pre-build native dependencies for parallel build [START] ; \
+	   env $(ENV) $(MAKE) native-depend ; \
+	   $(MSG) Pre-build native dependencies for parallel build [END] ; \
+	} ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 $(TARGET_TYPE)-arch-% &: pre-build-native
 	-@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) arch-$*
