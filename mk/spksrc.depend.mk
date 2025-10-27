@@ -48,7 +48,7 @@ native-depend: native-depend_msg_target
 	@set -e; \
 	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do                          \
-	  env $(ENV) WORK_DIR= LOGGING_ENABLED=1 $(MAKE) -C ../../$$native ; \
+	  env $(ENV) WORK_DIR= $(MAKE) -C ../../$$native ; \
 	done
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \
@@ -84,7 +84,7 @@ endif
 	  env $(ENV) WORK_DIR=$(WORK_DIR) $(MAKE) -C ../../$$depend ; \
 	done
 	@set -e; \
-	for depend in $(filter-out native/%,$(BUILD_DEPENDS) $(TOOLKIT_DEPEND) $(DEPENDS)); \
+	for depend in $(filter-out native/%,$(TOOLKIT_DEPEND) $(BUILD_DEPENDS) $(DEPENDS)); \
 	do                          \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done
