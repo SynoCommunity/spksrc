@@ -19,12 +19,23 @@ fi
 SVC_BACKGROUND=y
 SVC_WAIT_TIMEOUT=90
 
+dsm_lt_7_2() {
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] || \
+       { [ "${SYNOPKG_DSM_VERSION_MAJOR}" -eq 7 ] && [ "${SYNOPKG_DSM_VERSION_MINOR}" -lt 2 ]; }; then
+        return 0    # DSM < 7.2
+    else
+        return 1    # DSM ≥ 7.2
+    fi
+}
+
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        echo "Set update required"
-        # Make Prowlarr do an update check on start
-        touch "${PROWLARR_CONFIG_DIR}/update_required" 2>&1
+        if ! dsm_lt_7_2; then
+            # DSM ≥ 7.2; make Prowlarr do an update check on start
+            echo "Set update required"
+            touch "${PROWLARR_CONFIG_DIR}/update_required" 2>&1
+        fi
 
         if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
             set_unix_permissions "${CONFIG_DIR}"
@@ -34,12 +45,8 @@ service_postinst ()
 
 service_preupgrade ()
 {
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] || \
-        { [ "${SYNOPKG_DSM_VERSION_MAJOR}" -eq 7 ] && [ "${SYNOPKG_DSM_VERSION_MINOR}" -lt 2 ]; }; then
-        ## earlier DSM < 7.2 with auto-update disabled, update Prowlarr distribution
-        return 0
-    else
-        ## DSM >= 7.2; don't update Prowlarr distribution, use internal updater only
+    if ! dsm_lt_7_2; then
+        # DSM ≥ 7.2; don't update Prowlarr distribution, use internal updater only
         [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup" ] && rm -rf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
         echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
         mkdir -p "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup" 2>&1
@@ -49,7 +56,7 @@ service_preupgrade ()
 
 service_postupgrade ()
 {
-    ## restore Prowlarr distribution
+    # restore Prowlarr distribution
     if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/share" ]; then
         echo "Restore previous distribution from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
         rm -rf "${SYNOPKG_PKGDEST}/share/Prowlarr/bin" 2>&1
