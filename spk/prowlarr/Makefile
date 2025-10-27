@@ -54,7 +54,7 @@ POST_STRIP_TARGET += prowlarr_extra_install
 include ../../mk/spksrc.spk.mk
 
 PACKAGE_VERSION = $(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV)
-PACKAGE_AUTHOR = [Team Prowlarr](https://prowlarr.com)
+PACKAGE_AUTHOR = [SynoCommunity](https://synocommunity.com/)
 
 .PHONY: prowlarr_custom_libe_sqlite3
 prowlarr_custom_libe_sqlite3:
