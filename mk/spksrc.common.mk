@@ -93,10 +93,10 @@ ARCHS_DUPES_DEPRECATED += $(addsuffix %,$(DEPRECATED_ARCHS))
 ARCHS_DUPES = $(ARCHS_WITH_GENERIC_SUPPORT) $(ARCHS_DUPES_DEPRECATED) $(TCVERSION_DUPES)
 
 # supported: used for all-supported target
-SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
+SUPPORTED_ARCHS = $(sort $(filter-out %-rust $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
 
 # default: used for all-latest target
-LATEST_ARCHS = $(foreach arch,$(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS)))))),$(arch)-$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $(arch)%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $(arch)%, $(AVAILABLE_TOOLCHAINS))))))))
+LATEST_ARCHS = $(foreach arch,$(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS)))))),$(arch)-$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $(arch)%, $(filter-out %-rust,$(AVAILABLE_TOOLCHAINS))))))),$(sort $(filter $(arch)%,$(AVAILABLE_TOOLCHAINS))))))))
 
 # legacy: used for all-legacy and when kernel support is used
 #         all archs except generic archs
