@@ -29,13 +29,6 @@ include ../../mk/spksrc.common.mk
 
 #####
 
-status:
-ifneq ($(wildcard $(WORK_DIR)/.$(NAME)-depend_done)),)
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") | tee --append $(STATUS_LOG)
-endif
-
-#####
-
 include ../../mk/spksrc.pre-check.mk
 
 include ../../mk/spksrc.cross-env.mk
@@ -43,6 +36,8 @@ include ../../mk/spksrc.cross-env.mk
 include ../../mk/spksrc.download.mk
 
 include ../../mk/spksrc.depend.mk
+
+include ../../mk/spksrc.status.mk
 
 checksum: download
 include ../../mk/spksrc.checksum.mk
