@@ -26,7 +26,7 @@ include ../../mk/spksrc.cross-go.mk
 
 # PATH must be defined after include of spksrc.cross-go.mk,
 # otherwise WORK_DIR is not defined when building in cross/gitea folder
-PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
+PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/pnpm:$(PATH)
 
 SYNOPKG_PKGVAR = /var/packages/$(PKG_NAME)/var
 CUSTOM_PATH = -X \"code.gitea.io/gitea/modules/setting.CustomPath=$(SYNOPKG_PKGVAR)/custom\"
