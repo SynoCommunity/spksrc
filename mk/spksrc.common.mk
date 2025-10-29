@@ -138,9 +138,8 @@ endif
 
 DEFAULT_LOG  = $(LOG_DIR)/build$(ARCH_SUFFIX).log
 CROSSENV_LOG = $(LOG_DIR)/build$(ARCH_SUFFIX)-crossenv.log
+WHEEL_LOG    = $(LOG_DIR)/build$(ARCH_SUFFIX)-wheel.log
 NATIVE_LOG   = $(LOG_DIR)/build-native-$(PKG_NAME).log
-WHEEL_LOG    = $(LOG_DIR)/build-$(ARCH_SUFFIX)-wheel.log
-#
 STATUS_LOG   = $(LOG_DIR)/status-build.log
 
 # Terminal colors
