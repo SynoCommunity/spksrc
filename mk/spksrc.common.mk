@@ -133,7 +133,7 @@ endif
 
 # Enable stats over parallel build mode
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-PSTAT_TIME = time -o $(STATUS_LOG) --append
+PSTAT_TIME = time -o $(STATUS_LOG) --append --quiet
 endif
 
 DEFAULT_LOG  = $(LOG_DIR)/build$(ARCH_SUFFIX).log
