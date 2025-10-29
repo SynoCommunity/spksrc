@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 
-BUILD_DEPENDS = native/go native/nodejs
+BUILD_DEPENDS = native/go native/nodejs native/pnpm
 
 HOMEPAGE = https://gitea.io/
 COMMENT  = Gitea is a community managed lightweight code hosting solution written in Go.
