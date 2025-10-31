@@ -19,19 +19,24 @@ fi
 SVC_BACKGROUND=y
 SVC_WAIT_TIMEOUT=90
 
-update_supported() {
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] || \
-       { [ "${SYNOPKG_DSM_VERSION_MAJOR}" -eq 7 ] && [ "${SYNOPKG_DSM_VERSION_MINOR}" -lt 2 ]; }; then
-        return 1    # DSM < 7.2
+internal_update_supported() {
+    info_file="${SYNOPKG_PKGINST_TEMP_DIR}/share/Prowlarr/package_info"
+
+    # If the file doesn't exist, assume update is supported
+    [ -f "$info_file" ] || return 0
+
+    # If the file contains "UpdateMethod=External", updates are NOT supported
+    if grep -q '^UpdateMethod=External' "$info_file" 2>/dev/null; then
+        return 1    # DSM < 7.2; Not supported
     else
-        return 0    # DSM ≥ 7.2
+        return 0    # DSM ≥ 7.2; Supported
     fi
 }
 
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        if update_supported; then
+        if internal_update_supported; then
             # DSM ≥ 7.2; make Prowlarr do an update check on start
             echo "Set update required"
             touch "${PROWLARR_CONFIG_DIR}/update_required" 2>&1
@@ -45,7 +50,7 @@ service_postinst ()
 
 service_preupgrade ()
 {
-    if update_supported; then
+    if internal_update_supported; then
         # DSM ≥ 7.2; don't update Prowlarr distribution, use internal updater only
         [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup" ] && rm -rf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
         echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
