@@ -27,9 +27,9 @@ internal_update_supported() {
 
     # If the file contains "UpdateMethod=External", updates are NOT supported
     if grep -q '^UpdateMethod=External' "$info_file" 2>/dev/null; then
-        return 1    # DSM < 7.2; Not supported
+        return 1    # Not supported
     else
-        return 0    # DSM ≥ 7.2; Supported
+        return 0    # Supported
     fi
 }
 
@@ -37,7 +37,7 @@ service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         if internal_update_supported; then
-            # DSM ≥ 7.2; make Prowlarr do an update check on start
+            # make Prowlarr do an update check on start
             echo "Set update required"
             touch "${PROWLARR_CONFIG_DIR}/update_required" 2>&1
         fi
@@ -51,7 +51,7 @@ service_postinst ()
 service_preupgrade ()
 {
     if internal_update_supported; then
-        # DSM ≥ 7.2; don't update Prowlarr distribution, use internal updater only
+        # don't update Prowlarr distribution, use internal updater
         [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup" ] && rm -rf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
         echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
         mkdir -p "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup" 2>&1
