@@ -3,22 +3,10 @@
 SHELL := $(SHELL) -e
 default: all
 
-WORK_DIR := $(CURDIR)/work
-include ../../mk/spksrc.directories.mk
-
 include ../../mk/spksrc.common.mk
 
 ### Include common rules
 include ../../mk/spksrc.common-rules.mk
-
-# Include ross-rust-env.mk to generate install its toolchain
-include ../../mk/spksrc.cross-rust-env.mk
-
-# Include cross-cmake-env.mk to generate its toolchain file
-include ../../mk/spksrc.cross-cmake-env.mk
-
-# Include cross-meson-env.mk to generate its toolchain file
-include ../../mk/spksrc.cross-meson-env.mk
 
 # Configure the included makefiles
 URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
@@ -38,6 +26,25 @@ TC_LOCAL_VARS_MK           = $(WORK_DIR)/tc_vars.mk
 TC_LOCAL_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
 TC_LOCAL_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
 TC_LOCAL_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
+
+ifneq ($(strip $(ARCH)),)
+ARCH_SUFFIX := -$(ARCH)-$(TCVERSION)
+else
+ARCH_SUFFIX :=
+endif
+
+#####
+
+include ../../mk/spksrc.directories.mk
+
+# Include ross-rust-env.mk to generate install its toolchain
+include ../../mk/spksrc.cross-rust-env.mk
+
+# Include cross-cmake-env.mk to generate its toolchain file
+include ../../mk/spksrc.cross-cmake-env.mk
+
+# Include cross-meson-env.mk to generate its toolchain file
+include ../../mk/spksrc.cross-meson-env.mk
 
 #####
 
@@ -69,7 +76,30 @@ include ../../mk/spksrc.tc-flags.mk
 rustc: flag
 include ../../mk/spksrc.tc-rust.mk
 
-all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON_CROSS) $(TC_LOCAL_VARS_MESON_NATIVE) $(TC_LOCAL_VARS_MK)
+# Define _all as a real target that does the work
+.PHONY: _all
+_all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON_CROSS) $(TC_LOCAL_VARS_MESON_NATIVE) $(TC_LOCAL_VARS_MK)
+
+# all wraps _all with logging
+.PHONY: all
+.DEFAULT_GOAL := all
+
+all:
+	@bash -o pipefail -c ' \
+	  mkdir -p $(WORK_DIR) ; \
+	  $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG) ; \
+	   if [ -z "$$LOGGING_ENABLED" ]; then \
+	      export LOGGING_ENABLED=1 ; \
+	      { \
+	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	      } > >(tee --append $(DEFAULT_LOG)) 2>&1 ; \
+	   else \
+	      $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	   fi \
+	' || { \
+	   $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG) ; \
+	   exit 1 ; \
+	}
 
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK):

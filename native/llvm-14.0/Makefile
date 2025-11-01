@@ -1,7 +1,7 @@
 PKG_NAME = llvm
 PKG_VERS = 14.0.5
 PKG_VERS_MAJ = $(firstword $(subst ., ,$(PKG_VERS)))
-PKG_EXT = tar.gz
+PKG_EXT = txz
 PKG_DIST_NAME = native-$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/native%2Fllvm
 EXTRACT_PATH = $(WORK_DIR)
@@ -24,5 +24,9 @@ COMMENT = The LLVM Project is a collection of modular and reusable compiler and 
 LICENSE = Apache v2.0 with LLVM Exceptions
 
 INSTALL_TARGET = nop
+POST_INSTALL_TARGET = llvm-14-post_install_target
 
 include ../../mk/spksrc.native-install.mk
+
+llvm-14-post_install_target:
+	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf clang-$(PKG_VERS_MAJ) clang-tool

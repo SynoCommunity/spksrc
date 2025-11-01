@@ -1,14 +1,10 @@
 # Build CMake programs
 #
+# This makefile extends spksrc.cross-cc.mk with CMake-specific functionality
+#
 # prerequisites:
 # - cross/module depends on cmake
 #
-# remarks:
-# - most content is taken from spksrc.cross-cc.mk and modified for cmake
-#
-
-# Common makefiles
-include ../../mk/spksrc.common.mk
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -32,12 +28,15 @@ endif
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
 
+# Common makefiles
+include ../../mk/spksrc.common.mk
+
 ###
 
 # cmake specific configurations
 include ../../mk/spksrc.cross-cmake-env.mk
 
-# meson toolchain-file usage definition
+# cmake toolchain-file usage definition
 include ../../mk/spksrc.cross-cmake-toolchainfile.mk
 
 # configure using cmake
@@ -51,7 +50,7 @@ CMAKE_SOURCE_DIR = $(CMAKE_BASE_DIR)
 endif
 
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-include ../../mk/spksrc.cross-ninja.mk
+include ../../mk/spksrc.ninja.mk
 else
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
@@ -73,39 +72,7 @@ endif
 
 ###
 
-include ../../mk/spksrc.pre-check.mk
-
-include ../../mk/spksrc.cross-env.mk
-
-include ../../mk/spksrc.download.mk
-
-include ../../mk/spksrc.depend.mk
-
-checksum: download
-include ../../mk/spksrc.checksum.mk
-
-extract: checksum depend
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-configure: patch
-include ../../mk/spksrc.configure.mk
-
-compile: configure
-include ../../mk/spksrc.compile.mk
-
-install: compile
-include ../../mk/spksrc.install.mk
-
-plist: install
-include ../../mk/spksrc.plist.mk
-
-all: install plist
-
-###
-
+# CMake specific targets
 .PHONY: cmake_configure_target
 cmake_configure_target: $(CMAKE_TOOLCHAIN_FILE_PKG)
 	@$(MSG) - CMake configure
@@ -126,7 +93,6 @@ cmake_configure_target: $(CMAKE_TOOLCHAIN_FILE_PKG)
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	@$(MSG) $$(date +%Y%m%d-%H%M%S) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
 	$(RUN_CMAKE) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
 
 .PHONY: cmake_install_target
@@ -148,6 +114,7 @@ cmake_post_install_target:
 	@$(MSG) - CMake post-install \(clean\)
 	$(RUN_CMAKE) cmake --build $(CMAKE_BUILD_DIR) --target clean
 
+###
 
-### For arch-* and all-<supported|latest>
-include ../../mk/spksrc.supported.mk
+# Include base cross-cc makefile for common functionality
+include ../../mk/spksrc.cross-cc.mk

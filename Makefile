@@ -170,7 +170,7 @@ local.mk:
 	@echo "# Option to disable the use of github API to get the real name and url of the maintainer" >> $@
 	@echo "# define it for local builds when you reach the API rate limit" >> $@
 	@echo "DISABLE_GITHUB_MAINTAINER =" >> $@
-	@echo "#PSTAT = on" >> $@
+	@echo "PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
 
 dsm-%: local.mk
