@@ -107,9 +107,6 @@ ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 # [pydantic-core]
 DEPENDS += python/pydantic-core
 
-# [pygobject]
-DEPENDS += python/pygobject
-
 # [PyNaCl]
 DEPENDS += cross/libsodium
 ENV += SODIUM_INSTALL=system
@@ -205,4 +202,9 @@ ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
+endif
+
+# [pygobject]
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+DEPENDS += python/pygobject
 endif
