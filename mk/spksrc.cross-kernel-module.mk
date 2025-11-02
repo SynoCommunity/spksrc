@@ -47,6 +47,7 @@ endif
 
 kernel_module_msg:
 	@$(MSG) "Compiling kernel modules for $(NAME)"
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "kernel-modules") | tee --append $(STATUS_LOG) ; \
 
 pre_kernel_module_target: kernel_module_msg
 

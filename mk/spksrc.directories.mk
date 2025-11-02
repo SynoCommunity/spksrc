@@ -22,7 +22,12 @@ DISTRIB_DIR = $(BASE_DISTRIB_DIR)
 endif
 
 ifndef WORK_DIR
-WORK_DIR := $(CURDIR)/work$(ARCH_SUFFIX)
+WORK_DIR = $(CURDIR)/work$(ARCH_SUFFIX)
+endif
+
+ifndef LOG_DIR
+LOG_DIR = $(CURDIR)
+export LOG_DIR
 endif
 
 ifndef INSTALL_DIR

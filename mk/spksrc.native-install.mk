@@ -5,13 +5,6 @@
 # - implement a custom INSTALL_TARGET to copy the required files to the 
 #   target location under $(STAGING_INSTALL_PREFIX)
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
-
-# Force build in native tool directory, not cross directory.
-WORK_DIR := $(CURDIR)/work-native
-
 # Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
@@ -24,6 +17,11 @@ endif
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
+# Setup common directories
+include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 
@@ -33,39 +31,19 @@ endif
 
 #####
 
-.NOTPARALLEL:
+# native-install specific: skip configure and compile steps
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
 
-include ../../mk/spksrc.native-env.mk
+# INSTALL_TARGET must be provided by the including makefile
 
-include ../../mk/spksrc.download.mk
-
-include ../../mk/spksrc.depend.mk
-
-checksum: download
-include ../../mk/spksrc.checksum.mk
-
-extract: checksum depend
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-install: patch
-include ../../mk/spksrc.install.mk
+#####
 
 ifeq ($(strip $(PLIST_TRANSFORM)),)
 PLIST_TRANSFORM= cat
 endif
 
-.PHONY: cat_PLIST
-cat_PLIST:
-	@true
+#####
 
-all: install
-
-####
-
-### Include common rules
-include ../../mk/spksrc.common-rules.mk
-
-###
+# Include base native-cc makefile for common functionality
+include ../../mk/spksrc.native-cc.mk
