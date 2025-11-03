@@ -203,3 +203,8 @@ WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
 endif
+
+# [pygobject]
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+DEPENDS += python/pygobject
+endif

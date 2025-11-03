@@ -207,7 +207,6 @@ meson_cross_vars:
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
 	    echo "fortran = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
-	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
 	    echo "c = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
@@ -226,12 +225,17 @@ meson_native_vars:
 	  if [ "$${target}" = "cc" ]; then \
 	    echo "c = '$$(which $${source})'" ; \
 	    echo "$${target} = '$$(which $${source})'" ; \
+	  elif [ "$${target}" = "fc" ]; then \
+	    $$(which gfortran) && echo "fortran = '$$(which gfortran)'" || true ; \
 	  elif [ "$${target}" = "ldshared" ]; then \
 	    echo "$${target} = '$$(which gcc) -shared'" ; \
 	  else \
 	    echo "$${target} = '$$(which $${source})'" ; \
 	  fi ; \
 	done
+	@echo "g-ir-compiler = '$$(which g-ir-compiler)'" ; \
+        echo "g-ir-generate = '$$(which g-ir-generate)'" ; \
+        echo "g-ir-scanner = '$$(which g-ir-scanner)'"
 
 .PHONY: tc_vars
 tc_vars: flag
