@@ -51,11 +51,13 @@ ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 # [Pendulum]
+# DISABLED -> Needs to use a newer PyO3>=0.24.1
+#             ENV += PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 -> Not working!
 # Needs atomic to build
 # Serves as maturin type python-wheel.mk example
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += python/pendulum
-endif
+#ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+#DEPENDS += python/pendulum
+#endif
 
 # [Pillow]
 DEPENDS += python/pillow
