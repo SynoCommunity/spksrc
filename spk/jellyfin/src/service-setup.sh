@@ -18,10 +18,6 @@ SERVICE_COMMAND="${SYNOPKG_PKGDEST}/share/jellyfin ${JELLYFIN_ARGS}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
-if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
-    GROUP=sc-media
-fi
-
 service_postinst() {
     if [ "$SYNOPKG_DSM_VERSION_MAJOR" -ge 7 ]; then
         mkdir -p --mode=0777 "${SYNOPKG_PKGVAR}/data/transcodes"
