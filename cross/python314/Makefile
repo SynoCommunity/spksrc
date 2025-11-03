@@ -45,6 +45,7 @@ POST_PATCH_TARGET    = python314_post_patch
 PRE_CONFIGURE_TARGET = python314_pre_configure
 COMPILE_TARGET       = python314_compile
 INSTALL_TARGET       = python314_install
+POST_INSTALL_TARGET  = python314_post_install
 
 include ../../mk/spksrc.common.mk
 
@@ -112,3 +113,7 @@ python314_install:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
+
+.PHONY: python314_post_install
+python314_post_install:
+	$(RUN) sed -i 's|^prefix=.*|prefix=$(STAGING_INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/python*.pc
