@@ -40,10 +40,10 @@ RUN apt update && apt install --no-install-recommends -y \
 	imagemagick \
 	intltool \
 	jq \
-	libtool-bin \
 	libbz2-dev \
 	libc6-i386 \
 	libcppunit-dev \
+	libelf-dev \
 	libffi-dev \
 	libgc-dev \
 	libgmp3-dev \
@@ -53,6 +53,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	libpcre2-dev \
 	libssl-dev \
 	libtool \
+	libtool-bin \
 	libunistring-dev \
 	lzip \
 	man-db \

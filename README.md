@@ -59,11 +59,11 @@ sudo apt install --no-install-recommends -y \
                  check cmake curl cython3 debootstrap ed expect \
                  fakeroot flex gh g++-multilib gawk gettext git \
                  gobject-introspection gperf imagemagick intltool \
-                 jq libtool-bin libbz2-dev libc6-i386 libcppunit-dev \
-                 libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev \
-                 libncurses-dev libpcre2-dev libssl-dev libtool \
-                 libunistring-dev lzip man-db manpages-dev moreutils \
-                 nasm p7zip patchelf php pkg-config plocate \
+                 jq libbz2-dev libc6-i386 libcppunit-dev libelf-dev \
+                 libffi-dev libgc-dev libgmp3-dev libltdl-dev \
+                 libmount-dev libncurses-dev libpcre2-dev libssl-dev \
+                 libtool libtool-bin libunistring-dev lzip man-db manpages-dev \
+                 moreutils nasm p7zip patchelf php pkg-config plocate \
                  rename ripgrep rsync ruby-mustache scons subversion \
                  sudo swig texinfo time tree unzip xmlto yasm \
                  zip zlib1g-dev
@@ -91,11 +91,11 @@ lxc exec spksrc -- /usr/bin/apt install --no-install-recommends -y \
                  check cmake curl cython3 debootstrap ed expect \
                  fakeroot flex gh g++-multilib gawk gettext git \
                  gobject-introspection gperf imagemagick intltool \
-                 jq libtool-bin libbz2-dev libc6-i386 libcppunit-dev \
-                 libffi-dev libgc-dev libgmp3-dev libltdl-dev libmount-dev \
-                 libncurses-dev libpcre2-dev libssl-dev libtool \
-                 libunistring-dev lzip man-db manpages-dev moreutils \
-                 nasm p7zip patchelf php pkg-config plocate \
+                 jq libbz2-dev libc6-i386 libcppunit-dev libelf-dev \
+                 libffi-dev libgc-dev libgmp3-dev libltdl-dev \
+                 libmount-dev libncurses-dev libpcre2-dev libssl-dev \
+                 libtool libtool-bin libunistring-dev lzip man-db manpages-dev \
+                 moreutils nasm p7zip patchelf php pkg-config plocate \
                  rename ripgrep rsync ruby-mustache scons subversion \
                  sudo swig texinfo time tree unzip xmlto yasm \
                  zip zlib1g-dev
