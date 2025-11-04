@@ -1,0 +1,3 @@
+Pending migration to Debian-13 trixie as requiring autotools>=2.72
+
+Ref: https://github.com/SynoCommunity/spksrc/pull/6766
