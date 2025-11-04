@@ -6,7 +6,7 @@ include $(BASEDIR)mk/spksrc.kernel-env.mk
 ###
 
 kernel-modules:
-	@bash -o pipefail -c ' \
+	@bash -e -o pipefail -c ' \
 	{ \
 	  $(MSG) "kernel-modules archs to be processed: $(KERNEL_DEPEND)" ; \
 	    rsync -ah --mkpath work$(ARCH_SUFFIX)/tc_vars* work$(ARCH_SUFFIX)/tc_vars-backup ; \
