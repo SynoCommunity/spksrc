@@ -1,7 +1,7 @@
 SPK_NAME = python311
-SPK_VERS = 3.11.13
+SPK_VERS = 3.11.14
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/python3.png
 
 # Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
@@ -17,7 +17,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.11
-CHANGELOG = "1. Update to Python 3.11.13"
+CHANGELOG = "1. Update to Python 3.11.14"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
