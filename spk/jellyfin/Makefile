@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
 SPK_VERS = 10.11.2
-SPK_REV = 29
+SPK_REV = 30
 SPK_ICON = src/jellyfin.png
 
 DEPENDS = cross/jellyfin cross/jellyfin-web
@@ -40,6 +40,9 @@ SERVICE_PORT_TITLE = Jellyfin (HTTP)
 
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
+
+# Use TMPDIR (insufficient space in /tmp/jellyfin)
+USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET += jellyfin_extra_install
 
