@@ -1,0 +1,12 @@
+bin:bin/arpaname
+bin:bin/delv
+bin:bin/dig
+bin:bin/mdig
+lib:lib/libdns-9.20.11.so
+lnk:lib/libdns.so
+lib:lib/libisc-9.20.11.so
+lnk:lib/libisc.so
+lib:lib/libisccfg-9.20.11.so
+lnk:lib/libisccfg.so
+lib:lib/libns-9.20.11.so
+lnk:lib/libns.so

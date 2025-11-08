@@ -42,7 +42,7 @@ ARM_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS)
 PPC_ARCHS = powerpc ppc824x ppc853x ppc854x qoriq
 
 i686_ARCHS = evansport
-x64_ARCHS = $(GENERIC_x64_ARCH) apollolake avoton braswell broadwell broadwellnk broadwellnkv2 broadwellntbap bromolow cedarview denverton dockerx64 epyc7002 geminilake grantley purley kvmx64 v1000 r1000 x86 x86_64
+x64_ARCHS = $(GENERIC_x64_ARCH) apollolake avoton braswell broadwell broadwellnk broadwellnkv2 broadwellntbap bromolow cedarview denverton dockerx64 epyc7002 geminilake geminilakenk grantley purley kvmx64 v1000 v1000nk r1000 r1000nk x86 x86_64
 
 32bit_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(i686_ARCHS) $(PPC_ARCHS)
 64bit_ARCHS = $(ARMv8_ARCHS) $(x64_ARCHS)
@@ -72,5 +72,12 @@ endif
 # Exclusions for dotnet 6.0 servarr apps (except x86)
 ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),1)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k
+    UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
+endif
+
+# Exclusions for dotnet 6.0 servarr apps (except x86)
+# ARMv7 incompatibility — see: https://github.com/dotnet/runtime/issues/109739
+ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),2)
+    UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) armada370 alpine comcerto2k $(ARMv7_ARCHS)
     UNSUPPORTED_ARCHS_TCVERSION = armv7-6.1 armv7-6.2.4 armv7-1.2
 endif

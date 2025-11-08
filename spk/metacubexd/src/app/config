@@ -1,0 +1,11 @@
+{
+    ".url": {
+        "com.synocommunity.packages.metacubexd": {
+            "type": "url",
+            "icon": "images/metacubexd-{0}.png",
+            "title": "MetaCubeXD",
+            "url": "/metacubexd",
+            "allUsers": true
+        }
+    }
+}

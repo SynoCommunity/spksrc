@@ -12,9 +12,11 @@
 #   build: -Cinstall-args='<value>'
 #
 
+# Setup common directories
+include ../../mk/spksrc.directories.mk
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
 
 ###
 
@@ -44,7 +46,7 @@ endif
 ###
 
 # Define where is located the crossenv
-CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
+CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME))-$(PKG_VERS) $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME)) $(WORK_DIR)/crossenv-default))
 
 # If using spksrc.python.mk with PYTHON_STAGING_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
@@ -57,8 +59,8 @@ endif
 
 ### Prepare crossenv
 prepare_crossenv:
-	@$(MSG) $(MAKE) WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
-	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
+	@$(MSG) $(MAKE) WHEEL_NAME=\"$(or $(PKG_REAL_NAME),$(PKG_NAME))\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
+	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(or $(PKG_REAL_NAME),$(PKG_NAME))" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
 .PHONY: build_meson_python_wheel
 
@@ -102,13 +104,13 @@ build_meson_python_wheel:
 install_meson_python_wheel: SHELL:=/bin/bash
 install_meson_python_wheel:
 	@set -o pipefail; { \
-	$(MSG) $(MAKE) REQUIREMENT=\"$(PKG_NAME)==$(PKG_VERS)\" \
-	               WHEEL_NAME=\"$(PKG_NAME)\" \
+	$(MSG) $(MAKE) REQUIREMENT=\"$(or $(PKG_REAL_NAME),$(PKG_NAME))==$(PKG_VERS)\" \
+	               WHEEL_NAME=\"$(or $(PKG_REAL_NAME),$(PKG_NAME))\" \
 	               WHEEL_VERSION=\"$(PKG_VERS)\" \
 	               WHEEL_TYPE=\"cross\" \
 	               wheel_install ; \
-	MAKEFLAGS= $(MAKE) REQUIREMENT="$(PKG_NAME)==$(PKG_VERS)" \
-	                   WHEEL_NAME="$(PKG_NAME)" \
+	MAKEFLAGS= $(MAKE) REQUIREMENT="$(or $(PKG_REAL_NAME),$(PKG_NAME))==$(PKG_VERS)" \
+	                   WHEEL_NAME="$(or $(PKG_REAL_NAME),$(PKG_NAME))" \
 	                   WHEEL_VERSION="$(PKG_VERS)" \
 	                   WHEEL_TYPE="cross" \
 	                   --no-print-directory \

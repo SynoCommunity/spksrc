@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 7.0.2
+PKG_VERS = 7.0.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -13,18 +13,21 @@ LICENSE  = GPLv2
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include"
-CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
-CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl -lm" --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
+CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
+CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
-CONFIGURE_ARGS += --disable-debug
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+  CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --disable-optimizations --assert-level=2 --enable-ftrapv
+else
+  CONFIGURE_ARGS += --disable-debug
+endif
 
-# Must match $(SPK_REV) from spk/ffmpeg6/Makefile
-CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg6/Makefile)
+# Must match $(SPK_REV) from spk/ffmpeg7/Makefile
+CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg7/Makefile)
 
 # Enable Synology specific -hls_seek_time option and other optimizations
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
@@ -38,29 +41,24 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
 include ../../mk/spksrc.common.mk
 
-OPTIONAL_DEPENDS  = cross/chromaprint-fftw
-OPTIONAL_DEPENDS += cross/dav1d
-OPTIONAL_DEPENDS += cross/frei0r
-OPTIONAL_DEPENDS += cross/libass
+# ARCH specific
+OPTIONAL_DEPENDS  = cross/openh264
 OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/libvpx
-OPTIONAL_DEPENDS += cross/libzimg
-OPTIONAL_DEPENDS += cross/openh264
 OPTIONAL_DEPENDS += cross/svt-av1
+# GCC specific
+OPTIONAL_DEPENDS += cross/frei0r
+# prebuilt by synocli-videodriver
 OPTIONAL_DEPENDS += cross/libva
 OPTIONAL_DEPENDS += cross/libva-utils
 OPTIONAL_DEPENDS += cross/intel-vaapi-driver
 OPTIONAL_DEPENDS += cross/intel-media-driver
 OPTIONAL_DEPENDS += cross/intel-mediasdk
+# prebuilt by synocli-videodriver for gcc >= 5
 OPTIONAL_DEPENDS += cross/intel-level-zero
 OPTIONAL_DEPENDS += cross/intel-graphics-compiler
 OPTIONAL_DEPENDS += cross/intel-compute-runtime
 OPTIONAL_DEPENDS += cross/ocl-icd
 OPTIONAL_DEPENDS += cross/clinfo
-OPTIONAL_DEPENDS += cross/twolame
-OPTIONAL_DEPENDS += cross/x264
-OPTIONAL_DEPENDS += cross/x265
-OPTIONAL_DEPENDS += cross/shine
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
@@ -70,6 +68,13 @@ CONFIGURE_ARGS += --x86asmexe=nasm
 else ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-asm
 endif
+
+# build cario first, otherwise cross/cairo fails to build for x64-6.* arch
+# It does not fail for x64-7.* when cario is prebuilt with videodriver.
+# The failing seems related to parallel builds and occurs since cairo is built with meson
+# due lacking videodriver build include path for cairo.
+# cairo is dependency of harfbuzz, dependency of libass
+DEPENDS = cross/cairo
 
 DEPENDS += cross/codec2
 CONFIGURE_ARGS += --enable-libcodec2
@@ -121,11 +126,6 @@ CONFIGURE_ARGS += --enable-libzmq
 DEPENDS += cross/gnutls
 CONFIGURE_ARGS += --enable-gnutls
 
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/openh264
-CONFIGURE_ARGS += --enable-libopenh264
-endif
-
 DEPENDS += cross/opus
 CONFIGURE_ARGS += --enable-libopus
 
@@ -171,6 +171,9 @@ CONFIGURE_ARGS += --enable-libzimg
 DEPENDS += cross/snappy
 CONFIGURE_ARGS += --enable-libsnappy
 
+DEPENDS += cross/libass
+CONFIGURE_ARGS += --enable-libass
+
 #
 # fdk-acc is now considered compatible with (L)GPL.
 # It requires --enable-nonfree if you're also using --enable-gpl
@@ -182,6 +185,16 @@ CONFIGURE_ARGS += --enable-libsnappy
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
+##
+## ARCH SPECIFIC
+##
+
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/openh264
+CONFIGURE_ARGS += --enable-libopenh264
+endif
+
+# Add libaom to supported ARCH
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
@@ -193,10 +206,6 @@ DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
-##
-## ARCH SPECIFIC
-##
-
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
@@ -206,7 +215,7 @@ CONFIGURE_ARGS += --disable-armv5te
 CONFIGURE_ARGS += --disable-armv6
 CONFIGURE_ARGS += --disable-armv6t2
 CONFIGURE_ARGS += --disable-vfp
-ifneq ($(findstring $(ARCH),alpine),$(ARCH))
+ifeq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
 endif
@@ -233,7 +242,7 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 # Dependencies provided by synocli-videodriver
 # If built outside spksrc.videodriver.mk
-ifeq ($(strip $(VIDEODRV_PACKAGE)),)
+ifeq ($(wildcard $(VIDEODRV_STAGING_PREFIX)),)
 DEPENDS += cross/libva cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
 DEPENDS += cross/intel-media-driver cross/intel-mediasdk
@@ -246,6 +255,7 @@ CONFIGURE_ARGS += --enable-libmfx
 CONFIGURE_ARGS += --enable-vaapi
 endif
 
+# Evaluation of TC_GCC works only after the following include
 include ../../mk/spksrc.cross-cc.mk
 
 ##
@@ -258,7 +268,7 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 # Dependencies provided by synocli-videodriver
 # If built outside spksrc.videodriver.mk
-ifeq ($(strip $(VIDEODRV_PACKAGE)),)
+ifeq ($(wildcard $(VIDEODRV_STAGING_PREFIX)),)
 DEPENDS += cross/intel-level-zero
 DEPENDS += cross/intel-graphics-compiler
 DEPENDS += cross/intel-compute-runtime
@@ -272,12 +282,6 @@ endif
 ##
 ## GCC SPECIFIC
 ##
-
-# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/libass
-CONFIGURE_ARGS += --enable-libass
-endif
 
 # Newer frei0r requires newer gcc
 ifeq ($(call version_ge, $(TC_GCC), 7.5),1)

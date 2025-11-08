@@ -1,10 +1,13 @@
-PKG_NAME = numpy_v2
-PKG_SHORT_NAME = $(firstword $(subst _, ,$(PKG_NAME)))
-PKG_VERS = 2.2.4
+# Reminder to update wheelhouse:numpy==<version>
+# in python31*/crossenv/requirements-scipy.txt
+PKG_NAME = numpy_$(PKG_VERS)
+PKG_REAL_NAME = numpy
+# version >= 2.3 -> Requires gcc >= 9.4 -> DSM-7.2
+PKG_VERS = 2.2.6
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_SHORT_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/n/numpy
-PKG_DIR = $(PKG_SHORT_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/openblas
 CONFIGURE_ARGS += -Dblas=OpenBLAS

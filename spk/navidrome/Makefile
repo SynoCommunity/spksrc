@@ -1,21 +1,19 @@
 SPK_NAME = navidrome
-SPK_VERS = 0.54.5
-SPK_REV = 3
+SPK_VERS = 0.56.1
+SPK_REV = 5
 SPK_ICON = src/navidrome.png
 
 DEPENDS = cross/navidrome
 
-# C++11 compiler required
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-# go does not support ppc archs
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = hgy59
 HOMEPAGE = https://www.navidrome.org/
 DESCRIPTION = 🎧☁ Modern Music Server and Streamer compatible with Subsonic/Airsonic. It gives you freedom to listen to your music collection from any browser or mobile device.
 LICENSE = GPLv3
 DISPLAY_NAME = Navidrome
-CHANGELOG = "Update Navidrome to v0.54.5."
+CHANGELOG = "Update Navidrome to v0.56.1 (requires DSM 7+)."
 
 STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh

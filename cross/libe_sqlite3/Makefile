@@ -52,6 +52,7 @@ endif
 .PHONY: libe_sqlite3_download
 libe_sqlite3_download:
 	@$(MSG) "install sources into work folder"
+	@mkdir -p $(WORK_DIR)
 	@tar -cf - -C source . | tar -xf - -C $(WORK_DIR)/
 
 .PHONY: libe_sqlite3_compile

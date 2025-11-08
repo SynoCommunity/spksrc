@@ -1,6 +1,6 @@
 SPK_NAME = kiwix
 SPK_VERS = 3.7.0
-SPK_REV  = 7
+SPK_REV  = 8
 SPK_ICON = src/kiwix.png
 
 DEPENDS = cross/kiwix-tools
@@ -15,7 +15,7 @@ LICENSE  = GPLv3
 
 MAINTAINER = hgy59
 DISPLAY_NAME = Kiwix
-CHANGELOG = "1. Update kiwix to v3.7.0. <br/>2. Support library auto reload."
+CHANGELOG = "1. Update multiple dependencies"
 
 SERVICE_USER = auto
 STARTABLE = yes

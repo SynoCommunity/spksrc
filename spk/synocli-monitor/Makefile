@@ -1,6 +1,6 @@
 SPK_NAME = synocli-monitor
 SPK_VERS = 1.7
-SPK_REV = 9
+SPK_REV = 11
 SPK_ICON = src/synocli-monitor.png
 
 DEPENDS  = cross/nmon cross/njmon
@@ -13,7 +13,7 @@ DEPENDS += cross/cpulimit
 DEPENDS += cross/net-snmp
 DEPENDS += cross/lm-sensors
 
-OPTIONAL_DEPENDS = cross/bandwhich cross/bottom cross/procs
+OPTIONAL_DEPENDS = cross/bandwhich cross/bottom cross/bottom_0.10 cross/procs
 
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
@@ -26,15 +26,20 @@ OPTIONAL_DESC = ", and process utilities \(lsof, iostat, pgrep, pmap, watch\)"
 endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/bandwhich cross/bottom cross/procs
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bandwhich, bottom, procs"
+DEPENDS += cross/bandwhich cross/procs
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/bottom_0.10
+else
+DEPENDS += cross/bottom
+endif
 endif
 
 MAINTAINER = hgy59
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
 DISPLAY_NAME = SynoCli Monitor Tools
 STARTABLE = no
-CHANGELOG = "1. Add lm-sensors<br/>2. Add ionice (util-linux) and drop ionice of busybox.<br/>3. Fix net-snmp version number."
+CHANGELOG = "1. Update bottom from v0.10.2 to v0.11.2 (except for ARMv5 and qoriq archs). <br/>2. Update ionice (util-linux) from v2.41.1 to 2.41.2."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.

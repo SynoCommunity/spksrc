@@ -1,24 +1,26 @@
 SPK_NAME = rutorrent
-SPK_VERS = 4.3.7
-SPK_REV = 17
+SPK_VERS = 5.1.12
+SPK_REV = 18
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
 MAINTAINER = smaarn
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Upgrade rutorrent to 4.3.7"
+CHANGELOG = "1. Upgrade rutorrent to 5.1.12. <br/>2. Update rtorrent to v0.10.0. <br/>3. Update libtorrent to v0.14.0. <br/>4. Update screen to v5.0.1. <br/>5. Migrate to Python 3.12."
 
-# newer libtorrent-rakshasa requires C++14 support
+# libtorrent-rakshasa requires C++14 support
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 
-SPK_DEPENDS = "WebStation:python311:PHP7.4:Apache2.4"
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "WebStation:${PYTHON_PACKAGE}:PHP7.4:Apache2.4"
 WHEELS = src/requirements-pure.txt
 
 # Must be done prior to busybox (aarch64)
 DEPENDS += cross/openssl3
 
+# pgrep commandline tool (used by _tasks plugin) see #4234
 DEPENDS += cross/busybox
 export BUSYBOX_CONFIG=procutils
 
@@ -27,7 +29,8 @@ DEPENDS += cross/curl
 export CURL_INCLUDE_EXECUTABLE=1
 
 # Remaining dependencies
-DEPENDS += cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/sox cross/unzip
+DEPENDS += cross/mediainfo cross/rtorrent cross/rutorrent cross/screen5 cross/sox cross/unzip
+DEPENDS += cross/dumptorrent
 
 ADMIN_URL = /rutorrent/
 STARTABLE = yes
@@ -43,7 +46,6 @@ DSM_UI_CONFIG = src/app/config
 # Required environment variables will be injected in service-setup.sh
 SERVICE_COMMAND = /var/packages/rutorrent/target/bin/rtorrent-daemon
 
-FWPORTS = src/rutorrent.sc
 CONF_DIR = src/conf/
 WIZARDS_DIR = $(WORK_DIR)/generated-wizards
 WIZARDS = install_uifile upgrade_uifile
@@ -53,7 +55,7 @@ POST_STRIP_TARGET = rutorrent_extra_install
 SYSTEM_GROUP = http
 
 SERVICE_PORT = 8050
-SERVICE_PORT_TITLE = rutorrent RPC
+SERVICE_PORT_TITLE = ruTorrent RPC
 
 SUPPORTED_LANGUAGES = fre
 
@@ -86,8 +88,6 @@ generated-wizards:
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
-	install -m 755 -d $(STAGING_DIR)/bin
+	install -m 755 -d $(STAGING_DIR)/bin $(STAGING_DIR)/var/.session $(STAGING_DIR)/tmp
 	install -m 755 src/bin/rtorrent-daemon $(STAGING_DIR)/bin/rtorrent-daemon
-	install -m 755 -d $(STAGING_DIR)/var/.session
 	install -m 644 src/rtorrent.rc $(STAGING_DIR)/var/rtorrent.rc
-	install -m 775 -d $(STAGING_DIR)/tmp
