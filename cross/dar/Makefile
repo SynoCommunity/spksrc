@@ -1,8 +1,10 @@
 PKG_NAME = dar
 PKG_VERS = 2.8.1
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://sourceforge.net/projects/dar/files/dar/$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).orig.$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+#PKG_DIST_SITE = https://sourceforge.net/projects/dar/files/dar/$(PKG_VERS)
+PKG_DIST_SITE = http://deb.debian.org/debian/pool/main/d/dar
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # error: C++ compiler lack support for c++14 standard
