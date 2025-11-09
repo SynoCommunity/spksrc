@@ -160,9 +160,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      if [ -f $${localFile} ]; then \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
 	      else \
-	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 -nv $${url}" ; \
+	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused --max-redirect=20 --trust-server-names -nv $${url}" ; \
 	        rm -f $${localFile}.part ; \
-	        wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused -nv -O $${localFile}.part -nc $${url} ; \
+	        wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused --max-redirect=20 --trust-server-names -nv -O $${localFile}.part -nc $${url} ; \
 	        mv $${localFile}.part $${localFile} ; \
 	      fi ; \
 	      flock -u 9 ; \
