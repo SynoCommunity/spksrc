@@ -152,7 +152,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      if [ -z "$${localFile}" ]; then \
 	        localFile=$$(basename $${url}) ; \
 	      fi ; \
-	      url=$$(echo $${url} | sed -e 's#//ftp.gnu.org/#//ftpmirror.gnu.org/#g') ; \
+	      url=$$(echo $${url} | sed -E -e 's#//ftp\.gnu\.org/#//ftpmirror.gnu.org/#g' \
+	                                   -e 's#//sourceforge\.net/projects/([^/]+)/files/#//downloads.sourceforge.net/project/\1/#g' \
+	                                   -e 's#//downloads\.sourceforge\.net/projects/([^/]+)/files/#//downloads.sourceforge.net/project/\1/#g') ; \
 	      exec 9> /tmp/wget.$${localFile}.lock ; \
 	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 9 || exit 1 ; \
 	      pid=$$$$ ; \
@@ -161,9 +163,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        $(MSG) "  File $${localFile} already downloaded" ; \
 	      else \
 	        rm -f $${localFile}.part ; \
-	        $(MSG) "  wget --user-agent=\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36\" --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused --max-redirect=20 --trust-server-names -nv $${url}" ; \
-	        wget --user-agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" \
-	             --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused --max-redirect=20 --trust-server-names \
+	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused --max-redirect=20 --content-disposition -nv -O $${localFile} -nc $${url}" ; \
+	        wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 \
+	             --retry-connrefused --max-redirect=20 --content-disposition \
 	             -nv -O $${localFile}.part -nc $${url} ; \
 	        mv $${localFile}.part $${localFile} ; \
 	      fi ; \
