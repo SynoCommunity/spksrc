@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/diesel-rs/diesel/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS += cross/mysql-connector-c
+DEPENDS += cross/mariadb-connector-c
 
 # powerpc archs (except qoriq) are not supported
 UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
