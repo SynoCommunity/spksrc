@@ -1,0 +1,11 @@
+# Generated using the requirements script on November 7, 2025
+
+# rpds_py downgraded for rustc 1.77.2:
+# rpds-py >= 0.22.3 requires rustc >= 1.80
+
+borgbackup==1.4.1
+charset_normalizer==3.4.4
+llfuse==1.5.1
+msgpack==1.1.0
+rpds_py==0.21.0
+ruamel.yaml.clib==0.2.14
