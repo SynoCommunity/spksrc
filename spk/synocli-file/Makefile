@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 4.0.1
-SPK_REV = 28
+SPK_REV = 29
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -14,6 +14,7 @@ DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/pixz
+DEPENDS += cross/pigz
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
 DEPENDS += cross/iconv
@@ -122,7 +123,7 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     mg \(emacs-like text editor\), nano, \
     jupp \(based on JOE - Joe\'s Own Editor 3.1\), \
     file, detox, pcre2, zstd, lzip, plzip, \
-    pixz, \
+    pixz, pigz, \
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
@@ -142,6 +143,7 @@ CHANGELOG += "13. Update pcre2 from v10.44 to v10.46. <br/>"
 CHANGELOG += "14. Update rhash from v1.4.5 to v1.4.6 (except for old ppc archs). <br/>"
 CHANGELOG += "15. Update rmlint from v2.10.2 to v2.10.3. <br/>"
 CHANGELOG += "16. Update zstd from v1.5.6 to v1.5.7. <br/>"
+CHANGELOG  = "17. Add pigz v2.8 (parallel gzip compression tool). <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
@@ -161,6 +163,7 @@ SPK_COMMANDS += bin/rmlint
 SPK_COMMANDS += bin/zstd bin/unzstd bin/zstdcat bin/zstdmt bin/zstdgrep bin/zstdless
 SPK_COMMANDS += bin/lzip bin/plzip
 SPK_COMMANDS += bin/pixz
+SPK_COMMANDS += bin/pigz bin/unpigz
 SPK_COMMANDS += bin/fdupes
 SPK_COMMANDS += bin/micro
 SPK_COMMANDS += bin/fzf
