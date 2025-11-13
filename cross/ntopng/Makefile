@@ -22,6 +22,10 @@ HOMEPAGE = https://www.ntop.org/
 COMMENT  = High-Speed Web-based Traffic Analysis and Flow Collection.
 LICENSE  = GPLv3
 
+# find MariaDB includes & library
+ADDITIONAL_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/include/mariadb
+ADDITIONAL_LDFLAGS  += -lmysqlclient
+
 include ../../mk/spksrc.archs.mk
 
 SYNOLOGY_OS = DSM
