@@ -105,7 +105,7 @@ endif
 	echo -ne "\t]\n"
 	@echo
 	@echo "rust_args = [" ; \
-	echo -ne "\t'--target=$(CARGO_BUILD_TARGET)',\n" ; \
+	echo -ne "\t'--target=$(RUST_TARGET)',\n" ; \
 	echo -ne "\t'-Clinker=$(TC_PATH)$(TC_PREFIX)gcc',\n"
 ifeq ($(GCC_DEBUG_INFO),1)
 	@echo -ne "\t'-Cdebuginfo=2',\n" ; \
@@ -117,5 +117,5 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
 endif
-	@echo $(RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 	@echo -ne "\t]\n"

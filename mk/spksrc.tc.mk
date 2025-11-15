@@ -210,7 +210,7 @@ endif
 	echo "set(ENV{CARGO_BUILD_TARGET} \$${RUST_TARGET})" ; \
 	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER} \$${RUST_LINKER})" ; \
 	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR} \$${RUST_AR})" ; \
-	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS} \$${RUSTFLAGS})"
+	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS} $(TC_EXTRA_RUSTFLAGS))"
 
 .PHONY: meson_cross_vars
 meson_cross_vars:
@@ -293,7 +293,7 @@ tc_vars: flag
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_EXTRA_RUSTFLAGS)\" ; \
 	echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
 	echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_SYSROOT := $(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
@@ -312,6 +312,7 @@ tc_vars: flag
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
+	echo TC_EXTRA_RUSTFLAGS := $(TC_EXTRA_RUSTFLAGS) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \

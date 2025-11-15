@@ -33,6 +33,7 @@ cmake_pkg_toolchain:
 	echo "  \"-Clinker=\$${RUST_LINKER}\"" ; \
 	echo $(RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/  \"/" -e "s/$$/\"/" ; \
 	echo ")" ; \
+	echo "set(ENV{RUSTFLAGS} \$${RUSTFLAGS})" ; \
 	echo
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
