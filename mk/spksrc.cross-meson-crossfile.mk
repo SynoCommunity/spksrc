@@ -103,3 +103,19 @@ ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
 endif
 	@echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
+	@echo
+	@echo "rust_args = [" ; \
+	echo -ne "\t'--target=$(CARGO_BUILD_TARGET)',\n" ; \
+	echo -ne "\t'-Clinker=$(TC_PATH)$(TC_PREFIX)gcc',\n"
+ifeq ($(GCC_DEBUG_INFO),1)
+	@echo -ne "\t'-Cdebuginfo=2',\n" ; \
+	echo -ne "\t'-Copt-level=0',\n"
+else
+	@echo -ne "\t'-Cdebuginfo=0',\n" ; \
+	echo -ne "\t'-Copt-level=s',\n"
+endif
+ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
+endif
+	@echo $(RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo -ne "\t]\n"
