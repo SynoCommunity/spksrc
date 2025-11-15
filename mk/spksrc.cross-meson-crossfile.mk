@@ -117,5 +117,5 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
 endif
-	@echo $(RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 	@echo -ne "\t]\n"
