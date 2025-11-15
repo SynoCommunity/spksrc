@@ -31,8 +31,12 @@ ENV_VARS_TO_CLEAN = AR AS CC CPP CXX FC LD LDSHARED NM OBJCOPY OBJDUMP RANLIB RE
                     CFLAGS ADDITIONAL_CFLAGS CPPFLAGS ADDITIONAL_CPPFLAGS \
                     CXXFLAGS ADDITIONAL_CXXFLAGS FFLAGS ADDITIONAL_FFLAGS \
                     LDFLAGS ADDITIONAL_LDFLAGS PKG_CONFIG_PATH SYSROOT \
-                    RUSTFLAGS CARGO_HOME RUSTUP_HOME RUSTUP_TOOLCHAIN CARGO_BUILD_TARGET \
-                    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_AR CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS
+                    RUSTFLAGS RUST_TARGET RUSTUP_HOME RUSTUP_TOOLCHAIN \
+                    CARGO_HOME CARGO_BUILD_TARGET \
+                    CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR \
+                    CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER \
+                    CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS
+
 ENV_FILTERED = $(shell env -i $(ENV) sh -c 'env' | \
     grep -v -E '^($(subst $(space),|,$(ENV_VARS_TO_CLEAN)))=' | \
     awk -F'=' '{if($$2 ~ / /) print $$1"=\""$$2"\""; else print $$0}' | \

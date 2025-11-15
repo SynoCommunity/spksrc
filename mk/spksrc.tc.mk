@@ -188,6 +188,29 @@ endif
 	echo "# search headers and libraries in the target environment" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY $(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY))" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))"
+	@echo ; \
+	echo "# Rust compiler and Cargo" ; \
+	echo "set(CARGO  $(RUSTUP_HOME)/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo)"
+ifeq ($(TC_RUSTUP_TOOLCHAIN),stable)
+	@echo "set(RUSTC  $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)-x86_64-unknown-linux-gnu/bin/rustc)"
+else
+	@echo "set(RUSTC  $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/bin/rustc)"
+endif
+	@echo ; \
+	echo "# Cross target triple" ; \
+	echo "set(RUST_TARGET  $(RUST_TARGET))" ; \
+	echo ; \
+	echo "# Rust linker and AR" ; \
+	echo "set(RUST_LINKER  \$${CMAKE_C_COMPILER})" ; \
+	echo "set(RUST_AR      \$${CMAKE_AR})" ; \
+	echo ; \
+	echo "# Export Rust environment for Cargo builds" ; \
+	echo "set(ENV{RUSTC} \$${RUSTC})" ; \
+	echo "set(ENV{CARGO} \$${CARGO})" ; \
+	echo "set(ENV{CARGO_BUILD_TARGET} \$${RUST_TARGET})" ; \
+	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER} \$${RUST_LINKER})" ; \
+	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR} \$${RUST_AR})" ; \
+	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS} \$${RUSTFLAGS})"
 
 .PHONY: meson_cross_vars
 meson_cross_vars:
@@ -285,6 +308,7 @@ tc_vars: flag
 	fi ; \
 	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
 	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
+	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \

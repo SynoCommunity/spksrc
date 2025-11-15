@@ -28,6 +28,12 @@ endif
 cmake_pkg_toolchain:
 	@cat $(CMAKE_TOOLCHAIN_FILE_WRK) ; \
 	echo
+	@echo "# Rust flags (linker, rpath, libs)" ; \
+	echo "set(RUSTFLAGS" ; \
+	echo "  \"-Clinker=\$${RUST_LINKER}\"" ; \
+	echo $(RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/  \"/" -e "s/$$/\"/" ; \
+	echo ")" ; \
+	echo
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	@echo "# set assembly compiler" ; \
