@@ -34,6 +34,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	g++-multilib \
 	gawk \
 	gettext \
+	gfortran \
 	git \
 	gobject-introspection \
 	gperf \

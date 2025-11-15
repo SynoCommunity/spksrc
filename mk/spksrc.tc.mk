@@ -255,7 +255,7 @@ meson_native_vars:
 	    echo "c = '$$(which $${source})'" ; \
 	    echo "$${target} = '$$(which $${source})'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
-	    $$(which gfortran) && echo "fortran = '$$(which gfortran)'" || true ; \
+	    echo "fortran = '$$(which $${source})'" ; \
 	  elif [ "$${target}" = "ldshared" ]; then \
 	    echo "$${target} = '$$(which gcc) -shared'" ; \
 	  else \
