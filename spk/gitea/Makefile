@@ -23,10 +23,12 @@ SERVICE_PORT = 8418
 SERVICE_PORT_TITLE = $(DISPLAY_NAME) (HTTP)
 ADMIN_PORT = $(SERVICE_PORT)
 
+POST_STRIP_TARGET = gitea_extra_install
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: gitea_extra_install
 gitea_extra_install:
-	@$(MSG) "Install config.ini file"
+	@$(MSG) "Install conf.ini file"
 	@install -m 755 -d $(STAGING_DIR)/var
-	@install -m 644 src/config.ini $(STAGING_DIR)/var/config.ini
+	@install -m 644 src/conf.ini $(STAGING_DIR)/var/conf.ini
