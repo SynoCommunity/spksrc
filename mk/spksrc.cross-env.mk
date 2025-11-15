@@ -105,7 +105,4 @@ else ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
   ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_NO_DEBUG_FLAGS)
   ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_NO_DEBUG_FLAGS)
   ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) -w -s -Wl,--gc-sections
-else
-  # rust: set no debug symbols and optimize for space
-  ADDITIONAL_RUSTFLAGS := -Cdebuginfo=0 -Copt-level=s
 endif
