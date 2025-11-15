@@ -107,13 +107,6 @@ endif
 	@echo "rust_args = [" ; \
 	echo -ne "\t'--target=$(RUST_TARGET)',\n" ; \
 	echo -ne "\t'-Clinker=$(TC_PATH)$(TC_PREFIX)gcc',\n"
-ifeq ($(GCC_DEBUG_INFO),1)
-	@echo -ne "\t'-Cdebuginfo=2',\n" ; \
-	echo -ne "\t'-Copt-level=0',\n"
-else
-	@echo -ne "\t'-Cdebuginfo=0',\n" ; \
-	echo -ne "\t'-Copt-level=s',\n"
-endif
 ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
 endif
