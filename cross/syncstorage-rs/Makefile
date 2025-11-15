@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # for openssl-sys
 DEPENDS = cross/openssl3
 # for mysqlclient-sys
-DEPENDS += cross/mysql-connector-c
+DEPENDS += cross/mariadb-connector-c
 
 # powerpc archs are not supported
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)

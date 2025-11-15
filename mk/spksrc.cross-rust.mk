@@ -76,7 +76,7 @@ rust_install_target:
 	@echo "  ==> Cargo install rust package $(PKG_NAME) (rustc +$(TC_RUSTUP_TOOLCHAIN) -vV)"
 	@$(RUN) rustc +$(TC_RUSTUP_TOOLCHAIN) -vV
 	@$(RUN) echo cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
-	@$(RUN) cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
+	$(RUN) cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
 
 ###
 

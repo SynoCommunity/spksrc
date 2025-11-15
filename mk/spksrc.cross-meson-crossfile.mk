@@ -103,3 +103,12 @@ ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
 endif
 	@echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
+	@echo
+	@echo "rust_args = [" ; \
+	echo -ne "\t'--target=$(RUST_TARGET)',\n" ; \
+	echo -ne "\t'-Clinker=$(TC_PATH)$(TC_PREFIX)gcc',\n"
+ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
+endif
+	@echo $(RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo -ne "\t]\n"
