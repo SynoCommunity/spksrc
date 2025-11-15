@@ -57,8 +57,8 @@ sudo apt install --no-install-recommends -y \
                  autoconf-archive autogen automake autopoint \
                  bash bash-completion bc bison build-essential \
                  check cmake curl cython3 debootstrap ed expect \
-                 fakeroot flex gh g++-multilib gawk gettext git \
-                 gobject-introspection gperf imagemagick intltool \
+                 fakeroot flex gh g++-multilib gawk gettext gfortran \
+                 git gobject-introspection gperf imagemagick intltool \
                  jq libbz2-dev libc6-i386 libcppunit-dev libelf-dev \
                  libffi-dev libgc-dev libgmp3-dev libltdl-dev \
                  libmount-dev libncurses-dev libpcre2-dev libssl-dev \
@@ -89,8 +89,8 @@ lxc exec spksrc -- /usr/bin/apt install --no-install-recommends -y \
                  autoconf-archive autogen automake autopoint \
                  bash bash-completion bc bison build-essential \
                  check cmake curl cython3 debootstrap ed expect \
-                 fakeroot flex gh g++-multilib gawk gettext git \
-                 gobject-introspection gperf imagemagick intltool \
+                 fakeroot flex gh g++-multilib gawk gettext gfortran \
+                 git gobject-introspection gperf imagemagick intltool \
                  jq libbz2-dev libc6-i386 libcppunit-dev libelf-dev \
                  libffi-dev libgc-dev libgmp3-dev libltdl-dev \
                  libmount-dev libncurses-dev libpcre2-dev libssl-dev \
