@@ -88,6 +88,7 @@ ifeq ($(strip $(GCC_DEBUG_INFO)),1)
   ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS))
   ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS))
   ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS))
+  ADDITIONAL_RUSTFLAGS := -Cdebuginfo=2 -Copt-level=0
 
 # gcc:
 #  -g0 deactivates debug information generation

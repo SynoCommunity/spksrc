@@ -74,14 +74,6 @@ ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
 
-# Use native cmake (Debian 10 "Buster")
-ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
-  BUILD_DEPENDS += native/cmake-legacy
-  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-legacy/work-native/install/usr/local/bin)
-  ENV += PATH=$(CMAKE_PATH):$$PATH
-  export PATH := $(CMAKE_PATH):$(PATH)
-endif
-
 # Use ninja to build
 ifeq ($(strip $(CMAKE_USE_NINJA)),)
   CMAKE_USE_NINJA = 1
