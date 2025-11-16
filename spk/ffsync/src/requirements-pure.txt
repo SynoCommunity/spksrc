@@ -1,4 +1,4 @@
-# Generated using the requirements script on September 12, 2025
+# Generated using the requirements script on November 16, 2025
 
 backoff==2.2.1
 boto==2.49.0
@@ -6,8 +6,8 @@ boto==2.49.0
 datadog==0.52.1
 hawkauthlib==2.0.0
 hupper==1.12.1
-idna==3.10
-iniconfig==2.1.0
+idna==3.11
+iniconfig==2.3.0
 packaging==25.0
 PasteDeploy==3.1.0
 #pip                        ==> python312
@@ -22,7 +22,7 @@ pyramid==1.10.8
 pytest==8.3.5
 requests==2.32.5
 #setuptools                 ==> python312
-testfixtures==9.1.0
+testfixtures==10.0.0
 tokenlib==2.0.0
 translationstring==1.4
 urllib3==2.5.0

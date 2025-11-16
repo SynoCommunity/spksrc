@@ -13,13 +13,12 @@ SYNCSERVER="${SYNOPKG_PKGDEST}/bin/syncserver"
 DIESEL="${SYNOPKG_PKGDEST}/bin/diesel"
 CFG_FILE="${SYNOPKG_PKGVAR}/local.toml"
 
-SERVICE_COMMAND="${SYNCSERVER} --config=${CFG_FILE}"
+# enhance logging
+ENV="RUST_LOG=debug RUST_BACKTRACE=full"
+
+SERVICE_COMMAND="env ${ENV} ${SYNCSERVER} --config=${CFG_FILE}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
-
-# enhance logging
-export RUST_LOG=debug
-export RUST_BACKTRACE=full
 
 DBUSER=ffsync
 DBSERVER="localhost"
