@@ -8,6 +8,15 @@ if [ ! -d "${SOURCE}" ]; then
   exit 1
 fi
 
+# ensure config folder exists
+CFG=~/.config/nushell
+if [ ! -d ${CFG} ]; then
+    echo ""
+    echo "create nushell config folder ${CFG}"
+    mkdir -p ${CFG}
+    echo ""
+fi
+
 NU=${SOURCE}/nu
 PLUGINS="$(ls ${SOURCE}/nu_plugin_*)"
 
