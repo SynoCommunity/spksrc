@@ -56,5 +56,8 @@ ifeq ($(MYSQL_DB_SOCKET),)
 MYSQL_DB_SOCKET = /run/mysqld/mysqld.sock
 endif
 CMAKE_ARGS += -DMARIADB_UNIX_ADDR=$(MYSQL_DB_SOCKET)
+# Disable default TLS server certificate verification (enabled by default in 3.4.x)
+# to avoid "SSL is required, but the server does not support it" on non-TLS servers.
+CMAKE_ARGS += -DDEFAULT_SSL_VERIFY_SERVER_CERT=OFF
 
 include ../../mk/spksrc.cross-cmake.mk
