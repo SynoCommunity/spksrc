@@ -7,7 +7,7 @@ OPTIONAL_DEPENDS = cross/libstdc++ cross/libe_sqlite3
 DEPENDS = cross/radarr
 
 # Arch exclusions for dotnet
-DOTNET_SERVARR_ARCHS = 1
+DOTNET_CORE_ARCHS = 1
 
 MAINTAINER = Team Radarr
 MAINTAINER_URL = https://radarr.video/
