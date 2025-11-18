@@ -72,18 +72,19 @@ _all: install plist
 
 all:
 	@mkdir -p $(WORK_DIR)
-	@bash -o pipefail -c ' \
-	   if [ -z "$$LOGGING_ENABLED" ]; then \
-	      export LOGGING_ENABLED=1 ; \
-	      { \
-	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	      } > >(tee --append $(DEFAULT_LOG)) 2>&1 ; \
-	   else \
-	      $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	   fi \
-	' || { \
-	   $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") | tee --append $(STATUS_LOG) ; \
-	   exit 1 ; \
+	@if [ -z "$$LOGGING_ENABLED" ]; then \
+		export LOGGING_ENABLED=1 ; \
+		bash -o pipefail -c '\
+			script -q -c "$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all" /dev/null \
+				| tee >(sed -r "s/\x1B\[[0-9;]*[mK]//g" >> "$(DEFAULT_LOG)") \
+		' ; \
+	else \
+		$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	fi || { \
+		$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" \
+		"$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") \
+		| tee --append $(STATUS_LOG) ; \
+		exit 1 ; \
 	}
 
 ####
