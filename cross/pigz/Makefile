@@ -2,7 +2,8 @@ PKG_NAME = pigz
 PKG_VERS = 2.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/madler/pigz/archive/refs/tags
+PKG_DIST_SITE = https://github.com/madler/pigz/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
@@ -11,12 +12,11 @@ HOMEPAGE = https://zlib.net/pigz/
 COMMENT  = A parallel implementation of gzip for modern multi-processor, multi-core machines.
 LICENSE  = zlib
 
+# pigz uses simple Makefile, no configure available
 CONFIGURE_TARGET = nop
 
-# pigz uses simple Makefile, no configure
-COMPILE_MAKE_OPTIONS = CC=$(TC_PATH)$(TC_PREFIX)gcc
-COMPILE_MAKE_OPTIONS += CFLAGS="$(CFLAGS) $(ADDITIONAL_CFLAGS)"
-COMPILE_MAKE_OPTIONS += LDFLAGS="$(LDFLAGS) $(ADDITIONAL_LDFLAGS)"
+# CFLAGS as in original Makefile:
+ADDITONAL_CFLAGS = -O3 -Wall -Wextra -Wno-unknown-pragmas -Wcast-qual
 
 INSTALL_TARGET = pigz_install
 
