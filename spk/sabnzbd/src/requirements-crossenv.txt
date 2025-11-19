@@ -1,10 +1,10 @@
-# Generated using the requirements script on August 25, 2025
+# Generated using the requirements script on October 23, 2025
 
-cffi==1.17.1
-charset_normalizer==3.4.3
-cryptography==45.0.6
+cffi==2.0.0
+charset_normalizer==3.4.4
+cryptography==46.0.3
 CT3==3.4.0
-#orjson==3.11.2             ==> supported version depends on rust version
-PyYAML==6.0.2
+#orjson==3.11.3             ==> supported version depends on rust version
+pyyaml==6.0.3
 sabctools==8.2.6
-ujson==5.10.0
+ujson==5.11.0

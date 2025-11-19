@@ -3,22 +3,10 @@
 SHELL := $(SHELL) -e
 default: all
 
-WORK_DIR := $(CURDIR)/work
-include ../../mk/spksrc.directories.mk
-
 include ../../mk/spksrc.common.mk
 
 ### Include common rules
 include ../../mk/spksrc.common-rules.mk
-
-# Include ross-rust-env.mk to generate install its toolchain
-include ../../mk/spksrc.cross-rust-env.mk
-
-# Include cross-cmake-env.mk to generate its toolchain file
-include ../../mk/spksrc.cross-cmake-env.mk
-
-# Include cross-meson-env.mk to generate its toolchain file
-include ../../mk/spksrc.cross-meson-env.mk
 
 # Configure the included makefiles
 URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
@@ -38,6 +26,25 @@ TC_LOCAL_VARS_MK           = $(WORK_DIR)/tc_vars.mk
 TC_LOCAL_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
 TC_LOCAL_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
 TC_LOCAL_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
+
+ifneq ($(strip $(ARCH)),)
+ARCH_SUFFIX := -$(ARCH)-$(TCVERSION)
+else
+ARCH_SUFFIX :=
+endif
+
+#####
+
+include ../../mk/spksrc.directories.mk
+
+# Include ross-rust-env.mk to generate install its toolchain
+include ../../mk/spksrc.cross-rust-env.mk
+
+# Include cross-cmake-env.mk to generate its toolchain file
+include ../../mk/spksrc.cross-cmake-env.mk
+
+# Include cross-meson-env.mk to generate its toolchain file
+include ../../mk/spksrc.cross-meson-env.mk
 
 #####
 
@@ -69,7 +76,30 @@ include ../../mk/spksrc.tc-flags.mk
 rustc: flag
 include ../../mk/spksrc.tc-rust.mk
 
-all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON_CROSS) $(TC_LOCAL_VARS_MESON_NATIVE) $(TC_LOCAL_VARS_MK)
+# Define _all as a real target that does the work
+.PHONY: _all
+_all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON_CROSS) $(TC_LOCAL_VARS_MESON_NATIVE) $(TC_LOCAL_VARS_MK)
+
+# all wraps _all with logging
+.PHONY: all
+.DEFAULT_GOAL := all
+
+all:
+	@bash -o pipefail -c ' \
+	  mkdir -p $(WORK_DIR) ; \
+	  $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG) ; \
+	   if [ -z "$$LOGGING_ENABLED" ]; then \
+	      export LOGGING_ENABLED=1 ; \
+	      { \
+	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	      } > >(tee --append $(DEFAULT_LOG)) 2>&1 ; \
+	   else \
+	      $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	   fi \
+	' || { \
+	   $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG) ; \
+	   exit 1 ; \
+	}
 
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK):
@@ -158,6 +188,29 @@ endif
 	echo "# search headers and libraries in the target environment" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY $(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY))" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))"
+	@echo ; \
+	echo "# Rust compiler and Cargo" ; \
+	echo "set(CARGO  $(RUSTUP_HOME)/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo)"
+ifeq ($(TC_RUSTUP_TOOLCHAIN),stable)
+	@echo "set(RUSTC  $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)-x86_64-unknown-linux-gnu/bin/rustc)"
+else
+	@echo "set(RUSTC  $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/bin/rustc)"
+endif
+	@echo ; \
+	echo "# Cross target triple" ; \
+	echo "set(RUST_TARGET  $(RUST_TARGET))" ; \
+	echo ; \
+	echo "# Rust linker and AR" ; \
+	echo "set(RUST_LINKER  \$${CMAKE_C_COMPILER})" ; \
+	echo "set(RUST_AR      \$${CMAKE_AR})" ; \
+	echo ; \
+	echo "# Export Rust environment for Cargo builds" ; \
+	echo "set(ENV{RUSTC} \$${RUSTC})" ; \
+	echo "set(ENV{CARGO} \$${CARGO})" ; \
+	echo "set(ENV{CARGO_BUILD_TARGET} \$${RUST_TARGET})" ; \
+	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER} \$${RUST_LINKER})" ; \
+	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR} \$${RUST_AR})" ; \
+	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS} $(TC_EXTRA_RUSTFLAGS))"
 
 .PHONY: meson_cross_vars
 meson_cross_vars:
@@ -177,7 +230,6 @@ meson_cross_vars:
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
 	    echo "fortran = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
-	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
 	    echo "c = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
@@ -185,6 +237,12 @@ meson_cross_vars:
 	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  fi ; \
 	done
+	@echo "cargo = '$(RUSTUP_HOME)/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo'"
+ifeq ($(TC_RUSTUP_TOOLCHAIN),stable)
+	@echo "rust = '$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)-x86_64-unknown-linux-gnu/bin/rustc'"
+else
+	@echo "rust = '$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/bin/rustc'"
+endif
 
 .PHONY: meson_native_vars
 meson_native_vars:
@@ -196,12 +254,17 @@ meson_native_vars:
 	  if [ "$${target}" = "cc" ]; then \
 	    echo "c = '$$(which $${source})'" ; \
 	    echo "$${target} = '$$(which $${source})'" ; \
+	  elif [ "$${target}" = "fc" ]; then \
+	    echo "fortran = '$$(which $${source})'" ; \
 	  elif [ "$${target}" = "ldshared" ]; then \
 	    echo "$${target} = '$$(which gcc) -shared'" ; \
 	  else \
 	    echo "$${target} = '$$(which $${source})'" ; \
 	  fi ; \
 	done
+	@echo "g-ir-compiler = '$$(which g-ir-compiler)'" ; \
+        echo "g-ir-generate = '$$(which g-ir-generate)'" ; \
+        echo "g-ir-scanner = '$$(which g-ir-scanner)'"
 
 .PHONY: tc_vars
 tc_vars: flag
@@ -223,13 +286,14 @@ tc_vars: flag
 	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
 	fi ; \
 	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
+	echo TC_ENV += RUSTFLAGS=\"$(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
 	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_EXTRA_RUSTFLAGS)\" ; \
 	echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
 	echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_SYSROOT := $(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
@@ -243,9 +307,12 @@ tc_vars: flag
 	   echo FFLAGS := $(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\) ; \
 	fi ; \
 	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
+	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
+	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
+	echo TC_EXTRA_RUSTFLAGS := $(TC_EXTRA_RUSTFLAGS) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \

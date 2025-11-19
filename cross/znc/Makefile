@@ -91,7 +91,7 @@ znc_post_install:
 	@chmod +x $(CMAKE_BUILD_DIR)/znc-buildmod
 	@rm -fr $(WORK_DIR)/modules
 	@cp -R modules $(WORK_DIR)/
-	$(RUN) sed -i 's|$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
-	@cd $(WORK_DIR)/modules && CMAKE_PREFIX_PATH=$(STAGING_INSTALL_PREFIX) $(CMAKE_BUILD_DIR)/znc-buildmod $(EXTRA_MODULES)
-	$(RUN) sed -i 's|$(STAGING_INSTALL_PREFIX)|$(INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
+	@$(RUN) sed -i 's|$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
+	cd $(WORK_DIR)/modules && env $(ENV) CMAKE_PREFIX_PATH=$(STAGING_INSTALL_PREFIX) $(CMAKE_BUILD_DIR)/znc-buildmod $(EXTRA_MODULES)
+	@$(RUN) sed -i 's|$(STAGING_INSTALL_PREFIX)|$(INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
 	@install -m 644 $(WORK_DIR)/modules/*.so $(STAGING_INSTALL_PREFIX)/lib/znc/

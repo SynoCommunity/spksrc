@@ -12,9 +12,11 @@
 #   build: -Cinstall-args='<value>'
 #
 
+# Setup common directories
+include ../../mk/spksrc.directories.mk
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
 
 ###
 
