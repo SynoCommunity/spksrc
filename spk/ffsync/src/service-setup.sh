@@ -148,40 +148,43 @@ service_postupgrade ()
     fi
 
     echo "Verify database URLs for socket parameter"
-    tmp_file="$(mktemp)"
-    if [ -z "$tmp_file" ]; then
-        echo "Unable to create temporary file for config update" >&2
-        return 1
+
+    sync_before=0
+    token_before=0
+    if grep -q '^syncstorage\.database_url[[:space:]]*=.*\?socket=' "${CFG_FILE}"; then
+        sync_before=1
+    fi
+    if grep -q '^tokenserver\.database_url[[:space:]]*=.*\?socket=' "${CFG_FILE}"; then
+        token_before=1
     fi
 
-    if ! awk -v socket="${DBSOCKET}" '
-        /^syncstorage\.database_url[[:space:]]*=/ {
-            if ($0 !~ /\?socket=/) {
-                sub(/"$/, "?socket=" socket "\"")
-            }
-        }
-        /^tokenserver\.database_url[[:space:]]*=/ {
-            if ($0 !~ /\?socket=/) {
-                sub(/"$/, "?socket=" socket "\"")
-            }
-        }
-        { print }
-    ' "${CFG_FILE}" > "$tmp_file"; then
-        echo "Failed to process config file" >&2
-        rm -f "$tmp_file"
-        return 1
+    escaped_socket=$(printf '%s' "$DBSOCKET" | sed -e 's/[\/&|]/\\&/g')
+
+    sed -i \
+        -e "/^syncstorage\.database_url[[:space:]]*=/ { /\?socket=/! s|\"$|?socket=${escaped_socket}\"| }" \
+        -e "/^tokenserver\.database_url[[:space:]]*=/ { /\?socket=/! s|\"$|?socket=${escaped_socket}\"| }" \
+        "${CFG_FILE}"
+
+    sync_after=0
+    token_after=0
+    if grep -q '^syncstorage\.database_url[[:space:]]*=.*\?socket=' "${CFG_FILE}"; then
+        sync_after=1
+    fi
+    if grep -q '^tokenserver\.database_url[[:space:]]*=.*\?socket=' "${CFG_FILE}"; then
+        token_after=1
     fi
 
-    if ! cmp -s "${CFG_FILE}" "$tmp_file"; then
-        echo "Updated database URLs with socket parameter"
-        if ! mv "$tmp_file" "${CFG_FILE}"; then
-            rm -f "$tmp_file"
-            echo "Failed to update config file" >&2
-            return 1
-        fi
+    if [ "$sync_before" -eq 0 ] && [ "$sync_after" -eq 1 ]; then
+        echo "Added socket parameter to syncstorage.database_url"
+    fi
+    if [ "$token_before" -eq 0 ] && [ "$token_after" -eq 1 ]; then
+        echo "Added socket parameter to tokenserver.database_url"
+    fi
+
+    if [ "$sync_after" -eq 1 ] && [ "$token_after" -eq 1 ]; then
+        echo "Database URLs now include socket parameter"
     else
-        rm -f "$tmp_file"
-        echo "Database URLs already include socket parameter"
+        echo "Warning: unable to ensure socket parameter for both database URLs" >&2
     fi
 }
 
