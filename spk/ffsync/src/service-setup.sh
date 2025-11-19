@@ -22,6 +22,7 @@ SVC_WRITE_PID=y
 
 DBUSER=ffsync
 DBSERVER="localhost"
+DBSOCKET="/run/mysqld/mysqld10.sock"
 
 percent_encode ()
 {
@@ -133,6 +134,7 @@ EOF
             -e "s|{{SQL_USER}}|${DBUSER}|g"                         \
             -e "s|{{SQL_PASS}}|${DBPASS_ENC}|g"                     \
             -e "s|{{DB_SERVER}}|${DBSERVER}|g"                      \
+            -e "s|{{DB_SOCKET}}|${DBSOCKET}|g"                      \
             -e "s|{{METRICS_HASH_SECRET}}|${METRICS_HASH_SECRET}|g" \
             -i "${CFG_FILE}"
     fi
