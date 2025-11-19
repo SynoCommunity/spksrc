@@ -140,6 +140,51 @@ EOF
     fi
 }
 
+service_postupgrade ()
+{
+    # Verify socket suffix when upgrading existing configs
+    if [ ! -f "${CFG_FILE}" ]; then
+        return
+    fi
+
+    echo "Verify database URLs for socket parameter"
+    tmp_file="$(mktemp)"
+    if [ -z "$tmp_file" ]; then
+        echo "Unable to create temporary file for config update" >&2
+        return 1
+    fi
+
+    if ! awk -v socket="${DBSOCKET}" '
+        /^syncstorage\.database_url[[:space:]]*=/ {
+            if ($0 !~ /\?socket=/) {
+                sub(/"$/, "?socket=" socket "\"")
+            }
+        }
+        /^tokenserver\.database_url[[:space:]]*=/ {
+            if ($0 !~ /\?socket=/) {
+                sub(/"$/, "?socket=" socket "\"")
+            }
+        }
+        { print }
+    ' "${CFG_FILE}" > "$tmp_file"; then
+        echo "Failed to process config file" >&2
+        rm -f "$tmp_file"
+        return 1
+    fi
+
+    if ! cmp -s "${CFG_FILE}" "$tmp_file"; then
+        echo "Updated database URLs with socket parameter"
+        if ! mv "$tmp_file" "${CFG_FILE}"; then
+            rm -f "$tmp_file"
+            echo "Failed to update config file" >&2
+            return 1
+        fi
+    else
+        rm -f "$tmp_file"
+        echo "Database URLs already include socket parameter"
+    fi
+}
+
 validate_preuninst ()
 {
     # Check database
