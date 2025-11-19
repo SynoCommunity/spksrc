@@ -48,6 +48,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	libffi-dev \
 	libgc-dev \
 	libgmp3-dev \
+	libicu76 \
 	libltdl-dev \
 	libmount-dev \
 	libncurses-dev \

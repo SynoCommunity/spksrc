@@ -60,7 +60,7 @@ sudo apt install --no-install-recommends -y \
                  fakeroot flex gh g++-multilib gawk gettext gfortran \
                  git gobject-introspection gperf imagemagick intltool \
                  jq libbz2-dev libc6-i386 libcppunit-dev libelf-dev \
-                 libffi-dev libgc-dev libgmp3-dev libltdl-dev \
+                 libffi-dev libgc-dev libgmp3-dev libicu76 libltdl-dev \
                  libmount-dev libncurses-dev libpcre2-dev libssl-dev \
                  libtool libtool-bin libunistring-dev lzip man-db manpages-dev \
                  moreutils nasm p7zip patchelf php pkg-config plocate \
@@ -92,7 +92,7 @@ lxc exec spksrc -- /usr/bin/apt install --no-install-recommends -y \
                  fakeroot flex gh g++-multilib gawk gettext gfortran \
                  git gobject-introspection gperf imagemagick intltool \
                  jq libbz2-dev libc6-i386 libcppunit-dev libelf-dev \
-                 libffi-dev libgc-dev libgmp3-dev libltdl-dev \
+                 libffi-dev libgc-dev libgmp3-dev libicu76 libltdl-dev \
                  libmount-dev libncurses-dev libpcre2-dev libssl-dev \
                  libtool libtool-bin libunistring-dev lzip man-db manpages-dev \
                  moreutils nasm p7zip patchelf php pkg-config plocate \
