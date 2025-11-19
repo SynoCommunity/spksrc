@@ -15,8 +15,6 @@ DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregis
 DISPLAY_NAME = FFmpeg $(firstword $(subst ., ,$(SPK_VERS)))
 STARTABLE = no
 
-GCC_DEBUG_INFO := 1
-
 HOMEPAGE = https://www.ffmpeg.org/
 LICENSE  = GPLv3
 
