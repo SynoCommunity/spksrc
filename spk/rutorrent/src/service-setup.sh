@@ -75,10 +75,14 @@ service_postinst ()
         TOP_DIR=`echo "${wizard_download_dir}" | cut -d "/" -f 2`
         MAX_MEMORY=`awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo`
 
-        sed -i -e "s|scgi_port = 5000;|scgi_port = ${SERVICE_PORT};|g" \
-               -e "s|topDirectory = '/';|topDirectory = '/${TOP_DIR}/';|g" \
-               -e "s|tempDirectory = null;|tempDirectory = '${SYNOPKG_PKGDEST}/tmp/';|g" \
-               -e "s|\"python\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"python\"\1=>\2'${SYNOPKG_PKGDEST}/env/bin/python3'\3,\4|g" \
+        sed -i \
+                -e "s|^\([[:space:]]*\)\$scgi_port =.*|\1\$scgi_port = ${SERVICE_PORT};|" \
+                -e "s|^\([[:space:]]*\)\$log_file =.*|\1\$log_file = '${SYNOPKG_PKGDEST}/tmp/errors.log';|" \
+                -e "s|^\([[:space:]]*\)\$topDirectory =.*|\1\$topDirectory = '/${TOP_DIR}/';|" \
+                -e "s|^\([[:space:]]*\)\$tempDirectory =.*|\1\$tempDirectory = '${SYNOPKG_PKGDEST}/tmp/';|" \
+                "${RUTORRENT_WEB_DIR}/conf/config.php"
+
+        sed -i -e "s|\"python\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"python\"\1=>\2'${SYNOPKG_PKGDEST}/env/bin/python3'\3,\4|g" \
                -e "s|\"pgrep\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"pgrep\"\1=>\2'${SYNOPKG_PKGDEST}/bin/pgrep'\3,\4|g" \
                -e "s|\"sox\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"sox\"\1=>\2'${SYNOPKG_PKGDEST}/bin/sox'\3,\4|g" \
                -e "s|\"mediainfo\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"mediainfo\"\1=>\2'${SYNOPKG_PKGDEST}/bin/mediainfo'\3,\4|g" \
