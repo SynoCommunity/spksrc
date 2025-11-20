@@ -1,5 +1,5 @@
 PKG_NAME = chromaprint
-PKG_VERS = 1.5.1
+PKG_VERS = 1.6.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/acoustid/chromaprint/archive/refs/tags

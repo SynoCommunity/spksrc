@@ -5,11 +5,12 @@ SPK_ICON = src/kavita.png
 
 DEPENDS = cross/kavita cross/libe_sqlite3
 
-# Arch exclusions for dotnet 6.0
+# Arch exclusions for dotnet
 DOTNET_CORE_ARCHS = 1
 
-# Requires glibc 2.28 which is not in DSM 6 toolchains
+# Requires glibc 2.28 which is not available in DSM 6 and SRM 1.2
 REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/

@@ -59,7 +59,9 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(or $(PYTHON_PACKAGE),$(SPK_NAME))/wor
 
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --find-links $(PIP_DISTRIB_DIR) --cache-dir $(PIP_CACHE_DIR)
-PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+PIP_BASIC_OPT ?= --no-color --disable-pip-version-check
+PIP_WHEEL_ARGS = wheel $(PIP_BASIC_OPT) --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+
 # Adding --no-index only for crossenv
 # to force using localy downloaded version
 PIP_WHEEL_ARGS_CROSSENV = $(PIP_WHEEL_ARGS) --no-index
