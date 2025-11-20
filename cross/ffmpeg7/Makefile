@@ -33,7 +33,9 @@ ifeq ($(strip $(GCC_DEBUG_INFO)),1)
 else
   CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
-  CONFIGURE_ARGS += --enable-lto
+  ifeq ($(findstring $(ARCH), $(i686_ARCHS)),)
+    CONFIGURE_ARGS += --enable-lto
+  endif
 endif
 
 # Must match $(SPK_REV) from spk/ffmpeg7/Makefile
