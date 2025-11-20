@@ -38,7 +38,7 @@ CMAKE_INSTALL_RPATH_USE_LINK_PATH = TRUE
 CMAKE_BUILD_WITH_INSTALL_RPATH = TRUE
 
 # Allow building shared libraries to be manually set
-ifeq ($(filter -DBUILD_SHARED_LIBS%,$(CMAKE_ARGS)),)
+ifeq ($(or $(filter -DBUILD_SHARED_LIBS%,$(CMAKE_ARGS)),$(strip $(BUILD_SHARED_LIBS))),)
 BUILD_SHARED_LIBS = ON
 endif
 
@@ -61,21 +61,15 @@ CMAKE_ARGS += -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=$(CMAKE_FIND_ROOT_PATH_MODE_PR
 CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(CMAKE_INSTALL_RPATH)
 CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=$(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=$(CMAKE_BUILD_WITH_INSTALL_RPATH)
+ifneq ($(strip $(BUILD_SHARED_LIBS)),)
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=$(BUILD_SHARED_LIBS)
+endif
 endif
 
 # Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   BUILD_DEPENDS += native/cmake
   CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake/work-native/install/usr/local/bin)
-  ENV += PATH=$(CMAKE_PATH):$$PATH
-  export PATH := $(CMAKE_PATH):$(PATH)
-endif
-
-# Use native cmake (Debian 10 "Buster")
-ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
-  BUILD_DEPENDS += native/cmake-legacy
-  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-legacy/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif

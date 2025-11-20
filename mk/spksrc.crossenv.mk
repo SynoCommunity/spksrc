@@ -202,10 +202,10 @@ endif
 	. $(CROSSENV_PATH)/bin/activate ; \
 	$(MSG) crossenv-$(CROSSENV_WHEEL)/build default packages: $(CROSSENV_BUILD_PIP), $(CROSSENV_BUILD_SETUPTOOLS), $(CROSSENV_BUILD_WHEEL) ; \
 	$(RUN) $$(which build-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_BUILD_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
-	$(RUN) $$(which build-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(CROSSENV_BUILD_SETUPTOOLS) $(CROSSENV_BUILD_WHEEL) ; \
+	$(RUN) $$(which build-pip) $(PIP_BASIC_OPT) --cache-dir $(PIP_CACHE_DIR) install $(CROSSENV_BUILD_SETUPTOOLS) $(CROSSENV_BUILD_WHEEL) ; \
 	$(MSG) crossenv-$(CROSSENV_WHEEL)/cross default packages: $(CROSSENV_CROSS_PIP), $(CROSSENV_CROSS_SETUPTOOLS), $(CROSSENV_CROSS_WHEEL) ; \
 	$(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_CROSS_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
-	$(RUN) $$(which cross-pip) --cache-dir $(PIP_CACHE_DIR) --disable-pip-version-check install $(CROSSENV_CROSS_SETUPTOOLS) $(CROSSENV_CROSS_WHEEL) ; \
+	$(RUN) $$(which cross-pip) $(PIP_BASIC_OPT) --cache-dir $(PIP_CACHE_DIR) install $(CROSSENV_CROSS_SETUPTOOLS) $(CROSSENV_CROSS_WHEEL) ; \
 	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 	@$(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" requirement
 	@MAKEFLAGS= $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT="$(CROSSENV_REQUIREMENTS)" REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" requirement

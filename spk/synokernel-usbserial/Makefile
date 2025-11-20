@@ -19,6 +19,9 @@ DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_505
 CHANGELOG = "Add support for Linux 5.x kernels."
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+# we only have ipq806x for SRM 1.2, but this fails with:
+# /usr/bin/ld: scripts/dtc/dtc-parser.tab.o:(.bss+0x10): multiple definition of `yylloc'; scripts/dtc/dtc-lexer.lex.o:(.bss+0x0): first defined here
+REQUIRED_MIN_SRM = 1.3
 
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB Serial drivers

@@ -30,7 +30,13 @@ space := $(empty) $(empty)
 ENV_VARS_TO_CLEAN = AR AS CC CPP CXX FC LD LDSHARED NM OBJCOPY OBJDUMP RANLIB READELF STRIP \
                     CFLAGS ADDITIONAL_CFLAGS CPPFLAGS ADDITIONAL_CPPFLAGS \
                     CXXFLAGS ADDITIONAL_CXXFLAGS FFLAGS ADDITIONAL_FFLAGS \
-                    LDFLAGS ADDITIONAL_LDFLAGS PKG_CONFIG_PATH SYSROOT
+                    LDFLAGS ADDITIONAL_LDFLAGS PKG_CONFIG_PATH SYSROOT \
+                    RUSTFLAGS RUST_TARGET RUSTUP_HOME RUSTUP_TOOLCHAIN \
+                    CARGO_HOME CARGO_BUILD_TARGET \
+                    CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR \
+                    CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER \
+                    CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS
+
 ENV_FILTERED = $(shell env -i $(ENV) sh -c 'env' | \
     grep -v -E '^($(subst $(space),|,$(ENV_VARS_TO_CLEAN)))=' | \
     awk -F'=' '{if($$2 ~ / /) print $$1"=\""$$2"\""; else print $$0}' | \
@@ -53,7 +59,9 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(or $(PYTHON_PACKAGE),$(SPK_NAME))/wor
 
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --find-links $(PIP_DISTRIB_DIR) --cache-dir $(PIP_CACHE_DIR)
-PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+PIP_BASIC_OPT ?= --no-color --disable-pip-version-check
+PIP_WHEEL_ARGS = wheel $(PIP_BASIC_OPT) --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+
 # Adding --no-index only for crossenv
 # to force using localy downloaded version
 PIP_WHEEL_ARGS_CROSSENV = $(PIP_WHEEL_ARGS) --no-index
