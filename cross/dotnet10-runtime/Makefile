@@ -1,5 +1,5 @@
 PKG_NAME = aspnetcore-runtime
-PKG_VERS = 8.0.22
+PKG_VERS = 10.0.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/$(PKG_VERS)
@@ -36,4 +36,4 @@ include ../../mk/spksrc.install-resources.mk
 dotnet_runtime_custom_install:
 	mkdir -p "$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/dotnet/"
 	tar -cf - -C $(EXTRACT_PATH) . | tar -xf - -C "$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/dotnet/"
-
+	
