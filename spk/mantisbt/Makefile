@@ -36,14 +36,14 @@ CONF_DIR = src/conf/
 
 include ../../mk/spksrc.common.mk
 
-# Default to the PHP 7.4 runtime bundled with WebStation on DSM 6.x
+# Default to PHP 7.4 on DSM 6.x
 SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
-# DSM 7.2+ ships WebStation with PHP 8.2
+# Use PHP 8.2 on DSM 7.2+ (PHP 8.0 not supported)
 SPK_DEPENDS = "WebStation:PHP8.2:MariaDB10:Apache2.4"
 else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-# DSM 7.0/7.1 provide PHP 8.0 only
+# Use PHP 8.0 on DSM 7.0/7.1
 SPK_DEPENDS = "WebStation:PHP8.0:MariaDB10:Apache2.4"
 OS_MAX_VER = 7.1-59999
 endif
