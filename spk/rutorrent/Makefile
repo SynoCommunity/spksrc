@@ -12,6 +12,8 @@ CHANGELOG = "1. Upgrade rutorrent to 5.1.12. <br/>2. Update rtorrent to v0.10.0.
 # libtorrent-rakshasa requires C++14 support
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+# SRM is not supported due lacking webstation, php and apache packages
+REQUIRED_MIN_SRM = 3.0
 
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "WebStation:${PYTHON_PACKAGE}:PHP7.4:Apache2.4"

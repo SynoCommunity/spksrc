@@ -10,6 +10,8 @@ override ARCH=noarch
 # Due to not obvious WebStation handling requirements
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
+# SRM is not supported due lacking webstation, php, mariadb and apache packages
+REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Mantis is an easily deployable, web based bugtracker to aid product bug tracking. It requires PHP, MySQL and a web server. It is simpler than Bugzilla and easily editable.
