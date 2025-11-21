@@ -1,6 +1,6 @@
 SPK_NAME = wallabag
-SPK_VERS = 2.6.13
-SPK_REV = 8
+SPK_VERS = 2.6.14
+SPK_REV = 9
 SPK_ICON = src/wallabag.png
 
 DEPENDS  = cross/wallabag
@@ -9,14 +9,13 @@ override ARCH=noarch
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_MIN_DSM = 6.0
-SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 # SRM is not supported due lacking webstation, php, mariadb and apache packages
 REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Wallabag is a self hostable application allowing you to save an offline copy of your favorite articles. Click, save, read it when you can. It extracts content so that you can read it when you have time.
 DISPLAY_NAME = Wallabag
-CHANGELOG = "1. Update to v2.6.13."
+CHANGELOG = "1. Update to v2.6.14.<br/>2. Adjust PHP dependency per DSM version."
 
 HOMEPAGE = https://www.wallabag.org/
 LICENSE  = MIT
@@ -35,6 +34,18 @@ DSM_UI_CONFIG = src/app/config
 CONF_DIR = src/conf/
 
 include ../../mk/spksrc.common.mk
+
+# Default to PHP 7.4 on DSM 6.x
+SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
+
+ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
+# Use PHP 8.2 on DSM 7.2+ (PHP 8.0 not supported)
+SPK_DEPENDS = "WebStation:PHP8.2:MariaDB10:Apache2.4"
+else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+# Use PHP 8.0 on DSM 7.0/7.1
+SPK_DEPENDS = "WebStation:PHP8.0:MariaDB10:Apache2.4"
+OS_MAX_VER = 7.1-59999
+endif
 
 # Alternate conf dir for DSM 6
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
