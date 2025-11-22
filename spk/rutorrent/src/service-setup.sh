@@ -9,19 +9,13 @@ PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/b
 DSM6_WEB_DIR="/var/services/web"
 WEB_DIR="/var/services/web_packages"
 
-APACHE_USER="$([ $(grep buildnumber /etc.defaults/VERSION | cut -d"\"" -f2) -ge 4418 ] && echo -n http || echo -n nobody)"
+GROUP="synocommunity"
+APACHE_USER="http"
 APACHE_GROUP=${APACHE_USER}
-BUILDNUMBER="$(/bin/get_key_value /etc.defaults/VERSION buildnumber)"
 
 RUTORRENT_WEB_DIR=${WEB_DIR}/${PACKAGE}
 # rtorrent configuration file location
 RTORRENT_RC=${RUTORRENT_WEB_DIR}/conf/rtorrent.rc
-
-GROUP="sc-download"
-GROUP_DESC="SynoCommunity's download related group"
-LEGACY_USER="rutorrent"
-LEGACY_GROUP="users"
-
 
 SVC_BACKGROUND=y
 PID_FILE="${SYNOPKG_PKGVAR}/rtorrent.pid"
@@ -32,7 +26,7 @@ SERVICE_COMMAND="env RUTORRENT_WEB_DIR=${RUTORRENT_WEB_DIR} SYNOPKG_PKGVAR=${SYN
 
 fix_shared_folders_rights()
 {
-    local folder=$1
+    folder=$1
     echo "Fixing shared folder rights for ${folder}"
 
     # Delete any previous ACL to limit duplicates
@@ -71,9 +65,9 @@ service_postinst ()
     ln -s -T -f "${RTORRENT_RC}" "${SYNOPKG_PKGVAR}/.rtorrent.rc"
 
     # Configure files
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
-        TOP_DIR=`echo "${wizard_download_dir}" | cut -d "/" -f 2`
-        MAX_MEMORY=`awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo`
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        TOP_DIR=$(echo "${wizard_download_dir}" | cut -d "/" -f 2)
+        MAX_MEMORY=$(awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo)
 
         sed -i \
                 -e "s|^\([[:space:]]*\)\$scgi_port =.*|\1\$scgi_port = ${SERVICE_PORT};|" \
@@ -100,7 +94,7 @@ service_postinst ()
                "${RTORRENT_RC}"
 
         if [ -n "${wizard_watch_dir}" ]; then
-            local effective_watch_dir="${wizard_download_dir}${wizard_watch_dir}"
+            effective_watch_dir="${wizard_download_dir}${wizard_watch_dir}"
             mkdir -p "${effective_watch_dir}"
             sed -i -e "s|@watch_dir@|${effective_watch_dir}|g" ${RTORRENT_RC}
         else
@@ -122,13 +116,11 @@ service_postinst ()
 
     fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
     
-    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
       mkdir -p "${RUTORRENT_WEB_DIR}/share"
-  
+
       # Allow read/write/execute over the share web/rutorrent/share directory
       fix_shared_folders_rights "${RUTORRENT_WEB_DIR}/share"
-
-      touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
     fi
 
     return 0
@@ -142,19 +134,19 @@ service_postuninst ()
 
 service_save ()
 {
-    local source_directory="${RUTORRENT_WEB_DIR}"
-    if [ -d "${DSM6_WEB_DIR}/${PACKAGE}" ] && [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
+    source_directory="${RUTORRENT_WEB_DIR}"
+    if [ -d "${DSM6_WEB_DIR}/${PACKAGE}" ]; then
       source_directory="${DSM6_WEB_DIR}/${PACKAGE}"
     fi
-    local ruTorrentConfigFile="${source_directory}/conf/config.php"
+    ruTorrentConfigFile="${source_directory}/conf/config.php"
 
     # Revision 8 introduces backward incompatible changes
-    if [ `echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/"` -le 8 ]; then
+    if [ "$(echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/")" -le 8 ]; then
         sed -i -e "s|http_cacert = .*|http_cacert = /etc/ssl/certs/ca-certificates.crt|g" ${RTORRENT_RC}
     fi
 
     # Revision 15 introduces backward incompatible changes in the configuration
-    if [ `echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/"` -lt 15 ]; then
+    if [ "$(echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/")" -lt 15 ]; then
         sed -i -E -e "s/@define\(\s*'HTTP_USER_AGENT'\s*,\s*'(.*)'\s*(,\s*(true|false)\s*)?\)/\$httpUserAgent = '\\1'/g" \
               -e "s/@define\(\s*'HTTP_TIME_OUT'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$httpTimeOut = \\1/g" \
               -e "s/@define\(\s*'HTTP_USE_GZIP'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$httpUseGzip = \\1/g" \
@@ -165,39 +157,41 @@ service_save ()
               -e "s/@define\(\s*'PHP_GZIP_LEVEL'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$phpGzipLevel = \\1/g" \
               -e "s|\\\$profilePath(\s*)=(\s*)'\\.\\./share'|\\\$profilePath\\1=\\2'../../share'|g" \
           "${ruTorrentConfigFile}"
-        echo '  $throttleMaxSpeed = 327625*1024;	// DO NOT EDIT THIS LINE!!! DO NOT COMMENT THIS LINE!!!'  >> "${ruTorrentConfigFile}"
-        echo "  // Can't be greater then 327625*1024 due to limitation in libtorrent ResourceManager::set_max_upload_unchoked function." >> "${ruTorrentConfigFile}"
-        echo "  \$al_diagnostic = true; // Diagnose auto-loader. Set to \"false\" to make composer plugins work." >> "${ruTorrentConfigFile}"
-        echo "  \$localHostedMode = true;		// Set to false if rTorrent is NOT hosted on the SAME machine as ruTorrent" >> "${ruTorrentConfigFile}"
-        echo "  \$cachedPluginLoading = false;		// Set to true to enable rapid cached loading of ruTorrent plugins" >> "${ruTorrentConfigFile}"
-        echo "  \$enableCSRFCheck = false;		// If true then Origin and Referer will be checked" >> "${ruTorrentConfigFile}"
-	      echo "  \$enabledOrigins = array();		// List of enabled domains for CSRF check (only hostnames, without protocols, port etc.)." >> "${ruTorrentConfigFile}"
-        echo "  // If empty, then will retrieve domain from HTTP_HOST / HTTP_X_FORWARDED_HOST" >> "${ruTorrentConfigFile}"
+        {
+            echo "  \$throttleMaxSpeed = 327625*1024;	// DO NOT EDIT THIS LINE!!! DO NOT COMMENT THIS LINE!!!"
+            echo "  // Can't be greater then 327625*1024 due to limitation in libtorrent ResourceManager::set_max_upload_unchoked function."
+            echo "  \$al_diagnostic = true; // Diagnose auto-loader. Set to \"false\" to make composer plugins work."
+            echo "  \$localHostedMode = true;		// Set to false if rTorrent is NOT hosted on the SAME machine as ruTorrent"
+            echo "  \$cachedPluginLoading = false;		// Set to true to enable rapid cached loading of ruTorrent plugins"
+            echo "  \$enableCSRFCheck = false;		// If true then Origin and Referer will be checked"
+            echo "  \$enabledOrigins = array();		// List of enabled domains for CSRF check (only hostnames, without protocols, port etc.)."
+            echo "  // If empty, then will retrieve domain from HTTP_HOST / HTTP_X_FORWARDED_HOST"
+        } >> "${ruTorrentConfigFile}"
     fi
 
     # Save the configuration file
-    cp -ap -t "${TMP_DIR}" "${ruTorrentConfigFile}"
+    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${ruTorrentConfigFile}"
     if [ -f "${source_directory}/.htaccess" ]; then
-        cp -ap -t "${TMP_DIR}" "${source_directory}/.htaccess"
+        cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${source_directory}/.htaccess"
     fi
 
     # Save session files
-    cp -ap -t "${TMP_DIR}" "${SYNOPKG_PKGVAR}/.session"
+    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${SYNOPKG_PKGVAR}/.session"
 
     # Save rtorrent configuration file (new location)
-    if [ -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" -a -f "${RTORRENT_RC}" ]; then
-       mv -t "${TMP_DIR}" "${RTORRENT_RC}"
+    if [ -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] && [ -f "${RTORRENT_RC}" ]; then
+       mv -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${RTORRENT_RC}"
     # Save rtorrent configuration file (old location -> prior to symlink)
-    elif [ ! -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" -a -f "${SYNOPKG_PKGVAR}/.rtorrent.rc" ]; then
-       mv "${SYNOPKG_PKGVAR}/.rtorrent.rc" "${TMP_DIR}/rtorrent.rc"
+    elif [ ! -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] && [ -f "${SYNOPKG_PKGVAR}/.rtorrent.rc" ]; then
+       mv "${SYNOPKG_PKGVAR}/.rtorrent.rc" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc"
     fi
 
     # Save rutorrent share directory
-    cp -ap -t "${TMP_DIR}" "${source_directory}/share"
+    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${source_directory}/share"
 
     # Save plugins directory for any user-added plugins
-    cp -ap -t "${TMP_DIR}" "${source_directory}/conf/plugins.ini"
-    cp -ap -t "${TMP_DIR}" "${source_directory}/plugins"
+    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${source_directory}/conf/plugins.ini"
+    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${source_directory}/plugins"
 
     return 0
 }
@@ -218,25 +212,17 @@ define_external_program()
         >> "${RUTORRENT_WEB_DIR}/conf/config.php"
 }
 
-fix_unix_permissions ()
-{
-    local file=$1
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-      set_unix_permissions "${file}"
-    fi
-}
-
 service_restore ()
 {
     echo "Restoring http custom security file ${RUTORRENT_WEB_DIR}/.htaccess"
-    if [ -f "${TMP_DIR}/.htaccess" ]; then
-        cp -ap -t "${RUTORRENT_WEB_DIR}" "${TMP_DIR}/.htaccess"
-        rm "${TMP_DIR}/.htaccess"
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.htaccess" ]; then
+        cp -ap -t "${RUTORRENT_WEB_DIR}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.htaccess"
+        rm "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.htaccess"
     fi
 
     echo "Restoring rtorrent configuration ${RTORRENT_RC}"
-    cp -apf "${TMP_DIR}/rtorrent.rc" "${RTORRENT_RC}"
-    rm "${TMP_DIR}/rtorrent.rc"
+    cp -apf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc" "${RTORRENT_RC}"
+    rm "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc"
 
     # http_cacert command has been moved to network.http.cacert
     if [ ! "$(grep -c 'http_cacert = ' "${RTORRENT_RC}")" -eq 0 ]; then
@@ -244,30 +230,29 @@ service_restore ()
     fi
 
     echo "Restoring rutorrent web shared directory ${RUTORRENT_WEB_DIR}/share"
-    cp -ap -t "${RUTORRENT_WEB_DIR}" -f "${TMP_DIR}/share"
-    rm -rf "${TMP_DIR}/share"
+    cp -ap -t "${RUTORRENT_WEB_DIR}" -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/share"
+    rm -rf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/share"
 
     echo "Restoring rutorrent custom plugins configuration ${RUTORRENT_WEB_DIR}/conf/plugins.ini"
-    cp -ap -t "${RUTORRENT_WEB_DIR}/conf/" -f "${TMP_DIR}/plugins.ini"
-    rm "${TMP_DIR}/plugins.ini"
+    cp -ap -t "${RUTORRENT_WEB_DIR}/conf/" -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/plugins.ini"
+    rm "${SYNOPKG_TEMP_UPGRADE_FOLDER}/plugins.ini"
 
     echo "Restoring rutorrent custom plugins ${RUTORRENT_WEB_DIR}/plugins"
-    for src in "${TMP_DIR}/plugins"/*; do
+    for src in "${SYNOPKG_TEMP_UPGRADE_FOLDER}/plugins"/*; do
         plugin=$(basename "$src")
         dest="${RUTORRENT_WEB_DIR}/plugins/${plugin}"
         if [ ! -e "$dest" ]; then
             cp -ap "$src" "${RUTORRENT_WEB_DIR}/plugins/"
-            fix_unix_permissions "${dest}"
         fi
     done
-    rm -rf "${TMP_DIR}/plugins"
+    rm -rf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/plugins"
 
     echo "Restoring rutorrent global configuration ${RUTORRENT_WEB_DIR}/conf/config.php"
-    cp -ap -t "${RUTORRENT_WEB_DIR}/conf" -f "${TMP_DIR}/config.php"
-    rm -f "${TMP_DIR}/config.php"
+    cp -ap -t "${RUTORRENT_WEB_DIR}/conf" -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/config.php"
+    rm -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/config.php"
 
     # Force new line at EOF for older rutorrent upgrade when missing (#4295)
-    [ ! -z "$(tail -c1 ${RUTORRENT_WEB_DIR}/conf/config.php)" ] && echo >> "${RUTORRENT_WEB_DIR}/conf/config.php"
+    [ -n "$(tail -c1 ${RUTORRENT_WEB_DIR}/conf/config.php)" ] && echo >> "${RUTORRENT_WEB_DIR}/conf/config.php"
 
     # In previous versions the python entry had nothing defined, 
     # here we define it if, and only if, python3 is actually installed
@@ -309,10 +294,6 @@ service_restore ()
 
     if is_not_defined_external_program 'php'; then
         define_external_program 'php' '/bin/php' '/usr/bin/php'
-    fi
-
-    if [ ! -f "${SYNOPKG_PKGVAR}/.dsm7_migrated" ]; then
-      touch "${SYNOPKG_PKGVAR}/.dsm7_migrated"
     fi
 
     return 0
