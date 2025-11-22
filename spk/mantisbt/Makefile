@@ -32,25 +32,22 @@ SYSTEM_GROUP = http
 
 DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
-CONF_DIR = src/conf/
 
 include ../../mk/spksrc.common.mk
 
 # Default to PHP 7.4 on DSM 6.x
 SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
+CONF_DIR = src/conf_6/
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
 # Use PHP 8.2 on DSM 7.2+ (PHP 8.0 not supported)
 SPK_DEPENDS = "WebStation:PHP8.2:MariaDB10:Apache2.4"
+CONF_DIR = src/conf_72/
 else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 # Use PHP 8.0 on DSM 7.0/7.1
 SPK_DEPENDS = "WebStation:PHP8.0:MariaDB10:Apache2.4"
 OS_MAX_VER = 7.1-59999
-endif
-
-# Alternate conf dir for DSM 6
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-CONF_DIR = src/conf_6/
+CONF_DIR = src/conf_7/
 endif
 
 POST_STRIP_TARGET = mantisbt_extra_install

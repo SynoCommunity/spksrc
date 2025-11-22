@@ -42,7 +42,7 @@
                 "display_name": "MantisBT",
                 "icon": "app/images/mantisbt-{0}.png",
                 "php": {
-                    "backend": 8,
+                    "backend": 9,
                     "extensions": [
                         "curl",
                         "gd",
@@ -53,7 +53,7 @@
                         "zlib"
                     ],
                     "group": "http",
-                    "profile_desc": "PHP Profile for mantisbt",
+                    "profile_desc": "PHP 8.0 Profile for mantisbt",
                     "profile_name": "mantisbt Profile",
                     "user": "sc-mantisbt"
                 },
