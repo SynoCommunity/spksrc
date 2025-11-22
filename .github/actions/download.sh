@@ -9,7 +9,7 @@
 # - Use the "download-all" target when a package has multiple (arch-specific) files.
 # - Retry download if checksum fails (cached file may be outdated).
 
-set -euo pipefail
+set -uo pipefail
 # Report any error (with line and package context) and exit.
 trap 'echo "::error::Error on line ${LINENO} while processing ${current:-<none>}"; exit 1' ERR
 
@@ -20,29 +20,43 @@ command -v make >/dev/null 2>&1 || { echo "::error::make is not installed"; exit
 download_with_retry() {
     local target_dir="$1"
     local target_name="$2"
+    local result=0
+    local output=""
 
     echo "  -> ${target_dir}: ${target_name} then checksum"
 
-    # First attempt
-    if make -C "${target_dir}" ${target_name} checksum; then
+    # First attempt (disable exit on error temporarily)
+    set +e
+    output=$(make -C "${target_dir}" ${target_name} checksum 2>&1)
+    result=$?
+    set -e
+
+    # Display output
+    echo "$output"
+
+    if [ $result -eq 0 ]; then
         return 0
     fi
 
-    # Check if checksum failure occurred (files renamed to .wrong)
-    if find distrib -name "*.wrong" -newer /tmp/download_start_marker 2>/dev/null | grep -q .; then
-        echo "  -> Checksum failed, retrying download for ${target_dir}..."
+    # Check if checksum failure occurred by looking for .wrong rename in output
+    if echo "$output" | grep -q "Renamed as .*.wrong"; then
+        echo "  -> Checksum failed due to outdated cached file, retrying download for ${target_dir}..."
+
         # Retry download and checksum
-        if make -C "${target_dir}" ${target_name} checksum; then
+        set +e
+        make -C "${target_dir}" ${target_name} checksum
+        result=$?
+        set -e
+
+        if [ $result -eq 0 ]; then
             return 0
         fi
     fi
 
-    # Both attempts failed
+    # Both attempts failed or failure was not due to cached file
+    echo "::error::Download/checksum failed for ${target_dir}"
     return 1
 }
-
-# Create marker file for tracking new .wrong files
-touch /tmp/download_start_marker
 
 echo ""
 # 1) Download native / cross-compiled sources.
@@ -67,9 +81,6 @@ else
         download_with_retry "${current}" "download-wheels"
     done
 fi
-
-# Cleanup marker file
-rm -f /tmp/download_start_marker
 
 echo ""
 echo "===> All downloads completed successfully."
