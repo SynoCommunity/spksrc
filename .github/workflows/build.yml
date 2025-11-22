@@ -109,12 +109,20 @@ jobs:
           GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges_push.outputs.dependency_folders }} ${{ steps.getchanges_pr.outputs.dependency_folders }}
           USER_SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
+# Optimized cache configuration for spksrc
+# Cache is cumulative and maintained by cache-maintenance.yml
+
       - name: Cache downloaded files
         uses: actions/cache@v4
         with:
           path: distrib
-          # use run_id in key to cache within workflow only.
-          key: distrib-${{ github.run_id }}
+          # Simple key based on branch name
+          # Master cache is maintained by cache-maintenance.yml
+          key: distrib-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            distrib-${{ github.ref_name }}-
+            distrib-master-
+            distrib-
 
       - name: Download source files
         run: ./.github/actions/download.sh
@@ -260,7 +268,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: distrib
-          key: distrib-${{ github.run_id }}
+          key: distrib-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            distrib-${{ github.ref_name }}-
+            distrib-master-
+            distrib-
 
       - name: Build Package (based on changed files)
         # We don't want to stop the build on errors.
