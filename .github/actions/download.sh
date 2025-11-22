@@ -65,7 +65,7 @@ if [ -z "${DOWNLOAD_PACKAGES:-}" ]; then
 else
     echo "===> Downloading packages: ${DOWNLOAD_PACKAGES}"
     for current in ${DOWNLOAD_PACKAGES}; do
-        download_with_retry "${current}" "download-all"
+        download_with_retry "${current}" "download"
     done
 fi
 
