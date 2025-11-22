@@ -6,7 +6,8 @@
 # Functions:
 # - Download all referenced native and cross source files for packages.
 # - Download all referenced python wheels needed to build.
-# - Use the “download-all” target when a package has multiple (arch-specific) files.
+# - Use the "download-all" target when a package has multiple (arch-specific) files.
+# - Retry download if checksum fails (cached file may be outdated).
 
 set -euo pipefail
 # Report any error (with line and package context) and exit.
@@ -15,6 +16,34 @@ trap 'echo "::error::Error on line ${LINENO} while processing ${current:-<none>}
 # Ensure required tooling is present.
 command -v make >/dev/null 2>&1 || { echo "::error::make is not installed"; exit 1; }
 
+# Function to download and verify with retry on checksum failure
+download_with_retry() {
+    local target_dir="$1"
+    local target_name="$2"
+
+    echo "  -> ${target_dir}: ${target_name} then checksum"
+
+    # First attempt
+    if make -C "${target_dir}" ${target_name} checksum; then
+        return 0
+    fi
+
+    # Check if checksum failure occurred (files renamed to .wrong)
+    if find distrib -name "*.wrong" -newer /tmp/download_start_marker 2>/dev/null | grep -q .; then
+        echo "  -> Checksum failed, retrying download for ${target_dir}..."
+        # Retry download and checksum
+        if make -C "${target_dir}" ${target_name} checksum; then
+            return 0
+        fi
+    fi
+
+    # Both attempts failed
+    return 1
+}
+
+# Create marker file for tracking new .wrong files
+touch /tmp/download_start_marker
+
 echo ""
 # 1) Download native / cross-compiled sources.
 if [ -z "${DOWNLOAD_PACKAGES:-}" ]; then
@@ -22,9 +51,7 @@ if [ -z "${DOWNLOAD_PACKAGES:-}" ]; then
 else
     echo "===> Downloading packages: ${DOWNLOAD_PACKAGES}"
     for current in ${DOWNLOAD_PACKAGES}; do
-        echo "  → ${current}: download-all then checksum"
-        # download-all pulls down all sources; checksum verifies them.
-        make -C "${current}" download-all checksum
+        download_with_retry "${current}" "download-all"
     done
 fi
 
@@ -37,11 +64,12 @@ else
     echo "===> Downloading wheels: ${build_pkgs[*]}"
     for pkg in "${build_pkgs[@]}"; do
         current="spk/${pkg}"
-        echo "  → ${current}: download-wheels"
-        # download-wheels grabs all needed .whl files.
-        make -C "${current}" download-wheels
+        download_with_retry "${current}" "download-wheels"
     done
 fi
+
+# Cleanup marker file
+rm -f /tmp/download_start_marker
 
 echo ""
 echo "===> All downloads completed successfully."
