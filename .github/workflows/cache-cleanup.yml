@@ -42,7 +42,7 @@ jobs:
           else
             echo "No cache found or partial restore"
           fi
-          
+
           echo ""
           echo "Current distrib cache status:"
           if [ -d "distrib" ]; then
@@ -62,26 +62,41 @@ jobs:
         run: |
           echo "Cleaning files older than $MAX_AGE_DAYS days"
           echo ""
-          
+
           if [ ! -d "distrib" ] || [ -z "$(ls -A distrib 2>/dev/null)" ]; then
             echo "Distrib cache is empty, nothing to clean"
             exit 0
           fi
-          
+
+          # Remove corrupted/invalid files marked as .wrong by checksum verification
+          WRONG_FILES=$(find distrib -type f -name "*.wrong" 2>/dev/null || true)
+          if [ -n "$WRONG_FILES" ]; then
+            WRONG_COUNT=$(echo "$WRONG_FILES" | wc -l)
+            echo "Found $WRONG_COUNT corrupted file(s) marked as .wrong:"
+            echo "$WRONG_FILES"
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "[DRY RUN] Would delete $WRONG_COUNT .wrong file(s)"
+            else
+              echo "$WRONG_FILES" | xargs rm -f
+              echo "Deleted $WRONG_COUNT .wrong file(s)"
+            fi
+            echo ""
+          fi
+
           # Find files not modified for more than MAX_AGE_DAYS
           OLD_FILES=$(find distrib -type f -mtime +${MAX_AGE_DAYS} 2>/dev/null || true)
-          
+
           if [ -z "$OLD_FILES" ]; then
             echo "No obsolete files found"
             exit 0
           fi
-          
+
           OLD_COUNT=$(echo "$OLD_FILES" | wc -l)
           OLD_SIZE=$(echo "$OLD_FILES" | xargs du -ch 2>/dev/null | tail -1 | cut -f1 || echo "0")
-          
+
           echo "Obsolete files found: $OLD_COUNT ($OLD_SIZE)"
           echo ""
-          
+
           if [ "$DRY_RUN" = "true" ]; then
             echo "[DRY RUN] Files that would be deleted:"
             echo "$OLD_FILES" | head -50
@@ -91,20 +106,20 @@ jobs:
           else
             echo "Deleting files..."
             echo "$OLD_FILES" | xargs rm -f
-            
+
             # Clean empty directories
             find distrib -type d -empty -delete 2>/dev/null || true
-            
+
             echo "$OLD_COUNT files deleted ($OLD_SIZE freed)"
           fi
 
       - name: Download common dependencies
         run: |
           echo "Downloading common dependencies..."
-          
+
           # Setup for make
           make setup-synocommunity 2>/dev/null || true
-          
+
           # List of frequently used packages to pre-download
           # Adjust this list based on your needs
           COMMON_DEPS="
@@ -120,7 +135,7 @@ jobs:
             native/ninja
             native/meson
           "
-          
+
           for dep in $COMMON_DEPS; do
             if [ -d "$dep" ]; then
               echo "  -> $dep"
@@ -137,7 +152,7 @@ jobs:
             TOTAL_SIZE=$(du -sh distrib 2>/dev/null | cut -f1 || echo "0")
             echo "  Files: $FILE_COUNT"
             echo "  Size: $TOTAL_SIZE"
-            
+
             echo ""
             echo "Distribution by file type:"
             find distrib -type f -name "*.tar.gz" | wc -l | xargs -I{} echo "  .tar.gz: {}"
@@ -145,7 +160,7 @@ jobs:
             find distrib -type f -name "*.tar.bz2" | wc -l | xargs -I{} echo "  .tar.bz2: {}"
             find distrib -type f -name "*.zip" | wc -l | xargs -I{} echo "  .zip: {}"
             find distrib -type f -name "*.whl" | wc -l | xargs -I{} echo "  .whl: {}"
-            
+
             echo ""
             echo "File age distribution:"
             find distrib -type f -mtime -7 | wc -l | xargs -I{} echo "  < 7 days: {}"
@@ -176,43 +191,43 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Cleaning up old GitHub cache entries"
-          
+
           gh extension install actions/gh-actions-cache 2>/dev/null || true
-          
+
           # List all distrib-master caches except the most recent one
           CACHES=$(gh actions-cache list -R ${{ github.repository }} \
             --key "distrib-master-" --limit 100 \
             --json key,createdAt \
             --jq 'sort_by(.createdAt) | reverse | .[1:] | .[].key' 2>/dev/null || true)
-          
+
           if [ -z "$CACHES" ]; then
             echo "No old caches to clean"
             exit 0
           fi
-          
+
           echo "Deleting old distrib-master caches:"
           for key in $CACHES; do
             echo "  Deleting: $key"
             gh actions-cache delete "$key" -R ${{ github.repository }} --confirm 2>/dev/null || true
           done
-          
+
           # Also clean caches from closed PR branches (older than 14 days)
           echo ""
           echo "Cleaning stale branch caches..."
-          
+
           OLD_BRANCH_CACHES=$(gh actions-cache list -R ${{ github.repository }} \
             --key "distrib-" --limit 100 \
             --json key,lastAccessedAt \
             --jq '[.[] | select(.key | startswith("distrib-master-") | not)] | 
                   [.[] | select(.lastAccessedAt < (now - 14*24*60*60 | strftime("%Y-%m-%dT%H:%M:%SZ")))] |
                   .[].key' 2>/dev/null || true)
-          
+
           if [ -n "$OLD_BRANCH_CACHES" ]; then
             for key in $OLD_BRANCH_CACHES; do
               echo "  Deleting: $key"
               gh actions-cache delete "$key" -R ${{ github.repository }} --confirm 2>/dev/null || true
             done
           fi
-          
+
           echo ""
           echo "Cleanup completed"
