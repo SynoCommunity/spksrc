@@ -159,11 +159,8 @@ jobs:
         run: |
           echo "Cleaning up old GitHub cache entries"
 
-          gh extension install actions/gh-actions-cache 2>/dev/null || true
-
           # List all distrib-master caches except the most recent one
-          CACHES=$(gh actions-cache list -R ${{ github.repository }} \
-            --key "distrib-master-" --limit 100 \
+          CACHES=$(gh cache list --key "distrib-" --limit 100 \
             --json key,createdAt \
             --jq 'sort_by(.createdAt) | reverse | .[1:] | .[].key' 2>/dev/null || true)
 
@@ -172,27 +169,26 @@ jobs:
             exit 0
           fi
 
-          echo "Deleting old distrib-master caches:"
+          echo "Deleting old distrib caches:"
           for key in $CACHES; do
             echo "  Deleting: $key"
-            gh actions-cache delete "$key" -R ${{ github.repository }} --confirm 2>/dev/null || true
+            gh cache delete "$key" --confirm 2>/dev/null || true
           done
 
           # Also clean caches from closed PR branches (older than 14 days)
           echo ""
           echo "Cleaning stale branch caches..."
 
-          OLD_BRANCH_CACHES=$(gh actions-cache list -R ${{ github.repository }} \
-            --key "distrib-" --limit 100 \
+          OLD_BRANCH_CACHES=$(gh cache list --key "distrib-" --limit 100 \
             --json key,lastAccessedAt \
-            --jq '[.[] | select(.key | startswith("distrib-master-") | not)] |
+            --jq '[.[] | select(.key | startswith("distrib-") | not)] |
                   [.[] | select(.lastAccessedAt < (now - 14*24*60*60 | strftime("%Y-%m-%dT%H:%M:%SZ")))] |
                   .[].key' 2>/dev/null || true)
 
           if [ -n "$OLD_BRANCH_CACHES" ]; then
             for key in $OLD_BRANCH_CACHES; do
               echo "  Deleting: $key"
-              gh actions-cache delete "$key" -R ${{ github.repository }} --confirm 2>/dev/null || true
+              gh cache delete "$key" --confirm 2>/dev/null || true
             done
           fi
 

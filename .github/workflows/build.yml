@@ -145,7 +145,7 @@ jobs:
         id: cache-check
         run: |
           # Check if a cache with this hash already exists to avoid duplication
-          if gh actions-cache list -R ${{ github.repository }} --key "distrib-${{ steps.distrib-hash.outputs.hash }}" | grep -q "distrib-"; then
+          if gh cache list --key "distrib-${{ steps.distrib-hash.outputs.hash }}" | grep -q "distrib-"; then
             echo "Cache with this hash already exists, skipping save"
             echo "save_cache=false" >> $GITHUB_OUTPUT
           else
