@@ -24,7 +24,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      # Restore existing cache
       - name: Restore distrib cache
         id: cache-restore
         uses: actions/cache/restore@v4
@@ -113,36 +112,6 @@ jobs:
             echo "$OLD_COUNT files deleted ($OLD_SIZE freed)"
           fi
 
-      - name: Download common dependencies
-        run: |
-          echo "Downloading common dependencies..."
-
-          # Setup for make
-          make setup-synocommunity 2>/dev/null || true
-
-          # List of frequently used packages to pre-download
-          # Adjust this list based on your needs
-          COMMON_DEPS="
-            cross/zlib
-            cross/openssl3
-            cross/curl
-            cross/sqlite
-            cross/pcre2
-            cross/libffi
-            cross/liblzma
-            cross/bzip2
-            native/cmake
-            native/ninja
-            native/meson
-          "
-
-          for dep in $COMMON_DEPS; do
-            if [ -d "$dep" ]; then
-              echo "  -> $dep"
-              make -C "$dep" download 2>/dev/null || true
-            fi
-          done
-
       - name: Report final status
         run: |
           echo ""
@@ -172,14 +141,12 @@ jobs:
             echo "  (empty)"
           fi
 
-      # Save refreshed cache with new key
       - name: Save refreshed cache
         uses: actions/cache/save@v4
         with:
           path: distrib
           key: distrib-master-${{ github.run_id }}
 
-  # Cleanup old GitHub cache entries (keep only the most recent master)
   cleanup-stale-caches:
     runs-on: ubuntu-latest
     needs: maintain-distrib-cache
@@ -218,7 +185,7 @@ jobs:
           OLD_BRANCH_CACHES=$(gh actions-cache list -R ${{ github.repository }} \
             --key "distrib-" --limit 100 \
             --json key,lastAccessedAt \
-            --jq '[.[] | select(.key | startswith("distrib-master-") | not)] | 
+            --jq '[.[] | select(.key | startswith("distrib-master-") | not)] |
                   [.[] | select(.lastAccessedAt < (now - 14*24*60*60 | strftime("%Y-%m-%dT%H:%M:%SZ")))] |
                   .[].key' 2>/dev/null || true)
 
