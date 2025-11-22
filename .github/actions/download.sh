@@ -65,7 +65,7 @@ if [ -z "${DOWNLOAD_PACKAGES:-}" ]; then
 else
     echo "===> Downloading packages: ${DOWNLOAD_PACKAGES}"
     for current in ${DOWNLOAD_PACKAGES}; do
-        download_with_retry "${current}" "download"
+        download_with_retry "${current}" "download-all"
     done
 fi
 
@@ -78,7 +78,8 @@ else
     echo "===> Downloading wheels: ${build_pkgs[*]}"
     for pkg in "${build_pkgs[@]}"; do
         current="spk/${pkg}"
-        download_with_retry "${current}" "download-wheels"
+        echo "  → ${current}: download-wheels"
+        make -C "${current}" download-wheels
     done
 fi
 
