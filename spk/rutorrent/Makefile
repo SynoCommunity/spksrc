@@ -4,7 +4,7 @@ SPK_REV = 19
 SPK_ICON = src/rutorrent.png
 DSM_UI_DIR = app
 
-MAINTAINER = smaarn
+MAINTAINER = SynoCommunity
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 DISPLAY_NAME = ruTorrent
 CHANGELOG = "1. Upgrade rutorrent to v5.2.10.<br/>2. Update MediaInfo to v25.10.<br/>3. Adjust PHP dependency per DSM version."

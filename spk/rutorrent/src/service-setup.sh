@@ -6,7 +6,6 @@ PYTHON_DIR="/var/packages/python312/target/bin"
 # Add local bin, virtualenv along with python312 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 # Others
-DSM6_WEB_DIR="/var/services/web"
 WEB_DIR="/var/services/web_packages"
 
 GROUP="synocommunity"
@@ -77,21 +76,21 @@ service_postinst ()
                 "${RUTORRENT_WEB_DIR}/conf/config.php"
 
         sed -i -e "s|\"python\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"python\"\1=>\2'${SYNOPKG_PKGDEST}/env/bin/python3'\3,\4|g" \
-               -e "s|\"pgrep\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"pgrep\"\1=>\2'${SYNOPKG_PKGDEST}/bin/pgrep'\3,\4|g" \
-               -e "s|\"sox\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"sox\"\1=>\2'${SYNOPKG_PKGDEST}/bin/sox'\3,\4|g" \
-               -e "s|\"mediainfo\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"mediainfo\"\1=>\2'${SYNOPKG_PKGDEST}/bin/mediainfo'\3,\4|g" \
-               -e "s|\"stat\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"stat\"\1=>\2'/bin/stat'\3,\4|g" \
-               -e "s|\"curl\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"curl\"\1=>\2'${SYNOPKG_PKGDEST}/bin/curl'\3,\4|g" \
-               -e "s|\"id\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"id\"\1=>\2'/bin/id'\3,\4|g" \
-               -e "s|\"gzip\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"gzip\"\1=>\2'/bin/gzip'\3,\4|g" \
-               -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'/bin/php'\3,\4|g" \
-               -e "s|\"dumptorrent\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"dumptorrent\"\1=>\2'${SYNOPKG_PKGDEST}/bin/dumptorrent'\3,\4|g" \
-               "${RUTORRENT_WEB_DIR}/conf/config.php"
+            -e "s|\"pgrep\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"pgrep\"\1=>\2'${SYNOPKG_PKGDEST}/bin/pgrep'\3,\4|g" \
+            -e "s|\"sox\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"sox\"\1=>\2'${SYNOPKG_PKGDEST}/bin/sox'\3,\4|g" \
+            -e "s|\"mediainfo\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"mediainfo\"\1=>\2'${SYNOPKG_PKGDEST}/bin/mediainfo'\3,\4|g" \
+            -e "s|\"stat\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"stat\"\1=>\2'/bin/stat'\3,\4|g" \
+            -e "s|\"curl\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"curl\"\1=>\2'${SYNOPKG_PKGDEST}/bin/curl'\3,\4|g" \
+            -e "s|\"id\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"id\"\1=>\2'/bin/id'\3,\4|g" \
+            -e "s|\"gzip\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"gzip\"\1=>\2'/bin/gzip'\3,\4|g" \
+            -e "s|\"php\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"php\"\1=>\2'/bin/php'\3,\4|g" \
+            -e "s|\"dumptorrent\"\(\\s*\)=>\(\\s*\)'.*'\(\\s*\),\(\\s*\)|\"dumptorrent\"\1=>\2'${SYNOPKG_PKGDEST}/bin/dumptorrent'\3,\4|g" \
+            "${RUTORRENT_WEB_DIR}/conf/config.php"
 
         sed -i -e "s|@download_dir@|${wizard_download_dir}|g" \
-               -e "s|@max_memory@|$MAX_MEMORY|g" \
-               -e "s|@service_port@|${SERVICE_PORT}|g" \
-               "${RTORRENT_RC}"
+            -e "s|@max_memory@|$MAX_MEMORY|g" \
+            -e "s|@service_port@|${SERVICE_PORT}|g" \
+            "${RTORRENT_RC}"
 
         if [ -n "${wizard_watch_dir}" ]; then
             effective_watch_dir="${wizard_download_dir}${wizard_watch_dir}"
@@ -103,7 +102,7 @@ service_postinst ()
     fi
 
     sed -i -e "s|\$pathToExternals\['dumptorrent'\] = '';|\$pathToExternals['dumptorrent'] = '${SYNOPKG_PKGDEST}/bin/dumptorrent';|g" \
-           "${RUTORRENT_WEB_DIR}/plugins/dump/conf.php"
+        "${RUTORRENT_WEB_DIR}/plugins/dump/conf.php"
 
     # Setup a virtual environment with cloudscraper
     # Create a Python virtualenv
@@ -117,10 +116,10 @@ service_postinst ()
     fix_shared_folders_rights "${SYNOPKG_PKGDEST}/tmp"
     
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-      mkdir -p "${RUTORRENT_WEB_DIR}/share"
+        mkdir -p "${RUTORRENT_WEB_DIR}/share"
 
-      # Allow read/write/execute over the share web/rutorrent/share directory
-      fix_shared_folders_rights "${RUTORRENT_WEB_DIR}/share"
+        # Allow read/write/execute over the share web/rutorrent/share directory
+        fix_shared_folders_rights "${RUTORRENT_WEB_DIR}/share"
     fi
 
     return 0
@@ -134,11 +133,7 @@ service_postuninst ()
 
 service_save ()
 {
-    source_directory="${RUTORRENT_WEB_DIR}"
-    if [ -d "${DSM6_WEB_DIR}/${PACKAGE}" ]; then
-      source_directory="${DSM6_WEB_DIR}/${PACKAGE}"
-    fi
-    ruTorrentConfigFile="${source_directory}/conf/config.php"
+    ruTorrentConfigFile="${RUTORRENT_WEB_DIR}/conf/config.php"
 
     # Revision 8 introduces backward incompatible changes
     if [ "$(echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/")" -le 8 ]; then
@@ -148,15 +143,15 @@ service_save ()
     # Revision 15 introduces backward incompatible changes in the configuration
     if [ "$(echo "${SYNOPKG_OLD_PKGVER}" | sed -r "s/^.*-([0-9]+)$/\1/")" -lt 15 ]; then
         sed -i -E -e "s/@define\(\s*'HTTP_USER_AGENT'\s*,\s*'(.*)'\s*(,\s*(true|false)\s*)?\)/\$httpUserAgent = '\\1'/g" \
-              -e "s/@define\(\s*'HTTP_TIME_OUT'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$httpTimeOut = \\1/g" \
-              -e "s/@define\(\s*'HTTP_USE_GZIP'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$httpUseGzip = \\1/g" \
-              -e "s/@define\(\s*'RPC_TIME_OUT'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$rpcTimeOut = \\1/g" \
-              -e "s/@define\(\s*'LOG_RPC_CALLS'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$rpcLogCalls = \\1/g" \
-              -e "s/@define\(\s*'LOG_RPC_FAULTS'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$rpcLogFaults = \\1/g" \
-              -e "s/@define\(\s*'PHP_USE_GZIP'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$phpUseGzip = \\1/g" \
-              -e "s/@define\(\s*'PHP_GZIP_LEVEL'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$phpGzipLevel = \\1/g" \
-              -e "s|\\\$profilePath(\s*)=(\s*)'\\.\\./share'|\\\$profilePath\\1=\\2'../../share'|g" \
-          "${ruTorrentConfigFile}"
+            -e "s/@define\(\s*'HTTP_TIME_OUT'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$httpTimeOut = \\1/g" \
+            -e "s/@define\(\s*'HTTP_USE_GZIP'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$httpUseGzip = \\1/g" \
+            -e "s/@define\(\s*'RPC_TIME_OUT'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$rpcTimeOut = \\1/g" \
+            -e "s/@define\(\s*'LOG_RPC_CALLS'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$rpcLogCalls = \\1/g" \
+            -e "s/@define\(\s*'LOG_RPC_FAULTS'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$rpcLogFaults = \\1/g" \
+            -e "s/@define\(\s*'PHP_USE_GZIP'\s*,\s*(true|false)\s*(,\s*(true|false)\s*)?\)/\$phpUseGzip = \\1/g" \
+            -e "s/@define\(\s*'PHP_GZIP_LEVEL'\s*,\s*([0-9]*)\s*(,\s*(true|false)\s*)?\)/\$phpGzipLevel = \\1/g" \
+            -e "s|\\\$profilePath(\s*)=(\s*)'\\.\\./share'|\\\$profilePath\\1=\\2'../../share'|g" \
+            "${ruTorrentConfigFile}"
         {
             echo "  \$throttleMaxSpeed = 327625*1024;	// DO NOT EDIT THIS LINE!!! DO NOT COMMENT THIS LINE!!!"
             echo "  // Can't be greater then 327625*1024 due to limitation in libtorrent ResourceManager::set_max_upload_unchoked function."
@@ -171,8 +166,8 @@ service_save ()
 
     # Save the configuration file
     cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${ruTorrentConfigFile}"
-    if [ -f "${source_directory}/.htaccess" ]; then
-        cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${source_directory}/.htaccess"
+    if [ -f "${RUTORRENT_WEB_DIR}/.htaccess" ]; then
+        cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${RUTORRENT_WEB_DIR}/.htaccess"
     fi
 
     # Save session files
@@ -180,18 +175,18 @@ service_save ()
 
     # Save rtorrent configuration file (new location)
     if [ -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] && [ -f "${RTORRENT_RC}" ]; then
-       mv -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${RTORRENT_RC}"
+        mv -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${RTORRENT_RC}"
     # Save rtorrent configuration file (old location -> prior to symlink)
     elif [ ! -L "${SYNOPKG_PKGVAR}/.rtorrent.rc" ] && [ -f "${SYNOPKG_PKGVAR}/.rtorrent.rc" ]; then
-       mv "${SYNOPKG_PKGVAR}/.rtorrent.rc" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc"
+        mv "${SYNOPKG_PKGVAR}/.rtorrent.rc" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc"
     fi
 
     # Save rutorrent share directory
-    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${source_directory}/share"
+    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${RUTORRENT_WEB_DIR}/share"
 
     # Save plugins directory for any user-added plugins
-    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${source_directory}/conf/plugins.ini"
-    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${source_directory}/plugins"
+    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${RUTORRENT_WEB_DIR}/conf/plugins.ini"
+    cp -ap -t "${SYNOPKG_TEMP_UPGRADE_FOLDER}" "${RUTORRENT_WEB_DIR}/plugins"
 
     return 0
 }
