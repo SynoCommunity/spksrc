@@ -9,9 +9,9 @@
 # - Use the "download-all" target when a package has multiple (arch-specific) files.
 # - Retry download if checksum fails (cached file may be outdated).
 
-set -uo pipefail
+set -euo pipefail
 # Report any error (with line and package context) and exit.
-trap 'echo "::error::Error on line ${LINENO} while processing ${current:-<none>}"; exit 1' ERR
+trap 'echo "::error::Error on line ${LINENO} while processing ${current:-unknown}"; exit 1' ERR
 
 # Ensure required tooling is present.
 command -v make >/dev/null 2>&1 || { echo "::error::make is not installed"; exit 1; }
@@ -25,7 +25,7 @@ download_with_retry() {
 
     echo "  -> ${target_dir}: ${target_name} then checksum"
 
-    # First attempt (disable exit on error temporarily)
+    # First attempt
     set +e
     output=$(make -C "${target_dir}" ${target_name} checksum 2>&1)
     result=$?
@@ -39,7 +39,8 @@ download_with_retry() {
     fi
 
     # Check if checksum failure occurred by looking for .wrong rename in output
-    if echo "$output" | grep -q "Renamed as .*.wrong"; then
+    # Use escaped dot to match literal .wrong extension
+    if echo "$output" | grep -q 'Renamed as .*\.wrong'; then
         echo "  -> Checksum failed due to outdated cached file, retrying download for ${target_dir}..."
 
         # Retry download and checksum
@@ -78,7 +79,8 @@ else
     echo "===> Downloading wheels: ${build_pkgs[*]}"
     for pkg in "${build_pkgs[@]}"; do
         current="spk/${pkg}"
-        echo "  → ${current}: download-wheels"
+        echo "  -> ${current}: download-wheels"
+        # Wheels don't have checksum verification, so no retry needed
         make -C "${current}" download-wheels
     done
 fi
