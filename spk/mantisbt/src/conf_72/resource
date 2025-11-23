@@ -53,7 +53,7 @@
                         "zlib"
                     ],
                     "group": "http",
-                    "profile_desc": "PHP 8.2 Profile for mantisbt",
+                    "profile_desc": "PHP profile for mantisbt",
                     "profile_name": "mantisbt Profile",
                     "user": "sc-mantisbt"
                 },
