@@ -135,7 +135,8 @@ service_postinst ()
         if [ ! "$WS_BACKEND" = "2" ]; then
             echo "Set Apache as the back-end server"
             jq '.default.backend = 2' ${WS_CFG_PATH} > "${TMP_WS_CFG_PATH}"
-            rsync -aX "${RSYNC_ARCH_ARGS}" "${TMP_WS_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
+            # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_WS_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
         # Check if default PHP profile is selected
@@ -144,14 +145,16 @@ service_postinst ()
             # Locate default PHP profile
             PHP_PROF_ID="$(jq -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${PHP_CFG_PATH}")"
             jq ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}" > "${TMP_WS_CFG_PATH}"
-            rsync -aX "${RSYNC_ARCH_ARGS}" "${TMP_WS_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
+            # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_WS_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
         # Check for PHP profile
         if ! jq -e ".[\"${SC_PKG_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Add PHP profile for ${SC_DNAME}"
             jq --slurpfile newProfile "${SYNOPKG_PKGDEST}/web/${SYNOPKG_PKGNAME}.json" '.["'"${SC_PKG_NAME}"'"] = $newProfile[0]' "${PHP_CFG_PATH}" > "${TMP_PHP_CFG_PATH}"
-            rsync -aX "${RSYNC_ARCH_ARGS}" "${TMP_PHP_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
+            # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_PHP_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
             RESTART_APACHE="yes"
         fi
         # Check for Apache config
@@ -331,7 +334,8 @@ service_postuninst ()
         if jq -e ".[\"${SC_PKG_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Removing PHP profile for ${SC_DNAME}"
             jq 'del(.["'"${SC_PKG_NAME}"'"])' ${PHP_CFG_PATH} > "${TMP_PHP_CFG_PATH}"
-            rsync -aX "${RSYNC_ARCH_ARGS}" "${TMP_PHP_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
+            # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_PHP_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
             ${RM} "${WS_CFG_DIR}/php_profile/${SC_PKG_NAME}"
             RESTART_APACHE="yes"
         fi
