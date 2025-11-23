@@ -216,15 +216,15 @@ jobs:
           CACHE_COUNT=$(echo "$ALL_CACHES" | jq 'length')
           echo "Found $CACHE_COUNT distrib caches"
 
-          # Keep 5 most recent, delete the rest
-          # Since we can't rely on createdAt, we'll keep the first 5 returned (most recent by default)
-          if [ "$CACHE_COUNT" -le 5 ]; then
-            echo "5 or fewer caches exist, nothing to delete based on count"
+          # Keep 10 most recent, delete the remaining 
+          # Keeping more during transition period to accommodate both old and new cache formats.
+          if [ "$CACHE_COUNT" -le 10 ]; then
+            echo "10 or fewer caches exist, nothing to delete based on count"
           else
-            CACHES_TO_DELETE=$(echo "$ALL_CACHES" | jq -r '.[5:] | .[].key' 2>/dev/null || true)
+            CACHES_TO_DELETE=$(echo "$ALL_CACHES" | jq -r '.[10:] | .[].key' 2>/dev/null || true)
 
             if [ -n "$CACHES_TO_DELETE" ]; then
-              echo "Deleting old caches (keeping 5 most recent):"
+              echo "Deleting old caches (keeping 10 most recent):"
               for key in $CACHES_TO_DELETE; do
                 echo "  Deleting: $key"
                 gh cache delete "$key" --confirm 2>/dev/null || true
