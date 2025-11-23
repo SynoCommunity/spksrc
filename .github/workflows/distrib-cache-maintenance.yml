@@ -1,4 +1,4 @@
-name: Cache Maintenance
+name: Distrib Cache Maintenance
 
 on:
   # Regular refresh to prevent GitHub's 7-day eviction policy
