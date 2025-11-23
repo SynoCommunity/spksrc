@@ -9,7 +9,7 @@
 			"backend": 2,
 			"php": {
 				"profile_name": "ruTorrent",
-				"profile_desc": "PHP 8.2 profile for ruTorrent",
+				"profile_desc": "PHP profile for ruTorrent",
 				"backend": 11,
 				"extensions": [],
 				"user": "sc-rutorrent",
