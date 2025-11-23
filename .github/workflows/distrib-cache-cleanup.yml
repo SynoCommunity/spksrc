@@ -203,7 +203,8 @@ jobs:
           echo "Cleaning up old GitHub cache entries"
 
           # List all distrib caches with available fields
-          # Note: gh cache list returns different fields depending on context
+          # Note: Only targets caches with keys starting with "distrib-"
+          # Other caches (e.g., toolchain-*) are not affected
           ALL_CACHES=$(gh cache list --key "distrib-" --limit 100 --json key 2>/dev/null || true)
 
           if [ -z "$ALL_CACHES" ] || [ "$ALL_CACHES" = "[]" ]; then
