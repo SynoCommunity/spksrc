@@ -1,5 +1,5 @@
 PKG_NAME = mediainfo
-PKG_VERS = 25.10
+PKG_VERS = 25.04
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MediaArea/MediaInfo/archive
