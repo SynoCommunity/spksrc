@@ -31,10 +31,15 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-STRIP_TARGET = nop
+STRIP_TARGET = usbserial_strip
 POST_STRIP_TARGET = usbserial_extra_install
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: usbserial_strip
+usbserial_strip:
+	@$(MSG) Strip debug symbols in kernel modules
+	find $(STAGING_DIR) -type f -name "*.ko" -exec $(STRIP) --strip-debug {} \;
 
 .PHONY: usbserial_extra_install
 usbserial_extra_install:

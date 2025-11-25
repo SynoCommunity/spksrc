@@ -26,12 +26,17 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-STRIP_TARGET = nop
-POST_STRIP_TARGET = synokernel-cdrom_extra-install
+STRIP_TARGET = synokernel-cdrom_strip
+POST_STRIP_TARGET = synokernel-cdrom_extra_install
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: synokernel-cdrom_extra-install
-synokernel-cdrom_extra-install:
+.PHONY: synokernel-cdrom_strip
+synokernel-cdrom_strip:
+	@$(MSG) Strip debug symbols in kernel modules
+	find $(STAGING_DIR) -type f -name "*.ko" -exec $(STRIP) --strip-debug {} \;
+
+.PHONY: synokernel-cdrom_extra_install
+synokernel-cdrom_extra_install:
 	install -m 755 -d $(STAGING_DIR)/etc/
 	install -m 644 src/synokernel-cdrom.cfg $(STAGING_DIR)/etc/
