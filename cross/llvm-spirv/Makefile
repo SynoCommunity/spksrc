@@ -64,6 +64,13 @@ CMAKE_ARGS += -DLLVM_BUILD_TESTS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
 
+# Remove build warnings
+ADDITIONAL_CXXFLAGS  = -Wno-cast-function-type
+ADDITIONAL_CXXFLAGS += -Wno-pedantic
+ADDITIONAL_CXXFLAGS += -Wno-switch
+ADDITIONAL_CXXFLAGS += -Wno-unused-function
+ADDITIONAL_CXXFLAGS += -Wno-variadic-macros
+
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
 # -----------------------------------------------------------------------------
