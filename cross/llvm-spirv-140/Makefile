@@ -17,16 +17,15 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-BUILD_DEPENDS = cross/llvm-project-140.src
-DEPENDS  = cross/Khronos-SPIRV-Headers
+BUILD_DEPENDS  = native/llvm-14.0
+BUILD_DEPENDS += cross/llvm-project-140.src
+BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
+DEPENDS  = cross/llvm-140
 DEPENDS += cross/Khronos-SPIRV-Tools
-NATIVE_DEPENDS = native/llvm-14.0
 
 # -----------------------------------------------------------------------------
 # Directories
 # -----------------------------------------------------------------------------
-CMAKE_BUILD_DIR = $(WORK_DIR)/llvm-spirv.build
-CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 LLVM_BIN_DIR = $(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin)
 
 # Add native LLVM tools to PATH
@@ -43,29 +42,10 @@ llvm_spirv_post_extract_target:
 # -----------------------------------------------------------------------------
 # CMake arguments
 # -----------------------------------------------------------------------------
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang'
-
-CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv'
-CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON
-CMAKE_ARGS += -DLLVM_ENABLE_EH=ON
-CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
-CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(STAGING_INSTALL_PREFIX)/include/spirv
-
-# Build flags
-CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
-CMAKE_ARGS += -DLLVM_BUILD_TESTS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
+CMAKE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
 
 # Remove build warnings
-ADDITIONAL_CXXFLAGS  = -Wno-cast-function-type
-ADDITIONAL_CXXFLAGS += -Wno-pedantic
-ADDITIONAL_CXXFLAGS += -Wno-switch
-ADDITIONAL_CXXFLAGS += -Wno-unused-function
-ADDITIONAL_CXXFLAGS += -Wno-variadic-macros
+ADDITIONAL_CXXFLAGS = -Wno-maybe-uninitialized
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
