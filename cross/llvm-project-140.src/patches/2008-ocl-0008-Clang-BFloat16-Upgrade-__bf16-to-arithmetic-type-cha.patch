@@ -1,0 +1,187 @@
+From fb1c11f76ee840c6dc776638dbd822d8fe311107 Mon Sep 17 00:00:00 2001
+From: Wenju He <wenju.he@intel.com>
+Date: Fri, 21 Nov 2025 04:49:55 +0100
+Subject: [PATCH 1/2] [Clang][BFloat16] Upgrade __bf16 to arithmetic type,
+ change mangling, and extend excess precision support
+
+Pursuant to discussions at
+https://discourse.llvm.org/t/rfc-c-23-p1467r9-extended-floating-point-types-and-standard-names/70033/22,
+this commit enhances the handling of the __bf16 type in Clang.
+- Firstly, it upgrades __bf16 from a storage-only type to an arithmetic
+  type.
+- Secondly, it changes the mangling of __bf16 to DF16b on all
+  architectures except ARM. This change has been made in
+  accordance with the finalization of the mangling for the
+  std::bfloat16_t type, as discussed at
+  https://github.com/itanium-cxx-abi/cxx-abi/pull/147.
+- Finally, this commit extends the existing excess precision support to
+  the __bf16 type. This applies to hardware architectures that do not
+  natively support bfloat16 arithmetic.
+Appropriate tests have been added to verify the effects of these
+changes and ensure no regressions in other areas of the compiler.
+
+Reviewed By: rjmccall, pengfei, zahiraam
+
+Differential Revision: https://reviews.llvm.org/D150913
+
+(partially cherry picked from commit e62175736551abf40a3410bc246f58e650eb8158)
+---
+ clang/include/clang/Basic/DiagnosticSemaKinds.td |  2 --
+ clang/include/clang/Basic/TargetInfo.h           | 15 +++++++++++----
+ clang/lib/AST/Type.cpp                           |  3 +--
+ clang/lib/Basic/TargetInfo.cpp                   |  1 +
+ clang/lib/Sema/SemaCast.cpp                      | 14 --------------
+ clang/lib/Sema/SemaExpr.cpp                      |  4 ----
+ clang/lib/Sema/SemaOverload.cpp                  | 10 +++++-----
+ 7 files changed, 18 insertions(+), 31 deletions(-)
+
+diff --git a/clang/include/clang/Basic/DiagnosticSemaKinds.td b/clang/include/clang/Basic/DiagnosticSemaKinds.td
+index a8cf00c1263f..895411e49d1d 100644
+--- a/clang/include/clang/Basic/DiagnosticSemaKinds.td
++++ b/clang/include/clang/Basic/DiagnosticSemaKinds.td
+@@ -8584,8 +8584,6 @@ def warn_cast_function_type : Warning<
+   InGroup<CastFunctionType>, DefaultIgnore;
+ def err_cast_pointer_to_non_pointer_int : Error<
+   "pointer cannot be cast to type %0">;
+-def err_cast_to_bfloat16 : Error<"cannot type-cast to __bf16">;
+-def err_cast_from_bfloat16 : Error<"cannot type-cast from __bf16">;
+ def err_typecheck_expect_scalar_operand : Error<
+   "operand of type %0 where arithmetic or pointer type is required">;
+ def err_typecheck_cond_incompatible_operands : Error<
+diff --git a/clang/include/clang/Basic/TargetInfo.h b/clang/include/clang/Basic/TargetInfo.h
+index e7db877f4e2b..7804eb01f079 100644
+--- a/clang/include/clang/Basic/TargetInfo.h
++++ b/clang/include/clang/Basic/TargetInfo.h
+@@ -199,6 +199,9 @@ protected:
+   bool HasFloat128;
+   bool HasFloat16;
+   bool HasBFloat16;
++  bool HasFullBFloat16; // True if the backend supports native bfloat16
++                        // arithmetic. Used to determine excess precision
++                        // support in the frontend.
+   bool HasIbm128;
+   bool HasLongDouble;
+   bool HasFPReturn;
+@@ -611,7 +614,13 @@ public:
+   virtual bool hasFloat16Type() const { return HasFloat16; }
+ 
+   /// Determine whether the _BFloat16 type is supported on this target.
+-  virtual bool hasBFloat16Type() const { return HasBFloat16; }
++  virtual bool hasBFloat16Type() const {
++    return HasBFloat16 || HasFullBFloat16;
++  }
++
++  /// Determine whether the BFloat type is fully supported on this target, i.e
++  /// arithemtic operations.
++  virtual bool hasFullBFloat16Type() const { return HasFullBFloat16; }
+ 
+   /// Determine whether the __ibm128 type is supported on this target.
+   virtual bool hasIbm128Type() const { return HasIbm128; }
+@@ -719,9 +728,7 @@ public:
+   }
+ 
+   /// Return the mangled code of bfloat.
+-  virtual const char *getBFloat16Mangling() const {
+-    llvm_unreachable("bfloat not implemented on this target");
+-  }
++  virtual const char *getBFloat16Mangling() const { return "DF16b"; }
+ 
+   /// Return the value for the C99 FLT_EVAL_METHOD macro.
+   virtual unsigned getFloatEvalMethod() const { return 0; }
+diff --git a/clang/lib/AST/Type.cpp b/clang/lib/AST/Type.cpp
+index 774b3e94159d..d3a69472cec6 100644
+--- a/clang/lib/AST/Type.cpp
++++ b/clang/lib/AST/Type.cpp
+@@ -2142,8 +2142,7 @@ bool Type::isRealType() const {
+ bool Type::isArithmeticType() const {
+   if (const auto *BT = dyn_cast<BuiltinType>(CanonicalType))
+     return BT->getKind() >= BuiltinType::Bool &&
+-           BT->getKind() <= BuiltinType::Ibm128 &&
+-           BT->getKind() != BuiltinType::BFloat16;
++           BT->getKind() <= BuiltinType::Ibm128;
+   if (const auto *ET = dyn_cast<EnumType>(CanonicalType))
+     // GCC allows forward declaration of enum types (forbid by C99 6.7.2.3p2).
+     // If a body isn't seen by the time we get here, return false.
+diff --git a/clang/lib/Basic/TargetInfo.cpp b/clang/lib/Basic/TargetInfo.cpp
+index 188ffb5f2f78..d98288d74df2 100644
+--- a/clang/lib/Basic/TargetInfo.cpp
++++ b/clang/lib/Basic/TargetInfo.cpp
+@@ -37,6 +37,7 @@ TargetInfo::TargetInfo(const llvm::Triple &T) : Triple(T) {
+   HasIbm128 = false;
+   HasFloat16 = false;
+   HasBFloat16 = false;
++  HasFullBFloat16 = false;
+   HasLongDouble = true;
+   HasFPReturn = true;
+   HasStrictFP = false;
+diff --git a/clang/lib/Sema/SemaCast.cpp b/clang/lib/Sema/SemaCast.cpp
+index 7ef1732496c2..fc6dfc3236d2 100644
+--- a/clang/lib/Sema/SemaCast.cpp
++++ b/clang/lib/Sema/SemaCast.cpp
+@@ -3028,20 +3028,6 @@ void CastOperation::CheckCStyleCast() {
+     return;
+   }
+ 
+-  // Can't cast to or from bfloat
+-  if (DestType->isBFloat16Type() && !SrcType->isBFloat16Type()) {
+-    Self.Diag(SrcExpr.get()->getExprLoc(), diag::err_cast_to_bfloat16)
+-        << SrcExpr.get()->getSourceRange();
+-    SrcExpr = ExprError();
+-    return;
+-  }
+-  if (SrcType->isBFloat16Type() && !DestType->isBFloat16Type()) {
+-    Self.Diag(SrcExpr.get()->getExprLoc(), diag::err_cast_from_bfloat16)
+-        << SrcExpr.get()->getSourceRange();
+-    SrcExpr = ExprError();
+-    return;
+-  }
+-
+   // If either type is a pointer, the other type has to be either an
+   // integer or a pointer.
+   if (!DestType->isArithmeticType()) {
+diff --git a/clang/lib/Sema/SemaExpr.cpp b/clang/lib/Sema/SemaExpr.cpp
+index 85553eccde83..a40658da2b36 100644
+--- a/clang/lib/Sema/SemaExpr.cpp
++++ b/clang/lib/Sema/SemaExpr.cpp
+@@ -10122,10 +10122,6 @@ QualType Sema::CheckVectorOperands(ExprResult &LHS, ExprResult &RHS,
+   const VectorType *RHSVecType = RHSType->getAs<VectorType>();
+   assert(LHSVecType || RHSVecType);
+ 
+-  if ((LHSVecType && LHSVecType->getElementType()->isBFloat16Type()) ||
+-      (RHSVecType && RHSVecType->getElementType()->isBFloat16Type()))
+-    return InvalidOperands(Loc, LHS, RHS);
+-
+   // AltiVec-style "vector bool op vector bool" combinations are allowed
+   // for some operators but not others.
+   if (!AllowBothBool &&
+diff --git a/clang/lib/Sema/SemaOverload.cpp b/clang/lib/Sema/SemaOverload.cpp
+index 3fa192cedfa3..f232b0f4fcd0 100644
+--- a/clang/lib/Sema/SemaOverload.cpp
++++ b/clang/lib/Sema/SemaOverload.cpp
+@@ -1873,8 +1873,11 @@ static bool IsStandardConversion(Sema &S, Expr* From, QualType ToType,
+     // if their representation is different until there is back end support
+     // We of course allow this conversion if long double is really double.
+ 
+-    // Conversions between bfloat and other floats are not permitted.
+-    if (FromType == S.Context.BFloat16Ty || ToType == S.Context.BFloat16Ty)
++    // Conversions between bfloat16 and float16 are currently not supported.
++    if ((FromType->isBFloat16Type() &&
++         (ToType->isFloat16Type() || ToType->isHalfType())) ||
++        (ToType->isBFloat16Type() &&
++         (FromType->isFloat16Type() || FromType->isHalfType())))
+       return false;
+ 
+     // Conversions between IEEE-quad and IBM-extended semantics are not
+@@ -1895,9 +1898,6 @@ static bool IsStandardConversion(Sema &S, Expr* From, QualType ToType,
+               ToType->isIntegralType(S.Context)) ||
+              (FromType->isIntegralOrUnscopedEnumerationType() &&
+               ToType->isRealFloatingType())) {
+-    // Conversions between bfloat and int are not permitted.
+-    if (FromType->isBFloat16Type() || ToType->isBFloat16Type())
+-      return false;
+ 
+     // Floating-integral conversions (C++ 4.9).
+     SCS.Second = ICK_Floating_Integral;
+-- 
+2.39.1
+
