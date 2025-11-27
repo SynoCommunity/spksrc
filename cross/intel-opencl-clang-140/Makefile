@@ -36,19 +36,18 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-BUILD_DEPENDS  = cross/llvm-project-140.src
-BUILD_DEPENDS += cross/Khronos-SPIRV-LLVM-Translator-140.src
-BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
+BUILD_DEPENDS  = native/llvm-14.0
+BUILD_DEPENDS += cross/llvm-project-140.src
 BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
-DEPENDS += cross/Khronos-SPIRV-Tools
-BUILD_DEPENDS += native/llvm-14.0
+DEPENDS = cross/llvm-spirv-140
 
 # -----------------------------------------------------------------------------
 # Directories
 # -----------------------------------------------------------------------------
-CMAKE_BUILD_DIR = $(WORK_DIR)/opencl-clang.build
-CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 LLVM_BIN_DIR = $(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin)
+
+# Add opencl-clang build (linux_resource_linker) + native LLVM tools to PATH
+ENV += PATH=$(WORK_DIR)/$(PKG_DIR)/build/bin:$(LLVM_BIN_DIR):$$PATH
 
 # -----------------------------------------------------------------------------
 # Post-extract: create symlink so LLVM can find opencl-clang
@@ -60,40 +59,18 @@ opencl-clang_post_extract_target:
 # -----------------------------------------------------------------------------
 # CMake arguments
 # -----------------------------------------------------------------------------
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang'
+CMAKE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
 
-CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang'
-CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON
-CMAKE_ARGS += -DLLVM_ENABLE_EH=ON
-CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(STAGING_INSTALL_PREFIX)/include
-CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
-CMAKE_ARGS += -DLLVM_EXTERNAL_OPENCL_CLANG_SOURCE_DIR=$(WORK_DIR)/$(PKG_NAME)
+# Use native LLVM tools to avoid circular dependencies
+CMAKE_ARGS += -DLLVM_TABLEGEN_EXE=$(LLVM_BIN_DIR)/llvm-tblgen
+CMAKE_ARGS += -DCLANG_COMMAND=$(LLVM_BIN_DIR)/clang
 
 # [intel-opencl-clang-140]
 CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
-
-# Use native LLVM tools to avoid circular dependencies
-CMAKE_ARGS += -DLLVM_TABLEGEN=$(LLVM_BIN_DIR)/llvm-tblgen
-CMAKE_ARGS += -DCLANG_TABLEGEN=$(LLVM_BIN_DIR)/clang-tblgen
 
 # Does not fails but when built using Ninja and/or requires various CMP0??? such as:
 #   CMAKE_ARGS += -DCMAKE_POLICY_DEFAULT_CMP0116='OLD|NEW'
 CMAKE_USE_NINJA = 0
 
-# Enforce static build
-CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=OFF
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
-
-# Build flags
-CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
-CMAKE_ARGS += -DLLVM_BUILD_TESTS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
-
-# Suppress developer warnings
-CMAKE_ARGS += -Wno-dev
-
 include ../../mk/spksrc.cross-cmake.mk
