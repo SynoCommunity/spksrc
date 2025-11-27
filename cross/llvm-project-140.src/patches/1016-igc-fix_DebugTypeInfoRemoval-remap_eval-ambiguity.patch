@@ -1,0 +1,27 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2025 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+#    Description                  : Fix ambiguous evaluation order
+
+diff --git a/llvm/lib/IR/DebugInfo.cpp b/llvm/lib/IR/DebugInfo.cpp
+--- a/llvm/lib/IR/DebugInfo.cpp
++++ b/llvm/lib/IR/DebugInfo.cpp
+@@ -664,7 +664,12 @@ private:
+ 
+       return getReplacementMDNode(N);
+     };
+-    Replacements[N] = doRemap(N);
++    
++    // Seperate recursive doRemap and operator [] into 2 lines to avoid
++    // out-of-order evaluations since both of them can access the same memory
++    // location in map Replacements.
++    auto Value = doRemap(N);
++    Replacements[N] = Value;
+   }
+ 
+   /// Do the remapping traversal.
