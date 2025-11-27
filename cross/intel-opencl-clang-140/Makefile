@@ -68,9 +68,5 @@ CMAKE_ARGS += -DCLANG_COMMAND=$(LLVM_BIN_DIR)/clang
 # [intel-opencl-clang-140]
 CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
 
-# Does not fails but when built using Ninja and/or requires various CMP0??? such as:
-#   CMAKE_ARGS += -DCMAKE_POLICY_DEFAULT_CMP0116='OLD|NEW'
-CMAKE_USE_NINJA = 0
-
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
 include ../../mk/spksrc.cross-cmake.mk
