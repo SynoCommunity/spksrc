@@ -1,4 +1,3 @@
 bin:bin/llvm-spirv
-lnk:lib/libLLVM.so
-lnk:lib/libLLVM-14.0.5.so
-lib:lib/libLLVM-14.so
+lnk:lib/libLLVMSPIRVLib.so
+lib:lib/libLLVMSPIRVLib.so.14
