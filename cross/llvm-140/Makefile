@@ -40,21 +40,6 @@ CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
 CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
 
-# Use native LLVM tools to avoid:
-#   - avoid circular dependencies
-#   - conflicts with native/llvm causing shlib error
-#CMAKE_ARGS += -DCLANG_TABLEGEN=$(LLVM_BIN_DIR)/clang-tblgen
-#CMAKE_ARGS += -DLLVM_TABLEGEN=$(LLVM_BIN_DIR)/llvm-tblgen
-
-# -----------------------------------------------------------------------------
-# Post-install: create symlink native llvm-tblgen & clang-tblgen
-# -----------------------------------------------------------------------------
-POST_INSTALL_TARGET = llvm_post_install_target
-llvm_post_install_target:
-	@$(RUN) ln -sf $(LLVM_BIN_DIR)/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
-	@$(RUN) mv -f $(STAGING_INSTALL_PREFIX)/bin/llvm-tblgen $(STAGING_INSTALL_PREFIX)/bin/llvm-tblgen.orig
-	@$(RUN) ln -sf $(LLVM_BIN_DIR)/llvm-tblgen $(STAGING_INSTALL_PREFIX)/bin/llvm-tblgen
-
 # Install headers
 CMAKE_ARGS += -DLLVM_INCLUDE_TOOLS=ON
 
