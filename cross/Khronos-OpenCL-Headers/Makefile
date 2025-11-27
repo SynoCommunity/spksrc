@@ -1,5 +1,5 @@
 PKG_NAME = OpenCL-Headers
-PKG_VERS = 2024.05.08
+PKG_VERS = 2025.07.22
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = khronos-opencl-headers-$(PKG_VERS).$(PKG_EXT)
