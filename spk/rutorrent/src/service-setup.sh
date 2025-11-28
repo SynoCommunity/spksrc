@@ -135,13 +135,15 @@ service_postinst ()
             -e "s|^\([[:space:]]*\)\$tempDirectory =.*|\1\$tempDirectory = '${SYNOPKG_PKGDEST}/tmp/';|" \
             "${RUTORRENT_WEB_DIR}/conf/config.php"
 
-        sed -i -e "s|@download_dir@|${wizard_download_dir}|g" \
+        cleaned_download_dir=${wizard_download_dir%/}
+        sed -i -e "s|@download_dir@|${cleaned_download_dir}|g" \
             -e "s|@max_memory@|$MAX_MEMORY|g" \
             -e "s|@service_port@|${SERVICE_PORT}|g" \
             "${RTORRENT_RC}"
 
         if [ -n "${wizard_watch_dir}" ]; then
-            effective_watch_dir="${wizard_download_dir}${wizard_watch_dir}"
+            cleaned_watch_dir=${wizard_watch_dir#/}
+            effective_watch_dir="${cleaned_download_dir}/${cleaned_watch_dir}"
             mkdir -p "${effective_watch_dir}"
             sed -i -e "s|@watch_dir@|${effective_watch_dir}|g" ${RTORRENT_RC}
         else
