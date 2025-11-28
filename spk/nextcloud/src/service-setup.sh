@@ -30,7 +30,7 @@ configure_trusted_domains() {
     echo "${DOMAINS}" | while read -r line; do
         if echo "$line" | grep -qE ':5000|:5001'; then
             cleaned=$(echo "$line" | sed -E 's/(:5000|:5001)//')
-            exec_occ config:system:set trusted_domains $line_number --value="$cleaned"
+            exec_occ config:system:set trusted_domains "$line_number" --value="$cleaned"
         fi
         line_number=$((line_number + 1))
     done
@@ -42,7 +42,7 @@ configure_trusted_domains() {
     for var in wizard_nextcloud_trusted_domain_1 wizard_nextcloud_trusted_domain_2 wizard_nextcloud_trusted_domain_3; do
         eval val=\$$var
         if [ -n "$val" ] && ! echo "${DOMAINS}" | grep -qx "$val"; then
-            exec_occ config:system:set trusted_domains $line_number --value="$val"
+            exec_occ config:system:set trusted_domains "$line_number" --value="$val"
             line_number=$((line_number + 1))
         fi
     done
@@ -126,11 +126,11 @@ validate_preinst() {
             echo "Incorrect MariaDB 'root' password"
             exit 1
         fi
-        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ >/dev/null 2>&1; then
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^"${MYSQL_USER}"$ >/dev/null 2>&1; then
             echo "MariaDB user '${MYSQL_USER}' already exists"
             exit 1
         fi
-        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ >/dev/null 2>&1; then
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^"${MYSQL_DATABASE}"$ >/dev/null 2>&1; then
             echo "MariaDB database '${MYSQL_DATABASE}' already exists"
             exit 1
         fi
@@ -173,7 +173,7 @@ service_postinst() {
             db_user=$(grep "'dbuser'" "${WEB_ROOT}/config/config.php" | sed -n "s/.*'dbuser' => '\(.*\)'.*/\1/p")
             db_password=$(grep "'dbpassword'" "${WEB_ROOT}/config/config.php" | sed -n "s/.*'dbpassword' => '\(.*\)'.*/\1/p")
             ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${db_user}'@'localhost' IDENTIFIED BY '${db_password}';" 2>&1
-            ${MYSQL} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} < ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" < "${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql" 2>&1
             exec_occ maintenance:data-fingerprint -n
             exec_occ maintenance:mode --off
         else
@@ -213,7 +213,7 @@ service_preuninst() {
             TEMPDIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}_backup_v${OCC_VER}_$(date +"%Y%m%d")"
             ${MKDIR} "${TEMPDIR}/database"
             exec_occ maintenance:mode --on
-            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+            ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" > "${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql" 2>&1
             ${MKDIR} "${TEMPDIR}/config"
             rsync -aX "${WEB_ROOT}/config/" "${TEMPDIR}/config/" 2>&1
             if [ -d "${WEB_ROOT}/themes" ]; then
@@ -250,20 +250,20 @@ service_save ()
 {
     # Stash existing installation for the upgrade transaction
     exec_occ maintenance:mode --on
-    ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
-    ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
-    rsync -aX ${WEB_ROOT}/ ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} 2>&1
+    ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+    ${MKDIR} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+    rsync -aX "${WEB_ROOT}/" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" 2>&1
 }
 
 service_restore ()
 {
     # Restore config/themes and finish upgrade with maintenance routines
-    rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config/ ${WEB_ROOT}/config/ 2>&1
-    if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes ]; then
-        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes/ ${WEB_ROOT}/themes/ 2>&1
+    rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config/" "${WEB_ROOT}/config/" 2>&1
+    if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes" ]; then
+        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes/" "${WEB_ROOT}/themes/" 2>&1
     fi
     exec_occ maintenance:mode --off
     exec_occ upgrade
     configure_after_install
-    ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
+    ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
 }
