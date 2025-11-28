@@ -9,6 +9,7 @@ if [ -z "${SYNOPKG_PKGTMP}" ]; then
     SYNOPKG_PKGTMP="${SYNOPKG_PKGDEST_VOL}/@tmp"
 fi
 
+# PHP CLI used for all maintenance tasks
 PHP_BIN="/usr/local/bin/php82"
 MYSQL="/usr/local/mariadb10/bin/mysql"
 MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
@@ -16,10 +17,12 @@ MYSQL_DATABASE="${SYNOPKG_PKGNAME}"
 MYSQL_USER="nc_${wizard_nextcloud_admin_username}"
 
 exec_occ() {
+    # Call Nextcloud's occ tool with consistent PHP options
     "${PHP_BIN}" -d memory_limit=512M "${WEB_ROOT}/occ" --no-warnings "$@"
 }
 
 configure_trusted_domains() {
+    # Remove NAS UI ports and append wizard-supplied domains if missing
     if ! DOMAINS=$(exec_occ config:system:get trusted_domains 2>/dev/null); then
         DOMAINS=""
     fi
@@ -46,6 +49,7 @@ configure_trusted_domains() {
 }
 
 configure_security_headers() {
+    # Ensure HTTPS redirect and HSTS are present in the shipped .htaccess
     APACHE_CONF="${WEB_ROOT}/.htaccess"
     if [ -f "${APACHE_CONF}" ]; then
         if ! grep -q "RewriteCond %{HTTPS} off" "${APACHE_CONF}"; then
@@ -66,6 +70,7 @@ configure_security_headers() {
 }
 
 setup_instance() {
+    # Fresh install path: create DB, user and bootstrap Nextcloud
     ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${wizard_mysql_password_nextcloud}';"
     exec_occ maintenance:install \
         --database "mysql" \
@@ -79,6 +84,7 @@ setup_instance() {
 }
 
 configure_after_install() {
+    # Common post-install/upgrade tasks and heavy maintenance routines
     configure_security_headers
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         configure_trusted_domains
@@ -93,6 +99,7 @@ configure_after_install() {
 }
 
 service_prestart() {
+    # Emulate cron by looping Nextcloud's cron.php inside the package service
     cron_script="${WEB_ROOT}/cron.php"
     sleep_interval=300
 
@@ -113,6 +120,7 @@ service_prestart() {
 }
 
 validate_preinst() {
+    # Guard fresh installs and optional restores before files are deployed
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit >/dev/null 2>&1; then
             echo "Incorrect MariaDB 'root' password"
@@ -149,6 +157,7 @@ validate_preinst() {
 }
 
 service_postinst() {
+    # Handle fresh install and optional restore once files are unpacked
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         DATA_DIR="${SHARE_PATH}/data"
         ${MKDIR} "${DATA_DIR}"
@@ -175,6 +184,7 @@ service_postinst() {
 }
 
 validate_preuninst() {
+    # Ensure we can connect to MariaDB and optional export path is writable
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
         if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit >/dev/null 2>&1; then
             echo "Incorrect MariaDB 'root' password"
@@ -195,6 +205,7 @@ validate_preuninst() {
 }
 
 service_preuninst() {
+    # Optional backup and DB cleanup before files are removed
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
         if [ -n "${wizard_export_path}" ]; then
             DATADIR="$(exec_occ config:system:get datadirectory 2>/dev/null)"
@@ -225,6 +236,7 @@ service_preuninst() {
 }
 
 validate_preupgrade() {
+    # Confirm data directory exists prior to upgrade prep
     if [ "${SYNOPKG_PKG_STATUS}" = "UPGRADE" ]; then
         DATADIR="$(exec_occ config:system:get datadirectory 2>/dev/null)"
         if [ -z "${DATADIR}" ] || [ ! -d "${DATADIR}" ]; then
@@ -236,6 +248,7 @@ validate_preupgrade() {
 
 service_save ()
 {
+    # Stash existing installation for the upgrade transaction
     exec_occ maintenance:mode --on
     ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
     ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
@@ -244,6 +257,7 @@ service_save ()
 
 service_restore ()
 {
+    # Restore config/themes and finish upgrade with maintenance routines
     rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config/ ${WEB_ROOT}/config/ 2>&1
     if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes ]; then
         rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes/ ${WEB_ROOT}/themes/ 2>&1
