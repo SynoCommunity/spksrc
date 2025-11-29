@@ -16,7 +16,10 @@ PKG_VERS = 14.0.5
 # do not contain these binaries and libraries must exactly match to avoid API issues.
 #
 #   binaries: clang-tblgen, llvm-tblgen, llvm-spirv
-#   libraries: libLLVMSPIRVLib.so.14
+#   libraries:
+#      libLLVM-14.so             <-- for built-time IGC 'CMCLTranslatorTool', 'elf_packager', 'vcb'
+#      libLLVMGenXIntrinsics.so  <-- for built-time IGC 'CMCLTranslatorTool', 'vcb'
+#      libLLVMSPIRVLib.so.14     <-- for built-time IGC 'vcb'
 
 HOMEPAGE = https://llvm.org/
 COMMENT  = Collection of modular and reusable compiler and toolchain technologies.
