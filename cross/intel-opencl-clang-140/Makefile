@@ -24,22 +24,13 @@ LICENSE  = Apache License v2.0 with LLVM Exceptions
 REQUIRED_MIN_DSM = 7
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
-###
-### This serves as test the sub-component builds
-### needed in order to compile in-tree IGC needed
-### dependencies.
-###
-### Optionally next iteration may use out-of-tree
-### builds of IGC for easier management of dependendices
-###
-
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
 BUILD_DEPENDS  = native/llvm-14.0
 BUILD_DEPENDS += cross/llvm-project-140.src
 BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
-DEPENDS = cross/llvm-spirv-140
+DEPENDS = cross/Khronos-SPIRV-LLVM-Translator-140
 
 # -----------------------------------------------------------------------------
 # Directories
@@ -68,5 +59,7 @@ CMAKE_ARGS += -DCLANG_COMMAND=$(LLVM_BIN_DIR)/clang
 # [intel-opencl-clang-140]
 CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
 
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
+# -----------------------------------------------------------------------------
+# Include the common cross-cmake rules
+# -----------------------------------------------------------------------------
 include ../../mk/spksrc.cross-cmake.mk
