@@ -27,7 +27,18 @@ DEPENDS += cross/Khronos-SPIRV-Tools
 # -----------------------------------------------------------------------------
 LLVM_BIN_DIR = $(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/bin)
 LLVM_LIB_DIR = $(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/lib)
+
+# Needed for built-time tool usage: 'CMCLTranslatorTool', 'elf_packager', 'vcb'
+# CMake rules would benefit from a patch to ensure linking to native/llvm-14.0
 ENV += LD_LIBRARY_PATH=$(LLVM_LIB_DIR):$$LD_LIBRARY_PATH
+
+# Fails to access in NATIVE/bin/llvm-tblgen possibly due to parallel compiling
+CMAKE_ARGS += -DLLVM_TABLEGEN=$(LLVM_BIN_DIR)/llvm-tblgen
+CMAKE_ARGS += -DCLANG_TABLEGEN=$(LLVM_BIN_DIR)/clang-tblgen
+CMAKE_ARGS += -DCLANG_EXE=$(LLVM_BIN_DIR)/clang
+CMAKE_ARGS += -DLLVM_AS_EXE=$(LLVM_BIN_DIR)/llvm-as
+CMAKE_ARGS += -DLLVM_LINK_EXE=$(LLVM_BIN_DIR)/llvm-link
+CMAKE_ARGS += -DLLVM_OPT_EXE=$(LLVM_BIN_DIR)/opt
 
 # -----------------------------------------------------------------------------
 # Post-extract: create symlink to igc
@@ -71,21 +82,13 @@ CMAKE_ARGS += -DIGC_OPTION__LLVM_MODE=Prebuilds
 CMAKE_ARGS += -DIGC_OPTION__LINK_VC_BACKEND='ON'
 CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Prebuilds'
 
-# Fails to access in NATIVE/bin/llvm-tblgen possibly due to parallel compiling
-CMAKE_ARGS += -DLLVM_TABLEGEN=$(LLVM_BIN_DIR)/llvm-tblgen
-CMAKE_ARGS += -DCLANG_TABLEGEN=$(LLVM_BIN_DIR)/clang-tblgen
-CMAKE_ARGS += -DCLANG_EXE=$(LLVM_BIN_DIR)/clang
-CMAKE_ARGS += -DLLVM_AS_EXE=$(LLVM_BIN_DIR)/llvm-as
-CMAKE_ARGS += -DLLVM_LINK_EXE=$(LLVM_BIN_DIR)/llvm-link
-CMAKE_ARGS += -DLLVM_OPT_EXE=$(LLVM_BIN_DIR)/opt
-
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
 # -----------------------------------------------------------------------------
 include ../../mk/spksrc.cross-cmake.mk
 
 # Requires access to:
-#   CMCLTranslatorTool (during build time): IGC/Release/CMCLTranslatorTool
-#   llvm-tblgen, clang-tool (symlink -> clang-14), llvm-link, opt: native/llvm-14.0
+#   Build time (IGC/Release/CMCLTranslatorTool): 'CMCLTranslatorTool', 'elf_packager', 'vcb'
+#   native/llvm-14.0: 'llvm-tblgen', 'clang-tool', 'llvm-link', 'opt'
 ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/$(CMAKE_BUILD_TYPE):$(LLVM_BIN_DIR):$$PATH
 CMAKE_ARGS += -DCMAKE_BUILD_RPATH="\$$ORIGIN:\$$ORIGIN/.."
