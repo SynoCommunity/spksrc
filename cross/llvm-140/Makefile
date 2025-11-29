@@ -61,6 +61,9 @@ CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
 CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 
+# [llvm-libunwind]
+# Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
+
 # Remove build warnings
 ADDITIONAL_CXXFLAGS  = -Wno-cast-function-type
 ADDITIONAL_CXXFLAGS += -Wno-pedantic
