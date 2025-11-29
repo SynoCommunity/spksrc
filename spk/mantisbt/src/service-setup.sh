@@ -90,7 +90,7 @@ validate_preinst ()
 
         # Check for valid backup to restore
         if [ "${wizard_mantisbt_restore}" = "true" ] && [ -n "${wizard_backup_file}" ]; then
-            if [ ! -f "${wizard_backup_file}" ]; then
+            if [ ! -r "${wizard_backup_file}" ]; then
                 echo "The backup file path specified is incorrect or not accessible"
                 exit 1
             fi
@@ -254,14 +254,10 @@ validate_preuninst ()
     # Check export directory
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
         if [ ! -d "${wizard_export_path}" ]; then
-            # If the export path directory does not exist, create it
-            ${MKDIR} "${wizard_export_path}" || {
-                # If mkdir fails, print an error message and exit
-                echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
-                exit 1
-            }
-        elif [ ! -w "${wizard_export_path}" ]; then
-            # If the export path directory is not writable, print an error message and exit
+            echo "Error: Export directory ${wizard_export_path} does not exist"
+            exit 1
+        fi
+        if [ ! -w "${wizard_export_path}" ]; then
             echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
             exit 1
         fi
