@@ -1,5 +1,5 @@
 PKG_NAME = intel-media
-# Last supported version to match gmmlib 22.5 API for Gen9
+# Last supported version to match gmmlib 22.5
 PKG_VERS = 24.4.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
