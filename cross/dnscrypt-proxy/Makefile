@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jedisct1/dnscrypt-proxy/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
-PKG_DIR =  $(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 include ../../mk/spksrc.common.mk
