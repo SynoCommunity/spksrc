@@ -3,13 +3,17 @@
 # This makefile extends spksrc.cross-cc.mk with Go-specific functionality
 # 
 # prerequisites:
-# - cross/module depends on native/go only
+# - cross/module depends on native/go or native/go_1.23 only
 # - module does not require kernel (REQUIRE_KERNEL)
 # 
 # remarks:
 # - Restriction for minimal DSM version is not supported (toolchains are not used for go builds)
 # - CONFIGURE_TARGET is not supported/bypassed
 # 
+
+ifeq ($(NATIVE_GO),)
+NATIVE_GO = native/go
+endif
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
