@@ -6,7 +6,17 @@ PKG_DIST_SITE = https://github.com/filebrowser/filebrowser/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go native/nodejs native/pnpm
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+include ../../mk/spksrc.common.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/go_1.23
+NATIVE_GO = native/go_1.23
+else
+BUILD_DEPENDS = native/go
+NATIVE_GO = native/go
+endif
+
+BUILD_DEPENDS += native/nodejs native/pnpm
 
 HOMEPAGE = https://github.com/filebrowser/filebrowser
 COMMENT  = Web File Browser.
@@ -20,7 +30,7 @@ PRE_COMPILE_TARGET = filebrowser_pre_compile
 
 include ../../mk/spksrc.cross-go.mk
 
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(realpath $(WORK_DIR)/../../../native/pnpm/work-native/bin):$(realpath $(WORK_DIR)/../../../native/go/work-native/go/bin):$(PATH)
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(realpath $(WORK_DIR)/../../../native/pnpm/work-native/bin):$(realpath $(WORK_DIR)/../../../$(NATIVE_GO)/work-native/go/bin):$(PATH)
 
 # avoid webpack error ERR_OSSL_EVP_UNSUPPORTED with nodejs 18
 ENV += NODE_OPTIONS=--openssl-legacy-provider

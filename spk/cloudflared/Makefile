@@ -4,7 +4,8 @@ SPK_REV = 20
 SPK_ICON = src/cloudflared.png
 
 DEPENDS = cross/cloudflared
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
 MAINTAINER = karasevm
 DISPLAY_NAME = Cloudflare Tunnel
