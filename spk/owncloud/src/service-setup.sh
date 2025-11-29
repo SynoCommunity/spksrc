@@ -361,24 +361,28 @@ service_postinst ()
 
 validate_preuninst ()
 {
-    # Check database
-    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-        echo "Incorrect MariaDB 'root' password"
-        exit 1
-    fi
-    # Check export directory
-    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
-        if [ ! -d "${wizard_export_path}" ]; then
-            # If the export path directory does not exist, create it
-            ${MKDIR} "${wizard_export_path}" || {
-                # If mkdir fails, print an error message and exit
-                echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
-                exit 1
-            }
-        elif [ ! -w "${wizard_export_path}" ]; then
-            # If the export path directory is not writable, print an error message and exit
-            echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
+        # Check database
+        if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit >/dev/null 2>&1; then
+            echo "Incorrect MariaDB 'root' password"
             exit 1
+        fi
+        # Check export directory
+        if [ -n "${wizard_export_path}" ]; then
+            if [ ! -d "${wizard_export_path}" ]; then
+                echo "Error: Export directory ${wizard_export_path} does not exist"
+                exit 1
+            fi
+            if [ ! -w "${wizard_export_path}" ]; then
+                echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
+                exit 1
+            fi
+            # Ensure the configured data directory exists before attempting a backup
+            DATADIR="$(exec_occ config:system:get datadirectory 2>/dev/null)"
+            if [ -z "${DATADIR}" ] || [ ! -d "${DATADIR}" ]; then
+                echo "Expected data directory missing; aborting uninstall backup"
+                exit 1
+            fi
         fi
     fi
 }
@@ -523,6 +527,13 @@ validate_preupgrade ()
     DATABASE_TYPE="$(exec_occ config:system:get dbtype)"
     if [ "$DATABASE_TYPE" != "mysql" ]; then
         echo "Please migrate your previous database from ${DATABASE_TYPE} to mariadb (mysql) before performing upgrade."
+        exit 1
+    fi
+
+    # Ensure data directory is present before proceeding
+    DATADIR="$(exec_occ config:system:get datadirectory 2>/dev/null)"
+    if [ -z "${DATADIR}" ] || [ ! -d "${DATADIR}" ]; then
+        echo "Expected data directory missing; aborting upgrade"
         exit 1
     fi
 }
