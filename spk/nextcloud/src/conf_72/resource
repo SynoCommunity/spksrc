@@ -60,7 +60,9 @@
           "php_settings": {
             "error_log": "/var/services/web_packages/nextcloud/php_errors.log",
             "memory_limit": "512M",
+            "post_max_size": "16G",
             "opcache.interned_strings_buffer": "32",
+            "upload_max_filesize": "16G",
             "pdo_mysql.default_socket": "/run/mysqld/mysqld10.sock"
           },
           "profile_desc": "PHP profile for Nextcloud",
