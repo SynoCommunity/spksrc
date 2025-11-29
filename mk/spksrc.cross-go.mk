@@ -11,10 +11,6 @@
 # - CONFIGURE_TARGET is not supported/bypassed
 # 
 
-ifeq ($(NATIVE_GO),)
-NATIVE_GO = native/go
-endif
-
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
