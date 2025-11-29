@@ -13,17 +13,8 @@ LICENSE = MIT
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
-###
-### This serves as test the sub-component builds
-### needed in order to compile in-tree IGC needed
-### dependencies.
-###
-### Optionally next iteration may use out-of-tree
-### builds of IGC for easier management of dependendices
-###
-
 BUILD_DEPENDS += cross/llvm-project-140.src
-DEPENDS = cross/intel-opencl-clang-140
+DEPENDS = cross/Khronos-SPIRV-LLVM-Translator-140
 
 # Allow vc-intrinsics to be built out-of-tree from intel-opencl-clang
 export VC_INTRINSICS_IN_TREE_INSTALL=FALSE
