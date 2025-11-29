@@ -3,8 +3,8 @@ PKG_LLVM_MAJ = 14
 PKG_VERS = $(PKG_LLVM_MAJ).0.5
 PKG_DIR = llvm-project
 
-HOMEPAGE = https://github.com/KhronosGroup/SPIRV-LLVM-Translator
-COMMENT  = Tool and library for translation between LLVM IR and SPIR-V
+HOMEPAGE = https://llvm.org/
+COMMENT  = Collection of modular and reusable compiler and toolchain technologies.
 LICENSE  = Apache-2.0 with LLVM-exception
 
 REQUIRED_MIN_DSM = 7.1
@@ -33,7 +33,7 @@ ENV += PATH=$(LLVM_BIN_DIR):$$PATH
 # -----------------------------------------------------------------------------
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=MinSizeRel
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang'
+CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
 CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON
 CMAKE_ARGS += -DLLVM_ENABLE_EH=ON
 CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
