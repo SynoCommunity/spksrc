@@ -32,14 +32,6 @@ LLVM_LIB_DIR = $(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install
 # CMake rules would benefit from a patch to ensure linking to native/llvm-14.0
 ENV += LD_LIBRARY_PATH=$(LLVM_LIB_DIR):$$LD_LIBRARY_PATH
 
-# Fails to access in NATIVE/bin/llvm-tblgen possibly due to parallel compiling
-CMAKE_ARGS += -DLLVM_TABLEGEN=$(LLVM_BIN_DIR)/llvm-tblgen
-CMAKE_ARGS += -DCLANG_TABLEGEN=$(LLVM_BIN_DIR)/clang-tblgen
-CMAKE_ARGS += -DCLANG_EXE=$(LLVM_BIN_DIR)/clang
-CMAKE_ARGS += -DLLVM_AS_EXE=$(LLVM_BIN_DIR)/llvm-as
-CMAKE_ARGS += -DLLVM_LINK_EXE=$(LLVM_BIN_DIR)/llvm-link
-CMAKE_ARGS += -DLLVM_OPT_EXE=$(LLVM_BIN_DIR)/opt
-
 # -----------------------------------------------------------------------------
 # Post-extract: create symlink to igc
 # -----------------------------------------------------------------------------
@@ -51,19 +43,12 @@ igc_post_extract_target:
 # -----------------------------------------------------------------------------
 # CMake arguments
 # -----------------------------------------------------------------------------
-CMAKE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
-
-# Default version of LLVM used by IGC
-IGC_LLVM_MAJ = 14
-IGC_LLVM_VER = $(IGC_LLVM_MAJ).0.5
-
-# Fails when built using Ninja and/or requires various CMP0??? such as:
-#   CMAKE_ARGS += -DCMAKE_POLICY_DEFAULT_CMP0116='OLD|NEW'
-CMAKE_USE_NINJA = 0
-
-# IGC specific
 CMAKE_ARGS += -DIGC_OPTION__ARCHITECTURE_TARGET='Linux64'
 CMAKE_ARGS += -DIGC_OPTION__ARCHITECTURE_HOST='Linux64'
+
+# [llvm]
+CMAKE_ARGS += -DIGC_OPTION__LLVM_MODE=Prebuilds
+CMAKE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
 
 # [Khronos-SPIRV-Headers]
 CMAKE_ARGS += -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
@@ -72,15 +57,17 @@ CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR:PATH=$(WORK_DIR)/SPIRV-He
 # [Khronos-SPIRV-Tools]
 CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
 
-# [llvm]
-CMAKE_ARGS += -DIGC_OPTION__LLVM_MODE=Prebuilds
-
-# [llvm-libunwind]
-# Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
-
 # [vc-intrinsics]
 CMAKE_ARGS += -DIGC_OPTION__LINK_VC_BACKEND='ON'
 CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Prebuilds'
+
+# -----------------------------------------------------------------------------
+# Access to native/llvm-14.0 spcific binaries
+# -----------------------------------------------------------------------------
+CMAKE_ARGS += -DCLANG_EXE=$(LLVM_BIN_DIR)/clang
+CMAKE_ARGS += -DLLVM_AS_EXE=$(LLVM_BIN_DIR)/llvm-as
+CMAKE_ARGS += -DLLVM_LINK_EXE=$(LLVM_BIN_DIR)/llvm-link
+CMAKE_ARGS += -DLLVM_OPT_EXE=$(LLVM_BIN_DIR)/opt
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
@@ -91,4 +78,3 @@ include ../../mk/spksrc.cross-cmake.mk
 #   Build time (IGC/Release/CMCLTranslatorTool): 'CMCLTranslatorTool', 'elf_packager', 'vcb'
 #   native/llvm-14.0: 'llvm-tblgen', 'clang-tool', 'llvm-link', 'opt'
 ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/$(CMAKE_BUILD_TYPE):$(LLVM_BIN_DIR):$$PATH
-CMAKE_ARGS += -DCMAKE_BUILD_RPATH="\$$ORIGIN:\$$ORIGIN/.."
