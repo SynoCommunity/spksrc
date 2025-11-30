@@ -1,6 +1,6 @@
 SPK_NAME = adminer
 SPK_VERS = 5.4.1
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
@@ -33,7 +33,7 @@ CONF_DIR = src/conf_dsm72
 else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4"
 # DSM >= 7.3 does not support PHP8.0
-OS_MAX_VER = 7.2-81180
+OS_MAX_VER = 7.1-59999
 # DSM 7.0 and 7.1
 CONF_DIR = src/conf_dsm7
 else
