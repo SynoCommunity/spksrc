@@ -32,12 +32,19 @@ SYSTEM_GROUP = http
 
 DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
-CONF_DIR = src/conf/
+CONF_DIR = src/conf_72/
 
 include ../../mk/spksrc.common.mk
 
-# Alternate conf dir for DSM 6
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# DSM-specific PHP profiles
+ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
+SPK_DEPENDS = "WebStation:PHP8.2:MariaDB10:Apache2.4"
+CONF_DIR = src/conf_72/
+else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+SPK_DEPENDS = "WebStation:PHP8.0:MariaDB10:Apache2.4"
+OS_MAX_VER = 7.1-59999
+CONF_DIR = src/conf_7/
+else
 CONF_DIR = src/conf_6/
 endif
 

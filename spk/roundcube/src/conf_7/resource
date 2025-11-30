@@ -42,7 +42,7 @@
                 "display_name": "Roundcube Webmail",
                 "icon": "app/images/roundcube-{0}.png",
                 "php": {
-                    "backend": 8,
+                    "backend": 9,
                     "extensions": [
                         "curl",
                         "exif",
