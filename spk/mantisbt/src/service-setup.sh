@@ -126,16 +126,16 @@ service_postinst ()
         PHP_CFG_PATH="${WS_CFG_DIR}/${PHP_CFG_FILE}"
         TMP_PHP_CFG_PATH="${TEMPDIR}/${PHP_CFG_FILE}"
         PHP_PROF_NAME="Default PHP 7.4 Profile"
-        WS_BACKEND="$(jq -r '.default.backend' ${WS_CFG_PATH})"
-        WS_PHP="$(jq -r '.default.php' ${WS_CFG_PATH})"
+        WS_BACKEND="$(jq -r '.default.backend' "${WS_CFG_PATH}")"
+        WS_PHP="$(jq -r '.default.php' "${WS_CFG_PATH}")"
         RESTART_APACHE="no"
         RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
         # Check if Apache is the selected back-end
         if [ ! "$WS_BACKEND" = "2" ]; then
             echo "Set Apache as the back-end server"
-            jq '.default.backend = 2' ${WS_CFG_PATH} > "${TMP_WS_CFG_PATH}"
-            # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
-            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_WS_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
+            jq '.default.backend = 2' "${WS_CFG_PATH}" > "${TMP_WS_CFG_PATH}"
+            # shellcheck disable=SC2086  # RSYNC_ARCH_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_WS_CFG_PATH}" "${WS_CFG_DIR}/" 2>&1
             RESTART_APACHE="yes"
         fi
         # Check if default PHP profile is selected
@@ -144,16 +144,16 @@ service_postinst ()
             # Locate default PHP profile
             PHP_PROF_ID="$(jq -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${PHP_CFG_PATH}")"
             jq ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}" > "${TMP_WS_CFG_PATH}"
-            # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
-            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_WS_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
+            # shellcheck disable=SC2086  # RSYNC_ARCH_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_WS_CFG_PATH}" "${WS_CFG_DIR}/" 2>&1
             RESTART_APACHE="yes"
         fi
         # Check for PHP profile
         if ! jq -e ".[\"${SC_PKG_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Add PHP profile for ${SC_DNAME}"
             jq --slurpfile newProfile "${SYNOPKG_PKGDEST}/web/${SYNOPKG_PKGNAME}.json" '.["'"${SC_PKG_NAME}"'"] = $newProfile[0]' "${PHP_CFG_PATH}" > "${TMP_PHP_CFG_PATH}"
-            # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
-            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_PHP_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
+            # shellcheck disable=SC2086  # RSYNC_ARCH_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_PHP_CFG_PATH}" "${WS_CFG_DIR}/" 2>&1
             RESTART_APACHE="yes"
         fi
         # Check for Apache config
@@ -299,7 +299,8 @@ service_preuninst ()
 
         # Move archive to export directory
         RSYNC_BAK_ARGS="--backup --suffix=.bak"
-        rsync -aX "${RSYNC_BAK_ARGS}" "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
+        # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
+        rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
         echo "Backup file copied successfully to ${wizard_export_path}"
 
         # Clean-up temporary files
@@ -328,9 +329,9 @@ service_postuninst ()
         # Check for PHP profile
         if jq -e ".[\"${SC_PKG_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Removing PHP profile for ${SC_DNAME}"
-            jq 'del(.["'"${SC_PKG_NAME}"'"])' ${PHP_CFG_PATH} > "${TMP_PHP_CFG_PATH}"
-            # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
-            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_PHP_CFG_PATH}" ${WS_CFG_DIR}/ 2>&1
+            jq 'del(.["'"${SC_PKG_NAME}"'"])' "${PHP_CFG_PATH}" > "${TMP_PHP_CFG_PATH}"
+            # shellcheck disable=SC2086  # RSYNC_ARCH_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_PHP_CFG_PATH}" "${WS_CFG_DIR}/" 2>&1
             ${RM} "${WS_CFG_DIR}/php_profile/${SC_PKG_NAME}"
             RESTART_APACHE="yes"
         fi
