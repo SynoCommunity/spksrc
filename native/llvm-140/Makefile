@@ -9,7 +9,6 @@ LICENSE  = Apache-2.0 with LLVM-exception
 
 DOWNLOAD_TARGET = nop
 CHECKSUM_TARGET = nop
-POST_INSTALL_TARGET = llvm_post_install_target
 
 # -----------------------------------------------------------------------------
 # Dependencies
@@ -23,6 +22,13 @@ CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_NAME).build
 CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 
 # -----------------------------------------------------------------------------
+# Post-extract: create symlink so LLVM can find the translator
+# -----------------------------------------------------------------------------
+POST_INSTALL_TARGET = llvm_post_install_target
+llvm_post_install_target:
+	$(RUN) install -m 755 $(CMAKE_BUILD_DIR)/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
+
+# -----------------------------------------------------------------------------
 # CMake arguments
 # -----------------------------------------------------------------------------
 CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
@@ -34,6 +40,9 @@ CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
 CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
 
+# intel-compute-runtime requires compressions support
+CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
+
 # Install headers
 CMAKE_ARGS += -DLLVM_INCLUDE_TOOLS=ON
 
@@ -44,7 +53,6 @@ CMAKE_ARGS += -DLLVM_INSTALL_UTILS=ON
 CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=OFF
 
 # Build flags
-CMAKE_ARGS += -DCLANG_BUILD_TESTS=OFF
 CMAKE_ARGS += -DCLANG_INCLUDE_DOCS=OFF
 CMAKE_ARGS += -DCLANG_INCLUDE_TESTS=OFF
 CMAKE_ARGS += -DLLVM_BUILD_TESTS=OFF
@@ -55,13 +63,11 @@ CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
 CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 
+# [llvm-libunwind]
+# Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
+
 # Remove build warnings
-CMAKE_ARGS += -DCMAKE_CXX_STANDARD=14
-CMAKE_ARGS += -DCMAKE_CXX_EXTENSIONS=ON
-ADDITIONAL_CXXFLAGS  = -Wno-attributes
-ADDITIONAL_CXXFLAGS += -Wno-cast-function-type
-ADDITIONAL_CXXFLAGS += -Wno-dangling-reference
-ADDITIONAL_CXXFLAGS += -Wno-missing-template-keyword
+ADDITIONAL_CXXFLAGS  = -Wno-cast-function-type
 ADDITIONAL_CXXFLAGS += -Wno-pedantic
 ADDITIONAL_CXXFLAGS += -Wno-switch
 ADDITIONAL_CXXFLAGS += -Wno-unused-function
@@ -71,7 +77,3 @@ ADDITIONAL_CXXFLAGS += -Wno-variadic-macros
 # Include the common cross-cmake rules
 # -----------------------------------------------------------------------------
 include ../../mk/spksrc.native-cmake.mk
-
-.PHONY: llvm_post_install_target
-llvm_post_install_target:
-	$(RUN) install -m 755 $(CMAKE_BUILD_DIR)/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
