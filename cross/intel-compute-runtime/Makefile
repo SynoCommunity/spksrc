@@ -26,13 +26,12 @@ COMMENT = The Intel(R) Graphics Compute Runtime for oneAPI Level Zero and OpenCL
 LICENSE = MIT license
 
 POST_EXTRACT_TARGET = intel-compute-runtime_post_extract_target
-CMAKE_USE_NINJA = 0
 
 DEPENDS  = cross/intel-gmmlib
 DEPENDS += cross/intel-graphics-compiler
 
 # [Khronos-OpenCL-Headers]
-BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
+BUILD_DEPENDS  = cross/Khronos-OpenCL-Headers
 CMAKE_ARGS += -DKHRONOS_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 
 # [Khronos-SPIRV-Headers]
