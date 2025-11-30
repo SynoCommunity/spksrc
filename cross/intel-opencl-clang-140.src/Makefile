@@ -7,7 +7,7 @@ PKG_DIST_SITE = https://github.com/intel/opencl-clang/archive
 
 # ocl-open-140 branch is still receiving updates
 # using latest git hash to ensure replicable builds
-PKG_GIT_HASH = 470cf0018e1ef6fc92eda1356f5f31f7da452abc
+PKG_GIT_HASH = b8cd348820bd8df86c68d5c58540acd4ff426d2e
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
