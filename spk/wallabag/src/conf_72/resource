@@ -55,7 +55,7 @@
                 "display_name": "Wallabag",
                 "icon": "app/images/wallabag-{0}.png",
                 "php": {
-                    "backend": 8,
+                    "backend": 11,
                     "extensions": [
                         "bcmath",
                         "curl",
@@ -72,8 +72,8 @@
                     "php_settings": {
                         "error_log": "/var/services/web_packages/wallabag/php_errors.log",
                         "pdo_mysql.default_socket": "/run/mysqld/mysqld10.sock"
-                    },    
-                    "profile_desc": "PHP Profile for wallabag",
+                    },
+                    "profile_desc": "PHP profile for wallabag",
                     "profile_name": "wallabag Profile",
                     "user": "sc-wallabag"
                 },
