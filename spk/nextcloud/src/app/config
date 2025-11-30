@@ -1,0 +1,14 @@
+{
+	".url": {
+		"com.synocommunity.packages.nextcloud": {
+			"allUsers": true,
+			"desc": "Nextcloud",
+			"icon": "images/nextcloud-{0}.png",
+			"port": "443",
+			"protocol": "https",
+			"title": "Nextcloud",
+			"type": "url",
+			"url": "/nextcloud/"
+		}
+	}
+}
