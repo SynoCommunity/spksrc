@@ -15,8 +15,9 @@ CHECKSUM_TARGET = nop
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-BUILD_DEPENDS  = native/llvm-14.0
+BUILD_DEPENDS  = native/llvm-14.0-build
 BUILD_DEPENDS += cross/llvm-project-140.src
+DEPENDS = cross/zlib
 
 # -----------------------------------------------------------------------------
 # Directories
@@ -43,6 +44,9 @@ CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
 # Install headers
 CMAKE_ARGS += -DLLVM_INCLUDE_TOOLS=ON
 
+# intel-compute-runtime requires compressions support
+CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
+
 # Avoid building and/or installing unecessary tools
 CMAKE_ARGS += -DLLVM_BUILD_TOOLS=ON
 CMAKE_ARGS += -DCLANG_BUILD_TOOLS=ON
@@ -50,7 +54,6 @@ CMAKE_ARGS += -DLLVM_INSTALL_UTILS=OFF
 CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=OFF
 
 # Build flags
-CMAKE_ARGS += -DCLANG_BUILD_TESTS=OFF
 CMAKE_ARGS += -DCLANG_INCLUDE_DOCS=OFF
 CMAKE_ARGS += -DCLANG_INCLUDE_TESTS=OFF
 CMAKE_ARGS += -DLLVM_BUILD_TESTS=OFF
