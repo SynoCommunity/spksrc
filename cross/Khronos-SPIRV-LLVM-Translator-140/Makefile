@@ -17,7 +17,7 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-BUILD_DEPENDS  = native/llvm-14.0
+BUILD_DEPENDS  = native/llvm-14.0-build
 BUILD_DEPENDS += cross/llvm-project-140.src
 BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
 DEPENDS  = cross/llvm-140
