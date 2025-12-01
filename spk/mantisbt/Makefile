@@ -1,6 +1,6 @@
 SPK_NAME = mantisbt
 SPK_VERS = 2.27.3
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/mantisbt.png
 
 DEPENDS  = cross/mantisbt
