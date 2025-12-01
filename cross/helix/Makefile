@@ -36,6 +36,9 @@ ENV += CC_x86_64_unknown_linux_gnu=gcc
 ENV += CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=gcc
 endif
 
+# temp to analyze grammar fetching errors
+ENV += RUST_BACKTRACE=full
+
 ADDITIONAL_RUSTFLAGS = -C linker=$(TC_PATH)$(TC_TARGET)-gcc
 
 ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-gcc
