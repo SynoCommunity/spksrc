@@ -4,7 +4,8 @@ wizard_download_share_validator()
   jsonify "{
   var value = arguments[0];
   var step = arguments[2];
-  step.items.map['wizard_download_dir'].setValue(step.items.map['wizard_download_volume'].value + '/' + value + '/');
+  var volume = step.items.map['wizard_download_volume'].value.replace(/\/$/, '');
+  step.items.map['wizard_download_dir'].setValue(volume + '/' + value);
   return true;
 }"
 }
@@ -14,7 +15,8 @@ wizard_download_volume_validator()
   jsonify "{
   var value = arguments[0];
   var step = arguments[2];
-  step.items.map['wizard_download_dir'].setValue(value + '/' + step.items.map['wizard_download_share'].value + '/');
+  var sanitizedVolume = value.replace(/\/$/, '');
+  step.items.map['wizard_download_dir'].setValue(sanitizedVolume + '/' + step.items.map['wizard_download_share'].value);
   return true;
 }"
 }
@@ -79,7 +81,7 @@ base_install_step() {
                   "key": "wizard_download_dir",
                   "desc": "Full path to the shared download folder",
                   "hidden": true,
-                  "defaultValue": "/volume1/downloads/"
+                  "defaultValue": "/volume1/downloads"
                 }
             ]
         },
