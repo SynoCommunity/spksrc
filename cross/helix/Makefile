@@ -8,6 +8,14 @@ PKG_DIR = $(PKG_NAME)/helix-term
 
 DEPENDS =
 
+# rust >= 1.82 required
+UNSUPPORTED_ARCHS  = $(ARMv5_ARCHS)
+# For more information about this error, try `rustc --explain E0432`.
+# error: could not compile `nucleo` (lib) due to 1 previous error
+UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+# some grammars fail to build
+UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
+
 HOMEPAGE = https://helix-editor.com/
 COMMENT  = A post-modern modal text editor.
 LICENSE  = MPL-2.0
