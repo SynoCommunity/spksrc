@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-usbserial
 SPK_VERS = 1.2
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/synokernel-usbserial.png
 
 DEPENDS =
@@ -15,15 +15,10 @@ REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_PL2303:drivers/usb/serial:pl2303
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_TI:drivers/usb/serial:ti_usb_3410_5052
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko"
-CHANGELOG = "1. Support DSM-7.1 and DSM-7.2"
+DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko."
+CHANGELOG = "Add support for Linux 5.x kernels."
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
-# archs with kernel 5.x fail to build
-# error: Cannot generate ORC metadata for CONFIG_UNWINDER_ORC=y, please install libelf-dev, libelf-devel or elfutils-libelf-devel
-# with installation of elfutils and libelf-dev to the development environment,
-# it further fails with error: pointer may be used after ‘realloc’ [-Werror=use-after-free]
-UNSUPPORTED_ARCHS += epyc7002 rtd1619b
 # we only have ipq806x for SRM 1.2, but this fails with:
 # /usr/bin/ld: scripts/dtc/dtc-parser.tab.o:(.bss+0x10): multiple definition of `yylloc'; scripts/dtc/dtc-lexer.lex.o:(.bss+0x0): first defined here
 REQUIRED_MIN_SRM = 1.3
@@ -36,10 +31,15 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-STRIP_TARGET = nop
+STRIP_TARGET = usbserial_strip
 POST_STRIP_TARGET = usbserial_extra_install
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: usbserial_strip
+usbserial_strip:
+	@$(MSG) Strip debug symbols in kernel modules
+	find $(STAGING_DIR) -type f -name "*.ko" -exec $(STRIP) --strip-debug {} \;
 
 .PHONY: usbserial_extra_install
 usbserial_extra_install:

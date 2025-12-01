@@ -61,6 +61,7 @@ ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
 	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) < 3.8"
 	@$(RUN) yes "" | $(MAKE) oldconfig
 else
+	@$(MSG) "make olddefconfig for kernel $(TC_KERNEL)"
 	@$(RUN) $(MAKE) olddefconfig
 endif
 # Call to make kernelversion is not available for kernel <= 3.0

@@ -6,8 +6,7 @@ SPK_ICON = src/synocli-kernel.png
 DEPENDS = cross/usbutils cross/psmisc
 
 MAINTAINER    = th0ma7
-DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: fuser, usb-devices, usbhid-dump"
-OPTIONAL_DESC =
+DESCRIPTION   = "SynoCli Kernel Tools provides a set of small command-line utilities: fuser, usb-devices, usbhid-dump. Additionally the synocli-kernelmodule.sh script helps to install kernel modules of synokernel packages."
 DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
 CHANGELOG     = "1. Add support for r1000 arch"
