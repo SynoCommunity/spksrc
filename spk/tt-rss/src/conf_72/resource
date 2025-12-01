@@ -63,7 +63,7 @@
                 "display_name": "Tiny Tiny RSS",
                 "icon": "app/images/tt-rss-{0}.png",
                 "php": {
-                    "backend": 8,
+                    "backend": 11,
                     "extensions": [
                         "curl",
                         "gd",
