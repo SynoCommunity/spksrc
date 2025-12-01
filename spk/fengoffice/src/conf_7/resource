@@ -42,7 +42,7 @@
                 "display_name": "Feng Office",
                 "icon": "app/images/fengoffice-{0}.png",
                 "php": {
-                    "backend": 8,
+                    "backend": 9,
                     "extensions": [
                         "curl",
                         "gd",
