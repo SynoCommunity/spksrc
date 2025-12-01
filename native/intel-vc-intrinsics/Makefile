@@ -18,7 +18,7 @@ NATIVE_DEPENDS += native/Khronos-SPIRV-LLVM-Translator-140
 export VC_INTRINSICS_IN_TREE_INSTALL=FALSE
 
 # External build: To configure VC Intrinsics with prebuilt LLVM
-CMAKE_ARGS += -DLLVM_DIR=$(WORK_DIR)/../../llvm-14.0/work-native/install/usr/local/lib/cmake/llvm
+CMAKE_ARGS += -DLLVM_DIR=$(WORK_DIR)/../../llvm-14.0-build/work-native/install/usr/local/lib/cmake/llvm
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
 include ../../mk/spksrc.native-cmake.mk
