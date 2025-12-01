@@ -8,13 +8,12 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 DEPENDS = cross/libkiwix
 
 HOMEPAGE = https://www.kiwix.org/
 COMMENT  = Command line Kiwix tools: kiwix-serve, kiwix-manage, ...
 LICENSE  = GPLv3
-
-GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.cross-meson.mk

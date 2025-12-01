@@ -1,6 +1,0 @@
-lnk:lib/libcord.so
-lnk:lib/libcord.so.1
-lib:lib/libcord.so.1.0.3
-lnk:lib/libgc.so
-lnk:lib/libgc.so.1
-lib:lib/libgc.so.1.0.3

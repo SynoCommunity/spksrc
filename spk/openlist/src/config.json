@@ -1,0 +1,121 @@
+{
+  "force": false,
+  "site_url": "%site_url%",
+  "cdn": "",
+  "jwt_secret": "%jwt_secret%",
+  "token_expires_in": 48,
+  "database": {
+    "type": "sqlite3",
+    "host": "",
+    "port": 0,
+    "user": "",
+    "password": "",
+    "name": "",
+    "db_file": "%data%/data.db",
+    "table_prefix": "x_",
+    "ssl_mode": "",
+    "dsn": ""
+  },
+  "meilisearch": {
+    "host": "http://localhost:7700",
+    "api_key": "",
+    "index_prefix": ""
+  },
+  "scheme": {
+    "address": "0.0.0.0",
+    "http_port": 5244,
+    "https_port": -1,
+    "force_https": false,
+    "cert_file": "",
+    "key_file": "",
+    "unix_file": "",
+    "unix_file_perm": "",
+    "enable_h2c": false
+  },
+  "temp_dir": "%data%/temp",
+  "bleve_dir": "%data%/bleve",
+  "dist_dir": "",
+  "log": {
+    "enable": true,
+    "name": "%data%/log/log.log",
+    "max_size": 50,
+    "max_backups": 30,
+    "max_age": 28,
+    "compress": false
+  },
+  "delayed_start": 0,
+  "max_connections": 0,
+  "max_concurrency": 64,
+  "tls_insecure_skip_verify": true,
+  "tasks": {
+    "download": {
+      "workers": 5,
+      "max_retry": 1,
+      "task_persistant": false
+    },
+    "transfer": {
+      "workers": 5,
+      "max_retry": 2,
+      "task_persistant": false
+    },
+    "upload": {
+      "workers": 5,
+      "max_retry": 0,
+      "task_persistant": false
+    },
+    "copy": {
+      "workers": 5,
+      "max_retry": 2,
+      "task_persistant": false
+    },
+    "move": {
+      "workers": 5,
+      "max_retry": 2,
+      "task_persistant": false
+    },
+    "decompress": {
+      "workers": 5,
+      "max_retry": 2,
+      "task_persistant": false
+    },
+    "decompress_upload": {
+      "workers": 5,
+      "max_retry": 2,
+      "task_persistant": false
+    },
+    "allow_retry_canceled": false
+  },
+  "cors": {
+    "allow_origins": [
+      "*"
+    ],
+    "allow_methods": [
+      "*"
+    ],
+    "allow_headers": [
+      "*"
+    ]
+  },
+  "s3": {
+    "enable": false,
+    "port": 5246,
+    "ssl": false
+  },
+  "ftp": {
+    "enable": false,
+    "listen": ":5221",
+    "find_pasv_port_attempts": 50,
+    "active_transfer_port_non_20": false,
+    "idle_timeout": 900,
+    "connection_timeout": 30,
+    "disable_active_mode": false,
+    "default_transfer_binary": false,
+    "enable_active_conn_ip_check": true,
+    "enable_pasv_conn_ip_check": true
+  },
+  "sftp": {
+    "enable": false,
+    "listen": ":5222"
+  },
+  "last_launched_version": "v4.0.0"
+}

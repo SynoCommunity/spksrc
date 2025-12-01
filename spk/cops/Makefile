@@ -1,20 +1,22 @@
 SPK_NAME = cops
-SPK_VERS = 3.2.2
-SPK_REV = 11
+SPK_VERS = 3.6.5
+SPK_REV = 16
 SPK_ICON = src/cops.png
 
 DEPENDS  = cross/cops
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
-REQUIRED_MIN_DSM = 7.0
-SPK_DEPENDS=WebStation:PHP8.2:Apache2.4
+REQUIRED_MIN_DSM = 7.2
+SPK_DEPENDS = WebStation:PHP8.2:Apache2.4
+# SRM is not supported due lacking webstation, php and apache packages
+REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Calibre OPDS and HTML PHP Server : light alternative to Calibre content server / Calibre2OPDS.
 DESCRIPTION_FRE = Calibre OPDS et HTML PHP Serveur : alternative légère au serveur de contenu de Calibre et à Calibre2OPDS.
 DISPLAY_NAME = COPS
-CHANGELOG = "1. Update to v3.2.2. (Requires PHP 8.2)"
+CHANGELOG = "1. Update to v3.6.5. (Requires PHP 8.2 and DSM 7.2)"
 
 HOMEPAGE = https://blog.slucas.fr/en/oss/calibre-opds-php-server
 LICENSE = GPLv2
@@ -30,7 +32,6 @@ DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
 CONF_DIR = src/conf/
 
-SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 STARTABLE = no
 

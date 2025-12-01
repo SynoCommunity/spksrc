@@ -14,6 +14,6 @@ COMMENT  = EZStream is a command line source client for Icecast media streaming 
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-ADDITIONAL_CFLAGS = -O
+ADDITIONAL_CFLAGS = -Os
 
 include ../../mk/spksrc.cross-cc.mk

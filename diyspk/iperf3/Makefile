@@ -1,13 +1,15 @@
 SPK_NAME = iperf3
-SPK_VERS = 3.17.1
+SPK_VERS = 3.19.1
 SPK_REV = 1
 SPK_ICON = src/iperf3.png
 
 DEPENDS = cross/iperf3
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(call version_lt, ${TCVERSION}, 6.0)$(call version_ge, ${TCVERSION}, 3.0),11)
+SPK_VERS = 3.15
+else ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 SPK_VERS = 3.15
 endif
 

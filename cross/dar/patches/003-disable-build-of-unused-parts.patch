@@ -1,0 +1,16 @@
+# Skip some subdirs from build
+# - documentation (man, doc)
+# - language support (po)
+# - misc tools (misc)
+# 
+--- Makefile.in.orig	2025-05-20 15:16:54.000000000 +0000
++++ Makefile.in	2025-07-28 10:10:59.371860154 +0000
+@@ -397,7 +397,7 @@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+ upx = @upx@
+-SUBDIRS = man src doc misc po
++SUBDIRS = src
+ dist_noinst_DATA = INSTALL README THANKS TODO AUTHORS COPYING ChangeLog NEWS ABOUT-NLS
+ CPPCHECKDIR = ./cppcheckbuilddir
+ ACLOCAL_AMFLAGS = -I m4

@@ -1,4 +1,4 @@
-PYTHON_DIR="/var/packages/python311/target/bin"
+PYTHON_DIR="/var/packages/python312/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 BIN="${SYNOPKG_PKGDEST}/bin"
@@ -40,7 +40,4 @@ service_postinst ()
             mkdir -p "$(dirname ${LOG_FILE})"
         fi
     fi
-
-    # Install nice/ionice
-    ${BIN}/busybox --install ${BIN}
 }

@@ -14,4 +14,6 @@ LICENSE  = MIT
 
 CONFIGURE_ARGS = -Ddriverdir=$(INSTALL_PREFIX)/lib
 
+ADDITIONAL_CFLAGS = -Os
+
 include ../../mk/spksrc.cross-meson.mk

@@ -1,20 +1,22 @@
 SPK_NAME = fengoffice
-SPK_VERS = 3.11.2.8
-SPK_REV = 4
+SPK_VERS = 3.11.8.0
+SPK_REV = 7
 SPK_ICON = src/fengoffice.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/fengoffice
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_MIN_DSM = 6.0
 SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
+# SRM is not supported due lacking webstation, php, mariadb and apache packages
+REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Feng Office is a Collaboration Platform and Project Management System.
 DISPLAY_NAME = Feng Office
-CHANGELOG = "1. Update to v3.11.2.8.<br/>2. Add PHP profiles for DSM 6.<br/>3. Add backup and restore functions."
+CHANGELOG = "1. Update to v3.11.8.0."
 
 HOMEPAGE = https://www.fengoffice.com/
 LICENSE = AGPL

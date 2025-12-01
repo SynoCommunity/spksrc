@@ -10,7 +10,7 @@ service_postinst ()
 {
     # Initialize or update configuration file based on user preferences.
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        CFG_FILE="${WEB_ROOT}/config_local.php"
+        CFG_FILE="${WEB_ROOT}/config/local.php"
         DEFAULT_CFG_FILE="${SYNOPKG_PKGDEST}/web/config_local.php.synology"
         # Create a default configuration file
         if [ ! -f "${CFG_FILE}" ]; then
@@ -29,22 +29,26 @@ service_save ()
     # Save some stuff
     [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE} ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}
     echo "Backup existing data to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"
-    ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web
+    ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config
     # Save cops configuration files
-    rsync -aX ${WEB_ROOT}/config_local.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/ 2>&1
+    if [ -f "${WEB_ROOT}/config/local.php" ]; then
+        rsync -aX ${WEB_ROOT}/config/local.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config/ 2>&1
+    elif [ -f "${WEB_ROOT}/config_local.php" ]; then
+        rsync -aX ${WEB_ROOT}/config_local.php ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config/local.php 2>&1
+    fi
     rsync -aX ${WEB_ROOT}/.htaccess ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/ 2>&1
 }
 
 service_restore ()
 {
-    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config_local.php" ]; then
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config/local.php" ]; then
         # Restore some stuff
         echo "Restore previous data from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}"
         # Restore cops configuration file
-        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config_local.php ${WEB_ROOT}/config_local.php 2>&1
+        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${PACKAGE}/web/config/local.php ${WEB_ROOT}/config/local.php 2>&1
     else
         # Backup missing, re-initialise default values
-        CFG_FILE="${WEB_ROOT}/config_local.php"
+        CFG_FILE="${WEB_ROOT}/config/local.php"
         DEFAULT_CFG_FILE="${SYNOPKG_PKGDEST}/web/config_local.php.synology"
         if [ ! -f "${CFG_FILE}" ]; then
             echo "Backup data missing, re-initialising default values"

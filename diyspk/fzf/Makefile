@@ -1,9 +1,11 @@
 SPK_NAME = fzf
-SPK_VERS = 0.56.0
+SPK_VERS = 0.66.0
 SPK_REV = 1
 SPK_ICON = src/fzf.png
 
 DEPENDS = cross/fzf
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = A command-line fuzzy finder.

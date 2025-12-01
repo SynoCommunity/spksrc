@@ -16,4 +16,6 @@ HOMEPAGE = https://github.com/lsd-rs/lsd
 COMMENT  = The next gen ls command.
 LICENSE  = Apache 2.0
 
+CARGO_BUILD_ARGS = --locked
+
 include ../../mk/spksrc.cross-rust.mk

@@ -120,7 +120,7 @@ include ../../mk/spksrc.cross-cmake.mk
 # Requires access to:
 #   CMCLTranslatorTool (during build time): IGC/Release/CMCLTranslatorTool
 #   llvm-tblgen, clang-tool (symlink -> clang-14), llvm-link, opt: native/llvm-14.0
-ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/Release:$(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin):$$PATH
+ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/$(CMAKE_BUILD_TYPE):$(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin):$$PATH
 
 # Associate external projects to LLVM build, this replaces (and cannot be combined):
 #   -DLLVM_EXTERNAL_PROJECTS='llvm-spirv;opencl-clang'

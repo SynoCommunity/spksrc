@@ -1,0 +1,11 @@
+--- libmp3lame/util.c-orig	2017-09-06 19:33:36.000000000 +0000
++++ libmp3lame/util.c	2025-09-28 18:39:54.425769102 +0000
+@@ -911,7 +911,7 @@ disable_FPE(void)
+         mask &= ~(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
+         _FPU_SETCW(mask);
+     }
+-# elif defined(__linux__)
++# elif defined(__linux__) && (defined(__i386__) || defined(__x86_64__))
+     {
+ 
+ #  include <fpu_control.h>

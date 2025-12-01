@@ -10,7 +10,7 @@
 # * The full content of $(STAGING_DIR) is packed, it will then be unpacked on the target in $(INSTALL_PREFIX)
 
 BASE_DISTRIB_DIR  = $(CURDIR)/../../distrib
-PIP_DISTRIB_DIR = $(DISTRIB_DIR)/pip
+PIP_DISTRIB_DIR = $(abspath $(DISTRIB_DIR)/pip)
 PIP_CACHE_DIR = $(WORK_DIR)/pip
 TOOLCHAIN_DIR = $(BASE_DISTRIB_DIR)/toolchain
 TOOLKIT_DIR = $(BASE_DISTRIB_DIR)/toolkit
@@ -23,6 +23,11 @@ endif
 
 ifndef WORK_DIR
 WORK_DIR = $(CURDIR)/work$(ARCH_SUFFIX)
+endif
+
+ifndef LOG_DIR
+LOG_DIR = $(CURDIR)
+export LOG_DIR
 endif
 
 ifndef INSTALL_DIR

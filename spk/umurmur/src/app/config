@@ -5,9 +5,8 @@
             "desc": "Minimalistic Mumble Server",
             "icon": "images/umurmur-{0}.png",
             "type": "url",
-            "url": "3rdparty/umurmur/umurmur.cgi",
-            "protocol" : "http",
-            "port": "64738",
+            "url": "/webman/3rdparty/umurmur/umurmur.cgi",
+            "protocol" : "https",
             "allUsers": true,
             "grantPrivilege": "all",
             "advanceGrantPrivilege": true

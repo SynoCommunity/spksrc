@@ -1,0 +1,23 @@
+If hw_base_encode_send_frame() is called with frame == NULL before any
+input frames are submitted, ctx->pic_end is NULL and dereferencing it
+causes a crash. This can occur in hardware encoding pipelines that flush
+before receiving any input frames.
+
+Fix by checking ctx->pic_end before accessing its pts field.
+
+Link: https://github.com/tvheadend/tvheadend/issues/1833
+Signed-off-by: James Hutchinson <jahutchinson99@googlemail.com>
+
+Source: https://patchwork.ffmpeg.org/project/ffmpeg/patch/20250719070836.283597-1-jahutchinson99@googlemail.com/
+
+--- libavcodec/vaapi_encode.c-orig	2025-08-05 00:22:34.000000000 +0000
++++ libavcodec/vaapi_encode.c	2025-10-12 12:10:57.687449669 +0000
+@@ -1382,7 +1382,7 @@ static int vaapi_encode_send_frame(AVCod
+ 
+         // Fix timestamps if we hit end-of-stream before the initial decode
+         // delay has elapsed.
+-        if (ctx->input_order < ctx->decode_delay)
++        if (ctx->input_order <= ctx->decode_delay && ctx->pic_end)
+             ctx->dts_pts_diff = ctx->pic_end->pts - ctx->first_pts;
+     }
+ 
