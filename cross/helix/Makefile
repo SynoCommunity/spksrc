@@ -63,6 +63,8 @@ endif
 
 .PHONY: helix_build
 helix_build:
+	@$(MSG) "- Avoid dubious ownership restriction in github CI for clonging repositories with 'fetch tree-sitter grammars'"
+	git config --global --add safe.directory '*'
 	@$(MSG) "- Build helix with cargo build"
 	$(RUN) cargo build $(CARGO_BUILD_ARGS)
 
