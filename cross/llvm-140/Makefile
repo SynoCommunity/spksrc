@@ -15,7 +15,7 @@ CHECKSUM_TARGET = nop
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-BUILD_DEPENDS  = native/llvm-14.0-build
+BUILD_DEPENDS  = native/llvm-14.0
 BUILD_DEPENDS += cross/llvm-project-140.src
 DEPENDS = cross/zlib
 
