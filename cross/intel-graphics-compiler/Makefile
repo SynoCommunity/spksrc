@@ -16,7 +16,7 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-DEPENDS += native/llvm-14.0-build
+DEPENDS += native/llvm-14.0
 DEPENDS += cross/intel-level-zero
 DEPENDS += cross/intel-opencl-clang-140
 DEPENDS += cross/intel-vc-intrinsics
@@ -25,8 +25,8 @@ DEPENDS += cross/Khronos-SPIRV-Tools
 # -----------------------------------------------------------------------------
 # Directories
 # -----------------------------------------------------------------------------
-LLVM_BIN_DIR = $(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/bin)
-LLVM_LIB_DIR = $(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/lib)
+LLVM_BIN_DIR = $(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin)
+LLVM_LIB_DIR = $(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/lib)
 
 # Needed for built-time tool usage: 'CMCLTranslatorTool', 'elf_packager', 'vcb'
 # CMake rules would benefit from a patch to ensure linking to native/llvm-14.0
