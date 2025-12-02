@@ -1,5 +1,5 @@
 SPK_NAME = ddns-go
-SPK_VERS = 6.13.2
+SPK_VERS = 6.13.3
 SPK_REV = 1
 SPK_ICON = src/ddns-go.png
 
@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 MAINTAINER = GrandDuke1106
-DESCRIPTION = Automatically obtain your public IPv4 or IPv6 address and resolve it to the corresponding domain name service.
+DESCRIPTION = Automatically obtain your public IPv4 or IPv6 address and resolve it to the corresponding domain name service. Supported domain service providers are: Aliyun, Tencent, Dnspod, Cloudflare, Huawei, Callback, Baidu, Porkbun, GoDaddy, Namecheap, NameSilo, Dynadot, DNSLA, Nowcn, Eranet, Gcore.
 DISPLAY_NAME = ddns-go
 CHANGELOG = "Initial package release."
 
