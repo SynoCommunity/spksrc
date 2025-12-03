@@ -5,8 +5,7 @@ SPK_ICON = src/btop.png
 
 DEPENDS = cross/btop
 
-include ../../mk/spksrc.archs.mk
-UNSUPPORTED_ARCHS = $(32bit_ARCHS) $(ARMv8_ARCHS)
+REQUIRED_MIN_DSM = 7.2
 
 MAINTAINER = tofuHero
 DESCRIPTION = Resource monitor that shows usage and stats for processor, memory, disks, network and processes.
@@ -21,4 +20,3 @@ STARTABLE = no
 SPK_COMMANDS  = bin/btop
 
 include ../../mk/spksrc.spk.mk
-
