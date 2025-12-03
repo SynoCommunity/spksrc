@@ -39,6 +39,7 @@ BUILD_DEPENDS   = cross/llvm-project-140.src
 NATIVE_DEPENDS += native/llvm-140
 NATIVE_DEPENDS += native/Khronos-SPIRV-LLVM-Translator-140
 NATIVE_DEPENDS += native/intel-vc-intrinsics
+NATIVE_DEPENDS += native/intel-opencl-clang-140
 
 # -----------------------------------------------------------------------------
 # Include the common native-cmake rules
