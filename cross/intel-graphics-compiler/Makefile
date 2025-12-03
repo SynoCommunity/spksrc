@@ -16,8 +16,7 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-DEPENDS += native/llvm-14.0
-DEPENDS += cross/intel-level-zero
+DEPENDS += native/llvm-14.0-build
 DEPENDS += cross/intel-opencl-clang-140
 DEPENDS += cross/intel-vc-intrinsics
 DEPENDS += cross/Khronos-SPIRV-Tools
@@ -25,8 +24,8 @@ DEPENDS += cross/Khronos-SPIRV-Tools
 # -----------------------------------------------------------------------------
 # Directories
 # -----------------------------------------------------------------------------
-LLVM_BIN_DIR = $(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin)
-LLVM_LIB_DIR = $(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/lib)
+LLVM_BIN_DIR = $(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/bin)
+LLVM_LIB_DIR = $(abspath $(PWD)/../../native/llvm-14.0-build/work-native/install/usr/local/lib)
 
 # Needed for built-time tool usage: 'CMCLTranslatorTool', 'elf_packager', 'vcb'
 # CMake rules would benefit from a patch to ensure linking to native/llvm-14.0
@@ -43,22 +42,19 @@ igc_post_extract_target:
 # -----------------------------------------------------------------------------
 # CMake arguments
 # -----------------------------------------------------------------------------
-CMAKE_ARGS += -DIGC_OPTION__ARCHITECTURE_TARGET='Linux64'
-CMAKE_ARGS += -DIGC_OPTION__ARCHITECTURE_HOST='Linux64'
-
 # [llvm]
 CMAKE_ARGS += -DIGC_OPTION__LLVM_MODE=Prebuilds
 CMAKE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
 
 # [Khronos-SPIRV-Headers]
+CMAKE_ARGS += -DIGC_BUILD__SPIRV_ENABLED=ON
 CMAKE_ARGS += -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
-CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR:PATH=$(WORK_DIR)/SPIRV-Headers
 
 # [Khronos-SPIRV-Tools]
 CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
 
 # [vc-intrinsics]
-CMAKE_ARGS += -DIGC_OPTION__LINK_VC_BACKEND='ON'
+CMAKE_ARGS += -DIGC_BUILD__VC_ENABLED=ON
 CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Prebuilds'
 
 # -----------------------------------------------------------------------------

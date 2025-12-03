@@ -28,10 +28,13 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-BUILD_DEPENDS  = cross/Khronos-OpenCL-Headers
+BUILD_DEPENDS  = cross/libglvnd
+BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
 BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
-DEPENDS  = cross/intel-gmmlib
+DEPENDS += cross/Khronos-SPIRV-LLVM-Translator-140
 DEPENDS += cross/intel-graphics-compiler
+DEPENDS += cross/intel-level-zero
+DEPENDS  = cross/intel-gmmlib
 
 # -----------------------------------------------------------------------------
 # Post-extract: create symlink so LLVM can find the translator
@@ -40,17 +43,25 @@ POST_EXTRACT_TARGET = intel-compute-runtime_post_extract_target
 intel-compute-runtime_post_extract_target:
 	@cd $(WORK_DIR) && ln -s $(PKG_DIR) $(PKG_NAME)
 
+POST_INSTALL_TARGET = intel-compute-runtime_post_install_target
+intel-compute-runtime_post_install_target:
+	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -s ocloc-24.35.0 ocloc
+
 # -----------------------------------------------------------------------------
 # CMake arguments
 # -----------------------------------------------------------------------------
 CMAKE_ARGS += -DIGC_DIR=$(STAGING_INSTALL_PREFIX)
-CMAKE_ARGS += -DNEO_DISABLE_LD_GOLD:BOOL='ON'
 CMAKE_ARGS += -DSKIP_UNIT_TESTS=1
 CMAKE_ARGS += -DOCL_ICD_VENDORDIR=$(INSTALL_PREFIX)/etc/OpenCL/vendors/
-CMAKE_ARGS += -DNEO_LEGACY_PLATFORMS_SUPPORT=1
-CMAKE_ARGS += -DNEO_CURRENT_PLATFORMS_SUPPORT=0
+CMAKE_ARGS += -DNEO_DISABLE_LD_GOLD:BOOL='ON'
+CMAKE_ARGS += -DL0_INSTALL_UDEV_RULES='OFF'
+CMAKE_ARGS += -DCOMPILE_BUILT_INS='ON'
+# Reduce build size, support up to Gen9.5, uses _legacy1 suffix
+CMAKE_ARGS += -DNEO_LEGACY_PLATFORMS_SUPPORT='ON'
+CMAKE_ARGS += -DNEO_CURRENT_PLATFORMS_SUPPORT='OFF'
 
-# [Khronos-OpenCL-Headers]
+# [OpenCL/GL-Headers]
+CMAKE_ARGS += -DKHRONOS_GL_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 CMAKE_ARGS += -DKHRONOS_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 
 # -----------------------------------------------------------------------------
