@@ -31,10 +31,10 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 BUILD_DEPENDS  = cross/libglvnd
 BUILD_DEPENDS += cross/Khronos-OpenCL-Headers
 BUILD_DEPENDS += cross/Khronos-SPIRV-Headers
-DEPENDS += cross/Khronos-SPIRV-LLVM-Translator-140
+DEPENDS  = cross/Khronos-SPIRV-LLVM-Translator-140
 DEPENDS += cross/intel-graphics-compiler
 DEPENDS += cross/intel-level-zero
-DEPENDS  = cross/intel-gmmlib
+DEPENDS += cross/intel-gmmlib
 
 # -----------------------------------------------------------------------------
 # Post-extract: create symlink so LLVM can find the translator
