@@ -34,6 +34,9 @@ CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(WORK_DIR)/install/$(INSTALL_PREFIX)
 CMAKE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
 CMAKE_ARGS += -Wno-dev
 
+# Reduce build-time binary size
+GCC_NO_DEBUG_INFO = 1
+
 # Deactivate unecessary GPU generations (only Gen8/Gen9 needed)
 #CMAKE_ARGS += -DGEN8=OFF
 #CMAKE_ARGS += -DGEN11=OFF
