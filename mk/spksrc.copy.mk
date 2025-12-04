@@ -43,12 +43,13 @@ pre_copy_target: copy_msg install_resources_merge
 
 .PHONY: install_resources_merge
 install_resources_merge:
-	@$(MSG) "Merge install-resources content"
+	$(MSG) "Merge install-resources content"
+	@set -x
 	@for depend in $(DEPENDS); do \
 	  depend_name=$${depend##*/} ; \
 	  info_file="" ; shared_info="" ; \
-	  # install-resources info files describe payload paths from dependencies.  We
-	  # prefer the dependency's own copy and fall back to ours when rebuilding.
+	  # install-resources info files describe payload paths from dependencies.  We \
+	  # prefer the dependency's own copy and fall back to ours when rebuilding. \
 	  for candidate in "../../$$depend/work/install-resources-$$depend_name-shared.info" "$(WORK_DIR)/install-resources-$$depend_name-shared.info" ; do \
 	    if [ -z "$$shared_info" ] && [ -f "$$candidate" ]; then \
 	      shared_info="$$candidate" ; \
@@ -89,7 +90,6 @@ install_resources_merge:
 	    done < $$shared_info ; \
 	  fi ; \
 	done
-
 copy_target: SHELL:=/bin/bash
 copy_target: .SHELLFLAGS := -o pipefail -c
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
