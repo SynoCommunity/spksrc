@@ -5,7 +5,7 @@ SPK_ICON = src/btop.png
 
 DEPENDS = cross/btop
 
-REQUIRED_MIN_DSM = 7.2
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = tofuHero
 DESCRIPTION = Resource monitor that shows usage and stats for processor, memory, disks, network and processes.
@@ -17,6 +17,6 @@ HOMEPAGE = https://github.com/aristocratos/btop
 
 STARTABLE = no
 
-SPK_COMMANDS  = bin/btop
+SPK_COMMANDS = bin/btop
 
 include ../../mk/spksrc.spk.mk
