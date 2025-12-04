@@ -39,7 +39,56 @@ copy_msg:
 	@$(MSG) "Creating target installation dir of $(NAME)"
 	@rm -fr $(STAGING_DIR)
 
-pre_copy_target: copy_msg
+pre_copy_target: copy_msg install_resources_merge
+
+.PHONY: install_resources_merge
+install_resources_merge:
+	@$(MSG) "Merge install-resources content"
+	@for depend in $(DEPENDS); do \
+	  depend_name=$${depend##*/} ; \
+	  info_file="" ; shared_info="" ; \
+	  # install-resources info files describe payload paths from dependencies.  We
+	  # prefer the dependency's own copy and fall back to ours when rebuilding.
+	  for candidate in "../../$$depend/work/install-resources-$$depend_name-shared.info" "$(WORK_DIR)/install-resources-$$depend_name-shared.info" ; do \
+	    if [ -z "$$shared_info" ] && [ -f "$$candidate" ]; then \
+	      shared_info="$$candidate" ; \
+	    fi ; \
+	  done ; \
+	  for candidate in "../../$$depend/work/install-resources-$$depend_name.info" "$(WORK_DIR)/install-resources-$$depend_name.info" ; do \
+	    if [ -z "$$info_file" ] && [ -f "$$candidate" ]; then \
+	      info_file="$$candidate" ; \
+	    fi ; \
+	  done ; \
+	  if [ -z "$$info_file" ]; then \
+	    continue ; \
+	  fi ; \
+	  while IFS='|' read -r src_dir dest_dir; do \
+	    if [ -n "$$src_dir" ] && [ -d "$$src_dir" ]; then \
+	      target_dir="$(INSTALL_DIR)$(INSTALL_PREFIX)/$$dest_dir" ; \
+	      if [ "$$src_dir" -ef "$$target_dir" ]; then \
+	        $(MSG) " - Skip $$src_dir (already staged)" ; \
+	        continue ; \
+	      fi ; \
+	      $(RUN) mkdir -p "$$target_dir" ; \
+	      $(MSG) " - Copy $$src_dir -> $$target_dir" ; \
+	      $(RUN) tar -cf - -C "$$src_dir" . | tar -xf - -C "$$target_dir" ; \
+	    fi ; \
+	  done < $$info_file ; \
+	  if [ -n "$$shared_info" ]; then \
+	    while IFS='|' read -r src_dir dest_dir; do \
+	      if [ -n "$$src_dir" ] && [ -d "$$src_dir" ]; then \
+	        target_dir="$(INSTALL_DIR)$(INSTALL_PREFIX)/$$dest_dir" ; \
+	        if [ "$$src_dir" -ef "$$target_dir" ]; then \
+	          $(MSG) " - Skip $$src_dir (already staged)" ; \
+	          continue ; \
+	        fi ; \
+	        $(RUN) mkdir -p "$$target_dir" ; \
+	        $(MSG) " - Copy $$src_dir -> $$target_dir" ; \
+	        $(RUN) tar -cf - -C "$$src_dir" . | tar -xf - -C "$$target_dir" ; \
+	      fi ; \
+	    done < $$shared_info ; \
+	  fi ; \
+	done
 
 copy_target: SHELL:=/bin/bash
 copy_target: .SHELLFLAGS := -o pipefail -c
@@ -91,4 +140,3 @@ $(INSTALL_PLIST):
 	    cat PLIST ; \
 	  fi \
 	) | $(PLIST_TRANSFORM) | sort -u > $@
-

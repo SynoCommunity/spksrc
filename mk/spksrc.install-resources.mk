@@ -48,3 +48,33 @@ COMPILE_TARGET = nop
 
 # Include base cross-cc makefile for common functionality
 include ../../mk/spksrc.cross-cc.mk
+
+# Record the patched payload location so dependent packages can merge it during
+# their copy step.
+INSTALL_RESOURCES_INFO = $(WORK_DIR)/install-resources-$(PKG_NAME).info
+INSTALL_RESOURCES_DEST ?= share/$(PKG_NAME)
+INSTALL_RESOURCES_SRC  ?= $(WORK_DIR)/$(PKG_DIR)
+
+post_install_target: install_resources_info
+
+.PHONY: install_resources_info
+install_resources_info:
+	@$(MSG) "Recording install-resources mapping for $(PKG_NAME)"
+	@mkdir -p $(WORK_DIR)
+	@echo "$(INSTALL_RESOURCES_SRC)|$(INSTALL_RESOURCES_DEST)" > $(INSTALL_RESOURCES_INFO)
+
+.PHONY: cat_INSTALL_RESOURCES
+cat_INSTALL_RESOURCES:
+	@if [ -f $(INSTALL_RESOURCES_INFO) ]; then cat $(INSTALL_RESOURCES_INFO); fi
+
+# Default to copying the patched tree into the staging install prefix unless the
+# package provides its own INSTALL_TARGET.
+ifeq ($(strip $(INSTALL_TARGET)),)
+INSTALL_TARGET = install_resources_copy
+endif
+
+install_resources_copy: pre_install_target
+	@$(MSG) "Install resources copy for $(PKG_NAME)"
+	$(RUN) rm -rf $(INSTALL_DIR)$(INSTALL_PREFIX)/$(INSTALL_RESOURCES_DEST)
+	$(RUN) mkdir -p $(INSTALL_DIR)$(INSTALL_PREFIX)/$(INSTALL_RESOURCES_DEST)
+	$(RUN) tar -cf - -C $(INSTALL_RESOURCES_SRC) . | tar -xf - -C $(INSTALL_DIR)$(INSTALL_PREFIX)/$(INSTALL_RESOURCES_DEST)
