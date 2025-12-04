@@ -75,6 +75,11 @@ ADDITIONAL_CXXFLAGS += -Wno-unused-function
 ADDITIONAL_CXXFLAGS += -Wno-variadic-macros
 
 # -----------------------------------------------------------------------------
+# Reduce build-time binary size
+# -----------------------------------------------------------------------------
+GCC_NO_DEBUG_INFO = 1
+
+# -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
 # -----------------------------------------------------------------------------
 include ../../mk/spksrc.cross-cmake.mk
