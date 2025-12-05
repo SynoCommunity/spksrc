@@ -1,6 +1,6 @@
 PKG_NAME = transmission
-PKG_VERS = 4.1.0-beta.3
-PKG_REVISION = rf20fd5e373
+PKG_VERS = 4.1.0-beta.4
+PKG_REVISION = rc92b42de9c
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)+$(PKG_REVISION).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/transmission/transmission/releases/download/$(PKG_VERS)
