@@ -22,6 +22,7 @@ DEPENDS += cross/libcap
 # needs C11 with some C17 features
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 
 HOMEPAGE = https://www.isc.org/

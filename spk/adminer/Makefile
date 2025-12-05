@@ -1,13 +1,13 @@
 SPK_NAME = adminer
 SPK_VERS = 5.4.1
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/adminer
 
 # SRM is lacking webstation and php
-UNSUPPORTED_ARCHS_TCVERSION = noarch-1.1
+REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = piwi82
 DESCRIPTION = Adminer is a full-featured database management tool available for MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.
@@ -33,7 +33,7 @@ CONF_DIR = src/conf_dsm72
 else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4"
 # DSM >= 7.3 does not support PHP8.0
-OS_MAX_VER = 7.2-81180
+OS_MAX_VER = 7.1-59999
 # DSM 7.0 and 7.1
 CONF_DIR = src/conf_dsm7
 else

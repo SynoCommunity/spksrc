@@ -3,7 +3,7 @@
 # This makefile extends spksrc.cross-cc.mk with Go-specific functionality
 # 
 # prerequisites:
-# - cross/module depends on native/go only
+# - cross/module depends on native/go or native/go_1.23 only
 # - module does not require kernel (REQUIRE_KERNEL)
 # 
 # remarks:

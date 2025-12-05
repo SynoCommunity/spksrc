@@ -39,17 +39,9 @@ endif
 ifeq ($(GCC_DEBUG_INFO),1)
 	@echo "debug = 'true'" ; \
 	echo "b_ndebug = 'true'" ; \
-	echo "optimization = '0'" ; \
+	echo "optimization = '$(strip $(patsubst -O%,%,$(filter -O%,$(GCC_DEBUG_FLAGS))))'" ; \
 	echo
 endif
-#	@echo "install_rpath = [" ; \
-#	echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | grep '^-Wl,--rpath,' | sed -e "s/^-Wl,--rpath,//" -e "s/^/\t'/" -e "s/$$/',/" ; \
-#	echo -ne "\t]\n" ; \
-#	echo
-#	@echo "runtime_rpath = [" ; \
-#	echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | grep '^-Wl,--rpath,' | sed -e "s/^-Wl,--rpath,//" -e "s/^/\t'/" -e "s/$$/',/" ; \
-#	echo -ne "\t]\n" ; \
-#	echo
 	@echo "c_args = ["
 ifneq ($(strip $(MESON_BUILTIN_C_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_ARGS)',\n"
@@ -103,3 +95,12 @@ ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
 endif
 	@echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
+	@echo
+	@echo "rust_args = [" ; \
+	echo -ne "\t'--target=$(RUST_TARGET)',\n" ; \
+	echo -ne "\t'-Clinker=$(TC_PATH)$(TC_PREFIX)gcc',\n"
+ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
+endif
+	@echo $(RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo -ne "\t]\n"

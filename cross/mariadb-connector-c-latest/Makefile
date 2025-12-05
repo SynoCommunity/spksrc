@@ -45,4 +45,19 @@ CMAKE_ARGS += -DWITH_ICONV=ON
 DEPENDS += cross/curl
 CMAKE_ARGS += -DWITH_CURL=ON
 
+# custom mariadb socket addr (default MariaDB is usually /tmp/mysql.sock)
+# on DSM 7 (only MariaDB 10 available)
+#   /run/mysqld/mysqld10.sock  (links to /run/mysqld/mysqld.sock)
+# on DSM 6 with mariadb 5 and 10
+#   /run/mysqld/mysqld.sock (MariaDB 5)
+#   /run/mysqld/mysqld10.sock (MariaDB 10)
+ifeq ($(MYSQL_DB_SOCKET),)
+# default mysql/mariadb socket for DSM
+MYSQL_DB_SOCKET = /run/mysqld/mysqld.sock
+endif
+CMAKE_ARGS += -DMARIADB_UNIX_ADDR=$(MYSQL_DB_SOCKET)
+# Disable default TLS server certificate verification (enabled by default in 3.4.x)
+# to avoid "SSL is required, but the server does not support it" on non-TLS servers.
+CMAKE_ARGS += -DDEFAULT_SSL_VERIFY_SERVER_CERT=OFF
+
 include ../../mk/spksrc.cross-cmake.mk
