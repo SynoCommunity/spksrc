@@ -67,11 +67,15 @@ CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 # Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
 
 # Remove build warnings
-ADDITIONAL_CXXFLAGS  = -Wno-cast-function-type
-ADDITIONAL_CXXFLAGS += -Wno-pedantic
-ADDITIONAL_CXXFLAGS += -Wno-switch
-ADDITIONAL_CXXFLAGS += -Wno-unused-function
-ADDITIONAL_CXXFLAGS += -Wno-variadic-macros
+NATIVE_CXXFLAGS  = -Wno-cast-function-type
+NATIVE_CXXFLAGS += -Wno-enum-compare
+NATIVE_CXXFLAGS += -Wno-pedantic
+NATIVE_CXXFLAGS += -Wno-switch
+NATIVE_CXXFLAGS += -Wno-unused-function
+NATIVE_CXXFLAGS += -Wno-variadic-macros
+
+# Docker build workaround
+CMAKE_ARGS += -DCMAKE_CXX_VISIBILITY_PRESET=default
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
