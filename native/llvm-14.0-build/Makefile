@@ -1,5 +1,4 @@
 PKG_NAME = llvm
-PKG_LLVM_MAJ = 14
 PKG_VERS = 14.0.5
 
 # REMARKS:
@@ -22,8 +21,8 @@ PKG_VERS = 14.0.5
 #      libLLVMSPIRVLib.so.14     <-- for built-time IGC 'vcb'
 
 HOMEPAGE = https://llvm.org/
-COMMENT  = Collection of modular and reusable compiler and toolchain technologies.
-LICENSE  = Apache-2.0 with LLVM-exception
+COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
+LICENSE = Apache 2.0 with LLVM exceptions
 
 DOWNLOAD_TARGET = nop
 CHECKSUM_TARGET = nop
@@ -55,4 +54,4 @@ build-archive:
 ifeq ($(wildcard work-native/install/usr/local/bin/*),)
 	$(error "Installation not found. Please call make first.")
 endif
-	cd work-native && tar -czf ../native-$(PKG_NAME)-$(PKG_VERS).tar.gz ./install/*
+	cd work-native && tar -cJf ../native-$(PKG_NAME)-$(PKG_VERS).txz ./install/*
