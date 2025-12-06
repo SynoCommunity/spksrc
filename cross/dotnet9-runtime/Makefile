@@ -1,5 +1,5 @@
 PKG_NAME = aspnetcore-runtime
-PKG_VERS = 9.0.8
+PKG_VERS = 9.0.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/$(PKG_VERS)

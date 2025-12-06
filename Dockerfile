@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:trixie
 LABEL description="Framework for maintaining and compiling native community packages for Synology devices"
 LABEL maintainer="SynoCommunity <https://github.com/SynoCommunity/spksrc/graphs/contributors>"
 LABEL url="https://synocommunity.com"
@@ -34,29 +34,33 @@ RUN apt update && apt install --no-install-recommends -y \
 	g++-multilib \
 	gawk \
 	gettext \
+	gfortran \
 	git \
+	gobject-introspection \
 	gperf \
 	imagemagick \
 	intltool \
 	jq \
-	libtool-bin \
 	libbz2-dev \
 	libc6-i386 \
 	libcppunit-dev \
+	libelf-dev \
 	libffi-dev \
 	libgc-dev \
 	libgmp3-dev \
+	libicu76 \
 	libltdl-dev \
 	libmount-dev \
 	libncurses-dev \
-	libpcre3-dev \
+	libpcre2-dev \
 	libssl-dev \
 	libtool \
+	libtool-bin \
 	libunistring-dev \
 	lzip \
 	man-db \
 	manpages-dev \
-	mlocate \
+	plocate \
 	moreutils \
 	nasm \
 	p7zip \
@@ -87,19 +91,23 @@ RUN apt install --no-install-recommends -y \
 	meson \
 	ninja-build \
 	python3 \
-	python3-distutils \
 	python3-mako \
 	python3-pip \
+	python3-setuptools \
 	python3-virtualenv \
 	python3-yaml
 
+###
+### Keeping backport channel management for later use
+###
+
 # Add backport channel
-RUN echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/backports.list && \
-    echo "Package: *\nPin: release a=bookworm-backports\nPin-Priority: 100" > /etc/apt/preferences.d/99-backports
+RUN echo "deb http://deb.debian.org/debian trixie-backports main" > /etc/apt/sources.list.d/backports.list && \
+    echo "Package: *\nPin: release a=trixie-backports\nPin-Priority: 100" > /etc/apt/preferences.d/99-backports
 
 # Update package list & install needed package from backport
-RUN apt-get update && \
-    apt-get install -y -t bookworm-backports meson
+RUN apt-get update
+###RUN apt-get install -y -t trixie-backports meson
 
 # Clean-up apt db
 RUN apt clean && \

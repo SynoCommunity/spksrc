@@ -152,7 +152,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      if [ -z "$${localFile}" ]; then \
 	        localFile=$$(basename $${url}) ; \
 	      fi ; \
-	      url=$$(echo $${url} | sed -e 's#//ftp.gnu.org/#//ftpmirror.gnu.org/#g') ; \
+	      url=$$(echo $${url} | sed -E -e 's#//ftp\.gnu\.org/#//ftpmirror.gnu.org/#g' \
+	                                   -e 's#//sourceforge\.net/projects/([^/]+)/files/#//downloads.sourceforge.net/project/\1/#g' \
+	                                   -e 's#//downloads\.sourceforge\.net/projects/([^/]+)/files/#//downloads.sourceforge.net/project/\1/#g') ; \
 	      exec 9> /tmp/wget.$${localFile}.lock ; \
 	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 9 || exit 1 ; \
 	      pid=$$$$ ; \
@@ -160,9 +162,12 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	      if [ -f $${localFile} ]; then \
 	        $(MSG) "  File $${localFile} already downloaded" ; \
 	      else \
-	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 -nv $${url}" ; \
 	        rm -f $${localFile}.part ; \
-	        wget --secure-protocol=TLSv1_2 --timeout=30 -nv -O $${localFile}.part -nc $${url} ; \
+	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused --max-redirect=20 --content-disposition --retry-on-http-error=429,500,502,503,504 -nv -O $${localFile} -nc $${url}" ; \
+	        wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 \
+	             --retry-connrefused --max-redirect=20 --content-disposition \
+	             --retry-on-http-error=429,500,502,503,504 \
+	             -nv -O $${localFile}.part -nc $${url} ; \
 	        mv $${localFile}.part $${localFile} ; \
 	      fi ; \
 	      flock -u 9 ; \

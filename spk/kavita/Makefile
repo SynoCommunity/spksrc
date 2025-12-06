@@ -1,20 +1,21 @@
 SPK_NAME = kavita
-SPK_VERS = 0.8.7
-SPK_REV = 12
+SPK_VERS = 0.8.8.3
+SPK_REV = 14
 SPK_ICON = src/kavita.png
 
 DEPENDS = cross/kavita cross/libe_sqlite3
 
-# Arch exclusions for dotnet 6.0
+# Arch exclusions for dotnet
 DOTNET_CORE_ARCHS = 1
 
-# Requires glibc 2.28 which is not in DSM 6 toolchains
+# Requires glibc 2.28 which is not available in DSM 6 and SRM 1.2
 REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION  = Kavita is a fast, feature rich, cross platform reading server. Built with a focus for being a full solution for all your reading needs.
-CHANGELOG = "Update Kavita to v0.8.7"
+CHANGELOG = "Update Kavita to v0.8.8.3"
 DISPLAY_NAME = Kavita
 HOMEPAGE = https://www.kavitareader.com/
 LICENSE  = GPLv3

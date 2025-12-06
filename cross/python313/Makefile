@@ -1,5 +1,5 @@
 PKG_NAME = python313
-PKG_VERS = 3.13.5
+PKG_VERS = 3.13.8
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)

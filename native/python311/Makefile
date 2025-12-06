@@ -1,5 +1,5 @@
 PKG_NAME = python311
-PKG_VERS = 3.11.13
+PKG_VERS = 3.11.14
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -29,18 +29,21 @@ PYTHON = $(WORK_DIR)/install/usr/local/bin/python3
 PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
-PIP_VERSION = "24.3.1"
-PIP_WHEELS  = setuptools==80.9.0
-PIP_WHEELS += wheel==0.45.1
-PIP_WHEELS += crossenv==1.5.0
+REQUIREMENTS = src/requirements.txt
+PIP_WHEEL = $(shell grep -h -E "(^pip|^)[<>=]=" $(wildcard $(REQUIREMENTS)))
 
 .PHONY: python311_native_post_install
 python311_native_post_install: $(WORK_DIR)/python-native.mk
-	@$(MSG) Installing pip
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	@$(RUN) $(PYTHON) get-pip.py "pip==$(PIP_VERSION)" --no-setuptools --no-wheel --disable-pip-version-check
-	@$(MSG) Installing setuptools, wheel, cffi and crossenv
-	@$(PIP) --disable-pip-version-check install $(PIP_WHEELS)
+ifeq ($(PIP_WHEEL),)
+	@$(MSG) Installing latest pip
+	@$(RUN) $(PYTHON) get-pip.py --no-setuptools --no-wheel --disable-pip-version-check
+else
+	@$(MSG) Installing $(PIP_WHEEL)
+	@$(RUN) $(PYTHON) get-pip.py "$(PIP_WHEEL)" --no-setuptools --no-wheel --disable-pip-version-check
+endif
+	@$(MSG) Installing wheels from requirements file
+	@$(PIP) --disable-pip-version-check install -r $(REQUIREMENTS)
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@

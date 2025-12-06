@@ -11,6 +11,7 @@ PKG_DIR = MPD-$(PKG_VERS)
 # GCC version is too old. You need at least version 8.
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 include ../../mk/spksrc.archs.mk
 

@@ -15,7 +15,6 @@ DEPENDS += cross/libxml2
 
 OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
 
-# by cross/libuv
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk

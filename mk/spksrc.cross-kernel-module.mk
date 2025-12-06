@@ -47,6 +47,7 @@ endif
 
 kernel_module_msg:
 	@$(MSG) "Compiling kernel modules for $(NAME)"
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "kernel-modules") | tee --append $(STATUS_LOG) ; \
 
 pre_kernel_module_target: kernel_module_msg
 
@@ -54,10 +55,31 @@ pre_kernel_module_target: kernel_module_msg
 kernel_module_prepare:
 	@$(MSG) "DISTRIB_DIR = $(DISTRIB_DIR)"
 	@$(MSG) "Prepare kernel source for module build"
+	@for module in $(REQUIRE_KERNEL_MODULE); \
+	do \
+	  cd $(WORK_DIR)/$(PKG_DIR); scripts/config --module $${module%%:*} ; \
+	done
+# olddefconfig is not available on kernels < 3.8
+ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
+	@$(MSG) "make oldconfig OLD style... $(TC_KERNEL) < 3.8"
+	@$(RUN) yes "" | $(MAKE) oldconfig
+else
+	@$(MSG) "make olddefconfig for kernel $(TC_KERNEL)"
+	@$(RUN) $(MAKE) olddefconfig
+endif
+	@if [ -f $(WORK_DIR)/$(PKG_DIR)/tools/lib/subcmd/Makefile ]; then \
+	  $(MSG) "- Disable gcc warnings as error in ./tools/lib/subcmd/Makefile (5.x kernels)." ; \
+	  sed "s/-Wall //" -i.bak $(WORK_DIR)/$(PKG_DIR)/tools/lib/subcmd/Makefile ; \
+	fi
+	@if [ -f $(WORK_DIR)/$(PKG_DIR)/tools/objtool/Makefile ]; then \
+	  $(MSG) "- Disable build of ./tools/objtool (5.x kernels)." ; \
+	  echo "all:" > $(WORK_DIR)/$(PKG_DIR)/tools/objtool/Makefile ; \
+	fi
 	@$(RUN) $(MAKE) modules_prepare
 
 .PHONY: kernel_module_target
 kernel_module_target:  $(PRE_KERNEL_MODULE_TARGET) kernel_module_prepare
+	@$(MSG) Compile kernel modules $(REQUIRE_KERNEL_MODULE)
 	@for module in $(REQUIRE_KERNEL_MODULE); \
 	do \
 	  $(MAKE) kernel_module_compile module=$$module ; \
@@ -65,10 +87,10 @@ kernel_module_target:  $(PRE_KERNEL_MODULE_TARGET) kernel_module_prepare
 
 .PHONY: kernel_module_compile
 kernel_module_compile:
-	@$(MSG) Compiling kernel module module=$(module)
-	@$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/$(PKG_DIR) INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
+	@$(MSG) Compile kernel module module=$(module)
+	@$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/$(PKG_DIR) M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m OBJECT_FILES_NON_STANDARD=y modules
 	@$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/$(PKG_DIR)/modules.order
-	@$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))
+	install -d $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))
 	install -m 644 $(WORK_DIR)/$(PKG_DIR)/$(word 2,$(subst :, ,$(module)))/$(lastword $(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(subst syno-,,$(NAME))/$(TC_KERNEL)/$(word 2,$(subst :, ,$(module)))
 
 post_kernel_module_target: $(KERNEL_MODULE_TARGET)
@@ -82,4 +104,3 @@ $(KERNEL_MODULE_COOKIE): $(POST_KERNEL_MODULE_TARGET)
 else
 kernel_module: ;
 endif
-

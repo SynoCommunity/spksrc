@@ -1,6 +1,7 @@
 distrib
 packages
 native/*/work*
+native/*/build*
 native/*/status*
 cross/*/work*
 cross/*/build*
@@ -18,7 +19,8 @@ diyspk/*/work*
 diyspk/*/build*
 diyspk/*/status*
 toolchain/*/work*
-toolchain/*/*_done
+toolchain/*/build*
+toolchain/*/status*
 toolkit/*/work*
 local.mk
 *.DS_Store

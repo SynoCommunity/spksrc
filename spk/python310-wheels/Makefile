@@ -32,6 +32,7 @@ SERVICE_SETUP = src/service-setup.sh
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/pandas
 OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
@@ -64,9 +65,17 @@ endif
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
+ifeq ($(call version_lt, $(TC_GCC), 4.8),1)
+WHEELS_CFLAGS += [lxml] -std=gnu99
+WHEELS += lxml==5.4.0
+else ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [lxml] -std=c11
+WHEELS += lxml==5.4.0
+else
+WHEELS += lxml==6.0.2
+endif
 
 # [mysqlclient]
-DEPENDS += cross/mysql-connector-c
 DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
@@ -175,6 +184,11 @@ ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
 DEPENDS += python/scipy
 endif
 
+# [pandas] - depends on numpy >= 1.26
+ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+DEPENDS += python/pandas
+endif
+
 # >> [numpy] and [scipy] unsupported with old PPC arch
 endif
 
@@ -190,4 +204,9 @@ ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 else
 WHEELS_CFLAGS += [pycryptodomex] -std=c99
+endif
+
+# [pygobject]
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+DEPENDS += python/pygobject
 endif

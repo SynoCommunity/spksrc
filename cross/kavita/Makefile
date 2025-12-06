@@ -1,8 +1,9 @@
 PKG_NAME = kavita
-PKG_VERS = 0.8.7
+PKG_VERS = 0.8.8.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Kareadita/Kavita/releases/download/v$(PKG_VERS)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIR = Kavita
 
 DEPENDS =

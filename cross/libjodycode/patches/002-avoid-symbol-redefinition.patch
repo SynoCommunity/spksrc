@@ -1,13 +1,13 @@
 # use jodyhash_t definition by include of jody_hash.h to avoid symbol redefinition
 # 
 # without this patch old GCC fails with error:
-# In file included from jc_block_hash.c:9:
+# In file included from block_hash.c:9:
 # jody_hash.h:43: error: redefinition of typedef 'jodyhash_t'
-# libjodycode.h:132: error: previous declaration of 'jodyhash_t' was here
+# libjodycode.h:382: error: previous declaration of 'jodyhash_t' was here
 # 
---- libjodycode.h.orig	2024-07-26 01:01:47.000000000 +0200
-+++ libjodycode.h	2024-10-19 00:20:12.960721930 +0200
-@@ -121,16 +121,13 @@
+--- libjodycode.h.orig	2025-08-21 19:48:43.000000000 +0000
++++ libjodycode.h	2025-08-21 19:58:53.614413751 +0000
+@@ -371,16 +371,13 @@
  
  
  /*** jody_hash ***/
@@ -15,13 +15,13 @@
  
  /* Version increments when algorithm changes incompatibly */
  #ifndef JODY_HASH_VERSION
- #define JODY_HASH_VERSION 7
+  #define JODY_HASH_VERSION 7
  #endif
  
 -/* Width of a jody_hash */
 -#define JODY_HASH_WIDTH 64
 -typedef uint64_t jodyhash_t;
 -
- extern int jc_block_hash(jodyhash_t *data, jodyhash_t *hash, const size_t count);
+ enum jc_e_hash { NORMAL = 0, ROLLING = 1 };
  
- 
+ extern int jc_block_hash(const enum jc_e_hash type, jodyhash_t *data, jodyhash_t *hash, const size_t count);

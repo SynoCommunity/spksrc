@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg7
-SPK_VERS = 7.0.2
-SPK_REV = 2
+SPK_VERS = 7.0.3
+SPK_REV = 4
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Fix issue on ppc-qoriq arch"
+CHANGELOG = "1. Update to version 7.0.3<br/>2. Apply crash fix by checking ctx->pic_end before accessing its pts field."
 
 DEPENDS = cross/ffmpeg7
 

@@ -21,30 +21,6 @@ TOOLKIT_ROOT = $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
 ENV += TOOLKIT_ROOT=$(TOOLKIT_ROOT)
 endif
 
-ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-GCC_DEBUG_FLAGS = -O0 -g3
-ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_DEBUG_FLAGS)
-ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_DEBUG_FLAGS)
-ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_DEBUG_FLAGS)
-endif
-
-# gcc:
-#  -g0 deactivates debug information generation
-#  -Os enable some optimizations while avoiding those that increases space
-#  -flto enable optimization at link time (Link Time Optimization)
-#  -ffunction-sections -fdata-sections allows placing functions in their own ELF section
-# ld:
-#  -Wl,--gc-sections allows removing unused functions set previously (-f*-sections)
-#  -w omits the DWARF symbol table removing debugging information
-#  -s strips the symbol table and debug information from the binary
-ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
-GCC_NO_DEBUG_FLAGS = -g0 -Os -ffunction-sections -fdata-sections -fvisibility=hidden
-ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_NO_DEBUG_FLAGS)
-ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_NO_DEBUG_FLAGS)
-ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_NO_DEBUG_FLAGS)
-ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) -w -s -Wl,--gc-sections
-endif
-
 ifneq ($(strip $(TC)),)
 TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
 TC_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
@@ -82,10 +58,8 @@ else
 endif
 
 -include $(TC_VARS_MK)
-ifneq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
-endif
 endif
 
 # Allow toolchain mandatory variables to
@@ -94,3 +68,54 @@ endif
 ENV += TC_GCC=$$(eval $$(echo $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -dumpversion) 2>/dev/null || true)
 ENV += TC_GLIBC=$(TC_GLIBC)
 ENV += TC_KERNEL=$(TC_KERNEL)
+
+# Debug flags (remove any other -O%):
+#  -ggdb3 generates extensive debug info optimized for GDB
+#  -g3 includes macro definitions in debug info
+#  -O0 disables optimizations for predictable debugging
+#  -gz compresses debug sections to reduce file size (60-80% smaller)
+#
+# PowerPC e500v2 (qoriq): Use -O1 to avoid stack frame offset limitations
+# (e500v2 has 248-byte max offset for certain load/store instructions)
+#
+# GCC 4.8.3 (hi3535/armv7l) with old binutils cannot handle compressed
+# debug sections from -g3. Use -g (level 2) instead which generates
+# less debug info and avoids compression
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+  ifeq ($(strip $(GCC_DEBUG_FLAGS)),)
+    ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
+      GCC_DEBUG_FLAGS = -ggdb3 -g3 -O1 -fno-omit-frame-pointer
+    else ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+      GCC_DEBUG_FLAGS = -ggdb3 -g3 -O1 -fno-omit-frame-pointer
+    else
+      GCC_DEBUG_FLAGS = -ggdb3 -g -O0
+    endif
+
+    # Check compression support and add to flags
+    GCC_SUPPORTS_GZ := $(shell echo | $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -gz -E - 2>/dev/null 1>&2 && echo yes)
+    ifeq ($(strip $(GCC_SUPPORTS_GZ)),yes)
+      GCC_DEBUG_FLAGS += -gz
+    endif
+  endif
+
+  ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS))
+  ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS))
+  ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS))
+  ADDITIONAL_RUSTFLAGS := -Cdebuginfo=2 -Copt-level=0
+
+# gcc:
+#  -g0 deactivates debug information generation
+#  -Os enable some optimizations while avoiding those that increases space
+#  -flto enable optimization at link time (Link Time Optimization)
+#  -ffunction-sections -fdata-sections allows placing functions in their own ELF section
+# ld:
+#  -Wl,--gc-sections allows removing unused functions set previously (-f*-sections)
+#  -w omits the DWARF symbol table removing debugging information
+#  -s strips the symbol table and debug information from the binary
+else ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
+  GCC_NO_DEBUG_FLAGS = -g0 -Os -ffunction-sections -fdata-sections -fvisibility=hidden
+  ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS)) $(GCC_NO_DEBUG_FLAGS)
+  ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS)) $(GCC_NO_DEBUG_FLAGS)
+  ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS)) $(GCC_NO_DEBUG_FLAGS)
+  ADDITIONAL_LDFLAGS := $(ADDITIONAL_LDFLAGS) -w -s -Wl,--gc-sections
+endif
