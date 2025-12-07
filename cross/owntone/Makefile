@@ -1,38 +1,51 @@
 PKG_NAME = owntone
-PKG_VERS = 28.1
+PKG_VERS = 29.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/owntone/owntone-server/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-OPTIONAL_DEPENDS = cross/ffmpeg4
+# https://github.com/owntone/owntone-server/releases/download/29.0/owntone-29.0.tar.xz
+# ffmpeg7 requires c11 support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-DEPENDS = cross/libunistring cross/zlib cross/libconfuse cross/curl
-DEPENDS += cross/mxml cross/sqlite cross/libevent cross/json-c
-DEPENDS += cross/libantlr3c cross/libgcrypt
+# build instructions:
+# https://owntone.github.io/owntone-server/building/
+
+DEPENDS  = cross/openssl3
+DEPENDS += cross/libwebsockets
+DEPENDS += cross/curl
+DEPENDS += cross/libunistring
+DEPENDS += cross/libconfuse
+DEPENDS += cross/libsodium
+DEPENDS += cross/mxml
+DEPENDS += cross/libxml2
+DEPENDS += cross/sqlite
+DEPENDS += cross/libevent
+DEPENDS += cross/json-c
+DEPENDS += cross/libantlr3c
+DEPENDS += cross/libgcrypt
 DEPENDS += cross/avahi
 DEPENDS += cross/libplist
-DEPENDS += cross/libwebsockets
-DEPENDS += cross/libsodium
 DEPENDS += cross/alsa-lib
-
-ifeq ($(wildcard $(FFMPEG_DIR)),)
-DEPENDS += cross/ffmpeg4
-endif
+DEPENDS += cross/protobuf-c
 
 HOMEPAGE = http://owntone.github.io/owntone-server
 COMMENT  = OwnTone is forked-daapd's new name. Linux/FreeBSD DAAP (iTunes) and MPD media server with support for AirPlay devices (multiroom), Apple Remote (and compatibles), Chromecast, Spotify and internet radio. 
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
-ADDITIONAL_CFLAGS = -std=c99
 
 include ../../mk/spksrc.archs.mk
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 POST_INSTALL_TARGET = owntone_post_install
 else
 PLIST_TRANSFORM = sed -e '/\/libssp\.so/d' 
 endif
+
+CONFIGURE_ARGS  = --with-libgcrypt-prefix=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-libgpg-error-prefix=$(STAGING_INSTALL_PREFIX)
+
 
 include ../../mk/spksrc.cross-cc.mk
 

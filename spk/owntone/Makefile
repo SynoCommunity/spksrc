@@ -1,9 +1,14 @@
 SPK_NAME = owntone
-SPK_VERS = 28.1
+SPK_VERS = 29.0
 SPK_REV = 1
 SPK_ICON = src/owntone.png
 
-DEPENDS = cross/owntone
+FFMPEG_PACKAGE = ffmpeg7
+DEPENDS = cross/owntone_ffmpeg7
+SPK_DEPENDS = $(FFMPEG_PACKAGE)
+
+# ffmpeg7 requires c11 support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = OwnTone is forked-daapd\'s new name. Linux/FreeBSD DAAP \(iTunes\) and MPD media server with support for AirPlay devices \(multiroom\), Apple Remote \(and compatibles\), Chromecast, Spotify and internet radio.
@@ -25,26 +30,9 @@ STARTABLE = yes
 SERVICE_PORT = 3689
 ADMIN_PORT = $(SERIVCE_PORT)
 
-# Reuse FFmpeg libraries
-export FFMPEG_DIR = $(shell pwd)/../ffmpeg4/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
-
-ifneq ($(wildcard $(FFMPEG_DIR)),)
-PRE_DEPEND_TARGET = owntone_pre_depend
-SPK_DEPENDS = "ffmpeg>4.2"
-# Use some shared libraries of the FFMPEG package
-FFMPEG_LIBS = libavformat.pc libavcodec.pc libavutil.pc libavfilter.pc
-FFMPEG_LIBS += libswscale.pc libpostproc.pc
-FFMPEG_LIBS += libswresample.pc libavresample.pc
-endif
-
 POST_STRIP_TARGET = owntone_extra_install
 
-include ../../mk/spksrc.spk.mk
-
-.PHONY: owntone_pre_depend
-owntone_pre_depend:
-	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+include ../../mk/spksrc.ffmpeg.mk
 
 .PHONY: owntone_extra_install
 owntone_extra_install:
