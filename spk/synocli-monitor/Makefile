@@ -1,6 +1,6 @@
 SPK_NAME = synocli-monitor
 SPK_VERS = 1.8
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/synocli-monitor.png
 
 DEPENDS  = cross/nmon cross/njmon
@@ -43,17 +43,27 @@ DEPENDS += cross/btop
 endif
 
 MAINTAINER = hgy59
-DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
-DISPLAY_NAME = SynoCli Monitor Tools
-STARTABLE = no
-CHANGELOG = "1. Add btop 1.4.5."
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
 
+WIKI_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliMonitor\</a\>"
+
+# Remarks: html in DESCRIPTION is not supported
+DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
+DISPLAY_NAME = SynoCli Monitor Tools
+STARTABLE = no
+CHANGELOG  = "1. Add btop 1.4.5. </br>"
+CHANGELOG += "2. Update bottom to v0.11.4. </br>"
+CHANGELOG += "3. Update iperf3 to v3.20. </br>"
+CHANGELOG += "4. Update njmon to v90. </br>"
+CHANGELOG += "5. Update nmon v16s. </br>"
+CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
+
 SERVICE_SETUP = src/service-setup.sh
 
 SPK_COMMANDS  = bin/htop
+SPK_COMMANDS += bin/btop
 SPK_COMMANDS += bin/nmon bin/njmon
 SPK_COMMANDS += bin/iperf2 bin/iperf3
 SPK_COMMANDS += bin/ionice
@@ -66,6 +76,5 @@ SPK_COMMANDS += bin/procs
 SPK_COMMANDS += bin/snmpget bin/snmpgetnext bin/snmpbulkget bin/snmpwalk bin/snmpbulkwalk bin/snmpdelta bin/snmpdf
 SPK_COMMANDS += bin/snmpinform bin/snmpnetstat bin/snmpps bin/snmpstatus bin/snmptable bin/snmptest bin/snmptranslate
 SPK_COMMANDS += bin/sensors bin/sensors-conf-convert sbin/fancontrol sbin/sensors-detect
-SPK_COMMANDS += bin/btop
 
 include ../../mk/spksrc.spk.mk

@@ -1,5 +1,5 @@
 SPK_NAME = nmon
-SPK_VERS = 16q
+SPK_VERS = 16s
 SPK_REV = 1
 SPK_ICON = src/nmon.png
 
@@ -10,9 +10,9 @@ DESCRIPTION = nmon \(Nigel\'s performance Monitor\) is a performance monitoring 
 DISPLAY_NAME = nmon
 STARTABLE = no
 
-HOMEPAGE   = http://nmon.sourceforge.net/
-LICENSE    = GPLv3
-HELP_URL   = http://nmon.sourceforge.net/pmwiki.php
+HOMEPAGE = http://nmon.sourceforge.net/
+LICENSE = GPLv3
+HELP_URL = http://nmon.sourceforge.net/pmwiki.php
 
 SPK_COMMANDS = bin/nmon
 
