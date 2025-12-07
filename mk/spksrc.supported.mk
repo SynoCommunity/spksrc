@@ -9,12 +9,20 @@ include ../../mk/spksrc.common-rules.mk
 # make all-supported
 ifeq (supported,$(findstring supported,$(subst -, ,$(firstword $(MAKECMDGOALS)))))
 TARGET_TYPE = supported
+ifeq ($(ARCH),noarch)
+TARGET_ARCH = $(addprefix noarch-,$(sort $(foreach version,$(SUPPORTED_ARCHS),$(word 2,$(subst -, ,$(version))))))
+else
 TARGET_ARCH = $(SUPPORTED_ARCHS)
+endif
 
 # make all-latest
 else ifeq (latest,$(findstring latest,$(subst -, ,$(firstword $(MAKECMDGOALS)))))
 TARGET_TYPE = latest
+ifeq ($(ARCH),noarch)
+TARGET_ARCH = $(addprefix noarch-,$(sort $(foreach version,$(LATEST_ARCHS),$(word 2,$(subst -, ,$(version))))))
+else
 TARGET_ARCH = $(LATEST_ARCHS)
+endif
 endif
 
 # error: make setup not invoked
