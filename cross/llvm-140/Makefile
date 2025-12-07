@@ -74,9 +74,6 @@ ADDITIONAL_CXXFLAGS += -Wno-switch
 ADDITIONAL_CXXFLAGS += -Wno-unused-function
 ADDITIONAL_CXXFLAGS += -Wno-variadic-macros
 
-# Docker build workaround
-CMAKE_ARGS += -DCMAKE_CXX_VISIBILITY_PRESET=default
-
 # -----------------------------------------------------------------------------
 # Reduce build-time binary size
 # -----------------------------------------------------------------------------
