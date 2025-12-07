@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/owntone.png
 
 FFMPEG_PACKAGE = ffmpeg7
-DEPENDS = cross/owntone_ffmpeg7
+DEPENDS = cross/owntone
 SPK_DEPENDS = $(FFMPEG_PACKAGE)
 
 # ffmpeg7 requires c11 support
