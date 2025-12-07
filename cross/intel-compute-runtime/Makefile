@@ -1,8 +1,11 @@
 PKG_NAME = compute-runtime
-# Last version compatible with Gen9
-PKG_VERS = 24.35
+# Last maintained branch 24.35 with Gen8-9-11-12 support
+PKG_VERS = 24.35.30872.40
 PKG_EXT = tar.gz
+PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/compute-runtime/archive
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Use last git commit from releases/24.35 branch:
 # https://github.com/intel/compute-runtime/blob/master/BUILD.md#optional---building-neo-with-support-for-gen8-gen9-and-gen11-devices
@@ -11,12 +14,11 @@ PKG_DIST_SITE = https://github.com/intel/compute-runtime/archive
 # cd compute-runtime && git checkout releases/24.35
 # git rev-parse HEAD
 #    6595ef08f71c8a23806aaf1cdde783bc449ec4e0
-
-PKG_GIT_BRANCH = release/$(PKG_VERS)
-PKG_GIT_HASH = 6595ef08f71c8a23806aaf1cdde783bc449ec4e0
-PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
+#PKG_GIT_BRANCH = release/$(PKG_VERS)
+#PKG_GIT_HASH = 6595ef08f71c8a23806aaf1cdde783bc449ec4e0
+#PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
+#PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+#PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
 HOMEPAGE = https://github.com/intel/compute-runtime
 COMMENT = The Intel(R) Graphics Compute Runtime for oneAPI Level Zero and OpenCL(TM) Driver is an open source project providing compute API support (Level Zero, OpenCL) for Intel graphics hardware architectures (HD Graphics, Xe).
@@ -63,6 +65,9 @@ CMAKE_ARGS += -DNEO_CURRENT_PLATFORMS_SUPPORT='OFF'
 # [OpenCL/GL-Headers]
 CMAKE_ARGS += -DKHRONOS_GL_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 CMAKE_ARGS += -DKHRONOS_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
+
+# Docker build workaround
+CMAKE_ARGS += -DCMAKE_CXX_VISIBILITY_PRESET=default
 
 # -----------------------------------------------------------------------------
 # Reduce build-time binary size

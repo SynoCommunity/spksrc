@@ -57,6 +57,9 @@ CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
 CMAKE_ARGS += -DIGC_BUILD__VC_ENABLED=ON
 CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Prebuilds'
 
+# Docker build workaround
+CMAKE_ARGS += -DCMAKE_CXX_VISIBILITY_PRESET=default
+
 # -----------------------------------------------------------------------------
 # Access to native/llvm-14.0 spcific binaries
 # -----------------------------------------------------------------------------

@@ -79,7 +79,7 @@ include ../../mk/spksrc.tc-rust.mk
 # Define _all as a real target that does the work
 .PHONY: _all
 _all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON_CROSS) $(TC_LOCAL_VARS_MESON_NATIVE) $(TC_LOCAL_VARS_MK)
-
+spksrc.tc.mk
 # all wraps _all with logging
 .PHONY: all
 .DEFAULT_GOAL := all
@@ -188,14 +188,6 @@ endif
 	echo "# search headers and libraries in the target environment" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY $(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY))" ; \
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE $(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE))"
-	@echo ; \
-	echo "# Default visibility for Docker compatibility" ; \
-	echo "if(NOT DEFINED CMAKE_CXX_VISIBILITY_PRESET)" ; \
-	echo "    set(CMAKE_CXX_VISIBILITY_PRESET default CACHE STRING \"Symbol visibility preset\")" ; \
-	echo "endif()" ;\
-	echo "if(NOT DEFINED CMAKE_C_VISIBILITY_PRESET)" ; \
-	echo "    set(CMAKE_C_VISIBILITY_PRESET default CACHE STRING \"Symbol visibility preset\")" ; \
-	echo "endif()"
 	@echo ; \
 	echo "# Rust compiler and Cargo" ; \
 	echo "set(CARGO  $(RUSTUP_HOME)/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo)"
