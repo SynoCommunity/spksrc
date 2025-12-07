@@ -79,7 +79,7 @@ include ../../mk/spksrc.tc-rust.mk
 # Define _all as a real target that does the work
 .PHONY: _all
 _all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON_CROSS) $(TC_LOCAL_VARS_MESON_NATIVE) $(TC_LOCAL_VARS_MK)
-spksrc.tc.mk
+
 # all wraps _all with logging
 .PHONY: all
 .DEFAULT_GOAL := all
