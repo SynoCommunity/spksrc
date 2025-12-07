@@ -1,0 +1,123 @@
+# Pelican Panel Docker Compose Configuration
+# For Synology DSM 7.2+ with Container Manager
+# Version: 1.0.0-beta28
+
+services:
+  panel:
+    image: ghcr.io/pelican-dev/panel:latest
+    container_name: pelican_panel-panel-1
+    restart: unless-stopped
+
+    ports:
+      # Internal port 8090 - the loading proxy handles 8080
+      - "${PANEL_INTERNAL_PORT:-8090}:8080"
+      - "${PANEL_HTTPS_PORT:-8443}:443"
+
+    extra_hosts:
+      # Required for Wings to communicate with Panel on same host
+      - "host.docker.internal:host-gateway"
+
+    volumes:
+      # Persistent data (SQLite DB, uploads, cache)
+      - ${DATA_ROOT}/pelican-data:/pelican-data
+      # Application logs
+      - ${DATA_ROOT}/pelican-logs:/var/www/html/storage/logs
+      # Patched PHP files for Synology (default Wings port 8445)
+      - /var/packages/pelican_panel/target/share/patches/Node.php:/var/www/html/app/Models/Node.php:ro
+      - /var/packages/pelican_panel/target/share/patches/CreateNode.php:/var/www/html/app/Filament/Admin/Resources/Nodes/Pages/CreateNode.php:ro
+      - /var/packages/pelican_panel/target/share/patches/EditNode.php:/var/www/html/app/Filament/Admin/Resources/Nodes/Pages/EditNode.php:ro
+
+    environment:
+      # Data location (required for Pelican)
+      XDG_DATA_HOME: /pelican-data
+
+      # Application settings
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: "${APP_URL}"
+      APP_TIMEZONE: "${APP_TIMEZONE:-Europe/Paris}"
+
+      # Email for Caddy SSL (Let's Encrypt) - required even if not using HTTPS
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@localhost}"
+
+      # Session/Cookie (false for HTTP, true with reverse proxy HTTPS)
+      SESSION_SECURE_COOKIE: "false"
+
+      # Trust all proxies (DSM reverse proxy)
+      TRUSTED_PROXIES: "*"
+
+      # Mail (optional, can configure in admin panel)
+      MAIL_DRIVER: "${MAIL_DRIVER:-log}"
+      MAIL_HOST: "${MAIL_HOST:-}"
+      MAIL_PORT: "${MAIL_PORT:-587}"
+      MAIL_FROM: "${MAIL_FROM:-}"
+      MAIL_USERNAME: "${MAIL_USERNAME:-}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD:-}"
+      MAIL_ENCRYPTION: "${MAIL_ENCRYPTION:-tls}"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  wings:
+    image: ghcr.io/pelican-dev/wings:latest
+    container_name: pelican_panel-wings-1
+    restart: unless-stopped
+
+    ports:
+      # Wings API port
+      # IMPORTANT: Lors de la création du Node dans le Panel, utilisez le port 8445
+      - "${WINGS_PORT:-8445}:8080"
+      - "${WINGS_SFTP_PORT:-2022}:2022"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    volumes:
+      # Wings configuration
+      - ${DATA_ROOT}/wings:/etc/pelican
+      # Docker socket for container management
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Server data - IMPORTANT: same path inside and outside for Docker-in-Docker
+      - ${DATA_ROOT}/servers:${DATA_ROOT}/servers
+      # Server backups
+      - ${DATA_ROOT}/backups:${DATA_ROOT}/backups
+      # Server archives
+      - ${DATA_ROOT}/archives:${DATA_ROOT}/archives
+      # Temporary files for installation scripts - must be accessible from host
+      - ${DATA_ROOT}/tmp:${DATA_ROOT}/tmp
+      # Logs
+      - ${DATA_ROOT}/wings-logs:${DATA_ROOT}/wings-logs
+
+    environment:
+      TZ: "${APP_TIMEZONE:-Europe/Paris}"
+      WINGS_UID: 0
+      WINGS_GID: 0
+      WINGS_USERNAME: root
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/system"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  default:
+    name: pelican_network
+    driver: bridge

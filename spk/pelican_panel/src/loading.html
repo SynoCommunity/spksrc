@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelican Panel - Initialisation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .logo-container {
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .progress-container {
+            margin-bottom: 40px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4fc3f7, #29b6f6);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.5s ease-out;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                transparent 100%
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .progress-percent {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #4fc3f7;
+        }
+
+        .progress-time {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .status-container {
+            min-height: 100px;
+        }
+
+        .status-message {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .migrations-info {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #4fc3f7;
+            font-family: monospace;
+        }
+
+        .current-migration {
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(79, 195, 247, 0.3);
+            border-top-color: #4fc3f7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .warning {
+            margin-top: 50px;
+            padding: 16px 24px;
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .warning-icon {
+            color: #ffc107;
+            font-size: 1.2rem;
+        }
+
+        .warning-text {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: left;
+        }
+
+        /* Success state */
+        .success .progress-bar {
+            background: linear-gradient(90deg, #4caf50, #81c784);
+        }
+
+        .success .progress-percent {
+            color: #81c784;
+        }
+
+        .success .spinner {
+            display: none;
+        }
+
+        .success .status-message::before {
+            content: '✓';
+            color: #81c784;
+            font-size: 1.2rem;
+        }
+
+        .checkmark {
+            display: none;
+            color: #81c784;
+        }
+
+        .success .checkmark {
+            display: inline;
+        }
+
+        /* Elapsed time */
+        .elapsed {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="logo-container">
+            <div class="logo">PELICAN</div>
+            <div class="logo-subtitle">Game Server Management</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-info">
+                <span class="progress-percent" id="progressPercent">0%</span>
+                <span class="progress-time" id="progressTime">Calcul en cours...</span>
+            </div>
+        </div>
+
+        <div class="status-container">
+            <div class="status-message" id="statusMessage">
+                <span class="spinner" id="spinner"></span>
+                <span id="statusText">Connexion au service...</span>
+            </div>
+            <div class="migrations-info" id="migrationsInfo"></div>
+            <div class="current-migration" id="currentMigration"></div>
+        </div>
+
+        <div class="warning">
+            <span class="warning-icon">⚠</span>
+            <span class="warning-text">
+                Ne fermez pas cette fenêtre. Le premier démarrage peut prendre plusieurs minutes
+                pour initialiser la base de données.
+            </span>
+        </div>
+
+        <div class="elapsed" id="elapsed"></div>
+    </div>
+
+    <script>
+        const elements = {
+            container: document.getElementById('container'),
+            progressBar: document.getElementById('progressBar'),
+            progressPercent: document.getElementById('progressPercent'),
+            progressTime: document.getElementById('progressTime'),
+            statusText: document.getElementById('statusText'),
+            migrationsInfo: document.getElementById('migrationsInfo'),
+            currentMigration: document.getElementById('currentMigration'),
+            spinner: document.getElementById('spinner'),
+            elapsed: document.getElementById('elapsed')
+        };
+
+        let lastProgress = 0;
+
+        function formatTime(seconds) {
+            if (seconds <= 0 || !seconds) return '--:--';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+        }
+
+        function formatElapsed(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            if (mins === 0) {
+                return `${secs} seconde${secs > 1 ? 's' : ''}`;
+            }
+            return `${mins} minute${mins > 1 ? 's' : ''} ${secs}s`;
+        }
+
+        async function updateStatus() {
+            try {
+                const response = await fetch('/api/loading-status');
+                const data = await response.json();
+
+                // Update progress bar with smooth animation
+                const progress = Math.max(lastProgress, data.progress || 0);
+                elements.progressBar.style.width = progress + '%';
+                elements.progressPercent.textContent = progress + '%';
+                lastProgress = progress;
+
+                // Update status message
+                elements.statusText.textContent = data.message || 'Chargement...';
+
+                // Update migrations info
+                if (data.migrations_done > 0 && data.migrations_total) {
+                    elements.migrationsInfo.textContent =
+                        `Tables: ${data.migrations_done}/${data.migrations_total}`;
+
+                    // Show current migration name if available
+                    if (data.current_migration) {
+                        elements.currentMigration.textContent = `→ ${data.current_migration}`;
+                    } else {
+                        elements.currentMigration.textContent = '';
+                    }
+                } else {
+                    elements.migrationsInfo.textContent = '';
+                    elements.currentMigration.textContent = '';
+                }
+
+                // Update time estimate
+                if (data.estimated_remaining_seconds && data.estimated_remaining_seconds > 0) {
+                    elements.progressTime.textContent =
+                        'Temps restant estimé: ' + formatTime(data.estimated_remaining_seconds);
+                } else if (progress >= 95) {
+                    elements.progressTime.textContent = 'Presque terminé...';
+                } else {
+                    elements.progressTime.textContent = 'Calcul en cours...';
+                }
+
+                // Update elapsed time
+                if (data.elapsed_seconds) {
+                    elements.elapsed.textContent =
+                        'Temps écoulé: ' + formatElapsed(data.elapsed_seconds);
+                }
+
+                // Check if ready
+                if (data.panel_ready) {
+                    elements.container.classList.add('success');
+                    elements.statusText.textContent = 'Panel prêt ! Redirection...';
+                    elements.progressBar.style.width = '100%';
+                    elements.progressPercent.textContent = '100%';
+                    elements.progressTime.textContent = '';
+                    elements.migrationsInfo.textContent = '';
+                    elements.currentMigration.textContent = '';
+
+                    // Redirect after a short delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                }
+
+            } catch (error) {
+                // API not available yet, show waiting state
+                elements.statusText.textContent = 'Connexion au service...';
+                elements.statusDetail.textContent = 'En attente du démarrage du proxy';
+            }
+        }
+
+        // Initial update
+        updateStatus();
+
+        // Update every 2 seconds
+        setInterval(updateStatus, 2000);
+    </script>
+</body>
+</html>
