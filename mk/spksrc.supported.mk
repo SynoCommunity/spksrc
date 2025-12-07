@@ -78,7 +78,7 @@ build-arch-%:
 build-noarch-%: SHELL:=/bin/bash
 build-noarch-%: 
 	@$(MSG) BUILDING noarch package for TCVERSION $*
-	@MAKEFLAGS= $(MAKE) TCVERSION=$* ARCH= 2>&1 ; \
+	@MAKEFLAGS= $(MAKE) TCVERSION=$* ARCH=noarch 2>&1 ; \
 	status=$${PIPESTATUS[0]} ; \
 	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, TCVERSION: %s, NAME: %s [END]\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") | tee --append $(STATUS_LOG) ; \
 	[ $${status[0]} -eq 0 ] || false
