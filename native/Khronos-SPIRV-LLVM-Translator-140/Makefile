@@ -43,7 +43,7 @@ CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(STAGING_INSTALL_PREFIX)
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 
 # Remove build warnings
-ADDITIONAL_CXXFLAGS = -Wno-maybe-uninitialized
+NATIVE_CXXFLAGS = -Wno-maybe-uninitialized
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
