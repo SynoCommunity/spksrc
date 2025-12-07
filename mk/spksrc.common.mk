@@ -144,7 +144,7 @@ ifneq ($(filter 1 on ON,$(PSTAT)),)
 PSTAT_TIME = time -o $(STATUS_LOG) --append --quiet
 endif
 
-DEFAULT_LOG  = $(LOG_DIR)/build$(ARCH_SUFFIX).log
+DEFAULT_LOG  = $(LOG_DIR)/build$(or $(ARCH_SUFFIX),-noarch-$(TCVERSION)).log
 CROSSENV_LOG = $(LOG_DIR)/build$(ARCH_SUFFIX)-crossenv.log
 WHEEL_LOG    = $(LOG_DIR)/build$(ARCH_SUFFIX)-wheel.log
 NATIVE_LOG   = $(LOG_DIR)/build-native-$(PKG_NAME).log
