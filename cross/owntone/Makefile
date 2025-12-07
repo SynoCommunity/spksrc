@@ -8,6 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # https://github.com/owntone/owntone-server/releases/download/29.0/owntone-29.0.tar.xz
 # ffmpeg7 requires c11 support
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# archs lacking SO_REUSEPORT in sockets.h
+UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS) $(PPC_ARCHS) $(i686_ARCHS) comcerto2k
 
 # build instructions:
 # https://owntone.github.io/owntone-server/building/
@@ -31,17 +33,12 @@ DEPENDS += cross/alsa-lib
 DEPENDS += cross/protobuf-c
 
 HOMEPAGE = http://owntone.github.io/owntone-server
-COMMENT  = OwnTone is forked-daapd's new name. Linux/FreeBSD DAAP (iTunes) and MPD media server with support for AirPlay devices (multiroom), Apple Remote (and compatibles), Chromecast, Spotify and internet radio. 
-LICENSE  = GPLv2
+COMMENT = OwnTone is an open source (audio) media server.
+LICENSE = GPLv2
 
 GNU_CONFIGURE = 1
 
-include ../../mk/spksrc.archs.mk
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 POST_INSTALL_TARGET = owntone_post_install
-else
-PLIST_TRANSFORM = sed -e '/\/libssp\.so/d' 
-endif
 
 CONFIGURE_ARGS  = --with-libgcrypt-prefix=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-libgpg-error-prefix=$(STAGING_INSTALL_PREFIX)
