@@ -3,7 +3,7 @@ SPK_VERS = 32.0.2
 SPK_REV = 1
 SPK_ICON = src/nextcloud.png
 
-DEPENDS = cross/nextcloud
+DEPENDS =
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
@@ -21,7 +21,7 @@ CHANGELOG = "Initial packaging for Nextcloud 32.0.2."
 HOMEPAGE = https://nextcloud.com/
 
 LICENSE = AGPLv3
-LICENSE_FILE = $(WORK_DIR)/nextcloud/COPYING
+LICENSE_FILE = src/COPYING
 
 WIZARDS_TEMPLATES_DIR = src/wizard_templates
 SERVICE_WIZARD_SHARENAME = wizard_data_share
@@ -42,4 +42,13 @@ SERVICE_USER = auto
 # TMPDIR is used for nextcloud built in backup and update
 USE_ALTERNATE_TMPDIR = 1
 
+PRE_COPY_TARGET = nextcloud_install
+PLIST_TRANSFORM = sed 's,^target/,,'
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: nextcloud_install
+nextcloud_install:
+	install -d -m 755 "$(INSTALL_DIR)/var/packages/$(SPK_NAME)/target/share/nextcloud"
+	install -m 644 "src/COPYING" "$(INSTALL_DIR)/var/packages/$(SPK_NAME)/target/share/nextcloud/COPYING"
+	install -m 644 "src/README" "$(INSTALL_DIR)/var/packages/$(SPK_NAME)/target/share/nextcloud/README"

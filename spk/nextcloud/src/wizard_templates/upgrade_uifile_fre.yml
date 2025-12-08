@@ -1,0 +1,2 @@
+NEXTCLOUD_UPGRADE_NOTICE_STEP_TITLE: "Mise à niveau de Nextcloud"
+NEXTCLOUD_UPGRADE_NOTICE_DESCRIPTION: "Lors de la mise à niveau, le paquet téléchargera les fichiers du serveur Nextcloud ; cette archive est volumineuse et cette étape peut prendre plusieurs minutes."
