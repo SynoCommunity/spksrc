@@ -163,10 +163,9 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        $(MSG) "  File $${localFile} already downloaded" ; \
 	      else \
 	        rm -f $${localFile}.part ; \
-	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused --max-redirect=20 --content-disposition --retry-on-http-error=429,500,502,503,504 -nv -O $${localFile} -nc $${url}" ; \
+	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused --max-redirect=20 --content-disposition -nv -O $${localFile} -nc $${url}" ; \
 	        wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 \
 	             --retry-connrefused --max-redirect=20 --content-disposition \
-	             --retry-on-http-error=429,500,502,503,504 \
 	             -nv -O $${localFile}.part -nc $${url} ; \
 	        mv $${localFile}.part $${localFile} ; \
 	      fi ; \
