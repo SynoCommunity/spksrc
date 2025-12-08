@@ -4,9 +4,6 @@ SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/navidrome --port ${SERVICE_PORT} --confi
 SVC_WRITE_PID=y
 SVC_BACKGROUND=y
 
-# navidrome executable does not contain rpath
-export LD_LIBRARY_PATH="${SYNOPKG_PKGDEST}/lib"
-
 service_postinst ()
 {
     # update config with values from wizard variables

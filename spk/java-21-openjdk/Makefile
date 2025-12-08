@@ -2,7 +2,7 @@ SPK_NAME = java-21-openjdk
 JAVA_RELEASE = 11
 JAVA_VERSION = 21.0.5
 SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-21-openjdk
@@ -10,13 +10,14 @@ DEPENDS = cross/java-21-openjdk
 # gcc >= 5.0 required
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 21 is the open-source reference implementation of version 21 of the Java SE Platform as specified by JSR 396 in the Java Community Process.
 
 STARTABLE = no
 DISPLAY_NAME = Java 21 OpenJDK
-CHANGELOG = "Initial Java 21 package release."
+CHANGELOG = "Removed cacerts-file/src flags — now using default PKCS\#12 truststore."
 
 HOMEPAGE = https://openjdk.org/projects/jdk/21/
 LICENSE_FILE = src/LICENSE

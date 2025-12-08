@@ -1,5 +1,5 @@
 PKG_NAME = libzmq
-PKG_VERS = 4.3.4
+PKG_VERS = 4.3.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/zeromq/libzmq/archive
@@ -22,3 +22,6 @@ endif
 
 # Build ZeroMQ with encryption support
 CMAKE_ARGS += -DWITH_LIBSODIUM=ON
+
+# Disable benchmarking performance tools
+CMAKE_ARGS += -DWITH_PERF_TOOL=OFF

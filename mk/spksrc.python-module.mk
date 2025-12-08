@@ -17,12 +17,12 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 # Define where is located the crossenv
-CROSSENV_MODULE_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(PKG_NAME)-$(PKG_VERS) $(WORK_DIR)/crossenv-$(PKG_NAME) $(WORK_DIR)/crossenv-default))
+CROSSENV_MODULE_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME))-$(PKG_VERS) $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME)) $(WORK_DIR)/crossenv-default))
 
 ### Prepare crossenv
 prepare_crossenv:
-	@$(MSG) $(MAKE) WHEEL_NAME=\"$(PKG_NAME)\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
-	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(PKG_NAME)" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
+	@$(MSG) $(MAKE) WHEEL_NAME=\"$(or $(PKG_REAL_NAME),$(PKG_NAME))\" WHEEL_VERSION=\"$(PKG_VERS)\" crossenv-$(ARCH)-$(TCVERSION)
+	@MAKEFLAGS= $(MAKE) WHEEL_NAME="$(or $(PKG_REAL_NAME),$(PKG_NAME))" WHEEL_VERSION="$(PKG_VERS)" crossenv-$(ARCH)-$(TCVERSION) --no-print-directory
 
 ### Python extension module rules
 compile_python_module: SHELL:=/bin/bash

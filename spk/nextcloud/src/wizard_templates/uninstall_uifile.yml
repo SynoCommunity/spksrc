@@ -1,0 +1,8 @@
+NEXTCLOUD_PATH_VALIDATION_ERROR_TEXT: "Path should begin with /volume?/ with ? the number of the volume"
+
+NEXTCLOUD_BACKUP_SERVER_STEP_TITLE: "Backup Nextcloud server"
+NEXTCLOUD_BACKUP_SERVER_DESCRIPTION: "<strong>WARNING:</strong> Uninstalling the Nextcloud package will result in the removal of the Nextcloud server, along with all associated user accounts, data, and configurations."
+MYSQL_ROOT_PASSWORD_DESCRIPTION: "Enter your MariaDB superuser account password"
+MYSQL_ROOT_PASSWORD_LABEL: "MariaDB 'root' password"
+NEXTCLOUD_BACKUP_EXPORT_LOCATION_DESCRIPTION: "Before uninstalling, if you want to keep a backup of your data, please specify the directory where you would like to export to. Ensure that the user 'sc-nextcloud' has write permissions to that directory. To skip exporting, leave this field blank."
+NEXTCLOUD_BACKUP_EXPORT_LOCATION_LABEL: "Export location"

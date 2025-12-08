@@ -25,6 +25,11 @@ ifndef WORK_DIR
 WORK_DIR = $(CURDIR)/work$(ARCH_SUFFIX)
 endif
 
+ifndef LOG_DIR
+LOG_DIR = $(CURDIR)
+export LOG_DIR
+endif
+
 ifndef INSTALL_DIR
 INSTALL_DIR = $(WORK_DIR)/install
 endif

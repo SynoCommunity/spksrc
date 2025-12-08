@@ -12,6 +12,7 @@ COMMENT  = elfutils is a collection of utilities and libraries to read, create a
 LICENSE  = GPL
 
 REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_SRM = 1.3
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --disable-libdebuginfod

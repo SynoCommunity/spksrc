@@ -1,5 +1,5 @@
 SPK_NAME = njmon
-SPK_VERS = 81
+SPK_VERS = 90
 SPK_REV = 1
 
 DEPENDS = cross/njmon

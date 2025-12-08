@@ -1,5 +1,5 @@
 PKG_NAME = syncstorage-rs
-PKG_VERS = 0.18.3
+PKG_VERS = 0.21.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VERS}
@@ -8,15 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # for openssl-sys
 DEPENDS = cross/openssl3
 # for mysqlclient-sys
-DEPENDS += cross/mysql-connector-c
+DEPENDS += cross/mariadb-connector-c
 
-# OLD_PPC_ARCHS are not supported for Rust builds
-# Rust has support for qoriq, but the "ring" dependency has issue(s) with big-endian targets
-# see: https://github.com/briansmith/ring/issues/1555 (and referenced issues)
-# There is an update in https://github.com/briansmith/ring/pull/1677 for (64-bit) PPC
-# this might fix ring for 32-bit PPC (qoriq) too.
-# An update of ring (>= 0.17.0) is required, syncstorage-rs 0.14.3 has locked ring to 0.16.20.
-# 
 # powerpc archs are not supported
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
@@ -39,6 +32,9 @@ export MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock
 ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
 # to find dependencies of libmysqlclient (libz)
 ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
+
+# pass mysql client version for non-x86 archs
+ENV += MYSQLCLIENT_VERSION=$(lastword $(subst -, ,$(wildcard $(WORK_DIR)/mariadb-connector-c-[0-9]*)))
 
 POST_INSTALL_TARGET = syncstorage-rs_post_install
 

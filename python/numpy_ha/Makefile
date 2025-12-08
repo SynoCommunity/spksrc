@@ -1,10 +1,10 @@
 PKG_NAME = numpy_ha
-WHEEL_NAME = numpy
+PKG_REAL_NAME = numpy
 PKG_VERS = 2.1.3
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(WHEEL_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/n/numpy
-PKG_DIR = $(WHEEL_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/openblas
 CONFIGURE_ARGS += -Dblas=OpenBLAS
@@ -24,6 +24,7 @@ LICENSE  = NumPy Developers
 # Requires gcc>=8.4 to build sucesfully
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 include ../../mk/spksrc.common.mk
 

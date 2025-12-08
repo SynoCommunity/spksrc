@@ -5,35 +5,10 @@ MESON_CROSS_FILE_NAME = $(ARCH)-crossfile.meson
 MESON_CROSS_FILE_PKG = $(WORK_DIR)/$(PKG_DIR)/$(MESON_CROSS_FILE_NAME)
 CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_FILE_PKG)
 
-# Enforce unsetting all flags as using cross-file with the
-# exception of PKG_CONFIG_LIBDIR to force default pkgconfig.
-#
-# Also due to meson bug, keep LDFLAGS for rpath management.
-# This only occurs when there are multiple rpath definitions.
-# Ref: https://github.com/mesonbuild/meson/issues/14354
-#      https://github.com/mesonbuild/meson/issues/6541
-#
-# Note0: The only way to get rpath defined in resulting *.so
-#        is from using LDFLAGS variable part of environment.
-# Note1: Adding options --enable-new-dtags or --strip-all to
-#        *_link_args has no effect on resulting rpath and runpath.
-# Note2: Defining build_rpath and install_rpath has no effect.
-#        It should normally affect the runpath and not the rpath.
-# Note3: Similarly, re-defining -Wl,--rpath-link and -Wl,--rpath
-#        part of *_link_args has no effect neither as LDFLAGS
-#        needs to be set anyway and already has rpath defined.
-# Note4: Defining runpath (instead of rpath) using install_rpath
-#        or -Wl,--enable-new-dtags has no effect neither.
-#
-ENV_MESON  = -u AR -u AS -u CC -u CPP -u CXX -u LD -u LDSHARED
-ENV_MESON += -u OBJCOPY -u OBJDUMP -u RANLIB -u READELF -u STRIP
-ENV_MESON += -u CFLAGS -u ADDITIONAL_CFLAGS
-ENV_MESON += -u CPPFLAGS -u ADDITIONAL_CPPFLAGS
-ENV_MESON += -u CXXFLAGS -u ADDITIONAL_CXXFLAGS
-ENV_MESON += -u FFLAGS -u ADDITIONAL_FFLAGS
-#ENV_MESON += -u LDFLAGS -u ADDITIONAL_LDFLAGS
-ENV_MESON += -u PKG_CONFIG_PATH -u SYSROOT
-ENV_MESON += $(ENV)
+# Enforce running in a clean environement to avoid
+# issues between 'build' and 'host' environments
+ENV_MESON = $(addprefix -u ,$(VARS_TO_CLEAN)) $(ENV_FILTERED)
+RUN_MESON = cd $(MESON_BASE_DIR) && env $(ENV_MESON)
 
 .PHONY: $(MESON_CROSS_FILE_PKG)
 $(MESON_CROSS_FILE_PKG):
@@ -55,56 +30,77 @@ ifeq ($(strip $(MESON_PYTHON)),1)
 	echo "python = '$$(which cross-python)'"
 endif
 	@echo
-	@echo "[built-in options]" ; \
-	echo "prefix = '$(INSTALL_PREFIX)'"
-	@echo
 	@echo "[properties]" ; \
 	echo "# Not needed due to PKG_CONFIG_LIBDIR" ; \
 	echo "#pkg_config_path = '$(abspath $(PKG_CONFIG_LIBDIR))'"
 	@echo
-	@echo "[built-in]" ; \
-	echo "c_args = ["
+	@echo "[built-in options]" ; \
+	echo "prefix = '$(INSTALL_PREFIX)'"
+ifeq ($(GCC_DEBUG_INFO),1)
+	@echo "debug = 'true'" ; \
+	echo "b_ndebug = 'true'" ; \
+	echo "optimization = '$(strip $(patsubst -O%,%,$(filter -O%,$(GCC_DEBUG_FLAGS))))'" ; \
+	echo
+endif
+	@echo "c_args = ["
 ifneq ($(strip $(MESON_BUILTIN_C_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_ARGS)',\n"
 endif
-	@echo $(CFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
-	echo -ne "\t]\n"
+ifeq ($(GCC_DEBUG_INFO),1)
+	@echo $(patsubst -O%,,$(CFLAGS) $(GCC_DEBUG_FLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+else
+	@echo $(CFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+endif
+	@echo -ne "\t]\n"
 	@echo
 	@echo "c_link_args = ["
 ifneq ($(strip $(MESON_BUILTIN_C_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "cpp_args = ["
 ifneq ($(strip $(MESON_BUILTIN_CPP_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_ARGS)',\n"
 endif
-	@echo $(CPPFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
-	echo -ne "\t]\n"
+ifeq ($(GCC_DEBUG_INFO),1)
+	@echo $(patsubst -O%,,$(CPPFLAGS) $(GCC_DEBUG_FLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+else
+	@echo $(CPPFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+endif
+	@echo -ne "\t]\n"
 	@echo
 	@echo "cpp_link_args = ["
 ifneq ($(strip $(MESON_BUILTIN_CPP_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
-	@echo "cxx_args = ["
-	@echo $(CXXFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
-	echo -ne "\t]\n"
-	@echo
-	@echo "fc_args = ["
+	@echo "fortran_args = ["
 ifneq ($(strip $(MESON_BUILTIN_FC_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_FC_ARGS)',\n"
 endif
-	@echo $(FFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
-	echo -ne "\t]\n"
+ifeq ($(GCC_DEBUG_INFO),1)
+	@echo $(patsubst -O%,,$(FFLAGS) $(GCC_DEBUG_FLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+else
+	@echo $(FFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+endif
+	@echo -ne "\t]\n"
 	@echo
-	@echo "fc_link_args = ["
+	@echo "fortran_link_args = ["
 ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_FC_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | grep -v rpath | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
+	@echo
+	@echo "rust_args = [" ; \
+	echo -ne "\t'--target=$(RUST_TARGET)',\n" ; \
+	echo -ne "\t'-Clinker=$(TC_PATH)$(TC_PREFIX)gcc',\n"
+ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
+	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
+endif
+	@echo $(RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo -ne "\t]\n"

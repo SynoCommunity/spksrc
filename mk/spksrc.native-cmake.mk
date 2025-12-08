@@ -1,20 +1,9 @@
 # Build native CMake programs
 #
-# remarks:
-# - most content is taken from spksrc.native-cc.mk and modified for cmake
+# This makefile extends spksrc.native-cc.mk with CMake-specific functionality
 #
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
-
-# cmake specific configurations
-include ../../mk/spksrc.native-cmake-env.mk
-
-# Force build in native tool directrory, not cross directory.
-WORK_DIR := $(CURDIR)/work-native
-
-# Package dependend
+# Package dependent (same as native-cc.mk)
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
@@ -26,11 +15,25 @@ endif
 DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
+# Setup common directories
+include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
+
+# cmake specific configurations
+include ../../mk/spksrc.native-cmake-env.mk
+
 #####
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = cmake_configure_target
+endif
+
+# source directory
+ifeq ($(strip $(CMAKE_SOURCE_DIR)),)
+CMAKE_SOURCE_DIR = $(CMAKE_BASE_DIR)
 endif
 
 # install
@@ -39,7 +42,7 @@ CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-include ../../mk/spksrc.cross-ninja.mk
+include ../../mk/spksrc.ninja.mk
 else
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
@@ -52,46 +55,9 @@ INSTALL_TARGET = cmake_install_target
 endif
 endif
 
-###
+#####
 
-.NOTPARALLEL:
-
-# native specific environment
-include ../../mk/spksrc.native-env.mk
-
-include ../../mk/spksrc.download.mk
-
-include ../../mk/spksrc.depend.mk
-
-checksum: download
-include ../../mk/spksrc.checksum.mk
-
-extract: checksum depend
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-configure: patch
-include ../../mk/spksrc.configure.mk
-
-compile: configure
-include ../../mk/spksrc.compile.mk
-
-install: compile
-include ../../mk/spksrc.install.mk
-
-all: install
-
-###
-
-# No PLIST to be processed for native
-.PHONY: cat_PLIST
-cat_PLIST:
-	@true
-
-###
-
+# CMake specific targets
 .PHONY: cmake_configure_target
 
 # default cmake configure:
@@ -102,9 +68,10 @@ cmake_configure_target:
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
+	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(CMAKE_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
 
@@ -124,9 +91,7 @@ else
 	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
 endif
 
-###
+#####
 
-### Include common rules
-include ../../mk/spksrc.common-rules.mk
-
-####
+# Include base native-cc makefile for common functionality
+include ../../mk/spksrc.native-cc.mk

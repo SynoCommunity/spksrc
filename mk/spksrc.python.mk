@@ -35,16 +35,24 @@ endif
 
 # set build flags including ld to rewrite for the library path
 # used to access python package provide libraries at destination
-export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
-export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
-export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
-export ADDITIONAL_LDFLAGS  += -L$(PYTHON_STAGING_INSTALL_PREFIX)/lib
-export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(PYTHON_STAGING_INSTALL_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
+export ADDITIONAL_CFLAGS    += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CPPFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CXXFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_LDFLAGS   += -L$(PYTHON_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath-link,$(PYTHON_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(PYTHON_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(PYTHON_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(PYTHON_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(PYTHON_PREFIX)/lib
 
 # similarly, ld to rewrite OpenSSL library path if differs
 ifneq ($(OPENSSL_STAGING_PREFIX),$(PYTHON_STAGING_INSTALL_PREFIX))
-export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
-export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -L$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(OPENSSL_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
 
 # Re-use all default python mandatory libraries (with exception of bzip2, xz, zlib)
@@ -56,7 +64,7 @@ PYTHON_DEPENDS_EXCLUDE = bzip2 xz zlib
 PYTHON_DEPENDS := $(foreach cross,$(filter-out $(PYTHON_DEPENDS_EXCLUDE),$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $(PYTHON_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$(PYTHON_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $(PYTHON_PACKAGE_WORK_DIR)/.$(cross)-*_done))
 
 # call-up pre-depend to prepare the shared python build environment
-PRE_DEPEND_TARGET = python_pre_depend
+PRE_DEPEND_TARGET += python_pre_depend
 
 else
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
@@ -64,7 +72,11 @@ BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
 endif
 endif
 
+ifneq ($(FFMPEG_PACKAGE),)
+include ../../mk/spksrc.ffmpeg.mk
+else
 include ../../mk/spksrc.spk.mk
+endif
 
 .PHONY: python_pre_depend
 python_pre_depend:

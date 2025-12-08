@@ -1,9 +1,9 @@
-# Generated using the requirements script on May 15, 2025
+# Generated using the requirements script on November 16, 2025
 
-cffi==1.17.1
-charset_normalizer==3.4.2
-cryptography==44.0.2
+cffi==2.0.0
+charset_normalizer==3.4.4
+cryptography==44.0.3
 #greenlet                   ==> supported version depends on gcc version
 mysqlclient==2.1.1
 SQLAlchemy==1.4.46
-zope.interface==7.2
+zope_interface==8.1.1

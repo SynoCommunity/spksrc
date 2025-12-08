@@ -1,54 +1,93 @@
 PKG_NAME = llvm
+PKG_LLVM_MAJ = 14
 PKG_VERS = 14.0.5
-PKG_VERS_MAJ = $(firstword $(subst ., ,$(PKG_VERS)))
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-project-$(PKG_VERS).src.$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)
+PKG_EXT = tar.gz
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/refs/tags
+PKG_DIST_FILE = SPIRV-LLVM-Translator-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS).src
 
 # REMARKS:
-# Since it takes a huge amount of resources to build this, we started to host the 
+# Since it takes a huge amount of resources to build this, we started to host the
 # output on https://github.com/SynoCommunity/spksrc/releases/tag/native%2Fllvm
-# 
+#
 # This Makefile is to build the native llvm
 # and has one additional target to build the archive (make build-archive)
-# 
+#
 # The main reason to build llvm from source is, that other prebuilt packages
-# do not contain the binary "clang-tblgen" that is mandatory to build cross/llvm-14.0.
+# do not contain mandatory binaries to build cross/llvm-14.0.
+#
+#   Native binaries: clang-tblgen, llvm-tblgen, llvm-spirv
 
-DEPENDS =
+HOMEPAGE = https://github.com/KhronosGroup/SPIRV-LLVM-Translator
+COMMENT  = Tool and library for translation between LLVM IR and SPIR-V
+LICENSE  = Apache-2.0 with LLVM-exception
 
-HOMEPAGE = https://llvm.org/
-COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
-LICENSE  = Apache License v2.0 with LLVM Exceptions
+NATIVE_DEPENDS  = cross/llvm-project-140.src
+NATIVE_DEPENDS += native/Khronos-SPIRV-Headers
+NATIVE_DEPENDS += native/Khronos-SPIRV-Tools
 
-POST_INSTALL_TARGET = llvm_post_install
-CMAKE_USE_NINJA = 1
+POST_EXTRACT_TARGET = llvm_post_extract_target
+POST_INSTALL_TARGET = llvm_post_install_target
 
-# Using LLVM project source need to change to llvm sub-directory
-CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/llvm
+# Using various LLVM project sources needs a top-level master directory
+CMAKE_BUILD_DIR = $(WORK_DIR)/llvm.build
+CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 
+CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=MinSizeRel
 CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=ON
 CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
 CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
-CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang'
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
+CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv'
+CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
+
+# Points towards proper source and include dirs
+CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(STAGING_INSTALL_PREFIX)
+CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
+
+# Install all build tools
+CMAKE_ARGS += -DLLVM_INSTALL_UTILS=ON
+CMAKE_ARGS += -DLLVM_BUILD_TOOLS=ON
+CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=OFF
+
+# Assertions are internal checks to help find bugs
+CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
+
+# BUILD_SHARED_LIBS is only recommended for use by LLVM developers
+CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
+
+# Disable benchmarks and tests
+CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
+CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
+CMAKE_ARGS += -DLLVM_BUILD_TESTS=OFF
+CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
+
+# Disable lit testing framework (requires patch as well to fully disable)
+CMAKE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
+
+# Reduce build warnings
+CMAKE_ARGS += -DCMAKE_CXX_STANDARD=14
+CMAKE_ARGS += -DCMAKE_CXX_EXTENSIONS=ON
+NATIVE_CXXFLAGS  = -Wno-cast-function-type
+NATIVE_CXXFLAGS += -Wno-dangling-pointer
+NATIVE_CXXFLAGS += -Wno-free-nonheap-object
+NATIVE_CXXFLAGS += -Wno-missing-template-keyword
+NATIVE_CXXFLAGS += -Wno-uninitialized
 
 include ../../mk/spksrc.native-cmake.mk
 
-.PHONY: llvm_post_install
-llvm_post_install:
-	$(RUN) install -m 755 build/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
-	@cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf clang-$(PKG_VERS_MAJ) clang-tool
-	$(RUN) install -m 755 build/bin/llvm-config $(STAGING_INSTALL_PREFIX)/bin/llvm-config
-	$(RUN) install -m 755 build/bin/llvm-link $(STAGING_INSTALL_PREFIX)/bin/llvm-link
-	$(RUN) install -m 755 build/bin/llvm-tblgen $(STAGING_INSTALL_PREFIX)/bin/llvm-tblgen
-	$(RUN) install -m 755 build/bin/opt $(STAGING_INSTALL_PREFIX)/bin/opt
+.PHONY: llvm_post_extract_target llvm_post_install_target build-archive
 
-.PHONY: build-archive
+# Create symlink for LLVM to find the translator
+llvm_post_extract_target:
+	@cd $(WORK_DIR) && ln -sf SPIRV-LLVM-Translator-$(PKG_VERS) SPIRV-LLVM-Translator
+	@cd $(WORK_DIR)/llvm-project/llvm/projects && ln -sf ../../../$(PKG_DIR) llvm-spirv
+
+llvm_post_install_target:
+	$(RUN) install -m 755 $(CMAKE_BUILD_DIR)/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
+
 build-archive:
 	@$(MSG) "Build archive of install folder"
 ifeq ($(wildcard work-native/install/usr/local/bin/*),)

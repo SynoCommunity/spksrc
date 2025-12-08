@@ -1,13 +1,16 @@
 PKG_NAME = znc
-PKG_VERS = 1.9.1
+PKG_VERS = 1.10.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://znc.in/releases/archive
+# use synocommunity "abandoned sources" 
+# original site https://znc.in/releases/archive does not work
+PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/sources
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Ensure C++17 compatibility
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
@@ -16,7 +19,7 @@ LICENSE  = Apache 2.0
 ifeq ($(strip $(PYTHON_PACKAGE)),)
 BUILD_DEPENDS = cross/python312
 endif
-CMAKE_ARGS = -DWANT_PYTHON=true
+CMAKE_ARGS += -DWANT_PYTHON=true
 DEPENDS = cross/zlib
 
 DEPENDS += cross/openssl3
@@ -88,7 +91,7 @@ znc_post_install:
 	@chmod +x $(CMAKE_BUILD_DIR)/znc-buildmod
 	@rm -fr $(WORK_DIR)/modules
 	@cp -R modules $(WORK_DIR)/
-	$(RUN) sed -i 's|$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
-	@cd $(WORK_DIR)/modules && CMAKE_PREFIX_PATH=$(STAGING_INSTALL_PREFIX) $(CMAKE_BUILD_DIR)/znc-buildmod $(EXTRA_MODULES)
-	$(RUN) sed -i 's|$(STAGING_INSTALL_PREFIX)|$(INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
+	@$(RUN) sed -i 's|$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
+	cd $(WORK_DIR)/modules && env $(ENV) CMAKE_PREFIX_PATH=$(STAGING_INSTALL_PREFIX) $(CMAKE_BUILD_DIR)/znc-buildmod $(EXTRA_MODULES)
+	@$(RUN) sed -i 's|$(STAGING_INSTALL_PREFIX)|$(INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
 	@install -m 644 $(WORK_DIR)/modules/*.so $(STAGING_INSTALL_PREFIX)/lib/znc/

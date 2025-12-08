@@ -11,14 +11,6 @@ ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
 
-# Use native cmake (Debian 10 "Buster")
-ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
-  BUILD_DEPENDS += native/cmake-legacy
-  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-legacy/work-native/install/usr/local/bin)
-  ENV += PATH=$(CMAKE_PATH):$$PATH
-  export PATH := $(CMAKE_PATH):$(PATH)
-endif
-
 # Use ninja to build
 ifeq ($(strip $(CMAKE_USE_NINJA)),)
   CMAKE_USE_NINJA = 1
@@ -47,6 +39,10 @@ endif
 # set default destdir directory
 ifeq ($(strip $(CMAKE_DESTDIR)),)
   CMAKE_DESTDIR = $(INSTALL_DIR)
+endif
+
+ifeq ($(strip $(CMAKE_BASE_DIR)),)
+  CMAKE_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 
 # set default build directory

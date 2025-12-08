@@ -1,13 +1,13 @@
-# Generated using the requirements script on May 15, 2025
+# Generated using the requirements script on November 16, 2025
 
 backoff==2.2.1
 boto==2.49.0
 #certifi                    ==> python312
-datadog==0.51.0
+datadog==0.52.1
 hawkauthlib==2.0.0
 hupper==1.12.1
-idna==3.10
-iniconfig==2.1.0
+idna==3.11
+iniconfig==2.3.0
 packaging==25.0
 PasteDeploy==3.1.0
 #pip                        ==> python312
@@ -15,17 +15,17 @@ plaster==1.1.2
 plaster_pastedeploy==1.0.1
 pluggy==1.6.0
 PyBrowserID==0.14.0
-pycparser==2.22
+pycparser==2.23
 pyfxa==0.8.1
 PyJWT==2.10.1
-pyramid==2.0.2
+pyramid==1.10.8
 pytest==8.3.5
-requests==2.32.3
+requests==2.32.5
 #setuptools                 ==> python312
-testfixtures==8.3.0
+testfixtures==10.0.0
 tokenlib==2.0.0
 translationstring==1.4
-urllib3==2.4.0
+urllib3==2.5.0
 venusian==3.1.1
 WebOb==1.8.9
-zope.deprecation==5.1
+zope_deprecation==6.0

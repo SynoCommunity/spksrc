@@ -1,7 +1,8 @@
 PKG_NAME = pnpm
-PKG_VERS = 10.4.1
-PKG_DIST_NAME = pnpm-linux-x64
+PKG_VERS = 10.23.0
+PKG_DIST_NAME = $(PKG_NAME)-linux-x64
 PKG_DIST_SITE = https://github.com/pnpm/pnpm/releases/download/v$(PKG_VERS)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS)-linux-x64
 
 HOMEPAGE = https://pnpm.io/
 COMMENT  = Fast, disk space efficient package manager.
