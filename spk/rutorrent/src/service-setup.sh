@@ -55,6 +55,31 @@ fix_shared_folders_rights()
     find "${folder}" -mindepth 1 -type d -exec synoacltool -enforce-inherit "{}" \;
 }
 
+resolve_download_dir()
+{
+    requested_path=${1%/}
+    parent_dir=${requested_path%/*}
+    leaf_name=${requested_path##*/}
+
+    needle=$(printf '%s\n' "${leaf_name}" | tr '[:upper:]' '[:lower:]')
+
+    match=$(find "${parent_dir}" -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | \
+        while IFS= read -r entry; do
+            base=${entry##*/}
+            lowered_base=$(printf '%s\n' "${base}" | tr '[:upper:]' '[:lower:]')
+            if [ "${lowered_base}" = "${needle}" ]; then
+                printf '%s\n' "${entry}"
+                break
+            fi
+        done)
+
+    if [ -n "${match}" ]; then
+        printf '%s\n' "${match}"
+    else
+        printf '%s\n' "${requested_path}"
+    fi
+}
+
 set_external_program_path()
 {
     sep_program=$1
@@ -117,15 +142,20 @@ configure_external_programs()
     set_external_program_path 'dumptorrent' "${SYNOPKG_PKGDEST}/bin/dumptorrent" "${SYNOPKG_PKGDEST}/bin/dumptorrent"
 }
 
-service_postinst ()
+service_postinst()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        resolved_download_dir=$(resolve_download_dir "${wizard_download_dir}")
+        if [ "${resolved_download_dir}" != "${wizard_download_dir}" ]; then
+            echo "Using existing download folder '${resolved_download_dir}'"
+        fi
+
         # Allow direct-user access to rtorrent configuration file
         mv "${SYNOPKG_PKGVAR}/rtorrent.rc" "${RTORRENT_RC}"
         ln -s -T -f "${RTORRENT_RC}" "${SYNOPKG_PKGVAR}/.rtorrent.rc"
 
         # Configure files
-        TOP_DIR=${wizard_download_dir##/}
+        TOP_DIR=${resolved_download_dir##/}
         MAX_MEMORY=$(awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo)
 
         sed -i \
@@ -135,7 +165,7 @@ service_postinst ()
             -e "s|^\([[:space:]]*\)\$tempDirectory =.*|\1\$tempDirectory = '${SYNOPKG_PKGDEST}/tmp/';|" \
             "${RUTORRENT_WEB_DIR}/conf/config.php"
 
-        cleaned_download_dir=${wizard_download_dir%/}
+        cleaned_download_dir=${resolved_download_dir%/}
         sed -i -e "s|@download_dir@|${cleaned_download_dir}|g" \
             -e "s|@max_memory@|$MAX_MEMORY|g" \
             -e "s|@service_port@|${SERVICE_PORT}|g" \
