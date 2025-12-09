@@ -25,6 +25,10 @@ ifndef WORK_DIR
 WORK_DIR = $(CURDIR)/work$(ARCH_SUFFIX)
 endif
 
+ifndef PATCH_DIR
+PATCH_DIR = $(abspath $(WORK_DIR)/../patches)
+endif
+
 ifndef LOG_DIR
 LOG_DIR = $(CURDIR)
 export LOG_DIR
