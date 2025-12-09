@@ -9,12 +9,20 @@ include ../../mk/spksrc.common-rules.mk
 # make all-supported
 ifeq (supported,$(findstring supported,$(subst -, ,$(firstword $(MAKECMDGOALS)))))
 TARGET_TYPE = supported
+ifeq ($(ARCH),noarch)
+TARGET_ARCH = $(addprefix noarch-,$(sort $(foreach version,$(SUPPORTED_ARCHS),$(word 2,$(subst -, ,$(version))))))
+else
 TARGET_ARCH = $(SUPPORTED_ARCHS)
+endif
 
 # make all-latest
 else ifeq (latest,$(findstring latest,$(subst -, ,$(firstword $(MAKECMDGOALS)))))
 TARGET_TYPE = latest
+ifeq ($(ARCH),noarch)
+TARGET_ARCH = $(addprefix noarch-,$(sort $(foreach version,$(LATEST_ARCHS),$(word 2,$(subst -, ,$(version))))))
+else
 TARGET_ARCH = $(LATEST_ARCHS)
+endif
 endif
 
 # error: make setup not invoked
@@ -51,10 +59,10 @@ $(TARGET_TYPE)-arch-% &: pre-build-native
 	-@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) arch-$*
 
 arch-%:
-	$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+	@$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
 
-noarch-%:
-	$(PSTAT_TIME) $(MAKE) $(addprefix build-noarch-, $(filter $*, $(AVAILABLE_TCVERSIONS) 3.1))
+arch-noarch-%:
+	@$(PSTAT_TIME) $(MAKE) $(addprefix build-noarch-, $(filter $*, $(AVAILABLE_TCVERSIONS) 3.1))
 
 ####
 
@@ -70,7 +78,7 @@ build-arch-%:
 build-noarch-%: SHELL:=/bin/bash
 build-noarch-%: 
 	@$(MSG) BUILDING noarch package for TCVERSION $*
-	@MAKEFLAGS= $(MAKE) TCVERSION=$* 2>&1 ; \
+	@MAKEFLAGS= $(MAKE) TCVERSION=$* ARCH=noarch 2>&1 ; \
 	status=$${PIPESTATUS[0]} ; \
 	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, TCVERSION: %s, NAME: %s [END]\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") | tee --append $(STATUS_LOG) ; \
 	[ $${status[0]} -eq 0 ] || false

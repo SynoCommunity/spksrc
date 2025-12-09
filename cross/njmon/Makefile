@@ -1,5 +1,5 @@
 PKG_NAME = njmon
-PKG_VERS = v84
+PKG_VERS = v90
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)_linux_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/nmon/files
