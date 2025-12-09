@@ -16,18 +16,18 @@ PATCHES_LEVEL = 0
 endif
 
 # find patches into the following directory order:
-#    patches/*.patch                                   ## this is the default location for native
+#    patches/*.patch                                   ## this is the default location (and the only location for native)
 #    patches/kernel-$(subst +,,$(TC_KERNEL))/*.patch   ## Discards any ending + in version number
 #    patches/DSM-$(TCVERSION)/*.patch                  ## Can also be used for noarch specific
-#    patches/$(group)-$(TCVERSION)/*.patch
-#    patches/$(group)/*.patch
 #    patches/$(arch)-$(TCVERSION)/*.patch
 #    patches/$(arch)/*.patch
-#    patches/noarch-$(TCVERSION)/*.patch
-#    patches/noarch/*.patch
+#    patches/$(group)-$(TCVERSION)/*.patch
+#    patches/$(group)/*.patch
 # supported groups: arm, armv5, armv7, armv7l, armv8, ppc, i686, x64
 PATCHES += $(sort $(wildcard patches/*.patch))
-ifneq ($(filter cross diyspk python spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
+ifeq ($(strip $(ARCH)),noarch)
+PATCHES += $(sort $(wildcard patches/DSM-$(TCVERSION)/*.patch))
+else ifneq ($(filter cross diyspk python spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
 PATCHES += $(sort $(foreach group,ARM_ARCHS ARMv5_ARCHS ARMv7_ARCHS ARMv7L_ARCHS ARMv8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
 	$(foreach arch,$($(group)), \
 	$(if $(filter $(ARCH),$(arch)),$(sort $(wildcard patches/kernel-$(subst +,,$(TC_KERNEL))/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch  patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')-$(TCVERSION)/*.patch patches/$(arch)/*.patch patches/$(arch)-$(TCVERSION)/*.patch)),))))
