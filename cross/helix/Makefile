@@ -36,9 +36,6 @@ ENV += CC_x86_64_unknown_linux_gnu=gcc
 ENV += CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=gcc
 endif
 
-# temp to analyze grammar fetching errors
-ENV += RUST_BACKTRACE=full
-
 ADDITIONAL_RUSTFLAGS = -C linker=$(TC_PATH)$(TC_TARGET)-gcc
 
 ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-gcc
@@ -48,9 +45,12 @@ ENV += RANLIB_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_TARGET)-ranli
 
 ENV += CFLAGS_$(shell echo $(RUST_TARGET) | tr - _)=-O3
 
+# for build error analysis
+ENV += RUST_BACKTRACE=full
+
 .PHONY: helix_patch
 helix_patch:
-	@$(MSG) "- Patch cc crate for crossbuild"
+	@$(MSG) "- Add patched cc crate for crossbuild"
 	@tar -xf src/cargo-cc-patched-1.2.29.tar.gz -C $(WORK_DIR)/helix/
 	@$(MSG) "- Patch Cargo.toml to use patched cc"
 	@cat patches/001-cargo-cc.patch | (cd $(WORK_DIR)/helix/ && patch -b -p0)
