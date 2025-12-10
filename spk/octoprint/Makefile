@@ -1,6 +1,6 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.11.3
-SPK_REV    = 14
+SPK_VERS   = 1.11.5
+SPK_REV    = 15
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
@@ -21,7 +21,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.11.3."
+CHANGELOG    = "Update OctoPrint to v1.11.5."
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
