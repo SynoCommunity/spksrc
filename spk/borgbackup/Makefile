@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.4.1
-SPK_REV = 19
+SPK_VERS = 1.4.3
+SPK_REV = 20
 SPK_ICON = src/borgbackup.png
 
 PYTHON_PACKAGE = python312
@@ -42,7 +42,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgmatic to v2.0.7.<br/>3. Update emborg to v1.42."
+CHANGELOG = "1. Update Borg to v1.4.3.<br/>2. Update borgmatic to v2.0.12.<br/>3. Refresh Python dependencies."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
@@ -73,10 +73,10 @@ endif
 
 # [msgpack]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [msgpack] -std=c11
+WHEELS_CFLAGS += [msgpack] -std=gnu99
 endif
 
-# [ruamel.yaml.clib]
+# [ruamel_yaml_clib]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
+WHEELS_CFLAGS += [ruamel_yaml_clib] -std=c11
 endif
