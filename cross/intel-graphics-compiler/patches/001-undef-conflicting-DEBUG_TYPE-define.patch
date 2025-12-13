@@ -1,0 +1,184 @@
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/FixAddrSpaceCast.cpp ./IGC/Compiler/CISACodeGen/FixAddrSpaceCast.cpp
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/FixAddrSpaceCast.cpp	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/CISACodeGen/FixAddrSpaceCast.cpp	2025-11-29 20:07:53.006496943 +0000
+@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
+ 
+ ============================= end_copyright_notice ===========================*/
+ 
+-#define DEBUG_TYPE "addrspacecast-fixer"
+ #include "Compiler/CISACodeGen/FixAddrSpaceCast.h"
+ #include "Compiler/CISACodeGen/ShaderCodeGen.hpp"
+ #include "Compiler/CodeGenContextWrapper.hpp"
+@@ -18,6 +17,8 @@ SPDX-License-Identifier: MIT
+ #include <llvm/Pass.h>
+ #include "common/LLVMWarningsPop.hpp"
+ #include "GenISAIntrinsics/GenIntrinsics.h"
++#undef DEBUG_TYPE
++#define DEBUG_TYPE "addrspacecast-fixer"
+ 
+ using namespace llvm;
+ using namespace IGC;
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/FixupExtractValuePair.cpp ./IGC/Compiler/CISACodeGen/FixupExtractValuePair.cpp
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/FixupExtractValuePair.cpp	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/CISACodeGen/FixupExtractValuePair.cpp	2025-11-29 20:05:24.160095166 +0000
+@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
+ 
+ ============================= end_copyright_notice ===========================*/
+ 
+-#define DEBUG_TYPE "gen-simplification"
+ #include "Compiler/CISACodeGen/FixupExtractValuePair.h"
+ #include "Compiler/CISACodeGen/ShaderCodeGen.hpp"
+ #include "Compiler/CISACodeGen/TranslationTable.hpp"
+@@ -22,6 +21,8 @@ SPDX-License-Identifier: MIT
+ #include <llvm/IR/Instruction.h>
+ #include <llvm/Support/raw_ostream.h>
+ #include "common/LLVMWarningsPop.hpp"
++#undef DEBUG_TYPE
++#define DEBUG_TYPE "gen-simplification"
+ 
+ using namespace llvm;
+ using namespace IGC;
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/GenSimplification.cpp ./IGC/Compiler/CISACodeGen/GenSimplification.cpp
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/GenSimplification.cpp	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/CISACodeGen/GenSimplification.cpp	2025-11-29 20:07:41.992202260 +0000
+@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
+ 
+ ============================= end_copyright_notice ===========================*/
+ 
+-#define DEBUG_TYPE "gen-simplification"
+ #include "Compiler/CISACodeGen/GenSimplification.h"
+ #include "Compiler/CISACodeGen/ShaderCodeGen.hpp"
+ #include "Compiler/CodeGenContextWrapper.hpp"
+@@ -22,6 +21,8 @@ SPDX-License-Identifier: MIT
+ #include <llvmWrapper/IR/DerivedTypes.h>
+ #include "common/LLVMWarningsPop.hpp"
+ #include "Probe/Assertion.h"
++#undef DEBUG_TYPE
++#define DEBUG_TYPE "gen-simplification"
+ 
+ using namespace llvm;
+ using namespace IGC;
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/LoopDCE.cpp ./IGC/Compiler/CISACodeGen/LoopDCE.cpp
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/LoopDCE.cpp	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/CISACodeGen/LoopDCE.cpp	2025-11-29 20:03:34.993176532 +0000
+@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
+ 
+ ============================= end_copyright_notice ===========================*/
+ 
+-#define DEBUG_TYPE "slm-blocking"
+ #include "Compiler/CISACodeGen/LoopDCE.h"
+ #include "Compiler/CISACodeGen/ShaderCodeGen.hpp"
+ #include "Compiler/CodeGenContextWrapper.hpp"
+@@ -27,6 +26,8 @@ SPDX-License-Identifier: MIT
+ #include "GenISAIntrinsics/GenIntrinsics.h"
+ #include "Probe/Assertion.h"
+ #include <functional>   // for std::function
++#undef DEBUG_TYPE
++#define DEBUG_TYPE "slm-blocking"
+ 
+ using namespace llvm;
+ using namespace IGC;
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/PreRARematFlag.cpp ./IGC/Compiler/CISACodeGen/PreRARematFlag.cpp
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/PreRARematFlag.cpp	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/CISACodeGen/PreRARematFlag.cpp	2025-11-29 20:03:41.982398642 +0000
+@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
+ 
+ ============================= end_copyright_notice ===========================*/
+ 
+-#define DEBUG_TYPE "pre-ra-remat-flag"
+ #include "common/LLVMUtils.h"
+ #include "Compiler/CISACodeGen/PreRARematFlag.h"
+ #include "Compiler/CISACodeGen/ShaderCodeGen.hpp"
+@@ -23,6 +22,8 @@ SPDX-License-Identifier: MIT
+ #include "common/LLVMWarningsPop.hpp"
+ #include "GenISAIntrinsics/GenIntrinsics.h"
+ #include "Probe/Assertion.h"
++#undef DEBUG_TYPE
++#define DEBUG_TYPE "pre-ra-remat-flag"
+ 
+ using namespace llvm;
+ using namespace IGC;
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/TypeDemote.cpp ./IGC/Compiler/CISACodeGen/TypeDemote.cpp
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/CISACodeGen/TypeDemote.cpp	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/CISACodeGen/TypeDemote.cpp	2025-11-29 20:06:07.043365929 +0000
+@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
+ 
+ ============================= end_copyright_notice ===========================*/
+ 
+-#define DEBUG_TYPE "type-demote"
+ #include "Compiler/CISACodeGen/TypeDemote.h"
+ #include "Compiler/CISACodeGen/ShaderCodeGen.hpp"
+ #include "Compiler/CodeGenContextWrapper.hpp"
+@@ -20,6 +19,8 @@ SPDX-License-Identifier: MIT
+ #include "common/LLVMWarningsPop.hpp"
+ #include "GenISAIntrinsics/GenIntrinsics.h"
+ #include "Probe/Assertion.h"
++#undef DEBUG_TYPE
++#define DEBUG_TYPE "type-demote"
+ 
+ using namespace llvm;
+ using namespace IGC;
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/Legalizer/PeepholeTypeLegalizer.cpp ./IGC/Compiler/Legalizer/PeepholeTypeLegalizer.cpp
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/Legalizer/PeepholeTypeLegalizer.cpp	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/Legalizer/PeepholeTypeLegalizer.cpp	2025-11-29 20:03:56.587981194 +0000
+@@ -14,7 +14,6 @@ FIXME? ::
+ 4. StoreInst : Need to consider illegal type being stored directly without being cast back to a legal.
+ */
+ 
+-#define DEBUG_TYPE "type-legalizer"
+ #include "PeepholeTypeLegalizer.hpp"
+ #include "common/LLVMWarningsPush.hpp"
+ #include "llvmWrapper/IR/DerivedTypes.h"
+@@ -27,6 +26,8 @@ FIXME? ::
+ #include "Compiler/CodeGenContextWrapper.hpp"
+ #include "Compiler/CodeGenPublic.h"
+ #include "CISACodeGen/PrepareLoadsStoresUtils.h"
++#undef DEBUG_TYPE
++#define DEBUG_TYPE "type-legalizer"
+ 
+ using namespace llvm;
+ using namespace IGC::Legalizer;
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/Legalizer/TypeLegalizer.cpp ./IGC/Compiler/Legalizer/TypeLegalizer.cpp
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/Legalizer/TypeLegalizer.cpp	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/Legalizer/TypeLegalizer.cpp	2025-11-29 20:03:49.343861303 +0000
+@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
+ 
+ ============================= end_copyright_notice ===========================*/
+ 
+-#define DEBUG_TYPE "type-legalizer"
+ #include "TypeLegalizerPass.h"
+ #include "TypeLegalizer.h"
+ #include "InstLegalChecker.h"
+@@ -27,6 +26,8 @@ SPDX-License-Identifier: MIT
+ #include "common/LLVMWarningsPop.hpp"
+ #include "Compiler/IGCPassSupport.h"
+ #include "Probe/Assertion.h"
++#undef DEBUG_TYPE
++#define DEBUG_TYPE "type-legalizer"
+ 
+ using namespace llvm;
+ using namespace IGC::Legalizer;
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/Optimizer/OpenCLPasses/GenericAddressResolution/GASPropagator.h ./IGC/Compiler/Optimizer/OpenCLPasses/GenericAddressResolution/GASPropagator.h
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/Optimizer/OpenCLPasses/GenericAddressResolution/GASPropagator.h	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/Optimizer/OpenCLPasses/GenericAddressResolution/GASPropagator.h	2025-11-29 20:13:40.701738411 +0000
+@@ -14,8 +14,6 @@ SPDX-License-Identifier: MIT
+ #include <llvm/IR/NoFolder.h>
+ #include "common/LLVMWarningsPop.hpp"
+ 
+-#define DEBUG_TYPE "gas-resolver"
+-
+ namespace IGC{
+ 
+     typedef IRBuilder<llvm::NoFolder> BuilderType;
+diff -uprN ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/Optimizer/OpenCLPasses/GenericAddressResolution/GASResolving.h ./IGC/Compiler/Optimizer/OpenCLPasses/GenericAddressResolution/GASResolving.h
+--- ../intel-graphics-compiler-igc-1.0.17537.20.orig/IGC/Compiler/Optimizer/OpenCLPasses/GenericAddressResolution/GASResolving.h	2024-09-10 08:30:35.000000000 +0000
++++ ./IGC/Compiler/Optimizer/OpenCLPasses/GenericAddressResolution/GASResolving.h	2025-11-29 20:12:32.109779997 +0000
+@@ -13,8 +13,6 @@ SPDX-License-Identifier: MIT
+ #include "llvm/ADT/PostOrderIterator.h"
+ #include "common/LLVMWarningsPop.hpp"
+ 
+-#define DEBUG_TYPE "gas-resolver"
+-
+ using namespace llvm;
+ using namespace IGC;
+ using namespace IGC::IGCMD;
