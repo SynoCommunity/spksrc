@@ -66,9 +66,6 @@ CMAKE_ARGS += -DNEO_CURRENT_PLATFORMS_SUPPORT='OFF'
 CMAKE_ARGS += -DKHRONOS_GL_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 CMAKE_ARGS += -DKHRONOS_HEADERS_DIR=$(STAGING_INSTALL_PREFIX)/include
 
-# Docker build workaround
-CMAKE_ARGS += -DCMAKE_CXX_VISIBILITY_PRESET=default
-
 # -----------------------------------------------------------------------------
 # Reduce build-time binary size
 # -----------------------------------------------------------------------------

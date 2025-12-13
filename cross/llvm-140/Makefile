@@ -69,9 +69,6 @@ CMAKE_ARGS += -DLLVM_ENABLE_DUMP=ON
 # [llvm-libunwind]
 # Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
 
-# Docker build workaround
-CMAKE_ARGS += -DCMAKE_CXX_VISIBILITY_PRESET=default
-
 # Remove build warnings
 ADDITIONAL_CXXFLAGS  = -Wno-cast-function-type
 ADDITIONAL_CXXFLAGS += -Wno-enum-compare

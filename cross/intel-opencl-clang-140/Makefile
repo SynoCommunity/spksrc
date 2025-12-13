@@ -62,9 +62,6 @@ CMAKE_ARGS += -DCLANG_COMMAND=$(LLVM_BIN_DIR)/clang
 # [intel-opencl-clang-140]
 CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
 
-# Docker build workaround
-CMAKE_ARGS += -DCMAKE_CXX_VISIBILITY_PRESET=default
-
 # -----------------------------------------------------------------------------
 # Reduce build-time binary size
 # -----------------------------------------------------------------------------
