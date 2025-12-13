@@ -63,6 +63,9 @@ CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
 CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 
+# Required for rusticl https://docs.mesa3d.org/rusticl.html
+CMAKE_ARGS += -DLLVM_ENABLE_DUMP=ON
+
 # [llvm-libunwind]
 # Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
 
