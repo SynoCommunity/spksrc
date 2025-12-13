@@ -1,6 +1,6 @@
 PKG_NAME = compute-runtime
 # Last maintained branch 24.35 with Gen8-9-11-12 support
-PKG_VERS = 24.35.30872.40
+PKG_VERS = 24.35.30872.41
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
