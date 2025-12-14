@@ -1,6 +1,6 @@
 SPK_NAME = adminer
 SPK_VERS = 5.4.1
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/adminer.png
 DSM_UI_DIR = app
 
@@ -14,7 +14,7 @@ DESCRIPTION = Adminer is a full-featured database management tool available for 
 DESCRIPTION_FRE = Adminer est un outil de gestion de base de données complet disponible pour MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, ElasticSearch et MongoDB.
 ADMIN_URL = /adminer/
 DISPLAY_NAME = Adminer
-CHANGELOG = "1. Update to v5.4.1. <br/>This package depends on Apache 2.4 (DSM >= 6) and PHP 8.2 (DSM 7.2) or PHP 8.0 (DSM 7.0-7.1) or PHP 7.4 (DSM 6)."
+CHANGELOG = "Update to PHP8.4 for DSM >= 7.2."
 
 HOMEPAGE = https://www.adminer.org
 LICENSE  = Apache 2.0 or GPLv2
@@ -27,7 +27,9 @@ include ../../mk/spksrc.common.mk
 ##
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
-SPK_DEPENDS = "WebStation:PHP8.2:Apache2.4"
+SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4"
+# os_min_ver of Synology PHP8.4
+TC_OS_MIN_VER = "7.2-60096"
 # DSM >= 7.2
 CONF_DIR = src/conf_dsm72
 else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
