@@ -1,6 +1,6 @@
 PKG_NAME = intel-graphics-compiler
 # Last supported version to match intel-compute-runtim 24.35 API
-PKG_VERS = 1.0.17537.20
+PKG_VERS = 1.0.17537.24
 PKG_EXT = tar.gz
 PKG_DIST_NAME = igc-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/intel-graphics-compiler/archive
