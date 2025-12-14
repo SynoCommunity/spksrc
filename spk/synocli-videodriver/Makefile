@@ -4,7 +4,7 @@ SPK_REV = 4
 SPK_ICON = src/SynoPackagegreen-videodriver.png
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Provides video driver support for Intel GPU acceleration including OpenCL \(DSM7.1+ only\)."
+DESCRIPTION = "Provides video driver support for Intel GPU acceleration (DSM6-7), including OpenCL \(DSM7.1+ only\)."
 DISPLAY_NAME = SynoCli Video Drivers
 STARTABLE = no
 
@@ -29,8 +29,8 @@ include ../../mk/spksrc.common.mk
 
 CHANGELOG  = "1. Intel Media Driver Release 2024Q4 (Release 2022Q4 for DSM 6).<br/> "
 CHANGELOG += "2. Intel Level-Zero 1.17.42 (DSM 7.1+).<br/> "
-CHANGELOG += "3. Intel Graphics Compiler (IGC) 1.0.17537.20 (DSM 7.1+).<br/> "
-CHANGELOG += "4. Intel Compute Runtime 24.35 (DSM 7.1+).<br/> "
+CHANGELOG += "3. Intel Graphics Compiler (IGC) 1.0.17537.24 (DSM 7.1+).<br/> "
+CHANGELOG += "4. Intel Compute Runtime 24.35.30872.41 (DSM 7.1+).<br/> "
 CHANGELOG += "5. Intel Video Processing Library (Intel VPL) 2.15.0 (DSM 7.1+).<br/> "
 CHANGELOG += "6. Intel GPU Tools (IGT) 1.30 (DSM 7.1+)."
 
