@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 MAINTAINER = GrandDuke1106
-DESCRIPTION = Automatically obtain your public IPv4 or IPv6 address and resolve it to the corresponding domain name service. Supported domain service providers are: Aliyun, Tencent, Dnspod, Cloudflare, Huawei, Callback, Baidu, Porkbun, GoDaddy, Namecheap, NameSilo, Dynadot, DNSLA, Nowcn, Eranet, Gcore.
+DESCRIPTION = Automatically obtain your public IPv4 or IPv6 address and resolve it to the corresponding domain name service. Supported domain service providers are: Aliyun, Tencent, Dnspod, Cloudflare, Huawei, Callback, Baidu, Porkbun, GoDaddy, Namecheap, NameSilo, Dynadot, DNSLA, Nowcn, Eranet, Gcore, IBM NS1 Connect.
 DISPLAY_NAME = ddns-go
 CHANGELOG = "1. Update to 6.14.0."
 
