@@ -57,7 +57,7 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_C_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "cpp_args = ["
@@ -75,7 +75,7 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_CPP_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "fortran_args = ["
@@ -93,7 +93,7 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_FC_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) $(ADDITIONAL_LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "rust_args = [" ; \
@@ -102,5 +102,5 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
 endif
-	@echo $(RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 	@echo -ne "\t]\n"
