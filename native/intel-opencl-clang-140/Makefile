@@ -1,21 +1,19 @@
 PKG_NAME = opencl-clang
 PKG_LLVM_MAJ = 14
-PKG_VERS = $(PKG_LLVM_MAJ)0
-PKG_GIT_BRANCH = ocl-open-$(PKG_VERS)
+PKG_VERS = $(PKG_LLVM_MAJ).0.5
 PKG_EXT = tar.gz
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/opencl-clang/archive
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # ocl-open-140 branch is still receiving updates
 # using latest git hash to ensure replicable builds
-PKG_GIT_HASH = b8cd348820bd8df86c68d5c58540acd4ff426d2e
-PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
-
-# use below for direct ocl-open-140 branch
-#PKG_DIST_NAME = $(PKG_GIT_BRANCH).$(PKG_EXT)
-#PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-#PKG_DIR = $(PKG_NAME)-$(PKG_GIT_BRANCH)
+#PKG_GIT_BRANCH = ocl-open-$(PKG_VERS)
+#PKG_GIT_HASH = b8cd348820bd8df86c68d5c58540acd4ff426d2e
+#PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
+#PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
+#PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
 HOMEPAGE = https://github.com/intel/opencl-clang
 COMMENT  = opencl-clang is a thin wrapper library around clang. The library has OpenCL-oriented API and is capable to compile OpenCL C kernels to SPIR-V modules.
