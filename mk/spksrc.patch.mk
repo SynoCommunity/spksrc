@@ -59,8 +59,6 @@ endif
 
 patch_msg:
 	@$(MSG) "Patching for $(NAME)"
-	@$(MSG) PATCHES: $(PATCHES)
-	exit 2
 
 pre_patch_target: patch_msg
 
