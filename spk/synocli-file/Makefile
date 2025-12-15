@@ -20,8 +20,8 @@ DEPENDS += cross/jupp
 DEPENDS += cross/iconv
 DEPENDS += cross/dos2unix
 DEPENDS += cross/patch
+DEPENDS += cross/rhash
 
-OPTIONAL_DEPENDS  = cross/rhash cross/rhash_1.4.5
 OPTIONAL_DEPENDS += cross/rmlint
 OPTIONAL_DEPENDS += cross/rnm
 OPTIONAL_DEPENDS += cross/micro
@@ -30,8 +30,8 @@ OPTIONAL_DEPENDS += cross/ripgrep
 OPTIONAL_DEPENDS += cross/fd
 OPTIONAL_DEPENDS += cross/sd
 OPTIONAL_DEPENDS += cross/bat
-OPTIONAL_DEPENDS += cross/eza cross/eza_0.20.18
-OPTIONAL_DEPENDS += cross/nnn cross/nnn_4.8 cross/nnn_4.0
+OPTIONAL_DEPENDS += cross/eza
+OPTIONAL_DEPENDS += cross/nnn
 OPTIONAL_DEPENDS += cross/lsd
 OPTIONAL_DEPENDS += cross/xstow
 
@@ -44,31 +44,11 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/rhash_1.4.5
-else
-DEPENDS += cross/rhash
-endif
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-ifneq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-DEPENDS += cross/nnn
-else
-# comcerto2k for DSM>=7
-DEPENDS += cross/nnn_4.0
-endif
-else ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-DEPENDS += cross/nnn_4.8
-else
-# 32-bit archs for DSM<7
-DEPENDS += cross/nnn_4.0
-endif
-endif
-
 # PPC archs except QorIQ
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/nnn
+OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
+
 DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
@@ -84,11 +64,7 @@ ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/bat
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 DEPENDS += cross/eza
-else
-DEPENDS += cross/eza_0.20.18
-endif
 OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
 
 DEPENDS += cross/ripgrep
@@ -123,11 +99,20 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     mg \(emacs-like text editor\), nano, \
     jupp \(based on JOE - Joe\'s Own Editor 3.1\), \
     file, detox, pcre2, zstd, lzip, plzip, \
-    pixz, pigz, \
+    pixz, \
+    pigz, \
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
+
 CHANGELOG  = "1. Add pigz. <br/>"
+CHANGELOG += "2. Update bat from v0.25.0 to v0.26.1 (except for ARMv5 and evansport on DSM < 7). <br/>"
+CHANGELOG += "3. Update dos2unix from v7.5.2 to v7.5.3. <br/>"
+CHANGELOG += "4. Update fzf from v0.66.0 to v0.67.0. <br/>"
+CHANGELOG += "5. Update less from v679 to v685. <br/>"
+CHANGELOG += "6. Update lsd from v1.1.5 to v1.2.0 (except for ARMv5). <br/>"
+CHANGELOG += "7. Update nano from v8.6 to v8.7. <br/>"
+CHANGELOG += "8. Update ripgrep from v14.1.1 to v15.1.0 (except for ARMv5). <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
