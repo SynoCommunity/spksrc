@@ -4,7 +4,7 @@ SPK_REV = 4
 SPK_ICON = src/SynoPackagegreen-videodriver.png
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Provides video driver support for Intel GPU acceleration (DSM6-7), including OpenCL \(DSM7.1+ only\)."
+DESCRIPTION = "Provides video driver support for Intel GPU acceleration \(DSM6-7\), including OpenCL \(DSM7.1+ only\)."
 DISPLAY_NAME = SynoCli Video Drivers
 STARTABLE = no
 
