@@ -1,5 +1,5 @@
 PKG_NAME = SPIRV-Headers
-PKG_VERS = 1.3.283.0
+PKG_VERS = 1.4.335.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = vulkan-sdk-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/KhronosGroup/SPIRV-Headers/archive/refs/tags

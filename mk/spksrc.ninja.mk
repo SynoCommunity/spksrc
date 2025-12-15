@@ -95,6 +95,6 @@ endif
 # default ninja post-install: clean
 ninja_post_install_target:
 	@$(MSG) - Ninja post-install \(clean\)
-	$(RUN_NINJA) ninja -C $(NINJA_BUILD_DIR) clean
+	-$(RUN_NINJA) ninja -C $(NINJA_BUILD_DIR) clean || true
 	$(RUN) rm -f $(NINJA_BUILD_DIR)/build.ninja
 	$(RUN) rm -f $(NINJA_BUILD_DIR)/compile_commands.json

@@ -1,4 +1,5 @@
 PKG_NAME = level-zero
+# Last supported version to match intel-compute-runtim 24.35 API
 PKG_VERS = 1.17.42
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
