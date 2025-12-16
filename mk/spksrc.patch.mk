@@ -28,12 +28,14 @@ PATCHES += $(sort $(wildcard patches/*.patch))
 PATCHES += $(sort $(wildcard patches/kernel-$(subst +,,$(TC_KERNEL))/*.patch))
 PATCHES += $(sort $(wildcard patches/DSM-$(TCVERSION)/*.patch \
 	                     patches/DSM-$(firstword $(subst ., ,$(TCVERSION)))/*.patch))
+ifneq ($(ARCH),)
 PATCHES += $(sort $(wildcard patches/$(ARCH)-$(TCVERSION)/*.patch \
 	                     patches/$(ARCH)/*.patch))
 PATCHES += $(sort $(foreach group,ARM_ARCHS ARMv5_ARCHS ARMv7_ARCHS ARMv7L_ARCHS ARMv8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
 	   $(if $(filter $(ARCH),$($(group))), \
 	   $(wildcard patches/$(shell echo $(group) | cut -f1 -d '_' | tr 'A-Z' 'a-z')/*.patch \
 	              patches/$(shell echo $(group) | cut -f1 -d '_' | tr 'A-Z' 'a-z')-$(TCVERSION)/*.patch))))
+endif
 PATCHES := $(realpath $(PATCHES))
 
 PATCH_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)patch_done
