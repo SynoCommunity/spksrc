@@ -1,0 +1,40 @@
+# drop gitcommit grammar from grammars
+# 
+# gitcommit grammar fails to build for ARMv8 archs with Toolchain < 7.0
+#   Failure 1/1: gitcommit Parser compilation failed.
+#   Stderr: /tmp/cceOLXIb.s: Assembler messages:
+#   /tmp/cceOLXIb.s:33: Error: conditional branch out of range
+# 
+--- languages.toml.orig	2025-07-18 15:07:04.000000000 +0000
++++ languages.toml	2025-12-01 13:10:37.705062352 +0000
+@@ -1887,30 +1887,6 @@
+ grammar = "yaml"
+ 
+ [[language]]
+-name = "git-commit"
+-scope = "git.commitmsg"
+-file-types = [{ glob = "COMMIT_EDITMSG" }, { glob = "MERGE_MSG" }]
+-comment-token = "#"
+-indent = { tab-width = 4, unit = "    " }
+-rulers = [51, 73]
+-text-width = 72
+-grammar = "gitcommit"
+-
+-[[grammar]]
+-name = "gitcommit"
+-source = { git = "https://github.com/gbprod/tree-sitter-gitcommit", rev = "a716678c0f00645fed1e6f1d0eb221481dbd6f6d" }
+-
+-[[language]]
+-name = "git-notes"
+-scope = "git.notesmsg"
+-file-types = [{ glob = "NOTES_EDITMSG" }]
+-comment-token = "#"
+-indent = { tab-width = 4, unit = "    " }
+-rulers = [73]
+-text-width = 72
+-grammar = "gitcommit"
+-
+-[[language]]
+ name = "diff"
+ scope = "source.diff"
+ file-types = ["diff", "patch", "rej"]
