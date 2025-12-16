@@ -7,7 +7,8 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.main-depends.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+# rustc >= 1.85 required
 DEPENDS += cross/ripgrep-14
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)

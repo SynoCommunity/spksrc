@@ -77,6 +77,7 @@ endif
 
 DEPENDS += cross/sd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
+
 DEPENDS += cross/lsd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
 endif
@@ -106,13 +107,13 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
 STARTABLE = no
 
 CHANGELOG  = "1. Add pigz. <br/>"
-CHANGELOG += "2. Update bat from v0.25.0 to v0.26.1 (except for ARMv5 and evansport on DSM < 7). <br/>"
+CHANGELOG += "2. Update bat from v0.25.0 to v0.26.1 (except for ARMv5, qoriq and evansport on DSM < 7). <br/>"
 CHANGELOG += "3. Update dos2unix from v7.5.2 to v7.5.3. <br/>"
 CHANGELOG += "4. Update fzf from v0.66.0 to v0.67.0. <br/>"
 CHANGELOG += "5. Update less from v679 to v685. <br/>"
 CHANGELOG += "6. Update lsd from v1.1.5 to v1.2.0 (except for ARMv5). <br/>"
 CHANGELOG += "7. Update nano from v8.6 to v8.7. <br/>"
-CHANGELOG += "8. Update ripgrep from v14.1.1 to v15.1.0 (except for ARMv5). <br/>"
+CHANGELOG += "8. Update ripgrep from v14.1.1 to v15.1.0 (except for ARMv5 and qoriq). <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 SERVICE_SETUP = src/service-setup.sh

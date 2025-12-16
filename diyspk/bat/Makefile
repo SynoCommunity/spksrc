@@ -7,7 +7,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 DEPENDS = cross/bat
 
 include ../../mk/spksrc.archs.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 SPK_VERS = 0.25.0
 endif
 

@@ -6,10 +6,10 @@ SPK_ICON = src/ripgrep.png
 # powerpc archs (except qoriq) are not supported
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-DEPENDS += cross/ripgrep
+DEPENDS = cross/ripgrep
 
 include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 SPK_VERS = 14.1.1
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)

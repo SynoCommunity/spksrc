@@ -10,8 +10,8 @@ DEPENDS = cross/pcre2
 
 # powerpc archs (except qoriq) are not supported
 UNSUPPORTED_ARCHS  = $(OLD_PPC_ARCHS) 
-# Rust edition2024 required
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+# Rust edition2024 required (rustc >= 1.85)
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(PPC_ARCHS)
 # asm error:
 UNSUPPORTED_ARCHS_TCVERSION = evansport-6.2.4
 
