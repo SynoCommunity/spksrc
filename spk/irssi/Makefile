@@ -1,6 +1,6 @@
 SPK_NAME = irssi
-SPK_VERS = 1.2.3
-SPK_REV = 3
+SPK_VERS = 1.4.5
+SPK_REV = 4
 SPK_ICON = src/irssi.png
 
 DEPENDS = cross/irssi
@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Irssi is a terminal based IRC client for UNIX systems. It also supports SILC and ICB protocols via plugins.
 DISPLAY_NAME = Irssi
 STARTABLE = no
-CHANGELOG = "1. Update irssi to v1.2.3 released on 2021-04-11.<br/>2. Update openssl to 1.1.1k.<br/>3. Update glib to 2.66."
+CHANGELOG = "Update irssi to v1.4.5 released on 2023-10-03."
 
 HOMEPAGE = https://www.irssi.org/
 LICENSE = GPLv2
