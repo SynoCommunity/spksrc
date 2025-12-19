@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/irssi/irssi/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/glib cross/ncursesw cross/openssl
+DEPENDS = cross/glib cross/ncursesw cross/openssl3
 
 HOMEPAGE = http://www.irssi.org/
 COMMENT  = Irssi is a terminal based IRC client for UNIX systems. It also supports SILC and ICB protocols via plugins.
