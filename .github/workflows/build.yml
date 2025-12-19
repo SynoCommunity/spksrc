@@ -78,7 +78,7 @@ jobs:
       distrib_hash: ${{ steps.distrib-hash.outputs.hash }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -289,7 +289,7 @@ jobs:
       matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Cache toolchains
         uses: actions/cache@v5
