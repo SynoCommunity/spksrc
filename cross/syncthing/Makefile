@@ -69,10 +69,12 @@ syncthing_install:
 	  echo "*** sqlite runtime missing prior to install" >&2; \
 	  exit 1; \
 	fi; \
-	cp -a $(SQLITE_STAGING)/lib/libsqlite3.so* $(STAGING_INSTALL_PREFIX)/lib/
-	for so in libz.so libz.so.1 libz.so.*; do \
-	  find $(SQLITE_STAGING)/lib -maxdepth 1 -name "$$so" -exec cp -P {} $(STAGING_INSTALL_PREFIX)/lib/ \; ; \
-	done
+	if [ "$(SQLITE_STAGING)" != "$(STAGING_INSTALL_PREFIX)" ]; then \
+	  cp -a $(SQLITE_STAGING)/lib/libsqlite3.so* $(STAGING_INSTALL_PREFIX)/lib/; \
+	  for so in libz.so libz.so.1 libz.so.*; do \
+	    find $(SQLITE_STAGING)/lib -maxdepth 1 -name "$$so" -exec cp -P {} $(STAGING_INSTALL_PREFIX)/lib/ \; ; \
+	  done; \
+	fi
 
 .PHONY: syncthing_post_install
 # cross/sqlite stages headers, pkgconfig data, manpages, etc.; prune those so
