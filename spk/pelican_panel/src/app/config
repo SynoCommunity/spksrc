@@ -1,0 +1,31 @@
+{
+	".url": {
+		"com.synocommunity.packages.pelican_panel": {
+			"title": "Pelican Panel",
+			"desc": "Ouvrir l'interface web du Panel Pelican",
+			"icon": "images/pelican_panel-{0}.png",
+			"type": "url",
+			"protocol": "http",
+			"port": "8080",
+			"url": "/",
+			"allUsers": true
+		}
+	},
+	"PelicanWings.js": {
+		"PelicanWings.AppInstance": {
+			"type": "app",
+			"title": "Configurer Wings",
+			"desc": "Configurer le daemon Wings pour ce NAS",
+			"icon": "images/pelican_panel-{0}.png",
+			"allowMultiInstance": false,
+			"allUsers": false,
+			"appWindow": "PelicanWings.AppWindow",
+			"depend": ["PelicanWings.AppWindow"]
+		},
+		"PelicanWings.AppWindow": {
+			"type": "lib",
+			"title": "Configurer Wings",
+			"icon": "images/pelican_panel-{0}.png"
+		}
+	}
+}
