@@ -1,0 +1,128 @@
+# config.toml
+
+# Hostname / IP
+#
+# Default: "localhost"
+#
+host = "0.0.0.0"
+
+# Port
+#
+# Default: 7474
+#
+port = 7474
+
+# Base url
+# Set custom baseUrl eg /autobrr/ to serve in subdirectory.
+# Not needed for subdomain, or by accessing with the :port directly.
+#
+# Optional
+#
+#baseUrl = "/autobrr/"
+
+# Base url mode legacy
+# This is kept for compatibility with older versions doing url rewrite on the proxy.
+# If you use baseUrl you can set this to false and skip any url rewrite in your proxy.
+#
+# Default: true
+#
+baseUrlModeLegacy = true
+
+# autobrr logs file
+# If not defined, logs to stdout
+# Make sure to use forward slashes and include the filename with extension. eg: "log/autobrr.log", "C:/autobrr/log/autobrr.log"
+#
+# Optional
+#
+logPath = "/var/packages/autobrr/var/log/autobrr.log"
+
+# Log level
+#
+# Default: "DEBUG"
+#
+# Options: "ERROR", "DEBUG", "INFO", "WARN", "TRACE"
+#
+logLevel = "INFO"
+
+# Log Max Size
+#
+# Default: 50
+#
+# Max log size in megabytes
+#
+#logMaxSize = 50
+
+# Log Max Backups
+#
+# Default: 3
+#
+# Max amount of old log files
+#
+#logMaxBackups = 3
+
+# Check for updates
+#
+checkForUpdates = false
+
+# Session secret
+#
+sessionSecret = "@@session_secret@@"
+
+# Database Max Backups
+#
+# Default: 5
+#
+#databaseMaxBackups = 5
+
+# Golang pprof profiling and tracing
+#
+#profilingEnabled = false
+#
+#profilingHost = "127.0.0.1"
+#
+# Default: 6060
+#profilingPort = 6060
+
+# OpenID Connect Configuration
+#
+# Enable OIDC authentication
+#oidcEnabled = false
+#
+# OIDC Issuer URL (e.g. https://auth.example.com)
+#oidcIssuer = ""
+#
+# OIDC Client ID
+#oidcClientId = ""
+#
+# OIDC Client Secret
+#oidcClientSecret = ""
+#
+# OIDC Redirect URL (e.g. http://localhost:7474/api/auth/oidc/callback)
+#oidcRedirectUrl = ""
+#
+# Disable Built In Login Form (only works when using external auth)
+#oidcDisableBuiltInLogin = false
+
+# Metrics
+#
+# Enable metrics endpoint
+#metricsEnabled = true
+#
+# Metrics server host
+#
+#metricsHost = "127.0.0.1"
+#
+# Metrics server port
+#
+#metricsPort = 9074
+#
+# Metrics basic auth
+#
+# Comma separate list of user:password. Password must be htpasswd bcrypt hashed. Use autobrrctl to generate.
+# Only enabled if correctly set with user:pass.
+#
+#metricsBasicAuthUsers = ""
+
+# Custom definitions
+#
+#customDefinitions = "test/definitions"
