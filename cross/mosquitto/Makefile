@@ -20,11 +20,11 @@ LICENSE  = EPL 1.0 and EDL 1.0
 CMAKE_ARGS += -DWITH_WEBSOCKETS=ON
 CMAKE_ARGS += -DWITH_SRV=ON
 CMAKE_ARGS += -DDOCUMENTATION=OFF
-CMAKE_ARGS += -DCMAKE_C_STANDARD=99
-CMAKE_ARGS += -DCMAKE_C_STANDARD_REQUIRED=ON
-CMAKE_USE_TOOLCHAIN_FILE = ON
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt,$(TC_GCC),5),1)
+ADDITIONAL_CFLAGS += -std=c99
+endif
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 # use clock_gettime of librt
 ADDITIONAL_LDFLAGS += -lrt
