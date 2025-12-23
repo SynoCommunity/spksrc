@@ -9,9 +9,6 @@ DEPENDS = cross/syncthing
 # archs not supported by go (ARMv5 requires legacy toolchain no longer provided)
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
-# cross/sqlite installs the CLI shell; strip it so the package ships runtime libs only
-PLIST_TRANSFORM = sed '/^bin:bin\/sqlite3$$/d'
-
 MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
