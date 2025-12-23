@@ -1,6 +1,6 @@
 PKG_NAME = llvm-140
 PKG_LLVM_MAJ = 14
-PKG_VERS = $(PKG_LLVM_MAJ).0.5
+PKG_VERS = $(PKG_LLVM_MAJ).0.6
 PKG_DIR = llvm-project
 
 HOMEPAGE = https://llvm.org/
