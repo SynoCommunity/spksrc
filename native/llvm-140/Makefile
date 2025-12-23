@@ -67,8 +67,12 @@ CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 # Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
 
 # Remove build warnings
-NATIVE_CXXFLAGS  = -Wno-cast-function-type
+NATIVE_CXXFLAGS  = -Wno-attributes
+NATIVE_CXXFLAGS += -Wno-cast-function-type
 NATIVE_CXXFLAGS += -Wno-enum-compare
+NATIVE_CXXFLAGS += -Wno-nonnull
+NATIVE_CXXFLAGS += -Wno-mismatched-new-delete
+NATIVE_CXXFLAGS += -Wno-missing-template-keyword
 NATIVE_CXXFLAGS += -Wno-pedantic
 NATIVE_CXXFLAGS += -Wno-switch
 NATIVE_CXXFLAGS += -Wno-unused-function
