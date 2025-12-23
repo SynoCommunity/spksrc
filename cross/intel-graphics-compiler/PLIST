@@ -9,4 +9,5 @@ lib:lib/libigdfcl.so.1.0.1
 lnk:lib/libiga64.so
 lnk:lib/libiga64.so.1
 lib:lib/libiga64.so.1.0.1
+lib:lib/libBiFManager.so
 rsc:lib/igc/NOTICES.txt
