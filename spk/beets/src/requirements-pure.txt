@@ -1,4 +1,5 @@
-# Generated using the requirements script on June 15, 2025
+# Generated using the requirements script on December 23, 2025
+# Command: ./generate_requirements.sh "beets[beatport,chroma,discogs,embedart,embyupdate,fetchart,kodiupdate,lastgenre,lastimport,lyrics,metasync,plexupdate,replaygain,scrub,sonosupdate]==2.5.1" 312
 
 # NOTE: The following plugins were excluded due to being broken or deprecated:
 # absubmit, docs, import, reflink
@@ -6,37 +7,38 @@
 # NOTE: Excluded plugins that require background services or desktop environments:
 # aura, bpd, mpdstats, thumbnails, web
 
-anyio==4.9.0
+# NOTE: Plugins not available due to lacking dependencies: AutoBPM.
+
+anyio==4.12.0
 appdirs==1.4.4
-audioread==3.0.1
-beautifulsoup4==4.13.4          # for plugins: fetchart, lyrics
-beets==2.3.1
-#certifi                        ==> python312
-confuse==2.0.1
+audioread==3.1.0
+beautifulsoup4==4.14.3
+beets==2.5.1
+#certifi                ==> python312
+confuse==2.1.0
 filetype==1.2.0
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
-idna==3.10
+idna==3.11
 ifaddr==0.2.0
-langdetect==1.0.9               # for plugins: fetchart, lyrics
+langdetect==1.0.9
 mediafile==0.13.0
 musicbrainzngs==0.7.1
-mutagen==1.47.0                 # for plugins: scrub
-oauthlib==3.2.2
-#pip                            ==> python312
-#platformdirs>=3.5.0            ==> python312
+mutagen==1.47.0
+oauthlib==3.3.1
+#pip                    ==> python312
+#platformdirs>=3.5.0    ==> python312
 pyacoustid==1.3.0
-pylast==5.5.0
+pylast==7.0.0
 python3_discogs_client==2.8
 python_dateutil==2.9.0.post0
-requests==2.32.4                # for plugins: embyupdate, fetchart, kodiupdate, lyrics, plexupdate
-requests_oauthlib==2.0.0        # for plugins: beatport
-#six                            ==> python312
-sniffio==1.3.1
-soco==0.30.10                   # for plugins: sonosupdate
-soupsieve==2.7
-typing_extensions==4.14.0
+requests==2.32.5
+requests_oauthlib==2.0.0
+#six                    ==> python312
+soco==0.30.13
+soupsieve==2.8.1
+#typing_extensions      ==> python312
 Unidecode==1.4.0
-urllib3==2.4.0
-xmltodict==0.14.2
+urllib3==2.6.2
+xmltodict==1.0.2
