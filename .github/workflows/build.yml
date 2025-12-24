@@ -291,6 +291,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      # Monitor initial disk space before build starts
+      - name: Initial Disk Space Check
+        id: disk-start
+        run: |
+          echo "=== Disk Space at Start ==="
+          df -h
+          echo ""
+          echo "=== Largest directories in workspace ==="
+          du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
+          echo ""
+          df -h > disk_start.txt
+          du -sh /home/runner/work/* > disk_usage_start.txt 2>/dev/null || true
+
       - name: Cache toolchains
         uses: actions/cache@v5
         # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
@@ -298,6 +311,12 @@ jobs:
         with:
           path: toolchain/*/work
           key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
+
+      # Check disk space after toolchain cache restore
+      - name: Disk Space After Cache Restore
+        run: |
+          echo "=== Disk Space after Cache ==="
+          df -h
 
       - name: Restore distrib cache
         uses: actions/cache/restore@v5
@@ -308,6 +327,13 @@ jobs:
           key: distrib-placeholder-${{ github.run_id }}
           restore-keys: |
             distrib-
+
+      # Check disk space after distrib cache restore
+      - name: Disk Space After Distrib Restore
+        run: |
+          echo "=== Disk Space after Distrib ==="
+          df -h
+          du -sh distrib 2>/dev/null || echo "No distrib directory"
 
       - name: Build Package (based on changed files)
         # We don't want to stop the build on errors.
@@ -329,6 +355,64 @@ jobs:
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
+      # Check disk space after build completes (success or failure)
+      - name: Disk Space After Build
+        if: always()
+        run: |
+          echo "=== Disk Space after Build ==="
+          df -h
+          echo ""
+          echo "=== Largest directories after build ==="
+          du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
+          echo ""
+          df -h > disk_end.txt
+          du -sh /home/runner/work/* > disk_usage_end.txt 2>/dev/null || true
+          
+          # Check if running low on disk space
+          DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+          if [ "$DISK_USAGE" -gt 90 ]; then
+            echo "::warning::Disk usage is at ${DISK_USAGE}% - build may have failed due to low disk space"
+          fi
+
+      # Capture Docker logs when build fails
+      - name: Capture Docker Logs on Failure
+        if: failure()
+        run: |
+          echo "=== Attempting to capture docker logs ==="
+          docker ps -a || true
+          docker logs $(docker ps -aq | head -1) 2>&1 | tail -500 > docker_logs.txt || echo "Could not capture docker logs"
+
+      # Collect all build logs from spk package directories
+      - name: Collect Build Logs from SPK directories
+        if: always()
+        run: |
+          echo "=== Collecting build logs from spk directories ==="
+          mkdir -p collected_logs
+          
+          # Search for all build logs in spk directories
+          find spk/ -type f \( -name "*.log" -o -name "build-*.log" -o -name "status-*.log" \) -print0 | while IFS= read -r -d '' logfile; do
+            # Create directory structure in collected_logs
+            relative_path=$(dirname "$logfile")
+            mkdir -p "collected_logs/$relative_path"
+            # Copy log file
+            cp "$logfile" "collected_logs/$logfile" 2>/dev/null || true
+            echo "Collected: $logfile"
+          done
+          
+          # Display summary of collected logs
+          echo ""
+          echo "=== Summary of collected logs ==="
+          find collected_logs -type f -name "*.log" -exec ls -lh {} \; | head -50
+          
+          # For current architecture, display last lines of main build logs
+          echo ""
+          echo "=== Last 100 lines of main build log for ${{ matrix.arch }} ==="
+          find spk/ -type f -name "build-${{ matrix.arch }}.log" -exec tail -100 {} \; 2>/dev/null || echo "No build log found for ${{ matrix.arch }}"
+          
+          echo ""
+          echo "=== Content of status-build.log if exists ==="
+          find spk/ -type f -name "status-build.log" -exec cat {} \; 2>/dev/null || echo "No status-build.log found"
+
       - name: Build Status
         id: build_status
         # We need this status since we don't want to stop the build on errors.
@@ -341,6 +425,25 @@ jobs:
           BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+
+      # Upload diagnostic logs and disk space info for troubleshooting
+      - name: Upload Diagnostic Logs
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: Diagnostics-${{ matrix.arch }}
+          path: |
+            disk_start.txt
+            disk_end.txt
+            disk_usage_start.txt
+            disk_usage_end.txt
+            docker_logs.txt
+            build_errors.txt
+            build_log_errors.txt
+            build_unsupported.txt
+            build_success.txt
+            collected_logs/**/*.log
+          if-no-files-found: ignore
 
       - name: Upload artifacts
         if: always()
