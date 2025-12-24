@@ -291,6 +291,52 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      # Free up disk space on GitHub runner before build starts
+      - name: Free Disk Space (Ubuntu)
+        run: |
+          echo "=== Disk space before cleanup ==="
+          df -h
+          
+          echo ""
+          echo "=== Removing unnecessary packages and files ==="
+          
+          # Remove Android SDK/NDK (takes ~10-15GB)
+          sudo rm -rf /usr/local/lib/android || true
+          
+          # Remove .NET runtime (takes ~2GB)
+          sudo rm -rf /usr/share/dotnet || true
+          
+          # Remove Haskell (takes ~5GB)
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/local/.ghcup || true
+          
+          # Remove large tool caches
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
+          
+          # Remove Docker images we don't need (keep space for our build image)
+          docker rmi $(docker image ls -aq) 2>/dev/null || true
+          
+          # Remove swap file if exists (can free 4GB+)
+          sudo swapoff -a || true
+          sudo rm -f /swapfile /mnt/swapfile || true
+          
+          # Clean apt cache
+          sudo apt-get clean || true
+          
+          # Remove large packages we don't need
+          sudo apt-get remove -y '^aspnetcore-.*' '^dotnet-.*' '^llvm-.*' 'php.*' '^mongodb-.*' '^mysql-.*' 'azure-cli' 'google-cloud-sdk' 'google-chrome-stable' 'firefox' 'powershell' 'mono-devel' 'temurin-.*' || true
+          sudo apt-get autoremove -y || true
+          sudo apt-get clean || true
+          
+          echo ""
+          echo "=== Disk space after cleanup ==="
+          df -h
+          
+          # Calculate space freed
+          echo ""
+          echo "=== Space freed calculation ==="
+          df -h / | tail -1 | awk '{print "Available space: " $4}'
+
       # Monitor initial disk space before build starts
       - name: Initial Disk Space Check
         id: disk-start
