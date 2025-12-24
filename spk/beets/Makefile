@@ -65,7 +65,7 @@ DEPENDS += cross/mp3gain
 DEPENDS += cross/libyaml
 
 # [numpy]
-DEPENDS += python/numpy
+DEPENDS += python/numpy_1.26
 
 # [lap] - depends on [numpy]
 DEPENDS += python/lap
