@@ -1,6 +1,6 @@
 SPK_NAME = beets
 SPK_VERS = 2.3.1
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/beets.png
 
 PYTHON_PACKAGE = python312
@@ -65,7 +65,7 @@ DEPENDS += cross/mp3gain
 DEPENDS += cross/libyaml
 
 # [numpy]
-DEPENDS += python/numpy
+DEPENDS += python/numpy_1.26
 
 # [lap] - depends on [numpy]
 DEPENDS += python/lap
