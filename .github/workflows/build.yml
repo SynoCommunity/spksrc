@@ -373,6 +373,23 @@ jobs:
           if [ "$DISK_USAGE" -gt 90 ]; then
             echo "::warning::Disk usage is at ${DISK_USAGE}% - build may have failed due to low disk space"
           fi
+          
+          # Emergency cleanup if disk is critically full (above 95%)
+          if [ "$DISK_USAGE" -gt 95 ]; then
+            echo "::error::CRITICAL: Disk usage is at ${DISK_USAGE}% - performing emergency cleanup"
+            echo "disk_critical=true" >> $GITHUB_ENV
+            
+            # Clean up Docker to free space for diagnostics upload
+            echo "Cleaning Docker system..."
+            docker system prune -af --volumes 2>/dev/null || true
+            
+            # Remove large work directories except logs
+            echo "Cleaning large build artifacts..."
+            find . -type d -name "work-*" -exec sh -c 'find "$1" -type f ! -name "*.log" -delete' _ {} \; 2>/dev/null || true
+            
+            echo "Space after emergency cleanup:"
+            df -h
+          fi
 
       # Capture Docker logs when build fails
       - name: Capture Docker Logs on Failure
@@ -390,10 +407,10 @@ jobs:
           mkdir -p collected_logs
           
           # Search for all build logs in spk directories
-          find spk/ -type f \( -name "*.log" -o -name "build-*.log" -o -name "status-*.log" \) -print0 | while IFS= read -r -d '' logfile; do
+          find spk/ -type f \( -name "*.log" -o -name "build-*.log" -o -name "status-*.log" \) -print0 2>/dev/null | while IFS= read -r -d '' logfile; do
             # Create directory structure in collected_logs
             relative_path=$(dirname "$logfile")
-            mkdir -p "collected_logs/$relative_path"
+            mkdir -p "collected_logs/$relative_path" 2>/dev/null || true
             # Copy log file
             cp "$logfile" "collected_logs/$logfile" 2>/dev/null || true
             echo "Collected: $logfile"
@@ -402,7 +419,7 @@ jobs:
           # Display summary of collected logs
           echo ""
           echo "=== Summary of collected logs ==="
-          find collected_logs -type f -name "*.log" -exec ls -lh {} \; | head -50
+          find collected_logs -type f -name "*.log" -exec ls -lh {} \; 2>/dev/null | head -50
           
           # For current architecture, display last lines of main build logs
           echo ""
@@ -412,6 +429,12 @@ jobs:
           echo ""
           echo "=== Content of status-build.log if exists ==="
           find spk/ -type f -name "status-build.log" -exec cat {} \; 2>/dev/null || echo "No status-build.log found"
+          
+          # If disk was critical, create a marker file
+          if [ "${{ env.disk_critical }}" == "true" ]; then
+            echo "Build failed due to critical disk space (>95% full)" > collected_logs/DISK_SPACE_CRITICAL.txt
+            df -h >> collected_logs/DISK_SPACE_CRITICAL.txt
+          fi
 
       - name: Build Status
         id: build_status
@@ -427,8 +450,10 @@ jobs:
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
       # Upload diagnostic logs and disk space info for troubleshooting
+      # Uses continue-on-error to ensure this runs even if previous steps had issues
       - name: Upload Diagnostic Logs
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@v6
         with:
           name: Diagnostics-${{ matrix.arch }}
@@ -443,7 +468,10 @@ jobs:
             build_unsupported.txt
             build_success.txt
             collected_logs/**/*.log
+            collected_logs/DISK_SPACE_CRITICAL.txt
           if-no-files-found: ignore
+          retention-days: 30
+          compression-level: 9
 
       - name: Upload artifacts
         if: always()
