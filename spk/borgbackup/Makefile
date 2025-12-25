@@ -3,6 +3,12 @@ SPK_VERS = 1.4.3
 SPK_REV = 20
 SPK_ICON = src/borgbackup.png
 
+# Remarks:
+# keep spk/borgbackup_py311 in sync.
+# update and validate borgbackup for python311 too.
+# publish python312 version first, then publish py311 version for DSM 6,
+# for priority of py312 over py311 for archs that support both.
+
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
