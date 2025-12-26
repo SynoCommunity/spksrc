@@ -41,6 +41,8 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.1),1)
 DEPENDS += cross/intel-compute-runtime
 DEPENDS += cross/clinfo
 DEPENDS += cross/mesa
+DEPENDS += cross/Khronos-Vulkan-Loader
+DEPENDS += cross/Khronos-Vulkan-Tools
 
 # Enable intel_gpu_top on DSM >= 7.1
 DEPENDS += cross/intel-gpu-tools
