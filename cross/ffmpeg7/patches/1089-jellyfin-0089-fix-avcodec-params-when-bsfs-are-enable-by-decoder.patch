@@ -1,0 +1,14 @@
+Index: FFmpeg/libavcodec/decode.c
+===================================================================
+--- libavcodec/decode.c
++++ libavcodec/decode.c
+@@ -207,6 +207,9 @@ static int decode_bsfs_init(AVCodecConte
+     ret = av_bsf_init(avci->bsf);
+     if (ret < 0)
+         goto fail;
++    ret = avcodec_parameters_to_context(avctx, avci->bsf->par_out);
++    if (ret < 0)
++        goto fail;
+ 
+     return 0;
+ fail:

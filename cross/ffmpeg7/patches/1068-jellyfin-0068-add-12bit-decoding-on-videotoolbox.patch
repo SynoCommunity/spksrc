@@ -1,0 +1,24 @@
+Index: FFmpeg/libavcodec/hevc/hevcdec.c
+===================================================================
+--- libavcodec/hevc/hevcdec.c
++++ libavcodec/hevc/hevcdec.c
+@@ -660,6 +660,9 @@ static enum AVPixelFormat get_format(HEV
+ #if CONFIG_HEVC_NVDEC_HWACCEL
+         *fmt++ = AV_PIX_FMT_CUDA;
+ #endif
++#if CONFIG_HEVC_VIDEOTOOLBOX_HWACCEL
++        *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
++#endif
+         break;
+     case AV_PIX_FMT_YUV422P12:
+ #if CONFIG_HEVC_DXVA2_HWACCEL
+@@ -675,6 +678,9 @@ static enum AVPixelFormat get_format(HEV
+ #if CONFIG_HEVC_VULKAN_HWACCEL
+         *fmt++ = AV_PIX_FMT_VULKAN;
+ #endif
++#if CONFIG_HEVC_VIDEOTOOLBOX_HWACCEL
++        *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
++#endif
+         break;
+     }
+ 

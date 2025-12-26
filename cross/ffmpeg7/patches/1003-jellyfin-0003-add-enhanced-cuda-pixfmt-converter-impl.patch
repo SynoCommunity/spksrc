@@ -279,256 +279,74 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
 ===================================================================
 --- libavfilter/vf_scale_cuda.c
 +++ libavfilter/vf_scale_cuda.c
-@@ -1,5 +1,8 @@
- /*
- * Copyright (c) 2017, NVIDIA CORPORATION. All rights reserved.
-+* Copyright (c) 2019 rcombs
-+*
-+* This file is part of FFmpeg.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
-@@ -20,9 +23,9 @@
- * DEALINGS IN THE SOFTWARE.
- */
- 
--#include <float.h>
+@@ -23,6 +23,7 @@
+ #include <float.h>
  #include <stdio.h>
  
 +#include "libavutil/avassert.h"
  #include "libavutil/common.h"
  #include "libavutil/hwcontext.h"
  #include "libavutil/hwcontext_cuda_internal.h"
-@@ -32,12 +35,12 @@
+@@ -32,6 +33,7 @@
  #include "libavutil/pixdesc.h"
  
  #include "avfilter.h"
 +#include "dither_matrix.h"
- #include "internal.h"
+ #include "filters.h"
  #include "scale_eval.h"
  #include "video.h"
+@@ -108,6 +110,9 @@ typedef struct CUDAScaleContext {
+     int interp_as_integer;
  
- #include "cuda/load_helper.h"
--#include "vf_scale_cuda.h"
- 
- static const enum AVPixelFormat supported_formats[] = {
-     AV_PIX_FMT_YUV420P,
-@@ -46,10 +49,6 @@ static const enum AVPixelFormat supporte
-     AV_PIX_FMT_P010,
-     AV_PIX_FMT_P016,
-     AV_PIX_FMT_YUV444P16,
--    AV_PIX_FMT_0RGB32,
--    AV_PIX_FMT_0BGR32,
--    AV_PIX_FMT_RGB32,
--    AV_PIX_FMT_BGR32,
- };
- 
- #define DIV_UP(a, b) ( ((a) + (b) - 1) / (b) )
-@@ -58,27 +57,13 @@ static const enum AVPixelFormat supporte
- 
- #define CHECK_CU(x) FF_CUDA_CHECK_DL(ctx, s->hwctx->internal->cuda_dl, x)
- 
--enum {
--    INTERP_ALGO_DEFAULT,
--
--    INTERP_ALGO_NEAREST,
--    INTERP_ALGO_BILINEAR,
--    INTERP_ALGO_BICUBIC,
--    INTERP_ALGO_LANCZOS,
--
--    INTERP_ALGO_COUNT
--};
--
- typedef struct CUDAScaleContext {
-     const AVClass *class;
- 
-     AVCUDADeviceContext *hwctx;
- 
--    enum AVPixelFormat in_fmt, out_fmt;
--    const AVPixFmtDescriptor *in_desc, *out_desc;
--    int in_planes, out_planes;
--    int in_plane_depths[4];
--    int in_plane_channels[4];
-+    enum AVPixelFormat in_fmt;
-+    enum AVPixelFormat out_fmt;
- 
-     AVBufferRef *frames_ctx;
-     AVFrame     *frame;
-@@ -90,6 +75,7 @@ typedef struct CUDAScaleContext {
-      * Output sw format. AV_PIX_FMT_NONE for no conversion.
-      */
-     enum AVPixelFormat format;
-+    char *format_str;
- 
-     char *w_expr;               ///< width  expression string
-     char *h_expr;               ///< height expression string
-@@ -99,21 +85,56 @@ typedef struct CUDAScaleContext {
- 
-     CUcontext   cu_ctx;
-     CUmodule    cu_module;
--    CUfunction  cu_func;
--    CUfunction  cu_func_uv;
+     float param;
 +
-+#define VARIANT(NAME) \
-+    CUfunction  cu_func_ ## NAME;
-+#define VARIANTSET(NAME) \
-+    VARIANT(NAME) \
-+    VARIANT(NAME ## _c) \
-+    VARIANT(NAME ## _p2) \
-+    VARIANT(NAME ## _2) \
-+    VARIANT(NAME ## _2_u) \
-+    VARIANT(NAME ## _2_v) \
-+    VARIANT(NAME ## _4)
-+
-+    VARIANTSET(8_8)
-+    VARIANTSET(16_16)
-+    VARIANTSET(8_16)
-+    VARIANTSET(16_8)
-+#undef VARIANTSET
-+#undef VARIANT
-+
-+    CUfunction  cu_func_luma;
-+    CUfunction  cu_func_chroma_u;
-+    CUfunction  cu_func_chroma_v;
-+
-     CUstream    cu_stream;
- 
--    int interp_algo;
--    int interp_use_linear;
--    int interp_as_integer;
-+    CUdeviceptr srcBuffer;
-+    CUdeviceptr dstBuffer;
-+    int         tex_alignment;
- 
--    float param;
-+    const AVPixFmtDescriptor *in_desc, *out_desc;
-+    int         in_planes, out_planes;
-+
-+    CUdeviceptr ditherBuffer;
-+    CUtexObject ditherTex;
++    CUdeviceptr dither_buffer;
++    CUtexObject dither_tex;
  } CUDAScaleContext;
  
  static av_cold int cudascale_init(AVFilterContext *ctx)
- {
-     CUDAScaleContext *s = ctx->priv;
- 
-+    if (!strcmp(s->format_str, "same")) {
-+        s->format = AV_PIX_FMT_NONE;
-+    } else {
-+        s->format = av_get_pix_fmt(s->format_str);
-+        if (s->format == AV_PIX_FMT_NONE) {
-+            av_log(ctx, AV_LOG_ERROR, "Unrecognized pixel format: %s\n", s->format_str);
-+            return AVERROR(EINVAL);
-+        }
-+    }
-+
-     s->frame = av_frame_alloc();
-     if (!s->frame)
-         return AVERROR(ENOMEM);
-@@ -129,13 +150,22 @@ static av_cold void cudascale_uninit(AVF
+@@ -129,13 +134,23 @@ static av_cold void cudascale_uninit(AVF
  {
      CUDAScaleContext *s = ctx->priv;
  
 -    if (s->hwctx && s->cu_module) {
 +    if (s->hwctx) {
          CudaFunctions *cu = s->hwctx->internal->cuda_dl;
--        CUcontext dummy;
-+        CUcontext dummy, cuda_ctx = s->hwctx->cuda_ctx;
-+
-+        CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
-+
-+        if (s->ditherTex) {
-+            CHECK_CU(cu->cuTexObjectDestroy(s->ditherTex));
-+            s->ditherTex = 0;
-+        }
-+
-+        if (s->ditherBuffer) {
-+            CHECK_CU(cu->cuMemFree(s->ditherBuffer));
-+            s->ditherBuffer = 0;
-+        }
+         CUcontext dummy;
  
--        CHECK_CU(cu->cuCtxPushCurrent(s->hwctx->cuda_ctx));
+         CHECK_CU(cu->cuCtxPushCurrent(s->hwctx->cuda_ctx));
 -        CHECK_CU(cu->cuModuleUnload(s->cu_module));
 -        s->cu_module = NULL;
++        if (s->dither_tex) {
++            CHECK_CU(cu->cuTexObjectDestroy(s->dither_tex));
++            s->dither_tex = 0;
++        }
++        if (s->dither_buffer) {
++            CHECK_CU(cu->cuMemFree(s->dither_buffer));
++            s->dither_buffer = 0;
++        }
++        if (s->cu_module) {
++            CHECK_CU(cu->cuModuleUnload(s->cu_module));
++            s->cu_module = NULL;
++        }
          CHECK_CU(cu->cuCtxPopCurrent(&dummy));
      }
  
-@@ -191,32 +221,6 @@ static int format_is_supported(enum AVPi
+@@ -275,6 +290,68 @@ static av_cold int init_processing_chain
      return 0;
  }
  
--static av_cold void set_format_info(AVFilterContext *ctx, enum AVPixelFormat in_format, enum AVPixelFormat out_format)
--{
--    CUDAScaleContext *s = ctx->priv;
--    int i, p, d;
--
--    s->in_fmt = in_format;
--    s->out_fmt = out_format;
--
--    s->in_desc  = av_pix_fmt_desc_get(s->in_fmt);
--    s->out_desc = av_pix_fmt_desc_get(s->out_fmt);
--    s->in_planes  = av_pix_fmt_count_planes(s->in_fmt);
--    s->out_planes = av_pix_fmt_count_planes(s->out_fmt);
--
--    // find maximum step of each component of each plane
--    // For our subset of formats, this should accurately tell us how many channels CUDA needs
--    // i.e. 1 for Y plane, 2 for UV plane of NV12, 4 for single plane of RGB0 formats
--
--    for (i = 0; i < s->in_desc->nb_components; i++) {
--        d = (s->in_desc->comp[i].depth + 7) / 8;
--        p = s->in_desc->comp[i].plane;
--        s->in_plane_channels[p] = FFMAX(s->in_plane_channels[p], s->in_desc->comp[i].step / d);
--
--        s->in_plane_depths[p] = s->in_desc->comp[i].depth;
--    }
--}
--
- static av_cold int init_processing_chain(AVFilterContext *ctx, int in_width, int in_height,
-                                          int out_width, int out_height)
- {
-@@ -248,7 +252,8 @@ static av_cold int init_processing_chain
-         return AVERROR(ENOSYS);
-     }
- 
--    set_format_info(ctx, in_format, out_format);
-+    s->in_fmt = in_format;
-+    s->out_fmt = out_format;
- 
-     if (s->passthrough && in_width == out_width && in_height == out_height && in_format == out_format) {
-         s->frames_ctx = av_buffer_ref(ctx->inputs[0]->hw_frames_ctx);
-@@ -260,10 +265,6 @@ static av_cold int init_processing_chain
-         ret = init_hwframe_ctx(s, in_frames_ctx->device_ref, out_width, out_height);
-         if (ret < 0)
-             return ret;
--
--        if (in_width == out_width && in_height == out_height &&
--            in_format == out_format && s->interp_algo == INTERP_ALGO_DEFAULT)
--            s->interp_algo = INTERP_ALGO_NEAREST;
-     }
- 
-     ctx->outputs[0]->hw_frames_ctx = av_buffer_ref(s->frames_ctx);
-@@ -273,74 +274,60 @@ static av_cold int init_processing_chain
-     return 0;
- }
- 
--static av_cold int cudascale_load_functions(AVFilterContext *ctx)
 +static av_cold int cudascale_setup_dither(AVFilterContext *ctx)
- {
--    CUDAScaleContext *s = ctx->priv;
--    CUcontext dummy, cuda_ctx = s->hwctx->cuda_ctx;
--    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
--    char buf[128];
--    int ret;
++{
 +    CUDAScaleContext    *s  = ctx->priv;
 +    AVFilterLink        *inlink = ctx->inputs[0];
-+    AVHWFramesContext   *frames_ctx = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
++    FilterLink          *inl = ff_filter_link(inlink);
++    AVHWFramesContext   *frames_ctx = (AVHWFramesContext*)inl->hw_frames_ctx->data;
 +    AVCUDADeviceContext *device_hwctx = frames_ctx->device_ctx->hwctx;
 +    CudaFunctions       *cu = device_hwctx->internal->cuda_dl;
 +    CUcontext dummy, cuda_ctx = device_hwctx->cuda_ctx;
 +    int ret = 0;
- 
--    const char *in_fmt_name = av_get_pix_fmt_name(s->in_fmt);
--    const char *out_fmt_name = av_get_pix_fmt_name(s->out_fmt);
++
 +    CUDA_MEMCPY2D cpy = {
 +        .srcMemoryType = CU_MEMORYTYPE_HOST,
 +        .dstMemoryType = CU_MEMORYTYPE_DEVICE,
@@ -539,15 +357,16 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
 +        .WidthInBytes  = ff_fruit_dither_size * sizeof(ff_fruit_dither_matrix[0]),
 +        .Height        = ff_fruit_dither_size,
 +    };
- 
--    const char *function_infix = "";
++
++#ifndef CU_TRSF_NORMALIZED_COORDINATES
++  #define CU_TRSF_NORMALIZED_COORDINATES 2
++#endif
 +    CUDA_TEXTURE_DESC tex_desc = {
++        .addressMode = { CU_TR_ADDRESS_MODE_WRAP },
 +        .filterMode = CU_TR_FILTER_MODE_POINT,
-+        .flags = CU_TRSF_READ_AS_INTEGER,
++        .flags = CU_TRSF_NORMALIZED_COORDINATES,
 +    };
- 
--    extern const unsigned char ff_vf_scale_cuda_ptx_data[];
--    extern const unsigned int ff_vf_scale_cuda_ptx_len;
++
 +    CUDA_RESOURCE_DESC res_desc = {
 +        .resType = CU_RESOURCE_TYPE_PITCH2D,
 +        .res.pitch2D.format = CU_AD_FORMAT_UNSIGNED_INT16,
@@ -557,1881 +376,265 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
 +        .res.pitch2D.pitchInBytes = ff_fruit_dither_size * sizeof(ff_fruit_dither_matrix[0]),
 +        .res.pitch2D.devPtr = 0,
 +    };
- 
--    switch(s->interp_algo) {
--    case INTERP_ALGO_NEAREST:
--        function_infix = "Nearest";
--        s->interp_use_linear = 0;
--        s->interp_as_integer = 1;
--        break;
--    case INTERP_ALGO_BILINEAR:
--        function_infix = "Bilinear";
--        s->interp_use_linear = 1;
--        s->interp_as_integer = 1;
--        break;
--    case INTERP_ALGO_DEFAULT:
--    case INTERP_ALGO_BICUBIC:
--        function_infix = "Bicubic";
--        s->interp_use_linear = 0;
--        s->interp_as_integer = 0;
--        break;
--    case INTERP_ALGO_LANCZOS:
--        function_infix = "Lanczos";
--        s->interp_use_linear = 0;
--        s->interp_as_integer = 0;
--        break;
--    default:
--        av_log(ctx, AV_LOG_ERROR, "Unknown interpolation algorithm\n");
--        return AVERROR_BUG;
--    }
++
 +    av_assert0(sizeof(ff_fruit_dither_matrix) == sizeof(ff_fruit_dither_matrix[0]) * ff_fruit_dither_size * ff_fruit_dither_size);
- 
--    ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
--    if (ret < 0)
++
 +    if ((ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx))) < 0)
-         return ret;
- 
--    ret = ff_cuda_load_module(ctx, s->hwctx, &s->cu_module,
--                              ff_vf_scale_cuda_ptx_data, ff_vf_scale_cuda_ptx_len);
--    if (ret < 0)
-+    if ((ret = CHECK_CU(cu->cuMemAlloc(&s->ditherBuffer, sizeof(ff_fruit_dither_matrix)))) < 0)
-         goto fail;
- 
--    snprintf(buf, sizeof(buf), "Subsample_%s_%s_%s", function_infix, in_fmt_name, out_fmt_name);
--    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func, s->cu_module, buf));
--    if (ret < 0) {
--        av_log(ctx, AV_LOG_FATAL, "Unsupported conversion: %s -> %s\n", in_fmt_name, out_fmt_name);
--        ret = AVERROR(ENOSYS);
-+    res_desc.res.pitch2D.devPtr = cpy.dstDevice = s->ditherBuffer;
++        return ret;
++
++    if ((ret = CHECK_CU(cu->cuMemAlloc(&s->dither_buffer, sizeof(ff_fruit_dither_matrix)))) < 0)
++        goto fail;
++
++    res_desc.res.pitch2D.devPtr = cpy.dstDevice = s->dither_buffer;
 +
 +    if ((ret = CHECK_CU(cu->cuMemcpy2D(&cpy))) < 0)
-         goto fail;
--    }
- 
--    snprintf(buf, sizeof(buf), "Subsample_%s_%s_%s_uv", function_infix, in_fmt_name, out_fmt_name);
--    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_uv, s->cu_module, buf));
--    if (ret < 0)
-+    if ((ret = CHECK_CU(cu->cuTexObjectCreate(&s->ditherTex, &res_desc, &tex_desc, NULL))) < 0)
-         goto fail;
- 
- fail:
-     CHECK_CU(cu->cuCtxPopCurrent(&dummy));
--
-     return ret;
- }
- 
-@@ -351,12 +338,50 @@ static av_cold int cudascale_config_prop
-     CUDAScaleContext *s  = ctx->priv;
-     AVHWFramesContext     *frames_ctx = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
-     AVCUDADeviceContext *device_hwctx = frames_ctx->device_ctx->hwctx;
-+    CUcontext dummy, cuda_ctx = device_hwctx->cuda_ctx;
-+    CudaFunctions *cu = device_hwctx->internal->cuda_dl;
-     int w, h;
-+    int i;
-     int ret;
- 
-+    extern const unsigned char ff_vf_scale_cuda_ptx_data[];
-+    extern const unsigned int ff_vf_scale_cuda_ptx_len;
++        goto fail;
 +
++    if ((ret = CHECK_CU(cu->cuTexObjectCreate(&s->dither_tex, &res_desc, &tex_desc, NULL))) < 0)
++        goto fail;
++
++fail:
++    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++    return ret;
++}
++
+ static av_cold int cudascale_load_functions(AVFilterContext *ctx)
+ {
+     CUDAScaleContext *s = ctx->priv;
+@@ -383,6 +460,11 @@ static av_cold int cudascale_config_prop
      s->hwctx = device_hwctx;
      s->cu_stream = s->hwctx->stream;
  
-+    ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
-+    if (ret < 0)
-+        goto fail;
-+
-+    ret = ff_cuda_load_module(ctx, s->hwctx, &s->cu_module,
-+                              ff_vf_scale_cuda_ptx_data, ff_vf_scale_cuda_ptx_len);
-+    if (ret < 0)
-+        goto fail;
-+
-+#define VARIANT(NAME) \
-+    CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_ ## NAME, s->cu_module, "Subsample_Bilinear_" #NAME)); \
-+    if (ret < 0) \
-+        goto fail;
-+
-+#define VARIANTSET(NAME) \
-+    VARIANT(NAME) \
-+    VARIANT(NAME ## _c) \
-+    VARIANT(NAME ## _2) \
-+    VARIANT(NAME ## _p2) \
-+    VARIANT(NAME ## _2_u) \
-+    VARIANT(NAME ## _2_v) \
-+    VARIANT(NAME ## _4)
-+
-+    VARIANTSET(8_8)
-+    VARIANTSET(16_16)
-+    VARIANTSET(8_16)
-+    VARIANTSET(16_8)
-+#undef VARIANTSET
-+#undef VARIANT
-+
-+    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
-+
-     if ((ret = ff_scale_eval_dimensions(s,
-                                         s->w_expr, s->h_expr,
-                                         inlink, outlink,
-@@ -377,6 +402,56 @@ static av_cold int cudascale_config_prop
-     if (ret < 0)
-         return ret;
- 
-+    s->in_desc  = av_pix_fmt_desc_get(s->in_fmt);
-+    s->out_desc = av_pix_fmt_desc_get(s->out_fmt);
-+
-+    for (i = 0; i < s->in_desc->nb_components; i++)
-+        s->in_planes  = FFMAX(s->in_planes,  s->in_desc ->comp[i].plane + 1);
-+
-+    for (i = 0; i < s->in_desc->nb_components; i++)
-+        s->out_planes = FFMAX(s->out_planes, s->out_desc->comp[i].plane + 1);
-+
-+#define VARIANT(INDEPTH, OUTDEPTH, SUFFIX) s->cu_func_ ## INDEPTH ## _ ## OUTDEPTH ## SUFFIX
-+#define BITS(n) ((n + 7) & ~7)
-+#define VARIANTSET(INDEPTH, OUTDEPTH) \
-+    else if (BITS(s->in_desc->comp[0].depth)  == INDEPTH && \
-+             BITS(s->out_desc->comp[0].depth) == OUTDEPTH) { \
-+        s->cu_func_luma = VARIANT(INDEPTH, OUTDEPTH,); \
-+        if (s->in_planes == 3 && s->out_planes == 3) { \
-+            s->cu_func_chroma_u = s->cu_func_chroma_v = VARIANT(INDEPTH, OUTDEPTH, _c); \
-+        } else if (s->in_planes == 3 && s->out_planes == 2) { \
-+            s->cu_func_chroma_u = s->cu_func_chroma_v = VARIANT(INDEPTH, OUTDEPTH, _p2); \
-+        } else if (s->in_planes == 2 && s->out_planes == 2) { \
-+            s->cu_func_chroma_u = VARIANT(INDEPTH, OUTDEPTH, _2); \
-+        } else if (s->in_planes == 2 && s->out_planes == 3) { \
-+            s->cu_func_chroma_u = VARIANT(INDEPTH, OUTDEPTH, _2_u); \
-+            s->cu_func_chroma_v = VARIANT(INDEPTH, OUTDEPTH, _2_v); \
-+        } else { \
-+            ret = AVERROR_BUG; \
-+            goto fail; \
-+        } \
-+    }
-+
-+    if (0) {}
-+    VARIANTSET(8,  8)
-+    VARIANTSET(16, 16)
-+    VARIANTSET(8,  16)
-+    VARIANTSET(16, 8)
-+    else {
-+        ret = AVERROR_BUG;
-+        goto fail;
-+    }
-+#undef VARIANTSET
-+#undef VARIANT
-+
 +    if (s->in_desc->comp[0].depth > s->out_desc->comp[0].depth) {
 +        if ((ret = cudascale_setup_dither(ctx)) < 0)
 +            goto fail;
 +    }
 +
-+    av_log(ctx, AV_LOG_VERBOSE, "w:%d h:%d -> w:%d h:%d%s\n",
-+           inlink->w, inlink->h, outlink->w, outlink->h, s->passthrough ? " (passthrough)" : "");
-+
      if (inlink->sample_aspect_ratio.num) {
          outlink->sample_aspect_ratio = av_mul_q((AVRational){outlink->h*inlink->w,
                                                               outlink->w*inlink->h},
-@@ -385,118 +460,93 @@ static av_cold int cudascale_config_prop
-         outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
-     }
- 
--    av_log(ctx, AV_LOG_VERBOSE, "w:%d h:%d fmt:%s -> w:%d h:%d fmt:%s%s\n",
--           inlink->w, inlink->h, av_get_pix_fmt_name(s->in_fmt),
--           outlink->w, outlink->h, av_get_pix_fmt_name(s->out_fmt),
--           s->passthrough ? " (passthrough)" : "");
--
--    ret = cudascale_load_functions(ctx);
--    if (ret < 0)
--        return ret;
--
-     return 0;
- 
- fail:
-     return ret;
- }
- 
--static int call_resize_kernel(AVFilterContext *ctx, CUfunction func,
--                              CUtexObject src_tex[4], int src_width, int src_height,
--                              AVFrame *out_frame, int dst_width, int dst_height, int dst_pitch)
-+static int call_resize_kernel(AVFilterContext *ctx, CUfunction func, int channels,
-+                              uint8_t *src_dptr, int src_width, int src_height, int src_pitch,
-+                              uint8_t *dst_dptr, int dst_width, int dst_height, int dst_pitch,
-+                              int pixel_size)
- {
-     CUDAScaleContext *s = ctx->priv;
-     CudaFunctions *cu = s->hwctx->internal->cuda_dl;
-+    CUdeviceptr dst_devptr = (CUdeviceptr)dst_dptr;
-+    CUtexObject tex = 0;
-+    void *args_uchar[] = { &tex, &dst_devptr, &dst_width, &dst_height, &dst_pitch, &src_width, &src_height, &s->ditherTex };
-+    int ret;
- 
--    CUdeviceptr dst_devptr[4] = {
--        (CUdeviceptr)out_frame->data[0], (CUdeviceptr)out_frame->data[1],
--        (CUdeviceptr)out_frame->data[2], (CUdeviceptr)out_frame->data[3]
-+    CUDA_TEXTURE_DESC tex_desc = {
-+        .filterMode = CU_TR_FILTER_MODE_LINEAR,
-+        .flags = CU_TRSF_READ_AS_INTEGER,
+@@ -418,11 +500,15 @@ static int call_resize_kernel(AVFilterCo
+         (CUdeviceptr)out_frame->data[2], (CUdeviceptr)out_frame->data[3]
      };
  
--    void *args_uchar[] = {
--        &src_tex[0], &src_tex[1], &src_tex[2], &src_tex[3],
--        &dst_devptr[0], &dst_devptr[1], &dst_devptr[2], &dst_devptr[3],
--        &dst_width, &dst_height, &dst_pitch,
++    float dither_size = (float)ff_fruit_dither_size;
++    float dither_quantization = (float)((1 << s->out_desc->comp[0].depth) - 1);
++
+     void *args_uchar[] = {
+         &src_tex[0], &src_tex[1], &src_tex[2], &src_tex[3],
+         &dst_devptr[0], &dst_devptr[1], &dst_devptr[2], &dst_devptr[3],
+         &dst_width, &dst_height, &dst_pitch,
 -        &src_width, &src_height, &s->param
-+    CUDA_RESOURCE_DESC res_desc = {
-+        .resType = CU_RESOURCE_TYPE_PITCH2D,
-+        .res.pitch2D.format = pixel_size == 1 ?
-+                              CU_AD_FORMAT_UNSIGNED_INT8 :
-+                              CU_AD_FORMAT_UNSIGNED_INT16,
-+        .res.pitch2D.numChannels = channels,
-+        .res.pitch2D.width = src_width,
-+        .res.pitch2D.height = src_height,
-+        .res.pitch2D.pitchInBytes = src_pitch,
-+        .res.pitch2D.devPtr = (CUdeviceptr)src_dptr,
++        &src_width, &src_height, &s->param,
++        &s->dither_tex, &dither_size, &dither_quantization
      };
  
--    return CHECK_CU(cu->cuLaunchKernel(func,
--                                       DIV_UP(dst_width, BLOCKX), DIV_UP(dst_height, BLOCKY), 1,
--                                       BLOCKX, BLOCKY, 1, 0, s->cu_stream, args_uchar, NULL));
-+    ret = CHECK_CU(cu->cuTexObjectCreate(&tex, &res_desc, &tex_desc, NULL));
-+    if (ret < 0)
-+        goto exit;
-+
-+    ret = CHECK_CU(cu->cuLaunchKernel(func,
-+                                      DIV_UP(dst_width, BLOCKX), DIV_UP(dst_height, BLOCKY), 1,
-+                                      BLOCKX, BLOCKY, 1, 0, s->cu_stream, args_uchar, NULL));
-+
-+exit:
-+    if (tex)
-+        CHECK_CU(cu->cuTexObjectDestroy(tex));
-+
-+    return ret;
- }
+     return CHECK_CU(cu->cuLaunchKernel(func,
+@@ -446,6 +532,7 @@ static int scalecuda_resize(AVFilterCont
  
- static int scalecuda_resize(AVFilterContext *ctx,
-                             AVFrame *out, AVFrame *in)
- {
-     CUDAScaleContext *s = ctx->priv;
--    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
--    CUcontext dummy, cuda_ctx = s->hwctx->cuda_ctx;
--    int i, ret;
- 
--    CUtexObject tex[4] = { 0, 0, 0, 0 };
-+#define DEPTH_BYTES(depth) (((depth) + 7) / 8)
- 
--    ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
--    if (ret < 0)
--        return ret;
--
--    for (i = 0; i < s->in_planes; i++) {
--        CUDA_TEXTURE_DESC tex_desc = {
--            .filterMode = s->interp_use_linear ?
--                          CU_TR_FILTER_MODE_LINEAR :
--                          CU_TR_FILTER_MODE_POINT,
--            .flags = s->interp_as_integer ? CU_TRSF_READ_AS_INTEGER : 0,
--        };
--
--        CUDA_RESOURCE_DESC res_desc = {
--            .resType = CU_RESOURCE_TYPE_PITCH2D,
--            .res.pitch2D.format = s->in_plane_depths[i] <= 8 ?
--                                  CU_AD_FORMAT_UNSIGNED_INT8 :
--                                  CU_AD_FORMAT_UNSIGNED_INT16,
--            .res.pitch2D.numChannels = s->in_plane_channels[i],
--            .res.pitch2D.pitchInBytes = in->linesize[i],
--            .res.pitch2D.devPtr = (CUdeviceptr)in->data[i],
--        };
--
--        if (i == 1 || i == 2) {
--            res_desc.res.pitch2D.width = AV_CEIL_RSHIFT(in->width, s->in_desc->log2_chroma_w);
--            res_desc.res.pitch2D.height = AV_CEIL_RSHIFT(in->height, s->in_desc->log2_chroma_h);
--        } else {
--            res_desc.res.pitch2D.width = in->width;
--            res_desc.res.pitch2D.height = in->height;
--        }
--
--        ret = CHECK_CU(cu->cuTexObjectCreate(&tex[i], &res_desc, &tex_desc, NULL));
--        if (ret < 0)
--            goto exit;
--    }
--
--    // scale primary plane(s). Usually Y (and A), or single plane of RGB frames.
--    ret = call_resize_kernel(ctx, s->cu_func,
--                             tex, in->width, in->height,
--                             out, out->width, out->height, out->linesize[0]);
--    if (ret < 0)
--        goto exit;
--
--    if (s->out_planes > 1) {
--        // scale UV plane. Scale function sets both U and V plane, or singular interleaved plane.
--        ret = call_resize_kernel(ctx, s->cu_func_uv, tex,
--                                 AV_CEIL_RSHIFT(in->width, s->in_desc->log2_chroma_w),
--                                 AV_CEIL_RSHIFT(in->height, s->in_desc->log2_chroma_h),
--                                 out,
--                                 AV_CEIL_RSHIFT(out->width, s->out_desc->log2_chroma_w),
--                                 AV_CEIL_RSHIFT(out->height, s->out_desc->log2_chroma_h),
--                                 out->linesize[1]);
--        if (ret < 0)
--            goto exit;
-+    call_resize_kernel(ctx, s->cu_func_luma, 1,
-+                       in->data[0], in->width, in->height, in->linesize[0],
-+                       out->data[0], out->width, out->height, out->linesize[0],
-+                       DEPTH_BYTES(s->in_desc->comp[0].depth));
-+
-+    call_resize_kernel(ctx, s->cu_func_chroma_u, s->in_planes == 2 ? 2 : 1,
-+                       in->data[1],
-+                       AV_CEIL_RSHIFT(in->width,  s->in_desc->log2_chroma_w),
-+                       AV_CEIL_RSHIFT(in->height, s->in_desc->log2_chroma_h),
-+                       in->linesize[1],
-+                       out->data[1],
-+                       AV_CEIL_RSHIFT(out->width,  s->out_desc->log2_chroma_w),
-+                       AV_CEIL_RSHIFT(out->height, s->out_desc->log2_chroma_h),
-+                       out->linesize[1],
-+                       DEPTH_BYTES(s->in_desc->comp[1].depth));
-+
-+    if (s->cu_func_chroma_v) {
-+        call_resize_kernel(ctx, s->cu_func_chroma_v, s->in_planes == 2 ? 2 : 1,
-+                           in->data[s->in_desc->comp[2].plane],
-+                           AV_CEIL_RSHIFT(in->width,       s->in_desc->log2_chroma_w),
-+                           AV_CEIL_RSHIFT(in->height,      s->in_desc->log2_chroma_h),
-+                           in->linesize[s->in_desc->comp[2].plane],
-+                           out->data[s->out_desc->comp[2].plane] + s->out_desc->comp[2].offset,
-+                           AV_CEIL_RSHIFT(out->width,       s->out_desc->log2_chroma_w),
-+                           AV_CEIL_RSHIFT(out->height,      s->out_desc->log2_chroma_h),
-+                           out->linesize[s->out_desc->comp[2].plane],
-+                           DEPTH_BYTES(s->in_desc->comp[2].depth));
-     }
- 
--exit:
--    for (i = 0; i < s->in_planes; i++)
--        if (tex[i])
--            CHECK_CU(cu->cuTexObjectDestroy(tex[i]));
--
--    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
--
--    return ret;
-+    return 0;
- }
- 
- static int cudascale_scale(AVFilterContext *ctx, AVFrame *out, AVFrame *in)
-@@ -583,21 +633,15 @@ static AVFrame *cudascale_get_video_buff
- #define OFFSET(x) offsetof(CUDAScaleContext, x)
- #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM)
- static const AVOption options[] = {
--    { "w", "Output video width",  OFFSET(w_expr), AV_OPT_TYPE_STRING, { .str = "iw" }, .flags = FLAGS },
--    { "h", "Output video height", OFFSET(h_expr), AV_OPT_TYPE_STRING, { .str = "ih" }, .flags = FLAGS },
--    { "interp_algo", "Interpolation algorithm used for resizing", OFFSET(interp_algo), AV_OPT_TYPE_INT, { .i64 = INTERP_ALGO_DEFAULT }, 0, INTERP_ALGO_COUNT - 1, FLAGS, .unit = "interp_algo" },
--        { "nearest",  "nearest neighbour", 0, AV_OPT_TYPE_CONST, { .i64 = INTERP_ALGO_NEAREST }, 0, 0, FLAGS, .unit = "interp_algo" },
--        { "bilinear", "bilinear", 0, AV_OPT_TYPE_CONST, { .i64 = INTERP_ALGO_BILINEAR }, 0, 0, FLAGS, .unit = "interp_algo" },
--        { "bicubic",  "bicubic",  0, AV_OPT_TYPE_CONST, { .i64 = INTERP_ALGO_BICUBIC  }, 0, 0, FLAGS, .unit = "interp_algo" },
--        { "lanczos",  "lanczos",  0, AV_OPT_TYPE_CONST, { .i64 = INTERP_ALGO_LANCZOS  }, 0, 0, FLAGS, .unit = "interp_algo" },
--    { "format", "Output video pixel format", OFFSET(format), AV_OPT_TYPE_PIXEL_FMT, { .i64 = AV_PIX_FMT_NONE }, INT_MIN, INT_MAX, .flags=FLAGS },
-+    { "w",      "Output video width",  OFFSET(w_expr),     AV_OPT_TYPE_STRING, { .str = "iw"   }, .flags = FLAGS },
-+    { "h",      "Output video height", OFFSET(h_expr),     AV_OPT_TYPE_STRING, { .str = "ih"   }, .flags = FLAGS },
-+    { "format", "Output format",       OFFSET(format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
-     { "passthrough", "Do not process frames at all if parameters match", OFFSET(passthrough), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, FLAGS },
--    { "param", "Algorithm-Specific parameter", OFFSET(param), AV_OPT_TYPE_FLOAT, { .dbl = SCALE_CUDA_PARAM_DEFAULT }, -FLT_MAX, FLT_MAX, FLAGS },
--    { "force_original_aspect_ratio", "decrease or increase w/h if necessary to keep the original AR", OFFSET(force_original_aspect_ratio), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 2, FLAGS, .unit = "force_oar" },
--        { "disable",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 0 }, 0, 0, FLAGS, .unit = "force_oar" },
--        { "decrease", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 1 }, 0, 0, FLAGS, .unit = "force_oar" },
--        { "increase", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 2 }, 0, 0, FLAGS, .unit = "force_oar" },
--    { "force_divisible_by", "enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 1 }, 1, 256, FLAGS },
-+    { "force_original_aspect_ratio", "decrease or increase w/h if necessary to keep the original AR", OFFSET(force_original_aspect_ratio), AV_OPT_TYPE_INT, { .i64 = 0}, 0, 2, FLAGS, .unit = "force_oar" },
-+    { "disable",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 0 }, 0, 0, FLAGS, .unit = "force_oar" },
-+    { "decrease", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 1 }, 0, 0, FLAGS, .unit = "force_oar" },
-+    { "increase", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = 2 }, 0, 0, FLAGS, .unit = "force_oar" },
-+    { "force_divisible_by", "enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 1}, 1, 256, FLAGS },
-     { NULL },
- };
- 
-@@ -610,9 +654,9 @@ static const AVClass cudascale_class = {
- 
- static const AVFilterPad cudascale_inputs[] = {
-     {
--        .name        = "default",
--        .type        = AVMEDIA_TYPE_VIDEO,
--        .filter_frame = cudascale_filter_frame,
-+        .name             = "default",
-+        .type             = AVMEDIA_TYPE_VIDEO,
-+        .filter_frame     = cudascale_filter_frame,
-         .get_buffer.video = cudascale_get_video_buffer,
-     },
- };
-@@ -626,14 +670,14 @@ static const AVFilterPad cudascale_outpu
- };
- 
- const AVFilter ff_vf_scale_cuda = {
--    .name      = "scale_cuda",
--    .description = NULL_IF_CONFIG_SMALL("GPU accelerated video resizer"),
-+    .name          = "scale_cuda",
-+    .description   = NULL_IF_CONFIG_SMALL("GPU accelerated video resizer"),
- 
-     .init          = cudascale_init,
-     .uninit        = cudascale_uninit,
- 
--    .priv_size = sizeof(CUDAScaleContext),
--    .priv_class = &cudascale_class,
-+    .priv_size     = sizeof(CUDAScaleContext),
-+    .priv_class    = &cudascale_class,
- 
-     FILTER_INPUTS(cudascale_inputs),
-     FILTER_OUTPUTS(cudascale_outputs),
+     for (i = 0; i < s->in_planes; i++) {
+         CUDA_TEXTURE_DESC tex_desc = {
++            .addressMode = { CU_TR_ADDRESS_MODE_CLAMP },
+             .filterMode = s->interp_use_linear ?
+                           CU_TR_FILTER_MODE_LINEAR :
+                           CU_TR_FILTER_MODE_POINT,
 Index: FFmpeg/libavfilter/vf_scale_cuda.cu
 ===================================================================
 --- libavfilter/vf_scale_cuda.cu
 +++ libavfilter/vf_scale_cuda.cu
-@@ -1,5 +1,5 @@
- /*
-- * This file is part of FFmpeg.
-+ * Copyright (c) 2017, NVIDIA CORPORATION. All rights reserved.
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a
-  * copy of this software and associated documentation files (the "Software"),
-@@ -20,1306 +20,174 @@
-  * DEALINGS IN THE SOFTWARE.
-  */
+@@ -29,6 +29,19 @@ using subsample_function_t = T (*)(cudaT
+                                    int src_width, int src_height,
+                                    int bit_depth, float param);
  
--#include "cuda/vector_helpers.cuh"
--#include "vf_scale_cuda.h"
-+typedef unsigned char uchar;
-+typedef unsigned short ushort;
- 
--template<typename T>
--using subsample_function_t = T (*)(cudaTextureObject_t tex, int xo, int yo,
--                                   int dst_width, int dst_height,
--                                   int src_width, int src_height,
--                                   int bit_depth, float param);
--
--// --- CONVERSION LOGIC ---
--
--static const ushort mask_10bit = 0xFFC0;
--static const ushort mask_16bit = 0xFFFF;
--
--static inline __device__ ushort conv_8to16(uchar in, ushort mask)
--{
--    return ((ushort)in | ((ushort)in << 8)) & mask;
--}
--
--static inline __device__ uchar conv_16to8(ushort in)
--{
--    return in >> 8;
--}
--
--static inline __device__ uchar conv_10to8(ushort in)
--{
--    return in >> 8;
--}
--
--static inline __device__ ushort conv_10to16(ushort in)
--{
--    return in | (in >> 10);
--}
--
--static inline __device__ ushort conv_16to10(ushort in)
--{
--    return in & mask_10bit;
--}
--
--#define DEF_F(N, T) \
--    template<subsample_function_t<in_T> subsample_func_y,                                      \
--             subsample_function_t<in_T_uv> subsample_func_uv>                                  \
--    __device__ static inline void N(cudaTextureObject_t src_tex[4], T *dst[4], int xo, int yo, \
--                                    int dst_width, int dst_height, int dst_pitch,              \
--                                    int src_width, int src_height, float param)
--
--#define SUB_F(m, plane) \
--    subsample_func_##m(src_tex[plane], xo, yo, \
--                       dst_width, dst_height,  \
--                       src_width, src_height,  \
--                       in_bit_depth, param)
--
--// FFmpeg passes pitch in bytes, CUDA uses potentially larger types
--#define FIXED_PITCH \
--    (dst_pitch/sizeof(*dst[0]))
--
--#define DEFAULT_DST(n) \
--    dst[n][yo*FIXED_PITCH+xo]
--
--// yuv420p->X
--
--struct Convert_yuv420p_yuv420p
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = SUB_F(uv, 1);
--        DEFAULT_DST(2) = SUB_F(uv, 2);
--    }
--};
--
--struct Convert_yuv420p_nv12
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef uchar out_T;
--    typedef uchar2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_uchar2(
--            SUB_F(uv, 1),
--            SUB_F(uv, 2)
--        );
--    }
--};
--
--struct Convert_yuv420p_yuv444p
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = SUB_F(uv, 1);
--        DEFAULT_DST(2) = SUB_F(uv, 2);
--    }
--};
-+#define SHIFTDOWN(val) (dstbase)(val >> abs(2 + shift))
-+#define SHIFTUP(val)   (dstbase)(val << abs(-shift - 2))
- 
--struct Convert_yuv420p_p010le
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift1_d
- {
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
-+    typedef DST dstbase;
- 
--    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_10bit);
--    }
-+        unsigned ret = (unsigned)i1 + (unsigned)i2 + (unsigned)i3 + (unsigned)i4 + ((1 + d) >> (sizeof(SRC) * 8 - dither + 3));
- 
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_ushort2(
--            conv_8to16(SUB_F(uv, 1), mask_10bit),
--            conv_8to16(SUB_F(uv, 2), mask_10bit)
--        );
-+        if (shift > -2)
-+            return SHIFTDOWN(ret);
-+        else
-+            return SHIFTUP(ret);
-     }
- };
- 
--struct Convert_yuv420p_p016le
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift1
- {
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
-+    typedef DST dstbase;
- 
--    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_16bit);
--    }
-+        unsigned ret = (unsigned)i1 + (unsigned)i2 + (unsigned)i3 + (unsigned)i4 + 2;
- 
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_ushort2(
--            conv_8to16(SUB_F(uv, 1), mask_16bit),
--            conv_8to16(SUB_F(uv, 2), mask_16bit)
--        );
-+        if (shift > -2)
-+            return SHIFTDOWN(ret);
-+        else
-+            return SHIFTUP(ret);
-     }
- };
- 
--struct Convert_yuv420p_yuv444p16le
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift2
- {
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef ushort out_T;
--    typedef ushort out_T_uv;
-+    typedef decltype(DST::x) dstbase;
- 
--    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_16bit);
--    }
-+        unsigned retx = (unsigned)i1.x + (unsigned)i2.x + (unsigned)i3.x + (unsigned)i4.x + 2;
-+        unsigned rety = (unsigned)i1.y + (unsigned)i2.y + (unsigned)i3.y + (unsigned)i4.y + 2;
- 
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = conv_8to16(SUB_F(uv, 1), mask_16bit);
--        DEFAULT_DST(2) = conv_8to16(SUB_F(uv, 2), mask_16bit);
-+        if (shift > -2)
-+            return { SHIFTDOWN(retx), SHIFTDOWN(rety) };
-+        else
-+            return { SHIFTUP(retx),   SHIFTUP(rety)   };
-     }
- };
- 
--// nv12->X
--
--struct Convert_nv12_yuv420p
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift2_x
- {
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar2 in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = res.x;
--        DEFAULT_DST(2) = res.y;
-+        return add_conv_shift1<unsigned, DST, shift, dither>()(i1.x, i2.x, i3.x, i4.x, d);
-     }
- };
- 
--struct Convert_nv12_nv12
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift2_y
- {
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar2 in_T_uv;
--    typedef uchar out_T;
--    typedef uchar2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
--        DEFAULT_DST(1) = SUB_F(uv, 1);
-+        return add_conv_shift1<unsigned, DST, shift, dither>()(i1.y, i2.y, i3.y, i4.y, d);
-     }
- };
- 
--struct Convert_nv12_yuv444p
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift3
- {
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar2 in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
-+    typedef decltype(DST::x) dstbase;
- 
--    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
-+        unsigned retx = (unsigned)i1.x + (unsigned)i2.x + (unsigned)i3.x + (unsigned)i4.x + 2;
-+        unsigned rety = (unsigned)i1.y + (unsigned)i2.y + (unsigned)i3.y + (unsigned)i4.y + 2;
-+        unsigned retz = (unsigned)i1.z + (unsigned)i2.z + (unsigned)i3.z + (unsigned)i4.z + 2;
- 
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = res.x;
--        DEFAULT_DST(2) = res.y;
-+        if (shift > -2)
-+            return { SHIFTDOWN(retx), SHIFTDOWN(rety), SHIFTDOWN(retz) };
-+        else
-+            return { SHIFTUP(retx),   SHIFTUP(rety),   SHIFTUP(retz)   };
-     }
- };
- 
--struct Convert_nv12_p010le
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift4
- {
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar2 in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
-+    typedef decltype(DST::x) dstbase;
- 
--    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_10bit);
--    }
-+        unsigned retx = (unsigned)i1.x + (unsigned)i2.x + (unsigned)i3.x + (unsigned)i4.x + 2;
-+        unsigned rety = (unsigned)i1.y + (unsigned)i2.y + (unsigned)i3.y + (unsigned)i4.y + 2;
-+        unsigned retz = (unsigned)i1.z + (unsigned)i2.z + (unsigned)i3.z + (unsigned)i4.z + 2;
-+        unsigned retw = (unsigned)i1.w + (unsigned)i2.w + (unsigned)i3.w + (unsigned)i4.w + 2;
- 
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = make_ushort2(
--            conv_8to16(res.x, mask_10bit),
--            conv_8to16(res.y, mask_10bit)
--        );
-+        if (shift > -2)
-+            return { SHIFTDOWN(retx), SHIFTDOWN(rety), SHIFTDOWN(retz), SHIFTDOWN(retw) };
-+        else
-+            return { SHIFTUP(retx),   SHIFTUP(rety),   SHIFTUP(retz),   SHIFTUP(retw)   };
-     }
- };
- 
--struct Convert_nv12_p016le
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar2 in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_16bit);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = make_ushort2(
--            conv_8to16(res.x, mask_16bit),
--            conv_8to16(res.y, mask_16bit)
--        );
--    }
--};
--
--struct Convert_nv12_yuv444p16le
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar2 in_T_uv;
--    typedef ushort out_T;
--    typedef ushort out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_16bit);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = conv_8to16(res.x, mask_16bit);
--        DEFAULT_DST(2) = conv_8to16(res.y, mask_16bit);
--    }
--};
--
--// yuv444p->X
--
--struct Convert_yuv444p_yuv420p
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = SUB_F(uv, 1);
--        DEFAULT_DST(2) = SUB_F(uv, 2);
--    }
--};
--
--struct Convert_yuv444p_nv12
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef uchar out_T;
--    typedef uchar2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_uchar2(
--            SUB_F(uv, 1),
--            SUB_F(uv, 2)
--        );
--    }
--};
--
--struct Convert_yuv444p_yuv444p
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = SUB_F(uv, 1);
--        DEFAULT_DST(2) = SUB_F(uv, 2);
--    }
--};
--
--struct Convert_yuv444p_p010le
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_10bit);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_ushort2(
--            conv_8to16(SUB_F(uv, 1), mask_10bit),
--            conv_8to16(SUB_F(uv, 2), mask_10bit)
--        );
--    }
--};
--
--struct Convert_yuv444p_p016le
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_16bit);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_ushort2(
--            conv_8to16(SUB_F(uv, 1), mask_16bit),
--            conv_8to16(SUB_F(uv, 2), mask_16bit)
--        );
--    }
--};
--
--struct Convert_yuv444p_yuv444p16le
--{
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef ushort out_T;
--    typedef ushort out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_16bit);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = conv_8to16(SUB_F(uv, 1), mask_16bit);
--        DEFAULT_DST(2) = conv_8to16(SUB_F(uv, 2), mask_16bit);
--    }
--};
--
--// p010le->X
--
--struct Convert_p010le_yuv420p
--{
--    static const int in_bit_depth = 10;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_10to8(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = conv_10to8(res.x);
--        DEFAULT_DST(2) = conv_10to8(res.y);
--    }
--};
--
--struct Convert_p010le_nv12
--{
--    static const int in_bit_depth = 10;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef uchar out_T;
--    typedef uchar2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_10to8(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = make_uchar2(
--            conv_10to8(res.x),
--            conv_10to8(res.y)
--        );
--    }
--};
--
--struct Convert_p010le_yuv444p
--{
--    static const int in_bit_depth = 10;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_10to8(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = conv_10to8(res.x);
--        DEFAULT_DST(2) = conv_10to8(res.y);
--    }
--};
--
--struct Convert_p010le_p010le
--{
--    static const int in_bit_depth = 10;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = SUB_F(uv, 1);
--    }
--};
--
--struct Convert_p010le_p016le
--{
--    static const int in_bit_depth = 10;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_10to16(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = make_ushort2(
--            conv_10to16(res.x),
--            conv_10to16(res.y)
--        );
--    }
--};
--
--struct Convert_p010le_yuv444p16le
--{
--    static const int in_bit_depth = 10;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef ushort out_T;
--    typedef ushort out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_10to16(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = conv_10to16(res.x);
--        DEFAULT_DST(2) = conv_10to16(res.y);
--    }
--};
--
--// p016le->X
--
--struct Convert_p016le_yuv420p
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = conv_16to8(res.x);
--        DEFAULT_DST(2) = conv_16to8(res.y);
--    }
--};
--
--struct Convert_p016le_nv12
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef uchar out_T;
--    typedef uchar2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = make_uchar2(
--            conv_16to8(res.x),
--            conv_16to8(res.y)
--        );
--    }
--};
--
--struct Convert_p016le_yuv444p
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = conv_16to8(res.x);
--        DEFAULT_DST(2) = conv_16to8(res.y);
--    }
--};
--
--struct Convert_p016le_p010le
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_16to10(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = make_ushort2(
--            conv_16to10(res.x),
--            conv_16to10(res.y)
--        );
--    }
--};
--
--struct Convert_p016le_p016le
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = SUB_F(uv, 1);
--    }
--};
--
--struct Convert_p016le_yuv444p16le
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort2 in_T_uv;
--    typedef ushort out_T;
--    typedef ushort out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        in_T_uv res = SUB_F(uv, 1);
--        DEFAULT_DST(1) = res.x;
--        DEFAULT_DST(2) = res.y;
--    }
--};
--
--// yuv444p16le->X
--
--struct Convert_yuv444p16le_yuv420p
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = conv_16to8(SUB_F(uv, 1));
--        DEFAULT_DST(2) = conv_16to8(SUB_F(uv, 2));
--    }
--};
--
--struct Convert_yuv444p16le_nv12
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort in_T_uv;
--    typedef uchar out_T;
--    typedef uchar2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_uchar2(
--            conv_16to8(SUB_F(uv, 1)),
--            conv_16to8(SUB_F(uv, 2))
--        );
--    }
--};
--
--struct Convert_yuv444p16le_yuv444p
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort in_T_uv;
--    typedef uchar out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = conv_16to8(SUB_F(uv, 1));
--        DEFAULT_DST(2) = conv_16to8(SUB_F(uv, 2));
--    }
--};
--
--struct Convert_yuv444p16le_p010le
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = conv_16to10(SUB_F(y, 0));
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_ushort2(
--            conv_16to10(SUB_F(uv, 1)),
--            conv_16to10(SUB_F(uv, 2))
--        );
--    }
--};
--
--struct Convert_yuv444p16le_p016le
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_ushort2(
--            SUB_F(uv, 1),
--            SUB_F(uv, 2)
--        );
--    }
--};
--
--struct Convert_yuv444p16le_yuv444p16le
--{
--    static const int in_bit_depth = 16;
--    typedef ushort in_T;
--    typedef ushort in_T_uv;
--    typedef ushort out_T;
--    typedef ushort out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = SUB_F(uv, 1);
--        DEFAULT_DST(2) = SUB_F(uv, 2);
--    }
--};
--
--#define DEF_CONVERT_IDENTITY(fmt1, fmt2)\
--                                        \
--struct Convert_##fmt1##_##fmt2          \
--{                                       \
--    static const int in_bit_depth = 8;  \
--    typedef uchar4 in_T;                \
--    typedef uchar in_T_uv;              \
--    typedef uchar4 out_T;               \
--    typedef uchar out_T_uv;             \
--                                        \
--    DEF_F(Convert, out_T)               \
--    {                                   \
--        DEFAULT_DST(0) = SUB_F(y, 0);   \
--    }                                   \
--                                        \
--    DEF_F(Convert_uv, out_T_uv)         \
--    {                                   \
--    }                                   \
--};                                      \
--
--#define DEF_CONVERT_REORDER(fmt1, fmt2) \
--                                        \
--struct Convert_##fmt1##_##fmt2          \
--{                                       \
--    static const int in_bit_depth = 8;  \
--    typedef uchar4 in_T;                \
--    typedef uchar in_T_uv;              \
--    typedef uchar4 out_T;               \
--    typedef uchar out_T_uv;             \
--                                        \
--    DEF_F(Convert, out_T)               \
--    {                                   \
--        uchar4 res = SUB_F(y, 0);       \
--        DEFAULT_DST(0) = make_uchar4(   \
--            res.z,                      \
--            res.y,                      \
--            res.x,                      \
--            res.w                       \
--        );                              \
--    }                                   \
--                                        \
--    DEF_F(Convert_uv, out_T_uv)         \
--    {                                   \
--    }                                   \
--};                                      \
--
--#define DEF_CONVERT_RGB(fmt1, fmt2)     \
--                                        \
--DEF_CONVERT_IDENTITY(fmt1, fmt1)        \
--DEF_CONVERT_REORDER (fmt1, fmt2)        \
--DEF_CONVERT_REORDER (fmt2, fmt1)        \
--DEF_CONVERT_IDENTITY(fmt2, fmt2)
--
--DEF_CONVERT_RGB(rgb0, bgr0)
--DEF_CONVERT_RGB(rgba, bgra)
--DEF_CONVERT_IDENTITY(rgba, rgb0)
--DEF_CONVERT_IDENTITY(bgra, bgr0)
--DEF_CONVERT_REORDER(rgba, bgr0)
--DEF_CONVERT_REORDER(bgra, rgb0)
--
--struct Convert_bgr0_bgra
-+template<class SRC, class DST, template<class, class, int, int> class conv, int pitch, int shift, int dither>
-+__inline__ __device__ void Subsample_Bilinear(cudaTextureObject_t tex,
-+                                   DST *dst,
-+                                   int dst_width, int dst_height, int dst_pitch,
-+                                   int src_width, int src_height,
-+                                   cudaTextureObject_t ditherTex)
- {
--    static const int in_bit_depth = 8;
--    typedef uchar4 in_T;
--    typedef uchar in_T_uv;
--    typedef uchar4 out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        uchar4 res = SUB_F(y, 0);
--        DEFAULT_DST(0) = make_uchar4(
--            res.x,
--            res.y,
--            res.z,
--            1
--        );
--    }
-+    int xo = blockIdx.x * blockDim.x + threadIdx.x;
-+    int yo = blockIdx.y * blockDim.y + threadIdx.y;
- 
--    DEF_F(Convert_uv, out_T_uv)
-+    if (yo < dst_height && xo < dst_width)
-     {
--    }
--};
-+        float hscale = (float)src_width / (float)dst_width;
-+        float vscale = (float)src_height / (float)dst_height;
-+        float xi = (xo + 0.5f) * hscale;
-+        float yi = (yo + 0.5f) * vscale;
-+        // 3-tap filter weights are {wh,1.0,wh} and {wv,1.0,wv}
-+        float wh = min(max(0.5f * (hscale - 1.0f), 0.0f), 1.0f);
-+        float wv = min(max(0.5f * (vscale - 1.0f), 0.0f), 1.0f);
-+        // Convert weights to two bilinear weights -> {wh,1.0,wh} -> {wh,0.5,0} + {0,0.5,wh}
-+        float dx = wh / (0.5f + wh);
-+        float dy = wv / (0.5f + wv);
++// --- DITHERING ---
 +
-+        SRC i0 = tex2D<SRC>(tex, xi-dx, yi-dy);
-+        SRC i1 = tex2D<SRC>(tex, xi+dx, yi-dy);
-+        SRC i2 = tex2D<SRC>(tex, xi-dx, yi+dy);
-+        SRC i3 = tex2D<SRC>(tex, xi+dx, yi+dy);
- 
--struct Convert_bgr0_rgba
--{
--    static const int in_bit_depth = 8;
--    typedef uchar4 in_T;
--    typedef uchar in_T_uv;
--    typedef uchar4 out_T;
--    typedef uchar out_T_uv;
-+        ushort ditherVal = dither ? tex2D<ushort>(ditherTex, xo, yo) : 0;
- 
--    DEF_F(Convert, out_T)
--    {
--        uchar4 res = SUB_F(y, 0);
--        DEFAULT_DST(0) = make_uchar4(
--            res.z,
--            res.y,
--            res.x,
--            1
--        );
-+        dst[yo*(dst_pitch / sizeof(DST))+xo*pitch] = conv<SRC, DST, shift, dither>()(i0, i1, i2, i3, ditherVal);
-     }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--    }
--};
--
--struct Convert_rgb0_bgra
--{
--    static const int in_bit_depth = 8;
--    typedef uchar4 in_T;
--    typedef uchar in_T_uv;
--    typedef uchar4 out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        uchar4 res = SUB_F(y, 0);
--        DEFAULT_DST(0) = make_uchar4(
--            res.z,
--            res.y,
--            res.x,
--            1
--        );
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--    }
--};
--
--struct Convert_rgb0_rgba
--{
--    static const int in_bit_depth = 8;
--    typedef uchar4 in_T;
--    typedef uchar in_T_uv;
--    typedef uchar4 out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        uchar4 res = SUB_F(y, 0);
--        DEFAULT_DST(0) = make_uchar4(
--            res.x,
--            res.y,
--            res.z,
--            1
--        );
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--    }
--};
--
--// --- SCALING LOGIC ---
--
--typedef float4 (*coeffs_function_t)(float, float);
--
--__device__ static inline float4 lanczos_coeffs(float x, float param)
--{
--    const float pi = 3.141592654f;
--
--    float4 res = make_float4(
--        pi * (x + 1),
--        pi * x,
--        pi * (x - 1),
--        pi * (x - 2));
--
--    res.x = res.x == 0.0f ? 1.0f :
--        __sinf(res.x) * __sinf(res.x / 2.0f) / (res.x * res.x / 2.0f);
--    res.y = res.y == 0.0f ? 1.0f :
--        __sinf(res.y) * __sinf(res.y / 2.0f) / (res.y * res.y / 2.0f);
--    res.z = res.z == 0.0f ? 1.0f :
--        __sinf(res.z) * __sinf(res.z / 2.0f) / (res.z * res.z / 2.0f);
--    res.w = res.w == 0.0f ? 1.0f :
--        __sinf(res.w) * __sinf(res.w / 2.0f) / (res.w * res.w / 2.0f);
--
--    return res / (res.x + res.y + res.z + res.w);
--}
--
--__device__ static inline float4 bicubic_coeffs(float x, float param)
--{
--    const float A = param == SCALE_CUDA_PARAM_DEFAULT ? 0.0f : -param;
--
--    float4 res;
--    res.x = ((A * (x + 1) - 5 * A) * (x + 1) + 8 * A) * (x + 1) - 4 * A;
--    res.y = ((A + 2) * x - (A + 3)) * x * x + 1;
--    res.z = ((A + 2) * (1 - x) - (A + 3)) * (1 - x) * (1 - x) + 1;
--    res.w = 1.0f - res.x - res.y - res.z;
--
--    return res;
--}
--
--template<typename V>
--__device__ static inline V apply_coeffs(float4 coeffs, V c0, V c1, V c2, V c3)
--{
--    V res = c0 * coeffs.x;
--    res  += c1 * coeffs.y;
--    res  += c2 * coeffs.z;
--    res  += c3 * coeffs.w;
--
--    return res;
--}
--
--template<typename T>
--__device__ static inline T Subsample_Nearest(cudaTextureObject_t tex,
--                                             int xo, int yo,
--                                             int dst_width, int dst_height,
--                                             int src_width, int src_height,
--                                             int bit_depth, float param)
--{
--    float hscale = (float)src_width / (float)dst_width;
--    float vscale = (float)src_height / (float)dst_height;
--    float xi = (xo + 0.5f) * hscale;
--    float yi = (yo + 0.5f) * vscale;
--
--    return tex2D<T>(tex, xi, yi);
--}
--
--template<typename T>
--__device__ static inline T Subsample_Bilinear(cudaTextureObject_t tex,
--                                              int xo, int yo,
--                                              int dst_width, int dst_height,
--                                              int src_width, int src_height,
--                                              int bit_depth, float param)
--{
--    float hscale = (float)src_width / (float)dst_width;
--    float vscale = (float)src_height / (float)dst_height;
--    float xi = (xo + 0.5f) * hscale;
--    float yi = (yo + 0.5f) * vscale;
--    // 3-tap filter weights are {wh,1.0,wh} and {wv,1.0,wv}
--    float wh = min(max(0.5f * (hscale - 1.0f), 0.0f), 1.0f);
--    float wv = min(max(0.5f * (vscale - 1.0f), 0.0f), 1.0f);
--    // Convert weights to two bilinear weights -> {wh,1.0,wh} -> {wh,0.5,0} + {0,0.5,wh}
--    float dx = wh / (0.5f + wh);
--    float dy = wv / (0.5f + wv);
--
--    intT r;
--    vec_set_scalar(r, 2);
--    r += tex2D<T>(tex, xi - dx, yi - dy);
--    r += tex2D<T>(tex, xi + dx, yi - dy);
--    r += tex2D<T>(tex, xi - dx, yi + dy);
--    r += tex2D<T>(tex, xi + dx, yi + dy);
--
--    T res;
--    vec_set(res, r >> 2);
--
--    return res;
- }
- 
--template<typename T, coeffs_function_t coeffs_function>
--__device__ static inline T Subsample_Bicubic(cudaTextureObject_t tex,
--                                             int xo, int yo,
--                                             int dst_width, int dst_height,
--                                             int src_width, int src_height,
--                                             int bit_depth, float param)
--{
--    float hscale = (float)src_width / (float)dst_width;
--    float vscale = (float)src_height / (float)dst_height;
--    float xi = (xo + 0.5f) * hscale - 0.5f;
--    float yi = (yo + 0.5f) * vscale - 0.5f;
--    float px = floor(xi);
--    float py = floor(yi);
--    float fx = xi - px;
--    float fy = yi - py;
--
--    float factor = bit_depth > 8 ? 0xFFFF : 0xFF;
--
--    float4 coeffsX = coeffs_function(fx, param);
--    float4 coeffsY = coeffs_function(fy, param);
--
--#define PIX(x, y) tex2D<floatT>(tex, (x), (y))
--
--    return from_floatN<T, floatT>(
--        apply_coeffs<floatT>(coeffsY,
--            apply_coeffs<floatT>(coeffsX, PIX(px - 1, py - 1), PIX(px, py - 1), PIX(px + 1, py - 1), PIX(px + 2, py - 1)),
--            apply_coeffs<floatT>(coeffsX, PIX(px - 1, py    ), PIX(px, py    ), PIX(px + 1, py    ), PIX(px + 2, py    )),
--            apply_coeffs<floatT>(coeffsX, PIX(px - 1, py + 1), PIX(px, py + 1), PIX(px + 1, py + 1), PIX(px + 2, py + 1)),
--            apply_coeffs<floatT>(coeffsX, PIX(px - 1, py + 2), PIX(px, py + 2), PIX(px + 1, py + 2), PIX(px + 2, py + 2))
--        ) * factor
--    );
--
--#undef PIX
--}
--
--/// --- FUNCTION EXPORTS ---
--
--#define KERNEL_ARGS(T) \
--    cudaTextureObject_t src_tex_0, cudaTextureObject_t src_tex_1, \
--    cudaTextureObject_t src_tex_2, cudaTextureObject_t src_tex_3, \
--    T *dst_0, T *dst_1, T *dst_2, T *dst_3,                       \
--    int dst_width, int dst_height, int dst_pitch,                 \
--    int src_width, int src_height, float param
--
--#define SUBSAMPLE(Convert, T) \
--    cudaTextureObject_t src_tex[4] =                    \
--        { src_tex_0, src_tex_1, src_tex_2, src_tex_3 }; \
--    T *dst[4] = { dst_0, dst_1, dst_2, dst_3 };         \
--    int xo = blockIdx.x * blockDim.x + threadIdx.x;     \
--    int yo = blockIdx.y * blockDim.y + threadIdx.y;     \
--    if (yo >= dst_height || xo >= dst_width) return;    \
--    Convert(                                            \
--        src_tex, dst, xo, yo,                           \
--        dst_width, dst_height, dst_pitch,               \
--        src_width, src_height, param);
--
- extern "C" {
- 
--#define NEAREST_KERNEL(C, S) \
--    __global__ void Subsample_Nearest_##C##S(                      \
--        KERNEL_ARGS(Convert_##C::out_T##S))                        \
--    {                                                              \
--        SUBSAMPLE((Convert_##C::Convert##S<                        \
--                       Subsample_Nearest<Convert_##C::in_T>,       \
--                       Subsample_Nearest<Convert_##C::in_T_uv> >), \
--                  Convert_##C::out_T##S) \
--    }
--
--#define NEAREST_KERNEL_RAW(C) \
--    NEAREST_KERNEL(C,)   \
--    NEAREST_KERNEL(C,_uv)
--
--#define NEAREST_KERNELS(C) \
--    NEAREST_KERNEL_RAW(yuv420p_ ## C)     \
--    NEAREST_KERNEL_RAW(nv12_ ## C)        \
--    NEAREST_KERNEL_RAW(yuv444p_ ## C)     \
--    NEAREST_KERNEL_RAW(p010le_ ## C)      \
--    NEAREST_KERNEL_RAW(p016le_ ## C)      \
--    NEAREST_KERNEL_RAW(yuv444p16le_ ## C)
--
--#define NEAREST_KERNELS_RGB(C) \
--    NEAREST_KERNEL_RAW(rgb0_ ## C)  \
--    NEAREST_KERNEL_RAW(bgr0_ ## C)  \
--    NEAREST_KERNEL_RAW(rgba_ ## C)  \
--    NEAREST_KERNEL_RAW(bgra_ ## C)  \
--
--NEAREST_KERNELS(yuv420p)
--NEAREST_KERNELS(nv12)
--NEAREST_KERNELS(yuv444p)
--NEAREST_KERNELS(p010le)
--NEAREST_KERNELS(p016le)
--NEAREST_KERNELS(yuv444p16le)
--
--NEAREST_KERNELS_RGB(rgb0)
--NEAREST_KERNELS_RGB(bgr0)
--NEAREST_KERNELS_RGB(rgba)
--NEAREST_KERNELS_RGB(bgra)
--
--#define BILINEAR_KERNEL(C, S) \
--    __global__ void Subsample_Bilinear_##C##S(                      \
--        KERNEL_ARGS(Convert_##C::out_T##S))                         \
--    {                                                               \
--        SUBSAMPLE((Convert_##C::Convert##S<                         \
--                       Subsample_Bilinear<Convert_##C::in_T>,       \
--                       Subsample_Bilinear<Convert_##C::in_T_uv> >), \
--                  Convert_##C::out_T##S) \
--    }
--
--#define BILINEAR_KERNEL_RAW(C) \
--    BILINEAR_KERNEL(C,)   \
--    BILINEAR_KERNEL(C,_uv)
--
--#define BILINEAR_KERNELS(C) \
--    BILINEAR_KERNEL_RAW(yuv420p_ ## C)     \
--    BILINEAR_KERNEL_RAW(nv12_ ## C)        \
--    BILINEAR_KERNEL_RAW(yuv444p_ ## C)     \
--    BILINEAR_KERNEL_RAW(p010le_ ## C)      \
--    BILINEAR_KERNEL_RAW(p016le_ ## C)      \
--    BILINEAR_KERNEL_RAW(yuv444p16le_ ## C)
--
--#define BILINEAR_KERNELS_RGB(C)     \
--    BILINEAR_KERNEL_RAW(rgb0_ ## C) \
--    BILINEAR_KERNEL_RAW(bgr0_ ## C) \
--    BILINEAR_KERNEL_RAW(rgba_ ## C) \
--    BILINEAR_KERNEL_RAW(bgra_ ## C)
--
--BILINEAR_KERNELS(yuv420p)
--BILINEAR_KERNELS(nv12)
--BILINEAR_KERNELS(yuv444p)
--BILINEAR_KERNELS(p010le)
--BILINEAR_KERNELS(p016le)
--BILINEAR_KERNELS(yuv444p16le)
--
--BILINEAR_KERNELS_RGB(rgb0)
--BILINEAR_KERNELS_RGB(bgr0)
--BILINEAR_KERNELS_RGB(rgba)
--BILINEAR_KERNELS_RGB(bgra)
--
--#define BICUBIC_KERNEL(C, S) \
--    __global__ void Subsample_Bicubic_##C##S(                                        \
--        KERNEL_ARGS(Convert_##C::out_T##S))                                          \
--    {                                                                                \
--        SUBSAMPLE((Convert_##C::Convert##S<                                          \
--                       Subsample_Bicubic<Convert_## C ::in_T, bicubic_coeffs>,       \
--                       Subsample_Bicubic<Convert_## C ::in_T_uv, bicubic_coeffs> >), \
--                  Convert_##C::out_T##S)                                             \
--    }
--
--#define BICUBIC_KERNEL_RAW(C) \
--    BICUBIC_KERNEL(C,)   \
--    BICUBIC_KERNEL(C,_uv)
--
--#define BICUBIC_KERNELS(C) \
--    BICUBIC_KERNEL_RAW(yuv420p_ ## C)     \
--    BICUBIC_KERNEL_RAW(nv12_ ## C)        \
--    BICUBIC_KERNEL_RAW(yuv444p_ ## C)     \
--    BICUBIC_KERNEL_RAW(p010le_ ## C)      \
--    BICUBIC_KERNEL_RAW(p016le_ ## C)      \
--    BICUBIC_KERNEL_RAW(yuv444p16le_ ## C)
--
--#define BICUBIC_KERNELS_RGB(C)      \
--    BICUBIC_KERNEL_RAW(rgb0_ ## C)  \
--    BICUBIC_KERNEL_RAW(bgr0_ ## C)  \
--    BICUBIC_KERNEL_RAW(rgba_ ## C)  \
--    BICUBIC_KERNEL_RAW(bgra_ ## C)
--
--BICUBIC_KERNELS(yuv420p)
--BICUBIC_KERNELS(nv12)
--BICUBIC_KERNELS(yuv444p)
--BICUBIC_KERNELS(p010le)
--BICUBIC_KERNELS(p016le)
--BICUBIC_KERNELS(yuv444p16le)
--
--BICUBIC_KERNELS_RGB(rgb0)
--BICUBIC_KERNELS_RGB(bgr0)
--BICUBIC_KERNELS_RGB(rgba)
--BICUBIC_KERNELS_RGB(bgra)
--
--#define LANCZOS_KERNEL(C, S) \
--    __global__ void Subsample_Lanczos_##C##S(                                        \
--        KERNEL_ARGS(Convert_##C::out_T##S))                                          \
--    {                                                                                \
--        SUBSAMPLE((Convert_##C::Convert##S<                                          \
--                       Subsample_Bicubic<Convert_## C ::in_T, lanczos_coeffs>,       \
--                       Subsample_Bicubic<Convert_## C ::in_T_uv, lanczos_coeffs> >), \
--                  Convert_##C::out_T##S) \
--    }
-+#define VARIANT(SRC, DST, CONV, SHIFT, PITCH, DITHER, NAME) \
-+__global__ void Subsample_Bilinear_ ## NAME(cudaTextureObject_t tex, \
-+                                    DST *dst, \
-+                                    int dst_width, int dst_height, int dst_pitch, \
-+                                    int src_width, int src_height, \
-+                                    cudaTextureObject_t ditherTex) \
-+{ \
-+    Subsample_Bilinear<SRC, DST, CONV, PITCH, SHIFT, DITHER>(tex, dst, dst_width, dst_height, dst_pitch, \
-+                                                             src_width, src_height, ditherTex); \
++static inline __device__ float get_dithered_y(float y, float d, float dither_size, float dither_quantization, float factor)
++{
++    return floor(y / factor * dither_quantization + d + 0.5f / (dither_size * dither_size)) * 1.0f / dither_quantization * factor;
 +}
 +
-+#define VARIANTSET2(SRC, DST, SHIFT, NAME) \
-+    VARIANT(SRC,      DST,      add_conv_shift1_d, SHIFT, 1, (sizeof(DST) < sizeof(SRC)) ? sizeof(DST) : 0, NAME) \
-+    VARIANT(SRC,      DST,      add_conv_shift1,   SHIFT, 1, 0, NAME ## _c) \
-+    VARIANT(SRC,      DST,      add_conv_shift1,   SHIFT, 2, 0, NAME ## _p2) \
-+    VARIANT(SRC ## 2, DST ## 2, add_conv_shift2,   SHIFT, 1, 0, NAME ## _2) \
-+    VARIANT(SRC ## 2, DST,      add_conv_shift2_x, SHIFT, 1, 0, NAME ## _2_u) \
-+    VARIANT(SRC ## 2, DST,      add_conv_shift2_y, SHIFT, 1, 0, NAME ## _2_v) \
-+    VARIANT(SRC ## 4, DST ## 4, add_conv_shift4,   SHIFT, 1, 0, NAME ## _4)
++static inline __device__ float read_dither(cudaTextureObject_t dither_tex, float dither_size, int x, int y)
++{
++    float dither_size_recip = 1.0f / dither_size;
++    return tex2D<float>(dither_tex, (float)x * dither_size_recip, (float)y * dither_size_recip);
++}
 +
-+#define VARIANTSET(SRC, DST, SRCSIZE, DSTSIZE) \
-+    VARIANTSET2(SRC, DST, (SRCSIZE - DSTSIZE), SRCSIZE ## _ ## DSTSIZE)
-+
-+// Straight no-conversion
-+VARIANTSET(uchar,  uchar,  8,  8)
-+VARIANTSET(ushort, ushort, 16, 16)
-+
-+// Conversion between 8- and 16-bit
-+VARIANTSET(uchar,  ushort, 8,  16)
-+VARIANTSET(ushort, uchar,  16, 8)
+ // --- CONVERSION LOGIC ---
  
--#define LANCZOS_KERNEL_RAW(C) \
--    LANCZOS_KERNEL(C,)   \
--    LANCZOS_KERNEL(C,_uv)
--
--#define LANCZOS_KERNELS(C) \
--    LANCZOS_KERNEL_RAW(yuv420p_ ## C)     \
--    LANCZOS_KERNEL_RAW(nv12_ ## C)        \
--    LANCZOS_KERNEL_RAW(yuv444p_ ## C)     \
--    LANCZOS_KERNEL_RAW(p010le_ ## C)      \
--    LANCZOS_KERNEL_RAW(p016le_ ## C)      \
--    LANCZOS_KERNEL_RAW(yuv444p16le_ ## C)
--
--#define LANCZOS_KERNELS_RGB(C)      \
--    LANCZOS_KERNEL_RAW(rgb0_ ## C)  \
--    LANCZOS_KERNEL_RAW(bgr0_ ## C)  \
--    LANCZOS_KERNEL_RAW(rgba_ ## C)  \
--    LANCZOS_KERNEL_RAW(bgra_ ## C)
--
--LANCZOS_KERNELS(yuv420p)
--LANCZOS_KERNELS(nv12)
--LANCZOS_KERNELS(yuv444p)
--LANCZOS_KERNELS(p010le)
--LANCZOS_KERNELS(p016le)
--LANCZOS_KERNELS(yuv444p16le)
--
--LANCZOS_KERNELS_RGB(rgb0)
--LANCZOS_KERNELS_RGB(bgr0)
--LANCZOS_KERNELS_RGB(rgba)
--LANCZOS_KERNELS_RGB(bgra)
- }
-Index: FFmpeg/libavfilter/vf_scale_cuda.h
-===================================================================
---- libavfilter/vf_scale_cuda.h
-+++ /dev/null
-@@ -1,28 +0,0 @@
--/*
-- * This file is part of FFmpeg.
-- *
-- * Permission is hereby granted, free of charge, to any person obtaining a
-- * copy of this software and associated documentation files (the "Software"),
-- * to deal in the Software without restriction, including without limitation
-- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-- * and/or sell copies of the Software, and to permit persons to whom the
-- * Software is furnished to do so, subject to the following conditions:
-- *
-- * The above copyright notice and this permission notice shall be included in
-- * all copies or substantial portions of the Software.
-- *
-- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-- * DEALINGS IN THE SOFTWARE.
-- */
--
--#ifndef AVFILTER_SCALE_CUDA_H
--#define AVFILTER_SCALE_CUDA_H
--
--#define SCALE_CUDA_PARAM_DEFAULT 999999.0f
--
--#endif
+ static const ushort mask_10bit = 0xFFC0;
+@@ -64,7 +77,9 @@ static inline __device__ ushort conv_16t
+              subsample_function_t<in_T_uv> subsample_func_uv>                                  \
+     __device__ static inline void N(cudaTextureObject_t src_tex[4], T *dst[4], int xo, int yo, \
+                                     int dst_width, int dst_height, int dst_pitch,              \
+-                                    int src_width, int src_height, float param)
++                                    int src_width, int src_height, float param,                \
++                                    cudaTextureObject_t dither_tex,                            \
++                                    float dither_size, float dither_quantization)
+ 
+ #define SUB_F(m, plane) \
+     subsample_func_##m(src_tex[plane], xo, yo, \
+@@ -477,7 +492,10 @@ struct Convert_p010le_yuv420p
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_10to8(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_10bit);
++        DEFAULT_DST(0) = conv_10to8(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -498,7 +516,10 @@ struct Convert_p010le_nv12
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_10to8(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_10bit);
++        DEFAULT_DST(0) = conv_10to8(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -521,7 +542,10 @@ struct Convert_p010le_yuv444p
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_10to8(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_10bit);
++        DEFAULT_DST(0) = conv_10to8(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -607,7 +631,10 @@ struct Convert_p016le_yuv420p
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_16bit);
++        DEFAULT_DST(0) = conv_16to8(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -628,7 +655,10 @@ struct Convert_p016le_nv12
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_16bit);
++        DEFAULT_DST(0) = conv_16to8(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -651,7 +681,10 @@ struct Convert_p016le_yuv444p
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_16bit);
++        DEFAULT_DST(0) = conv_16to8(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -672,7 +705,10 @@ struct Convert_p016le_p010le
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_16to10(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_16bit);
++        DEFAULT_DST(0) = conv_16to10(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -737,7 +773,10 @@ struct Convert_yuv444p16le_yuv420p
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_16bit);
++        DEFAULT_DST(0) = conv_16to8(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -757,7 +796,10 @@ struct Convert_yuv444p16le_nv12
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_16bit);
++        DEFAULT_DST(0) = conv_16to8(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -779,7 +821,10 @@ struct Convert_yuv444p16le_yuv444p
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_16bit);
++        DEFAULT_DST(0) = conv_16to8(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -799,7 +844,10 @@ struct Convert_yuv444p16le_p010le
+ 
+     DEF_F(Convert, out_T)
+     {
+-        DEFAULT_DST(0) = conv_16to10(SUB_F(y, 0));
++        in_T res = SUB_F(y, 0);
++        res = (in_T)get_dithered_y((float)res, read_dither(dither_tex, dither_size, xo, yo),
++                                   dither_size, dither_quantization, (float)mask_16bit);
++        DEFAULT_DST(0) = conv_16to10(res);
+     }
+ 
+     DEF_F(Convert_uv, out_T_uv)
+@@ -1114,8 +1162,8 @@ __device__ static inline T Subsample_Bic
+ {
+     float hscale = (float)src_width / (float)dst_width;
+     float vscale = (float)src_height / (float)dst_height;
+-    float xi = (xo + 0.5f) * hscale - 0.5f;
+-    float yi = (yo + 0.5f) * vscale - 0.5f;
++    float xi = xo * hscale + 0.5f * hscale - 0.5f; // avoid (x - v + v = x)
++    float yi = yo * hscale + 0.5f * vscale - 0.5f;
+     float px = floor(xi);
+     float py = floor(yi);
+     float fx = xi - px;
+@@ -1147,7 +1195,9 @@ __device__ static inline T Subsample_Bic
+     cudaTextureObject_t src_tex_2, cudaTextureObject_t src_tex_3, \
+     T *dst_0, T *dst_1, T *dst_2, T *dst_3,                       \
+     int dst_width, int dst_height, int dst_pitch,                 \
+-    int src_width, int src_height, float param
++    int src_width, int src_height, float param,                   \
++    cudaTextureObject_t dither_tex,                               \
++    float dither_size, float dither_quantization
+ 
+ #define SUBSAMPLE(Convert, T) \
+     cudaTextureObject_t src_tex[4] =                    \
+@@ -1159,7 +1209,9 @@ __device__ static inline T Subsample_Bic
+     Convert(                                            \
+         src_tex, dst, xo, yo,                           \
+         dst_width, dst_height, dst_pitch,               \
+-        src_width, src_height, param);
++        src_width, src_height, param,                   \
++        dither_tex,                                     \
++        dither_size, dither_quantization);
+ 
+ extern "C" {
+ 
