@@ -10,6 +10,8 @@ HOMEPAGE = https://libclc.llvm.org/
 COMMENT  = Library requirements of the OpenCL C programming language
 LICENSE  = BSD/MIT dual licensed
 
+POST_INSTALL_TARGET = libclc_create_pkgconfig
+
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
@@ -38,3 +40,18 @@ CMAKE_ARGS += -DLLVM_SPIRV=$(LLVM_BIN_DIR)/llvm-spirv
 # Include the common cross-cmake rules
 # -----------------------------------------------------------------------------
 include ../../mk/spksrc.native-cmake.mk
+
+.PHONY: libclc_create_pkgconfig
+libclc_create_pkgconfig:
+	@echo "Creating libclc.pc file"
+	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig
+	@( \
+		echo "prefix=$(INSTALL_PREFIX)"; \
+		echo "includedir=\$${prefix}/include"; \
+		echo "datadir=\$${prefix}/share"; \
+		echo ""; \
+		echo "Name: libclc"; \
+		echo "Description: Library requirements for OpenCL C"; \
+		echo "Version: $(PKG_VERS)"; \
+		echo "Cflags: -I\$${includedir}"; \
+	) > $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/libclc.pc
