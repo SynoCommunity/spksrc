@@ -1,6 +1,6 @@
 SPK_NAME = ffmpeg7
-SPK_VERS = 7.0.3
-SPK_REV = 5
+SPK_VERS = 7.1.3
+SPK_REV = 6
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to using updated synocli-videodriver package."
 
