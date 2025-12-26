@@ -32,6 +32,7 @@ CONFIGURE_ARGS = --cross-file=$(WORK_DIR)/$(PKG_DIR)/mesa.meson
 # Default meson parameters
 # -----------------------------------------------------------------------------
 CONFIGURE_ARGS += -Dvulkan-drivers=intel
+CONFIGURE_ARGS += -Dvulkan-icd-dir=etc/vulkan/icd.d
 CONFIGURE_ARGS += -Dgallium-drivers=
 CONFIGURE_ARGS += -Dmicrosoft-clc=disabled
 CONFIGURE_ARGS += -Dllvm=enabled
