@@ -1,0 +1,185 @@
+Index: FFmpeg/libavutil/hwcontext_vulkan.c
+===================================================================
+--- libavutil/hwcontext_vulkan.c
++++ libavutil/hwcontext_vulkan.c
+@@ -90,6 +90,9 @@ typedef struct VulkanDevicePriv {
+     VkPhysicalDeviceMemoryProperties mprops;
+     VkPhysicalDeviceExternalMemoryHostPropertiesEXT hprops;
+ 
++    /* Opaque FD external semaphore properties */
++    VkExternalSemaphoreProperties ext_sem_props_opaque;
++
+     /* Features */
+     VkPhysicalDeviceVulkan11Features device_features_1_1;
+     VkPhysicalDeviceVulkan12Features device_features_1_2;
+@@ -1212,7 +1215,7 @@ static int setup_queue_families(AVHWDevi
+         };
+         qf[i] = (VkQueueFamilyProperties2) {
+             .sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2,
+-            .pNext = &qf_vid[i],
++            .pNext = p->vkctx.extensions & FF_VK_EXT_VIDEO_QUEUE ? &qf_vid[i] : NULL,
+         };
+     }
+ 
+@@ -1642,6 +1645,7 @@ static int vulkan_device_init(AVHWDevice
+     FFVulkanFunctions *vk = &p->vkctx.vkfn;
+     VkQueueFamilyProperties2 *qf;
+     VkQueueFamilyVideoPropertiesKHR *qf_vid;
++    VkPhysicalDeviceExternalSemaphoreInfo ext_sem_props_info;
+     int graph_index, comp_index, tx_index, enc_index, dec_index;
+ 
+     /* Set device extension flags */
+@@ -1687,6 +1691,24 @@ static int vulkan_device_init(AVHWDevice
+         return AVERROR_EXTERNAL;
+     }
+ 
++    ext_sem_props_info = (VkPhysicalDeviceExternalSemaphoreInfo) {
++        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_SEMAPHORE_INFO,
++    };
++
++    /* Opaque FD semaphore properties */
++    ext_sem_props_info.handleType =
++#ifdef _WIN32
++        IsWindows8OrGreater()
++            ? VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT
++            : VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT;
++#else
++        VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
++#endif
++    p->ext_sem_props_opaque.sType = VK_STRUCTURE_TYPE_EXTERNAL_SEMAPHORE_PROPERTIES;
++    vk->GetPhysicalDeviceExternalSemaphoreProperties(hwctx->phys_dev,
++                                                     &ext_sem_props_info,
++                                                     &p->ext_sem_props_opaque);
++
+     qf = av_malloc_array(qf_num, sizeof(VkQueueFamilyProperties2));
+     if (!qf)
+         return AVERROR(ENOMEM);
+@@ -1703,7 +1725,7 @@ static int vulkan_device_init(AVHWDevice
+         };
+         qf[i] = (VkQueueFamilyProperties2) {
+             .sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2,
+-            .pNext = &qf_vid[i],
++            .pNext = p->vkctx.extensions & FF_VK_EXT_VIDEO_QUEUE ? &qf_vid[i] : NULL,
+         };
+     }
+ 
+@@ -1980,7 +2002,7 @@ static int vulkan_frames_get_constraints
+         count += vkfmt_from_pixfmt2(ctx, vk_formats_list[i].pixfmt,
+                                     p->use_linear_images ? VK_IMAGE_TILING_LINEAR :
+                                                            VK_IMAGE_TILING_OPTIMAL,
+-                                    NULL, NULL, NULL, NULL, 0, 0) >= 0;
++                                    NULL, NULL, NULL, NULL, p->disable_multiplane, 1) >= 0;
+     }
+ 
+     constraints->valid_sw_formats = av_malloc_array(count + 1,
+@@ -1993,7 +2015,7 @@ static int vulkan_frames_get_constraints
+         if (vkfmt_from_pixfmt2(ctx, vk_formats_list[i].pixfmt,
+                                p->use_linear_images ? VK_IMAGE_TILING_LINEAR :
+                                                       VK_IMAGE_TILING_OPTIMAL,
+-                               NULL, NULL, NULL, NULL, 0, 0) >= 0) {
++                               NULL, NULL, NULL, NULL, p->disable_multiplane, 1) >= 0) {
+             constraints->valid_sw_formats[count++] = vk_formats_list[i].pixfmt;
+         }
+     }
+@@ -2346,8 +2368,19 @@ static int create_frame(AVHWFramesContex
+     VulkanDevicePriv *p = ctx->hwctx;
+     AVVulkanDeviceContext *hwctx = &p->p;
+     FFVulkanFunctions *vk = &p->vkctx.vkfn;
++    AVVkFrame *f;
+ 
+-    VkExportSemaphoreCreateInfo ext_sem_info = {
++    VkSemaphoreTypeCreateInfo sem_type_info = {
++        .sType         = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO,
++        .semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE,
++        .initialValue  = 0,
++    };
++    VkSemaphoreCreateInfo sem_spawn = {
++        .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
++        .pNext = &sem_type_info,
++    };
++
++    VkExportSemaphoreCreateInfo ext_sem_info_opaque = {
+         .sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO,
+ #ifdef _WIN32
+         .handleTypes = IsWindows8OrGreater()
+@@ -2358,23 +2391,13 @@ static int create_frame(AVHWFramesContex
+ #endif
+     };
+ 
+-    VkSemaphoreTypeCreateInfo sem_type_info = {
+-        .sType         = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO,
+-#ifdef _WIN32
+-        .pNext         = p->vkctx.extensions & FF_VK_EXT_EXTERNAL_WIN32_SEM ? &ext_sem_info : NULL,
+-#else
+-        .pNext         = p->vkctx.extensions & FF_VK_EXT_EXTERNAL_FD_SEM ? &ext_sem_info : NULL,
+-#endif
+-        .semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE,
+-        .initialValue  = 0,
+-    };
+-
+-    VkSemaphoreCreateInfo sem_spawn = {
+-        .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+-        .pNext = &sem_type_info,
+-    };
++    /* Check if exporting is supported before chaining any structs */
++    if (p->ext_sem_props_opaque.externalSemaphoreFeatures & VK_EXTERNAL_SEMAPHORE_FEATURE_EXPORTABLE_BIT) {
++        if (p->vkctx.extensions & (FF_VK_EXT_EXTERNAL_WIN32_SEM | FF_VK_EXT_EXTERNAL_FD_SEM))
++            ff_vk_link_struct(&sem_type_info, &ext_sem_info_opaque);
++    }
+ 
+-    AVVkFrame *f = av_vk_frame_alloc();
++    f = av_vk_frame_alloc();
+     if (!f) {
+         av_log(ctx, AV_LOG_ERROR, "Unable to allocate memory for AVVkFrame!\n");
+         return AVERROR(ENOMEM);
+@@ -2689,11 +2712,11 @@ static int vulkan_frames_init(AVHWFrames
+                             !(hwctx->usage & VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR)));
+         int sampleable = hwctx->usage & (VK_IMAGE_USAGE_SAMPLED_BIT |
+                                          VK_IMAGE_USAGE_STORAGE_BIT);
++        hwctx->img_flags = VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
+         if (sampleable && !is_lone_dpb) {
+-            hwctx->img_flags = VK_IMAGE_CREATE_ALIAS_BIT;
++            hwctx->img_flags |= VK_IMAGE_CREATE_ALIAS_BIT;
+             if ((fmt->vk_planes > 1) && (hwctx->format[0] == fmt->vkf))
+-                hwctx->img_flags |= VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT |
+-                                    VK_IMAGE_CREATE_EXTENDED_USAGE_BIT;
++                hwctx->img_flags |= VK_IMAGE_CREATE_EXTENDED_USAGE_BIT;
+         }
+     }
+ 
+Index: FFmpeg/libavutil/vulkan.c
+===================================================================
+--- libavutil/vulkan.c
++++ libavutil/vulkan.c
+@@ -185,7 +185,7 @@ int ff_vk_load_props(FFVulkanContext *s)
+         };
+         s->qf_props[i] = (VkQueueFamilyProperties2) {
+             .sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2,
+-            .pNext = &s->video_props[i],
++            .pNext = s->extensions & FF_VK_EXT_VIDEO_QUEUE ? &s->video_props[i] : NULL,
+         };
+     }
+ 
+Index: FFmpeg/libavutil/vulkan_functions.h
+===================================================================
+--- libavutil/vulkan_functions.h
++++ libavutil/vulkan_functions.h
+@@ -33,10 +33,8 @@ typedef enum FFVulkanExtensions {
+     FF_VK_EXT_EXTERNAL_FD_SEM        = 1ULL <<  3, /* VK_KHR_external_semaphore_fd */
+     FF_VK_EXT_EXTERNAL_HOST_MEMORY   = 1ULL <<  4, /* VK_EXT_external_memory_host */
+     FF_VK_EXT_DEBUG_UTILS            = 1ULL <<  5, /* VK_EXT_debug_utils */
+-#ifdef _WIN32
+     FF_VK_EXT_EXTERNAL_WIN32_MEMORY  = 1ULL <<  6, /* VK_KHR_external_memory_win32 */
+     FF_VK_EXT_EXTERNAL_WIN32_SEM     = 1ULL <<  7, /* VK_KHR_external_semaphore_win32 */
+-#endif
+     FF_VK_EXT_DESCRIPTOR_BUFFER      = 1ULL <<  8, /* VK_EXT_descriptor_buffer */
+     FF_VK_EXT_DEVICE_DRM             = 1ULL <<  9, /* VK_EXT_physical_device_drm */
+     FF_VK_EXT_VIDEO_QUEUE            = 1ULL << 10, /* VK_KHR_video_queue */
+@@ -75,6 +73,7 @@ typedef enum FFVulkanExtensions {
+     MACRO(1, 0, FF_VK_EXT_NO_FLAG,              CreateDevice)                            \
+     MACRO(1, 0, FF_VK_EXT_NO_FLAG,              GetPhysicalDeviceFeatures2)              \
+     MACRO(1, 0, FF_VK_EXT_NO_FLAG,              GetPhysicalDeviceProperties)             \
++    MACRO(1, 0, FF_VK_EXT_NO_FLAG,              GetPhysicalDeviceExternalSemaphoreProperties)          \
+     MACRO(1, 0, FF_VK_EXT_VIDEO_QUEUE,          GetPhysicalDeviceVideoCapabilitiesKHR)     \
+     MACRO(1, 0, FF_VK_EXT_VIDEO_QUEUE,          GetPhysicalDeviceVideoFormatPropertiesKHR) \
+     MACRO(1, 0, FF_VK_EXT_NO_FLAG,              DeviceWaitIdle)                          \

@@ -1,0 +1,67 @@
+Index: FFmpeg/libavcodec/audiotoolboxenc.c
+===================================================================
+--- libavcodec/audiotoolboxenc.c
++++ libavcodec/audiotoolboxenc.c
+@@ -236,8 +236,8 @@ static int get_aac_tag(const AVChannelLa
+         { AV_CHANNEL_LAYOUT_6POINT0,           kAudioChannelLayoutTag_AAC_6_0 },
+         { AV_CHANNEL_LAYOUT_6POINT1,           kAudioChannelLayoutTag_AAC_6_1 },
+         { AV_CHANNEL_LAYOUT_7POINT0,           kAudioChannelLayoutTag_AAC_7_0 },
+-        { AV_CHANNEL_LAYOUT_7POINT1_WIDE_BACK, kAudioChannelLayoutTag_AAC_7_1 },
+-        { AV_CHANNEL_LAYOUT_7POINT1,           kAudioChannelLayoutTag_MPEG_7_1_C },
++        { AV_CHANNEL_LAYOUT_7POINT1_WIDE_BACK, kAudioChannelLayoutTag_AAC_7_1_B },
++        { AV_CHANNEL_LAYOUT_7POINT1,           kAudioChannelLayoutTag_AAC_7_1_B },
+     };
+     int i;
+ 
+@@ -635,7 +635,7 @@ static const AVOption options[] = {
+         .version    = LIBAVUTIL_VERSION_INT, \
+     };
+ 
+-#define FFAT_ENC(NAME, ID, PROFILES, CAPS, CHANNEL_LAYOUTS, CH_LAYOUTS) \
++#define FFAT_ENC(NAME, ID, PROFILES, CAPS, CHANNEL_LAYOUTS, CH_LAYOUTS, SAMPLE_RATES) \
+     FFAT_ENC_CLASS(NAME) \
+     const FFCodec ff_##NAME##_at_encoder = { \
+         .p.name         = #NAME "_at", \
+@@ -652,9 +652,10 @@ static const AVOption options[] = {
+                           AV_CODEC_CAP_ENCODER_FLUSH CAPS, \
+         .p.ch_layouts   = CH_LAYOUTS, \
+         .p.sample_fmts  = (const enum AVSampleFormat[]) { \
+-            AV_SAMPLE_FMT_S16, \
++            AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S32,\
+             AV_SAMPLE_FMT_U8,  AV_SAMPLE_FMT_NONE \
+         }, \
++        .p.supported_samplerates = SAMPLE_RATES, \
+         .p.profiles     = PROFILES, \
+         .p.wrapper_name = "at", \
+     };
+@@ -669,15 +670,25 @@ static const AVChannelLayout aac_at_ch_l
+     AV_CHANNEL_LAYOUT_6POINT0,
+     AV_CHANNEL_LAYOUT_6POINT1,
+     AV_CHANNEL_LAYOUT_7POINT0,
++    AV_CHANNEL_LAYOUT_7POINT1,
+     AV_CHANNEL_LAYOUT_7POINT1_WIDE_BACK,
+     AV_CHANNEL_LAYOUT_QUAD,
+     AV_CHANNEL_LAYOUT_OCTAGONAL,
+     { 0 },
+ };
+ 
+-FFAT_ENC(aac,          AV_CODEC_ID_AAC,          aac_profiles, , aac_at_channel_layouts, aac_at_ch_layouts)
++static const int aac_at_sample_rates[9] = {
++    48000, 44100, 32000,24000, 22050, 16000, 12000, 11025, 8000
++};
++
++static const int alac_at_sample_rates[16] = {
++    384000, 352800, 192000, 176400, 96000, 88200, 64000, 48000,
++    44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000
++};
++
++FFAT_ENC(aac,          AV_CODEC_ID_AAC,          aac_profiles, , aac_at_channel_layouts, aac_at_ch_layouts, aac_at_sample_rates)
+ //FFAT_ENC(adpcm_ima_qt, AV_CODEC_ID_ADPCM_IMA_QT, NULL)
+-FFAT_ENC(alac,         AV_CODEC_ID_ALAC,         NULL, , NULL, NULL)
+-FFAT_ENC(ilbc,         AV_CODEC_ID_ILBC,         NULL, , NULL, NULL)
+-FFAT_ENC(pcm_alaw,     AV_CODEC_ID_PCM_ALAW,     NULL, , NULL, NULL)
+-FFAT_ENC(pcm_mulaw,    AV_CODEC_ID_PCM_MULAW,    NULL, , NULL, NULL)
++FFAT_ENC(alac,         AV_CODEC_ID_ALAC,         NULL, , NULL, NULL, alac_at_sample_rates)
++FFAT_ENC(ilbc,         AV_CODEC_ID_ILBC,         NULL, , NULL, NULL, aac_at_sample_rates)
++FFAT_ENC(pcm_alaw,     AV_CODEC_ID_PCM_ALAW,     NULL, , NULL, NULL, NULL)
++FFAT_ENC(pcm_mulaw,    AV_CODEC_ID_PCM_MULAW,    NULL, , NULL, NULL, NULL)

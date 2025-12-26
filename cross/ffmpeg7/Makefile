@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 7.0.3
+PKG_VERS = 7.1.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -66,6 +66,9 @@ OPTIONAL_DEPENDS += cross/intel-graphics-compiler
 OPTIONAL_DEPENDS += cross/intel-compute-runtime
 OPTIONAL_DEPENDS += cross/ocl-icd
 OPTIONAL_DEPENDS += cross/clinfo
+OPTIONAL_DEPENDS += cross/mesa
+OPTIONAL_DEPENDS += cross/Khronos-Vulkan-Loader
+OPTIONAL_DEPENDS += cross/Khronos-Vulkan-Tools
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
@@ -277,8 +280,12 @@ DEPENDS += cross/intel-graphics-compiler
 DEPENDS += cross/intel-compute-runtime
 DEPENDS += cross/ocl-icd
 DEPENDS += cross/clinfo
+DEPENDS += cross/mesa
+DEPENDS += cross/Khronos-Vulkan-Loader
+DEPENDS += cross/Khronos-Vulkan-Tools
 endif
 CONFIGURE_ARGS += --enable-opencl
+CONFIGURE_ARGS += --enable-vulkan
 endif
 endif
 
