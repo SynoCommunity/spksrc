@@ -1,0 +1,26 @@
+Index: FFmpeg/fftools/ffmpeg_filter.c
+===================================================================
+--- fftools/ffmpeg_filter.c
++++ fftools/ffmpeg_filter.c
+@@ -2384,10 +2384,21 @@ static int close_output(OutputFilterPriv
+     if (!fgt->got_frame) {
+         AVFrame *frame = fgt->frame;
+         FrameData *fd;
++        const AVPixFmtDescriptor *ofp_fmt_desc;
+ 
+         frame->time_base   = ofp->tb_out;
+         frame->format      = ofp->format;
+ 
++        ofp_fmt_desc = av_pix_fmt_desc_get(ofp->format);
++        // a dummy frame with HW pixel format requires a valid hw_frames_ctx
++        if (ofp_fmt_desc->flags & AV_PIX_FMT_FLAG_HWACCEL) {
++            AVFilterContext *sink = ofp->filter;
++            AVBufferRef *hwfc = av_buffersink_get_hw_frames_ctx(sink);
++            ret = av_buffer_replace(&frame->hw_frames_ctx, hwfc);
++            if (ret < 0)
++                return ret;
++        }
++
+         frame->width               = ofp->width;
+         frame->height              = ofp->height;
+         frame->sample_aspect_ratio = ofp->sample_aspect_ratio;

@@ -1,0 +1,26 @@
+Index: FFmpeg/libavfilter/framesync.c
+===================================================================
+--- libavfilter/framesync.c
++++ libavfilter/framesync.c
+@@ -248,7 +248,7 @@ static void framesync_inject_frame(FFFra
+ 
+     av_assert0(!fs->in[in].have_next);
+     av_assert0(frame);
+-    pts = av_rescale_q(frame->pts, fs->in[in].time_base, fs->time_base);
++    pts = av_rescale_q_rnd(frame->pts, fs->in[in].time_base, fs->time_base, AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
+     frame->pts = pts;
+     fs->in[in].frame_next = frame;
+     fs->in[in].pts_next   = pts;
+Index: FFmpeg/libavfilter/vf_scale.c
+===================================================================
+--- libavfilter/vf_scale.c
++++ libavfilter/vf_scale.c
+@@ -1119,7 +1119,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
+         goto err;
+ 
+     av_assert0(out);
+-    out->pts = av_rescale_q(fs->pts, fs->time_base, outlink->time_base);
++    out->pts = av_rescale_q_rnd(fs->pts, fs->time_base, outlink->time_base, AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
+     return ff_filter_frame(outlink, out);
+ 
+ err:
