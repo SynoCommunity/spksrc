@@ -22,4 +22,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: libuniberak_pre_configure
 libuniberak_pre_configure:
-	@$(RUN) ./autogen.sh
+	@$(RUN) NOCONFIGURE=1 ./autogen.sh
