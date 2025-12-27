@@ -1,6 +1,6 @@
 PKG_NAME = intel-graphics-compiler
 # Last supported version to match intel-compute-runtim 24.35 API
-PKG_VERS = 1.0.17537.24
+PKG_VERS = 1.0.17791.18
 PKG_EXT = tar.gz
 PKG_DIST_NAME = igc-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/intel-graphics-compiler/archive
@@ -22,14 +22,10 @@ DEPENDS += cross/intel-vc-intrinsics
 DEPENDS += cross/Khronos-SPIRV-Tools
 
 # -----------------------------------------------------------------------------
-# Directories
+# Directories for NATIVE LLVM
 # -----------------------------------------------------------------------------
 LLVM_BIN_DIR = $(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin)
 LLVM_LIB_DIR = $(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/lib)
-
-# Needed for built-time tool usage: 'CMCLTranslatorTool', 'elf_packager', 'vcb'
-# CMake rules would benefit from a patch to ensure linking to native/llvm-14.0
-ENV += LD_LIBRARY_PATH=$(LLVM_LIB_DIR):$$LD_LIBRARY_PATH
 
 # -----------------------------------------------------------------------------
 # Post-extract: create symlink to igc
@@ -65,6 +61,10 @@ CMAKE_ARGS += -DLLVM_AS_EXE=$(LLVM_BIN_DIR)/llvm-as
 CMAKE_ARGS += -DLLVM_LINK_EXE=$(LLVM_BIN_DIR)/llvm-link
 CMAKE_ARGS += -DLLVM_OPT_EXE=$(LLVM_BIN_DIR)/opt
 
+# For native build-time tools to link against LLVM libraries
+# 'CMCLTranslatorTool', 'elf_packager', 'vcb', 'libBiFManager.so', etc.
+CMAKE_ARGS += -DCMAKE_BUILD_RPATH="$(LLVM_LIB_DIR)"
+
 # -----------------------------------------------------------------------------
 # Reduce build-time binary size
 # -----------------------------------------------------------------------------
@@ -77,5 +77,4 @@ include ../../mk/spksrc.cross-cmake.mk
 
 # Requires access to:
 #   Build time (IGC/Release/CMCLTranslatorTool): 'CMCLTranslatorTool', 'elf_packager', 'vcb'
-#   native/llvm-14.0: 'llvm-tblgen', 'clang-tool', 'llvm-link', 'opt'
-ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/$(CMAKE_BUILD_TYPE):$(LLVM_BIN_DIR):$$PATH
+ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/$(CMAKE_BUILD_TYPE):$$PATH

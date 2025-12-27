@@ -1,0 +1,74 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -5601,7 +5601,7 @@ elif enabled x86; then
+         ;;
+         # everything else should support nopl and conditional mov (cmov)
+         *)
+-            cpuflags="-march=$cpu"
++            # there is no -march=generic option
+             enable i686
+             enable fast_cmov
+         ;;
+@@ -7592,7 +7592,9 @@ if enabled icc; then
+             disable aligned_stack
+     fi
+ elif enabled gcc; then
+-    check_optflags -fno-tree-vectorize
++    case $gcc_basever in
++        2|2.*|3.*|4.*|5.*|6.*) check_optflags -fno-tree-vectorize ;;
++    esac
+     check_cflags -Werror=format-security
+     check_cflags -Werror=implicit-function-declaration
+     check_cflags -Werror=missing-prototypes
+Index: FFmpeg/libavcodec/huffyuvdsp.c
+===================================================================
+--- libavcodec/huffyuvdsp.c
++++ libavcodec/huffyuvdsp.c
+@@ -16,6 +16,13 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++// GCC Vectorize with AVX will break huffyuv unit tests.
++#if defined(__GNUC__) && !defined(__clang__)
++    #if (__GNUC__ > 6)
++        #pragma GCC optimize ("no-tree-vectorize")
++    #endif
++#endif
++
+ #include <stdint.h>
+ 
+ #include "config.h"
+Index: FFmpeg/libavcodec/huffyuvenc.c
+===================================================================
+--- libavcodec/huffyuvenc.c
++++ libavcodec/huffyuvenc.c
+@@ -28,6 +28,13 @@
+  * huffyuv encoder
+  */
+ 
++ // GCC Vectorize with AVX will break huffyuv unit tests.
++#if defined(__GNUC__) && !defined(__clang__)
++    #if (__GNUC__ > 6)
++        #pragma GCC optimize ("no-tree-vectorize")
++    #endif
++#endif
++
+ #include "config_components.h"
+ 
+ #include "avcodec.h"
+Index: FFmpeg/libavcodec/x86/cabac.h
+===================================================================
+--- libavcodec/x86/cabac.h
++++ libavcodec/x86/cabac.h
+@@ -183,6 +183,9 @@ av_noinline
+ #else
+ av_always_inline
+ #endif
++#ifdef __GNUC__
++__attribute__((optimize("-fno-tree-vectorize")))
++#endif
+ int get_cabac_inline_x86(CABACContext *c, uint8_t *const state)
+ {
+     int bit, tmp;

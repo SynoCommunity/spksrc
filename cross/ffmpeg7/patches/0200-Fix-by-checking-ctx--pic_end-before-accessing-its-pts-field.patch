@@ -10,13 +10,13 @@ Signed-off-by: James Hutchinson <jahutchinson99@googlemail.com>
 
 Source: https://patchwork.ffmpeg.org/project/ffmpeg/patch/20250719070836.283597-1-jahutchinson99@googlemail.com/
 
---- libavcodec/vaapi_encode.c-orig	2025-08-05 00:22:34.000000000 +0000
-+++ libavcodec/vaapi_encode.c	2025-10-12 12:10:57.687449669 +0000
-@@ -1382,7 +1382,7 @@ static int vaapi_encode_send_frame(AVCod
+--- libavcodec/hw_base_encode.c-orig	2025-11-21 01:15:18.000000000 +0000
++++ libavcodec/hw_base_encode.c	2025-12-27 00:27:24.108168862 +0000
+@@ -503,7 +503,7 @@ static int hw_base_encode_send_frame(AVC
  
          // Fix timestamps if we hit end-of-stream before the initial decode
          // delay has elapsed.
--        if (ctx->input_order < ctx->decode_delay)
+-        if (ctx->input_order <= ctx->decode_delay)
 +        if (ctx->input_order <= ctx->decode_delay && ctx->pic_end)
              ctx->dts_pts_diff = ctx->pic_end->pts - ctx->first_pts;
      }

@@ -53,7 +53,7 @@ native-depend: native-depend_msg_target
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \
 	do                          \
-	  env $(ENV) WORK_DIR=$(WORK_DIR) $(MAKE) -C ../../$$depend ; \
+	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) -C ../../$$depend ; \
 	done
 	@set -e; \
 	for depend in $(filter-out native/%,$(BUILD_DEPENDS) $(OPTIONAL_DEPENDS) $(DEPENDS)); \

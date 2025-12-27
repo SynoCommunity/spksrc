@@ -3,7 +3,9 @@
 PKG_CONFIG_LIBDIR = $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig
 
 INSTALL_DIR = $(WORK_DIR)/install
+ifeq ($(lastword $(subst -, ,$(WORK_DIR))),native)
 INSTALL_PREFIX = /usr/local
+endif
 
 # Unsetting variables MUST always be first
 # as otherwise it fails silently
