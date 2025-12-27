@@ -1,5 +1,5 @@
 PKG_NAME = nushell
-PKG_VERS = 0.108.0
+PKG_VERS = 0.109.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/nushell/nushell/archive
