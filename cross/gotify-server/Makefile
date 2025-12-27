@@ -1,5 +1,5 @@
 PKG_NAME = gotify-server
-PKG_VERS = 2.1.4
+PKG_VERS = 2.8.0
 PKG_EXT = zip
 PKG_DIST_NAME = gotify-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/gotify/server/releases/download/v$(PKG_VERS)
