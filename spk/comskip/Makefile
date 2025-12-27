@@ -1,6 +1,6 @@
 SPK_NAME = comskip
 SPK_VERS = 0.83
-SPK_REV = 13
+SPK_REV = 14
 SPK_ICON = src/comskip.png
 
 FFMPEG_PACKAGE = ffmpeg7
@@ -16,7 +16,7 @@ STARTABLE = no
 MAINTAINER = SynoCommunity
 DESCRIPTION = Comskip is a free mpeg commercial detector. Read the wiki on how to use and configure it.
 DISPLAY_NAME = Comskip
-CHANGELOG = "1. Update to version 0.83<br/>2. Migrate to using ffmpeg7"
+CHANGELOG = "1. Update to FFMPEG 7.1.3"
 
 HOMEPAGE = https://www.kaashoek.com/comskip/
 LICENSE = LGPL
