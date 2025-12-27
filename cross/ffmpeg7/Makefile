@@ -9,8 +9,8 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
-# requires c11 support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# requires c11 and proper atomic using gcc-4.9+ support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.common.mk
 
@@ -23,13 +23,7 @@ CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-  ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
-    # Workaround for gcc-4.8.3 internal compilier bug in debug mode
-    CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2
-    CONFIGURE_ARGS += --extra-cflags=-O1
-  else
-    CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
-  endif
+  CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
 else
   CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
@@ -216,7 +210,7 @@ DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
 CONFIGURE_ARGS += --enable-thumb
@@ -226,11 +220,6 @@ CONFIGURE_ARGS += --disable-armv6t2
 CONFIGURE_ARGS += --disable-vfp
 ifeq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
-endif
-# ffmpeg-7.1 no longer finds atomics for hi3535
-# and using --extra-libs=-latomic does not work
-ifeq ($(findstring $(ARCH),hi3535),$(ARCH))
-CONFIGURE_ARGS += --disable-pthreads
 endif
 endif
 

@@ -7,8 +7,8 @@ FFMPEG_PACKAGE = ffmpeg7
 DEPENDS = cross/chromaprint
 SPK_DEPENDS = $(FFMPEG_PACKAGE)
 
-# ffmpeg7 requires c11 support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# ffmpeg-7 no longer support 88f6281 (armv5) and ffmpeg-7.1 hi3535 (armv7l)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 STARTABLE = no
 

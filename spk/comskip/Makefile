@@ -5,8 +5,8 @@ SPK_ICON = src/comskip.png
 
 FFMPEG_PACKAGE = ffmpeg7
 
-# ffmpeg7 no longer support armv5
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# ffmpeg-7 no longer support 88f6281 (armv5) and ffmpeg-7.1 hi3535 (armv7l)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/comskip
 SPK_DEPENDS = $(FFMPEG_PACKAGE)
