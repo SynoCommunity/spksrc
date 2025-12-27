@@ -14,7 +14,13 @@ HOMEPAGE = https://github.com/libass/libass
 COMMENT  = libass is a portable subtitle renderer for the ASS/SSA (Advanced Substation Alpha/Substation Alpha) subtitle format.
 LICENSE  = ICS
 
-CONFIGURE_ARGS += -Dfontconfig=enabled
-CONFIGURE_ARGS += -Dlibunibreak=enabled
+GNU_CONFIGURE = 1
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --enable-fontconfig
+CONFIGURE_ARGS += --enable-libunibreak
+ADDITIONAL_CFLAGS = -O
 
-include ../../mk/spksrc.cross-meson.mk
+# While meson is supported it does
+# not allow to build shared library
+
+include ../../mk/spksrc.cross-cc.mk
