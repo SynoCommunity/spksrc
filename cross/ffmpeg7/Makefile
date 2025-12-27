@@ -227,6 +227,11 @@ CONFIGURE_ARGS += --disable-vfp
 ifeq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
+# ffmpeg-7.1 no longer finds atomics for hi3535
+# and using --extra-libs=-latomic does not work
+ifeq ($(findstring $(ARCH),hi3535),$(ARCH))
+CONFIGURE_ARGS += --disable-pthreads
+endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
@@ -239,6 +244,8 @@ ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
+# ffmpeg-7.1 video4linux2 is no longer compatible
+CONFIGURE_ARGS += --disable-indev=v4l2
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
