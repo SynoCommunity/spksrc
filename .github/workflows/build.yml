@@ -411,8 +411,61 @@ jobs:
           echo "=== Largest directories after build ==="
           du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
           echo ""
-          df -h > disk_end.txt
-          du -sh /home/runner/work/* > disk_usage_end.txt 2>/dev/null || true
+          
+          # Create detailed disk usage report
+          {
+            echo "=========================================="
+            echo "WORKSPACE DIRECTORIES"
+            echo "=========================================="
+            du -sh /home/runner/work/* 2>/dev/null || true
+            
+            echo ""
+            echo "=========================================="
+            echo "BUILT PACKAGES (SPK files)"
+            echo "=========================================="
+            if [ -d "/home/runner/work/spksrc/packages" ]; then
+              ls -lh /home/runner/work/spksrc/packages/*.spk 2>/dev/null || echo "No SPK packages found"
+              echo ""
+              echo "Total packages size:"
+              du -sh /home/runner/work/spksrc/packages 2>/dev/null || echo "0"
+            else
+              echo "No packages directory found"
+            fi
+            
+            echo ""
+            echo "=========================================="
+            echo "BUILD DIRECTORIES (with logs)"
+            echo "=========================================="
+            # Find all directories containing build logs and show their sizes
+            if [ -n "${{ needs.prepare.outputs.arch_packages }}" ] || [ -n "${{ needs.prepare.outputs.noarch_packages }}" ]; then
+              for pkg in ${{ needs.prepare.outputs.arch_packages }} ${{ needs.prepare.outputs.noarch_packages }}; do
+                if [ -d "spk/$pkg" ]; then
+                  echo "Package: $pkg"
+                  du -sh "spk/$pkg" 2>/dev/null || true
+                  # Show work directories if they exist
+                  find "spk/$pkg" -maxdepth 2 -type d -name "work-*" -exec du -sh {} \; 2>/dev/null | sed 's/^/  /' || true
+                  echo ""
+                fi
+              done
+            else
+              echo "No package list available - scanning for build directories..."
+              find spk/ -type f -name "*.log" -o -name "work-*" 2>/dev/null | \
+                xargs -I {} dirname {} | sort -u | \
+                while read dir; do
+                  du -sh "$dir" 2>/dev/null || true
+                done
+            fi
+            
+            echo ""
+            echo "=========================================="
+            echo "OVERALL DISK STATUS"
+            echo "=========================================="
+            df -h
+            
+          } > disk_usage_end.txt
+          
+          # Also display to console
+          cat disk_usage_end.txt
           
           # Check if running low on disk space
           DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
