@@ -14,6 +14,6 @@ REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
-DEPENDS  = python/numpy
+DEPENDS  = python/numpy_1.26
 
 include ../../mk/spksrc.python-wheel.mk
