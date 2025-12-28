@@ -294,8 +294,19 @@ jobs:
       # Free up disk space on GitHub runner before build starts
       - name: Free Disk Space (Ubuntu)
         run: |
-          echo "=== Disk space before cleanup ==="
-          df -h
+          # Capture initial disk space before cleanup
+          {
+            echo "=========================================="
+            echo "DISK SPACE BEFORE CLEANUP"
+            echo "=========================================="
+            df -h
+            echo ""
+            echo "=== Largest directories in workspace ==="
+            du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
+          } > disk_usage_start.txt
+          
+          # Also display to console
+          cat disk_usage_start.txt
           
           echo ""
           echo "=== Removing unnecessary packages and files ==="
@@ -328,27 +339,25 @@ jobs:
           sudo apt-get autoremove -y || true
           sudo apt-get clean || true
           
+          # Capture disk space after cleanup
+          {
+            echo ""
+            echo "=========================================="
+            echo "DISK SPACE AFTER CLEANUP"
+            echo "=========================================="
+            df -h
+            echo ""
+            echo "=== Space freed calculation ==="
+            df -h / | tail -1 | awk '{print "Available space: " $4}'
+          } >> disk_usage_start.txt
+          
+          # Display cleanup results to console
           echo ""
           echo "=== Disk space after cleanup ==="
           df -h
-          
-          # Calculate space freed
           echo ""
           echo "=== Space freed calculation ==="
           df -h / | tail -1 | awk '{print "Available space: " $4}'
-
-      # Monitor initial disk space before build starts
-      - name: Initial Disk Space Check
-        id: disk-start
-        run: |
-          echo "=== Disk Space at Start ==="
-          df -h
-          echo ""
-          echo "=== Largest directories in workspace ==="
-          du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
-          echo ""
-          df -h > disk_start.txt
-          du -sh /home/runner/work/* > disk_usage_start.txt 2>/dev/null || true
 
       - name: Cache toolchains
         uses: actions/cache@v5
@@ -421,29 +430,33 @@ jobs:
             
             echo ""
             echo "=========================================="
-            echo "BUILT PACKAGES (SPK files)"
+            echo "BUILD PACKAGES (with logs)"
             echo "=========================================="
-            if [ -d "/home/runner/work/spksrc/packages" ]; then
-              ls -lh /home/runner/work/spksrc/packages/*.spk 2>/dev/null || echo "No SPK packages found"
-              echo ""
-              echo "Total packages size:"
-              du -sh /home/runner/work/spksrc/packages 2>/dev/null || echo "0"
-            else
-              echo "No packages directory found"
-            fi
-            
-            echo ""
-            echo "=========================================="
-            echo "BUILD DIRECTORIES (with logs)"
-            echo "=========================================="
-            # Find all directories containing build logs and show their sizes
             if [ -n "${{ needs.prepare.outputs.arch_packages }}" ] || [ -n "${{ needs.prepare.outputs.noarch_packages }}" ]; then
               for pkg in ${{ needs.prepare.outputs.arch_packages }} ${{ needs.prepare.outputs.noarch_packages }}; do
                 if [ -d "spk/$pkg" ]; then
                   echo "Package: $pkg"
+                  
+                  # Show total package directory size
                   du -sh "spk/$pkg" 2>/dev/null || true
+                  
                   # Show work directories if they exist
-                  find "spk/$pkg" -maxdepth 2 -type d -name "work-*" -exec du -sh {} \; 2>/dev/null | sed 's/^/  /' || true
+                  work_dirs=$(find "spk/$pkg" -maxdepth 2 -type d -name "work-*" 2>/dev/null)
+                  if [ -n "$work_dirs" ]; then
+                    echo "$work_dirs" | while read work_dir; do
+                      du -sh "$work_dir" 2>/dev/null | sed 's/^/  /' || true
+                    done
+                  else
+                    echo "  n/a	spk/$pkg/work-${{ matrix.arch }}"
+                  fi
+                  
+                  # Show SPK file size if it exists
+                  if ls packages/${pkg}*.spk 2>/dev/null; then
+                    ls -lh packages/${pkg}*.spk 2>/dev/null | awk '{print "  " $5 "\tpackages/" $9}' || echo "  n/a	packages/${pkg}*.spk"
+                  else
+                    echo "  n/a	packages/${pkg}*.spk"
+                  fi
+                  
                   echo ""
                 fi
               done
@@ -557,8 +570,6 @@ jobs:
         with:
           name: Diagnostics-${{ matrix.arch }}
           path: |
-            disk_start.txt
-            disk_end.txt
             disk_usage_start.txt
             disk_usage_end.txt
             docker_logs.txt
