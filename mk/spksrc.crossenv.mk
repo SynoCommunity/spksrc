@@ -31,8 +31,10 @@ PYTHON_NATIVE               = $(PYTHON_NATIVE_PATH)/python3
 PYTHON_LIB_NATIVE           = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell uname -m)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_LIB_CROSS            = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell expr "$(TC_TARGET)" : '\([^-]*\)' )-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 
-# wheel crossenv definitions
-CROSSENV_CONFIG_PATH = $(realpath $(PYTHON_PACKAGE_DIR)/crossenv)
+# wheel crossenv definitions: 
+#   Use PYTHON_PACKAGE_DIR from spksrc.python.mk
+#   OR if empty then we are building spk/python3*
+CROSSENV_CONFIG_PATH = $(realpath $(or $(PYTHON_PACKAGE_DIR),$(WORK_DIR)/..)/crossenv)
 CROSSENV_CONFIG_DEFAULT = $(CROSSENV_CONFIG_PATH)/requirements-default.txt
 CROSSENV_PATH = $(abspath $(WORK_DIR)/crossenv-$(CROSSENV_WHEEL)/)
 
