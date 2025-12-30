@@ -1,5 +1,5 @@
 PKG_NAME = automake
-PKG_VERS = 1.16.5
+PKG_VERS = 1.18.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/automake/
