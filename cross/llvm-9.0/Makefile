@@ -71,13 +71,6 @@ CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 # enabled and still inherit from LLVM classes
 CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON
 
-# Requires native/llvm-9.0
-BUILD_DEPENDS = native/llvm-9.0
-CMAKE_ARGS += -DLLVM_TOOLS_BINARY_DIR=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin)
-CMAKE_ARGS += -DLLVM_CONFIG=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/llvm-config)
-CMAKE_ARGS += -DLLVM_TABLEGEN=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/llvm-tblgen)
-CMAKE_ARGS += -DCLANG_TABLEGEN=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/clang-tblgen)
-
 include ../../mk/spksrc.common.mk
 
 #
