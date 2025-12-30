@@ -1,5 +1,5 @@
 PKG_NAME = llvm
-PKG_VERS = 16.0.6
+PKG_VERS = 21.1.8
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-project-$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)
@@ -9,11 +9,9 @@ HOMEPAGE = https://llvm.org/
 COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies
 LICENSE = Apache v2.0 with LLVM Exceptions
 
-REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) comcerto2k
 REQUIRED_MIN_SRM = 1.3
-
-CMAKE_USE_NINJA = 1
 
 POST_INSTALL_TARGET = llvm_post_install
 
