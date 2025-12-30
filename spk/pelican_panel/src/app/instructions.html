@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelican Panel - Instructions d'installation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #e4e4e7;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #4ade80;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #a1a1aa;
+            font-size: 1rem;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .info-box p {
+            color: #93c5fd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .warning-box {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .warning-box h3 {
+            color: #fbbf24;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .steps-list {
+            list-style: none;
+        }
+
+        .steps-list li {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #e4e4e7;
+            font-size: 0.95rem;
+        }
+
+        .steps-list li .step-name {
+            min-width: 100px;
+            font-weight: 500;
+        }
+
+        .steps-list li .step-action {
+            color: #a1a1aa;
+        }
+
+        .steps-list li .arrow {
+            color: #4ade80;
+            margin: 0 10px;
+        }
+
+        .admin-box {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .admin-box h3 {
+            color: #4ade80;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-box p {
+            color: #bbf7d0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        .continue-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .continue-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .continue-button:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #71717a;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Installation presque terminee !</h1>
+            <p>Les parametres techniques sont deja configures</p>
+        </div>
+
+        <div class="info-box">
+            <p>
+                Vous allez etre redirige vers l'assistant d'installation de Pelican Panel.
+                Les parametres de base de donnees, cache, file d'attente et session sont
+                <strong>deja configures</strong> pour fonctionner avec votre NAS Synology.
+            </p>
+        </div>
+
+        <div class="warning-box">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                Ne modifiez pas ces etapes
+            </h3>
+            <ul class="steps-list">
+                <li>
+                    <span class="step-name">Database</span>
+                    <span class="arrow">→</span>
+                    <span class="step-action">Cliquez sur "Next"</span>
+                </li>
+                <li>
+                    <span class="step-name">Cache</span>
+                    <span class="arrow">→</span>
+                    <span class="step-action">Cliquez sur "Next"</span>
+                </li>
+                <li>
+                    <span class="step-name">Queue</span>
+                    <span class="arrow">→</span>
+                    <span class="step-action">Cliquez sur "Next"</span>
+                </li>
+                <li>
+                    <span class="step-name">Session</span>
+                    <span class="arrow">→</span>
+                    <span class="step-action">Cliquez sur "Finish"</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="admin-box">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Creez votre compte administrateur
+            </h3>
+            <p>
+                A la premiere etape <strong>"Environment"</strong>, remplissez vos informations :
+                email, nom d'utilisateur et mot de passe. Ce sera votre compte administrateur.
+            </p>
+        </div>
+
+        <div class="button-container">
+            <a href="/installer" class="continue-button" id="continueBtn">
+                Continuer vers l'installation
+            </a>
+        </div>
+
+        <div class="footer">
+            Pelican Panel pour Synology NAS
+        </div>
+    </div>
+
+    <script>
+        // Redirect to installer on internal port
+        document.getElementById('continueBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Redirect to the panel internal port /installer
+            var host = window.location.hostname;
+            var internalPort = '{{INTERNAL_PORT}}';
+            window.location.href = 'http://' + host + ':' + internalPort + '/installer';
+        });
+    </script>
+</body>
+</html>
