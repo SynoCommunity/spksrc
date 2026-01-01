@@ -19,6 +19,7 @@ VIDEODRIVER = on
 
 SPK_COMMANDS  = bin/clinfo
 SPK_COMMANDS += bin/vainfo
+SPK_COMMANDS += bin/vulkaninfo
 SPK_COMMANDS += bin/lsgpu
 
 DEPENDS  = cross/libva cross/libva-utils
