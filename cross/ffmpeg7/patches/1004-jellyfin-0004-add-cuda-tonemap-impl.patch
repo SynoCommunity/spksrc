@@ -2,7 +2,7 @@ Index: FFmpeg/configure
 ===================================================================
 --- configure
 +++ configure
-@@ -3291,6 +3291,8 @@ scale_cuda_filter_deps="ffnvcodec"
+@@ -3312,6 +3312,8 @@ scale_cuda_filter_deps="ffnvcodec"
  scale_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  thumbnail_cuda_filter_deps="ffnvcodec"
  thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -11,25 +11,31 @@ Index: FFmpeg/configure
  transpose_npp_filter_deps="ffnvcodec libnpp"
  overlay_cuda_filter_deps="ffnvcodec"
  overlay_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
-@@ -4082,7 +4084,7 @@ enable doc
- enable faan faandct faanidct
- enable large_tests
- enable optimizations
--enable ptx_compression
-+disable ptx_compression
- enable runtime_cpudetect
- enable safe_bitstream_reader
- enable static
-@@ -4630,7 +4632,7 @@ if enabled cuda_nvcc; then
+@@ -4690,8 +4692,10 @@ if enabled cuda_nvcc; then
+     nvcc_default="nvcc"
      nvccflags_default="-gencode arch=compute_30,code=sm_30 -O2"
  else
++    # clang-20 emits ptx60 instruction 'brx.idx' even for ptx32 target (llvm/llvm-project@ccc3127)
++    # default to ptx60/sm_30 to follow the changes made in clang-16+ (llvm/llvm-project@d677505)
      nvcc_default="clang"
 -    nvccflags_default="--cuda-gpu-arch=sm_30 -O2"
-+    nvccflags_default="--cuda-gpu-arch=sm_30 -O2 -ffast-math"
++    nvccflags_default="--cuda-feature=+ptx60 --cuda-gpu-arch=sm_30 -O2 -ffast-math"
      NVCC_C=""
  fi
  
-@@ -6711,7 +6713,7 @@ fi
+@@ -4701,6 +4705,11 @@ if enabled cuda_nvcc; then
+     if $nvcc $nvccflags_default 2>&1 | grep -qi unsupported; then
+         nvccflags_default="-gencode arch=compute_60,code=sm_60 -O2"
+     fi
++else
++    # '--cuda-feature=+ptx*' option is not available before clang-15
++    if $nvcc $nvccflags_default 2>&1 | grep -qi unsupported; then
++        nvccflags_default="--cuda-gpu-arch=sm_30 -O2 -ffast-math"
++    fi
+ fi
+ 
+ set_default arch cc cxx doxygen pkg_config ranlib strip sysinclude \
+@@ -6753,7 +6762,7 @@ fi
  if enabled cuda_nvcc; then
      nvccflags="$nvccflags -ptx"
  else
@@ -54,12 +60,12 @@ Index: FFmpeg/libavfilter/Makefile
 ===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -522,6 +522,8 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
+@@ -524,6 +524,8 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
  OBJS-$(CONFIG_TMIDEQUALIZER_FILTER)          += vf_tmidequalizer.o
  OBJS-$(CONFIG_TMIX_FILTER)                   += vf_mix.o framesync.o
  OBJS-$(CONFIG_TONEMAP_FILTER)                += vf_tonemap.o
 +OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.ptx.o \
-+                                                cuda/host_util.o
++                                                cuda/host_util.o cuda/load_helper.o
  OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o opencl.o \
                                                  opencl/tonemap.o opencl/colorspace_common.o
  OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
@@ -67,7 +73,7 @@ Index: FFmpeg/libavfilter/allfilters.c
 ===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -493,6 +493,7 @@ extern const AVFilter ff_vf_tmedian;
+@@ -494,6 +494,7 @@ extern const AVFilter ff_vf_tmedian;
  extern const AVFilter ff_vf_tmidequalizer;
  extern const AVFilter ff_vf_tmix;
  extern const AVFilter ff_vf_tonemap;
@@ -98,29 +104,34 @@ Index: FFmpeg/libavfilter/colorspace.c
  void ff_matrix_mul_3x3(double dst[3][3],
                 const double src1[3][3], const double src2[3][3])
  {
-@@ -191,3 +203,154 @@ void ff_update_hdr_metadata(AVFrame *in,
+@@ -191,3 +203,159 @@ void ff_update_hdr_metadata(AVFrame *in,
              metadata->max_luminance = av_d2q(peak * REFERENCE_WHITE, 10000);
      }
  }
 +
-+double ff_determine_dovi_signal_peak(const AVDOVIMetadata *data)
++double ff_determine_dovi_signal_peak(const AVDOVIMetadata *data, int l0_only)
 +{
 +    float peak;
 +    const AVDOVIColorMetadata *color;
++    const AVDOVIDmData *ext;
 +
 +    // Fallback to the peak of 10000 if SMPTE ST.2084
 +    if (!data)
 +        return 100.0f;
 +
 +    color = av_dovi_get_color(data);
++    // L0 max
 +    peak = color->source_max_pq / 4095.0f;
++    // L1 max
++    if (!l0_only && (ext = av_dovi_find_level(data, 1)))
++        peak = ext->l1.max_pq / 4095.0f;
 +    if (!peak)
 +        return peak;
 +
 +    peak = powf(peak, 1.0f / ST2084_M2);
-+    peak = fmaxf(peak - ST2084_C1, 0.0f) / (ST2084_C2 - ST2084_C3 * peak);
++    peak = FFMAX(peak - ST2084_C1, 0.0f) / FFMAX((ST2084_C2 - ST2084_C3 * peak), FLOAT_EPS);
 +    peak = powf(peak, 1.0f / ST2084_M1);
-+    peak *= 100.0f;
++    peak *= (ST2084_MAX_LUMINANCE / REFERENCE_WHITE);
 +
 +    return peak;
 +}
@@ -241,12 +252,12 @@ Index: FFmpeg/libavfilter/colorspace.c
 +
 +// linearizer for HLG/ARIB-B67
 +float eotf_arib_b67(float x) {
-+    return ootf_1_2(inverse_oetf_arib_b67(x)) * 5.0f;
++    return ootf_1_2(inverse_oetf_arib_b67(x)) * (12.0f / REFERENCE_WHITE_HLG);
 +}
 +
 +// delinearizer for HLG/ARIB-B67
 +float inverse_eotf_arib_b67(float x) {
-+    return oetf_arib_b67(inverse_ootf_1_2(x / 5.0f));
++    return oetf_arib_b67(inverse_ootf_1_2(x / (12.0f / REFERENCE_WHITE_HLG)));
 +}
 +
 +// delinearizer for BT709, BT2020-10
@@ -257,7 +268,7 @@ Index: FFmpeg/libavfilter/colorspace.h
 ===================================================================
 --- libavfilter/colorspace.h
 +++ libavfilter/colorspace.h
-@@ -23,10 +23,42 @@
+@@ -23,10 +23,67 @@
  #include "libavutil/csp.h"
  #include "libavutil/frame.h"
  #include "libavutil/pixfmt.h"
@@ -265,6 +276,7 @@ Index: FFmpeg/libavfilter/colorspace.h
  
  #define REFERENCE_WHITE 100.0f
 +#define REFERENCE_WHITE_ALT 203.0f
++#define REFERENCE_WHITE_HLG 3.17955f
 +#define ST2084_MAX_LUMINANCE 10000.0f
 +#define ST2084_M1 0.1593017578125f
 +#define ST2084_M2 78.84375f
@@ -275,6 +287,30 @@ Index: FFmpeg/libavfilter/colorspace.h
 +#define ARIB_B67_B 0.28466892f
 +#define ARIB_B67_C 0.55991073f
 +#define FLOAT_EPS 1e-6f
++
++/*
++ * Pre-calculated constants used for YCbCr narrow to full range scaling
++ * The base formula is the quantization formula derived from BT.2100 Table 9:
++ * Where Y' = Round [(219 * E′ + 16) * 2^(n−8)],
++ * Cb',Cr' = Round [(224 * E′ + 128) * 2^(n−8)]
++ * where E' is the signal value in [0,1] range and n is the bit depth. Round is rounding towards 0.
++ * For inputs, the inverse is used where we are solving for E' for a given Y'Cb'Cr' normalized by GPU
++ * in [0,1] range. The GPU will interpret color as a 16bit int value, and solving for E' becomes:
++ * E' = (Y' - 2^(n-4)) / (219 * 2^(n-8))
++ * E' = (Cb'Cr' - 2^(n-1)) / (7 * 2^(n-3))
++ * Y' and Cb'Cr' is in the range of [0, 2^n - 1] in original formula, we need to scale the value normalized to [0,1]:
++ * C = Y'Cb'Cr' * (2^n - 1)
++ * Which means the input scale = (2^n - 1) / (219 * 2^(n-8)) and input offset = 2^(n-4)) / (219 * 2^(n-8)) for Y' and
++ * 2^(n-1)) / (7 * 2^(n-3)) for Cb'Cr'
++ */
++#define INPUT_Y_SCALE(n)  ((double)((1 << (n)) - 1) / (219 * (1 << ((n) - 8))))
++#define INPUT_UV_SCALE(n) ((double)((1 << (n)) - 1) / (224 * (1 << ((n) - 8))))
++
++/*
++ * GPU will interpret 10bit and 12bit color as 16bit int
++ * but that will introduce a slight (2^(16-n))/2^16 quantization offset which we want to compensate for
++*/
++#define QUANTIZATION_OFFSET(n) ((double)(1 << (16 - (n))) / ((1 << 16) - 1))
 +
 +// Parsed metadata from the Dolby Vision RPU
 +struct DoviMetadata {
@@ -300,11 +336,11 @@ Index: FFmpeg/libavfilter/colorspace.h
  void ff_matrix_mul_3x3(double dst[3][3],
                 const double src1[3][3], const double src2[3][3]);
  void ff_matrix_mul_3x3_vec(double dst[3], const double vec[3], const double mat[3][3]);
-@@ -38,4 +70,19 @@ void ff_fill_rgb2yuv_table(const AVLumaC
+@@ -38,4 +95,19 @@ void ff_fill_rgb2yuv_table(const AVLumaC
  double ff_determine_signal_peak(AVFrame *in);
  void ff_update_hdr_metadata(AVFrame *in, double peak);
  
-+double ff_determine_dovi_signal_peak(const AVDOVIMetadata *data);
++double ff_determine_dovi_signal_peak(const AVDOVIMetadata *data, int l0_only);
 +void ff_map_dovi_metadata(struct DoviMetadata *out, const AVDOVIMetadata *data);
 +
 +float eotf_st2084_common(float x);
@@ -324,7 +360,7 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 ===================================================================
 --- /dev/null
 +++ libavfilter/cuda/colorspace_common.h
-@@ -0,0 +1,330 @@
+@@ -0,0 +1,341 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -349,6 +385,9 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +#include "util.h"
 +#include "libavutil/pixfmt.h"
 +
++#define REFERENCE_WHITE_ALT 203.0f
++#define REFERENCE_WHITE_HLG 3.17955f
++
 +#define ST2084_MAX_LUMINANCE 10000.0f
 +
 +#define ST2084_M1 0.1593017578125f
@@ -363,7 +402,6 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +
 +#define FLOAT_EPS 1e-6f
 +
-+extern __constant__ const float ref_white;
 +extern __constant__ const float3 luma_dst;
 +extern __constant__ const float3 ycc2rgb_offset;
 +extern __constant__ const enum AVColorTransferCharacteristic trc_src, trc_dst;
@@ -373,8 +411,13 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +extern __constant__ const float rgb2rgb_matrix[9];
 +extern __constant__ const float lms2rgb_matrix[9];
 +extern __constant__ const float yuv_matrix[9], rgb_matrix[9];
-+extern __constant__ const float pq_max_lum_div_ref_white;
-+extern __constant__ const float ref_white_div_pq_max_lum;
++extern __constant__ const float input_quantization_offset;
++extern __constant__ const float output_quantization_offset;
++extern __constant__ const float input_y_scale;
++extern __constant__ const float input_uv_scale;
++extern __constant__ const float output_quantization_factor;
++extern __constant__ const float output_quantization_scale;
++
 +
 +static __inline__ __device__ float get_luma_dst(float3 c, const float3& luma_dst) {
 +    return luma_dst.x * c.x + luma_dst.y * c.y + luma_dst.z * c.z;
@@ -416,7 +459,7 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +}
 +
 +static __inline__ __device__ float eotf_st2084(float x) {
-+    return eotf_st2084_common(x) * pq_max_lum_div_ref_white;
++    return eotf_st2084_common(x) * ST2084_MAX_LUMINANCE / REFERENCE_WHITE_ALT;
 +}
 +
 +// delinearizer for PQ/ST2084
@@ -437,7 +480,7 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +}
 +
 +static __inline__ __device__ float inverse_eotf_st2084(float x) {
-+    x *= ref_white_div_pq_max_lum;
++    x *= REFERENCE_WHITE_ALT / ST2084_MAX_LUMINANCE;
 +    return inverse_eotf_st2084_common(x);
 +}
 +
@@ -465,12 +508,12 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +
 +// linearizer for HLG/ARIB-B67
 +static __inline__ __device__ float eotf_arib_b67(float x) {
-+    return ootf_1_2(inverse_oetf_arib_b67(x)) * 5.0f;
++    return ootf_1_2(inverse_oetf_arib_b67(x)) * (12.0f / REFERENCE_WHITE_ALT);
 +}
 +
 +// delinearizer for HLG/ARIB-B67
 +static __inline__ __device__ float inverse_eotf_arib_b67(float x) {
-+    return oetf_arib_b67(inverse_ootf_1_2(x / 5.0f));
++    return oetf_arib_b67(inverse_ootf_1_2(x / (12.0f / REFERENCE_WHITE_ALT)));
 +}
 +
 +// delinearizer for BT709, BT2020-10
@@ -497,16 +540,21 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +}
 +
 +static __inline__ __device__ float3 yuv2rgb(float y, float u, float v) {
-+    if (range_src == AVCOL_RANGE_JPEG) {
-+        u -= 0.5f; v -= 0.5f;
++    y += y > 0.0f ? input_quantization_offset : 0.0f;
++    u += u > 0.0f ? input_quantization_offset : 0.0f;
++    v += v > 0.0f ? input_quantization_offset : 0.0f;
++    if (range_src == AVCOL_RANGE_MPEG) {
++        y = input_y_scale * y - 0.07305936073f;
++        u = input_uv_scale * u - 0.5714285714f;
++        v = input_uv_scale * v - 0.5714285714f;
 +    } else {
-+        y = (y * 255.0f -  16.0f) / 219.0f;
-+        u = (u * 255.0f - 128.0f) / 224.0f;
-+        v = (v * 255.0f - 128.0f) / 224.0f;
++        u -= 0.5f;
++        v -= 0.5f;
 +    }
 +    float r = y * rgb_matrix[0] + u * rgb_matrix[1] + v * rgb_matrix[2];
 +    float g = y * rgb_matrix[3] + u * rgb_matrix[4] + v * rgb_matrix[5];
 +    float b = y * rgb_matrix[6] + u * rgb_matrix[7] + v * rgb_matrix[8];
++
 +    return make_float3(r, g, b);
 +}
 +
@@ -521,20 +569,26 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +    float y = r*yuv_matrix[0] + g*yuv_matrix[1] + b*yuv_matrix[2];
 +    float u = r*yuv_matrix[3] + g*yuv_matrix[4] + b*yuv_matrix[5];
 +    float v = r*yuv_matrix[6] + g*yuv_matrix[7] + b*yuv_matrix[8];
-+    if (range_dst == AVCOL_RANGE_JPEG) {
-+        u += 0.5f; v += 0.5f;
++    if (range_dst == AVCOL_RANGE_MPEG) {
++        y = floorf(((219.0f * y + 16.0f) * output_quantization_factor) + 0.5f) / output_quantization_scale;
++        u = floorf(((224.0f * u + 128.0f) * output_quantization_factor) + 0.5f) / output_quantization_scale;
++        v = floorf(((224.0f * v + 128.0f) * output_quantization_factor) + 0.5f) / output_quantization_scale;
 +    } else {
-+        y = (219.0f * y + 16.0f) / 255.0f;
-+        u = (224.0f * u + 128.0f) / 255.0f;
-+        v = (224.0f * v + 128.0f) / 255.0f;
++        u += 0.5f;
++        v += 0.5f;
 +    }
++    y -= y > 0.0f ? output_quantization_offset : 0.0f;
++    u -= u > 0.0f ? output_quantization_offset : 0.0f;
++    v -= v > 0.0f ? output_quantization_offset : 0.0f;
 +    return make_float3(y, u, v);
 +}
 +
 +static __inline__ __device__ float rgb2y(float r, float g, float b) {
 +    float y = r*yuv_matrix[0] + g*yuv_matrix[1] + b*yuv_matrix[2];
-+    if (range_dst != AVCOL_RANGE_JPEG)
-+        y = (219.0f * y + 16.0f) / 255.0f;
++    if (range_dst == AVCOL_RANGE_MPEG) {
++        y = floorf(((219.0f * y + 16.0f) * output_quantization_factor) + 0.5f) / output_quantization_scale;
++    }
++    y -= y > 0.0f ? output_quantization_offset : 0.0f;
 +    return y;
 +}
 +
@@ -581,13 +635,6 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +    rr = inverse_eotf_st2084_common(rr);
 +    gg = inverse_eotf_st2084_common(gg);
 +    bb = inverse_eotf_st2084_common(bb);
-+    return rgb2lrgb(make_float3(rr, gg, bb));
-+}
-+
-+static __inline__ __device__ float3 lms2rgb_fast(float r, float g, float b) {
-+    float rr = r * lms2rgb_matrix[0] + g * lms2rgb_matrix[1] + b * lms2rgb_matrix[2];
-+    float gg = r * lms2rgb_matrix[3] + g * lms2rgb_matrix[4] + b * lms2rgb_matrix[5];
-+    float bb = r * lms2rgb_matrix[6] + g * lms2rgb_matrix[7] + b * lms2rgb_matrix[8];
 +    return rgb2lrgb(make_float3(rr, gg, bb));
 +}
 +
@@ -772,6 +819,96 @@ Index: FFmpeg/libavfilter/cuda/host_util.h
 +                       FFCUDAFrame *dst, const AVFrame *src, const AVPixFmtDescriptor *src_desc);
 +
 +#endif /* AVFILTER_CUDA_HOST_UTIL_H */
+Index: FFmpeg/libavfilter/cuda/load_helper.c
+===================================================================
+--- libavfilter/cuda/load_helper.c
++++ libavfilter/cuda/load_helper.c
+@@ -32,11 +32,9 @@
+ 
+ #define CHECK_CU(x) FF_CUDA_CHECK_DL(avctx, cu, x)
+ 
+-int ff_cuda_load_module(void *avctx, AVCUDADeviceContext *hwctx, CUmodule *cu_module,
+-                        const unsigned char *data, const unsigned int length)
++static int decompress_cuda_ptx(void *avctx, uint8_t **data_out, uint64_t *length_out,
++                               const unsigned char *data, const unsigned int length)
+ {
+-    CudaFunctions *cu = hwctx->internal->cuda_dl;
+-
+ #if CONFIG_PTX_COMPRESSION
+     z_stream stream = { 0 };
+     uint8_t *buf, *tmp;
+@@ -88,10 +86,51 @@ int ff_cuda_load_module(void *avctx, AVC
+ 
+     inflateEnd(&stream);
+ 
+-    ret = CHECK_CU(cu->cuModuleLoadData(cu_module, buf));
+-    av_free(buf);
+-    return ret;
++    *data_out   = buf;
++    *length_out = stream.total_out;
+ #else
+-    return CHECK_CU(cu->cuModuleLoadData(cu_module, data));
++    *data_out   = NULL;
++    *length_out = 0;
+ #endif
++    return 0;
++}
++
++int ff_cuda_load_module(void *avctx, AVCUDADeviceContext *hwctx, CUmodule *cu_module,
++                        const unsigned char *data, const unsigned int length)
++{
++    CudaFunctions *cu = hwctx->internal->cuda_dl;
++    uint8_t *data_out = NULL;
++    uint64_t length_out = 0;
++    int ret;
++
++    if ((ret = decompress_cuda_ptx(avctx, &data_out, &length_out, data, length)) < 0)
++        goto exit;
++
++    ret = CHECK_CU(cu->cuModuleLoadData(cu_module, (data_out ? data_out : data)));
++exit:
++    if (data_out)
++        av_free(data_out);
++    return ret;
++}
++
++int ff_cuda_link_add_data(void *avctx, AVCUDADeviceContext *hwctx,
++                          CUlinkState state, const char* name,
++                          const unsigned char *data, const unsigned int length)
++{
++    CudaFunctions *cu = hwctx->internal->cuda_dl;
++    uint8_t *data_out = NULL;
++    uint64_t length_out = 0;
++    int ret;
++
++    if ((ret = decompress_cuda_ptx(avctx, &data_out, &length_out, data, length)) < 0)
++        goto exit;
++
++    ret = CHECK_CU(cu->cuLinkAddData(state, CU_JIT_INPUT_PTX,
++                                     (void *)(data_out ? data_out : data),
++                                     (size_t)(data_out ? length_out : length),
++                                     name, 0, NULL, NULL));
++exit:
++    if (data_out)
++        av_free(data_out);
++    return ret;
+ }
+Index: FFmpeg/libavfilter/cuda/load_helper.h
+===================================================================
+--- libavfilter/cuda/load_helper.h
++++ libavfilter/cuda/load_helper.h
+@@ -25,4 +25,11 @@
+ int ff_cuda_load_module(void *avctx, AVCUDADeviceContext *hwctx, CUmodule *cu_module,
+                         const unsigned char *data, const unsigned int length);
+ 
++/**
++ * Adds a PTX data to a pending linker invocation and applies any decompression, if necessary.
++ */
++int ff_cuda_link_add_data(void *avctx, AVCUDADeviceContext *hwctx,
++                          CUlinkState state, const char* name,
++                          const unsigned char *data, const unsigned int length);
++
+ #endif /* AVFILTER_CUDA_LOAD_HELPER_H */
 Index: FFmpeg/libavfilter/cuda/pixfmt.h
 ===================================================================
 --- /dev/null
@@ -1044,7 +1181,7 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 ===================================================================
 --- /dev/null
 +++ libavfilter/cuda/tonemap.cu
-@@ -0,0 +1,579 @@
+@@ -0,0 +1,661 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -1077,8 +1214,11 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +
 +#define clamp(a, b, c) min(max((a), (b)), (c))
 +#define mix(x, y, a) ((x) + ((y) - (x)) * (a))
++#define select(a, b, c) ((c) ? (b) : (a))
 +#define dot3(a, b) ((a).z * (b).z + ((a).y * (b).y + (a).x * (b).x))
 +#define dot4(a, b) ((a).w * (b).w + ((a).z * (b).z + ((a).y * (b).y + (a).x * (b).x)))
++
++#define LUT_SIZE 65
 +
 +static __inline__ __device__
 +float3 clamp3(const float3 a, const float min_val, const float max_val) {
@@ -1154,7 +1294,7 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    float s_pq = s * scale;
 +    float max_lum = inverse_eotf_st2084(dst_peak) * scale;
 +
-+    float ks = 1.5f * max_lum - 0.5f;
++    float ks = (1.0f + tone_param) * max_lum - tone_param;
 +    float tb = (s_pq - ks) / (1.0f - ks);
 +    float tb2 = tb * tb;
 +    float tb3 = tb2 * tb;
@@ -1168,7 +1308,8 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +
 +static __inline__ __device__
 +float bt2390(float s, float peak, float dst_peak) {
-+    float s_pq = inverse_eotf_st2084(s);
++    float s_clipped = min(s, peak);
++    float s_pq = inverse_eotf_st2084(s_clipped);
 +    return eotf_st2084(bt2390_common(s_pq, peak, dst_peak));
 +}
 +
@@ -1208,11 +1349,9 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +}
 +
 +static __inline__ __device__
-+float3 map_one_pixel_rgb_mode_max(float3 rgb, const FFCUDAFrame& src, const FFCUDAFrame& dst) {
++float3 map_one_pixel_rgb_mode_max(float3 rgb, float peak, float dst_peak) {
 +    float sig = max(max(rgb.x, max(rgb.y, rgb.z)), FLOAT_EPS);
 +    float sig_old = sig;
-+    float peak = src.peak;
-+    float dst_peak = 1.0f;
 +
 +    // Desaturate the color using a coefficient dependent on the signal level
 +    if (desat_param > 0.0f) {
@@ -1230,14 +1369,12 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +}
 +
 +static __inline__ __device__
-+float3 map_one_pixel_rgb_mode_rgb(float3 rgb, const FFCUDAFrame& src, const FFCUDAFrame& dst) {
++float3 map_one_pixel_rgb_mode_rgb(float3 rgb, float peak, float dst_peak) {
 +    float3 sig;
 +    sig.x = max(rgb.x, FLOAT_EPS);
 +    sig.y = max(rgb.y, FLOAT_EPS);
 +    sig.z = max(rgb.z, FLOAT_EPS);
 +    float3 sig_old = sig;
-+    float peak = src.peak;
-+    float dst_peak = 1.0f;
 +
 +    // Desaturate the color using a coefficient dependent on the signal level
 +    if (desat_param > 0.0f) {
@@ -1260,12 +1397,10 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +}
 +
 +static __inline__ __device__
-+float3 map_one_pixel_rgb_mode_lum(float3 rgb, const FFCUDAFrame& src, const FFCUDAFrame& dst) {
++float3 map_one_pixel_rgb_mode_lum(float3 rgb, float peak, float dst_peak) {
 +    float sig = max((rgb.x * 0.2627f + rgb.y * 0.678f + rgb.z * 0.0593f), FLOAT_EPS);
-+    float peak = src.peak;
 +    sig = min(sig, peak);
 +    float sig_old = sig;
-+    float dst_peak = 1.0f;
 +
 +    // Desaturate the color using a coefficient dependent on the signal level
 +    if (desat_param > 0.0f) {
@@ -1281,10 +1416,11 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +}
 +
 +static __inline__ __device__
-+float3 map_one_pixel_itp_mode(float3 rgb, const FFCUDAFrame& src, const FFCUDAFrame& dst) {
-+    float3 ictcp = lrgb2ictcp(rgb.x, rgb.y, rgb.z);
-+    float peak = src.peak;
-+    float dst_peak = 1.0f;
++float3 map_one_pixel_itp_mode(float3 rgb, float peak, float dst_peak) {
++    float r = mix(rgb.x, min(rgb.x, peak), tonemap_func == TONEMAP_BT2390);
++    float g = mix(rgb.y, min(rgb.y, peak), tonemap_func == TONEMAP_BT2390);
++    float b = mix(rgb.z, min(rgb.z, peak), tonemap_func == TONEMAP_BT2390);
++    float3 ictcp = lrgb2ictcp(r, g, b);
 +    ictcp.x = max(ictcp.x, FLOAT_EPS);
 +    float i_o = ictcp.x;
 +
@@ -1304,17 +1440,25 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    return ictcp2lrgb(ictcp.x, ictcp.y, ictcp.z);
 +}
 +
++// Map from source space YUV to source space RGB
++static __inline__ __device__
++float3 map_to_src_space_from_yuv(float3 yuv) {
++    float3 c = yuv2lrgb(yuv);
++    return c;
++}
++
++static __inline__ __device__
++float3 map_to_src_space_from_yuv_dovi(float3 yuv) {
++    float3 c = ycc2rgb(yuv.x, yuv.y, yuv.z);
++    c = lms2rgb(c.x, c.y, c.z);
++    return c;
++}
++
 +// Map from source space YUV to destination space RGB
 +static __inline__ __device__
 +float3 map_to_dst_space_from_yuv(float3 yuv) {
 +    float3 c = yuv2lrgb(yuv);
 +    return lrgb2lrgb(c);
-+}
-+
-+static __inline__ __device__
-+float3 map_to_src_space_from_yuv(float3 yuv) {
-+    float3 c = yuv2lrgb(yuv);
-+    return c;
 +}
 +
 +static __inline__ __device__
@@ -1326,34 +1470,12 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +}
 +
 +static __inline__ __device__
-+float3 map_to_dst_space_from_yuv_dovi_fast(float3 yuv) {
-+    float3 c = ycc2rgb(yuv.x, yuv.y, yuv.z);
-+    c = lms2rgb_fast(c.x, c.y, c.z);
-+    c = lrgb2lrgb(c);
-+    return c;
-+}
-+
-+static __inline__ __device__
-+float3 map_to_src_space_from_yuv_dovi(float3 yuv) {
-+    float3 c = ycc2rgb(yuv.x, yuv.y, yuv.z);
-+    c = lms2rgb(c.x, c.y, c.z);
-+    return c;
-+}
-+
-+static __inline__ __device__
-+float3 map_to_src_space_from_yuv_dovi_fast(float3 yuv) {
-+    float3 c = ycc2rgb(yuv.x, yuv.y, yuv.z);
-+    c = lms2rgb_fast(c.x, c.y, c.z);
-+    return c;
-+}
-+
-+static __inline__ __device__
 +float reshape_poly(float s, float4 coeffs) {
 +    return (coeffs.z * s + coeffs.y) * s + coeffs.x;
 +}
 +
 +static __inline__ __device__
-+float reshape_mmr(float3 sig, float4 coeffs, float4 *dovi_mmr,
++float reshape_mmr(float3 sig, float4 coeffs, const float4 *dovi_mmr,
 +                  int dovi_mmr_single, int dovi_min_order, int dovi_max_order)
 +{
 +    int mmr_idx = dovi_mmr_single ? 0 : (int)coeffs.y;
@@ -1390,8 +1512,8 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +
 +static __inline__ __device__
 +float3 reshape_dovi_yuv(float3 yuv,
-+                        float *src_dovi_params, float *src_dovi_pivots,
-+                        float4 *src_dovi_coeffs, float4 *src_dovi_mmr)
++                        const float *src_dovi_params, const float *src_dovi_pivots,
++                        const float4 *src_dovi_coeffs, const float4 *src_dovi_mmr)
 +{
 +    int i;
 +    float s;
@@ -1403,9 +1525,9 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    int dovi_num_pivots, dovi_has_mmr, dovi_has_poly;
 +    int dovi_mmr_single, dovi_min_order, dovi_max_order;
 +    float dovi_lo, dovi_hi;
-+    float *dovi_params;
-+    float *dovi_pivots;
-+    float4 *dovi_coeffs, *dovi_mmr;
++    const float *dovi_params;
++    const float *dovi_pivots;
++    const float4 *dovi_coeffs, *dovi_mmr;
 +
 +#pragma unroll
 +    for (i = 0; i < 3; i++) {
@@ -1453,13 +1575,71 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    return make_float3(sig_arr[0], sig_arr[1], sig_arr[2]);
 +}
 +
++static __inline__ __device__
++float3 apply_lut3d(const float4 *lut, float3 color)
++{
++    float4 lut_val;
++    color = clamp3(color, 0.0f, 1.0f);
++
++    // Scale the color to the LUT grid.
++    float3 pos = color * (float)(LUT_SIZE - 1);
++
++    // Get the integer base indices in the LUT.
++    int3 base = make_int3((int)floorf(pos.x), (int)floorf(pos.y), (int)floorf(pos.z));
++    // Compute the fractional part within the cell.
++    float3 f = pos - make_float3((float)base.x, (float)base.y, (float)base.z);
++
++    // Compute the base linear index.
++    unsigned base_idx = base.x + base.y * LUT_SIZE + base.z * LUT_SIZE * LUT_SIZE;
++
++    // Sort the fraction offsets, so that we always have a>=b>=c
++    float a = max(f.x, max(f.y, f.z));
++    float c = min(f.x, min(f.y, f.z));
++    float b = f.x + f.y + f.z - a - c;
++
++#define LUT_IDX_MAX (LUT_SIZE * LUT_SIZE * LUT_SIZE - 1)
++
++    // The initial and the last corner values of current cube will always be fetched
++    lut_val = lut[min(base_idx, (unsigned)LUT_IDX_MAX)];
++    float3 c000 = make_float3(lut_val.x, lut_val.y, lut_val.z);
++    lut_val = lut[min(base_idx + 1 + LUT_SIZE + LUT_SIZE * LUT_SIZE, (unsigned)LUT_IDX_MAX)];
++    float3 c111 = make_float3(lut_val.x, lut_val.y, lut_val.z);
++
++    // Select the index for vertices of the tetrahedron.
++    unsigned idx100 = base_idx + 1;
++    unsigned idx010 = base_idx + LUT_SIZE;
++    unsigned idx110 = base_idx + 1 + LUT_SIZE;
++    unsigned idx001 = base_idx + LUT_SIZE * LUT_SIZE;
++    unsigned idx101 = base_idx + 1 + LUT_SIZE * LUT_SIZE;
++    unsigned idx011 = base_idx + LUT_SIZE + LUT_SIZE * LUT_SIZE;
++
++    // Although we have a and c as max and min value, we cannot use them in the
++    // following selection as float equality comparison is not accurate on GPU.
++    unsigned idx0 = select(select(idx001, idx010, (f.y >= f.z && f.y >= f.x)), idx100, (f.x >= f.y && f.x >= f.z));
++    unsigned idx1 = select(select(idx110, idx101, (f.y <= f.z && f.y <= f.x)), idx011, (f.x <= f.y && f.x <= f.z));
++
++    // Fetch LUT value with determined tetrahedron
++    lut_val = lut[min(idx0, (unsigned)LUT_IDX_MAX)];
++    float3 c0 = make_float3(lut_val.x, lut_val.y, lut_val.z);
++    lut_val = lut[min(idx1, (unsigned)LUT_IDX_MAX)];
++    float3 c1 = make_float3(lut_val.x, lut_val.y, lut_val.z);
++
++    float3 ca = c0 - c000;
++    float3 cb = c1 - c0;
++    float3 cc = c111 - c1;
++
++    float3 result = c000 + a * ca + b * cb + c * cc;
++
++    return clamp3(result, 0.0f, 1.0f);
++}
++
 +extern "C" {
 +
 +#define _READER \
 +    int xi = blockIdx.x * blockDim.x + threadIdx.x; \
 +    int yi = blockIdx.y * blockDim.y + threadIdx.y; \
-+    int x = 2 * xi; \
-+    int y = 2 * yi; \
++    int x = xi << 1; \
++    int y = yi << 1; \
 +    if (y + 1 >= src.height || x + 1 >= src.width) \
 +        return; \
 +    float3 yuv0 = read_tex_px_flt(src, x,     y); \
@@ -1468,10 +1648,10 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    float3 yuv3 = read_tex_px_flt(src, x + 1, y + 1);
 +
 +#define _RESHAPE \
-+    float *dovi_params = doviBuf; \
-+    float *dovi_pivots = doviBuf + 24; \
-+    float4 *dovi_coeffs = (float4 *)(doviBuf + 48); \
-+    float4 *dovi_mmr = (float4 *)(doviBuf + 144); \
++    const float *dovi_params = dovi_buf; \
++    const float *dovi_pivots = dovi_buf + 24; \
++    const float4 *dovi_coeffs = (const float4 *)(dovi_buf + 48); \
++    const float4 *dovi_mmr = (const float4 *)(dovi_buf + 144); \
 +    yuv0 = reshape_dovi_yuv(yuv0, dovi_params, dovi_pivots, dovi_coeffs, dovi_mmr); \
 +    yuv1 = reshape_dovi_yuv(yuv1, dovi_params, dovi_pivots, dovi_coeffs, dovi_mmr); \
 +    yuv2 = reshape_dovi_yuv(yuv2, dovi_params, dovi_pivots, dovi_coeffs, dovi_mmr); \
@@ -1483,7 +1663,7 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    float3 c2 = map_to_dst_space_from_yuv(yuv2); \
 +    float3 c3 = map_to_dst_space_from_yuv(yuv3);
 +
-+#define _YUV2RGB_S \
++#define _YUV2RGB_SRC \
 +    float3 c0 = map_to_src_space_from_yuv(yuv0); \
 +    float3 c1 = map_to_src_space_from_yuv(yuv1); \
 +    float3 c2 = map_to_src_space_from_yuv(yuv2); \
@@ -1495,47 +1675,35 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    float3 c2 = map_to_dst_space_from_yuv_dovi(yuv2); \
 +    float3 c3 = map_to_dst_space_from_yuv_dovi(yuv3);
 +
-+#define _YCC2RGB_F \
-+    float3 c0 = map_to_dst_space_from_yuv_dovi_fast(yuv0); \
-+    float3 c1 = map_to_dst_space_from_yuv_dovi_fast(yuv1); \
-+    float3 c2 = map_to_dst_space_from_yuv_dovi_fast(yuv2); \
-+    float3 c3 = map_to_dst_space_from_yuv_dovi_fast(yuv3);
-+
-+#define _YCC2RGB_S \
++#define _YCC2RGB_SRC \
 +    float3 c0 = map_to_src_space_from_yuv_dovi(yuv0); \
 +    float3 c1 = map_to_src_space_from_yuv_dovi(yuv1); \
 +    float3 c2 = map_to_src_space_from_yuv_dovi(yuv2); \
 +    float3 c3 = map_to_src_space_from_yuv_dovi(yuv3);
 +
-+#define _YCC2RGB_FS \
-+    float3 c0 = map_to_src_space_from_yuv_dovi_fast(yuv0); \
-+    float3 c1 = map_to_src_space_from_yuv_dovi_fast(yuv1); \
-+    float3 c2 = map_to_src_space_from_yuv_dovi_fast(yuv2); \
-+    float3 c3 = map_to_src_space_from_yuv_dovi_fast(yuv3);
-+
 +#define _TONEMAP_MAX \
-+    c0 = map_one_pixel_rgb_mode_max(c0, src, dst); \
-+    c1 = map_one_pixel_rgb_mode_max(c1, src, dst); \
-+    c2 = map_one_pixel_rgb_mode_max(c2, src, dst); \
-+    c3 = map_one_pixel_rgb_mode_max(c3, src, dst);
++    c0 = map_one_pixel_rgb_mode_max(c0, src.peak, dst.peak); \
++    c1 = map_one_pixel_rgb_mode_max(c1, src.peak, dst.peak); \
++    c2 = map_one_pixel_rgb_mode_max(c2, src.peak, dst.peak); \
++    c3 = map_one_pixel_rgb_mode_max(c3, src.peak, dst.peak);
 +
 +#define _TONEMAP_RGB \
-+    c0 = map_one_pixel_rgb_mode_rgb(c0, src, dst); \
-+    c1 = map_one_pixel_rgb_mode_rgb(c1, src, dst); \
-+    c2 = map_one_pixel_rgb_mode_rgb(c2, src, dst); \
-+    c3 = map_one_pixel_rgb_mode_rgb(c3, src, dst);
++    c0 = map_one_pixel_rgb_mode_rgb(c0, src.peak, dst.peak); \
++    c1 = map_one_pixel_rgb_mode_rgb(c1, src.peak, dst.peak); \
++    c2 = map_one_pixel_rgb_mode_rgb(c2, src.peak, dst.peak); \
++    c3 = map_one_pixel_rgb_mode_rgb(c3, src.peak, dst.peak);
 +
 +#define _TONEMAP_LUM \
-+    c0 = map_one_pixel_rgb_mode_lum(c0, src, dst); \
-+    c1 = map_one_pixel_rgb_mode_lum(c1, src, dst); \
-+    c2 = map_one_pixel_rgb_mode_lum(c2, src, dst); \
-+    c3 = map_one_pixel_rgb_mode_lum(c3, src, dst);
++    c0 = map_one_pixel_rgb_mode_lum(c0, src.peak, dst.peak); \
++    c1 = map_one_pixel_rgb_mode_lum(c1, src.peak, dst.peak); \
++    c2 = map_one_pixel_rgb_mode_lum(c2, src.peak, dst.peak); \
++    c3 = map_one_pixel_rgb_mode_lum(c3, src.peak, dst.peak);
 +
 +#define _TONEMAP_ITP \
-+    c0 = map_one_pixel_itp_mode(c0, src, dst); \
-+    c1 = map_one_pixel_itp_mode(c1, src, dst); \
-+    c2 = map_one_pixel_itp_mode(c2, src, dst); \
-+    c3 = map_one_pixel_itp_mode(c3, src, dst);
++    c0 = map_one_pixel_itp_mode(c0, src.peak, dst.peak); \
++    c1 = map_one_pixel_itp_mode(c1, src.peak, dst.peak); \
++    c2 = map_one_pixel_itp_mode(c2, src.peak, dst.peak); \
++    c3 = map_one_pixel_itp_mode(c3, src.peak, dst.peak);
 +
 +#define _RGB2YUV \
 +    yuv0 = lrgb2yuv(c0); \
@@ -1543,7 +1711,7 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    yuv2 = lrgb2yuv(c2); \
 +    yuv3 = lrgb2yuv(c3);
 +
-+#define _RGB2YUV_S \
++#define _RGB2YUV_SRC \
 +    c0 = lrgb2lrgb(c0); \
 +    c1 = lrgb2lrgb(c1); \
 +    c2 = lrgb2lrgb(c2); \
@@ -1559,22 +1727,18 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    yuv2 = lrgb2yuv(clamp3(c2, 0.0f, 1.0f)); \
 +    yuv3 = lrgb2yuv(clamp3(c3, 0.0f, 1.0f));
 +
-+#define _RGB2YUV_FS \
-+    c0 = clamp3(lrgb2lrgb(c0), 0.0f, 1.0f); \
-+    c1 = clamp3(lrgb2lrgb(c1), 0.0f, 1.0f); \
-+    c2 = clamp3(lrgb2lrgb(c2), 0.0f, 1.0f); \
-+    c3 = clamp3(lrgb2lrgb(c3), 0.0f, 1.0f); \
-+    yuv0 = lrgb2yuv(c0); \
-+    yuv1 = lrgb2yuv(c1); \
-+    yuv2 = lrgb2yuv(c2); \
-+    yuv3 = lrgb2yuv(c3);
-+
 +#define _DITHER \
-+    float d = read_dither(ditherTex, dither_size, xi, yi); \
++    float d = read_dither(dither_tex, dither_size, xi, yi); \
 +    yuv0.x = get_dithered_y(yuv0.x, d); \
 +    yuv1.x = get_dithered_y(yuv1.x, d); \
 +    yuv2.x = get_dithered_y(yuv2.x, d); \
 +    yuv3.x = get_dithered_y(yuv3.x, d);
++
++#define _LUT3D \
++    yuv0 = apply_lut3d(lut, yuv0); \
++    yuv1 = apply_lut3d(lut, yuv1); \
++    yuv2 = apply_lut3d(lut, yuv2); \
++    yuv3 = apply_lut3d(lut, yuv3);
 +
 +#define _WRITER \
 +    write_2x2_flt(dst, x, y, yuv0, yuv1, yuv2, yuv3);
@@ -1582,7 +1746,8 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +#define TONEMAP_VARIANT(NAME, READER, RESHAPE, YUV2RGB, TONEMAP, RGB2YUV, DITHER, WRITER) \
 +__global__ void tonemap ## NAME( \
 +    FFCUDAFrame src, FFCUDAFrame dst, \
-+    cudaTextureObject_t ditherTex, float *doviBuf) \
++    cudaTextureObject_t dither_tex, \
++    const float *__restrict__ dovi_buf) \
 +{ \
 +    READER \
 +    RESHAPE \
@@ -1593,35 +1758,89 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +    WRITER \
 +}
 +
-+TONEMAP_VARIANT(_max,          _READER,         , _YUV2RGB,    _TONEMAP_MAX, _RGB2YUV,           , _WRITER)
-+TONEMAP_VARIANT(_max_d,        _READER,         , _YUV2RGB,    _TONEMAP_MAX, _RGB2YUV,    _DITHER, _WRITER)
-+TONEMAP_VARIANT(_rgb,          _READER,         , _YUV2RGB,    _TONEMAP_RGB, _RGB2YUV,           , _WRITER)
-+TONEMAP_VARIANT(_rgb_d,        _READER,         , _YUV2RGB,    _TONEMAP_RGB, _RGB2YUV,    _DITHER, _WRITER)
-+TONEMAP_VARIANT(_lum,          _READER,         , _YUV2RGB_S,  _TONEMAP_LUM, _RGB2YUV_S,         , _WRITER)
-+TONEMAP_VARIANT(_lum_d,        _READER,         , _YUV2RGB_S,  _TONEMAP_LUM, _RGB2YUV_S,  _DITHER, _WRITER)
-+TONEMAP_VARIANT(_itp,          _READER,         , _YUV2RGB_S,  _TONEMAP_ITP, _RGB2YUV_S,         , _WRITER)
-+TONEMAP_VARIANT(_itp_d,        _READER,         , _YUV2RGB_S,  _TONEMAP_ITP, _RGB2YUV_S,  _DITHER, _WRITER)
++TONEMAP_VARIANT(_max,        _READER,         , _YUV2RGB,     _TONEMAP_MAX, _RGB2YUV,            , _WRITER)
++TONEMAP_VARIANT(_max_d,      _READER,         , _YUV2RGB,     _TONEMAP_MAX, _RGB2YUV,     _DITHER, _WRITER)
++TONEMAP_VARIANT(_rgb,        _READER,         , _YUV2RGB,     _TONEMAP_RGB, _RGB2YUV,            , _WRITER)
++TONEMAP_VARIANT(_rgb_d,      _READER,         , _YUV2RGB,     _TONEMAP_RGB, _RGB2YUV,     _DITHER, _WRITER)
++TONEMAP_VARIANT(_lum,        _READER,         , _YUV2RGB_SRC, _TONEMAP_LUM, _RGB2YUV_SRC,        , _WRITER)
++TONEMAP_VARIANT(_lum_d,      _READER,         , _YUV2RGB_SRC, _TONEMAP_LUM, _RGB2YUV_SRC, _DITHER, _WRITER)
++TONEMAP_VARIANT(_itp,        _READER,         , _YUV2RGB_SRC, _TONEMAP_ITP, _RGB2YUV_SRC,        , _WRITER)
++TONEMAP_VARIANT(_itp_d,      _READER,         , _YUV2RGB_SRC, _TONEMAP_ITP, _RGB2YUV_SRC, _DITHER, _WRITER)
++TONEMAP_VARIANT(_dovi_max,   _READER, _RESHAPE, _YCC2RGB,     _TONEMAP_MAX, _RGB2YUV,            , _WRITER)
++TONEMAP_VARIANT(_dovi_max_d, _READER, _RESHAPE, _YCC2RGB,     _TONEMAP_MAX, _RGB2YUV,     _DITHER, _WRITER)
++TONEMAP_VARIANT(_dovi_rgb,   _READER, _RESHAPE, _YCC2RGB,     _TONEMAP_RGB, _RGB2YUV,            , _WRITER)
++TONEMAP_VARIANT(_dovi_rgb_d, _READER, _RESHAPE, _YCC2RGB,     _TONEMAP_RGB, _RGB2YUV,     _DITHER, _WRITER)
++TONEMAP_VARIANT(_dovi_lum,   _READER, _RESHAPE, _YCC2RGB_SRC, _TONEMAP_LUM, _RGB2YUV_SRC,        , _WRITER)
++TONEMAP_VARIANT(_dovi_lum_d, _READER, _RESHAPE, _YCC2RGB_SRC, _TONEMAP_LUM, _RGB2YUV_SRC, _DITHER, _WRITER)
++TONEMAP_VARIANT(_dovi_itp,   _READER, _RESHAPE, _YCC2RGB_SRC, _TONEMAP_ITP, _RGB2YUV_SRC,        , _WRITER)
++TONEMAP_VARIANT(_dovi_itp_d, _READER, _RESHAPE, _YCC2RGB_SRC, _TONEMAP_ITP, _RGB2YUV_SRC, _DITHER, _WRITER)
++TONEMAP_VARIANT(_dovi_pq,    _READER, _RESHAPE, _YCC2RGB,                 , _RGB2YUV,            , _WRITER)
 +
-+TONEMAP_VARIANT(_dovi_max,     _READER, _RESHAPE, _YCC2RGB,    _TONEMAP_MAX, _RGB2YUV,          , _WRITER)
-+TONEMAP_VARIANT(_dovi_max_d,   _READER, _RESHAPE, _YCC2RGB,    _TONEMAP_MAX, _RGB2YUV,    _DITHER, _WRITER)
-+TONEMAP_VARIANT(_dovi_rgb,     _READER, _RESHAPE, _YCC2RGB,    _TONEMAP_RGB, _RGB2YUV,           , _WRITER)
-+TONEMAP_VARIANT(_dovi_rgb_d,   _READER, _RESHAPE, _YCC2RGB,    _TONEMAP_RGB, _RGB2YUV,    _DITHER, _WRITER)
-+TONEMAP_VARIANT(_dovi_lum,     _READER, _RESHAPE, _YCC2RGB_S,  _TONEMAP_LUM, _RGB2YUV_S,         , _WRITER)
-+TONEMAP_VARIANT(_dovi_lum_d,   _READER, _RESHAPE, _YCC2RGB_S,  _TONEMAP_LUM, _RGB2YUV_S,  _DITHER, _WRITER)
-+TONEMAP_VARIANT(_dovi_itp,     _READER, _RESHAPE, _YCC2RGB_S,  _TONEMAP_ITP, _RGB2YUV_S,         , _WRITER)
-+TONEMAP_VARIANT(_dovi_itp_d,   _READER, _RESHAPE, _YCC2RGB_S,  _TONEMAP_ITP, _RGB2YUV_S,  _DITHER, _WRITER)
++__global__ void build_lut(float4 *__restrict__ lut,
++                          float peak,
++                          float dst_peak,
++                          int tonemap_mode,
++                          int skip_tonemap,
++                          int dovi_reshape)
++{
++    const int total_entries = LUT_SIZE * LUT_SIZE * LUT_SIZE;
++    int idx = blockIdx.x * blockDim.x + threadIdx.x;
++    if (idx >= total_entries) return;
++    int z = idx / (LUT_SIZE * LUT_SIZE);
++    int rem = idx - (z * LUT_SIZE * LUT_SIZE);
++    int y = rem / LUT_SIZE;
++    int x = rem % LUT_SIZE;
++    float fx = (float)x / (LUT_SIZE - 1);
++    float fy = (float)y / (LUT_SIZE - 1);
++    float fz = (float)z / (LUT_SIZE - 1);
++    float3 c = make_float3(fx, fy, fz);
++    if (tonemap_mode == TONEMAP_MODE_ITP) {
++        c = dovi_reshape
++            ? map_to_src_space_from_yuv_dovi(c)
++            : map_to_src_space_from_yuv(c);
++    } else {
++        c = dovi_reshape
++            ? map_to_dst_space_from_yuv_dovi(c)
++            : map_to_dst_space_from_yuv(c);
++    }
++    switch (tonemap_mode) {
++    case TONEMAP_MODE_MAX:
++        c = skip_tonemap ? c : map_one_pixel_rgb_mode_max(c, peak, dst_peak);
++        break;
++    case TONEMAP_MODE_RGB:
++        c = skip_tonemap ? c : map_one_pixel_rgb_mode_rgb(c, peak, dst_peak);
++        break;
++    case TONEMAP_MODE_LUM:
++        c = skip_tonemap ? c : map_one_pixel_rgb_mode_lum(c, peak, dst_peak);
++        break;
++    case TONEMAP_MODE_ITP:
++        c = skip_tonemap ? c : map_one_pixel_itp_mode(c, peak, dst_peak);
++        break;
++    }
++    if (tonemap_mode == TONEMAP_MODE_ITP) {
++        c = lrgb2lrgb(c);
++        c = rgb2rgb_passthrough ? c : gamut_compress(c);
++        c = clamp3(c, 0.0f, 1.0f);
++    }
++    c = lrgb2yuv(c);
++    c = clamp3(c, 0.0f, 1.0f);
++    lut[idx] = make_float4(c.x, c.y, c.z, 0.0f);
++}
 +
-+TONEMAP_VARIANT(_dovi_max_f,   _READER, _RESHAPE, _YCC2RGB_F,  _TONEMAP_MAX, _RGB2YUV,           , _WRITER)
-+TONEMAP_VARIANT(_dovi_max_d_f, _READER, _RESHAPE, _YCC2RGB_F,  _TONEMAP_MAX, _RGB2YUV,    _DITHER, _WRITER)
-+TONEMAP_VARIANT(_dovi_rgb_f,   _READER, _RESHAPE, _YCC2RGB_F,  _TONEMAP_RGB, _RGB2YUV,           , _WRITER)
-+TONEMAP_VARIANT(_dovi_rgb_d_f, _READER, _RESHAPE, _YCC2RGB_F,  _TONEMAP_RGB, _RGB2YUV,    _DITHER, _WRITER)
-+TONEMAP_VARIANT(_dovi_lum_f,   _READER, _RESHAPE, _YCC2RGB_FS, _TONEMAP_LUM, _RGB2YUV_FS,        , _WRITER)
-+TONEMAP_VARIANT(_dovi_lum_d_f, _READER, _RESHAPE, _YCC2RGB_FS, _TONEMAP_LUM, _RGB2YUV_FS, _DITHER, _WRITER)
-+TONEMAP_VARIANT(_dovi_itp_f,   _READER, _RESHAPE, _YCC2RGB_FS, _TONEMAP_ITP, _RGB2YUV_FS,        , _WRITER)
-+TONEMAP_VARIANT(_dovi_itp_d_f, _READER, _RESHAPE, _YCC2RGB_FS, _TONEMAP_ITP, _RGB2YUV_FS, _DITHER, _WRITER)
++#define TONEMAP_LUT_VARIANT(NAME, READER, RESHAPE, LUT3D, WRITER) \
++__global__ void tonemap_lut ## NAME( \
++    FFCUDAFrame src, FFCUDAFrame dst, \
++    const float4 *__restrict__ lut, \
++    const float *__restrict__ dovi_buf) \
++{ \
++    READER \
++    RESHAPE \
++    LUT3D \
++    WRITER \
++}
 +
-+TONEMAP_VARIANT(_dovi_pq,      _READER, _RESHAPE, _YCC2RGB,                , _RGB2YUV,           , _WRITER)
-+TONEMAP_VARIANT(_dovi_pq_f,    _READER, _RESHAPE, _YCC2RGB_F,              , _RGB2YUV,           , _WRITER)
++TONEMAP_LUT_VARIANT(     , _READER,         , _LUT3D, _WRITER)
++TONEMAP_LUT_VARIANT(_dovi, _READER, _RESHAPE, _LUT3D, _WRITER)
 +
 +}
 Index: FFmpeg/libavfilter/cuda/tonemap.h
@@ -1676,7 +1895,7 @@ Index: FFmpeg/libavfilter/cuda/util.h
 ===================================================================
 --- /dev/null
 +++ libavfilter/cuda/util.h
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,102 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -1706,6 +1925,10 @@ Index: FFmpeg/libavfilter/cuda/util.h
 +    return make_float3(a.x + b, a.y + b, a.z + b);
 +}
 +
++static inline __device__ float3 operator+(float a, const float3 &b) {
++    return make_float3(b.x + a, b.y + a, b.z + a);
++}
++
 +static inline __device__ float3 operator-(const float3 &a, const float3 &b) {
 +    return make_float3(a.x - b.x, a.y - b.y, a.z - b.z);
 +}
@@ -1720,6 +1943,10 @@ Index: FFmpeg/libavfilter/cuda/util.h
 +
 +static inline __device__ float3 operator*(const float3 &a, float b) {
 +    return make_float3(a.x * b, a.y * b, a.z * b);
++}
++
++static inline __device__ float3 operator*(float a, const float3 &b) {
++    return make_float3(b.x * a, b.y * a, b.z * a);
 +}
 +
 +static inline __device__ float3 operator/(const float3 &a, const float3 &b) {
@@ -1738,6 +1965,10 @@ Index: FFmpeg/libavfilter/cuda/util.h
 +    return make_float4(a.x + b, a.y + b, a.z + b, a.w + b);
 +}
 +
++static inline __device__ float4 operator+(float a, const float4 &b) {
++    return make_float4(b.x + a, b.y + a, b.z + a, b.w + a);
++}
++
 +static inline __device__ float4 operator-(const float4 &a, const float4 &b) {
 +    return make_float4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 +}
@@ -1754,6 +1985,10 @@ Index: FFmpeg/libavfilter/cuda/util.h
 +    return make_float4(a.x * b, a.y * b, a.z * b, a.w * b);
 +}
 +
++static inline __device__ float4 operator*(float a, const float4 &b) {
++    return make_float4(b.x * a, b.y * a, b.z * a, b.w * a);
++}
++
 +static inline __device__ float4 operator/(const float4 &a, const float4 &b) {
 +    return make_float4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
 +}
@@ -1767,7 +2002,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 ===================================================================
 --- /dev/null
 +++ libavfilter/vf_tonemap_cuda.c
-@@ -0,0 +1,1127 @@
+@@ -0,0 +1,1271 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -1793,10 +2028,10 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +#include "libavutil/avassert.h"
 +#include "libavutil/avstring.h"
 +#include "libavutil/bprint.h"
-+#include "libavutil/common.h"
++#include "libavutil/cuda_check.h"
 +#include "libavutil/hwcontext.h"
 +#include "libavutil/hwcontext_cuda_internal.h"
-+#include "libavutil/cuda_check.h"
++#include "libavutil/mem.h"
 +#include "libavutil/internal.h"
 +#include "libavutil/opt.h"
 +#include "libavutil/pixdesc.h"
@@ -1804,9 +2039,10 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +#include "avfilter.h"
 +#include "colorspace.h"
 +#include "cuda/host_util.h"
++#include "cuda/load_helper.h"
 +#include "cuda/shared.h"
 +#include "cuda/tonemap.h"
-+#include "internal.h"
++#include "formats.h"
 +#include "scale_eval.h"
 +#include "video.h"
 +#include "dither_matrix.h"
@@ -1818,6 +2054,13 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    AV_PIX_FMT_P016
 +};
 +
++static const int colorspaces_out[] = {
++    AVCOL_SPC_UNSPECIFIED,
++    AVCOL_SPC_BT709,
++    AVCOL_SPC_BT2020_NCL,
++    -1
++};
++
 +#define DIV_UP(a, b) ( ((a) + (b) - 1) / (b) )
 +#define ALIGN_UP(a, b) (((a) + (b) - 1) & ~((b) - 1))
 +#define NUM_BUFFERS 2
@@ -1825,6 +2068,8 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +#define BLOCKY 16
 +
 +#define CHECK_CU(x) FF_CUDA_CHECK_DL(ctx, s->hwctx->internal->cuda_dl, x)
++
++#define REF_WHITE_SCALE (REFERENCE_WHITE / REFERENCE_WHITE_ALT)
 +
 +typedef struct TonemapCUDAContext {
 +    const AVClass *class;
@@ -1853,12 +2098,16 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    CUcontext   cu_ctx;
 +    CUmodule    cu_module;
 +
++    CUfunction  cu_func_build_lut;
 +    CUfunction  cu_func_tm;
 +    CUfunction  cu_func_dovi;
 +    CUfunction  cu_func_dovi_pq;
 +
-+    CUdeviceptr ditherBuffer;
-+    CUtexObject ditherTex;
++#define LUT_SIZE (65 * 65 * 65)
++    CUdeviceptr lut_buffer;
++
++    CUdeviceptr dither_buffer;
++    CUtexObject dither_tex;
 +
 +#define params_cnt 8
 +#define pivots_cnt (7+1)
@@ -1868,7 +2117,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +#define pivots_sz pivots_cnt*sizeof(float)
 +#define coeffs_sz coeffs_cnt*sizeof(float)
 +#define mmr_sz mmr_cnt*sizeof(float)
-+    CUdeviceptr doviBuffer;
++    CUdeviceptr dovi_buffer;
 +    struct DoviMetadata *dovi;
 +    float *dovi_pbuf;
 +
@@ -1877,15 +2126,23 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    int apply_dovi;
 +    int tradeoff;
 +    int init_with_dovi;
-+    double ref_white;
 +    double param;
++    double final_param;
 +    double desat_param;
 +    double peak;
++    double src_peak;
 +    double dst_peak;
 +    double scene_threshold;
 +
 +    const AVPixFmtDescriptor *in_desc, *out_desc;
 +} TonemapCUDAContext;
++
++static av_cold int preinit(AVFilterContext *ctx)
++{
++    TonemapCUDAContext *s = ctx->priv;
++    s->final_param = NAN;
++    return 0;
++}
 +
 +static av_cold int init(AVFilterContext *ctx)
 +{
@@ -1909,8 +2166,9 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    if (!s->tmp_frame)
 +        return AVERROR(ENOMEM);
 +
++    s->lut_buffer = 0;
 +    s->dovi = NULL;
-+    s->doviBuffer = 0;
++    s->dovi_buffer = 0;
 +
 +    return 0;
 +}
@@ -1925,9 +2183,9 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +
 +        CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
 +
-+        if (s->doviBuffer) {
-+            CHECK_CU(cu->cuMemFree(s->doviBuffer));
-+            s->doviBuffer = 0;
++        if (s->dovi_buffer) {
++            CHECK_CU(cu->cuMemFree(s->dovi_buffer));
++            s->dovi_buffer = 0;
 +        }
 +
 +        CHECK_CU(cu->cuCtxPopCurrent(&dummy));
@@ -1951,16 +2209,21 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +
 +        CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
 +
-+        if (s->ditherTex) {
-+            CHECK_CU(cu->cuTexObjectDestroy(s->ditherTex));
-+            s->ditherTex = 0;
++        if (s->lut_buffer) {
++            CHECK_CU(cu->cuMemFree(s->lut_buffer));
++            s->lut_buffer = 0;
 +        }
-+        if (s->ditherBuffer) {
-+            CHECK_CU(cu->cuMemFree(s->ditherBuffer));
-+            s->ditherBuffer = 0;
++        if (s->dither_tex) {
++            CHECK_CU(cu->cuTexObjectDestroy(s->dither_tex));
++            s->dither_tex = 0;
++        }
++        if (s->dither_buffer) {
++            CHECK_CU(cu->cuMemFree(s->dither_buffer));
++            s->dither_buffer = 0;
 +        }
 +        if (s->cu_module) {
 +            CHECK_CU(cu->cuModuleUnload(s->cu_module));
++            s->cu_func_build_lut = NULL;
 +            s->cu_func_tm = NULL;
 +            s->cu_func_dovi = NULL;
 +            s->cu_func_dovi_pq = NULL;
@@ -1987,7 +2250,8 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +{
 +    TonemapCUDAContext  *s = ctx->priv;
 +    AVFilterLink        *inlink = ctx->inputs[0];
-+    AVHWFramesContext   *frames_ctx = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
++    FilterLink          *inl = ff_filter_link(inlink);
++    AVHWFramesContext   *frames_ctx = (AVHWFramesContext*)inl->hw_frames_ctx->data;
 +    AVCUDADeviceContext *device_hwctx = frames_ctx->device_ctx->hwctx;
 +    CudaFunctions       *cu = device_hwctx->internal->cuda_dl;
 +    CUcontext dummy, cuda_ctx = device_hwctx->cuda_ctx;
@@ -2028,15 +2292,15 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    if ((ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx))) < 0)
 +        return ret;
 +
-+    if ((ret = CHECK_CU(cu->cuMemAlloc(&s->ditherBuffer, sizeof(ff_fruit_dither_matrix)))) < 0)
++    if ((ret = CHECK_CU(cu->cuMemAlloc(&s->dither_buffer, sizeof(ff_fruit_dither_matrix)))) < 0)
 +        goto fail;
 +
-+    res_desc.res.pitch2D.devPtr = cpy.dstDevice = s->ditherBuffer;
++    res_desc.res.pitch2D.devPtr = cpy.dstDevice = s->dither_buffer;
 +
 +    if ((ret = CHECK_CU(cu->cuMemcpy2D(&cpy))) < 0)
 +        goto fail;
 +
-+    if ((ret = CHECK_CU(cu->cuTexObjectCreate(&s->ditherTex, &res_desc, &tex_desc, NULL))) < 0)
++    if ((ret = CHECK_CU(cu->cuTexObjectCreate(&s->dither_tex, &res_desc, &tex_desc, NULL))) < 0)
 +        goto fail;
 +
 +fail:
@@ -2044,8 +2308,9 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    return ret;
 +}
 +
-+static av_cold int init_stage(TonemapCUDAContext *s, AVBufferRef *device_ctx,
-+                              AVFilterLink *outlink)
++static av_cold int init_hwframe_ctx(TonemapCUDAContext *s,
++                                    AVBufferRef *device_ctx,
++                                    int out_width, int out_height)
 +{
 +    AVBufferRef *out_ref = NULL;
 +    AVHWFramesContext *out_ctx;
@@ -2058,8 +2323,8 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +
 +    out_ctx->format    = AV_PIX_FMT_CUDA;
 +    out_ctx->sw_format = s->out_fmt;
-+    out_ctx->width     = FFALIGN(outlink->w, 32);
-+    out_ctx->height    = FFALIGN(outlink->h, 32);
++    out_ctx->width     = FFALIGN(out_width,  32);
++    out_ctx->height    = FFALIGN(out_height, 32);
 +
 +    ret = av_hwframe_ctx_init(out_ref);
 +    if (ret < 0)
@@ -2070,8 +2335,8 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    if (ret < 0)
 +        goto fail;
 +
-+    s->frame->width  = outlink->w;
-+    s->frame->height = outlink->h;
++    s->frame->width  = out_width;
++    s->frame->height = out_height;
 +
 +    av_buffer_unref(&s->frames_ctx);
 +    s->frames_ctx = out_ref;
@@ -2092,9 +2357,12 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    return 0;
 +}
 +
-+static av_cold int init_processing_chain(AVFilterContext *ctx, AVFilterLink *outlink)
++static av_cold int init_processing_chain(AVFilterContext *ctx,
++                                         int out_width, int out_height)
 +{
 +    TonemapCUDAContext *s = ctx->priv;
++    FilterLink       *inl = ff_filter_link(ctx->inputs[0]);
++    FilterLink      *outl = ff_filter_link(ctx->outputs[0]);
 +
 +    AVHWFramesContext *in_frames_ctx;
 +
@@ -2105,11 +2373,11 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    int ret;
 +
 +    /* check that we have a hw context */
-+    if (!ctx->inputs[0]->hw_frames_ctx) {
++    if (!inl->hw_frames_ctx) {
 +        av_log(ctx, AV_LOG_ERROR, "No hw context provided on input\n");
 +        return AVERROR(EINVAL);
 +    }
-+    in_frames_ctx = (AVHWFramesContext*)ctx->inputs[0]->hw_frames_ctx->data;
++    in_frames_ctx = (AVHWFramesContext*)inl->hw_frames_ctx->data;
 +    in_format     = in_frames_ctx->sw_format;
 +    out_format    = (s->format == AV_PIX_FMT_NONE) ? in_format : s->format;
 +    in_desc       = av_pix_fmt_desc_get(in_format);
@@ -2137,12 +2405,12 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    s->in_desc  = in_desc;
 +    s->out_desc = out_desc;
 +
-+    ret = init_stage(s, in_frames_ctx->device_ref, outlink);
++    ret = init_hwframe_ctx(s, in_frames_ctx->device_ref, out_width, out_height);
 +    if (ret < 0)
 +        return ret;
 +
-+    ctx->outputs[0]->hw_frames_ctx = av_buffer_ref(s->frames_ctx);
-+    if (!ctx->outputs[0]->hw_frames_ctx)
++    outl->hw_frames_ctx = av_buffer_ref(s->frames_ctx);
++    if (!outl->hw_frames_ctx)
 +        return AVERROR(ENOMEM);
 +
 +    return 0;
@@ -2279,7 +2547,13 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    enum AVColorSpace in_spc = s->in_spc, out_spc = s->out_spc;
 +    enum AVColorPrimaries in_pri = s->in_pri, out_pri = s->out_pri;
 +    enum AVColorRange in_range = s->in_range, out_range = s->out_range;
-+    int d = s->in_desc->comp[0].depth > s->out_desc->comp[0].depth && s->ditherTex;
++    int d = s->in_desc->comp[0].depth > s->out_desc->comp[0].depth && s->dither_tex;
++    float input_quantization_offset = 0.0f;
++    float output_quantization_offset = 0.0f;
++    float input_y_scale = 1.0f;
++    float input_uv_scale = 1.0f;
++    float output_quantization_factor = 1.0f;
++    float output_quantization_scale = 255.0f;
 +    char info_log[4096], error_log[4096];
 +    CUjit_option options[] = { CU_JIT_INFO_LOG_BUFFER,
 +                               CU_JIT_ERROR_LOG_BUFFER,
@@ -2296,26 +2570,33 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    switch(s->tonemap) {
 +    case TONEMAP_GAMMA:
 +        if (isnan(s->param))
-+            s->param = 1.8f;
++            s->final_param = 1.8f;
 +        break;
 +    case TONEMAP_REINHARD:
 +        if (!isnan(s->param))
-+            s->param = (1.0f - s->param) / s->param;
++            s->final_param = (1.0f - s->param) / s->param;
 +        break;
 +    case TONEMAP_MOBIUS:
 +        if (isnan(s->param))
-+            s->param = 0.3f;
++            s->final_param = 0.3f;
++        break;
++    case TONEMAP_BT2390:
++        if (isnan(s->param))
++            s->final_param = 1.0f; // diff from the spec-defined 0.5f
++        else
++            s->final_param = FFMIN(FFMAX(s->param, 0.5f), 2.0f);
 +        break;
 +    }
 +
-+    if (isnan(s->param))
-+        s->param = 1.0f;
++    if (isnan(s->final_param))
++        s->final_param = 1.0f;
 +
-+    s->ref_white = s->tonemap == TONEMAP_BT2390 ? REFERENCE_WHITE_ALT
-+                                                : REFERENCE_WHITE;
++    if (s->peak)
++        s->src_peak = s->peak / 10.0f * REF_WHITE_SCALE;
 +
-+    if (s->tonemap == TONEMAP_BT2390 && s->peak)
-+        s->peak = FFMAX(s->peak / 10.0f, 1.1f);
++    // sanity check
++    if (s->src_peak <= REF_WHITE_SCALE)
++        s->src_peak = 10.0f * REF_WHITE_SCALE;
 +
 +    s->dst_peak = 1.0f;
 +
@@ -2386,6 +2667,28 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    if ((ret = get_rgb2rgb_matrix(in_pri, out_pri, rgb2rgb_matrix)) < 0)
 +        return ret;
 +
++    if (s->in_desc->comp[0].depth == 16) {
++        // Assume 16bit is actually 12bit for now as that is what the hardware decoders producing
++        // and what videos are actually encoded in
++        input_quantization_offset = QUANTIZATION_OFFSET(12);
++        input_y_scale = INPUT_Y_SCALE(12);
++        input_uv_scale = INPUT_UV_SCALE(12);
++    } else {
++        input_quantization_offset = QUANTIZATION_OFFSET(s->in_desc->comp[0].depth);
++        input_y_scale = INPUT_Y_SCALE(s->in_desc->comp[0].depth);
++        input_uv_scale = INPUT_UV_SCALE(s->in_desc->comp[0].depth);
++    }
++
++    if (s->out_desc->comp[0].depth == 10) {
++        // Don't handle 12b offset for now and assume 16b output is real 16b out to make it consistent with other filters
++        output_quantization_offset = QUANTIZATION_OFFSET(10);
++    }
++
++    if (s->out_desc->comp[0].depth > 8) {
++        output_quantization_factor = 256.0f; // 2^(16-8)
++        output_quantization_scale = 65535.0f; // 2^16 - 1
++    }
++
 +    av_bprint_init(&constants, 2048, AV_BPRINT_SIZE_UNLIMITED);
 +
 +    av_bprintf(&constants, ".version 3.2\n");
@@ -2396,12 +2699,12 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    av_bprintf(&constants, ".visible .const .align " #align " " decl ";\n", __VA_ARGS__)
 +#define CONSTANT(decl, ...) CONSTANT_A(decl, 4, __VA_ARGS__)
 +#define CONSTANT_M(a, b) \
-+    CONSTANT(".f32 " a "[] = {%f, %f, %f, %f, %f, %f, %f, %f, %f}", \
++    CONSTANT(".f32 " a "[] = {%.13lf, %.13lf, %.13lf, %.13lf, %.13lf, %.13lf, %.13lf, %.13lf, %.13lf}", \
 +             b[0][0], b[0][1], b[0][2], \
 +             b[1][0], b[1][1], b[1][2], \
 +             b[2][0], b[2][1], b[2][2])
 +#define CONSTANT_C(a, b, c, d) \
-+    CONSTANT(".f32 " a "[] = {%f, %f, %f}", \
++    CONSTANT(".f32 " a "[] = {%.13lf, %.13lf, %.13lf}", \
 +             b, c, d)
 +
 +    CONSTANT(".u32 depth_src           = %i", (int)s->in_desc->comp[0].depth);
@@ -2416,13 +2719,16 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    CONSTANT(".u32 chroma_loc_dst      = %i", (int)s->out_chroma_loc);
 +    CONSTANT(".u32 tonemap_func        = %i", (int)s->tonemap);
 +    CONSTANT(".u32 enable_dither       = %i", (int)(s->in_desc->comp[0].depth > s->out_desc->comp[0].depth));
-+    CONSTANT(".f32 dither_size         = %f", (float)ff_fruit_dither_size);
-+    CONSTANT(".f32 dither_quantization = %f", (float)((1 << s->out_desc->comp[0].depth) - 1));
-+    CONSTANT(".f32 ref_white           = %f", s->ref_white);
-+    CONSTANT(".f32 tone_param          = %f", s->param);
-+    CONSTANT(".f32 desat_param         = %f", s->desat_param);
-+    CONSTANT(".f32 pq_max_lum_div_ref_white = %f", (float)(ST2084_MAX_LUMINANCE / s->ref_white));
-+    CONSTANT(".f32 ref_white_div_pq_max_lum = %f", (float)(s->ref_white / ST2084_MAX_LUMINANCE));
++    CONSTANT(".f32 dither_size         = %.1f", (float)ff_fruit_dither_size);
++    CONSTANT(".f32 dither_quantization = %.1f", (float)((1 << s->out_desc->comp[0].depth) - 1));
++    CONSTANT(".f32 tone_param          = %.4f", s->final_param);
++    CONSTANT(".f32 desat_param         = %.4f", s->desat_param);
++    CONSTANT(".f32 input_quantization_offset = %.13lf", input_quantization_offset);
++    CONSTANT(".f32 input_y_scale = %.13lf", input_y_scale);
++    CONSTANT(".f32 input_uv_scale = %.13lf", input_uv_scale);
++    CONSTANT(".f32 output_quantization_offset = %.13lf", output_quantization_offset);
++    CONSTANT(".f32 output_quantization_factor = %.13lf", output_quantization_factor);
++    CONSTANT(".f32 output_quantization_scale = %.13lf", output_quantization_scale);
 +    CONSTANT_M("rgb_matrix", (s->dovi ? s->dovi->nonlinear : rgb_matrix));
 +    CONSTANT_M("yuv_matrix", yuv_matrix);
 +    CONSTANT_A(".u8 rgb2rgb_passthrough = %i", 1, in_pri == out_pri);
@@ -2437,24 +2743,24 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +
 +    if (s->dovi) {
 +        s->dovi_pbuf = av_mallocz(3*(params_sz+pivots_sz+coeffs_sz+mmr_sz));
-+        ret = CHECK_CU(cu->cuMemAlloc(&s->doviBuffer, 3*(params_sz+pivots_sz+coeffs_sz+mmr_sz)));
++        ret = CHECK_CU(cu->cuMemAlloc(&s->dovi_buffer, 3*(params_sz+pivots_sz+coeffs_sz+mmr_sz)));
 +        if (ret < 0)
 +            goto fail;
 +    }
 +
-+    if (s->dovi && s->tradeoff == -1) {
++    if (s->tradeoff == -1) {
 +        int major, minor, mp;
 +        s->tradeoff = 0;
 +
 +        ret = CHECK_CU(cu->cuDeviceComputeCapability(&major, &minor, s->hwctx->internal->cuda_device));
 +        if (ret < 0)
-+            return ret;
++            goto fail;
 +
 +        ret = CHECK_CU(cu->cuDeviceGetAttribute(&mp,
 +                                                CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,
 +                                                s->hwctx->internal->cuda_device));
 +        if (ret < 0)
-+            return ret;
++            goto fail;
 +
 +        switch (major) {
 +        case 1:
@@ -2469,7 +2775,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +            if (minor == 1 || minor == 2) s->tradeoff = mp * 128 < 1024;
 +            break;
 +        case 7:
-+            s->tradeoff = mp * 64 < 512; break;
++            s->tradeoff = mp * 64 < 896; break;
 +        }
 +
 +        if (!s->tradeoff)
@@ -2504,8 +2810,8 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    if (ret < 0)
 +        goto fail2;
 +
-+    ret = CHECK_CU(cu->cuLinkAddData(link_state, CU_JIT_INPUT_PTX, (void *)ff_tonemap_ptx_data,
-+                                     (size_t)ff_tonemap_ptx_len, "ff_tonemap_ptx_data", 0, NULL, NULL));
++    ret = ff_cuda_link_add_data(ctx, s->hwctx, link_state, "ff_tonemap_ptx_data",
++                                ff_tonemap_ptx_data, ff_tonemap_ptx_len);
 +    if (ret < 0)
 +        goto fail2;
 +
@@ -2517,47 +2823,65 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    if (ret < 0)
 +        goto fail2;
 +
-+    switch (s->tonemap_mode) {
-+        default:
-+        case TONEMAP_MODE_MAX:
-+            ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_tm, s->cu_module, d ? "tonemap_max_d" : "tonemap_max"));
-+            if (ret < 0) goto fail2;
-+            ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_dovi, s->cu_module,
-+                                                   s->tradeoff == 1 ? (d ? "tonemap_dovi_max_d_f" : "tonemap_dovi_max_f")
-+                                                                    : (d ? "tonemap_dovi_max_d"   : "tonemap_dovi_max")));
-+            if (ret < 0) goto fail2;
-+            break;
-+        case TONEMAP_MODE_RGB:
-+            ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_tm, s->cu_module, d ? "tonemap_rgb_d" : "tonemap_rgb"));
-+            if (ret < 0) goto fail2;
-+            ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_dovi, s->cu_module,
-+                                                   s->tradeoff == 1 ? (d ? "tonemap_dovi_rgb_d_f" : "tonemap_dovi_rgb_f")
-+                                                                    : (d ? "tonemap_dovi_rgb_d"   : "tonemap_dovi_rgb")));
-+            if (ret < 0) goto fail2;
-+            break;
-+        case TONEMAP_MODE_LUM:
-+            ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_tm, s->cu_module, d ? "tonemap_lum_d" : "tonemap_lum"));
-+            if (ret < 0) goto fail2;
-+            ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_dovi, s->cu_module,
-+                                                   s->tradeoff == 1 ? (d ? "tonemap_dovi_lum_d_f" : "tonemap_dovi_lum_f")
-+                                                                    : (d ? "tonemap_dovi_lum_d"   : "tonemap_dovi_lum")));
-+            if (ret < 0) goto fail2;
-+            break;
-+        case TONEMAP_MODE_ITP:
-+            ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_tm, s->cu_module, d ? "tonemap_itp_d" : "tonemap_itp"));
-+            if (ret < 0) goto fail2;
-+            ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_dovi, s->cu_module,
-+                                                   s->tradeoff == 1 ? (d ? "tonemap_dovi_itp_d_f" : "tonemap_dovi_itp_f")
-+                                                                    : (d ? "tonemap_dovi_itp_d"   : "tonemap_dovi_itp")));
-+            if (ret < 0) goto fail2;
-+            break;
-+    }
++    if (s->tradeoff == 1) {
++        const size_t lut_size = LUT_SIZE;
++        const size_t lut_buffer_size = lut_size * sizeof(float) * 4;
++        float peak = (float)s->src_peak;
++        float dst_peak = (float)s->dst_peak;
++        int skip_tonemap = s->out_trc == AVCOL_TRC_SMPTE2084;
++        int dovi_reshape = !!s->dovi;
 +
-+    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_dovi_pq, s->cu_module,
-+                                           s->tradeoff == 1 ? "tonemap_dovi_pq_f"
-+                                                            : "tonemap_dovi_pq"));
-+    if (ret < 0)
-+        goto fail2;
++        ret = CHECK_CU(cu->cuMemAlloc(&s->lut_buffer, lut_buffer_size));
++        if (ret < 0)
++            goto fail2;
++
++        ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_build_lut, s->cu_module, "build_lut"));
++        if (ret < 0)
++            goto fail2;
++
++        ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_tm, s->cu_module, "tonemap_lut"));
++        if (ret < 0)
++            goto fail2;
++
++        ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_dovi, s->cu_module, "tonemap_lut_dovi"));
++        s->cu_func_dovi_pq = s->cu_func_dovi;
++        if (ret < 0)
++            goto fail2;
++
++        {
++            void *args[] = { &s->lut_buffer, &peak, &dst_peak, &s->tonemap_mode, &skip_tonemap, &dovi_reshape };
++
++            ret = CHECK_CU(cu->cuLaunchKernel(s->cu_func_build_lut,
++                                              lut_size, 1, 1,
++                                              1, 1, 1, 0, s->hwctx->stream, args, NULL));
++            if (ret < 0)
++                goto fail2;
++        }
++    } else {
++        int mode = s->tonemap_mode;
++        char *func_name = NULL;
++        func_name = av_asprintf("tonemap%s%s",
++                                ((mode == TONEMAP_MODE_ITP) ? "_itp" :
++                                 (mode == TONEMAP_MODE_LUM) ? "_lum" :
++                                 (mode == TONEMAP_MODE_RGB) ? "_rgb" : "_max"), (d ? "_d" : ""));
++        ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_tm, s->cu_module, func_name));
++        av_free(func_name);
++        if (ret < 0)
++            goto fail2;
++
++        func_name = av_asprintf("tonemap_dovi%s%s",
++                                ((mode == TONEMAP_MODE_ITP) ? "_itp" :
++                                 (mode == TONEMAP_MODE_LUM) ? "_lum" :
++                                 (mode == TONEMAP_MODE_RGB) ? "_rgb" : "_max"), (d ? "_d" : ""));
++        ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_dovi, s->cu_module, func_name));
++        av_free(func_name);
++        if (ret < 0)
++            goto fail2;
++
++        ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_dovi_pq, s->cu_module, "tonemap_dovi_pq"));
++        if (ret < 0)
++            goto fail2;
++    }
 +
 +fail2:
 +    CHECK_CU(cu->cuLinkDestroy(link_state));
@@ -2580,19 +2904,23 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +{
 +    AVFilterContext *ctx = outlink->src;
 +    AVFilterLink *inlink = outlink->src->inputs[0];
-+    AVHWFramesContext *frames_ctx = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
-+    AVCUDADeviceContext *device_hwctx = frames_ctx->device_ctx->hwctx;
++    FilterLink      *inl = ff_filter_link(inlink);
++    AVHWFramesContext *frames_ctx;
++    AVCUDADeviceContext *device_hwctx;
 +    TonemapCUDAContext *s  = ctx->priv;
 +    int ret;
-+
-+    s->hwctx = device_hwctx;
 +
 +    outlink->w = inlink->w;
 +    outlink->h = inlink->h;
 +
-+    ret = init_processing_chain(ctx, outlink);
++    ret = init_processing_chain(ctx, outlink->w, outlink->h);
 +    if (ret < 0)
 +        return ret;
++
++    frames_ctx = (AVHWFramesContext*)inl->hw_frames_ctx->data;
++    device_hwctx = frames_ctx->device_ctx->hwctx;
++
++    s->hwctx = device_hwctx;
 +
 +    if (s->in_desc->comp[0].depth > s->out_desc->comp[0].depth) {
 +        if ((ret = setup_dither(ctx)) < 0)
@@ -2610,7 +2938,8 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    TonemapCUDAContext *s = ctx->priv;
 +    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
 +    FFCUDAFrame src, dst;
-+    void *args[] = { &src, &dst, &s->ditherTex, &s->doviBuffer };
++    void *args[] = { &src, &dst, &s->dither_tex, &s->dovi_buffer };
++    void *args2[] = { &src, &dst, &s->lut_buffer, &s->dovi_buffer };
 +    int ret, pq_out = s->out_trc == AVCOL_TRC_SMPTE2084;
 +
 +    ret = ff_make_cuda_frame(ctx, cu, 1,
@@ -2623,12 +2952,12 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    if (ret < 0)
 +        goto fail;
 +
-+    src.peak = s->peak;
++    src.peak = s->src_peak;
 +    dst.peak = s->dst_peak;
 +
 +    ret = CHECK_CU(cu->cuLaunchKernel(s->dovi ? (pq_out ? s->cu_func_dovi_pq : s->cu_func_dovi) : s->cu_func_tm,
 +                                      DIV_UP(src.width / 2, BLOCKX), DIV_UP(src.height / 2, BLOCKY), 1,
-+                                      BLOCKX, BLOCKY, 1, 0, s->hwctx->stream, args, NULL));
++                                      BLOCKX, BLOCKY, 1, 0, s->hwctx->stream, (s->lut_buffer ? args2 : args), NULL));
 +
 +fail:
 +    return ret;
@@ -2710,11 +3039,17 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    if (!s->peak) {
 +        if (dovi_sd) {
 +            const AVDOVIMetadata *metadata = (AVDOVIMetadata *) dovi_sd->data;
-+            s->peak = ff_determine_dovi_signal_peak(metadata);
-+        } else {
-+            s->peak = ff_determine_signal_peak(in);
++            const int l0_only = s->tradeoff == 1 || !s->src_peak;
++            if (!s->src_peak || s->tradeoff != 1) {
++                s->src_peak = ff_determine_dovi_signal_peak(metadata, l0_only);
++                s->src_peak *= REF_WHITE_SCALE;
++            }
++        } else if (!s->src_peak) {
++            s->src_peak = ff_determine_signal_peak(in);
++            s->src_peak *= REF_WHITE_SCALE;
 +        }
-+        av_log(ctx, AV_LOG_DEBUG, "Computed signal peak: %f\n", s->peak);
++        av_log(ctx, AV_LOG_DEBUG, "Computed signal peak: %f "
++               "at pts %"PRId64"\n", s->src_peak, in->pts);
 +    }
 +
 +    if (dovi_sd) {
@@ -2731,6 +3066,8 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +            in->color_trc = AVCOL_TRC_SMPTE2084;
 +            in->colorspace = AVCOL_SPC_UNSPECIFIED;
 +            in->color_primaries = AVCOL_PRI_BT2020;
++            if (rpu->bl_video_full_range_flag)
++                in->color_range = AVCOL_RANGE_JPEG;
 +        }
 +    }
 +
@@ -2751,9 +3088,9 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +        s->in_chroma_loc = in->chroma_location;
 +
 +        s->out_trc        = s->trc == -1 ? AVCOL_TRC_UNSPECIFIED : s->trc;
-+        s->out_spc        = s->spc == -1 ? AVCOL_SPC_UNSPECIFIED : s->spc;
++        s->out_spc        = outlink->colorspace;
 +        s->out_pri        = s->pri == -1 ? AVCOL_PRI_UNSPECIFIED : s->pri;
-+        s->out_range      = s->range == -1 ? s->in_range : s->range;
++        s->out_range      = outlink->color_range;
 +        s->out_chroma_loc = s->in_chroma_loc;
 +
 +        if ((ret = compile(link)) < 0)
@@ -2769,7 +3106,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    if (s->dovi) {
 +        update_dovi_buf(ctx);
 +
-+        ret = CHECK_CU(cu->cuMemcpyHtoDAsync(s->doviBuffer, s->dovi_pbuf,
++        ret = CHECK_CU(cu->cuMemcpyHtoDAsync(s->dovi_buffer, s->dovi_pbuf,
 +                                             3*(params_sz+pivots_sz+coeffs_sz+mmr_sz), s->hwctx->stream));
 +        if (ret < 0) {
 +            av_log(ctx, AV_LOG_ERROR, "Failed to update dovi buf.\n");
@@ -2805,10 +3142,51 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    return ret;
 +}
 +
++static int query_formats(AVFilterContext *avctx)
++{
++    TonemapCUDAContext *s = avctx->priv;
++    AVFilterFormats *formats;
++    int ret;
++    const enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_CUDA, AV_PIX_FMT_NONE };
++
++    // single format
++    formats = ff_make_format_list(pix_fmts);
++    ret = ff_formats_ref(formats, &avctx->inputs[0]->outcfg.formats);
++    if (ret < 0)
++        return ret;
++
++    ret = ff_formats_ref(formats, &avctx->outputs[0]->incfg.formats);
++    if (ret < 0)
++        return ret;
++
++    // colorspaces and ranges
++    if ((ret = ff_formats_ref(ff_all_color_spaces(),
++                              &avctx->inputs[0]->outcfg.color_spaces)) < 0)
++        return ret;
++
++    if ((ret = ff_formats_ref(ff_all_color_ranges(),
++                              &avctx->inputs[0]->outcfg.color_ranges)) < 0)
++        return ret;
++
++    formats = s->spc != -1
++        ? ff_make_formats_list_singleton(s->spc)
++        : ff_make_format_list(colorspaces_out);
++    if ((ret = ff_formats_ref(formats, &avctx->outputs[0]->incfg.color_spaces)) < 0)
++        return ret;
++
++    formats = s->range != -1
++        ? ff_make_formats_list_singleton(s->range)
++        : ff_all_color_ranges();
++    if ((ret = ff_formats_ref(formats, &avctx->outputs[0]->incfg.color_ranges)) < 0)
++        return ret;
++
++    return 0;
++}
++
 +#define OFFSET(x) offsetof(TonemapCUDAContext, x)
 +#define FLAGS (AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM)
 +static const AVOption options[] = {
-+    { "tonemap",       "Tonemap algorithm selection", OFFSET(tonemap), AV_OPT_TYPE_INT, {.i64 = TONEMAP_NONE}, TONEMAP_NONE, TONEMAP_COUNT - 1, FLAGS, .unit = "tonemap" },
++    { "tonemap",       "Tonemap algorithm selection", OFFSET(tonemap), AV_OPT_TYPE_INT, {.i64 = TONEMAP_BT2390}, TONEMAP_NONE, TONEMAP_COUNT - 1, FLAGS, .unit = "tonemap" },
 +    {     "none",      0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_NONE},              0, 0, FLAGS, .unit = "tonemap" },
 +    {     "linear",    0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_LINEAR},            0, 0, FLAGS, .unit = "tonemap" },
 +    {     "gamma",     0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_GAMMA},             0, 0, FLAGS, .unit = "tonemap" },
@@ -2850,7 +3228,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    {     "enabled",   0, 0, AV_OPT_TYPE_CONST, {.i64 = 1},                         0, 0, FLAGS, .unit = "tradeoff" },
 +    { "peak",          "Signal peak override", OFFSET(peak), AV_OPT_TYPE_DOUBLE, {.dbl = 0}, 0, DBL_MAX, FLAGS },
 +    { "param",         "Tonemap parameter",   OFFSET(param), AV_OPT_TYPE_DOUBLE, {.dbl = NAN}, DBL_MIN, DBL_MAX, FLAGS },
-+    { "desat",         "Desaturation parameter",   OFFSET(desat_param), AV_OPT_TYPE_DOUBLE, {.dbl = 0.5}, 0, DBL_MAX, FLAGS },
++    { "desat",         "Desaturation parameter",   OFFSET(desat_param), AV_OPT_TYPE_DOUBLE, {.dbl = 0}, 0, DBL_MAX, FLAGS },
 +    { "threshold",     "Scene detection threshold",   OFFSET(scene_threshold), AV_OPT_TYPE_DOUBLE, {.dbl = 0.2}, 0, DBL_MAX, FLAGS },
 +    { NULL },
 +};
@@ -2882,6 +3260,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    .name           = "tonemap_cuda",
 +    .description    = NULL_IF_CONFIG_SMALL("GPU accelerated HDR to SDR tonemapping"),
 +
++    .preinit        = preinit,
 +    .init           = init,
 +    .uninit         = uninit,
 +
@@ -2891,7 +3270,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
 +    FILTER_INPUTS(tonemap_cuda_inputs),
 +    FILTER_OUTPUTS(tonemap_cuda_outputs),
 +
-+    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_CUDA),
++    FILTER_QUERY_FUNC(query_formats),
 +
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};

@@ -2,7 +2,7 @@ Index: FFmpeg/libavfilter/avfilter.h
 ===================================================================
 --- libavfilter/avfilter.h
 +++ libavfilter/avfilter.h
-@@ -564,6 +564,8 @@ struct AVFilterLink {
+@@ -579,6 +579,8 @@ struct AVFilterLink {
      enum AVColorSpace colorspace;   ///< agreed upon YUV color space
      enum AVColorRange color_range;  ///< agreed upon YUV color range
  
@@ -15,7 +15,7 @@ Index: FFmpeg/libavfilter/opencl.c
 ===================================================================
 --- libavfilter/opencl.c
 +++ libavfilter/opencl.c
-@@ -75,6 +75,9 @@ int ff_opencl_filter_config_input(AVFilt
+@@ -77,6 +77,9 @@ int ff_opencl_filter_config_input(AVFilt
      if (!ctx->output_height)
          ctx->output_height = inlink->h;
  
@@ -25,7 +25,7 @@ Index: FFmpeg/libavfilter/opencl.c
      return 0;
  }
  
-@@ -123,6 +126,9 @@ int ff_opencl_filter_config_output(AVFil
+@@ -126,6 +129,9 @@ int ff_opencl_filter_config_output(AVFil
      outlink->w = ctx->output_width;
      outlink->h = ctx->output_height;
  
@@ -48,9 +48,9 @@ Index: FFmpeg/libavfilter/vf_hwmap.c
 +#endif
 +
  #include "avfilter.h"
+ #include "filters.h"
  #include "formats.h"
- #include "internal.h"
-@@ -122,6 +126,12 @@ static int hwmap_config_output(AVFilterL
+@@ -124,6 +128,12 @@ static int hwmap_config_output(AVFilterL
                  goto fail;
              }
  
@@ -63,7 +63,7 @@ Index: FFmpeg/libavfilter/vf_hwmap.c
          } else if (inlink->format == hwfc->format &&
                     (desc->flags & AV_PIX_FMT_FLAG_HWACCEL) &&
                     ctx->reverse) {
-@@ -131,6 +141,9 @@ static int hwmap_config_output(AVFilterL
+@@ -133,6 +143,9 @@ static int hwmap_config_output(AVFilterL
              // mapped from that back to the source type.
              AVBufferRef *source;
              AVHWFramesContext *frames;
@@ -73,7 +73,7 @@ Index: FFmpeg/libavfilter/vf_hwmap.c
  
              ctx->hwframes_ref = av_hwframe_ctx_alloc(device);
              if (!ctx->hwframes_ref) {
-@@ -144,8 +157,19 @@ static int hwmap_config_output(AVFilterL
+@@ -146,8 +159,19 @@ static int hwmap_config_output(AVFilterL
              frames->width     = hwfc->width;
              frames->height    = hwfc->height;
  
@@ -84,8 +84,8 @@ Index: FFmpeg/libavfilter/vf_hwmap.c
 +
 +            if (frames->initial_pool_size == 0) {
 +                // Dynamic allocation.
-+            } else if (avctx->extra_hw_frames) {
-+                frames->initial_pool_size += avctx->extra_hw_frames;
++            } else {
++                frames->initial_pool_size += (avctx->extra_hw_frames > 2 ? avctx->extra_hw_frames : 2);
 +            }
 +
 +#if HAVE_OPENCL_D3D11
@@ -108,10 +108,10 @@ Index: FFmpeg/libavfilter/vf_hwupload.c
 +#endif
 +
  #include "avfilter.h"
+ #include "filters.h"
  #include "formats.h"
- #include "internal.h"
-@@ -110,6 +114,9 @@ static int hwupload_config_output(AVFilt
-     AVFilterLink   *inlink = avctx->inputs[0];
+@@ -112,6 +116,9 @@ static int hwupload_config_output(AVFilt
+     FilterLink        *inl = ff_filter_link(inlink);
      HWUploadContext   *ctx = avctx->priv;
      int err;
 +#if HAVE_OPENCL_D3D11
@@ -120,7 +120,7 @@ Index: FFmpeg/libavfilter/vf_hwupload.c
  
      av_buffer_unref(&ctx->hwframes_ref);
  
-@@ -151,6 +158,11 @@ static int hwupload_config_output(AVFilt
+@@ -153,6 +160,11 @@ static int hwupload_config_output(AVFilt
      if (avctx->extra_hw_frames >= 0)
          ctx->hwframes->initial_pool_size = 2 + avctx->extra_hw_frames;
  
@@ -136,7 +136,7 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.c
 ===================================================================
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
-@@ -227,7 +227,7 @@ static AVBufferRef *d3d11va_alloc_single
+@@ -229,7 +229,7 @@ static AVBufferRef *d3d11va_alloc_single
          .ArraySize  = 1,
          .Usage      = D3D11_USAGE_DEFAULT,
          .BindFlags  = hwctx->BindFlags,
@@ -145,7 +145,7 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.c
      };
  
      hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &tex);
-@@ -291,9 +291,17 @@ static int d3d11va_frames_init(AVHWFrame
+@@ -293,9 +293,17 @@ static int d3d11va_frames_init(AVHWFrame
          .ArraySize  = ctx->initial_pool_size,
          .Usage      = D3D11_USAGE_DEFAULT,
          .BindFlags  = hwctx->BindFlags,

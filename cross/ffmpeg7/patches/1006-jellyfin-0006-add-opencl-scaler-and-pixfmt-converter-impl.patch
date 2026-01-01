@@ -2,7 +2,7 @@ Index: FFmpeg/configure
 ===================================================================
 --- configure
 +++ configure
-@@ -3889,6 +3889,7 @@ rubberband_filter_deps="librubberband"
+@@ -3935,6 +3935,7 @@ rubberband_filter_deps="librubberband"
  sab_filter_deps="gpl swscale"
  scale2ref_filter_deps="swscale"
  scale_filter_deps="swscale"
@@ -14,7 +14,7 @@ Index: FFmpeg/libavfilter/Makefile
 ===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -459,6 +459,7 @@ OBJS-$(CONFIG_SCALE_FILTER)
+@@ -461,6 +461,7 @@ OBJS-$(CONFIG_SCALE_FILTER)
  OBJS-$(CONFIG_SCALE_CUDA_FILTER)             += vf_scale_cuda.o scale_eval.o \
                                                  vf_scale_cuda.ptx.o cuda/load_helper.o
  OBJS-$(CONFIG_SCALE_NPP_FILTER)              += vf_scale_npp.o scale_eval.o
@@ -26,7 +26,7 @@ Index: FFmpeg/libavfilter/allfilters.c
 ===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -432,6 +432,7 @@ extern const AVFilter ff_vf_sab;
+@@ -433,6 +433,7 @@ extern const AVFilter ff_vf_sab;
  extern const AVFilter ff_vf_scale;
  extern const AVFilter ff_vf_scale_cuda;
  extern const AVFilter ff_vf_scale_npp;
@@ -38,7 +38,7 @@ Index: FFmpeg/libavfilter/opencl/scale.cl
 ===================================================================
 --- /dev/null
 +++ libavfilter/opencl/scale.cl
-@@ -0,0 +1,276 @@
+@@ -0,0 +1,318 @@
 +/*
 + * Copyright (c) 2018 Gabriel Machado
 + * Copyright (c) 2021 NyanMisaka
@@ -60,16 +60,16 @@ Index: FFmpeg/libavfilter/opencl/scale.cl
 + * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 + */
 +
-+__constant sampler_t sampler = (CLK_NORMALIZED_COORDS_FALSE |
-+                                CLK_ADDRESS_CLAMP_TO_EDGE   |
-+                                CLK_FILTER_NEAREST);
++__constant sampler_t n_sampler = (CLK_NORMALIZED_COORDS_FALSE |
++                                  CLK_ADDRESS_CLAMP_TO_EDGE   |
++                                  CLK_FILTER_NEAREST);
 +
-+__constant sampler_t sampler2 = (CLK_NORMALIZED_COORDS_FALSE |
-+                                 CLK_ADDRESS_NONE            |
-+                                 CLK_FILTER_NEAREST);
++__constant sampler_t l_sampler = (CLK_NORMALIZED_COORDS_FALSE |
++                                  CLK_ADDRESS_CLAMP_TO_EDGE   |
++                                  CLK_FILTER_LINEAR);
 +
-+__constant sampler_t d_sampler = (CLK_NORMALIZED_COORDS_TRUE |
-+                                  CLK_ADDRESS_REPEAT         |
++__constant sampler_t d_sampler = (CLK_NORMALIZED_COORDS_TRUE  |
++                                  CLK_ADDRESS_REPEAT          |
 +                                  CLK_FILTER_NEAREST);
 +
 +#ifdef ENABLE_DITHER
@@ -83,236 +83,278 @@ Index: FFmpeg/libavfilter/opencl/scale.cl
 +                       __read_only  image2d_t src1,
 +                       __write_only image2d_t dst2,
 +                       __read_only  image2d_t src2
-+#ifdef NON_SEMI_PLANAR_OUT
++  #if defined(NON_SEMI_PLANAR_OUT) && !defined(SCALE) && !defined(SCALE_BUILTIN)
 +                      ,__write_only image2d_t dst3
-+#endif
-+#ifdef NON_SEMI_PLANAR_IN
++  #endif
++  #if defined(NON_SEMI_PLANAR_IN) && !defined(SCALE) && !defined(SCALE_BUILTIN)
 +                      ,__read_only  image2d_t src3
-+#endif
-+#ifdef ENABLE_DITHER
++  #endif
++  #ifdef ENABLE_DITHER
 +                      ,__read_only  image2d_t dither
-+#endif
++  #endif
 +                       )
 +{
 +    int xi = get_global_id(0);
 +    int yi = get_global_id(1);
 +    // each work item process four pixels
-+    int x = 2 * xi;
-+    int y = 2 * yi;
++    int x = xi << 1;
++    int y = yi << 1;
 +
-+#ifdef ENABLE_DITHER
-+    float2 ncoords = convert_float2((int2)(xi, yi)) *
++  #ifdef ENABLE_DITHER
++    float2 ncoords_d = convert_float2((int2)(xi, yi)) *
 +        native_recip((float2)(get_image_width(dither), get_image_height(dither)));
-+#endif
++  #endif
 +
-+    if (xi < get_image_width(dst2) && yi < get_image_height(dst2)) {
-+        float y0 = read_imagef(src1, sampler, (int2)(x,     y)).x;
-+        float y1 = read_imagef(src1, sampler, (int2)(x + 1, y)).x;
-+        float y2 = read_imagef(src1, sampler, (int2)(x,     y + 1)).x;
-+        float y3 = read_imagef(src1, sampler, (int2)(x + 1, y + 1)).x;
-+#ifdef NON_SEMI_PLANAR_IN
-+        float u = read_imagef(src2, sampler, (int2)(xi, yi)).x;
-+        float v = read_imagef(src3, sampler, (int2)(xi, yi)).x;
-+#else
-+        float2 uv = read_imagef(src2, sampler, (int2)(xi, yi)).xy;
-+        float u = uv.x;
-+        float v = uv.y;
-+#endif
-+#ifdef ENABLE_DITHER
-+        float d = read_imagef(dither, d_sampler, ncoords).x;
-+        y0 = get_dithered_y(y0, d);
-+        y1 = get_dithered_y(y1, d);
-+        y2 = get_dithered_y(y2, d);
-+        y3 = get_dithered_y(y3, d);
-+#endif
-+        write_imagef(dst1, (int2)(x,     y), (float4)(y0, 0.0f, 0.0f, 1.0f));
-+        write_imagef(dst1, (int2)(x + 1, y), (float4)(y1, 0.0f, 0.0f, 1.0f));
-+        write_imagef(dst1, (int2)(x,     y + 1), (float4)(y2, 0.0f, 0.0f, 1.0f));
-+        write_imagef(dst1, (int2)(x + 1, y + 1), (float4)(y3, 0.0f, 0.0f, 1.0f));
-+#ifdef NON_SEMI_PLANAR_OUT
-+        write_imagef(dst2, (int2)(xi, yi), (float4)(u, 0.0f, 0.0f, 1.0f));
-+        write_imagef(dst3, (int2)(xi, yi), (float4)(v, 0.0f, 0.0f, 1.0f));
-+#else
-+        write_imagef(dst2, (int2)(xi, yi), (float4)(u, v, 0.0f, 1.0f));
-+#endif
-+    }
++    if (xi >= get_image_width(dst2) || yi >= get_image_height(dst2))
++        return;
++
++  #ifndef P010LE_COMPACT_IN
++    float y0 = read_imagef(src1, n_sampler, (int2)(x,     y)).x;
++    float y1 = read_imagef(src1, n_sampler, (int2)(x + 1, y)).x;
++    float y2 = read_imagef(src1, n_sampler, (int2)(x,     y + 1)).x;
++    float y3 = read_imagef(src1, n_sampler, (int2)(x + 1, y + 1)).x;
++  #else
++    uint off0 = ((x + 0) << 1) & 7;
++    uint off1 = ((x + 1) << 1) & 7;
++    int2 pos0 = (int2)((x + 0) * 1.25f,     y + 0);
++    int2 pos1 = (int2)((x + 0) * 1.25f + 1, y + 0);
++    int2 pos2 = (int2)((x + 1) * 1.25f,     y + 0);
++    int2 pos3 = (int2)((x + 1) * 1.25f + 1, y + 0);
++    int2 pos4 = (int2)((x + 0) * 1.25f,     y + 1);
++    int2 pos5 = (int2)((x + 0) * 1.25f + 1, y + 1);
++    int2 pos6 = (int2)((x + 1) * 1.25f,     y + 1);
++    int2 pos7 = (int2)((x + 1) * 1.25f + 1, y + 1);
++    uint4 px4ui;
++    float4 px4f;
++    px4ui.x = read_imageui(src1, n_sampler, pos0).x >> off0 |
++              read_imageui(src1, n_sampler, pos1).x << (8 - off0);
++    px4ui.y = read_imageui(src1, n_sampler, pos2).x >> off1 |
++              read_imageui(src1, n_sampler, pos3).x << (8 - off1);
++    px4ui.z = read_imageui(src1, n_sampler, pos4).x >> off0 |
++              read_imageui(src1, n_sampler, pos5).x << (8 - off0);
++    px4ui.w = read_imageui(src1, n_sampler, pos6).x >> off1 |
++              read_imageui(src1, n_sampler, pos7).x << (8 - off1);
++    px4f = convert_float4((px4ui & 0x3FF) << 6) / USHRT_MAX;
++    float y0 = px4f.x, y1 = px4f.y, y2 = px4f.z, y3 = px4f.w;
++  #endif
++
++  #if defined(NON_SEMI_PLANAR_IN) && !defined(SCALE) && !defined(SCALE_BUILTIN)
++    float2 uv = { read_imagef(src2, n_sampler, (int2)(xi, yi)).x,
++                  read_imagef(src3, n_sampler, (int2)(xi, yi)).x };
++  #else
++    #ifndef P010LE_COMPACT_IN
++    float2 uv = read_imagef(src2, n_sampler, (int2)(xi, yi)).xy;
++    #else
++    off0 = ((xi * 2 + 0) << 1) & 7;
++    off1 = ((xi * 2 + 1) << 1) & 7;
++    pos0 = (int2)((xi * 2 + 0) * 1.25f,     yi);
++    pos1 = (int2)((xi * 2 + 0) * 1.25f + 1, yi);
++    pos2 = (int2)((xi * 2 + 1) * 1.25f,     yi);
++    pos3 = (int2)((xi * 2 + 1) * 1.25f + 1, yi);
++    px4ui.x = read_imageui(src2, n_sampler, pos0).x >> off0 |
++              read_imageui(src2, n_sampler, pos1).x << (8 - off0);
++    px4ui.y = read_imageui(src2, n_sampler, pos2).x >> off1 |
++              read_imageui(src2, n_sampler, pos3).x << (8 - off1);
++    float2 uv = convert_float2((px4ui.xy & 0x3FF) << 6) / USHRT_MAX;
++    #endif
++  #endif
++
++  #ifdef ENABLE_DITHER
++    float d = read_imagef(dither, d_sampler, ncoords_d).x;
++    y0 = get_dithered_y(y0, d);
++    y1 = get_dithered_y(y1, d);
++    y2 = get_dithered_y(y2, d);
++    y3 = get_dithered_y(y3, d);
++  #endif
++
++    write_imagef(dst1, (int2)(x,     y), (float4)(y0, 0.0f, 0.0f, 1.0f));
++    write_imagef(dst1, (int2)(x + 1, y), (float4)(y1, 0.0f, 0.0f, 1.0f));
++    write_imagef(dst1, (int2)(x,     y + 1), (float4)(y2, 0.0f, 0.0f, 1.0f));
++    write_imagef(dst1, (int2)(x + 1, y + 1), (float4)(y3, 0.0f, 0.0f, 1.0f));
++  #if defined(NON_SEMI_PLANAR_OUT) && !defined(SCALE) && !defined(SCALE_BUILTIN)
++    write_imagef(dst2, (int2)(xi, yi), (float4)(uv.x, 0.0f, 0.0f, 1.0f));
++    write_imagef(dst3, (int2)(xi, yi), (float4)(uv.y, 0.0f, 0.0f, 1.0f));
++  #else
++    write_imagef(dst2, (int2)(xi, yi), (float4)(uv.x, uv.y, 0.0f, 1.0f));
++  #endif
 +}
 +#endif
 +
-+#ifdef NEIGHBOR
-+__kernel void neighbor(__write_only image2d_t dst1,
-+                       __read_only  image2d_t src1,
-+#ifdef ENABLE_DITHER
-+                       __read_only  image2d_t dither,
-+#endif
-+                                    int2      src_size)
++#ifdef SCALE_BUILTIN
++__kernel void scale_builtin(__write_only image2d_t dst1,
++                            __read_only  image2d_t src1,
++  #ifdef ENABLE_DITHER
++                            __read_only  image2d_t dither,
++  #endif
++                                         int2      src_sz)
 +{
-+    int xi = get_global_id(0);
-+    int yi = get_global_id(1);
++    int2 dst_pos = { get_global_id(0), get_global_id(1) };
++    float2 dst_sz = { get_global_size(0), get_global_size(1) };
 +
-+    int2 dst_pos = { xi, yi };
-+    float2 dst_size = { get_global_size(0), get_global_size(1) };
++    float2 src_pos = (convert_float2(dst_pos) + 0.5f) * convert_float2(src_sz) * native_recip(dst_sz);
++    src_pos = clamp(src_pos, 0.0f, convert_float2(src_sz - 1));
 +
-+    float2 src_coord = (convert_float2(dst_pos) + 0.5f) * convert_float2(src_size) * native_recip(dst_size);
-+    int2 src_pos = convert_int2(floor(src_coord - 0.5f));
-+
-+#ifdef ENABLE_DITHER
-+    float2 ncoords = convert_float2((int2)(xi, yi)) *
++  #if defined(ENABLE_DITHER) && !defined(CONV)
++    float2 ncoords_d = convert_float2(dst_pos) *
 +        native_recip((float2)(get_image_width(dither), get_image_height(dither)));
-+#endif
++  #endif
 +
-+    int2 read_pos = clamp(src_pos, 0, src_size - 1);
-+    float y = read_imagef(src1, sampler2, read_pos).x;
++  #ifdef SCALE_BUILTIN_BILINEAR
++    float y = read_imagef(src1, l_sampler, src_pos).x;
++  #else // SCALE_BUILTIN_NEIGHBOR
++    float y = read_imagef(src1, n_sampler, src_pos).x;
++  #endif
 +
-+#ifdef ENABLE_DITHER
-+    float d = read_imagef(dither, d_sampler, ncoords).x;
++  #if defined(ENABLE_DITHER) && !defined(CONV)
++    float d = read_imagef(dither, d_sampler, ncoords_d).x;
 +    y = get_dithered_y(y, d);
-+#endif
++  #endif
 +
 +    write_imagef(dst1, dst_pos, (float4)(y, 0.0f, 0.0f, 1.0f));
 +}
 +
-+__kernel void neighbor_uv(__write_only image2d_t dst2,
-+                          __read_only  image2d_t src2,
-+#ifdef NON_SEMI_PLANAR_OUT
-+                          __write_only image2d_t dst3,
-+#endif
-+#ifdef NON_SEMI_PLANAR_IN
-+                          __read_only  image2d_t src3,
-+#endif
-+                                       int2      src_size)
++__kernel void scale_builtin_uv(__write_only image2d_t dst2,
++                               __read_only  image2d_t src2,
++  #ifdef NON_SEMI_PLANAR_OUT
++                               __write_only image2d_t dst3,
++  #endif
++  #if defined(NON_SEMI_PLANAR_IN) && !defined(CONV)
++                               __read_only  image2d_t src3,
++  #endif
++                                            int2      src_sz)
 +{
 +    int2 dst_pos = { get_global_id(0), get_global_id(1) };
-+    float2 dst_size = { get_global_size(0), get_global_size(1) };
++    float2 dst_sz = { get_global_size(0), get_global_size(1) };
 +
-+    float2 src_coord = (convert_float2(dst_pos) + 0.5f) * convert_float2(src_size) * native_recip(dst_size);
-+    int2 src_pos = convert_int2(floor(src_coord - 0.5f));
++    float2 src_pos = (convert_float2(dst_pos) + 0.5f) * convert_float2(src_sz) * native_recip(dst_sz);
++    src_pos = clamp(src_pos, 0.0f, convert_float2(src_sz - 1));
 +
-+    int2 read_pos = clamp(src_pos, 0, src_size - 1);
-+#ifdef NON_SEMI_PLANAR_IN
-+    float u = read_imagef(src2, sampler2, read_pos).x;
-+    float v = read_imagef(src3, sampler2, read_pos).x;
-+#else
-+    float2 uv = read_imagef(src2, sampler2, read_pos).xy;
-+    float u = uv.x;
-+    float v = uv.y;
-+#endif
++  #if defined(NON_SEMI_PLANAR_IN) && !defined(CONV)
++    #ifdef SCALE_BUILTIN_BILINEAR
++    float2 uv = { read_imagef(src2, l_sampler, src_pos).x,
++                  read_imagef(src3, l_sampler, src_pos).x };
++    #else // SCALE_BUILTIN_NEIGHBOR
++    float2 uv = { read_imagef(src2, n_sampler, src_pos).x,
++                  read_imagef(src3, n_sampler, src_pos).x };
++    #endif
++  #else
++    #ifdef SCALE_BUILTIN_BILINEAR
++    float2 uv = read_imagef(src2, l_sampler, src_pos).xy;
++    #else // SCALE_BUILTIN_NEIGHBOR
++    float2 uv = read_imagef(src2, n_sampler, src_pos).xy;
++    #endif
++  #endif
 +
-+#ifdef NON_SEMI_PLANAR_OUT
-+    write_imagef(dst2, dst_pos, (float4)(u, 0.0f, 0.0f, 1.0f));
-+    write_imagef(dst3, dst_pos, (float4)(v, 0.0f, 0.0f, 1.0f));
-+#else
-+    write_imagef(dst2, dst_pos, (float4)(u, v, 0.0f, 1.0f));
-+#endif
++  #ifdef NON_SEMI_PLANAR_OUT
++    write_imagef(dst2, dst_pos, (float4)(uv.x, 0.0f, 0.0f, 1.0f));
++    write_imagef(dst3, dst_pos, (float4)(uv.y, 0.0f, 0.0f, 1.0f));
++  #else
++    write_imagef(dst2, dst_pos, (float4)(uv.x, uv.y, 0.0f, 1.0f));
++  #endif
 +}
 +#endif
 +
 +#ifdef SCALE
 +__kernel void scale(__write_only image2d_t dst1,
 +                    __read_only  image2d_t src1,
-+#ifdef ENABLE_DITHER
++  #ifdef ENABLE_DITHER
 +                    __read_only  image2d_t dither,
-+#endif
++  #endif
 +                    __constant   float    *cx,
 +                    __constant   float    *cy,
-+                                 int2      src_size)
++                                 int2      src_sz)
 +{
-+    int xi = get_global_id(0);
-+    int yi = get_global_id(1);
++    int2 dst_pos = { get_global_id(0), get_global_id(1) };
++    float2 dst_sz = { get_global_size(0), get_global_size(1) };
 +
-+    int2 dst_pos = { xi, yi };
-+    float2 dst_size = { get_global_size(0), get_global_size(1) };
-+
-+    float2 src_coord = (convert_float2(dst_pos) + 0.5f) * convert_float2(src_size) * native_recip(dst_size);
++    float2 src_coord = (convert_float2(dst_pos) + 0.5f) * convert_float2(src_sz) * native_recip(dst_sz);
 +    int2 src_pos = convert_int2(floor(src_coord - 0.5f));
 +
-+#ifdef ENABLE_DITHER
-+    float2 ncoords = convert_float2((int2)(xi, yi)) *
++  #if defined(ENABLE_DITHER) && !defined(CONV)
++    float2 ncoords_d = convert_float2(dst_pos) *
 +        native_recip((float2)(get_image_width(dither), get_image_height(dither)));
-+#endif
++  #endif
 +
 +    int i, j;
 +    int filterw2 = filterw >> 1;
 +    int filterh2 = filterh >> 1;
-+    int2 src_size_edge = src_size - 1;
-+    float4 col1 = 0.0f, s1 = 0.0f;
++    int2 read_pos, src_sz_edge = src_sz - 1;
++    float4 c1, col1 = 0.0f, s1 = 0.0f;
 +
-+#pragma unroll
++  #pragma unroll
 +    for (i = 0; i < filterh; ++i, s1 = 0.0f) {
-+        #pragma unroll
++    #pragma unroll
 +        for (j = 0; j < filterw; ++j) {
-+            int2 read_pos = clamp(src_pos + (int2)(filterw2 - j, filterh2 - i), 0, src_size_edge);
-+            float4 c1 = read_imagef(src1, sampler2, read_pos);
++            read_pos = clamp(src_pos + (int2)(filterw2 - j, filterh2 - i), 0, src_sz_edge);
++            c1 = read_imagef(src1, n_sampler, read_pos);
 +            s1 += c1 * cx[dst_pos.x * filterw + j];
 +        }
 +        col1 += s1 * cy[dst_pos.y * filterh + i];
 +    }
 +
 +    float y = col1.x;
-+#ifdef ENABLE_DITHER
-+    float d = read_imagef(dither, d_sampler, ncoords).x;
++  #if defined(ENABLE_DITHER) && !defined(CONV)
++    float d = read_imagef(dither, d_sampler, ncoords_d).x;
 +    y = get_dithered_y(y, d);
-+#endif
++  #endif
 +
 +    write_imagef(dst1, dst_pos, (float4)(y, 0.0f, 0.0f, 1.0f));
 +}
 +
 +__kernel void scale_uv(__write_only image2d_t dst2,
 +                       __read_only  image2d_t src2,
-+#ifdef NON_SEMI_PLANAR_OUT
++  #ifdef NON_SEMI_PLANAR_OUT
 +                       __write_only image2d_t dst3,
-+#endif
-+#ifdef NON_SEMI_PLANAR_IN
++  #endif
++  #if defined(NON_SEMI_PLANAR_IN) && !defined(CONV)
 +                       __read_only  image2d_t src3,
-+#endif
++  #endif
 +                       __constant   float    *cx,
 +                       __constant   float    *cy,
-+                                    int2      src_size)
++                                    int2      src_sz)
 +{
 +    int2 dst_pos = { get_global_id(0), get_global_id(1) };
-+    float2 dst_size = { get_global_size(0), get_global_size(1) };
++    float2 dst_sz = { get_global_size(0), get_global_size(1) };
 +
-+    float2 src_coord = (convert_float2(dst_pos) + 0.5f) * convert_float2(src_size) * native_recip(dst_size);
++    float2 src_coord = (convert_float2(dst_pos) + 0.5f) * convert_float2(src_sz) * native_recip(dst_sz);
 +    int2 src_pos = convert_int2(floor(src_coord - 0.5f));
 +
 +    int i, j;
 +    int filterw2 = filterw >> 1;
 +    int filterh2 = filterh >> 1;
-+    int2 src_size_edge = src_size - 1;
-+    float4 col2 = 0.0f, col3 = 0.0f, s2 = 0.0f, s3 = 0.0f;
++    int2 read_pos, src_sz_edge = src_sz - 1;
++    float4 c2, c3, col2 = 0.0f, col3 = 0.0f, s2 = 0.0f, s3 = 0.0f;
 +
-+#pragma unroll
++  #pragma unroll
 +    for (i = 0; i < filterh; ++i, s2 = s3 = 0.0f) {
-+        #pragma unroll
++    #pragma unroll
 +        for (j = 0; j < filterw; ++j) {
-+            int2 read_pos = clamp(src_pos + (int2)(filterw2 - j, filterh2 - i), 0, src_size_edge);
-+            float4 c2 = read_imagef(src2, sampler2, read_pos);
++            read_pos = clamp(src_pos + (int2)(filterw2 - j, filterh2 - i), 0, src_sz_edge);
++            c2 = read_imagef(src2, n_sampler, read_pos);
 +            s2 += c2 * cx[dst_pos.x * filterw + j];
-+#ifdef NON_SEMI_PLANAR_IN
-+            float4 c3 = read_imagef(src3, sampler2, read_pos);
++  #ifdef NON_SEMI_PLANAR_IN
++            c3 = read_imagef(src3, n_sampler, read_pos);
 +            s3 += c3 * cx[dst_pos.x * filterw + j];
-+#endif
++  #endif
 +        }
 +        col2 += s2 * cy[dst_pos.y * filterh + i];
-+#ifdef NON_SEMI_PLANAR_IN
++  #ifdef NON_SEMI_PLANAR_IN
 +        col3 += s3 * cy[dst_pos.y * filterh + i];
-+#endif
++  #endif
 +    }
 +
-+#ifdef NON_SEMI_PLANAR_IN
-+    float u = col2.x;
-+    float v = col3.x;
-+#else
-+    float u = col2.x;
-+    float v = col2.y;
-+#endif
++  #if defined(NON_SEMI_PLANAR_IN) && !defined(CONV)
++    float2 uv = { col2.x, col3.x };
++  #else
++    float2 uv = { col2.x, col2.y };
++  #endif
 +
-+#ifdef NON_SEMI_PLANAR_OUT
-+    write_imagef(dst2, dst_pos, (float4)(u, 0.0f, 0.0f, 1.0f));
-+    write_imagef(dst3, dst_pos, (float4)(v, 0.0f, 0.0f, 1.0f));
-+#else
-+    write_imagef(dst2, dst_pos, (float4)(u, v, 0.0f, 1.0f));
-+#endif
++  #ifdef NON_SEMI_PLANAR_OUT
++    write_imagef(dst2, dst_pos, (float4)(uv.x, 0.0f, 0.0f, 1.0f));
++    write_imagef(dst3, dst_pos, (float4)(uv.y, 0.0f, 0.0f, 1.0f));
++  #else
++    write_imagef(dst2, dst_pos, (float4)(uv.x, uv.y, 0.0f, 1.0f));
++  #endif
 +}
 +#endif
 Index: FFmpeg/libavfilter/opencl_source.h
@@ -331,7 +373,7 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 ===================================================================
 --- /dev/null
 +++ libavfilter/vf_scale_opencl.c
-@@ -0,0 +1,777 @@
+@@ -0,0 +1,931 @@
 +/*
 + * Copyright (c) 2018 Gabriel Machado
 + * Copyright (c) 2021 NyanMisaka
@@ -354,13 +396,13 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 + */
 +
 +#include "libavutil/avassert.h"
-+#include "libavutil/common.h"
 +#include "libavutil/imgutils.h"
++#include "libavutil/mem.h"
 +#include "libavutil/opt.h"
 +#include "libavutil/pixdesc.h"
 +
 +#include "avfilter.h"
-+#include "internal.h"
++#include "filters.h"
 +#include "opencl.h"
 +#include "opencl_source.h"
 +#include "scale_eval.h"
@@ -373,6 +415,7 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    AV_PIX_FMT_YUV420P,
 +    AV_PIX_FMT_YUV420P16,
 +    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_NV15,
 +    AV_PIX_FMT_P010,
 +    AV_PIX_FMT_P016,
 +};
@@ -409,8 +452,13 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    cl_mem           dither_image;
 +    cl_kernel        kernel;
 +    cl_kernel        kernel_uv;
++    cl_kernel        kernel_conv;
 +    const char      *kernel_name;
 +    const char      *kernel_name_uv;
++    const char      *kernel_name_conv;
++
++    AVBufferRef     *tmp_hwframes_ctx;
++    AVFrame         *tmp_frame;
 +
 +    char *w_expr,  *h_expr;
 +    int   dst_w,    dst_h;
@@ -533,6 +581,61 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    return 0;
 +}
 +
++static av_cold int init_tmp_hwframes_ctx(AVFilterContext *avctx,
++                                         enum AVPixelFormat pix_fmt,
++                                         int width, int height)
++{
++    ScaleOpenCLContext *ctx = avctx->priv;
++    AVFilterLink       *inlink = avctx->inputs[0];
++    FilterLink         *inl    = ff_filter_link(inlink);
++    AVHWFramesContext  *hwfc_in;
++    AVHWFramesContext  *hwfc_tmp;
++    AVBufferRef        *hwfc_tmp_ref;
++    AVHWDeviceContext  *device_ctx;
++    AVBufferRef        *device_ref;
++    int                 ret;
++
++    if (!inl->hw_frames_ctx)
++        return AVERROR(EINVAL);
++
++    hwfc_in = (AVHWFramesContext *)inl->hw_frames_ctx->data;
++    device_ref = hwfc_in->device_ref;
++    device_ctx = (AVHWDeviceContext *)device_ref->data;
++
++    if (!device_ctx || device_ctx->type != AV_HWDEVICE_TYPE_OPENCL) {
++        if (avctx->hw_device_ctx) {
++            device_ref = avctx->hw_device_ctx;
++            device_ctx = (AVHWDeviceContext *)device_ref->data;
++        }
++        if (!device_ctx || device_ctx->type != AV_HWDEVICE_TYPE_OPENCL) {
++            av_log(avctx, AV_LOG_ERROR, "No OpenCL hardware context provided\n");
++            return AVERROR(EINVAL);
++        }
++    }
++
++    hwfc_tmp_ref = av_hwframe_ctx_alloc(device_ref);
++    if (!hwfc_tmp_ref)
++        return AVERROR(ENOMEM);
++
++    hwfc_tmp = (AVHWFramesContext *)hwfc_tmp_ref->data;
++    hwfc_tmp->format    = AV_PIX_FMT_OPENCL;
++    hwfc_tmp->sw_format = pix_fmt;
++    hwfc_tmp->width     = width;
++    hwfc_tmp->height    = height;
++
++    ret = av_hwframe_ctx_init(hwfc_tmp_ref);
++    if (ret < 0) {
++        av_log(avctx, AV_LOG_ERROR, "Error creating frames_ctx for tmp frame: %d\n", ret);
++        av_buffer_unref(&hwfc_tmp_ref);
++        return ret;
++    }
++
++    av_buffer_unref(&ctx->tmp_hwframes_ctx);
++    ctx->tmp_hwframes_ctx = hwfc_tmp_ref;
++
++    return 0;
++}
++
 +static int scale_opencl_init(AVFilterContext *avctx)
 +{
 +    ScaleOpenCLContext *ctx = avctx->priv;
@@ -557,11 +660,22 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +            av_bprintf(&header, "#define CONV\n");
 +            ctx->kernel_name = "conv_yuv";
 +        }
-+    } else if (ctx->algorithm == F_NEIGHBOR) {
-+        av_bprintf(&header, "#define NEIGHBOR\n");
-+        ctx->kernel_name = "neighbor";
-+        ctx->kernel_name_uv = "neighbor_uv";
++    } else if (ctx->algorithm == F_NEIGHBOR ||
++               ctx->algorithm == F_BILINEAR) {
++        if (ctx->in_fmt == AV_PIX_FMT_NV15) {
++            av_bprintf(&header, "#define CONV\n");
++            ctx->kernel_name_conv = "conv_yuv";
++        }
++        av_bprintf(&header, "#define SCALE_BUILTIN\n");
++        av_bprintf(&header, "#define SCALE_BUILTIN_%s\n",
++            ctx->algorithm == F_BILINEAR ? "BILINEAR" : "NEIGHBOR");
++        ctx->kernel_name = "scale_builtin";
++        ctx->kernel_name_uv = "scale_builtin_uv";
 +    } else {
++        if (ctx->in_fmt == AV_PIX_FMT_NV15) {
++            av_bprintf(&header, "#define CONV\n");
++            ctx->kernel_name_conv = "conv_yuv";
++        }
 +        av_bprintf(&header, "#define SCALE\n");
 +        ctx->kernel_name = "scale";
 +        ctx->kernel_name_uv = "scale_uv";
@@ -651,6 +765,9 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    if (ctx->out_planes > 2)
 +        av_bprintf(&header, "#define NON_SEMI_PLANAR_OUT\n");
 +
++    if (ctx->in_fmt == AV_PIX_FMT_NV15)
++        av_bprintf(&header, "#define P010LE_COMPACT_IN\n");
++
 +    if (ctx->in_desc->comp[0].depth > ctx->out_desc->comp[0].depth) {
 +        av_bprintf(&header, "#define ENABLE_DITHER\n");
 +        av_bprintf(&header, "__constant float dither_size2 = %.4ff;\n", (float)(ff_fruit_dither_size * ff_fruit_dither_size));
@@ -726,6 +843,35 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +        }
 +    }
 +
++    if (ctx->kernel_name_conv) {
++        enum AVPixelFormat tmp_fmt;
++        av_assert0(ctx->in_fmt == AV_PIX_FMT_NV15);
++
++        ctx->kernel_conv = clCreateKernel(ctx->ocf.program, ctx->kernel_name_conv, &cle);
++        if (!ctx->kernel_conv) {
++            av_log(avctx, AV_LOG_ERROR, "Failed to create kernel_conv: %d.\n", cle);
++            err = AVERROR(EIO);
++            goto fail;
++        }
++        /* for scaling P010 compact: 1st pass conv & 2nd pass scale */
++        tmp_fmt = ctx->out_desc->comp[0].depth <= 8 ? AV_PIX_FMT_NV12 : AV_PIX_FMT_P010;
++        if ((err = init_tmp_hwframes_ctx(avctx, tmp_fmt, ctx->src_w, ctx->src_h)) < 0)
++            goto fail;
++
++        if (ctx->tmp_frame)
++            av_frame_free(&ctx->tmp_frame);
++
++        ctx->tmp_frame = av_frame_alloc();
++        if (!ctx->tmp_frame) {
++            err = AVERROR(ENOMEM);
++            goto fail;
++        }
++        if ((err = av_hwframe_get_buffer(ctx->tmp_hwframes_ctx, ctx->tmp_frame, 0)) < 0) {
++            av_buffer_unref(&ctx->tmp_hwframes_ctx);
++            goto fail;
++        }
++    }
++
 +    ctx->initialised = 1;
 +    return 0;
 +
@@ -737,6 +883,8 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +        clReleaseKernel(ctx->kernel);
 +    if (ctx->kernel_uv)
 +        clReleaseKernel(ctx->kernel_uv);
++    if (ctx->kernel_conv)
++        clReleaseKernel(ctx->kernel_conv);
 +    if (event)
 +        clReleaseEvent(event);
 +    if (ctx->dither_image)
@@ -762,8 +910,10 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +
 +static int scale_opencl_config_output(AVFilterLink *outlink)
 +{
++    FilterLink        *outl = ff_filter_link(outlink);
 +    AVFilterContext  *avctx = outlink->src;
 +    AVFilterLink    *inlink = avctx->inputs[0];
++    FilterLink         *inl = ff_filter_link(inlink);
 +    ScaleOpenCLContext *ctx = avctx->priv;
 +    AVHWFramesContext *in_frames_ctx;
 +    enum AVPixelFormat in_format;
@@ -772,9 +922,9 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    const AVPixFmtDescriptor *out_desc;
 +    int ret;
 +
-+    if (!inlink->hw_frames_ctx)
++    if (!inl->hw_frames_ctx)
 +        return AVERROR(EINVAL);
-+    in_frames_ctx = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
++    in_frames_ctx = (AVHWFramesContext*)inl->hw_frames_ctx->data;
 +    in_format     = in_frames_ctx->sw_format;
 +    out_format    = (ctx->format == AV_PIX_FMT_NONE) ? in_format : ctx->format;
 +    in_desc       = av_pix_fmt_desc_get(in_format);
@@ -818,13 +968,18 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    ctx->ocf.output_height = ctx->dst_h;
 +
 +    if (ctx->passthrough && ctx->src_w == ctx->dst_w && ctx->src_h == ctx->dst_h && ctx->in_fmt == ctx->out_fmt) {
-+        av_buffer_unref(&outlink->hw_frames_ctx);
-+        outlink->hw_frames_ctx = av_buffer_ref(inlink->hw_frames_ctx);
-+        if (!outlink->hw_frames_ctx)
++        av_buffer_unref(&outl->hw_frames_ctx);
++        outl->hw_frames_ctx = av_buffer_ref(inl->hw_frames_ctx);
++        if (!outl->hw_frames_ctx)
 +            return AVERROR(ENOMEM);
 +        return 0;
 +    } else {
 +        ctx->passthrough = 0;
++        if (out_format == AV_PIX_FMT_NV15) {
++            av_log(ctx, AV_LOG_ERROR, "Unsupported output format: %s\n",
++                   av_get_pix_fmt_name(out_format));
++            return AVERROR(ENOSYS);
++        }
 +    }
 +
 +    ret = ff_opencl_filter_config_output(outlink);
@@ -842,18 +997,134 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +                              ff_default_get_video_buffer(inlink, w, h);
 +}
 +
++static int scale_opencl_filter_frame_internal(AVFilterLink *inlink,
++                                              AVFrame *input, AVFrame *output,
++                                              int in_planes, int out_planes, int conv)
++{
++    AVFilterContext     *avctx = inlink->dst;
++    ScaleOpenCLContext    *ctx = avctx->priv;
++    int x_subsample = 1 << ctx->in_desc->log2_chroma_w;
++    int y_subsample = 1 << ctx->in_desc->log2_chroma_h;
++    size_t global_work[2];
++    cl_kernel kernel = (conv && ctx->kernel_conv) ? ctx->kernel_conv : ctx->kernel;
++    cl_int cle;
++    cl_int2 src_size, uv_size;
++    int err, idx_arg1, idx_arg2;
++
++    if (!output->data[0] || !input->data[0] || !output->data[1] || !input->data[1]) {
++        err = AVERROR(EIO);
++        goto fail;
++    }
++
++    if (out_planes > 2 && !output->data[2]) {
++        err = AVERROR(EIO);
++        goto fail;
++    }
++
++    if (in_planes > 2 && !input->data[2]) {
++        err = AVERROR(EIO);
++        goto fail;
++    }
++
++    CL_SET_KERNEL_ARG(kernel, 0, cl_mem, &output->data[0]);
++    CL_SET_KERNEL_ARG(kernel, 1, cl_mem, &input->data[0]);
++
++    if (conv) {
++        CL_SET_KERNEL_ARG(kernel, 2, cl_mem, &output->data[1]);
++        CL_SET_KERNEL_ARG(kernel, 3, cl_mem, &input->data[1]);
++
++        idx_arg1 = 4;
++        if (out_planes > 2) {
++            CL_SET_KERNEL_ARG(kernel, idx_arg1++, cl_mem, &output->data[2]);
++        }
++        if (in_planes > 2) {
++            CL_SET_KERNEL_ARG(kernel, idx_arg1++, cl_mem, &input->data[2]);
++        }
++        if (ctx->dither_image) {
++            CL_SET_KERNEL_ARG(kernel, idx_arg1++, cl_mem, &ctx->dither_image);
++        }
++
++        // conv_yuv
++        global_work[0] = output->width / x_subsample;
++        global_work[1] = output->height / y_subsample;
++
++        av_log(avctx, AV_LOG_DEBUG, "Run kernel conv_yuv "
++               "(%"SIZE_SPECIFIER"x%"SIZE_SPECIFIER").\n",
++               global_work[0], global_work[1]);
++
++        cle = clEnqueueNDRangeKernel(ctx->command_queue, kernel, 2, NULL,
++                                     global_work, NULL, 0, NULL, NULL);
++        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to enqueue kernel: %d.\n", cle);
++    } else {
++        CL_SET_KERNEL_ARG(ctx->kernel_uv, 0, cl_mem, &output->data[1]);
++        CL_SET_KERNEL_ARG(ctx->kernel_uv, 1, cl_mem, &input->data[1]);
++
++        idx_arg1 = 2;
++        if (ctx->out_planes > 2) {
++            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &output->data[2]);
++        }
++        if (ctx->in_planes > 2) {
++            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &input->data[2]);
++        }
++
++        idx_arg2 = 2;
++        if (ctx->dither_image) {
++            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_mem, &ctx->dither_image);
++        }
++        if (!(ctx->algorithm == F_NEIGHBOR || ctx->algorithm == F_BILINEAR)) {
++            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_mem, &ctx->cx);
++            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_mem, &ctx->cy);
++
++            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &ctx->cx);
++            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &ctx->cy);
++        }
++
++        src_size.s[0] = ctx->src_w;
++        src_size.s[1] = ctx->src_h;
++        uv_size.s[0] = src_size.s[0] / x_subsample;
++        uv_size.s[1] = src_size.s[1] / y_subsample;
++        CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_int2, &src_size);
++        CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_int2, &uv_size);
++
++        // scale, scale_builtin
++        global_work[0] = output->width;
++        global_work[1] = output->height;
++
++        av_log(avctx, AV_LOG_DEBUG, "Run kernel %s "
++               "(%"SIZE_SPECIFIER"x%"SIZE_SPECIFIER").\n",
++               ctx->kernel_name, global_work[0], global_work[1]);
++
++        cle = clEnqueueNDRangeKernel(ctx->command_queue, ctx->kernel, 2, NULL,
++                                     global_work, NULL, 0, NULL, NULL);
++        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to enqueue kernel: %d.\n", cle);
++
++        // scale_uv, scale_builtin_uv
++        global_work[0] = output->width / x_subsample;
++        global_work[1] = output->height / y_subsample;
++
++        av_log(avctx, AV_LOG_DEBUG, "Run kernel %s "
++               "(%"SIZE_SPECIFIER"x%"SIZE_SPECIFIER").\n",
++               ctx->kernel_name_uv, global_work[0], global_work[1]);
++
++        cle = clEnqueueNDRangeKernel(ctx->command_queue, ctx->kernel_uv, 2, NULL,
++                                     global_work, NULL, 0, NULL, NULL);
++        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to enqueue kernel: %d.\n", cle);
++    }
++
++    return 0;
++
++fail:
++    return err;
++}
++
 +static int scale_opencl_filter_frame(AVFilterLink *inlink, AVFrame *input)
 +{
 +    AVFilterContext     *avctx = inlink->dst;
 +    AVFilterLink      *outlink = avctx->outputs[0];
 +    ScaleOpenCLContext    *ctx = avctx->priv;
-+    int x_subsample = 1 << ctx->in_desc->log2_chroma_w;
-+    int y_subsample = 1 << ctx->in_desc->log2_chroma_h;
 +    AVFrame *output = NULL;
-+    size_t global_work[2];
 +    cl_int cle;
-+    cl_int2 src_size, uv_size;
-+    int err, idx_arg1, idx_arg2;
++    int err;
 +
 +    av_log(ctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
 +           av_get_pix_fmt_name(input->format),
@@ -883,104 +1154,16 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    output->width  = outlink->w;
 +    output->height = outlink->h;
 +
-+    if (!output->data[0] || !input->data[0] || !output->data[1] || !input->data[1]) {
-+        err = AVERROR(EIO);
-+        goto fail;
-+    }
-+
-+    if (ctx->out_planes > 2 && !output->data[2]) {
-+        err = AVERROR(EIO);
-+        goto fail;
-+    }
-+
-+    if (ctx->in_planes > 2 && !input->data[2]) {
-+        err = AVERROR(EIO);
-+        goto fail;
-+    }
-+
-+    CL_SET_KERNEL_ARG(ctx->kernel, 0, cl_mem, &output->data[0]);
-+    CL_SET_KERNEL_ARG(ctx->kernel, 1, cl_mem, &input->data[0]);
-+
-+    if (ctx->src_w == ctx->dst_w && ctx->src_h == ctx->dst_h) {
-+        CL_SET_KERNEL_ARG(ctx->kernel, 2, cl_mem, &output->data[1]);
-+        CL_SET_KERNEL_ARG(ctx->kernel, 3, cl_mem, &input->data[1]);
-+
-+        idx_arg1 = 4;
-+        if (ctx->out_planes > 2) {
-+            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg1++, cl_mem, &output->data[2]);
-+        }
-+        if (ctx->in_planes > 2) {
-+            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg1++, cl_mem, &input->data[2]);
-+        }
-+        if (ctx->dither_image) {
-+            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg1++, cl_mem, &ctx->dither_image);
-+        }
-+
-+        // conv_yuv
-+        global_work[0] = output->width / x_subsample;
-+        global_work[1] = output->height / y_subsample;
-+
-+        av_log(avctx, AV_LOG_DEBUG, "Run kernel %s "
-+               "(%"SIZE_SPECIFIER"x%"SIZE_SPECIFIER").\n",
-+               ctx->kernel_name, global_work[0], global_work[1]);
-+
-+        cle = clEnqueueNDRangeKernel(ctx->command_queue, ctx->kernel, 2, NULL,
-+                                     global_work, NULL, 0, NULL, NULL);
-+        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to enqueue kernel: %d.\n", cle);
++    if (ctx->in_fmt == AV_PIX_FMT_NV15 && !(ctx->src_w == ctx->dst_w && ctx->src_h == ctx->dst_h)) {
++        /* for scaling P010 compact: 1st pass conv & 2nd pass scale */
++        if ((err = scale_opencl_filter_frame_internal(inlink, input, ctx->tmp_frame, ctx->in_planes, 2, 1)) < 0)
++            goto fail;
++        if ((err = scale_opencl_filter_frame_internal(inlink, ctx->tmp_frame, output, 2, ctx->out_planes, 0)) < 0)
++            goto fail;
 +    } else {
-+        CL_SET_KERNEL_ARG(ctx->kernel_uv, 0, cl_mem, &output->data[1]);
-+        CL_SET_KERNEL_ARG(ctx->kernel_uv, 1, cl_mem, &input->data[1]);
-+
-+        idx_arg1 = 2;
-+        if (ctx->out_planes > 2) {
-+            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &output->data[2]);
-+        }
-+        if (ctx->in_planes > 2) {
-+            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &input->data[2]);
-+        }
-+
-+        idx_arg2 = 2;
-+        if (ctx->dither_image) {
-+            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_mem, &ctx->dither_image);
-+        }
-+        if (ctx->algorithm != F_NEIGHBOR) {
-+            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_mem, &ctx->cx);
-+            CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_mem, &ctx->cy);
-+
-+            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &ctx->cx);
-+            CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_mem, &ctx->cy);
-+        }
-+
-+        src_size.s[0] = ctx->src_w;
-+        src_size.s[1] = ctx->src_h;
-+        uv_size.s[0] = src_size.s[0] / x_subsample;
-+        uv_size.s[1] = src_size.s[1] / y_subsample;
-+        CL_SET_KERNEL_ARG(ctx->kernel, idx_arg2++, cl_int2, &src_size);
-+        CL_SET_KERNEL_ARG(ctx->kernel_uv, idx_arg1++, cl_int2, &uv_size);
-+
-+        // scale, neighbor
-+        global_work[0] = output->width;
-+        global_work[1] = output->height;
-+
-+        av_log(avctx, AV_LOG_DEBUG, "Run kernel %s "
-+               "(%"SIZE_SPECIFIER"x%"SIZE_SPECIFIER").\n",
-+               ctx->kernel_name, global_work[0], global_work[1]);
-+
-+        cle = clEnqueueNDRangeKernel(ctx->command_queue, ctx->kernel, 2, NULL,
-+                                     global_work, NULL, 0, NULL, NULL);
-+        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to enqueue kernel: %d.\n", cle);
-+
-+        // scale_uv, neighbor_uv
-+        global_work[0] = output->width / x_subsample;
-+        global_work[1] = output->height / y_subsample;
-+
-+        av_log(avctx, AV_LOG_DEBUG, "Run kernel %s "
-+               "(%"SIZE_SPECIFIER"x%"SIZE_SPECIFIER").\n",
-+               ctx->kernel_name_uv, global_work[0], global_work[1]);
-+
-+        cle = clEnqueueNDRangeKernel(ctx->command_queue, ctx->kernel_uv, 2, NULL,
-+                                     global_work, NULL, 0, NULL, NULL);
-+        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to enqueue kernel: %d.\n", cle);
++        if ((err = scale_opencl_filter_frame_internal(inlink, input, output, ctx->in_planes, ctx->out_planes,
++                                                      ctx->src_w == ctx->dst_w && ctx->src_h == ctx->dst_h)) < 0)
++            goto fail;
 +    }
 +
 +    cle = clFinish(ctx->command_queue);
@@ -1006,6 +1189,12 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    ScaleOpenCLContext *ctx = avctx->priv;
 +    cl_int cle;
 +
++    if (ctx->tmp_frame)
++        av_frame_free(&ctx->tmp_frame);
++
++    if (ctx->tmp_hwframes_ctx)
++        av_buffer_unref(&ctx->tmp_hwframes_ctx);
++
 +    if (ctx->kernel) {
 +        cle = clReleaseKernel(ctx->kernel);
 +        if (cle != CL_SUCCESS)
@@ -1018,6 +1207,13 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +        if (cle != CL_SUCCESS)
 +            av_log(avctx, AV_LOG_ERROR, "Failed to release "
 +                   "kernel_uv: %d.\n", cle);
++    }
++
++    if (ctx->kernel_conv) {
++        cle = clReleaseKernel(ctx->kernel_conv);
++        if (cle != CL_SUCCESS)
++            av_log(avctx, AV_LOG_ERROR, "Failed to release "
++                   "kernel_conv: %d.\n", cle);
 +    }
 +
 +    if (ctx->command_queue) {
@@ -1068,11 +1264,11 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +        { "sinc",         "Sinc",             0, AV_OPT_TYPE_CONST, { .i64 = F_SINC         }, 0, 0, FLAGS, .unit = "algo" },
 +        { "spline",       "Bicubic Spline",   0, AV_OPT_TYPE_CONST, { .i64 = F_SPLINE       }, 0, 0, FLAGS, .unit = "algo" },
 +        { "experimental", "Experimental",     0, AV_OPT_TYPE_CONST, { .i64 = F_EXPERIMENTAL }, 0, 0, FLAGS, .unit = "algo" },
-+    { "force_original_aspect_ratio", "Decrease or increase w/h if necessary to keep the original AR", OFFSET(force_original_aspect_ratio), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 2, FLAGS, .unit = "force_oar" },
++    { "force_original_aspect_ratio", "Decrease or increase w/h if necessary to keep the original AR", OFFSET(force_original_aspect_ratio), AV_OPT_TYPE_INT, { .i64 = 1 }, 0, 2, FLAGS, .unit = "force_oar" },
 +        { "disable",       NULL,              0, AV_OPT_TYPE_CONST, {.i64 = 0 }, 0, 0, FLAGS, .unit = "force_oar" },
 +        { "decrease",      NULL,              0, AV_OPT_TYPE_CONST, {.i64 = 1 }, 0, 0, FLAGS, .unit = "force_oar" },
 +        { "increase",      NULL,              0, AV_OPT_TYPE_CONST, {.i64 = 2 }, 0, 0, FLAGS, .unit = "force_oar" },
-+    { "force_divisible_by", "Enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 1 }, 1, 256, FLAGS },
++    { "force_divisible_by", "Enforce that the output resolution is divisible by a defined integer when force_original_aspect_ratio is used", OFFSET(force_divisible_by), AV_OPT_TYPE_INT, { .i64 = 2 }, 1, 256, FLAGS },
 +    { NULL }
 +};
 +

@@ -1,0 +1,242 @@
+Index: FFmpeg/libavcodec/hevc/hevcdec.c
+===================================================================
+--- libavcodec/hevc/hevcdec.c
++++ libavcodec/hevc/hevcdec.c
+@@ -3257,9 +3257,19 @@ static int hevc_frame_start(HEVCContext
+     s->first_nal_type    = s->nal_unit_type;
+     s->poc               = s->sh.poc;
+ 
+-    if (IS_IRAP(s))
++    if (IS_IRAP(s)) {
+         s->no_rasl_output_flag = IS_IDR(s) || IS_BLA(s) ||
+                                  (s->nal_unit_type == HEVC_NAL_CRA_NUT && s->last_eos);
++        s->recovery_poc = HEVC_RECOVERY_END;
++    }
++
++    if (s->recovery_poc != HEVC_RECOVERY_END &&
++        s->sei.recovery_point.has_recovery_poc) {
++        if (s->recovery_poc == HEVC_RECOVERY_UNSPECIFIED)
++            s->recovery_poc = s->poc + s->sei.recovery_point.recovery_poc_cnt;
++        else if (s->poc >= s->recovery_poc)
++            s->recovery_poc = HEVC_RECOVERY_END;
++    }
+ 
+     /* 8.3.1 */
+     if (s->temporal_id == 0 &&
+@@ -3635,6 +3645,12 @@ fail:
+     return ret;
+ }
+ 
++static void decode_reset_recovery_point(HEVCContext *s)
++{
++    s->recovery_poc = HEVC_RECOVERY_UNSPECIFIED;
++    s->sei.recovery_point.has_recovery_poc = 0;
++}
++
+ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
+ {
+     int i, ret = 0;
+@@ -3645,6 +3661,8 @@ static int decode_nal_units(HEVCContext
+     s->last_eos = s->eos;
+     s->eos = 0;
+     s->slice_initialized = 0;
++    if (s->last_eos)
++        decode_reset_recovery_point(s);
+ 
+     for (int i = 0; i < FF_ARRAY_ELEMS(s->layers); i++) {
+         HEVCLayerContext *l = &s->layers[i];
+@@ -3666,6 +3684,7 @@ static int decode_nal_units(HEVCContext
+             s->pkt.nals[i].type == HEVC_NAL_EOS_NUT) {
+             if (eos_at_start) {
+                 s->last_eos = 1;
++                decode_reset_recovery_point(s);
+             } else {
+                 s->eos = 1;
+             }
+@@ -4040,6 +4059,8 @@ static int hevc_update_thread_context(AV
+     s->sei.common.mastering_display    = s0->sei.common.mastering_display;
+     s->sei.common.content_light        = s0->sei.common.content_light;
+     s->sei.tdrdi                       = s0->sei.tdrdi;
++    s->sei.recovery_point              = s0->sei.recovery_point;
++    s->recovery_poc                    = s0->recovery_poc;
+ 
+     return 0;
+ }
+Index: FFmpeg/libavcodec/hevc/hevcdec.h
+===================================================================
+--- libavcodec/hevc/hevcdec.h
++++ libavcodec/hevc/hevcdec.h
+@@ -78,6 +78,10 @@
+                    (s)->nal_unit_type == HEVC_NAL_BLA_N_LP)
+ #define IS_IRAP(s) ((s)->nal_unit_type >= HEVC_NAL_BLA_W_LP && (s)->nal_unit_type <= HEVC_NAL_RSV_IRAP_VCL23)
+ 
++#define HEVC_RECOVERY_UNSPECIFIED INT_MAX
++#define HEVC_RECOVERY_END INT_MIN
++#define HEVC_IS_RECOVERING(s) ((s)->recovery_poc != HEVC_RECOVERY_UNSPECIFIED && (s)->recovery_poc != HEVC_RECOVERY_END)
++
+ enum RPSType {
+     ST_CURR_BEF = 0,
+     ST_CURR_AFT,
+@@ -353,6 +357,7 @@ typedef struct DBParams {
+ #define HEVC_FRAME_FLAG_SHORT_REF (1 << 1)
+ #define HEVC_FRAME_FLAG_LONG_REF  (1 << 2)
+ #define HEVC_FRAME_FLAG_UNAVAILABLE (1 << 3)
++#define HEVC_FRAME_FLAG_CORRUPT (1 << 4)
+ 
+ typedef struct HEVCFrame {
+     union {
+@@ -523,6 +528,7 @@ typedef struct HEVCContext {
+     int slice_idx; ///< number of the slice being currently decoded
+     int eos;       ///< current packet contains an EOS/EOB NAL
+     int last_eos;  ///< last packet contains an EOS/EOB NAL
++    int recovery_poc;
+ 
+     // NoRaslOutputFlag associated with the last IRAP frame
+     int no_rasl_output_flag;
+Index: FFmpeg/libavcodec/hevc/refs.c
+===================================================================
+--- libavcodec/hevc/refs.c
++++ libavcodec/hevc/refs.c
+@@ -34,6 +34,8 @@
+ void ff_hevc_unref_frame(HEVCFrame *frame, int flags)
+ {
+     frame->flags &= ~flags;
++    if (!(frame->flags & ~HEVC_FRAME_FLAG_CORRUPT))
++        frame->flags = 0;
+     if (!frame->flags) {
+         ff_progress_frame_unref(&frame->tf);
+         av_frame_unref(frame->frame_grain);
+@@ -176,6 +178,7 @@ int ff_hevc_set_new_ref(HEVCContext *s,
+ {
+     HEVCFrame *ref;
+     int i;
++    int no_output;
+ 
+     /* check that this POC doesn't already exist */
+     for (i = 0; i < FF_ARRAY_ELEMS(l->DPB); i++) {
+@@ -199,7 +202,11 @@ int ff_hevc_set_new_ref(HEVCContext *s,
+     ref->base_layer_frame = (l != &s->layers[0] && s->layers[0].cur_frame) ?
+                             s->layers[0].cur_frame - s->layers[0].DPB : -1;
+ 
+-    if (s->sh.pic_output_flag)
++    no_output = !IS_IRAP(s) && (s->poc < s->recovery_poc) &&
++                HEVC_IS_RECOVERING(s) &&
++                !(s->avctx->flags & AV_CODEC_FLAG_OUTPUT_CORRUPT) &&
++                !(s->avctx->flags2 & AV_CODEC_FLAG2_SHOW_ALL);
++    if (s->sh.pic_output_flag && !no_output)
+         ref->flags = HEVC_FRAME_FLAG_OUTPUT | HEVC_FRAME_FLAG_SHORT_REF;
+     else
+         ref->flags = HEVC_FRAME_FLAG_SHORT_REF;
+@@ -266,6 +273,8 @@ int ff_hevc_output_frames(HEVCContext *s
+             int output = !discard && (layers_active_output & (1 << min_layer));
+ 
+             if (output) {
++                if (frame->flags & HEVC_FRAME_FLAG_CORRUPT)
++                    f->flags |= AV_FRAME_FLAG_CORRUPT;
+                 f->pkt_dts = s->pkt_dts;
+                 ret = ff_container_fifo_write(s->output_fifo, f);
+             }
+@@ -462,6 +471,20 @@ static int add_candidate_ref(HEVCContext
+     if (ref == s->cur_frame || list->nb_refs >= HEVC_MAX_REFS)
+         return AVERROR_INVALIDDATA;
+ 
++    if (!IS_IRAP(s)) {
++        int ref_corrupt = !ref || ref->flags & (HEVC_FRAME_FLAG_CORRUPT |
++                                                HEVC_FRAME_FLAG_UNAVAILABLE);
++        int recovering = HEVC_IS_RECOVERING(s);
++
++        if (ref_corrupt && !recovering) {
++            if (!(s->avctx->flags & AV_CODEC_FLAG_OUTPUT_CORRUPT) &&
++                !(s->avctx->flags2 & AV_CODEC_FLAG2_SHOW_ALL))
++                return AVERROR_INVALIDDATA;
++
++            s->cur_frame->flags |= HEVC_FRAME_FLAG_CORRUPT;
++        }
++    }
++
+     if (!ref) {
+         ref = generate_missing_ref(s, l, poc);
+         if (!ref)
+Index: FFmpeg/libavcodec/hevc/sei.c
+===================================================================
+--- libavcodec/hevc/sei.c
++++ libavcodec/hevc/sei.c
+@@ -79,6 +79,21 @@ static int decode_nal_sei_pic_timing(HEV
+     return 0;
+ }
+ 
++static int decode_nal_sei_recovery_point(HEVCSEI *s, GetBitContext *gb)
++{
++    HEVCSEIRecoveryPoint *rec = &s->recovery_point;
++    int recovery_poc_cnt = get_se_golomb(gb);
++
++    if (recovery_poc_cnt > INT16_MAX || recovery_poc_cnt < INT16_MIN)
++        return AVERROR_INVALIDDATA;
++    rec->recovery_poc_cnt = recovery_poc_cnt;
++    rec->exact_match_flag = get_bits1(gb);
++    rec->broken_link_flag = get_bits1(gb);
++    rec->has_recovery_poc = 1;
++
++    return 0;
++}
++
+ static int decode_nal_sei_active_parameter_sets(HEVCSEI *s, GetBitContext *gb, void *logctx)
+ {
+     int num_sps_ids_minus1;
+@@ -212,6 +227,8 @@ static int decode_nal_sei_prefix(GetBitC
+         return decode_nal_sei_decoded_picture_hash(&s->picture_hash, gbyte);
+     case SEI_TYPE_PIC_TIMING:
+         return decode_nal_sei_pic_timing(s, gb, ps, logctx);
++    case SEI_TYPE_RECOVERY_POINT:
++        return decode_nal_sei_recovery_point(s, gb);
+     case SEI_TYPE_ACTIVE_PARAMETER_SETS:
+         return decode_nal_sei_active_parameter_sets(s, gb, logctx);
+     case SEI_TYPE_TIME_CODE:
+Index: FFmpeg/libavcodec/hevc/sei.h
+===================================================================
+--- libavcodec/hevc/sei.h
++++ libavcodec/hevc/sei.h
+@@ -95,6 +95,13 @@ typedef struct HEVCSEITDRDI {
+     uint8_t three_dimensional_reference_displays_extension_flag;
+ } HEVCSEITDRDI;
+ 
++typedef struct HEVCSEIRecoveryPoint {
++    int16_t recovery_poc_cnt;
++    uint8_t exact_match_flag;
++    uint8_t broken_link_flag;
++    uint8_t has_recovery_poc;
++} HEVCSEIRecoveryPoint;
++
+ typedef struct HEVCSEI {
+     H2645SEI common;
+     HEVCSEIPictureHash picture_hash;
+@@ -102,6 +109,7 @@ typedef struct HEVCSEI {
+     int active_seq_parameter_set_id;
+     HEVCSEITimeCode timecode;
+     HEVCSEITDRDI tdrdi;
++    HEVCSEIRecoveryPoint recovery_point;
+ } HEVCSEI;
+ 
+ struct HEVCParamSets;
+Index: FFmpeg/tests/fate/hevc.mak
+===================================================================
+--- tests/fate/hevc.mak
++++ tests/fate/hevc.mak
+@@ -207,7 +207,7 @@ $(HEVC_TESTS_444_8BIT): SCALE_OPTS := -p
+ $(HEVC_TESTS_10BIT): SCALE_OPTS := -pix_fmt yuv420p10le -vf scale
+ $(HEVC_TESTS_422_10BIT) $(HEVC_TESTS_422_10BIN): SCALE_OPTS := -pix_fmt yuv422p10le -vf scale
+ $(HEVC_TESTS_444_12BIT): SCALE_OPTS := -pix_fmt yuv444p12le -vf scale
+-fate-hevc-conformance-%: CMD = framecrc -i $(TARGET_SAMPLES)/hevc-conformance/$(subst fate-hevc-conformance-,,$(@)).bit $(SCALE_OPTS)
++fate-hevc-conformance-%: CMD = framecrc -flags output_corrupt -i $(TARGET_SAMPLES)/hevc-conformance/$(subst fate-hevc-conformance-,,$(@)).bit $(SCALE_OPTS)
+ $(HEVC_TESTS_422_10BIN): CMD = framecrc -i $(TARGET_SAMPLES)/hevc-conformance/$(subst fate-hevc-conformance-,,$(@)).bin $(SCALE_OPTS)
+ $(HEVC_TESTS_MULTIVIEW): CMD = framecrc -i $(TARGET_SAMPLES)/hevc-conformance/$(subst fate-hevc-conformance-,,$(@)).bit \
+ 	-pix_fmt yuv420p -map "0:view:0" -map "0:view:1" -vf setpts=N:strip_fps=1
+@@ -248,7 +248,7 @@ FATE_HEVC_FFPROBE-$(call DEMDEC, HEVC, H
+ fate-hevc-monochrome-crop: CMD = probeframes -show_entries frame=width,height:stream=width,height $(TARGET_SAMPLES)/hevc/hevc-monochrome.hevc
+ FATE_HEVC_FFPROBE-$(call PARSERDEMDEC, HEVC, HEVC, HEVC) += fate-hevc-monochrome-crop
+ 
+-fate-hevc-afd-tc-sei: CMD = run ffprobe$(PROGSSUF)$(EXESUF) -bitexact -show_entries frame_side_data_list -select_streams v $(TARGET_SAMPLES)/mpegts/loewe.ts
++fate-hevc-afd-tc-sei: CMD = run ffprobe$(PROGSSUF)$(EXESUF) -bitexact -flags output_corrupt -show_entries frame_side_data_list -select_streams v $(TARGET_SAMPLES)/mpegts/loewe.ts
+ FATE_HEVC_FFPROBE-$(call PARSERDEMDEC, HEVC, HEVC, HEVC) += fate-hevc-afd-tc-sei
+ 
+ fate-hevc-hdr10-plus-metadata: CMD = probeframes -show_entries frame=side_data_list $(TARGET_SAMPLES)/hevc/hdr10_plus_h265_sample.hevc
