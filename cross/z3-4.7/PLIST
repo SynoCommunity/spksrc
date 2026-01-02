@@ -1,0 +1,4 @@
+bin:bin/z3
+lnk:lib/libz3.so
+lnk:lib/libz3.so.4.7
+lib:lib/libz3.so.4.7.1.0
