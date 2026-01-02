@@ -1,7 +1,17 @@
-# Configuration for CMake build
 #
-CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
+# Configuration for NATIVE CMake build
+#
+
+ifeq ($(strip $(filter -DCMAKE_BUILD_TYPE=%,$(CMAKE_ARGS))),)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release
+endif
+
+# Native build: install to staging prefix with
+# RPATH pointing to ../lib for relocatable execution
+CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH='$$ORIGIN/../lib'
+CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF
 
 # Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)

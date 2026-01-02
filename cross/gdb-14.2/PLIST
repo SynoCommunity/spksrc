@@ -2,6 +2,5 @@ rsc:bin/gcore
 bin:bin/gdb
 rsc:bin/gdb-add-index
 bin:bin/gdbserver
-bin:bin/gstack
 bin:bin/run
 lib:lib/libinproctrace.so
