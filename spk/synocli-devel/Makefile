@@ -1,11 +1,11 @@
 SPK_NAME = synocli-devel
-SPK_VERS = 1.3
-SPK_REV = 4
+SPK_VERS = 1.4
+SPK_REV = 5
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Fix autoconf to use installed m4 command.<br/>2. Update autoconf to v2.72.<br/>3. Update binutils to v2.42.<br/>4. Update gdb to v14.2.<br/>5. Update strace to v6.9."
+CHANGELOG = "1. Update LLVM to 21.1.8 (DSM7\).<br/>2. Update to GDB 17.1 (DSM7\).<br/>3. Update binutils to v2.45.<br/>4. Update automake to 1.18.1.<br/>5. Update strate to 6.18."
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.5
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.18.1, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.18
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -16,7 +16,7 @@ SPK_DEPENDS = "Perl"
 
 OPTIONAL_DEPENDS = cross/llvm
 
-include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.spk.mk
 
 ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 DEPENDS += cross/llvm
@@ -93,8 +93,10 @@ SPK_COMMANDS += bin/strip
 ##
 ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 OPTIONAL_DESC += ", gdb 7.12.1"
+else ifeq ($(call version_lt, $(TC_GCC), 5),1)
+OPTIONAL_DESC += ", gdb 14.2"
 else
-OPTIONAL_DESC += ", gdb 13.2"
+OPTIONAL_DESC += ", gdb 17.1"
 endif
 SPK_COMMANDS += bin/gcore
 SPK_COMMANDS += bin/gdb
@@ -109,8 +111,8 @@ endif
 ##
 ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
-OPTIONAL_DESC += ", LLVM 16.0.6"
-SPK_COMMANDS += bin/clang-16
+OPTIONAL_DESC += ", LLVM 21.1.8"
+SPK_COMMANDS += bin/clang-21
 else
 OPTIONAL_DESC += ", LLVM 9.0.1"
 SPK_COMMANDS += bin/clang-9
@@ -168,6 +170,3 @@ SPK_COMMANDS += bin/libtree
 ##
 SPK_COMMANDS += bin/strace
 SPK_COMMANDS += bin/strace-log-merge
-
-
-include ../../mk/spksrc.spk.mk
