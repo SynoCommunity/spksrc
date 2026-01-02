@@ -1,0 +1,6 @@
+bin:bin/tor
+bin:bin/tor-gencert
+bin:bin/torify
+bin:bin/tor-resolve
+shr:share/tor/geoip
+shr:share/tor/geoip6
