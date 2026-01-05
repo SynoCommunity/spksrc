@@ -47,21 +47,21 @@ ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 endif
 endif
 	@echo "# set default compiler flags for cross-compiling" ; \
-	echo 'set(CMAKE_C_FLAGS $(strip "$(CFLAGS) $(CMAKE_C_FLAGS)"))' ; \
-	echo 'set(CMAKE_CPP_FLAGS $(strip "$(CPPFLAGS) $(CMAKE_CPP_FLAGS)"))' ; \
-	echo 'set(CMAKE_CXX_FLAGS $(strip "$(CXXFLAGS) $(CMAKE_CXX_FLAGS)"))' ; \
+	echo 'set(CMAKE_C_FLAGS "$(strip $(CFLAGS) $(CMAKE_C_FLAGS))")' ; \
+	echo 'set(CMAKE_CPP_FLAGS "$(strip $(CPPFLAGS) $(CMAKE_CPP_FLAGS))")' ; \
+	echo 'set(CMAKE_CXX_FLAGS "$(strip $(CXXFLAGS) $(CMAKE_CXX_FLAGS))")' ; \
 	echo
 ifeq ($(GCC_DEBUG_INFO),1)
 	@echo "# set Debug compiler extra flags for cross-compiling (and deactivate C/C++ assert)" ; \
-	echo 'set(CMAKE_C_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug C flags" FORCE)' ; \
-	echo 'set(CMAKE_CPP_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug CPP flags" FORCE)' ; \
-	echo 'set(CMAKE_CXX_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug CXX flags" FORCE)' ; \
+	echo 'set(CMAKE_C_FLAGS_DEBUG "$(strip $(GCC_DEBUG_FLAGS) -DNDEBUG)" CACHE STRING "Debug C flags" FORCE)' ; \
+	echo 'set(CMAKE_CPP_FLAGS_DEBUG "$(strip $(GCC_DEBUG_FLAGS) -DNDEBUG)" CACHE STRING "Debug CPP flags" FORCE)' ; \
+	echo 'set(CMAKE_CXX_FLAGS_DEBUG "$(strip $(GCC_DEBUG_FLAGS) -DNDEBUG)" CACHE STRING "Debug CXX flags" FORCE)' ; \
 	echo
 endif
 ifneq ($(strip $(CMAKE_DISABLE_EXE_LINKER_FLAGS)),1)
-	@echo 'set(CMAKE_EXE_LINKER_FLAGS $(strip "$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS)"))'
+	@echo 'set(CMAKE_EXE_LINKER_FLAGS "$(strip $(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS))")'
 endif
-	@echo 'set(CMAKE_SHARED_LINKER_FLAGS $(strip "$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS)"))' ; \
+	@echo 'set(CMAKE_SHARED_LINKER_FLAGS "$(strip $(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS))")' ; \
 	echo
 ifneq ($(strip $(BUILD_SHARED_LIBS)),)
 	@echo "# build shared library" ; \
