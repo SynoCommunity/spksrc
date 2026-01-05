@@ -5,15 +5,18 @@ MESON_CROSS_FILE_NAME = $(ARCH)-crossfile.meson
 MESON_CROSS_FILE_PKG = $(WORK_DIR)/$(PKG_DIR)/$(MESON_CROSS_FILE_NAME)
 CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_FILE_PKG)
 
-# Enforce running in a clean environement to avoid
-# issues between 'build' and 'host' environments
-ENV_MESON = $(addprefix -u ,$(VARS_TO_CLEAN)) $(ENV_FILTERED)
-RUN_MESON = cd $(MESON_BASE_DIR) && env $(ENV_MESON)
+# Default meson run environment
+RUN_MESON = cd $(MESON_BASE_DIR) && env $(ENV)
+
+# Map words to filenames
+TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_BUILD),$(WORK_DIR)/tc_vars.$(b).mk))
+# Include them (optional include)
+-include $(TC_VARS_FILES)
 
 .PHONY: $(MESON_CROSS_FILE_PKG)
 $(MESON_CROSS_FILE_PKG):
 	@$(MSG) Generating $(MESON_CROSS_FILE_PKG)
-	env $(MAKE) --no-print-directory generate_meson_crossfile_pkg > $(MESON_CROSS_FILE_PKG) 2>/dev/null;
+	env $(ENV) $(MAKE) --no-print-directory generate_meson_crossfile_pkg > $(MESON_CROSS_FILE_PKG) 2>/dev/null;
 
 .PHONY: generate_meson_crossfile_pkg
 generate_meson_crossfile_pkg: SHELL:=/bin/bash

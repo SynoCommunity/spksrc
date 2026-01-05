@@ -10,10 +10,13 @@ ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 CMAKE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE_PKG)
 endif
 
-# Enforce running in a clean environement to avoid
-# issues between 'build' and 'host' environments
-ENV_CMAKE = $(addprefix -u ,$(VARS_TO_CLEAN)) $(ENV_FILTERED)
-RUN_CMAKE = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV_CMAKE)
+# Default CMake run environment
+RUN_CMAKE = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
+
+# Map words to filenames
+TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_BUILD),$(WORK_DIR)/tc_vars.$(b).mk))
+# Include them (optional include)
+-include $(TC_VARS_FILES)
 
 .PHONY: $(CMAKE_TOOLCHAIN_FILE_PKG)
 $(CMAKE_TOOLCHAIN_FILE_PKG):
@@ -22,7 +25,7 @@ ifeq ($(wildcard $(CMAKE_BUILD_DIR)),)
 	@mkdir --parents $(CMAKE_BUILD_DIR)
 endif
 	@$(MSG) Generating $(CMAKE_TOOLCHAIN_FILE_PKG)
-	env $(MAKE) --no-print-directory cmake_pkg_toolchain > $(CMAKE_TOOLCHAIN_FILE_PKG) 2>/dev/null;
+	env $(ENV) $(MAKE) --no-print-directory cmake_pkg_toolchain > $(CMAKE_TOOLCHAIN_FILE_PKG) 2>/dev/null;
 
 .PHONY: cmake_pkg_toolchain
 cmake_pkg_toolchain:

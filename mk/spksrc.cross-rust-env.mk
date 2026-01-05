@@ -1,5 +1,8 @@
-# Configuration for rust compiler
-#
+# rustc cross-compilation definitions
+
+# Set rust build as enabled to ensure
+# inclusion of default autotools $(ENV)
+DEFAULT_BUILD ?= rust
 
 RUSTUP_QORIQ_TOOLCHAIN = 1.82.0
 
