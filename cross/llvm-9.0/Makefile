@@ -38,53 +38,13 @@ CMAKE_ARGS += -DZ3_RETURNCODE__TRYRUN_OUTPUT=""
 CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/llvm
 LLVM_NATIVE_BUILD = $(WORK_DIR)/$(PKG_DIR)/build-native
 
-include ../../mk/spksrc.common.mk
-
-# -----------------------------------------------------------------------------
-# Pre-Configure: Compile NATIVE mandatory tools later needed at build-time
-# -----------------------------------------------------------------------------
-PRE_CONFIGURE_TARGET = llvm_prebuild_native
-
-.PHONY: llvm_prebuild_native
-llvm_prebuild_native:
-	@$(MSG) "Building native LLVM tools for cross-compilation..."
-	@mkdir -p $(LLVM_NATIVE_BUILD)
-	@env -i \
-		PATH="/usr/bin:/bin:/usr/local/bin" \
-		cmake -G Ninja \
-			-S $(CMAKE_DIR) \
-			-B $(LLVM_NATIVE_BUILD) \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DLLVM_TARGETS_TO_BUILD=X86 \
-		-DLLVM_ENABLE_PROJECTS="clang" \
-		-DLLVM_BUILD_TOOLS=ON \
-		-DLLVM_INCLUDE_TOOLS=ON \
-		-DLLVM_BUILD_UTILS=ON \
-		-DLLVM_ENABLE_WARNINGS=OFF \
-		-Wno-dev
-	@env -i \
-		PATH="/usr/bin:/bin:/usr/local/bin" \
-		ninja -C $(LLVM_NATIVE_BUILD) \
-			llvm-config \
-			llvm-tblgen \
-			clang-tblgen \
-			FileCheck
-
-# Location of pre-built NATIVE tools:
-#   FileCheck, llvm-config, llvm-tblgen, clang-tblgen
-CMAKE_ARGS += -DLLVM_NATIVE_BUILD=$(LLVM_NATIVE_BUILD)
-CMAKE_ARGS += -DLLVM_TOOLS_BINARY_DIR=$(LLVM_NATIVE_BUILD)/bin
-CMAKE_ARGS += -DLLVM_CONFIG_PATH=$(LLVM_NATIVE_BUILD)/bin/llvm-config
-CMAKE_ARGS += -DLLVM_EXTERNAL_LIT=$(LLVM_NATIVE_BUILD)/bin/FileCheck
-CMAKE_ARGS += -DLLVM_TABLEGEN=$(LLVM_NATIVE_BUILD)/bin/llvm-tblgen
-CMAKE_ARGS += -DCLANG_TABLEGEN=$(LLVM_NATIVE_BUILD)/bin/clang-tblgen
-
 # -----------------------------------------------------------------------------
 # CMake arguments - https://llvm.org/docs/CMake.html
 # -----------------------------------------------------------------------------
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=MinSizeRel
 CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
 CMAKE_ARGS += -DLLVM_DEFAULT_TARGET_TRIPLE=$(TC_TARGET)
+CMAKE_ARGS += -DCROSS_TOOLCHAIN_FLAGS_NATIVE=-DCMAKE_C_COMPILER=$$(which gcc)\;-DCMAKE_CXX_COMPILER=$$(which g++)
 
 # Suppress developer warnings
 CMAKE_ARGS += -Wno-dev
