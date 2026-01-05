@@ -5,7 +5,6 @@ SPK_ICON = src/gotify.png
 
 DEPENDS = cross/gotify-server cross/gotify-cli
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 REQUIRED_MIN_DSM = 7.2
 
 MAINTAINER = SynoCommunity
