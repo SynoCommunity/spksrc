@@ -1,8 +1,7 @@
 # CMake cross-compilation definitions
 
-# Set meson build as enabled to avoid
-# inclusion of default autotools $(ENV)
-DEFAULT_BUILD ?= cmake
+# Force CMake environment, bypassing default autotools settings.
+DEFAULT_ENV ?= cmake
 
 # By default use cmake toolchain
 # for cross-compiling

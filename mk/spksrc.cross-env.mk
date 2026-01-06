@@ -71,8 +71,8 @@ endif
 -include $(TC_VARS_MK)
 
 # Default is autotools / make
-DEFAULT_BUILD ?= autotools
-ifneq ($(filter autotools rust,$(DEFAULT_BUILD)),)
+DEFAULT_ENV ?= autotools
+ifneq ($(filter autotools,$(DEFAULT_ENV)),)
   -include $(TC_VARS_AUTOTOOLS_MK)
   -include $(TC_VARS_FLAGS_MK)
   -include $(TC_VARS_RUST_MK)
