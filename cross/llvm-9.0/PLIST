@@ -13,12 +13,12 @@ bin:bin/clang-rename
 bin:bin/clang-scan-deps
 rsc:bin/git-clang-format
 rsc:bin/hmaptool
-lnk:bin/ld6.lld
+lnk:bin/ld.lld
 lnk:bin/ld64.lld
 lnk:bin/lld-link
 bin:bin/lld
 bin:bin/llvm-ar
-lnk:bin/llvm-link
+lnk:bin/llvm-lib
 bin:bin/llvm-nm
 bin:bin/llvm-objcopy
 bin:bin/llvm-objdump
@@ -26,6 +26,7 @@ bin:bin/llvm-profdata
 lnk:bin/llvm-ranlib
 bin:bin/llvm-rc
 bin:bin/llvm-symbolizer
+lnk:bin/wasm-ld
 lnk:lib/libclang-cpp.so
 lib:lib/libclang-cpp.so.9
 lnk:lib/libclang.so
