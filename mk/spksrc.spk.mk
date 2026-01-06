@@ -96,9 +96,15 @@ SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK
 
 #####
 
+# Do not initialize any environment to avoid variable leakage.
+DEFAULT_ENV = none
+
+#####
+
 include ../../mk/spksrc.pre-check.mk
 
-# Even though this makefile doesn't cross compile, we need this to setup the cross environment.
+# Even though this makefile doesn't cross compile,
+# we need this to setup the cross environment.
 include ../../mk/spksrc.cross-env.mk
 
 include ../../mk/spksrc.depend.mk

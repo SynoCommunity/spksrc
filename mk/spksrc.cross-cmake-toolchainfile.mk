@@ -14,7 +14,7 @@ endif
 RUN_CMAKE = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
 # Map words to filenames
-TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_BUILD),$(WORK_DIR)/tc_vars.$(b).mk))
+TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
 # Include them (optional include)
 -include $(TC_VARS_FILES)
 

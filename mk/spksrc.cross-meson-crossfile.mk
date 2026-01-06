@@ -9,7 +9,7 @@ CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_FILE_PKG)
 RUN_MESON = cd $(MESON_BASE_DIR) && env $(ENV)
 
 # Map words to filenames
-TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_BUILD),$(WORK_DIR)/tc_vars.$(b).mk))
+TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
 # Include them (optional include)
 -include $(TC_VARS_FILES)
 

@@ -52,7 +52,7 @@ include ../../mk/spksrc.ninja.mk
 # Meson specific targets
 .PHONY: meson_generate_toolchain_file
 meson_generate_toolchain_file:
-	$(MAKE) --no-print-directory DEFAULT_BUILD="flags rust" $(MESON_CROSS_FILE_PKG)
+	$(MAKE) --no-print-directory DEFAULT_ENV="flags rust" $(MESON_CROSS_FILE_PKG)
 
 .PHONY: meson_configure_target
 meson_configure_target: meson_generate_toolchain_file

@@ -1,8 +1,7 @@
 # meson cross-compilation definitions
 
-# Set meson build as enabled to avoid
-# inclusion of default autotools $(ENV)
-DEFAULT_BUILD ?= meson
+# Force meson environment, bypassing default autotools settings.
+DEFAULT_ENV ?= meson
 
 # Set default base meson directory
 # Exceptionnally it is under a sub-directory (ex: zstd)
