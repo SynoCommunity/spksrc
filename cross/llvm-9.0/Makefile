@@ -18,7 +18,7 @@ DEPENDS += cross/zlib
 CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 
 DEPENDS += cross/libffi
-CMAKE_ARGS += LLVM_ENABLE_FFI=ON
+CMAKE_ARGS += -DLLVM_ENABLE_FFI=ON
 
 DEPENDS += cross/ncursesw
 CMAKE_ARGS += -DLLVM_ENABLE_TERMINFO=ON
@@ -36,7 +36,6 @@ CMAKE_ARGS += -DZ3_RETURNCODE__TRYRUN_OUTPUT=""
 # Directories
 # -----------------------------------------------------------------------------
 CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/llvm
-LLVM_NATIVE_BUILD = $(WORK_DIR)/$(PKG_DIR)/build-native
 
 # -----------------------------------------------------------------------------
 # CMake arguments - https://llvm.org/docs/CMake.html
@@ -50,7 +49,7 @@ CMAKE_ARGS += -DCROSS_TOOLCHAIN_FLAGS_NATIVE=-DCMAKE_C_COMPILER=$$(which gcc)\;-
 CMAKE_ARGS += -Wno-dev
 
 # Disable LLVM's own extra warning flags
-CMAKE_ARGS += -DLLVM_ENABLE_WARNINGS=OFF 
+CMAKE_ARGS += -DLLVM_ENABLE_WARNINGS=OFF
 
 # Assertions are internal checks to help find bugs.
 # They typically slow down LLVM and Clang when enabled
@@ -89,49 +88,57 @@ CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
 CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
 
+ADDITIONAL_CXXFLAGS  = -Wno-misleading-indentation
+ADDITIONAL_CXXFLAGS += -Wno-stringop-overflow
+ADDITIONAL_CXXFLAGS += -Wno-redundant-move
+ADDITIONAL_CXXFLAGS += -Wno-init-list-lifetime
+ADDITIONAL_CXXFLAGS += -Wno-range-loop-construct
+
 include ../../mk/spksrc.cross-cmake.mk
 
 ifeq ($(call version_lt, $(TC_GCC), 5),1)
-CMAKE_ARGS += -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=TRUE
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
-CMAKE_ARGS += -DZ3_VERSION_STRING=4.7.1
+  CMAKE_ARGS += -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=TRUE
+  CMAKE_ARGS += -DZ3_VERSION_STRING=4.7.1
 else
-CMAKE_ARGS += -DZ3_VERSION_STRING=4.11.2
+  CMAKE_ARGS += -DZ3_VERSION_STRING=4.11.2
 endif
 
 # -----------------------------------------------------------------------------
 # ARCH specific - https://llvm.org/docs/HowToCrossCompileBuiltinsOnArm.html
 # -----------------------------------------------------------------------------
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=ARM
 
-ifeq ($(call version_lt, $(TC_GCC), 5),1)
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
+# Compiler run-time options:
+#   - Applies to all DSM >= 7
+#   - Applies to all DSM >= 6 with exception of ARMv7
+ifneq ($(or $(call version_ge,$(TCVERSION),7),$(filter-out $(ARMv7_ARCHS) $(ARMv7L_ARCHS),$(ARCH))),)
+  CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_BUILTINS=ON
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_PROFILE=OFF
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_MEMPROF=OFF
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_SANITIZERS=OFF
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_XRAY=OFF
 else
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_BUILTINS=ON
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_PROFILE=OFF
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_SANITIZERS=OFF
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_XRAY=OFF
+  CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
+  PLIST_TRANSFORM = sed -e '/_rt\./d'
 endif
+
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=ARM
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=AArch64
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=AArch64
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=PowerPC
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=PowerPC
 endif

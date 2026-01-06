@@ -37,8 +37,8 @@ lnk:lib/libLTO.so
 lib:lib/libLTO.so.9
 lnk:lib/libRemarks.so
 lib:lib/libRemarks.so.9
-lib:lib/clang/9.0.1/lib/linux/clang_rt.crtbegin-aarch64.o
-lib:lib/clang/9.0.1/lib/linux/clang_rt.crtend-aarch64.o
-lib:lib/clang/9.0.1/lib/linux/libclang_rt.builtins-aarch64.a
+lib:lib/clang/9.0.1/lib/linux/clang_rt.crtbegin-*.o
+lib:lib/clang/9.0.1/lib/linux/clang_rt.crtend-*.o
+lib:lib/clang/9.0.1/lib/linux/libclang_rt.builtins-*.a
 rsc:libexec/c++-analyzer
 rsc:libexec/ccc-analyzer
