@@ -8,9 +8,7 @@ PKG_DIR = $(PKG_NAME)
 
 DEPENDS =
 
-# TODO: check later
-# linker error: undefined reference to `pthread_setname_np'
-#UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 HOMEPAGE = https://garagehq.deuxfleurs.fr/
 COMMENT  = Garage is an S3-compatible distributed object storage service designed for self-hosting at a small-to-medium scale.
