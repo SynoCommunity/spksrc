@@ -1,11 +1,12 @@
 PKG_NAME = gotify-server
-PKG_VERS = 2.1.4
+PKG_VERS = 2.8.0
 PKG_EXT = zip
 PKG_DIST_NAME = gotify-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/gotify/server/releases/download/v$(PKG_VERS)
 PKG_DIST_FILE = gotify-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# Requires GLIBC 2.34+ (DSM 7.2+)
+REQUIRED_MIN_DSM = 7.2
 
 HOMEPAGE = https://gotify.net/
 COMMENT  = A simple server for sending and receiving messages

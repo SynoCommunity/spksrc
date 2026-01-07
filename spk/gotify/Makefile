@@ -1,11 +1,11 @@
 SPK_NAME = gotify
-SPK_VERS = 2.1.4
-SPK_REV = 1
+SPK_VERS = 2.8.0
+SPK_REV = 2
 SPK_ICON = src/gotify.png
 
 DEPENDS = cross/gotify-server cross/gotify-cli
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+REQUIRED_MIN_DSM = 7.2
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Gotify
@@ -13,7 +13,7 @@ DESCRIPTION = A simple server for sending and receiving messages. Includes gotif
 HOMEPAGE = https://gotify.net/
 HELPURL = https://github.com/gotify/server/issues
 LICENSE = MIT
-CHANGELOG = "Initial release"
+CHANGELOG = "Update Gotify server to 2.8.0 and CLI to 2.3.2. Requires DSM 7.2+ (GLIBC 2.34+ dependency)."
 
 STARTABLE = yes
 SERVICE_USER = auto
