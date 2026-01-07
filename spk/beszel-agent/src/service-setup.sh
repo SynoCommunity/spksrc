@@ -20,9 +20,13 @@ SVC_WRITE_PID=y
 
 service_postinst ()
 {
-    # Save the public key
-    echo "${wizard_pub_key}" > "${SYNOPKG_PKGVAR}/key.pub"
+    # Save the public key only if provided
+    if [ -n "${wizard_pub_key}" ]; then
+        echo "${wizard_pub_key}" > "${SYNOPKG_PKGVAR}/key.pub"
+    fi
 
-    # Save the extra filesystems
-    echo "${wizard_extra_fs}" > "${SYNOPKG_PKGVAR}/extra_fs.conf"
+    # Save the extra filesystems only if provided
+    if [ -n "${wizard_extra_fs}" ]; then
+        echo "${wizard_extra_fs}" > "${SYNOPKG_PKGVAR}/extra_fs.conf"
+    fi
 }
