@@ -1,0 +1,24 @@
+SPK_NAME = beszel-agent
+SPK_VERS = 0.17.0
+SPK_REV = 1
+SPK_ICON = src/beszel.png
+
+DEPENDS = cross/beszel-agent
+
+MAINTAINER = not-first
+DESCRIPTION = "Lightweight server monitoring with historical data, docker stats, and alerts. This package provides only the agent."
+
+DISPLAY_NAME = Beszel Agent
+CHANGELOG = "Initial package release for Beszel 0.17.0"
+
+HOMEPAGE = https://beszel.dev/
+LICENSE = MIT
+
+STARTABLE = yes
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 45876
+NO_SERVICE_SHORTCUT = y
+
+WIZARDS_DIR = src/wizard/
+
+include ../../mk/spksrc.spk.mk

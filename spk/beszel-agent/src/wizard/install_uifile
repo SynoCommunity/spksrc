@@ -1,0 +1,29 @@
+[
+  {
+    "step_title": "Beszel Agent Configuration",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Provide the SSH public key of the Beszel Hub you want to add this system to.",
+        "subitems": [
+          {
+            "key": "wizard_pub_key",
+            "desc": "Public Key",
+            "defaultValue": "",
+            "width": 520,
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "^ssh-ed25519 [A-Za-z0-9+/]+=*( .*)?$",
+                "errorText": "Please enter a valid SSH Ed25519 public key (starts with 'ssh-ed25519')"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "desc": "The Beszel agent listens on port 45876 by default. Make sure this port is accessible from your Beszel Hub."
+      }
+    ]
+  }
+]
