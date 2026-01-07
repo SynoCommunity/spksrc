@@ -10,12 +10,11 @@
             "key": "wizard_pub_key",
             "desc": "Public Key",
             "defaultValue": "",
-            "width": 520,
             "validator": {
               "allowBlank": false,
               "regex": {
-                "expr": "^ssh-ed25519 [A-Za-z0-9+/]+=*( .*)?$",
-                "errorText": "Please enter a valid SSH Ed25519 public key (starts with 'ssh-ed25519')"
+                "expr": "/^(ssh-(rsa|ed25519)|ecdsa-sha2-nistp(256|384|521)) [A-Za-z0-9+/]+={0,3}( .+)?$/",
+                "errorText": "Please enter a valid SSH public key."
               }
             }
           }
