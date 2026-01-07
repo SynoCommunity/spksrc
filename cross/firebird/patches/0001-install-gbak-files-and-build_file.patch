@@ -1,0 +1,28 @@
+diff -u builds/install/arch-specific/linux/makeInstallImage.sh.in builds/install/arch-specific/linux/makeInstallImage.sh.in
+--- builds/install/arch-specific/linux/makeInstallImage.sh.in	2023-08-11 11:55:02.848124743 +0200
++++ builds/install/arch-specific/linux/makeInstallImage.sh.in	2023-08-11 13:44:38.846348466 +0200
+@@ -34,7 +34,7 @@
+ BuildRootDir=..
+ BuiltFBDir=Release/firebird  # Where the just build fb exists.
+ TargetDir=buildroot    # Where we want to build the install image
+-SecurityDatabase=security4.fdb
++SecurityDatabase=security4.gbak
+ TomMathBuild="@TOMMATH_BUILD@"
+ TomCryptBuild="@TOMCRYPT_BUILD@"
+ 
+@@ -183,6 +183,7 @@
+     copyIfExists $BuiltFBDir/bin/fbtracemgr ${TargetDir}@FB_BINDIR@
+     cp $BuiltFBDir/bin/isql ${TargetDir}@FB_BINDIR@/isql
+     cp $BuiltFBDir/bin/qli ${TargetDir}@FB_BINDIR@/qli
++    cp $BuiltFBDir/bin/build_file ${TargetDir}@FB_BINDIR@/build_file
+ 
+ 	chmod 0755 ${TargetDir}@FB_BINDIR@/*
+ 
+@@ -239,6 +240,7 @@
+ 
+ 	#secureDB (access rights will be set at install time)
+     cp $BuiltFBDir/$SecurityDatabase ${TargetDir}@FB_SECDBDIR@
++    cp $BuiltFBDir/msg.gbak ${TargetDir}@FB_SECDBDIR@
+ 
+ 	#include (.h .pas files)
+     cp $BuiltFBDir/include/*.h ${TargetDir}@FB_INCDIR@
