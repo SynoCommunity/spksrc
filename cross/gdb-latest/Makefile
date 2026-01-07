@@ -31,8 +31,8 @@ PLIST_TRANSFORM_SED_ARGS += -e 's?lib:lib/libinproctrace.so??g'
 endif
 endif
 
-ifneq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
-# binary only created for arm
+# binary only created for aarch64
+ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PLIST_TRANSFORM_SED_ARGS += -e 's?bin:bin/run??g'
 endif
 
