@@ -109,8 +109,8 @@ endif
 
 # Compiler run-time options:
 #   - Applies to all DSM >= 7 with exception of comcerto2k (gcc-4.9)
-#   - Applies to all DSM >= 6 with exception of ARMv7
-ifneq ($(or $(call version_gt,$(TC_GCC),5),$(filter-out $(ARMv7_ARCHS) $(ARMv7L_ARCHS),$(ARCH))),)
+#   - Applies to all DSM >= 6 with exception of ARMv7, and only partially supported by PPC
+ifneq ($(or $(call version_gt,$(TC_GCC),5),$(filter-out $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS),$(ARCH))),)
   CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
   CMAKE_ARGS += -DCOMPILER_RT_BUILD_BUILTINS=ON
   CMAKE_ARGS += -DCOMPILER_RT_BUILD_PROFILE=OFF
