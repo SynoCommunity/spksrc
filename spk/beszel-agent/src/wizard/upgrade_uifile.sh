@@ -29,6 +29,8 @@ cat << EOF > "${SYNOPKG_TEMP_LOGFILE}"
             "key": "wizard_pub_key",
             "desc": "Public Key",
             "defaultValue": "${CURRENT_KEY}",
+            "emptyText": "ssh-ed25519 ....",
+            "width": "400",
             "validator": {
               "allowBlank": false,
               "regex": {
@@ -40,18 +42,20 @@ cat << EOF > "${SYNOPKG_TEMP_LOGFILE}"
         ]
       },
       {
-        "desc": "The Beszel agent listens on port 45876 by default. Make sure this port is accessible from your Beszel Hub."
-      },
-      {
         "type": "textfield",
-        "desc": "Enter additional filesystems to monitor (comma-separated, e.g., /volume1,/volumeUSB1/usbshare).",
+        "desc": "Enter additional filesystems to monitor.",
         "subitems": [
           {
             "key": "wizard_extra_fs",
             "desc": "Extra Filesystems",
+            "emptyText": "/volume1,/volumeUSB1/usbshare",
+            "width": "400",
             "defaultValue": "${CURRENT_FS}"
           }
         ]
+      },
+      {
+        "desc": "The Beszel agent listens on port 45876 by default. Make sure this port is accessible from your Beszel Hub."
       }
     ]
   }
