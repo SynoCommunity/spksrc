@@ -1,8 +1,8 @@
 PKG_NAME = ntfs-3g_ntfsprogs
-PKG_VERS = 2021.8.22
+PKG_VERS = 2022.10.3
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://tuxera.com/opensource
+PKG_DIST_SITE = https://download.tuxera.com/opensource
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

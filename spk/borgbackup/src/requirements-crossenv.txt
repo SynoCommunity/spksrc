@@ -1,7 +1,8 @@
-# requirements that need crossenv to build wheel for
+# Generated using the requirements script on December 11, 2025
 
-borgbackup==1.2.2
-
-msgpack==1.0.4     # used compiled verrsion for performance
-ruamel.yaml.clib==0.2.7
-llfuse==1.4.2
+borgbackup==1.4.3
+charset_normalizer==3.4.4
+llfuse==1.5.1
+msgpack==1.1.2
+rpds_py==0.22.3
+ruamel_yaml_clib==0.2.15

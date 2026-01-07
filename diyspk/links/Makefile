@@ -1,5 +1,5 @@
 SPK_NAME = links
-SPK_VERS = 2.28
+SPK_VERS = 2.30
 SPK_REV = 1
 SPK_ICON = src/links.png
 

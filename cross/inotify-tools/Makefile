@@ -1,5 +1,5 @@
 PKG_NAME = inotify-tools
-PKG_VERS = 3.22.6.0
+PKG_VERS = 4.25.9.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/inotify-tools/inotify-tools/archive
@@ -23,4 +23,4 @@ PRE_CONFIGURE_TARGET = inotify_pre_configure
 include ../../mk/spksrc.cross-cc.mk
 
 inotify_pre_configure:
-	$(RUN) ./autogen.sh 
+	$(RUN) ./autogen.sh

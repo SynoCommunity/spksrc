@@ -1,0 +1,36 @@
+# Define BYOBU_PYTHON to use python312 package
+# Install snack package into $HOME
+# 
+--- usr/lib/byobu/include/constants.orig	2018-05-27 19:30:52.000000000 +0000
++++ usr/lib/byobu/include/constants	2025-08-17 21:45:25.513931217 +0000
+@@ -57,15 +57,9 @@
+ # Determine if we have ulimit support
+ eval $BYOBU_TEST ulimit >/dev/null 2>&1 && export BYOBU_ULIMIT="ulimit" || export BYOBU_ULIMIT="false"
+ 
+-# Find a suitable python interpreter, if undefined
++# Use python of python312 package
+ if [ -z "$BYOBU_PYTHON" ]; then
+-	if python3 -c "import snack" >/dev/null 2>&1; then
+-		export BYOBU_PYTHON="python3"
+-	elif python2 -c "import snack" >/dev/null 2>&1; then
+-		export BYOBU_PYTHON="python2"
+-	elif python -c "import snack" >/dev/null 2>&1; then
+-		export BYOBU_PYTHON="python"
+-	fi
++	export BYOBU_PYTHON="/var/packages/python312/target/bin/python3"
+ fi
+ 
+ export BYOBU_WINDOW_NAME="-"
+--- usr/lib/byobu/include/dirs.in.orig	2016-04-07 22:05:52.000000000 +0000
++++ usr/lib/byobu/include/dirs.in	2025-08-17 20:37:43.743019853 +0000
+@@ -70,3 +70,10 @@
+ 		export BYOBU_RUN_DIR="$HOME/.cache/$PKG"
+ 	fi
+ fi
++BYOBU_SITE_PACKAGES_DIR=$HOME/.local/lib/python3.12/site-packages
++if [ ! -d "$BYOBU_SITE_PACKAGES_DIR" ]; then
++	# link snack into .local site-packages
++	mkdir -p ${BYOBU_SITE_PACKAGES_DIR}
++	ln -sf /var/packages/byobu/target/lib/python3.12/site-packages/_snack.so ${BYOBU_SITE_PACKAGES_DIR}/_snack.so
++	ln -sf /var/packages/byobu/target/lib/python3.12/site-packages/snack.py  ${BYOBU_SITE_PACKAGES_DIR}/snack.py
++fi

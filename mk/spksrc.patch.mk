@@ -16,25 +16,27 @@ PATCHES_LEVEL = 0
 endif
 
 # find patches into the following directory order:
-#    patches/*.patch      ## this is the only location for native and noarch builds
-#    patches/kernel-$(subst +,,$(TC_KERNEL))/*.patch   ## Discard any ending +
-#    patches/DSM-$(TCVERSION)/*.patch
-#    patches/$(group)/*.patch
-#    patches/$(group)-$(TCVERSION)/*.patch
-#    patches/$(arch)/*.patch
+#    patches/*.patch                                   ## this is the default location (and the only location for native)
+#    patches/kernel-$(subst +,,$(TC_KERNEL))/*.patch   ## Discards trailing + in version number
+#    patches/DSM-$(TCVERSION)/*.patch                  ## Ex: DSM-6.2.4, DSM-7.2, also applies to noarch
+#    patches/DSM-<major>/*.patch                       ## Ex: DSM-6, DSM-7, also applies to noarch
 #    patches/$(arch)-$(TCVERSION)/*.patch
-# supported groups: arm, armv5, armv7, armv7l, armv8, ppc, i686, x64
-ifeq ($(strip $(PATCHES)),)
-ifeq ($(strip $(ARCH)),)
-PATCHES = $(wildcard patches/*.patch)
-else ifneq ($(filter cross diyspk spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
-PATCHES = $(sort $(foreach group,ARM_ARCHS ARMv5_ARCHS ARMv7_ARCHS ARMv7L_ARCHS ARMv8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
-	$(foreach arch,$($(group)), \
-	$(if $(filter $(ARCH),$(arch)),$(sort $(wildcard patches/*.patch patches/kernel-$(subst +,,$(TC_KERNEL))/*.patch patches/DSM-$(TCVERSION)/*.patch patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')/*.patch  patches/$(shell echo ${group} | cut -f1 -d'_'| tr '[:upper:]' '[:lower:]')-$(TCVERSION)/*.patch patches/$(arch)/*.patch patches/$(arch)-$(TCVERSION)/*.patch)),))))
-else
-PATCHES = $(sort $(wildcard patches/*.patch))
-endif  
+#    patches/$(arch)/*.patch
+#    patches/$(group)-$(TCVERSION)/*.patch
+#    patches/$(group)/*.patch                          ## supported groups: arm, armv5, armv7, armv7l, armv8, ppc, i686, x64
+PATCHES += $(sort $(wildcard patches/*.patch))
+PATCHES += $(sort $(wildcard patches/kernel-$(subst +,,$(TC_KERNEL))/*.patch))
+PATCHES += $(sort $(wildcard patches/DSM-$(TCVERSION)/*.patch \
+	                     patches/DSM-$(firstword $(subst ., ,$(TCVERSION)))/*.patch))
+ifneq ($(ARCH),)
+PATCHES += $(sort $(wildcard patches/$(ARCH)-$(TCVERSION)/*.patch \
+	                     patches/$(ARCH)/*.patch))
+PATCHES += $(sort $(foreach group,ARM_ARCHS ARMv5_ARCHS ARMv7_ARCHS ARMv7L_ARCHS ARMv8_ARCHS PPC_ARCHS i686_ARCHS x64_ARCHS, \
+	   $(if $(filter $(ARCH),$($(group))), \
+	   $(wildcard patches/$(shell echo $(group) | cut -f1 -d '_' | tr 'A-Z' 'a-z')/*.patch \
+	              patches/$(shell echo $(group) | cut -f1 -d '_' | tr 'A-Z' 'a-z')-$(TCVERSION)/*.patch))))
 endif
+PATCHES := $(realpath $(PATCHES))
 
 PATCH_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)patch_done
 

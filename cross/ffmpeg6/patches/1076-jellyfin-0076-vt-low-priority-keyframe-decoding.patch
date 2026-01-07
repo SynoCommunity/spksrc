@@ -1,0 +1,72 @@
+Subject: [PATCH] lavcvideotoolbox: Add low_priority key_frame_only decoding
+---
+Index: libavcodec/avcodec.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/libavcodec/avcodec.h b/libavcodec/avcodec.h
+--- libavcodec/avcodec.h	(revision 019c5b13ace26af67613d27f333104e90bde8b31)
++++ libavcodec/avcodec.h	(revision c58e99fd3e45d898d4726456f6bddb0453592bac)
+@@ -2275,6 +2275,13 @@
+  */
+ #define AV_HWACCEL_FLAG_UNSAFE_OUTPUT (1 << 3)
+
++/**
++ * Some hardware decoders (like VideoToolbox) supports decode session priority
++ * that run decode pipeline at a lower priority than is used for realtime decoding.
++ * This will be useful for background processing without interrupting normal playback.
++ */
++#define AV_HWACCEL_FLAG_LOW_PRIORITY (1 << 4)
++
+ /**
+  * @}
+  */
+Index: libavcodec/options_table.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/libavcodec/options_table.h b/libavcodec/options_table.h
+--- libavcodec/options_table.h	(revision 019c5b13ace26af67613d27f333104e90bde8b31)
++++ libavcodec/options_table.h	(revision c58e99fd3e45d898d4726456f6bddb0453592bac)
+@@ -397,6 +397,7 @@
+ {"unsafe_output", "allow potentially unsafe hwaccel frame output that might require special care to process successfully", 0, AV_OPT_TYPE_CONST, {.i64 = AV_HWACCEL_FLAG_UNSAFE_OUTPUT }, INT_MIN, INT_MAX, V | D, "hwaccel_flags"},
+ {"extra_hw_frames", "Number of extra hardware frames to allocate for the user", OFFSET(extra_hw_frames), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT_MAX, V|D },
+ {"discard_damaged_percentage", "Percentage of damaged samples to discard a frame", OFFSET(discard_damaged_percentage), AV_OPT_TYPE_INT, {.i64 = 95 }, 0, 100, V|D },
++{"low_priority", "attempt to run decode pipeline at a lower priority than is used for realtime decoding", 0, AV_OPT_TYPE_CONST, {.i64 = AV_HWACCEL_FLAG_LOW_PRIORITY }, INT_MIN, INT_MAX, V | D, "hwaccel_flags"},
+ {NULL},
+ };
+
+Index: libavcodec/videotoolbox.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/libavcodec/videotoolbox.c b/libavcodec/videotoolbox.c
+--- libavcodec/videotoolbox.c	(revision 019c5b13ace26af67613d27f333104e90bde8b31)
++++ libavcodec/videotoolbox.c	(revision c58e99fd3e45d898d4726456f6bddb0453592bac)
+@@ -983,6 +983,23 @@
+             av_log(avctx, AV_LOG_ERROR, "VideoToolbox reported invalid data.\n");
+             return AVERROR_INVALIDDATA;
+         case 0:
++            if (avctx->skip_frame >= AVDISCARD_NONKEY) {
++                status = VTSessionSetProperty(videotoolbox->session,
++                                              kVTDecompressionPropertyKey_OnlyTheseFrames,
++                                              kVTDecompressionProperty_OnlyTheseFrames_KeyFrames);
++                if (status) {
++                    av_log(avctx, AV_LOG_WARNING, "kVTDecompressionProperty_OnlyTheseFrames_KeyFrames is not supported on this device. Ignoring.\n");
++                }
++            }
++            if (avctx->hwaccel_flags & AV_HWACCEL_FLAG_LOW_PRIORITY) {
++                status = VTSessionSetProperty(videotoolbox->session,
++                                              kVTDecompressionPropertyKey_RealTime,
++                                              kCFBooleanFalse);
++                av_log(avctx, AV_LOG_INFO, "Decoder running at lower priority.\n");
++                if (status) {
++                    av_log(avctx, AV_LOG_WARNING, "kVTDecompressionPropertyKey_RealTime is not supported on this device. Ignoring.\n");
++                }
++            }
+             return 0;
+         default:
+             av_log(avctx, AV_LOG_ERROR, "Unknown VideoToolbox session creation error %d\n", (int)status);

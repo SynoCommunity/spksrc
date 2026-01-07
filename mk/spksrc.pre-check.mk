@@ -9,6 +9,9 @@
 #                          use SERVICE_SETUP instead, this includes support for DSM >= 7.
 #
 
+# disable checks for dependency targets
+ifneq ($(DEPENDENCY_WALK),1)
+
 # SPK_FOLDER    
 # name of the spk package folder
 # github status check does not rely on the (SPK) NAME but uses the folder name
@@ -67,7 +70,7 @@ endif
 
 # Check maximal DSM requirements of package
 ifneq ($(REQUIRED_MAX_DSM),)
-  ifeq (,$(findstring $(ARCH),$(SRM_ARCHS)))
+  ifeq ($(call version_ge, ${TCVERSION}, 3.0),1)
     ifneq ($(TCVERSION),$(firstword $(sort $(TCVERSION) $(REQUIRED_MAX_DSM))))
       ifneq (,$(BUILD_UNSUPPORTED_FILE))
         $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): DSM Toolchain $(TCVERSION) is higher than $(REQUIRED_MAX_DSM) >> $(BUILD_UNSUPPORTED_FILE))
@@ -79,7 +82,7 @@ endif
 
 # Check minimum DSM requirements of package
 ifneq ($(REQUIRED_MIN_DSM),)
-  ifeq (,$(findstring $(ARCH),$(SRM_ARCHS)))
+  ifeq ($(call version_ge, ${TCVERSION}, 3.0),1)
     ifneq ($(REQUIRED_MIN_DSM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_DSM))))
       ifneq (,$(BUILD_UNSUPPORTED_FILE))
         $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): DSM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_DSM) >> $(BUILD_UNSUPPORTED_FILE))
@@ -91,7 +94,7 @@ endif
 
 # Check minimum SRM requirements of package
 ifneq ($(REQUIRED_MIN_SRM),)
-  ifeq ($(ARCH),$(findstring $(ARCH),$(SRM_ARCHS)))
+  ifeq ($(call version_lt, ${TCVERSION}, 3.0),1)
     ifneq ($(REQUIRED_MIN_SRM),$(firstword $(sort $(TCVERSION) $(REQUIRED_MIN_SRM))))
       ifneq (,$(BUILD_UNSUPPORTED_FILE))
         $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): SRM Toolchain $(TCVERSION) is lower than $(REQUIRED_MIN_SRM) >> $(BUILD_UNSUPPORTED_FILE))
@@ -101,4 +104,6 @@ ifneq ($(REQUIRED_MIN_SRM),)
   endif
 endif
 
-endif
+endif # ifneq ($(TCVERSION),)
+
+endif # ifneq ($(DEPENDENCY_WALK),1)

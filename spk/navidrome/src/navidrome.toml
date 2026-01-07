@@ -1,0 +1,135 @@
+# For all available configuration options see:
+# https://www.navidrome.org/docs/usage/configuration-options/#available-options
+# For security considerations see:
+# https://www.navidrome.org/docs/usage/security/
+#
+
+# Folder where your music library is stored. Can be read-only
+MusicFolder = "@@wizard_music_folder@@"
+
+# Folder to store application data (DB, cache...)
+DataFolder= "/var/packages/navidrome/var"
+
+# Configure periodic scans using "cron" syntax. To disable it altogether, set it to "0"
+# ScanSchedule = "@every 1m"
+
+# Log level. Useful for troubleshooting. Possible values: error, warn, info, debug, trace
+# LogLevel = "info"
+
+# Whether or not sensitive information (like tokens and passwords) should be redacted (hidden) in the logs
+# EnableLogRedacting = true
+
+# IP address the server will bind to
+# Address = 0.0.0.0
+
+# Enables transcoding configuration in the UI
+# EnableTranscodingConfig = false
+
+# Size of transcoding cache. Set to "0" to disable cache
+# TranscodingCacheSize = "100MB"
+
+# Size of image (art work) cache. Set to "0" to disable cache
+# ImageCacheSize = "100MB"
+
+# Enable/disable .m3u playlist auto-import
+# AutoImportPlaylists = true
+
+# Where to search for and import playlists from. Can be a list of folders/globs (separated by : ). Paths are relative to MusicFolder
+# PlaylistsPath = ".:**/**" # (meaning MusicFolder and all its subfolders)"
+
+# Base URL (only the path part) to configure Navidrome behind a proxy (ex: /music)
+# BaseUrl = ""
+
+# Change background image used in the Login page
+# UILoginBackgroundUrl = "random music image from Unsplash.com"
+
+# Add a welcome message to the login screen
+# UIWelcomeMessage = ""
+
+# Send basic info to your own Google Analytics account. Must be in the format UA-XXXXXXXX
+# GATrackingID = ""
+
+# Sets the default theme used by the UI when logging in from a new browser. This value must match one of the options in the UI
+# DefaultTheme = Dark
+
+# Controls whether the player in the UI will animate the album cover (rotation)
+# EnableCoverAnimation = true
+
+# List of ignored articles when sorting/indexing artists
+# IgnoredArticles = "The El La Los Las Le Les Os As O A Der Die Das"
+
+# Match query strings anywhere in searchable fields, not only in word boundaries. Useful for languages where words are not space separated
+# SearchFullString = false
+
+# Uses music files' modification time when sorting by "Recently Added". Otherwise use import time
+# RecentlyAddedByModTime = false
+
+# Configure the order to look for cover art images. Use special embedded value to get embedded images from the audio files
+# CoverArtPriority = "embedded, cover.*, folder.*, front.*"
+
+# Set JPEG quality percentage for resized cover art images
+# CoverJpegQuality = 75
+
+# Enable the option in the UI to download music/albums/artists/playlists from the server
+# EnableDownloads = true
+
+# How long Navidrome will wait before closing web ui idle sessions
+# SessionTimeout = "24h"
+
+# How many login requests can be processed from a single IP during the AuthWindowLength. Set to 0 to disable the limit rater
+# AuthRequestLimit = 5
+
+# Window Length for the authentication rate limit
+# AuthWindowLength = "20s"
+
+# Select metadata extractor implementation. Options: taglib or ffmpeg
+# Scanner.Extractor = "taglib"
+
+# List of separators to split genre tags
+# Scanner.GenreSeparators = ";/,"
+
+# Set this to false to completely disable Last.fm integration
+# LastFM.Enabled = true
+
+# Last.fm ApiKey
+# LastFM.ApiKey = "Navidrome project's shared ApiKey"
+
+# Last.fm Shared Secret
+# LastFM.Secret = "Navidrome project's shared Secret"
+
+# Two letter-code for language to be used to retrieve biographies from Last.fm
+# LastFM.Language = "en"
+
+# Spotify Client ID. Required if you want Artist images
+# Spotify.ID = ""
+
+# Spotify Client Secret. Required if you want Artist images
+# Spotify.Secret = ""
+
+# Set this to false to completely disable ListenBrainz integration
+# ListenBrainz.Enabled = true
+
+# Use Gravatar images as the user profile image. Needs the user's email to be filled
+# EnableGravatar = false
+
+# Set this to false to completely disable ALL external integrations
+# EnableExternalServices = true
+
+# Enable toggling "Heart"/"Loved" for songs/albums/artists in the UI (maps to "Star"/"Starred" in Subsonic Clients)
+# EnableFavourites = true
+
+# Enable 5-star ratings in the UI
+# EnableStarRating = true
+
+# Enable regular users to edit their details and change their password
+# EnableUserEditing = true
+
+# Passphrase used to encrypt passwords in the DB. 
+# For details see: https://www.navidrome.org/docs/usage/security/#encrypted-passwords)
+# PasswordEncryptionKey = "-"
+
+# HTTP header containing user name from authenticated proxy
+# ReverseProxyUserHeader = "Remote-User"
+
+# Comma separated list of IP CIDRs which are allowed to use reverse proxy authentication, empty means "deny all"
+# ReverseProxyWhitelist = ""

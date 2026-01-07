@@ -1,5 +1,5 @@
 PKG_NAME = curl
-PKG_VERS = 8.1.2
+PKG_VERS = 8.4.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://curl.se/download
@@ -34,6 +34,13 @@ CONFIGURE_ARGS += --with-openssl
 CONFIGURE_ARGS += --enable-ares
 CONFIGURE_ARGS += --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 CONFIGURE_ARGS += --with-ca-path=/usr/share/ca-certificates/mozilla
+
+# Do not fail on warnings when built in debug mode
+ifeq ($(GCC_DEBUG_INFO),1)
+CONFIGURE_ARGS += --disable-code-coverage
+CONFIGURE_ARGS += --disable-maintainer-mode
+CONFIGURE_ARGS += --disable-debug
+endif
 
 ifneq ($(strip $(CURL_INCLUDE_EXECUTABLE)),1)
 PLIST_TRANSFORM = sed -e '/bin:bin/d'

@@ -1,9 +1,6 @@
+#
 # Default make programs
 #
-
-# Common makefiles
-include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -19,8 +16,16 @@ DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+ifneq ($(ARCH),noarch)
 TC = syno$(ARCH_SUFFIX)
 endif
+endif
+
+# Common directories (must be set after ARCH_SUFFIX)
+include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 
@@ -32,10 +37,12 @@ include ../../mk/spksrc.download.mk
 
 include ../../mk/spksrc.depend.mk
 
+include ../../mk/spksrc.status.mk
+
 checksum: download
 include ../../mk/spksrc.checksum.mk
 
-extract: checksum depend
+extract: checksum depend status
 include ../../mk/spksrc.extract.mk
 
 patch: extract
@@ -53,68 +60,36 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
+###
 
-### Clean rules
-smart-clean:
-	rm -rf $(WORK_DIR)/$(PKG_DIR)
-	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
+# Define _all as a real target that does the work
+.PHONY: _all
+_all: install plist
 
-clean:
-	rm -fr work work-* build-*.log
+# all wraps _all with logging
+.PHONY: all
+.DEFAULT_GOAL := all
 
-all: install plist
-
-### For make kernel-required (used by spksrc.spk.mk)
-include ../../mk/spksrc.kernel-required.mk
-
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
+all:
+	@mkdir -p $(WORK_DIR)
+	@bash -o pipefail -c ' \
+	    if [ -z "$$LOGGING_ENABLED" ]; then \
+	        export LOGGING_ENABLED=1 ; \
+	        script -q -e -c "$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all" /dev/null \
+	            | tee >(sed -r "s/\x1B\[[0-9;]*[mK]//g; s/\\r//g" >> "$(DEFAULT_LOG)") ; \
+	    else \
+	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	    fi \
+	' || { \
+	    $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" \
+	    "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") \
+	    | tee --append $(STATUS_LOG) ; \
+	    exit 1 ; \
+	}
 
 ####
 
-all-supported: SHELL:=/bin/bash
-all-supported:
-	@$(MSG) Pre-build native dependencies for parallel build
-	@for depend in $$($(MAKE) dependency-list) ; \
-	do \
-	  if [ "$${depend%/*}" = "native" ]; then \
-	    $(MSG) "Pre-processing $${depend}" ; \
-	    $(MSG) "  env $(ENV) $(MAKE) -C ../../$$depend" ; \
-	    env $(ENV) $(MAKE) -C ../../$$depend 2>&1 | tee --append build-$${depend%/*}-$${depend#*/}.log ; \
-	    [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
-	  fi ; \
-	done ; \
-	$(MAKE) $(addprefix supported-arch-,$(SUPPORTED_ARCHS))
-
-supported-arch-%:
-	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	-@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) arch-$* 2>&1 | tee --append build-$*.log
-
-cross-cc_msg:
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(subst build-arch-,,$(MAKECMDGOALS)), NAME: $(NAME) >> $(PSTAT_LOG)
-endif
-
-arch-%:
-	@$(MSG) Building package for arch $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))), $*)
-	$(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
-
-build-arch-%: SHELL:=/bin/bash
-build-arch-%: cross-cc_msg
-	@$(MSG) Building package for arch $*
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [BEGIN] >> $(PSTAT_LOG)
-endif
-	@MAKEFLAGS= $(PSTAT_TIME) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 | tee --append build-$*.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $*, NAME: $(NAME) [END] >> $(PSTAT_LOG)
-endif
+### For arch-* and all-<supported|latest>
+include ../../mk/spksrc.supported.mk
 
 ####

@@ -9,7 +9,7 @@ diff --git a/conf/config.php b/conf/config.php
 --- conf/config.php.orig	(revision 48933089370b667e8d3b19fb8f9b92bc6db5409d)
 +++ conf/config.php	(date 1683473924000)
 @@ -63,7 +63,7 @@
-		"mediainfo"	=> '',			// Something like /usr/bin/mediainfo. If empty, will be found in PATH
+ 		"mediainfo"	=> '',			// Something like /usr/bin/mediainfo. If empty, will be found in PATH.
  	);
  
 -	$localHostedMode = false;		// Set to true if rTorrent is hosted on the SAME machine as ruTorrent

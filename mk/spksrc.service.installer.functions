@@ -1,4 +1,3 @@
-
 ### common installer functions and variables for synocommunity generic service installer
 # 
 # functions are common for all DSM versions
@@ -19,6 +18,8 @@ TAR="/bin/tar"
 
 INST_ETC="/var/packages/${SYNOPKG_PKGNAME}/etc"
 INST_VARIABLES="${INST_ETC}/installer-variables"
+# DSM7 only
+INST_SHARES="/var/packages/${SYNOPKG_PKGNAME}/shares"
 
 if [ -z "${SYNOPKG_PKGVAR}" ]; then
     # define SYNOPKG_PKGVAR for compatibility with DSM7 (replaces former INST_VAR)
@@ -46,27 +47,48 @@ initialize_variables ()
         GROUP_DESC="SynoCommunity Package Group"
     fi
 
-    # Extract share volume and share name from download location if provided
+    # Extract share volume and share name from share path when provided, and not already defined
     if [ -n "${SHARE_PATH}" ]; then
-        if [ -n "${wizard_volume}" ]; then
-            SHARE_PATH="${wizard_volume}/${SHARE_PATH}"
+        # migrate SHARE_PATH that holds the share name only to full share path
+        # this is required for installers without resource worker for file share (SRM 1, DSM 5, DSM 6 old packages)
+        if [ "$(echo ${SHARE_PATH} | grep ^/)" != "${SHARE_PATH}" ]; then
+            SHARE_NAME=${SHARE_PATH}
+            if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+                if synoshare --get "${SHARE_NAME}" &> /dev/null; then
+                    SHARE_PATH=$(synoshare --get "${SHARE_NAME}" | awk 'NR==4' | cut -d] -f1 | cut -d[ -f2)
+                    install_log "Path of existing share [${SHARE_NAME}] is [${SHARE_PATH}]"
+                fi
+            else
+                # synoshare fails on DSM 7 (at least on 7.2.1) with "Permission denied"
+                # but DSM 7 links package specific shares to the package installation folder
+                if [ -d ${INST_SHARES}/${SHARE_NAME} ]; then
+                    SHARE_PATH=$(realpath ${INST_SHARES}/${SHARE_NAME})
+                    install_log "Path of existing share [${SHARE_NAME}] is [${SHARE_PATH}]"
+                fi
+            fi
+            if [ ! -d "${SHARE_PATH}" ]; then
+                install_log "SHARE_NAME is not an existing share [${SHARE_PATH}]."
+            fi
         fi
-        SHARE_VOLUME=$(echo "${SHARE_PATH}" | awk -F/ '{print "/"$2}')
-        SHARE_NAME=$(echo "${SHARE_PATH}" | awk -F/ '{print $3}')
+        if [ -z "${SHARE_NAME}" ]; then
+            SHARE_NAME=$(basename ${SHARE_PATH})
+        fi
+        install_log "Shared folder configured with SHARE_NAME [${SHARE_NAME}] and SHARE_PATH [${SHARE_PATH}]"
     fi
 }
 
 
 install_python_virtualenv ()
 {
-    # Output Python version (confirming PATH)
+    # Print out default python version found in PATH
     python3 --version
+
+    # Print out default pip version
+    PIP_VERSION=$(python3 -m pip --version | awk '{print $2}')
+    echo "Default pip version ${PIP_VERSION}"
 
     # Create a Python virtualenv
     python3 -m venv --system-site-packages ${SYNOPKG_PKGDEST}/env
-
-    # Update to latest pip package installer
-    python3 -m pip install --upgrade pip
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         set_unix_permissions ${SYNOPKG_PKGDEST}/env
@@ -85,11 +107,13 @@ install_python_wheels ()
     echo "Install packages from wheels"
     if [ -s ${requirements} ]; then
        echo "Install packages from wheels [${requirements}]"
-       pip install $([ $# -gt 0 ] && echo $*) \
+       pip3 install $([ $# -gt 0 ] && echo $*) \
+                   --disable-pip-version-check \
                    --force-reinstall \
                    --cache-dir ${cachedir} \
                    --find-links ${wheelhouse} \
-                   --requirement ${requirements}
+                   --requirement ${requirements} \
+       || echo "ERROR: Python package installation failed" 1>&2
     fi
 
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
@@ -97,21 +121,25 @@ install_python_wheels ()
     fi
 
     echo "Installed modules:"
-    pip freeze
+    pip3 freeze
 }
 
 
 # function to read and export variables from a text file
 # empty lines and lines starting with # are ignored
 # we cannot 'source' the file to load the variables, when values have special characters like <, >, ...
+# already defined variables are not taken from the file (e.g. variables from wizard)
 load_variables_from_file ()
 {
    if [ -n "$1" -a -r "$1" ]; then
       while read -r _line; do
         if [ "$(echo ${_line} | grep -v ^[/s]*#)" != "" ]; then
-           _key="$(echo ${_line} | cut --fields=1 --delimiter==)"
-           _value="$(echo ${_line} | cut --fields=2- --delimiter==)"
-           export "${_key}=${_value}"
+           _key=${_line%%=*}
+           _value=${_line#*=}
+           _existing_value=$(eval echo "\$${_key}")
+           if [ -z "${_existing_value}" ]; then
+              export "${_key}=${_value}"
+           fi
         fi
       done < "$1"
    fi
@@ -120,7 +148,7 @@ load_variables_from_file ()
 
 save_wizard_variables ()
 {
-    if [ -e "${INST_VARIABLES}" ]; then
+    if [ -e "${INST_VARIABLES}" -a -n "${GROUP}${SHARE_PATH}${SHARE_NAME}" ]; then
         $RM "${INST_VARIABLES}"
     fi
     if [ -n "${GROUP}" ]; then
@@ -128,5 +156,8 @@ save_wizard_variables ()
     fi
     if [ -n "${SHARE_PATH}" ]; then
         echo "SHARE_PATH=${SHARE_PATH}" >> ${INST_VARIABLES}
+    fi
+    if [ -n "${SHARE_NAME}" ]; then
+        echo "SHARE_NAME=${SHARE_NAME}" >> ${INST_VARIABLES}
     fi
 }

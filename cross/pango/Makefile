@@ -7,17 +7,13 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/fontconfig cross/cairo cross/glib
-OPTIONAL_DEPENDS = cross/harfbuzz cross/harfbuzz_2
-
-include ../../mk/spksrc.archs.mk
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-# REMARKS: we must build glib before harfbuzz to get harbuzz glib integration (hb-glib.h)
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += cross/harfbuzz_2
-else
+# avoid build of fribidi as subproject of pango
+DEPENDS += cross/fribidi
 DEPENDS += cross/harfbuzz
-endif
-endif
+
+# harfbuzz
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS_TCVERSION = x86-5.2
 
 HOMEPAGE = https://pango.gnome.org/
 COMMENT  = Pango is a library for layout and rendering of text, with an emphasis on internationalization.

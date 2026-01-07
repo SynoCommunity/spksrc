@@ -1,0 +1,142 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2021 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+From 35e218a886f4c066eabd18685240d55270bd5a6d Mon Sep 17 00:00:00 2001
+From: Aleksander Us <aleksander.us@intel.com>
+Date: Mon, 26 Aug 2019 15:45:47 +0300
+Subject: [PATCH] [IndVarSimplify] Do not use SCEV expander for IVCount in
+ LFTR when possible.
+
+SCEV analysis cannot properly cache instruction with poison flags
+(for example, add nsw outside of loop will not be reused by expander).
+This can lead to generating of additional instructions by SCEV expander.
+
+Example IR:
+
+  ...
+  %maxval = add nuw nsw i32 %a1, %a2
+  ...
+for.body:
+  ...
+  %cmp22 = icmp ult i32 %ivadd, %maxval
+  br i1 %cmp22, label %for.body, label %for.end
+  ...
+
+SCEV expander will generate copy of %maxval in preheader but without
+nuw/nsw flags. This can be avoided by explicit check that iv count
+value gives the same SCEV expressions as calculated by LFTR.
+---
+ lib/Transforms/Scalar/IndVarSimplify.cpp     | 12 +++++++++-
+ test/Transforms/IndVarSimplify/add_nsw.ll    | 23 ++++++++++++++++++++
+ test/Transforms/IndVarSimplify/lftr-reuse.ll |  9 +++-----
+ test/Transforms/IndVarSimplify/udiv.ll       |  1 +
+ 4 files changed, 38 insertions(+), 7 deletions(-)
+ create mode 100644 test/Transforms/IndVarSimplify/add_nsw.ll
+
+diff --git a/llvm/lib/Transforms/Scalar/IndVarSimplify.cpp b/llvm/lib/Transforms/Scalar/IndVarSimplify.cpp
+index f9fc698a4a9..5e04dac8aa6 100644
+--- a/llvm/lib/Transforms/Scalar/IndVarSimplify.cpp
++++ b/llvm/lib/Transforms/Scalar/IndVarSimplify.cpp
+@@ -2375,6 +2375,17 @@ static Value *genLoopLimit(PHINode *IndVar, BasicBlock *ExitingBB,
+     if (UsePostInc)
+       IVLimit = SE->getAddExpr(IVLimit, SE->getOne(IVLimit->getType()));
+ 
++    // If computed limit is equal to old limit then do not use SCEV expander
++    // because it can lost NUW/NSW flags and create extra instructions.
++    BranchInst *BI = cast<BranchInst>(ExitingBB->getTerminator());
++    if (ICmpInst *Cmp = dyn_cast<ICmpInst>(BI->getOperand(0))) {
++      Value *Limit = Cmp->getOperand(0);
++      if (!L->isLoopInvariant(Limit))
++        Limit = Cmp->getOperand(1);
++      if (SE->getSCEV(Limit) == IVLimit)
++        return Limit;
++    }
++
+     // Expand the code for the iteration count.
+     assert(SE->isLoopInvariant(IVLimit, L) &&
+            "Computed iteration count is not loop invariant!");
+@@ -2383,7 +2394,6 @@ static Value *genLoopLimit(PHINode *IndVar, BasicBlock *ExitingBB,
+     // SCEV expression (IVInit) for a pointer type IV value (IndVar).
+     Type *LimitTy = ExitCount->getType()->isPointerTy() ?
+       IndVar->getType() : ExitCount->getType();
+-    BranchInst *BI = cast<BranchInst>(ExitingBB->getTerminator());
+     return Rewriter.expandCodeFor(IVLimit, LimitTy, BI);
+   }
+ }
+diff --git a/llvm/test/Transforms/IndVarSimplify/add_nsw.ll b/llvm/test/Transforms/IndVarSimplify/add_nsw.ll
+new file mode 100644
+index 00000000000..abd1cbb6c51
+--- /dev/null
++++ b/llvm/test/Transforms/IndVarSimplify/add_nsw.ll
+@@ -0,0 +1,23 @@
++; RUN: opt -indvars -S %s | FileCheck %s
++
++target datalayout = "e-p:32:32-i64:64-n8:16:32"
++
++; CHECK: for.body.preheader:
++; CHECK-NOT: add
++; CHECK: for.body:
++
++define void @foo(i32 %a1, i32 %a2) {
++entry:
++  %maxval = add nuw nsw i32 %a1, %a2
++  %cmp = icmp slt i32 %maxval, 1
++  br i1 %cmp, label %for.end, label %for.body
++
++for.body:                                         ; preds = %entry, %for.body
++  %j.02 = phi i32 [ 0, %entry ], [ %add31, %for.body ]
++  %add31 = add nuw nsw i32 %j.02, 1
++  %cmp22 = icmp slt i32 %add31, %maxval
++  br i1 %cmp22, label %for.body, label %for.end
++
++for.end:                                          ; preds = %for.body
++  ret void
++}
+diff --git a/llvm/test/Transforms/IndVarSimplify/lftr-reuse.ll b/llvm/test/Transforms/IndVarSimplify/lftr-reuse.ll
+index 96dd92d13..8be983cc7 100644
+--- a/llvm/test/Transforms/IndVarSimplify/lftr-reuse.ll
++++ b/llvm/test/Transforms/IndVarSimplify/lftr-reuse.ll
+@@ -70,7 +70,7 @@ define void @expandOuterRecurrence(i32 %arg) nounwind {
+ ; CHECK-NEXT:    br label [[OUTER:%.*]]
+ ; CHECK:       outer:
+ ; CHECK-NEXT:    [[INDVARS_IV:%.*]] = phi i32 [ [[SUB1]], [[OUTER_PREHEADER]] ], [ [[INDVARS_IV_NEXT:%.*]], [[OUTER_INC:%.*]] ]
+-; CHECK-NEXT:    [[I:%.*]] = phi i32 [ [[I_INC:%.*]], [[OUTER_INC]] ], [ 0, [[OUTER_PREHEADER]] ]
++; CHECK-NEXT:    [[I:%.*]] = phi i32 [ [[I_INC:%.*]], [[OUTER_INC:%.*]] ], [ 0, [[OUTER_PREHEADER]] ]
+ ; CHECK-NEXT:    [[SUB2:%.*]] = sub nsw i32 [[ARG]], [[I]]
+ ; CHECK-NEXT:    [[SUB3:%.*]] = sub nsw i32 [[SUB2]], 1
+ ; CHECK-NEXT:    [[CMP2:%.*]] = icmp slt i32 0, [[SUB3]]
+@@ -80,13 +80,12 @@ define void @expandOuterRecurrence(i32 %arg) nounwind {
+ ; CHECK:       inner:
+ ; CHECK-NEXT:    [[J:%.*]] = phi i32 [ 0, [[INNER_PH]] ], [ [[J_INC:%.*]], [[INNER]] ]
+ ; CHECK-NEXT:    [[J_INC]] = add nuw nsw i32 [[J]], 1
+-; CHECK-NEXT:    [[EXITCOND:%.*]] = icmp ne i32 [[J_INC]], [[INDVARS_IV]]
++; CHECK-NEXT:    [[EXITCOND:%.*]] = icmp ne i32 [[J_INC]], [[SUB3]]
+ ; CHECK-NEXT:    br i1 [[EXITCOND]], label [[INNER]], label [[OUTER_INC_LOOPEXIT:%.*]]
+ ; CHECK:       outer.inc.loopexit:
+ ; CHECK-NEXT:    br label [[OUTER_INC]]
+ ; CHECK:       outer.inc:
+ ; CHECK-NEXT:    [[I_INC]] = add nuw nsw i32 [[I]], 1
+-; CHECK-NEXT:    [[INDVARS_IV_NEXT]] = add i32 [[INDVARS_IV]], -1
+ ; CHECK-NEXT:    [[EXITCOND1:%.*]] = icmp ne i32 [[I_INC]], [[SUB1]]
+ ; CHECK-NEXT:    br i1 [[EXITCOND1]], label [[OUTER]], label [[EXIT_LOOPEXIT:%.*]]
+ ; CHECK:       exit.loopexit:
+diff --git a/llvm/test/Transforms/IndVarSimplify/udiv.ll b/llvm/test/Transforms/IndVarSimplify/udiv.ll
+index b3f2c2a6a66..3530343ef4a 100644
+--- a/llvm/test/Transforms/IndVarSimplify/udiv.ll
++++ b/llvm/test/Transforms/IndVarSimplify/udiv.ll
+@@ -133,6 +133,7 @@ declare i32 @printf(i8* nocapture, ...) nounwind
+ ; CHECK-LABEL: @foo(
+ ; CHECK: for.body.preheader:
+ ; CHECK-NOT: udiv
++; CHECK: for.body:
+ 
+ define void @foo(double* %p, i64 %n) nounwind {
+ entry:
+-- 
+2.18.0
+

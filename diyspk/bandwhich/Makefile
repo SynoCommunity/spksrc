@@ -1,8 +1,8 @@
 SPK_NAME = bandwhich
-SPK_VERS = 0.20.0
+SPK_VERS = 0.23.1
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/bandwhich
 
 # unknown relocation type 95 ...
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)

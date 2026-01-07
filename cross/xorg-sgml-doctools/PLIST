@@ -1,9 +1,8 @@
-rsc:lib/pkgconfig/xorg-sgml-doctools.pc
 rsc:lib/sgml/X11/dbs/masterdb.html.xml
 rsc:lib/sgml/X11/dbs/masterdb.pdf.xml
 rsc:lib/sgml/X11/defs.ent
 rsc:lib/sgml/X11/xorg-chunk.xsl
-rsc:lib/sgml/X11/xorg.css
 rsc:lib/sgml/X11/xorg-fo.xsl
 rsc:lib/sgml/X11/xorg-xhtml.xsl
+rsc:lib/sgml/X11/xorg.css
 rsc:lib/sgml/X11/xorg.xsl

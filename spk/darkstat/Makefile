@@ -4,7 +4,7 @@ SPK_REV = 5
 SPK_ICON = src/darkstat.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/darkstat
 
 # DSM 7 does not allow to run package as root
 # error: pcap_open_live(): ovs_eth0: You don't have permission to capture on that device (socket: Operation not permitted)
