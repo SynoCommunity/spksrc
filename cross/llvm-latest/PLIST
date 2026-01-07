@@ -1,4 +1,4 @@
-bin:bin/analyze-build
+rsc:bin/analyze-build
 lnk:bin/clang
 lnk:bin/clang++
 bin:bin/clang-21
@@ -17,9 +17,9 @@ bin:bin/clang-repl
 bin:bin/clang-scan-deps
 bin:bin/clang-sycl-linker
 bin:bin/diagtool
-bin:bin/git-clang-format
-bin:bin/hmaptool
-bin:bin/intercept-build
+rsc:bin/git-clang-format
+rsc:bin/hmaptool
+rsc:bin/intercept-build
 lnk:bin/ld64.lld
 lnk:bin/ld.lld
 bin:bin/lld
@@ -47,9 +47,9 @@ bin:bin/llvm-strings
 lnk:bin/llvm-strip
 bin:bin/llvm-symbolizer
 bin:bin/offload-arch
-bin:bin/scan-build
-bin:bin/scan-build-py
-bin:bin/scan-view
+rsc:bin/scan-build
+rsc:bin/scan-build-py
+rsc:bin/scan-view
 rsc:lib/cmake/llvm/LLVMConfigExtensions.cmake
 rsc:libexec/analyze-c++
 rsc:libexec/analyze-cc
