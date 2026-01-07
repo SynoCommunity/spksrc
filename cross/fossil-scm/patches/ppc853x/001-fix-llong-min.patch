@@ -1,0 +1,17 @@
+--- extsrc/shell.c.orig	2024-01-01 00:00:00.000000000 +0000
++++ extsrc/shell.c	2024-01-01 00:00:00.000000000 +0000
+@@ -105,6 +105,14 @@
+ # define _LARGEFILE_SOURCE 1
+ #endif
+ 
++/* Define LLONG_MIN if not available (for old PPC toolchains) */
++#ifndef LLONG_MIN
++# define LLONG_MIN (-9223372036854775807LL - 1)
++#endif
++#ifndef LLONG_MAX
++# define LLONG_MAX 9223372036854775807LL
++#endif
++
+ #if defined(SQLITE_SHELL_FIDDLE) && !defined(_POSIX_SOURCE)
+ /*
+ ** emcc requires _POSIX_SOURCE (or one of several similar defines)
