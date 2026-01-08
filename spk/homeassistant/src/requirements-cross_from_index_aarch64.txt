@@ -1,14 +1,68 @@
-# wheels that need cross compilation
-# but fail to build with spksrc framework
-# are downloaded from index at package installation
+# all available wheels are downloaded from index at package installation
 
 # wheels for python arch aarch64
 
+aioesphomeapi==42.4.0
+aiohttp==3.13.2
+annotatedyaml==1.0.2
+apischema==0.19.0
+audioop_lts==0.2.1
 av==13.1.0
-awscrt==0.24.1
-###deebot_client==9.4.0         not available for aarch64, 'ecovacs' component not supported
-grpcio==1.67.1
-# isal fails to cross compile...
-isal==1.7.1
-# pandas: maturin error
-pandas==2.2.3
+awscrt==0.30.0
+bcrypt==5.0.0
+bitarray==3.8.0
+bitstruct==8.21.0
+bleak_esphome==3.4.0
+bluetooth_data_tools==1.28.4
+brotli==1.2.0
+cached_ipaddress==1.0.1
+caio==0.9.24
+cbor2==5.7.1
+cffi==2.0.0
+ciso8601==2.3.3
+convertertools==1.1.0
+coverage==7.13.0
+cryptography==46.0.2
+dbus_fast==2.44.5
+### deebot_client==16.3.0       not available for aarch64, 'ecovacs' component not supported
+### DTLSSocket==0.1.19          # pip wheel fails to cross compile, use python/dtlssocket
+ephem==4.1.6
+fnv_hash_fast==1.6.0
+frozenlist==1.8.0
+greenlet==3.3.0
+grpcio==1.75.1
+guppy3==3.1.5
+habluetooth==5.7.0
+ijson==3.4.0.post0
+isal==1.8.0
+jiter==0.12.0
+kasa_crypt==1.1.0
+lxml==6.0.1
+markupsafe==3.0.3
+msgpack==1.1.2
+multidict==6.7.0
+numpy==2.3.2
+orjson==3.11.3
+pandas==2.3.3
+pillow==12.0.0
+propcache==0.4.1
+protobuf==6.32.0
+psutil==7.1.2
+pycares==4.11.0
+pycryptodome==3.23.0
+pycryptodomex==3.23.0
+pydantic_core==2.41.4
+pynacl==1.6.0
+pyyaml==6.0.3
+regex==2024.11.6
+rpds_py==0.26.0
+scipy==1.16.3
+simplejson==3.20.2
+sqlalchemy==2.0.41
+ujson==5.11.0
+ulid_transform==1.5.2
+uv==0.9.6
+websockets==15.0.1
+wrapt==1.17.3
+yarl==1.22.0
+zeroconf==0.148.0
