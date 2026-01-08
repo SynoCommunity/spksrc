@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 4.0.1
-SPK_REV = 27
+SPK_VERS = 4.0.2
+SPK_REV = 29
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -9,18 +9,20 @@ SPK_ICON = src/synocli-file.png
 #   it's own libblkid and rmlint cannot find the working library of cross/libblkid.
 BUILD_DEPENDS = cross/libblkid
 
-DEPENDS  = cross/less cross/tree cross/jdupes cross/rhash cross/nano cross/file
+DEPENDS  = cross/less cross/tree cross/jdupes cross/nano cross/file
 DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/pixz
+DEPENDS += cross/pigz
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
 DEPENDS += cross/iconv
 DEPENDS += cross/dos2unix
 DEPENDS += cross/patch
+DEPENDS += cross/rhash
 
-OPTIONAL_DEPENDS  = cross/rmlint
+OPTIONAL_DEPENDS += cross/rmlint
 OPTIONAL_DEPENDS += cross/rnm
 OPTIONAL_DEPENDS += cross/micro
 OPTIONAL_DEPENDS += cross/fzf
@@ -29,7 +31,7 @@ OPTIONAL_DEPENDS += cross/fd
 OPTIONAL_DEPENDS += cross/sd
 OPTIONAL_DEPENDS += cross/bat
 OPTIONAL_DEPENDS += cross/eza
-OPTIONAL_DEPENDS += cross/nnn cross/nnn_4.8 cross/nnn_4.0
+OPTIONAL_DEPENDS += cross/nnn
 OPTIONAL_DEPENDS += cross/lsd
 OPTIONAL_DEPENDS += cross/xstow
 
@@ -42,25 +44,11 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
 
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-ifneq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-DEPENDS += cross/nnn
-else
-# comcerto2k for DSM>=7
-DEPENDS += cross/nnn_4.0
-endif
-else ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-DEPENDS += cross/nnn_4.8
-else
-# 32-bit archs for DSM<7
-DEPENDS += cross/nnn_4.0
-endif
-endif
-
 # PPC archs except QorIQ
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/nnn
+OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
+
 DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
@@ -73,20 +61,23 @@ endif
 
 # OLD_PPC archs are not supported with rust
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 DEPENDS += cross/bat
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
-endif
+
 DEPENDS += cross/eza
 OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
+
 DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
+
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 endif
+
 DEPENDS += cross/sd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
+
 DEPENDS += cross/lsd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
 endif
@@ -100,6 +91,9 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
+WIKI_URL = "\<a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile\"\>FAQ SynoCliFile\</a\>"
+
+# Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
     less, tree, jdupes, fdupes, rhash, \
     mc \(midnight commander\), \
@@ -107,20 +101,20 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     jupp \(based on JOE - Joe\'s Own Editor 3.1\), \
     file, detox, pcre2, zstd, lzip, plzip, \
     pixz, \
+    pigz, \
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Remove fd (fd-find) for VS and NVR models (ARMv7L archs) and for ARMv5 archs. <br/>"
-CHANGELOG += "2. Remove ncdu (ncdu is part of synocli-disk). <br/>"
-CHANGELOG += "3. Update bat to v0.250. <br/>"
-CHANGELOG += "4. Update eza to v0.20.18. <br/>"
-CHANGELOG += "5. Update file to v5.46. <br/>"
-CHANGELOG += "6. Update fzf to v0.58.0. <br/>"
-CHANGELOG += "7. Update mc to v4.8.33. <br/>"
-CHANGELOG += "8. Update nano to v8.3. <br/>"
-CHANGELOG += "9. Update nnn to v5.0 (DSM 7 only). <br/>"
-CHANGELOG += "10. Update plzip to v1,12. <br/>"
-CHANGELOG += "11. Update tree to v2.2.1."
+
+CHANGELOG  = "1. Add pigz. <br/>"
+CHANGELOG += "2. Update bat from v0.25.0 to v0.26.1 (except for ARMv5, qoriq and evansport on DSM < 7). <br/>"
+CHANGELOG += "3. Update dos2unix from v7.5.2 to v7.5.3. <br/>"
+CHANGELOG += "4. Update fzf from v0.66.0 to v0.67.0. <br/>"
+CHANGELOG += "5. Update less from v679 to v685. <br/>"
+CHANGELOG += "6. Update lsd from v1.1.5 to v1.2.0 (except for ARMv5). <br/>"
+CHANGELOG += "7. Update nano from v8.6 to v8.7. <br/>"
+CHANGELOG += "8. Update ripgrep from v14.1.1 to v15.1.0 (except for ARMv5 and qoriq). <br/>"
+CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -139,6 +133,7 @@ SPK_COMMANDS += bin/rmlint
 SPK_COMMANDS += bin/zstd bin/unzstd bin/zstdcat bin/zstdmt bin/zstdgrep bin/zstdless
 SPK_COMMANDS += bin/lzip bin/plzip
 SPK_COMMANDS += bin/pixz
+SPK_COMMANDS += bin/pigz bin/unpigz
 SPK_COMMANDS += bin/fdupes
 SPK_COMMANDS += bin/micro
 SPK_COMMANDS += bin/fzf
@@ -167,7 +162,7 @@ SPK_COMMANDS += bin/tiger-hash
 SPK_COMMANDS += bin/tth-hash
 SPK_COMMANDS += bin/whirlpool-hash
 
-SPK_COMMANDS += bin/xstow bin/xstow-static bin/merge-info
+SPK_COMMANDS += bin/xstow bin/merge-info
 SPK_COMMANDS += bin/patch
 
 include ../../mk/spksrc.spk.mk

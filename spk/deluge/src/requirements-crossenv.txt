@@ -1,22 +1,16 @@
-##
-## required wheels that need cross compilation
-##
-
-# [deluge]
-#deluge==2.1.1        ==> pure
-# Latest commit on develop branch
-#git+https://github.com/deluge-torrent/deluge.git@develop#egg=deluge==2.1.1
-# Commit from March 1st 2025 on develop branch
-git+https://github.com/deluge-torrent/deluge.git@0b5addf58eac1f379ee1af83247d8dee0c1eae78#egg=deluge==2.1.1.dev136
-
-# [rencode] 1.0.6     ==> abi3
+# Generated using the requirements script on June 2, 2025
 
 cffi==1.17.1
-cryptography==44.0.2
-GeoIP==1.3.2
+cryptography==45.0.3
 MarkupSafe==3.0.2
+#pillow                 ==> python/pillow
+#rencode                ==> python/rencode
+setproctitle==1.3.6
 zope.interface==7.2
 
+# Additional core requirements not included by default
+
+GeoIP==1.3.2
 # [libtorrent] 2.0.11
 # Depends: openssl3, boost 1.82, geoip
 # Require environment variables
@@ -24,5 +18,15 @@ zope.interface==7.2
 #  BOOST_BUILD_PATH
 # Only supported on DSM7 armv7, aarch64, x64
 git+https://github.com/arvidn/libtorrent.git@v2.0.11#egg=libtorrent==2.0.11
-# Use RC_2_0 for latest development snapshots
+
+# Reference documentation for using Git bisect, in case it's needed in the future
+#
+# [libtorrent] 2.0.11
+# Instructions for using RC_2_0 branch for the latest development snapshots
 # git+https://github.com/arvidn/libtorrent.git@RC_2_0#egg=libtorrent==2.0.11
+#
+# [deluge]
+# Reference to the most recent commit on the develop branch
+# git+https://github.com/deluge-torrent/deluge.git@develop#egg=deluge==2.1.1
+# Specific commit made on March 1, 2025 in the develop branch
+# git+https://github.com/deluge-torrent/deluge.git@0b5addf58eac1f379ee1af83247d8dee0c1eae78#egg=deluge==2.1.1.dev136

@@ -1,0 +1,236 @@
+name: Distrib Cache Maintenance
+
+on:
+  # Regular refresh to prevent GitHub's 7-day eviction policy
+  schedule:
+    - cron: '0 4 * * 1,4'  # Monday and Thursday at 4 AM
+  workflow_dispatch:
+    inputs:
+      max_age_days:
+        description: 'Maximum age of files to keep (days)'
+        required: false
+        default: '180'
+        type: string
+      dry_run:
+        description: 'Dry run mode (no deletions)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  maintain-distrib-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Restore distrib cache
+        id: cache-restore
+        uses: actions/cache/restore@v5
+        with:
+          path: distrib
+          # Use a placeholder key that will never match for the exact key,
+          # forcing GitHub to use restore-keys to find the best available cache
+          key: distrib-placeholder-${{ github.run_id }}
+          restore-keys: |
+            distrib-
+
+      - name: Display cache status
+        run: |
+          if [ "${{ steps.cache-restore.outputs.cache-hit }}" = "true" ]; then
+            echo "Cache restored successfully"
+          else
+            echo "No cache found or partial restore"
+          fi
+
+          echo ""
+          echo "Current distrib cache status:"
+          if [ -d "distrib" ]; then
+            FILE_COUNT=$(find distrib -type f | wc -l)
+            TOTAL_SIZE=$(du -sh distrib 2>/dev/null | cut -f1 || echo "0")
+            echo "  Files: $FILE_COUNT"
+            echo "  Size: $TOTAL_SIZE"
+          else
+            echo "  (empty)"
+            mkdir -p distrib
+          fi
+
+      - name: Clean old files from distrib
+        env:
+          MAX_AGE_DAYS: ${{ github.event.inputs.max_age_days || '180' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          echo "Cleaning files older than $MAX_AGE_DAYS days"
+          echo ""
+
+          if [ ! -d "distrib" ] || [ -z "$(ls -A distrib 2>/dev/null)" ]; then
+            echo "Distrib cache is empty, nothing to clean"
+            exit 0
+          fi
+
+          # Remove corrupted/invalid files marked as .wrong by checksum verification
+          WRONG_FILES=$(find distrib -type f -name "*.wrong" 2>/dev/null || true)
+          if [ -n "$WRONG_FILES" ]; then
+            WRONG_COUNT=$(echo "$WRONG_FILES" | wc -l)
+            echo "Found $WRONG_COUNT corrupted file(s) marked as .wrong"
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "[DRY RUN] Would delete $WRONG_COUNT .wrong file(s)"
+              echo "Sample files (first 5):"
+              echo "$WRONG_FILES" | head -5
+            else
+              echo "$WRONG_FILES" | xargs rm -f
+              echo "Deleted $WRONG_COUNT .wrong file(s)"
+            fi
+            echo ""
+          fi
+
+          # Find files not modified for more than MAX_AGE_DAYS
+          OLD_FILES=$(find distrib -type f -mtime +${MAX_AGE_DAYS} 2>/dev/null || true)
+
+          if [ -z "$OLD_FILES" ]; then
+            echo "No obsolete files found"
+            exit 0
+          fi
+
+          OLD_COUNT=$(echo "$OLD_FILES" | wc -l)
+          OLD_SIZE=$(echo "$OLD_FILES" | xargs du -ch 2>/dev/null | tail -1 | cut -f1 || echo "0")
+
+          echo "Obsolete files found: $OLD_COUNT ($OLD_SIZE)"
+          echo ""
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "[DRY RUN] Files that would be deleted:"
+            echo "Sample files (first 10):"
+            echo "$OLD_FILES" | head -10
+            if [ "$OLD_COUNT" -gt 10 ]; then
+              echo "  ... and $((OLD_COUNT - 10)) more"
+            fi
+          else
+            echo "Deleting files..."
+            echo "$OLD_FILES" | xargs rm -f
+
+            # Clean empty directories
+            find distrib -type d -empty -delete 2>/dev/null || true
+
+            echo "$OLD_COUNT files deleted ($OLD_SIZE freed)"
+          fi
+
+      - name: Report final status
+        run: |
+          echo ""
+          echo "Final distrib cache status:"
+          if [ -d "distrib" ]; then
+            FILE_COUNT=$(find distrib -type f | wc -l)
+            TOTAL_SIZE=$(du -sh distrib 2>/dev/null | cut -f1 || echo "0")
+            TOTAL_BYTES=$(du -sb distrib 2>/dev/null | cut -f1 || echo "0")
+            echo "  Files: $FILE_COUNT"
+            echo "  Size: $TOTAL_SIZE"
+
+            echo ""
+            echo "Distribution by file type:"
+            find distrib -type f -name "*.tar.gz" | wc -l | xargs -I{} echo "  .tar.gz: {}"
+            find distrib -type f -name "*.tar.xz" | wc -l | xargs -I{} echo "  .tar.xz: {}"
+            find distrib -type f -name "*.tar.bz2" | wc -l | xargs -I{} echo "  .tar.bz2: {}"
+            find distrib -type f -name "*.zip" | wc -l | xargs -I{} echo "  .zip: {}"
+            find distrib -type f -name "*.whl" | wc -l | xargs -I{} echo "  .whl: {}"
+
+            echo ""
+            echo "File age distribution:"
+            find distrib -type f -mtime -7 | wc -l | xargs -I{} echo "  < 7 days: {}"
+            find distrib -type f -mtime +7 -mtime -30 | wc -l | xargs -I{} echo "  7-30 days: {}"
+            find distrib -type f -mtime +30 -mtime -90 | wc -l | xargs -I{} echo "  30-90 days: {}"
+            find distrib -type f -mtime +90 -mtime -180 | wc -l | xargs -I{} echo "  90-180 days: {}"
+            find distrib -type f -mtime +180 | wc -l | xargs -I{} echo "  > 180 days: {}"
+
+            # Alert if cache size exceeds 2GB (considering other active caches in the repository)
+            echo ""
+            LIMIT_BYTES=2147483648
+            if [ "$TOTAL_BYTES" -gt "$LIMIT_BYTES" ]; then
+              echo "WARNING: Distrib cache size exceeds 2GB. Consider reducing max_age_days parameter."
+            else
+              echo "Cache size is within acceptable limits."
+            fi
+          else
+            echo "  (empty)"
+          fi
+
+      - name: Compute distrib hash
+        id: distrib-hash
+        run: |
+          # Compute a hash based on file paths and sizes (not content) for performance.
+          # This is fast even with thousands of files since we don't read file contents.
+          # Format: "path size" per line, sorted for reproducibility, then hashed.
+          if [ -d "distrib" ] && [ -n "$(ls -A distrib 2>/dev/null)" ]; then
+            HASH=$(find distrib -type f -printf '%p %s\n' | sort | sha256sum | cut -d' ' -f1)
+          else
+            HASH="empty"
+          fi
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+          echo "Distrib cache hash: $HASH"
+
+      - name: Check if cache already exists
+        id: cache-check
+        run: |
+          # Check if a cache with this exact hash already exists to avoid duplication
+          CACHE_KEY="distrib-${{ steps.distrib-hash.outputs.hash }}"
+          if gh cache list --json key | jq -e --arg key "$CACHE_KEY" '.[] | select(.key == $key)' > /dev/null 2>&1; then
+            echo "Cache with key $CACHE_KEY already exists, skipping save"
+            echo "save_cache=false" >> $GITHUB_OUTPUT
+          else
+            echo "New cache content detected, will save with key: $CACHE_KEY"
+            echo "save_cache=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save refreshed cache
+        if: steps.cache-check.outputs.save_cache == 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: distrib
+          key: distrib-${{ steps.distrib-hash.outputs.hash }}
+
+  cleanup-stale-caches:
+    runs-on: ubuntu-latest
+    needs: maintain-distrib-cache
+    permissions:
+      actions: write
+    steps:
+      - name: Cleanup old GitHub cache entries
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Cleaning up old GitHub cache entries"
+
+          # List all distrib caches with available fields
+          # Note: Only targets caches with keys starting with "distrib-"
+          # Other caches (e.g., toolchain-*) are not affected
+          ALL_CACHES=$(gh cache list --key "distrib-" --limit 100 --json key 2>/dev/null || true)
+
+          if [ -z "$ALL_CACHES" ] || [ "$ALL_CACHES" = "[]" ]; then
+            echo "No caches found"
+            exit 0
+          fi
+
+          # Count total caches
+          CACHE_COUNT=$(echo "$ALL_CACHES" | jq 'length')
+          echo "Found $CACHE_COUNT distrib caches"
+
+          # Keep 10 most recent, delete the remaining 
+          # Keeping more during transition period to accommodate both old and new cache formats.
+          if [ "$CACHE_COUNT" -le 10 ]; then
+            echo "10 or fewer caches exist, nothing to delete based on count"
+          else
+            CACHES_TO_DELETE=$(echo "$ALL_CACHES" | jq -r '.[10:] | .[].key' 2>/dev/null || true)
+
+            if [ -n "$CACHES_TO_DELETE" ]; then
+              echo "Deleting old caches (keeping 10 most recent):"
+              for key in $CACHES_TO_DELETE; do
+                echo "  Deleting: $key"
+                gh cache delete "$key" --confirm 2>/dev/null || true
+              done
+            fi
+          fi
+
+          echo ""
+          echo "Cleanup completed"

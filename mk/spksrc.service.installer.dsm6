@@ -3,7 +3,7 @@
 # DSM 5 -> 6 upgrade path:
 # - Not supported anymore
 
-# installer log is not writable, use for reference only.
+# installer log is not writable, defined for reference only.
 INST_LOG="/var/log/packages/${SYNOPKG_PKGNAME}.log"
 
 # Optional FWPORTS file

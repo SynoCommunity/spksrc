@@ -1,0 +1,31 @@
+[{
+    "step_title": "{{{CONFIGURATION_TITLE}}}",
+    "items": [{
+        "type": "textfield",
+        "desc": "{{{SITE_URL_DESCRIPTION}}}",
+        "subitems": [{
+            "key": "wizard_site_url",
+            "emptyText": "https://example.com",
+            "desc": "{{{SITE_URL_LABEL}}}"
+          }
+        ]
+      },{
+        "type": "password",
+        "desc": "{{{ADMIN_PASSWORD_DESCRIPTION}}}",
+        "subitems": [{
+            "key": "wizard_admin_password",
+            "defaultValue": "admin",
+            "desc": "{{{ADMIN_PASSWORD_LABEL}}}",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      },{
+        "desc": ""
+      },{
+        "desc": "{{{INSTALLATION_NOTES_TITLE}}}{{{INSTALLATION_NOTES_TEXT1}}}"
+      }
+    ]
+  }
+]

@@ -1,0 +1,131 @@
+diff -uprN ../rencode-1.0.8-orig/build.py ./build.py
+--- ../rencode-1.0.8-orig/build.py	1970-01-01 00:00:00.000000000 +0000
++++ ./build.py	1970-01-01 00:00:00.000000000 +0000
+@@ -1,59 +0,0 @@
+-from __future__ import annotations
+-
+-import os
+-import shutil
+-
+-from pathlib import Path
+-
+-from Cython.Build import cythonize
+-from setuptools import Distribution
+-from setuptools import Extension
+-from setuptools.command.build_ext import build_ext
+-
+-
+-COMPILE_ARGS = ["-march=native", "-O3", "-msse", "-msse2", "-mfma", "-mfpmath=sse"]
+-LINK_ARGS: list[str] = []
+-INCLUDE_DIRS: list[str] = []
+-LIBRARIES: list[str] = []
+-
+-
+-def build() -> None:
+-    extensions = [
+-        Extension(
+-            "*",
+-            ["rencode/*.pyx"],
+-            extra_compile_args=COMPILE_ARGS,
+-            extra_link_args=LINK_ARGS,
+-            include_dirs=INCLUDE_DIRS,
+-            libraries=LIBRARIES,
+-        )
+-    ]
+-    ext_modules = cythonize(
+-        extensions,
+-        include_path=INCLUDE_DIRS,
+-        compiler_directives={"binding": True, "language_level": 3},
+-    )
+-
+-    distribution = Distribution({
+-        "name": "rencode",
+-        "ext_modules": ext_modules
+-    })
+-
+-    cmd = build_ext(distribution)
+-    cmd.ensure_finalized()
+-    cmd.run()
+-
+-    # Copy built extensions back to the project
+-    for output in cmd.get_outputs():
+-        output = Path(output)
+-        relative_extension = output.relative_to(cmd.build_lib)
+-        for so in relative_extension.parent.glob('*.so'):
+-            so.unlink()
+-        shutil.copyfile(output, relative_extension)
+-        mode = os.stat(relative_extension).st_mode
+-        mode |= (mode & 0o444) >> 2
+-        os.chmod(relative_extension, mode)
+-
+-
+-if __name__ == "__main__":
+-    build()
+diff -uprN ../rencode-1.0.8-orig/pyproject.toml ./pyproject.toml
+--- ../rencode-1.0.8-orig/pyproject.toml	1970-01-01 00:00:00.000000000 +0000
++++ ./pyproject.toml	2025-06-09 00:44:31.923643473 +0000
+@@ -1,29 +1,3 @@
+-[tool.poetry]
+-name = "rencode"
+-version = "1.0.8"
+-description = "rencode is an object serialization library similar to bencode from the Bittorrent project."
+-authors = ["Andrew Resch <andrewresch@gmail.com>"]
+-license = "GPLv3"
+-include = [{path = "rencode/*.so", format = "wheel"}, {path = "rencode/*.c", format = "sdist"}]
+-packages = [{include = "rencode"}]
+-exclude = ['rencode/*.c']
+-
+-[tool.poetry.build]
+-script = "build.py"
+-
+-[tool.poetry.dependencies]
+-python = "^3.9"
+-
+-[tool.poetry.group.dev.dependencies]
+-black = "^21.9b0"
+-cython = "^3.1.0"
+-pytest = "^8.3.5"
+-
+-[tool.poetry.group.build.dependencies]
+-setuptools = "^80.9.0"
+-cython = "^3.1.1"
+-poetry-core = "^2.1.3"
+-
+ [build-system]
+-requires = ["poetry-core", "setuptools", "cython"]
+-build-backend = "poetry.core.masonry.api"
++requires = ["setuptools", "wheel", "cython"]
++build-backend = "setuptools.build_meta"
+diff -uprN ../rencode-1.0.8-orig/setup.py ./setup.py
+--- ../rencode-1.0.8-orig/setup.py	1970-01-01 00:00:00.000000000 +0000
++++ ./setup.py	2025-06-09 00:44:12.443363293 +0000
+@@ -0,0 +1,29 @@
++from setuptools import setup, Extension
++from Cython.Build import cythonize
++import platform
++
++if platform.machine() == "x86_64":
++    compile_args = ["-march=native", "-O3", "-msse", "-msse2", "-mfma", "-mfpmath=sse"]
++elif platform.machine().startswith("arm") or platform.machine().startswith("aarch64"):
++    compile_args = ["-O3"]
++else:
++    compile_args = ["-O2"]
++
++extensions = [
++    Extension(
++        "rencode._rencode",
++        sources=["rencode/_rencode.pyx"],
++        extra_compile_args=compile_args,
++    )
++]
++
++setup(
++    name="rencode",
++    version="1.0.8",
++    description="rencode is an object serialization library similar to bencode from the Bittorrent project.",
++    author="Andrew Resch",
++    license="GPLv3",
++    packages=["rencode"],
++    ext_modules=cythonize(extensions, compiler_directives={"language_level": "3"}),
++    zip_safe=False,
++)

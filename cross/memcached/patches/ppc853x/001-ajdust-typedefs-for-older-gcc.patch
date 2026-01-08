@@ -1,0 +1,14 @@
+# Adjust typedef of io_queue_t to fix build with gcc 4.3.7 (gcc < 4.5)
+# 
+--- memcached.h.orig	2025-03-18 22:16:07.000000000 +0000
++++ memcached.h	2025-06-25 16:50:45.821775153 +0000
+@@ -691,8 +691,7 @@
+ 
+ typedef STAILQ_HEAD(iop_head_s, _io_pending_t) iop_head_t;
+ typedef struct _io_pending_t io_pending_t;
+-typedef struct io_queue_s io_queue_t;
+-typedef void (*io_queue_stack_cb)(io_queue_t *q);
++typedef void (*io_queue_stack_cb)(struct io_queue_s *q);
+ typedef void (*io_queue_cb)(io_pending_t *pending);
+ // IO pending objects are created and stacked into this structure. They are
+ // then sent off to remote threads.

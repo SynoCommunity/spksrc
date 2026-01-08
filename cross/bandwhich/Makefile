@@ -1,5 +1,5 @@
 PKG_NAME = bandwhich
-PKG_VERS = 0.22.2
+PKG_VERS = 0.23.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/imsnif/bandwhich/archive
@@ -14,5 +14,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 HOMEPAGE = https://github.com/imsnif/bandwhich#readme
 COMMENT  = CLI utility for displaying current network utilization by process, connection and remote IP/hostname.
 LICENSE  = MIT
+
+CARGO_BUILD_ARGS = --locked
 
 include ../../mk/spksrc.cross-rust.mk

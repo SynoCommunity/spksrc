@@ -1,20 +1,19 @@
 SPK_NAME = deluge
-SPK_VERS = 2.1.1.136
-SPK_REV = 24
+SPK_VERS = 2.2.0
+SPK_REV = 25
 SPK_ICON = src/deluge.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "python312"
+SPK_DEPENDS = "${PYTHON_PACKAGE}"
 
 WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
-WHEELS += src/requirements-abi3.txt
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
 DESCRIPTION_FRE = Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), desservant l\'interface utilisateur web deluge.
 STARTABLE = yes
-CHANGELOG = "1. Update to latest github development (dev136) commit<br/>2. Update to libtorrent 2.0.11<br/>3. Update all other wheels<br/>Migrate to python 3.12"
+CHANGELOG = "1. Update deluge to 2.2.0.<br/>2. Update all other wheels."
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
@@ -23,6 +22,7 @@ HELPURL  = https://dev.deluge-torrent.org/wiki/UserGuide
 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 WIZARDS_DIR = src/wizard/
 
@@ -56,6 +56,12 @@ WHEELS_BUILD_ARGS += --b2-args=libtorrent-python-pic=on
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 endif
+
+# [Pillow]
+DEPENDS += python/pillow
+
+# [rencode]
+DEPENDS += python/rencode
 
 .NOTPARALLEL:
 .PHONY: deluge_extra_install

@@ -1,9 +1,12 @@
+lnk:lib/libharfbuzz-cairo.so
+lnk:lib/libharfbuzz-cairo.so.0
+lib:lib/libharfbuzz-cairo.so.0.61145.0
 lnk:lib/libharfbuzz-gobject.so
 lnk:lib/libharfbuzz-gobject.so.0
-lib:lib/libharfbuzz-gobject.so.0.50301.0
+lib:lib/libharfbuzz-gobject.so.0.61145.0
 lnk:lib/libharfbuzz-subset.so
 lnk:lib/libharfbuzz-subset.so.0
-lib:lib/libharfbuzz-subset.so.0.50301.0
+lib:lib/libharfbuzz-subset.so.0.61145.0
 lnk:lib/libharfbuzz.so
 lnk:lib/libharfbuzz.so.0
-lib:lib/libharfbuzz.so.0.50301.0
+lib:lib/libharfbuzz.so.0.61145.0
