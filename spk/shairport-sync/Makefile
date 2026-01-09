@@ -1,35 +1,32 @@
 SPK_NAME = shairport-sync
-SPK_VERS = 2.3.11
-SPK_REV = 2
+SPK_VERS = 4.3.7
+SPK_REV = 3
 SPK_ICON = src/shairport-sync.png
 
-DEPENDS =  cross/busybox cross/shairport-sync
+DEPENDS = cross/shairport-sync
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Use Synology NAS as an AirPlay receiver. Requires USB soundcard or speakers.
+DESCRIPTION = AirPlay audio player. Shairport Sync adds multi-room capability with Audio Synchronisation. Requires USB soundcard or speakers.
 DISPLAY_NAME = Shairport Sync
-BETA = 1
-CHANGELOG = "Initial SynoCommunity Release"
+CHANGELOG = "1. Update to v4.3.7. <br/>2. Update for DSM 7 compatibility. <br/>3. Fix DSM 6 service installation. <br/>4. Add soxr support.<br/> 5. Add convolution filter support except for limitted CPUs."
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
-LICENSE  =
+LICENSE  = Please refer to the individual source files for licenses.
+STARTABLE = yes
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+SERVICE_USER = auto
+FWPORTS = src/shairport-sync.sc
 
-FWPORTS          = src/${SPK_NAME}.sc
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+# the path of the pid file must be configured in the configfile
+# (sessioncontrol.daemon_pid_dir) as "/var/packages/shairport-sync/var"
+SERVICE_COMMAND = $${SYNOPKG_PKGDEST}/bin/shairport-sync --daemon --configfile=$${SYNOPKG_PKGVAR}/shairport-sync.conf
 
 POST_STRIP_TARGET = shairport_extra_install
-
-BUSYBOX_CONFIG = daemon
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: shairport_extra_install
 shairport_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa/alsa.conf
-	install -m 644 src/shairport-sync.conf $(STAGING_DIR)/var/shairport-sync.conf
+	@install -m 755 -d $(STAGING_DIR)/var
+	@install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa/alsa.conf
+	@install -m 644 src/shairport-sync.conf $(STAGING_DIR)/var/shairport-sync.conf
