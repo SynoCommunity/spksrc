@@ -11,6 +11,9 @@ HOMEPAGE = https://elixir-lang.org
 COMMENT  = Elixir is a dynamic, functional language designed for building scalable and maintainable applications. Elixir leverages the Erlang VM, known for running low-latency, distributed and fault-tolerant systems, while also being successfully used in web development and the embedded software domain.
 
 LICENSE = Apache 2.0
+# Elixir's Makefile has .NOTPARALLEL: compile due to bootstrap dependencies
+# but make -j can override this, causing race conditions during the bootstrap phase
+DISABLE_PARALLEL_MAKE = 1
 
 ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
 
