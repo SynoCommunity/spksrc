@@ -1,13 +1,13 @@
 # add ncursesw to termcap libraries to link with ncursesw
-# 
---- erts/configure.orig	2021-09-17 08:20:27.000000000 +0000
-+++ erts/configure	2022-01-16 01:20:16.435834858 +0000
-@@ -13719,7 +13719,7 @@
- if test "x$with_termcap" != "xno" &&
-    test "X$host" != "Xwin32"; then
+#
+--- erts/configure.orig
++++ erts/configure
+@@ -15563,7 +15563,7 @@
+ then :
+
      # try these libs
 -    termcap_libs="tinfo ncurses curses termcap termlib"
 +    termcap_libs="tinfo ncursesw ncurses curses termcap termlib"
- 
+
      for termcap_lib in $termcap_libs; do
- 	as_ac_Lib=`$as_echo "ac_cv_lib_$termcap_lib''_tgetent" | $as_tr_sh`
+	as_ac_Lib=`printf "%s\n" "ac_cv_lib_$termcap_lib""_tgetent" | $as_tr_sh`

@@ -1,0 +1,22 @@
+--- lib/erl_interface/src/Makefile.in.orig
++++ lib/erl_interface/src/Makefile.in
+@@ -108,7 +108,7 @@ endif
+ 
+ WARNFLAGS += -DEI_NO_DEPR_WARN
+ 
+-CFLAGS = @DED_CFLAGS@ $(WARNFLAGS) $(INCFLAGS) $(TYPE_FLAGS) \
++CFLAGS = -Iopenssl/include @DED_CFLAGS@ $(WARNFLAGS) $(INCFLAGS) $(TYPE_FLAGS) \
+ 	-DERLANG_OPENSSL_INTEGRATION
+ DED_LD = @DED_LD@
+ DED_LDFLAGS = @DED_LDFLAGS@
+--- erts/emulator/Makefile.in.orig
++++ erts/emulator/Makefile.in
+@@ -182,7 +182,7 @@ endif
+ # If type isn't one of the above, it *is* opt type...
+ override TYPE=opt
+ TYPEMARKER =
+-TYPE_FLAGS = @CFLAGS@
++TYPE_FLAGS = -Iopenssl/include @CFLAGS@
+ endif
+ endif
+ endif
