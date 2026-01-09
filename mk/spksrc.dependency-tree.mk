@@ -50,17 +50,19 @@ dependency-flat:
 .PHONY: _dependency-flat-parallel
 _dependency-flat-parallel:
 	@mkdir -p $(TMP_DONE)
-	@if [ ! -f "$(TMP_DONE)/$$(basename $(CURDIR))" ]; then \
+	@KEY=$$(echo $(CURDIR) | grep -Po '/\K(spk|cross|python|native|diyspk|toolchain)/.*' | tr '/' '_'); \
+	if [ ! -f "$(TMP_DONE)/$$KEY" ]; then \
 		DEPS="$$(echo "$(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)" | tr ' ' '\n' | sort -u)"; \
 		PIDS=""; \
 		for dep in $$DEPS; do \
-			if [ -d ../../$$dep ] && [ ! -f "$(TMP_DONE)/$$(basename $$dep)" ]; then \
+			DEP_KEY=$$(echo "$$dep" | tr '/' '_'); \
+			if [ -d ../../$$dep ] && [ ! -f "$(TMP_DONE)/$$DEP_KEY" ]; then \
 				$(MAKE) -s -C ../../$$dep _dependency-flat-parallel DEPENDENCY_WALK=1 & \
 				PIDS="$$PIDS $$!"; \
 			fi; \
 		done; \
 		for pid in $$PIDS; do wait $$pid; done; \
-		touch "$(TMP_DONE)/$$(basename $(CURDIR))"; \
+		touch "$(TMP_DONE)/$$KEY"; \
 		echo "$$(echo $(CURDIR) | grep -Po '/\K(spk|cross|python|native|diyspk|toolchain)/.*')"; \
 	fi
 
