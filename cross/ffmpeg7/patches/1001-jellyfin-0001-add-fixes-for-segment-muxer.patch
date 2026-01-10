@@ -2,7 +2,7 @@ Index: FFmpeg/libavformat/segment.c
 ===================================================================
 --- libavformat/segment.c
 +++ libavformat/segment.c
-@@ -88,6 +88,7 @@ typedef struct SegmentContext {
+@@ -89,6 +89,7 @@ typedef struct SegmentContext {
      int64_t last_val;      ///< remember last time for wrap around detection
      int cut_pending;
      int header_written;    ///< whether we've already called avformat_write_header
@@ -10,7 +10,7 @@ Index: FFmpeg/libavformat/segment.c
  
      char *entry_prefix;    ///< prefix to add to list entry filenames
      int list_type;         ///< set the list type
-@@ -707,6 +708,7 @@ static int seg_init(AVFormatContext *s)
+@@ -708,6 +709,7 @@ static int seg_init(AVFormatContext *s)
          if ((ret = parse_frames(s, &seg->frames, &seg->nb_frames, seg->frames_str)) < 0)
              return ret;
      } else {
@@ -18,7 +18,7 @@ Index: FFmpeg/libavformat/segment.c
          if (seg->use_clocktime) {
              if (seg->time <= 0) {
                  av_log(s, AV_LOG_ERROR, "Invalid negative segment_time with segment_atclocktime option set\n");
-@@ -890,7 +892,15 @@ calc_times:
+@@ -891,7 +893,15 @@ calc_times:
                  seg->cut_pending = 1;
              seg->last_val = wrapped_val;
          } else {
