@@ -49,20 +49,15 @@ include ../../mk/spksrc.ninja.mk
 
 ###
 
-# Meson specific targets
-.PHONY: meson_generate_toolchain_file
-meson_generate_toolchain_file:
-	$(MAKE) --no-print-directory DEFAULT_ENV="flags rust" $(MESON_CROSS_FILE_PKG)
-
 .PHONY: meson_configure_target
-meson_configure_target: meson_generate_toolchain_file
+meson_configure_target: meson_generate_crossfile
 	@$(MSG) - Meson configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
 	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	@$(MSG) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
-	$(RUN_MESON) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	@$(MSG) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	$(RUN) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
 ###
 

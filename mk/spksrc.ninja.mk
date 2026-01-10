@@ -35,7 +35,7 @@ endif
 else
 
 # Set default run environment
-RUN_NINJA = $(RUN_MESON)
+RUN_NINJA = $(RUN)
 
 # Set default build directory
 NINJA_BUILD_DIR = $(MESON_BUILD_DIR)

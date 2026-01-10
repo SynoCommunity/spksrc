@@ -32,7 +32,7 @@ include ../../mk/spksrc.cross-meson-crossfile.mk
 # 1- Prepare the crossenv
 # 2- Generate the per-dependency cross-file definition
 ifeq ($(strip $(CONFIGURE_TARGET)),)
-CONFIGURE_TARGET = prepare_crossenv $(MESON_CROSS_FILE_PKG)
+CONFIGURE_TARGET = prepare_crossenv meson_generate_crossfile
 endif
 
 ifeq ($(strip $(COMPILE_TARGET)),)
@@ -88,7 +88,7 @@ build_meson_python_wheel:
 	   -Cbuilddir=\"$(MESON_BUILD_DIR)\" \
 	   --outdir $(WHEELHOUSE) \
 	   --verbose ; \
-	$(RUN_MESON) \
+	cd $(MESON_BASE_DIR) && env $(ENV_MESON) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
 	   PATH=$${PATH} \
 	   $$(which cross-python) -m build -w -n -x . \

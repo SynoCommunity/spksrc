@@ -5,13 +5,15 @@ MESON_CROSS_FILE_NAME = $(ARCH)-crossfile.meson
 MESON_CROSS_FILE_PKG = $(WORK_DIR)/$(PKG_DIR)/$(MESON_CROSS_FILE_NAME)
 CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_FILE_PKG)
 
-# Default meson run environment
-RUN_MESON = cd $(MESON_BASE_DIR) && env $(ENV)
-
 # Map words to filenames
 TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
 # Include them (optional include)
 -include $(TC_VARS_FILES)
+
+# Meson specific targets
+.PHONY: meson_generate_crossfile
+meson_generate_crossfile:
+	$(MAKE) --no-print-directory DEFAULT_ENV="flags rust" $(MESON_CROSS_FILE_PKG)
 
 .PHONY: $(MESON_CROSS_FILE_PKG)
 $(MESON_CROSS_FILE_PKG):
