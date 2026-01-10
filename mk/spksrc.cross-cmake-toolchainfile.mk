@@ -10,9 +10,6 @@ ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 CMAKE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE_PKG)
 endif
 
-# Default CMake run environment
-RUN_CMAKE = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
-
 # Map words to filenames
 TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
 # Include them (optional include)
