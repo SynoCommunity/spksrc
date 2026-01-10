@@ -55,8 +55,8 @@ ejabberd_post_install:
 	sed -e "s#$(INSTALL_DIR)##g" 										\
 		 -e "s#$(NATIVE_ERLANG_BIN)#$(INSTALL_PREFIX)/bin#g"	\
 		 -e "s#^INSTALLUSER=.*#INSTALLUSER=\"sc-ejabberd\"#g"	\
-		 -e "s#/etc/ejabberd\"#/var\"#g"								\
-		 -e "s#/var/lib/ejabberd\"#/var/lib\"#g"					\
-		 -e "s#/var/log/ejabberd\"#/var/log\"#g"					\
+		 -e "s#/target/var/log/ejabberd#/var/log#g"					\
+		 -e "s#/target/var/lib/ejabberd#/var/lib#g"					\
+		 -e "s#/target/var#/var#g"										\
 		 -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
 	cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../sbin/ejabberdctl .
