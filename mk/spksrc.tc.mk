@@ -23,6 +23,9 @@ DISTRIB_DIR                = $(TOOLCHAIN_DIR)/$(TC_VERS)
 DIST_FILE                  = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT                   = $(TC_EXT)
 TC_LOCAL_VARS_MK           = $(WORK_DIR)/tc_vars.mk
+TC_LOCAL_VARS_AUTOTOOLS_MK = $(WORK_DIR)/tc_vars.autotools.mk
+TC_LOCAL_VARS_FLAGS_MK     = $(WORK_DIR)/tc_vars.flags.mk
+TC_LOCAL_VARS_RUST_MK      = $(WORK_DIR)/tc_vars.rust.mk
 TC_LOCAL_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
 TC_LOCAL_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
 TC_LOCAL_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
@@ -78,7 +81,14 @@ include ../../mk/spksrc.tc-rust.mk
 
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: rustc depend $(TC_LOCAL_VARS_CMAKE) $(TC_LOCAL_VARS_MESON_CROSS) $(TC_LOCAL_VARS_MESON_NATIVE) $(TC_LOCAL_VARS_MK)
+_all: rustc depend \
+	$(TC_LOCAL_VARS_MK) \
+	$(TC_LOCAL_VARS_AUTOTOOLS_MK) \
+	$(TC_LOCAL_VARS_FLAGS_MK) \
+	$(TC_LOCAL_VARS_RUST_MK) \
+	$(TC_LOCAL_VARS_CMAKE) \
+	$(TC_LOCAL_VARS_MESON_CROSS) \
+	$(TC_LOCAL_VARS_MESON_NATIVE)
 
 # all wraps _all with logging
 .PHONY: all
@@ -104,6 +114,18 @@ all:
 .PHONY: $(TC_LOCAL_VARS_MK)
 $(TC_LOCAL_VARS_MK):
 	env $(MAKE) --no-print-directory tc_vars > $@ 2>/dev/null;
+
+.PHONY: $(TC_LOCAL_VARS_FLAGS_MK)
+$(TC_LOCAL_VARS_FLAGS_MK):
+	env $(MAKE) --no-print-directory tc_flags > $@ 2>/dev/null;
+
+.PHONY: $(TC_LOCAL_VARS_AUTOTOOLS_MK)
+$(TC_LOCAL_VARS_AUTOTOOLS_MK):
+	env $(MAKE) --no-print-directory autotools_vars > $@ 2>/dev/null;
+
+.PHONY: $(TC_LOCAL_VARS_RUST_MK)
+$(TC_LOCAL_VARS_RUST_MK):
+	env $(MAKE) --no-print-directory rust_vars > $@ 2>/dev/null;
 
 .PHONY: $(TC_LOCAL_VARS_CMAKE)
 $(TC_LOCAL_VARS_CMAKE): 
@@ -274,9 +296,22 @@ meson_native_vars:
         echo "g-ir-generate = '$$(which g-ir-generate)'" ; \
         echo "g-ir-scanner = '$$(which g-ir-scanner)'"
 
-.PHONY: tc_vars
-tc_vars: flag
-	@echo TC_ENV := ; \
+.PHONY: rust_vars
+rust_vars:
+	@echo TC_ENV += RUSTFLAGS=\"$(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
+	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
+	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
+	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_EXTRA_RUSTFLAGS)\" ; \
+	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
+	echo RUST_TARGET := $(RUST_TARGET)
+
+.PHONY: autotools_vars
+autotools_vars:
+	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
 	echo TC_ENV += SYSROOT=\"$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)\" ; \
 	for tool in $(TOOLS) ; \
 	do \
@@ -293,30 +328,25 @@ tc_vars: flag
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
 	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
 	fi ; \
-	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\" ; \
-	echo TC_ENV += RUSTFLAGS=\"$(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
-	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
-	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
-	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
-	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_EXTRA_RUSTFLAGS)\" ; \
-	echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
-	echo TC_TYPE := $(TC_TYPE) ; \
-	echo TC_SYSROOT := $(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
-	echo TC_TARGET := $(TC_TARGET) ; \
-	echo TC_PREFIX := $(TC_PREFIX) ; \
-	echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/ ; \
-	echo CFLAGS := $(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
+	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\"
+
+.PHONY: tc_flags
+tc_flags:
+	@echo CFLAGS := $(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
 	echo CPPFLAGS := $(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\) ; \
 	echo CXXFLAGS := $(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
 	   echo FFLAGS := $(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\) ; \
 	fi ; \
-	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\) ; \
-	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
-	echo RUST_TARGET := $(RUST_TARGET) ; \
+	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)
+
+.PHONY: tc_vars
+tc_vars: flag
+	@echo TC_TYPE := $(TC_TYPE) ; \
+	echo TC_SYSROOT := $(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
+	echo TC_TARGET := $(TC_TARGET) ; \
+	echo TC_PREFIX := $(TC_PREFIX) ; \
+	echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/ ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
@@ -325,6 +355,14 @@ tc_vars: flag
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
 	echo TC_ARCH := $(TC_ARCH) ; \
+	for tool in $(TOOLS) ; \
+	do \
+	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
+	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  if [ "$${target}" = "CC" ] ; then \
+	    gcc_version=$$(eval $$(echo $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
+	  fi ; \
+	done ; \
 	echo TC_GCC := $${gcc_version} ; \
 	echo TC_GLIBC := $(TC_GLIBC)
 # Add "+" to EXTRAVERSION for kernels version >= 4.4

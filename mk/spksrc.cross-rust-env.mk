@@ -1,5 +1,4 @@
-# Configuration for rust compiler
-#
+# rustc cross-compilation definitions
 
 RUSTUP_QORIQ_TOOLCHAIN = 1.82.0
 

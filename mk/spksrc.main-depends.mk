@@ -1,6 +1,9 @@
 # include this file for dummy modules that evaluate dependent packages only
 #
 
+# Do not initialize any environment to avoid variable leakage.
+DEFAULT_ENV = none
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
@@ -39,7 +42,6 @@ include ../../mk/spksrc.cross-env.mk
 
 # for dependency evaluation
 include ../../mk/spksrc.depend.mk
-
 
 install: depend
 include ../../mk/spksrc.install.mk
