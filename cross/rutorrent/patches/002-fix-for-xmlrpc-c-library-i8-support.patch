@@ -1,5 +1,5 @@
---- php/settings.php	2025-06-18 07:47:50
-+++ php/settings.php.new	2025-11-24 23:44:40
+--- php/settings.php.orig	2026-01-10 02:10:53.502183636 +0000
++++ php/settings.php	2026-01-10 02:12:09.684692186 +0000
 @@ -230,7 +230,10 @@
  					$this->apiVersion = $req->val[0];
  			}
