@@ -5,7 +5,7 @@ SPK_ICON = src/synocli-devel.png
 CHANGELOG = "1. Update LLVM to 21.1.8 (DSM7\).<br/>2. Update to GDB 17.1 (DSM7\).<br/>3. Update binutils to v2.45.<br/>4. Update automake to 1.18.1.<br/>5. Update strate to 6.18."
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.18.1, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.18
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.18.1, autoconf 2.71$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.18
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -54,13 +54,20 @@ SPK_COMMANDS += bin/m4
 ## automake
 ##
 SPK_COMMANDS += bin/aclocal
-SPK_COMMANDS += bin/aclocal-1.16
+SPK_COMMANDS += bin/aclocal-1.18
 SPK_COMMANDS += bin/automake
-SPK_COMMANDS += bin/automake-1.16
+SPK_COMMANDS += bin/automake-1.18
 
 ##
 ## binutils
 ##
+ifeq ($(call version_lt, $(TC_GCC), 4.4),1)
+OPTIONAL_DESC += ", binutils 2.32"
+else ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)`
+OPTIONAL_DESC += ", binutils 2.41"
+else
+OPTIONAL_DESC += ", binutils 2.45"
+endif
 SPK_COMMANDS += bin/addr2line
 SPK_COMMANDS += bin/ar
 SPK_COMMANDS += bin/as
