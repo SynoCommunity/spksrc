@@ -1,9 +1,6 @@
-Added entries corresponding to external programs which are also potentially used by plugins and
-may therefore be configured
-index b68c526c..3f79fd6f 100644
---- conf/config.php.orig
-+++ conf/config.php
-@@ -57,6 +57,11 @@
+--- conf/config.php.orig	2026-01-10 02:10:48.651008973 +0000
++++ conf/config.php	2026-01-10 02:11:23.236935461 +0000
+@@ -57,9 +57,14 @@
  		"gzip"	=> '',			// Something like /usr/bin/gzip. If empty, will be found in PATH.
  		"id"	=> '',			// Something like /usr/bin/id. If empty, will be found in PATH.
  		"stat"	=> '',			// Something like /usr/bin/stat. If empty, will be found in PATH.
@@ -14,4 +11,8 @@ index b68c526c..3f79fd6f 100644
 +		"dumptorrent"	=> '',			// Something like /usr/bin/dumptorrent. If empty, will be found in PATH.
  	);
  
- 	$localhosts = array( 			// list of local interfaces
+-	$localHostedMode = false;		// Set to true if rTorrent is hosted on the SAME machine as ruTorrent
++	$localHostedMode = true;		// Set to false if rTorrent is NOT hosted on the SAME machine as ruTorrent
+ 	
+ 	$cachedPluginLoading = false;		// Set to true to enable rapid cached loading of ruTorrent plugins
+ 										// Required to clear web browser cache when upgrading versions	
