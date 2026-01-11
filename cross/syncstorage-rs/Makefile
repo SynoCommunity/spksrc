@@ -33,8 +33,9 @@ ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
 # to find dependencies of libmysqlclient (libz)
 ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
 
-# pass mysql client version for non-x86 archs
-ENV += MYSQLCLIENT_VERSION=$(lastword $(subst -, ,$(wildcard $(WORK_DIR)/mariadb-connector-c-[0-9]*)))
+# pass mysql client version (needed by mysqlclient-sys crate)
+# Read from mariadb-connector-c-latest Makefile which exists at parse time
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)cross/mariadb-connector-c-latest/Makefile)
 
 POST_INSTALL_TARGET = syncstorage-rs_post_install
 
