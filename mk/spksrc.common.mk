@@ -85,6 +85,9 @@ AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell ec
 # Global arch definitions
 include $(BASEDIR)mk/spksrc.archs.mk
 
+# Standardized boolean parsing helpers
+include $(BASEDIR)mk/spksrc.bool.mk
+
 # Load local configuration
 LOCAL_CONFIG_MK = $(BASEDIR)local.mk
 ifneq ($(wildcard $(LOCAL_CONFIG_MK)),)
