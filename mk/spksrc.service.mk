@@ -256,7 +256,7 @@ ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 # e.g. SERVICE_WIZARD_SHARE=wizard_download_dir, for DSM 6 with USE_DATA_SHARE_WORKER = yes
-ifeq ($(strip $(USE_DATA_SHARE_WORKER)),yes)
+ifeq ($(call is_true,$(USE_DATA_SHARE_WORKER)),true)
 	@jq --arg share "{{${SERVICE_WIZARD_SHARE}}}" --arg user sc-${SPK_USER} \
 		'."data-share" = {"shares": [{"name": $$share, "permission":{"rw":[$$user]}} ] }' $@ | sponge $@
 endif
@@ -436,7 +436,7 @@ endif
 #     - SERVICE_TYPE
 # default values are documentent at the top of this file
 ifneq ($(strip $(SPK_ICON)),)
-ifeq ($(strip $(NO_SERVICE_SHORTCUT)),)
+ifeq ($(call is_true,$(NO_SERVICE_SHORTCUT)),)
 ifneq ($(wildcard $(DSM_UI_CONFIG)),)
 $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
