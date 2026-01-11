@@ -2,7 +2,7 @@
 # service ctl file
 EJABBERD_CTL="${SYNOPKG_PKGDEST}/bin/ejabberdctl"
 # HOME to place the erlang cookie into
-export HOME=${SYNOPKG_PKGDEST}
+export HOME=${SYNOPKG_PKGVAR}
 
 service_preinst ()
 {
@@ -24,6 +24,9 @@ service_preinst ()
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # patch ejabberd.yml to grant access for admin
+        sed -e "s#@@adminuser@@#${wizard_ejabberd_admin_username}@${wizard_ejabberd_hostname}#g" -i ${SYNOPKG_PKGVAR}/ejabberd.yml
+
         ${EJABBERD_CTL} start
         ${EJABBERD_CTL} started
         
@@ -33,4 +36,3 @@ service_postinst ()
         ${EJABBERD_CTL} stopped
     fi
 }
-

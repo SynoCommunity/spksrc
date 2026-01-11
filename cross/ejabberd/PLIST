@@ -1,8 +1,4 @@
-rsc:sbin/ejabberdctl
-lnk:bin/ejabberdctl
-rsc:var/ejabberd.yml
-rsc:var/ejabberdctl.cfg
-rsc:var/inetrc
+rsc:bin/ejabberdctl
 rsc:lib/base64url-1.0.1/LICENSE.txt
 rsc:lib/base64url-1.0.1/ebin/base64url.app
 rsc:lib/base64url-1.0.1/ebin/base64url.beam
@@ -94,6 +90,7 @@ rsc:lib/ejabberd-23.10/ebin/ejabberd_sm_redis.beam
 rsc:lib/ejabberd-23.10/ebin/ejabberd_sm_sql.beam
 rsc:lib/ejabberd-23.10/ebin/ejabberd_sql.beam
 rsc:lib/ejabberd-23.10/ebin/ejabberd_sql_pt.beam
+rsc:lib/ejabberd-23.10/ebin/ejabberd_sql_schema.beam
 rsc:lib/ejabberd-23.10/ebin/ejabberd_sql_sup.beam
 rsc:lib/ejabberd-23.10/ebin/ejabberd_stun.beam
 rsc:lib/ejabberd-23.10/ebin/ejabberd_sup.beam
@@ -202,6 +199,7 @@ rsc:lib/ejabberd-23.10/ebin/mod_muc_admin_opt.beam
 rsc:lib/ejabberd-23.10/ebin/mod_muc_log.beam
 rsc:lib/ejabberd-23.10/ebin/mod_muc_log_opt.beam
 rsc:lib/ejabberd-23.10/ebin/mod_muc_mnesia.beam
+rsc:lib/ejabberd-23.10/ebin/mod_muc_occupantid.beam
 rsc:lib/ejabberd-23.10/ebin/mod_muc_opt.beam
 rsc:lib/ejabberd-23.10/ebin/mod_muc_room.beam
 rsc:lib/ejabberd-23.10/ebin/mod_muc_rtbl.beam
@@ -356,6 +354,7 @@ rsc:lib/ejabberd-23.10/priv/img/vcss.png
 rsc:lib/ejabberd-23.10/priv/js/admin.js
 rsc:lib/ejabberd-23.10/priv/js/muc.js
 rsc:lib/ejabberd-23.10/priv/msgs/ar.msg
+rsc:lib/ejabberd-23.10/priv/msgs/bg.msg
 rsc:lib/ejabberd-23.10/priv/msgs/ca.msg
 rsc:lib/ejabberd-23.10/priv/msgs/cs.msg
 rsc:lib/ejabberd-23.10/priv/msgs/de.msg
@@ -568,6 +567,7 @@ rsc:lib/p1_mysql-1.0.22/ebin/p1_mysql.app
 rsc:lib/p1_mysql-1.0.22/ebin/p1_mysql.beam
 rsc:lib/p1_mysql-1.0.22/ebin/p1_mysql_app.beam
 rsc:lib/p1_mysql-1.0.22/ebin/p1_mysql_auth.beam
+rsc:lib/p1_mysql-1.0.22/ebin/p1_mysql_bin.beam
 rsc:lib/p1_mysql-1.0.22/ebin/p1_mysql_conn.beam
 rsc:lib/p1_mysql-1.0.22/ebin/p1_mysql_sup.beam
 rsc:lib/p1_mysql-1.0.22/include/p1_mysql.hrl
@@ -724,9 +724,11 @@ rsc:lib/xmpp-1.7.0/ebin/xep0359.beam
 rsc:lib/xmpp-1.7.0/ebin/xep0363.beam
 rsc:lib/xmpp-1.7.0/ebin/xep0369.beam
 rsc:lib/xmpp-1.7.0/ebin/xep0377.beam
+rsc:lib/xmpp-1.7.0/ebin/xep0402.beam
 rsc:lib/xmpp-1.7.0/ebin/xep0403.beam
 rsc:lib/xmpp-1.7.0/ebin/xep0405.beam
 rsc:lib/xmpp-1.7.0/ebin/xep0417.beam
+rsc:lib/xmpp-1.7.0/ebin/xep0421.beam
 rsc:lib/xmpp-1.7.0/ebin/xep0422.beam
 rsc:lib/xmpp-1.7.0/ebin/xep0424.beam
 rsc:lib/xmpp-1.7.0/ebin/xep0425.beam

@@ -23,6 +23,8 @@ GNU_CONFIGURE = 1
 # force native erlang root dir
 CONFIGURE_ARGS = ac_cv_erlang_root_dir=$(NATIVE_ERLANG_ROOT_DIR)
 CONFIGURE_ARGS += --enable-mysql
+# install into bin instead of sbin for DSM 7 compatibility
+CONFIGURE_ARGS += --sbindir=$(INSTALL_PREFIX)/bin
 
 # for 'rebar configure-deps' + 'rebar compile' to find cross compiled libei.a and liberl_interface.a
 # remarks: arguments for rebar are collected in 'vars.config'
@@ -43,20 +45,18 @@ include ../../mk/spksrc.cross-cc.mk
 # related to: https://github.com/processone/ejabberd/issues/139
 ejabberd_pre_configure:
 	@$(MSG) Patch to fix cross compile of rebar package
-	@$(RUN) ; sed -e "s#\" ./configure \"#\" ./configure $(TC_CONFIGURE_ARGS)\"#g" -i ./rebar.config.script
+	@$(RUN) ; sed -e "s#\" ./configure \"#\" ./configure $(TC_CONFIGURE_ARGS)\"#g" -i.orig ./rebar.config.script
 	@$(MSG) Run autogen and avoid to take version from git tag
-	@$(RUN) ; sed 's?git describe --tags 2>/dev/null || ??' -i ./configure.ac
+	@$(RUN) ; sed 's#git describe --tags 2>/dev/null || ##' -i.orig ./configure.ac
 	@$(RUN) ; ./autogen.sh
 
 .PHONY: ejabberd_post_install
 # patch the generated ejabberdctl script
-# and link sbin/ejabberdctl into bin (as DSM7 does not support executables in sbin folders).
+# additionally the files inetrc, ejabberd.yml and ejabberdctl.cfg must be installed into $(STAGING_DIR)/var/ in spk Makefile
 ejabberd_post_install:
-	sed -e "s#$(INSTALL_DIR)##g" 										\
-		 -e "s#$(NATIVE_ERLANG_BIN)#$(INSTALL_PREFIX)/bin#g"	\
-		 -e "s#^INSTALLUSER=.*#INSTALLUSER=\"sc-ejabberd\"#g"	\
-		 -e "s#/target/var/log/ejabberd#/var/log#g"					\
-		 -e "s#/target/var/lib/ejabberd#/var/lib#g"					\
-		 -e "s#/target/var#/var#g"										\
-		 -i $(STAGING_INSTALL_PREFIX)/sbin/ejabberdctl
-	cd $(STAGING_INSTALL_PREFIX)/bin && ln -sf ../sbin/ejabberdctl .
+	sed -e "s#$(INSTALL_DIR)##g"                             \
+	    -e "s#$(NATIVE_ERLANG_BIN)#$(INSTALL_PREFIX)/bin#g"  \
+	    -e "s#^INSTALLUSER=.*#INSTALLUSER=\"sc-ejabberd\"#g" \
+	    -e "s#/var/lib/ejabberd\"#/var/lib\"#g"              \
+	    -e "s#/var/log/ejabberd\"#/var/log\"#g"              \
+	    -i.orig $(STAGING_INSTALL_PREFIX)/bin/ejabberdctl
