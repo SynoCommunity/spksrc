@@ -1,5 +1,5 @@
 SPK_NAME = beszel-agent
-SPK_VERS = 0.18.0
+SPK_VERS = 0.18.1
 SPK_REV = 1
 SPK_ICON = src/beszel.png
 
