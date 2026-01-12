@@ -1,0 +1,13 @@
+--- libmariadb/ma_context.c-orig	2024-07-28 07:38:52.000000000 +0000
++++ libmariadb/ma_context.c	2026-01-12 22:03:03.616928202 +0000
+@@ -93,6 +93,10 @@ my_context_spawn(struct my_context *c, v
+   int err;
+   union pass_void_ptr_as_2_int u;
+ 
++  /* Avoid maybe-uninitialized warning on some architectures (ARM, cross) */
++  u.a[0] = 0;
++  u.a[1] = 0;
++
+   err= getcontext(&c->spawned_context);
+   if (err)
+     return -1;

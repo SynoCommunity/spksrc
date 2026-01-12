@@ -44,9 +44,9 @@ ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 endif
 endif
 	@echo "# set default compiler flags for cross-compiling" ; \
-	echo 'set(CMAKE_C_FLAGS $(strip "$(CFLAGS) $(CMAKE_C_FLAGS)"))' ; \
-	echo 'set(CMAKE_CPP_FLAGS $(strip "$(CPPFLAGS) $(CMAKE_CPP_FLAGS)"))' ; \
-	echo 'set(CMAKE_CXX_FLAGS $(strip "$(CXXFLAGS) $(CMAKE_CXX_FLAGS)"))' ; \
+	echo 'set(CMAKE_C_FLAGS $(strip "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)"))' ; \
+	echo 'set(CMAKE_CPP_FLAGS $(strip "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS)"))' ; \
+	echo 'set(CMAKE_CXX_FLAGS $(strip "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)"))' ; \
 	echo
 ifeq ($(GCC_DEBUG_INFO),1)
 	@echo "# set Debug compiler extra flags for cross-compiling (and deactivate C/C++ assert)" ; \
@@ -56,9 +56,9 @@ ifeq ($(GCC_DEBUG_INFO),1)
 	echo
 endif
 ifneq ($(strip $(CMAKE_DISABLE_EXE_LINKER_FLAGS)),1)
-	@echo 'set(CMAKE_EXE_LINKER_FLAGS $(strip "$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS)"))'
+	@echo 'set(CMAKE_EXE_LINKER_FLAGS $(strip "$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)"))'
 endif
-	@echo 'set(CMAKE_SHARED_LINKER_FLAGS $(strip "$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS)"))' ; \
+	@echo 'set(CMAKE_SHARED_LINKER_FLAGS $(strip "$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)"))' ; \
 	echo
 ifneq ($(strip $(BUILD_SHARED_LIBS)),)
 	@echo "# build shared library" ; \
