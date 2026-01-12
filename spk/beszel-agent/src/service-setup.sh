@@ -1,11 +1,9 @@
 export PATH="/usr/local/bin:$PATH"
 export LOG_LEVEL=debug
 
-export SMART_DEVICES="/dev/sda:sat,/dev/sdb:sat,/dev/sdr:sat"
-SMART_INTERVAL=1m
-
 KEY_FILE="${SYNOPKG_PKGVAR}/key.pub"
 EXTRA_FS_FILE="${SYNOPKG_PKGVAR}/extra_fs.conf"
+SMART_DEVICES_FILE="${SYNOPKG_PKGVAR}/smart_devices.conf"
 
 # Read the public key from the saved file
 if [ -f "${KEY_FILE}" ]; then
@@ -17,6 +15,12 @@ fi
 if [ -f "${EXTRA_FS_FILE}" ]; then
     EXTRA_FS=$(cat "${EXTRA_FS_FILE}")
     export EXTRA_FILESYSTEMS="${EXTRA_FS}"
+fi
+
+# Read the SMART devices from the saved file
+if [ -f "${SMART_DEVICES_FILE}" ]; then
+    SMART_DEVS=$(cat "${SMART_DEVICES_FILE}")
+    export SMART_DEVICES="${SMART_DEVS}"
 fi
 
 BESZEL_AGENT="${SYNOPKG_PKGDEST}/bin/beszel-agent"
@@ -36,6 +40,11 @@ service_postinst ()
     if [ -n "${wizard_extra_fs}" ]; then
         echo "${wizard_extra_fs}" > "${EXTRA_FS_FILE}"
     fi
+
+    # Save the SMART devices only if provided
+    if [ -n "${wizard_smart_devices}" ]; then
+        echo "${wizard_smart_devices}" > "${SMART_DEVICES_FILE}"
+    fi
 }
 
 service_preupgrade ()
@@ -47,6 +56,9 @@ service_preupgrade ()
     if [ -f "${EXTRA_FS_FILE}" ]; then
         cp "${EXTRA_FS_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/"
     fi
+    if [ -f "${SMART_DEVICES_FILE}" ]; then
+        cp "${SMART_DEVICES_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/"
+    fi
 }
 
 service_postupgrade ()
@@ -57,5 +69,8 @@ service_postupgrade ()
     fi
     if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/extra_fs.conf" ]; then
         cp "${SYNOPKG_TEMP_UPGRADE_FOLDER}/extra_fs.conf" "${EXTRA_FS_FILE}"
+    fi
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/smart_devices.conf" ]; then
+        cp "${SYNOPKG_TEMP_UPGRADE_FOLDER}/smart_devices.conf" "${SMART_DEVICES_FILE}"
     fi
 }

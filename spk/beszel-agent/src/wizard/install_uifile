@@ -36,6 +36,19 @@
         ]
       },
       {
+        "type": "textfield",
+        "desc": "Configure SMART monitoring devices. List devices with :sat suffix for proper detection.",
+        "subitems": [
+          {
+            "key": "wizard_smart_devices",
+            "desc": "SMART Devices",
+            "emptyText": "/dev/sda:sat,/dev/sdb:sat",
+            "width": "400",
+            "defaultValue": ""
+          }
+        ]
+      },
+      {
         "desc": "The Beszel agent listens on port 45876 by default. Make sure this port is accessible from your Beszel Hub."
       }
     ]
