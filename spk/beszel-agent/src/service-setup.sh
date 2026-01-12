@@ -1,3 +1,8 @@
+export PATH="/usr/local/bin:$PATH"
+export LOG_LEVEL=debug
+
+export SMART_DEVICES="/dev/sda:sat,/dev/sdb:sat,/dev/sdr:sat"
+SMART_INTERVAL=1m
 
 KEY_FILE="${SYNOPKG_PKGVAR}/key.pub"
 EXTRA_FS_FILE="${SYNOPKG_PKGVAR}/extra_fs.conf"
@@ -16,6 +21,7 @@ fi
 
 BESZEL_AGENT="${SYNOPKG_PKGDEST}/bin/beszel-agent"
 SERVICE_COMMAND="${BESZEL_AGENT}"
+
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
