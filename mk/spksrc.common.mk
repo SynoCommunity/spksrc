@@ -161,6 +161,18 @@ version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; f
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 
+# Remove duplicate words within string while preserving order
+define uniq
+$(strip \
+  $(eval __seen :=) \
+  $(foreach f,$1, \
+    $(if $(filter $f,$(__seen)),, \
+      $(eval __seen += $f)$(f) \
+    ) \
+  ) \
+)
+endef
+
 # Macro: dedup
 #        removes duplicate entries from a specified delimiter,
 #        preserving the order of unique elements.
