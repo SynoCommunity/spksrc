@@ -31,7 +31,7 @@ cmake_pkg_toolchain:
 	@echo "# Rust flags (linker, rpath, libs)" ; \
 	echo "set(RUSTFLAGS" ; \
 	echo "  \"-Clinker=\$${RUST_LINKER}\"" ; \
-	echo $(RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/  \"/" -e "s/$$/\"/" ; \
+	echo $(call uniq,$(RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS)) | tr ' ' '\n' | sed -e "s/^/  \"/" -e "s/$$/\"/" ; \
 	echo ")" ; \
 	echo "set(ENV{RUSTFLAGS} \$${RUSTFLAGS})" ; \
 	echo
@@ -44,21 +44,27 @@ ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 endif
 endif
 	@echo "# set default compiler flags for cross-compiling" ; \
-	echo 'set(CMAKE_C_FLAGS $(strip "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)"))' ; \
-	echo 'set(CMAKE_CPP_FLAGS $(strip "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS)"))' ; \
-	echo 'set(CMAKE_CXX_FLAGS $(strip "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)"))' ; \
-	echo
+	echo 'set(CMAKE_C_FLAGS "$(call uniq,$(CFLAGS) $(TC_EXTRA_CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS))")' ; \
+	echo 'set(CMAKE_CPP_FLAGS "$(call uniq,$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS))")' ; \
+	echo 'set(CMAKE_CXX_FLAGS "$(call uniq,$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS))")'
+#ifneq ($(strip $(FFLAGS)),)
+	@echo 'set(CMAKE_Fortran_FLAGS "$(call uniq,$(FFLAGS) $(CMAKE_Fortran_FLAGS) $(ADDITIONAL_FFLAGS))")'
+#endif
+	@echo
 ifeq ($(GCC_DEBUG_INFO),1)
 	@echo "# set Debug compiler extra flags for cross-compiling (and deactivate C/C++ assert)" ; \
 	echo 'set(CMAKE_C_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug C flags" FORCE)' ; \
 	echo 'set(CMAKE_CPP_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug CPP flags" FORCE)' ; \
-	echo 'set(CMAKE_CXX_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug CXX flags" FORCE)' ; \
-	echo
+	echo 'set(CMAKE_CXX_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug CXX flags" FORCE)'
+#ifneq ($(strip $(FFLAGS)),)
+	@echo 'set(CMAKE_Fortran_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug Fortran flags" FORCE)'
+#endif
+	@echo
 endif
 ifneq ($(strip $(CMAKE_DISABLE_EXE_LINKER_FLAGS)),1)
-	@echo 'set(CMAKE_EXE_LINKER_FLAGS $(strip "$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)"))'
+	@echo 'set(CMAKE_EXE_LINKER_FLAGS "$(call uniq,$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS))")'
 endif
-	@echo 'set(CMAKE_SHARED_LINKER_FLAGS $(strip "$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS)"))' ; \
+	@echo 'set(CMAKE_SHARED_LINKER_FLAGS "$(call uniq,$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS))")' ; \
 	echo
 ifneq ($(strip $(BUILD_SHARED_LIBS)),)
 	@echo "# build shared library" ; \
