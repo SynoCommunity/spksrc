@@ -65,9 +65,9 @@ ifneq ($(strip $(MESON_BUILTIN_CPP_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_ARGS)',\n"
 endif
 ifeq ($(GCC_DEBUG_INFO),1)
-	@echo $(call uniq,$(patsubst -O%,,$(CPPFLAGS) $(GCC_DEBUG_FLAGS) $(ADDITIONAL_CPPLAGS))) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(patsubst -O%,,$(CPPFLAGS) $(GCC_DEBUG_FLAGS) $(ADDITIONAL_CPPFLAGS))) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 else
-	@echo $(call uniq,$(CPPFLAGS) $(ADDITIONAL_CPPLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(CPPFLAGS) $(ADDITIONAL_CPPFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 endif
 	@echo -ne "\t]\n"
 	@echo
