@@ -2,7 +2,7 @@ PKG_NAME = libdaemon
 PKG_VERS = 0.14
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = http://0pointer.de/lennart/projects/$(PKG_NAME)
+PKG_DIST_SITE = http://0pointer.de/lennart/projects/libdaemon
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
