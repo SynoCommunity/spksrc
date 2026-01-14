@@ -47,18 +47,18 @@ endif
 	echo 'set(CMAKE_C_FLAGS "$(call uniq,$(CFLAGS) $(TC_EXTRA_CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS))")' ; \
 	echo 'set(CMAKE_CPP_FLAGS "$(call uniq,$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS))")' ; \
 	echo 'set(CMAKE_CXX_FLAGS "$(call uniq,$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS))")'
-#ifneq ($(strip $(FFLAGS)),)
+ifneq ($(strip $(FFLAGS)),)
 	@echo 'set(CMAKE_Fortran_FLAGS "$(call uniq,$(FFLAGS) $(CMAKE_Fortran_FLAGS) $(ADDITIONAL_FFLAGS))")'
-#endif
+endif
 	@echo
 ifeq ($(GCC_DEBUG_INFO),1)
 	@echo "# set Debug compiler extra flags for cross-compiling (and deactivate C/C++ assert)" ; \
 	echo 'set(CMAKE_C_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug C flags" FORCE)' ; \
 	echo 'set(CMAKE_CPP_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug CPP flags" FORCE)' ; \
 	echo 'set(CMAKE_CXX_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug CXX flags" FORCE)'
-#ifneq ($(strip $(FFLAGS)),)
+ifneq ($(strip $(FFLAGS)),)
 	@echo 'set(CMAKE_Fortran_FLAGS_DEBUG $(strip "$(GCC_DEBUG_FLAGS) -DNDEBUG") CACHE STRING "Debug Fortran flags" FORCE)'
-#endif
+endif
 	@echo
 endif
 ifneq ($(strip $(CMAKE_DISABLE_EXE_LINKER_FLAGS)),1)

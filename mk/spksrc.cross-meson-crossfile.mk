@@ -83,7 +83,7 @@ endif
 	@echo $(call uniq,$(LDFLAGS) $(ADDITIONAL_LDFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
-#ifneq ($(strip $(FFLAGS)),)
+ifneq ($(strip $(FFLAGS)),)
 	@echo "fortran_args = ["
 ifneq ($(strip $(MESON_BUILTIN_FC_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_FC_ARGS)',\n"
@@ -102,7 +102,7 @@ endif
 	@echo $(call uniq,$(LDFLAGS) $(ADDITIONAL_LDFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
-#endif
+endif
 	@echo "rust_args = [" ; \
 	echo -ne "\t'--target=$(RUST_TARGET)',\n" ; \
 	echo -ne "\t'-Clinker=$(TC_PATH)$(TC_PREFIX)gcc',\n"
