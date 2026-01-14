@@ -29,10 +29,15 @@ export MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock
 ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
 ENV += MYSQLCLIENT_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/mariadb
 
-# pass mysql client version for non-x86 archs
-ENV += MYSQLCLIENT_VERSION=$(lastword $(subst -, ,$(wildcard $(WORK_DIR)/mariadb-connector-c-[0-9]*)))
-
 # let ./configure find mysql_config (it is a script and works for cross compile)
 ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
 
 include ../../mk/spksrc.cross-rust.mk
+
+# pass mysql client version (needed by mysqlclient-sys crate)
+# Use same conditional as mariadb-connector-c to select correct version
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)cross/mariadb-connector-c-latest/Makefile)
+else
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)cross/mariadb-connector-c-3.3.11/Makefile)
+endif
