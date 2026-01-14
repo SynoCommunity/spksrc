@@ -2,10 +2,15 @@
 QBITTORRENT="${SYNOPKG_PKGDEST}/bin/qbittorrent-nox"
 WEBUI_PORT="8095"
 CFG_FILE="${SYNOPKG_PKGVAR}/qBittorrent/config/qBittorrent.conf"
+PWHASH="${SYNOPKG_PKGDEST}/bin/qbt-pwhash"
 
 SERVICE_COMMAND="${QBITTORRENT} --confirm-legal-notice --profile=${SYNOPKG_PKGVAR} --webui-port=${WEBUI_PORT}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
+
+generate_password_hash() {
+    "${PWHASH}" "$1"
+}
 
 check_folder_access() {
     folder=$1
@@ -30,16 +35,18 @@ service_postinst() {
         check_folder_access "${share_path}/complete"
         check_folder_access "${share_path}/incomplete"
 
+        # Generate password hash using wizard password
+        password_hash=$(generate_password_hash "${wizard_password}")
+
         # Apply substitutions to config template
-        # Password is pre-computed PBKDF2 hash for "adminadmin"
         sed -i -e "s|@download_dir@|${share_path}/complete|g" \
                -e "s|@incomplete_dir@|${share_path}/incomplete|g" \
                -e "s|@webui_port@|${WEBUI_PORT}|g" \
                -e "s|@username@|${wizard_username}|g" \
+               -e "s|@password_hash@|${password_hash}|g" \
                "${CFG_FILE}"
 
         echo "qBittorrent configured with username: ${wizard_username}"
-        echo "Default password: adminadmin (please change via WebUI after first login)"
         echo "Downloads: ${share_path}/complete"
     fi
 }

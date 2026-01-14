@@ -1,5 +1,7 @@
 #!/bin/bash
 
+INTERNAL_IP=$(ip -4 route get 8.8.8.8 | awk '/8.8.8.8/ {for (i=1; i<NF; i++) if ($i=="src") print $(i+1)}')
+
 quote_json () {
     sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
 }
@@ -57,7 +59,17 @@ PAGE_CREDENTIALS=$(/bin/cat<<EOF
         }]
     },
     {
-        "desc": "<br><b>Default password:</b> adminadmin<br><br>Please change the password after first login via WebUI Settings > Web UI > Authentication."
+        "type": "password",
+        "desc": "Web interface password (minimum 6 characters, default: adminadmin)",
+        "subitems": [{
+            "key": "wizard_password",
+            "desc": "Password",
+            "defaultValue": "adminadmin",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 6
+            }
+        }]
     }]
 }
 EOF
@@ -67,10 +79,10 @@ PAGE_INFO=$(/bin/cat<<EOF
 {
     "step_title": "Access & Permissions",
     "items": [{
-        "desc": "<b>Web Interface</b><br>qBittorrent will be accessible at <b>http://&lt;NAS_IP&gt;:8095</b><br><br>Downloads will be saved to <b>complete</b> and <b>incomplete</b> subfolders in your selected shared folder."
+        "desc": "<b>Web Interface</b><br>qBittorrent will be accessible at <b>http://${INTERNAL_IP}:8095</b><br>Downloads will be saved to <b>complete</b> and <b>incomplete</b> subfolders in your selected shared folder."
     },
     {
-        "desc": "<br><b>Permissions</b><br>Permissions are managed with the group <b>'synocommunity'</b>.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "<b>Permissions</b><br>Permissions are managed with the group <b>'synocommunity'</b>.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
     }]
 }
 EOF

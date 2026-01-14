@@ -3,7 +3,7 @@ SPK_VERS = 5.1.4
 SPK_REV = 1
 SPK_ICON = src/qbittorrent.png
 
-DEPENDS = cross/qbittorrent
+DEPENDS = cross/qbittorrent cross/qbittorrent-pwhash
 
 REQUIRED_MIN_DSM = 6.0
 REQUIRED_MIN_SRM = 1.3

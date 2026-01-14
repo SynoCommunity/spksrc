@@ -1,0 +1,17 @@
+[package]
+name = "qbt-pwhash"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+pbkdf2 = { version = "0.12", default-features = false, features = ["hmac"] }
+sha2 = { version = "0.10", default-features = false }
+base64 = { version = "0.21", default-features = false, features = ["alloc"] }
+getrandom = { version = "0.2", default-features = false, features = ["std"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
