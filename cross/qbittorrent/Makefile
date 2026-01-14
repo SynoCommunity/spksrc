@@ -14,8 +14,8 @@ LICENSE  = GPLv2
 INSTALL_TARGET = qbittorrent_install
 
 # Static binaries from userdocs/qbittorrent-nox-static
-# Available: x86_64, aarch64, armv7, armhf, x86
-PKG_DIST_ARCH_LIST = x86_64 aarch64 armv7 armhf x86
+# Available: x86_64, aarch64, armv7, x86
+PKG_DIST_ARCH_LIST = x86_64 aarch64 armv7 x86
 
 include ../../mk/spksrc.archs.mk
 
@@ -25,14 +25,12 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = aarch64
 else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = armv7
-else ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-PKG_DIST_ARCH = armhf
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = x86
 endif
 
 # Unsupported architectures (no static binary available)
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS) $(ARMv5_ARCHS)
 
 include ../../mk/spksrc.install-resources.mk
 

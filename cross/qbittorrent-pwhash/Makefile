@@ -6,8 +6,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# Match qbittorrent's unsupported architectures
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS)
+# Match qbittorrent's unsupported architectures plus 88f6281 (glibc 2.15 < required 2.16)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS) $(ARMv5_ARCHS)
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc
 COMMENT  = PBKDF2-SHA512 password hash generator for qBittorrent
