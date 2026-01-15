@@ -12,24 +12,27 @@ SVC_BACKGROUND=yes
 
 service_postinst ()
 {
-    if [ ! -e ${ENV_FILE} ]; then
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         # Create default env file
         cp -f ${ENV_FILE_DEFAULT} ${ENV_FILE}
-    fi
+        if [ ! -e ${ENV_FILE} ]; then
+            echo "Failed to create env file: ${ENV_FILE}"
+        fi
 
-    if [ ! -e ${CONFIG_FILE} ]; then
         # Create config file with values from wizard
         cp -f ${CONFIG_FILE_TEMPLATE} ${CONFIG_FILE}
-        if [ -z "${wizard_admin_token}" ]; then
-            disable_admin_token=true
+        if [ -e ${CONFIG_FILE} ]; then
+            if [ -z "${wizard_admin_token}" ]; then
+                disable_admin_token=true
+            else
+                disable_admin_token=false
+            fi
+            sed -e "s|@@domain@@|${wizard_domain}|g"  \
+                -e "s|@@admin_token@@|${wizard_admin_token}|g"  \
+                -e "s|\"@@disable_admin_token@@\"|${disable_admin_token}|g"  \
+                -i ${CONFIG_FILE}
         else
-            disable_admin_token=false
+            echo "Failed to create config file: ${CONFIG_FILE}"
         fi
-        sed -e "s|@@domain@@|${wizard_domain}|g"  \
-            -e "s|@@admin_token@@|${wizard_admin_token}|g"  \
-            -e "s|\"@@disable_admin_token@@\"|${disable_admin_token}|g"  \
-            -i ${CONFIG_FILE}
-    else
-        echo "Missing config file: ${CONFIG_FILE}"
     fi
 }
