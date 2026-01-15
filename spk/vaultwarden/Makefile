@@ -19,8 +19,8 @@ STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8180
-SERVICE_PORT_TITLE = vaultwarden web
-ADMIN_PORT = $(SERVICE_PORT)
+SERVICE_PORT_TITLE = Vaultwarden
+NO_SERVICE_SHORTCUT = true
 
 WIZARDS_DIR = src/wizard/
 
