@@ -1,9 +1,10 @@
 PKG_NAME = gotify-cli
-PKG_VERS = 2.2.1
+PKG_VERS = 2.3.2
 PKG_DIST_NAME = gotify-cli-linux-$(PKG_DIST_ARCH)
 PKG_DIST_SITE = https://github.com/gotify/cli/releases/download/v$(PKG_VERS)
 PKG_DIST_FILE = gotify-cli-$(PKG_VERS)-linux-$(PKG_DIST_ARCH)
 
+# No binaries available for these architectures
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 HOMEPAGE = https://gotify.net/

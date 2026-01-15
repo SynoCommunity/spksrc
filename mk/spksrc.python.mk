@@ -6,7 +6,7 @@
 
 # set default spk/python* path to use
 PYTHON_PACKAGE_DIR = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE))
-PYTHON_PACKAGE_WORK_DIR = $(PYTHON_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION))
+PYTHON_PACKAGE_WORK_DIR = $(PYTHON_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
 
 include ../../mk/spksrc.common.mk
 

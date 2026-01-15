@@ -1,6 +1,6 @@
 SPK_NAME = ffsync
 SPK_VERS = 0.21.1
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/ffsync.png
 
 DEPENDS = cross/syncstorage-rs cross/diesel
