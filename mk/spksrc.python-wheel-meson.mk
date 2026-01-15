@@ -32,7 +32,7 @@ include ../../mk/spksrc.cross-meson-crossfile.mk
 # 1- Prepare the crossenv
 # 2- Generate the per-dependency cross-file definition
 ifeq ($(strip $(CONFIGURE_TARGET)),)
-CONFIGURE_TARGET = prepare_crossenv $(MESON_CROSS_FILE_PKG)
+CONFIGURE_TARGET = prepare_crossenv meson_generate_crossfile
 endif
 
 ifeq ($(strip $(COMPILE_TARGET)),)

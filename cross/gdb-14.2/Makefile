@@ -1,5 +1,5 @@
 PKG_NAME = gdb
-PKG_VERS = 17.1
+PKG_VERS = 14.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/gdb
@@ -31,8 +31,8 @@ PLIST_TRANSFORM_SED_ARGS += -e 's?lib:lib/libinproctrace.so??g'
 endif
 endif
 
-# binary only created for aarch64
-ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
+# binary only created for arm
 PLIST_TRANSFORM_SED_ARGS += -e 's?bin:bin/run??g'
 endif
 

@@ -21,12 +21,16 @@ TOOLKIT_ROOT = $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
 ENV += TOOLKIT_ROOT=$(TOOLKIT_ROOT)
 endif
 
-ifneq ($(strip $(TC)),)
-TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
-TC_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
-TC_VARS_MESON_CROSS = $(WORK_DIR)/tc_vars.meson-cross
+TC_VARS_MK           = $(WORK_DIR)/tc_vars.mk
+TC_VARS_AUTOTOOLS_MK = $(WORK_DIR)/tc_vars.autotools.mk
+TC_VARS_FLAGS_MK     = $(WORK_DIR)/tc_vars.flags.mk
+TC_VARS_RUST_MK      = $(WORK_DIR)/tc_vars.rust.mk
+#
+TC_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
+TC_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
 TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 
+ifneq ($(strip $(TC)),)
 # Mandatory to build the CFLAGS and LDFLAGS env variables
 export INSTALL_DIR
 export INSTALL_PREFIX
@@ -38,9 +42,12 @@ ifeq ($(strip $(MAKECMDGOALS)),download)
 	@if env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) download ; \
 	then \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $(TC_VARS_MK) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_flags > $(TC_VARS_FLAGS_MK) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) autotools_vars > $(TC_VARS_AUTOTOOLS_MK) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_VARS_CMAKE) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_cross_vars > $(TC_VARS_MESON_CROSS) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_native_vars > $(TC_VARS_MESON_NATIVE) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) rust_vars > $(TC_VARS_RUST_MK) ; \
 	else \
 	  echo "$$""(error An error occured while downloading the toolchain, please check the messages above)" > $@; \
 	fi
@@ -49,15 +56,28 @@ else
 	@if env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) ; \
 	then \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $(TC_VARS_MK) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_flags > $(TC_VARS_FLAGS_MK) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) autotools_vars > $(TC_VARS_AUTOTOOLS_MK) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_VARS_CMAKE) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_cross_vars > $(TC_VARS_MESON_CROSS) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_native_vars > $(TC_VARS_MESON_NATIVE) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) rust_vars > $(TC_VARS_RUST_MK) ; \
 	else \
 	  echo "$$""(error An error occured while setting up the toolchain, please check the messages above)" > $@; \
 	fi
 endif
 
+# Include generic exports
 -include $(TC_VARS_MK)
+
+# Default is autotools / make
+DEFAULT_ENV ?= autotools flags rust
+
+# Map DEFAULT_ENV definitions to filenames
+TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
+# Include them (optional include)
+-include $(TC_VARS_FILES)
+
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
