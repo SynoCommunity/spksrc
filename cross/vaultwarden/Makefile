@@ -29,6 +29,17 @@ LICENSE = GPLv3
 CARGO_INSTALL_ARGS = --features sqlite,mysql,postgresql
 
 ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
+
+# mysqlclient-sys: to find libmysqlclient (mariadb-connector-c)
+ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
+ENV += MYSQLCLIENT_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/mariadb
+
+# let ./configure find mysql_config (it is a script and works for cross compile)
+ENV += "PATH=$(PATH):$(STAGING_INSTALL_PREFIX)/bin"
+
+# libpq: to find PostgreSQL client library
+ENV += PQ_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
+
 # prevent reading version from local git repository:
 ENV += VW_VERSION="$(PKG_VERS) (SynoCommunity-$(ARCH))"
 
@@ -42,3 +53,11 @@ ADDITIONAL_CFLAGS = -std=c99
 endif
 
 include ../../mk/spksrc.cross-rust.mk
+
+# pass mysql client version (needed by mysqlclient-sys crate)
+# Use same conditional as mariadb-connector-c to select correct version
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)cross/mariadb-connector-c-latest/Makefile)
+else
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)cross/mariadb-connector-c-3.3.11/Makefile)
+endif
