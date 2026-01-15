@@ -1,11 +1,10 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.4.1
-# reuse former SPK_REV to separate from python312 dependent packages
-SPK_REV = 17
+SPK_VERS = 1.4.3
+SPK_REV = 20
 SPK_ICON = src/borgbackup.png
 
 # REMARKS
-# Python 3.11 compatible version for ARMv5 archs
+# Python 3.11 compatible version for ARMv5 and ARMv7L archs
 
 PYTHON_PACKAGE = python311
 SPK_DEPENDS = $(PYTHON_PACKAGE)
@@ -32,7 +31,7 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # 
 # # 4. Generate the requirements file, restricting version of rpds-py for compatibility
 # # rpds-py >= 0.22.3 requires rustc >= 1.80
-# ./generate_requirements.sh "borgbackup[llfuse]=="1.4.1" borgmatic emborg rpds-py==0.21.0" 311
+# ./generate_requirements.sh "borgbackup[llfuse] borgmatic emborg rpds-py==0.21.0" 311
 # 
 # # 5. Post-generation
 # # The script will create three files (pure, cross, and combined) for the Borg deployment
@@ -48,7 +47,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Borgbackup 1.4.1 with Python 3.11 dependency for ARMv5 (88f628x) and ARMv7L (hi3535) archs. <br/>2. Update borgmatic to v2.0.11. <br/>3. Update emborg to v1.42."
+CHANGELOG = "1. Update Borg to v1.4.3.<br/>2. Update borgmatic to v2.0.12."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
@@ -68,3 +67,8 @@ ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
+
+# [msgpack]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [msgpack] -std=gnu99
+endif
