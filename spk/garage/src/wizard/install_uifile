@@ -1,0 +1,31 @@
+[
+   {
+      "step_title": "Garage configuration",
+      "items": [
+         {
+            "type": "textfield",
+            "desc": "Data shared folder. This must be the name of the shared folder only, without any path. The share will be created during installation if it does not already exist.",
+            "subitems": [
+               {
+                  "key": "wizard_data_directory",
+                  "desc": "Data shared folder",
+                  "defaultValue": "garage",
+                  "validator": {
+                     "allowBlank": false,
+                     "regex": {
+                        "expr": "/^[^<>: */?\"]*/",
+                        "errorText": "Share name must be a single folder name only. Path separators, spaces, and special characters are not allowed."
+                     }
+                  }
+               }
+            ]
+         },
+         {
+            "desc": "If you let the installer create the shared folder, it will be created on the same volume as the package installation. If you want to use a different volume, create the shared folder manually in DSM Control Panel first, then enter its name in the field above."
+         },
+         {
+            "desc": "If no config file exists in the shared folder, it will be created automatically. To configure garage, edit the generated configuration file in that folder and restart the service."
+         }
+      ]
+   }
+]
