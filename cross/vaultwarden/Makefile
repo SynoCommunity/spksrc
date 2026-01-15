@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/dani-garcia/vaultwarden/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl3 cross/mysql-connector-c cross/libpq
+DEPENDS = cross/openssl3 cross/mariadb-connector-c cross/libpq
 
 # issue with dependent component "ring"
 # https://github.com/briansmith/ring/issues/1424
