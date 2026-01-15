@@ -1,0 +1,41 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_README.scan.dpatch by Stephane Glondu <steph@glondu.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Explicitly include <stdint.h> and include system headers first
+## DP: to fix FTBFS (Closes: #525580)
+
+@DPATCH@
+diff -Nru linuxtv-dvb-apps-1.1.1+rev1207/lib/libdvbapi/dvbaudio.c linuxtv-dvb-apps-1.1.1+rev1207/lib/libdvbapi/dvbaudio.c
+--- linuxtv-dvb-apps-1.1.1+rev1207/lib/libdvbapi/dvbaudio.c	2008-06-16 15:44:38.000000000 +0000
++++ linuxtv-dvb-apps-1.1.1+rev1207/lib/libdvbapi/dvbaudio.c	2009-04-29 13:10:19.000000000 +0000
+@@ -21,6 +21,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>
++#include <stdint.h>
+ #include <sys/param.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+diff -Nru linuxtv-dvb-apps-1.1.1+rev1207/test/test_av.c linuxtv-dvb-apps-1.1.1+rev1207/test/test_av.c
+--- linuxtv-dvb-apps-1.1.1+rev1207/test/test_av.c	2008-06-16 15:44:38.000000000 +0000
++++ linuxtv-dvb-apps-1.1.1+rev1207/test/test_av.c	2009-04-29 13:10:19.000000000 +0000
+@@ -23,6 +23,7 @@
+ #include <sys/ioctl.h>
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <stdint.h>
+ #include <string.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+diff -Nru linuxtv-dvb-apps-1.1.1+rev1207/util/scan/diseqc.c linuxtv-dvb-apps-1.1.1+rev1207/util/scan/diseqc.c
+--- linuxtv-dvb-apps-1.1.1+rev1207/util/scan/diseqc.c	2008-06-16 15:44:38.000000000 +0000
++++ linuxtv-dvb-apps-1.1.1+rev1207/util/scan/diseqc.c	2009-04-29 13:10:19.000000000 +0000
+@@ -1,6 +1,6 @@
+-#include <linux/dvb/frontend.h>
+ #include <sys/ioctl.h>
+ #include <time.h>
++#include <linux/dvb/frontend.h>
+ 
+ #include "scan.h"
+ #include "diseqc.h"

@@ -42,10 +42,19 @@
         ]
     },
     {
-        "step_title": "DSM Permissions",
+        "step_title": "Permissions and Customization",
         "items": [
             {
-                "desc": "Permissions for this package are handled by the <b>'sc-syncthing'</b> group. <br>Using File Station, add this group to every folder Syncthing should be allowed to access.<br>Please read <a <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+                "desc": "<b>Permissions</b>"
+            },
+            {
+                "desc": "Permissions for this package are handled by the <b>'sc-syncthing'</b> group. <br>Using File Station, add this group to every folder Syncthing should be allowed to access. <br/>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+            },
+            {
+                "desc": "<b>Customization</b>"
+            },
+            {
+                "desc": "For advanced customization you can edit the file <code>/var/packages/syncthing/var/options.conf</code>. For example, you can define a custom <code>HOME</code> folder or additional parameters to start Syncthing with. <br/>To modify the options file, you need <code>SSH</code> access with a privileged user account. To apply your modifications, you have to restart Syncthing in the Package Center."
             }
         ]
     }

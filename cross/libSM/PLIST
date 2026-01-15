@@ -1,7 +1,3 @@
-rsc:include/X11/SM/SM.h
-rsc:include/X11/SM/SMlib.h
-rsc:include/X11/SM/SMproto.h
 lnk:lib/libSM.so
 lnk:lib/libSM.so.6
 lib:lib/libSM.so.6.0.1
-rsc:lib/pkgconfig/sm.pc

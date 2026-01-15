@@ -1,5 +1,19 @@
-# Cross-compiled Dependencies
+# Generated using the requirements script on December 23, 2025
+# Command: ./generate_requirements.sh "beets[beatport,chroma,discogs,embedart,embyupdate,fetchart,kodiupdate,lastgenre,lastimport,lyrics,metasync,plexupdate,replaygain,scrub,sonosupdate]==2.5.1" 312
 
-MarkupSafe==2.0.1
-PyYAML==6.0
-# Pillow               ==> Makefile
+# NOTE: The following plugins were excluded due to being broken or deprecated:
+# absubmit, docs, import, reflink
+
+# NOTE: Excluded plugins that require background services or desktop environments:
+# aura, bpd, mpdstats, thumbnails, web
+
+charset_normalizer==3.4.4
+#dbus_python            ==> python/dbus-python          for plugins: metasync
+jellyfish==1.2.1
+#lap>=0.5.12            ==> python/lap
+lxml==6.0.2
+#numpy>=1.24.4          ==> python/numpy
+#pillow                 ==> python/pillow               for plugins: embedart, fetchart
+#pycairo                ==> python/pycairo
+#pygobject              ==> python/pygobject            for plugins: replaygain
+pyyaml==6.0.3

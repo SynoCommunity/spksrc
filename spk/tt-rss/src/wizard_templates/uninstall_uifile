@@ -1,0 +1,31 @@
+[{
+	"step_title": "{{REMOVE_TT_RSS_TITLE}}",
+	"invalid_next_disabled_v2": true,
+	"items": [{
+		"desc": "{{REMOVE_TT_RSS_DESC}}"
+	}, {
+		"type": "password",
+		"desc": "{{ENTER_MYSQL_PASSWORD_DESC}}",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "{{ROOT_PASSWORD}}",
+			"validator": {
+				"allowBlank": false
+			}
+		}]
+	}, {
+		"type": "textfield",
+		"desc": "{{DB_EXPORT_DESCRIPTION}}",
+		"subitems": [{
+			"key": "wizard_dbexport_path",
+			"desc": "{{{DB_EXPORT_LOCATION_LABEL}}}",
+			"validator": {
+				"allowBlank": true,
+				"regex": {
+					"expr": "/^\\\/(volume|volumeUSB)[0-9]+\\\//",
+					"errorText": "{{{DB_EXPORT_LOCATION_FORMAT_ERROR}}}"
+				}
+			}		
+		}]
+	}]
+}]

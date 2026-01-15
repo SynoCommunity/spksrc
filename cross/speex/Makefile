@@ -13,6 +13,6 @@ LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static
-ADDITIONAL_CFLAGS = -O
+ADDITIONAL_CFLAGS = -Os
 
 include ../../mk/spksrc.cross-cc.mk

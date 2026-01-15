@@ -1,3 +1,5 @@
+# adjust location of special folders to match package installed on DSM
+# 
 --- ./mcs/class/corlib/System/Environment.cs.orig	2018-02-17 20:23:18.195842002 +0100
 +++ ./mcs/class/corlib/System/Environment.cs	2018-02-17 20:27:50.300067318 +0100
 @@ -676,7 +676,7 @@

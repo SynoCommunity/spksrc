@@ -11,7 +11,7 @@ body:
   attributes:
     label: Is this a new Bug?
     options:
-      - label: "I checkd that the bug hasn't been reported before"
+      - label: "I checked that the bug hasn't been reported before"
         required: true
           
 - type: input
@@ -39,7 +39,7 @@ body:
   id: arch
   attributes:
     label: Device Architecture
-    description: Which CPU Architecture does your NAS have? [You can look up the Architectrue for your NAS here](https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures)
+    description: Which CPU Architecture does your NAS have? [You can look up the Architecture for your NAS here](https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures)
     options:
       - x86_64
       - AArch64 (ARMv8)
@@ -59,7 +59,7 @@ body:
     required: true
     
 - type: textarea
-  id: decription
+  id: description
   attributes:
     label: What happened?
     description: |
@@ -69,16 +69,15 @@ body:
   validations:
     required: true
 - type: textarea
-  id: repoduce
+  id: reproduce
   attributes:
     label: Reproduction steps
     description: "How do you trigger this bug? Please walk us through it step by step."
     value: |
-      1.
-      2.
-      3.
+      1. 
+      2. 
+      3. 
       ...
-    render: bash
   validations:
     required: true
 - type: textarea

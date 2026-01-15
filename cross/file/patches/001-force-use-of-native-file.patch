@@ -1,0 +1,14 @@
+# force the use of native file executable instead of system installed version
+# required to compile the magic.mgc of the same version as the native executable
+#
+--- magic/Makefile.in.orig	2023-07-27 19:46:45.000000000 +0000
++++ magic/Makefile.in	2023-09-19 18:44:24.771956250 +0000
+@@ -638,7 +638,7 @@
+ 
+ # FIXME: Build file natively as well so that it can be used to compile
+ # the target's magic file; for now we bail if the local version does not match
+-@IS_CROSS_COMPILE_TRUE@FILE_COMPILE = file${EXEEXT}
++@IS_CROSS_COMPILE_TRUE@FILE_COMPILE = ${NATIVE_FILE}
+ @IS_CROSS_COMPILE_FALSE@FILE_COMPILE_DEP = $(FILE_COMPILE)
+ @IS_CROSS_COMPILE_TRUE@FILE_COMPILE_DEP = 
+ all: all-am

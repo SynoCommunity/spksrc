@@ -1,11 +1,13 @@
 [{
-    "step_title": "Updating Lidarr",
-    "items": [{
-        "desc": "Keep Lidarr up-to-date by using Lidarr's built-in updater.<br>Navigate to System>Updates in the Lidarr UI."
-    }]
+	"step_title": "Updating Lidarr",
+	"items": [{
+		"desc": "This update is for additional libraries and DSM integration. It does not modify your current Lidarr version."
+	}, {
+		"desc": "Keep Lidarr up-to-date by using Lidarr's built-in updater.<br>Navigate to <b>System>Updates</b> in the Lidarr UI."
+	}]
 }, {
-    "step_title": "Attention! DSM Permissions",
-    "items": [{
-        "desc": "Permissions for all download-related packages are managed with the group <b>'sc-download'</b> in DSM.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
-    }]
+	"step_title": "DSM Permissions",
+	"items": [{
+		"desc": "Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+	}]
 }]

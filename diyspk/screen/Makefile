@@ -1,8 +1,8 @@
 SPK_NAME = screen
-SPK_VERS = 4.9.0
+SPK_VERS = 4.9.1
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/screen
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Screen is a full-screen window manager that multiplexes a physical terminal between several processes, typically interactive shells.

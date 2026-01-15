@@ -1,0 +1,16 @@
+bin:bin/arpaname
+bin:bin/delv
+bin:bin/dig
+bin:bin/mdig
+lib:lib/libbind9-9.18.38.so
+lnk:lib/libbind9.so
+lib:lib/libdns-9.18.38.so
+lnk:lib/libdns.so
+lib:lib/libirs-9.18.38.so
+lnk:lib/libirs.so
+lib:lib/libisc-9.18.38.so
+lnk:lib/libisc.so
+lib:lib/libisccfg-9.18.38.so
+lnk:lib/libisccfg.so
+lib:lib/libns-9.18.38.so
+lnk:lib/libns.so

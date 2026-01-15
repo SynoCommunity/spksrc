@@ -1,0 +1,8 @@
+[{
+    "step_title": "Démarrer et configurer Kavita",
+    "items": [{
+        "desc": "La première fois que Kavita est lancée, il peut falloir quelques instants avant que l'interface ne soit disponible !"
+    }, {
+        "desc": "Avant d'ajouter une bibliothèque, assurez-vous d'accorder les permissions à l'utilisateur interne <b>'sc-kavita'</b> dans DSM. Consultez le guide de <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Gestion des autorisations</a> pour plus de détails."
+    }]
+}]

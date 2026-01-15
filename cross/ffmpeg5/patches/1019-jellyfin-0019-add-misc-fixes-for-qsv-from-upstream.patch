@@ -1,0 +1,464 @@
+Index: jellyfin-ffmpeg/libavcodec/qsv_internal.h
+===================================================================
+--- libavcodec/qsv_internal.h
++++ libavcodec/qsv_internal.h
+@@ -57,6 +57,8 @@
+ 
+ #define QSV_MAX_FRAME_EXT_PARAMS 4
+ 
++#define QSV_PAYLOAD_SIZE 1024
++
+ #define QSV_VERSION_ATLEAST(MAJOR, MINOR)   \
+     (MFX_VERSION_MAJOR > (MAJOR) ||         \
+      MFX_VERSION_MAJOR == (MAJOR) && MFX_VERSION_MINOR >= (MINOR))
+@@ -90,6 +92,7 @@ typedef struct QSVFrame {
+ 
+     int queued;
+     int used;
++    int external_frame;
+ 
+     struct QSVFrame *next;
+ } QSVFrame;
+Index: jellyfin-ffmpeg/libavcodec/qsvdec.c
+===================================================================
+--- libavcodec/qsvdec.c
++++ libavcodec/qsvdec.c
+@@ -41,13 +41,16 @@
+ #include "libavutil/time.h"
+ #include "libavutil/imgutils.h"
+ #include "libavutil/film_grain_params.h"
++#include "libavutil/stereo3d.h"
+ 
+ #include "avcodec.h"
+ #include "codec_internal.h"
+ #include "internal.h"
+ #include "decode.h"
+ #include "hwconfig.h"
++#include "get_bits.h"
+ #include "qsv.h"
++#include "h264_sei.h"
+ #include "qsv_internal.h"
+ 
+ static const AVRational mfx_tb = { 1, 90000 };
+@@ -99,8 +102,13 @@ typedef struct QSVContext {
+ 
+     char *load_plugins;
+ 
++    mfxPayload payload;
++
+     mfxExtBuffer **ext_buffers;
+     int         nb_ext_buffers;
++
++    H264SEIContext sei;
++    H264ParamSets ps;
+ } QSVContext;
+ 
+ static const AVCodecHWConfigInternal *const qsv_hw_configs[] = {
+@@ -600,6 +608,147 @@ static int qsv_export_film_grain(AVCodec
+ }
+ #endif
+ 
++static int h264_decode_fpa(H264SEIFramePacking *fpa, AVFrame *frame)
++{
++    if (!fpa || !frame) {
++        return AVERROR(EINVAL);
++    }
++
++    if (!fpa->arrangement_cancel_flag &&
++        fpa->arrangement_type <= 6 &&
++        fpa->content_interpretation_type > 0 &&
++        fpa->content_interpretation_type < 3) {
++        AVStereo3D *stereo = av_stereo3d_create_side_data(frame);
++        if (stereo) {
++            switch (fpa->arrangement_type) {
++            case 0:
++                stereo->type = AV_STEREO3D_CHECKERBOARD;
++                break;
++            case 1:
++                stereo->type = AV_STEREO3D_COLUMNS;
++                break;
++            case 2:
++                stereo->type = AV_STEREO3D_LINES;
++                break;
++            case 3:
++                if (fpa->quincunx_sampling_flag)
++                    stereo->type = AV_STEREO3D_SIDEBYSIDE_QUINCUNX;
++                else
++                    stereo->type = AV_STEREO3D_SIDEBYSIDE;
++                break;
++            case 4:
++                stereo->type = AV_STEREO3D_TOPBOTTOM;
++                break;
++            case 5:
++                stereo->type = AV_STEREO3D_FRAMESEQUENCE;
++                if (fpa->current_frame_is_frame0_flag)
++                    stereo->view = AV_STEREO3D_VIEW_LEFT;
++                else
++                    stereo->view = AV_STEREO3D_VIEW_RIGHT;
++                break;
++            case 6:
++                stereo->type = AV_STEREO3D_2D;
++                break;
++            }
++
++            if (fpa->content_interpretation_type == 2)
++                stereo->flags = AV_STEREO3D_FLAG_INVERT;
++        }
++    }
++    return 0;
++}
++
++static int h264_parse_side_data(AVCodecContext *avctx, QSVContext *q, AVFrame *frame)
++{
++    GetBitContext gb_payload;
++    uint8_t *sei_buffer;
++    int sei_buffer_index;
++    int ret;
++
++    /* remove emulation prevention bytes */
++    sei_buffer = (uint8_t *)av_mallocz(q->payload.NumBit / 8);
++    if (!sei_buffer) {
++        av_freep(&sei_buffer);
++        return AVERROR(ENOMEM);
++    }
++    sei_buffer_index = 0;
++    for (int i = 0; i < q->payload.NumBit / 8; i++) {
++        if (q->payload.Data[i] == 3)
++            i++;
++        sei_buffer[sei_buffer_index] = q->payload.Data[i];
++        sei_buffer_index += 1;
++    }
++
++    ret = init_get_bits8(&gb_payload, sei_buffer, sei_buffer_index+1);
++    if (ret < 0) {
++        av_freep(&sei_buffer);
++        return ret;
++    }
++
++    ret = ff_h264_sei_decode(&q->sei, &gb_payload, &q->ps, avctx);
++    if (ret < 0) {
++        av_freep(&sei_buffer);
++        return ret;
++    }
++
++    switch (q->payload.Type) {
++    case SEI_TYPE_FRAME_PACKING_ARRANGEMENT:
++        ret = h264_decode_fpa(&q->sei.frame_packing, frame);
++        break;
++    default:
++        break;
++    }
++
++    av_freep(&sei_buffer);
++    return ret;
++}
++
++static int extract_frame_side_data(AVCodecContext *avctx, QSVContext *q, AVFrame *frame)
++{
++    mfxU64 ts;
++    mfxStatus sts;
++    int ret = 0;
++
++    if (q->payload.BufSize == 0) {
++        q->payload.Data = av_mallocz(QSV_PAYLOAD_SIZE);
++        if (!q->payload.Data) {
++            av_freep(&q->payload.Data);
++            return AVERROR(ENOMEM);
++        }
++        q->payload.BufSize = QSV_PAYLOAD_SIZE;
++    }
++
++    sts = MFX_ERR_NONE;
++    while (sts == MFX_ERR_NONE) {
++
++        sts = MFXVideoDECODE_GetPayload(q->session, &ts, &q->payload);
++
++        if (sts == MFX_ERR_NOT_ENOUGH_BUFFER) {
++            av_log(avctx, AV_LOG_DEBUG, "Space for SEI is not enough. One SEI will be skipped\n");
++            continue;
++        } else if (sts != MFX_ERR_NONE || q->payload.NumBit == 0) {
++            break;
++        }
++
++        if (q->payload.Type != SEI_TYPE_FRAME_PACKING_ARRANGEMENT)
++            continue;
++
++        switch (avctx->codec_id) {
++        case AV_CODEC_ID_H264:
++            ret = h264_parse_side_data(avctx, q, frame);
++            break;
++        default:
++            break;
++        }
++
++        if (ret < 0) {
++            av_log(avctx, AV_LOG_DEBUG, "parse side data failed\n");
++            break;
++        }
++    }
++    return ret;
++}
++
+ static int qsv_decode(AVCodecContext *avctx, QSVContext *q,
+                       AVFrame *frame, int *got_frame,
+                       const AVPacket *avpkt)
+@@ -709,6 +858,10 @@ static int qsv_decode(AVCodecContext *av
+ 
+         outsurf = &aframe.frame->surface;
+ 
++        ret = extract_frame_side_data(avctx, q, frame);
++        if (ret < 0)
++            av_log(avctx, AV_LOG_DEBUG, "Extracting side from packet failed\n");
++
+         frame->pts = MFX_PTS_TO_PTS(outsurf->Data.TimeStamp, avctx->pkt_timebase);
+ #if QSV_VERSION_ATLEAST(1, 34)
+         if ((avctx->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN) &&
+@@ -770,6 +923,8 @@ static void qsv_decode_close_qsvcontext(
+     av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
+     av_buffer_unref(&q->frames_ctx.mids_buf);
+     av_buffer_pool_uninit(&q->pool);
++
++    av_freep(&q->payload.Data);
+ }
+ 
+ static int qsv_process_data(AVCodecContext *avctx, QSVContext *q,
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
+===================================================================
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -564,7 +564,7 @@ static int init_video_param_jpeg(AVCodec
+                                             !desc->log2_chroma_w + !desc->log2_chroma_h;
+     q->param.mfx.FrameInfo.BitDepthLuma   = desc->comp[0].depth;
+     q->param.mfx.FrameInfo.BitDepthChroma = desc->comp[0].depth;
+-    q->param.mfx.FrameInfo.Shift          = desc->comp[0].depth > 8;
++    q->param.mfx.FrameInfo.Shift          = desc->comp[0].shift > 0;
+ 
+     q->param.mfx.FrameInfo.Width  = FFALIGN(avctx->width, 16);
+     q->param.mfx.FrameInfo.Height = FFALIGN(avctx->height, 16);
+@@ -663,7 +663,7 @@ static int init_video_param(AVCodecConte
+                                             !desc->log2_chroma_w + !desc->log2_chroma_h;
+     q->param.mfx.FrameInfo.BitDepthLuma   = desc->comp[0].depth;
+     q->param.mfx.FrameInfo.BitDepthChroma = desc->comp[0].depth;
+-    q->param.mfx.FrameInfo.Shift          = desc->comp[0].depth > 8;
++    q->param.mfx.FrameInfo.Shift          = desc->comp[0].shift > 0;
+ 
+     // If the minor version is greater than or equal to 19,
+     // then can use the same alignment settings as H.264 for HEVC
+@@ -812,11 +812,6 @@ static int init_video_param(AVCodecConte
+ 
+             q->extco2.LookAheadDS = q->look_ahead_downsampling;
+             q->extco2.RepeatPPS   = q->repeat_pps ? MFX_CODINGOPTION_ON : MFX_CODINGOPTION_OFF;
+-
+-            if (q->adaptive_i >= 0)
+-                q->extco2.AdaptiveI = q->adaptive_i ? MFX_CODINGOPTION_ON : MFX_CODINGOPTION_OFF;
+-            if (q->adaptive_b >= 0)
+-                q->extco2.AdaptiveB = q->adaptive_b ? MFX_CODINGOPTION_ON : MFX_CODINGOPTION_OFF;
+         }
+ 
+         if (avctx->codec_id == AV_CODEC_ID_H264 || avctx->codec_id == AV_CODEC_ID_HEVC) {
+@@ -836,6 +831,10 @@ static int init_video_param(AVCodecConte
+ 
+             if (q->b_strategy >= 0)
+                 q->extco2.BRefType = q->b_strategy ? MFX_B_REF_PYRAMID : MFX_B_REF_OFF;
++            if (q->adaptive_i >= 0)
++                q->extco2.AdaptiveI = q->adaptive_i ? MFX_CODINGOPTION_ON : MFX_CODINGOPTION_OFF;
++            if (q->adaptive_b >= 0)
++                q->extco2.AdaptiveB = q->adaptive_b ? MFX_CODINGOPTION_ON : MFX_CODINGOPTION_OFF;
+             if ((avctx->qmin >= 0 && avctx->qmax >= 0 && avctx->qmin > avctx->qmax) ||
+                 (q->max_qp_i >= 0 && q->min_qp_i >= 0 && q->min_qp_i > q->max_qp_i) ||
+                 (q->max_qp_p >= 0 && q->min_qp_p >= 0 && q->min_qp_p > q->max_qp_p) ||
+@@ -1421,6 +1420,10 @@ static void clear_unused_frames(QSVEncCo
+             memset(&cur->enc_ctrl, 0, sizeof(cur->enc_ctrl));
+             cur->enc_ctrl.Payload = cur->payloads;
+             cur->enc_ctrl.ExtParam = cur->extparam;
++            if (cur->external_frame) {
++                av_freep(&cur->surface.Data.MemId);
++                cur->external_frame = 0;
++            }
+             if (cur->frame->format == AV_PIX_FMT_QSV) {
+                 av_frame_unref(cur->frame);
+             }
+@@ -1484,12 +1487,20 @@ static int submit_frame(QSVEncContext *q
+ 
+         qf->surface = *(mfxFrameSurface1*)qf->frame->data[3];
+ 
++
+         if (q->frames_ctx.mids) {
+             ret = ff_qsv_find_surface_idx(&q->frames_ctx, qf);
+-            if (ret < 0)
+-                return ret;
+-
+-            qf->surface.Data.MemId = &q->frames_ctx.mids[ret];
++            if (ret >= 0)
++                qf->surface.Data.MemId = &q->frames_ctx.mids[ret];
++        }
++        if (!q->frames_ctx.mids || ret < 0) {
++            QSVMid *mid = NULL;
++            mid = (QSVMid *)av_mallocz(sizeof(*mid));
++            if (!mid)
++                return AVERROR(ENOMEM);
++            mid->handle_pair = (mfxHDLPair *)qf->surface.Data.MemId;
++            qf->surface.Data.MemId = mid;
++            qf->external_frame = 1;
+         }
+     } else {
+         /* make a copy if the input is not padded as libmfx requires */
+Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
+===================================================================
+--- libavfilter/qsvvpp.c
++++ libavfilter/qsvvpp.c
+@@ -465,15 +465,14 @@ static QSVFrame *query_frame(QSVVPPConte
+         if (!out_frame->frame)
+             return NULL;
+ 
+-        out_frame->frame->width  = outlink->w;
+-        out_frame->frame->height = outlink->h;
+-
+         ret = map_frame_to_surface(out_frame->frame,
+                                    &out_frame->surface);
+         if (ret < 0)
+             return NULL;
+     }
+ 
++    out_frame->frame->width  = outlink->w;
++    out_frame->frame->height = outlink->h;
+     out_frame->surface.Info = s->vpp_param.vpp.Out;
+ 
+     return out_frame;
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -486,7 +486,7 @@ static int qsv_init_surface(AVHWFramesCo
+ 
+     surf->Info.BitDepthLuma   = desc->comp[0].depth;
+     surf->Info.BitDepthChroma = desc->comp[0].depth;
+-    surf->Info.Shift          = desc->comp[0].depth > 8;
++    surf->Info.Shift          = desc->comp[0].shift > 0;
+ 
+     if (desc->log2_chroma_w && desc->log2_chroma_h)
+         surf->Info.ChromaFormat   = MFX_CHROMAFORMAT_YUV420;
+@@ -1337,11 +1337,23 @@ static int qsv_frames_derive_to(AVHWFram
+     return 0;
+ }
+ 
++static void qsv_umap_from_vaapi(AVHWFramesContext *dst_fc,
++                                 HWMapDescriptor *hwmap)
++{
++    mfxFrameSurface1 *new_sur = (mfxFrameSurface1 *)hwmap->priv;
++    mfxHDLPair *hdlpair = (mfxHDLPair *)new_sur->Data.MemId;
++    av_freep(&hdlpair->first);
++    av_freep(&new_sur->Data.MemId);
++    av_freep(&new_sur);
++}
++
+ static int qsv_map_to(AVHWFramesContext *dst_ctx,
+                       AVFrame *dst, const AVFrame *src, int flags)
+ {
+     AVQSVFramesContext *hwctx = dst_ctx->hwctx;
+     int i, err, index = -1;
++    mfxFrameSurface1 *new_sur = NULL;
++    mfxHDLPair *new_hdlpair = NULL;
+ 
+     for (i = 0; i < hwctx->nb_surfaces && index < 0; i++) {
+         switch(src->format) {
+@@ -1380,21 +1392,77 @@ static int qsv_map_to(AVHWFramesContext
+         }
+     }
+     if (index < 0) {
+-        av_log(dst_ctx, AV_LOG_ERROR, "Trying to map from a surface which "
+-               "is not in the mapped frames context.\n");
+-        return AVERROR(EINVAL);
+-    }
++        switch (src->format) {
++#if CONFIG_VAAPI
++        case AV_PIX_FMT_VAAPI:
++        {
++            new_sur = (mfxFrameSurface1 *)av_mallocz(sizeof(*new_sur));
++            if (!new_sur) {
++                err = AVERROR(ENOMEM);
++                goto qsv_map_to_err;
++            }
++            err = qsv_init_surface(dst_ctx, new_sur);
++            if (err < 0)
++                goto qsv_map_to_err;
++
++            new_hdlpair = (mfxHDLPair *)av_mallocz(sizeof(*new_hdlpair));
++            if (!new_hdlpair) {
++                err = AVERROR(ENOMEM);
++                goto qsv_map_to_err;
++            }
++            new_hdlpair->first = (VASurfaceID *)av_mallocz(sizeof(VASurfaceID));
++            if (!new_hdlpair->first) {
++                err = AVERROR(ENOMEM);
++                goto qsv_map_to_err;
++            }
++            *(VASurfaceID*)(new_hdlpair->first) = (VASurfaceID)(uintptr_t)src->data[3];
++            new_sur->Data.MemId = new_hdlpair;
+ 
+-    err = ff_hwframe_map_create(dst->hw_frames_ctx,
+-                                dst, src, NULL, NULL);
+-    if (err)
+-        return err;
++            err = ff_hwframe_map_create(dst->hw_frames_ctx, dst, src,
++                                        &qsv_umap_from_vaapi,
++                                        (void*)new_sur);
++            if (err)
++                goto qsv_map_to_err;
++
++            av_log(dst_ctx, AV_LOG_DEBUG, "Trying to map from a surface which "
++                "is not in the mapped frames context, so create a new surface\n");
++        }
++        break;
++#endif
++#if CONFIG_DXVA2
++        case AV_PIX_FMT_DXVA2_VLD:
++        {
++            av_log(dst_ctx, AV_LOG_ERROR, "Trying to map from a surface which "
++                "is not in the mapped frames context.\n");
++            return AVERROR(EINVAL);
++        }
++        break;
++#endif
++        default:
++            return AVERROR(ENOSYS);
++        }
++    } else {
++        err = ff_hwframe_map_create(dst->hw_frames_ctx,
++                                    dst, src, NULL, NULL);
++        if (err)
++            goto qsv_map_to_err;
++    }
+ 
+     dst->width   = src->width;
+     dst->height  = src->height;
+-    dst->data[3] = (uint8_t*)&hwctx->surfaces[index];
++    dst->data[3] = (uint8_t*)((index == -1) ? new_sur : &hwctx->surfaces[index]);
+ 
+     return 0;
++
++qsv_map_to_err:
++    if (new_sur)
++        av_freep(&new_sur);
++    if (new_hdlpair) {
++        if (new_hdlpair->first)
++            av_freep(&new_hdlpair->first);
++        av_freep(&new_hdlpair);
++    }
++    return err;
+ }
+ 
+ static int qsv_frames_get_constraints(AVHWDeviceContext *ctx,
+Index: jellyfin-ffmpeg/libavcodec/qsvenc_hevc.c
+===================================================================
+--- libavcodec/qsvenc_hevc.c
++++ libavcodec/qsvenc_hevc.c
+@@ -234,6 +234,8 @@ static const AVOption options[] = {
+     QSV_OPTION_DBLK_IDC
+     QSV_OPTION_LOW_DELAY_BRC
+     QSV_OPTION_MAX_MIN_QP
++    QSV_OPTION_ADAPTIVE_I
++    QSV_OPTION_ADAPTIVE_B
+ 
+     { "idr_interval", "Distance (in I-frames) between IDR frames", OFFSET(qsv.idr_interval), AV_OPT_TYPE_INT, { .i64 = 0 }, -1, INT_MAX, VE, "idr_interval" },
+     { "begin_only", "Output an IDR-frame only at the beginning of the stream", 0, AV_OPT_TYPE_CONST, { .i64 = -1 }, 0, 0, VE, "idr_interval" },

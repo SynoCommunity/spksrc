@@ -3,7 +3,7 @@
 OLD_SPK_REV="${SYNOPKG_OLD_PKGVER##*-}"
 
 # display this wizard page only for updates from mosquitto < 2.x
-if [ -n ${OLD_SPK_REV} ] && [ ${OLD_SPK_REV} -lt 13 ]; then
+if [ -n "${OLD_SPK_REV}" ] && [ ${OLD_SPK_REV} -lt 13 ]; then
 
 cat <<EOF > $SYNOPKG_TEMP_LOGFILE
 [{

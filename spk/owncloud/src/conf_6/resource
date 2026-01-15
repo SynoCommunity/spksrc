@@ -1,0 +1,11 @@
+{
+	"data-share": {
+		"shares": [{
+			"name": "{{wizard_data_share}}",
+			"permission": {
+				"rw": ["http"]
+			},
+			"once": true
+		}]
+	}
+}

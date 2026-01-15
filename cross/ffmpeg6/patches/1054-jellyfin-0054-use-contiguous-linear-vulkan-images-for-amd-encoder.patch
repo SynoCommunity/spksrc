@@ -1,0 +1,203 @@
+Index: jellyfin-ffmpeg/libavutil/hwcontext_vulkan.c
+===================================================================
+--- libavutil/hwcontext_vulkan.c
++++ libavutil/hwcontext_vulkan.c
+@@ -111,6 +111,9 @@ typedef struct VulkanDevicePriv {
+ 
+     /* Intel */
+     int dev_is_intel;
++
++    /* Amd */
++    int dev_is_amd;
+ } VulkanDevicePriv;
+ 
+ typedef struct VulkanFramesPriv {
+@@ -231,6 +234,7 @@ static const struct {
+     { AV_PIX_FMT_BGR32,  { VK_FORMAT_A8B8G8R8_UNORM_PACK32 } },
+     { AV_PIX_FMT_0BGR32, { VK_FORMAT_A8B8G8R8_UNORM_PACK32 } },
+ 
++    { AV_PIX_FMT_X2BGR10, { VK_FORMAT_A2B10G10R10_UNORM_PACK32 } },
+     { AV_PIX_FMT_X2RGB10, { VK_FORMAT_A2R10G10B10_UNORM_PACK32 } },
+ 
+     { AV_PIX_FMT_GBRAP, { VK_FORMAT_R8_UNORM, VK_FORMAT_R8_UNORM, VK_FORMAT_R8_UNORM, VK_FORMAT_R8_UNORM } },
+@@ -1482,6 +1486,13 @@ static int vulkan_device_init(AVHWDevice
+ 
+     p->dev_is_nvidia = (p->props.properties.vendorID == 0x10de);
+     p->dev_is_intel  = (p->props.properties.vendorID == 0x8086);
++    p->dev_is_amd    = (p->props.properties.vendorID == 0x1002);
++
++#if CONFIG_LIBDRM
++    /* AMD encoder requires contiguous and linear images */
++    if (p->dev_is_amd)
++        p->use_linear_images = 1;
++#endif
+ 
+     vk->GetPhysicalDeviceQueueFamilyProperties(hwctx->phys_dev, &queue_num, NULL);
+     if (!queue_num) {
+@@ -2292,7 +2303,7 @@ static int vulkan_frames_init(AVHWFrames
+ 
+     if (!(hwctx->flags & AV_VK_FRAME_FLAG_NONE)) {
+         if (p->contiguous_planes == 1 ||
+-           ((p->contiguous_planes == -1) && p->dev_is_intel))
++           (p->contiguous_planes == -1 && (p->dev_is_intel || p->dev_is_amd)))
+            hwctx->flags |= AV_VK_FRAME_FLAG_CONTIGUOUS_MEMORY;
+     }
+ 
+@@ -2360,19 +2371,23 @@ static int vulkan_frames_init(AVHWFrames
+             /* Finally get all modifiers from the device */
+             vk->GetPhysicalDeviceFormatProperties2(dev_hwctx->phys_dev, fmt[0], &prop);
+ 
+-            /* Reject any modifiers that don't match our requirements */
+-            for (int i = 0; i < mod_props_list.drmFormatModifierCount; i++) {
+-                if (!(mod_props[i].drmFormatModifierTilingFeatures & hwctx->usage))
+-                    continue;
+-
+-                modifiers[modifier_count++] = mod_props[i].drmFormatModifier;
+-            }
++            if (p->use_linear_images) {
++                has_modifiers = 0;
++                modifiers[modifier_count++] = 0x0;
++            } else {
++                /* Reject any modifiers that don't match our requirements */
++                for (int i = 0; i < mod_props_list.drmFormatModifierCount; i++) {
++                    if (!(mod_props[i].drmFormatModifierTilingFeatures & hwctx->usage))
++                        continue;
++                    modifiers[modifier_count++] = mod_props[i].drmFormatModifier;
++                }
+ 
+-            if (!modifier_count) {
+-                av_log(hwfc, AV_LOG_ERROR, "None of the given modifiers supports"
+-                                        " the usage flags!\n");
+-                av_freep(&mod_props);
+-                return AVERROR(EINVAL);
++                if (!modifier_count) {
++                    av_log(hwfc, AV_LOG_ERROR, "None of the given modifiers supports"
++                                            " the usage flags!\n");
++                    av_freep(&mod_props);
++                    return AVERROR(EINVAL);
++                }
+             }
+ 
+             modifier_info->drmFormatModifierCount = modifier_count;
+@@ -2465,9 +2480,11 @@ static void vulkan_unmap_frame(AVHWFrame
+ {
+     VulkanMapping *map = hwmap->priv;
+     AVVulkanDeviceContext *hwctx = hwfc->device_ctx->hwctx;
++    AVVulkanFramesContext *hwfctx = hwfc->hwctx;
+     const int planes = av_pix_fmt_count_planes(hwfc->sw_format);
+     VulkanDevicePriv *p = hwfc->device_ctx->internal->priv;
+     FFVulkanFunctions *vk = &p->vkfn;
++    int mem_planes = 0;
+ 
+     /* Check if buffer needs flushing */
+     if ((map->flags & AV_HWFRAME_MAP_WRITE) &&
+@@ -2489,7 +2506,8 @@ static void vulkan_unmap_frame(AVHWFrame
+         }
+     }
+ 
+-    for (int i = 0; i < planes; i++)
++    mem_planes = hwfctx->flags & AV_VK_FRAME_FLAG_CONTIGUOUS_MEMORY ? 1 : planes;
++    for (int i = 0; i < mem_planes; i++)
+         vk->UnmapMemory(hwctx->act_dev, map->frame->mem[i]);
+ 
+     av_free(map);
+@@ -2638,6 +2656,10 @@ static const struct {
+     { DRM_FORMAT_XRGB8888, VK_FORMAT_B8G8R8A8_UNORM },
+     { DRM_FORMAT_ABGR8888, VK_FORMAT_R8G8B8A8_UNORM },
+     { DRM_FORMAT_XBGR8888, VK_FORMAT_R8G8B8A8_UNORM },
++    { DRM_FORMAT_ARGB2101010, VK_FORMAT_A2R10G10B10_UNORM_PACK32 },
++    { DRM_FORMAT_XRGB2101010, VK_FORMAT_A2R10G10B10_UNORM_PACK32 },
++    { DRM_FORMAT_ABGR2101010, VK_FORMAT_A2B10G10R10_UNORM_PACK32 },
++    { DRM_FORMAT_XBGR2101010, VK_FORMAT_A2B10G10R10_UNORM_PACK32 },
+ 
+     // All these DRM_FORMATs were added in the same libdrm commit.
+ #ifdef DRM_FORMAT_XYUV8888
+@@ -2672,6 +2694,7 @@ static int vulkan_map_from_drm_frame_des
+     const AVDRMFrameDescriptor *desc = (AVDRMFrameDescriptor *)src->data[0];
+     VkBindImageMemoryInfo bind_info[AV_DRM_MAX_PLANES];
+     VkBindImagePlaneMemoryInfo plane_info[AV_DRM_MAX_PLANES];
++    const int has_modifiers = !!(p->extensions & FF_VK_EXT_DRM_MODIFIER_FLAGS);
+ 
+     for (int i = 0; i < desc->nb_layers; i++) {
+         if (drm_to_vulkan_fmt(desc->layers[i].format) == VK_FORMAT_UNDEFINED) {
+@@ -2681,13 +2704,22 @@ static int vulkan_map_from_drm_frame_des
+         }
+     }
+ 
++    if (!has_modifiers &&
++        desc->objects[0].format_modifier != DRM_FORMAT_MOD_INVALID &&
++        desc->objects[0].format_modifier != DRM_FORMAT_MOD_LINEAR) {
++        av_log(ctx, AV_LOG_ERROR, "The driver can only import DRM frame with invalid/linear modifier!\n");
++        err = AVERROR_EXTERNAL;
++        goto fail;
++    }
++
+     if (!(f = av_vk_frame_alloc())) {
+         av_log(ctx, AV_LOG_ERROR, "Unable to allocate memory for AVVkFrame!\n");
+         err = AVERROR(ENOMEM);
+         goto fail;
+     }
+ 
+-    f->tiling = VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT;
++    f->tiling = has_modifiers ? VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT :
++                VK_IMAGE_TILING_LINEAR;
+ 
+     for (int i = 0; i < desc->nb_layers; i++) {
+         const int planes = desc->layers[i].nb_planes;
+@@ -2758,7 +2790,7 @@ static int vulkan_map_from_drm_frame_des
+         };
+         VkPhysicalDeviceImageFormatInfo2 fmt_props = {
+             .sType  = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2,
+-            .pNext  = &props_ext,
++            .pNext  = has_modifiers ? &props_ext : NULL,
+             .format = create_info.format,
+             .type   = create_info.imageType,
+             .tiling = create_info.tiling,
+@@ -2776,6 +2808,10 @@ static int vulkan_map_from_drm_frame_des
+             goto fail;
+         }
+ 
++        /* Skip checking if the driver has no support for the DRM modifier extension */
++        if (!has_modifiers && !fmt_props.pNext)
++            fmt_props.pNext = &props_ext;
++
+         /* Set the image width/height */
+         get_plane_wh(&create_info.extent.width, &create_info.extent.height,
+                      hwfc->sw_format, src->width, src->height, i);
+@@ -3328,6 +3364,7 @@ static int vulkan_map_to_drm(AVHWFramesC
+     AVVulkanDeviceContext *hwctx = hwfc->device_ctx->hwctx;
+     AVVulkanFramesContext *hwfctx = hwfc->hwctx;
+     const int planes = av_pix_fmt_count_planes(hwfc->sw_format);
++    const int has_modifiers = !!(p->extensions & FF_VK_EXT_DRM_MODIFIER_FLAGS);
+     VkImageDrmFormatModifierPropertiesEXT drm_mod = {
+         .sType = VK_STRUCTURE_TYPE_IMAGE_DRM_FORMAT_MODIFIER_PROPERTIES_EXT,
+     };
+@@ -3355,10 +3392,16 @@ static int vulkan_map_to_drm(AVHWFramesC
+     if (err < 0)
+         goto end;
+ 
+-    ret = vk->GetImageDrmFormatModifierPropertiesEXT(hwctx->act_dev, f->img[0],
++    if (has_modifiers) {
++        ret = vk->GetImageDrmFormatModifierPropertiesEXT(hwctx->act_dev, f->img[0],
+                                                      &drm_mod);
+-    if (ret != VK_SUCCESS) {
+-        av_log(hwfc, AV_LOG_ERROR, "Failed to retrieve DRM format modifier!\n");
++        if (ret != VK_SUCCESS) {
++            av_log(hwfc, AV_LOG_ERROR, "Failed to retrieve DRM format modifier!\n");
++            err = AVERROR_EXTERNAL;
++            goto end;
++        }
++    } else if (f->tiling != VK_IMAGE_TILING_LINEAR) {
++        av_log(hwfc, AV_LOG_ERROR, "The driver can only export linear images to DRM frame!\n");
+         err = AVERROR_EXTERNAL;
+         goto end;
+     }
+@@ -3380,7 +3423,7 @@ static int vulkan_map_to_drm(AVHWFramesC
+ 
+         drm_desc->nb_objects++;
+         drm_desc->objects[i].size = f->size[i];
+-        drm_desc->objects[i].format_modifier = drm_mod.drmFormatModifier;
++        drm_desc->objects[i].format_modifier = has_modifiers ? drm_mod.drmFormatModifier : 0x0;
+     }
+ 
+     drm_desc->nb_layers = planes;

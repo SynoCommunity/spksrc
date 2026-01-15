@@ -1,5 +1,5 @@
 PKG_NAME = memcached
-PKG_VERS = 1.6.15
+PKG_VERS = 1.6.39
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = http://www.memcached.org/files
@@ -12,12 +12,13 @@ COMMENT  = Free & open source, high-performance, distributed memory object cachi
 LICENSE  = 3-Clause BSD
 
 GNU_CONFIGURE = 1
-ADDITIONAL_CFLAGS = -O
+CONFIGURE_ARGS = --disable-werror
+ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.archs.mk
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # EFD_NONBLOCK is not defined (define it OR disable use of eventfd)
-#ADDITIONAL_CFLAGS += -DEFD_NONBLOCK=0x0004000
+#ADDITIONAL_CFLAGS += -DEFD_NONBLOCK=00004000
 CONFIGURE_ARGS = ac_cv_func_eventfd=no
 endif
 

@@ -1,0 +1,107 @@
+Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
+===================================================================
+--- libavutil/hwcontext_d3d11va.c
++++ libavutil/hwcontext_d3d11va.c
+@@ -84,11 +84,20 @@ static const struct {
+     DXGI_FORMAT d3d_format;
+     enum AVPixelFormat pix_fmt;
+ } supported_formats[] = {
+-    { DXGI_FORMAT_NV12,         AV_PIX_FMT_NV12 },
+-    { DXGI_FORMAT_P010,         AV_PIX_FMT_P010 },
++    { DXGI_FORMAT_NV12,           AV_PIX_FMT_NV12 },
++    { DXGI_FORMAT_P010,           AV_PIX_FMT_P010 },
++    { DXGI_FORMAT_B8G8R8A8_UNORM, AV_PIX_FMT_BGRA },
++    { DXGI_FORMAT_R10G10B10A2_UNORM, AV_PIX_FMT_X2BGR10 },
++    { DXGI_FORMAT_AYUV,           AV_PIX_FMT_0YUV },
++    { DXGI_FORMAT_YUY2,           AV_PIX_FMT_YUYV422 },
++    { DXGI_FORMAT_Y210,           AV_PIX_FMT_Y210 },
++    { DXGI_FORMAT_Y410,           AV_PIX_FMT_Y410 },
++    { DXGI_FORMAT_P016,           AV_PIX_FMT_P012 },
++    { DXGI_FORMAT_Y216,           AV_PIX_FMT_Y212 },
++    { DXGI_FORMAT_Y416,           AV_PIX_FMT_Y412 },
+     // Special opaque formats. The pix_fmt is merely a place holder, as the
+     // opaque format cannot be accessed directly.
+-    { DXGI_FORMAT_420_OPAQUE,   AV_PIX_FMT_YUV420P },
++    { DXGI_FORMAT_420_OPAQUE,     AV_PIX_FMT_YUV420P },
+ };
+ 
+ static void d3d11va_default_lock(void *ctx)
+@@ -555,9 +564,12 @@ static int d3d11va_device_create(AVHWDev
+     AVD3D11VADeviceContext *device_hwctx = ctx->hwctx;
+ 
+     HRESULT hr;
++    AVDictionaryEntry *e;
+     IDXGIAdapter           *pAdapter = NULL;
+     ID3D10Multithread      *pMultithread;
+     UINT creationFlags = D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
++    int adapter = -1;
++    long int vendor_id = -1;
+     int is_debug       = !!av_dict_get(opts, "debug", NULL, 0);
+     int ret;
+ 
+@@ -577,13 +589,45 @@ static int d3d11va_device_create(AVHWDev
+         return AVERROR_UNKNOWN;
+     }
+ 
++    e = av_dict_get(opts, "vendor", NULL, 0);
++    if (e) {
++        vendor_id = strtol(e->value, NULL, 0);
++    }
++
+     if (device) {
++        adapter = atoi(device);
++    }
++
++    if (adapter >= 0 || vendor_id != -1) {
+         IDXGIFactory2 *pDXGIFactory;
+         hr = mCreateDXGIFactory(&IID_IDXGIFactory2, (void **)&pDXGIFactory);
+         if (SUCCEEDED(hr)) {
+-            int adapter = atoi(device);
+-            if (FAILED(IDXGIFactory2_EnumAdapters(pDXGIFactory, adapter, &pAdapter)))
++            if (adapter < 0) {
++                int adapter_cnt = 0;
++                while (IDXGIFactory2_EnumAdapters(pDXGIFactory, adapter_cnt++, &pAdapter) != DXGI_ERROR_NOT_FOUND) {
++                    DXGI_ADAPTER_DESC adapter_desc;
++                    hr = IDXGIAdapter2_GetDesc(pAdapter, &adapter_desc);
++                    if (FAILED(hr)) {
++                        av_log(ctx, AV_LOG_ERROR, "IDXGIAdapter2_GetDesc returned error with adapter id %d\n", adapter_cnt);
++                        continue;
++                    }
++
++                    if (adapter_desc.VendorId == vendor_id) {
++                        break;
++                    }
++
++                    if (adapter)
++                        IDXGIAdapter_Release(pAdapter);
++                }
++                if (adapter_cnt < 0) {
++                    av_log(ctx, AV_LOG_ERROR, "Failed to find d3d11va adapter by vendor id %ld\n", vendor_id);
++                    IDXGIFactory2_Release(pDXGIFactory);
++                    return AVERROR_UNKNOWN;
++                }
++            } else {
++                if (FAILED(IDXGIFactory2_EnumAdapters(pDXGIFactory, adapter, &pAdapter)))
+                 pAdapter = NULL;
++            }
+             IDXGIFactory2_Release(pDXGIFactory);
+         }
+     }
+Index: jellyfin-ffmpeg/libavutil/hwcontext_dxva2.c
+===================================================================
+--- libavutil/hwcontext_dxva2.c
++++ libavutil/hwcontext_dxva2.c
+@@ -82,6 +82,13 @@ static const struct {
+ } supported_formats[] = {
+     { MKTAG('N', 'V', '1', '2'), AV_PIX_FMT_NV12 },
+     { MKTAG('P', '0', '1', '0'), AV_PIX_FMT_P010 },
++    { MKTAG('A', 'Y', 'U', 'V'), AV_PIX_FMT_0YUV },
++    { MKTAG('Y', 'U', 'Y', '2'), AV_PIX_FMT_YUYV422 },
++    { MKTAG('Y', '2', '1', '0'), AV_PIX_FMT_Y210 },
++    { MKTAG('Y', '4', '1', '0'), AV_PIX_FMT_Y410 },
++    { MKTAG('P', '0', '1', '6'), AV_PIX_FMT_P012 },
++    { MKTAG('Y', '2', '1', '6'), AV_PIX_FMT_Y212 },
++    { MKTAG('Y', '4', '1', '6'), AV_PIX_FMT_Y412 },
+     { D3DFMT_P8,                 AV_PIX_FMT_PAL8 },
+     { D3DFMT_A8R8G8B8,           AV_PIX_FMT_BGRA },
+ };

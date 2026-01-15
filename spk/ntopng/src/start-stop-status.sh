@@ -2,9 +2,20 @@
 
 # start/stop script derived from ntopng/packages/etc/init.d/ntopng
 
-SERVICE_CFG_FILE="${SYNOPKG_PKGDEST}/etc/ntopng.conf"
+if [ -z "${SYNOPKG_PKGNAME}" ] || [ -z "${SYNOPKG_DSM_VERSION_MAJOR}" ]; then
+    echo "Error: Environment variables are not set." 1>&2;
+    echo "Please run me using synopkg instead. Example: 'synopkg start ntopng'" 1>&2;
+    exit 1
+fi
+
+if [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 7 ]; then
+    # define SYNOPKG_PKGVAR for forward compatibility
+    SYNOPKG_PKGVAR="${SYNOPKG_PKGDEST}/var"
+fi
+
+SERVICE_CFG_FILE="${SYNOPKG_PKGVAR}/ntopng.conf"
 SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/ntopng ${SERVICE_CFG_FILE}"
-SERVICE_LOG_FILE="${SYNOPKG_PKGDEST}/var/ntopng.log"
+SERVICE_LOG_FILE="${SYNOPKG_PKGVAR}/ntopng.log"
 
 ERROR=0
 
@@ -161,24 +172,24 @@ status_ntopng() {
 ########
 
 case "$1" in
-  start)
+    start)
         start_ntopng;
         ;;
 
-  stop)
+    stop)
         stop_ntopng;
         ;;
 
-  status)
+    status)
         status_ntopng;
         ;;
 
-  restart)
+    restart)
         stop_ntopng;
         start_ntopng;
         ;;
 
-  *)
+    *)
         echo "Usage: ${0} {start|stop|restart|status}]"
         exit 1
 esac

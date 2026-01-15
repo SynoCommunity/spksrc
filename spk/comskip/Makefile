@@ -1,16 +1,22 @@
 SPK_NAME = comskip
-SPK_VERS = 0.82.010
-SPK_REV = 9
+SPK_VERS = 0.83
+SPK_REV = 13
 SPK_ICON = src/comskip.png
 
-DEPENDS = cross/$(SPK_NAME)
+FFMPEG_PACKAGE = ffmpeg7
+
+# ffmpeg7 no longer support armv5
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
+DEPENDS = cross/comskip
+SPK_DEPENDS = $(FFMPEG_PACKAGE)
 
 STARTABLE = no
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Comskip is a free mpeg commercial detector. Read the wiki on how to use and configure it.
 DISPLAY_NAME = Comskip
-CHANGELOG = "1. Update to latest git hash from April 7th 2022<br/>2. Update to FFMPEG 4.4.3"
+CHANGELOG = "1. Update to version 0.83<br/>2. Migrate to using ffmpeg7"
 
 HOMEPAGE = https://www.kaashoek.com/comskip/
 LICENSE = LGPL
@@ -20,22 +26,9 @@ SPK_COMMANDS = bin/comskip
 
 POST_STRIP_TARGET = comskip_extra_install
 
-# Reuse FFmpeg libraries
-export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
+include ../../mk/spksrc.ffmpeg.mk
 
-ifneq ($(wildcard $(FFMPEG_DIR)),)
-PRE_DEPEND_TARGET = comskip_pre_depend
-SPK_DEPENDS = "ffmpeg>4.4"
-endif
-
-include ../../mk/spksrc.spk.mk
-
-.PHONY: comskip_pre_depend comskip_extra_install
-
-FFMPEG_LIBS = libswresample.pc libavutil.pc libavformat.pc libavcodec.pc libswscale.pc
-comskip_pre_depend:
-	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+.PHONY: comskip_extra_install
 
 comskip_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var

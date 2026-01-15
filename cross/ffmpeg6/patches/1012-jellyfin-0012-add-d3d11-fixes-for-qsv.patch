@@ -1,0 +1,45 @@
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -2128,7 +2128,6 @@ static int qsv_device_create(AVHWDeviceC
+         }
+     } else if (CONFIG_VAAPI) {
+         child_device_type = AV_HWDEVICE_TYPE_VAAPI;
+-#if QSV_ONEVPL
+     } else if (CONFIG_D3D11VA) {  // Use D3D11 by default if d3d11va is enabled
+         av_log(ctx, AV_LOG_VERBOSE,
+                "Defaulting child_device_type to AV_HWDEVICE_TYPE_D3D11VA for oneVPL."
+@@ -2137,16 +2136,6 @@ static int qsv_device_create(AVHWDeviceC
+         child_device_type = AV_HWDEVICE_TYPE_D3D11VA;
+     } else if (CONFIG_DXVA2) {
+         child_device_type = AV_HWDEVICE_TYPE_DXVA2;
+-#else
+-    } else if (CONFIG_DXVA2) {
+-        av_log(NULL, AV_LOG_WARNING,
+-                "WARNING: defaulting child_device_type to AV_HWDEVICE_TYPE_DXVA2 for compatibility "
+-                "with old commandlines. This behaviour will be removed "
+-                "in the future. Please explicitly set device type via \"-init_hw_device\" option.\n");
+-        child_device_type = AV_HWDEVICE_TYPE_DXVA2;
+-    } else if (CONFIG_D3D11VA) {
+-        child_device_type = AV_HWDEVICE_TYPE_D3D11VA;
+-#endif
+     } else {
+         av_log(ctx, AV_LOG_ERROR, "No supported child device type is enabled\n");
+         return AVERROR(ENOSYS);
+@@ -2202,7 +2191,14 @@ static int qsv_device_create(AVHWDeviceC
+ 
+     impl = choose_implementation(device, child_device_type);
+ 
+-    return qsv_device_derive_from_child(ctx, impl, child_device, 0);
++    ret = qsv_device_derive_from_child(ctx, impl, child_device, 0);
++    if (ret == 0) {
++        ctx->internal->source_device = av_buffer_ref(priv->child_device_ctx);
++        if (!ctx->internal->source_device)
++            ret = AVERROR(ENOMEM);
++    }
++
++    return ret;
+ }
+ 
+ const HWContextType ff_hwcontext_type_qsv = {

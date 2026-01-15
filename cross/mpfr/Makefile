@@ -1,5 +1,5 @@
 PKG_NAME = mpfr
-PKG_VERS = 4.0.2
+PKG_VERS = 4.2.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/mpfr
@@ -10,9 +10,6 @@ DEPENDS = cross/gmp
 HOMEPAGE = https://www.mpfr.org/
 COMMENT  = C library for multiple-precision floating-point computations with correct rounding.
 LICENSE  = GNU Lesser GPL
-
-# Cumulative patches from https://www.mpfr.org/mpfr-4.0.2/allpatches
-# for version 4.0.2-p1
 
 GNU_CONFIGURE = 1
 

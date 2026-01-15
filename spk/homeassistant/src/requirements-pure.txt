@@ -1,86 +1,97 @@
-# Home Assistant core
-# requirements are taken from homeassistant dependency files
-# - pyproject.toml
-# - requirements.txt (including homeassistant/package_constraints.txt)
-# - requirements_all.txt
-# those requirements are splitted into multiple files
-# - requirements-crossenv.txt             (containing requirements that need cross compilation)
-# - requirements-pure.txt                 (containing pure-python requirements for homeassistant core and default_configuration, this file)
-# - postinst_integration_requirements.txt (requirements for integrations)
-# postinst requirements must be pure python wheels.
-# To minimize the package size the spk does not contain dependent wheels that are pure python.
+homeassistant==2024.12.5
+home_assistant_intents==2024.12.9
+hass_nabucasa==0.86.0
 
-homeassistant==2022.10.5
-home-assistant-frontend==20221010.0
-hass-nabucasa==0.56.0
+# additionally installed to avoid conflicting versions
+construct==2.10.68      # avoid version 2.10.70, incompatible with some dependecies
+rich==10.16.2           # avoid version >= 11.0.0, incompatible with surepy==0.9.0
+tenacity==8.5.0         # avoid version 9.0.0, incompatible with some dependecies
+
+# additionally installed to fix restfull integrations
+asyncio==3.4.3
 
 
-acme==1.29.0
-aiodiscover==1.4.13
-aiohttp-cors==0.7.0
-aiosignal==1.2.0
-anyio==3.6.2
+acme==3.0.1
+aiodiscover==2.1.0
+aiodns==3.2.0
+aiofiles==24.1.0
+aiohappyeyeballs==2.6.1
+aiohasupervisor==0.2.1
+aiohttp_cors==0.7.0
+aiohttp_fast_zlib==0.2.0
+aiomqtt==2.0.1
+aiooui==0.1.7
+aiosignal==1.3.2
+aiozoneinfo==0.2.1
 astral==2.2
-async-upnp-client==0.31.2
-async_timeout==4.0.2
-atomicwrites-homeassistant==1.4.1
-attrs==21.2.0
-awesomeversion==22.9.0
-bleak-retry-connector==2.1.3
-bleak==0.18.1
-bluetooth-adapters==0.6.0
-bluetooth-auto-recovery==0.3.6
-boto3==1.26.4
-botocore==1.29.4
-btsocket==0.2.0
-charset-normalizer==2.1.1
-dbus-fast==1.24.0
+async_interrupt==1.2.0
+async_timeout==4.0.3
+async_upnp_client==0.41.0
+atomicwrites_homeassistant==1.4.1
+attrs==24.2.0
+awesomeversion==24.6.0
+bleak_retry_connector==3.6.0
+bluetooth_adapters==0.20.2
+bluetooth_auto_recovery==1.4.2
+boto3==1.34.131
+botocore==1.34.131
+btsocket==0.3.0
+cachetools==5.5.2
+chacha20poly1305==0.0.3
+chacha20poly1305_reuseable==0.13.2
+charset_normalizer==3.4.0
+cronsim==2.6
 defusedxml==0.7.1
-dnspython==2.2.1
-ecdsa==0.18.0
+dnspython==2.7.0
+ecdsa==0.19.1
 envs==1.4
 fnvhash==0.1.0
 gTTS==2.2.4
-h11==0.12.0
-home-assistant-bluetooth==1.3.0
-httpcore==0.15.0
-httpx==0.23.0
-idna==3.4
-ifaddr==0.1.7
-Jinja2==3.1.2
+h11==0.14.0
+home_assistant_bluetooth==1.13.0
+httpcore==1.0.5
+httpx==0.27.2
+idna==3.10
+ifaddr==0.2.0
+jinja2==3.1.4
 jmespath==1.0.1
-josepy==1.13.0
-mutagen==1.45.1
-# mediafile>0.10.0 would break tts due to depencency of mutagen>=1.46
-mediafile==0.10.0
-psutil-home-assistant==0.0.1
+josepy==1.15.0
+mac_vendor_lookup==0.1.12
+mashumaro==3.15
+mutagen==1.47.0
+noiseprotocol==0.3.1
+packaging==24.2
+psutil_home_assistant==0.0.1
 pyasn1==0.4.8
-pycognito==2022.8.0
-pycparser==2.21
-PyJWT==2.5.0
-pyOpenSSL==22.1.0
-pyRFC3339==1.1
+pycognito==2024.5.1
+pycparser==2.22
+PyJWT==2.10.1
+pyOpenSSL==24.2.1
+pyRFC3339==2.0.1
 PyRIC==0.1.6.3
+pyroute2==0.7.5
 pyserial==3.5
-python-dateutil==2.8.2
-python-didl-lite==1.3.2
-python-jose==3.3.0
-python-slugify==4.0.1
-pytz==2022.6
-pyudev==0.23.2
-requests-toolbelt==0.10.1
-requests==2.28.1
-rfc3986==1.5.0
+python_dateutil==2.9.0.post0
+python_didl_lite==1.4.1
+python_jose==3.4.0
+python_slugify==8.0.4
+pytz==2025.1
+pyudev==0.24.1
+requests==2.32.3
+requests_toolbelt==1.0.0
 rsa==4.9
-s3transfer==0.6.0
-scapy==2.4.5
-securetar==2022.2.0
-six==1.16.0
-sniffio==1.3.0
-snitun==0.31.0
-text-unidecode==1.3
-typing-extensions==4.4.0
-urllib3==1.26.12
-voluptuous-serialize==2.5.0
-voluptuous==0.13.1
-zeroconf==0.39.1
+s3transfer==0.10.4
+scapy==2.6.1
+securetar==2024.11.0
+sniffio==1.3.1
+snitun==0.39.1
+svg.py==1.6.0
+text_unidecode==1.3
+typing_extensions==4.12.2
+uart_devices==0.1.1
+urllib3==1.26.20
+usb_devices==0.4.5
+voluptuous==0.15.2
+voluptuous_openapi==0.0.5
+voluptuous_serialize==2.6.0
+webrtc_models==0.3.0

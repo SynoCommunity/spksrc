@@ -1,58 +1,31 @@
 [
     {
-        "step_title": "Basic configuration",
+        "step_title": "Gitea configuration",
         "items": [
             {
-                "type": "combobox",
-                "desc": "Please select a volume to use for the gitea folder",
-                "subitems": [
-                    {
-                        "key": "wizard_volume",
-                        "desc": "volume name",
-                        "displayField": "display_name",
-                        "valueField": "volume_path",
-                        "editable": false,
-                        "mode": "remote",
-                        "api_store": {
-                            "api": "SYNO.Core.Storage.Volume",
-                            "method": "list",
-                            "version": 1,
-                            "baseParams": {
-                                "limit": -1,
-                                "offset": 0,
-                                "location": "internal"
-                            },
-                            "root": "volumes",
-                            "idProperty": "volume_path",
-                            "fields": [
-                                "display_name",
-                                "volume_path"
-                            ]
-                        },
-                        "validator": {
-                            "fn": "{console.log(arguments);return true;}"
-                        }
-                    }
-                ]
-            },
-            {
                 "type": "textfield",
-                "desc": "Repository shared folder name (using the volume chosen above)",
+                "desc": "Please specify a shared folder for this package. This share is created at installation when it does not already exist.",
                 "subitems": [
                     {
-                        "key": "wizard_gitea_dir",
-                        "desc": "Repository shared folder",
-                        "defaultValue": "git",
+                        "key": "wizard_shared_folder_name",
+                        "desc": "Shared Folder",
+                        "defaultValue": "gitea-share",
                         "validator": {
                             "allowBlank": false,
                             "regex": {
                                 "expr": "/^[\\w _-]+$/",
-                                "errorText": "Subdirectories are not supported."
+                                "errorText": "Subdirectories are not supported."              
                             }
                         }
                     }
                 ]
-            }
+                }, {
+                    "desc": "If you let the installer create the shared folder, it is created under the same volume as the package is installed. If you want to use a different volume for the share, you must create the shared folder in DSM Control Panel before, and enter the name of the existing share in the field above."
+                }, {
+                    "desc": ""
+                }, {
+                    "desc": "This package runs as internal service user <b>'sc-gitea'</b> in DSM. The shared folder above is configured at installation time to be accessible by this user. Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+                }
         ]
     }
 ]

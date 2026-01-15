@@ -1,0 +1,12 @@
+--- Makefile.orig	2019-04-11 08:39:47.000000000 +0000
++++ Makefile	2025-11-11 11:55:30.276311464 +0000
+@@ -1,6 +1,6 @@
+-CC=gcc
+-CFLAGS=-O3 -Wall -Wextra -Wno-unknown-pragmas -Wcast-qual
+-LDFLAGS=
++CC?=gcc
++CFLAGS?=-O3 -Wall -Wextra -Wno-unknown-pragmas -Wcast-qual
++LDFLAGS?=
+ # CFLAGS=-O3 -Wall -Wextra -Wno-unknown-pragmas -Wcast-qual -g -fsanitize=thread
+ # LDFLAGS=-g -fsanitize=thread
+ # CFLAGS=-O3 -Wall -Wextra -Wno-unknown-pragmas -Wcast-qual -g -fsanitize=address

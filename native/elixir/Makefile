@@ -1,5 +1,5 @@
 PKG_NAME = elixir
-PKG_VERS = 1.12.3
+PKG_VERS = 1.14.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/elixir-lang/elixir/archive
@@ -17,6 +17,9 @@ ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/insta
 CONFIGURE_TARGET = nop
 INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 
+# REMARKS: 
+# build fails in native/elixir folder due to ERLANG_BIN_DIR, 
+# but succeeds in dependencies folders (i.e. cross/rabbitmq and spk/rabbitmq)
 ENV += PATH=$$PATH:$(ERLANG_BIN_DIR)
 
 include ../../mk/spksrc.native-cc.mk

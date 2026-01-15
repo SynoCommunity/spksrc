@@ -1,26 +1,25 @@
-# Wheels that absolutely needs
-# to be managed as pure-python
+# Generated using the requirements script on December 11, 2025
 
 appdirs==1.4.4
-arrow==1.2.3
-attrs==22.1.0
-borgmatic==1.7.5
-#certifi==2022.9.24                	   ==> python310:pure
-charset-normalizer==2.1.1
-colorama==0.4.6
+arrow==1.4.0
+attrs==25.4.0
+borgmatic==2.0.12
+#certifi==2025.11.12                     ==> python312
 docopt==0.6.2
-emborg==1.34
-idna==3.4
-inform==1.27.0
-jsonschema==4.17.3
-#msgpack==1.0.4                        ==> crossenv
-packaging==21.3
-pyparsing==3.0.9
-pyrsistent==0.19.2
-python-dateutil==2.8.2
-quantiphy==2.18.0
-requests==2.28.1
-ruamel.yaml==0.17.21
-#ruamel.yaml.clib==0.2.7               ==> crossenv
-#six==1.16.0                           ==> python310:pure
-urllib3==1.26.13
+emborg==1.42
+idna==3.11
+inform==1.35
+jsonschema==4.25.1
+jsonschema_specifications==2025.9.1
+nestedtext==3.7
+packaging==25.0
+#pip==25.3                                ==> python312
+python_dateutil==2.9.0.post0
+quantiphy==2.20
+referencing==0.37.0
+requests==2.32.5
+ruamel.yaml==0.18.16
+#six==1.17.0                              ==> python312
+typing_extensions==4.15.0
+tzdata==2025.2
+urllib3==2.6.1

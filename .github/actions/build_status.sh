@@ -15,6 +15,7 @@
 # BUILD_SUCCESS_FILE        defines the name of the file with built packages
 # BUILD_UNSUPPORTED_FILE    defines the name of the file with unsupported packages
 # BUILD_ERROR_FILE          defines the name of the file with build errors
+# BUILD_ERROR_LOGFILE       defines the name of the file with last 15 lines of build output for failed packages
 #
 
 echo ""
@@ -38,7 +39,7 @@ fi
 echo ""
 echo "UNSUPPORTED (skipped):"
 if [ -f "${BUILD_UNSUPPORTED_FILE}" ]; then
-    cat "${BUILD_UNSUPPORTED_FILE}"
+    cat "${BUILD_UNSUPPORTED_FILE}" | awk '!seen[$0]++'
     if [ -f "${BUILD_ERROR_FILE}" ]; then
         # remove unsupported packages from errors:
         unsupported_packages=$(cat "${BUILD_UNSUPPORTED_FILE}" | grep -Po "\- \K.*:" | sort -u | tr '\n' '|' | sed -e 's/|$//')

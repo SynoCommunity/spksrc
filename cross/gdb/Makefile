@@ -1,16 +1,13 @@
-PKG_NAME = gdb
-PKG_VERS = 7.6
-PKG_EXT = tar.bz2
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/gdb
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = gdb-main
 
-DEPENDS = cross/termcap
+OPTIONAL_DEPENDS  = cross/gdb-latest
+OPTIONAL_DEPENDS += cross/gdb-7.12
 
-HOMEPAGE = https://www.gnu.org/software/gdb/
-COMMENT  = The GNU Project Debugger
-LICENSE  = GPLv2/LGPLv2
+include ../../mk/spksrc.main-depends.mk
 
-GNU_CONFIGURE = 1
-
-include ../../mk/spksrc.cross-cc.mk
+ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
+DEPENDS += cross/gdb-7.12
+else
+# A compiler with support for C++11 language features is required.
+DEPENDS += cross/gdb-latest
+endif

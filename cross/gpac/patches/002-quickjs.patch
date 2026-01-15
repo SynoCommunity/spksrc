@@ -1,0 +1,11 @@
+--- src/quickjs/quickjs.c
++++ src/quickjs/quickjs.c
+@@ -73,7 +73,7 @@
+ 
+ /* define to include Atomics.* operations which depend on the OS
+    threads */
+-#if !defined(EMSCRIPTEN) && !defined(_MSC_VER) && !defined(GPAC_CONFIG_ANDROID) && !defined(__MINGW32__) && !defined(__CYGWIN__)
++#if !defined(EMSCRIPTEN) && !defined(_MSC_VER) && !defined(GPAC_CONFIG_ANDROID) && !defined(GPAC_NO_STDATOMIC) && !defined(__MINGW32__) && !defined(__CYGWIN__)
+ #define CONFIG_ATOMICS
+ #endif
+ 

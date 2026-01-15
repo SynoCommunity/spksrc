@@ -1,26 +1,28 @@
 SPK_NAME = deluge
-SPK_VERS = 2.1.1
-SPK_REV = 18
+SPK_VERS = 2.2.0
+SPK_REV = 25
 SPK_ICON = src/deluge.png
 
-BUILD_DEPENDS = cross/python310
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = "${PYTHON_PACKAGE}"
 
 WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
-WHEELS += src/requirements-abi3.txt
-
-SPK_DEPENDS = "python310"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Deluge is a cross platform BitTorrent client, based on libtorrent rasterbar. This package integrates both the deluge deamon \(deluged\), as well as its web counterpart \(deluge-web\), which serves the deluge web UI.
 DESCRIPTION_FRE = Deluge est un client BitTorrent multi-plateforme, basé sur libtorrent rasterbar. Ce paquet intègre à la fois le démon deluge \(deluged\) ainsi que son penchant web \(deluge-web\), desservant l\'interface utilisateur web deluge.
 STARTABLE = yes
-CHANGELOG = "1. Update to libtorrent DSM7-2.0.8 and DSM6-1.2.18<br/>2. Update to OpenSSL 1.1.1s<br/>3. Fix Error: skipping tracker announce (unreachable)<br/>4. Enable debug_info mode level 3 for DSM6 builds<br/>5. Fix issue with special characters on DSM7"
+CHANGELOG = "1. Update deluge to 2.2.0.<br/>2. Update all other wheels."
 DISPLAY_NAME = Deluge
 
 HOMEPAGE = https://deluge-torrent.org
 LICENSE  = GPL
 HELPURL  = https://dev.deluge-torrent.org/wiki/UserGuide
+
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 WIZARDS_DIR = src/wizard/
 
@@ -35,28 +37,16 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = deluge_extra_install
 
-# [cryptography]
-# To generate py36-abi3 limited API
-DEPENDS += cross/cryptography
+include ../../mk/spksrc.python.mk
 
-# [rencode]
-PYTHON_LIMITED_API=cp36
-
-include ../../mk/spksrc.common.mk
-
-# Enable debug_info builds for DSM6 for segfault tracking
-ifeq ($(call version_lt, ${TCVERSION}, 7),1)
-GCC_DEBUG_INFO := 1
-endif
-
-# [libtorrent] - generic
+# [libtorrent]
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
-DEPENDS += cross/openssl
+DEPENDS += cross/openssl3
 DEPENDS += cross/geoip
 DEPENDS += cross/libiconv
-DEPENDS += cross/boost_1.78
+DEPENDS += cross/boost_1.86
+BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_86_0
 BOOST_LIBRARIES += system python chrono random
-BOOST_BUILD_PATH=$(WORK_DIR)/boost_1_78_0
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 ENV += BOOST_BUILD_PATH="$(BOOST_BUILD_PATH)"
 ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
@@ -67,26 +57,11 @@ ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 WHEELS_BUILD_ARGS += --b2-args=address-model=32 --no-autoconf=address-model
 endif
 
-include ../../mk/spksrc.spk.mk
+# [Pillow]
+DEPENDS += python/pillow
 
-# [libtorrent] 2.0.8
-# DSM7 only due to c++14 minimal requirement
-# Unless c++1y is fixed: https://github.com/arvidn/libtorrent/issues/6868
-ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
-WHEELS += src/requirements-crossenv-libtorrent.txt
-# Ensure build arguments matches boost_1.78
-WHEELS_CXXFLAGS += [libtorrent]
-WHEELS_CXXFLAGS += -D_GLIBCXX_USE_C99_MATH
-WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISNAN
-WHEELS_CXXFLAGS += -D_GLIBCXX_HAVE_OBSOLETE_ISINF
-
-# [libtorrent] 1.2.18
-# DSM6 & archs lacking C++14 compiler (88f6281, hi3535, PPC and comcerto2k)
-else
-WHEELS += src/requirements-crossenv-libtorrent-gcc4.txt
-# Ensure build arguments matches boost_1.78
-WHEELS_BUILD_ARGS += --b2-args=cxxstd=11
-endif
+# [rencode]
+DEPENDS += python/rencode
 
 .NOTPARALLEL:
 .PHONY: deluge_extra_install

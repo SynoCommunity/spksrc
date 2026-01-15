@@ -1,0 +1,15 @@
+# add ADDITIONAL_CFLAGS to makefile for gcc
+# 
+# allow to define additional cflags (required to fix build for 32-bit arm archs)
+# 
+--- CPP/7zip/7zip_gcc.mak.orig	2024-11-25 17:00:00.000000000 +0000
++++ CPP/7zip/7zip_gcc.mak	2025-01-03 17:13:03.955679931 +0000
+@@ -50,7 +50,7 @@
+ endif
+ 
+ # CFLAGS_BASE_LIST = -S
+-CFLAGS_BASE = -O2 $(CFLAGS_BASE_LIST) $(CFLAGS_WARN_WALL) $(CFLAGS_WARN) \
++CFLAGS_BASE = -O2 $(CFLAGS_BASE_LIST) $(CFLAGS_WARN_WALL) $(CFLAGS_WARN) $(ADDITIONAL_CFLAGS) \
+  $(CFLAGS_DEBUG) -D_REENTRANT -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
+  -fPIC
+ 

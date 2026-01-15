@@ -1,23 +1,25 @@
 PKG_NAME = libxslt
-PKG_VERS = 1.1.34
-PKG_EXT = tar.gz
+PKG_VERS = 1.1.42
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = ftp://xmlsoft.org/$(PKG_NAME)
+PKG_DIST_SITE = https://download.gnome.org/sources/libxslt/$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libxml2 cross/libgcrypt
 
-HOMEPAGE = http://xmlsoft.org/
-COMMENT  = Libxslt is the XSLT C library developed for the GNOME project
+HOMEPAGE = https://gitlab.gnome.org/GNOME/libxslt/-/wikis/home
+COMMENT  = Libxslt is the XSLT C library developed for the GNOME project.
 LICENSE  = MIT
 
-CONFIGURE_ARGS  = --without-python
-GNU_CONFIGURE = 1
+CMAKE_ARGS  = -DLIBXSLT_WITH_PYTHON=OFF
+CMAKE_ARGS += -DLIBXSLT_WITH_TESTS=OFF
+CMAKE_ARGS += -DLIBXSLT_WITH_DEBUGGER=OFF
+CMAKE_ARGS += -DLIBXSLT_WITH_XSLT_DEBUG=OFF
 
-# if for libgcrypt, replace the -config path with abspath
+# adjust prefix in xslt-config (initialy added for libgcrypt)
 POST_INSTALL_TARGET = libxslt_post_install
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-cmake.mk
 
 .PHONY: libxslt_post_install
 libxslt_post_install:

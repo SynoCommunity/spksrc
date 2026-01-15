@@ -1,0 +1,6 @@
+COPS_CONFIGURATION_UPGRADE_STEP_TITLE: "Mise à jour de la bibliothèque COPS"
+
+UPGRADE_CALIBRE_DIRECTORY_DESCRIPTION: "Le répertoire de la bibliothèque Calibre doit désormais résider dans un dossier partagé. Sur la base de la configuration précédente détectée, veuillez confirmer que le dossier partagé spécifié contient votre bibliothèque."
+UPGRADE_CALIBRE_DIRECTORY_LABEL: "Dossier partagé"
+UPGRADE_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT: "Le nom du dossier partagé contient des caractères non valides ou commence/se termine par un espace."
+UPGRADE_NOTE_CALIBRE_DIRECTORY_DESCRIPTION: "REMARQUE: si votre bibliothèque Calibre ne se trouve pas dans le dossier partagé spécifié, un nouveau sera créé. Après la mise à niveau, déplacez manuellement la bibliothèque vers ce nouvel emplacement."

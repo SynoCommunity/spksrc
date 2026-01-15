@@ -1,5 +1,5 @@
 SPK_NAME = aria2
-SPK_VERS = 1.36.0
+SPK_VERS = 1.37.0
 SPK_REV = 1
 SPK_ICON = src/aria2.png
 
@@ -9,7 +9,6 @@ MAINTAINER = cnrat
 DESCRIPTION = aria2 is a lightweight multi-protocol and multi-source command-line download utility.
 DESCRIPTION_CHS = Aria2是一个命令行下运行、多协议、多来源下载工具（HTTP/HTTPS、FTP、BitTorrent、Metalink）。
 DISPLAY_NAME = Aria2
-CHANGELOG = "Initial package release."
 
 STARTABLE = no
 

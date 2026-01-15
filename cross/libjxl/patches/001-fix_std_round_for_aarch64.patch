@@ -1,0 +1,17 @@
+# include cmath to resolve std:round in neon specific code
+# fixes: .../libjxl-0.7.2/lib/jxl/fast_dct-inl.h:176:21: error: ‘round’ is not a member of ‘std’
+# 
+--- lib/jxl/fast_dct-inl.h.orig	2024-11-27 17:45:37.000000000 +0000
++++ lib/jxl/fast_dct-inl.h	2025-09-12 12:18:02.444828689 +0000
+@@ -15,6 +15,11 @@
+ 
+ #include "lib/jxl/base/status.h"
+ 
++#if HWY_TARGET == HWY_NEON
++#include <cmath>
++using std::round;
++#endif
++
+ HWY_BEFORE_NAMESPACE();
+ namespace jxl {
+ namespace HWY_NAMESPACE {

@@ -1,0 +1,9 @@
+CONFIGURATION_TITLE: "Server Configuration"
+SITE_URL_DESCRIPTION:     "The URL of your OpenList server, e.g., https://example.com. (without trailing slash). Required if you use a reverse proxy (optional)."
+SITE_URL_LABEL:          "Site URL"
+
+ADMIN_PASSWORD_DESCRIPTION: "Initial Password for user 'admin'"
+ADMIN_PASSWORD_LABEL:       "Password (default: admin)"
+
+INSTALLATION_NOTES_TITLE: "<b>Notes</b><br/>"
+INSTALLATION_NOTES_TEXT1: "See <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/OpenList\\\">OpenList package</a> for additional information and links to the official documentation."

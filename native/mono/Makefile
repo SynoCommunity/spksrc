@@ -1,22 +1,24 @@
 PKG_NAME = mono
-PKG_VERS = 5.20.1.34
-PKG_EXT = tar.bz2
+PKG_VERS = 6.12.0.182
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.mono-project.com/sources/$(PKG_NAME)
+PKG_DIST_SITE = https://download.mono-project.com/sources/mono
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
 HOMEPAGE = https://www.mono-project.com
 COMMENT  = Cross platform, open source .NET development framework.
-LICENSE  = https://github.com/mono/mono/blob/master/LICENSE
+LICENSE  = https://www.mono-project.com/docs/faq/licensing/
 
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS  = --disable-dependency-tracking
 # disable-static does not work without disable-libraries
-CONFIGURE_ARGS += --disable-static --disable-libraries 
+CONFIGURE_ARGS += --disable-static --disable-libraries
 CONFIGURE_ARGS += --without-mcs-docs
+CONFIGURE_ARGS += --disable-boehm
+CONFIGURE_ARGS += --without-ikvm-native
 
 POST_INSTALL_TARGET = mono_native_post_install
 

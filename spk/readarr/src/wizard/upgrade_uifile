@@ -1,0 +1,13 @@
+[{
+    "step_title": "Updating Readarr",
+    "items": [{
+        "desc": "This update is for additional libraries and DSM integration. It does not modify your current Readarr version."
+    },{
+        "desc": "Keep Readarr up-to-date by using Readarr's built-in updater.<br>Navigate to <b>System>Updates</b> in the Readarr UI."
+    }]
+}, {
+    "step_title": "DSM Permissions",
+    "items": [{
+        "desc": "Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    }]
+}]

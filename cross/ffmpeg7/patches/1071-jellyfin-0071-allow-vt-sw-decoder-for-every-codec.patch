@@ -1,0 +1,15 @@
+Index: FFmpeg/libavcodec/videotoolbox.c
+===================================================================
+--- libavcodec/videotoolbox.c
++++ libavcodec/videotoolbox.c
+@@ -812,9 +812,7 @@ static CFDictionaryRef videotoolbox_deco
+                                                                    &kCFTypeDictionaryValueCallBacks);
+ 
+     CFDictionarySetValue(config_info,
+-                         codec_type == kCMVideoCodecType_HEVC ?
+-                            kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder :
+-                            kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder,
++                         kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder,
+                          kCFBooleanTrue);
+ 
+     avc_info = CFDictionaryCreateMutable(kCFAllocatorDefault,

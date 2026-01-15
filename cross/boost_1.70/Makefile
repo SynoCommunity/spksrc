@@ -2,7 +2,7 @@ PKG_NAME = boost
 PKG_VERS = 1.70.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)_$(subst .,_,$(PKG_VERS)).$(PKG_EXT)
-PKG_DIST_SITE = https://boostorg.jfrog.io/artifactory/main/release/$(PKG_VERS)/source
+PKG_DIST_SITE = https://archives.boost.io/release/$(PKG_VERS)/source
 PKG_DIR = $(PKG_NAME)_$(subst .,_,$(PKG_VERS))
 
 DEPENDS = cross/bzip2 cross/zlib
@@ -19,7 +19,7 @@ CONFIGURE_TARGET = boost_configure
 COMPILE_TARGET = boost_compile
 INSTALL_TARGET = boost_install
 
-# Build all if not told otherwise (we exclude python library when "all" selected)
+# Build all if not told otherwise (we exclude python library when "all" selected)
 BOOST_LIBRARIES ?= all
 
 # Expect already built python when python library selected
@@ -27,7 +27,7 @@ WITH_PYTHON_LIBRARY =
 ifneq ($(findstring python,$(BOOST_LIBRARIES)),)
 WITH_PYTHON_LIBRARY = 1
 # The packages depending on boost with python, must build python before.
-include $(WORK_DIR)/python-cc.mk
+include $(or $(wildcard $(WORK_DIR)/crossenv/build/python-cc.mk), $(wildcard $(PYTHON_PACKAGE_WORK_DIR)/crossenv/build/python-cc.mk))
 PYTHON_NAME = $(basename $(notdir $(PYTHON_INTERPRETER)))
 else ifneq ($(findstring $(BOOST_LIBRARIES), all),)
 # exclude python library if "all" selected

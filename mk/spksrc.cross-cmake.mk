@@ -1,29 +1,57 @@
 # Build CMake programs
 #
+# This makefile extends spksrc.cross-cc.mk with CMake-specific functionality
+#
 # prerequisites:
 # - cross/module depends on cmake
 #
 
+# Configure the included makefiles
+URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
+NAME          = $(PKG_NAME)
+COOKIE_PREFIX = $(PKG_NAME)-
+ifneq ($(PKG_DIST_FILE),)
+LOCAL_FILE    = $(PKG_DIST_FILE)
+else
+LOCAL_FILE    = $(PKG_DIST_NAME)
+endif
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT      = $(PKG_EXT)
+
+ifneq ($(ARCH),)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+ifneq ($(ARCH),noarch)
+TC = syno$(ARCH_SUFFIX)
+endif
+endif
+
+# Common directories (must be set after ARCH_SUFFIX)
+include ../../mk/spksrc.directories.mk
+
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
+
+###
 
 # cmake specific configurations
 include ../../mk/spksrc.cross-cmake-env.mk
 
-####
+# cmake toolchain-file usage definition
+include ../../mk/spksrc.cross-cmake-toolchainfile.mk
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = cmake_configure_target
 endif
 
-# install
-ifeq ($(strip $(CMAKE_DIR)),)
-CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
+# source directory
+ifeq ($(strip $(CMAKE_SOURCE_DIR)),)
+CMAKE_SOURCE_DIR = $(CMAKE_BASE_DIR)
 endif
 
-ifneq ($(strip $(CMAKE_USE_NINJA)),1)
+ifeq ($(strip $(CMAKE_USE_NINJA)),1)
+include ../../mk/spksrc.ninja.mk
+else
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
 COMPILE_TARGET = cmake_compile_target
@@ -33,69 +61,39 @@ endif
 ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = cmake_install_target
 endif
+
+# post-install
+ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
+ifeq ($(strip $(POST_INSTALL_TARGET)),)
+POST_INSTALL_TARGET = cmake_post_install_target
+endif
+endif
 endif
 
-.PHONY: $(CMAKE_TOOLCHAIN_PKG)
-$(CMAKE_TOOLCHAIN_PKG):
-	@$(MSG) Generating $(CMAKE_TOOLCHAIN_PKG)
-	env $(MAKE) --no-print-directory cmake_pkg_toolchain > $(CMAKE_TOOLCHAIN_PKG) 2>/dev/null;
+###
 
-.PHONY: cmake_pkg_toolchain
-cmake_pkg_toolchain:
-	@cat $(CMAKE_TOOLCHAIN_WRK) ; \
-	echo
-ifeq ($(strip $(CMAKE_USE_NASM)),1)
-	@echo "# set assembly compiler" ; \
-	echo "set(ENABLE_ASSEMBLY $(ENABLE_ASSEMBLY))" ; \
-	echo "set(CMAKE_ASM_COMPILER $(CMAKE_ASM_COMPILER))" ; \
-	echo
-endif
-	@echo "# set compiler flags for cross-compiling" ; \
-	echo 'set(CMAKE_C_FLAGS "$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)")' ; \
-	echo 'set(CMAKE_CPP_FLAGS "$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS)")' ; \
-	echo 'set(CMAKE_CXX_FLAGS "$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)")' ; \
-	echo 'set(CMAKE_LD_FLAGS "$(LDFLAGS) $(CMAKE_LD_FLAGS) $(ADDITIONAL_LDFLAGS)")' ; \
-	echo
-	@echo "# define library rpath" ; \
-	echo "set(CMAKE_INSTALL_RPATH $(subst $() $(),:,$(CMAKE_INSTALL_RPATH)))" ; \
-	echo "set(CMAKE_INSTALL_RPATH_USE_LINK_PATH $(CMAKE_INSTALL_RPATH_USE_LINK_PATH))" ; \
-	echo "set(CMAKE_BUILD_WITH_INSTALL_RPATH $(CMAKE_BUILD_WITH_INSTALL_RPATH))" ; \
-	echo
-
+# CMake specific targets
 .PHONY: cmake_configure_target
-
-# default cmake configure:
-cmake_configure_target: $(CMAKE_TOOLCHAIN_PKG)
+cmake_configure_target: $(CMAKE_TOOLCHAIN_FILE_PKG)
 	@$(MSG) - CMake configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Optional Dependencies = $(OPTIONAL_DEPENDS)
-	@$(MSG)    - Use Toolchain File = $(CMAKE_USE_TOOLCHAIN_FILE) [$(CMAKE_TOOLCHAIN_PKG)]
+	@$(MSG)    - Use Toolchain File = $(CMAKE_USE_TOOLCHAIN_FILE) [$(CMAKE_TOOLCHAIN_FILE_PKG)]
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
+	@$(MSG)    - CMake = $(shell which cmake) [$(shell cmake --version | head -1 | awk '{print $$NF}')]
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
-	@$(MSG)    - Path CMAKE_DIR = $(CMAKE_DIR)
-	$(RUN) rm -rf CMakeCache.txt CMakeFiles
-	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_PKG) $(CMAKE_ARGS) $(CMAKE_DIR)
-else
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake $(CMAKE_ARGS) $(CMAKE_DIR)
-endif
+	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
+	@$(RUN) rm -rf CMakeCache.txt CMakeFiles
+	$(RUN_CMAKE) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
-
-ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-include ../../mk/spksrc.cross-ninja.mk
-else
 
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-	@$(MSG) MAKELEVEL: $(MAKELEVEL), PARALLEL_MAKE: $(PARALLEL_MAKE), ARCH: $(ARCH)-$(TCVERSION), NAME: $(NAME) >> $(PSTAT_LOG)
-endif
-	env $(ENV) $(PSTAT_TIME) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	$(RUN_CMAKE) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
 
 .PHONY: cmake_install_target
 
@@ -103,11 +101,20 @@ endif
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install
+	$(RUN_CMAKE) cmake --install $(CMAKE_BUILD_DIR)
 else
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
-endif
+	$(RUN_CMAKE) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR)
 endif
 
-# call-up regular build process
+.PHONY: cmake_post_install_target
+
+# default post-install: clean
+# only called when GCC_NO_DEBUG_INFO=1
+cmake_post_install_target:
+	@$(MSG) - CMake post-install \(clean\)
+	$(RUN_CMAKE) cmake --build $(CMAKE_BUILD_DIR) --target clean
+
+###
+
+# Include base cross-cc makefile for common functionality
 include ../../mk/spksrc.cross-cc.mk

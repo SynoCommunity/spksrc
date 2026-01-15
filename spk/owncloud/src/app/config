@@ -1,15 +1,14 @@
 {
-    ".url": {
-        "com.synocommunity.packages.owncloud": {
-            "title": "ownCloud",
-            "desc": "ownCloud",
-            "icon": "images/owncloud-{0}.png",
-            "type": "url",
-            "protocol": "http",
-            "port": "80",
-            "url": "/owncloud",
-            "allUsers": true,
-            "grantPrivilege": "local"
-        }
-    }
+	".url": {
+		"com.synocommunity.packages.owncloud": {
+			"allUsers": true,
+			"desc": "ownCloud",
+			"icon": "images/owncloud-{0}.png",
+			"port": "443",
+			"protocol": "https",
+			"title": "ownCloud",
+			"type": "url",
+			"url": "/owncloud/"
+		}
+	}
 }

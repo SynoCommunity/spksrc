@@ -3,7 +3,7 @@ PKG_VERS = 4.0.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/neurobin/rnm/archive/refs/tags
-PKG_DIST_FILE=$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/jpcre2 cross/gmp
@@ -18,9 +18,11 @@ PRE_CONFIGURE_TARGET = rnm_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
-# requires gnu GCC >= 4.8
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
+# A compiler with support for C++11 language features is required.
+UNSUPPORTED_ARCHS = $(ARCH)
+endif
 
 .PHONY: rnm_pre_configure
 rnm_pre_configure:
-	$(RUN) ./autogen.sh
+	@$(RUN) ./autogen.sh

@@ -1,15 +1,14 @@
 {
     ".url": {
         "com.synocommunity.packages.selfoss": {
-            "title": "Selfoss",
+            "allUsers": true,
             "desc": "Selfoss",
             "icon": "images/selfoss-{0}.png",
-            "type": "url",
-            "protocol": "http",
             "port": "80",
-            "url": "/selfoss",
-            "allUsers": true,
-            "grantPrivilege": "local"
+            "protocol": "http",
+            "title": "Selfoss",
+            "type": "url",
+            "url": "/selfoss"
         }
     }
 }

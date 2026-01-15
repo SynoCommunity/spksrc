@@ -1,0 +1,78 @@
+Index: FFmpeg/libavcodec/qsv.c
+===================================================================
+--- libavcodec/qsv.c
++++ libavcodec/qsv.c
+@@ -473,8 +473,8 @@ static int ff_qsv_set_display_handle(AVC
+     AVVAAPIDeviceContext *hwctx;
+     int ret;
+ 
+-    av_dict_set(&child_device_opts, "kernel_driver", "i915", 0);
+-    av_dict_set(&child_device_opts, "driver",        "iHD",  0);
++    av_dict_set(&child_device_opts, "vendor_id", "0x8086", 0);
++    av_dict_set(&child_device_opts, "driver",    "iHD",    0);
+ 
+     ret = av_hwdevice_ctx_create(&qs->va_device_ref, AV_HWDEVICE_TYPE_VAAPI, NULL, child_device_opts, 0);
+     av_dict_free(&child_device_opts);
+Index: FFmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -2644,8 +2644,8 @@ static int qsv_device_create(AVHWDeviceC
+             // used on recent Intel hardware.  Set options to the VAAPI device
+             // creation so that we should pick a usable setup by default if
+             // possible, even when multiple devices and drivers are available.
+-            av_dict_set(&child_device_opts, "kernel_driver", "i915", 0);
+-            av_dict_set(&child_device_opts, "driver",        "iHD",  0);
++            av_dict_set(&child_device_opts, "vendor_id", "0x8086", 0);
++            av_dict_set(&child_device_opts, "driver",    "iHD",    0);
+         }
+         break;
+ #endif
+Index: FFmpeg/libavutil/hwcontext_vaapi.c
+===================================================================
+--- libavutil/hwcontext_vaapi.c
++++ libavutil/hwcontext_vaapi.c
+@@ -1763,7 +1763,9 @@ static int vaapi_device_create(AVHWDevic
+ #if CONFIG_LIBDRM
+             drmVersion *info;
+             const AVDictionaryEntry *kernel_driver;
++            const AVDictionaryEntry *vendor_id;
+             kernel_driver = av_dict_get(opts, "kernel_driver", NULL, 0);
++            vendor_id = av_dict_get(opts, "vendor_id", NULL, 0);
+ #endif
+             for (n = 0; n < max_devices; n++) {
+                 snprintf(path, sizeof(path),
+@@ -1818,6 +1820,33 @@ static int vaapi_device_create(AVHWDevic
+                     close(priv->drm_fd);
+                     priv->drm_fd = -1;
+                     continue;
++                } else if (vendor_id) {
++                    drmDevicePtr device;
++                    char drm_vendor[8];
++                    if (drmGetDevice(priv->drm_fd, &device)) {
++                        av_log(ctx, AV_LOG_VERBOSE,
++                               "Failed to get DRM device info for device %d.\n", n);
++                        close(priv->drm_fd);
++                        priv->drm_fd = -1;
++                        continue;
++                    }
++
++                    snprintf(drm_vendor, sizeof(drm_vendor), "0x%x", device->deviceinfo.pci->vendor_id);
++                    if (strcmp(vendor_id->value, drm_vendor)) {
++                        av_log(ctx, AV_LOG_VERBOSE, "Ignoring device %d "
++                               "with non-matching vendor id (%s).\n",
++                               n, vendor_id->value);
++                        drmFreeDevice(&device);
++                        close(priv->drm_fd);
++                        priv->drm_fd = -1;
++                        continue;
++                    }
++                    av_log(ctx, AV_LOG_VERBOSE, "Trying to use "
++                           "DRM render node for device %d, "
++                           "with matching vendor id (%s).\n",
++                           n, vendor_id->value);
++                    drmFreeDevice(&device);
++                    break;
+                 }
+                 drmFreeVersion(info);
+ #endif

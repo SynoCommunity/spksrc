@@ -1,9 +1,10 @@
 PKG_NAME = libuv
 PKG_VERS = 1.44.2
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://dist.libuv.org/dist/v$(PKG_VERS)
-PKG_DIR = $(PKG_NAME)-v$(PKG_VERS)
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/libuv/libuv/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 

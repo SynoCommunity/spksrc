@@ -1,0 +1,44 @@
+{
+	"data-share": {
+		"shares": [
+			{
+				"name": "{{wizard_shared_folder_name}}", 
+				"permission":{"rw":["sc-demowebservice"]}
+			}
+		]
+	},
+	"webservice": {
+		"services": [{
+			"service": "demowebservice",
+			"display_name": "Demo Web Service",
+			"icon": "app/images/demowebservice-{0}.png",
+			"type": "apache_php",
+			"root": "demowebservice",
+			"backend": 2,
+			"php": {
+				"profile_name": "Web Service Demo Profile",
+				"profile_desc": "PHP 7.4 profile for Demo Web Service",
+				"backend": 8,
+				"extensions": [],
+				"user": "sc-demowebservice",
+				"group": "http"
+			}
+		}],
+		"portals": [
+			{
+				"service": "demowebservice",
+				"type": "alias",
+				"name": "Demo Web Service",
+				"alias": "demowebservice",
+				"app": "com.synocommunity.packages.demowebservice"
+			}
+		],
+		"pkg_dir_prepare": [{
+			"source": "/var/packages/demowebservice/target/web/demowebservice",
+			"target": "demowebservice",
+			"mode": "0755",
+			"user": "sc-demowebservice",
+			"group": "http"
+		}]
+	}
+}

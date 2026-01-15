@@ -1,0 +1,27 @@
+# avoid cross compiling error when testing for libthreadar
+# 
+--- configure.orig	2024-03-23 11:43:33.000000000 +0000
++++ configure	2024-03-28 20:18:54.638679310 +0000
+@@ -29035,13 +29035,6 @@
+ if  test "$local_threadar" = "yes"
+ then :
+ 
+-    if test "$cross_compiling" = yes
+-then :
+-  { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+-printf "%s\n" "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See \`config.log' for more details" "$LINENO" 5; }
+-else $as_nop
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
+@@ -29082,8 +29075,6 @@
+ fi
+ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+   conftest.$ac_objext conftest.beam conftest.$ac_ext
+-fi
+-
+ 
+ 
+ fi

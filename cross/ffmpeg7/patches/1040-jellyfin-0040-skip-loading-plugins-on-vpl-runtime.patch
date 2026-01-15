@@ -1,0 +1,22 @@
+Index: FFmpeg/libavcodec/qsv.c
+===================================================================
+--- libavcodec/qsv.c
++++ libavcodec/qsv.c
+@@ -406,9 +406,17 @@ static int qsv_load_plugins(mfxSession s
+                             void *logctx)
+ {
+ #if QSV_HAVE_USER_PLUGIN
++    mfxVersion ver;
+     if (!load_plugins || !*load_plugins)
+         return 0;
+ 
++    // Plugins have been removed in VPL runtime, don't load them
++    // if using the VPL runtime with MSDK loader to avoid failure.
++    if (MFXQueryVersion(session, &ver) == MFX_ERR_NONE &&
++        QSV_RUNTIME_VERSION_ATLEAST(ver, 1, 255)) {
++        return 0;
++    }
++
+     while (*load_plugins) {
+         mfxPluginUID uid;
+         mfxStatus ret;
