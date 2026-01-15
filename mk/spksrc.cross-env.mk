@@ -71,12 +71,12 @@ endif
 -include $(TC_VARS_MK)
 
 # Default is autotools / make
-DEFAULT_ENV ?= autotools
-ifneq ($(filter autotools,$(DEFAULT_ENV)),)
-  -include $(TC_VARS_AUTOTOOLS_MK)
-  -include $(TC_VARS_FLAGS_MK)
-  -include $(TC_VARS_RUST_MK)
-endif
+DEFAULT_ENV ?= autotools flags rust
+
+# Map DEFAULT_ENV definitions to filenames
+TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
+# Include them (optional include)
+-include $(TC_VARS_FILES)
 
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
