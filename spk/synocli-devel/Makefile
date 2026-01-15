@@ -2,7 +2,7 @@ SPK_NAME = synocli-devel
 SPK_VERS = 1.4
 SPK_REV = 5
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Update LLVM to 21.1.8 (DSM7\).<br/>2. Update to GDB 17.1 (DSM7\).<br/>3. Update binutils to v2.45.<br/>4. Update automake to 1.18.1.<br/>5. Update strate to 6.18."
+CHANGELOG = "1. Update LLVM to 21.1.8 (DSM7\).<br/>2. Update to GDB 17.1 (DSM7\).<br/>3. Update binutils to v2.45.<br/>4. Update automake to 1.18.1.<br/>5. Update strace to 6.18."
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.18.1, autoconf 2.71$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.18
