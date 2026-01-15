@@ -9,7 +9,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = Hylen
 DESCRIPTION = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
-DISPLAY_NAME = vaultwarden
+DISPLAY_NAME = Vaultwarden
 CHANGELOG = "Initial package release with vaultwarden 1.35.2 and vaultwarden_web 2025.12.1."
 
 HOMEPAGE = https://github.com/dani-garcia/vaultwarden
