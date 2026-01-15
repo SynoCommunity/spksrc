@@ -1,25 +1,16 @@
-duplicity==1.2.3
+# Generated using the requirements script on July 12, 2025
 
-# gitlab source fails to generate $version
-# ref: https://gitlab.com/duplicity/duplicity/-/issues/109
-#git+https://gitlab.com/duplicity/duplicity.git@rel.0.8.23#egg=duplicity==0.8.23
-
-# Using launchpad source as alternate
-#https://launchpad.net/duplicity/0.8-series/0.8.23/+download/duplicity-0.8.23.tar.gz#egg=duplicity==0.8.23
-
-bcrypt==4.0.1
-cffi==1.15.1
-coverage==7.2.7
-#cryptography               ==> cross/cryptography
-lazy-object-proxy==1.9.0
-lxml==4.9.3
-MarkupSafe==2.1.3
-msgpack==1.0.5
-msgpack-python==0.5.6
+bcrypt==4.3.0
+cffi==1.17.1
+charset_normalizer==3.4.2
+cryptography==43.0.3
+#duplicity                          ==> python/duplicity
+lxml==5.4.0                         # Downgrade from 6.0.0 to build
+msgpack_python==0.5.6
 netifaces==0.11.0
-protobuf==4.23.4
-psutil==5.9.5
+protobuf==6.31.1
+psutil==7.0.0
 PyNaCl==1.5.0
-PyYAML==6.0.1
-simplejson==3.19.1
-wrapt==1.15.0
+PyYAML==6.0.2
+simplejson==3.20.1
+wrapt==1.17.2

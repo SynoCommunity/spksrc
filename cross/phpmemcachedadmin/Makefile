@@ -1,4 +1,4 @@
-PKG_NAME = phpMemcachedAdmin
+PKG_NAME = phpmemcachedadmin
 PKG_EXT = tar.gz
 PKG_GIT_HASH = aaf3d16a2a1e3dff72dd358f1758d96f0f174cb3
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
@@ -21,15 +21,16 @@ INSTALL_TARGET = phpmemcachedadmin_install
 
 include ../../mk/spksrc.install-resources.mk
 
-CONFIG_FOLDER = $(STAGING_INSTALL_PREFIX)/var/phpmemcachedadmin.config
+CONFIG_FOLDER = var/phpmemcachedadmin.config
 
 .PHONY: phpmemcachedadmin_install
 # link the Config folder into var for backup/restore on package update
 # and for on demand creation of the default config on DSM 7.
 phpmemcachedadmin_install:
+	@$(MSG) "Extract web app to folder: share/$(PKG_NAME)"
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
 	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR) --exclude Config . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME)
-	@echo folder=$(CONFIG_FOLDER)
-	@install -d -m 755 $(CONFIG_FOLDER)
-	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/Config/* $(CONFIG_FOLDER)/
+	@$(MSG) "Install config to folder: $(CONFIG_FOLDER)"
+	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/$(CONFIG_FOLDER)
+	@install -m 755 $(WORK_DIR)/$(PKG_DIR)/Config/* $(STAGING_INSTALL_PREFIX)/$(CONFIG_FOLDER)/
 	@cd $(STAGING_INSTALL_PREFIX)/share/$(PKG_NAME) && ln -sf $(INSTALL_PREFIX_VAR)/phpmemcachedadmin.config Config

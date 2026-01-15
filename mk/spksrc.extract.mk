@@ -6,21 +6,24 @@
 #  pre_extract_target   (override with PRE_EXTRACT_TARGET)
 #  extract_target       (override with EXTRACT_TARGET)
 #  post_extract_target  (override with POST_EXTRACT_TARGET)
+# Variables:
+#  ADDITIONAL_EXTRACTFLAGS  Additional extract flags being passed
 EXTRACT_PATH ?= $(WORK_DIR)
 
 # Extract commands (optionally use TAR_CMD="fakeroot tar" as workaround on OSX)
 TAR_CMD ?= tar
 ifeq ($(strip $(EXTRACT_CMD.$(DIST_EXT))),)
-EXTRACT_CMD.tgz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.txz = $(TAR_CMD) -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.gz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.bz2 = $(TAR_CMD) -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tbz = $(TAR_CMD) -xjpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.xz = $(TAR_CMD) -xJpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.lzma = $(TAR_CMD) --lzma -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.tar.lz = $(TAR_CMD) --lzip -xpf $(DIST_FILE) -C $(EXTRACT_PATH)
-EXTRACT_CMD.zip = unzip $(DIST_FILE) -d $(EXTRACT_PATH)
-EXTRACT_CMD.deb = dpkg-deb -R $(DIST_FILE) $(EXTRACT_PATH)
+EXTRACT_CMD.tgz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.txz = $(TAR_CMD) -xpf $(DIST_FILE) -C $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.tar.gz = $(TAR_CMD) -xzpf $(DIST_FILE) -C $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.tar.bz2 = $(TAR_CMD) -xjpf $(DIST_FILE) -C $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.tbz = $(TAR_CMD) -xjpf $(DIST_FILE) -C $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.tar.xz = $(TAR_CMD) -xJpf $(DIST_FILE) -C $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.tar.lzma = $(TAR_CMD) --lzma -xpf $(DIST_FILE) -C $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.tar.lz = $(TAR_CMD) --lzip -xpf $(DIST_FILE) -C $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.7z = 7zr x $(DIST_FILE) -o$(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.zip = unzip $(DIST_FILE) -d $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
+EXTRACT_CMD.deb = dpkg-deb -R $(DIST_FILE) $(EXTRACT_PATH) $(ADDITIONAL_EXTRACTFLAGS)
 endif
 
 ifeq ($(strip $(EXTRACT_CMD)),)

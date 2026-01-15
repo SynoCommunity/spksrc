@@ -1,0 +1,15 @@
+# fix include path within installed libthreadar header files
+# - use relativ path instead of absolute path (pkgincludedir)
+# otherwise cross/dar cannot use the libthreadar header files and disables multithreading support
+# 
+--- src/Makefile.in.orig	2024-08-21 20:55:45.000000000 +0000
++++ src/Makefile.in	2025-01-31 19:54:51.171604127 +0000
+@@ -719,7 +719,7 @@
+ install-data-local:
+ 	mkdir -p $(DESTDIR)$(pkgincludedir)
+ 	cp ../config.h $(DESTDIR)$(pkgincludedir)/libthreadar_config.h
+-	for file in $(dist_noinst_DATA) ; do sed -e 's%#include \"config.h\"%MY_CONFIG_FILE_H%g' -e "s%#include \"%#include \"$(pkgincludedir)/%g" -e "s%MY_CONFIG_FILE_H%#include \"$(pkgincludedir)/libthreadar_config.h\"%g" "$$file" > $(DESTDIR)$(pkgincludedir)/"$$file"  ; done
++	for file in $(dist_noinst_DATA) ; do sed -e 's%#include \"config.h\"%MY_CONFIG_FILE_H%g' -e "s%#include \"%#include \"libthreadar/%g" -e "s%MY_CONFIG_FILE_H%#include \"libthreadar/libthreadar_config.h\"%g" "$$file" > $(DESTDIR)$(pkgincludedir)/"$$file"  ; done
+ 	for file in $(DESTDIR)$(pkgincludedir)/* ; do sed -e 's%HAVE_%LIBTHREADAR_HAS_%g' -e 's%VERSION%LIBTHREADAR_VERSION%g' -e 's%_AVAILABLE%_AVAILABLE_FOR_LIBTHREDAR%g' -e 's%ENABLE_NLS%LIBTHREADAR_ENABLE_NLS%g' -e 's%PACKAGE_%LIBTHREADAR_PACKAGE_%g' "$$file" > "$$file.tmp" && mv "$$file.tmp" "$$file" ; done
+ 	egrep 'LIBTHREADAR' $(DESTDIR)$(pkgincludedir)/libthreadar_config.h | grep -v "#undef" >  $(DESTDIR)$(pkgincludedir)/config.h.tmp
+ 	mv  $(DESTDIR)$(pkgincludedir)/config.h.tmp  $(DESTDIR)$(pkgincludedir)/libthreadar_config.h

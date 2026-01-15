@@ -1,5 +1,3 @@
-rsc:include/X11/Xauth.h
 lnk:lib/libXau.so
 lnk:lib/libXau.so.6
 lib:lib/libXau.so.6.0.0
-rsc:lib/pkgconfig/xau.pc

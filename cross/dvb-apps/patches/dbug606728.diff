@@ -1,0 +1,12 @@
+Index: linuxtv-dvb-apps-1.1.1+rev1483/util/dvbscan/dvbscan.c
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1483.orig/util/dvbscan/dvbscan.c	2012-04-11 00:44:06.000000000 +1000
++++ linuxtv-dvb-apps-1.1.1+rev1483/util/dvbscan/dvbscan.c	2012-05-13 20:14:41.000000000 +1000
+@@ -225,6 +225,7 @@
+ 			output_filename = argv[argpos+2];
+ 			if (!strcmp(output_filename, "-"))
+ 				output_filename = NULL;
++			argpos+=3;
+ 		} else {
+ 			if ((argc - argpos) != 1)
+ 				usage();

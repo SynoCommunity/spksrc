@@ -1,0 +1,29 @@
+Index: FFmpeg/fftools/ffmpeg_sched.h
+===================================================================
+--- fftools/ffmpeg_sched.h
++++ fftools/ffmpeg_sched.h
+@@ -243,7 +243,10 @@ int sch_add_mux(Scheduler *sch, SchThrea
+ /**
+  * Default size of a frame thread queue.
+  */
+-#define DEFAULT_FRAME_THREAD_QUEUE_SIZE 8
++#define DEFAULT_FRAME_THREAD_QUEUE_SIZE 1
++
++// The new default value of 8 does little to help hwaccel, but instead increases
++// extra_hw_frames, which causes video memory on dGPU to be exhausted more easily.
+ 
+ /**
+  * Add a muxed stream for a previously added muxer.
+Index: FFmpeg/tests/ref/fate/ffmpeg-fix_sub_duration_heartbeat
+===================================================================
+--- tests/ref/fate/ffmpeg-fix_sub_duration_heartbeat
++++ tests/ref/fate/ffmpeg-fix_sub_duration_heartbeat
+@@ -33,3 +33,8 @@
+ <font face="Monospace">{\an7}(<i> inaudible radio chatter</i> )
+ >> Safety remains our numb</font>
+ 
++9
++00:00:03,704 --> 00:00:04,004
++<font face="Monospace">{\an7}(<i> inaudible radio chatter</i> )
++>> Safety remains our number one</font>
++

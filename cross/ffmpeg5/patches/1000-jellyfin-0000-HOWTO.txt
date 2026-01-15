@@ -1,10 +1,11 @@
-Projet page: https://github.com/jellyfin/jellyfin-ffmpeg
+Project page: https://github.com/jellyfin/jellyfin-ffmpeg
 Patches: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patches
 
 Extract jellyfin-ffmpeg git repository
 $ git clone https://github.com/jellyfin/jellyfin-ffmpeg.git
 
 Check out jellyfin-5.1 branch:
+$ cd jellyfin-ffmpeg
 $ git branch -a
 * jellyfin
   remotes/origin/HEAD -> origin/jellyfin
@@ -16,19 +17,23 @@ Branch 'jellyfin-5.1' set up to track remote branch 'jellyfin-5.1' from 'origin'
 Switched to a new branch 'jellyfin-5.1'
 
 Check that current ffmpeg matches jellyfin version
-$ cat jellyfin-ffmpeg/VERSION 
-5.1.3
+$ cat VERSION 
+5.1.4
 
 Modify patches to be in -p0 mode:
-cd jellyfin-ffmpeg/debian/patches
-$ sed -i -e 's?+++ jellyfin-ffmpeg/?+++ ?1' \
-         -e 's?--- jellyfin-ffmpeg.orig/?--- ?1' \
+$ cd debian/patches
+$ sed -i -e 's?--- jellyfin-ffmpeg.orig/?--- ?1' \
+         -e 's?+++ jellyfin-ffmpeg/?+++ ?1' \
+         -e 's?--- a/?--- ?1' \
+         -e 's?+++ b/?+++ ?1' \
+         -e 's?--- FFmpeg.orig/?--- ?1' \
+         -e 's?+++ FFmpeg/?+++ ?1' \
          *.patch
 
 Rename the patches:
 $ i=1001 && ls -1 *.patch | while read LINE; do echo $(printf "%04d" $i)-jellyfin-$LINE; mv $LINE $(printf "%04d" $i)-jellyfin-$LINE; let i++; done
 
 Test the patches on a clean ffmpeg tree:
-$ tar -jxvf ffmpeg-5.1.3.tar.bz2 
-$ cd ffmpeg-5.1.3/
-$ ls -1d ~/jellyfin-ffmpeg/debian/patches/*.patch | while read LINE; do patch -p0 < $LINE; done
+$ tar -jxvf ffmpeg-5.1.5.tar.bz2 
+$ cd ffmpeg-5.1.5/
+$ ls -1d ~/jellyfin-ffmpeg/debian/patches/10*.patch | while read LINE; do patch -p0 < $LINE; done

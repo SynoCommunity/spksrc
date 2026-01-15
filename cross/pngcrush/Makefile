@@ -16,7 +16,8 @@ CONFIGURE_TARGET = nop
 COMPILE_MAKE_OPTIONS = -f Makefile-nolib LIBS="-L$(STAGING_INSTALL_PREFIX) -lpng -lz"
 INSTALL_MAKE_OPTIONS = -f Makefile-nolib install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
-#ENV += LIBS="-L$(STAGING_INSTALL_PREFIX) -lpng -lz"
-#GNU_CONFIGURE = 1
+# libpng >= 1.6.41
+# pngcrush.c:5523:46: error: ‘PNG_IGNORE_ADLER32’ undeclared (first use in this function)
+ADDITIONAL_CFLAGS = -DPNG_SET_OPTION_SUPPORTED  -DPNG_DISABLE_ADLER32_CHECK_SUPPORTED
 
 include ../../mk/spksrc.cross-cc.mk

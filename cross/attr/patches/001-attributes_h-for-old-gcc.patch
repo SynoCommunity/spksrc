@@ -1,0 +1,73 @@
+# remove deprecated attributes not supported by old GCC
+# 
+--- include/attributes.h.orig	2022-12-31 01:37:46.000000000 +0100
++++ include/attributes.h	2024-10-19 01:00:38.903700421 +0200
+@@ -126,11 +126,9 @@
+  * The return value is -1 on error (w/errno set appropriately), 0 on success.
+  */
+ EXPORT int attr_get (const char *__path, const char *__attrname,
+-			char *__attrvalue, int *__valuelength, int __flags)
+-	__attribute__ ((deprecated ("Use getxattr or lgetxattr instead")));
++			char *__attrvalue, int *__valuelength, int __flags);
+ EXPORT int attr_getf (int __fd, const char *__attrname, char *__attrvalue,
+-			int *__valuelength, int __flags)
+-	__attribute__ ((deprecated ("Use fgetxattr instead")));
++			int *__valuelength, int __flags);
+ 
+ /*
+  * Set the value of an attribute, creating the attribute if necessary.
+@@ -138,22 +136,18 @@
+  */
+ EXPORT int attr_set (const char *__path, const char *__attrname,
+ 			const char *__attrvalue, const int __valuelength,
+-			int __flags)
+-	__attribute__ ((deprecated ("Use setxattr or lsetxattr instead")));
++			int __flags);
+ EXPORT int attr_setf (int __fd, const char *__attrname,
+ 			const char *__attrvalue, const int __valuelength,
+-			int __flags)
+-	__attribute__ ((deprecated ("Use fsetxattr instead")));
++			int __flags);
+ 
+ /*
+  * Remove an attribute.
+  * The return value is -1 on error (w/errno set appropriately), 0 on success.
+  */
+ EXPORT int attr_remove (const char *__path, const char *__attrname,
+-			int __flags)
+-	__attribute__ ((deprecated ("Use removexattr or lremovexattr instead")));
+-EXPORT int attr_removef (int __fd, const char *__attrname, int __flags)
+-	__attribute__ ((deprecated ("Use fremovexattr instead")));
++			int __flags);
++EXPORT int attr_removef (int __fd, const char *__attrname, int __flags);
+ 
+ /*
+  * List the names and sizes of the values of all the attributes of an object.
+@@ -163,11 +157,9 @@
+  * The return value is -1 on error (w/errno set appropriately), 0 on success.
+  */
+ EXPORT int attr_list(const char *__path, char *__buffer, const int __buffersize,
+-		int __flags, attrlist_cursor_t *__cursor)
+-	__attribute__ ((deprecated ("Use listxattr or llistxattr instead")));
++		int __flags, attrlist_cursor_t *__cursor);
+ EXPORT int attr_listf(int __fd, char *__buffer, const int __buffersize,
+-		int __flags, attrlist_cursor_t *__cursor)
+-	__attribute__ ((deprecated ("Use flistxattr instead")));
++		int __flags, attrlist_cursor_t *__cursor);
+ 
+ /*
+  * Operate on multiple attributes of the same object simultaneously.
+@@ -187,11 +179,9 @@
+  * to a ATTR_OP_GET are the same as the args to an attr_get() call.
+  */
+ EXPORT int attr_multi (const char *__path, attr_multiop_t *__oplist,
+-			int __count, int __flags)
+-	__attribute__ ((deprecated ("Use getxattr, setxattr, listxattr, removexattr instead")));
++			int __count, int __flags);
+ EXPORT int attr_multif (int __fd, attr_multiop_t *__oplist,
+-			int __count, int __flags)
+-	__attribute__ ((deprecated ("Use getxattr, setxattr, listxattr, removexattr instead")));
++			int __count, int __flags);
+ 
+ #ifdef __cplusplus
+ }

@@ -1,0 +1,37 @@
+From 62267fec4a0d74472bc64695597f2477cc8c11df Mon Sep 17 00:00:00 2001
+From: FirstName LastName <your@email.com>
+Date: Wed, 5 Apr 2023 17:02:38 +0200
+Subject: [PATCH] Enable use of GNU C extension - const statement expression as array size
+
+This patch partially reverts the commit:
+llvm/llvm-project@6781fee
+
+For backward compatibility, we still need to support the
+expressions like:
+```
+const int size = ({ false; }) ? 0 : 1;
+float array[size];
+```
+https://gcc.gnu.org/onlinedocs/gcc/Statement-Exprs.html
+
+---
+ clang/lib/Sema/SemaType.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/clang/lib/Sema/SemaType.cpp b/clang/lib/Sema/SemaType.cpp
+index ab47e9f03..8cb26be44 100644
+--- a/clang/lib/Sema/SemaType.cpp
++++ b/clang/lib/Sema/SemaType.cpp
+@@ -2330,7 +2330,8 @@ static ExprResult checkArraySize(Sema &S, Expr *&ArraySize,
+   } Diagnoser(VLADiag, VLAIsError);
+ 
+   ExprResult R =
+-      S.VerifyIntegerConstantExpression(ArraySize, &SizeVal, Diagnoser);
++      S.VerifyIntegerConstantExpression(ArraySize, &SizeVal, Diagnoser,
++      S.LangOpts.OpenCL ? Sema::AllowFold : Sema::NoFold);
+   if (Diagnoser.IsVLA)
+     return ExprResult();
+   return R;
+-- 
+2.34.1
+

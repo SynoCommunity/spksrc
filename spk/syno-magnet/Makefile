@@ -1,29 +1,29 @@
-PKG_NAME = syno-magnet
-PKG_VERS = 1.0
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/neykov/$(PKG_NAME)/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-
-SPK_NAME = $(PKG_NAME)
-SPK_VERS = $(PKG_VERS)
+SPK_NAME = syno-magnet
+SPK_VERS = 1.0
 SPK_REV = 3
 SPK_ICON = src/magnet.png
+
+PKG_NAME = $(SPK_NAME)
+PKG_VERS = $(SPK_VERS)
+PKG_EXT = tar.gz
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/neykov/syno-magnet/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 MAINTAINER = neykov
 DESCRIPTION = Download Station Magnet Handler. Register Download Station as the application to download magnet links from your browser. No plugins required.
 DISPLAY_NAME = Download Station Magnet
 CHANGELOG = "Initial Version"
 
-HOMEPAGE   = https://github.com/neykov/syno-magnet
-LICENSE    = Apache 2.0
+HOMEPAGE = https://github.com/neykov/syno-magnet
+LICENSE = Apache 2.0
 
 STARTABLE  = no
 DSM_UI_DIR = app
 SERVICE_TYPE = legacy
 SERVICE_URL = /webman/3rdparty/syno-magnet/index.html
-SERVICE_PORT_ALL_USERS=true
+SERVICE_PORT_ALL_USERS = true
 
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
@@ -34,8 +34,8 @@ URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 
 COPY_TARGET = syno_magnet_copy
 
-# Pure web package, make sure ARCH is not defined
-override ARCH =
+# Pure web package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

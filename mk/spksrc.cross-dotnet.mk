@@ -1,5 +1,7 @@
 # Build dotnet programs
 #
+# This makefile extends spksrc.cross-cc.mk with .NET-specific functionality
+#
 # prerequisites:
 # - cross/module depends on native/dotnet only
 # - module does not require kernel (REQUIRE_KERNEL)
@@ -7,15 +9,10 @@
 # remarks:
 # - Restriction for minimal DSM version is not supported (toolchains are not used for dotnet builds)
 # - CONFIGURE_TARGET is not supported/bypassed
-# - most content is taken from spksrc.go.mk and modified for dotnet build and install
 #
 # NOTE: Don't strip the self-contained binary!
 #    aka don't use 'bin' for the PLIST use 'rsc' instead.
 #    It *will* break the program.
-
-# Common makefiles
-include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -31,8 +28,16 @@ DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+ifneq ($(ARCH),noarch)
 TC = syno$(ARCH_SUFFIX)
 endif
+endif
+
+# Common directories (must be set after ARCH_SUFFIX)
+include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 ##### dotnet specific configurations
 include ../../mk/spksrc.cross-dotnet-env.mk
@@ -48,67 +53,24 @@ ifeq ($(strip $(INSTALL_TARGET)),)
 INSTALL_TARGET = nop
 endif
 
-# default dotnet publish:
-# https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
-dotnet_compile_target:
-	@$(MSG) - Compile with dotnet publish
-	$(RUN) dotnet publish $(DOTNET_PACKAGE_NAME) $(DOTNET_BUILD_ARGS)
-
 #####
 
 ifneq ($(REQUIRE_KERNEL),)
   @$(error dotnet modules cannot build when REQUIRE_KERNEL is set)
 endif
 
-include ../../mk/spksrc.pre-check.mk
+###
 
-include ../../mk/spksrc.cross-env.mk
+# .NET specific targets
+.PHONY: dotnet_compile_target
 
-include ../../mk/spksrc.download.mk
+# default dotnet publish:
+# https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
+dotnet_compile_target:
+	@$(MSG) - Compile with dotnet publish
+	$(RUN) dotnet publish $(DOTNET_PACKAGE_NAME) $(DOTNET_BUILD_ARGS)
 
-include ../../mk/spksrc.depend.mk
+###
 
-checksum: download
-include ../../mk/spksrc.checksum.mk
-
-extract: checksum depend
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-configure: patch
-include ../../mk/spksrc.configure.mk
-
-compile: configure
-include ../../mk/spksrc.compile.mk
-
-install: compile
-include ../../mk/spksrc.install.mk
-
-plist: install
-include ../../mk/spksrc.plist.mk
-
-
-clean:
-	rm -fr work work-* build-*.log
-
-
-all: install plist
-
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_ARCHS))
-
-####
-
-arch-%:
-	@$(MSG) Building package for arch $*
-	@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*))) 2>&1 | tee --append build-$*.log
-
-####
+# Include base cross-cc makefile for common functionality
+include ../../mk/spksrc.cross-cc.mk

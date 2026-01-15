@@ -1,13 +1,15 @@
---- Makefile.orig	2017-03-27 21:10:20.023847566 +0200
-+++ Makefile	2017-03-27 21:10:46.282317463 +0200
-@@ -10,8 +10,8 @@
+--- dvb-apps-3ee111da5b3a-orig/Makefile	2024-03-03 13:36:32.677691624 +0000
++++ dvb-apps-3ee111da5b3a/Makefile	2024-03-03 13:36:45.309815511 +0000
+@@ -10,9 +10,9 @@ DVB_API_MINOR := $(word 3, $(shell grep
  
  all clean install:
  	$(MAKE) -C lib $@
 -	$(MAKE) -C test $@
 -	$(MAKE) -C util $@
+-	$(MAKE) -C man $@
 +#	$(MAKE) -C test $@
 +#	$(MAKE) -C util $@
++#	$(MAKE) -C man $@
  
  update:
  	@echo "Pulling changes & updating from master repository"

@@ -2,7 +2,7 @@ SPK_NAME = cpulimit
 SPK_VERS = 0.2
 SPK_REV = 1
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/cpulimit
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = CPU usage limiter for Linux.

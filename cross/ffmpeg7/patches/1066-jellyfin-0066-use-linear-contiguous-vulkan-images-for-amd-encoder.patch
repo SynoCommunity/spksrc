@@ -1,0 +1,279 @@
+Index: FFmpeg/libavutil/hwcontext_vulkan.c
+===================================================================
+--- libavutil/hwcontext_vulkan.c
++++ libavutil/hwcontext_vulkan.c
+@@ -1382,6 +1382,7 @@ static void vulkan_device_uninit(AVHWDev
+ 
+ static int vulkan_device_create_internal(AVHWDeviceContext *ctx,
+                                          VulkanDeviceSelection *dev_select,
++                                         int use_linear_images,
+                                          int disable_multiplane,
+                                          AVDictionary *opts, int flags)
+ {
+@@ -1580,10 +1581,14 @@ static int vulkan_device_create_internal
+         goto end;
+     }
+ 
+-    /* Tiled images setting, use them by default */
+-    opt_d = av_dict_get(opts, "linear_images", NULL, 0);
+-    if (opt_d)
+-        p->use_linear_images = strtol(opt_d->value, NULL, 10);
++    /* Tiled images setting, use them by default.
++     * The use_linear_images argument takes precedent over the option */
++    p->use_linear_images = use_linear_images;
++    if (!p->use_linear_images) {
++        opt_d = av_dict_get(opts, "linear_images", NULL, 0);
++        if (opt_d)
++            p->use_linear_images = strtol(opt_d->value, NULL, 10);
++    }
+ 
+     /*
+      * The disable_multiplane argument takes precedent over the option.
+@@ -1829,7 +1834,7 @@ static int vulkan_device_create(AVHWDevi
+         }
+     }
+ 
+-    return vulkan_device_create_internal(ctx, &dev_select, 0, opts, flags);
++    return vulkan_device_create_internal(ctx, &dev_select, 0, 0, opts, flags);
+ }
+ 
+ static int vulkan_device_derive(AVHWDeviceContext *ctx,
+@@ -1853,6 +1858,7 @@ static int vulkan_device_derive(AVHWDevi
+         };
+ #endif
+         const char *vendor;
++        int use_linear_images = 0;
+ 
+ #if VA_CHECK_VERSION(1, 15, 0)
+         vas = vaGetDisplayAttributes(dpy, &attr, 1);
+@@ -1867,11 +1873,14 @@ static int vulkan_device_derive(AVHWDevi
+                 return AVERROR_EXTERNAL;
+             }
+ 
+-            if (strstr(vendor, "AMD"))
++            if (strstr(vendor, "AMD")) {
+                 dev_select.vendor_id = 0x1002;
++                use_linear_images = 1;
++            }
+         }
+ 
+-        return vulkan_device_create_internal(ctx, &dev_select, 0, opts, flags);
++        /* AMD VA-API encoders require linear contiguous (multiplane) surface */
++        return vulkan_device_create_internal(ctx, &dev_select, use_linear_images, 0, opts, flags);
+     }
+ #endif
+ #if CONFIG_LIBDRM
+@@ -1880,6 +1889,7 @@ static int vulkan_device_derive(AVHWDevi
+         struct stat drm_node_info;
+         drmDevice *drm_dev_info;
+         AVDRMDeviceContext *src_hwctx = src_ctx->hwctx;
++        int use_linear_images = 0;
+ 
+         err = fstat(src_hwctx->fd, &drm_node_info);
+         if (err) {
+@@ -1899,12 +1909,15 @@ static int vulkan_device_derive(AVHWDevi
+             return AVERROR_EXTERNAL;
+         }
+ 
+-        if (drm_dev_info->bustype == DRM_BUS_PCI)
++        if (drm_dev_info->bustype == DRM_BUS_PCI) {
+             dev_select.pci_device = drm_dev_info->deviceinfo.pci->device_id;
++            use_linear_images = drm_dev_info->deviceinfo.pci->vendor_id == 0x1002;
++        }
+ 
+         drmFreeDevice(&drm_dev_info);
+ 
+-        return vulkan_device_create_internal(ctx, &dev_select, 0, opts, flags);
++        /* AMD VA-API encoders require linear contiguous (multiplane) surface */
++        return vulkan_device_create_internal(ctx, &dev_select, use_linear_images, 0, opts, flags);
+     }
+ #endif
+ #if CONFIG_CUDA
+@@ -1927,7 +1940,7 @@ static int vulkan_device_derive(AVHWDevi
+          * CUDA is not able to import multiplane images, so always derive a
+          * Vulkan device with multiplane disabled.
+          */
+-        return vulkan_device_create_internal(ctx, &dev_select, 1, opts, flags);
++        return vulkan_device_create_internal(ctx, &dev_select, 0, 1, opts, flags);
+     }
+ #endif
+     default:
+@@ -2774,6 +2787,10 @@ static const struct {
+     { DRM_FORMAT_XRGB8888, VK_FORMAT_B8G8R8A8_UNORM },
+     { DRM_FORMAT_ABGR8888, VK_FORMAT_R8G8B8A8_UNORM },
+     { DRM_FORMAT_XBGR8888, VK_FORMAT_R8G8B8A8_UNORM },
++    { DRM_FORMAT_ARGB2101010, VK_FORMAT_A2R10G10B10_UNORM_PACK32 },
++    { DRM_FORMAT_XRGB2101010, VK_FORMAT_A2R10G10B10_UNORM_PACK32 },
++    { DRM_FORMAT_ABGR2101010, VK_FORMAT_A2B10G10R10_UNORM_PACK32 },
++    { DRM_FORMAT_XBGR2101010, VK_FORMAT_A2B10G10R10_UNORM_PACK32 },
+ 
+     // All these DRM_FORMATs were added in the same libdrm commit.
+ #ifdef DRM_FORMAT_XYUV8888
+@@ -2808,6 +2825,7 @@ static int vulkan_map_from_drm_frame_des
+     const AVDRMFrameDescriptor *desc = (AVDRMFrameDescriptor *)src->data[0];
+     VkBindImageMemoryInfo bind_info[AV_DRM_MAX_PLANES];
+     VkBindImagePlaneMemoryInfo plane_info[AV_DRM_MAX_PLANES];
++    const int has_modifiers = !!(p->vkctx.extensions & FF_VK_EXT_DRM_MODIFIER_FLAGS);
+ 
+     for (int i = 0; i < desc->nb_layers; i++) {
+         if (drm_to_vulkan_fmt(desc->layers[i].format) == VK_FORMAT_UNDEFINED) {
+@@ -2817,13 +2835,21 @@ static int vulkan_map_from_drm_frame_des
+         }
+     }
+ 
++    if (!has_modifiers &&
++        desc->objects[0].format_modifier != DRM_FORMAT_MOD_INVALID &&
++        desc->objects[0].format_modifier != DRM_FORMAT_MOD_LINEAR) {
++        av_log(ctx, AV_LOG_ERROR, "The driver can only import DRM frame with invalid/linear modifier!\n");
++        err = AVERROR_EXTERNAL;
++        goto fail;
++    }
++
+     if (!(f = av_vk_frame_alloc())) {
+         av_log(ctx, AV_LOG_ERROR, "Unable to allocate memory for AVVkFrame!\n");
+         err = AVERROR(ENOMEM);
+         goto fail;
+     }
+ 
+-    f->tiling = VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT;
++    f->tiling = has_modifiers ? VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT : VK_IMAGE_TILING_LINEAR;
+ 
+     for (int i = 0; i < desc->nb_layers; i++) {
+         const int planes = desc->layers[i].nb_planes;
+@@ -2861,7 +2887,7 @@ static int vulkan_map_from_drm_frame_des
+             .mipLevels             = 1,
+             .arrayLayers           = 1,
+             .flags                 = 0x0,
+-            .tiling                = VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT,
++            .tiling                = f->tiling,
+             .initialLayout         = VK_IMAGE_LAYOUT_UNDEFINED, /* specs say so */
+             .usage                 = VK_IMAGE_USAGE_SAMPLED_BIT |
+                                      VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+@@ -2894,7 +2920,7 @@ static int vulkan_map_from_drm_frame_des
+         };
+         VkPhysicalDeviceImageFormatInfo2 fmt_props = {
+             .sType  = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2,
+-            .pNext  = &props_ext,
++            .pNext  = has_modifiers ? &props_ext : NULL,
+             .format = create_info.format,
+             .type   = create_info.imageType,
+             .tiling = create_info.tiling,
+@@ -3396,22 +3422,14 @@ fail:
+ static int vulkan_map_to(AVHWFramesContext *hwfc, AVFrame *dst,
+                          const AVFrame *src, int flags)
+ {
+-    av_unused VulkanDevicePriv *p = hwfc->device_ctx->hwctx;
+-
+     switch (src->format) {
+ #if CONFIG_LIBDRM
+ #if CONFIG_VAAPI
+     case AV_PIX_FMT_VAAPI:
+-        if (p->vkctx.extensions & FF_VK_EXT_DRM_MODIFIER_FLAGS)
+-            return vulkan_map_from_vaapi(hwfc, dst, src, flags);
+-        else
+-            return AVERROR(ENOSYS);
++        return vulkan_map_from_vaapi(hwfc, dst, src, flags);
+ #endif
+     case AV_PIX_FMT_DRM_PRIME:
+-        if (p->vkctx.extensions & FF_VK_EXT_DRM_MODIFIER_FLAGS)
+-            return vulkan_map_from_drm(hwfc, dst, src, flags);
+-        else
+-            return AVERROR(ENOSYS);
++        return vulkan_map_from_drm(hwfc, dst, src, flags);
+ #endif
+     default:
+         return AVERROR(ENOSYS);
+@@ -3454,13 +3472,14 @@ static int vulkan_map_to_drm(AVHWFramesC
+     VulkanFramesPriv *fp = hwfc->hwctx;
+     AVVulkanFramesContext *hwfctx = &fp->p;
+     const int planes = av_pix_fmt_count_planes(hwfc->sw_format);
++    const int has_modifiers = !!(p->vkctx.extensions & FF_VK_EXT_DRM_MODIFIER_FLAGS);
+     VkImageDrmFormatModifierPropertiesEXT drm_mod = {
+         .sType = VK_STRUCTURE_TYPE_IMAGE_DRM_FORMAT_MODIFIER_PROPERTIES_EXT,
+     };
+     VkSemaphoreWaitInfo wait_info = {
+         .sType          = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO,
+         .flags          = 0x0,
+-        .semaphoreCount = planes,
++        .semaphoreCount = p->disable_multiplane ? planes : 1,
+     };
+ 
+     AVDRMFrameDescriptor *drm_desc = av_mallocz(sizeof(*drm_desc));
+@@ -3481,10 +3500,16 @@ static int vulkan_map_to_drm(AVHWFramesC
+     if (err < 0)
+         goto end;
+ 
+-    ret = vk->GetImageDrmFormatModifierPropertiesEXT(hwctx->act_dev, f->img[0],
+-                                                     &drm_mod);
+-    if (ret != VK_SUCCESS) {
+-        av_log(hwfc, AV_LOG_ERROR, "Failed to retrieve DRM format modifier!\n");
++    if (has_modifiers) {
++        ret = vk->GetImageDrmFormatModifierPropertiesEXT(hwctx->act_dev, f->img[0],
++                                                         &drm_mod);
++        if (ret != VK_SUCCESS) {
++            av_log(hwfc, AV_LOG_ERROR, "Failed to retrieve DRM format modifier!\n");
++            err = AVERROR_EXTERNAL;
++            goto end;
++        }
++    } else if (f->tiling != VK_IMAGE_TILING_LINEAR) {
++        av_log(hwfc, AV_LOG_ERROR, "The driver can only export linear images to DRM frame!\n");
+         err = AVERROR_EXTERNAL;
+         goto end;
+     }
+@@ -3506,7 +3531,7 @@ static int vulkan_map_to_drm(AVHWFramesC
+ 
+         drm_desc->nb_objects++;
+         drm_desc->objects[i].size = f->size[i];
+-        drm_desc->objects[i].format_modifier = drm_mod.drmFormatModifier;
++        drm_desc->objects[i].format_modifier = has_modifiers ? drm_mod.drmFormatModifier : 0x0;
+     }
+ 
+     drm_desc->nb_layers = planes;
+@@ -3517,6 +3542,14 @@ static int vulkan_map_to_drm(AVHWFramesC
+         };
+         VkFormat plane_vkfmt = av_vkfmt_from_pixfmt(hwfc->sw_format)[i];
+ 
++        if (drm_desc->nb_layers > 1 && !p->disable_multiplane) {
++            switch (i) {
++            case 0: sub.aspectMask = VK_IMAGE_ASPECT_PLANE_0_BIT; break;
++            case 1: sub.aspectMask = VK_IMAGE_ASPECT_PLANE_1_BIT; break;
++            case 2: sub.aspectMask = VK_IMAGE_ASPECT_PLANE_2_BIT; break;
++            }
++        }
++
+         drm_desc->layers[i].format    = vulkan_fmt_to_drm(plane_vkfmt);
+         drm_desc->layers[i].nb_planes = 1;
+ 
+@@ -3531,7 +3564,7 @@ static int vulkan_map_to_drm(AVHWFramesC
+         if (f->tiling == VK_IMAGE_TILING_OPTIMAL)
+             continue;
+ 
+-        vk->GetImageSubresourceLayout(hwctx->act_dev, f->img[i], &sub, &layout);
++        vk->GetImageSubresourceLayout(hwctx->act_dev, f->img[p->disable_multiplane ? i : 0], &sub, &layout);
+         drm_desc->layers[i].planes[0].offset = layout.offset;
+         drm_desc->layers[i].planes[0].pitch  = layout.rowPitch;
+ 
+@@ -3583,21 +3616,13 @@ fail:
+ static int vulkan_map_from(AVHWFramesContext *hwfc, AVFrame *dst,
+                            const AVFrame *src, int flags)
+ {
+-    av_unused VulkanDevicePriv *p = hwfc->device_ctx->hwctx;
+-
+     switch (dst->format) {
+ #if CONFIG_LIBDRM
+     case AV_PIX_FMT_DRM_PRIME:
+-        if (p->vkctx.extensions & FF_VK_EXT_DRM_MODIFIER_FLAGS)
+-            return vulkan_map_to_drm(hwfc, dst, src, flags);
+-        else
+-            return AVERROR(ENOSYS);
++        return vulkan_map_to_drm(hwfc, dst, src, flags);
+ #if CONFIG_VAAPI
+     case AV_PIX_FMT_VAAPI:
+-        if (p->vkctx.extensions & FF_VK_EXT_DRM_MODIFIER_FLAGS)
+-            return vulkan_map_to_vaapi(hwfc, dst, src, flags);
+-        else
+-            return AVERROR(ENOSYS);
++        return vulkan_map_to_vaapi(hwfc, dst, src, flags);
+ #endif
+ #endif
+     default:

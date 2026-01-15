@@ -1,0 +1,8 @@
+bin:bin/sensors
+rsc:bin/sensors-conf-convert
+lnk:lib/libsensors.so
+lnk:lib/libsensors.so.5
+lib:lib/libsensors.so.5.0.0
+rsc:sbin/fancontrol
+rsc:sbin/sensors-detect
+rsc:var/sensors3.conf

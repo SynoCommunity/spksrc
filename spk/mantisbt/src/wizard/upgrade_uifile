@@ -1,0 +1,19 @@
+[{
+    "step_title": "MantisBT upgrade",
+    "items": [{
+        "desc": "The upgrading process ensures that your configurations and files are saved prior to updating your setup."
+    }, {
+        "type": "multiselect",
+        "subitems": [{
+            "key": "wizard_create_db",
+            "desc": "Creates initial DB",
+            "defaultValue": false,
+            "hidden": true
+        }, {
+            "key": "mysql_grant_user",
+            "desc": "Initializes user rights",
+            "defaultValue": false,
+            "hidden": true
+        }]
+    }]
+}]

@@ -50,11 +50,18 @@ ifeq ($(strip $(GOPATH)),)
   GOPATH=$(DISTRIB_DIR)/go
 endif
 
+ifeq ($(NATIVE_GO),)
+NATIVE_GO = native/go
+endif
+ENV += PATH=$(WORK_DIR)/../../../$(NATIVE_GO)/work-native/go/bin:$$PATH
+
 ENV += GOPATH=$(GOPATH)
 ENV += CGO_ENABLED=$(CGO_ENABLED)
-ENV += PATH=$(WORK_DIR)/../../../native/go/work-native/go/bin/:$$PATH
 ENV += GOARCH=$(GO_ARCH)
 ENV += GOOS=$(GOOS)
+
+# Ensure downloaded mod are u+rw
+ENV += GOFLAGS=-modcacherw
 
 ifneq ($(strip $(GO_BIN_DIR)),)
   GO_BUILD_ARGS := -o $(GO_BIN_DIR) $(GO_BUILD_ARGS)

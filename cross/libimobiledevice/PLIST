@@ -14,7 +14,8 @@ bin:bin/idevicenotificationproxy
 bin:bin/idevicepair
 bin:bin/ideviceprovision
 bin:bin/idevicescreenshot
+bin:bin/idevicesetlocation
 bin:bin/idevicesyslog
-lnk:lib/libimobiledevice.so
-lnk:lib/libimobiledevice.so.6
-lib:lib/libimobiledevice.so.6.0.0
+lnk:lib/libimobiledevice-1.0.so
+lnk:lib/libimobiledevice-1.0.so.6
+lib:lib/libimobiledevice-1.0.so.6.0.0

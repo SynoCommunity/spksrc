@@ -3,7 +3,7 @@ SPK_VERS = 1.4.3
 SPK_REV = 1
 SPK_ICON = src/dante.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/dante-sockd
 
 MAINTAINER = Anonym-tsk
 # From Inferno Nettverk A/S

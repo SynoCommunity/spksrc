@@ -15,7 +15,7 @@ Fixes # <!--Optionally, add links to existing issues or other PR's-->
 
 ### Type of change
 
-<!--Please use any relavent tags.-->
+<!--Please use any relevant tags.-->
 - [ ] Bug fix
 - [ ] New Package
 - [ ] Package update

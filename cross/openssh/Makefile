@@ -1,11 +1,11 @@
 PKG_NAME = openssh
-PKG_VERS = 9.3p1
+PKG_VERS = 9.6p1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/openssl
+DEPENDS = cross/zlib cross/openssl3
 
 HOMEPAGE = https://www.openssh.com/
 COMMENT  = Open source version of SSH connectivity tools.

@@ -1,0 +1,16 @@
+# Disable error for aarch64 compiler bug (print warning only)
+# gcc issue: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63293
+# 
+# ignore this bug as long as code is not optimized (avoid use of -O2)
+#
+--- include/urcu/arch/aarch64.h.orig	2024-08-28 19:09:31.000000000 +0000
++++ include/urcu/arch/aarch64.h	2025-08-01 11:57:56.693202812 +0000
+@@ -55,7 +55,7 @@
+ 
+ #ifdef URCU_GCC_VERSION
+ # if URCU_GCC_VERSION < 50100 && !defined(URCU_GCC_PATCHED_63293)
+-#  error Your gcc version performs unsafe access to deallocated stack
++#  warning Your gcc version performs unsafe access to deallocated stack
+ # endif
+ #endif
+ 

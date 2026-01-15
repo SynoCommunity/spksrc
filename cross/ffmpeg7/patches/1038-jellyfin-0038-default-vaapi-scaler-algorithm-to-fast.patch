@@ -1,0 +1,13 @@
+Index: FFmpeg/libavfilter/vf_scale_vaapi.c
+===================================================================
+--- libavfilter/vf_scale_vaapi.c
++++ libavfilter/vf_scale_vaapi.c
+@@ -224,7 +224,7 @@ static const AVOption scale_vaapi_option
+     { "format", "Output video format (software format of hardware frames)",
+       OFFSET(output_format_string), AV_OPT_TYPE_STRING, .flags = FLAGS },
+     { "mode", "Scaling mode",
+-      OFFSET(mode), AV_OPT_TYPE_INT, { .i64 = VA_FILTER_SCALING_HQ },
++      OFFSET(mode), AV_OPT_TYPE_INT, { .i64 = VA_FILTER_SCALING_FAST },
+       0, VA_FILTER_SCALING_NL_ANAMORPHIC, FLAGS, .unit = "mode" },
+         { "default", "Use the default (depend on the driver) scaling algorithm",
+           0, AV_OPT_TYPE_CONST, { .i64 = VA_FILTER_SCALING_DEFAULT }, 0, 0, FLAGS, .unit = "mode" },

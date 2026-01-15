@@ -1,5 +1,5 @@
 PKG_NAME = ombi
-PKG_VERS = 4.43.5
+PKG_VERS = 4.47.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Ombi-app/Ombi/releases/download/v$(PKG_VERS)

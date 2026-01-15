@@ -1,0 +1,3 @@
+lnk:lib/libarchive.so
+lnk:lib/libarchive.so.13
+lib:lib/libarchive.so.13.7.3

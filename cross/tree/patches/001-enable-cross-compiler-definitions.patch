@@ -1,20 +1,11 @@
---- Makefile.orig	2023-05-31 20:06:18.000000000 +0000
-+++ Makefile	2023-09-19 20:23:34.496980046 +0000
-@@ -18,7 +18,7 @@
- 
- PREFIX=/usr/local
- 
--CC=gcc
-+#CC=gcc
- INSTALL=install
- 
- VERSION=2.1.1
-@@ -32,7 +32,7 @@
- # Uncomment options below for your particular OS:
- 
- # Linux defaults:
--CFLAGS+=-ggdb -std=c11 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-+#CFLAGS+=-ggdb -std=c11 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
- #CFLAGS+=-O3 -std=c11 -pedantic -Wall -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
- #LDFLAGS+=-s
+--- Makefile.orig	2024-11-26 00:55:17.000000000 +0000
++++ Makefile	2025-01-03 23:05:51.677704322 +0000
+@@ -36,7 +36,7 @@
+ LDFLAGS?=-s
+ #CFLAGS?=-ggdb
+ CFLAGS?=-O3
+-CFLAGS+=-std=c11 -Wpedantic -Wall -Wextra -Wstrict-prototypes -Wshadow -Wconversion
++#CFLAGS+=-std=c11 -Wpedantic -Wall -Wextra -Wstrict-prototypes -Wshadow -Wconversion
+ # _LARGEFILE64_SOURCE may be considered obsolete
+ CPPFLAGS+=-DLARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
  

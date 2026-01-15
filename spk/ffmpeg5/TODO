@@ -31,6 +31,5 @@ Not to be enabled:
   --enable-libjack 
   --enable-libpulse 
   --enable-openal 
-  --enable-opencl 
   --enable-opengl 
   --enable-sdl2

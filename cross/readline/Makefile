@@ -1,5 +1,5 @@
 PKG_NAME = readline
-PKG_VERS = 8.2
+PKG_VERS = 8.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/readline
@@ -14,6 +14,8 @@ LICENSE  = GPLv3
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --disable-install-examples
+CONFIGURE_ARGS += --with-curses=ncursesw
+CONFIGURE_ARGS += --with-shared-termcap-library=-lncursesw
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk

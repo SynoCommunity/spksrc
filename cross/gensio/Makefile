@@ -1,5 +1,5 @@
 PKG_NAME = gensio
-PKG_VERS = 2.3.9
+PKG_VERS = 2.8.15
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cminyard/gensio/archive
@@ -12,15 +12,16 @@ LICENSE  = GPLv2
 
 # qoriq is the only PPC arch that is supported
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
-DEPENDS = cross/openssl
+DEPENDS = cross/openssl3
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = gensio_pre_configure
 
 CONFIGURE_ARGS  = --disable-static
-CONFIGURE_ARGS += --with-python=no
-CONFIGURE_ARGS += --with-swig=no
+CONFIGURE_ARGS += --without-python
+CONFIGURE_ARGS += --without-swig
 CONFIGURE_ARGS += --disable-doc
 
 include ../../mk/spksrc.cross-cc.mk
@@ -32,4 +33,4 @@ endif
 
 .PHONY: gensio_pre_configure
 gensio_pre_configure:
-	$(RUN) autoreconf -i 
+	@$(RUN) autoreconf -i

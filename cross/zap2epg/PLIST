@@ -1,2 +1,2 @@
 rsc:bin/tv_grab_zap2epg
-rsc:var/epggrab/conf/zap2epg.xml
+rsc:var/epggrab/zap2epg/conf/zap2epg.xml

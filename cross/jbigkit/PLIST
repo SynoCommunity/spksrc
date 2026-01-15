@@ -1,3 +1,6 @@
+lnk:lib/libjbig.so
+lnk:lib/libjbig.so.0
+lib:lib/libjbig.so.0.0.0
 lnk:lib/libjbig85.so
 lnk:lib/libjbig85.so.0
 lib:lib/libjbig85.so.0.0.0

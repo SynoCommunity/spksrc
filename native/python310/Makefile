@@ -1,5 +1,5 @@
 PKG_NAME = python310
-PKG_VERS = 3.10.13
+PKG_VERS = 3.10.19
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -16,8 +16,6 @@ CONFIGURE_ARGS += --without-static-libpython
 CONFIGURE_ARGS += --with-ensurepip=no
 # test modules are required for optimization only
 CONFIGURE_ARGS += --disable-test-modules
-# Uses system default libffi-dev
-CONFIGURE_ARGS += --with-system-ffi
 # Uses system default libssl-dev
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
@@ -31,13 +29,21 @@ PYTHON = $(WORK_DIR)/install/usr/local/bin/python3
 PIP = $(WORK_DIR)/install/usr/local/bin/pip
 PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/pip
 
+REQUIREMENTS = src/requirements.txt
+PIP_WHEEL = $(shell grep -h -E "(^pip|^)[<>=]=" $(wildcard $(REQUIREMENTS)))
+
 .PHONY: python310_native_post_install
 python310_native_post_install: $(WORK_DIR)/python-native.mk
-	@$(MSG) Installing pip
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
-	@$(RUN) $(PYTHON) get-pip.py "pip==23.2.1" --no-setuptools --no-wheel --disable-pip-version-check
-	@$(MSG) Installing setuptools, wheel, cffi and cross env
-	@$(PIP) --disable-pip-version-check install "setuptools==68.1.2" "setuptools-rust==1.7.0" "maturin==1.2.3" "wheel==0.41.2" "cffi==1.15.1" "crossenv==1.4.0"
+ifeq ($(PIP_WHEEL),)
+	@$(MSG) Installing latest pip
+	@$(RUN) $(PYTHON) get-pip.py --no-setuptools --no-wheel --disable-pip-version-check
+else
+	@$(MSG) Installing $(PIP_WHEEL)
+	@$(RUN) $(PYTHON) get-pip.py "$(PIP_WHEEL)" --no-setuptools --no-wheel --disable-pip-version-check
+endif
+	@$(MSG) Installing wheels from requirements file
+	@$(PIP) --disable-pip-version-check install -r $(REQUIREMENTS)
 
 $(WORK_DIR)/python-native.mk:
 	@echo PIP=$(PIP_NATIVE) >> $@

@@ -1,0 +1,4 @@
+bin:bin/cllayerinfo
+lnk:lib/libOpenCL.so
+lnk:lib/libOpenCL.so.1
+lib:lib/libOpenCL.so.1.0.0

@@ -1,0 +1,7 @@
+lnk:bin/ocloc
+bin:bin/ocloc-24.35.0
+lib:lib/libocloc_legacy1.so
+lnk:lib/libze_intel_gpu_legacy1.so.1
+lib:lib/libze_intel_gpu_legacy1.so.1.5.30872
+lib:lib/intel-opencl/libigdrcl_legacy1.so
+rsc:etc/OpenCL/vendors/intel_legacy1.icd

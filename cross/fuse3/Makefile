@@ -1,10 +1,14 @@
 PKG_NAME = fuse3
 PKG_REAL_NAME = fuse
-PKG_VERS = 3.12.0
+PKG_VERS = 3.16.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libfuse/libfuse/archive/
 PKG_DIR = libfuse-$(PKG_REAL_NAME)-$(PKG_VERS)
+
+# REMARKS:
+# 3.16.2 is the latest version for ARMv5 and ARMv7L archs
+# 3.17.0 will require stdatomic
 
 OPTIONAL_DEPENDS = cross/libudev_204 cross/libudev_219
 
@@ -33,7 +37,7 @@ CONFIGURE_ARGS += -Duseroot=false
 include ../../mk/spksrc.cross-meson.mk
 
 .PHONY: fuse3_add_missing_toolchain_file
-# workaround for arch-qoriq-6.1 and arch-88f6281-5.2
+# workaround for arch-qoriq-6.2.4 and arch-88f6281-5.2
 fuse3_add_missing_toolchain_file:
 	@install -d -m 755 $(STAGING_INSTALL_PREFIX)/include/linux
 	@install -m 755 src/securebits.h $(STAGING_INSTALL_PREFIX)/include/linux/

@@ -863,7 +863,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
              break;
  #endif
          default:
-@@ -307,40 +134,57 @@ static int amf_init_context(AVCodecConte
+@@ -307,40 +134,70 @@ static int amf_init_context(AVCodecConte
              return AVERROR(ENOMEM);
  
      } else {
@@ -906,18 +906,31 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
      return 0;
  }
  
-+static int amf_check_hevc_encoder_10bit_support(AVCodecContext *avctx)
++static int amf_check_encoder_10bit_support(AVCodecContext *avctx)
 +{
 +    AMFEncContext *ctx = avctx->priv_data;
 +    AVAMFContext  *amfctx = ctx->amfctx;
-+    const wchar_t *codec_id = AMFVideoEncoder_HEVC;
++    const wchar_t *codec_id;
 +    AMF_RESULT     res;
 +
-+    res = amfctx->factory->pVtbl->CreateComponent(amfctx->factory, amfctx->context, codec_id, &ctx->encoder);
-+    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_ENCODER_NOT_FOUND, "CreateComponent(%ls) failed with error %d\n", codec_id, res);
-+
-+    AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_COLOR_BIT_DEPTH, AMF_COLOR_BIT_DEPTH_10);
-+    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR(EINVAL), "Assigning 10-bit property failed with error %d\n", res);
++    switch (avctx->codec->id) {
++    case AV_CODEC_ID_HEVC:
++        codec_id = AMFVideoEncoder_HEVC;
++        res = amfctx->factory->pVtbl->CreateComponent(amfctx->factory, amfctx->context, codec_id, &ctx->encoder);
++        AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR(ENOSYS), "CreateComponent(%ls) failed with error %d\n", codec_id, res);
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_COLOR_BIT_DEPTH, AMF_COLOR_BIT_DEPTH_10);
++        AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR(EINVAL), "Assigning 10-bit property failed with error %d\n", res);
++        break;
++    case AV_CODEC_ID_AV1:
++        codec_id = AMFVideoEncoder_AV1;
++        res = amfctx->factory->pVtbl->CreateComponent(amfctx->factory, amfctx->context, codec_id, &ctx->encoder);
++        AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR(ENOSYS), "CreateComponent(%ls) failed with error %d\n", codec_id, res);
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_AV1_COLOR_BIT_DEPTH, AMF_COLOR_BIT_DEPTH_10);
++        AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR(EINVAL), "Assigning 10-bit property failed with error %d\n", res);
++        break;
++    default:
++        return AVERROR(ENOSYS);
++    }
 +
 +    res = ctx->encoder->pVtbl->Init(ctx->encoder, AMF_SURFACE_P010, avctx->width, avctx->height);
 +    if (res == AMF_OK) {
@@ -925,7 +938,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
 +        ctx->encoder->pVtbl->Release(ctx->encoder);
 +        ctx->encoder = NULL;
 +    } else {
-+        return AVERROR(EINVAL);
++        return AVERROR(ENOSYS);
 +    }
 +    return res;
 +}
@@ -942,7 +955,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
  
      switch (avctx->codec->id) {
          case AV_CODEC_ID_H264:
-@@ -355,26 +199,70 @@ static int amf_init_encoder(AVCodecConte
+@@ -355,26 +212,62 @@ static int amf_init_encoder(AVCodecConte
          default:
              break;
      }
@@ -962,28 +975,20 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
 -                        "Format %s is not supported\n", av_get_pix_fmt_name(pix_fmt));
 +    AMF_RETURN_IF_FALSE(avctx, ctx->format != AMF_SURFACE_UNKNOWN,
 +        AVERROR(EINVAL), "Format %s is not supported\n", av_get_pix_fmt_name(pix_fmt));
-+
-+    ctx->bit_depth = 8;
-+    if (pix_fmt == AV_PIX_FMT_P010) {
-+        switch (avctx->codec->id) {
-+        case AV_CODEC_ID_HEVC:
-+            // GPU >= Navi or APU >= Renoir is required.
-+            res = amf_check_hevc_encoder_10bit_support(avctx);
-+            if (res == AMF_OK) {
-+                ctx->bit_depth = 10;
-+            } else {
-+                av_log(avctx, AV_LOG_ERROR, "HEVC 10-bit encoding is not supported by the given AMF device\n");
-+                return res;
-+            }
-+            break;
-+        default:
-+            av_log(avctx, AV_LOG_ERROR, "10-bit encoding is not supported by AMF %s encoder\n", avctx->codec->name);
-+            return AVERROR(EINVAL);
-+        }
-+    }
  
 -    res = ctx->factory->pVtbl->CreateComponent(ctx->factory, ctx->context, codec_id, &ctx->encoder);
 -    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_ENCODER_NOT_FOUND, "CreateComponent(%ls) failed with error %d\n", codec_id, res);
++    ctx->bit_depth = 8;
++    if (pix_fmt == AV_PIX_FMT_P010) {
++        res = amf_check_encoder_10bit_support(avctx);
++        if (res == AMF_OK) {
++            ctx->bit_depth = 10;
++        } else {
++            av_log(avctx, AV_LOG_ERROR, "%s 10-bit encoding is not supported by AMF device\n", avctx->codec->name);
++            return res;
++        }
++    }
++
 +    ctx->out_color_trc = amf_av_to_amf_color_trc(avctx->color_trc);
 +    ctx->out_color_prm = amf_av_to_amf_color_prm(avctx->color_primaries);
 +
@@ -1024,7 +1029,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
  
      if (ctx->delayed_surface) {
          ctx->delayed_surface->pVtbl->Release(ctx->delayed_surface);
-@@ -387,34 +275,34 @@ int av_cold ff_amf_encode_close(AVCodecC
+@@ -387,34 +280,34 @@ int av_cold ff_amf_encode_close(AVCodecC
          ctx->encoder = NULL;
      }
  
@@ -1079,7 +1084,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
  {
      AMFPlane *plane;
      uint8_t  *dst_data[4];
-@@ -430,38 +318,37 @@ static int amf_copy_surface(AVCodecConte
+@@ -430,38 +323,37 @@ static int amf_copy_surface(AVCodecConte
          dst_data[i] = plane->pVtbl->GetNative(plane);
          dst_linesize[i] = plane->pVtbl->GetHPitch(plane);
      }
@@ -1127,23 +1132,20 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
              break;
          case AV_CODEC_ID_AV1:
              buffer->pVtbl->GetProperty(buffer, AMF_VIDEO_ENCODER_AV1_OUTPUT_FRAME_TYPE, &var);
-@@ -476,44 +363,27 @@ static int amf_copy_buffer(AVCodecContex
+@@ -476,7 +368,6 @@ static int amf_copy_buffer(AVCodecContex
  
      pkt->pts = var.int64Value; // original pts
  
 -
--    AMF_RETURN_IF_FALSE(ctx, av_fifo_read(ctx->timestamp_list, &timestamp, 1) >= 0,
--                        AVERROR_UNKNOWN, "timestamp_list is empty\n");
-+    AMF_RETURN_IF_FALSE(ctx, av_fifo_read(ctx->timestamp_list, &timestamp, 1) >= 0, AVERROR_UNKNOWN, "timestamp_list is empty\n");
+     AMF_RETURN_IF_FALSE(ctx, av_fifo_read(ctx->timestamp_list, &timestamp, 1) >= 0,
+                         AVERROR_UNKNOWN, "timestamp_list is empty\n");
  
-     // calc dts shift if max_b_frames > 0
-     if (avctx->max_b_frames > 0 && ctx->dts_delay == 0) {
-         int64_t timestamp_last = AV_NOPTS_VALUE;
+@@ -486,34 +377,20 @@ static int amf_copy_buffer(AVCodecContex
          size_t can_read = av_fifo_can_read(ctx->timestamp_list);
  
--        AMF_RETURN_IF_FALSE(ctx, can_read > 0, AVERROR_UNKNOWN,
+         AMF_RETURN_IF_FALSE(ctx, can_read > 0, AVERROR_UNKNOWN,
 -            "timestamp_list is empty while max_b_frames = %d\n", avctx->max_b_frames);
-+        AMF_RETURN_IF_FALSE(ctx, can_read > 0, AVERROR_UNKNOWN, AVERROR_UNKNOWN, "timestamp_list is empty while max_b_frames = %d\n", avctx->max_b_frames);
++                            "timestamp_list is empty while max_b_frames = %d\n", avctx->max_b_frames);
 +
          av_fifo_peek(ctx->timestamp_list, &timestamp_last, 1, can_read - 1);
 -        if (timestamp < 0 || timestamp_last < AV_NOPTS_VALUE) {
@@ -1179,7 +1181,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
  {
      AMF_RESULT res;
      AMFVariantStruct var;
-@@ -527,15 +397,16 @@ static AMF_RESULT amf_set_property_buffe
+@@ -527,15 +404,16 @@ static AMF_RESULT amf_set_property_buffe
              res = AMFVariantAssignInterface(&var, amf_interface);
              amf_interface->pVtbl->Release(amf_interface);
          }
@@ -1199,7 +1201,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
  {
      AMF_RESULT res;
      AMFVariantStruct var;
-@@ -583,9 +454,60 @@ static void amf_release_buffer_with_fram
+@@ -583,9 +461,60 @@ static void amf_release_buffer_with_fram
      frame_ref_storage_buffer->pVtbl->Release(frame_ref_storage_buffer);
  }
  
@@ -1261,7 +1263,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
      AMFSurface *surface;
      AMF_RESULT  res;
      int         ret;
-@@ -612,10 +534,9 @@ int ff_amf_receive_packet(AVCodecContext
+@@ -612,10 +541,9 @@ int ff_amf_receive_packet(AVCodecContext
                  if (res == AMF_INPUT_FULL) {
                      ctx->delayed_drain = 1; // input queue is full: resubmit Drain() in ff_amf_receive_packet
                  } else {
@@ -1274,7 +1276,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
                  }
              }
          }
-@@ -631,13 +552,10 @@ int ff_amf_receive_packet(AVCodecContext
+@@ -631,13 +559,10 @@ int ff_amf_receive_packet(AVCodecContext
                  ID3D11Texture2D *texture = (ID3D11Texture2D*)frame->data[0]; // actual texture
                  int index = (intptr_t)frame->data[1]; // index is a slice in texture array is - set to tell AMF which slice to use
  
@@ -1290,7 +1292,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
  
                  hw_surface = 1;
              }
-@@ -648,8 +566,8 @@ int ff_amf_receive_packet(AVCodecContext
+@@ -648,8 +573,8 @@ int ff_amf_receive_packet(AVCodecContext
              {
                  IDirect3DSurface9 *texture = (IDirect3DSurface9 *)frame->data[3]; // actual texture
  
@@ -1301,7 +1303,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
  
                  hw_surface = 1;
              }
-@@ -657,8 +575,8 @@ int ff_amf_receive_packet(AVCodecContext
+@@ -657,8 +582,8 @@ int ff_amf_receive_packet(AVCodecContext
  #endif
          default:
              {
@@ -1312,7 +1314,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
                  amf_copy_surface(avctx, frame, surface);
              }
              break;
-@@ -670,28 +588,49 @@ int ff_amf_receive_packet(AVCodecContext
+@@ -670,28 +595,49 @@ int ff_amf_receive_packet(AVCodecContext
              // input HW surfaces can be vertically aligned by 16; tell AMF the real size
              surface->pVtbl->SetCrop(surface, 0, 0, frame->width, frame->height);
  
@@ -1371,7 +1373,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
          }
  
          // submit surface
-@@ -702,7 +641,7 @@ int ff_amf_receive_packet(AVCodecContext
+@@ -702,7 +648,7 @@ int ff_amf_receive_packet(AVCodecContext
          } else {
              int64_t pts = frame->pts;
              surface->pVtbl->Release(surface);
@@ -1380,7 +1382,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
  
              av_frame_unref(frame);
              ret = av_fifo_write(ctx->timestamp_list, &pts, 1);
-@@ -711,7 +650,6 @@ int ff_amf_receive_packet(AVCodecContext
+@@ -711,7 +657,6 @@ int ff_amf_receive_packet(AVCodecContext
          }
      }
  
@@ -1388,7 +1390,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
      do {
          block_and_wait = 0;
          // poll data
-@@ -728,23 +666,37 @@ int ff_amf_receive_packet(AVCodecContext
+@@ -728,23 +673,37 @@ int ff_amf_receive_packet(AVCodecContext
              if (data->pVtbl->HasProperty(data, L"av_frame_ref")) {
                  AMFBuffer *frame_ref_storage_buffer;
                  res = amf_get_property_buffer(data, L"av_frame_ref", &frame_ref_storage_buffer);
@@ -1429,7 +1431,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
  
                      ret = av_fifo_write(ctx->timestamp_list, &pts, 1);
                      if (ret < 0)
-@@ -757,24 +709,26 @@ int ff_amf_receive_packet(AVCodecContext
+@@ -757,24 +716,26 @@ int ff_amf_receive_packet(AVCodecContext
                  if (res != AMF_INPUT_FULL) {
                      ctx->delayed_drain = 0;
                      ctx->eof = 1; // drain started
@@ -1940,7 +1942,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc_av1.c
              res = AMF_NOT_SUPPORTED;
              av_log(ctx, AV_LOG_ERROR, "Resolution incorrect for alignment mode\n");
              return AVERROR_EXIT;
-@@ -249,51 +264,55 @@ static av_cold int amf_encode_init_av1(A
+@@ -249,51 +264,59 @@ static av_cold int amf_encode_init_av1(A
      }
      AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_AV1_ALIGNMENT_MODE, ctx->align);
  
@@ -1951,6 +1953,10 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc_av1.c
 +        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_AV1_OUTPUT_TRANSFER_CHARACTERISTIC, ctx->out_color_trc);
 +    if (ctx->out_color_prm > AMF_COLOR_PRIMARIES_UNDEFINED)
 +        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_AV1_OUTPUT_COLOR_PRIMARIES, ctx->out_color_prm);
++
++    // Set 10-bit encoding if possible
++    if (ctx->bit_depth == 10)
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_AV1_COLOR_BIT_DEPTH, AMF_COLOR_BIT_DEPTH_10);
  
 -    // init encoder
 +    // Init encoder
@@ -2012,7 +2018,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc_av1.c
      res = AMFVariantInit(&var);
      AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_BUG, "AMFVariantInit() failed with error %d\n", res);
  
-@@ -304,9 +323,8 @@ static av_cold int amf_encode_init_av1(A
+@@ -304,9 +327,8 @@ static av_cold int amf_encode_init_av1(A
      guid = IID_AMFBuffer();
  
      res = var.pInterface->pVtbl->QueryInterface(var.pInterface, &guid, (void**)&buffer); // query for buffer interface
@@ -2023,7 +2029,7 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc_av1.c
      AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_BUG, "QueryInterface(IID_AMFBuffer) failed with error %d\n", res);
  
      avctx->extradata_size = (int)buffer->pVtbl->GetSize(buffer);
-@@ -342,20 +360,21 @@ static const AVClass av1_amf_class = {
+@@ -342,20 +364,21 @@ static const AVClass av1_amf_class = {
  };
  
  const FFCodec ff_av1_amf_encoder = {
