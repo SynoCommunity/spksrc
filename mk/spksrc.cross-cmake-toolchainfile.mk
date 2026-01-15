@@ -10,7 +10,7 @@ ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 CMAKE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE_PKG)
 endif
 
-# Map words to filenames
+# Map DEFAULT_ENV definitions to filenames
 TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
 # Include them (optional include)
 -include $(TC_VARS_FILES)
