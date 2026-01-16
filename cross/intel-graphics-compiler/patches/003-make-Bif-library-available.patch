@@ -1,0 +1,11 @@
+--- IGC/VectorCompiler/lib/BiF/CMakeLists.txt-orig	2024-11-19 16:04:15.000000000 +0000
++++ IGC/VectorCompiler/lib/BiF/CMakeLists.txt	2025-12-23 20:38:22.208352087 +0000
+@@ -67,3 +67,8 @@ add_library(VCEmbeddedBiF OBJECT
+   ${PRINTF_OCL_32} ${PRINTF_OCL_64} ${PRINTF_ZE_32} ${PRINTF_ZE_64}
+   ${BUILTINS} ${SPIRV_BUILTINS})
+ target_link_libraries(VCEmbeddedBiF VCHeaders)
++
++install(
++  TARGETS BiFManager
++  LIBRARY DESTINATION lib
++)

@@ -145,7 +145,7 @@ Index: FFmpeg/libavutil/hwcontext_qsv.c
 ===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
-@@ -369,7 +369,7 @@ static void qsv_frames_uninit(AVHWFrames
+@@ -379,7 +379,7 @@ static void qsv_frames_uninit(AVHWFrames
      av_buffer_unref(&s->child_frames_ref);
  }
  
@@ -154,7 +154,7 @@ Index: FFmpeg/libavutil/hwcontext_qsv.c
  {
  }
  
-@@ -382,7 +382,7 @@ static AVBufferRef *qsv_pool_alloc(void
+@@ -417,7 +417,7 @@ static AVBufferRef *qsv_fixed_pool_alloc
      if (s->nb_surfaces_used < hwctx->nb_surfaces) {
          s->nb_surfaces_used++;
          return av_buffer_create((uint8_t*)(s->surfaces_internal + s->nb_surfaces_used - 1),
@@ -163,7 +163,7 @@ Index: FFmpeg/libavutil/hwcontext_qsv.c
      }
  
      return NULL;
-@@ -2272,8 +2272,17 @@ static int qsv_device_create(AVHWDeviceC
+@@ -2617,8 +2617,17 @@ static int qsv_device_create(AVHWDeviceC
      child_device = (AVHWDeviceContext*)priv->child_device_ctx->data;
  
      impl = choose_implementation(device, child_device_type);

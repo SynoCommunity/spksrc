@@ -1,0 +1,93 @@
+Index: FFmpeg/doc/filters.texi
+===================================================================
+--- doc/filters.texi
++++ doc/filters.texi
+@@ -31438,6 +31438,12 @@ This filter accepts the following option
+ @item expr
+ The expression which is evaluated for each frame to construct its timestamp.
+ 
++@item strip_fps (@emph{video only})
++Boolean option which determines if the original framerate and frame duration
++metadata is unset. If set to true, be advised that a sane frame rate should be
++explicitly specified if output is sent to a constant frame rate muxer.
++Default is @code{false}.
++
+ @end table
+ 
+ The expression is evaluated through the eval API and can contain the following
+Index: FFmpeg/libavfilter/setpts.c
+===================================================================
+--- libavfilter/setpts.c
++++ libavfilter/setpts.c
+@@ -98,6 +98,7 @@ typedef struct SetPTSContext {
+     const AVClass *class;
+     char *expr_str;
+     AVExpr *expr;
++    int strip_fps;
+     double var_values[VAR_VARS_NB];
+     enum AVMediaType type;
+ } SetPTSContext;
+@@ -153,8 +154,10 @@ static int config_input(AVFilterLink *in
+ static int config_output_video(AVFilterLink *outlink)
+ {
+     FilterLink *l = ff_filter_link(outlink);
++    SetPTSContext *s = outlink->src->priv;
+ 
+-    l->frame_rate = (AVRational){ 1, 0 };
++    if (s->strip_fps)
++        l->frame_rate = (AVRational){ 1, 0 };
+ 
+     return 0;
+ }
+@@ -207,7 +210,8 @@ static int filter_frame(AVFilterLink *in
+ 
+     d = eval_pts(setpts, inlink, frame, frame->pts);
+     frame->pts = D2TS(d);
+-    frame->duration = 0;
++    if (setpts->strip_fps)
++        frame->duration = 0;
+ 
+     av_log(inlink->dst, AV_LOG_TRACE,
+             "N:%"PRId64" PTS:%s T:%f",
+@@ -320,6 +324,7 @@ static int process_command(AVFilterConte
+ #if CONFIG_SETPTS_FILTER
+ static const AVOption setpts_options[] = {
+     { "expr", "Expression determining the frame timestamp", OFFSET(expr_str), AV_OPT_TYPE_STRING, { .str = "PTS" }, .flags = V|F|R },
++    { "strip_fps",  "Unset framerate metadata", OFFSET(strip_fps), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, .flags = V|F },
+     { NULL }
+ };
+ AVFILTER_DEFINE_CLASS(setpts);
+Index: FFmpeg/tests/fate/hevc.mak
+===================================================================
+--- tests/fate/hevc.mak
++++ tests/fate/hevc.mak
+@@ -210,7 +210,7 @@ $(HEVC_TESTS_444_12BIT): SCALE_OPTS := -
+ fate-hevc-conformance-%: CMD = framecrc -i $(TARGET_SAMPLES)/hevc-conformance/$(subst fate-hevc-conformance-,,$(@)).bit $(SCALE_OPTS)
+ $(HEVC_TESTS_422_10BIN): CMD = framecrc -i $(TARGET_SAMPLES)/hevc-conformance/$(subst fate-hevc-conformance-,,$(@)).bin $(SCALE_OPTS)
+ $(HEVC_TESTS_MULTIVIEW): CMD = framecrc -i $(TARGET_SAMPLES)/hevc-conformance/$(subst fate-hevc-conformance-,,$(@)).bit \
+-	-pix_fmt yuv420p -map "0:view:0" -map "0:view:1" -vf setpts=N
++	-pix_fmt yuv420p -map "0:view:0" -map "0:view:1" -vf setpts=N:strip_fps=1
+ 
+ FATE_HEVC-$(call FRAMECRC, HEVC, HEVC, HEVC_PARSER) += $(HEVC_TESTS_8BIT) $(HEVC_TESTS_444_8BIT)
+ FATE_HEVC-$(call FRAMECRC, HEVC, HEVC, HEVC_PARSER SCALE_FILTER) +=         \
+Index: FFmpeg/tests/fate/mov.mak
+===================================================================
+--- tests/fate/mov.mak
++++ tests/fate/mov.mak
+@@ -219,7 +219,7 @@ fate-mov-pcm-remux: CMP = oneline
+ fate-mov-pcm-remux: REF = e76115bc392d702da38f523216bba165
+ 
+ FATE_MOV_FFMPEG-$(call TRANSCODE, RAWVIDEO, MOV, TESTSRC_FILTER SETPTS_FILTER) += fate-mov-vfr
+-fate-mov-vfr: CMD = md5 -filter_complex testsrc=size=2x2:duration=1,setpts=N*N -c rawvideo -fflags +bitexact -f mov
++fate-mov-vfr: CMD = md5 -filter_complex testsrc=size=2x2:duration=1,setpts=N*N:strip_fps=1 -c rawvideo -fflags +bitexact -f mov
+ fate-mov-vfr: CMP = oneline
+ fate-mov-vfr: REF = 1558b4a9398d8635783c93f84eb5a60d
+ 
+Index: FFmpeg/tests/filtergraphs/setpts
+===================================================================
+--- tests/filtergraphs/setpts
++++ tests/filtergraphs/setpts
+@@ -1,2 +1,2 @@
+ settb=1/1000,
+-setpts=1/(35*TB) * (N + 0.05 * sin(N*2*PI/25))
++setpts=1/(35*TB) * (N + 0.05 * sin(N*2*PI/25)):strip_fps=1
