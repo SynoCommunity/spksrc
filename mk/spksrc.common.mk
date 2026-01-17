@@ -1,5 +1,8 @@
 # Common definitions, shared by all makefiles
 
+# Include base definitions (version macros, MSG, etc.) first
+include ../../mk/spksrc.base.mk
+
 ###
 
 # Set basedir in case called from spkrc/ or from normal sub-dir
@@ -16,16 +19,6 @@ PWD := $(CURDIR)
 # all will be the default target, regardless of what is defined in the other
 # makefiles.
 default: all
-
-# Stop on first error
-SHELL := $(SHELL) -e
-
-# Define $(empty) and $(space)
-empty :=
-space := $(empty) $(empty)
-
-# Display message in a consistent way
-MSG = echo "===> "
 
 # Launch command in the working dir of the package source and the right environment
 RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
@@ -52,9 +45,6 @@ PIP_WHEEL_ARGS_CROSSENV = $(PIP_WHEEL_ARGS) --no-index
 # Current implementation is a work-around for the
 # lack of proper source download support from pip
 PIP_DOWNLOAD_ARGS = download --no-index --find-links $(PIP_DISTRIB_DIR) --disable-pip-version-check --no-binary :all: --no-deps --dest $(PIP_DISTRIB_DIR) --no-build-isolation --exists-action w
-
-# Available languages
-LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
 
 # Available toolchains formatted as '{ARCH}-{TC}'
 AVAILABLE_TOOLCHAINS = $(subst syno-,,$(filter-out %-rust,$(sort $(notdir $(wildcard $(BASEDIR)toolchain/syno-*)))))
@@ -131,54 +121,3 @@ CROSSENV_LOG = $(LOG_DIR)/build$(ARCH_SUFFIX)-crossenv.log
 WHEEL_LOG    = $(LOG_DIR)/build$(ARCH_SUFFIX)-wheel.log
 NATIVE_LOG   = $(LOG_DIR)/build-native-$(PKG_NAME).log
 STATUS_LOG   = $(LOG_DIR)/status-build.log
-
-# Terminal colors
-RED=$$(tput setaf 1)
-GREEN=$$(tput setaf 2)
-NC=$$(tput sgr0)
-
-# Macro: Version Comparison
-version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
-version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
-version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
-version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
-
-# Remove duplicate words within string while preserving order
-define uniq
-$(strip \
-  $(eval __seen :=) \
-  $(foreach f,$1, \
-    $(if $(filter $f,$(__seen)),, \
-      $(eval __seen += $f)$(f) \
-    ) \
-  ) \
-)
-endef
-
-# Macro: dedup
-#        removes duplicate entries from a specified delimiter,
-#        preserving the order of unique elements.
-dedup = $(shell /bin/bash -c '\
-    input="$$(echo "$1" | xargs)"; \
-    delimiter="$$(echo "$2" | xargs)"; \
-    echo "$$input" | \
-    tr "$$delimiter" "\n" | \
-    awk '\''!seen[$$0]++ {print $$0}'\'' | \
-    tr "\n" "$$delimiter" | \
-    sed "s/$$delimiter$$//" \
-')
-
-# Macro: merge
-#        merges multiple environment variable values from a given input string,
-#        inverting their order and separating them with a specified delimiter
-merge = $(shell /bin/bash -c '\
-    input="$$(echo "$1" | xargs)"; \
-    var_name="$$(echo "$2" | xargs)"; \
-    delimiter="$$(echo "$3" | xargs)"; \
-    echo "$$input" | \
-    grep -o "$$var_name=[^ ]*" | \
-    tac | \
-    sed "s/^$$var_name=//" | \
-    tr "\n" "$$delimiter" | \
-    sed "s/$$delimiter$$//" \
-')
