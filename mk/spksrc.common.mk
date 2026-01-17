@@ -24,24 +24,6 @@ SHELL := $(SHELL) -e
 empty :=
 space := $(empty) $(empty)
 
-# Define all variable needing cleaning
-# Used for native, CMake and Meson builds
-# Exception for PKG_CONFIG_LIBDIR to force default pkgconfig.
-ENV_VARS_TO_CLEAN = AR AS CC CPP CXX FC LD LDSHARED NM OBJCOPY OBJDUMP RANLIB READELF STRIP \
-                    CFLAGS ADDITIONAL_CFLAGS CPPFLAGS ADDITIONAL_CPPFLAGS \
-                    CXXFLAGS ADDITIONAL_CXXFLAGS FFLAGS ADDITIONAL_FFLAGS \
-                    LDFLAGS ADDITIONAL_LDFLAGS PKG_CONFIG_PATH SYSROOT \
-                    RUSTFLAGS RUST_TARGET RUSTUP_HOME RUSTUP_TOOLCHAIN \
-                    CARGO_HOME CARGO_BUILD_TARGET \
-                    CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR \
-                    CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER \
-                    CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS
-
-ENV_FILTERED = $(shell env -i $(ENV) sh -c 'env' | \
-    grep -v -E '^($(subst $(space),|,$(ENV_VARS_TO_CLEAN)))=' | \
-    awk -F'=' '{if($$2 ~ / /) print $$1"=\""$$2"\""; else print $$0}' | \
-    tr '\n' ' ')
-
 # Display message in a consistent way
 MSG = echo "===> "
 
