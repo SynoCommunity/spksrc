@@ -39,13 +39,14 @@ endef
 
 # Macro: dedup
 #        removes duplicate entries from a specified delimiter,
-#        preserving the order of unique elements.
+#        preserving the order of unique elements,
+#        and dropping empty elements (e.g. "::")
 dedup = $(shell /bin/bash -c '\
     input="$$(echo "$1" | xargs)"; \
     delimiter="$$(echo "$2" | xargs)"; \
-    echo "$$input" | \
+    printf "%s\n" "$$input" | \
     tr "$$delimiter" "\n" | \
-    awk '\''!seen[$$0]++ {print $$0}'\'' | \
+    awk '\''NF && !seen[$$0]++ {print $$0}'\'' | \
     tr "\n" "$$delimiter" | \
     sed "s/$$delimiter$$//" \
 ')
