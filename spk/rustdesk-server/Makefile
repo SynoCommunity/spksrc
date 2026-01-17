@@ -25,7 +25,8 @@ WIZARDS_DIR = src/wizard
 # 21115 (TCP) - NAT type test
 # 21116 (TCP+UDP) - ID/Rendezvous server
 # 21117 (TCP) - Relay server
-# 21118 (TCP) - WebSocket for web clients
+# 21118 (TCP) - ID server WebSocket for web clients
+# 21119 (TCP) - Relay server WebSocket for web clients
 FWPORTS = src/rustdesk-server.sc
 
 # Minimum DSM version

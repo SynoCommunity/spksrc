@@ -1,23 +1,29 @@
 [rustdesk-server_nat]
 title="RustDesk NAT Test (TCP)"
-desc="RustDesk NAT type test"
+desc="NAT type test"
 port_forward="yes"
 dst.ports="21115/tcp"
 
 [rustdesk-server_id]
 title="RustDesk ID Server (TCP+UDP)"
-desc="RustDesk ID/Rendezvous server"
+desc="ID/Rendezvous server"
 port_forward="yes"
 dst.ports="21116"
 
 [rustdesk-server_relay]
 title="RustDesk Relay (TCP)"
-desc="RustDesk relay server"
+desc="Relay server"
 port_forward="yes"
 dst.ports="21117/tcp"
 
 [rustdesk-server_ws]
-title="RustDesk WebSocket (TCP)"
-desc="RustDesk websocket for web clients"
+title="RustDesk ID Server WebSocket (TCP)"
+desc="ID server WebSocket for web clients"
 port_forward="yes"
 dst.ports="21118/tcp"
+
+[rustdesk-server_relay2]
+title="RustDesk Relay Server WebSocket (TCP)"
+desc="Relay server WebSocket for web clients"
+port_forward="yes"
+dst.ports="21119/tcp"

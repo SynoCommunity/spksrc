@@ -19,8 +19,8 @@ service_postinst()
     INTERNAL_IP=${INTERNAL_IP:-<NAS_IP>}
 
     echo "RustDesk Server installed successfully."
-    echo "ID/Rendezvous server will run on ports 21115-21116"
-    echo "Relay server will run on port 21117"
+    echo "ID/Rendezvous server will run on ports 21115-21116, 21118 (WebSocket)"
+    echo "Relay server will run on port 21117, 21119 (WebSocket)"
     echo ""
     echo "After starting the service, find your public key in:"
     echo "  ${SYNOPKG_PKGVAR}/id_ed25519.pub"

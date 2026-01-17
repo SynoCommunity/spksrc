@@ -19,7 +19,7 @@ PAGE_CONFIG=$(/bin/cat<<EOF
 {
     "step_title": "RustDesk Server Information",
     "items": [{
-        "desc": "RustDesk Server provides ID/Rendezvous and Relay services for RustDesk remote desktop clients.<br><br><b>Default Ports:</b><br>• 21115 (TCP) - NAT type test<br>• 21116 (TCP/UDP) - ID/Rendezvous server<br>• 21117 (TCP) - Relay server<br>• 21118 (TCP) - WebSocket for web clients<br><br>Ensure these ports are open in your firewall and forwarded on your router for remote access."
+        "desc": "RustDesk Server provides ID/Rendezvous and Relay services for RustDesk remote desktop clients.<br><br><b>Default Ports:</b><br>• 21115 (TCP) - NAT type test<br>• 21116 (TCP+UDP) - ID/Rendezvous server<br>• 21117 (TCP) - Relay server<br>• 21118 (TCP) - ID server WebSocket for web clients<br>• 21119 (TCP) - Relay server WebSocket for web clients<br><br>Ensure these ports are open in your firewall and forwarded on your router for remote access."
     }]
 }
 EOF
