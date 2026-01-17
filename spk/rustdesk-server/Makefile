@@ -32,4 +32,13 @@ FWPORTS = src/rustdesk-server.sc
 # Minimum DSM version
 SPK_MIN_DSM = 6.0
 
+# Install config file template
+POST_STRIP_TARGET = rustdesk_extra_install
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: rustdesk_extra_install
+rustdesk_extra_install:
+	@$(MSG) Install config file template
+	@install -d -m 755 $(STAGING_DIR)/share
+	@install -m 644 src/hbbs.env $(STAGING_DIR)/share/
