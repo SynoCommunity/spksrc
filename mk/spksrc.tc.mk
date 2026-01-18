@@ -332,7 +332,15 @@ autotools_vars:
 
 .PHONY: tc_flags
 tc_flags:
-	@echo CFLAGS := $(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
+	@echo CC := $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc ; \
+	echo CXX := $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++ ; \
+	echo LD := $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ld ; \
+	echo AR := $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar ; \
+	echo AS := $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)as ; \
+	echo NM := $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)nm ; \
+	echo RANLIB := $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ranlib ; \
+	echo STRIP := $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)strip ; \
+	echo CFLAGS := $(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
 	echo CPPFLAGS := $(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\) ; \
 	echo CXXFLAGS := $(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
