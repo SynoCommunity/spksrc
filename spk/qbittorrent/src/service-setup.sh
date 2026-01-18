@@ -1,3 +1,4 @@
+# qBittorrent service setup
 
 QBITTORRENT="${SYNOPKG_PKGDEST}/bin/qbittorrent-nox"
 CFG_FILE="${SYNOPKG_PKGVAR}/qBittorrent/config/qBittorrent.conf"

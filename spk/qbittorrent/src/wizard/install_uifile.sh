@@ -82,7 +82,7 @@ PAGE_INFO=$(/bin/cat<<EOF
         "desc": "<b>Web Interface</b><br>qBittorrent will be accessible at <b>http://${INTERNAL_IP}:8095</b><br>Downloads will be saved to <b>complete</b> and <b>incomplete</b> subfolders in your selected shared folder."
     },
     {
-        "desc": "<b>Permissions</b><br>Permissions are managed with the group <b>'synocommunity'</b>.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "<b>Permissions</b><br>Permissions are managed via the <b>'synocommunity'</b> group on DSM 7, and the <b>'sc-download'</b> group on DSM 6.<br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
     }]
 }
 EOF
