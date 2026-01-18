@@ -1,3 +1,9 @@
-dotnet-sdk-9.0.308-linux-x64.tar.gz SHA1 c868f5c54a5532da33f8cb6526971d5fd7a81546
-dotnet-sdk-9.0.308-linux-x64.tar.gz SHA256 69d78419376778078ac383b14e80e3949ec8e01bab5b724aeb8bd2d2b3f8fd1b
-dotnet-sdk-9.0.308-linux-x64.tar.gz MD5 96f9e57383fae2aab6e551006dbc2aac
+dotnet-sdk-9.0.309-linux-x64.tar.gz SHA1 3793850df966111c0e5af4b63c123b5065903665
+dotnet-sdk-9.0.309-linux-x64.tar.gz SHA256 3eb75d4b5282f2d766aeaddefd41177748cbe8b05b64569862653b8a3d98b51b
+dotnet-sdk-9.0.309-linux-x64.tar.gz MD5 c591afd5834de48313ae5fe272ba3f00
+dotnet-sdk-9.0.309-linux-arm.tar.gz SHA1 17d9981927dc626b0ac4673d861a11b4fa2a651e
+dotnet-sdk-9.0.309-linux-arm.tar.gz SHA256 95447be0885066a2c78abb0fb64742c62e1ac126604b4d8a35ff0d716a0d4d3f
+dotnet-sdk-9.0.309-linux-arm.tar.gz MD5 f70fab5f0d15ad68e1adcaa6d43c5d0a
+dotnet-sdk-9.0.309-linux-arm64.tar.gz SHA1 aba79bb35bce31107f661bd9f197fd03a94e4ac3
+dotnet-sdk-9.0.309-linux-arm64.tar.gz SHA256 068b80e42d7e5f4e53c563993964da49fc15fb0463478dcbf3af4cf2072fcaa3
+dotnet-sdk-9.0.309-linux-arm64.tar.gz MD5 8216a4d78addcc7b14e107cb9fbc8451
