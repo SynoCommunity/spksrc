@@ -1,10 +1,9 @@
 
 QBITTORRENT="${SYNOPKG_PKGDEST}/bin/qbittorrent-nox"
-WEBUI_PORT="8095"
 CFG_FILE="${SYNOPKG_PKGVAR}/qBittorrent/config/qBittorrent.conf"
 PWHASH="${SYNOPKG_PKGDEST}/bin/qbt-pwhash"
 
-SERVICE_COMMAND="${QBITTORRENT} --confirm-legal-notice --profile=${SYNOPKG_PKGVAR} --webui-port=${WEBUI_PORT}"
+SERVICE_COMMAND="${QBITTORRENT} --confirm-legal-notice --profile=${SYNOPKG_PKGVAR} --webui-port=${SERVICE_PORT}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
@@ -41,7 +40,7 @@ service_postinst() {
         # Apply substitutions to config template
         sed -i -e "s|@download_dir@|${share_path}/complete|g" \
                -e "s|@incomplete_dir@|${share_path}/incomplete|g" \
-               -e "s|@webui_port@|${WEBUI_PORT}|g" \
+               -e "s|@webui_port@|${SERVICE_PORT}|g" \
                -e "s|@username@|${wizard_username}|g" \
                -e "s|@password_hash@|${password_hash}|g" \
                "${CFG_FILE}"
