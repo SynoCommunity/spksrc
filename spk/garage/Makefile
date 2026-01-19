@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 MAINTAINER = fgma
 DESCRIPTION = Garage is an S3-compatible distributed object storage service designed for self-hosting at a small-to-medium scale.
-DISPLAY_NAME = garage
+DISPLAY_NAME = Garage
 CHANGELOG = "Initial version"
 LICENSE_FILE = $(WORK_DIR)/garage/LICENSE
 HOMEPAGE = https://garagehq.deuxfleurs.fr/
