@@ -27,3 +27,4 @@ FWPORTS = src/garage.sc
 SPK_COMMANDS = bin/garage
 
 include ../../mk/spksrc.spk.mk
+
