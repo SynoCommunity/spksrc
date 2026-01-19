@@ -65,4 +65,3 @@ service_prestart ()
 
    SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/garage -c ${SHARE_PATH}/garage/garage.toml server"
 }
-

@@ -17,4 +17,3 @@ LICENSE  = AGPLv3.0
 RUST_SRC_DIR = $(WORK_DIR)/garage/src/garage
 
 include ../../mk/spksrc.cross-rust.mk
-
