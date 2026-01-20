@@ -26,4 +26,11 @@ FWPORTS = src/garage.sc
 
 SPK_COMMANDS = bin/garage
 
+POST_STRIP_TARGET = garage-extras-install
+
 include ../../mk/spksrc.spk.mk
+
+.PHONY: garage-extras-install
+garage-extras-install:
+	install -m 644 src/garage_config_template.toml $(STAGING_DIR)/
+
