@@ -5,6 +5,8 @@ GROUP="sc-garage"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
+# prevent openssl warnings on DSM6
+export RANDFILE=/dev/null
 
 service_postinst()
 {
@@ -40,3 +42,4 @@ service_prestart ()
 
    SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/garage -c ${SHARE_PATH}/garage/garage.toml server"
 }
+
