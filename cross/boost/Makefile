@@ -73,7 +73,7 @@ boost_configure:
 boost_pre_compile:
 	@# Recreate user-config.jam to include python-cc.mk on second run
 	@rm -rf $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-	@echo "using gcc : ${TC_GCC} : ${CXX} : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS) $(ADDITIONAL_CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
+	@$(RUN) sh -c 'echo "using gcc : ${TC_GCC} : $${CXX} : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS) $(ADDITIONAL_CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam'
 ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 	@echo "using python : $(PYTHON_VERSION) : : $(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 endif
