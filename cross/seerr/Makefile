@@ -92,6 +92,7 @@ seerr_install:
 	# ------------------------------------------------------------
 	$(RUN) rm -rf \
 		.next/cache \
+		.next/trace \
 		charts \
 		docs \
 		gen-docs \
