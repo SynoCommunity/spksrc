@@ -1,11 +1,11 @@
 SPK_NAME = zstd
-SPK_VERS = 1.5.5
+SPK_VERS = 1.5.7
 SPK_REV = 1
 SPK_ICON = src/zstd.png
 
 DEPENDS = cross/zstd
 
-MAINTAINER = stliu
+MAINTAINER = SynoCommunity
 DESCRIPTION = Zstandard is a fast compression algorithm, providing high compression ratios.
 DISPLAY_NAME = Zstandard
 STARTABLE = no

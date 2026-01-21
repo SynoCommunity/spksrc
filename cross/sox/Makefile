@@ -2,7 +2,7 @@ PKG_NAME = sox
 PKG_VERS = 14.4.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://sourceforge.net/projects/$(PKG_NAME)/files/sox/$(PKG_VERS)/
+PKG_DIST_SITE = https://sourceforge.net/projects/sox/files/sox/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/flac
@@ -14,5 +14,8 @@ COMMENT  = SoX is the Swiss Army Knife of sound processing utilities. It can con
 LICENSE  = GPL & LGPL v2
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-static
+
+ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk

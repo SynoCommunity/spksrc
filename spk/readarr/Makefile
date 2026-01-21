@@ -1,18 +1,18 @@
 SPK_NAME = readarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 3
+SPK_REV = 5
 SPK_ICON = src/readarr.png
 
 OPTIONAL_DEPENDS = cross/libstdc++
 DEPENDS = cross/readarr
 
 # Arch exclusions for dotnet 6.0
-DOTNET_SERVARR_ARCHS = 1
+DOTNET_SERVARR_ARCHS = 2
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION  = Readarr is an ebook and audiobook collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new books from your favorite authors and will grab, sort, and rename them.
-CHANGELOG = "1. Update Readarr to v0.3.14.2358."
+CHANGELOG = "1. Update Readarr to v0.4.16.2793."
 DISPLAY_NAME = Readarr
 HOMEPAGE = https://readarr.com/
 LICENSE  = GPLv3

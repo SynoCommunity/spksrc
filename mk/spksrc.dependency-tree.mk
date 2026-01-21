@@ -23,7 +23,7 @@
 .PHONY: dependency-tree
 dependency-tree:
 	@echo $$(perl -e 'print "\\\t" x $(MAKELEVEL),"\n"')+ $(NAME) $(PKG_VERS)
-	@for depend in $$(echo "$(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)" | tr ' ' '\n' | sort -u | tr '\n' ' ') ; \
+	@for depend in $$(echo "$(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)" | tr ' ' '\n' | sort -u | tr '\n' ' ') ; \
 	do \
 	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-tree ; \
 	done
@@ -32,20 +32,38 @@ dependency-tree:
 .PHONY: dependency-list
 dependency-list:
 	@echo -n "$(NAME): "
-	@$(MAKE) -s dependency-flat | grep -P "^(cross|native)" | sort -u | tr '\n' ' \0'
+	@$(MAKE) -s dependency-flat | grep -P "^(cross|python|native)" | sort -u | tr '\n' ' \0'
 	@echo ""
 
 
+HEAD_DIR = $$(echo $(CURDIR) | grep -Po '/\K(spk|cross|python|native|diyspk|toolchain)/.*')
+TMP_DONE ?= /tmp/spksrc-dependency-flat-done
+
 .PHONY: dependency-flat
 dependency-flat:
-	@echo "$(CURDIR)" | grep -Po "/\K(spk|cross|native|diyspk|toolchain)/.*"
-	@for depend in $$(echo "$(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)" | tr ' ' '\n' | sort -u | tr '\n' ' ') ; \
-	do \
-	  DEPENDENCY_WALK=1 $(MAKE) -s -C ../../$$depend dependency-flat ; \
-	done
+	@rm -rf $(TMP_DONE)
+	@mkdir -p $(TMP_DONE)
+	@echo $(HEAD_DIR)
+	@$(MAKE) -s _dependency-flat-parallel DIR=$(CURDIR) DEPENDENCY_WALK=1 | sort -u | grep -v -F "$(HEAD_DIR)"
+	@rm -rf $(TMP_DONE)
 
+.PHONY: _dependency-flat-parallel
+_dependency-flat-parallel:
+	@mkdir -p $(TMP_DONE)
+	@KEY=$$(echo $(CURDIR) | grep -Po '/\K(spk|cross|python|native|diyspk|toolchain)/.*' | tr '/' '_'); \
+	if [ ! -f "$(TMP_DONE)/$$KEY" ]; then \
+		DEPS="$$(echo "$(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS)" | tr ' ' '\n' | sort -u)"; \
+		PIDS=""; \
+		for dep in $$DEPS; do \
+			DEP_KEY=$$(echo "$$dep" | tr '/' '_'); \
+			if [ -d ../../$$dep ] && [ ! -f "$(TMP_DONE)/$$DEP_KEY" ]; then \
+				$(MAKE) -s -C ../../$$dep _dependency-flat-parallel DEPENDENCY_WALK=1 & \
+				PIDS="$$PIDS $$!"; \
+			fi; \
+		done; \
+		for pid in $$PIDS; do wait $$pid; done; \
+		touch "$(TMP_DONE)/$$KEY"; \
+		echo "$$(echo $(CURDIR) | grep -Po '/\K(spk|cross|python|native|diyspk|toolchain)/.*')"; \
+	fi
 
-.PHONY: dependency-kernel-list
-dependency-kernel-list:
-	@echo -n "$(NAME): "
-	@echo "$(KERNEL_MODULE_DEPEND)"
+### 

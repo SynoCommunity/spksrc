@@ -1,0 +1,20 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -1872,7 +1872,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
+ 
+ EXTERNAL_LIBRARY_NONFREE_LIST="
+     decklink
+-    libfdk_aac
+     libtls
+ "
+ 
+@@ -1912,6 +1911,7 @@ EXTERNAL_LIBRARY_LIST="
+     libcodec2
+     libdav1d
+     libdc1394
++    libfdk_aac
+     libflite
+     libfontconfig
+     libfreetype

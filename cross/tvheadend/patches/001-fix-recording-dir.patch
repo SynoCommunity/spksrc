@@ -1,12 +1,12 @@
 # This ensures that the default recording directory is not placed in package system directories, independent of the DSM version
---- src/dvr/dvr_config.c.orig	2018-02-27 18:58:45.957196424 +0100
-+++ src/dvr/dvr_config.c	2018-02-27 19:00:17.210138337 +0100
-@@ -282,7 +282,7 @@
+--- src/dvr/dvr_config.c.orig	2024-06-15 07:32:43.000000000 +0000
++++ src/dvr/dvr_config.c	2024-06-17 00:44:57.198422104 +0000
+@@ -289,7 +289,7 @@ dvr_config_storage_check(dvr_config_t *c
+     return;
  
    /* Try to figure out a good place to put them videos */
- 
--  homedir = getenv("HOME");
-+  homedir = "/usr/local/tvheadend/var";
- 
-   if(homedir != NULL) {
-     snprintf(buf, sizeof(buf), "%s/Videos", homedir);
+-  snprintf(home_dir, sizeof(home_dir), "%s/Videos", getenv("HOME"));
++  snprintf(home_dir, sizeof(home_dir), "%s/Videos", "/var/packages/tvheadend/var");
+   xdg_dir = hts_settings_get_xdg_dir_with_fallback("VIDEOS", home_dir);
+   if (xdg_dir != NULL) {
+     if (stat(xdg_dir, &st) == 0) {

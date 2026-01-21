@@ -13,11 +13,9 @@ SVC_WRITE_PID=y
 
 service_postinst ()
 {
-    echo HOME="${SYNOPKG_PKGVAR}"                           >> ${INST_VARIABLES}
-    echo WIZARD_DATA_VOLUME="${wizard_data_volume}"         >> ${INST_VARIABLES}
-    echo WIZARD_DATA_DIRECTORY="${wizard_data_directory}"   >> ${INST_VARIABLES}
-    echo MINIO_ROOT_USER="${wizard_root_user}"              >> ${INST_VARIABLES}
-    echo MINIO_ROOT_PASSWORD="${wizard_root_password}"      >> ${INST_VARIABLES}
+   echo HOME="${SYNOPKG_PKGVAR}"                           >> ${INST_VARIABLES}
+   echo MINIO_ROOT_USER="${wizard_root_user}"              >> ${INST_VARIABLES}
+   echo MINIO_ROOT_PASSWORD="${wizard_root_password}"      >> ${INST_VARIABLES}
 }
 
 # function to read and export variables from a text file
@@ -38,11 +36,11 @@ export_variables_from_file ()
 
 service_prestart ()
 {
-    # Reload wizard variables stored by postinst
-    export_variables_from_file "${INST_VARIABLES}"
+   # Reload wizard variables stored by postinst
+   export_variables_from_file "${INST_VARIABLES}"
 
-    # Load custom variables
-    export_variables_from_file "${ENV_VARIABLES}"
+   # Load custom variables
+   export_variables_from_file "${ENV_VARIABLES}"
 
-    SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/minio server --quiet --console-address :${CONSOLE_PORT} --anonymous ${WIZARD_DATA_VOLUME}/${WIZARD_DATA_DIRECTORY}"
+   SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/minio server --quiet --console-address :${CONSOLE_PORT} --anonymous ${SHARE_PATH}"
 }

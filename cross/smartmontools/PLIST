@@ -1,0 +1,7 @@
+lnk:sbin/smartctl7
+bin:sbin/smartctl
+bin:sbin/smartd
+rsc:sbin/update-smart-drivedb
+rsc:share/smartmontools/drivedb.h
+rsc:var/smartd.conf
+rsc:var/smartd_warning.sh

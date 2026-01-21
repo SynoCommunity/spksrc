@@ -1,0 +1,10 @@
+pip==24.3.1
+setuptools==78.1.0
+wheel==0.45.1
+#
+cross:build==1.2.2.post1
+build:Cython==3.0.11
+build:meson-python==0.18.0
+build:scikit-build==0.18.1
+build:scikit-build-core==0.11.4
+build:setuptools-scm==8.3.1

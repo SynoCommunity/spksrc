@@ -1,0 +1,64 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2024 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+/*========================== begin_copyright_notice ============================
+
+Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+See https://llvm.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 with LLVM-exception
+
+============================= end_copyright_notice ===========================*/
+
+From d39249a7ba290d8b6b57a12cb9860682f34c1952 Mon Sep 17 00:00:00 2001
+From: Florian Hahn <flo@fhahn.com>
+Date: Mon, 10 Oct 2022 20:42:18 +0100
+Subject: [PATCH 2/5] [SCEV] Verify block disposition cache.
+
+This extends the existing SCEV verification to catch cache invalidation
+issues as in #57837.
+
+The validation logic is similar to the recently added loop disposition
+cache validation in bb68b2402daa9.
+
+Reviewed By: nikic
+
+Differential Revision: https://reviews.llvm.org/D134531
+---
+ llvm/lib/Analysis/ScalarEvolution.cpp | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/llvm/lib/Analysis/ScalarEvolution.cpp b/llvm/lib/Analysis/ScalarEvolution.cpp
+index 1d887d4b60c9..495cd73d8eef 100644
+--- a/llvm/lib/Analysis/ScalarEvolution.cpp
++++ b/llvm/lib/Analysis/ScalarEvolution.cpp
+@@ -13467,6 +13467,22 @@ void ScalarEvolution::verify() const {
+       }
+     }
+   }
++
++  // Verify integrity of the block disposition cache.
++  for (const auto &It : BlockDispositions) {
++    const SCEV *S = It.first;
++    auto &Values = It.second;
++    for (auto &V : Values) {
++      auto CachedDisposition = V.getInt();
++      const BasicBlock *BB = V.getPointer();
++      const auto RecomputedDisposition = SE2.getBlockDisposition(S, BB);
++      if (CachedDisposition != RecomputedDisposition) {
++        dbgs() << "Cached disposition of " << *S << " for block %"
++               << BB->getName() << " is incorrect! \n";
++        std::abort();
++      }
++    }
++  }
+ }
+ 
+ bool ScalarEvolution::invalidate(
+-- 
+2.34.1
+

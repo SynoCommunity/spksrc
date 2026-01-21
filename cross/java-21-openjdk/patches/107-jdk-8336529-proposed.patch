@@ -1,0 +1,57 @@
+https://sources.debian.org/src/openjdk-21/21.0.5+11-1/debian/patches/jdk-8336529-proposed.patch
+
+Description: (fs) UnixFileAttributeViews setTimes() failing on armhf, Ubuntu noble
+ time_t transition in Debian/Ubuntu left 32 bit time_t symbols in glibc.
+ Looking up 'futimens' via dlsym returns 32 bit version of the function.
+ This is causing failure to set last modified time
+ (e.g. instead of year 2017 we get 1976 in the test).
+ Using the function directly correctly calls 64 bit versions.
+ When we lookup functions with time_t arguments through dlsym()
+ calls we should use 64 bit versions.
+Author: Vladimir Petko <vladimir.petko@canonical.com>
+Origin: upstream, https://github.com/openjdk/jdk/pull/20208
+Bug: https://bugs.openjdk.org/browse/JDK-8336529
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/openjdk-23/+bug/2073335
+Last-Update: 2024-07-17
+---
+
+--- a/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c
++++ b/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c
+@@ -281,6 +281,20 @@ static int fstatat64_wrapper(int dfd, co
+ }
+ #endif
+ 
++/**
++ * Lookup time functions symbols, trying 64 bit version first
++ */
++static void* lookup_time_function(const char* symbol64, const char* symbol) {
++    void* ret = NULL;
++    if (sizeof(time_t) > 4) {
++        ret = dlsym(RTLD_DEFAULT, symbol64);
++    }
++    if (ret == NULL) {
++        ret = dlsym(RTLD_DEFAULT, symbol);
++    }
++    return ret;
++}
++
+ #if defined(__linux__)
+ static int statx_wrapper(int dirfd, const char *restrict pathname, int flags,
+                          unsigned int mask, struct my_statx *restrict statxbuf) {
+@@ -385,10 +399,13 @@ Java_sun_nio_fs_UnixNativeDispatcher_ini
+     my_unlinkat_func = (unlinkat_func*) dlsym(RTLD_DEFAULT, "unlinkat");
+     my_renameat_func = (renameat_func*) dlsym(RTLD_DEFAULT, "renameat");
+ #ifndef _ALLBSD_SOURCE
+-    my_futimesat_func = (futimesat_func*) dlsym(RTLD_DEFAULT, "futimesat");
+-    my_lutimes_func = (lutimes_func*) dlsym(RTLD_DEFAULT, "lutimes");
++    my_futimesat_func = (futimesat_func*) lookup_time_function("__futimesat64",
++        "futimesat");
++    my_lutimes_func = (lutimes_func*) lookup_time_function("__lutimes64",
++        "lutimes");
+ #endif
+-    my_futimens_func = (futimens_func*) dlsym(RTLD_DEFAULT, "futimens");
++    my_futimens_func = (futimens_func*) lookup_time_function("__futimens64",
++        "futimens");
+ #if defined(_AIX)
+     my_fdopendir_func = (fdopendir_func*) dlsym(RTLD_DEFAULT, "fdopendir64");
+ #else

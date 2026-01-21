@@ -1,0 +1,33 @@
+{
+    "mariadb10-db": {
+        "admin-account-m10": "root",
+        "admin-account-m5": "root",
+        "admin-pw-m10": "{{wizard_mysql_password_root}}",
+        "admin-pw-m5": "{{wizard_mariadb5_password_root}}",
+        "create-db": {
+            "db-collision": "skip",
+            "db-name": "wallabag",
+            "flag": "{{wizard_create_db}}"
+        },
+        "drop-db-inst": {
+            "db-name": "wallabag",
+            "flag": "{{wizard_run_migration}}",
+            "ver": "m5"
+        },
+        "drop-db-uninst": true,
+        "drop-user-uninst": true,
+        "grant-user": {
+            "db-name": "wallabag",
+            "flag": "{{mysql_grant_user}}",
+            "host": "localhost",
+            "user-name": "wallabag",
+            "user-pw": "{{wizard_mysql_database_password}}"
+        },
+        "migrate-db": {
+            "db-collision": "replace",
+            "flag": "{{wizard_run_migration}}",
+            "m10-db-name": "wallabag",
+            "m5-db-name": "wallabag"
+        }
+    }
+}

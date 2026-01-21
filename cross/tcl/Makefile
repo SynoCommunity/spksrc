@@ -1,5 +1,5 @@
 PKG_NAME = tcl
-PKG_VERS = 8.6.13
+PKG_VERS = 8.6.14
 PKG_MAIN_VERS=$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)$(PKG_VERS)-src.$(PKG_EXT)

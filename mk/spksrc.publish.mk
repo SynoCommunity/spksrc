@@ -57,7 +57,7 @@ endif
 ifeq ($(PUBLISH_API_KEY),)
 	$(error Set PUBLISH_API_KEY in local.mk)
 endif
-	@response=$$(http --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME) --print=hb) ; \
+	@response=$$(PYTHONPATH= http --verify=no --ignore-stdin --auth $(PUBLISH_API_KEY): POST $(PUBLISH_URL)/packages @$(SPK_FILE_NAME) --print=hb) ; \
 	response_code=$$(echo "$$response" | grep -Fi "HTTP/1.1" | awk '{print $$2}') ; \
 	if [ "$$response_code" = "201" ] ; then \
 		output=$$(echo "$$response" | awk '/^[[:space:]]*$$/ {p=1;next} p') ; \

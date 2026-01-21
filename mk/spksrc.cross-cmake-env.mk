@@ -1,3 +1,8 @@
+# CMake cross-compilation definitions
+
+# Force CMake environment, bypassing default autotools settings.
+DEFAULT_ENV ?= cmake
+
 # By default use cmake toolchain
 # for cross-compiling
 ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),)
@@ -6,10 +11,13 @@ endif
 
 # We normally build regular Release
 ifeq ($(strip $(CMAKE_BUILD_TYPE)),)
-CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release
-else
-CMAKE_ARGS += -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
+  ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+    CMAKE_BUILD_TYPE = Debug
+  else
+    CMAKE_BUILD_TYPE = Release
+  endif
 endif
+CMAKE_ARGS += -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE)
 
 # Set the default install prefix
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
@@ -32,52 +40,34 @@ CMAKE_FIND_ROOT_PATH_MODE_LIBRARY = ONLY
 CMAKE_FIND_ROOT_PATH_MODE_INCLUDE = ONLY
 CMAKE_INSTALL_RPATH = $(INSTALL_PREFIX)/lib
 CMAKE_INSTALL_RPATH_USE_LINK_PATH = TRUE
-CMAKE_BUILD_WITH_INSTALL_RPATH = TRUE
 
 # Allow building shared libraries to be manually set
-ifeq ($(filter -DBUILD_SHARED_LIBS%,$(CMAKE_ARGS)),)
+ifeq ($(or $(filter -DBUILD_SHARED_LIBS%,$(CMAKE_ARGS)),$(strip $(BUILD_SHARED_LIBS))),)
 BUILD_SHARED_LIBS = ON
 endif
-
-# Configuration for CMake build
-CMAKE_TOOLCHAIN_NAME = $(ARCH)-toolchain.cmake
-CMAKE_TOOLCHAIN_WRK = $(WORK_DIR)/tc_vars.cmake
-CMAKE_TOOLCHAIN_PKG = $(WORK_DIR)/$(PKG_DIR)/$(CMAKE_TOOLCHAIN_NAME)
-
-# Ensure to unset cross-compiler target toolchain
-# so host toolset can be available to CMAKE
-ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
-ENV := -u AR -u AS -u CC -u CPP -u CXX -u LD -u NM -u OBJDUMP -u RANLIB -u READELF -u STRIP -u CFLAGS -u CPPFLAGS -u CXXFLAGS -u LDFLAGS $(ENV)
 
 # "legacy" mode
 # Otherwise mimic autoconf cross-compiling
 # by hiding host tools and enforce using
 # target cross-compilers & tools
-else
-CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
-CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=$(CMAKE_SYSTEM_NAME)
-CMAKE_ARGS += -D_CMAKE_TOOLCHAIN_LOCATION=$(_CMAKE_TOOLCHAIN_LOCATION)
-CMAKE_ARGS += -D_CMAKE_TOOLCHAIN_PREFIX=$(_CMAKE_TOOLCHAIN_PREFIX)
-CMAKE_ARGS += -DCMAKE_FIND_ROOT_PATH=$(CMAKE_FIND_ROOT_PATH)
-CMAKE_ARGS += -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=$(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
-CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(CMAKE_INSTALL_RPATH)
-CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=$(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
-CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=$(CMAKE_BUILD_WITH_INSTALL_RPATH)
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=$(BUILD_SHARED_LIBS)
+ifneq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
+  CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
+  CMAKE_ARGS += -DCMAKE_SYSTEM_NAME=$(CMAKE_SYSTEM_NAME)
+  CMAKE_ARGS += -D_CMAKE_TOOLCHAIN_LOCATION=$(_CMAKE_TOOLCHAIN_LOCATION)
+  CMAKE_ARGS += -D_CMAKE_TOOLCHAIN_PREFIX=$(_CMAKE_TOOLCHAIN_PREFIX)
+  CMAKE_ARGS += -DCMAKE_FIND_ROOT_PATH=$(CMAKE_FIND_ROOT_PATH)
+  CMAKE_ARGS += -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=$(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
+  CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(CMAKE_INSTALL_RPATH)
+  CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=$(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+  ifneq ($(strip $(BUILD_SHARED_LIBS)),)
+    CMAKE_ARGS += -DBUILD_SHARED_LIBS=$(BUILD_SHARED_LIBS)
+  endif
 endif
 
 # Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   BUILD_DEPENDS += native/cmake
   CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake/work-native/install/usr/local/bin)
-  ENV += PATH=$(CMAKE_PATH):$$PATH
-  export PATH := $(CMAKE_PATH):$(PATH)
-endif
-
-# Use native cmake (Debian 10 "Buster")
-ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
-  BUILD_DEPENDS += native/cmake-legacy
-  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-legacy/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
@@ -102,12 +92,18 @@ endif
 ifeq ($(strip $(CMAKE_USE_NASM)),1)
   # Define x86asm
   ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-  DEPENDS += native/nasm
-  NASM_PATH = $(abspath $(CURDIR)/../../native/nasm/work-native/install/usr/local/bin)
-  ENV += PATH=$(NASM_PATH):$$PATH
-  ENV += AS=$(NASM_PATH)/nasm
-  ENABLE_ASSEMBLY = ON
-  CMAKE_ASM_COMPILER = $(NASM_PATH)/nasm
+    HOST_NASM = $(shell command -v nasm 2>/dev/null)
+    ENABLE_ASSEMBLY = ON
+    ifneq ($(HOST_NASM),)
+      ENV += AS=$(HOST_NASM)
+      CMAKE_ASM_COMPILER = $(HOST_NASM)
+    else
+      DEPENDS += native/nasm
+      NASM_PATH = $(abspath $(CURDIR)/../../native/nasm/work-native/install/usr/local/bin)
+      ENV += PATH=$(NASM_PATH):$$PATH
+      ENV += AS=$(NASM_PATH)/nasm
+      CMAKE_ASM_COMPILER = $(NASM_PATH)/nasm
+    endif
   endif
 else
   CMAKE_USE_NASM = 0
@@ -144,7 +140,6 @@ ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
   CMAKE_SYSTEM_PROCESSOR = aarch64
-  CROSS_COMPILE_ARM = ON
   CMAKE_CXX_FLAGS += -fPIC
 endif
 ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
@@ -166,6 +161,10 @@ ifneq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
 CMAKE_ARGS += -DCMAKE_SYSTEM_PROCESSOR=$(CMAKE_SYSTEM_PROCESSOR)
 CMAKE_ARGS += -DCMAKE_C_FLAGS="$(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS)"
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS="$(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS)"
+ifeq ($(GCC_DEBUG_INFO),1)
+CMAKE_ARGS += -DCMAKE_C_FLAGS_DEBUG="$(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS) $(GCC_DEBUG_FLAGS)"
+CMAKE_ARGS += -DCMAKE_CXX_FLAGS_DEBUG="$(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS) $(GCC_DEBUG_FLAGS)"
+endif
 
 ifneq ($(strip $(CROSS_COMPILE_ARM)),)
 CMAKE_ARGS += -DCROSS_COMPILE_ARM=$(CROSS_COMPILE_ARM)

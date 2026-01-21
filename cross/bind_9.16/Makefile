@@ -1,13 +1,13 @@
 PKG_NAME = bind
-PKG_VERS = 9.16.45
+PKG_VERS = 9.16.50
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# This is the latest version that builds for ARMv5 archs.
+# This is the latest version that builds for ARMv5_ARCHS, ARMv7L_ARCHS and x86-5.2
 
-DEPENDS = cross/libuv
+DEPENDS  = cross/libuv_1.34
 DEPENDS += cross/openssl3
 DEPENDS += cross/readline
 DEPENDS += cross/jemalloc
@@ -15,7 +15,6 @@ DEPENDS += cross/libxml2
 
 OPTIONAL_DEPENDS = cross/libcap cross/libcap_2.51
 
-# by cross/libuv
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.archs.mk
@@ -47,7 +46,7 @@ CONFIGURE_ARGS += BUILD_LIBS="$(LIBS)"
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: bind_pre_compile
+# compile gen tool with host compiler to run in build environment
 bind_pre_compile:
 	@$(MSG) Build gen tool for host
-	# compile gen tool with host compiler to run in build environment
 	cd $(WORK_DIR)/$(PKG_DIR)/lib/dns; gcc -I../../lib/isc/include -o gen ./gen.c

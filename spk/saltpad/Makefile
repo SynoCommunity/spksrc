@@ -26,8 +26,8 @@ CONF_DIR         = src/conf/
 
 POST_STRIP_TARGET = saltpad_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+# Pure Python package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

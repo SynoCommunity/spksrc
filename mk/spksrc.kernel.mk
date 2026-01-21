@@ -1,47 +1,87 @@
-###
 
-KERNEL_REQUIRED = $(MAKE) kernel-required
-ifeq ($(strip $(KERNEL_REQUIRED)),)
-ALL_ACTION = $(sort $(basename $(subst -,.,$(basename $(subst .,,$(ARCHS_WITH_KERNEL_SUPPORT))))))
+# Constants
+default: all
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
+include ../../mk/spksrc.directories.mk
+
+# Common kernel variables
+include ../../mk/spksrc.kernel-flags.mk
+
+# Configure the included makefiles
+NAME          = $(KERNEL_NAME)
+URLS          = $(KERNEL_DIST_SITE)/$(KERNEL_DIST_NAME)
+COOKIE_PREFIX = $(PKG_NAME)-
+
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+PKG_NAME      = linux-$(subst syno-,,$(NAME))
+PKG_DIR       = $(PKG_NAME)
+else
+PKG_NAME      = linux
+PKG_DIR       = $(PKG_NAME)
 endif
 
-#### used as subroutine to test whether any dependency has REQUIRE_KERNEL defined
+ifneq ($(KERNEL_DIST_FILE),)
+LOCAL_FILE    = $(KERNEL_DIST_FILE)
+# download.mk uses PKG_DIST_FILE
+PKG_DIST_FILE = $(KERNEL_DIST_FILE)
+else
+LOCAL_FILE    = $(KERNEL_DIST_NAME)
+endif
+DISTRIB_DIR   = $(KERNEL_DIR)/$(KERNEL_VERS)
+DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
+DIST_EXT      = $(KERNEL_EXT)
+EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components=$(KERNEL_STRIP) $(KERNEL_PREFIX)
 
-.PHONY: kernel-required
-kernel-required:
-	@if [ -n "$(REQUIRE_KERNEL)" -o -n "$(REQUIRE_KERNEL_MODULE)" ]; then \
-	  exit 1 ; \
-	fi
-	@for depend in $(BUILD_DEPENDS) $(DEPENDS) ; do \
-	  if $(MAKE) --no-print-directory -C ../../$$depend kernel-required >/dev/null 2>&1 ; then \
-	    exit 0 ; \
-	  else \
-	    exit 1 ; \
-	  fi ; \
-	done
+#####
 
-####
+# Prior to interacting with the kernel files
+# move the kernel source tree to its final destination
+POST_EXTRACT_TARGET      = kernel_post_extract_target
 
-kernel-modules-%: SHELL:=/bin/bash
-kernel-modules-%:
-	@if [ "$(filter $(DEFAULT_TC),lastword $(subst -, ,$(MAKECMDGOALS)))" ]; then \
-	   archs2process="$(filter $(addprefix %-,$(SUPPORTED_KERNEL_VERSIONS)),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
-	elif [ "$(filter $(GENERIC_ARCHS),$(subst -, ,$(MAKECMDGOALS)))" ]; then \
-	   archs2process="$(filter $(addprefix %-,$(lastword $(subst -, ,$(MAKECMDGOALS)))),$(filter $(addsuffix -$(word 1,$(subst ., ,$(word 2,$(subst -, ,$*))))%,$(shell sed -n -e '/TC_ARCH/ s/.*= *//p' ../../toolchain/syno-$*/Makefile)), $(LEGACY_ARCHS)))" ; \
-	else \
-	   archs2process=$* ; \
-	fi ; \
-	$(MSG) ARCH to be processed: $${archs2process} ; \
-	set -e ; \
-	for arch in $${archs2process} ; do \
-	  $(MSG) "Processing $${arch} ARCH" ; \
-	  MAKEFLAGS= $(PSTAT_TIME) $(MAKE) WORK_DIR=$(CURDIR)/work-$* ARCH=$$(echo $${arch} | cut -f1 -d-) TCVERSION=$$(echo $${arch} | cut -f2 -d-) strip 2>&1 | tee --append build-$*-kernel-modules.log ; \
-	  [ $${PIPESTATUS[0]} -eq 0 ] || false ; \
-	  $(MAKE) spkclean ; \
-	  rm -fr $(CURDIR)/work-$*/$(addprefix linux-, $${arch}) ; \
-	  $(MAKE) -C ../../toolchain/syno-$${arch} clean ; \
-	done
+# By default do not install kernel headers
+INSTALL_TARGET           = nop
 
-kernel-arch-%:
-	$(MAKE) $(addprefix kernel-modules-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
-	$(MAKE) REQUIRE_KERNEL_MODULE= REQUIRE_KERNEL= WORK_DIR=$(CURDIR)/work-$* $(addprefix build-arch-, $*)
+#####
+
+TC ?= syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+
+#####
+
+include ../../mk/spksrc.cross-env.mk
+
+include ../../mk/spksrc.download.mk
+
+checksum: download
+include ../../mk/spksrc.checksum.mk
+
+extract: checksum
+include ../../mk/spksrc.extract.mk
+
+patch: extract
+include ../../mk/spksrc.patch.mk
+
+kernel_configure: patch
+include ../../mk/spksrc.cross-kernel-configure.mk
+
+kernel_module: kernel_configure
+include ../../mk/spksrc.cross-kernel-module.mk
+
+install: kernel_module
+include ../../mk/spksrc.cross-kernel-headers.mk
+
+install: kernel_headers
+include ../../mk/spksrc.install.mk
+
+plist: install
+include ../../mk/spksrc.plist.mk
+
+.PHONY: kernel_post_extract_target
+kernel_post_extract_target:
+	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/$(PKG_DIR)
+
+all: install plist
+
+# Common rules makefiles
+include ../../mk/spksrc.common-rules.mk

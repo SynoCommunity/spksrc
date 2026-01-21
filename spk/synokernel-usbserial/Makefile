@@ -1,9 +1,9 @@
 SPK_NAME = synokernel-usbserial
-SPK_VERS = 1.1
-SPK_REV = 8
-SPK_ICON = src/$(SPK_NAME).png
+SPK_VERS = 1.2
+SPK_REV = 10
+SPK_ICON = src/synokernel-usbserial.png
 
-DEPENDS = 
+DEPENDS =
 
 REQUIRE_KERNEL ?= 1
 REQUIRE_KERNEL_MODULE  = CONFIG_USB_SERIAL_OPTION:drivers/usb/serial:usbserial
@@ -15,10 +15,13 @@ REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_PL2303:drivers/usb/serial:pl2303
 REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_TI:drivers/usb/serial:ti_usb_3410_5052
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko"
-CHANGELOG = "1. Synology Kernel USB serial drivers<br/>2. Update kernel module build framework<br/>3. Fixes for many unsupported archs"
+DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko."
+CHANGELOG = "Add support for Linux 5.x kernels."
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+# we only have ipq806x for SRM 1.2, but this fails with:
+# /usr/bin/ld: scripts/dtc/dtc-parser.tab.o:(.bss+0x10): multiple definition of `yylloc'; scripts/dtc/dtc-lexer.lex.o:(.bss+0x0): first defined here
+REQUIRED_MIN_SRM = 1.3
 
 STARTABLE = no
 DISPLAY_NAME = SynoKernel USB Serial drivers
@@ -28,10 +31,15 @@ LICENSE  = GPLv2
 
 SPK_DEPENDS = synocli-kernel
 
-STRIP_TARGET = nop
+STRIP_TARGET = usbserial_strip
 POST_STRIP_TARGET = usbserial_extra_install
 
 include ../../mk/spksrc.spk.mk
+
+.PHONY: usbserial_strip
+usbserial_strip:
+	@$(MSG) Strip debug symbols in kernel modules
+	find $(STAGING_DIR) -type f -name "*.ko" -exec $(STRIP) --strip-debug {} \;
 
 .PHONY: usbserial_extra_install
 usbserial_extra_install:

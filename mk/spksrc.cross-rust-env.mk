@@ -1,5 +1,6 @@
-# Configuration for rust compiler
-#
+# rustc cross-compilation definitions
+
+RUSTUP_QORIQ_TOOLCHAIN = 1.82.0
 
 ifeq ($(RUSTUP_DEFAULT_TOOLCHAIN),)
 RUSTUP_DEFAULT_TOOLCHAIN = stable
@@ -7,8 +8,14 @@ endif
 
 # Set to 1 to force building from
 # source Tier-3 toolchains (qoriq)
+# ref: https://rustc-dev-guide.rust-lang.org/building/how-to-build-and-run.html
 ifeq ($(RUST_BUILD_TOOLCHAIN),)
 RUST_BUILD_TOOLCHAIN = 0
+endif
+
+# Versions available: https://releases.rs/docs/
+ifeq ($(RUST_BUILD_VERSION),)
+RUST_BUILD_VERSION = $(RUSTUP_QORIQ_TOOLCHAIN)
 endif
 
 # Enforce using newer cmake when building Tier-3 toolchains
@@ -23,7 +30,9 @@ endif
 # When calling directly from toolchain/syno-<arch>-<version>
 # ARCH variable is still unset thus using $(TC_ARCH) although
 # in generic archs we must rely on $(TC_NANE)
+ifneq ($(ARCH),noarch)
 RUST_ARCH = $(or $(ARCH),$(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))
+endif
 
 # When building toolchain Tier-3 arch support
 #   While stage-2 is the truly current compiler, stage-1 suffice our needs
@@ -32,6 +41,7 @@ RUSTUP_DEFAULT_TOOLCHAIN_STAGE = 2
 
 # map archs to rust targets
 ifeq ($(findstring $(RUST_ARCH), $(ARMv5_ARCHS)),$(RUST_ARCH))
+RUSTUP_DEFAULT_TOOLCHAIN = 1.77.2
 RUST_TARGET = armv5te-unknown-linux-gnueabi
 endif
 ifeq ($(findstring $(RUST_ARCH), $(ARMv7_ARCHS)),$(RUST_ARCH))
@@ -45,7 +55,7 @@ RUST_TARGET = aarch64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(RUST_ARCH), $(PPC_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = powerpc-unknown-linux-gnuspe
-TC_RUSTUP_TOOLCHAIN = stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)-$(RUST_TARGET)
+TC_RUSTUP_TOOLCHAIN = stable-$(RUSTUP_QORIQ_TOOLCHAIN)-$(RUST_TARGET)
 endif
 ifeq ($(findstring $(RUST_ARCH), $(x64_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = x86_64-unknown-linux-gnu

@@ -1,5 +1,5 @@
 PKG_NAME = nasm
-PKG_VERS = 2.16.01
+PKG_VERS = 2.16.03
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://fossies.org/linux/misc

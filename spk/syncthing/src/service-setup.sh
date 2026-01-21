@@ -1,5 +1,7 @@
 # syncthing service definition
 SYNCTHING="${SYNOPKG_PKGDEST}/bin/syncthing"
+# file with additional options
+SYNCTHING_OPTIONS_FILE=${SYNOPKG_PKGVAR}/options.conf
 # define folder for configuration (config, keys, database, logs)
 SYNCTHING_CONFIG="--config=${SYNOPKG_PKGVAR} --data=${SYNOPKG_PKGVAR}"
 SERVICE_COMMAND="${SYNCTHING} serve ${SYNCTHING_CONFIG}"
@@ -27,19 +29,46 @@ service_postinst() {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_credentials
     fi
+    
+    if [ "${SYNOPKG_DSM_ARCH}" == "88f628x" ]; then
+        # disable auto update for AMRv5 archs
+        comment="disable auto update for ${SYNOPKG_DSM_ARCH} arch"
+        if [ -r ${SYNCTHING_OPTIONS_FILE} ]; then
+            if grep -q "^SYNCTHING_OPTIONS=" "${SYNCTHING_OPTIONS_FILE}"; then
+                options=$(grep '^SYNCTHING_OPTIONS=' ${SYNCTHING_OPTIONS_FILE} | cut -d= -f2 | tr -d '"')
+                if [[ "${options}" == *"--no-upgrade"* ]]; then
+                    echo "- 'auto update' option is already disabled for ${SYNOPKG_DSM_ARCH} arch"
+                else
+                    echo "- Patch ${SYNCTHING_OPTIONS_FILE} to ${comment}"
+                    sed "s/^SYNCTHING_OPTIONS=.*/SYNCTHING_OPTIONS=\"${options} --no-upgrade\"/" -i ${SYNCTHING_OPTIONS_FILE}
+                fi
+            elif grep -q "#SYNCTHING_OPTIONS=" "${SYNCTHING_OPTIONS_FILE}"; then
+                # commented SYNCTHING_OPTIONS defined, append line to disable auto update
+                echo "- Patch ${SYNCTHING_OPTIONS_FILE} to add option to ${comment}"
+                sed '/#SYNCTHING_OPTIONS=.*/a SYNCTHING_OPTIONS="--no-upgrade"' -i ${SYNCTHING_OPTIONS_FILE}
+            else
+                echo "- Add option in ${SYNCTHING_OPTIONS_FILE} to ${comment}"
+                echo "SYNCTHING_OPTIONS=\"--no-upgrade\"" >>  ${SYNCTHING_OPTIONS_FILE}
+            fi
+        else
+            # create options file (should not occur, since such a file was just installed)
+            echo "- Create ${SYNCTHING_OPTIONS_FILE} with option to ${comment}"
+            echo "SYNCTHING_OPTIONS=\"--no-upgrade\"" > ${SYNCTHING_OPTIONS_FILE}
+        fi
+    fi
 }
 
 service_prestart ()
 {
     # Read additional startup options and variables from var/options.conf
-    if [ -f ${SYNOPKG_PKGVAR}/options.conf ]; then
-        . ${SYNOPKG_PKGVAR}/options.conf
+    if [ -r ${SYNCTHING_OPTIONS_FILE} ]; then
+        . ${SYNCTHING_OPTIONS_FILE}
         SERVICE_COMMAND="${SERVICE_COMMAND} ${SYNCTHING_OPTIONS}"
     fi
 
     # Required to run any syncthing command: set $HOME environment variable
     if [ -z "${HOME}" ]; then
-        # if HOME is not set in options.conf
+        # if HOME is not set in ${SYNCTHING_OPTIONS_FILE}
         # use a default folder the package user has permissions for
         HOME=${SYNOPKG_PKGVAR}
     fi
@@ -57,9 +86,9 @@ service_prestart ()
 service_save ()
 {
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        if [ -e ${SYNOPKG_PKGVAR}/options.conf.new ]; then
+        if [ -e ${SYNCTHING_OPTIONS_FILE}.new ]; then
             echo "remove former version of options.conf.new"
-            rm -f ${SYNOPKG_PKGVAR}/options.conf.new
+            rm -f ${SYNCTHING_OPTIONS_FILE}.new
         fi
     fi
 }
@@ -68,7 +97,7 @@ service_restore ()
 {
     if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
         echo "install updated options.conf as options.conf.new"
-        mv -f ${SYNOPKG_PKGVAR}/options.conf ${SYNOPKG_PKGVAR}/options.conf.new
+        mv -f ${SYNCTHING_OPTIONS_FILE} ${SYNCTHING_OPTIONS_FILE}.new
     fi
 }
 

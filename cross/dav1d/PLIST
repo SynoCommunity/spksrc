@@ -1,4 +1,4 @@
 bin:bin/dav1d
 lnk:lib/libdav1d.so
-lnk:lib/libdav1d.so.6
-lib:lib/libdav1d.so.6.8.0
+lnk:lib/libdav1d.so.7
+lib:lib/libdav1d.so.7.0.0

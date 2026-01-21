@@ -1,0 +1,46 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2024 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+/*========================== begin_copyright_notice ============================
+
+Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+See https://llvm.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 with LLVM-exception
+
+============================= end_copyright_notice ===========================*/
+
+# Description:
+# The thread through two basic blocks functionality leads to extra basic block construction
+# that is suboptimal from the performance point of view.
+# Adding `jump-threading-through-two-bbs` option to control it.
+diff --git a/llvm/lib/Transforms/Scalar/JumpThreading.cpp b/llvm/lib/Transforms/Scalar/JumpThreading.cpp
+index a3efad104..b31bbbe67 100644
+--- a/llvm/lib/Transforms/Scalar/JumpThreading.cpp
++++ b/llvm/lib/Transforms/Scalar/JumpThreading.cpp
+@@ -116,6 +116,10 @@ static cl::opt<bool> ThreadAcrossLoopHeaders(
+     cl::desc("Allow JumpThreading to thread across loop headers, for testing"),
+     cl::init(false), cl::Hidden);
+
++static cl::opt<bool> ThreadThroughTwoBBs(
++    "jump-threading-through-two-bbs",
++    cl::desc("Allow JumpThreading to thread through two basic blocks"),
++    cl::init(false), cl::Hidden);
+
+ namespace {
+
+@@ -2131,6 +2135,10 @@ bool JumpThreadingPass::maybethreadThroughTwoBasicBlocks(BasicBlock *BB,
+   // edges (say, PredBB1 and PredBB2), we know the value of %var in each copy of
+   // PredBB.  Then we can thread edges PredBB1->BB and PredBB2->BB through BB.
+
++  // Check that threading through two BBs is allowed
++  if (!ThreadThroughTwoBBs)
++    return false;
++
+   // Require that BB end with a Branch for simplicity.
+   BranchInst *CondBr = dyn_cast<BranchInst>(BB->getTerminator());
+   if (!CondBr)
