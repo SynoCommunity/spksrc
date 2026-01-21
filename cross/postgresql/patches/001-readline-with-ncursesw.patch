@@ -1,0 +1,13 @@
+# look for lib ncursesw too
+# as readline is built with ncursesw and not ncurses
+--- configure.org	2020-08-10 21:17:40.000000000 +0000
++++ configure	2020-11-16 18:58:33.389739604 +0000
+@@ -11464,7 +11464,7 @@
+ else	READLINE_ORDER="-ledit -lreadline"
+ fi
+ for pgac_rllib in $READLINE_ORDER ; do
+-  for pgac_lib in "" " -ltermcap" " -lncurses" " -lcurses" ; do
++  for pgac_lib in "" " -ltermcap" " -lncurses" " -lncursesw" " -lcurses" ; do
+     LIBS="${pgac_rllib}${pgac_lib} $pgac_save_LIBS"
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
