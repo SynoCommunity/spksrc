@@ -1,0 +1,34 @@
+{
+    ".url": {
+        "com.synocommunity.packages.simpleextjsapp": {
+            "title": "SynoExtJS API Docs",
+            "desc": "SynoExtJS API Docs",
+            "icon": "images/simpleextjsapp-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/simpleextjsapp",
+            "allUsers": false,
+            "grantPrivilege": "local"
+        }
+    },
+    "simpleextjsapp.js": {
+        "SYNOCOMMUNITY.SimpleExtJSApp.AppInstance": {
+            "type": "app",
+            "title": "app:app_name",
+            "version": "0.1",
+            "icon": "images/simpleextjsapp-{0}.png",
+            "texts": "texts",
+            "allowMultiInstance": false,
+            "allUsers": false,
+            "appWindow": "SYNOCOMMUNITY.SimpleExtJSApp.AppWindow",
+            "depend": ["SYNOCOMMUNITY.SimpleExtJSApp.AppWindow"]
+        },
+        "SYNOCOMMUNITY.SimpleExtJSApp.AppWindow": {
+            "type": "lib",
+            "title": "app:app_name",
+            "icon": "images/simpleextjsapp-{0}.png",
+            "texts": "texts"
+        }
+    }
+}
