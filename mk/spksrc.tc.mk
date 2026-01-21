@@ -1,12 +1,5 @@
+### Toolchain rules
 
-# Constants
-SHELL := $(SHELL) -e
-default: all
-
-include ../../mk/spksrc.common.mk
-
-### Include common rules
-include ../../mk/spksrc.common-rules.mk
 
 # Configure the included makefiles
 URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
@@ -22,13 +15,6 @@ endif
 DISTRIB_DIR                = $(TOOLCHAIN_DIR)/$(TC_VERS)
 DIST_FILE                  = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT                   = $(TC_EXT)
-TC_LOCAL_VARS_MK           = $(WORK_DIR)/tc_vars.mk
-TC_LOCAL_VARS_AUTOTOOLS_MK = $(WORK_DIR)/tc_vars.autotools.mk
-TC_LOCAL_VARS_FLAGS_MK     = $(WORK_DIR)/tc_vars.flags.mk
-TC_LOCAL_VARS_RUST_MK      = $(WORK_DIR)/tc_vars.rust.mk
-TC_LOCAL_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
-TC_LOCAL_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
-TC_LOCAL_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 
 ifneq ($(strip $(ARCH)),)
 ARCH_SUFFIX := -$(ARCH)-$(TCVERSION)
@@ -36,18 +22,94 @@ else
 ARCH_SUFFIX :=
 endif
 
-#####
-
+# Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
 
-# Include ross-rust-env.mk to generate install its toolchain
+### Include common definitions
+include ../../mk/spksrc.common.mk
+
+### Include common rules
+include ../../mk/spksrc.common-rules.mk
+
+#####
+
+# Include cross-compilation definitions
+# (provides arch-specific variables for toolchain generation)
+include ../../mk/spksrc.cross-cmake-env.mk
+include ../../mk/spksrc.cross-meson-env.mk
 include ../../mk/spksrc.cross-rust-env.mk
 
-# Include cross-cmake-env.mk to generate its toolchain file
-include ../../mk/spksrc.cross-cmake-env.mk
+#####
 
-# Include cross-meson-env.mk to generate its toolchain file
-include ../../mk/spksrc.cross-meson-env.mk
+# Mappings (target_name:output_file)
+TC_VAR_MAPPING_MK = \
+	tc_vars:tc_vars.mk \
+	tc_flags:tc_vars.flags.mk \
+	autotools_vars:tc_vars.autotools.mk \
+	rust_vars:tc_vars.rust.mk
+
+TC_VAR_MAPPING_OTHER = \
+	cmake_vars:tc_vars.cmake \
+	meson_cross_vars:tc_vars.meson-cross \
+	meson_native_vars:tc_vars.meson-native
+
+# Common variables to simply calls
+# (e.g. direct call such as 'make work/tc_vars.mk')
+TC_VARS_MK           = $(WORK_DIR)/tc_vars.mk
+TC_VARS_AUTOTOOLS_MK = $(WORK_DIR)/tc_vars.autotools.mk
+TC_VARS_FLAGS_MK     = $(WORK_DIR)/tc_vars.flags.mk
+TC_VARS_RUST_MK      = $(WORK_DIR)/tc_vars.rust.mk
+TC_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
+TC_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
+TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
+
+# Template to generate toolchain rule
+define make_tc_var_rule
+.PHONY: $(WORK_DIR)/$(2)
+$(WORK_DIR)/$(2):
+	@$(MSG) "Generating $(WORK_DIR)/$(2)"
+	@$(MAKE) --no-print-directory $(1) > $$@ 2>/dev/null
+endef
+
+# Generate all .mk files
+$(foreach mapping,$(TC_VAR_MAPPING_MK),\
+  $(eval $(call make_tc_var_rule,$(word 1,$(subst :, ,$(mapping))),$(word 2,$(subst :, ,$(mapping))))))
+
+# Generate all other targets (cmake, meson)
+$(foreach mapping,$(TC_VAR_MAPPING_OTHER),\
+  $(eval $(call make_tc_var_rule,$(word 1,$(subst :, ,$(mapping))),$(word 2,$(subst :, ,$(mapping))))))
+
+# Grouped targets to generate multiple files
+.PHONY: generate_tc_vars_mk
+generate_tc_vars_mk: $(foreach m,$(TC_VAR_MAPPING_MK),$(WORK_DIR)/$(word 2,$(subst :, ,$(m))))
+
+.PHONY: generate_tc_vars_other
+generate_tc_vars_other: $(foreach m,$(TC_VAR_MAPPING_OTHER),$(WORK_DIR)/$(word 2,$(subst :, ,$(m))))
+
+#####
+
+TOOLCHAIN_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)toolchain_done
+
+.PHONY: $(PRE_TOOLCHAIN_TARGET) $(TOOLCHAIN_TARGET) $(POST_TOOLCHAIN_TARGET)
+ifeq ($(strip $(PRE_TOOLCHAIN_TARGET)),)
+PRE_TOOLCHAIN_TARGET = pre_toolchain_target
+else
+$(PRE_TOOLCHAIN_TARGET): toolchain_msg
+endif
+ifeq ($(strip $(TOOLCHAIN_TARGET)),)
+TOOLCHAIN_TARGET = toolchain_target
+else
+$(TOOLCHAIN_TARGET): $(PRE_TOOLCHAIN_TARGET)
+endif
+ifeq ($(strip $(POST_TOOLCHAIN_TARGET)),)
+POST_TOOLCHAIN_TARGET = post_toolchain_target
+else
+$(POST_TOOLCHAIN_TARGET): $(TOOLCHAIN_TARGET)
+endif
+
+.PHONY: toolchain toolchain_msg
+toolchain_msg:
+	@$(MSG) "Preparing toolchain for $(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)"
 
 #####
 
@@ -79,22 +141,26 @@ include ../../mk/spksrc.tc-flags.mk
 rustc: flag
 include ../../mk/spksrc.tc-rust.mk
 
+#####
+
+.DEFAULT_GOAL := toolchain
+
+pre_toolchain_target: toolchain_msg
+
 # Define _all as a real target that does the work
 .PHONY: _all
 _all: rustc depend \
-	$(TC_LOCAL_VARS_MK) \
-	$(TC_LOCAL_VARS_AUTOTOOLS_MK) \
-	$(TC_LOCAL_VARS_FLAGS_MK) \
-	$(TC_LOCAL_VARS_RUST_MK) \
-	$(TC_LOCAL_VARS_CMAKE) \
-	$(TC_LOCAL_VARS_MESON_CROSS) \
-	$(TC_LOCAL_VARS_MESON_NATIVE)
+	$(TC_VARS_MK) \
+	$(TC_VARS_AUTOTOOLS_MK) \
+	$(TC_VARS_FLAGS_MK) \
+	$(TC_VARS_RUST_MK) \
+	$(TC_VARS_CMAKE) \
+	$(TC_VARS_MESON_CROSS) \
+	$(TC_VARS_MESON_NATIVE)
 
-# all wraps _all with logging
-.PHONY: all
-.DEFAULT_GOAL := all
-
-all:
+# toolchain_target wraps _all with logging
+.PHONY: toolchain_target
+toolchain_target: $(PRE_TOOLCHAIN_TARGET)
 	@bash -o pipefail -c ' \
 	  mkdir -p $(WORK_DIR) ; \
 	  $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG) ; \
@@ -111,33 +177,9 @@ all:
 	   exit 1 ; \
 	}
 
-.PHONY: $(TC_LOCAL_VARS_MK)
-$(TC_LOCAL_VARS_MK):
-	env $(MAKE) --no-print-directory tc_vars > $@ 2>/dev/null;
+post_toolchain_target: $(TOOLCHAIN_TARGET)
 
-.PHONY: $(TC_LOCAL_VARS_FLAGS_MK)
-$(TC_LOCAL_VARS_FLAGS_MK):
-	env $(MAKE) --no-print-directory tc_flags > $@ 2>/dev/null;
-
-.PHONY: $(TC_LOCAL_VARS_AUTOTOOLS_MK)
-$(TC_LOCAL_VARS_AUTOTOOLS_MK):
-	env $(MAKE) --no-print-directory autotools_vars > $@ 2>/dev/null;
-
-.PHONY: $(TC_LOCAL_VARS_RUST_MK)
-$(TC_LOCAL_VARS_RUST_MK):
-	env $(MAKE) --no-print-directory rust_vars > $@ 2>/dev/null;
-
-.PHONY: $(TC_LOCAL_VARS_CMAKE)
-$(TC_LOCAL_VARS_CMAKE): 
-	env $(MAKE) --no-print-directory cmake_vars > $@ 2>/dev/null;
-
-.PHONY: $(TC_LOCAL_VARS_MESON_CROSS)
-$(TC_LOCAL_VARS_MESON_CROSS): 
-	env $(MAKE) --no-print-directory meson_cross_vars > $@ 2>/dev/null;
-
-.PHONY: $(TC_LOCAL_VARS_MESON_NATIVE)
-$(TC_LOCAL_VARS_MESON_NATIVE): 
-	env $(MAKE) --no-print-directory meson_native_vars > $@ 2>/dev/null;
+#####
 
 .PHONY: cmake_vars
 cmake_vars:
@@ -370,6 +412,19 @@ ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 	@echo TC_KERNEL := $(TC_KERNEL)+
 else
 	@echo TC_KERNEL := $(TC_KERNEL)
+endif
+
+
+post_toolchain_target: $(TOOLCHAIN_TARGET)
+
+ifeq ($(wildcard $(TOOLCHAIN_COOKIE)),)
+toolchain: $(TOOLCHAIN_COOKIE)
+
+$(TOOLCHAIN_COOKIE): $(POST_TOOLCHAIN_TARGET)
+	$(create_target_dir)
+	@touch -f $@
+else
+toolchain: ;
 endif
 
 ### For make digests
