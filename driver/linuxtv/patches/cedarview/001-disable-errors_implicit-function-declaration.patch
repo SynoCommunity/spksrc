@@ -1,0 +1,12 @@
+--- ../linuxtv.orig/v4l/Makefile	2021-02-08 10:24:43.000000000 +0000
++++ v4l/Makefile	2021-03-10 01:30:05.148056731 +0000
+@@ -142,6 +142,9 @@ EXTRA_CFLAGS += -include $(obj)/compat.h
+ # gives too much warnings (false positives) -> disable it
+ EXTRA_CFLAGS += -Wno-format-truncation
+ 
++# In order to allow 'implicit-function-declaration'
++EXTRA_CFLAGS += -Wno-error=implicit-function-declaration
++
+ #################################################
+ # Kernel 2.6/3.x specific rules
+ 
