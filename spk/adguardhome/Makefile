@@ -1,5 +1,5 @@
 SPK_NAME = adguardhome
-SPK_VERS = 0.107.48
+SPK_VERS = 0.107.71
 SPK_REV = 0
 SPK_ICON = src/adguardhome.png
 

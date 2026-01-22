@@ -1,5 +1,5 @@
 PKG_NAME = adguardhome
-PKG_VERS = 0.107.48
+PKG_VERS = 0.107.71
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/AdguardTeam/$(PKG_NAME)/archive/refs/tags
