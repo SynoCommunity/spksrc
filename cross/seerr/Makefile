@@ -93,6 +93,7 @@ seerr_install:
 	$(RUN) rm -rf \
 		.next/cache \
 		.next/trace \
+		.next/*.nft.json \
 		charts \
 		docs \
 		gen-docs \
@@ -123,7 +124,6 @@ seerr_install:
 	cp -a $(WORK_DIR)/$(PKG_DIR)/node_modules    $(STAGING_INSTALL_PREFIX)/share/seerr/
 
 	cp $(WORK_DIR)/$(PKG_DIR)/package.json       $(STAGING_INSTALL_PREFIX)/share/seerr/
-	cp $(WORK_DIR)/$(PKG_DIR)/package-lock.json  $(STAGING_INSTALL_PREFIX)/share/seerr/
 	cp $(WORK_DIR)/$(PKG_DIR)/jellyseerr-api.yml $(STAGING_INSTALL_PREFIX)/share/seerr/
 	cp $(WORK_DIR)/$(PKG_DIR)/committag.json     $(STAGING_INSTALL_PREFIX)/share/seerr/
 
