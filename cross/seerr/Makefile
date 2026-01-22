@@ -100,11 +100,8 @@ seerr_install:
 		server \
 		pnpm-lock.yaml
 
-	# Remove ace-builds unused source variants (keep only src-min-noconflict)
-	$(RUN) rm -rf \
-		node_modules/ace-builds/src \
-		node_modules/ace-builds/src-noconflict \
-		node_modules/ace-builds/src-min
+	# Remove ace-builds entirely (already bundled into client JS)
+	$(RUN) rm -rf node_modules/ace-builds
 
 	# Remove node-gyp build tools (not needed at runtime)
 	$(RUN) rm -rf \
