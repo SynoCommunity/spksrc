@@ -108,6 +108,23 @@ seerr_install:
 		node_modules/node-gyp \
 		node_modules/sqlite3/node_modules/node-gyp
 
+	# Remove @babel packages except runtime (compiler/plugins are build-only)
+	$(RUN) find node_modules/@babel -mindepth 1 -maxdepth 1 -type d ! -name 'runtime' -exec rm -rf {} +
+
+	# Remove @svgr and svgo (webpack SVG loader - build-only)
+	$(RUN) rm -rf \
+		node_modules/@svgr \
+		node_modules/svgo
+
+	# Remove babel-plugin-* packages (build-only transpilation plugins)
+	$(RUN) rm -rf \
+		node_modules/babel-plugin-emotion \
+		node_modules/babel-plugin-macros \
+		node_modules/babel-plugin-polyfill-corejs2 \
+		node_modules/babel-plugin-polyfill-corejs3 \
+		node_modules/babel-plugin-polyfill-regenerator \
+		node_modules/babel-plugin-syntax-jsx
+
 	# Remove TypeScript source files (keep only compiled JS)
 	$(RUN) find node_modules -type f -name '*.ts' ! -name '*.d.ts' -delete
 
