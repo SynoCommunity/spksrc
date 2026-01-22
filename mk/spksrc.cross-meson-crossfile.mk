@@ -18,7 +18,7 @@ meson_generate_crossfile:
 .PHONY: $(MESON_CROSS_FILE_PKG)
 $(MESON_CROSS_FILE_PKG):
 	@$(MSG) Generating $(MESON_CROSS_FILE_PKG)
-	env $(ENV) $(MAKE) --no-print-directory generate_meson_crossfile_pkg > $(MESON_CROSS_FILE_PKG) 2>/dev/null;
+	@env $(ENV) $(MAKE) --no-print-directory generate_meson_crossfile_pkg > $(MESON_CROSS_FILE_PKG) 2>/dev/null;
 
 .PHONY: generate_meson_crossfile_pkg
 generate_meson_crossfile_pkg: SHELL:=/bin/bash
