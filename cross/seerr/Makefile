@@ -100,6 +100,37 @@ seerr_install:
 		server \
 		pnpm-lock.yaml
 
+	# Remove ace-builds unused source variants (keep only src-min-noconflict)
+	$(RUN) rm -rf \
+		node_modules/ace-builds/src \
+		node_modules/ace-builds/src-noconflict \
+		node_modules/ace-builds/src-min
+
+	# Remove node-gyp build tools (not needed at runtime)
+	$(RUN) rm -rf \
+		node_modules/node-gyp \
+		node_modules/sqlite3/node_modules/node-gyp
+
+	# Remove TypeScript source files (keep only compiled JS)
+	$(RUN) find node_modules -type f -name '*.ts' ! -name '*.d.ts' -delete
+
+	# Remove C/C++ source and gyp build files
+	$(RUN) find node_modules -type f \( \
+		-name '*.c' -o -name '*.cpp' -o -name '*.cc' -o \
+		-name '*.h' -o -name '*.hpp' -o \
+		-name '*.gyp' -o -name '*.gypi' \) -delete
+
+	# Remove documentation files
+	$(RUN) find node_modules -type f \( \
+		-name 'README*' -o -name 'CHANGELOG*' -o -name 'HISTORY*' -o \
+		-name 'AUTHORS*' -o -name 'CONTRIBUTORS*' \) -delete
+
+	# Remove test and example directories
+	$(RUN) find node_modules -type d \( \
+		-name '__tests__' -o -name 'test' -o -name 'tests' -o \
+		-name 'example' -o -name 'examples' \) -exec rm -rf {} + 2>/dev/null || true
+
+	# Remove TypeScript definitions, source maps, and build info
 	$(RUN) find node_modules -type f \
 		\( -name '*.d.ts' -o -name '*.map' -o -name '*.tsbuildinfo' \) -delete
 
