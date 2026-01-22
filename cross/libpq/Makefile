@@ -1,5 +1,5 @@
 PKG_NAME = libpq
-PKG_VERS = 11.22
+PKG_VERS = 16.11
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = postgresql-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.postgresql.org/pub/source/v$(PKG_VERS)/
@@ -21,6 +21,7 @@ CONFIGURE_ARGS  = --with-template=linux
 CONFIGURE_ARGS += --with-openssl
 CONFIGURE_ARGS += --with-system-tzdata=/usr/share/zoneinfo
 CONFIGURE_ARGS += --without-readline
+CONFIGURE_ARGS += --without-icu
 ADDITIONAL_CFLAGS = -O
 
 COMPILE_TARGET = libpq_compile
@@ -30,9 +31,9 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: libpq_compile
 libpq_compile:
+	@$(RUN) ; cd src/backend && $(MAKE) generated-headers
 	@$(RUN) ; cd src/interfaces && $(MAKE) -C libpq all
 
 .PHONY: libpq_install
 libpq_install:
 	@$(RUN) ; cd src/interfaces && $(MAKE) -C libpq DESTDIR=$(INSTALL_DIR) install prefix=$(INSTALL_PREFIX)
-	@$(RUN) ; cd src/backend && $(MAKE) generated-headers
