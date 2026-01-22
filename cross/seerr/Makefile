@@ -125,17 +125,12 @@ seerr_install:
 		node_modules/babel-plugin-polyfill-regenerator \
 		node_modules/babel-plugin-syntax-jsx
 
-	# Remove TypeScript source files (keep only compiled JS)
-	$(RUN) find node_modules -type f -name '*.ts' ! -name '*.d.ts' -delete
-
-	# Remove C/C++ source and gyp build files
+	# Remove source files, build artifacts, and documentation
 	$(RUN) find node_modules -type f \( \
+		-name '*.ts' -o -name '*.map' -o -name '*.tsbuildinfo' -o \
 		-name '*.c' -o -name '*.cpp' -o -name '*.cc' -o \
 		-name '*.h' -o -name '*.hpp' -o \
-		-name '*.gyp' -o -name '*.gypi' \) -delete
-
-	# Remove documentation files
-	$(RUN) find node_modules -type f \( \
+		-name '*.gyp' -o -name '*.gypi' -o \
 		-name 'README*' -o -name 'CHANGELOG*' -o -name 'HISTORY*' -o \
 		-name 'AUTHORS*' -o -name 'CONTRIBUTORS*' \) -delete
 
@@ -143,10 +138,6 @@ seerr_install:
 	$(RUN) find node_modules -type d \( \
 		-name '__tests__' -o -name 'test' -o -name 'tests' -o \
 		-name 'example' -o -name 'examples' \) -exec rm -rf {} + 2>/dev/null || true
-
-	# Remove TypeScript definitions, source maps, and build info
-	$(RUN) find node_modules -type f \
-		\( -name '*.d.ts' -o -name '*.map' -o -name '*.tsbuildinfo' \) -delete
 
 	# ------------------------------------------------------------
 	# 8. Version tag
