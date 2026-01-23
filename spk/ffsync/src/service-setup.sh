@@ -1,28 +1,25 @@
 
 # ffsync service setup
-PYTHON_DIR="/var/packages/python311/target/bin"
+PYTHON_DIR="/var/packages/python312/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
-MARIADB_10_INSTALL_DIRECTORY="/var/packages/MariaDB10"
-MARIADB_10_BIN_DIRECTORY="${MARIADB_10_INSTALL_DIRECTORY}/target/usr/local/mariadb10/bin"
-MYSQL="${MARIADB_10_BIN_DIRECTORY}/mysql"
-MYSQLDUMP="${MARIADB_10_BIN_DIRECTORY}/mysqldump"
-
+MYSQL="/usr/local/mariadb10/bin/mysql"
+MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
 PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
 SYNCSERVER="${SYNOPKG_PKGDEST}/bin/syncserver"
 DIESEL="${SYNOPKG_PKGDEST}/bin/diesel"
 CFG_FILE="${SYNOPKG_PKGVAR}/local.toml"
 
-SERVICE_COMMAND="${SYNCSERVER} --config=${CFG_FILE}"
+# enhance logging
+ENV="RUST_LOG=debug RUST_BACKTRACE=full"
+
+SERVICE_COMMAND="env ${ENV} ${SYNCSERVER} --config=${CFG_FILE}"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
-# enhance logging
-export RUST_LOG=debug
-export RUST_BACKTRACE=full
-
 DBUSER=ffsync
 DBSERVER="localhost"
+DBSOCKET="/run/mysqld/mysqld10.sock"
 
 percent_encode ()
 {
@@ -44,19 +41,19 @@ percent_encode ()
 
 validate_preinst ()
 {
-    # Check MySQL database
+    # Check database
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         if [ -n "${wizard_mysql_password_root}" ]; then
             if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-                echo "Incorrect MySQL root password"
+                echo "Incorrect MariaDB root password"
                 exit 1
             fi
             if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${DBUSER}$ > /dev/null 2>&1; then
-                echo "MySQL user ${DBUSER} already exists"
+                echo "MariaDB user ${DBUSER} already exists"
                 exit 1
             fi
             if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep -E '^(syncstorage_rs|tokenserver_rs)$' > /dev/null 2>&1; then
-                echo "MySQL database(s) for ${DBUSER} already exist(s)"
+                echo "MariaDB database(s) for ${DBUSER} already exist(s)"
                 exit 1
             fi
         fi
@@ -134,8 +131,57 @@ EOF
             -e "s|{{SQL_USER}}|${DBUSER}|g"                         \
             -e "s|{{SQL_PASS}}|${DBPASS_ENC}|g"                     \
             -e "s|{{DB_SERVER}}|${DBSERVER}|g"                      \
+            -e "s|{{DB_SOCKET}}|${DBSOCKET}|g"                      \
             -e "s|{{METRICS_HASH_SECRET}}|${METRICS_HASH_SECRET}|g" \
             -i "${CFG_FILE}"
+    fi
+}
+
+service_postupgrade ()
+{
+    # Verify socket suffix when upgrading existing configs
+    if [ ! -f "${CFG_FILE}" ]; then
+        return
+    fi
+
+    echo "Verify database URLs for socket parameter"
+
+    sync_before=0
+    token_before=0
+    if grep -q '^syncstorage\.database_url[[:space:]]*=.*\?socket=' "${CFG_FILE}"; then
+        sync_before=1
+    fi
+    if grep -q '^tokenserver\.database_url[[:space:]]*=.*\?socket=' "${CFG_FILE}"; then
+        token_before=1
+    fi
+
+    escaped_socket=$(printf '%s' "$DBSOCKET" | sed -e 's/[\/&|]/\\&/g')
+
+    sed -i \
+        -e "/^syncstorage\.database_url[[:space:]]*=/ { /\?socket=/! s|\"$|?socket=${escaped_socket}\"| }" \
+        -e "/^tokenserver\.database_url[[:space:]]*=/ { /\?socket=/! s|\"$|?socket=${escaped_socket}\"| }" \
+        "${CFG_FILE}"
+
+    sync_after=0
+    token_after=0
+    if grep -q '^syncstorage\.database_url[[:space:]]*=.*\?socket=' "${CFG_FILE}"; then
+        sync_after=1
+    fi
+    if grep -q '^tokenserver\.database_url[[:space:]]*=.*\?socket=' "${CFG_FILE}"; then
+        token_after=1
+    fi
+
+    if [ "$sync_before" -eq 0 ] && [ "$sync_after" -eq 1 ]; then
+        echo "Added socket parameter to syncstorage.database_url"
+    fi
+    if [ "$token_before" -eq 0 ] && [ "$token_after" -eq 1 ]; then
+        echo "Added socket parameter to tokenserver.database_url"
+    fi
+
+    if [ "$sync_after" -eq 1 ] && [ "$token_after" -eq 1 ]; then
+        echo "Database URLs now include socket parameter"
+    else
+        echo "Warning: unable to ensure socket parameter for both database URLs" >&2
     fi
 }
 
@@ -143,7 +189,7 @@ validate_preuninst ()
 {
     # Check database
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-        echo "Incorrect MySQL root password"
+        echo "Incorrect MariaDB root password"
         exit 1
     fi
     # Check if database export path is specified

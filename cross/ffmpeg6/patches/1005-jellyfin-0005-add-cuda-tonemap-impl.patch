@@ -98,7 +98,7 @@ Index: jellyfin-ffmpeg/libavfilter/colorspace.c
  void ff_matrix_mul_3x3(double dst[3][3],
                 const double src1[3][3], const double src2[3][3])
  {
-@@ -191,3 +203,157 @@ void ff_update_hdr_metadata(AVFrame *in,
+@@ -191,3 +203,155 @@ void ff_update_hdr_metadata(AVFrame *in,
              metadata->max_luminance = av_d2q(peak * REFERENCE_WHITE, 10000);
      }
  }
@@ -183,8 +183,7 @@ Index: jellyfin-ffmpeg/libavfilter/colorspace.c
 +// linearizer for PQ/ST2084
 +float eotf_st2084_common(float x)
 +{
-+    x = FFMAX(x, 0.0f);
-+    float xpow = powf(x, 1.0f / ST2084_M2);
++    float xpow = powf(FFMAX(x, 0.0f), 1.0f / ST2084_M2);
 +    float num = FFMAX(xpow - ST2084_C1, 0.0f);
 +    float den = FFMAX(ST2084_C2 - ST2084_C3 * xpow, FLOAT_EPS);
 +    x = powf(num / den, 1.0f / ST2084_M1);
@@ -199,8 +198,7 @@ Index: jellyfin-ffmpeg/libavfilter/colorspace.c
 +// delinearizer for PQ/ST2084
 +float inverse_eotf_st2084_common(float x)
 +{
-+    x = FFMAX(x, 0.0f);
-+    float xpow = powf(x, ST2084_M1);
++    float xpow = powf(FFMAX(x, 0.0f), ST2084_M1);
 +#if 0
 +    // Original formulation from SMPTE ST 2084:2014 publication.
 +    float num = ST2084_C1 + ST2084_C2 * xpow;
@@ -244,12 +242,12 @@ Index: jellyfin-ffmpeg/libavfilter/colorspace.c
 +
 +// linearizer for HLG/ARIB-B67
 +float eotf_arib_b67(float x) {
-+    return ootf_1_2(inverse_oetf_arib_b67(x));
++    return ootf_1_2(inverse_oetf_arib_b67(x)) * 5.0f;
 +}
 +
 +// delinearizer for HLG/ARIB-B67
 +float inverse_eotf_arib_b67(float x) {
-+    return oetf_arib_b67(inverse_ootf_1_2(x));
++    return oetf_arib_b67(inverse_ootf_1_2(x / 5.0f));
 +}
 +
 +// delinearizer for BT709, BT2020-10
@@ -468,12 +466,12 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/colorspace_common.h
 +
 +// linearizer for HLG/ARIB-B67
 +static __inline__ __device__ float eotf_arib_b67(float x) {
-+    return ootf_1_2(inverse_oetf_arib_b67(x));
++    return ootf_1_2(inverse_oetf_arib_b67(x)) * 5.0f;
 +}
 +
 +// delinearizer for HLG/ARIB-B67
 +static __inline__ __device__ float inverse_eotf_arib_b67(float x) {
-+    return oetf_arib_b67(inverse_ootf_1_2(x));
++    return oetf_arib_b67(inverse_ootf_1_2(x / 5.0f));
 +}
 +
 +// delinearizer for BT709, BT2020-10
@@ -599,7 +597,7 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.c
 ===================================================================
 --- /dev/null
 +++ libavfilter/cuda/host_util.c
-@@ -0,0 +1,78 @@
+@@ -0,0 +1,77 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -637,15 +635,14 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.c
 +        dst->data[i] = src->data[i];
 +        dst->linesize[i] = src->linesize[i];
 +        dst->tex[i] = 0;
++    }
 +
-+        if (!make_cuTex)
-+            continue;
-+
++    for (i = 0; make_cuTex && (i < dst->planes); i++) {
 +#ifndef CU_TRSF_NORMALIZED_COORDINATES
 +  #define CU_TRSF_NORMALIZED_COORDINATES 2
 +#endif
 +        CUDA_TEXTURE_DESC tex_desc = {
-+            .addressMode = CU_TR_ADDRESS_MODE_CLAMP,
++            .addressMode = { CU_TR_ADDRESS_MODE_CLAMP },
 +            .filterMode = i == 0 ? CU_TR_FILTER_MODE_POINT : CU_TR_FILTER_MODE_LINEAR,
 +            .flags = i == 0 ? 0 : CU_TRSF_NORMALIZED_COORDINATES,
 +        };
@@ -1688,7 +1685,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 +        return AVERROR(ENOMEM);
 +
 +    s->dovi = NULL;
-+    s->doviBuffer = NULL;
++    s->doviBuffer = 0;
 +
 +    return 0;
 +}
@@ -1786,7 +1783,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 +  #define CU_TRSF_NORMALIZED_COORDINATES 2
 +#endif
 +    CUDA_TEXTURE_DESC tex_desc = {
-+        .addressMode = CU_TR_ADDRESS_MODE_WRAP,
++        .addressMode = { CU_TR_ADDRESS_MODE_WRAP },
 +        .filterMode = CU_TR_FILTER_MODE_POINT,
 +        .flags = CU_TRSF_NORMALIZED_COORDINATES,
 +    };
@@ -2270,13 +2267,13 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 +    if (ret < 0)
 +        goto fail;
 +
-+    ret = CHECK_CU(cu->cuLinkAddData(link_state, CU_JIT_INPUT_PTX, constants.str,
-+                                     constants.len, "constants", 0, NULL, NULL));
++    ret = CHECK_CU(cu->cuLinkAddData(link_state, CU_JIT_INPUT_PTX, (void *)constants.str,
++                                     (size_t)constants.len, "constants", 0, NULL, NULL));
 +    if (ret < 0)
 +        goto fail2;
 +
-+    ret = CHECK_CU(cu->cuLinkAddData(link_state, CU_JIT_INPUT_PTX, ff_tonemap_ptx_data,
-+                                     ff_tonemap_ptx_len, "ff_tonemap_ptx_data", 0, NULL, NULL));
++    ret = CHECK_CU(cu->cuLinkAddData(link_state, CU_JIT_INPUT_PTX, (void *)ff_tonemap_ptx_data,
++                                     (size_t)ff_tonemap_ptx_len, "ff_tonemap_ptx_data", 0, NULL, NULL));
 +    if (ret < 0)
 +        goto fail2;
 +

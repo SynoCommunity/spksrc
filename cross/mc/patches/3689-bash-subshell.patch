@@ -1,19 +1,9 @@
 dnl original patch provided by alllexx88 as 3689-bash-subshell-V3.patch
 dnl https://midnight-commander.org/ticket/3689
+dnl since v4.8.32 src/subshell/common.c does not need a patch anymore
 
---- src/subshell/common.c.org	2019-06-16 17:49:31.000000000 +0000
-+++ src/subshell/common.c	2019-12-29 17:28:33.049619129 +0000
-@@ -369,7 +369,7 @@
-     switch (mc_global.shell->type)
-     {
-     case SHELL_BASH:
--        execl (mc_global.shell->path, "bash", "-rcfile", init_file, (char *) NULL);
-+        execl (mc_global.shell->path, mc_global.shell->name, "-rcfile", init_file, (char *) NULL);
-         break;
- 
-     case SHELL_ZSH:
---- lib/shell.c.org	2019-06-16 17:49:31.000000000 +0000
-+++ lib/shell.c	2019-12-29 17:34:32.741113924 +0000
+--- lib/shell.c.orig	2025-01-15 16:52:17.000000000 +0000
++++ lib/shell.c	2025-02-01 14:41:48.363742677 +0000
 @@ -33,6 +33,8 @@
  #include <stdarg.h>
  #include <stdio.h>
@@ -23,7 +13,7 @@ dnl https://midnight-commander.org/ticket/3689
  
  #include "global.h"
  #include "util.h"
-@@ -191,16 +193,56 @@
+@@ -217,16 +219,56 @@
          mc_shell->type = SHELL_NONE;
  }
  
@@ -69,10 +59,10 @@ dnl https://midnight-commander.org/ticket/3689
  /* --------------------------------------------------------------------------------------------- */
  
  static void
- mc_shell_recognize_path (mc_shell_t * mc_shell)
+ mc_shell_recognize_path (mc_shell_t *mc_shell)
  {
 -    /* If shell is not symlinked to busybox, it is safe to assume it is a real shell */
--    if (strstr (mc_shell->path, "/bash") != NULL || getenv ("BASH") != NULL)
+-    if (strstr (mc_shell->path, "/bash") != NULL || getenv ("BASH_VERSION") != NULL)
 +    /* If shell is not symlinked to busybox, it is safe to assume it is a real shell
 +       Let's assume shell is bash if BASH internal variable is set */
 +    if (mc_shell_internal_variable_isset (mc_shell, "BASH"))
@@ -81,5 +71,5 @@ dnl https://midnight-commander.org/ticket/3689
 -        mc_shell->name = "bash";
 +        mc_shell->name = mc_shell->path;
      }
-     else if (strstr (mc_shell->path, "/sh") != NULL || getenv ("SH") != NULL)
+     else if (strstr (mc_shell->path, "/sh") != NULL)
      {

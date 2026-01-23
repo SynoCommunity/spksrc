@@ -1,6 +1,6 @@
 TC_NAME = syno-x64
 
-TC_ARCH = apollolake avoton braswell broadwell broadwellnk broadwellnkv2 broadwellntbap bromolow cedarview denverton epyc7002 geminilake grantley kvmx64 purley r1000 v1000
+TC_ARCH = apollolake avoton braswell broadwell broadwellnk broadwellnkv2 broadwellntbap bromolow cedarview denverton epyc7002 geminilake geminilakenk grantley kvmx64 purley r1000 r1000nk v1000 v1000nk
 TC_VERS = 7.1
 TC_KERNEL = 4.4.180
 TC_GLIBC = 2.26

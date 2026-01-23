@@ -1,5 +1,5 @@
 PKG_NAME = libcap
-PKG_VERS = 2.66
+PKG_VERS = 2.70
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://mirrors.edge.kernel.org/pub/linux/libs/security/linux-privs/libcap2/

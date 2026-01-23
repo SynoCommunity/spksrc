@@ -3,7 +3,7 @@ SPK_VERS = 2.3.1
 SPK_REV = 2
 SPK_ICON = src/monitoring-plugins.png
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/monitoring-plugins
 
 SPK_DEPENDS = Perl
 

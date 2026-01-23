@@ -10,6 +10,7 @@ DEPENDS = cross/libmpdclient cross/openssl3 cross/pcre2 cross/libid3tag
 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://jcorporation.github.io/
 COMMENT  = myMPD is a standalone and mobile friendly web mpd client with a tiny footprint and advanced features.
@@ -17,6 +18,7 @@ LICENSE  = GPLv3
 # myMPD was originally a fork of ympd, but it has evolved into a much more comprehensive MPD client.
 
 CMAKE_USE_TOOLCHAIN_FILE = NO
+CMAKE_USE_NINJA = 0
 
 POST_INSTALL_TARGET = mympd_post_install
 

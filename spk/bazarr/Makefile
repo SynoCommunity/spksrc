@@ -1,42 +1,31 @@
 SPK_NAME = bazarr
-SPK_VERS = 1.4.2
-SPK_REV = 14
+SPK_VERS = 1.5.3
+SPK_REV = 18
 SPK_ICON = src/bazarr.png
 
-PYTHON_PACKAGE = python311
+PYTHON_PACKAGE = python312
 
-SPK_DEPENDS = "python311:ffmpeg"
+SPK_DEPENDS = "${PYTHON_PACKAGE}:ffmpeg7"
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/bazarr
 DEPENDS += cross/unrar
-
-# [lxml]
-DEPENDS += cross/libxml2
-DEPENDS += cross/libxslt
-
-# [Pillow]
-DEPENDS += cross/freetype cross/libjpeg cross/zlib
-WHEELS_BUILD_ARGS += [Pillow]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += --disable-platform-guessing
-WHEELS_BUILD_ARGS += --enable-freetype
-WHEELS_BUILD_ARGS += --enable-jpeg
-WHEELS_BUILD_ARGS += --enable-zlib
 
 MAINTAINER = smaarn
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
-CHANGELOG = 'Update to 1.4.2. <br>See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.4.2">1.4.2</a> and <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.4.1">1.4.1</a> for more details.'
+CHANGELOG = 'Update bazarr to 1.5.3 See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.3">1.5.3</a> for more details'
 
 HOMEPAGE  = https://www.bazarr.media/
 LICENSE   = GPLv3
 STARTABLE = yes
 
-# [numpy] <= 1.21.6 (armv5)  - gcc-4.6.4 - unsupported
-# [numpy] <= 1.22.4 (armv7l) - gcc-4.8.3 - unsupported
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# [numpy]
+# Requires gcc>=8.4 to build succesfully
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 SERVICE_USER  = auto
 SERVICE_SETUP = src/service-setup.sh
@@ -50,29 +39,21 @@ ADMIN_PORT = $(SERVICE_PORT)
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 USE_ALTERNATE_TMPDIR = 1
 
+# [Pillow]
+DEPENDS += python/pillow
+
 include ../../mk/spksrc.python.mk
 
-# [greenlet]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-WHEELS += src/requirements-crossenv-greenlet-v2.txt
+# [lxml]
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
-endif
-else
-WHEELS += src/requirements-crossenv-greenlet-v1.txt
+WHEELS_CFLAGS += [lxml] -std=c11
 endif
 
-# [numpy] <= 1.24.4 last working version with gcc-4.9
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy-gcc4.txt
-# [numpy] >= 1.25.0 requires c++17
-else ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-numpy.txt
-endif
-# workaround for compiler bug:
-# https://github.com/numpy/numpy/issues/13622
-ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS += [numpy] -O0
-endif
+# [numpy]
+# gcc-8.4 is the minimal version to build numpy
+# gcc-8.5 hapens to be the default version for DSM-7.1
+ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy
 endif

@@ -1,0 +1,20 @@
+[{
+    "step_title": "sslh service variant",
+    "items": [{
+        "type": "singleselect",
+        "desc": "Select what sslh variant to use:",
+        "subitems": [{
+            "key": "wizard_sslh_fork",
+            "desc": "<b>sslh-fork</b> forks a new process for each incoming connection. It is well-tested and very reliable, but incurs the overhead of many processes. If you are going to use sslh for a 'small' setup (less than a dozen ssh connections and a low-traffic https server) then <code>sslh-fork</code> is probably more suited for you.",
+            "defaultValue": true
+        },{
+            "key": "wizard_sslh_select",
+            "desc": "<b>sslh-select</b> uses only one thread, which monitors all connections at once. It only incurs a 16 byte overhead per connection. Also, if it stops, you'll lose all connections, which means you can't upgrade it remotely. If you are going to use sslh on a 'medium' setup (a few hundreds of connections), or if you are on a system where forking is expensive (e.g. Windows), <code>sslh-select</code> will be better.",
+            "defaultValue": false
+        },{
+            "key": "wizard_sslh_ev",
+            "desc": "<b>sslh-ev</b> is similar to <code>sslh-select</code>, but uses libev as a backend. This allows using specific kernel APIs that allow to manage thousands of connections concurrently.",
+            "defaultValue": false
+        }]
+    }]
+}]

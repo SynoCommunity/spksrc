@@ -1,6 +1,6 @@
-# Define python311 binary path
-PYTHON_DIR="/var/packages/python311/target/bin"
-# Add local bin, virtualenv along with python311 to the default PATH
+# Define python312 binary path
+PYTHON_DIR="/var/packages/python312/target/bin"
+# Add local bin, virtualenv along with python312 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 LANGUAGE="env LANG=en_US.UTF-8"
 SYNOPKG_PKGETC=/var/packages/${SYNOPKG_PKGNAME}/etc
@@ -15,13 +15,13 @@ service_postinst ()
     # Install wheels
     install_python_wheels
 
-    # patch rsax931.py file to find libcrypto lib provided by python311
-    # (rely on patch==1.16 included in requirements-pure.txt)
-    python ${SYNOPKG_PKGDEST}/env/lib/python3.11/site-packages/patch.py \
-           --directory=${SYNOPKG_PKGDEST}/env/lib/python3.11/site-packages/salt/utils \
+    # patch rsax931.py file to find libcrypto lib provided by python312
+    # (rely on patch-ng==1.18.1 included in requirements-pure.txt)
+    python ${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/patch_ng.py \
+           --directory=${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/salt/utils \
            ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
 
-    # Prepare salt-minion config in /var/packages/salt-minion/target/etc
+    # Prepare salt-minion config in /var/packages/salt-minion/etc
     test -d ${SYNOPKG_PKGETC}/minion.d || install -m 755 -d ${SYNOPKG_PKGETC}/minion.d
     test -f ${SYNOPKG_PKGETC}/minion || install -m 644 ${SYNOPKG_PKGDEST}/share/minion ${SYNOPKG_PKGETC}/minion
     test -f ${SYNOPKG_PKGETC}/proxy || install -m 644 ${SYNOPKG_PKGDEST}/share/proxy ${SYNOPKG_PKGETC}/proxy

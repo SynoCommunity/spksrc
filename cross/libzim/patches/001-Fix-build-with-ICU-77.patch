@@ -1,0 +1,24 @@
+Patch taken from Arch Linux
+https://gitlab.archlinux.org/archlinux/packaging/packages/libkiwix/-/blob/main/0001-Fix-build-with-ICU-76.patch?ref_type=heads
+
+Due to unicode-org/icu@199bc82, ICU 77 no longer adds `icu-uc` by
+default. This causes linker errors for undefined symbols like
+`icu_77::UnicodeString::doReplace(...)`, referenced from:
+`zim::removeAccents(...)` in tools.cpp.o.
+
+Meson will automatically flatten the dependencies list as documented
+at https://mesonbuild.com/Reference-manual_functions.html#build_target
+
+--- meson.build-orig	2025-04-17 09:15:37.000000000 +0000
++++ meson.build	2025-04-21 15:18:32.080914220 +0000
+@@ -78,6 +78,10 @@ endif
+ 
+ if xapian_dep.found()
+     icu_dep = dependency('icu-i18n', static:static_linkage)
++    icu_dep = [
++      dependency('icu-i18n', static:static_linkage),
++      dependency('icu-uc', static:static_linkage)
++    ]
+ else
+     icu_dep = dependency('icu-i18n', required:false, static:static_linkage)
+ endif

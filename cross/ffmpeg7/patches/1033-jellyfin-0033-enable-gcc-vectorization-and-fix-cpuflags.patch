@@ -1,0 +1,38 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -5558,7 +5558,7 @@ elif enabled x86; then
+         ;;
+         # everything else should support nopl and conditional mov (cmov)
+         *)
+-            cpuflags="-march=$cpu"
++            # there is no -march=generic option
+             enable i686
+             enable fast_cmov
+         ;;
+@@ -7539,7 +7539,9 @@ if enabled icc; then
+             disable aligned_stack
+     fi
+ elif enabled gcc; then
+-    check_optflags -fno-tree-vectorize
++    case $gcc_basever in
++        2|2.*|3.*|4.*|5.*|6.*) check_optflags -fno-tree-vectorize ;;
++    esac
+     check_cflags -Werror=format-security
+     check_cflags -Werror=implicit-function-declaration
+     check_cflags -Werror=missing-prototypes
+Index: FFmpeg/libavcodec/x86/cabac.h
+===================================================================
+--- libavcodec/x86/cabac.h
++++ libavcodec/x86/cabac.h
+@@ -183,6 +183,9 @@ av_noinline
+ #else
+ av_always_inline
+ #endif
++#ifdef __GNUC__
++__attribute__((optimize("-fno-tree-vectorize")))
++#endif
+ int get_cabac_inline_x86(CABACContext *c, uint8_t *const state)
+ {
+     int bit, tmp;

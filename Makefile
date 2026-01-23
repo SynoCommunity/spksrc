@@ -70,32 +70,18 @@ native-%: native/%/Makefile
 native-%-clean: native/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
 
-# build dependency flat list for all packages
-dependency-flat:
-	@echo $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile)))
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
-	do \
-	    echo "$(MAKE) -s -C $${spk} dependency-flat" ; \
-	    $(MAKE) -s -C $${spk} dependency-flat ; \
-	done
-
 # build dependency tree for all packages
+# - exclude broken packages
 dependency-tree:
-	@echo $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile)))
 	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
-	    echo "$(MAKE) --no-print-directory -C $${spk} dependency-tree" ; \
 	    $(MAKE) --no-print-directory -C $${spk} dependency-tree ; \
 	done
 
 # build dependency list for all packages
+# - broken packages are excluded
 dependency-list:
-	@echo $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile)))
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
-	do \
-	    echo "$(MAKE) -s -C $${spk} dependency-list" ; \
-	    $(MAKE) -s -C $${spk} dependency-list ; \
-	done
+	@mk/dependency-list.sh
 
 # define a template that instantiates a 'python3-avoton-6.1' -style target for
 # every ($2) arch, every ($1) spk
@@ -181,7 +167,10 @@ local.mk:
 	@echo "DISTRIBUTOR_URL =" >> $@
 	@echo "REPORT_URL =" >> $@
 	@echo "DEFAULT_TC =" >> $@
-	@echo "#PSTAT = on" >> $@
+	@echo "# Option to disable the use of github API to get the real name and url of the maintainer" >> $@
+	@echo "# define it for local builds when you reach the API rate limit" >> $@
+	@echo "DISABLE_GITHUB_MAINTAINER =" >> $@
+	@echo "PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
 
 dsm-%: local.mk

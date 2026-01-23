@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/aria2/aria2/releases/download/release-$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libssh2 cross/gnutls cross/libgcrypt cross/libexpat cross/c-ares cross/sqlite
+DEPENDS = cross/openssl3 cross/libssh2 cross/libexpat cross/c-ares cross/sqlite
 
 # A compiler with support for C++11 language features is required.
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
@@ -24,5 +24,9 @@ GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS  = --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 CONFIGURE_ARGS += --with-sqlite3
+# There is an issue with gnutls on ARMv8 archs
+# ensure gnutls and libgcrypt are ignored when found
+CONFIGURE_ARGS += --without-gnutls
+CONFIGURE_ARGS += --without-libgcrypt
 
 include ../../mk/spksrc.cross-cc.mk

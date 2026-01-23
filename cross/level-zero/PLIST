@@ -1,9 +1,0 @@
-lnk:lib/libze_loader.so
-lnk:lib/libze_loader.so.1
-lib:lib/libze_loader.so.1.9.0
-lnk:lib/libze_tracing_layer.so
-lnk:lib/libze_tracing_layer.so.1
-lib:lib/libze_tracing_layer.so.1.9.0
-lnk:lib/libze_validation_layer.so
-lnk:lib/libze_validation_layer.so.1
-lib:lib/libze_validation_layer.so.1.9.0

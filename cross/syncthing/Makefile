@@ -1,12 +1,12 @@
 PKG_NAME = syncthing
-PKG_VERS = 1.27.2
+PKG_VERS = 1.30.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/syncthing/syncthing/releases/download/v$(PKG_VERS)
 PKG_DIR = src/github.com/$(PKG_NAME)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
-BUILD_DEPENDS = native/go
+BUILD_DEPENDS = native/go_1.23
 
 HOMEPAGE = https://www.syncthing.net/
 COMMENT  = Syncthing is a continuous file synchronization program. It synchronizes files between two or more computers.
@@ -24,4 +24,4 @@ BUILD_ARGS = -goos=$(GOOS) -goarch=$(GO_ARCH) -version=v$(PKG_VERS)
 .PHONY: syncthing_compile
 # use custom build to remove GOARCH from ENV and for custom BUILD_ARGS
 syncthing_compile:
-	cd $(GO_SRC_DIR) && env $(filter-out GOARCH=%, $(ENV)) go run build.go $(BUILD_ARGS) build
+	cd $(GO_SRC_DIR) && PATH=$(WORK_DIR)/../../../native/go_1.23/work-native/go/bin/:$$PATH && env $(filter-out GOARCH=%, $(ENV)) go run build.go $(BUILD_ARGS) build

@@ -44,11 +44,11 @@ pre_kernel_configure_target: kernel_configure_msg
 
 kernel_configure_target:  $(PRE_KERNEL_CONFIGURE_TARGET)
 	@$(MSG) "Updating kernel Makefile"
-	@$(RUN) sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' Makefile
-	@$(RUN) sed -i -r 's,^ARCH\s*.+,ARCH\t= $(KERNEL_ARCH),' Makefile
+	@$(RUN) sed -r 's,^ARCH[^_]\s*.+,ARCH\t\t= $(KERNEL_ARCH),' -i.ARCH.orig Makefile
+	@$(RUN) sed -r -e '/^ARCH/a\' -e 'CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX)' -i.CROSS_COMPILE.orig Makefile
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
-	@$(RUN) sed -i -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' Makefile
+	@$(RUN) sed -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' -i Makefile
 endif
 	@test -e $(WORK_DIR)/arch/$(KERNEL_ARCH) || $(RUN) ln -sf $(KERNEL_BASE_ARCH) arch/$(KERNEL_ARCH)
 	@$(MSG) "Cleaning the kernel source"
@@ -61,6 +61,7 @@ ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
 	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) < 3.8"
 	@$(RUN) yes "" | $(MAKE) oldconfig
 else
+	@$(MSG) "make olddefconfig for kernel $(TC_KERNEL)"
 	@$(RUN) $(MAKE) olddefconfig
 endif
 # Call to make kernelversion is not available for kernel <= 3.0

@@ -1,5 +1,5 @@
 PKG_NAME = docker-tvheadend
-PKG_VERS = 42078692-ls128
+PKG_VERS = 221400c9-ls253
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/linuxserver/docker-tvheadend/archive

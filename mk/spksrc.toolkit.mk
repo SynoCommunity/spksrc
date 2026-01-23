@@ -4,8 +4,11 @@ SHELL := $(SHELL) -e
 default: all
 
 WORK_DIR := $(CURDIR)/work
+
+# Setup common directories
 include ../../mk/spksrc.directories.mk
 
+# Common makefiles
 include ../../mk/spksrc.common.mk
 
 # Configure the included makefiles

@@ -1,5 +1,4 @@
 rsc:bin/arp-fingerprint
 bin:bin/arp-scan
-rsc:bin/get-iab
-rsc:bin/get-oui
+rsc:etc/arp-scan/mac-vendor.txt
 rsc:share/arp-scan

@@ -1,0 +1,92 @@
+Index: FFmpeg/libavcodec/dxva2.c
+===================================================================
+--- libavcodec/dxva2.c
++++ libavcodec/dxva2.c
+@@ -615,6 +615,16 @@ int ff_dxva2_common_frame_params(AVCodec
+     else
+         surface_alignment = 16;
+ 
++    /* align surfaces to 32 on Intel to keep in line with the MSDK impl,
++    which avoids the unnecessary resizing when mapping to QSV */
++    if (device_ctx->type == AV_HWDEVICE_TYPE_D3D11VA) {
++        AVD3D11VADeviceContext *device_hwctx = device_ctx->hwctx;
++        if (device_hwctx->device_desc.VendorId == 0x8086) {
++            av_log(avctx, AV_LOG_DEBUG, "Intel DX11 device found, alignment changed!\n");
++            surface_alignment = 32;
++        }
++    }
++
+     /* 1 base work surface */
+     num_surfaces = 1;
+ 
+Index: FFmpeg/libavutil/hwcontext_d3d11va.c
+===================================================================
+--- libavutil/hwcontext_d3d11va.c
++++ libavutil/hwcontext_d3d11va.c
+@@ -609,6 +609,35 @@ static int d3d11va_device_find_adapter_b
+     return -1;
+ }
+ 
++static int d3d11va_check_uma_support(AVHWDeviceContext *ctx)
++{
++    AVD3D11VADeviceContext *device_hwctx = ctx->hwctx;
++    D3D11_FEATURE_DATA_D3D11_OPTIONS2 data = {};
++    HRESULT hr = ID3D11Device_CheckFeatureSupport(device_hwctx->device,
++                                                  D3D11_FEATURE_D3D11_OPTIONS2,
++                                                  &data, sizeof(data));
++    return SUCCEEDED(hr) && data.UnifiedMemoryArchitecture;
++}
++
++static void d3d11va_query_device_desc(AVHWDeviceContext *ctx,
++                                      DXGI_ADAPTER_DESC *desc)
++{
++    AVD3D11VADeviceContext *device_hwctx = ctx->hwctx;
++    IDXGIDevice *pDXGIDevice = NULL;
++    IDXGIAdapter *pDXGIAdapter = NULL;
++    HRESULT hr = ID3D11Device_QueryInterface(device_hwctx->device, &IID_IDXGIDevice,
++                                             (void **)&pDXGIDevice);
++    if (SUCCEEDED(hr) && pDXGIDevice) {
++        hr = IDXGIDevice_GetParent(pDXGIDevice, &IID_IDXGIAdapter,
++                                   (void **)&pDXGIAdapter);
++        if (SUCCEEDED(hr) && pDXGIAdapter) {
++            IDXGIAdapter_GetDesc(pDXGIAdapter, desc);
++            IDXGIAdapter_Release(pDXGIAdapter);
++        }
++        IDXGIDevice_Release(pDXGIDevice);
++    }
++}
++
+ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
+                                  AVDictionary *opts, int flags)
+ {
+@@ -686,6 +715,9 @@ static int d3d11va_device_create(AVHWDev
+         ID3D10Multithread_Release(pMultithread);
+     }
+ 
++    device_hwctx->is_uma = d3d11va_check_uma_support(ctx);
++    d3d11va_query_device_desc(ctx, &device_hwctx->device_desc);
++
+ #if !HAVE_UWP && HAVE_DXGIDEBUG_H
+     if (is_debug) {
+         HANDLE dxgidebug_dll = LoadLibrary("dxgidebug.dll");
+Index: FFmpeg/libavutil/hwcontext_d3d11va.h
+===================================================================
+--- libavutil/hwcontext_d3d11va.h
++++ libavutil/hwcontext_d3d11va.h
+@@ -94,6 +94,16 @@ typedef struct AVD3D11VADeviceContext {
+     void (*lock)(void *lock_ctx);
+     void (*unlock)(void *lock_ctx);
+     void *lock_ctx;
++
++    /**
++     * DXGI adapter description of the device.
++     */
++    DXGI_ADAPTER_DESC device_desc;
++
++    /**
++     * Whether the device is an UMA device.
++     */
++    int is_uma;
+ } AVD3D11VADeviceContext;
+ 
+ /**

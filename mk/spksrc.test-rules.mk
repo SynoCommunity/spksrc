@@ -48,7 +48,6 @@ test-all: test-ffmpeg
 test-info:
 	@echo SUPPORTED_ARCHS: $(SUPPORTED_ARCHS)
 	@echo LATEST_ARCHS: $(LATEST_ARCHS)
-	@echo SUPPORTED_KERNEL_VERSIONS: $(SUPPORTED_KERNEL_VERSIONS)
 
 # Testing against toolchain and simple build use-cases
 # Process 'clean' on toolchains at the end as otherwise rebuilt

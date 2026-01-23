@@ -1,0 +1,69 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2024 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+/*========================== begin_copyright_notice ============================
+ 
+Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+See https://llvm.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 with LLVM-exception
+ 
+============================= end_copyright_notice ===========================*/
+
+From 08b20f20d2854377009822dfe597c78a4bf18de8 Mon Sep 17 00:00:00 2001
+From: Benjamin Kramer <benny.kra@googlemail.com>
+Date: Thu, 5 May 2022 15:50:33 +0200
+Subject: [PATCH] [ConstantFold] Use getFltSemantics instead of manually
+ checking the type
+
+Simplifies the code and makes fpext/fptrunc constant folding not crash
+when the result is bf16.
+---
+ llvm/lib/IR/ConstantFold.cpp                        | 10 ++--------
+ llvm/test/Transforms/InstSimplify/ConstProp/cast.ll |  8 ++++++++
+ 2 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/llvm/lib/IR/ConstantFold.cpp b/llvm/lib/IR/ConstantFold.cpp
+index 9cbbe2bf5df8..b032a3fea98f 100644
+--- a/llvm/lib/IR/ConstantFold.cpp
++++ b/llvm/lib/IR/ConstantFold.cpp
+@@ -435,14 +435,8 @@ Constant *llvm::ConstantFoldCastInstruction(unsigned opc, Constant *V,
+     if (ConstantFP *FPC = dyn_cast<ConstantFP>(V)) {
+       bool ignored;
+       APFloat Val = FPC->getValueAPF();
+-      Val.convert(DestTy->isHalfTy() ? APFloat::IEEEhalf() :
+-                  DestTy->isFloatTy() ? APFloat::IEEEsingle() :
+-                  DestTy->isDoubleTy() ? APFloat::IEEEdouble() :
+-                  DestTy->isX86_FP80Ty() ? APFloat::x87DoubleExtended() :
+-                  DestTy->isFP128Ty() ? APFloat::IEEEquad() :
+-                  DestTy->isPPC_FP128Ty() ? APFloat::PPCDoubleDouble() :
+-                  APFloat::Bogus(),
+-                  APFloat::rmNearestTiesToEven, &ignored);
++      Val.convert(DestTy->getFltSemantics(), APFloat::rmNearestTiesToEven,
++                  &ignored);
+       return ConstantFP::get(V->getContext(), Val);
+     }
+     return nullptr; // Can't fold.
+diff --git a/llvm/test/Transforms/InstSimplify/ConstProp/cast.ll b/llvm/test/Transforms/InstSimplify/ConstProp/cast.ll
+index 8e9fd5fbae30..14eb29e636c6 100644
+--- a/llvm/test/Transforms/InstSimplify/ConstProp/cast.ll
++++ b/llvm/test/Transforms/InstSimplify/ConstProp/cast.ll
+@@ -62,3 +62,11 @@ define <3 x half> @nan_v3f64_trunc() {
+   %f = fptrunc <3 x double> <double 0x7FF0020000000000, double 0x7FF003FFFFFFFFFF, double 0x7FF8000000000001> to <3 x half>
+   ret <3 x half> %f
+ }
++
++define bfloat @nan_bf16_trunc() {
++; CHECK-LABEL: @nan_bf16_trunc(
++; CHECK-NEXT:    ret bfloat 0xR7FC0
++;
++  %f = fptrunc double 0x7FF0000000000001 to bfloat
++  ret bfloat %f
++}
+-- 
+2.39.1.windows.1
+

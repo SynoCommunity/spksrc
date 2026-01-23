@@ -1,5 +1,5 @@
 PKG_NAME = procs
-PKG_VERS = 0.14.0
+PKG_VERS = 0.14.10
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/dalance/procs/archive
@@ -14,5 +14,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 HOMEPAGE = https://github.com/dalance/procs#readme
 COMMENT  = A modern replacement for ps written in Rust.
 LICENSE  = MIT
+
+CARGO_BUILD_ARGS = --locked
 
 include ../../mk/spksrc.cross-rust.mk

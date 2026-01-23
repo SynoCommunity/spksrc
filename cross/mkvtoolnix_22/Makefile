@@ -15,8 +15,8 @@ DEPENDS += cross/libogg cross/libvorbis cross/zlib
 DEPENDS += cross/flac cross/file
 DEPENDS += cross/libmatroska_1.5
 
-HOMEPAGE = https://mkvtoolnix.download/index.html
-COMMENT  = MKVToolNix is a set of tools to create, alter and inspect Matroska files.
+HOMEPAGE = https://mkvtoolnix.org/
+COMMENT  = MKVToolNix - Ultimate Tool for Editing and Merging MKV Files.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1

@@ -1,6 +1,6 @@
 PKG_NAME = gpac
 PKG_VERS = 2.2.1
-PKG_REV = 1
+GPAC_GIT_REVISION = "1 (SynoCommunity)"
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/gpac/gpac/archive
@@ -11,18 +11,22 @@ HOMEPAGE = https://gpac.io
 COMMENT  = Home of MP4Box.
 LICENSE  = LGPLv2
 
-# incompatible toolchain
+# toolchains lacking atomic support
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 DEPENDS = cross/zlib
 
-CONFIGURE_ARGS  = --enable-pic
-CONFIGURE_ARGS += --extra-cflags="-Wno-pointer-sign"
+GNU_CONFIGURE = 1
 
-PRE_COMPILE_TARGET = gpac_precompile
+CONFIGURE_ARGS = --enable-pic
+# suppress some compiler warnings:
+CONFIGURE_ARGS += --extra-cflags="-Wno-pointer-sign -Wno-array-bounds -Wno-maybe-uninitialized"
+
+PRE_COMPILE_TARGET = gpac_pre_compile
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: gpac_precompile 
-gpac_precompile:
-	@echo "#define GPAC_GIT_REVISION \"$(PKG_REV) (SynoCommunity)\"" > $(WORK_DIR)/$(PKG_DIR)/include/gpac/revision.h
+.PHONY: gpac_pre_compile 
+gpac_pre_compile:
+	@$(MSG) "Patch revision.h to avoid UNKNOWN_REV (used when build is not in gpac git repository)"
+	@sed -e 's/"UNKNOWN_REV"/$(GPAC_GIT_REVISION)/' -i $(WORK_DIR)/$(PKG_DIR)/include/gpac/revision.h

@@ -4,7 +4,7 @@
 
 .PHONY: clean
 clean:
-	rm -fr work work-* build-*.log publish-*.log status-*.log
+	rm -fr work work-* build.log build-*.log publish-*.log status-*.log
 
 .PHONY: smart-clean
 smart-clean:
@@ -36,6 +36,6 @@ include ../../mk/spksrc.dependency-tree.mk
 include ../../mk/spksrc.generate-digests.mk
 
 ### For make kernel-required
-include ../../mk/spksrc.kernel.mk
+include ../../mk/spksrc.kernel-required.mk
 
 ###

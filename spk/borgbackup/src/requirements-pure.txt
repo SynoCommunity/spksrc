@@ -1,36 +1,25 @@
-# Wheels that absolutely needs
-# to be managed as pure-python
+# Generated using the requirements script on December 11, 2025
 
 appdirs==1.4.4
-arrow==1.2.3
-attrs==23.1.0
-#borgbackup                            ==> crossenv
-borgmatic==1.8.2
-#certifi                               ==> python311:pure
-#charset-normalizer                    ==> crossenv
-colorama==0.4.6
-#distlib                               ==> python311:pure
+arrow==1.4.0
+attrs==25.4.0
+borgmatic==2.0.12
+#certifi==2025.11.12                     ==> python312
 docopt==0.6.2
-emborg==1.37
-#filelock                              ==> python311:pure
-idna==3.4
-inform==1.28
-jsonschema==4.19.0
-jsonschema-specifications==2023.7.1
-#llfuse                                ==> crossenv
-#msgpack                               ==> crossenv
-nestedtext==3.6
-packaging==23.1
-#platformdirs                          ==> python311:pure
-pyparsing==3.1.1
-#pyrsistent                            ==> crossenv
-python-dateutil==2.8.2
-quantiphy==2.19
-referencing==0.30.2
-requests==2.31.0
-#rpds-py                               ==> crossenv
-ruamel.yaml==0.17.32
-#ruamel.yaml.clib                      ==> crossenv
-#six                                   ==> python311:pure
-urllib3==2.0.4
-#virtualenv                            ==> python311:pure
+emborg==1.42
+idna==3.11
+inform==1.35
+jsonschema==4.25.1
+jsonschema_specifications==2025.9.1
+nestedtext==3.7
+packaging==25.0
+#pip==25.3                                ==> python312
+python_dateutil==2.9.0.post0
+quantiphy==2.20
+referencing==0.37.0
+requests==2.32.5
+ruamel.yaml==0.18.16
+#six==1.17.0                              ==> python312
+typing_extensions==4.15.0
+tzdata==2025.2
+urllib3==2.6.1

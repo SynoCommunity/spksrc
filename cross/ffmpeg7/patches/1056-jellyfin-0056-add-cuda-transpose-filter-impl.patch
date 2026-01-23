@@ -1,0 +1,586 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -3297,6 +3297,8 @@ thumbnail_cuda_filter_deps="ffnvcodec"
+ thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
+ tonemap_cuda_filter_deps="ffnvcodec const_nan"
+ tonemap_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
++transpose_cuda_filter_deps="ffnvcodec"
++transpose_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
+ transpose_npp_filter_deps="ffnvcodec libnpp"
+ overlay_cuda_filter_deps="ffnvcodec"
+ overlay_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
+Index: FFmpeg/libavfilter/Makefile
+===================================================================
+--- libavfilter/Makefile
++++ libavfilter/Makefile
+@@ -540,6 +540,8 @@ OBJS-$(CONFIG_TONEMAP_VIDEOTOOLBOX_FILTE
+                                                 metal/utils.o
+ OBJS-$(CONFIG_TPAD_FILTER)                   += vf_tpad.o
+ OBJS-$(CONFIG_TRANSPOSE_FILTER)              += vf_transpose.o
++OBJS-$(CONFIG_TRANSPOSE_CUDA_FILTER)         += vf_transpose_cuda.o vf_transpose_cuda.ptx.o \
++                                                cuda/load_helper.o
+ OBJS-$(CONFIG_TRANSPOSE_NPP_FILTER)          += vf_transpose_npp.o
+ OBJS-$(CONFIG_TRANSPOSE_OPENCL_FILTER)       += vf_transpose_opencl.o opencl.o opencl/transpose.o
+ OBJS-$(CONFIG_TRANSPOSE_VAAPI_FILTER)        += vf_transpose_vaapi.o vaapi_vpp.o
+Index: FFmpeg/libavfilter/allfilters.c
+===================================================================
+--- libavfilter/allfilters.c
++++ libavfilter/allfilters.c
+@@ -504,6 +504,7 @@ extern const AVFilter ff_vf_tonemap_vaap
+ extern const AVFilter ff_vf_tonemap_videotoolbox;
+ extern const AVFilter ff_vf_tpad;
+ extern const AVFilter ff_vf_transpose;
++extern const AVFilter ff_vf_transpose_cuda;
+ extern const AVFilter ff_vf_transpose_npp;
+ extern const AVFilter ff_vf_transpose_opencl;
+ extern const AVFilter ff_vf_transpose_vaapi;
+Index: FFmpeg/libavfilter/vf_transpose_cuda.c
+===================================================================
+--- /dev/null
++++ libavfilter/vf_transpose_cuda.c
+@@ -0,0 +1,477 @@
++/*
++ * Copyright (C) 2024 NyanMisaka
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include "libavutil/common.h"
++#include "libavutil/hwcontext.h"
++#include "libavutil/hwcontext_cuda_internal.h"
++#include "libavutil/cuda_check.h"
++#include "libavutil/internal.h"
++#include "libavutil/opt.h"
++#include "libavutil/pixdesc.h"
++
++#include "avfilter.h"
++#include "internal.h"
++#include "video.h"
++#include "transpose.h"
++
++#include "cuda/load_helper.h"
++
++#define CHECK_CU(x) FF_CUDA_CHECK_DL(ctx, s->hwctx->internal->cuda_dl, x)
++#define DIV_UP(a, b) ( ((a) + (b) - 1) / (b) )
++
++#define BLOCK_X 32
++#define BLOCK_Y 16
++
++static const enum AVPixelFormat supported_formats[] = {
++    AV_PIX_FMT_YUV420P,
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_YUV444P,
++    AV_PIX_FMT_P010,
++    AV_PIX_FMT_P016,
++    AV_PIX_FMT_YUV444P16,
++    AV_PIX_FMT_0RGB32,
++    AV_PIX_FMT_0BGR32,
++    AV_PIX_FMT_RGB32,
++    AV_PIX_FMT_BGR32,
++};
++
++typedef struct TransposeCUDAContext {
++    const AVClass *class;
++
++    AVCUDADeviceContext *hwctx;
++    AVBufferRef         *frames_ctx;
++    AVFrame             *frame;
++    AVFrame             *tmp_frame;
++
++    const AVPixFmtDescriptor *pix_desc;
++
++    CUcontext  cu_ctx;
++    CUmodule   cu_module;
++    CUfunction cu_func_uchar;
++    CUfunction cu_func_ushort;
++    CUstream   cu_stream;
++
++    int passthrough;    ///< PassthroughType, landscape passthrough mode enabled
++    int dir;            ///< TransposeDir
++} TransposeCUDAContext;
++
++static av_cold int cudatranspose_init(AVFilterContext *ctx)
++{
++    TransposeCUDAContext *s = ctx->priv;
++
++    s->frame = av_frame_alloc();
++    if (!s->frame)
++        return AVERROR(ENOMEM);
++
++    s->tmp_frame = av_frame_alloc();
++    if (!s->tmp_frame)
++        return AVERROR(ENOMEM);
++
++    return 0;
++}
++
++static av_cold void cudatranspose_uninit(AVFilterContext *ctx)
++{
++    TransposeCUDAContext *s = ctx->priv;
++
++    if (s->hwctx && s->cu_module) {
++        CUcontext dummy;
++        CudaFunctions *cu = s->hwctx->internal->cuda_dl;
++        CHECK_CU(cu->cuCtxPushCurrent(s->cu_ctx));
++        CHECK_CU(cu->cuModuleUnload(s->cu_module));
++        CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++    }
++
++    av_frame_free(&s->frame);
++    av_buffer_unref(&s->frames_ctx);
++    av_frame_free(&s->tmp_frame);
++}
++
++static av_cold int init_hwframe_ctx(TransposeCUDAContext *s,
++                                    AVBufferRef *device_ctx,
++                                    int width, int height,
++                                    enum AVPixelFormat sw_format)
++{
++    AVBufferRef *out_ref = NULL;
++    AVHWFramesContext *out_ctx;
++    int ret;
++
++    out_ref = av_hwframe_ctx_alloc(device_ctx);
++    if (!out_ref)
++        return AVERROR(ENOMEM);
++    out_ctx = (AVHWFramesContext*)out_ref->data;
++
++    out_ctx->format    = AV_PIX_FMT_CUDA;
++    out_ctx->sw_format = sw_format;
++    out_ctx->width     = FFALIGN(width,  32);
++    out_ctx->height    = FFALIGN(height, 32);
++
++    ret = av_hwframe_ctx_init(out_ref);
++    if (ret < 0)
++        goto fail;
++
++    av_frame_unref(s->frame);
++    ret = av_hwframe_get_buffer(out_ref, s->frame, 0);
++    if (ret < 0)
++        goto fail;
++
++    s->frame->width  = width;
++    s->frame->height = height;
++
++    av_buffer_unref(&s->frames_ctx);
++    s->frames_ctx = out_ref;
++
++    return 0;
++fail:
++    av_buffer_unref(&out_ref);
++    return ret;
++}
++
++static int format_is_supported(enum AVPixelFormat fmt)
++{
++    int i;
++
++    for (i = 0; i < FF_ARRAY_ELEMS(supported_formats); i++)
++        if (supported_formats[i] == fmt)
++            return 1;
++
++    return 0;
++}
++
++static int init_processing_chain(AVFilterContext *ctx,
++                                 int out_width, int out_height)
++{
++    TransposeCUDAContext *s = ctx->priv;
++    AVHWFramesContext *in_frames_ctx;
++    enum AVPixelFormat format;
++    int ret;
++
++    /* check that we have a hw context */
++    if (!ctx->inputs[0]->hw_frames_ctx) {
++        av_log(ctx, AV_LOG_ERROR, "No hw context provided on input\n");
++        return AVERROR(EINVAL);
++    }
++
++    in_frames_ctx = (AVHWFramesContext*)ctx->inputs[0]->hw_frames_ctx->data;
++    format        = in_frames_ctx->sw_format;
++    s->pix_desc   = av_pix_fmt_desc_get(format);
++
++    if (!format_is_supported(format)) {
++        av_log(ctx, AV_LOG_ERROR, "Unsupported input format: %s\n",
++               av_get_pix_fmt_name(format));
++        return AVERROR(ENOSYS);
++    }
++
++    ret = init_hwframe_ctx(s, in_frames_ctx->device_ref,
++                           out_width, out_height, format);
++    if (ret < 0)
++        return ret;
++
++    s->hwctx = in_frames_ctx->device_ctx->hwctx;
++    s->cu_stream = s->hwctx->stream;
++
++    ctx->outputs[0]->hw_frames_ctx = av_buffer_ref(s->frames_ctx);
++    if (!ctx->outputs[0]->hw_frames_ctx)
++        return AVERROR(ENOMEM);
++
++    return 0;
++}
++
++static int cudatranspose_config_props(AVFilterLink *outlink)
++{
++    extern const unsigned char ff_vf_transpose_cuda_ptx_data[];
++    extern const unsigned int ff_vf_transpose_cuda_ptx_len;
++    AVFilterContext *ctx   = outlink->src;
++    AVFilterLink *inlink   = ctx->inputs[0];
++    TransposeCUDAContext *s = ctx->priv;
++    CUcontext dummy, cuda_ctx;
++    CudaFunctions *cu;
++    int ret;
++
++    if ((inlink->w >= inlink->h && s->passthrough == TRANSPOSE_PT_TYPE_LANDSCAPE) ||
++        (inlink->w <= inlink->h && s->passthrough == TRANSPOSE_PT_TYPE_PORTRAIT)) {
++        if (inlink->hw_frames_ctx) {
++            outlink->hw_frames_ctx = av_buffer_ref(inlink->hw_frames_ctx);
++            if (!outlink->hw_frames_ctx)
++                return AVERROR(ENOMEM);
++        }
++
++        av_log(ctx, AV_LOG_VERBOSE,
++               "w:%d h:%d -> w:%d h:%d (passthrough mode)\n",
++               inlink->w, inlink->h, inlink->w, inlink->h);
++        return 0;
++    } else {
++        s->passthrough = TRANSPOSE_PT_TYPE_NONE;
++    }
++
++    switch (s->dir) {
++    case TRANSPOSE_CCLOCK_FLIP:
++    case TRANSPOSE_CCLOCK:
++    case TRANSPOSE_CLOCK:
++    case TRANSPOSE_CLOCK_FLIP:
++        outlink->w = inlink->h;
++        outlink->h = inlink->w;
++        break;
++    default:
++        outlink->w = inlink->w;
++        outlink->h = inlink->h;
++        break;
++    }
++
++    if (inlink->sample_aspect_ratio.num)
++        outlink->sample_aspect_ratio = av_div_q((AVRational) { 1, 1 },
++                                                inlink->sample_aspect_ratio);
++    else
++        outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
++
++    ret = init_processing_chain(ctx, outlink->w, outlink->h);
++    if (ret < 0)
++        return ret;
++
++    cuda_ctx = s->cu_ctx = s->hwctx->cuda_ctx;
++    cu = s->hwctx->internal->cuda_dl;
++
++    ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
++    if (ret < 0)
++        return ret;
++
++    ret = ff_cuda_load_module(ctx, s->hwctx, &s->cu_module,
++                              ff_vf_transpose_cuda_ptx_data, ff_vf_transpose_cuda_ptx_len);
++    if (ret < 0) {
++        CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++        return ret;
++    }
++
++    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_uchar,
++                                           s->cu_module, "Transpose_Cuda_uchar"));
++    if (ret < 0) {
++        CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++        return ret;
++    }
++
++    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_ushort,
++                                           s->cu_module, "Transpose_Cuda_ushort"));
++    if (ret < 0) {
++        CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++        return ret;
++    }
++
++    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++
++    av_log(ctx, AV_LOG_VERBOSE,
++           "w:%d h:%d dir:%d -> w:%d h:%d\n",
++           inlink->w, inlink->h, s->dir, outlink->w, outlink->h);
++    return 0;
++}
++
++static int call_transpose_kernel(AVFilterContext *ctx,
++                                 int pix_size,
++                                 int pix_step,
++                                 int pix_offset,
++                                 CUdeviceptr dst_data,
++                                 int dst_width,
++                                 int dst_height,
++                                 int dst_pitch,
++                                 CUdeviceptr src_data,
++                                 int src_width,
++                                 int src_height,
++                                 int src_pitch)
++{
++    TransposeCUDAContext *s = ctx->priv;
++    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
++
++    void* kernel_args[] = {
++        &dst_data, &dst_width, &dst_height, &dst_pitch,
++        &src_data, &src_width, &src_height, &src_pitch,
++        &pix_step, &pix_offset, &s->dir,
++    };
++
++    return CHECK_CU(cu->cuLaunchKernel(pix_size == 1 ? s->cu_func_uchar : s->cu_func_ushort,
++                                       DIV_UP(dst_width, BLOCK_X), DIV_UP(dst_height, BLOCK_Y), 1,
++                                       BLOCK_X, BLOCK_Y, 1, 0, s->cu_stream, kernel_args, NULL));
++}
++
++static int cudatranspose_rotate(AVFilterContext *ctx,
++                                AVFrame *out, AVFrame *in)
++{
++    TransposeCUDAContext *s = ctx->priv;
++    int pix_size, pix_step, pix_offset;
++    int c, p, ret;
++
++    for (c = 0; c < s->pix_desc->nb_components; c++) {
++        p = s->pix_desc->comp[c].plane;
++        if (!out->data[p] || !in->data[p])
++            return AVERROR(ENOMEM);
++
++        pix_size = (s->pix_desc->comp[c].depth + s->pix_desc->comp[c].shift) / 8;
++        if (!(pix_size == 1 || pix_size == 2))
++            return AVERROR(ENOSYS);
++
++        pix_step = s->pix_desc->comp[c].step / pix_size;
++        pix_offset = s->pix_desc->comp[c].offset / pix_size;
++
++        ret = call_transpose_kernel(ctx, pix_size, pix_step, pix_offset,
++                                    (CUdeviceptr)out->data[p],
++                                    AV_CEIL_RSHIFT(out->width, p ? s->pix_desc->log2_chroma_w : 0),
++                                    AV_CEIL_RSHIFT(out->height, p ? s->pix_desc->log2_chroma_h : 0),
++                                    out->linesize[p] / pix_size,
++                                    (CUdeviceptr)in->data[p],
++                                    AV_CEIL_RSHIFT(in->width, p ? s->pix_desc->log2_chroma_w : 0),
++                                    AV_CEIL_RSHIFT(in->height, p ? s->pix_desc->log2_chroma_h : 0),
++                                    in->linesize[p] / pix_size);
++        if (ret < 0)
++            return ret;
++    }
++
++    return 0;
++}
++
++static int cudatranspose_filter_frame_internal(AVFilterContext *ctx,
++                                               AVFrame *out, AVFrame *in)
++{
++    TransposeCUDAContext *s = ctx->priv;
++    AVFilterLink         *outlink = ctx->outputs[0];
++    AVFrame *src = in;
++    int ret;
++
++    ret = cudatranspose_rotate(ctx, s->frame, src);
++    if (ret < 0)
++        return ret;
++
++    src = s->frame;
++    ret = av_hwframe_get_buffer(src->hw_frames_ctx, s->tmp_frame, 0);
++    if (ret < 0)
++        return ret;
++
++    av_frame_move_ref(out, s->frame);
++    av_frame_move_ref(s->frame, s->tmp_frame);
++
++    s->frame->width  = outlink->w;
++    s->frame->height = outlink->h;
++
++    ret = av_frame_copy_props(out, in);
++    if (ret < 0)
++        return ret;
++
++    return 0;
++}
++
++static int cudatranspose_filter_frame(AVFilterLink *link, AVFrame *in)
++{
++    AVFilterContext      *ctx = link->dst;
++    TransposeCUDAContext *s = ctx->priv;
++    AVFilterLink         *outlink = ctx->outputs[0];
++    CudaFunctions *cu;
++    AVFrame *out = NULL;
++    CUcontext dummy;
++    int ret = 0;
++
++    if (s->passthrough)
++        return ff_filter_frame(outlink, in);
++
++    out = av_frame_alloc();
++    if (!out) {
++        ret = AVERROR(ENOMEM);
++        goto fail;
++    }
++
++    cu = s->hwctx->internal->cuda_dl;
++
++    ret = CHECK_CU(cu->cuCtxPushCurrent(s->cu_ctx));
++    if (ret < 0)
++        goto fail;
++
++    ret = cudatranspose_filter_frame_internal(ctx, out, in);
++
++    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++    if (ret < 0)
++        goto fail;
++
++    av_frame_free(&in);
++
++    return ff_filter_frame(outlink, out);
++
++fail:
++    av_frame_free(&in);
++    av_frame_free(&out);
++    return ret;
++}
++
++static AVFrame *cudatranspose_get_video_buffer(AVFilterLink *inlink, int w, int h)
++{
++    TransposeCUDAContext *s = inlink->dst->priv;
++
++    return s->passthrough ?
++        ff_null_get_video_buffer   (inlink, w, h) :
++        ff_default_get_video_buffer(inlink, w, h);
++}
++
++#define OFFSET(x) offsetof(TransposeCUDAContext, x)
++#define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
++
++static const AVOption cudatranspose_options[] = {
++    { "dir", "set transpose direction", OFFSET(dir), AV_OPT_TYPE_INT, { .i64 = TRANSPOSE_CCLOCK_FLIP }, 0, 6, FLAGS, .unit = "dir" },
++        { "cclock_flip", "rotate counter-clockwise with vertical flip", 0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CCLOCK_FLIP }, 0, 0, FLAGS, .unit = "dir" },
++        { "clock",       "rotate clockwise",                            0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CLOCK       }, 0, 0, FLAGS, .unit = "dir" },
++        { "cclock",      "rotate counter-clockwise",                    0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CCLOCK      }, 0, 0, FLAGS, .unit = "dir" },
++        { "clock_flip",  "rotate clockwise with vertical flip",         0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_CLOCK_FLIP  }, 0, 0, FLAGS, .unit = "dir" },
++        { "reversal",    "rotate by half-turn",                         0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_REVERSAL    }, 0, 0, FLAGS, .unit = "dir" },
++        { "hflip",       "flip horizontally",                           0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_HFLIP       }, 0, 0, FLAGS, .unit = "dir" },
++        { "vflip",       "flip vertically",                             0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_VFLIP       }, 0, 0, FLAGS, .unit = "dir" },
++
++    { "passthrough", "do not apply transposition if the input matches the specified geometry", OFFSET(passthrough), AV_OPT_TYPE_INT, { .i64 = TRANSPOSE_PT_TYPE_NONE },  0, 2, FLAGS, .unit = "passthrough" },
++        { "none",      "always apply transposition",  0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_PT_TYPE_NONE },      0, 0, FLAGS, .unit = "passthrough" },
++        { "landscape", "preserve landscape geometry", 0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_PT_TYPE_LANDSCAPE }, 0, 0, FLAGS, .unit = "passthrough" },
++        { "portrait",  "preserve portrait geometry",  0, AV_OPT_TYPE_CONST, { .i64 = TRANSPOSE_PT_TYPE_PORTRAIT },  0, 0, FLAGS, .unit = "passthrough" },
++
++    { NULL },
++};
++
++AVFILTER_DEFINE_CLASS(cudatranspose);
++
++static const AVFilterPad cudatranspose_inputs[] = {
++    {
++        .name         = "default",
++        .type         = AVMEDIA_TYPE_VIDEO,
++        .filter_frame = cudatranspose_filter_frame,
++        .get_buffer.video = cudatranspose_get_video_buffer,
++    },
++};
++
++static const AVFilterPad cudatranspose_outputs[] = {
++    {
++        .name         = "default",
++        .type         = AVMEDIA_TYPE_VIDEO,
++        .config_props = cudatranspose_config_props,
++    },
++};
++
++const AVFilter ff_vf_transpose_cuda = {
++    .name           = "transpose_cuda",
++    .description    = NULL_IF_CONFIG_SMALL("Transpose input video using CUDA"),
++    .init           = cudatranspose_init,
++    .uninit         = cudatranspose_uninit,
++    .priv_size      = sizeof(TransposeCUDAContext),
++    .priv_class     = &cudatranspose_class,
++    FILTER_INPUTS(cudatranspose_inputs),
++    FILTER_OUTPUTS(cudatranspose_outputs),
++    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_CUDA),
++    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
++};
+Index: FFmpeg/libavfilter/vf_transpose_cuda.cu
+===================================================================
+--- /dev/null
++++ libavfilter/vf_transpose_cuda.cu
+@@ -0,0 +1,61 @@
++/*
++ * Copyright (C) 2024 NyanMisaka
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++template<typename T>
++__inline__ __device__ void transpose_func(
++    T* dst, int dst_width, int dst_height, int dst_pitch,
++    T* src, int src_width, int src_height, int src_pitch,
++    int pix_step, int pix_offset, int dir)
++{
++    int xo = blockIdx.x * blockDim.x + threadIdx.x;
++    int yo = blockIdx.y * blockDim.y + threadIdx.y;
++    if (xo >= dst_width || yo >= dst_height)
++        return;
++
++    int xi = (dir < 4) ? ((dir &  2) ? (dst_height - 1 - yo) : yo)
++                       : ((dir == 6) ? xo : (dst_width  - 1 - xo));
++    int yi = (dir < 4) ? ((dir &  1) ? (dst_width  - 1 - xo) : xo)
++                       : ((dir == 5) ? yo : (dst_height - 1 - yo));
++    if (xi >= src_width || yi >= src_height)
++        return;
++
++    int dst_pos = xo*pix_step + yo*dst_pitch + pix_offset;
++    int src_pos = xi*pix_step + yi*src_pitch + pix_offset;
++    dst[dst_pos] = src[src_pos];
++}
++
++extern "C" {
++
++#define TRANSPOSE_VARIANT(NAME, TYPE) \
++__global__ void Transpose_Cuda_ ## NAME( \
++    TYPE* dst, int dst_width, int dst_height, int dst_pitch, \
++    TYPE* src, int src_width, int src_height, int src_pitch, \
++    int pix_step, int pix_offset, int dir) \
++{ \
++    transpose_func( \
++        dst, dst_width, dst_height, dst_pitch, \
++        src, src_width, src_height, src_pitch, \
++        pix_step, pix_offset, dir); \
++}
++
++TRANSPOSE_VARIANT(uchar, unsigned char)
++TRANSPOSE_VARIANT(ushort, unsigned short)
++
++} /* extern "C" */

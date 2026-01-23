@@ -28,7 +28,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 # Installer brings all the binaries
 COPY_TARGET = nop
-override ARCH=
+override ARCH=noarch
 
 POST_STRIP_TARGET = nzbget_extra_install
 

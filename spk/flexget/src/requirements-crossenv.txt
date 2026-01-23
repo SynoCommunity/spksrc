@@ -1,21 +1,15 @@
-# Snapshot from Jul. 23rd 2023
+# Generated using the requirements script on May 31, 2025
 
-aniso8601==9.0.1
-Brotli==1.0.9
-cffi==1.15.1
-charset-normalizer==2.1.1
-#cryptography                ==> cross/cryptography
-dulwich==0.21.5
-greenlet==2.0.1
-MarkupSafe==2.1.1
-msgpack==1.0.5
-psutil==5.9.4
-pydantic==1.10.2
-pyrsistent==0.19.2
-PyYAML==6.0.1
-SQLAlchemy==2.0.15
-
-# Building will generate a non-optimized build: py3-none-any
-# At installation time it will pip download a c++17 compiled
-# optimized build, in case of failure fall-back on this one.
-rapidfuzz==2.15.1
+Brotli==1.1.0
+charset_normalizer==3.4.2
+#greenlet==3.2.2                    ==> supported version depends on gcc version
+MarkupSafe==3.0.2
+#pendulum==3.1.0                    ==> python/pendulum
+psutil==7.0.0
+PyYAML==6.0.2
+# rpds_py==0.25.1: "rpds@1.1.1 requires rustc 1.85.0"
+# rpds_py==0.24.0 is the latest version that builds with rustc 1.82.0 (for qoriq)
+# jsonschema requires rpds-py>=0.7.1
+rpds_py==0.24.0
+sqlalchemy==2.0.41
+zstandard==0.23.0

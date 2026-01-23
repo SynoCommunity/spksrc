@@ -1,11 +1,11 @@
 PKG_NAME = git
-PKG_VERS = 2.43.0
+PKG_VERS = 2.51.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://kernel.org/pub/software/scm/git
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libexpat cross/zlib cross/openssl cross/libssh2 cross/curl
+DEPENDS = cross/libexpat cross/zlib cross/openssl3 cross/libssh2 cross/curl
 
 HOMEPAGE = https://git-scm.com
 COMMENT  = Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.
@@ -25,7 +25,6 @@ ADDITIONAL_CPPFLAGS  = -std=gnu99
 ADDITIONAL_CPPFLAGS += -O
 
 PRE_CONFIGURE_TARGET = git_pre_configure
-POST_COMPILE_TARGET = git_post_compile
 POST_INSTALL_TARGET = git_post_install
 
 INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
@@ -39,13 +38,10 @@ include ../../mk/spksrc.cross-cc.mk
 git_pre_configure:
 	@$(RUN) autoconf
 
-.PHONY: git_post_compile
-git_post_compile:
-	@$(MSG) Compiling contrib subtree
-	@$(RUN) $(MAKE) -C contrib/subtree/ $(MAKE_COMPILE_OPTIONS)
-
 .PHONY: git_post_install
 git_post_install:
+	@$(MSG) Compile and install git-subtree
 	@$(RUN) $(MAKE) -C contrib/subtree/ $(INSTALL_MAKE_OPTIONS)
+	@$(MSG) Install gitconfig
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
 	@install -m 644 src/gitconfig $(STAGING_INSTALL_PREFIX)/etc/gitconfig

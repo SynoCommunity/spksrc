@@ -1,9 +1,0 @@
-rsc:include/X11/Xtrans/transport.c
-rsc:include/X11/Xtrans/Xtrans.c
-rsc:include/X11/Xtrans/Xtrans.h
-rsc:include/X11/Xtrans/Xtransint.h
-rsc:include/X11/Xtrans/Xtranslcl.c
-rsc:include/X11/Xtrans/Xtranssock.c
-rsc:include/X11/Xtrans/Xtransutil.c
-rsc:lib/aclocal/xtrans.m4
-rsc:lib/pkgconfig/xtrans.pc

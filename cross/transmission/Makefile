@@ -1,8 +1,8 @@
 PKG_NAME = transmission
-PKG_VERS = 4.0.5
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/transmission/transmission/releases/download/$(PKG_VERS)
+PKG_VERS = 4.0.6
+PKG_EXT = tar.gz
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-with-submodules.$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/transmission
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/curl
@@ -14,6 +14,7 @@ LICENSE  = GPLv2/GPLv3
 # gcc >= 5.1 required
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 CMAKE_ARGS = -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 CMAKE_ARGS += -DENABLE_TESTS=OFF

@@ -12,7 +12,7 @@ INST_LOG_TEMP="/tmp/${SYNOPKG_PKGNAME}_install.log"
 FWPORTS_FILE="/var/packages/${SYNOPKG_PKGNAME}/target/app/${SYNOPKG_PKGNAME}.sc"
 
 # Versions lower than DSM 6 don't support an upgrade folder
-# hard coded DSM 5 temp ugrade folder for migration
+# hard coded DSM 5 temp upgrade folder for migration
 TMP_DIR="/var/tmp/${SYNOPKG_PKGNAME}/var"
 
 install_log ()

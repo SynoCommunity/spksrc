@@ -42,6 +42,7 @@ copy_msg:
 pre_copy_target: copy_msg
 
 copy_target: SHELL:=/bin/bash
+copy_target: .SHELLFLAGS := -o pipefail -c
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@$(MSG) [DSM7+] Copy target to staging, discard var directory

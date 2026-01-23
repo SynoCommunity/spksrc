@@ -5,32 +5,41 @@
         "items": [
             {
                 "type": "textfield",
-                "desc": "Aria2 Settings",
                 "subitems": [
                     {
-                        "key": "wizard_download_dir",
-                        "desc": "dir",
-                        "defaultValue": "/volume1/downloads",
+                        "key": "wizard_download_share",
+                        "desc": "Shared folder for downloads",
+                        "defaultValue": "downloads",
                         "validator": {
                             "allowBlank": false,
                             "regex": {
-                                "expr": "/^\\/volume[0-9]{1,2}\\/[^<>: */?\"]*/",
-                                "errorText": "Path should begin with /volume?/ where ? is volume number (1-99)"
+                               "expr": "/^[^<>: */?\"]*/",
+                               "errorText": "Share name must be a folder name only. Path separators, spaces and other special chars are not allowed."
                             }
                         }
-                    },
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "subitems": [
                     {
                         "key": "wizard_rpc_secret",
                         "desc": "rpc-secret",
-                        "defaultValue": "RA3CAVdZ6hfvdkMWNgvLxeTJsgYmPRsA",
+                        "emptyText": "please provide a secret",
                         "validator": {
                             "allowBlank": false,
                             "regex": {
-                                "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$/",
+                                "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*#?&]{8,}$/",
                                 "errorText": "Minimum eight characters, at least one uppercase letter, one lowercase letter and one number"
                             }
                         }
-                    },
+                    }
+                ]
+            },            
+            {
+                "type": "textfield",
+                "subitems": [
                     {
                         "key": "wizard_max_concurrent_downloads",
                         "desc": "max-concurrent-downloads",
@@ -102,29 +111,35 @@
                                 "errorText": "SIZE can include K or M (1K = 1024, 1M = 1024K), default: 32M"
                             }
                         }
-                    },
+                    }
+                ]
+            },
+            {
+                "type": "combobox",
+                "subitems": [
                     {
                         "key": "wizard_file_allocation",
                         "desc": "file-allocation",
+                        "editable": false,
                         "defaultValue": "falloc",
+                        "store": [ "none", "prealloc", "trunc", "falloc" ],
                         "validator": {
-                            "allowBlank": false,
-                            "regex": {
-                                "expr": "/^(none|prealloc|trunc|falloc)$/",
-                                "errorText": "Possible Values: none/prealloc/trunc/falloc, default: prealloc"
-                            }
-                        }
-                    },
+                            "allowBlank": false
+                        }                        
+                    }
+                ]
+            },
+            {
+                "type": "combobox",
+                "subitems": [
                     {
                         "key": "wizard_log_level",
                         "desc": "log-level",
+                        "editable": false,
                         "defaultValue": "error",
+                        "store": [ "debug", "info", "notice", "warn", "error" ],
                         "validator": {
-                            "allowBlank": false,
-                            "regex": {
-                                "expr": "/^(debug|info|notice|warn|error)$/",
-                                "errorText": "LEVEL is either debug/info/notice/warn/error, default: error"
-                            }
+                            "allowBlank": false
                         }
                     }
                 ]
