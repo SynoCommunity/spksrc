@@ -21,51 +21,14 @@ TOOLKIT_ROOT = $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
 ENV += TOOLKIT_ROOT=$(TOOLKIT_ROOT)
 endif
 
-TC_VARS_MK           = $(WORK_DIR)/tc_vars.mk
-TC_VARS_AUTOTOOLS_MK = $(WORK_DIR)/tc_vars.autotools.mk
-TC_VARS_FLAGS_MK     = $(WORK_DIR)/tc_vars.flags.mk
-TC_VARS_RUST_MK      = $(WORK_DIR)/tc_vars.rust.mk
-#
-TC_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
-TC_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
-TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
-
+# If toolchain environment not defined: 
+#  - load default $(WORK_DIR)/tc_vars.mk
+#  - set ENV to $(TC_ENV) based on loaded $(WORK_DIR)/*.mk
 ifneq ($(strip $(TC)),)
+
 # Mandatory to build the CFLAGS and LDFLAGS env variables
 export INSTALL_DIR
 export INSTALL_PREFIX
-
-$(TC_VARS_MK):
-	$(create_target_dir)
-ifeq ($(strip $(MAKECMDGOALS)),download)
-	@$(MSG) "Downloading toolchain"
-	@if env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) download ; \
-	then \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $(TC_VARS_MK) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_flags > $(TC_VARS_FLAGS_MK) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) autotools_vars > $(TC_VARS_AUTOTOOLS_MK) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_VARS_CMAKE) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_cross_vars > $(TC_VARS_MESON_CROSS) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_native_vars > $(TC_VARS_MESON_NATIVE) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) rust_vars > $(TC_VARS_RUST_MK) ; \
-	else \
-	  echo "$$""(error An error occured while downloading the toolchain, please check the messages above)" > $@; \
-	fi
-else
-	@$(MSG) "Setting-up toolchain "
-	@if env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) ; \
-	then \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $(TC_VARS_MK) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_flags > $(TC_VARS_FLAGS_MK) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) autotools_vars > $(TC_VARS_AUTOTOOLS_MK) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_VARS_CMAKE) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_cross_vars > $(TC_VARS_MESON_CROSS) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_native_vars > $(TC_VARS_MESON_NATIVE) ; \
-	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) rust_vars > $(TC_VARS_RUST_MK) ; \
-	else \
-	  echo "$$""(error An error occured while setting up the toolchain, please check the messages above)" > $@; \
-	fi
-endif
 
 # Include generic exports
 -include $(TC_VARS_MK)
