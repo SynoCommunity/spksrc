@@ -15,18 +15,6 @@ DISTRIB_DIR                = $(TOOLCHAIN_DIR)/$(TC_VERS)
 DIST_FILE                  = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT                   = $(TC_EXT)
 
-ifneq ($(strip $(ARCH)),)
-ARCH_SUFFIX := -$(ARCH)-$(TCVERSION)
-else
-ARCH_SUFFIX :=
-endif
-
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
-
-### Include common definitions
-include ../../mk/spksrc.common.mk
-
 #####
 
 # Include cross-compilation definitions
@@ -43,8 +31,6 @@ ifeq ($(TCVARS_SUBMAKE),1)
 else
 .DEFAULT_GOAL := tcvars
 endif
-
-RUN = cd $(WORK_DIR)/$(TC_TARGET) && env $(ENV)
 
 #####
 
@@ -74,6 +60,7 @@ TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 define make_tc_var_rule
 $(WORK_DIR)/$(2):
 	@$(MSG) "Generating $(WORK_DIR)/$(2)"
+	@@mkdir -p $(WORK_DIR)
 	@$(MAKE) --no-print-directory \
 		-f Makefile \
 		TCVARS_SUBMAKE=1 \
@@ -118,7 +105,7 @@ endif
 
 .PHONY: tcvars_msg
 tcvars_msg:
-	@$(MSG) "Preparing toolchain cross-compilation configuration files for $(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)"
+	@$(MSG) "Generating toolchain cross-compilation configuration files for $(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)"
 
 #####
 
@@ -165,17 +152,17 @@ endif
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  if [ "$${target}" = "CC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LD" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_LINKER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_LINKER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LDSHARED" ] ; then \
 	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS $$(echo $${source} | cut -f2 -d' ') ; \
 	  elif [ "$${target}" = "FC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
+	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
 	  else \
-	    printf "set(%-25s %s)\n" CMAKE_$${target} $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target} $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  fi ; \
 	done ; \
 	echo
@@ -256,14 +243,14 @@ tc_meson_cross_vars:
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
-	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
+	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
-	    echo "fortran = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "fortran = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
-	    echo "c = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
-	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "c = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  else \
-	    echo "$${target} = '$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  fi ; \
 	done
 	@echo "cargo = '$(RUSTUP_HOME)/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo'"
@@ -302,8 +289,8 @@ tc_rust_vars:
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
+	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
 	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_EXTRA_RUSTFLAGS)\" ; \
 	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
 	echo RUST_TARGET := $(RUST_TARGET)
@@ -311,14 +298,14 @@ tc_rust_vars:
 .PHONY: tc_autotools_vars
 tc_autotools_vars:
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
-	echo TC_ENV += SYSROOT=\"$(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)\" ; \
+	echo TC_ENV += SYSROOT=\"$(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT)\" ; \
 	for tool in $(TOOLS) ; \
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  echo TC_ENV += $${target}=\"$(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
+	  echo TC_ENV += $${target}=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
 	  if [ "$${target}" = "CC" ] ; then \
-	    gcc_version=$$(eval $$(echo $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
+	    gcc_version=$$(eval $$(echo $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
 	  fi ; \
 	done ; \
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
@@ -342,10 +329,11 @@ tc_flags:
 .PHONY: tc_vars
 tc_vars:
 	@echo TC_TYPE := $(TC_TYPE) ; \
-	echo TC_SYSROOT := $(WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
+	echo TC_WORK_DIR := $(TC_WORK_DIR) ; \
+	echo TC_SYSROOT := $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
 	echo TC_TARGET := $(TC_TARGET) ; \
 	echo TC_PREFIX := $(TC_PREFIX) ; \
-	echo TC_PATH := $(WORK_DIR)/$(TC_TARGET)/bin/ ; \
+	echo TC_PATH := $(TC_WORK_DIR)/$(TC_TARGET)/bin/ ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
@@ -359,7 +347,7 @@ tc_vars:
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  if [ "$${target}" = "CC" ] ; then \
-	    gcc_version=$$(eval $$(echo $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
+	    gcc_version=$$(eval $$(echo $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
 	  fi ; \
 	done ; \
 	echo TC_GCC := $${gcc_version} ; \

@@ -16,17 +16,15 @@ DISTRIB_DIR                = $(TOOLCHAIN_DIR)/$(TC_VERS)
 DIST_FILE                  = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT                   = $(TC_EXT)
 
-ifneq ($(strip $(ARCH)),)
-ARCH_SUFFIX := -$(ARCH)-$(TCVERSION)
+ifneq ($(strip $(or $(TC_NAME),$(TC_ARCH))),)
+TC_ARCH_SUFFIX = -$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)
 else
-ARCH_SUFFIX :=
+TC_ARCH_SUFFIX :=
 endif
-
-RUN = cd $(WORK_DIR)/$(TC_TARGET) && env $(ENV)
 
 #####
 
-# Common directories (must be set after ARCH_SUFFIX)
+# Common directories
 include ../../mk/spksrc.directories.mk
 
 ### Include common definitions
@@ -37,7 +35,15 @@ include ../../mk/spksrc.common-rules.mk
 
 #####
 
-TOOLCHAIN_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)toolchain_done
+TC = syno$(TC_ARCH_SUFFIX)
+TC_WORK_DIR ?= $(abspath $(WORK_DIR)/../../../toolchain/$(TC)/work)
+
+# Define $(RUN) for other targets (download, extract, patch, etc)
+RUN = cd $(TC_WORK_DIR)/$(TC_TARGET) && env $(ENV)
+
+#####
+
+TOOLCHAIN_COOKIE = $(TC_WORK_DIR)/.$(COOKIE_PREFIX)toolchain_done
 
 .PHONY: $(PRE_TOOLCHAIN_TARGET) $(TOOLCHAIN_TARGET) $(POST_TOOLCHAIN_TARGET)
 ifeq ($(strip $(PRE_TOOLCHAIN_TARGET)),)
@@ -103,12 +109,12 @@ _all: rustc depend tcvars
 .PHONY: toolchain_target
 toolchain_target: $(PRE_TOOLCHAIN_TARGET)
 	@bash -o pipefail -c ' \
-	  mkdir -p $(WORK_DIR) ; \
+	  mkdir -p $(TC_WORK_DIR) ; \
 	  $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG) ; \
 	   if [ -z "$$LOGGING_ENABLED" ]; then \
 	      export LOGGING_ENABLED=1 ; \
 	      { \
-	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
+	        $(MAKE) WORK_DIR=$(TC_WORK_DIR) -f $(firstword $(MAKEFILE_LIST)) _all ; \
 	      } > >(tee --append $(DEFAULT_LOG)) 2>&1 ; \
 	   else \
 	      $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
