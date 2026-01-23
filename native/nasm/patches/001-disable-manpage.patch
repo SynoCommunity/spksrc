@@ -1,0 +1,15 @@
+--- Makefile.in-orig	2025-10-11 06:42:56.000000000 +0000
++++ Makefile.in	2026-01-23 21:21:19.234201774 +0000
+@@ -449,8 +449,12 @@ install: $(PROGS)
+ 	$(MKDIR_P) $(DESTDIR)$(bindir)
+ 	$(INSTALL_PROGRAM) $(PROGS) $(DESTDIR)$(bindir)/
+ 	$(MKDIR_P) $(DESTDIR)$(mandir)/man1
++ifneq ($(wildcard nasm.1),)
+ 	$(INSTALL_DATA) $(srcdir)/nasm.1 $(DESTDIR)$(mandir)/man1/nasm.1
++endif
++ifneq ($(wildcard ndisasm.1),)
+ 	$(INSTALL_DATA) $(srcdir)/ndisasm.1 $(DESTDIR)$(mandir)/man1/ndisasm.1
++endif
+ 
+ install_editors: $(EDITORS)
+ 	$(MKDIR_P) $(DESTDIR)$(pkgdatadir)
