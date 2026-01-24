@@ -1,9 +1,0 @@
-pip==24.3.1
-setuptools==78.1.0
-wheel==0.45.1
-#
-build:Cython==3.1.4     # must support directive 'freethreading_compatible'
-build:pip-tools==7.4.1
-#
-cross:build==1.2.2
-cross:expandvars==0.12.0
