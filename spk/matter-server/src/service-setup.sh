@@ -1,4 +1,3 @@
-PYTHON_VER=python3.12
 PYTHON_DIR="/var/packages/python312/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
@@ -21,12 +20,10 @@ service_postinst ()
    install_python_virtualenv
 
    echo ${separator}
-   echo "Install packages from wheelhouse"
-   pip install --disable-pip-version-check --no-deps --no-input --no-index ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
-    
-   echo ${separator}
-   echo "Install python packages from index"
-   pip install --disable-pip-version-check --no-deps --no-input --requirement ${SYNOPKG_PKGDEST}/share/requirements-pure.txt
+   echo "Install all requirements"
+   pip install --disable-pip-version-check --no-input ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl \
+        --requirement ${SYNOPKG_PKGDEST}/share/requirements-crossenv.txt \
+        --requirement ${SYNOPKG_PKGDEST}/share/requirements-pure.txt
     
    echo ${separator}
    echo "create special folders"
