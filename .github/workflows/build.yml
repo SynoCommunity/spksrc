@@ -71,14 +71,14 @@ jobs:
   prepare:
     name: Prepare for Build
     runs-on: ubuntu-latest
-    # provide results to other jobs
     outputs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
       noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
       has_min_dsm72_packages: ${{ steps.dependencies.outputs.has_min_dsm72_packages }}
+      distrib_hash: ${{ steps.distrib-hash.outputs.hash }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -109,19 +109,62 @@ jobs:
           GH_DEPENDENCY_FOLDERS: ${{ steps.getchanges_push.outputs.dependency_folders }} ${{ steps.getchanges_pr.outputs.dependency_folders }}
           USER_SPK_TO_BUILD: ${{ github.event.inputs.package }}
 
-      - name: Cache downloaded files
-        uses: actions/cache@v4
+      - name: Restore distrib cache
+        id: cache-restore
+        uses: actions/cache/restore@v5
         with:
           path: distrib
-          # use run_id in key to cache within workflow only.
-          key: distrib-${{ github.run_id }}
+          # Use a placeholder key that will never match for the exact key,
+          # forcing GitHub to use restore-keys to find the best available cache
+          key: distrib-placeholder-${{ github.run_id }}
+          restore-keys: |
+            distrib-
 
       - name: Download source files
         run: ./.github/actions/download.sh
         env:
           DOWNLOAD_PACKAGES: ${{ steps.dependencies.outputs.download_packages }}
-          ARCH_PACKAGES: ${{ needs.prepare.outputs.arch_packages }}
-          NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
+          ARCH_PACKAGES: ${{ steps.dependencies.outputs.arch_packages }}
+          NOARCH_PACKAGES: ${{ steps.dependencies.outputs.noarch_packages }}
+
+      - name: Compute distrib hash
+        id: distrib-hash
+        run: |
+          # Compute a hash based on file paths and sizes (not content) for performance.
+          # This is fast even with thousands of files since we don't read file contents.
+          # Including file size ensures that if a corrupted file (.wrong) is replaced
+          # by a fresh download with different size, the hash will change.
+          # Format: "path size" per line, sorted for reproducibility, then hashed.
+          if [ -d "distrib" ] && [ -n "$(ls -A distrib 2>/dev/null)" ]; then
+            HASH=$(find distrib -type f -printf '%p %s\n' | sort | sha256sum | cut -d' ' -f1)
+          else
+            HASH="empty"
+          fi
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+          echo "Distrib cache hash: $HASH"
+
+      - name: Check if cache already exists
+        id: cache-check
+        run: |
+          # Check if a cache with this exact hash already exists to avoid duplication.
+          # We search for the exact key pattern to see if this content was already cached.
+          CACHE_KEY="distrib-${{ steps.distrib-hash.outputs.hash }}"
+          if gh cache list --json key | jq -e --arg key "$CACHE_KEY" '.[] | select(.key == $key)' > /dev/null 2>&1; then
+            echo "Cache with key $CACHE_KEY already exists, skipping save"
+            echo "save_cache=false" >> $GITHUB_OUTPUT
+          else
+            echo "New cache content detected, will save with key: $CACHE_KEY"
+            echo "save_cache=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save distrib cache
+        if: steps.cache-check.outputs.save_cache == 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: distrib
+          key: distrib-${{ steps.distrib-hash.outputs.hash }}
 
   set-defaults:
     name: Set Defaults
@@ -246,21 +289,25 @@ jobs:
       matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Cache toolchains
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
         if: ${{ contains(matrix.arch,'qoriq') == false }}
         with:
           path: toolchain/*/work
           key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
 
-      - name: Use cache of downloaded files
-        uses: actions/cache@v4
+      - name: Restore distrib cache
+        uses: actions/cache/restore@v5
         with:
           path: distrib
-          key: distrib-${{ github.run_id }}
+          # Use a placeholder key that will never match for the exact key,
+          # forcing GitHub to use restore-keys to find the best available cache
+          key: distrib-placeholder-${{ github.run_id }}
+          restore-keys: |
+            distrib-
 
       - name: Build Package (based on changed files)
         # We don't want to stop the build on errors.
@@ -297,7 +344,7 @@ jobs:
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Packages for ${{ matrix.arch }}
           path: packages/*.spk

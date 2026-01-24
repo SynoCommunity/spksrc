@@ -1,5 +1,5 @@
 PKG_NAME = neon
-PKG_VERS = 0.33.0
+PKG_VERS = 0.35.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/notroj/neon/archive
@@ -14,8 +14,10 @@ LICENSE  = LGPL
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-shared --disable-static
+CONFIGURE_ARGS += --disable-debug
 CONFIGURE_ARGS += --with-libxml2 XML2_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/xml2-config
-CONFIGURE_ARGS += --with-zlib --with-ssl=openssl
+CONFIGURE_ARGS += --with-zlib
+CONFIGURE_ARGS += --with-ssl=openssl
 
 PRE_CONFIGURE_TARGET = neon_pre_configure
 POST_INSTALL_TARGET = neon_post_install
@@ -31,4 +33,4 @@ neon_pre_configure:
 # davfs2 configure needs neon-config (with corrected prefix) to evaluate neon capabilities.
 .PHONY: neon_post_install
 neon_post_install:
-	sed -i -e 's|^prefix=$(INSTALL_PREFIX)$$|prefix=$(STAGING_INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/bin/neon-config
+	sed -e 's|^prefix=$(INSTALL_PREFIX)$$|prefix=$(STAGING_INSTALL_PREFIX)|' -i.bak $(STAGING_INSTALL_PREFIX)/bin/neon-config

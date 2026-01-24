@@ -72,7 +72,7 @@ get_ko_list() {
 
    if [ "${SPK_CFG}" ]; then
       # Check that configuration exists (if requested)
-      if [ ! -f ${SPK_CFG_PATH}/${SPK_CFG} ]; then
+      if [ ! -r ${SPK_CFG_PATH}/${SPK_CFG} ]; then
          usage
          echo -ne "\nERROR: Configuration file [${SPK_CFG_PATH}/${SPK_CFG}] does not exist or inaccessible...\n\n"
          exit 1

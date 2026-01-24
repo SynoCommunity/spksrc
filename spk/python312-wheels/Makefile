@@ -47,7 +47,6 @@ include ../../mk/spksrc.common.mk
 DEPENDS += python/cryptography
 
 # [mysqlclient]
-DEPENDS += cross/mysql-connector-c
 DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
@@ -178,6 +177,11 @@ endif
 # [pycryptodomex]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
+endif
+
+# [pygobject]
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+DEPENDS += python/pygobject
 endif
 
 # [ruamel.yaml.clib]

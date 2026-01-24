@@ -1,0 +1,18 @@
+--- conf/config.php.orig	2026-01-10 02:10:48.651008973 +0000
++++ conf/config.php	2026-01-10 02:11:23.236935461 +0000
+@@ -57,9 +57,14 @@
+ 		"gzip"	=> '',			// Something like /usr/bin/gzip. If empty, will be found in PATH.
+ 		"id"	=> '',			// Something like /usr/bin/id. If empty, will be found in PATH.
+ 		"stat"	=> '',			// Something like /usr/bin/stat. If empty, will be found in PATH.
++		"python"=> '',			// Something like /usr/bin/python3. If empty, will be found in PATH.
++		"pgrep"	=> '',			// Something like /usr/bin/pgrep. If empty, will be found in PATH.
++		"sox"	=> '',			// Something like /usr/bin/sox. If empty, will be found in PATH.
++		"mediainfo"	=> '',			// Something like /usr/bin/mediainfo. If empty, will be found in PATH.
++		"dumptorrent"	=> '',			// Something like /usr/bin/dumptorrent. If empty, will be found in PATH.
+ 	);
+ 
+-	$localHostedMode = false;		// Set to true if rTorrent is hosted on the SAME machine as ruTorrent
++	$localHostedMode = true;		// Set to false if rTorrent is NOT hosted on the SAME machine as ruTorrent
+ 	
+ 	$cachedPluginLoading = false;		// Set to true to enable rapid cached loading of ruTorrent plugins
+ 										// Required to clear web browser cache when upgrading versions	

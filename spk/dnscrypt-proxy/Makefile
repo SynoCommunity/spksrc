@@ -34,6 +34,12 @@ PRE_COPY_TARGET = dnscrypt_extra_install
 
 GO_LDFLAGS = -s -w
 include ../../mk/spksrc.common.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+NATIVE_GO = native/go_1.23
+else
+NATIVE_GO = native/go
+endif
+
 include ../../mk/spksrc.cross-go-env.mk
 
 include ../../mk/spksrc.spk.mk

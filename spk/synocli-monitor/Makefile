@@ -1,6 +1,6 @@
 SPK_NAME = synocli-monitor
-SPK_VERS = 1.7
-SPK_REV = 10
+SPK_VERS = 1.8
+SPK_REV = 13
 SPK_ICON = src/synocli-monitor.png
 
 DEPENDS  = cross/nmon cross/njmon
@@ -13,7 +13,8 @@ DEPENDS += cross/cpulimit
 DEPENDS += cross/net-snmp
 DEPENDS += cross/lm-sensors
 
-OPTIONAL_DEPENDS = cross/bandwhich cross/bottom cross/procs
+OPTIONAL_DEPENDS  = cross/bandwhich cross/bottom cross/bottom_0.10 cross/procs
+OPTIONAL_DEPENDS += cross/btop
 
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_gt,${TCVERSION},2.0),11)
@@ -24,34 +25,45 @@ else
 BUSYBOX_CONFIG = procutils
 OPTIONAL_DESC = ", and process utilities \(lsof, iostat, pgrep, pmap, watch\)"
 endif
+ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/bandwhich cross/bottom cross/procs
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bandwhich, bottom, procs"
+DEPENDS += cross/bandwhich cross/procs
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/bottom_0.10
+else
+DEPENDS += cross/bottom
+endif
+endif
+
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+OPTIONAL_DESC := $(OPTIONAL_DESC)", btop"
+DEPENDS += cross/btop
 endif
 
 MAINTAINER = hgy59
-DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
-DISPLAY_NAME = SynoCli Monitor Tools
-STARTABLE = no
-CHANGELOG  = "1. Update bandwhich from v0.22.2 to v0.23.1 <br/>"
-CHANGELOG += "2. Update bottom from v0.9.6 to v0.10.2 <br/>"
-CHANGELOG += "3. Update htop from v3.3.0 to v3.4.1 <br/>"
-CHANGELOG += "4. Update ionice from v2.40.1 to v2.41.1 <br/>"
-CHANGELOG += "5. Update iperf2 from v2.2.0 to v2.2.1 <br/>"
-CHANGELOG += "6. Update iperf3 from v3.17.1 to v3.19.1 (some archs support v3.15 only) <br/>"
-CHANGELOG += "7. Update lsof from v4.99.3 to v4.99.5 <br/>"
-CHANGELOG += "8. Update njmon from v81 to v84 <br/>"
-CHANGELOG += "9. Update procs from v0.14.5 to v0.14.10"
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
 LICENSE  = Each tool is licensed under it\'s respective license.
 
+WIKI_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliMonitor\</a\>"
+
+# Remarks: html in DESCRIPTION is not supported
+DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
+DISPLAY_NAME = SynoCli Monitor Tools
+STARTABLE = no
+CHANGELOG  = "1. Add btop 1.4.5. </br>"
+CHANGELOG += "2. Update bottom to v0.11.4. </br>"
+CHANGELOG += "3. Update iperf3 to v3.20. </br>"
+CHANGELOG += "4. Update njmon to v90. </br>"
+CHANGELOG += "5. Update nmon v16s. </br>"
+CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
+
 SERVICE_SETUP = src/service-setup.sh
 
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
 SPK_COMMANDS  = bin/htop
+SPK_COMMANDS += bin/btop
 SPK_COMMANDS += bin/nmon bin/njmon
 SPK_COMMANDS += bin/iperf2 bin/iperf3
 SPK_COMMANDS += bin/ionice

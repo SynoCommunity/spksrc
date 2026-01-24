@@ -14,6 +14,8 @@ DEPENDS =
 # Supported emulations: elf_x86_64 elf32_x86_64 elf_i386 elf_iamcu i386pep i386pe
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
+CARGO_BUILD_ARGS = --locked
+
 HOMEPAGE = https://lib.rs/crates/dua-cli
 COMMENT  = A tool to conveniently learn about the disk usage of directories, fast!
 LICENSE  = MIT

@@ -1,5 +1,5 @@
 PKG_NAME = Radarr
-PKG_VERS = 5.25.0.10024
+PKG_VERS = 6.0.4.10291
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).master.$(PKG_VERS).linux-core-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Radarr/Radarr/releases/download/v$(PKG_VERS)
@@ -14,12 +14,10 @@ LICENSE  = GPLv3
 INSTALL_TARGET = radarr_install
 
 # use digests with multiple files
-PKG_DIST_ARCH_LIST = x86 x64 arm arm64
+PKG_DIST_ARCH_LIST = x64 arm arm64
 
 include ../../mk/spksrc.archs.mk
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-PKG_DIST_ARCH = x86
-else ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = x64
 else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm

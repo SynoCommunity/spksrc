@@ -1,7 +1,17 @@
+# we can't check whether gfortran exists, because toolchain is not yet extracted
 ifeq ($(strip $(firstword $(subst ., ,$(TC_VERS)))),7)
-TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ fc:gfortran ar strip objdump objcopy readelf
-else
+TC_HAS_FORTRAN = 1
+else ifeq ($(strip $(TC_VERS)),1.3)
+TC_HAS_FORTRAN = 1
+else ifeq ($(strip $(TC_VERS)),6.2.4)
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+TC_HAS_FORTRAN = 1
+endif
+endif
+
 TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump objcopy readelf
+ifneq ($(strip $(TC_HAS_FORTRAN)),)
+TOOLS += fc:gfortran
 endif
 
 ifeq ($(strip $(TC_NAME)),)
@@ -57,7 +67,7 @@ CPPFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 CXXFLAGS += -I$(abspath $(WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_CFLAGS)
 CXXFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 
-ifeq ($(strip $(firstword $(subst ., ,$(TC_VERS)))),7)
+ifneq ($(strip $(TC_HAS_FORTRAN)),)
 FFLAGS += -I$(abspath $(WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_FFLAGS)
 FFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 endif
@@ -66,3 +76,8 @@ LDFLAGS += -L$(abspath $(WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY)) $(TC_EXTRA_CFLAGS
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath-link,$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath,$(abspath $(INSTALL_PREFIX)/lib)
+
+RUSTFLAGS += -Clink-arg=-L$(abspath $(WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY))
+RUSTFLAGS += -Clink-arg=-L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
+RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
+RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(abspath $(INSTALL_PREFIX)/lib)

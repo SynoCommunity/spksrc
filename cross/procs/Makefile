@@ -15,4 +15,6 @@ HOMEPAGE = https://github.com/dalance/procs#readme
 COMMENT  = A modern replacement for ps written in Rust.
 LICENSE  = MIT
 
+CARGO_BUILD_ARGS = --locked
+
 include ../../mk/spksrc.cross-rust.mk

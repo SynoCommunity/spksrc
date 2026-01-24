@@ -21,6 +21,7 @@ LICENSE  = Apache License 2.0
 # Ensure C++17 compatibility
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 WIZARDS_DIR = src/wizard
 CONF_DIR = src/conf

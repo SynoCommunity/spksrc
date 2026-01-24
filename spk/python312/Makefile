@@ -1,7 +1,7 @@
 SPK_NAME = python312
-SPK_VERS = 3.12.11
+SPK_VERS = 3.12.12
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/python3.png
 
 # Compiler must support std=c++11
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.12
-CHANGELOG = "1. Update to Python 3.12.11"
+CHANGELOG = "1. Update to Python 3.12.12"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF

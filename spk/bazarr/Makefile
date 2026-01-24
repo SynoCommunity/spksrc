@@ -25,6 +25,7 @@ STARTABLE = yes
 # Requires gcc>=8.4 to build succesfully
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 SERVICE_USER  = auto
 SERVICE_SETUP = src/service-setup.sh

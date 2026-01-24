@@ -1,0 +1,99 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2024 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+/*========================== begin_copyright_notice ============================
+
+Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+See https://llvm.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 with LLVM-exception
+
+============================= end_copyright_notice ===========================*/
+From 0cc9899a2a7a555866fdbda76d78bf1e0c8853ca Mon Sep 17 00:00:00 2001
+From: Florian Hahn <flo@fhahn.com>
+Date: Wed, 28 Dec 2022 00:09:52 +0000
+Subject: [PATCH 5/5] [SCEV] Properly clean up duplicated FoldCacheUser ID
+ entries.
+
+The current code did not properly handled duplicated FoldCacheUser ID
+entries when overwriting an existing entry in the FoldCache.
+
+This triggered verification failures reported by @uabelho and #59721.
+
+The patch fixes that by removing stale IDs when overwriting an existing
+entry in the cache.
+
+Fixes #59721.
+---
+ llvm/lib/Analysis/ScalarEvolution.cpp | 37 +++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 10 deletions(-)
+
+diff --git a/llvm/lib/Analysis/ScalarEvolution.cpp b/llvm/lib/Analysis/ScalarEvolution.cpp
+index 40c7b4bb149f..8fd2e1631d03 100644
+--- a/llvm/lib/Analysis/ScalarEvolution.cpp
++++ b/llvm/lib/Analysis/ScalarEvolution.cpp
+@@ -1578,6 +1578,29 @@ static APInt extractConstantWithoutWrapping(ScalarEvolution &SE,
+   return APInt(BitWidth, 0);
+ }
+ 
++static void insertFoldCacheEntry(
++    const ScalarEvolution::FoldID &ID, const SCEV *S,
++    DenseMap<ScalarEvolution::FoldID, const SCEV *> &FoldCache,
++    DenseMap<const SCEV *, SmallVector<ScalarEvolution::FoldID, 2>>
++        &FoldCacheUser) {
++  auto I = FoldCache.insert({ID, S});
++  if (!I.second) {
++    // Remove FoldCacheUser entry for ID when replacing an existing FoldCache
++    // entry.
++    auto &UserIDs = FoldCacheUser[I.first->second];
++    assert(count(UserIDs, ID) == 1 && "unexpected duplicates in UserIDs");
++    for (unsigned I = 0; I != UserIDs.size(); ++I)
++      if (UserIDs[I] == ID) {
++        std::swap(UserIDs[I], UserIDs.back());
++        break;
++      }
++    UserIDs.pop_back();
++    I.first->second = S;
++  }
++  auto R = FoldCacheUser.insert({S, {}});
++  R.first->second.push_back(ID);
++}
++
+ const SCEV *
+ ScalarEvolution::getZeroExtendExpr(const SCEV *Op, Type *Ty, unsigned Depth) {
+   assert(getTypeSizeInBits(Op->getType()) < getTypeSizeInBits(Ty) &&
+@@ -1596,11 +1619,8 @@ ScalarEvolution::getZeroExtendExpr(const SCEV *Op, Type *Ty, unsigned Depth) {
+     return Iter->second;
+ 
+   const SCEV *S = getZeroExtendExprImpl(Op, Ty, Depth);
+-  if (!isa<SCEVZeroExtendExpr>(S)) {
+-    FoldCache.insert({ID, S});
+-    auto R = FoldCacheUser.insert({S, {}});
+-    R.first->second.push_back(ID);
+-  }
++  if (!isa<SCEVZeroExtendExpr>(S))
++    insertFoldCacheEntry(ID, S, FoldCache, FoldCacheUser);
+   return S;
+ }
+ 
+@@ -1923,11 +1943,8 @@ ScalarEvolution::getSignExtendExpr(const SCEV *Op, Type *Ty, unsigned Depth) {
+     return Iter->second;
+ 
+   const SCEV *S = getSignExtendExprImpl(Op, Ty, Depth);
+-  if (!isa<SCEVSignExtendExpr>(S)) {
+-    FoldCache.insert({ID, S});
+-    auto R = FoldCacheUser.insert({S, {}});
+-    R.first->second.push_back(ID);
+-  }
++  if (!isa<SCEVSignExtendExpr>(S))
++    insertFoldCacheEntry(ID, S, FoldCache, FoldCacheUser);
+   return S;
+ }
+ 
+-- 
+2.34.1
+

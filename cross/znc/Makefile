@@ -10,6 +10,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # Ensure C++17 compatibility
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://wiki.znc.in/
 COMMENT  = Advanced IRC bouncer
@@ -56,6 +57,13 @@ ifneq ($(wildcard modules/*),)
 POST_INSTALL_TARGET = znc_post_install
 endif
 
+# Although ZNC uses CMake, its modules are built via znc-buildmod,
+# which requires CC/CXX (tc_vars.autotools.mk) and *FLAGS (tc_vars.flags.mk)
+# to be present in the environment.
+DEFAULT_ENV  = cmake
+DEFAULT_ENV += autotools
+DEFAULT_ENV += flags
+
 include ../../mk/spksrc.cross-cmake.mk
 
 EXTRA_MODULES  = colloquy.cpp
@@ -90,7 +98,7 @@ znc_post_install:
 	@chmod +x $(CMAKE_BUILD_DIR)/znc-buildmod
 	@rm -fr $(WORK_DIR)/modules
 	@cp -R modules $(WORK_DIR)/
-	$(RUN) sed -i 's|$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
-	@cd $(WORK_DIR)/modules && CMAKE_PREFIX_PATH=$(STAGING_INSTALL_PREFIX) $(CMAKE_BUILD_DIR)/znc-buildmod $(EXTRA_MODULES)
-	$(RUN) sed -i 's|$(STAGING_INSTALL_PREFIX)|$(INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
+	@$(RUN) sed -i 's|$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
+	cd $(WORK_DIR)/modules && env $(ENV) sh -c 'CMAKE_PREFIX_PATH=$(STAGING_INSTALL_PREFIX) $(CMAKE_BUILD_DIR)/znc-buildmod $(EXTRA_MODULES)'
+	@$(RUN) sed -i 's|$(STAGING_INSTALL_PREFIX)|$(INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
 	@install -m 644 $(WORK_DIR)/modules/*.so $(STAGING_INSTALL_PREFIX)/lib/znc/

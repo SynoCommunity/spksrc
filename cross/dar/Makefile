@@ -1,5 +1,5 @@
 PKG_NAME = dar
-PKG_VERS = 2.7.19
+PKG_VERS = 2.8.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/dar/files/dar/$(PKG_VERS)
@@ -22,6 +22,7 @@ DEPENDS += cross/e2fsprogs
 DEPENDS += cross/librsync
 DEPENDS += cross/curl
 DEPENDS += cross/libthreadar
+DEPENDS += cross/libssh
 
 HOMEPAGE = http://dar.linux.free.fr/
 COMMENT = Disk ARchive - dar is a shell command that backs up from a single file to a whole filesystems, taking care of hard links, Extended Attributes, sparse files, etc.

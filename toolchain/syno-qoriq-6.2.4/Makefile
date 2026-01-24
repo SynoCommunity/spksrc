@@ -9,7 +9,7 @@ TC_DIST_SITE_PATH = PowerPC%20QorIQ%20Linux%202.6.32
 TC_TARGET = powerpc-e500v2-linux-gnuspe
 TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
-TC_RUSTFLAGS = -C target-cpu=e500
+TC_EXTRA_RUSTFLAGS = -Ctarget-cpu=e500
 
 include ../../mk/spksrc.tc.mk
 

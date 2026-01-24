@@ -1,5 +1,5 @@
 SPK_NAME = ionice
-SPK_VERS = 2.41.1
+SPK_VERS = 2.41.2
 SPK_REV = 1
 
 DEPENDS = cross/ionice

@@ -9,6 +9,7 @@ DEPENDS =
 
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://rarlab.com
 COMMENT  = Extract files from rar archives.

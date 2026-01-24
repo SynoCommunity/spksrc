@@ -24,18 +24,6 @@ SHELL := $(SHELL) -e
 empty :=
 space := $(empty) $(empty)
 
-# Define all variable needing cleaning
-# Used for native, CMake and Meson builds
-# Exception for PKG_CONFIG_LIBDIR to force default pkgconfig.
-ENV_VARS_TO_CLEAN = AR AS CC CPP CXX FC LD LDSHARED NM OBJCOPY OBJDUMP RANLIB READELF STRIP \
-                    CFLAGS ADDITIONAL_CFLAGS CPPFLAGS ADDITIONAL_CPPFLAGS \
-                    CXXFLAGS ADDITIONAL_CXXFLAGS FFLAGS ADDITIONAL_FFLAGS \
-                    LDFLAGS ADDITIONAL_LDFLAGS PKG_CONFIG_PATH SYSROOT
-ENV_FILTERED = $(shell env -i $(ENV) sh -c 'env' | \
-    grep -v -E '^($(subst $(space),|,$(ENV_VARS_TO_CLEAN)))=' | \
-    awk -F'=' '{if($$2 ~ / /) print $$1"=\""$$2"\""; else print $$0}' | \
-    tr '\n' ' ')
-
 # Display message in a consistent way
 MSG = echo "===> "
 
@@ -53,7 +41,9 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(or $(PYTHON_PACKAGE),$(SPK_NAME))/wor
 
 # Why ask for the same thing twice? Always cache downloads
 PIP_CACHE_OPT ?= --find-links $(PIP_DISTRIB_DIR) --cache-dir $(PIP_CACHE_DIR)
-PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+PIP_BASIC_OPT ?= --no-color --disable-pip-version-check
+PIP_WHEEL_ARGS = wheel $(PIP_BASIC_OPT) --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+
 # Adding --no-index only for crossenv
 # to force using localy downloaded version
 PIP_WHEEL_ARGS_CROSSENV = $(PIP_WHEEL_ARGS) --no-index
@@ -67,7 +57,7 @@ PIP_DOWNLOAD_ARGS = download --no-index --find-links $(PIP_DISTRIB_DIR) --disabl
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
 
 # Available toolchains formatted as '{ARCH}-{TC}'
-AVAILABLE_TOOLCHAINS = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)toolchain/syno-*))))
+AVAILABLE_TOOLCHAINS = $(subst syno-,,$(filter-out %-rust,$(sort $(notdir $(wildcard $(BASEDIR)toolchain/syno-*)))))
 AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell echo ${arch} | cut -f2 -d'-')))
 
 # Available toolchains formatted as '{ARCH}-{TC}'
@@ -133,24 +123,14 @@ endif
 
 # Enable stats over parallel build mode
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-PSTAT_TIME = time -o $(PSTAT_LOG) --append
+PSTAT_TIME = time -o $(STATUS_LOG) --append --quiet
 endif
 
-# Always send PSTAT output to proper log file
-# independantly from active Makefile location
-ifeq ($(filter cross diyspk spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
-CROSSENV_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build-$(ARCH)-$(TCVERSION)-crossenv.log
-PSTAT_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/status-build.log
-WHEEL_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build-$(ARCH)-$(TCVERSION)-wheel.log
-else ifneq ($(wildcard $(WORK_DIR)),)
-CROSSENV_LOG = $(WORK_DIR)/../build-$(ARCH)-$(TCVERSION)-crossenv.log
-PSTAT_LOG = $(WORK_DIR)/../status-build.log
-WHEEL_LOG = $(WORK_DIR)/../build-$(ARCH)-$(TCVERSION)-wheel.log
-else
-CROSSENV_LOG = $(CURDIR)/build-$(ARCH)-$(TCVERSION)-crossenv.log
-PSTAT_LOG = $(CURDIR)/status-build.log
-WHEEL_LOG = $(CURDIR)/build-$(ARCH)-$(TCVERSION)-wheel.log
-endif
+DEFAULT_LOG  = $(LOG_DIR)/build$(or $(ARCH_SUFFIX),-noarch-$(TCVERSION)).log
+CROSSENV_LOG = $(LOG_DIR)/build$(ARCH_SUFFIX)-crossenv.log
+WHEEL_LOG    = $(LOG_DIR)/build$(ARCH_SUFFIX)-wheel.log
+NATIVE_LOG   = $(LOG_DIR)/build-native-$(PKG_NAME).log
+STATUS_LOG   = $(LOG_DIR)/status-build.log
 
 # Terminal colors
 RED=$$(tput setaf 1)
@@ -162,6 +142,18 @@ version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
+
+# Remove duplicate words within string while preserving order
+define uniq
+$(strip \
+  $(eval __seen :=) \
+  $(foreach f,$1, \
+    $(if $(filter $f,$(__seen)),, \
+      $(eval __seen += $f)$(f) \
+    ) \
+  ) \
+)
+endef
 
 # Macro: dedup
 #        removes duplicate entries from a specified delimiter,

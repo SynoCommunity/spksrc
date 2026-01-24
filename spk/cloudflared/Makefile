@@ -1,17 +1,18 @@
 SPK_NAME = cloudflared
-SPK_VERS = 2025.6.1
-SPK_REV = 19
+SPK_VERS = 2025.10.0
+SPK_REV = 20
 SPK_ICON = src/cloudflared.png
 
 DEPENDS = cross/cloudflared
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
 MAINTAINER = karasevm
 DISPLAY_NAME = Cloudflare Tunnel
 DESCRIPTION = "Cloudflare Tunnel provides you with a secure way to connect your resources to Cloudflare without a publicly routable IP address. With Tunnel, you do not send traffic to an external IP - instead, a lightweight daemon in your infrastructure \('cloudflared'\) creates outbound-only connections to Cloudflare\'s global network. Cloudflare Tunnel can connect HTTP web servers, SSH servers, remote desktops, and other protocols safely to Cloudflare. This way, your origins can serve traffic through Cloudflare without being vulnerable to attacks that bypass Cloudflare."
 HOMEPAGE = https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/
 LICENSE = Apache-2.0
-CHANGELOG = "Update to v2025.6.1"
+CHANGELOG = "Update to v2025.10.0."
 
 WIZARDS_DIR = src/wizard/
 

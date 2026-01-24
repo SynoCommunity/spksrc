@@ -15,4 +15,6 @@ HOMEPAGE = https://github.com/imsnif/bandwhich#readme
 COMMENT  = CLI utility for displaying current network utilization by process, connection and remote IP/hostname.
 LICENSE  = MIT
 
+CARGO_BUILD_ARGS = --locked
+
 include ../../mk/spksrc.cross-rust.mk

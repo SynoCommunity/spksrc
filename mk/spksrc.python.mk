@@ -5,19 +5,30 @@
 #  PYTHON_PACKAGE       Must be set to the python spk folder (python310, python311, ...)
 
 # set default spk/python* path to use
-PYTHON_PACKAGE_WORK_DIR = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
+PYTHON_PACKAGE_DIR = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE))
+PYTHON_PACKAGE_WORK_DIR = $(PYTHON_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
 
 include ../../mk/spksrc.common.mk
 
 # armv5 no longer supported with python >= 3.12
 ifeq ($(call version_ge, $(subst python,,$(PYTHON_PACKAGE)), 312), 1)
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 endif
 
-ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+# If no python3*/work-<arch>-<tcversion> is present
+# then default to legacy build needing to rebuild the
+# entire python binaries+libraries as build dependency.
 
+ifeq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+# Needed to find the spk/python3*/crossenv/requirement-*.txt files
+export PYTHON_PACKAGE_DIR
+
+BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
+
+else
 # Export variables so to be usable in crossenv and cross/*
 export PYTHON_PACKAGE
+export PYTHON_PACKAGE_DIR
 export PYTHON_PACKAGE_WORK_DIR
 export SPK_NAME
 
@@ -35,16 +46,24 @@ endif
 
 # set build flags including ld to rewrite for the library path
 # used to access python package provide libraries at destination
-export ADDITIONAL_CFLAGS   += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
-export ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
-export ADDITIONAL_CXXFLAGS += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
-export ADDITIONAL_LDFLAGS  += -L$(PYTHON_STAGING_INSTALL_PREFIX)/lib
-export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(PYTHON_STAGING_INSTALL_PREFIX)/lib -Wl,--rpath,$(PYTHON_PREFIX)/lib
+export ADDITIONAL_CFLAGS    += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CPPFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CXXFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_LDFLAGS   += -L$(PYTHON_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath-link,$(PYTHON_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(PYTHON_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(PYTHON_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(PYTHON_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(PYTHON_PREFIX)/lib
 
 # similarly, ld to rewrite OpenSSL library path if differs
 ifneq ($(OPENSSL_STAGING_PREFIX),$(PYTHON_STAGING_INSTALL_PREFIX))
-export ADDITIONAL_LDFLAGS  += -L$(OPENSSL_STAGING_PREFIX)/lib
-export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib -Wl,--rpath,$(OPENSSL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -L$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(OPENSSL_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(OPENSSL_PREFIX)/lib
 endif
 
 # Re-use all default python mandatory libraries (with exception of bzip2, xz, zlib)
@@ -57,11 +76,6 @@ PYTHON_DEPENDS := $(foreach cross,$(filter-out $(PYTHON_DEPENDS_EXCLUDE),$(forea
 
 # call-up pre-depend to prepare the shared python build environment
 PRE_DEPEND_TARGET += python_pre_depend
-
-else
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
-endif
 endif
 
 ifneq ($(FFMPEG_PACKAGE),)

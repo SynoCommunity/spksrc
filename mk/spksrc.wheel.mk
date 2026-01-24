@@ -43,7 +43,7 @@ include ../../mk/spksrc.wheel-install.mk
 
 ##
 
-ifneq ($(and $(WHEEL_NAME),$(or (WHEEL_VERISON),$(WHEEL_URL))),)
+ifneq ($(and $(WHEEL_NAME),$(or $(WHEEL_VERSION),$(WHEEL_URL))),)
 download-wheels: wheel_download
 wheel: wheel_install
 else

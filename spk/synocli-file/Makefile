@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 4.0.1
-SPK_REV = 28
+SPK_VERS = 4.0.2
+SPK_REV = 29
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -14,13 +14,14 @@ DEPENDS += cross/mc cross/pcre2 cross/fdupes cross/zstd
 DEPENDS += cross/detox
 DEPENDS += cross/lzip cross/plzip
 DEPENDS += cross/pixz
+DEPENDS += cross/pigz
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
 DEPENDS += cross/iconv
 DEPENDS += cross/dos2unix
 DEPENDS += cross/patch
+DEPENDS += cross/rhash
 
-OPTIONAL_DEPENDS  = cross/rhash cross/rhash_1.4.5
 OPTIONAL_DEPENDS += cross/rmlint
 OPTIONAL_DEPENDS += cross/rnm
 OPTIONAL_DEPENDS += cross/micro
@@ -29,8 +30,8 @@ OPTIONAL_DEPENDS += cross/ripgrep
 OPTIONAL_DEPENDS += cross/fd
 OPTIONAL_DEPENDS += cross/sd
 OPTIONAL_DEPENDS += cross/bat
-OPTIONAL_DEPENDS += cross/eza cross/eza_0.20.18
-OPTIONAL_DEPENDS += cross/nnn cross/nnn_4.8 cross/nnn_4.0
+OPTIONAL_DEPENDS += cross/eza
+OPTIONAL_DEPENDS += cross/nnn
 OPTIONAL_DEPENDS += cross/lsd
 OPTIONAL_DEPENDS += cross/xstow
 
@@ -43,31 +44,11 @@ OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/rhash_1.4.5
-else
-DEPENDS += cross/rhash
-endif
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
-ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-ifneq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-DEPENDS += cross/nnn
-else
-# comcerto2k for DSM>=7
-DEPENDS += cross/nnn_4.0
-endif
-else ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-DEPENDS += cross/nnn_4.8
-else
-# 32-bit archs for DSM<7
-DEPENDS += cross/nnn_4.0
-endif
-endif
-
 # PPC archs except QorIQ
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/nnn
+OPTIONAL_DESC := $(OPTIONAL_DESC)", nnn (n³)"
+
 DEPENDS += cross/rmlint
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rmlint"
 endif
@@ -83,11 +64,7 @@ ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/bat
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 DEPENDS += cross/eza
-else
-DEPENDS += cross/eza_0.20.18
-endif
 OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
 
 DEPENDS += cross/ripgrep
@@ -100,6 +77,7 @@ endif
 
 DEPENDS += cross/sd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
+
 DEPENDS += cross/lsd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
 endif
@@ -123,25 +101,19 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     jupp \(based on JOE - Joe\'s Own Editor 3.1\), \
     file, detox, pcre2, zstd, lzip, plzip, \
     pixz, \
+    pigz, \
     detox, iconv, dos2unix tools, \
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
-CHANGELOG  = "1. Remove xstow-static (keep dynamic version only). <br/>"
-CHANGELOG += "2. Update detox from v2.0.0 to v3.0.1. <br/>"
-CHANGELOG += "3. Update eza from v0.20.18 to v0.23.4 (except for ARMv5). <br/>"
-CHANGELOG += "4. Update fd from v10.2.0 to v10.3.0. <br/>"
-CHANGELOG += "5. Update fdupes from v2.3.2 to v2.4.0. <br/>"
-CHANGELOG += "6. Update fzf from v0.58.0 to v0.66.0. <br/>"
-CHANGELOG += "7. Update jdupes from v1.28.0 to v1.30.0. <br/>"
-CHANGELOG += "8. Update less from v668 to v679. <br/>"
-CHANGELOG += "9. Update lzip from v1.24.1 to v1.25. <br/>"
-CHANGELOG += "10. Update nano from v8.3 to v8.6. <br/>"
-CHANGELOG += "11. Update nnn from v5.0 to v5.1 (DSM 7 only). <br/>"
-CHANGELOG += "12. Update patch from v2.7.6 to v2.8. <br/>"
-CHANGELOG += "13. Update pcre2 from v10.44 to v10.46. <br/>"
-CHANGELOG += "14. Update rhash from v1.4.5 to v1.4.6 (except for old ppc archs). <br/>"
-CHANGELOG += "15. Update rmlint from v2.10.2 to v2.10.3. <br/>"
-CHANGELOG += "16. Update zstd from v1.5.6 to v1.5.7. <br/>"
+
+CHANGELOG  = "1. Add pigz. <br/>"
+CHANGELOG += "2. Update bat from v0.25.0 to v0.26.1 (except for ARMv5, qoriq and evansport on DSM < 7). <br/>"
+CHANGELOG += "3. Update dos2unix from v7.5.2 to v7.5.3. <br/>"
+CHANGELOG += "4. Update fzf from v0.66.0 to v0.67.0. <br/>"
+CHANGELOG += "5. Update less from v679 to v685. <br/>"
+CHANGELOG += "6. Update lsd from v1.1.5 to v1.2.0 (except for ARMv5). <br/>"
+CHANGELOG += "7. Update nano from v8.6 to v8.7. <br/>"
+CHANGELOG += "8. Update ripgrep from v14.1.1 to v15.1.0 (except for ARMv5 and qoriq). <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
@@ -161,6 +133,7 @@ SPK_COMMANDS += bin/rmlint
 SPK_COMMANDS += bin/zstd bin/unzstd bin/zstdcat bin/zstdmt bin/zstdgrep bin/zstdless
 SPK_COMMANDS += bin/lzip bin/plzip
 SPK_COMMANDS += bin/pixz
+SPK_COMMANDS += bin/pigz bin/unpigz
 SPK_COMMANDS += bin/fdupes
 SPK_COMMANDS += bin/micro
 SPK_COMMANDS += bin/fzf

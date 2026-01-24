@@ -1,11 +1,10 @@
-# Build CMake programs
+# Build Meson programs
+#
+# This makefile extends spksrc.cross-cc.mk with Meson-specific functionality
 #
 # prerequisites:
 # - cross/module depends on meson + ninja
 #
-
-# Common makefiles
-include ../../mk/spksrc.common.mk
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -29,6 +28,11 @@ endif
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
 
+# Common makefiles
+include ../../mk/spksrc.common.mk
+
+###
+
 # meson specific configurations
 include ../../mk/spksrc.cross-meson-env.mk
 
@@ -41,19 +45,21 @@ CONFIGURE_TARGET = meson_configure_target
 endif
 
 # call-up ninja build process
-include ../../mk/spksrc.cross-ninja.mk
+include ../../mk/spksrc.ninja.mk
+
+###
 
 .PHONY: meson_configure_target
-
-# default meson configure:
-meson_configure_target: $(MESON_CROSS_FILE_PKG)
+meson_configure_target: meson_generate_crossfile
 	@$(MSG) - Meson configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
 	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	@$(MSG) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
-	$(RUN_MESON) meson setup $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	@$(MSG) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	$(RUN) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
 
-# call-up regular build process
+###
+
+# Include base cross-cc makefile for common functionality
 include ../../mk/spksrc.cross-cc.mk

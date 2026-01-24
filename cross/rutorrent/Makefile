@@ -1,5 +1,5 @@
 PKG_NAME = ruTorrent
-PKG_VERS = 5.1.12
+PKG_VERS = 5.2.10
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Novik/ruTorrent/archive

@@ -21,12 +21,16 @@ TOOLKIT_ROOT = $(WORK_DIR)/../../../toolkit/syno-$(ARCH)-$(TCVERSION)/work
 ENV += TOOLKIT_ROOT=$(TOOLKIT_ROOT)
 endif
 
-ifneq ($(strip $(TC)),)
-TC_VARS_MK = $(WORK_DIR)/tc_vars.mk
-TC_VARS_CMAKE = $(WORK_DIR)/tc_vars.cmake
-TC_VARS_MESON_CROSS = $(WORK_DIR)/tc_vars.meson-cross
+TC_VARS_MK           = $(WORK_DIR)/tc_vars.mk
+TC_VARS_AUTOTOOLS_MK = $(WORK_DIR)/tc_vars.autotools.mk
+TC_VARS_FLAGS_MK     = $(WORK_DIR)/tc_vars.flags.mk
+TC_VARS_RUST_MK      = $(WORK_DIR)/tc_vars.rust.mk
+#
+TC_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
+TC_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
 TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 
+ifneq ($(strip $(TC)),)
 # Mandatory to build the CFLAGS and LDFLAGS env variables
 export INSTALL_DIR
 export INSTALL_PREFIX
@@ -38,9 +42,12 @@ ifeq ($(strip $(MAKECMDGOALS)),download)
 	@if env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) download ; \
 	then \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $(TC_VARS_MK) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_flags > $(TC_VARS_FLAGS_MK) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) autotools_vars > $(TC_VARS_AUTOTOOLS_MK) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_VARS_CMAKE) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_cross_vars > $(TC_VARS_MESON_CROSS) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_native_vars > $(TC_VARS_MESON_NATIVE) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) rust_vars > $(TC_VARS_RUST_MK) ; \
 	else \
 	  echo "$$""(error An error occured while downloading the toolchain, please check the messages above)" > $@; \
 	fi
@@ -49,15 +56,28 @@ else
 	@if env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) ; \
 	then \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_vars > $(TC_VARS_MK) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tc_flags > $(TC_VARS_FLAGS_MK) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) autotools_vars > $(TC_VARS_AUTOTOOLS_MK) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) cmake_vars > $(TC_VARS_CMAKE) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_cross_vars > $(TC_VARS_MESON_CROSS) ; \
 	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) meson_native_vars > $(TC_VARS_MESON_NATIVE) ; \
+	  env $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) rust_vars > $(TC_VARS_RUST_MK) ; \
 	else \
 	  echo "$$""(error An error occured while setting up the toolchain, please check the messages above)" > $@; \
 	fi
 endif
 
+# Include generic exports
 -include $(TC_VARS_MK)
+
+# Default is autotools / make
+DEFAULT_ENV ?= autotools flags rust
+
+# Map DEFAULT_ENV definitions to filenames
+TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
+# Include them (optional include)
+-include $(TC_VARS_FILES)
+
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
 endif
@@ -74,9 +94,22 @@ ENV += TC_KERNEL=$(TC_KERNEL)
 #  -g3 includes macro definitions in debug info
 #  -O0 disables optimizations for predictable debugging
 #  -gz compresses debug sections to reduce file size (60-80% smaller)
+#
+# PowerPC e500v2 (qoriq): Use -O1 to avoid stack frame offset limitations
+# (e500v2 has 248-byte max offset for certain load/store instructions)
+#
+# GCC 4.8.3 (hi3535/armv7l) with old binutils cannot handle compressed
+# debug sections from -g3. Use -g (level 2) instead which generates
+# less debug info and avoids compression
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
   ifeq ($(strip $(GCC_DEBUG_FLAGS)),)
-    GCC_DEBUG_FLAGS = -ggdb3 -g3 -O0
+    ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
+      GCC_DEBUG_FLAGS = -ggdb3 -g3 -O1 -fno-omit-frame-pointer
+    else ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+      GCC_DEBUG_FLAGS = -ggdb3 -g3 -O1 -fno-omit-frame-pointer
+    else
+      GCC_DEBUG_FLAGS = -ggdb3 -g -O0
+    endif
 
     # Check compression support and add to flags
     GCC_SUPPORTS_GZ := $(shell echo | $(WORK_DIR)/../../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -gz -E - 2>/dev/null 1>&2 && echo yes)
@@ -88,6 +121,7 @@ ifeq ($(strip $(GCC_DEBUG_INFO)),1)
   ADDITIONAL_CFLAGS := $(patsubst -O%,,$(ADDITIONAL_CFLAGS))
   ADDITIONAL_CPPFLAGS := $(patsubst -O%,,$(ADDITIONAL_CPPFLAGS))
   ADDITIONAL_CXXFLAGS := $(patsubst -O%,,$(ADDITIONAL_CXXFLAGS))
+  ADDITIONAL_RUSTFLAGS := -Cdebuginfo=2 -Copt-level=0
 
 # gcc:
 #  -g0 deactivates debug information generation

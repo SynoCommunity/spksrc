@@ -25,6 +25,11 @@ CMAKE_ARGS += -DCOMPILE_C_ONLY=ON
 endif
 endif
 
+# GCC 4.9 has incomplete/broken AVX-512 intrinsics support
+ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
+  CMAKE_ARGS += -DENABLE_AVX512=OFF
+endif
+
 .PHONY: svt-av1_post_install_target
 svt-av1_post_install_target:
 	$(RUN) sed -i 's|^prefix=.*|prefix=$(STAGING_INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/SvtAv1Enc.pc

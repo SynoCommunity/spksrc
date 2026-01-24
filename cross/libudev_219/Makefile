@@ -76,13 +76,14 @@ CONFIGURE_ARGS += --with-dbuspolicydir=/usr/share/dbus-1/system.d
 CONFIGURE_ARGS += --with-dbussessionservicedir=/usr/share/dbus-1/services
 CONFIGURE_ARGS += --with-dbussystemservicedir=/usr/share/dbus-1/system-services
 
-ADDITIONAL_CFLAGS  = -DSG_FLAG_LUN_INHIBIT=2
-
 include ../../mk/spksrc.common.mk
 
 # Build fix for aarch64 and x64 for DSM-7.2:
 #   error: static declaration of 'renameat2' follows non-static declaration
 ifeq ($(call version_ge, $(TCVERSION), 7.2),1)
+CONFIGURE_ARGS += ac_cv_have_decl_renameat2=yes
+else ifeq ($(strip $(TCVERSION)),1.3)
+# Same for armv7 and aarch64 for SRM 1.3 (but SRM 1.3 is still on systemd 204):
 CONFIGURE_ARGS += ac_cv_have_decl_renameat2=yes
 endif
 

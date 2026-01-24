@@ -10,7 +10,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 BUILD_DEPENDS = native/nodejs_16
 
 DEPENDS  = cross/libcap cross/ndpi cross/curl
-DEPENDS += cross/libmaxminddb cross/sqlite cross/mysql-connector-c
+DEPENDS += cross/libmaxminddb cross/sqlite cross/mariadb-connector-c
 DEPENDS += cross/readline cross/libzmq cross/libxml2 cross/glib cross/groff
 DEPENDS += cross/json-c cross/rrdtool cross/lua
 DEPENDS += cross/hiredis
@@ -21,6 +21,10 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 HOMEPAGE = https://www.ntop.org/
 COMMENT  = High-Speed Web-based Traffic Analysis and Flow Collection.
 LICENSE  = GPLv3
+
+# find MariaDB includes & library
+ADDITIONAL_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/include/mariadb
+ADDITIONAL_LDFLAGS  += -lmysqlclient
 
 include ../../mk/spksrc.archs.mk
 

@@ -1,20 +1,18 @@
-PKG_NAME = nnn
-PKG_VERS = 5.1
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/jarun/nnn/releases/download/v$(PKG_VERS)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = nnn-main
 
-DEPENDS = cross/ncursesw cross/readline
+OPTIONAL_DEPENDS  = cross/nnn-latest
+OPTIONAL_DEPENDS += cross/nnn-4.8
+OPTIONAL_DEPENDS += cross/nnn-4.0
 
-REQUIRED_MIN_DSM = 7
-UNSUPPORTED_ARCHS = comcerto2k
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-HOMEPAGE = https://github.com/jarun/nnn
-COMMENT  = n³ The unorthodox terminal file manager.
-LICENSE  = 2-clause BSD
+include ../../mk/spksrc.main-depends.mk
 
-CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
-
-include ../../mk/spksrc.cross-cc.mk
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+DEPENDS += cross/nnn-latest
+else ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
+DEPENDS += cross/nnn-4.8
+else
+# 32-bit archs for DSM<7
+DEPENDS += cross/nnn-4.0
+endif

@@ -23,6 +23,7 @@ LICENSE  = NumPy Developers
 
 # Requires gcc>=9.3 to build sucesfully
 REQUIRED_MIN_DSM = 7.2
+REQUIRED_MIN_SRM = 1.3
 
 include ../../mk/spksrc.common.mk
 
