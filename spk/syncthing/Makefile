@@ -1,5 +1,5 @@
 SPK_NAME = syncthing
-SPK_VERS = 2.0.12
+SPK_VERS = 2.0.13
 SPK_REV = 33
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
@@ -13,7 +13,7 @@ MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
-CHANGELOG = "1. Update Syncthing to v2.0.12 (built with Go 1.25). <br/>2. Drop legacy ARMv5 models that required the Go 1.23 compiler. <br/><br/>REMARKS: New packages are rarely created because Syncthing's in-app updater is used."
+CHANGELOG = "1. Update Syncthing to v2.0.13 (built with Go 1.25). <br/>2. Drop legacy ARMv5 models that required the Go 1.23 compiler. <br/><br/>REMARKS: New packages are rarely created because Syncthing's in-app updater is used."
 HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes
