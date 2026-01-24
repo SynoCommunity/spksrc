@@ -103,13 +103,20 @@ rustc_target: $(PRE_RUSTC_TARGET) $(TC_LOCAL_VARS_RUST)
 	$(MSG) "rustup default $(RUSTUP_DEFAULT_TOOLCHAIN)" ; \
 	rustup default $(RUSTUP_DEFAULT_TOOLCHAIN) ; \
 	flock -u 5
-ifeq ($(TC_RUSTUP_TOOLCHAIN),$(RUSTUP_DEFAULT_TOOLCHAIN))
-	@$(MSG) "rustup target add $(RUST_TARGET)"
-	rustup override set $(RUSTUP_DEFAULT_TOOLCHAIN)
-	rustup target add $(RUST_TARGET)
-	rustup show
-else
-	@$(MSG) "Target $(RUST_TARGET) unavailable..."
+	@$(MSG) "Checking Rust target $(RUST_TARGET) availability"
+	@if rustup target list --toolchain $(TC_RUSTUP_TOOLCHAIN) 2>/dev/null | grep -q "^$(RUST_TARGET) (installed)" ; then \
+	   $(MSG) "Rust target already installed for $(TC_RUSTUP_TOOLCHAIN)" ; \
+	   rustup show ; \
+	elif rustup target list --toolchain $(TC_RUSTUP_TOOLCHAIN) 2>/dev/null | grep -q "^$(RUST_TARGET)" ; then \
+	   $(MSG) "Installing Rust target $(RUST_TARGET) for $(TC_RUSTUP_TOOLCHAIN)" ; \
+	   $(MSG) "rustup override set $(RUSTUP_DEFAULT_TOOLCHAIN)" ; \
+	   rustup override set $(RUSTUP_DEFAULT_TOOLCHAIN) ; \
+	   $(MSG) "rustup target add $(RUST_TARGET)" ; \
+	   rustup target add $(RUST_TARGET) ; \
+	   rustup show ; \
+	else \
+	   $(MSG) "Target $(RUST_TARGET) unavailable for $(TC_RUSTUP_TOOLCHAIN)" ; \
+	fi
 ifeq ($(RUST_BUILD_TOOLCHAIN),1)
 	@$(MSG) "Build rust target $(RUST_TARGET) from sources"
 	@$(MSG) "Building Tier-3 rust target: $(RUST_TARGET)"
@@ -132,7 +139,6 @@ endif
 	done
 	@$(MSG) "Building Tier 3 rust target: $(RUST_TARGET) - stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE) complete"
 	rustup show
-endif
 endif
 
 post_rustc_target: $(RUSTC_TARGET)

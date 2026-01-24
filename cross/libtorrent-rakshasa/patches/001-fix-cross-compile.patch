@@ -2,7 +2,7 @@
 # 
 --- configure.orig	2024-09-28 16:06:43.000000000 +0000
 +++ configure	2025-01-18 18:28:08.024342161 +0000
-@@ -18375,7 +18375,7 @@
+@@ -18982,7 +18982,7 @@
    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking the byte alignment" >&5
  printf %s "checking the byte alignment... " >&6; }
  

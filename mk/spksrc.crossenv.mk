@@ -31,8 +31,10 @@ PYTHON_NATIVE               = $(PYTHON_NATIVE_PATH)/python3
 PYTHON_LIB_NATIVE           = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell uname -m)-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 PYTHON_LIB_CROSS            = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell expr "$(TC_TARGET)" : '\([^-]*\)' )-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 
-# wheel crossenv definitions
-CROSSENV_CONFIG_PATH = $(abspath $(PYTHON_WORK_DIR)/../crossenv)
+# wheel crossenv definitions: 
+#   Use PYTHON_PACKAGE_DIR from spksrc.python.mk
+#   OR if empty then we are building spk/python3*
+CROSSENV_CONFIG_PATH = $(realpath $(or $(PYTHON_PACKAGE_DIR),$(WORK_DIR)/..)/crossenv)
 CROSSENV_CONFIG_DEFAULT = $(CROSSENV_CONFIG_PATH)/requirements-default.txt
 CROSSENV_PATH = $(abspath $(WORK_DIR)/crossenv-$(CROSSENV_WHEEL)/)
 
@@ -122,9 +124,11 @@ crossenv-%:
 
 ####
 
-# Defined using current install prefix by replacing package name using
-# PYTHON_PACKAGE from spksrc.python.mk, else use local install prefix
-ifneq ($(PYTHON_PACKAGE),)
+# Determine the correct Python install prefix:
+# - If PYTHON_PACKAGE_WORK_DIR exists (pre-built python package available),
+#   use the python package's install prefix by replacing SPK_NAME with PYTHON_PACKAGE
+# - Otherwise (python is built as a dependency), use the current package's install prefix
+ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
 PYTHON_INSTALL_PREFIX = $(subst $(SPK_NAME),$(PYTHON_PACKAGE),$(INSTALL_PREFIX))
 else
 PYTHON_INSTALL_PREFIX = $(INSTALL_PREFIX)
@@ -207,9 +211,18 @@ endif
 	$(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_CROSS_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
 	$(RUN) $$(which cross-pip) $(PIP_BASIC_OPT) --cache-dir $(PIP_CACHE_DIR) install $(CROSSENV_CROSS_SETUPTOOLS) $(CROSSENV_CROSS_WHEEL) ; \
 	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
-	@$(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" requirement
-	@MAKEFLAGS= $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT="$(CROSSENV_REQUIREMENTS)" REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" requirement
-
+	@$(MSG) $(MAKE) \
+		ARCH=$(ARCH) \
+		TCVERSION=$(TCVERSION) \
+		REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" \
+		REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" \
+		requirement
+	@MAKEFLAGS= $(MAKE) \
+		ARCH=$(ARCH) \
+		TCVERSION=$(TCVERSION) \
+		REQUIREMENT="$(CROSSENV_REQUIREMENTS)" \
+		REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" \
+		requirement
 
 ### 
 ### crossenv-install-<crossenv>
@@ -220,6 +233,7 @@ crossenv-install-%:
 	. $(abspath $(WORK_DIR)/crossenv-$*)/bin/activate ; \
 	if [ -e "$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate" ] ; then \
 	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$*)/build/bin ; \
+	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
 	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate]" ; \
 	   $(MSG) "python: [$$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python)]" ; \
 	else \

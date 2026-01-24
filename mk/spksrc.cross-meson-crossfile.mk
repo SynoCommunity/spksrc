@@ -5,15 +5,20 @@ MESON_CROSS_FILE_NAME = $(ARCH)-crossfile.meson
 MESON_CROSS_FILE_PKG = $(WORK_DIR)/$(PKG_DIR)/$(MESON_CROSS_FILE_NAME)
 CONFIGURE_ARGS += --cross-file=$(MESON_CROSS_FILE_PKG)
 
-# Enforce running in a clean environement to avoid
-# issues between 'build' and 'host' environments
-ENV_MESON = $(addprefix -u ,$(VARS_TO_CLEAN)) $(ENV_FILTERED)
-RUN_MESON = cd $(MESON_BASE_DIR) && env $(ENV_MESON)
+# Map DEFAULT_ENV definitions to filenames
+TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
+# Include them (optional include)
+-include $(TC_VARS_FILES)
+
+# Meson specific targets
+.PHONY: meson_generate_crossfile
+meson_generate_crossfile:
+	$(MAKE) --no-print-directory DEFAULT_ENV="flags rust" $(MESON_CROSS_FILE_PKG)
 
 .PHONY: $(MESON_CROSS_FILE_PKG)
 $(MESON_CROSS_FILE_PKG):
 	@$(MSG) Generating $(MESON_CROSS_FILE_PKG)
-	env $(MAKE) --no-print-directory generate_meson_crossfile_pkg > $(MESON_CROSS_FILE_PKG) 2>/dev/null;
+	env $(ENV) $(MAKE) --no-print-directory generate_meson_crossfile_pkg > $(MESON_CROSS_FILE_PKG) 2>/dev/null;
 
 .PHONY: generate_meson_crossfile_pkg
 generate_meson_crossfile_pkg: SHELL:=/bin/bash
@@ -47,9 +52,9 @@ ifneq ($(strip $(MESON_BUILTIN_C_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_ARGS)',\n"
 endif
 ifeq ($(GCC_DEBUG_INFO),1)
-	@echo $(patsubst -O%,,$(CFLAGS) $(GCC_DEBUG_FLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(patsubst -O%,,$(CFLAGS) $(GCC_DEBUG_FLAGS) $(TC_EXTRA_CFLAGS) $(ADDITIONAL_CFLAGS))) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 else
-	@echo $(CFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(CFLAGS) $(TC_EXTRA_CFLAGS) $(ADDITIONAL_CFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 endif
 	@echo -ne "\t]\n"
 	@echo
@@ -57,7 +62,7 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_C_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(call uniq,$(LDFLAGS) $(ADDITIONAL_LDFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
 	@echo "cpp_args = ["
@@ -65,9 +70,9 @@ ifneq ($(strip $(MESON_BUILTIN_CPP_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_ARGS)',\n"
 endif
 ifeq ($(GCC_DEBUG_INFO),1)
-	@echo $(patsubst -O%,,$(CPPFLAGS) $(GCC_DEBUG_FLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(patsubst -O%,,$(CPPFLAGS) $(GCC_DEBUG_FLAGS) $(ADDITIONAL_CPPFLAGS))) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 else
-	@echo $(CPPFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(CPPFLAGS) $(ADDITIONAL_CPPFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 endif
 	@echo -ne "\t]\n"
 	@echo
@@ -75,17 +80,18 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_CPP_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_CPP_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(call uniq,$(LDFLAGS) $(ADDITIONAL_LDFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
+ifneq ($(strip $(FFLAGS)),)
 	@echo "fortran_args = ["
 ifneq ($(strip $(MESON_BUILTIN_FC_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_FC_ARGS)',\n"
 endif
 ifeq ($(GCC_DEBUG_INFO),1)
-	@echo $(patsubst -O%,,$(FFLAGS) $(GCC_DEBUG_FLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(patsubst -O%,,$(FFLAGS) $(GCC_DEBUG_FLAGS) $(ADDITIONAL_FFLAGS))) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 else
-	@echo $(FFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(FFLAGS) $(ADDITIONAL_FFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 endif
 	@echo -ne "\t]\n"
 	@echo
@@ -93,14 +99,15 @@ endif
 ifneq ($(strip $(MESON_BUILTIN_FC_LINK_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_FC_LINK_ARGS)',\n"
 endif
-	@echo $(LDFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
+	@echo $(call uniq,$(LDFLAGS) $(ADDITIONAL_LDFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/" ; \
 	echo -ne "\t]\n"
 	@echo
+endif
 	@echo "rust_args = [" ; \
 	echo -ne "\t'--target=$(RUST_TARGET)',\n" ; \
 	echo -ne "\t'-Clinker=$(TC_PATH)$(TC_PREFIX)gcc',\n"
 ifneq ($(strip $(MESON_BUILTIN_RUST_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_RUST_ARGS)',\n"
 endif
-	@echo $(RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) $(ADDITIONAL_RUSTFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 	@echo -ne "\t]\n"

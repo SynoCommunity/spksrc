@@ -22,11 +22,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Restore distrib cache
         id: cache-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: distrib
           # Use a placeholder key that will never match for the exact key,
@@ -185,7 +185,7 @@ jobs:
 
       - name: Save refreshed cache
         if: steps.cache-check.outputs.save_cache == 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: distrib
           key: distrib-${{ steps.distrib-hash.outputs.hash }}

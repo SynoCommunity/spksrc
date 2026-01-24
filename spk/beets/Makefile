@@ -1,6 +1,6 @@
 SPK_NAME = beets
-SPK_VERS = 2.3.1
-SPK_REV = 11
+SPK_VERS = 2.5.1
+SPK_REV = 12
 SPK_ICON = src/beets.png
 
 PYTHON_PACKAGE = python312
@@ -18,10 +18,10 @@ DESCRIPTION = Beets is the media library management system for obsessive music g
 
 DISPLAY_NAME = beets
 STARTABLE = no
-CHANGELOG = "1. Update beets to 2.3.1.<br/>2. Migrate to Python 3.12."
+CHANGELOG = "1. Update beets to 2.5.1. <br/>2. Fix wheel build issue with lap."
 
-HOMEPAGE = http://beets.io/
-LICENSE  = GPL
+HOMEPAGE = https://beets.io/
+LICENSE  = MIT
 
 SERVICE_SETUP = src/service-setup.sh
 
@@ -65,7 +65,7 @@ DEPENDS += cross/mp3gain
 DEPENDS += cross/libyaml
 
 # [numpy]
-DEPENDS += python/numpy
+DEPENDS += python/numpy_1.26
 
 # [lap] - depends on [numpy]
 DEPENDS += python/lap

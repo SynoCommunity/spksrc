@@ -33,10 +33,8 @@ else
 fi
 JQ="/bin/jq"
 SYNOSVC="/usr/syno/sbin/synoservice"
-MARIADB_10_INSTALL_DIRECTORY="/var/packages/MariaDB10"
-MARIADB_10_BIN_DIRECTORY="${MARIADB_10_INSTALL_DIRECTORY}/target/usr/local/mariadb10/bin"
-MYSQL="${MARIADB_10_BIN_DIRECTORY}/mysql"
-MYSQLDUMP="${MARIADB_10_BIN_DIRECTORY}/mysqldump"
+MYSQL="/usr/local/mariadb10/bin/mysql"
+MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
 MYSQL_USER="ttrss"
 MYSQL_DATABASE="ttrss"
 
@@ -175,6 +173,22 @@ validate_preinst ()
       exit 1
     fi
   fi
+
+  # Check database
+  if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+    if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+      echo "Incorrect MariaDB 'root' password"
+      exit 1
+    fi
+    if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^"${MYSQL_USER}"$ > /dev/null 2>&1; then
+      echo "MariaDB user '${MYSQL_USER}' already exists"
+      exit 1
+    fi
+    if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^"${MYSQL_DATABASE}"$ > /dev/null 2>&1; then
+      echo "MariaDB database '${MYSQL_DATABASE}' already exists"
+      exit 1
+    fi
+  fi
 }
 
 validate_preuninst ()
@@ -182,7 +196,7 @@ validate_preuninst ()
   if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
     # Check database
     if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-      echo "Incorrect MySQL root password"
+      echo "Incorrect MySQL 'root' password"
       exit 1
     fi
 
