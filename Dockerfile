@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:trixie
 LABEL description="Framework for maintaining and compiling native community packages for Synology devices"
 LABEL maintainer="SynoCommunity <https://github.com/SynoCommunity/spksrc/graphs/contributors>"
 LABEL url="https://synocommunity.com"
@@ -10,82 +10,118 @@ ENV LANG C.UTF-8
 RUN dpkg --add-architecture i386
 
 # Install required packages (in sync with README.rst instructions)
-RUN apt-get update && apt-get install --no-install-recommends -y \
-		autoconf-archive \
-		autogen \
-		automake \
-		autopoint \
-		bash \
-		bc \
-		bison \
-		build-essential \
-		check \
-		cmake \
-		curl \
-		cython3 \
-		debootstrap \
-		ed \
-		expect \
-		fakeroot \
-		flex \
-		g++-multilib \
-		gawk \
-		gettext \
-		git \
-		gperf \
-		imagemagick \
-		intltool \
-		jq \
-		libbz2-dev \
-		libc6-i386 \
-		libcppunit-dev \
-		libffi-dev \
-		libgc-dev \
-		libgmp3-dev \
-		libltdl-dev \
-		libmount-dev \
-		libncurses-dev \
-		libpcre3-dev \
-		libssl-dev \
-		libtool \
-		libunistring-dev \
-		lzip \
-		mercurial \
-		moreutils \
-		ninja-build \
-		patchelf \
-		php \
-		pkg-config \
-		python2 \
-		python3 \
-		python3-distutils \
-		rename \
-		rsync \
-		scons \
-		subversion \
-		sudo \
-		swig \
-		texinfo \
-		unzip \
-		xmlto \
-		zlib1g-dev && \
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-	adduser --disabled-password --gecos '' user && \
+# ATTENTION: the total length of the following RUN command must not exceed 1024 characters
+RUN apt update && apt install --no-install-recommends -y \
+	autoconf-archive \
+	autogen \
+	automake \
+	autopoint \
+	bash \
+	bash-completion \
+	bc \
+	bison \
+	build-essential \
+	check \
+	cmake \
+	curl \
+	cython3 \
+	debootstrap \
+	ed \
+	expect \
+	fakeroot \
+	flex \
+	gh \
+	g++-multilib \
+	gawk \
+	gettext \
+	gfortran \
+	git \
+	glslang-tools \
+	gobject-introspection \
+	gperf \
+	imagemagick \
+	intltool \
+	jq \
+	libbz2-dev \
+	libc6-i386 \
+	libcppunit-dev \
+	libelf-dev \
+	libffi-dev \
+	libgc-dev \
+	libgmp3-dev \
+	libicu76 \
+	libltdl-dev \
+	libmount-dev \
+	libncurses-dev \
+	libpcre2-dev \
+	libssl-dev \
+	libtool \
+	libtool-bin \
+	libunistring-dev \
+	lzip \
+	man-db \
+	manpages-dev \
+	plocate \
+	moreutils \
+	nasm \
+	p7zip \
+	patchelf \
+	php \
+	pkg-config \
+	rename \
+	ripgrep \
+	rsync \
+	ruby-mustache \
+	scons \
+	spirv-tools \
+	subversion \
+	sudo \
+	swig \
+	texinfo \
+	time \
+	tree \
+	unzip \
+	xmlto \
+	yasm \
+	zip \
+	zlib1g-dev
+
+# Python based apps
+RUN apt install --no-install-recommends -y \
+	httpie \
+	mercurial \
+	meson \
+	ninja-build \
+	python3 \
+	python3-mako \
+	python3-pip \
+	python3-setuptools \
+	python3-virtualenv \
+	python3-yaml
+
+###
+### Keeping backport channel management for later use
+###
+
+# Add backport channel
+RUN echo "deb http://deb.debian.org/debian trixie-backports main" > /etc/apt/sources.list.d/backports.list && \
+    echo "Package: *\nPin: release a=trixie-backports\nPin-Priority: 100" > /etc/apt/preferences.d/99-backports
+
+# Update package list & install needed package from backport
+RUN apt-get update
+###RUN apt-get install -y -t trixie-backports meson
+
+# Clean-up apt db
+RUN apt clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Update locate db
+RUN updatedb
+
+# Add user
+RUN adduser --disabled-password --gecos '' user && \
 	adduser user sudo && \
-	echo "%users ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/users
-
-# Install setuptools, wheel and pip for Python2
-RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | python2
-# Install virtualenv and httpie for Python2
-# Use pip2 as default pip -> python3
-RUN pip2 install virtualenv httpie
-
-# Install setuptools, wheel and pip for Python3
-# Default pip -> python3 aware for native python wheels builds
-RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
-# Install meson cross-platform build system
-RUN pip3 install meson==1.0.0
+	echo "%user ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/users
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc

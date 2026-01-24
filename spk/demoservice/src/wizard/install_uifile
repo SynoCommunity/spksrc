@@ -1,44 +1,31 @@
 [
   {
-    "step_title": "Example configuration for demoservice",
+    "step_title": "Demo Configuration",
     "items": [
       {
         "type": "textfield",
-        "desc": "Download configuration",
+        "desc": "Please specify a shared folder for this package. This share is created at installation when it does not already exist.",
         "subitems": [
           {
-            "key": "wizard_download_dir",
-            "desc": "Download location",
-            "defaultValue": "/volume1/downloads",
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared Folder",
+            "defaultValue": "demo-share",
             "validator": {
               "allowBlank": false,
               "regex": {
-                "expr": "/^\\\/volume[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                "errorText": "Path should begin with /volume?/ where ? is volume number (1-99)"
-              }
-            }
-          },
-          {
-            "key": "wizard_group",
-            "desc": "DSM group",
-            "defaultValue": "sc-download",
-            "validator": {
-              "allowBlank": false,
-              "regex": {
-                "expr": "/^[^<>:*/?\"]*$/",
-                "errorText": "Not allowed character in group name"
-              }
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Subdirectories are not supported."              }
             }
           }
         ]
-      }
-    ]
-  },
-  {
-    "step_title": "Attention! DSM Permissions",
-    "items": [
-      {
-        "desc": "Permissions are managed with the group <b>'sc-download'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user (= demoservice) will not appear on most UI settings.<br>Including the following:<br>- Application privilege's permission viewer<br>- FPT's chroot user selector<br>- File Stations's<br>- Change owner<br>- Shared Links Manager -> Enable secure sharing<br><br>The only exceptions are:<br>- Control Panel > Shared Folder > Edit > Permission > System internal user<br>- ACL editor<br>"
+      }, {
+        "desc": ""
+      }, {
+        "desc": "If you let the installer create the shared folder, it is created under the same volume as the package is installed.<br/>If you want to use a different volume for the share, you must create the shared folder in DSM Control Panel before, and enter the name of the existing share in the field above."
+      }, {
+        "desc": ""
+      }, {
+        "desc": "This package runs as internal service user <b>'sc-demoservice'</b> in DSM. The shared folder above is configured at installation time to be accessible by this user.<p>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
       }
     ]
   }

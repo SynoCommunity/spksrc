@@ -1,0 +1,29 @@
+# add option to avoid definition of KERNEL_V4L2_HAVE_TIME32
+# 
+# since strace v6.7:
+# build fails on OLD_PPC_ARCHS when KERNEL_V4L2_HAVE_TIME32 is defined
+# 
+--- src/kernel_v4l2_types.h.orig	2024-03-19 13:00:00.000000000 +0100
++++ src/kernel_v4l2_types.h	2024-06-13 20:21:42.778741158 +0200
+@@ -47,8 +47,9 @@
+ 	};
+ } kernel_v4l2_buffer_t;
+ 
+-# if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32
+-#  define KERNEL_V4L2_HAVE_TIME32 1
++# if !defined DISABLE_KERNEL_V4L2_HAVE_TIME32
++#  if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32
++#   define KERNEL_V4L2_HAVE_TIME32 1
+ 
+ /*
+  * On all 32-bit architectures and on 64-bit ones with COMPAT enabled
+@@ -87,7 +88,8 @@
+ 		uint32_t		reserved;
+ 	};
+ } kernel_v4l2_buffer_time32_t;
+-# endif /* HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32 */
++#  endif /* HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32 */
++# endif  /* !defined DISABLE_KERNEL_V4L2_HAVE_TIME32 */
+ 
+ typedef struct {
+ 	uint32_t				type;

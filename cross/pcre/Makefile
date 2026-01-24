@@ -2,7 +2,7 @@ PKG_NAME = pcre
 PKG_VERS = 8.45
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://altushost-swe.dl.sourceforge.net/project/pcre/pcre/$(PKG_VERS)
+PKG_DIST_SITE = https://downloads.sourceforge.net/project/pcre/pcre/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # This version of PCRE is now at end of life, and is no longer being actively maintained. 
@@ -18,7 +18,7 @@ LICENSE  = BSD
 
 GNU_CONFIGURE = 1
 # enable UTF-8 support
-# pcre is used by glib and dependents: mc, sshfs, irssi, bitlbee, museek-plus, rmlint
+# pcre is used by glib-2.58 and dependents: mc, sshfs2, irssi, rmlint
 CONFIGURE_ARGS = --enable-utf
 CONFIGURE_ARGS += --enable-unicode-properties
 CONFIGURE_ARGS += --disable-static

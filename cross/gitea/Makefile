@@ -1,12 +1,14 @@
 PKG_NAME = gitea
-PKG_VERS = 1.17.3
+PKG_VERS = 1.25.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/go-gitea/gitea/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go native/nodejs
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+
+BUILD_DEPENDS = native/go native/nodejs native/pnpm
 
 HOMEPAGE = https://gitea.io/
 COMMENT  = Gitea is a community managed lightweight code hosting solution written in Go.
@@ -24,7 +26,7 @@ include ../../mk/spksrc.cross-go.mk
 
 # PATH must be defined after include of spksrc.cross-go.mk,
 # otherwise WORK_DIR is not defined when building in cross/gitea folder
-PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
+PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(PATH)
 
 SYNOPKG_PKGVAR = /var/packages/$(PKG_NAME)/var
 CUSTOM_PATH = -X \"code.gitea.io/gitea/modules/setting.CustomPath=$(SYNOPKG_PKGVAR)/custom\"

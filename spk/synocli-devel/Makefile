@@ -1,11 +1,11 @@
 SPK_NAME = synocli-devel
-SPK_VERS = 1.0
-SPK_REV = 1
+SPK_VERS = 1.4
+SPK_REV = 5
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Initial release of synocli-devel"
+CHANGELOG = "1. Update LLVM to 21.1.8 (DSM7\).<br/>2. Update to GDB 17.1 (DSM7\).<br/>3. Update binutils to v2.45.<br/>4. Update automake to 1.18.1.<br/>5. Update strace to 6.18."
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.39$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2.
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.18.1, autoconf 2.71$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.18
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -14,20 +14,28 @@ LICENSE  = Each tool is licensed under it\'s respective license.
 
 SPK_DEPENDS = "Perl"
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+OPTIONAL_DEPENDS = cross/llvm
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.spk.mk
 
-DEPENDS  = cross/llvm
-# build pkg-config before autoconf otherwise
-# glib fails on libiconv on some platforms
-# (to investigate ...)
-DEPENDS += cross/pkg-config
-DEPENDS += cross/autoconf
-DEPENDS += cross/automake
+ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
+DEPENDS += cross/llvm
+endif
+
+# build binutils bofore the following
+# otherwise it fails to build for ARMv5
 DEPENDS += cross/binutils
+DEPENDS += cross/pkg-config
 DEPENDS += cross/gdb
 DEPENDS += cross/make
+DEPENDS += cross/libtree
+DEPENDS += cross/strace
+
+# build autotools last
+# otherwise glib and gdb fail on libiconv on some platforms
+# (to investigate ...)
+DEPENDS += cross/autoconf
+DEPENDS += cross/automake
 
 ##
 ## autoconf
@@ -46,13 +54,20 @@ SPK_COMMANDS += bin/m4
 ## automake
 ##
 SPK_COMMANDS += bin/aclocal
-SPK_COMMANDS += bin/aclocal-1.16
+SPK_COMMANDS += bin/aclocal-1.18
 SPK_COMMANDS += bin/automake
-SPK_COMMANDS += bin/automake-1.16
+SPK_COMMANDS += bin/automake-1.18
 
 ##
 ## binutils
 ##
+ifeq ($(call version_lt, $(TC_GCC), 4.4),1)
+OPTIONAL_DESC += ", binutils 2.32"
+else ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)`
+OPTIONAL_DESC += ", binutils 2.41"
+else
+OPTIONAL_DESC += ", binutils 2.45"
+endif
 SPK_COMMANDS += bin/addr2line
 SPK_COMMANDS += bin/ar
 SPK_COMMANDS += bin/as
@@ -83,29 +98,28 @@ SPK_COMMANDS += bin/strip
 ##
 ## gdb
 ##
-
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 OPTIONAL_DESC += ", gdb 7.12.1"
+else ifeq ($(call version_lt, $(TC_GCC), 5),1)
+OPTIONAL_DESC += ", gdb 14.2"
 else
-OPTIONAL_DESC += ", gdb 13.1"
+OPTIONAL_DESC += ", gdb 17.1"
 endif
-
 SPK_COMMANDS += bin/gcore
 SPK_COMMANDS += bin/gdb
 SPK_COMMANDS += bin/gdb-add-index
 SPK_COMMANDS += bin/gdbserver
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
 SPK_COMMANDS += bin/run
 endif
-
-include ../../mk/spksrc.spk.mk
 
 ##
 ## LLVM
 ##
+ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
-OPTIONAL_DESC += ", LLVM 16.0.1"
-SPK_COMMANDS += bin/clang-16
+OPTIONAL_DESC += ", LLVM 21.1.8"
+SPK_COMMANDS += bin/clang-21
 else
 OPTIONAL_DESC += ", LLVM 9.0.1"
 SPK_COMMANDS += bin/clang-9
@@ -117,15 +131,11 @@ SPK_COMMANDS += bin/clang-cl
 SPK_COMMANDS += bin/clang-cpp
 SPK_COMMANDS += bin/clang-extdef-mapping
 SPK_COMMANDS += bin/clang-format
-SPK_COMMANDS += bin/clang-import-test
-SPK_COMMANDS += bin/clang-offload-bundler
 SPK_COMMANDS += bin/clang-refactor
 SPK_COMMANDS += bin/clang-rename
 SPK_COMMANDS += bin/clang-scan-deps
 SPK_COMMANDS += bin/git-clang-format
 SPK_COMMANDS += bin/hmaptool
-SPK_COMMANDS += bin/ld64.lld
-SPK_COMMANDS += bin/ld.lld
 SPK_COMMANDS += bin/lld
 SPK_COMMANDS += bin/lld-link
 SPK_COMMANDS += bin/llvm-ar
@@ -136,10 +146,16 @@ SPK_COMMANDS += bin/llvm-objdump
 SPK_COMMANDS += bin/llvm-profdata
 SPK_COMMANDS += bin/llvm-ranlib
 SPK_COMMANDS += bin/llvm-rc
+SPK_COMMANDS += bin/llvm-readelf
+SPK_COMMANDS += bin/llvm-readobj
+SPK_COMMANDS += bin/llvm-size
+SPK_COMMANDS += bin/llvm-strings
+SPK_COMMANDS += bin/llvm-strip
 SPK_COMMANDS += bin/llvm-symbolizer
 SPK_COMMANDS += bin/scan-build
 SPK_COMMANDS += bin/scan-view
 SPK_COMMANDS += bin/wasm-ld
+endif
 
 ##
 ## make
@@ -150,3 +166,14 @@ SPK_COMMANDS += bin/make
 ## pkg-config
 ##
 SPK_COMMANDS += bin/pkg-config
+
+##
+## libtree
+##
+SPK_COMMANDS += bin/libtree
+
+##
+## strace
+##
+SPK_COMMANDS += bin/strace
+SPK_COMMANDS += bin/strace-log-merge

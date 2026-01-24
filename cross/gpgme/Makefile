@@ -2,8 +2,10 @@ PKG_NAME = gpgme
 PKG_VERS = 1.17.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/$(PKG_NAME)
+PKG_DIST_SITE = https://gnupg.org/ftp/gcrypt/gpgme
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+# Versions newer than 1.17.1 are not compatible with DSM 6 toolchains anymore...
 
 DEPENDS = cross/libgpg-error cross/libassuan
 

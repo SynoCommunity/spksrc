@@ -1,5 +1,5 @@
 <Config>
-  <Branch>develop</Branch>
+  <Branch>main</Branch>
   <LaunchBrowser>False</LaunchBrowser>
   <Port>8989</Port>
   <UpdateAutomatically>True</UpdateAutomatically>

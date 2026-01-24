@@ -1,0 +1,71 @@
+Index: FFmpeg/libavfilter/vf_scale_vt.c
+===================================================================
+--- libavfilter/vf_scale_vt.c
++++ libavfilter/vf_scale_vt.c
+@@ -40,11 +40,26 @@ typedef struct ScaleVtContext {
+     enum AVColorPrimaries colour_primaries;
+     enum AVColorTransferCharacteristic colour_transfer;
+     enum AVColorSpace colour_matrix;
++    enum AVPixelFormat format;
+     char *colour_primaries_string;
+     char *colour_transfer_string;
+     char *colour_matrix_string;
+ } ScaleVtContext;
+ 
++static const enum AVPixelFormat supported_formats[] = {
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_P010,
++    AV_PIX_FMT_NONE,
++};
++
++static int format_is_supported(enum AVPixelFormat fmt)
++{
++    for (int i = 0; i < FF_ARRAY_ELEMS(supported_formats); i++)
++        if (supported_formats[i] == fmt)
++            return 1;
++    return 0;
++}
++
+ static av_cold int scale_vt_init(AVFilterContext *avctx)
+ {
+     ScaleVtContext *s = avctx->priv;
+@@ -179,6 +194,7 @@ static int scale_vt_config_output(AVFilt
+     AVFilterLink *inlink = outlink->src->inputs[0];
+     AVHWFramesContext *hw_frame_ctx_in;
+     AVHWFramesContext *hw_frame_ctx_out;
++    enum AVPixelFormat out_format;
+ 
+     err = ff_scale_eval_dimensions(s, s->w_expr, s->h_expr, inlink, outlink,
+                                    &s->output_width,
+@@ -198,13 +214,21 @@ static int scale_vt_config_output(AVFilt
+ 
+     hw_frame_ctx_in = (AVHWFramesContext *)inlink->hw_frames_ctx->data;
+ 
++    out_format = (s->format == AV_PIX_FMT_NONE) ? hw_frame_ctx_in->sw_format : s->format;
++    if (!format_is_supported(s->format)) {
++        av_log(s, AV_LOG_ERROR, "Unsupported output format: %s\n",
++               av_get_pix_fmt_name(out_format));
++        return AVERROR(ENOSYS);
++    }
++
+     av_buffer_unref(&outlink->hw_frames_ctx);
+     outlink->hw_frames_ctx = av_hwframe_ctx_alloc(hw_frame_ctx_in->device_ref);
+     hw_frame_ctx_out = (AVHWFramesContext *)outlink->hw_frames_ctx->data;
+     hw_frame_ctx_out->format = AV_PIX_FMT_VIDEOTOOLBOX;
+-    hw_frame_ctx_out->sw_format = hw_frame_ctx_in->sw_format;
++    hw_frame_ctx_out->sw_format = out_format;
+     hw_frame_ctx_out->width = outlink->w;
+     hw_frame_ctx_out->height = outlink->h;
++    ((AVVTFramesContext *)hw_frame_ctx_out->hwctx)->color_range = ((AVVTFramesContext *)hw_frame_ctx_in->hwctx)->color_range;
+ 
+     err = ff_filter_init_hw_frames(avctx, outlink, 1);
+     if (err < 0)
+@@ -234,6 +258,8 @@ static const AVOption scale_vt_options[]
+             OFFSET(colour_primaries_string), AV_OPT_TYPE_STRING, { .str = NULL }, .flags = FLAGS },
+     { "color_transfer", "Output colour transfer characteristics",
+             OFFSET(colour_transfer_string),  AV_OPT_TYPE_STRING, { .str = NULL }, .flags = FLAGS },
++    { "format", "Output pixel format",
++            OFFSET(format), AV_OPT_TYPE_PIXEL_FMT, { .i64 = AV_PIX_FMT_NONE }, AV_PIX_FMT_NONE, INT_MAX, .flags = FLAGS },
+     { NULL },
+ };
+ 

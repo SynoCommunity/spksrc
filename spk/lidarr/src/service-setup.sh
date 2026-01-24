@@ -12,7 +12,7 @@ CMD_ARGS="-nobrowser -data=${LIDARR_CONFIG_DIR}"
 # Older installations have it in the wrong place for DSM 7
 LEGACY_CONFIG_DIR="${SYNOPKG_PKGDEST}/.config"
 
-if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
     GROUP="sc-download"
     SERVICE_COMMAND="env HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${LIDARR} ${CMD_ARGS}"
 else
@@ -22,48 +22,68 @@ fi
 SVC_BACKGROUND=y
 SVC_WAIT_TIMEOUT=90
 
+internal_update_supported() {
+    info_file="${SYNOPKG_PKGINST_TEMP_DIR}/share/Lidarr/package_info"
+
+    # If the file doesn't exist, assume update is supported
+    [ -f "$info_file" ] || return 0
+
+    # If the file contains "UpdateMethod=External", updates are NOT supported
+    if grep -q '^UpdateMethod=External' "$info_file" 2>/dev/null; then
+        return 1    # Not supported
+    else
+        return 0    # Supported
+    fi
+}
+
 service_postinst ()
 {
-    echo "Set update required"
-    # Make Lidarr do an update check on start to avoid possible Lidarr
-    # downgrade when synocommunity package is updated
-    touch ${LIDARR_CONFIG_DIR}/update_required 2>&1
+    if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        if internal_update_supported; then
+            # Make Lidarr do an update check on start to avoid possible Lidarr
+            # downgrade when synocommunity package is updated
+            echo "Set update required"
+            touch "${LIDARR_CONFIG_DIR}/update_required" 2>&1
+        fi
 
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        set_unix_permissions "${CONFIG_DIR}"
+        if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+            set_unix_permissions "${CONFIG_DIR}"
+        fi
     fi
 }
 
 service_preupgrade ()
 {
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -ge 7 ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
         # ensure config is in @appdata folder
         if [ -d "${LEGACY_CONFIG_DIR}" ]; then
-            if [ "$(realpath ${LEGACY_CONFIG_DIR})" != "$(realpath ${CONFIG_DIR})" ]; then
+            if [ "$(realpath "${LEGACY_CONFIG_DIR}")" != "$(realpath "${CONFIG_DIR}")" ]; then
                 echo "Move ${LEGACY_CONFIG_DIR} to ${CONFIG_DIR}"
-                mv ${LEGACY_CONFIG_DIR} ${CONFIG_DIR} 2>&1
+                mv "${LEGACY_CONFIG_DIR}" "${CONFIG_DIR}" 2>&1
             fi
         fi
     fi
 
-    ## never update Lidarr distribution, use internal updater only
-    [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup ] && rm -rf ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup
-    echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
-    mkdir -p ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup 2>&1
-    rsync -aX ${SYNOPKG_PKGDEST}/share ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/ 2>&1
+    if internal_update_supported; then
+        # don't update Lidarr distribution, use internal updater only
+        [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup" ] && rm -rf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
+        echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
+        mkdir -p "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup" 2>&1
+        rsync -aX "${SYNOPKG_PKGDEST}/share" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/" 2>&1
+    fi
 }
 
 service_postupgrade ()
 {
-    ## restore Lidarr distribution
-    if [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/share ]; then
+    # restore Lidarr distribution
+    if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/share" ]; then
         echo "Restore previous distribution from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
-        rm -rf ${SYNOPKG_PKGDEST}/share/Lidarr/bin 2>&1
+        rm -rf "${SYNOPKG_PKGDEST}/share/Lidarr/bin" 2>&1
         # prevent overwrite of updated package_info
-        rsync -aX --exclude=package_info ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/share/ ${SYNOPKG_PKGDEST}/share 2>&1
+        rsync -aX --exclude=package_info "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/share/" "${SYNOPKG_PKGDEST}/share" 2>&1
     fi
 
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         set_unix_permissions "${SYNOPKG_PKGDEST}/share"
     fi
 }

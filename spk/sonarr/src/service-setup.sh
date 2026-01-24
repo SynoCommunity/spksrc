@@ -1,5 +1,6 @@
 
 # Sonarr service setup
+PATH="${SYNOPKG_PKGDEST}/bin:${PATH}"
 SONARR="${SYNOPKG_PKGDEST}/share/Sonarr/bin/Sonarr"
 
 # Sonarr uses custom Config and PID directories
@@ -23,13 +24,13 @@ LEGACY_OLD_CONFIG_DIR="${LEGACY_SYNOPKG_PKGDEST}/.config"
 
 if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
     GROUP="sc-download"
-    SERVICE_COMMAND="env HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${SONARR} ${CMD_ARGS}"
+    SERVICE_COMMAND="env PATH=${PATH} HOME=${HOME_DIR} LD_LIBRARY_PATH=${SYNOPKG_PKGDEST}/lib ${SONARR} ${CMD_ARGS}"
 else
-    SERVICE_COMMAND="env HOME=${HOME_DIR} ${SONARR} ${CMD_ARGS}"
+    SERVICE_COMMAND="env PATH=${PATH} HOME=${HOME_DIR} ${SONARR} ${CMD_ARGS}"
 fi
 
 SVC_BACKGROUND=y
-SVC_WAIT_TIMEOUT=90
+SVC_WAIT_TIMEOUT=120
 
 validate_preinst ()
 {

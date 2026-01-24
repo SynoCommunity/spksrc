@@ -3,8 +3,8 @@
 # - make PREFIX overwritable
 # - add targets to build shared libraries only
 # 
---- Makefile.orig	2019-06-24 16:08:57.000000000 +0000
-+++ Makefile	2022-09-06 05:28:43.957220363 +0000
+--- Makefile.orig	2024-02-19 01:01:50.000000000 +0000
++++ Makefile	2024-06-07 15:21:30.693835603 +0000
 @@ -8,13 +8,13 @@
  #
  OFLAGS = -O0 -g
@@ -21,24 +21,24 @@
  BINDIR = $(PREFIX)/bin
  INCDIR = $(PREFIX)/include
  LIBDIR = $(PREFIX)/lib
-@@ -66,6 +66,8 @@
+@@ -95,6 +95,8 @@
  
  $(UTILS):: libgif.a libutil.a
  
 +shared-lib: libgif.so libutil.so
 +
- libgif.so: $(OBJECTS) $(HEADERS)
- 	$(CC) $(CFLAGS) -shared $(LDFLAGS) -Wl,-soname -Wl,libgif.so.$(LIBMAJOR) -o libgif.so $(OBJECTS)
- 
-@@ -102,6 +104,11 @@
- 	$(INSTALL) -m 755 libgif.so "$(DESTDIR)$(LIBDIR)/libgif.so.$(LIBVER)"
- 	ln -sf libgif.so.$(LIBVER) "$(DESTDIR)$(LIBDIR)/libgif.so.$(LIBMAJOR)"
- 	ln -sf libgif.so.$(LIBMAJOR) "$(DESTDIR)$(LIBDIR)/libgif.so"
+ $(LIBGIFSO): $(OBJECTS) $(HEADERS)
+ ifeq ($(UNAME), Darwin)
+ 	$(CC) $(CFLAGS) -dynamiclib -current_version $(LIBVER) $(OBJECTS) -o $(LIBGIFSO)
+@@ -147,6 +149,11 @@
+ 	$(INSTALL) -m 755 $(LIBGIFSO) "$(DESTDIR)$(LIBDIR)/$(LIBGIFSOVER)"
+ 	ln -sf $(LIBGIFSOVER) "$(DESTDIR)$(LIBDIR)/$(LIBGIFSOMAJOR)"
+ 	ln -sf $(LIBGIFSOMAJOR) "$(DESTDIR)$(LIBDIR)/$(LIBGIFSO)"
 +install-shared-lib: install-include
 +	$(INSTALL) -d "$(DESTDIR)$(LIBDIR)"
-+	$(INSTALL) -m 755 libgif.so "$(DESTDIR)$(LIBDIR)/libgif.so.$(LIBVER)"
-+	ln -sf libgif.so.$(LIBVER) "$(DESTDIR)$(LIBDIR)/libgif.so.$(LIBMAJOR)"
-+	ln -sf libgif.so.$(LIBMAJOR) "$(DESTDIR)$(LIBDIR)/libgif.so"
++	$(INSTALL) -m 755 $(LIBGIFSO) "$(DESTDIR)$(LIBDIR)/$(LIBGIFSOVER)"
++	ln -sf $(LIBGIFSOVER) "$(DESTDIR)$(LIBDIR)/$(LIBGIFSOMAJOR)"
++	ln -sf $(LIBGIFSOMAJOR) "$(DESTDIR)$(LIBDIR)/$(LIBGIFSO)"
  install-man:
  	$(INSTALL) -d "$(DESTDIR)$(MANDIR)/man1"
- 	$(INSTALL) -m 644 doc/*.1 "$(DESTDIR)$(MANDIR)/man1"
+ 	$(INSTALL) -m 644 $(MANUAL_PAGES) "$(DESTDIR)$(MANDIR)/man1"

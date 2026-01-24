@@ -1,0 +1,16 @@
+The obsolete stime function is no longer available to newly linked binaries
+since glibc 2.31. Replace it by clock_settime.
+
+--- a/util/dvbdate/dvbdate.c
++++ b/util/dvbdate/dvbdate.c
+@@ -309,7 +309,9 @@ int atsc_scan_date(time_t *rx_time, unsi
+  */
+ int set_time(time_t * new_time)
+ {
+-	if (stime(new_time)) {
++	struct timespec ts = { .tv_sec = new_time };
++
++	if (clock_settime(CLOCK_REALTIME, &ts)) {
+ 		perror("Unable to set time");
+ 		return -1;
+ 	}

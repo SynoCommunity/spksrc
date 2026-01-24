@@ -1,0 +1,28 @@
+Description: Remove scan files from dvb-apps package
+ The scan files included in the linux-dvb-apps tarball are redundant
+ and out of date since Jan 2013, when the scan files were split into a
+ separate upstream dtv-scan-tables tarball. Debian has followed
+ upstream's lead, and split these packages in Debian too.
+ .
+ Remove the linux-dvb-apps scan files from dvb-apps package until
+ such time as upstream removes them from tarball.
+Author: Jonathan McCrohan <jmccrohan@gmail.com>
+Date: Thu, 19 Sep 2013 00:33:37 +0100
+---
+--- a/util/scan/Makefile
++++ b/util/scan/Makefile
+@@ -30,12 +30,5 @@ atsc_psip_section.c atsc_psip_section.h:
+ include ../../Make.rules
+ 
+ install::
+-	@echo installing scan files
+-	@mkdir -p $(DESTDIR)$(sharedir)/dvb/atsc
+-	@mkdir -p $(DESTDIR)$(sharedir)/dvb/dvb-c
+-	@mkdir -p $(DESTDIR)$(sharedir)/dvb/dvb-s
+-	@mkdir -p $(DESTDIR)$(sharedir)/dvb/dvb-t
+-	@install -m 664 atsc/* $(DESTDIR)$(sharedir)/dvb/atsc/
+-	@install -m 664 dvb-c/* $(DESTDIR)$(sharedir)/dvb/dvb-c/
+-	@install -m 664 dvb-s/* $(DESTDIR)$(sharedir)/dvb/dvb-s/
+-	@install -m 664 dvb-t/* $(DESTDIR)$(sharedir)/dvb/dvb-t/
++	@echo not installing scan files
++	@echo please see dtv-scan-tables package instead

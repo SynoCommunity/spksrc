@@ -17,8 +17,8 @@ LICENSE  = GPLv2
 
 SERVICE_SETUP = src/service-setup.sh
 
-# Pure Perl package, make sure ARCH is not defined
-override ARCH=
+# Pure Perl package, make sure ARCH is noarch
+override ARCH=noarch
 
 SPK_COMMANDS = bin/rsnapshot bin/rsnapshot-diff
 

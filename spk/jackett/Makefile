@@ -1,16 +1,15 @@
 SPK_NAME = jackett
-SPK_VERS = 0.20.3990
-SPK_REV = 17
+SPK_VERS = 0.24.726
+SPK_REV = 20
 SPK_ICON = src/jackett.png
 DSM_UI_DIR = app
 
-OPTIONAL_DEPENDS = cross/libstdc++ cross/curl cross/$(SPK_NAME)-mono
-DEPENDS = cross/$(SPK_NAME)
+OPTIONAL_DEPENDS = cross/jackett cross/jackett-mono cross/libstdc++ cross/curl 
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
 DESCRIPTION = "Jackett works as a proxy server. It translates queries from apps into tracker-site-specific http queries, parses the html response, then sends results back to the requesting software. Jackett is a single repository of maintained indexer scraping and translation logic - removing the burden from other apps."
-CHANGELOG = "1. Update Jackett to 0.20.3990.<br/>2. Fix dotnet dependencies for DSM 7.2."
+CHANGELOG = "1. Update Jackett to 0.24.726 <br/>NOTE: ARMv7 architectures now use Mono version to avoid GLIBC 2.34 requirement in native ARM32 binaries."
 DISPLAY_NAME = Jackett
 HOMEPAGE = https://github.com/Jackett/Jackett
 LICENSE = GPLv2
@@ -23,30 +22,34 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 # Service configuration
 SERVICE_PORT = 9117
-SERVICE_PORT_TITLE = Jackett(HTTP)
+SERVICE_PORT_TITLE = Jackett (HTTP)
 
 # Admin link
 ADMIN_PORT = $(SERVICE_PORT)
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-# Mono build for unsupported .NET archs
+# Use Mono for unsupported .NET archs
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)),$(ARCH))
+DEPENDS = cross/curl cross/jackett-mono
+SERVICE_SETUP = src/service-setup-mono.sh
+SPK_DEPENDS = "mono>=5.8"
+else
+DEPENDS = cross/jackett
 # dotnet requires libstdc++ version >= 6.0.22
 DEPENDS += cross/libstdc++
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)),$(ARCH))
-DEPENDS = cross/curl cross/$(SPK_NAME)-mono
-SERVICE_SETUP = src/service-setup-mono.sh
-SPK_DEPENDS = "mono>=5.8"
 endif
 else
-ifeq ($(findstring $(ARCH),$(i686_ARCHS) armada370 alpine alpine4k),$(ARCH))
-DEPENDS = cross/curl cross/$(SPK_NAME)-mono
+# ARM32 binaries in Jackett >= 0.24.x require GLIBC 2.34 (DSM 7.2+)
+# Use Mono for all ARMv7 architectures on DSM 7.x to avoid GLIBC issues
+ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(ARMv7_ARCHS)),$(ARCH))
+DEPENDS = cross/curl cross/jackett-mono
 SERVICE_SETUP = src/service-setup-mono.sh
 SPK_DEPENDS = "mono>=5.8"
 else
-UNSUPPORTED_ARCHS += armada370 alpine alpine4k
+DEPENDS = cross/jackett
 endif
 endif
 

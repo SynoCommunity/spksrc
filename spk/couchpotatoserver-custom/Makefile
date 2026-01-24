@@ -29,8 +29,8 @@ ADMIN_PORT = $(SERVICE_PORT)
 COPY_TARGET = nop
 POST_STRIP_TARGET = couchpotatoserver-custom_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+# Pure Python package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

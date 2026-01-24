@@ -4,7 +4,7 @@ SPK_VERS = 5.9
 SPK_CONFLICT ?= zsh-static
 # Allow overriding the revision, used by spk/zsh-static.
 # If you rev here, please also rev spk/zsh-static.
-SPK_REV ?= 13
+SPK_REV ?= 14
 SPK_ICON = ../zsh/src/zsh.png
 
 DEPENDS = cross/zsh
@@ -16,7 +16,7 @@ DESCRIPTION_GER = Die Z shell \(zsh\) ist eine Unix-Shell, die sowohl als intera
 DESCRIPTION_ITA = La Z shell \(zsh\) è una shell che può essere utilizzata come linea di comando interattiva e come un potente interprete per script di shell. Zsh può essere vista come un\'estensione della Bourne shell dotata di numerose migliorie, fra le quali alcune caratteristiche mutuate da bash, ksh e tcsh.
 DISPLAY_NAME = Z shell
 STARTABLE = no
-CHANGELOG = "Update to v5.9. For incompatiblities with former version please read the <a target=\"_blank\" href=\"https://zsh.sourceforge.io/releases.html\">release notes</a>."
+CHANGELOG = "1. Update to v5.9. For incompatiblities with former version please read the <a target=\"_blank\" href=\"https://zsh.sourceforge.io/releases.html\">release notes</a>.<br/>2. Include pcre library.<br/>3. Include cap (linux capabilities) library for supported archs."
 
 HOMEPAGE = https://www.zsh.org
 LICENSE = Custom

@@ -1,4 +1,4 @@
-bin:bin/gcore
+rsc:bin/gcore
 bin:bin/gdb
 bin:bin/gdbserver
 bin:bin/run

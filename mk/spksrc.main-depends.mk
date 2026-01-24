@@ -1,0 +1,58 @@
+# include this file for dummy modules that evaluate dependent packages only
+#
+
+# Do not initialize any environment to avoid variable leakage.
+DEFAULT_ENV = none
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
+
+# nothing to download
+download:
+download-all:
+checksum:
+
+# Configure the included makefiles
+NAME          = $(PKG_NAME)
+COOKIE_PREFIX = $(PKG_NAME)-
+
+ifneq ($(ARCH),)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+ifneq ($(ARCH),noarch)
+TC = syno$(ARCH_SUFFIX)
+endif
+endif
+
+# Common directories (must be set after ARCH_SUFFIX)
+include ../../mk/spksrc.directories.mk
+
+#####
+
+ifneq ($(REQUIRE_KERNEL),)
+  @$(error main-depends cannot be used when REQUIRE_KERNEL is set)
+endif
+
+#####
+
+# to check for supported archs and DSM versions
+include ../../mk/spksrc.pre-check.mk
+
+# for common env variables
+include ../../mk/spksrc.cross-env.mk
+
+# for dependency evaluation
+include ../../mk/spksrc.depend.mk
+
+install: depend
+include ../../mk/spksrc.install.mk
+
+plist: install
+include ../../mk/spksrc.plist.mk
+
+all: install plist
+
+
+### For managing make all-<supported|latest>
+include ../../mk/spksrc.supported.mk
+
+####

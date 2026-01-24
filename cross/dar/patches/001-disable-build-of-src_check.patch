@@ -1,0 +1,28 @@
+# the check directory
+#  contains the global validation routine that are run when calling
+#  "make check".
+# 
+# The build with src/check/Makefile fails to cross compile, due to
+# cross binary execution like:
+# ./bnonzero: cannot execute binary file: Exec format error
+# 
+--- src/Makefile.in.orig	2024-03-23 11:43:36.000000000 +0000
++++ src/Makefile.in	2024-03-28 17:55:00.947566476 +0000
+@@ -183,7 +183,7 @@
+   unique=`for i in $$list; do \
+     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+   done | $(am__uniquify_input)`
+-DIST_SUBDIRS = libdar dar_suite check python examples testing
++DIST_SUBDIRS = libdar dar_suite python
+ am__DIST_COMMON = $(srcdir)/Makefile.in README
+ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ am__relativize = \
+@@ -376,7 +376,7 @@
+ top_srcdir = @top_srcdir@
+ upx = @upx@
+ @MAKE_ALL_DIR_TRUE@OPT_SUBDIR = examples testing
+-SUBDIRS = libdar dar_suite check python $(OPT_SUBDIR)
++SUBDIRS = libdar dar_suite python $(OPT_SUBDIR)
+ noinst_HEADERS = my_config.h
+ dist_noinst_DATA = README gettext.h
+ all: all-recursive

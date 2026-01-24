@@ -1,0 +1,217 @@
+Index: FFmpeg/libswscale/swscale_unscaled.c
+===================================================================
+--- libswscale/swscale_unscaled.c
++++ libswscale/swscale_unscaled.c
+@@ -352,7 +352,7 @@ static int planar8ToP01xleWrapper(SwsCon
+         const uint8_t *tsrc0 = src[0];
+         for (x = c->srcW; x > 0; x--) {
+             t = *tsrc0++;
+-            output_pixel(tdstY++, t | (t << 8));
++            output_pixel(tdstY++, (t << 8));
+         }
+         src[0] += srcStride[0];
+         dstY += dstStride[0] / 2;
+@@ -363,9 +363,9 @@ static int planar8ToP01xleWrapper(SwsCon
+             const uint8_t *tsrc2 = src[2];
+             for (x = c->srcW / 2; x > 0; x--) {
+                 t = *tsrc1++;
+-                output_pixel(tdstUV++, t | (t << 8));
++                output_pixel(tdstUV++, (t << 8));
+                 t = *tsrc2++;
+-                output_pixel(tdstUV++, t | (t << 8));
++                output_pixel(tdstUV++, (t << 8));
+             }
+             src[1] += srcStride[1];
+             src[2] += srcStride[2];
+Index: FFmpeg/tests/ref/fate/filter-pixdesc-p010le
+===================================================================
+--- tests/ref/fate/filter-pixdesc-p010le
++++ tests/ref/fate/filter-pixdesc-p010le
+@@ -1 +1 @@
+-pixdesc-p010le      7b4a503997eb4e14cba80ee52db85e39
++pixdesc-p010le      0268fd44f63022e21ada69704534fc85
+Index: FFmpeg/tests/ref/fate/filter-pixdesc-p016le
+===================================================================
+--- tests/ref/fate/filter-pixdesc-p016le
++++ tests/ref/fate/filter-pixdesc-p016le
+@@ -1 +1 @@
+-pixdesc-p016le      ed04897de0a6788bb3458e7365f10d36
++pixdesc-p016le      0268fd44f63022e21ada69704534fc85
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-copy
+===================================================================
+--- tests/ref/fate/filter-pixfmts-copy
++++ tests/ref/fate/filter-pixfmts-copy
+@@ -63,11 +63,11 @@ nv21                335d85c9af6110f26ae9
+ nv24                f30fc8d0ac40af69e119ea919a314572
+ nv42                29a212f70f8780fe0eb99abcae81894d
+ p010be              7f9842d6015026136bad60d03c035cc3
+-p010le              c453421b9f726bdaf2bacf59a492c43b
++p010le              1929db89609c4b8c6d9c9030a9e7843d
+ p012be              7f9842d6015026136bad60d03c035cc3
+ p012le              1929db89609c4b8c6d9c9030a9e7843d
+ p016be              7f9842d6015026136bad60d03c035cc3
+-p016le              c453421b9f726bdaf2bacf59a492c43b
++p016le              1929db89609c4b8c6d9c9030a9e7843d
+ p210be              847e9c6e292b17349e69570829252b3e
+ p210le              c06e4b76cf504e908128081f92b60ce2
+ p212be              4df641ed058718ad27a01889f923b04f
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-crop
+===================================================================
+--- tests/ref/fate/filter-pixfmts-crop
++++ tests/ref/fate/filter-pixfmts-crop
+@@ -61,11 +61,11 @@ nv21                1bcfc197f4fb95de85ba
+ nv24                514c8f12082f0737e558778cbe7de258
+ nv42                ece9baae1c5de579dac2c66a89e08ef3
+ p010be              8b2de2eb6b099bbf355bfc55a0694ddc
+-p010le              373b50c766dfd0a8e79c9a73246d803a
++p010le              a1e4f713e145dfc465bfe0cc77096a03
+ p012be              8b2de2eb6b099bbf355bfc55a0694ddc
+ p012le              a1e4f713e145dfc465bfe0cc77096a03
+ p016be              8b2de2eb6b099bbf355bfc55a0694ddc
+-p016le              373b50c766dfd0a8e79c9a73246d803a
++p016le              a1e4f713e145dfc465bfe0cc77096a03
+ p210be              2947f43774352ef61f9e83777548c7c5
+ p210le              74fcd5a32eee687eebe002c884103963
+ p212be              c983aa869bae2c70e7b01810902ffc05
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-field
+===================================================================
+--- tests/ref/fate/filter-pixfmts-field
++++ tests/ref/fate/filter-pixfmts-field
+@@ -63,11 +63,11 @@ nv21                7294574037cc7f9373ef
+ nv24                3b100fb527b64ee2b2d7120da573faf5
+ nv42                1841ce853152d86b27c130f319ea0db2
+ p010be              a0311a09bba7383553267d2b3b9c075e
+-p010le              ee09a18aefa3ebe97715b3a7312cb8ff
++p010le              f1cc90d292046109a626db2da9f0f9b6
+ p012be              a0311a09bba7383553267d2b3b9c075e
+ p012le              f1cc90d292046109a626db2da9f0f9b6
+ p016be              a0311a09bba7383553267d2b3b9c075e
+-p016le              ee09a18aefa3ebe97715b3a7312cb8ff
++p016le              f1cc90d292046109a626db2da9f0f9b6
+ p210be              58d46f566ab28e3bcfb715c7aa53cf58
+ p210le              8d68f7655a3d76f2f8436bd25beb3973
+ p212be              a8901966c5bc111e9e62d3989b0b666b
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-hflip
+===================================================================
+--- tests/ref/fate/filter-pixfmts-hflip
++++ tests/ref/fate/filter-pixfmts-hflip
+@@ -61,11 +61,11 @@ nv21                9f10dfff8963dc327d33
+ nv24                f0c5b2f42970f8d4003621d8857a872f
+ nv42                4dcf9aec82b110712b396a8b365dcb13
+ p010be              744b13e44d39e1ff7588983fa03e0101
+-p010le              a50b160346ab94f55a425065b57006f0
++p010le              aeb31f50c66f376b0530c7bb6287212b
+ p012be              744b13e44d39e1ff7588983fa03e0101
+ p012le              aeb31f50c66f376b0530c7bb6287212b
+ p016be              744b13e44d39e1ff7588983fa03e0101
+-p016le              a50b160346ab94f55a425065b57006f0
++p016le              aeb31f50c66f376b0530c7bb6287212b
+ p210be              6f5a76d6467b86d55fe5589d3af8a7ea
+ p210le              b6982912b2376371edea4fccf99fe40c
+ p212be              9ffa4664543233ec7c9b99a627cb7003
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-il
+===================================================================
+--- tests/ref/fate/filter-pixfmts-il
++++ tests/ref/fate/filter-pixfmts-il
+@@ -63,11 +63,11 @@ nv21                ab586d8781246b5a32d8
+ nv24                554153c71d142e3fd8e40b7dcaaec229
+ nv42                d699724c8deaeb4f87faf2766512eec3
+ p010be              3df51286ef66b53e3e283dbbab582263
+-p010le              eadcd8241e97e35b2b47d5eb2eaea6cd
++p010le              38945445b360fa737e9e37257393e823
+ p012be              3df51286ef66b53e3e283dbbab582263
+ p012le              38945445b360fa737e9e37257393e823
+ p016be              3df51286ef66b53e3e283dbbab582263
+-p016le              eadcd8241e97e35b2b47d5eb2eaea6cd
++p016le              38945445b360fa737e9e37257393e823
+ p210be              29ec4e8912d456cd15203a96487c42e8
+ p210le              c695064fb9f2cc4e35957d4d649cc281
+ p212be              ee6f88801823da3d617fb9e073e88068
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-null
+===================================================================
+--- tests/ref/fate/filter-pixfmts-null
++++ tests/ref/fate/filter-pixfmts-null
+@@ -63,11 +63,11 @@ nv21                335d85c9af6110f26ae9
+ nv24                f30fc8d0ac40af69e119ea919a314572
+ nv42                29a212f70f8780fe0eb99abcae81894d
+ p010be              7f9842d6015026136bad60d03c035cc3
+-p010le              c453421b9f726bdaf2bacf59a492c43b
++p010le              1929db89609c4b8c6d9c9030a9e7843d
+ p012be              7f9842d6015026136bad60d03c035cc3
+ p012le              1929db89609c4b8c6d9c9030a9e7843d
+ p016be              7f9842d6015026136bad60d03c035cc3
+-p016le              c453421b9f726bdaf2bacf59a492c43b
++p016le              1929db89609c4b8c6d9c9030a9e7843d
+ p210be              847e9c6e292b17349e69570829252b3e
+ p210le              c06e4b76cf504e908128081f92b60ce2
+ p212be              4df641ed058718ad27a01889f923b04f
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-pad
+===================================================================
+--- tests/ref/fate/filter-pixfmts-pad
++++ tests/ref/fate/filter-pixfmts-pad
+@@ -28,9 +28,9 @@ nv16                d3a50501d2ea8535489f
+ nv21                0fdeb2cdd56cf5a7147dc273456fa217
+ nv24                193b9eadcc06ad5081609f76249b3e47
+ nv42                1738ad3c31c6c16e17679f5b09ce4677
+-p010le              fbbc23cc1d764a5e6fb71883d985f3ed
++p010le              3a92c1bd3e9de050bf6abcc3fd911ab7
+ p012le              3a92c1bd3e9de050bf6abcc3fd911ab7
+-p016le              fbbc23cc1d764a5e6fb71883d985f3ed
++p016le              3a92c1bd3e9de050bf6abcc3fd911ab7
+ p210le              680912c059de39c3401cac856bd1b0c1
+ p212le              a2f88017bcce2383ba60bc4872e639ba
+ p216le              8718662e226a4581561e7bb532af2d83
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-scale
+===================================================================
+--- tests/ref/fate/filter-pixfmts-scale
++++ tests/ref/fate/filter-pixfmts-scale
+@@ -63,11 +63,11 @@ nv21                c74bb1c10dbbdee8a1f6
+ nv24                2aa6e805bf6d4179ed8d7dea37d75db3
+ nv42                80714d1eb2d8bcaeab3abc3124df1abd
+ p010be              1d6726d94bf1385996a9a9840dd0e878
+-p010le              4b316f2b9e18972299beb73511278fa8
++p010le              5d436e6b35292a0e356d81f37f989b66
+ p012be              e4dc7ccd654c2d74fde9c7b2711d960b
+ p012le              cd4b6bdcd8967fc0e869ce3b8a014133
+ p016be              31e204018cbb53f8988c4e1174ea8ce9
+-p016le              d5afe557f492a09317e525d7cb782f5b
++p016le              6832661b5fe5f9a7a882f482a881b679
+ p210be              2cc6dfcf5e006c8ed5238988a06fd45e
+ p210le              04efb8f14a9d98417af40954a06aa187
+ p212be              611c6e267e7a694ce89467779e44060b
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-transpose
+===================================================================
+--- tests/ref/fate/filter-pixfmts-transpose
++++ tests/ref/fate/filter-pixfmts-transpose
+@@ -60,11 +60,11 @@ nv21                292adaf5271c5c8516b7
+ nv24                ea9de8b47faed722ee40182f89489beb
+ nv42                636af6cd6a4f3ac5edc0fc3ce3c56d63
+ p010be              ad0de2cc9bff81688b182a870fcf7000
+-p010le              e7ff5143595021246733ce6bd0a769e8
++p010le              024ef1cf56a4872f202b96a6a4bbf10a
+ p012be              ad0de2cc9bff81688b182a870fcf7000
+ p012le              024ef1cf56a4872f202b96a6a4bbf10a
+ p016be              ad0de2cc9bff81688b182a870fcf7000
+-p016le              e7ff5143595021246733ce6bd0a769e8
++p016le              024ef1cf56a4872f202b96a6a4bbf10a
+ p410be              8b3e0ccb31b6a20ff00a29253fb2dec3
+ p410le              4e5f78dfccda9a6387e81354a56a033a
+ p412be              88e4578d2c6d99399a6cf1db9e4c0553
+Index: FFmpeg/tests/ref/fate/filter-pixfmts-vflip
+===================================================================
+--- tests/ref/fate/filter-pixfmts-vflip
++++ tests/ref/fate/filter-pixfmts-vflip
+@@ -63,11 +63,11 @@ nv21                2909feacd27bebb080c8
+ nv24                334420b9d3df84499d2ca16bb66eed2b
+ nv42                ba4063e2795c17fea3c8a646b01fd1f5
+ p010be              06e9354b6e0e38ba41736352cedc0bd5
+-p010le              fd18d322bffbf5816902c13102872e22
++p010le              cdf6a3c38d9d4e3f079fa369e1dda662
+ p012be              06e9354b6e0e38ba41736352cedc0bd5
+ p012le              cdf6a3c38d9d4e3f079fa369e1dda662
+ p016be              06e9354b6e0e38ba41736352cedc0bd5
+-p016le              fd18d322bffbf5816902c13102872e22
++p016le              cdf6a3c38d9d4e3f079fa369e1dda662
+ p210be              ca886ab2b3ea5c153f1954b3709f7249
+ p210le              d71c2d4e483030ffd87fa6a68c83fce0
+ p212be              1734e5840d4e75defe7a28683c3f8856

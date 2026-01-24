@@ -1,4 +1,3 @@
-rsc:bin/pcre-config
 bin:bin/pcregrep
 bin:bin/pcretest
 lnk:lib/libpcre.so

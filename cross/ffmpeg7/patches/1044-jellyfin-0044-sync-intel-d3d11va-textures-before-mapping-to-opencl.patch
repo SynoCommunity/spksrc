@@ -1,0 +1,299 @@
+Index: FFmpeg/libavcodec/dxva2.c
+===================================================================
+--- libavcodec/dxva2.c
++++ libavcodec/dxva2.c
+@@ -714,8 +714,10 @@ int ff_dxva2_common_frame_params(AVCodec
+ #if CONFIG_D3D11VA
+     if (frames_ctx->format == AV_PIX_FMT_D3D11) {
+         AVD3D11VAFramesContext *frames_hwctx = frames_ctx->hwctx;
++        AVD3D11VADeviceContext *device_hwctx = device_ctx->hwctx;
+ 
+         frames_hwctx->BindFlags |= D3D11_BIND_DECODER;
++        frames_hwctx->require_sync = device_hwctx->device_desc.VendorId == 0x8086;
+     }
+ #endif
+ 
+Index: FFmpeg/libavfilter/qsvvpp.c
+===================================================================
+--- libavfilter/qsvvpp.c
++++ libavfilter/qsvvpp.c
+@@ -641,6 +641,9 @@ static int init_vpp_session(AVFilterCont
+ 
+         out_frames_hwctx->frame_type      = s->out_mem_mode;
+ 
++        if (in_frames_hwctx)
++            out_frames_hwctx->require_sync = in_frames_hwctx->require_sync;
++
+         ret = av_hwframe_ctx_init(out_frames_ref);
+         if (ret < 0) {
+             av_buffer_unref(&out_frames_ref);
+Index: FFmpeg/libavutil/hwcontext_d3d11va.h
+===================================================================
+--- libavutil/hwcontext_d3d11va.h
++++ libavutil/hwcontext_d3d11va.h
+@@ -183,6 +183,11 @@ typedef struct AVD3D11VAFramesContext {
+      * This field is ignored/invalid if a user-allocated texture is provided.
+     */
+     AVD3D11FrameDescriptor *texture_infos;
++
++    /**
++     * Whether the frames require extra sync when exporting as external memory.
++     */
++    int require_sync;
+ } AVD3D11VAFramesContext;
+ 
+ #endif /* AVUTIL_HWCONTEXT_D3D11VA_H */
+Index: FFmpeg/libavutil/hwcontext_opencl.c
+===================================================================
+--- libavutil/hwcontext_opencl.c
++++ libavutil/hwcontext_opencl.c
+@@ -181,6 +181,10 @@ typedef struct OpenCLFramesContext {
+     int                   nb_mapped_frames;
+     AVOpenCLFrameDescriptor *mapped_frames;
+ #endif
++#if HAVE_OPENCL_D3D11
++    ID3D11Texture2D         *sync_tex_2x2;
++    ID3D11Asynchronous      *sync_point;
++#endif
+ } OpenCLFramesContext;
+ 
+ 
+@@ -1809,7 +1813,16 @@ static void opencl_frames_uninit(AVHWFra
+         av_freep(&priv->mapped_frames);
+     }
+ #endif
+-
++#if HAVE_OPENCL_D3D11
++    if (priv->sync_tex_2x2) {
++        ID3D11Texture2D_Release(priv->sync_tex_2x2);
++        priv->sync_tex_2x2 = NULL;
++    }
++    if (priv->sync_point) {
++        ID3D11Asynchronous_Release(priv->sync_point);
++        priv->sync_point = NULL;
++    }
++#endif
+     if (priv->command_queue) {
+         cle = clReleaseCommandQueue(priv->command_queue);
+         if (cle != CL_SUCCESS) {
+@@ -2583,6 +2596,98 @@ fail:
+ 
+ #if HAVE_OPENCL_D3D11
+ 
++static int opencl_init_d3d11_sync_point(OpenCLFramesContext    *priv,
++                                        AVD3D11VADeviceContext *device_hwctx,
++                                        ID3D11Texture2D        *src_texture,
++                                        void                   *logctx)
++{
++    HRESULT hr;
++    D3D11_QUERY_DESC query = { D3D11_QUERY_EVENT, 0 };
++    D3D11_TEXTURE2D_DESC cur_desc = { 0 };
++    D3D11_TEXTURE2D_DESC src_desc = { 0 };
++    D3D11_TEXTURE2D_DESC dst_desc = {
++        .Width          = 2,
++        .Height         = 2,
++        .MipLevels      = 1,
++        .SampleDesc     = { .Count = 1 },
++        .ArraySize      = 1,
++        .Usage          = D3D11_USAGE_DEFAULT,
++    };
++
++    if (!priv || !device_hwctx || !src_texture)
++        return AVERROR(EINVAL);
++
++    ID3D11Texture2D_GetDesc(src_texture, &src_desc);
++    if (priv->sync_tex_2x2) {
++        ID3D11Texture2D_GetDesc(priv->sync_tex_2x2, &cur_desc);
++        if (src_desc.Format != cur_desc.Format) {
++            ID3D11Texture2D_Release(priv->sync_tex_2x2);
++            priv->sync_tex_2x2 = NULL;
++        }
++    }
++    if (!priv->sync_tex_2x2) {
++        dst_desc.Format = src_desc.Format;
++        hr = ID3D11Device_CreateTexture2D(device_hwctx->device,
++                                          &dst_desc, NULL, &priv->sync_tex_2x2);
++        if (FAILED(hr)) {
++            av_log(logctx, AV_LOG_ERROR, "Could not create the sync texture (%lx)\n", (long)hr);
++            goto fail;
++        }
++    }
++
++    if (!priv->sync_point) {
++        hr = ID3D11Device_CreateQuery(device_hwctx->device, &query,
++                                      (ID3D11Query **)&priv->sync_point);
++        if (FAILED(hr)) {
++            av_log(logctx, AV_LOG_ERROR, "Could not create the sync point (%lx)\n", (long)hr);
++            goto fail;
++        }
++    }
++
++    return 0;
++fail:
++    if (priv->sync_tex_2x2) {
++        ID3D11Texture2D_Release(priv->sync_tex_2x2);
++        priv->sync_tex_2x2 = NULL;
++    }
++    if (priv->sync_point) {
++        ID3D11Asynchronous_Release(priv->sync_point);
++        priv->sync_point = NULL;
++    }
++    return AVERROR_UNKNOWN;
++}
++
++static void opencl_sync_d3d11_texture(OpenCLFramesContext    *priv,
++                                      AVD3D11VADeviceContext *device_hwctx,
++                                      ID3D11Texture2D        *texture,
++                                      unsigned                subresource,
++                                      void                   *logctx)
++{
++    const D3D11_BOX box_2x2 = { 0, 0, 0, 2, 2, 1 };
++    BOOL data = FALSE;
++
++    if (!priv || !device_hwctx || !texture)
++        return;
++
++    av_log(logctx, AV_LOG_DEBUG, "Sync D3D11 texture %d\n", subresource);
++
++    device_hwctx->lock(device_hwctx->lock_ctx);
++    ID3D11DeviceContext_Begin(device_hwctx->device_context, priv->sync_point);
++
++    /* Force DX to wait for DXVA DEC/VP by copying 2x2 pixels, which can act as a sync point */
++    ID3D11DeviceContext_CopySubresourceRegion(device_hwctx->device_context,
++                                              (ID3D11Resource *)priv->sync_tex_2x2, 0, 0, 0, 0,
++                                              (ID3D11Resource *)texture, subresource, &box_2x2);
++    ID3D11DeviceContext_Flush(device_hwctx->device_context);
++    ID3D11DeviceContext_End(device_hwctx->device_context, priv->sync_point);
++
++    while ((S_OK != ID3D11DeviceContext_GetData(device_hwctx->device_context,
++                                                priv->sync_point,
++                                                &data,
++                                                sizeof(data), 0)) || (data != TRUE)) { /* do nothing */ }
++    device_hwctx->unlock(device_hwctx->lock_ctx);
++}
++
+ #if CONFIG_LIBMFX
+ 
+ static void opencl_unmap_from_d3d11_qsv(AVHWFramesContext *dst_fc,
+@@ -2623,6 +2728,14 @@ static void opencl_unmap_from_d3d11_qsv(
+ static int opencl_map_from_d3d11_qsv(AVHWFramesContext *dst_fc, AVFrame *dst,
+                                      const AVFrame *src, int flags)
+ {
++    AVHWFramesContext *src_fc =
++        (AVHWFramesContext*)src->hw_frames_ctx->data;
++    AVHWDeviceContext *src_dev = src_fc->device_ctx;
++    FFHWDeviceContext *fsrc_dev = (FFHWDeviceContext*)src_dev;
++    AVHWDeviceContext *src_subdev =
++        (AVHWDeviceContext*)fsrc_dev->source_device->data;
++    AVD3D11VADeviceContext *device_hwctx = src_subdev->hwctx;
++    AVQSVFramesContext     *src_hwctx = src_fc->hwctx;
+     OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->hwctx;
+     OpenCLFramesContext  *frames_priv = dst_fc->hwctx;
+     AVOpenCLDeviceContext    *dst_dev = &device_priv->p;
+@@ -2652,6 +2765,21 @@ static int opencl_map_from_d3d11_qsv(AVH
+         }
+     }
+ 
++    if (src_hwctx->require_sync) {
++        err = opencl_init_d3d11_sync_point(frames_priv,
++                                           device_hwctx,
++                                           tex, dst_fc);
++        if (err < 0)
++            return err;
++
++        if (frames_priv->sync_point || frames_priv->sync_tex_2x2) {
++            opencl_sync_d3d11_texture(frames_priv,
++                                      device_hwctx,
++                                      tex, (derived_frames ? index : 0),
++                                      dst_fc);
++        }
++    }
++
+     if (derived_frames) {
+         desc = &frames_priv->mapped_frames[index];
+     } else {
+@@ -2843,6 +2971,10 @@ static void opencl_unmap_from_d3d11(AVHW
+ static int opencl_map_from_d3d11(AVHWFramesContext *dst_fc, AVFrame *dst,
+                                  const AVFrame *src, int flags)
+ {
++    AVHWFramesContext *src_fc =
++        (AVHWFramesContext*)src->hw_frames_ctx->data;
++    AVD3D11VAFramesContext *src_hwctx = src_fc->hwctx;
++    AVD3D11VADeviceContext *device_hwctx = src_fc->device_ctx->hwctx;
+     OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->hwctx;
+     OpenCLFramesContext  *frames_priv = dst_fc->hwctx;
+     AVOpenCLFrameDescriptor *desc;
+@@ -2873,6 +3005,14 @@ static int opencl_map_from_d3d11(AVHWFra
+     mem_objs = device_priv->d3d11_map_amd ? &desc->planes[nb_planes]
+                                           : desc->planes;
+ 
++    if (src_hwctx->require_sync &&
++        frames_priv->sync_point && frames_priv->sync_tex_2x2) {
++        opencl_sync_d3d11_texture(frames_priv,
++                                  device_hwctx,
++                                  (ID3D11Texture2D*)src->data[0], index,
++                                  dst_fc);
++    }
++
+     cle = device_priv->clEnqueueAcquireD3D11ObjectsKHR(
+         frames_priv->command_queue, num_objs, mem_objs,
+         0, NULL, &event);
+@@ -2912,6 +3052,7 @@ fail:
+ static int opencl_frames_derive_from_d3d11(AVHWFramesContext *dst_fc,
+                                            AVHWFramesContext *src_fc, int flags)
+ {
++    AVD3D11VADeviceContext *device_hwctx = src_fc->device_ctx->hwctx;
+     AVD3D11VAFramesContext *src_hwctx = src_fc->hwctx;
+     OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->hwctx;
+     AVOpenCLDeviceContext    *dst_dev = &device_priv->p;
+@@ -2954,6 +3095,14 @@ static int opencl_frames_derive_from_d3d
+     if (!frames_priv->mapped_frames)
+         return AVERROR(ENOMEM);
+ 
++    if (src_hwctx->require_sync) {
++        err = opencl_init_d3d11_sync_point(frames_priv,
++                                           device_hwctx,
++                                           src_hwctx->texture, dst_fc);
++        if (err < 0)
++            return err;
++    }
++
+     for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
+         AVOpenCLFrameDescriptor *desc = &frames_priv->mapped_frames[i];
+         desc->nb_planes = nb_planes;
+Index: FFmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -2016,6 +2016,7 @@ static int qsv_dynamic_frames_derive_to(
+         } else {
+             dst_hwctx->frame_type |= MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
+         }
++        dst_hwctx->require_sync = src_hwctx->require_sync;
+     }
+     break;
+ #endif
+@@ -2091,6 +2092,7 @@ static int qsv_fixed_frames_derive_to(AV
+             } else {
+                 dst_hwctx->frame_type |= MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
+             }
++            dst_hwctx->require_sync = src_hwctx->require_sync;
+         }
+         break;
+ #endif
+Index: FFmpeg/libavutil/hwcontext_qsv.h
+===================================================================
+--- libavutil/hwcontext_qsv.h
++++ libavutil/hwcontext_qsv.h
+@@ -81,6 +81,11 @@ typedef struct AVQSVFramesContext {
+      * pool have the same mfxFrameInfo.
+      */
+     mfxFrameInfo *info;
++
++    /**
++     * Whether the frames require extra sync when exporting as external memory.
++     */
++    int require_sync;
+ } AVQSVFramesContext;
+ 
+ #endif /* AVUTIL_HWCONTEXT_QSV_H */

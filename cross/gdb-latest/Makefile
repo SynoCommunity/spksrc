@@ -1,5 +1,5 @@
 PKG_NAME = gdb
-PKG_VERS = 13.1
+PKG_VERS = 17.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/gdb
@@ -8,21 +8,41 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/zlib cross/libexpat cross/gmp cross/ncursesw cross/mpfr
 
 HOMEPAGE = https://www.gnu.org/software/gdb/
-COMMENT  = The GNU Project Debugger
+COMMENT  = The GNU Project Debugger.
 LICENSE  = GPLv2/LGPLv2
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS += --enable-host-shared
+CONFIGURE_ARGS  = --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+include ../../mk/spksrc.archs.mk
+
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+# sim/ppc is broken
+CONFIGURE_ARGS += --disable-sim
+endif
+
+PLIST_TRANSFORM_SED_ARGS =
+
+# Library is not created for 32-bit non intel archs
+ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
+ifneq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+PLIST_TRANSFORM_SED_ARGS += -e 's?lib:lib/libinproctrace.so??g'
+endif
+endif
+
+# binary only created for aarch64
+ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+PLIST_TRANSFORM_SED_ARGS += -e 's?bin:bin/run??g'
+endif
+
+ifneq ($(strip $(PLIST_TRANSFORM_SED_ARGS)),)
+PLIST_TRANSFORM = sed $(PLIST_TRANSFORM_SED_ARGS)
+endif
 
 include ../../mk/spksrc.cross-cc.mk
 
-# Library is not created under armv7
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-PLIST_TRANSFORM = sed -e 's?lib:lib/libinproctrace.so??g'
-# binary only created on armv7
-else
-PLIST_TRANSFORM = sed -e 's?bin:bin/run??g'
+ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
+# archs without C++11 support are not supported:
+UNSUPPORTED_ARCHS = $(ARCHS)
 endif

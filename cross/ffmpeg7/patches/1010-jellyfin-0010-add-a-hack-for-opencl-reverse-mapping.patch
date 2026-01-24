@@ -1,0 +1,166 @@
+Index: FFmpeg/libavfilter/avfilter.h
+===================================================================
+--- libavfilter/avfilter.h
++++ libavfilter/avfilter.h
+@@ -564,6 +564,8 @@ struct AVFilterLink {
+     enum AVColorSpace colorspace;   ///< agreed upon YUV color space
+     enum AVColorRange color_range;  ///< agreed upon YUV color range
+ 
++    int fixed_pool_size;        ///< fixed size of the frame pool for reverse hw mapping
++
+     /* These parameters apply only to audio */
+     int sample_rate;            ///< samples per second
+     AVChannelLayout ch_layout;  ///< channel layout of current buffer (see libavutil/channel_layout.h)
+Index: FFmpeg/libavfilter/opencl.c
+===================================================================
+--- libavfilter/opencl.c
++++ libavfilter/opencl.c
+@@ -75,6 +75,9 @@ int ff_opencl_filter_config_input(AVFilt
+     if (!ctx->output_height)
+         ctx->output_height = inlink->h;
+ 
++    if (avctx->nb_outputs > 0)
++        avctx->outputs[0]->fixed_pool_size = inlink->fixed_pool_size;
++
+     return 0;
+ }
+ 
+@@ -123,6 +126,9 @@ int ff_opencl_filter_config_output(AVFil
+     outlink->w = ctx->output_width;
+     outlink->h = ctx->output_height;
+ 
++    if (avctx->nb_inputs > 0)
++        outlink->fixed_pool_size = avctx->inputs[0]->fixed_pool_size;
++
+     return 0;
+ fail:
+     av_buffer_unref(&output_frames_ref);
+Index: FFmpeg/libavfilter/vf_hwmap.c
+===================================================================
+--- libavfilter/vf_hwmap.c
++++ libavfilter/vf_hwmap.c
+@@ -22,6 +22,10 @@
+ #include "libavutil/opt.h"
+ #include "libavutil/pixdesc.h"
+ 
++#if HAVE_OPENCL_D3D11
++#include "libavutil/hwcontext_d3d11va.h"
++#endif
++
+ #include "avfilter.h"
+ #include "formats.h"
+ #include "internal.h"
+@@ -122,6 +126,12 @@ static int hwmap_config_output(AVFilterL
+                 goto fail;
+             }
+ 
++            if (hwfc->initial_pool_size) {
++                outlink->fixed_pool_size = hwfc->initial_pool_size;
++                av_log(avctx, AV_LOG_DEBUG, "Saved the fixed_pool_size from "
++                       "initial_pool_size: %d\n", outlink->fixed_pool_size);
++            }
++
+         } else if (inlink->format == hwfc->format &&
+                    (desc->flags & AV_PIX_FMT_FLAG_HWACCEL) &&
+                    ctx->reverse) {
+@@ -131,6 +141,9 @@ static int hwmap_config_output(AVFilterL
+             // mapped from that back to the source type.
+             AVBufferRef *source;
+             AVHWFramesContext *frames;
++#if HAVE_OPENCL_D3D11
++            D3D11_TEXTURE2D_DESC texDesc = { .BindFlags = D3D11_BIND_DECODER, };
++#endif
+ 
+             ctx->hwframes_ref = av_hwframe_ctx_alloc(device);
+             if (!ctx->hwframes_ref) {
+@@ -144,8 +157,19 @@ static int hwmap_config_output(AVFilterL
+             frames->width     = hwfc->width;
+             frames->height    = hwfc->height;
+ 
+-            if (avctx->extra_hw_frames >= 0)
+-                frames->initial_pool_size = 2 + avctx->extra_hw_frames;
++            if (inlink->fixed_pool_size)
++                frames->initial_pool_size = inlink->fixed_pool_size;
++
++            if (frames->initial_pool_size == 0) {
++                // Dynamic allocation.
++            } else if (avctx->extra_hw_frames) {
++                frames->initial_pool_size += avctx->extra_hw_frames;
++            }
++
++#if HAVE_OPENCL_D3D11
++            if (frames->format == AV_PIX_FMT_D3D11)
++                frames->user_opaque = &texDesc;
++#endif
+ 
+             err = av_hwframe_ctx_init(ctx->hwframes_ref);
+             if (err < 0) {
+Index: FFmpeg/libavfilter/vf_hwupload.c
+===================================================================
+--- libavfilter/vf_hwupload.c
++++ libavfilter/vf_hwupload.c
+@@ -23,6 +23,10 @@
+ #include "libavutil/pixdesc.h"
+ #include "libavutil/opt.h"
+ 
++#if HAVE_OPENCL_D3D11
++#include "libavutil/hwcontext_d3d11va.h"
++#endif
++
+ #include "avfilter.h"
+ #include "formats.h"
+ #include "internal.h"
+@@ -110,6 +114,9 @@ static int hwupload_config_output(AVFilt
+     AVFilterLink   *inlink = avctx->inputs[0];
+     HWUploadContext   *ctx = avctx->priv;
+     int err;
++#if HAVE_OPENCL_D3D11
++    D3D11_TEXTURE2D_DESC texDesc = { .BindFlags = D3D11_BIND_DECODER, };
++#endif
+ 
+     av_buffer_unref(&ctx->hwframes_ref);
+ 
+@@ -151,6 +158,11 @@ static int hwupload_config_output(AVFilt
+     if (avctx->extra_hw_frames >= 0)
+         ctx->hwframes->initial_pool_size = 2 + avctx->extra_hw_frames;
+ 
++#if HAVE_OPENCL_D3D11
++    if (ctx->hwframes->format == AV_PIX_FMT_D3D11)
++        ctx->hwframes->user_opaque = &texDesc;
++#endif
++
+     err = av_hwframe_ctx_init(ctx->hwframes_ref);
+     if (err < 0)
+         goto fail;
+Index: FFmpeg/libavutil/hwcontext_d3d11va.c
+===================================================================
+--- libavutil/hwcontext_d3d11va.c
++++ libavutil/hwcontext_d3d11va.c
+@@ -227,7 +227,7 @@ static AVBufferRef *d3d11va_alloc_single
+         .ArraySize  = 1,
+         .Usage      = D3D11_USAGE_DEFAULT,
+         .BindFlags  = hwctx->BindFlags,
+-        .MiscFlags  = hwctx->MiscFlags,
++        .MiscFlags  = hwctx->MiscFlags | D3D11_RESOURCE_MISC_SHARED,
+     };
+ 
+     hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &tex);
+@@ -291,9 +291,17 @@ static int d3d11va_frames_init(AVHWFrame
+         .ArraySize  = ctx->initial_pool_size,
+         .Usage      = D3D11_USAGE_DEFAULT,
+         .BindFlags  = hwctx->BindFlags,
+-        .MiscFlags  = hwctx->MiscFlags,
++        .MiscFlags  = hwctx->MiscFlags | D3D11_RESOURCE_MISC_SHARED,
+     };
+ 
++#if HAVE_OPENCL_D3D11
++    if (ctx->user_opaque) {
++        D3D11_TEXTURE2D_DESC *desc = ctx->user_opaque;
++        if (desc->BindFlags & D3D11_BIND_DECODER)
++            texDesc.BindFlags = D3D11_BIND_DECODER;
++    }
++#endif
++
+     if (hwctx->texture) {
+         D3D11_TEXTURE2D_DESC texDesc2;
+         ID3D11Texture2D_GetDesc(hwctx->texture, &texDesc2);

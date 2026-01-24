@@ -8,7 +8,7 @@ bin:bin/amidi
 bin:bin/amixer
 bin:bin/aplay
 bin:bin/aplaymidi
-bin:bin/arecord
+lnk:bin/arecord
 bin:bin/arecordmidi
 bin:bin/aseqdump
 bin:bin/aseqnet
@@ -17,7 +17,7 @@ bin:bin/iecset
 bin:bin/speaker-test
 lib:lib/alsa-topology/libalsatplg_module_nhlt.so
 rsc:sbin/alsa-info.sh
-bin:sbin/alsaconf
+rsc:sbin/alsaconf
 bin:sbin/alsactl
 rsc:share/alsa/
 rsc:share/sounds/

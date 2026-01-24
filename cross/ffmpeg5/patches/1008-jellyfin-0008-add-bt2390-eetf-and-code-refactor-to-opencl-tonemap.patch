@@ -214,12 +214,12 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/colorspace_common.cl
 +
 +// linearizer for HLG/ARIB-B67
 +float eotf_arib_b67(float x) {
-+    return ootf_1_2(inverse_oetf_arib_b67(x));
++    return ootf_1_2(inverse_oetf_arib_b67(x)) * 5.0f;
 +}
 +
 +// delinearizer for HLG/ARIB-B67
 +float inverse_eotf_arib_b67(float x) {
-+    return oetf_arib_b67(inverse_ootf_1_2(x));
++    return oetf_arib_b67(inverse_ootf_1_2(x / 5.0f));
  }
  
 -float inverse_eotf_bt1886(float c) {

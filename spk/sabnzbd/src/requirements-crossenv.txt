@@ -1,6 +1,10 @@
-# cross-compiled wheels
-cffi==1.15.1
-Cheetah3==3.2.6
-cryptography==3.3.2
-sabctools==7.0.2
-ujson==5.7.0
+# Generated using the requirements script on October 23, 2025
+
+cffi==2.0.0
+charset_normalizer==3.4.4
+cryptography==46.0.3
+CT3==3.4.0
+#orjson==3.11.3             ==> supported version depends on rust version
+pyyaml==6.0.3
+sabctools==8.2.6
+ujson==5.11.0
