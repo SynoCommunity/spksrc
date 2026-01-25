@@ -44,16 +44,12 @@ include ../../mk/spksrc.python.mk
 
 # [aiohttp]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [aiohttp] -std=c11
-endif
-# [aiohttp] Disable Cython atomics on older GCC (ATOMIC_INT_LOCK_FREE issue)
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [aiohttp] -DCYTHON_ATOMICS=0
+WHEELS_CFLAGS += [aiohttp] -std=c11 -DCYTHON_ATOMICS=0
 endif
 
 # [frozenlist]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [frozenlist] -std=c11
+WHEELS_CXXFLAGS += [frozenlist] -std=c++11
 endif
 
 # [msgpack]
