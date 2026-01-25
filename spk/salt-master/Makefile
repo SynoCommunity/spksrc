@@ -56,7 +56,10 @@ include ../../mk/spksrc.python.mk
 
 # [aiohttp]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [aiohttp] -std=c11 -DCYTHON_ATOMICS=0 -U__ARM_NEON__
+WHEELS_CFLAGS += [aiohttp] -std=c11 -DCYTHON_ATOMICS=0
+ifeq ($(findstring $(ARCH),comcerto2k),comcerto2k)
+WHEELS_CFLAGS += [aiohttp] -U__ARM_NEON__
+endif
 endif
 
 # [frozenlist]
