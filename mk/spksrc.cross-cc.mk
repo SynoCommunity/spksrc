@@ -1,6 +1,10 @@
+###############################################################################
+# spksrc.cross-cc.mk
 #
-# Default make programs
-#
+# Provides a two-stage cross compilation environment:
+# 1) Stage1: ensures toolchain is built and $(WORK_DIR)/tc_vars* are generated
+# 2) Stage2: sets up cross-env using $(WORK_DIR)/tc_vars*
+###############################################################################
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -20,6 +24,8 @@ ifneq ($(ARCH),noarch)
 TC = syno$(ARCH_SUFFIX)
 endif
 endif
+
+.DEFAULT_GOAL := all
 
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
@@ -42,7 +48,7 @@ include ../../mk/spksrc.status.mk
 checksum: download
 include ../../mk/spksrc.checksum.mk
 
-extract: checksum depend status toolchain
+extract: checksum depend status
 include ../../mk/spksrc.extract.mk
 
 patch: extract
@@ -60,32 +66,32 @@ include ../../mk/spksrc.install.mk
 plist: install
 include ../../mk/spksrc.plist.mk
 
-###
+#####
 
-# Define _all as a real target that does the work
-.PHONY: _all
-_all: install plist
+TCVARS_DONE := $(WORK_DIR)/.tcvars_done
 
-# all wraps _all with logging
+# -----------------------------------------------------------------------------
+# Stage1: Toolchain bootstrap
+# -----------------------------------------------------------------------------
+.PHONY: cross-stage1
+cross-stage1: $(TCVARS_DONE)
+
+$(TCVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+
+# -----------------------------------------------------------------------------
+# Stage2: Define cross-stage2 as a real target that does the work
+# -----------------------------------------------------------------------------
+.PHONY: cross-stage2
+cross-stage2: install plist
+
+# all wraps cross-stage2 with logging
 .PHONY: all
-.DEFAULT_GOAL := all
-
 all:
 	@mkdir -p $(WORK_DIR)
-	@bash -o pipefail -c ' \
-	    if [ -z "$$LOGGING_ENABLED" ]; then \
-	        export LOGGING_ENABLED=1 ; \
-	        script -q -e -c "$(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all" /dev/null \
-	            | tee >(sed -r "s/\x1B\[[0-9;]*[mK]//g; s/\\r//g" >> "$(DEFAULT_LOG)") ; \
-	    else \
-	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	    fi \
-	' || { \
-	    $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" \
-	    "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") \
-	    | tee --append $(STATUS_LOG) ; \
-	    exit 1 ; \
-	}
+	$(call LOG_WRAPPED,cross-stage1)
+	$(call LOG_WRAPPED,cross-stage2)
 
 ####
 

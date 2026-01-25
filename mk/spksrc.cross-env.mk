@@ -39,25 +39,13 @@ DEFAULT_ENV ?= autotools flags rust
 # Map DEFAULT_ENV definitions to filenames
 TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
 
-ifeq ($(TC_VARS_READY),)
-ifneq ($(filter-out digests download,$(MAKECMDGOALS)),)
-toolchain:
-	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
-	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
-	@$(MAKE) TC_VARS_READY=1 $(MAKECMDGOALS)
+# Load full toolchain environment ONLY after tcvars are generated
+ifeq ($(wildcard $(TCVARS_DONE)),$(TCVARS_DONE))
+  $(eval -include $(TC_VARS_MK) $(TC_VARS_FILES))
 endif
-else
-toolchain: ;
-
-# Include generic exports
-include $(TC_VARS_MK)
-
-# Include them (optional include)
--include $(TC_VARS_FILES)
 
 ENV += TC=$(TC)
 ENV += $(TC_ENV)
-endif
 endif
 
 # Allow toolchain mandatory variables to
