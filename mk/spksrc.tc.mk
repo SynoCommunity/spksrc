@@ -108,21 +108,7 @@ _all: rustc depend tcvars
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target
 toolchain_target: $(PRE_TOOLCHAIN_TARGET)
-	@bash -o pipefail -c ' \
-	  mkdir -p $(TC_WORK_DIR) ; \
-	  $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG) ; \
-	   if [ -z "$$LOGGING_ENABLED" ]; then \
-	      export LOGGING_ENABLED=1 ; \
-	      { \
-	        $(MAKE) WORK_DIR=$(TC_WORK_DIR) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	      } > >(tee --append $(DEFAULT_LOG)) 2>&1 ; \
-	   else \
-	      $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	   fi \
-	' || { \
-	   $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG) ; \
-	   exit 1 ; \
-	}
+	$(call LOG_WRAPPED,_all)
 
 post_toolchain_target: $(TOOLCHAIN_TARGET)
 
