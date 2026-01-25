@@ -46,6 +46,10 @@ include ../../mk/spksrc.python.mk
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [aiohttp] -std=c11
 endif
+# [aiohttp] Disable Cython atomics on older GCC (ATOMIC_INT_LOCK_FREE issue)
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [aiohttp] -DCYTHON_ATOMICS=0
+endif
 
 # [frozenlist]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
@@ -75,6 +79,11 @@ endif
 # [yarl]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [yarl] -std=c11
+endif
+
+# [propcache]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [propcache] -std=c11
 endif
 
 .PHONY: salt-minion_extra_install
