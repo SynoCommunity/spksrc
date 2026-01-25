@@ -34,7 +34,7 @@ CHANGELOG += "3. Intel Graphics Compiler (IGC) 1.0.17791.18 (DSM 7.1+).<br/> "
 CHANGELOG += "4. Intel Compute Runtime 24.35.30872.41 (DSM 7.1+).<br/> "
 CHANGELOG += "5. Intel Video Processing Library (Intel VPL) 2.15.0 (DSM 7.1+).<br/> "
 CHANGELOG += "6. MESA Intel Vulkan driver (anv) 23.3.6 (DSM 7.1+)."
-CHANGELOG += "7. Intel GPU Tools (IGT) 1.30 (DSM 7.1+)."
+CHANGELOG += "7. Intel GPU Tools (igt) 2.3 (DSM 7.1+)."
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.1),1)
 
