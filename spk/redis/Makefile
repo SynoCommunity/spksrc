@@ -1,6 +1,6 @@
 SPK_NAME = redis
-SPK_VERS = 7.4.5
-SPK_REV = 16
+SPK_VERS = 7.4.7
+SPK_REV = 17
 SPK_ICON = src/redis.png
 
 DEPENDS = cross/redis
@@ -13,7 +13,7 @@ DESCRIPTION = Redis is an open source, advanced key-value store. It is often ref
 
 DISPLAY_NAME = redis
 
-CHANGELOG = "Update redis to v7.4.5 (CVE-2025-32023, CVE-2025-48367 and other fixes)."
+CHANGELOG = "Update redis to v7.4.7 (CVE-2025-49844, CVE-2025-46817, CVE-2025-46818, CVE-2025-46819 and other fixes)."
 
 HOMEPAGE = https://redis.io
 LICENSE  = 3-clause BSD
