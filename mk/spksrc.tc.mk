@@ -74,6 +74,8 @@ include ../../mk/spksrc.tc-vers.mk
 
 include ../../mk/spksrc.tc-flags.mk
 
+include ../../mk/spksrc.status.mk
+
 download:
 include ../../mk/spksrc.download.mk
 
@@ -92,7 +94,6 @@ include ../../mk/spksrc.patch.mk
 rustc: patch
 include ../../mk/spksrc.tc-rust.mk
 
-#tcvars: rustc
 include ../../mk/spksrc.tc-vars.mk
 
 #####
@@ -103,7 +104,7 @@ pre_toolchain_target: toolchain_msg
 
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: rustc depend tcvars
+_all: status rustc depend tcvars
 
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target
