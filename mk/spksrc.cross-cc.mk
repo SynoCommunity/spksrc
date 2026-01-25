@@ -39,12 +39,6 @@ include ../../mk/spksrc.depend.mk
 
 include ../../mk/spksrc.status.mk
 
-ifneq ($(filter-out digests download,$(MAKECMDGOALS)),)
-toolchain:
-	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
-	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
-endif
-
 checksum: download
 include ../../mk/spksrc.checksum.mk
 
