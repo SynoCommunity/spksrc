@@ -497,7 +497,29 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons s
 
 package: $(SPK_FILE_NAME)
 
-all: package
+# -----------------------------------------------------------------------------
+# Stage1: Toolchain bootstrap
+# -----------------------------------------------------------------------------
+.PHONY: spk-stage1
+spk-stage1: $(TCVARS_DONE)
+
+ifneq ($(strip $(TC)),)
+$(TCVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+else
+$(TCVARS_DONE): ;
+endif
+
+# -----------------------------------------------------------------------------
+# Stage2: Define package as a real target that does the work
+# -----------------------------------------------------------------------------
+.PHONY: spk-stage2
+spk-stage2: package
+
+all:
+	$(call LOG_WRAPPED,spk-stage1)
+	$(call LOG_WRAPPED,spk-stage2)
 
 
 ### spk-specific clean rules
@@ -532,11 +554,11 @@ spkclean:
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
-	       work-*/.wheel_done \
+	       work-*/.tcvars_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
-	       work-*/tc_vars.mk \
+	       work-*/tc_vars.*.mk \
 	       work-*/tc_vars.cmake \
 	       work-*/tc_vars.meson-* \
 	       work-*/package.tgz \
