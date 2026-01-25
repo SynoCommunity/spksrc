@@ -149,6 +149,24 @@ version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; f
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 
+# Generic macro to call recipe execution using logging
+define LOG_WRAPPED
+@bash -o pipefail -c '\
+    if [ -z "$$LOGGING_ENABLED" ]; then \
+        export LOGGING_ENABLED=1 ; \
+        script -q -e -c "$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1)" /dev/null \
+            | tee >(sed -r "s/\x1B\[[0-9;]*[mK]//g; s/\\r//g" >> "$(DEFAULT_LOG)") ; \
+    else \
+        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1) ; \
+    fi \
+' || { \
+    $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" \
+        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(1)") \
+        | tee --append $(STATUS_LOG) ; \
+    exit 1 ; \
+}
+endef
+
 # Remove duplicate words within string while preserving order
 define uniq
 $(strip \
