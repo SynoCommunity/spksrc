@@ -2,51 +2,18 @@
 PYTHON_DIR="/var/packages/python312/target/bin"
 # Add local bin, virtualenv along with python312 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
-LANGUAGE="env LANG=en_US.UTF-8"
+export LANG=en_US.UTF-8
 SYNOPKG_PKGETC=/var/packages/${SYNOPKG_PKGNAME}/etc
 
-service_prestart ()
-{
-    # Define variables and commands
-    LOG_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master.log"
-    LOG_FILE_API="${SYNOPKG_PKGVAR}/salt-api.log"
-    PID_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master-runtime.pid"
-    PID_FILE_API="${SYNOPKG_PKGVAR}/salt-api-runtime.pid"
-    COMMAND_MASTER="salt-master --pid-file ${PID_FILE_MASTER} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_MASTER} -d"
-    COMMAND_API="salt-api --pid-file ${PID_FILE_API} -c ${SYNOPKG_PKGETC} --log-file=${LOG_FILE_API} -d"
-    # Execute salt-master command
-    $COMMAND_MASTER
-    # Wait until salt-master is populated
-    i=0
-    while [ $i -lt 10 ]; do
-        [ -s "${PID_FILE_MASTER}" ] && break
-        sleep 1
-        i=$((i + 1))
-    done
-    # Execute salt-api command
-    $COMMAND_API
-    # Wait until salt-api is populated
-    i=0
-    while [ $i -lt 10 ]; do
-        [ -s "${PID_FILE_API}" ] && break
-        sleep 1
-        i=$((i + 1))
-    done
-    # Combine PID files
-    : > "${PID_FILE}"
-    [ -s "${PID_FILE_API}" ] && echo "$(cat "${PID_FILE_API}")" >> "${PID_FILE}"
-    [ -s "${PID_FILE_MASTER}" ] && echo "$(cat "${PID_FILE_MASTER}")" >> "${PID_FILE}"
-}
+# Service configuration - let framework handle background execution and PID tracking
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
 
-service_poststop ()
-{
-    # Define variables
-    PID_FILE_MASTER="${SYNOPKG_PKGVAR}/salt-master-runtime.pid"
-    PID_FILE_API="${SYNOPKG_PKGVAR}/salt-api-runtime.pid"
-    # Remove any runtime PID files
-    [ -f "${PID_FILE_API}" ] && rm -f "${PID_FILE_API}"
-    [ -f "${PID_FILE_MASTER}" ] && rm -f "${PID_FILE_MASTER}"
-}
+# Multi-command service: salt-master first, then salt-api
+# Framework iterates over newline-separated commands in SERVICE_COMMAND
+SALT_MASTER_CMD="salt-master -c ${SYNOPKG_PKGETC} -d"
+SALT_API_CMD="salt-api -c ${SYNOPKG_PKGETC} -d"
+SERVICE_COMMAND=$(printf "%s\n%s" "${SALT_MASTER_CMD}" "${SALT_API_CMD}")
 
 service_postinst ()
 {

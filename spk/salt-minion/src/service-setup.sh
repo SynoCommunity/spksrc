@@ -2,7 +2,7 @@
 PYTHON_DIR="/var/packages/python312/target/bin"
 # Add local bin, virtualenv along with python312 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
-LANGUAGE="env LANG=en_US.UTF-8"
+export LANG=en_US.UTF-8
 SYNOPKG_PKGETC=/var/packages/${SYNOPKG_PKGNAME}/etc
 
 SERVICE_COMMAND="salt-minion --pid-file ${PID_FILE} -c ${SYNOPKG_PKGETC} -d"

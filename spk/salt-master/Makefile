@@ -1,6 +1,6 @@
 SPK_NAME = salt-master
-SPK_VERS = 3007.3
-SPK_REV = 13
+SPK_VERS = 3007.11
+SPK_REV = 14
 SPK_ICON = src/salt-master.png
 
 PYTHON_PACKAGE = python312
@@ -16,7 +16,7 @@ REQUIRED_MIN_SRM = 1.3
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Master
-CHANGELOG    = "1. Update to 3007.3"
+CHANGELOG    = "1. Update to v3007.11"
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache v2
