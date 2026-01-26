@@ -1,19 +1,59 @@
-### tc_vars rules
+###############################################################################
+# spksrc.toolchain/vars.mk
+#
+# This makefile generates all toolchain-specific environment definition files
+# $(WORK_DIR)/tc_vars* used by spksrc cross-compilation stages.
+#
+# It is responsible for:
+#  - emitting Makefile fragments (tc_vars*.mk) consumed by cross-env.mk
+#  - generating configuration files for build systems:
+#      * Autotools
+#      * CMake
+#      * Meson (cross + native)
+#      * Rust / Cargo
+#
+# The tc_vars files are generated once per toolchain and cached using a
+# status cookie to avoid unnecessary regeneration.
+#
+# Generated files:
+#  $(WORK_DIR)/tc_vars.mk
+#      Core toolchain metadata and paths
+#  $(WORK_DIR)/tc_vars.autotools.mk
+#      Autotools cross-compilation variables (CC, CFLAGS, SYSROOT, …)
+#  $(WORK_DIR)/tc_vars.flags.mk
+#      Raw compiler and linker flags
+#  $(WORK_DIR)/tc_vars.rust.mk
+#      Rust / Cargo environment variables
+#  $(WORK_DIR)/tc_vars.cmake
+#      CMake toolchain definition file
+#  $(WORK_DIR)/tc_vars.meson-cross
+#      Meson cross file for target builds
+#  $(WORK_DIR)/tc_vars.meson-native
+#      Meson native file for in-build tools
+#
+# Targets are executed in the following order:
+#  tcvars_msg
+#  pre_tcvars_target    (override with PRE_TCVARS_TARGET)
+#  tcvars_target        (override with TCVARS_TARGET)
+#  post_tcvars_target   (override with POST_TCVARS_TARGET)
+#
+# Variables:
+#  TCVARS_COOKIE    : Status cookie indicating tc_vars generation completion
+#  TCVARS_SUBMAKE   : Internal flag to avoid recursive default goal execution
+#
+# Notes:
+#  - This makefile only emits configuration files; it does not build anything.
+#  - All output is written to $(WORK_DIR).
+#  - tc_vars files are consumed by spksrc.cross-env.mk and package builds.
+#  - The tcvars target is idempotent and skipped if the cookie exists.
+#
+###############################################################################
 
-# Configure the included makefiles
-URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
-NAME                       = $(TC_NAME)
-COOKIE_PREFIX              =
-ifneq ($(strip $(TC_DIST_FILE)),)
-LOCAL_FILE                 = $(TC_DIST_FILE)
-# download.mk uses PKG_DIST_FILE
-PKG_DIST_FILE              = $(TC_DIST_FILE)
-else
-LOCAL_FILE                 = $(TC_DIST_NAME)
-endif
-DISTRIB_DIR                = $(TOOLCHAIN_DIR)/$(TC_VERS)
-DIST_FILE                  = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT                   = $(TC_EXT)
+# Variables
+COOKIE_PREFIX =
+
+# Mark tc_vars generation as completed using status cookie
+TCVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)tcvars_done
 
 #####
 
@@ -83,8 +123,6 @@ generate_tc_vars_mk: $(foreach m,$(TC_VAR_MAPPING_MK),$(WORK_DIR)/$(word 2,$(sub
 generate_tc_vars_other: $(foreach m,$(TC_VAR_MAPPING_OTHER),$(WORK_DIR)/$(word 2,$(subst :, ,$(m))))
 
 #####
-
-TCVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)tcvars_done
 
 .PHONY: $(PRE_TCVARS_TARGET) $(TCVARS_TARGET) $(POST_TCVARS_TARGET)
 ifeq ($(strip $(PRE_TCVARS_TARGET)),)

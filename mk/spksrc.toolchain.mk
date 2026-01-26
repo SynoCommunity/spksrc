@@ -1,7 +1,92 @@
-### Toolchain rules
-
-
-# Configure the included makefiles
+###############################################################################
+# spksrc.toolchain.mk
+#
+# This makefile provides the complete toolchain build logic for spksrc.
+# It is responsible for:
+#  - downloading and extracting the toolchain
+#  - applying fixes and patches
+#  - installing other compiler components (rust)
+#  - generating tc_vars* files used by cross-compilation environments
+#
+# The toolchain build is organized as a staged pipeline with overridable
+# pre/post hooks and a persistent status cookie.
+#
+# Targets are executed in the following order:
+#  toolchain_msg
+#  pre_toolchain_target    (override with PRE_TOOLCHAIN_TARGET)
+#  toolchain_target        (override with TOOLCHAIN_TARGET)
+#  post_toolchain_target   (override with POST_TOOLCHAIN_TARGET)
+#
+# The actual work is performed by the internal target:
+#  _all
+#
+# which executes:
+#  status      : echo status to logging facility
+#  rustc       : install rust toolchain components
+#  depend      : resolve and build toolchain dependencies (if any)
+#  tcvars      : generate tc_vars*.mk files for spksrc.cross-env.mk
+#
+# Variables:
+#  TC_NAME           : Toolchain name (optional, used with generic archs)
+#  TC_ARCH           : Target architecture (fallback if TC_NAME unset)
+#  TC_VERS           : Toolchain DSM version
+#  TC                : Fully qualified toolchain identifier (syno-<arch>-<vers>)
+#  TC_WORK_DIR       : Toolchain working directory
+#  TOOLCHAIN_COOKIE  : Status cookie indicating toolchain build completion
+#
+# Files:
+#  $(TC_WORK_DIR)/.$(COOKIE_PREFIX)toolchain_done
+#                     Marks successful completion of the toolchain build
+#  $(WORK_DIR)/tc_vars*.mk
+#                     Generated toolchain environment definitions used by
+#                     cross-env.mk and package builds
+#
+# Notes:
+#  - The toolchain target is idempotent: if the cookie exists, it is skipped.
+#  - Logging is centralized via LOG_WRAPPED and applied to the full build.
+#  - This makefile is intentionally agnostic of package builds; it only
+#    produces artifacts consumed later by cross-compilation stages.
+#
+###############################################################################
+# Cross-compilation orchestration overview
+#
+# This makefile provides a two-stage cross-compilation pipeline.
+#
+# ┌──────────────────────────────────────────────────────────────────────┐
+# │                          cross-stage1                                │
+# │  (toolchain bootstrap & environment materialization)                 │
+# │                                                                      │
+# │   make -C toolchain/<TC> toolchain                                   │
+# │        │                                                             │
+# │        ▼                                                             │
+# │   [ toolchain build ]                                                │
+# │        │                                                             │
+# │        ├─ downloads / patches / rust / deps                          │
+# │        └─ generates tc_vars* files                                   │
+# │             │                                                        │
+# │             ├─ tc_vars.mk                (core toolchain identity)   │
+# │             ├─ tc_vars.autotools.mk      (autotools adapter)         │
+# │             ├─ tc_vars.flags.mk          (C/C++ flags)               │
+# │             ├─ tc_vars.rust.mk            (Rust env)                 │
+# │             ├─ tc_vars.cmake              (CMake toolchain file)     │
+# │             └─ tc_vars.meson-*            (Meson cross/native files) │
+# │                                                                      │
+# │   creates status cookie: $(WORK_DIR)/.tcvars_done                    │
+# └──────────────────────────────────────────────────────────────────────┘
+#                                  │
+#                                  │ (cookie exists)
+#                                  ▼
+# ┌──────────────────────────────────────────────────────────────────────┐
+# │                          cross-stage2                                │
+# │  (package build using cross-env)                                     │
+# └──────────────────────────────────────────────────────────────────────┘
+#
+# Notes:
+#  - cross-stage1 is idempotent (guarded by .tcvars_done)
+#  - cross-stage2 never builds the toolchain
+#  - toolchain and package builds are strictly separated
+###############################################################################
+# Variables
 URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
 NAME                       = $(TC_NAME)
 COOKIE_PREFIX              = 
@@ -35,6 +120,9 @@ include ../../mk/spksrc.common-rules.mk
 
 #####
 
+# Mark toolchain instasllation as completed using status cookie
+TOOLCHAIN_COOKIE = $(TC_WORK_DIR)/.$(COOKIE_PREFIX)toolchain_done
+
 TC = syno$(TC_ARCH_SUFFIX)
 TC_WORK_DIR ?= $(abspath $(WORK_DIR)/../../../toolchain/$(TC)/work)
 
@@ -42,8 +130,6 @@ TC_WORK_DIR ?= $(abspath $(WORK_DIR)/../../../toolchain/$(TC)/work)
 RUN = cd $(TC_WORK_DIR)/$(TC_TARGET) && env $(ENV)
 
 #####
-
-TOOLCHAIN_COOKIE = $(TC_WORK_DIR)/.$(COOKIE_PREFIX)toolchain_done
 
 .PHONY: $(PRE_TOOLCHAIN_TARGET) $(TOOLCHAIN_TARGET) $(POST_TOOLCHAIN_TARGET)
 ifeq ($(strip $(PRE_TOOLCHAIN_TARGET)),)
