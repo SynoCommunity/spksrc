@@ -1,0 +1,257 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2024 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+/*========================== begin_copyright_notice ============================
+
+Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+See https://llvm.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 with LLVM-exception
+
+============================= end_copyright_notice ===========================*/
+
+From 65fb672dce4a7f2df0df7626ec3a18d6cbc73090 Mon Sep 17 00:00:00 2001
+From: Florian Hahn <flo@fhahn.com>
+Date: Fri, 9 Dec 2022 22:14:03 +0000
+Subject: [PATCH 3/5] [SCEV] Cache ZExt SCEV expressions.
+
+When creating SCEV expressions for ZExt, there's quite a bit of
+reasoning done and in many places the reasoning in turn will try to
+create new SCEVs for other ZExts.
+
+This can have a huge compile-time impact. The attached test from #58402
+takes an excessive amount of compile time; without the patch, the test
+doesn't complete in 1500+ seconds, but with the patch it completes in 1
+second.
+
+To speed up this case, cache created ZExt expressions for given (SCEV, Ty) pairs.
+Caching just ZExts is relatively straight-forward, but it might make
+sense to extend it to other expressions in the future.
+
+This has a slight positive impact on CTMark:
+* O3: -0.03%
+* ReleaseThinLTO: -0.03%
+* ReleaseLTO-g: 0.00%
+
+The patch also improves compile-time for some internal real-world workloads
+where time spent in SCEV goes from ~300 seconds to ~3 seconds.
+
+There are a few cases where computing & caching the result earlier may
+return more pessimistic results, but the compile-time savings seem to
+outweigh that.
+
+Fixes #58402.
+
+Reviewed By: mkazantsev
+
+Differential Revision: https://reviews.llvm.org/D137505
+---
+ llvm/include/llvm/Analysis/ScalarEvolution.h | 68 ++++++++++++++++++++
+ llvm/lib/Analysis/ScalarEvolution.cpp        | 66 +++++++++++++++++++
+ 2 files changed, 134 insertions(+)
+
+diff --git a/llvm/include/llvm/Analysis/ScalarEvolution.h b/llvm/include/llvm/Analysis/ScalarEvolution.h
+index b16aa7017719..f0c3ba40a8d6 100644
+--- a/llvm/include/llvm/Analysis/ScalarEvolution.h
++++ b/llvm/include/llvm/Analysis/ScalarEvolution.h
+@@ -567,6 +567,8 @@ public:
+   const SCEV *getPtrToIntExpr(const SCEV *Op, Type *Ty);
+   const SCEV *getTruncateExpr(const SCEV *Op, Type *Ty, unsigned Depth = 0);
+   const SCEV *getZeroExtendExpr(const SCEV *Op, Type *Ty, unsigned Depth = 0);
++  const SCEV *getZeroExtendExprImpl(const SCEV *Op, Type *Ty,
++                                    unsigned Depth = 0);
+   const SCEV *getSignExtendExpr(const SCEV *Op, Type *Ty, unsigned Depth = 0);
+   const SCEV *getCastExpr(SCEVTypes Kind, const SCEV *Op, Type *Ty);
+   const SCEV *getAnyExtendExpr(const SCEV *Op, Type *Ty);
+@@ -1209,6 +1211,45 @@ public:
+   /// to be infinite, it must also be undefined.
+   bool loopIsFiniteByAssumption(const Loop *L);
+ 
++  class FoldID {
++    SmallVector<unsigned, 4> Bits;
++
++  public:
++    void addInteger(unsigned long I) { Bits.push_back(I); }
++    void addInteger(unsigned I) { Bits.push_back(I); }
++    void addInteger(int I) { Bits.push_back(I); }
++
++    void addInteger(unsigned long long I) {
++      addInteger(unsigned(I));
++      addInteger(unsigned(I >> 32));
++    }
++
++    void addPointer(const void *Ptr) {
++      // Note: this adds pointers to the hash using sizes and endianness that
++      // depend on the host. It doesn't matter, however, because hashing on
++      // pointer values is inherently unstable. Nothing should depend on the
++      // ordering of nodes in the folding set.
++      static_assert(sizeof(uintptr_t) <= sizeof(unsigned long long),
++                    "unexpected pointer size");
++      addInteger(reinterpret_cast<uintptr_t>(Ptr));
++    }
++
++    unsigned computeHash() const {
++      unsigned Hash = Bits.size();
++      for (unsigned I = 0; I != Bits.size(); ++I)
++        Hash = detail::combineHashValue(Hash, Bits[I]);
++      return Hash;
++    }
++    bool operator==(const FoldID &RHS) const {
++      if (Bits.size() != RHS.Bits.size())
++        return false;
++      for (unsigned I = 0; I != Bits.size(); ++I)
++        if (Bits[I] != RHS.Bits[I])
++          return false;
++      return true;
++    }
++  };
++
+ private:
+   /// A CallbackVH to arrange for ScalarEvolution to be notified whenever a
+   /// Value is deleted.
+@@ -1289,6 +1330,11 @@ private:
+   /// This is a cache of the values we have analyzed so far.
+   ValueExprMapType ValueExprMap;
+ 
++  /// This is a cache for expressions that got folded to a different existing
++  /// SCEV.
++  DenseMap<FoldID, const SCEV *> FoldCache;
++  DenseMap<const SCEV *, SmallVector<FoldID, 2>> FoldCacheUser;
++
+   /// Mark predicate values currently being processed by isImpliedCond.
+   SmallPtrSet<const Value *, 6> PendingLoopPredicates;
+ 
+@@ -2263,6 +2309,28 @@ private:
+   const SCEV *BackedgeCount = nullptr;
+ };
+ 
++template <> struct DenseMapInfo<ScalarEvolution::FoldID> {
++  static inline ScalarEvolution::FoldID getEmptyKey() {
++    ScalarEvolution::FoldID ID;
++    ID.addInteger(~0ULL);
++    return ID;
++  }
++  static inline ScalarEvolution::FoldID getTombstoneKey() {
++    ScalarEvolution::FoldID ID;
++    ID.addInteger(~0ULL - 1ULL);
++    return ID;
++  }
++
++  static unsigned getHashValue(const ScalarEvolution::FoldID &Val) {
++    return Val.computeHash();
++  }
++
++  static bool isEqual(const ScalarEvolution::FoldID &LHS,
++                      const ScalarEvolution::FoldID &RHS) {
++    return LHS == RHS;
++  }
++};
++
+ } // end namespace llvm
+ 
+ #endif // LLVM_ANALYSIS_SCALAREVOLUTION_H
+diff --git a/llvm/lib/Analysis/ScalarEvolution.cpp b/llvm/lib/Analysis/ScalarEvolution.cpp
+index 495cd73d8eef..7c745ff07cac 100644
+--- a/llvm/lib/Analysis/ScalarEvolution.cpp
++++ b/llvm/lib/Analysis/ScalarEvolution.cpp
+@@ -1587,6 +1587,30 @@ ScalarEvolution::getZeroExtendExpr(const SCEV *Op, Type *Ty, unsigned Depth) {
+   assert(!Op->getType()->isPointerTy() && "Can't extend pointer!");
+   Ty = getEffectiveSCEVType(Ty);
+ 
++  FoldID ID;
++  ID.addInteger(scZeroExtend);
++  ID.addPointer(Op);
++  ID.addPointer(Ty);
++  auto Iter = FoldCache.find(ID);
++  if (Iter != FoldCache.end())
++    return Iter->second;
++
++  const SCEV *S = getZeroExtendExprImpl(Op, Ty, Depth);
++  if (!isa<SCEVZeroExtendExpr>(S)) {
++    FoldCache.insert({ID, S});
++    auto R = FoldCacheUser.insert({S, {}});
++    R.first->second.push_back(ID);
++  }
++  return S;
++}
++
++const SCEV *ScalarEvolution::getZeroExtendExprImpl(const SCEV *Op, Type *Ty,
++                                                   unsigned Depth) {
++  assert(getTypeSizeInBits(Op->getType()) < getTypeSizeInBits(Ty) &&
++         "This is not an extending conversion!");
++  assert(isSCEVable(Ty) && "This is not a conversion to a SCEVable type!");
++  assert(!Op->getType()->isPointerTy() && "Can't extend pointer!");
++
+   // Fold if the operand is constant.
+   if (const SCEVConstant *SC = dyn_cast<SCEVConstant>(Op))
+     return getConstant(
+@@ -7840,6 +7864,8 @@ void ScalarEvolution::forgetAllLoops() {
+   HasRecMap.clear();
+   MinTrailingZerosCache.clear();
+   PredicatedSCEVRewrites.clear();
++  FoldCache.clear();
++  FoldCacheUser.clear();
+ }
+ 
+ void ScalarEvolution::forgetLoop(const Loop *L) {
+@@ -13236,6 +13262,12 @@ void ScalarEvolution::forgetMemoizedResultsImpl(const SCEV *S) {
+       forgetBackedgeTakenCounts(Pair.getPointer(), Pair.getInt());
+     BECountUsers.erase(BEUsersIt);
+   }
++
++  auto FoldUser = FoldCacheUser.find(S);
++  if (FoldUser != FoldCacheUser.end())
++    for (auto &KV : FoldUser->second)
++      FoldCache.erase(KV);
++  FoldCacheUser.erase(S);
+ }
+ 
+ void
+@@ -13483,6 +13515,40 @@ void ScalarEvolution::verify() const {
+       }
+     }
+   }
++
++  // Verify FoldCache/FoldCacheUser caches.
++  // NOTE: Original patch used structured bindings, only available with C++17.
++  for (const auto &It : FoldCache) {
++    auto &FoldID = It.first;
++    const SCEV *Expr = It.second;
++    auto I = FoldCacheUser.find(Expr);
++    if (I == FoldCacheUser.end()) {
++      dbgs() << "Missing entry in FoldCacheUser for cached expression " << *Expr
++             << "!\n";
++      std::abort();
++    }
++    if (!is_contained(I->second, FoldID)) {
++      dbgs() << "Missing FoldID in cached users of " << *Expr << "!\n";
++      std::abort();
++    }
++  }
++  for (const auto &It : FoldCacheUser) {
++    const SCEV *Expr = It.first;
++    auto &IDs = It.second;
++    for (auto &FoldID : IDs) {
++      auto I = FoldCache.find(FoldID);
++      if (I == FoldCache.end()) {
++        dbgs() << "Missing entry in FoldCache for expression " << *Expr
++               << "!\n";
++        std::abort();
++      }
++      if (I->second != Expr) {
++        dbgs() << "Entry in FoldCache doesn't match FoldCacheUser: "
++               << *I->second << " != " << *Expr << "!\n";
++        std::abort();
++      }
++    }
++  }
+ }
+ 
+ bool ScalarEvolution::invalidate(
+-- 
+2.34.1
+

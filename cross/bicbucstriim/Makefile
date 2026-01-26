@@ -1,5 +1,5 @@
 PKG_NAME = bicbucstriim
-PKG_VERS = 3.6.3
+PKG_VERS = 3.6.7
 PKG_EXT = zip
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-php82.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mikespub-org/rvolz-BicBucStriim/releases/download/v$(PKG_VERS)

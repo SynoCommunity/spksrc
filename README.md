@@ -80,9 +80,13 @@ From there, follow the instructions in the [Developers HOW TO].
 
 ### LXC
 A container based on 64-bit version of Debian 13 stable OS is recommended. Non-x86 architectures are not supported.  The following assumes your LXD/LXC environment is already initiated (e.g. `lxc init`) and you have minimal LXD/LXC basic knowledge :
+
 1. Create a new container (will use x86_64/amd64 arch by default): `lxc launch images:debian/13 spksrc`
+
 2. Enable i386 arch: `lxc exec spksrc -- /usr/bin/dpkg --add-architecture i386`
+
 3. Update apt channels: `lxc exec spksrc -- /usr/bin/apt update`
+
 4. Install all default required packages:
 ```bash
 lxc exec spksrc -- /usr/bin/apt install --no-install-recommends -y \
@@ -100,6 +104,7 @@ lxc exec spksrc -- /usr/bin/apt install --no-install-recommends -y \
                  sudo swig texinfo time tree unzip xmlto yasm \
                  zip zlib1g-dev
 ```
+
 5. Install Python based dependencies:
 ```bash
 lxc exec spksrc -- /usr/bin/apt install --no-install-recommends -y \
@@ -109,10 +114,12 @@ lxc exec spksrc -- /usr/bin/apt install --no-install-recommends -y \
 ```
 
 #### LXC: `spksrc` user
+
 6. By default it is assumed that you will be running as `spksrc` user into the LXC container.  Such user needs to be created into the default container image:
 ```bash
 lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc
 ```
+
 7. Setup a default shell environment:
 ```bash
 lxc exec spksrc --user 1001 -- cp /etc/skel/.profile /etc/skel/.bashrc ~spksrc/.
@@ -125,18 +132,21 @@ spksrc@spksrc:~$
 ```
 
 #### (OPTIONAL) LXC: Shared `spksrc` user
-You can create a shared user between your Debian/Ubuntu host and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already created a user `spksrc` with uid 1001 in your Debian/Ubuntu host environment and that you which to share its `/home` userspace.
+You can create a shared user between your Debian/Ubuntu host and the LXC Debian container which simplifies greatly file management between the two.  The following assumes you already created a user `spksrc` with uid 1001 in your Debian/Ubuntu host environment and that you whish to share its `/home` userspace.
+
 8. Create a mapping rule between the hosts and the LXC image:
 ```bash
 lxc config set spksrc raw.idmap "both 1001 1001"
 lxc restart spksrc
 Remapping container filesystem
 ```
-9. Add `/home/spksrc` from the hsot to the LXC container:
+
+9. Add `/home/spksrc` from the host to the LXC container:
 ```bash
 lxc config device add spksrc home disk path=/home/spksrc source=/home/spksrc
 Device home added to spksrc
 ```
+
 10. Connect as `spksrc` user:
 ```bash
 lxc exec spksrc -- su --login spksrc
@@ -145,11 +155,13 @@ spksrc@spksrc:~$
 
 #### LXC: Proxy (OPTIONAL)
 The following assume you have a running proxy on your LAN setup at IP 192.168.1.1 listening on port 3128 that will allow caching files.
+
 11. Enforce using a proxy:
 ```bash
 lxc config set spksrc environment.http_proxy http://192.168.1.1:3128
 lxc config set spksrc environment.https_proxy http://192.168.1.1:3128
 ```
+
 12. Enforce using a proxy with `wget` in the spksrc container user account:
 ```bash
 lxc exec spksrc --user $(id -u spksrc) -- bash -c "cat << EOF > ~spksrc/.wgetrc

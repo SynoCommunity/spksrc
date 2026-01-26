@@ -36,6 +36,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	gettext \
 	gfortran \
 	git \
+	glslang-tools \
 	gobject-introspection \
 	gperf \
 	imagemagick \
@@ -72,6 +73,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	rsync \
 	ruby-mustache \
 	scons \
+	spirv-tools \
 	subversion \
 	sudo \
 	swig \

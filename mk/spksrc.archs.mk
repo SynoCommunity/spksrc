@@ -14,9 +14,6 @@ endif
 
 # All available CPU architectures
 
-# noarch specific for per DSM version patching
-NOARCH = noarch
-
 # Distinct SRM and DSM archs to allow handling of different TCVERSION ranges.
 # SRM - Synology Router Manager
 SRM_ARMv7_ARCHS = northstarplus ipq806x dakota hawkeye

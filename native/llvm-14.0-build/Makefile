@@ -1,96 +1,56 @@
 PKG_NAME = llvm
-PKG_LLVM_MAJ = 14
-PKG_VERS = 14.0.5
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/refs/tags
-PKG_DIST_FILE = SPIRV-LLVM-Translator-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-project-$(PKG_VERS).src
+PKG_VERS = 14.0.6
 
 # REMARKS:
-# Since it takes a huge amount of resources to build this, we started to host the
-# output on https://github.com/SynoCommunity/spksrc/releases/tag/native%2Fllvm
 #
-# This Makefile is to build the native llvm
-# and has one additional target to build the archive (make build-archive)
+# This Makefile is to build a native llvm, clang, lld, along with SPIRV/OpenCL toolset.
+# It also has one additional target to build the archive (make build-archive)
 #
-# The main reason to build llvm from source is, that other prebuilt packages
-# do not contain mandatory binaries to build cross/llvm-14.0.
+# Since it takes a huge amount of resources to build we are hosting ouput on
+#     https://github.com/SynoCommunity/spksrc/releases/tag/native%2Fllvm
+# And later referring to it using DEPENDS = native/llvm-14.0
 #
-#   Native binaries: clang-tblgen, llvm-tblgen, llvm-spirv
+# Usage of native LLVM tools and librairies is needed in order to avoid circular
+# dependencies when building LLVM SPIRV/OpenCL toolset. Regular prebuilt packages
+# do not contain these binaries and libraries must exactly match to avoid API issues.
+#
+#   binaries: clang-tblgen, llvm-tblgen, llvm-spirv
+#   libraries:
+#      libLLVM-14.so             <-- for built-time IGC 'CMCLTranslatorTool', 'elf_packager', 'vcb'
+#      libLLVMGenXIntrinsics.so  <-- for built-time IGC 'CMCLTranslatorTool', 'vcb'
+#      libLLVMSPIRVLib.so.14     <-- for built-time IGC 'vcb'
 
-HOMEPAGE = https://github.com/KhronosGroup/SPIRV-LLVM-Translator
-COMMENT  = Tool and library for translation between LLVM IR and SPIR-V
-LICENSE  = Apache-2.0 with LLVM-exception
+HOMEPAGE = https://llvm.org/
+COMMENT = The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.
+LICENSE = Apache 2.0 with LLVM exceptions
 
-NATIVE_DEPENDS  = cross/llvm-project-140.src
-NATIVE_DEPENDS += native/Khronos-SPIRV-Headers
-NATIVE_DEPENDS += native/Khronos-SPIRV-Tools
+DOWNLOAD_TARGET = nop
+CHECKSUM_TARGET = nop
+EXTRACT_TARGET = nop
+CONFIGURE_TARGET = nop
+COMPILE_TARGET = nop
+INSTALL_TARGET = nop
 
-POST_EXTRACT_TARGET = llvm_post_extract_target
-POST_INSTALL_TARGET = llvm_post_install_target
+# -----------------------------------------------------------------------------
+# Dependencies
+# -----------------------------------------------------------------------------
+NATIVE_DEPENDS += native/llvm-140
+NATIVE_DEPENDS += native/Khronos-SPIRV-LLVM-Translator-140
+NATIVE_DEPENDS += native/intel-vc-intrinsics
+NATIVE_DEPENDS += native/intel-opencl-clang-140
 
-# Using various LLVM project sources needs a top-level master directory
-CMAKE_BUILD_DIR = $(WORK_DIR)/llvm.build
-CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
-
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DCMAKE_BUILD_TYPE=MinSizeRel
-CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=ON
-CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
-CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
-CMAKE_ARGS += -DLLVM_EXTERNAL_PROJECTS='llvm-spirv'
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
-
-# Points towards proper source and include dirs
-CMAKE_ARGS += -DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$(STAGING_INSTALL_PREFIX)
-CMAKE_ARGS += -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR=$(WORK_DIR)/SPIRV-LLVM-Translator
-
-# Install all build tools
-CMAKE_ARGS += -DLLVM_INSTALL_UTILS=ON
-CMAKE_ARGS += -DLLVM_BUILD_TOOLS=ON
-CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=OFF
-
-# Assertions are internal checks to help find bugs
-CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
-
-# BUILD_SHARED_LIBS is only recommended for use by LLVM developers
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
-
-# Disable benchmarks and tests
-CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
-CMAKE_ARGS += -DLLVM_BUILD_TESTS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
-
-# Disable lit testing framework (requires patch as well to fully disable)
-CMAKE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
-
-# Reduce build warnings
-CMAKE_ARGS += -DCMAKE_CXX_STANDARD=14
-CMAKE_ARGS += -DCMAKE_CXX_EXTENSIONS=ON
-NATIVE_CXXFLAGS  = -Wno-cast-function-type
-NATIVE_CXXFLAGS += -Wno-dangling-pointer
-NATIVE_CXXFLAGS += -Wno-free-nonheap-object
-NATIVE_CXXFLAGS += -Wno-missing-template-keyword
-NATIVE_CXXFLAGS += -Wno-uninitialized
-
+# -----------------------------------------------------------------------------
+# Include the common native-cmake rules
+# -----------------------------------------------------------------------------
 include ../../mk/spksrc.native-cmake.mk
 
-.PHONY: llvm_post_extract_target llvm_post_install_target build-archive
-
-# Create symlink for LLVM to find the translator
-llvm_post_extract_target:
-	@cd $(WORK_DIR) && ln -sf SPIRV-LLVM-Translator-$(PKG_VERS) SPIRV-LLVM-Translator
-	@cd $(WORK_DIR)/llvm-project/llvm/projects && ln -sf ../../../$(PKG_DIR) llvm-spirv
-
-llvm_post_install_target:
-	$(RUN) install -m 755 $(CMAKE_BUILD_DIR)/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
-
+# -----------------------------------------------------------------------------
+# Recipe to generate an archive of installed directories
+# -----------------------------------------------------------------------------
+.PHONY: build-archive
 build-archive:
 	@$(MSG) "Build archive of install folder"
 ifeq ($(wildcard work-native/install/usr/local/bin/*),)
 	$(error "Installation not found. Please call make first.")
 endif
-	cd work-native && tar -czf ../native-$(PKG_NAME)-$(PKG_VERS).tar.gz ./install/*
+	cd work-native && tar -cJf ../native-$(PKG_NAME)-$(PKG_VERS).txz ./install/*

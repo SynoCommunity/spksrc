@@ -1,0 +1,96 @@
+Index: FFmpeg/fftools/ffprobe.c
+===================================================================
+--- fftools/ffprobe.c
++++ fftools/ffprobe.c
+@@ -147,6 +147,8 @@ static int show_private_data
+ #define SHOW_OPTIONAL_FIELDS_ALWAYS      1
+ static int show_optional_fields = SHOW_OPTIONAL_FIELDS_AUTO;
+ 
++static int only_show_first_video_frame = 0;
++
+ static char *output_format;
+ static char *stream_specifier;
+ static char *show_data_hash;
+@@ -3108,9 +3110,10 @@ static int read_interval_packets(WriterC
+     AVFormatContext *fmt_ctx = ifile->fmt_ctx;
+     AVPacket *pkt = NULL;
+     AVFrame *frame = NULL;
+-    int ret = 0, i = 0, frame_count = 0;
++    int ret = 0, i = 0, frame_count = 0, nb_video_streams = 0;
+     int64_t start = -INT64_MAX, end = interval->end;
+     int has_start = 0, has_end = interval->has_end && !interval->end_is_offset;
++    unsigned char *checked_stream = NULL;
+ 
+     av_log(NULL, AV_LOG_VERBOSE, "Processing read interval ");
+     log_read_interval(interval, NULL, AV_LOG_VERBOSE);
+@@ -3149,6 +3152,22 @@ static int read_interval_packets(WriterC
+         ret = AVERROR(ENOMEM);
+         goto end;
+     }
++
++    if (only_show_first_video_frame) {
++        int si = 0;
++        checked_stream = av_calloc(ifile->nb_streams, sizeof(unsigned char));
++        if (!checked_stream) {
++            ret = AVERROR(ENOMEM);
++            goto end;
++        }
++        for (si = 0; si < ifile->nb_streams; si ++) {
++            AVCodecParameters *par = ifile->streams[si].st->codecpar;
++            if (par->codec_type == AVMEDIA_TYPE_VIDEO) {
++                nb_video_streams++;
++                selected_streams[si] = 1;
++            }
++        }
++    }
+     while (!av_read_frame(fmt_ctx, pkt)) {
+         if (fmt_ctx->nb_streams > nb_streams) {
+             REALLOCZ_ARRAY_STREAM(nb_streams_frames,  nb_streams, fmt_ctx->nb_streams);
+@@ -3181,6 +3200,12 @@ static int read_interval_packets(WriterC
+             }
+ 
+             frame_count++;
++
++            if (only_show_first_video_frame) {
++                AVCodecParameters *par = ifile->streams[pkt->stream_index].st->codecpar;
++                if (par->codec_type != AVMEDIA_TYPE_VIDEO) continue;
++            }
++
+             if (do_read_packets) {
+                 if (do_show_packets)
+                     show_packet(w, ifile, pkt, i++);
+@@ -3201,6 +3226,16 @@ static int read_interval_packets(WriterC
+ 
+                 while (process_frame(w, ifile, frame, pkt, &packet_new) > 0);
+             }
++            if (only_show_first_video_frame) {
++                int nb_checked_streams = 0, si = 0;
++                checked_stream[pkt->stream_index] = 1;
++                for (si = 0; si < ifile->nb_streams; si ++) {
++                    nb_checked_streams += checked_stream[si];
++                }
++                if (nb_checked_streams >= nb_video_streams) {
++                    break;
++                }
++            }
+         }
+         av_packet_unref(pkt);
+     }
+@@ -3218,6 +3253,9 @@ static int read_interval_packets(WriterC
+ end:
+     av_frame_free(&frame);
+     av_packet_free(&pkt);
++    if (checked_stream) {
++        av_freep(&checked_stream);
++    }
+     if (ret < 0) {
+         av_log(NULL, AV_LOG_ERROR, "Could not read packets in interval ");
+         log_read_interval(interval, NULL, AV_LOG_ERROR);
+@@ -4609,6 +4647,7 @@ static const OptionDef real_options[] =
+     { "print_filename",        OPT_TYPE_FUNC, OPT_FUNC_ARG, {.func_arg = opt_print_filename}, "override the printed input filename", "print_file"},
+     { "find_stream_info",      OPT_TYPE_BOOL, OPT_INPUT | OPT_EXPERT, { &find_stream_info },
+         "read and decode the streams to fill missing information with heuristics" },
++    { "only_first_vframe",     OPT_TYPE_BOOL,        0, { &only_show_first_video_frame }, "only show first video frame when show_frames is used" },
+     { NULL, },
+ };
+ 

@@ -1,0 +1,7 @@
+This SynoCommunity package downloads the corresponding Nextcloud release from
+upstream during installation or upgrade.
+
+During installation the service scripts fetch the official archive into the
+package temporary directory and extract it into
+/var/services/web_packages/nextcloud. The downloaded tarball is cached in
+@tmp to support future reinstalls while keeping the published SPK small.

@@ -1,0 +1,12 @@
+Index: FFmpeg/libavcodec/hw_base_encode.h
+===================================================================
+--- libavcodec/hw_base_encode.h
++++ libavcodec/hw_base_encode.h
+@@ -248,6 +248,6 @@ int ff_hw_base_encode_close(FFHWBaseEnco
+     { "async_depth", "Maximum processing parallelism. " \
+       "Increase this to improve single channel performance.", \
+       OFFSET(common.base.async_depth), AV_OPT_TYPE_INT, \
+-      { .i64 = 2 }, 1, MAX_ASYNC_DEPTH, FLAGS }
++      { .i64 = 4 }, 1, MAX_ASYNC_DEPTH, FLAGS }
+ 
+ #endif /* AVCODEC_HW_BASE_ENCODE_H */

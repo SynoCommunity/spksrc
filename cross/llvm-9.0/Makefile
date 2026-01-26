@@ -10,37 +10,50 @@ COMMENT = The LLVM Project is a collection of modular and reusable compiler and 
 LICENSE = Apache v2.0 with LLVM Exceptions
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-CMAKE_USE_NINJA = 1
 
-# Using LLVM project source need to change to llvm sub-directory
-CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/llvm
-
-# https://llvm.org/docs/CMake.html
-CMAKE_ARGS += -DCMAKE_BUILD_TYPE=MinSizeRel
-CMAKE_ARGS += -Wno-dev
-CMAKE_ARGS += -DLLVM_BUILD_DOCS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_DOCS=OFF
-CMAKE_ARGS += -DLLVM_ENABLE_WARNINGS=OFF 
-CMAKE_ARGS += -DLLVM_INCLUDE_EXAMPLES=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF 
-CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
-CMAKE_ARGS += -DLLVM_DEFAULT_TARGET_TRIPLE=$(TC_TARGET)
-
-# Enable building with zlib to support compression/uncompression
+# -----------------------------------------------------------------------------
+# Dependencies
+# -----------------------------------------------------------------------------
 DEPENDS += cross/zlib
 CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 
-# Indicates whether the LLVM Interpreter will be
-# linked with the Foreign Function Interface library
-# (libffi) in order to enable calling external functions.
 DEPENDS += cross/libffi
-CMAKE_ARGS += LLVM_ENABLE_FFI=ON
+CMAKE_ARGS += -DLLVM_ENABLE_FFI=ON
 
 DEPENDS += cross/ncursesw
 CMAKE_ARGS += -DLLVM_ENABLE_TERMINFO=ON
 
 DEPENDS += cross/libxml2
 CMAKE_ARGS += -DLLVM_ENABLE_LIBXML2=ON
+
+DEPENDS += cross/z3
+CMAKE_ARGS += -DLLVM_ENABLE_Z3_SOLVER=ON
+CMAKE_ARGS += -DLLVM_Z3_INSTALL_DIR=$(STAGING_INSTALL_PREFIX)
+CMAKE_ARGS += -DZ3_RETURNCODE=0
+CMAKE_ARGS += -DZ3_RETURNCODE__TRYRUN_OUTPUT=""
+
+# -----------------------------------------------------------------------------
+# Directories
+# -----------------------------------------------------------------------------
+CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)/llvm
+
+# -----------------------------------------------------------------------------
+# CMake arguments - https://llvm.org/docs/CMake.html
+# -----------------------------------------------------------------------------
+CMAKE_ARGS += -DCMAKE_BUILD_TYPE=MinSizeRel
+CMAKE_ARGS += -DCMAKE_CROSSCOMPILING=TRUE
+CMAKE_ARGS += -DLLVM_DEFAULT_TARGET_TRIPLE=$(TC_TARGET)
+CMAKE_ARGS += -DCROSS_TOOLCHAIN_FLAGS_NATIVE=-DCMAKE_C_COMPILER=$$(which gcc)\;-DCMAKE_CXX_COMPILER=$$(which g++)
+
+# Suppress developer warnings
+CMAKE_ARGS += -Wno-dev
+
+# Disable LLVM's own extra warning flags
+CMAKE_ARGS += -DLLVM_ENABLE_WARNINGS=OFF
+
+# Assertions are internal checks to help find bugs.
+# They typically slow down LLVM and Clang when enabled
+CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 
 # When set to ON it removes many of the LLVM development and
 # testing tools as well as component libraries from the
@@ -49,15 +62,8 @@ CMAKE_ARGS += -DLLVM_ENABLE_LIBXML2=ON
 # are only intended for development and testing use.
 CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
 
-# Assertions are internal checks to help find bugs.
-# They typically slow down LLVM and Clang when enabled
-CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
-
-# BUILD_SHARED_LIBS is only recommended for use
-# by LLVM developers. If you want to build LLVM
-# as a shared library, you should use the
-# LLVM_BUILD_LLVM_DYLIB option
-# CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
+# Only recommended for use by LLVM developers. To build
+# LLVM as a shared library, use LLVM_BUILD_LLVM_DYLIB
 CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
 
 # The most impactful way to reduce binary size is
@@ -71,67 +77,68 @@ CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
 # enabled and still inherit from LLVM classes
 CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON
 
-# Requires native/llvm-9.0
-BUILD_DEPENDS = native/llvm-9.0
-CMAKE_ARGS += -DLLVM_TOOLS_BINARY_DIR=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin)
-CMAKE_ARGS += -DLLVM_CONFIG=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/llvm-config)
-CMAKE_ARGS += -DLLVM_TABLEGEN=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/llvm-tblgen)
-CMAKE_ARGS += -DCLANG_TABLEGEN=$(abspath $(PWD)/../../native/llvm-9.0/work-native/install/usr/local/bin/clang-tblgen)
+# Disable tests
+CMAKE_ARGS += -DCLANG_INCLUDE_DOCS=OFF
+CMAKE_ARGS += -DCLANG_INCLUDE_TESTS=OFF
+CMAKE_ARGS += -DLLVM_BUILD_TESTS=OFF
+CMAKE_ARGS += -DLLVM_BUILD_DOCS=OFF
+CMAKE_ARGS += -DLLVM_INCLUDE_DOCS=OFF
+CMAKE_ARGS += -DLLVM_INCLUDE_EXAMPLES=OFF
+CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
+CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
+CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
 
-include ../../mk/spksrc.common.mk
-
-#
-# https://llvm.org/docs/HowToCrossCompileBuiltinsOnArm.html
-#
-# armv7-6.1, hi3535-6.1 and comcerto2k
-# has errors with gnu-as related to compiler-rt
-#
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=ARM
-
-ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
-
-else ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
-
-else
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_BUILTINS=ON
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_PROFILE=OFF
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_SANITIZERS=OFF
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_XRAY=OFF
-endif
-endif
-
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=ARM
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
-endif
-
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=AArch64
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
-endif
-
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
-endif
-
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
-endif
-
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=PowerPC
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
-endif
+ADDITIONAL_CXXFLAGS  = -Wno-misleading-indentation
+ADDITIONAL_CXXFLAGS += -Wno-stringop-overflow
+ADDITIONAL_CXXFLAGS += -Wno-redundant-move
+ADDITIONAL_CXXFLAGS += -Wno-init-list-lifetime
+ADDITIONAL_CXXFLAGS += -Wno-range-loop-construct
 
 include ../../mk/spksrc.cross-cmake.mk
 
-ifeq ($(call version_lt, $(TC_GCC), 5.1),1)
-CMAKE_ARGS += -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON
-CMAKE_ARGS += -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
+ifeq ($(call version_lt, $(TC_GCC), 5),1)
+  CMAKE_ARGS += -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=TRUE
+  CMAKE_ARGS += -DZ3_VERSION_STRING=4.7.1
+else
+  CMAKE_ARGS += -DZ3_VERSION_STRING=4.11.2
+endif
+
+# -----------------------------------------------------------------------------
+# ARCH specific - https://llvm.org/docs/HowToCrossCompileBuiltinsOnArm.html
+# -----------------------------------------------------------------------------
+
+# Compiler run-time options:
+#   - Applies to all DSM >= 7 with exception of comcerto2k (gcc-4.9)
+#   - Applies to all DSM >= 6 with exception of ARMv7, and only partially supported by PPC
+ifneq ($(or $(call version_gt,$(TC_GCC),5),$(filter-out $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS),$(ARCH))),)
+  CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;compiler-rt;lld'
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_BUILTINS=ON
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_PROFILE=OFF
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_MEMPROF=OFF
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_SANITIZERS=OFF
+  CMAKE_ARGS += -DCOMPILER_RT_BUILD_XRAY=OFF
+else
+  CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='clang;lld'
+  PLIST_TRANSFORM = sed -e '/_rt\./d'
+endif
+
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=ARM
+endif
+
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=AArch64
+endif
+
+ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
+endif
+
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
+endif
+
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+  CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=PowerPC
 endif

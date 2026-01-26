@@ -5,19 +5,30 @@
 #  PYTHON_PACKAGE       Must be set to the python spk folder (python310, python311, ...)
 
 # set default spk/python* path to use
-PYTHON_PACKAGE_WORK_DIR = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION))
+PYTHON_PACKAGE_DIR = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE))
+PYTHON_PACKAGE_WORK_DIR = $(PYTHON_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
 
 include ../../mk/spksrc.common.mk
 
 # armv5 no longer supported with python >= 3.12
 ifeq ($(call version_ge, $(subst python,,$(PYTHON_PACKAGE)), 312), 1)
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 endif
 
-ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+# If no python3*/work-<arch>-<tcversion> is present
+# then default to legacy build needing to rebuild the
+# entire python binaries+libraries as build dependency.
 
+ifeq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+# Needed to find the spk/python3*/crossenv/requirement-*.txt files
+export PYTHON_PACKAGE_DIR
+
+BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
+
+else
 # Export variables so to be usable in crossenv and cross/*
 export PYTHON_PACKAGE
+export PYTHON_PACKAGE_DIR
 export PYTHON_PACKAGE_WORK_DIR
 export SPK_NAME
 
@@ -65,11 +76,6 @@ PYTHON_DEPENDS := $(foreach cross,$(filter-out $(PYTHON_DEPENDS_EXCLUDE),$(forea
 
 # call-up pre-depend to prepare the shared python build environment
 PRE_DEPEND_TARGET += python_pre_depend
-
-else
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
-endif
 endif
 
 ifneq ($(FFMPEG_PACKAGE),)

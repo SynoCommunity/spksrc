@@ -1,19 +1,19 @@
 SPK_NAME = syncthing
-SPK_VERS = 1.30.0
-SPK_REV = 32
+SPK_VERS = 2.0.13
+SPK_REV = 33
 SPK_ICON = src/syncthing.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/syncthing
 
-# archs not supported by go
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+# archs not supported by go (ARMv5 requires legacy toolchain no longer provided)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 
 MAINTAINER = acolomb
 DESCRIPTION = Automatically sync files via secure, distributed technology.
 DESCRIPTION_FRE = Synchronisation automatique de fichiers via une technologie sécurisée et distribuée.
 DISPLAY_NAME = Syncthing
-CHANGELOG = "Build syncthing v1.30.0 with go v1.23 for final ARMv5 compatibility. <br/><br/>REMARKS: New packages are rarely created because syncthing's automatic package updater is used. <br/>On ARMv5 archs (i.e. DS213air, DS213, DS413j, DS112, DS112+, DS212, DS212+, RS212, RS812, DS212j, DS112j, DS111, DS211, DS211+, DS411slim, DS411, RS411, DS211j and DS411j) the automatic update is disabled. Further updates will not work, and manual use of the internal updater will result in a broken installation."
+CHANGELOG = "1. Update Syncthing to v2.0.13 (built with Go 1.25). <br/>2. Drop legacy ARMv5 models that required the Go 1.23 compiler. <br/><br/>ATTENTION: This is a major version upgrade requiring a database migration on first launch. Please read the <a target=_blank href=https://github.com/syncthing/syncthing/releases/tag/v2.0.13>official release notes</a> and be prepared for some service downtime. <br/>REMARKS: New packages are rarely created because Syncthing's in-app updater is used."
 HOMEPAGE = https://www.syncthing.net
 LICENSE = MPLv2.0
 STARTABLE = yes

@@ -68,19 +68,28 @@ arch-noarch-%:
 
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: 
-	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [BEGIN]\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") | tee --append $(STATUS_LOG)
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain | tee --append build-$*.log
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [BEGIN]\n" \
+	        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
+	        | tee --append $(STATUS_LOG)
 	@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 ; \
 	status=$${PIPESTATUS[0]} ; \
-	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [END]\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") | tee --append $(STATUS_LOG) ; \
+	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [END]\n" \
+	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
+	       | tee --append $(STATUS_LOG) ; \
 	[ $${status[0]} -eq 0 ] || false
 
 build-noarch-%: SHELL:=/bin/bash
 build-noarch-%: 
-	@$(MSG) BUILDING noarch package for TCVERSION $*
+	@$(MSG) BUILDING noarch package for TCVERSION $* | tee --append build-noarch-$*.log
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, TCVERSION: %s, NAME: %s [BEGIN]\n" \
+	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
+	       | tee --append $(STATUS_LOG)
 	@MAKEFLAGS= $(MAKE) TCVERSION=$* ARCH=noarch 2>&1 ; \
 	status=$${PIPESTATUS[0]} ; \
-	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, TCVERSION: %s, NAME: %s [END]\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") | tee --append $(STATUS_LOG) ; \
+	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, TCVERSION: %s, NAME: %s [END]\n" \
+	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
+	       | tee --append $(STATUS_LOG) ; \
 	[ $${status[0]} -eq 0 ] || false
 
 ####
