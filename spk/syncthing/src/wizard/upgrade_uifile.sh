@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 page_append ()
 {
@@ -11,27 +11,27 @@ page_append ()
     fi
 }
 
-# Get the current installed syncthing version from the binary
-SYNCTHING="/var/packages/${SYNOPKG_PKGNAME}/target/bin/syncthing"
-SYNOPKG_PKGVAR="/var/packages/${SYNOPKG_PKGNAME}/var"
-
-OLD_MAJOR_VER=""
-if [ -x "${SYNCTHING}" ]; then
-    CUR_VER=$(HOME="${SYNOPKG_PKGVAR}" "${SYNCTHING}" --version 2>/dev/null | awk '{print $2}' | cut -d'-' -f1)
-    OLD_MAJOR_VER=$(echo "${CUR_VER}" | cut -d. -f1 | tr -d 'v')
-fi
+# Check for major version upgrade from v1.x
+check_major_upgrade ()
+{
+    SYNCTHING="/var/packages/${SYNOPKG_PKGNAME}/target/bin/syncthing"
+    if [ -x "${SYNCTHING}" ]; then
+        SYNOPKG_PKGVAR="/var/packages/${SYNOPKG_PKGNAME}/var"
+        OLD_MAJOR_VER=$(HOME="${SYNOPKG_PKGVAR}" "${SYNCTHING}" --version 2>/dev/null | awk '{print $2}' | cut -d. -f1 | tr -d 'v')
+        if [ "${OLD_MAJOR_VER}" = "1" ]; then
+            return 0  # true
+        fi
+    fi
+    return 1  # false
+}
 
 PAGE_MAJOR_UPGRADE=$(/bin/cat<<EOF
 {
     "step_title": "Important: Major Version Upgrade",
     "items": [{
-        "desc": "<b style=\\"color: red\\">Warning: You are upgrading from Syncthing v1.x to v2.x.</b>"
+        "desc": "<b>Warning:</b> You are upgrading from Syncthing v1.x to v2.x."
     },{
         "desc": "<b>Database Migration:</b> The database backend has switched from LevelDB to SQLite. On first launch after the upgrade, there will be a migration process which can be lengthy for larger setups."
-    },{
-        "desc": "<b style=\\"color: red\\">Do not interrupt the migration process.</b>"
-    },{
-        "desc": "<b>Recommendation:</b> Backup your Syncthing configuration and database before proceeding."
     },{
         "desc": "For full details on breaking changes, see the <a target=\"_blank\" href=\"https://github.com/syncthing/syncthing/releases/tag/v2.0.0\">Syncthing v2.0.0 release notes</a>."
     }]
@@ -59,17 +59,12 @@ EOF
 
 main ()
 {
-    local wizard_pages=""
-
-    # Show major upgrade warning for v1.x to v2.x upgrades
-    if [ "${OLD_MAJOR_VER}" = "1" ]; then
-        wizard_pages=$(page_append "${wizard_pages}" "${PAGE_MAJOR_UPGRADE}")
+    upgrade_page=""
+    if check_major_upgrade; then
+        upgrade_page=$(page_append "$upgrade_page" "$PAGE_MAJOR_UPGRADE")
     fi
-
-    # Always show the permissions page
-    wizard_pages=$(page_append "${wizard_pages}" "${PAGE_PERMISSIONS}")
-
-    echo "[${wizard_pages}]" > "${SYNOPKG_TEMP_LOGFILE}"
+    upgrade_page=$(page_append "$upgrade_page" "$PAGE_PERMISSIONS")
+    echo "[$upgrade_page]" > "${SYNOPKG_TEMP_LOGFILE}"
 }
 
 main "$@"
