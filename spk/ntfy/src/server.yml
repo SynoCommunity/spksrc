@@ -83,6 +83,14 @@ listen-http: ":8094"
 #   set to "read-write" (default), "read-only", "write-only" or "deny-all".
 # - auth-startup-queries allows you to run commands when the database is initialized, e.g. to enable
 #   WAL mode. This is similar to cache-startup-queries. See above for details.
+# - auth-users is a list of users that are automatically created when the server starts.
+#   Each entry is in the format "<username>:<password-hash>:<role>", e.g. "phil:$2a$10$YLiO8U21sX1uhZamTLJXHuxgVC0Z/GKISibrKCLohPgtG7yIxSk4C:user"
+#   Use 'ntfy user hash' to generate the password hash from a password.
+# - auth-access is a list of access control entries that are automatically created when the server starts.
+#   Each entry is in the format "<username>:<topic-pattern>:<access>", e.g. "phil:mytopic:rw" or "phil:phil-*:rw".
+# - auth-tokens is a list of access tokens that are automatically created when the server starts.
+#   Each entry is in the format "<username>:<token>[:<label>]", e.g. "phil:tk_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef:My token".
+#   Use 'ntfy token generate' to generate a new access token.
 #
 # Debian/RPM package users:
 #   Use /var/lib/ntfy/user.db as user database to avoid permission issues. The package
@@ -96,14 +104,27 @@ listen-http: ":8094"
 auth-file: /var/packages/ntfy/var/users.db
 # auth-default-access: "read-write"
 # auth-startup-queries:
+# auth-users:
+# auth-access:
+# auth-tokens:
 
-# If set, the X-Forwarded-For header is used to determine the visitor IP address
-# instead of the remote address of the connection.
+# If set, the X-Forwarded-For header (or whatever is configured in proxy-forwarded-header) is used to determine
+# the visitor IP address instead of the remote address of the connection.
 #
-# WARNING: If you are behind a proxy, you must set this, otherwise all visitors are rate limited
+# WARNING: If you are behind a proxy, you must set this, otherwise all visitors are rate-limited
 #          as if they are one.
 #
+# - behind-proxy makes it so that the real visitor IP address is extracted from the header defined in
+#   proxy-forwarded-header. Without this, the remote address of the incoming connection is used.
+# - proxy-forwarded-header is the header to use to identify visitors. It may be a single IP address (e.g. 1.2.3.4),
+#   a comma-separated list of IP addresses (e.g. "1.2.3.4, 5.6.7.8"), or an RFC 7239-style header (e.g. "for=1.2.3.4;by=proxy.example.com, for=5.6.7.8").
+# - proxy-trusted-hosts is a comma-separated list of IP addresses, hostnames or CIDRs that are removed from the forwarded header
+#   to determine the real IP address. This is only useful if there are multiple proxies involved that add themselves to
+#   the forwarded header.
+#
 # behind-proxy: false
+# proxy-forwarded-header: "X-Forwarded-For"
+# proxy-trusted-hosts:
 
 # If enabled, clients can attach files to notifications as attachments. Minimum settings to enable attachments
 # are "attachment-cache-dir" and "base-url".
@@ -117,6 +138,26 @@ auth-file: /var/packages/ntfy/var/users.db
 # attachment-total-size-limit: "5G"
 # attachment-file-size-limit: "15M"
 # attachment-expiry-duration: "3h"
+
+# Template directory for message templates.
+#
+# When "X-Template: <name>" (aliases: "Template: <name>", "Tpl: <name>") or "?template=<name>" is set, transform the message
+# based on one of the built-in pre-defined templates, or on a template defined in the "template-dir" directory.
+#
+# Template files must have the ".yml" extension and must be formatted as YAML. They may contain "title" and "message" keys,
+# which are interpreted as Go templates.
+#
+# Example template file (e.g. /etc/ntfy/templates/grafana.yml):
+#   title: |
+#     {{- if eq .status "firing" }}
+#     {{ .title | default "Alert firing" }}
+#     {{- else if eq .status "resolved" }}
+#     {{ .title | default "Alert resolved" }}
+#     {{- end }}
+#   message: |
+#     {{ .message | trunc 2000 }}
+#
+# template-dir: "/etc/ntfy/templates"
 
 # If enabled, allow outgoing e-mail notifications via the 'X-Email' header. If this header is set,
 # messages will additionally be sent out as e-mail using an external SMTP server.
@@ -140,7 +181,7 @@ auth-file: /var/packages/ntfy/var/users.db
 # - smtp-server-domain is the e-mail domain, e.g. ntfy.sh
 # - smtp-server-addr-prefix is an optional prefix for the e-mail addresses to prevent spam. If set to "ntfy-",
 #   for instance, only e-mails to ntfy-$topic@ntfy.sh will be accepted. If this is not set, all emails to
-#   $topic@ntfy.sh will be accepted (which may obviously be a spam problem).
+#   $topic@ntfy.sh will be accepted (which may be a spam problem).
 #
 # smtp-server-listen:
 # smtp-server-domain:
@@ -148,7 +189,7 @@ auth-file: /var/packages/ntfy/var/users.db
 
 # Web Push support (background notifications for browsers)
 #
-# If enabled, allows ntfy to receive push notifications, even when the ntfy web app is closed. When enabled, users
+# If enabled, allows the ntfy web app to receive push notifications, even when the web app is closed. When enabled, users
 # can enable background notifications in the web app. Once enabled, ntfy will forward published messages to the push
 # endpoint, which will then forward it to the browser.
 #
@@ -157,15 +198,19 @@ auth-file: /var/packages/ntfy/var/users.db
 #
 # - web-push-public-key is the generated VAPID public key, e.g. AA1234BBCCddvveekaabcdfqwertyuiopasdfghjklzxcvbnm1234567890
 # - web-push-private-key is the generated VAPID private key, e.g. AA2BB1234567890abcdefzxcvbnm1234567890
-# - web-push-file is a database file to keep track of browser subscription endpoints, e.g. `/var/cache/ntfy/webpush.db`
-# - web-push-email-address is the admin email address send to the push provider, e.g. `sysadmin@example.com`
+# - web-push-file is a database file to keep track of browser subscription endpoints, e.g. /var/cache/ntfy/webpush.db
+# - web-push-email-address is the admin email address send to the push provider, e.g. sysadmin@example.com
 # - web-push-startup-queries is an optional list of queries to run on startup`
+# - web-push-expiry-warning-duration defines the duration after which unused subscriptions are sent a warning (default is 55d`)
+# - web-push-expiry-duration defines the duration after which unused subscriptions will expire (default is 60d)
 #
 # web-push-public-key:
 # web-push-private-key:
 # web-push-file:
 # web-push-email-address:
 # web-push-startup-queries:
+# web-push-expiry-warning-duration: "55d"
+# web-push-expiry-duration: "60d"
 
 # If enabled, ntfy can perform voice calls via Twilio via the "X-Call" header.
 #
@@ -173,11 +218,13 @@ auth-file: /var/packages/ntfy/var/users.db
 # - twilio-auth-token is the Twilio auth token, e.g. affebeef258625862586258625862586
 # - twilio-phone-number is the outgoing phone number you purchased, e.g. +18775132586
 # - twilio-verify-service is the Twilio Verify service SID, e.g. VA12345beefbeef67890beefbeef122586
+# - twilio-call-format is the custom TwiML send to the Call API (optional, see https://www.twilio.com/docs/voice/twiml)
 #
 # twilio-account:
 # twilio-auth-token:
 # twilio-phone-number:
 # twilio-verify-service:
+# twilio-call-format:
 
 # Interval in which keepalive messages are sent to the client. This is to prevent
 # intermediaries closing the connection for inactivity.
@@ -216,6 +263,7 @@ web-root: /
 #
 # - enable-signup allows users to sign up via the web app, or API
 # - enable-login allows users to log in via the web app, or API
+# - require-login redirects users to the login page if they are not logged in (disallows web app access without login)
 # - enable-reservations allows users to reserve topics (if their tier allows it)
 #
 # enable-signup: false
@@ -283,6 +331,18 @@ enable-reservations: true
 #
 # visitor-email-limit-burst: 16
 # visitor-email-limit-replenish: "1h"
+
+# Rate limiting: IPv4/IPv6 address prefix bits used for rate limiting
+# - visitor-prefix-bits-ipv4: number of bits of the IPv4 address to use for rate limiting (default: 32, full address)
+# - visitor-prefix-bits-ipv6: number of bits of the IPv6 address to use for rate limiting (default: 64, /64 subnet)
+#
+# This is used to group visitors by their IP address or subnet. For example, if you set visitor-prefix-bits-ipv4 to 24,
+# all visitors in the 1.2.3.0/24 network are treated as one.
+#
+# By default, ntfy uses the full IPv4 address (32 bits) and the /64 subnet of the IPv6 address (64 bits).
+#
+# visitor-prefix-bits-ipv4: 32
+# visitor-prefix-bits-ipv6: 64
 
 # Rate limiting: Attachment size and bandwidth limits per visitor:
 # - visitor-attachment-total-size-limit is the total storage limit used for attachments per visitor

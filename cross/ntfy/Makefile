@@ -1,7 +1,7 @@
 PKG_NAME = ntfy
-PKG_VERS = 2.11.0
+PKG_VERS = 2.16.0
 # keep the commit in sync with version $(PKG_VERS)
-PKG_COMMIT = d11b1007ef5cf8546adee9db3fb8ebf61ce9b17a
+PKG_COMMIT = 4b474a89b7803e8f974f888021612c2c49cce734
 PKG_DATE = $(shell date +%s)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
@@ -14,9 +14,10 @@ BUILD_DEPENDS = native/go
 DEPENDS =
 
 # go does not support ppc archs
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 # ARMv5 is lacking atomics support (error: '__ATOMIC_CONSUME' undeclared, error: '__ATOMIC_RELEASE' undeclared)
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
+# and ARMv5 is not supported with go >= 1.24 anyway
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 HOMEPAGE = https://ntfy.sh/
 COMMENT  = Send push notifications to your phone or desktop using PUT/POST.
