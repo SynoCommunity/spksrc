@@ -13,4 +13,4 @@ TC_TARGET = aarch64-unknown-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_CFLAGS = -march=armv8-a -mcpu=cortex-a53+crypto
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

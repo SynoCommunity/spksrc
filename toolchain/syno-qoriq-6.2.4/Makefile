@@ -11,7 +11,7 @@ TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 TC_EXTRA_RUSTFLAGS = -Ctarget-cpu=e500
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk
 
 ifneq ($(RUST_BUILD_TOOLCHAIN),1)
 DEPENDS = toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust

@@ -16,4 +16,4 @@ TC_TARGET = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_CFLAGS = -mhard-float -mfpu=vfpv3-d16 -march=armv7-a -mtune=cortex-a9
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

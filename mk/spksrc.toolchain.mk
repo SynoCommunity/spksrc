@@ -70,9 +70,9 @@ toolchain_msg:
 
 include ../../mk/spksrc.depend.mk
 
-include ../../mk/spksrc.tc-vers.mk
+include ../../mk/spksrc.toolchain/versions.mk
 
-include ../../mk/spksrc.tc-flags.mk
+include ../../mk/spksrc.toolchain/flags.mk
 
 include ../../mk/spksrc.status.mk
 
@@ -86,15 +86,15 @@ extract: checksum
 include ../../mk/spksrc.extract.mk
 
 fix: extract
-include ../../mk/spksrc.tc-fix.mk
+include ../../mk/spksrc.toolchain/fix.mk
 
 patch: fix
 include ../../mk/spksrc.patch.mk
 
 rustc: patch
-include ../../mk/spksrc.tc-rust.mk
+include ../../mk/spksrc.toolchain/rust.mk
 
-include ../../mk/spksrc.tc-vars.mk
+include ../../mk/spksrc.toolchain/vars.mk
 
 #####
 

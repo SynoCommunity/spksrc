@@ -13,4 +13,4 @@ TC_DIST_SITE_PATH = Intel%20x86%20Linux%203.2.40%20%28Pineview%29
 TC_TARGET = x86_64-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sys-root
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

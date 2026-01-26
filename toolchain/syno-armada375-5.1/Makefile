@@ -14,7 +14,7 @@ TC_EXTRA_CFLAGS = -mhard-float -mfpu=vfpv3
 
 PRE_FIX_TARGET = syno_armada375_fix
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk
 
 .PHONY: syno_armada375_fix
 syno_armada375_fix:
