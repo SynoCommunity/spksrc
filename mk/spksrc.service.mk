@@ -405,7 +405,11 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/$(SPK_NAME).sc:
 ifneq ($(strip $(SERVICE_PORT_TITLE)),)
 	@echo "title=\"$(SERVICE_PORT_TITLE)\"" >> $@
 else
+ifneq ($(strip $(DISPLAY_NAME)),)
+	@echo "title=\"$(DISPLAY_NAME)\"" >> $@
+else
 	@echo "title=\"$(SPK_NAME)\"" >> $@
+endif
 endif
 ifneq ($(strip $(DISPLAY_NAME)),)
 	@echo "desc=\"$(DISPLAY_NAME)\"" >> $@
