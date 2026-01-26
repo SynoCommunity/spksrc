@@ -17,6 +17,10 @@ PWD := $(CURDIR)
 # makefiles.
 default: all
 
+# Marks tc_vars generation as completed for stage1 (bootstrap)
+# used with spksrc.cross-cc.mk and spksrc.spk.mk
+TCVARS_DONE := $(WORK_DIR)/.tcvars_done
+
 # Stop on first error
 SHELL := $(SHELL) -e
 
