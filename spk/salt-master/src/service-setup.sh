@@ -41,6 +41,12 @@ service_poststop()
     rm -f "${PID_FILE_MASTER}" "${PID_FILE_API}"
 }
 
+service_preupgrade()
+{
+    # Remove saltgui folder to allow clean upgrade (static web assets, not user config)
+    rm -rf "${SYNOPKG_PKGVAR}/saltgui"
+}
+
 service_postinst()
 {
     install_python_virtualenv
