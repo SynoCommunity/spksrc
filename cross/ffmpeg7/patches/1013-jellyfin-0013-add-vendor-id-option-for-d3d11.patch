@@ -2,7 +2,7 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.c
 ===================================================================
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
-@@ -638,6 +638,8 @@ static int d3d11va_device_create(AVHWDev
+@@ -640,6 +640,8 @@ static int d3d11va_device_create(AVHWDev
          adapter = atoi(device);
      } else {
          AVDictionaryEntry *e = av_dict_get(opts, "vendor_id", NULL, 0);

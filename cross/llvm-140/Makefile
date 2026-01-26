@@ -1,6 +1,6 @@
 PKG_NAME = llvm-140
 PKG_LLVM_MAJ = 14
-PKG_VERS = $(PKG_LLVM_MAJ).0.5
+PKG_VERS = $(PKG_LLVM_MAJ).0.6
 PKG_DIR = llvm-project
 
 HOMEPAGE = https://llvm.org/
@@ -70,7 +70,8 @@ CMAKE_ARGS += -DLLVM_ENABLE_DUMP=ON
 # Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
 
 # Remove build warnings
-ADDITIONAL_CXXFLAGS  = -Wno-cast-function-type
+ADDITIONAL_CXXFLAGS  = -Wno-attributes
+ADDITIONAL_CXXFLAGS += -Wno-cast-function-type
 ADDITIONAL_CXXFLAGS += -Wno-enum-compare
 ADDITIONAL_CXXFLAGS += -Wno-pedantic
 ADDITIONAL_CXXFLAGS += -Wno-switch

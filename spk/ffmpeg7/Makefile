@@ -1,13 +1,13 @@
 SPK_NAME = ffmpeg7
-SPK_VERS = 7.0.3
-SPK_REV = 5
+SPK_VERS = 7.1.3
+SPK_REV = 6
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to using updated synocli-videodriver package."
+CHANGELOG = "1. Update to using updated synocli-videodriver package.<br/>2. No longer support ARMv7L (hi3535) architecture"
 
 DEPENDS = cross/ffmpeg7
 
-# requires c11 support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# requires c11 and proper atomic using gcc-4.9+ support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg

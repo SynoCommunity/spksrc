@@ -1,0 +1,289 @@
+Index: FFmpeg/libavcodec/dxva2.c
+===================================================================
+--- libavcodec/dxva2.c
++++ libavcodec/dxva2.c
+@@ -298,12 +298,13 @@ static void dxva_list_guids_debug(AVCode
+ }
+ 
+ static int dxva_get_decoder_guid(AVCodecContext *avctx, void *service, void *surface_format,
+-                                 unsigned guid_count, const GUID *guid_list, GUID *decoder_guid)
++                                 unsigned guid_count, const GUID *guid_list, GUID *decoder_guid, int guid_debug)
+ {
+     FFDXVASharedContext *sctx = DXVA_SHARED_CONTEXT(avctx);
+     unsigned i, j;
+ 
+-    dxva_list_guids_debug(avctx, service, guid_count, guid_list);
++    if (guid_debug)
++        dxva_list_guids_debug(avctx, service, guid_count, guid_list);
+ 
+     *decoder_guid = ff_GUID_NULL;
+     for (i = 0; dxva_modes[i].guid; i++) {
+@@ -434,7 +435,7 @@ static int dxva2_create_decoder(AVCodecC
+     }
+ 
+     ret = dxva_get_decoder_guid(avctx, sctx->dxva2_service, &surface_format,
+-                                guid_count, guid_list, &device_guid);
++                                guid_count, guid_list, &device_guid, 1);
+     CoTaskMemFree(guid_list);
+     if (ret < 0) {
+         goto fail;
+@@ -524,28 +525,34 @@ static DXGI_FORMAT d3d11va_map_sw_to_hw_
+     }
+ }
+ 
+-static int d3d11va_create_decoder(AVCodecContext *avctx)
++static unsigned d3d11va_prefer_array_of_tex(const AVCodecContext *avctx,
++                                            D3D11_VIDEO_DECODER_CONFIG config)
++{
++    switch (avctx->codec_id) {
++    case AV_CODEC_ID_H264:
++    case AV_CODEC_ID_HEVC:
++    case AV_CODEC_ID_VP9:
++    case AV_CODEC_ID_AV1:
++        return (config.ConfigDecoderSpecific >> 14) & 1;
++    default:
++        return 0;
++    }
++}
++
++static int d3d11va_get_decoder_desc_and_config(AVCodecContext *avctx,
++                                               AVHWFramesContext *frames_ctx,
++                                               int guid_debug,
++                                               GUID *decoder_guid,
++                                               D3D11_VIDEO_DECODER_DESC *desc,
++                                               D3D11_VIDEO_DECODER_CONFIG *config)
+ {
+-    FFDXVASharedContext *sctx = DXVA_SHARED_CONTEXT(avctx);
+     GUID *guid_list;
+     unsigned guid_count, i;
+-    GUID decoder_guid;
+-    D3D11_VIDEO_DECODER_DESC desc = { 0 };
+-    D3D11_VIDEO_DECODER_CONFIG config;
+-    AVHWFramesContext *frames_ctx = (AVHWFramesContext *)avctx->hw_frames_ctx->data;
+     AVD3D11VADeviceContext *device_hwctx = frames_ctx->device_ctx->hwctx;
+-    AVD3D11VAFramesContext *frames_hwctx = frames_ctx->hwctx;
+     DXGI_FORMAT surface_format = d3d11va_map_sw_to_hw_format(frames_ctx->sw_format);
+-    D3D11_TEXTURE2D_DESC texdesc;
+     HRESULT hr;
+     int ret;
+ 
+-    if (!frames_hwctx->texture) {
+-        av_log(avctx, AV_LOG_ERROR, "AVD3D11VAFramesContext.texture not set.\n");
+-        return AVERROR(EINVAL);
+-    }
+-    ID3D11Texture2D_GetDesc(frames_hwctx->texture, &texdesc);
+-
+     guid_count = ID3D11VideoDevice_GetVideoDecoderProfileCount(device_hwctx->video_device);
+     guid_list = av_malloc_array(guid_count, sizeof(*guid_list));
+     if (guid_list == NULL || guid_count == 0) {
+@@ -563,36 +570,71 @@ static int d3d11va_create_decoder(AVCode
+     }
+ 
+     ret = dxva_get_decoder_guid(avctx, device_hwctx->video_device, &surface_format,
+-                                guid_count, guid_list, &decoder_guid);
++                                guid_count, guid_list, decoder_guid, guid_debug);
+     av_free(guid_list);
+     if (ret < 0)
+         return AVERROR(EINVAL);
+ 
+-    desc.SampleWidth  = avctx->coded_width;
+-    desc.SampleHeight = avctx->coded_height;
+-    desc.OutputFormat = surface_format;
+-    desc.Guid         = decoder_guid;
++    desc->SampleWidth  = avctx->coded_width;
++    desc->SampleHeight = avctx->coded_height;
++    desc->OutputFormat = surface_format;
++    desc->Guid         = *decoder_guid;
+ 
+-    ret = d3d11va_get_decoder_configuration(avctx, device_hwctx->video_device, &desc, &config);
++    ret = d3d11va_get_decoder_configuration(avctx, device_hwctx->video_device, desc, config);
+     if (ret < 0)
+         return AVERROR(EINVAL);
+ 
+-    sctx->d3d11_views = av_calloc(texdesc.ArraySize, sizeof(sctx->d3d11_views[0]));
++    return 0;
++}
++
++static int d3d11va_create_decoder(AVCodecContext *avctx)
++{
++    FFDXVASharedContext *sctx = DXVA_SHARED_CONTEXT(avctx);
++    unsigned i;
++    GUID decoder_guid;
++    D3D11_VIDEO_DECODER_DESC desc = { 0 };
++    D3D11_VIDEO_DECODER_CONFIG config;
++    AVHWFramesContext *frames_ctx = (AVHWFramesContext *)avctx->hw_frames_ctx->data;
++    AVD3D11VADeviceContext *device_hwctx = frames_ctx->device_ctx->hwctx;
++    AVD3D11VAFramesContext *frames_hwctx = frames_ctx->hwctx;
++    HRESULT hr;
++    int ret, array_of_tex;
++
++    if ((ret = d3d11va_get_decoder_desc_and_config(avctx, frames_ctx, 1, &decoder_guid, &desc, &config)) < 0)
++        return AVERROR(EINVAL);
++
++    array_of_tex = !frames_hwctx->texture && d3d11va_prefer_array_of_tex(avctx, config);
++    av_log(avctx, AV_LOG_VERBOSE, "Creating the decoder with %s.\n",
++           array_of_tex ? "an array of textures" : "a texture array");
++
++    if (array_of_tex) {
++        for (i = 0; i < frames_ctx->initial_pool_size; i++) {
++            if (!frames_hwctx->texture_infos || !frames_hwctx->texture_infos[i].texture) {
++                av_log(avctx, AV_LOG_ERROR, "AVD3D11VAFramesContext.texture_infos[%d].texture not set.\n", i);
++                return AVERROR(EINVAL);
++            }
++        }
++    } else if (!frames_hwctx->texture) {
++        av_log(avctx, AV_LOG_ERROR, "AVD3D11VAFramesContext.texture not set.\n");
++        return AVERROR(EINVAL);
++    }
++
++    sctx->d3d11_views = av_calloc(frames_ctx->initial_pool_size, sizeof(sctx->d3d11_views[0]));
+     if (!sctx->d3d11_views)
+         return AVERROR(ENOMEM);
+-    sctx->nb_d3d11_views = texdesc.ArraySize;
++    sctx->nb_d3d11_views = frames_ctx->initial_pool_size;
+ 
+     for (i = 0; i < sctx->nb_d3d11_views; i++) {
+         D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc = {
+             .DecodeProfile = decoder_guid,
+             .ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D,
+             .Texture2D = {
+-                .ArraySlice = i,
++                .ArraySlice = array_of_tex ? 0 : i,
+             }
+         };
++        ID3D11Texture2D *tex = array_of_tex ? frames_hwctx->texture_infos[i].texture : frames_hwctx->texture;
+         hr = ID3D11VideoDevice_CreateVideoDecoderOutputView(device_hwctx->video_device,
+-                                                            (ID3D11Resource*) frames_hwctx->texture,
+-                                                            &viewDesc,
++                                                            (ID3D11Resource*) tex, &viewDesc,
+                                                             (ID3D11VideoDecoderOutputView**) &sctx->d3d11_views[i]);
+         if (FAILED(hr)) {
+             av_log(avctx, AV_LOG_ERROR, "Could not create the decoder output view %d\n", i);
+@@ -608,7 +650,8 @@ static int d3d11va_create_decoder(AVCode
+     }
+ 
+     sctx->d3d11_config = config;
+-    sctx->d3d11_texture = frames_hwctx->texture;
++    sctx->d3d11_texture = array_of_tex ? NULL : frames_hwctx->texture;
++    sctx->d3d11_texture_infos = array_of_tex ? frames_hwctx->texture_infos : NULL;
+ 
+     sctx->decoder_ref = bufref_wrap_interface((IUnknown *)sctx->d3d11_decoder);
+     if (!sctx->decoder_ref)
+@@ -716,9 +759,19 @@ int ff_dxva2_common_frame_params(AVCodec
+     if (frames_ctx->format == AV_PIX_FMT_D3D11) {
+         AVD3D11VAFramesContext *frames_hwctx = frames_ctx->hwctx;
+         AVD3D11VADeviceContext *device_hwctx = device_ctx->hwctx;
++        GUID decoder_guid;
++        D3D11_VIDEO_DECODER_DESC desc = { 0 };
++        D3D11_VIDEO_DECODER_CONFIG config;
+ 
+         frames_hwctx->BindFlags |= D3D11_BIND_DECODER;
+         frames_hwctx->require_sync = device_hwctx->device_desc.VendorId == 0x8086;
++
++        if (!d3d11va_get_decoder_desc_and_config(avctx, frames_ctx, 0, &decoder_guid, &desc, &config)) {
++            frames_hwctx->array_of_tex = d3d11va_prefer_array_of_tex(avctx, config);
++
++            if (frames_hwctx->array_of_tex && device_hwctx->device_desc.VendorId == 0x1002)
++                frames_hwctx->require_sync = 1;
++        }
+     }
+ #endif
+ 
+@@ -823,14 +876,40 @@ int ff_dxva2_decode_uninit(AVCodecContex
+     return 0;
+ }
+ 
++#if CONFIG_D3D11VA
++static int d3d11va_get_surface_index(const AVCodecContext *avctx,
++                                     const AVFrame *frame)
++{
++    if (frame->format == AV_PIX_FMT_D3D11) {
++        FFDXVASharedContext *sctx = DXVA_SHARED_CONTEXT(avctx);
++        AVDXVAContext *ctx = DXVA_CONTEXT(avctx);
++        int i, array_of_tex = !sctx->d3d11_texture &&
++            d3d11va_prefer_array_of_tex(avctx, *(D3D11VA_CONTEXT(ctx)->cfg));
++        ID3D11Texture2D *tex = (ID3D11Texture2D *)frame->data[0];
++        intptr_t index = (intptr_t)frame->data[1];
++
++        if (array_of_tex) {
++            for (i = 0; i < sctx->nb_d3d11_views; i++) {
++                if (sctx->d3d11_texture_infos[i].texture == tex)
++                    return i;
++            }
++        } else
++            return index;
++    }
++    return -1;
++}
++#endif
++
+ static void *get_surface(const AVCodecContext *avctx, const AVFrame *frame)
+ {
+ #if CONFIG_D3D11VA
+     if (frame->format == AV_PIX_FMT_D3D11) {
+         FFDXVASharedContext *sctx = DXVA_SHARED_CONTEXT(avctx);
+-        intptr_t index = (intptr_t)frame->data[1];
++        ID3D11Texture2D *tex = (ID3D11Texture2D *)frame->data[0];
++        int index = d3d11va_get_surface_index(avctx, frame);
++
+         if (index < 0 || index >= sctx->nb_d3d11_views ||
+-            sctx->d3d11_texture != (ID3D11Texture2D *)frame->data[0]) {
++            (sctx->d3d11_texture && sctx->d3d11_texture != tex)) {
+             av_log((void *)avctx, AV_LOG_ERROR, "get_buffer frame is invalid!\n");
+             return NULL;
+         }
+@@ -853,8 +932,10 @@ unsigned ff_dxva2_get_surface_index(cons
+     }
+ #endif
+ #if CONFIG_D3D11VA
+-    if (avctx->pix_fmt == AV_PIX_FMT_D3D11)
+-        return (intptr_t)frame->data[1];
++    if (avctx->pix_fmt == AV_PIX_FMT_D3D11) {
++        int index = d3d11va_get_surface_index(avctx, frame);
++        return FFMAX(index, 0);
++    }
+     if (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD) {
+         D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
+         ID3D11VideoDecoderOutputView_GetDesc((ID3D11VideoDecoderOutputView*) surface, &viewDesc);
+Index: FFmpeg/libavcodec/dxva2_internal.h
+===================================================================
+--- libavcodec/dxva2_internal.h
++++ libavcodec/dxva2_internal.h
+@@ -100,6 +100,7 @@ typedef struct FFDXVASharedContext {
+     ID3D11VideoDecoderOutputView  **d3d11_views;
+     int                          nb_d3d11_views;
+     ID3D11Texture2D                *d3d11_texture;
++    AVD3D11FrameDescriptor         *d3d11_texture_infos;
+ #endif
+ 
+ #if CONFIG_DXVA2
+Index: FFmpeg/libavutil/hwcontext_d3d11va.c
+===================================================================
+--- libavutil/hwcontext_d3d11va.c
++++ libavutil/hwcontext_d3d11va.c
+@@ -318,7 +318,8 @@ static int d3d11va_frames_init(AVHWFrame
+         ctx->initial_pool_size = texDesc2.ArraySize;
+         hwctx->BindFlags = texDesc2.BindFlags;
+         hwctx->MiscFlags = texDesc2.MiscFlags;
+-    } else if (!(texDesc.BindFlags & D3D11_BIND_RENDER_TARGET) && texDesc.ArraySize > 0) {
++    } else if ((!(texDesc.BindFlags & D3D11_BIND_RENDER_TARGET) &&
++                !((texDesc.BindFlags & D3D11_BIND_DECODER) && hwctx->array_of_tex)) && texDesc.ArraySize > 0) {
+         hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &hwctx->texture);
+         if (FAILED(hr)) {
+             av_log(ctx, AV_LOG_ERROR, "Could not create the texture (%lx)\n", (long)hr);
+Index: FFmpeg/libavutil/hwcontext_d3d11va.h
+===================================================================
+--- libavutil/hwcontext_d3d11va.h
++++ libavutil/hwcontext_d3d11va.h
+@@ -188,6 +188,11 @@ typedef struct AVD3D11VAFramesContext {
+      * Whether the frames require extra sync when exporting as external memory.
+      */
+     int require_sync;
++
++    /**
++     * Whether to alloc an array of textures when (BindFlags & D3D11_BIND_DECODER).
++     */
++    int array_of_tex;
+ } AVD3D11VAFramesContext;
+ 
+ #endif /* AVUTIL_HWCONTEXT_D3D11VA_H */
