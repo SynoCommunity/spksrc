@@ -1,5 +1,5 @@
 SPK_NAME = zabbix-agent
-SPK_VERS = 7.2.14
+SPK_VERS = 7.4.5
 SPK_REV = 1
 SPK_ICON = src/zabbix.png
 

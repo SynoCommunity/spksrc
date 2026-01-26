@@ -1,6 +1,6 @@
 PKG_NAME = zabbix-agent
 REAL_PKG_NAME = zabbix
-PKG_VERS = 7.2.14
+PKG_VERS = 7.4.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(REAL_PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 SHORT_VERSION = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
