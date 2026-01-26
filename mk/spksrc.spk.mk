@@ -500,6 +500,8 @@ package: $(SPK_FILE_NAME)
 # -----------------------------------------------------------------------------
 # Stage1: Toolchain bootstrap
 # -----------------------------------------------------------------------------
+TCVARS_DONE := $(WORK_DIR)/.tcvars_done
+
 .PHONY: spk-stage1
 spk-stage1: $(TCVARS_DONE)
 
