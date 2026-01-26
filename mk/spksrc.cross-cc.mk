@@ -135,6 +135,8 @@ include ../../mk/spksrc.plist.mk
 #  - First call builds the toolchain (download / extract / patch / build)
 #  - Second call generates tc_vars* files in the package WORK_DIR
 # -----------------------------------------------------------------------------
+TCVARS_DONE := $(WORK_DIR)/.tcvars_done
+
 .PHONY: cross-stage1
 cross-stage1: $(TCVARS_DONE)
 
