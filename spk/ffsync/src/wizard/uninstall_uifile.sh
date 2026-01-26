@@ -24,7 +24,7 @@ PAGE_FFSYNC_REMOVE=$(/bin/cat<<EOF
 		"desc": "Attention: The Mozilla Sync Server database will be removed during package uninstallation. All users and sync data will be deleted."
 	}, {
 		"type": "password",
-		"desc": "Enter your MySQL password",
+		"desc": "Enter your MariaDB password",
 		"subitems": [{
 			"key": "wizard_mysql_password_root",
 			"desc": "Root password",

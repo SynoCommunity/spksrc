@@ -1,19 +1,14 @@
-PKG_NAME = lsd
-PKG_VERS = 1.1.5
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/lsd-rs/lsd/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = lsd-main
 
-DEPENDS =
+OPTIONAL_DEPENDS  = cross/lsd-latest
+OPTIONAL_DEPENDS += cross/lsd-1.1
 
-# even it compiles with native/rust-qoriq, the tool does not run
-# on other PPC archs than qoriq (fails with "Segmentation fault (core dumped)")
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-HOMEPAGE = https://github.com/lsd-rs/lsd
-COMMENT  = The next gen ls command.
-LICENSE  = Apache 2.0
+include ../../mk/spksrc.main-depends.mk
 
-include ../../mk/spksrc.cross-rust.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+DEPENDS = cross/lsd-1.1
+else
+DEPENDS = cross/lsd-latest
+endif

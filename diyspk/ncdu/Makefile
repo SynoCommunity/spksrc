@@ -1,5 +1,5 @@
 SPK_NAME = ncdu
-SPK_VERS = 1.20
+SPK_VERS = 1.22
 SPK_REV = 1
 
 DEPENDS = cross/ncdu

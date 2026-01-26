@@ -1,15 +1,13 @@
 PKG_NAME = x264
-PKG_VERS = 20240512-stable
+PKG_VERS = 20250608-stable
 PKG_EXT = tar.gz
-PKG_GIT_HASH = 4613ac3c15fd75cebc4b9f65b7fb95e70a3acce1
+PKG_GIT_HASH = b35605ace3ddf7c1a5d67a2eb553f034aef41d55
 PKG_DIST_NAME = $(PKG_NAME)-master.$(PKG_EXT)
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://code.videolan.org/videolan/x264/-/archive/$(PKG_GIT_HASH)
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_GIT_HASH)
 
 DEPENDS =
-OPTIONAL_DEPENDS = native/nasm
 
 HOMEPAGE = https://www.videolan.org/developers/x264.html
 COMMENT  = x264 is a free software library and application for encoding video streams into the H.264/MPEG-4 AVC forma
@@ -47,10 +45,7 @@ endif
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
-ENV += AS=$(NASM_PATH)/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
+ENV += AS=$(shell which nasm)
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))

@@ -15,4 +15,6 @@ HOMEPAGE = https://github.com/chmln/sd#readme
 COMMENT  = Intuitive find & replace CLI (sed alternative).
 LICENSE  = MIT
 
+CARGO_BUILD_ARGS = --locked
+
 include ../../mk/spksrc.cross-rust.mk

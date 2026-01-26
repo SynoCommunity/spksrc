@@ -1,0 +1,280 @@
+# similar to original update 
+# https://codeberg.org/mbunkus/mkvtoolnix/commit/ab6455f68c597ede3d6959597a38f2ecbc198011
+# but for MKVToolNix v22.0.0
+# 
+# 
+# build system: fix compatibility with Ruby 3.2.0
+# 
+# Several deprecated functions were removed: `Dir.exists?`,
+# `File.exists?` & `FileTest.exists?`.  Instead of those
+# `FileTest.exist?` must be used (without the `s`). See the release
+# notes for Ruby 3.2.0 as well as the issue for removing the functions:
+# 
+# https://www.ruby-lang.org/en/news/2022/12/25/ruby-3-2-0-released/
+# https://bugs.ruby-lang.org/issues/17391
+#
+#
+--- Rakefile.orig	2018-04-01 15:27:19.000000000 +0000
++++ Rakefile	2025-07-17 08:46:02.295719800 +0000
+@@ -195,7 +195,7 @@
+   targets << ($run_unit_tests ? 'tests:run_unit' : 'tests:unit') if $have_gtest
+ 
+   # The tags file -- but only if it exists already
+-  if File.exists?("TAGS")
++  if FileTest.exist?("TAGS")
+     targets << "TAGS"   if !c(:ETAGS).empty?
+     targets << "BROWSE" if !c(:EBROWSE).empty?
+   end
+@@ -325,7 +325,7 @@
+ rule '.1' => '.xml' do |t|
+   filter = lambda do |code, lines|
+     if (0 == code) && lines.any? { |line| /^error|parser error/i.match(line) }
+-      File.unlink(t.name) if File.exists?(t.name)
++      File.unlink(t.name) if FileTest.exist?(t.name)
+       result = 1
+       puts lines.join('')
+ 
+@@ -343,7 +343,7 @@
+ 
+   stylesheet = "#{c(:DOCBOOK_ROOT)}/manpages/docbook.xsl"
+ 
+-  if !FileTest.exists?(stylesheet)
++  if !FileTest.exist?(stylesheet)
+     puts "Error: the DocBook stylesheet '#{stylesheet}' does not exist."
+     exit 1
+   end
+@@ -699,7 +699,7 @@
+       existing = Hash.new
+ 
+       doc.elements.to_a("/RCC/qresource/file").each do |node|
+-        if File.exists? "src/mkvtoolnix-gui/#{node.text}"
++        if FileTest.exist? "src/mkvtoolnix-gui/#{node.text}"
+           existing[node.text] = true
+         else
+           puts "Removing <file> for non-existing #{node.text}"
+@@ -883,7 +883,7 @@
+ 
+   remove_files_by_patterns patterns
+ 
+-  if Dir.exists? $dependency_dir
++  if FileTest.exist? $dependency_dir
+     puts_vaction "rm -rf", :target => "#{$dependency_dir}"
+     FileUtils.rm_rf $dependency_dir
+   end
+--- tools/development/update_translations.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ tools/development/update_translations.rb	2025-07-17 08:53:09.102275000 +0000
+@@ -108,11 +108,11 @@
+     base ||= ''
+     target = "#{$po_dir}/qt/qt#{base}_#{language}.ts"
+ 
+-    if !FileTest.exists?(target) && /^([a-z]+)_[a-z]+/i.match(language)
++    if !FileTest.exist?(target) && /^([a-z]+)_[a-z]+/i.match(language)
+       target = "#{$po_dir}/qt/qt#{base}_#{$1}.ts"
+     end
+ 
+-    fail "target file does not exist yet: #{target} (wrong language?)" if !FileTest.exists?(target)
++    fail "target file does not exist yet: #{target} (wrong language?)" if !FileTest.exist?(target)
+ 
+     File.open(target, "w") { |file| file.puts content.map(&:chomp).join("\n") }
+     File.unlink file_name
+--- tools/windows/file_list_to_nsi_uninstaller_instructions.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ tools/windows/file_list_to_nsi_uninstaller_instructions.rb	2025-07-17 08:53:24.451540000 +0000
+@@ -7,7 +7,7 @@
+ 
+ config    = read_config
+ file_name = ARGV[0]
+-file_name = "#{config['file_list_dir']}/#{file_name}.txt" if !FileTest.exists?(file_name)
++file_name = "#{config['file_list_dir']}/#{file_name}.txt" if !FileTest.exist?(file_name)
+ files     = IO.readlines(file_name).map { |file| file.chomp.gsub(%r{^\.}, '').gsub(%r{^/}, '').gsub(%r{/}, '\\') }
+ dirs      = {}
+ 
+--- rake.d/compilation_database.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ rake.d/compilation_database.rb	2025-07-17 08:49:27.682192300 +0000
+@@ -8,7 +8,7 @@
+     end
+ 
+     def self.read
+-      return {} unless FileTest.exists?(@file_name)
++      return {} unless FileTest.exist?(@file_name)
+ 
+       Hash[
+         *JSON.parse(IO.readlines(@file_name).join("")).
+@@ -19,7 +19,7 @@
+ 
+     def self.write
+       return if @compilation_commands.empty?
+-      return if !FileTest.exists?(@file_name) && !c?(:BUILD_COMPILATION_DATABASE)
++      return if !FileTest.exist?(@file_name) && !c?(:BUILD_COMPILATION_DATABASE)
+ 
+       entries = self.read.merge(@compilation_commands).values.sort_by { |e| e["file"] }
+       File.open(@file_name, "w") do |f|
+--- rake.d/config.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ rake.d/config.rb	2025-07-17 08:49:47.825168900 +0000
+@@ -11,10 +11,10 @@
+ end
+ 
+ def read_build_config
+-  fail "build-config not found: please run ./configure" unless File.exists?("build-config")
++  fail "build-config not found: please run ./configure" unless FileTest.exist?("build-config")
+ 
+   config = read_config_file("build-config")
+-  config = config.merge(read_config_file("build-config.local")) if File.exists?("build-config.local")
++  config = config.merge(read_config_file("build-config.local")) if FileTest.exist?("build-config.local")
+ 
+   config
+ end
+--- rake.d/helpers.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ rake.d/helpers.rb	2025-07-17 08:50:13.586604500 +0000
+@@ -158,7 +158,7 @@
+   Dir.glob("#{$dependency_dir}/*.dep").each do |file_name|
+     lines  = IO.readlines(file_name).collect(&:chomp)
+     target = lines.shift
+-    file target => lines.select { |dep_name| File.exists? dep_name }
++    file target => lines.select { |dep_name| FileTest.exist? dep_name }
+   end
+ end
+ 
+@@ -188,7 +188,7 @@
+ end
+ 
+ def remove_files_by_patterns patterns
+-  patterns.collect { |pattern| FileList[pattern].to_a }.flatten.uniq.select { |file_name| File.exists? file_name }.each do |file_name|
++  patterns.collect { |pattern| FileList[pattern].to_a }.flatten.uniq.select { |file_name| FileTest.exist? file_name }.each do |file_name|
+     puts_vaction "rm", :target => file_name
+     File.unlink file_name
+   end
+--- rake.d/tarball.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ rake.d/tarball.rb	2025-07-17 08:50:25.010773400 +0000
+@@ -2,7 +2,7 @@
+   require "tmpdir"
+ 
+   tarball = "#{Dir.pwd}/../mkvtoolnix-#{c(:PACKAGE_VERSION)}#{suffix}.tar.xz"
+-  fail "#{tarball} does already exist" if FileTest.exists?(tarball)
++  fail "#{tarball} does already exist" if FileTest.exist?(tarball)
+ 
+   Dir.mktmpdir do |dir|
+     clone_dir = "#{dir}/mkvtoolnix-#{c(:PACKAGE_VERSION)}"
+--- rake.d/target.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ rake.d/target.rb	2025-07-17 08:50:34.072731800 +0000
+@@ -116,7 +116,7 @@
+     dep_builder.call(cpp_files).      each { |cpp, ui_hs| file cpp.ext('o')   => ui_hs }
+     dep_builder.call(qobject_h_files).each { |h,   ui_hs| file h.  ext('moc') => ui_hs }
+ 
+-    cpp_files << "src/#{subdir}/qt_resources.cpp" if FileTest.exists?("src/#{subdir}/qt_resources.qrc")
++    cpp_files << "src/#{subdir}/qt_resources.cpp" if FileTest.exist?("src/#{subdir}/qt_resources.qrc")
+ 
+     self.
+       sources(ui_files).
+--- tests/test.d/simple_test.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ tests/test.d/simple_test.rb	2025-07-17 08:51:01.607518700 +0000
+@@ -76,7 +76,7 @@
+   end
+ 
+   def clean_tmp
+-    File.unlink(@tmp) if @tmp && File.exists?(@tmp) && !ENV["KEEP_TMPFILES"].nil? && (ENV["KEEP_TMPFILES"] != "1")
++    File.unlink(@tmp) if @tmp && FileTest.exist?(@tmp) && !ENV["KEEP_TMPFILES"].nil? && (ENV["KEEP_TMPFILES"] != "1")
+     @tmp = nil
+   end
+ 
+@@ -97,7 +97,7 @@
+     re = %r{^#{self.tmp_name_prefix}}
+     Dir.entries("/tmp").each do |entry|
+       file = "/tmp/#{entry}"
+-      File.unlink(file) if re.match(file) and File.exists?(file)
++      File.unlink(file) if re.match(file) and FileTest.exist?(file)
+     end
+   end
+ 
+@@ -288,7 +288,7 @@
+     command = "../src/mkvpropedit --engage no_variable_data #{file_name} #{args.first}"
+     *result = self.sys command, :exit_code => options[:exit_code], :no_result => options[:no_result]
+ 
+-    self.sys "../src/tools/ebml_validator -M #{file_name}", dont_record_command: true if FileTest.exists?("../src/tools/ebml_validator")
++    self.sys "../src/tools/ebml_validator -M #{file_name}", dont_record_command: true if FileTest.exist?("../src/tools/ebml_validator")
+ 
+     return *result
+   end
+--- tests/test.d/test.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ tests/test.d/test.rb	2025-07-17 08:51:22.795686300 +0000
+@@ -39,7 +39,7 @@
+     re = /^#{self.tmp_name_prefix}/
+     Dir.entries("/tmp").each do |entry|
+       file = "/tmp/#{entry}"
+-      File.unlink(file) if re.match(file) and File.exists?(file)
++      File.unlink(file) if re.match(file) and FileTest.exist?(file)
+     end
+   end
+ 
+@@ -95,7 +95,7 @@
+     output = hash_file @tmp
+ 
+     if erase
+-      File.unlink(@tmp) if File.exists?(@tmp) && (ENV["KEEP_TMPFILES"] != "1")
++      File.unlink(@tmp) if FileTest.exist?(@tmp) && (ENV["KEEP_TMPFILES"] != "1")
+       @debug_commands << "rm #{@tmp}"
+       @tmp = nil
+     end
+@@ -122,7 +122,7 @@
+     command = "../src/mkvpropedit --engage no_variable_data #{file_name} #{args.shift}"
+     *result = sys command, retcode
+ 
+-    sys "../src/tools/ebml_validator -M #{file_name}", :dont_record_command => true if FileTest.exists?("../src/tools/ebml_validator")
++    sys "../src/tools/ebml_validator -M #{file_name}", :dont_record_command => true if FileTest.exist?("../src/tools/ebml_validator")
+ 
+     return *result
+   end
+--- tests/test-382split_chapters.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ tests/test-382split_chapters.rb	2025-07-17 08:51:39.969813600 +0000
+@@ -7,7 +7,7 @@
+ chapters = "data/text/chapters-v-h264-aac.txt"
+ 
+ def hash_results max
+-  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ File.exists?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
++  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ FileTest.exist?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
+ end
+ 
+ test "chapters-in-mkv: numbers 1 & 7" do
+--- tests/test-532chapter_generation_when_appending.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ tests/test-532chapter_generation_when_appending.rb	2025-07-17 08:52:01.619244600 +0000
+@@ -7,7 +7,7 @@
+ describe "mkvmerge / generate chapter »when-appending«"
+ 
+ def hash_results max
+-  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ File.exists?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
++  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ FileTest.exist?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
+ end
+ 
+ test_merge "#{file} + #{file} + #{file}", :args => "--generate-chapters when-appending"
+--- tests/test-533chapter_generation_interval.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ tests/test-533chapter_generation_interval.rb	2025-07-17 08:52:16.272928100 +0000
+@@ -7,7 +7,7 @@
+ describe "mkvmerge / generate chapter »interval«"
+ 
+ def hash_results max
+-  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ File.exists?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
++  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ FileTest.exist?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
+ end
+ 
+ test_merge "#{file} + #{file} + #{file}", :args => "--generate-chapters interval:30s"
+--- tests/test-534chapter_generation_when_appending_audio_only.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ tests/test-534chapter_generation_when_appending_audio_only.rb	2025-07-17 08:52:32.107654000 +0000
+@@ -7,7 +7,7 @@
+ describe "mkvmerge / generate chapter »when-appending« without video tracks"
+ 
+ def hash_results max
+-  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ File.exists?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
++  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ FileTest.exist?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
+ end
+ 
+ test_merge "#{file} + #{file} + #{file}", :args => "--generate-chapters when-appending"
+--- tests/test-535chapter_generation_interval_audio_only.rb.orig	2018-04-01 15:27:20.000000000 +0000
++++ tests/test-535chapter_generation_interval_audio_only.rb	2025-07-17 08:52:48.023115600 +0000
+@@ -7,7 +7,7 @@
+ describe "mkvmerge / generate chapter »interval« without video tracks"
+ 
+ def hash_results max
+-  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ File.exists?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
++  ( (1..max).collect { |i| hash_file(sprintf("%s-%02d", tmp, i)) } + [ FileTest.exist?(sprintf("%s-%02d", tmp, max + 1)) ? 'bad' : 'ok' ]).join '+'
+ end
+ 
+ test_merge "#{file} + #{file} + #{file}", :args => "--generate-chapters interval:30s"

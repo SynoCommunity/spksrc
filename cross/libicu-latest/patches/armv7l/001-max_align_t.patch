@@ -1,0 +1,62 @@
+# In armv7l architecture (namely hi3535) the gcc version is 4.8.3 which contains
+# non standard C++11 definition of max_align_t (meaning it's not in std namespace)
+--- common/uarrsort.cpp	2021-01-05 20:29:56.000000000 +0100
++++ common/uarrsort.cpp	2021-01-05 20:30:17.000000000 +0100
+@@ -37,7 +37,7 @@
+ };
+ 
+ static constexpr int32_t sizeInMaxAlignTs(int32_t sizeInBytes) {
+-    return (sizeInBytes + sizeof(std::max_align_t) - 1) / sizeof(std::max_align_t);
++    return (sizeInBytes + sizeof(max_align_t) - 1) / sizeof(max_align_t);
+ }
+ 
+ /* UComparator convenience implementations ---------------------------------- */
+@@ -141,7 +141,7 @@
+ insertionSort(char *array, int32_t length, int32_t itemSize,
+               UComparator *cmp, const void *context, UErrorCode *pErrorCode) {
+ 
+-    icu::MaybeStackArray<std::max_align_t, sizeInMaxAlignTs(STACK_ITEM_SIZE)> v;
++    icu::MaybeStackArray<max_align_t, sizeInMaxAlignTs(STACK_ITEM_SIZE)> v;
+     if (sizeInMaxAlignTs(itemSize) > v.getCapacity() &&
+             v.resize(sizeInMaxAlignTs(itemSize)) == nullptr) {
+         *pErrorCode = U_MEMORY_ALLOCATION_ERROR;
+@@ -235,7 +235,7 @@
+ quickSort(char *array, int32_t length, int32_t itemSize,
+             UComparator *cmp, const void *context, UErrorCode *pErrorCode) {
+     /* allocate two intermediate item variables (x and w) */
+-    icu::MaybeStackArray<std::max_align_t, sizeInMaxAlignTs(STACK_ITEM_SIZE) * 2> xw;
++    icu::MaybeStackArray<max_align_t, sizeInMaxAlignTs(STACK_ITEM_SIZE) * 2> xw;
+     if(sizeInMaxAlignTs(itemSize)*2 > xw.getCapacity() &&
+             xw.resize(sizeInMaxAlignTs(itemSize) * 2) == nullptr) {
+         *pErrorCode=U_MEMORY_ALLOCATION_ERROR;
+--- common/utext.cpp	2021-01-05 20:32:33.000000000 +0100
++++ common/utext.cpp	2021-01-05 20:33:01.000000000 +0100
+@@ -569,7 +569,7 @@
+ 
+ struct ExtendedUText {
+     UText               ut;
+-    std::max_align_t    extension;
++    max_align_t    extension;
+ };
+ 
+ static const UText emptyText = UTEXT_INITIALIZER;
+@@ -584,7 +584,7 @@
+         // We need to heap-allocate storage for the new UText
+         int32_t spaceRequired = sizeof(UText);
+         if (extraSpace > 0) {
+-            spaceRequired = sizeof(ExtendedUText) + extraSpace - sizeof(std::max_align_t);
++            spaceRequired = sizeof(ExtendedUText) + extraSpace - sizeof(max_align_t);
+         }
+         ut = (UText *)uprv_malloc(spaceRequired);
+         if (ut == NULL) {
+--- tools/toolutil/toolutil.cpp	2021-01-05 20:34:22.000000000 +0100
++++ tools/toolutil/toolutil.cpp	2021-01-05 20:34:27.000000000 +0100
+@@ -245,7 +245,7 @@
+     char name[64];
+     int32_t capacity, maxCapacity, size, idx;
+     void *array;
+-    alignas(std::max_align_t) char staticArray[1];
++    alignas(max_align_t) char staticArray[1];
+ };
+ 
+ U_CAPI UToolMemory * U_EXPORT2

@@ -1,5 +1,5 @@
 PKG_NAME = glib
-PKG_VERS = 2.78.4
+PKG_VERS = 2.84.2
 PKG_EXT = tar.xz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -15,6 +15,8 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 # https://docs.gtk.org/glib/building.html
 CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false
+CONFIGURE_ARGS += -Dtests=false
+CONFIGURE_ARGS += -Dglib_debug=disabled
 CONFIGURE_ARGS += -Dlibmount=disabled
 CONFIGURE_ARGS += -Ddefault_library=shared
 CONFIGURE_ARGS += -Dselinux=disabled

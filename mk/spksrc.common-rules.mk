@@ -4,7 +4,7 @@
 
 .PHONY: clean
 clean:
-	rm -fr work work-* build-*.log publish-*.log status-*.log
+	rm -fr work work-* build.log build-*.log publish-*.log status-*.log
 
 .PHONY: smart-clean
 smart-clean:

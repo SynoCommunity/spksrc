@@ -3,6 +3,7 @@ bin:bin/col
 bin:bin/colcrt
 bin:bin/colrm
 bin:bin/column
+bin:bin/findmnt
 bin:bin/hardlink
 bin:bin/hexdump
 bin:bin/lsblk
@@ -13,6 +14,12 @@ bin:bin/rev
 bin:bin/wall
 bin:bin/whereis
 bin:bin/zramctl
+lnk:lib/libblkid.so
+lnk:lib/libblkid.so.1
+lib:lib/libblkid.so.1.1.0
+lnk:lib/libmount.so
+lnk:lib/libmount.so.1
+lib:lib/libmount.so.1.1.0
 lnk:lib/libsmartcols.so
 lnk:lib/libsmartcols.so.1
 lib:lib/libsmartcols.so.1.1.0

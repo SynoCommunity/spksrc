@@ -1,5 +1,5 @@
 PKG_NAME = navidrome
-PKG_VERS = 0.53.3
+PKG_VERS = 0.58.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/navidrome/navidrome/archive
@@ -7,16 +7,16 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/go native/nodejs
-DEPENDS = cross/taglib
+DEPENDS = cross/taglib2
 
-# C++11 compiler required
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-# go does not support ppc archs
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+# taglib2:
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 HOMEPAGE = https://www.navidrome.org/
 COMMENT  = 🎧☁ Modern Music Server and Streamer compatible with Subsonic/Airsonic.
-LICENSE  = GPL-3.0 License
+LICENSE  = GPLv3
 
 COMPILE_TARGET = navidrome_compile
 
@@ -31,7 +31,6 @@ GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
 
 include ../../mk/spksrc.cross-go.mk
 
-ENV += NPM_CONFIG_USER=root
 PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 
 .PHONY: navidrome_compile

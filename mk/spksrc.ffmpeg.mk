@@ -42,7 +42,7 @@ FFMPEG_LIBS += libswscale.pc
 endif
 
 # call-up pre-depend to prepare the shared ffmpeg build environment
-PRE_DEPEND_TARGET = ffmpeg_pre_depend
+PRE_DEPEND_TARGET += ffmpeg_pre_depend
 
 else
 BUILD_DEPENDS += cross/$(FFMPEG_PACKAGE)

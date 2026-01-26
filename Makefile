@@ -79,12 +79,9 @@ dependency-tree:
 	done
 
 # build dependency list for all packages
-# - exclude broken packages
+# - broken packages are excluded
 dependency-list:
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
-	do \
-	    $(MAKE) -s -C $${spk} dependency-list ; \
-	done
+	@mk/dependency-list.sh
 
 # define a template that instantiates a 'python3-avoton-6.1' -style target for
 # every ($2) arch, every ($1) spk
@@ -173,7 +170,7 @@ local.mk:
 	@echo "# Option to disable the use of github API to get the real name and url of the maintainer" >> $@
 	@echo "# define it for local builds when you reach the API rate limit" >> $@
 	@echo "DISABLE_GITHUB_MAINTAINER =" >> $@
-	@echo "#PSTAT = on" >> $@
+	@echo "PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
 
 dsm-%: local.mk

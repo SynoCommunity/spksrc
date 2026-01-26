@@ -1,0 +1,91 @@
+# Ignore whether SO_REUSEPORT is defined
+# 
+# SO_REUSEPORT is not supported in all ARMv7 cpu toolchains 
+# provided in toolchain .../usr/include/asm-generic/socket.h
+# 
+# see issue https://github.com/SynoCommunity/spksrc/issues/6441
+# 
+--- lib/isc/include/isc/netmgr.h.orig	2025-07-04 09:46:42.142971900 +0000
++++ lib/isc/include/isc/netmgr.h	2025-08-02 07:21:31.655085696 +0000
+@@ -24,9 +24,6 @@
+ #include <sys/socket.h>
+ #include <sys/types.h>
+ 
+-#if defined(SO_REUSEPORT_LB) || (defined(SO_REUSEPORT) && defined(__linux__))
+-#define HAVE_SO_REUSEPORT_LB 1
+-#endif
+ 
+ /*
+  * Replacement for isc_sockettype_t provided by socket.h.
+--- lib/isc/netmgr/netmgr.c.orig	2025-07-04 09:46:42.149972100 +0000
++++ lib/isc/netmgr/netmgr.c	2025-08-02 12:02:00.105189149 +0000
+@@ -265,11 +265,7 @@
+ 	atomic_init(&mgr->send_tcp_buffer_size, 0);
+ 	atomic_init(&mgr->recv_udp_buffer_size, 0);
+ 	atomic_init(&mgr->send_udp_buffer_size, 0);
+-#if HAVE_SO_REUSEPORT_LB
+-	mgr->load_balance_sockets = true;
+-#else
+ 	mgr->load_balance_sockets = false;
+-#endif
+ 
+ #ifdef NETMGR_TRACE
+ 	ISC_LIST_INIT(mgr->active_sockets);
+@@ -638,11 +634,7 @@
+ isc_nm_setloadbalancesockets(isc_nm_t *mgr, bool enabled) {
+ 	REQUIRE(VALID_NM(mgr));
+ 
+-#if HAVE_SO_REUSEPORT_LB
+-	mgr->load_balance_sockets = enabled;
+-#else
+ 	UNUSED(enabled);
+-#endif
+ }
+ 
+ void
+@@ -3326,20 +3318,8 @@
+ 	 * by another socket.
+ 	 */
+ 
+-#if defined(SO_REUSEPORT) && !defined(__linux__)
+-	if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val)) == -1) {
+-		return ISC_R_FAILURE;
+-	}
+-	return ISC_R_SUCCESS;
+-#elif defined(SO_REUSEADDR)
+-	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)) == -1) {
+-		return ISC_R_FAILURE;
+-	}
+-	return ISC_R_SUCCESS;
+-#else
+ 	UNUSED(fd);
+-	return ISC_R_NOTIMPLEMENTED;
+-#endif
++	return ISC_R_SUCCESS;
+ }
+ 
+ isc_result_t
+@@ -3354,22 +3334,8 @@
+ 	 *
+ 	 * On Linux, the same thing is achieved simply with SO_REUSEPORT.
+ 	 */
+-#if defined(SO_REUSEPORT_LB)
+-	if (setsockopt_on(fd, SOL_SOCKET, SO_REUSEPORT_LB) == -1) {
+-		return ISC_R_FAILURE;
+-	} else {
+-		return ISC_R_SUCCESS;
+-	}
+-#elif defined(SO_REUSEPORT) && defined(__linux__)
+-	if (setsockopt_on(fd, SOL_SOCKET, SO_REUSEPORT) == -1) {
+-		return ISC_R_FAILURE;
+-	} else {
+-		return ISC_R_SUCCESS;
+-	}
+-#else
+ 	UNUSED(fd);
+-	return ISC_R_NOTIMPLEMENTED;
+-#endif
++	return ISC_R_SUCCESS;
+ }
+ 
+ isc_result_t

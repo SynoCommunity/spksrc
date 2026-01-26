@@ -1,6 +1,4 @@
 
-# specific service installation
-
 UMURMUR="${SYNOPKG_PKGDEST}/bin/umurmurd"
 CFG_FILE="${SYNOPKG_PKGVAR}/umurmur.conf"
 SERVICE_COMMAND="${UMURMUR} -c ${CFG_FILE} -p ${PID_FILE}"
@@ -23,7 +21,7 @@ create_certificate ()
     fi
 
     # create certificate (use openssl of DSM)
-    ${OPENSSL} req -x509 -newkey rsa:2048 -keyout ${PRIVATE_KEY} -nodes -sha1 -days 3653 -out ${PUBLIC_KEY} -batch -config /etc/ssl/openssl.cnf > /dev/null 2>&1
+    ${OPENSSL} req -x509 -newkey rsa:4096 -keyout ${PRIVATE_KEY} -nodes -sha256 -days 3653 -out ${PUBLIC_KEY} -batch -config /etc/ssl/openssl.cnf > /dev/null 2>&1
 
     # Exit with the right code and an explicit message
     if [ $? -ne 0 ]; then
@@ -51,7 +49,7 @@ service_preupgrade ()
     if [ -e "${CFG_FILE}" ]; then
         if $(grep -q "/usr/local/umurmur/var/" "${CFG_FILE}"); then
             echo "Update var folder for DSM 7 compatibility in configuration file."
-            sed -i -e "s,/usr/local/umurmur/var/,/var/packages/umurmur/var/,g" "${CFG_FILE}"
+            sed -e "s,/usr/local/umurmur/var/,/var/packages/umurmur/var/,g" -i "${CFG_FILE}"
         fi
     fi
 
@@ -59,7 +57,7 @@ service_preupgrade ()
     if [ -e "${CFG_FILE}" ]; then
         if $(grep -q "umurmurd.log" "${CFG_FILE}"); then
             echo "Update log file name in configuration file."
-            sed -i -e "s,umurmurd.log,umurmur.log,g" "${CFG_FILE}"
+            sed -e "s,umurmurd.log,umurmur.log,g" -i "${CFG_FILE}"
         fi
     fi
 
@@ -69,12 +67,12 @@ service_preupgrade ()
             USER_NOBODY=$(grep -e 'username = "nobody";' "${CFG_FILE}" | cut -c1)
             if [ "${USER_NOBODY}" != "" ] && [ "${USER_NOBODY}" != "#" ]; then
                 echo "Remove user nobody from umurmur configuration for DSM6+ compatibility."
-                sed -i -e "s,username = \"nobody\";,# username = \"nobody\";,g" "${CFG_FILE}"
+                sed -e "s,username = \"nobody\";,# username = \"nobody\";,g" -i "${CFG_FILE}"
             fi
             GROUP_NOBODY=$(grep -e 'groupname = "nobody";' "${CFG_FILE}" | cut -c1)
             if [ "${GROUP_NOBODY}" != "" ] && [ "${GROUP_NOBODY}" != "#" ]; then
                 echo "Remove group nobody from umurmur configuration for DSM6+ compatibility."
-                sed -i -e "s,groupname = \"nobody\";,# groupname = \"nobody\";,g" "${CFG_FILE}"
+                sed -e "s,groupname = \"nobody\";,# groupname = \"nobody\";,g" -i "${CFG_FILE}"
             fi
         fi
     fi

@@ -1,12 +1,22 @@
 PKG_NAME = filebrowser
-PKG_VERS = 2.30.0
+PKG_VERS = 2.55.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/filebrowser/filebrowser/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/go native/nodejs
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+include ../../mk/spksrc.common.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/go_1.23
+NATIVE_GO = native/go_1.23
+else
+BUILD_DEPENDS = native/go
+NATIVE_GO = native/go
+endif
+
+BUILD_DEPENDS += native/nodejs native/pnpm
 
 HOMEPAGE = https://github.com/filebrowser/filebrowser
 COMMENT  = Web File Browser.
@@ -20,12 +30,11 @@ PRE_COMPILE_TARGET = filebrowser_pre_compile
 
 include ../../mk/spksrc.cross-go.mk
 
-ENV += PATH=$(realpath $(WORK_DIR)/../../../native/nodejs/work-native/node/bin):$(realpath $(WORK_DIR)/../../../native/go/work-native/go/bin):$(PATH)
-
-# avoid webpack error ERR_OSSL_EVP_UNSUPPORTED with nodejs 18
-ENV += NODE_OPTIONS=--openssl-legacy-provider
+# PATH must be defined after include of spksrc.cross-go.mk,
+# otherwise WORK_DIR is not defined when building in cross/filebrowser folder
+PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(PATH)
 
 .PHONY: filebrowser_pre_compile
 filebrowser_pre_compile:
 	@sed -i 's/Version = "(untracked)"/Version = "$(PKG_VERS)"/g' -i $(WORK_DIR)/$(PKG_DIR)/version/version.go
-	@$(RUN) $(MAKE) build-frontend
+	@cd $(WORK_DIR)/$(PKG_DIR)/frontend && pnpm install --frozen-lockfile && pnpm run build

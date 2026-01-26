@@ -1,5 +1,5 @@
 PKG_NAME = cloudflared
-PKG_VERS = 2024.10.1
+PKG_VERS = 2026.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cloudflare/cloudflared/archive
@@ -7,6 +7,11 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/go
+
+UNSUPPORTED_ARCHS  = $(PPC_ARCHS)
+# cloudflared v2025.5.0 is the last version that builds with go < 1.24
+# and go >= 1.24 requires a linux kernel >= 3.2
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 HOMEPAGE = https://github.com/cloudflare/cloudflared
 COMMENT  = Cloudflare Tunnel provides you with a secure way to connect your resources to Cloudflare without a publicly routable IP address.
@@ -18,13 +23,7 @@ COMPILE_TARGET = cloudflared_compile
 
 include ../../mk/spksrc.cross-go.mk
 
-GOROOT_BOOTSTRAP=$(WORK_DIR)/../../../native/go/work-native/go/
-
 .PHONY: cloudflared_compile
 cloudflared_compile:
-ifeq (,$(wildcard /tmp/go))
-	@$(MSG) "- Call install-cloudflare-go.sh"
-	@$(RUN) GOARCH= GOOS= GOROOT_BOOTSTRAP=$(GOROOT_BOOTSTRAP) .teamcity/install-cloudflare-go.sh
-endif
 	@$(MSG) "- Build cloudflared"
-	@$(RUN) $(MAKE) PATH="/tmp/go/bin:${PATH}" VERSION=$(PKG_VERS) LINK_FLAGS="-s -w" cloudflared
+	@$(RUN) $(MAKE) VERSION=$(PKG_VERS) LINK_FLAGS="-s -w" cloudflared

@@ -1,5 +1,5 @@
 # Define python binary path
-PYTHON_DIR="/var/packages/python311/target/bin"
+PYTHON_DIR="/var/packages/python312/target/bin"
 # Add local bin, virtualenv along with python to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 # Define other locations

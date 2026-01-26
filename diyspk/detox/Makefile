@@ -1,5 +1,5 @@
 SPK_NAME = detox
-SPK_VERS = 2.0.0
+SPK_VERS = 3.0.1
 SPK_REV = 1
 SPK_ICON = src/detox_logo.png
 

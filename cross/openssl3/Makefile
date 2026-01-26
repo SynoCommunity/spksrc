@@ -1,9 +1,11 @@
 PKG_NAME = openssl3
-PKG_VERS = 3.1.7
+PKG_VERS = 3.5.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = openssl-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.openssl.org/source
 PKG_DIR = openssl-$(PKG_VERS)
+
+# OpenSSL 3.5 is a long term stable (LTS) release and will be supported until April 8, 2030.
 
 DEPENDS = cross/zlib
 

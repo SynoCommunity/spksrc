@@ -59,7 +59,7 @@ endif
 
 # call-up pre-depend to prepare the shared videodrv build environment
 ifeq ($(strip $(PRE_DEPEND_TARGET)),)
-PRE_DEPEND_TARGET = videodrv_pre_depend
+PRE_DEPEND_TARGET += videodrv_pre_depend
 endif
 
 # end ifeq $(x64_ARCHS)
@@ -74,5 +74,4 @@ videodrv_pre_depend:
 	@$(MSG) "*** PATH: $(VIDEODRV_PACKAGE_ROOT)"
 	@$(MSG) "*****************************************************"
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(MSG) VIDEODRV_LIBS: $(VIDEODRV_LIBS)
 	@$(foreach lib,$(VIDEODRV_LIBS),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)

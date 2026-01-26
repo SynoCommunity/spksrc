@@ -1,20 +1,21 @@
 SPK_NAME = roundcube
-SPK_VERS = 1.6.9
-SPK_REV = 5
+SPK_VERS = 1.6.11
+SPK_REV = 8
 SPK_ICON = src/roundcube.png
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/roundcube
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
 # Due to not obvious WebStation handling requirements
 REQUIRED_MIN_DSM = 6.0
-SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
+# SRM is not supported due lacking webstation, php, mariadb and apache packages
+REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Roundcube is a free and open source webmail solution with a desktop-like user interface which is easy to install/configure and that runs on a standard LAMPP server. It is the same software Synology offers as Mail Station except this does not depend on Mail Server package.
 DISPLAY_NAME = Roundcube Webmail
-CHANGELOG = "1. Update to v1.6.9.<br/>2. Add PHP profiles for DSM 6.<br/>3. Add backup and restore functions."
+CHANGELOG = "1. Adjust PHP dependency handling for DSM 6/7 (PHP 7.4/8.0/8.2)."
 
 HOMEPAGE   = https://www.roundcube.net
 LICENSE    = GPLv3
@@ -30,16 +31,25 @@ SYSTEM_GROUP = http
 
 DSM_UI_DIR = app
 DSM_UI_CONFIG = src/app/config
-CONF_DIR = src/conf/
 
 include ../../mk/spksrc.common.mk
 
-# Alternate conf dir for DSM 6
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
+# DSM-specific PHP profiles
+ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
+SPK_DEPENDS = "WebStation:PHP8.2:MariaDB10:Apache2.4"
+CONF_DIR = src/conf_72/
+else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
+SPK_DEPENDS = "WebStation:PHP8.0:MariaDB10:Apache2.4"
+OS_MAX_VER = 7.1-59999
+CONF_DIR = src/conf_7/
+else
+SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 CONF_DIR = src/conf_6/
 endif
 
+ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
 POST_STRIP_TARGET = roundcube_extra_install
+endif
 
 include ../../mk/spksrc.spk.mk
 

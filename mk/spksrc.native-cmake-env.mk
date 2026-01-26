@@ -1,20 +1,22 @@
-# Configuration for CMake build
 #
-CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
+# Configuration for NATIVE CMake build
+#
+
+ifeq ($(strip $(filter -DCMAKE_BUILD_TYPE=%,$(CMAKE_ARGS))),)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release
+endif
+
+# Native build: install to staging prefix with
+# RPATH pointing to ../lib for relocatable execution
+CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH='$$ORIGIN/../lib'
+CMAKE_ARGS += -DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF
+CMAKE_ARGS += -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF
 
 # Use native cmake (latest stable)
 ifeq ($(strip $(USE_NATIVE_CMAKE)),1)
   BUILD_DEPENDS += native/cmake
   CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake/work-native/install/usr/local/bin)
-  ENV += PATH=$(CMAKE_PATH):$$PATH
-  export PATH := $(CMAKE_PATH):$(PATH)
-endif
-
-# Use native cmake (Debian 10 "Buster")
-ifeq ($(strip $(USE_NATIVE_CMAKE_LEGACY)),1)
-  BUILD_DEPENDS += native/cmake-legacy
-  CMAKE_PATH = $(abspath $(CURDIR)/../../native/cmake-legacy/work-native/install/usr/local/bin)
   ENV += PATH=$(CMAKE_PATH):$$PATH
   export PATH := $(CMAKE_PATH):$(PATH)
 endif
@@ -47,6 +49,10 @@ endif
 # set default destdir directory
 ifeq ($(strip $(CMAKE_DESTDIR)),)
   CMAKE_DESTDIR = $(INSTALL_DIR)
+endif
+
+ifeq ($(strip $(CMAKE_BASE_DIR)),)
+  CMAKE_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 
 # set default build directory

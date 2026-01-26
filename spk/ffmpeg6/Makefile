@@ -4,7 +4,7 @@ SPK_REV = 5
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to version 6.0.1<br/>2. Update Jellyfin upstream patches<br/>3. Update Intel Media Driver 2024Q2 Release (DSM7 only)<br/>4. Revert DSM7 to MFX intead of Intel Video Processing Library (Intel-VPL) as unsupported by Jellyfin<br/>5. Enable OpenCL on Intel platforms (DSM7 only)<br/>6. Update to latest version of x264 (fix for \#6176)<br/>6. Now using new synocli-videodriver package"
 
-DEPENDS = cross/$(SPK_NAME)
+DEPENDS = cross/ffmpeg6
 
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg

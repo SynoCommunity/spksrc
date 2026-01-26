@@ -33,5 +33,5 @@ bzip2_post_install:
 	ln -sf libbz2.so.$(PKG_VERS) $(STAGING_INSTALL_PREFIX)/lib/libbz2.so.1.0
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/lib/pkgconfig
 	@install -m 644 src/bzip2.pc $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	@sed -ie 's%@PREFIX@%$(STAGING_INSTALL_PREFIX)%g' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/bzip2.pc
-	@sed -ie 's%@VERSION@%$(PKG_VERS)%g' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/bzip2.pc
+	@sed -i 's%@PREFIX@%$(STAGING_INSTALL_PREFIX)%g' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/bzip2.pc
+	@sed -i 's%@VERSION@%$(PKG_VERS)%g' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/bzip2.pc

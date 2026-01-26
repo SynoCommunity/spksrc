@@ -1,5 +1,5 @@
 SPK_NAME = lsof
-SPK_VERS = 4.99.3
+SPK_VERS = 4.99.5
 SPK_REV = 1
 
 DEPENDS = cross/lsof

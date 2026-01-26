@@ -5,9 +5,10 @@
 # Evaluate packages to build and referenced source files to download.
 #
 # Functions:
-# - Evaluate all packages to build depending on files defined in ${GH_FILES}.
+# - Build all packages defined by ${USER_SPK_TO_BUILD} and ${GH_SPK_PACKAGES}
+# - Evaluate additional packages to build depending on changed folders defined in ${GH_DEPENDENT_PACKAGES}.
 # - synocli-videodriver is moved to head of packages to build first if triggered by its ffmpeg5-7
-# - python310-311 and ffmpeg5-7 are moved to head of remaining packages to build when triggered by its own or a dependent.
+# - python310-313 and ffmpeg5-7 are moved to head of remaining packages to build when triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -18,39 +19,30 @@ echo "::group:: ---- find dependent packages"
 make setup-synocommunity
 DEFAULT_TC=$(grep DEFAULT_TC local.mk | cut -f2 -d= | xargs)
 
-# filter for changes made in the spk directories and take unique package name (without spk folder)
-SPK_TO_BUILD+=" "
-SPK_TO_BUILD+=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "^spk/\K[^\/]*" | sort -u | tr '\n' ' ')
-
-# filter for changes made in the cross and native directories and take unique package name (including cross or native folder)
-DEPENDENT_PACKAGES=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(cross|native)/[^\/]*" | sort -u | tr '\n' ' ')
+# all packages to build from changes or manual definition
+SPK_TO_BUILD="${USER_SPK_TO_BUILD} ${GH_SPK_PACKAGES} "
 
 # get dependency list
 # dependencies in this list include the cross or native folder (i.e. native/python cross/glib)
 echo "Building dependency list..."
-DEPENDENCY_LIST=
-for package in $(find spk/ -maxdepth 1 -type d | cut -c 5- | sort)
-do
-    if [ ! -f "./spk/${package}/BROKEN" ]; then
-        DEPENDENCY_LIST+=$(DEPENDENCY_WALK=1 make -s -C spk/${package} dependency-list 2> /dev/null)$'\n'
-    fi
-done
+DEPENDENCY_LIST=./dependency-list.txt
+make dependency-list 2> /dev/null > ${DEPENDENCY_LIST}
 
 # search for dependent spk packages
-for package in ${DEPENDENT_PACKAGES}
+for package in ${GH_DEPENDENCY_FOLDERS}
 do
     echo "===> Searching for dependent package: ${package}"
-    packages=$(echo "${DEPENDENCY_LIST}" | grep " ${package} " | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
+    packages=$(cat "${DEPENDENCY_LIST}" | grep -w "${package}" | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
     echo "===> Found: ${packages}"
-    SPK_TO_BUILD+=${packages}
+    SPK_TO_BUILD+=" ${packages}"
 done
 
 # fix for packages with different names
-if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "nzbdrone" | tr '\n' ' ')" sonarr3"
+if [ "$(echo ${SPK_TO_BUILD} | grep -o ' nzbdrone ')" != "" ]; then
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "^nzbdrone$" | tr '\n' ' ')" sonarr3"
 fi
-if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -vw "python" | tr '\n' ' ')" python2"
+if [ "$(echo ${SPK_TO_BUILD} | grep -o ' python ')" != "" ]; then
+    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "^python$" | tr '\n' ' ')" python2"
 fi
 
 # remove duplicate packages
@@ -65,7 +57,7 @@ for i in {5..7}; do
     for package in ${packages}
     do
         if [ "$(echo ffmpeg${i} ${ffmpeg_dependent_packages} | grep -ow ${package})" != "" ]; then
-            packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg${i}" | tr '\n' ' ')
+            packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "^ffmpeg${i}\$" | tr '\n' ' ')
             packages="ffmpeg${i} ${packages_without_ffmpeg}"
             break
         fi
@@ -80,14 +72,14 @@ videodrv_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile"
 for package in ${packages}
 do
     if [ "$(echo synocli-videodriver ${videodrv_dependent_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_videodrv=$(echo "${packages}" | tr ' ' '\n' | grep -v "synocli-videodriver" | tr '\n' ' ')
+        packages_without_videodrv=$(echo "${packages}" | tr ' ' '\n' | grep -v "^synocli-videodriver\$" | tr '\n' ' ')
         packages="synocli-videodriver ${packages_without_videodrv}"
         break
     fi
 done
 
-# for python (310, 311) find all packages that depend on them
-for py in python310 python311; do
+# for python (310, 311, 312, 313) find all packages that depend on them
+for py in python310 python311 python312 python313; do
     python_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "PYTHON_PACKAGE = ${py}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
     # If packages contain a package that depends on python (or is python), then ensure
@@ -95,7 +87,7 @@ for py in python310 python311; do
     for package in ${packages}
     do
         if [ "$(echo ${py} ${python_dependent_packages} | grep -ow ${package})" != "" ]; then
-            packages_without_python=$(echo "${packages}" | tr ' ' '\n' | grep -v "${py}" | tr '\n' ' ')
+            packages_without_python=$(echo "${packages}" | tr ' ' '\n' | grep -v "^${py}\$" | tr '\n' ' ')
             packages="${py} ${packages_without_python}"
             break
         fi
@@ -157,7 +149,7 @@ else
     DOWNLOAD_LIST=
     for package in ${packages}
     do
-        DOWNLOAD_LIST+=$(echo "${DEPENDENCY_LIST}" | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
+        DOWNLOAD_LIST+=$(cat "${DEPENDENCY_LIST}" | grep "^${package}:" | grep -o ":.*" | tr ':' ' ' | sort -u | tr '\n' ' ')
     done
     # remove duplicate downloads
     downloads=$(printf %s "${DOWNLOAD_LIST}" | tr ' ' '\n' | sort -u | tr '\n' ' ')

@@ -1,5 +1,5 @@
 SPK_NAME = pcre2
-SPK_VERS = 10.44
+SPK_VERS = 10.46
 SPK_REV = 1
 
 DEPENDS = cross/pcre2

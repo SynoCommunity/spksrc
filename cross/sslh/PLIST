@@ -1,1 +1,3 @@
-bin:bin/sslh
+bin:bin/sslh-fork
+bin:bin/sslh-ev
+bin:bin/sslh-select

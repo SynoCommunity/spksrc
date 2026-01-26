@@ -1,5 +1,5 @@
 PKG_NAME = libwebp
-PKG_VERS = 1.4.0
+PKG_VERS = 1.6.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/webmproject/libwebp/archive
@@ -10,9 +10,7 @@ DEPENDS = cross/xz cross/libtiff cross/libjpeg cross/libpng cross/giflib
 
 HOMEPAGE = https://developers.google.com/speed/webp
 COMMENT  = WebP codec: library to encode and decode images in WebP format.
-LICENSE  = https://github.com/webmproject/libwebp/blob/master/COPYING
-
-CMAKE_USE_NINJA = 1
+LICENSE  = 3-Clause BSD
 
 include ../../mk/spksrc.cross-cmake.mk
 

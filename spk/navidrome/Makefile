@@ -1,21 +1,20 @@
 SPK_NAME = navidrome
-SPK_VERS = 0.53.3
-SPK_REV = 1
+SPK_VERS = 0.58.5
+SPK_REV = 6
 SPK_ICON = src/navidrome.png
 
 DEPENDS = cross/navidrome
 
-# C++11 compiler required
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
-# go does not support ppc archs
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = hgy59
 HOMEPAGE = https://www.navidrome.org/
 DESCRIPTION = 🎧☁ Modern Music Server and Streamer compatible with Subsonic/Airsonic. It gives you freedom to listen to your music collection from any browser or mobile device.
 LICENSE = GPLv3
 DISPLAY_NAME = Navidrome
-CHANGELOG = "Initial package release"
+CHANGELOG = "1. Update Navidrome to v0.58.5. <br/>2. Update taglib to v2.1.1."
 
 STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh
@@ -34,5 +33,8 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: navidrome_extra_install
 navidrome_extra_install:
-	install -d -m 755 $(STAGING_DIR)/var
-	install -m 644 src/navidrome.toml $(STAGING_DIR)/var/
+	@$(MSG) Add rpath to navidrome to find package libraries
+	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/navidrome
+	@$(MSG) Install navidrome.toml
+	@install -d -m 755 $(STAGING_DIR)/var
+	@install -m 644 src/navidrome.toml $(STAGING_DIR)/var/

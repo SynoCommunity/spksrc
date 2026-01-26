@@ -55,10 +55,10 @@ PAGE_UNINSTALL_CONFIG=$(/bin/cat<<EOF
 		"desc": "Attention: The '${SYNOPKG_PKGNAME}' database will be removed during package uninstallation. All mailbox settings and contacts will be deleted."
 	}, {
 		"type": "password",
-		"desc": "Enter your MySQL superuser account password",
+		"desc": "Enter your MariaDB superuser account password",
 		"subitems": [{
 			"key": "wizard_mysql_password_root",
-			"desc": "MySQL 'root' password",
+			"desc": "MariaDB 'root' password",
 			"validator": {
 				"allowBlank": false
 			}

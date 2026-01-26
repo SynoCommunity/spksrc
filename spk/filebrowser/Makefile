@@ -1,6 +1,6 @@
 SPK_NAME = filebrowser
-SPK_VERS = 2.30.0
-SPK_REV = 5
+SPK_VERS = 2.55.0
+SPK_REV = 8
 SPK_ICON = src/filebrowser.png
 
 DEPENDS = cross/filebrowser
@@ -13,7 +13,7 @@ DESCRIPTION = filebrowser provides a file managing interface within a specified 
 HOMEPAGE = https://filebrowser.org/
 HELPURL = https://github.com/filebrowser/filebrowser/issues
 LICENSE = Apache 2.0
-CHANGELOG = "1. Update filebrowser to v2.30.0.<br/>2. Built with go v1.22 and node v20."
+CHANGELOG = "1. Update File Browser to v2.55.0 <br/>2. Add wizard for admin credential configuration <br/>3. Built with go v1.25.4 and node v24.11.1."
 
 GROUP = synocommunity
 

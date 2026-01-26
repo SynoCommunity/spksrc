@@ -28,6 +28,11 @@
 					"sqlite3"
 				],
 				"group": "http",
+				"php_settings": {
+					"error_log": "/var/services/web_packages/bbs/php_errors.log",
+					"session.save_path": "/var/packages/bicbucstriim/tmp/",
+					"zend.assertions": "-1"
+				},
 				"profile_desc": "PHP Profile for bicbucstriim",
 				"profile_name": "bicbucstriim Profile",
 				"user": "sc-bicbucstriim"

@@ -1,0 +1,18 @@
+Index: FFmpeg/libavcodec/qsvenc.c
+===================================================================
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -701,6 +701,13 @@ static int check_enc_param(AVCodecContex
+               av_log(avctx, AV_LOG_ERROR, "Current resolution is unsupported\n");
+         if (UNMATCH(FrameInfo.FourCC))
+               av_log(avctx, AV_LOG_ERROR, "Current pixel format is unsupported\n");
++        /* bail out from the error caused by unsupported Low power mode */
++        if (q->param.mfx.LowPower == MFX_CODINGOPTION_ON) {
++            av_log(avctx, AV_LOG_WARNING, "Some encoding parameters are not supported "
++                   "under Low power mode, trying to recover with it set to disabled\n");
++            q->param.mfx.LowPower = MFX_CODINGOPTION_UNKNOWN;
++            return check_enc_param(avctx, q);
++        }
+         return 0;
+     }
+     return 1;

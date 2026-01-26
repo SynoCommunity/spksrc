@@ -11,9 +11,11 @@ HOMEPAGE = https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git/about/
 COMMENT  = kmod is a set of tools to handle common tasks with Linux kernel modules like insert, remove, list, check properties, resolve dependencies and aliases.
 LICENSE  = LGPL 2.1
 
-GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = kmod_pre_configure
+
+GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-manpages
+ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-cc.mk
 

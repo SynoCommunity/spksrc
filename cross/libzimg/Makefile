@@ -1,5 +1,5 @@
 PKG_NAME = zimg
-PKG_VERS = 3.0.5
+PKG_VERS = 3.0.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = release-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sekrit-twc/zimg/archive/refs/tags
@@ -20,7 +20,7 @@ PRE_CONFIGURE_TARGET = zimg_pre_configure
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-simd
 endif
 endif
