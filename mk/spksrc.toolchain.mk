@@ -4,7 +4,7 @@
 # This makefile provides the complete toolchain build logic for spksrc.
 # It is responsible for:
 #  - downloading and extracting the toolchain
-#  - applying fixes and patches
+#  - applying normalization and patches
 #  - installing other compiler components (rust)
 #  - generating tc_vars* files used by cross-compilation environments
 #
@@ -148,17 +148,14 @@ else
 $(POST_TOOLCHAIN_TARGET): $(TOOLCHAIN_TARGET)
 endif
 
-.PHONY: toolchain_msg
-toolchain_msg:
-	@$(MSG) "Preparing toolchain for $(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)"
-
 #####
 
 include ../../mk/spksrc.depend.mk
 
-include ../../mk/spksrc.toolchain/versions.mk
-
-include ../../mk/spksrc.toolchain/flags.mk
+include ../../mk/spksrc.toolchain/tc-base.mk
+include ../../mk/spksrc.toolchain/tc-flags.mk
+include ../../mk/spksrc.toolchain/tc-url.mk
+include ../../mk/spksrc.toolchain/tc-versions.mk
 
 include ../../mk/spksrc.status.mk
 
@@ -171,20 +168,24 @@ include ../../mk/spksrc.checksum.mk
 extract: checksum
 include ../../mk/spksrc.extract.mk
 
-fix: extract
-include ../../mk/spksrc.toolchain/fix.mk
+normalize: extract
+include ../../mk/spksrc.toolchain/tc-normalize.mk
 
-patch: fix
+patch: normalize
 include ../../mk/spksrc.patch.mk
 
 rustc: patch
-include ../../mk/spksrc.toolchain/rust.mk
+include ../../mk/spksrc.toolchain/tc-rust.mk
 
-include ../../mk/spksrc.toolchain/vars.mk
+include ../../mk/spksrc.toolchain/tc_vars.mk
 
 #####
 
 .DEFAULT_GOAL := toolchain
+
+.PHONY: toolchain_msg
+toolchain_msg:
+	@$(MSG) "Preparing toolchain for $(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS)"
 
 pre_toolchain_target: toolchain_msg
 

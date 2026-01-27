@@ -1,10 +1,32 @@
-### Toolchain rustc rules
-# Invoke rustc toolchain install
-# Targets are executed in the following order:
-#  rustc_msg_target
-#  pre_rustc_target   (override with PRE_RUSTC_TARGET)
-#  rustc_target       (override with RUSTC_TARGET)
-#  post_rustc_target  (override with POST_RUSTC_TARGET)
+###############################################################################
+# spksrc.toolchain/tc-rust.mk
+#
+# Manages Rust toolchain installation and target support for cross-compilation.
+#
+# This file:
+#  - installs and configures rustup and rustc
+#  - installs prebuilt Rust targets when available (Tier 1/2)
+#  - optionally builds Rust targets from source (Tier 3)
+#  - generates a toolchain-specific config.toml for rustc
+#
+# Targets:
+#  rustc_msg
+#  pre_rustc_target     (override with PRE_RUSTC_TARGET)
+#  rustc_target         (override with RUSTC_TARGET)
+#  post_rustc_target    (override with POST_RUSTC_TARGET)
+#
+# Variables:
+#  TC_LOCAL_VARS_RUST   : rustc config.toml path for the target
+#  RUSTC_COOKIE         : Status cookie for rust toolchain installation
+#  FLOCK_TIMEOUT        : Lock timeout to serialize rustup operations
+#
+# Notes:
+#  - Uses file locking to prevent concurrent rustup/rustc installs.
+#  - Supports both prebuilt and source-built Rust targets.
+#  - Tier-3 targets are built using Rust’s ./x build system,
+#    driven by a target-specific config.toml.
+#
+###############################################################################
 
 # Define rustc configuration toml file location
 # when rebuilding for unsupported archs (i.e. Tier 3)

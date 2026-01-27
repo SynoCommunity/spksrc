@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.toolchain/vars.mk
+# spksrc.toolchain/tc_vars.mk
 #
 # This makefile generates all toolchain-specific environment definition files
 # $(WORK_DIR)/tc_vars* used by spksrc cross-compilation stages.
