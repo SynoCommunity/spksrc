@@ -1,5 +1,5 @@
 PKG_NAME = libmpdclient
-PKG_VERS = 2.22
+PKG_VERS = 2.24
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MusicPlayerDaemon/libmpdclient/archive
@@ -7,6 +7,8 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
+
+PATCHES_LEVEL = 1
 
 HOMEPAGE = https://www.musicpd.org/libs/libmpdclient/
 COMMENT  = libmpdclient is a C library which implements the Music Player Daemon protocol.

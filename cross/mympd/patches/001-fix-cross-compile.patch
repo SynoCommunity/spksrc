@@ -1,0 +1,42 @@
+--- a/CMakeLists.txt	2026-01-27 03:11:31.756455555 +0000
++++ b/CMakeLists.txt	2026-01-27 03:11:45.013497424 +0000
+@@ -91,7 +91,12 @@
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
+ 
+ # required dependencies
+-find_library(MATH_LIB m REQUIRED)
++# For cross-compilation, MATH_LIB can be set externally to bypass find_library
++if(NOT MATH_LIB)
++  find_library(MATH_LIB m REQUIRED)
++else()
++  message(STATUS "Using pre-defined MATH_LIB: ${MATH_LIB}")
++endif()
+ find_package(Threads REQUIRED)
+ find_package(PCRE2 REQUIRED)
+ find_package(OpenSSL REQUIRED)
+@@ -442,16 +447,21 @@
+   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
+ elseif(CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
+   add_compile_options(
+-    "-fPIE"
++    "-fPIC"
+     "-O2"
+   )
+   if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+     message("Generating binary with debug symbols")
+     add_compile_options("-g")
+   endif()
+-  # IPO/LTO support
+-  check_ipo_supported()
+-  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
++  # IPO/LTO support (check if supported before enabling)
++  check_ipo_supported(RESULT ipo_supported OUTPUT ipo_output)
++  if(ipo_supported)
++    message(STATUS "IPO is supported")
++    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
++  else()
++    message(STATUS "IPO is not supported: ${ipo_output}")
++  endif()
+ else()
+   # if CMAKE_BUILD_TYPE is not Debug, Release, RelWithDebInfo or MinSizeRel
+   # do not alter compile options

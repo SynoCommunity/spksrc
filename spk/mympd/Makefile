@@ -1,6 +1,6 @@
 SPK_NAME = mympd
-SPK_VERS = 14.1.0
-SPK_REV = 2
+SPK_VERS = 24.0.2
+SPK_REV = 3
 SPK_ICON = src/mympd.png
 DSM_UI_DIR = app
 
@@ -12,7 +12,7 @@ REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = hgy59
 DESCRIPTION = myMPD is a standalone and mobile friendly web mpd client with a tiny footprint and advanced features.
-CHANGELOG = "Initial package release."
+CHANGELOG = "Update myMPD 24.0.2 <br/>Major version update with fuzzy search, improved MPD protocol handling, and better UTF-8 support."
 
 DISPLAY_NAME = myMPD
 
