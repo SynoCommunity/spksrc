@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/jcorporation/myMPD/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = myMPD-$(PKG_VERS)
 
-DEPENDS = cross/libmpdclient cross/openssl3 cross/pcre2 cross/libid3tag cross/utf8proc
+DEPENDS = cross/libmpdclient cross/openssl3 cross/pcre2 cross/libid3tag cross/utf8proc cross/lua
 PATCHES_LEVEL = 1
 
 REQUIRED_MIN_DSM = 7.0
@@ -18,7 +18,6 @@ COMMENT  = myMPD is a standalone and mobile friendly web mpd client with a tiny 
 LICENSE  = GPLv3
 
 CMAKE_USE_NINJA = 0
-CMAKE_ARGS  = -DMYMPD_ENABLE_LUA=OFF
 CMAKE_ARGS += -DMYMPD_ENABLE_FLAC=OFF
 CMAKE_ARGS += -DMYMPD_DOC=OFF
 CMAKE_ARGS += -DMYMPD_MANPAGES=OFF
