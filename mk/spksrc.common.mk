@@ -126,7 +126,13 @@ ifneq ($(filter 1 on ON,$(PSTAT)),)
 PSTAT_TIME = time -o $(STATUS_LOG) --append --quiet
 endif
 
-DEFAULT_LOG  = $(LOG_DIR)/build$(or $(ARCH_SUFFIX),-noarch-$(TCVERSION)).log
+ifneq ($(TC_NAME),)
+  # In toolchain context
+  DEFAULT_LOG = $(LOG_DIR)/build-$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS).log
+else
+  # In package context (handles both arch-specific and noarch)
+  DEFAULT_LOG = $(LOG_DIR)/build$(or $(ARCH_SUFFIX),-noarch-$(TCVERSION)).log
+endif
 CROSSENV_LOG = $(LOG_DIR)/build$(ARCH_SUFFIX)-crossenv.log
 WHEEL_LOG    = $(LOG_DIR)/build$(ARCH_SUFFIX)-wheel.log
 NATIVE_LOG   = $(LOG_DIR)/build-native-$(PKG_NAME).log
@@ -142,6 +148,24 @@ version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
+
+# Generic macro to call recipe execution using logging
+define LOG_WRAPPED
+@bash -o pipefail -c '\
+    if [ -z "$$LOGGING_ENABLED" ]; then \
+        export LOGGING_ENABLED=1 ; \
+        script -q -e -c "$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1)" /dev/null \
+            | tee >(sed -r "s/\x1B\[[0-9;]*[mK]//g; s/\\r//g" >> "$(DEFAULT_LOG)") ; \
+    else \
+        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1) ; \
+    fi \
+' || { \
+    $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" \
+        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(1)") \
+        | tee --append $(STATUS_LOG) ; \
+    exit 1 ; \
+}
+endef
 
 # Remove duplicate words within string while preserving order
 define uniq

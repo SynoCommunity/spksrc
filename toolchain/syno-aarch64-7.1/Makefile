@@ -11,4 +11,4 @@ TC_DIST_SITE_PATH = Realtek%20RTD129x%20Linux%204.4.180
 TC_TARGET = aarch64-unknown-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sysroot
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk
