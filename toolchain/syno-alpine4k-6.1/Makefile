@@ -4,7 +4,7 @@ TC_KERNEL = 3.10.102
 TC_GLIBC = 2.20
 
 TC_DIST = alpine4k-gcc493_glibc220_hard-GPL
-TC_DIST_SITE_PATH = Annapurna%20Alpine%20Linux%203.10.102
+TC_DIST_SITE_PATH = Annapurna%20Alpine4k%20Linux%203.10.102
 
 TC_TARGET = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot
