@@ -14,6 +14,7 @@ LICENSE  = GPLv2
 
 PATCHES_LEVEL = 1
 
-CMAKE_USE_TOOLCHAIN_FILE = NO
+# Explicit include path needed for CMake 3.31+ (implicit include detection)
+ADDITIONAL_CFLAGS = -I$(INSTALL_DIR)$(INSTALL_PREFIX)/include
 
 include ../../mk/spksrc.cross-cmake.mk
