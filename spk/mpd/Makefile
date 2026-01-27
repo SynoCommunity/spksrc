@@ -1,18 +1,18 @@
 SPK_NAME = mpd
-SPK_VERS = 0.23.17
-SPK_REV = 3
+SPK_VERS = 0.24.8
+SPK_REV = 4
 SPK_ICON = src/mpd.png
 DSM_UI_DIR = app
 
 DEPENDS = cross/mpd
 
-REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_DSM = 7.2
 UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = hgy59
 DESCRIPTION = Music Player Daemon \(MPD\) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
-CHANGELOG = "1. Update MPD to v0.23.17 <br/>2. Add Unix socket for local client communication (myMPD, ympd)."
+CHANGELOG = "1. Update MPD to v0.24.8 (requires DSM 7.2+ for C++20 support). <br/>2. Remove Boost dependency."
 
 DISPLAY_NAME = Music Player Daemon
 
