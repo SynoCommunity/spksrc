@@ -1,5 +1,5 @@
-# Include base definitions (version macros, etc.)
-include ../../mk/spksrc.base.mk
+# Include macro definitions
+include ../../mk/spksrc.common/macros.mk
 
 # * all goes in $(WORK_DIR) : work-arch (for noarch: work-all or work-dsm7), in the current directory
 # * it will be installed in $(INSTALL_PREFIX) on the target system (/usr/local/transmission)

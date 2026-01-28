@@ -1,23 +1,28 @@
-# Base definitions, shared by all makefiles
-# This file contains only plain macros and defines with NO directory dependencies
-
-# Stop on first error
-SHELL := $(SHELL) -e
-
-# Define $(empty) and $(space)
-empty :=
-space := $(empty) $(empty)
-
-# Display message in a consistent way
-MSG = echo "===> "
-
-# Available languages
-LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
-
-# Terminal colors
-RED=$$(tput setaf 1)
-GREEN=$$(tput setaf 2)
-NC=$$(tput sgr0)
+###############################################################################
+# mk/spksrc.common/macros.mk
+#
+# Defines generic GNU Make helper macros used across spksrc.
+#
+# This file:
+#  - provides version string comparison helpers
+#  - implements list and string de-duplication utilities
+#  - offers helpers to merge environment variable values
+#
+# Macros:
+#  version_le  : true if version A <= version B
+#  version_ge  : true if version A >= version B
+#  version_lt  : true if version A <  version B
+#  version_gt  : true if version A >  version B
+#
+#  uniq        : removes duplicate words while preserving order
+#  dedup       : de-duplicates delimiter-separated strings
+#  merge       : merges environment variable values from input
+#
+# Notes:
+#  - Version comparisons rely on GNU sort (-V)
+#  - Some macros invoke /bin/bash for string processing
+#
+###############################################################################
 
 # Macro: Version Comparison
 version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi)

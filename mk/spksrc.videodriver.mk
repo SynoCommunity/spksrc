@@ -10,7 +10,7 @@ endif
 # set default spk/synocli-videodriver path to use
 VIDEODRV_PACKAGE_ROOT = $(realpath $(CURDIR)/../../spk/$(VIDEODRV_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 
