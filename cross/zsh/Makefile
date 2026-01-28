@@ -16,7 +16,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-gdbm
 CONFIGURE_ARGS += --enable-pcre
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 DEPENDS += cross/libcap

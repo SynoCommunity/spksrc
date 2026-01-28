@@ -18,7 +18,7 @@ CONFIGURE_ARGS += -Denable_examples=false
 CONFIGURE_ARGS += -Denable_docs=false
 ADDITIONAL_CFLAGS = -O
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))

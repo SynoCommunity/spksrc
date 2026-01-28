@@ -21,7 +21,7 @@ GNU_CONFIGURE = 1
 # tesseract integration requires c++17, but fails to build...
 CONFIGURE_ARGS += --without-tesseract
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
 CONFIGURE_ARGS += --disable-neon
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

@@ -13,7 +13,7 @@ REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 DEPENDS  = cross/glib
 DEPENDS += cross/alsa-lib
@@ -44,7 +44,7 @@ GNU_CONFIGURE = 1
 BOOST_LIBRARIES += system
 ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))  
 # define value missing in socket.h in evansport toolchain
 ADDITIONAL_CXXFLAGS = -DSO_REUSEPORT=15
