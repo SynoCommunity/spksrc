@@ -1,5 +1,5 @@
 lnk:lib/libLLVM.so
-lnk:lib/libLLVM-14.0.5.so
+lnk:lib/libLLVM-14.0.6.so
 lib:lib/libLLVM-14.so
 lnk:lib/libclang-cpp.so
 lib:lib/libclang-cpp.so.14
