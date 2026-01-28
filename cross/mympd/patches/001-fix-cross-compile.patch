@@ -1,20 +1,23 @@
 --- a/CMakeLists.txt	2026-01-27 03:11:31.756455555 +0000
 +++ b/CMakeLists.txt	2026-01-27 03:11:45.013497424 +0000
-@@ -91,7 +91,12 @@
+@@ -91,7 +91,15 @@
  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
  
  # required dependencies
 -find_library(MATH_LIB m REQUIRED)
 +# For cross-compilation, MATH_LIB can be set externally to bypass find_library
++# Set to 'm' (just library name) to link using -lm without full path
 +if(NOT MATH_LIB)
 +  find_library(MATH_LIB m REQUIRED)
-+else()
-+  message(STATUS "Using pre-defined MATH_LIB: ${MATH_LIB}")
++elseif(MATH_LIB STREQUAL "m")
++  # Just use the library name directly for linking (works with cross-compilers)
++  message(STATUS "Using MATH_LIB as library name: m")
++  set(MATH_LIB "m")
 +endif()
  find_package(Threads REQUIRED)
  find_package(PCRE2 REQUIRED)
  find_package(OpenSSL REQUIRED)
-@@ -442,16 +447,21 @@
+@@ -442,16 +450,21 @@
    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
  elseif(CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
    add_compile_options(
@@ -35,7 +38,7 @@
 +    message(STATUS "IPO is supported")
 +    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 +  else()
-+    message(STATUS "IPO is not supported: ${ipo_output}")
++    message(STATUS "IPO is not supported: \${ipo_output}")
 +  endif()
  else()
    # if CMAKE_BUILD_TYPE is not Debug, Release, RelWithDebInfo or MinSizeRel
