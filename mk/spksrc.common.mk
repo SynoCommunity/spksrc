@@ -24,6 +24,15 @@
 #
 # Notes:
 #  - Parallel build mode is auto-detected unless explicitly set
+#  - This file is intended to be the single entry point for common build definitions
+#
+# Common include structure:
+#
+#   mk/spksrc.common.mk
+#   └── mk/spksrc.common/
+#       ├── archs.mk   : architecture and toolchain classification
+#       ├── logs.mk    : build log paths and logging helpers
+#       └── macros.mk  : generic GNU Make helper macros
 #
 ###############################################################################
 
