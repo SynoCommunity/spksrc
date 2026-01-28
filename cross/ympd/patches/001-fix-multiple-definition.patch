@@ -1,0 +1,25 @@
+--- a/src/mpd_client.h
++++ b/src/mpd_client.h
+@@ -92,7 +92,9 @@ struct t_mpd {
+ 
+     int song_id;
+     unsigned queue_version;
+-} mpd;
++};
++
++extern struct t_mpd mpd;
+ 
+ struct t_mpd_client_session {
+     int song_id;
+--- a/src/mpd_client.c
++++ b/src/mpd_client.c
+@@ -27,6 +27,9 @@
+ #include "config.h"
+ #include "json_encode.h"
+ 
++/* Global variable definition (declared extern in mpd_client.h) */
++struct t_mpd mpd;
++
+ /* forward declaration */
+ static int mpd_notify_callback(struct mg_connection *c, enum mg_event ev);
+ 
