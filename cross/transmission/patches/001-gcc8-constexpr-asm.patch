@@ -1,6 +1,6 @@
---- libtransmission/net.h
-+++ libtransmission/net.h
-@@ -397,7 +397,8 @@
+--- libtransmission/net.h.orig	2026-01-26 19:59:25
++++ libtransmission/net.h	2026-01-28 08:52:42
+@@ -389,7 +389,8 @@
      // 2002::/16
      [[nodiscard]] constexpr bool is_ipv6_6to4() const noexcept
      {
