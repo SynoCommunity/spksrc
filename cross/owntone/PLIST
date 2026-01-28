@@ -1,0 +1,6 @@
+rsc:etc/owntone.conf
+lib:lib/owntone/owntone-sqlext.so
+bin:sbin/owntone
+lnk:lib/libssp.so
+lnk:lib/libssp.so.0
+lib:lib/libssp.so.0.0.0
