@@ -17,7 +17,7 @@ CONFIGURE_ARGS += --without-docs
 CONFIGURE_ARGS += --without-tutorial
 PRE_CONFIGURE_TARGET = mg_pre_configure
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # old gcc does not support option -flto
 CONFIGURE_ARGS += --enable-size-optimizations

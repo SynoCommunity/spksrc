@@ -25,7 +25,7 @@ CONFIGURE_ARGS += --disable-doc
 # ec-inline.h:666:5: error: 'asm' operand has impossible constraints
 ADDITIONAL_CFLAGS = -O3
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # avoid key generation failure for aarch64 (#5150)
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))

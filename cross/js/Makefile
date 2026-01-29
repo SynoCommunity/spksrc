@@ -22,7 +22,7 @@ CONFIGURE_ARGS = ac_cv_va_copy=C99 --disable-dependency-tracking --disable-stati
 
 PRE_COMPILE_TARGET = js_pre_compile
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 PRE_COMPILE_HOST_CPU =
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))

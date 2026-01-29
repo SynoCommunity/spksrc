@@ -49,7 +49,7 @@ ENV += BOOST_LIBRARIES="$(BOOST_LIBRARIES)"
 ENV += BOOST_INCLUDEDIR=$(STAGING_INSTALL_PREFIX)/include/boost
 ENV += BOOST_LIBRARYDIR=$(STAGING_INSTALL_PREFIX)/lib
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 # define value missing in socket.h in evansport toolchain

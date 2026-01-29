@@ -13,7 +13,7 @@ LICENSE  = GPLv2/LGPLv2
 
 GNU_CONFIGURE = 1
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 CONFIGURE_TARGET = glibc_configure_target
 COMPILE_TARGET = glibc_compile_taget
