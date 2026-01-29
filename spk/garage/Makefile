@@ -1,6 +1,6 @@
 SPK_NAME = garage
-SPK_VERS = 2.1.0
-SPK_REV = 1
+SPK_VERS = 2.2.0
+SPK_REV = 2
 SPK_ICON = src/garage.png
 DSM_UI_DIR = app
 
@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 MAINTAINER = fgma
 DESCRIPTION = Garage is an S3-compatible distributed object storage service designed for self-hosting at a small-to-medium scale.
 DISPLAY_NAME = Garage
-CHANGELOG = "Initial version"
+CHANGELOG = "Update to garage v2.2.0"
 LICENSE_FILE = $(WORK_DIR)/garage/LICENSE
 HOMEPAGE = https://garagehq.deuxfleurs.fr/
 LICENSE = AGPLv3.0
