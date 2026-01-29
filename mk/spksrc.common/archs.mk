@@ -1,14 +1,50 @@
-# Common arch definitions
+###############################################################################
+# mk/spksrc.common/archs.mk
+#
+# Defines architecture and toolchain classification variables for spksrc.
+#
+# This file:
+#  - detects available toolchains and kernel versions
+#  - defines CPU architecture groupings
+#  - applies architecture exclusions for specific build scenarios
+#
+# Variables:
+#  AVAILABLE_TOOLCHAINS        : detected toolchains ({ARCH}-{TC})
+#  AVAILABLE_TCVERSIONS        : detected toolchain versions
+#  AVAILABLE_KERNEL            : detected kernel toolchains
+#
+#  ARM_ARCHS, x64_ARCHS,
+#  PPC_ARCHS, i686_ARCHS       : architecture families
+#  ARMv5, ARMv7, ARMv8         : ARM variants
+#  32bit_ARCHS, 64bit_ARCHS    : bitness groupings
+#
+#  SUPPORTED_ARCHS             : fully supported architectures
+#  LATEST_ARCHS                : latest toolchain per architecture
+#  LEGACY_ARCHS                : non-generic, legacy architectures
+#
+# Notes:
+#  - BASEDIR is auto-detected when not explicitly set
+#  - Generic architectures are used where multi-arch support exists
+#  - Dotnet-related exclusions are handled conditionally
+#
+###############################################################################
 
-###
-
-# Set basedir in case called from spkrc/ or from normal sub-dir
-# Note that github-action uses workspace/ in place of spksrc/
+# Allows direct inclusion for backward compatibility
 ifeq ($(BASEDIR),)
 ifeq ($(filter spksrc workspace,$(shell basename $(CURDIR))),)
 BASEDIR = ../../
 endif
 endif
+
+###
+
+# Available toolchains formatted as '{ARCH}-{TC}'
+AVAILABLE_TOOLCHAINS = $(subst syno-,,$(filter-out %-rust,$(sort $(notdir $(wildcard $(BASEDIR)toolchain/syno-*)))))
+AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell echo ${arch} | cut -f2 -d'-')))
+
+# Available toolchains formatted as '{ARCH}-{TC}'
+AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)kernel/syno-*))))
+AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell echo ${arch} | cut -f2 -d'-')))
 
 ###
 
@@ -80,3 +116,22 @@ endif
 ifeq ($(strip $(DOTNET_SERVARR_ARCHS)),2)
     UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(ARMv7_ARCHS)
 endif
+
+# Filter to exclude TC versions greater than DEFAULT_TC (from local configuration)
+TCVERSION_DUPES = $(addprefix %,$(filter-out $(DEFAULT_TC),$(AVAILABLE_TCVERSIONS)))
+
+# remove unsupported (outdated) archs
+ARCHS_DUPES_DEPRECATED += $(addsuffix %,$(DEPRECATED_ARCHS))
+
+# Filter for all-supported
+ARCHS_DUPES = $(ARCHS_WITH_GENERIC_SUPPORT) $(ARCHS_DUPES_DEPRECATED) $(TCVERSION_DUPES)
+
+# supported: used for all-supported target
+SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
+
+# default: used for all-latest target
+LATEST_ARCHS = $(foreach arch,$(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS)))))),$(arch)-$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $(arch)%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $(arch)%, $(AVAILABLE_TOOLCHAINS))))))))
+
+# legacy: used for all-legacy and when kernel support is used
+#         all archs except generic archs
+LEGACY_ARCHS = $(sort $(filter-out $(addsuffix %,$(GENERIC_ARCHS)), $(AVAILABLE_TOOLCHAINS)))

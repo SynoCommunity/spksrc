@@ -44,7 +44,7 @@ OPENSSL_ARCH = linux-ppc
 endif
 
 ifeq ($(strip $(OPENSSL_ARCH)),)
-# Unexpected CPU architecture. Please add arch to mk/spksrc.archs.mk
+# Unexpected CPU architecture. Please add arch to mk/spksrc.common.mk
 $(error Arch $(ARCH) not expected yet)
 endif
 

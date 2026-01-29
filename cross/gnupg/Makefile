@@ -28,7 +28,7 @@ CONFIGURE_ARGS += GPGRT_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/gpgrt-config
 
 ADDITIONAL_CPPFLAGS = -O
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # kernel before 2.6.36 do not support inotify
