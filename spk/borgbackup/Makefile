@@ -68,7 +68,9 @@ endif
 
 # [llfuse]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [llfuse] -std=gnu11
+# llfuse 1.5.2 uses Cython 3.2.3 which generates C11 atomics code that fails
+# due to ATOMIC_INT_LOCK_FREE not being a preprocessor constant in older GCC.
+WHEELS_CFLAGS += [llfuse] -std=gnu11 -DCYTHON_ATOMICS=0
 endif
 
 # [msgpack]
