@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.4.3
-SPK_REV = 20
+SPK_REV = 21
 SPK_ICON = src/borgbackup.png
 
 PYTHON_PACKAGE = python312
@@ -42,7 +42,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update Borg to v1.4.3.<br/>2. Update borgmatic to v2.0.12.<br/>3. Refresh Python dependencies."
+CHANGELOG = "1. Update borgmatic to v2.1.1.<br/>2. Refresh Python dependencies."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
