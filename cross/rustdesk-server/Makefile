@@ -13,7 +13,7 @@ LICENSE  = AGPL-3.0
 
 INSTALL_TARGET = rustdesk-server_install
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Map spksrc architectures to RustDesk binary architectures
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))

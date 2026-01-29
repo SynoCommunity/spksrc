@@ -17,7 +17,7 @@ INSTALL_TARGET = qbittorrent_install
 # Available: x86_64, aarch64, armv7, x86
 PKG_DIST_ARCH_LIST = x86_64 aarch64 armv7 x86
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = x86_64
