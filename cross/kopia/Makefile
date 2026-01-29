@@ -1,5 +1,5 @@
 PKG_NAME = kopia
-PKG_VERS = 0.21.1
+PKG_VERS = 0.22.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/kopia/kopia/releases/download/v$(PKG_VERS)
@@ -16,7 +16,7 @@ INSTALL_TARGET = kopia_install
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = x64 arm arm64
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = x64
 else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))

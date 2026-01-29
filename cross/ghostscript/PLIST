@@ -25,4 +25,4 @@ rsc:bin/ps2pdfwr
 rsc:bin/ps2ps
 rsc:bin/ps2ps2
 rsc:bin/unix-lpr.sh
-rsc:share/ghostscript/10.05.0/
+rsc:share/ghostscript/10.06.0/

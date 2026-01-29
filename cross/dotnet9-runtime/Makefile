@@ -1,12 +1,12 @@
 PKG_NAME = aspnetcore-runtime
-PKG_VERS = 9.0.11
+PKG_VERS = 9.0.12
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # use digests with multiple files and individual dist names
 # both lists must have the same order

@@ -15,7 +15,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-elf-shlibs
 CONFIGURE_ARGS += --disable-uuidd
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # This is more a toolchain than an arch limitation
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))

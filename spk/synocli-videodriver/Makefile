@@ -1,10 +1,10 @@
 SPK_NAME = synocli-videodriver
-SPK_VERS = 1.3
-SPK_REV = 4
+SPK_VERS = 1.4
+SPK_REV = 5
 SPK_ICON = src/SynoPackagegreen-videodriver.png
 
 MAINTAINER = th0ma7
-DESCRIPTION = "Provides video driver support for Intel GPU acceleration \(DSM6-7\), including OpenCL \(DSM7.1+ only\)."
+DESCRIPTION = "Provides video driver support for Intel GPU acceleration \(DSM6-7\), including Vulkan and OpenCL \(DSM7.1+ only\)."
 DISPLAY_NAME = SynoCli Video Drivers
 STARTABLE = no
 
@@ -19,6 +19,7 @@ VIDEODRIVER = on
 
 SPK_COMMANDS  = bin/clinfo
 SPK_COMMANDS += bin/vainfo
+SPK_COMMANDS += bin/vulkaninfo
 SPK_COMMANDS += bin/lsgpu
 
 DEPENDS  = cross/libva cross/libva-utils
@@ -29,16 +30,20 @@ include ../../mk/spksrc.common.mk
 
 CHANGELOG  = "1. Intel Media Driver Release 2024Q4 (Release 2022Q4 for DSM 6).<br/> "
 CHANGELOG += "2. Intel Level-Zero 1.17.42 (DSM 7.1+).<br/> "
-CHANGELOG += "3. Intel Graphics Compiler (IGC) 1.0.17537.24 (DSM 7.1+).<br/> "
+CHANGELOG += "3. Intel Graphics Compiler (IGC) 1.0.17791.18 (DSM 7.1+).<br/> "
 CHANGELOG += "4. Intel Compute Runtime 24.35.30872.41 (DSM 7.1+).<br/> "
 CHANGELOG += "5. Intel Video Processing Library (Intel VPL) 2.15.0 (DSM 7.1+).<br/> "
-CHANGELOG += "6. Intel GPU Tools (IGT) 1.30 (DSM 7.1+)."
+CHANGELOG += "6. MESA Intel Vulkan driver (anv) 23.3.6 (DSM 7.1+)."
+CHANGELOG += "7. Intel GPU Tools (igt) 2.3 (DSM 7.1+)."
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.1),1)
 
 # Enable OpenCL only on DSM >= 7.1
 DEPENDS += cross/intel-compute-runtime
 DEPENDS += cross/clinfo
+DEPENDS += cross/mesa
+DEPENDS += cross/Khronos-Vulkan-Loader
+DEPENDS += cross/Khronos-Vulkan-Tools
 
 # Enable intel_gpu_top on DSM >= 7.1
 DEPENDS += cross/intel-gpu-tools

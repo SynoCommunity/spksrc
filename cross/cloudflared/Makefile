@@ -1,5 +1,5 @@
 PKG_NAME = cloudflared
-PKG_VERS = 2025.10.0
+PKG_VERS = 2026.1.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cloudflare/cloudflared/archive

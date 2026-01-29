@@ -96,9 +96,15 @@ SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK
 
 #####
 
+# Do not initialize any environment to avoid variable leakage.
+DEFAULT_ENV = none
+
+#####
+
 include ../../mk/spksrc.pre-check.mk
 
-# Even though this makefile doesn't cross compile, we need this to setup the cross environment.
+# Even though this makefile doesn't cross compile,
+# we need this to setup the cross environment.
 include ../../mk/spksrc.cross-env.mk
 
 include ../../mk/spksrc.depend.mk
@@ -539,6 +545,7 @@ spkclean:
 	       work-*/PACKAGE_ICON* \
 	       work-*/WIZARD_UIFILES
 
+wheelclean: SHELL:=/bin/bash
 wheelclean: spkclean
 	rm -fr work*/.wheel_done \
 	       work*/.wheel_*_done \
@@ -547,9 +554,10 @@ wheelclean: spkclean
 	@make --no-print-directory dependency-flat | sort -u | grep '\(cross\|python\)/' | while read depend ; do \
 	   makefile="../../$${depend}/Makefile" ; \
 	   if grep -q 'spksrc\.python-wheel\(-meson\)\?\.mk' $${makefile} ; then \
-	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
-	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
-	      echo "rm -fr work-*/$${pkgname}*\\n       work-*/.$${pkgname}-*" ; \
+	      pkgvers=$$(grep ^PKG_VERS $${makefile} | cut -d= -f2 | xargs) ; \
+	      pkgname=$$(grep ^PKG_NAME $${makefile} | cut -d= -f2 | xargs) ; \
+	      pkgname=$${pkgname//\$$\(PKG_VERS\)/$${pkgvers}} ; \
+	      echo -ne "rm -fr work-*/$${pkgname}* \\ \\n       work-*/.$${pkgname}-* \\n" ; \
 	      rm -fr work-*/$${pkgname}* \
                      work-*/.$${pkgname}-* ; \
 	   fi ; \

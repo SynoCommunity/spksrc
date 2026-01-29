@@ -1,6 +1,51 @@
-[{
-    "step_title": "Admin Credentials",
-    "items": [{
-        "desc": "The default credentials are: username: <b>admin</b> password: <b>admin</b>.<br><br>NOTE that most files will not be writable and some are not even readable due to the package having inadequate permissions for those actions."
-    }]
-}]
+[
+    {
+        "step_title": "Admin Credentials",
+        "invalid_next_disabled": true,
+        "items": [
+            {
+                "desc": "Please provide credentials for the administrator account. These will be used to log into the File Browser web interface.<br><br>The default credentials are <b>admin/adminpassword</b>."
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_username",
+                        "desc": "Username",
+                        "defaultValue": "admin",
+                        "validator": {
+                            "allowBlank": false,
+                            "minLength": 1,
+                            "regex": {
+                                "expr": "/^[a-zA-Z0-9_-]+$/",
+                                "errorText": "Username can only contain letters, numbers, underscores and hyphens"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "subitems": [
+                    {
+                        "key": "wizard_password",
+                        "desc": "Password (minimum 12 characters)",
+                        "defaultValue": "adminpassword",
+                        "validator": {
+                            "allowBlank": false,
+                            "minLength": 12
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "step_title": "Permissions Notice",
+        "items": [
+            {
+                "desc": "Most files will not be writable and some are not even readable due to the package having inadequate permissions for those actions.<br><br>Using File Station, add the <b>'sc-filebrowser'</b> user to folders that File Browser should be allowed to access."
+            }
+        ]
+    }
+]

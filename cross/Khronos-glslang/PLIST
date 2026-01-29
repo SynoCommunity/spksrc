@@ -1,0 +1,11 @@
+bin:bin/glslang
+lnk:bin/glslangValidator
+lnk:lib/libSPIRV.so
+lnk:lib/libSPIRV.so.16
+lib:lib/libSPIRV.so.16.1.0
+lnk:lib/libglslang-default-resource-limits.so
+lnk:lib/libglslang-default-resource-limits.so.16
+lib:lib/libglslang-default-resource-limits.so.16.1.0
+lnk:lib/libglslang.so
+lnk:lib/libglslang.so.16
+lib:lib/libglslang.so.16.1.0

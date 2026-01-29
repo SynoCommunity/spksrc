@@ -27,7 +27,7 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = debian-chroot_extra_install
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 DEBIAN_ARCH =
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
