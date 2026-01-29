@@ -61,8 +61,10 @@ endif
 # when invoking make from under spk/*.  Setting var when
 # test-building dependencies from under cross/* is unecessary.
 #
+ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifeq ($(lastword $(subst /, ,$(INSTALL_PREFIX))),target)
 INSTALL_PREFIX_VAR = $(shell dirname $(INSTALL_PREFIX))/var
+endif
 endif
 ifeq ($(strip $(INSTALL_PREFIX_VAR)),)
 INSTALL_PREFIX_VAR  = $(INSTALL_PREFIX)/var
