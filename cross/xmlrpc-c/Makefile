@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libxml2 cross/curl
+DEPENDS = cross/libxml2
 
 HOMEPAGE = http://xmlrpc-c.sourceforge.net/
 COMMENT  = Programming library for writing an XML-RPC server or client in C or C++.
@@ -14,6 +14,15 @@ LICENSE  = BSD
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --enable-libxml2-backend
+# Disable components not used by rTorrent (the only consumer of xmlrpc-c in spksrc):
+# - abyss-server: rTorrent uses its own SCGI server, not the Abyss HTTP server
+# - cplusplus: rTorrent uses the C API (xmlrpc_registry_*, xmlrpc_DECREF, etc.)
+# - libwww-client: W3C libwww HTTP client transport (deprecated, unused)
+# - curl-client: XML-RPC client transport; rTorrent is a server, not a client
+CONFIGURE_ARGS += --disable-abyss-server
+CONFIGURE_ARGS += --disable-cplusplus
+CONFIGURE_ARGS += --disable-libwww-client
+CONFIGURE_ARGS += --disable-curl-client
 
 # Limit parallelism for xmlrpc-c; avoid races in libxmlrpc_util.so build
 DISABLE_PARALLEL_MAKE = 1
