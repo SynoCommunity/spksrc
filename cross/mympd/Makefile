@@ -7,6 +7,9 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = myMPD-$(PKG_VERS)
 
 DEPENDS = cross/libmpdclient cross/openssl3 cross/pcre2 cross/libid3tag cross/utf8proc cross/lua
+BUILD_DEPENDS = native/lua
+LUA_NATIVE_PATH = $(abspath $(PWD)/../../native/lua/work-native/install/bin)
+ENV += PATH=$(LUA_NATIVE_PATH):$$PATH
 PATCHES_LEVEL = 1
 
 REQUIRED_MIN_DSM = 7.0
