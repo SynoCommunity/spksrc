@@ -1,6 +1,8 @@
 
 CONFIG_DIR=${SYNOPKG_PKGVAR}/config
 CONFIG_DEFAULT_DIR=${SYNOPKG_PKGVAR}/config.default
+export MPD_HOST=/var/packages/mpd/var/mpd.socket
+
 SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/mympd"
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y

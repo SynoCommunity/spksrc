@@ -8,7 +8,7 @@ DEPENDS = cross/ympd
 
 MAINTAINER = hgy59
 DESCRIPTION = ympd: Standalone MPD Web GUI written in C, utilizing Websockets and Bootstrap/JS.
-CHANGELOG = "Fix cross-compilation with CMake toolchain file."
+CHANGELOG = "1. Configure MPD socket connection for music directory and playlist directory support. <br/>2. Fix cross-compilation with CMake toolchain file."
 
 DISPLAY_NAME = MPD Web GUI
 
