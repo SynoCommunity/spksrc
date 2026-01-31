@@ -1,0 +1,12 @@
+--- libtransmission/net.h.orig	2026-01-26 19:59:25
++++ libtransmission/net.h	2026-01-28 08:52:42
+@@ -389,7 +389,8 @@
+     // 2002::/16
+     [[nodiscard]] constexpr bool is_ipv6_6to4() const noexcept
+     {
+-        return is_ipv6() && reinterpret_cast<uint16_t const*>(&addr.addr6)[0] == htons(0x2002U);
++        auto const* bytes = reinterpret_cast<uint8_t const*>(&addr.addr6);
++        return is_ipv6() && bytes[0] == 0x20U && bytes[1] == 0x02U;
+     }
+ 
+     // fe80::/64 from fe80::/10
