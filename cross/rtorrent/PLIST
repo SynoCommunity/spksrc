@@ -1,2 +1,1 @@
 bin:bin/rtorrent
-rsc:share/rtorrent/lua/rtorrent.lua
