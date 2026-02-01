@@ -16,3 +16,10 @@ service_postinst ()
         $RSYNC --ignore-existing ${CONFIG_DEFAULT_DIR}/ ${CONFIG_DIR}
     fi
 }
+
+service_preupgrade()
+{
+    # Remove legacy mpd_host files to allow migration to socket-based connection
+    rm -f "${SYNOPKG_PKGVAR}/state/mpd_host" \
+          "${SYNOPKG_PKGVAR}/state/stickerdb_mpd_host"
+}
