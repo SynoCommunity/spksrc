@@ -1,6 +1,6 @@
 --- a/include/mpd/sticker.h
 +++ b/include/mpd/sticker.h
-@@ -22,7 +22,7 @@ struct mpd_connection;
+@@ -23,7 +23,8 @@
   * Comparison operators for sticker search api
   */
  enum mpd_sticker_operator {
@@ -10,7 +10,7 @@
  	MPD_STICKER_OP_EQ,
  	MPD_STICKER_OP_GT,
  	MPD_STICKER_OP_LT,
-@@ -37,7 +37,7 @@ enum mpd_sticker_operator {
+@@ -38,7 +39,8 @@
   * Sort by settings for sticker search api
   */
  enum mpd_sticker_sort {
@@ -22,7 +22,7 @@
  	MPD_STICKER_SORT_VALUE_INT,
 --- a/src/sticker.c
 +++ b/src/sticker.c
-@@ -252,7 +252,7 @@ static const char *get_sticker_oper_str(enum mpd_sticker_operator oper) {
+@@ -251,7 +251,7 @@
  	case MPD_STICKER_OP_LT_INT:      return "lt";
  	case MPD_STICKER_OP_CONTAINS:    return "contains";
  	case MPD_STICKER_OP_STARTS_WITH: return "starts_with";
@@ -31,7 +31,7 @@
  	}
  	return NULL;
  }
-@@ -289,7 +289,7 @@ static const char *get_sticker_sort_name(enum mpd_sticker_sort sort) {
+@@ -293,7 +293,7 @@
  	case MPD_STICKER_SORT_URI:       return "uri";
  	case MPD_STICKER_SORT_VALUE:     return "value";
  	case MPD_STICKER_SORT_VALUE_INT: return "value_int";
