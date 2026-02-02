@@ -1,6 +1,6 @@
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -24,8 +24,8 @@ include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}	${LIBMPDCLIENT_I
+--- CMakeLists.txt.orig	2016-02-13 17:01:52
++++ CMakeLists.txt	2026-02-02 16:50:15
+@@ -24,8 +24,8 @@
  
  include(CheckCSourceCompiles)
  

@@ -1,6 +1,6 @@
---- a/src/mympd_worker/smartpls.c
-+++ b/src/mympd_worker/smartpls.c
-@@ -462,7 +462,7 @@ static bool mympd_worker_smartpls_update_newest(struct t_mympd_worker_state *mym
+--- src/mympd_worker/smartpls.c.orig	2026-01-22 17:08:11
++++ src/mympd_worker/smartpls.c	2026-02-02 16:59:54
+@@ -462,7 +462,7 @@
      if ((time_t)timerange > value_max) {
          return false;
      }

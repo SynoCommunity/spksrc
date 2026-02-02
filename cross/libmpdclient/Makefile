@@ -8,8 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-PATCHES_LEVEL = 1
-
 HOMEPAGE = https://www.musicpd.org/libs/libmpdclient/
 COMMENT  = libmpdclient is a C library which implements the Music Player Daemon protocol.
 LICENSE  = 3-Clause BSD

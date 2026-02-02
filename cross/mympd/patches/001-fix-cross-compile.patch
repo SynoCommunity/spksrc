@@ -1,5 +1,5 @@
---- a/CMakeLists.txt	2026-01-27 03:11:31.756455555 +0000
-+++ b/CMakeLists.txt	2026-01-27 03:11:45.013497424 +0000
+--- CMakeLists.txt.orig	2026-01-22 17:08:11
++++ CMakeLists.txt	2026-02-02 16:57:38
 @@ -91,7 +91,15 @@
  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
  
