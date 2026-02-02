@@ -211,9 +211,18 @@ endif
 	$(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_CROSS_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
 	$(RUN) $$(which cross-pip) $(PIP_BASIC_OPT) --cache-dir $(PIP_CACHE_DIR) install $(CROSSENV_CROSS_SETUPTOOLS) $(CROSSENV_CROSS_WHEEL) ; \
 	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
-	@$(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" requirement
-	@MAKEFLAGS= $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT="$(CROSSENV_REQUIREMENTS)" REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" requirement
-
+	@$(MSG) $(MAKE) \
+		ARCH=$(ARCH) \
+		TCVERSION=$(TCVERSION) \
+		REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" \
+		REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" \
+		requirement
+	@MAKEFLAGS= $(MAKE) \
+		ARCH=$(ARCH) \
+		TCVERSION=$(TCVERSION) \
+		REQUIREMENT="$(CROSSENV_REQUIREMENTS)" \
+		REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" \
+		requirement
 
 ### 
 ### crossenv-install-<crossenv>
@@ -224,6 +233,7 @@ crossenv-install-%:
 	. $(abspath $(WORK_DIR)/crossenv-$*)/bin/activate ; \
 	if [ -e "$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate" ] ; then \
 	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$*)/build/bin ; \
+	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
 	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate]" ; \
 	   $(MSG) "python: [$$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python)]" ; \
 	else \

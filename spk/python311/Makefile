@@ -41,5 +41,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: python311_extra_install
 python311_extra_install:
-	@$(MSG) - Remove compiled files from __pycache__
-	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' -delete
+	@$(MSG) \($(SPK_NAME)\) Remove compiled files from __pycache__
+	@find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' -delete

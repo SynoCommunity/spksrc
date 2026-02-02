@@ -1,11 +1,11 @@
 PKG_NAME = libtorrent
-PKG_VERS = 0.16.4
+PKG_VERS = 0.16.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/openssl3 cross/libsigc++
+DEPENDS = cross/zlib cross/openssl3 cross/libsigc++ cross/curl
 
 # A compiler with support for C++14 language features is required.
 REQUIRED_MIN_DSM = 7.0

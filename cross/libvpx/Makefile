@@ -24,7 +24,7 @@ CONFIGURE_ARGS += --enable-vp9-highbitdepth --enable-better-hw-compatibility
 CONFIGURE_ARGS += --enable-webm-io
 CONFIGURE_ARGS += --disable-multithread
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --target=generic-gnu

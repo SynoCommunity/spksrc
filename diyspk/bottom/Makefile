@@ -4,7 +4,7 @@ SPK_REV = 1
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 DEPENDS = cross/bottom_0.10
 SPK_VERS = 0.10.2

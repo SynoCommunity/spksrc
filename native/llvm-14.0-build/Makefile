@@ -1,5 +1,5 @@
 PKG_NAME = llvm
-PKG_VERS = 14.0.5
+PKG_VERS = 14.0.6
 
 # REMARKS:
 #
@@ -34,7 +34,6 @@ INSTALL_TARGET = nop
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-BUILD_DEPENDS   = cross/llvm-project-140.src
 NATIVE_DEPENDS += native/llvm-140
 NATIVE_DEPENDS += native/Khronos-SPIRV-LLVM-Translator-140
 NATIVE_DEPENDS += native/intel-vc-intrinsics

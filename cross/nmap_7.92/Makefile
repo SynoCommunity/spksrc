@@ -16,7 +16,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --without-zenmap --with-liblua=included --with-libpcre=included
 ADDITIONAL_CPPFLAGS = -O3
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 ADDITIONAL_CPPFLAGS += -DLUA_32BITS
 endif

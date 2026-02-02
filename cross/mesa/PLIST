@@ -1,0 +1,3 @@
+lib:lib/libvulkan_intel.so
+rsc:etc/vulkan/icd.d
+rsc:share/drirc.d/00-mesa-defaults.conf

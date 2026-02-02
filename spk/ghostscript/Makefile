@@ -1,6 +1,6 @@
 SPK_NAME = ghostscript
-SPK_VERS = 10.05.0
-SPK_REV = 1
+SPK_VERS = 10.06.0
+SPK_REV = 2
 SPK_ICON = src/ghostscript.png
 
 DEPENDS = cross/ghostscript
@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = comcerto2k
 MAINTAINER = hgy59
 DESCRIPTION = Ghostscript is an interpreter for the PostScript® language and PDF files.
 DISPLAY_NAME = ghostscript
-CHANGELOG = "Initial package release."
+CHANGELOG = "Update ghostscript to v10.06.0."
 
 HOMEPAGE = https://ghostscript.com
 LICENSE  = AGPL 3.0

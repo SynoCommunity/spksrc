@@ -21,7 +21,7 @@ CONFIGURE_ARGS += --without-ncurses
 CONFIGURE_ARGS += --without-python
 CONFIGURE_ARGS += --disable-asciidoc
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifneq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-year2038
 endif

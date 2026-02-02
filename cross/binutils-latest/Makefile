@@ -1,5 +1,5 @@
 PKG_NAME = binutils
-PKG_VERS = 2.42
+PKG_VERS = 2.45
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/binutils
@@ -21,7 +21,7 @@ CONFIGURE_ARGS += --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 CONFIGURE_ARGS += --enable-gold=yes
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # gprofng fails to build for i686 
 # ./../common/core_pcbe.c:2698:33: error: ‘PERF_COUNT_HW_REF_CPU_CYCLES’ undeclared here

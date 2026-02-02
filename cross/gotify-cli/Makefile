@@ -1,9 +1,10 @@
 PKG_NAME = gotify-cli
-PKG_VERS = 2.2.1
+PKG_VERS = 2.3.2
 PKG_DIST_NAME = gotify-cli-linux-$(PKG_DIST_ARCH)
 PKG_DIST_SITE = https://github.com/gotify/cli/releases/download/v$(PKG_VERS)
 PKG_DIST_FILE = gotify-cli-$(PKG_VERS)-linux-$(PKG_DIST_ARCH)
 
+# No binaries available for these architectures
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 HOMEPAGE = https://gotify.net/
@@ -15,7 +16,7 @@ INSTALL_TARGET = gotify-cli_install
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = amd64 386 arm-7 arm64
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = amd64
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

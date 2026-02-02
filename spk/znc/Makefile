@@ -47,7 +47,7 @@ ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
 
 DEPENDS += cross/znc
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 # bugfix for libicudata error, solution proposed by Steven R. Loomis
