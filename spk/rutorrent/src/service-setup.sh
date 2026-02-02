@@ -19,13 +19,17 @@ else
 fi
 
 MEDIAINFO_BIN="/var/packages/mediainfo/target/bin/mediainfo"
+# Set HOME for rtorrent to find .rtorrent.rc symlink
+HOME="${SYNOPKG_PKGVAR}"
+export HOME
+export LD_LIBRARY_PATH="${SYNOPKG_PKGDEST}/lib"
 
 SVC_BACKGROUND=y
 PID_FILE="${SYNOPKG_PKGVAR}/rtorrent.pid"
 LOG_FILE="${SYNOPKG_PKGVAR}/rtorrent.log"
 SVC_WRITE_PID=y
 
-SERVICE_COMMAND="env RUTORRENT_WEB_DIR=${RUTORRENT_WEB_DIR} SYNOPKG_PKGVAR=${SYNOPKG_PKGVAR} SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST} ${SERVICE_COMMAND}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/rtorrent -n -o import=${RTORRENT_RC}"
 
 fix_shared_folders_rights()
 {
@@ -221,8 +225,12 @@ service_restore ()
     cp -apf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc" "${RTORRENT_RC}"
     rm "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc"
 
-    # Drop legacy execute hooks that pointed to php74 initplugins, no longer valid
+    # Upgrade migrations for rtorrent.rc: drop legacy PHP 7.4 execute hooks,
+    # and ensure daemon mode is enabled (required for running without screen)
     sed -i -e "/\/var\/packages\/PHP7\.4\/target\/usr\/local\/bin\/php74/d" "${RTORRENT_RC}"
+    if ! grep -q "^system\.daemon\.set" "${RTORRENT_RC}"; then
+        sed -i '1i # Run in daemon mode (no ncurses UI)\nsystem.daemon.set = true\n' "${RTORRENT_RC}"
+    fi
 
     echo "Restoring rutorrent web shared directory ${RUTORRENT_WEB_DIR}/share"
     cp -ap -t "${RUTORRENT_WEB_DIR}" -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/share"

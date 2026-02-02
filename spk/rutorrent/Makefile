@@ -15,7 +15,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Downgrade rtorrent/libtorrent to v0.15.7 to fix crash (\#6931). <br/>2. Switch to TinyXML2 dependency for rTorrent."
+CHANGELOG = "1. Upgrade ruTorrent to v5.2.10, rtorrent/libtorrent to v0.15.7. <br/>2. Improve stability and reduce package size."
 
 HOMEPAGE = https://github.com/Novik/ruTorrent
 LICENSE = GPLv3
@@ -44,7 +44,7 @@ DEPENDS += cross/curl
 export CURL_INCLUDE_EXECUTABLE=1
 
 # Remaining dependencies
-DEPENDS += cross/dumptorrent cross/rtorrent cross/rutorrent cross/screen5 cross/sox cross/unzip
+DEPENDS += cross/dumptorrent cross/rtorrent cross/rutorrent cross/sox cross/unzip
 
 include ../../mk/spksrc.common.mk
 
@@ -65,6 +65,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
-	install -m 755 -d $(STAGING_DIR)/bin $(STAGING_DIR)/var/.session $(STAGING_DIR)/tmp
-	install -m 755 src/bin/rtorrent-daemon $(STAGING_DIR)/bin/rtorrent-daemon
+	install -m 755 -d $(STAGING_DIR)/var/.session $(STAGING_DIR)/tmp
 	install -m 644 src/rtorrent.rc $(STAGING_DIR)/var/rtorrent.rc
