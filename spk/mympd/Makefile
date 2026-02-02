@@ -19,6 +19,9 @@ DISPLAY_NAME = myMPD
 HOMEPAGE = https://jcorporation.github.io/
 LICENSE = GPLv3
 
+WIZARDS_DIR = src/wizard
+SERVICE_WIZARD_SHARENAME = wizard_music_folder
+
 # SERVICE_COMMAND is defined in service-setup.sh
 STARTABLE = yes
 SERVICE_PORT = 8185
