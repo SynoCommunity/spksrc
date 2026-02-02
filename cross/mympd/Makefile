@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/jcorporation/myMPD/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = myMPD-$(PKG_VERS)
 
-DEPENDS = cross/libmpdclient cross/openssl3 cross/pcre2 cross/libid3tag cross/utf8proc cross/lua
+DEPENDS = cross/flac cross/libmpdclient cross/openssl3 cross/pcre2 cross/libid3tag cross/utf8proc cross/lua
 BUILD_DEPENDS = native/lua
 LUA_NATIVE_PATH = $(abspath $(PWD)/../../native/lua/work-native/install/bin)
 ENV += PATH=$(LUA_NATIVE_PATH):$$PATH
@@ -23,7 +23,6 @@ CMAKE_USE_NINJA = 0
 CMAKE_ARGS += -DLUA_INCLUDE_DIR:PATH=$(INSTALL_DIR)$(INSTALL_PREFIX)/include
 CMAKE_ARGS += -DLUA_LIBRARY:FILEPATH=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib/liblua.so
 CMAKE_ARGS += -DLUA_MATH_LIBRARY:STRING=m
-CMAKE_ARGS += -DMYMPD_ENABLE_FLAC=OFF
 CMAKE_ARGS += -DMYMPD_ENABLE_MYGPIOD=OFF
 CMAKE_ARGS += -DMYMPD_DOC=OFF
 CMAKE_ARGS += -DMYMPD_MANPAGES=OFF
