@@ -37,7 +37,7 @@
       },
       {
         "type": "textfield",
-        "desc": "Configure SMART monitoring devices. List devices with :sat suffix for proper detection.",
+        "desc": "Configure SMART monitoring devices. List devices with :sat suffix for proper detection. Refer to Beszel documentation for details.",
         "subitems": [
           {
             "key": "wizard_smart_devices",
