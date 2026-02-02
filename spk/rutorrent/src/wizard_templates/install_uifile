@@ -26,10 +26,9 @@
                 "allowBlank": true
             }
         }]
-    }]
-}, {
-    "step_title": "{{{DSM_PERMISSIONS_TITLE}}}",
-    "items": [{
+    }, {
+        "desc": ""
+    }, {
         "desc": "{{{DSM_PERMISSIONS_TEXT}}}"
     }]
 }]
