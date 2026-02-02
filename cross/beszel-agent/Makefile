@@ -1,6 +1,6 @@
 PKG_NAME = beszel-agent
 REAL_PKG_NAME = beszel
-PKG_VERS = 0.18.1
+PKG_VERS = 0.18.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/henrygd/beszel/archive/refs/tags

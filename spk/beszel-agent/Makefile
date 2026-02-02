@@ -1,5 +1,5 @@
 SPK_NAME = beszel-agent
-SPK_VERS = 0.18.1
+SPK_VERS = 0.18.3
 SPK_REV = 1
 SPK_ICON = src/beszel.png
 
@@ -9,7 +9,7 @@ MAINTAINER = not-first
 DESCRIPTION = "Lightweight server monitoring with historical data, docker stats, and alerts. This package provides only the agent, and requires Beszel Hub to be running elsewhere."
 
 DISPLAY_NAME = Beszel Agent
-CHANGELOG = "Initial package release for Beszel 0.18.0"
+CHANGELOG = "Initial package release for Beszel 0.18.3"
 
 HOMEPAGE = https://beszel.dev/
 LICENSE = MIT
