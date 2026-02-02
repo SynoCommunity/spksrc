@@ -145,8 +145,8 @@ configure_external_programs()
 service_postinst()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
-        resolved_download_dir=$(resolve_download_dir "${wizard_download_dir}")
-        if [ "${resolved_download_dir}" != "${wizard_download_dir}" ]; then
+        resolved_download_dir=$(resolve_download_dir "${SHARE_PATH}")
+        if [ "${resolved_download_dir}" != "${SHARE_PATH}" ]; then
             echo "Using existing download folder '${resolved_download_dir}'"
         fi
 
