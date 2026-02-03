@@ -6,12 +6,12 @@ PKG_DIST_SITE = https://github.com/MusicPlayerDaemon/mpc/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libmpdclient
+DEPENDS = cross/libmpdclient cross/libiconv
 
 HOMEPAGE = https://www.musicpd.org/clients/mpc/
 COMMENT  = Command-line client for MPD
 LICENSE  = GPLv2
 
-CONFIGURE_ARGS = -Diconv=disabled
+ADDITIONAL_LDFLAGS = -liconv
 
 include ../../mk/spksrc.cross-meson.mk
