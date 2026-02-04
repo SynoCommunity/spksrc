@@ -20,6 +20,7 @@ CONFIGURE_ARGS += --with-dummy
 CONFIGURE_ARGS += --with-pipe
 CONFIGURE_ARGS += --with-ssl=openssl
 CONFIGURE_ARGS += --with-soxr
+CONFIGURE_ARGS += --with-metadata
 CONFIGURE_ARGS += --with-libdaemon
 CONFIGURE_ARGS += --with-tinysvcmdns
 CONFIGURE_ARGS += --without-configfiles

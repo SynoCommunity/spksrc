@@ -8,7 +8,7 @@ DEPENDS = cross/shairport-sync
 MAINTAINER = SynoCommunity
 DESCRIPTION = AirPlay audio player. Stream audio wirelessly from Apple devices to your Synology NAS. Requires USB soundcard or speakers connected to your NAS.
 DISPLAY_NAME = Shairport Sync
-CHANGELOG = "1. Update to v4.3.7. <br/>2. Modernize for DSM 7. <br/>3. Use OpenSSL 3 and soxr for improved audio quality."
+CHANGELOG = "1. Update to v4.3.7 with metadata support. <br/>2. Modernize for DSM 7."
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
 LICENSE = GPL
