@@ -1,0 +1,32 @@
+[{
+    "step_title": "Uninstall PostgreSQL",
+    "items": [{
+        "type": "multiselect",
+        "desc": "By default the PostgreSQL config files and databases will be dumped. Please select the option:",
+        "subitems": [{
+            "key": "wizard_pg_dump_database",
+            "desc": "Save config files and databases dump files to backup directory",
+            "defaultValue": true
+        }]
+        }, {
+        "type": "textfield",
+        "desc": "Provide backup directory :",
+        "subitems": [{
+            "key": "wizard_pg_dump_directory",
+            "desc": "Databases dump location",
+            "defaultValue": "/volume1/pg_dump/"
+        }]
+        }, {
+          "type": "singleselect",
+          "desc": "Keep or delete package settings and database.",
+          "subitems": [{
+            "key": "wizard_keep_data",
+            "desc": "<b>Uninstall only.</b> Keep existing files for future re-installation.",
+            "defaultValue": true
+          }, {
+            "key": "wizard_delete_data",
+            "desc": "<b style=\"color: red\">Erase all of the package data files. (Not Recoverable)</b>",
+            "defaultValue": false
+        }]
+    }]
+}]
