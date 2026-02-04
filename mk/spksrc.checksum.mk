@@ -99,3 +99,15 @@ else
 checksum: ;
 endif
 
+
+# checksum-all validates all files when PKG_DIST_ARCH_LIST is defined
+# This mirrors the download-all target pattern
+ifneq ($(strip $(PKG_DIST_ARCH_LIST)),)
+checksum-all:
+	@for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
+	  rm -f $(CHECKSUM_COOKIE) ; \
+	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} checksum ; \
+	done ;
+else
+checksum-all: checksum
+endif

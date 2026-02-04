@@ -7,6 +7,7 @@
 # - Download all referenced native and cross source files for packages.
 # - Download all referenced python wheels needed to build.
 # - Use the "download-all" target when a package has multiple (arch-specific) files.
+# - Use the "checksum-all" target to validate all arch-specific files.
 # - Retry download if checksum fails (cached file may be outdated).
 
 set -euo pipefail
@@ -23,11 +24,11 @@ download_with_retry() {
     local result=0
     local output=""
 
-    echo "  -> ${target_dir}: ${target_name} then checksum"
+    echo "  -> ${target_dir}: ${target_name} then checksum-all"
 
     # First attempt
     set +e
-    output=$(make -C "${target_dir}" ${target_name} checksum 2>&1)
+    output=$(make -C "${target_dir}" ${target_name} checksum-all 2>&1)
     result=$?
     set -e
 
@@ -45,7 +46,7 @@ download_with_retry() {
 
         # Retry download and checksum
         set +e
-        make -C "${target_dir}" ${target_name} checksum
+        make -C "${target_dir}" ${target_name} checksum-all
         result=$?
         set -e
 
