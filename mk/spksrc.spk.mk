@@ -6,6 +6,10 @@
 #  SPK_NAME                     Package name
 #  MAINTAINER                   Package maintainer (mandatory)
 #  MAINTAINER_URL               URL of package maintainer (optional when MAINTAINER is a valid github user)
+#  DISPLAY_NAME                 package name as shown in DSM and SynoCommunity Repository
+#  DESCRIPTION                  package description
+#  DISPLAY_NAME_%               language specific display name, all upper case (available languages are defined as LANGUAGES in spksrc.common.mk)
+#  DESCRIPTION_%                language specific description, all upper case (available languages are defined as LANGUAGES in spksrc.common.mk)
 #  SPK_NAME_ARCH                (optional) arch specific spk file name (default: $(ARCH))
 #  SPK_PACKAGE_ARCHS            (optional) list of archs in the spk file (default: $(ARCH) or list of archs when generic arch)
 #  UNSUPPORTED_ARCHS            (optional) Unsupported archs are removed from gemeric arch list (ignored when SPK_PACKAGE_ARCHS is used)
@@ -14,6 +18,9 @@
 #  INSTALLER_SCRIPT             (optional) Use installer script from given file
 #  CONF_DIR                     (optional) To provide a package specific conf folder with files (e.g. privilege file)
 #  LICENSE_FILE                 (optional) Add licence from given file
+#  DSM_APP_NAME                 (optional) To use custom dsmappname (default: com.synocommunity.packages.$(SPK_NAME))
+#  WIZARDS_TARGET               (optional) To override the default wizards target
+#  SCRIPTS_TARGET               (optional) To override the default target to generate the script files
 # 
 # Internal variables used in this file:
 #  NAME                         The internal name of the package.
@@ -94,6 +101,12 @@ endif
 
 SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK_VERS)-$(SPK_REV).spk
 
+ifeq ($(strip $(WIZARDS_TARGET)),)
+WIZARDS_TARGET = wizards
+endif
+
+
+
 #####
 
 # Do not initialize any environment to avoid variable leakage.
@@ -151,6 +164,11 @@ ifneq ($(CONF_DIR),)
 SPK_CONF_DIR = $(CONF_DIR)
 endif
 
+ifeq ($(strip $(DSM_APP_NAME)),)
+DSM_APP_NAME=com.synocommunity.packages.$(SPK_NAME)
+endif
+
+
 # Generic service scripts
 include ../../mk/spksrc.service.mk
 
@@ -161,6 +179,11 @@ endif
 
 ifeq ($(strip $(MAINTAINER)),)
 $(error Add MAINTAINER for '$(SPK_NAME)' in spk Makefile or set default MAINTAINER in local.mk.)
+endif
+
+IS_GITHUB_MAINTAINER = 0
+ifeq ($(shell echo "${MAINTAINER}" | wc -w),1)
+IS_GITHUB_MAINTAINER = 1
 endif
 
 ifeq ($(strip $(DISABLE_GITHUB_MAINTAINER)),)
@@ -187,16 +210,29 @@ $(WORK_DIR)/INFO:
 	fi
 	@echo package=\"$(SPK_NAME)\" > $@
 	@echo version=\"$(SPK_VERS)-$(SPK_REV)\" >> $@
+
+ifneq ($(strip $(DISPLAY_NAME)),)
+	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
+endif
 	@/bin/echo -n "description=\"" >> $@
 	@/bin/echo -n "${DESCRIPTION}" | sed -e 's/\\//g' -e 's/"/\\"/g' >> $@
 	@echo "\"" >> $@
-	@echo $(foreach LANGUAGE, $(LANGUAGES), \
-	  $(shell [ ! -z "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+	@echo -n $(foreach LANGUAGE, $(LANGUAGES), \
+	  $(shell [ -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
 	    /bin/echo -n "description_$(LANGUAGE)=\\\"" && \
-	    /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))"  | sed -e 's/"/\\\\\\"/g' && \
-	    /bin/echo -n "\\\"\\\n")) | sed -e 's/ description_/description_/g' >> $@
+	    /bin/echo -n "$(DESCRIPTION_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" | sed -e 's/"/\\\\\\"/g' && \
+	    /bin/echo -n "\\\"\\\n") \
+	  $(shell [ -n "$(DISPLAY_NAME_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" ] && \
+	    /bin/echo -n "displayname_$(LANGUAGE)=\\\"" && \
+	    /bin/echo -n "$(DISPLAY_NAME_$(shell echo $(LANGUAGE) | tr [:lower:] [:upper:]))" | sed -e 's/"/\\\\\\"/g' && \
+	    /bin/echo -n "\\\"\\\n") \
+	  ) | sed -e 's/^ //g' >> $@
 	@echo arch=\"$(SPK_ARCH)\" >> $@
+ifeq ($(IS_GITHUB_MAINTAINER),1)
 	@echo maintainer=\"$(call get_github_maintainer_name,$(MAINTAINER))\" >> $@
+else
+	@echo maintainer=\"$(MAINTAINER)\" >> $@
+endif
 ifeq ($(strip $(MAINTAINER_URL)),)
 	@echo maintainer_url=\"$(call get_github_maintainer_url,$(MAINTAINER))\" >> $@
 else
@@ -255,17 +291,10 @@ else
 endif
 endif
 
-ifneq ($(strip $(DISPLAY_NAME)),)
-	@echo displayname=\"$(DISPLAY_NAME)\" >> $@
-endif
 ifneq ($(strip $(DSM_UI_DIR)),)
 	@[ -d $(STAGING_DIR)/$(DSM_UI_DIR) ] && echo dsmuidir=\"$(DSM_UI_DIR)\" >> $@ || true
 endif
-ifneq ($(strip $(DSM_APP_NAME)),)
 	@echo dsmappname=\"$(DSM_APP_NAME)\" >> $@
-else
-	@echo dsmappname=\"com.synocommunity.packages.$(SPK_NAME)\" >> $@
-endif
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 ifneq ($(strip $(DSM_APP_PAGE)),)
 	@echo dsmapppage=\"$(DSM_APP_PAGE)\" >> $@
@@ -339,7 +368,9 @@ $(WORK_DIR)/package.tgz: icon service
 	@[ -f $@ ] && rm $@ || true
 	(cd $(STAGING_DIR) && find . -mindepth 1 -maxdepth 1 -not -empty | tar cpzf $@ --owner=root --group=root --files-from=/dev/stdin)
 
-DSM_SCRIPTS = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
+ifeq ($(strip $(SCRIPTS_TARGET)),)
+SCRIPTS_TARGET = $(addprefix $(DSM_SCRIPTS_DIR)/,$(DSM_SCRIPT_FILES))
+endif
 
 define dsm_script_redirect
 $(create_target_dir)
@@ -491,7 +522,7 @@ ifneq ($(strip $(DSM_LICENSE)),)
 SPK_CONTENT += LICENSE
 endif
 
-$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(DSM_SCRIPTS) wizards $(DSM_LICENSE) conf
+$(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons service $(SCRIPTS_TARGET) $(WIZARDS_TARGET) $(DSM_LICENSE) conf
 	$(create_target_dir)
 	(cd $(WORK_DIR) && tar cpf $@ --group=root --owner=root $(SPK_CONTENT))
 
