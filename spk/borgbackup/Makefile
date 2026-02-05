@@ -30,7 +30,9 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # # The script will create three files (pure, cross, and combined) for the Borg deployment
 # # with Python 3.12. Use the pure and cross requirement files as the base for your PR.
 
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+# Default wheels for most architectures
+WHEELS_CROSSENV = src/requirements-crossenv.txt
+WHEELS = $(WHEELS_CROSSENV) src/requirements-pure.txt
 
 # Force building pure-python wheels (issue #5204)
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
@@ -58,6 +60,12 @@ SERVICE_SETUP = src/service-setup_py311.sh
 else
 PYTHON_PACKAGE = python312
 SERVICE_SETUP = src/service-setup_py312.sh
+endif
+
+# ARMv5: Use separate requirements with rpds_py pinned to 0.20.0
+# (Cargo.lock v3 compatibility with Rust 1.77.2)
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS_CROSSENV = src/requirements-crossenv-armv5.txt
 endif
 
 SPK_DEPENDS = "$(PYTHON_PACKAGE)"
