@@ -55,12 +55,13 @@ service_prestart ()
         # Export environment variables for dashboard
         export HAPROXY_DASHBOARD_DIR="${SYNOPKG_PKGVAR}"
         export HAPROXY_CFG="${CFG_FILE}"
-        export HAPROXY_LOG="${SYNOPKG_PKGVAR}/haproxy.log"
+        export HAPROXY_LOG="${SYNOPKG_PKGVAR}/http-access.log"
         export HAPROXY_CERT="${CERT_DIR}/default.pem"
         export DASHBOARD_PORT="${DASHBOARD_PORT}"
         export HAPROXY_STATS_PORT="8280"
         export HAPROXY_BIN="${HAPROXY}"
         export SYNOPKG_PKGNAME="${SYNOPKG_PKGNAME}"
+        export HAPROXY_PID="${PID_FILE}"
 
         cd "${DASHBOARD_DIR}"
         "${SYNOPKG_PKGDEST}/env/bin/python3" app.py >> "${LOG_FILE}" 2>&1 &

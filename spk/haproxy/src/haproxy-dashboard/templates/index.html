@@ -44,6 +44,11 @@
             text-decoration: none;
         }
 
+        .menu-link.active {
+            background-color: #3B444B;
+            color: white;
+        }
+
          /* Custom CSS for dark mode */
       .dark-mode {
           background-color: #121B2E;
@@ -80,6 +85,11 @@
             color: #2bb9c7;
             font-weight: bold;
 
+      }
+
+      .dark-mode .menu-link.active {
+          color: #2bb9c7;
+          border-bottom: 2px solid #2bb9c7;
       }
 
       .dark-mode input[type=text] {
@@ -144,10 +154,10 @@
         </h3>
     </a>
     <a href="/home" class="menu-link" >Home</a>
-    <a href="/" class="menu-link">Add Frontend&Backend</a>
+    <a href="/" class="menu-link active">Add Frontend & Backend</a>
     <a href="/edit" class="menu-link">Edit HAProxy Config</a>
     <a href="/logs" class="menu-link">Security Events</a>
-    <a href="/statistics" class="menu-link">Statictics</a>
+    <a href="/statistics" class="menu-link">Statistics</a>
     <a href="http://{{ request.host.split(':')[0] }}:{{ stats_port }}/" class="menu-link" >HAProxy Stats</a>
     <div class="custom-control custom-switch ml-auto">
     <input type="checkbox" class="custom-control-input" id="darkModeSwitch">
@@ -508,7 +518,7 @@
 </form>
 
     <!-- Add Bootstrap JS and jQuery (required for some Bootstrap components) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="/static/js/jquery.slim.min.js"></script>
     <script src="/static/js/popper.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
 

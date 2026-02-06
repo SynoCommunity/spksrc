@@ -37,6 +37,11 @@
             color: white;
             text-decoration: none;
         }
+
+        .menu-link.active {
+            background-color: #3B444B;
+            color: white;
+        }
         
          /* Custom CSS for dark mode */
       .dark-mode {
@@ -76,6 +81,11 @@
             color: #2bb9c7;
             font-weight: bold;
       
+      }
+
+      .dark-mode .menu-link.active {
+          color: #2bb9c7;
+          border-bottom: 2px solid #2bb9c7;
       }
       
       .dark-mode #editor_container{
@@ -135,9 +145,9 @@ border: none;
     </a>
     <a href="/home" class="menu-link">Home</a>
     <a href="/" class="menu-link">Add Frontend & Backend</a>
-    <a href="/edit" class="menu-link">Edit HAProxy Config</a>
+    <a href="/edit" class="menu-link active">Edit HAProxy Config</a>
     <a href="/logs" class="menu-link">Security Events</a>
-    <a href="/statistics" class="menu-link">Statictics</a>
+    <a href="/statistics" class="menu-link">Statistics</a>
     <a  href="http://{{ request.host.split(':')[0] }}:{{ stats_port }}/" class="menu-link" target="_blank">HAProxy Stats</a>
     
     <div class="custom-control custom-switch ml-auto">

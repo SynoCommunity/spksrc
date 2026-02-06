@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request
 import os
 import subprocess
 from auth.auth_middleware import requires_auth
+import signal
 
 edit_bp = Blueprint('edit', __name__)
 
@@ -40,13 +41,29 @@ def edit_haproxy_config():
                 error_message = check_result.stderr
                 check_output += f"\n\nError occurred:\n{error_message}"
             else:
-                # If no error, use synopkg to restart HAProxy on Synology
-                reload_result = subprocess.run(['synopkg', 'restart', synopkg_name], capture_output=True, text=True)
-                check_output += f"\n\nHAProxy Restart Output:\n{reload_result.stdout}"
+                # Graceful reload: start new HAProxy process and signal old one to finish
+                # Read current PID file
+                pid_file = os.environ.get('HAPROXY_PID', f'/var/packages/{synopkg_name}/var/haproxy.pid')
+                old_pid = None
+                if os.path.exists(pid_file):
+                    try:
+                        with open(pid_file, 'r') as f:
+                            old_pid = f.read().strip()
+                    except Exception:
+                        pass
 
-                # Also add stderr if there are any warnings or errors during restart
-                if reload_result.stderr:
-                    check_output += f"\nRestart Stderr:\n{reload_result.stderr}"
+                # Use HAProxy's graceful reload (-sf option)
+                reload_cmd = [haproxy_bin, '-f', haproxy_cfg, '-p', pid_file, '-D']
+                if old_pid:
+                    reload_cmd.extend(['-sf', old_pid])
+
+                reload_result = subprocess.run(reload_cmd, capture_output=True, text=True)
+                if reload_result.returncode == 0:
+                    check_output += "\n\nHAProxy reloaded successfully (graceful reload)"
+                else:
+                    check_output += f"\n\nHAProxy Reload Output:\n{reload_result.stdout}"
+                    if reload_result.stderr:
+                        check_output += f"\nReload Stderr:\n{reload_result.stderr}"
 
         return render_template('edit.html', config_content=edited_config, check_output=check_output)
 

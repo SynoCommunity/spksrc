@@ -3,11 +3,29 @@ import requests
 import csv
 
 HAPROXY_STATS_PORT = os.environ.get('HAPROXY_STATS_PORT', '8280')
-HAPROXY_STATS_URL = f'http://127.0.0.1:{HAPROXY_STATS_PORT}/;csv'
+HAPROXY_CFG = os.environ.get('HAPROXY_CFG', '/var/packages/haproxy/var/haproxy.cfg')
+
+def get_stats_credentials():
+    """Parse stats auth credentials from haproxy.cfg"""
+    try:
+        with open(HAPROXY_CFG, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith('stats auth '):
+                    # Format: stats auth user:password
+                    auth_part = line[11:].strip()
+                    if ':' in auth_part:
+                        user, passwd = auth_part.split(':', 1)
+                        return user, passwd
+    except Exception:
+        pass
+    return 'admin', 'admin'
 
 def fetch_haproxy_stats():
+    stats_url = f'http://127.0.0.1:{HAPROXY_STATS_PORT}/;csv'
     try:
-        response = requests.get(HAPROXY_STATS_URL)
+        user, passwd = get_stats_credentials()
+        response = requests.get(stats_url, auth=(user, passwd), timeout=5)
         response.raise_for_status()
         return response.text
     except requests.exceptions.RequestException as e:

@@ -50,6 +50,11 @@
             color: white;
             text-decoration: none;
         }
+
+        .menu-link.active {
+            background-color: #3B444B;
+            color: white;
+        }
         
           /* Custom CSS for dark mode */
       .dark-mode {
@@ -90,6 +95,11 @@
             font-weight: bold;
       
       }
+
+      .dark-mode .menu-link.active {
+          color: #2bb9c7;
+          border-bottom: 2px solid #2bb9c7;
+      }
       
       .dark-mode #status_header{
       color: #2bb9c7;
@@ -110,17 +120,17 @@
     
 </head>
 <body>
-<header class="header1" id="header1>
+<header class="header1" id="header1">
     <a href="/home" style="text-decoration: none;">
         <h3 style="font-size: 22px;" class="logo">
             <i style="margin: 8px;" class="fas fa-globe"></i>Haproxy Configurator
         </h3>
     </a>
     <a href="/home" class="menu-link">Home</a>
+    <a href="/" class="menu-link">Add Frontend & Backend</a>
     <a href="/edit" class="menu-link">Edit HAProxy Config</a>
-    <a href="/" class="menu-link">Add Frontend&Backend</a>
-    <a href="/logs" class="menu-link">Security Events</a>
-    <a href="/statistics" class="menu-link">Statictics</a>
+    <a href="/logs" class="menu-link active">Security Events</a>
+    <a href="/statistics" class="menu-link">Statistics</a>
     <a href="http://{{ request.host.split(':')[0] }}:{{ stats_port }}/" class="menu-link" >HAProxy Stats</a>
     <div class="custom-control custom-switch ml-auto">
     <input type="checkbox" class="custom-control-input" id="darkModeSwitch">
@@ -162,7 +172,7 @@
                 
                 <!-- XSS Category -->
                 {% if entry['xss_alert'] %}
-                    <p class="collapse-trigger" data-bs-toggle="collapse" data-bs-target="#xssCollapse{{ loop.index }}">XSS Alert <span class="text-danger">(Click to show details)</span></p>
+                    <p class="collapse-trigger" data-toggle="collapse" data-target="#xssCollapse{{ loop.index }}">XSS Alert <span class="text-danger">(Click to show details)</span></p>
                     <div id="xssCollapse{{ loop.index }}" class="collapse">
                         <p style="color: red"><strong>{{ entry['xss_alert'] }}</strong></p>
                     </div>
@@ -170,7 +180,7 @@
                 
                 <!-- SQL Category -->
                 {% if entry['sql_alert'] %}
-                    <p class="collapse-trigger" data-bs-toggle="collapse" data-bs-target="#sqlCollapse{{ loop.index }}">SQL Alert <span class="text-danger">(Click to show details)</span></p>
+                    <p class="collapse-trigger" data-toggle="collapse" data-target="#sqlCollapse{{ loop.index }}">SQL Alert <span class="text-danger">(Click to show details)</span></p>
                     <div id="sqlCollapse{{ loop.index }}" class="collapse">
                         <p style="color: red"><strong>{{ entry['sql_alert'] }}</strong></p>
                     </div>
@@ -178,7 +188,7 @@
                 
                 <!-- PUT Method Category -->
                 {% if entry['put_method'] %}
-                    <p class="collapse-trigger" data-bs-toggle="collapse" data-bs-target="#putMethodCollapse{{ loop.index }}">PUT Method Alert <span class="text-danger">(Click to show details)</span></p>
+                    <p class="collapse-trigger" data-toggle="collapse" data-target="#putMethodCollapse{{ loop.index }}">PUT Method Alert <span class="text-danger">(Click to show details)</span></p>
                     <div id="putMethodCollapse{{ loop.index }}" class="collapse">
                         <p style="color: red"><strong>{{ entry['put_method'] }}</strong></p>
                     </div>
@@ -186,24 +196,26 @@
                 
                 <!-- Illegal Resource Access -->
                 {% if entry['illegal_resource'] %}
-                    <p class="collapse-trigger" data-bs-toggle="collapse" data-bs-target="#putMethodCollapse{{ loop.index }}">Illegal Resource Access Alert <span class="text-danger">(Click to show details)</span></p>
-                    <div id="putMethodCollapse{{ loop.index }}" class="collapse">
+                    <p class="collapse-trigger" data-toggle="collapse" data-target="#illegalResourceCollapse{{ loop.index }}">Illegal Resource Access Alert <span class="text-danger">(Click to show details)</span></p>
+                    <div id="illegalResourceCollapse{{ loop.index }}" class="collapse">
                         <p style="color: red"><strong>{{ entry['illegal_resource'] }}</strong></p>
                     </div>
                 {% endif %}
                 
-                <!-- Illegal Resource Access -->
+                <!-- WebShell Attack -->
                 {% if entry['webshell_alert'] %}
-                    <p class="collapse-trigger" data-bs-toggle="collapse" data-bs-target="#putMethodCollapse{{ loop.index }}">WebShell Attack Alert <span class="text-danger">(Click to show details)</span></p>
-                    <div id="putMethodCollapse{{ loop.index }}" class="collapse">
+                    <p class="collapse-trigger" data-toggle="collapse" data-target="#webshellCollapse{{ loop.index }}">WebShell Attack Alert <span class="text-danger">(Click to show details)</span></p>
+                    <div id="webshellCollapse{{ loop.index }}" class="collapse">
                         <p style="color: red"><strong>{{ entry['webshell_alert'] }}</strong></p>
                     </div>
                 {% endif %}
                 
-                <p><strong>Status Code:</strong> 403</p>
+               <p><strong>Status Code:</strong> 403</p>
             </div>
         {% endfor %}
     </div>
+    <script src="/static/js/jquery.slim.min.js"></script>
+    <script src="/static/js/popper.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
 </body>
 </html>

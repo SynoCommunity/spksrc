@@ -12,7 +12,7 @@ app = Flask(__name__)
 # Get configuration from environment variables
 HAPROXY_DASHBOARD_DIR = os.environ.get('HAPROXY_DASHBOARD_DIR', '/var/packages/haproxy/var')
 HAPROXY_CERT = os.environ.get('HAPROXY_CERT', os.path.join(HAPROXY_DASHBOARD_DIR, 'crt/default.pem'))
-HAPROXY_LOG = os.environ.get('HAPROXY_LOG', os.path.join(HAPROXY_DASHBOARD_DIR, 'haproxy.log'))
+HAPROXY_LOG = os.environ.get('HAPROXY_LOG', os.path.join(HAPROXY_DASHBOARD_DIR, 'http-access.log'))
 HAPROXY_STATS_PORT = os.environ.get('HAPROXY_STATS_PORT', '8280')
 DASHBOARD_PORT = int(os.environ.get('DASHBOARD_PORT', '8281'))
 
@@ -40,9 +40,19 @@ def display_haproxy_stats():
     haproxy_stats = fetch_haproxy_stats()
     if haproxy_stats.startswith('Error'):
         parsed_stats = []
+        error_message = haproxy_stats
     else:
         parsed_stats = parse_haproxy_stats(haproxy_stats)
+        error_message = None
     return render_template_string('''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>HAProxy Statistics</title>
+            <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+            <link href="/static/css/all.min.css" rel="stylesheet">
+        </head>
+        <body>
         <style>
             header {
                 background-color: #f2f2f2;
@@ -66,23 +76,75 @@ def display_haproxy_stats():
                 color: white;
                 text-decoration: none;
             }
+            .menu-link.active {
+                background-color: #3B444B;
+                color: white;
+            }
+            /* Dark mode styles */
+            .dark-mode {
+                background-color: #121B2E;
+                color: white;
+            }
+            .dark-mode header {
+                background-color: #25354e;
+                color: white;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            }
+            .dark-mode .menu-link {
+                color: white;
+            }
+            .dark-mode .logo {
+                color: #2bb9c7;
+            }
+            .dark-mode .menu-link:hover {
+                color: #2bb9c7;
+            }
+            .dark-mode .menu-link.active {
+                color: #2bb9c7;
+                border-bottom: 2px solid #2bb9c7;
+                background-color: transparent;
+            }
+            .dark-mode .table {
+                color: white;
+            }
+            .dark-mode .table-striped tbody tr:nth-of-type(odd) {
+                background-color: rgba(255, 255, 255, 0.05);
+            }
+            .dark-mode .table-bordered {
+                border-color: #2bb9c7;
+            }
+            .dark-mode .table-bordered th,
+            .dark-mode .table-bordered td {
+                border-color: rgba(43, 185, 199, 0.3);
+            }
+            .dark-mode h1 {
+                color: #2bb9c7;
+            }
         </style>
         <header>
             <a href="/home" style="text-decoration: none;">
-                <h3 style="color: grey; font-size: 22px;" class="logo">
+                <h3 style="font-size: 22px;" class="logo">
                     <i style="margin: 8px;" class="fas fa-globe"></i>HAProxy Dashboard
                 </h3>
             </a>
             <a href="/home" class="menu-link">Home</a>
-            <a href="/" class="menu-link">Add Frontend&Backend</a>
+            <a href="/" class="menu-link">Add Frontend & Backend</a>
             <a href="/edit" class="menu-link">Edit HAProxy Config</a>
             <a href="/logs" class="menu-link">Security Events</a>
-            <a href="/statistics" class="menu-link">Statistics</a>
-            <a href="http://{{ request.host.split(':')[0] }}:''' + HAPROXY_STATS_PORT + '''/stats" class="menu-link">HAProxy Stats</a>
+            <a href="/statistics" class="menu-link active">Statistics</a>
+            <a href="http://{{ request.host.split(':')[0] }}:''' + HAPROXY_STATS_PORT + '''/" class="menu-link">HAProxy Stats</a>
+            <div class="custom-control custom-switch ml-auto">
+                <input type="checkbox" class="custom-control-input" id="darkModeSwitch">
+                <label class="custom-control-label" for="darkModeSwitch">Dark Mode</label>
+            </div>
         </header>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <div class="container">
             <h1 class="my-4">HAProxy Statistics</h1>
+            {% if error_message %}
+            <div class="alert alert-warning" role="alert">
+                {{ error_message }}
+            </div>
+            {% endif %}
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <thead>
@@ -112,7 +174,22 @@ def display_haproxy_stats():
                 </table>
             </div>
         </div>
-    ''', stats=parsed_stats)
+        <script>
+            function toggleDarkMode() {
+                const body = document.body;
+                body.classList.toggle('dark-mode');
+                localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+            }
+            // Check localStorage for dark mode preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeSwitch').checked = true;
+            }
+            document.getElementById('darkModeSwitch').addEventListener('change', toggleDarkMode);
+        </script>
+        </body>
+        </html>
+    ''', stats=parsed_stats, error_message=error_message)
 
 # Logs Route
 @app.route('/logs')
