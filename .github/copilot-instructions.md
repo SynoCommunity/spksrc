@@ -82,7 +82,7 @@ make arch-x64-7.2
 **DSM 5.2** (legacy): `x86-5.2`, `88f6281-5.2`, `ppc853x-5.2`
 **SRM 1.3**: `aarch64-1.3`, `armv7-1.3`
 
-**Architecture groups** (defined in `mk/spksrc.archs.mk`):
+**Architecture groups** (defined in `mk/spksrc.common/archs.mk`):
 - `x64_ARCHS` - 64-bit Intel/AMD
 - `ARMv8_ARCHS` - 64-bit ARM (aarch64)
 - `ARMv7_ARCHS` - 32-bit ARM

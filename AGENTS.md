@@ -12,6 +12,7 @@ spksrc is a cross-compilation framework for building Synology NAS packages (SPK 
 2. **Test builds before committing** - Run `make arch-x64-7.2` to verify changes compile
 3. **Preserve existing patterns** - Follow conventions from similar packages in the repo
 4. **Patches must apply cleanly** - No fuzz or offset warnings
+5. **Simplicity over cleverness** - If a simpler solution works for all cases, prefer it over complex conditionals
 
 ## Directory Conventions
 
@@ -59,28 +60,64 @@ For complex packages (Erlang-based, large dependency trees), PLIST may need rege
 from actual build output when library versions change.
 
 ### Toolchain Differences
+- DSM 6.2.4 with 88f6281 (ARMv5) uses GCC 4.6.4 - does not support `-std=c11`
 - DSM 7.1 uses GCC 8.5 (older, may need C++ compatibility patches)
 - DSM 7.2 uses GCC 12.x (modern C++ features supported)
 - Use arch-specific patches in `patches/archname/` for toolchain-specific fixes
+
+### Compiler Standards
+- GCC < 4.7 (ARMv5/88f6281) does not support `-std=c11` - use `-std=gnu99` instead
+- GCC < 5.0 may need explicit standard flags; GCC 5+ defaults to gnu11
+- When a flag like `-std=gnu99` works across all toolchain versions, use it universally rather than tiered conditionals
+
+### Python Multi-Version Support
+- Packages can use conditional `PYTHON_PACKAGE` for different architectures (e.g., python311 for ARMv5/ARMv7L, python312 for others)
+- The `include ../../mk/spksrc.python.mk` must come before conditional assignments (it defines arch variables needed for conditions)
+- Framework exports `PYTHON_PACKAGE` variables for deferred evaluation
+- Use arch-specific requirements files (e.g., `requirements-crossenv-armv5.txt`) when wheel versions differ by architecture
 
 ### Icon Requirements
 Icons should be 512x512 pixels; the framework scales down automatically.
 
 ## Architecture Groups
 
-Defined in `mk/spksrc.archs.mk`:
+Defined in `mk/spksrc.common/archs.mk`:
 - `x64_ARCHS` - Intel/AMD 64-bit
 - `ARMv8_ARCHS` - ARM 64-bit (aarch64)
 - `ARMv7_ARCHS` - ARM 32-bit
+- `ARMv7L_ARCHS` - Legacy ARM 32-bit (hi3535)
+- `ARMv5_ARCHS` - Legacy ARM (88f6281) - GCC 4.6.4, limited C standard support
 - `OLD_PPC_ARCHS` - Legacy PowerPC (often unsupported)
 
 ## Git Workflow
 
-- Create branches for changes (e.g., `packagename-version` or `fix-issue-description`)
+- **Always work in feature branches** - never commit directly to master
+- Branch naming: `packagename-version` or `fix-issue-description`
 - Avoid slashes in branch names when possible for simpler handling
-- Use descriptive commit messages
-- Squash commits before PR when appropriate
+- **Never push without explicit approval** - always ask first
+- **Never amend commits already pushed to GitHub** - create new commits instead
 - Configured user: check `git config user.name` and `git config user.email`
+
+### Commit Messages
+- Use package name prefix: `packagename: description` (e.g., `borgbackup: Use gnu99 for GCC < 5.0`)
+- Use `framework:` prefix for mk/ changes (not `mk:`)
+- Keep messages concise but descriptive
+- Squash related commits before PR when appropriate
+
+## Code Style
+
+- **Keep related items separated but simple** - e.g., each wheel's CFLAGS in its own block, but don't nest conditionals unnecessarily
+- **Remove redundant code** - don't leave dead code paths
+- **Check existing patterns first** - look at how similar packages solve the same problem before inventing new approaches
+- **Question necessity** - before making framework changes, verify they're truly required by comparing working vs failing cases
+
+## CI/Build Failures
+
+- Analyze CI logs carefully rather than guessing at fixes
+- Compare working vs failing builds to isolate differences
+- Check if the issue is arch-specific (toolchain version, available libraries)
+- Upload CI logs for review when debugging complex failures
+- Local builds may differ from CI (e.g., pre-existing work directories affect dependency resolution)
 
 ## Detailed Documentation
 
