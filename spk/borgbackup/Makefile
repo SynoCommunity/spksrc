@@ -80,15 +80,17 @@ ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
+
+# [borgbackup]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [borgbackup] -std=c11
+WHEELS_CFLAGS += [borgbackup] -std=gnu99
 endif
 
 # [llfuse]
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-# llfuse 1.5.2 uses Cython 3.2.3 which generates C11 atomics code that fails
+# llfuse uses Cython which generates C11 atomics code that fails
 # due to ATOMIC_INT_LOCK_FREE not being a preprocessor constant in older GCC.
-WHEELS_CFLAGS += [llfuse] -std=gnu11 -DCYTHON_ATOMICS=0
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [llfuse] -std=gnu99 -DCYTHON_ATOMICS=0
 endif
 
 # [msgpack]
@@ -98,5 +100,5 @@ endif
 
 # [ruamel_yaml_clib]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [ruamel_yaml_clib] -std=c11
+WHEELS_CFLAGS += [ruamel_yaml_clib] -std=gnu99
 endif
