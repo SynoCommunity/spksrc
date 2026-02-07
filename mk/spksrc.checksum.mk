@@ -1,14 +1,40 @@
-### Checksum rules
-#   Validate the downloaded files with sha256 or similar.
+###############################################################################
+# spksrc.checksum.mk
+#
+# Provides checksum verification for downloaded distribution files.
+#
+# This makefile is responsible for:
+#  - validating downloaded files against the digests file
+#  - supporting multiple checksum types (SHA256, SHA1, MD5)
+#  - orchestrating multi-architecture checksum verification when required
+#
+# The checksum process is organized as a small pipeline with overridable
+# pre/post hooks and a persistent status cookie.
+#
 # Targets are executed in the following order:
-#  checksum_msg_target
-#  pre_checksum_target   (override with PRE_CHECKSUM_TARGET)
-#  checksum_target       (override with CHECKSUM_TARGET)
-#  post_checksum_target  (override with POST_CHECKSUM_TARGET)
+#  checksum_msg
+#  pre_checksum_target    (override with PRE_CHECKSUM_TARGET)
+#  checksum_target        (override with CHECKSUM_TARGET)
+#  post_checksum_target   (override with POST_CHECKSUM_TARGET)
+#
 # Variables:
-#  LOCAL_FILE            name of file to check 
+#  LOCAL_FILE            : Name of the downloaded file to verify
+#  PKG_DIST_ARCH_LIST    : Optional list of distribution architectures
+#                          (2 or more entries enable multi-arch orchestration)
+#  PKG_DIST_ARCH         : Optional current distribution architecture
+#                          (single element used during leaf execution)
+#
 # Files:
-#  digests               File with filename, hash-type and checksum values
+#  digests               : List of filename, checksum type and checksum value
+#
+# Notes:
+#  - The checksum target is idempotent and guarded by CHECKSUM_COOKIE.
+#  - When PKG_DIST_ARCH_LIST contains 2 or more elements, checksum acts as an
+#    orchestrator and invokes sub-make executions per architecture.
+#  - Sub-make calls force PKG_DIST_ARCH_LIST to a single element to avoid
+#    recursion and ensure leaf execution.
+#
+###############################################################################
 
 DIGESTS_FILE = digests
 CHECKSUM_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)checksum_done
@@ -87,7 +113,21 @@ checksum_target: $(PRE_CHECKSUM_TARGET)
 
 	@echo $(DIST_FILE)
 
-post_checksum_target: $(CHECKSUM_TARGET) 
+# Multi-arch orchestration:
+# - words(PKG_DIST_ARCH_LIST) >= 2 → iterate over architectures
+# - words(PKG_DIST_ARCH_LIST) <= 1 → single execution
+ifeq ($(filter 0 1,$(words $(PKG_DIST_ARCH_LIST))),)
+post_checksum_target:
+	for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
+	  rm -f $(CHECKSUM_COOKIE) ; \
+	  $(MAKE) -s \
+	    PKG_DIST_ARCH_LIST=$${pkg_arch} \
+	    PKG_DIST_ARCH=$${pkg_arch} \
+	    checksum ; \
+	done ;
+else
+post_checksum_target: $(CHECKSUM_TARGET)
+endif
 
 ifeq ($(wildcard $(CHECKSUM_COOKIE)),)
 checksum: $(CHECKSUM_COOKIE)
@@ -97,17 +137,4 @@ $(CHECKSUM_COOKIE): $(POST_CHECKSUM_TARGET)
 	@touch -f $@
 else
 checksum: ;
-endif
-
-
-# checksum-all validates all files when PKG_DIST_ARCH_LIST is defined
-# This mirrors the download-all target pattern
-ifneq ($(strip $(PKG_DIST_ARCH_LIST)),)
-checksum-all:
-	@for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
-	  rm -f $(CHECKSUM_COOKIE) ; \
-	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} checksum ; \
-	done ;
-else
-checksum-all: checksum
 endif
