@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.4.3
-SPK_REV = 20
+SPK_REV = 21
 SPK_ICON = src/borgbackup.png
 
 PYTHON_PACKAGE = python312
@@ -42,7 +42,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update Borg to v1.4.3.<br/>2. Update borgmatic to v2.0.12.<br/>3. Refresh Python dependencies."
+CHANGELOG = "1. Update borgmatic to v2.1.1.<br/>2. Refresh Python dependencies."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
@@ -68,7 +68,9 @@ endif
 
 # [llfuse]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [llfuse] -std=gnu11
+# llfuse 1.5.2 uses Cython 3.2.3 which generates C11 atomics code that fails
+# due to ATOMIC_INT_LOCK_FREE not being a preprocessor constant in older GCC.
+WHEELS_CFLAGS += [llfuse] -std=gnu11 -DCYTHON_ATOMICS=0
 endif
 
 # [msgpack]
