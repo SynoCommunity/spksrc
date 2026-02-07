@@ -67,7 +67,11 @@ endif
 .PHONY: $(PRE_CHECKSUM_TARGET) $(CHECKSUM_TARGET) $(POST_CHECKSUM_TARGET)
 
 checksum_msg:
+ifneq ($(strip $(PKG_DIST_ARCH)),)
+	@$(MSG) "Verifying files for $(NAME) [$(PKG_DIST_ARCH)]"
+else
 	@$(MSG) "Verifying files for $(NAME)"
+endif
 
 pre_checksum_target: checksum_msg
 
