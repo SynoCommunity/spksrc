@@ -5,24 +5,36 @@
 #
 # Targets are executed in the following order:
 #  download_msg_target
-#  pre_download_target   (override with PRE_DOWNLOAD_TARGET)
-#  download_target       (override with DOWNLOAD_TARGET)
-#  post_download_target  (override with POST_DOWNLOAD_TARGET)
+#  pre_download_target    (override with PRE_DOWNLOAD_TARGET)
+#  download_target        (override with DOWNLOAD_TARGET)
+#  post_download_target   (override with POST_DOWNLOAD_TARGET)
 #
 # Variables:
-#  URLS                  : List of URL to download
-#  DISTRIB_DIR           : Downloaded files will be placed there
-#  PKG_DIST_ARCH_LIST    : Optional list of distribution architectures
-#                          (2 or more entries enable multi-arch orchestration)
-#  PKG_DIST_ARCH         : Optional current distribution architecture
-#                          (single element used during leaf execution)
+#  URLS                   : List of URLs to download
+#  DISTRIB_DIR            : Destination directory for downloaded files
+#  PKG_DIST_ARCH_LIST     : Optional list of distribution architectures
+#                           (2 or more entries enable multi-arch orchestration)
+#  PKG_DIST_ARCH          : Optional current distribution architecture
+#                           (single element used during leaf execution)
+#
+# Files:
+#  $(WORK_DIR)/.$(COOKIE_PREFIX)download_done
+#                          Generic download completion cookie
+#                          (used when PKG_DIST_ARCH is unset)
+#  $(WORK_DIR)/.$(COOKIE_PREFIX)<arch>-download_done
+#                          Architecture-specific download completion cookie
+#                          (used when PKG_DIST_ARCH is set)
 #
 # Notes:
-#  - The download target is idempotent and guarded by DOWNLOAD_COOKIE.
+#  - The download target is idempotent and guarded by a completion cookie.
+#  - When PKG_DIST_ARCH is unset, a single generic cookie is used, preserving
+#    the classic single-archive behavior.
+#  - When PKG_DIST_ARCH is set, the cookie is architecture-specific, allowing
+#    multiple downloads to coexist for multi-architecture packages.
 #  - When PKG_DIST_ARCH_LIST contains 2 or more elements, download acts as an
 #    orchestrator and invokes sub-make executions per architecture.
-#  - Sub-make calls force PKG_DIST_ARCH_LIST to a single element to avoid
-#    recursion and ensure leaf execution.
+#  - Sub-make calls force PKG_DIST_ARCH_LIST to a single element to ensure
+#    leaf execution and avoid recursive orchestration.
 #
 ###############################################################################
 
@@ -31,7 +43,11 @@ ifeq ($(strip $(FLOCK_TIMEOUT)),)
 FLOCK_TIMEOUT = 300
 endif
 
+ifneq ($(strip $(PKG_DIST_ARCH)),)
+DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)$(PKG_DIST_ARCH)-download_done
+else
 DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)download_done
+endif
 
 ifeq ($(strip $(PRE_DOWNLOAD_TARGET)),)
 PRE_DOWNLOAD_TARGET = pre_download_target
@@ -60,7 +76,7 @@ download_msg:
 ifeq ($(strip $(PKG_DIST_ARCH)),)
 	@$(MSG) "Downloading files for $(NAME)"
 else
-	@$(MSG) "Downloading files for $(NAME), PKG_DIST_ARCH = $(PKG_DIST_ARCH)"
+	@$(MSG) "Downloading files for $(NAME) [$(PKG_DIST_ARCH)]"
 endif
 
 manual_dl_target:
