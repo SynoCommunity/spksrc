@@ -1,0 +1,35 @@
+{
+  "connectionSettings": {
+    "dbType": "DBTYPE_VAR",
+    "connectionString": "CONNECTIONSTRING_VAR"
+  },
+  "aesSettings": {
+    "key": "EKx3dIvOfzyfxYWRSQyyigoMZ7MHgx/w9jYW8I6eikM=",
+    "iv": "OevLuB2NQXw3bIvHUuscqg=="
+  },
+  "jwtSettings": {
+    "expiresIn": "00:30:00",
+    "expiryTime": "15.00:00:00",
+    "validIssuer": "ZdinNav",
+    "validAudience": "ZdinNav.Web"
+  },
+  "accountSettings": {
+    "requireDigit": false,
+    "requiredMinLength": 6,
+    "requiredMaxLength": 12,
+    "requireNonAlphanumeric": false,
+    "requireUppercase": false,
+    "requireLowercase": false,
+    "requiredUniqueChars": 3,
+    "requireChinese": false,
+    "requireBlankSpace": false,
+    "lockout": "00:03:00",
+    "maxFailedAccessAttempts": 3
+  },
+  "zdinNavApiSetting": {
+    "swaggerUI": false,
+    "cors": false,
+    "listenport": "PORT_VAR",
+    "maxFileSize": 6291456
+  }
+}

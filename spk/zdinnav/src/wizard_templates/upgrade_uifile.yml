@@ -1,0 +1,32 @@
+ZDINNAV_WIZARD_UPGRADE_TITLE: "ZdinNav Upgrade"
+ZDINNAV_WIZARD_UPGRADE_DESCRIPTION: "Before installation and upgrade, it is recommended to manually back up user data."
+
+ZDINNAV_WIZARD_INSTALL_VOLUME_DESCRIPTION: "Select the storage volume where the folder resides"
+ZDINNAV_WIZARD_INSTALL_VOLUME: "Storage Volume Name"
+
+ZDINNAV_WIZARD_INSTALL_PATH_DESCRIPTION: "ZdinNav data storage folder"
+ZDINNAV_WIZARD_INSTALL_WARNING_DESCRIPTION: "For data security, do not share this path with non-super administrator users."
+ZDINNAV_WIZARD_INSTALL_PATH: "Folder Name"
+ZDINNAV_WIZARD_INSTALL_WARNING_PATH: "Subdirectories are not supported. Please enter only letters or numbers."
+
+ZDINNAV_WIZARD_INSTALL_SETTINGS_TITLE: "ZdinNav - Database Configuration"
+ZDINNAV_WIZARD_INSTALL_WARNING_db_a: "1. Modifying database settings requires familiarity with the database system,"
+ZDINNAV_WIZARD_INSTALL_WARNING_db_b: "otherwise the application may fail to start!"
+ZDINNAV_WIZARD_INSTALL_WARNING_db_c: "2. Connection strings vary between database types; proceed with caution."
+ZDINNAV_WIZARD_INSTALL_WARNING_db_d: "3. If the application fails to start after modifying the database, delete the ZdinNav-generated data and reinstall."
+
+ZDINNAV_WIZARD_INSTALL_DATABASE_TYPE: "Database Type"
+ZDINNAV_WIZARD_INSTALL_CONNECTION_DESCRIPTION: "The database connection string must match the above database type"
+ZDINNAV_WIZARD_INSTALL_CONNECTION: "Database Connection String"
+
+ZDINNAV_WIZARD_INSTALL_MORE_TITLE: "ZdinNav - Additional Information"
+
+ZDINNAV_WIZARD_INSTALL_GUIDE: "1. More Usage Tutorials"
+ZDINNAV_WIZARD_INSTALL_WATCH: "Watch"
+ZDINNAV_WIZARD_INSTALL_LINK: "Visit for more information"
+
+ZDINNAV_WIZARD_INSTALL_JOIN: "2. If you have suggestions for this program, join my"
+ZDINNAV_WIZARD_INSTALL_QQ_GROUP: "QQ Group"
+ZDINNAV_WIZARD_INSTALL_TPLEASANT: "Welcome to join and help make it better!"
+
+DEFAULT_ACCOUNT_REMARK: "3、Default super administrator login account: zdinnav Password: pwd123"
