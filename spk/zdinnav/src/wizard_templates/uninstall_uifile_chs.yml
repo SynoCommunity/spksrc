@@ -1,0 +1,4 @@
+ZDINNAV_WIZARD_UNINSTALL_TITLE: "卸载智淀导航"
+ZDINNAV_WIZARD_UNINSTALL_DESCRIPTION: "您即将卸载智淀导航，是否需要保留你的配置数据？"
+ZDINNAV_WIZARD_UNINSTALL_KEEP: "保留数据（推荐）- 将来重新安装时可恢复。"
+ZDINNAV_WIZARD_UNINSTALL_DELETE: "删除所有数据 - 此操作不可恢复！删除文件夹全部数据：" 
