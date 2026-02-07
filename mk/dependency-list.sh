@@ -41,8 +41,15 @@ function get_spk_name ()
 function get_python_dependency ()
 {
    if [ -f ${1}/Makefile -a "$(grep ^include.*\/spksrc\.python\.mk ${1}/Makefile)" ]; then
-      local dep=$(grep "PYTHON_PACKAGE\s*=" ${1}/Makefile | cut -d= -f2 | xargs)
-      echo "cross/${dep} "
+      # Handle multiple PYTHON_PACKAGE assignments (e.g., conditional for different archs)
+      # by prefixing each value with cross/ separately
+      local deps=""
+      for pkg in $(grep "PYTHON_PACKAGE\s*=" ${1}/Makefile | cut -d= -f2 | xargs); do
+         if [ -n "${pkg}" ]; then
+            deps+="cross/${pkg} "
+         fi
+      done
+      echo "${deps}"
    fi
 }
 
