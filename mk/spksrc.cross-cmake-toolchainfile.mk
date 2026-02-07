@@ -22,7 +22,7 @@ ifeq ($(wildcard $(CMAKE_BUILD_DIR)),)
 	@mkdir --parents $(CMAKE_BUILD_DIR)
 endif
 	@$(MSG) Generating $(CMAKE_TOOLCHAIN_FILE_PKG)
-	env $(ENV) $(MAKE) --no-print-directory cmake_pkg_toolchain > $(CMAKE_TOOLCHAIN_FILE_PKG) 2>/dev/null;
+	@env $(ENV) $(MAKE) --no-print-directory cmake_pkg_toolchain > $(CMAKE_TOOLCHAIN_FILE_PKG) 2>/dev/null;
 
 .PHONY: cmake_pkg_toolchain
 cmake_pkg_toolchain:

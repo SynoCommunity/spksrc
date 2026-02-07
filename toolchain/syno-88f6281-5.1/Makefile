@@ -12,4 +12,4 @@ TC_TARGET = arm-marvell-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/libc
 TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

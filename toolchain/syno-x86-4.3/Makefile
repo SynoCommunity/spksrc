@@ -12,4 +12,4 @@ TC_TARGET = x86_64-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sys-root
 TC_LIBRARY = $(TC_TARGET)/lib
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

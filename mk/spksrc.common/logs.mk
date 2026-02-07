@@ -32,7 +32,13 @@ RED=$$(tput setaf 1)
 GREEN=$$(tput setaf 2)
 NC=$$(tput sgr0)
 
-DEFAULT_LOG  = $(LOG_DIR)/build$(or $(ARCH_SUFFIX),-noarch-$(TCVERSION)).log
+ifneq ($(TC_NAME),)
+  # In toolchain context
+  DEFAULT_LOG = $(LOG_DIR)/build-$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS).log
+else
+  # In package context (handles both arch-specific and noarch)
+  DEFAULT_LOG = $(LOG_DIR)/build$(or $(ARCH_SUFFIX),-noarch-$(TCVERSION)).log
+endif
 CROSSENV_LOG = $(LOG_DIR)/build$(ARCH_SUFFIX)-crossenv.log
 WHEEL_LOG    = $(LOG_DIR)/build$(ARCH_SUFFIX)-wheel.log
 NATIVE_LOG   = $(LOG_DIR)/build-native-$(PKG_NAME).log

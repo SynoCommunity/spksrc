@@ -11,4 +11,4 @@ TC_SYSROOT = $(TC_TARGET)
 TC_INCLUDE = $(TC_SYSROOT)/include
 TC_EXTRA_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

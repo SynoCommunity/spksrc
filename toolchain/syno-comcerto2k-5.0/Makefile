@@ -12,4 +12,4 @@ TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 TC_EXTRA_CFLAGS = -mfloat-abi=hard -mtune=cortex-a15 -mfpu=neon-vfpv4 -mthumb
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

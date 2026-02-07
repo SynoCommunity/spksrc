@@ -12,4 +12,4 @@ TC_TARGET = powerpc-linux
 TC_SYSROOT = $(TC_TARGET)
 TC_INCLUDE = $(TC_SYSROOT)/include
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk
