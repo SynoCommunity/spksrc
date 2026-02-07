@@ -1,15 +1,7 @@
 ###############################################################################
 # spksrc.checksum.mk
 #
-# Provides checksum verification for downloaded distribution files.
-#
-# This makefile is responsible for:
-#  - validating downloaded files against the digests file
-#  - supporting multiple checksum types (SHA256, SHA1, MD5)
-#  - orchestrating multi-architecture checksum verification when required
-#
-# The checksum process is organized as a small pipeline with overridable
-# pre/post hooks and a persistent status cookie.
+# Verify checksums of downloaded distribution files.
 #
 # Targets are executed in the following order:
 #  checksum_msg
@@ -18,26 +10,42 @@
 #  post_checksum_target   (override with POST_CHECKSUM_TARGET)
 #
 # Variables:
-#  LOCAL_FILE            : Name of the downloaded file to verify
-#  PKG_DIST_ARCH_LIST    : Optional list of distribution architectures
-#                          (2 or more entries enable multi-arch orchestration)
-#  PKG_DIST_ARCH         : Optional current distribution architecture
-#                          (single element used during leaf execution)
+#  LOCAL_FILE             : Name of the downloaded file to verify
+#  DIGESTS_FILE           : File containing checksum entries
+#  PKG_DIST_ARCH_LIST     : Optional list of distribution architectures
+#                           (2 or more entries enable multi-arch orchestration)
+#  PKG_DIST_ARCH          : Optional current distribution architecture
+#                           (single element used during leaf execution)
 #
 # Files:
-#  digests               : List of filename, checksum type and checksum value
+#  $(WORK_DIR)/.$(COOKIE_PREFIX)checksum_done
+#                           Generic checksum completion cookie
+#                           (used when PKG_DIST_ARCH is unset)
+#  $(WORK_DIR)/.$(COOKIE_PREFIX)<arch>-checksum_done
+#                           Architecture-specific checksum completion cookie
+#                           (used when PKG_DIST_ARCH is set)
+#  $(DIGESTS_FILE)        : List of filename, checksum type and checksum value
 #
 # Notes:
-#  - The checksum target is idempotent and guarded by CHECKSUM_COOKIE.
+#  - The checksum target is idempotent and guarded by a completion cookie.
+#  - When PKG_DIST_ARCH is unset, a single generic cookie is used, preserving
+#    the classic single-archive behavior.
+#  - When PKG_DIST_ARCH is set, the cookie is architecture-specific, allowing
+#    checksum verification to be tracked independently per architecture.
 #  - When PKG_DIST_ARCH_LIST contains 2 or more elements, checksum acts as an
 #    orchestrator and invokes sub-make executions per architecture.
-#  - Sub-make calls force PKG_DIST_ARCH_LIST to a single element to avoid
-#    recursion and ensure leaf execution.
+#  - Sub-make calls force PKG_DIST_ARCH_LIST to a single element to ensure
+#    leaf execution and avoid recursive orchestration.
 #
 ###############################################################################
 
 DIGESTS_FILE = digests
+
+ifneq ($(strip $(PKG_DIST_ARCH)),)
+CHECKSUM_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)$(PKG_DIST_ARCH)-checksum_done
+else
 CHECKSUM_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)checksum_done
+endif
 
 ifeq ($(strip $(PRE_CHECKSUM_TARGET)),)
 PRE_CHECKSUM_TARGET = pre_checksum_target
@@ -110,8 +118,6 @@ checksum_target: $(PRE_CHECKSUM_TARGET)
 	    ) ; \
 	  fi ; \
 	fi
-
-	@echo $(DIST_FILE)
 
 # Multi-arch orchestration:
 # - words(PKG_DIST_ARCH_LIST) >= 2 → iterate over architectures
