@@ -118,7 +118,7 @@ checksum_target: $(PRE_CHECKSUM_TARGET)
 # - words(PKG_DIST_ARCH_LIST) <= 1 → single execution
 ifeq ($(filter 0 1,$(words $(PKG_DIST_ARCH_LIST))),)
 post_checksum_target:
-	for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
+	@for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
 	  rm -f $(CHECKSUM_COOKIE) ; \
 	  $(MAKE) -s \
 	    PKG_DIST_ARCH_LIST=$${pkg_arch} \
