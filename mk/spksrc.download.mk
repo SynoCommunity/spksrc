@@ -23,7 +23,6 @@
 #    orchestrator and invokes sub-make executions per architecture.
 #  - Sub-make calls force PKG_DIST_ARCH_LIST to a single element to avoid
 #    recursion and ensure leaf execution.
-#  - download-all is kept for backward compatibility but simply calls download.
 #
 ###############################################################################
 
@@ -54,7 +53,7 @@ else
 $(POST_DOWNLOAD_TARGET): $(DOWNLOAD_TARGET)
 endif
 
-.PHONY: download download-all download_msg
+.PHONY: download download_msg
 .PHONY: $(PRE_DOWNLOAD_TARGET) $(DOWNLOAD_TARGET) $(POST_DOWNLOAD_TARGET)
 
 download_msg:
@@ -213,6 +212,3 @@ $(DOWNLOAD_COOKIE): $(POST_DOWNLOAD_TARGET)
 else
 download: ;
 endif
-
-# Backward compatibility: download-all now simply calls download
-download-all: download
