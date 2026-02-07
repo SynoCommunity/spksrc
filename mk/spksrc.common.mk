@@ -49,6 +49,9 @@ include $(BASEDIR)mk/spksrc.common/archs.mk
 include $(BASEDIR)mk/spksrc.common/logs.mk
 include $(BASEDIR)mk/spksrc.common/macros.mk
 
+# Standardized boolean parsing helpers
+include $(BASEDIR)mk/spksrc.bool.mk
+
 # Load local configuration
 LOCAL_CONFIG_MK = $(BASEDIR)local.mk
 ifneq ($(wildcard $(LOCAL_CONFIG_MK)),)
