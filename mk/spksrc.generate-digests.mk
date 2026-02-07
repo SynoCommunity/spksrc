@@ -1,10 +1,20 @@
-# general rule for "make digests"
-# 
-# include this file after the rule "all:"
+###############################################################################
+# spksrc.generate-digests.mk
 #
+# Generate digests file for downloaded distribution files.
+#
+# This makefile is responsible for:
+#  - computing SHA1, SHA256, and MD5 checksums for downloaded files
+#  - supporting multi-architecture packages via PKG_DIST_ARCH_LIST
+#  - supporting multi-site packages via PKG_DIST_SITE_LIST
+#
+# Include this file after the rule "all:"
+#
+###############################################################################
 
 ifeq ($(strip $(PKG_DIST_ARCH_LIST)),)
 
+# Single architecture: generate digests for the one downloaded file
 $(DIGESTS_FILE): download
 	@$(MSG) "Generate digests for $(NAME)"
 	@rm -f $@ && touch -f $@
@@ -19,10 +29,10 @@ $(DIGESTS_FILE): download
 
 else
 
-# download different files for multiple PKG_DIST_ARCH and add digests for all of them
+# Multi-architecture: generate digests for each arch-specific file
 
 digests-%:
-	$(MSG) "Add digests for PKG_DIST_ARCH = $*"
+	@$(MSG) "Add digests for PKG_DIST_ARCH = $*"
 	@for type in SHA1 SHA256 MD5; do \
 	  case $$type in \
 	    SHA1)     tool=sha1sum ;; \
@@ -32,33 +42,12 @@ digests-%:
 	  echo "$(LOCAL_FILE) $${type} $$($${tool} $(DIST_FILE) | cut -d' ' -f1)" >> $(DIGESTS_FILE) ; \
 	done
 
-
-ifeq ($(strip $(PKG_DIST_SITE_LIST)),)
-
-# download with individual dist archs
+# The download target now auto-orchestrates for multi-arch packages,
+# so we just need to iterate for digest generation.
 $(DIGESTS_FILE): download
+	@rm -f $(DIGESTS_FILE) && touch -f $(DIGESTS_FILE)
 	@for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
-	  rm $(DOWNLOAD_COOKIE) ; \
-	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} download ; \
-	done ; \
-	rm -f $(DIGESTS_FILE) && touch -f $(DIGESTS_FILE) ; \
-	for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
 	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} digests-$${pkg_arch} ; \
-	done ; \
-
-else
-
-# download with individual dist sites
-$(DIGESTS_FILE): download
-	@for pkg_dist_url in $(PKG_DIST_SITE_LIST); do \
-	  rm $(DOWNLOAD_COOKIE) ; \
-	  $(MAKE) -s URLS=$${pkg_dist_url} download ; \
-	done ; \
-	rm -f $(DIGESTS_FILE) && touch -f $(DIGESTS_FILE) ; \
-	for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
-	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} digests-$${pkg_arch} ; \
-	done ; \
-
-endif
+	done
 
 endif

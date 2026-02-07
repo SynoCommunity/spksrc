@@ -1,18 +1,31 @@
-### Download rules
-#   Download $(URLS) from the wild internet, and place them in $(DISTRIB_DIR).
+###############################################################################
+# spksrc.download.mk
+#
+# Download $(URLS) from the wild internet, and place them in $(DISTRIB_DIR).
+#
 # Targets are executed in the following order:
 #  download_msg_target
 #  pre_download_target   (override with PRE_DOWNLOAD_TARGET)
 #  download_target       (override with DOWNLOAD_TARGET)
 #  post_download_target  (override with POST_DOWNLOAD_TARGET)
-# Variables:
-#  URLS:                 List of URL to download
-#  DISTRIB_DIR:          Downloaded files will be placed there.
-# Targets:
-# download               Regular target for file download
-# download-all           To additionally download all files when PKG_DIST_ARCH_LIST is defined
-#                        This target is for github prepare action to pre download all sources
 #
+# Variables:
+#  URLS                  : List of URL to download
+#  DISTRIB_DIR           : Downloaded files will be placed there
+#  PKG_DIST_ARCH_LIST    : Optional list of distribution architectures
+#                          (2 or more entries enable multi-arch orchestration)
+#  PKG_DIST_ARCH         : Optional current distribution architecture
+#                          (single element used during leaf execution)
+#
+# Notes:
+#  - The download target is idempotent and guarded by DOWNLOAD_COOKIE.
+#  - When PKG_DIST_ARCH_LIST contains 2 or more elements, download acts as an
+#    orchestrator and invokes sub-make executions per architecture.
+#  - Sub-make calls force PKG_DIST_ARCH_LIST to a single element to avoid
+#    recursion and ensure leaf execution.
+#  - download-all is kept for backward compatibility but simply calls download.
+#
+###############################################################################
 
 # Configure file descriptor lock timeout
 ifeq ($(strip $(FLOCK_TIMEOUT)),)
@@ -41,7 +54,7 @@ else
 $(POST_DOWNLOAD_TARGET): $(DOWNLOAD_TARGET)
 endif
 
-.PHONY: download download_msg
+.PHONY: download download-all download_msg
 .PHONY: $(PRE_DOWNLOAD_TARGET) $(DOWNLOAD_TARGET) $(POST_DOWNLOAD_TARGET)
 
 download_msg:
@@ -175,7 +188,21 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	  esac ; \
 	done
 
-post_download_target: $(DOWNLOAD_TARGET) 
+# Multi-arch orchestration:
+# - words(PKG_DIST_ARCH_LIST) >= 2 → iterate over architectures
+# - words(PKG_DIST_ARCH_LIST) <= 1 → single execution
+ifeq ($(filter 0 1,$(words $(PKG_DIST_ARCH_LIST))),)
+post_download_target:
+	for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
+	  rm -f $(DOWNLOAD_COOKIE) ; \
+	  $(MAKE) -s \
+	    PKG_DIST_ARCH_LIST=$${pkg_arch} \
+	    PKG_DIST_ARCH=$${pkg_arch} \
+	    download ; \
+	done ;
+else
+post_download_target: $(DOWNLOAD_TARGET)
+endif
 
 ifeq ($(wildcard $(DOWNLOAD_COOKIE)),)
 download: $(DOWNLOAD_COOKIE)
@@ -187,13 +214,5 @@ else
 download: ;
 endif
 
-
-ifneq ($(strip $(PKG_DIST_ARCH_LIST)),)
-download-all:
-	@for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
-	  rm -f $(DOWNLOAD_COOKIE) ; \
-	  $(MAKE) -s PKG_DIST_ARCH=$${pkg_arch} download ; \
-	done ;
-else
+# Backward compatibility: download-all now simply calls download
 download-all: download
-endif

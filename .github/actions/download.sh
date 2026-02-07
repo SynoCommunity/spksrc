@@ -6,7 +6,7 @@
 # Functions:
 # - Download all referenced native and cross source files for packages.
 # - Download all referenced python wheels needed to build.
-# - Use the "download-all" target when a package has multiple (arch-specific) files.
+# - The "download" target auto-orchestrates when a package has multiple (arch-specific) files.
 # - Retry download if checksum fails (cached file may be outdated).
 
 set -euo pipefail
@@ -66,7 +66,7 @@ if [ -z "${DOWNLOAD_PACKAGES:-}" ]; then
 else
     echo "===> Downloading packages: ${DOWNLOAD_PACKAGES}"
     for current in ${DOWNLOAD_PACKAGES}; do
-        download_with_retry "${current}" "download-all"
+        download_with_retry "${current}" "download"
     done
 fi
 
