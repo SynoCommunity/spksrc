@@ -1,4 +1,4 @@
-from flask import Flask, render_template, render_template_string
+from flask import Flask, render_template, render_template_string, send_from_directory
 import os
 import ssl
 from routes.main_routes import main_bp
@@ -33,6 +33,11 @@ ssl_context = None
 if os.path.exists(HAPROXY_CERT):
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     ssl_context.load_cert_chain(certfile=HAPROXY_CERT)
+
+# Favicon route
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/x-icon')
 
 # Statistics Route
 @app.route('/statistics')

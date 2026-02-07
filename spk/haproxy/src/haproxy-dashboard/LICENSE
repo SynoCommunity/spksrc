@@ -27,4 +27,5 @@ This package also includes the following third-party components:
 
 Bootstrap 4.5.2 - Copyright (c) 2011-2020 Twitter, Inc. - MIT License
 Font Awesome 5.15.4 - Copyright (c) Fonticons, Inc. - Font Awesome Free License
-Popper.js 2.0.7 - Copyright (c) 2019 Federico Zivolo - MIT License
+Popper.js 1.16.1 - Copyright (c) 2016-2020 Federico Zivolo - MIT License
+jQuery 3.5.1 Slim - Copyright (c) OpenJS Foundation - MIT License
