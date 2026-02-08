@@ -51,7 +51,7 @@ ifeq ($(filter 0 1,$(words $(PKG_DIST_ARCH_LIST))),)
 # Iterate over PKG_DIST_ARCH_LIST and invoke download and digest generation
 # once per architecture, resetting PKG_DIST_ARCH_LIST to a single value
 # for each sub-make invocation.
-digests:
+$(DIGESTS_FILE):
 	@rm -f $(DIGESTS_FILE) && touch -f $(DIGESTS_FILE) ; \
 	for pkg_arch in $(PKG_DIST_ARCH_LIST); do \
 	  $(MAKE) -s PKG_DIST_ARCH_LIST=$${pkg_arch} PKG_DIST_ARCH=$${pkg_arch} download ; \
@@ -62,7 +62,7 @@ else
 # Single-architecture package.
 # Generate digests directly from the downloaded file without setting
 # PKG_DIST_ARCH, producing a single DIGESTS_FILE.
-digests: download
+$(DIGESTS_FILE): download
 	@$(MSG) "Generate digests for $(NAME)"
 	@rm -f $@ && touch -f $@
 	@for type in SHA1 SHA256 MD5; do \
