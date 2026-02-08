@@ -1,0 +1,13 @@
+bin:bin/GenX_IR
+bin:bin/iga64
+lnk:lib/libigc.so
+lnk:lib/libigc.so.1
+lib:lib/libigc.so.1.0.1
+lnk:lib/libigdfcl.so
+lnk:lib/libigdfcl.so.1
+lib:lib/libigdfcl.so.1.0.1
+lnk:lib/libiga64.so
+lnk:lib/libiga64.so.1
+lib:lib/libiga64.so.1.0.1
+lib:lib/libBiFManager.so
+rsc:lib/igc/NOTICES.txt

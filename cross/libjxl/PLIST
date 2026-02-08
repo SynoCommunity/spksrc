@@ -1,0 +1,6 @@
+lnk:lib/libjxl.so
+lnk:lib/libjxl.so.0.7
+lib:lib/libjxl.so.0.7.2
+lnk:lib/libjxl_threads.so
+lnk:lib/libjxl_threads.so.0.7
+lib:lib/libjxl_threads.so.0.7.2

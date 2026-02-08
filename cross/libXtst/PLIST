@@ -1,0 +1,3 @@
+lnk:lib/libXtst.so
+lnk:lib/libXtst.so.6
+lib:lib/libXtst.so.6.1.0

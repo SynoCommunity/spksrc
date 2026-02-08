@@ -1,0 +1,5 @@
+pyextdirect==0.3.1
+flask
+Werkzeug
+Jinja2
+itsdangerous

@@ -1,0 +1,3 @@
+lnk:lib/libXfixes.so
+lnk:lib/libXfixes.so.3
+lib:lib/libXfixes.so.3.1.0

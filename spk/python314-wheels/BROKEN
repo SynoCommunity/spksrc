@@ -1,0 +1,23 @@
+Issues TODO:
+1- 'make wheelclean' fails to clean numpy properly
+2- 'pendulum` wheel broken -> Probably needs an update
+	-> Temporarily disabled
+2- Wheels in wheelhouse are no longer being installed in crossenv?!?!
+   Seen with scipy that requires numpy from wheelhouse where instead online
+   sources gets priority resulting in failing to build numpy for scipy crossenv
+   while cross-compiled version is available in wheelhouse.
+
+Names python 3.14 / 3.13 looks ok:
+  numpy-2.2.6-cp314-cp314-linux_aarch64_unknown_linux_gnu.whl
+  numpy-2.2.6-cp313-cp313-linux_aarch64_unknown_linux_gnu.whl
+
+---
+
+Issues fixed:
+1- pkgconfig prefix uses INSTALL_PREFIX instead of STAGING_INSTALL_PREFIX
+	FIX) ATM using a post_install_target rules in cross/python314 to address the issue
+	     -->> To look if install options upstream have changed or open a bug upstream.
+2- cross/mysql-connector-c does no longer build using Debian-13 trixie
+	FIX) Enable mysql compatibility in mariadb-connector-c and discard old mysql version
+3- pydantic_core was migrated to rustc and no longer needs its default crossenv
+	FIX) Remove pydantic_core specific requirement files

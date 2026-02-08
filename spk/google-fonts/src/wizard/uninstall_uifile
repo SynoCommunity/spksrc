@@ -1,0 +1,19 @@
+[{
+    "step_title": "Uninstall google fonts",
+    "items": [{
+        "type": "singleselect",
+        "desc": "Keep or delete the installed fonts in the shared folder.",
+        "subitems": [{
+            "key": "wizard_keep_data",
+            "desc": "<b>Uninstall only.</b> Keep installed fonts.",
+            "defaultValue": true
+          }, {
+            "key": "wizard_delete_data",
+            "desc": "<b style=\"color: red\">Erase installed fonts.</b>",
+            "defaultValue": false
+          }
+        ]
+      }
+    ]
+  }
+]

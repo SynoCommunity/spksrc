@@ -1,0 +1,34 @@
+{
+    "backend": 8,
+    "custom_open_basedir": false,
+    "display_errors": false,
+    "enable_cache": true,
+    "enable_xdebug": false,
+    "extensions": [
+        "curl",
+        "exif",
+        "gd",
+        "iconv",
+        "imagick",
+        "intl",
+        "ldap",
+        "mysqli",
+        "openssl",
+        "pdo_mysql",
+        "sockets",
+        "zip"
+    ],
+    "fpm_settings": {
+        "max_children": 20,
+        "max_spare_servers": 3,
+        "min_spare_servers": 1,
+        "mode": "dynamic",
+        "start_servers": 2
+    },
+    "open_basedir": "",
+    "php_settings": {
+        "mysqli.default_socket": "/run/mysqld/mysqld10.sock"
+    },
+    "profile_desc": "PHP Profile for roundcube",
+    "profile_name": "roundcube Profile"
+}

@@ -1,0 +1,106 @@
+[{
+    "step_title": "Shared folder configuration",
+    "items": [{
+        "desc": "Shared folder of downloaded files. If the specified share does not exist, it will be created."
+      }, {
+        "type": "combobox",
+        "desc": "Please select a volume and a folder to use for the download files",
+        "subitems": [{
+            "key": "wizard_download_volume",
+            "desc": "Volume name",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            },
+            "validator": {
+              "fn": "{console.log(arguments);return true;}"
+            }
+          }
+        ]
+      }, {
+        "type": "textfield",
+        "desc": "Configuration de téléchargement",
+        "subitems": [{
+            "key": "wizard_download_folder",
+            "desc": "Répertoire cible",
+            "defaultValue": "downloads",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[^<>: */?\"]*/",
+                "errorText": "Share name must be a folder name only. Path separators, spaces and other special chars are not allowed."
+              }
+            }
+          }
+        ]
+      }, {
+        "desc": "Permissions for download-related packages are managed with the group <b>'synocommunity'</b> in DSM. Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for further information."
+      }
+    ]
+  }, {
+    "step_title": "User configuration",
+    "items": [{
+        "desc": "Define the User Credentials for the web interface."
+      }, {
+        "type": "textfield",
+        "desc": "Utilisateur d'administration. Par défaut nzbget",
+        "subitems": [{
+            "key": "wizard_control_username",
+            "desc": "Utilisateur d'administration",
+            "defaultValue": "nzbget",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      }, {
+        "type": "password",
+        "desc": "Mot de passe d'administration. Par défaut nzbget",
+        "subitems": [{
+            "key": "wizard_control_password",
+            "desc": "Mot de passe d'administration",
+            "defaultValue": "nzbget",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      }
+    ]
+  }, {
+    "step_title": "Installation de NZBGet",
+    "items": [{
+        "desc": "L'installateur va maintenant télécharger la version voulue de NZBGet depuis NZBget.com et l'installer. Vous pouvez ensuite mettre à jour depuis NZBGet (Config > System)."
+      }, {
+        "type": "singleselect",
+        "desc": "Version à installer:",
+        "subitems": [{
+            "key": "wizard_stable_release",
+            "desc": "Dernière version stable de NZBGet",
+            "defaultValue": true
+          }, {
+            "key": "wizard_testing_release",
+            "desc": "Dernière version de test (beta) de NZBGet",
+            "defaultValue": false
+          }
+        ]
+      }
+    ]
+  }
+]

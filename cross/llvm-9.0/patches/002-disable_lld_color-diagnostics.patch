@@ -1,0 +1,23 @@
+--- ../llvm-project-9.0.1-orig/llvm/cmake/modules/HandleLLVMOptions.cmake	2019-12-11 19:15:30.000000000 +0000
++++ llvm/cmake/modules/HandleLLVMOptions.cmake	2023-03-11 12:49:47.428525380 +0000
+@@ -786,13 +786,13 @@ if (UNIX AND
+   append("-fdiagnostics-color" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+ endif()
+ 
+-# lld doesn't print colored diagnostics when invoked from Ninja
+-if (UNIX AND CMAKE_GENERATOR STREQUAL "Ninja")
+-  include(CheckLinkerFlag)
+-  check_linker_flag("-Wl,--color-diagnostics" LINKER_SUPPORTS_COLOR_DIAGNOSTICS)
+-  append_if(LINKER_SUPPORTS_COLOR_DIAGNOSTICS "-Wl,--color-diagnostics"
+-    CMAKE_EXE_LINKER_FLAGS CMAKE_MODULE_LINKER_FLAGS CMAKE_SHARED_LINKER_FLAGS)
+-endif()
++## lld doesn't print colored diagnostics when invoked from Ninja
++#if (UNIX AND CMAKE_GENERATOR STREQUAL "Ninja")
++#  include(CheckLinkerFlag)
++#  check_linker_flag("-Wl,--color-diagnostics" LINKER_SUPPORTS_COLOR_DIAGNOSTICS)
++#  append_if(LINKER_SUPPORTS_COLOR_DIAGNOSTICS "-Wl,--color-diagnostics"
++#    CMAKE_EXE_LINKER_FLAGS CMAKE_MODULE_LINKER_FLAGS CMAKE_SHARED_LINKER_FLAGS)
++#endif()
+ 
+ # Add flags for add_dead_strip().
+ # FIXME: With MSVS, consider compiling with /Gy and linking with /OPT:REF?

@@ -1,0 +1,16 @@
+diff --git a/scheduler/log.c b/scheduler/log.c
+index 17331ff02..41ddb4cb9 100644
+--- a/scheduler/log.c
++++ b/scheduler/log.c
+@@ -569,11 +569,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
+   * Format and write the log message...
+   */
+ 
+-#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
+-  if (job && strcmp(ErrorLog, "syslog"))
+-#else
+   if (job)
+-#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
+     snprintf(jobmsg, sizeof(jobmsg), "[Job %d] %s", job->id, message);
+   else
+     strlcpy(jobmsg, message, sizeof(jobmsg));

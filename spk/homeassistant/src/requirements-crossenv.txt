@@ -1,0 +1,15 @@
+# only wheels that are not available in index are built and included in the package
+# 
+aiokafka==0.10.0                # downloadable only for python <= 312
+crcmod==1.7                     # downloadable only for win32, installs from index as py3-none-any.whl
+debugpy==1.8.16                 # installs from index as py2.py3-none-any.whl
+### DTLSSocket==0.1.19          # no wheels in index, source only, pip wheel fails to cross compile, use python/dtlssocket
+faust_cchardet==2.1.19          # downloadable only for python <= 310
+lru_dict==1.3.0                 # downloadable only for python <= 310
+miniaudio==1.61                 # downloadable only for python <= 310
+netifaces==0.11.0               # downloadable only for python <= 39
+pyads==3.4.0                    # no wheels in index, source only
+pycrc16==0.1.2                  # no wheels in index, source only
+pyitachip2ir==0.0.7             # no wheels in index, source only
+pymicro_vad==1.0.1              # downloadable only for python <= 312
+pyspeex_noise==1.0.2            # no wheels in index, source only

@@ -1,0 +1,3 @@
+bin:bin/dnscrypt-proxy
+rsc:example-*
+rsc:blocklist/

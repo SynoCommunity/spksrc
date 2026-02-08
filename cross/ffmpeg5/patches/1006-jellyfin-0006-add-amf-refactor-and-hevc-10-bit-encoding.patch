@@ -1,0 +1,2614 @@
+Index: jellyfin-ffmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -6993,7 +6993,7 @@ fi
+ 
+ enabled amf &&
+     check_cpp_condition amf "AMF/core/Version.h" \
+-        "(AMF_VERSION_MAJOR << 48 | AMF_VERSION_MINOR << 32 | AMF_VERSION_RELEASE << 16 | AMF_VERSION_BUILD_NUM) >= 0x0001000400090000"
++        "(AMF_VERSION_MAJOR << 48 | AMF_VERSION_MINOR << 32 | AMF_VERSION_RELEASE << 16 | AMF_VERSION_BUILD_NUM) >= 0x0001000400180000"
+ 
+ # Funny iconv installations are not unusual, so check it after all flags have been set
+ if enabled libc_iconv; then
+Index: jellyfin-ffmpeg/libavcodec/Makefile
+===================================================================
+--- libavcodec/Makefile
++++ libavcodec/Makefile
+@@ -65,7 +65,7 @@ OBJS = ac3_parser.o
+ OBJS-$(CONFIG_AANDCTTABLES)            += aandcttab.o
+ OBJS-$(CONFIG_AC3DSP)                  += ac3dsp.o ac3.o ac3tab.o
+ OBJS-$(CONFIG_ADTS_HEADER)             += adts_header.o mpeg4audio_sample_rates.o
+-OBJS-$(CONFIG_AMF)                     += amfenc.o
++OBJS-$(CONFIG_AMF)                     += amfenc.o amf.o
+ OBJS-$(CONFIG_AUDIO_FRAME_QUEUE)       += audio_frame_queue.o
+ OBJS-$(CONFIG_ATSC_A53)                += atsc_a53.o
+ OBJS-$(CONFIG_AUDIODSP)                += audiodsp.o
+@@ -1233,7 +1233,7 @@ SKIPHEADERS                            +
+                                           aacenc_quantization_misc.h    \
+                                           $(ARCH)/vp56_arith.h          \
+ 
+-SKIPHEADERS-$(CONFIG_AMF)              += amfenc.h
++SKIPHEADERS-$(CONFIG_AMF)              += amfenc.h amf.h
+ SKIPHEADERS-$(CONFIG_D3D11VA)          += d3d11va.h dxva2_internal.h
+ SKIPHEADERS-$(CONFIG_DXVA2)            += dxva2.h dxva2_internal.h
+ SKIPHEADERS-$(CONFIG_JNI)              += ffjni.h
+Index: jellyfin-ffmpeg/libavcodec/amf.c
+===================================================================
+--- /dev/null
++++ libavcodec/amf.c
+@@ -0,0 +1,371 @@
++/*
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include "amf.h"
++
++#define FFMPEG_AMF_WRITER_ID L"ffmpeg_amf"
++
++const FormatMap format_map[] =
++{
++    { AV_PIX_FMT_NONE,       AMF_SURFACE_UNKNOWN },
++    { AV_PIX_FMT_NV12,       AMF_SURFACE_NV12    },
++    { AV_PIX_FMT_P010,       AMF_SURFACE_P010    },
++    { AV_PIX_FMT_BGR0,       AMF_SURFACE_BGRA    },
++    { AV_PIX_FMT_RGB0,       AMF_SURFACE_RGBA    },
++    { AV_PIX_FMT_GRAY8,      AMF_SURFACE_GRAY8   },
++    { AV_PIX_FMT_YUV420P,    AMF_SURFACE_YUV420P },
++    { AV_PIX_FMT_YUYV422,    AMF_SURFACE_YUY2    },
++};
++
++enum AMF_SURFACE_FORMAT amf_av_to_amf_format(enum AVPixelFormat fmt)
++{
++    int i;
++    for (i = 0; i < amf_countof(format_map); i++) {
++        if (format_map[i].av_format == fmt) {
++            return format_map[i].amf_format;
++        }
++    }
++    return AMF_SURFACE_UNKNOWN;
++}
++
++enum AVPixelFormat amf_to_av_format(enum AMF_SURFACE_FORMAT fmt)
++{
++    int i;
++    for (i = 0; i < amf_countof(format_map); i++) {
++        if (format_map[i].amf_format == fmt) {
++            return format_map[i].av_format;
++        }
++    }
++    return AMF_SURFACE_UNKNOWN;
++}
++
++const ColorTransferMap color_trc_map[] =
++{
++    { AVCOL_TRC_RESERVED0,       AMF_COLOR_TRANSFER_CHARACTERISTIC_UNDEFINED    },
++    { AVCOL_TRC_BT709,           AMF_COLOR_TRANSFER_CHARACTERISTIC_BT709        },
++    { AVCOL_TRC_UNSPECIFIED,     AMF_COLOR_TRANSFER_CHARACTERISTIC_UNSPECIFIED  },
++    { AVCOL_TRC_RESERVED,        AMF_COLOR_TRANSFER_CHARACTERISTIC_RESERVED     },
++    { AVCOL_TRC_GAMMA22,         AMF_COLOR_TRANSFER_CHARACTERISTIC_GAMMA22      },
++    { AVCOL_TRC_GAMMA28,         AMF_COLOR_TRANSFER_CHARACTERISTIC_GAMMA28      },
++    { AVCOL_TRC_SMPTE170M,       AMF_COLOR_TRANSFER_CHARACTERISTIC_SMPTE170M    },
++    { AVCOL_TRC_SMPTE240M,       AMF_COLOR_TRANSFER_CHARACTERISTIC_SMPTE240M    },
++    { AVCOL_TRC_LINEAR,          AMF_COLOR_TRANSFER_CHARACTERISTIC_LINEAR       },
++    { AVCOL_TRC_LOG,             AMF_COLOR_TRANSFER_CHARACTERISTIC_LOG          },
++    { AVCOL_TRC_LOG_SQRT,        AMF_COLOR_TRANSFER_CHARACTERISTIC_LOG_SQRT     },
++    { AVCOL_TRC_IEC61966_2_4,    AMF_COLOR_TRANSFER_CHARACTERISTIC_IEC61966_2_4 },
++    { AVCOL_TRC_BT1361_ECG,      AMF_COLOR_TRANSFER_CHARACTERISTIC_BT1361_ECG   },
++    { AVCOL_TRC_IEC61966_2_1,    AMF_COLOR_TRANSFER_CHARACTERISTIC_IEC61966_2_1 },
++    { AVCOL_TRC_BT2020_10,       AMF_COLOR_TRANSFER_CHARACTERISTIC_BT2020_10    },
++    { AVCOL_TRC_BT2020_12,       AMF_COLOR_TRANSFER_CHARACTERISTIC_BT2020_12    },
++    { AVCOL_TRC_SMPTE2084,       AMF_COLOR_TRANSFER_CHARACTERISTIC_SMPTE2084    },
++    { AVCOL_TRC_SMPTE428,        AMF_COLOR_TRANSFER_CHARACTERISTIC_SMPTE428     },
++    { AVCOL_TRC_ARIB_STD_B67,    AMF_COLOR_TRANSFER_CHARACTERISTIC_ARIB_STD_B67 },
++};
++
++enum AMF_COLOR_TRANSFER_CHARACTERISTIC_ENUM amf_av_to_amf_color_trc(enum AVColorTransferCharacteristic trc)
++{
++    int i;
++    for (i = 0; i < amf_countof(color_trc_map); i++) {
++        if (color_trc_map[i].av_color_trc == trc) {
++            return color_trc_map[i].amf_color_trc;
++        }
++    }
++    return AMF_COLOR_TRANSFER_CHARACTERISTIC_UNDEFINED;
++}
++
++const ColorPrimariesMap color_prm_map[] =
++{
++    { AVCOL_PRI_RESERVED0,      AMF_COLOR_PRIMARIES_UNDEFINED   },
++    { AVCOL_PRI_BT709,          AMF_COLOR_PRIMARIES_BT709       },
++    { AVCOL_PRI_UNSPECIFIED,    AMF_COLOR_PRIMARIES_UNSPECIFIED },
++    { AVCOL_PRI_RESERVED,       AMF_COLOR_PRIMARIES_RESERVED    },
++    { AVCOL_PRI_BT470M,         AMF_COLOR_PRIMARIES_BT470M      },
++    { AVCOL_PRI_BT470BG,        AMF_COLOR_PRIMARIES_BT470BG     },
++    { AVCOL_PRI_SMPTE170M,      AMF_COLOR_PRIMARIES_SMPTE170M   },
++    { AVCOL_PRI_SMPTE240M,      AMF_COLOR_PRIMARIES_SMPTE240M   },
++    { AVCOL_PRI_FILM,           AMF_COLOR_PRIMARIES_FILM        },
++    { AVCOL_PRI_BT2020,         AMF_COLOR_PRIMARIES_BT2020      },
++    { AVCOL_PRI_SMPTE428,       AMF_COLOR_PRIMARIES_SMPTE428    },
++    { AVCOL_PRI_SMPTE431,       AMF_COLOR_PRIMARIES_SMPTE431    },
++    { AVCOL_PRI_SMPTE432,       AMF_COLOR_PRIMARIES_SMPTE432    },
++    { AVCOL_PRI_JEDEC_P22,      AMF_COLOR_PRIMARIES_JEDEC_P22   },
++};
++
++enum AMF_COLOR_PRIMARIES_ENUM amf_av_to_amf_color_prm(enum AVColorPrimaries prm)
++{
++    int i;
++    for (i = 0; i < amf_countof(color_prm_map); i++) {
++        if (color_prm_map[i].av_color_prm == prm) {
++            return color_prm_map[i].amf_color_prm;
++        }
++    }
++    return AMF_COLOR_PRIMARIES_UNDEFINED;
++}
++
++static void AMF_CDECL_CALL AMFTraceWriter_Write(AMFTraceWriter *pThis,
++                                                const wchar_t *scope, const wchar_t *message)
++{
++    AVAMFLogger *logger = (AVAMFLogger*)pThis;
++    av_log(logger->avcl, AV_LOG_DEBUG, "%ls: %ls", scope, message);
++}
++
++static void AMF_CDECL_CALL AMFTraceWriter_Flush(AMFTraceWriter *pThis) {}
++
++static AMFTraceWriterVtbl tracer_vtbl =
++{
++    .Write = AMFTraceWriter_Write,
++    .Flush = AMFTraceWriter_Flush,
++};
++
++int amf_load_library(AVAMFContext *ctx)
++{
++    AMFInit_Fn         init_fun;
++    AMFQueryVersion_Fn version_fun;
++    AMF_RESULT         res;
++
++    ctx->library = dlopen(AMF_DLL_NAMEA, RTLD_NOW | RTLD_LOCAL);
++    AMF_RETURN_IF_FALSE(ctx->avclass, ctx->library != NULL,
++        AVERROR_UNKNOWN, "DLL %s failed to open\n", AMF_DLL_NAMEA);
++
++    init_fun = (AMFInit_Fn)dlsym(ctx->library, AMF_INIT_FUNCTION_NAME);
++    AMF_RETURN_IF_FALSE(ctx->avclass, init_fun != NULL,
++        AVERROR_UNKNOWN, "DLL %s failed to find function %s\n", AMF_DLL_NAMEA, AMF_INIT_FUNCTION_NAME);
++
++    version_fun = (AMFQueryVersion_Fn)dlsym(ctx->library, AMF_QUERY_VERSION_FUNCTION_NAME);
++    AMF_RETURN_IF_FALSE(ctx->avclass, version_fun != NULL,
++        AVERROR_UNKNOWN, "DLL %s failed to find function %s\n", AMF_DLL_NAMEA, AMF_QUERY_VERSION_FUNCTION_NAME);
++
++    res = version_fun(&ctx->version);
++    AMF_RETURN_IF_FALSE(ctx->avclass, res == AMF_OK,
++        AVERROR_UNKNOWN, "%s failed with error %d\n", AMF_QUERY_VERSION_FUNCTION_NAME, res);
++
++    res = init_fun(AMF_FULL_VERSION, &ctx->factory);
++    AMF_RETURN_IF_FALSE(ctx->avclass, res == AMF_OK,
++        AVERROR_UNKNOWN, "%s failed with error %d\n", AMF_INIT_FUNCTION_NAME, res);
++
++    res = ctx->factory->pVtbl->GetTrace(ctx->factory, &ctx->trace);
++    AMF_RETURN_IF_FALSE(ctx->avclass, res == AMF_OK,
++        AVERROR_UNKNOWN, "GetTrace() failed with error %d\n", res);
++
++    res = ctx->factory->pVtbl->GetDebug(ctx->factory, &ctx->debug);
++    AMF_RETURN_IF_FALSE(ctx->avclass, res == AMF_OK,
++        AVERROR_UNKNOWN, "GetDebug() failed with error %d\n", res);
++
++    return 0;
++}
++
++int amf_create_context(AVAMFContext *ctx)
++{
++    AMF_RESULT res;
++
++    // configure AMF logger
++    ctx->trace->pVtbl->EnableWriter(ctx->trace, AMF_TRACE_WRITER_DEBUG_OUTPUT, !!ctx->log_to_dbg);
++    if (ctx->log_to_dbg)
++        ctx->trace->pVtbl->SetWriterLevel(ctx->trace, AMF_TRACE_WRITER_DEBUG_OUTPUT, AMF_TRACE_TRACE);
++    ctx->trace->pVtbl->EnableWriter(ctx->trace, AMF_TRACE_WRITER_CONSOLE, 0);
++    ctx->trace->pVtbl->SetGlobalLevel(ctx->trace, AMF_TRACE_TRACE);
++
++    // connect AMF logger to av_log
++    ctx->logger.vtbl = &tracer_vtbl;
++    ctx->logger.avcl = ctx->avclass;
++    ctx->trace->pVtbl->RegisterWriter(ctx->trace, FFMPEG_AMF_WRITER_ID, (AMFTraceWriter*)&ctx->logger, 1);
++    ctx->trace->pVtbl->SetWriterLevel(ctx->trace, FFMPEG_AMF_WRITER_ID, AMF_TRACE_TRACE);
++
++    res = ctx->factory->pVtbl->CreateContext(ctx->factory, &ctx->context);
++    AMF_RETURN_IF_FALSE(ctx->avclass, res == AMF_OK,
++        AVERROR_UNKNOWN, "CreateContext() failed with error %d\n", res);
++
++    return 0;
++}
++
++void amf_unload_library(AVAMFContext *ctx)
++{
++    if (ctx->context) {
++        ctx->context->pVtbl->Terminate(ctx->context);
++        ctx->context->pVtbl->Release(ctx->context);
++        ctx->context = NULL;
++    }
++    if (ctx->trace) {
++        ctx->trace->pVtbl->UnregisterWriter(ctx->trace, FFMPEG_AMF_WRITER_ID);
++    }
++    if (ctx->library) {
++        dlclose(ctx->library);
++        ctx->library = NULL;
++    }
++    ctx->trace = NULL;
++    ctx->debug = NULL;
++    ctx->factory = NULL;
++    ctx->version = 0;
++}
++
++int amf_context_init_dx11(AVAMFContext *ctx)
++{
++    AMF_RESULT res;
++
++    res = ctx->context->pVtbl->InitDX11(ctx->context, NULL, AMF_DX11_1);
++    if (res != AMF_OK) {
++        res = ctx->context->pVtbl->InitDX11(ctx->context, NULL, AMF_DX11_0);
++    }
++
++    if (res == AMF_OK) {
++        av_log(ctx->avclass, AV_LOG_VERBOSE, "AMF initialization succeeded via DX11\n");
++    } else {
++        if (res == AMF_NOT_SUPPORTED)
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF via DX11 is not supported on the given device\n");
++        else
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF failed to initialize on the default DX11 device: %d\n", res);
++    }
++    return res;
++}
++
++int amf_context_init_dx9(AVAMFContext *ctx)
++{
++    AMF_RESULT res;
++
++    res = ctx->context->pVtbl->InitDX9(ctx->context, NULL);
++    if (res == AMF_OK) {
++        av_log(ctx->avclass, AV_LOG_VERBOSE, "AMF initialization succeeded via DX9\n");
++    } else {
++        if (res == AMF_NOT_SUPPORTED)
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF via DX9 is not supported on the given device\n");
++        else
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF failed to initialize on the default DX9 device: %d\n", res);
++    }
++    return res;
++}
++
++int amf_context_init_vulkan(AVAMFContext *ctx)
++{
++    AMF_RESULT res;
++    AMFContext1* context1 = NULL;
++    AMFGuid guid = IID_AMFContext1();
++
++    res = ctx->context->pVtbl->QueryInterface(ctx->context, &guid, (void**)&context1);
++    AMF_RETURN_IF_FALSE(ctx->avclass, res == AMF_OK, AVERROR_UNKNOWN, "CreateContext1() failed with error %d\n", res);
++
++    res = context1->pVtbl->InitVulkan(context1, NULL);
++    context1->pVtbl->Release(context1);
++    if (res == AMF_OK) {
++        av_log(ctx->avclass, AV_LOG_VERBOSE, "AMF initialization succeeded via Vulkan\n");
++    } else {
++        if (res == AMF_NOT_SUPPORTED)
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF via Vulkan is not supported on the given device\n");
++        else
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF failed to initialize on the default Vulkan device: %d\n", res);
++    }
++    return res;
++}
++
++int amf_context_init_opencl(AVAMFContext *ctx)
++{
++    AMF_RESULT res;
++
++    res = ctx->context->pVtbl->InitOpenCL(ctx->context, NULL);
++    if (res == AMF_OK) {
++        av_log(ctx->avclass, AV_LOG_VERBOSE, "AMF initialization succeeded via OpenCL\n");
++    } else {
++        if (res == AMF_NOT_SUPPORTED)
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF via OpenCL is not supported on the given device\n");
++        else
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF failed to initialize on the default OpenCL device: %d\n", res);
++    }
++    return res;
++}
++
++#if CONFIG_D3D11VA
++int amf_context_derive_dx11(AVAMFContext *ctx, AVD3D11VADeviceContext *hwctx)
++{
++    AMF_RESULT res;
++
++    res = ctx->context->pVtbl->InitDX11(ctx->context, hwctx->device, AMF_DX11_1);
++    if (res != AMF_OK) {
++        res = ctx->context->pVtbl->InitDX11(ctx->context, hwctx->device, AMF_DX11_0);
++    }
++
++    if (res == AMF_OK) {
++        av_log(ctx->avclass, AV_LOG_VERBOSE, "AMF derived succeeded via DX11\n");
++    } else {
++        if (res == AMF_NOT_SUPPORTED)
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF via DX11 is not supported on the given device\n");
++        else
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF failed to derive from the given DX11 device: %d\n", res);
++        return AVERROR(ENODEV);
++    }
++    return res;
++}
++#endif
++
++#if CONFIG_DXVA2
++int amf_context_derive_dx9(AVAMFContext *ctx, AVDXVA2DeviceContext *hwctx)
++{
++    AMF_RESULT res;
++    HRESULT hr;
++    HANDLE device_handle;
++    IDirect3DDevice9* device;
++
++    hr = IDirect3DDeviceManager9_OpenDeviceHandle(hwctx->devmgr, &device_handle);
++    if (FAILED(hr)) {
++        av_log(ctx->avclass, AV_LOG_ERROR, "Failed to open device handle for DX9 device: %lx\n", (unsigned long)hr);
++        return AVERROR_EXTERNAL;
++    }
++
++    hr = IDirect3DDeviceManager9_LockDevice(hwctx->devmgr, device_handle, &device, FALSE);
++    if (SUCCEEDED(hr)) {
++        IDirect3DDeviceManager9_UnlockDevice(hwctx->devmgr, device_handle, FALSE);
++    } else {
++        av_log(ctx->avclass, AV_LOG_ERROR, "Failed to lock device handle for DX9 device: %lx\n", (unsigned long)hr);
++        return AVERROR_EXTERNAL;
++    }
++
++    IDirect3DDeviceManager9_CloseDeviceHandle(hwctx->devmgr, device_handle);
++
++    res = ctx->context->pVtbl->InitDX9(ctx->context, device);
++
++    IDirect3DDevice9_Release(device);
++
++    if (res == AMF_OK) {
++        av_log(ctx->avclass, AV_LOG_VERBOSE, "AMF derived succeeded via DX9\n");
++    } else {
++        if (res == AMF_NOT_SUPPORTED)
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF via DX9 is not supported on the given device\n");
++        else
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF failed to derive from the given DX9 device: %d\n", res);
++        return AVERROR(ENODEV);
++    }
++    return res;
++}
++#endif
++
++#if CONFIG_OPENCL
++int amf_context_derive_opencl(AVAMFContext *ctx, AVOpenCLDeviceContext *hwctx)
++{
++    AMF_RESULT res;
++
++    res = ctx->context->pVtbl->InitOpenCL(ctx->context, hwctx->command_queue);
++    if (res == AMF_OK) {
++        av_log(ctx->avclass, AV_LOG_VERBOSE, "AMF derived succeeded via OpenCL\n");
++    } else {
++        if (res == AMF_NOT_SUPPORTED)
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF via OpenCL is not supported on the given device\n");
++        else
++            av_log(ctx->avclass, AV_LOG_ERROR, "AMF failed to derive from the given OpenCL device: %d\n", res);
++        return AVERROR(ENODEV);
++    }
++    return res;
++}
++#endif
+Index: jellyfin-ffmpeg/libavcodec/amf.h
+===================================================================
+--- /dev/null
++++ libavcodec/amf.h
+@@ -0,0 +1,156 @@
++/*
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef AVCODEC_AMF_H
++#define AVCODEC_AMF_H
++
++#include <AMF/core/Factory.h>
++#include <AMF/core/Surface.h>
++#include <AMF/components/ColorSpace.h>
++
++#include "config.h"
++#include "avcodec.h"
++
++#include "libavutil/pixdesc.h"
++
++#if CONFIG_D3D11VA
++#include "libavutil/hwcontext_d3d11va.h"
++#endif
++
++#if CONFIG_DXVA2
++#define COBJMACROS
++#include "libavutil/hwcontext_dxva2.h"
++#endif
++
++#if CONFIG_OPENCL
++#include "libavutil/hwcontext_opencl.h"
++#endif
++
++#ifdef _WIN32
++#include "compat/w32dlfcn.h"
++#else
++#include <dlfcn.h>
++#endif
++
++/**
++* Error handling helper
++*/
++#define AMF_RETURN_IF_FALSE(avctx, exp, ret_value, /*message,*/ ...) \
++    if (!(exp)) { \
++        av_log(avctx, AV_LOG_ERROR, __VA_ARGS__); \
++        return ret_value; \
++    }
++
++#define AMF_GOTO_FAIL_IF_FALSE(avctx, exp, ret_value, /*message,*/ ...) \
++    if (!(exp)) { \
++        av_log(avctx, AV_LOG_ERROR, __VA_ARGS__); \
++        ret = ret_value; \
++        goto fail; \
++    }
++
++/**
++* AMF trace writer callback class
++* Used to capture all AMF logging
++*/
++typedef struct AVAMFLogger {
++    AMFTraceWriterVtbl *vtbl;
++    void               *avcl;
++} AVAMFLogger;
++
++typedef struct AVAMFContext {
++    void               *avclass;
++    int                 log_to_dbg;
++
++    // access to AMF runtime
++    amf_handle          library; ///< handle to DLL library
++    AMFFactory         *factory; ///< pointer to AMF factory
++    AMFDebug           *debug;   ///< pointer to AMF debug interface
++    AMFTrace           *trace;   ///< pointer to AMF trace interface
++
++    amf_uint64          version; ///< version of AMF runtime
++    AVAMFLogger         logger;  ///< AMF writer registered with AMF
++    AMFContext         *context; ///< AMF context
++} AVAMFContext;
++
++/**
++* Surface/Pixel format
++*/
++typedef struct FormatMap {
++    enum AVPixelFormat      av_format;
++    enum AMF_SURFACE_FORMAT amf_format;
++} FormatMap;
++
++extern const FormatMap format_map[];
++enum AMF_SURFACE_FORMAT amf_av_to_amf_format(enum AVPixelFormat fmt);
++enum AVPixelFormat amf_to_av_format(enum AMF_SURFACE_FORMAT fmt);
++
++/**
++* Color Transfer
++*/
++typedef struct ColorTransferMap {
++    enum AVColorTransferCharacteristic          av_color_trc;
++    enum AMF_COLOR_TRANSFER_CHARACTERISTIC_ENUM amf_color_trc;
++} ColorTransferMap;
++
++extern const ColorTransferMap color_trc_map[];
++enum AMF_COLOR_TRANSFER_CHARACTERISTIC_ENUM amf_av_to_amf_color_trc(enum AVColorTransferCharacteristic trc);
++enum AVColorTransferCharacteristic amf_to_av_color_trc(enum AMF_COLOR_TRANSFER_CHARACTERISTIC_ENUM trc);
++
++/**
++* Color Primaries
++*/
++typedef struct ColorPrimariesMap {
++    enum AVColorPrimaries         av_color_prm;
++    enum AMF_COLOR_PRIMARIES_ENUM amf_color_prm;
++} ColorPrimariesMap;
++
++extern const ColorPrimariesMap color_prm_map[];
++enum AMF_COLOR_PRIMARIES_ENUM amf_av_to_amf_color_prm(enum AVColorPrimaries prm);
++enum AVColorPrimaries amf_to_av_color_prm(enum AMF_COLOR_PRIMARIES_ENUM prm);
++
++/**
++* Load AMFContext
++*/
++int amf_load_library(AVAMFContext *ctx);
++int amf_create_context(AVAMFContext *ctx);
++void amf_unload_library(AVAMFContext *ctx);
++
++/**
++* Init AMFContext standalone
++*/
++int amf_context_init_dx11(AVAMFContext *ctx);
++int amf_context_init_dx9(AVAMFContext *ctx);
++int amf_context_init_vulkan(AVAMFContext *ctx);
++int amf_context_init_opencl(AVAMFContext *ctx);
++
++/**
++* Derive AMFContext from builtin hwcontext
++*/
++#if CONFIG_D3D11VA
++int amf_context_derive_dx11(AVAMFContext *ctx, AVD3D11VADeviceContext *hwctx);
++#endif
++
++#if CONFIG_DXVA2
++int amf_context_derive_dx9(AVAMFContext *ctx, AVDXVA2DeviceContext *hwctx);
++#endif
++
++#if CONFIG_OPENCL
++int amf_context_derive_opencl(AVAMFContext *ctx, AVOpenCLDeviceContext *hwctx);
++#endif
++
++#endif /* AVCODEC_AMF_H */
+Index: jellyfin-ffmpeg/libavcodec/amfenc.c
+===================================================================
+--- libavcodec/amfenc.c
++++ libavcodec/amfenc.c
+@@ -16,229 +16,56 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
+-#include "config.h"
+-#include "config_components.h"
+-
+ #include "libavutil/avassert.h"
+-#include "libavutil/imgutils.h"
+ #include "libavutil/hwcontext.h"
+-#if CONFIG_D3D11VA
+-#include "libavutil/hwcontext_d3d11va.h"
+-#endif
+-#if CONFIG_DXVA2
+-#define COBJMACROS
+-#include "libavutil/hwcontext_dxva2.h"
+-#endif
++#include "libavutil/imgutils.h"
++#include "libavutil/mastering_display_metadata.h"
++
+ #include "libavutil/mem.h"
+-#include "libavutil/pixdesc.h"
+ #include "libavutil/time.h"
+ 
+ #include "amfenc.h"
+ #include "encode.h"
+ #include "internal.h"
+ 
+-#if CONFIG_D3D11VA
+-#include <d3d11.h>
+-#endif
+-
+-#ifdef _WIN32
+-#include "compat/w32dlfcn.h"
+-#else
+-#include <dlfcn.h>
+-#endif
+-
+-#define FFMPEG_AMF_WRITER_ID L"ffmpeg_amf"
+-
+ #define PTS_PROP L"PtsProp"
+ 
+-const enum AVPixelFormat ff_amf_pix_fmts[] = {
+-    AV_PIX_FMT_NV12,
+-    AV_PIX_FMT_YUV420P,
+-#if CONFIG_D3D11VA
+-    AV_PIX_FMT_D3D11,
+-#endif
+-#if CONFIG_DXVA2
+-    AV_PIX_FMT_DXVA2_VLD,
+-#endif
+-    AV_PIX_FMT_NONE
+-};
+-
+-typedef struct FormatMap {
+-    enum AVPixelFormat       av_format;
+-    enum AMF_SURFACE_FORMAT  amf_format;
+-} FormatMap;
+-
+-static const FormatMap format_map[] =
+-{
+-    { AV_PIX_FMT_NONE,       AMF_SURFACE_UNKNOWN },
+-    { AV_PIX_FMT_NV12,       AMF_SURFACE_NV12 },
+-    { AV_PIX_FMT_BGR0,       AMF_SURFACE_BGRA },
+-    { AV_PIX_FMT_RGB0,       AMF_SURFACE_RGBA },
+-    { AV_PIX_FMT_GRAY8,      AMF_SURFACE_GRAY8 },
+-    { AV_PIX_FMT_YUV420P,    AMF_SURFACE_YUV420P },
+-    { AV_PIX_FMT_YUYV422,    AMF_SURFACE_YUY2 },
+-};
+-
+-static enum AMF_SURFACE_FORMAT amf_av_to_amf_format(enum AVPixelFormat fmt)
+-{
+-    int i;
+-    for (i = 0; i < amf_countof(format_map); i++) {
+-        if (format_map[i].av_format == fmt) {
+-            return format_map[i].amf_format;
+-        }
+-    }
+-    return AMF_SURFACE_UNKNOWN;
+-}
+-
+-static void AMF_CDECL_CALL AMFTraceWriter_Write(AMFTraceWriter *pThis,
+-    const wchar_t *scope, const wchar_t *message)
+-{
+-    AmfTraceWriter *tracer = (AmfTraceWriter*)pThis;
+-    av_log(tracer->avctx, AV_LOG_DEBUG, "%ls: %ls", scope, message); // \n is provided from AMF
+-}
+-
+-static void AMF_CDECL_CALL AMFTraceWriter_Flush(AMFTraceWriter *pThis)
+-{
+-}
+-
+-static AMFTraceWriterVtbl tracer_vtbl =
++static int amf_init_context(AVCodecContext *avctx)
+ {
+-    .Write = AMFTraceWriter_Write,
+-    .Flush = AMFTraceWriter_Flush,
+-};
++    AMFEncContext *ctx = avctx->priv_data;
++    AVAMFContext *amfctx = NULL;
++    AMF_RESULT  res;
++    int ret;
+ 
+-static int amf_load_library(AVCodecContext *avctx)
+-{
+-    AmfContext        *ctx = avctx->priv_data;
+-    AMFInit_Fn         init_fun;
+-    AMFQueryVersion_Fn version_fun;
+-    AMF_RESULT         res;
++    ctx->dts_delay = 0;
++    ctx->hwsurfaces_in_queue = 0;
++    ctx->hwsurfaces_in_queue_max = 16;
+ 
+     ctx->delayed_frame = av_frame_alloc();
+-    if (!ctx->delayed_frame) {
++    if (!ctx->delayed_frame)
+         return AVERROR(ENOMEM);
+-    }
++
+     // hardcoded to current HW queue size - will auto-realloc if too small
+     ctx->timestamp_list = av_fifo_alloc2(avctx->max_b_frames + 16, sizeof(int64_t),
+                                          AV_FIFO_FLAG_AUTO_GROW);
+-    if (!ctx->timestamp_list) {
++    if (!ctx->timestamp_list)
+         return AVERROR(ENOMEM);
+-    }
+-    ctx->dts_delay = 0;
+-
+-
+-    ctx->library = dlopen(AMF_DLL_NAMEA, RTLD_NOW | RTLD_LOCAL);
+-    AMF_RETURN_IF_FALSE(ctx, ctx->library != NULL,
+-        AVERROR_UNKNOWN, "DLL %s failed to open\n", AMF_DLL_NAMEA);
+-
+-    init_fun = (AMFInit_Fn)dlsym(ctx->library, AMF_INIT_FUNCTION_NAME);
+-    AMF_RETURN_IF_FALSE(ctx, init_fun != NULL, AVERROR_UNKNOWN, "DLL %s failed to find function %s\n", AMF_DLL_NAMEA, AMF_INIT_FUNCTION_NAME);
+-
+-    version_fun = (AMFQueryVersion_Fn)dlsym(ctx->library, AMF_QUERY_VERSION_FUNCTION_NAME);
+-    AMF_RETURN_IF_FALSE(ctx, version_fun != NULL, AVERROR_UNKNOWN, "DLL %s failed to find function %s\n", AMF_DLL_NAMEA, AMF_QUERY_VERSION_FUNCTION_NAME);
+-
+-    res = version_fun(&ctx->version);
+-    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "%s failed with error %d\n", AMF_QUERY_VERSION_FUNCTION_NAME, res);
+-    res = init_fun(AMF_FULL_VERSION, &ctx->factory);
+-    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "%s failed with error %d\n", AMF_INIT_FUNCTION_NAME, res);
+-    res = ctx->factory->pVtbl->GetTrace(ctx->factory, &ctx->trace);
+-    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "GetTrace() failed with error %d\n", res);
+-    res = ctx->factory->pVtbl->GetDebug(ctx->factory, &ctx->debug);
+-    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "GetDebug() failed with error %d\n", res);
+-    return 0;
+-}
+ 
+-#if CONFIG_D3D11VA
+-static int amf_init_from_d3d11_device(AVCodecContext *avctx, AVD3D11VADeviceContext *hwctx)
+-{
+-    AmfContext *ctx = avctx->priv_data;
+-    AMF_RESULT res;
+-
+-    res = ctx->context->pVtbl->InitDX11(ctx->context, hwctx->device, AMF_DX11_1);
+-    if (res != AMF_OK) {
+-        if (res == AMF_NOT_SUPPORTED)
+-            av_log(avctx, AV_LOG_ERROR, "AMF via D3D11 is not supported on the given device.\n");
+-        else
+-            av_log(avctx, AV_LOG_ERROR, "AMF failed to initialise on the given D3D11 device: %d.\n", res);
+-        return AVERROR(ENODEV);
+-    }
+-
+-    return 0;
+-}
+-#endif
+-
+-#if CONFIG_DXVA2
+-static int amf_init_from_dxva2_device(AVCodecContext *avctx, AVDXVA2DeviceContext *hwctx)
+-{
+-    AmfContext *ctx = avctx->priv_data;
+-    HANDLE device_handle;
+-    IDirect3DDevice9 *device;
+-    HRESULT hr;
+-    AMF_RESULT res;
+-    int ret;
+-
+-    hr = IDirect3DDeviceManager9_OpenDeviceHandle(hwctx->devmgr, &device_handle);
+-    if (FAILED(hr)) {
+-        av_log(avctx, AV_LOG_ERROR, "Failed to open device handle for Direct3D9 device: %lx.\n", (unsigned long)hr);
+-        return AVERROR_EXTERNAL;
+-    }
+-
+-    hr = IDirect3DDeviceManager9_LockDevice(hwctx->devmgr, device_handle, &device, FALSE);
+-    if (SUCCEEDED(hr)) {
+-        IDirect3DDeviceManager9_UnlockDevice(hwctx->devmgr, device_handle, FALSE);
+-        ret = 0;
+-    } else {
+-        av_log(avctx, AV_LOG_ERROR, "Failed to lock device handle for Direct3D9 device: %lx.\n", (unsigned long)hr);
+-        ret = AVERROR_EXTERNAL;
+-    }
++    amfctx = av_mallocz(sizeof(AVAMFContext));
++    if (!amfctx)
++        return AVERROR(ENOMEM);
+ 
+-    IDirect3DDeviceManager9_CloseDeviceHandle(hwctx->devmgr, device_handle);
++    ctx->amfctx = amfctx;
++    amfctx->avclass = avctx;
++    amfctx->log_to_dbg = ctx->log_to_dbg;
+ 
++    ret = amf_load_library(amfctx);
+     if (ret < 0)
+         return ret;
+ 
+-    res = ctx->context->pVtbl->InitDX9(ctx->context, device);
+-
+-    IDirect3DDevice9_Release(device);
+-
+-    if (res != AMF_OK) {
+-        if (res == AMF_NOT_SUPPORTED)
+-            av_log(avctx, AV_LOG_ERROR, "AMF via D3D9 is not supported on the given device.\n");
+-        else
+-            av_log(avctx, AV_LOG_ERROR, "AMF failed to initialise on given D3D9 device: %d.\n", res);
+-        return AVERROR(ENODEV);
+-    }
+-
+-    return 0;
+-}
+-#endif
+-
+-static int amf_init_context(AVCodecContext *avctx)
+-{
+-    AmfContext *ctx = avctx->priv_data;
+-    AMFContext1 *context1 = NULL;
+-    AMF_RESULT  res;
+-    av_unused int ret;
+-
+-    ctx->hwsurfaces_in_queue = 0;
+-    ctx->hwsurfaces_in_queue_max = 16;
+-
+-    // configure AMF logger
+-    // the return of these functions indicates old state and do not affect behaviour
+-    ctx->trace->pVtbl->EnableWriter(ctx->trace, AMF_TRACE_WRITER_DEBUG_OUTPUT, ctx->log_to_dbg != 0 );
+-    if (ctx->log_to_dbg)
+-        ctx->trace->pVtbl->SetWriterLevel(ctx->trace, AMF_TRACE_WRITER_DEBUG_OUTPUT, AMF_TRACE_TRACE);
+-    ctx->trace->pVtbl->EnableWriter(ctx->trace, AMF_TRACE_WRITER_CONSOLE, 0);
+-    ctx->trace->pVtbl->SetGlobalLevel(ctx->trace, AMF_TRACE_TRACE);
+-
+-    // connect AMF logger to av_log
+-    ctx->tracer.vtbl = &tracer_vtbl;
+-    ctx->tracer.avctx = avctx;
+-    ctx->trace->pVtbl->RegisterWriter(ctx->trace, FFMPEG_AMF_WRITER_ID,(AMFTraceWriter*)&ctx->tracer, 1);
+-    ctx->trace->pVtbl->SetWriterLevel(ctx->trace, FFMPEG_AMF_WRITER_ID, AMF_TRACE_TRACE);
+-
+-    res = ctx->factory->pVtbl->CreateContext(ctx->factory, &ctx->context);
+-    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "CreateContext() failed with error %d\n", res);
++    ret = amf_create_context(amfctx);
++    if (ret < 0)
++        return ret;
+ 
+     // If a device was passed to the encoder, try to initialise from that.
+     if (avctx->hw_frames_ctx) {
+@@ -253,16 +80,16 @@ static int amf_init_context(AVCodecConte
+         switch (frames_ctx->device_ctx->type) {
+ #if CONFIG_D3D11VA
+         case AV_HWDEVICE_TYPE_D3D11VA:
+-            ret = amf_init_from_d3d11_device(avctx, frames_ctx->device_ctx->hwctx);
+-            if (ret < 0)
+-                return ret;
++            res = amf_context_derive_dx11(amfctx, frames_ctx->device_ctx->hwctx);
++            if (res != AMF_OK)
++                return res;
+             break;
+ #endif
+ #if CONFIG_DXVA2
+         case AV_HWDEVICE_TYPE_DXVA2:
+-            ret = amf_init_from_dxva2_device(avctx, frames_ctx->device_ctx->hwctx);
+-            if (ret < 0)
+-                return ret;
++            res = amf_context_derive_dx9(amfctx, frames_ctx->device_ctx->hwctx);
++            if (res != AMF_OK)
++                return res;
+             break;
+ #endif
+         default:
+@@ -284,16 +111,16 @@ static int amf_init_context(AVCodecConte
+         switch (device_ctx->type) {
+ #if CONFIG_D3D11VA
+         case AV_HWDEVICE_TYPE_D3D11VA:
+-            ret = amf_init_from_d3d11_device(avctx, device_ctx->hwctx);
+-            if (ret < 0)
+-                return ret;
++            res = amf_context_derive_dx11(amfctx, device_ctx->hwctx);
++            if (res != AMF_OK)
++                return res;
+             break;
+ #endif
+ #if CONFIG_DXVA2
+         case AV_HWDEVICE_TYPE_DXVA2:
+-            ret = amf_init_from_dxva2_device(avctx, device_ctx->hwctx);
+-            if (ret < 0)
+-                return ret;
++            res = amf_context_derive_dx9(amfctx, device_ctx->hwctx);
++            if (res != AMF_OK)
++                return res;
+             break;
+ #endif
+         default:
+@@ -307,40 +134,57 @@ static int amf_init_context(AVCodecConte
+             return AVERROR(ENOMEM);
+ 
+     } else {
+-        res = ctx->context->pVtbl->InitDX11(ctx->context, NULL, AMF_DX11_1);
+-        if (res == AMF_OK) {
+-            av_log(avctx, AV_LOG_VERBOSE, "AMF initialisation succeeded via D3D11.\n");
+-        } else {
+-            res = ctx->context->pVtbl->InitDX9(ctx->context, NULL);
+-            if (res == AMF_OK) {
+-                av_log(avctx, AV_LOG_VERBOSE, "AMF initialisation succeeded via D3D9.\n");
+-            } else {
+-                AMFGuid guid = IID_AMFContext1();
+-                res = ctx->context->pVtbl->QueryInterface(ctx->context, &guid, (void**)&context1);
+-                AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "CreateContext1() failed with error %d\n", res);
+-
+-                res = context1->pVtbl->InitVulkan(context1, NULL);
+-                context1->pVtbl->Release(context1);
++#ifdef _WIN32
++        res = amf_context_init_dx11(amfctx);
++        if (res != AMF_OK) {
++            res = amf_context_init_dx9(amfctx);
++            if (res != AMF_OK) {
++#endif
++                res = amf_context_init_vulkan(amfctx);
+                 if (res != AMF_OK) {
+-                    if (res == AMF_NOT_SUPPORTED)
+-                        av_log(avctx, AV_LOG_ERROR, "AMF via Vulkan is not supported on the given device.\n");
+-                    else
+-                        av_log(avctx, AV_LOG_ERROR, "AMF failed to initialise on the given Vulkan device: %d.\n", res);
++                    av_log(avctx, AV_LOG_ERROR, "AMF initialisation is not supported.\n");
+                     return AVERROR(ENOSYS);
+                 }
+-                av_log(avctx, AV_LOG_VERBOSE, "AMF initialisation succeeded via Vulkan.\n");
++#ifdef _WIN32
+             }
+         }
++#endif
+     }
++
+     return 0;
+ }
+ 
++static int amf_check_hevc_encoder_10bit_support(AVCodecContext *avctx)
++{
++    AMFEncContext *ctx = avctx->priv_data;
++    AVAMFContext  *amfctx = ctx->amfctx;
++    const wchar_t *codec_id = AMFVideoEncoder_HEVC;
++    AMF_RESULT     res;
++
++    res = amfctx->factory->pVtbl->CreateComponent(amfctx->factory, amfctx->context, codec_id, &ctx->encoder);
++    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_ENCODER_NOT_FOUND, "CreateComponent(%ls) failed with error %d\n", codec_id, res);
++
++    AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_COLOR_BIT_DEPTH, AMF_COLOR_BIT_DEPTH_10);
++    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR(EINVAL), "Assigning 10-bit property failed with error %d\n", res);
++
++    res = ctx->encoder->pVtbl->Init(ctx->encoder, AMF_SURFACE_P010, avctx->width, avctx->height);
++    if (res == AMF_OK) {
++        ctx->encoder->pVtbl->Terminate(ctx->encoder);
++        ctx->encoder->pVtbl->Release(ctx->encoder);
++        ctx->encoder = NULL;
++    } else {
++        return AVERROR(EINVAL);
++    }
++    return res;
++}
++
+ static int amf_init_encoder(AVCodecContext *avctx)
+ {
+-    AmfContext        *ctx = avctx->priv_data;
++    AMFEncContext     *ctx = avctx->priv_data;
++    AVAMFContext      *amfctx = ctx->amfctx;
+     const wchar_t     *codec_id = NULL;
+-    AMF_RESULT         res;
+     enum AVPixelFormat pix_fmt;
++    AMF_RESULT         res;
+ 
+     switch (avctx->codec->id) {
+         case AV_CODEC_ID_H264:
+@@ -352,26 +196,70 @@ static int amf_init_encoder(AVCodecConte
+         default:
+             break;
+     }
+-    AMF_RETURN_IF_FALSE(ctx, codec_id != NULL, AVERROR(EINVAL), "Codec %d is not supported\n", avctx->codec->id);
++    AMF_RETURN_IF_FALSE(avctx, codec_id != NULL,
++        AVERROR(EINVAL), "Codec %d is not supported\n", avctx->codec->id);
+ 
+-    if (ctx->hw_frames_ctx)
+-        pix_fmt = ((AVHWFramesContext*)ctx->hw_frames_ctx->data)->sw_format;
+-    else
+-        pix_fmt = avctx->pix_fmt;
++    pix_fmt = avctx->hw_frames_ctx ? ((AVHWFramesContext*)avctx->hw_frames_ctx->data)->sw_format
++                                   : avctx->pix_fmt;
+ 
+     ctx->format = amf_av_to_amf_format(pix_fmt);
+-    AMF_RETURN_IF_FALSE(ctx, ctx->format != AMF_SURFACE_UNKNOWN, AVERROR(EINVAL),
+-                        "Format %s is not supported\n", av_get_pix_fmt_name(pix_fmt));
++    AMF_RETURN_IF_FALSE(avctx, ctx->format != AMF_SURFACE_UNKNOWN,
++        AVERROR(EINVAL), "Format %s is not supported\n", av_get_pix_fmt_name(pix_fmt));
++
++    ctx->bit_depth = 8;
++    if (pix_fmt == AV_PIX_FMT_P010) {
++        switch (avctx->codec->id) {
++        case AV_CODEC_ID_HEVC:
++            // GPU >= Navi or APU >= Renoir is required.
++            res = amf_check_hevc_encoder_10bit_support(avctx);
++            if (res == AMF_OK) {
++                ctx->bit_depth = 10;
++            } else {
++                av_log(avctx, AV_LOG_ERROR, "HEVC 10-bit encoding is not supported by the given AMF device\n");
++                return res;
++            }
++            break;
++        default:
++            av_log(avctx, AV_LOG_ERROR, "10-bit encoding is not supported by AMF %s encoder\n", avctx->codec->name);
++            return AVERROR(EINVAL);
++        }
++    }
+ 
+-    res = ctx->factory->pVtbl->CreateComponent(ctx->factory, ctx->context, codec_id, &ctx->encoder);
+-    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_ENCODER_NOT_FOUND, "CreateComponent(%ls) failed with error %d\n", codec_id, res);
++    ctx->out_color_trc = amf_av_to_amf_color_trc(avctx->color_trc);
++    ctx->out_color_prm = amf_av_to_amf_color_prm(avctx->color_primaries);
++
++    switch (avctx->colorspace) {
++        case AVCOL_SPC_BT470BG:
++        case AVCOL_SPC_SMPTE170M:
++        case AVCOL_SPC_SMPTE240M:
++            ctx->out_color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_601;
++            break;
++        case AVCOL_SPC_BT709:
++            ctx->out_color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_709;
++            break;
++        case AVCOL_SPC_BT2020_NCL:
++        case AVCOL_SPC_BT2020_CL:
++            ctx->out_color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_2020;
++            break;
++        case AVCOL_SPC_RGB:
++            ctx->out_color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_JPEG;
++            break;
++        default:
++            ctx->out_color_profile = AMF_VIDEO_CONVERTER_COLOR_PROFILE_UNKNOWN;
++            break;
++    }
++
++    res = amfctx->factory->pVtbl->CreateComponent(amfctx->factory, amfctx->context, codec_id, &ctx->encoder);
++    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK,
++        AVERROR_ENCODER_NOT_FOUND, "CreateComponent(%ls) failed with error %d\n", codec_id, res);
+ 
+     return 0;
+ }
+ 
+-int av_cold ff_amf_encode_close(AVCodecContext *avctx)
++av_cold int ff_amf_encode_close(AVCodecContext *avctx)
+ {
+-    AmfContext *ctx = avctx->priv_data;
++    AMFEncContext *ctx = avctx->priv_data;
++    AVAMFContext  *amfctx = ctx->amfctx;
+ 
+     if (ctx->delayed_surface) {
+         ctx->delayed_surface->pVtbl->Release(ctx->delayed_surface);
+@@ -384,34 +272,34 @@ int av_cold ff_amf_encode_close(AVCodecC
+         ctx->encoder = NULL;
+     }
+ 
+-    if (ctx->context) {
+-        ctx->context->pVtbl->Terminate(ctx->context);
+-        ctx->context->pVtbl->Release(ctx->context);
+-        ctx->context = NULL;
+-    }
++    amf_unload_library(amfctx);
++    if (amfctx)
++        av_freep(&amfctx);
++
++    ctx->delayed_drain = 0;
+     av_buffer_unref(&ctx->hw_device_ctx);
+     av_buffer_unref(&ctx->hw_frames_ctx);
+ 
+-    if (ctx->trace) {
+-        ctx->trace->pVtbl->UnregisterWriter(ctx->trace, FFMPEG_AMF_WRITER_ID);
+-    }
+-    if (ctx->library) {
+-        dlclose(ctx->library);
+-        ctx->library = NULL;
+-    }
+-    ctx->trace = NULL;
+-    ctx->debug = NULL;
+-    ctx->factory = NULL;
+-    ctx->version = 0;
+-    ctx->delayed_drain = 0;
+     av_frame_free(&ctx->delayed_frame);
+     av_fifo_freep2(&ctx->timestamp_list);
+-
+     return 0;
+ }
+ 
+-static int amf_copy_surface(AVCodecContext *avctx, const AVFrame *frame,
+-    AMFSurface* surface)
++av_cold int ff_amf_encode_init(AVCodecContext *avctx)
++{
++    int ret;
++
++    if ((ret = amf_init_context(avctx)) == 0)
++        if ((ret = amf_init_encoder(avctx)) == 0)
++            return 0;
++
++    ff_amf_encode_close(avctx);
++    return ret;
++}
++
++static int amf_copy_surface(AVCodecContext *avctx,
++                            const AVFrame *frame,
++                            AMFSurface* surface)
+ {
+     AMFPlane *plane;
+     uint8_t  *dst_data[4];
+@@ -427,38 +315,37 @@ static int amf_copy_surface(AVCodecConte
+         dst_data[i] = plane->pVtbl->GetNative(plane);
+         dst_linesize[i] = plane->pVtbl->GetHPitch(plane);
+     }
++
+     av_image_copy(dst_data, dst_linesize,
+         (const uint8_t**)frame->data, frame->linesize, frame->format,
+         avctx->width, avctx->height);
+-
+     return 0;
+ }
+ 
+-static int amf_copy_buffer(AVCodecContext *avctx, AVPacket *pkt, AMFBuffer *buffer)
++static int amf_copy_buffer(AVCodecContext *avctx,
++                           AVPacket *pkt,
++                           AMFBuffer *buffer)
+ {
+-    AmfContext      *ctx = avctx->priv_data;
++    AMFEncContext   *ctx = avctx->priv_data;
+     int              ret;
+-    AMFVariantStruct var = {0};
++    AMFVariantStruct var = { 0 };
+     int64_t          timestamp = AV_NOPTS_VALUE;
+     int64_t          size = buffer->pVtbl->GetSize(buffer);
+ 
+-    if ((ret = ff_get_encode_buffer(avctx, pkt, size, 0)) < 0) {
++    if ((ret = ff_get_encode_buffer(avctx, pkt, size, 0)) < 0)
+         return ret;
+-    }
+     memcpy(pkt->data, buffer->pVtbl->GetNative(buffer), size);
+ 
+     switch (avctx->codec->id) {
+         case AV_CODEC_ID_H264:
+             buffer->pVtbl->GetProperty(buffer, AMF_VIDEO_ENCODER_OUTPUT_DATA_TYPE, &var);
+-            if(var.int64Value == AMF_VIDEO_ENCODER_OUTPUT_DATA_TYPE_IDR) {
++            if (var.int64Value == AMF_VIDEO_ENCODER_OUTPUT_DATA_TYPE_IDR)
+                 pkt->flags = AV_PKT_FLAG_KEY;
+-            }
+             break;
+         case AV_CODEC_ID_HEVC:
+             buffer->pVtbl->GetProperty(buffer, AMF_VIDEO_ENCODER_HEVC_OUTPUT_DATA_TYPE, &var);
+-            if (var.int64Value == AMF_VIDEO_ENCODER_HEVC_OUTPUT_DATA_TYPE_IDR) {
++            if (var.int64Value == AMF_VIDEO_ENCODER_HEVC_OUTPUT_DATA_TYPE_IDR)
+                 pkt->flags = AV_PKT_FLAG_KEY;
+-            }
+             break;
+         default:
+             break;
+@@ -468,44 +355,27 @@ static int amf_copy_buffer(AVCodecContex
+ 
+     pkt->pts = var.int64Value; // original pts
+ 
+-
+-    AMF_RETURN_IF_FALSE(ctx, av_fifo_read(ctx->timestamp_list, &timestamp, 1) >= 0,
+-                        AVERROR_UNKNOWN, "timestamp_list is empty\n");
++    AMF_RETURN_IF_FALSE(ctx, av_fifo_read(ctx->timestamp_list, &timestamp, 1) >= 0, AVERROR_UNKNOWN, "timestamp_list is empty\n");
+ 
+     // calc dts shift if max_b_frames > 0
+     if (avctx->max_b_frames > 0 && ctx->dts_delay == 0) {
+         int64_t timestamp_last = AV_NOPTS_VALUE;
+         size_t can_read = av_fifo_can_read(ctx->timestamp_list);
+ 
+-        AMF_RETURN_IF_FALSE(ctx, can_read > 0, AVERROR_UNKNOWN,
+-            "timestamp_list is empty while max_b_frames = %d\n", avctx->max_b_frames);
++        AMF_RETURN_IF_FALSE(ctx, can_read > 0, AVERROR_UNKNOWN, AVERROR_UNKNOWN, "timestamp_list is empty while max_b_frames = %d\n", avctx->max_b_frames);
++
+         av_fifo_peek(ctx->timestamp_list, &timestamp_last, 1, can_read - 1);
+-        if (timestamp < 0 || timestamp_last < AV_NOPTS_VALUE) {
++        if (timestamp < 0 || timestamp_last < AV_NOPTS_VALUE)
+             return AVERROR(ERANGE);
+-        }
+         ctx->dts_delay = timestamp_last - timestamp;
+     }
+     pkt->dts = timestamp - ctx->dts_delay;
+     return 0;
+ }
+ 
+-// amfenc API implementation
+-int ff_amf_encode_init(AVCodecContext *avctx)
+-{
+-    int ret;
+-
+-    if ((ret = amf_load_library(avctx)) == 0) {
+-        if ((ret = amf_init_context(avctx)) == 0) {
+-            if ((ret = amf_init_encoder(avctx)) == 0) {
+-                return 0;
+-            }
+-        }
+-    }
+-    ff_amf_encode_close(avctx);
+-    return ret;
+-}
+-
+-static AMF_RESULT amf_set_property_buffer(AMFSurface *object, const wchar_t *name, AMFBuffer *val)
++static AMF_RESULT amf_set_property_buffer(AMFSurface *object,
++                                          const wchar_t *name,
++                                          AMFBuffer *val)
+ {
+     AMF_RESULT res;
+     AMFVariantStruct var;
+@@ -519,15 +389,16 @@ static AMF_RESULT amf_set_property_buffe
+             res = AMFVariantAssignInterface(&var, amf_interface);
+             amf_interface->pVtbl->Release(amf_interface);
+         }
+-        if (res == AMF_OK) {
++        if (res == AMF_OK)
+             res = object->pVtbl->SetProperty(object, name, var);
+-        }
+         AMFVariantClear(&var);
+     }
+     return res;
+ }
+ 
+-static AMF_RESULT amf_get_property_buffer(AMFData *object, const wchar_t *name, AMFBuffer **val)
++static AMF_RESULT amf_get_property_buffer(AMFData *object,
++                                          const wchar_t *name,
++                                          AMFBuffer **val)
+ {
+     AMF_RESULT res;
+     AMFVariantStruct var;
+@@ -575,9 +446,60 @@ static void amf_release_buffer_with_fram
+     frame_ref_storage_buffer->pVtbl->Release(frame_ref_storage_buffer);
+ }
+ 
++static int amf_save_hdr_metadata(AVCodecContext *avctx, const AVFrame *frame, AMFHDRMetadata *hdrmeta)
++{
++    AVFrameSideData            *sd_display;
++    AVFrameSideData            *sd_light;
++    AVMasteringDisplayMetadata *display_meta;
++    AVContentLightMetadata     *light_meta;
++
++    sd_display = av_frame_get_side_data(frame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
++    if (sd_display) {
++        display_meta = (AVMasteringDisplayMetadata *)sd_display->data;
++        if (display_meta->has_luminance) {
++            const unsigned int luma_den = 10000;
++            hdrmeta->maxMasteringLuminance =
++                (amf_uint32)(luma_den * av_q2d(display_meta->max_luminance));
++            hdrmeta->minMasteringLuminance =
++                FFMIN((amf_uint32)(luma_den * av_q2d(display_meta->min_luminance)), hdrmeta->maxMasteringLuminance);
++        }
++        if (display_meta->has_primaries) {
++            const unsigned int chroma_den = 50000;
++            hdrmeta->redPrimary[0] =
++                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[0][0])), chroma_den);
++            hdrmeta->redPrimary[1] =
++                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[0][1])), chroma_den);
++            hdrmeta->greenPrimary[0] =
++                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[1][0])), chroma_den);
++            hdrmeta->greenPrimary[1] =
++                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[1][1])), chroma_den);
++            hdrmeta->bluePrimary[0] =
++                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[2][0])), chroma_den);
++            hdrmeta->bluePrimary[1] =
++                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[2][1])), chroma_den);
++            hdrmeta->whitePoint[0] =
++                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->white_point[0])), chroma_den);
++            hdrmeta->whitePoint[1] =
++                FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->white_point[1])), chroma_den);
++        }
++
++        sd_light = av_frame_get_side_data(frame, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
++        if (sd_light) {
++            light_meta = (AVContentLightMetadata *)sd_light->data;
++            if (light_meta) {
++                hdrmeta->maxContentLightLevel = (amf_uint16)light_meta->MaxCLL;
++                hdrmeta->maxFrameAverageLightLevel = (amf_uint16)light_meta->MaxFALL;
++            }
++        }
++        return 0;
++    }
++    return 1;
++}
++
+ int ff_amf_receive_packet(AVCodecContext *avctx, AVPacket *avpkt)
+ {
+-    AmfContext *ctx = avctx->priv_data;
++    AMFEncContext *ctx = avctx->priv_data;
++    AVAMFContext *amfctx = ctx->amfctx;
+     AMFSurface *surface;
+     AMF_RESULT  res;
+     int         ret;
+@@ -604,10 +526,9 @@ int ff_amf_receive_packet(AVCodecContext
+                 if (res == AMF_INPUT_FULL) {
+                     ctx->delayed_drain = 1; // input queue is full: resubmit Drain() in ff_amf_receive_packet
+                 } else {
+-                    if (res == AMF_OK) {
++                    if (res == AMF_OK)
+                         ctx->eof = 1; // drain started
+-                    }
+-                    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "Drain() failed with error %d\n", res);
++                    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "Drain() failed with error %d\n", res);
+                 }
+             }
+         }
+@@ -623,13 +544,10 @@ int ff_amf_receive_packet(AVCodecContext
+                 ID3D11Texture2D *texture = (ID3D11Texture2D*)frame->data[0]; // actual texture
+                 int index = (intptr_t)frame->data[1]; // index is a slice in texture array is - set to tell AMF which slice to use
+ 
+-                av_assert0(frame->hw_frames_ctx       && ctx->hw_frames_ctx &&
+-                           frame->hw_frames_ctx->data == ctx->hw_frames_ctx->data);
+-
+                 texture->lpVtbl->SetPrivateData(texture, &AMFTextureArrayIndexGUID, sizeof(index), &index);
+ 
+-                res = ctx->context->pVtbl->CreateSurfaceFromDX11Native(ctx->context, texture, &surface, NULL); // wrap to AMF surface
+-                AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR(ENOMEM), "CreateSurfaceFromDX11Native() failed  with error %d\n", res);
++                res = amfctx->context->pVtbl->CreateSurfaceFromDX11Native(amfctx->context, texture, &surface, NULL); // wrap to AMF surface
++                AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR(ENOMEM), "CreateSurfaceFromDX11Native() failed with error %d\n", res);
+ 
+                 hw_surface = 1;
+             }
+@@ -640,8 +558,8 @@ int ff_amf_receive_packet(AVCodecContext
+             {
+                 IDirect3DSurface9 *texture = (IDirect3DSurface9 *)frame->data[3]; // actual texture
+ 
+-                res = ctx->context->pVtbl->CreateSurfaceFromDX9Native(ctx->context, texture, &surface, NULL); // wrap to AMF surface
+-                AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR(ENOMEM), "CreateSurfaceFromDX9Native() failed  with error %d\n", res);
++                res = amfctx->context->pVtbl->CreateSurfaceFromDX9Native(amfctx->context, texture, &surface, NULL); // wrap to AMF surface
++                AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR(ENOMEM), "CreateSurfaceFromDX9Native() failed with error %d\n", res);
+ 
+                 hw_surface = 1;
+             }
+@@ -649,8 +567,8 @@ int ff_amf_receive_packet(AVCodecContext
+ #endif
+         default:
+             {
+-                res = ctx->context->pVtbl->AllocSurface(ctx->context, AMF_MEMORY_HOST, ctx->format, avctx->width, avctx->height, &surface);
+-                AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR(ENOMEM), "AllocSurface() failed  with error %d\n", res);
++                res = amfctx->context->pVtbl->AllocSurface(amfctx->context, AMF_MEMORY_HOST, ctx->format, avctx->width, avctx->height, &surface);
++                AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR(ENOMEM), "AllocSurface() failed with error %d\n", res);
+                 amf_copy_surface(avctx, frame, surface);
+             }
+             break;
+@@ -662,27 +580,46 @@ int ff_amf_receive_packet(AVCodecContext
+             // input HW surfaces can be vertically aligned by 16; tell AMF the real size
+             surface->pVtbl->SetCrop(surface, 0, 0, frame->width, frame->height);
+ 
+-            frame_ref_storage_buffer = amf_create_buffer_with_frame_ref(frame, ctx->context);
+-            AMF_RETURN_IF_FALSE(ctx, frame_ref_storage_buffer != NULL, AVERROR(ENOMEM), "create_buffer_with_frame_ref() returned NULL\n");
++            frame_ref_storage_buffer = amf_create_buffer_with_frame_ref(frame, amfctx->context);
++            AMF_RETURN_IF_FALSE(avctx, frame_ref_storage_buffer != NULL, AVERROR(ENOMEM), "create_buffer_with_frame_ref() returned NULL\n");
+ 
+             res = amf_set_property_buffer(surface, L"av_frame_ref", frame_ref_storage_buffer);
+-            AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "SetProperty failed for \"av_frame_ref\" with error %d\n", res);
++            AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "SetProperty failed for \"av_frame_ref\" with error %d\n", res);
++
+             ctx->hwsurfaces_in_queue++;
+             frame_ref_storage_buffer->pVtbl->Release(frame_ref_storage_buffer);
+         }
+ 
++        // HDR10 metadata
++        if (frame->color_trc == AVCOL_TRC_SMPTE2084) {
++            AMFBuffer *hdrmeta_buffer = NULL;
++            res = amfctx->context->pVtbl->AllocBuffer(amfctx->context, AMF_MEMORY_HOST, sizeof(AMFHDRMetadata), &hdrmeta_buffer);
++            if (res == AMF_OK) {
++                AMFHDRMetadata *hdrmeta = (AMFHDRMetadata*)hdrmeta_buffer->pVtbl->GetNative(hdrmeta_buffer);
++                if (amf_save_hdr_metadata(avctx, frame, hdrmeta) == 0) {
++                    switch (avctx->codec->id) {
++                    case AV_CODEC_ID_H264:
++                        AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_INPUT_HDR_METADATA, hdrmeta_buffer); break;
++                    case AV_CODEC_ID_HEVC:
++                        AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_INPUT_HDR_METADATA, hdrmeta_buffer); break;
++                    }
++                    res = amf_set_property_buffer(surface, L"av_frame_hdrmeta", hdrmeta_buffer);
++                    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "SetProperty failed for \"av_frame_hdrmeta\" with error %d\n", res);
++                }
++                hdrmeta_buffer->pVtbl->Release(hdrmeta_buffer);
++            }
++        }
++
+         surface->pVtbl->SetPts(surface, frame->pts);
+         AMF_ASSIGN_PROPERTY_INT64(res, surface, PTS_PROP, frame->pts);
+ 
+         switch (avctx->codec->id) {
+         case AV_CODEC_ID_H264:
+-            AMF_ASSIGN_PROPERTY_INT64(res, surface, AMF_VIDEO_ENCODER_INSERT_AUD, !!ctx->aud);
+-            break;
++            AMF_ASSIGN_PROPERTY_INT64(res, surface, AMF_VIDEO_ENCODER_INSERT_SPS, 1);
++            AMF_ASSIGN_PROPERTY_INT64(res, surface, AMF_VIDEO_ENCODER_INSERT_PPS, 1);
++            AMF_ASSIGN_PROPERTY_INT64(res, surface, AMF_VIDEO_ENCODER_INSERT_AUD, !!ctx->aud); break;
+         case AV_CODEC_ID_HEVC:
+-            AMF_ASSIGN_PROPERTY_INT64(res, surface, AMF_VIDEO_ENCODER_HEVC_INSERT_AUD, !!ctx->aud);
+-            break;
+-        default:
+-            break;
++            AMF_ASSIGN_PROPERTY_INT64(res, surface, AMF_VIDEO_ENCODER_HEVC_INSERT_AUD, !!ctx->aud); break;
+         }
+ 
+         // submit surface
+@@ -693,7 +630,7 @@ int ff_amf_receive_packet(AVCodecContext
+         } else {
+             int64_t pts = frame->pts;
+             surface->pVtbl->Release(surface);
+-            AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "SubmitInput() failed with error %d\n", res);
++            AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "SubmitInput() failed with error %d\n", res);
+ 
+             av_frame_unref(frame);
+             ret = av_fifo_write(ctx->timestamp_list, &pts, 1);
+@@ -702,7 +639,6 @@ int ff_amf_receive_packet(AVCodecContext
+         }
+     }
+ 
+-
+     do {
+         block_and_wait = 0;
+         // poll data
+@@ -719,23 +655,35 @@ int ff_amf_receive_packet(AVCodecContext
+             if (data->pVtbl->HasProperty(data, L"av_frame_ref")) {
+                 AMFBuffer *frame_ref_storage_buffer;
+                 res = amf_get_property_buffer(data, L"av_frame_ref", &frame_ref_storage_buffer);
+-                AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "GetProperty failed for \"av_frame_ref\" with error %d\n", res);
++                AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "GetProperty failed for \"av_frame_ref\" with error %d\n", res);
+                 amf_release_buffer_with_frame_ref(frame_ref_storage_buffer);
+                 ctx->hwsurfaces_in_queue--;
+             }
+ 
+             data->pVtbl->Release(data);
+ 
+-            AMF_RETURN_IF_FALSE(ctx, ret >= 0, ret, "amf_copy_buffer() failed with error %d\n", ret);
++            AMF_RETURN_IF_FALSE(avctx, ret >= 0, ret, "amf_copy_buffer() failed with error %d\n", ret);
+ 
+             if (ctx->delayed_surface != NULL) { // try to resubmit frame
++                if (ctx->delayed_surface->pVtbl->HasProperty(ctx->delayed_surface, L"av_frame_hdrmeta")) {
++                    AMFBuffer *hdrmeta_buffer = NULL;
++                    res = amf_get_property_buffer((AMFData *)ctx->delayed_surface, L"av_frame_hdrmeta", &hdrmeta_buffer);
++                    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "GetProperty failed for \"av_frame_hdrmeta\" with error %d\n", res);
++                    switch (avctx->codec->id) {
++                    case AV_CODEC_ID_H264:
++                        AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_INPUT_HDR_METADATA, hdrmeta_buffer); break;
++                    case AV_CODEC_ID_HEVC:
++                        AMF_ASSIGN_PROPERTY_INTERFACE(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_INPUT_HDR_METADATA, hdrmeta_buffer); break;
++                    }
++                    hdrmeta_buffer->pVtbl->Release(hdrmeta_buffer);
++                }
+                 res = ctx->encoder->pVtbl->SubmitInput(ctx->encoder, (AMFData*)ctx->delayed_surface);
+                 if (res != AMF_INPUT_FULL) {
+                     int64_t pts = ctx->delayed_surface->pVtbl->GetPts(ctx->delayed_surface);
+                     ctx->delayed_surface->pVtbl->Release(ctx->delayed_surface);
+                     ctx->delayed_surface = NULL;
+                     av_frame_unref(ctx->delayed_frame);
+-                    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "Repeated SubmitInput() failed with error %d\n", res);
++                    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "Repeated SubmitInput() failed with error %d\n", res);
+ 
+                     ret = av_fifo_write(ctx->timestamp_list, &pts, 1);
+                     if (ret < 0)
+@@ -748,24 +696,26 @@ int ff_amf_receive_packet(AVCodecContext
+                 if (res != AMF_INPUT_FULL) {
+                     ctx->delayed_drain = 0;
+                     ctx->eof = 1; // drain started
+-                    AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_UNKNOWN, "Repeated Drain() failed with error %d\n", res);
++                    AMF_RETURN_IF_FALSE(avctx, res == AMF_OK, AVERROR_UNKNOWN, "Repeated Drain() failed with error %d\n", res);
+                 } else {
+                     av_log(avctx, AV_LOG_WARNING, "Data acquired but delayed drain submission got AMF_INPUT_FULL- should not happen\n");
+                 }
+             }
+-        } else if (ctx->delayed_surface != NULL || ctx->delayed_drain || (ctx->eof && res_query != AMF_EOF) || (ctx->hwsurfaces_in_queue >= ctx->hwsurfaces_in_queue_max)) {
++        } else if (ctx->delayed_surface != NULL ||
++                   ctx->delayed_drain ||
++                   (ctx->eof && res_query != AMF_EOF) ||
++                   (ctx->hwsurfaces_in_queue >= ctx->hwsurfaces_in_queue_max)) {
+             block_and_wait = 1;
+             av_usleep(1000); // wait and poll again
+         }
+     } while (block_and_wait);
+ 
+-    if (res_query == AMF_EOF) {
++    if (res_query == AMF_EOF)
+         ret = AVERROR_EOF;
+-    } else if (data == NULL) {
++    else if (data == NULL)
+         ret = AVERROR(EAGAIN);
+-    } else {
++    else
+         ret = 0;
+-    }
+     return ret;
+ }
+ 
+Index: jellyfin-ffmpeg/libavcodec/amfenc.h
+===================================================================
+--- libavcodec/amfenc.h
++++ libavcodec/amfenc.h
+@@ -1,64 +1,46 @@
+ /*
+-* This file is part of FFmpeg.
+-*
+-* FFmpeg is free software; you can redistribute it and/or
+-* modify it under the terms of the GNU Lesser General Public
+-* License as published by the Free Software Foundation; either
+-* version 2.1 of the License, or (at your option) any later version.
+-*
+-* FFmpeg is distributed in the hope that it will be useful,
+-* but WITHOUT ANY WARRANTY; without even the implied warranty of
+-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-* Lesser General Public License for more details.
+-*
+-* You should have received a copy of the GNU Lesser General Public
+-* License along with FFmpeg; if not, write to the Free Software
+-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+-*/
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
+ 
+ #ifndef AVCODEC_AMFENC_H
+ #define AVCODEC_AMFENC_H
+ 
+-#include <AMF/core/Factory.h>
+-
+ #include <AMF/components/VideoEncoderVCE.h>
+ #include <AMF/components/VideoEncoderHEVC.h>
+ 
+ #include "libavutil/fifo.h"
+ 
+-#include "avcodec.h"
++#include "amf.h"
+ #include "hwconfig.h"
+ 
+-
+-/**
+-* AMF trace writer callback class
+-* Used to capture all AMF logging
+-*/
+-
+-typedef struct AmfTraceWriter {
+-    AMFTraceWriterVtbl *vtbl;
+-    AVCodecContext     *avctx;
+-} AmfTraceWriter;
+-
+ /**
+ * AMF encoder context
+ */
+-
+-typedef struct AmfContext {
+-    AVClass            *avclass;
+-    // access to AMF runtime
+-    amf_handle          library; ///< handle to DLL library
+-    AMFFactory         *factory; ///< pointer to AMF factory
+-    AMFDebug           *debug;   ///< pointer to AMF debug interface
+-    AMFTrace           *trace;   ///< pointer to AMF trace interface
+-
+-    amf_uint64          version; ///< version of AMF runtime
+-    AmfTraceWriter      tracer;  ///< AMF writer registered with AMF
+-    AMFContext         *context; ///< AMF context
+-    //encoder
+-    AMFComponent       *encoder; ///< AMF encoder object
+-    amf_bool            eof;     ///< flag indicating EOF happened
+-    AMF_SURFACE_FORMAT  format;  ///< AMF surface format
++typedef struct AMFEncContext {
++    void               *avclass;
++    void               *amfctx;
++
++    // encoder
++    AMFComponent                          *encoder; ///< AMF encoder object
++    amf_bool                               eof;     ///< flag indicating EOF happened
++    AMF_SURFACE_FORMAT                     format;  ///< AMF surface format
++    AMF_VIDEO_CONVERTER_COLOR_PROFILE_ENUM out_color_profile;
++    AMF_COLOR_TRANSFER_CHARACTERISTIC_ENUM out_color_trc;
++    AMF_COLOR_PRIMARIES_ENUM               out_color_prm;
+ 
+     AVBufferRef        *hw_device_ctx; ///< pointer to HW accelerator (decoder)
+     AVBufferRef        *hw_frames_ctx; ///< pointer to HW accelerator (frame allocator)
+@@ -76,24 +58,25 @@ typedef struct AmfContext {
+     int64_t             dts_delay;
+ 
+     // common encoder option options
+-
+     int                 log_to_dbg;
+ 
+     // Static options, have to be set before Init() call
+     int                 usage;
+     int                 profile;
+     int                 level;
+-    int                 preanalysis;
++    int                 pre_encode;
+     int                 quality;
++    int                 bit_depth;
++    int                 qvbr_level;
+     int                 b_frame_delta_qp;
+     int                 ref_b_frame_delta_qp;
+ 
+     // Dynamic options, can be set after Init() call
+-
+     int                 rate_control_mode;
+     int                 enforce_hrd;
+     int                 filler_data;
+     int                 enable_vbaq;
++    int                 enable_hmqb;
+     int                 skip_frame;
+     int                 qp_i;
+     int                 qp_p;
+@@ -108,7 +91,6 @@ typedef struct AmfContext {
+     int                 aud;
+ 
+     // HEVC - specific options
+-
+     int                 gops_per_idr;
+     int                 header_insertion_mode;
+     int                 min_qp_i;
+@@ -116,7 +98,7 @@ typedef struct AmfContext {
+     int                 min_qp_p;
+     int                 max_qp_p;
+     int                 tier;
+-} AmfContext;
++} AMFEncContext;
+ 
+ extern const AVCodecHWConfigInternal *const ff_amfenc_hw_configs[];
+ 
+@@ -134,18 +116,4 @@ int ff_amf_encode_close(AVCodecContext *
+ */
+ int ff_amf_receive_packet(AVCodecContext *avctx, AVPacket *avpkt);
+ 
+-/**
+-* Supported formats
+-*/
+-extern const enum AVPixelFormat ff_amf_pix_fmts[];
+-
+-/**
+-* Error handling helper
+-*/
+-#define AMF_RETURN_IF_FALSE(avctx, exp, ret_value, /*message,*/ ...) \
+-    if (!(exp)) { \
+-        av_log(avctx, AV_LOG_ERROR, __VA_ARGS__); \
+-        return ret_value; \
+-    }
+-
+-#endif //AVCODEC_AMFENC_H
++#endif /* AVCODEC_AMFENC_H */
+Index: jellyfin-ffmpeg/libavcodec/amfenc_h264.c
+===================================================================
+--- libavcodec/amfenc_h264.c
++++ libavcodec/amfenc_h264.c
+@@ -16,112 +16,104 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
+-
+ #include "libavutil/internal.h"
+ #include "libavutil/opt.h"
+ #include "amfenc.h"
+ #include "codec_internal.h"
+ #include "internal.h"
+ 
+-#define OFFSET(x) offsetof(AmfContext, x)
++#define OFFSET(x) offsetof(AMFEncContext, x)
+ #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
++#define ENUM(a, b, c, d) { a, b, 0, AV_OPT_TYPE_CONST, { .i64 = c }, 0, 0, VE, d }
+ 
+-static const AVOption options[] = {
+-    // Static
+-    /// Usage
+-    { "usage",          "Encoder Usage",        OFFSET(usage),  AV_OPT_TYPE_INT,   { .i64 = AMF_VIDEO_ENCODER_USAGE_TRANSCONDING      }, AMF_VIDEO_ENCODER_USAGE_TRANSCONDING, AMF_VIDEO_ENCODER_USAGE_WEBCAM, VE, "usage" },
+-    { "transcoding",    "Generic Transcoding",  0,              AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_USAGE_TRANSCONDING      }, 0, 0, VE, "usage" },
+-    { "ultralowlatency","",                     0,              AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_USAGE_ULTRA_LOW_LATENCY }, 0, 0, VE, "usage" },
+-    { "lowlatency",     "",                     0,              AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_USAGE_LOW_LATENCY       }, 0, 0, VE, "usage" },
+-    { "webcam",         "Webcam",               0,              AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_USAGE_WEBCAM            }, 0, 0, VE, "usage" },
+-
+-    /// Profile,
+-    { "profile",        "Profile",              OFFSET(profile),AV_OPT_TYPE_INT,   { .i64 = AMF_VIDEO_ENCODER_PROFILE_MAIN                 }, AMF_VIDEO_ENCODER_PROFILE_BASELINE, AMF_VIDEO_ENCODER_PROFILE_CONSTRAINED_HIGH, VE, "profile" },
+-    { "main",           "",                     0,              AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_PROFILE_MAIN                 }, 0, 0, VE, "profile" },
+-    { "high",           "",                     0,              AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_PROFILE_HIGH                 }, 0, 0, VE, "profile" },
+-    { "constrained_baseline", "",               0,              AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_PROFILE_CONSTRAINED_BASELINE }, 0, 0, VE, "profile" },
+-    { "constrained_high",     "",               0,              AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_PROFILE_CONSTRAINED_HIGH     }, 0, 0, VE, "profile" },
+-
+-    /// Profile Level
+-    { "level",          "Profile Level",        OFFSET(level),  AV_OPT_TYPE_INT,   { .i64 = 0  }, 0, 62, VE, "level" },
+-    { "auto",           "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 0  }, 0, 0,  VE, "level" },
+-    { "1.0",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 10 }, 0, 0,  VE, "level" },
+-    { "1.1",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 11 }, 0, 0,  VE, "level" },
+-    { "1.2",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 12 }, 0, 0,  VE, "level" },
+-    { "1.3",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 13 }, 0, 0,  VE, "level" },
+-    { "2.0",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 20 }, 0, 0,  VE, "level" },
+-    { "2.1",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 21 }, 0, 0,  VE, "level" },
+-    { "2.2",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 22 }, 0, 0,  VE, "level" },
+-    { "3.0",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 30 }, 0, 0,  VE, "level" },
+-    { "3.1",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 31 }, 0, 0,  VE, "level" },
+-    { "3.2",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 32 }, 0, 0,  VE, "level" },
+-    { "4.0",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 40 }, 0, 0,  VE, "level" },
+-    { "4.1",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 41 }, 0, 0,  VE, "level" },
+-    { "4.2",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 42 }, 0, 0,  VE, "level" },
+-    { "5.0",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 50 }, 0, 0,  VE, "level" },
+-    { "5.1",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 51 }, 0, 0,  VE, "level" },
+-    { "5.2",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 52 }, 0, 0,  VE, "level" },
+-    { "6.0",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 60 }, 0, 0,  VE, "level" },
+-    { "6.1",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 61 }, 0, 0,  VE, "level" },
+-    { "6.2",            "",                     0,              AV_OPT_TYPE_CONST, { .i64 = 62 }, 0, 0,  VE, "level" },
+-
+-
+-    /// Quality Preset
+-    { "quality",        "Quality Preference",                   OFFSET(quality),    AV_OPT_TYPE_INT,   { .i64 = AMF_VIDEO_ENCODER_QUALITY_PRESET_SPEED    }, AMF_VIDEO_ENCODER_QUALITY_PRESET_BALANCED, AMF_VIDEO_ENCODER_QUALITY_PRESET_QUALITY, VE, "quality" },
+-    { "speed",          "Prefer Speed",                         0,                  AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_QUALITY_PRESET_SPEED    },       0, 0, VE, "quality" },
+-    { "balanced",       "Balanced",                             0,                  AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_QUALITY_PRESET_BALANCED },    0, 0, VE, "quality" },
+-    { "quality",        "Prefer Quality",                       0,                  AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_QUALITY_PRESET_QUALITY  },     0, 0, VE, "quality" },
+-
+-    // Dynamic
+-    /// Rate Control Method
+-    { "rc",             "Rate Control Method",                  OFFSET(rate_control_mode), AV_OPT_TYPE_INT,   { .i64 = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_UNKNOWN }, AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_UNKNOWN, AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_LATENCY_CONSTRAINED_VBR, VE, "rc" },
+-    { "cqp",            "Constant Quantization Parameter",      0,                         AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CONSTANT_QP             }, 0, 0, VE, "rc" },
+-    { "cbr",            "Constant Bitrate",                     0,                         AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CBR                     }, 0, 0, VE, "rc" },
+-    { "vbr_peak",       "Peak Contrained Variable Bitrate",     0,                         AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR    }, 0, 0, VE, "rc" },
+-    { "vbr_latency",    "Latency Constrained Variable Bitrate", 0,                         AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_LATENCY_CONSTRAINED_VBR }, 0, 0, VE, "rc" },
+-
+-    /// Enforce HRD, Filler Data, VBAQ, Frame Skipping
+-    { "enforce_hrd",    "Enforce HRD",                          OFFSET(enforce_hrd),        AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
+-    { "filler_data",    "Filler Data Enable",                   OFFSET(filler_data),        AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
+-    { "vbaq",           "Enable VBAQ",                          OFFSET(enable_vbaq),        AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
+-    { "frame_skipping", "Rate Control Based Frame Skip",        OFFSET(skip_frame),         AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
+-
+-    /// QP Values
+-    { "qp_i",           "Quantization Parameter for I-Frame",   OFFSET(qp_i),               AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 51, VE },
+-    { "qp_p",           "Quantization Parameter for P-Frame",   OFFSET(qp_p),               AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 51, VE },
+-    { "qp_b",           "Quantization Parameter for B-Frame",   OFFSET(qp_b),               AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 51, VE },
+-
+-    /// Pre-Pass, Pre-Analysis, Two-Pass
+-    { "preanalysis",    "Pre-Analysis Mode",                    OFFSET(preanalysis),        AV_OPT_TYPE_BOOL,{ .i64 = 0 }, 0, 1, VE, NULL },
+-
+-    /// Maximum Access Unit Size
+-    { "max_au_size",    "Maximum Access Unit Size for rate control (in bits)",   OFFSET(max_au_size),        AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, VE },
+-
+-    /// Header Insertion Spacing
+-    { "header_spacing", "Header Insertion Spacing",             OFFSET(header_spacing),     AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 1000, VE },
+-
+-    /// B-Frames
+-    // BPicturesPattern=bf
+-    { "bf_delta_qp",    "B-Picture Delta QP",                   OFFSET(b_frame_delta_qp),   AV_OPT_TYPE_INT,  { .i64 = 4 }, -10, 10, VE },
+-    { "bf_ref",         "Enable Reference to B-Frames",         OFFSET(b_frame_ref),        AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, VE },
+-    { "bf_ref_delta_qp","Reference B-Picture Delta QP",         OFFSET(ref_b_frame_delta_qp), AV_OPT_TYPE_INT,  { .i64 = 4 }, -10, 10, VE },
+-
+-    /// Intra-Refresh
+-    { "intra_refresh_mb","Intra Refresh MBs Number Per Slot in Macroblocks",       OFFSET(intra_refresh_mb),    AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, VE },
+-
+-    /// coder
+-    { "coder",          "Coding Type",                          OFFSET(coding_mode),   AV_OPT_TYPE_INT,   { .i64 = AMF_VIDEO_ENCODER_UNDEFINED }, AMF_VIDEO_ENCODER_UNDEFINED, AMF_VIDEO_ENCODER_CALV, VE, "coder" },
+-    { "auto",           "Automatic",                            0,                     AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_UNDEFINED }, 0, 0, VE, "coder" },
+-    { "cavlc",          "Context Adaptive Variable-Length Coding", 0,                  AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_CALV },      0, 0, VE, "coder" },
+-    { "cabac",          "Context Adaptive Binary Arithmetic Coding", 0,                AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_CABAC },     0, 0, VE, "coder" },
+-
+-    { "me_half_pel",    "Enable ME Half Pixel",                 OFFSET(me_half_pel),   AV_OPT_TYPE_BOOL,  { .i64 = 1 }, 0, 1, VE },
+-    { "me_quarter_pel", "Enable ME Quarter Pixel",              OFFSET(me_quarter_pel),AV_OPT_TYPE_BOOL,  { .i64 = 1 }, 0, 1, VE },
+-
+-    { "aud",            "Inserts AU Delimiter NAL unit",        OFFSET(aud)          ,AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0, 1, VE },
++static const enum AVPixelFormat ff_amfenc_h264_pix_fmts[] = {
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_YUV420P,
++#if CONFIG_D3D11VA
++    AV_PIX_FMT_D3D11,
++#endif
++#if CONFIG_DXVA2
++    AV_PIX_FMT_DXVA2_VLD,
++#endif
++    AV_PIX_FMT_NONE
++};
+ 
+-    { "log_to_dbg",     "Enable AMF logging to debug output",   OFFSET(log_to_dbg)    , AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
++static const AVOption options[] = {
++    { "usage",            "Encoder Usage",                                        OFFSET(usage),                AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_USAGE_TRANSCODING }, AMF_VIDEO_ENCODER_USAGE_TRANSCODING, AMF_VIDEO_ENCODER_USAGE_LOW_LATENCY_HIGH_QUALITY, VE, "usage" },
++        ENUM("transcoding",          "Transcoding, video editing",                AMF_VIDEO_ENCODER_USAGE_TRANSCODING,              "usage"),
++        ENUM("ultralowlatency",      "Video game streaming",                      AMF_VIDEO_ENCODER_USAGE_ULTRA_LOW_LATENCY,        "usage"),
++        ENUM("lowlatency",           "Video collaboration, RDP",                  AMF_VIDEO_ENCODER_USAGE_LOW_LATENCY,              "usage"),
++        ENUM("webcam",               "Video conferencing",                        AMF_VIDEO_ENCODER_USAGE_WEBCAM,                   "usage"),
++        ENUM("highquality",          "High-quality encoding",                     AMF_VIDEO_ENCODER_USAGE_HIGH_QUALITY,             "usage"),
++        ENUM("llhighquality",        "High-quality encoding (low latency)",       AMF_VIDEO_ENCODER_USAGE_LOW_LATENCY_HIGH_QUALITY, "usage"),
++
++    { "profile",          "Profile",                                              OFFSET(profile),              AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_PROFILE_MAIN }, AMF_VIDEO_ENCODER_PROFILE_BASELINE, AMF_VIDEO_ENCODER_PROFILE_CONSTRAINED_HIGH, VE, "profile" },
++        ENUM("main",                 "",                                          AMF_VIDEO_ENCODER_PROFILE_MAIN,                 "profile"),
++        ENUM("high",                 "",                                          AMF_VIDEO_ENCODER_PROFILE_HIGH,                 "profile"),
++        ENUM("constrained_baseline", "",                                          AMF_VIDEO_ENCODER_PROFILE_CONSTRAINED_BASELINE, "profile"),
++        ENUM("constrained_high",     "",                                          AMF_VIDEO_ENCODER_PROFILE_CONSTRAINED_HIGH,     "profile"),
++
++    { "level",            "Profile Level",                                        OFFSET(level),                AV_OPT_TYPE_INT,  { .i64 = 0 }, 0, 62, VE, "level" },
++        ENUM("auto",                 "",                                          0,  "level"),
++        ENUM("1.0",                  "",                                          10, "level"),
++        ENUM("1.1",                  "",                                          11, "level"),
++        ENUM("1.2",                  "",                                          12, "level"),
++        ENUM("1.3",                  "",                                          13, "level"),
++        ENUM("2.0",                  "",                                          20, "level"),
++        ENUM("2.1",                  "",                                          21, "level"),
++        ENUM("2.2",                  "",                                          22, "level"),
++        ENUM("3.0",                  "",                                          30, "level"),
++        ENUM("3.1",                  "",                                          31, "level"),
++        ENUM("3.2",                  "",                                          32, "level"),
++        ENUM("4.0",                  "",                                          40, "level"),
++        ENUM("4.1",                  "",                                          41, "level"),
++        ENUM("4.2",                  "",                                          42, "level"),
++        ENUM("5.0",                  "",                                          50, "level"),
++        ENUM("5.1",                  "",                                          51, "level"),
++        ENUM("5.2",                  "",                                          52, "level"),
++        ENUM("6.0",                  "",                                          60, "level"),
++        ENUM("6.1",                  "",                                          61, "level"),
++        ENUM("6.2",                  "",                                          62, "level"),
++
++    { "quality",          "Quality Preset",                                       OFFSET(quality),              AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_QUALITY_PRESET_SPEED }, AMF_VIDEO_ENCODER_QUALITY_PRESET_BALANCED, AMF_VIDEO_ENCODER_QUALITY_PRESET_QUALITY, VE, "quality" },
++        ENUM("speed",                "Prefer Speed",                              AMF_VIDEO_ENCODER_QUALITY_PRESET_SPEED,    "quality"),
++        ENUM("balanced",             "Balanced",                                  AMF_VIDEO_ENCODER_QUALITY_PRESET_BALANCED, "quality"),
++        ENUM("quality",              "Prefer Quality",                            AMF_VIDEO_ENCODER_QUALITY_PRESET_QUALITY,  "quality"),
++
++    { "rc",               "Rate Control Method",                                  OFFSET(rate_control_mode),    AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_UNKNOWN }, AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_UNKNOWN, AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_QUALITY_VBR, VE, "rc" },
++        ENUM("cqp",                  "Constant Quantization Parameter",           AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CONSTANT_QP,             "rc"),
++        ENUM("cbr",                  "Constant Bitrate",                          AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CBR,                     "rc"),
++        ENUM("vbr_peak",             "Peak Constrained Variable Bitrate",         AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR,    "rc"),
++        ENUM("vbr_latency",          "Latency Constrained Variable Bitrate",      AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_LATENCY_CONSTRAINED_VBR, "rc"),
++        ENUM("qvbr",                 "Quality-defined Variable Bitrate",          AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_QUALITY_VBR,             "rc"),
++
++    { "preanalysis",      "Enable Pre-Encode/Analysis for Rate Control (2-Pass)", OFFSET(pre_encode),           AV_OPT_TYPE_BOOL, { .i64 = 0  },  0,   1, VE },
++    { "vbaq",             "Enable VBAQ",                                          OFFSET(enable_vbaq),          AV_OPT_TYPE_BOOL, { .i64 = 0  },  0,   1, VE },
++    { "hmqb",             "Enable High Motion Quality Boost",                     OFFSET(enable_hmqb),          AV_OPT_TYPE_BOOL, { .i64 = 0  },  0,   1, VE },
++    { "enforce_hrd",      "Enforce HRD",                                          OFFSET(enforce_hrd),          AV_OPT_TYPE_BOOL, { .i64 = 0  },  0,   1, VE },
++    { "filler_data",      "Filler Data Enable",                                   OFFSET(filler_data),          AV_OPT_TYPE_BOOL, { .i64 = 0  },  0,   1, VE },
++    { "frame_skipping",   "Rate Control Based Frame Skip",                        OFFSET(skip_frame),           AV_OPT_TYPE_BOOL, { .i64 = 0  },  0,   1, VE },
++    { "qvbr_level",       "Quality level for QVBR rate control",                  OFFSET(qvbr_level),           AV_OPT_TYPE_INT,  { .i64 = 23 },  1,   51, VE },
++    { "qp_i",             "Quantization Parameter for I-Frame",                   OFFSET(qp_i),                 AV_OPT_TYPE_INT,  { .i64 = -1 }, -1,   51, VE },
++    { "qp_p",             "Quantization Parameter for P-Frame",                   OFFSET(qp_p),                 AV_OPT_TYPE_INT,  { .i64 = -1 }, -1,   51, VE },
++    { "qp_b",             "Quantization Parameter for B-Frame",                   OFFSET(qp_b),                 AV_OPT_TYPE_INT,  { .i64 = -1 }, -1,   51, VE },
++    { "max_au_size",      "Maximum Access Unit Size for rate control (in bits)",  OFFSET(max_au_size),          AV_OPT_TYPE_INT,  { .i64 = 0  },  0,   INT_MAX, VE },
++    { "header_spacing",   "Header Insertion Spacing",                             OFFSET(header_spacing),       AV_OPT_TYPE_INT,  { .i64 = -1 }, -1,   1000, VE },
++    { "bf_delta_qp",      "B-Picture Delta QP",                                   OFFSET(b_frame_delta_qp),     AV_OPT_TYPE_INT,  { .i64 = 4  }, -10,  10, VE },
++    { "bf_ref",           "Enable Reference to B-Frames",                         OFFSET(b_frame_ref),          AV_OPT_TYPE_BOOL, { .i64 = 1  },  0,   1, VE },
++    { "bf_ref_delta_qp",  "Reference B-Picture Delta QP",                         OFFSET(ref_b_frame_delta_qp), AV_OPT_TYPE_INT,  { .i64 = 4  }, -10,  10, VE },
++    { "intra_refresh_mb", "Intra Refresh MBs Number Per Slot in Macroblocks",     OFFSET(intra_refresh_mb),     AV_OPT_TYPE_INT,  { .i64 = 0  },  0,   INT_MAX, VE },
++
++    { "coder",            "Coding Type",                                          OFFSET(coding_mode),          AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_UNDEFINED }, AMF_VIDEO_ENCODER_UNDEFINED, AMF_VIDEO_ENCODER_CALV, VE, "coder" },
++        ENUM("auto",                 "Automatic",                                 AMF_VIDEO_ENCODER_UNDEFINED, "coder"),
++        ENUM("cavlc",                "Context Adaptive Variable-Length Coding",   AMF_VIDEO_ENCODER_CALV,      "coder"),
++        ENUM("cabac",                "Context Adaptive Binary Arithmetic Coding", AMF_VIDEO_ENCODER_CABAC,     "coder"),
++
++    { "me_half_pel",      "Enable ME Half Pixel",                                 OFFSET(me_half_pel),          AV_OPT_TYPE_BOOL, { .i64 = 1  },  0,   1, VE },
++    { "me_quarter_pel",   "Enable ME Quarter Pixel",                              OFFSET(me_quarter_pel),       AV_OPT_TYPE_BOOL, { .i64 = 1  },  0,   1, VE },
++    { "aud",              "Inserts AU Delimiter NAL unit",                        OFFSET(aud),                  AV_OPT_TYPE_BOOL, { .i64 = 0  },  0,   1, VE },
+ 
++    { "log_to_dbg",       "Enable AMF logging to debug output",                   OFFSET(log_to_dbg),           AV_OPT_TYPE_BOOL, { .i64 = 0  },  0,   1, VE },
+     { NULL }
+ };
+ 
+@@ -129,7 +121,7 @@ static av_cold int amf_encode_init_h264(
+ {
+     int                              ret = 0;
+     AMF_RESULT                       res = AMF_OK;
+-    AmfContext                      *ctx = avctx->priv_data;
++    AMFEncContext                   *ctx = avctx->priv_data;
+     AMFVariantStruct                 var = { 0 };
+     amf_int64                        profile = 0;
+     amf_int64                        profile_level = 0;
+@@ -137,13 +129,13 @@ static av_cold int amf_encode_init_h264(
+     AMFGuid                          guid;
+     AMFRate                          framerate;
+     AMFSize                          framesize = AMFConstructSize(avctx->width, avctx->height);
++    int                              probed_rc_mode = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_UNKNOWN;
+     int                              deblocking_filter = (avctx->flags & AV_CODEC_FLAG_LOOP_FILTER) ? 1 : 0;
+ 
+-    if (avctx->framerate.num > 0 && avctx->framerate.den > 0) {
++    if (avctx->framerate.num > 0 && avctx->framerate.den > 0)
+         framerate = AMFConstructRate(avctx->framerate.num, avctx->framerate.den);
+-    } else {
++    else
+         framerate = AMFConstructRate(avctx->time_base.den, avctx->time_base.num * avctx->ticks_per_frame);
+-    }
+ 
+     if ((ret = ff_amf_encode_init(avctx)) != 0)
+         return ret;
+@@ -172,62 +164,84 @@ static av_cold int amf_encode_init_h264(
+         profile = AMF_VIDEO_ENCODER_PROFILE_CONSTRAINED_HIGH;
+         break;
+     }
+-    if (profile == 0) {
++    if (profile == 0)
+         profile = ctx->profile;
+-    }
+ 
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_PROFILE, profile);
+ 
+     profile_level = avctx->level;
+-    if (profile_level == FF_LEVEL_UNKNOWN) {
++    if (profile_level == FF_LEVEL_UNKNOWN)
+         profile_level = ctx->level;
+-    }
+-    if (profile_level != 0) {
++    if (profile_level != 0)
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_PROFILE_LEVEL, profile_level);
+-    }
+ 
+     // Maximum Reference Frames
+-    if (avctx->refs != -1) {
++    if (avctx->refs != -1)
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MAX_NUM_REFRAMES, avctx->refs);
+-    }
+     if (avctx->sample_aspect_ratio.den && avctx->sample_aspect_ratio.num) {
+         AMFRatio ratio = AMFConstructRatio(avctx->sample_aspect_ratio.num, avctx->sample_aspect_ratio.den);
+         AMF_ASSIGN_PROPERTY_RATIO(res, ctx->encoder, AMF_VIDEO_ENCODER_ASPECT_RATIO, ratio);
+     }
+ 
+-    /// Color Range (Partial/TV/MPEG or Full/PC/JPEG)
+-    if (avctx->color_range == AVCOL_RANGE_JPEG) {
+-        AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_FULL_RANGE_COLOR, 1);
++    // Auto detect rate control method
++    if (ctx->qp_i != -1 || ctx->qp_p != -1 || ctx->qp_b != -1) {
++        probed_rc_mode = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CONSTANT_QP;
++    } else if (avctx->rc_max_rate > 0 ) {
++        probed_rc_mode = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR;
++    } else {
++        probed_rc_mode = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CBR;
+     }
+ 
+-    // autodetect rate control method
+     if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_UNKNOWN) {
+-        if (ctx->qp_i != -1 || ctx->qp_p != -1 || ctx->qp_b != -1) {
+-            ctx->rate_control_mode = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CONSTANT_QP;
+-            av_log(ctx, AV_LOG_DEBUG, "Rate control turned to CQP\n");
+-        } else if (avctx->rc_max_rate > 0 ) {
+-            ctx->rate_control_mode = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR;
+-            av_log(ctx, AV_LOG_DEBUG, "Rate control turned to Peak VBR\n");
+-        } else {
+-            ctx->rate_control_mode = AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CBR;
+-            av_log(ctx, AV_LOG_DEBUG, "Rate control turned to CBR\n");
++        switch (probed_rc_mode) {
++        case AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CONSTANT_QP:
++            ctx->rate_control_mode = probed_rc_mode;
++            av_log(ctx, AV_LOG_DEBUG, "Rate control method turned to CQP\n");
++            break;
++        case AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR:
++            ctx->rate_control_mode = probed_rc_mode;
++            av_log(ctx, AV_LOG_DEBUG, "Rate control method turned to Peak VBR\n");
++            break;
++        case AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CBR:
++            ctx->rate_control_mode = probed_rc_mode;
++            av_log(ctx, AV_LOG_DEBUG, "Rate control method turned to CBR\n");
++            break;
+         }
+     }
+ 
++    // Pre-Encode/Two-Pass(pre-encode assisted rate control)
+     if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CONSTANT_QP) {
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_RATE_CONTROL_PREANALYSIS_ENABLE, AMF_VIDEO_ENCODER_PREENCODE_DISABLED);
+-        if (ctx->preanalysis)
+-            av_log(ctx, AV_LOG_WARNING, "Pre-Analysis is not supported by cqp Rate Control Method, automatically disabled\n");
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_PREENCODE_ENABLE, AMF_VIDEO_ENCODER_PREENCODE_DISABLED);
++        if (ctx->pre_encode) {
++            ctx->pre_encode = 0;
++            av_log(ctx, AV_LOG_WARNING, "Pre-Encode is not supported by CQP rate control method, automatically disabled\n");
++        }
+     } else {
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_RATE_CONTROL_PREANALYSIS_ENABLE, ctx->preanalysis);
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_PREENCODE_ENABLE, ctx->pre_encode);
+     }
+ 
++    // Quality preset
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_QUALITY_PRESET, ctx->quality);
+ 
+     // Dynamic parmaters
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD, ctx->rate_control_mode);
++    if (res != AMF_OK && ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_QUALITY_VBR) {
++        ctx->rate_control_mode = probed_rc_mode;
++        av_log(ctx, AV_LOG_WARNING, "QVBR is not supported by this GPU, switch to auto detect rate control method\n");
++    }
++
++    // High Motion Quality Boost mode
++    if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_QUALITY_VBR) {
++        AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HIGH_MOTION_QUALITY_BOOST_ENABLE, 0);
++        if (ctx->enable_hmqb) {
++            ctx->enable_hmqb = 0;
++            av_log(ctx, AV_LOG_WARNING, "VBAQ is not supported by QVBR rate control method, automatically disabled\n");
++        }
++    } else {
++        AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HIGH_MOTION_QUALITY_BOOST_ENABLE, !!ctx->enable_hmqb);
++    }
+ 
+-    /// VBV Buffer
++    // VBV Buffer
+     if (avctx->rc_buffer_size != 0) {
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_VBV_BUFFER_SIZE, avctx->rc_buffer_size);
+         if (avctx->rc_initial_buffer_occupancy != 0) {
+@@ -237,7 +251,8 @@ static av_cold int amf_encode_init_h264(
+             AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_INITIAL_VBV_BUFFER_FULLNESS, amf_buffer_fullness);
+         }
+     }
+-    /// Maximum Access Unit Size
++
++    // Maximum Access Unit Size
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MAX_AU_SIZE, ctx->max_au_size);
+ 
+     if (ctx->max_au_size)
+@@ -247,7 +262,25 @@ static av_cold int amf_encode_init_h264(
+     if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CONSTANT_QP) {
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MIN_QP, 0);
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MAX_QP, 51);
++    } else if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_QUALITY_VBR) {
++        if (ctx->qvbr_level) {
++            AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_QVBR_QUALITY_LEVEL, ctx->qvbr_level);
++        }
+     } else {
++        if (avctx->qmin == -1 && avctx->qmax == -1) {
++            switch (ctx->usage) {
++            case AMF_VIDEO_ENCODER_USAGE_TRANSCONDING:
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MIN_QP, 18);
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MAX_QP, 46);
++                break;
++            case AMF_VIDEO_ENCODER_USAGE_ULTRA_LOW_LATENCY:
++            case AMF_VIDEO_ENCODER_USAGE_LOW_LATENCY:
++            case AMF_VIDEO_ENCODER_USAGE_WEBCAM:
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MIN_QP, 22);
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MAX_QP, 48);
++                break;
++            }
++        }
+         if (avctx->qmin != -1) {
+             int qval = avctx->qmin > 51 ? 51 : avctx->qmin;
+             AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MIN_QP, qval);
+@@ -267,31 +300,50 @@ static av_cold int amf_encode_init_h264(
+ 
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_TARGET_BITRATE, avctx->bit_rate);
+ 
+-    if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CBR) {
++    if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CBR)
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_PEAK_BITRATE, avctx->bit_rate);
+-    }
++
+     if (avctx->rc_max_rate) {
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_PEAK_BITRATE, avctx->rc_max_rate);
+     } else if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR) {
+-        av_log(ctx, AV_LOG_WARNING, "rate control mode is PEAK_CONSTRAINED_VBR but rc_max_rate is not set\n");
++        av_log(ctx, AV_LOG_WARNING, "Rate control method is PEAK_CONSTRAINED_VBR but rc_max_rate is not set\n");
+     }
+ 
++    // Color Range (Partial/TV/MPEG or Full/PC/JPEG)
++    if (avctx->color_range == AVCOL_RANGE_JPEG) {
++        AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_FULL_RANGE_COLOR, 1);
++    } else {
++        AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_FULL_RANGE_COLOR, 0);
++    }
++
++    // Set output color profile, transfer and primaries
++    if (ctx->out_color_profile > AMF_VIDEO_CONVERTER_COLOR_PROFILE_UNKNOWN)
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_OUTPUT_COLOR_PROFILE, ctx->out_color_profile);
++    if (ctx->out_color_trc > AMF_COLOR_TRANSFER_CHARACTERISTIC_UNDEFINED)
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_OUTPUT_TRANSFER_CHARACTERISTIC, ctx->out_color_trc);
++    if (ctx->out_color_prm > AMF_COLOR_PRIMARIES_UNDEFINED)
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_OUTPUT_COLOR_PRIMARIES, ctx->out_color_prm);
++
+     // Initialize Encoder
+     res = ctx->encoder->pVtbl->Init(ctx->encoder, ctx->format, avctx->width, avctx->height);
+     AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_BUG, "encoder->Init() failed with error %d\n", res);
+ 
+-    // Enforce HRD, Filler Data, VBAQ, Frame Skipping, Deblocking Filter
++    // Enforce HRD, Filler Data, Frame Skipping, Deblocking Filter
+     AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_ENFORCE_HRD, !!ctx->enforce_hrd);
+     AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_FILLER_DATA_ENABLE, !!ctx->filler_data);
+     AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_RATE_CONTROL_SKIP_FRAME_ENABLE, !!ctx->skip_frame);
++    AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_DE_BLOCKING_FILTER, !!deblocking_filter);
++
++    // VBAQ
+     if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_RATE_CONTROL_METHOD_CONSTANT_QP) {
+         AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_ENABLE_VBAQ, 0);
+-        if (ctx->enable_vbaq)
++        if (ctx->enable_vbaq) {
++            ctx->enable_vbaq = 0;
+             av_log(ctx, AV_LOG_WARNING, "VBAQ is not supported by cqp Rate Control Method, automatically disabled\n");
++        }
+     } else {
+         AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_ENABLE_VBAQ, !!ctx->enable_vbaq);
+     }
+-    AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_DE_BLOCKING_FILTER, !!deblocking_filter);
+ 
+     // B-Frames
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_B_PIC_PATTERN, avctx->max_b_frames);
+@@ -302,6 +354,7 @@ static av_cold int amf_encode_init_h264(
+         avctx->max_b_frames = (int)var.int64Value;
+     }
+     if (avctx->max_b_frames) {
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MAX_CONSECUTIVE_BPICTURES, avctx->max_b_frames);
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_B_PIC_DELTA_QP, ctx->b_frame_delta_qp);
+         AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_B_REFERENCE_ENABLE, !!ctx->b_frame_ref);
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_REF_B_PIC_DELTA_QP, ctx->ref_b_frame_delta_qp);
+@@ -339,9 +392,8 @@ static av_cold int amf_encode_init_h264(
+     guid = IID_AMFBuffer();
+ 
+     res = var.pInterface->pVtbl->QueryInterface(var.pInterface, &guid, (void**)&buffer); // query for buffer interface
+-    if (res != AMF_OK) {
++    if (res != AMF_OK)
+         var.pInterface->pVtbl->Release(var.pInterface);
+-    }
+     AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_BUG, "QueryInterface(IID_AMFBuffer) failed with error %d\n", res);
+ 
+     avctx->extradata_size = (int)buffer->pVtbl->GetSize(buffer);
+@@ -360,15 +412,15 @@ static av_cold int amf_encode_init_h264(
+ }
+ 
+ static const FFCodecDefault defaults[] = {
+-    { "refs",       "-1"  },
+-    { "aspect",     "0"   },
+-    { "qmin",       "-1"  },
+-    { "qmax",       "-1"  },
+-    { "b",          "2M"  },
+-    { "g",          "250" },
+-    { "slices",     "1"   },
+-    { "flags",      "+loop"},
+-    { NULL                },
++    { "refs",       "-1"    },
++    { "aspect",     "0"     },
++    { "qmin",       "-1"    },
++    { "qmax",       "-1"    },
++    { "b",          "2M"    },
++    { "g",          "250"   },
++    { "slices",     "1"     },
++    { "flags",      "+loop" },
++    { NULL                  },
+ };
+ 
+ static const AVClass h264_amf_class = {
+@@ -386,13 +438,13 @@ const FFCodec ff_h264_amf_encoder = {
+     .init           = amf_encode_init_h264,
+     FF_CODEC_RECEIVE_PACKET_CB(ff_amf_receive_packet),
+     .close          = ff_amf_encode_close,
+-    .priv_data_size = sizeof(AmfContext),
++    .priv_data_size = sizeof(AMFEncContext),
+     .p.priv_class   = &h264_amf_class,
+     .defaults       = defaults,
+     .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HARDWARE |
+                       AV_CODEC_CAP_DR1,
+     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+-    .p.pix_fmts     = ff_amf_pix_fmts,
++    .p.pix_fmts     = ff_amfenc_h264_pix_fmts,
+     .p.wrapper_name = "amf",
+     .hw_configs     = ff_amfenc_hw_configs,
+ };
+Index: jellyfin-ffmpeg/libavcodec/amfenc_hevc.c
+===================================================================
+--- libavcodec/amfenc_hevc.c
++++ libavcodec/amfenc_hevc.c
+@@ -22,73 +22,91 @@
+ #include "codec_internal.h"
+ #include "internal.h"
+ 
+-#define OFFSET(x) offsetof(AmfContext, x)
++#define OFFSET(x) offsetof(AMFEncContext, x)
+ #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
+-static const AVOption options[] = {
+-    { "usage",          "Set the encoding usage",             OFFSET(usage),          AV_OPT_TYPE_INT,   { .i64 = AMF_VIDEO_ENCODER_HEVC_USAGE_TRANSCONDING }, AMF_VIDEO_ENCODER_HEVC_USAGE_TRANSCONDING, AMF_VIDEO_ENCODER_HEVC_USAGE_WEBCAM, VE, "usage" },
+-    { "transcoding",    "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_USAGE_TRANSCONDING },         0, 0, VE, "usage" },
+-    { "ultralowlatency","", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_USAGE_ULTRA_LOW_LATENCY },    0, 0, VE, "usage" },
+-    { "lowlatency",     "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_USAGE_LOW_LATENCY },          0, 0, VE, "usage" },
+-    { "webcam",         "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_USAGE_WEBCAM },               0, 0, VE, "usage" },
+-
+-    { "profile",        "Set the profile (default main)",           OFFSET(profile),   AV_OPT_TYPE_INT,{ .i64 = AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN }, AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN, AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN, VE, "profile" },
+-    { "main",           "", 0,                      AV_OPT_TYPE_CONST,{ .i64 = AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN }, 0, 0, VE, "profile" },
+-
+-    { "profile_tier",   "Set the profile tier (default main)",      OFFSET(tier), AV_OPT_TYPE_INT,{ .i64 = AMF_VIDEO_ENCODER_HEVC_TIER_MAIN }, AMF_VIDEO_ENCODER_HEVC_TIER_MAIN, AMF_VIDEO_ENCODER_HEVC_TIER_HIGH, VE, "tier" },
+-    { "main",           "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_TIER_MAIN }, 0, 0, VE, "tier" },
+-    { "high",           "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_TIER_HIGH }, 0, 0, VE, "tier" },
+-
+-    { "level",          "Set the encoding level (default auto)",    OFFSET(level), AV_OPT_TYPE_INT,{ .i64 = 0 }, 0, AMF_LEVEL_6_2, VE, "level" },
+-    { "auto",           "", 0, AV_OPT_TYPE_CONST, { .i64 = 0             }, 0, 0, VE, "level" },
+-    { "1.0",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_1   }, 0, 0, VE, "level" },
+-    { "2.0",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_2   }, 0, 0, VE, "level" },
+-    { "2.1",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_2_1 }, 0, 0, VE, "level" },
+-    { "3.0",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_3   }, 0, 0, VE, "level" },
+-    { "3.1",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_3_1 }, 0, 0, VE, "level" },
+-    { "4.0",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_4   }, 0, 0, VE, "level" },
+-    { "4.1",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_4_1 }, 0, 0, VE, "level" },
+-    { "5.0",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_5   }, 0, 0, VE, "level" },
+-    { "5.1",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_5_1 }, 0, 0, VE, "level" },
+-    { "5.2",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_5_2 }, 0, 0, VE, "level" },
+-    { "6.0",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_6   }, 0, 0, VE, "level" },
+-    { "6.1",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_6_1 }, 0, 0, VE, "level" },
+-    { "6.2",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_LEVEL_6_2 }, 0, 0, VE, "level" },
+-
+-    { "quality",        "Set the encoding quality",                 OFFSET(quality),      AV_OPT_TYPE_INT,   { .i64 = AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_SPEED }, AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_QUALITY, AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_SPEED, VE, "quality" },
+-    { "balanced",       "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_BALANCED }, 0, 0, VE, "quality" },
+-    { "speed",          "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_SPEED    }, 0, 0, VE, "quality" },
+-    { "quality",        "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_QUALITY  }, 0, 0, VE, "quality" },
+-
+-    { "rc",             "Set the rate control mode",            OFFSET(rate_control_mode), AV_OPT_TYPE_INT, { .i64 = AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_UNKNOWN }, AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_UNKNOWN, AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CBR, VE, "rc" },
+-    { "cqp",            "Constant Quantization Parameter",      0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CONSTANT_QP             }, 0, 0, VE, "rc" },
+-    { "cbr",            "Constant Bitrate",                     0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CBR                     }, 0, 0, VE, "rc" },
+-    { "vbr_peak",       "Peak Contrained Variable Bitrate",     0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR    }, 0, 0, VE, "rc" },
+-    { "vbr_latency",    "Latency Constrained Variable Bitrate", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_LATENCY_CONSTRAINED_VBR }, 0, 0, VE, "rc" },
+-
+-    { "header_insertion_mode",        "Set header insertion mode",  OFFSET(header_insertion_mode),      AV_OPT_TYPE_INT,{ .i64 = AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_NONE }, AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_NONE, AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_IDR_ALIGNED, VE, "hdrmode" },
+-    { "none",           "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_NONE        }, 0, 0, VE, "hdrmode" },
+-    { "gop",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_GOP_ALIGNED }, 0, 0, VE, "hdrmode" },
+-    { "idr",            "", 0, AV_OPT_TYPE_CONST, { .i64 = AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_IDR_ALIGNED }, 0, 0, VE, "hdrmode" },
+-
+-    { "gops_per_idr",    "GOPs per IDR 0-no IDR will be inserted",  OFFSET(gops_per_idr),  AV_OPT_TYPE_INT,  { .i64 = 1  },  0, INT_MAX, VE },
+-    { "preanalysis",    "Enable preanalysis",                       OFFSET(preanalysis),   AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE},
+-    { "vbaq",           "Enable VBAQ",                              OFFSET(enable_vbaq),   AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE},
+-    { "enforce_hrd",    "Enforce HRD",                              OFFSET(enforce_hrd),   AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE},
+-    { "filler_data",    "Filler Data Enable",                       OFFSET(filler_data),   AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE},
+-    { "max_au_size",    "Maximum Access Unit Size for rate control (in bits)", OFFSET(max_au_size),   AV_OPT_TYPE_INT,{ .i64 = 0 }, 0, INT_MAX, VE},
+-    { "min_qp_i",       "min quantization parameter for I-frame",   OFFSET(min_qp_i),      AV_OPT_TYPE_INT, { .i64 = -1  }, -1, 51, VE },
+-    { "max_qp_i",       "max quantization parameter for I-frame",   OFFSET(max_qp_i),      AV_OPT_TYPE_INT, { .i64 = -1  }, -1, 51, VE },
+-    { "min_qp_p",       "min quantization parameter for P-frame",   OFFSET(min_qp_p),      AV_OPT_TYPE_INT, { .i64 = -1  }, -1, 51, VE },
+-    { "max_qp_p",       "max quantization parameter for P-frame",   OFFSET(max_qp_p),      AV_OPT_TYPE_INT, { .i64 = -1  }, -1, 51, VE },
+-    { "qp_p",           "quantization parameter for P-frame",       OFFSET(qp_p),          AV_OPT_TYPE_INT, { .i64 = -1  }, -1, 51, VE },
+-    { "qp_i",           "quantization parameter for I-frame",       OFFSET(qp_i),          AV_OPT_TYPE_INT, { .i64 = -1  }, -1, 51, VE },
+-    { "skip_frame",     "Rate Control Based Frame Skip",            OFFSET(skip_frame),    AV_OPT_TYPE_BOOL,{ .i64 = 0   },  0, 1, VE },
+-    { "me_half_pel",    "Enable ME Half Pixel",                     OFFSET(me_half_pel),   AV_OPT_TYPE_BOOL,{ .i64 = 1   },  0, 1, VE },
+-    { "me_quarter_pel", "Enable ME Quarter Pixel ",                 OFFSET(me_quarter_pel),AV_OPT_TYPE_BOOL,{ .i64 = 1   },  0, 1, VE },
++#define ENUM(a, b, c, d) { a, b, 0, AV_OPT_TYPE_CONST, { .i64 = c }, 0, 0, VE, d }
+ 
+-    { "aud",            "Inserts AU Delimiter NAL unit",            OFFSET(aud)           ,AV_OPT_TYPE_BOOL,{ .i64 = 0 }, 0, 1, VE },
++static const enum AVPixelFormat ff_amfenc_hevc_pix_fmts[] = {
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_YUV420P,
++    AV_PIX_FMT_P010,
++#if CONFIG_D3D11VA
++    AV_PIX_FMT_D3D11,
++#endif
++#if CONFIG_DXVA2
++    AV_PIX_FMT_DXVA2_VLD,
++#endif
++    AV_PIX_FMT_NONE
++};
+ 
+-    { "log_to_dbg",     "Enable AMF logging to debug output",   OFFSET(log_to_dbg), AV_OPT_TYPE_BOOL,{ .i64 = 0 }, 0, 1, VE },
++static const AVOption options[] = {
++    { "usage",                 "Encoder Usage",                                        OFFSET(usage),                 AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_HEVC_USAGE_TRANSCODING }, AMF_VIDEO_ENCODER_HEVC_USAGE_TRANSCODING, AMF_VIDEO_ENCODER_HEVC_USAGE_LOW_LATENCY_HIGH_QUALITY, VE, "usage" },
++        ENUM("transcoding",     "Transcoding, video editing",           AMF_VIDEO_ENCODER_HEVC_USAGE_TRANSCODING,              "usage"),
++        ENUM("ultralowlatency", "Video game streaming",                 AMF_VIDEO_ENCODER_HEVC_USAGE_ULTRA_LOW_LATENCY,        "usage"),
++        ENUM("lowlatency",      "Video collaboration, RDP",             AMF_VIDEO_ENCODER_HEVC_USAGE_LOW_LATENCY,              "usage"),
++        ENUM("webcam",          "Video conferencing",                   AMF_VIDEO_ENCODER_HEVC_USAGE_WEBCAM,                   "usage"),
++        ENUM("highquality",     "High-quality encoding",                AMF_VIDEO_ENCODER_HEVC_USAGE_HIGH_QUALITY,             "usage"),
++        ENUM("llhighquality",   "High-quality encoding (low latency)",  AMF_VIDEO_ENCODER_HEVC_USAGE_LOW_LATENCY_HIGH_QUALITY, "usage"),
++
++    { "profile",               "Profile",                                              OFFSET(profile),               AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN }, AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN, AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN_10, VE, "profile" },
++        ENUM("main",            "",                                     AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN,    "profile"),
++        ENUM("main10",          "",                                     AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN_10, "profile"),
++
++
++    { "profile_tier",          "Profile Tier",                                         OFFSET(tier),                  AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_HEVC_TIER_MAIN }, AMF_VIDEO_ENCODER_HEVC_TIER_MAIN, AMF_VIDEO_ENCODER_HEVC_TIER_HIGH, VE, "tier" },
++        ENUM("main",            "",                                     AMF_VIDEO_ENCODER_HEVC_TIER_MAIN, "tier"),
++        ENUM("high",            "",                                     AMF_VIDEO_ENCODER_HEVC_TIER_HIGH, "tier"),
++
++    { "level",                 "Profile Level",                                        OFFSET(level),                 AV_OPT_TYPE_INT,  { .i64 = 0 }, 0, AMF_LEVEL_6_2, VE, "level" },
++        ENUM("auto",            "",                                     0,             "level"),
++        ENUM("1.0",             "",                                     AMF_LEVEL_1,   "level"),
++        ENUM("2.0",             "",                                     AMF_LEVEL_2,   "level"),
++        ENUM("2.1",             "",                                     AMF_LEVEL_2_1, "level"),
++        ENUM("3.0",             "",                                     AMF_LEVEL_3,   "level"),
++        ENUM("3.1",             "",                                     AMF_LEVEL_3_1, "level"),
++        ENUM("4.0",             "",                                     AMF_LEVEL_4,   "level"),
++        ENUM("4.1",             "",                                     AMF_LEVEL_4_1, "level"),
++        ENUM("5.0",             "",                                     AMF_LEVEL_5,   "level"),
++        ENUM("5.1",             "",                                     AMF_LEVEL_5_1, "level"),
++        ENUM("5.2",             "",                                     AMF_LEVEL_5_2, "level"),
++        ENUM("6.0",             "",                                     AMF_LEVEL_6,   "level"),
++        ENUM("6.1",             "",                                     AMF_LEVEL_6_1, "level"),
++        ENUM("6.2",             "",                                     AMF_LEVEL_6_2, "level"),
++
++    { "quality",               "Quality Preset",                                       OFFSET(quality),               AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_SPEED }, AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_QUALITY, AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_SPEED, VE, "quality" },
++        ENUM("speed",           "Prefer Speed",                         AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_SPEED,    "quality"),
++        ENUM("balanced",        "Balanced",                             AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_BALANCED, "quality"),
++        ENUM("quality",         "Prefer Quality",                       AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET_QUALITY,  "quality"),
++
++    { "rc",                    "Rate Control Method",                                  OFFSET(rate_control_mode),     AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_UNKNOWN }, AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_UNKNOWN, AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CBR, VE, "rc" },
++        ENUM("cqp",             "Constant Quantization Parameter",      AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CONSTANT_QP,             "rc"),
++        ENUM("cbr",             "Constant Bitrate",                     AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CBR,                     "rc"),
++        ENUM("vbr_peak",        "Peak Contrained Variable Bitrate",     AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR,    "rc"),
++        ENUM("vbr_latency",     "Latency Constrained Variable Bitrate", AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_LATENCY_CONSTRAINED_VBR, "rc"),
++
++    { "header_insertion_mode", "Set header insertion mode",                            OFFSET(header_insertion_mode), AV_OPT_TYPE_INT,  { .i64 = AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_NONE }, AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_NONE, AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_IDR_ALIGNED, VE, "hdrmode" },
++        ENUM("none",            "",                                     AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_NONE,        "hdrmode"),
++        ENUM("gop",             "",                                     AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_GOP_ALIGNED, "hdrmode"),
++        ENUM("idr",             "",                                     AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE_IDR_ALIGNED, "hdrmode"),
++
++    { "gops_per_idr",          "GOPs per IDR 0-no IDR will be inserted",               OFFSET(gops_per_idr),          AV_OPT_TYPE_INT,  { .i64 = 1  },  0, INT_MAX, VE },
++    { "preanalysis",           "Enable Pre-Encode/Analysis for rate rontrol (2-Pass)", OFFSET(pre_encode),            AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE },
++    { "vbaq",                  "Enable VBAQ",                                          OFFSET(enable_vbaq),           AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE },
++    { "hmqb",                  "Enable High Motion Quality Boost",                     OFFSET(enable_hmqb),           AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE },
++    { "enforce_hrd",           "Enforce HRD",                                          OFFSET(enforce_hrd),           AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE },
++    { "filler_data",           "Filler Data Enable",                                   OFFSET(filler_data),           AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE },
++    { "max_au_size",           "Maximum Access Unit Size for rate control (in bits)",  OFFSET(max_au_size),           AV_OPT_TYPE_INT,  { .i64 = 0  },  0, INT_MAX, VE},
++    { "min_qp_i",              "Min Quantization Parameter for I-frame",               OFFSET(min_qp_i),              AV_OPT_TYPE_INT,  { .i64 = -1 }, -1, 51, VE },
++    { "max_qp_i",              "Max Quantization Parameter for I-frame",               OFFSET(max_qp_i),              AV_OPT_TYPE_INT,  { .i64 = -1 }, -1, 51, VE },
++    { "min_qp_p",              "Min Quantization Parameter for P-frame",               OFFSET(min_qp_p),              AV_OPT_TYPE_INT,  { .i64 = -1 }, -1, 51, VE },
++    { "max_qp_p",              "Max Quantization Parameter for P-frame",               OFFSET(max_qp_p),              AV_OPT_TYPE_INT,  { .i64 = -1 }, -1, 51, VE },
++    { "qp_p",                  "Quantization Parameter for P-frame",                   OFFSET(qp_p),                  AV_OPT_TYPE_INT,  { .i64 = -1 }, -1, 51, VE },
++    { "qp_i",                  "Quantization Parameter for I-frame",                   OFFSET(qp_i),                  AV_OPT_TYPE_INT,  { .i64 = -1 }, -1, 51, VE },
++    { "skip_frame",            "Rate Control Based Frame Skip",                        OFFSET(skip_frame),            AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE },
++    { "me_half_pel",           "Enable ME Half Pixel",                                 OFFSET(me_half_pel),           AV_OPT_TYPE_BOOL, { .i64 = 1  },  0, 1, VE },
++    { "me_quarter_pel",        "Enable ME Quarter Pixel",                              OFFSET(me_quarter_pel),        AV_OPT_TYPE_BOOL, { .i64 = 1  },  0, 1, VE },
++    { "aud",                   "Inserts AU Delimiter NAL unit",                        OFFSET(aud),                   AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE },
++    { "log_to_dbg",            "Enable AMF logging to debug output",                   OFFSET(log_to_dbg),            AV_OPT_TYPE_BOOL, { .i64 = 0  },  0, 1, VE },
+     { NULL }
+ };
+ 
+@@ -96,8 +114,8 @@ static av_cold int amf_encode_init_hevc(
+ {
+     int                 ret = 0;
+     AMF_RESULT          res = AMF_OK;
+-    AmfContext         *ctx = avctx->priv_data;
+-    AMFVariantStruct    var = {0};
++    AMFEncContext      *ctx = avctx->priv_data;
++    AMFVariantStruct    var = { 0 };
+     amf_int64           profile = 0;
+     amf_int64           profile_level = 0;
+     AMFBuffer          *buffer;
+@@ -106,16 +124,15 @@ static av_cold int amf_encode_init_hevc(
+     AMFSize             framesize = AMFConstructSize(avctx->width, avctx->height);
+     int                 deblocking_filter = (avctx->flags & AV_CODEC_FLAG_LOOP_FILTER) ? 1 : 0;
+ 
+-    if (avctx->framerate.num > 0 && avctx->framerate.den > 0) {
++    if (avctx->framerate.num > 0 && avctx->framerate.den > 0)
+         framerate = AMFConstructRate(avctx->framerate.num, avctx->framerate.den);
+-    } else {
++    else
+         framerate = AMFConstructRate(avctx->time_base.den, avctx->time_base.num * avctx->ticks_per_frame);
+-    }
+ 
+     if ((ret = ff_amf_encode_init(avctx)) < 0)
+         return ret;
+ 
+-    // init static parameters
++    // Static parameters
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_USAGE, ctx->usage);
+ 
+     AMF_ASSIGN_PROPERTY_SIZE(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_FRAMESIZE, framesize);
+@@ -126,28 +143,28 @@ static av_cold int amf_encode_init_hevc(
+     case FF_PROFILE_HEVC_MAIN:
+         profile = AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN;
+         break;
++    case FF_PROFILE_HEVC_MAIN_10:
++        profile = AMF_VIDEO_ENCODER_HEVC_PROFILE_MAIN_10;
++        break;
+     default:
+         break;
+     }
+-    if (profile == 0) {
++    if (profile == 0)
+         profile = ctx->profile;
+-    }
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_PROFILE, profile);
+ 
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_TIER, ctx->tier);
+ 
+     profile_level = avctx->level;
+-    if (profile_level == FF_LEVEL_UNKNOWN) {
++    if (profile_level == FF_LEVEL_UNKNOWN)
+         profile_level = ctx->level;
+-    }
+-    if (profile_level != 0) {
++    if (profile_level != 0)
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_PROFILE_LEVEL, profile_level);
+-    }
++
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_QUALITY_PRESET, ctx->quality);
+     // Maximum Reference Frames
+-    if (avctx->refs != -1) {
++    if (avctx->refs != -1)
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_NUM_REFRAMES, avctx->refs);
+-    }
+     // Aspect Ratio
+     if (avctx->sample_aspect_ratio.den && avctx->sample_aspect_ratio.num) {
+         AMFRatio ratio = AMFConstructRatio(avctx->sample_aspect_ratio.num, avctx->sample_aspect_ratio.den);
+@@ -157,30 +174,28 @@ static av_cold int amf_encode_init_hevc(
+     // Picture control properties
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_NUM_GOPS_PER_IDR, ctx->gops_per_idr);
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_GOP_SIZE, avctx->gop_size);
+-    if (avctx->slices > 1) {
++    if (avctx->slices > 1)
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_SLICES_PER_FRAME, avctx->slices);
+-    }
+     AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_DE_BLOCKING_FILTER_DISABLE, deblocking_filter);
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_HEADER_INSERTION_MODE, ctx->header_insertion_mode);
+ 
+-    // Rate control
+-    // autodetect rate control method
++    // Rate control properties
++    // Auto detect rate control method
+     if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_UNKNOWN) {
+         if (ctx->min_qp_i != -1 || ctx->max_qp_i != -1 ||
+             ctx->min_qp_p != -1 || ctx->max_qp_p != -1 ||
+             ctx->qp_i !=-1 || ctx->qp_p != -1) {
+             ctx->rate_control_mode = AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CONSTANT_QP;
+-            av_log(ctx, AV_LOG_DEBUG, "Rate control turned to CQP\n");
++            av_log(ctx, AV_LOG_DEBUG, "Rate control method turned to CQP\n");
+         } else if (avctx->rc_max_rate > 0) {
+             ctx->rate_control_mode = AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR;
+-            av_log(ctx, AV_LOG_DEBUG, "Rate control turned to Peak VBR\n");
++            av_log(ctx, AV_LOG_DEBUG, "Rate control method turned to Peak VBR\n");
+         } else {
+             ctx->rate_control_mode = AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CBR;
+-            av_log(ctx, AV_LOG_DEBUG, "Rate control turned to CBR\n");
++            av_log(ctx, AV_LOG_DEBUG, "Rate control method turned to CBR\n");
+         }
+     }
+ 
+-
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD, ctx->rate_control_mode);
+     if (avctx->rc_buffer_size) {
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_VBV_BUFFER_SIZE, avctx->rc_buffer_size);
+@@ -192,20 +207,37 @@ static av_cold int amf_encode_init_hevc(
+             AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_INITIAL_VBV_BUFFER_FULLNESS, amf_buffer_fullness);
+         }
+     }
+-    // Pre-Pass, Pre-Analysis, Two-Pass
+-    AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_PREANALYSIS_ENABLE, ctx->preanalysis);
+ 
++    // Pre-Encode/Two-Pass(pre-encode assisted rate control)
++    if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CONSTANT_QP) {
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_PREENCODE_ENABLE, 0);
++        if (ctx->pre_encode) {
++            ctx->pre_encode = 0;
++            av_log(ctx, AV_LOG_WARNING, "Pre-Encode is not supported by CQP rate control method, automatically disabled\n");
++        }
++    } else {
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_PREENCODE_ENABLE, ctx->pre_encode);
++    }
++
++    // VBAQ
+     if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CONSTANT_QP) {
+-        AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_ENABLE_VBAQ, false);
+-        if (ctx->enable_vbaq)
+-            av_log(ctx, AV_LOG_WARNING, "VBAQ is not supported by cqp Rate Control Method, automatically disabled\n");
++        AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_ENABLE_VBAQ, 0);
++        if (ctx->enable_vbaq) {
++            ctx->enable_vbaq = 0;
++            av_log(ctx, AV_LOG_WARNING, "VBAQ is not supported by CQP rate control method, automatically disabled\n");
++        }
+     } else {
+         AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_ENABLE_VBAQ, !!ctx->enable_vbaq);
+     }
++
++    // High Motion Quality Boost mode
++    AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_HIGH_MOTION_QUALITY_BOOST_ENABLE, !!ctx->enable_hmqb);
++
++    // Motion estimation
+     AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MOTION_HALF_PIXEL, ctx->me_half_pel);
+     AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MOTION_QUARTERPIXEL, ctx->me_quarter_pel);
+ 
+-    // init dynamic rate control params
++    // Dynamic rate control params
+     if (ctx->max_au_size)
+         ctx->enforce_hrd = 1;
+     AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_ENFORCE_HRD, ctx->enforce_hrd);
+@@ -213,57 +245,99 @@ static av_cold int amf_encode_init_hevc(
+ 
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_TARGET_BITRATE, avctx->bit_rate);
+ 
+-    if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CBR) {
++    if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CBR)
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_PEAK_BITRATE, avctx->bit_rate);
+-    }
+     if (avctx->rc_max_rate) {
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_PEAK_BITRATE, avctx->rc_max_rate);
+     } else if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR) {
+-        av_log(ctx, AV_LOG_WARNING, "rate control mode is PEAK_CONSTRAINED_VBR but rc_max_rate is not set\n");
++        av_log(ctx, AV_LOG_WARNING, "Rate control method is PEAK_CONSTRAINED_VBR but rc_max_rate is not set\n");
++    }
++
++    // Color Range (Studio/Partial/TV/MPEG or Full/PC/JPEG)
++    if (avctx->color_range == AVCOL_RANGE_JPEG) {
++        AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_NOMINAL_RANGE, AMF_VIDEO_ENCODER_HEVC_NOMINAL_RANGE_FULL);
++    } else {
++        AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_NOMINAL_RANGE, AMF_VIDEO_ENCODER_HEVC_NOMINAL_RANGE_STUDIO);
+     }
+ 
+-    // init encoder
++    // Output color profile, transfer and primaries
++    if (ctx->out_color_profile > AMF_VIDEO_CONVERTER_COLOR_PROFILE_UNKNOWN)
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_OUTPUT_COLOR_PROFILE, ctx->out_color_profile);
++    if (ctx->out_color_trc > AMF_COLOR_TRANSFER_CHARACTERISTIC_UNDEFINED)
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_OUTPUT_TRANSFER_CHARACTERISTIC, ctx->out_color_trc);
++    if (ctx->out_color_prm > AMF_COLOR_PRIMARIES_UNDEFINED)
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_OUTPUT_COLOR_PRIMARIES, ctx->out_color_prm);
++
++    // Set 10-bit encoding if possible
++    if (ctx->bit_depth == 10)
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_COLOR_BIT_DEPTH, AMF_COLOR_BIT_DEPTH_10);
++
++    // Init encoder
+     res = ctx->encoder->pVtbl->Init(ctx->encoder, ctx->format, avctx->width, avctx->height);
+     AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_BUG, "encoder->Init() failed with error %d\n", res);
+ 
+-    // init dynamic picture control params
++    // Dynamic picture control params
+     AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_AU_SIZE, ctx->max_au_size);
+ 
+-    if (ctx->min_qp_i != -1) {
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_I, ctx->min_qp_i);
+-    } else if (avctx->qmin != -1) {
+-        int qval = avctx->qmin > 51 ? 51 : avctx->qmin;
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_I, qval);
+-    }
+-    if (ctx->max_qp_i != -1) {
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_I, ctx->max_qp_i);
+-    } else if (avctx->qmax != -1) {
+-        int qval = avctx->qmax > 51 ? 51 : avctx->qmax;
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_I, qval);
+-    }
+-    if (ctx->min_qp_p != -1) {
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_P, ctx->min_qp_p);
+-    } else if (avctx->qmin != -1) {
+-        int qval = avctx->qmin > 51 ? 51 : avctx->qmin;
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_P, qval);
+-    }
+-    if (ctx->max_qp_p != -1) {
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_P, ctx->max_qp_p);
+-    } else if (avctx->qmax != -1) {
+-        int qval = avctx->qmax > 51 ? 51 : avctx->qmax;
+-        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_P, qval);
++    // QP Minimum / Maximum
++    if (ctx->rate_control_mode == AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_METHOD_CONSTANT_QP) {
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_I, 0);
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_I, 51);
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_P, 0);
++        AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_P, 51);
++    } else {
++        if (ctx->min_qp_i != -1) {
++            AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_I, ctx->min_qp_i);
++        } else if (avctx->qmin != -1) {
++            int qval = avctx->qmin > 51 ? 51 : avctx->qmin;
++            AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_I, qval);
++        }
++        if (ctx->max_qp_i != -1) {
++            AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_I, ctx->max_qp_i);
++        } else if (avctx->qmax != -1) {
++            int qval = avctx->qmax > 51 ? 51 : avctx->qmax;
++            AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_I, qval);
++        }
++        if (ctx->min_qp_p != -1) {
++            AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_P, ctx->min_qp_p);
++        } else if (avctx->qmin != -1) {
++            int qval = avctx->qmin > 51 ? 51 : avctx->qmin;
++            AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_P, qval);
++        }
++        if (ctx->max_qp_p != -1) {
++            AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_P, ctx->max_qp_p);
++        } else if (avctx->qmax != -1) {
++            int qval = avctx->qmax > 51 ? 51 : avctx->qmax;
++            AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_P, qval);
++        }
++        if (ctx->min_qp_i == -1 && ctx->max_qp_i == -1 && ctx->min_qp_p == -1 && ctx->max_qp_p == -1 &&
++            avctx->qmin == -1 && avctx->qmax == -1) {
++            switch (ctx->usage) {
++            case AMF_VIDEO_ENCODER_HEVC_USAGE_TRANSCONDING:
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_I, 18);
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_I, 46);
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_P, 18);
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_P, 46);
++                break;
++            case AMF_VIDEO_ENCODER_HEVC_USAGE_ULTRA_LOW_LATENCY:
++            case AMF_VIDEO_ENCODER_HEVC_USAGE_LOW_LATENCY:
++            case AMF_VIDEO_ENCODER_HEVC_USAGE_WEBCAM:
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_I, 22);
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_I, 48);
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MIN_QP_P, 22);
++                AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_MAX_QP_P, 48);
++                break;
++            }
++        }
+     }
+ 
+-    if (ctx->qp_p != -1) {
++    if (ctx->qp_p != -1)
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_QP_P, ctx->qp_p);
+-    }
+-    if (ctx->qp_i != -1) {
++    if (ctx->qp_i != -1)
+         AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_QP_I, ctx->qp_i);
+-    }
+     AMF_ASSIGN_PROPERTY_BOOL(res, ctx->encoder, AMF_VIDEO_ENCODER_HEVC_RATE_CONTROL_SKIP_FRAME_ENABLE, ctx->skip_frame);
+ 
+-
+-    // fill extradata
++    // Fill extradata
+     res = AMFVariantInit(&var);
+     AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_BUG, "AMFVariantInit() failed with error %d\n", res);
+ 
+@@ -274,9 +348,8 @@ static av_cold int amf_encode_init_hevc(
+     guid = IID_AMFBuffer();
+ 
+     res = var.pInterface->pVtbl->QueryInterface(var.pInterface, &guid, (void**)&buffer); // query for buffer interface
+-    if (res != AMF_OK) {
++    if (res != AMF_OK)
+         var.pInterface->pVtbl->Release(var.pInterface);
+-    }
+     AMF_RETURN_IF_FALSE(ctx, res == AMF_OK, AVERROR_BUG, "QueryInterface(IID_AMFBuffer) failed with error %d\n", res);
+ 
+     avctx->extradata_size = (int)buffer->pVtbl->GetSize(buffer);
+@@ -293,6 +366,7 @@ static av_cold int amf_encode_init_hevc(
+ 
+     return 0;
+ }
++
+ static const FFCodecDefault defaults[] = {
+     { "refs",       "-1"  },
+     { "aspect",     "0"   },
+@@ -303,6 +377,7 @@ static const FFCodecDefault defaults[] =
+     { "qmax",       "-1"  },
+     { NULL                },
+ };
++
+ static const AVClass hevc_amf_class = {
+     .class_name = "hevc_amf",
+     .item_name = av_default_item_name,
+@@ -318,13 +393,13 @@ const FFCodec ff_hevc_amf_encoder = {
+     .init           = amf_encode_init_hevc,
+     FF_CODEC_RECEIVE_PACKET_CB(ff_amf_receive_packet),
+     .close          = ff_amf_encode_close,
+-    .priv_data_size = sizeof(AmfContext),
++    .priv_data_size = sizeof(AMFEncContext),
+     .p.priv_class   = &hevc_amf_class,
+     .defaults       = defaults,
+     .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HARDWARE |
+                       AV_CODEC_CAP_DR1,
+     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
+-    .p.pix_fmts     = ff_amf_pix_fmts,
++    .p.pix_fmts     = ff_amfenc_hevc_pix_fmts,
+     .p.wrapper_name = "amf",
+     .hw_configs     = ff_amfenc_hw_configs,
+ };

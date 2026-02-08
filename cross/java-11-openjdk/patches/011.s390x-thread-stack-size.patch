@@ -1,0 +1,48 @@
+--- a/src/hotspot/os_cpu/linux_zero/globals_linux_zero.hpp
++++ b/src/hotspot/os_cpu/linux_zero/globals_linux_zero.hpp
+@@ -34,7 +34,11 @@
+ define_pd_global(bool,  DontYieldALot,           false);
+ define_pd_global(intx,  ThreadStackSize,         1536);
+ #ifdef _LP64
++#if defined(PPC64) || defined(__s390x__)
++define_pd_global(intx,  VMThreadStackSize,       1600);
++#else
+ define_pd_global(intx,  VMThreadStackSize,       1024);
++#endif
+ #else
+ define_pd_global(intx,  VMThreadStackSize,       512);
+ #endif // _LP64
+--- a/make/autoconf/boot-jdk.m4
++++ b/make/autoconf/boot-jdk.m4
+@@ -431,6 +431,9 @@ AC_DEFUN_ONCE([BOOTJDK_SETUP_BOOT_JDK_AR
+   fi
+   ADD_JVM_ARG_IF_OK([-Xmx${JVM_MAX_HEAP}M],boot_jdk_jvmargs_big,[$JAVA])
+   ADD_JVM_ARG_IF_OK([-XX:ThreadStackSize=$STACK_SIZE],boot_jdk_jvmargs_big,[$JAVA])
++  if test "$VAR_CPU" = s390x; then
++    ADD_JVM_ARG_IF_OK([-Xss1600k],boot_jdk_jvmargs_big,[$JAVA])
++  fi
+ 
+   AC_MSG_RESULT([$boot_jdk_jvmargs_big])
+ 
+@@ -460,6 +463,9 @@ AC_DEFUN_ONCE([BOOTJDK_SETUP_BOOT_JDK_AR
+   ADD_JVM_ARG_IF_OK([-XX:+UseSerialGC],boot_jdk_jvmargs_small,[$JAVA])
+   ADD_JVM_ARG_IF_OK([-Xms32M],boot_jdk_jvmargs_small,[$JAVA])
+   ADD_JVM_ARG_IF_OK([-Xmx512M],boot_jdk_jvmargs_small,[$JAVA])
++  if test "$VAR_CPU" = s390x; then
++    ADD_JVM_ARG_IF_OK([-Xss1600k],boot_jdk_jvmargs_small,[$JAVA])
++  fi
+   ADD_JVM_ARG_IF_OK([-XX:TieredStopAtLevel=1],boot_jdk_jvmargs_small,[$JAVA])
+ 
+   AC_MSG_RESULT([$boot_jdk_jvmargs_small])
+--- a/make/autoconf/build-performance.m4
++++ b/make/autoconf/build-performance.m4
+@@ -443,6 +443,9 @@ AC_DEFUN_ONCE([BPERF_SETUP_SMART_JAVAC],
+     MX_VALUE=512
+   fi
+   ADD_JVM_ARG_IF_OK([-Xms${MS_VALUE}M -Xmx${MX_VALUE}M],SJAVAC_SERVER_JAVA_FLAGS,[$SJAVAC_SERVER_JAVA])
++  if test "$VAR_CPU" = s390x; then
++    ADD_JVM_ARG_IF_OK([-Xss1600k],SJAVAC_SERVER_JAVA_FLAGS,[$SJAVAC_SERVER_JAVA])
++  fi
+   AC_SUBST(SJAVAC_SERVER_JAVA_FLAGS)
+ 
+   AC_ARG_ENABLE([sjavac], [AS_HELP_STRING([--enable-sjavac],

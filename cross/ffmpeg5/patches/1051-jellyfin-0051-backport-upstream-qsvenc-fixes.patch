@@ -1,0 +1,223 @@
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
+===================================================================
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -963,7 +963,11 @@ static int init_video_param(AVCodecConte
+         q->extvsi.ColourDescriptionPresent = 1;
+         q->extvsi.ColourPrimaries = avctx->color_primaries;
+         q->extvsi.TransferCharacteristics = avctx->color_trc;
+-        q->extvsi.MatrixCoefficients = avctx->colorspace;
++        if (avctx->colorspace == AVCOL_SPC_RGB)
++            // RGB will be converted to YUV, so RGB colorspace is not supported
++            q->extvsi.MatrixCoefficients = AVCOL_SPC_UNSPECIFIED;
++        else
++            q->extvsi.MatrixCoefficients = avctx->colorspace;
+     }
+ 
+     if (q->extvsi.VideoFullRange || q->extvsi.ColourDescriptionPresent) {
+@@ -1473,6 +1477,120 @@ static int get_free_frame(QSVEncContext
+     return 0;
+ }
+ 
++static int qsvenc_fill_padding_area(AVFrame *frame, int new_w, int new_h)
++{
++    const AVPixFmtDescriptor *desc;
++    int max_step[4], filled[4] = { 0 };
++
++    desc = av_pix_fmt_desc_get(frame->format);
++    av_assert0(desc);
++    av_image_fill_max_pixsteps(max_step, NULL, desc);
++
++    for (int i = 0; i < desc->nb_components; i++) {
++        const AVComponentDescriptor *comp = &desc->comp[i];
++        int sheight, dheight, plane = comp->plane;
++        ptrdiff_t swidth = av_image_get_linesize(frame->format,
++                                                 frame->width,
++                                                 plane);
++        ptrdiff_t dwidth = av_image_get_linesize(frame->format,
++                                                 new_w,
++                                                 plane);
++
++        if (swidth < 0 || dwidth < 0) {
++            av_log(NULL, AV_LOG_ERROR, "av_image_get_linesize failed\n");
++            return AVERROR(EINVAL);
++        }
++
++        if (filled[plane])
++            continue;
++
++        sheight = frame->height;
++        dheight = new_h;
++
++        if (plane) {
++            sheight = AV_CEIL_RSHIFT(frame->height, desc->log2_chroma_h);
++            dheight = AV_CEIL_RSHIFT(new_h, desc->log2_chroma_h);
++        }
++
++        // Fill right padding
++        if (new_w > frame->width) {
++            for (int j = 0; j < sheight; j++) {
++                void *line_ptr = frame->data[plane] + j * frame->linesize[plane] + swidth;
++
++                av_memcpy_backptr(line_ptr,
++                                  max_step[plane],
++                                  new_w - frame->width);
++            }
++        }
++
++        // Fill bottom padding
++        for (int j = sheight; j < dheight; j++)
++            memcpy(frame->data[plane] + j * frame->linesize[plane],
++                   frame->data[plane] + (sheight - 1) * frame->linesize[plane],
++                   dwidth);
++
++        filled[plane] = 1;
++    }
++
++    return 0;
++}
++
++/* frame width / height have been aligned with the alignment */
++static int qsvenc_get_continuous_buffer(AVFrame *frame)
++{
++    int total_size;
++
++    switch (frame->format) {
++    case AV_PIX_FMT_NV12:
++        frame->linesize[0] = frame->width;
++        frame->linesize[1] = frame->linesize[0];
++        total_size = frame->linesize[0] * frame->height + frame->linesize[1] * frame->height / 2;
++        break;
++
++    case AV_PIX_FMT_P010:
++    case AV_PIX_FMT_P012:
++        frame->linesize[0] = 2 * frame->width;
++        frame->linesize[1] = frame->linesize[0];
++        total_size = frame->linesize[0] * frame->height + frame->linesize[1] * frame->height / 2;
++        break;
++
++    case AV_PIX_FMT_YUYV422:
++        frame->linesize[0] = 2 * frame->width;
++        frame->linesize[1] = 0;
++        total_size = frame->linesize[0] * frame->height;
++        break;
++
++    case AV_PIX_FMT_Y210:
++    case AV_PIX_FMT_0YUV:
++    case AV_PIX_FMT_Y410:
++    case AV_PIX_FMT_BGRA:
++    case AV_PIX_FMT_X2RGB10:
++        frame->linesize[0] = 4 * frame->width;
++        frame->linesize[1] = 0;
++        total_size = frame->linesize[0] * frame->height;
++        break;
++
++    default:
++        // This should never be reached
++        av_assert0(0);
++        return AVERROR(EINVAL);
++    }
++
++    frame->buf[0] = av_buffer_alloc(total_size);
++    if (!frame->buf[0])
++        return AVERROR(ENOMEM);
++
++    frame->data[0] = frame->buf[0]->data;
++    frame->extended_data = frame->data;
++
++    if (frame->format == AV_PIX_FMT_NV12 ||
++        frame->format == AV_PIX_FMT_P010 ||
++        frame->format == AV_PIX_FMT_P012)
++        frame->data[1] = frame->data[0] + frame->linesize[0] * frame->height;
++
++    return 0;
++}
++
+ static int submit_frame(QSVEncContext *q, const AVFrame *frame,
+                         QSVFrame **new_frame)
+ {
+@@ -1508,15 +1626,17 @@ static int submit_frame(QSVEncContext *q
+     } else {
+         /* make a copy if the input is not padded as libmfx requires */
+         /* and to make allocation continious for data[0]/data[1] */
+-         if ((frame->height & 31 || frame->linesize[0] & (q->width_align - 1)) ||
+-            (frame->data[1] - frame->data[0] != frame->linesize[0] * FFALIGN(qf->frame->height, q->height_align))) {
+-            qf->frame->height = FFALIGN(frame->height, q->height_align);
+-            qf->frame->width  = FFALIGN(frame->width, q->width_align);
++         if ((frame->height & (q->height_align - 1) || frame->linesize[0] & (q->width_align - 1)) ||
++            ((frame->format == AV_PIX_FMT_NV12 || frame->format == AV_PIX_FMT_P010 || frame->format == AV_PIX_FMT_P012) &&
++             (frame->data[1] - frame->data[0] != frame->linesize[0] * FFALIGN(qf->frame->height, q->height_align)))) {
++            int tmp_w, tmp_h;
++            qf->frame->height = tmp_h = FFALIGN(frame->height, q->height_align);
++            qf->frame->width  = tmp_w = FFALIGN(frame->width, q->width_align);
+ 
+             qf->frame->format = frame->format;
+ 
+             if (!qf->frame->data[0]) {
+-                ret = av_frame_get_buffer(qf->frame, q->width_align);
++                ret = qsvenc_get_continuous_buffer(qf->frame);
+                 if (ret < 0)
+                     return ret;
+             }
+@@ -1529,6 +1649,12 @@ static int submit_frame(QSVEncContext *q
+                 av_frame_unref(qf->frame);
+                 return ret;
+             }
++
++            ret = qsvenc_fill_padding_area(qf->frame, tmp_w, tmp_h);
++            if (ret < 0) {
++                av_frame_unref(qf->frame);
++                return ret;
++            }
+         } else {
+             av_frame_unref(qf->frame);
+             ret = av_frame_ref(qf->frame, frame);
+@@ -1770,8 +1896,8 @@ static int encode_frame(AVCodecContext *
+         pkt.bs->ExtParam = enc_buf;
+     }
+ 
+-    if (q->set_encode_ctrl_cb) {
+-        q->set_encode_ctrl_cb(avctx, frame, &qsv_frame->enc_ctrl);
++    if (q->set_encode_ctrl_cb && enc_ctrl) {
++        q->set_encode_ctrl_cb(avctx, frame, enc_ctrl);
+     }
+ 
+     if ((avctx->codec_id == AV_CODEC_ID_H264 ||
+@@ -1864,7 +1990,7 @@ int ff_qsv_encode(AVCodecContext *avctx,
+             pict_type = AV_PICTURE_TYPE_P;
+         else if (qpkt.bs->FrameType & MFX_FRAMETYPE_B || qpkt.bs->FrameType & MFX_FRAMETYPE_xB)
+             pict_type = AV_PICTURE_TYPE_B;
+-        else if (qpkt.bs->FrameType == MFX_FRAMETYPE_UNKNOWN) {
++        else if (qpkt.bs->FrameType == MFX_FRAMETYPE_UNKNOWN && qpkt.bs->DataLength) {
+             pict_type = AV_PICTURE_TYPE_NONE;
+             av_log(avctx, AV_LOG_WARNING, "Unknown FrameType, set pict_type to AV_PICTURE_TYPE_NONE.\n");
+         } else {
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -1413,7 +1413,7 @@ static int qsv_map_to(AVHWFramesContext
+         case AV_PIX_FMT_VAAPI:
+         {
+             mfxHDLPair *pair = (mfxHDLPair*)hwctx->surfaces[i].Data.MemId;
+-            if (*(VASurfaceID*)pair->first == (VASurfaceID)src->data[3]) {
++            if (*(VASurfaceID*)pair->first == (VASurfaceID)(uintptr_t)src->data[3]) {
+                 index = i;
+                 break;
+             }
+@@ -1689,6 +1689,15 @@ static int qsv_device_derive(AVHWDeviceC
+                              AVDictionary *opts, int flags)
+ {
+     mfxIMPL impl;
++    QSVDevicePriv *priv;
++
++    priv = av_mallocz(sizeof(*priv));
++    if (!priv)
++        return AVERROR(ENOMEM);
++
++    ctx->user_opaque = priv;
++    ctx->free = qsv_device_free;
++    
+     impl = choose_implementation("hw_any", child_device_ctx->type);
+     return qsv_device_derive_from_child(ctx, impl,
+                                         child_device_ctx, flags);

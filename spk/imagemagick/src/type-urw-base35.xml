@@ -1,0 +1,319 @@
+<?xml version="1.0"?>
+<typemap>
+
+  <type
+     format="type1"
+     name="NimbusSansNarrow"
+     fullname="Nimbus Sans Narrow Regular"
+     family="Nimbus Sans Narrow"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n019043l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n019043l.afm"
+     />
+
+  <type
+     format="type1"
+     name="Dingbats"
+     fullname="Dingbats"
+     family="Dingbats"
+     glyphs="/var/packages/imagemagick/target/share/fonts/d050000l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/d050000l.afm"
+     />
+
+  <type
+     format="type1"
+     name="PalladioURWB"
+     fullname="Palladio URW Bold"
+     family="Palladio URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/p052004l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/p052004l.afm"
+     />
+
+  <type
+     format="type1"
+     name="PalladioURWBI"
+     fullname="Palladio URW Bold Italic"
+     family="Palladio URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/p052024l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/p052024l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusRomanNo9"
+     fullname="Nimbus Roman No9 Regular"
+     family="Nimbus Roman No9"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n021003l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n021003l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusRomanNo9MI"
+     fullname="Nimbus Roman No9 Medium Italic"
+     family="Nimbus Roman No9"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n021024l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n021024l.afm"
+     />
+
+  <type
+     format="type1"
+     name="URWGothicDemi"
+     fullname="URW Gothic Demi"
+     family="URW Gothic"
+     glyphs="/var/packages/imagemagick/target/share/fonts/a010015l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/a010015l.afm"
+     />
+
+  <type
+     format="type1"
+     name="CenturySchoolBookURWI"
+     fullname="Century SchoolBook URW Italic"
+     family="Century SchoolBook URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/c059033l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/c059033l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusRomanNo9I"
+     fullname="Nimbus Roman No9 Regular Italic"
+     family="Nimbus Roman No9"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n021023l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n021023l.afm"
+     />
+
+  <type
+     format="type1"
+     name="BookmanURWDbI"
+     fullname="Bookman URW Demi Bold Italic"
+     family="Bookman URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/b018035l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/b018035l.afm"
+     />
+
+  <type
+     format="type1"
+     name="PalladioURWRoman"
+     fullname="Palladio URW Roman"
+     family="Palladio URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/p052003l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/p052003l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSansNarrowI"
+     fullname="Nimbus Sans Narrow Italic"
+     family="Nimbus Sans Narrow"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n019063l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n019063l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusMono"
+     fullname="Nimbus Mono Regular"
+     family="Nimbus Mono"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n022003l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n022003l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusMonoBOb"
+     fullname="Nimbus Mono Bold Oblique"
+     family="Nimbus Mono"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n022024l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n022024l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusMonoB"
+     fullname="Nimbus Mono Bold"
+     family="Nimbus Mono"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n022004l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n022004l.afm"
+     />
+
+  <type
+     format="type1"
+     name="PalladioURWI"
+     fullname="Palladio URW Italic"
+     family="Palladio URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/p052023l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/p052023l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSansNarrowBI"
+     fullname="Nimbus Sans Narrow Bold Italic"
+     family="Nimbus Sans Narrow"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n019064l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n019064l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSansB"
+     fullname="Nimbus Sans Bold"
+     family="Nimbus Sans"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n019004l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n019004l.afm"
+     />
+
+  <type
+     format="type1"
+     name="CenturySchoolBookURWBI"
+     fullname="Century SchoolBook URW Bold Italic"
+     family="Century SchoolBook URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/c059036l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/c059036l.afm"
+     />
+
+  <type
+     format="type1"
+     name="URWGothicBookOb"
+     fullname="URW Gothic Book Oblique"
+     family="URW Gothic"
+     glyphs="/var/packages/imagemagick/target/share/fonts/a010033l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/a010033l.afm"
+     />
+
+  <type
+     format="type1"
+     name="CenturySchoolBookURWRoman"
+     fullname="Century SchoolBook URW Roman"
+     family="Century SchoolBook URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/c059013l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/c059013l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSansBI"
+     fullname="Nimbus Sans Bold Italic"
+     family="Nimbus Sans"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n019024l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n019024l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSans"
+     fullname="Nimbus Sans Regular"
+     family="Nimbus Sans"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n019003l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n019003l.afm"
+     />
+
+  <type
+     format="type1"
+     name="StandardSymbols"
+     fullname="Standard Symbols"
+     family="Standard Symbols"
+     glyphs="/var/packages/imagemagick/target/share/fonts/s050000l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/s050000l.afm"
+     />
+
+  <type
+     format="type1"
+     name="URWGothicBook"
+     fullname="URW Gothic Book"
+     family="URW Gothic"
+     glyphs="/var/packages/imagemagick/target/share/fonts/a010013l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/a010013l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusRomanNo9M"
+     fullname="Nimbus Roman No9 Medium"
+     family="Nimbus Roman No9"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n021004l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n021004l.afm"
+     />
+
+  <type
+     format="type1"
+     name="CenturySchoolBookURWB"
+     fullname="Century SchoolBook URW Bold"
+     family="Century SchoolBook URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/c059016l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/c059016l.afm"
+     />
+
+  <type
+     format="type1"
+     name="ChanceryURWMI"
+     fullname="Chancery URW Medium Italic"
+     family="Chancery URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/z003034l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/z003034l.afm"
+     />
+
+  <type
+     format="type1"
+     name="BookmanURWDb"
+     fullname="Bookman URW Demi Bold"
+     family="Bookman URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/b018015l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/b018015l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSansI"
+     fullname="Nimbus Sans Regular Italic"
+     family="Nimbus Sans"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n019023l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n019023l.afm"
+     />
+
+  <type
+     format="type1"
+     name="URWGothicDo"
+     fullname="URW Gothic Demi Oblique"
+     family="URW Gothic"
+     glyphs="/var/packages/imagemagick/target/share/fonts/a010035l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/a010035l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSansNarrowB"
+     fullname="Nimbus Sans Narrow Bold"
+     family="Nimbus Sans Narrow"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n019044l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n019044l.afm"
+     />
+
+  <type
+     format="type1"
+     name="BookmanURWL"
+     fullname="Bookman URW Light"
+     family="Bookman URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/b018012l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/b018012l.afm"
+     />
+
+  <type
+     format="type1"
+     name="BookmanURWLI"
+     fullname="Bookman URW Light Italic"
+     family="Bookman URW"
+     glyphs="/var/packages/imagemagick/target/share/fonts/b018032l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/b018032l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusMonoOb"
+     fullname="Nimbus Mono Oblique"
+     family="Nimbus Mono"
+     glyphs="/var/packages/imagemagick/target/share/fonts/n022023l.pfb"
+     metrics="/var/packages/imagemagick/target/share/fonts/n022023l.afm"
+     />
+
+</typemap>

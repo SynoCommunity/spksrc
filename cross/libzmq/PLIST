@@ -1,0 +1,3 @@
+lnk:lib/libzmq.so
+lnk:lib/libzmq.so.5
+lib:lib/libzmq.so.5.2.5

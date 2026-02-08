@@ -1,0 +1,58 @@
+
+# Create links for cli binaries
+service_create_links ()
+{
+    for cmd in ${SPK_COMMANDS}
+    do
+        if [ -e "${SYNOPKG_PKGDEST}/${cmd}" ]; then
+            mkdir -p "$(dirname /usr/local/${cmd})"
+            echo "create link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"
+            ln -s "${SYNOPKG_PKGDEST}/${cmd}" "/usr/local/${cmd}"
+        fi
+    done
+
+    for item in ${SPK_USR_LOCAL_LINKS}
+    do
+        _target=$(echo ${item} | sed "s/.*://g")
+        _link=/usr/local/$(echo ${item} | sed "s/:.*//g")/${_target##*/}
+        if [ -e "${SYNOPKG_PKGDEST}/${_target}" ]; then
+            mkdir -p "$(dirname ${_link})"
+            echo "create link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"
+            ln -s "${SYNOPKG_PKGDEST}/${_target}" "${_link}"
+        fi
+    done
+}
+
+# Remove links created for cli binaries
+service_remove_links ()
+{
+    for cmd in ${SPK_COMMANDS}
+    do
+        if [ -L "/usr/local/${cmd}" ]; then
+            if [ "$(readlink /usr/local/${cmd})" == "${SYNOPKG_PKGDEST}/${cmd}" ]; then
+                echo "remove link: /usr/local/${cmd} -> ${SYNOPKG_PKGDEST}/${cmd}"
+                rm -f "/usr/local/${cmd}"
+            else
+                echo "skip remove link: /usr/local/${cmd} -> $(readlink /usr/local/${cmd})"
+            fi
+        else
+           echo "link to remove not found: /usr/local/${cmd}"
+        fi
+    done
+
+    for item in ${SPK_USR_LOCAL_LINKS}
+    do
+        _target=$(echo ${item} | sed "s/.*://g")
+        _link=/usr/local/$(echo ${item} | sed "s/:.*//g")/${_target##*/}
+        if [ -L "${_link}" ]; then
+            if [ "$(readlink ${_link})" == "${SYNOPKG_PKGDEST}/${_target}" ]; then
+                echo "remove link: ${_link} -> ${SYNOPKG_PKGDEST}/${_target}"
+                rm -f "${_link}"
+            else
+                echo "skip remove link: ${_link} -> $(readlink ${_link})"
+            fi
+        else
+           echo "link to remove not found: ${_link}"
+        fi
+    done
+}

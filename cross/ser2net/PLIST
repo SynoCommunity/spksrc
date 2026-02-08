@@ -1,0 +1,2 @@
+bin:sbin/ser2net
+rsc:etc/ser2net.yaml

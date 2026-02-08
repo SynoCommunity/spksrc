@@ -1,0 +1,111 @@
+diff -uprN ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c ./fftools/ffmpeg_opt.c
+--- ../ffmpeg-4.2.2-patch060-NEW/fftools/ffmpeg_opt.c	2019-12-31 16:35:22.000000000 -0500
++++ ./fftools/ffmpeg_opt.c	2020-02-29 08:06:28.499961361 -0500
+@@ -43,6 +43,12 @@
+ 
+ #define DEFAULT_PASS_LOGFILENAME_PREFIX "ffmpeg2pass"
+ 
++#include "synoconfig.h"
++
++#ifdef SYNO_DTV_SKIP_UNKNOWN_TRACK
++#include <strings.h>
++#endif
++
+ #define MATCH_PER_STREAM_OPT(name, type, outvar, fmtctx, st)\
+ {\
+     int i, ret;\
+@@ -107,11 +113,18 @@ int qp_hist           = 0;
+ int stdin_interaction = 1;
+ int frame_bits_per_raw_sample = 0;
+ float max_error_rate  = 2.0/3;
++
++#ifdef SYNO_DTV_SKIP_UNKNOWN_TRACK
++int dtv_skip_unknown = 0;
++#endif
++#ifdef SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
++int dtv_skip_visual_impaired = 0;
++#endif
++
+ int filter_nbthreads = 0;
+ int filter_complex_nbthreads = 0;
+ int vstats_version = 2;
+ 
+-
+ static int intra_only         = 0;
+ static int file_overwrite     = 0;
+ static int no_file_overwrite  = 0;
+@@ -310,7 +323,6 @@ static int opt_map(void *optctx, const c
+         }
+     }
+ 
+-
+     if (map[0] == '[') {
+         /* this mapping refers to lavfi output */
+         const char *c = map + 1;
+@@ -344,6 +356,27 @@ static int opt_map(void *optctx, const c
+                 if (check_stream_specifier(input_files[file_idx]->ctx, input_files[file_idx]->ctx->streams[i],
+                             *p == ':' ? p + 1 : p) <= 0)
+                     continue;
++#ifdef SYNO_DTV_SKIP_UNKNOWN_TRACK
++                               if (dtv_skip_unknown) {
++                                       char buf[256];
++                                       AVStream *st = input_files[file_idx]->ctx->streams[i];
++                                       avcodec_string(buf, sizeof(buf), st->codec, 0);
++                                       if (!strncasecmp(buf, "unknown", 7)) {
++                                               continue;
++                                       }
++                                       if (strstr(buf, "0 channels") != NULL) {
++                                               continue;
++                                       }
++                               }
++#endif
++#ifdef SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
++                               if (dtv_skip_visual_impaired) {
++                                       AVStream *st = input_files[file_idx]->ctx->streams[i];
++                                       if (st->disposition & AV_DISPOSITION_VISUAL_IMPAIRED) {
++                                               continue;
++                                       }
++                               }
++#endif
+                 if (input_streams[input_files[file_idx]->ist_index + i]->user_set_discard == AVDISCARD_ALL) {
+                     disabled = 1;
+                     continue;
+@@ -3407,6 +3439,15 @@ static int opt_progress(void *optctx, co
+ const OptionDef options[] = {
+     /* main options */
+     CMDUTILS_COMMON_OPTIONS
++#ifdef SYNO_DTV_SKIP_UNKNOWN_TRACK
++    { "dtv_skip_unknown",        OPT_BOOL,                                    {              &dtv_skip_unknown},
++        "skip unknown codec track during dtv streaming" },
++#endif
++#ifdef SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
++    { "dtv_skip_visual_impaired",        OPT_BOOL,                   {              &dtv_skip_visual_impaired },
++        "skip visual impaired track during dtv streaming" },
++#endif
++
+     { "f",              HAS_ARG | OPT_STRING | OPT_OFFSET |
+                         OPT_INPUT | OPT_OUTPUT,                      { .off       = OFFSET(format) },
+         "force format", "fmt" },
+diff -uprN ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h	2020-02-25 18:55:30.000000000 -0500
++++ ./synoconfig.h	2020-02-29 08:06:28.505961834 -0500
+@@ -95,3 +95,19 @@
+ #if defined(SYNO_VIDEOSTATION)
+ #define SYNO_DTV_MPEGTS_DVBSUB_ENCODING
+ #endif
++ 
++/* Add skip unknown track config to support dtv streaming with unknown codec track.
++ * add flag "-dtv_skip_unknown" to skip unknown tracks.
++ * See Video Station #2470
++ */
++#if defined(SYNO_VIDEOSTATION)
++#define SYNO_DTV_SKIP_UNKNOWN_TRACK
++#endif
++
++/* Add skip visual impaired track config to support dtv streaming with visual impaired track.
++ * add flag "-dtv_skip_visual_impaired" to skip visual impaired tracks.
++ * See Video Station #2525
++ */
++#if defined(SYNO_VIDEOSTATION)
++#define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
++#endif

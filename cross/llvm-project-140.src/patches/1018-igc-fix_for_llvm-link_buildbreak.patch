@@ -1,0 +1,20 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2021 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+#    Description                  : Fix build break for building llvm-link
+
+--- a/llvm/tools/llvm-link/CMakeLists.txt
++++ b/llvm/tools/llvm-link/CMakeLists.txt
+@@ -8,6 +8,7 @@ set(LLVM_LINK_COMPONENTS
+   Support
+   TransformUtils
+   IPO
++  Demangle
+   )
+ 
+ add_llvm_tool(llvm-link

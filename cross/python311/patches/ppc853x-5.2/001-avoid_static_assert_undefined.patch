@@ -1,0 +1,16 @@
+# gcc 4.3.2 is lacking static_assert for c code (available for c++ code only).
+# 
+# Since static_assert acts at compile time only, it does not affect the runtime
+# behaviour when omitting the implementation.
+# 
+--- Include/pymacro.h.orig	2023-08-24 12:09:18.000000000 +0000
++++ Include/pymacro.h	2024-03-02 18:15:00.033365138 +0000
+@@ -21,6 +21,8 @@
+      && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L \
+      && __STDC_VERSION__ <= 201710L
+ #  define static_assert _Static_assert
++#else
++#  define static_assert
+ #endif
+ 
+ /* Minimum value between x and y */

@@ -1,0 +1,4 @@
+bin:bin/lsusb
+rsc:bin/lsusb.py
+rsc:bin/usb-devices
+bin:bin/usbhid-dump

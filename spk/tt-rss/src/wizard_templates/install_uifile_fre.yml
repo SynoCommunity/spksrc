@@ -1,0 +1,13 @@
+DB_CONFIGURATION_TITLE:             Configuration de la base de donnée de tt-rss
+ENTER_MYSQL_PASSWORD:               Saisissez votre mot de passe MySQL.
+ROOT_PASSWORD_DESCRIPTION:          Mot de passe Root
+ENTER_TT-RSS_PASSWORD:              Un utilisateur et une base de donnée MySQL 'ttrss' vont être créés. Saisissez un mot de passe pour l'utilisateur 'ttrss'.
+TT-RSS_PASSWORD_DESCRIPTION:        Mot de passe Ttrss
+INVALID_TT-RSS_PASSWORD:            "Mot de passe invalide. Assurez-vous qu'il comprend au moins une lettre majuscule, une lettre minuscule, un chiffre, un caractère spécial et qu'il a une longueur minimale de 10 caractères."
+TT-RSS_CONFIGURATION_TITLE:         Tt-rss configuration
+DOMAIN_NAME_SECTION_LABEL:          "Nom de domaine de votre DiskStation. Par exemple : vous.synology.me."
+DOMAIN_NAME_INPUT_LABEL:            Nom de domaine
+SINGLE_USER_SECTION_LABEL:          Activer le mode utilisateur unique. Si vous n'activez pas ce mode, l'utilisateur par défaut est 'admin' avec le mot de passe 'password'.
+SINGLE_USER_CHECKBOX_LABEL:         Utilisateur unique
+PHP_PROFILES_TITLE:                 Plusieurs profils PHP
+PHP_PROFILES_DESCRIPTION:           "Attention : Plusieurs profils PHP détectés ; la page Web du package ne s'affichera pas tant qu'un redémarrage de DSM n'aura pas été effectué pour charger de nouvelles configurations."

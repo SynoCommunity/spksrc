@@ -1,0 +1,2 @@
+bin:bin/qemu-ga
+bin:libexec/qemu-bridge-helper

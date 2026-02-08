@@ -1,0 +1,14 @@
+# Remove default env flags
+--- configure.orig	2023-01-23 11:29:16.000000000 +0000
++++ configure	2023-09-06 20:43:45.749507150 +0000
+@@ -21,10 +21,6 @@
+ datarootdir='$(prefix)/share'
+ infodir='$(datarootdir)/info'
+ mandir='$(datarootdir)/man'
+-CXX=g++
+-CPPFLAGS=
+-CXXFLAGS='-Wall -W -O2'
+-LDFLAGS=
+ MAKEINFO=makeinfo
+ 
+ # checking whether we are using GNU C++.

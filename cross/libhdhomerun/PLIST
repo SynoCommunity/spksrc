@@ -1,0 +1,2 @@
+bin:bin/hdhomerun_config
+lib:lib/libhdhomerun.so

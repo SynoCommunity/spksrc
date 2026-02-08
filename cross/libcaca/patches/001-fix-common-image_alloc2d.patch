@@ -1,0 +1,11 @@
+--- src/common-image.c-orig	2021-10-19 13:58:30.000000000 +0000
++++ src/common-image.c	2025-11-20 01:03:40.952965116 +0000
+@@ -161,7 +161,7 @@ struct image * load_image(char const * n
+     uint32_t depth = (bpp + 7) / 8;
+ 
+     /* Allocate the pixel buffer */
+-    im->pixels = _caca_alloc2d(im->w, im->h, depth);
++    im->pixels = malloc(im->w * im->h * depth);
+     if (!im->pixels)
+     {
+         caca_file_close(f);

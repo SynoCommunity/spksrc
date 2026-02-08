@@ -1,0 +1,11 @@
+[{
+	"step_title": "Mettre à jour Sonarr",
+	"items": [{
+		"desc": "Au premier démarrage de Sonarr cela peut prendre un moment avant que l'interface ne soit disponible !<br><br>Garder Sonarr à jour en utilisant System>Updates dans l'interface Sonarr."
+	}]
+}, {
+	"step_title": "Permissions DSM",
+	"items": [{
+		"desc": "Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+	}]
+}]

@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "com.synocommunity.packages.cops": {
+            "allUsers": true,
+            "desc": "Calibre OPDS (and HTML) PHP Server : light alternative to Calibre content server / Calibre2OPDS",
+            "icon": "images/cops-{0}.png",
+            "port": "80",
+            "protocol": "http",
+            "title": "COPS",
+            "type": "url",
+            "url": "/cops"
+        }
+    }
+}

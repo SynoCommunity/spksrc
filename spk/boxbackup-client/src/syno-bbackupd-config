@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+use strict;
+
+sub error_print_usage
+{
+	print <<__E;
+
+Wrapper for bbackupd-config.
+
+Bad command line parameters.
+Usage:
+    syno-bbackupd-config backup-mode account-num server-hostname [backup directories]
+
+See:
+    bbackupd-config
+
+__E
+	print "=========\nERROR:\n",$_[0],"\n\n" if $_[0] ne '';
+	exit(1);
+}
+
+# check and get command line parameters
+if($#ARGV < 2)
+{
+	error_print_usage();
+}
+
+# command line parameters
+my ($backup_mode,$account_num,$server,@tobackup) = @ARGV;
+
+# default parameters for Synology
+my $path = "/usr/local/boxbackup-client/bin:/usr/local/boxbackup-client/sbin";
+my $config_dir = "/usr/local/boxbackup-client/var";
+my $working_dir = "/usr/local/boxbackup-client/var/run";
+
+$ENV{PATH} = "$path:$ENV{PATH}";
+exec "/usr/local/boxbackup-client/sbin/bbackupd-config", $config_dir, $backup_mode, $account_num, $server, $working_dir, @tobackup;
+

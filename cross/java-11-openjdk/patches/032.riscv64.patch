@@ -1,0 +1,129 @@
+# HG changeset patch
+# User enevill
+# Date 1521985117 -3600
+#      Sun Mar 25 14:38:37 2018 +0100
+# Node ID 7d1ae835ef5194e7ae5b56b51f944029fe602d11
+# Parent  1b1de4b263c81853719f6bb0385fe23bc4e35f6c
+8199138: Add RISC-V support to Zero
+Reviewed-by: aph, erikj, ehelin, ihse
+
+--- a/make/autoconf/build-aux/config.guess
++++ b/make/autoconf/build-aux/config.guess
+@@ -27,6 +27,13 @@
+ # autoconf system (which might easily get lost in a future update), we wrap it
+ # and fix the broken property, if needed.
+ 
++machine=`(uname -m) 2>/dev/null` || UNAME_MACHINE=unknown
++if test $machine = riscv64; then
++  # This is all we need to know for riscv64
++  echo riscv64-unknown-linux-gnu
++  exit
++fi
++
+ DIR=`dirname $0`
+ OUT=`. $DIR/autoconf-config.guess`
+ 
+--- a/make/autoconf/build-aux/config.sub
++++ b/make/autoconf/build-aux/config.sub
+@@ -29,8 +29,8 @@
+ 
+ DIR=`dirname $0`
+ 
+-# First, filter out everything that doesn't begin with "aarch64-"
+-if ! echo $* | grep '^aarch64-' >/dev/null ; then
++# First, filter out everything that doesn't begin with "aarch64-" or "riscv64-"
++if ! echo $* | grep '^aarch64-\|^riscv64-' >/dev/null ; then
+     . $DIR/autoconf-config.sub "$@"
+     # autoconf-config.sub exits, so we never reach here, but just in
+     # case we do:
+@@ -45,6 +45,10 @@ while test $# -gt 0 ; do
+             config=`echo $1 | sed 's/^aarch64-/arm-/'`
+             sub_args="$sub_args $config"
+             shift; ;;
++        riscv64-* )
++            config=`echo $1 | sed 's/^riscv64-/x86-/'`
++            sub_args="$sub_args $config"
++            shift; ;;
+         - )    # Use stdin as input.
+             sub_args="$sub_args $1"
+             shift; break ;;
+@@ -57,7 +61,7 @@ done
+ result=`. $DIR/autoconf-config.sub $sub_args "$@"`
+ exitcode=$?
+ 
+-result=`echo $result | sed "s/^arm-/aarch64-/"`
++result=`echo $result | sed "s/^arm-/aarch64-/" | sed "s/^x86-/riscv64-/"`
+ 
+ echo $result
+ exit $exitcode
+--- a/make/autoconf/platform.m4
++++ b/make/autoconf/platform.m4
+@@ -118,6 +118,12 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU
+       VAR_CPU_BITS=64
+       VAR_CPU_ENDIAN=little
+       ;;
++    riscv64)
++      VAR_CPU=riscv64
++      VAR_CPU_ARCH=riscv64
++      VAR_CPU_BITS=64
++      VAR_CPU_ENDIAN=little
++      ;;
+     s390)
+       VAR_CPU=s390
+       VAR_CPU_ARCH=s390
+@@ -475,6 +481,8 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS_HEL
+     HOTSPOT_$1_CPU_DEFINE=SPARC
+   elif test "x$OPENJDK_$1_CPU" = xppc; then
+     HOTSPOT_$1_CPU_DEFINE=PPC32
++  elif test "x$OPENJDK_$1_CPU" = xriscv64; then
++    HOTSPOT_$1_CPU_DEFINE=RISCV64
+   elif test "x$OPENJDK_$1_CPU" = xs390; then
+     HOTSPOT_$1_CPU_DEFINE=S390
+   elif test "x$OPENJDK_$1_CPU" = xs390x; then
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -1829,6 +1829,9 @@ void * os::dll_load(const char *filename
+ #ifndef EM_AARCH64
+   #define EM_AARCH64    183               /* ARM AARCH64 */
+ #endif
++#ifndef EM_RISCV                          /* RISCV */
++  #define EM_RISCV      243
++#endif
+ 
+   static const arch_t arch_array[]={
+     {EM_386,         EM_386,     ELFCLASS32, ELFDATA2LSB, (char*)"IA 32"},
+@@ -1854,6 +1857,7 @@ void * os::dll_load(const char *filename
+     {EM_PARISC,      EM_PARISC,  ELFCLASS32, ELFDATA2MSB, (char*)"PARISC"},
+     {EM_68K,         EM_68K,     ELFCLASS32, ELFDATA2MSB, (char*)"M68k"},
+     {EM_AARCH64,     EM_AARCH64, ELFCLASS64, ELFDATA2LSB, (char*)"AARCH64"},
++    {EM_RISCV,       EM_RISCV,   ELFCLASS64, ELFDATA2LSB, (char*)"RISCV"},
+   };
+ 
+ #if  (defined IA32)
+@@ -1870,6 +1874,8 @@ void * os::dll_load(const char *filename
+   static  Elf32_Half running_arch_code=EM_PPC64;
+ #elif  (defined __powerpc__)
+   static  Elf32_Half running_arch_code=EM_PPC;
++#elif  (defined RISCV)
++  static  Elf32_Half running_arch_code=EM_RISCV;
+ #elif  (defined AARCH64)
+   static  Elf32_Half running_arch_code=EM_AARCH64;
+ #elif  (defined ARM)
+@@ -1890,7 +1896,7 @@ void * os::dll_load(const char *filename
+   static  Elf32_Half running_arch_code=EM_SH;
+ #else
+     #error Method os::dll_load requires that one of following is defined:\
+-        AARCH64, ALPHA, ARM, AMD64, IA32, IA64, M68K, MIPS, MIPSEL, PARISC, __powerpc__, __powerpc64__, S390, SH, __sparc
++        AARCH64, ALPHA, ARM, AMD64, IA32, IA64, M68K, MIPS, MIPSEL, PARISC, __powerpc__, __powerpc64__, S390, SH, __sparc, RISCV
+ #endif
+ 
+   // Identify compatability class for VM's architecture and library's architecture
+@@ -2600,6 +2606,8 @@ void os::get_summary_cpu_info(char* cpui
+   strncpy(cpuinfo, "IA64", length);
+ #elif defined(PPC)
+   strncpy(cpuinfo, "PPC64", length);
++#elif defined(RISCV)
++  strncpy(cpuinfo, "RISCV", length);
+ #elif defined(S390)
+   strncpy(cpuinfo, "S390", length);
+ #elif defined(SPARC)

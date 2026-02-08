@@ -1,0 +1,15 @@
+# HotSpot code is licensed under GPLv2
+# JDK library code is licensed under GPLv2 with the Classpath exception
+# The Apache license is used in code taken from Apache projects (primarily xalan & xerces)
+# DOM levels 2 & 3 and the XML digital signature schemas are licensed under the W3C Software License
+# The JSR166 concurrency code is in the public domain
+# The BSD and MIT licenses are used for a number of third-party libraries (see ADDITIONAL_LICENSE_INFO)
+# The OpenJDK source tree includes:
+# - JPEG library (IJG), zlib & libpng (zlib), giflib (MIT), harfbuzz (ISC),
+# - freetype (FTL), jline (BSD) and LCMS (MIT)
+# - jquery (MIT), jdk.crypto.cryptoki PKCS 11 wrapper (RSA)
+# - public_suffix_list.dat from publicsuffix.org (MPLv2.0)
+# The test code includes copies of NSS under the Mozilla Public License v2.0
+# The PCSClite headers are under a BSD with advertising license
+# The elliptic curve cryptography (ECC) source code is licensed under the LGPLv2.1 or any later version
+

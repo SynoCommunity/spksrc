@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.plexivity": {
+            "title": "plexivity",
+            "desc": "plexivity Web UI",
+            "icon": "images/plexivity-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "6060",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

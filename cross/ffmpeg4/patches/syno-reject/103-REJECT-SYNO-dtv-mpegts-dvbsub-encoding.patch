@@ -1,0 +1,66 @@
+diff -uprN ../ffmpeg-4.2.2-patch060-NEW/libavcodec/dvbsub.c ./libavcodec/dvbsub.c
+--- ../ffmpeg-4.2.2-patch060-NEW/libavcodec/dvbsub.c	2019-12-31 16:35:23.000000000 -0500
++++ ./libavcodec/dvbsub.c	2020-02-29 07:36:49.807271036 -0500
+@@ -22,6 +22,8 @@
+ #include "bytestream.h"
+ #include "libavutil/colorspace.h"
+ 
++#include "synoconfig.h"
++
+ typedef struct DVBSubtitleContext {
+     int object_version;
+ } DVBSubtitleContext;
+@@ -254,7 +256,6 @@ static int encode_dvb_subtitles(AVCodecC
+     uint8_t *q, *pseg_len;
+     int page_id, region_id, clut_id, object_id, i, bpp_index, page_state;
+ 
+-
+     q = outbuf;
+ 
+     page_id = 1;
+@@ -275,6 +276,10 @@ static int encode_dvb_subtitles(AVCodecC
+         bytestream_put_be16(&pseg_len, q - pseg_len - 2);
+     }
+ 
++#ifndef SYNO_DTV_MPEGTS_DVBSUB_ENCODING
++    *q++ = 0x00; /* subtitle_stream_id */
++#endif
++
+     /* page composition segment */
+ 
+     *q++ = 0x0f; /* sync_byte */
+@@ -314,7 +319,6 @@ static int encode_dvb_subtitles(AVCodecC
+                 return -1;
+             }
+ 
+-
+             /* CLUT segment */
+             *q++ = 0x0f; /* sync byte */
+             *q++ = 0x12; /* CLUT definition segment */
+@@ -452,6 +456,10 @@ static int encode_dvb_subtitles(AVCodecC
+ 
+     bytestream_put_be16(&pseg_len, q - pseg_len - 2);
+ 
++#ifndef SYNO_DTV_MPEGTS_DVBSUB_ENCODING
++    *q++ = 0xff; /* end of PES data */
++#endif
++
+     s->object_version = (s->object_version + 1) & 0xf;
+     return q - outbuf;
+ }
+diff -uprN ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch060-NEW/synoconfig.h	2020-02-29 07:40:39.603065849 -0500
++++ ./synoconfig.h	2020-02-29 07:44:27.704735528 -0500
+@@ -86,3 +86,12 @@
+  * See Audio Station #1013
+  */
+ #define SYNO_SKIP_FLAC_PARSE_PICTURE
++ 
++/* Add patch to fix mpegts dvbsub encoding
++ * https://trac.ffmpeg.org/ticket/2024
++ * https://github.com/FFmpeg/FFmpeg/commit/c917cde9cc52ad1ca89926a617f847bc9861d5a0add
++ * See Video Station #2500
++ */
++#if defined(SYNO_VIDEOSTATION)
++#define SYNO_DTV_MPEGTS_DVBSUB_ENCODING
++#endif

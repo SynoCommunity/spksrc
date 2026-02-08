@@ -1,0 +1,14 @@
+# avoid build of examples in doc directory
+# - examples are statically linked but we don't want to build the static library
+# 
+--- Makefile.in.orig	2024-08-21 20:55:45.000000000 +0000
++++ Makefile.in	2025-01-31 21:17:57.328622772 +0000
+@@ -338,7 +338,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-SUBDIRS = src doc
++SUBDIRS = src
+ dist_noinst_DATA = INSTALL README THANKS AUTHORS COPYING COPYING.LESSER
+ all: config.h
+ 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

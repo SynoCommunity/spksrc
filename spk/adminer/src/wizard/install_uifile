@@ -1,0 +1,28 @@
+[{
+    "step_title": "Configure network(s) to access Adminer",
+    "items": [{
+        "type": "textfield",
+        "desc": "Configure networks for clients that are allowed to access Adminer on this DiskStation. Choose one ore multiple networks of the format <strong>[ip_addr][ip_mask]</strong> separated by space.",
+        "subitems": [{
+            "key": "wizard_htaccess_allowed_from",
+            "desc": "Allowed networks",
+            "defaultValue": "192.168.0.0/16 172.16.0.0/12 10.0.0.0/8",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[0-9 \\.\\\/]*$/",
+                "errorText": "invalid network definition"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }, {
+    "step_title": "PHP Extensions",
+    "items": [{
+        "desc": "On DSM &lt; 7 you have to activate the following PHP extensions in the default PHP profile:<br/>mysqli, pgsql, pdo_mysql, pdo_pgsql, pdo_dblib, pdo_sqlite."
+      }
+    ]
+  }
+]

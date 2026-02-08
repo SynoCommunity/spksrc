@@ -1,0 +1,20 @@
+Make failing to load the Java ATK wrapper non-fatal
+
+---
+ src/java.desktop/share/classes/java/awt/Toolkit.java |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/src/java.desktop/share/classes/java/awt/Toolkit.java
++++ b/src/java.desktop/share/classes/java/awt/Toolkit.java
+@@ -602,7 +602,11 @@ public abstract class Toolkit {
+                 toolkit = new HeadlessToolkit(toolkit);
+             }
+             if (!GraphicsEnvironment.isHeadless()) {
++              try {
+                 loadAssistiveTechnologies();
++              } catch (java.awt.AWTError e) {
++                // too bad
++              }
+             }
+         }
+         return toolkit;

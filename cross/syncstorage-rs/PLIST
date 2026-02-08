@@ -1,0 +1,4 @@
+bin:bin/syncserver
+rsc:tools/
+rsc:syncstorage-mysql/
+rsc:tokenserver-db/

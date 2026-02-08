@@ -1,0 +1,13 @@
+# use -std=gnu99 that works for older compilers too.
+# 
+--- Makefile.orig	2023-08-27 01:12:34.000000000 +0000
++++ Makefile	2023-09-19 20:37:23.480268500 +0000
+@@ -38,7 +38,7 @@
+ # Configuration section
+ COMPILER_OPTIONS = -Wall -Wwrite-strings -Wcast-align -Wstrict-aliasing -Wstrict-prototypes -Wpointer-arith -Wundef
+ COMPILER_OPTIONS += -Wshadow -Wfloat-equal -Waggregate-return -Wcast-qual -Wswitch-default -Wswitch-enum -Wunreachable-code -Wformat=2
+-COMPILER_OPTIONS += -std=gnu11 -D_FILE_OFFSET_BITS=64 -fstrict-aliasing -pipe
++COMPILER_OPTIONS += -std=gnu99 -D_FILE_OFFSET_BITS=64 -fstrict-aliasing -pipe
+ COMPILER_OPTIONS += -DNO_ATIME
+ 
+ # Remove unused code if requested

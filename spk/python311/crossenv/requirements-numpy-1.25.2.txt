@@ -1,0 +1,9 @@
+pip==23.2.1
+setuptools==59.8.0
+wheel==0.41.2
+#
+build:Cython==0.29.36
+build:meson-python==0.17.1
+build:scikit-build==0.18.1
+build:scikit-build-core==0.10.7
+build:setuptools-scm==8.1.0

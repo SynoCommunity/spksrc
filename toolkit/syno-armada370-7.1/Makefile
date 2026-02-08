@@ -1,0 +1,7 @@
+TK_ARCH = armada370
+TK_VERS = 7.1
+
+TK_TARGET = arm-unknown-linux-gnueabi
+TK_SYSROOT = sysroot
+
+include ../../mk/spksrc.toolkit.mk

@@ -1,0 +1,10 @@
+[{
+    "step_title": "Aktualizacja Gitea",
+    "items": [{
+        "desc": "Uwaga: plik konfiguracyjny może wymagać manualnego dopasowania."
+    },{
+        "desc": "Po aktualizacji sprawdź panel administracyjny Gitea i edytuj plik <b>/var/packages/gitea/var/conf.ini</b> według potrzeb."
+    },{
+        "desc": "Pamiętaj, aby po zmianach ponownie uruchomić pakiet Gitea."
+    }]
+}]

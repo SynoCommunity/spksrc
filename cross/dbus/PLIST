@@ -1,0 +1,3 @@
+lnk:lib/libdbus-1.so
+lnk:lib/libdbus-1.so.3
+lib:lib/libdbus-1.so.3.31.0

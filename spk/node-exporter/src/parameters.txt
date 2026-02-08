@@ -1,0 +1,16 @@
+# node_exporter parameters
+# ------------------------
+# 
+# Every line without a leading # is added as paramter to node_exporter
+# 
+# To list all available parameters call:
+# /var/packages/node-exporter/target/bin/node_exporter --help
+#
+# To activate changes in this file, you need to restart (i.e. stop and start) 
+# node-exporter service in the DSM Package Center.
+# 
+# examples:
+# --collector.disable-defaults
+# --collector.network_route
+# --collector.textfile.directory='/tmp/prom'
+#

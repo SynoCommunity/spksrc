@@ -1,0 +1,12 @@
+Fix finding the Java ATK wrapper, see #900912
+
+--- a/src/hotspot/os/linux/os_linux.cpp
++++ b/src/hotspot/os/linux/os_linux.cpp
+@@ -454,6 +454,7 @@ void os::init_system_properties_values()
+     }
+     Arguments::set_java_home(buf);
+     set_boot_path('/', ':');
++    Arguments::append_sysclasspath("/usr/share/java/java-atk-wrapper.jar");
+   }
+ 
+   // Where to look for native libraries.

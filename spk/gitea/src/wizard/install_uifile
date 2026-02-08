@@ -1,0 +1,31 @@
+[
+    {
+        "step_title": "Gitea configuration",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Please specify a shared folder for this package. This share is created at installation when it does not already exist.",
+                "subitems": [
+                    {
+                        "key": "wizard_shared_folder_name",
+                        "desc": "Shared Folder",
+                        "defaultValue": "gitea-share",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[\\w _-]+$/",
+                                "errorText": "Subdirectories are not supported."              
+                            }
+                        }
+                    }
+                ]
+                }, {
+                    "desc": "If you let the installer create the shared folder, it is created under the same volume as the package is installed. If you want to use a different volume for the share, you must create the shared folder in DSM Control Panel before, and enter the name of the existing share in the field above."
+                }, {
+                    "desc": ""
+                }, {
+                    "desc": "This package runs as internal service user <b>'sc-gitea'</b> in DSM. The shared folder above is configured at installation time to be accessible by this user. Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+                }
+        ]
+    }
+]

@@ -1,0 +1,23 @@
+# enable build of shared libs when cross compiling
+# enable 64-bit support as gcc of all toolchains support "long long" type
+# 
+--- configure.orig	2008-05-23 08:18:03.000000000 +0000
++++ configure	2022-10-22 08:19:17.280203269 +0000
+@@ -1595,7 +1595,7 @@
+   echo $ac_n "(cached) $ac_c" 1>&6
+ else
+   if test "$cross_compiling" = yes; then
+-  ac_cv_sizeof_long_long=0
++  ac_cv_sizeof_long_long=8
+ else
+   cat > conftest.$ac_ext <<EOF
+ #line 1602 "configure"
+@@ -3291,7 +3291,7 @@
+   echo $ac_n "(cached) $ac_c" 1>&6
+ else
+   if test "$cross_compiling" = yes; then
+-  mr_cv_target_elf=no
++  mr_cv_target_elf=yes
+ else
+   cat > conftest.$ac_ext <<EOF
+ #line 3298 "configure"

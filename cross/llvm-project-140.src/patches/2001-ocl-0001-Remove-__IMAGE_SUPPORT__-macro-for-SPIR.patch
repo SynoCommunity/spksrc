@@ -1,0 +1,61 @@
+From 1ca45b5f5725a447ded14c0096df39f2751c4e9a Mon Sep 17 00:00:00 2001
+From: Haonan Yang <haonan.yang@intel.com>
+Date: Fri, 25 Feb 2022 10:36:57 +0800
+Subject: [PATCH] Remove __IMAGE_SUPPORT__ macro for SPIR
+
+Signed-off-by: Haonan Yang <haonan.yang@intel.com>
+---
+ clang/lib/Frontend/InitPreprocessor.cpp     | 3 ---
+ clang/test/Preprocessor/predefined-macros.c | 4 ----
+ 2 files changed, 7 deletions(-)
+
+diff --git a/clang/lib/Frontend/InitPreprocessor.cpp b/clang/lib/Frontend/InitPreprocessor.cpp
+index e259ab47c558..0bfdd62f17a2 100644
+--- a/clang/lib/Frontend/InitPreprocessor.cpp
++++ b/clang/lib/Frontend/InitPreprocessor.cpp
+@@ -1234,9 +1234,6 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
+   // OpenCL definitions.
+   if (LangOpts.OpenCL) {
+     InitializeOpenCLFeatureTestMacros(TI, LangOpts, Builder);
+-
+-    if (TI.getTriple().isSPIR() || TI.getTriple().isSPIRV())
+-      Builder.defineMacro("__IMAGE_SUPPORT__");
+   }
+ 
+   if (TI.hasInt128Type() && LangOpts.CPlusPlus && LangOpts.GNUMode) {
+diff --git a/clang/test/Preprocessor/predefined-macros.c b/clang/test/Preprocessor/predefined-macros.c
+index 0b67cbe233ca..aad4a6f05563 100644
+--- a/clang/test/Preprocessor/predefined-macros.c
++++ b/clang/test/Preprocessor/predefined-macros.c
+@@ -207,28 +207,24 @@
+ 
+ // RUN: %clang_cc1 %s -E -dM -o - -x cl -triple spir-unknown-unknown \
+ // RUN:   | FileCheck -match-full-lines %s --check-prefix=CHECK-SPIR
+-// CHECK-SPIR-DAG: #define __IMAGE_SUPPORT__ 1
+ // CHECK-SPIR-DAG: #define __SPIR__ 1
+ // CHECK-SPIR-DAG: #define __SPIR32__ 1
+ // CHECK-SPIR-NOT: #define __SPIR64__ 1
+ 
+ // RUN: %clang_cc1 %s -E -dM -o - -x cl -triple spir64-unknown-unknown \
+ // RUN:   | FileCheck -match-full-lines %s --check-prefix=CHECK-SPIR64
+-// CHECK-SPIR64-DAG: #define __IMAGE_SUPPORT__ 1
+ // CHECK-SPIR64-DAG: #define __SPIR__ 1
+ // CHECK-SPIR64-DAG: #define __SPIR64__ 1
+ // CHECK-SPIR64-NOT: #define __SPIR32__ 1
+ 
+ // RUN: %clang_cc1 %s -E -dM -o - -x cl -triple spirv32-unknown-unknown \
+ // RUN:   | FileCheck -match-full-lines %s --check-prefix=CHECK-SPIRV32
+-// CHECK-SPIRV32-DAG: #define __IMAGE_SUPPORT__ 1
+ // CHECK-SPIRV32-DAG: #define __SPIRV__ 1
+ // CHECK-SPIRV32-DAG: #define __SPIRV32__ 1
+ // CHECK-SPIRV32-NOT: #define __SPIRV64__ 1
+ 
+ // RUN: %clang_cc1 %s -E -dM -o - -x cl -triple spirv64-unknown-unknown \
+ // RUN:   | FileCheck -match-full-lines %s --check-prefix=CHECK-SPIRV64
+-// CHECK-SPIRV64-DAG: #define __IMAGE_SUPPORT__ 1
+ // CHECK-SPIRV64-DAG: #define __SPIRV__ 1
+ // CHECK-SPIRV64-DAG: #define __SPIRV64__ 1
+ // CHECK-SPIRV64-NOT: #define __SPIRV32__ 1
+-- 
+2.29.2
+

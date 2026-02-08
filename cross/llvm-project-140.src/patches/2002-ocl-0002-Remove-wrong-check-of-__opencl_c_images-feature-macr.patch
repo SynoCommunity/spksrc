@@ -1,0 +1,37 @@
+From 9780cc0e044c73dcd549c67a1278a4ff7daf3b01 Mon Sep 17 00:00:00 2001
+From: Marcin Naczk <marcin.naczk@intel.com>
+Date: Fri, 4 Nov 2022 15:41:16 +0100
+Subject: [PATCH] Remove wrong check of __opencl_c_images feature macro
+
+Deleted mechanism that wrongly assumes that
+all functions that use image types must be under
+__opencl_c_images feature macro
+Mechanism added by https://reviews.llvm.org/D103911
+More info on github issue:
+https://github.com/llvm/llvm-project/issues/58017
+---
+ clang/lib/Sema/SemaType.cpp | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/clang/lib/Sema/SemaType.cpp b/clang/lib/Sema/SemaType.cpp
+index ab47e9f03eaf..f72c2fb57ddd 100644
+--- a/clang/lib/Sema/SemaType.cpp
++++ b/clang/lib/Sema/SemaType.cpp
+@@ -1741,13 +1741,7 @@ static QualType ConvertDeclSpecToType(TypeProcessingState &state) {
+     // __opencl_c_3d_image_writes feature. OpenCL C v3.0 API s4.2 - For devices
+     // that support OpenCL 3.0, cl_khr_3d_image_writes must be returned when and
+     // only when the optional feature is supported
+-    if ((Result->isImageType() || Result->isSamplerT()) &&
+-        (IsOpenCLC30Compatible &&
+-         !OpenCLOptions.isSupported("__opencl_c_images", S.getLangOpts()))) {
+-      S.Diag(DS.getTypeSpecTypeLoc(), diag::err_opencl_requires_extension)
+-          << 0 << Result << "__opencl_c_images";
+-      declarator.setInvalidType();
+-    } else if (Result->isOCLImage3dWOType() &&
++    if (Result->isOCLImage3dWOType() &&
+                !OpenCLOptions.isSupported("cl_khr_3d_image_writes",
+                                           S.getLangOpts())) {
+       S.Diag(DS.getTypeSpecTypeLoc(), diag::err_opencl_requires_extension)
+-- 
+2.33.0.windows.1
+

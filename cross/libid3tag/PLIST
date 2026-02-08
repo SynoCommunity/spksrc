@@ -1,0 +1,3 @@
+lnk:lib/libid3tag.so
+lnk:lib/libid3tag.so.0
+lib:lib/libid3tag.so.0.3.0

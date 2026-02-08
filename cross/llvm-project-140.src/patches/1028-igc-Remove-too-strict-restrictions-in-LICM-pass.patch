@@ -1,0 +1,53 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2023 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+From 8b66a82ac8c802cc67b4c73667acb6a1d769ae5f Mon Sep 17 00:00:00 2001
+From: Marcin Naczk <marcin.naczk@intel.com>
+Date: Wed, 22 Feb 2023 15:33:37 +0100
+Subject: [PATCH] Remove too strict restrictions in LICM pass.
+
+The reason for removal of below condition was that it took a very strict
+approach to the Convergent attribute, which caused missed optimization
+opportunities in cases where it was safe to do so.
+The decision is based on the discussion in LLVM RFC
+https://reviews.llvm.org/D90361?id=303195
+This patch should be considered obsolete if LICM introduces a more
+advanced approach to the Convergent attribute in the future version of
+LLVM.
+---
+ llvm/lib/Transforms/Scalar/LICM.cpp | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/lib/Transforms/Scalar/LICM.cpp b/llvm/lib/Transforms/Scalar/LICM.cpp
+index 6372ce19f..39d11d7b2 100644
+--- a/llvm/lib/Transforms/Scalar/LICM.cpp
++++ b/llvm/lib/Transforms/Scalar/LICM.cpp
+@@ -1196,8 +1196,18 @@ bool llvm::canSinkOrHoistInst(Instruction &I, AAResults *AA, DominatorTree *DT,
+     // inter-thread communication which results are implicitly affected by the
+     // enclosing control flows. It is not safe to hoist or sink such operations
+     // across control flow.
+-    if (CI->isConvergent())
+-      return false;
++
++    // The reason for removal of below condition was that it took a very strict
++    // approach to the Convergent attribute, which caused missed optimization
++    // opportunities in cases where it was safe to do so.
++    // The decision is based on the discussion in LLVM RFC
++    // https://reviews.llvm.org/D90361?id=303195
++    // This patch should be considered obsolete if LICM introduces a more
++    // advanced approach to the Convergent attribute in the future version of
++    // LLVM.
++
++    //if (CI->isConvergent())
++    //  return false;
+ 
+     using namespace PatternMatch;
+     if (match(CI, m_Intrinsic<Intrinsic::assume>()))
+-- 
+2.33.0.windows.1
+

@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.umurmur": {
+            "title": "uMurmur",
+            "desc": "Minimalistic Mumble Server",
+            "icon": "images/umurmur-{0}.png",
+            "type": "url",
+            "url": "/webman/3rdparty/umurmur/umurmur.cgi",
+            "protocol" : "https",
+            "allUsers": true,
+            "grantPrivilege": "all",
+            "advanceGrantPrivilege": true
+        }
+    }
+}

@@ -1,0 +1,21 @@
+https://sources.debian.org/src/openjdk-21/21.0.5+11-1/debian/patches/jdk-8334502-proposed.patch
+
+Description: use int instead of time_t to print timezone info
+ printf() call uses %02d format specifier that requires an int parameter.
+Author: Vladimir Petko <vladimir.petko@canonical.com>
+Bug: https://bugs.openjdk.org/browse/JDK-8334502
+Last-Update: 2024-06-19
+
+--- a/src/hotspot/share/runtime/os.cpp
++++ b/src/hotspot/share/runtime/os.cpp
+@@ -197,8 +197,8 @@ char* os::iso8601_time(jlong millisecond
+     abs_local_to_UTC = -(abs_local_to_UTC);
+   }
+   // Convert time zone offset seconds to hours and minutes.
+-  const time_t zone_hours = (abs_local_to_UTC / seconds_per_hour);
+-  const time_t zone_min =
++  const int zone_hours = (abs_local_to_UTC / seconds_per_hour);
++  const int zone_min =
+     ((abs_local_to_UTC % seconds_per_hour) / seconds_per_minute);
+ 
+   // Print an ISO 8601 date and time stamp into the buffer

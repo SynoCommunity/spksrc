@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.demowebservice": {
+            "type": "url",
+            "title": "Demo Web Service",
+            "desc": "Web Service Demo Package (Tooltip)",
+            "icon": "images/demowebservice-{0}.png",
+            "protocol": "http",
+            "port": "80",
+            "url": "/demowebservice",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

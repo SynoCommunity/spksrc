@@ -1,0 +1,104 @@
+From a60b8f468119065f8a6cb4a16598263cb00de0b5 Mon Sep 17 00:00:00 2001
+From: Sven van Haastregt <sven.vanhaastregt@arm.com>
+Date: Mon, 16 Jan 2023 11:32:12 +0000
+Subject: [PATCH] [OpenCL] Allow undefining header-only features
+
+`opencl-c-base.h` always defines 5 particular feature macros for
+SPIR-V, making it impossible to disable those features.
+
+To allow disabling any of those features, let the header recognize
+`__undef_<feature>` macros.  The user can then pass the
+`-D__undef_<feature>` flag on the command line to disable a specific
+feature.  The __undef macro could potentially also be set from
+`-cl-ext=-feature`, but for now only change the header and only
+provide __undef macros for the 5 features that are always enabled in
+`opencl-c-base.h`.
+
+Differential Revision: https://reviews.llvm.org/D141297
+---
+ clang/lib/Headers/opencl-c-base.h | 19 ++++++++++++++++
+ clang/test/SemaOpenCL/features.cl | 37 ++++++++++++++++++++++---------
+ 2 files changed, 45 insertions(+), 11 deletions(-)
+
+diff --git a/clang/lib/Headers/opencl-c-base.h b/clang/lib/Headers/opencl-c-base.h
+index c433b4f7eb1af..fad2f9c0272bf 100644
+--- a/clang/lib/Headers/opencl-c-base.h
++++ b/clang/lib/Headers/opencl-c-base.h
+@@ -74,6 +74,25 @@
+ #define __opencl_c_atomic_scope_all_devices 1
+ #define __opencl_c_read_write_images 1
+ #endif // defined(__SPIR__)
++
++// Undefine any feature macros that have been explicitly disabled using
++// an __undef_<feature> macro.
++#ifdef __undef___opencl_c_work_group_collective_functions
++#undef __opencl_c_work_group_collective_functions
++#endif
++#ifdef __undef___opencl_c_atomic_order_seq_cst
++#undef __opencl_c_atomic_order_seq_cst
++#endif
++#ifdef __undef___opencl_c_atomic_scope_device
++#undef __opencl_c_atomic_scope_device
++#endif
++#ifdef __undef___opencl_c_atomic_scope_all_devices
++#undef __opencl_c_atomic_scope_all_devices
++#endif
++#ifdef __undef___opencl_c_read_write_images
++#undef __opencl_c_read_write_images
++#endif
++
+ #endif // (__OPENCL_CPP_VERSION__ == 202100 || __OPENCL_C_VERSION__ == 300)
+
+ #if !defined(__opencl_c_generic_address_space)
+diff --git a/clang/test/SemaOpenCL/features.cl b/clang/test/SemaOpenCL/features.cl
+index af058b5e69828..3f59b4ea3b5ae 100644
+--- a/clang/test/SemaOpenCL/features.cl
++++ b/clang/test/SemaOpenCL/features.cl
+@@ -26,6 +26,15 @@
+ // RUN: %clang_cc1 -triple spir-unknown-unknown %s -E -dM -o - -x cl -cl-std=clc++1.0 \
+ // RUN:   | FileCheck -match-full-lines %s  --check-prefix=NO-FEATURES
+
++// For OpenCL C 3.0, header-only features can be disabled using macros.
++// RUN: %clang_cc1 -triple spir-unknown-unknown %s -E -dM -o - -x cl -cl-std=CL3.0 -fdeclare-opencl-builtins -finclude-default-header \
++// RUN:    -D__undef___opencl_c_work_group_collective_functions=1 \
++// RUN:    -D__undef___opencl_c_atomic_order_seq_cst=1 \
++// RUN:    -D__undef___opencl_c_atomic_scope_device=1 \
++// RUN:    -D__undef___opencl_c_atomic_scope_all_devices=1 \
++// RUN:    -D__undef___opencl_c_read_write_images=1 \
++// RUN:   | FileCheck %s --check-prefix=NO-HEADERONLY-FEATURES
++
+ // Note that __opencl_c_int64 is always defined assuming
+ // always compiling for FULL OpenCL profile
+
+@@ -43,14 +52,20 @@
+ // FEATURES: #define __opencl_c_subgroups 1
+
+ // NO-FEATURES: #define __opencl_c_int64 1
+-// NO-FEATURES-NOT: __opencl_c_3d_image_writes
+-// NO-FEATURES-NOT: __opencl_c_atomic_order_acq_rel
+-// NO-FEATURES-NOT: __opencl_c_atomic_order_seq_cst
+-// NO-FEATURES-NOT: __opencl_c_device_enqueue
+-// NO-FEATURES-NOT: __opencl_c_fp64
+-// NO-FEATURES-NOT: __opencl_c_generic_address_space
+-// NO-FEATURES-NOT: __opencl_c_images
+-// NO-FEATURES-NOT: __opencl_c_pipes
+-// NO-FEATURES-NOT: __opencl_c_program_scope_global_variables
+-// NO-FEATURES-NOT: __opencl_c_read_write_images
+-// NO-FEATURES-NOT: __opencl_c_subgroups
++// NO-FEATURES-NOT: #define __opencl_c_3d_image_writes
++// NO-FEATURES-NOT: #define __opencl_c_atomic_order_acq_rel
++// NO-FEATURES-NOT: #define __opencl_c_atomic_order_seq_cst
++// NO-FEATURES-NOT: #define __opencl_c_device_enqueue
++// NO-FEATURES-NOT: #define __opencl_c_fp64
++// NO-FEATURES-NOT: #define __opencl_c_generic_address_space
++// NO-FEATURES-NOT: #define __opencl_c_images
++// NO-FEATURES-NOT: #define __opencl_c_pipes
++// NO-FEATURES-NOT: #define __opencl_c_program_scope_global_variables
++// NO-FEATURES-NOT: #define __opencl_c_read_write_images
++// NO-FEATURES-NOT: #define __opencl_c_subgroups
++
++// NO-HEADERONLY-FEATURES-NOT: #define __opencl_c_work_group_collective_functions
++// NO-HEADERONLY-FEATURES-NOT: #define __opencl_c_atomic_order_seq_cst
++// NO-HEADERONLY-FEATURES-NOT: #define __opencl_c_atomic_scope_device
++// NO-HEADERONLY-FEATURES-NOT: #define __opencl_c_atomic_scope_all_devices
++// NO-HEADERONLY-FEATURES-NOT: #define __opencl_c_read_write_images

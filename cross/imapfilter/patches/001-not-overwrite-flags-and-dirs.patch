@@ -1,0 +1,38 @@
+# do not overwrite CFLAGS and LDFLAGS
+# make dirs like SHAREDIR overwriteable
+# make SSLCA definitions overwriteable
+# 
+--- Makefile.orig	2025-04-27 18:05:21.000000000 +0000
++++ Makefile	2025-07-05 18:17:11.376479688 +0000
+@@ -1,11 +1,11 @@
+ DESTDIR ?=
+ PREFIX ?= /usr/local
+-BINDIR = $(PREFIX)/bin
+-SHAREDIR = $(PREFIX)/share/imapfilter
+-MANDIR = $(PREFIX)/man
++BINDIR ?= $(PREFIX)/bin
++SHAREDIR ?= $(PREFIX)/share/imapfilter
++MANDIR ?= $(PREFIX)/man
+ 
+-SSLCAPATH = /etc/ssl/certs
+-SSLCAFILE = /etc/ssl/cert.pem
++SSLCAPATH ?= /etc/ssl/certs
++SSLCAFILE ?= /etc/ssl/cert.pem
+ 
+ MYCFLAGS =
+ MYLDFLAGS =
+@@ -19,12 +19,12 @@
+ LIBSSL = -lssl
+ LIBCRYPTO = -lcrypto
+ 
+-CFLAGS = -Wall -Wextra -O \
++CFLAGS += -Wall -Wextra -O \
+ 	 -DCONFIG_SHAREDIR='"$(SHAREDIR)"' \
+ 	 -DCONFIG_SSL_CAPATH='"$(SSLCAPATH)"' \
+ 	 -DCONFIG_SSL_CAFILE='"$(SSLCAFILE)"' \
+ 	 $(INCDIRS) $(MYCFLAGS)
+-LDFLAGS = $(LIBDIRS) $(MYLDFLAGS)
++LDFLAGS += $(LIBDIRS) $(MYLDFLAGS)
+ LIBS = -lm -ldl $(LIBLUA) $(LIBPCRE) $(LIBSSL) $(LIBCRYPTO) $(MYLIBS)
+ 
+ MAN1 = imapfilter.1

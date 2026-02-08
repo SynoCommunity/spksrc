@@ -1,0 +1,9 @@
+lnk:lib/libasm.so
+lnk:lib/libasm.so.1
+lib:lib/libasm-0.191.so
+lnk:lib/libdw.so
+lnk:lib/libdw.so.1
+lib:lib/libdw-0.191.so
+lnk:lib/libelf.so
+lnk:lib/libelf.so.1
+lib:lib/libelf-0.191.so

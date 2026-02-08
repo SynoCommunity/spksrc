@@ -1,0 +1,166 @@
+--- a/src/java.desktop/share/classes/javax/swing/JTree.java
++++ b/src/java.desktop/share/classes/javax/swing/JTree.java
+@@ -5133,7 +5133,7 @@ public class JTree extends JComponent im
+             public AccessibleSelection getAccessibleSelection() {
+                 AccessibleContext ac = getCurrentAccessibleContext();
+                 if (ac != null && isLeaf) {
+-                    return getCurrentAccessibleContext().getAccessibleSelection();
++                    return ac.getAccessibleSelection();
+                 } else {
+                     return this;
+                 }
+@@ -5148,7 +5148,7 @@ public class JTree extends JComponent im
+             public AccessibleText getAccessibleText() {
+                 AccessibleContext ac = getCurrentAccessibleContext();
+                 if (ac != null) {
+-                    return getCurrentAccessibleContext().getAccessibleText();
++                    return ac.getAccessibleText();
+                 } else {
+                     return null;
+                 }
+@@ -5163,7 +5163,7 @@ public class JTree extends JComponent im
+             public AccessibleValue getAccessibleValue() {
+                 AccessibleContext ac = getCurrentAccessibleContext();
+                 if (ac != null) {
+-                    return getCurrentAccessibleContext().getAccessibleValue();
++                    return ac.getAccessibleValue();
+                 } else {
+                     return null;
+                 }
+--- a/src/java.desktop/share/classes/javax/swing/table/JTableHeader.java
++++ b/src/java.desktop/share/classes/javax/swing/table/JTableHeader.java
+@@ -1143,7 +1143,12 @@ public class JTableHeader extends JCompo
+             }
+ 
+             public AccessibleAction getAccessibleAction() {
+-                return getCurrentAccessibleContext().getAccessibleAction();
++                AccessibleContext ac = getCurrentAccessibleContext();
++                if (ac != null) {
++			return ac.getAccessibleAction();
++		} else {
++			return null;
++		}
+             }
+ 
+            /**
+@@ -1159,15 +1164,30 @@ public class JTableHeader extends JCompo
+             }
+ 
+             public AccessibleSelection getAccessibleSelection() {
+-                return getCurrentAccessibleContext().getAccessibleSelection();
++                AccessibleContext ac = getCurrentAccessibleContext();
++                if (ac != null) {
++			return ac.getAccessibleSelection();
++		} else {
++			return null;
++		}
+             }
+ 
+             public AccessibleText getAccessibleText() {
+-                return getCurrentAccessibleContext().getAccessibleText();
++                AccessibleContext ac = getCurrentAccessibleContext();
++                if (ac != null) {
++			return ac.getAccessibleText();
++		} else {
++			return null;
++		}
+             }
+ 
+             public AccessibleValue getAccessibleValue() {
+-                return getCurrentAccessibleContext().getAccessibleValue();
++                AccessibleContext ac = getCurrentAccessibleContext();
++                if (ac != null) {
++			return ac.getAccessibleValue();
++		} else {
++			return null;
++		}
+             }
+ 
+ 
+--- a/src/java.desktop/share/classes/javax/swing/JTable.java
++++ b/src/java.desktop/share/classes/javax/swing/JTable.java
+@@ -9223,7 +9223,12 @@ public class JTable extends JComponent i
+              * @return the <code>AccessibleAction</code>, or <code>null</code>
+              */
+             public AccessibleAction getAccessibleAction() {
+-                return getCurrentAccessibleContext().getAccessibleAction();
++                AccessibleContext ac = getCurrentAccessibleContext();
++                if (ac != null) {
++		    return ac.getAccessibleAction();
++                } else {
++                    return null;
++                }
+             }
+ 
+             /**
+@@ -9245,7 +9250,12 @@ public class JTable extends JComponent i
+              *    <code>null</code>
+              */
+             public AccessibleSelection getAccessibleSelection() {
+-                return getCurrentAccessibleContext().getAccessibleSelection();
++                AccessibleContext ac = getCurrentAccessibleContext();
++                if (ac != null) {
++		    return ac.getAccessibleSelection();
++                } else {
++                    return null;
++                }
+             }
+ 
+             /**
+@@ -9255,7 +9265,12 @@ public class JTable extends JComponent i
+              * @return the <code>AccessibleText</code>, or <code>null</code>
+              */
+             public AccessibleText getAccessibleText() {
+-                return getCurrentAccessibleContext().getAccessibleText();
++                AccessibleContext ac = getCurrentAccessibleContext();
++                if (ac != null) {
++		    return ac.getAccessibleText();
++                } else {
++                    return null;
++                }
+             }
+ 
+             /**
+@@ -9265,7 +9280,12 @@ public class JTable extends JComponent i
+              * @return the <code>AccessibleValue</code>, or <code>null</code>
+              */
+             public AccessibleValue getAccessibleValue() {
+-                return getCurrentAccessibleContext().getAccessibleValue();
++                AccessibleContext ac = getCurrentAccessibleContext();
++                if (ac != null) {
++		    return ac.getAccessibleValue();
++                } else {
++                    return null;
++                }
+             }
+ 
+ 
+--- a/src/jdk.accessibility/windows/classes/com/sun/java/accessibility/internal/AccessBridge.java
++++ b/src/jdk.accessibility/windows/classes/com/sun/java/accessibility/internal/AccessBridge.java
+@@ -6562,7 +6562,7 @@ final public class AccessBridge {
+         public AccessibleSelection getAccessibleSelection() {
+             AccessibleContext ac = getCurrentAccessibleContext();
+             if (ac != null && isLeaf) {
+-                return getCurrentAccessibleContext().getAccessibleSelection();
++                return ac.getAccessibleSelection();
+             } else {
+                 return this;
+             }
+@@ -6577,7 +6577,7 @@ final public class AccessBridge {
+         public AccessibleText getAccessibleText() {
+             AccessibleContext ac = getCurrentAccessibleContext();
+             if (ac != null) {
+-                return getCurrentAccessibleContext().getAccessibleText();
++                return ac.getAccessibleText();
+             } else {
+                 return null;
+             }
+@@ -6592,7 +6592,7 @@ final public class AccessBridge {
+         public AccessibleValue getAccessibleValue() {
+             AccessibleContext ac = getCurrentAccessibleContext();
+             if (ac != null) {
+-                return getCurrentAccessibleContext().getAccessibleValue();
++                return ac.getAccessibleValue();
+             } else {
+                 return null;
+             }

@@ -1,0 +1,24 @@
+# remove #pragma GCC diagnostic
+# for outdated gcc compiler of ppc arch toolchain
+#
+--- src/xkb/XKBBind.c.orig	2024-07-28 17:53:09.000000000 +0000
++++ src/xkb/XKBBind.c	2025-01-15 21:12:35.024973949 +0000
+@@ -205,9 +205,6 @@
+ #ifdef __clang__
+ #pragma clang diagnostic push
+ #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+-#elif defined(__GNUC__)
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+ #endif
+ 
+ KeySym
+@@ -224,8 +221,6 @@
+ 
+ #ifdef __clang__
+ #pragma clang diagnostic pop
+-#elif defined(__GNUC__)
+-#pragma GCC diagnostic pop
+ #endif
+ 
+    /*

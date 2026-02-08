@@ -1,0 +1,35 @@
+[
+  {
+    "step_title": "Kopia Configuration",
+    "invalid_next_disabled": true,
+    "items": [
+      {
+        "desc": "Permissions for the package are managed by a \"System internal user\" named <b>sc-kopia</b>.Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      },
+      {
+        "type": "textfield",
+        "desc": "Kopia Settings",
+        "subitems": [
+          {
+            "key": "wizard_username",
+            "desc": "Web Username",
+            "defaultValue": "kopia",
+            "validator": {
+              "allowBlank": false,
+              "minLength": 1
+            }
+          },
+          {
+            "key": "wizard_password",
+            "desc": "Web Password",
+            "defaultValue": "kopiakopia",
+            "validator": {
+              "allowBlank": false,
+              "minLength": 8
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

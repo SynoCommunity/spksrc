@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="E=edge,chrome=1">
+        <title>dnscrypt-proxy</title>
+        <link rel="stylesheet" type="text/css" href="../../../../help/help.css">
+        <link rel="stylesheet" type="text/css" href="../../../../help/scrollbar/flexcroll.css">
+        <script type="text/javascript" src="../../../../help/scrollbar/flexcroll.js"></script>
+        <script type="text/javascript" src="../../../../help/scrollbar/initFlexcroll.js"></script>
+    </head>
+    <body>
+        <h1>dnscrypt-proxy</h1>
+        <p><a href="https://github.com/jedisct1/dnscrypt-proxy" target="_blank">dnscrypt-proxy</a> is a DNS proxy that implements the <a href="https://dnscrypt.info/protocol" target="_blank">dnscrypt</a> and <a href="https://tools.ietf.org/html/draft-ietf-doh-dns-over-https" target="_blank">DNS-over-HTTPS (doh)</a> protocols.</p>
+        <p><a href="https://github.com/SynoCommunity/spksrc/wiki/FAQ-DNSCrypt-proxy" target="_blank">A copy of the this document is available online</a></p>
+        <h2>Configuration</h2>
+        <img src="/webman/3rdparty/dnscrypt-proxy/help/images/ui.png" alt="User interface of dnscrypt-proxy">
+        <ol>
+            <li><b>Generate Blacklist:</b> will fetch provided lists and update the var/blacklist.txt file using the <a href="https://github.com/jedisct1/dnscrypt-proxy/wiki/Public-blacklists" target="_blank">generate-domains-blacklist.py</a> script</li>
+            <li><b>Save:</b> Saves the file to disk. You need to manually restart dnscrypt-proxy to apply changes.</li>
+        </ol>
+        <p>For more detailed information I suggest you visit the <a href="https://github.com/jedisct1/dnscrypt-proxy/wiki" target="_blank">dnscrypt-proxy wiki</a>.</p>
+        <h3>Optional: Individual device configuration</h3>
+        <p><a href="https://1.1.1.1/#setup-instructions" target="_blank">Cloudflare</a> has some good instructions on how to change your DNS settings to point to a custom DNS server. Instead of <code>1.1.1.1</code> you need to use your Synology's IP address. e.g. <code>192.168.1.1<code></p>
+        <h2>Test that everything is working correctly</h2>
+        <p>To see which servers are resolving your queries you can visit <a href="https://www.dnsleaktest.com/" target="_blank">dnsleaktest.com</a></p>
+        <p>If you prefer the command line you can use <code>dig whoami.akamai.net</code>, <code>drill resolver.dnscrypt.org</code> or <code>nslookup whoami.ultradns.net</code> to find out which resolver is currently in use. Using the output the <code>SERVER</code> should be the IP address of the device running DNSCrypt-Proxy. The IP address in the <code>ANSWER SECTION</code> should be your preferred DNS resolver. Note that on anycast networks like <code>1.1.1.1</code> or <code>8.8.8.8</code> the IPs will differ and can checked by the <a href="https://iptoasn.com/" target="_blank">ASN</a></p>
+    </body>
+</html>

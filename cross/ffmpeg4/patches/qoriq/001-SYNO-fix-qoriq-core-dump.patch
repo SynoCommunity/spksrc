@@ -1,0 +1,40 @@
+diff -uprN ../ffmpeg-4.2.2-patch020/libavcodec/ppc/blockdsp.c ./libavcodec/ppc/blockdsp.c
+--- ../ffmpeg-4.2.2-patch020/libavcodec/ppc/blockdsp.c	2019-07-08 13:45:25.000000000 -0400
++++ ./libavcodec/ppc/blockdsp.c	2020-01-26 17:11:24.801629973 -0500
+@@ -32,6 +32,8 @@
+ 
+ #include "libavcodec/blockdsp.h"
+ 
++#include "synoconfig.h"
++
+ /* ***** WARNING ***** WARNING ***** WARNING ***** */
+ /*
+  * clear_blocks_dcbz32_ppc will not work properly on PowerPC processors with
+@@ -115,7 +117,15 @@ static long check_dcbzl_effect(void)
+ 
+     /* Below the constraint "b" seems to mean "address base register"
+      * in gcc-3.3 / RS/6000 speaks. Seems to avoid using r0, so.... */
++#ifdef SYNO_FIX_QORIQ_CORE_DUMP
++	#if SYNO_PLATFORM == PPC_QORIQ || defined(SYNO_PLAT_TRANSCODE_FOR_QORIQ)
++	__asm__ volatile("dcbz %0, %1" : : "r" (fakedata_middle), "r" (zero));
++	#else
++	__asm__ volatile("dcbzl %0, %1" : : "b" (fakedata_middle), "r" (zero));
++	#endif
++#else
+     __asm__ volatile ("dcbzl %0, %1" :: "b" (fakedata_middle), "r" (zero));
++#endif
+ 
+     for (i = 0; i < 1024; i++)
+         if (fakedata[i] == (char) 0)
+diff -uprN ../ffmpeg-4.2.2-patch020/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch020/synoconfig.h	2020-01-26 17:10:08.482045232 -0500
++++ ./synoconfig.h	2020-01-26 17:11:24.805629959 -0500
+@@ -66,3 +66,8 @@
+  * See Media Server #386
+  */
+ #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
++
++/* Fixed core dump when truncate recording in QORIQ platform
++ * See Surveillance bug 1151/1155
++ */
++#define SYNO_FIX_QORIQ_CORE_DUMP

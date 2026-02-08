@@ -1,0 +1,7 @@
+bin:bin/intel_gem_info
+bin:bin/intel_gpu_top
+bin:bin/intel_opregion_decode
+bin:bin/intel_stepping
+bin:bin/lsgpu
+lnk:lib/libigt.so
+lib:lib/libigt.so.0

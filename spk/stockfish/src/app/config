@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.stockfish-webgui": {
+            "title": "Stockfish Chess",
+            "desc": "Play Chess in the browser against Stockfish engine.",
+            "icon": "images/stockfish-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/stockfish",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

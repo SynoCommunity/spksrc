@@ -1,0 +1,14 @@
+# fix the signature of quotactl function to match the declaration in
+# sysroot/usr/include/linux/quota.h
+# 
+--- powerpc-e500v2-linux-gnuspe/sysroot/usr/include/sys/quota.h.orig	2017-08-23 04:25:40.000000000 +0200
++++ powerpc-e500v2-linux-gnuspe/sysroot/usr/include/sys/quota.h	2021-09-25 09:48:32.456671500 +0200
+@@ -217,7 +217,7 @@
+ 
+ __BEGIN_DECLS
+ 
+-extern int quotactl (int __cmd, const char *__special, int __id,
++extern long quotactl (unsigned int __cmd, const char *__special, int __id,
+ 		     caddr_t __addr) __THROW;
+ 
+ __END_DECLS

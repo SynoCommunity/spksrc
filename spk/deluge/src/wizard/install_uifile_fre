@@ -1,0 +1,64 @@
+[
+  {
+    "step_title": "Configuration de base",
+    "items": [
+      {
+        "type": "combobox",
+        "desc": "Sélectionner le volume à utiliser pour le répertoire de téléchargements",
+        "subitems": [
+          {
+            "key": "wizard_volume",
+            "desc": "Nom du volume",
+            "displayField": "display_name",
+            "valueField": "volume_path",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Storage.Volume",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "limit": -1,
+                "offset": 0,
+                "location": "internal"
+              },
+              "root": "volumes",
+              "idProperty": "volume_path",
+              "fields": [
+                "display_name",
+                "volume_path"
+              ]
+            },
+            "validator": {
+              "fn": "{console.log(arguments);return true;}"
+            }
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "desc": "Répertoire partagé de téléchargements (utilisant le volume sélectionné ci-dessus)",
+        "subitems": [
+          {
+            "key": "wizard_download_dir",
+            "desc": "Répertoire de téléchargements",
+            "defaultValue": "downloads",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Sous-répertoires non-supportés."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "desc": "Si le répertoire partagé est inexistant, il sera créé.  Vous pouvez utiliser un partage existant en spécifiant le nom du répertoire destination."
+      },
+      {
+        "desc": "Le nom d'utilisateur et groupe n'apparaîteront pas dans la plupart des options de configuration de l'interface utilisateur. Prière de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour d'avantage de détails."
+      }
+    ]
+  }
+]

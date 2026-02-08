@@ -1,0 +1,34 @@
+# Define custom environment variables for gotify-server configuration
+# see: https://gotify.net/docs/config#environment-variables
+#
+
+#export GOTIFY_SERVER_PORT=7152
+#export GOTIFY_SERVER_KEEPALIVEPERIODSECONDS=0
+#export GOTIFY_SERVER_LISTENADDR=
+#export GOTIFY_SERVER_SSL_ENABLED=false
+#export GOTIFY_SERVER_SSL_REDIRECTTOHTTPS=true
+#export GOTIFY_SERVER_SSL_LISTENADDR=
+#export GOTIFY_SERVER_SSL_PORT=443
+#export GOTIFY_SERVER_SSL_CERTFILE=
+#export GOTIFY_SERVER_SSL_CERTKEY=
+#export GOTIFY_SERVER_SSL_LETSENCRYPT_ENABLED=false
+#export GOTIFY_SERVER_SSL_LETSENCRYPT_ACCEPTTOS=false
+#export GOTIFY_SERVER_SSL_LETSENCRYPT_CACHE=${SYNOPKG_PKGVAR}/certs
+
+# lists are a little weird but do-able (:
+# export GOTIFY_SERVER_SSL_LETSENCRYPT_HOSTS=- mydomain.tld\n- myotherdomain.tld
+#export GOTIFY_SERVER_RESPONSEHEADERS="X-Custom-Header: \"custom value\""
+# export GOTIFY_SERVER_CORS_ALLOWORIGINS="- \".+.example.com\"\n- \"otherdomain.com\""
+# export GOTIFY_SERVER_CORS_ALLOWMETHODS="- \"GET\"\n- \"POST\""
+# export GOTIFY_SERVER_CORS_ALLOWHEADERS="- \"Authorization\"\n- \"content-type\""
+# export GOTIFY_SERVER_STREAM_ALLOWEDORIGINS="- \".+.example.com\"\n- \"otherdomain.com\""
+
+#export GOTIFY_SERVER_STREAM_PINGPERIODSECONDS=45
+#export GOTIFY_DATABASE_DIALECT=sqlite3
+#export GOTIFY_DATABASE_CONNECTION=${SYNOPKG_PKGVAR}/gotify.db
+#export GOTIFY_DEFAULTUSER_NAME=admin
+#export GOTIFY_DEFAULTUSER_PASS=admin
+#export GOTIFY_PASSSTRENGTH=10
+#export GOTIFY_UPLOADEDIMAGESDIR=${SYNOPKG_PKGVAR}/images
+#export GOTIFY_PLUGINSDIR=${SYNOPKG_PKGVAR}/plugins
+#export GOTIFY_REGISTRATION=false

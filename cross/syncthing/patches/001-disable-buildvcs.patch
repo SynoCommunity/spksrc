@@ -1,0 +1,14 @@
+# disable VCS stamping 
+# - due to nested repos it is not possible to embed vcs info with github build action
+# 
+--- syncthing/build.go.orig	2022-11-02 07:19:22.000000000 +0000
++++ syncthing/build.go	2023-02-11 23:02:26.898539100 +0000
+@@ -556,6 +556,8 @@
+ 		args = append(args, "-gcflags", "all=-N -l")
+ 	}
+ 
++	args = append(args, "-buildvcs=false")
++
+ 	return append(args, pkgs...)
+ }
+ 

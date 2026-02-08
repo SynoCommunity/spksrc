@@ -1,0 +1,11 @@
+[{
+    "step_title": "Starting and updating Readarr",
+    "items": [{
+        "desc": "The first time Readarr is started it might take a few moments for the interface to become available!<br><br>Keep Readarr up-to-date by using Readarr's built-in updater.<br>Navigate to System>Updates in the Readarr UI."
+    }]
+},{
+    "step_title": "DSM Permissions",
+    "items": [{
+        "desc": "Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    }]
+}]

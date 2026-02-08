@@ -1,0 +1,14 @@
+# make CC configurable
+# 
+
+--- is_utf8/Makefile.orig	2021-12-21 19:39:00.000000000 +0000
++++ is_utf8/Makefile	2022-11-18 22:52:11.868059458 +0000
+@@ -37,7 +37,7 @@
+ SONAME = $(LINKERNAME).$(VERSION)
+ REALNAME = $(SONAME).$(MINOR).$(RELEASE)
+ 
+-CC = gcc
++CC ?= gcc
+ CFLAGS ?= -O3 -Wextra -Wall -ansi -Wstrict-prototypes
+ 
+ $(NAME): $(OBJ)

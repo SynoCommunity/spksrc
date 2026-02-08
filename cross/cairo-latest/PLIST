@@ -1,0 +1,9 @@
+lnk:lib/libcairo-gobject.so
+lnk:lib/libcairo-gobject.so.2
+lib:lib/libcairo-gobject.so.2.11804.4
+lnk:lib/libcairo-script-interpreter.so
+lnk:lib/libcairo-script-interpreter.so.2
+lib:lib/libcairo-script-interpreter.so.2.11804.4
+lnk:lib/libcairo.so
+lnk:lib/libcairo.so.2
+lib:lib/libcairo.so.2.11804.4

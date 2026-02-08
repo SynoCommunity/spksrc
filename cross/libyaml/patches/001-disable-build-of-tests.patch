@@ -1,0 +1,17 @@
+# avoid build of test code in sub dir tests
+# 
+# Remarks:
+# There are a lot of build warnings when building tests for some archs
+# and this speeds up the build a little
+# 
+--- Makefile.in.orig	2020-06-01 21:34:56.000000000 +0000
++++ Makefile.in	2023-07-25 14:43:47.263703866 +0000
+@@ -356,7 +356,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-SUBDIRS = include src . tests
++SUBDIRS = include src .
+ EXTRA_DIST = Changes ReadMe.md License CMakeLists.txt doc/doxygen.cfg
+ LIBYAML_TEST_SUITE_RUN_REPO_DEFAULT := https://github.com/yaml/libyaml
+ pkgconfigdir = $(libdir)/pkgconfig

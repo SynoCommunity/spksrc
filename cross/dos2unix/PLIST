@@ -1,0 +1,4 @@
+bin:bin/dos2unix
+lnk:bin/mac2unix
+bin:bin/unix2dos
+lnk:bin/unix2mac

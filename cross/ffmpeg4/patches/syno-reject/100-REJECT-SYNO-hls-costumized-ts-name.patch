@@ -1,0 +1,41 @@
+diff -uprN ../ffmpeg-4.2.2-patch099/libavformat/segment.c ./libavformat/segment.c
+--- ../ffmpeg-4.2.2-patch099/libavformat/segment.c	2020-01-25 10:35:19.000000000 -0500
++++ ./libavformat/segment.c	2020-01-25 11:22:26.968159703 -0500
+@@ -232,13 +232,22 @@ static int set_segment_filename(AVFormat
+     ff_format_set_url(oc, new_name);
+ 
+     /* copy modified name in list entry */
++#ifdef SYNO_HLS_COSTUMIZED_TS_NAME
++    const size_t SVS_FILE_NAME_LEN = 1024;
++    size = SVS_FILE_NAME_LEN;
++#else
+     size = strlen(av_basename(oc->url)) + 1;
++#endif
+     if (seg->entry_prefix)
+         size += strlen(seg->entry_prefix);
+ 
+     if ((ret = av_reallocp(&seg->cur_entry.filename, size)) < 0)
+         return ret;
+-#ifdef SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME
++#ifdef SYNO_HLS_COSTUMIZED_TS_NAME
++    snprintf(seg->cur_entry.filename, size, "%s%s",
++             seg->entry_prefix ? seg->entry_prefix : "",
++             oc->filename);
++#elif defined(SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME)
+     snprintf(seg->cur_entry.filename, size, "%s%03d",
+              seg->entry_prefix ? seg->entry_prefix : "",
+              seg->segment_idx);
+diff -uprN ../ffmpeg-4.2.2-patch099/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch099/synoconfig.h	2020-01-25 11:18:25.000000000 -0500
++++ ./synoconfig.h	2020-01-25 11:22:26.968159703 -0500
+@@ -66,3 +66,10 @@
+  * See Media Server #386
+  */
+ #define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV
++
++/* Rule out basename logic in filename setting
++ * Set Name length to 64 rather than fix strlen(%d.ts)
++ */
++#if defined(SYNO_SURVEILLANCESTATION)
++#define SYNO_HLS_COSTUMIZED_TS_NAME
++#endif

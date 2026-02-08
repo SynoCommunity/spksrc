@@ -1,0 +1,10 @@
+lnk:bin/depmod
+lnk:bin/insmod
+lnk:bin/lsmod
+lnk:bin/rmmod
+lnk:bin/modinfo
+lnk:bin/modprobe
+bin:bin/kmod
+lnk:lib/libkmod.so
+lnk:lib/libkmod.so.2
+lib:lib/libkmod.so.2.5.0

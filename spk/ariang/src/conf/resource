@@ -1,0 +1,39 @@
+{
+  "webservice": {
+    "services": [
+      {
+        "service": "ariang",
+        "display_name": "AriaNg",
+        "type": "static",
+        "root": "ariang",
+        "icon": "app/images/ariang-{0}.png",
+        "php": {
+            "profile_name": "ariang profile",
+            "profile_desc": "AriaNg profile desc",
+            "backend": 8,
+            "extensions": [],
+            "user": "sc-ariang",
+            "group": "http"
+        }
+      }
+    ],
+    "portals": [
+        {
+            "service": "ariang",
+            "name": "AriaNg",
+            "type": "alias",
+            "alias": "ariang",
+            "app": "com.synocommunity.packages.ariang"
+        }
+    ],
+    "pkg_dir_prepare": [
+      {
+        "source": "/var/packages/ariang/target/web",
+        "target": "ariang",
+        "mode": "0755",
+        "user": "sc-ariang",
+        "group": "http"
+      }
+    ]
+  }
+}

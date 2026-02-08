@@ -1,0 +1,4 @@
+bin:bin/gsasl
+lnk:lib/libgsasl.so
+lnk:lib/libgsasl.so.18
+lib:lib/libgsasl.so.18.0.0

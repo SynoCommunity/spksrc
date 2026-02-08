@@ -1,0 +1,8 @@
+KERNEL_ARCH = armada37xx
+KERNEL_VERS = 6.2.4
+KERNEL_BUILD = 25556
+KERNEL_DIST = linux-4.4.x
+KERNEL_BASE_ARCH = arm64
+KERNEL_URL_VERSION = 6.2
+
+include ../../mk/spksrc.kernel.mk

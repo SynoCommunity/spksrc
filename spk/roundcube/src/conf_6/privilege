@@ -1,0 +1,7 @@
+{
+    "defaults": {
+        "run-as": "root"
+    },
+    "username": "sc-roundcube",
+    "join-groupname": "http"
+}

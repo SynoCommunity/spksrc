@@ -1,0 +1,86 @@
+##
+## All configurations below are optional and
+## are provided to demonstrate how to build
+## various wheels.
+##
+
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+atom==0.11.0
+
+# [bcrypt]
+# Require environment variables
+#  PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+bcrypt==5.0.0
+
+# [cryptography]
+# Mandatory of using OPENSSL_*_DIR starting with version >= 40
+# https://docs.rs/openssl/latest/openssl/#automatic
+#  ENV += OPENSSL_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#  ENV += OPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+cryptography==46.0.1
+
+# Requirement for cryptography
+cffi==1.17.1
+cffi==2.0.0
+
+# commonly used cross-compiled wheels
+# All tested and can be enabled but may conflict
+# with local python apps requirements
+
+charset_normalizer==3.4.3
+immutables==0.21
+MarkupSafe==3.0.3
+msgpack==1.0.5              # used compiled verrsion for performance - keep older version for gcc <= 4.9.x
+msgpack_python==0.5.6
+netifaces==0.11.0
+psutil==7.1.0
+pyrsistent==0.20.0
+regex==2025.9.18
+ruamel.yaml.clib==0.2.14
+SQLAlchemy==2.0.43
+zope.interface==8.0.1
+
+# [llfuse] ** Does not build on py313 **
+# gcc < 5 requires -std=gnu11 to find "clock_gettime"
+### llfuse==1.5.1
+
+# [mysqlclient]
+# Depends: mysql-connector-c, mariadb-connector-c
+# Require environment variables
+#  MYSQLCLIENT_CFLAGS
+#  MYSQLCLIENT_LDFLAGS
+mysqlclient==2.2.7
+
+# [pycares]
+# Depends: c-ares
+# Require environment variables
+#  PYCARES_USE_SYSTEM_LIB=1
+pycares==4.11.0
+
+# [pycurl]
+# Depends: curl
+# Require environment variables
+#  PYCURL_CURL_CONFIG
+pycurl==7.45.7
+
+# [PyNaCl]
+# Depends: cross/libsodium
+# Require environment variables
+#  SODIUM_INSTALL=system
+PyNaCl==1.6.0
+
+# [PyYAML]
+# Depends: libyaml
+PyYAML==6.0.3
+
+# [ujson]
+#   - Require setuptools-scm in cross/python3* crossenv
+ujson==5.11.0
+
+# [webrtcvad]
+# webrtcvad==2.0.10           # requires unreleased version at specific commit for qoriq arch
+git+https://github.com/wiseman/py-webrtcvad@3bd761332a9404f5c9276105070ee814c4428342#egg=webrtcvad==2.0.10

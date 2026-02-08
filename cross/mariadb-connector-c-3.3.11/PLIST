@@ -1,0 +1,11 @@
+bin:bin/mariadb_config
+lnk:lib/libmariadb.so
+lib:lib/libmariadb.so.3
+lnk:lib/libmysqlclient.so
+lnk:lib/libmysqlclient_r.so
+lib:lib/mariadb/plugin/caching_sha2_password.so
+lib:lib/mariadb/plugin/client_ed25519.so
+lib:lib/mariadb/plugin/dialog.so
+lib:lib/mariadb/plugin/mysql_clear_password.so
+lib:lib/mariadb/plugin/remote_io.so
+lib:lib/mariadb/plugin/sha256_password.so

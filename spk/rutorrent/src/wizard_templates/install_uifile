@@ -1,0 +1,34 @@
+[{
+    "step_title": "{{{BASIC_CONFIGURATION_TITLE}}}",
+    "invalid_next_disabled_v2": true,
+    "items": [{
+        "type": "textfield",
+        "desc": "{{{DOWNLOAD_SHARE_DESC}}}",
+        "subitems": [{
+            "key": "wizard_data_share",
+            "desc": "{{{DOWNLOAD_SHARE_LABEL}}}",
+            "defaultValue": "downloads",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^[\\w.][\\w. -]{0,30}[\\w.-]\\$?$|^[\\w]\\$?$/",
+                    "errorText": "{{{DOWNLOAD_SHARE_VALIDATION_ERROR}}}"
+                }
+            }
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "{{{WATCH_DIR_DESC}}}",
+        "subitems": [{
+            "key": "wizard_watch_dir",
+            "desc": "{{{WATCH_DIR_LABEL}}}",
+            "validator": {
+                "allowBlank": true
+            }
+        }]
+    }, {
+        "desc": ""
+    }, {
+        "desc": "{{{DSM_PERMISSIONS_TEXT}}}"
+    }]
+}]

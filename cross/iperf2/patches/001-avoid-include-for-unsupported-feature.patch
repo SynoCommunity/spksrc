@@ -1,0 +1,15 @@
+# avoid include of unused prague_cc.h when UDP_L4S is not supported
+# - this fixes build for OLD_PPC_ARCHS
+# 
+--- src/Server.cpp.orig	2024-11-06 21:47:34.000000000 +0000
++++ src/Server.cpp	2025-07-26 22:01:48.393044983 +0000
+@@ -65,7 +65,9 @@
+ #include "PerfSocket.hpp"
+ #include "SocketAddr.h"
+ #include "payloads.h"
++#if HAVE_UDP_L4S
+ #include "prague_cc.h"
++#endif
+ #include <cmath>
+ #if defined(HAVE_LINUX_FILTER_H) && defined(HAVE_AF_PACKET)
+ #include "checksums.h"

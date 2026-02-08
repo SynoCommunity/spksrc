@@ -1,0 +1,19 @@
+# fix scaffold.c:28:14: error: conflicting types for ‘malloc’
+# taken from https://dev.archive.openwrt.org/attachment/ticket/5195/003-scaffold_malloc.patch.html
+--- scaffold.c.org	2020-11-07 11:38:32.056240423 +0000
++++ scaffold.c	2020-11-07 11:38:47.781708623 +0000
+@@ -20,13 +20,12 @@
+ #include <syslog.h>
+ #include <setjmp.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ #ifndef INADDR_NONE
+ #define	INADDR_NONE	(-1)		/* XXX should be 0xffffffff */
+ #endif
+ 
+-extern char *malloc();
+-
+ /* Application-specific. */
+ 
+ #include "tcpd.h"

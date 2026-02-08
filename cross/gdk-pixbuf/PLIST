@@ -1,0 +1,14 @@
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-ani.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-bmp.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-gif.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-icns.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-ico.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-pnm.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-qtif.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-tga.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-tiff.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-xbm.so
+lib:lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-xpm.so
+lnk:lib/libgdk_pixbuf-2.0.so
+lnk:lib/libgdk_pixbuf-2.0.so.0
+lib:lib/libgdk_pixbuf-2.0.so.0.4200.9

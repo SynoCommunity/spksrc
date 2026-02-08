@@ -1,0 +1,7 @@
+Newer version is 2.6+
+
+Also need to integrate Haproxy web interface
+https://github.com/sheremet/haproxy-wi
+New Python3 wheel list: https://github.com/sheremet/haproxy-wi/blob/master/requirements.txt
+
+Wheels do not build anymore for Python2

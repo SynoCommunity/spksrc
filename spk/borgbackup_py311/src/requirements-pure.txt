@@ -1,0 +1,24 @@
+# Generated using the requirements script on November 7, 2025
+
+appdirs==1.4.4
+arrow==1.4.0
+attrs==25.4.0
+borgmatic==2.0.11
+#certifi==2025.10.5                     ==> python311
+docopt==0.6.2
+emborg==1.42
+idna==3.11
+inform==1.35
+jsonschema==4.25.1
+jsonschema_specifications==2025.9.1
+nestedtext==3.7
+packaging==25.0
+#pip                                    ==> python311
+python_dateutil==2.9.0.post0
+quantiphy==2.20
+referencing==0.37.0
+requests==2.32.5
+ruamel.yaml==0.18.16
+#six==1.17.0                            ==> python311
+typing_extensions==4.15.0
+urllib3==2.5.0

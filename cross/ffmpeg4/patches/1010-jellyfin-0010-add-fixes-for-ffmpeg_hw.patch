@@ -1,0 +1,70 @@
+Index: jellyfin-ffmpeg/fftools/ffmpeg_hw.c
+===================================================================
+--- fftools/ffmpeg_hw.c
++++ fftools/ffmpeg_hw.c
+@@ -93,6 +93,8 @@ static char *hw_device_default_name(enum
+ 
+ int hw_device_init_from_string(const char *arg, HWDevice **dev_out)
+ {
++    // "type=name"
++    // "type=name,key=value,key2=value2"
+     // "type=name:device,key=value,key2=value2"
+     // "type:device,key=value,key2=value2"
+     // -> av_hwdevice_ctx_create()
+@@ -124,7 +126,7 @@ int hw_device_init_from_string(const cha
+     }
+ 
+     if (*p == '=') {
+-        k = strcspn(p + 1, ":@");
++        k = strcspn(p + 1, ":@,");
+ 
+         name = av_strndup(p + 1, k);
+         if (!name) {
+@@ -190,6 +192,18 @@ int hw_device_init_from_string(const cha
+                                              src->device_ref, 0);
+         if (err < 0)
+             goto fail;
++    } else if (*p == ',') {
++        err = av_dict_parse_string(&options, p + 1, "=", ",", 0);
++
++        if (err < 0) {
++            errmsg = "failed to parse options";
++            goto invalid;
++        }
++
++        err = av_hwdevice_ctx_create(&device_ref, type,
++                                     NULL, options, 0);
++        if (err < 0)
++            goto fail;
+     } else {
+         errmsg = "parse error";
+         goto invalid;
+@@ -527,15 +541,21 @@ int hw_device_setup_for_filter(FilterGra
+     HWDevice *dev;
+     int i;
+ 
+-    // If the user has supplied exactly one hardware device then just
+-    // give it straight to every filter for convenience.  If more than
+-    // one device is available then the user needs to pick one explcitly
+-    // with the filter_hw_device option.
++    // Pick the last hardware device if the user doesn't pick the device for
++    // filters explicitly with the filter_hw_device option.
+     if (filter_hw_device)
+         dev = filter_hw_device;
+-    else if (nb_hw_devices == 1)
+-        dev = hw_devices[0];
+-    else
++    else if (nb_hw_devices > 0) {
++        dev = hw_devices[nb_hw_devices - 1];
++
++        if (nb_hw_devices > 1)
++            av_log(NULL, AV_LOG_WARNING, "There are %d hardware devices. device "
++                   "%s of type %s is picked for filters by default. Set hardware "
++                   "device explicitly with the filter_hw_device option if device "
++                   "%s is not usable for filters.\n",
++                   nb_hw_devices, dev->name,
++                   av_hwdevice_get_type_name(dev->type), dev->name);
++    } else
+         dev = NULL;
+ 
+     if (dev) {

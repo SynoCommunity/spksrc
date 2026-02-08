@@ -1,0 +1,4 @@
+bin:bin/lame
+lnk:lib/libmp3lame.so
+lnk:lib/libmp3lame.so.0
+lib:lib/libmp3lame.so.0.0.0

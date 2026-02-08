@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.adminer": {
+            "title": "Adminer",
+            "desc": "Adminer",
+            "icon": "images/adminer-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/adminer",
+            "allUsers": false,
+            "grantPrivilege": "local"
+        }
+    }
+}

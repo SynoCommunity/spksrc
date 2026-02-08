@@ -1,0 +1,9 @@
+[{
+    "step_title": "Attention! DSM6 Permissions",
+    "items": [{
+        "desc": "Permissions for all media-related packages are managed with the group <b>'sc-media'</b> in DSM.<br>The group 'users' is no longer used as of DSM 6.<br>Package user will not appear on most UI settings."
+    },
+    {
+        "desc": "<strong style='color:red'>NOTE:</strong> The package upgrade will try to set the correct permissions on your folders. If you get permission errors within SiCKRAGE, manually set Read/Write permissions for the 'sc-media' group on the reported folders using File Station."
+    }]
+}]

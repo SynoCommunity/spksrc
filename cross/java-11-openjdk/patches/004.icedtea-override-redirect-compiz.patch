@@ -1,0 +1,12 @@
+Index: b/src/java.desktop/unix/classes/sun/awt/X11/XWindowPeer.java
+===================================================================
+--- a/src/java.desktop/unix/classes/sun/awt/X11/XWindowPeer.java
++++ b/src/java.desktop/unix/classes/sun/awt/X11/XWindowPeer.java
+@@ -1260,6 +1260,7 @@ class XWindowPeer extends XPanelPeer imp
+ 
+     boolean isOverrideRedirect() {
+         return XWM.getWMID() == XWM.OPENLOOK_WM ||
++            XWM.getWMID() == XWM.COMPIZ_WM ||
+             Window.Type.POPUP.equals(getWindowType());
+     }
+ 

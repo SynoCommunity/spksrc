@@ -1,0 +1,3 @@
+bin:bin/SvtHevcEncApp
+lib:lib/libSvtHevcEnc.so.1
+lnk:lib/libSvtHevcEnc.so

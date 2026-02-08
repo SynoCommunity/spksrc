@@ -1,0 +1,188 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2023-2024 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+/*========================== begin_copyright_notice ============================
+
+Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+See https://llvm.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 with LLVM-exception
+
+============================= end_copyright_notice ===========================*/
+
+diff --git a/llvm/include/llvm/Analysis/ScalarEvolution.h b/llvm/include/llvm/Analysis/ScalarEvolution.h
+index 51558a37b..a2069980a 100644
+--- a/llvm/include/llvm/Analysis/ScalarEvolution.h
++++ b/llvm/include/llvm/Analysis/ScalarEvolution.h
+@@ -1613,6 +1613,9 @@ private:
+   /// Provide the special handling we need to analyze PHI SCEVs.
+   const SCEV *createNodeForPHI(PHINode *PN);
+ 
++  /// Helper function to get a single start and back edge value from a phi node.
++  std::pair<Value*, Value*> getStartAndBackEdgeValues(PHINode *PN);
++
+   /// Helper function called from createNodeForPHI.
+   const SCEV *createAddRecFromPHI(PHINode *PN);
+ 
+diff --git a/llvm/lib/Analysis/ScalarEvolution.cpp b/llvm/lib/Analysis/ScalarEvolution.cpp
+index fc9517ebb..facfe1c7d 100644
+--- a/llvm/lib/Analysis/ScalarEvolution.cpp
++++ b/llvm/lib/Analysis/ScalarEvolution.cpp
+@@ -5529,10 +5529,11 @@ const SCEV *ScalarEvolution::createSimpleAffineAddRec(PHINode *PN,
+   return PHISCEV;
+ }
+ 
+-const SCEV *ScalarEvolution::createAddRecFromPHI(PHINode *PN) {
++std::pair<Value *, Value *>
++ScalarEvolution::getStartAndBackEdgeValues(PHINode *PN) {
+   const Loop *L = LI.getLoopFor(PN->getParent());
+   if (!L || L->getHeader() != PN->getParent())
+-    return nullptr;
++    return {};
+ 
+   // The loop may have multiple entrances or multiple exits; we can analyze
+   // this phi as an addrec if it has a unique entry value and a unique
+@@ -5555,10 +5556,18 @@ const SCEV *ScalarEvolution::createAddRecFromPHI(PHINode *PN) {
+     }
+   }
+   if (!BEValueV || !StartValueV)
+-    return nullptr;
++    return {};
++  return {StartValueV, BEValueV};
++}
+ 
+-  assert(ValueExprMap.find_as(PN) == ValueExprMap.end() &&
+-         "PHI node already processed?");
++const SCEV *ScalarEvolution::createAddRecFromPHI(PHINode *PN) {
++  // The loop may have multiple entrances or multiple exits; we can analyze
++  // this phi as an addrec if it has a unique entry value and a unique
++  // backedge value.
++  std::pair<Value *, Value *> StartAndBEValueV = getStartAndBackEdgeValues(PN);
++  Value *BEValueV = StartAndBEValueV.second, *StartValueV = StartAndBEValueV.first;
++  if (!BEValueV || !StartValueV)
++    return nullptr;
+ 
+   // First, try to find AddRec expression without creating a fictituos symbolic
+   // value for PN.
+@@ -5572,6 +5581,7 @@ const SCEV *ScalarEvolution::createAddRecFromPHI(PHINode *PN) {
+   // Using this symbolic name for the PHI, analyze the value coming around
+   // the back-edge.
+   const SCEV *BEValue = getSCEV(BEValueV);
++  const Loop *L = LI.getLoopFor(PN->getParent());
+ 
+   // NOTE: If BEValue is loop invariant, we know that the PHI node just
+   // has a special value for the first iteration of the loop.
+@@ -5772,8 +5782,15 @@ static bool IsAvailableOnEntry(const Loop *L, DominatorTree &DT, const SCEV *S,
+ // Try to match a control flow sequence that branches out at BI and merges back
+ // at Merge into a "C ? LHS : RHS" select pattern.  Return true on a successful
+ // match.
+-static bool BrPHIToSelect(DominatorTree &DT, BranchInst *BI, PHINode *Merge,
+-                          Value *&C, Value *&LHS, Value *&RHS) {
++static bool BrPHIToSelect(DominatorTree &DT, PHINode *Merge, Value *&C,
++                          Value *&LHS, Value *&RHS) {
++
++  BasicBlock *IDom = DT[Merge->getParent()]->getIDom()->getBlock();
++  assert(IDom && "At least the entry block should dominate PN");
++
++  auto *BI = dyn_cast<BranchInst>(IDom->getTerminator());
++  if (!BI || !BI->isConditional())
++    return false;
+   C = BI->getCondition();
+ 
+   BasicBlockEdge LeftEdge(BI->getParent(), BI->getSuccessor(0));
+@@ -5802,6 +5819,11 @@ static bool BrPHIToSelect(DominatorTree &DT, BranchInst *BI, PHINode *Merge,
+   return false;
+ }
+ 
++static bool BrPHIToSelect(DominatorTree& DT, PHINode* Merge) {
++  Value *Cond = nullptr, *LHS = nullptr, *RHS = nullptr;
++  return BrPHIToSelect(DT, Merge, Cond, LHS, RHS);
++}
++
+ const SCEV *ScalarEvolution::createNodeFromSelectLikePHI(PHINode *PN) {
+   auto IsReachable =
+       [&](BasicBlock *BB) { return DT.isReachableFromEntry(BB); };
+@@ -5824,18 +5846,16 @@ const SCEV *ScalarEvolution::createNodeFromSelectLikePHI(PHINode *PN) {
+     //  V = phi [ %x, %left ], [ %y, %right ]
+     //
+     // as "select %cond, %x, %y"
+-
+-    BasicBlock *IDom = DT[PN->getParent()]->getIDom()->getBlock();
+-    assert(IDom && "At least the entry block should dominate PN");
+-
+-    auto *BI = dyn_cast<BranchInst>(IDom->getTerminator());
+     Value *Cond = nullptr, *LHS = nullptr, *RHS = nullptr;
+ 
+-    if (BI && BI->isConditional() &&
+-        BrPHIToSelect(DT, BI, PN, Cond, LHS, RHS) &&
++    // do not run over cycled PHIs while processing createNodeFromSelectLikePHI
++    const SCEV* S = nullptr;
++    if (BrPHIToSelect(DT, PN, Cond, LHS, RHS) &&
+         IsAvailableOnEntry(L, DT, getSCEV(LHS), PN->getParent()) &&
+-        IsAvailableOnEntry(L, DT, getSCEV(RHS), PN->getParent()))
+-      return createNodeForSelectOrPHI(PN, Cond, LHS, RHS);
++        IsAvailableOnEntry(L, DT, getSCEV(RHS), PN->getParent())) {
++        S = createNodeForSelectOrPHI(PN, Cond, LHS, RHS);
++    }
++    return S;
+   }
+ 
+   return nullptr;
+@@ -7004,6 +7024,7 @@ const SCEV *ScalarEvolution::createSCEVIter(Value *V) {
+ 
+   Stack.emplace_back(V, true);
+   Stack.emplace_back(V, false);
++
+   while (!Stack.empty()) {
+     auto E = Stack.pop_back_val();
+     Value *CurV = E.getPointer();
+@@ -7023,14 +7044,15 @@ const SCEV *ScalarEvolution::createSCEVIter(Value *V) {
+       CreatedSCEV = getOperandsToCreate(CurV, Ops);
+     }
+ 
+-    if (CreatedSCEV) {
++    if (CreatedSCEV)
+       insertValueToMap(CurV, CreatedSCEV);
+-    } else {
++    else {
+       // Queue CurV for SCEV creation, followed by its's operands which need to
+       // be constructed first.
+       Stack.emplace_back(CurV, true);
+-      for (Value *Op : Ops)
++      for (Value *Op : Ops) {
+         Stack.emplace_back(Op, false);
++      }
+     }
+   }
+ 
+@@ -7152,9 +7174,24 @@ ScalarEvolution::getOperandsToCreate(Value *V, SmallVectorImpl<Value *> &Ops) {
+   case Instruction::IntToPtr:
+     return getUnknown(V);
+ 
+-  case Instruction::PHI:
+-    // Keep constructing SCEVs' for phis recursively for now.
++  case Instruction::PHI: {
++    PHINode *PN = cast<PHINode>(U);
++
++    if (PN->getNumIncomingValues() == 2) {
++      std::pair<Value *, Value *> StartAndBEValueV =
++          getStartAndBackEdgeValues(PN);
++      if (StartAndBEValueV.first && StartAndBEValueV.second)
++        // resolve recursively - may create cycles
++        return nullptr;
++      else if (BrPHIToSelect(DT, PN))
++        // resolve iteratively - does not create cycles
++        for (auto &Op : PN->operands())
++          Ops.push_back(Op);
++    }
++
++    // resolve iteratively - does not create SCEV cycles (trivially resolved)
+     return nullptr;
++  }
+ 
+   case Instruction::Select: {
+     // Check if U is a select that can be simplified to a SCEVUnknown.

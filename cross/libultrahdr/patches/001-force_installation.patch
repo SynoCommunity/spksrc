@@ -1,0 +1,19 @@
+# Force definition of install target.
+# Original cmake configuration disables install and uninstall targets for cross compilation.
+# But we need it to install the library, header and pkg_config files.
+# 
+--- CMakeLists.txt.orig	2025-01-10 19:31:48.000000000 +0000
++++ CMakeLists.txt	2025-09-12 21:03:34.967553147 +0000
+@@ -143,12 +143,6 @@
+   message(FATAL_ERROR "Building benchmarks not supported for wasm targets")
+ endif()
+ 
+-# side effects
+-if(CMAKE_CROSSCOMPILING AND UHDR_ENABLE_INSTALL)
+-  set(UHDR_ENABLE_INSTALL FALSE) # disable install and uninstall targets during cross compilation.
+-  message(STATUS "Install and uninstall targets - Disabled")
+-endif()
+-
+ if(UHDR_BUILD_FUZZERS AND NOT UHDR_BUILD_DEPS)
+   set(UHDR_BUILD_DEPS TRUE) # For fuzz testing its best to build all dependencies from source.
+                             # This is to instrument dependency libs as well.

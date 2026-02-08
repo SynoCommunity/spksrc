@@ -1,0 +1,17 @@
+# avoid use of PERF_COUNT_HW_REF_CPU_CYCLES if not defined
+# fixes build for arch-evansport-7.1
+# 
+--- hwy/perf_counters.cc.orig	2025-08-14 07:25:53.000000000 +0000
++++ hwy/perf_counters.cc	2025-09-12 12:51:28.710862219 +0000
+@@ -58,7 +58,11 @@
+ // because the latter is not supported and returns 0, see
+ // https://lwn.net/Articles/967791/.
+ uint64_t RefCyclesOrCycles() {
++#if defined(PERF_COUNT_HW_REF_CPU_CYCLES)
+   const uint32_t ref_cycles = PERF_COUNT_HW_REF_CPU_CYCLES;
++#else
++  const uint32_t ref_cycles = PERF_COUNT_HW_CPU_CYCLES;
++#endif
+ 
+   utsname buf;
+   if (uname(&buf) != 0) return ref_cycles;

@@ -1,0 +1,3 @@
+lnk:lib/libpcap.so
+lnk:lib/libpcap.so.1
+lib:lib/libpcap.so.1.10.5

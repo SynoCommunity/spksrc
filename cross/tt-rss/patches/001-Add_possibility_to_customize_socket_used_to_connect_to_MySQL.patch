@@ -1,0 +1,48 @@
+Index: classes/db.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/classes/db.php b/classes/db.php
+--- a/classes/db.php	(revision c30b24d09f4096e612965af658540595262f6848)
++++ b/classes/db.php	(date 1673518844000)
+@@ -35,8 +35,12 @@
+ 		} else {
+ 			$db_charset = '';
+ 		}
++		$db_socket = '';
++		if (Config::get(Config::DB_TYPE) == "mysql" && Config::get(Config::MYSQL_DB_SOCKET)) {
++			$db_socket = ';unix_socket=' . Config::get(Config::MYSQL_DB_SOCKET);
++		}
+ 
+-		return Config::get(Config::DB_TYPE) . ':dbname=' . Config::get(Config::DB_NAME) . $db_host . $db_port . $db_charset;
++		return Config::get(Config::DB_TYPE) . ':dbname=' . Config::get(Config::DB_NAME) . $db_host . $db_port . $db_socket . $db_charset;
+ 	}
+ 
+ 	// this really shouldn't be used unless a separate PDO connection is needed
+Index: classes/config.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/classes/config.php b/classes/config.php
+--- a/classes/config.php	(revision c30b24d09f4096e612965af658540595262f6848)
++++ b/classes/config.php	(date 1673518844000)
+@@ -45,6 +45,9 @@
+	/** connection charset for MySQL. if you have a legacy database and/or experience
+	 * garbage unicode characters with this option, try setting it to a blank string. */
+	const MYSQL_CHARSET = "MYSQL_CHARSET";
++
++	/** Path to the MySQL Socket to use for connecting */ 
++	const MYSQL_DB_SOCKET = "MYSQL_DB_SOCKET";
+
+	/** this should be set to a fully qualified URL used to access
+	 * your tt-rss instance over the net, such as: https://example.com/tt-rss/
+@@ -182,6 +184,7 @@
+ 		Config::DB_PASS => [ "", 											Config::T_STRING ],
+ 		Config::DB_PORT => [ "5432",										Config::T_STRING ],
+ 		Config::MYSQL_CHARSET => [ "UTF8",								Config::T_STRING ],
++		Config::MYSQL_DB_SOCKET => [ "",								Config::T_STRING ],
+ 		Config::SELF_URL_PATH => [ "",									Config::T_STRING ],
+ 		Config::SINGLE_USER_MODE => [ "",								Config::T_BOOL ],
+ 		Config::SIMPLE_UPDATE_MODE => [ "",								Config::T_BOOL ],

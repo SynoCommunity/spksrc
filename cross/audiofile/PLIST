@@ -1,0 +1,5 @@
+bin:bin/sfconvert
+bin:bin/sfinfo
+lnk:lib/libaudiofile.so
+lnk:lib/libaudiofile.so.1
+lib:lib/libaudiofile.so.1.0.0

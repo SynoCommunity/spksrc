@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.horde": {
+            "title": "Horde",
+            "desc": "Horde",
+            "icon": "images/horde-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": 80,
+            "url": "/horde",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

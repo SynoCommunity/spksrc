@@ -1,0 +1,45 @@
+Task List:
+----------
+ONGOING - Isolate into individual patches
+ TODO   - Review code of SYNO_EVANSPORT_DTV_SMD_AVSYNC to use ifdef (currently forced with // comments)
+ TODO   - Merge code of patch 086 directly on _smd main patches as this is fix segfault fix
+
+PATCH:
+10 -> 49 : Port from Synology FFMPEG 3.3.7
+50 -> 99 : Port from Synology FFMPEG 2.7.1
+   100+  : Discarded patches as non-applicable to FFMPEG usage with VideoStation
+
+COMPLETED - FFMPEG 3.3.7:
+#define SYNO_VIDEOSTATION_HLS_SEEK_TIME                      -> 020
+#define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME             -> 021
+#define SYNO_VIDEOSTATION_SKIP_DISPLAYMATRIX                 -> 022
+#define SYNO_VIDEOSTATION_WEBM_SEEK_TIME                     -> 023
+#define SYNO_SMOOTH_STREAMING                                -> 030
+#define SYNO_FILTER_SRT_TAGS                                 -> 031
+#define SYNO_FIX_MP4_REMUX_H264PARSER                        -> 032
+#define SYNO_WRITE_RIFF_INFO_TAG_TO_WAV                      -> 033 - Fixed: spksrc issue #3716
+#define SYNO_ALPINE_NEON_LIBSWSCALE                          -> alpine/001
+#define SYNO_FIX_QORIQ_CORE_DUMP                             -> qoriq/001
+
+COMPLETED - FFMPEG 2.7.1:
+#define SYNO_EVANSPORT_SMD                                   -> evansport/001
+#define SYNO_EVANSPORT_AUTO_HW_DECODER                       -> evansport/002
+#define SYNO_EVANSPORT_FLV_EXTRADATA                         -> evansport/003
+#define SYNO_EVANSPORT_DTV_SMD_AVSYNC                        -> evansport/004 -> Fixed: Use ifdef instead of //
+#define SYNO_EVANSPORT_HANDBRAKE_MP4                         -> evansport/005
+#define SYNO_EVANSPORT_SMOOTH_STREAMING_TIMESTAMP_INACCURATE -> evansport/006
+
+REJECT:
+#define SYNO_HLS_COSTUMIZED_TS_NAME                         -> 100 -> Relates to Synology SurveillanceStation
+#define SYNO_SKIP_DISABLED_AUDIO_STREAM                     -> 101 -> Unrelated to VideoStation
+#define SYNO_SKIP_FLAC_PARSE_PICTURE                        -> 102 -> Relates to AudioStation...   *** To reconsider? ***
+#define SYNO_DTV_MPEGTS_DVBSUB_ENCODING                     -> 103 -> Fixed upstream
+DTV_SKIP: UNKNOWN OR VISUAL_IMPAIRED TRACK                  -> 104 -> To reconsider if usage known
+   #define SYNO_DTV_SKIP_UNKNOWN_TRACK
+   #define SYNO_DTV_SKIP_VISUAL_IMPAIRED_TRACK
+Empty #define                                               -> 105
+   #define SYNO_DTV_SKIP_TELETEXT
+   #define SYNO_MPEGTS_FORAMT_AAC_COPY_FAILED
+   #define SYNO_FFSERVER_MULTIPLE_AUDIO_TRACK               -> ffserver no longer existent
+#define SYNO_CODEC_PATENT_G1                                -> 106 -> Prevents users of Xpenology from using VideoStation
+Synology build configs & scripts                            -> 107 -> Kept for later reference

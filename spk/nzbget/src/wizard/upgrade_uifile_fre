@@ -1,0 +1,21 @@
+[{
+    "step_title": "Installation de NZBGet",
+    "items": [{
+        "desc": "L'installateur va maintenant télécharger la version voulue de NZBGet depuis NZBget.com et l'installer. Vous pouvez ensuite mettre à jour depuis NZBGet (Config > System)."
+      }, {
+        "type": "singleselect",
+        "desc": "Version à installer:",
+        "subitems": [{
+            "key": "wizard_stable_release",
+            "desc": "Dernière version stable de NZBGet",
+            "defaultValue": true
+          }, {
+            "key": "wizard_testing_release",
+            "desc": "Dernière version de test (beta) de NZBGet",
+            "defaultValue": false
+          }
+        ]
+      }
+    ]
+  }
+]

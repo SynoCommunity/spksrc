@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.jellyfin": {
+            "title": "Jellyfin",
+            "desc": "Jellyfin Web UI",
+            "icon": "images/jellyfin-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "8096",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

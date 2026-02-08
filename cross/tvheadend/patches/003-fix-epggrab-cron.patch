@@ -1,0 +1,11 @@
+--- src/epggrab.c.orig	2021-10-21 00:14:56.000000000 +0000
++++ src/epggrab.c	2021-10-25 20:17:24.306546129 +0000
+@@ -252,7 +252,7 @@ static void _epggrab_load ( void )
+   /* Defaults */
+   } else {
+     free(epggrab_conf.cron);
+-    epggrab_conf.cron = strdup("# Default config (00:04 and 12:04 everyday)\n4 */12 * * *");
++    epggrab_conf.cron = strdup("# Default config (00:04 and 12:04 everyday)\n4 0 * * *\n4 12 * * *");
+     LIST_FOREACH(mod, &epggrab_modules, link) // enable only OTA EIT and OTA PSIP by default
+       if (mod->type == EPGGRAB_OTA &&
+           ((mod->subsys == LS_TBL_EIT && strcmp(mod->id, "eit") == 0) ||

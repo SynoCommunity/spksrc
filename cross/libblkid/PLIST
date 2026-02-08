@@ -1,0 +1,3 @@
+lnk:lib/libblkid.so
+lnk:lib/libblkid.so.1
+lib:lib/libblkid.so.1.1.0

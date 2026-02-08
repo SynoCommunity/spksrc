@@ -1,0 +1,3 @@
+lnk:lib/libssh.so
+lnk:lib/libssh.so.4
+lib:lib/libssh.so.4.10.3

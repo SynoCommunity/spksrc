@@ -1,0 +1,32 @@
+[
+  {
+    "step_title": "Configuration de démonstration",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Veuillez spécifier un dossier partagé pour ce package. Ce partage est créé à l'installation lorsqu'il n'existe pas déjà.",
+        "subitems": [
+          {
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared Folder",
+            "defaultValue": "demo-share",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Les sous-répertoires ne sont pas pris en charge."              }
+            }
+          }
+        ]
+      }, {
+        "desc": ""
+      }, {
+        "desc": "Si vous laissez le programme d'installation créer le dossier partagé, il est créé sous le même volume que celui où le package est installé.<br/>Si vous souhaitez utiliser un volume différent pour le partage, vous devez auparavant créer le dossier partagé dans le panneau de configuration DSM et saisir le nom du partage existant dans le champ ci-dessus."
+      }, {
+        "desc": ""
+      }, {
+         "desc": "Ce package s'exécute en tant qu'utilisateur de service interne <b>'sc-demoservice'</b> dans DSM. Le dossier partagé ci-dessus est configuré au moment de l'installation pour être accessible par cet utilisateur.<p>Veuillez lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+      }
+    ]
+  }
+]

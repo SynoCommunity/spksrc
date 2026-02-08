@@ -1,0 +1,31 @@
+[
+  {
+    "step_title": "Basic Configuration",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Please specify a download folder for this package. This share is created at installation when it does not already exist.",
+        "subitems": [
+          {
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared Folder",
+            "defaultValue": "Downloads",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Subdirectories are not supported."
+              }
+            }
+          }
+        ]
+      }, {
+        "desc": "If you let the installer handle it, the shared folder goes to the package's volume. To use a different volume, create the shared folder in DSM Control Panel before installation and input its name during setup."
+      }, {
+        "desc": ""
+      }, {
+        "desc": "This package utilizes the internal service user <b>'sc-sabnzbd'</b> in DSM. The shared folder mentioned is set up during installation to be accessible specifically by this user. For more detailed information, please consult the <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> guide."
+      }
+    ]
+  }
+]

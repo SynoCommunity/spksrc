@@ -1,0 +1,3 @@
+lnk:lib/libXrandr.so
+lnk:lib/libXrandr.so.2
+lib:lib/libXrandr.so.2.2.0

@@ -1,0 +1,23 @@
+--- a/src/java.base/share/native/libjli/java.c
++++ b/src/java.base/share/native/libjli/java.c
+@@ -1997,7 +1997,7 @@
+ ReadKnownVMs(const char *jvmCfgName, jboolean speculative)
+ {
+     FILE *jvmCfg;
+-    char line[MAXPATHLEN+20];
++    char line[MAXPATHLEN+30];
+     int cnt = 0;
+     int lineno = 0;
+     jlong start = 0, end = 0;
+@@ -2012,6 +2012,11 @@
+ 
+     jvmCfg = fopen(jvmCfgName, "r");
+     if (jvmCfg == NULL) {
++      char cfgName[strlen(jvmCfgName)+10];
++      sprintf(cfgName, "%s-default", jvmCfgName);
++      jvmCfg = fopen(cfgName, "r");
++    }
++    if (jvmCfg == NULL) {
+       if (!speculative) {
+         JLI_ReportErrorMessage(CFG_ERROR6, jvmCfgName);
+         exit(1);

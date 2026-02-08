@@ -1,0 +1,4 @@
+bin:bin/stunnel
+rsc:bin/stunnel3
+rsc:etc/stunnel/stunnel.conf-sample
+lib:lib/stunnel/libstunnel.so

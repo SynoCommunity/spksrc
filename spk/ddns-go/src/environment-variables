@@ -1,0 +1,8 @@
+# Define environment variables for ddns-go parameters configuration
+#
+# If you want to change the startup parameters after installation, 
+# you can modify the following variables
+#
+# example:
+#DDNS_GO_FREQUENCY=300
+#DDNS_GO_CACHETIMES=5

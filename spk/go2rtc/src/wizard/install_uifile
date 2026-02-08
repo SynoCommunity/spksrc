@@ -1,0 +1,43 @@
+[
+   {
+      "step_title": "go2rtc configuration",
+      "items": [
+         {
+            "type": "textfield",
+            "subitems": [
+               {
+                  "key": "wizard_root_user",
+                  "desc": "go2rtc root user",
+                  "defaultValue": "",
+                  "validator": {
+                     "allowBlank": false,
+                     "minLength": 3,
+                     "regex": {
+                        "expr": "/^[^<>:*/?\"|]*$/",
+                        "errorText": "Not allowed character in username"
+                     }
+                  }
+               }
+            ]
+         },
+         {
+            "type": "password",
+            "subitems": [
+               {
+                  "key": "wizard_root_password",
+                  "desc": "go2rtc root password",
+                  "defaultValue": "",
+                  "validator": {
+                     "allowBlank": false,
+                     "minLength": 8,
+                     "regex": {
+                        "expr": "/^[^\"|]*$/",
+                        "errorText": "Not allowed character in password"
+                     }
+                  }
+               }
+            ]
+         }
+      ]
+   }
+]

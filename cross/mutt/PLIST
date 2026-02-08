@@ -1,0 +1,10 @@
+rsc:bin/flea
+bin:bin/mutt
+bin:bin/mutt_pgpring
+rsc:bin/muttbug
+bin:bin/pgpewrap
+rsc:bin/smime_keys
+rsc:var/Muttrc
+rsc:var/mime.types
+rsc:var/mime.types.dist
+rsc:share/

@@ -1,0 +1,15 @@
+bin:bin/ircat
+bin:bin/irexec
+bin:bin/irpty
+bin:bin/irrecord
+bin:bin/irsend
+bin:bin/irw
+bin:bin/lircrcd
+bin:bin/mode2
+rsc:bin/pronto2lirc
+lnk:lib/liblirc_client.so
+lnk:lib/liblirc_client.so.0
+lib:lib/liblirc_client.so.0.2.1
+rsc:lib/modules/*
+bin:sbin/lircd
+bin:sbin/lircmd

@@ -1,0 +1,6 @@
+COPS_CONFIGURATION_UPGRADE_STEP_TITLE: "COPS library upgrade"
+
+UPGRADE_CALIBRE_DIRECTORY_DESCRIPTION: "The Calibre library directory must now reside within a data share. Based on the detected previous configuration, please confirm that the specified data share contains your library."
+UPGRADE_CALIBRE_DIRECTORY_LABEL: "Share name"
+UPGRADE_CALIBRE_DIRECTORY_VALIDATION_ERROR_TEXT: "The shared folder name contains invalid characters or starts/ends with a space."
+UPGRADE_NOTE_CALIBRE_DIRECTORY_DESCRIPTION: "NOTE: If your Calibre library isn't in the specified share, a new share will be created. After the upgrade, manually move the library to this new location."

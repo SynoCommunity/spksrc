@@ -1,0 +1,173 @@
+Index: linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/ChangeLog
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1457.orig/util/alevt/ChangeLog	2011-12-08 01:26:50.000000000 +1100
++++ linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/ChangeLog	2012-01-05 22:23:33.000000000 +1100
+@@ -1,11 +1,11 @@
+-Thu Feb 11 22:05:00 MET 2010	(1.7.0)
++Sat Feb 14 15:10:00 MET 2010	(1.7.0)
+ 
+     - redesigned version:
+     - outfile, new starting methods, libzvbi implementation
+     - lots of bug fixes, all patches available in the Internet applied
+-    - extensive code cleanup
++    - intensive code cleanup
+ 
+-Mon Dec  3 03:11:07 MET 2007	(1.6.2)
++Mon Dec 3 03:11:07 MET 2007	(1.6.2)
+ 
+     - compilation fixes for newer gcc
+     - makefile tweaks (man vs share/man, /usr/X11R6 vs /usr, etc)
+Index: linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/README
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1457.orig/util/alevt/README	2011-12-08 01:26:50.000000000 +1100
++++ linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/README	2012-01-05 22:23:33.000000000 +1100
+@@ -13,7 +13,7 @@
+ 3. lots of cruft which is completely outdated or obsolete for other reasons
+ 
+ To handle all that in one big effort I decided to redesign the program
+-completely, enlarging its capabilities for DVB-S at the same time.
++completely, enlarging its DVB capabilities at the same time.
+ 
+ So here are the changes:
+ 
+@@ -22,8 +22,7 @@
+ 
+ 2. Erasure of old outdated integers, functions, parameters:
+ 
+-- bell, big_buf, debug, display, editor, erc, fine_tune, newbttv,
+-- oldbttv
++- bell, big_buf, debug, display, editor, erc, fine_tune, newbttv, oldbttv.
+ 
+ 3. Coding style cleanups (no superfluous comments, not more than
+    80 characters per column, no uncommented code.
+@@ -52,20 +51,24 @@
+    make install" there is an uninstaller now to revert the installation:
+    "make uninstall".
+ 
+-ENJOY IT!
++External dependencies to run that program:
+ 
+-Uwe Bugla, February 11th, 2010.
++AleVT needs some some system libraries to be installed in your system.
++- libc6 (>= 2.3.6)
++- libpng12 (>= 1.2.13)
++- libx11 (>= 1.3.3)
++- libzvbi0 (>= 0.2.11)
++- zlib (>= 1.1.4)
+ 
+-External dependencies
++ENJOY IT!
+ 
+-AleVT needs some system libraries to be installed in your system.
+-They are zlib, libX11, libpng and libzvbi.
++Uwe Bugla, February 14th, 2010.
+ 
+ Credits go to:
+ - Andreas Rottmann from debian.org for compiler fixes and
+   other kinds of investigation.
+ - Francesco Lavra for supplying a kernel patch to avoid kernel demux
+-  incompatibilities with kernels >= 2.6.32
++  incompatibilities with kernels 2.6.32-rc1 - 2.6.33-rc7
+ - Andy Walls for helpful investigation in kernelspace
+ - Edgar Toernig for providing the source version 1.6.2 and doing all the
+   development for the basic versions
+Index: linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/TODO
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1457.orig/util/alevt/TODO	2011-12-08 01:26:50.000000000 +1100
++++ linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/TODO	2012-01-05 22:23:33.000000000 +1100
+@@ -1,12 +1,18 @@
+-Hi, these are issues that I unfortunately cannot resolve myself:
++These are issues that I unfortunately cannot resolve myself:
+ 
+-1. graphical menu written in GKT2, to be used in general connection with
++1. Most important: for usage without script and outfile option:
++    DVB monitoring demon helping the program to rewrite the PAT
++    (Program Allocation Table) when the external player software
++    has chosen a channel which is part of a new transponder.
++    At the moment alevt hangs when the transponder is changed by an
++    external player software.
++    It then can only be stopped via "killall -9 alevt".
++    Or you switch it off before every channel change.
++
++2. Graphical menu written in GKT2, to be used in general connection with
+     the outfile (-o) option.
+ 
+-2. for usage without script and outfile option:
+-    DVB monitoring demon helping the program to rewrite the PAT when the
+-    external player software has chosen a channel which is part of a
+-    new transponder.
+-    At the moment alevt hangs when the transponder is changed.
++3. New BDF fonts for slightly bigger windows.
++    Those BDF fonts need to be edited so that they can be transformed by bdf2xbm.
+ 
+-Uwe Bugla, February 11th, 2010.
++Uwe Bugla, February 14th, 2010.
+Index: linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/vbi.c
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1457.orig/util/alevt/vbi.c	2011-12-08 01:26:50.000000000 +1100
++++ linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/vbi.c	2012-01-05 22:23:33.000000000 +1100
+@@ -706,10 +706,6 @@
+ 			}
+ 		j = i + 5;
+ 		i = j + (((tbl[i+3] << 8) | tbl[i+4]) & 0x0fff);
+-		if (!progp) {
+-			error("SDT: service_id 0x%x not in PAT\n", k);
+-			continue;
+-		}
+          while (j < i) {
+             switch (tbl[j]) {
+                case 0x48: // service descriptor
+Index: linuxtv-dvb-apps-1.1.1+rev1457/util/Makefile
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1457.orig/util/Makefile	2011-12-08 01:26:50.000000000 +1100
++++ linuxtv-dvb-apps-1.1.1+rev1457/util/Makefile	2012-01-05 22:23:33.000000000 +1100
+@@ -19,3 +19,4 @@
+ 	$(MAKE) -C gotox $@
+ 	$(MAKE) -C zap $@
+ 	$(MAKE) -C lsdvb $@
++	$(MAKE) -C alevt $@
+Index: linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/Makefile
+===================================================================
+--- linuxtv-dvb-apps-1.1.1+rev1457.orig/util/alevt/Makefile	2011-12-08 01:26:50.000000000 +1100
++++ linuxtv-dvb-apps-1.1.1+rev1457/util/alevt/Makefile	2012-01-05 22:27:12.000000000 +1100
+@@ -57,28 +57,36 @@
+ 	rm -f alevt alevt-date alevt-cap
+ 
+ rpm-install: all
++	install -d 0755 ${RPM_BUILD_ROOT}$(USR_X11R6)/bin
++	install -d 0755 ${RPM_BUILD_ROOT}$(USR_X11R6)/$(MAN)/man1
++	install -d 0755 $(RPM_BUILD_ROOT)$(USR_X11R6)/include/X11/pixmaps
++
+ 	install -m 0755 alevt        ${RPM_BUILD_ROOT}$(USR_X11R6)/bin
+ 	install -m 0755 alevt-date   ${RPM_BUILD_ROOT}$(USR_X11R6)/bin
+ 	install -m 0755 alevt-cap    ${RPM_BUILD_ROOT}$(USR_X11R6)/bin
+ 	install -m 0644 alevt.1      ${RPM_BUILD_ROOT}$(USR_X11R6)/$(MAN)/man1
+ 	install -m 0644 alevt-date.1 ${RPM_BUILD_ROOT}$(USR_X11R6)/$(MAN)/man1
+ 	install -m 0644 alevt-cap.1  ${RPM_BUILD_ROOT}$(USR_X11R6)/$(MAN)/man1
+-	install -d 0755 $(RPM_BUILD_ROOT)$(USR_X11R6)/include/X11/pixmaps
+-	install -m 0644 alevt.png $(RPM_BUILD_ROOT)$(USR_X11R6)/include/X11/pixmaps
++	install -m 0644 icon.xbm $(RPM_BUILD_ROOT)$(USR_X11R6)/include/X11/pixmaps/alevt.xbm
+ 
+ install: all
++	install -d 0755 $(DESTDIR)$(PREFIX)/bin
++	install -d 0755 $(DESTDIR)$(PREFIX)/share/man/man1
++	install -d 0755 $(DESTDIR)$(PREFIX)/share/pixmaps
++	install -d 0755 $(DESTDIR)$(PREFIX)/share/applications
++
+ 	install -m 0755 alevt		$(DESTDIR)$(PREFIX)/bin
+ 	install -m 0755 alevt-date	$(DESTDIR)$(PREFIX)/bin
+ 	install -m 0755 alevt-cap	$(DESTDIR)$(PREFIX)/bin
+ 	install -m 0644 alevt.1		$(DESTDIR)$(PREFIX)/share/man/man1
+ 	install -m 0644 alevt-date.1	$(DESTDIR)$(PREFIX)/share/man/man1
+ 	install -m 0644 alevt-cap.1	$(DESTDIR)$(PREFIX)/share/man/man1
+-	install -m 0644 alevt.png $(DESTDIR)$(PREFIX)/share/pixmaps
++	install -m 0644 icon.xbm $(DESTDIR)$(PREFIX)/share/pixmaps/alevt.xbm
+ 	install -m 0644 alevt.desktop $(DESTDIR)$(PREFIX)/share/applications
+ 
+ uninstall: clean
+ 	rm -f /usr/bin/alevt /usr/bin/alevt-cap /usr/bin/alevt-date \
+-	/usr/share/pixmaps/alevt.png /usr/share/applications/alevt.desktop \
++	/usr/share/pixmaps/alevt.xbm /usr/share/applications/alevt.desktop \
+ 	/usr/share/man/man1/alevt.1 /usr/share/man/man1/alevt-cap.1 \
+ 	/usr/share/man/man1/alevt-date.1
+ 

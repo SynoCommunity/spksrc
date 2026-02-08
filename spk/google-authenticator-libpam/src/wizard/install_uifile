@@ -1,0 +1,10 @@
+[
+    {
+        "step_title": "How to use this package",
+        "items": [
+            {
+                "desc": "For instructions on how to use this package with your device, please visit our wiki page <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Google-Authenticator-PAM\">Google-Authenticator-PAM</a>."
+            }
+        ]
+    }
+]

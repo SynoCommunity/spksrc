@@ -1,0 +1,8 @@
+NEXTCLOUD_PATH_VALIDATION_ERROR_TEXT: "Le chemin doit commencer par /volume?/ avec ? le numéro de volume"
+
+NEXTCLOUD_BACKUP_SERVER_STEP_TITLE: "Sauvegarder le serveur Nextcloud"
+NEXTCLOUD_BACKUP_SERVER_DESCRIPTION: "<strong>AVERTISSEMENT:</strong> La désinstallation du package Nextcloud entraînera la suppression du serveur Nextcloud, ainsi que de tous les comptes d'utilisateurs, données et configurations associés."
+MYSQL_ROOT_PASSWORD_DESCRIPTION: "Entrez le mot de passe de votre compte superutilisateur MariaDB"
+MYSQL_ROOT_PASSWORD_LABEL: "Mot de passe « root » de MariaDB"
+NEXTCLOUD_BACKUP_EXPORT_LOCATION_DESCRIPTION: "Avant la désinstallation, si vous souhaitez conserver une sauvegarde de vos données, veuillez spécifier le répertoire vers lequel vous souhaitez exporter. Assurez-vous que l'utilisateur 'sc-nextcloud' dispose des autorisations d'écriture dans ce répertoire. Pour ignorer l'exportation, laissez ce champ vide."
+NEXTCLOUD_BACKUP_EXPORT_LOCATION_LABEL: "Emplacement d'exportation"

@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.jackett": {
+            "title": "Jackett",
+            "desc": "Jackett Web UI",
+            "icon": "images/jackett-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "9117",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

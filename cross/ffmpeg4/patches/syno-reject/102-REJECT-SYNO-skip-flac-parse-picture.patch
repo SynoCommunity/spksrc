@@ -1,0 +1,31 @@
+diff -uprN ../ffmpeg-4.2.2-patch101/libavformat/flacdec.c ./libavformat/flacdec.c
+--- ../ffmpeg-4.2.2-patch101/libavformat/flacdec.c	2019-12-31 16:35:24.000000000 -0500
++++ ./libavformat/flacdec.c	2020-03-06 08:22:41.693149443 -0500
+@@ -146,12 +146,14 @@ static int flac_read_header(AVFormatCont
+             }
+             av_freep(&buffer);
+         } else if (metadata_type == FLAC_METADATA_TYPE_PICTURE) {
++#ifndef SYNO_SKIP_FLAC_PARSE_PICTURE
+             ret = ff_flac_parse_picture(s, buffer, metadata_size);
+             av_freep(&buffer);
+             if (ret < 0) {
+                 av_log(s, AV_LOG_ERROR, "Error parsing attached picture.\n");
+                 return ret;
+             }
++#endif
+         } else if (metadata_type == FLAC_METADATA_TYPE_SEEKTABLE) {
+             const uint8_t *seekpoint = buffer;
+             int i, seek_point_count = metadata_size/SEEKPOINT_SIZE;
+diff -uprN ../ffmpeg-4.2.2-patch101/synoconfig.h ./synoconfig.h
+--- ../ffmpeg-4.2.2-patch101/synoconfig.h	2020-03-06 08:15:13.000000000 -0500
++++ ./synoconfig.h	2020-03-06 08:23:33.246210959 -0500
+@@ -80,3 +80,9 @@
+ #if !defined(STANDALONE) && !defined(SYNO_VIDEOSTATION) && !defined(SYNO_MEDIASERVER)
+ #define SYNO_SKIP_DISABLED_AUDIO_STREAM
+ #endif
++ 
++/* skip parse_picture in flacdec.c
++ * to avoid gapless playback fails when flac has big embedded cover
++ * See Audio Station #1013
++ */
++#define SYNO_SKIP_FLAC_PARSE_PICTURE

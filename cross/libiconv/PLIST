@@ -1,0 +1,7 @@
+bin:bin/iconv
+lnk:lib/libcharset.so
+lnk:lib/libcharset.so.1
+lib:lib/libcharset.so.1.0.0
+lnk:lib/libiconv.so
+lnk:lib/libiconv.so.2
+lib:lib/libiconv.so.2.6.1

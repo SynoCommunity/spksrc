@@ -1,0 +1,22 @@
+# see https://gitlab.gnome.org/GNOME/glib/-/issues/2274
+# as this will not be maintained upstream we will have to maintain this patch
+--- meson.build.orig	2021-01-09 14:43:01.994870325 +0000
++++ meson.build	2021-01-09 14:44:35.463405360 +0000
+@@ -1835,7 +1835,16 @@ else
+     glib_conf.set('HAVE_PTHREAD_GETNAME_NP', 1)
+   endif
+ 
+-  if cc.has_header_symbol('sys/syscall.h', 'SYS_sched_getattr')
++  if cc.links('''
++              #include <sys/syscall.h>
++              #include <sys/types.h>
++              #include <unistd.h>
++              int main(void) {
++                uint8_t buf[100];
++                syscall (SYS_sched_getattr, (pid_t) 0, buf, (unsigned int) sizeof (buf), (unsigned int) 0);
++                return 0;
++              }''',
++              name : 'sched_getattr')
+     glib_conf.set('HAVE_SYS_SCHED_GETATTR', 1)
+   endif
+ 

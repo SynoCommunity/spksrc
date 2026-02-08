@@ -1,0 +1,12 @@
+Index: b/src/java.base/share/conf/security/java.security
+===================================================================
+--- a/src/java.base/share/conf/security/java.security
++++ b/src/java.base/share/conf/security/java.security
+@@ -316,6 +316,7 @@ keystore.type.compat=true
+ #
+ package.access=sun.misc.,\
+                sun.reflect.,\
++               org.GNOME.Accessibility.,\
+ 
+ #
+ # List of comma-separated packages that start with or equal this string

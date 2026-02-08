@@ -1,0 +1,21 @@
+[{
+    "step_title": "NZBGet installation",
+    "items": [{
+        "desc": "The installer will now download and install the specified version of NZBGet from NZBget.com.<br>In the future you should update from within NZBGet (Config > System)."
+      }, {
+        "type": "singleselect",
+        "desc": "Version to install:",
+        "subitems": [{
+            "key": "wizard_stable_release",
+            "desc": "Latest stable NZBGet version",
+            "defaultValue": true
+          }, {
+            "key": "wizard_testing_release",
+            "desc": "Latest testing (beta) NZBGet version",
+            "defaultValue": false
+          }
+        ]
+      }
+    ]
+  }
+]

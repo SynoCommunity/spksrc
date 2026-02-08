@@ -1,0 +1,38 @@
+Index: jellyfin-ffmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -7196,6 +7196,8 @@ if enabled lto; then
+     test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
+     check_cflags  -flto
+     check_ldflags -flto $cpuflags
++    check_cflags  -flto=auto
++    check_ldflags -flto=auto $cpuflags
+     disable inline_asm_direct_symbol_refs
+ fi
+ 
+@@ -7234,7 +7236,9 @@ if enabled icc; then
+             disable aligned_stack
+     fi
+ elif enabled gcc; then
+-    check_optflags -fno-tree-vectorize
++    case $gcc_basever in
++        2|2.*|3.*|4.*|5.*|6.*) check_optflags -fno-tree-vectorize ;;
++    esac
+     check_cflags -Werror=format-security
+     check_cflags -Werror=implicit-function-declaration
+     check_cflags -Werror=missing-prototypes
+Index: jellyfin-ffmpeg/libavcodec/x86/cabac.h
+===================================================================
+--- libavcodec/x86/cabac.h
++++ libavcodec/x86/cabac.h
+@@ -183,6 +183,9 @@ av_noinline
+ #else
+ av_always_inline
+ #endif
++#ifdef __GNUC__
++__attribute__((optimize("-fno-tree-vectorize")))
++#endif
+ int get_cabac_inline_x86(CABACContext *c, uint8_t *const state)
+ {
+     int bit, tmp;

@@ -1,0 +1,3 @@
+# Generated using the requirements script on March 2, 2025
+
+#pip                        ==> py312
