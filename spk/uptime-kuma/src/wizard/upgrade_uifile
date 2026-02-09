@@ -1,0 +1,22 @@
+[
+    {
+        "step_title": "Uptime Kuma Upgrade",
+        "items": [
+            {
+                "desc": "<b>Upgrading Uptime Kuma</b><br/><br/>Your existing monitoring data (database, configuration, and uploads) will be preserved during the upgrade."
+            },
+            {
+                "desc": ""
+            },
+            {
+                "desc": "<b>Recommended:</b> Back up your data directory before proceeding.<br/>Data location: <b>/var/packages/uptime-kuma/var/</b><br/><br/>You can use Hyper Backup or manually copy the directory to a safe location."
+            },
+            {
+                "desc": ""
+            },
+            {
+                "desc": "The service will be stopped during the upgrade and automatically restarted once the process completes."
+            }
+        ]
+    }
+]
