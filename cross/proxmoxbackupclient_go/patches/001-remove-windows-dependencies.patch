@@ -1,0 +1,61 @@
+# remove dependencies not available on linux and not required for cli tool
+# 
+--- main.go.orig	2024-11-21 00:27:38.000000000 +0000
++++ main.go	2025-06-30 14:18:55.962799680 +0000
+@@ -16,8 +16,6 @@
+ 	"time"
+ 
+ 	"github.com/cornelk/hashmap"
+-	"github.com/gen2brain/beeep"
+-	"github.com/getlantern/systray"
+ 	"github.com/tawesoft/golib/v2/dialog"
+ )
+ 
+@@ -185,17 +183,6 @@
+ 		os.Exit(2)
+ 	}
+ 	defer L.ReleaseProcessLock()
+-	if runtime.GOOS == "windows" {
+-		go systray.Run(func() {
+-			systray.SetIcon(ICON)
+-			systray.SetTooltip("PBSGO Backup running")
+-			beeep.Notify("Proxmox Backup Go", "Backup started", "")
+-		},
+-			func() {
+-
+-			})
+-	}
+-	
+ 
+ 	insecure := cfg.CertFingerprint != ""
+ 
+@@ -261,10 +248,6 @@
+ 			panic(err)
+ 		}
+ 	}
+-	if runtime.GOOS == "windows" {
+-		systray.Quit()
+-		beeep.Notify("Proxmox Backup Go", msg, "")
+-	}
+ 	if cfg.SMTP != nil {
+ 		var subject string
+ 
+--- go.mod.orig	2024-11-21 00:27:38.000000000 +0000
++++ go.mod	2025-06-30 14:19:05.895435170 +0000
+@@ -5,8 +5,6 @@
+ require (
+ 	github.com/cornelk/hashmap v1.0.8
+ 	github.com/dchest/siphash v1.2.3
+-	github.com/gen2brain/beeep v0.0.0-20230907135156-1a38885a97fc
+-	github.com/getlantern/systray v1.2.2
+ 	github.com/jeromehadorn/vss v0.1.0
+ 	github.com/klauspost/compress v1.17.4
+ 	github.com/rodolfoag/gow32 v0.0.0-20230512144032-1e896a3c51aa
+@@ -28,7 +26,6 @@
+ 	github.com/godbus/dbus/v5 v5.1.0 // indirect
+ 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
+ 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
+-	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
+ 	golang.org/x/exp v0.0.0-20221208152030-732eee02a75a // indirect
+ 	golang.org/x/sys v0.15.0 // indirect
+ 	golang.org/x/text v0.14.0 // indirect
