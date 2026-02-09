@@ -1,0 +1,1 @@
+Uptime Kuma 是一款自托管的监控工具，具有现代化的简洁界面。通过 HTTP(s)、TCP、Ping、DNS、Docker、MQTT、WebSocket、gRPC 等方式监控您的网站、API 和服务。通过 Telegram、Discord、Slack、电子邮件等 87 多个通知提供商即时接收告警。创建美观的公共状态页面，跟踪 SSL 证书到期时间，查看响应时间图表和可用性统计。支持双因素认证、代理配置和维护窗口。
