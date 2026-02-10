@@ -15,7 +15,7 @@ EXTRACT_PATH = $(WORK_DIR)
 
 INSTALL_TARGET = mantisbt_install
 
-# Pure PHP package, make sure ARCH is not defined
+# Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
 include ../../mk/spksrc.install-resources.mk
