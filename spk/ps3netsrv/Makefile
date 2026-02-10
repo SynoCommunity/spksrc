@@ -1,6 +1,6 @@
 SPK_NAME = ps3netsrv
-SPK_VERS = 20240709
-SPK_REV = 10
+SPK_VERS = 20250501
+SPK_REV = 11
 SPK_ICON = src/${SPK_NAME}.png
 
 DEPENDS = cross/ps3netsrv
@@ -9,7 +9,7 @@ MAINTAINER = Hirador
 # webMAN MOD is a homebrew plugin for PlayStation®3 forked from the original webMAN/sMAN by DeanK with many features added.
 DESCRIPTION = Allows PlayStation®3 content to be loaded from network. Please edit the default port “38008” to “14167” on your PS3's webMAN-MOD "Setup" section.
 DISPLAY_NAME = ps3netsrv
-CHANGELOG = "Update to ps3netsrv 20240709."
+CHANGELOG = "Update to ps3netsrv 20250501."
 
 HOMEPAGE = https://github.com/aldostools/webMAN-MOD
 LICENSE  = GPLv3
