@@ -19,7 +19,7 @@
 			"display_name": "BicBucStriim",
 			"icon": "app/images/bicbucstriim-{0}.png",
 			"php": {
-				"backend": 11,
+				"backend": 13,
 				"extensions": [
 					"gd",
 					"intl",
