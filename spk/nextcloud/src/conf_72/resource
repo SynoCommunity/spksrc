@@ -33,7 +33,7 @@
         "display_name": "Nextcloud",
         "icon": "app/images/nextcloud-{0}.png",
         "php": {
-          "backend": 11,
+          "backend": 13,
           "connect_timeout": 120,
           "extensions": [
             "curl",
@@ -42,7 +42,6 @@
             "gd",
             "gmp",
             "imagick",
-            "imap",
             "intl",
             "ldap",
             "memcached",
@@ -58,7 +57,7 @@
           ],
           "group": "http",
           "php_settings": {
-            "error_log": "/var/services/web_packages/nextcloud/php_errors.log",
+            "error_log": "/var/packages/nextcloud/var/php_errors.log",
             "memory_limit": "512M",
             "post_max_size": "16G",
             "opcache.interned_strings_buffer": "32",

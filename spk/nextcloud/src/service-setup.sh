@@ -1,4 +1,4 @@
-# Nextcloud service setup for DSM 7 with PHP 8.2
+# Nextcloud service setup for DSM 7 with PHP 8.4
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
@@ -7,14 +7,14 @@ WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 NEXTCLOUD_VERSION="${SYNOPKG_PKGVER%%-*}"
 NEXTCLOUD_ARCHIVE="nextcloud-${NEXTCLOUD_VERSION}.tar.bz2"
 NEXTCLOUD_URL="https://download.nextcloud.com/server/releases/${NEXTCLOUD_ARCHIVE}"
-NEXTCLOUD_SHA256="15ede19ad88ec724834dfad7fae306a72f932fd042f36b333fe2418155a937c5"
+NEXTCLOUD_SHA256="8dd0bc8f8e2d262edad11197d4a07af799b51fe872ee2d9259ffa19b43e543ad"
 
 if [ -z "${SYNOPKG_PKGTMP}" ]; then
     SYNOPKG_PKGTMP="${SYNOPKG_PKGDEST_VOL}/@tmp"
 fi
 
 # PHP CLI used for all maintenance tasks
-PHP_BIN="/usr/local/bin/php82"
+PHP_BIN="/usr/local/bin/php84"
 MYSQL="/usr/local/mariadb10/bin/mysql"
 MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
 MYSQL_DATABASE="${SYNOPKG_PKGNAME}"
