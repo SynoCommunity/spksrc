@@ -1,0 +1,25 @@
+{
+	"PHP84Manager.js": {
+		"SYNO.SDS.PHP84Manager.Application": {
+			"type": "app",
+			"title": "PHP 8.4 Extension Manager",
+			"appWindow": "SYNO.SDS.PHP84Manager.MainWindow",
+			"desc": "Gestionnaire d'extensions PHP 8.4",
+			"icon": "images/php84_{0}.png",
+			"allowMultiInstance": false,
+			"allowStandalone": true,
+			"allowSharing": false,
+			"allUsers": true,
+			"grantPrivilege": "all",
+			"advanceGrantPrivilege": true,
+			"depend": ["SYNO.SDS.PHP84Manager.MainWindow"]
+		},
+		"SYNO.SDS.PHP84Manager.MainWindow": {
+			"type": "lib",
+			"title": "PHP 8.4 Extension Manager",
+			"icon": "images/php84_{0}.png",
+			"depend": ["SYNO.SDS.PHP84Manager.Utils"]
+		},
+		"SYNO.SDS.PHP84Manager.Utils": []
+	}
+}
