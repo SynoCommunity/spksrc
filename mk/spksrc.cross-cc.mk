@@ -140,9 +140,13 @@ TCVARS_DONE := $(WORK_DIR)/.tcvars_done
 .PHONY: cross-stage1
 cross-stage1: $(TCVARS_DONE)
 
+ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
 	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
 	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+else
+$(TCVARS_DONE): ;
+endif
 
 # -----------------------------------------------------------------------------
 # Stage2: Package cross build
