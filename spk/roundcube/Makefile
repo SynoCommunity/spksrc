@@ -1,6 +1,6 @@
 SPK_NAME = roundcube
-SPK_VERS = 1.6.11
-SPK_REV = 8
+SPK_VERS = 1.6.13
+SPK_REV = 9
 SPK_ICON = src/roundcube.png
 
 DEPENDS  = cross/roundcube
@@ -15,7 +15,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = Roundcube is a free and open source webmail solution with a desktop-like user interface which is easy to install/configure and that runs on a standard LAMPP server. It is the same software Synology offers as Mail Station except this does not depend on Mail Server package.
 DISPLAY_NAME = Roundcube Webmail
-CHANGELOG = "1. Adjust PHP dependency handling for DSM 6/7 (PHP 7.4/8.0/8.2)."
+CHANGELOG = "Update to v1.6.13 with PHP 8.4 support for DSM 7.2+."
 
 HOMEPAGE   = https://www.roundcube.net
 LICENSE    = GPLv3
@@ -36,7 +36,7 @@ include ../../mk/spksrc.common.mk
 
 # DSM-specific PHP profiles
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
-SPK_DEPENDS = "WebStation:PHP8.2:MariaDB10:Apache2.4"
+SPK_DEPENDS = "WebStation:PHP8.4:MariaDB10:Apache2.4"
 CONF_DIR = src/conf_72/
 else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 SPK_DEPENDS = "WebStation:PHP8.0:MariaDB10:Apache2.4"
