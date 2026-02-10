@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Wings - Pelican</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2744 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; color: #4fc3f7; }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(79, 195, 247, 0.2);
+        }
+        .card h2 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .status-running { background: rgba(76, 175, 80, 0.2); color: #81c784; }
+        .status-stopped { background: rgba(244, 67, 54, 0.2); color: #e57373; }
+        .instructions {
+            background: rgba(79, 195, 247, 0.1);
+            border-left: 3px solid #4fc3f7;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+        }
+        .instructions ol { margin-left: 20px; line-height: 1.8; }
+        .instructions code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 15px;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #4fc3f7;
+        }
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: flex-end;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+            color: #000;
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .alert-success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #81c784;
+        }
+        .alert-error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: #e57373;
+        }
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-left-color: #000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .info-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .info-label {
+            display: block;
+            font-size: 0.8rem;
+            color: #a0a0a0;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            display: block;
+            font-size: 1.1rem;
+            color: #4fc3f7;
+            font-family: monospace;
+            font-weight: 600;
+        }
+        .warning-note {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #fbbf24;
+        }
+        .warning-note code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fff;
+        }
+        .success-note {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #81c784;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Configuration Wings - Pelican</h1>
+
+        <div class="card">
+            <h2>Status Wings <span id="wingsStatus" class="status-badge status-stopped">Chargement...</span></h2>
+        </div>
+
+        <div class="card">
+            <h2>Instructions</h2>
+            <div class="instructions">
+                <ol>
+                    <li>Dans le <strong>Panel Pelican</strong>, allez dans <code>Admin</code> &rarr; <code>Nodes</code> &rarr; <code>Create New</code></li>
+                    <li>Configurez le Node avec les informations ci-dessous</li>
+                    <li>Cliquez sur l'onglet <code>Configuration</code> puis <code>Generate Token</code></li>
+                    <li><strong>Copiez tout le YAML</strong> et collez-le ci-dessous</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Informations pour la creation du Node</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">FQDN / IP du NAS</span>
+                    <span class="info-value" id="nasHost">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Port Daemon (Wings API)</span>
+                    <span class="info-value">8445</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Port SFTP</span>
+                    <span class="info-value">2022</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">URL du Panel (pour config Node)</span>
+                    <span class="info-value" id="panelUrl">-</span>
+                </div>
+            </div>
+            <div class="warning-note">
+                <strong>Important :</strong> Dans la configuration du Node, utilisez le port <code>8090</code> pour l'URL du Panel (pas 8080).
+            </div>
+            <div class="success-note">
+                <strong>Corrections automatiques :</strong> Lors de l'enregistrement, le port API et les chemins systeme sont automatiquement corriges pour fonctionner avec Docker sur Synology.
+            </div>
+        </div>
+
+        <div id="alertSuccess" class="alert alert-success"></div>
+        <div id="alertError" class="alert alert-error"></div>
+
+        <div class="card">
+            <h2>Configuration YAML</h2>
+            <textarea id="configEditor" placeholder="Collez la configuration YAML generee par le Panel..."></textarea>
+            <div class="button-row">
+                <button class="btn-secondary" onclick="loadConfig()">Recharger</button>
+                <button class="btn-primary" id="saveBtn" onclick="saveConfig()">Enregistrer &amp; Redemarrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Detect if running in HTTPS context (DSM built-in mode)
+        // If HTTPS, use CGI proxy served by DSM. If HTTP, call loading proxy directly.
+        const isHttps = window.location.protocol === 'https:';
+        const CGI_BASE = '/webman/3rdparty/pelican_panel/api.cgi';
+        const API_BASE = 'http://' + window.location.hostname + ':8080/api/wings';
+
+        async function apiCall(action, method, body) {
+            if (isHttps) {
+                // Use CGI proxy for HTTPS (DSM built-in mode)
+                const url = CGI_BASE + '?action=' + action;
+                const options = { method: method || 'GET' };
+                if (body) {
+                    options.headers = { 'Content-Type': 'application/json' };
+                    options.body = JSON.stringify(body);
+                }
+                return fetch(url, options);
+            } else {
+                // Direct call for HTTP
+                const endpoint = action === 'status' ? '/status' : '/config';
+                const url = API_BASE + endpoint;
+                const options = { method: method || 'GET' };
+                if (body) {
+                    options.headers = { 'Content-Type': 'application/json' };
+                    options.body = JSON.stringify(body);
+                }
+                return fetch(url, options);
+            }
+        }
+
+        async function loadConfig() {
+            hideAlerts();
+            try {
+                const response = await apiCall('get-config', 'GET');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('configEditor').value = data.config || '';
+                } else {
+                    showError(data.error || 'Erreur de chargement');
+                }
+            } catch (e) {
+                showError('Erreur de connexion: ' + e.message);
+            }
+            checkStatus();
+        }
+
+        async function saveConfig() {
+            const config = document.getElementById('configEditor').value.trim();
+            if (!config) {
+                showError('La configuration ne peut pas etre vide');
+                return;
+            }
+
+            hideAlerts();
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Enregistrement...';
+
+            try {
+                const response = await apiCall('save-config', 'POST', { config: config });
+                const data = await response.json();
+                if (data.success) {
+                    showSuccess('Configuration enregistree ! Le service redemarre...');
+                    setTimeout(checkStatus, 3000);
+                } else {
+                    showError(data.error || 'Erreur de sauvegarde');
+                }
+            } catch (e) {
+                showError('Erreur de connexion: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await apiCall('status', 'GET');
+                const data = await response.json();
+                const badge = document.getElementById('wingsStatus');
+                if (data.running) {
+                    badge.className = 'status-badge status-running';
+                    badge.textContent = 'En cours';
+                } else {
+                    badge.className = 'status-badge status-stopped';
+                    badge.textContent = data.configured ? 'Arrete' : 'Non configure';
+                }
+            } catch (e) {
+                const badge = document.getElementById('wingsStatus');
+                badge.className = 'status-badge status-stopped';
+                badge.textContent = 'Erreur';
+            }
+        }
+
+        function showSuccess(msg) {
+            const el = document.getElementById('alertSuccess');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('alertError');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function hideAlerts() {
+            document.getElementById('alertSuccess').style.display = 'none';
+            document.getElementById('alertError').style.display = 'none';
+        }
+
+        // Populate dynamic info on page load
+        function populateInfo() {
+            document.getElementById('nasHost').textContent = window.location.hostname;
+            document.getElementById('panelUrl').textContent = 'http://' + window.location.hostname + ':8090';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            populateInfo();
+            loadConfig();
+        });
+        setInterval(checkStatus, 15000);
+    </script>
+</body>
+</html>
