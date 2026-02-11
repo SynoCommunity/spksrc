@@ -1,0 +1,18 @@
+[
+    {
+        "step_title": "Ente Configuration",
+        "items": [
+            {
+                "desc": "⚠️ <b>IMPORTANT:</b> Ente requires manual setup before use:"
+            }, {
+                "desc": "1. Create PostgreSQL database 'ente_db'"
+            }, {
+                "desc": "2. Create MinIO bucket 'ente-data' via MinIO web interface"
+            }, {
+                "desc": "3. The web interface will be available on port 8097 after installation"
+            }, {
+                "desc": "4. Check the help documentation for detailed setup instructions"
+            }
+        ]
+    }
+]
