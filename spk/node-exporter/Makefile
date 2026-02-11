@@ -1,6 +1,6 @@
 SPK_NAME = node-exporter
-SPK_VERS = 1.8.2
-SPK_REV = 5
+SPK_VERS = 1.10.2
+SPK_REV = 6
 SPK_ICON = src/node-exporter.png
 
 DEPENDS = cross/node-exporter
@@ -11,7 +11,7 @@ MAINTAINER = chiehmin
 DESCRIPTION = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.
 STARTABLE = yes
 DISPLAY_NAME = Node Exporter
-CHANGELOG = "1. Update to v1.8.2."
+CHANGELOG = "Update to v1.10.2"
 
 HOMEPAGE = https://github.com/prometheus/node_exporter
 LICENSE  = Apache License 2.0
