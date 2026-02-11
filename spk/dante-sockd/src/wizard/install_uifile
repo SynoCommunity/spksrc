@@ -14,7 +14,38 @@
                 }
             }
         }]
-    }, {
+    },
+    {
+        "type": "combobox",
+        "subitems": [
+            {
+                "key": "wizard_interface",
+                "desc": "Network Interface",
+                "displayField": "ifname",
+                "valueField": "ifname",
+                "editable": false,
+                "mode": "remote",
+                "api_store": {
+                    "api": "SYNO.Core.Network.Interface",
+                    "method": "list",
+                    "version": 1,
+                    "baseParams": {
+                        "limit": -1,
+                        "offset": 0,
+                        "location": "internal"
+                    },
+                    "idProperty": "ifname",
+                    "fields": [
+                        "ifname"
+                    ]
+                },
+                "validator": {
+                    "fn": "{console.log(arguments);return true;}"
+                }
+            }
+        ]
+    },
+    {
         "type": "textfield",
         "desc": "Prevent access to local network through proxy",
         "subitems": [{
