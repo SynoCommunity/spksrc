@@ -1,0 +1,26 @@
+--- src/mpd_client.h.orig	2016-02-13 17:01:52
++++ src/mpd_client.h	2026-02-02 16:44:00
+@@ -92,8 +92,10 @@
+ 
+     int song_id;
+     unsigned queue_version;
+-} mpd;
++};
+ 
++extern struct t_mpd mpd;
++
+ struct t_mpd_client_session {
+     int song_id;
+     unsigned queue_version;
+--- src/mpd_client.c.orig	2016-02-13 17:01:52
++++ src/mpd_client.c	2026-02-02 16:44:39
+@@ -27,6 +27,9 @@
+ #include "config.h"
+ #include "json_encode.h"
+ 
++/* Global variable definition (declared extern in mpd_client.h) */
++struct t_mpd mpd;
++
+ /* forward declaration */
+ static int mpd_notify_callback(struct mg_connection *c, enum mg_event ev);
+ 

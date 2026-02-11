@@ -1,0 +1,13 @@
+--- CMakeLists.txt.orig	2016-02-13 17:01:52
++++ CMakeLists.txt	2026-02-02 16:50:15
+@@ -24,8 +24,8 @@
+ 
+ include(CheckCSourceCompiles)
+ 
+-set(CMAKE_C_FLAGS "-std=gnu99 -Wall")
+-set(CMAKE_C_FLAGS_DEBUG "-ggdb -pedantic")
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wall")
++set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -pedantic")
+ if(WITH_IPV6)
+     set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS NS_ENABLE_IPV6)
+ endif()

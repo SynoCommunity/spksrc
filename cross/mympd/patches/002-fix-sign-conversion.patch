@@ -1,0 +1,11 @@
+--- src/mympd_worker/smartpls.c.orig	2026-01-22 17:08:11
++++ src/mympd_worker/smartpls.c	2026-02-02 16:59:54
+@@ -462,7 +462,7 @@
+     if ((time_t)timerange > value_max) {
+         return false;
+     }
+-    value_max = value_max - timerange;
++    value_max = value_max - (time_t)timerange;
+ 
+     if (strcmp(sort, "shuffle") == 0 ||
+         max_entries == 0)
