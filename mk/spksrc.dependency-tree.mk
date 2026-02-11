@@ -68,8 +68,14 @@ ENCODED_DEPENDS     := $(subst /,__,$(ALL_DEPENDS))
 DEP_FLAT_TARGETS_MK := $(addprefix dep-flat-mk-,$(ENCODED_DEPENDS))
 
 # -------------------------------------------------------------------
-# spk package discovery
+# Root-level detection and spk package discovery
+#
+# When BASEDIR is empty, we are at the spksrc root directory.
+# At root level, only dependency-list-spk should be available.
+# In package directories, all other targets are exposed.
 # -------------------------------------------------------------------
+AT_ROOT_LEVEL := $(if $(BASEDIR),,1)
+
 SPK_DIRS    := $(sort $(dir $(wildcard spk/*/Makefile)))
 SPK_NAMES   := $(notdir $(patsubst %/,%,$(SPK_DIRS)))
 SPK_TARGETS := $(addprefix dependency-list-spk-,$(SPK_NAMES))
@@ -94,6 +100,34 @@ $(DEP_FLAT_STAMP_DIR):
 # Ensure per-spk output directory exists
 $(SPK_LIST_STAMP_DIR):
 	@mkdir -p $@
+
+# -------------------------------------------------------------------
+# Root-level only targets
+# -------------------------------------------------------------------
+ifeq ($(AT_ROOT_LEVEL),1)
+
+# At root level, only dependency-list-spk is available
+.PHONY: dependency-list-spk
+dependency-list-spk: | $(SPK_LIST_STAMP_DIR)
+	@$(MAKE) -j $(nproc) --silent --no-print-directory $(SPK_TARGETS)
+	@cat $(SPK_LIST_STAMP_DIR)/*.out | sort
+	@rm -rf $(SPK_LIST_STAMP_DIR)
+
+# -------------------------------------------------------------------
+# dependency-list-spk-%
+# Runs dependency-list for a single spk package and writes output to a file
+# -------------------------------------------------------------------
+.PHONY: dependency-list-spk-%
+dependency-list-spk-%: | $(SPK_LIST_STAMP_DIR)
+	@DEP_FLAT_RUN_ID=spk-$* \
+	DEP_FLAT_STAMP_DIR=/tmp/spksrc-dep-$* \
+	$(MAKE) -s --no-print-directory -C spk/$* dependency-list \
+		> $(SPK_LIST_STAMP_DIR)/$*.out 2>/dev/null || true
+
+else
+# -------------------------------------------------------------------
+# Package-level targets (only available inside package directories)
+# -------------------------------------------------------------------
 
 # -------------------------------------------------------------------
 # dependency-tree
@@ -151,23 +185,5 @@ dependency-list:
 		| tr '\n' ' '
 	@echo ""
 
-# -------------------------------------------------------------------
-# dependency-list-spk
-# Runs dependency-list for all spk packages in parallel and aggregates output
-# -------------------------------------------------------------------
-.PHONY: dependency-list-spk
-dependency-list-spk: | $(SPK_LIST_STAMP_DIR)
-	@$(MAKE) -j $(nproc) --silent --no-print-directory $(SPK_TARGETS)
-	@cat $(SPK_LIST_STAMP_DIR)/*.out | sort
-	@rm -rf $(SPK_LIST_STAMP_DIR)
-
-# -------------------------------------------------------------------
-# dependency-list-spk-%
-# Runs dependency-list for a single spk package and writes output to a file
-# -------------------------------------------------------------------
-.PHONY: dependency-list-spk-%
-dependency-list-spk-%: | $(SPK_LIST_STAMP_DIR)
-	@DEP_FLAT_RUN_ID=spk-$* \
-	DEP_FLAT_STAMP_DIR=/tmp/spksrc-dep-$* \
-	$(MAKE) -s --no-print-directory -C spk/$* dependency-list \
-		> $(SPK_LIST_STAMP_DIR)/$*.out 2>/dev/null || true
+# End of package-level targets
+endif
