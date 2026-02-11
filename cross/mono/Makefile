@@ -1,5 +1,5 @@
 PKG_NAME = mono
-PKG_VERS = 6.12.0.182
+PKG_VERS = 6.12.0.199
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.mono-project.com/sources/mono
@@ -30,6 +30,11 @@ CONFIGURE_ARGS += --disable-boehm
 CONFIGURE_ARGS += --without-ikvm-native
 # disable some features
 CONFIGURE_ARGS += --enable-minimal=profiler
+# enable net core
+CONFIGURE_ARGS += --with-core
+# jemalloc fails to cross compile
+#CONFIGURE_ARGS += --with-jemalloc
+CONFIGURE_ARGS += --with-wasm
 
 # Optimize compilation for minimal size
 ADDITIONAL_CFLAGS  = -Os
@@ -57,6 +62,11 @@ endif
 AG_ARGS += --disable-mcs-build
 AG_ARGS += --disable-boehm
 AG_ARGS += --without-ikvm-native
+AG_ARGS += --with-core
+# jemalloc fails to cross compile
+#AG_ARGS += --with-jemalloc
+AG_ARGS += --with-wasm
+AG_ARGS += --enable-btls
 
 include ../../mk/spksrc.cross-cc.mk
 
