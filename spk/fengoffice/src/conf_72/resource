@@ -42,7 +42,7 @@
                 "display_name": "Feng Office",
                 "icon": "app/images/fengoffice-{0}.png",
                 "php": {
-                    "backend": 11,
+                    "backend": 12,
                     "extensions": [
                         "curl",
                         "gd",
@@ -50,6 +50,7 @@
                         "imap",
                         "intl",
                         "mysqli",
+                        "openssl",
                         "pdo_mysql",
                         "xmlrpc",
                         "zip",
