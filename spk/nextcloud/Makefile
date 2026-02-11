@@ -9,7 +9,7 @@ override ARCH=noarch
 
 REQUIRED_MIN_DSM = 7.2
 CONF_DIR = src/conf_72
-SPK_DEPENDS = WebStation:PHP8.4:MariaDB10:Apache2.4:redis
+SPK_DEPENDS = WebStation:PHP8.3:MariaDB10:Apache2.4:redis
 
 # SRM is not supported due lacking webstation, php, mariadb and apache packages
 REQUIRED_MIN_SRM = 3.0
