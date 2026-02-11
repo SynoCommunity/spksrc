@@ -1,0 +1,441 @@
+# ntfy server config file
+#
+# Please refer to the documentation at https://ntfy.sh/docs/config/ for details.
+# All options also support underscores (_) instead of dashes (-) to comply with the YAML spec.
+
+# Public facing base URL of the service (e.g. https://ntfy.sh or https://ntfy.example.com)
+#
+# This setting is required for any of the following features:
+# - attachments (to return a download URL)
+# - e-mail sending (for the topic URL in the email footer)
+# - iOS push notifications for self-hosted servers (to calculate the Firebase poll_request topic)
+# - Matrix Push Gateway (to validate that the pushkey is correct)
+#
+# base-url:
+
+# Listen address for the HTTP & HTTPS web server. If "listen-https" is set, you must also
+# set "key-file" and "cert-file". Format: [<ip>]:<port>, e.g. "1.2.3.4:8080".
+#
+# To listen on all interfaces, you may omit the IP address, e.g. ":443".
+# To disable HTTP, set "listen-http" to "-".
+#
+# listen-http: ":80"
+listen-http: ":8094"
+# listen-https:
+
+# Listen on a Unix socket, e.g. /var/lib/ntfy/ntfy.sock
+# This can be useful to avoid port issues on local systems, and to simplify permissions.
+#
+# listen-unix: <socket-path>
+# listen-unix-mode: <linux permissions, e.g. 0700>
+
+# Path to the private key & cert file for the HTTPS web server. Not used if "listen-https" is not set.
+#
+# key-file: <filename>
+# cert-file: <filename>
+
+# If set, also publish messages to a Firebase Cloud Messaging (FCM) topic for your app.
+# This is optional and only required to save battery when using the Android app.
+#
+# firebase-key-file: <filename>
+
+# If "cache-file" is set, messages are cached in a local SQLite database instead of only in-memory.
+# This allows for service restarts without losing messages in support of the since= parameter.
+#
+# The "cache-duration" parameter defines the duration for which messages will be buffered
+# before they are deleted. This is required to support the "since=..." and "poll=1" parameter.
+# To disable the cache entirely (on-disk/in-memory), set "cache-duration" to 0.
+# The cache file is created automatically, provided that the correct permissions are set.
+#
+# The "cache-startup-queries" parameter allows you to run commands when the database is initialized,
+# e.g. to enable WAL mode (see https://phiresky.github.io/blog/2020/sqlite-performance-tuning/)).
+# Example:
+#    cache-startup-queries: |
+#       pragma journal_mode = WAL;
+#       pragma synchronous = normal;
+#       pragma temp_store = memory;
+#       pragma busy_timeout = 15000;
+#       vacuum;
+#
+# The "cache-batch-size" and "cache-batch-timeout" parameter allow enabling async batch writing
+# of messages. If set, messages will be queued and written to the database in batches of the given
+# size, or after the given timeout. This is only required for high volume servers.
+#
+# Debian/RPM package users:
+#   Use /var/cache/ntfy/cache.db as cache file to avoid permission issues. The package
+#   creates this folder for you.
+#
+# Check your permissions:
+#   If you are running ntfy with systemd, make sure this cache file is owned by the
+#   ntfy user and group by running: chown ntfy:ntfy <filename>.
+#
+# cache-file: <filename>
+# cache-duration: "12h"
+# cache-startup-queries:
+# cache-batch-size: 0
+# cache-batch-timeout: "0ms"
+
+# If set, access to the ntfy server and API can be controlled on a granular level using
+# the 'ntfy user' and 'ntfy access' commands. See the --help pages for details, or check the docs.
+#
+# - auth-file is the SQLite user/access database; it is created automatically if it doesn't already exist
+# - auth-default-access defines the default/fallback access if no access control entry is found; it can be
+#   set to "read-write" (default), "read-only", "write-only" or "deny-all".
+# - auth-startup-queries allows you to run commands when the database is initialized, e.g. to enable
+#   WAL mode. This is similar to cache-startup-queries. See above for details.
+# - auth-users is a list of users that are automatically created when the server starts.
+#   Each entry is in the format "<username>:<password-hash>:<role>", e.g. "phil:$2a$10$YLiO8U21sX1uhZamTLJXHuxgVC0Z/GKISibrKCLohPgtG7yIxSk4C:user"
+#   Use 'ntfy user hash' to generate the password hash from a password.
+# - auth-access is a list of access control entries that are automatically created when the server starts.
+#   Each entry is in the format "<username>:<topic-pattern>:<access>", e.g. "phil:mytopic:rw" or "phil:phil-*:rw".
+# - auth-tokens is a list of access tokens that are automatically created when the server starts.
+#   Each entry is in the format "<username>:<token>[:<label>]", e.g. "phil:tk_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef:My token".
+#   Use 'ntfy token generate' to generate a new access token.
+#
+# Debian/RPM package users:
+#   Use /var/lib/ntfy/user.db as user database to avoid permission issues. The package
+#   creates this folder for you.
+#
+# Check your permissions:
+#   If you are running ntfy with systemd, make sure this user database file is owned by the
+#   ntfy user and group by running: chown ntfy:ntfy <filename>.
+#
+# auth-file: <filename>
+auth-file: /var/packages/ntfy/var/users.db
+# auth-default-access: "read-write"
+# auth-startup-queries:
+# auth-users:
+# auth-access:
+# auth-tokens:
+
+# If set, the X-Forwarded-For header (or whatever is configured in proxy-forwarded-header) is used to determine
+# the visitor IP address instead of the remote address of the connection.
+#
+# WARNING: If you are behind a proxy, you must set this, otherwise all visitors are rate-limited
+#          as if they are one.
+#
+# - behind-proxy makes it so that the real visitor IP address is extracted from the header defined in
+#   proxy-forwarded-header. Without this, the remote address of the incoming connection is used.
+# - proxy-forwarded-header is the header to use to identify visitors. It may be a single IP address (e.g. 1.2.3.4),
+#   a comma-separated list of IP addresses (e.g. "1.2.3.4, 5.6.7.8"), or an RFC 7239-style header (e.g. "for=1.2.3.4;by=proxy.example.com, for=5.6.7.8").
+# - proxy-trusted-hosts is a comma-separated list of IP addresses, hostnames or CIDRs that are removed from the forwarded header
+#   to determine the real IP address. This is only useful if there are multiple proxies involved that add themselves to
+#   the forwarded header.
+#
+# behind-proxy: false
+# proxy-forwarded-header: "X-Forwarded-For"
+# proxy-trusted-hosts:
+
+# If enabled, clients can attach files to notifications as attachments. Minimum settings to enable attachments
+# are "attachment-cache-dir" and "base-url".
+#
+# - attachment-cache-dir is the cache directory for attached files
+# - attachment-total-size-limit is the limit of the on-disk attachment cache directory (total size)
+# - attachment-file-size-limit is the per-file attachment size limit (e.g. 300k, 2M, 100M)
+# - attachment-expiry-duration is the duration after which uploaded attachments will be deleted (e.g. 3h, 20h)
+#
+# attachment-cache-dir:
+# attachment-total-size-limit: "5G"
+# attachment-file-size-limit: "15M"
+# attachment-expiry-duration: "3h"
+
+# Template directory for message templates.
+#
+# When "X-Template: <name>" (aliases: "Template: <name>", "Tpl: <name>") or "?template=<name>" is set, transform the message
+# based on one of the built-in pre-defined templates, or on a template defined in the "template-dir" directory.
+#
+# Template files must have the ".yml" extension and must be formatted as YAML. They may contain "title" and "message" keys,
+# which are interpreted as Go templates.
+#
+# Example template file (e.g. /etc/ntfy/templates/grafana.yml):
+#   title: |
+#     {{- if eq .status "firing" }}
+#     {{ .title | default "Alert firing" }}
+#     {{- else if eq .status "resolved" }}
+#     {{ .title | default "Alert resolved" }}
+#     {{- end }}
+#   message: |
+#     {{ .message | trunc 2000 }}
+#
+# template-dir: "/etc/ntfy/templates"
+
+# If enabled, allow outgoing e-mail notifications via the 'X-Email' header. If this header is set,
+# messages will additionally be sent out as e-mail using an external SMTP server.
+#
+# As of today, only SMTP servers with plain text auth (or no auth at all), and STARTLS are supported.
+# Please also refer to the rate limiting settings below (visitor-email-limit-burst & visitor-email-limit-burst).
+#
+# - smtp-sender-addr is the hostname:port of the SMTP server
+# - smtp-sender-from is the e-mail address of the sender
+# - smtp-sender-user/smtp-sender-pass are the username and password of the SMTP user (leave blank for no auth)
+#
+# smtp-sender-addr:
+# smtp-sender-from:
+# smtp-sender-user:
+# smtp-sender-pass:
+
+# If enabled, ntfy will launch a lightweight SMTP server for incoming messages. Once configured, users can send
+# emails to a topic e-mail address to publish messages to a topic.
+#
+# - smtp-server-listen defines the IP address and port the SMTP server will listen on, e.g. :25 or 1.2.3.4:25
+# - smtp-server-domain is the e-mail domain, e.g. ntfy.sh
+# - smtp-server-addr-prefix is an optional prefix for the e-mail addresses to prevent spam. If set to "ntfy-",
+#   for instance, only e-mails to ntfy-$topic@ntfy.sh will be accepted. If this is not set, all emails to
+#   $topic@ntfy.sh will be accepted (which may be a spam problem).
+#
+# smtp-server-listen:
+# smtp-server-domain:
+# smtp-server-addr-prefix:
+
+# Web Push support (background notifications for browsers)
+#
+# If enabled, allows the ntfy web app to receive push notifications, even when the web app is closed. When enabled, users
+# can enable background notifications in the web app. Once enabled, ntfy will forward published messages to the push
+# endpoint, which will then forward it to the browser.
+#
+# You must configure web-push-public/private key, web-push-file, and web-push-email-address below to enable Web Push.
+# Run "ntfy webpush keys" to generate the keys.
+#
+# - web-push-public-key is the generated VAPID public key, e.g. AA1234BBCCddvveekaabcdfqwertyuiopasdfghjklzxcvbnm1234567890
+# - web-push-private-key is the generated VAPID private key, e.g. AA2BB1234567890abcdefzxcvbnm1234567890
+# - web-push-file is a database file to keep track of browser subscription endpoints, e.g. /var/cache/ntfy/webpush.db
+# - web-push-email-address is the admin email address send to the push provider, e.g. sysadmin@example.com
+# - web-push-startup-queries is an optional list of queries to run on startup`
+# - web-push-expiry-warning-duration defines the duration after which unused subscriptions are sent a warning (default is 55d`)
+# - web-push-expiry-duration defines the duration after which unused subscriptions will expire (default is 60d)
+#
+# web-push-public-key:
+# web-push-private-key:
+# web-push-file:
+# web-push-email-address:
+# web-push-startup-queries:
+# web-push-expiry-warning-duration: "55d"
+# web-push-expiry-duration: "60d"
+
+# If enabled, ntfy can perform voice calls via Twilio via the "X-Call" header.
+#
+# - twilio-account is the Twilio account SID, e.g. AC12345beefbeef67890beefbeef122586
+# - twilio-auth-token is the Twilio auth token, e.g. affebeef258625862586258625862586
+# - twilio-phone-number is the outgoing phone number you purchased, e.g. +18775132586
+# - twilio-verify-service is the Twilio Verify service SID, e.g. VA12345beefbeef67890beefbeef122586
+# - twilio-call-format is the custom TwiML send to the Call API (optional, see https://www.twilio.com/docs/voice/twiml)
+#
+# twilio-account:
+# twilio-auth-token:
+# twilio-phone-number:
+# twilio-verify-service:
+# twilio-call-format:
+
+# Interval in which keepalive messages are sent to the client. This is to prevent
+# intermediaries closing the connection for inactivity.
+#
+# Note that the Android app has a hardcoded timeout at 77s, so it should be less than that.
+#
+# keepalive-interval: "45s"
+
+# Interval in which the manager prunes old messages, deletes topics
+# and prints the stats.
+#
+# manager-interval: "1m"
+
+# Defines topic names that are not allowed, because they are otherwise used. There are a few default topics
+# that cannot be used (e.g. app, account, settings, ...). To extend the default list, define them here.
+#
+# Example:
+#   disallowed-topics:
+#     - about
+#     - pricing
+#     - contact
+#
+# disallowed-topics:
+
+# Defines the root path of the web app, or disables the web app entirely.
+#
+# Can be any simple path, e.g. "/", "/app", or "/ntfy". For backwards-compatibility reasons,
+# the values "app" (maps to "/"), "home" (maps to "/app"), or "disable" (maps to "") to disable
+# the web app entirely.
+#
+# web-root: /
+web-root: /
+
+# Various feature flags used to control the web app, and API access, mainly around user and
+# account management.
+#
+# - enable-signup allows users to sign up via the web app, or API
+# - enable-login allows users to log in via the web app, or API
+# - require-login redirects users to the login page if they are not logged in (disallows web app access without login)
+# - enable-reservations allows users to reserve topics (if their tier allows it)
+#
+# enable-signup: false
+# enable-login: false
+# enable-reservations: false
+enable-signup: true
+enable-login: true
+enable-reservations: true
+
+# Server URL of a Firebase/APNS-connected ntfy server (likely "https://ntfy.sh").
+#
+# iOS users:
+#   If you use the iOS ntfy app, you MUST configure this to receive timely notifications. You'll like want this:
+#   upstream-base-url: "https://ntfy.sh"
+#
+# If set, all incoming messages will publish a "poll_request" message to the configured upstream server, containing
+# the message ID of the original message, instructing the iOS app to poll this server for the actual message contents.
+# This is to prevent the upstream server and Firebase/APNS from being able to read the message.
+#
+# - upstream-base-url is the base URL of the upstream server. Should be "https://ntfy.sh".
+# - upstream-access-token is the token used to authenticate with the upstream server. This is only required
+#   if you exceed the upstream rate limits, or the uptream server requires authentication.
+#
+# upstream-base-url:
+# upstream-access-token:
+
+# Configures message-specific limits
+#
+# - message-size-limit defines the max size of a message body. Please note message sizes >4K are NOT RECOMMENDED,
+#   and largely untested. If FCM and/or APNS is used, the limit should stay 4K, because their limits are around that size.
+#   If you increase this size limit regardless, FCM and APNS will NOT work for large messages.
+# - message-delay-limit defines the max delay of a message when using the "Delay" header.
+#
+# message-size-limit: "4k"
+# message-delay-limit: "3d"
+
+# Rate limiting: Total number of topics before the server rejects new topics.
+#
+# global-topic-limit: 15000
+
+# Rate limiting: Number of subscriptions per visitor (IP address)
+#
+# visitor-subscription-limit: 30
+
+# Rate limiting: Allowed GET/PUT/POST requests per second, per visitor:
+# - visitor-request-limit-burst is the initial bucket of requests each visitor has
+# - visitor-request-limit-replenish is the rate at which the bucket is refilled
+# - visitor-request-limit-exempt-hosts is a comma-separated list of hostnames, IPs or CIDRs to be
+#   exempt from request rate limiting. Hostnames are resolved at the time the server is started.
+#   Example: "1.2.3.4,ntfy.example.com,8.7.6.0/24"
+#
+# visitor-request-limit-burst: 60
+# visitor-request-limit-replenish: "5s"
+# visitor-request-limit-exempt-hosts: ""
+
+# Rate limiting: Hard daily limit of messages per visitor and day. The limit is reset
+# every day at midnight UTC. If the limit is not set (or set to zero), the request
+# limit (see above) governs the upper limit.
+#
+# visitor-message-daily-limit: 0
+
+# Rate limiting: Allowed emails per visitor:
+# - visitor-email-limit-burst is the initial bucket of emails each visitor has
+# - visitor-email-limit-replenish is the rate at which the bucket is refilled
+#
+# visitor-email-limit-burst: 16
+# visitor-email-limit-replenish: "1h"
+
+# Rate limiting: IPv4/IPv6 address prefix bits used for rate limiting
+# - visitor-prefix-bits-ipv4: number of bits of the IPv4 address to use for rate limiting (default: 32, full address)
+# - visitor-prefix-bits-ipv6: number of bits of the IPv6 address to use for rate limiting (default: 64, /64 subnet)
+#
+# This is used to group visitors by their IP address or subnet. For example, if you set visitor-prefix-bits-ipv4 to 24,
+# all visitors in the 1.2.3.0/24 network are treated as one.
+#
+# By default, ntfy uses the full IPv4 address (32 bits) and the /64 subnet of the IPv6 address (64 bits).
+#
+# visitor-prefix-bits-ipv4: 32
+# visitor-prefix-bits-ipv6: 64
+
+# Rate limiting: Attachment size and bandwidth limits per visitor:
+# - visitor-attachment-total-size-limit is the total storage limit used for attachments per visitor
+# - visitor-attachment-daily-bandwidth-limit is the total daily attachment download/upload traffic limit per visitor
+#
+# visitor-attachment-total-size-limit: "100M"
+# visitor-attachment-daily-bandwidth-limit: "500M"
+
+# Rate limiting: Enable subscriber-based rate limiting (mostly used for UnifiedPush)
+#
+# If subscriber-based rate limiting is enabled, messages published on UnifiedPush topics** (topics starting with "up")
+# will be counted towards the "rate visitor" of the topic. A "rate visitor" is the first subscriber to the topic.
+#
+# Once enabled, a client subscribing to UnifiedPush topics via HTTP stream, or websockets, will be automatically registered as
+# a "rate visitor", i.e. the visitor whose rate limits will be used when publishing on this topic. Note that setting the rate visitor
+# requires **read-write permission** on the topic.
+#
+# If this setting is enabled, publishing to UnifiedPush topics will lead to a HTTP 507 response if
+# no "rate visitor" has been previously registered. This is to avoid burning the publisher's "visitor-message-daily-limit".
+#
+# visitor-subscriber-rate-limiting: false
+
+# Payments integration via Stripe
+#
+# - stripe-secret-key is the key used for the Stripe API communication. Setting this values
+#   enables payments in the ntfy web app (e.g. Upgrade dialog). See https://dashboard.stripe.com/apikeys.
+# - stripe-webhook-key is the key required to validate the authenticity of incoming webhooks from Stripe.
+#   Webhooks are essential up keep the local database in sync with the payment provider. See https://dashboard.stripe.com/webhooks.
+# - billing-contact is an email address or website displayed in the "Upgrade tier" dialog to let people reach
+#   out with billing questions. If unset, nothing will be displayed.
+#
+# stripe-secret-key:
+# stripe-webhook-key:
+# billing-contact:
+
+# Metrics
+#
+# ntfy can expose Prometheus-style metrics via a /metrics endpoint, or on a dedicated listen IP/port.
+# Metrics may be considered sensitive information, so before you enable them, be sure you know what you are
+# doing, and/or secure access to the endpoint in your reverse proxy.
+#
+# - enable-metrics enables the /metrics endpoint for the default ntfy server (i.e. HTTP, HTTPS and/or Unix socket)
+# - metrics-listen-http exposes the metrics endpoint via a dedicated [IP]:port. If set, this option implicitly
+#   enables metrics as well, e.g. "10.0.1.1:9090" or ":9090"
+#
+# enable-metrics: false
+# metrics-listen-http:
+
+# Profiling
+#
+# ntfy can expose Go's net/http/pprof endpoints to support profiling of the ntfy server. If enabled, ntfy will listen
+# on a dedicated listen IP/port, which can be accessed via the web browser on http://<ip>:<port>/debug/pprof/.
+# This can be helpful to expose bottlenecks, and visualize call flows. See https://pkg.go.dev/net/http/pprof for details.
+#
+# profile-listen-http:
+
+# Logging options
+#
+# By default, ntfy logs to the console (stderr), with an "info" log level, and in a human-readable text format.
+# ntfy supports five different log levels, can also write to a file, log as JSON, and even supports granular
+# log level overrides for easier debugging. Some options (log-level and log-level-overrides) can be hot reloaded
+# by calling "kill -HUP $pid" or "systemctl reload ntfy".
+#
+# - log-format defines the output format, can be "text" (default) or "json"
+# - log-file is a filename to write logs to. If this is not set, ntfy logs to stderr.
+# - log-level defines the default log level, can be one of "trace", "debug", "info" (default), "warn" or "error".
+#   Be aware that "debug" (and particularly "trace") can be VERY CHATTY. Only turn them on briefly for debugging purposes.
+# - log-level-overrides lets you override the log level if certain fields match. This is incredibly powerful
+#   for debugging certain parts of the system (e.g. only the account management, or only a certain visitor).
+#   This is an array of strings in the format:
+#      - "field=value -> level" to match a value exactly, e.g. "tag=manager -> trace"
+#      - "field -> level" to match any value, e.g. "time_taken_ms -> debug"
+#   Warning: Using log-level-overrides has a performance penalty. Only use it for temporary debugging.
+#
+# Check your permissions:
+#   If you are running ntfy with systemd, make sure this log file is owned by the
+#   ntfy user and group by running: chown ntfy:ntfy <filename>.
+#
+# Example (good for production):
+#   log-level: info
+#   log-format: json
+#   log-file: /var/log/ntfy.log
+#
+# Example level overrides (for debugging, only use temporarily):
+#   log-level-overrides:
+#      - "tag=manager -> trace"
+#      - "visitor_ip=1.2.3.4 -> debug"
+#      - "time_taken_ms -> debug"
+#
+# log-level: info
+# log-level-overrides:
+# log-format: text
+# log-file:
+log-level: info
+log-format: text
+log-file: /var/packages/ntfy/var/ntfy.log
