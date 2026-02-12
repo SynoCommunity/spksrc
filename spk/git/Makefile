@@ -11,7 +11,7 @@ DESCRIPTION = Git is a fast, scalable, distributed revision control system with 
 DESCRIPTION_FRE = Git est un système de gestion de révision rapide, extensible et distribué avec un ensemble de commandes inhabituellement riche qui fournit à la fois des opérations de haut niveau et un accès complet aux structures de bas niveau.
 STARTABLE = no
 DISPLAY_NAME = Git
-CHANGELOG = "Update git to v2.53.0."
+CHANGELOG = "1. Update git to v2.53.0. <br/>2. Add PCRE2 support for Perl-compatible regular expressions (git grep -P)."
 
 HOMEPAGE = https://git-scm.com
 LICENSE  = GPLv2
