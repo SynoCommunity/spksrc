@@ -3,7 +3,7 @@
 appdirs==1.4.4
 arrow==1.4.0
 attrs==25.4.0
-borgmatic==2.1.1
+borgmatic==2.1.2
 #certifi==2026.1.4                        ==> python312
 docopt==0.6.2
 emborg==1.42

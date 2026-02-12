@@ -55,7 +55,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgmatic to v2.1.1.<br/>2. Refresh Python dependencies."
+CHANGELOG = "1. Update borgmatic to v2.1.2.<br/>2. Refresh Python dependencies."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
