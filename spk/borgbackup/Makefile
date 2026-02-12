@@ -3,11 +3,10 @@ SPK_VERS = 1.4.3
 SPK_REV = 21
 SPK_ICON = src/borgbackup.png
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 # Default to Python 3.12 - overridden for ARMv5/ARMv7L after include
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = $(PYTHON_PACKAGE)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 cross/xxhash cross/zstd
 
@@ -51,6 +50,9 @@ CHANGELOG = "1. Update borgmatic to v2.1.1.<br/>2. Refresh Python dependencies."
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
 
+SERVICE_SETUP = src/service-setup.sh
+POST_SERVICE_TARGET = borgbackup_extra_install
+
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
 include ../../mk/spksrc.python.mk
@@ -58,9 +60,6 @@ include ../../mk/spksrc.python.mk
 # Build for ARMv5 and ARMv7L using Python 3.11. All other use Python 3.12
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 PYTHON_PACKAGE = python311
-SERVICE_SETUP = src/service-setup_py311.sh
-else
-SERVICE_SETUP = src/service-setup_py312.sh
 endif
 
 # ARMv5: Use separate requirements with rpds_py pinned to 0.20.0
@@ -100,3 +99,8 @@ endif
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [ruamel_yaml_clib] -std=gnu99
 endif
+
+.PHONY: borgbackup_extra_install
+borgbackup_extra_install:
+	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
+	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup
