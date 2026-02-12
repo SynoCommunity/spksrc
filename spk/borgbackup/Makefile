@@ -5,6 +5,10 @@ SPK_ICON = src/borgbackup.png
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
+# Default to Python 3.12 - overridden for ARMv5/ARMv7L after include
+PYTHON_PACKAGE = python312
+SPK_DEPENDS = $(PYTHON_PACKAGE)
+
 DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 cross/xxhash cross/zstd
 
 # # Generate Requirements File
@@ -51,14 +55,11 @@ SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
 include ../../mk/spksrc.python.mk
 
-PYTHON_PACKAGE = 
-
 # Build for ARMv5 and ARMv7L using Python 3.11. All other use Python 3.12
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 PYTHON_PACKAGE = python311
 SERVICE_SETUP = src/service-setup_py311.sh
 else
-PYTHON_PACKAGE = python312
 SERVICE_SETUP = src/service-setup_py312.sh
 endif
 
@@ -67,9 +68,6 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS_CROSSENV = src/requirements-crossenv-armv5.txt
 endif
-
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
-
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
