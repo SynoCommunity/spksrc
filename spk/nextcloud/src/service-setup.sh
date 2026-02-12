@@ -311,13 +311,27 @@ service_save ()
 
 service_restore ()
 {
-    # Restore config/themes and finish upgrade with maintenance routines
+    # Restore config/themes/custom_apps and finish upgrade with maintenance routines
     if ! stage_nextcloud_sources; then
         return 1
     fi
     rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config/" "${WEB_ROOT}/config/" 2>&1
     if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes" ]; then
         rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes/" "${WEB_ROOT}/themes/" 2>&1
+    fi
+    if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/custom_apps" ]; then
+        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/custom_apps/" "${WEB_ROOT}/custom_apps/" 2>&1
+    fi
+    # Restore user-installed apps that are not part of the base distribution
+    if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps" ]; then
+        # Merge apps directory - only copy apps that don't exist in the fresh install
+        # This preserves user-installed apps while allowing bundled apps to be updated
+        for app_dir in "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps"/*/; do
+            app_name=$(basename "${app_dir}")
+            if [ -n "${app_name}" ] && [ ! -d "${WEB_ROOT}/apps/${app_name}" ]; then
+                rsync -aX "${app_dir}" "${WEB_ROOT}/apps/${app_name}/" 2>&1
+            fi
+        done
     fi
     exec_occ maintenance:mode --off
     exec_occ upgrade
