@@ -1,4 +1,4 @@
-# Nextcloud service setup for DSM 7 with PHP 8.4
+# Nextcloud service setup for DSM 7 with PHP 8.3
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
@@ -14,7 +14,7 @@ if [ -z "${SYNOPKG_PKGTMP}" ]; then
 fi
 
 # PHP CLI used for all maintenance tasks
-PHP_BIN="/usr/local/bin/php84"
+PHP_BIN="/usr/local/bin/php83"
 MYSQL="/usr/local/mariadb10/bin/mysql"
 MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
 MYSQL_DATABASE="${SYNOPKG_PKGNAME}"
