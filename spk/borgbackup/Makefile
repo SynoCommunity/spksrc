@@ -3,8 +3,18 @@ SPK_VERS = 1.4.3
 SPK_REV = 21
 SPK_ICON = src/borgbackup.png
 
-# Default to Python 3.12 - overridden for ARMv5/ARMv7L after include
+# Include common.mk first to get ARCH definitions
+include ../../mk/spksrc.common.mk
+
+# Build for ARMv5 and ARMv7L using Python 3.11; all others use Python 3.12
+# This must be set BEFORE including spksrc.python.mk to avoid adding
+# ARMv5 to UNSUPPORTED_ARCHS when using python312
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),)
+PYTHON_PACKAGE = python311
+else
 PYTHON_PACKAGE = python312
+endif
+
 SPK_DEPENDS = $(PYTHON_PACKAGE)
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
@@ -56,11 +66,6 @@ POST_SERVICE_TARGET = borgbackup_extra_install
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
 include ../../mk/spksrc.python.mk
-
-# Build for ARMv5 and ARMv7L using Python 3.11. All other use Python 3.12
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-PYTHON_PACKAGE = python311
-endif
 
 # ARMv5: Use separate requirements with rpds_py pinned to 0.20.0
 # (Cargo.lock v3 compatibility with Rust 1.77.2)
