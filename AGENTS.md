@@ -13,21 +13,26 @@ spksrc is a cross-compilation framework for building Synology NAS packages (SPK 
 3. **Preserve existing patterns** - Follow conventions from similar packages in the repo
 4. **Patches must apply cleanly** - No fuzz or offset warnings
 5. **Simplicity over cleverness** - If a simpler solution works for all cases, prefer it over complex conditionals
+6. **Always rebase against master before merging** - Keep branch history clean
 
 ## Directory Conventions
 
 - `cross/` - Libraries and applications cross-compiled for target architecture
+- `diyspk/` - Do-it-yourself SPK templates for standalone versions of bundled packages
 - `spk/` - Final SPK package definitions that users install
 - `native/` - Tools built for the host system (used during cross-compilation)
 - `mk/` - Framework Makefiles (avoid modifying unless necessary)
 - `toolchain/` - Synology toolchain definitions (rarely modified)
+- `kernel/` - Synology modified kernel sources for building modules
 
 ## Common Operations
 
 ### Building a Package
 ```bash
+make setup                 # Initial setup (creates local.mk) - run once
 cd spk/packagename
 make arch-x64-7.2  # Build for specific architecture
+make all-supported # Build all supported architectures
 make clean         # Clean build artifacts
 ```
 
@@ -37,6 +42,8 @@ make clean         # Clean build artifacts
 3. Edit `SPK_VERS` in `spk/packagename/Makefile`, increment `SPK_REV`
 4. Update `CHANGELOG`
 5. Test with `make arch-x64-7.2`
+
+For major version upgrades, check upstream release notes for breaking changes, dependency compatibility, and migration requirements.
 
 ### Creating Patches
 - Use unified diff format (`diff -u`)
@@ -60,21 +67,19 @@ For complex packages (Erlang-based, large dependency trees), PLIST may need rege
 from actual build output when library versions change.
 
 ### Toolchain Differences
-- DSM 6.2.4 with 88f6281 (ARMv5) uses GCC 4.6.4 - does not support `-std=c11`
-- DSM 7.1 uses GCC 8.5 (older, may need C++ compatibility patches)
-- DSM 7.2 uses GCC 12.x (modern C++ features supported)
+- DSM 7.2 uses GCC 8.5
+- DSM 7.1 uses GCC 7.x (except comcerto2k which uses older GCC)
+- DSM 6.2.4 uses GCC 4.9.x (except ARMv5/88f6281 which uses GCC 4.6.4)
+- ARMv5/88f6281 (GCC 4.6.4) does not support `-std=c11` - use `-std=gnu99`
 - Use arch-specific patches in `patches/archname/` for toolchain-specific fixes
-
-### Compiler Standards
-- GCC < 4.7 (ARMv5/88f6281) does not support `-std=c11` - use `-std=gnu99` instead
-- GCC < 5.0 may need explicit standard flags; GCC 5+ defaults to gnu11
-- When a flag like `-std=gnu99` works across all toolchain versions, use it universally rather than tiered conditionals
+- Atomic support varies by architecture (some require libatomic linking)
+- When a flag works across all toolchains, use it universally rather than complex conditionals
 
 ### Python Multi-Version Support
-- Packages can use conditional `PYTHON_PACKAGE` for different architectures (e.g., python311 for ARMv5/ARMv7L, python312 for others)
-- The `include ../../mk/spksrc.python.mk` must come before conditional assignments (it defines arch variables needed for conditions)
-- Framework exports `PYTHON_PACKAGE` variables for deferred evaluation
-- Use arch-specific requirements files (e.g., `requirements-crossenv-armv5.txt`) when wheel versions differ by architecture
+- When using `ifeq` conditionals with arch variables, include `spksrc.common.mk` first to define `ARMv5_ARCHS`, etc.
+- Python wheels have four types: pure-python, crossenv, abi3-limited, and cross-package
+- Pin all wheel versions exactly (e.g., `mercurial==6.5.1`); never include setuptools/pip/wheel
+- See copilot-instructions.md for detailed Python package patterns
 
 ### Icon Requirements
 Icons should be 512x512 pixels; the framework scales down automatically.
@@ -87,22 +92,25 @@ Defined in `mk/spksrc.common/archs.mk`:
 - `ARMv7_ARCHS` - ARM 32-bit
 - `ARMv7L_ARCHS` - Legacy ARM 32-bit (hi3535)
 - `ARMv5_ARCHS` - Legacy ARM (88f6281) - GCC 4.6.4, limited C standard support
+- `PPC_ARCHS` - PowerPC (qoriq, ppc853x, etc.)
 - `OLD_PPC_ARCHS` - Legacy PowerPC (often unsupported)
+- `32bit_ARCHS` - All 32-bit architectures
+- `64bit_ARCHS` - All 64-bit architectures
 
 ## Git Workflow
 
 - **Always work in feature branches** - never commit directly to master
-- Branch naming: `packagename-version` or `fix-issue-description`
-- Avoid slashes in branch names when possible for simpler handling
+- Branch naming: `packagename-version` or `fix-issue-description` (no `/` in branch names)
 - **Never push without explicit approval** - always ask first
 - **Never amend commits already pushed to GitHub** - create new commits instead
+- **Always rebase against master before merging** - keep branch history clean
 - Configured user: check `git config user.name` and `git config user.email`
 
 ### Commit Messages
-- Use package name prefix: `packagename: description` (e.g., `borgbackup: Use gnu99 for GCC < 5.0`)
-- Use `framework:` prefix for mk/ changes (not `mk:`)
+- Use `DISPLAY_NAME:` prefix from `spk/*/Makefile` (e.g., `Borg: Use gnu99 for GCC < 5.0`)
+- Use `Framework:` prefix for mk/ changes (not filename prefix)
 - Keep messages concise but descriptive
-- Squash related commits before PR when appropriate
+- Keep commit messages in sync with PR title/description
 
 ## Code Style
 
@@ -118,6 +126,7 @@ Defined in `mk/spksrc.common/archs.mk`:
 - Check if the issue is arch-specific (toolchain version, available libraries)
 - Upload CI logs for review when debugging complex failures
 - Local builds may differ from CI (e.g., pre-existing work directories affect dependency resolution)
+- Updating widely-used dependencies (zlib, openssl) triggers many package rebuilds - isolate in separate PRs
 
 ## Detailed Documentation
 
