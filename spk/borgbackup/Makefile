@@ -44,8 +44,7 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # # with Python 3.12. Use the pure and cross requirement files as the base for your PR.
 
 # Default wheels for most architectures
-WHEELS_CROSSENV = src/requirements-crossenv.txt
-WHEELS = $(WHEELS_CROSSENV) src/requirements-pure.txt
+WHEELS = src/requirements-pure.txt
 
 # Force building pure-python wheels (issue #5204)
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
@@ -70,7 +69,9 @@ include ../../mk/spksrc.python.mk
 # ARMv5: Use separate requirements with rpds_py pinned to 0.20.0
 # (Cargo.lock v3 compatibility with Rust 1.77.2)
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS_CROSSENV = src/requirements-crossenv-armv5.txt
+WHEELS += src/requirements-crossenv-armv5.txt
+else
+WHEELS += src/requirements-crossenv.txt
 endif
 
 # [borgbackup]
