@@ -1,0 +1,8 @@
+[{
+    "step_title": "Install Instructions",
+    "items": [{
+        "desc": "Please <b style=\"color: red\">unselect 'Run after installation'</b>, To run adguard you need to first run the following command via SSH and everytime there is an update"
+    }, {
+        "desc": "<code style=\"user-select: all\">setcap 'CAP_NET_BIND_SERVICE=+eip CAP_NET_RAW=+eip' /var/packages/adguardhome/target/bin/adguardhome</code>"
+    }]
+}]
