@@ -1,35 +1,32 @@
 SPK_NAME = shairport-sync
-SPK_VERS = 2.3.11
-SPK_REV = 2
+SPK_VERS = 4.3.7
+SPK_REV = 3
 SPK_ICON = src/shairport-sync.png
 
-DEPENDS =  cross/busybox cross/shairport-sync
+DEPENDS = cross/shairport-sync
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Use Synology NAS as an AirPlay receiver. Requires USB soundcard or speakers.
+DESCRIPTION = AirPlay audio player. Stream audio wirelessly from Apple devices to your Synology NAS. Requires USB soundcard or speakers connected to your NAS.
 DISPLAY_NAME = Shairport Sync
-BETA = 1
-CHANGELOG = "Initial SynoCommunity Release"
+CHANGELOG = "1. Update to v4.3.7 with metadata support. <br/>2. Modernize for DSM 7."
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
-LICENSE  =
+LICENSE = GPL
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+STARTABLE = yes
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
 
-FWPORTS          = src/${SPK_NAME}.sc
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+FWPORTS = src/shairport-sync.sc
+WIZARDS_DIR = src/wizard
 
 POST_STRIP_TARGET = shairport_extra_install
-
-BUSYBOX_CONFIG = daemon
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: shairport_extra_install
 shairport_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
+	install -m 755 -d $(STAGING_DIR)/share/alsa
 	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa/alsa.conf
 	install -m 644 src/shairport-sync.conf $(STAGING_DIR)/var/shairport-sync.conf

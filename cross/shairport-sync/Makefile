@@ -1,27 +1,36 @@
 PKG_NAME = shairport-sync
-PKG_VERS = 2.3.11
-PKG_EXT = zip
+PKG_VERS = 4.3.7
+PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mikebrady/shairport-sync/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libtool cross/libconfig cross/popt cross/libdaemon cross/openssl cross/alsa-lib
+# Classic AirPlay mode (AirPlay 2 requires NQPTP which needs root for ports 319/320)
+DEPENDS = cross/alsa-lib cross/libconfig cross/libdaemon cross/openssl3 cross/popt cross/soxr
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
-COMMENT  = Use Synology NAS as an Airplay receiver. Requires USB soundcard or speakers.
-LICENSE  = https://raw.githubusercontent.com/mikebrady/shairport-sync/$(PKG_VERS)/LICENSES
+COMMENT  = AirPlay audio player for streaming from Apple devices
+LICENSE  = GPL
 
 GNU_CONFIGURE = 1
 
-CONFIGURE_ARGS += --with-alsa --with-ssl=openssl --with-tinysvcmdns --without-configfiles --with-piddir=$(INSTALL_DIR)/var
+CONFIGURE_ARGS  = --with-alsa
+CONFIGURE_ARGS += --with-dummy
+CONFIGURE_ARGS += --with-pipe
+CONFIGURE_ARGS += --with-ssl=openssl
+CONFIGURE_ARGS += --with-soxr
+CONFIGURE_ARGS += --with-metadata
+CONFIGURE_ARGS += --with-libdaemon
+CONFIGURE_ARGS += --with-tinysvcmdns
+CONFIGURE_ARGS += --without-configfiles
+CONFIGURE_ARGS += --with-piddir=/var/packages/shairport-sync/var
 CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
 
-PRE_CONFIGURE_TARGET = myPreConfigure
+PRE_CONFIGURE_TARGET = shairport_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: myPreConfigure
-myPreConfigure:
+.PHONY: shairport_pre_configure
+shairport_pre_configure:
 	$(RUN) autoreconf -i -f
-

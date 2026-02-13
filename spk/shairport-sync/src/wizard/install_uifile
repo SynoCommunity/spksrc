@@ -1,0 +1,23 @@
+[{
+  "step_title": "Shairport Sync Configuration",
+  "items": [
+    {
+      "desc": "<b>Requirements</b>"
+    },
+    {
+      "desc": "Shairport Sync requires a USB sound card or USB speakers connected to your NAS to output audio."
+    },
+    {
+      "desc": "<b>Configuration</b>"
+    },
+    {
+      "desc": "After installation, configure your audio device by editing:<br/><code>/var/packages/shairport-sync/var/shairport-sync.conf</code><br/><br/>To find available sound devices, check <code>/proc/asound/cards</code> via SSH."
+    },
+    {
+      "desc": "<b>Testing without a sound card</b>"
+    },
+    {
+      "desc": "To verify network connectivity without audio hardware, change <code>output_backend</code> to <code>\"dummy\"</code> in the config file. Enable <code>log_verbosity</code> and <code>statistics</code> to see activity in syslog."
+    }
+  ]
+}]
