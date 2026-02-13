@@ -1,8 +1,8 @@
-# Generated using the requirements script on December 11, 2025
+# Cross-compiled requirements for borgbackup (Python 3.11/3.12)
 
 borgbackup==1.4.3
 charset_normalizer==3.4.4
-llfuse==1.5.1
+llfuse==1.5.2
 msgpack==1.1.2
 rpds_py==0.22.3
 ruamel_yaml_clib==0.2.15

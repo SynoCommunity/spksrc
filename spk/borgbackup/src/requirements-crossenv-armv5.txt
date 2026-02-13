@@ -1,0 +1,9 @@
+# ARMv5-specific cross-compiled requirements (Python 3.11)
+# rpds_py pinned to 0.21.0 for Cargo.lock v3 compatibility with Rust 1.77.2
+
+borgbackup==1.4.3
+charset_normalizer==3.4.4
+llfuse==1.5.2
+msgpack==1.1.2
+rpds_py==0.21.0
+ruamel_yaml_clib==0.2.15

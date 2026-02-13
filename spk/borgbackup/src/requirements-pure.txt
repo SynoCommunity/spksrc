@@ -1,25 +1,25 @@
-# Generated using the requirements script on December 11, 2025
+# Pure-python requirements for borgbackup (Python 3.11/3.12)
 
 appdirs==1.4.4
 arrow==1.4.0
 attrs==25.4.0
-borgmatic==2.0.12
-#certifi==2025.11.12                     ==> python312
+borgmatic==2.1.2
+#certifi==2026.1.4                        ==> python312
 docopt==0.6.2
 emborg==1.42
 idna==3.11
-inform==1.35
+inform==1.36
 jsonschema==4.25.1
 jsonschema_specifications==2025.9.1
-nestedtext==3.7
-packaging==25.0
+nestedtext==3.8
+packaging==26.0
 #pip==25.3                                ==> python312
 python_dateutil==2.9.0.post0
-quantiphy==2.20
+quantiphy==2.21
 referencing==0.37.0
 requests==2.32.5
-ruamel.yaml==0.18.16
+ruamel.yaml==0.19.1
 #six==1.17.0                              ==> python312
 typing_extensions==4.15.0
-tzdata==2025.2
-urllib3==2.6.1
+tzdata==2025.3
+urllib3==2.6.3
