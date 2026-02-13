@@ -476,5 +476,6 @@ grep -r "cross/openssl" spk/*/Makefile
 
 - [SynoCommunity Wiki](https://github.com/SynoCommunity/spksrc/wiki)
 - [Developers HOW-TO](https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO)
+- [Using Python Wheels](https://github.com/SynoCommunity/spksrc/wiki/Using-wheels-to-distribute-Python-packages)
 - [Architecture Reference](https://github.com/SynoCommunity/spksrc/wiki/Architecture-per-Synology-model)
 - [FAQ](https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions)
