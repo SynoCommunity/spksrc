@@ -1,4 +1,4 @@
-# Generated requirements for borgbackup with Python 3.12
+# Cross-compiled requirements for borgbackup (Python 3.11/3.12)
 
 borgbackup==1.4.3
 charset_normalizer==3.4.4

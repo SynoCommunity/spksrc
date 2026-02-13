@@ -1,4 +1,4 @@
-# Generated requirements for borgbackup with Python 3.12
+# Pure-python requirements for borgbackup (Python 3.11/3.12)
 
 appdirs==1.4.4
 arrow==1.4.0

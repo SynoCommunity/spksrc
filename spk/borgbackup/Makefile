@@ -43,8 +43,16 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # # The script will create three files (pure, cross, and combined) for the Borg deployment
 # # with Python 3.12. Use the pure and cross requirement files as the base for your PR.
 
-# Default wheels for most architectures
+# Wheels: pure-python requirements (all architectures)
 WHEELS = src/requirements-pure.txt
+
+# Cross-compiled requirements vary by architecture
+# ARMv5 uses rpds_py pinned to 0.21.0 for Cargo.lock v3 compatibility with Rust 1.77.2
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-armv5.txt
+else
+WHEELS += src/requirements-crossenv.txt
+endif
 
 # Force building pure-python wheels (issue #5204)
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
@@ -66,14 +74,6 @@ SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
 include ../../mk/spksrc.python.mk
 
-# ARMv5: Use separate requirements with rpds_py pinned to 0.20.0
-# (Cargo.lock v3 compatibility with Rust 1.77.2)
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-armv5.txt
-else
-WHEELS += src/requirements-crossenv.txt
-endif
-
 # [borgbackup]
 # Use OpenSSL path as defined by either
 # spksrc.wheel-env.mk or spksrc.python.mk
@@ -85,23 +85,29 @@ ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
 
 # [borgbackup]
+# GCC < 5.0 (DSM 6.2.4) requires gnu99 for Cython-generated code.
+# C11 (the original setting) is not fully supported by GCC 4.9.x, and Cython
+# uses GNU extensions (e.g., typeof, statement expressions) in its fallback paths.
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [borgbackup] -std=gnu99
 endif
 
 # [llfuse]
-# llfuse uses Cython which generates C11 atomics code that fails
-# due to ATOMIC_INT_LOCK_FREE not being a preprocessor constant in older GCC.
+# GCC < 5.0 requires gnu99 for Cython-generated code (see borgbackup above).
+# Requires CYTHON_ATOMICS=0 because ATOMIC_INT_LOCK_FREE is not a
+# preprocessor constant in GCC < 5.0.
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [llfuse] -std=gnu99 -DCYTHON_ATOMICS=0
 endif
 
 # [msgpack]
+# GCC < 5.0 requires gnu99 for Cython-generated code (see borgbackup above).
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=gnu99
 endif
 
 # [ruamel_yaml_clib]
+# GCC < 5.0 requires gnu99 for Cython-generated code (see borgbackup above).
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [ruamel_yaml_clib] -std=gnu99
 endif
