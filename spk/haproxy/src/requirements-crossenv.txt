@@ -1,0 +1,2 @@
+# Cross-compiled dependencies
+MarkupSafe==3.0.2
