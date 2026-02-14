@@ -1,0 +1,4 @@
+ZDINNAV_WIZARD_UNINSTALL_TITLE: "Uninstall ZdinNav"
+ZDINNAV_WIZARD_UNINSTALL_DESCRIPTION: "You are about to uninstall ZdinNav. Do you want to keep your configuration data?"
+ZDINNAV_WIZARD_UNINSTALL_KEEP: "Keep data (Recommended) - Restorable upon reinstallation."
+ZDINNAV_WIZARD_UNINSTALL_DELETE: "Delete all data - This action cannot be undone! Delete all data in folder: " 
