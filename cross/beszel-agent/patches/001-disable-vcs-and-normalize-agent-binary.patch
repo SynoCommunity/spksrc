@@ -1,0 +1,9 @@
+--- Makefile.orig
++++ Makefile
+@@ -54,7 +54,7 @@
+
+ # Update build-agent to include conditional .NET build
+ build-agent: tidy build-dotnet-conditional fetch-smartctl-conditional
+-	GOOS=$(OS) GOARCH=$(ARCH) go build -o ./build/beszel-agent_$(OS)_$(ARCH)$(EXE_EXT) -ldflags "-w -s" ./internal/cmd/agent
++	GOOS=$(OS) GOARCH=$(ARCH) go build -buildvcs=false -o ./build/beszel-agent -ldflags "-w -s" ./internal/cmd/agent
+

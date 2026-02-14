@@ -1,0 +1,56 @@
+[
+  {
+    "step_title": "Beszel Agent Configuration",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Provide the SSH public key of the Beszel Hub you want to add this system to.",
+        "subitems": [
+          {
+            "key": "wizard_pub_key",
+            "desc": "Public Key",
+            "defaultValue": "",
+            "emptyText": "ssh-ed25519 ....",
+            "width": "400",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^(ssh-(rsa|ed25519)|ecdsa-sha2-nistp(256|384|521)) [A-Za-z0-9+/]+={0,3}( .+)?$/",
+                "errorText": "Please enter a valid SSH public key."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "desc": "Enter additional filesystems to monitor.",
+        "subitems": [
+          {
+            "key": "wizard_extra_fs",
+            "desc": "Extra Filesystems",
+            "emptyText": "/volume1,/volumeUSB1/usbshare",
+            "width": "400",
+            "defaultValue": ""
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "desc": "Configure SMART monitoring devices. List devices with :sat suffix for proper detection. Refer to Beszel documentation for details.",
+        "subitems": [
+          {
+            "key": "wizard_smart_devices",
+            "desc": "SMART Devices",
+            "emptyText": "/dev/sda:sat,/dev/sdb:sat",
+            "width": "400",
+            "defaultValue": ""
+          }
+        ]
+      },
+      {
+        "desc": "The Beszel agent listens on port 45876 by default. Make sure this port is accessible from your Beszel Hub."
+      }
+    ]
+  }
+]
