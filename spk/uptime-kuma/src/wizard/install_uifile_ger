@@ -1,0 +1,43 @@
+[
+    {
+        "step_title": "Uptime Kuma Konfiguration",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Geben Sie den Port an, auf dem Uptime Kuma lauschen soll.",
+                "subitems": [
+                    {
+                        "key": "wizard_port",
+                        "desc": "HTTP-Port",
+                        "defaultValue": "3001",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^(102[4-9]|10[3-9]\\d|1[1-9]\\d{2}|[2-9]\\d{3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])$/",
+                                "errorText": "Geben Sie eine gueltige Portnummer zwischen 1024 und 65535 ein."
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "desc": ""
+            },
+            {
+                "desc": "Dieses Paket wird als interner Dienstbenutzer <b>sc-uptime-kuma</b> in DSM ausgefuehrt.<br/>Der Dienstbenutzer wird bei der Installation automatisch erstellt."
+            },
+            {
+                "desc": ""
+            },
+            {
+                "desc": "Ueberwachungsdaten (SQLite-Datenbank und Uploads) werden gespeichert in:<br/><b>/var/packages/uptime-kuma/var/</b><br/><br/>Dieses Verzeichnis bleibt bei Paketaktualisierungen erhalten. Es wird empfohlen, es in Ihre Sicherungsstrategie aufzunehmen."
+            },
+            {
+                "desc": ""
+            },
+            {
+                "desc": "Weitere Informationen finden Sie im <a target=\"_blank\" href=\"https://github.com/louislam/uptime-kuma/wiki\">Uptime Kuma Wiki</a>."
+            }
+        ]
+    }
+]

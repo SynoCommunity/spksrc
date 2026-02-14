@@ -1,0 +1,15 @@
+{
+    "port-config": {
+        "protocol-file": "app/uptime-kuma.sc"
+    },
+    "data-share": {
+        "shares": [
+            {
+                "name": "uptime-kuma",
+                "permission": {
+                    "rw": ["sc-uptime-kuma"]
+                }
+            }
+        ]
+    }
+}
