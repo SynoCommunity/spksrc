@@ -32,11 +32,11 @@ RED=$$(tput setaf 1)
 GREEN=$$(tput setaf 2)
 NC=$$(tput sgr0)
 
-ifneq ($(TC_NAME),)
-  # In toolchain context
+ifeq ($(notdir $(abspath $(CURDIR)/..)),toolchain)
   DEFAULT_LOG = $(LOG_DIR)/build-$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS).log
+else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolkit)
+  DEFAULT_LOG = $(LOG_DIR)/build-$(or $(lastword $(subst -, ,$(TK_NAME))),$(TK_ARCH))-$(TK_VERS).log
 else
-  # In package context (handles both arch-specific and noarch)
   DEFAULT_LOG = $(LOG_DIR)/build$(or $(ARCH_SUFFIX),-noarch-$(TCVERSION)).log
 endif
 CROSSENV_LOG = $(LOG_DIR)/build$(ARCH_SUFFIX)-crossenv.log
