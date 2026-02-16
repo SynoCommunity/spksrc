@@ -64,7 +64,7 @@ ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 endif
 
 ifeq ($(strip $(OPENSSL_PLATFORM)),)
-# Unexpected CPU architecture. Please add arch to mk/spksrc.archs.mk
+# Unexpected CPU architecture. Please add arch to mk/spksrc.common.mk
 $(error Arch $(ARCH) not expected yet)
 endif
 

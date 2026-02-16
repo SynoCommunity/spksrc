@@ -11,7 +11,7 @@ STARTABLE = no
 HOMEPAGE = https://pngquant.org/
 LICENSE = GPL
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 # std=c11 not fully supported
 DEPENDS = cross/pngquant2

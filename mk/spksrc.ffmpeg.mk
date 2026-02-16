@@ -12,7 +12,7 @@ endif
 # set default spk/synocli-videodriver path to use
 export FFMPEG_PACKAGE_ROOT = $(realpath $(CURDIR)/../../spk/$(FFMPEG_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifneq ($(wildcard $(FFMPEG_PACKAGE_ROOT)),)
 

@@ -15,7 +15,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-werror
 ADDITIONAL_CFLAGS = -O2
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # EFD_NONBLOCK is not defined (define it OR disable use of eventfd)
 #ADDITIONAL_CFLAGS += -DEFD_NONBLOCK=00004000

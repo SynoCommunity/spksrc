@@ -15,7 +15,7 @@ GNU_CONFIGURE = 1
 
 # strace uses its own ARCH definition
 # ARCH is `x86_64', `i386', `aarch64', `powerpc64le', etc.
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 STRACE_ARCH =
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))

@@ -10,7 +10,7 @@ EXTRACT_PATH = $(INSTALL_DIR)/$(INSTALL_PREFIX)/shared
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = linux-x64 linux-arm linux-arm64
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = linux-x64

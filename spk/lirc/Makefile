@@ -10,7 +10,7 @@ LIRC_SUPPORTED_DRIVERS =
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 # include arch definitions
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Use older LIRC build for ARCHs with kernel < 2.6.36
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))

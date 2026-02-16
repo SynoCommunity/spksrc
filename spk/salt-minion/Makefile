@@ -1,6 +1,6 @@
 SPK_NAME = salt-minion
-SPK_VERS = 3007.3
-SPK_REV = 6
+SPK_VERS = 3007.11
+SPK_REV = 7
 SPK_ICON = src/salt-minion.png
 
 PYTHON_PACKAGE = python312
@@ -14,7 +14,7 @@ REQUIRED_MIN_SRM = 1.3
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Minion
-CHANGELOG    = "1. Update to 3007.3"
+CHANGELOG    = "1. Update to v3007.11"
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache
@@ -44,12 +44,15 @@ include ../../mk/spksrc.python.mk
 
 # [aiohttp]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [aiohttp] -std=c11
+WHEELS_CFLAGS += [aiohttp] -std=c11 -DCYTHON_ATOMICS=0
+ifeq ($(findstring $(ARCH),comcerto2k),comcerto2k)
+WHEELS_CFLAGS += [aiohttp] -U__ARM_NEON__
+endif
 endif
 
 # [frozenlist]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [frozenlist] -std=c11
+WHEELS_CXXFLAGS += [frozenlist] -std=c++11
 endif
 
 # [msgpack]
@@ -75,6 +78,11 @@ endif
 # [yarl]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [yarl] -std=c11
+endif
+
+# [propcache]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [propcache] -std=c11
 endif
 
 .PHONY: salt-minion_extra_install

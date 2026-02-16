@@ -1,0 +1,15 @@
+--- IGC/BiFManager/CMakeLists.txt-orig	2024-12-03 15:00:35.000000000 +0000
++++ IGC/BiFManager/CMakeLists.txt	2025-12-22 22:44:32.209543523 +0000
+@@ -35,6 +35,12 @@ add_library("${IGC_BUILD__PROJ__BiFManag
+ add_dependencies("${IGC_BUILD__PROJ__BiFManager}" "${IGC_BUILD__PROJ__BiFManagerSplitTask}")
+ target_include_directories("${IGC_BUILD__PROJ__BiFManager}" PRIVATE ${IGC_BUILD__BIF_DIR})
+ 
++# Link BiFManager shared library against LLVM
++target_link_libraries("${IGC_BUILD__PROJ__BiFManager}"
++    PRIVATE
++    ${IGC_BUILD__LLVM_LIBS_TO_LINK}
++    ${CMAKE_DL_LIBS}
++)
+ 
+ add_executable("${IGC_BUILD__PROJ__BiFManager_EXE}"
+ "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"

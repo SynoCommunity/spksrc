@@ -1,0 +1,43 @@
+Index: FFmpeg/libavfilter/vf_tonemap_vaapi.c
+===================================================================
+--- libavfilter/vf_tonemap_vaapi.c
++++ libavfilter/vf_tonemap_vaapi.c
+@@ -56,7 +56,7 @@ static int tonemap_vaapi_save_metadata(A
+     AVContentLightMetadata *light_meta;
+ 
+     if (input_frame->color_trc != AVCOL_TRC_SMPTE2084) {
+-        av_log(avctx, AV_LOG_WARNING, "Only support HDR10 as input for vaapi tone-mapping\n");
++        av_log(avctx, AV_LOG_DEBUG, "Only support HDR10 as input for vaapi tone-mapping\n");
+     }
+ 
+     ctx->src_display = av_frame_get_side_data(input_frame,
+@@ -64,8 +64,7 @@ static int tonemap_vaapi_save_metadata(A
+     if (ctx->src_display) {
+         hdr_meta = (AVMasteringDisplayMetadata *)ctx->src_display->data;
+         if (!hdr_meta) {
+-            av_log(avctx, AV_LOG_ERROR, "No mastering display data\n");
+-            return AVERROR(EINVAL);
++            av_log(avctx, AV_LOG_DEBUG, "No mastering display data\n");
+         }
+ 
+         if (hdr_meta->has_luminance) {
+@@ -122,8 +121,7 @@ static int tonemap_vaapi_save_metadata(A
+                    ctx->in_metadata.white_point_y);
+         }
+     } else {
+-        av_log(avctx, AV_LOG_ERROR, "No mastering display data from input\n");
+-        return AVERROR(EINVAL);
++        av_log(avctx, AV_LOG_DEBUG, "No mastering display data from input\n");
+     }
+ 
+     ctx->src_light = av_frame_get_side_data(input_frame,
+@@ -131,8 +129,7 @@ static int tonemap_vaapi_save_metadata(A
+     if (ctx->src_light) {
+         light_meta = (AVContentLightMetadata *)ctx->src_light->data;
+         if (!light_meta) {
+-            av_log(avctx, AV_LOG_ERROR, "No light metadata\n");
+-            return AVERROR(EINVAL);
++            av_log(avctx, AV_LOG_DEBUG, "No light metadata\n");
+         }
+ 
+         ctx->in_metadata.max_content_light_level = light_meta->MaxCLL;

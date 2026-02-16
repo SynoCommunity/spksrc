@@ -1,15 +1,15 @@
 [{
-    "step_title": "Configuration de base",
+    "step_title": "Configuration HAProxy",
     "items": [{
         "type": "textfield",
-        "desc": "Identifiant de l'administrateur. admin par défaut",
+        "desc": "Identifiant pour le tableau de bord et les statistiques (par défaut : admin)",
         "subitems": [{
             "key": "wizard_user",
             "desc": "Identifiant"
         }]
     }, {
         "type": "password",
-        "desc": "Mot de passe de l'administrateur. admin par défaut",
+        "desc": "Mot de passe (par défaut : admin)",
         "subitems": [{
             "key": "wizard_passwd",
             "desc": "Mot de passe"

@@ -9,4 +9,4 @@ TC_DIST_SITE_PATH = Intel%20x86%20linux%203.10.108%20%28Bromolow%29
 TC_TARGET = x86_64-pc-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sys-root
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

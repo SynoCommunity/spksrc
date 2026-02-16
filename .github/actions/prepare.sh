@@ -26,7 +26,7 @@ SPK_TO_BUILD="${USER_SPK_TO_BUILD} ${GH_SPK_PACKAGES} "
 # dependencies in this list include the cross or native folder (i.e. native/python cross/glib)
 echo "Building dependency list..."
 DEPENDENCY_LIST=./dependency-list.txt
-make dependency-list 2> /dev/null > ${DEPENDENCY_LIST}
+make dependency-list-spk 2> /dev/null > ${DEPENDENCY_LIST}
 
 # search for dependent spk packages
 for package in ${GH_DEPENDENCY_FOLDERS}

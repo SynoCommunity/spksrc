@@ -34,7 +34,7 @@ Index: FFmpeg/libavfilter/opencl/overlay.cl
      int2 overlay_size = get_image_dim(overlay);
      int2 loc = (int2)(get_global_id(0), get_global_id(1));
  
-@@ -41,15 +50,15 @@ __kernel void overlay_no_alpha(__write_o
+@@ -41,16 +50,18 @@ __kernel void overlay_no_alpha(__write_o
      }
  }
  
@@ -50,15 +50,18 @@ Index: FFmpeg/libavfilter/opencl/overlay.cl
 +                            int x_position,
 +                            int y_position,
 +                            int alpha_adj_x,
-+                            int alpha_adj_y)
++                            int alpha_adj_y,
++                            int overlay_full)
  {
 -    const sampler_t sampler = (CLK_NORMALIZED_COORDS_FALSE |
 -                               CLK_FILTER_NEAREST);
 -
      int2 overlay_size = get_image_dim(overlay);
++    int2 alpha_size = get_image_dim(alpha);
      int2 loc = (int2)(get_global_id(0), get_global_id(1));
  
-@@ -63,24 +72,50 @@ __kernel void overlay_internal_alpha(__w
+     if (loc.x <  x_position ||
+@@ -63,24 +74,35 @@ __kernel void overlay_internal_alpha(__w
          int2 loc_overlay  = (int2)(x_position, y_position);
          float4 in_main    = read_imagef(main,    sampler, loc);
          float4 in_overlay = read_imagef(overlay, sampler, loc - loc_overlay);
@@ -67,6 +70,18 @@ Index: FFmpeg/libavfilter/opencl/overlay.cl
 +        int2 loc_alpha    = (int2)(loc.x * alpha_adj_x, loc.y * alpha_adj_y) - loc_overlay;
 +        float4 in_alpha   = read_imagef(alpha,   sampler, loc_alpha);
 +
++#ifdef NEED_UNPREMUL
++        float offset = overlay_full ? 0 : 0.0627f;
++        in_overlay.x = (alpha_size.x == overlay_size.x && alpha_size.y == overlay_size.y) &&
++                       (in_alpha.x > 0.0f && in_alpha.x < 1.0f)
++                       ? min(max(in_overlay.x - offset, 0.0f) * 1.0f / in_alpha.x + offset, 1.0f)
++                       : in_overlay.x;
++
++        in_overlay.x = (alpha_size.x > overlay_size.x && alpha_size.y > overlay_size.y) &&
++                       (in_alpha.x > 0.0f && in_alpha.x < 1.0f)
++                       ? min((in_overlay.x - 0.5f) * 1.0f / in_alpha.x + 0.5f, 1.0f)
++                       : in_overlay.x;
++#endif
 +        float4 val = in_overlay * in_alpha.x + in_main * (1.0f - in_alpha.x);
          write_imagef(dst, loc, val);
      }
@@ -89,24 +104,29 @@ Index: FFmpeg/libavfilter/opencl/overlay.cl
  {
 -    const sampler_t sampler = (CLK_NORMALIZED_COORDS_FALSE |
 -                               CLK_FILTER_NEAREST);
-+    int2 overlay_size = get_image_dim(overlay_u);
-+    int2 loc = (int2)(get_global_id(0), get_global_id(1));
- 
+-
 -    int2 overlay_size = get_image_dim(overlay);
-+    if (loc.x <  x_position ||
-+        loc.y <  y_position ||
-+        loc.x >= overlay_size.x + x_position ||
-+        loc.y >= overlay_size.y + y_position) {
-+        float4 val = read_imagef(main, sampler, loc);
-+        write_imagef(dst, loc, val);
-+    } else {
++    int2 overlay_size = get_image_dim(overlay_u);
+     int2 loc = (int2)(get_global_id(0), get_global_id(1));
+ 
+     if (loc.x <  x_position ||
+@@ -90,14 +112,48 @@ __kernel void overlay_external_alpha(__w
+         float4 val = read_imagef(main, sampler, loc);
+         write_imagef(dst, loc, val);
+     } else {
+-        int2 loc_overlay  = (int2)(x_position, y_position);
+-        float4 in_main    = read_imagef(main,    sampler, loc);
+-        float4 in_overlay = read_imagef(overlay, sampler, loc - loc_overlay);
 +        int2 loc_overlay = (int2)(x_position, y_position);
 +        float4 val_u     = read_imagef(overlay_u, sampler, loc - loc_overlay);
 +        float4 val_v     = read_imagef(overlay_v, sampler, loc - loc_overlay);
 +        write_imagef(dst, loc, (float4)(val_u.x, val_v.x, 0.0f, 1.0f));
 +    }
 +}
-+
+ 
+-        int2 loc_alpha    = (int2)(loc.x * alpha_adj_x,
+-                                   loc.y * alpha_adj_y) - loc_overlay;
+-        float4 in_alpha   = read_imagef(alpha,   sampler, loc_alpha);
 +__kernel void overlay_alpha_uv(__write_only image2d_t dst,
 +                               __read_only  image2d_t main,
 +                               __read_only  image2d_t overlay_u,
@@ -115,41 +135,46 @@ Index: FFmpeg/libavfilter/opencl/overlay.cl
 +                               int x_position,
 +                               int y_position,
 +                               int alpha_adj_x,
-+                               int alpha_adj_y)
++                               int alpha_adj_y,
++                               int overlay_full)
 +{
 +    int2 overlay_size = get_image_dim(overlay_u);
-     int2 loc = (int2)(get_global_id(0), get_global_id(1));
++    int2 loc = (int2)(get_global_id(0), get_global_id(1));
  
-     if (loc.x <  x_position ||
-@@ -90,13 +125,14 @@ __kernel void overlay_external_alpha(__w
-         float4 val = read_imagef(main, sampler, loc);
-         write_imagef(dst, loc, val);
-     } else {
--        int2 loc_overlay  = (int2)(x_position, y_position);
--        float4 in_main    = read_imagef(main,    sampler, loc);
--        float4 in_overlay = read_imagef(overlay, sampler, loc - loc_overlay);
++    if (loc.x <  x_position ||
++        loc.y <  y_position ||
++        loc.x >= overlay_size.x + x_position ||
++        loc.y >= overlay_size.y + y_position) {
++        float4 val = read_imagef(main, sampler, loc);
++        write_imagef(dst, loc, val);
++    } else {
 +        int2 loc_overlay    = (int2)(x_position, y_position);
 +        float4 in_main      = read_imagef(main,    sampler, loc);
 +        float4 in_overlay_u = read_imagef(overlay_u, sampler, loc - loc_overlay);
 +        float4 in_overlay_v = read_imagef(overlay_v, sampler, loc - loc_overlay);
 +        float4 in_overlay   = (float4)(in_overlay_u.x, in_overlay_v.x, 0.0f, 1.0f);
- 
--        int2 loc_alpha    = (int2)(loc.x * alpha_adj_x,
--                                   loc.y * alpha_adj_y) - loc_overlay;
--        float4 in_alpha   = read_imagef(alpha,   sampler, loc_alpha);
++
 +        int2 loc_alpha      = (int2)(loc.x * alpha_adj_x, loc.y * alpha_adj_y) - loc_overlay;
 +        float4 in_alpha     = read_imagef(alpha,   sampler, loc_alpha);
- 
++
++#ifdef NEED_UNPREMUL
++        in_overlay.xy = (in_alpha.x > 0.0f && in_alpha.x < 1.0f)
++                        ? min((in_overlay.xy - 0.5f) * 1.0f / in_alpha.x + 0.5f, 1.0f)
++                        : in_overlay.xy;
++#endif
          float4 val = in_overlay * in_alpha.x + in_main * (1.0f - in_alpha.x);
          write_imagef(dst, loc, val);
+     }
 Index: FFmpeg/libavfilter/vf_overlay_opencl.c
 ===================================================================
 --- libavfilter/vf_overlay_opencl.c
 +++ libavfilter/vf_overlay_opencl.c
-@@ -27,72 +27,117 @@
+@@ -27,72 +27,130 @@
  #include "opencl_source.h"
  #include "video.h"
  
++#define OPENCL_SOURCE_NB 2
++
 +static const enum AVPixelFormat supported_main_formats[] = {
 +    AV_PIX_FMT_NV12,
 +    AV_PIX_FMT_YUV420P,
@@ -191,6 +216,7 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
  
      int              x_position;
      int              y_position;
++    int              alpha_format;
 +
 +    int              opt_repeatlast;
 +    int              opt_shortest;
@@ -227,6 +253,8 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
 +static int overlay_opencl_load(AVFilterContext *avctx)
  {
      OverlayOpenCLContext *ctx = avctx->priv;
++    const char *opencl_sources[OPENCL_SOURCE_NB];
++    AVBPrint header;
      cl_int cle;
 -    const char *source = ff_source_overlay_cl;
 -    const char *kernel;
@@ -292,26 +320,37 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
      }
  
 -    av_log(avctx, AV_LOG_DEBUG, "Using kernel %s.\n", kernel);
-+    av_log(avctx, AV_LOG_DEBUG, "Using kernel %s.\n", ctx->kernel_name);
++    av_bprint_init(&header, 2048, AV_BPRINT_SIZE_UNLIMITED);
++
++    if (ctx->alpha && ctx->alpha_format == 1)
++        av_bprintf(&header, "#define NEED_UNPREMUL\n");
++
++    av_log(avctx, AV_LOG_DEBUG, "Generated OpenCL header:\n%s\n", header.str);
++    opencl_sources[0] = header.str;
++    opencl_sources[1] = ff_source_overlay_cl;
++    err = ff_opencl_filter_load_program(avctx, opencl_sources, OPENCL_SOURCE_NB);
  
 -    err = ff_opencl_filter_load_program(avctx, &source, 1);
-+    err = ff_opencl_filter_load_program(avctx, &ff_source_overlay_cl, 1);
++    av_bprint_finalize(&header, NULL);
      if (err < 0)
          goto fail;
  
-@@ -102,10 +147,20 @@ static int overlay_opencl_load(AVFilterC
+@@ -102,10 +160,23 @@ static int overlay_opencl_load(AVFilterC
      CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create OpenCL "
                       "command queue %d.\n", cle);
  
 -    ctx->kernel = clCreateKernel(ctx->ocf.program, kernel, &cle);
++    av_log(avctx, AV_LOG_DEBUG, "Using kernel %s.\n", ctx->kernel_name);
 +    ctx->kernel = clCreateKernel(ctx->ocf.program, ctx->kernel_name, &cle);
      CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create kernel %d.\n", cle);
  
++    av_log(avctx, AV_LOG_DEBUG, "Using kernel (pass) %s.\n", ctx->kernel_name_pass);
 +    ctx->kernel_name_pass = "overlay_pass";
 +    ctx->kernel_pass = clCreateKernel(ctx->ocf.program, ctx->kernel_name_pass, &cle);
 +    CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create kernel_pass %d.\n", cle);
 +
 +    if (ctx->kernel_name_uv) {
++        av_log(avctx, AV_LOG_DEBUG, "Using kernel (uv) %s.\n", ctx->kernel_name_uv);
 +        ctx->kernel_uv = clCreateKernel(ctx->ocf.program, ctx->kernel_name_uv, &cle);
 +        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create kernel_uv %d.\n", cle);
 +    }
@@ -321,7 +360,7 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
      return 0;
  
  fail:
-@@ -113,21 +168,113 @@ fail:
+@@ -113,21 +184,118 @@ fail:
          clReleaseCommandQueue(ctx->command_queue);
      if (ctx->kernel)
          clReleaseKernel(ctx->kernel);
@@ -405,6 +444,11 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
 +            CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_int, &alpha_adj_x);
 +            CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_int, &alpha_adj_y);
 +        }
++
++        if (ctx->alpha) {
++            cl_int overlay_full = input_overlay->color_range == AVCOL_RANGE_JPEG;
++            CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_int, &overlay_full);
++        }
 +    }
 +
 +    err = ff_opencl_filter_work_size_from_image(avctx, global_work,
@@ -442,7 +486,7 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
  
      err = ff_framesync_get_frame(fs, 0, &input_main, 0);
      if (err < 0)
-@@ -136,14 +283,14 @@ static int overlay_opencl_blend(FFFrameS
+@@ -136,14 +304,14 @@ static int overlay_opencl_blend(FFFrameS
      if (err < 0)
          return err;
  
@@ -464,7 +508,7 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
          if (err < 0)
              return err;
      }
-@@ -154,54 +301,10 @@ static int overlay_opencl_blend(FFFrameS
+@@ -154,54 +322,10 @@ static int overlay_opencl_blend(FFFrameS
          goto fail;
      }
  
@@ -522,7 +566,7 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
      }
  
      cle = clFinish(ctx->command_queue);
-@@ -216,6 +319,9 @@ static int overlay_opencl_blend(FFFrameS
+@@ -216,6 +340,9 @@ static int overlay_opencl_blend(FFFrameS
      return ff_filter_frame(outlink, output);
  
  fail:
@@ -532,16 +576,18 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
      av_frame_free(&output);
      return err;
  }
-@@ -224,8 +330,49 @@ static int overlay_opencl_config_output(
+@@ -224,8 +351,51 @@ static int overlay_opencl_config_output(
  {
      AVFilterContext *avctx = outlink->src;
      OverlayOpenCLContext *ctx = avctx->priv;
 +
 +    AVFilterLink *inlink = avctx->inputs[0];
-+    AVHWFramesContext *frames_ctx_main = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
++    FilterLink      *inl = ff_filter_link(inlink);
++    AVHWFramesContext *frames_ctx_main = (AVHWFramesContext*)inl->hw_frames_ctx->data;
 +
 +    AVFilterLink *inlink_overlay = avctx->inputs[1];
-+    AVHWFramesContext *frames_ctx_overlay = (AVHWFramesContext*)inlink_overlay->hw_frames_ctx->data;
++    FilterLink      *inl_overlay = ff_filter_link(inlink_overlay);
++    AVHWFramesContext *frames_ctx_overlay = (AVHWFramesContext*)inl_overlay->hw_frames_ctx->data;
 +
      int err;
  
@@ -582,7 +628,7 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
      err = ff_opencl_filter_config_output(outlink);
      if (err < 0)
          return err;
-@@ -234,6 +381,11 @@ static int overlay_opencl_config_output(
+@@ -234,6 +404,11 @@ static int overlay_opencl_config_output(
      if (err < 0)
          return err;
  
@@ -594,7 +640,7 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
      return ff_framesync_configure(&ctx->fs);
  }
  
-@@ -265,6 +417,20 @@ static av_cold void overlay_opencl_unini
+@@ -265,6 +440,20 @@ static av_cold void overlay_opencl_unini
                     "kernel: %d.\n", cle);
      }
  
@@ -615,7 +661,7 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
      if (ctx->command_queue) {
          cle = clReleaseCommandQueue(ctx->command_queue);
          if (cle != CL_SUCCESS)
-@@ -279,11 +445,20 @@ static av_cold void overlay_opencl_unini
+@@ -279,11 +468,23 @@ static av_cold void overlay_opencl_unini
  
  #define OFFSET(x) offsetof(OverlayOpenCLContext, x)
  #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
@@ -625,6 +671,9 @@ Index: FFmpeg/libavfilter/vf_overlay_opencl.c
        OFFSET(x_position), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, .flags = FLAGS },
      { "y", "Overlay y position",
        OFFSET(y_position), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, .flags = FLAGS },
++    { "alpha_format", "alpha format", OFFSET(alpha_format), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, FLAGS, .unit = "alpha_format" },
++        { "straight",      "The overlay input is unpremultiplied", 0, AV_OPT_TYPE_CONST, { .i64 = 0 }, .flags = FLAGS, .unit = "alpha_format" },
++        { "premultiplied", "The overlay input is premultiplied",   0, AV_OPT_TYPE_CONST, { .i64 = 1 }, .flags = FLAGS, .unit = "alpha_format" },
 +    { "eof_action", "Action to take when encountering EOF from secondary input ",
 +        OFFSET(opt_eof_action), AV_OPT_TYPE_INT, { .i64 = EOF_ACTION_REPEAT },
 +        EOF_ACTION_REPEAT, EOF_ACTION_PASS, .flags = FLAGS, .unit = "eof_action" },

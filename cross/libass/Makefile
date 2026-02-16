@@ -1,11 +1,11 @@
 PKG_NAME = libass
-PKG_VERS = 0.17.2
+PKG_VERS = 0.17.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libass/libass/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/freetype cross/fribidi cross/fontconfig cross/harfbuzz
+DEPENDS = cross/freetype cross/fribidi cross/fontconfig cross/harfbuzz cross/libunibreak
 
 # harfbuzz
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
@@ -15,7 +15,12 @@ COMMENT  = libass is a portable subtitle renderer for the ASS/SSA (Advanced Subs
 LICENSE  = ICS
 
 GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static
+CONFIGURE_ARGS  = --disable-static
+CONFIGURE_ARGS += --enable-fontconfig
+CONFIGURE_ARGS += --enable-libunibreak
 ADDITIONAL_CFLAGS = -O
+
+# While meson is supported it does
+# not allow to build shared library
 
 include ../../mk/spksrc.cross-cc.mk

@@ -29,33 +29,6 @@ service_postinst() {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
         set_credentials
     fi
-    
-    if [ "${SYNOPKG_DSM_ARCH}" == "88f628x" ]; then
-        # disable auto update for AMRv5 archs
-        comment="disable auto update for ${SYNOPKG_DSM_ARCH} arch"
-        if [ -r ${SYNCTHING_OPTIONS_FILE} ]; then
-            if grep -q "^SYNCTHING_OPTIONS=" "${SYNCTHING_OPTIONS_FILE}"; then
-                options=$(grep '^SYNCTHING_OPTIONS=' ${SYNCTHING_OPTIONS_FILE} | cut -d= -f2 | tr -d '"')
-                if [[ "${options}" == *"--no-upgrade"* ]]; then
-                    echo "- 'auto update' option is already disabled for ${SYNOPKG_DSM_ARCH} arch"
-                else
-                    echo "- Patch ${SYNCTHING_OPTIONS_FILE} to ${comment}"
-                    sed "s/^SYNCTHING_OPTIONS=.*/SYNCTHING_OPTIONS=\"${options} --no-upgrade\"/" -i ${SYNCTHING_OPTIONS_FILE}
-                fi
-            elif grep -q "#SYNCTHING_OPTIONS=" "${SYNCTHING_OPTIONS_FILE}"; then
-                # commented SYNCTHING_OPTIONS defined, append line to disable auto update
-                echo "- Patch ${SYNCTHING_OPTIONS_FILE} to add option to ${comment}"
-                sed '/#SYNCTHING_OPTIONS=.*/a SYNCTHING_OPTIONS="--no-upgrade"' -i ${SYNCTHING_OPTIONS_FILE}
-            else
-                echo "- Add option in ${SYNCTHING_OPTIONS_FILE} to ${comment}"
-                echo "SYNCTHING_OPTIONS=\"--no-upgrade\"" >>  ${SYNCTHING_OPTIONS_FILE}
-            fi
-        else
-            # create options file (should not occur, since such a file was just installed)
-            echo "- Create ${SYNCTHING_OPTIONS_FILE} with option to ${comment}"
-            echo "SYNCTHING_OPTIONS=\"--no-upgrade\"" > ${SYNCTHING_OPTIONS_FILE}
-        fi
-    fi
 }
 
 service_prestart ()

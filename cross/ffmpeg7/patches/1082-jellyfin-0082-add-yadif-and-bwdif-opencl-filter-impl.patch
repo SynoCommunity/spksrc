@@ -1,0 +1,1219 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -3867,6 +3867,7 @@ boxblur_opencl_filter_deps="opencl gpl"
+ bs2b_filter_deps="libbs2b"
+ bwdif_cuda_filter_deps="ffnvcodec"
+ bwdif_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
++bwdif_opencl_filter_deps="opencl"
+ bwdif_videotoolbox_filter_deps="metal corevideo videotoolbox"
+ bwdif_vulkan_filter_deps="vulkan spirv_compiler"
+ chromaber_vulkan_filter_deps="vulkan spirv_compiler"
+@@ -4019,6 +4020,7 @@ xfade_opencl_filter_deps="opencl"
+ xfade_vulkan_filter_deps="vulkan spirv_compiler"
+ yadif_cuda_filter_deps="ffnvcodec"
+ yadif_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
++yadif_opencl_filter_deps="opencl"
+ yadif_videotoolbox_filter_deps="metal corevideo videotoolbox"
+ hstack_vaapi_filter_deps="vaapi_1"
+ vstack_vaapi_filter_deps="vaapi_1"
+Index: FFmpeg/libavfilter/Makefile
+===================================================================
+--- libavfilter/Makefile
++++ libavfilter/Makefile
+@@ -219,6 +219,8 @@ OBJS-$(CONFIG_BOXBLUR_OPENCL_FILTER)
+ OBJS-$(CONFIG_BWDIF_FILTER)                  += vf_bwdif.o bwdifdsp.o yadif_common.o
+ OBJS-$(CONFIG_BWDIF_CUDA_FILTER)             += vf_bwdif_cuda.o vf_bwdif_cuda.ptx.o \
+                                                 yadif_common.o
++OBJS-$(CONFIG_BWDIF_OPENCL_FILTER)           += vf_bwdif_opencl.o opencl.o opencl/bwdif.o \
++                                                yadif_common.o
+ OBJS-$(CONFIG_BWDIF_VIDEOTOOLBOX_FILTER)     += vf_bwdif_videotoolbox.o \
+                                                 metal/vf_bwdif_videotoolbox.metallib.o \
+                                                 metal/utils.o \
+@@ -591,6 +593,8 @@ OBJS-$(CONFIG_XSTACK_FILTER)
+ OBJS-$(CONFIG_YADIF_FILTER)                  += vf_yadif.o yadif_common.o
+ OBJS-$(CONFIG_YADIF_CUDA_FILTER)             += vf_yadif_cuda.o vf_yadif_cuda.ptx.o \
+                                                 yadif_common.o cuda/load_helper.o
++OBJS-$(CONFIG_YADIF_OPENCL_FILTER)           += vf_yadif_opencl.o opencl.o opencl/yadif.o \
++                                                yadif_common.o
+ OBJS-$(CONFIG_YADIF_VIDEOTOOLBOX_FILTER)     += vf_yadif_videotoolbox.o \
+                                                 metal/vf_yadif_videotoolbox.metallib.o \
+                                                 metal/utils.o \
+Index: FFmpeg/libavfilter/allfilters.c
+===================================================================
+--- libavfilter/allfilters.c
++++ libavfilter/allfilters.c
+@@ -201,6 +201,7 @@ extern const AVFilter ff_vf_boxblur;
+ extern const AVFilter ff_vf_boxblur_opencl;
+ extern const AVFilter ff_vf_bwdif;
+ extern const AVFilter ff_vf_bwdif_cuda;
++extern const AVFilter ff_vf_bwdif_opencl;
+ extern const AVFilter ff_vf_bwdif_videotoolbox;
+ extern const AVFilter ff_vf_bwdif_vulkan;
+ extern const AVFilter ff_vf_cas;
+@@ -548,6 +549,7 @@ extern const AVFilter ff_vf_xpsnr;
+ extern const AVFilter ff_vf_xstack;
+ extern const AVFilter ff_vf_yadif;
+ extern const AVFilter ff_vf_yadif_cuda;
++extern const AVFilter ff_vf_yadif_opencl;
+ extern const AVFilter ff_vf_yadif_videotoolbox;
+ extern const AVFilter ff_vf_yaepblur;
+ extern const AVFilter ff_vf_zmq;
+Index: FFmpeg/libavfilter/opencl.c
+===================================================================
+--- libavfilter/opencl.c
++++ libavfilter/opencl.c
+@@ -86,9 +86,17 @@ int ff_opencl_filter_config_input(AVFilt
+ 
+ int ff_opencl_filter_config_output(AVFilterLink *outlink)
+ {
+-    FilterLink            *l = ff_filter_link(outlink);
+     AVFilterContext   *avctx = outlink->src;
+     OpenCLFilterContext *ctx = avctx->priv;
++
++    return ff_opencl_filter_config_output2(outlink, ctx);
++}
++
++int ff_opencl_filter_config_output2(AVFilterLink *outlink,
++                                    OpenCLFilterContext *ctx)
++{
++    FilterLink            *l = ff_filter_link(outlink);
++    AVFilterContext   *avctx = outlink->src;
+     AVBufferRef       *output_frames_ref = NULL;
+     AVHWFramesContext *output_frames;
+     int err;
+@@ -151,6 +159,13 @@ int ff_opencl_filter_init(AVFilterContex
+ void ff_opencl_filter_uninit(AVFilterContext *avctx)
+ {
+     OpenCLFilterContext *ctx = avctx->priv;
++
++    ff_opencl_filter_uninit2(avctx, ctx);
++}
++
++void ff_opencl_filter_uninit2(AVFilterContext *avctx,
++                              OpenCLFilterContext *ctx)
++{
+     cl_int cle;
+ 
+     if (ctx->program) {
+@@ -191,6 +206,16 @@ int ff_opencl_filter_load_program(AVFilt
+                                   int nb_strings)
+ {
+     OpenCLFilterContext *ctx = avctx->priv;
++
++    return ff_opencl_filter_load_program2(avctx, ctx,
++                                          program_source_array, nb_strings);
++}
++
++int ff_opencl_filter_load_program2(AVFilterContext *avctx,
++                                   OpenCLFilterContext *ctx,
++                                   const char **program_source_array,
++                                   int nb_strings)
++{
+     cl_int cle;
+ 
+     ctx->program = clCreateProgramWithSource(ctx->hwctx->context, nb_strings,
+Index: FFmpeg/libavfilter/opencl.h
+===================================================================
+--- libavfilter/opencl.h
++++ libavfilter/opencl.h
+@@ -256,6 +256,9 @@ int ff_opencl_filter_config_input(AVFilt
+  */
+ int ff_opencl_filter_config_output(AVFilterLink *outlink);
+ 
++int ff_opencl_filter_config_output2(AVFilterLink *outlink,
++                                    OpenCLFilterContext *ctx);
++
+ /**
+  * Initialise an OpenCL filter context.
+  */
+@@ -266,6 +269,9 @@ int ff_opencl_filter_init(AVFilterContex
+  */
+ void ff_opencl_filter_uninit(AVFilterContext *avctx);
+ 
++void ff_opencl_filter_uninit2(AVFilterContext *avctx,
++                              OpenCLFilterContext *ctx);
++
+ /**
+  * Load a new OpenCL program from strings in memory.
+  *
+@@ -276,6 +282,11 @@ int ff_opencl_filter_load_program(AVFilt
+                                   const char **program_source_array,
+                                   int nb_strings);
+ 
++int ff_opencl_filter_load_program2(AVFilterContext *avctx,
++                                   OpenCLFilterContext *ctx,
++                                   const char **program_source_array,
++                                   int nb_strings);
++
+ /**
+  * Load a new OpenCL program from a file.
+  *
+Index: FFmpeg/libavfilter/opencl/bwdif.cl
+===================================================================
+--- /dev/null
++++ libavfilter/opencl/bwdif.cl
+@@ -0,0 +1,183 @@
++/*
++ * Copyright (C) 2019 Philip Langdale <philipl@overt.org>
++ * Copyright (C) 2025 NyanMisaka
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#define max3(a, b, c) max(max((a), (b)), (c))
++#define min3(a, b, c) min(min((a), (b)), (c))
++
++__constant sampler_t sampler = (CLK_NORMALIZED_COORDS_FALSE |
++                                CLK_ADDRESS_CLAMP_TO_EDGE   |
++                                CLK_FILTER_NEAREST);
++
++__constant float coef_lf[2] = { 4309.0f, 213.0f };
++__constant float coef_hf[3] = { 5570.0f, 3801.0f, 1016.0f };
++__constant float coef_sp[2] = { 5077.0f, 981.0f };
++
++#define FILTER_INTRA(T) \
++T filter_intra_##T(T cur_prefs3, T cur_prefs, \
++                   T cur_mrefs, T cur_mrefs3) \
++{ \
++    T final = native_divide((coef_sp[0] * (cur_mrefs + cur_prefs) - \
++                             coef_sp[1] * (cur_mrefs3 + cur_prefs3)), (float)(1 << 13)); \
++    return clamp(final, 0.0f, 1.0f); \
++}
++
++FILTER_INTRA(float)
++FILTER_INTRA(float2)
++
++float filter_temp_float(float cur_prefs3, float cur_prefs, float cur_mrefs, float cur_mrefs3,
++                        float prev2_prefs4, float prev2_prefs2, float prev2_0, float prev2_mrefs2, float prev2_mrefs4,
++                        float prev_prefs, float prev_mrefs, float next_prefs, float next_mrefs,
++                        float next2_prefs4, float next2_prefs2, float next2_0, float next2_mrefs2, float next2_mrefs4)
++{
++    float final;
++    float c = cur_mrefs;
++    float d = (prev2_0 + next2_0) * 0.5f;
++    float e = cur_prefs;
++    float temporal_diff0 = fabs(prev2_0 - next2_0);
++    float temporal_diff1 = (fabs(prev_mrefs - c) + fabs(prev_prefs - e)) * 0.5f;
++    float temporal_diff2 = (fabs(next_mrefs - c) + fabs(next_prefs - e)) * 0.5f;
++    float diff = max3(temporal_diff0 * 0.5f, temporal_diff1, temporal_diff2);
++
++    if (!diff) {
++        final = d;
++    } else {
++        float b = ((prev2_mrefs2 + next2_mrefs2) * 0.5f) - c;
++        float f = ((prev2_prefs2 + next2_prefs2) * 0.5f) - e;
++        float dc = d - c;
++        float de = d - e;
++        float mmax = max3(de, dc, min(b, f));
++        float mmin = min3(de, dc, max(b, f));
++        diff = max3(diff, mmin, -mmax);
++
++        float interpol;
++        if (fabs(c - e) > temporal_diff0) {
++            interpol = native_divide((((coef_hf[0] * (prev2_0 + next2_0)
++                - coef_hf[1] * (prev2_mrefs2 + next2_mrefs2 + prev2_prefs2 + next2_prefs2)
++                + coef_hf[2] * (prev2_mrefs4 + next2_mrefs4 + prev2_prefs4 + next2_mrefs4)) * 0.25f)
++                + coef_lf[0] * (c + e) - coef_lf[1] * (cur_mrefs3 + cur_prefs3)), (float)(1 << 13));
++        } else {
++            interpol = native_divide((coef_sp[0] * (c + e) - coef_sp[1] * (cur_mrefs3 + cur_prefs3)), (float)(1 << 13));
++        }
++
++        if (interpol > d + diff) {
++            interpol = d + diff;
++        } else if (interpol < d - diff) {
++            interpol = d - diff;
++        }
++        final = clamp(interpol, 0.0f, 1.0f);
++    }
++    return final;
++}
++
++float2 filter_temp_float2(float2 cur_prefs3, float2 cur_prefs, float2 cur_mrefs, float2 cur_mrefs3,
++                          float2 prev2_prefs4, float2 prev2_prefs2, float2 prev2_0, float2 prev2_mrefs2, float2 prev2_mrefs4,
++                          float2 prev_prefs, float2 prev_mrefs, float2 next_prefs, float2 next_mrefs,
++                          float2 next2_prefs4, float2 next2_prefs2, float2 next2_0, float2 next2_mrefs2, float2 next2_mrefs4)
++{
++    return (float2)(filter_temp_float(cur_prefs3.x, cur_prefs.x, cur_mrefs.x, cur_mrefs3.x,
++                                      prev2_prefs4.x, prev2_prefs2.x, prev2_0.x, prev2_mrefs2.x, prev2_mrefs4.x,
++                                      prev_prefs.x, prev_mrefs.x, next_prefs.x, next_mrefs.x,
++                                      next2_prefs4.x, next2_prefs2.x, next2_0.x, next2_mrefs2.x, next2_mrefs4.x),
++                    filter_temp_float(cur_prefs3.y, cur_prefs.y, cur_mrefs.y, cur_mrefs3.y,
++                                      prev2_prefs4.y, prev2_prefs2.y, prev2_0.y, prev2_mrefs2.y, prev2_mrefs4.y,
++                                      prev_prefs.y, prev_mrefs.y, next_prefs.y, next_mrefs.y,
++                                      next2_prefs4.y, next2_prefs2.y, next2_0.y, next2_mrefs2.y, next2_mrefs4.y));
++}
++
++#define BWDIF_COMPUTE(T, XY) \
++T bwdif_compute_##T(__write_only image2d_t dst, \
++                    __read_only  image2d_t cur, \
++                    __read_only  image2d_t prev2, \
++                    __read_only  image2d_t prev1, \
++                    __read_only  image2d_t next1, \
++                    __read_only  image2d_t next2, \
++                    int parity, \
++                    bool is_field_end, \
++                    int2 pos) \
++{ \
++    /* Don't modify the primary field */ \
++    if (pos.y % 2 == parity) { \
++        return read_imagef(cur, sampler, (int2)(pos.x, pos.y)).XY; \
++    } \
++    T cur_prefs3 = read_imagef(cur, sampler, (int2)(pos.x, pos.y + 3)).XY; \
++    T cur_prefs  = read_imagef(cur, sampler, (int2)(pos.x, pos.y + 1)).XY; \
++    T cur_mrefs  = read_imagef(cur, sampler, (int2)(pos.x, pos.y - 1)).XY; \
++    T cur_mrefs3 = read_imagef(cur, sampler, (int2)(pos.x, pos.y - 3)).XY; \
++    if (is_field_end) { \
++        return filter_intra_##T(cur_prefs3, cur_prefs, cur_mrefs, cur_mrefs3); \
++    } \
++    /* Calculate temporal prediction */ \
++    T prev2_prefs4 = read_imagef(prev2, sampler, (int2)(pos.x, pos.y + 4)).XY; \
++    T prev2_prefs2 = read_imagef(prev2, sampler, (int2)(pos.x, pos.y + 2)).XY; \
++    T prev2_0      = read_imagef(prev2, sampler, (int2)(pos.x, pos.y + 0)).XY; \
++    T prev2_mrefs2 = read_imagef(prev2, sampler, (int2)(pos.x, pos.y - 2)).XY; \
++    T prev2_mrefs4 = read_imagef(prev2, sampler, (int2)(pos.x, pos.y - 4)).XY; \
++    T prev_prefs   = read_imagef(prev1, sampler, (int2)(pos.x, pos.y + 1)).XY; \
++    T prev_mrefs   = read_imagef(prev1, sampler, (int2)(pos.x, pos.y - 1)).XY; \
++    T next_prefs   = read_imagef(next1, sampler, (int2)(pos.x, pos.y + 1)).XY; \
++    T next_mrefs   = read_imagef(next1, sampler, (int2)(pos.x, pos.y - 1)).XY; \
++    T next2_prefs4 = read_imagef(next2, sampler, (int2)(pos.x, pos.y + 4)).XY; \
++    T next2_prefs2 = read_imagef(next2, sampler, (int2)(pos.x, pos.y + 2)).XY; \
++    T next2_0      = read_imagef(next2, sampler, (int2)(pos.x, pos.y + 0)).XY; \
++    T next2_mrefs2 = read_imagef(next2, sampler, (int2)(pos.x, pos.y - 2)).XY; \
++    T next2_mrefs4 = read_imagef(next2, sampler, (int2)(pos.x, pos.y - 4)).XY; \
++    return filter_temp_##T(cur_prefs3, cur_prefs, cur_mrefs, cur_mrefs3, \
++                           prev2_prefs4, prev2_prefs2, prev2_0, prev2_mrefs2, prev2_mrefs4, \
++                           prev_prefs, prev_mrefs, next_prefs, next_mrefs, \
++                           next2_prefs4, next2_prefs2, next2_0, next2_mrefs2, next2_mrefs4); \
++}
++
++BWDIF_COMPUTE(float, x)
++BWDIF_COMPUTE(float2, xy)
++
++__kernel void bwdif(__write_only image2d_t dst,
++                    __read_only  image2d_t prev,
++                    __read_only  image2d_t cur,
++                    __read_only  image2d_t next,
++                    int channels,
++                    int parity,
++                    int is_field_end,
++                    int is_second_field)
++{
++    int2 pos = (int2)(get_global_id(0), get_global_id(1));
++
++    if (pos.x >= get_image_width(dst) ||
++        pos.y >= get_image_height(dst))
++        return;
++
++    if (channels == 1) {
++        float pred = is_second_field
++            ? bwdif_compute_float(dst, cur, prev, cur, next, next,
++                                  parity, is_field_end, pos)
++            : bwdif_compute_float(dst, cur, prev, prev, cur, next,
++                                  parity, is_field_end, pos);
++
++        write_imagef(dst, pos, (float4)(pred, 0.0f, 0.0f, 1.0f));
++    } else if (channels == 2) {
++        float2 pred = is_second_field
++            ? bwdif_compute_float2(dst, cur, prev, cur, next, next,
++                                   parity, is_field_end, pos)
++            : bwdif_compute_float2(dst, cur, prev, prev, cur, next,
++                                   parity, is_field_end, pos);
++
++        write_imagef(dst, pos, (float4)(pred.x, pred.y, 0.0f, 1.0f));
++    }
++}
+Index: FFmpeg/libavfilter/opencl/yadif.cl
+===================================================================
+--- /dev/null
++++ libavfilter/opencl/yadif.cl
+@@ -0,0 +1,197 @@
++/*
++ * Copyright (C) 2018 Philip Langdale <philipl@overt.org>
++ * Copyright (C) 2025 NyanMisaka
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#define max3(a, b, c) max(max((a), (b)), (c))
++#define min3(a, b, c) min(min((a), (b)), (c))
++
++__constant sampler_t sampler = (CLK_NORMALIZED_COORDS_FALSE |
++                                CLK_ADDRESS_CLAMP_TO_EDGE   |
++                                CLK_FILTER_NEAREST);
++
++float spatial_predictor_float(float a, float b, float c, float d, float e, float f, float g,
++                              float h, float i, float j, float k, float l, float m, float n)
++{
++    float spatial_pred = (d + k) * 0.5f;
++    float spatial_score = fabs(c - j) + fabs(d - k) + fabs(e - l);
++
++    float score = fabs(b - k) + fabs(c - l) + fabs(d - m);
++    if (score < spatial_score) {
++        spatial_pred = (c + l) * 0.5f;
++        spatial_score = score;
++        score = fabs(a - l) + fabs(b - m) + fabs(c - n);
++        if (score < spatial_score) {
++            spatial_pred = (b + m) * 0.5f;
++            spatial_score = score;
++        }
++    }
++    score = fabs(d - i) + fabs(e - j) + fabs(f - k);
++    if (score < spatial_score) {
++        spatial_pred = (e + j) * 0.5f;
++        spatial_score = score;
++        score = fabs(e - h) + fabs(f - i) + fabs(g - j);
++        if (score < spatial_score) {
++            spatial_pred = (f + i) * 0.5f;
++            spatial_score = score;
++        }
++    }
++    return spatial_pred;
++}
++
++float2 spatial_predictor_float2(float2 a, float2 b, float2 c, float2 d, float2 e, float2 f, float2 g,
++                                float2 h, float2 i, float2 j, float2 k, float2 l, float2 m, float2 n)
++{
++    return (float2)(spatial_predictor_float(a.x, b.x, c.x, d.x, e.x, f.x, g.x,
++                                            h.x, i.x, j.x, k.x, l.x, m.x, n.x),
++                    spatial_predictor_float(a.y, b.y, c.y, d.y, e.y, f.y, g.y,
++                                            h.y, i.y, j.y, k.y, l.y, m.y, n.y));
++}
++
++
++float temporal_predictor_float(float A, float B, float C, float D, float E, float F,
++                               float G, float H, float I, float J, float K, float L,
++                               float spatial_pred, bool skip_check)
++{
++    float p0 = (C + H) * 0.5f;
++    float p1 = F;
++    float p2 = (D + I) * 0.5f;
++    float p3 = G;
++    float p4 = (E + J) * 0.5f;
++
++    float tdiff0 = fabs(D - I);
++    float tdiff1 = (fabs(A - F) + fabs(B - G)) * 0.5f;
++    float tdiff2 = (fabs(K - F) + fabs(G - L)) * 0.5f;
++
++    float diff = max3(tdiff0, tdiff1, tdiff2);
++
++    if (!skip_check) {
++        float maxi = max3(p2 - p3, p2 - p1, min(p0 - p1, p4 - p3));
++        float mini = min3(p2 - p3, p2 - p1, max(p0 - p1, p4 - p3));
++        diff = max3(diff, mini, -maxi);
++    }
++    return clamp(spatial_pred, p2 - diff, p2 + diff);
++}
++
++float2 temporal_predictor_float2(float2 A, float2 B, float2 C, float2 D, float2 E, float2 F,
++                                 float2 G, float2 H, float2 I, float2 J, float2 K, float2 L,
++                                 float2 spatial_pred, bool skip_check)
++{
++    return (float2)(temporal_predictor_float(A.x, B.x, C.x, D.x, E.x, F.x,
++                                             G.x, H.x, I.x, J.x, K.x, L.x,
++                                             spatial_pred.x, skip_check),
++                    temporal_predictor_float(A.y, B.y, C.y, D.y, E.y, F.y,
++                                             G.y, H.y, I.y, J.y, K.y, L.y,
++                                             spatial_pred.y, skip_check));
++}
++
++#define YADIF_COMPUTE_SPATIAL(T, XY) \
++T yadif_compute_spatial_##T(__read_only image2d_t cur, int2 pos) \
++{ \
++    T a = read_imagef(cur, sampler, (int2)(pos.x - 3, pos.y - 1)).XY; \
++    T b = read_imagef(cur, sampler, (int2)(pos.x - 2, pos.y - 1)).XY; \
++    T c = read_imagef(cur, sampler, (int2)(pos.x - 1, pos.y - 1)).XY; \
++    T d = read_imagef(cur, sampler, (int2)(pos.x - 0, pos.y - 1)).XY; \
++    T e = read_imagef(cur, sampler, (int2)(pos.x + 1, pos.y - 1)).XY; \
++    T f = read_imagef(cur, sampler, (int2)(pos.x + 2, pos.y - 1)).XY; \
++    T g = read_imagef(cur, sampler, (int2)(pos.x + 3, pos.y - 1)).XY; \
++    T h = read_imagef(cur, sampler, (int2)(pos.x - 3, pos.y + 1)).XY; \
++    T i = read_imagef(cur, sampler, (int2)(pos.x - 2, pos.y + 1)).XY; \
++    T j = read_imagef(cur, sampler, (int2)(pos.x - 1, pos.y + 1)).XY; \
++    T k = read_imagef(cur, sampler, (int2)(pos.x - 0, pos.y + 1)).XY; \
++    T l = read_imagef(cur, sampler, (int2)(pos.x + 1, pos.y + 1)).XY; \
++    T m = read_imagef(cur, sampler, (int2)(pos.x + 2, pos.y + 1)).XY; \
++    T n = read_imagef(cur, sampler, (int2)(pos.x + 3, pos.y + 1)).XY; \
++    return spatial_predictor_##T(a, b, c, d, e, f, g, \
++                                 h, i, j, k, l, m, n); \
++}
++
++#define YADIF_COMPUTE_TEMPORAL(T, XY) \
++T yadif_compute_temporal_##T(__read_only image2d_t cur, \
++                             __read_only image2d_t prev2, \
++                             __read_only image2d_t prev1, \
++                             __read_only image2d_t next1, \
++                             __read_only image2d_t next2, \
++                             T spatial_pred, \
++                             bool skip_spatial_check, \
++                             int2 pos) \
++{ \
++    T A = read_imagef(prev2, sampler, (int2)(pos.x, pos.y - 1)).XY; \
++    T B = read_imagef(prev2, sampler, (int2)(pos.x, pos.y + 1)).XY; \
++    T C = read_imagef(prev1, sampler, (int2)(pos.x, pos.y - 2)).XY; \
++    T D = read_imagef(prev1, sampler, (int2)(pos.x, pos.y + 0)).XY; \
++    T E = read_imagef(prev1, sampler, (int2)(pos.x, pos.y + 2)).XY; \
++    T F = read_imagef(cur,   sampler, (int2)(pos.x, pos.y - 1)).XY; \
++    T G = read_imagef(cur,   sampler, (int2)(pos.x, pos.y + 1)).XY; \
++    T H = read_imagef(next1, sampler, (int2)(pos.x, pos.y - 2)).XY; \
++    T I = read_imagef(next1, sampler, (int2)(pos.x, pos.y + 0)).XY; \
++    T J = read_imagef(next1, sampler, (int2)(pos.x, pos.y + 2)).XY; \
++    T K = read_imagef(next2, sampler, (int2)(pos.x, pos.y - 1)).XY; \
++    T L = read_imagef(next2, sampler, (int2)(pos.x, pos.y + 1)).XY; \
++    return temporal_predictor_##T(A, B, C, D, E, F, G, H, I, J, K, L, \
++                                  spatial_pred, skip_spatial_check); \
++}
++
++YADIF_COMPUTE_SPATIAL(float, x)
++YADIF_COMPUTE_TEMPORAL(float, x)
++YADIF_COMPUTE_SPATIAL(float2, xy)
++YADIF_COMPUTE_TEMPORAL(float2, xy)
++
++__kernel void yadif(__write_only image2d_t dst,
++                    __read_only  image2d_t prev,
++                    __read_only  image2d_t cur,
++                    __read_only  image2d_t next,
++                    int channels,
++                    int parity,
++                    int is_second_field,
++                    int skip_spatial_check)
++{
++    int2 pos = (int2)(get_global_id(0), get_global_id(1));
++
++    if (pos.x >= get_image_width(dst) ||
++        pos.y >= get_image_height(dst))
++        return;
++
++    // Don't modify the primary field
++    if (pos.y % 2 == parity) {
++        float4 in = read_imagef(cur, sampler, pos);
++        write_imagef(dst, pos, in);
++        return;
++    }
++
++    if (channels == 1) {
++        float spatial_pred = yadif_compute_spatial_float(cur, pos);
++        float pred = is_second_field
++            ? yadif_compute_temporal_float(cur, prev, cur, next, next,
++                                           spatial_pred, skip_spatial_check, pos)
++            : yadif_compute_temporal_float(cur, prev, prev, cur, next,
++                                           spatial_pred, skip_spatial_check, pos);
++
++        write_imagef(dst, pos, (float4)(pred, 0.0f, 0.0f, 1.0f));
++    } else if (channels == 2) {
++        float2 spatial_pred = yadif_compute_spatial_float2(cur, pos);
++        float2 pred = is_second_field
++            ? yadif_compute_temporal_float2(cur, prev, cur, next, next,
++                                            spatial_pred, skip_spatial_check, pos)
++            : yadif_compute_temporal_float2(cur, prev, prev, cur, next,
++                                            spatial_pred, skip_spatial_check, pos);
++
++        write_imagef(dst, pos, (float4)(pred.x, pred.y, 0.0f, 1.0f));
++    }
++}
+Index: FFmpeg/libavfilter/opencl_source.h
+===================================================================
+--- libavfilter/opencl_source.h
++++ libavfilter/opencl_source.h
+@@ -20,6 +20,7 @@
+ #define AVFILTER_OPENCL_SOURCE_H
+ 
+ extern const char *ff_source_avgblur_cl;
++extern const char *ff_source_bwdif_cl;
+ extern const char *ff_source_colorkey_cl;
+ extern const char *ff_source_colorspace_common_cl;
+ extern const char *ff_source_convolution_cl;
+@@ -34,5 +35,6 @@ extern const char *ff_source_tonemap_cl;
+ extern const char *ff_source_transpose_cl;
+ extern const char *ff_source_unsharp_cl;
+ extern const char *ff_source_xfade_cl;
++extern const char *ff_source_yadif_cl;
+ 
+ #endif /* AVFILTER_OPENCL_SOURCE_H */
+Index: FFmpeg/libavfilter/vf_bwdif_opencl.c
+===================================================================
+--- /dev/null
++++ libavfilter/vf_bwdif_opencl.c
+@@ -0,0 +1,328 @@
++/*
++ * Copyright (c) 2025 NyanMisaka
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++ 
++#include "libavutil/avassert.h"
++#include "libavutil/common.h"
++#include "libavutil/imgutils.h"
++#include "libavutil/opt.h"
++#include "libavutil/pixdesc.h"
++
++#include "filters.h"
++#include "opencl.h"
++#include "opencl_source.h"
++#include "video.h"
++#include "yadif.h"
++
++typedef struct DeintOpenCLContext {
++    YADIFContext yadif;
++
++    OpenCLFilterContext ocf;
++
++    cl_command_queue command_queue;
++    cl_kernel        kernel;
++
++    int initialised;
++} DeintOpenCLContext;
++
++static int deint_opencl_kernel_init(AVFilterContext *avctx)
++{
++    DeintOpenCLContext *ctx = avctx->priv;
++    cl_int cle;
++    int err;
++
++    err = ff_opencl_filter_load_program2(avctx, &ctx->ocf, &ff_source_bwdif_cl, 1);
++    if (err < 0)
++        goto fail;
++
++    ctx->command_queue = clCreateCommandQueue(ctx->ocf.hwctx->context,
++                                              ctx->ocf.hwctx->device_id,
++                                              0, &cle);
++    if (!ctx->command_queue) {
++        av_log(avctx, AV_LOG_ERROR, "Failed to create OpenCL command queue: %d.\n", cle);
++        err = AVERROR(EIO);
++        goto fail;
++    }
++
++    ctx->kernel = clCreateKernel(ctx->ocf.program, "bwdif", &cle);
++    if (!ctx->kernel) {
++        av_log(avctx, AV_LOG_ERROR, "Failed to create kernel: %d.\n", cle);
++        err = AVERROR(EIO);
++        goto fail;
++    }
++
++    ctx->initialised = 1;
++    return 0;
++
++fail:
++    if (ctx->command_queue)
++        clReleaseCommandQueue(ctx->command_queue);
++    if (ctx->kernel)
++        clReleaseKernel(ctx->kernel);
++    return err;
++}
++
++static void deint_opencl_filter(AVFilterContext *avctx, AVFrame *dst,
++                                int parity, int tff)
++{
++    DeintOpenCLContext *ctx = avctx->priv;
++    YADIFContext *y = &ctx->yadif;
++    size_t global_work[2];
++    size_t local_work[2] = { 16, 16 };
++    int i, err;
++    cl_int cle;
++
++    if (!ctx->initialised) {
++        err = deint_opencl_kernel_init(avctx);
++        if (err < 0)
++            goto fail;
++    }
++
++    for (i = 0; i < y->csp->nb_components; i++) {
++        int pixel_size, channels;
++        int is_field_end = y->current_field == YADIF_FIELD_END;
++        int is_second_field = !(parity ^ tff);
++        const AVComponentDescriptor *comp = &y->csp->comp[i];
++
++        if (comp->plane < i) {
++            // We process planes as a whole, so don't reprocess
++            // them for additional components
++            continue;
++        }
++
++        pixel_size = (comp->depth + comp->shift) / 8;
++        channels = comp->step / pixel_size;
++        if (!pixel_size || pixel_size > 2 || channels > 2) {
++            av_log(ctx, AV_LOG_ERROR, "Unsupported pixel format: %s\n", y->csp->name);
++            goto fail;
++        }
++        av_log(ctx, AV_LOG_TRACE,
++               "Deinterlacing plane %d: pixel_size: %d channels: %d\n",
++               comp->plane, pixel_size, channels);
++
++        if (!dst->data[i] || !y->prev->data[i] || !y->cur->data[i] || !y->next->data[i]) {
++            err = AVERROR(EIO);
++            goto fail;
++        }
++
++        CL_SET_KERNEL_ARG(ctx->kernel, 0, cl_mem, &dst->data[i]);
++        CL_SET_KERNEL_ARG(ctx->kernel, 1, cl_mem, &y->prev->data[i]);
++        CL_SET_KERNEL_ARG(ctx->kernel, 2, cl_mem, &y->cur->data[i]);
++        CL_SET_KERNEL_ARG(ctx->kernel, 3, cl_mem, &y->next->data[i]);
++        CL_SET_KERNEL_ARG(ctx->kernel, 4, cl_int, &channels);
++        CL_SET_KERNEL_ARG(ctx->kernel, 5, cl_int, &parity);
++        CL_SET_KERNEL_ARG(ctx->kernel, 6, cl_int, &is_field_end);
++        CL_SET_KERNEL_ARG(ctx->kernel, 7, cl_int, &is_second_field);
++
++        err = ff_opencl_filter_work_size_from_image(avctx, global_work, dst, i, 16);
++        if (err < 0)
++            goto fail;
++
++        cle = clEnqueueNDRangeKernel(ctx->command_queue, ctx->kernel,
++                                     2, NULL, global_work, local_work,
++                                     0, NULL, NULL);
++        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to enqueue kernel: %d.\n", cle);
++    }
++
++    if (y->current_field == YADIF_FIELD_END)
++        y->current_field = YADIF_FIELD_NORMAL;
++
++    clFinish(ctx->command_queue);
++    return;
++
++fail:
++    clFinish(ctx->command_queue);
++    av_frame_free(&dst);
++    return;
++}
++
++static int deint_opencl_config_input(AVFilterLink *inlink)
++{
++    FilterLink            *l = ff_filter_link(inlink);
++    AVFilterContext   *avctx = inlink->dst;
++    DeintOpenCLContext  *ctx = avctx->priv;
++    OpenCLFilterContext *ocf = &ctx->ocf;
++    AVHWFramesContext *input_frames;
++
++    if (!l->hw_frames_ctx) {
++        av_log(avctx, AV_LOG_ERROR, "OpenCL filtering requires a "
++               "hardware frames context on the input.\n");
++        return AVERROR(EINVAL);
++    }
++
++    // Extract the device and default output format from the first input.
++    if (avctx->inputs[0] != inlink)
++        return 0;
++
++    input_frames = (AVHWFramesContext*)l->hw_frames_ctx->data;
++    if (input_frames->format != AV_PIX_FMT_OPENCL)
++        return AVERROR(EINVAL);
++
++    av_buffer_unref(&ocf->device_ref);
++
++    ocf->device_ref = av_buffer_ref(input_frames->device_ref);
++    if (!ocf->device_ref)
++        return AVERROR(ENOMEM);
++
++    ocf->device = (AVHWDeviceContext*)ocf->device_ref->data;
++    ocf->hwctx  = ocf->device->hwctx;
++
++    // Default output parameters match input parameters.
++    if (ocf->output_format == AV_PIX_FMT_NONE)
++        ocf->output_format = input_frames->sw_format;
++    if (!ocf->output_width)
++        ocf->output_width  = inlink->w;
++    if (!ocf->output_height)
++        ocf->output_height = inlink->h;
++
++    return 0;
++}
++
++static int deint_opencl_config_output(AVFilterLink *outlink)
++{
++    AVFilterContext  *avctx = outlink->src;
++    AVFilterLink    *inlink = avctx->inputs[0];
++    FilterLink         *inl = ff_filter_link(inlink);
++    DeintOpenCLContext *ctx = avctx->priv;
++    YADIFContext *y = &ctx->yadif;
++    AVHWFramesContext *in_frames_ctx;
++    enum AVPixelFormat in_format;
++    const AVPixFmtDescriptor *in_desc;
++    int ret;
++
++    if (!inl->hw_frames_ctx)
++        return AVERROR(EINVAL);
++    in_frames_ctx = (AVHWFramesContext*)inl->hw_frames_ctx->data;
++    in_format     = in_frames_ctx->sw_format;
++    in_desc       = av_pix_fmt_desc_get(in_format);
++    ctx->ocf.output_format = in_format;
++    ctx->ocf.output_width  = inlink->w;
++    ctx->ocf.output_height = inlink->h;
++
++    ret = ff_opencl_filter_config_output2(outlink, &ctx->ocf);
++    if (ret < 0)
++        return ret;
++
++    y->csp = in_desc;
++    y->filter = deint_opencl_filter;
++
++    if (AV_CEIL_RSHIFT(outlink->w, y->csp->log2_chroma_w) < 3 ||
++        AV_CEIL_RSHIFT(outlink->h, y->csp->log2_chroma_h) < 3) {
++        av_log(ctx, AV_LOG_ERROR,
++               "Video with planes less than 3 columns or lines is not supported\n");
++        return AVERROR(EINVAL);
++    }
++
++    ret = ff_yadif_config_output_common(outlink);
++    if (ret < 0)
++        return ret;
++
++    return 0;
++}
++
++static int deint_opencl_init(AVFilterContext *avctx)
++{
++    DeintOpenCLContext *ctx = avctx->priv;
++    OpenCLFilterContext *ocf = &ctx->ocf;
++
++    ocf->output_format = AV_PIX_FMT_NONE;
++
++    return 0;
++}
++
++static av_cold void deint_opencl_uninit(AVFilterContext *avctx)
++{
++    DeintOpenCLContext *ctx = avctx->priv;
++    OpenCLFilterContext *ocf = &ctx->ocf;
++    cl_int cle;
++
++    ff_yadif_uninit(avctx);
++
++    if (ctx->kernel) {
++        cle = clReleaseKernel(ctx->kernel);
++        if (cle != CL_SUCCESS)
++            av_log(avctx, AV_LOG_ERROR, "Failed to release "
++                   "kernel: %d.\n", cle);
++    }
++
++    if (ctx->command_queue) {
++        cle = clReleaseCommandQueue(ctx->command_queue);
++        if (cle != CL_SUCCESS)
++            av_log(avctx, AV_LOG_ERROR, "Failed to release "
++                   "command queue: %d.\n", cle);
++    }
++
++    ff_opencl_filter_uninit2(avctx, ocf);
++}
++
++#define OFFSET(x) offsetof(YADIFContext, x)
++#define FLAGS (AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_FILTERING_PARAM)
++#define CONST(name, help, val, unit) { name, help, 0, AV_OPT_TYPE_CONST, { .i64 = val }, INT_MIN, INT_MAX, FLAGS, unit }
++
++static const AVOption bwdif_opencl_options[] = {
++    { "mode",   "specify the interlacing mode", OFFSET(mode), AV_OPT_TYPE_INT, { .i64 = YADIF_MODE_SEND_FRAME }, 0, 1, FLAGS, .unit = "mode" },
++    CONST("send_frame", "send one frame for each frame", YADIF_MODE_SEND_FRAME, .unit = "mode"),
++    CONST("send_field", "send one frame for each field", YADIF_MODE_SEND_FIELD, .unit = "mode"),
++
++    { "parity", "specify the assumed picture field parity", OFFSET(parity), AV_OPT_TYPE_INT, { .i64 = YADIF_PARITY_AUTO }, -1, 1, FLAGS, .unit = "parity" },
++    CONST("tff",  "assume top field first",    YADIF_PARITY_TFF,  .unit = "parity"),
++    CONST("bff",  "assume bottom field first", YADIF_PARITY_BFF,  .unit = "parity"),
++    CONST("auto", "auto detect parity",        YADIF_PARITY_AUTO, .unit = "parity"),
++
++    { "deint", "specify which frames to deinterlace", OFFSET(deint), AV_OPT_TYPE_INT, { .i64 = YADIF_DEINT_ALL }, 0, 1, FLAGS, .unit = "deint" },
++    CONST("all",        "deinterlace all frames",                       YADIF_DEINT_ALL,        .unit = "deint"),
++    CONST("interlaced", "only deinterlace frames marked as interlaced", YADIF_DEINT_INTERLACED, .unit = "deint"),
++
++    { NULL }
++};
++
++AVFILTER_DEFINE_CLASS(bwdif_opencl);
++
++static const AVFilterPad deint_opencl_inputs[] = {
++    {
++        .name             = "default",
++        .type             = AVMEDIA_TYPE_VIDEO,
++        .filter_frame     = ff_yadif_filter_frame,
++        .config_props     = &deint_opencl_config_input,
++    },
++};
++
++static const AVFilterPad deint_opencl_outputs[] = {
++    {
++        .name         = "default",
++        .type         = AVMEDIA_TYPE_VIDEO,
++        .request_frame = ff_yadif_request_frame,
++        .config_props = &deint_opencl_config_output,
++    },
++};
++
++const AVFilter ff_vf_bwdif_opencl = {
++    .name           = "bwdif_opencl",
++    .description    = NULL_IF_CONFIG_SMALL("Deinterlace (BWDIF) the video through OpenCL."),
++    .priv_size      = sizeof(DeintOpenCLContext),
++    .priv_class     = &bwdif_opencl_class,
++    .init           = &deint_opencl_init,
++    .uninit         = &deint_opencl_uninit,
++    FILTER_INPUTS(deint_opencl_inputs),
++    FILTER_OUTPUTS(deint_opencl_outputs),
++    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_OPENCL),
++    .flags          = AVFILTER_FLAG_HWDEVICE |
++                      AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
++    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
++};
+Index: FFmpeg/libavfilter/vf_yadif_opencl.c
+===================================================================
+--- /dev/null
++++ libavfilter/vf_yadif_opencl.c
+@@ -0,0 +1,320 @@
++/*
++ * Copyright (c) 2025 NyanMisaka
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++ 
++#include "libavutil/avassert.h"
++#include "libavutil/common.h"
++#include "libavutil/imgutils.h"
++#include "libavutil/opt.h"
++#include "libavutil/pixdesc.h"
++
++#include "filters.h"
++#include "opencl.h"
++#include "opencl_source.h"
++#include "video.h"
++#include "yadif.h"
++
++typedef struct DeintOpenCLContext {
++    YADIFContext yadif;
++
++    OpenCLFilterContext ocf;
++
++    cl_command_queue command_queue;
++    cl_kernel        kernel;
++
++    int initialised;
++} DeintOpenCLContext;
++
++static int deint_opencl_kernel_init(AVFilterContext *avctx)
++{
++    DeintOpenCLContext *ctx = avctx->priv;
++    cl_int cle;
++    int err;
++
++    err = ff_opencl_filter_load_program2(avctx, &ctx->ocf, &ff_source_yadif_cl, 1);
++    if (err < 0)
++        goto fail;
++
++    ctx->command_queue = clCreateCommandQueue(ctx->ocf.hwctx->context,
++                                              ctx->ocf.hwctx->device_id,
++                                              0, &cle);
++    if (!ctx->command_queue) {
++        av_log(avctx, AV_LOG_ERROR, "Failed to create OpenCL command queue: %d.\n", cle);
++        err = AVERROR(EIO);
++        goto fail;
++    }
++
++    ctx->kernel = clCreateKernel(ctx->ocf.program, "yadif", &cle);
++    if (!ctx->kernel) {
++        av_log(avctx, AV_LOG_ERROR, "Failed to create kernel: %d.\n", cle);
++        err = AVERROR(EIO);
++        goto fail;
++    }
++
++    ctx->initialised = 1;
++    return 0;
++
++fail:
++    if (ctx->command_queue)
++        clReleaseCommandQueue(ctx->command_queue);
++    if (ctx->kernel)
++        clReleaseKernel(ctx->kernel);
++    return err;
++}
++
++static void deint_opencl_filter(AVFilterContext *avctx, AVFrame *dst,
++                                int parity, int tff)
++{
++    DeintOpenCLContext *ctx = avctx->priv;
++    YADIFContext *y = &ctx->yadif;
++    size_t global_work[2];
++    size_t local_work[2] = { 16, 16 };
++    int i, err;
++    cl_int cle;
++
++    if (!ctx->initialised) {
++        err = deint_opencl_kernel_init(avctx);
++        if (err < 0)
++            goto fail;
++    }
++
++    for (i = 0; i < y->csp->nb_components; i++) {
++        int pixel_size, channels;
++        int skip_spatial_check = !!(y->mode & 2);
++        int is_second_field = !(parity ^ tff);
++        const AVComponentDescriptor *comp = &y->csp->comp[i];
++
++        if (comp->plane < i) {
++            // We process planes as a whole, so don't reprocess
++            // them for additional components
++            continue;
++        }
++
++        pixel_size = (comp->depth + comp->shift) / 8;
++        channels = comp->step / pixel_size;
++        if (!pixel_size || pixel_size > 2 || channels > 2) {
++            av_log(ctx, AV_LOG_ERROR, "Unsupported pixel format: %s\n", y->csp->name);
++            goto fail;
++        }
++        av_log(ctx, AV_LOG_TRACE,
++               "Deinterlacing plane %d: pixel_size: %d channels: %d\n",
++               comp->plane, pixel_size, channels);
++
++        if (!dst->data[i] || !y->prev->data[i] || !y->cur->data[i] || !y->next->data[i]) {
++            err = AVERROR(EIO);
++            goto fail;
++        }
++
++        CL_SET_KERNEL_ARG(ctx->kernel, 0, cl_mem, &dst->data[i]);
++        CL_SET_KERNEL_ARG(ctx->kernel, 1, cl_mem, &y->prev->data[i]);
++        CL_SET_KERNEL_ARG(ctx->kernel, 2, cl_mem, &y->cur->data[i]);
++        CL_SET_KERNEL_ARG(ctx->kernel, 3, cl_mem, &y->next->data[i]);
++        CL_SET_KERNEL_ARG(ctx->kernel, 4, cl_int, &channels);
++        CL_SET_KERNEL_ARG(ctx->kernel, 5, cl_int, &parity);
++        CL_SET_KERNEL_ARG(ctx->kernel, 6, cl_int, &is_second_field);
++        CL_SET_KERNEL_ARG(ctx->kernel, 7, cl_int, &skip_spatial_check);
++
++        err = ff_opencl_filter_work_size_from_image(avctx, global_work, dst, i, 16);
++        if (err < 0)
++            goto fail;
++
++        cle = clEnqueueNDRangeKernel(ctx->command_queue, ctx->kernel,
++                                     2, NULL, global_work, local_work,
++                                     0, NULL, NULL);
++        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to enqueue kernel: %d.\n", cle);
++    }
++
++    clFinish(ctx->command_queue);
++    return;
++
++fail:
++    clFinish(ctx->command_queue);
++    av_frame_free(&dst);
++    return;
++}
++
++static int deint_opencl_config_input(AVFilterLink *inlink)
++{
++    FilterLink            *l = ff_filter_link(inlink);
++    AVFilterContext   *avctx = inlink->dst;
++    DeintOpenCLContext  *ctx = avctx->priv;
++    OpenCLFilterContext *ocf = &ctx->ocf;
++    AVHWFramesContext *input_frames;
++
++    if (!l->hw_frames_ctx) {
++        av_log(avctx, AV_LOG_ERROR, "OpenCL filtering requires a "
++               "hardware frames context on the input.\n");
++        return AVERROR(EINVAL);
++    }
++
++    // Extract the device and default output format from the first input.
++    if (avctx->inputs[0] != inlink)
++        return 0;
++
++    input_frames = (AVHWFramesContext*)l->hw_frames_ctx->data;
++    if (input_frames->format != AV_PIX_FMT_OPENCL)
++        return AVERROR(EINVAL);
++
++    av_buffer_unref(&ocf->device_ref);
++
++    ocf->device_ref = av_buffer_ref(input_frames->device_ref);
++    if (!ocf->device_ref)
++        return AVERROR(ENOMEM);
++
++    ocf->device = (AVHWDeviceContext*)ocf->device_ref->data;
++    ocf->hwctx  = ocf->device->hwctx;
++
++    // Default output parameters match input parameters.
++    if (ocf->output_format == AV_PIX_FMT_NONE)
++        ocf->output_format = input_frames->sw_format;
++    if (!ocf->output_width)
++        ocf->output_width  = inlink->w;
++    if (!ocf->output_height)
++        ocf->output_height = inlink->h;
++
++    return 0;
++}
++
++static int deint_opencl_config_output(AVFilterLink *outlink)
++{
++    AVFilterContext  *avctx = outlink->src;
++    AVFilterLink    *inlink = avctx->inputs[0];
++    FilterLink         *inl = ff_filter_link(inlink);
++    DeintOpenCLContext *ctx = avctx->priv;
++    YADIFContext *y = &ctx->yadif;
++    AVHWFramesContext *in_frames_ctx;
++    enum AVPixelFormat in_format;
++    const AVPixFmtDescriptor *in_desc;
++    int ret;
++
++    if (!inl->hw_frames_ctx)
++        return AVERROR(EINVAL);
++    in_frames_ctx = (AVHWFramesContext*)inl->hw_frames_ctx->data;
++    in_format     = in_frames_ctx->sw_format;
++    in_desc       = av_pix_fmt_desc_get(in_format);
++    ctx->ocf.output_format = in_format;
++    ctx->ocf.output_width  = inlink->w;
++    ctx->ocf.output_height = inlink->h;
++
++    ret = ff_opencl_filter_config_output2(outlink, &ctx->ocf);
++    if (ret < 0)
++        return ret;
++
++    y->csp = in_desc;
++    y->filter = deint_opencl_filter;
++
++    ret = ff_yadif_config_output_common(outlink);
++    if (ret < 0)
++        return ret;
++
++    return 0;
++}
++
++static int deint_opencl_init(AVFilterContext *avctx)
++{
++    DeintOpenCLContext *ctx = avctx->priv;
++    OpenCLFilterContext *ocf = &ctx->ocf;
++
++    ocf->output_format = AV_PIX_FMT_NONE;
++
++    return 0;
++}
++
++static av_cold void deint_opencl_uninit(AVFilterContext *avctx)
++{
++    DeintOpenCLContext *ctx = avctx->priv;
++    OpenCLFilterContext *ocf = &ctx->ocf;
++    cl_int cle;
++
++    ff_yadif_uninit(avctx);
++
++    if (ctx->kernel) {
++        cle = clReleaseKernel(ctx->kernel);
++        if (cle != CL_SUCCESS)
++            av_log(avctx, AV_LOG_ERROR, "Failed to release "
++                   "kernel: %d.\n", cle);
++    }
++
++    if (ctx->command_queue) {
++        cle = clReleaseCommandQueue(ctx->command_queue);
++        if (cle != CL_SUCCESS)
++            av_log(avctx, AV_LOG_ERROR, "Failed to release "
++                   "command queue: %d.\n", cle);
++    }
++
++    ff_opencl_filter_uninit2(avctx, ocf);
++}
++
++#define OFFSET(x) offsetof(YADIFContext, x)
++#define FLAGS (AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_FILTERING_PARAM)
++#define CONST(name, help, val, unit) { name, help, 0, AV_OPT_TYPE_CONST, { .i64 = val }, INT_MIN, INT_MAX, FLAGS, unit }
++
++static const AVOption yadif_opencl_options[] = {
++    { "mode",   "specify the interlacing mode", OFFSET(mode), AV_OPT_TYPE_INT, { .i64 = YADIF_MODE_SEND_FRAME }, 0, 3, FLAGS, .unit = "mode" },
++    CONST("send_frame",           "send one frame for each frame",                                     YADIF_MODE_SEND_FRAME,           .unit = "mode"),
++    CONST("send_field",           "send one frame for each field",                                     YADIF_MODE_SEND_FIELD,           .unit = "mode"),
++    CONST("send_frame_nospatial", "send one frame for each frame, but skip spatial interlacing check", YADIF_MODE_SEND_FRAME_NOSPATIAL, .unit = "mode"),
++    CONST("send_field_nospatial", "send one frame for each field, but skip spatial interlacing check", YADIF_MODE_SEND_FIELD_NOSPATIAL, .unit = "mode"),
++
++    { "parity", "specify the assumed picture field parity", OFFSET(parity), AV_OPT_TYPE_INT, { .i64 = YADIF_PARITY_AUTO }, -1, 1, FLAGS, .unit = "parity" },
++    CONST("tff",  "assume top field first",    YADIF_PARITY_TFF,  .unit = "parity"),
++    CONST("bff",  "assume bottom field first", YADIF_PARITY_BFF,  .unit = "parity"),
++    CONST("auto", "auto detect parity",        YADIF_PARITY_AUTO, .unit = "parity"),
++
++    { "deint", "specify which frames to deinterlace", OFFSET(deint), AV_OPT_TYPE_INT, { .i64 = YADIF_DEINT_ALL }, 0, 1, FLAGS, .unit = "deint" },
++    CONST("all",        "deinterlace all frames",                       YADIF_DEINT_ALL,        .unit = "deint"),
++    CONST("interlaced", "only deinterlace frames marked as interlaced", YADIF_DEINT_INTERLACED, .unit = "deint"),
++
++    { NULL }
++};
++
++AVFILTER_DEFINE_CLASS(yadif_opencl);
++
++static const AVFilterPad deint_opencl_inputs[] = {
++    {
++        .name             = "default",
++        .type             = AVMEDIA_TYPE_VIDEO,
++        .filter_frame     = ff_yadif_filter_frame,
++        .config_props     = &deint_opencl_config_input,
++    },
++};
++
++static const AVFilterPad deint_opencl_outputs[] = {
++    {
++        .name         = "default",
++        .type         = AVMEDIA_TYPE_VIDEO,
++        .request_frame = ff_yadif_request_frame,
++        .config_props = &deint_opencl_config_output,
++    },
++};
++
++const AVFilter ff_vf_yadif_opencl = {
++    .name           = "yadif_opencl",
++    .description    = NULL_IF_CONFIG_SMALL("Deinterlace (YADIF) the video through OpenCL."),
++    .priv_size      = sizeof(DeintOpenCLContext),
++    .priv_class     = &yadif_opencl_class,
++    .init           = &deint_opencl_init,
++    .uninit         = &deint_opencl_uninit,
++    FILTER_INPUTS(deint_opencl_inputs),
++    FILTER_OUTPUTS(deint_opencl_outputs),
++    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_OPENCL),
++    .flags          = AVFILTER_FLAG_HWDEVICE |
++                      AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
++    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
++};

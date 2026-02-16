@@ -34,7 +34,7 @@ CONFIGURE_ARGS += --with-build-python=$(PYTHON_NATIVE)
 CONFIGURE_ARGS += --with-readline=readline
 CONFIGURE_ARGS += --disable-test-modules
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)

@@ -47,7 +47,7 @@ PLIST_TRANSFORM = sed -e '/bin:bin/d'
 endif
 
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifneq ($(ARCH),)
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 HTTP3_SUPPORTED = 0

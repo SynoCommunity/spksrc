@@ -17,7 +17,7 @@ INSTALL_TARGET = jackett_install
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = AMDx64 ARM32 ARM64
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 PKG_DIST_ARCH = AMDx64
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = ARM32

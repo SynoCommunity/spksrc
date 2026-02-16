@@ -1,0 +1,27 @@
+[{
+  "step_title": "Music folder access",
+  "items": [
+    {
+      "type": "textfield",
+      "desc": "Shared folder containing your music library. This should match the music folder configured in MPD. The share must exist before installation.",
+      "subitems": [{
+        "key": "wizard_music_folder",
+        "desc": "Music folder",
+        "defaultValue": "music",
+        "validator": {
+          "allowBlank": false,
+          "regex": {
+            "expr": "/^[^<>: */\"\\\\]+$/",
+            "errorText": "Subdirectories are not supported."
+          }
+        }
+      }]
+    },
+    {
+      "desc": ""
+    },
+    {
+      "desc": "myMPD runs as internal service user <b>'sc-mympd'</b>. Read access to the music folder is required for cover art, lyrics, and other metadata features.<br><br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+    }
+  ]
+}]

@@ -19,18 +19,19 @@ endif
 # then default to legacy build needing to rebuild the
 # entire python binaries+libraries as build dependency.
 
-ifeq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
-# Needed to find the spk/python3*/crossenv/requirement-*.txt files
-export PYTHON_PACKAGE_DIR
-
-BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
-
-else
-# Export variables so to be usable in crossenv and cross/*
+# Always export these variables - they use deferred expansion so
+# they will resolve correctly at recipe execution time even when
+# PYTHON_PACKAGE is set conditionally after include.
 export PYTHON_PACKAGE
 export PYTHON_PACKAGE_DIR
 export PYTHON_PACKAGE_WORK_DIR
 export SPK_NAME
+
+ifeq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+
+BUILD_DEPENDS += cross/$(PYTHON_PACKAGE)
+
+else
 
 # Set Python installtion prefix directory variables
 ifeq ($(strip $(PYTHON_STAGING_INSTALL_PREFIX)),)

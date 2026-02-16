@@ -1,6 +1,6 @@
 SPK_NAME = mantisbt
-SPK_VERS = 2.27.3
-SPK_REV = 10
+SPK_VERS = 2.28.0
+SPK_REV = 11
 SPK_ICON = src/mantisbt.png
 
 DEPENDS  = cross/mantisbt
@@ -16,7 +16,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Mantis is an easily deployable, web based bugtracker to aid product bug tracking. It requires PHP, MySQL and a web server. It is simpler than Bugzilla and easily editable.
 DESCRIPTION_FRE = Mantis est un bugtracker web aisément déployable pour faciliter le suivi des bogues. Il nécessite PHP, MySQL et un serveur web. Il est plus simple d\'accès que Bugzilla et facilement modifiable.
 DISPLAY_NAME = MantisBT
-CHANGELOG = "1. Update to v2.27.3.<br/>2. Adjust PHP dependency per DSM version."
+CHANGELOG = "1. Update to v2.28.0.<br/>2. Update PHP dependency to 8.4 for DSM >= 7.2."
 
 HOMEPAGE   = https://www.mantisbt.org
 LICENSE    = GPL
@@ -40,8 +40,9 @@ SPK_DEPENDS = "WebStation:PHP7.4:MariaDB10:Apache2.4"
 CONF_DIR = src/conf_6/
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
-# Use PHP 8.2 on DSM 7.2+ (PHP 8.0 not supported)
-SPK_DEPENDS = "WebStation:PHP8.2:MariaDB10:Apache2.4"
+# Use PHP 8.4 on DSM 7.2+
+SPK_DEPENDS = "WebStation:PHP8.4:MariaDB10:Apache2.4"
+TC_OS_MIN_VER = 7.2-60096
 CONF_DIR = src/conf_72/
 else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 # Use PHP 8.0 on DSM 7.0/7.1

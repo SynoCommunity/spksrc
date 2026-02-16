@@ -15,7 +15,7 @@ HOMEPAGE = http://site.icu-project.org/home
 COMMENT  = International Components for Unicode.
 LICENSE  = https://www.unicode.org/copyright.html#License
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Compiler too old, stdc++11 is required.
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)

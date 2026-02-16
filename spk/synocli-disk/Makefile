@@ -22,7 +22,7 @@ DISPLAY_NAME = SynoCli Disk Tools
 OPTIONAL_DESC =
 SPK_COMMANDS =
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # Tools built with go are not supported on PPC archs

@@ -8,6 +8,31 @@ include ../../mk/spksrc.python-requirement.mk
 ##### rust specific configurations
 include ../../mk/spksrc.cross-rust-env.mk
 
+# fallback by default to native/python*
+PIP ?= pip
+
+# System default pip outside from build environment
+PIP_SYSTEM = $(shell which pip)
+
+# System default pip outside from build environment
+PIP_NATIVE = $(WORK_DIR)/../../../native/$(or $(PYTHON_PACKAGE),$(SPK_NAME))/work-native/install/usr/local/bin/pip
+
+# Why ask for the same thing twice? Always cache downloads
+PIP_CACHE_OPT ?= --find-links $(PIP_DISTRIB_DIR) --cache-dir $(PIP_CACHE_DIR)
+PIP_BASIC_OPT ?= --no-color --disable-pip-version-check
+PIP_WHEEL_ARGS = wheel $(PIP_BASIC_OPT) --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
+
+# Adding --no-index only for crossenv
+# to force using localy downloaded version
+PIP_WHEEL_ARGS_CROSSENV = $(PIP_WHEEL_ARGS) --no-index
+
+# BROKEN: https://github.com/pypa/pip/issues/1884
+# Current implementation is a work-around for the
+# lack of proper source download support from pip
+PIP_DOWNLOAD_ARGS = download --no-index --find-links $(PIP_DISTRIB_DIR) --disable-pip-version-check --no-binary :all: --no-deps --dest $(PIP_DISTRIB_DIR) --no-build-isolation --exists-action w
+
+###
+
 # set PYTHON_*_PREFIX if unset
 ifeq ($(strip $(PYTHON_STAGING_INSTALL_PREFIX)),)
 PYTHON_STAGING_INSTALL_PREFIX = $(STAGING_INSTALL_PREFIX)

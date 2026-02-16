@@ -23,7 +23,7 @@ CONFIGURE_ARGS += -Dvmwgfx=disabled
 # - freedreno 	(all ARM CPU)
 # - intel	(all intel CPU)
 # - radeon	(all 64bit intel CPU)
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 PLIST_TRANSFORM = grep -v -e libdrm_intel -e libdrm_amdgpu -e libdrm_radeon -e libdrm_etnaviv -e libdrm_freedreno
 endif

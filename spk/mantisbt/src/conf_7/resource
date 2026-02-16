@@ -48,6 +48,7 @@
                         "gd",
                         "ldap",
                         "mysqli",
+                        "openssl",
                         "pdo_mysql",
                         "soap",
                         "zlib"

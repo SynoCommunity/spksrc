@@ -1,0 +1,236 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -2533,6 +2533,7 @@ HAVE_LIST="
+     xmllint
+     zlib_gzip
+     openvino2
++    libvpl_legacy_mfxinit
+ "
+ 
+ # options emitted with CONFIG_ prefix but not available on the command line
+@@ -6989,6 +6990,9 @@ elif enabled libvpl; then
+             die "ERROR: libvpl >= 2.6 not found"
+     add_cflags -DMFX_DEPRECATED_OFF
+     check_type "vpl/mfxdefs.h vpl/mfxvideo.h" "struct mfxConfigInterface"
++# Ancient Intel driver on Windows still require the legacy init functions.
++# No compiler option is changed if the test fails, just needs to add back the disabled libmfx.
++    { test_pkg_config libmfx "vpl >= 2.6" "mfxvideo.h mfxdispatcher.h" "MFXInit MFXInitEx" && enable libvpl_legacy_mfxinit; } || enable libmfx
+ fi
+ 
+ if enabled libmfx; then
+Index: FFmpeg/libavcodec/qsv.c
+===================================================================
+--- libavcodec/qsv.c
++++ libavcodec/qsv.c
+@@ -499,6 +499,17 @@ static int ff_qsv_set_display_handle(AVC
+ }
+ #endif //AVCODEC_QSV_LINUX_SESSION_HANDLE
+ 
++#if !QSV_ONEVPL || HAVE_LIBVPL_LEGACY_MFXINIT
++
++static int qsv_create_mfx_session_legacy(AVCodecContext *avctx,
++                                         mfxIMPL implementation,
++                                         mfxVersion *pver,
++                                         int gpu_copy,
++                                         mfxSession *psession,
++                                         void **ploader);
++
++#endif
++
+ #if QSV_ONEVPL
+ static int qsv_new_mfx_loader(AVCodecContext *avctx,
+                               mfxIMPL implementation,
+@@ -639,6 +650,16 @@ static int qsv_create_mfx_session(AVCode
+     return 0;
+ 
+ fail:
++#if HAVE_LIBVPL_LEGACY_MFXINIT
++    av_log(avctx, AV_LOG_VERBOSE, "Error creating a MFX session using oneVPL, "
++           "falling back to retry with the legacy Media SDK path\n");
++    if (!qsv_create_mfx_session_legacy(avctx, implementation, pver, gpu_copy, psession, ploader)) {
++        if (!*ploader)
++            *ploader = loader;
++        return 0;
++    }
++#endif
++
+     if (!*ploader && loader)
+         MFXUnload(loader);
+ 
+@@ -654,6 +675,20 @@ static int qsv_create_mfx_session(AVCode
+                                   mfxSession *psession,
+                                   void **ploader)
+ {
++    return qsv_create_mfx_session_legacy(avctx, implementation, pver, gpu_copy, psession, ploader);
++}
++
++#endif
++
++#if !QSV_ONEVPL || HAVE_LIBVPL_LEGACY_MFXINIT
++
++static int qsv_create_mfx_session_legacy(AVCodecContext *avctx,
++                                         mfxIMPL implementation,
++                                         mfxVersion *pver,
++                                         int gpu_copy,
++                                         mfxSession *psession,
++                                         void **ploader)
++{
+     mfxInitParam init_par = { MFX_IMPL_AUTO_ANY };
+     mfxSession session = NULL;
+     mfxStatus sts;
+Index: FFmpeg/libavcodec/qsvenc.c
+===================================================================
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -1192,7 +1192,7 @@ static int init_video_param(AVCodecConte
+ 
+ #if QSV_HAVE_EXT_AV1_PARAM
+     if (avctx->codec_id == AV_CODEC_ID_AV1) {
+-        if (QSV_RUNTIME_VERSION_ATLEAST(q->ver, 2, 5)) {
++        if (QSV_RUNTIME_VERSION_ATLEAST(q->ver, 1, 255)) { // (2, 5)
+             q->extav1tileparam.Header.BufferId = MFX_EXTBUFF_AV1_TILE_PARAM;
+             q->extav1tileparam.Header.BufferSz = sizeof(q->extav1tileparam);
+             q->extav1tileparam.NumTileColumns  = q->tile_cols;
+@@ -1416,7 +1416,7 @@ static int qsv_retrieve_enc_av1_params(A
+         (mfxExtBuffer*)&co3,
+     };
+ 
+-    if (!QSV_RUNTIME_VERSION_ATLEAST(q->ver, 2, 5)) {
++    if (!QSV_RUNTIME_VERSION_ATLEAST(q->ver, 1, 255)) { // (2, 5)
+         av_log(avctx, AV_LOG_ERROR,
+                "This version of runtime doesn't support AV1 encoding\n");
+         return AVERROR_UNKNOWN;
+Index: FFmpeg/libavfilter/qsvvpp.c
+===================================================================
+--- libavfilter/qsvvpp.c
++++ libavfilter/qsvvpp.c
+@@ -1065,6 +1065,16 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
+     return 0;
+ }
+ 
++#if !QSV_ONEVPL || HAVE_LIBVPL_LEGACY_MFXINIT
++
++static int qsvvpp_create_mfx_session_legacy(void *ctx,
++                                            void *loader,
++                                            mfxIMPL implementation,
++                                            mfxVersion *pver,
++                                            mfxSession *psession);
++
++#endif
++
+ #if QSV_ONEVPL
+ 
+ int ff_qsvvpp_create_mfx_session(void *ctx,
+@@ -1108,6 +1118,15 @@ int ff_qsvvpp_create_mfx_session(void *c
+         impl_idx++;
+     }
+ 
++#if HAVE_LIBVPL_LEGACY_MFXINIT
++    if (sts < 0) {
++        av_log(ctx, AV_LOG_VERBOSE, "Error creating a MFX session using oneVPL, "
++               "falling back to retry with the legacy Media SDK path\n");
++        if (!qsvvpp_create_mfx_session_legacy(ctx, loader, implementation, pver, psession))
++            return 0;
++    }
++#endif
++
+     if (sts < 0)
+         return ff_qsvvpp_print_error(ctx, sts,
+                                      "Error creating a MFX session");
+@@ -1125,6 +1144,19 @@ int ff_qsvvpp_create_mfx_session(void *c
+                                  mfxVersion *pver,
+                                  mfxSession *psession)
+ {
++    return qsvvpp_create_mfx_session_legacy(ctx, loader, implementation, pver, psession);
++}
++
++#endif
++
++#if !QSV_ONEVPL || HAVE_LIBVPL_LEGACY_MFXINIT
++
++static int qsvvpp_create_mfx_session_legacy(void *ctx,
++                                            void *loader,
++                                            mfxIMPL implementation,
++                                            mfxVersion *pver,
++                                            mfxSession *psession)
++{
+     mfxSession session = NULL;
+     mfxStatus sts;
+ 
+Index: FFmpeg/libavfilter/vf_vpp_qsv.c
+===================================================================
+--- libavfilter/vf_vpp_qsv.c
++++ libavfilter/vf_vpp_qsv.c
+@@ -426,7 +426,7 @@ static int vpp_set_frame_ext_params(AVFi
+     fp->num_ext_buf = 0;
+ 
+     if (!in || !out ||
+-        !QSV_RUNTIME_VERSION_ATLEAST(qsvvpp->ver, 2, 0))
++        !QSV_RUNTIME_VERSION_ATLEAST(qsvvpp->ver, 1, 255)) // (2, 0)
+         return 0;
+ 
+     memset(&invsi_conf, 0, sizeof(mfxExtVideoSignalInfo));
+Index: FFmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -827,6 +827,18 @@ static mfxStatus frame_get_hdl(mfxHDL pt
+     return MFX_ERR_NONE;
+ }
+ 
++#if !QSV_ONEVPL || HAVE_LIBVPL_LEGACY_MFXINIT
++
++static int qsv_create_mfx_session_legacy(void *ctx,
++                                         mfxHDL handle,
++                                         mfxHandleType handle_type,
++                                         mfxIMPL implementation,
++                                         mfxVersion *pver,
++                                         mfxSession *psession,
++                                         void **ploader);
++
++#endif
++
+ #if QSV_ONEVPL
+ 
+ static int qsv_d3d11_update_config(void *ctx, mfxHDL handle, mfxConfig cfg)
+@@ -1218,6 +1230,16 @@ static int qsv_create_mfx_session(void *
+     return 0;
+ 
+ fail:
++#if HAVE_LIBVPL_LEGACY_MFXINIT
++    av_log(ctx, AV_LOG_VERBOSE, "Error creating a MFX session using oneVPL, "
++           "falling back to retry with the legacy Media SDK path\n");
++    if (!qsv_create_mfx_session_legacy(ctx, handle, handle_type, implementation, pver, psession, ploader)) {
++        if (!*ploader)
++            *ploader = loader;
++        return 0;
++    }
++#endif
++
+     if (!*ploader && loader)
+         MFXUnload(loader);
+ 
+@@ -1234,6 +1256,21 @@ static int qsv_create_mfx_session(void *
+                                   mfxSession *psession,
+                                   void **ploader)
+ {
++    return qsv_create_mfx_session_legacy(ctx, handle, handle_type, implementation, pver, psession, ploader);
++}
++
++#endif
++
++#if !QSV_ONEVPL || HAVE_LIBVPL_LEGACY_MFXINIT
++
++static int qsv_create_mfx_session_legacy(void *ctx,
++                                         mfxHDL handle,
++                                         mfxHandleType handle_type,
++                                         mfxIMPL implementation,
++                                         mfxVersion *pver,
++                                         mfxSession *psession,
++                                         void **ploader)
++{
+     mfxVersion ver;
+     mfxStatus sts;
+     mfxSession session = NULL;

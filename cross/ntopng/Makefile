@@ -26,7 +26,7 @@ LICENSE  = GPLv3
 ADDITIONAL_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/include/mariadb
 ADDITIONAL_LDFLAGS  += -lmysqlclient
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 SYNOLOGY_OS = DSM
 ifeq ($(findstring $(ARCH),$(SRM_ARCHS)),$(ARCH))

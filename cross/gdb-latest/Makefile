@@ -15,7 +15,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # sim/ppc is broken
