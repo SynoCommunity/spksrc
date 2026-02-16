@@ -100,7 +100,7 @@ TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 define make_tc_var_rule
 $(WORK_DIR)/$(2):
 	@$(MSG) "Generating $(WORK_DIR)/$(2)"
-	@@mkdir -p $(WORK_DIR)
+	@mkdir -p $(WORK_DIR)
 	@$(MAKE) --no-print-directory \
 		-f Makefile \
 		TCVARS_SUBMAKE=1 \

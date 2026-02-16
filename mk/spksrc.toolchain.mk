@@ -4,8 +4,10 @@
 # This makefile provides the complete toolchain build logic for spksrc.
 # It is responsible for:
 #  - downloading and extracting the toolchain
+#  - verifying checksums
 #  - applying normalization and patches
-#  - installing other compiler components (rust)
+#  - installing additional compiler components (rust)
+#  - resolving toolchain dependencies
 #  - generating tc_vars* files used by cross-compilation environments
 #
 # The toolchain build is organized as a staged pipeline with overridable
@@ -44,8 +46,8 @@
 # Notes:
 #  - The toolchain target is idempotent: if the cookie exists, it is skipped.
 #  - Logging is centralized via LOG_WRAPPED and applied to the full build.
-#  - This makefile is intentionally agnostic of package builds; it only
-#    produces artifacts consumed later by cross-compilation stages.
+#  - This makefile orchestrates modular logic implemented under
+#    mk/spksrc.toolchain/.
 #
 ###############################################################################
 # Cross-compilation orchestration overview
@@ -86,6 +88,7 @@
 #  - cross-stage2 never builds the toolchain
 #  - toolchain and package builds are strictly separated
 ###############################################################################
+
 # Variables
 URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
 NAME                       = $(TC_NAME)
@@ -120,7 +123,8 @@ include ../../mk/spksrc.common-rules.mk
 
 #####
 
-# Mark toolchain instasllation as completed using status cookie
+# Mark toolchain installation as completed using status cookie
+COOKIE_PREFIX = toolchain-
 TOOLCHAIN_COOKIE = $(TC_WORK_DIR)/.$(COOKIE_PREFIX)toolchain_done
 
 TC = syno$(TC_ARCH_SUFFIX)
