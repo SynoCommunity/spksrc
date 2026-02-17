@@ -20,9 +20,16 @@ TK_DIST_SITE_URL = \
     https://$(TK_WWW)/$(call toolkit-download-url,$(TK_WWW)))
 endif
 
-# TK_DIST_SITE_PATH is defined in toolkit specific Makefile
 ifeq ($(strip $(TK_DIST_SITE)),)
-TK_DIST_SITE = $(TK_DIST_SITE_URL)/$(TK_DIST_SITE_PATH)
+TK_DIST_SITE = $(TK_DIST_SITE_URL)/$(or $(TK_DIST_VERS),$(TK_VERS))/$(or $(TK_DIST),$(TK_ARCH))
+endif
+
+ifeq ($(strip $(TK_DIST_PREFIX)),)
+TK_DIST_PREFIX = ds.
+endif
+
+ifeq ($(strip $(TK_DIST_SUFFIX)),)
+TK_DIST_SUFFIX = .dev
 endif
 
 ifeq ($(strip $(TK_EXT)),)
@@ -30,11 +37,11 @@ TK_EXT = txz
 endif
 
 ifeq ($(strip $(TK_DIST)),)
-TK_DIST = ds.$(TK_ARCH)-$(or $(TK_VERS_URL),$(TK_VERS)).dev
+TK_DIST = $(TK_ARCH)
 endif
 
 ifeq ($(strip $(TK_DIST_NAME)),)
-TK_DIST_NAME = $(TK_DIST).$(TK_EXT)
+TK_DIST_NAME = $(TK_DIST_PREFIX)$(TK_DIST)-$(or $(TK_DIST_VERS),$(TK_VERS))$(TK_DIST_SUFFIX).$(TK_EXT)
 endif
 
 ####
@@ -58,4 +65,4 @@ toolkit-download-url = \
     $(if $(filter $(1):%,$(u)),\
       $(patsubst $(1):%,%,$(u)))))
 
-TK_URL_MAP = global.synologydownload.com:download/ToolChain/toolkit/$(or $(TK_VERS_URL),$(TK_VERS))/$(TK_ARCH)
+TK_URL_MAP = global.synologydownload.com:download/ToolChain/toolkit

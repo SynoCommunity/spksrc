@@ -1,6 +1,6 @@
 TK_ARCH = evansport
 TK_VERS = 6.2.4
-TK_VERS_URL = 6.2
+TK_DIST_VERS = 6.2
 
 TK_TARGET = i686-pc-linux-gnu
 TK_SYSROOT = $(TK_TARGET)/sys-root
