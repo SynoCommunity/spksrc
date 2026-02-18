@@ -6,8 +6,8 @@
 
 general =
 {
-  name = "%H"; // Hostname with first letter capitalised
-  output_backend = "alsa"; // Options: "alsa", "dummy", "pipe"
+  @@SERVER_NAME@@
+  output_backend = "@@OUTPUT_BACKEND@@"; // Options: "alsa", "dummy", "pipe"
   port = 8303; // SynoCommunity assigned port (default 5000 conflicts with DSM)
   udp_port_base = 8304;
   udp_port_range = 10;
@@ -24,8 +24,8 @@ diagnostics =
 // Check /proc/asound/cards to list available devices
 alsa =
 {
-  output_device = "default"; // Change to "hw:0" or "hw:1" based on card number
-  // mixer_control_name = "PCM"; // Uncomment and set if volume control needed
+  output_device = "@@OUTPUT_DEVICE@@"; // Change to "hw:0" or "hw:1" based on card number
+  @@MIXER_CONTROL@@
 };
 
 // To test without a sound card:

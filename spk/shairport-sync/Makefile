@@ -5,10 +5,17 @@ SPK_ICON = src/shairport-sync.png
 
 DEPENDS = cross/shairport-sync
 
+# Require AudioStation for USB audio driver support on DSM 6
+SPK_DEPENDS = "AudioStation"
+
+# DSM 6 only - DSM 7 does not allow packages to run as root
+# which is required for ALSA device access
+REQUIRED_MAX_DSM = 6.999
+
 MAINTAINER = SynoCommunity
 DESCRIPTION = AirPlay audio player. Stream audio wirelessly from Apple devices to your Synology NAS. Requires USB soundcard or speakers connected to your NAS.
 DISPLAY_NAME = Shairport Sync
-CHANGELOG = "1. Update to v4.3.7 with metadata support. <br/>2. Modernize for DSM 7."
+CHANGELOG = "1. Update to v4.3.7 with metadata support.<br/>2. DSM 6 only - requires AudioStation for USB audio drivers."
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
 LICENSE = GPL
@@ -16,6 +23,7 @@ LICENSE = GPL
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
+CONF_DIR = src/conf
 
 FWPORTS = src/shairport-sync.sc
 WIZARDS_DIR = src/wizard
@@ -27,6 +35,6 @@ include ../../mk/spksrc.spk.mk
 .PHONY: shairport_extra_install
 shairport_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/share/alsa
-	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa/alsa.conf
-	install -m 644 src/shairport-sync.conf $(STAGING_DIR)/var/shairport-sync.conf
+	install -m 755 -d $(STAGING_DIR)/share
+	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa.conf
+	install -m 644 src/shairport-sync.conf.template $(STAGING_DIR)/share/shairport-sync.conf.template
