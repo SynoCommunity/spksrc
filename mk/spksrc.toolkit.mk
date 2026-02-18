@@ -53,7 +53,7 @@
 # Variables
 URLS                       = $(TK_DIST_SITE)/$(TK_DIST_NAME)
 NAME                       = $(TK_NAME)
-COOKIE_PREFIX              = 
+COOKIE_PREFIX              = toolkit-
 ifneq ($(strip $(TK_DIST_FILE)),)
 LOCAL_FILE                 = $(TK_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
@@ -85,7 +85,6 @@ include ../../mk/spksrc.common-rules.mk
 #####
 
 # Mark toolkit installation as completed using status cookie
-COOKIE_PREFIX = toolkit-
 TOOLKIT_COOKIE = $(TK_WORK_DIR)/.$(COOKIE_PREFIX)toolkit_done
 
 TK = syno$(TK_ARCH_SUFFIX)

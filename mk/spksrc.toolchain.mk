@@ -92,7 +92,7 @@
 # Variables
 URLS                       = $(TC_DIST_SITE)/$(TC_DIST_NAME)
 NAME                       = $(TC_NAME)
-COOKIE_PREFIX              = 
+COOKIE_PREFIX              = toolchain-
 ifneq ($(strip $(TC_DIST_FILE)),)
 LOCAL_FILE                 = $(TC_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
@@ -124,7 +124,6 @@ include ../../mk/spksrc.common-rules.mk
 #####
 
 # Mark toolchain installation as completed using status cookie
-COOKIE_PREFIX = toolchain-
 TOOLCHAIN_COOKIE = $(TC_WORK_DIR)/.$(COOKIE_PREFIX)toolchain_done
 
 TC = syno$(TC_ARCH_SUFFIX)
