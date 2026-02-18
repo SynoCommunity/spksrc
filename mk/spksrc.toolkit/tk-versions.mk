@@ -20,4 +20,4 @@ TK_VERSION_MAP = \
     7.0:41890:DSM:global.synologydownload.com \
     7.1:42661:DSM:global.synologydownload.com \
     7.2:72806:DSM:global.synologydownload.com \
-    7.3:72806:DSM:global.synologydownload.com
+    7.3:86009:DSM:global.synologydownload.com
