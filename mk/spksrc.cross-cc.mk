@@ -27,6 +27,9 @@
 #   TC               : Toolchain identifier (syno-<arch>-<tcversion>)
 #   TC_WORK_DIR      : Toolchain working directory
 #   TCVARS_DONE      : Cookie indicating tc_vars generation completed
+#   TK               : Toolkit identifier (syno-<arch>-<tcversion>)
+#   TK_WORK_DIR      : Toolkit working directory
+#   TKVARS_DONE      : Cookie indicating tk_vars generation completed
 #
 # Notes:
 #   - This file is the canonical entry point for cross builds.
@@ -42,7 +45,8 @@
 # │                          cross-stage1                                │
 # │  (toolchain bootstrap & environment materialization)                 │
 # │                                                                      │
-# │   make -C toolchain/<TC> toolchain                                   │
+# │   make -C toolchain/<TC> toolchain  (MANDATORY)                      │
+# │   make -C toolchain/<TC> toolkit    (OPTIONAL)                       │
 # └──────────────────────────────────────────────────────────────────────┘
 #                                  │
 #                                  │ (cookie exists)
@@ -55,16 +59,18 @@
 # │        │                                                             │
 # │        ├─ loads tc_vars.mk (always)                                  │
 # │        ├─ loads tc_vars.<env>.mk based on DEFAULT_ENV                │
-# │        └─ exports TC_ENV into ENV                                    │
+# │        ├─ exports TC_ENV into ENV                                    │
+# │        │                                                             │
+# │        └─ loads tk_vars.mk (optional)                                │
 # │                                                                      │
 # │   Standard spksrc pipeline:                                          │
 # │     depend → configure → compile → install → plist                   │
 # └──────────────────────────────────────────────────────────────────────┘
 #
 # Notes:
-#  - cross-stage1 is idempotent (guarded by .tcvars_done)
-#  - cross-stage2 never builds the toolchain
-#  - toolchain and package builds are strictly separated
+#  - cross-stage1 is idempotent (guarded by .tcvars_done and .tkvars_done)
+#  - cross-stage2 never builds the toolchain nor toolkit
+#  - toolchain and toolkit package builds are strictly separated
 ###############################################################################
 
 
@@ -84,6 +90,9 @@ ifneq ($(ARCH),)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 ifneq ($(ARCH),noarch)
 TC = syno$(ARCH_SUFFIX)
+ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
+TK = $(TC)
+endif
 endif
 endif
 
@@ -131,14 +140,15 @@ include ../../mk/spksrc.plist.mk
 #####
 
 # -----------------------------------------------------------------------------
-# Stage1: Toolchain bootstrap
-#  - First call builds the toolchain (download / extract / patch / build)
-#  - Second call generates tc_vars* files in the package WORK_DIR
+# Stage1: Toolchain (MANDATORY) + Toolkit (OPTIONAL) bootstrap
+#  - First call builds the toolchain / toolkit (download / extract / patch / build)
+#  - Second call generates tc_vars* and tk_vars.mk files in the package WORK_DIR
 # -----------------------------------------------------------------------------
 TCVARS_DONE := $(WORK_DIR)/.tcvars_done
+TKVARS_DONE := $(WORK_DIR)/.tkvars_done
 
 .PHONY: cross-stage1
-cross-stage1: $(TCVARS_DONE)
+cross-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
 
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
@@ -146,6 +156,15 @@ $(TCVARS_DONE):
 	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
 $(TCVARS_DONE): ;
+endif
+
+# $(TK) is only being set if REQUIRE_TOOLKIT=1
+ifneq ($(strip $(TK)),)
+$(TKVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) toolkit
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) tkvars
+else
+$(TKVARS_DONE): ;
 endif
 
 # -----------------------------------------------------------------------------

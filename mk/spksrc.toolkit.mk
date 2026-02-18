@@ -176,9 +176,7 @@ $(TOOLKIT_COOKIE): $(POST_TOOLKIT_TARGET)
 	@touch -f $@
 
 else
-#toolkit: ;
-toolkit:
-	@$(MSG) cookie: $(wildcard $(TOOLKIT_COOKIE))
+toolkit: ;
 endif
 
 ### For make digests
