@@ -50,6 +50,9 @@ SPK_NAME_ARCH = $(ARCH)
 endif
 SPK_TCVERS = $(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
+ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
+TK = $(TC)
+endif
 endif
 endif
 
@@ -498,12 +501,13 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons s
 package: $(SPK_FILE_NAME)
 
 # -----------------------------------------------------------------------------
-# Stage1: Toolchain bootstrap
+# Stage1: Toolchain (MANDATORY) + Toolkit (OPTIONAL) bootstrap
 # -----------------------------------------------------------------------------
 TCVARS_DONE := $(WORK_DIR)/.tcvars_done
+TKVARS_DONE := $(WORK_DIR)/.tkvars_done
 
 .PHONY: spk-stage1
-spk-stage1: $(TCVARS_DONE)
+spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
 
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
@@ -511,6 +515,15 @@ $(TCVARS_DONE):
 	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
 $(TCVARS_DONE): ;
+endif
+
+# $(TK) is only being set if REQUIRE_TOOLKIT=1
+ifneq ($(strip $(TK)),)
+$(TKVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) toolkit
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) tkvars
+else
+$(TKVARS_DONE): ;
 endif
 
 # -----------------------------------------------------------------------------
