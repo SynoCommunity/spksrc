@@ -1,5 +1,5 @@
 // Shairport Sync configuration for Synology NAS
-// Classic AirPlay mode (AirPlay 1)
+// AirPlay 2 enabled with NQPTP timing daemon
 //
 // For full configuration options see:
 // https://github.com/mikebrady/shairport-sync/blob/master/scripts/shairport-sync.conf
