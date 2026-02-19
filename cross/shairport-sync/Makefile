@@ -15,6 +15,8 @@ DEPENDS  = cross/alsa-lib cross/libconfig cross/libdaemon cross/openssl3 cross/p
 SHAIRPORT_AIRPLAY2 ?= 1
 ifeq ($(SHAIRPORT_AIRPLAY2),1)
 BUILD_DEPENDS = native/xxd
+XXD_PATH = $(abspath $(PWD)/../../native/xxd/work-native/install/usr/local/bin)
+ENV += PATH=$(XXD_PATH):$$PATH
 DEPENDS += cross/nqptp
 DEPENDS += cross/libplist
 DEPENDS += cross/libsodium
