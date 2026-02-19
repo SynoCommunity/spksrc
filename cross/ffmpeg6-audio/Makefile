@@ -67,10 +67,13 @@ include ../../mk/spksrc.common.mk
 # Minimal dependencies - no video-related packages
 DEPENDS = cross/zlib
 
-# Disable assembly for all architectures to avoid nasm dependency.
+# Disable assembly for most architectures to avoid nasm dependency.
 # This is acceptable for an audio-only build where performance impact is minimal.
-# ARMv8 could use native ASM but we disable it for simplicity.
+# However, ARMv8 MUST have ASM/NEON enabled otherwise FFmpeg's init code
+# references undefined NEON symbols (FFmpeg assumes NEON is always available on ARMv8).
+ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-asm
+endif
 
 # Architecture-specific settings
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
@@ -79,6 +82,8 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm64
+# Enable NEON on ARMv8 - required to compile the assembly that the init code references
+CONFIGURE_ARGS += --enable-neon --enable-thumb
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
