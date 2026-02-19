@@ -14,6 +14,7 @@ DEPENDS  = cross/alsa-lib cross/libconfig cross/libdaemon cross/openssl3 cross/p
 # AirPlay 2 requires avahi (provided by cross/avahi-headers which compiles against DSM system avahi)
 SHAIRPORT_AIRPLAY2 ?= 1
 ifeq ($(SHAIRPORT_AIRPLAY2),1)
+BUILD_DEPENDS = native/xxd
 DEPENDS += cross/nqptp
 DEPENDS += cross/libplist
 DEPENDS += cross/libsodium
