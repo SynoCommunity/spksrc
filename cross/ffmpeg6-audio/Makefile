@@ -67,22 +67,26 @@ include ../../mk/spksrc.common.mk
 # Minimal dependencies - no video-related packages
 DEPENDS = cross/zlib
 
+# Disable assembly for all architectures to avoid nasm dependency.
+# This is acceptable for an audio-only build where performance impact is minimal.
+# ARMv8 could use native ASM but we disable it for simplicity.
+CONFIGURE_ARGS += --disable-asm
+
 # Architecture-specific settings
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --disable-asm
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb
+CONFIGURE_ARGS += --arch=arm64
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te
+CONFIGURE_ARGS += --arch=arm
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --disable-neon --disable-asm
+CONFIGURE_ARGS += --arch=arm
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
