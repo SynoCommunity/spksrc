@@ -1,0 +1,19 @@
+[
+  {
+    "step_title": "Zabbix Agent Update",
+    "items": [
+      {
+        "desc": "The Zabbix Agent configuration (Server, ServerActive, Hostname) can be modified by editing the configuration file directly."
+      },
+      {
+        "desc": "Configuration file location: <code>/var/packages/zabbix-agent/var/zabbix_agentd.conf</code>"
+      },
+      {
+        "desc": "After modifying the configuration, restart the package to apply changes."
+      },
+      {
+        "desc": "For more information, refer to the <a target=\"_blank\" href=\"https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd\">Zabbix Agent documentation</a>."
+      }
+    ]
+  }
+]
