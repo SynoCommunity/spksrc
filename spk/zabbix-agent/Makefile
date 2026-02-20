@@ -22,6 +22,7 @@ WIZARDS_DIR = src/wizard/
 # agent does not have an UI
 NO_SERVICE_SHORTCUT = yes
 SERVICE_PORT = 10050
+SERVICE_PORT_TITLE = Zabbix Agent
 
 POST_STRIP_TARGET = zabbix-agent_extra_install
 
