@@ -30,7 +30,9 @@ ADMIN_URL = /
 WIZARDS_DIR = src/wizard/
 CONF_DIR = src/conf
 
-OS_MIN_VER = 7.0-40000
+REQUIRED_MIN_DSM = 7.2
+UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = uptime_kuma_extra_install
 

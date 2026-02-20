@@ -14,8 +14,8 @@ LICENSE  = MIT
 
 INSTALL_TARGET = uptime_kuma_install
 
-# Build environment — use native Node.js from spksrc
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(PATH)
+# Build environment - use native Node.js from spksrc
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
 
 # Uptime Kuma pre-built frontend dist URL
 DIST_URL = https://github.com/louislam/uptime-kuma/releases/download/$(PKG_VERS)/dist.tar.gz
@@ -25,12 +25,9 @@ include ../../mk/spksrc.install-resources.mk
 .PHONY: uptime_kuma_install
 uptime_kuma_install:
 	@$(MSG) "Installing production dependencies for Uptime Kuma"
-	cd $(WORK_DIR)/$(PKG_DIR) && \
-		env HOME=$(WORK_DIR) \
-		npm ci --omit dev --no-audit --no-fund
+	$(RUN) npm ci --omit dev --no-audit --no-fund
 	@$(MSG) "Downloading pre-built frontend dist"
-	cd $(WORK_DIR)/$(PKG_DIR) && \
-		curl -sL "$(DIST_URL)" | tar xzf -
+	$(RUN) curl -sL "$(DIST_URL)" | tar xzf -
 	@$(MSG) "Installing Uptime Kuma to staging directory"
 	@install -d $(STAGING_INSTALL_PREFIX)/share/uptime-kuma
 	@# Install server files
