@@ -5,16 +5,25 @@ SPK_ICON = src/uptime-kuma.png
 
 DEPENDS = cross/uptime-kuma
 BUILD_DEPENDS = native/nodejs_22
+
+REQUIRED_MIN_DSM = 7.2
+UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+
 SPK_DEPENDS = "Node.js_v22"
 
 MAINTAINER = efren-builder
 MAINTAINER_URL = https://efren.me
 
 DISPLAY_NAME = Uptime Kuma
-DESCRIPTION = A self-hosted monitoring tool. Monitor HTTP\(s\), TCP, Ping, DNS, Docker containers, game servers, and more with 87+ notification providers.
+DESCRIPTION  = A self-hosted monitoring tool. Monitor HTTP\(s\), TCP, Ping, DNS, Docker containers, game servers, and more with 87+ notification providers.
+DESCRIPTION_CHS = 自托管监控工具。监控 HTTP\(s\)、TCP、Ping、DNS、Docker 容器、游戏服务器等，支持 87+ 通知提供商。
+DESCRIPTION_FRE = Outil de surveillance auto-hébergé. Surveillez HTTP\(s\), TCP, Ping, DNS, conteneurs Docker, serveurs de jeux et plus avec 87+ fournisseurs de notifications.
+DESCRIPTION_GER = Selbst gehostetes Monitoring-Tool. Überwachen Sie HTTP\(s\), TCP, Ping, DNS, Docker-Container, Spieleserver und mehr mit 87+ Benachrichtigungsanbietern.
+DESCRIPTION_JPN = セルフホスト型監視ツール。HTTP\(s\)、TCP、Ping、DNS、Dockerコンテナ、ゲームサーバーなどを87以上の通知プロバイダーで監視。
+DESCRIPTION_SPN = Herramienta de monitoreo autoalojada. Monitoree HTTP\(s\), TCP, Ping, DNS, contenedores Docker, servidores de juegos y más con 87+ proveedores de notificaciones.
 HOMEPAGE = https://uptime.kuma.pet
 LICENSE = MIT
-CHANGELOG = "Initial package release. Uptime Kuma v2.1.0."
+CHANGELOG = "Initial package release."
 
 STARTABLE = yes
 SERVICE_USER = auto
@@ -28,18 +37,7 @@ ADMIN_PROTOCOL = http
 ADMIN_URL = /
 
 WIZARDS_DIR = src/wizard/
-CONF_DIR = src/conf
 
-REQUIRED_MIN_DSM = 7.2
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 USE_ALTERNATE_TMPDIR = 1
 
-POST_STRIP_TARGET = uptime_kuma_extra_install
-
 include ../../mk/spksrc.spk.mk
-
-.PHONY: uptime_kuma_extra_install
-uptime_kuma_extra_install:
-	@$(MSG) "Installing Uptime Kuma service configuration"
-	@install -d $(STAGING_DIR)/app
-	@install -m 644 src/app/uptime-kuma.sc $(STAGING_DIR)/app/uptime-kuma.sc
