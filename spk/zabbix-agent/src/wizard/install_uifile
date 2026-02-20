@@ -46,7 +46,7 @@
       },
       {
         "type": "textfield",
-        "desc": "<b>Option: Hostname</b><br/>List of comma delimited unique, case sensitive hostnames.<br/>Required for active checks and must match hostnames as configured on the server.<br/>Example: Zabbix server",
+        "desc": "<b>Option: Hostname</b><br/>List of comma delimited unique, case sensitive hostnames.<br/>Must match hostnames as configured on the server for active checks.<br/>If left blank, defaults to system hostname (via HostnameItem).<br/>Example: Zabbix server",
         "subitems": [
           {
             "key": "wizard_Hostname",
