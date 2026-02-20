@@ -1,5 +1,5 @@
 SPK_NAME = uptime-kuma
-SPK_VERS = 2.1.0
+SPK_VERS = 2.1.3
 SPK_REV = 1
 SPK_ICON = src/uptime-kuma.png
 
