@@ -1,5 +1,5 @@
 PKG_NAME = fish
-PKG_VERS = 4.0.2
+PKG_VERS = 4.5.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/fish-shell/fish-shell/releases/download/$(PKG_VERS)
@@ -28,8 +28,8 @@ ifeq ($(call version_lt, $(TC_GCC), 5),1)
 ADDITIONAL_CFLAGS += -std=c11
 endif
 
-# fish fails to build with gettext
-CMAKE_ARGS = -DWITH_GETTEXT=OFF
+# fish fails to build with message localization (gettext)
+CMAKE_ARGS = -DWITH_MESSAGE_LOCALIZATION=OFF
 
 # fish >= 4.0.0 requires rust
 # IMPORTANT:
