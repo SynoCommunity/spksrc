@@ -7,10 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# requirements: C++11 compiler (g++ 4.8 or later, or clang 3.3 or later)
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-# build with custom qoriq rust_target fails to build in spk folder (but not in cross/fish)
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+# fish 4.x requires Rust 2024 edition (1.85+); ARMv5 is capped at 1.77.2 in framework
+# PPC uses SPE ABI (powerpc-unknown-linux-gnuspe) which Rust doesn't support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 HOMEPAGE = https://fishshell.com
 COMMENT = fish is a smart and user-friendly command line shell for Linux, macOS, and the rest of the family.
@@ -20,13 +19,7 @@ POST_INSTALL_TARGET = fish_post_install
 
 ENV += FISH_BUILD_DOCS=0
 
-# for fish_test_helper.c
-ADDITIONAL_CFLAGS = -D_DEFAULT_SOURCE
-
 include ../../mk/spksrc.common.mk
-ifeq ($(call version_lt, $(TC_GCC), 5),1)
-ADDITIONAL_CFLAGS += -std=c11
-endif
 
 # fish fails to build with message localization (gettext)
 CMAKE_ARGS = -DWITH_MESSAGE_LOCALIZATION=OFF
@@ -51,9 +44,6 @@ endif
 ifeq ($(findstring $(ARCH), $(ARMv8_ARCHS)),$(ARCH))
 RUST_TARGET = aarch64-unknown-linux-gnu
 endif
-ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
-RUST_TARGET = powerpc-unknown-linux-gnuspe
-endif
 ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
 RUST_TARGET = x86_64-unknown-linux-gnu
 endif
@@ -72,8 +62,10 @@ CMAKE_ARGS += -DRust_CARGO_TARGET=$(RUST_TARGET)
 ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)gcc
 ENV += CXX_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)g++
 ENV += AR_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)ar
-# pcre2-sys requires C99 (for loop variable declarations)
-ENV += CFLAGS_$(shell echo $(RUST_TARGET) | tr - _)=-std=gnu99
+# pcre2-sys uses C99 features; older GCC (< 5.0) defaults to C89
+ENV += CFLAGS_$(shell echo $(RUST_TARGET) | tr - _)=-std=c99
+# Set cross-linker for Rust cargo builds
+ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr a-z- A-Z_)_LINKER=$(TC_PATH)$(TC_PREFIX)gcc
 
 include ../../mk/spksrc.cross-cmake.mk
 
