@@ -67,6 +67,12 @@ endif
 #   setting `Rust_CARGO_TARGET`.
 CMAKE_ARGS += -DRust_CARGO_TARGET=$(RUST_TARGET)
 
+# Export cross-compiler paths for cc-rs crate used by pcre2-sys
+# The cc-rs crate looks for CC_<target> (with underscores) to find the compiler
+ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)gcc
+ENV += CXX_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)g++
+ENV += AR_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)ar
+
 include ../../mk/spksrc.cross-cmake.mk
 
 .PHONY: fish_post_install
