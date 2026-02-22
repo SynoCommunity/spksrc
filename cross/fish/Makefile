@@ -72,6 +72,8 @@ CMAKE_ARGS += -DRust_CARGO_TARGET=$(RUST_TARGET)
 ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)gcc
 ENV += CXX_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)g++
 ENV += AR_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)ar
+# pcre2-sys requires C99 (for loop variable declarations)
+ENV += CFLAGS_$(shell echo $(RUST_TARGET) | tr - _)=-std=gnu99
 
 include ../../mk/spksrc.cross-cmake.mk
 
