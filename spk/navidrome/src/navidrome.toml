@@ -3,12 +3,21 @@
 # For security considerations see:
 # https://www.navidrome.org/docs/usage/security/
 #
+# Note: Since v0.58.0, Navidrome supports multiple music libraries.
+# Additional libraries can be configured through the web UI.
 
 # Folder where your music library is stored. Can be read-only
 MusicFolder = "@@wizard_music_folder@@"
 
 # Folder to store application data (DB, cache...)
-DataFolder= "/var/packages/navidrome/var"
+DataFolder = "/var/packages/navidrome/var"
+
+# Optional: Folder for cache files (transcoding, images). Defaults to DataFolder/cache
+# CacheFolder = ""
+
+# Database connection string. Default uses SQLite in DataFolder.
+# For PostgreSQL: "host=localhost port=5432 user=navidrome password=secret dbname=navidrome"
+# DbPath = ""
 
 # Configure periodic scans using "cron" syntax. To disable it altogether, set it to "0"
 # ScanSchedule = "@every 1m"
@@ -34,8 +43,8 @@ DataFolder= "/var/packages/navidrome/var"
 # Enable/disable .m3u playlist auto-import
 # AutoImportPlaylists = true
 
-# Where to search for and import playlists from. Can be a list of folders/globs (separated by : ). Paths are relative to MusicFolder
-# PlaylistsPath = ".:**/**" # (meaning MusicFolder and all its subfolders)"
+# Where to search for and import playlists from. Can be a list of folders/globs (separated by :). Paths are relative to MusicFolder
+# PlaylistsPath = ".:**/**"
 
 # Base URL (only the path part) to configure Navidrome behind a proxy (ex: /music)
 # BaseUrl = ""
@@ -46,11 +55,8 @@ DataFolder= "/var/packages/navidrome/var"
 # Add a welcome message to the login screen
 # UIWelcomeMessage = ""
 
-# Send basic info to your own Google Analytics account. Must be in the format UA-XXXXXXXX
-# GATrackingID = ""
-
-# Sets the default theme used by the UI when logging in from a new browser. This value must match one of the options in the UI
-# DefaultTheme = Dark
+# Sets the default theme used by the UI when logging in from a new browser
+# DefaultTheme = "Dark"
 
 # Controls whether the player in the UI will animate the album cover (rotation)
 # EnableCoverAnimation = true
@@ -58,7 +64,7 @@ DataFolder= "/var/packages/navidrome/var"
 # List of ignored articles when sorting/indexing artists
 # IgnoredArticles = "The El La Los Las Le Les Os As O A Der Die Das"
 
-# Match query strings anywhere in searchable fields, not only in word boundaries. Useful for languages where words are not space separated
+# Match query strings anywhere in searchable fields, not only in word boundaries
 # SearchFullString = false
 
 # Uses music files' modification time when sorting by "Recently Added". Otherwise use import time
@@ -76,46 +82,70 @@ DataFolder= "/var/packages/navidrome/var"
 # How long Navidrome will wait before closing web ui idle sessions
 # SessionTimeout = "24h"
 
-# How many login requests can be processed from a single IP during the AuthWindowLength. Set to 0 to disable the limit rater
+# How many login requests can be processed from a single IP during the AuthWindowLength
 # AuthRequestLimit = 5
 
 # Window Length for the authentication rate limit
 # AuthWindowLength = "20s"
 
+#
+# Scanner options
+#
+
 # Select metadata extractor implementation. Options: taglib or ffmpeg
 # Scanner.Extractor = "taglib"
 
-# List of separators to split genre tags
-# Scanner.GenreSeparators = ";/,"
+# Whether to follow symlinks when scanning directories
+# Scanner.FollowSymlinks = false
 
-# Set this to false to completely disable Last.fm integration
-# LastFM.Enabled = true
+# Purge missing files from database. Values: "never", "always", "full"
+# Scanner.PurgeMissing = "never"
 
-# Last.fm ApiKey
-# LastFM.ApiKey = "Navidrome project's shared ApiKey"
+#
+# Backup options (new in v0.59.0)
+#
 
-# Last.fm Shared Secret
-# LastFM.Secret = "Navidrome project's shared Secret"
+# Number of backups to keep
+# Backup.Count = 5
 
-# Two letter-code for language to be used to retrieve biographies from Last.fm
-# LastFM.Language = "en"
+# Path to store backups. Defaults to DataFolder
+# Backup.Path = ""
 
-# Spotify Client ID. Required if you want Artist images
-# Spotify.ID = ""
+# Backup schedule using cron syntax. Default: daily at 4am
+# Backup.Schedule = "0 4 * * *"
 
-# Spotify Client Secret. Required if you want Artist images
-# Spotify.Secret = ""
-
-# Set this to false to completely disable ListenBrainz integration
-# ListenBrainz.Enabled = true
-
-# Use Gravatar images as the user profile image. Needs the user's email to be filled
-# EnableGravatar = false
+#
+# External services
+#
 
 # Set this to false to completely disable ALL external integrations
 # EnableExternalServices = true
 
-# Enable toggling "Heart"/"Loved" for songs/albums/artists in the UI (maps to "Star"/"Starred" in Subsonic Clients)
+# Last.fm integration
+# LastFM.Enabled = true
+# LastFM.ApiKey = "Navidrome project's shared ApiKey"
+# LastFM.Secret = "Navidrome project's shared Secret"
+# LastFM.Language = "en"
+
+# Spotify integration (for artist images)
+# Spotify.ID = ""
+# Spotify.Secret = ""
+
+# Deezer integration (for artist images, new in v0.60.0)
+# Deezer.Enabled = true
+# Deezer.Language = "en"
+
+# ListenBrainz integration
+# ListenBrainz.Enabled = true
+
+#
+# User interface options
+#
+
+# Use Gravatar images as the user profile image
+# EnableGravatar = false
+
+# Enable toggling "Heart"/"Loved" for songs/albums/artists in the UI
 # EnableFavourites = true
 
 # Enable 5-star ratings in the UI
@@ -124,12 +154,16 @@ DataFolder= "/var/packages/navidrome/var"
 # Enable regular users to edit their details and change their password
 # EnableUserEditing = true
 
-# Passphrase used to encrypt passwords in the DB. 
-# For details see: https://www.navidrome.org/docs/usage/security/#encrypted-passwords)
+#
+# Security options
+#
+
+# Passphrase used to encrypt passwords in the DB
+# For details see: https://www.navidrome.org/docs/usage/security/#encrypted-passwords
 # PasswordEncryptionKey = "-"
 
 # HTTP header containing user name from authenticated proxy
 # ReverseProxyUserHeader = "Remote-User"
 
-# Comma separated list of IP CIDRs which are allowed to use reverse proxy authentication, empty means "deny all"
+# Comma separated list of IP CIDRs which are allowed to use reverse proxy authentication
 # ReverseProxyWhitelist = ""

@@ -1,0 +1,47 @@
+# replace '$(ARCH)' with target system 'linux' to avoid erros due to ARCH variable by spksrc framework
+# 
+--- src/libs/zbxsysinfo/Makefile.in.orig	2025-05-20 09:07:33.000000000 +0000
++++ src/libs/zbxsysinfo/Makefile.in	2025-06-07 15:45:06.525711800 +0000
+@@ -489,7 +489,7 @@
+ 	alias \
+ 	common \
+ 	simple \
+-	$(ARCH)
++	linux
+ 
+ EXTRA_DIST = \
+ 	win32
+--- src/zabbix_agent/Makefile.in.orig	2025-05-20 09:07:34.000000000 +0000
++++ src/zabbix_agent/Makefile.in	2025-06-07 15:59:01.468134600 +0000
+@@ -122,12 +122,12 @@
+ 	listener/libzbxlistener.a agent_conf/libagent_conf.a \
+ 	logfiles/libzbxlogfiles.a metrics/libzbxmetrics.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+-	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
+-	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
++	$(top_builddir)/src/libs/zbxsysinfo/linux/libfunclistsysinfo.a \
++	$(top_builddir)/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+-	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
++	$(top_builddir)/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/alias/libalias.a \
+@@ -500,12 +500,12 @@
+ 	logfiles/libzbxlogfiles.a \
+ 	metrics/libzbxmetrics.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+-	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
+-	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
++	$(top_builddir)/src/libs/zbxsysinfo/linux/libfunclistsysinfo.a \
++	$(top_builddir)/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+-	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
++	$(top_builddir)/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+ 	$(top_builddir)/src/libs/zbxsysinfo/alias/libalias.a \

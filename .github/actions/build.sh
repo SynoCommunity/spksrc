@@ -34,10 +34,11 @@ echo "===> TARGET: ${GH_ARCH}"
 echo "===> ARCH   packages: ${ARCH_PACKAGES}"
 echo "===> NOARCH packages: ${NOARCH_PACKAGES}"
 
-# Remove rust toolchain status file to enfore re-installing cargo/rust
-# This fixes isees on github-action where toolchain caching omits the
+# Remove toolchain status files to enforce re-building toolchain including cargo/rust
+# This fixes issues on github-action where toolchain caching omits the
 # actual installation state of cargo/rust within the distrib folder
 rm -f toolchain/syno-${GH_ARCH}/work/.rustc_done
+rm -f toolchain/syno-${GH_ARCH}/work/.toolchain_done
 
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
     build_packages=${NOARCH_PACKAGES}

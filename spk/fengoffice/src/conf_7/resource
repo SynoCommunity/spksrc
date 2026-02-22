@@ -50,6 +50,7 @@
                         "imap",
                         "intl",
                         "mysqli",
+                        "openssl",
                         "pdo_mysql",
                         "xmlrpc",
                         "zip",

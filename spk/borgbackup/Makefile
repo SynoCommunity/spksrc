@@ -1,11 +1,22 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.4.3
-SPK_REV = 20
+SPK_REV = 21
 SPK_ICON = src/borgbackup.png
 
+# Include common.mk first to get ARCH definitions
+include ../../mk/spksrc.common.mk
+
+# Build for ARMv5 and ARMv7L using Python 3.11; all others use Python 3.12
+# This must be set BEFORE including spksrc.python.mk to avoid adding
+# ARMv5 to UNSUPPORTED_ARCHS when using python312
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),)
+PYTHON_PACKAGE = python311
+else
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+endif
+
+SPK_DEPENDS = $(PYTHON_PACKAGE)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 cross/xxhash cross/zstd
 
@@ -32,7 +43,16 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # # The script will create three files (pure, cross, and combined) for the Borg deployment
 # # with Python 3.12. Use the pure and cross requirement files as the base for your PR.
 
-WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+# Wheels: pure-python requirements (all architectures)
+WHEELS = src/requirements-pure.txt
+
+# Cross-compiled requirements vary by architecture
+# ARMv5 uses rpds_py pinned to 0.21.0 for Cargo.lock v3 compatibility with Rust 1.77.2
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-armv5.txt
+else
+WHEELS += src/requirements-crossenv.txt
+endif
 
 # Force building pure-python wheels (issue #5204)
 WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1
@@ -42,12 +62,13 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update Borg to v1.4.3.<br/>2. Update borgmatic to v2.0.12.<br/>3. Refresh Python dependencies."
+CHANGELOG = "1. Update borgmatic to v2.1.2.<br/>2. Refresh Python dependencies."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
 
 SERVICE_SETUP = src/service-setup.sh
+POST_SERVICE_TARGET = borgbackup_extra_install
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
@@ -62,21 +83,36 @@ ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
+
+# [borgbackup]
+# GCC < 5.0 (DSM 6.2.4) requires gnu99 for Cython-generated code.
+# C11 (the original setting) is not fully supported by GCC 4.9.x, and Cython
+# uses GNU extensions (e.g., typeof, statement expressions) in its fallback paths.
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [borgbackup] -std=c11
+WHEELS_CFLAGS += [borgbackup] -std=gnu99
 endif
 
 # [llfuse]
+# GCC < 5.0 requires gnu99 for Cython-generated code (see borgbackup above).
+# Requires CYTHON_ATOMICS=0 because ATOMIC_INT_LOCK_FREE is not a
+# preprocessor constant in GCC < 5.0.
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [llfuse] -std=gnu11
+WHEELS_CFLAGS += [llfuse] -std=gnu99 -DCYTHON_ATOMICS=0
 endif
 
 # [msgpack]
+# GCC < 5.0 requires gnu99 for Cython-generated code (see borgbackup above).
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=gnu99
 endif
 
 # [ruamel_yaml_clib]
+# GCC < 5.0 requires gnu99 for Cython-generated code (see borgbackup above).
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [ruamel_yaml_clib] -std=c11
+WHEELS_CFLAGS += [ruamel_yaml_clib] -std=gnu99
 endif
+
+.PHONY: borgbackup_extra_install
+borgbackup_extra_install:
+	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
+	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup

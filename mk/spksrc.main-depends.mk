@@ -9,7 +9,6 @@ include ../../mk/spksrc.common.mk
 
 # nothing to download
 download:
-download-all:
 checksum:
 
 # Configure the included makefiles
