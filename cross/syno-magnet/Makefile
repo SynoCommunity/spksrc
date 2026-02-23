@@ -20,11 +20,11 @@ DSM_UI_DIR := $(or $(DSM_UI_DIR),app)
 # exported from spk/syno-magnet
 DISPLAY_NAME := $(or $(DISPLAY_NAME),Download Station Magnet)
 DESCRIPTION := $(or $(DESCRIPTION),$(COMMENT))
+SERVICE_TYPE := $(or $(SERVICE_TYPE),legacy)
+SERVICE_URL := $(or $(SERVICE_URL),/webman/3rdparty/syno-magnet/index.html)
+SERVICE_PORT_ALL_USERS := $(or $(SERVICE_PORT_ALL_USERS),true)
 
 DESC=$(shell echo ${DESCRIPTION} | sed -e 's/\\//g' -e 's/"/\\"/g')
-SERVICE_TYPE = legacy
-SERVICE_URL = /webman/3rdparty/syno-magnet/index.htm
-SERVICE_PORT_ALL_USERS = true
 
 include ../../mk/spksrc.install-resources.mk
 
