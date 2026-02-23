@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 SPK_DEPENDS = "Node.js_v22"
 
 MAINTAINER = efren-builder
-MAINTAINER_URL = https://efren.me
+MAINTAINER_URL = https://github.com/efren-builder
 
 DISPLAY_NAME = Uptime Kuma
 DESCRIPTION  = A self-hosted monitoring tool. Monitor HTTP\(s\), TCP, Ping, DNS, Docker containers, game servers, and more with 87+ notification providers.
