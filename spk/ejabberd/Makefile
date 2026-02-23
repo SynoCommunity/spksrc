@@ -29,7 +29,7 @@ SSS_SCRIPT = src/service-start-stop.sh
 
 FWPORTS = src/ejabberd.sc
 
-SPK_COMMANDS = bin/ejabberdctl
+SPK_COMMANDS = share/ejabberdctl
 
 POST_STRIP_TARGET = ejabberd_extra_install
 
@@ -42,3 +42,5 @@ ejabberd_extra_install:
 	install -m 644 src/ejabberd.yml     $(STAGING_DIR)/var/
 	install -m 644 src/ejabberdctl.cfg  $(STAGING_DIR)/var/
 	install -m 644 src/inetrc           $(STAGING_DIR)/var/
+	install -m 755 -d $(STAGING_DIR)/share
+	install -m 755 src/bin/ejabberdctl  $(STAGING_DIR)/share/
