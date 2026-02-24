@@ -9,10 +9,10 @@ CMD_NAME=$(basename "$0")
 
 # Find the actual command (glob must be unquoted to expand)
 for cmd in ${PKG_DIR}/target/lib/rabbitmq_server-*/sbin/${CMD_NAME}; do
-    [ -x "$cmd" ] && break
+    [ -f "$cmd" ] && break
 done
 
-if [ ! -x "$cmd" ]; then
+if [ ! -f "$cmd" ]; then
     echo "Error: Cannot find $CMD_NAME" >&2
     exit 1
 fi
