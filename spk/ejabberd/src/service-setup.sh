@@ -108,6 +108,10 @@ service_preinst ()
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        # Add custom hostname to hosts list (below localhost) if not localhost
+        if [ "${wizard_ejabberd_hostname}" != "localhost" ]; then
+            sed -e "/^  - localhost$/a\\  - ${wizard_ejabberd_hostname}" -i ${SYNOPKG_PKGVAR}/ejabberd.yml
+        fi
         # Patch ejabberd.yml with admin user from install wizard
         sed -e "s#@@adminuser@@#${wizard_ejabberd_admin_username}@${wizard_ejabberd_hostname}#g" -i ${SYNOPKG_PKGVAR}/ejabberd.yml
 
