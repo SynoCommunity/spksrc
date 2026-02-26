@@ -1,0 +1,26 @@
+[
+  {
+    "step_title": "Options de désinstallation",
+    "items": [
+      {
+        "desc": "La désinstallation va arrêter et supprimer le conteneur Docker du Panel Pelican."
+      },
+      {
+        "type": "multiselect",
+        "subitems": [
+          {
+            "key": "wizard_delete_data",
+            "desc": "Supprimer toutes les données (base de données SQLite, configuration, fichiers téléchargés)",
+            "defaultValue": false
+          }
+        ]
+      },
+      {
+        "desc": "<br><b>Attention :</b> Si vous cochez cette case, toutes les données seront définitivement supprimées, y compris :<ul><li>La base de données (utilisateurs, serveurs, nodes)</li><li>Les fichiers de configuration</li><li>Les logs</li></ul>"
+      },
+      {
+        "desc": "<br><i>Note: Les serveurs de jeux gérés par Wings ne seront pas supprimés automatiquement.</i>"
+      }
+    ]
+  }
+]
