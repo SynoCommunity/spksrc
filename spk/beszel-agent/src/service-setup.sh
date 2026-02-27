@@ -1,5 +1,4 @@
 export PATH="/usr/local/bin:$PATH"
-export LOG_LEVEL=debug
 
 KEY_FILE="${SYNOPKG_PKGVAR}/key.pub"
 EXTRA_FS_FILE="${SYNOPKG_PKGVAR}/extra_fs.conf"
