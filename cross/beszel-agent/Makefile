@@ -15,6 +15,8 @@ HOMEPAGE = https://beszel.dev/
 COMMENT  = Simple, lightweight server monitoring agent.
 LICENSE  = MIT
 
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+
 COMPILE_MAKE_OPTIONS = OS=$(GOOS) ARCH=$(GO_ARCH) build-agent
 INSTALL_TARGET = install_beszel
 
