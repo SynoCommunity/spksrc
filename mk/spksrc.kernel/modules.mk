@@ -1,7 +1,7 @@
 ####
 
 # kernel arch definitions
-include $(BASEDIR)mk/spksrc.kernel-env.mk
+include $(BASEDIR)mk/spksrc.kernel/env.mk
 
 ###
 
