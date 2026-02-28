@@ -45,31 +45,3 @@ service_postinst ()
         echo "${wizard_smart_devices}" > "${SMART_DEVICES_FILE}"
     fi
 }
-
-service_preupgrade ()
-{
-    # Backup configuration files before upgrade
-    if [ -f "${KEY_FILE}" ]; then
-        cp "${KEY_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/"
-    fi
-    if [ -f "${EXTRA_FS_FILE}" ]; then
-        cp "${EXTRA_FS_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/"
-    fi
-    if [ -f "${SMART_DEVICES_FILE}" ]; then
-        cp "${SMART_DEVICES_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/"
-    fi
-}
-
-service_postupgrade ()
-{
-    # Restore configuration files after upgrade
-    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/key.pub" ]; then
-        cp "${SYNOPKG_TEMP_UPGRADE_FOLDER}/key.pub" "${KEY_FILE}"
-    fi
-    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/extra_fs.conf" ]; then
-        cp "${SYNOPKG_TEMP_UPGRADE_FOLDER}/extra_fs.conf" "${EXTRA_FS_FILE}"
-    fi
-    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/smart_devices.conf" ]; then
-        cp "${SYNOPKG_TEMP_UPGRADE_FOLDER}/smart_devices.conf" "${SMART_DEVICES_FILE}"
-    fi
-}
