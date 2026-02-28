@@ -95,13 +95,13 @@ patch: extract
 include ../../mk/spksrc.patch.mk
 
 kernel_configure: patch
-include ../../mk/spksrc.cross-kernel-configure.mk
+include ../../mk/spksrc.kernel/configure.mk
 
 kernel_module: kernel_configure
-include ../../mk/spksrc.cross-kernel-module.mk
+include ../../mk/spksrc.kernel/module.mk
 
 install: kernel_module
-include ../../mk/spksrc.cross-kernel-headers.mk
+include ../../mk/spksrc.kernel/headers.mk
 
 install: kernel_headers
 include ../../mk/spksrc.install.mk
