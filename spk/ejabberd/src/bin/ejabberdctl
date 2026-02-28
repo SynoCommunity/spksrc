@@ -1,0 +1,26 @@
+#!/bin/sh
+# ejabberd CLI wrapper for DSM
+# Erlang requires the cookie to be readable by the package user.
+# CLI tools must run as the package user to access the cookie.
+
+PKG_USER="sc-ejabberd"
+PKG_DIR="/var/packages/ejabberd"
+EJABBERDCTL="${PKG_DIR}/target/bin/ejabberdctl"
+
+# Check file exists (not -x since we run as different user via sudo)
+if [ ! -f "$EJABBERDCTL" ]; then
+    echo "Error: Cannot find ejabberdctl" >&2
+    exit 1
+fi
+
+# Change to package directory to avoid permission errors on CWD
+cd "${PKG_DIR}/target" || exit 1
+
+# Inform user about sudo requirement only if authentication needed
+if ! sudo -n true 2>/dev/null; then
+    echo "ejabberd CLI tools require administrator privileges."
+    echo "Enter your DSM password when prompted."
+fi
+
+# Execute as package user with required environment
+exec sudo -u "$PKG_USER" HOME="${PKG_DIR}/var" "$EJABBERDCTL" "$@"

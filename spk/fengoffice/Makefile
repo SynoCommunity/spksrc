@@ -1,6 +1,6 @@
 SPK_NAME = fengoffice
-SPK_VERS = 3.11.8.0
-SPK_REV = 8
+SPK_VERS = 3.11.13.11
+SPK_REV = 9
 SPK_ICON = src/fengoffice.png
 
 DEPENDS = cross/fengoffice
@@ -15,7 +15,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = Feng Office is a Collaboration Platform and Project Management System.
 DISPLAY_NAME = Feng Office
-CHANGELOG = "1. Update to v3.11.8.0.<br/>2. Adjust PHP dependency per DSM version."
+CHANGELOG = "1. Update to v3.11.13.11.<br/>2. Use PHP 8.3 on DSM 7.2."
 
 HOMEPAGE = https://www.fengoffice.com/
 LICENSE = AGPL
@@ -35,8 +35,9 @@ DSM_UI_CONFIG = src/app/config
 include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
-# Use PHP 8.2 on DSM 7.2+
-SPK_DEPENDS = "WebStation:PHP8.2:MariaDB10:Apache2.4"
+# Use PHP 8.3 on DSM 7.2
+SPK_DEPENDS = "WebStation:PHP8.3:MariaDB10:Apache2.4"
+OS_MAX_VER = 7.2-79999
 CONF_DIR = src/conf_72/
 else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 # Use PHP 8.0 on DSM 7.0/7.1 and cap at DSM 7.1

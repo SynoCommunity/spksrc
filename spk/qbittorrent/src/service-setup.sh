@@ -50,3 +50,13 @@ service_postinst() {
         echo "Downloads: ${share_path}/complete"
     fi
 }
+
+service_restore() {
+    # Add Python path for search functionality if not already configured
+    if ! grep -q 'pythonExecutablePath' "${CFG_FILE}" 2>/dev/null; then
+        if grep -q '^\[Preferences\]' "${CFG_FILE}"; then
+            sed -i '/^\[Preferences\]/a Search\\pythonExecutablePath=/var/packages/python312/target/bin/python3' "${CFG_FILE}"
+            echo "Added Python 3.12 path for search functionality"
+        fi
+    fi
+}

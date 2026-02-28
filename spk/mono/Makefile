@@ -1,6 +1,6 @@
 SPK_NAME = mono
-SPK_VERS = 6.12.0.182
-SPK_REV = 20
+SPK_VERS = 6.12.0.199
+SPK_REV = 21
 SPK_ICON = src/mono.png
 
 DEPENDS = cross/mono
@@ -13,7 +13,7 @@ MAINTAINER = hgy59
 DESCRIPTION = Cross platform, open source .NET development framework.
 DISPLAY_NAME = Mono
 STARTABLE = no
-CHANGELOG = "1. Update mono to version 6.12.0.182.<br/>2. Fix BTLS for aarch64 on DSM 6<br/>3. Add script to update ca certificates."
+CHANGELOG = "Update to version 6.12.0.199."
 
 HOMEPAGE = https://mono-project.com
 LICENSE  = https://www.mono-project.com/docs/faq/licensing

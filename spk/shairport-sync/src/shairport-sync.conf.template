@@ -1,0 +1,45 @@
+// Shairport Sync configuration for Synology NAS
+// AirPlay 2 enabled with NQPTP timing daemon
+//
+// For full configuration options see:
+// https://github.com/mikebrady/shairport-sync/blob/master/scripts/shairport-sync.conf
+
+general =
+{
+  @@SERVER_NAME@@
+  output_backend = "@@OUTPUT_BACKEND@@"; // Options: "alsa", "dummy", "pipe"
+  port = 8303; // SynoCommunity assigned port (default 5000 conflicts with DSM)
+  udp_port_base = 8304;
+  udp_port_range = 10;
+};
+
+diagnostics =
+{
+  log_output_to = "syslog";
+  // log_verbosity = 1; // Uncomment for detailed logging
+  // statistics = "yes"; // Uncomment to see audio frame statistics
+};
+
+// ALSA configuration - configure for your USB sound card
+// Check /proc/asound/cards to list available devices
+alsa =
+{
+  output_device = "@@OUTPUT_DEVICE@@"; // Change to "hw:0" or "hw:1" based on card number
+  @@MIXER_CONTROL@@
+};
+
+// To test without a sound card:
+// 1. Change output_backend above to "dummy"
+// 2. Uncomment log_verbosity and statistics in diagnostics section
+// 3. Restart the package
+// 4. Connect from iOS and check syslog for activity
+
+// Metadata - track info from the source (artist, album, cover art)
+// Can be read by other applications via pipe at /tmp/shairport-sync-metadata
+metadata =
+{
+  enabled = "yes";
+  include_cover_art = "yes";
+  pipe_name = "/tmp/shairport-sync-metadata";
+  pipe_timeout = 5000;
+};

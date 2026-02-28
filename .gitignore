@@ -22,6 +22,8 @@ toolchain/*/work*
 toolchain/*/build*
 toolchain/*/status*
 toolkit/*/work*
+toolkit/*/build*
+toolkit/*/status*
 local.mk
 *.DS_Store
 *~

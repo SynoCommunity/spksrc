@@ -26,7 +26,7 @@ exec_php ()
     # Pick PHP by DSM version
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
         if [ "${SYNOPKG_DSM_VERSION_MINOR}" -ge 2 ]; then
-            PHP="/usr/local/bin/php82"
+            PHP="/usr/local/bin/php84"
         else
             PHP="/usr/local/bin/php80"
         fi
