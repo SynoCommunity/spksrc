@@ -88,7 +88,7 @@ include ../../mk/spksrc.download.mk
 checksum: download
 include ../../mk/spksrc.checksum.mk
 
-extract: checksum
+extract: checksum status
 include ../../mk/spksrc.extract.mk
 
 patch: extract
