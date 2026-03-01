@@ -22,8 +22,11 @@ NO_SERVICE_SHORTCUT = 1
 
 include ../../mk/spksrc.common.mk
 
-# libicu dependency doesn't support these architectures
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# libicu dependency doesn't support ARMv5/OLD_PPC (no DSM 7.x toolchains)
+# comcerto2k: DSM 7.x toolchain uses GCC 4.9.3 (GEOS 3.12.3 requires C++14/GCC 5+)
+UNSUPPORTED_ARCHS = comcerto2k
+# DSM < 7.0: GCC 4.9 fails PostGIS libpq detection (strict linker requires SSL libs)
+REQUIRED_MIN_DSM = 7.0
 
 # Use auto-generated service user (sc-postgresql)
 SERVICE_USER = auto

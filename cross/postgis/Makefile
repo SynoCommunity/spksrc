@@ -14,42 +14,47 @@ LICENSE = GPLv2
 
 GNU_CONFIGURE = 1
 
-# Path to cross-compiled PostgreSQL
-CROSS_PG_CONFIG = $(STAGING_INSTALL_PREFIX)/bin/pg_config
+# Cross-compilation requires a pg_config wrapper that returns cross-compiled
+# paths for libraries but uses native PGXS for building
+PG_VERSION = 17.4
+PG_CONFIG_WRAPPER = $(WORK_DIR)/pg_config_wrapper
+NATIVE_PG_DIR = $(realpath $(WORK_DIR)/../../../native/postgresql/work-native/install/usr/local)
 
-CONFIGURE_ARGS  = --with-pgconfig=$(CROSS_PG_CONFIG)
+CONFIGURE_ARGS  = --with-pgconfig=$(PG_CONFIG_WRAPPER)
 CONFIGURE_ARGS += --with-geosconfig=$(STAGING_INSTALL_PREFIX)/bin/geos-config
 CONFIGURE_ARGS += --with-projdir=$(STAGING_INSTALL_PREFIX)
-
-# Provide PROJ version to avoid cross-compilation test failure
 CONFIGURE_ARGS += PROJ_VERSION=8.2.1
-
 CONFIGURE_ARGS += --without-raster
 CONFIGURE_ARGS += --without-protobuf
 CONFIGURE_ARGS += --without-gui
 CONFIGURE_ARGS += --without-topology
+# SSL libraries needed for libpq link check
+CONFIGURE_ARGS += LIBS="-lssl -lcrypto -lpthread -lm"
 
-# Disable parallel build to avoid race conditions in SQL file generation
-COMPILE_MAKE_OPTIONS = -j1
+# Disable parallel build (SQL file generation race conditions)
+# Override CC since PGXS hardcodes gcc
+COMPILE_MAKE_OPTIONS = -j1 CC="$(TC_PATH)$(TC_PREFIX)gcc"
 
-# Override install to use a custom target that handles PGXS path issues
-# PostGIS uses PGXS which gets paths from pg_config. The cross-compiled
-# pg_config returns paths with INSTALL_DIR baked in (e.g., /workspace/.../install/var/packages/...)
-# Since these paths already contain the install directory, we use DESTDIR=""
-# and PostGIS will install directly to the correct staging location.
+PRE_CONFIGURE_TARGET = postgis_pre_configure
 INSTALL_TARGET = postgis_install
 
 include ../../mk/spksrc.cross-cc.mk
 
+.PHONY: postgis_pre_configure
+postgis_pre_configure:
+	@# Fix PostGIS configure to preserve LIBS during libpq check
+	sed -i 's/LIBS="$$PGSQL_FE_LDFLAGS"/LIBS="$$PGSQL_FE_LDFLAGS $$LIBS"/g' $(WORK_DIR)/$(PKG_DIR)/configure
+	@# Create pg_config wrapper from template
+	sed -e 's|@NATIVE_PG_DIR@|$(NATIVE_PG_DIR)|g' \
+	    -e 's|@PG_VERSION@|$(PG_VERSION)|g' \
+	    -e 's|@CROSS_PG_INCLUDEDIR@|$(STAGING_INSTALL_PREFIX)/include|g' \
+	    -e 's|@CROSS_PG_LIBDIR@|$(STAGING_INSTALL_PREFIX)/lib|g' \
+	    -e 's|@CROSS_PG_SHAREDIR@|$(STAGING_INSTALL_PREFIX)/share|g' \
+	    -e 's|@CROSS_PG_BINDIR@|$(STAGING_INSTALL_PREFIX)/bin|g' \
+	    -e 's|@CROSS_CC@|$(TC_PATH)$(TC_PREFIX)gcc|g' \
+	    $(CURDIR)/src/pg_config_wrapper.sh.in > $(PG_CONFIG_WRAPPER)
+	chmod +x $(PG_CONFIG_WRAPPER)
+
 .PHONY: postgis_install
 postgis_install:
-	@echo "Installing PostGIS with custom target..."
 	$(RUN) $(MAKE) install DESTDIR=""
-	@# Verify PostGIS files were installed
-	@PKGLIBDIR=$$($(CROSS_PG_CONFIG) --pkglibdir); \
-	if [ -f "$$PKGLIBDIR/postgis-3.so" ]; then \
-	  echo "PostGIS installation verified: $$PKGLIBDIR/postgis-3.so"; \
-	else \
-	  echo "ERROR: PostGIS shared library not found at $$PKGLIBDIR"; \
-	  exit 1; \
-	fi
