@@ -58,11 +58,7 @@ start_daemon ()
                 else
                     SVC_CD="cd ${SVC_CWD}; "
                 fi
-                if [ -n "${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
-                    SU="su ${EFF_USER} -s"
-                else
-                    SU=""
-                fi
+                SU="su ${EFF_USER} -s"
                 if [ -z "${SVC_BACKGROUND}" ]; then
                     $SU /bin/sh -c "${SVC_CD}${service}" >> "${OUT}" 2>&1
                 else
