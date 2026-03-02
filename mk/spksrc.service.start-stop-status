@@ -72,7 +72,7 @@ start_daemon ()
             else
                 # DSM 6 user is set by conf/privilege
                 if [ -n "${SVC_CWD}" ]; then
-                    cd "${SVC_CWD}" || return 1
+                    cd "${SVC_CWD}" || { echo "Failed to cd to ${SVC_CWD}" >> "${LOG_FILE}"; exit 1; }
                 fi
                 if [ -z "${SVC_BACKGROUND}" ]; then
                     ${service} >> "${OUT}" 2>&1
