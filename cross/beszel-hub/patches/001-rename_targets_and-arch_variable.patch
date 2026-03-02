@@ -1,0 +1,26 @@
+# rename ARCH variable to avoid conflicts with spksrc framework
+# avoid OS and _ARCH in target names
+# 
+--- Makefile.orig	2025-04-29 00:57:27.000000000 +0000
++++ Makefile	2025-05-13 17:02:39.916955450 +0000
+@@ -1,6 +1,6 @@
+ # Default OS/ARCH values
+ OS ?= $(shell go env GOOS)
+-ARCH ?= $(shell go env GOARCH)
++_ARCH ?= $(shell go env GOARCH)
+ # Skip building the web UI if true
+ SKIP_WEB ?= false
+ 
+@@ -31,10 +31,10 @@
+ 	fi
+ 
+ build-agent: tidy
+-	GOOS=$(OS) GOARCH=$(ARCH) go build -o ./build/beszel-agent_$(OS)_$(ARCH) -ldflags "-w -s" beszel/cmd/agent
++	GOOS=$(OS) GOARCH=$(_ARCH) go build -o ./build/beszel-agent -ldflags "-w -s" beszel/cmd/agent
+ 
+ build-hub: tidy $(if $(filter false,$(SKIP_WEB)),build-web-ui)
+-	GOOS=$(OS) GOARCH=$(ARCH) go build -o ./build/beszel_$(OS)_$(ARCH) -ldflags "-w -s" beszel/cmd/hub
++	GOOS=$(OS) GOARCH=$(_ARCH) go build -o ./build/beszel -ldflags "-w -s" beszel/cmd/hub
+ 
+ build: build-agent build-hub
+ 
