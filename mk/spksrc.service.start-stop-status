@@ -16,20 +16,18 @@ if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi
 
-
 # Invoke shell function if available
-call_func ()
+call_func()
 {
     FUNC=$1
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
         echo "Begin ${FUNC}" >> "${LOG_FILE}"
-        eval "${FUNC}"       >> "${LOG_FILE}"
-        echo "End ${FUNC}"   >> "${LOG_FILE}"
+        eval "${FUNC}" >> "${LOG_FILE}"
+        echo "End ${FUNC}" >> "${LOG_FILE}"
     fi
 }
 
-
-start_daemon ()
+start_daemon()
 {
     i=0
     if [ -z "${SVC_QUIET}" ]; then
@@ -64,7 +62,6 @@ start_daemon ()
                 else
                     $SU /bin/sh -c "${SVC_CD}${service}" >> "${OUT}" 2>&1 &
                 fi
-
             else
                 # DSM 6 user is set by conf/privilege
                 if [ -n "${SVC_CWD}" ]; then
@@ -85,7 +82,7 @@ start_daemon ()
     done
 }
 
-stop_daemon ()
+stop_daemon()
 {
     if [ -n "${PID_FILE}" ] && [ -r "${PID_FILE}" ]; then
         for pid in $(cat "${PID_FILE}")
@@ -111,21 +108,21 @@ stop_daemon ()
 #
 # Return 0 when all pid are OK, else return 1
 #------------------------------------------------------
-daemon_status ()
+daemon_status()
 {
     status=0
     [ -z "${1}" ] && pid_list=$(cat "${PID_FILE}" 2>/dev/null) || pid_list=${1}
     if [ -n "${pid_list}" ]; then
         for pid in ${pid_list}
         do
-           kill -0 "${pid}" > /dev/null 2>&1
-           status=$((status + $?))
+            kill -0 "${pid}" > /dev/null 2>&1
+            status=$((status + $?))
         done
-        if [ $status -ne 0 ]; then
-           rm -f "${PID_FILE}" > /dev/null
-           return 1
+        if [ "$status" -ne 0 ]; then
+            rm -f "${PID_FILE}" > /dev/null
+            return 1
         else
-           return 0
+            return 0
         fi
     else
         return 1
@@ -145,14 +142,14 @@ daemon_status ()
 # return value from daemon_status().  If it match
 # return 0 else return 1 if wait time is over.
 #------------------------------------------------------
-wait_for_status ()
+wait_for_status()
 {
     # default value: 20 seconds
     counter=${2}
-    counter=${counter:=20}
+    counter="${counter:=20}"
     while [ "${counter}" -gt 0 ]; do
         daemon_status "${3}"
-        [ $? -eq "$1" ] && return
+        [ "$?" -eq "$1" ] && return
         counter=$((counter - 1))
         sleep 1
     done
