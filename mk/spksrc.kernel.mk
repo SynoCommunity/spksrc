@@ -48,7 +48,7 @@ include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.common-rules.mk
 
 # Common kernel variables
-include ../../mk/spksrc.kernel/flags.mk
+include ../../mk/spksrc.kernel/env.mk
 
 # Constants
 default: all
@@ -56,13 +56,9 @@ default: all
 #####
 
 # Mark toolchain installation as completed using status cookie
-KERNEL_COOKIE = $(KERNEL_WORK_DIR)/.$(COOKIE_PREFIX)kernel_done
+KERNEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)kernel_done
 
 KERNEL = syno$(KERNEL_ARCH_SUFFIX)
-KERNEL_WORK_DIR ?= $(abspath $(WORK_DIR)/../../../kernel/$(KERNEL)/work)
-
-# Define $(RUN) for other targets (download, extract, patch, etc)
-RUN = cd $(KERNEL_WORK_DIR)/linux && env $(ENV)
 
 #####
 
@@ -122,7 +118,7 @@ kernel-stage1: $(TCVARS_DONE)
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
 	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
-	@$(MAKE) WORK_DIR=$(KERNEL_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
 $(TCVARS_DONE): ;
 endif

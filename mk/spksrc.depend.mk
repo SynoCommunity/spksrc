@@ -12,7 +12,7 @@
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
 
 ### For managing kernel modules dependent builds
-include ../../mk/spksrc.kernel/modules.mk
+include ../../mk/spksrc.kernel/depend.mk
 
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
 
@@ -61,9 +61,9 @@ pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
 ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-# As depend is also ran at toolchain-time, ensure to skip kernel-modules
+# As depend is also ran at toolchain-time, ensure to skip kernel-depend
 ifeq ($(filter toolchain,$(shell basename $(abspath $(CURDIR)/../))),)
-depend_target: kernel-modules
+depend_target: kernel-depend
 endif
 endif
 	@set -e; \
