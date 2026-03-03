@@ -4,9 +4,6 @@ KEY_FILE="${SYNOPKG_PKGVAR}/key.pub"
 EXTRA_FS_FILE="${SYNOPKG_PKGVAR}/extra_fs.conf"
 SMART_DEVICES_FILE="${SYNOPKG_PKGVAR}/smart_devices.conf"
 
-SKIP_SYSTEMD=false
-
-
 # Read the public key from the saved file
 if [ -f "${KEY_FILE}" ]; then
     BESZEL_PUBLIC_KEY=$(cat "${KEY_FILE}")
