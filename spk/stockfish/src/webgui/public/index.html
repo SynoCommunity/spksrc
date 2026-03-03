@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stockfish Chess</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e; color: #eee; min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; padding: 20px;
+        }
+        h1 { margin-bottom: 20px; color: #4ecca3; }
+        #board-container { max-width: 500px; width: 100%; }
+        #board { width: 100%; }
+        .controls { margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        button {
+            padding: 10px 20px; border: none; border-radius: 5px;
+            background: #4ecca3; color: #1a1a2e; cursor: pointer;
+            font-size: 14px; font-weight: bold; transition: all 0.2s;
+        }
+        button:hover { background: #3db892; transform: translateY(-1px); }
+        button:disabled { background: #666; cursor: not-allowed; transform: none; }
+        #status { 
+            margin: 15px 0; padding: 15px; background: #16213e; 
+            border-radius: 8px; min-width: 300px; text-align: center;
+        }
+        #eval { font-size: 24px; font-weight: bold; color: #4ecca3; }
+        #bestmove { margin-top: 8px; color: #aaa; }
+        #thinking { color: #888; font-style: italic; }
+        .settings { margin: 15px 0; display: flex; gap: 15px; align-items: center; }
+        select, input[type="range"] { padding: 8px; border-radius: 5px; border: 1px solid #4ecca3; background: #16213e; color: #eee; }
+    </style>
+</head>
+<body>
+    <h1>♔ Stockfish Chess ♚</h1>
+    
+    <div class="settings">
+        <label>Play as: <select id="playerColor">
+            <option value="w">White</option>
+            <option value="b">Black</option>
+        </select></label>
+        <label>Difficulty: <input type="range" id="difficulty" min="1" max="20" value="10"> <span id="diffVal">10</span></label>
+    </div>
+    
+    <div id="board-container">
+        <div id="board"></div>
+    </div>
+    
+    <div class="controls">
+        <button id="newGame">New Game</button>
+        <button id="undo">Undo</button>
+        <button id="hint">Get Hint</button>
+        <button id="flip">Flip Board</button>
+    </div>
+    
+    <div id="status">
+        <div id="eval">0.0</div>
+        <div id="bestmove"></div>
+        <div id="thinking"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
