@@ -1,19 +1,35 @@
-### Kernel module rules
-#   Compile kernel modules as provided with the REQUIRE_KERNEL_MODULE variable.
+###############################################################################
+# spksrc.kernel/module.mk
+#
+# Compile kernel modules for the target kernel and architecture.
+#
+# This file:
+#  - prepares the kernel source for module compilation
+#  - compiles modules listed in REQUIRE_KERNEL_MODULE
+#  - installs compiled modules under
+#      $(STAGING_INSTALL_PREFIX)/lib/modules/<arch>-<version>/
+#
 # Targets are executed in the following order:
 #  kernel_module_msg_target
 #  pre_kernel_module_target    (override with PRE_KERNEL_MODULE_TARGET)
 #  kernel_module_target        (override with KERNEL_MODULE_TARGET)
 #  post_kernel_module_target   (override with POST_KERNEL_MODULE_TARGET)
+#
 # Variables:
-#  ARCH                    Actual ARCH being built for
-#  GENERIC_ARCHS           Names of generic ARCH groups (i.e. armv7, aarch64, x64, etc)
-#  REQUIRE_KERNEL_MODULE   List of modules to be compiled
-#  STAGING_INSTALL_PREFIX  Full installation path consisting of $(INSTALL_DIR)$(INSTALL_PREFIX)
-#  WORK_DIR                Base directory used for compilation of specified ARCH
-#  PKG_DIR                 The extracted package directory name
-#  NAME                    Refers to $(KERNEL_NAME) being syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
-#  TC_KERNEL               Exact kernel version as provided by toolchain configuration $(WORK_DIR)/tc_vars.mk
+#   ARCH                     architecture being built
+#   GENERIC_ARCHS            generic arch groups (e.g., armv7, aarch64, x64)
+#   REQUIRE_KERNEL_MODULE    list of modules to compile
+#   STAGING_INSTALL_PREFIX   full install path for compiled modules
+#   WORK_DIR                 base directory for compilation
+#   PKG_DIR                  extracted kernel source directory
+#   NAME                     kernel name, defaults to $(KERNEL_NAME)
+#   TC_KERNEL                exact kernel version from toolchain
+#
+# Notes:
+#  - Module compilation is skipped for generic architectures
+#  - Prepares kernel source with modules_prepare and olddefconfig/oldconfig
+#  - Adjusts kernel Makefiles for warnings and tools where needed
+###############################################################################
 
 KERNEL_MODULE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)kernel_module_done
 

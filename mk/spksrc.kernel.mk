@@ -1,3 +1,105 @@
+###############################################################################
+# spksrc.kernel.mk
+#
+# Provides the complete kernel build logic for spksrc.
+#
+# This makefile supports two distinct execution modes:
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# 1) Standalone Kernel Mode (Reference Mode)
+#    Invoked from: spksrc/kernel
+#
+#    Purpose:
+#      - Download and extract Synology kernel sources
+#      - Maintain a reference kernel source tree
+#
+#    Working directory:
+#      work
+#
+#    Extracted source tree:
+#      work/linux
+#
+#    Characteristics:
+#      - No package context
+#      - No architecture-specific work directory suffix
+#      - Similar conceptual role to toolchain/ or toolkit/
+#      - Used primarily as a canonical kernel source reference
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# 2) Package Module Mode (Packaging Mode)
+#    Invoked from: spksrc/spk/<package>
+#    Requires: REQUIRE_KERNEL_MODULE=1
+#
+#    Purpose:
+#      - Prepare kernel source tree for external module compilation
+#      - Build modules as part of SPK package generation
+#
+#    Working directory:
+#      work-<arch>-<tcversion>
+#
+#    Extracted source tree:
+#      work-<arch>-<tcversion>/linux-<arch>-<tcversion>
+#
+#    Characteristics:
+#      - Architecture-specific build
+#      - Integrated with cross-compilation environment
+#      - Kernel tree is local to the package build
+#      - Modules are compiled for packaging into SPK
+#
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Build Pipeline
+#
+# Stage 1: Toolchain bootstrap (MANDATORY)
+#   - Ensures the matching toolchain exists
+#   - Generates tc_vars* files in the active WORK_DIR
+#
+# Stage 2: Kernel build
+#   - download → checksum → extract → patch
+#   - relocate source tree (kernel_post_extract_target)
+#   - kernel_configure
+#   - kernel_module (if enabled)
+#   - kernel_headers (optional)
+#   - install → plist
+#
+# Stage separation guarantees that:
+#   - The toolchain environment is fully materialized before kernel logic runs
+#   - tc_vars* files are generated once per WORK_DIR
+#   - Toolchain and kernel builds remain strictly separated
+#
+# Key Variables:
+#   KERNEL_NAME               Kernel identifier (syno-<arch>-<version>)
+#   KERNEL_VERS               Synology OS version (DSM / SRM)
+#   KERNEL_ARCH               Target architecture
+#   REQUIRE_KERNEL_MODULE     Enables packaging/module mode
+#   KERNEL_ARCH_SUFFIX        Derived arch/version suffix
+#   KERNEL_COOKIE             Build completion marker
+#
+# Important Behavioral Differences:
+#   - PKG_NAME and PKG_DIR vary depending on REQUIRE_KERNEL_MODULE
+#   - WORK_DIR differs between standalone and packaging modes
+#   - Extracted kernel tree location depends on invocation context
+#
+# Notes:
+#  - The kernel build is idempotent when guarded by cookies.
+#  - Logging is centralized via LOG_WRAPPED.
+#  - cross-env.mk consumes tc_vars* generated during Stage1.
+#  - Kernel source relocation is handled by kernel_post_extract_target.
+#
+# Common include structure:
+#
+#   spksrc.kernel.mk
+#   └── spksrc.kernel/
+#       ├── configure.mk  : Prepare kernel sources & set .config
+#       ├── module.mk     : Compile kernel modules for SPK
+#       ├── headers.mk    : Install kernel headers to staging/include
+#       ├── depend.mk     : Loop over generic architectures and sub-archs
+#       ├── required.mk   : Check if kernel/module is required by dependencies
+#       ├── env.mk        : Sets default kernel environment variables
+#       ├── url.mk        : Kernel download URLs
+#       └── versions.mk   : Kernel versions per architecture / DSM
+#
+###############################################################################
 
 # Configure the included makefiles
 NAME          = $(KERNEL_NAME)

@@ -1,13 +1,35 @@
+###############################################################################
+# spksrc.kernel/env.mk
+#
+# Defines default kernel environment variables.
+#
+# This file:
+#  - derives toolchain work directory path
+#  - defines default kernel naming convention
+#  - sets default kernel configuration file
+#  - initializes optional kernel packaging parameters
+#
+# Variables:
+#
+#   TC_WORK_DIR     Absolute path to toolchain work directory
+#                   ($(WORK_DIR)/../../../toolchain/$(TC)/work)
+#   KERNEL_NAME     Default: syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+#   KERNEL_CONFIG   Default: synoconfigs/$(KERNEL_ARCH)
+#   KERNEL_PREFIX   Default: $(KERNEL_DIST)
+#   KERNEL_STRIP    Strip kernel modules (0 = disabled, default)
+#
+# Notes:
+#
+#  - All variables except TC_WORK_DIR may be overridden before inclusion.
+#  - Defaults are only applied when variables are unset or empty.
+#
+###############################################################################
 
 TC_WORK_DIR=$(abspath $(WORK_DIR)/../../../toolchain/$(TC)/work)
 
 ifeq ($(strip $(KERNEL_NAME)),)
 KERNEL_NAME = syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
 endif
-
-#ifeq ($(strip $(KERNEL_DIST_FILE)),)
-#KERNEL_DIST_FILE = $(KERNEL_ARCH)-$(KERNEL_DIST).$(KERNEL_EXT)
-#endif
 
 ifeq ($(strip $(KERNEL_CONFIG)),)
 KERNEL_CONFIG = synoconfigs/$(KERNEL_ARCH)
@@ -20,19 +42,3 @@ endif
 ifeq ($(strip $(KERNEL_STRIP)),)
 KERNEL_STRIP = 0
 endif
-
-# 6.1-6.2
-##ifeq ($(strip $(KERNEL_URL_DIR)),)
-##KERNEL_URL_DIR = $(KERNEL_ARCH)-source
-##endif
-
-#
-# SRM
-#
-###ifeq ($(strip $(KERNEL_DIST_SITE)),)
-###KERNEL_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/kernels/srm$(KERNEL_VERS)
-###endif
-
-###ifeq ($(strip $(KERNEL_DIST_NAME)),)
-###KERNEL_DIST_NAME = $(KERNEL_ARCH)-$(KERNEL_DIST).$(KERNEL_EXT)
-###endif

@@ -1,4 +1,46 @@
-###
+###############################################################################
+# spksrc.kernel/depend.mk
+#
+# Kernel module dependency manager for spksrc.
+#
+# Purpose:
+#  - Determine which kernel architectures require module compilation.
+#  - Handle generic architectures (e.g., x64) that contain multiple
+#    sub-architectures (e.g., denverton, apollolake). In this case:
+#      * Backup tc_vars* cookies for the generic arch
+#      * Loop through each sub-architecture and build required kernel modules
+#      * Restore the generic arch tc_vars* cookies after processing
+#
+# This ensures that:
+#  - The generic arch environment remains consistent for other package builds
+#  - Module builds are executed per sub-arch
+#  - Logging and error handling are centralized
+#
+# Variables:
+#   KO_ARCH                : the kernel architecture being processed
+#   KO_TCVERSION           : toolchain version for this kernel
+#   REQUIRE_KERNEL         : enables dependency processing
+#   REQUIRE_KERNEL_MODULE  : list of kernel modules to build
+#   GENERIC_ARCHS          : architectures that serve as anchors for multiple sub-archs
+#   UNSUPPORTED_ARCHS      : toolchain architectures that cannot be built
+#   LEGACY_ARCHS           : fallback list of known architectures
+#   KERNEL_DEPEND          : architectures/sub-archs selected for module build
+#   WORK_DIR               : base working directory
+#   ARCH_SUFFIX            : optional suffix for WORK_DIR
+#   STATUS_LOG             : centralized build log
+#
+# Targets:
+#   kernel-depend          : process kernel module dependencies
+#                           for the current ARCH/generic-ARCH context
+#
+# Behavior:
+#  - Generic architectures are used as anchors to iterate over sub-architectures
+#  - Only non-generic sub-architectures are built
+#  - Each sub-arch build occurs in its own WORK_DIR
+#  - Build logs are written to build-<arch>-<tcversion>.log
+#  - tc_vars* files are backed up/restored for generic architectures
+#  - Called by spksrc.depend.mk via depend_target if REQUIRE_KERNEL_MODULE is set
+###############################################################################
 
 # Find the kernel architecture being processed
 KO_ARCH = $(or $(ARCH),$(firstword $(subst -, ,$*)))
