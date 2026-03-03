@@ -28,6 +28,20 @@ UNSUPPORTED_ARCHS = comcerto2k
 # DSM < 7.0: GCC 4.9 fails PostGIS libpq detection (strict linker requires SSL libs)
 REQUIRED_MIN_DSM = 7.0
 
+# Common PostgreSQL commands available via /usr/local/bin/
+SPK_COMMANDS  = bin/psql
+SPK_COMMANDS += bin/pg_dump
+SPK_COMMANDS += bin/pg_dumpall
+SPK_COMMANDS += bin/pg_restore
+SPK_COMMANDS += bin/createdb
+SPK_COMMANDS += bin/dropdb
+SPK_COMMANDS += bin/createuser
+SPK_COMMANDS += bin/dropuser
+SPK_COMMANDS += bin/pg_isready
+SPK_COMMANDS += bin/vacuumdb
+SPK_COMMANDS += bin/reindexdb
+SPK_COMMANDS += bin/clusterdb
+
 # Use auto-generated service user (sc-postgresql)
 SERVICE_USER = auto
 

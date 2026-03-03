@@ -1,7 +1,7 @@
 [{
     "step_title": "PostgreSQL",
     "items": [{
-        "desc": "Create an administrator account to manage your PostgreSQL databases. This account will have full superuser privileges.<br><br>To connect after installation:<br><code>/var/packages/postgresql/target/bin/psql -h localhost -p 5433 -U &lt;username&gt; -d postgres</code>"
+        "desc": "Create an administrator account to manage your PostgreSQL databases. This account will have full superuser privileges.<br><br>To connect after installation:<br><code>/usr/local/bin/psql -h localhost -p 5433 -U &lt;username&gt; -d postgres</code>"
     }, {
         "type": "textfield",
         "desc": "Administrator username",
