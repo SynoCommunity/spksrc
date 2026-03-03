@@ -570,10 +570,12 @@ spkclean:
 	       work-*/.icon_done \
 	       work-*/.strip_done \
 	       work-*/.tcvars_done \
+	       work-*/.tkvars_done \
+	       work-*/.wheel_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
-	       work-*/tc_vars.*.mk \
+	       work-*/tc_vars*.mk \
 	       work-*/tc_vars.cmake \
 	       work-*/tc_vars.meson-* \
 	       work-*/package.tgz \
