@@ -144,7 +144,7 @@ all:
 
 .PHONY: kernel_post_extract_target
 kernel_post_extract_target:
-	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/$(PKG_DIR)
+	mv $(WORK_DIR)/$(KERNEL_PREFIX) $(WORK_DIR)/$(PKG_DIR)
 
 ####
 
