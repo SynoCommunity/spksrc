@@ -1,11 +1,11 @@
 PKG_NAME = stunnel
-PKG_VERS = 5.60
+PKG_VERS = 5.77
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.usenix.org.uk/mirrors/stunnel/archive/5.x
+PKG_DIST_SITE = https://www.stunnel.org/downloads
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/tcp_wrappers cross/openssl
+DEPENDS = cross/tcp_wrappers cross/openssl3
 
 HOMEPAGE = https://www.stunnel.org/
 COMMENT  = "Stunnel is a proxy designed to add TLS encryption functionality to existing clients and servers without any changes in the programs' code.<br/>This package is for advanced users. "
