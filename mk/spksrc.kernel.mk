@@ -90,14 +90,18 @@
 #
 #   spksrc.kernel.mk
 #   └── spksrc.kernel/
+#
+#       Core kernel build logic (directly included by spksrc.kernel.mk):
 #       ├── configure.mk  : Prepare kernel sources & set .config
 #       ├── module.mk     : Compile kernel modules for SPK
 #       ├── headers.mk    : Install kernel headers to staging/include
-#       ├── depend.mk     : Loop over generic architectures and sub-archs
-#       ├── required.mk   : Check if kernel/module is required by dependencies
-#       ├── env.mk        : Sets default kernel environment variables
+#       ├── env.mk        : Set default kernel environment variables
 #       ├── url.mk        : Kernel download URLs
 #       └── versions.mk   : Kernel versions per architecture / DSM
+#
+#       Framework support (invoked externally by the build framework):
+#       ├── depend.mk     : Loop over generic architectures and sub-archs
+#       └── required.mk   : Check if kernel/module is required by dependencies
 #
 ###############################################################################
 
