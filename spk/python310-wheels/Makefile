@@ -21,7 +21,7 @@ LICENSE  = PSF
 # Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
-# IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
+# IMPORTANT: WHEELS must be initialized before include of spksrc.spk-python.mk
 # later additions are ok, but WHEELS must not be empty at this point,
 # otherwise the build of WHEELS is skipped
 WHEELS += src/requirements-abi3.txt
@@ -211,4 +211,4 @@ WHEELS += rpds_py==0.30.0
 endif
 endif
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

@@ -24,7 +24,7 @@ LICENSE  = PSF
 # Enable debug_info symbols
 #GCC_DEBUG_INFO := 1
 
-# IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
+# IMPORTANT: WHEELS must be initialized before include of spksrc.spk-python.mk
 # later additions are ok, but WHEELS must not be empty at this point,
 # otherwise the build of WHEELS is skipped
 WHEELS += src/requirements-abi3.txt
@@ -138,20 +138,6 @@ endif
 DEPENDS += cross/c-ares
 ENV += PYCARES_USE_SYSTEM_LIB=1
 
-# [pycurl]
-DEPENDS += cross/curl
-ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
-
-# [pydantic-core] 
-DEPENDS += python/pydantic-core
-
-# [PyNaCl]
-DEPENDS += cross/libsodium
-ENV += SODIUM_INSTALL=system
-
-# [PyYAML]
-DEPENDS += cross/libyaml
-
 # [pycryptodome]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pycryptodome] -std=c11
@@ -162,10 +148,24 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 endif
 
+# [pycurl]
+DEPENDS += cross/curl
+ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+
+# [pydantic-core] 
+DEPENDS += python/pydantic-core
+
 # [pygobject]
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
 DEPENDS += python/pygobject
 endif
+
+# [PyNaCl]
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+# [PyYAML]
+DEPENDS += cross/libyaml
 
 # [rencode]
 DEPENDS += python/rencode
@@ -192,4 +192,4 @@ ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/scipy
 endif
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

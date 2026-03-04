@@ -58,4 +58,4 @@ endif
 # [Pillow]
 DEPENDS += python/pillow
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

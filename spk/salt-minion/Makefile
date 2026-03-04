@@ -91,4 +91,4 @@ salt-minion_extra_install:
 	install -m 644 src/app/minion $(STAGING_DIR)/share
 	install -m 644 src/app/proxy $(STAGING_DIR)/share
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

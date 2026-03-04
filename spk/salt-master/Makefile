@@ -104,4 +104,4 @@ salt-master_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/extensions/auth
 	install -m 644 src/app/synology.py $(STAGING_DIR)/var/extensions/auth/synology.py
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

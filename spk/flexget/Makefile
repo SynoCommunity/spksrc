@@ -59,4 +59,4 @@ flexget_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/config.yml $(STAGING_DIR)/var/
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

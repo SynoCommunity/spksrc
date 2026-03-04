@@ -55,7 +55,7 @@ ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 export LIBICU_DATA_PACKAGING_MODE=files
 endif
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk
 
 .PHONY: znc_extra_install
 znc_extra_install:

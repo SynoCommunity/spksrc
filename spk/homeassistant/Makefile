@@ -57,7 +57,7 @@ DEPENDS += cross/libpcap
 # needs patch of opuslib to find libopus.so
 DEPENDS += cross/opus
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk
 
 # use python arch specific requirements file to download cross wheels from index
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
