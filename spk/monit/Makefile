@@ -1,6 +1,6 @@
 SPK_NAME = monit
-SPK_VERS = 5.34.4
-SPK_REV = 11
+SPK_VERS = 5.35.2
+SPK_REV = 12
 SPK_ICON = src/monit.png
 DSM_UI_DIR = app
 
@@ -8,12 +8,10 @@ DEPENDS = cross/monit
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-BETA = 1
-
 MAINTAINER = SynoCommunity
 DESCRIPTION = Monit is a small Open Source utility for managing and monitoring Unix systems. Monit conducts automatic maintenance and repair and can execute meaningful causal actions in error situations.
 DISPLAY_NAME = Monit
-CHANGELOG = "1. Update monit to v5.34.4 <br/>2. Update OpenSSL to v3.1.7."
+CHANGELOG = "1. Update monit to v5.35.2."
 
 HOMEPAGE = https://mmonit.com/monit
 LICENSE  = AGPLv3
