@@ -19,7 +19,7 @@ fi
 # Invoke shell function if available
 call_func()
 {
-    FUNC=$1
+    FUNC="$1"
     if type "${FUNC}" 2>/dev/null | grep -q 'function' 2>/dev/null; then
         echo "Begin ${FUNC}" >> "${LOG_FILE}"
         eval "${FUNC}" >> "${LOG_FILE}"
@@ -51,6 +51,8 @@ start_daemon()
                 OUT="${LOG_FILE}"
             fi
             if [ -n "${USER}" ] && [ -n "${SYNOPKG_DSM_VERSION_MAJOR}" ] && [ "$SYNOPKG_DSM_VERSION_MAJOR" -lt 6 ]; then
+                # DSM 5 and earlier: use su to switch user context
+                # DSM 6+: user is set by conf/privilege, no su needed
                 if [ -z "${SVC_CWD}" ]; then
                     SVC_CD=""
                 else
@@ -111,7 +113,7 @@ stop_daemon()
 daemon_status()
 {
     status=0
-    [ -z "${1}" ] && pid_list=$(cat "${PID_FILE}" 2>/dev/null) || pid_list=${1}
+    [ -z "${1}" ] && pid_list=$(cat "${PID_FILE}" 2>/dev/null) || pid_list="${1}"
     if [ -n "${pid_list}" ]; then
         for pid in ${pid_list}
         do
