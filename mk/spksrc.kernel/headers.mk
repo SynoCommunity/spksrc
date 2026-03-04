@@ -1,15 +1,30 @@
-### Configure rules
-#   Install kernel headers in $(INSTALL_PREFIX)/include/linux/<arch>-<version>/
+###############################################################################
+# spksrc.kernel/headers.mk
+#
+# Install kernel headers for building external modules.
+#
+# This file:
+#  - installs kernel headers under
+#      $(INSTALL_PREFIX)/include/linux/<arch>-<version>/
+#  - adjusts include paths for module builds
+#
 # Targets are executed in the following order:
 #  kernel_headers_msg_target
 #  pre_kernel_headers_target    (override with PRE_KERNEL_HEADERS_TARGET)
 #  kernel_headers_target        (override with KERNEL_HEADERS_TARGET)
 #  post_kernel_headers_target   (override with POST_KERNEL_HEADERS_TARGET)
+#
 # Variables:
-#  KERNEL_HEADERS          When set to 1 will install kernel headers
-#  KERNEL_HEADERS_ARGS     Currently unused, may be used at a later time
-#  KERNEL_ARCH             Kernel arch as define in kernel/syno-<arch>-<version>/Makefile
-#  NAME                    Refers to $(KERNEL_NAME) being syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+#   KERNEL_HEADERS        if set to 1, install kernel headers
+#   KERNEL_HEADERS_ARGS   currently unused
+#   KERNEL_ARCH           kernel architecture (from syno-<arch>-<version>/Makefile)
+#   NAME                  kernel name, defaults to $(KERNEL_NAME)
+#
+# Notes:
+#  - Targets are no-op if KERNEL_HEADERS != 1
+#  - Path adjustments ensure headers reference $(INSTALL_PREFIX)
+#
+###############################################################################
 
 KERNEL_HEADERS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)kernel_headers_done
 

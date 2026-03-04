@@ -116,6 +116,23 @@ do
     fi
 done
 
+# evaluate packages that require DSM 7.3
+min_dsm73_packages=
+has_min_dsm73_packages='false'
+for package in ${packages}
+do
+    if [ -f "./spk/${package}/Makefile" ]; then
+        if [ "$(grep REQUIRED_MIN_DSM ./spk/${package}/Makefile | cut -d= -f2 | xargs)" = "7.3" ]; then
+            min_dsm73_packages+="${package} "
+            has_min_dsm73_packages='true'
+        fi
+    fi
+done
+
+if [ "${has_min_dsm73_packages}" = "true" ]; then
+    echo "===> Min DSM 7.3 packages found: ${min_dsm73_packages}"
+fi
+
 # evaluate packages that require DSM 7.2
 min_dsm72_packages=
 has_min_dsm72_packages='false'

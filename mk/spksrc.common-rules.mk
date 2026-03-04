@@ -36,6 +36,6 @@ include ../../mk/spksrc.dependency-tree.mk
 include ../../mk/spksrc.generate-digests.mk
 
 ### For make kernel-required
-include ../../mk/spksrc.kernel-required.mk
+include ../../mk/spksrc.kernel/required.mk
 
 ###

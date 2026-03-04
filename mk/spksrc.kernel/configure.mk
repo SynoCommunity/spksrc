@@ -1,19 +1,52 @@
-### Configure rules
-#   Prepare the kernel sources to match target version and be ready for latest steps.
-# Targets are executed in the following order:
-#  kernel_configure_msg_target
-#  pre_kernel_configure_target    (override with PRE_KERNEL_CONFIGURE_TARGET)
-#  kernel_configure_target        (override with KERNEL_CONFIGURE_TARGET)
-#  post_kernel_configure_target   (override with POST_KERNEL_CONFIGURE_TARGET)
+###############################################################################
+# spksrc.kernel/configure.mk
+#
+# Defines kernel configuration rules.
+#
+# This file:
+#  - prepares kernel sources for module compilation
+#  - aligns ARCH and CROSS_COMPILE with toolchain settings
+#  - applies the selected kernel configuration
+#  - normalizes configuration symbols (oldconfig / olddefconfig)
+#  - exposes override hooks for custom configure steps
+#
+# Targets (execution order):
+#
+#   kernel_configure_msg
+#   pre_kernel_configure_target    (override: PRE_KERNEL_CONFIGURE_TARGET)
+#   kernel_configure_target        (override: KERNEL_CONFIGURE_TARGET)
+#   post_kernel_configure_target   (override: POST_KERNEL_CONFIGURE_TARGET)
+#
+# Main target:
+#
+#   kernel_configure
+#     └── guarded by KERNEL_CONFIGURE_COOKIE
+#
 # Variables:
-#  KERNEL_CONFIGURE_ARGS   Currently unused, may be used at a later time
-#  KERNEL_ARCH             Kernel arch as define in kernel/syno-<arch>-<version>/Makefile
-#  KERNEL_BASE_ARCH        Default kernel source arch directory
-#  KERNEL_CONFIG           Actual kernel configuration to use to build modules from
-#  NAME                    Refers to $(KERNEL_NAME) being syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
-#  TC_KERNEL               Exact kernel version as provided by toolchain configuration $(WORK_DIR)/tc_vars.mk
-#  TC_PATH                 Arch toolchain path as provided in $(WORK_DIR)/tc_vars.mk
-#  TC_PREFIX               Arch triplet bineg used as prefix for toolchain compilers & tools
+#
+#   KERNEL_CONFIGURE_ARGS   Reserved (currently unused)
+#   KERNEL_ARCH             Target kernel ARCH value
+#   KERNEL_BASE_ARCH        Default arch directory in source tree
+#   KERNEL_CONFIG           Kernel .config used for module builds
+#   NAME                    syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+#
+# Toolchain variables (from tc_vars.mk):
+#
+#   TC_KERNEL               Exact kernel version from toolchain
+#   TC_PATH                 Toolchain binary path
+#   TC_PREFIX               Toolchain triplet prefix
+#
+# Behavior notes:
+#
+#  - Updates kernel Makefile ARCH and CROSS_COMPILE
+#  - Adds "+" to EXTRAVERSION for kernels >= 4.4
+#  - Uses:
+#       oldconfig     for kernels < 3.8
+#       olddefconfig  for kernels >= 3.8
+#  - Calls "make kernelversion" for kernels >= 3.0
+#  - Ensures arch/$(KERNEL_ARCH) symlink exists
+#
+###############################################################################
 
 KERNEL_CONFIGURE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)kernel_configure_done
 

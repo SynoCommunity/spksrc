@@ -17,6 +17,16 @@ on:
         required: false
         default: true
         type: boolean
+      add_noarch_dsm73_builds:
+        description: 'Include noarch DSM 7.3 packages'
+        required: false
+        default: false
+        type: boolean
+      add_dsm73_builds:
+        description: 'Include DSM 7.3 archs'
+        required: false
+        default: false
+        type: boolean
       add_noarch_dsm72_builds:
         description: 'Include noarch DSM 7.2 packages'
         required: false
@@ -194,6 +204,12 @@ jobs:
             # Enable noarch builds if noarch packages exist
             add_noarch_builds=$([ "$has_noarch_packages" == "true" ] && echo "true" || echo "false")
 
+            # Enable noarch DSM 7.3 builds if noarch packages exist and minimum DSM 7.3 requirements are met
+            add_noarch_dsm73_builds=$([ "$has_noarch_packages" == "true" ] && [ "$has_min_dsm73_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable DSM 7.3 builds if arch packages exist and minimum DSM 7.3 requirements are met
+            add_dsm73_builds=$([ "$has_arch_packages" == "true" ] && [ "$has_min_dsm73_packages" == "true" ] && echo "true" || echo "false")
+
             # Enable noarch DSM 7.2 builds if noarch packages exist and minimum DSM 7.2 requirements are met
             add_noarch_dsm72_builds=$([ "$has_noarch_packages" == "true" ] && [ "$has_min_dsm72_packages" == "true" ] && echo "true" || echo "false")
 
@@ -221,6 +237,18 @@ jobs:
             add_to_matrix "noarch-3.1"
             add_to_matrix "noarch-6.1"
             add_to_matrix "noarch-7.0"
+          fi
+
+          # Add noarch DSM 7.3 builds
+          if [ "$add_noarch_dsm73_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
+            add_to_matrix "noarch-7.3"
+          fi
+
+          # Add DSM 7.3 builds
+          if [ "$add_dsm73_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x64-7.3"
+            add_to_matrix "aarch64-7.3"
+            add_to_matrix "armv7-7.3"
           fi
 
           # Add noarch DSM 7.2 builds
