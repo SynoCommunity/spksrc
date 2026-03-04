@@ -5,7 +5,7 @@ const path = require('path');
 const WebSocket = require('ws');
 
 const STOCKFISH_PATH = process.env.STOCKFISH_PATH || '/var/packages/stockfish/target/bin/stockfish';
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8300;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 // Serve static files
