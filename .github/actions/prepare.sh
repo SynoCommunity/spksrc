@@ -48,6 +48,18 @@ fi
 # remove duplicate packages
 packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
+# Remove BROKEN packages (not present in dependency list)
+filtered_packages=
+for package in ${packages}
+do
+    if grep -q "^${package}:" "${DEPENDENCY_LIST}"; then
+        filtered_packages+="${package} "
+    else
+        echo "===> Skipping BROKEN or invalid package: ${package}"
+    fi
+done
+packages=$(echo "${filtered_packages}" | xargs)
+
 # for ffmpeg v5-7 find all packages that depend on them
 for i in {5..7}; do
     ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_PACKAGE = ffmpeg${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
