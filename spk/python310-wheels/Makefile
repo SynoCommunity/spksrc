@@ -46,7 +46,7 @@ endif
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
-# spksrc.wheel-env.mk or spksrc.python.mk
+# spksrc.wheel-env.mk or spksrc.spk-python.mk
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
