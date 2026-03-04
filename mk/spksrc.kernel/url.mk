@@ -54,6 +54,9 @@ kernel-build = \
 kernel-type = \
   $(word 3,$(subst :, ,$(call kernel-map,$(1))))
 
+kernel-type-lc = \
+  $(shell printf '%s' "$(call kernel-type,$(1))" | tr A-Z a-z)
+
 kernel-url = \
   $(word 4,$(subst :, ,$(call kernel-map,$(1))))
 
@@ -64,4 +67,4 @@ kernel-download-url = \
 
 KERNEL_URL_MAP = \
     global.synologydownload.com:download/ToolChain/Synology%20NAS%20GPL%20Source/$(KERNEL_URL_VERSION)-$(KERNEL_BUILD)/$(KERNEL_URL_DIR) \
-    github.com/SynoCommunity/spksrc:releases/download/kernels%2F$(shell printf '%s' "$(call kernel-type,$(KERNEL_VERS))" | tr A-Z a-z)$(KERNEL_VERS)
+    github.com/SynoCommunity/spksrc:releases/download/kernels%2F$(call kernel-type-lc,$(KERNEL_VERS))$(KERNEL_VERS)
