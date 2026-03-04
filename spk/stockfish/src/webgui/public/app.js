@@ -32,10 +32,16 @@ function playSound(type) {
 
 // Piece images for captured display
 const pieceImages = {
-    p: 'img/pieces/bP.png', n: 'img/pieces/bN.png', b: 'img/pieces/bB.png',
-    r: 'img/pieces/bR.png', q: 'img/pieces/bQ.png',
-    P: 'img/pieces/wP.png', N: 'img/pieces/wN.png', B: 'img/pieces/wB.png',
-    R: 'img/pieces/wR.png', Q: 'img/pieces/wQ.png'
+    p: 'img/pieces/bP.png',
+    n: 'img/pieces/bN.png',
+    b: 'img/pieces/bB.png',
+    r: 'img/pieces/bR.png',
+    q: 'img/pieces/bQ.png',
+    P: 'img/pieces/wP.png',
+    N: 'img/pieces/wN.png',
+    B: 'img/pieces/wB.png',
+    R: 'img/pieces/wR.png',
+    Q: 'img/pieces/wQ.png'
 };
 
 // WebSocket connection
@@ -160,7 +166,7 @@ function showPromotionDialog(color) {
     const prefix = color === 'w' ? 'w' : 'b';
     piecesDiv.innerHTML = ['q','r','b','n'].map(p => `
         <div class="promo-piece" data-piece="${p}">
-            <img src="img/pieces/${prefix}${p.toUpperCase()}.png" alt="${p}">
+            <img src="img/pieces/${colorPrefix}${p.toUpperCase()}.png" alt="${p}">
         </div>
     `).join('');
     modal.classList.add('active');
@@ -330,9 +336,12 @@ function copyFEN() {
 // Initialize
 $(document).ready(() => {
     board = Chessboard('board', {
-        draggable: true, position: 'start',
+        draggable: true,
+        position: 'start',
         pieceTheme: 'img/pieces/{piece}.png',
-        onDragStart, onDrop, onSnapEnd
+        onDragStart: onDragStart,
+        onDrop: onDrop,
+        onSnapEnd: onSnapEnd
     });
     connectWS();
     updateDisplay();
@@ -388,7 +397,10 @@ $(document).ready(() => {
     document.getElementById('selfPlay').onchange = (e) => {
         selfPlayMode = e.target.checked;
         document.getElementById('playerColor').disabled = selfPlayMode;
-        if (selfPlayMode && !game.game_over() && !isThinking) engineMove();
+        if (!game.game_over() && !isThinking) {
+            const isEngineTurn = selfPlayMode || (playerColor === "w" && game.turn() === "b") || (playerColor === "b" && game.turn() === "w");
+            if (isEngineTurn) engineMove();
+        }
     };
 
     $(window).resize(() => board.resize());
