@@ -11,7 +11,7 @@ REQUIRE_KERNEL_MODULE += CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides Synology kernel CD-ROM drivers cdrom.ko and sr_mod.ko."
-CHANGELOG = "Add support for Linux 5.x kernels."
+CHANGELOG = "Add DSM-7.3 support."
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 # we only have ipq806x for SRM 1.2, but this fails with:
