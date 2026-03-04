@@ -38,7 +38,7 @@ POST_STRIP_TARGET = sickchill_extra_install
 # [cryptography]
 DEPENDS += cross/openssl3
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk
 
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)

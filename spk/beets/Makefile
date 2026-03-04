@@ -70,4 +70,4 @@ DEPENDS += python/numpy_1.26
 # [lap] - depends on [numpy]
 DEPENDS += python/lap
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk

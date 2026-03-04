@@ -7,7 +7,7 @@ SPK_ICON = src/borgbackup.png
 include ../../mk/spksrc.common.mk
 
 # Build for ARMv5 and ARMv7L using Python 3.11; all others use Python 3.12
-# This must be set BEFORE including spksrc.python.mk to avoid adding
+# This must be set BEFORE including spksrc.spk-python.mk to avoid adding
 # ARMv5 to UNSUPPORTED_ARCHS when using python312
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),)
 PYTHON_PACKAGE = python311
@@ -72,11 +72,11 @@ POST_SERVICE_TARGET = borgbackup_extra_install
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
-# spksrc.wheel-env.mk or spksrc.python.mk
+# spksrc.wheel-env.mk or spksrc.spk-python.mk
 ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"

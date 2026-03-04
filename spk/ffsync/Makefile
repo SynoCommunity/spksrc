@@ -43,7 +43,7 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 POST_STRIP_TARGET = ffsync_extra_install
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk
 
 # [greenlet]
 # version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support

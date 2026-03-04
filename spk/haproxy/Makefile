@@ -33,7 +33,7 @@ WIZARDS_DIR = src/wizard/
 
 POST_STRIP_TARGET = haproxy_extra_install
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk
 
 .PHONY: haproxy_extra_install
 haproxy_extra_install:
