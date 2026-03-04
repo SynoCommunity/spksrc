@@ -64,5 +64,4 @@ kernel-download-url = \
 
 KERNEL_URL_MAP = \
     global.synologydownload.com:download/ToolChain/Synology%20NAS%20GPL%20Source/$(KERNEL_URL_VERSION)-$(KERNEL_BUILD)/$(KERNEL_URL_DIR) \
-    github.com/SynoCommunity/spksrc:releases/download/kernels%2F$(shell printf '%s' "$(call kernel-type,$(KERNEL_VERS))" | tr A-Z a-z)$(KERNEL_VERS) \
-    sourceforge.net:projects/dsgpl/files/Synology%20NAS%20GPL%20Source/$(KERNEL_BUILD)branch/$(KERNEL_URL_DIR)
+    github.com/SynoCommunity/spksrc:releases/download/kernels%2F$(shell printf '%s' "$(call kernel-type,$(KERNEL_VERS))" | tr A-Z a-z)$(KERNEL_VERS)
