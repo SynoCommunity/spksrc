@@ -35,10 +35,10 @@ USE_ALTERNATE_TMPDIR = 1
 
 POST_STRIP_TARGET = sickchill_extra_install
 
+include ../../mk/spksrc.common.mk
+
 # [cryptography]
 DEPENDS += cross/openssl3
-
-include ../../mk/spksrc.common.mk
 
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
@@ -64,4 +64,4 @@ endif
 sickchill_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

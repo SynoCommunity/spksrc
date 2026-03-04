@@ -61,4 +61,4 @@ DEPENDS += cross/libyaml
 #   - To be built last
 DEPENDS += python/duplicity
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

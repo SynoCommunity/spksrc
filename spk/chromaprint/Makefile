@@ -22,4 +22,4 @@ LICENSE    = LGPL2.1+
 
 SPK_COMMANDS = bin/fpcalc
 
-include ../../mk/spksrc.ffmpeg.mk
+include ../../mk/spksrc.spk-ffmpeg.mk

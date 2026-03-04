@@ -34,16 +34,16 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+POST_STRIP_TARGET = ffsync_extra_install
+
+include ../../mk/spksrc.common.mk
+
 # [cryptography]
 DEPENDS += cross/openssl3
 
 # [mysqlclient]
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
-
-POST_STRIP_TARGET = ffsync_extra_install
-
-include ../../mk/spksrc.common.mk
 
 # [greenlet]
 # version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
@@ -65,4 +65,4 @@ ffsync_extra_install:
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib:/var/packages/$(PYTHON_PACKAGE)/target/lib $(STAGING_DIR)/bin/syncserver
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/diesel
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk
