@@ -26,7 +26,7 @@
 #  status      : echo status to logging facility
 #  rustc       : install rust toolchain components
 #  depend      : resolve and build toolchain dependencies (if any)
-#  tcvars      : generate tc_vars*.mk files for spksrc.cross-env.mk
+#  tcvars      : generate tc_vars*.mk files for spksrc.cross/env-default.mk
 #
 # Variables:
 #  TC_NAME           : Toolchain name (optional, used with generic archs)
@@ -113,13 +113,13 @@ endif
 #####
 
 # Common directories
-include ../../mk/spksrc.directories.mk
+include ../../mk/spksrc.common/directories.mk
 
 ### Include common definitions
 include ../../mk/spksrc.common.mk
 
 ### Include common rules
-include ../../mk/spksrc.common-rules.mk
+include ../../mk/spksrc.rules.mk
 
 #####
 
@@ -153,29 +153,29 @@ endif
 
 #####
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/depend.mk
 
 include ../../mk/spksrc.toolchain/tc-base.mk
 include ../../mk/spksrc.toolchain/tc-flags.mk
 include ../../mk/spksrc.toolchain/tc-url.mk
 include ../../mk/spksrc.toolchain/tc-versions.mk
 
-include ../../mk/spksrc.status.mk
+include ../../mk/spksrc.rules/status.mk
 
 download:
-include ../../mk/spksrc.download.mk
+include ../../mk/spksrc.build/download.mk
 
 checksum: download
-include ../../mk/spksrc.checksum.mk
+include ../../mk/spksrc.build/checksum.mk
 
 extract: checksum
-include ../../mk/spksrc.extract.mk
+include ../../mk/spksrc.build/extract.mk
 
 normalize: extract
 include ../../mk/spksrc.toolchain/tc-normalize.mk
 
 patch: normalize
-include ../../mk/spksrc.patch.mk
+include ../../mk/spksrc.build/patch.mk
 
 rustc: patch
 include ../../mk/spksrc.toolchain/tc-rust.mk
@@ -217,4 +217,4 @@ toolchain: ;
 endif
 
 ### For make digests
-include ../../mk/spksrc.generate-digests.mk
+include ../../mk/spksrc.rules/generate-digests.mk

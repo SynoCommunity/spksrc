@@ -36,7 +36,7 @@ USE_ALTERNATE_TMPDIR = 1
 # [frozendict]
 WHEELS_CFLAGS = [frozendict] --std=c99
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk
 
 .PHONY: octoprint_extra_install
 octoprint_extra_install:

@@ -55,7 +55,7 @@
 # │                          cross-stage2                                │
 # │  (package build using cross-env)                                     │
 # │                                                                      │
-# │   spksrc.cross-env.mk                                                │
+# │   spksrc.cross/env-default.mk                                        │
 # │        │                                                             │
 # │        ├─ loads tc_vars.mk (always)                                  │
 # │        ├─ loads tc_vars.<env>.mk based on DEFAULT_ENV                │
@@ -99,43 +99,43 @@ endif
 .DEFAULT_GOAL := all
 
 # Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
+include ../../mk/spksrc.common/directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
 #####
 
-include ../../mk/spksrc.pre-check.mk
+include ../../mk/spksrc.rules/pre-check.mk
 
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.download.mk
+include ../../mk/spksrc.build/download.mk
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/depend.mk
 
-include ../../mk/spksrc.status.mk
+include ../../mk/spksrc.rules/status.mk
 
 checksum: download
-include ../../mk/spksrc.checksum.mk
+include ../../mk/spksrc.build/checksum.mk
 
 extract: checksum depend status
-include ../../mk/spksrc.extract.mk
+include ../../mk/spksrc.build/extract.mk
 
 patch: extract
-include ../../mk/spksrc.patch.mk
+include ../../mk/spksrc.build/patch.mk
 
 configure: patch
-include ../../mk/spksrc.configure.mk
+include ../../mk/spksrc.build/configure.mk
 
 compile: configure
-include ../../mk/spksrc.compile.mk
+include ../../mk/spksrc.build/compile.mk
 
 install: compile
-include ../../mk/spksrc.install.mk
+include ../../mk/spksrc.build/install.mk
 
 plist: install
-include ../../mk/spksrc.plist.mk
+include ../../mk/spksrc.build/plist.mk
 
 #####
 
@@ -187,6 +187,6 @@ all:
 ####
 
 ### For arch-* and all-<supported|latest>
-include ../../mk/spksrc.supported.mk
+include ../../mk/spksrc.rules/supported.mk
 
 ####

@@ -22,4 +22,4 @@ SERVICE_SETUP = src/service-setup.sh
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/hg
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk

@@ -59,9 +59,9 @@ TCVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)tcvars_done
 
 # Include cross-compilation definitions
 # (provides arch-specific variables for toolchain generation)
-include ../../mk/spksrc.cross-cmake-env.mk
-include ../../mk/spksrc.cross-meson-env.mk
-include ../../mk/spksrc.cross-rust-env.mk
+include ../../mk/spksrc.cross/env-cmake.mk
+include ../../mk/spksrc.cross/env-meson.mk
+include ../../mk/spksrc.cross/env-rust.mk
 
 #####
 

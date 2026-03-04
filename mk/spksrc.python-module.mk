@@ -82,4 +82,4 @@ all: install fix_shebang_python_module
 include ../../mk/spksrc.crossenv.mk
 
 ## python wheel specific configurations
-include ../../mk/spksrc.wheel-env.mk
+include ../../mk/spksrc.wheel/env.mk

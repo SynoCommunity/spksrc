@@ -243,13 +243,31 @@ CONFIGURE_ARGS += --cpu=atom
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+
 # Dependencies provided by synocli-videodriver
 # If built outside spksrc.videodriver.mk
 ifeq ($(wildcard $(VIDEODRV_STAGING_PREFIX)),)
 DEPENDS += cross/libva cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
 DEPENDS += cross/intel-media-driver cross/intel-mediasdk
+
+ifeq ($(call version_ge, ${TCVERSION}, 7),1)
+# Enable OpenCL only on DSM >= 7.1
+DEPENDS += cross/intel-compute-runtime
+DEPENDS += cross/clinfo
+
+# Enable Vulkan only on DSM >= 7.1
+DEPENDS += cross/mesa
+DEPENDS += cross/Khronos-Vulkan-Loader
+DEPENDS += cross/Khronos-Vulkan-Tools
+
+# Enable intel_gpu_top on DSM >= 7.1
+DEPENDS += cross/intel-gpu-tools
+
+# Enable Intel libVPL only on DSM 7
 DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
+endif
+
 endif
 CONFIGURE_ARGS += --arch=x86_64
 CONFIGURE_ARGS += --enable-libdrm

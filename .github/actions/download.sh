@@ -81,7 +81,7 @@ else
         current="spk/${pkg}"
         echo "  -> ${current}: download-wheels"
         # Wheels don't have checksum verification, so no retry needed
-        make -C "${current}" download-wheels
+        make -C "${current}" download-wheels || true
     done
 fi
 

@@ -49,7 +49,7 @@ BUILD_DEPENDS += cross/$(FFMPEG_PACKAGE)
 CMAKE_RPATH =
 endif
 
-include ../../mk/spksrc.videodriver.mk
+include ../../mk/spksrc.spk-videodriver.mk
 
 .PHONY: ffmpeg_pre_depend
 

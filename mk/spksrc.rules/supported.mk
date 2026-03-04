@@ -1,7 +1,7 @@
 ####
 
 ### Include common rules
-include ../../mk/spksrc.common-rules.mk
+include ../../mk/spksrc.rules.mk
 
 
 ###

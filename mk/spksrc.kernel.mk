@@ -4,10 +4,10 @@ default: all
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
+include ../../mk/spksrc.common/directories.mk
 
 # Common kernel variables
-include ../../mk/spksrc.kernel-flags.mk
+include ../../mk/spksrc.kernel/flags.mk
 
 # Configure the included makefiles
 NAME          = $(KERNEL_NAME)
@@ -49,18 +49,18 @@ TC ?= syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
 
 #####
 
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.download.mk
+include ../../mk/spksrc.build/download.mk
 
 checksum: download
-include ../../mk/spksrc.checksum.mk
+include ../../mk/spksrc.build/checksum.mk
 
 extract: checksum
-include ../../mk/spksrc.extract.mk
+include ../../mk/spksrc.build/extract.mk
 
 patch: extract
-include ../../mk/spksrc.patch.mk
+include ../../mk/spksrc.build/patch.mk
 
 kernel_configure: patch
 include ../../mk/spksrc.cross-kernel-configure.mk
@@ -72,10 +72,10 @@ install: kernel_module
 include ../../mk/spksrc.cross-kernel-headers.mk
 
 install: kernel_headers
-include ../../mk/spksrc.install.mk
+include ../../mk/spksrc.build/install.mk
 
 plist: install
-include ../../mk/spksrc.plist.mk
+include ../../mk/spksrc.build/plist.mk
 
 .PHONY: kernel_post_extract_target
 kernel_post_extract_target:
@@ -84,4 +84,4 @@ kernel_post_extract_target:
 all: install plist
 
 # Common rules makefiles
-include ../../mk/spksrc.common-rules.mk
+include ../../mk/spksrc.rules.mk

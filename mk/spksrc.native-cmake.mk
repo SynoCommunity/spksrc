@@ -17,13 +17,13 @@ DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 # Setup common directories
-include ../../mk/spksrc.directories.mk
+include ../../mk/spksrc.common/directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
 # cmake specific configurations
-include ../../mk/spksrc.native-cmake-env.mk
+include ../../mk/spksrc.native/env-cmake.mk
 
 #####
 
@@ -43,7 +43,7 @@ CMAKE_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-include ../../mk/spksrc.ninja.mk
+include ../../mk/spksrc.build/ninja.mk
 else
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)

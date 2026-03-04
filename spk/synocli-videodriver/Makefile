@@ -17,10 +17,7 @@ UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 SERVICE_USER = auto
 VIDEODRIVER = on
 
-SPK_COMMANDS  = bin/clinfo
-SPK_COMMANDS += bin/vainfo
-SPK_COMMANDS += bin/vulkaninfo
-SPK_COMMANDS += bin/lsgpu
+SPK_COMMANDS  = bin/vainfo
 
 DEPENDS  = cross/libva cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
@@ -41,12 +38,17 @@ ifeq ($(call version_ge, ${TCVERSION}, 7.1),1)
 # Enable OpenCL only on DSM >= 7.1
 DEPENDS += cross/intel-compute-runtime
 DEPENDS += cross/clinfo
+SPK_COMMANDS += bin/clinfo
+
+# Enable Vulkan only on DSM >= 7.1
 DEPENDS += cross/mesa
 DEPENDS += cross/Khronos-Vulkan-Loader
 DEPENDS += cross/Khronos-Vulkan-Tools
+SPK_COMMANDS += bin/vulkaninfo
 
 # Enable intel_gpu_top on DSM >= 7.1
 DEPENDS += cross/intel-gpu-tools
+SPK_COMMANDS += bin/lsgpu
 
 endif
 

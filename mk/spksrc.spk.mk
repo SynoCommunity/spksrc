@@ -57,7 +57,7 @@ endif
 endif
 
 # Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
+include ../../mk/spksrc.common/directories.mk
 
 ifeq ($(ARCH),noarch)
 ifneq ($(strip $(TCVERSION)),)
@@ -104,22 +104,22 @@ DEFAULT_ENV = none
 
 #####
 
-include ../../mk/spksrc.pre-check.mk
+include ../../mk/spksrc.rules/pre-check.mk
 
 # Even though this makefile doesn't cross compile,
 # we need this to setup the cross environment.
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/depend.mk
 
 copy: depend
 include ../../mk/spksrc.wheel.mk
 
 copy: wheel
-include ../../mk/spksrc.copy.mk
+include ../../mk/spksrc.spk/copy.mk
 
 strip: copy
-include ../../mk/spksrc.strip.mk
+include ../../mk/spksrc.spk/strip.mk
 
 
 # Scripts
@@ -159,7 +159,7 @@ include ../../mk/spksrc.service.mk
 
 icon: strip
 ifneq ($(strip $(SPK_ICON)),)
-include ../../mk/spksrc.icon.mk
+include ../../mk/spksrc.spk/icon.mk
 endif
 
 ifeq ($(strip $(MAINTAINER)),)
@@ -415,7 +415,7 @@ wizards:
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@$(MSG) "Create default DSM7 uninstall wizard"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $(SPKSRC_MK)wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(SPKSRC_MK)/wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 ifeq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
@@ -625,9 +625,9 @@ pythoncleanall: pythonclean
 	rm -fr work-*/[Pp]ython* work-*/.python*
 
 ### For managing make all-<supported|latest>
-include ../../mk/spksrc.supported.mk
+include ../../mk/spksrc.rules/supported.mk
 
 ### For managing make publish-all-<supported|latest>
-include ../../mk/spksrc.publish.mk
+include ../../mk/spksrc.spk/publish.mk
 
 ###

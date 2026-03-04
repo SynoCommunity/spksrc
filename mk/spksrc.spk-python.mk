@@ -80,7 +80,7 @@ PRE_DEPEND_TARGET += python_pre_depend
 endif
 
 ifneq ($(FFMPEG_PACKAGE),)
-include ../../mk/spksrc.ffmpeg.mk
+include ../../mk/spksrc.spk-ffmpeg.mk
 else
 include ../../mk/spksrc.spk.mk
 endif
