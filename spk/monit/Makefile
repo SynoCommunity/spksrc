@@ -6,7 +6,8 @@ DSM_UI_DIR = app
 
 DEPENDS = cross/monit
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+# Monit 5.35+ requires C11 stdatomic.h (GCC 4.9+)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Monit is a small Open Source utility for managing and monitoring Unix systems. Monit conducts automatic maintenance and repair and can execute meaningful causal actions in error situations.
