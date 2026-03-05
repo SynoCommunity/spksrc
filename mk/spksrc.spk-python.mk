@@ -53,6 +53,9 @@
 #   - Hooks into PRE_DEPEND_TARGET via python_pre_depend.
 #   - Designed to be transparent to package Makefiles.
 #
+# TODO TODO TODO TODO
+# Manage SPK_DEPEND
+#
 ###############################################################################
 
 # Set default python package name
@@ -97,7 +100,8 @@ endif
 # used to access python package provide libraries at destination
 ifneq ($(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)),)
 
-# Only apply flags if we are in spk-stage2
+# Only apply flags if we are in build stage2 as
+# usage of += will duplicate values per make calls
 ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
 export ADDITIONAL_CFLAGS    += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CPPFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
@@ -147,7 +151,9 @@ endif
 # re-inject either:
 #    - python dependencies for inclusion in-app spk package; or
 #    - filtered libraries to be processed first
+ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
 DEPENDS := $(PYTHON_DEPENDS) $(PYTHON_FILTERED_DEPENDS) $(DEPENDS)
+endif
 
 ifneq ($(FFMPEG_PACKAGE),)
 include ../../mk/spksrc.spk-ffmpeg.mk
