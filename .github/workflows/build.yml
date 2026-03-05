@@ -594,7 +594,7 @@ jobs:
       - name: Upload Diagnostic Logs
         if: always()
         continue-on-error: true
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Diagnostics-${{ matrix.arch }}
           path: |
@@ -613,7 +613,7 @@ jobs:
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Packages for ${{ matrix.arch }}
           path: packages/*.spk
