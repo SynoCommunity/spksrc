@@ -50,4 +50,4 @@ SPK_COMMANDS += bin/byobu-tmux
 SPK_COMMANDS += bin/byobu-ugraph
 SPK_COMMANDS += bin/byobu-ulevel
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk

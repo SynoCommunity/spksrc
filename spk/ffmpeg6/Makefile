@@ -32,7 +32,7 @@ SPK_DEPENDS = "synocli-videodriver"
 SERVICE_SETUP = src/service-setup.sh
 endif
 
-include ../../mk/spksrc.videodriver.mk
+include ../../mk/spksrc.spk-videodriver.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:

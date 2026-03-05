@@ -34,7 +34,7 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 SPK_DEPENDS = "synocli-videodriver"
 endif
 
-include ../../mk/spksrc.videodriver.mk
+include ../../mk/spksrc.spk-videodriver.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:

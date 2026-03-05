@@ -64,7 +64,7 @@ else
 WHEELS += orjson==3.11.3
 endif
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-python.mk
 
 # prefer native python tools (pip, maturin, ...) used for orjson
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
