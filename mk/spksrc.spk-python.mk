@@ -96,6 +96,9 @@ endif
 # set build flags including ld to rewrite for the library path
 # used to access python package provide libraries at destination
 ifneq ($(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)),)
+
+# Only apply flags if we are in spk-stage2
+ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
 export ADDITIONAL_CFLAGS    += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CPPFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CXXFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
@@ -114,6 +117,7 @@ export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(OPENSSL_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(OPENSSL_INSTALL_PREFIX)/lib
+endif
 endif
 
 # Re-use all default python mandatory libraries (with exception of bzip2, xz, zlib)
