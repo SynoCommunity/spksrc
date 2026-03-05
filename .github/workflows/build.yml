@@ -12,23 +12,8 @@ on:
         description: 'Package to build'
         required: true
         default: 'adminer'
-      add_noarch_builds:
-        description: 'Include noarch packages'
-        required: false
-        default: true
-        type: boolean
-      add_noarch_dsm73_builds:
-        description: 'Include noarch DSM 7.3 packages'
-        required: false
-        default: false
-        type: boolean
       add_dsm73_builds:
         description: 'Include DSM 7.3 archs'
-        required: false
-        default: false
-        type: boolean
-      add_noarch_dsm72_builds:
-        description: 'Include noarch DSM 7.2 packages'
         required: false
         default: false
         type: boolean
@@ -59,6 +44,21 @@ on:
         type: boolean
       add_srm12_builds:
         description: 'Include SRM 1.2 archs'
+        required: false
+        default: false
+        type: boolean
+      add_noarch_builds:
+        description: 'Include noarch packages'
+        required: false
+        default: true
+        type: boolean
+      add_noarch_dsm73_builds:
+        description: 'Include noarch DSM 7.3 packages'
+        required: false
+        default: false
+        type: boolean
+      add_noarch_dsm72_builds:
+        description: 'Include noarch DSM 7.2 packages'
         required: false
         default: false
         type: boolean
