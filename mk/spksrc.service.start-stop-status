@@ -91,7 +91,7 @@ stop_daemon()
         do
             if [ -z "${SVC_QUIET}" ]; then
                 date >> "${LOG_FILE}"
-                echo "Stopping ${DNAME} service : $(ps -p"${pid}" -o comm=) (${pid})" >> "${LOG_FILE}"
+                echo "Stopping ${DNAME} service : $(ps -p "${pid}" -o comm=) (${pid})" >> "${LOG_FILE}"
             fi
             kill -TERM "${pid}" >> "${LOG_FILE}" 2>&1
             wait_for_status 1 "${SVC_WAIT_TIMEOUT:=20}" "${pid}" || kill -KILL "${pid}" >> "${LOG_FILE}" 2>&1
