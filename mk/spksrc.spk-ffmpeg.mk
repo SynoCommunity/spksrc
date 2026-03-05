@@ -47,6 +47,9 @@
 #   - Hooks into PRE_DEPEND_TARGET via ffmpeg_pre_depend.
 #   - Compatible with spksrc.spk.mk and spksrc.spk-videodriver.mk.
 #
+# TODO TODO TODO TODO
+# Manage SPK_DEPEND
+#
 ###############################################################################
 
 # Set default ffmpeg package name
@@ -83,6 +86,10 @@ endif
 # set build flags including ld to rewrite for the library path
 # used to access ffmpeg package provide libraries at destination
 ifneq ($(wildcard $(FFMPEG_STAGING_INSTALL_PREFIX)),)
+
+# Only apply flags if we are in build stage2 as
+# usage of += will duplicate values per make calls
+ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
 export ADDITIONAL_CFLAGS   += -I$(FFMPEG_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CPPFLAGS += -I$(FFMPEG_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CXXFLAGS += -I$(FFMPEG_STAGING_INSTALL_PREFIX)/include
@@ -101,7 +108,7 @@ FFMPEG_LIBS += libpostproc.pc
 FFMPEG_LIBS += libavutil.pc
 FFMPEG_LIBS += libswresample.pc
 FFMPEG_LIBS += libswscale.pc
-
+endif
 
 # Link .ffmpeg-*_done status cookies
 FFMPEG_STATUS_COOKIES := $(wildcard $(FFMPEG_PACKAGE_WORK_DIR)/.ffmpeg-*_done)
@@ -118,10 +125,11 @@ endif
 # end ifeq FFMPEG_PACKAGE_WORK_DIR
 endif
 
-
 # re-inject either:
 #    - ffmpeg dependencies for inclusion in-app spk package; or
+ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
 DEPENDS := $(FFMPEG_DEPENDS) $(DEPENDS)
+endif
 
 ifneq ($(VIDEODRV_PACKAGE),)
 include ../../mk/spksrc.spk-videodriver.mk

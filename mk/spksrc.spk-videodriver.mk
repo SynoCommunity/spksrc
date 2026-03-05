@@ -51,6 +51,9 @@
 #   - Hooks into PRE_DEPEND_TARGET via videodrv_pre_depend.
 #   - Designed to be transparent to package Makefiles.
 #
+# TODO TODO TODO TODO
+# Manage SPK_DEPEND
+#
 ###############################################################################
 
 # Set default videodriver package name
@@ -114,6 +117,10 @@ endif
 # set build flags including ld to rewrite for the library path
 # used to access videodrv package provide libraries at destination
 ifneq ($(wildcard $(VIDEODRV_STAGING_INSTALL_PREFIX)),)
+
+# Only apply flags if we are in build stage2 as
+# usage of += will duplicate values per make calls
+ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
 export ADDITIONAL_CFLAGS   += -I$(VIDEODRV_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CPPFLAGS += -I$(VIDEODRV_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CXXFLAGS += -I$(VIDEODRV_STAGING_INSTALL_PREFIX)/include
@@ -123,6 +130,7 @@ export ADDITIONAL_LDFLAGS  += -Wl,--rpath,$(VIDEODRV_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(VIDEODRV_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(VIDEODRV_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(VIDEODRV_INSTALL_PREFIX)/lib
+endif
 
 VIDEODRV_LIBS_EXCLUDE = %bzip2.pc %lzma.pc %zlib.pc
 VIDEODRV_DEPENDS_EXCLUDE = bzip2 xz zlib
@@ -149,7 +157,9 @@ endif
 # re-inject either:
 #    - videodrv dependencies for inclusion in-app spk package; or
 #    - filtered libraries to be processed first
+ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
 DEPENDS := $(VIDEODRV_DEPENDS) $(VIDEODRV_FILTERED_DEPENDS) $(DEPENDS)
+endif
 
 include ../../mk/spksrc.spk.mk
 
