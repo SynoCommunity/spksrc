@@ -18,10 +18,11 @@ CFG_FILE="${SYNOPKG_PKGVAR}/dnscrypt-proxy.toml"
 MONITORING_PORT="8153"  # Web UI for monitoring DNS queries
 BACKUP_PORT="10053"     # Used when DHCP server occupies port 53
 
-# Detect OS type: DSM (DiskStation) vs SRM (Router)
-# SRM devices have model names in uname output
-case "$(uname -a)" in
-    *rt1900ac*|*rt2600ac*|*mr2200ac*) OS="srm" ;;
+# Detect OS type: DSM (DiskStation Manager) vs SRM (Synology Router Manager)
+# SRM uses productversion < 3.0 (e.g., 1.2.x), DSM uses >= 6.0
+productversion=$(grep '^productversion=' /etc.defaults/VERSION | cut -d= -f2 | tr -d '"')
+case "${productversion%%.*}" in
+    [012]) OS="srm" ;;
     *) OS="dsm" ;;
 esac
 
