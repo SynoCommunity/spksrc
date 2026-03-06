@@ -1,0 +1,8 @@
+# Example monit configuration for Sonarr
+# Copy to /var/packages/monit/var/monit.d/ and adjust as needed
+
+check process Sonarr with pidfile /var/packages/sonarr/var/sonarr.pid
+    start program = "/var/packages/sonarr/scripts/start-stop-status start"
+    stop program  = "/var/packages/sonarr/scripts/start-stop-status stop"
+    if failed host localhost port 8989 for 2 cycles then restart
+    if 3 restarts within 5 cycles then timeout
