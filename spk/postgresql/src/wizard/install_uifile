@@ -1,0 +1,33 @@
+[{
+    "step_title": "PostgreSQL",
+    "items": [{
+        "desc": "Create an administrator account to manage your PostgreSQL databases. This account will have full superuser privileges.<br><br>To connect after installation:<br><code>/usr/local/bin/psql -h localhost -p 5433 -U &lt;username&gt; -d postgres</code>"
+    }, {
+        "type": "textfield",
+        "desc": "Administrator username",
+        "subitems": [{
+            "key": "wizard_pg_username",
+            "desc": "Username",
+            "defaultValue": "pgadmin",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 3,
+                "maxLength": 63
+            }
+        }]
+    }, {
+        "type": "password",
+        "desc": "Administrator password",
+        "subitems": [{
+            "key": "wizard_pg_password",
+            "desc": "Password",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?{}()\\[\\]\\-=_+\\;'\":<>/,.])[A-Za-z\\d!@#$%^&*?{}()\\[\\]\\-=_+\\;'\":<>/,.]{10,}$/",
+                    "errorText": "Password must be at least 10 characters and include: uppercase, lowercase, number, and special character."
+                }
+            }
+        }]
+    }]
+}]
