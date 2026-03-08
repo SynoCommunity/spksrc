@@ -1,0 +1,11 @@
+--- scripts/dtc/dtc-parser.tab.c_shipped.orig	2021-02-17 07:10:09.000000000 +0000
++++ scripts/dtc/dtc-parser.tab.c_shipped	2023-05-23 23:22:41.400125887 +0000
+@@ -1196,7 +1196,7 @@ int yychar;
+ /* The semantic value of the lookahead symbol.  */
+ YYSTYPE yylval;
+ /* Location data for the lookahead symbol.  */
+-YYLTYPE yylloc
++//YYLTYPE yylloc
+ # if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+   = { 1, 1, 1, 1 }
+ # endif
