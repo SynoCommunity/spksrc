@@ -89,7 +89,6 @@ kernel-depend:
 	          "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$${depend}" "kernel-modules") | tee --append $(STATUS_LOG) ; \
 	        exit 1 ; \
 	      fi ; \
-	      rm -fr $(CURDIR)/work$(ARCH_SUFFIX)/linux-$${depend} ; \
 	    } > >(tee --append build-$${depend}.log) 2>&1 ; \
 	  done ; \
 	  rsync -ah work$(ARCH_SUFFIX)/tc_vars-backup/tc_vars* work$(ARCH_SUFFIX)/. ; \
