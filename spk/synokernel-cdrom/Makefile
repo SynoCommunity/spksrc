@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-cdrom
 SPK_VERS = 1.3
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/synokernel-cdrom.png
 
 DEPENDS =
@@ -11,7 +11,7 @@ REQUIRE_KERNEL_MODULE += CONFIG_BLK_DEV_SR:drivers/scsi:sr_mod
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides Synology kernel CD-ROM drivers cdrom.ko and sr_mod.ko."
-CHANGELOG = "Add DSM-7.3 support."
+CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1"
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 # we only have ipq806x for SRM 1.2, but this fails with:
