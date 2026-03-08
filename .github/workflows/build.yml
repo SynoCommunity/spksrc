@@ -27,10 +27,20 @@ on:
         required: false
         default: true
         type: boolean
+      add_dsm70_builds:
+        description: 'Include DSM 7.0 archs'
+        required: false
+        default: false
+        type: boolean
       add_dsm62_builds:
         description: 'Include DSM 6.2 archs'
         required: false
         default: true
+        type: boolean
+      add_dsm61_builds:
+        description: 'Include DSM 6.1 archs'
+        required: false
+        default: false
         type: boolean
       add_dsm52_builds:
         description: 'Include DSM 5.2 archs'
@@ -187,14 +197,18 @@ jobs:
       - id: defaults
         run: |
           # Retrieve inputs and package availability
-          add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
-          add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
+          add_dsm73_builds=${{ github.event.inputs.add_dsm73_builds || 'false' }}
           add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || 'false' }}
           add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
+          add_dsm70_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
+          add_dsm61_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
+          add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
+          add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
+          add_noarch_dsm73_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
           has_noarch_packages=$([ -n "${{ needs.prepare.outputs.noarch_packages }}" ] && echo "true" || echo "false")
           has_arch_packages=$([ -n "${{ needs.prepare.outputs.arch_packages }}" ] && echo "true" || echo "false")
           has_min_dsm72_packages=${{ needs.prepare.outputs.has_min_dsm72_packages || 'false' }}
@@ -219,8 +233,14 @@ jobs:
             # Enable DSM 7.1 builds if arch packages exist
             add_dsm71_builds=$([ "$has_arch_packages" == "true" ] && echo "true" || echo "false")
 
+            # Enable DSM 7.0 builds if arch packages exist
+            add_dsm70_builds=$([ "$has_arch_packages" == "true" ] && echo "true" || echo "false")
+
             # Enable DSM 6.2 builds if arch packages exist
             add_dsm62_builds=$([ "$has_arch_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable DSM 6.1 builds if arch packages exist
+            add_dsm61_builds=$([ "$has_arch_packages" == "true" ] && echo "true" || echo "false")
           fi
 
           # Build matrix
@@ -272,6 +292,15 @@ jobs:
             add_to_matrix "comcerto2k-7.1"
           fi
 
+          # Add DSM 7.0 builds
+          if [ "$add_dsm70_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x64-7.0"
+            add_to_matrix "aarch64-7.0"
+            add_to_matrix "evansport-7.0"
+            add_to_matrix "armv7-7.0"
+            add_to_matrix "comcerto2k-7.0"
+          fi
+
           # Add DSM 6.2 builds
           if [ "$add_dsm62_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
             add_to_matrix "x64-6.2.4"
@@ -281,6 +310,17 @@ jobs:
             add_to_matrix "hi3535-6.2.4"
             add_to_matrix "88f6281-6.2.4"
             add_to_matrix "qoriq-6.2.4"
+          fi
+
+          # Add DSM 6.1 builds
+          if [ "$add_dsm62_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+            add_to_matrix "x64-6.1"
+            add_to_matrix "aarch64-6.1"
+            add_to_matrix "evansport-6.1"
+            add_to_matrix "armv7-6.1"
+            add_to_matrix "hi3535-6.1"
+            add_to_matrix "88f6281-6.1"
+            add_to_matrix "qoriq-6.1"
           fi
 
           # Add DSM 5.2 builds
