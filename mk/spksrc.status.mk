@@ -40,7 +40,7 @@ else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolchain)
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolkit)
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(TK_NAME)))-$(TK_VERS)" "toolkit") | tee --append $(STATUS_LOG)
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),kernel)
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(KERNEL_NAME)" "kernel") | tee --append $(STATUS_LOG)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(KERNEL_NAME)))-$(KERNEL_VERS)" "kernel") | tee --append $(STATUS_LOG)
 else
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") | tee --append $(STATUS_LOG)
 endif

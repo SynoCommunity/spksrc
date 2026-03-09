@@ -92,10 +92,10 @@
 #   └── spksrc.kernel/
 #
 #       Core kernel build logic (directly included by spksrc.kernel.mk):
+#       ├── base.mk       : Set default kernel environment variables
 #       ├── configure.mk  : Prepare kernel sources & set .config
 #       ├── module.mk     : Compile kernel modules for SPK
 #       ├── headers.mk    : Install kernel headers to staging/include
-#       ├── env.mk        : Set default kernel environment variables
 #       ├── url.mk        : Kernel download URLs
 #       └── versions.mk   : Kernel versions per architecture / DSM
 #
@@ -154,7 +154,7 @@ include ../../mk/spksrc.common.mk
 include ../../mk/spksrc.common-rules.mk
 
 # Common kernel variables
-include ../../mk/spksrc.kernel/env.mk
+include ../../mk/spksrc.kernel/base.mk
 
 # Constants
 default: all
