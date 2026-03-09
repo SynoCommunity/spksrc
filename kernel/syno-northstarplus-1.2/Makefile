@@ -1,6 +1,5 @@
 KERNEL_ARCH = northstarplus
 KERNEL_VERS = 1.2
-KERNEL_BUILD = 7742
 KERNEL_EXT = txz
 KERNEL_CONFIG = synoconfigs/broadcom_northstarplus
 KERNEL_DIST = $(KERNEL_ARCH)-linux-3.6.x
