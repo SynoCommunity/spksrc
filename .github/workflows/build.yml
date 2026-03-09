@@ -200,15 +200,15 @@ jobs:
           add_dsm73_builds=${{ github.event.inputs.add_dsm73_builds || 'false' }}
           add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || 'false' }}
           add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
-          add_dsm70_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
+          add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
-          add_dsm61_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
+          add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
           add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
           add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
-          add_noarch_dsm73_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
+          add_noarch_dsm73_builds=${{ github.event.inputs.add_noarch_dsm73_builds || 'false' }}
           has_noarch_packages=$([ -n "${{ needs.prepare.outputs.noarch_packages }}" ] && echo "true" || echo "false")
           has_arch_packages=$([ -n "${{ needs.prepare.outputs.arch_packages }}" ] && echo "true" || echo "false")
           has_min_dsm72_packages=${{ needs.prepare.outputs.has_min_dsm72_packages || 'false' }}
@@ -253,6 +253,11 @@ jobs:
             add_to_matrix "noarch-7.0"
           fi
 
+          # Add noarch DSM 7.2 builds
+          if [ "$add_noarch_dsm72_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
+            add_to_matrix "noarch-7.2"
+          fi
+
           # Add noarch DSM 7.3 builds
           if [ "$add_noarch_dsm73_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
             add_to_matrix "noarch-7.3"
@@ -263,11 +268,6 @@ jobs:
             add_to_matrix "x64-7.3"
             add_to_matrix "aarch64-7.3"
             add_to_matrix "armv7-7.3"
-          fi
-
-          # Add noarch DSM 7.2 builds
-          if [ "$add_noarch_dsm72_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
-            add_to_matrix "noarch-7.2"
           fi
 
           # Add DSM 7.2 builds
@@ -307,7 +307,7 @@ jobs:
           fi
 
           # Add DSM 6.1 builds
-          if [ "$add_dsm62_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+          if [ "$add_dsm61_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
             add_to_matrix "x64-6.1"
             add_to_matrix "aarch64-6.1"
             add_to_matrix "evansport-6.1"
