@@ -19,6 +19,6 @@ KERNEL_VERSION_MAP = \
     6.1:15284:DSM:global.synologydownload.com \
     6.2.4:25556:DSM:global.synologydownload.com \
     7.0:41890:DSM:global.synologydownload.com \
-    7.1:42661:DSM:global.synologydownload.com \
+    7.1:42962:DSM:global.synologydownload.com \
     7.2:72806:DSM:global.synologydownload.com \
     7.3:86009:DSM:global.synologydownload.com

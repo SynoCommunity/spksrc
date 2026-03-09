@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.kernel/env.mk
+# spksrc.kernel/base.mk
 #
 # Defines default kernel environment variables.
 #
@@ -13,7 +13,9 @@
 #
 #   TC_WORK_DIR     Absolute path to toolchain work directory
 #                   ($(WORK_DIR)/../../../toolchain/$(TC)/work)
-#   KERNEL_NAME     Default: syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+#   KERNEL_NAME     Default: syno-$(KERNEL_VERS)
+#   KERNEL_TYPE     Kernel type (DSM/SRM)
+#   KERNEL_BUILD    Synology DSM/SRM build number
 #   KERNEL_CONFIG   Default: synoconfigs/$(KERNEL_ARCH)
 #   KERNEL_PREFIX   Default: $(KERNEL_DIST)
 #   KERNEL_STRIP    Strip kernel modules (0 = disabled, default)
@@ -28,7 +30,15 @@
 TC_WORK_DIR=$(abspath $(WORK_DIR)/../../../toolchain/$(TC)/work)
 
 ifeq ($(strip $(KERNEL_NAME)),)
-KERNEL_NAME = syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+KERNEL_NAME = syno-$(KERNEL_ARCH)
+endif
+
+ifeq ($(strip $(KERNEL_TYPE)),)
+KERNEL_TYPE = $(call kernel-type,$(KERNEL_VERS))
+endif
+
+ifeq ($(strip $(KERNEL_BUILD)),)
+KERNEL_BUILD = $(call kernel-build,$(KERNEL_VERS))
 endif
 
 ifeq ($(strip $(KERNEL_CONFIG)),)

@@ -1,6 +1,6 @@
 SPK_NAME = synokernel-usbserial
 SPK_VERS = 1.2
-SPK_REV = 11
+SPK_REV = 12
 SPK_ICON = src/synokernel-usbserial.png
 
 DEPENDS =
@@ -16,7 +16,7 @@ REQUIRE_KERNEL_MODULE += CONFIG_USB_SERIAL_TI:drivers/usb/serial:ti_usb_3410_505
 
 MAINTAINER = th0ma7
 DESCRIPTION = "Provides usbserial.ko ch341.ko cp210x.ko pl2303.ko ti_usb3410_5052.ko and ftdi_sio.ko."
-CHANGELOG = "Add DSM-7.3 support."
+CHANGELOG = "1. Add DSM-7.3 support. <br/>2. Add support for older DSM-7.0 and DSM-6.1"
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 # we only have ipq806x for SRM 1.2, but this fails with:
