@@ -89,7 +89,7 @@ ifneq ($(wildcard $(FFMPEG_STAGING_INSTALL_PREFIX)),)
 
 # Only apply flags if we are in build stage2 as
 # usage of += will duplicate values per make calls
-ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
+ifneq ($(filter %stage2,$(MAKECMDGOALS)),)
 export ADDITIONAL_CFLAGS   += -I$(FFMPEG_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CPPFLAGS += -I$(FFMPEG_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CXXFLAGS += -I$(FFMPEG_STAGING_INSTALL_PREFIX)/include
@@ -127,16 +127,12 @@ endif
 
 # re-inject either:
 #    - ffmpeg dependencies for inclusion in-app spk package; or
-ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
+ifneq ($(filter %stage2,$(MAKECMDGOALS)),)
 DEPENDS := $(FFMPEG_DEPENDS) $(DEPENDS)
+SPK_DEPENDS := $(if $(strip $(SPK_DEPENDS)),$(FFMPEG_PACKAGE):$(SPK_DEPENDS),$(FFMPEG_PACKAGE))
 endif
 
-ifneq ($(VIDEODRV_PACKAGE),)
 include ../../mk/spksrc.spk-videodriver.mk
-else
-include ../../mk/spksrc.spk.mk
-endif
-
 
 # Create symbolic links against:
 #    - ffmpeg pkg_config files
