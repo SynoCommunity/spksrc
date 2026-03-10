@@ -102,7 +102,7 @@ ifneq ($(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)),)
 
 # Only apply flags if we are in build stage2 as
 # usage of += will duplicate values per make calls
-ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
+ifneq ($(filter %stage2,$(MAKECMDGOALS)),)
 export ADDITIONAL_CFLAGS    += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CPPFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CXXFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
@@ -147,12 +147,12 @@ endif
 # end ifeq PYTHON_PACKAGE_WORK_DIR
 endif
 
-
 # re-inject either:
 #    - python dependencies for inclusion in-app spk package; or
 #    - filtered libraries to be processed first
-ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
+ifneq ($(filter %stage2,$(MAKECMDGOALS)),)
 DEPENDS := $(PYTHON_DEPENDS) $(PYTHON_FILTERED_DEPENDS) $(DEPENDS)
+SPK_DEPENDS := $(if $(strip $(SPK_DEPENDS)),$(PYTHON_PACKAGE):$(SPK_DEPENDS),$(PYTHON_PACKAGE))
 endif
 
 ifneq ($(FFMPEG_PACKAGE),)

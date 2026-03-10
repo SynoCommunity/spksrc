@@ -4,55 +4,38 @@
 # Shared Video Driver reuse logic for SPK packages.
 #
 # Purpose:
-#   Allows a package to either:
-#     1) Build required video driver stack locally (legacy mode), or
-#     2) Reuse an existing synocli-videodriver SPK build (reuse mode).
+#   Supports two modes for SPK packages needing the videodriver stack:
+#     1) Legacy Mode
+#        - Builds the full video driver stack locally, injecting required
+#          cross/* dependencies.
+#        - Triggered when work directories (work-<arch>-<tcversion>) do not exist.
+#     2) Reuse Mode
+#        - Reuses pre-built headers, libraries, and pkg-config files from
+#          an existing synocli-videodriver SPK work directory.
+#        - Avoids rebuilding common GPU/media dependencies.
 #
-# ─────────────────────────────────────────────────────────────────────────────
-# Modes of Operation
-#
-# 1) Legacy Mode (default fallback)
-#    - Triggered when no matching:
-#          spk/<videodriver>/work-<arch>-<tcversion>
-#      directory exists.
-#    - Injects required cross/* dependencies directly.
-#    - Primarily relevant for x64 architectures.
-#    - Builds libva, Intel media stack, OpenCL, Vulkan, etc., as needed.
-#
-# 2) Reuse Mode
-#    - Triggered when a matching videodriver work directory exists.
-#    - Reuses staged headers and shared libraries.
-#    - Injects include/lib paths into ADDITIONAL_*FLAGS.
-#    - Links pkg-config files into STAGING_INSTALL_PREFIX.
-#    - Links dependency .*-*_done cookies into WORK_DIR.
-#    - Avoids rebuilding the full GPU/media stack.
-#
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# Architecture Constraints:
-#   - Reuse is bound to:
-#         work-<arch>-<tcversion>
-#   - Ensures ABI compatibility with the active toolchain.
-#   - Extended Intel stack enabled only when toolchain GCC >= 5.
-#
-# Key Variables:
-#   VIDEODRV_PACKAGE                Default: synocli-videodriver
-#   VIDEODRV_PACKAGE_WORK_DIR       Architecture-specific work dir
-#   VIDEODRV_STAGING_INSTALL_PREFIX Staged reuse prefix
-#   VIDEODRV_LIBS                   Reused pkg-config libraries
-#   VIDEODRV_STATUS_COOKIES         Reused build completion markers
-#
-# Failure Handling:
-#   - If reuse mode is detected but required staging paths are missing,
-#     the build aborts explicitly via $(error).
+# Dependency Management:
+#   - VIDEODRV_DEPENDS: default videodriver cross-* dependencies.
+#   - VIDEODRV_DEPENDS_EXCLUDE: libraries excluded from automatic injection
+#       (e.g., bzip2, xz, zlib) because they can cause build issues with
+#       other dependencies that also require them.
+#   - VIDEODRV_FILTERED_DEPENDS: subset of excluded libraries that actually
+#       appear in the current package, ensuring they are integrated if required.
+#   - DEPENDENCY_LIST: computed list of current package dependencies excluding
+#       VIDEODRV_DEPENDS and other specified libraries (supports EXCLUDE_DEPENDS).
 #
 # Integration:
-#   - Extends DEPENDS dynamically.
+#   - DEPENDS is extended dynamically with filtered videodriver dependencies.
+#   - SPK_DEPENDS is updated to reflect inclusion of the videodriver SPK.
 #   - Hooks into PRE_DEPEND_TARGET via videodrv_pre_depend.
-#   - Designed to be transparent to package Makefiles.
 #
-# TODO TODO TODO TODO
-# Manage SPK_DEPEND
+# Notes:
+#   - Excluded dependencies are only reinjected if needed by the package.
+#   - Dependency filtering avoids infinite loops during nested make calls.
+#   - Only certain targets (e.g., dependency-%) will trigger DEPENDENCY_LIST
+#     evaluation to minimize redundant shell calls.
+#   - Build flags (CFLAGS, LDFLAGS, etc.) are updated when staging install
+#     paths exist and stage2 build is in progress.
 #
 ###############################################################################
 
@@ -74,11 +57,8 @@ export VIDEODRV_PACKAGE
 export VIDEODRV_PACKAGE_DIR
 export VIDEODRV_PACKAGE_WORK_DIR
 
-ifeq ($(wildcard $(VIDEODRV_PACKAGE_WORK_DIR)),)
+# List of videodriver default dependencies
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-
-# if VIDEODRV_PACKAGE_WORK_DIR does not exist, proceed with the inclusion
-# of synocli-videodriver dependencies directly built-into the package
 
 # Common videodrv dependencies
 VIDEODRV_DEPENDS  = cross/libva cross/libva-utils
@@ -103,7 +83,7 @@ endif
 endif
 
 # VIDEODRV_PACKAGE_WORK_DIR exists
-else
+ifneq ($(wildcard $(VIDEODRV_PACKAGE_WORK_DIR)),)
 
 # Set videodriver installation prefix directory variables
 ifeq ($(strip $(VIDEODRV_STAGING_INSTALL_PREFIX)),)
@@ -117,7 +97,7 @@ ifneq ($(wildcard $(VIDEODRV_STAGING_INSTALL_PREFIX)),)
 
 # Only apply flags if we are in build stage2 as
 # usage of += will duplicate values per make calls
-ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
+ifneq ($(filter %stage2,$(MAKECMDGOALS)),)
 export ADDITIONAL_CFLAGS   += -I$(VIDEODRV_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CPPFLAGS += -I$(VIDEODRV_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CXXFLAGS += -I$(VIDEODRV_STAGING_INSTALL_PREFIX)/include
@@ -127,11 +107,17 @@ export ADDITIONAL_LDFLAGS  += -Wl,--rpath,$(VIDEODRV_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(VIDEODRV_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(VIDEODRV_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(VIDEODRV_INSTALL_PREFIX)/lib
+
+# Generate package dependencies excluding specific videodriver libs
+ifeq ($(filter dependency-%,$(MAKECMDGOALS)),)
+DEPENDENCY_LIST = $(shell $(MAKE) -s dependency-list EXCLUDE_DEPENDS="$(VIDEODRV_DEPENDS) cross/ffmpeg7 $(FFMPEG_DEPENDS)" | cut -f2 -d:)
 endif
 
 VIDEODRV_LIBS_EXCLUDE = %bzip2.pc %lzma.pc %zlib.pc
 VIDEODRV_DEPENDS_EXCLUDE = bzip2 xz zlib
-VIDEODRV_FILTERED_DEPENDS = $(addprefix cross/,$(VIDEODRV_DEPENDS_EXCLUDE))
+
+# Only include excluded dependencies that actually appear in the current package
+VIDEODRV_FILTERED_DEPENDS := $(filter $(addprefix cross/,$(VIDEODRV_DEPENDS_EXCLUDE)),$(DEPENDENCY_LIST))
 
 # Re-use all default videodriver library dependencies (with exception of excludes)
 VIDEODRV_LIBS := $(filter-out $(VIDEODRV_LIBS_EXCLUDE),$(wildcard $(VIDEODRV_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc))
@@ -142,21 +128,28 @@ VIDEODRV_STATUS_COOKIES := $(foreach cross,$(filter-out $(VIDEODRV_DEPENDS_EXCLU
 # call-up pre-depend to prepare the shared videodrv build environment
 PRE_DEPEND_TARGET += videodrv_pre_depend
 
+# Define resulting dependencies
+DEPENDS := $(VIDEODRV_FILTERED_DEPENDS) $(DEPENDS)
+
+# Assign SPK package depdendencies
+SPK_DEPENDS := $(if $(strip $(SPK_DEPENDS)),$(VIDEODRV_PACKAGE):$(SPK_DEPENDS),$(VIDEODRV_PACKAGE))
+
+# end ifeq stage2
+endif
+
 else
 $(error VIDEODRIVER reuse detected but staging prefix not found: $(VIDEODRV_STAGING_INSTALL_PREFIX))
 
 # end ifeq VIDEODRV_STAGING_INSTALL_PREFIX
 endif
 
+# No pre-built videodriver available, inject dependencies
+else
+DEPENDS := $(VIDEODRV_DEPENDS) $(DEPENDS)
+
 # end ifeq VIDEODRV_PACKAGE_WORK_DIR
 endif
 
-# re-inject either:
-#    - videodrv dependencies for inclusion in-app spk package; or
-#    - filtered libraries to be processed first
-ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
-DEPENDS := $(VIDEODRV_DEPENDS) $(VIDEODRV_FILTERED_DEPENDS) $(DEPENDS)
-endif
 
 include ../../mk/spksrc.spk.mk
 
@@ -165,6 +158,9 @@ videodrv_pre_depend:
 	@$(MSG) "*****************************************************"
 	@$(MSG) "*** Use existing shared objects from [$(VIDEODRV_PACKAGE)]"
 	@$(MSG) "*** PATH: $(VIDEODRV_PACKAGE_WORK_DIR)"
+	@$(MSG) "*** DEPENDS: $(DEPENDS)"
+	@$(MSG) "*** VIDEODRV_DEPENDS: $(VIDEODRV_DEPENDS)"
+	@$(MSG) "*** DEPENDENCY_LIST: $(DEPENDENCY_LIST)"
 	@$(MSG) "*****************************************************"
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
 	@$(foreach lib,$(VIDEODRV_LIBS),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
