@@ -9,7 +9,6 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = SynoCommunity

@@ -15,7 +15,6 @@ else
 PYTHON_PACKAGE = python312
 endif
 
-SPK_DEPENDS = $(PYTHON_PACKAGE)
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 cross/xxhash cross/zstd

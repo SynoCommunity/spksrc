@@ -13,8 +13,6 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 # unrar not supported
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
-SPK_DEPENDS = $(PYTHON_PACKAGE)
-
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = Safihre

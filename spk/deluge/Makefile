@@ -4,7 +4,6 @@ SPK_REV = 25
 SPK_ICON = src/deluge.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "${PYTHON_PACKAGE}"
 
 WHEELS  = src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt

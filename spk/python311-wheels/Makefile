@@ -10,7 +10,6 @@ SPK_ICON = src/python3-pip.png
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 PYTHON_PACKAGE = python311
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION =  Collection of programs for the Python 3.11 programming language.

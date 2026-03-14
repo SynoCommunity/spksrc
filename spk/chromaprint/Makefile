@@ -5,7 +5,6 @@ SPK_ICON = src/chromaprint.png
 
 FFMPEG_PACKAGE = ffmpeg7
 DEPENDS = cross/chromaprint
-SPK_DEPENDS = $(FFMPEG_PACKAGE)
 
 # ffmpeg-7 no longer support 88f6281 (armv5) and ffmpeg-7.1 hi3535 (armv7l)
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)

@@ -4,7 +4,6 @@ SPK_REV = 12
 SPK_ICON = src/beets.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 # numpy, pygobject
 REQUIRED_MIN_DSM = 7.1

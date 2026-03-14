@@ -5,7 +5,6 @@ SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt

@@ -4,7 +4,6 @@ SPK_REV = 7
 SPK_ICON = src/rdiff-backup.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "${PYTHON_PACKAGE}"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) ${ARMv5_ARCHS}
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt

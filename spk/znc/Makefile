@@ -5,7 +5,6 @@ SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "python312"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Advanced IRC bouncer. An IRC bouncer is nothing more than an IRC proxy. ZNC will always be connected in your chat rooms, and will be the gateway between your clients, and your IRC servers. You can, for instance, consult messages while you were offline or hide your identity.

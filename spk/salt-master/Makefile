@@ -4,7 +4,6 @@ SPK_REV = 14
 SPK_ICON = src/salt-master.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 DEPENDS = cross/saltgui
