@@ -11,15 +11,6 @@ PYTHON_PACKAGE_WORK_DIR = $(PYTHON_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
 PYTHON_DEPENDS += cross/$(PYTHON_PACKAGE)
 META_DEPENDS += $(PYTHON_DEPENDS)
 
-# Always export these variables - they use deferred expansion so
-# they will resolve correctly at recipe execution time even when
-# PYTHON_PACKAGE is set conditionally after include.
-export PYTHON_PACKAGE
-export PYTHON_PACKAGE_DIR
-export PYTHON_PACKAGE_WORK_DIR
-export PYTHON_DEPENDS
-export META_DEPENDS
-
 .PHONY: PYTHON_meta
 PYTHON_meta:
 	@# EXCEPTION: Do not symlink cross/* wheel builds
@@ -32,4 +23,13 @@ PYTHON_meta:
 	   fi ; \
 	done
 
-$(eval $(call SPK_BASE_TEMPLATE,PYTHON))
+ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+  export PYTHON_PACKAGE
+  export PYTHON_PACKAGE_DIR
+  export PYTHON_PACKAGE_WORK_DIR
+  export PYTHON_DEPENDS
+  export META_DEPENDS
+  $(eval $(call SPK_BASE_TEMPLATE,PYTHON))
+else
+  DEPENDS := $(PYTHON_DEPENDS) $(DEPENDS)
+endif

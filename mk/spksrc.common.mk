@@ -83,9 +83,11 @@ RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 # Display message in a consistent way
 MSG = echo "===> "
 
-# Define $(empty) and $(space)
+# Utility variables
 empty :=
 space := $(empty) $(empty)
+# For literal ',' in $(eval ...) contexts interpreted as individual arguments -> $(eval -Wl$(,)--rpath-link$(,)/some/path)
+, := ,
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
