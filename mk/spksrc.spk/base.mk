@@ -54,8 +54,9 @@ $(eval export OPENSSL_STAGING_INSTALL_PREFIX)
 # Build the list of pkg-config files to symlink:
 #   - if $(1)_PC is set, use only those specific .pc files
 #   - otherwise use all .pc files (minus excludes)
-$(eval $(1)_LIBS_DEFAULT := $(filter-out $(EXCLUDED_LIBS),$(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc)))
-$(eval $(1)_LIBS := $(if $(strip $($(1)_PC)),$(wildcard $(addprefix $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/,$($(1)_PC))),$($(1)_LIBS_DEFAULT)))
+#   - using realpath for real destination to avoid symlink -> symlink
+$(eval $(1)_LIBS_DEFAULT := $(filter-out $(EXCLUDED_LIBS),$(foreach f,$(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc),$(realpath $(f)))))
+$(eval $(1)_LIBS := $(if $(strip $($(1)_PC)),$(foreach f,$(wildcard $(addprefix $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/,$($(1)_PC))),$(realpath $(f))),$($(1)_LIBS_DEFAULT)))
 
 # Generate filtered dependency list (exclude all meta package deps)
 $(eval $(1)_DEPENDS_FILTERED := $(sort $(shell $(MAKE) -s dependency-list EXCLUDE_DEPENDS="$(META_DEPENDS)" | cut -f2 -d:)))
