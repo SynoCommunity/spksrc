@@ -65,4 +65,4 @@ endif
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
-include ../../mk/spksrc.spk-python.mk
+include ../../mk/spksrc.spk-meta.mk
