@@ -31,6 +31,23 @@ export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$($(1)_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$($(1)_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$($(1)_INSTALL_PREFIX)/lib
 
+# Set OpenSSL installation prefix directory variables
+ifeq ($(strip $(OPENSSL_STAGING_INSTALL_PREFIX)),)
+  ifneq ($(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/libssl.so),)
+    export OPENSSL_INSTALL_PREFIX = $($(1)_INSTALL_PREFIX)
+    export OPENSSL_STAGING_INSTALL_PREFIX = $($(1)_STAGING_INSTALL_PREFIX)
+
+    # similarly, ld to rewrite OpenSSL library path if differs
+    export ADDITIONAL_LDFLAGS   += -L$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
+    export ADDITIONAL_LDFLAGS   += -Wl,--rpath-link,$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
+    export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(OPENSSL_INSTALL_PREFIX)/lib
+    export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
+    export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
+    export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(OPENSSL_INSTALL_PREFIX)/lib
+  endif
+endif
+
+
 # If no $(1)_PC specified then re-use all PKS_CONFIG libraries (with exception of excludes)
 $(eval $(1)_LIBS_DEFAULT := $(filter-out $(EXCLUDED_LIBS),$(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc)))
 $(eval $(1)_LIBS := $(if $(strip $($(1)_PC)),$(wildcard $(addprefix $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/,$($(1)_PC))),$($(1)_LIBS_DEFAULT)))
@@ -73,7 +90,6 @@ $(1)_msg:
 	@$(MSG) "*** Use existing shared objects from [$($(1)_PACKAGE)]"
 	@$(MSG) "*** PATH: $($(1)_PACKAGE_WORK_DIR)"
 	@$(MSG) "*** DEPENDS: $(DEPENDS)"
-	@$(MSG) "*** $(1)_STATUS_COOKIES: $($(1)_STATUS_COOKIES)"
 	@$(MSG) "*********************************************************************"
 
 .PHONY: $(1)_links
