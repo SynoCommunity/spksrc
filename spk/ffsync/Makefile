@@ -11,7 +11,7 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)
 
 REQUIRED_MIN_DSM = 6.0
-SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
+SPK_DEPENDS = MariaDB10
 # SRM is not supported due lacking mariadb package
 REQUIRED_MIN_SRM = 3.0
 

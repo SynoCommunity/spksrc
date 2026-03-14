@@ -5,7 +5,6 @@ SPK_REV = 1
 SPK_ICON = src/python3-pip.png
 
 PYTHON_PACKAGE = python310
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION =  Collection of programs for the Python 3.10 programming language.

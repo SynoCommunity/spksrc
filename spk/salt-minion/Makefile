@@ -4,7 +4,6 @@ SPK_REV = 7
 SPK_ICON = src/salt-minion.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)

@@ -31,10 +31,6 @@ SERVICE_USER = auto
 VIDEODRIVER = on
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-SPK_DEPENDS = "synocli-videodriver"
-endif
-
 include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: $(SPK_NAME)_extra_install

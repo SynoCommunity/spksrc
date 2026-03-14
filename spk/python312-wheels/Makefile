@@ -8,7 +8,6 @@ SPK_ICON = src/python3-pip.png
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION =  Collection of programs for the Python 3.12 programming language.

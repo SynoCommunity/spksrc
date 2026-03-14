@@ -4,7 +4,6 @@ SPK_REV = 10
 SPK_ICON = src/mercurial.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "python312"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
