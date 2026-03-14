@@ -19,6 +19,9 @@ FFMPEG_PC += libavutil.pc
 FFMPEG_PC += libpostproc.pc
 FFMPEG_PC += libswresample.pc
 FFMPEG_PC += libswscale.pc
+# Also include openssl
+FFMPEG_PC += libssl.pc
+FFMPEG_PC += openssl.pc
 
 # Create symbolic links against:
 #    - any other pkg_config files defined using $(MEDIA_LIBS) - see cross/tvheadend
