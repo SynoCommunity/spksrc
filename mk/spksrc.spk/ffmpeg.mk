@@ -1,7 +1,7 @@
 
 # Set default ffmpeg package name
 ifeq ($(strip $(FFMPEG_PACKAGE)),)
-export FFMPEG_PACKAGE = ffmpeg7
+  FFMPEG_PACKAGE = ffmpeg7
 endif
 
 # set default spk/ffmpeg* path to use

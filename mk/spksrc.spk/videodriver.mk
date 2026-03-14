@@ -1,7 +1,7 @@
 
 # Set default videodriver package name
 ifeq ($(strip $(VIDEODRV_PACKAGE)),)
-export VIDEODRV_PACKAGE = synocli-videodriver
+  VIDEODRV_PACKAGE = synocli-videodriver
 endif
 
 # set default spk/synocli-videodriver path to use
@@ -42,6 +42,7 @@ export VIDEODRV_PACKAGE
 export VIDEODRV_PACKAGE_DIR
 export VIDEODRV_PACKAGE_WORK_DIR
 export VIDEODRV_DEPENDS
+export META_DEPENDS
 
 .PHONY: VIDEODRV_meta
 VIDEODRV_meta: ;
