@@ -84,7 +84,7 @@ PYTHON_DEPENDS += cross/$(PYTHON_PACKAGE)
 # PYTHON_PACKAGE_WORK_DIR exists
 else
 
-# Set Python installation prefix directory variables
+# Set and export Python installation prefix directory variables
 ifeq ($(strip $(PYTHON_STAGING_INSTALL_PREFIX)),)
 export PYTHON_INSTALL_PREFIX = /var/packages/$(PYTHON_PACKAGE)/target
 export PYTHON_STAGING_INSTALL_PREFIX = $(realpath $(PYTHON_PACKAGE_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX))
