@@ -38,13 +38,18 @@ META_DEPENDS += $(VIDEODRV_DEPENDS)
 # Always export these variables - they use deferred expansion so
 # they will resolve correctly at recipe execution time even when
 # VIDEODRV_PACKAGE is set conditionally after include.
-export VIDEODRV_PACKAGE
-export VIDEODRV_PACKAGE_DIR
-export VIDEODRV_PACKAGE_WORK_DIR
-export VIDEODRV_DEPENDS
-export META_DEPENDS
 
 .PHONY: VIDEODRV_meta
 VIDEODRV_meta: ;
 
-$(eval $(call SPK_BASE_TEMPLATE,VIDEODRV))
+ifneq ($(wildcard $(VIDEODRV_PACKAGE_WORK_DIR)),)
+  export VIDEODRV_PACKAGE
+  export VIDEODRV_PACKAGE_DIR
+  export VIDEODRV_PACKAGE_WORK_DIR
+  export VIDEODRV_DEPENDS
+  export META_DEPENDS
+
+  $(eval $(call SPK_BASE_TEMPLATE,VIDEODRV))
+else
+  DEPENDS := $(VIDEODRV_DEPENDS) $(DEPENDS)
+endif
