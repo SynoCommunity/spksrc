@@ -14,21 +14,20 @@ include ../../mk/spksrc.directories.mk
 
 ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
   include ../../mk/spksrc.spk/base.mk
+endif
 
-  ifdef FFMPEG_PACKAGE
-    include ../../mk/spksrc.spk/ffmpeg.mk
+ifdef FFMPEG_PACKAGE
+  include ../../mk/spksrc.spk/ffmpeg.mk
 
-    # Videodriver only for x64 architectures
-    ifneq ($(findstring $(ARCH),$(x64_ARCHS)),)
-      include ../../mk/spksrc.spk/videodriver.mk
-    endif
+  # Videodriver only for x64 architectures
+  ifneq ($(findstring $(ARCH),$(x64_ARCHS)),)
+    include ../../mk/spksrc.spk/videodriver.mk
   endif
+endif
 
-  ifdef PYTHON_PACKAGE
-    include ../../mk/spksrc.spk/python.mk
-  endif
-
-endif # ifeq stage2
+ifdef PYTHON_PACKAGE
+  include ../../mk/spksrc.spk/python.mk
+endif
 
 # -------------------------------------------------------------------
 # Include main SPK rules in all cases

@@ -5,11 +5,12 @@ ifeq ($(strip $(PYTHON_PACKAGE)),)
 endif
 
 # set default spk/python* path to use
-PYTHON_PACKAGE_DIR = $(realpath $(CURDIR)/../../spk/$(PYTHON_PACKAGE))
+PYTHON_PACKAGE_DIR = $(abspath $(CURDIR)/../../spk/$(PYTHON_PACKAGE))
 PYTHON_PACKAGE_WORK_DIR = $(PYTHON_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
 
 PYTHON_DEPENDS += cross/$(PYTHON_PACKAGE)
 META_DEPENDS += $(PYTHON_DEPENDS)
+OPTIONAL_DEPENDS += $(PYTHON_DEPENDS)
 
 .PHONY: PYTHON_meta
 PYTHON_meta:
@@ -23,7 +24,7 @@ PYTHON_meta:
 	   fi ; \
 	done
 
-ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+ifneq ($(and $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKECMDGOALS))),)
   export PYTHON_PACKAGE
   export PYTHON_PACKAGE_DIR
   export PYTHON_PACKAGE_WORK_DIR
@@ -31,5 +32,5 @@ ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
   export META_DEPENDS
   $(eval $(call SPK_BASE_TEMPLATE,PYTHON))
 else
-  DEPENDS := $(PYTHON_DEPENDS) $(DEPENDS)
+  DEPENDS += $(PYTHON_DEPENDS)
 endif
