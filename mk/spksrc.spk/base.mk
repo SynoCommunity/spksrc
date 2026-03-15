@@ -1,6 +1,11 @@
 ifndef SPKSRC_SPK_BASE_MK
 SPKSRC_SPK_BASE_MK := 1
 
+# Define excluded library / package list
+# Note: covers both bare and lib-prefixed variants (e.g. lzma.pc AND liblzma.pc)
+EXCLUDED_LIBS = %bzip2.pc %lzma.pc %zlib.pc
+EXCLUDED_NAME = bzip2 xz zlib
+
 # -------------------------------------------------------------------
 # SPK_BASE_TEMPLATE
 #
@@ -17,10 +22,6 @@ SPKSRC_SPK_BASE_MK := 1
 #   endif
 # -------------------------------------------------------------------
 define SPK_BASE_TEMPLATE
-
-# Define excluded library / package list
-EXCLUDED_LIBS = %bzip2.pc %lzma.pc %zlib.pc
-EXCLUDED_NAME = bzip2 xz zlib
 
 # Set installation prefix variables for this namespace
 $(eval $(1)_INSTALL_PREFIX         := /var/packages/$($(1)_PACKAGE)/target)
@@ -55,7 +56,7 @@ $(eval export OPENSSL_STAGING_INSTALL_PREFIX)
 #   - if $(1)_PC is set, use only those specific .pc files
 #   - otherwise use all .pc files (minus excludes)
 #   - using realpath for real destination to avoid symlink -> symlink
-$(eval $(1)_LIBS_DEFAULT := $(filter-out $(EXCLUDED_LIBS),$(foreach f,$(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc),$(realpath $(f)))))
+$(eval $(1)_LIBS_DEFAULT := $(foreach f,$(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc),$(if $(filter-out $(EXCLUDED_LIBS),$(notdir $(f))),$(realpath $(f)),)))
 $(eval $(1)_LIBS := $(if $(strip $($(1)_PC)),$(foreach f,$(wildcard $(addprefix $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/,$($(1)_PC))),$(realpath $(f))),$($(1)_LIBS_DEFAULT)))
 
 # Generate filtered dependency list (exclude all meta package deps)
@@ -65,13 +66,13 @@ $(eval $(1)_DEPENDS_FILTERED := $(sort $(shell $(MAKE) -s dependency-list EXCLUD
 $(eval $(1)_DIRECT_DEPENDS := $(filter $(addprefix cross/,$(EXCLUDED_NAME)),$($(1)_DEPENDS_FILTERED)))
 
 # Inject direct deps into the package DEPENDS list
-$(eval DEPENDS := $($(1)_DIRECT_DEPENDS) $(DEPENDS))
+$(eval DEPENDS := $(call uniq,$($(1)_DIRECT_DEPENDS) $(DEPENDS)))
 
 # Register this meta package as an SPK dependency (no duplicates)
 $(eval SPK_DEPENDS := $(call dedup,$($(1)_PACKAGE):$(SPK_DEPENDS),:))
 
 # Build list of status cookies to symlink (skip if $(1)_PC is set)
-$(eval $(1)_STATUS_COOKIES := $(if $(strip $($(1)_PC)),,$(foreach cross,$(filter-out $(EXCLUDED_NAME),$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $($(1)_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$($(1)_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $($(1)_PACKAGE_WORK_DIR)/.$(cross)-*_done))))
+$(eval $(1)_STATUS_COOKIES := $(sort $(if $(strip $($(1)_PC)),,$(foreach cross,$(filter-out $(EXCLUDED_NAME),$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $($(1)_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$($(1)_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $($(1)_PACKAGE_WORK_DIR)/.$(cross)-*_done)))))
 
 # Register pre-depend hook so _links runs before dependency compilation
 $(eval PRE_DEPEND_TARGET += $(1)_meta_pre_depend)

@@ -5,7 +5,7 @@ ifeq ($(strip $(VIDEODRV_PACKAGE)),)
 endif
 
 # set default spk/synocli-videodriver path to use
-VIDEODRV_PACKAGE_DIR = $(realpath $(CURDIR)/../../spk/$(VIDEODRV_PACKAGE))
+VIDEODRV_PACKAGE_DIR = $(abspath $(CURDIR)/../../spk/$(VIDEODRV_PACKAGE))
 VIDEODRV_PACKAGE_WORK_DIR = $(VIDEODRV_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
 
 # List of videodriver default dependencies
@@ -34,6 +34,7 @@ endif
 endif
 
 META_DEPENDS += $(VIDEODRV_DEPENDS)
+OPTIONAL_DEPENDS += $(VIDEODRV_DEPENDS)
 
 # Always export these variables - they use deferred expansion so
 # they will resolve correctly at recipe execution time even when
@@ -42,14 +43,13 @@ META_DEPENDS += $(VIDEODRV_DEPENDS)
 .PHONY: VIDEODRV_meta
 VIDEODRV_meta: ;
 
-ifneq ($(wildcard $(VIDEODRV_PACKAGE_WORK_DIR)),)
+ifneq ($(and $(wildcard $(VIDEODRV_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKECMDGOALS))),)
   export VIDEODRV_PACKAGE
   export VIDEODRV_PACKAGE_DIR
   export VIDEODRV_PACKAGE_WORK_DIR
   export VIDEODRV_DEPENDS
   export META_DEPENDS
-
   $(eval $(call SPK_BASE_TEMPLATE,VIDEODRV))
 else
-  DEPENDS := $(VIDEODRV_DEPENDS) $(DEPENDS)
+  DEPENDS += $(VIDEODRV_DEPENDS)
 endif
