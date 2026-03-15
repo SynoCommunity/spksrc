@@ -78,26 +78,8 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
 endif
 
-# Use media and other libraries through FFMPEG package shared libraries
-ifneq ($(wildcard $(FFMPEG_PACKAGE_ROOT)),)
-MEDIA_LIBS  = fdk-aac.pc
-MEDIA_LIBS += fontconfig.pc
-MEDIA_LIBS += ogg.pc
-MEDIA_LIBS += opus.pc
-MEDIA_LIBS += libpcre2-8.pc
-MEDIA_LIBS += libpcre2-32.pc
-MEDIA_LIBS += libpcre2-posix.pc
-MEDIA_LIBS += theoradec.pc
-MEDIA_LIBS += theoraenc.pc
-MEDIA_LIBS += theora.pc
-MEDIA_LIBS += vorbisenc.pc
-MEDIA_LIBS += vorbisfile.pc
-MEDIA_LIBS += vorbis.pc
-MEDIA_LIBS += vpx.pc
-MEDIA_LIBS += x264.pc
-MEDIA_LIBS += x265.pc
-
-else
+# If libraries through FFMPEG_PACKAGE shared libraries unavailable
+ifeq ($(wildcard $(FFMPEG_PACKAGE_WORK_DIR)),)
 DEPENDS += cross/ffmpeg7
 DEPENDS += cross/fdk-aac
 DEPENDS += cross/fontconfig

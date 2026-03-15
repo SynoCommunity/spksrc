@@ -38,7 +38,7 @@ ADMIN_PORT = ${SERVICE_PORT}
 # ffmpeg-7 no longer support 88f6281 (armv5) and ffmpeg-7.1 hi3535 (armv7l)
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
-DEPENDS = cross/tvheadend
+DEPENDS  = cross/tvheadend
 DEPENDS += cross/dtv-scan-tables
 DEPENDS += cross/docker-tvheadend
 DEPENDS += cross/zap2epg
@@ -47,6 +47,24 @@ OPTIONAL_DEPENDS += python/numpy-latest
 OPTIONAL_DEPENDS += python/pandas
 
 WHEELS += src/requirements-pure.txt
+
+# Use media and other libraries from FFMPEG_PACKAGE shared libraries
+MEDIA_LIBS  = fdk-aac.pc
+MEDIA_LIBS += fontconfig.pc
+MEDIA_LIBS += ogg.pc
+MEDIA_LIBS += opus.pc
+MEDIA_LIBS += libpcre2-8.pc
+MEDIA_LIBS += libpcre2-32.pc
+MEDIA_LIBS += libpcre2-posix.pc
+MEDIA_LIBS += theoradec.pc
+MEDIA_LIBS += theoraenc.pc
+MEDIA_LIBS += theora.pc
+MEDIA_LIBS += vorbisenc.pc
+MEDIA_LIBS += vorbisfile.pc
+MEDIA_LIBS += vorbis.pc
+MEDIA_LIBS += vpx.pc
+MEDIA_LIBS += x264.pc
+MEDIA_LIBS += x265.pc
 
 include ../../mk/spksrc.common.mk
 
