@@ -71,8 +71,6 @@ POST_SERVICE_TARGET = borgbackup_extra_install
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
-include ../../mk/spksrc.common.mk
-
 # [borgbackup]
 # Use OpenSSL path as defined by either
 # spksrc.wheel-env.mk or spksrc.spk-meta.mk
