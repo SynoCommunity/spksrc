@@ -40,8 +40,8 @@ DEPENDS += cross/uriparser cross/libiconv
 DEPENDS += cross/libdvbcsa cross/dvb-apps
 DEPENDS += cross/libhdhomerun
 
-DEPENDS += cross/curl
 # curl build needs additional configuration for gnutls and libssh2
+DEPENDS += cross/curl
 export BUILD_CURL_WITH="gnutls libssh2 zstd"
 
 GNU_CONFIGURE = 1
@@ -63,6 +63,14 @@ CONFIGURE_ARGS += --disable-libvpx_static --enable-libvpx
 CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
+
+# dbus splits its headers between include/ and lib/dbus-1.0/include/
+#    - include/dbus-1.0/ (public) must precede
+#    - lib/dbus-1.0/include/ (arch-specific dbus-arch-deps.h)
+DEPENDS += cross/dbus
+CONFIGURE_ARGS += --enable-dbus_1
+ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/include/dbus-1.0
+ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/lib/dbus-1.0/include
 
 include ../../mk/spksrc.common.mk
 
