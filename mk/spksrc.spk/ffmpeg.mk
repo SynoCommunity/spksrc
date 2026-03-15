@@ -27,9 +27,13 @@ FFMPEG_PC += openssl.pc
 # Create symbolic links against:
 #    - any other pkg_config files defined using $(MEDIA_LIBS) - see cross/tvheadend
 .PHONY: FFMPEG_meta
+ifneq ($(wildcard $(FFMPEG_PACKAGE_WORK_DIR)),)
 FFMPEG_meta:
-	@# EXCEPTION: Some package links against other manually speficied media libraries provided by ffmpeg (i.e. tvheadend)
-	@$(foreach lib,$(MEDIA_LIBS),ln -sf $(FFMPEG_STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
+	@$(foreach lib,$(addprefix $(FFMPEG_STAGING_INSTALL_PREFIX)/lib/pkgconfig/,$(MEDIA_LIBS)),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+else
+FFMPEG_meta: ;
+endif
 
 ifneq ($(and $(wildcard $(FFMPEG_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKECMDGOALS))),)
   export FFMPEG_PACKAGE

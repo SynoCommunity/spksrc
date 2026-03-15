@@ -78,7 +78,7 @@ $(eval $(1)_STATUS_COOKIES := $(sort $(if $(strip $($(1)_PC)),,$(foreach cross,$
 $(eval PRE_DEPEND_TARGET += $(1)_meta_pre_depend)
 
 .PHONY: $(1)_meta_pre_depend
-$(1)_meta_pre_depend: $(1)_meta $(1)_links
+$(1)_meta_pre_depend: $(1)_links $(1)_meta
 
 .PHONY: $(1)_msg
 $(1)_msg:
