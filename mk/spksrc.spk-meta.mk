@@ -6,27 +6,20 @@
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
-ifneq ($(ARCH),)
-ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
-endif
-
-include ../../mk/spksrc.directories.mk
-
 ifneq ($(filter spk-stage2,$(MAKECMDGOALS)),)
   include ../../mk/spksrc.spk/base.mk
 endif
 
 ifdef FFMPEG_PACKAGE
   include ../../mk/spksrc.spk/ffmpeg.mk
-
-  # Videodriver only for x64 architectures
-  ifneq ($(findstring $(ARCH),$(x64_ARCHS)),)
-    include ../../mk/spksrc.spk/videodriver.mk
-  endif
 endif
 
 ifdef PYTHON_PACKAGE
   include ../../mk/spksrc.spk/python.mk
+endif
+
+ifdef VIDEODRV_PACKAGE
+  include ../../mk/spksrc.spk/videodriver.mk
 endif
 
 # -------------------------------------------------------------------
