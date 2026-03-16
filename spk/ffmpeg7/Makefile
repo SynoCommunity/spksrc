@@ -5,6 +5,7 @@ SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to using updated synocli-videodriver package.<br/>2. No longer support ARMv7L (hi3535) architecture"
 
 DEPENDS = cross/ffmpeg7
+VIDEODRV_PACKAGE = synocli-videodriver
 
 # requires c11 and proper atomic using gcc-4.9+ support
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
