@@ -1,6 +1,6 @@
 SPK_NAME = ffmpeg7
 SPK_VERS = 7.1.3
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to using updated synocli-videodriver package.<br/>2. No longer support ARMv7L (hi3535) architecture"
 
