@@ -39,9 +39,9 @@ native-depend_msg_target:
 # parallalizing build for every arch targets
 native-depend: native-depend_msg_target
 	@set -e; \
-	for native in $$($(MAKE) -s dependency-flat DEPENDS_TYPE="DEPENDS BUILD_DEPENDS" | grep "^native/"); \
+	for native in $$($(MAKE) -s dependency-flat DEPENDS_TYPE="DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS" | grep "^native/"); \
 	do \
-	  env $(ENV) WORK_DIR= $(MAKE) -C ../../$$native ; \
+	  env -i PATH=$(PATH) $(MAKE) -C ../../$$native ; \
 	done
 
 depend_msg_target:
@@ -59,7 +59,7 @@ endif
 	@set -e; \
 	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do \
-	  env $(ENV) WORK_DIR= LOGGING_ENABLED= $(MAKE) -C ../../$$native ; \
+	  env -i PATH=$(PATH) $(MAKE) -C ../../$$native ; \
 	done
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \
@@ -84,4 +84,3 @@ $(DEPEND_COOKIE): $(POST_DEPEND_TARGET)
 else
 depend: ;
 endif
-
