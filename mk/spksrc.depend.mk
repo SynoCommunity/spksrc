@@ -41,7 +41,7 @@ native-depend: native-depend_msg_target
 	@set -e; \
 	for native in $$($(MAKE) -s dependency-flat DEPENDS_TYPE="DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS" | grep "^native/"); \
 	do \
-	  env -i PATH=$(PATH) $(MAKE) -C ../../$$native ; \
+	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
 	done
 
 depend_msg_target:
@@ -59,7 +59,7 @@ endif
 	@set -e; \
 	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do \
-	  env -i PATH=$(PATH) $(MAKE) -C ../../$$native ; \
+	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
 	done
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \
