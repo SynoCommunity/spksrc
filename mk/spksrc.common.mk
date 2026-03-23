@@ -56,7 +56,7 @@ include $(BASEDIR)/mk/spksrc.common/macros.mk
 include $(BASEDIR)/mk/spksrc.directories.mk
 
 # Setup minimal toolchain environment variables
-include $(BASEDIR)mk/spksrc.common/stage0.mk
+include $(BASEDIR)/mk/spksrc.common/stage0.mk
 
 # Load common definitions
 include $(BASEDIR)/mk/spksrc.common/archs.mk
