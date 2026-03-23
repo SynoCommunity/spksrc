@@ -68,7 +68,7 @@
 # └──────────────────────────────────────────────────────────────────────┘
 #
 # Notes:
-#  - cross-stage1 is idempotent (guarded by .tcvars_done and .tkvars_done)
+#  - cross-stage1 is idempotent (guarded by .stage1-tcvars_done and .stage1-tkvars_done)
 #  - cross-stage2 never builds the toolchain nor toolkit
 #  - toolchain and toolkit package builds are strictly separated
 ###############################################################################
@@ -144,8 +144,8 @@ include ../../mk/spksrc.plist.mk
 #  - First call builds the toolchain / toolkit (download / extract / patch / build)
 #  - Second call generates tc_vars* and tk_vars.mk files in the package WORK_DIR
 # -----------------------------------------------------------------------------
-TCVARS_DONE := $(WORK_DIR)/.tcvars_done
-TKVARS_DONE := $(WORK_DIR)/.tkvars_done
+TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
+TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
 .PHONY: cross-stage1
 cross-stage1: $(TCVARS_DONE) $(TKVARS_DONE)

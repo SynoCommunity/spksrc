@@ -30,6 +30,7 @@
 #
 #   mk/spksrc.common.mk
 #   └── mk/spksrc.common/
+#       ├── stage0.mk  : setup $(WORK_DIR)/tc_vars.mk for minimal init
 #       ├── archs.mk   : architecture and toolchain classification
 #       ├── logs.mk    : build log paths and logging helpers
 #       └── macros.mk  : generic GNU Make helper macros
@@ -53,6 +54,9 @@ include $(BASEDIR)/mk/spksrc.common/macros.mk
 
 # Common directories (must be set after ARCH_SUFFIX)
 include $(BASEDIR)/mk/spksrc.directories.mk
+
+# Setup minimal toolchain environment variables
+include $(BASEDIR)mk/spksrc.common/stage0.mk
 
 # Load common definitions
 include $(BASEDIR)/mk/spksrc.common/archs.mk
