@@ -39,19 +39,9 @@ native-depend_msg_target:
 # parallalizing build for every arch targets
 native-depend: native-depend_msg_target
 	@set -e; \
-	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
-	do                          \
-	  env $(ENV) WORK_DIR= $(MAKE) -C ../../$$native ; \
-	done
-	@set -e; \
-	for depend in $(NATIVE_DEPENDS); \
-	do                          \
-	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) -C ../../$$depend ; \
-	done
-	@set -e; \
-	for depend in $(filter-out native/%,$(BUILD_DEPENDS) $(OPTIONAL_DEPENDS) $(DEPENDS)); \
-	do                          \
-	  env $(ENV) $(MAKE) -C ../../$$depend native-depend; \
+	for native in $$($(MAKE) -s dependency-flat DEPENDS_TYPE="DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS" | grep "^native/"); \
+	do \
+	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
 	done
 
 depend_msg_target:
@@ -68,17 +58,17 @@ endif
 endif
 	@set -e; \
 	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
-	do                          \
-	  env $(ENV) WORK_DIR= LOGGING_ENABLED= $(MAKE) -C ../../$$native ; \
+	do \
+	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
 	done
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \
-	do                          \
-	  env $(ENV) WORK_DIR=$(WORK_DIR) $(MAKE) -C ../../$$depend ; \
+	do \
+	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) -C ../../$$depend ; \
 	done
 	@set -e; \
 	for depend in $(filter-out native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
-	do                          \
+	do \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done
 	
@@ -94,4 +84,3 @@ $(DEPEND_COOKIE): $(POST_DEPEND_TARGET)
 else
 depend: ;
 endif
-
