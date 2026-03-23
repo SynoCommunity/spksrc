@@ -32,9 +32,11 @@ STAGE0_DONE := $(WORK_DIR)/.stage0-tcvars_done
 ifneq ($(ARCH),noarch)
 ifeq ($(MAKECMDGOALS),)
 ifeq ($(TC),)
+ifeq ($(wildcard $(STAGE0_DONE)),)
   $(shell mkdir -p $(WORK_DIR))
   $(shell $(MAKE) --no-print-directory -C $(WORK_DIR)/$(BASEDIR)/../toolchain/syno-$(ARCH)-$(TCVERSION) tc_vars | grep -v '===>' > $(WORK_DIR)/tc_vars.mk 2>/dev/null)
   $(shell touch $(STAGE0_DONE))
+endif
 endif
 endif
 endif
