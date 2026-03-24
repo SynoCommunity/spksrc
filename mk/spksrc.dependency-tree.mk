@@ -117,10 +117,13 @@ DEP_FLAT_TARGETS_MK := $(strip \
 # -------------------------------------------------------------------
 # Root-level detection and spk package discovery
 #
-# When BASEDIR is empty, we are at the spksrc root directory.
+# AT_ROOT_LEVEL is set when BASEDIR resolves to the current directory,
+# meaning make was invoked from the spksrc root. Comparison uses
+# absolute paths to be independent of directory name.
+#
 # At root level, only dependency-list-spk is available.
 # -------------------------------------------------------------------
-AT_ROOT_LEVEL := $(if $(BASEDIR),,1)
+AT_ROOT_LEVEL := $(if $(filter $(abspath $(BASEDIR)),$(CURDIR)),1,)
 
 SPK_DIRS    := $(sort $(dir $(wildcard spk/*/Makefile)))
 SPK_NAMES   := $(notdir $(patsubst %/,%,$(SPK_DIRS)))
