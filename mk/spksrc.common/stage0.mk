@@ -33,8 +33,9 @@ ifneq ($(ARCH),noarch)
 ifeq ($(MAKECMDGOALS),)
 ifeq ($(TC),)
 ifeq ($(wildcard $(STAGE0_DONE)),)
+  $(info ===> Generating $(WORK_DIR)/tc_vars.mk (stage0))
   $(shell mkdir -p $(WORK_DIR))
-  $(shell $(MAKE) --no-print-directory -C $(WORK_DIR)/$(BASEDIR)/../toolchain/syno-$(ARCH)-$(TCVERSION) tc_vars | grep -v '===>' > $(WORK_DIR)/tc_vars.mk 2>/dev/null)
+  $(shell $(MAKE) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) MSG= tc_vars > $(WORK_DIR)/tc_vars.mk 2>/dev/null)
   $(shell touch $(STAGE0_DONE))
 endif
 endif
