@@ -36,24 +36,31 @@
 #
 ###############################################################################
 
-# Set basedir in case called from spkrc/ or from normal sub-dir
-# Note that github-action uses workspace/ in place of spksrc/
-ifeq ($(BASEDIR),)
-ifeq ($(filter spksrc workspace,$(shell basename $(CURDIR))),)
-BASEDIR = ../../
+# Determine MKDIR from this file's own location in MAKEFILE_LIST, regardless
+# of CURDIR or the caller's directory structure (works under github-action
+# where the workspace root may differ from the spksrc directory name).
+# MKDIR must use := for immediate evaluation before any further includes
+# alter MAKEFILE_LIST. BASEDIR uses ?= to allow override from the command line.
+MKDIR  := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+BASEDIR ?= $(abspath $(MKDIR)/..)
+
+ifneq ($(ARCH),)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 endif
-endif
+
+# Load macros early
+include $(BASEDIR)/mk/spksrc.common/macros.mk
+
+# Common directories (must be set after ARCH_SUFFIX)
+include $(BASEDIR)/mk/spksrc.directories.mk
 
 # Load common definitions
-include $(BASEDIR)mk/spksrc.common/archs.mk
-include $(BASEDIR)mk/spksrc.common/logs.mk
-include $(BASEDIR)mk/spksrc.common/macros.mk
+include $(BASEDIR)/mk/spksrc.common/archs.mk
+include $(BASEDIR)/mk/spksrc.common/logs.mk
 
 # Load local configuration
-LOCAL_CONFIG_MK = $(BASEDIR)local.mk
-ifneq ($(wildcard $(LOCAL_CONFIG_MK)),)
-include $(LOCAL_CONFIG_MK)
-endif
+LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
+-include $(LOCAL_CONFIG_MK)
 
 ###
 

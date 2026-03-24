@@ -23,27 +23,17 @@
 #  LEGACY_ARCHS                : non-generic, legacy architectures
 #
 # Notes:
-#  - BASEDIR is auto-detected when not explicitly set
 #  - Generic architectures are used where multi-arch support exists
 #  - Dotnet-related exclusions are handled conditionally
 #
 ###############################################################################
 
-# Allows direct inclusion for backward compatibility
-ifeq ($(BASEDIR),)
-ifeq ($(filter spksrc workspace,$(shell basename $(CURDIR))),)
-BASEDIR = ../../
-endif
-endif
-
-###
-
 # Available toolchains formatted as '{ARCH}-{TC}'
-AVAILABLE_TOOLCHAINS = $(subst syno-,,$(filter-out %-rust,$(sort $(notdir $(wildcard $(BASEDIR)toolchain/syno-*)))))
+AVAILABLE_TOOLCHAINS = $(subst syno-,,$(filter-out %-rust,$(sort $(notdir $(wildcard $(BASEDIR)/toolchain/syno-*)))))
 AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell echo ${arch} | cut -f2 -d'-')))
 
 # Available toolchains formatted as '{ARCH}-{TC}'
-AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)kernel/syno-*))))
+AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)/kernel/syno-*))))
 AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell echo ${arch} | cut -f2 -d'-')))
 
 ###
@@ -85,7 +75,7 @@ x64_ARCHS = $(GENERIC_x64_ARCH) apollolake avoton braswell broadwell broadwellnk
 
 # Arch groups
 ALL_ARCHS = $(x64_ARCHS) $(i686_ARCHS) $(PPC_ARCHS) $(ARM_ARCHS)
-ARCHS_WITH_GENERIC_SUPPORT = $(sort $(foreach version, $(AVAILABLE_TCVERSIONS), $(foreach arch, $(GENERIC_ARCHS), $(addsuffix -$(version),$(shell sed -n 's/^TC_ARCH = \(.*\)/\1/p' $(BASEDIR)toolchain/syno-$(arch)-$(version)/Makefile 2>/dev/null)))))
+ARCHS_WITH_GENERIC_SUPPORT = $(sort $(foreach version, $(AVAILABLE_TCVERSIONS), $(foreach arch, $(GENERIC_ARCHS), $(addsuffix -$(version),$(shell sed -n 's/^TC_ARCH = \(.*\)/\1/p' $(BASEDIR)/toolchain/syno-$(arch)-$(version)/Makefile 2>/dev/null)))))
 # PPC_ARCHS except qoriq
 OLD_PPC_ARCHS = powerpc ppc824x ppc853x ppc854x
 
