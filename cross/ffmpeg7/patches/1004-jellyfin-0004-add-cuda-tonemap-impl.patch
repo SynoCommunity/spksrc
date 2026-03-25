@@ -2,7 +2,7 @@ Index: FFmpeg/configure
 ===================================================================
 --- configure
 +++ configure
-@@ -3312,6 +3312,8 @@ scale_cuda_filter_deps="ffnvcodec"
+@@ -3316,6 +3316,8 @@ scale_cuda_filter_deps="ffnvcodec"
  scale_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  thumbnail_cuda_filter_deps="ffnvcodec"
  thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -11,31 +11,23 @@ Index: FFmpeg/configure
  transpose_npp_filter_deps="ffnvcodec libnpp"
  overlay_cuda_filter_deps="ffnvcodec"
  overlay_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
-@@ -4690,8 +4692,10 @@ if enabled cuda_nvcc; then
-     nvcc_default="nvcc"
-     nvccflags_default="-gencode arch=compute_30,code=sm_30 -O2"
- else
-+    # clang-20 emits ptx60 instruction 'brx.idx' even for ptx32 target (llvm/llvm-project@ccc3127)
-+    # default to ptx60/sm_30 to follow the changes made in clang-16+ (llvm/llvm-project@d677505)
-     nvcc_default="clang"
--    nvccflags_default="--cuda-gpu-arch=sm_30 -O2"
-+    nvccflags_default="--cuda-feature=+ptx60 --cuda-gpu-arch=sm_30 -O2 -ffast-math"
-     NVCC_C=""
- fi
- 
-@@ -4701,6 +4705,11 @@ if enabled cuda_nvcc; then
+@@ -4707,6 +4709,15 @@ if enabled cuda_nvcc; then
      if $nvcc $nvccflags_default 2>&1 | grep -qi unsupported; then
          nvccflags_default="-gencode arch=compute_60,code=sm_60 -O2"
      fi
 +else
++    clang_version=$($nvcc -dumpversion 2>/dev/null || echo 0)
++    # clang-11+ allows disabling reassociate with progma when fast-math is enabled
++    test ${clang_version%%[!0-9]*} -ge 11 && append nvccflags_default "-ffast-math"
++
++    # clang-20 emits ptx60 instruction 'brx.idx' even for ptx32 target (llvm/llvm-project@ccc3127)
++    # default to ptx60/sm_30 to follow the changes made in clang-16+ (llvm/llvm-project@d677505)
 +    # '--cuda-feature=+ptx*' option is not available before clang-15
-+    if $nvcc $nvccflags_default 2>&1 | grep -qi unsupported; then
-+        nvccflags_default="--cuda-gpu-arch=sm_30 -O2 -ffast-math"
-+    fi
++    test ${clang_version%%[!0-9]*} -ge 15 && append nvccflags_default "--cuda-feature=+ptx60"
  fi
  
  set_default arch cc cxx doxygen pkg_config ranlib strip sysinclude \
-@@ -6753,7 +6762,7 @@ fi
+@@ -6774,7 +6785,7 @@ fi
  if enabled cuda_nvcc; then
      nvccflags="$nvccflags -ptx"
  else
@@ -1129,8 +1121,8 @@ Index: FFmpeg/libavfilter/cuda/pixfmt.h
 +
 +static __inline__ __device__ float3 read_tex_px_flt(const FFCUDAFrame& frame, int x, int y)
 +{
-+    float ncoord_x = (float)(x + 1) * (1.0f / (frame.width + 1));
-+    float ncoord_y = (float)(y + 1) * (1.0f / (frame.height + 1));
++    float ncoord_x = (float)(x + 1) / (float)(frame.width  + 1);
++    float ncoord_y = (float)(y + 1) / (float)(frame.height + 1);
 +
 +    float px_y = tex2D<float>(frame.tex[0], x, y);
 +    float2 px_uv = tex2D<float2>(frame.tex[1], ncoord_x, ncoord_y);

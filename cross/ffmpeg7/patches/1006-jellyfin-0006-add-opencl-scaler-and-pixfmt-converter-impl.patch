@@ -2,7 +2,7 @@ Index: FFmpeg/configure
 ===================================================================
 --- configure
 +++ configure
-@@ -3935,6 +3935,7 @@ rubberband_filter_deps="librubberband"
+@@ -3939,6 +3939,7 @@ rubberband_filter_deps="librubberband"
  sab_filter_deps="gpl swscale"
  scale2ref_filter_deps="swscale"
  scale_filter_deps="swscale"
@@ -373,7 +373,7 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 ===================================================================
 --- /dev/null
 +++ libavfilter/vf_scale_opencl.c
-@@ -0,0 +1,931 @@
+@@ -0,0 +1,942 @@
 +/*
 + * Copyright (c) 2018 Gabriel Machado
 + * Copyright (c) 2021 NyanMisaka
@@ -986,6 +986,13 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    if (ret < 0)
 +        return ret;
 +
++    if (inlink->sample_aspect_ratio.num)
++        outlink->sample_aspect_ratio = av_mul_q((AVRational){outlink->h * inlink->w,
++                                                             outlink->w * inlink->h},
++                                                inlink->sample_aspect_ratio);
++    else
++        outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
++
 +    return 0;
 +}
 +
@@ -1153,6 +1160,10 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +        goto fail;
 +    output->width  = outlink->w;
 +    output->height = outlink->h;
++    av_reduce(&output->sample_aspect_ratio.num, &output->sample_aspect_ratio.den,
++              (int64_t)input->sample_aspect_ratio.num * outlink->h * inlink->w,
++              (int64_t)input->sample_aspect_ratio.den * outlink->w * inlink->h,
++              INT_MAX);
 +
 +    if (ctx->in_fmt == AV_PIX_FMT_NV15 && !(ctx->src_w == ctx->dst_w && ctx->src_h == ctx->dst_h)) {
 +        /* for scaling P010 compact: 1st pass conv & 2nd pass scale */

@@ -1,5 +1,6 @@
 PKG_NAME = ffmpeg
 PKG_VERS = 7.1.3
+PKG_MINOR_VERS = $(firstword $(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -32,8 +33,8 @@ else
   endif
 endif
 
-# Must match $(SPK_REV) from spk/ffmpeg7/Makefile
-CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg7/Makefile)
+# Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
+CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
 
 # Enable Synology specific -hls_seek_time option and other optimizations
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
@@ -48,21 +49,11 @@ OPTIONAL_DEPENDS += cross/libaom
 OPTIONAL_DEPENDS += cross/svt-av1
 # GCC specific
 OPTIONAL_DEPENDS += cross/frei0r
-# prebuilt by synocli-videodriver
-OPTIONAL_DEPENDS += cross/libva
-OPTIONAL_DEPENDS += cross/libva-utils
-OPTIONAL_DEPENDS += cross/intel-vaapi-driver
-OPTIONAL_DEPENDS += cross/intel-media-driver
-OPTIONAL_DEPENDS += cross/intel-mediasdk
-# prebuilt by synocli-videodriver for gcc >= 5
-OPTIONAL_DEPENDS += cross/intel-level-zero
-OPTIONAL_DEPENDS += cross/intel-graphics-compiler
-OPTIONAL_DEPENDS += cross/intel-compute-runtime
-OPTIONAL_DEPENDS += cross/ocl-icd
-OPTIONAL_DEPENDS += cross/clinfo
-OPTIONAL_DEPENDS += cross/mesa
-OPTIONAL_DEPENDS += cross/Khronos-Vulkan-Loader
-OPTIONAL_DEPENDS += cross/Khronos-Vulkan-Tools
+OPTIONAL_DEPENDS += cross/libjxl
+OPTIONAL_DEPENDS += cross/liblc3
+OPTIONAL_DEPENDS += cross/rubberband
+OPTIONAL_DEPENDS += cross/libvmaf
+OPTIONAL_DEPENDS += cross/vvenc
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
@@ -80,12 +71,34 @@ endif
 # cairo is dependency of harfbuzz, dependency of libass
 DEPENDS = cross/cairo
 
+DEPENDS += cross/chromaprint-fftw
+CONFIGURE_ARGS += --enable-chromaprint
+
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/frei0r
+CONFIGURE_ARGS += --enable-frei0r
+endif
+
+DEPENDS += cross/gnutls
+CONFIGURE_ARGS += --enable-gnutls
+
+DEPENDS += cross/libass
+CONFIGURE_ARGS += --enable-libass
+
+DEPENDS += cross/libbluray
+CONFIGURE_ARGS += --enable-libbluray
+
+DEPENDS += cross/libcaca
+CONFIGURE_ARGS += --enable-libcaca
+
+DEPENDS += cross/dav1d
+CONFIGURE_ARGS += --enable-libdav1d
+
 DEPENDS += cross/codec2
 CONFIGURE_ARGS += --enable-libcodec2
 
-DEPENDS += cross/libxml2
-CONFIGURE_ARGS += --enable-libxml2
-CONFIGURE_ARGS += --enable-demuxer=dash
+DEPENDS += cross/libdc1394
+CONFIGURE_ARGS += --enable-libdc1394
 
 DEPENDS += cross/fontconfig
 CONFIGURE_ARGS += --enable-libfontconfig
@@ -96,57 +109,79 @@ CONFIGURE_ARGS += --enable-libfreetype
 DEPENDS += cross/fribidi
 CONFIGURE_ARGS += --enable-libfribidi
 
-DEPENDS += cross/openjpeg
-CONFIGURE_ARGS += --enable-libopenjpeg
-
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
 
-DEPENDS += cross/libbluray
-CONFIGURE_ARGS += --enable-libbluray
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/libjxl
+CONFIGURE_ARGS += --enable-libjxl
+endif
+
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+DEPENDS += cross/liblc3
+CONFIGURE_ARGS += --enable-liblc3
+endif
+
+DEPENDS += cross/opencore-amr
+CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
+
+DEPENDS += cross/openjpeg
+CONFIGURE_ARGS += --enable-libopenjpeg
+
+DEPENDS += cross/opus
+CONFIGURE_ARGS += --enable-libopus
+
+DEPENDS += cross/librabbitmq
+CONFIGURE_ARGS += --enable-librabbitmq
+
+DEPENDS += cross/librist
+CONFIGURE_ARGS += --enable-librist
+
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/rubberband
+CONFIGURE_ARGS += --enable-librubberband
+endif
+
+DEPENDS += cross/shine
+CONFIGURE_ARGS += --enable-libshine
+
+DEPENDS += cross/snappy
+CONFIGURE_ARGS += --enable-libsnappy
+
+DEPENDS += cross/soxr
+CONFIGURE_ARGS += --enable-libsoxr
 
 DEPENDS += cross/speex
 CONFIGURE_ARGS += --enable-libspeex
+
+DEPENDS += cross/libsrt
+CONFIGURE_ARGS += --enable-libsrt
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --enable-libtheora
 
-DEPENDS += cross/libcaca
-CONFIGURE_ARGS += --enable-libcaca
+DEPENDS += cross/twolame
+CONFIGURE_ARGS += --enable-libtwolame
 
-DEPENDS += cross/libdc1394
-CONFIGURE_ARGS += --enable-libdc1394
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/libvmaf
+CONFIGURE_ARGS += --enable-libvmaf
+endif
 
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
 
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/vvenc
+CONFIGURE_ARGS += --enable-libvvenc
+endif
+
+DEPENDS += cross/libvpx
+CONFIGURE_ARGS += --enable-libvpx
+
 DEPENDS += cross/libwebp
 CONFIGURE_ARGS += --enable-libwebp
-
-DEPENDS += cross/libzmq
-CONFIGURE_ARGS += --enable-libzmq
-
-DEPENDS += cross/gnutls
-CONFIGURE_ARGS += --enable-gnutls
-
-DEPENDS += cross/opus
-CONFIGURE_ARGS += --enable-libopus
-
-DEPENDS += cross/soxr
-CONFIGURE_ARGS += --enable-libsoxr
-
-DEPENDS += cross/opencore-amr
-CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
-
-DEPENDS += cross/librabbitmq
-CONFIGURE_ARGS += --enable-librabbitmq
-
-DEPENDS += cross/twolame
-CONFIGURE_ARGS += --enable-libtwolame
-
-DEPENDS += cross/zvbi
-CONFIGURE_ARGS += --enable-libzvbi
 
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
@@ -154,35 +189,17 @@ CONFIGURE_ARGS += --enable-libx264
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --enable-libx265
 
-DEPENDS += cross/libvpx
-CONFIGURE_ARGS += --enable-libvpx
-
-DEPENDS += cross/shine
-CONFIGURE_ARGS += --enable-libshine
-
-DEPENDS += cross/chromaprint-fftw
-CONFIGURE_ARGS += --enable-chromaprint
-
-DEPENDS += cross/dav1d
-CONFIGURE_ARGS += --enable-libdav1d
-
-# Newer frei0r requires newer gcc
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/frei0r
-CONFIGURE_ARGS += --enable-frei0r
-endif
-
-DEPENDS += cross/librist
-CONFIGURE_ARGS += --enable-librist
+DEPENDS += cross/libxml2
+CONFIGURE_ARGS += --enable-libxml2 --enable-demuxer=dash
 
 DEPENDS += cross/libzimg
 CONFIGURE_ARGS += --enable-libzimg
 
-DEPENDS += cross/snappy
-CONFIGURE_ARGS += --enable-libsnappy
+DEPENDS += cross/libzmq
+CONFIGURE_ARGS += --enable-libzmq
 
-DEPENDS += cross/libass
-CONFIGURE_ARGS += --enable-libass
+DEPENDS += cross/zvbi
+CONFIGURE_ARGS += --enable-libzvbi
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
@@ -232,7 +249,9 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm64
 CONFIGURE_ARGS += --enable-neon
+CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-thumb
+CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
@@ -251,14 +270,30 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
 CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-libmfx
 CONFIGURE_ARGS += --enable-vaapi
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
+CONFIGURE_ARGS += --enable-v4l2-m2m
+endif
+
+# libmfx and libvpl cannot be enabled together:
+#   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
+#   - libvpl (oneVPL) → Gen12+, no Synology NAS has that
+CONFIGURE_ARGS += --enable-libmfx
+#CONFIGURE_ARGS += --enable-libvpl
 
 # Enable OpenCL and Vulkan acceleration
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
+#CONFIGURE_ARGS += --enable-libglslang  # <-- Mutually exclusive to shaderc
+CONFIGURE_ARGS += --enable-libshaderc
 CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
+
+# Requires GCC >= 12 (C++20 <version> header support)
+ifeq ($(call version_ge, $(TC_GCC), 12),1)
+CONFIGURE_ARGS += --enable-libplacebo
+endif
+
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk
