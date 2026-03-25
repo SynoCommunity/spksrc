@@ -170,11 +170,9 @@ DEPENDS += python/rencode
 # Require environment variables
 #   PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #   PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# Version = 0.24 requires rustc >= 1.82 (qoriq)
+# Version = 0.24 requires rustc >= 1.82 (qoriq) ==> No longer supported by py314
 # Version = 0.25 requires rustc >= 1.85
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-WHEELS += rpds_py==0.24.0
-else
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 WHEELS += rpds_py==0.25.1
 endif
 
