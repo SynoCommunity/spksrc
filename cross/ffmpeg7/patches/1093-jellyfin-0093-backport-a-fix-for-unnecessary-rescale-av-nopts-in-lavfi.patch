@@ -1,5 +1,3 @@
-Index: FFmpeg/libavfilter/framesync.c
-===================================================================
 --- libavfilter/framesync.c
 +++ libavfilter/framesync.c
 @@ -248,7 +248,7 @@ static void framesync_inject_frame(FFFra
@@ -11,8 +9,6 @@ Index: FFmpeg/libavfilter/framesync.c
      frame->pts = pts;
      fs->in[in].frame_next = frame;
      fs->in[in].pts_next   = pts;
-Index: FFmpeg/libavfilter/vf_scale.c
-===================================================================
 --- libavfilter/vf_scale.c
 +++ libavfilter/vf_scale.c
 @@ -1119,7 +1119,7 @@ FF_ENABLE_DEPRECATION_WARNINGS

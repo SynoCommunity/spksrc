@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/qsv.c
-===================================================================
 --- libavcodec/qsv.c
 +++ libavcodec/qsv.c
 @@ -409,9 +409,17 @@ static int qsv_load_plugins(mfxSession s

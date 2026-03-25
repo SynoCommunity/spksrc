@@ -3,25 +3,42 @@ Patches: https://github.com/jellyfin/jellyfin-ffmpeg/tree/jellyfin/debian/patche
 
 Extract jellyfin-ffmpeg git repository
 $ git clone https://github.com/jellyfin/jellyfin-ffmpeg.git
+$ cd jellyfin-ffmpeg
+
+Checkout the tag associated with current ffmpeg version
+$ git tag --list | grep 7.1.3
+$ git checkout v7.1.3-6
+
+If there were deleted files from earlier manipulations
+$ git restore .
+$ git status
+HEAD detached at v7.1.3-6
+nothing to commit, working tree clean
 
 Check that current ffmpeg matches jellyfin version
-$ cat jellyfin-ffmpeg/VERSION 
+$ cat VERSION 
 7.1.3
 
 Modify patches to be in -p0 mode:
-$ cd jellyfin-ffmpeg/debian/patches
-$ sed -i -e 's?--- jellyfin-ffmpeg.orig/?--- ?1' \
-         -e 's?+++ jellyfin-ffmpeg/?+++ ?1' \
-         -e 's?--- a/?--- ?1' \
-         -e 's?+++ b/?+++ ?1' \
-         -e 's?--- FFmpeg.orig/?--- ?1' \
-         -e 's?+++ FFmpeg/?+++ ?1' \
-         *.patch
+$ cd debian/patches
+$ i=1001 && for p in *.patch; do \
+    filterdiff -p1 --strip=1 "$p" > $(printf "%04d" $i)-jellyfin-$p ; \
+    let i++ ; \
+    done
 
-Rename the patches:
-$ i=1001 && ls -1 *.patch | while read LINE; do echo $(printf "%04d" $i)-jellyfin-$LINE; mv $LINE $(printf "%04d" $i)-jellyfin-$LINE; let i++; done
+Remove previous patches for spksrc repository:
+$ cd ~/ffmpeg8/spksrc/cross/ffmpeg7/patches/
+$ git rm 10*.patch
+
+Copy new patches:
+$ cp ~/jellyfin-ffmpeg/debian/patches/10*.patch .
 
 Test the patches on a clean ffmpeg tree:
 $ tar -jxvf ffmpeg-7.1.3.tar.bz2 
 $ cd ffmpeg-7.1.3/
-$ ls -1d ~/jellyfin-ffmpeg/debian/patches/*.patch | while read LINE; do patch -p0 < $LINE; done
+$ ls -1d ~/ffmpeg8/spksrc/cross/ffmpeg7/patches/*.patch | while read LINE; do patch -p0 < $LINE; done
+
+Add them to spksrc repository:
+$ git add 10*.patch
+$ git add 10*.patch
+$ git commit

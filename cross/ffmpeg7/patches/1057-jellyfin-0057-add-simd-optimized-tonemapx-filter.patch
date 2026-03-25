@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -2319,6 +2319,9 @@ HEADERS_LIST="
@@ -67,8 +65,6 @@ Index: FFmpeg/configure
      fi
  elif enabled llvm_gcc; then
      check_cflags -mllvm -stack-alignment=16
-Index: FFmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -532,6 +532,7 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
@@ -79,8 +75,6 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.ptx.o \
                                                  cuda/host_util.o cuda/load_helper.o
  OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o opencl.o \
-Index: FFmpeg/libavfilter/aarch64/Makefile
-===================================================================
 --- libavfilter/aarch64/Makefile
 +++ libavfilter/aarch64/Makefile
 @@ -1,5 +1,6 @@
@@ -90,8 +84,6 @@ Index: FFmpeg/libavfilter/aarch64/Makefile
  
  NEON-OBJS-$(CONFIG_BWDIF_FILTER)             += aarch64/vf_bwdif_neon.o
  NEON-OBJS-$(CONFIG_NLMEANS_FILTER)           += aarch64/vf_nlmeans_neon.o
-Index: FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.c
-===================================================================
 --- /dev/null
 +++ libavfilter/aarch64/vf_tonemapx_intrin_neon.c
 @@ -0,0 +1,2360 @@
@@ -2455,8 +2447,6 @@ Index: FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.c
 +    }
 +#endif // ENABLE_TONEMAPX_NEON_INTRINSICS
 +}
-Index: FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.h
-===================================================================
 --- /dev/null
 +++ libavfilter/aarch64/vf_tonemapx_intrin_neon.h
 @@ -0,0 +1,75 @@
@@ -2535,8 +2525,6 @@ Index: FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.h
 +                                    const struct TonemapIntParams *params);
 +
 +#endif // AVFILTER_AARCH64_TONEMAPX_INTRIN_NEON_H
-Index: FFmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -499,6 +499,7 @@ extern const AVFilter ff_vf_tmedian;
@@ -2547,8 +2535,6 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_tonemap_cuda;
  extern const AVFilter ff_vf_tonemap_opencl;
  extern const AVFilter ff_vf_tonemap_vaapi;
-Index: FFmpeg/libavfilter/colorspace.c
-===================================================================
 --- libavfilter/colorspace.c
 +++ libavfilter/colorspace.c
 @@ -17,6 +17,7 @@
@@ -2611,8 +2597,6 @@ Index: FFmpeg/libavfilter/colorspace.c
 +        av_assert2(out[1][2][0] == out[2][0][0]);
 +    }
 +}
-Index: FFmpeg/libavfilter/colorspace.h
-===================================================================
 --- libavfilter/colorspace.h
 +++ libavfilter/colorspace.h
 @@ -110,4 +110,8 @@ float eotf_arib_b67(float x);
@@ -2624,8 +2608,6 @@ Index: FFmpeg/libavfilter/colorspace.h
 +void ff_get_yuv_coeffs(int out[3][3][8], double (*table)[3],
 +                       int depth, int y_rng, int uv_rng, int yuv2rgb);
  #endif
-Index: FFmpeg/libavfilter/vf_tonemapx.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_tonemapx.c
 @@ -0,0 +1,1948 @@
@@ -4577,8 +4559,6 @@ Index: FFmpeg/libavfilter/vf_tonemapx.c
 +    FILTER_QUERY_FUNC(query_formats),
 +    .flags           = AVFILTER_FLAG_SLICE_THREADS,
 +};
-Index: FFmpeg/libavfilter/vf_tonemapx.h
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_tonemapx.h
 @@ -0,0 +1,144 @@
@@ -4726,8 +4706,6 @@ Index: FFmpeg/libavfilter/vf_tonemapx.h
 +                               const struct TonemapIntParams *params);
 +
 +#endif // AVFILTER_TONEMAPX_H
-Index: FFmpeg/libavfilter/x86/Makefile
-===================================================================
 --- libavfilter/x86/Makefile
 +++ libavfilter/x86/Makefile
 @@ -36,6 +36,8 @@ OBJS-$(CONFIG_STEREO3D_FILTER)
@@ -4739,8 +4717,6 @@ Index: FFmpeg/libavfilter/x86/Makefile
  OBJS-$(CONFIG_TRANSPOSE_FILTER)              += x86/vf_transpose_init.o
  OBJS-$(CONFIG_VOLUME_FILTER)                 += x86/af_volume_init.o
  OBJS-$(CONFIG_V360_FILTER)                   += x86/vf_v360_init.o
-Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.c
-===================================================================
 --- /dev/null
 +++ libavfilter/x86/vf_tonemapx_intrin_avx.c
 @@ -0,0 +1,2577 @@
@@ -7321,8 +7297,6 @@ Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.c
 +    }
 +#endif // ENABLE_TONEMAPX_AVX_INTRINSICS
 +}
-Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.h
-===================================================================
 --- /dev/null
 +++ libavfilter/x86/vf_tonemapx_intrin_avx.h
 @@ -0,0 +1,75 @@
@@ -7401,8 +7375,6 @@ Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.h
 +                                             const struct TonemapIntParams *params);
 +
 +#endif // AVFILTER_X86_TONEMAPX_INTRIN_AVX_H
-Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.c
-===================================================================
 --- /dev/null
 +++ libavfilter/x86/vf_tonemapx_intrin_sse.c
 @@ -0,0 +1,2740 @@
@@ -10146,8 +10118,6 @@ Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.c
 +    }
 +#endif // ENABLE_TONEMAPX_SSE_INTRINSICS
 +}
-Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.h
-===================================================================
 --- /dev/null
 +++ libavfilter/x86/vf_tonemapx_intrin_sse.h
 @@ -0,0 +1,75 @@

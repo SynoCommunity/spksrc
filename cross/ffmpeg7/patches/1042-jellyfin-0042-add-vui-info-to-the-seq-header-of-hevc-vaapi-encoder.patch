@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/vaapi_encode_h265.c
-===================================================================
 --- libavcodec/vaapi_encode_h265.c
 +++ libavcodec/vaapi_encode_h265.c
 @@ -264,6 +264,7 @@ static int vaapi_encode_h265_init_sequen

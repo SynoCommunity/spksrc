@@ -1,5 +1,3 @@
-Index: FFmpeg/libavutil/hwcontext_opencl.c
-===================================================================
 --- libavutil/hwcontext_opencl.c
 +++ libavutil/hwcontext_opencl.c
 @@ -64,6 +64,16 @@

@@ -1,5 +1,3 @@
-Index: FFmpeg/libavutil/hwcontext_d3d11va.c
-===================================================================
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
 @@ -640,6 +640,8 @@ static int d3d11va_device_create(AVHWDev

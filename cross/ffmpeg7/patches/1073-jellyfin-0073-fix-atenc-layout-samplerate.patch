@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/audiotoolboxenc.c
-===================================================================
 --- libavcodec/audiotoolboxenc.c
 +++ libavcodec/audiotoolboxenc.c
 @@ -236,8 +236,8 @@ static int get_aac_tag(const AVChannelLa

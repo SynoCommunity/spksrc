@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/videotoolbox.c
-===================================================================
 --- libavcodec/videotoolbox.c
 +++ libavcodec/videotoolbox.c
 @@ -787,11 +787,6 @@ static CFDictionaryRef videotoolbox_buff

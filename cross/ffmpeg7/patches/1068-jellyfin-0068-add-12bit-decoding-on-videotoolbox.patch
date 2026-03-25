@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/hevc/hevcdec.c
-===================================================================
 --- libavcodec/hevc/hevcdec.c
 +++ libavcodec/hevc/hevcdec.c
 @@ -660,6 +660,9 @@ static enum AVPixelFormat get_format(HEV

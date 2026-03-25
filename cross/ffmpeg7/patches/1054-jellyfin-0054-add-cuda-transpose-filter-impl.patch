@@ -1,8 +1,6 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
-@@ -3317,6 +3317,8 @@ thumbnail_cuda_filter_deps="ffnvcodec"
+@@ -3321,6 +3321,8 @@ thumbnail_cuda_filter_deps="ffnvcodec"
  thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  tonemap_cuda_filter_deps="ffnvcodec const_nan"
  tonemap_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -11,8 +9,6 @@ Index: FFmpeg/configure
  transpose_npp_filter_deps="ffnvcodec libnpp"
  overlay_cuda_filter_deps="ffnvcodec"
  overlay_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
-Index: FFmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -542,6 +542,8 @@ OBJS-$(CONFIG_TONEMAP_VIDEOTOOLBOX_FILTE
@@ -24,8 +20,6 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_TRANSPOSE_NPP_FILTER)          += vf_transpose_npp.o
  OBJS-$(CONFIG_TRANSPOSE_OPENCL_FILTER)       += vf_transpose_opencl.o opencl.o opencl/transpose.o
  OBJS-$(CONFIG_TRANSPOSE_VAAPI_FILTER)        += vf_transpose_vaapi.o vaapi_vpp.o
-Index: FFmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -505,6 +505,7 @@ extern const AVFilter ff_vf_tonemap_vaap
@@ -36,11 +30,9 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_transpose_npp;
  extern const AVFilter ff_vf_transpose_opencl;
  extern const AVFilter ff_vf_transpose_vaapi;
-Index: FFmpeg/libavfilter/vf_transpose_cuda.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_transpose_cuda.c
-@@ -0,0 +1,481 @@
+@@ -0,0 +1,483 @@
 +/*
 + * Copyright (C) 2024 NyanMisaka
 + *
@@ -111,6 +103,7 @@ Index: FFmpeg/libavfilter/vf_transpose_cuda.c
 +    CUfunction cu_func_ushort;
 +    CUstream   cu_stream;
 +
++    int flip_wh;
 +    int passthrough;    ///< PassthroughType, landscape passthrough mode enabled
 +    int dir;            ///< TransposeDir
 +} TransposeCUDAContext;
@@ -250,7 +243,7 @@ Index: FFmpeg/libavfilter/vf_transpose_cuda.c
 +    TransposeCUDAContext *s = ctx->priv;
 +    CUcontext dummy, cuda_ctx;
 +    CudaFunctions *cu;
-+    int ret;
++    int ret = 0;
 +
 +    if ((inlink->w >= inlink->h && s->passthrough == TRANSPOSE_PT_TYPE_LANDSCAPE) ||
 +        (inlink->w <= inlink->h && s->passthrough == TRANSPOSE_PT_TYPE_PORTRAIT)) {
@@ -275,16 +268,17 @@ Index: FFmpeg/libavfilter/vf_transpose_cuda.c
 +    case TRANSPOSE_CLOCK_FLIP:
 +        outlink->w = inlink->h;
 +        outlink->h = inlink->w;
++        s->flip_wh = 1;
 +        break;
 +    default:
 +        outlink->w = inlink->w;
 +        outlink->h = inlink->h;
++        s->flip_wh = 0;
 +        break;
 +    }
 +
-+    if (inlink->sample_aspect_ratio.num)
-+        outlink->sample_aspect_ratio = av_div_q((AVRational) { 1, 1 },
-+                                                inlink->sample_aspect_ratio);
++    if (s->flip_wh && inlink->sample_aspect_ratio.num)
++        outlink->sample_aspect_ratio = av_inv_q(inlink->sample_aspect_ratio);
 +    else
 +        outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
 +
@@ -301,31 +295,26 @@ Index: FFmpeg/libavfilter/vf_transpose_cuda.c
 +
 +    ret = ff_cuda_load_module(ctx, s->hwctx, &s->cu_module,
 +                              ff_vf_transpose_cuda_ptx_data, ff_vf_transpose_cuda_ptx_len);
-+    if (ret < 0) {
-+        CHECK_CU(cu->cuCtxPopCurrent(&dummy));
-+        return ret;
-+    }
++    if (ret < 0)
++        goto exit;
 +
 +    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_uchar,
 +                                           s->cu_module, "Transpose_Cuda_uchar"));
-+    if (ret < 0) {
-+        CHECK_CU(cu->cuCtxPopCurrent(&dummy));
-+        return ret;
-+    }
++    if (ret < 0)
++        goto exit;
 +
 +    ret = CHECK_CU(cu->cuModuleGetFunction(&s->cu_func_ushort,
 +                                           s->cu_module, "Transpose_Cuda_ushort"));
-+    if (ret < 0) {
-+        CHECK_CU(cu->cuCtxPopCurrent(&dummy));
-+        return ret;
-+    }
-+
-+    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++    if (ret < 0)
++        goto exit;
 +
 +    av_log(ctx, AV_LOG_VERBOSE,
 +           "w:%d h:%d dir:%d -> w:%d h:%d\n",
 +           inlink->w, inlink->h, s->dir, outlink->w, outlink->h);
-+    return 0;
++exit:
++    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
++
++    return ret;
 +}
 +
 +static int call_transpose_kernel(AVFilterContext *ctx,
@@ -416,6 +405,11 @@ Index: FFmpeg/libavfilter/vf_transpose_cuda.c
 +    ret = av_frame_copy_props(out, in);
 +    if (ret < 0)
 +        return ret;
++
++    if (s->flip_wh && in->sample_aspect_ratio.num)
++        out->sample_aspect_ratio = av_inv_q(in->sample_aspect_ratio);
++    else
++        out->sample_aspect_ratio = in->sample_aspect_ratio;
 +
 +    return 0;
 +}
@@ -522,8 +516,6 @@ Index: FFmpeg/libavfilter/vf_transpose_cuda.c
 +    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_CUDA),
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};
-Index: FFmpeg/libavfilter/vf_transpose_cuda.cu
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_transpose_cuda.cu
 @@ -0,0 +1,61 @@

@@ -1,5 +1,3 @@
-Index: FFmpeg/libavfilter/drawutils.c
-===================================================================
 --- libavfilter/drawutils.c
 +++ libavfilter/drawutils.c
 @@ -437,7 +437,7 @@ void ff_blend_rectangle(FFDrawContext *d
@@ -312,8 +310,6 @@ Index: FFmpeg/libavfilter/drawutils.c
      return fmts;
  }
 +
-Index: FFmpeg/libavfilter/drawutils.h
-===================================================================
 --- libavfilter/drawutils.h
 +++ libavfilter/drawutils.h
 @@ -59,7 +59,17 @@ typedef struct FFDrawColor {
@@ -340,8 +336,6 @@ Index: FFmpeg/libavfilter/drawutils.h
  
  #endif /* AVFILTER_DRAWUTILS_H */
 +
-Index: FFmpeg/libavfilter/vf_subtitles.c
-===================================================================
 --- libavfilter/vf_subtitles.c
 +++ libavfilter/vf_subtitles.c
 @@ -38,6 +38,7 @@

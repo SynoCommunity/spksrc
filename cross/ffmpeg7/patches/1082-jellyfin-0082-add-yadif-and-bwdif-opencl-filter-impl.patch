@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3867,6 +3867,7 @@ boxblur_opencl_filter_deps="opencl gpl"
@@ -18,8 +16,6 @@ Index: FFmpeg/configure
  yadif_videotoolbox_filter_deps="metal corevideo videotoolbox"
  hstack_vaapi_filter_deps="vaapi_1"
  vstack_vaapi_filter_deps="vaapi_1"
-Index: FFmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -219,6 +219,8 @@ OBJS-$(CONFIG_BOXBLUR_OPENCL_FILTER)
@@ -40,8 +36,6 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_YADIF_VIDEOTOOLBOX_FILTER)     += vf_yadif_videotoolbox.o \
                                                  metal/vf_yadif_videotoolbox.metallib.o \
                                                  metal/utils.o \
-Index: FFmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -201,6 +201,7 @@ extern const AVFilter ff_vf_boxblur;
@@ -60,8 +54,6 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_yadif_videotoolbox;
  extern const AVFilter ff_vf_yaepblur;
  extern const AVFilter ff_vf_zmq;
-Index: FFmpeg/libavfilter/opencl.c
-===================================================================
 --- libavfilter/opencl.c
 +++ libavfilter/opencl.c
 @@ -86,9 +86,17 @@ int ff_opencl_filter_config_input(AVFilt
@@ -114,8 +106,6 @@ Index: FFmpeg/libavfilter/opencl.c
      cl_int cle;
  
      ctx->program = clCreateProgramWithSource(ctx->hwctx->context, nb_strings,
-Index: FFmpeg/libavfilter/opencl.h
-===================================================================
 --- libavfilter/opencl.h
 +++ libavfilter/opencl.h
 @@ -256,6 +256,9 @@ int ff_opencl_filter_config_input(AVFilt
@@ -150,8 +140,6 @@ Index: FFmpeg/libavfilter/opencl.h
  /**
   * Load a new OpenCL program from a file.
   *
-Index: FFmpeg/libavfilter/opencl/bwdif.cl
-===================================================================
 --- /dev/null
 +++ libavfilter/opencl/bwdif.cl
 @@ -0,0 +1,183 @@
@@ -338,8 +326,6 @@ Index: FFmpeg/libavfilter/opencl/bwdif.cl
 +        write_imagef(dst, pos, (float4)(pred.x, pred.y, 0.0f, 1.0f));
 +    }
 +}
-Index: FFmpeg/libavfilter/opencl/yadif.cl
-===================================================================
 --- /dev/null
 +++ libavfilter/opencl/yadif.cl
 @@ -0,0 +1,197 @@
@@ -540,8 +526,6 @@ Index: FFmpeg/libavfilter/opencl/yadif.cl
 +        write_imagef(dst, pos, (float4)(pred.x, pred.y, 0.0f, 1.0f));
 +    }
 +}
-Index: FFmpeg/libavfilter/opencl_source.h
-===================================================================
 --- libavfilter/opencl_source.h
 +++ libavfilter/opencl_source.h
 @@ -20,6 +20,7 @@
@@ -559,8 +543,6 @@ Index: FFmpeg/libavfilter/opencl_source.h
 +extern const char *ff_source_yadif_cl;
  
  #endif /* AVFILTER_OPENCL_SOURCE_H */
-Index: FFmpeg/libavfilter/vf_bwdif_opencl.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_bwdif_opencl.c
 @@ -0,0 +1,328 @@
@@ -892,8 +874,6 @@ Index: FFmpeg/libavfilter/vf_bwdif_opencl.c
 +                      AVFILTER_FLAG_SUPPORT_TIMELINE_INTERNAL,
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};
-Index: FFmpeg/libavfilter/vf_yadif_opencl.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_yadif_opencl.c
 @@ -0,0 +1,320 @@

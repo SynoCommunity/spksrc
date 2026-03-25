@@ -1,5 +1,3 @@
-Index: FFmpeg/fftools/ffmpeg_filter.c
-===================================================================
 --- fftools/ffmpeg_filter.c
 +++ fftools/ffmpeg_filter.c
 @@ -1543,8 +1543,21 @@ static int configure_output_video_filter

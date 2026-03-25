@@ -1,5 +1,25 @@
-Index: FFmpeg/libavfilter/qsvvpp.c
-===================================================================
+--- libavcodec/qsvdec.c
++++ libavcodec/qsvdec.c
+@@ -202,6 +202,7 @@ static int qsv_init_session(AVCodecConte
+             MFXClose(q->internal_qs.session);
+             q->internal_qs.session = NULL;
+         }
++        ff_refstruct_unref(&q->frames_ctx.mids);
+         av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
+ 
+         q->frames_ctx.hw_frames_ctx = av_buffer_ref(hw_frames_ref);
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -1842,6 +1842,9 @@ int ff_qsv_enc_init(AVCodecContext *avct
+         return ret;
+     }
+ 
++    // Update AVCodecContext with actual encoding parameters
++    avctx->has_b_frames = q->param.mfx.GopRefDist > 1 ? q->param.mfx.GopRefDist - 1 : 0;
++
+     q->avctx = avctx;
+ 
+     return 0;
 --- libavfilter/qsvvpp.c
 +++ libavfilter/qsvvpp.c
 @@ -471,7 +471,8 @@ static QSVFrame *submit_frame(QSVVPPCont

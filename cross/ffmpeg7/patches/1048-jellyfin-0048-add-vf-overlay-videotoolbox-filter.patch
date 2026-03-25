@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3928,6 +3928,7 @@ overlay_opencl_filter_deps="opencl"
@@ -10,8 +8,6 @@ Index: FFmpeg/configure
  overlay_vulkan_filter_deps="vulkan spirv_compiler"
  overlay_rkrga_filter_deps="rkrga"
  owdenoise_filter_deps="gpl"
-Index: FFmpeg/doc/filters.texi
-===================================================================
 --- doc/filters.texi
 +++ doc/filters.texi
 @@ -19050,6 +19050,58 @@ See @ref{framesync}.
@@ -73,8 +69,6 @@ Index: FFmpeg/doc/filters.texi
  @section owdenoise
  
  Apply Overcomplete Wavelet denoiser.
-Index: FFmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -416,6 +416,9 @@ OBJS-$(CONFIG_OVERLAY_OPENCL_FILTER)
@@ -87,8 +81,6 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_OVERLAY_VULKAN_FILTER)         += vf_overlay_vulkan.o vulkan.o vulkan_filter.o
  OBJS-$(CONFIG_OVERLAY_RKRGA_FILTER)          += vf_overlay_rkrga.o framesync.o
  OBJS-$(CONFIG_OWDENOISE_FILTER)              += vf_owdenoise.o
-Index: FFmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -389,6 +389,7 @@ extern const AVFilter ff_vf_overlay;
@@ -99,8 +91,6 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_overlay_vulkan;
  extern const AVFilter ff_vf_overlay_cuda;
  extern const AVFilter ff_vf_overlay_rkrga;
-Index: FFmpeg/libavfilter/metal/utils.m
-===================================================================
 --- libavfilter/metal/utils.m
 +++ libavfilter/metal/utils.m
 @@ -55,6 +55,9 @@ CVMetalTextureRef ff_metal_texture_from_
@@ -124,8 +114,6 @@ Index: FFmpeg/libavfilter/metal/utils.m
          plane,
          &tex
      );
-Index: FFmpeg/libavfilter/metal/vf_overlay_videotoolbox.metal
-===================================================================
 --- /dev/null
 +++ libavfilter/metal/vf_overlay_videotoolbox.metal
 @@ -0,0 +1,99 @@
@@ -228,8 +216,6 @@ Index: FFmpeg/libavfilter/metal/vf_overlay_videotoolbox.metal
 +        dest_uv.write(float4(result_color.y, result_color.z, 0.0f, 1.0f), loc_uv);
 +    }
 +}
-Index: FFmpeg/libavfilter/vf_overlay_videotoolbox.m
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_overlay_videotoolbox.m
 @@ -0,0 +1,758 @@
