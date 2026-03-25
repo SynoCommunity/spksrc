@@ -216,7 +216,7 @@ include ../../mk/spksrc.plist.mk
 #  - First call builds the toolchain (download / extract / patch / build)
 #  - Second call generates tc_vars* files in the kernel WORK_DIR
 # -----------------------------------------------------------------------------
-TCVARS_DONE := $(WORK_DIR)/.tcvars_done
+TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
 
 .PHONY: kernel-stage1
 kernel-stage1: $(TCVARS_DONE)

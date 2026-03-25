@@ -43,7 +43,7 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 POST_STRIP_TARGET = ffsync_extra_install
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.common.mk
 
 # [greenlet]
 # version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
@@ -64,3 +64,5 @@ ffsync_extra_install:
 	@$(MSG) Patch binaries built with rust to find shared libraries
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib:/var/packages/$(PYTHON_PACKAGE)/target/lib $(STAGING_DIR)/bin/syncserver
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/diesel
+
+include ../../mk/spksrc.python.mk

@@ -37,6 +37,15 @@ OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
 
+# [atom]
+# Requires
+#  - build:setuptools-scm
+#  - cross:cppy
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+WHEELS += atom==0.10.5
+WHEELS += atom==0.11.0
+endif
+
 # [borgbackup]
 # Use OpenSSL path as defined by either
 # spksrc.wheel-env.mk or spksrc.python.mk
@@ -62,6 +71,19 @@ else
 WHEELS += gevent==25.5.1
 endif
 
+# [greenlet]
+# version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
+# version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Mandatory require full c++11 support
+# version  = 1.x: gcc <  4.9 (DSM5, DSM6) Last known working version (armv5, hi3535)
+ifeq ($(call version_ge, $(TC_GCC), 8),1)
+WHEELS += greenlet==3.2.3
+else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
+WHEELS += greenlet==3.0.3
+WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
+else
+WHEELS += greenlet==1.1.3
+endif
+
 # [lxml]
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
@@ -79,6 +101,41 @@ endif
 DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
+# >> [numpy] unsupported with old PPC arch
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+
+# [numpy]
+# version <= 1.21 (armv5)  Last working version
+# version <= 1.22 (armv7l) Last working version
+# version <= 1.24 (DSM6, comcerto2k) Last working version with gcc-4.9
+# version >= 1.25 (DSM7)   Mandatory requires c++17
+# version == 1.25.2        BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
+# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
+# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS += numpy==1.21.6
+else ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += numpy==1.22.4
+else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+WHEELS += numpy==1.24.4
+# workaround for compiler bug:
+# https://github.com/numpy/numpy/issues/13622
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+WHEELS_CFLAGS += [numpy] -O0
+endif
+else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+DEPENDS += python/numpy_1.26
+DEPENDS += python/numpy
+endif
+
+# >> [numpy] unsupported with old PPC arch
+endif
+
+# [pandas] - depends on numpy >= 1.26
+ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+DEPENDS += python/pandas
+endif
 
 # [Pendulum]
 # Needs atomic to build
@@ -98,8 +155,27 @@ ENV += PYCARES_USE_SYSTEM_LIB=1
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
+# [pycryptodome]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pycryptodome] -std=c11
+else
+WHEELS_CFLAGS += [pycryptodome] -std=c99
+endif
+
+# [pycryptodomex]
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+WHEELS_CFLAGS += [pycryptodomex] -std=c11
+else
+WHEELS_CFLAGS += [pycryptodomex] -std=c99
+endif
+
 # [pydantic-core]
 DEPENDS += python/pydantic-core
+
+# [pygobject]
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+DEPENDS += python/pygobject
+endif
 
 # [PyNaCl]
 DEPENDS += cross/libsodium
@@ -128,85 +204,12 @@ WHEELS += rpds_py==0.25.1
 endif
 endif
 
-include ../../mk/spksrc.python.mk
-
-# [atom]
-# Requires
-#  - build:setuptools-scm
-#  - cross:cppy
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-WHEELS += atom==0.10.5
-WHEELS += atom==0.11.0
-endif
-
-# [greenlet]
-# version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
-# version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Mandatory require full c++11 support
-# version  = 1.x: gcc <  4.9 (DSM5, DSM6) Last known working version (armv5, hi3535)
-ifeq ($(call version_ge, $(TC_GCC), 8),1)
-WHEELS += greenlet==3.2.3
-else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
-WHEELS += greenlet==3.0.3
-WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
-else
-WHEELS += greenlet==1.1.3
-endif
-
-# >> [numpy] and [scipy] unsupported with old PPC arch
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-
-# [numpy]
-# version <= 1.21 (armv5)  Last working version
-# version <= 1.22 (armv7l) Last working version
-# version <= 1.24 (DSM6, comcerto2k) Last working version with gcc-4.9
-# version >= 1.25 (DSM7)   Mandatory requires c++17
-# version == 1.25.2        BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
-# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
-# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS += numpy==1.21.6
-else ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-WHEELS += numpy==1.22.4
-else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
-WHEELS += numpy==1.24.4
-# workaround for compiler bug:
-# https://github.com/numpy/numpy/issues/13622
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-WHEELS_CFLAGS += [numpy] -O0
-endif
-else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
-DEPENDS += python/numpy_1.26
-DEPENDS += python/numpy
-endif
-
 # [scipy] - depends on numpy >= 2.x
+#           unsupported with old PPC arch
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
 DEPENDS += python/scipy
 endif
-
-# [pandas] - depends on numpy >= 1.26
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
-DEPENDS += python/pandas
 endif
 
-# >> [numpy] and [scipy] unsupported with old PPC arch
-endif
-
-# [pycryptodome]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-WHEELS_CFLAGS += [pycryptodome] -std=c11
-else
-WHEELS_CFLAGS += [pycryptodome] -std=c99
-endif
-
-# [pycryptodomex]
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-WHEELS_CFLAGS += [pycryptodomex] -std=c11
-else
-WHEELS_CFLAGS += [pycryptodomex] -std=c99
-endif
-
-# [pygobject]
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
-DEPENDS += python/pygobject
-endif
+include ../../mk/spksrc.python.mk

@@ -73,7 +73,7 @@
 # │             ├─ tc_vars.cmake              (CMake toolchain file)     │
 # │             └─ tc_vars.meson-*            (Meson cross/native files) │
 # │                                                                      │
-# │   creates status cookie: $(WORK_DIR)/.tcvars_done                    │
+# │   creates status cookie: $(WORK_DIR)/.stage1-tcvars_done             │
 # └──────────────────────────────────────────────────────────────────────┘
 #                                  │
 #                                  │ (cookie exists)
@@ -84,7 +84,7 @@
 # └──────────────────────────────────────────────────────────────────────┘
 #
 # Notes:
-#  - cross-stage1 is idempotent (guarded by .tcvars_done)
+#  - cross-stage1 is idempotent (guarded by .stage1-tcvars_done)
 #  - cross-stage2 never builds the toolchain
 #  - toolchain and package builds are strictly separated
 ###############################################################################

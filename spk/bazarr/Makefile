@@ -39,10 +39,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 # use alternate TMPDIR as /tmp might be too small and not accessible on DSM >= 7.1.
 USE_ALTERNATE_TMPDIR = 1
 
-# [Pillow]
-DEPENDS += python/pillow
-
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.common.mk
 
 # [lxml]
 DEPENDS += cross/libxml2
@@ -57,3 +54,8 @@ endif
 ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy
 endif
+
+# [Pillow]
+DEPENDS += python/pillow
+
+include ../../mk/spksrc.python.mk

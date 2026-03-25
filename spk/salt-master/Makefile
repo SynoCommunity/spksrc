@@ -46,13 +46,7 @@ SPK_USR_LOCAL_LINKS += bin:env/bin/spm
 
 USE_ALTERNATE_TMPDIR = 1
 
-# [cryptography]
-DEPENDS += cross/openssl3
-
-# [PyYAML]
-DEPENDS += cross/libyaml
-
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.common.mk
 
 # [aiohttp]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
@@ -61,6 +55,9 @@ ifeq ($(findstring $(ARCH),comcerto2k),comcerto2k)
 WHEELS_CFLAGS += [aiohttp] -U__ARM_NEON__
 endif
 endif
+
+# [cryptography]
+DEPENDS += cross/openssl3
 
 # [frozenlist]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
@@ -76,6 +73,9 @@ endif
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pycryptodomex] -std=c11
 endif
+
+# [PyYAML]
+DEPENDS += cross/libyaml
 
 # [pyzmq]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
@@ -103,3 +103,5 @@ salt-master_extra_install:
 	install -m 644 src/app/master $(STAGING_DIR)/share
 	install -m 755 -d $(STAGING_DIR)/var/extensions/auth
 	install -m 644 src/app/synology.py $(STAGING_DIR)/var/extensions/auth/synology.py
+
+include ../../mk/spksrc.python.mk
