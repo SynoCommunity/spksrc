@@ -182,7 +182,7 @@ WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
 endif
 
 # [scipy] - depends on numpy >= 2.x
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/scipy
 endif
 

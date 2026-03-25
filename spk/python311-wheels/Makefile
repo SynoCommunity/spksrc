@@ -37,6 +37,7 @@ SERVICE_SETUP = src/service-setup.sh
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/numpy-latest
 OPTIONAL_DEPENDS += python/pandas
 OPTIONAL_DEPENDS += python/scipy
 
@@ -114,7 +115,7 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 # version >= 1.25 (DSM7)   Mandatory requires c++17
 # version == 1.25.2        BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
 # version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
-# version >= 2.3  (DSM7.2) Requires gcc >= 9.4
+# version >= 2.3  (DSM7.2) Requires gcc >= 9.4 (using patch for DSM-7.1 compatibility)
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 WHEELS += numpy==1.22.4
@@ -125,14 +126,15 @@ WHEELS += numpy==1.24.4
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 WHEELS_CFLAGS += [numpy] -O0
 endif
-else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+else ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
+DEPENDS += python/numpy-latest
 endif
 endif
 
-# [pandas] - depends on numpy >= 1.26
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+# [pandas] - depends on numpy >= 2.x
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/pandas
 endif
 
@@ -202,7 +204,7 @@ WHEELS += rpds_py==0.25.1
 endif
 
 # [scipy] - depends on numpy >= 2.x
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/scipy
 endif
 
