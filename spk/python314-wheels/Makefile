@@ -33,7 +33,9 @@ WHEELS += src/requirements-pure.txt
 
 SERVICE_SETUP = src/service-setup.sh
 
+OPTIONAL_DEPENDS += python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/numpy-latest
 OPTIONAL_DEPENDS += python/pandas
 OPTIONAL_DEPENDS += python/scipy
 
@@ -105,25 +107,25 @@ ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
 # [numpy]
-# version == 1.26 -> NOT SUPPORTED SINCE PYTHON 3.13
-# version >= 2.3  -> Requires gcc >= 9.4 -> DSM-7.2
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+# version == 1.26 -> NOT officially supported python>3.13
+# version >= 2.3  -> Requires gcc >= 9.4 -> DSM-7.2 (using patch for DSM-7.1 gcc-8.5)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
+DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
+DEPENDS += python/numpy-latest
 endif
 
 # [pandas] - depends on numpy >= 2.x
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/pandas
 endif
 
 # [Pendulum]
-# DISABLED -> Needs to use a newer PyO3>=0.24.1
-#             ENV += PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 -> Not working!
 # Needs atomic to build
 # Serves as maturin type python-wheel.mk example
-#ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-#DEPENDS += python/pendulum
-#endif
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += python/pendulum
+endif
 
 # [Pillow]
 DEPENDS += python/pillow

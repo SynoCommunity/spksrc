@@ -34,6 +34,8 @@ WHEELS += src/requirements-pure.txt
 SERVICE_SETUP = src/service-setup.sh
 
 OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy-latest
 OPTIONAL_DEPENDS += python/pandas
 OPTIONAL_DEPENDS += python/scipy
 
@@ -107,12 +109,14 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 # [numpy]
 # version == 1.26 -> NOT SUPPORTED WITH PYTHON 3.13
 # version >= 2.3  -> Requires gcc >= 9.4 -> DSM-7.2
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
+DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
+DEPENDS += python/numpy-latest
 endif
 
 # [pandas] - depends on numpy >= 2.x
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/pandas
 endif
 
