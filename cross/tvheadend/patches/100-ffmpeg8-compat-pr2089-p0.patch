@@ -1,0 +1,684 @@
+From 1611bc71bfebcc8e453d24fac0ef4fea9c935bc9 Mon Sep 17 00:00:00 2001
+From: Ukn Unknown <4031821+uknunknown@users.noreply.github.com>
+Date: Sun, 22 Mar 2026 20:46:14 -0700
+Subject: [PATCH] update filter to format required by ffmpeg8
+
+- update the filter initialization from avfilter_graph_create_filter() to avfilter_graph_alloc_filter() +  avfilter_init_str(()
+- transition audio filter to aformat for audio conversions.
+- patched ffmpeg to allow attach of hw_device_ctx to upload filter
+---
+ Makefile.ffmpeg                       |  14 +-
+ src/transcoding/transcode/audio.c     |  93 ++++++--
+ src/transcoding/transcode/context.c   | 301 ++++++++++++++++++++++----
+ src/transcoding/transcode/internals.h |   9 +
+ src/transcoding/transcode/video.c     |  18 +-
+ support/patches/filter_1_ffmpg8.diff  |  14 ++
+ support/patches/filter_2_ffmpg8.diff  |  42 ++++
+ 7 files changed, 423 insertions(+), 68 deletions(-)
+ create mode 100644 support/patches/filter_1_ffmpg8.diff
+ create mode 100644 support/patches/filter_2_ffmpg8.diff
+
+diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
+index 5cbcc8b77b..44888a8c1b 100644
+--- Makefile.ffmpeg
++++ Makefile.ffmpeg
+@@ -41,7 +41,7 @@ ENCODERS       = mpeg2video mp2 aac vorbis flac
+ MUXERS         = mpegts matroska mp4
+ DEMUXERS       = mpegts matroska hls flv live_flv
+ BSFS           = h264_mp4toannexb hevc_mp4toannexb
+-FILTERS        = yadif format hwupload hwdownload scale null aresample anull
++FILTERS        = yadif format hwupload hwdownload scale null aresample aformat anull
+ HWACCELS       =
+ 
+ NASM_VER       = 2.16.03
+@@ -107,10 +107,14 @@ FFNVCODEC_TB   = $(FFNVCODEC).tar.gz
+ FFNVCODEC_URL  = https://github.com/FFmpeg/nv-codec-headers/releases/download/n$(FFNVCODEC_VER)/nv-codec-headers-$(FFNVCODEC_VER).tar.gz
+ FFNVCODEC_SHA1 = 74231bb5572ebde98652a26ce98ede7895b4c730
+ 
+-FFMPEG         = ffmpeg-6.1.1
++#FFMPEG         = ffmpeg-6.1.1
++#FFMPEG         = ffmpeg-7.1.3
++FFMPEG         = ffmpeg-8.0.1
+ FFMPEG_TB      = $(FFMPEG).tar.bz2
+ FFMPEG_URL     = https://ffmpeg.org/releases/$(FFMPEG_TB)
+-FFMPEG_SHA1    = 157e7b0f6521142e1ebd786175e363e9f1b59312
++#FFMPEG_SHA1    = 157e7b0f6521142e1ebd786175e363e9f1b59312
++#FFMPEG_SHA1    = 1aba57070ed172fac4f5a648a260e44dabbca0a4
++FFMPEG_SHA1    = c2f6d5fcbd3068c1c8b5af867dfa6809c456e6b4
+ 
+ 
+ # ##############################################################################
+@@ -673,6 +677,10 @@ endif
+ # FFMPEG
+ #
+ 
++# patch required to fix filtergraph: to allow attach of hw_device_ctx to hwupload filter
++FFMPEG_DIFFS += filter_1_ffmpg8.diff
++FFMPEG_DIFFS += filter_2_ffmpg8.diff
++
+ $(LIB_ROOT)/$(FFMPEG)/.tvh_download:
+ 	@mkdir -p $(EBUILDIR)
+ 	$(call DOWNLOAD,$(FFMPEG_URL),$(LIB_ROOT)/$(FFMPEG_TB),$(FFMPEG_SHA1))
+diff --git a/src/transcoding/transcode/audio.c b/src/transcoding/transcode/audio.c
+index 6c6119877a..66af3e567e 100644
+--- src/transcoding/transcode/audio.c
++++ src/transcoding/transcode/audio.c
+@@ -80,6 +80,64 @@ _audio_context_sample_rate(TVHContext *self, AVDictionary **opts)
+ 
+ 
+ #if LIBAVCODEC_VERSION_MAJOR > 59
++
++static int
++_audio_filters_get_filters(TVHContext *self, char **filters)
++{
++    char sample_rate[16];
++    char sample_fmt[32];
++    char obuf[64], channel_layouts[64];
++    char aformat[96];
++    int aformat_tokens = 0;
++
++    // sample_rate
++    memset(sample_rate, 0, sizeof(sample_rate));
++    if ((self->iavctx->sample_rate != self->oavctx->sample_rate) &&
++        str_snprintf(sample_rate, sizeof(sample_rate), "aresample=%d",
++                    self->oavctx->sample_rate)) {
++        return -1;    
++    }
++
++    // https://ayosec.github.io/ffmpeg-filters-docs/8.1/Filters/Audio/aformat.html
++    // sample_fmt
++    memset(sample_fmt, 0, sizeof(sample_fmt));
++    if (self->iavctx->sample_fmt != self->oavctx->sample_fmt) {
++        if(str_snprintf(sample_fmt, sizeof(sample_fmt), "sample_fmts=%s",
++                     av_get_sample_fmt_name(self->oavctx->sample_fmt))) {
++            return -1;
++        } else aformat_tokens++; 
++    }
++
++    // channel_layouts
++    memset(channel_layouts, 0, sizeof(channel_layouts));
++    if (self->iavctx->ch_layout.nb_channels != self->oavctx->ch_layout.nb_channels) {
++        av_channel_layout_describe(&self->oavctx->ch_layout, obuf, sizeof(obuf));
++        if(str_snprintf(channel_layouts, sizeof(channel_layouts), "channel_layouts=%s", obuf)) {
++            return -1;
++        } else aformat_tokens++; 
++    }
++
++    memset(aformat, 0, sizeof(aformat));
++    if (aformat_tokens == 2){
++        // we have to update both settings
++        if(str_snprintf(aformat, sizeof(aformat), "aformat=%s:%s", sample_fmt, channel_layouts)) {
++            return -1;
++        }
++    } else if (aformat_tokens == 1){
++        // we have to update only one setting
++        if(str_snprintf(aformat, sizeof(aformat), "aformat=%s%s", sample_fmt, channel_layouts)) {
++            return -1;
++        }
++    }
++
++    // context filters
++    if (!(*filters = str_join(",", sample_rate, aformat, NULL))) {
++        return -1;
++    }
++    
++    return 0;
++}
++
+ static void
+ _audio_context_channel_layout(TVHContext *self, AVDictionary **opts, AVChannelLayout *dst)
+ {
+@@ -254,6 +312,9 @@ tvh_audio_context_open_encoder(TVHContext *self, AVDictionary **opts)
+ static int
+ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+ {
++#if LIBAVCODEC_VERSION_MAJOR > 59
++    char *filters = NULL;
++#else
+     char source_args[128];
+     char filters[16];
+     char layout[32];
+@@ -261,11 +322,9 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+ 
+     // source args
+     memset(source_args, 0, sizeof(source_args));
+-#if LIBAVCODEC_VERSION_MAJOR > 59
+-    av_channel_layout_describe(&self->iavctx->ch_layout, layout, sizeof(layout));
+-#else
++
+     av_get_channel_layout_string(layout, sizeof(layout), self->iavctx->channels, self->iavctx->channel_layout);
+-#endif
++
+     if (str_snprintf(source_args, sizeof(source_args),
+             "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
+             self->iavctx->time_base.num,
+@@ -286,25 +345,21 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+                      (resample) ? "aresample" : "anull")) {
+         return -1;
+     }
++#endif
+ 
+ #if LIBAVCODEC_VERSION_MAJOR > 59
+-    char ch_layout[64];
+-    av_channel_layout_describe(&self->oavctx->ch_layout, ch_layout, sizeof(ch_layout));
++    // filters
++    if (_audio_filters_get_filters(self, &filters)) {
++        return -1;
++    }
+     
++    tvhinfo(LS_TRANSCODE, "filters: audio: '%s'", filters);
++
+     int ret = tvh_context_open_filters(self,
+-        "abuffer", source_args,                           // source
+-        filters,                                          // filters
+-        "abuffersink",                                    // sink
+-        "ch_layouts",   AV_OPT_SET_STRING,                // sink option: channel_layout
+-        sizeof(ch_layout),
+-        ch_layout,
+-        "sample_fmts",  AV_OPT_SET_BIN,                   // sink option: sample_fmt
+-        sizeof(self->oavctx->sample_fmt),
+-        &self->oavctx->sample_fmt,
+-        "sample_rates", AV_OPT_SET_BIN,                   // sink option: sample_rate
+-        sizeof(self->oavctx->sample_rate),
+-        &self->oavctx->sample_rate,
+-        NULL);                                            // _IMPORTANT!_
++        "abuffer",                                        // source
++        strlen(filters) ? filters : "anull",              // filters
++        "abuffersink"                                     // sink
++    );                    
+ #else
+     int ret = tvh_context_open_filters(self,
+         "abuffer", source_args,                           // source
+diff --git a/src/transcoding/transcode/context.c b/src/transcoding/transcode/context.c
+index ef1ea10b67..cfd688adc8 100644
+--- src/transcoding/transcode/context.c
++++ src/transcoding/transcode/context.c
+@@ -102,53 +102,17 @@ _context_print_opts(TVHContext *self, AVDictionary *opts)
+ }
+ 
+ 
++#if LIBAVCODEC_VERSION_MAJOR > 59
++#else
+ static int
+ _context_filters_apply_sink_options(TVHContext *self, va_list ap)
+ {
+     const char *opt_name = NULL;
+     const uint8_t *opt_val = NULL;
+-#if LIBAVCODEC_VERSION_MAJOR > 59
+-    const char *opt_val_char = NULL;
+-    av_opt_set_type opt_type = AV_OPT_SET_UNKNOWN;
+-    char err_desciption[32];
+-#endif
+     int opt_size = 0;
+     int ret = -1;
+ 
+     while ((opt_name = va_arg(ap, const char *))) {
+-#if LIBAVCODEC_VERSION_MAJOR > 59
+-        opt_type = (av_opt_set_type) va_arg(ap, int);
+-        opt_size = va_arg(ap, int);
+-        if (opt_type == AV_OPT_SET_BIN) {
+-            opt_val = va_arg(ap, const uint8_t *);
+-            ret = av_opt_set_bin(self->oavfltctx, opt_name, opt_val, opt_size, AV_OPT_SEARCH_CHILDREN);}
+-        else {
+-            if (opt_type == AV_OPT_SET_STRING) {
+-                opt_val_char = va_arg(ap, const char *);
+-                ret = av_opt_set(self->oavfltctx, opt_name, opt_val_char, AV_OPT_SEARCH_CHILDREN);} 
+-            else {
+-                tvh_context_log(self, LOG_ERR, "filters: failed to set option: '%s' with error: 'AV_OPT_SET_UNKNOWN'", opt_name);
+-                return ret;
+-            }
+-        }
+-        if (ret) {
+-            switch (ret) {
+-                case AVERROR_OPTION_NOT_FOUND:
+-                    str_snprintf(err_desciption, sizeof(err_desciption), "AVERROR_OPTION_NOT_FOUND");
+-                    break;
+-                case AVERROR(EINVAL):
+-                    str_snprintf(err_desciption, sizeof(err_desciption), "AVERROR(EINVAL)");
+-                    break;
+-                case AVERROR(ENOMEM):
+-                    str_snprintf(err_desciption, sizeof(err_desciption), "AVERROR(ENOMEM)");
+-                    break;
+-                default:
+-                    str_snprintf(err_desciption, sizeof(err_desciption), "UNKNOWN ERROR");
+-                    break;
+-            }
+-            tvh_context_log(self, LOG_ERR, "filters: failed to set option: '%s' with error: '%s'", opt_name, err_desciption);
+-        }
+-#else
+         opt_val = va_arg(ap, const uint8_t *);
+         opt_size = va_arg(ap, int);
+         if ((ret = av_opt_set_bin(self->oavfltctx, opt_name, opt_val, opt_size,
+@@ -157,10 +121,10 @@ _context_filters_apply_sink_options(TVHContext *self, va_list ap)
+                             opt_name);
+             break;
+         }
+-#endif
+     }
+     return ret;
+ }
++#endif
+ 
+ 
+ static int
+@@ -536,7 +500,265 @@ tvh_context_close(TVHContext *self, int flush)
+     }
+ }
+ 
++#if LIBAVCODEC_VERSION_MAJOR > 59
+ 
++int
++tvh_context_open_filters(TVHContext *self,
++                         const char *source_name,
++                         const char *filters, 
++                         const char *sink_name)
++{
++    static const AVClass logclass = {
++        .class_name = "TVHGraph",
++        .version    = 1,
++    };
++    struct {
++        const AVClass *class;
++    } logctx = { &logclass };
++    const AVFilter *iavflt = NULL, *oavflt = NULL;
++    AVFilterInOut *iavfltio = NULL, *oavfltio = NULL;
++    AVBufferSrcParameters *par = NULL;
++    int ret = -1;
++
++    tvh_context_log(self, LOG_DEBUG, "filters: '%s'", filters);
++
++    if (!(self->avfltgraph = avfilter_graph_alloc()) ||
++        !(iavfltio = avfilter_inout_alloc()) ||
++        !(oavfltio = avfilter_inout_alloc()) ||
++        !(par = av_buffersrc_parameters_alloc())) {
++        ret = AVERROR(ENOMEM);
++        goto finish;
++    }
++
++// source
++    if (!(iavflt = avfilter_get_by_name(source_name))) {
++        tvh_context_log(self, LOG_ERR, "filters: source filter'%s' not found", source_name);
++        ret = AVERROR_FILTER_NOT_FOUND;
++        goto finish;
++    }
++
++    // 1. ALLOCATE (No init yet, so it won't fail due to missing args)
++    self->iavfltctx = avfilter_graph_alloc_filter(self->avfltgraph, iavflt, "in");
++    if (!self->iavfltctx) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to create 'in' filter");
++        goto finish;
++    }
++
++    // additional buffersrc params
++    memset(par, 0, sizeof(AVBufferSrcParameters));
++    
++    if (!strcmp("buffer", source_name)) {
++        // for Video:
++        // 2. CONFIGURE PARAMETERS
++        // Basic video properties
++        par->width                = self->iavctx->width;
++        par->height               = self->iavctx->height;
++        par->format               = self->iavctx->pix_fmt;
++        par->sample_aspect_ratio  = self->iavctx->sample_aspect_ratio;
++        // CRITICAL: Metadata synchronization (fixes the FFmpeg 7 warnings)
++        par->time_base            = av_make_q(self->iavctx->time_base.num, self->iavctx->time_base.den); // or stream->time_base
++        par->color_range          = self->iavctx->color_range;  // Fixes "range: tv" warning
++        par->color_space          = self->iavctx->colorspace;   // Fixes "csp: unknown" warning
++        // to be added later on
++        //par->color_primaries = self->iavctx->color_primaries;
++        //par->color_trc       = self->iavctx->color_trc;
++
++        tvherror(LS_TRANSCODE, 
++        //tvh_context_log(self, LOG_DEBUG,
++            "filter in configuration: "
++            "video_size=%dx%d,"
++            "pix_fmt=%s,"
++            "time_base=%d/%d,"
++            "pixel_aspect:%d/%d,"
++            "color_range:%s,"
++            "color_space:%s",
++            self->iavctx->width, self->iavctx->height,
++            av_get_pix_fmt_name(self->iavctx->pix_fmt),
++            self->iavctx->time_base.num, self->iavctx->time_base.den,
++            self->iavctx->sample_aspect_ratio.num, self->iavctx->sample_aspect_ratio.den,
++            av_color_range_name(self->iavctx->color_range),
++            av_color_space_name(self->iavctx->colorspace));
++
++        // If using hardware acceleration (VAAPI/CUDA/etc), pass the frames context
++        if (self->iavctx->hw_frames_ctx){
++            par->hw_frames_ctx = self->iavctx->hw_frames_ctx;
++        }
++
++    } else if (!strcmp("abuffer", source_name)) {
++        // for Audio:
++        // 2. CONFIGURE PARAMETERS
++        // Basic audio properties
++        par->format      = self->iavctx->sample_fmt;
++        par->sample_rate = self->iavctx->sample_rate;
++        par->time_base   = (AVRational){1, self->iavctx->sample_rate}; // CRITICAL
++
++        // Copy channel layout (Crucial for FFmpeg 7/8)
++        ret = av_channel_layout_copy(&par->ch_layout, &self->iavctx->ch_layout);
++        if (ret < 0) {
++            tvh_context_log(self, LOG_ERR, "filters: failed to set av_channel_layout with error %d", ret);
++            goto finish;
++        }
++    }
++
++    // Push the parameters into the uninitialized filter context
++    ret = av_buffersrc_parameters_set(self->iavfltctx, par);
++    if (ret < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to set AVFilterContext parameters with error %d", ret);
++        goto finish;
++    }
++
++    // 3. MANUALLY INITIALIZE
++    // Now that the params are inside, we call init with NULL
++    ret = avfilter_init_str(self->iavfltctx, NULL);
++    if (ret < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to initialize AVFilterContext with error %d", ret);
++        goto finish;
++    }
++
++// sink
++    if (!(oavflt = avfilter_get_by_name(sink_name))) {
++        tvh_context_log(self, LOG_ERR, "filters: sink filter '%s' not found", sink_name);
++        ret = AVERROR_FILTER_NOT_FOUND;
++        goto finish;
++    }
++
++    ret = avfilter_graph_create_filter(&self->oavfltctx, oavflt, "out", NULL, NULL, self->avfltgraph);
++    if (ret < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to create 'out' filter with error %d", ret);
++        goto finish;
++    }
++
++    // Endpoints for the filter graph.
++    oavfltio->name       = av_strdup("in");
++    oavfltio->filter_ctx = self->iavfltctx;
++    oavfltio->pad_idx    = 0;
++    oavfltio->next       = NULL;
++
++    iavfltio->name       = av_strdup("out");
++    iavfltio->filter_ctx = self->oavfltctx;
++    iavfltio->pad_idx    = 0;
++    iavfltio->next       = NULL;
++
++    if (!iavfltio->name || !oavfltio->name) {
++        ret = AVERROR(ENOMEM);
++        tvh_context_log(self, LOG_ERR, "filters: fail during end point allocation with error %d", ret);
++        goto finish;
++    }
++
++    // filters
++    ret = avfilter_graph_parse_ptr(self->avfltgraph, filters, &iavfltio, &oavfltio, &logctx, self->hw_device_octx);
++    if (ret < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to add filters: '%s' with error %d", filters, ret);
++        goto finish;
++    }
++
++    // insert aditional filters required for conversions
++    avfilter_graph_set_auto_convert(self->avfltgraph, AVFILTER_AUTO_CONVERT_ALL);
++
++    //
++    if ((ret = avfilter_graph_config(self->avfltgraph, &logctx)) < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to config filter graph with error %d", ret);
++        goto finish;
++    }
++
++    // 1. CONFIGURE PARAMETERS
++    if (!strcmp("buffersink", sink_name)) {
++        // for Video:
++        // Extract negotiated parameters from the sink context and pass them to the encoder context.
++        self->oavctx->pix_fmt = av_buffersink_get_format(self->oavfltctx);
++        self->oavctx->width   = av_buffersink_get_w(self->oavfltctx);
++        self->oavctx->height  = av_buffersink_get_h(self->oavfltctx);
++        // Important: The filter graph may change the timebase
++        self->oavctx->time_base = av_buffersink_get_time_base(self->oavfltctx);
++        // Get the output link to access color metadata
++        AVFilterLink *outlink = self->oavfltctx->inputs[0];
++        // 1. Extract Color Range (MPEG/TV vs JPEG/PC)
++        self->oavctx->color_range = outlink->color_range;
++        // 2. Extract Color Space (e.g., BT.709, BT.2020)
++        self->oavctx->colorspace = outlink->colorspace;
++        // 3. Extract Color Primaries and Transfer Characteristics (Recommended)
++        // to be added later on
++        //self->oavctx->color_primaries = outlink->color_primaries;
++        //self->oavctx->color_trc       = outlink->color_trc;
++        // Handle Sample Aspect Ratio (SAR)
++        AVRational sar = av_buffersink_get_sample_aspect_ratio(self->oavfltctx);
++        if (sar.num > 0 && sar.den > 0)
++            self->oavctx->sample_aspect_ratio = sar;
++        
++        tvherror(LS_TRANSCODE, 
++        //tvh_context_log(self, LOG_DEBUG,
++            "filter out configuration: "
++            "video_size=%dx%d,"
++            "pix_fmt=%s,"
++            "time_base=%d/%d,"
++            "pixel_aspect:%d/%d,"
++            "color_range:%s,"
++            "color_space:%s",
++            self->oavctx->width, self->oavctx->height,
++            av_get_pix_fmt_name(self->oavctx->pix_fmt),
++            self->oavctx->time_base.num, self->oavctx->time_base.den,
++            self->oavctx->sample_aspect_ratio.num, self->oavctx->sample_aspect_ratio.den,
++            av_color_range_name(outlink->color_range),
++            av_color_space_name(outlink->colorspace));
++
++        // 2. THE HARDWARE LINK (The missing part)
++        // Query the hardware frames context from the sink.
++        AVBufferRef *hw_frames_ctx = av_buffersink_get_hw_frames_ctx(self->oavfltctx);
++        
++        if (hw_frames_ctx) {
++            // We must create a new reference to the context. 
++            // The encoder context will take ownership of this reference. 
++            self->oavctx->hw_frames_ctx = av_buffer_ref(hw_frames_ctx);
++            if (!self->oavctx->hw_frames_ctx) {
++                return AVERROR(ENOMEM);
++            }
++            
++            // Optimization: Some encoders (like VAAPI) benefit from knowing 
++            // the underlying software format being "hidden" by the hardware surface.
++            AVHWFramesContext *frames_fctx = (AVHWFramesContext *)hw_frames_ctx->data;
++            self->oavctx->sw_pix_fmt = frames_fctx->sw_format;
++            
++            // Log it so you can see it's working
++            tvh_context_log(self, LOG_DEBUG, "filters: filter sink provided HW frames (pix_fmt: %s, sw_pix_fmt: %s)", 
++                av_get_pix_fmt_name(self->oavctx->pix_fmt), av_get_pix_fmt_name(self->oavctx->sw_pix_fmt));
++        }
++    } else if (!strcmp("abuffersink", sink_name)) {
++        // for Audio:
++        // Extract negotiated parameters from the sink context and pass them to the encoder context.
++        self->oavctx->sample_rate = av_buffersink_get_sample_rate(self->oavfltctx);
++        self->oavctx->sample_fmt = av_buffersink_get_format(self->oavfltctx);
++
++        if (av_buffersink_get_ch_layout(self->oavfltctx, &self->oavctx->ch_layout)) {
++            tvh_context_log(self, LOG_ERR, "filters: failed to config AVCodecContext ch_layout with error %d", ret);
++            goto finish;
++        }
++    }
++
++    if (ret >= 0 && tvhtrace_enabled()) {
++        char *graph = avfilter_graph_dump(self->avfltgraph, NULL);
++        char *str, *token, *saveptr = NULL;
++        for (str = graph; ; str = NULL) {
++          token = strtok_r(str, "\n", &saveptr);
++          if (token == NULL)
++            break;
++          tvh_context_log(self, LOG_TRACE, "filters dump: %s", token);
++        }
++        av_freep(&graph);
++    }
++
++finish:
++    if (par) {
++        av_freep(&par);
++    }
++    if (iavfltio) {
++        avfilter_inout_free(&iavfltio);
++    }
++    if (oavfltio) {
++        avfilter_inout_free(&oavfltio);
++    }
++    return (ret > 0) ? 0 : ret;
++}
++#else
+ int
+ tvh_context_open_filters(TVHContext *self,
+                          const char *source_name, const char *source_args,
+@@ -682,6 +904,7 @@ tvh_context_open_filters(TVHContext *self,
+     }
+     return (ret > 0) ? 0 : ret;
+ }
++#endif
+ 
+ 
+ int
+diff --git a/src/transcoding/transcode/internals.h b/src/transcoding/transcode/internals.h
+index 2bf58b002d..9ec0304d34 100644
+--- src/transcoding/transcode/internals.h
++++ src/transcoding/transcode/internals.h
+@@ -56,6 +56,7 @@ typedef enum {
+     OPEN_ENCODER_POST
+ } TVHOpenPhase;
+ 
++// TO DO: remove
+ #if LIBAVCODEC_VERSION_MAJOR > 59
+ // this is needed to separate av_opt_set-s from _context_filters_apply_sink_options
+ typedef enum {
+@@ -184,12 +185,20 @@ tvh_context_get_str_opt(AVDictionary **opts, const char *key, char **value);
+ void
+ tvh_context_close(TVHContext *self, int flush);
+ 
++#if LIBAVCODEC_VERSION_MAJOR > 59
++int
++tvh_context_open_filters(TVHContext *self,
++                         const char *source_name,
++                         const char *filters, 
++                         const char *sink_name);
++#else
+ /* __VA_ARGS__ = NULL terminated list of sink options
+    sink option = (const char *name, av_opt_set_type opt_set_type, int size, const uint8_t *value) */
+ int
+ tvh_context_open_filters(TVHContext *self,
+                          const char *source_name, const char *source_args,
+                          const char *filters, const char *sink_name, ...);
++#endif
+ 
+ int
+ tvh_context_handle(TVHContext *self, th_pkt_t *pkt);
+diff --git a/src/transcoding/transcode/video.c b/src/transcoding/transcode/video.c
+index 5b3a118639..30de68829f 100644
+--- src/transcoding/transcode/video.c
++++ src/transcoding/transcode/video.c
+@@ -299,9 +299,12 @@ tvh_video_context_open_encoder(TVHContext *self, AVDictionary **opts)
+ static int
+ tvh_video_context_open_filters(TVHContext *self)
+ {
+-    char source_args[128];
+     char *filters = NULL;
+ 
++#if LIBAVCODEC_VERSION_MAJOR > 59
++#else
++    char source_args[128];
++
+     // source args
+     memset(source_args, 0, sizeof(source_args));
+     if (str_snprintf(source_args, sizeof(source_args),
+@@ -315,20 +318,21 @@ tvh_video_context_open_filters(TVHContext *self)
+             self->iavctx->sample_aspect_ratio.den)) {
+         return -1;
+     }
++#endif
+ 
+     // filters
+     if (_video_filters_get_filters(self, &filters)) {
+         return -1;
+     }
++    
++    tvhinfo(LS_TRANSCODE, "filters: video: '%s'", filters);
+ 
+ #if LIBAVCODEC_VERSION_MAJOR > 59
+     int ret = tvh_context_open_filters(self,
+-        "buffer", source_args,                                  // source
+-        strlen(filters) ? filters : "null",                     // filters
+-        "buffersink",                                           // sink
+-        "pix_fmts", AV_OPT_SET_BIN,                             // sink option: pix_fmt
+-        sizeof(self->oavctx->pix_fmt), &self->oavctx->pix_fmt,
+-        NULL);                                                  // _IMPORTANT!_
++        "buffer",                           // source
++        strlen(filters) ? filters : "null", // filters
++        "buffersink"                        // sink
++    );
+ #else
+     int ret = tvh_context_open_filters(self,
+         "buffer", source_args,              // source
+diff --git a/support/patches/filter_1_ffmpg8.diff b/support/patches/filter_1_ffmpg8.diff
+new file mode 100644
+index 0000000000..78009433ab
+--- /dev/null
++++ support/patches/filter_1_ffmpg8.diff
+@@ -0,0 +1,14 @@
++# Patch is allowing to attach a hw device context to hwupload filter
++# exracted from ffmpeg 8.0.1
++--- ./libavfilter/avfilter.old.h	2025-11-19 18:31:18.000000000 -0800
+++++ ./libavfilter/avfilter.h	2026-03-24 16:53:58.000000000 -0700
++@@ -804,7 +804,8 @@
++  */
++ int avfilter_graph_parse_ptr(AVFilterGraph *graph, const char *filters,
++                              AVFilterInOut **inputs, AVFilterInOut **outputs,
++-                             void *log_ctx);
+++                             void *log_ctx,
+++                             AVBufferRef *hw_device_octx);
++ 
++ /**
++  * Add a graph described by a string to a graph.
+diff --git a/support/patches/filter_2_ffmpg8.diff b/support/patches/filter_2_ffmpg8.diff
+new file mode 100644
+index 0000000000..54dc730560
+--- /dev/null
++++ support/patches/filter_2_ffmpg8.diff
+@@ -0,0 +1,42 @@
++# Patch is allowing to attach a hw device context to hwupload filter
++# exracted from ffmpeg 8.0.1
++--- ./libavfilter/graphparser.old.c	2025-11-19 18:31:18.000000000 -0800
+++++ ./libavfilter/graphparser.c	2026-03-24 21:22:16.000000000 -0700
++@@ -919,7 +919,8 @@
++ 
++ int avfilter_graph_parse_ptr(AVFilterGraph *graph, const char *filters,
++                          AVFilterInOut **open_inputs_ptr, AVFilterInOut **open_outputs_ptr,
++-                         void *log_ctx)
+++                         void *log_ctx,
+++                         AVBufferRef *hw_device_octx)
++ {
++     AVFilterInOut *user_inputs  = open_inputs_ptr  ? *open_inputs_ptr  : NULL;
++     AVFilterInOut *user_outputs = open_outputs_ptr ? *open_outputs_ptr : NULL;
++@@ -945,6 +946,27 @@
++         goto end;
++     }
++ 
+++    // append hardware device output ctx
+++    for (size_t i = 0; i < seg->nb_chains; i++) {
+++        AVFilterChain *ch = seg->chains[i];
+++
+++        for (size_t j = 0; j < ch->nb_filters; j++) {
+++            AVFilterParams *p = ch->filters[j];
+++
+++            // Check if the filter is 'hwupload'
+++            if (p->filter && p->filter->filter && hw_device_octx && strcmp(p->filter->filter->name, "hwupload") == 0) {
+++                // Free any existing context and assign the new one
+++                av_buffer_unref(&p->filter->hw_device_ctx);
+++                p->filter->hw_device_ctx = av_buffer_ref(hw_device_octx);
+++                if (!p->filter->hw_device_ctx) {
+++                    // Handle allocation failure
+++                    av_log(seg->graph, AV_LOG_ERROR, "Unable to allocate hw_device_ctx for filter '%s'\n",p->filter->name);
+++                    return AVERROR(ENOMEM);
+++                }
+++            }
+++        }
+++    }
+++
++     ret = avfilter_graph_segment_init(seg, 0);
++     if (ret < 0)
++         goto end;
