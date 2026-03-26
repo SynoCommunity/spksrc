@@ -5,8 +5,9 @@ wheel==0.46.3
 build:Cython==3.0.12                     # keep older version for gcc <= 4.9.x
 build:flit==3.12.0
 build:flit_core==3.12.0
-build:hatchling==1.29.0
+build:hatch-fancy-pypi-readme==25.1.0
 build:hatch-vcs==0.5.0
+build:hatchling==1.29.0
 build:maturin==1.12.6
 build:meson==1.10.2
 build:meson-python==0.19.0
