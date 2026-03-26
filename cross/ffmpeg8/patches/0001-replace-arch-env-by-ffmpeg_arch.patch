@@ -1,0 +1,84 @@
+diff -uprN ../ffmpeg-8.1-orig/configure ./configure
+--- ../ffmpeg-8.1-orig/configure	2026-03-16 18:13:04.000000000 +0000
++++ ./configure	2026-03-28 21:05:41.242862108 +0000
+@@ -8539,7 +8539,7 @@ ifndef MAIN_MAKEFILE
+ SRC_PATH:=\$(SRC_PATH:.%=..%)
+ endif
+ CC_IDENT=$cc_ident
+-ARCH=$arch
++FFMPEG_ARCH=$arch
+ INTRINSICS=$intrinsics
+ EXTERN_PREFIX=$extern_prefix
+ CC=$cc
+diff -uprN ../ffmpeg-8.1-orig/ffbuild/common.mak ./ffbuild/common.mak
+--- ../ffmpeg-8.1-orig/ffbuild/common.mak	2026-03-16 18:13:04.000000000 +0000
++++ ./ffbuild/common.mak	2026-03-28 21:05:41.245021952 +0000
+@@ -239,8 +239,8 @@ DEP_LIBS := $(foreach lib,$(FFLIBS),$(ca
+ STATIC_DEP_LIBS := $(foreach lib,$(FFLIBS),$(call PATH_LIBNAME,$(lib)))
+ 
+ SRC_DIR    := $(SRC_PATH)/lib$(NAME)
+-ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(ARCH)/*.h))
+-SKIPHEADERS += $(ARCH_HEADERS:%=$(ARCH)/%) $(SKIPHEADERS-)
++ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)/$(FFMPEG_ARCH)/*.h))
++SKIPHEADERS += $(ARCH_HEADERS:%=$(FFMPEG_ARCH)/%) $(SKIPHEADERS-)
+ SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
+ HOBJS        = $(filter-out $(SKIPHEADERS:.h=.h.o),$(ALLHEADERS:.h=.h.o))
+ SPVOBJS      = $(filter %.spv.o,$(OBJS))
+diff -uprN ../ffmpeg-8.1-orig/ffbuild/library.mak ./ffbuild/library.mak
+--- ../ffmpeg-8.1-orig/ffbuild/library.mak	2026-03-16 18:13:04.000000000 +0000
++++ ./ffbuild/library.mak	2026-03-28 21:05:41.245303055 +0000
+@@ -91,7 +91,7 @@ endif
+ 
+ clean::
+ 	$(RM) $(addprefix $(SUBDIR),$(CLEANFILES) $(CLEANSUFFIXES) $(LIBSUFFIXES)) \
+-	    $(CLEANSUFFIXES:%=$(SUBDIR)$(ARCH)/%) $(CLEANSUFFIXES:%=$(SUBDIR)tests/%)
++	    $(CLEANSUFFIXES:%=$(SUBDIR)$(FFMPEG_ARCH)/%) $(CLEANSUFFIXES:%=$(SUBDIR)tests/%)
+ 
+ install-lib$(NAME)-shared: $(SUBDIR)$(SLIBNAME)
+ 	$(Q)mkdir -p "$(SHLIBDIR)"
+diff -uprN ../ffmpeg-8.1-orig/libavcodec/Makefile ./libavcodec/Makefile
+--- ../ffmpeg-8.1-orig/libavcodec/Makefile	2026-03-16 18:13:04.000000000 +0000
++++ ./libavcodec/Makefile	2026-03-28 21:07:46.812127472 +0000
+@@ -73,8 +73,8 @@ include $(SRC_PATH)/libavcodec/hevc/Make
+ include $(SRC_PATH)/libavcodec/opus/Makefile
+ include $(SRC_PATH)/libavcodec/vvc/Makefile
+ include $(SRC_PATH)/libavcodec/vulkan/Makefile
+--include $(SRC_PATH)/libavcodec/$(ARCH)/hevc/Makefile
+--include $(SRC_PATH)/libavcodec/$(ARCH)/vvc/Makefile
++-include $(SRC_PATH)/libavcodec/$(FFMPEG_ARCH)/hevc/Makefile
++-include $(SRC_PATH)/libavcodec/$(FFMPEG_ARCH)/vvc/Makefile
+ OBJS-$(CONFIG_AANDCTTABLES)            += aandcttab.o
+ OBJS-$(CONFIG_AC3DSP)                  += ac3dsp.o ac3.o ac3tab.o
+ OBJS-$(CONFIG_ADTS_HEADER)             += adts_header.o mpeg4audio_sample_rates.o
+@@ -1335,7 +1335,7 @@ SKIPHEADERS                            +
+                                           aacenc_quantization.h         \
+                                           aacenc_quantization_misc.h    \
+                                           bitstream_template.h          \
+-                                          $(ARCH)/vpx_arith.h           \
++                                          $(FFMPEG_ARCH)/vpx_arith.h    \
+ 
+ SKIPHEADERS-$(CONFIG_AMF)              += amfenc.h amfdec.h
+ SKIPHEADERS-$(CONFIG_D3D11VA)          += d3d11va.h dxva2_internal.h
+diff -uprN ../ffmpeg-8.1-orig/Makefile ./Makefile
+--- ../ffmpeg-8.1-orig/Makefile	2026-03-16 18:13:04.000000000 +0000
++++ ./Makefile	2026-03-28 21:05:41.246531213 +0000
+@@ -124,7 +124,7 @@ define DOSUBDIR
+ $(foreach V,$(SUBDIR_VARS),$(eval $(call RESET,$(V))))
+ SUBDIR := $(1)/
+ include $(SRC_PATH)/$(1)/Makefile
+--include $(SRC_PATH)/$(1)/$(ARCH)/Makefile
++-include $(SRC_PATH)/$(1)/$(FFMPEG_ARCH)/Makefile
+ -include $(SRC_PATH)/$(1)/$(INTRINSICS)/Makefile
+ include $(SRC_PATH)/ffbuild/library.mak
+ endef
+diff -uprN ../ffmpeg-8.1-orig/tests/checkasm/Makefile ./tests/checkasm/Makefile
+--- ../ffmpeg-8.1-orig/tests/checkasm/Makefile	2026-03-16 18:13:05.000000000 +0000
++++ ./tests/checkasm/Makefile	2026-03-28 21:05:41.246772000 +0000
+@@ -130,6 +130,6 @@ checkasm: $(CHECKASM)
+ testclean:: checkasmclean
+ 
+ checkasmclean:
+-	$(RM) $(CHECKASM) $(CLEANSUFFIXES:%=tests/checkasm/%) $(CLEANSUFFIXES:%=tests/checkasm/$(ARCH)/%)
++	$(RM) $(CHECKASM) $(CLEANSUFFIXES:%=tests/checkasm/%) $(CLEANSUFFIXES:%=tests/checkasm/$(FFMPEG_ARCH)/%)
+ 
+ .PHONY: checkasm
