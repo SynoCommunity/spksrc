@@ -86,8 +86,13 @@ WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
 # [llfuse]
+# llfuse<=1.5.1 using gcc<5 requires -std=gnu11 to find "clock_gettime"
+# llfuse>=1.5.2 requires gcc>=7
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [llfuse] -std=gnu11
+WHEELS += llfuse==1.5.1
+else
+WHEELS += llfuse==1.5.2
 endif
 
 # [lxml]
@@ -134,6 +139,11 @@ endif
 
 # [Pillow]
 DEPENDS += python/pillow
+
+# [psutil]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [psutil] -std=gnu99
+endif
 
 # [pycares]
 DEPENDS += cross/c-ares

@@ -44,10 +44,6 @@ ruamel.yaml.clib==0.2.15
 SQLAlchemy==2.0.48
 zope.interface==8.2
 
-# [llfuse]
-# gcc < 5 requires -std=gnu11 to find "clock_gettime"
-llfuse==1.5.2
-
 # [mysqlclient]
 # Depends: mysql-connector-c, mariadb-connector-c
 # Require environment variables
