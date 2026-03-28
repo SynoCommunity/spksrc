@@ -48,8 +48,7 @@ include ../../mk/spksrc.common.mk
 #  - build:setuptools-scm
 #  - cross:cppy
 ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-WHEELS += atom==0.10.5
-WHEELS += atom==0.11.0
+WHEELS += atom==0.12.1
 endif
 
 # [borgbackup]
@@ -82,6 +81,16 @@ WHEELS += greenlet==3.0.3
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 else
 WHEELS += greenlet==1.1.3
+endif
+
+# [llfuse]
+# llfuse<=1.5.1 using gcc<5 requires -std=gnu11 to find "clock_gettime"
+# llfuse>=1.5.2 requires gcc>=7
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [llfuse] -std=gnu11
+WHEELS += llfuse==1.5.1
+else
+WHEELS += llfuse==1.5.2
 endif
 
 # [lxml]
@@ -141,6 +150,11 @@ endif
 
 # [Pillow]
 DEPENDS += python/pillow
+
+# [psutil]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [psutil] -std=gnu99
+endif
 
 # [pycares]
 DEPENDS += cross/c-ares
