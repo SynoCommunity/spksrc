@@ -8,7 +8,7 @@ SVC_WRITE_PID=y
 WEB_DIR="/var/services/web_packages"
 LOGS_DIR="${WEB_DIR}/${PACKAGE}/logs"
 
-PHP="/usr/local/bin/php82"
+PHP="/usr/local/bin/php84"
 TTRSS="${WEB_DIR}/${PACKAGE}/update.php"
 
 # PostgreSQL connection settings
@@ -251,6 +251,7 @@ service_restore ()
                -e "s|mysqld10.sock|${PG_HOST}|g" \
                -e "s|putenv('TTRSS_DB_USER=[^']*');|putenv('TTRSS_DB_USER=${PG_USER}');|" \
                -e "s|putenv('TTRSS_DB_PASS=[^']*');|putenv('TTRSS_DB_PASS=${wizard_pg_password_ttrss}');|" \
+               -e "s|putenv('TTRSS_PHP_EXECUTABLE=[^']*');|putenv('TTRSS_PHP_EXECUTABLE=${PHP}');|" \
             "${WEB_DIR}/${PACKAGE}/config.php"
         if ! grep -q "TTRSS_DB_PORT" "${WEB_DIR}/${PACKAGE}/config.php"; then
             echo "putenv('TTRSS_DB_PORT=${PG_PORT}');">>"${WEB_DIR}/${PACKAGE}/config.php"
