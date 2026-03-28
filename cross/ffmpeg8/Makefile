@@ -1,5 +1,6 @@
 PKG_NAME = ffmpeg
 PKG_VERS = 8.1
+PKG_MINOR_VERS = $(firstword $(subst ., ,$(PKG_VERS))
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -32,8 +33,8 @@ else
   endif
 endif
 
-# Must match $(SPK_REV) from spk/ffmpeg7/Makefile
-CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg7/Makefile)
+# Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
+CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
 
 # Enable Synology specific -hls_seek_time option and other optimizations
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
