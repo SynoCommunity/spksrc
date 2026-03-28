@@ -15,12 +15,12 @@ build:pip-tools==7.5.3
 build:poetry==2.3.2
 build:scikit-build==0.19.0
 build:scikit-build-core==0.12.2
-build:setuptools-rust==1.12.0
-build:setuptools-scm==10.0.2
+build:setuptools-rust==1.12.1
+build:setuptools-scm==10.0.5
 #
 cross:build==1.4.2
 cross:cffi==2.0.0
-cross:cryptography==46.0.5
+cross:cryptography==46.0.6
 cross:flit==3.12.0
 cross:msgpack==1.0.5                     # keep older version for gcc <= 4.9.x
 cross:typing_extensions==4.15.0
