@@ -44,7 +44,7 @@ DEPENDS += cross/dtv-scan-tables
 DEPENDS += cross/docker-tvheadend
 DEPENDS += cross/zap2epg
 
-OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/numpy-latest
 OPTIONAL_DEPENDS += python/pandas
 
 WHEELS += src/requirements-pure.txt
@@ -54,7 +54,7 @@ include ../../mk/spksrc.common.mk
 # Optional gracenote2epg dependencies
 ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 # [numpy]
-DEPENDS += python/numpy
+DEPENDS += python/numpy-latest
 
 # [pandas]
 DEPENDS += python/pandas
