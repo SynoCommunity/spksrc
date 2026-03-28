@@ -1,13 +1,15 @@
-DB_CONFIGURATION_TITLE:             Tt-rss database configuration
-ENTER_MYSQL_PASSWORD:               Enter your MySQL password.
-ROOT_PASSWORD_DESCRIPTION:          Root password
-ENTER_TT-RSS_PASSWORD:              A 'ttrss' MySQL user and database will be created. Please enter a password for the 'ttrss' user.
-TT-RSS_PASSWORD_DESCRIPTION:        Ttrss password
-INVALID_TT-RSS_PASSWORD:            "Password is invalid. Ensure it includes at least one uppercase letter, one lowercase letter, one digit, one special character, and has a minimum length of 10 characters."
-TT-RSS_CONFIGURATION_TITLE:         Tt-rss configuration
-DOMAIN_NAME_SECTION_LABEL:          "Domain name of your DiskStation. For example: you.synology.me."
-DOMAIN_NAME_INPUT_LABEL:            Domain name
-SINGLE_USER_SECTION_LABEL:          Enable single user mode. If you do not use this mode, default login is 'admin' with password 'password'.
-SINGLE_USER_CHECKBOX_LABEL:         Single user
-PHP_PROFILES_TITLE:                 Multiple PHP profiles
-PHP_PROFILES_DESCRIPTION:           "Attention: Multiple PHP profiles detected; the package webpage will not display until a DSM restart is performed to load new configurations."
+POSTGRESQL_TITLE: "PostgreSQL Server"
+POSTGRESQL_USERNAME_DESC: "Username for PostgreSQL server (default: pgadmin)"
+POSTGRESQL_USERNAME_LABEL: "Username"
+POSTGRESQL_PASSWORD_DESC: "Password for PostgreSQL admin user (required)"
+POSTGRESQL_PASSWORD_LABEL: "Password"
+POSTGRESQL_PORT_DESC: "Port number (default: 5433)"
+POSTGRESQL_PORT_LABEL: "Port"
+TTRSS_TITLE: "Tiny Tiny RSS Configuration"
+TTRSS_PASSWORD_DESC: "Password for tt-rss database user (required)"
+TTRSS_PASSWORD_LABEL: "Database password"
+TTRSS_PASSWORD_INVALID: "Password must include at least one uppercase letter, one lowercase letter, one digit, one special character, and be at least 10 characters."
+TTRSS_DOMAIN_DESC: "Domain name of your DiskStation. For example: you.synology.me."
+TTRSS_DOMAIN_LABEL: "Domain name"
+TTRSS_SINGLE_USER_DESC: "Enable single user mode. If disabled, default login is 'admin' with password 'password'."
+TTRSS_SINGLE_USER_LABEL: "Single user mode"

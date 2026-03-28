@@ -1,5 +1,14 @@
-DB_MIGRATION_TITLE:                 DB Migration for tt-rss
-ROOT_PASSWORD_INPUT_DESCRIPTIONS:   Enter your respective Maria DB installation root account passwords
-ENTER_TT-RSS_PASSWORD:              A 'ttrss' MySQL user and database will be created. Please enter a password for the 'ttrss' user.
-TT-RSS_PASSWORD_DESCRIPTION:        Ttrss password
-NO_DB_MIGRATION_DESCRIPTION:        Your current version does not require migration. Proceeding without migration steps.
+POSTGRESQL_SETTINGS_TITLE: "PostgreSQL Database Configuration"
+POSTGRESQL_USERNAME_DESC: "Username for PostgreSQL server (default: pgadmin)"
+POSTGRESQL_USERNAME_LABEL: "Username"
+POSTGRESQL_PASSWORD_DESC: "Password for PostgreSQL admin user"
+POSTGRESQL_PASSWORD_LABEL: "Password"
+POSTGRESQL_PORT_DESC: "Port number (default: 5433)"
+POSTGRESQL_PORT_LABEL: "Port"
+ENTER_TTRSS_PASSWORD: "Database user password"
+TTRSS_PASSWORD_DESC: "Password for ttrss database user"
+INVALID_TTRSS_PASSWORD: "Password is invalid. Ensure it includes at least one uppercase letter, one lowercase letter, one digit, one special character, and has a minimum length of 10 characters."
+MIGRATION_SETTINGS_TITLE: "MariaDB Migration"
+MIGRATION_NOTICE_DESC: "Feeds will be exported from MariaDB and imported into PostgreSQL. The admin password will be reset to the default password. Other users will need their passwords reset - login as admin after migration and go to Preferences (Users menu) to reset."
+ENTER_MARIADB_ROOT_PASSWORD: "MariaDB root password"
+MARIADB_ROOT_PASSWORD_DESC: "Password for MariaDB root user"
