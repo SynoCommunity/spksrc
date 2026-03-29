@@ -1,6 +1,6 @@
 PKG_NAME = numpy_$(PKG_VERS)
 PKG_REAL_NAME = numpy
-PKG_VERS = 2.3.0
+PKG_VERS = 2.4.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/n/numpy
@@ -22,7 +22,8 @@ COMMENT  = NumPy is the fundamental package for scientific computing with Python
 LICENSE  = NumPy Developers
 
 # Requires gcc>=9.3 to build sucesfully
-REQUIRED_MIN_DSM = 7.2
+# Using patch to allow DSM-7.1 gcc-8.5 compatibility
+REQUIRED_MIN_DSM = 7.1
 REQUIRED_MIN_SRM = 1.3
 
 include ../../mk/spksrc.common.mk
@@ -30,8 +31,8 @@ include ../../mk/spksrc.common.mk
 # numpy badly detects CPU on x86_64
 # CPU flags below are "apollolake" compatible
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += -Dcpu-baseline="sse2,ssse3,sse41,sse42"
-CONFIGURE_ARGS += -Dcpu-dispatch="popcnt"
+CONFIGURE_ARGS += -Dcpu-baseline="X86_V2"
+CONFIGURE_ARGS += -Dcpu-dispatch=none
 endif
 
 include ../../mk/spksrc.python-wheel-meson.mk

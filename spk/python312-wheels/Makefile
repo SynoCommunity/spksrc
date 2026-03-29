@@ -35,6 +35,7 @@ SERVICE_SETUP = src/service-setup.sh
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/numpy-latest
 OPTIONAL_DEPENDS += python/pandas
 OPTIONAL_DEPENDS += python/scipy
 
@@ -85,8 +86,13 @@ WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
 # [llfuse]
+# llfuse<=1.5.1 using gcc<5 requires -std=gnu11 to find "clock_gettime"
+# llfuse>=1.5.2 requires gcc>=7
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [llfuse] -std=gnu11
+WHEELS += llfuse==1.5.1
+else
+WHEELS += llfuse==1.5.2
 endif
 
 # [lxml]
@@ -113,13 +119,14 @@ ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 # version <= 1.25 -> NOT SUPPORTED WITH PYTHON 3.12
 # version == 1.26 -> Requires gcc >= 8.4 -> DSM-7.1
 # version >= 2.3  -> Requires gcc >= 9.4 -> DSM-7.2
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
+DEPENDS += python/numpy-latest
 endif
 
 # [pandas] - depends on numpy >= 1.26
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/pandas
 endif
 
@@ -132,6 +139,11 @@ endif
 
 # [Pillow]
 DEPENDS += python/pillow
+
+# [psutil]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [psutil] -std=gnu99
+endif
 
 # [pycares]
 DEPENDS += cross/c-ares
@@ -187,7 +199,7 @@ WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
 endif
 
 # [scipy] - depends on numpy >= 2.x
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/scipy
 endif
 
