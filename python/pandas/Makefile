@@ -17,7 +17,14 @@ LICENSE  = 3-Clause BSD license
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
 
-# Allows compatibility with numpy API 1.x / 2.x
+OPTIONAL_DEPENDS  = python/numpy
+OPTIONAL_DEPENDS  = python/numpy-latest
+
+# On older python 3.10/3.11 keep using numpy 2.2.x
+ifneq ($(filter %310 %311,$(PYTHON_PACKAGE)),)
+DEPENDS  = python/numpy
+else
 DEPENDS  = python/numpy-latest
+endif
 
 include ../../mk/spksrc.python-wheel-meson.mk

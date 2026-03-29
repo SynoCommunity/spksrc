@@ -33,7 +33,6 @@ SERVICE_SETUP = src/service-setup.sh
 OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
 OPTIONAL_DEPENDS += python/pandas
-OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
 
@@ -127,7 +126,7 @@ WHEELS += numpy==1.24.4
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 WHEELS_CFLAGS += [numpy] -O0
 endif
-else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+else ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
 endif
@@ -136,7 +135,7 @@ endif
 endif
 
 # [pandas] - depends on numpy >= 1.26
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/pandas
 endif
 
@@ -209,14 +208,6 @@ else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 WHEELS += rpds_py==0.24.0
 else
 WHEELS += rpds_py==0.25.1
-endif
-endif
-
-# [scipy] - depends on numpy >= 2.x
-#           unsupported with old PPC arch
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
-DEPENDS += python/scipy
 endif
 endif
 
