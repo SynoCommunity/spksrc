@@ -84,10 +84,10 @@ WHEELS += greenlet==1.1.3
 endif
 
 # [llfuse]
-# llfuse<=1.5.1 using gcc<5 requires -std=gnu11 to find "clock_gettime"
+# llfuse<=1.5.1 using gcc<5 requires -std=gnu11 to find "clock_gettime" (-std=gnu99 makes it compatible with older gcc)
 # llfuse>=1.5.2 requires gcc>=7
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [llfuse] -std=gnu11
+WHEELS_CFLAGS += [llfuse] -std=gnu99
 WHEELS += llfuse==1.5.1
 else
 WHEELS += llfuse==1.5.2
