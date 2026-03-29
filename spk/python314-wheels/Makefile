@@ -62,7 +62,7 @@ ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
 WHEELS += gevent==24.11.1
 else
-WHEELS += gevent==25.5.1
+WHEELS += gevent==25.9.1
 endif
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [gevent] -std=c11
@@ -72,7 +72,7 @@ endif
 # version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
 # version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Mandatory require full c++11 support *** unsupported ***
 ifeq ($(call version_ge, $(TC_GCC), 8),1)
-WHEELS += greenlet==3.2.3
+WHEELS += greenlet==3.3.2
 endif
 
 # [llfuse]
@@ -177,7 +177,7 @@ DEPENDS += python/rencode
 # Version = 0.24 requires rustc >= 1.82 (qoriq) ==> No longer supported by py314
 # Version = 0.25 requires rustc >= 1.85
 ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-WHEELS += rpds_py==0.25.1
+WHEELS += rpds_py==0.30.0
 endif
 
 # [ruamel.yaml.clib]
