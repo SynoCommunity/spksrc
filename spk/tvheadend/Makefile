@@ -17,7 +17,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 58861264 as of January 8th 2026<br/>2. Update to FFMPEG 7.1.3"
+CHANGELOG = "1. Update to latest git version eb023c57 of March 9th 2026<br/>2. Update all python wheels<br/>3. Fix for gracenote2epg install"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
@@ -59,6 +59,9 @@ DEPENDS += python/numpy-latest
 # [pandas]
 DEPENDS += python/pandas
 endif
+
+# [pandas] https://github.com/th0ma7/gracenote2epg/issues/8
+WHEELS += pgeocode==0.5.0
 
 # Export version to the build where version
 # script gets patched accordingly by:
