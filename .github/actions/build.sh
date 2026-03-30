@@ -39,8 +39,8 @@ echo "===> MIN_DSM73_PACKAGES packages: ${MIN_DSM73_PACKAGES}"
 # Remove toolchain status files to enforce re-building toolchain including cargo/rust
 # This fixes issues on github-action where toolchain caching omits the
 # actual installation state of cargo/rust within the distrib folder
-rm -f toolchain/syno-${GH_ARCH}/work/.rustc_done
-rm -f toolchain/syno-${GH_ARCH}/work/.toolchain_done
+rm -f toolchain/syno-${GH_ARCH}/work/.toolchain*_done
+rm -f toolchain/syno-${GH_ARCH}/work/.stage[01]-*_done
 
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
     build_packages=${NOARCH_PACKAGES}
