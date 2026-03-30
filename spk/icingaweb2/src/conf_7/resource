@@ -1,0 +1,50 @@
+{
+	"webservice": {
+		"migrate": {
+			"root": [{
+				"new": "icingaweb2",
+				"old": "icingaweb2"
+			}]
+		},
+		"pkg_dir_prepare": [{
+			"group": "http",
+			"mode": "0755",
+			"source": "/var/packages/icingaweb2/target/share/icingaweb2",
+			"target": "icingaweb2",
+			"user": "sc-icingaweb2"
+		}],
+		"portals": [{
+			"alias": "icingaweb2",
+			"app": "com.synocommunity.packages.icingaweb2",
+			"name": "Icinga Web 2",
+			"service": "icingaweb2",
+			"type": "alias"
+		}],
+		"services": [{
+			"backend": 2,
+			"display_name": "Icinga Web 2",
+			"icon": "app/images/icingaweb2-{0}.png",
+			"php": {
+				"backend": 9,
+				"extensions": [
+					"curl",
+					"gd",
+					"gettext",
+					"imagick",
+					"intl",
+					"ldap",
+					"openssl",
+					"pdo_mysql",
+					"pdo_pgsql"
+				],
+				"group": "http",
+				"profile_desc": "PHP profile used by Icinga Web 2",
+				"profile_name": "icingaweb2",
+				"user": "sc-icingaweb2"
+			},
+			"root": "icingaweb2/public",
+			"service": "icingaweb2",
+			"type": "apache_php"
+		}]
+	}
+}
