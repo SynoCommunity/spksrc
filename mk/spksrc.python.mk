@@ -35,14 +35,14 @@ else
 
 # Set Python installtion prefix directory variables
 ifeq ($(strip $(PYTHON_STAGING_INSTALL_PREFIX)),)
-export PYTHON_PREFIX = /var/packages/$(PYTHON_PACKAGE)/target
-export PYTHON_STAGING_INSTALL_PREFIX = $(realpath $(PYTHON_PACKAGE_WORK_DIR)/install/$(PYTHON_PREFIX))
+export PYTHON_INSTALL_PREFIX = /var/packages/$(PYTHON_PACKAGE)/target
+export PYTHON_STAGING_INSTALL_PREFIX = $(realpath $(PYTHON_PACKAGE_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX))
 endif
 
 # Set OpenSSL installtion prefix directory variables
-ifeq ($(strip $(OPENSSL_STAGING_PREFIX)),)
-export OPENSSL_PREFIX = $(PYTHON_PREFIX)
-export OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_INSTALL_PREFIX)
+ifeq ($(strip $(OPENSSL_STAGING_INSTALL_PREFIX)),)
+export OPENSSL_INSTALL_PREFIX = $(PYTHON_INSTALL_PREFIX)
+export OPENSSL_STAGING_INSTALL_PREFIX = $(PYTHON_STAGING_INSTALL_PREFIX)
 endif
 
 # set build flags including ld to rewrite for the library path
@@ -52,19 +52,19 @@ export ADDITIONAL_CPPFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_CXXFLAGS  += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include
 export ADDITIONAL_LDFLAGS   += -L$(PYTHON_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_LDFLAGS   += -Wl,--rpath-link,$(PYTHON_STAGING_INSTALL_PREFIX)/lib
-export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(PYTHON_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(PYTHON_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(PYTHON_STAGING_INSTALL_PREFIX)/lib
 export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(PYTHON_STAGING_INSTALL_PREFIX)/lib
-export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(PYTHON_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(PYTHON_INSTALL_PREFIX)/lib
 
 # similarly, ld to rewrite OpenSSL library path if differs
-ifneq ($(OPENSSL_STAGING_PREFIX),$(PYTHON_STAGING_INSTALL_PREFIX))
-export ADDITIONAL_LDFLAGS   += -L$(OPENSSL_STAGING_PREFIX)/lib
-export ADDITIONAL_LDFLAGS   += -Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib
-export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(OPENSSL_PREFIX)/lib
-export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(OPENSSL_STAGING_PREFIX)/lib
-export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(OPENSSL_STAGING_PREFIX)/lib
-export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(OPENSSL_PREFIX)/lib
+ifneq ($(OPENSSL_STAGING_INSTALL_PREFIX),$(PYTHON_STAGING_INSTALL_PREFIX))
+export ADDITIONAL_LDFLAGS   += -L$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath-link,$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS   += -Wl,--rpath,$(OPENSSL_INSTALL_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-L$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath-link,$(OPENSSL_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_RUSTFLAGS += -Clink-arg=-Wl,--rpath,$(OPENSSL_INSTALL_PREFIX)/lib
 endif
 
 # Re-use all default python mandatory libraries (with exception of bzip2, xz, zlib)
