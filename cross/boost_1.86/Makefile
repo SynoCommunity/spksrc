@@ -54,6 +54,20 @@ else
 ADDRESS_MODEL = 32
 endif
 
+# Boost.Context needs explicit architecture for cross-compilation
+# ARM targets need architecture=arm and abi=aapcs for context assembly
+ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),)
+BOOST_B2_ARGS = architecture=arm abi=aapcs
+else ifneq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),)
+BOOST_B2_ARGS = architecture=arm abi=aapcs
+else ifneq ($(findstring $(ARCH),$(x64_ARCHS)),)
+BOOST_B2_ARGS = architecture=x86
+else ifneq ($(findstring $(ARCH),$(i686_ARCHS)),)
+BOOST_B2_ARGS = architecture=x86
+else
+BOOST_B2_ARGS =
+endif
+
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(call version_ge, ${TC_GCC}, 7.5),1)
@@ -81,8 +95,8 @@ endif
 
 .PHONY: boost_compile
 boost_compile:
-	$(RUN) ./b2 --user-config=$(WORK_DIR)/$(PKG_DIR)/user-config.jam
+	$(RUN) ./b2 --user-config=$(WORK_DIR)/$(PKG_DIR)/user-config.jam $(BOOST_B2_ARGS)
 
 .PHONY: boost_install
 boost_install:
-	$(RUN) ./b2 --user-config=$(WORK_DIR)/$(PKG_DIR)/user-config.jam install
+	$(RUN) ./b2 --user-config=$(WORK_DIR)/$(PKG_DIR)/user-config.jam $(BOOST_B2_ARGS) install

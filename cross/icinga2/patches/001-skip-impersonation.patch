@@ -1,0 +1,20 @@
+Skip user/group impersonation when ICINGA2_SKIP_IMPERSONATION is defined.
+This allows running icinga2 under DSM's service manager which handles process identity.
+--- icinga-app/icinga.cpp.orig
++++ icinga-app/icinga.cpp
+@@ -571,6 +571,7 @@
+ 		} else if (command && command->GetImpersonationLevel() == ImpersonateIcinga) {
+ 			String group = Configuration::RunAsGroup;
+ 			String user = Configuration::RunAsUser;
++#ifndef ICINGA2_SKIP_IMPERSONATION
+ 
+ 			errno = 0;
+ 			struct group *gr = getgrnam(group.CStr());
+@@ -635,6 +636,7 @@
+ 					return EXIT_FAILURE;
+ 				}
+ 			}
++#endif /* ICINGA2_SKIP_IMPERSONATION */
+ 		}
+ #endif /* _WIN32 */
+ 
