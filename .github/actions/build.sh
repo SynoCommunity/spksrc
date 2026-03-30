@@ -14,8 +14,8 @@
 # - As the disk space in the workflow environment is limitted, we clean the
 #   work folder of each package after build. At 2020.06 this limit is 14GB.
 # - synocli-videodriver and ffmpeg5-7 are not cleaned to be available for dependents.
-# - Therefore synocli-videodriver is built first if triggered by ffmpeg5-7
-# - Therefore ffmpeg5 and ffmpeg7 are built second if triggered by its
+# - Therefore synocli-videodriver is built first if triggered by ffmpeg5-6-7-8
+# - Therefore ffmpeg5-6-7-8 are built second if triggered by its
 #   own or a dependent (see prepare.sh).
 
 set -o pipefail
@@ -62,7 +62,7 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
 fi
 
 # Build
-PACKAGES_TO_KEEP="synocli-videodriver ffmpeg5 ffmpeg7 python310 python311 python312  python313"
+PACKAGES_TO_KEEP="synocli-videodriver ffmpeg7 ffmpeg8 python310 python311 python312  python313"
 for package in ${build_packages}
 do
     echo "::group:: ---- build ${package}"

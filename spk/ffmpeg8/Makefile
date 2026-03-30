@@ -1,10 +1,10 @@
-SPK_NAME = ffmpeg7
-SPK_VERS = 7.1.3
-SPK_REV = 7
+SPK_NAME = ffmpeg8
+SPK_VERS = 8.1
+SPK_REV = 1
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to using v7.1.3-3 jellyfin-ffmpeg patches"
+CHANGELOG = "1. Initial package release"
 
-DEPENDS = cross/ffmpeg7
+DEPENDS = cross/ffmpeg8
 
 # requires c11 and proper atomic using gcc-4.9+ support
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)

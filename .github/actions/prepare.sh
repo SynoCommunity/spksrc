@@ -7,8 +7,8 @@
 # Functions:
 # - Build all packages defined by ${USER_SPK_TO_BUILD} and ${GH_SPK_PACKAGES}
 # - Evaluate additional packages to build depending on changed folders defined in ${GH_DEPENDENT_PACKAGES}.
-# - synocli-videodriver is moved to head of packages to build first if triggered by its ffmpeg5-7
-# - python310-313 and ffmpeg5-7 are moved to head of remaining packages to build when triggered by its own or a dependent.
+# - synocli-videodriver is moved to head of packages to build first if triggered by its ffmpeg5-6-7-8
+# - python310-313 and ffmpeg5-6-7-8 are moved to head of remaining packages to build when triggered by its own or a dependent.
 # - Referenced native and cross packages of the packages to build are added to the download list.
 
 set -o pipefail
@@ -60,8 +60,8 @@ do
 done
 packages=$(echo "${filtered_packages}" | xargs)
 
-# for ffmpeg v5-7 find all packages that depend on them
-for i in {5..7}; do
+# for ffmpeg v5-8 find all packages that depend on them
+for i in {5..8}; do
     ffmpeg_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "FFMPEG_PACKAGE = ffmpeg${i}" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
     # If packages contain a package that depends on ffmpeg (or is ffmpeg),
@@ -76,7 +76,7 @@ for i in {5..7}; do
     done
 done
 
-# for synocli-videodriver that ffmpeg v5-7 depends on
+# for synocli-videodriver that ffmpeg v5-8 depends on
 videodrv_dependent_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "spksrc.videodriver.mk" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
 
 # If packages contain a package that depends on spksrc.videodriver.mk,
