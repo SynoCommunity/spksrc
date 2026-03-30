@@ -33,6 +33,8 @@ echo "::endgroup::"
 echo "===> TARGET: ${GH_ARCH}"
 echo "===> ARCH   packages: ${ARCH_PACKAGES}"
 echo "===> NOARCH packages: ${NOARCH_PACKAGES}"
+echo "===> MIN_DSM72_PACKAGES packages: ${MIN_DSM72_PACKAGES}"
+echo "===> MIN_DSM73_PACKAGES packages: ${MIN_DSM73_PACKAGES}"
 
 # Remove toolchain status files to enforce re-building toolchain including cargo/rust
 # This fixes issues on github-action where toolchain caching omits the
@@ -43,7 +45,16 @@ rm -f toolchain/syno-${GH_ARCH}/work/.toolchain_done
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
     build_packages=${NOARCH_PACKAGES}
 else
-    build_packages=${ARCH_PACKAGES}
+    # Extract DSM version
+    DSM_VERSION="${GH_ARCH##*-}"
+    case "${DSM_VERSION}" in
+        7.3) build_packages="${MIN_DSM73_PACKAGES}"
+             ;;
+        7.2) build_packages="${MIN_DSM72_PACKAGES}"
+             ;;
+          *) build_packages=${ARCH_PACKAGES}
+             ;;
+    esac
 fi
 
 echo ""
