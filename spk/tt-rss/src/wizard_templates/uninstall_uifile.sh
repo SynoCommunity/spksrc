@@ -73,6 +73,13 @@ PAGE_EXPORT=$(/bin/cat<<EOF
             "key": "wizard_pg_password_ttrss",
             "desc": "{{DB_EXPORT_PASSWORD_LABEL}}"
         }]
+    }, {
+        "type": "singleselect",
+        "subitems": [{
+            "key": "wizard_delete_data",
+            "hidden": true,
+            "defaultValue": true
+        }]
     }]
 }
 EOF
