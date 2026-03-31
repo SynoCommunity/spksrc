@@ -1,0 +1,9 @@
+etc/icinga2/features-available/api.conf
+etc/icinga2/features-available/checker.conf
+etc/icinga2/icinga2.conf
+etc/icinga2/constants.conf
+etc/icinga2/zones.conf
+lib/icinga2/prepare-dirs
+lib/icinga2/safe-reload
+lib/icinga2/sbin/icinga2
+sbin/icinga2
