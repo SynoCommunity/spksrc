@@ -95,6 +95,9 @@ jobs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
       noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
       has_min_dsm72_packages: ${{ steps.dependencies.outputs.has_min_dsm72_packages }}
+      has_min_dsm73_packages: ${{ steps.dependencies.outputs.has_min_dsm73_packages }}
+      min_dsm72_packages: ${{ steps.dependencies.outputs.min_dsm72_packages }}
+      min_dsm73_packages: ${{ steps.dependencies.outputs.min_dsm73_packages }}
       distrib_hash: ${{ steps.distrib-hash.outputs.hash }}
     steps:
       - name: Checkout repository
@@ -462,6 +465,8 @@ jobs:
         env:
           ARCH_PACKAGES: ${{ needs.prepare.outputs.arch_packages }}
           NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
+          MIN_DSM72_PACKAGES: ${{ needs.prepare.outputs.min_dsm72_packages }}
+          MIN_DSM73_PACKAGES: ${{ needs.prepare.outputs.min_dsm73_packages }}
           PUBLISH: ${{ github.event.inputs.publish }}
           API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           PACKAGE_TO_PUBLISH: ${{ github.event.inputs.package }}
