@@ -1,0 +1,66 @@
+[
+    {
+        "step_title": "Master Connection",
+        "invalid_next_disabled_v2": true,
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Master Hostname",
+                "subitems": [
+                    {
+                        "key": "wizard_master_host",
+                        "desc": "Hostname or IP",
+                        "validator": {
+                            "allowBlank": false
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Master Port",
+                "subitems": [
+                    {
+                        "key": "wizard_master_port",
+                        "desc": "Default: 5665",
+                        "defaultValue": "5665"
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Agent Name",
+                "subitems": [
+                    {
+                        "key": "wizard_agent_name",
+                        "desc": "Optional",
+                        "emptyText": "synology"
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "Master Ticket",
+                "subitems": [
+                    {
+                        "key": "wizard_master_ticket",
+                        "desc": "Optional",
+                        "emptyText": "Optional"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "step_title": "Post-Install",
+        "invalid_next_disabled_v2": true,
+        "items": [
+            {
+                "desc": "1. Approve cert on master: icinga2 ca list && icinga2 ca sign <fingerprint>"
+            },
+            {
+                "desc": "2. Add host in master's zones.conf and conf.d/hosts.conf"
+            }
+        ]
+    }
+]
