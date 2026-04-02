@@ -1,31 +1,52 @@
 # Icinga Web 2 service setup
 
-# Set the install path
-WEB_ROOT="/var/services/web_packages/icingaweb2"
+# Director daemon (job runner) configuration
+export ICINGAWEB_CONFIGDIR="${SYNOPKG_PKGVAR}/etc/icingaweb2"
+export ICINGAWEB_LIBDIR="${SYNOPKG_PKGDEST}/share/icinga-php"
+export ICINGAWEB2_STORAGE_DIR="${SYNOPKG_PKGVAR}/storage"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/share/icingaweb2/bin/icingacli director daemon run"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
+
+# PHP binary (DSM 7.0+ only)
+if [ "${SYNOPKG_DSM_VERSION_MINOR}" -ge 2 ]; then
+    PHP="/usr/local/bin/php82"
+else
+    PHP="/usr/local/bin/php80"
+fi
 
 # MariaDB paths
 MYSQL="/usr/local/mariadb10/bin/mysql"
 
-# Database configuration (hardcoded)
+# Database configuration
 DB_NAME="icingaweb2"
 DB_USER="icingaweb2"
 
-# Set PHP binary based on DSM version
-if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ]; then
-    if [ "${SYNOPKG_DSM_VERSION_MINOR}" -ge 2 ]; then
-        PHP="/usr/local/bin/php82"
-    else
-        PHP="/usr/local/bin/php80"
-    fi
-else
-    PHP="/usr/local/bin/php74"
-fi
-
-ICINGAWEB2_CONF_DIR="${SYNOPKG_PKGVAR}/etc/icingaweb2"
 ICINGA2_API_USER_FILE="/var/packages/icinga2/var/etc/icingaweb2/api-credentials.txt"
 ICINGA2_IDO_CRED_FILE="/var/packages/icinga2/var/etc/icingaweb2/ido-credentials.txt"
 CONF_TEMPLATES="${SYNOPKG_PKGDEST}/share/templates"
 
+# Helper: extract field value from credential file (e.g., "Username: foo" -> "foo")
+get_credential()
+{
+    file=$1 field=$2
+    grep "^${field}:" "${file}" 2>/dev/null | cut -d: -f2 | tr -d ' '
+}
+
+# Helper: copy template file and optionally substitute placeholder variables
+# Usage: copy_config "source" "dest" "@var1@" "value1" "@var2@" "value2"
+copy_config()
+{
+    src=$1 dest=$2
+    shift 2
+    cp "${src}" "${dest}"
+    while [ $# -gt 0 ]; do
+        sed -i "s|$1|g" "${dest}"
+        shift
+    done
+}
+
+# Verify MariaDB root password and check for existing database/user
 validate_preinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
@@ -44,6 +65,20 @@ validate_preinst ()
     fi
 }
 
+# Verify MariaDB root password before uninstall
+validate_preuninst ()
+{
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
+        if [ -n "${wizard_mysql_password_root}" ]; then
+            if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
+                echo "Incorrect MariaDB root password"
+                exit 1
+            fi
+        fi
+    fi
+}
+
+# Remove database and user on package uninstall
 service_preuninst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
@@ -58,6 +93,7 @@ EOF
     fi
 }
 
+# Create icingaweb2 database and dedicated MariaDB user
 setup_icingaweb2_database ()
 {
     echo "Creating icingaweb2 database and user"
@@ -69,141 +105,109 @@ FLUSH PRIVILEGES;
 EOF
 }
 
+# Import Icinga Web 2 database schema from package
 import_icingaweb2_schema ()
 {
     echo "Importing Icinga Web 2 database schema"
-    local SCHEMA_FILE="${SYNOPKG_PKGDEST}/share/icingaweb2/schema/mysql.schema.sql"
+    SCHEMA_FILE="${SYNOPKG_PKGDEST}/share/icingaweb2/schema/mysql.schema.sql"
     if [ -f "${SCHEMA_FILE}" ]; then
         ${MYSQL} -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" < "${SCHEMA_FILE}"
     fi
 }
 
+# Create Icinga Web admin user via PHP script
 create_admin_user ()
 {
     echo "Creating administrator user '${wizard_admin_user}'"
-    ICINGAWEB_CONFIGDIR="${SYNOPKG_PKGVAR}/etc/icingaweb2" \
-    ICINGAWEB_LIBDIR="${SYNOPKG_PKGDEST}/share/icinga-php" \
     ${PHP} "${SYNOPKG_PKGDEST}/share/create-admin.php" "${wizard_admin_user}" "${wizard_admin_pass}"
-    local exit_code=$?
+    exit_code=$?
     echo "create-admin.php exit code: $exit_code"
     if [ $exit_code -ne 0 ]; then
         echo "WARNING: create-admin.php exited with code $exit_code"
     fi
 }
 
+# Post-installation: create directories and configure Icinga Web 2
 service_postinst ()
 {
-    # Database password (from wizard) - must be set before use
-    DB_PASS="${wizard_db_pass}"
-
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        DB_PASS="${wizard_db_pass}"
         setup_icingaweb2_database
         import_icingaweb2_schema
-    fi
+        if [ -n "${wizard_admin_user}" ] && [ -n "${wizard_admin_pass}" ]; then
+            create_admin_user
+        fi
 
-    # Create Icinga Web 2 storage directory
-    ICINGAWEB2_STORAGE_DIR="${SYNOPKG_PKGVAR}/storage"
-    mkdir -p "${ICINGAWEB2_STORAGE_DIR}"
-    chmod 2770 "${ICINGAWEB2_STORAGE_DIR}"
-    chown sc-icingaweb2:http "${ICINGAWEB2_STORAGE_DIR}"
+        # Create directories for storage and configuration
+        mkdir -p "${ICINGAWEB2_STORAGE_DIR}"
+        mkdir -p "${ICINGAWEB_CONFIGDIR}/modules/monitoring"
+        mkdir -p "${ICINGAWEB_CONFIGDIR}/enabledModules"
 
-    # Create configuration directory structure
-    mkdir -p "${ICINGAWEB2_CONF_DIR}"
-    mkdir -p "${ICINGAWEB2_CONF_DIR}/modules/monitoring"
-    mkdir -p "${ICINGAWEB2_CONF_DIR}/enabledModules"
+        # Retrieve credentials from icinga2 package (API and IDO database)
+        IDO_DB_NAME=$(get_credential "${ICINGA2_IDO_CRED_FILE}" "Database")
+        IDO_DB_USER=$(get_credential "${ICINGA2_IDO_CRED_FILE}" "Username")
+        IDO_DB_PASS=$(get_credential "${ICINGA2_IDO_CRED_FILE}" "Password")
+        API_USER=$(get_credential "${ICINGA2_API_USER_FILE}" "Username")
+        API_PASS=$(get_credential "${ICINGA2_API_USER_FILE}" "Password")
+        API_HOST=$(hostname)
 
-    # Create log directory
-    mkdir -p "${SYNOPKG_PKGVAR}/log"
+        # Copy base config files (resources.ini requires placeholder substitution)
+        copy_config "${CONF_TEMPLATES}/resources.ini" "${ICINGAWEB_CONFIGDIR}/resources.ini" \
+            "@db_name@" "${DB_NAME}" "@db_user@" "${DB_USER}" "@db_pass@" "${DB_PASS}" \
+            "@ido_db_name@" "${IDO_DB_NAME}" "@ido_db_user@" "${IDO_DB_USER}" "@ido_db_pass@" "${IDO_DB_PASS}" \
+            "@api_host@" "${API_HOST}" "@api_user@" "${API_USER}" "@api_pass@" "${API_PASS}"
 
-    # Get IDO database credentials from icinga2 package
-    IDO_DB_NAME="icinga_ido"
-    IDO_DB_USER="icinga2"
-    IDO_DB_PASS=""
-    if [ -f "${ICINGA2_IDO_CRED_FILE}" ]; then
-        IDO_DB_NAME=$(grep "^Database:" "${ICINGA2_IDO_CRED_FILE}" | cut -d: -f2 | tr -d ' ')
-        IDO_DB_USER=$(grep "^Username:" "${ICINGA2_IDO_CRED_FILE}" | cut -d: -f2 | tr -d ' ')
-        IDO_DB_PASS=$(grep "^Password:" "${ICINGA2_IDO_CRED_FILE}" | cut -d: -f2 | tr -d ' ')
-    fi
+        copy_config "${CONF_TEMPLATES}/config.ini" "${ICINGAWEB_CONFIGDIR}/config.ini"
+        copy_config "${CONF_TEMPLATES}/authentication.ini" "${ICINGAWEB_CONFIGDIR}/authentication.ini"
+        copy_config "${CONF_TEMPLATES}/groups.ini" "${ICINGAWEB_CONFIGDIR}/groups.ini"
 
-    # Copy and configure resources.ini
-    if [ ! -f "${ICINGAWEB2_CONF_DIR}/resources.ini" ]; then
-        cp "${CONF_TEMPLATES}/resources.ini" "${ICINGAWEB2_CONF_DIR}/resources.ini"
-        sed -i -e "s|@db_name@|${DB_NAME}|g" \
-               -e "s|@db_user@|${DB_USER}|g" \
-               -e "s|@db_pass@|${DB_PASS}|g" \
-               -e "s|@ido_db_name@|${IDO_DB_NAME}|g" \
-               -e "s|@ido_db_user@|${IDO_DB_USER}|g" \
-               -e "s|@ido_db_pass@|${IDO_DB_PASS}|g" \
-             "${ICINGAWEB2_CONF_DIR}/resources.ini"
-    fi
-
-    # Create admin user
-    if [ -n "${wizard_admin_user}" ] && [ -n "${wizard_admin_pass}" ]; then
-        create_admin_user
-    fi
-
-    # Copy config.ini
-    if [ ! -f "${ICINGAWEB2_CONF_DIR}/config.ini" ]; then
-        cp "${CONF_TEMPLATES}/config.ini" "${ICINGAWEB2_CONF_DIR}/config.ini"
-    fi
-
-    # Copy authentication.ini
-    if [ ! -f "${ICINGAWEB2_CONF_DIR}/authentication.ini" ]; then
-        cp "${CONF_TEMPLATES}/authentication.ini" "${ICINGAWEB2_CONF_DIR}/authentication.ini"
-    fi
-
-    # Copy groups.ini
-    if [ ! -f "${ICINGAWEB2_CONF_DIR}/groups.ini" ]; then
-        cp "${CONF_TEMPLATES}/groups.ini" "${ICINGAWEB2_CONF_DIR}/groups.ini"
-    fi
-
-    # Copy roles.ini
-    if [ ! -f "${ICINGAWEB2_CONF_DIR}/roles.ini" ]; then
-        cp "${CONF_TEMPLATES}/roles.ini" "${ICINGAWEB2_CONF_DIR}/roles.ini"
-        # Update roles.ini with the admin username from wizard
+        # Copy roles.ini and substitute admin user from wizard
+        copy_config "${CONF_TEMPLATES}/roles.ini" "${ICINGAWEB_CONFIGDIR}/roles.ini"
         if [ -n "${wizard_admin_user}" ]; then
-            sed -i "s/users = \"admin\"/users = \"${wizard_admin_user}\"/" "${ICINGAWEB2_CONF_DIR}/roles.ini"
+            sed -i "s/users = \"admin\"/users = \"${wizard_admin_user}\"/" "${ICINGAWEB_CONFIGDIR}/roles.ini"
+        fi
+
+        # Enable Icinga Web 2 modules (monitoring, incubator, director)
+        for module in monitoring incubator director; do
+            ln -sf "/var/packages/icingaweb2/target/share/icingaweb2/modules/${module}" \
+                "${ICINGAWEB_CONFIGDIR}/enabledModules/${module}"
+        done
+
+        # Configure Director module (config, kickstart, jobs)
+        mkdir -p "${ICINGAWEB_CONFIGDIR}/modules/director"
+        copy_config "${CONF_TEMPLATES}/modules/director/config.ini" "${ICINGAWEB_CONFIGDIR}/modules/director/config.ini"
+        copy_config "${CONF_TEMPLATES}/modules/director/kickstart.ini" "${ICINGAWEB_CONFIGDIR}/modules/director/kickstart.ini" \
+            "@api_host@" "${API_HOST}" "@api_user@" "${API_USER}" "@api_pass@" "${API_PASS}"
+        copy_config "${CONF_TEMPLATES}/modules/director/jobs.ini" "${ICINGAWEB_CONFIGDIR}/modules/director/jobs.ini"
+
+        # Configure monitoring module (config, backends, command transports)
+        copy_config "${CONF_TEMPLATES}/modules/monitoring/config.ini" "${ICINGAWEB_CONFIGDIR}/modules/monitoring/config.ini"
+        copy_config "${CONF_TEMPLATES}/modules/monitoring/backends.ini" "${ICINGAWEB_CONFIGDIR}/modules/monitoring/backends.ini"
+        copy_config "${CONF_TEMPLATES}/modules/monitoring/commandtransports.ini" "${ICINGAWEB_CONFIGDIR}/modules/monitoring/commandtransports.ini" \
+            "@api_user@" "${API_USER}" "@api_pass@" "${API_PASS}"
+
+        # Create symlink so package share points to config directory (needed for STARTABLE=no)
+        ICINGAWEB2_SHARE="/var/packages/icingaweb2/target/share/icingaweb2"
+        if [ -d "${ICINGAWEB2_SHARE}" ] && [ ! -L "${ICINGAWEB2_SHARE}/config" ]; then
+            rm -rf "${ICINGAWEB2_SHARE}/config" 2>/dev/null
+            ln -sf "${ICINGAWEB_CONFIGDIR}" "${ICINGAWEB2_SHARE}/config"
+        fi
+
+        # Set ownership and permissions on config and storage directories
+        find "${ICINGAWEB_CONFIGDIR}" -type f -exec chmod 640 {} \;
+        find "${ICINGAWEB_CONFIGDIR}" -type d -exec chmod 750 {} \;
+        chmod 750 "${ICINGAWEB2_STORAGE_DIR}"
+        if id sc-icingaweb2 >/dev/null 2>&1; then
+            chown -R sc-icingaweb2:http "${ICINGAWEB_CONFIGDIR}"
+            chown sc-icingaweb2:http "${ICINGAWEB2_STORAGE_DIR}"
+        fi
+
+        # Run Director database migration, kickstart API sync, and agent template setup
+        if [ -f "${ICINGAWEB_CONFIGDIR}/modules/director/kickstart.ini" ]; then
+            "${SYNOPKG_PKGDEST}/share/icingaweb2/bin/icingacli" director migration run 2>/dev/null || true
+            "${SYNOPKG_PKGDEST}/share/icingaweb2/bin/icingacli" director kickstart run 2>/dev/null || true
+            "${PHP}" "${SYNOPKG_PKGDEST}/share/setup-director-template.php" "agent-template" 2>/dev/null || true
+            "${SYNOPKG_PKGDEST}/share/icingaweb2/bin/icingacli" director config deploy 2>/dev/null || true
         fi
     fi
-
-    # Enable monitoring module by default
-    if [ ! -L "${ICINGAWEB2_CONF_DIR}/enabledModules/monitoring" ]; then
-        ln -sf "/var/packages/icingaweb2/target/share/icingaweb2/modules/monitoring" \
-            "${ICINGAWEB2_CONF_DIR}/enabledModules/monitoring"
-    fi
-
-    # Copy monitoring module config.ini
-    if [ ! -f "${ICINGAWEB2_CONF_DIR}/modules/monitoring/config.ini" ]; then
-        cp "${CONF_TEMPLATES}/modules/monitoring/config.ini" "${ICINGAWEB2_CONF_DIR}/modules/monitoring/config.ini"
-    fi
-
-    # Copy monitoring module backends.ini
-    if [ ! -f "${ICINGAWEB2_CONF_DIR}/modules/monitoring/backends.ini" ]; then
-        cp "${CONF_TEMPLATES}/modules/monitoring/backends.ini" "${ICINGAWEB2_CONF_DIR}/modules/monitoring/backends.ini"
-    fi
-
-    # Copy and configure monitoring module commandtransports.ini
-    if [ ! -f "${ICINGAWEB2_CONF_DIR}/modules/monitoring/commandtransports.ini" ]; then
-        API_USER="admin"
-        API_PASS=""
-        if [ -f "${ICINGA2_API_USER_FILE}" ]; then
-            API_USER=$(grep "^Username:" "${ICINGA2_API_USER_FILE}" | cut -d: -f2 | tr -d ' ')
-            API_PASS=$(grep "^Password:" "${ICINGA2_API_USER_FILE}" | cut -d: -f2 | tr -d ' ')
-        fi
-        cp "${CONF_TEMPLATES}/modules/monitoring/commandtransports.ini" "${ICINGAWEB2_CONF_DIR}/modules/monitoring/commandtransports.ini"
-        sed -i -e "s|@api_user@|${API_USER}|g" \
-               -e "s|@api_pass@|${API_PASS}|g" \
-            "${ICINGAWEB2_CONF_DIR}/modules/monitoring/commandtransports.ini"
-    fi
-
-    # Create symlink for config directory (needed for STARTABLE=no)
-    ICINGAWEB2_SHARE="/var/packages/icingaweb2/target/share/icingaweb2"
-    if [ -d "${ICINGAWEB2_SHARE}" ] && [ ! -L "${ICINGAWEB2_SHARE}/config" ]; then
-        rm -rf "${ICINGAWEB2_SHARE}/config" 2>/dev/null
-        ln -sf "${ICINGAWEB2_CONF_DIR}" "${ICINGAWEB2_SHARE}/config"
-    fi
-
-    # Set permissions
-    chmod -R 2770 "${ICINGAWEB2_CONF_DIR}"
-    chown -R sc-icingaweb2:http "${ICINGAWEB2_CONF_DIR}"
 }

@@ -24,6 +24,9 @@ SERVICE_SETUP = src/service-setup.sh
 NO_SERVICE_SHORTCUT = yes
 WIZARDS_DIR = src/wizard
 
+SERVICE_PORT = 5665
+SERVICE_PORT_TITLE = Icinga 2 Agent API
+
 POST_STRIP_TARGET = icinga2_agent_extra_install
 
 include ../../mk/spksrc.spk.mk

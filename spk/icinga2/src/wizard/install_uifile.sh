@@ -21,7 +21,7 @@ PAGE_DATABASE_SETUP=$(/bin/cat<<EOF
     "step_title": "Icinga 2 IDO Database Configuration",
     "invalid_next_disabled_v2": true,
     "items": [{
-        "desc": "Icinga 2 uses an IDO (Icinga Data Output) database to store monitoring data. This database is required for Icinga Web 2 to display monitoring information.<br><br>A MariaDB database and user will be created automatically."
+        "desc": "Icinga 2 uses an IDO (Icinga Data Output) database to store monitoring data. This database is required for Icinga Web 2 to display monitoring information. A MariaDB database and user will be created automatically."
     }, {
         "type": "password",
         "desc": "Enter your MariaDB 'root' password to create the IDO database.",
@@ -47,6 +47,8 @@ PAGE_DATABASE_SETUP=$(/bin/cat<<EOF
                  }
              }
         }]
+    }, {
+        "desc": "<b>Note:</b> After installation, run the following commands as root to enable ping checks:<br><code>sudo chmod +s /bin/ping</code> and <code>sudo chmod +s /bin/ping6</code>"
     }]
 }
 EOF

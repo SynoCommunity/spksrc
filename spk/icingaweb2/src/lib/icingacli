@@ -1,0 +1,15 @@
+#!/bin/sh
+# Icinga Web 2 CLI wrapper for Synology DSM
+# Sets required environment variables before running icingacli
+
+export ICINGAWEB_CONFIGDIR="/var/packages/icingaweb2/var/etc/icingaweb2"
+export ICINGAWEB_LIBDIR="/var/packages/icingaweb2/target/share/icinga-php"
+export ICINGAWEB_STORAGEDIR="/var/packages/icingaweb2/var/storage"
+
+# Use PHP with intl extension (WebStation PHP)
+PHP_BINARY="/usr/local/bin/php82"
+if [ ! -x "$PHP_BINARY" ]; then
+    PHP_BINARY="/usr/local/bin/php80"
+fi
+
+exec "$PHP_BINARY" /var/packages/icingaweb2/target/share/icingaweb2/bin/icingacli.real "$@"
