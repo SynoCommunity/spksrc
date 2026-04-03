@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.4.3
-SPK_REV = 21
+SPK_REV = 22
 SPK_ICON = src/borgbackup.png
 
 # Include common.mk first to get ARCH definitions
