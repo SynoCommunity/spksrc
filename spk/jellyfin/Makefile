@@ -1,7 +1,7 @@
 # Remember to also update jellyfin-web
 SPK_NAME = jellyfin
 SPK_VERS = 10.11.6
-SPK_REV = 35
+SPK_REV = 34
 SPK_ICON = src/jellyfin.png
 
 DEPENDS = cross/jellyfin cross/jellyfin-web
