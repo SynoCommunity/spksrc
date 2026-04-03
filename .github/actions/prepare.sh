@@ -6,12 +6,11 @@
 #
 # Functions:
 # - Build all packages defined by ${USER_SPK_TO_BUILD} and ${GH_SPK_PACKAGES}
-# - Evaluate additional packages to build depending on changed folders defined in ${GH_DEPENDENT_PACKAGES}.
-# - synocli-videodriver is moved to head of packages to build first (ffmpeg5-7 depends on it)
-# - ffmpeg (versions defined by ffmpeg_versions) are moved to head after synocli-videodriver
-# - python (versions defined by python_versions) are moved to head after ffmpeg
-# - Missing meta-packages required by packages in the list are automatically injected.
-# - Referenced native and cross packages of the packages to build are added to the download list.
+# - Evaluate additional packages to build depending on changed folders defined in ${GH_DEPENDENT_PACKAGES}
+# - Resolve and inject missing meta-packages recursively based on *_PACKAGE Makefile variables
+# - Ensure deterministic build order using dependency-driven resolution (DFS, post-order)
+# - Classify packages by architecture and minimum DSM version requirements
+# - Collect referenced native and cross packages into the download list
 #
 # Outputs (via GITHUB_OUTPUT):
 # - arch_packages           : space-separated list of arch-specific packages to build (standard DSM)
@@ -41,63 +40,75 @@ min_dsm_versions=(7.2 7.3)
 
 # Makefile variables that declare a dependency on a meta SPK to be built first.
 # Add new variable names here to extend meta-package detection.
-meta_package_vars=(PYTHON_PACKAGE FFMPEG_PACKAGE)
+meta_package_vars=(PYTHON_PACKAGE FFMPEG_PACKAGE VIDEODRV_PACKAGE)
+
+# Tracks already processed packages to avoid duplicates and ensure
+# deterministic ordering during recursive dependency resolution.
+declare -A visited
 
 # ===========================================================================
 
 # ---------------------------------------------------------------------------
-# Move a package to the head of $packages if it or any of its dependents
-# is already present in $packages. Dependent detection is caller-provided
-# via the second argument to keep this function generic.
+# Inject and order meta-packages in a package list.
 #
-# Usage: reorder_to_head <package_name> <space-separated dependent list>
-# Modifies the global $packages variable in place.
-# ---------------------------------------------------------------------------
-reorder_to_head() {
-    local pkg="$1"
-    local dependents="$2"
-    for package in ${packages}; do
-        if [ "$(echo "${pkg} ${dependents}" | grep -ow "${package}")" != "" ]; then
-            # grep -v "^${pkg}$" ensures word-exact removal, preventing partial
-            # matches like "python312" mangling "python312-wheels"
-            packages_without=$(echo "${packages}" | tr ' ' '\n' | grep -v "^${pkg}$" | tr '\n' ' ')
-            packages="${pkg} ${packages_without}"
-            break
-        fi
-    done
-}
-
-# ---------------------------------------------------------------------------
-# Inject missing meta-packages into a package list.
-# For each package in the list, checks Makefile variables defined in
-# meta_package_vars (e.g. PYTHON_PACKAGE, FFMPEG_PACKAGE). If the declared
-# meta SPK is not already in the list, it is prepended.
-# The process repeats until no new meta-packages are found, so that
-# meta-packages that themselves depend on other meta-packages are fully resolved.
+# This function resolves meta-package dependencies recursively based on
+# Makefile variables listed in meta_package_vars (e.g. PYTHON_PACKAGE,
+# FFMPEG_PACKAGE, VIDEODRV_PACKAGE).
+#
+# The resolution is implemented via a depth-first search (DFS) using the
+# internal helper function `_inject_one`. Each package is processed in
+# post-order: all its meta-dependencies are resolved first, then the package
+# itself is appended to the final list.
+#
+# A global "visited" set ensures that each package is processed only once,
+# preventing duplicate entries and guaranteeing deterministic output.
+#
+# The resulting list is effectively a topological ordering of packages based
+# on declared meta-dependencies:
+#   synocli-videodriver -> ffmpeg -> dependent packages
+#   pythonXY -> pythonXY-wheels -> dependent packages
+#
+# `inject_meta_packages` acts as a wrapper that initializes traversal over
+# the input package list, while `_inject_one` performs the recursive resolution.
+#
+# This function is the single source of truth for build ordering. The resulting
+# order must not be modified afterward, as any reordering would break dependency
+# guarantees.
 #
 # Usage: inject_meta_packages <space-separated package list>
-# Prints the augmented space-separated list to stdout.
+# Prints the ordered space-separated list to stdout.
 # Diagnostic messages are sent to stderr to avoid polluting the return value.
 # ---------------------------------------------------------------------------
 inject_meta_packages() {
-    local list="$1"
-    for package in ${list}; do
-        if [ -f "./spk/${package}/Makefile" ]; then
-            for meta_var in "${meta_package_vars[@]}"; do
-                while IFS= read -r meta; do
-                    [ -z "${meta}" ] && continue
-                    if ! echo "${list}" | tr ' ' '\n' | grep -qx "${meta}"; then
-                        echo "===> Adding missing meta-package ${meta} required by ${package}" >&2
-                        # Recursively resolve meta-dependencies of the newly found meta-package
-                        # before prepending it, so its own dependencies appear first
-                        meta_resolved=$(inject_meta_packages "${meta}")
-                        list="${meta_resolved} ${list}"
-                    fi
-                done < <(grep -E "^${meta_var}\s*=\s*" "./spk/${package}/Makefile" | cut -d= -f2 | xargs -n1)
-            done
-        fi
+    local input="$1"
+    local output=
+
+    for package in ${input}; do
+        _inject_one "$package"
     done
-    echo "${list}"
+
+    echo "${resolved}" | xargs
+}
+
+_inject_one() {
+    local package="$1"
+
+    # Skip if already processed
+    if [ "${visited[$package]}" = "1" ]; then
+        return
+    fi
+    visited[$package]=1
+
+    if [ -f "./spk/${package}/Makefile" ]; then
+        for meta_var in "${meta_package_vars[@]}"; do
+            while IFS= read -r meta; do
+                [ -z "${meta}" ] && continue
+                _inject_one "$meta"
+            done < <(grep -E "^${meta_var}\s*=" "./spk/${package}/Makefile" | cut -d= -f2 | xargs -n1)
+        done
+    fi
+
+    resolved="${resolved} ${package}"
 }
 
 # ---------------------------------------------------------------------------
@@ -146,7 +157,11 @@ make dependency-list-spk 2>/dev/null > "${DEPENDENCY_LIST}"
 for package in ${GH_DEPENDENCY_FOLDERS}; do
     echo "===> Searching for dependent package: ${package}"
     found=$(grep -w "${package}" "${DEPENDENCY_LIST}" | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
-    echo "===> Found: ${found}"
+    if [ -n "${found}" ]; then
+        echo "===> Found: ${found}"
+    else
+        echo "===> Found: none"
+    fi
     SPK_TO_BUILD+=" ${found}"
 done
 
@@ -180,37 +195,9 @@ packages=$(echo "${filtered_packages}" | xargs)
 # Inject missing meta-packages into the global package list
 packages=$(inject_meta_packages "${packages}")
 
-# ===========================================================================
-# 2. Enforce build order: synocli-videodriver > ffmpeg > python
-#    Packages that others depend on must be built first so that dependents
-#    can reuse their already-built artifacts (e.g. shared libs, wheels).
-# ===========================================================================
-
-# Ensure synocli-videodriver is first — ffmpeg5-7 depends on it via spksrc.videodriver.mk
-videodrv_dependents=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" \
-    -exec grep -Ho "spksrc.videodriver.mk" {} \; \
-    | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
-reorder_to_head "synocli-videodriver" "${videodrv_dependents}"
-
-# Ensure each ffmpeg is before its dependents
-for i in "${ffmpeg_versions[@]}"; do
-    ffmpeg_dependents=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" \
-        -exec grep -Ho "FFMPEG_PACKAGE = ffmpeg${i}" {} \; \
-        | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
-    reorder_to_head "ffmpeg${i}" "${ffmpeg_dependents}"
-done
-
-# Ensure each python is before its dependents
-for py_ver in "${python_versions[@]}"; do
-    py="python${py_ver}"
-    python_dependents=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" \
-        -exec grep -Ho "PYTHON_PACKAGE = ${py}" {} \; \
-        | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
-    reorder_to_head "${py}" "${python_dependents}"
-done
 
 # ===========================================================================
-# 3. Classify packages: arch-specific vs noarch, and by minimum DSM version
+# 2. Classify packages: arch-specific vs noarch, and by minimum DSM version
 #    All classifications iterate over $packages to preserve build order.
 # ===========================================================================
 
@@ -280,7 +267,7 @@ for package in ${packages}; do
 done
 
 # ===========================================================================
-# 4. Export all outputs to GITHUB_OUTPUT
+# 3. Export all outputs to GITHUB_OUTPUT
 # ===========================================================================
 
 # Static outputs
@@ -304,7 +291,7 @@ done
 echo "::endgroup::"
 
 # ===========================================================================
-# 5. Build summary — display what will be built per target for easier debugging
+# 4. Build summary — display what will be built per target for easier debugging
 # ===========================================================================
 echo ""
 echo "::group:: ---- build summary"
@@ -339,7 +326,7 @@ fi
 echo "::endgroup::"
 
 # ===========================================================================
-# 6. Evaluate download list for all packages to build
+# 5. Evaluate download list for all packages to build
 # ===========================================================================
 
 if [ -z "${packages}" ]; then
