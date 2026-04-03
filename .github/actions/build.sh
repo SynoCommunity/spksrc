@@ -33,8 +33,10 @@ echo "::endgroup::"
 echo "===> TARGET: ${GH_ARCH}"
 echo "===> ARCH   packages: ${ARCH_PACKAGES}"
 echo "===> NOARCH packages: ${NOARCH_PACKAGES}"
-echo "===> MIN_DSM72_PACKAGES packages: ${MIN_DSM72_PACKAGES}"
-echo "===> MIN_DSM73_PACKAGES packages: ${MIN_DSM73_PACKAGES}"
+echo "===> ARCH_MIN_DSM72 packages: ${ARCH_MIN_DSM72_PACKAGES}"
+echo "===> NOARCH_MIN_DSM72 packages: ${NOARCH_MIN_DSM72_PACKAGES}"
+echo "===> ARCH_MIN_DSM73 packages: ${ARCH_MIN_DSM73_PACKAGES}"
+echo "===> NOARCH_MIN_DSM73 packages: ${NOARCH_MIN_DSM73_PACKAGES}"
 
 # Remove toolchain status files to enforce re-building toolchain including cargo/rust
 # This fixes issues on github-action where toolchain caching omits the
@@ -48,10 +50,20 @@ else
     # Extract DSM version
     DSM_VERSION="${GH_ARCH##*-}"
     case "${DSM_VERSION}" in
-        7.3) build_packages="${MIN_DSM73_PACKAGES}"
-             ;;
-        7.2) build_packages="${MIN_DSM72_PACKAGES}"
-             ;;
+        7.3)
+            if [ "${GH_ARCH%%-*}" = "noarch" ]; then
+                build_packages="${NOARCH_MIN_DSM73_PACKAGES}"
+            else
+                build_packages="${ARCH_MIN_DSM73_PACKAGES}"
+            fi
+            ;;
+        7.2)
+            if [ "${GH_ARCH%%-*}" = "noarch" ]; then
+                build_packages="${NOARCH_MIN_DSM72_PACKAGES}"
+            else
+                build_packages="${ARCH_MIN_DSM72_PACKAGES}"
+            fi
+            ;;
           *) build_packages=${ARCH_PACKAGES}
              ;;
     esac

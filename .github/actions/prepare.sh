@@ -14,13 +14,15 @@
 # - Referenced native and cross packages of the packages to build are added to the download list.
 #
 # Outputs (via GITHUB_OUTPUT):
-# - arch_packages           : space-separated list of arch-specific packages to build (standard DSM)
-# - noarch_packages         : space-separated list of noarch packages to build (standard DSM)
-# - has_arch_packages       : true/false
-# - has_noarch_packages     : true/false
-# - has_min_dsm<V>_packages : true/false, one per DSM version with restricted packages
-# - min_dsm<V>_packages     : space-separated list of packages requiring that minimum DSM version
-# - download_packages       : space-separated list of cross/native packages to pre-download
+# - arch_packages                  : space-separated list of arch-specific packages to build (standard DSM)
+# - noarch_packages                : space-separated list of noarch packages to build (standard DSM)
+# - has_arch_packages              : true/false
+# - has_noarch_packages            : true/false
+# - arch_min_dsm<V>_packages       : space-separated list of arch packages requiring min DSM version
+# - noarch_min_dsm<V>_packages     : space-separated list of noarch packages requiring min DSM version
+# - has_arch_min_dsm<V>_packages   : true/false
+# - has_noarch_min_dsm<V>_packages : true/false
+# - download_packages              : space-separated list of cross/native packages to pre-download
 
 set -o pipefail
 
@@ -214,16 +216,30 @@ done
 #    All classifications iterate over $packages to preserve build order.
 # ===========================================================================
 
-# Collect DSM-restricted packages first so they can be excluded from standard builds.
+# Find all noarch packages (needed for classification)
+all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" \
+    -exec grep -Ho "override ARCH" {} \; \
+    | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+
+# Collect DSM-restricted packages, split into arch and noarch lists.
 # inject_meta_packages is called inside collect_min_dsm_packages for each DSM list.
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
-    min_packages_var="min_dsm${v}_packages"
-    has_min_packages_var="has_min_dsm${v}_packages"
-
     result=$(collect_min_dsm_packages "${version}")
-    declare "${min_packages_var}=${result}"
-    declare "${has_min_packages_var}=$([ -n "${result}" ] && echo 'true' || echo 'false')"
+
+    # Split into arch and noarch
+    arch_min_dsm${v}_packages=
+    noarch_min_dsm${v}_packages=
+    for pkg in ${result}; do
+        if echo "${all_noarch}" | tr ' ' '\n' | grep -qx "${pkg}"; then
+            noarch_min_dsm${v}_packages+="${pkg} "
+        else
+            arch_min_dsm${v}_packages+="${pkg} "
+        fi
+    done
+
+    declare "has_arch_min_dsm${v}_packages=$([ -n "${!arch_min_dsm${v}_packages}" ] && echo 'true' || echo 'false')"
+    declare "has_noarch_min_dsm${v}_packages=$([ -n "${!noarch_min_dsm${v}_packages}" ] && echo 'true' || echo 'false')"
 done
 
 # Build the combined list of all DSM-restricted non-meta packages for exclusion
@@ -232,8 +248,7 @@ done
 all_min_dsm_packages=
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
-    min_packages_var="min_dsm${v}_packages"
-    for pkg in ${!min_packages_var}; do
+    for pkg in ${arch_min_dsm${v}_packages} ${noarch_min_dsm${v}_packages}; do
         # Keep meta-packages in standard builds — only exclude applicative packages.
         # A package is a meta if its name matches python*, ffmpeg* or synocli-videodriver.
         is_meta=false
@@ -252,10 +267,10 @@ for version in "${min_dsm_versions[@]}"; do
     done
 done
 
-# Find all noarch packages
+# Find all noarch packages (needed for classification)
 all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" \
     -exec grep -Ho "override ARCH" {} \; \
-    | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
+    | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ')
 
 # Separate noarch and arch-specific packages.
 # Filter out packages that are removed or do not exist (e.g. nzbdrone).
@@ -291,10 +306,11 @@ output_vars=(
     has_noarch_packages
 )
 
-# Dynamic outputs — one pair per DSM version
+# Dynamic outputs — arch and noarch per DSM version
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
-    output_vars+=("min_dsm${v}_packages" "has_min_dsm${v}_packages")
+    output_vars+=("arch_min_dsm${v}_packages" "has_arch_min_dsm${v}_packages")
+    output_vars+=("noarch_min_dsm${v}_packages" "has_noarch_min_dsm${v}_packages")
 done
 
 for var in "${output_vars[@]}"; do
@@ -326,10 +342,13 @@ echo "RESTRICTED builds (min DSM version):"
 any_restricted='false'
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
-    min_packages_var="min_dsm${v}_packages"
-    has_min_packages_var="has_min_dsm${v}_packages"
-    if [ "${!has_min_packages_var}" = "true" ]; then
-        echo "  DSM ${version} : ${!min_packages_var}"
+    arch_var="arch_min_dsm${v}_packages"
+    noarch_var="noarch_min_dsm${v}_packages"
+    has_arch_var="has_arch_min_dsm${v}_packages"
+    has_noarch_var="has_noarch_min_dsm${v}_packages"
+    if [ "${!has_arch_var}" = "true" ] || [ "${!has_noarch_var}" = "true" ]; then
+        echo "  DSM ${version} arch: ${!arch_var}"
+        echo "  DSM ${version} noarch: ${!noarch_var}"
         any_restricted='true'
     fi
 done
