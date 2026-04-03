@@ -44,28 +44,20 @@ echo "===> NOARCH_MIN_DSM73 packages: ${NOARCH_MIN_DSM73_PACKAGES}"
 rm -f toolchain/syno-${GH_ARCH}/work/.toolchain*_done
 rm -f toolchain/syno-${GH_ARCH}/work/.stage[01]-*_done
 
+# Extract DSM version from GH_ARCH (e.g., "x64-7.2" → "7.2", "noarch-7.2" → "7.2")
+DSM_VERSION="${GH_ARCH##*-}"
+
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
-    build_packages=${NOARCH_PACKAGES}
-else
-    # Extract DSM version
-    DSM_VERSION="${GH_ARCH##*-}"
     case "${DSM_VERSION}" in
-        7.3)
-            if [ "${GH_ARCH%%-*}" = "noarch" ]; then
-                build_packages="${NOARCH_MIN_DSM73_PACKAGES}"
-            else
-                build_packages="${ARCH_MIN_DSM73_PACKAGES}"
-            fi
-            ;;
-        7.2)
-            if [ "${GH_ARCH%%-*}" = "noarch" ]; then
-                build_packages="${NOARCH_MIN_DSM72_PACKAGES}"
-            else
-                build_packages="${ARCH_MIN_DSM72_PACKAGES}"
-            fi
-            ;;
-          *) build_packages=${ARCH_PACKAGES}
-             ;;
+        7.3) build_packages="${NOARCH_MIN_DSM73_PACKAGES}" ;;
+        7.2) build_packages="${NOARCH_MIN_DSM72_PACKAGES}" ;;
+          *) build_packages=${NOARCH_PACKAGES} ;;
+    esac
+else
+    case "${DSM_VERSION}" in
+        7.3) build_packages="${ARCH_MIN_DSM73_PACKAGES}" ;;
+        7.2) build_packages="${ARCH_MIN_DSM72_PACKAGES}" ;;
+          *) build_packages=${ARCH_PACKAGES} ;;
     esac
 fi
 

@@ -227,19 +227,30 @@ for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
     result=$(collect_min_dsm_packages "${version}")
 
-    # Split into arch and noarch
-    arch_min_dsm${v}_packages=
-    noarch_min_dsm${v}_packages=
+    # Split into arch and noarch using intermediate variables
+    arch_var="arch_min_dsm${v}_packages"
+    noarch_var="noarch_min_dsm${v}_packages"
+
+    # Build strings in temporary variables first
+    arch_list=""
+    noarch_list=""
     for pkg in ${result}; do
         if echo "${all_noarch}" | tr ' ' '\n' | grep -qx "${pkg}"; then
-            noarch_min_dsm${v}_packages+="${pkg} "
+            noarch_list="${noarch_list}${noarch_list:+ }${pkg}"
         else
-            arch_min_dsm${v}_packages+="${pkg} "
+            arch_list="${arch_list}${arch_list:+ }${pkg}"
         fi
     done
 
-    declare "has_arch_min_dsm${v}_packages=$([ -n "${!arch_min_dsm${v}_packages}" ] && echo 'true' || echo 'false')"
-    declare "has_noarch_min_dsm${v}_packages=$([ -n "${!noarch_min_dsm${v}_packages}" ] && echo 'true' || echo 'false')"
+    # Assign to dynamic variable names
+    declare "${arch_var}=${arch_list}"
+    declare "${noarch_var}=${noarch_list}"
+
+    # Set has_* variables
+    has_arch_var="has_arch_min_dsm${v}_packages"
+    has_noarch_var="has_noarch_min_dsm${v}_packages"
+    declare "${has_arch_var}=$([ -n "${arch_list}" ] && echo 'true' || echo 'false')"
+    declare "${has_noarch_var}=$([ -n "${noarch_list}" ] && echo 'true' || echo 'false')"
 done
 
 # Build the combined list of all DSM-restricted non-meta packages for exclusion
@@ -248,7 +259,11 @@ done
 all_min_dsm_packages=
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
-    for pkg in ${arch_min_dsm${v}_packages} ${noarch_min_dsm${v}_packages}; do
+    arch_var="arch_min_dsm${v}_packages"
+    noarch_var="noarch_min_dsm${v}_packages"
+    eval "arch_pkgs=\$${arch_var}"
+    eval "noarch_pkgs=\$${noarch_var}"
+    for pkg in ${arch_pkgs} ${noarch_pkgs}; do
         # Keep meta-packages in standard builds — only exclude applicative packages.
         # A package is a meta if its name matches python*, ffmpeg* or synocli-videodriver.
         is_meta=false
@@ -266,11 +281,6 @@ for version in "${min_dsm_versions[@]}"; do
         fi
     done
 done
-
-# Find all noarch packages (needed for classification)
-all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" \
-    -exec grep -Ho "override ARCH" {} \; \
-    | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ')
 
 # Separate noarch and arch-specific packages.
 # Filter out packages that are removed or do not exist (e.g. nzbdrone).
