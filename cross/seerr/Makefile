@@ -76,6 +76,7 @@ seerr_install:
 	# 5. Install runtime deps only (npm, flat layout)
 	# ------------------------------------------------------------
 	$(RUN) npm install --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --no-optional
+	$(RUN) npm install then-pug@2.0.0 --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --no-optional
 
 	# ------------------------------------------------------------
 	# 6. Native binaries for target architecture ($(NODE_ARCH))
