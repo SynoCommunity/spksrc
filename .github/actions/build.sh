@@ -1,31 +1,52 @@
 #!/bin/bash
 
 # Part of github build action
-# 
-# build the packages depending on evaluated packages (see prepare.sh)
+#
+# Build the packages depending on evaluated packages (see prepare.sh)
 #
 # Functions:
 # - Build all packages depending on files defined in ${ARCH_PACKAGES} or ${NOARCH_PACKAGES}.
 # - Build for arch defined by ${GH_ARCH} (e.g. x64-6.1, noarch, ...).
-# - Successfully built packages are logged to $BUILD_SUCCESS_FILE.
+# - For DSM versions above the default builds, only packages declared for that
+#   minimum DSM version are built (driven by MIN_DSM<V>_PACKAGES env vars).
+# - Successfully built packages are logged to ${BUILD_SUCCESS_FILE}.
 # - Failed builds are logged to ${BUILD_ERROR_FILE} and annotated as error.
-# - For failed builds, the make command and the latest 15 lines of the build output are written to ${BUILD_ERROR_LOGFILE}
+# - For failed builds, the make command and the latest 15 lines of the build output are written to ${BUILD_ERROR_LOGFILE}.
 # - The build output is structured into log groups by package.
-# - As the disk space in the workflow environment is limitted, we clean the
+# - As the disk space in the workflow environment is limited, we clean the
 #   work folder of each package after build. At 2020.06 this limit is 14GB.
-# - synocli-videodriver and ffmpeg5-7 are not cleaned to be available for dependents.
-# - Therefore synocli-videodriver is built first if triggered by ffmpeg5-7
-# - Therefore ffmpeg5 and ffmpeg7 are built second if triggered by its
-#   own or a dependent (see prepare.sh).
+# - Packages in PACKAGES_TO_KEEP are not fully cleaned so dependents can reuse
+#   their artifacts (shared libs, python wheels, etc.).
+# - Therefore synocli-videodriver is built first if triggered by ffmpeg5-7.
+# - Therefore ffmpeg and python are built before their dependents (see prepare.sh).
 
 set -o pipefail
 
+# ===========================================================================
+# Configuration — keep in sync with prepare.sh
+# ===========================================================================
+
+# ffmpeg versions whose build artifacts must be preserved for dependents
+ffmpeg_versions=(5 6 7)
+
+# python minor versions whose build artifacts must be preserved for dependents
+python_versions=(310 311 312 313)
+
+# DSM versions above the default builds that require filtered package lists.
+# Must match the min_dsm_versions array in prepare.sh.
+min_dsm_versions=(7.2 7.3)
+
+# ===========================================================================
+
+# ===========================================================================
+# 1. Initialize build environment
+# ===========================================================================
 echo "::group:: ---- initialize build"
 make setup-synocommunity
 sed -i -e "s|#PARALLEL_MAKE\s*=.*|PARALLEL_MAKE=max|" \
     -e "s|PUBLISH_API_KEY\s*=.*|PUBLISH_API_KEY=$API_KEY|" \
     local.mk
-# Git >= 2.35.2 stops directory traversals when ownership changes from the current user (in response to CVE-2022-24765). 
+# Git >= 2.35.2 stops directory traversals when ownership changes from the current user (in response to CVE-2022-24765).
 # This prevents errors on nested repos that might have different file owner.
 git config --global --add safe.directory "/github/workspace"
 echo "::endgroup::"
@@ -33,31 +54,39 @@ echo "::endgroup::"
 echo "===> TARGET: ${GH_ARCH}"
 echo "===> ARCH   packages: ${ARCH_PACKAGES}"
 echo "===> NOARCH packages: ${NOARCH_PACKAGES}"
-echo "===> MIN_DSM72_PACKAGES packages: ${MIN_DSM72_PACKAGES}"
-echo "===> MIN_DSM73_PACKAGES packages: ${MIN_DSM73_PACKAGES}"
+for version in "${min_dsm_versions[@]}"; do
+    v=${version//.}
+    var="MIN_DSM${v^^}_PACKAGES"
+    echo "===> ${var}: ${!var}"
+done
 
-# Remove toolchain status files to enforce re-building toolchain including cargo/rust
+# Remove toolchain status files to enforce re-building toolchain including cargo/rust.
 # This fixes issues on github-action where toolchain caching omits the
-# actual installation state of cargo/rust within the distrib folder
+# actual installation state of cargo/rust within the distrib folder.
 rm -f toolchain/syno-${GH_ARCH}/work/.toolchain*_done
 rm -f toolchain/syno-${GH_ARCH}/work/.stage[01]-*_done
+
+# ===========================================================================
+# 2. Select packages to build for this arch
+# ===========================================================================
 
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
     build_packages=${NOARCH_PACKAGES}
 else
-    # Extract DSM version
+    # For DSM versions requiring special handling, only build packages
+    # declared for that minimum DSM version. For all other archs, build
+    # the full arch package list.
     DSM_VERSION="${GH_ARCH##*-}"
-    case "${DSM_VERSION}" in
-        7.3) build_packages="${MIN_DSM73_PACKAGES}"
-             ;;
-        7.2) build_packages="${MIN_DSM72_PACKAGES}"
-             ;;
-          *) build_packages=${ARCH_PACKAGES}
-             ;;
-    esac
+    build_packages=${ARCH_PACKAGES}
+    for version in "${min_dsm_versions[@]}"; do
+        if [ "${DSM_VERSION}" = "${version}" ]; then
+            v=${version//.}
+            var="MIN_DSM${v^^}_PACKAGES"
+            build_packages="${!var}"
+            break
+        fi
+    done
 fi
-
-echo ""
 
 if [ -z "${build_packages}" ]; then
     echo "===> No packages to build. <==="
@@ -66,16 +95,30 @@ fi
 
 echo "===> PACKAGES to Build: ${build_packages}"
 
-# publish to synocommunity.com when the API key is set
+# ===========================================================================
+# 3. Build each package
+# ===========================================================================
+
+# Packages whose build artifacts must be preserved for dependents.
+# synocli-videodriver and ffmpeg are kept for their shared libs;
+# python is kept for its wheels. All others are fully cleaned after build.
+packages_to_keep="synocli-videodriver"
+for i in "${ffmpeg_versions[@]}"; do
+    packages_to_keep+=" ffmpeg${i}"
+done
+for py_ver in "${python_versions[@]}"; do
+    packages_to_keep+=" python${py_ver}"
+done
+
+# Publish to synocommunity.com when the API key is set
 MAKE_ARGS=
 if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
     MAKE_ARGS="publish-"
 fi
 
-# Build
-PACKAGES_TO_KEEP="synocli-videodriver ffmpeg5 ffmpeg7 python310 python311 python312  python313"
-for package in ${build_packages}
-do
+for package in ${build_packages}; do
+    # Remove current package from remaining list at the start of each iteration
+    remaining_packages=$(echo "${remaining_packages}" | tr ' ' '\n' | grep -vx "${package}" | tr '\n' ' ')
     echo "::group:: ---- build ${package}"
     echo >build.log
 
@@ -105,19 +148,19 @@ do
     result=$?
 
     # For a build to succeed a <package>_<arch>-<version>.spk must also be generated
-    if [ ${result} -eq 0 -a "$(ls -1 ./packages/$(sed -n -e '/^SPK_NAME/ s/.*= *//p' spk/${package}/Makefile)_*.spk 2> /dev/null)" ]; then
-        echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE"   >> ${BUILD_SUCCESS_FILE}
+    if [ ${result} -eq 0 ] && [ "$(ls -1 ./packages/$(sed -n -e '/^SPK_NAME/ s/.*= *//p' spk/${package}/Makefile)_*.spk 2>/dev/null)" ]; then
+        echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE" >> ${BUILD_SUCCESS_FILE}
     # Ensure it's not a false-positive due to pre-check
     elif tail -15 build.log | grep -viq 'spksrc.pre-check.mk'; then
         cat build.log >> ${BUILD_ERROR_LOGFILE}
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) FAILED" >> ${BUILD_ERROR_FILE}
     fi
 
-    if [ "$(echo ${PACKAGES_TO_KEEP} | grep -ow ${package})" = "" ]; then
-        # free disk space (but not for packages to keep)
+    if [ "$(echo ${packages_to_keep} | grep -ow ${package})" = "" ]; then
+        # Free disk space (but not for packages to keep)
         make -C ./spk/${package} clean |& tee >(tail -15 >>build.log)
     else
-        # free disk space by removing source and staging directories (for packages to keep)
+        # Free disk space by removing source and staging directories (for packages to keep)
         make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
     fi
 
