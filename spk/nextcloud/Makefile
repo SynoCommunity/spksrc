@@ -1,6 +1,6 @@
 SPK_NAME = nextcloud
 SPK_VERS = 32.0.5
-SPK_REV = 3
+SPK_REV = 2
 SPK_ICON = src/nextcloud.png
 
 DEPENDS =
