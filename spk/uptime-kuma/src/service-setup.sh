@@ -1,4 +1,3 @@
-#!/bin/bash
 # Uptime Kuma service setup
 #
 # Environment variables provided by the framework:
@@ -28,7 +27,6 @@ export UPTIME_KUMA_HOST=0.0.0.0
 export UPTIME_KUMA_PORT="${SERVICE_PORT:-3001}"
 export DATA_DIR="${SYNOPKG_PKGVAR}"
 export NODE_ENV=production
-export PATH="/var/packages/Node.js_v22/target/usr/local/bin:${PATH}"
 
 service_postinst() {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
