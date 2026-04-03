@@ -8,10 +8,13 @@
 # - Build all packages depending on files defined in ${ARCH_PACKAGES} or ${NOARCH_PACKAGES}.
 # - Build for arch defined by ${GH_ARCH} (e.g. x64-6.1, noarch, ...).
 # - For DSM versions above the default builds, only packages declared for that
-#   minimum DSM version are built (driven by MIN_DSM<V>_PACKAGES env vars).
+#   minimum DSM version are built. The package lists are determined dynamically
+#   using the environment variables ARCH_MIN_DSM<V>_PACKAGES and
+#   NOARCH_MIN_DSM<V>_PACKAGES.
 # - Successfully built packages are logged to ${BUILD_SUCCESS_FILE}.
 # - Failed builds are logged to ${BUILD_ERROR_FILE} and annotated as error.
-# - For failed builds, the make command and the latest 15 lines of the build output are written to ${BUILD_ERROR_LOGFILE}.
+# - For failed builds, the make command and the latest 15 lines of the build
+#   output are written to ${BUILD_ERROR_LOGFILE}.
 # - The build output is structured into log groups by package.
 # - As the disk space in the workflow environment is limited, we clean the
 #   work folder of each package after build. At 2020.06 this limit is 14GB.
@@ -56,8 +59,11 @@ echo "===> ARCH   packages: ${ARCH_PACKAGES}"
 echo "===> NOARCH packages: ${NOARCH_PACKAGES}"
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
-    var="MIN_DSM${v^^}_PACKAGES"
-    echo "===> ${var}: ${!var}"
+    var_arch="ARCH_MIN_DSM${v}_PACKAGES"
+    var_noarch="NOARCH_MIN_DSM${v}_PACKAGES"
+
+    echo "===> ${var_arch}: ${!var_arch}"
+    echo "===> ${var_noarch}: ${!var_noarch}"
 done
 
 # Remove toolchain status files to enforce re-building toolchain including cargo/rust.
@@ -70,28 +76,30 @@ rm -f toolchain/syno-${GH_ARCH}/work/.stage[01]-*_done
 # 2. Select packages to build for this arch
 # ===========================================================================
 
+# Extract DSM version from GH_ARCH (e.g., "x64-7.2" → "7.2", "noarch-7.2" → "7.2")
+DSM_VERSION="${GH_ARCH##*-}"
+
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
-    build_packages=${NOARCH_PACKAGES}
+    prefix="NOARCH"
+    default_packages="${NOARCH_PACKAGES}"
 else
-    # For DSM versions requiring special handling, only build packages
-    # declared for that minimum DSM version. For all other archs, build
-    # the full arch package list.
-    DSM_VERSION="${GH_ARCH##*-}"
-    build_packages=${ARCH_PACKAGES}
-    for version in "${min_dsm_versions[@]}"; do
-        if [ "${DSM_VERSION}" = "${version}" ]; then
-            v=${version//.}
-            var="MIN_DSM${v^^}_PACKAGES"
-            build_packages="${!var}"
-            break
-        fi
-    done
+    prefix="ARCH"
+    default_packages="${ARCH_PACKAGES}"
 fi
 
-if [ -z "${build_packages}" ]; then
-    echo "===> No packages to build. <==="
-    exit 0
-fi
+build_packages="${default_packages}"
+
+for version in "${min_dsm_versions[@]}"; do
+    if [ "${DSM_VERSION}" = "${version}" ]; then
+        v=${version//.}
+        var="${prefix}_MIN_DSM${v}_PACKAGES"
+        value="${!var}"
+        if [ -n "${value}" ]; then
+            build_packages="${value}"
+        fi
+        break
+    fi
+done
 
 echo "===> PACKAGES to Build: ${build_packages}"
 
