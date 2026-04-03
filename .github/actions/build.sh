@@ -56,8 +56,10 @@ echo "===> ARCH   packages: ${ARCH_PACKAGES}"
 echo "===> NOARCH packages: ${NOARCH_PACKAGES}"
 for version in "${min_dsm_versions[@]}"; do
     v=${version//.}
-    var="MIN_DSM${v^^}_PACKAGES"
-    echo "===> ${var}: ${!var}"
+    arch_var="ARCH_MIN_DSM${v^^}_PACKAGES"
+    noarch_var="NOARCH_MIN_DSM${v^^}_PACKAGES"
+    echo "===> ${arch_var}: ${!arch_var}"
+    echo "===> ${noarch_var}: ${!noarch_var}"
 done
 
 # Remove toolchain status files to enforce re-building toolchain including cargo/rust.
@@ -70,18 +72,25 @@ rm -f toolchain/syno-${GH_ARCH}/work/.stage[01]-*_done
 # 2. Select packages to build for this arch
 # ===========================================================================
 
+# Extract DSM version from GH_ARCH (e.g., "x64-7.2" -> "7.2", "noarch-7.2" -> "7.2")
+DSM_VERSION="${GH_ARCH##*-}"
+
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
     build_packages=${NOARCH_PACKAGES}
+    for version in "${min_dsm_versions[@]}"; do
+        if [ "${DSM_VERSION}" = "${version}" ]; then
+            v=${version//.}
+            var="NOARCH_MIN_DSM${v^^}_PACKAGES"
+            build_packages="${!var}"
+            break
+        fi
+    done
 else
-    # For DSM versions requiring special handling, only build packages
-    # declared for that minimum DSM version. For all other archs, build
-    # the full arch package list.
-    DSM_VERSION="${GH_ARCH##*-}"
     build_packages=${ARCH_PACKAGES}
     for version in "${min_dsm_versions[@]}"; do
         if [ "${DSM_VERSION}" = "${version}" ]; then
             v=${version//.}
-            var="MIN_DSM${v^^}_PACKAGES"
+            var="ARCH_MIN_DSM${v^^}_PACKAGES"
             build_packages="${!var}"
             break
         fi
