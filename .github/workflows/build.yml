@@ -637,32 +637,64 @@ jobs:
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
-      # Upload diagnostic logs and disk space info for troubleshooting
-      # Uses continue-on-error to ensure this runs even if previous steps had issues
+      # Upload diagnostic logs and disk space info in a separate folder for troubleshooting
+      # Continues even if previous steps failed
+      # Diagnostic files (.diag-*) are now isolated from main package summary
+
+      - name: Organize Diagnostic Logs
+        if: always()
+        continue-on-error: true
+        run: |
+          echo "=== Organizing diagnostic files ==="
+          mkdir -p artifacts/diagnostics
+
+          # Copy files in the diagnostics directory
+          for file in disk_usage_start.txt disk_usage_end.txt docker_logs.txt build_errors.txt build_log_errors.txt build_unsupported.txt build_success.txt; do
+              [ -f "$file" ] && cp "$file" "artifacts/diagnostics/$file"
+          done
+
+          # Include all collected logs
+          mkdir -p artifacts/diagnostics/collected_logs
+          cp collected_logs/**/*.log artifacts/diagnostics/collected_logs/ 2>/dev/null || true
+          cp collected_logs/DISK_SPACE_CRITICAL.txt artifacts/diagnostics/collected_logs/ 2>/dev/null || true
+
       - name: Upload Diagnostic Logs
         if: always()
         continue-on-error: true
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
-          name: Diagnostics-${{ matrix.arch }}
-          path: |
-            disk_usage_start.txt
-            disk_usage_end.txt
-            docker_logs.txt
-            build_errors.txt
-            build_log_errors.txt
-            build_unsupported.txt
-            build_success.txt
-            collected_logs/**/*.log
-            collected_logs/DISK_SPACE_CRITICAL.txt
+          name: diagnostics-${{ matrix.arch }}
+          path: artifacts/diagnostics/
           if-no-files-found: ignore
-          retention-days: 30
+          retention-days: 1
           compression-level: 9
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Packages for ${{ matrix.arch }}
           path: packages/*.spk
           if-no-files-found: ignore
+
+  consolidate-diagnostics:
+    name: Consolidate Diagnostics
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Download all diagnostic artifacts
+        uses: actions/download-artifact@v7
+        with:
+          pattern: diagnostics-*
+          path: all-diagnostics
+          merge-multiple: false
+
+      - name: Upload consolidated diagnostics
+        uses: actions/upload-artifact@v7
+        with:
+          name: Diagnostics
+          path: all-diagnostics/**
+          if-no-files-found: ignore
+          retention-days: 30
+          compression-level: 9
