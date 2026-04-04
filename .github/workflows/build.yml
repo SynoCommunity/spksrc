@@ -216,10 +216,10 @@ jobs:
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
           add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
           add_noarch_dsm73_builds=${{ github.event.inputs.add_noarch_dsm73_builds || 'false' }}
-          has_arch_min_dsm73_packages=${{ needs.prepare.outputs.has_arch_min_dsm73_packages || 'false' }}
+          has_arch_packages=${{ needs.prepare.outputs.has_arch_packages || 'false' }}
           has_arch_min_dsm72_packages=${{ needs.prepare.outputs.has_arch_min_dsm72_packages || 'false' }}
-          has_arch_packages=$([ -n "${{ needs.prepare.outputs.arch_packages }}" ] && echo "true" || echo "false")
-          has_noarch_packages=$([ -n "${{ needs.prepare.outputs.noarch_packages }}" ] && echo "true" || echo "false")
+          has_arch_min_dsm73_packages=${{ needs.prepare.outputs.has_arch_min_dsm73_packages || 'false' }}
+          has_noarch_packages=${{ needs.prepare.outputs.has_noarch_packages || 'false' }}
           has_noarch_min_dsm72_packages=${{ needs.prepare.outputs.has_noarch_min_dsm72_packages || 'false' }}
           has_noarch_min_dsm73_packages=${{ needs.prepare.outputs.has_noarch_min_dsm73_packages || 'false' }}
 
