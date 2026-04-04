@@ -125,6 +125,9 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
     MAKE_ARGS="publish-"
 fi
 
+# Initialize remaining packages list for tracking build progress
+remaining_packages="${build_packages}"
+
 for package in ${build_packages}; do
     # Remove current package from remaining list at the start of each iteration
     remaining_packages=$(echo "${remaining_packages}" | tr ' ' '\n' | grep -vx "${package}" | tr '\n' ' ')
