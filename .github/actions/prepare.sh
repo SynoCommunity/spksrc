@@ -93,7 +93,7 @@ inject_meta_packages() {
 
 _inject_one() {
     local package="$1"
-    local -n _out="$2"
+    local -n _inject_one_out="$2"
 
     # Skip if already processed
     if [ "${visited[$package]}" = "1" ]; then
@@ -105,12 +105,12 @@ _inject_one() {
         for meta_var in "${meta_package_vars[@]}"; do
             while IFS= read -r meta; do
                 [ -z "${meta}" ] && continue
-                _inject_one "$meta" _out
+                _inject_one "$meta" "$2"
             done < <(grep -E "^${meta_var}\s*=" "./spk/${package}/Makefile" | cut -d= -f2 | xargs -n1)
         done
     fi
 
-    _out="${_out} ${package}"
+    _inject_one_out="${_inject_one_out} ${package}"
 }
 
 # ---------------------------------------------------------------------------
