@@ -116,7 +116,8 @@ _inject_one() {
 # ---------------------------------------------------------------------------
 # Collect packages that declare REQUIRED_MIN_DSM = <version>,
 # preserving the build order already established in $packages.
-# Injects required meta-packages so they are built first in the same DSM job.
+# Injects required meta-packages by resolving all qualifying packages
+# in a single inject_meta_packages call to avoid cross-iteration state issues.
 #
 # Usage: collect_min_dsm_packages <version>
 # Prints the space-separated list to stdout.
@@ -128,13 +129,10 @@ collect_min_dsm_packages() {
         if [ -f "./spk/${package}/Makefile" ]; then
             if [ "$(grep REQUIRED_MIN_DSM "./spk/${package}/Makefile" | cut -d= -f2 | xargs)" = "${version}" ]; then
                 result+="${package} "
-                # Immediately inject meta-packages required by this package
-                # so they are resolved before the next package is processed
-                result=$(inject_meta_packages "${result}")
             fi
         fi
     done
-    echo "${result}"
+    echo $(inject_meta_packages "${result}")
 }
 
 # ===========================================================================
