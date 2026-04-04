@@ -1,0 +1,219 @@
+site_name: spksrc Documentation
+site_description: Cross-compilation framework for building Synology NAS packages
+site_url: https://synocommunity.github.io/spksrc/
+repo_url: https://github.com/SynoCommunity/spksrc
+repo_name: SynoCommunity/spksrc
+edit_uri: edit/master/docs/
+
+copyright: Copyright &copy; 2012 - 2026 SynoCommunity
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    - scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - tags
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: SynoCommunity
+      repo: spksrc
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/SynoCommunity/spksrc
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/nnN9fgE7EF
+  generator: false
+
+nav:
+  - Home: index.md
+  - User Guide:
+    - user-guide/index.md
+    - Installation: user-guide/installation.md
+    - SSH Access: user-guide/ssh.md
+    - Troubleshooting: user-guide/troubleshooting.md
+    - Compatibility: user-guide/compatibility.md
+    - Permissions: user-guide/permissions.md
+  - Developer Guide:
+    - developer-guide/index.md
+    - Setup:
+      - developer-guide/setup/index.md
+      - Docker: developer-guide/setup/docker.md
+      - Virtual Machine: developer-guide/setup/vm.md
+      - LXC Container: developer-guide/setup/lxc.md
+    - Basics:
+      - developer-guide/basics/index.md
+      - Your First Package: developer-guide/basics/first-package.md
+      - Package Anatomy: developer-guide/basics/package-anatomy.md
+      - Build Workflow: developer-guide/basics/build-workflow.md
+    - Packaging:
+      - developer-guide/packaging/index.md
+      - Makefile Variables: developer-guide/packaging/makefile-variables.md
+      - Build Rules: developer-guide/packaging/build-rules.md
+      - PLIST Files: developer-guide/packaging/plist.md
+      - Service Scripts: developer-guide/packaging/service-scripts.md
+      - Wizards: developer-guide/packaging/wizards.md
+      - Resource Files: developer-guide/packaging/resource-files.md
+    - Package Types:
+      - developer-guide/package-types/index.md
+      - Python Packages: developer-guide/package-types/python.md
+      - Go Packages: developer-guide/package-types/go.md
+      - Rust Packages: developer-guide/package-types/rust.md
+      - Web Applications: developer-guide/package-types/web.md
+    - Advanced:
+      - developer-guide/advanced/index.md
+      - Cross-Compilation: developer-guide/advanced/cross-compilation.md
+      - Debugging: developer-guide/advanced/debugging.md
+      - Testing: developer-guide/advanced/testing.md
+      - Ash Shell PID Issue: developer-guide/advanced/ash-pid-issue.md
+    - Migration:
+      - developer-guide/migration/index.md
+      - DSM 7 Migration: developer-guide/migration/dsm7.md
+      - DSM 7.2 Features: developer-guide/migration/dsm72.md
+    - Publishing:
+      - developer-guide/publishing/index.md
+      - GitHub Actions: developer-guide/publishing/github-actions.md
+      - Manual Publishing: developer-guide/publishing/manual-publishing.md
+      - Repository Activation: developer-guide/publishing/repository-activation.md
+      - Package Server: developer-guide/publishing/package-server.md
+      - Update Policy: developer-guide/publishing/update-policy.md
+  - Framework:
+    - framework/index.md
+    - Architecture: framework/architecture.md
+    - Makefile System: framework/makefile-system.md
+    - Toolchains: framework/toolchains.md
+  - Reference:
+    - reference/index.md
+    - Architectures: reference/architectures.md
+    - Ports: reference/ports.md
+    - Makefile Reference: reference/makefile-reference.md
+    - Permissions: reference/permissions.md
+    - DSM APIs: reference/dsm-apis.md
+  - Packages:
+    - packages/index.md
+    - DSM Utilities: packages/dsm-utilities.md
+    - Media:
+      - FFmpeg: packages/ffmpeg.md
+      - Jellyfin: packages/jellyfin.md
+      - Navidrome: packages/navidrome.md
+      - GStreamer: packages/gstreamer.md
+    - Downloads:
+      - Transmission: packages/transmission.md
+      - ruTorrent: packages/rutorrent.md
+      - Deluge: packages/deluge.md
+      - Aria2: packages/aria2.md
+    - Home Automation:
+      - Home Assistant: packages/homeassistant.md
+      - Mosquitto: packages/mosquitto.md
+    - File Management:
+      - Syncthing: packages/syncthing.md
+      - ownCloud: packages/owncloud.md
+      - Rclone: packages/rclone.md
+      - BorgBackup: packages/borgbackup.md
+      - Borgmatic: packages/borgmatic.md
+      - Duplicity: packages/duplicity.md
+    - Network & Security:
+      - Vaultwarden: packages/vaultwarden.md
+      - DNSCrypt Proxy: packages/dnscrypt-proxy.md
+      - Cloudflared: packages/cloudflared.md
+      - AdGuard Home: packages/adguardhome.md
+      - Mosh: packages/mosh.md
+    - Arr Stack:
+      - Radarr/Sonarr: packages/radarr-sonarr.md
+    - Development:
+      - Git: packages/git.md
+      - Mono: packages/mono.md
+    - CLI Tools:
+      - SynoCli Kernel: packages/synocli-kernel.md
+      - SynoCli Net: packages/synocli-net.md
+      - SynoCli File: packages/synocli-file.md
+      - SynoCli Disk: packages/synocli-disk.md
+      - SynoCli Monitor: packages/synocli-monitor.md
+      - SynoCli Misc: packages/synocli-misc.md
+      - SynoCli Devel: packages/synocli-devel.md
+      - SynoCli VideoDriver: packages/synocli-videodriver.md
+      - SynoKernel USB Serial: packages/synokernel-usbserial.md
+    - Other:
+      - MinIO: packages/minio.md
+      - Matrix Synapse: packages/matrix-synapse.md
+      - Salt: packages/salt.md
+      - Beets: packages/beets.md
+      - Flexget: packages/flexget.md
+      - Kiwix: packages/kiwix.md
+      - Google Authenticator: packages/google-authenticator.md
+      - Mozilla Sync: packages/mozilla-sync.md
+      - Adminer: packages/adminer.md
+      - BicBucStriim: packages/bicbucstriim.md
+      - Comskip: packages/comskip.md
+      - Debian Chroot: packages/debian-chroot.md
+      - File Browser: packages/file-browser.md
+      - Node Exporter: packages/node-exporter.md
+      - OpenList: packages/openlist.md
+      - SickBeard Custom: packages/sickbeard-custom.md
+  - Contributing:
+    - contributing/index.md
+    - Development Process: contributing/development-process.md
+    - Pull Requests: contributing/pull-requests.md
