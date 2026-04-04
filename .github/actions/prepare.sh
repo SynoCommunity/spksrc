@@ -44,10 +44,6 @@ min_dsm_versions=(7.2 7.3)
 # Add new variable names here to extend meta-package detection.
 meta_package_vars=(PYTHON_PACKAGE FFMPEG_PACKAGE VIDEODRV_PACKAGE)
 
-# Tracks already processed packages to avoid duplicates and ensure
-# deterministic ordering during recursive dependency resolution.
-declare -A visited
-
 # ===========================================================================
 
 # ---------------------------------------------------------------------------
@@ -62,8 +58,8 @@ declare -A visited
 # post-order: all its meta-dependencies are resolved first, then the package
 # itself is appended to the final list.
 #
-# A global "visited" set ensures that each package is processed only once,
-# preventing duplicate entries and guaranteeing deterministic output.
+# A "visited" set, reset on each call, ensures that each package is processed
+# only once, preventing duplicate entries and guaranteeing deterministic output.
 #
 # The resulting list is effectively a topological ordering of packages based
 # on declared meta-dependencies:
@@ -71,7 +67,8 @@ declare -A visited
 #   pythonXY -> pythonXY-wheels -> dependent packages
 #
 # `inject_meta_packages` acts as a wrapper that initializes traversal over
-# the input package list, while `_inject_one` performs the recursive resolution.
+# the input package list and owns the local output accumulator, while
+# `_inject_one` performs the recursive resolution via a nameref parameter.
 #
 # This function is the single source of truth for build ordering. The resulting
 # order must not be modified afterward, as any reordering would break dependency
@@ -79,21 +76,24 @@ declare -A visited
 #
 # Usage: inject_meta_packages <space-separated package list>
 # Prints the ordered space-separated list to stdout.
-# Diagnostic messages are sent to stderr to avoid polluting the return value.
+# State (visited, output accumulator) is fully local to each call.
 # ---------------------------------------------------------------------------
 inject_meta_packages() {
     local input="$1"
     local output=
+    unset visited
+    declare -A visited
 
     for package in ${input}; do
-        _inject_one "$package"
+        _inject_one "$package" output
     done
 
-    echo "${resolved}" | xargs
+    echo "${output}" | xargs
 }
 
 _inject_one() {
     local package="$1"
+    local -n _out="$2"
 
     # Skip if already processed
     if [ "${visited[$package]}" = "1" ]; then
@@ -105,12 +105,12 @@ _inject_one() {
         for meta_var in "${meta_package_vars[@]}"; do
             while IFS= read -r meta; do
                 [ -z "${meta}" ] && continue
-                _inject_one "$meta"
+                _inject_one "$meta" _out
             done < <(grep -E "^${meta_var}\s*=" "./spk/${package}/Makefile" | cut -d= -f2 | xargs -n1)
         done
     fi
 
-    resolved="${resolved} ${package}"
+    _out="${_out} ${package}"
 }
 
 # ---------------------------------------------------------------------------
