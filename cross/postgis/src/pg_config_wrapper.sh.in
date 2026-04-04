@@ -1,0 +1,17 @@
+#!/bin/sh
+# pg_config wrapper for PostGIS cross-compilation
+# Returns cross-compiled paths for libraries, native PGXS for building
+NATIVE_PG="@NATIVE_PG_DIR@"
+case "$1" in
+  --version) echo "PostgreSQL @PG_VERSION@" ;;
+  --pgxs) echo "$NATIVE_PG/lib/postgresql/pgxs/src/makefiles/pgxs.mk" ;;
+  --includedir|--pkgincludedir) echo "@CROSS_PG_INCLUDEDIR@" ;;
+  --includedir-server) echo "@CROSS_PG_INCLUDEDIR@/server" ;;
+  --libdir|--pkglibdir) echo "@CROSS_PG_LIBDIR@" ;;
+  --sharedir) echo "@CROSS_PG_SHAREDIR@" ;;
+  --bindir) echo "@CROSS_PG_BINDIR@" ;;
+  --ldflags) echo "-L@CROSS_PG_LIBDIR@" ;;
+  --libs) echo "-lpq -lssl -lcrypto -lpthread -lm" ;;
+  --cc) echo "@CROSS_CC@" ;;
+  *) "$NATIVE_PG/bin/pg_config" "$1" ;;
+esac

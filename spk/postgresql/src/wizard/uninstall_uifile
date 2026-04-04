@@ -1,0 +1,39 @@
+[{
+    "step_title": "Backup PostgreSQL Data",
+    "invalid_next_disabled_v2": true,
+    "items": [{
+        "desc": "<b>Warning:</b> Uninstalling PostgreSQL will permanently delete all databases and configuration unless you create a backup first."
+    }, {
+        "type": "multiselect",
+        "subitems": [{
+            "key": "wizard_pg_dump_database",
+            "desc": "Export databases and configuration files before uninstalling",
+            "defaultValue": true
+        }]
+    }, {
+        "type": "password",
+        "desc": "Enter the PostgreSQL administrator password for database backup",
+        "subitems": [{
+            "key": "wizard_pg_password",
+            "desc": "Administrator password"
+        }]
+    }, {
+        "type": "textfield",
+        "desc": "Specify the backup directory.",
+        "subitems": [{
+            "key": "wizard_pg_dump_directory",
+            "desc": "Backup directory",
+            "defaultValue": "/volume1/backup/postgresql",
+            "validator": {
+                "fn": "{var path=arguments[0]; if(path && !path.match(/^\\/volume[0-9]+\\//)){return 'Path must start with /volumeX/';} return true;}"
+            }
+        }]
+    }, {
+        "type": "singleselect",
+        "subitems": [{
+            "key": "wizard_delete_data",
+            "hidden": true,
+            "defaultValue": true
+        }]
+    }]
+}]
