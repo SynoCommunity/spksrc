@@ -98,6 +98,8 @@ jobs:
       noarch_min_dsm72_packages: ${{ steps.dependencies.outputs.noarch_min_dsm72_packages }}
       arch_min_dsm73_packages: ${{ steps.dependencies.outputs.arch_min_dsm73_packages }}
       noarch_min_dsm73_packages: ${{ steps.dependencies.outputs.noarch_min_dsm73_packages }}
+      has_arch_packages: ${{ steps.dependencies.outputs.has_arch_packages }}
+      has_noarch_packages: ${{ steps.dependencies.outputs.has_noarch_packages }}
       has_arch_min_dsm72_packages: ${{ steps.dependencies.outputs.has_arch_min_dsm72_packages }}
       has_noarch_min_dsm72_packages: ${{ steps.dependencies.outputs.has_noarch_min_dsm72_packages }}
       has_arch_min_dsm73_packages: ${{ steps.dependencies.outputs.has_arch_min_dsm73_packages }}
