@@ -125,6 +125,9 @@ if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
     MAKE_ARGS="publish-"
 fi
 
+# Initialize remaining packages list for tracking build progress
+remaining_packages="${build_packages}"
+
 for package in ${build_packages}; do
     # Remove current package from remaining list at the start of each iteration
     remaining_packages=$(echo "${remaining_packages}" | tr ' ' '\n' | grep -vx "${package}" | tr '\n' ' ')
@@ -146,12 +149,12 @@ for package in ${build_packages}; do
             TCVERSION=${GH_ARCH##*-}
         fi
         # noarch package must be first built then published
-        echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}" >>build.log
-        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        echo "$ make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package}" >>build.log
+        make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} |& tee >(tail -15 >>build.log)
 
         if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
-            echo "$ make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
-            make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+            echo "$ make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
+            make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
         fi
     fi
     result=$?
@@ -170,7 +173,12 @@ for package in ${build_packages}; do
         make -C ./spk/${package} clean |& tee >(tail -15 >>build.log)
     else
         # Free disk space by removing source and staging directories (for packages to keep)
-        make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
+        # Use the same arch/noarch branching as the build step to ensure correct make target.
+        if [ "${GH_ARCH%%-*}" != "noarch" ]; then
+            make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
+        else
+            make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
+        fi
     fi
 
     echo "::endgroup::"
