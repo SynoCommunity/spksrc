@@ -5,7 +5,6 @@ SPK_REV = 1
 SPK_ICON = src/python3-pip.png
 
 PYTHON_PACKAGE = python310
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION =  Collection of programs for the Python 3.10 programming language.
@@ -21,7 +20,7 @@ LICENSE  = PSF
 # Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
-# IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
+# IMPORTANT: WHEELS must be initialized before include of spksrc.spk-meta.mk
 # later additions are ok, but WHEELS must not be empty at this point,
 # otherwise the build of WHEELS is skipped
 WHEELS += src/requirements-abi3.txt
@@ -48,8 +47,8 @@ endif
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
-# spksrc.wheel-env.mk or spksrc.python.mk
-ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
+# spksrc.wheel-env.mk or spksrc.spk-meta.mk
+ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
@@ -212,4 +211,4 @@ DEPENDS += python/scipy
 endif
 endif
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

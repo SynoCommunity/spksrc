@@ -4,7 +4,6 @@ SPK_REV = 25
 SPK_ICON = src/homeassistant.png
 
 PYTHON_PACKAGE = python313
-SPK_DEPENDS = $(PYTHON_PACKAGE)
 
 # unsupported wheels: av, numpy; require glibc >= 2.28 (av), >= 2.27 (numpy)
 REQUIRED_MIN_DSM = 7.2
@@ -57,7 +56,7 @@ DEPENDS += cross/libpcap
 # needs patch of opuslib to find libopus.so
 DEPENDS += cross/opus
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk
 
 # use python arch specific requirements file to download cross wheels from index
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))

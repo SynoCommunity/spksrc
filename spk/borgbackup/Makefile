@@ -7,7 +7,7 @@ SPK_ICON = src/borgbackup.png
 include ../../mk/spksrc.common.mk
 
 # Build for ARMv5 and ARMv7L using Python 3.11; all others use Python 3.12
-# This must be set BEFORE including spksrc.python.mk to avoid adding
+# This must be set BEFORE including spksrc.spk-meta.mk to avoid adding
 # ARMv5 to UNSUPPORTED_ARCHS when using python312
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),)
 PYTHON_PACKAGE = python311
@@ -15,7 +15,6 @@ else
 PYTHON_PACKAGE = python312
 endif
 
-SPK_DEPENDS = $(PYTHON_PACKAGE)
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 cross/xxhash cross/zstd
@@ -72,17 +71,15 @@ POST_SERVICE_TARGET = borgbackup_extra_install
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
-include ../../mk/spksrc.common.mk
-
 # [borgbackup]
 # Use OpenSSL path as defined by either
-# spksrc.wheel-env.mk or spksrc.python.mk
+# spksrc.wheel-env.mk or spksrc.spk-meta.mk
 ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
-ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
+ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_INSTALL_PREFIX)"
 
 # [borgbackup]
 # GCC < 5.0 (DSM 6.2.4) requires gnu99 for Cython-generated code.
@@ -117,4 +114,4 @@ borgbackup_extra_install:
 	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
 	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

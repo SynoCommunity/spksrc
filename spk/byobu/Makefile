@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/byobu.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE):synocli-net"
+SPK_DEPENDS = "synocli-net"
 
 # Python 3.12 not supported
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
@@ -50,4 +50,4 @@ SPK_COMMANDS += bin/byobu-tmux
 SPK_COMMANDS += bin/byobu-ugraph
 SPK_COMMANDS += bin/byobu-ulevel
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

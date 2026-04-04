@@ -4,7 +4,6 @@ SPK_REV = 7
 SPK_ICON = src/rdiff-backup.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "${PYTHON_PACKAGE}"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) ${ARMv5_ARCHS}
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
@@ -31,4 +30,4 @@ USE_ALTERNATE_TMPDIR = 1
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/rdiff-backup bin:env/bin/rdiff-backup-statistics
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk
