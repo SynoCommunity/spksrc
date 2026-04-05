@@ -124,19 +124,12 @@ crossenv-%:
 
 ####
 
-# Determine the correct Python install prefix:
-# - If PYTHON_PACKAGE_WORK_DIR exists (pre-built python package available),
-#   use the python package's install prefix by replacing SPK_NAME with PYTHON_PACKAGE
-# - Otherwise (python is built as a dependency), use the current package's install prefix
-ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
-PYTHON_INSTALL_PREFIX = $(subst $(SPK_NAME),$(PYTHON_PACKAGE),$(INSTALL_PREFIX))
-else
+# If python paths not-defined then use package default
+ifeq ($(PYTHON_INSTALL_PREFIX),)
 PYTHON_INSTALL_PREFIX = $(INSTALL_PREFIX)
 endif
-
-# Equivalent to STAGING_INSTALL_PREFIX relative to found python install
 ifeq ($(PYTHON_STAGING_INSTALL_PREFIX),)
-PYTHON_STAGING_INSTALL_PREFIX = $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX))
+PYTHON_STAGING_INSTALL_PREFIX = $(STAGING_INSTALL_PREFIX)
 endif
 
 # set OPENSSL_*_PREFIX if unset

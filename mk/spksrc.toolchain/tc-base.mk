@@ -8,8 +8,8 @@
 #
 # Variables:
 #  TC_NAME        : Toolchain name (default: syno-$(TC_ARCH))
-#  TC_TYPE        : Toolchain type (DSM / SRM)
-#  TC_BUILD       : Synology DSM build number
+#  TC_TYPE        : Toolchain type (DSM/SRM)
+#  TC_BUILD       : Synology DSM/SRM build number
 #  TC_OS_MIN_VER  : Minimum supported OS version (<major>.<minor>-<build>)
 #
 # Notes:

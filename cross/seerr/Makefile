@@ -1,5 +1,5 @@
 PKG_NAME = seerr
-PKG_VERS = 2.7.3
+PKG_VERS = 3.1.0
 PKG_EXT  = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/seerr-team/seerr/archive/refs/tags
@@ -17,23 +17,29 @@ INSTALL_TARGET = seerr_install
 # ------------------------------------------------------------
 # Build environment
 # ------------------------------------------------------------
-ENV += NPM_CONFIG_PREFIX=$(WORK_DIR)/npm-global
-ENV += PATH=$(WORK_DIR)/npm-global/bin:$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(PATH)
-ENV += COREPACK_ENABLE_DOWNLOAD=1
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(PATH)
+ENV += COREPACK_ENABLE_AUTO_PIN=0
+ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ENV += HUSKY=0
 ENV += HUSKY_SKIP_INSTALL=1
 ENV += SKIP_GIT_INSTALL_HOOKS=1
 
 include ../../mk/spksrc.install-resources.mk
 
+# Map spksrc ARCH to Node.js arch for native module downloads
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+NODE_ARCH = arm64
+else
+NODE_ARCH = x64
+endif
+
 .PHONY: seerr_install
 seerr_install:
 
 	# ------------------------------------------------------------
-	# 1. Install pnpm (REQUIRED for build)
+	# 1. Setup pnpm via corepack (bundled with Node.js 22)
 	# ------------------------------------------------------------
-	install -m 755 -d $(WORK_DIR)/npm-global/bin
-	$(RUN) npm install -g pnpm@9.0.0
+	$(RUN) corepack enable
 
 	# Disable husky prepare script
 	$(RUN) node -e "\
@@ -46,7 +52,7 @@ seerr_install:
 	# ------------------------------------------------------------
 	# 2. Install deps + build (pnpm-only phase)
 	# ------------------------------------------------------------
-	$(RUN) pnpm install --frozen-lockfile --filter '.' --config.ignore-workspace-root-check=true
+	$(RUN) pnpm install --frozen-lockfile
 	$(RUN) node $(CURDIR)/src/fix-entity-imports.js
 	$(RUN) COMMIT_TAG=$(PKG_VERS) pnpm build
 
@@ -69,26 +75,36 @@ seerr_install:
 	# ------------------------------------------------------------
 	# 5. Install runtime deps only (npm, flat layout)
 	# ------------------------------------------------------------
-	$(RUN) npm install --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund
+	$(RUN) npm install --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --no-optional
+	# Install then-pug (peer dependency of @ladjs/consolidate, needed for email-templates)
+	$(RUN) npm install then-pug@2.0.0 --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --no-optional
 
 	# ------------------------------------------------------------
-	# 6. Restore native binaries (runtime-safe)
+	# 6. Native binaries for target architecture ($(NODE_ARCH))
 	# ------------------------------------------------------------
 
-	# sqlite3
+	# sqlite3 - download prebuilt napi binary for target arch
 	$(RUN) sh -c "\
 		cd node_modules/sqlite3 && \
-		npx prebuild-install -r napi"
+		npx prebuild-install -r napi --platform linux --arch $(NODE_ARCH)"
 
-	# bcrypt (prebuilt glibc x64)
-	$(RUN) sh -c "\
-		cd node_modules/bcrypt && \
-		mkdir -p lib/binding && \
-		curl -sL https://github.com/kelektiv/node.bcrypt.js/releases/download/v5.1.0/bcrypt_lib-v5.1.0-napi-v3-linux-x64-glibc.tar.gz | \
-		tar -xz -C lib/binding"
+	# bcrypt v6.0.0 bundles prebuilts in prebuilds/ dir
+	# Keep only the target architecture prebuild
+	$(RUN) rm -rf \
+		node_modules/bcrypt/prebuilds/darwin-arm64 \
+		node_modules/bcrypt/prebuilds/darwin-x64 \
+		node_modules/bcrypt/prebuilds/linux-arm \
+		node_modules/bcrypt/prebuilds/win32-arm64 \
+		node_modules/bcrypt/prebuilds/win32-x64 \
+		node_modules/bcrypt/lib
+	@if [ "$(NODE_ARCH)" = "x64" ]; then \
+		rm -rf node_modules/bcrypt/prebuilds/linux-arm64; \
+	else \
+		rm -rf node_modules/bcrypt/prebuilds/linux-x64; \
+	fi
 
 	# ------------------------------------------------------------
-	# 7. Remove non-runtime artifacts
+	# 7. Cleanup non-runtime artifacts
 	# ------------------------------------------------------------
 	$(RUN) rm -rf \
 		.next/cache \
@@ -97,8 +113,7 @@ seerr_install:
 		charts \
 		docs \
 		gen-docs \
-		server \
-		pnpm-lock.yaml
+		server
 
 	# Remove ace-builds entirely (already bundled into client JS)
 	$(RUN) rm -rf node_modules/ace-builds
@@ -108,8 +123,20 @@ seerr_install:
 		node_modules/node-gyp \
 		node_modules/sqlite3/node_modules/node-gyp
 
-	# Remove @babel packages except runtime (compiler/plugins are build-only)
-	$(RUN) find node_modules/@babel -mindepth 1 -maxdepth 1 -type d ! -name 'runtime' -exec rm -rf {} +
+	# Preserve @babel packages needed for runtime (email-templates chain)
+	# Keep parser, types, runtime, and helper packages needed transitively
+	$(RUN) node -e "\
+		const fs = require('fs');\
+		const path = require('path');\
+		const babelDir = 'node_modules/@babel';\
+		if (!fs.existsSync(babelDir)) { process.exit(0); }\
+		const dirs = fs.readdirSync(babelDir);\
+		const keep = ['runtime', 'parser', 'types', 'helper-validator-identifier', 'helper-string-parser'];\
+		for (const d of dirs) {\
+			if (keep.indexOf(d) === -1) {\
+				try { fs.rmSync(path.join(babelDir, d), { recursive: true, force: true }); } catch(e) {}\
+			}\
+		}"
 
 	# Remove @svgr and svgo (webpack SVG loader - build-only)
 	$(RUN) rm -rf \
@@ -125,14 +152,15 @@ seerr_install:
 		node_modules/babel-plugin-polyfill-regenerator \
 		node_modules/babel-plugin-syntax-jsx
 
-	# Remove source files, build artifacts, and documentation
+	# Remove source files, build artifacts, documentation, and license files
 	$(RUN) find node_modules -type f \( \
 		-name '*.ts' -o -name '*.map' -o -name '*.tsbuildinfo' -o \
 		-name '*.c' -o -name '*.cpp' -o -name '*.cc' -o \
 		-name '*.h' -o -name '*.hpp' -o \
 		-name '*.gyp' -o -name '*.gypi' -o \
 		-name 'README*' -o -name 'CHANGELOG*' -o -name 'HISTORY*' -o \
-		-name 'AUTHORS*' -o -name 'CONTRIBUTORS*' \) -delete
+		-name 'AUTHORS*' -o -name 'CONTRIBUTORS*' -o \
+		-name 'LICENSE*' -o -name 'COPYING*' \) -delete
 
 	# Remove test and example directories
 	$(RUN) find node_modules -type d \( \
@@ -149,7 +177,7 @@ seerr_install:
 		)"
 
 	# ------------------------------------------------------------
-	# 9. Install into staging (Jellyseerr runtime layout)
+	# 9. Install into staging (Seerr runtime layout)
 	# ------------------------------------------------------------
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/seerr
 
@@ -160,7 +188,7 @@ seerr_install:
 	cp -a $(WORK_DIR)/$(PKG_DIR)/node_modules    $(STAGING_INSTALL_PREFIX)/share/seerr/
 
 	cp $(WORK_DIR)/$(PKG_DIR)/package.json       $(STAGING_INSTALL_PREFIX)/share/seerr/
-	cp $(WORK_DIR)/$(PKG_DIR)/jellyseerr-api.yml $(STAGING_INSTALL_PREFIX)/share/seerr/
+	cp $(WORK_DIR)/$(PKG_DIR)/seerr-api.yml      $(STAGING_INSTALL_PREFIX)/share/seerr/
 	cp $(WORK_DIR)/$(PKG_DIR)/committag.json     $(STAGING_INSTALL_PREFIX)/share/seerr/
 
 	# ------------------------------------------------------------

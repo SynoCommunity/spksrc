@@ -4,7 +4,7 @@
 # Resolves toolchain download locations and filenames.
 #
 # This file:
-#  - derives the toolchain base URL from TC_VERS metadata
+#  - derives the toolchain base URL from TC_VERSION_MAP metadata
 #  - constructs the final download URL and archive name
 #  - provides lookup macros used by toolchain rules
 #

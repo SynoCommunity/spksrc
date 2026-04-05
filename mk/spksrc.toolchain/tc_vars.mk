@@ -53,7 +53,7 @@
 COOKIE_PREFIX =
 
 # Mark tc_vars generation as completed using status cookie
-TCVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)tcvars_done
+TCVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)stage1-tcvars_done
 
 #####
 
@@ -100,7 +100,7 @@ TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
 define make_tc_var_rule
 $(WORK_DIR)/$(2):
 	@$(MSG) "Generating $(WORK_DIR)/$(2)"
-	@@mkdir -p $(WORK_DIR)
+	@mkdir -p $(WORK_DIR)
 	@$(MAKE) --no-print-directory \
 		-f Makefile \
 		TCVARS_SUBMAKE=1 \

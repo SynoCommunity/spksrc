@@ -1,0 +1,11 @@
+--- drivers/cdrom/cdrom.c-orig	2025-03-10 20:44:10.000000000 +0000
++++ drivers/cdrom/cdrom.c	2025-07-15 00:27:20.327175390 +0000
+@@ -602,7 +602,7 @@ int register_cdrom(struct gendisk *disk,
+ 	}
+ 
+ 	cdi->disk = disk;
+-	disk->cdi = cdi;
++	//disk->cdi = cdi;
+ 
+ 	ENSURE(cdo, drive_status, CDC_DRIVE_STATUS);
+ 	if (cdo->check_events == NULL)
