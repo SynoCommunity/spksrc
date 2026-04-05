@@ -98,9 +98,9 @@ seerr_install:
 		node_modules/bcrypt/prebuilds/win32-x64 \
 		node_modules/bcrypt/lib
 	@if [ "$(NODE_ARCH)" = "x64" ]; then \
-		$(RUN) rm -rf node_modules/bcrypt/prebuilds/linux-arm64; \
+		rm -rf node_modules/bcrypt/prebuilds/linux-arm64; \
 	else \
-		$(RUN) rm -rf node_modules/bcrypt/prebuilds/linux-x64; \
+		rm -rf node_modules/bcrypt/prebuilds/linux-x64; \
 	fi
 
 	# ------------------------------------------------------------
