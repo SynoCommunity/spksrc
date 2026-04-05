@@ -33,7 +33,6 @@ SERVICE_SETUP = src/service-setup.sh
 OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
 OPTIONAL_DEPENDS += python/pandas
-OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
 
@@ -42,8 +41,7 @@ include ../../mk/spksrc.common.mk
 #  - build:setuptools-scm
 #  - cross:cppy
 ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-WHEELS += atom==0.10.5
-WHEELS += atom==0.11.0
+WHEELS += atom==0.12.1
 endif
 
 # [borgbackup]
@@ -55,12 +53,6 @@ ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
 DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
 
-# [cryptography]
-# Use python/cryptography to generate py36-abi3 limited API
-# NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
-#       To generate py310-py310 regular build use src/requirements-crossenv.txt
-DEPENDS += python/cryptography
-
 # [gevent]
 DEPENDS += cross/libev cross/c-ares
 ENV += GEVENTSETUP_EMBED_CARES=FALSE
@@ -68,20 +60,30 @@ ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
 WHEELS += gevent==24.11.1
 else
-WHEELS += gevent==25.5.1
+WHEELS += gevent==25.9.1
 endif
 
 # [greenlet]
 # version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
 # version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Mandatory require full c++11 support
 # version  = 1.x: gcc <  4.9 (DSM5, DSM6) Last known working version (armv5, hi3535)
-ifeq ($(call version_ge, $(TC_GCC), 8),1)
-WHEELS += greenlet==3.2.3
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
+WHEELS += greenlet==3.3.2
 else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
 WHEELS += greenlet==3.0.3
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 else
 WHEELS += greenlet==1.1.3
+endif
+
+# [llfuse]
+# llfuse<=1.5.1 using gcc<5 requires -std=gnu11 to find "clock_gettime" (-std=gnu99 makes it compatible with older gcc)
+# llfuse>=1.5.2 requires gcc>=7
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [llfuse] -std=gnu99
+WHEELS += llfuse==1.5.1
+else
+WHEELS += llfuse==1.5.2
 endif
 
 # [lxml]
@@ -124,7 +126,7 @@ WHEELS += numpy==1.24.4
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 WHEELS_CFLAGS += [numpy] -O0
 endif
-else ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+else ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
 endif
@@ -133,7 +135,7 @@ endif
 endif
 
 # [pandas] - depends on numpy >= 1.26
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/pandas
 endif
 
@@ -146,6 +148,11 @@ endif
 
 # [Pillow]
 DEPENDS += python/pillow
+
+# [psutil]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [psutil] -std=gnu99
+endif
 
 # [pycares]
 DEPENDS += cross/c-ares
@@ -200,15 +207,7 @@ WHEELS += rpds_py==0.21.0
 else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 WHEELS += rpds_py==0.24.0
 else
-WHEELS += rpds_py==0.25.1
-endif
-endif
-
-# [scipy] - depends on numpy >= 2.x
-#           unsupported with old PPC arch
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-ifeq ($(call version_ge, $(TC_GCC), 8.4),1)
-DEPENDS += python/scipy
+WHEELS += rpds_py==0.30.0
 endif
 endif
 
