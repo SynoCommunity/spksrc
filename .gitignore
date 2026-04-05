@@ -1,5 +1,5 @@
 distrib
-/packages
+packages
 native/*/work*
 native/*/build*
 native/*/status*
@@ -25,7 +25,6 @@ toolkit/*/work*
 local.mk
 *.DS_Store
 *~
-site/
 
 # PyCharm project settings
 .idea
