@@ -1,5 +1,5 @@
 PKG_NAME = jellyfin
-PKG_VERS = 10.11.7
+PKG_VERS = 10.11.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jellyfin/jellyfin/archive
