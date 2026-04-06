@@ -1,0 +1,29 @@
+#!/bin/sh
+# mariadb_config wrapper pour cross-compilation spksrc
+
+# to be substituted
+STAGING_INSTALL_PREFIX="@STAGING_INSTALL_PREFIX@"
+VERSION="@VERSION@"
+SOCKET="@SOCKET@"
+
+case "$1" in
+  --include)
+    echo "-I${STAGING_INSTALL_PREFIX}/include/mariadb"
+    ;;
+  --libs)
+    echo "-L${STAGING_INSTALL_PREFIX}/lib/mariadb -lmysqlclient"
+    ;;
+  --libs_r)
+    echo "-L${STAGING_INSTALL_PREFIX}/lib/mariadb -lmysqlclient"
+    ;;
+  --version)
+    echo "${VERSION}"
+    ;;
+  --socket)
+    echo "${SOCKET}"
+    ;;
+  *)
+    echo "Unknown option: $1" >&2
+    exit 1
+    ;;
+esac
