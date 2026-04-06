@@ -108,10 +108,11 @@ service_postinst()
     # Create administrator role from wizard (peer auth via Unix socket)
     run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c \"CREATE ROLE ${PG_USERNAME} PASSWORD '${PG_PASSWORD}' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN REPLICATION BYPASSRLS;\""
 
-    # Enable PostGIS extension in template1 (so new databases get it automatically)
-    run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d template1 -c 'CREATE EXTENSION IF NOT EXISTS postgis;'"
-    # Enable PostGIS in the default postgres database as well
-    run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c 'CREATE EXTENSION IF NOT EXISTS postgis;'"
+    # Enable PostGIS extension if available (requires GCC 5+ toolchain build)
+    if ${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c "SELECT 1 FROM pg_available_extensions WHERE name = 'postgis' AND installed_version IS NOT NULL" -t > /dev/null 2>&1; then
+        run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d template1 -c 'CREATE EXTENSION IF NOT EXISTS postgis;'"
+        run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c 'CREATE EXTENSION IF NOT EXISTS postgis;'"
+    fi
 
     # Switch local authentication to scram-sha-256 for regular users
     # Keep peer auth for the system user (sc-postgresql) to allow passwordless backups

@@ -3,7 +3,7 @@ SPK_VERS = 17.4
 SPK_REV = 1
 SPK_ICON = src/postgresql.png
 
-DEPENDS = cross/postgresql cross/postgis
+DEPENDS = cross/postgresql
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS spatial database extension.
@@ -22,11 +22,11 @@ NO_SERVICE_SHORTCUT = 1
 
 include ../../mk/spksrc.common.mk
 
-# libicu dependency doesn't support ARMv5/OLD_PPC (no DSM 7.x toolchains)
-# comcerto2k: DSM 7.x toolchain uses GCC 4.9.3 (GEOS 3.12.3 requires C++14/GCC 5+)
-UNSUPPORTED_ARCHS = comcerto2k
-# DSM < 7.0: GCC 4.9 fails PostGIS libpq detection (strict linker requires SSL libs)
-REQUIRED_MIN_DSM = 7.0
+# PostGIS requires GCC 5+ (GEOS 3.12.3 needs C++14)
+# Only include postgis if toolchain GCC >= 5.0
+ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+DEPENDS += cross/postgis
+endif
 
 # Common PostgreSQL commands available via /usr/local/bin/
 SPK_COMMANDS  = bin/psql
