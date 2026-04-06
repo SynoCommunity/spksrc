@@ -6,7 +6,7 @@ SPK_ICON = src/postgresql.png
 DEPENDS = cross/postgresql
 
 MAINTAINER = DigitalBox98
-DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS spatial database extension.
+DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS spatial database extension for DSM 7+.
 CHANGELOG = "Initial package release."
 DISPLAY_NAME = PostgreSQL
 STARTABLE = yes
@@ -21,6 +21,9 @@ SERVICE_PORT_TITLE = PostgreSQL
 NO_SERVICE_SHORTCUT = 1
 
 include ../../mk/spksrc.common.mk
+
+# libicu-74.2 (used for GCC < 5 / DSM 6) doesn't support ARMv5
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 # PostGIS requires GCC 5+ (GEOS 3.12.3 needs C++14)
 # Only include postgis if toolchain GCC >= 5.0
