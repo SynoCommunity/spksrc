@@ -57,7 +57,7 @@ MYSQL_DB_SOCKET = /run/mysqld/mysqld.sock
 endif
 CMAKE_ARGS += -DMARIADB_UNIX_ADDR=$(MYSQL_DB_SOCKET)
 
-include ../../mk/spksrc.cross-cmake.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_gt, $(TC_GCC), 4.9),1)
 ADDITIONAL_CFLAGS += -Wno-error=maybe-uninitialized
@@ -73,6 +73,8 @@ ADDITIONAL_CFLAGS += -Wno-error=uninitialized
 # fails on hi3535-6.2.4
 ADDITIONAL_CFLAGS += -Wno-error=array-bounds
 endif
+
+include ../../mk/spksrc.cross-cmake.mk
 
 .PHONY: mariadb_post_install
 mariadb_post_install:
