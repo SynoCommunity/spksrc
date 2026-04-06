@@ -36,6 +36,8 @@ ifeq ($(notdir $(abspath $(CURDIR)/..)),toolchain)
   DEFAULT_LOG = $(LOG_DIR)/build-$(or $(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))-$(TC_VERS).log
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolkit)
   DEFAULT_LOG = $(LOG_DIR)/build-$(or $(lastword $(subst -, ,$(TK_NAME))),$(TK_ARCH))-$(TK_VERS).log
+else ifeq ($(notdir $(abspath $(CURDIR)/..)),kernel)
+  DEFAULT_LOG = $(LOG_DIR)/build-$(KERNEL_ARCH)-$(KERNEL_VERS).log
 else
   DEFAULT_LOG = $(LOG_DIR)/build$(or $(ARCH_SUFFIX),-noarch-$(TCVERSION)).log
 endif

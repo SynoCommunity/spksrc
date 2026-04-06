@@ -1,0 +1,8 @@
+# Example monit configuration for Jellyfin
+# Copy to /var/packages/monit/var/monit.d/ and adjust as needed
+
+check process Jellyfin with pidfile /var/packages/jellyfin/var/jellyfin.pid
+    start program = "/var/packages/jellyfin/scripts/start-stop-status start"
+    stop program  = "/var/packages/jellyfin/scripts/start-stop-status stop"
+    if failed host localhost port 8096 for 2 cycles then restart
+    if 3 restarts within 5 cycles then timeout

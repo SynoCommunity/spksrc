@@ -1,0 +1,16 @@
+{
+  "name": "stockfish-webgui",
+  "version": "1.0.0",
+  "description": "Web GUI for Stockfish chess engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "GPL-3.0"
+}

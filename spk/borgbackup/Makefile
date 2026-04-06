@@ -72,7 +72,7 @@ POST_SERVICE_TARGET = borgbackup_extra_install
 
 SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.common.mk
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
@@ -116,3 +116,5 @@ endif
 borgbackup_extra_install:
 	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
 	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup
+
+include ../../mk/spksrc.python.mk

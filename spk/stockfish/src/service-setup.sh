@@ -1,25 +1,14 @@
+# Stockfish service setup
 
-INSTALL_DIR=${SYNOPKG_PKGDEST}/webgui
-WEB_DIR="/var/services/web/stockfish"
-CONFIG_TEMPLATE=${SYNOPKG_PKGDEST}/var/webgui-config-template.php
-CONFIG_FILE="${WEB_DIR}/config.php"
+WEBGUI_HOME="${SYNOPKG_PKGDEST}/share/webgui"
+NODE_BIN="/var/packages/Node.js_v18/target/usr/local/bin/node"
 
-service_postinst ()
-{
-    # Install the web interface
-    cp -pR ${INSTALL_DIR} ${WEB_DIR}
-    # Overwrite config file from template
-    cp -f ${CONFIG_TEMPLATE} ${CONFIG_FILE}
+# Service configuration
+SERVICE_COMMAND="${NODE_BIN} server.js"
+SVC_CWD="${WEBGUI_HOME}"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
 
-    # Edit config file according to the wizard
-    sed -i -e "s|@@_wizard_security_code_@@|${wizard_security_code}|g" ${CONFIG_FILE}
-    sed -i -e "s|@@_wizard_thinking_time_ms_@@|${wizard_thinking_time_ms}|g" ${CONFIG_FILE}
-}
-
-
-service_postuninst ()
-{
-    # Remove the web interface
-    rm -rf ${WEB_DIR}
-}
-
+# Environment variables
+export STOCKFISH_PATH="${SYNOPKG_PKGDEST}/bin/stockfish"
+export PORT=${SERVICE_PORT}

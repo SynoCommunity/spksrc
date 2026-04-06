@@ -1,39 +1,41 @@
 SPK_NAME = stockfish
-SPK_VERS = 11
-SPK_REV = 3
-SPK_ICON= src/stockfish.png
-DSM_UI_DIR = app
+SPK_VERS = 16
+SPK_REV = 4
+SPK_ICON = src/stockfish.png
 
-DEPENDS = cross/stockfish cross/stockfish-webgui
+DEPENDS = cross/stockfish
+BUILD_DEPENDS = native/nodejs_22
+SPK_DEPENDS = "Node.js_v18"
+
+# C++17 requires GCC 8+ (comcerto2k has GCC 4.9.3)
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = mayweed
-DESCRIPTION = Strong open source chess engine. Stockfish is one of the strongest chess engines in the world. It is also much stronger than the best human chess grandmasters.
-CHANGELOG = "Initial package version. With web frontend to play chess against stockfish engine."
-
 DISPLAY_NAME = Stockfish
+DESCRIPTION = Strong open source chess engine. Stockfish is one of the strongest chess engines in the world. It is also much stronger than the best human chess grandmasters.
+CHANGELOG = "Update to v16. Replace legacy PHP web GUI with modern Node.js-based interface using server-side engine."
 HOMEPAGE = https://stockfishchess.org/
-LICENSE  = GPLv2/GPLv3
+LICENSE = GPLv3
 
-INSTALL_DEP_SERVICES = apache-web
-START_DEP_SERVICES = apache-web
-INSTUNINST_RESTART_SERVICES = apache-web
-
+SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
-SSS_SCRIPT = src/start-stop-status.sh
-WIZARDS_DIR = src/wizard
+STARTABLE = yes
+
+SERVICE_PORT = 8300
+SERVICE_PORT_TITLE = Stockfish Web GUI
+ADMIN_PORT = $(SERVICE_PORT)
+
+SPK_COMMANDS = bin/stockfish
 
 POST_STRIP_TARGET = stockfish_extra_install
-
-# Toolchains lacking c++11 compiler ar not supported
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-
-SPK_COMMANDS  = bin/stockfish
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: stockfish_extra_install
 stockfish_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/webgui-config-template.php $(STAGING_DIR)/var/webgui-config-template.php
+	install -m 755 -d $(STAGING_DIR)/share/webgui
+	cp -a src/webgui/. $(STAGING_DIR)/share/webgui/
+	cd $(STAGING_DIR)/share/webgui && \
+		PATH=$(realpath $(WORK_DIR)/../../../native/nodejs_22/work-native/node)/bin:$$PATH \
+		HOME=$(WORK_DIR) npm install --production --no-audit --no-fund

@@ -503,8 +503,8 @@ package: $(SPK_FILE_NAME)
 # -----------------------------------------------------------------------------
 # Stage1: Toolchain (MANDATORY) + Toolkit (OPTIONAL) bootstrap
 # -----------------------------------------------------------------------------
-TCVARS_DONE := $(WORK_DIR)/.tcvars_done
-TKVARS_DONE := $(WORK_DIR)/.tkvars_done
+TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
+TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
 .PHONY: spk-stage1
 spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
@@ -569,11 +569,14 @@ spkclean:
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
-	       work-*/.tcvars_done \
+	       work-*/.stage0-tcvars_done \
+	       work-*/.stage1-tcvars_done \
+	       work-*/.stage1-tkvars_done \
+	       work-*/.wheel_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
-	       work-*/tc_vars.*.mk \
+	       work-*/tc_vars*.mk \
 	       work-*/tc_vars.cmake \
 	       work-*/tc_vars.meson-* \
 	       work-*/package.tgz \

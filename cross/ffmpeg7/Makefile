@@ -166,6 +166,12 @@ CONFIGURE_ARGS += --enable-chromaprint
 DEPENDS += cross/dav1d
 CONFIGURE_ARGS += --enable-libdav1d
 
+# Newer frei0r requires newer gcc
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/frei0r
+CONFIGURE_ARGS += --enable-frei0r
+endif
+
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
 
@@ -245,32 +251,15 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 # Dependencies provided by synocli-videodriver
 # If built outside spksrc.videodriver.mk
-ifeq ($(wildcard $(VIDEODRV_STAGING_PREFIX)),)
+ifeq ($(wildcard $(VIDEODRV_STAGING_INSTALL_PREFIX)),)
 DEPENDS += cross/libva cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
 DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
-endif
-CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-libmfx
-CONFIGURE_ARGS += --enable-vaapi
-endif
 
-# Evaluation of TC_GCC works only after the following include
-include ../../mk/spksrc.cross-cc.mk
-
-##
-## x64  & GCC SPECIFIC
-##
-
-# OpenCL acceleration
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-# Newer Intel implementations (oneAPI, level-zero) requires gcc >= 5
+# Newer Intel implementations requires gcc >= 5
+# IGC (OpenCL), oneAPI, level-zero, vulkan
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
-# Dependencies provided by synocli-videodriver
-# If built outside spksrc.videodriver.mk
-ifeq ($(wildcard $(VIDEODRV_STAGING_PREFIX)),)
 DEPENDS += cross/intel-level-zero
 DEPENDS += cross/intel-graphics-compiler
 DEPENDS += cross/intel-compute-runtime
@@ -279,18 +268,18 @@ DEPENDS += cross/clinfo
 DEPENDS += cross/mesa
 DEPENDS += cross/Khronos-Vulkan-Loader
 DEPENDS += cross/Khronos-Vulkan-Tools
-endif
+endif # gcc >= 5
+endif # != synocli-videodriver
+
+CONFIGURE_ARGS += --arch=x86_64
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-libmfx
+CONFIGURE_ARGS += --enable-vaapi
+
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
-endif
+endif # ifeq x64_ARCHS
 
-##
-## GCC SPECIFIC
-##
-
-# Newer frei0r requires newer gcc
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/frei0r
-CONFIGURE_ARGS += --enable-frei0r
-endif
+include ../../mk/spksrc.cross-cc.mk

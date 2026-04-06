@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stockfish Chess</title>
+    <link rel="stylesheet" href="lib/chessboard.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee; min-height: 100vh; padding: 15px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { margin-bottom: 15px; color: #4ecca3; text-align: center; font-size: 1.8em; }
+        .main-layout { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .board-section { flex: 0 0 auto; }
+        #board-container { max-width: 500px; width: 100%; }
+        #board { width: 100%; }
+        .info-section { flex: 1; min-width: 220px; max-width: 280px; }
+        .panel { background: rgba(22, 33, 62, 0.95); border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(78, 204, 163, 0.2); }
+        .panel h3 { color: #4ecca3; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        button {
+            padding: 7px 14px; border: none; border-radius: 5px;
+            background: #4ecca3; color: #1a1a2e; cursor: pointer;
+            font-size: 12px; font-weight: 600; transition: all 0.2s;
+        }
+        button:hover { background: #3db892; transform: translateY(-1px); }
+        button:disabled { background: #666; cursor: not-allowed; transform: none; }
+        button.secondary { background: #3a4a6b; color: #ddd; }
+        button.secondary:hover { background: #4a5a7b; }
+        #eval { font-size: 26px; font-weight: bold; color: #4ecca3; text-align: center; }
+        #bestmove { margin-top: 4px; color: #aaa; text-align: center; font-size: 13px; }
+        #thinking { color: #888; font-style: italic; text-align: center; min-height: 16px; font-size: 12px; }
+        .settings { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; justify-content: center; background: rgba(22, 33, 62, 0.7); padding: 10px; border-radius: 8px; }
+        select, input[type="range"] { padding: 5px; border-radius: 5px; border: 1px solid #4ecca3; background: #16213e; color: #eee; font-size: 12px; }
+        label { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+        input[type="checkbox"] { width: 14px; height: 14px; accent-color: #4ecca3; }
+        #moveHistory {
+            max-height: 150px; overflow-y: auto; font-family: "SF Mono", Monaco, monospace; font-size: 12px;
+            background: #0f0f23; padding: 8px; border-radius: 4px; line-height: 1.5;
+        }
+        #moveHistory .move-pair { display: flex; gap: 6px; }
+        #moveHistory .move-num { color: #555; min-width: 28px; }
+        #moveHistory .white-move, #moveHistory .black-move { min-width: 50px; }
+        #moveHistory .current { color: #4ecca3; font-weight: bold; }
+        #fen { font-family: "SF Mono", Monaco, monospace; font-size: 10px; word-break: break-all; color: #777; cursor: pointer; }
+        #fen:hover { color: #4ecca3; }
+        .captured-section { display: flex; flex-direction: column; gap: 6px; }
+        .captured-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .captured-row { min-height: 30px; display: flex; flex-wrap: wrap; gap: 2px; align-items: center; padding: 6px 8px; border-radius: 4px; }
+        #captured-white { background: rgba(255,255,255,0.15); }
+        #captured-black { background: rgba(200,200,220,0.25); border: 1px solid rgba(255,255,255,0.1); }
+        .captured-row img { width: 22px; height: 22px; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.6)); }
+        /* Toast notification for copy feedback */
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #4ecca3; color: #1a1a2e; padding: 10px 20px; border-radius: 8px; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 2000; pointer-events: none; }
+        .toast.show { opacity: 1; }
+        .status-text { text-align: center; padding: 6px; color: #f0a500; font-weight: bold; font-size: 13px; }
+        /* Promotion Dialog */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #1a1a2e; border-radius: 12px; padding: 20px; border: 2px solid #4ecca3; text-align: center; }
+        .modal h3 { color: #4ecca3; margin-bottom: 15px; }
+        .promo-pieces { display: flex; gap: 10px; justify-content: center; }
+        .promo-piece { width: 60px; height: 60px; cursor: pointer; background: #2a3a5a; border-radius: 8px; padding: 5px; transition: all 0.2s; }
+        .promo-piece:hover { background: #4ecca3; transform: scale(1.1); }
+        .promo-piece img { width: 100%; height: 100%; }
+        /* FEN Input Modal */
+        .modal input[type="text"] { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #4ecca3; background: #0f0f23; color: #eee; font-family: monospace; font-size: 12px; margin: 10px 0; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        /* Turn indicator */
+        .turn-indicator { display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 8px; }
+        .turn-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .turn-dot.white { background: #fff; border: 1px solid #666; }
+        .turn-dot.black { background: #333; border: 1px solid #666; }
+        .turn-dot.active { box-shadow: 0 0 8px #4ecca3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>♔ Stockfish Chess ♚</h1>
+
+        <div class="settings">
+            <label>Play as: <select id="playerColor">
+                <option value="w">White</option>
+                <option value="b">Black</option>
+            </select></label>
+            <label>Level: <input type="range" id="difficulty" min="1" max="20" value="10"> <span id="diffVal">10</span></label>
+            <label><input type="checkbox" id="soundEnabled" checked> Sound</label>
+            <label><input type="checkbox" id="selfPlay"> Self-play</label>
+        </div>
+
+        <div class="main-layout">
+            <div class="board-section">
+                <div class="turn-indicator">
+                    <span class="turn-dot white" id="turnWhite"></span>
+                    <span id="turnText">White to move</span>
+                    <span class="turn-dot black" id="turnBlack"></span>
+                </div>
+                <div id="board-container">
+                    <div id="board"></div>
+                </div>
+                <div class="panel" style="margin-top: 15px;">
+                    <div class="captured-section">
+                        <div><span class="captured-label">White captured:</span><div id="captured-white" class="captured-row"></div></div>
+                        <div><span class="captured-label">Black captured:</span><div id="captured-black" class="captured-row"></div></div>
+                    </div>
+                </div>
+                <div class="controls" style="margin-top: 12px;">
+                    <button id="newGame">New Game</button>
+                    <button id="undo">Undo</button>
+                    <button id="hint">Hint</button>
+                    <button id="flip">Flip</button>
+                    <button id="loadFen" class="secondary">Load FEN</button>
+                    <button id="copyPgn" class="secondary">PGN</button>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="panel">
+                    <div id="eval">0.0</div>
+                    <div id="thinking"></div>
+                    <div id="bestmove"></div>
+                </div>
+
+                <div class="panel">
+                    <h3>Move History</h3>
+                    <div id="moveHistory"></div>
+                </div>
+
+                <div class="panel">
+                    <h3>Position (FEN)</h3>
+                    <div id="fen" title="Click to copy">rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1</div>
+                </div>
+
+                <div id="gameStatus" class="status-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promotion Dialog -->
+    <div class="modal-overlay" id="promoModal">
+        <div class="modal">
+            <h3>Choose promotion piece</h3>
+            <div class="promo-pieces" id="promoPieces"></div>
+        </div>
+    </div>
+
+    <!-- FEN Input Modal -->
+    <div class="modal-overlay" id="fenModal">
+        <div class="modal">
+            <h3>Load Position (FEN)</h3>
+            <input type="text" id="fenInput" placeholder="Paste FEN string here...">
+            <div class="modal-buttons">
+                <button id="fenLoad">Load</button>
+                <button id="fenCancel" class="secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/chessboard.min.js"></script>
+    <script src="lib/chess.min.js"></script>
+    <script src="app.js"></script>
+    <div class="toast" id="toast"></div>
+</body>
+</html>

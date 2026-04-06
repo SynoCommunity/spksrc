@@ -15,19 +15,19 @@ include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 
 # Set videodriver installtion prefix directory variables
-ifeq ($(strip $(VIDEODRV_STAGING_PREFIX)),)
-export VIDEODRV_PREFIX = /var/packages/$(VIDEODRV_PACKAGE)/target
-export VIDEODRV_STAGING_PREFIX = $(realpath $(VIDEODRV_PACKAGE_ROOT)/install/$(VIDEODRV_PREFIX))
+ifeq ($(strip $(VIDEODRV_STAGING_INSTALL_PREFIX)),)
+export VIDEODRV_INSTALL_PREFIX = /var/packages/$(VIDEODRV_PACKAGE)/target
+export VIDEODRV_STAGING_INSTALL_PREFIX = $(realpath $(VIDEODRV_PACKAGE_ROOT)/install/$(VIDEODRV_INSTALL_PREFIX))
 endif
 
 # set build flags including ld to rewrite for the library path
 # used to access videodrv package provide libraries at destination
-ifneq ($(strip $(VIDEODRV_STAGING_PREFIX)),)
-export ADDITIONAL_CFLAGS   += -I$(VIDEODRV_STAGING_PREFIX)/include
-export ADDITIONAL_CPPFLAGS += -I$(VIDEODRV_STAGING_PREFIX)/include
-export ADDITIONAL_CXXFLAGS += -I$(VIDEODRV_STAGING_PREFIX)/include
-export ADDITIONAL_LDFLAGS  += -L$(VIDEODRV_STAGING_PREFIX)/lib
-export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(VIDEODRV_STAGING_PREFIX)/lib -Wl,--rpath,$(VIDEODRV_PREFIX)/lib
+ifneq ($(strip $(VIDEODRV_STAGING_INSTALL_PREFIX)),)
+export ADDITIONAL_CFLAGS   += -I$(VIDEODRV_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CPPFLAGS += -I$(VIDEODRV_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CXXFLAGS += -I$(VIDEODRV_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_LDFLAGS  += -L$(VIDEODRV_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(VIDEODRV_STAGING_INSTALL_PREFIX)/lib -Wl,--rpath,$(VIDEODRV_INSTALL_PREFIX)/lib
 
 # videodrv library to share with other packages
 VIDEODRV_PKGCFG  = igc-opencl.pc
@@ -53,8 +53,8 @@ VIDEODRV_PKGCFG += vpl.pc
 
 # Re-use a default subset of videodrv mandatory libraries
 # This avoids sharing other built-in such as zlib and al
-# To share everything: $(wildcard $(VIDEODRV_STAGING_PREFIX)/lib/pkgconfig/*.pc)
-VIDEODRV_LIBS := $(wildcard $(patsubst %.pc,$(VIDEODRV_STAGING_PREFIX)/lib/pkgconfig/%.pc, $(VIDEODRV_PKGCFG)))
+# To share everything: $(wildcard $(VIDEODRV_STAGING_INSTALL_PREFIX)/lib/pkgconfig/*.pc)
+VIDEODRV_LIBS := $(wildcard $(patsubst %.pc,$(VIDEODRV_STAGING_INSTALL_PREFIX)/lib/pkgconfig/%.pc, $(VIDEODRV_PKGCFG)))
 endif
 
 # call-up pre-depend to prepare the shared videodrv build environment

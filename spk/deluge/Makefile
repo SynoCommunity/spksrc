@@ -37,7 +37,7 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = deluge_extra_install
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.common.mk
 
 # [libtorrent]
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
@@ -70,3 +70,5 @@ deluge_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/logs
 	install -m 644 src/core.conf $(STAGING_DIR)/var/core.conf
 	install -m 644 src/autoadd.conf $(STAGING_DIR)/var/autoadd.conf
+
+include ../../mk/spksrc.python.mk

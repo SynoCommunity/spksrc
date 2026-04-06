@@ -1,5 +1,5 @@
 PKG_NAME = seerr
-PKG_VERS = 3.0.1
+PKG_VERS = 3.1.0
 PKG_EXT  = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/seerr-team/seerr/archive/refs/tags
@@ -76,6 +76,8 @@ seerr_install:
 	# 5. Install runtime deps only (npm, flat layout)
 	# ------------------------------------------------------------
 	$(RUN) npm install --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --no-optional
+	# Install then-pug (peer dependency of @ladjs/consolidate, needed for email-templates)
+	$(RUN) npm install then-pug@2.0.0 --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --no-optional
 
 	# ------------------------------------------------------------
 	# 6. Native binaries for target architecture ($(NODE_ARCH))
@@ -96,9 +98,9 @@ seerr_install:
 		node_modules/bcrypt/prebuilds/win32-x64 \
 		node_modules/bcrypt/lib
 	@if [ "$(NODE_ARCH)" = "x64" ]; then \
-		$(RUN) rm -rf node_modules/bcrypt/prebuilds/linux-arm64; \
+		rm -rf node_modules/bcrypt/prebuilds/linux-arm64; \
 	else \
-		$(RUN) rm -rf node_modules/bcrypt/prebuilds/linux-x64; \
+		rm -rf node_modules/bcrypt/prebuilds/linux-x64; \
 	fi
 
 	# ------------------------------------------------------------
@@ -121,8 +123,20 @@ seerr_install:
 		node_modules/node-gyp \
 		node_modules/sqlite3/node_modules/node-gyp
 
-	# Remove @babel packages except runtime (compiler/plugins are build-only)
-	$(RUN) find node_modules/@babel -mindepth 1 -maxdepth 1 -type d ! -name 'runtime' -exec rm -rf {} +
+	# Preserve @babel packages needed for runtime (email-templates chain)
+	# Keep parser, types, runtime, and helper packages needed transitively
+	$(RUN) node -e "\
+		const fs = require('fs');\
+		const path = require('path');\
+		const babelDir = 'node_modules/@babel';\
+		if (!fs.existsSync(babelDir)) { process.exit(0); }\
+		const dirs = fs.readdirSync(babelDir);\
+		const keep = ['runtime', 'parser', 'types', 'helper-validator-identifier', 'helper-string-parser'];\
+		for (const d of dirs) {\
+			if (keep.indexOf(d) === -1) {\
+				try { fs.rmSync(path.join(babelDir, d), { recursive: true, force: true }); } catch(e) {}\
+			}\
+		}"
 
 	# Remove @svgr and svgo (webpack SVG loader - build-only)
 	$(RUN) rm -rf \

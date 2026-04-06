@@ -1,0 +1,10 @@
+[
+    {
+        "step_title": "Uptime Kuma",
+        "items": [
+            {
+                "desc": "Uptime Kuma est un outil de surveillance auto-hébergé pour HTTP(s), TCP, Ping, DNS, conteneurs Docker, et plus encore.<br><br>Les données de surveillance sont stockées dans <b>/var/packages/uptime-kuma/var/</b> et persistent lors des mises à jour. Incluez ce répertoire dans votre stratégie de sauvegarde.<br><br>Pour plus d'informations, visitez le <a target=\"_blank\" href=\"https://github.com/louislam/uptime-kuma/wiki\">Wiki Uptime Kuma</a>."
+            }
+        ]
+    }
+]

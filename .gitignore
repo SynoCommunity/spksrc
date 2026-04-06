@@ -1,32 +1,55 @@
-distrib
-packages
+# Top-level directories
+/distrib/
+/packages/
+/site/
+
+# Build artifacts
 native/*/work*
 native/*/build*
 native/*/status*
+
 cross/*/work*
 cross/*/build*
 cross/*/status*
+
 kernel/*/work*
+kernel/*/build*
+kernel/*/status*
+
 python/*/work*
 python/*/build*
 python/*/status*
+
 spk/*/work*
 spk/*/build*
 spk/*/publish*
 spk/*/status*
 spk/*/wheel*
+
 diyspk/*/work*
 diyspk/*/build*
 diyspk/*/status*
+
 toolchain/*/work*
 toolchain/*/build*
 toolchain/*/status*
+
 toolkit/*/work*
 toolkit/*/build*
 toolkit/*/status*
+
+# Local config
 local.mk
-*.DS_Store
+
+# pnpm local store
+.pnpm-store/
+
+# macOS
+.DS_Store
+
+# Temporary files
 *~
 
-# PyCharm project settings
-.idea
+# IDEs
+.idea/
+.vscode/

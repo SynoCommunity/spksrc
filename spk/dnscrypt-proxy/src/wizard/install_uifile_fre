@@ -1,34 +1,82 @@
-[{
-    "step_title": "Configuration de dnscrypt-proxy",
-    "items": [{
-        "desc": "Le fichier de configuration est: /var/packages/dnscrypt-proxy/target/var/dnscrypt-proxy.toml"
-    }, {
-        "type": "singleselect",
-        "desc": "IPv6 servers:",
-        "subitems": [{
-            "key": "wizard_ipv6",
-            "desc": "Activer le support IPv6 support (une connection IPv6 est requise)",
-            "defaultValue": false
-        }, {
-            "key": "wizard_noipv6",
-            "desc": "Désactiver le support IPv6",
-            "defaultValue": true
-        }]
-    }, {
-        "type": "textfield",
-        "subitems": [{
-            "key": "wizard_servers",
-            "desc": "Noms des servers",
-            "defaultValue": "",
-            "validator": {
-                "allowBlank": true,
-                "regex": {
-                    "expr": "/^((('[\\w_\\-\\.]+', )+'[\\w_\\-\\.]+')|('[\\w_\\-\\.]+'))$/",
-                    "errorText": "Merci d'utiliser le format suivant: 'cloudflare', 'google'"
-                }
+[
+    {
+        "step_title": "Paramètres DNS",
+        "items": [
+            {
+                "desc": "Configurez vos paramètres DNS chiffrés."
+            },
+            {
+                "type": "singleselect",
+                "desc": "<b>Support IPv6</b><br>Activez uniquement si votre réseau dispose d'une connectivité IPv6",
+                "subitems": [
+                    {
+                        "key": "wizard_noipv6",
+                        "desc": "Désactivé",
+                        "defaultValue": true
+                    },
+                    {
+                        "key": "wizard_ipv6",
+                        "desc": "Activé",
+                        "defaultValue": false
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "<b>Serveurs préférés</b> (optionnel)<br>Laisser vide pour sélection automatique, ou spécifier: 'cloudflare', 'google'",
+                "subitems": [
+                    {
+                        "key": "wizard_servers",
+                        "desc": "Noms de serveurs",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^((('[\\\\w_\\\\-\\\\.]+', )+'[\\\\w_\\\\-\\\\.]+')|('[\\\\w_\\\\-\\\\.]+'))$/",
+                                "errorText": "Utilisez le format: 'cloudflare', 'google'"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "desc": "<a target=\"_blank\" href=\"https://dnscrypt.info/public-servers\">Voir les serveurs disponibles</a>"
             }
-        }]
-    }, {
-        "desc": "Sans configuration, le proxy sélectionnera automatiquement le server disponible le plus rapide de sa liste. https://dnscrypt.info/public-servers"
-    }]
-}]
+        ]
+    },
+    {
+        "step_title": "Tableau de bord",
+        "items": [
+            {
+                "desc": "Configurez l'accès au tableau de bord de surveillance sur le port 8153.<br>Laissez le mot de passe vide pour désactiver l'authentification."
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_ui_user",
+                        "desc": "Nom d'utilisateur",
+                        "defaultValue": "admin",
+                        "validator": {
+                            "allowBlank": false,
+                            "minLength": 1
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "subitems": [
+                    {
+                        "key": "wizard_ui_pass",
+                        "desc": "Mot de passe",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -36,7 +36,7 @@
 COOKIE_PREFIX =
 
 # Mark tk_vars generation as completed using status cookie
-TKVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)tkvars_done
+TKVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)stage1-tkvars_done
 
 #####
 

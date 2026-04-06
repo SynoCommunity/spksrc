@@ -34,66 +34,12 @@ WHEELS += src/requirements-pure.txt
 SERVICE_SETUP = src/service-setup.sh
 
 OPTIONAL_DEPENDS += python/numpy
+OPTIONAL_DEPENDS += python/numpy_1.26
+OPTIONAL_DEPENDS += python/numpy-latest
 OPTIONAL_DEPENDS += python/pandas
 OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
-
-# [cryptography]
-# Use python/cryptography to generate py36-abi3 limited API
-# NOTE: It's not possible to build py36-abi3 limited API using pip due to PEP517
-#       To generate py311-py311 regular build use src/requirements-crossenv.txt
-DEPENDS += python/cryptography
-
-# [mysqlclient]
-DEPENDS += cross/mariadb-connector-c
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
-
-# [Pendulum]
-# Needs atomic to build
-# Serves as maturin type python-wheel.mk example
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
-DEPENDS += python/pendulum
-endif
-
-# [Pillow]
-DEPENDS += python/pillow
-
-# [pycares]
-DEPENDS += cross/c-ares
-ENV += PYCARES_USE_SYSTEM_LIB=1
-
-# [pycurl]
-DEPENDS += cross/curl
-ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
-
-# [pydantic-core] 
-DEPENDS += python/pydantic-core
-
-# [PyNaCl]
-DEPENDS += cross/libsodium
-ENV += SODIUM_INSTALL=system
-
-# [PyYAML]
-DEPENDS += cross/libyaml
-
-# [rencode]
-DEPENDS += python/rencode
-
-# [rpds-py]
-# Require environment variables
-#   PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
-#   PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# Version = 0.24 requires rustc >= 1.82 (qoriq)
-# Version = 0.25 requires rustc >= 1.85
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-WHEELS += rpds_py==0.24.0
-else
-WHEELS += rpds_py==0.25.1
-endif
-
-include ../../mk/spksrc.python.mk
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
@@ -116,7 +62,7 @@ ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
 ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
 WHEELS += gevent==24.11.1
 else
-WHEELS += gevent==25.5.1
+WHEELS += gevent==25.9.1
 endif
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [gevent] -std=c11
@@ -126,12 +72,17 @@ endif
 # version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
 # version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Mandatory require full c++11 support *** unsupported ***
 ifeq ($(call version_ge, $(TC_GCC), 8),1)
-WHEELS += greenlet==3.2.3
+WHEELS += greenlet==3.3.2
 endif
 
 # [llfuse]
+# llfuse<=1.5.1 using gcc<5 requires -std=gnu11 to find "clock_gettime"
+# llfuse>=1.5.2 requires gcc>=7
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [llfuse] -std=gnu11
+WHEELS += llfuse==1.5.1
+else
+WHEELS += llfuse==1.5.2
 endif
 
 # [lxml]
@@ -149,18 +100,57 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=c11
 endif
 
+# [mysqlclient]
+DEPENDS += cross/mariadb-connector-c
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
 # [numpy]
 # version == 1.26 -> NOT SUPPORTED WITH PYTHON 3.13
 # version >= 2.3  -> Requires gcc >= 9.4 -> DSM-7.2
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
+DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
+DEPENDS += python/numpy-latest
+endif
 
-# [scipy] - depends on numpy >= 2.x
-DEPENDS += python/scipy
-
-# [scipy] - depends on numpy >= 2.x
+# [pandas] - depends on numpy >= 2.x
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
 DEPENDS += python/pandas
 endif
+
+# [Pendulum]
+# Needs atomic to build
+# Serves as maturin type python-wheel.mk example
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += python/pendulum
+endif
+
+# [Pillow]
+DEPENDS += python/pillow
+
+# [psutil]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [psutil] -std=gnu99
+endif
+
+# [pycares]
+DEPENDS += cross/c-ares
+ENV += PYCARES_USE_SYSTEM_LIB=1
+
+# [pycurl]
+DEPENDS += cross/curl
+ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+
+# [pydantic-core] 
+DEPENDS += python/pydantic-core
+
+# [PyNaCl]
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+# [PyYAML]
+DEPENDS += cross/libyaml
 
 # [pycryptodome]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
@@ -177,7 +167,29 @@ ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
 DEPENDS += python/pygobject
 endif
 
+# [rencode]
+DEPENDS += python/rencode
+
+# [rpds-py]
+# Require environment variables
+#   PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
+#   PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
+# Version = 0.24 requires rustc >= 1.82 (qoriq)
+# Version = 0.25 requires rustc >= 1.85
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += rpds_py==0.24.0
+else
+WHEELS += rpds_py==0.30.0
+endif
+
 # [ruamel.yaml.clib]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
 endif
+
+# [scipy] - depends on numpy >= 2.x
+ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
+DEPENDS += python/scipy
+endif
+
+include ../../mk/spksrc.python.mk

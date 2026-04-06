@@ -1,7 +1,7 @@
 PKG_NAME = scipy
 # Version >= 1.14.x requires gcc>=9.1 -> DSM-7.2+
 # Or using patch to enforce lower minimal gcc-8.5
-PKG_VERS = 1.15.3
+PKG_VERS = 1.17.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/s/scipy
@@ -18,8 +18,18 @@ REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
-DEPENDS  = python/numpy
+OPTIONAL_DEPENDS  = python/numpy
+OPTIONAL_DEPENDS  = python/numpy-latest
+
 DEPENDS += cross/openblas
+# On older python 3.11 keep using numpy 2.2.x
+# Python 3.10 is no longer supported 
+ifneq ($(filter %311,$(PYTHON_PACKAGE)),)
+DEPENDS  = python/numpy
+else
+DEPENDS  = python/numpy-latest
+endif
+
 CONFIGURE_ARGS  = --cross-file=$(WORK_DIR)/$(PKG_DIR)/scipy.meson
 
 POST_CONFIGURE_TARGET = scipy_post_configure
@@ -27,7 +37,6 @@ POST_CONFIGURE_TARGET = scipy_post_configure
 include ../../mk/spksrc.python-wheel-meson.mk
 
 .PHONY: scipy_post_configure
-
 scipy_post_configure:
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@echo "[properties]" > $(WORK_DIR)/$(PKG_DIR)/scipy.meson

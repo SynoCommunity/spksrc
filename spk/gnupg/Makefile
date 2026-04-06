@@ -1,6 +1,6 @@
 SPK_NAME = gnupg
-SPK_VERS = 2.4.8
-SPK_REV = 7
+SPK_VERS = 2.4.9
+SPK_REV = 8
 SPK_ICON = src/gnupg.png
 
 DEPENDS = cross/gnupg
@@ -9,7 +9,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = GnuPG allows to encrypt and sign your data and communication, features a versatile key management system as well as access modules for all kinds of public key directories.
 STARTABLE = no
 DISPLAY_NAME = GnuPG
-CHANGELOG = "1. Update gnupg to 2.4.8<br/>2. Update shared libraries."
+CHANGELOG = "Update GnuPG to 2.4.9."
 
 HOMEPAGE = https://www.gnupg.org/
 LICENSE  = GPLv3

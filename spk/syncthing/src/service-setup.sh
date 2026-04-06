@@ -19,7 +19,7 @@ set_credentials() {
         # Password needs to be hashed for config entry
         # Required to run any syncthing command: set $HOME environment variable
         HOME=${SYNOPKG_PKGVAR} ${SYNCTHING} generate    \
-                --config=${SYNOPKG_PKGVAR}              \
+                ${SYNCTHING_CONFIG}                     \
                 --gui-user="${wizard_username}"         \
                 --gui-password="${wizard_password}"
     fi
