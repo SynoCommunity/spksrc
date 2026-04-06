@@ -142,7 +142,7 @@ jobs:
         id: cache-restore
         uses: actions/cache/restore@v5
         with:
-          path: distrib
+          path: ${{ github.workspace }}/distrib
           # Use a placeholder key that will never match for the exact key,
           # forcing GitHub to use restore-keys to find the best available cache
           key: distrib-placeholder-${{ github.run_id }}
@@ -192,7 +192,7 @@ jobs:
         if: steps.cache-check.outputs.save_cache == 'true'
         uses: actions/cache/save@v5
         with:
-          path: distrib
+          path: ${{ github.workspace }}/distrib
           key: distrib-${{ steps.distrib-hash.outputs.hash }}
 
   set-defaults:
@@ -362,83 +362,77 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
       # Free up disk space on GitHub runner before build starts
-      - name: Free Disk Space (Ubuntu)
+      - name: Disk Space BEFORE Cleanup
         run: |
           # Capture initial disk space before cleanup
           {
             echo "=========================================="
             echo "DISK SPACE BEFORE CLEANUP"
             echo "=========================================="
-            df -h
+
             echo ""
-            echo "=== Largest directories in workspace ==="
-            du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
-          } > disk_usage_start.txt
-          
-          # Also display to console
-          cat disk_usage_start.txt
-          
-          echo ""
-          echo "=== Removing unnecessary packages and files ==="
-          
-          # Remove Android SDK/NDK (takes ~10-15GB)
-          sudo rm -rf /usr/local/lib/android || true
-          
-          # Remove .NET runtime (takes ~2GB)
-          sudo rm -rf /usr/share/dotnet || true
-          
-          # Remove Haskell (takes ~5GB)
-          sudo rm -rf /opt/ghc || true
-          sudo rm -rf /usr/local/.ghcup || true
-          
-          # Remove large tool caches
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
-          
-          # Remove Docker images we don't need (keep space for our build image)
-          docker rmi $(docker image ls -aq) 2>/dev/null || true
-          
-          # Remove swap file if exists (can free 4GB+)
-          sudo swapoff -a || true
-          sudo rm -f /swapfile /mnt/swapfile || true
-          
-          # Clean apt cache
-          sudo apt-get clean || true
-          
-          # Remove large packages we don't need
-          sudo apt-get remove -y '^aspnetcore-.*' '^dotnet-.*' '^llvm-.*' 'php.*' '^mongodb-.*' '^mysql-.*' 'azure-cli' 'google-cloud-sdk' 'google-chrome-stable' 'firefox' 'powershell' 'mono-devel' 'temurin-.*' || true
-          sudo apt-get autoremove -y || true
-          sudo apt-get clean || true
-          
+            echo "=== FILESYSTEM USAGE (df -h) ==="
+            df -h
+
+            echo ""
+            echo "=== SWAP (swapon --show) ==="
+            swapon --show
+          } > disk_usage_cleanup.txt
+
+          # Display to console
+          cat disk_usage_cleanup.txt
+
+      - name: Maximize disk space
+        uses: easimon/maximize-build-space@v10
+        with:
+          root-reserve-mb: 49152
+          temp-reserve-mb: 10240
+          swap-size-mb: 4096
+          remove-android: true
+          remove-codeql: true
+          remove-docker-images: false
+          remove-dotnet: true
+          remove-haskell: true
+
+      - name: Disk Space AFTER Cleanup
+        run: |
           # Capture disk space after cleanup
           {
             echo ""
             echo "=========================================="
             echo "DISK SPACE AFTER CLEANUP"
             echo "=========================================="
+
+            echo ""
+            echo "=== BLOCK DEVICES (lsblk) ==="
+            lsblk
+
+            echo ""
+            echo "=== FILESYSTEM USAGE (df -h) ==="
             df -h
+
+            echo ""
+            echo "=== SWAP (swapon --show) ==="
+            swapon --show
+
             echo ""
             echo "=== Space freed calculation ==="
-            df -h / | tail -1 | awk '{print "Available space: " $4}'
-          } >> disk_usage_start.txt
-          
-          # Display cleanup results to console
-          echo ""
-          echo "=== Disk space after cleanup ==="
-          df -h
-          echo ""
-          echo "=== Space freed calculation ==="
-          df -h / | tail -1 | awk '{print "Available space: " $4}'
+            df -h /home/runner/work/spksrc/spksrc | tail -1 | awk '{print "Available space: " $4}'
+          } >> disk_usage_cleanup.txt
+
+          # Display to console
+          cat disk_usage_cleanup.txt
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
       - name: Cache toolchains
         uses: actions/cache@v5
         # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
         if: ${{ contains(matrix.arch,'qoriq') == false }}
         with:
-          path: toolchain/*/work
+          path: ${{ github.workspace }}/toolchain/*/work
           key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
 
       # Check disk space after toolchain cache restore
@@ -450,7 +444,7 @@ jobs:
       - name: Restore distrib cache
         uses: actions/cache/restore@v5
         with:
-          path: distrib
+          path: ${{ github.workspace }}/distrib
           # Use a placeholder key that will never match for the exact key,
           # forcing GitHub to use restore-keys to find the best available cache
           key: distrib-placeholder-${{ github.run_id }}
@@ -492,15 +486,17 @@ jobs:
       - name: Disk Space After Build
         if: always()
         run: |
+          echo ""
           echo "=== Disk Space after Build ==="
           df -h
+
           echo ""
           echo "=== Largest directories after build ==="
-          du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
-          echo ""
+          du -h -d 2 /home/runner/work/spksrc/spksrc 2>/dev/null | sort -hr | head -20 || true
           
           # Create detailed disk usage report
           {
+            echo ""
             echo "=========================================="
             echo "WORKSPACE DIRECTORIES"
             echo "=========================================="
@@ -553,10 +549,10 @@ jobs:
             echo "=========================================="
             df -h
             
-          } > disk_usage_end.txt
+          } > disk_usage_build.txt
           
           # Also display to console
-          cat disk_usage_end.txt
+          cat disk_usage_build.txt
           
           # Check if running low on disk space
           DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
@@ -651,7 +647,7 @@ jobs:
           mkdir -p artifacts/diagnostics
 
           # Copy files in the diagnostics directory
-          for file in disk_usage_start.txt disk_usage_end.txt docker_logs.txt build_errors.txt build_log_errors.txt build_unsupported.txt build_success.txt; do
+          for file in disk_usage_cleanup.txt disk_usage_build.txt docker_logs.txt build_errors.txt build_log_errors.txt build_unsupported.txt build_success.txt; do
               [ -f "$file" ] && cp "$file" "artifacts/diagnostics/$file"
           done
 
@@ -666,7 +662,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: diagnostics-${{ matrix.arch }}
-          path: artifacts/diagnostics/
+          path: ${{ github.workspace }}/artifacts/diagnostics/
           if-no-files-found: ignore
           retention-days: 1
           compression-level: 9
@@ -676,7 +672,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Packages for ${{ matrix.arch }}
-          path: packages/*.spk
+          path: ${{ github.workspace }}/packages/*.spk
           if-no-files-found: ignore
 
   consolidate-diagnostics:
@@ -689,14 +685,14 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           pattern: diagnostics-*
-          path: all-diagnostics
+          path: ${{ github.workspace }}/all-diagnostics
           merge-multiple: false
 
       - name: Upload consolidated diagnostics
         uses: actions/upload-artifact@v7
         with:
           name: Diagnostics
-          path: all-diagnostics/**
+          path: ${{ github.workspace }}/all-diagnostics/**
           if-no-files-found: ignore
           retention-days: 30
           compression-level: 9
