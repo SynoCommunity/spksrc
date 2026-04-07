@@ -176,6 +176,7 @@ endif
 # [pycurl]
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+ENV += PYCURL_OPENSSL_DIR=$(OPENSSL_STAGING_INSTALL_PREFIX)
 
 # [pydantic-core]
 DEPENDS += python/pydantic-core

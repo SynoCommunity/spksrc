@@ -160,6 +160,7 @@ ENV += PYCARES_USE_SYSTEM_LIB=1
 # [pycurl]
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+ENV += PYCURL_OPENSSL_DIR=$(OPENSSL_STAGING_INSTALL_PREFIX)
 
 # [pycryptodome]
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
