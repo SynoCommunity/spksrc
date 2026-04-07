@@ -1,6 +1,6 @@
 TC_NAME = syno-x64
 
-TC_ARCH = apollolake avoton braswell broadwell broadwellnk broadwellnkv2 broadwellntbap bromolow denverton epyc7002 geminilake geminilakenk grantley kvmx64 purley r1000 r1000nk v1000 v1000nk
+TC_ARCH = apollolake avoton braswell broadwell broadwellnk broadwellnkv2 broadwellntbap bromolow denverton epyc7002 geminilake geminilakenk grantley icelaked kvmx64 purley r1000 r1000nk v1000 v1000nk
 TC_VERS = 7.2
 # kernel is "4.4.302+"; despite TC_DIST_SITE_PATH is "Intel x86 Linux 4.4.180 (Apollolake)"
 TC_KERNEL = 4.4.302
