@@ -81,7 +81,7 @@ if [ "${GH_ARCH%%-*}" = "noarch" ]; then
         if [ "${DSM_VERSION}" = "${version}" ]; then
             v=${version//.}
             var="NOARCH_MIN_DSM${v^^}_PACKAGES"
-            build_packages="${!var}"
+            build_packages="${!var:-${NOARCH_PACKAGES}}"
             break
         fi
     done
@@ -91,7 +91,7 @@ else
         if [ "${DSM_VERSION}" = "${version}" ]; then
             v=${version//.}
             var="ARCH_MIN_DSM${v^^}_PACKAGES"
-            build_packages="${!var}"
+            build_packages="${!var:-${ARCH_PACKAGES}}"
             break
         fi
     done
