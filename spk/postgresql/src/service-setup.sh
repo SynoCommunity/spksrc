@@ -117,7 +117,7 @@ service_postinst()
     # Switch local authentication to scram-sha-256 for regular users
     # Keep peer auth for the system user (sc-postgresql) to allow passwordless backups
     # Order matters: first matching rule wins, so system user rule must come first
-    run_as_user "sed -e 's/^local.*all.*all.*peer$/local   all             ${EFF_USER}                             peer\\nlocal   all             all                                     scram-sha-256/' -i ${HBA_FILE}"
+    run_as_user "sed -e 's/^local.*all.*all.*peer$/local   all             ${EFF_USER}                           peer\\nlocal   all             all                                     scram-sha-256/' -i ${HBA_FILE}"
 
     # Stop server (will be started by DSM)
     run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop"
