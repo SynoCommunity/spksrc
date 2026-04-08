@@ -7,8 +7,11 @@
 # Functions:
 # - Build all packages depending on files defined in ${ARCH_PACKAGES} or ${NOARCH_PACKAGES}.
 # - Build for arch defined by ${GH_ARCH} (e.g. x64-6.1, noarch, ...).
-# - For DSM versions above the default builds, only packages declared for that
-#   minimum DSM version are built (driven by MIN_DSM<V>_PACKAGES env vars).
+# - For DSM versions above the default builds, packages declared for that minimum
+#   DSM version are built (driven by MIN_DSM<V>_PACKAGES env vars). If no
+#   DSM-restricted packages are present, standard packages are built instead,
+#   allowing packages that behave differently per DSM version (but declare no
+#   minimum) to be built on all selected toolchains.
 # - Successfully built packages are logged to ${BUILD_SUCCESS_FILE}.
 # - Failed builds are logged to ${BUILD_ERROR_FILE} and annotated as error.
 # - For failed builds, the make command and the latest 15 lines of the build output are written to ${BUILD_ERROR_LOGFILE}.
@@ -81,7 +84,8 @@ if [ "${GH_ARCH%%-*}" = "noarch" ]; then
         if [ "${DSM_VERSION}" = "${version}" ]; then
             v=${version//.}
             var="NOARCH_MIN_DSM${v^^}_PACKAGES"
-            build_packages="${!var}"
+            # No DSM-restricted packages — fall back to standard noarch packages
+            build_packages="${!var:-${NOARCH_PACKAGES}}"
             break
         fi
     done
@@ -91,7 +95,8 @@ else
         if [ "${DSM_VERSION}" = "${version}" ]; then
             v=${version//.}
             var="ARCH_MIN_DSM${v^^}_PACKAGES"
-            build_packages="${!var}"
+            # No DSM-restricted packages — fall back to standard arch packages
+            build_packages="${!var:-${ARCH_PACKAGES}}"
             break
         fi
     done
