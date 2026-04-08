@@ -1,6 +1,6 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 25
+SPK_REV = 26
 SPK_ICON = src/radarr.png
 
 OPTIONAL_DEPENDS = cross/libstdc++ cross/libe_sqlite3
