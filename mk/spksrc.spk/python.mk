@@ -4,6 +4,11 @@ ifeq ($(strip $(PYTHON_PACKAGE)),)
   PYTHON_PACKAGE = python312
 endif
 
+# Mark default unsupported archs
+ifeq ($(call version_ge, $(PYTHON_PACKAGE), python312),1)
+  UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+endif
+
 # set default spk/python* path to use
 PYTHON_PACKAGE_DIR = $(abspath $(CURDIR)/../../spk/$(PYTHON_PACKAGE))
 PYTHON_PACKAGE_WORK_DIR = $(PYTHON_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
