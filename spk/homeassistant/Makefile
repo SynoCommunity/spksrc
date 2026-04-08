@@ -43,6 +43,9 @@ DEPENDS = cross/unzip
 # Cross compiled wheels that are not available in the index
 WHEELS = src/requirements-crossenv.txt
 
+# [aiokafka] requires local zlib
+DEPENDS += cross/zlib
+
 # [DTLSSocket] runtime dependency of [tradfri]
 DEPENDS += python/dtlssocket
 
