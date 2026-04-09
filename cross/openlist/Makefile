@@ -1,5 +1,5 @@
 PKG_NAME = OpenList
-PKG_VERS = 4.1.10
+PKG_VERS = 4.2.0
 # must match PKG_VERS of cross/openlist-frontend (adjust if different)
 WEB_VERSION = $(PKG_VERS)
 PKG_EXT = tar.gz
@@ -29,15 +29,15 @@ GIT_AUTHOR = "SynoCommunity/spksrc"
 # git commit of SynoCommunity/spksrc repo
 GIT_COMMIT = $(shell git log --pretty=format:"%h" -1)
 
-CGO_ENABLED = 1
+CGO_ENABLED = 0
 GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
 GO_BIN_DIR = $(GO_SRC_DIR)/openlist
 GO_LDFLAGS = -w -s \
-  -X 'github.com/OpenListTeam/OpenList/internal/conf.BuiltAt=$(BUILT_AT)' \
-  -X 'github.com/OpenListTeam/OpenList/internal/conf.GitAuthor=$(GIT_AUTHOR)' \
-  -X 'github.com/OpenListTeam/OpenList/internal/conf.GitCommit=$(GIT_COMMIT)' \
-  -X 'github.com/OpenListTeam/OpenList/internal/conf.Version=$(PKG_VERS)' \
-  -X 'github.com/OpenListTeam/OpenList/internal/conf.WebVersion=$(WEB_VERSION)'
+  -X 'github.com/OpenListTeam/OpenList/v4/internal/conf.BuiltAt=$(BUILT_AT)' \
+  -X 'github.com/OpenListTeam/OpenList/v4/internal/conf.GitAuthor=$(GIT_AUTHOR)' \
+  -X 'github.com/OpenListTeam/OpenList/v4/internal/conf.GitCommit=$(GIT_COMMIT)' \
+  -X 'github.com/OpenListTeam/OpenList/v4/internal/conf.Version=$(PKG_VERS)' \
+  -X 'github.com/OpenListTeam/OpenList/v4/internal/conf.WebVersion=$(WEB_VERSION)'
 
 include ../../mk/spksrc.cross-go.mk
 
