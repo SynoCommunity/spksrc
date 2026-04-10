@@ -85,18 +85,6 @@ $(1)_msg:
 	@$(MSG) "*********************************************************************"
 	@$(MSG) "*** Use existing shared objects from [$($(1)_PACKAGE)]"
 	@$(MSG) "*** PATH: $($(1)_PACKAGE_WORK_DIR)"
-ifneq ($(OPENSSL_INSTALL_PREFIX),)
-	@$(MSG) "*** libssl.so: $(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/libssl.so)"
-endif
-	@$(MSG) "*** DEPENDS: $(DEPENDS)"
-	@$(MSG) "*** SPK_DEPENDS: $(SPK_DEPENDS)"
-	@$(MSG)
-	@$(MSG) "*** OPENSSL_INSTALL_PREFIX: $(OPENSSL_INSTALL_PREFIX)"
-	@$(MSG) "*** OPENSSL_STAGING_INSTALL_PREFIX: $(OPENSSL_STAGING_INSTALL_PREFIX)"
-	@$(MSG) "*** ADDITIONAL_LDFLAGS: $(ADDITIONAL_LDFLAGS)"
-	@$(MSG) "*** ADDITIONAL_RUSTFLAGS: $(ADDITIONAL_RUSTFLAGS)"
-	@$(MSG) "*** $(1)_DIRECT_DEPENDS: $($(1)_DIRECT_DEPENDS)"
-	@$(MSG) "*** $(1)_DEPENDS_FILTERED: $($(1)_DEPENDS_FILTERED)"
 	@$(MSG) "*********************************************************************"
 
 .PHONY: $(1)_links
