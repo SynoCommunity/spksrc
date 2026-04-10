@@ -37,5 +37,7 @@ ifneq ($(and $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKECM
   export META_DEPENDS
   $(eval $(call SPK_BASE_TEMPLATE,PYTHON))
 else
+  export PYTHON_PACKAGE
+  export PYTHON_PACKAGE_DIR
   DEPENDS += $(PYTHON_DEPENDS)
 endif
