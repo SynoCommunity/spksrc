@@ -1,5 +1,5 @@
 SPK_NAME = openlist
-SPK_VERS = 4.2.0
+SPK_VERS = 4.2.1
 SPK_REV = 9
 SPK_ICON = src/openlist.png
 
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 MAINTAINER = GrandDuke1106
 DESCRIPTION = A file list program that supports multiple storages, powered by Gin and SolidJS, fork of AList.
 DISPLAY_NAME = OpenList
-CHANGELOG = "1. Update to 4.2.0"
+CHANGELOG = "1. Update to 4.2.1"
 
 HOMEPAGE = https://docs.oplist.org/
 LICENSE = AGPL-3.0
