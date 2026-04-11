@@ -14,17 +14,11 @@ LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
-# Build Library and Package for Python 3.12
-# Depends on prebuilt python.
-include $(or $(wildcard $(WORK_DIR)/crossenv/build/python-cc.mk), $(wildcard $(PYTHON_PACKAGE_WORK_DIR)/crossenv/build/python-cc.mk))
-PYTHON_NAME = $(basename $(notdir $(PYTHON_INTERPRETER)))
-PYTHONVERS = python3.12
-CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/$(PYTHON_NAME)/work-native/install/usr/local/bin/$(PYTHON_NAME)
-ADDITIONAL_CFLAGS += -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR) -O
-
 # let it find python*-configure
 ENV += PATH=$$PATH:$(PYTHON_STAGING_INSTALL_PREFIX)/bin
 
+PYTHONVERS = $(notdir $(wildcard $(or $(PYTHON_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/include/python3*))
+ADDITIONAL_CFLAGS += -I$(or $(PYTHON_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/include/$(PYTHONVERS) -O
 CONFIGURE_ARGS  = --with-python=$(PYTHONVERS)
 CONFIGURE_ARGS += --without-tcl
 
@@ -32,12 +26,6 @@ PRE_CONFIGURE_TARGET = newt_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: python_dependency
-python_dependency:
-ifneq ($(PYTHON_PACKAGE),python312)
-	$(error "This package must be built withing PYTHON_PACKAGE for Python 3.12")
-endif
-
 .PHONY: newt_pre_configure
-newt_pre_configure: python_dependency
+newt_pre_configure:
 	@$(RUN) ; ./autogen.sh
