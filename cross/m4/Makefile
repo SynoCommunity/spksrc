@@ -1,5 +1,5 @@
 PKG_NAME = m4
-PKG_VERS = 1.4.19
+PKG_VERS = 1.4.21
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/m4/
