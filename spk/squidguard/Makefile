@@ -6,6 +6,9 @@ BETA = 1
 
 DEPENDS = cross/busybox cross/unrar cross/squidclamav cross/squidguard cross/squid cross/squidguardmanager
 
+# DSM 7 does not allow to run package as root
+REQUIRED_MAX_DSM = 6.999
+
 SPK_DEPENDS = "AntiVirus>1.2"
 
 MAINTAINER = SynoCommunity
@@ -14,26 +17,29 @@ DESCRIPTION_FRE = SquidGuard est un proxy HTTP, basé sur squid, qui permet de f
 DISPLAY_NAME = SquidGuard
 
 HOMEPAGE = http://www.squidguard.org/
-LICENSE  = GPL - Copyright © 1990,2007 Oracle.  All rights reserved for berkeley db library. See LICENSE file.
+LICENSE = GPL - Copyright © 1990,2007 Oracle.  All rights reserved for berkeley db library. See LICENSE file.
 
 # Toolchains lacking c++11 in conjunction with
 # march=native compiler are not supported
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
-CONF_DIR         = src/conf/
+SSS_SCRIPT = src/dsm-control.sh
+FWPORTS = src/squidguard.sc
+CONF_DIR = src/conf/
 
-POST_STRIP_TARGET = xz-compress
+POST_STRIP_TARGET = squidguard_extra_install
 
+# REMARKS:
+# This package is not yet updated to generic service installer
+# when migrated from INSTALLER_SCRIPT to SERVICE_SETUP, the busybox dependency is obsolete
 BUSYBOX_CONFIG = usrmng
 ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
-.PHONY: xz-compress
-xz-compress:
+.PHONY: squidguard_extra_install
+squidguard_extra_install:
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 755 -d $(STAGING_DIR)/libexec
 	install -m 755 -d $(STAGING_DIR)/bin
