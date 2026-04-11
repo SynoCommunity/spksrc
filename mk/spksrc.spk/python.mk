@@ -39,5 +39,5 @@ ifneq ($(and $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKECM
 else
   export PYTHON_PACKAGE
   export PYTHON_PACKAGE_DIR
-  DEPENDS += $(PYTHON_DEPENDS)
+  DEPENDS := $(call uniq,$(PYTHON_DEPENDS) $(DEPENDS))
 endif
