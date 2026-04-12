@@ -105,7 +105,7 @@ DEFAULT_ENV ?= autotools flags rust
 # Map DEFAULT_ENV definitions to filenames
 TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).mk))
 
-# Load full toolchain environment ONLY after tc_vars have been generated
+# Load full toolchain environment ONLY after tc_vars have been generated at stage1
 ifeq ($(wildcard $(TCVARS_DONE)),$(TCVARS_DONE))
   ENV += TC=$(TC)
   $(eval -include $(TC_VARS_MK))

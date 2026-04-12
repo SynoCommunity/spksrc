@@ -26,9 +26,6 @@
 #  DSM_SCRIPT_FILES             List of script files that are in the scripts folder within the spk file.
 #
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
@@ -58,6 +55,9 @@ endif
 
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 ifeq ($(ARCH),noarch)
 ifneq ($(strip $(TCVERSION)),)
