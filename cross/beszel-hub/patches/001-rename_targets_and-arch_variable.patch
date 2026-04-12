@@ -1,8 +1,8 @@
 # rename ARCH variable to avoid conflicts with spksrc framework
 # avoid OS and _ARCH in target names
 # 
---- Makefile.orig	2025-04-29 00:57:27.000000000 +0000
-+++ Makefile	2025-05-13 17:02:39.916955450 +0000
+--- Makefile.orig	2026-04-05 20:14:39.000000000 +0000
++++ Makefile	2026-04-12 10:45:45.828021891 +0000
 @@ -1,6 +1,6 @@
  # Default OS/ARCH values
  OS ?= $(shell go env GOOS)
@@ -10,17 +10,17 @@
 +_ARCH ?= $(shell go env GOARCH)
  # Skip building the web UI if true
  SKIP_WEB ?= false
+ # Controls NVML/glibc agent build tag behavior:
+@@ -87,10 +87,10 @@
  
-@@ -31,10 +31,10 @@
- 	fi
- 
- build-agent: tidy
--	GOOS=$(OS) GOARCH=$(ARCH) go build -o ./build/beszel-agent_$(OS)_$(ARCH) -ldflags "-w -s" beszel/cmd/agent
-+	GOOS=$(OS) GOARCH=$(_ARCH) go build -o ./build/beszel-agent -ldflags "-w -s" beszel/cmd/agent
+ # Update build-agent to include conditional .NET build
+ build-agent: tidy build-dotnet-conditional fetch-smartctl-conditional
+-	GOOS=$(OS) GOARCH=$(ARCH) go build $(AGENT_GO_TAGS) -o ./build/beszel-agent_$(OS)_$(ARCH)$(EXE_EXT) -ldflags "-w -s" ./internal/cmd/agent
++	GOOS=$(OS) GOARCH=$(_ARCH) go build $(AGENT_GO_TAGS) -o ./build/beszel-agent -ldflags "-w -s" ./internal/cmd/agent
  
  build-hub: tidy $(if $(filter false,$(SKIP_WEB)),build-web-ui)
--	GOOS=$(OS) GOARCH=$(ARCH) go build -o ./build/beszel_$(OS)_$(ARCH) -ldflags "-w -s" beszel/cmd/hub
-+	GOOS=$(OS) GOARCH=$(_ARCH) go build -o ./build/beszel -ldflags "-w -s" beszel/cmd/hub
+-	GOOS=$(OS) GOARCH=$(ARCH) go build -o ./build/beszel_$(OS)_$(ARCH)$(EXE_EXT) -ldflags "-w -s" ./internal/cmd/hub
++	GOOS=$(OS) GOARCH=$(_ARCH) go build -o ./build/beszel -ldflags "-w -s" ./internal/cmd/hub
  
- build: build-agent build-hub
- 
+ build-hub-dev: tidy
+ 	mkdir -p ./internal/site/dist && touch ./internal/site/dist/index.html
