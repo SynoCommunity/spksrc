@@ -18,10 +18,9 @@ CMAKE_ARGS += -DJAS_ENABLE_PROGRAMS=OFF
 CMAKE_ARGS += -DJAS_STDC_VERSION=199901L
 CMAKE_ARGS += -DCMAKE_C_FLAGS_RELEASE="-O"
 
-include ../../mk/spksrc.cross-cmake.mk
-
 # Avoid build dir within source:
 # The useof an in-source build is not officially supported and is 
 # therefore disallowed by default. 
-CMAKE_BUILD_DIR = $(CMAKE_BASE_DIR)/../jasper.build
-CMAKE_ARGS += -B$(CMAKE_BUILD_DIR)
+CMAKE_BUILD_DIR = $(abspath $(CMAKE_BASE_DIR)/../jasper.build)
+
+include ../../mk/spksrc.cross-cmake.mk

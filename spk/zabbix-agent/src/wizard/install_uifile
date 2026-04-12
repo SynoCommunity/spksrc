@@ -1,0 +1,60 @@
+[
+  {
+    "step_title": "Zabbix Server Connection",
+    "items": [
+      {
+        "desc": "Configure the Zabbix server or proxy that will monitor this device."
+      },
+      {
+        "type": "textfield",
+        "desc": "<b>Server</b><br/>Zabbix server/proxy IPs or hostnames allowed to connect.<br/>Example: <code>192.168.1.100</code>",
+        "subitems": [
+          {
+            "key": "wizard_Server",
+            "desc": "Server",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "step_title": "Active Checks (Optional)",
+    "items": [
+      {
+        "desc": "Configure active checks if your server requires the agent to initiate connections."
+      },
+      {
+        "type": "textfield",
+        "desc": "<b>ServerActive</b><br/>Server address for active checks.<br/>Example: <code>192.168.1.100:10051</code>",
+        "subitems": [
+          {
+            "key": "wizard_ServerActive",
+            "desc": "ServerActive",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": true
+            }
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "desc": "<b>Hostname</b><br/>Must match the name in Zabbix server. If blank, uses system hostname.<br/>Example: <code>MyNAS</code>",
+        "subitems": [
+          {
+            "key": "wizard_Hostname",
+            "desc": "Hostname",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": true
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

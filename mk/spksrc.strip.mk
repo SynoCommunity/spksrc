@@ -13,11 +13,8 @@
 #  $(INSTALL_PLIST)  Pair of type:filepath, type can be bin, lib, lnk, or rsc. Only bin and lib
 #                    files will be stripped. 
 
-ifeq ($(TC),)
-STRIP=strip
-else
-STRIP=$(patsubst STRIP=%,%,$(filter STRIP=%,$(TC_ENV)))
-endif
+# Prefer target strip if present, otherwise fallback to host strip
+STRIP := $(or $(wildcard $(TC_PATH)/$(TC_PREFIX)strip),strip)
 
 STRIP_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)strip_done
 

@@ -1,0 +1,3 @@
+lnk:lib/libpq.so
+lnk:lib/libpq.so.5
+lib:lib/libpq.so.5.16

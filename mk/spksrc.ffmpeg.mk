@@ -12,24 +12,24 @@ endif
 # set default spk/synocli-videodriver path to use
 export FFMPEG_PACKAGE_ROOT = $(realpath $(CURDIR)/../../spk/$(FFMPEG_PACKAGE)/work-$(ARCH)-$(TCVERSION))
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifneq ($(wildcard $(FFMPEG_PACKAGE_ROOT)),)
 
 # Set videodriver installtion prefix directory variables
-ifeq ($(strip $(FFMPEG_STAGING_PREFIX)),)
-export FFMPEG_PREFIX = /var/packages/$(FFMPEG_PACKAGE)/target
-export FFMPEG_STAGING_PREFIX = $(realpath $(FFMPEG_PACKAGE_ROOT)/install/$(FFMPEG_PREFIX))
+ifeq ($(strip $(FFMPEG_STAGING_INSTALL_PREFIX)),)
+export FFMPEG_INSTALL_PREFIX = /var/packages/$(FFMPEG_PACKAGE)/target
+export FFMPEG_STAGING_INSTALL_PREFIX = $(realpath $(FFMPEG_PACKAGE_ROOT)/install/$(FFMPEG_INSTALL_PREFIX))
 endif
 
 # set build flags including ld to rewrite for the library path
 # used to access ffmpeg package provide libraries at destination
-ifneq ($(strip $(FFMPEG_STAGING_PREFIX)),)
-export ADDITIONAL_CFLAGS   += -I$(FFMPEG_STAGING_PREFIX)/include
-export ADDITIONAL_CPPFLAGS += -I$(FFMPEG_STAGING_PREFIX)/include
-export ADDITIONAL_CXXFLAGS += -I$(FFMPEG_STAGING_PREFIX)/include
-export ADDITIONAL_LDFLAGS  += -L$(FFMPEG_STAGING_PREFIX)/lib
-export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(FFMPEG_STAGING_PREFIX)/lib -Wl,--rpath,$(FFMPEG_PREFIX)/lib
+ifneq ($(strip $(FFMPEG_STAGING_INSTALL_PREFIX)),)
+export ADDITIONAL_CFLAGS   += -I$(FFMPEG_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CPPFLAGS += -I$(FFMPEG_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_CXXFLAGS += -I$(FFMPEG_STAGING_INSTALL_PREFIX)/include
+export ADDITIONAL_LDFLAGS  += -L$(FFMPEG_STAGING_INSTALL_PREFIX)/lib
+export ADDITIONAL_LDFLAGS  += -Wl,--rpath-link,$(FFMPEG_STAGING_INSTALL_PREFIX)/lib -Wl,--rpath,$(FFMPEG_INSTALL_PREFIX)/lib
 
 # Re-use all default ffmpeg mandatory libraries
 FFMPEG_LIBS  = libavcodec.pc
@@ -64,5 +64,5 @@ endif
 	@$(MSG) "*** PATH: $(FFMPEG_PACKAGE_ROOT)"
 	@$(MSG) "*****************************************************"
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	@$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_STAGING_PREFIX)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
-	@$(foreach lib,$(MEDIA_LIBS),ln -sf $(FFMPEG_STAGING_PREFIX)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+	@$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+	@$(foreach lib,$(MEDIA_LIBS),ln -sf $(FFMPEG_STAGING_INSTALL_PREFIX)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)

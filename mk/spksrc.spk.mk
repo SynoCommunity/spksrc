@@ -50,6 +50,9 @@ SPK_NAME_ARCH = $(ARCH)
 endif
 SPK_TCVERS = $(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
+ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
+TK = $(TC)
+endif
 endif
 endif
 
@@ -96,9 +99,15 @@ SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK
 
 #####
 
+# Do not initialize any environment to avoid variable leakage.
+DEFAULT_ENV = none
+
+#####
+
 include ../../mk/spksrc.pre-check.mk
 
-# Even though this makefile doesn't cross compile, we need this to setup the cross environment.
+# Even though this makefile doesn't cross compile,
+# we need this to setup the cross environment.
 include ../../mk/spksrc.cross-env.mk
 
 include ../../mk/spksrc.depend.mk
@@ -491,7 +500,41 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons s
 
 package: $(SPK_FILE_NAME)
 
-all: package
+# -----------------------------------------------------------------------------
+# Stage1: Toolchain (MANDATORY) + Toolkit (OPTIONAL) bootstrap
+# -----------------------------------------------------------------------------
+TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
+TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
+
+.PHONY: spk-stage1
+spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
+
+ifneq ($(strip $(TC)),)
+$(TCVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+else
+$(TCVARS_DONE): ;
+endif
+
+# $(TK) is only being set if REQUIRE_TOOLKIT=1
+ifneq ($(strip $(TK)),)
+$(TKVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) toolkit
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) tkvars
+else
+$(TKVARS_DONE): ;
+endif
+
+# -----------------------------------------------------------------------------
+# Stage2: Define package as a real target that does the work
+# -----------------------------------------------------------------------------
+.PHONY: spk-stage2
+spk-stage2: package
+
+all:
+	$(call LOG_WRAPPED,spk-stage1)
+	$(call LOG_WRAPPED,spk-stage2)
 
 
 ### spk-specific clean rules
@@ -526,11 +569,14 @@ spkclean:
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
+	       work-*/.stage0-tcvars_done \
+	       work-*/.stage1-tcvars_done \
+	       work-*/.stage1-tkvars_done \
 	       work-*/.wheel_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
-	       work-*/tc_vars.mk \
+	       work-*/tc_vars*.mk \
 	       work-*/tc_vars.cmake \
 	       work-*/tc_vars.meson-* \
 	       work-*/package.tgz \
@@ -539,6 +585,7 @@ spkclean:
 	       work-*/PACKAGE_ICON* \
 	       work-*/WIZARD_UIFILES
 
+wheelclean: SHELL:=/bin/bash
 wheelclean: spkclean
 	rm -fr work*/.wheel_done \
 	       work*/.wheel_*_done \
@@ -547,9 +594,10 @@ wheelclean: spkclean
 	@make --no-print-directory dependency-flat | sort -u | grep '\(cross\|python\)/' | while read depend ; do \
 	   makefile="../../$${depend}/Makefile" ; \
 	   if grep -q 'spksrc\.python-wheel\(-meson\)\?\.mk' $${makefile} ; then \
-	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
-	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
-	      echo "rm -fr work-*/$${pkgname}*\\n       work-*/.$${pkgname}-*" ; \
+	      pkgvers=$$(grep ^PKG_VERS $${makefile} | cut -d= -f2 | xargs) ; \
+	      pkgname=$$(grep ^PKG_NAME $${makefile} | cut -d= -f2 | xargs) ; \
+	      pkgname=$${pkgname//\$$\(PKG_VERS\)/$${pkgvers}} ; \
+	      echo -ne "rm -fr work-*/$${pkgname}* \\ \\n       work-*/.$${pkgname}-* \\n" ; \
 	      rm -fr work-*/$${pkgname}* \
                      work-*/.$${pkgname}-* ; \
 	   fi ; \

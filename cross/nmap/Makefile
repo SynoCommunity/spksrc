@@ -19,8 +19,8 @@ CONFIGURE_ARGS  = --without-zenmap
 CONFIGURE_ARGS += --without-ndiff
 CONFIGURE_ARGS += --with-liblua=included
 CONFIGURE_ARGS += --with-libpcre=included
-ifneq ($(wildcard $(OPENSSL_STAGING_PREFIX)),)
-CONFIGURE_ARGS += --with-openssl=$(OPENSSL_STAGING_PREFIX)
+ifneq ($(wildcard $(OPENSSL_STAGING_INSTALL_PREFIX)),)
+CONFIGURE_ARGS += --with-openssl=$(OPENSSL_STAGING_INSTALL_PREFIX)
 endif
 
 ADDITIONAL_CPPFLAGS = -O3

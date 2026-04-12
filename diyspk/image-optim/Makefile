@@ -4,7 +4,7 @@ SPK_REV = 1
 
 # pngquant (pngquant3) must be built first
 OPTIONAL_DEPENDS = cross/pngquant
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifneq ($(findstring $(ARCH), $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS = cross/pngquant
 endif

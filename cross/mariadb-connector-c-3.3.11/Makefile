@@ -12,6 +12,7 @@ HOMEPAGE = https://mariadb.com/kb/en/mariadb-connector-c/
 COMMENT  = MariaDB C Connector
 LICENSE  = LGPL
 
+POST_INSTALL_TARGET = mariadb_post_install
 CMAKE_DISABLE_EXE_LINKER_FLAGS = 1
 
 # MySQL specific:
@@ -28,13 +29,13 @@ CMAKE_ARGS += -DWITH_MYSQLCOMPAT=ON
 
 # Does not handle pkgconfig well and fails to
 # find openssl3 include and libraries using
-# spksrc.python.mk thus using OPENSSL_STAGING_PREFIX
+# spksrc.python.mk thus using OPENSSL_STAGING_INSTALL_PREFIX
 DEPENDS += cross/openssl3
 CMAKE_ARGS += -DWITH_SSL=ON
-ifneq ($(wildcard $(OPENSSL_STAGING_PREFIX)),)
-CMAKE_ARGS += -DOPENSSL_CRYPTO_LIBRARY:FILEPATH=$(OPENSSL_STAGING_PREFIX)/lib/libcrypto.so
-CMAKE_ARGS += -DOPENSSL_SSL_LIBRARY:FILEPATH=$(OPENSSL_STAGING_PREFIX)/lib/libssl.so
-CMAKE_ARGS += -DOPENSSL_INCLUDE_DIR:PATH=$(OPENSSL_STAGING_PREFIX)/include
+ifneq ($(wildcard $(OPENSSL_STAGING_INSTALL_PREFIX)),)
+CMAKE_ARGS += -DOPENSSL_CRYPTO_LIBRARY:FILEPATH=$(OPENSSL_STAGING_INSTALL_PREFIX)/lib/libcrypto.so
+CMAKE_ARGS += -DOPENSSL_SSL_LIBRARY:FILEPATH=$(OPENSSL_STAGING_INSTALL_PREFIX)/lib/libssl.so
+CMAKE_ARGS += -DOPENSSL_INCLUDE_DIR:PATH=$(OPENSSL_STAGING_INSTALL_PREFIX)/include
 endif
 
 DEPENDS += cross/zlib
@@ -56,7 +57,7 @@ MYSQL_DB_SOCKET = /run/mysqld/mysqld.sock
 endif
 CMAKE_ARGS += -DMARIADB_UNIX_ADDR=$(MYSQL_DB_SOCKET)
 
-include ../../mk/spksrc.cross-cmake.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_gt, $(TC_GCC), 4.9),1)
 ADDITIONAL_CFLAGS += -Wno-error=maybe-uninitialized
@@ -72,3 +73,14 @@ ADDITIONAL_CFLAGS += -Wno-error=uninitialized
 # fails on hi3535-6.2.4
 ADDITIONAL_CFLAGS += -Wno-error=array-bounds
 endif
+
+include ../../mk/spksrc.cross-cmake.mk
+
+.PHONY: mariadb_post_install
+mariadb_post_install:
+	@cd $(WORK_DIR) && ln -s $(PKG_DIR) $(PKG_NAME)
+	install -m 755 -d $(CMAKE_BUILD_DIR)/NATIVE/bin
+	install -m 755 $(CURDIR)/mariadb_config $(CMAKE_BUILD_DIR)/NATIVE/bin
+	@sed -i -e 's%@STAGING_INSTALL_PREFIX@%$(STAGING_INSTALL_PREFIX)%g' $(CMAKE_BUILD_DIR)/NATIVE/bin/mariadb_config
+	@sed -i -e 's%@VERSION@%$(PKG_VERS)%g' $(CMAKE_BUILD_DIR)/NATIVE/bin/mariadb_config
+	@sed -i -e 's%@SOCKET@%$(MYSQL_DB_SOCKET)%g' $(CMAKE_BUILD_DIR)/NATIVE/bin/mariadb_config

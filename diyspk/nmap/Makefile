@@ -13,7 +13,7 @@ STARTABLE = no
 HOMEPAGE = https://nmap.org/
 LICENSE  = https://svn.nmap.org/nmap/LICENSE
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS = cross/nmap_7.92
 SPK_VERS = 7.92

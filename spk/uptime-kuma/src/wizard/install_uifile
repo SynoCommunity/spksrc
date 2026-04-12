@@ -1,0 +1,10 @@
+[
+    {
+        "step_title": "Uptime Kuma",
+        "items": [
+            {
+                "desc": "Uptime Kuma is a self-hosted monitoring tool for HTTP(s), TCP, Ping, DNS, Docker containers, and more.<br><br>Monitoring data is stored in <b>/var/packages/uptime-kuma/var/</b> and persists across upgrades. Include this directory in your backup strategy.<br><br>For more information, visit the <a target=\"_blank\" href=\"https://github.com/louislam/uptime-kuma/wiki\">Uptime Kuma Wiki</a>."
+            }
+        ]
+    }
+]

@@ -1,0 +1,11 @@
+--- scripts/dtc/dtc-parser.tab.c_shipped-orig	2015-07-29 03:58:43.000000000 +0000
++++ scripts/dtc/dtc-parser.tab.c_shipped	2026-03-08 22:05:19.276875458 +0000
+@@ -73,7 +73,7 @@
+ #include "dtc.h"
+ #include "srcpos.h"
+ 
+-YYLTYPE yylloc;
++extern YYLTYPE yylloc;
+ 
+ extern int yylex(void);
+ extern void print_error(char const *fmt, ...);

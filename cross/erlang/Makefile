@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = 24.3.4.13
+PKG_VERS = 25.3.2.21
 PKG_EXT = tar.gz
 PKG_DIST_NAME = OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/erlang/otp/archive
@@ -7,7 +7,7 @@ PKG_DIST_FILE = $(PKG_NAME)-OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = otp-OTP-$(PKG_VERS)
 
 BUILD_DEPENDS = native/erlang
-DEPENDS = cross/ncursesw cross/openssl
+DEPENDS = cross/ncursesw cross/openssl3
 
 HOMEPAGE = https://www.erlang.org
 COMMENT  = Erlang is a programming language used to build massively scalable soft real-time systems with requirements on high availability.
@@ -27,7 +27,7 @@ CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += erl_xcomp_sysroot=$(INSTALL_DIR)
 CONFIGURE_ARGS += CFLAGS="-O2 -g -D_GNU_SOURCE"
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 # custom definition of args normally defined with GNU_CONFIGURE = 1, to force cross compilation (see below)
 CONFIGURE_ARGS += --host=$(TC_TARGET) --prefix=$(INSTALL_PREFIX)
 

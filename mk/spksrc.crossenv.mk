@@ -124,25 +124,20 @@ crossenv-%:
 
 ####
 
-# Determine the correct Python install prefix:
-# - If PYTHON_PACKAGE_WORK_DIR exists (pre-built python package available),
-#   use the python package's install prefix by replacing SPK_NAME with PYTHON_PACKAGE
-# - Otherwise (python is built as a dependency), use the current package's install prefix
-ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
-PYTHON_INSTALL_PREFIX = $(subst $(SPK_NAME),$(PYTHON_PACKAGE),$(INSTALL_PREFIX))
-else
+# If python paths not-defined then use package default
+ifeq ($(PYTHON_INSTALL_PREFIX),)
 PYTHON_INSTALL_PREFIX = $(INSTALL_PREFIX)
 endif
-
-# Equivalent to STAGING_INSTALL_PREFIX relative to found python install
 ifeq ($(PYTHON_STAGING_INSTALL_PREFIX),)
-PYTHON_STAGING_INSTALL_PREFIX = $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX))
+PYTHON_STAGING_INSTALL_PREFIX = $(STAGING_INSTALL_PREFIX)
 endif
 
 # set OPENSSL_*_PREFIX if unset
-ifeq ($(strip $(OPENSSL_STAGING_PREFIX)),)
-OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_INSTALL_PREFIX)
-OPENSSL_PREFIX = $(PYTHON_INSTALL_PREFIX)
+ifeq ($(strip $(OPENSSL_STAGING_INSTALL_PREFIX)),)
+OPENSSL_STAGING_INSTALL_PREFIX = $(PYTHON_STAGING_INSTALL_PREFIX)
+endif
+ifeq ($(strip $(OPENSSL_INSTALL_PREFIX)),)
+OPENSSL_INSTALL_PREFIX = $(PYTHON_INSTALL_PREFIX)
 endif
 
 # Mandatory for rustc wheel building at crossenv preparation time
@@ -151,8 +146,8 @@ export PYO3_CROSS_LIB_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/lib/
 export PYO3_CROSS_INCLUDE_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/include/
 # Mandatory of using OPENSSL_*_DIR starting with cryptography version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
-export OPENSSL_LIB_DIR = $(OPENSSL_STAGING_PREFIX)/lib/
-export OPENSSL_INCLUDE_DIR = $(OPENSSL_STAGING_PREFIX)/include/
+export OPENSSL_LIB_DIR = $(OPENSSL_STAGING_INSTALL_PREFIX)/lib/
+export OPENSSL_INCLUDE_DIR = $(OPENSSL_STAGING_INSTALL_PREFIX)/include/
 
 # set PYTHONPATH for spksrc.python-module.mk
 export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages/
@@ -211,9 +206,18 @@ endif
 	$(RUN) $$(which cross-python) $(CROSSENV_PATH)/build/get-pip.py $(CROSSENV_CROSS_PIP) --no-setuptools --no-wheel --disable-pip-version-check ; \
 	$(RUN) $$(which cross-pip) $(PIP_BASIC_OPT) --cache-dir $(PIP_CACHE_DIR) install $(CROSSENV_CROSS_SETUPTOOLS) $(CROSSENV_CROSS_WHEEL) ; \
 	} > >(tee --append $(CROSSENV_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
-	@$(MSG) $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" requirement
-	@MAKEFLAGS= $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) REQUIREMENT="$(CROSSENV_REQUIREMENTS)" REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" requirement
-
+	@$(MSG) $(MAKE) \
+		ARCH=$(ARCH) \
+		TCVERSION=$(TCVERSION) \
+		REQUIREMENT=\"$(CROSSENV_REQUIREMENTS)\" \
+		REQUIREMENT_GOAL=\"crossenv-install-$(CROSSENV_WHEEL)\" \
+		requirement
+	@MAKEFLAGS= $(MAKE) \
+		ARCH=$(ARCH) \
+		TCVERSION=$(TCVERSION) \
+		REQUIREMENT="$(CROSSENV_REQUIREMENTS)" \
+		REQUIREMENT_GOAL="crossenv-install-$(CROSSENV_WHEEL)" \
+		requirement
 
 ### 
 ### crossenv-install-<crossenv>
@@ -224,6 +228,7 @@ crossenv-install-%:
 	. $(abspath $(WORK_DIR)/crossenv-$*)/bin/activate ; \
 	if [ -e "$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate" ] ; then \
 	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$*)/build/bin ; \
+	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
 	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate]" ; \
 	   $(MSG) "python: [$$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python)]" ; \
 	else \

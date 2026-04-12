@@ -19,7 +19,7 @@ CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 CMAKE_ARGS += -DSNAPPY_BUILD_TESTS=OFF
 CMAKE_ARGS += -DSNAPPY_BUILD_BENCHMARKS=OFF
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
 CMAKE_ARGS += -DSNAPPY_HAVE_NEON=OFF

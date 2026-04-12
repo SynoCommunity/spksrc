@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 7.0.3
+PKG_VERS = 7.1.3
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -9,8 +9,8 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
-# requires c11 support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# requires c11 and proper atomic using gcc-4.9+ support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.common.mk
 
@@ -23,13 +23,7 @@ CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
 ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-  ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
-    # Workaround for gcc-4.8.3 internal compilier bug in debug mode
-    CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2
-    CONFIGURE_ARGS += --extra-cflags=-O1
-  else
-    CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
-  endif
+  CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
 else
   CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
@@ -66,6 +60,9 @@ OPTIONAL_DEPENDS += cross/intel-graphics-compiler
 OPTIONAL_DEPENDS += cross/intel-compute-runtime
 OPTIONAL_DEPENDS += cross/ocl-icd
 OPTIONAL_DEPENDS += cross/clinfo
+OPTIONAL_DEPENDS += cross/mesa
+OPTIONAL_DEPENDS += cross/Khronos-Vulkan-Loader
+OPTIONAL_DEPENDS += cross/Khronos-Vulkan-Tools
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
@@ -169,6 +166,12 @@ CONFIGURE_ARGS += --enable-chromaprint
 DEPENDS += cross/dav1d
 CONFIGURE_ARGS += --enable-libdav1d
 
+# Newer frei0r requires newer gcc
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/frei0r
+CONFIGURE_ARGS += --enable-frei0r
+endif
+
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
 
@@ -213,7 +216,7 @@ DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
 CONFIGURE_ARGS += --enable-thumb
@@ -236,6 +239,8 @@ ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
+# ffmpeg-7.1 video4linux2 is no longer compatible
+CONFIGURE_ARGS += --disable-indev=v4l2
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
@@ -246,48 +251,35 @@ endif
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 # Dependencies provided by synocli-videodriver
 # If built outside spksrc.videodriver.mk
-ifeq ($(wildcard $(VIDEODRV_STAGING_PREFIX)),)
+ifeq ($(wildcard $(VIDEODRV_STAGING_INSTALL_PREFIX)),)
 DEPENDS += cross/libva cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
 DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
-endif
-CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-libmfx
-CONFIGURE_ARGS += --enable-vaapi
-endif
 
-# Evaluation of TC_GCC works only after the following include
-include ../../mk/spksrc.cross-cc.mk
-
-##
-## x64  & GCC SPECIFIC
-##
-
-# OpenCL acceleration
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-# Newer Intel implementations (oneAPI, level-zero) requires gcc >= 5
+# Newer Intel implementations requires gcc >= 5
+# IGC (OpenCL), oneAPI, level-zero, vulkan
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
-# Dependencies provided by synocli-videodriver
-# If built outside spksrc.videodriver.mk
-ifeq ($(wildcard $(VIDEODRV_STAGING_PREFIX)),)
 DEPENDS += cross/intel-level-zero
 DEPENDS += cross/intel-graphics-compiler
 DEPENDS += cross/intel-compute-runtime
 DEPENDS += cross/ocl-icd
 DEPENDS += cross/clinfo
-endif
+DEPENDS += cross/mesa
+DEPENDS += cross/Khronos-Vulkan-Loader
+DEPENDS += cross/Khronos-Vulkan-Tools
+endif # gcc >= 5
+endif # != synocli-videodriver
+
+CONFIGURE_ARGS += --arch=x86_64
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-libmfx
+CONFIGURE_ARGS += --enable-vaapi
+
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-opencl
+CONFIGURE_ARGS += --enable-vulkan
 endif
-endif
+endif # ifeq x64_ARCHS
 
-##
-## GCC SPECIFIC
-##
-
-# Newer frei0r requires newer gcc
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/frei0r
-CONFIGURE_ARGS += --enable-frei0r
-endif
+include ../../mk/spksrc.cross-cc.mk

@@ -1,202 +1,234 @@
 # shellcheck disable=SC2148
+#
+# dnscrypt-proxy service setup
+#
+# This package requires root to bind port 53 for DNS, then drops privileges
+# via the user_name setting in the config file.
+#
+# Reference: https://github.com/DNSCrypt/dnscrypt-proxy
+#
+
+# Package paths
 SVC_CWD="${SYNOPKG_PKGDEST}"
 DNSCRYPT_PROXY="${SYNOPKG_PKGDEST}/bin/dnscrypt-proxy"
-PID_FILE="${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.pid"
-CFG_FILE="${SYNOPKG_PKGDEST}/var/dnscrypt-proxy.toml"
-EXAMPLE_FILES="${SYNOPKG_PKGDEST}/example-*"
-BACKUP_PORT="10053"
-## I need root to bind to port 53 see `service_prestart()` below
-#SERVICE_COMMAND="${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} &"
+PID_FILE="${SYNOPKG_PKGVAR}/dnscrypt-proxy.pid"
+CFG_FILE="${SYNOPKG_PKGVAR}/dnscrypt-proxy.toml"
 
-echo "DSM Version: $SYNOPKG_DSM_VERSION_MAJOR.$SYNOPKG_DSM_VERSION_MINOR-$SYNOPKG_DSM_VERSION_BUILD"
-# SRM 1.2 example: DSM Version: 5.2-7915
-# DSM 6.2 example: DSM Version: 6.2-23739
-UNAME=$(uname -a)
-echo "uname: $UNAME"
-# SRM example: Linux {some-name} 4.4.60 #7779 SMP Mon Jan 28 04:30:39 CST 2019 armv7l GNU/Linux synology_ipq806x_rt2600ac
-# DSM example: Linux {some-name} 3.10.105 #23739 SMP Tue Jul 3 19:47:13 CST 2018 x86_64 GNU/Linux synology_bromolow_3615xs
-OS="dsm"
-if echo "$UNAME" | grep -q -i 'rt1900ac\|rt2600ac\|mr2200ac'; then
-    OS="srm"
+# Ports
+MONITORING_PORT="8153"  # Web UI for monitoring DNS queries
+BACKUP_PORT="10053"     # Used when DHCP server occupies port 53
+
+# Detect OS type: DSM (DiskStation Manager) vs SRM (Synology Router Manager)
+# SRM uses productversion < 3.0 (e.g., 1.2.x), DSM uses >= 6.0
+productversion=$(grep '^productversion=' /etc.defaults/VERSION | cut -d= -f2 | tr -d '"')
+case "${productversion%%.*}" in
+    [012]) OS="srm" ;;
+    *) OS="dsm" ;;
+esac
+
+# DHCP forwarding config paths differ between DSM and SRM
+if [ "$OS" = "dsm" ]; then
+    DHCP_PREFIX="dns-dns"
+else
+    DHCP_PREFIX="dnscrypt-dnscrypt"
 fi
-echo "OS detected: $OS"
 
-blocklist_setup () {
-    ## https://github.com/jedisct1/dnscrypt-proxy/wiki/Public-blacklists
-    ## https://github.com/jedisct1/dnscrypt-proxy/tree/master/utils/generate-domains-blacklists
-    echo "Install/Upgrade generate-domains-blacklist.py (requires python)"
-    mkdir -p "${SYNOPKG_PKGDEST}/var"
-    touch "${SYNOPKG_PKGDEST}"/var/ip-blocklist.txt
-    if [ ! -e "${SYNOPKG_PKGDEST}/var/domains-blacklist.conf" ]; then
-        wget -t 3 -O "${SYNOPKG_PKGDEST}/var/domains-blacklist.conf" \
-            --https-only https://raw.githubusercontent.com/jedisct1/dnscrypt-proxy/master/utils/generate-domains-blacklists/domains-blacklist.conf
+
+#
+# Helper functions
+#
+
+# Check if something is already using port 53 (typically DHCP server's dnsmasq)
+is_port53_in_use() {
+    # Check for running DHCP server (uses dnsmasq which binds port 53)
+    if [ "$OS" = "srm" ]; then
+        ps -w 2>/dev/null | grep -v grep | grep -q "dhcpd.conf"
+    else
+        ps aux 2>/dev/null | grep -v grep | grep -q "dhcpd.conf"
+    fi && return 0
+    
+    # Also check if port 53 is bound by anything else
+    netstat -na 2>/dev/null | grep -q ":53 " && return 0
+    
+    return 1
+}
+
+# Configure DHCP server to forward DNS queries to dnscrypt-proxy
+# When DHCP's dnsmasq is running, it handles port 53 and forwards to us on BACKUP_PORT
+forward_dns_dhcpd() {
+    action="$1"
+    conf="/etc/dhcpd/dhcpd-${DHCP_PREFIX}.conf"
+    info="/etc/dhcpd/dhcpd-${DHCP_PREFIX}.info"
+    
+    echo "dns forwarding - ${action}" >> "${LOG_FILE}"
+    
+    if [ "$action" = "no" ] && [ -f "$conf" ]; then
+        echo "enable=no" > "$info"
+        /etc/rc.network nat-restart-dhcp >> "${LOG_FILE}" 2>&1
+    elif [ "$action" = "yes" ] && is_port53_in_use; then
+        echo "server=127.0.0.1#${BACKUP_PORT}" > "$conf"
+        echo "enable=yes" > "$info"
+        /etc/rc.network nat-restart-dhcp >> "${LOG_FILE}" 2>&1
     fi
 }
 
-blocklist_cron_uninstall () {
-    # remove cron job
+# Configure the built-in monitoring web UI
+configure_monitoring_ui() {
+    ui_user="${1:-}"
+    ui_pass="${2:-}"
+    
+    # If [monitoring_ui] section doesn't exist, append it (upgrading from old version)
+    if ! grep -q "^\[monitoring_ui\]" "${CFG_FILE}" 2>/dev/null; then
+        cat >> "${CFG_FILE}" << UIEOF
+
+[monitoring_ui]
+enabled = true
+listen_address = "0.0.0.0:${MONITORING_PORT}"
+username = "${ui_user}"
+password = "${ui_pass}"
+UIEOF
+    else
+        # Update existing section with user's credentials
+        sed -i -e "s/^enabled = false/enabled = true/" \
+            -e "s/^listen_address = \"127.0.0.1:8080\"/listen_address = \"0.0.0.0:${MONITORING_PORT}\"/" \
+            -e "s/^username = \"admin\"/username = \"${ui_user}\"/" \
+            -e "s/^password = \"changeme\"/password = \"${ui_pass}\"/" \
+            "${CFG_FILE}"
+    fi
+}
+
+
+#
+# Blocklist management
+#
+
+blocklist_setup() {
+    mkdir -p "${SYNOPKG_PKGVAR}"
+    touch "${SYNOPKG_PKGVAR}/ip-blocklist.txt"
+    
+    # Download blocklist config if not present (supports both old and new filenames)
+    if [ ! -e "${SYNOPKG_PKGVAR}/domains-blocklist.conf" ] && \
+       [ ! -e "${SYNOPKG_PKGVAR}/domains-blacklist.conf" ]; then
+        wget -t 3 -O "${SYNOPKG_PKGVAR}/domains-blocklist.conf" --https-only \
+            https://raw.githubusercontent.com/DNSCrypt/dnscrypt-proxy/master/utils/generate-domains-blocklist/domains-blocklist.conf
+    fi
+}
+
+blocklist_cron_install() {
+    cron_line="3       0       *       *       *       root    /var/packages/dnscrypt-proxy/target/var/update-blocklist.sh"
+    
+    if [ "$OS" = "dsm" ]; then
+        mkdir -p /etc/cron.d
+        echo "$cron_line" > /etc/cron.d/dnscrypt-proxy-update-blocklist
+    else
+        # SRM: append to crontab if not already present
+        grep -q "update-blocklist.sh" /etc/crontab || echo "$cron_line" >> /etc/crontab
+    fi
+    synoservicectl --restart crond
+}
+
+blocklist_cron_uninstall() {
     if [ "$OS" = "dsm" ]; then
         rm -f /etc/cron.d/dnscrypt-proxy-update-blocklist
     else
-        sed -i '/.*update-blocklist.sh/d' /etc/crontab
+        sed -i '/update-blocklist.sh/d' /etc/crontab
     fi
     synoservicectl --restart crond
 }
 
-pgrep () {
-    if [ "$OS" = 'dsm' ]; then
-        # shellcheck disable=SC2009,SC2153
-        ps aux | grep "$1" >> "${LOG_FILE}" 2>&1
-    else
-        # shellcheck disable=SC2009,SC2153
-        ps -w | grep "[^]]$1" >> "${LOG_FILE}" 2>&1
-    fi
-}
 
-restart_dhcpd () {
-    /etc/rc.network nat-restart-dhcp >> "${LOG_FILE}" 2>&1
-}
+#
+# Service lifecycle hooks
+#
 
-forward_dns_dhcpd () {
-    echo "dns forwarding - $1" >> "${LOG_FILE}"
-    if [ "$1" = "no" ] && [ -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf ]; then
-        if [ "$OS" = "dsm" ]; then
-            echo "enable=no" > /etc/dhcpd/dhcpd-dns-dns.info
-        else
-            echo "enable=no" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
+service_postinst() {
+    mkdir -p "${SYNOPKG_PKGVAR}"
+
+    # Only configure on fresh install (config file doesn't exist yet)
+    if [ ! -e "${CFG_FILE}" ]; then
+        # Copy example configs and offline resolver cache
+        cp -f "${SYNOPKG_PKGDEST}"/example-* "${SYNOPKG_PKGVAR}/"
+        cp -f "${SYNOPKG_PKGDEST}"/offline-cache/* "${SYNOPKG_PKGVAR}/"
+        cp -f "${SYNOPKG_PKGDEST}"/blocklist/* "${SYNOPKG_PKGVAR}/"
+        
+        # Rename example-* files to their final names
+        for file in "${SYNOPKG_PKGVAR}"/example-*.toml; do
+            newname=$(basename "$file" | sed 's/^example-//')
+            mv "${file}" "${SYNOPKG_PKGVAR}/${newname}"
+        done
+
+        # Apply wizard settings: server names (only if user specified non-blank)
+        if [ -n "${wizard_servers:-}" ] && [ -n "$(echo "${wizard_servers}" | tr -d ' ')" ]; then
+            sed -i "s/# server_names = .*/server_names = [${wizard_servers}]/" "${CFG_FILE}"
         fi
-        restart_dhcpd
-    elif [ "$1" = "yes" ]; then
-        if pgrep "dhcpd.conf"; then  # if dhcpd (dnsmasq) is enabled and running
-            if [ "$OS" = "dsm" ]; then
-                echo "server=127.0.0.1#${BACKUP_PORT}" > /etc/dhcpd/dhcpd-dns-dns.conf
-                echo "enable=yes" > /etc/dhcpd/dhcpd-dns-dns.info
-                # /etc/dhcpd/dhcpd-vendor.conf
-                # /etc/dhcpd/dhcpd-dns-dns.conf
-            else # RSM
-                echo "server=127.0.0.1#${BACKUP_PORT}" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
-                echo "enable=yes" > /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
-            fi
-            restart_dhcpd
-        else
-            echo "pgrep: no process with 'dhcpd.conf' found" >> "${LOG_FILE}"
-        fi
+
+        # Choose port based on whether DHCP server is running
+        dns_port="53"
+        is_port53_in_use && dns_port="${BACKUP_PORT}"
+
+        # Apply remaining settings
+        sed -i -e "s/listen_addresses = .*/listen_addresses = ['0.0.0.0:${dns_port}']/" \
+            -e "s/# user_name = .*/user_name = '${EFF_USER:-nobody}'/" \
+            -e "s|# log_file = 'dnscrypt-proxy.log'.*|log_file = '${LOG_FILE:-}'|" \
+            -e "s/ipv6_servers = .*/ipv6_servers = ${wizard_ipv6:-false}/" \
+            "${CFG_FILE}"
+
+        configure_monitoring_ui "${wizard_ui_user:-}" "${wizard_ui_pass:-}"
     fi
+
+    chmod 0755 "${SYNOPKG_PKGVAR}"
+    blocklist_setup
 }
 
-service_prestart () {
-    echo "service_preinst ${SYNOPKG_PKG_STATUS}"
-
-    # Install daily cron job (3 minutes past midnight), to update the block list
-    if [ "$OS" = 'dsm' ]; then
-        mkdir -p /etc/cron.d
-        echo "3       0       *       *       *       root    /var/packages/dnscrypt-proxy/target/var/update-blocklist.sh" >> /etc/cron.d/dnscrypt-proxy-update-blocklist
-    else # RSM
-        echo "3       0       *       *       *       root    /var/packages/dnscrypt-proxy/target/var/update-blocklist.sh" >> /etc/crontab
+service_prestart() {
+    # Dynamic port switching: automatically adapt when DHCP server is enabled/disabled
+    # This allows users to change DHCP settings without reinstalling the package
+    current_port=$(sed -n "s/listen_addresses = \\['0.0.0.0:\([0-9]*\)'.*/\1/p" "${CFG_FILE}" 2>/dev/null)
+    current_port="${current_port:-53}"
+    needed_port="53"
+    is_port53_in_use && needed_port="${BACKUP_PORT}"
+    
+    if [ "$current_port" != "$needed_port" ]; then
+        echo "Switching DNS port from ${current_port} to ${needed_port}"
+        sed -i "s/listen_addresses = .*/listen_addresses = ['0.0.0.0:${needed_port}']/" "${CFG_FILE}"
     fi
-    synoservicectl --restart crond
 
-    # This fixes https://github.com/SynoCommunity/spksrc/issues/3468
-    # This can't be done at install time. see:
-    #  https://github.com/SynoCommunity/spksrc/blob/e914a32600e65f80131ae09913f1b6f6a2dd8b13/mk/spksrc.service.installer#L307-L319
-    chown root:root "${SYNOPKG_PKGDEST}/ui/index.cgi"
+    blocklist_cron_install
     forward_dns_dhcpd "yes"
-    cd "$SVC_CWD" || exit 1
 
-    # Limit num of processes https://golang.org/pkg/runtime/
-    #
-    # Fixes https://github.com/ksonnet/ksonnet/issues/298
-    #  until https://github.com/golang/go/commit/3a18f0ecb5748488501c565e995ec12a29e66966
-    #  is released.
-    # related https://github.com/golang/go/issues/14626
-    # https://github.com/golang/go/blob/release-branch.go1.11/src/os/user/lookup_stubs.go
-    #
-    # override community script from this point and launch the program ourselves
+    # Start dnscrypt-proxy
+    cd "$SVC_CWD" || exit 1
     env GOMAXPROCS=1 USER=root HOME=/root "${DNSCRYPT_PROXY}" --config "${CFG_FILE}" --pidfile "${PID_FILE}" &
-    # su "${EFF_USER}" -s /bin/false -c "cd ${SVC_CWD}; ${DNSCRYPT_PROXY} --config ${CFG_FILE} --pidfile ${PID_FILE} --logfile ${LOG_FILE}" &
 }
 
-service_poststop () {
-    echo "After stop (service_poststop)"
+service_poststop() {
     blocklist_cron_uninstall
     forward_dns_dhcpd "no"
 }
 
-service_postinst () {
-    echo "Running service_postinst script"
-    mkdir -p "${SYNOPKG_PKGDEST}"/var
-    if [ ! -e "${CFG_FILE}" ]; then
-        # shellcheck disable=SC2086
-        cp -f ${EXAMPLE_FILES} "${SYNOPKG_PKGDEST}/var/"
-        cp -f "${SYNOPKG_PKGDEST}"/offline-cache/* "${SYNOPKG_PKGDEST}/var/"
-        cp -f "${SYNOPKG_PKGDEST}"/blocklist/* "${SYNOPKG_PKGDEST}/var/"
-        # shellcheck disable=SC2231
-        for file in ${SYNOPKG_PKGDEST}/var/example-*; do
-            mv "${file}" "${file//example-/}"
-        done
-
-        echo "Applying settings from Wizard..."
-        ## if empty comment out server list
-        wizard_servers=${wizard_servers:-""}
-        if [ -z "${wizard_servers// }" ]; then
-            server_names_enabled="# "
-        fi
-
-        # Check for dhcp
-        if pgrep "dhcpd.conf" || netstat -na | grep ":${SERVICE_PORT} "; then
-            echo "dhcpd is running or port ${SERVICE_PORT} is in use. Switching service port to ${BACKUP_PORT}"
-            SERVICE_PORT=${BACKUP_PORT}
-        fi
-
-        ## IPv6 address errors with -> bind: address already in use
-        #listen_addresses=\[${wizard_listen_address:-"'0.0.0.0:$SERVICE_PORT', '[::1]:$SERVICE_PORT'"}\]
-        listen_addresses=\[${wizard_listen_address:-"'0.0.0.0:$SERVICE_PORT'"}\]
-        server_names=\[${wizard_servers:-"'scaleway-fr', 'google', 'yandex', 'cloudflare'"}\]
-
-        ## change default settings
-        sed -i -e "s/# server_names = .*/${server_names_enabled:-""}server_names = ${server_names}/" \
-            -e "s/listen_addresses = .*/listen_addresses = ${listen_addresses}/" \
-            -e "s/# user_name = .*/user_name = '${EFF_USER:-"nobody"}'/" \
-            -e "s/require_dnssec = .*/require_dnssec = true/" \
-            -e "s|# log_file = 'dnscrypt-proxy.log'.*|log_file = '${LOG_FILE:-""}'|" \
-            -e "s/netprobe_timeout = .*/netprobe_timeout = 2/" \
-            -e "s/ipv6_servers = .*/ipv6_servers = ${wizard_ipv6:=false}/" \
-            "${CFG_FILE}"
-    fi
-
-    echo "Fixing permissions for cgi GUI... "
-    # Fixes https://github.com/publicarray/spksrc/issues/3
-    # https://originhelp.synology.com/developer-guide/privilege/privilege_specification.html
-    chmod 0777 "${SYNOPKG_PKGDEST}/var/"
-
-    blocklist_setup
-
-    # shellcheck disable=SC2129
-    echo "Install Help files"
-    pkgindexer_add "${SYNOPKG_PKGDEST}/ui/index.conf"
-    pkgindexer_add "${SYNOPKG_PKGDEST}/ui/helptoc.conf"
-    # pkgindexer_add "${SYNOPKG_PKGDEST}/ui/helptoc.conf" "${SYNOPKG_PKGDEST}/indexdb/helpindexdb"   # DSM 6.0 ?
-}
-
-service_postuninst () {
-    echo "service_postuninst ${SYNOPKG_PKG_STATUS}"
+service_postuninst() {
     blocklist_cron_uninstall
-
-    # shellcheck disable=SC2129
-    echo "Uninstall Help files"
-    pkgindexer_del "${SYNOPKG_PKGDEST}/ui/helptoc.conf"
-    pkgindexer_del "${SYNOPKG_PKGDEST}/ui/index.conf"
-    disable_dhcpd_dns_port "no"
-    if [ "$OS" = "dsm" ]; then
-        rm -f /etc/dhcpd/dhcpd-dns-dns.conf
-        rm -f /etc/dhcpd/dhcpd-dns-dns.info
-    else
-        rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.conf
-        rm -f /etc/dhcpd/dhcpd-dnscrypt-dnscrypt.info
-    fi
+    forward_dns_dhcpd "no"
+    rm -f "/etc/dhcpd/dhcpd-${DHCP_PREFIX}.conf" "/etc/dhcpd/dhcpd-${DHCP_PREFIX}.info"
 }
 
-service_postupgrade () {
-    # upgrade script when the offline-cache is also updated
-    cp -f "${SYNOPKG_PKGDEST}"/blocklist/generate-domains-blacklist.py "${SYNOPKG_PKGDEST}/var/"
+service_postupgrade() {
+    # Update blocklist generator and offline cache
+    cp -f "${SYNOPKG_PKGDEST}"/blocklist/generate-domains-blocklist.py "${SYNOPKG_PKGVAR}/"
+    cp -f "${SYNOPKG_PKGDEST}"/offline-cache/* "${SYNOPKG_PKGVAR}/"
+    chmod 0755 "${SYNOPKG_PKGVAR}"
+
+    # Clean up old custom UI help files (from versions before built-in monitoring UI)
+    if [ -f "${SYNOPKG_PKGDEST}/ui/index.conf" ]; then
+        pkgindexer_del "${SYNOPKG_PKGDEST}/ui/helptoc.conf" 2>/dev/null || true
+        pkgindexer_del "${SYNOPKG_PKGDEST}/ui/index.conf" 2>/dev/null || true
+    fi
+
+    # Fix problematic settings from older package versions
+    if grep -q "require_dnssec = true" "${CFG_FILE}" 2>/dev/null; then
+        sed -i -e "s/require_dnssec = true/require_dnssec = false/" \
+            -e "s/netprobe_timeout = 2/netprobe_timeout = 60/" "${CFG_FILE}"
+    fi
+
+    configure_monitoring_ui "${wizard_ui_user:-}" "${wizard_ui_pass:-}"
 }

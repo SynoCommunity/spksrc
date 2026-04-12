@@ -1,5 +1,5 @@
 PKG_NAME = ombi
-PKG_VERS = 4.47.1
+PKG_VERS = 4.53.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Ombi-app/Ombi/releases/download/v$(PKG_VERS)
@@ -10,7 +10,7 @@ EXTRACT_PATH = $(INSTALL_DIR)/$(INSTALL_PREFIX)/shared
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = linux-x64 linux-arm linux-arm64
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = linux-x64

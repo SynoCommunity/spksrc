@@ -14,7 +14,7 @@ on:
     workflow_dispatch:
     # Trigger build on a schedule
     schedule:
-        # every fist day of the month
+        # every first day of the month
         - cron: '0 0 1 * *'
 
 jobs:

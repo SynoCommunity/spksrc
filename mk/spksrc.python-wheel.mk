@@ -22,11 +22,11 @@ include ../../mk/spksrc.cross-cc.mk
 # Define where is located the crossenv
 CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME))-$(PKG_VERS) $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME)) $(WORK_DIR)/crossenv-default))
 
-# If using spksrc.python.mk with PYTHON_STAGING_PREFIX defined
+# If using spksrc.python.mk with PYTHON_STAGING_INSTALL_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
 # wheels can find openssl and other libraries
-ifneq ($(wildcard $(PYTHON_STAGING_PREFIX)),)
-STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_PREFIX)
+ifneq ($(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)),)
+STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_INSTALL_PREFIX)
 endif
 
 ### Prepare crossenv
@@ -41,9 +41,9 @@ build_python_wheel_target: prepare_crossenv
 	. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$${PATH}:$(CROSSENV_PATH)/build/bin ; \
+	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
 	   $(MSG) "python: [$$(which cross-python)]" ; \
-	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \

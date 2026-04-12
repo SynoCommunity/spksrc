@@ -71,19 +71,7 @@ _all: install
 
 all:
 	@mkdir -p $(WORK_DIR)
-	@bash -o pipefail -c ' \
-	   if [ -z "$$LOGGING_ENABLED" ]; then \
-	      export LOGGING_ENABLED=1 ; \
-	      { \
-	        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	      } > >(tee --append $(NATIVE_LOG)) 2>&1 ; \
-	   else \
-	      $(MAKE) -f $(firstword $(MAKEFILE_LIST)) _all ; \
-	   fi \
-	' || { \
-	   $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "native" "$(NAME)") | tee --append $(STATUS_LOG) ; \
-	   exit 1 ; \
-	}
+	$(call LOG_WRAPPED,_all)
 
 ####
 

@@ -12,6 +12,7 @@ HOMEPAGE = https://ympd.org/
 COMMENT  = Standalone MPD Web GUI written in C, utilizing Websockets and Bootstrap/JS.
 LICENSE  = GPLv2
 
-CMAKE_USE_TOOLCHAIN_FILE = NO
+# Explicit include path needed for CMake 3.31+ (implicit include detection)
+ADDITIONAL_CFLAGS = -I$(INSTALL_DIR)$(INSTALL_PREFIX)/include
 
 include ../../mk/spksrc.cross-cmake.mk

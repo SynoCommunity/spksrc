@@ -12,13 +12,8 @@ on:
         description: 'Package to build'
         required: true
         default: 'adminer'
-      add_noarch_builds:
-        description: 'Include noarch packages'
-        required: false
-        default: true
-        type: boolean
-      add_noarch_dsm72_builds:
-        description: 'Include noarch DSM 7.2 packages'
+      add_dsm73_builds:
+        description: 'Include DSM 7.3 archs'
         required: false
         default: false
         type: boolean
@@ -32,10 +27,20 @@ on:
         required: false
         default: true
         type: boolean
+      add_dsm70_builds:
+        description: 'Include DSM 7.0 archs'
+        required: false
+        default: false
+        type: boolean
       add_dsm62_builds:
         description: 'Include DSM 6.2 archs'
         required: false
         default: true
+        type: boolean
+      add_dsm61_builds:
+        description: 'Include DSM 6.1 archs'
+        required: false
+        default: false
         type: boolean
       add_dsm52_builds:
         description: 'Include DSM 5.2 archs'
@@ -49,6 +54,21 @@ on:
         type: boolean
       add_srm12_builds:
         description: 'Include SRM 1.2 archs'
+        required: false
+        default: false
+        type: boolean
+      add_noarch_builds:
+        description: 'Include noarch packages'
+        required: false
+        default: true
+        type: boolean
+      add_noarch_dsm73_builds:
+        description: 'Include noarch DSM 7.3 packages'
+        required: false
+        default: false
+        type: boolean
+      add_noarch_dsm72_builds:
+        description: 'Include noarch DSM 7.2 packages'
         required: false
         default: false
         type: boolean
@@ -74,7 +94,16 @@ jobs:
     outputs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
       noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
-      has_min_dsm72_packages: ${{ steps.dependencies.outputs.has_min_dsm72_packages }}
+      arch_min_dsm72_packages: ${{ steps.dependencies.outputs.arch_min_dsm72_packages }}
+      noarch_min_dsm72_packages: ${{ steps.dependencies.outputs.noarch_min_dsm72_packages }}
+      arch_min_dsm73_packages: ${{ steps.dependencies.outputs.arch_min_dsm73_packages }}
+      noarch_min_dsm73_packages: ${{ steps.dependencies.outputs.noarch_min_dsm73_packages }}
+      has_arch_packages: ${{ steps.dependencies.outputs.has_arch_packages }}
+      has_noarch_packages: ${{ steps.dependencies.outputs.has_noarch_packages }}
+      has_arch_min_dsm72_packages: ${{ steps.dependencies.outputs.has_arch_min_dsm72_packages }}
+      has_noarch_min_dsm72_packages: ${{ steps.dependencies.outputs.has_noarch_min_dsm72_packages }}
+      has_arch_min_dsm73_packages: ${{ steps.dependencies.outputs.has_arch_min_dsm73_packages }}
+      has_noarch_min_dsm73_packages: ${{ steps.dependencies.outputs.has_noarch_min_dsm73_packages }}
       distrib_hash: ${{ steps.distrib-hash.outputs.hash }}
     steps:
       - name: Checkout repository
@@ -177,34 +206,47 @@ jobs:
       - id: defaults
         run: |
           # Retrieve inputs and package availability
-          add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
-          add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
+          add_dsm73_builds=${{ github.event.inputs.add_dsm73_builds || 'false' }}
           add_dsm72_builds=${{ github.event.inputs.add_dsm72_builds || 'false' }}
           add_dsm71_builds=${{ github.event.inputs.add_dsm71_builds || 'false' }}
+          add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
+          add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
           add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
-          has_noarch_packages=$([ -n "${{ needs.prepare.outputs.noarch_packages }}" ] && echo "true" || echo "false")
-          has_arch_packages=$([ -n "${{ needs.prepare.outputs.arch_packages }}" ] && echo "true" || echo "false")
-          has_min_dsm72_packages=${{ needs.prepare.outputs.has_min_dsm72_packages || 'false' }}
+          add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
+          add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
+          add_noarch_dsm73_builds=${{ github.event.inputs.add_noarch_dsm73_builds || 'false' }}
+          has_arch_packages=${{ needs.prepare.outputs.has_arch_packages || 'false' }}
+          has_arch_min_dsm72_packages=${{ needs.prepare.outputs.has_arch_min_dsm72_packages || 'false' }}
+          has_arch_min_dsm73_packages=${{ needs.prepare.outputs.has_arch_min_dsm73_packages || 'false' }}
+          has_noarch_packages=${{ needs.prepare.outputs.has_noarch_packages || 'false' }}
+          has_noarch_min_dsm72_packages=${{ needs.prepare.outputs.has_noarch_min_dsm72_packages || 'false' }}
+          has_noarch_min_dsm73_packages=${{ needs.prepare.outputs.has_noarch_min_dsm73_packages || 'false' }}
 
           # Dynamic logic for automatic builds
           if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
-            # Enable noarch builds if noarch packages exist
-            add_noarch_builds=$([ "$has_noarch_packages" == "true" ] && echo "true" || echo "false")
+            # Enable DSM 7.3 builds if arch packages require minimum DSM 7.3
+            add_dsm73_builds=$([ "$has_arch_min_dsm73_packages" == "true" ] && echo "true" || echo "false")
 
-            # Enable noarch DSM 7.2 builds if noarch packages exist and minimum DSM 7.2 requirements are met
-            add_noarch_dsm72_builds=$([ "$has_noarch_packages" == "true" ] && [ "$has_min_dsm72_packages" == "true" ] && echo "true" || echo "false")
-
-            # Enable DSM 7.2 builds if arch packages exist and minimum DSM 7.2 requirements are met
-            add_dsm72_builds=$([ "$has_arch_packages" == "true" ] && [ "$has_min_dsm72_packages" == "true" ] && echo "true" || echo "false")
+            # Enable DSM 7.2 builds if arch packages require minimum DSM 7.2
+            add_dsm72_builds=$([ "$has_arch_min_dsm72_packages" == "true" ] && echo "true" || echo "false")
 
             # Enable DSM 7.1 builds if arch packages exist
             add_dsm71_builds=$([ "$has_arch_packages" == "true" ] && echo "true" || echo "false")
 
             # Enable DSM 6.2 builds if arch packages exist
             add_dsm62_builds=$([ "$has_arch_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable noarch builds if noarch packages exist
+            add_noarch_builds=$([ "$has_noarch_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable noarch DSM 7.3 builds if noarch packages require minimum DSM 7.3
+            add_noarch_dsm73_builds=$([ "$has_noarch_min_dsm73_packages" == "true" ] && echo "true" || echo "false")
+
+            # Enable noarch DSM 7.2 builds if noarch packages require minimum DSM 7.2
+            add_noarch_dsm72_builds=$([ "$has_noarch_min_dsm72_packages" == "true" ] && echo "true" || echo "false")
           fi
 
           # Build matrix
@@ -216,7 +258,7 @@ jobs:
           }
 
           # Add noarch builds
-          if [ "$add_noarch_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
+          if [ "$add_noarch_builds" == "true" ]; then
             add_to_matrix "noarch-1.1"
             add_to_matrix "noarch-3.1"
             add_to_matrix "noarch-6.1"
@@ -224,19 +266,31 @@ jobs:
           fi
 
           # Add noarch DSM 7.2 builds
-          if [ "$add_noarch_dsm72_builds" == "true" ] && [ "$has_noarch_packages" == "true" ]; then
+          if [ "$add_noarch_dsm72_builds" == "true" ]; then
             add_to_matrix "noarch-7.2"
           fi
 
+          # Add noarch DSM 7.3 builds
+          if [ "$add_noarch_dsm73_builds" == "true" ]; then
+            add_to_matrix "noarch-7.3"
+          fi
+
+          # Add DSM 7.3 builds
+          if [ "$add_dsm73_builds" == "true" ]; then
+            add_to_matrix "x64-7.3"
+            add_to_matrix "aarch64-7.3"
+            add_to_matrix "armv7-7.3"
+          fi
+
           # Add DSM 7.2 builds
-          if [ "$add_dsm72_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+          if [ "$add_dsm72_builds" == "true" ]; then
             add_to_matrix "x64-7.2"
             add_to_matrix "aarch64-7.2"
             add_to_matrix "armv7-7.2"
           fi
 
           # Add DSM 7.1 builds
-          if [ "$add_dsm71_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+          if [ "$add_dsm71_builds" == "true" ]; then
             add_to_matrix "x64-7.1"
             add_to_matrix "aarch64-7.1"
             add_to_matrix "evansport-7.1"
@@ -244,8 +298,17 @@ jobs:
             add_to_matrix "comcerto2k-7.1"
           fi
 
+          # Add DSM 7.0 builds
+          if [ "$add_dsm70_builds" == "true" ]; then
+            add_to_matrix "x64-7.0"
+            add_to_matrix "aarch64-7.0"
+            add_to_matrix "evansport-7.0"
+            add_to_matrix "armv7-7.0"
+            add_to_matrix "comcerto2k-7.0"
+          fi
+
           # Add DSM 6.2 builds
-          if [ "$add_dsm62_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+          if [ "$add_dsm62_builds" == "true" ]; then
             add_to_matrix "x64-6.2.4"
             add_to_matrix "aarch64-6.2.4"
             add_to_matrix "evansport-6.2.4"
@@ -255,8 +318,19 @@ jobs:
             add_to_matrix "qoriq-6.2.4"
           fi
 
+          # Add DSM 6.1 builds
+          if [ "$add_dsm61_builds" == "true" ]; then
+            add_to_matrix "x64-6.1"
+            add_to_matrix "aarch64-6.1"
+            add_to_matrix "evansport-6.1"
+            add_to_matrix "armv7-6.1"
+            add_to_matrix "hi3535-6.1"
+            add_to_matrix "88f6281-6.1"
+            add_to_matrix "qoriq-6.1"
+          fi
+
           # Add DSM 5.2 builds
-          if [ "$add_dsm52_builds" == "true" ] && [ "$has_arch_packages" == "true" ]; then
+          if [ "$add_dsm52_builds" == "true" ]; then
             add_to_matrix "x86-5.2"
             add_to_matrix "88f6281-5.2"
             add_to_matrix "ppc853x-5.2"
@@ -291,6 +365,74 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      # Free up disk space on GitHub runner before build starts
+      - name: Free Disk Space (Ubuntu)
+        run: |
+          # Capture initial disk space before cleanup
+          {
+            echo "=========================================="
+            echo "DISK SPACE BEFORE CLEANUP"
+            echo "=========================================="
+            df -h
+            echo ""
+            echo "=== Largest directories in workspace ==="
+            du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
+          } > disk_usage_start.txt
+          
+          # Also display to console
+          cat disk_usage_start.txt
+          
+          echo ""
+          echo "=== Removing unnecessary packages and files ==="
+          
+          # Remove Android SDK/NDK (takes ~10-15GB)
+          sudo rm -rf /usr/local/lib/android || true
+          
+          # Remove .NET runtime (takes ~2GB)
+          sudo rm -rf /usr/share/dotnet || true
+          
+          # Remove Haskell (takes ~5GB)
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/local/.ghcup || true
+          
+          # Remove large tool caches
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
+          
+          # Remove Docker images we don't need (keep space for our build image)
+          docker rmi $(docker image ls -aq) 2>/dev/null || true
+          
+          # Remove swap file if exists (can free 4GB+)
+          sudo swapoff -a || true
+          sudo rm -f /swapfile /mnt/swapfile || true
+          
+          # Clean apt cache
+          sudo apt-get clean || true
+          
+          # Remove large packages we don't need
+          sudo apt-get remove -y '^aspnetcore-.*' '^dotnet-.*' '^llvm-.*' 'php.*' '^mongodb-.*' '^mysql-.*' 'azure-cli' 'google-cloud-sdk' 'google-chrome-stable' 'firefox' 'powershell' 'mono-devel' 'temurin-.*' || true
+          sudo apt-get autoremove -y || true
+          sudo apt-get clean || true
+          
+          # Capture disk space after cleanup
+          {
+            echo ""
+            echo "=========================================="
+            echo "DISK SPACE AFTER CLEANUP"
+            echo "=========================================="
+            df -h
+            echo ""
+            echo "=== Space freed calculation ==="
+            df -h / | tail -1 | awk '{print "Available space: " $4}'
+          } >> disk_usage_start.txt
+          
+          # Display cleanup results to console
+          echo ""
+          echo "=== Disk space after cleanup ==="
+          df -h
+          echo ""
+          echo "=== Space freed calculation ==="
+          df -h / | tail -1 | awk '{print "Available space: " $4}'
+
       - name: Cache toolchains
         uses: actions/cache@v5
         # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
@@ -298,6 +440,12 @@ jobs:
         with:
           path: toolchain/*/work
           key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
+
+      # Check disk space after toolchain cache restore
+      - name: Disk Space After Cache Restore
+        run: |
+          echo "=== Disk Space after Cache ==="
+          df -h
 
       - name: Restore distrib cache
         uses: actions/cache/restore@v5
@@ -309,6 +457,13 @@ jobs:
           restore-keys: |
             distrib-
 
+      # Check disk space after distrib cache restore
+      - name: Disk Space After Distrib Restore
+        run: |
+          echo "=== Disk Space after Distrib ==="
+          df -h
+          du -sh distrib 2>/dev/null || echo "No distrib directory"
+
       - name: Build Package (based on changed files)
         # We don't want to stop the build on errors.
         # Errors are reported in "Build Status"
@@ -319,6 +474,10 @@ jobs:
         env:
           ARCH_PACKAGES: ${{ needs.prepare.outputs.arch_packages }}
           NOARCH_PACKAGES: ${{ needs.prepare.outputs.noarch_packages }}
+          ARCH_MIN_DSM72_PACKAGES: ${{ needs.prepare.outputs.arch_min_dsm72_packages }}
+          NOARCH_MIN_DSM72_PACKAGES: ${{ needs.prepare.outputs.noarch_min_dsm72_packages }}
+          ARCH_MIN_DSM73_PACKAGES: ${{ needs.prepare.outputs.arch_min_dsm73_packages }}
+          NOARCH_MIN_DSM73_PACKAGES: ${{ needs.prepare.outputs.noarch_min_dsm73_packages }}
           PUBLISH: ${{ github.event.inputs.publish }}
           API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           PACKAGE_TO_PUBLISH: ${{ github.event.inputs.package }}
@@ -328,6 +487,144 @@ jobs:
           BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+
+      # Check disk space after build completes (success or failure)
+      - name: Disk Space After Build
+        if: always()
+        run: |
+          echo "=== Disk Space after Build ==="
+          df -h
+          echo ""
+          echo "=== Largest directories after build ==="
+          du -h -d 2 /home/runner/work 2>/dev/null | sort -hr | head -20 || true
+          echo ""
+          
+          # Create detailed disk usage report
+          {
+            echo "=========================================="
+            echo "WORKSPACE DIRECTORIES"
+            echo "=========================================="
+            du -sh /home/runner/work/* 2>/dev/null || true
+            
+            echo ""
+            echo "=========================================="
+            echo "BUILD PACKAGES (with logs)"
+            echo "=========================================="
+            if [ -n "${{ needs.prepare.outputs.arch_packages }}" ] || [ -n "${{ needs.prepare.outputs.noarch_packages }}" ]; then
+              for pkg in ${{ needs.prepare.outputs.arch_packages }} ${{ needs.prepare.outputs.noarch_packages }}; do
+                if [ -d "spk/$pkg" ]; then
+                  echo "Package: $pkg"
+                  
+                  # Show total package directory size
+                  du -sh "spk/$pkg" 2>/dev/null || true
+                  
+                  # Show work directories if they exist
+                  work_dirs=$(find "spk/$pkg" -maxdepth 2 -type d -name "work-*" 2>/dev/null)
+                  if [ -n "$work_dirs" ]; then
+                    echo "$work_dirs" | while read work_dir; do
+                      du -sh "$work_dir" 2>/dev/null | sed 's/^/  /' || true
+                    done
+                  else
+                    echo "  n/a	spk/$pkg/work-${{ matrix.arch }}"
+                  fi
+                  
+                  # Show SPK file size if it exists
+                  if ls packages/${pkg}*.spk 2>/dev/null; then
+                    ls -lh packages/${pkg}*.spk 2>/dev/null | awk '{print "  " $5 "\tpackages/" $9}' || echo "  n/a	packages/${pkg}*.spk"
+                  else
+                    echo "  n/a	packages/${pkg}*.spk"
+                  fi
+                  
+                  echo ""
+                fi
+              done
+            else
+              echo "No package list available - scanning for build directories..."
+              find spk/ -type f -name "*.log" -o -name "work-*" 2>/dev/null | \
+                xargs -I {} dirname {} | sort -u | \
+                while read dir; do
+                  du -sh "$dir" 2>/dev/null || true
+                done
+            fi
+            
+            echo ""
+            echo "=========================================="
+            echo "OVERALL DISK STATUS"
+            echo "=========================================="
+            df -h
+            
+          } > disk_usage_end.txt
+          
+          # Also display to console
+          cat disk_usage_end.txt
+          
+          # Check if running low on disk space
+          DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+          if [ "$DISK_USAGE" -gt 90 ]; then
+            echo "::warning::Disk usage is at ${DISK_USAGE}% - build may have failed due to low disk space"
+          fi
+          
+          # Emergency cleanup if disk is critically full (above 95%)
+          if [ "$DISK_USAGE" -gt 95 ]; then
+            echo "::error::CRITICAL: Disk usage is at ${DISK_USAGE}% - performing emergency cleanup"
+            echo "disk_critical=true" >> $GITHUB_ENV
+            
+            # Clean up Docker to free space for diagnostics upload
+            echo "Cleaning Docker system..."
+            docker system prune -af --volumes 2>/dev/null || true
+            
+            # Remove large work directories except logs
+            echo "Cleaning large build artifacts..."
+            find . -type d -name "work-*" -exec sh -c 'find "$1" -type f ! -name "*.log" -delete' _ {} \; 2>/dev/null || true
+            
+            echo "Space after emergency cleanup:"
+            df -h
+          fi
+
+      # Capture Docker logs when build fails
+      - name: Capture Docker Logs on Failure
+        if: failure()
+        run: |
+          echo "=== Attempting to capture docker logs ==="
+          docker ps -a || true
+          docker logs $(docker ps -aq | head -1) 2>&1 | tail -500 > docker_logs.txt || echo "Could not capture docker logs"
+
+      # Collect all build logs from spk package directories
+      - name: Collect Build Logs from SPK directories
+        if: always()
+        run: |
+          echo "=== Collecting build logs from spk directories ==="
+          mkdir -p collected_logs
+          
+          # Search for all build logs in spk directories
+          find spk/ -type f \( -name "*.log" -o -name "build-*.log" -o -name "status-*.log" \) -print0 2>/dev/null | while IFS= read -r -d '' logfile; do
+            # Create directory structure in collected_logs
+            relative_path=$(dirname "$logfile")
+            mkdir -p "collected_logs/$relative_path" 2>/dev/null || true
+            # Copy log file
+            cp "$logfile" "collected_logs/$logfile" 2>/dev/null || true
+            echo "Collected: $logfile"
+          done
+          
+          # Display summary of collected logs
+          echo ""
+          echo "=== Summary of collected logs ==="
+          find collected_logs -type f -name "*.log" -exec ls -lh {} \; 2>/dev/null | head -50
+          
+          # For current architecture, display last lines of main build logs
+          echo ""
+          echo "=== Last 100 lines of main build log for ${{ matrix.arch }} ==="
+          find spk/ -type f -name "build-${{ matrix.arch }}.log" -exec tail -100 {} \; 2>/dev/null || echo "No build log found for ${{ matrix.arch }}"
+          
+          echo ""
+          echo "=== Content of status-build.log if exists ==="
+          find spk/ -type f -name "status-build.log" -exec cat {} \; 2>/dev/null || echo "No status-build.log found"
+          
+          # If disk was critical, create a marker file
+          if [ "${{ env.disk_critical }}" == "true" ]; then
+            echo "Build failed due to critical disk space (>95% full)" > collected_logs/DISK_SPACE_CRITICAL.txt
+            df -h >> collected_logs/DISK_SPACE_CRITICAL.txt
+          fi
 
       - name: Build Status
         id: build_status
@@ -342,10 +639,64 @@ jobs:
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
+      # Upload diagnostic logs and disk space info in a separate folder for troubleshooting
+      # Continues even if previous steps failed
+      # Diagnostic files (.diag-*) are now isolated from main package summary
+
+      - name: Organize Diagnostic Logs
+        if: always()
+        continue-on-error: true
+        run: |
+          echo "=== Organizing diagnostic files ==="
+          mkdir -p artifacts/diagnostics
+
+          # Copy files in the diagnostics directory
+          for file in disk_usage_start.txt disk_usage_end.txt docker_logs.txt build_errors.txt build_log_errors.txt build_unsupported.txt build_success.txt; do
+              [ -f "$file" ] && cp "$file" "artifacts/diagnostics/$file"
+          done
+
+          # Include all collected logs
+          mkdir -p artifacts/diagnostics/collected_logs
+          cp collected_logs/**/*.log artifacts/diagnostics/collected_logs/ 2>/dev/null || true
+          cp collected_logs/DISK_SPACE_CRITICAL.txt artifacts/diagnostics/collected_logs/ 2>/dev/null || true
+
+      - name: Upload Diagnostic Logs
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v7
+        with:
+          name: diagnostics-${{ matrix.arch }}
+          path: artifacts/diagnostics/
+          if-no-files-found: ignore
+          retention-days: 1
+          compression-level: 9
+
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Packages for ${{ matrix.arch }}
           path: packages/*.spk
           if-no-files-found: ignore
+
+  consolidate-diagnostics:
+    name: Consolidate Diagnostics
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Download all diagnostic artifacts
+        uses: actions/download-artifact@v7
+        with:
+          pattern: diagnostics-*
+          path: all-diagnostics
+          merge-multiple: false
+
+      - name: Upload consolidated diagnostics
+        uses: actions/upload-artifact@v7
+        with:
+          name: Diagnostics
+          path: all-diagnostics/**
+          if-no-files-found: ignore
+          retention-days: 30
+          compression-level: 9

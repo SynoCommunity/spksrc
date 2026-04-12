@@ -22,11 +22,7 @@ HOMEPAGE = https://www.ntop.org/
 COMMENT  = High-Speed Web-based Traffic Analysis and Flow Collection.
 LICENSE  = GPLv3
 
-# find MariaDB includes & library
-ADDITIONAL_CXXFLAGS += -I$(STAGING_INSTALL_PREFIX)/include/mariadb
-ADDITIONAL_LDFLAGS  += -lmysqlclient
-
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 SYNOLOGY_OS = DSM
 ifeq ($(findstring $(ARCH),$(SRM_ARCHS)),$(ARCH))
@@ -70,13 +66,15 @@ CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-ndpi-includes=$(STAGING_INSTALL_PREFIX)/include/ndpi
 CONFIGURE_ARGS += --with-ndpi-static-lib=$(STAGING_INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += my_cv_rw_locks_supported=$(RW_LOCKS_SUPPORTED)
+CONFIGURE_ARGS += ac_cv_prog_ac_ct_MARIADB=mariadb_config
 
 ENV += DESTDIR=$(INSTALL_DIR)
 # add install/bin folder to path to let ./configure find mysql_config (it is a script and works for cross compile)
 # add native node and npm commands to path
 NODE_BIN_FOLDER = $(realpath $(WORK_DIR)/../../../$(BUILD_DEPENDS)/work-native/node/bin)
 NPM_BIN_FOLDER = $(realpath $(WORK_DIR)/../../../$(BUILD_DEPENDS)/work-native/node/lib/node_modules/npm/bin)
-ENV += "PATH=$(PATH):$(NODE_BIN_FOLDER):$(NPM_BIN_FOLDER):$(STAGING_INSTALL_PREFIX)/bin"
+MARIADB_BIN_FOLDER = $(realpath $(WORK_DIR)/mariadb-connector-c/build/NATIVE/bin)
+ENV += "PATH=$(PATH):$(MARIADB_BIN_FOLDER):$(NODE_BIN_FOLDER):$(NPM_BIN_FOLDER):$(STAGING_INSTALL_PREFIX)/bin"
 
 include ../../mk/spksrc.cross-cc.mk
 

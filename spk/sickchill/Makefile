@@ -38,7 +38,7 @@ POST_STRIP_TARGET = sickchill_extra_install
 # [cryptography]
 DEPENDS += cross/openssl3
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.common.mk
 
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
@@ -63,3 +63,5 @@ endif
 .PHONY: sickchill_extra_install
 sickchill_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
+
+include ../../mk/spksrc.python.mk

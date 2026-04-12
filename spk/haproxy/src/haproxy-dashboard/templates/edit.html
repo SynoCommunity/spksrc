@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit HAProxy Config</title>
+    <!-- Add Bootstrap CSS link here -->
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/all.min.css">
+      <style>
+        /* Custom CSS for the header */
+        header {
+            background-color: #f2f2f2;
+            padding: 20px;
+            display: flex;
+            padding-left: 100px;
+            align-items: center;
+        }
+        
+         #editor_container{
+           box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+         }
+
+
+        .logo {
+            width: 300px; /* Adjust the width as needed */
+            height: auto;
+        }
+
+        .menu-link {
+            text-decoration: none;
+            padding: 10px 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .menu-link:hover {
+            background-color: #3B444B;
+            color: white;
+            text-decoration: none;
+        }
+
+        .menu-link.active {
+            background-color: #3B444B;
+            color: white;
+        }
+        
+         /* Custom CSS for dark mode */
+      .dark-mode {
+          background-color: #121B2E;
+          color: white;
+      }
+      
+      .dark-mode .header1{
+      background-color: #25354e;
+          color: white;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      }
+      
+      
+      .dark-mode .menu-link{
+      text-decoration: none;
+            padding: 10px 20px;
+            color: white;
+            font-weight: bold;
+      
+      }
+      
+      .dark-mode  .logo {
+      
+            color: #2bb9c7;
+            font-weight: bold;
+      
+      }
+      
+      .dark-mode .fas-fa-globe{
+      color: #2bb9c7;
+      }
+      
+      .dark-mode .menu-link:hover{
+      text-decoration: none;
+            padding: 10px 20px;
+            color: #2bb9c7;
+            font-weight: bold;
+      
+      }
+
+      .dark-mode .menu-link.active {
+          color: #2bb9c7;
+          border-bottom: 2px solid #2bb9c7;
+      }
+      
+      .dark-mode #editor_container{
+      
+        box-shadow: 0 0 15px 5px rgba(43, 185, 199, 0.05);
+        background-color: #1E2C42;
+      }
+      
+      
+      
+      
+      
+      .dark-mode textarea {
+    background-color: #1a2131;
+    color: white;
+    border: 1px solid #ccc; /* Add a border for visibility */
+    padding: 5px; /* Add padding for a better visual appearance */
+    scrollbar-width: thin;
+    scrollbar-color: #1E2C42 #f1f1f1;
+    ::-webkit-scrollbar-thumb {
+    background-color: #888888;
+    border-radius: 6px; /* rounded thumb */
+    }
+}
+
+/* Apply specific styles when the textarea is focused */
+.dark-mode textarea:focus {
+    background-color: #1a2131;
+    color: white;
+    border-color: #fff; /* Change border color on focus */
+    outline: none; /* Remove default focus outline */
+}
+
+h3.edit_conf{
+ color: grey;
+}
+
+.dark-mode h3.edit_conf {
+    color: white !important;
+}
+
+.dark-mode #save_check{
+    
+background-color: #2bb9c7;
+border: none;
+}
+
+
+    </style>
+</head>
+<body>
+<header class="header1" id="header1">
+    <a href="/home" style="text-decoration: none;">
+        <h3 style="font-size: 22px;" class="logo">
+            <i style="margin: 8px;" class="fas fa-globe"></i>Haproxy Configurator
+        </h3>
+    </a>
+    <a href="/home" class="menu-link">Home</a>
+    <a href="/" class="menu-link">Add Frontend & Backend</a>
+    <a href="/edit" class="menu-link active">Edit HAProxy Config</a>
+    <a href="/logs" class="menu-link">Security Events</a>
+    <a href="/statistics" class="menu-link">Statistics</a>
+    <a  href="http://{{ request.host.split(':')[0] }}:{{ stats_port }}/" class="menu-link" target="_blank">HAProxy Stats</a>
+    
+    <div class="custom-control custom-switch ml-auto">
+    <input type="checkbox" class="custom-control-input" id="darkModeSwitch">
+    <label class="custom-control-label" for="darkModeSwitch">Dark Mode</label>
+</div>
+
+
+ <script>
+    // Function to toggle dark mode
+    function toggleDarkMode() {
+        const body = document.body;
+        body.classList.toggle('dark-mode');
+
+        // Save user's preference to localStorage
+        const isDarkMode = body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode); // Store the actual value
+    }
+
+    // Check if dark mode preference is saved in localStorage
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+
+    // Add event listener to the switch
+    const darkModeSwitch = document.getElementById('darkModeSwitch');
+    darkModeSwitch.addEventListener('change', toggleDarkMode);
+</script>
+</header>
+    <div style=" border-radius: 5px;" id="editor_container" class="container mt-5">
+        <h3 style="color: grey; padding: 15px;" id="edit_conf" class="edit_conf">Edit HAProxy Config</h3>
+        <form method="POST">
+            <div class="form-group">
+                <label for="haproxy_config">Configuration:</label>
+                <textarea  style="padding: 15px;" class="form-control" name="haproxy_config" rows="25" cols="120">{{ config_content }}</textarea>
+            </div>
+            <div style="padding-bottom: 20px;" class="form-group">
+                <input type="submit" class="btn btn-warning" id="save_check" name="save_check" value="Save & Check">
+                <input type="submit" class="btn btn-primary" name="save_reload" value="Save & Restart">
+            </div>
+        </form>
+        {% if check_output %}
+        <div style="padding-bottom: 15px;">
+        {% if 'Fatal errors' in check_output %}
+            <div  class="alert alert-danger alert-dismissible fade show" role="alert">
+                <pre class="mt-3">{{ check_output }}</pre>
+            </div>
+        {% elif 'Warnings' in check_output %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <pre class="mt-3">{{ check_output }}</pre>
+            </div>
+        {% elif 'error detected while parsing an' in check_output %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <pre class="mt-3">{{ check_output }}</pre>
+            </div>
+        {% else %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <pre class="mt-3">{{ check_output }}</pre>
+            </div>
+        {% endif %}
+        </div>
+    {% endif %}
+
+
+
+       
+    <!-- Add Bootstrap JS and jQuery scripts here (if needed) -->
+    <!-- You can get them from the official Bootstrap website or use CDN links -->
+</body>
+</html>

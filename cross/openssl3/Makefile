@@ -1,5 +1,5 @@
 PKG_NAME = openssl3
-PKG_VERS = 3.5.4
+PKG_VERS = 3.5.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = openssl-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.openssl.org/source
@@ -64,7 +64,7 @@ ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 endif
 
 ifeq ($(strip $(OPENSSL_PLATFORM)),)
-# Unexpected CPU architecture. Please add arch to mk/spksrc.archs.mk
+# Unexpected CPU architecture. Please add arch to mk/spksrc.common.mk
 $(error Arch $(ARCH) not expected yet)
 endif
 

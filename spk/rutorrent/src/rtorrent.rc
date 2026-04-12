@@ -1,3 +1,6 @@
+# Run in daemon mode (no ncurses UI)
+system.daemon.set = true
+
 scgi_port = localhost:@service_port@
 directory = @download_dir@
 session = /var/packages/rutorrent/var/.session
@@ -11,5 +14,18 @@ system.file.allocate = 1
 protocol.encryption.set = require,require_RC4,allow_incoming,try_outgoing
 dht.mode.set = auto
 dht.port.set = 6881
-protocol.pex.set= yes
+protocol.pex.set = yes
 port_range = 6881-6999
+
+# File handle limits optimized for ulimit of 1024
+# (DSM default, leave headroom for rtorrent internals)
+network.http.max_open.set = 50
+network.max_open_files.set = 600
+network.max_open_sockets.set = 300
+
+# Peer throttling to manage connection overhead
+throttle.min_peers.normal.set = 20
+throttle.max_peers.normal.set = 60
+throttle.min_peers.seed.set = 30
+throttle.max_peers.seed.set = 80
+trackers.numwant.set = 80

@@ -1,7 +1,7 @@
 SPK_NAME = python312
-SPK_VERS = 3.12.12
+SPK_VERS = 3.12.13
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/python3.png
 
 # Compiler must support std=c++11
@@ -15,7 +15,7 @@ DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
 DISPLAY_NAME = Python 3.12
-CHANGELOG = "1. Update to Python 3.12.12"
+CHANGELOG = "1. Update to Python 3.12.13"
 
 HOMEPAGE = https://www.python.org
 LICENSE  = PSF
@@ -39,5 +39,5 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: python312_extra_install
 python312_extra_install:
-	@$(MSG) - Remove compiled files from __pycache__
-	find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' -delete
+	@$(MSG) \($(SPK_NAME)\) Remove compiled files from __pycache__
+	@find $(STAGING_DIR)/$(PYTHON_LIB_DIR) -type f -regex '.*\.py[co]' -delete

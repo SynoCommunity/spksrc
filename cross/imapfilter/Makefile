@@ -20,7 +20,7 @@ ENV += SHAREDIR="$(INSTALL_PREFIX)/share/imapfilter"
 ENV += SSLCAPATH="/etc/ssl/certs"
 ENV += SSLCAFILE="/etc/ssl/certs/ca-certificates.crt"
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 ADDITIONAL_CFLAGS = -DLUA_USE_C89

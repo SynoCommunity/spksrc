@@ -1,5 +1,5 @@
 PKG_NAME = navidrome
-PKG_VERS = 0.58.5
+PKG_VERS = 0.60.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/navidrome/navidrome/archive
