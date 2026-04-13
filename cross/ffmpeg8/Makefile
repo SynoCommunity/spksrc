@@ -159,6 +159,11 @@ CONFIGURE_ARGS += --enable-libtheora
 DEPENDS += cross/twolame
 CONFIGURE_ARGS += --enable-libtwolame
 
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/libvmaf
+CONFIGURE_ARGS += --enable-libvmaf
+endif
+
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
 
