@@ -230,6 +230,7 @@ ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm64
 CONFIGURE_ARGS += --enable-neon
 CONFIGURE_ARGS += --enable-thumb
+CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
@@ -249,6 +250,9 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-vaapi
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
+CONFIGURE_ARGS += --enable-v4l2-m2m
+endif
 
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
