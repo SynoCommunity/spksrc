@@ -139,6 +139,9 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/speex
 CONFIGURE_ARGS += --enable-libspeex
 
+DEPENDS += cross/libsrt
+CONFIGURE_ARGS += --enable-libsrt
+
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --enable-libtheora
