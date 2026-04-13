@@ -117,6 +117,11 @@ DEPENDS += cross/libjxl
 CONFIGURE_ARGS += --enable-libjxl
 endif
 
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+DEPENDS += cross/liblc3
+CONFIGURE_ARGS += --enable-liblc3
+endif
+
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
