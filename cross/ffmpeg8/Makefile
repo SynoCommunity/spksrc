@@ -112,6 +112,11 @@ CONFIGURE_ARGS += --enable-libfribidi
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
 
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/libjxl
+CONFIGURE_ARGS += --enable-libjxl
+endif
+
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
 
