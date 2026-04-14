@@ -17,7 +17,7 @@
 #  WHEEL_VERSION           Version of wheel to process (can be empty)
 
 # Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
-PYTHON_WORK_DIR = $(or $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(wildcard $(WORK_DIR)))
+PYTHON_WORK_DIR = $(or $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(WORK_DIR))
 
 # Other Python spk/python* related variables
 PYTHON_PKG_VERS             = $(or $(lastword $(subst -, ,$(notdir $(patsubst %/,%,$(wildcard $(PYTHON_WORK_DIR)/Python-[0-9]*))))),$(SPK_VERS))
@@ -32,8 +32,9 @@ PYTHON_LIB_NATIVE           = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/bui
 PYTHON_LIB_CROSS            = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell expr "$(TC_TARGET)" : '\([^-]*\)' )-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 
 # wheel crossenv definitions: 
-#   Use PYTHON_PACKAGE_DIR from spksrc.python.mk
-#   OR if empty then we are building spk/python3*
+# *** Not to be confused with dynamically-created crossenv for building wheels ***
+#   Use PYTHON_PACKAGE_DIR from spksrc.spk/python.mk
+#   OR use local to current package build crossenv definition directory
 CROSSENV_CONFIG_PATH = $(realpath $(or $(PYTHON_PACKAGE_DIR),$(WORK_DIR)/..)/crossenv)
 CROSSENV_CONFIG_DEFAULT = $(CROSSENV_CONFIG_PATH)/requirements-default.txt
 CROSSENV_PATH = $(abspath $(WORK_DIR)/crossenv-$(CROSSENV_WHEEL)/)

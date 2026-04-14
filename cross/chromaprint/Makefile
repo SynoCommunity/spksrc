@@ -23,7 +23,7 @@ CMAKE_ARGS += -DBUILD_TOOLS=ON
 CMAKE_ARGS += -DBUILD_TESTS=OFF
 CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"
 
-ifneq ($(wildcard $(FFMPEG_PACKAGE_ROOT)),)
+ifneq ($(wildcard $(FFMPEG_STAGING_INSTALL_PREFIX)),)
 CMAKE_ARGS += -DCMAKE_INSTALL_RPATH=$(FFMPEG_INSTALL_PREFIX)/lib
 
 # Location of FFMPEG Headers

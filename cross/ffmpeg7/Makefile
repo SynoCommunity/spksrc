@@ -249,33 +249,12 @@ CONFIGURE_ARGS += --cpu=atom
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-# Dependencies provided by synocli-videodriver
-# If built outside spksrc.videodriver.mk
-ifeq ($(wildcard $(VIDEODRV_STAGING_INSTALL_PREFIX)),)
-DEPENDS += cross/libva cross/libva-utils
-DEPENDS += cross/intel-vaapi-driver
-DEPENDS += cross/intel-media-driver cross/intel-mediasdk
-DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
-
-# Newer Intel implementations requires gcc >= 5
-# IGC (OpenCL), oneAPI, level-zero, vulkan
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
-DEPENDS += cross/intel-level-zero
-DEPENDS += cross/intel-graphics-compiler
-DEPENDS += cross/intel-compute-runtime
-DEPENDS += cross/ocl-icd
-DEPENDS += cross/clinfo
-DEPENDS += cross/mesa
-DEPENDS += cross/Khronos-Vulkan-Loader
-DEPENDS += cross/Khronos-Vulkan-Tools
-endif # gcc >= 5
-endif # != synocli-videodriver
-
 CONFIGURE_ARGS += --arch=x86_64
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-libmfx
 CONFIGURE_ARGS += --enable-vaapi
 
+# Enable OpenCL and Vulkan acceleration
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan

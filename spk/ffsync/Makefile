@@ -11,7 +11,7 @@ WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)
 
 REQUIRED_MIN_DSM = 6.0
-SPK_DEPENDS = MariaDB10:$(PYTHON_PACKAGE)
+SPK_DEPENDS = MariaDB10
 # SRM is not supported due lacking mariadb package
 REQUIRED_MIN_SRM = 3.0
 
@@ -34,16 +34,12 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
-# [cryptography]
-DEPENDS += cross/openssl3
-
-# [mysqlclient]
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
-
 POST_STRIP_TARGET = ffsync_extra_install
 
 include ../../mk/spksrc.common.mk
+
+# [cryptography]
+DEPENDS += cross/openssl3
 
 # [greenlet]
 # version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
@@ -56,6 +52,10 @@ WHEELS += greenlet==3.0.3
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
+# [mysqlclient]
+ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
+ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
 	@$(MSG) Install config file
@@ -65,4 +65,4 @@ ffsync_extra_install:
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib:/var/packages/$(PYTHON_PACKAGE)/target/lib $(STAGING_DIR)/bin/syncserver
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/diesel
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

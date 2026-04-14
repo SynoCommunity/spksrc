@@ -8,7 +8,7 @@ SPK_ICON = src/duplicity.png
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE):gnupg>=2.1.6"
+SPK_DEPENDS = "gnupg>=2.1.6"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 DEPENDS = cross/librsync cross/duply
@@ -61,4 +61,4 @@ DEPENDS += cross/libyaml
 #   - To be built last
 DEPENDS += python/duplicity
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

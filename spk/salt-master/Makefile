@@ -4,7 +4,6 @@ SPK_REV = 14
 SPK_ICON = src/salt-master.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 DEPENDS = cross/saltgui
@@ -104,4 +103,4 @@ salt-master_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/extensions/auth
 	install -m 644 src/app/synology.py $(STAGING_DIR)/var/extensions/auth/synology.py
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

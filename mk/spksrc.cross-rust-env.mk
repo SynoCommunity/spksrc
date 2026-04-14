@@ -64,10 +64,6 @@ ifeq ($(findstring $(RUST_ARCH), $(i686_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = i686-unknown-linux-gnu
 endif
 
-ifeq ($(RUST_TARGET),)
-$(error Arch $(RUST_ARCH) not supported)
-endif
-
 # By default use the default toolchain if unset
 ifeq ($(TC_RUSTUP_TOOLCHAIN),)
 TC_RUSTUP_TOOLCHAIN = $(RUSTUP_DEFAULT_TOOLCHAIN)

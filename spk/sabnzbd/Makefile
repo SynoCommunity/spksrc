@@ -13,8 +13,6 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 # unrar not supported
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
-SPK_DEPENDS = $(PYTHON_PACKAGE)
-
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = Safihre
@@ -64,7 +62,7 @@ else
 WHEELS += orjson==3.11.3
 endif
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk
 
 # prefer native python tools (pip, maturin, ...) used for orjson
 ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
