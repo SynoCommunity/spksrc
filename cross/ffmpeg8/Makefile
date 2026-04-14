@@ -172,6 +172,11 @@ endif
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
 
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/vvenc
+CONFIGURE_ARGS += --enable-libvvenc
+endif
+
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += --enable-libvpx
 
