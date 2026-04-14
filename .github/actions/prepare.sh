@@ -30,7 +30,7 @@ set -o pipefail
 # ===========================================================================
 
 # ffmpeg versions to manage build order for
-ffmpeg_versions=(5 6 7)
+ffmpeg_versions=(5 6 7 8)
 
 # python minor versions to manage build order for
 python_versions=(310 311 312 313 314)
