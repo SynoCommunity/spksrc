@@ -30,7 +30,7 @@ set -o pipefail
 # ===========================================================================
 
 # ffmpeg versions whose build artifacts must be preserved for dependents
-ffmpeg_versions=(5 6 7)
+ffmpeg_versions=(5 6 7 8)
 
 # python minor versions whose build artifacts must be preserved for dependents
 python_versions=(310 311 312 313 314)
