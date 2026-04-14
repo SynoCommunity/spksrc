@@ -137,6 +137,11 @@ CONFIGURE_ARGS += --enable-librabbitmq
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
 
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/rubberband
+CONFIGURE_ARGS += --enable-librubberband
+endif
+
 DEPENDS += cross/shine
 CONFIGURE_ARGS += --enable-libshine
 
