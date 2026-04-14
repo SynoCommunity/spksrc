@@ -1,0 +1,3304 @@
+diff --git src/esstream.h src/esstream.h
+index 592a6933dc..a7057f6adb 100644
+--- src/esstream.h
++++ src/esstream.h
+@@ -22,6 +22,9 @@
+ 
+ #include "descrambler/descrambler.h"
+ #include "input/mpegts/dvb.h"
++#if ENABLE_LIBAV
++#include <libavutil/rational.h>
++#endif
+ 
+ /**
+  *
+@@ -95,11 +98,21 @@ struct elementary_info {
+ 
+   int es_frame_duration;
+ 
++  // temporary used for each field
++  int es_width_2b;
++  int es_height_2b;
++  int es_width_12b;
++  int es_height_12b;
++
++  // store the final width,height (after 2bits+12bits concatenation)
+   int es_width;
+   int es_height;
+ 
+   uint16_t es_aspect_num;
+   uint16_t es_aspect_den;
++#if ENABLE_LIBAV
++  AVRational es_sample_aspect_ratio;
++#endif
+ 
+   char es_lang[4];           /* ISO 639 2B 3-letter language code */
+   uint8_t es_audio_type;     /* Audio type */
+diff --git src/muxer/muxer_libav.c src/muxer/muxer_libav.c
+index 92bdf6a3d3..99e4966689 100644
+--- src/muxer/muxer_libav.c
++++ src/muxer/muxer_libav.c
+@@ -175,8 +175,10 @@ lav_muxer_add_stream(lav_muxer_t *lm,
+     c->time_base.num = 1;
+     c->time_base.den = 25;
+ 
+-    c->sample_aspect_ratio.num = ssc->es_aspect_num;
+-    c->sample_aspect_ratio.den = ssc->es_aspect_den;
++    // to be removed later on
++    tvherror(LS_LIBAV,  "ssc->sample_aspect_ratio = %d/%d", ssc->es_sample_aspect_ratio.num, ssc->es_sample_aspect_ratio.den);
++    c->sample_aspect_ratio.num = ssc->es_sample_aspect_ratio.num;
++    c->sample_aspect_ratio.den = ssc->es_sample_aspect_ratio.den;
+ 
+     if (lm->m_config.m_type == MC_AVMP4) {
+       /* this is a whole hell */
+diff --git src/packet.h src/packet.h
+index c6a507e32c..09a4670d2b 100644
+--- src/packet.h
++++ src/packet.h
+@@ -68,6 +68,9 @@ typedef struct th_pkt {
+ 
+       uint16_t pkt_aspect_num;
+       uint16_t pkt_aspect_den;
++#if ENABLE_LIBAV
++      AVRational pkt_sample_aspect_ratio;
++#endif
+     } v;
+     struct {
+       uint8_t pkt_keyframe;
+diff --git src/parsers/parser_h264.c src/parsers/parser_h264.c
+index ade299a633..e0d3b8a3f6 100644
+--- src/parsers/parser_h264.c
++++ src/parsers/parser_h264.c
+@@ -444,6 +444,11 @@ h264_decode_slice_header(parser_es_t *st, bitstream_t *bs, int *pkttype,
+     parser_set_stream_vparam(st, width, height, d);
+ 
+   if (sps->aspect_num && sps->aspect_den) {
++#if ENABLE_LIBAV
++    // save SAR
++    st->es_sample_aspect_ratio.num = sps->aspect_num;
++    st->es_sample_aspect_ratio.den = sps->aspect_den;
++#endif
+     width  *= sps->aspect_num;
+     height *= sps->aspect_den;
+     if (width && height) {
+@@ -452,6 +457,11 @@ h264_decode_slice_header(parser_es_t *st, bitstream_t *bs, int *pkttype,
+       st->es_aspect_den = height / v;
+     }
+   } else {
++#if ENABLE_LIBAV
++    // save SAR
++    st->es_sample_aspect_ratio.num = 0;
++    st->es_sample_aspect_ratio.den = 1;
++#endif
+     st->es_aspect_num = 0;
+     st->es_aspect_den = 1;
+   }
+diff --git src/parsers/parser_hevc.c src/parsers/parser_hevc.c
+index c46de5a2bd..e9a6e9c4fa 100644
+--- src/parsers/parser_hevc.c
++++ src/parsers/parser_hevc.c
+@@ -1713,6 +1713,11 @@ hevc_decode_slice_header(parser_es_t *st, bitstream_t *bs, int *pkttype)
+     parser_set_stream_vparam(st, width, height, d);
+ 
+   if (sps->vui.sar.num && sps->vui.sar.den) {
++#if ENABLE_LIBAV
++    // save SAR
++    st->es_sample_aspect_ratio.num = sps->vui.sar.num;
++    st->es_sample_aspect_ratio.den = sps->vui.sar.den;
++#endif
+     width  *= sps->vui.sar.num;
+     height *= sps->vui.sar.den;
+     if (width && height) {
+@@ -1721,6 +1726,11 @@ hevc_decode_slice_header(parser_es_t *st, bitstream_t *bs, int *pkttype)
+       st->es_aspect_den = height / v;
+     }
+   } else {
++#if ENABLE_LIBAV
++    // save SAR
++    st->es_sample_aspect_ratio.num = 0;
++    st->es_sample_aspect_ratio.den = 1;
++#endif
+     st->es_aspect_num = 0;
+     st->es_aspect_den = 1;
+   }
+diff --git src/parsers/parsers.c src/parsers/parsers.c
+index 7c20d01d21..0b99008355 100644
+--- src/parsers/parsers.c
++++ src/parsers/parsers.c
+@@ -144,6 +144,10 @@ parser_deliver(parser_t *t, parser_es_t *st, th_pkt_t *pkt)
+   if (SCT_ISVIDEO(pkt->pkt_type)) {
+     pkt->v.pkt_aspect_num = st->es_aspect_num;
+     pkt->v.pkt_aspect_den = st->es_aspect_den;
++#if ENABLE_LIBAV
++    pkt->v.pkt_sample_aspect_ratio.num = st->es_sample_aspect_ratio.num;
++    pkt->v.pkt_sample_aspect_ratio.den = st->es_sample_aspect_ratio.den;
++#endif
+   }
+ 
+   /* Forward packet */
+@@ -1131,13 +1135,35 @@ parser_set_stream_vparam(parser_es_t *st, int width, int height,
+   }
+ }
+ 
++static void
++parser_combine_stream_vparam(parser_es_t *st, int duration) {
++
++  int width  = (st->es_width_2b  << 12) | (st->es_width_12b  & 0xFFFu);
++  int height = (st->es_height_2b << 12) | (st->es_height_12b & 0xFFFu);
++#if ENABLE_LIBAV
++  /* CALCULATE SAR 
++     Now that we have the intended display area, we can refine the SAR 
++     calculation if we already have the DAR from the 0xB3 header. */
++  if (st->es_aspect_num && st->es_aspect_den && width > 0 && height > 0) {
++    // SAR = (DAR_num * display_height) / (DAR_den * display_width)
++    uint32_t sample_aspect_ratio_num = st->es_aspect_num * height;
++    uint32_t sample_aspect_ratio_den = st->es_aspect_den * width;
++    // Note: You should simplify this fraction via GCD.
++    uint32_t v = gcdU32(sample_aspect_ratio_num, sample_aspect_ratio_den);
++    st->es_sample_aspect_ratio.num = sample_aspect_ratio_num / v;
++    st->es_sample_aspect_ratio.den = sample_aspect_ratio_den / v;
++  }
++#endif
++  parser_set_stream_vparam(st, width, height, duration);
++}
+ 
++/* Standard MPEG-2 DAR table: {numerator, denominator} */
+ static const uint8_t mpeg2_aspect[16][2]={
+-    {0,1},
+-    {1,1},
+-    {4,3},
+-    {16,9},
+-    {221,100},
++    {0,1},      /* Reserved */
++    {1,1},      /* Square Pixels (SAR is 1:1, DAR depends on W/H) */
++    {4,3},      /* 4:3 DAR */
++    {16,9},     /* 16:9 DAR */
++    {221,100},  /* 2.21:1 DAR */
+     {0,1},
+     {0,1},
+     {0,1},
+@@ -1153,35 +1179,200 @@ static const uint8_t mpeg2_aspect[16][2]={
+ 
+ 
+ /**
+- * Parse mpeg2video sequence start
++ * @brief Parses the MPEG-2 Video Sequence Header to extract stream metadata.
++ *
++ * This function reads the mandatory fixed-length fields of an MPEG-2 sequence 
++ * start code. It populates the elementary stream (ES) structure with 
++ * resolution, aspect ratio, and frame timing data.
++ *
++ * @param t   Pointer to the global parser state.
++ * @param st  Pointer to the stream-specific context where results are stored.
++ * @param bs  Pointer to the bitstream buffer currently being read.
++ * * @return int PARSER_APPEND on success, or PARSER_RESET if there is insufficient data.
+  */
+ static int
+ parse_mpeg2video_seq_start(parser_t *t, parser_es_t *st,
+                            bitstream_t *bs)
+ {
+-  int width, height, aspect, duration;
+-
++  int aspect, duration;
++  /* 1. Check for minimum required bits. 
++     The Sequence Header core (up to VBV size) is 61 bits long.
++     If we have less, we return RESET to wait for more data. */
+   if(bs->len < 61)
+     return PARSER_RESET;
+-  
+-  width = read_bits(bs, 12);
+-  height = read_bits(bs, 12);
++  /* 2. Read Resolution: 
++     Horizontal and Vertical sizes are 12 bits each in the MPEG-2 spec. */
++  st->es_width_12b = read_bits(bs, 12);
++  st->es_height_12b = read_bits(bs, 12);
++  /* 3. Read Aspect Ratio:
++     A 4-bit index used to determine the Sample or Display aspect ratio. */
+   aspect = read_bits(bs, 4);
+-
++  /* Look up the actual numerator/denominator from a predefined MPEG-2 table. */
+   st->es_aspect_num = mpeg2_aspect[aspect][0];
+   st->es_aspect_den = mpeg2_aspect[aspect][1];
+-
++  /* 4. Read Frame Rate:
++     A 4-bit 'frame_rate_code'. This is mapped to a duration (likely in 90kHz ticks)
++     using the mpeg2video_framedurations lookup table. */
+   duration = mpeg2video_framedurations[read_bits(bs, 4)];
+-
++  /* 5. Skip Bit Rate and Marker:
++     - 18 bits for the bit_rate_value.
++     - 1 bit for the marker_bit (always '1' to prevent start-code emulation). */
+   skip_bits(bs, 18);
+   skip_bits(bs, 1);
+   
+ #if 0
++  /* Optional: Read VBV Buffer Size (10 bits).
++     VBV (Video Buffering Verifier) ensures the stream doesn't overflow the decoder buffer. */
+   int v = read_bits(bs, 10) * 16 * 1024 / 8;
+   st->es_vbv_size = v;
+ #endif
++  /* 6. Commit Parameters:
++     Update the stream context with the newly parsed width, height, and duration. */
++  parser_combine_stream_vparam(st, duration);
++  /* Return APPEND to signal that parsing of this header is complete. */
++  return PARSER_APPEND;
++}
+ 
+-  parser_set_stream_vparam(st, width, height, duration);
++
++/*
++ * parse_mpeg2video_seq_ext - Parse MPEG-2 sequence_extension (ISO/IEC 13818-2).
++ *
++ * extension_start_code_identifier: 0001 (0x1). Fixed-length syntax: 48 bits
++ * starting at the first bit of that 4-bit identifier (not counting the prior
++ * extension_start_code 0x000001B5 if the caller already consumed it).
++ *
++ * Bitstream layout (MSB-first, order must match the standard):
++ *   - extension_start_code_identifier (4)  -- consumed here via skip_bits(4)
++ *   - profile_and_level_indication (8)
++ *   - progressive_sequence (1)
++ *   - chroma_format (2)  -- value 00 is forbidden in conforming streams
++ *   - horizontal_size_extension (2)
++ *   - vertical_size_extension (2)
++ *   - bit_rate_extension (12)
++ *   - marker_bit (1)  -- shall be 1
++ *   - vbv_buffer_size_extension (8)
++ *   - low_delay (1)
++ *   - frame_rate_extension_n (2)
++ *   - frame_rate_extension_d (5)
++ *
++ * Preconditions:
++ *   - `bs` is positioned at the first bit of extension_start_code_identifier.
++ *   - At least 48 bits are available (returns PARSER_DROP if not).
++ *
++ * Coded picture size:
++ *   Combine with 12-bit horizontal_size_value / vertical_size_value from
++ *   sequence_header (0xB3): full width/height = (ext << 12) | value.
++ *   Extensions may be zero; the formula still applies.
++ *
++ * This implementation only refreshes width/height when either extension
++ * nibble is non-zero and is always applying the OR to achieve a one code
++ * path for all streams.
++ *
++ * Returns PARSER_APPEND on success, PARSER_DROP if the fixed extension
++ * cannot be read in full.
++ */
++static int
++parse_mpeg2video_seq_ext(parser_t *t, parser_es_t *st, bitstream_t *bs)
++{
++  /* 1. Check for minimum required bits. 
++     The Sequence Extension (0x1) is 48 bits long.
++     If we have less, we return PARSER_DROP to wait for more data. */
++  if(bs->len < 48)
++    return PARSER_DROP;
++  /* Skip the 4-bit ID we already read (0x1) */
++  skip_bits(bs, 4); 
++
++  skip_bits(bs, 8); // skip profile_and_level_indication
++  skip_bits(bs, 1); // skip progressive_sequence
++  skip_bits(bs, 2); // skip chroma_format
++  
++  /* Horizontal/Vertical size extensions (2 bits each) 
++     These would be appended to the 12-bit values from 0xB3 */
++  st->es_width_2b  = read_bits(bs, 2);
++  st->es_height_2b = read_bits(bs, 2);
++  skip_bits(bs, 12); // skip bit_rate_extension
++  // marker always 1
++  skip_bits(bs, 1); // skip marker_bit; TODO: maybe we sould check if is '1'
++
++  skip_bits(bs, 8); // skip vbv_buffer_size_extension
++  skip_bits(bs, 1); // skip low_delay
++  skip_bits(bs, 2); // skip frame_rate_extension_n
++  skip_bits(bs, 5); // skip frame_rate_extension_d
++
++  // Update st-> values
++  if (st->es_width_2b || st->es_height_2b) {
++    /* Commit Parameters:
++      Update the stream context with the newly parsed width, height, and duration. */
++    parser_combine_stream_vparam(st, st->es_frame_duration);
++  }
++  
++  /* Return APPEND to signal that parsing of this header is complete. */
++  return PARSER_APPEND; 
++}
++
++
++/*
++ * Parse MPEG-2 sequence_display_extension (ISO/IEC 13818-2, sequence_display_extension).
++ *
++ * Preconditions:
++ *   - bs is positioned at the first bit of extension_start_code_identifier.
++ *   - That identifier is 0x2 (binary 0010) for sequence_display_extension; the caller
++ *     should verify extension_start_code (0x000001B5) and optionally the ID before calling.
++ *
++ * Syntax (fixed part only; no frame_center offsets — those are in picture_display_extension):
++ *   - video_format (3), colour_description (1)
++ *   - if colour_description: colour_primaries (8), transfer_characteristics (8),
++ *     matrix_coefficients (8)
++ *   - display_horizontal_size (14), marker_bit (1), display_vertical_size (14)
++ *
++ * Length: 37 bits without optional colour fields, 61 bits with them (not counting the
++ * 32-bit extension_start_code, which is outside this routine if already consumed).
++ *
++ * Returns PARSER_APPEND on success, PARSER_DROP if insufficient bits remain.
++ */
++static int
++parse_mpeg2video_display_ext(parser_t *t, parser_es_t *st, bitstream_t *bs)
++{
++  /* 1. Check for minimum required bits. 
++     The Display Extension (0x2) is between 37 bits and 61 bits long.
++     If we have less, we return RESET to wait for more data. */
++  if(bs->len < 37)
++    return PARSER_DROP;
++  /* Skip the 4-bit ID (0x2) */
++  skip_bits(bs, 4);
++
++  skip_bits(bs, 3); // skip video_format
++  int colour_description = read_bits(bs, 1);
++
++  if (colour_description) {
++    if (bs->len < 61)
++      return PARSER_DROP;
++    skip_bits(bs, 8); // skip primaries
++    skip_bits(bs, 8); // skip transfer
++    skip_bits(bs, 8); // skip matrix
++  } else {
++    if (bs->len < 37)
++      return PARSER_DROP;
++  }
++
++  /* Extract Display Sizes - 14 bits each */
++  int display_width  = read_bits(bs, 14);
++  skip_bits(bs, 1); // Marker bit; TODO: maybe we sould check if is '1'
++  int display_height = read_bits(bs, 14);
++
++  if (display_width > 0 && display_height > 0) {
++    // update raw fields of es_width and st->es_height
++    st->es_width_12b  = display_width  & 0xFFFu;
++    st->es_height_12b = display_height & 0xFFFu;
++    st->es_width_2b   = (display_width  & 0x3000u) >> 12;
++    st->es_height_2b  = (display_height & 0x3000u) >> 12;
++
++    /* 6. Commit Parameters:
++    Update the stream context with the newly parsed width, height, and duration. */
++    parser_combine_stream_vparam(st, st->es_frame_duration);
++  }
++
++  /* Return APPEND to signal that parsing of this header is complete. */
+   return PARSER_APPEND;
+ }
+ 
+@@ -1229,6 +1420,21 @@ parser_global_data_move(parser_es_t *st, const uint8_t *data, size_t len, int re
+  * 'steal' the st->es_buffer and use it as 'pkt' buffer
+  *
+  */
++/**
++ * @brief Main reassembly and parsing logic for MPEG-2 Video elementary streams.
++ *
++ * This function processes MPEG-2 start codes to reconstruct frames from slices.
++ * It handles metadata extraction (Sequence, GOP, Extensions) and manages the
++ * lifecycle of media packets (th_pkt_t), including timestamp extrapolation
++ * and payload "stealing" for efficiency.
++ *
++ * @param t               Pointer to the global parser state.
++ * @param st              Pointer to the stream-specific context.
++ * @param len             Length of the current start code's data.
++ * @param next_startcode  The lookahead start code (used to detect frame boundaries).
++ * @param sc_offset       Offset in the stream buffer where the current code starts.
++ * @return int            Parser directive (APPEND, DROP, HEADER, or RESET).
++ */
+ static int
+ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+                  uint32_t next_startcode, int sc_offset)
+@@ -1237,15 +1443,16 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+   bitstream_t bs;
+   int frametype;
+   th_pkt_t *pkt;
+-
++  /* 0x1E0 is the PES start code for Video. If found, signal it's a header. */
+   if(next_startcode == 0x1e0)
+     return PARSER_HEADER;
+-
++  /* Initialize bitstream reader, skipping the 4-byte start code prefix (00 00 01 XX) */
+   init_rbits(&bs, buf + 4, (len - 4) * 8);
+-
++  /* Switch on the last byte of the start code */
+   switch(st->es_startcode & 0xff) {
+   case 0xe0 ... 0xef:
+-    /* System start codes for video */
++    /* 1. PES/System Start Codes:
++       If we find a PES header, parse it to extract PTS/DTS and reset. */
+     if(len < 9)
+       return PARSER_RESET;
+ 
+@@ -1253,16 +1460,17 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+     return PARSER_RESET;
+ 
+   case 0x00:
+-    /* Picture start code */
++    /* 2. Picture Start Code:
++       Start of a new frame. We need a valid duration before we can proceed. */
+     if(st->es_frame_duration == 0)
+       return PARSER_RESET;
+-
++    /* Extract frame type (I, P, or B) from the picture header. */
+     if(parse_mpeg2video_pic_start(t, st, &frametype, &bs) != PARSER_APPEND)
+       return PARSER_RESET;
+-
++    /* If there was a previous unfinished packet, release it. */
+     if(st->es_curpkt != NULL)
+       pkt_ref_dec(st->es_curpkt);
+-
++    /* Allocate a new packet and populate it with current timing/metadata. */
+     pkt = pkt_alloc(st->es_type, NULL, 0, st->es_curpts, st->es_curdts, t->prs_current_pcr);
+     pkt->v.pkt_frametype = frametype;
+     pkt->pkt_duration = st->es_frame_duration;
+@@ -1274,13 +1482,15 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+     if(st->es_curdts != PTS_UNSET)
+       st->es_curdts += st->es_frame_duration;
+ 
+-    /* PTS cannot be extrapolated (it's not linear) */
++    /* PTS is non-linear in MPEG-2 (due to B-frame reordering), so we can't extrapolate it. */
+     st->es_curpts = PTS_UNSET; 
+ 
+     break;
+ 
+   case 0xb3:
+-    /* Sequence start code */
++    /* 3. Sequence Header:
++       Contains critical stream info (Resolution, Aspect Ratio).
++       'parser_global_data_move' saves this as extradata/global header. */
+     if(!st->es_buf.sb_err) {
+       if(parse_mpeg2video_seq_start(t, st, &bs) != PARSER_APPEND)
+         return PARSER_RESET;
+@@ -1291,45 +1501,102 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+     return PARSER_DROP;
+ 
+   case 0xb5:
++    /* 4. Extension Header:
++       Check if it's a Sequence Extension (0x1) or Display Extension (0x2). */
+     if(len < 5)
+       return PARSER_RESET;
+     switch(buf[4] >> 4) {
+     case 0x1:
+       // Sequence Extension
+-      if(!st->es_buf.sb_err)
++      /* Fixed (~48 bits from first bit of ID, including marker_bit)*/
++      if(!st->es_buf.sb_err) {
++        if(parse_mpeg2video_seq_ext(t, st, &bs) != PARSER_APPEND)
++          return PARSER_RESET;
+         parser_global_data_move(st, buf, len, 0);
++      }
+       return PARSER_DROP;
+     case 0x2:
+       // Sequence Display Extension
+-      if(!st->es_buf.sb_err)
++      /* Variable (depends on flags + number_of_frame_center_offsets and optional colour description)*/
++      if(!st->es_buf.sb_err) {
++        if(parse_mpeg2video_display_ext(t, st, &bs) != PARSER_APPEND)
++          return PARSER_RESET;
+         parser_global_data_move(st, buf, len, 0);
++      }
+       return PARSER_DROP;
++/* other information that can be added later on: 
++  TODO: add data in the future.
++    case 0x03:
++      // Quant Matrix Extension
++      // Variable (depends on which load_*_intra/non_intra flags are set → optional 8×64 matrices)
++      if(!st->es_buf.sb_err) {
++        parser_global_data_move(st, buf, len, 0);
++      }
++    case 0x04:
++      // Copyright extension
++      // Fixed (fixed-width fields)
++    case 0x05:
++      // Sequence scalable extension
++      // Fixed
++      if(!st->es_buf.sb_err) {
++        parser_global_data_move(st, buf, len, 0);
++      }
++    case 0x06:
++      // reserved
++    case 0x07:
++      // Picture display extension
++      // Variable (number_of_frame_center_offsets + repeated offset pairs)
++    case 0x08:
++      // Picture coding extension
++      // Fixed (long but fixed)
++    case 0x09:
++      // Picture spatial scalable extension
++      // Fixed
++    case 0x0A:
++      // Picture temporal scalable extension
++      // Fixed
++    case 0x0B:
++      // Camera parameter extension
++      // Fixed
++    case 0x0C:
++      // ITU-T T.35 extension
++      // Variable (length follows T.35 payload rules)
++    case 0x0D:
++    case 0x0E:
++      // reserved
++    case 0x0F:
++      // forbidden
++*/
+     }
+     break;
+ 
+   case 0x01 ... 0xaf:
+-    /* Slices */
+-
++    /* 5. Slices:
++       These contain the actual macroblock data. We stay in this case until 
++       the 'next_startcode' indicates the end of the picture (a new pic or sequence). */
+     if(next_startcode == 0x100 || next_startcode > 0x1af) {
+-      /* Last picture slice (because next not a slice) */
++      /* This is the final slice of the current frame. */
+       th_pkt_t *pkt = st->es_curpkt;
+       size_t metalen = 0;
+       if(pkt == NULL) {
+         /* no packet, may've been discarded by sanity checks here */
+         return PARSER_RESET;
+       }
+-
++      /* Attach accumulated global headers (SPS/PPS/GOP) to this packet's metadata. */
+       if(st->es_global_data) {
+         pkt->pkt_meta = pktbuf_make(st->es_global_data,
+                                     metalen = st->es_global_data_len);
+         st->es_global_data = NULL;
+         st->es_global_data_len = 0;
+       }
+-
++      /* Check for stream errors before finalizing payload. */
+       if (st->es_buf.sb_err) {
+         pkt->pkt_err = st->es_buf.sb_err;
+         st->es_buf.sb_err = 0;
+       }
++      /* Payload handling:
++         If we have metadata, we must copy everything into a new buffer.
++         Otherwise, we "steal" the internal buffer to avoid a memory copy. */
+       if (metalen) {
+         pkt->pkt_payload = pktbuf_alloc(NULL, metalen + st->es_buf.sb_ptr - 4);
+         memcpy(pktbuf_ptr(pkt->pkt_payload), pktbuf_ptr(pkt->pkt_meta), metalen);
+@@ -1340,7 +1607,7 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+         sbuf_steal_data(&st->es_buf);
+       }
+       pkt->pkt_duration = st->es_frame_duration;
+-
++      /* Deliver the packet to the next stage of the pipeline. */
+       if (st->es_priv) {
+         if (!TAILQ_EMPTY(&st->es_backlog))
+           parser_do_backlog(t, st, NULL, pkt->pkt_meta);
+@@ -1357,19 +1624,22 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+     break;
+ 
+   case 0xb8:
+-    // GOP header
++    /* 6. Group of Pictures (GOP) Header:
++       Store this as global data so it's prepended to the next I-frame. */
+     if(!st->es_buf.sb_err)
+       parser_global_data_move(st, buf, len, 0);
+     return PARSER_DROP;
+ 
+   case 0xb2:
+-    // User data
++    /* 7. User Data:
++       Usually contains closed captions or hardware-specific info. 
++       Currently ignored by this switch. */
+     break;
+ 
+   default:
+     break;
+   }
+-
++  /* Continue accumulating data until a frame boundary is hit. */
+   return PARSER_APPEND;
+ }
+ 
+diff --git src/plumbing/globalheaders.c src/plumbing/globalheaders.c
+index ecd560ec66..5f054eed1d 100644
+--- src/plumbing/globalheaders.c
++++ src/plumbing/globalheaders.c
+@@ -78,44 +78,91 @@ gh_flush(globalheaders_t *gh)
+ 
+ 
+ /**
++ * @brief Initializes stream metadata and ensures a global header exists for the component.
+  *
++ * This function extracts essential stream parameters (frame duration, audio channels, 
++ * sample rate, and video aspect ratio) from an incoming packet if they are not already 
++ * defined in the streaming start component (ssc).
++ * * It is primarily responsible for ensuring the 'ssc_gh' (Global Header/Extradata) is 
++ * populated. If the packet contains metadata (pkt_meta), it increments the reference 
++ * count and assigns it. 
++ * * Special Case: AAC/MP4A
++ * If an AAC stream lacks a global header, this function manually constructs a 2-byte 
++ * (or 5-byte for SBR) AudioSpecificConfig (AAC-LC) using the packet's sample rate 
++ * index and channel configuration. This is required for many decoders to initialize 
++ * correctly.
++ *
++ * @param ssc  The streaming start component context to be updated.
++ * @param pkt  The input packet containing raw media data and technical attributes.
++ *
++ * @note This function returns immediately if ssc->ssc_gh is already set.
+  */
+ static void
+ apply_header(streaming_start_component_t *ssc, th_pkt_t *pkt)
+ {
++  /* 1. Set the elementary stream (ES) frame duration if it hasn't been initialized 
++        yet (is 0) and the incoming packet has a valid duration. */
+   if(ssc->es_frame_duration == 0 && pkt->pkt_duration != 0)
+     ssc->es_frame_duration = pkt->pkt_duration;
+-
++  /* 2. Audio-specific initialization: 
++        If the stream is an audio type and the channel count hasn't been set yet, 
++        copy the channel count and Sample Rate Indices (SRI) from the packet. */
+   if(SCT_ISAUDIO(ssc->es_type) && !ssc->es_channels) {
+     ssc->es_channels = pkt->a.pkt_channels;
+     ssc->es_sri      = pkt->a.pkt_sri;
+     ssc->es_ext_sri  = pkt->a.pkt_ext_sri;
+   }
+-
++  /* 3. Video-specific initialization:
++        If the stream is a video type and the packet contains aspect ratio information,
++        copy the Sample Aspect Ratio (SAR) and Elementary Stream Aspect Ratio to the component. */
+   if(SCT_ISVIDEO(ssc->es_type)) {
+     if(pkt->v.pkt_aspect_num && pkt->v.pkt_aspect_den) {
++#if ENABLE_LIBAV
++      ssc->es_sample_aspect_ratio.num = pkt->v.pkt_sample_aspect_ratio.num;
++      ssc->es_sample_aspect_ratio.den = pkt->v.pkt_sample_aspect_ratio.den;
++#endif
+       ssc->es_aspect_num = pkt->v.pkt_aspect_num;
+       ssc->es_aspect_den = pkt->v.pkt_aspect_den;
+     }
+   }
+-
++  /* 4. Global Header (Extradata) Check:
++        If the streaming component already has a global header initialized, 
++        there is no further work to do. */
+   if(ssc->ssc_gh != NULL)
+     return;
+-
++  /* 5. Apply existing packet metadata as the global header:
++        If the packet contains metadata, assign it to the component's global header 
++        and increment the reference counter for the packet buffer to prevent it from 
++        being freed prematurely. */
+   if(pkt->pkt_meta != NULL) {
+     ssc->ssc_gh = pkt->pkt_meta;
+     pktbuf_ref_inc(ssc->ssc_gh);
+     return;
+   }
+-
++  /* 6. Synthesize AAC AudioSpecificConfig:
++        If there was no packet metadata, but the stream is AAC/MP4A, we must manually 
++        generate the MPEG-4 AudioSpecificConfig header required by decoders. */
+   if (ssc->es_type == SCT_MP4A || ssc->es_type == SCT_AAC) {
++    /* Allocate 5 bytes if an extended Sample Rate Index (SBR/HE-AAC) exists, otherwise 2 bytes. */
+     ssc->ssc_gh = pktbuf_alloc(NULL, pkt->a.pkt_ext_sri ? 5 : 2);
+     uint8_t *d = pktbuf_ptr(ssc->ssc_gh);
+-
++    /* Hardcode the Audio Object Type to 2 (AAC-LC - Low Complexity) */
+     const int profile = 2; /* AAC LC */
++    /* Byte 0: 
++       - Top 5 bits: Audio Object Type (profile << 3)
++       - Bottom 3 bits: Top 3 bits of the 4-bit Sample Rate Index (SRI) */
+     d[0] = (profile << 3) | ((pkt->a.pkt_sri & 0xe) >> 1);
++    /* Byte 1:
++       - Top 1 bit: Bottom 1 bit of the 4-bit SRI
++       - Next 4 bits: Channel Configuration (channels << 3)
++       - Bottom 3 bits: 0 (Frame length, DependsOnCoreCoder, ExtensionFlag) */
+     d[1] = ((pkt->a.pkt_sri & 0x1) << 7) | (pkt->a.pkt_channels << 3);
++    /* Bytes 2-4: SBR (Spectral Band Replication) Extension signaling for HE-AAC */
+     if (pkt->a.pkt_ext_sri) { /* SBR extension */
++      /* Byte 4:
++         - Top 1 bit: 1 (signals SBR is present)
++         - Next 4 bits: The extended Sample Rate Index
++         - Bottom 3 bits: 0 */
+       d[2] = 0x56;
+       d[3] = 0xe5;
+       d[4] = 0x80 | ((pkt->a.pkt_ext_sri - 1) << 3);
+@@ -125,7 +172,27 @@ apply_header(streaming_start_component_t *ssc, th_pkt_t *pkt)
+ 
+ 
+ /**
++ * @brief Validates if sufficient metadata has been collected to initialize the stream.
++ *
++ * This function checks the streaming start component (ssc) to ensure that all 
++ * critical parameters required by decoders or muxers have been populated. 
++ * It prevents the stream from starting prematurely with incomplete headers.
+  *
++ * @param ssc           The streaming start component context to validate.
++ * @param not_so_picky  Flag to relax validation. If non-zero, the function will 
++ * ignore missing video dimensions (width/height) and aspect 
++ * ratios, which is useful for certain "raw" or passthrough 
++ * scenarios.
++ *
++ * @return int          Returns 1 if the metadata is complete and the stream can 
++ * proceed; returns 0 if more information is required.
++ *
++ * @note Validation criteria include:
++ * - Existence of frame duration for both audio and video.
++ * - Presence of audio channel configuration for audio streams.
++ * - (If picky) Presence of width, height, and aspect ratio for video streams.
++ * - Presence of a Global Header (extradata) if the codec type requires it 
++ * (checked via gh_require_meta).
+  */
+ static int
+ header_complete(streaming_start_component_t *ssc, int not_so_picky)
+@@ -153,47 +220,105 @@ header_complete(streaming_start_component_t *ssc, int not_so_picky)
+ 
+ 
+ /**
++ * @brief Calculates the time duration (delay) represented by packets in the hold queue.
++ * * This function determines the time spread between the earliest and latest queued 
++ * packets for a specific stream component (identified by `index`). It does this by 
++ * scanning the queue from both ends to find the first and last packets belonging to 
++ * the target stream that have valid Decoding Time Stamps (DTS), and computing the 
++ * difference while accounting for timestamp wraparound.
+  *
++ * @param gh Pointer to the global headers context containing the packet hold queue.
++ * @param index The elementary stream (ES) index to calculate the delay for.
++ * @return int64_t The calculated time difference (delay) in DTS units. Returns 0 if 
++ * valid timestamps aren't found, or 1 for special payloadless transcode packets.
+  */
+ static int64_t
+ gh_queue_delay(globalheaders_t *gh, int index)
+ {
++  /* Initialize pointers to the first (head) and last (tail) elements of the hold queue */
+   th_pktref_t *f = TAILQ_FIRST(&gh->gh_holdq);
+   th_pktref_t *l = TAILQ_LAST(&gh->gh_holdq, th_pktref_queue);
+   streaming_start_component_t *ssc;
+   int64_t diff;
++  int8_t found_f = 0, found_l = 0;
+ 
+   /*
+    * Find only packets which require the meta data. Ignore others.
+    */
++  /*
++   * 1. Forward Search: Find the EARLIEST packet in the queue for this stream.
++   * Iterate from the front of the queue towards the back. We are looking for the 
++   * first packet that has a valid DTS and belongs to the requested stream index.
++   */
+   while (f != l) {
+     if (f->pr_pkt->pkt_dts != PTS_UNSET) {
++      /* Retrieve the stream component context using the packet's internal component index */
+       ssc = streaming_start_component_find_by_index
+               (gh->gh_ss, f->pr_pkt->pkt_componentindex);
+-      if (ssc && ssc->es_index == index)
++      /* If the packet belongs to the requested elementary stream index, stop searching */
++      if (ssc && ssc->es_index == index){
++        found_f = 1;
+         break;
++      }
+     }
++    /* Move to the next packet in the queue */
+     f = TAILQ_NEXT(f, pr_link);
+   }
++  /*
++   * 2. Backward Search: Find the LATEST packet in the queue for this stream.
++   * Iterate from the back of the queue towards the front. Stop when we find the 
++   * last packet matching our stream index with a valid DTS.
++   */
+   while (l != f) {
+     if (l->pr_pkt->pkt_dts != PTS_UNSET) {
+       ssc = streaming_start_component_find_by_index
+               (gh->gh_ss, l->pr_pkt->pkt_componentindex);
+-      if (ssc && ssc->es_index == index)
++      if (ssc && ssc->es_index == index){
++        found_l = 1;
+         break;
++      }
+     }
++    /* Move to the previous packet in the queue */
+     l = TAILQ_PREV(l, th_pktref_queue, pr_link);
+   }
+-
++  /* * 3. Calculate Delay Difference:
++   * If both a first and last packet with valid timestamps were found, compute the delay.
++   */
+   if (l->pr_pkt->pkt_dts != PTS_UNSET && f->pr_pkt->pkt_dts != PTS_UNSET) {
+-    diff = (l->pr_pkt->pkt_dts & PTS_MASK) - (f->pr_pkt->pkt_dts & PTS_MASK);
++    /* Mask the DTS values (usually 33-bit for MPEG-TS) to drop overflow bits, 
++       then subtract the early timestamp from the late timestamp. */
++    if (found_f && found_l) {
++      /* Calculate raw difference */
++      diff = (l->pr_pkt->pkt_dts & PTS_MASK) - (f->pr_pkt->pkt_dts & PTS_MASK);
++    } else {
++        return 0;
++    }
++    /* Handle Timestamp Rollover/Wraparound: 
++       If the difference is negative, the timestamp counter rolled over its maximum 
++       value (PTS_MASK+1) between the first and last packet. Add the mask to correct it. */
+     if (diff < 0)
+-      diff += PTS_MASK;
++      /* When a 33-bit counter overflows (wraps around), it goes from the maximum value back to 0. 
++        The total number of unique values in that clock cycle is 233, which is PTS_MASK + 1.*/
++      diff += (int64_t)PTS_MASK + 1;
++    /*  The V4L2/Discontinuity Fix:
++        If the diff is greater than half the mask (roughly 13 hours),
++        it means f was actually significantly ahead of l. 
++        This is usually a startup discontinuity. */
++    if (diff > (PTS_MASK >> 1)) {
++      diff = 0; 
++    }
+   } else {
++    /* If no valid matching packets were found, there is no determinable delay. */
+     diff = 0;
+   }
+ 
+   /* special noop packet from transcoder, increase decision limit */
++  /* * 4. Edge Case - Empty Transcoder Packet:
++   * special noop packet from transcoder, increase decision limit.
++   * If the queue resolved to a single packet (first == last) and it has no actual 
++   * media payload, artificially return a delay of 1. This prevents the system from 
++   * treating it as a standard zero-delay scenario.
++   */
+   if (l == f && l->pr_pkt->pkt_payload == NULL)
+     return 1;
+ 
+diff --git src/transcoding/codec.h src/transcoding/codec.h
+index a16e2a3118..0be1909ed0 100644
+--- src/transcoding/codec.h
++++ src/transcoding/codec.h
+@@ -93,6 +93,15 @@ struct tvh_codec_profile {
+     double qscale;
+     int profile;
+     char *device; // for hardware acceleration
++    /**
++     * Support for tvh_context_open_filters2()
++     * @note
++     * int: 
++     * VALUE - support
++     * - 0 - no support (use tvh_context_open_filters())
++     * - 1 - has support for tvh_context_open_filters2()
++     */
++    int has_support_for_filter2;
+     LIST_ENTRY(tvh_codec_profile) link;
+ };
+ 
+diff --git src/transcoding/codec/codecs/aac.c src/transcoding/codec/codecs/aac.c
+index 07ef1d6cd5..c5c07958c6 100644
+--- src/transcoding/codec/codecs/aac.c
++++ src/transcoding/codec/codecs/aac.c
+@@ -67,14 +67,17 @@ typedef struct {
+ static int
+ tvh_codec_profile_aac_open(tvh_codec_profile_aac_t *self, AVDictionary **opts)
+ {
++    TVHCodecProfile *p = (TVHCodecProfile *)self;
++
+     // bit_rate or global_quality
+-    if (self->bit_rate) {
+-        AV_DICT_SET_BIT_RATE(LST_AAC, opts, self->bit_rate);
++    if (p->bit_rate) {
++        AV_DICT_SET_BIT_RATE(LST_AAC, opts, p->bit_rate);
+     }
+     else {
+-        AV_DICT_SET_GLOBAL_QUALITY(LST_AAC, opts, self->qscale, 1);
++        AV_DICT_SET_GLOBAL_QUALITY(LST_AAC, opts, p->qscale, 1);
+     }
+     AV_DICT_SET(LST_AAC, opts, "aac_coder", self->coder, 0);
++    p->has_support_for_filter2 = 1;
+     return 0;
+ }
+ 
+diff --git src/transcoding/codec/codecs/libs/libx26x.c src/transcoding/codec/codecs/libs/libx26x.c
+index 3457a32f29..7d6147716b 100644
+--- src/transcoding/codec/codecs/libs/libx26x.c
++++ src/transcoding/codec/codecs/libs/libx26x.c
+@@ -141,17 +141,21 @@ static int
+ tvh_codec_profile_libx264_open(tvh_codec_profile_libx26x_t *self,
+                                AVDictionary **opts)
+ {
++    TVHCodecProfile *p = (TVHCodecProfile *)self;
++    TVHVideoCodecProfile *vp = (TVHVideoCodecProfile *)self;
++
+     // bit_rate or crf
+-    if (self->bit_rate) {
+-        AV_DICT_SET_BIT_RATE(LST_LIBX26X, opts, self->bit_rate);
++    if (p->bit_rate) {
++        AV_DICT_SET_BIT_RATE(LST_LIBX26X, opts, p->bit_rate);
+     }
+     else {
+-        AV_DICT_SET_CRF(LST_LIBX26X, opts, self->crf, 15);
++        AV_DICT_SET_CRF(LST_LIBX26X, opts, vp->crf, 15);
+     }
+     // params
+     if (self->params && strlen(self->params)) {
+         AV_DICT_SET(LST_LIBX26X, opts, "x264-params", self->params, 0);
+     }
++    p->has_support_for_filter2 = 1;
+     return 0;
+ }
+ 
+@@ -240,17 +244,21 @@ static int
+ tvh_codec_profile_libx265_open(tvh_codec_profile_libx26x_t *self,
+                                AVDictionary **opts)
+ {
++    TVHCodecProfile *p = (TVHCodecProfile *)self;
++    TVHVideoCodecProfile *vp = (TVHVideoCodecProfile *)self;
++
+     // bit_rate or crf
+-    if (self->bit_rate) {
+-        AV_DICT_SET_BIT_RATE(LST_LIBX26X, opts, self->bit_rate);
++    if (p->bit_rate) {
++        AV_DICT_SET_BIT_RATE(LST_LIBX26X, opts, p->bit_rate);
+     }
+     else {
+-        AV_DICT_SET_CRF(LST_LIBX26X, opts, self->crf, 18);
++        AV_DICT_SET_CRF(LST_LIBX26X, opts, vp->crf, 18);
+     }
+     // params
+     if (self->params && strlen(self->params)) {
+         AV_DICT_SET(LST_LIBX26X, opts, "x265-params", self->params, 0);
+     }
++    p->has_support_for_filter2 = 1;
+     return 0;
+ }
+ 
+diff --git src/transcoding/codec/codecs/libs/vaapi.c src/transcoding/codec/codecs/libs/vaapi.c
+index 7ee2de5816..e6cfe40bf1 100644
+--- src/transcoding/codec/codecs/libs/vaapi.c
++++ src/transcoding/codec/codecs/libs/vaapi.c
+@@ -93,6 +93,12 @@
+     (vainfo_encoder_maxBfreames(VAINFO_##codec) << UI_MAX_B_FRAMES_OFFSET) + \
+     (vainfo_encoder_maxQuality(VAINFO_##codec) << UI_MAX_QUALITY_OFFSET)
+ 
++enum CODEC{
++    H264 = 1,
++    HEVC = 2,
++    VP8 = 3,
++    VP9 = 4
++};
+ /* hts ==================================================================== */
+ 
+ static htsmsg_t *
+@@ -224,6 +230,7 @@ typedef struct drm_version {
+ 
+ #define DRM_IOCTL_VERSION _IOWR('d', 0x00, struct drm_version)
+ 
++/* internal ==================================================================== */
+ 
+ static int
+ probe_vaapi_device(const char *device, char *name, size_t namelen)
+@@ -308,11 +315,134 @@ static int
+ tvh_codec_profile_vaapi_open(tvh_codec_profile_vaapi_t *self,
+                              AVDictionary **opts)
+ {
++    const TVHVideoCodecProfile *vp = (TVHVideoCodecProfile *)self;
++    
+     // pix_fmt
+-    AV_DICT_SET_PIX_FMT(LST_VAAPI, opts, self->pix_fmt, AV_PIX_FMT_VAAPI);
++    AV_DICT_SET_PIX_FMT(LST_VAAPI, opts, vp->pix_fmt, AV_PIX_FMT_VAAPI);
++    return 0;
++}
++
++static void
++compute_bitrates(tvh_codec_profile_vaapi_t *self, int *bitrate, int *buffer_size, int *max_bitrate){
++    const TVHCodecProfile *p = (TVHCodecProfile *)self;
++    const TVHVideoCodecProfile *vp = (TVHVideoCodecProfile *)self;
++
++    // to avoid issues we have this check:
++    if (self->buff_factor <= 0) {
++        self->buff_factor = 3;
++    }
++    *bitrate = (int)((p->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(vp->size.den) - 480.0) / 480.0)));
++    *buffer_size = (int)((p->bit_rate) * 2048.0 * self->buff_factor * (1.0 + self->bit_rate_scale_factor * ((double)(vp->size.den) - 480.0) / 480));
++    *max_bitrate = (int)((self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(vp->size.den) - 480.0) / 480.0)));
++    // force max_bitrate to be >= with bitrate (to avoid crash)
++    if (*bitrate > *max_bitrate) {
++        tvherror_transcode(LST_VAAPI, "Bitrate %d kbps is greater than Max bitrate %d kbps, increase Max bitrate to %d kbps", 
++            *bitrate / 1024, *max_bitrate / 1024, *bitrate / 1024);
++        *max_bitrate = *bitrate;
++    }
++    tvhinfo_transcode(LST_VAAPI, "Bitrate = %d kbps; Buffer size = %d kbps; Max bitrate = %d kbps", 
++        *bitrate / 1024, *buffer_size / 1024, *max_bitrate / 1024);
++}
++
++static int
++setup_baseline_opts_unconstrained(const tvh_codec_profile_vaapi_t *self, AVDictionary **opts, enum CODEC codec){
++    if (codec == VP8 || codec == VP9) {
++        if (self->loop_filter_level >= 0) {
++            AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_level", self->loop_filter_level, AV_DICT_DONT_OVERWRITE);
++        }
++        if (self->loop_filter_sharpness >= 0) {
++            AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_sharpness", self->loop_filter_sharpness, AV_DICT_DONT_OVERWRITE);
++        }
++    }
++    if (self->async_depth) {
++        AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
++    }
++    if ((codec == H264 || codec == HEVC) &&
++        self->level != -100) {
++            AV_DICT_SET_INT(LST_VAAPI, opts, "level", self->level, AV_DICT_DONT_OVERWRITE);
++    }
++    if (self->qmin) {
++        AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
++    }
++    if (self->qmax) {
++        AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
++    }
++    return 0;
++}
++
++static int
++setup_bitrate_qp_opts_unconstrained(const tvh_codec_profile_vaapi_t *self, AVDictionary **opts, int bitrate, int buffer_size, int max_bitrate){
++    const TVHCodecProfile *p = (TVHCodecProfile *)self;
++
++    if (p->bit_rate) {
++        AV_DICT_SET_INT(LST_VAAPI, opts, "b", bitrate, AV_DICT_DONT_OVERWRITE);
++        AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", buffer_size, AV_DICT_DONT_OVERWRITE);
++    }
++    if (self->max_bit_rate) {
++        AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", max_bitrate, AV_DICT_DONT_OVERWRITE);
++    }
++    if (self->qp) {
++        AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
++    }
+     return 0;
+ }
+ 
++static int
++setup_common_opts_unconstrained(const tvh_codec_profile_vaapi_t *self, AVDictionary **opts, enum CODEC codec, int bitrate, int buffer_size, int max_bitrate){
++    int ret = 0;
++
++    if ((ret = setup_bitrate_qp_opts_unconstrained(self, opts, bitrate, buffer_size, max_bitrate))) {
++        return ret;
++    };
++
++    if ((codec == HEVC) &&
++        self->tier >= 0) {
++            AV_DICT_SET_INT(LST_VAAPI, opts, "tier", self->tier, AV_DICT_DONT_OVERWRITE);
++    }
++    if (self->quality >= 0) {
++        AV_DICT_SET_INT(LST_VAAPI, opts, "quality", self->quality, AV_DICT_DONT_OVERWRITE);
++    }
++    if ((codec == VP8 || codec == VP9) &&
++        self->global_quality >= 0) {
++            AV_DICT_SET_INT(LST_VAAPI, opts, "global_quality", self->global_quality, AV_DICT_DONT_OVERWRITE);
++    }
++    if (self->low_power) {
++        AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
++    }
++    if ((ret = setup_baseline_opts_unconstrained(self, opts, H264))) {
++        return ret;
++    };
++    return 0;
++}
++
++static int
++setup_opts_unconstrained(const tvh_codec_profile_vaapi_t *self, AVDictionary **opts, enum CODEC codec, int bitrate, int buffer_size, int max_bitrate){
++    int ret = 0;
++
++    // Uncontrained --> will allow any combination of parameters (valid or invalid)
++    // this mode is useful for future platform and for debugging.
++    if (self->b_reference) {
++        // b_depth
++        AV_DICT_SET_INT(LST_VAAPI, opts, "b_depth", self->b_reference, AV_DICT_DONT_OVERWRITE);
++    }
++    if (self->desired_b_depth >= 0) {
++        // max_b_frames
++        AV_DICT_SET_INT(LST_VAAPI, opts, "bf", self->desired_b_depth, AV_DICT_DONT_OVERWRITE);
++    }
++    if ((codec == VP8 || codec == VP9) &&
++        self->super_frame) {
++            // according to example from https://trac.ffmpeg.org/wiki/Hardware/VAAPI
++            // -bsf:v vp9_raw_reorder,vp9_superframe
++            AV_DICT_SET(LST_VAAPI, opts, "bsf", "vp9_raw_reorder,vp9_superframe", AV_DICT_DONT_OVERWRITE);
++    }
++    if ((ret = setup_common_opts_unconstrained(self, opts, H264, bitrate, buffer_size, max_bitrate))) {
++        return ret;
++    };
++    return 0;
++}
++
++/* external ==================================================================== */
++
+ // NOTE:
+ // the names below are used in codec.js (/src/webui/static/app/codec.js)
+ static const codec_profile_class_t codec_profile_vaapi_class = {
+@@ -535,115 +665,23 @@ static int
+ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
+                                   AVDictionary **opts)
+ {
+-    // to avoid issues we have this check:
+-    if (self->buff_factor <= 0) {
+-        self->buff_factor = 3;
+-    }
+-    int int_bitrate = (int)((double)(self->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
+-    int int_buffer_size = (int)((double)(self->bit_rate) * 2048.0 * self->buff_factor * (1.0 + self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480));
+-    int int_max_bitrate = (int)((double)(self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
+-    // force max_bitrate to be >= with bitrate (to avoid crash)
+-    if (int_bitrate > int_max_bitrate) {
+-        tvherror_transcode(LST_VAAPI, "Bitrate %d kbps is greater than Max bitrate %d kbps, increase Max bitrate to %d kbps", int_bitrate / 1024, int_max_bitrate / 1024, int_bitrate / 1024);
+-        int_max_bitrate = int_bitrate;
+-    }
+-    tvhinfo_transcode(LST_VAAPI, "Bitrate = %d kbps; Buffer size = %d kbps; Max bitrate = %d kbps", int_bitrate / 1024, int_buffer_size / 1024, int_max_bitrate / 1024);
+-    // https://wiki.libav.org/Hardware/vaapi
+-    // https://blog.wmspanel.com/2017/03/vaapi-libva-support-nimble-streamer.html
+-    // to find available parameters use:
+-    // ffmpeg -hide_banner -h encoder=h264_vaapi
+-    // h264_vaapi AVOptions:
+-    // -low_power         <boolean>    E..V....... Use low-power encoding mode (only available on some platforms; may not support all encoding features) (default false)
+-    // -idr_interval      <int>        E..V....... Distance (in I-frames) between IDR frames (from 0 to INT_MAX) (default 0)
+-    // -b_depth           <int>        E..V....... Maximum B-frame reference depth (from 1 to INT_MAX) (default 1)
+-    // -rc_mode           <int>        E..V....... Set rate control mode (from 0 to 6) (default auto)
+-    //    auto            0            E..V....... Choose mode automatically based on other parameters
+-    //    CQP             1            E..V....... Constant-quality
+-    //    CBR             2            E..V....... Constant-bitrate
+-    //    VBR             3            E..V....... Variable-bitrate
+-    //    ICQ             4            E..V....... Intelligent constant-quality
+-    //    QVBR            5            E..V....... Quality-defined variable-bitrate
+-    //    AVBR            6            E..V....... Average variable-bitrate
+-    // -qp                <int>        E..V....... Constant QP (for P-frames; scaled by qfactor/qoffset for I/B) (from 0 to 52) (default 0)
+-    // -quality           <int>        E..V....... Set encode quality (trades off against speed, higher is faster) (from -1 to INT_MAX) (default -1)
+-    // -coder             <int>        E..V....... Entropy coder type (from 0 to 1) (default cabac)
+-    //    cavlc           0            E..V.......
+-    //    cabac           1            E..V.......
+-    //    vlc             0            E..V.......
+-    //    ac              1            E..V.......
+-    // -aud               <boolean>    E..V....... Include AUD (default false)
+-    // -sei               <flags>      E..V....... Set SEI to include (default identifier+timing+recovery_point)
+-    //    identifier                   E..V....... Include encoder version identifier
+-    //    timing                       E..V....... Include timing parameters (buffering_period and pic_timing)
+-    //    recovery_point               E..V....... Include recovery points where appropriate
+-    // -profile           <int>        E..V....... Set profile (profile_idc and constraint_set*_flag) (from -99 to 65535) (default -99)
+-    //    constrained_baseline 578          E..V.......
+-    //    main            77           E..V.......
+-    //    high            100          E..V.......
+-    // -level             <int>        E..V....... Set level (level_idc) (from -99 to 255) (default -99)
+-    //    1               10           E..V.......
+-    //    1.1             11           E..V.......
+-    //    1.2             12           E..V.......
+-    //    1.3             13           E..V.......
+-    //    2               20           E..V.......
+-    //    2.1             21           E..V.......
+-    //    2.2             22           E..V.......
+-    //    3               30           E..V.......
+-    //    3.1             31           E..V.......
+-    //    3.2             32           E..V.......
+-    //    4               40           E..V.......
+-    //    4.1             41           E..V.......
+-    //    4.2             42           E..V.......
+-    //    5               50           E..V.......
+-    //    5.1             51           E..V.......
+-    //    5.2             52           E..V.......
+-    //    6               60           E..V.......
+-    //    6.1             61           E..V.......
+-    //    6.2             62           E..V.......
++    TVHCodecProfile *p = (TVHCodecProfile *)self;
++    int int_bitrate = 0;
++    int int_buffer_size = 0;
++    int int_max_bitrate = 0;
++    int ret = 0;
++
++    compute_bitrates(self, &int_bitrate, &int_buffer_size, &int_max_bitrate);
++
+     if (self->rc_mode != VAAPI_ENC_PARAMS_RC_SKIP) {
+         AV_DICT_SET_INT(LST_VAAPI, opts, "rc_mode", self->rc_mode, AV_DICT_DONT_OVERWRITE);
+     }
+     int tempSupport = 0;
+     switch (self->platform) {
+         case VAAPI_ENC_PLATFORM_UNCONSTRAINED:
+-            // Uncontrained --> will allow any combination of parameters (valid or invalid)
+-            // this mode is useful for future platform and for debugging.
+-            if (self->b_reference) {
+-                // b_depth
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b_depth", self->b_reference, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->desired_b_depth >= 0) {
+-                // max_b_frames
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bf", self->desired_b_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->max_bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qp) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "quality", self->quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->low_power) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->level != -100) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "level", self->level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_opts_unconstrained(self, opts, H264, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                return ret;
++            };
+             break;
+         case VAAPI_ENC_PLATFORM_INTEL:
+             // Intel
+@@ -673,16 +711,9 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
+                     // same like 0 but is not sending 'rc_mode'
+                 case VAAPI_ENC_PARAMS_RC_AUTO:
+                     // for auto --> let the driver decide as requested by documentation
+-                    if (self->bit_rate) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-                    }
+-                    if (self->max_bit_rate) {
+-                            AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        }
+-                    if (self->qp) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-                    }
++                    if ((ret = setup_bitrate_qp_opts_unconstrained(self, opts, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                        return ret;
++                    };
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_CONSTQP:
+                 case VAAPI_ENC_PARAMS_RC_ICQ:
+@@ -693,14 +724,14 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_CBR:
+                     // for constant bitrate: CBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+                     }
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_VBR:
+                     // for variable bitrate: VBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+@@ -708,18 +739,13 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_QVBR:
+                     // for variable bitrate: QVBR we use bitrate + qp
+-                    if (self->bit_rate && self->buff_factor) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-                    }
+-                    if (self->qp) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-                    }
++                    if ((ret = setup_bitrate_qp_opts_unconstrained(self, opts, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                        return ret;
++                    };
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_AVBR:
+                     // for variable bitrate: AVBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+                     }
+@@ -737,54 +763,23 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
+             if (self->low_power) {
+                 AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+             }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->level != -100) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "level", self->level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_baseline_opts_unconstrained(self, opts, H264))) {
++                return ret;
++            };
+             break;
+         case VAAPI_ENC_PLATFORM_AMD:
+             // AMD --> will allow any combination of parameters
+             // I am unable to confirm this platform because I don't have the HW
+             // Is only going to override bf to 0 (as highlited by the previous implementation)
+-            if (self->bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->max_bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qp) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_common_opts_unconstrained(self, opts, H264, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                return ret;
++            };
+             AV_DICT_SET_INT(LST_VAAPI, opts, "bf", 0, 0);
+-            if (self->quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "quality", self->quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->low_power) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->level != -100) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "level", self->level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
+             break;
+     }
++    // force keyframe at t=0 and t=1s (used for flashing the encoder)
++    AV_DICT_SET(LST_VAAPI, opts, "force_key_frames", "expr:eq(t,0)+eq(t,1)", AV_DICT_DONT_OVERWRITE);
++    p->has_support_for_filter2 = 1;
+     return 0;
+ }
+ 
+@@ -858,107 +853,22 @@ static int
+ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
+                                   AVDictionary **opts)
+ {
+-    // to avoid issues we have this check:
+-    if (self->buff_factor <= 0) {
+-        self->buff_factor = 3;
+-    }
+-    int int_bitrate = (int)((double)(self->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
+-    int int_buffer_size = (int)((double)(self->bit_rate) * 2048.0 * self->buff_factor * (1.0 + self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480));
+-    int int_max_bitrate = (int)((double)(self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
+-    // force max_bitrate to be >= with bitrate (to avoid crash)
+-    if (int_bitrate > int_max_bitrate) {
+-        tvherror_transcode(LST_VAAPI, "Bitrate %d kbps is greater than Max bitrate %d kbps, increase Max bitrate to %d kbps", int_bitrate / 1024, int_max_bitrate / 1024, int_bitrate / 1024);
+-        int_max_bitrate = int_bitrate;
+-    }
+-    tvhinfo_transcode(LST_VAAPI, "Bitrate = %d kbps; Buffer size = %d kbps; Max bitrate = %d kbps", int_bitrate / 1024, int_buffer_size / 1024, int_max_bitrate / 1024);
+-    // https://wiki.libav.org/Hardware/vaapi
+-    // to find available parameters use:
+-    // ffmpeg -hide_banner -h encoder=hevc_vaapi
+-    //   h265_vaapi AVOptions:
+-    // -low_power         <boolean>    E..V....... Use low-power encoding mode (only available on some platforms; may not support all encoding features) (default false)
+-    // -idr_interval      <int>        E..V....... Distance (in I-frames) between IDR frames (from 0 to INT_MAX) (default 0)
+-    // -b_depth           <int>        E..V....... Maximum B-frame reference depth (from 1 to INT_MAX) (default 1)
+-    // -rc_mode           <int>        E..V....... Set rate control mode (from 0 to 6) (default auto)
+-    //    auto            0            E..V....... Choose mode automatically based on other parameters
+-    //    CQP             1            E..V....... Constant-quality
+-    //    CBR             2            E..V....... Constant-bitrate
+-    //    VBR             3            E..V....... Variable-bitrate
+-    //    ICQ             4            E..V....... Intelligent constant-quality
+-    //    QVBR            5            E..V....... Quality-defined variable-bitrate
+-    //    AVBR            6            E..V....... Average variable-bitrate
+-    // -qp                <int>        E..V....... Constant QP (for P-frames; scaled by qfactor/qoffset for I/B) (from 0 to 52) (default 0)
+-    // -aud               <boolean>    E..V....... Include AUD (default false)
+-    // -profile           <int>        E..V....... Set profile (general_profile_idc) (from -99 to 255) (default -99)
+-    //    main            1            E..V.......
+-    //    main10          2            E..V.......
+-    //    rext            4            E..V.......
+-    // -tier              <int>        E..V....... Set tier (general_tier_flag) (from 0 to 1) (default main)
+-    //    main            0            E..V.......
+-    //    high            1            E..V.......
+-    // -level             <int>        E..V....... Set level (general_level_idc) (from -99 to 255) (default -99)
+-    //    1               30           E..V.......
+-    //    2               60           E..V.......
+-    //    2.1             63           E..V.......
+-    //    3               90           E..V.......
+-    //    3.1             93           E..V.......
+-    //    4               120          E..V.......
+-    //    4.1             123          E..V.......
+-    //    5               150          E..V.......
+-    //    5.1             153          E..V.......
+-    //    5.2             156          E..V.......
+-    //    6               180          E..V.......
+-    //    6.1             183          E..V.......
+-    //    6.2             186          E..V.......
+-    // -sei               <flags>      E..V....... Set SEI to include (default hdr)
+-    //    hdr                          E..V....... Include HDR metadata for mastering display colour volume and content light level information
+-    // -tiles             <image_size> E..V....... Tile columns x rows
++    TVHCodecProfile *p = (TVHCodecProfile *)self;
++    int int_bitrate = 0;
++    int int_buffer_size = 0;
++    int int_max_bitrate = 0;
++    int ret = 0;
++
++    compute_bitrates(self, &int_bitrate, &int_buffer_size, &int_max_bitrate);
+ 
+     if (self->rc_mode != VAAPI_ENC_PARAMS_RC_SKIP) {
+         AV_DICT_SET_INT(LST_VAAPI, opts, "rc_mode", self->rc_mode, AV_DICT_DONT_OVERWRITE);
+     }
+     switch (self->platform) {
+         case VAAPI_ENC_PLATFORM_UNCONSTRAINED:
+-            // Unconstrained --> will allow any combination of parameters (valid or invalid)
+-            // this mode is useful for future platform and for debugging.
+-            if (self->b_reference) {
+-                // b_depth
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b_depth", self->b_reference, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->desired_b_depth >= 0) {
+-                // max_b_frames
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bf", self->desired_b_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->max_bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qp) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->tier >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "tier", self->tier, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "quality", self->quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->low_power) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->level != -100) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "level", self->level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_opts_unconstrained(self, opts, HEVC, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                return ret;
++            };
+             break;
+         case VAAPI_ENC_PLATFORM_INTEL:
+             // Intel
+@@ -975,16 +885,9 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
+                     // same like 0 but is not sending 'rc_mode'
+                 case VAAPI_ENC_PARAMS_RC_AUTO:
+                     // for auto --> let the driver decide as requested by documentation
+-                    if (self->bit_rate) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-                    }
+-                    if (self->max_bit_rate) {
+-                            AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        }
+-                    if (self->qp) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-                    }
++                    if ((ret = setup_bitrate_qp_opts_unconstrained(self, opts, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                        return ret;
++                    };
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_CONSTQP:
+                 case VAAPI_ENC_PARAMS_RC_ICQ:
+@@ -995,14 +898,14 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_CBR:
+                     // for constant bitrate: CBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+                     }
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_VBR:
+                     // for variable bitrate: VBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+@@ -1010,18 +913,13 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_QVBR:
+                     // for variable bitrate: QVBR we use bitrate + qp
+-                    if (self->bit_rate && self->buff_factor) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-                    }
+-                    if (self->qp) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-                    }
++                    if ((ret = setup_bitrate_qp_opts_unconstrained(self, opts, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                        return ret;
++                    };
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_AVBR:
+                     // for variable bitrate: AVBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+                     }
+@@ -1036,57 +934,23 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
+             if (self->low_power) {
+                 AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+             }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->level != -100) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "level", self->level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_baseline_opts_unconstrained(self, opts, HEVC))) {
++                return ret;
++            };
+             break;
+         case VAAPI_ENC_PLATFORM_AMD:
+             // AMD --> will allow any combination of parameters
+             // I am unable to confirm this platform because I don't have the HW
+             // Is only going to override bf to 0 (as highlited by the previous implementation)
+-            if (self->bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->max_bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qp) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_common_opts_unconstrained(self, opts, HEVC, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                return ret;
++            };
+             AV_DICT_SET_INT(LST_VAAPI, opts, "bf", 0, 0);
+-            if (self->tier >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "tier", self->tier, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "quality", self->quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->low_power) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->level != -100) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "level", self->level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
+             break;
+     }
++    // force keyframe at t=0 and t=1s (used for flashing the encoder)
++    AV_DICT_SET(LST_VAAPI, opts, "force_key_frames", "expr:eq(t,0)+eq(t,1)", AV_DICT_DONT_OVERWRITE);
++    p->has_support_for_filter2 = 1;
+     return 0;
+ }
+ 
+@@ -1168,86 +1032,22 @@ static int
+ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
+                                   AVDictionary **opts)
+ {
+-    // to avoid issues we have this check:
+-    if (self->buff_factor <= 0) {
+-        self->buff_factor = 3;
+-    }
+-    int int_bitrate = (int)((double)(self->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
+-    int int_buffer_size = (int)((double)(self->bit_rate) * 2048.0 * self->buff_factor * (1.0 + self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480));
+-    int int_max_bitrate = (int)((double)(self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
+-    // force max_bitrate to be >= with bitrate (to avoid crash)
+-    if (int_bitrate > int_max_bitrate) {
+-        tvherror_transcode(LST_VAAPI, "Bitrate %d kbps is greater than Max bitrate %d kbps, increase Max bitrate to %d kbps", int_bitrate / 1024, int_max_bitrate / 1024, int_bitrate / 1024);
+-        int_max_bitrate = int_bitrate;
+-    }
+-    tvhinfo_transcode(LST_VAAPI, "Bitrate = %d kbps; Buffer size = %d kbps; Max bitrate = %d kbps", int_bitrate / 1024, int_buffer_size / 1024, int_max_bitrate / 1024);
+-    // https://wiki.libav.org/Hardware/vaapi
+-    // to find available parameters use:
+-    // ffmpeg -hide_banner -h encoder=vp8_vaapi
+-    //   vp8_vaapi AVOptions:
+-    // -low_power         <boolean>    E..V....... Use low-power encoding mode (only available on some platforms; may not support all encoding features) (default false)
+-    // -idr_interval      <int>        E..V....... Distance (in I-frames) between IDR frames (from 0 to INT_MAX) (default 0)
+-    // -b_depth           <int>        E..V....... Maximum B-frame reference depth (from 1 to INT_MAX) (default 1)
+-    // -rc_mode           <int>        E..V....... Set rate control mode (from 0 to 6) (default auto)
+-    //    auto            0            E..V....... Choose mode automatically based on other parameters
+-    //    CQP             1            E..V....... Constant-quality
+-    //    CBR             2            E..V....... Constant-bitrate
+-    //    VBR             3            E..V....... Variable-bitrate
+-    //    ICQ             4            E..V....... Intelligent constant-quality
+-    //    QVBR            5            E..V....... Quality-defined variable-bitrate
+-    //    AVBR            6            E..V....... Average variable-bitrate
+-    // -loop_filter_level <int>        E..V....... Loop filter level (from 0 to 63) (default 16)
+-    // -loop_filter_sharpness <int>        E..V....... Loop filter sharpness (from 0 to 15) (default 4)
++    TVHCodecProfile *p = (TVHCodecProfile *)self;
++    int int_bitrate = 0;
++    int int_buffer_size = 0;
++    int int_max_bitrate = 0;
++    int ret = 0;
++
++    compute_bitrates(self, &int_bitrate, &int_buffer_size, &int_max_bitrate);
+ 
+     if (self->rc_mode != VAAPI_ENC_PARAMS_RC_SKIP) {
+         AV_DICT_SET_INT(LST_VAAPI, opts, "rc_mode", self->rc_mode, AV_DICT_DONT_OVERWRITE);
+     }
+     switch (self->platform) {
+         case VAAPI_ENC_PLATFORM_UNCONSTRAINED:
+-            // Unconstrained --> will allow any combination of parameters (valid or invalid)
+-            // this mode is useful for future platform and for debugging.
+-            if (self->b_reference) {
+-                // b_depth
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b_depth", self->b_reference, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->desired_b_depth >= 0) {
+-                // max_b_frames
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bf", self->desired_b_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->max_bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qp) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "quality", self->quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->global_quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "global_quality", self->global_quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->low_power) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_level >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_level", self->loop_filter_level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_sharpness >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_sharpness", self->loop_filter_sharpness, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_opts_unconstrained(self, opts, VP8, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                return ret;
++            };
+             break;
+         case VAAPI_ENC_PLATFORM_INTEL:
+             // Intel
+@@ -1270,16 +1070,9 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
+                     // same like 0 but is not sending 'rc_mode'
+                 case VAAPI_ENC_PARAMS_RC_AUTO:
+                     // for auto --> let the driver decide as requested by documentation
+-                    if (self->bit_rate) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-                    }
+-                    if (self->max_bit_rate) {
+-                            AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        }
+-                    if (self->qp) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-                    }
++                    if ((ret = setup_bitrate_qp_opts_unconstrained(self, opts, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                        return ret;
++                    };
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_CONSTQP:
+                 case VAAPI_ENC_PARAMS_RC_ICQ:
+@@ -1290,14 +1083,14 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_CBR:
+                     // for constant bitrate: CBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+                     }
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_VBR:
+                     // for variable bitrate: VBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+@@ -1305,18 +1098,13 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_QVBR:
+                     // for variable bitrate: QVBR we use bitrate + qp
+-                    if (self->bit_rate && self->buff_factor) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-                    }
+-                    if (self->qp) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-                    }
++                    if ((ret = setup_bitrate_qp_opts_unconstrained(self, opts, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                        return ret;
++                    };
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_AVBR:
+                     // for variable bitrate: AVBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+                     }
+@@ -1325,63 +1113,24 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
+             if (self->low_power) {
+                 AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+             }
+-            if (self->loop_filter_level >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_level", self->loop_filter_level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_sharpness >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_sharpness", self->loop_filter_sharpness, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_baseline_opts_unconstrained(self, opts, VP8))) {
++                return ret;
++            };
+             break;
+         case VAAPI_ENC_PLATFORM_AMD:
+             // AMD --> will allow any combination of parameters
+             // I am unable to confirm this platform because I don't have the HW
+             // Is only going to override bf to 0 (as highlited by the previous implementation)
+-            if (self->bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->max_bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qp) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_common_opts_unconstrained(self, opts, VP8, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                return ret;
++            };
+             AV_DICT_SET_INT(LST_VAAPI, opts, "bf", 0, 0);
+-            if (self->quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "quality", self->quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->global_quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "global_quality", self->global_quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->low_power) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_level >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_level", self->loop_filter_level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_sharpness >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_sharpness", self->loop_filter_sharpness, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
++
+             break;
+     }
++    // force keyframe at t=0 and t=1s (used for flashing the encoder)
++    AV_DICT_SET(LST_VAAPI, opts, "force_key_frames", "expr:eq(t,0)+eq(t,1)", AV_DICT_DONT_OVERWRITE);
++    p->has_support_for_filter2 = 1;
+     return 0;
+ }
+ 
+@@ -1474,91 +1223,22 @@ static int
+ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
+                                   AVDictionary **opts)
+ {
+-    // to avoid issues we have this check:
+-    if (self->buff_factor <= 0) {
+-        self->buff_factor = 3;
+-    }
+-    int int_bitrate = (int)((double)(self->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
+-    int int_buffer_size = (int)((double)(self->bit_rate) * 2048.0 * self->buff_factor * (1.0 + self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480));
+-    int int_max_bitrate = (int)((double)(self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
+-    // force max_bitrate to be >= with bitrate (to avoid crash)
+-    if (int_bitrate > int_max_bitrate) {
+-        tvherror_transcode(LST_VAAPI, "Bitrate %d kbps is greater than Max bitrate %d kbps, increase Max bitrate to %d kbps", int_bitrate / 1024, int_max_bitrate / 1024, int_bitrate / 1024);
+-        int_max_bitrate = int_bitrate;
+-    }
+-    tvhinfo_transcode(LST_VAAPI, "Bitrate = %d kbps; Buffer size = %d kbps; Max bitrate = %d kbps", int_bitrate / 1024, int_buffer_size / 1024, int_max_bitrate / 1024);
+-    // https://wiki.libav.org/Hardware/vaapi
+-    // to find available parameters use:
+-    // ffmpeg -hide_banner -h encoder=vp9_vaapi
+-    //   vp9_vaapi AVOptions:
+-    // -low_power         <boolean>    E..V....... Use low-power encoding mode (only available on some platforms; may not support all encoding features) (default false)
+-    // -idr_interval      <int>        E..V....... Distance (in I-frames) between IDR frames (from 0 to INT_MAX) (default 0)
+-    // -b_depth           <int>        E..V....... Maximum B-frame reference depth (from 1 to INT_MAX) (default 1)
+-    // -rc_mode           <int>        E..V....... Set rate control mode (from 0 to 6) (default auto)
+-    //    auto            0            E..V....... Choose mode automatically based on other parameters
+-    //    CQP             1            E..V....... Constant-quality
+-    //    CBR             2            E..V....... Constant-bitrate
+-    //    VBR             3            E..V....... Variable-bitrate
+-    //    ICQ             4            E..V....... Intelligent constant-quality
+-    //    QVBR            5            E..V....... Quality-defined variable-bitrate
+-    //    AVBR            6            E..V....... Average variable-bitrate
+-    // -loop_filter_level <int>        E..V....... Loop filter level (from 0 to 63) (default 16)
+-    // -loop_filter_sharpness <int>        E..V....... Loop filter sharpness (from 0 to 15) (default 4)
++    TVHCodecProfile *p = (TVHCodecProfile *)self;
++    int int_bitrate = 0;
++    int int_buffer_size = 0;
++    int int_max_bitrate = 0;
++    int ret = 0;
++
++    compute_bitrates(self, &int_bitrate, &int_buffer_size, &int_max_bitrate);
+ 
+     if (self->rc_mode != VAAPI_ENC_PARAMS_RC_SKIP) {
+         AV_DICT_SET_INT(LST_VAAPI, opts, "rc_mode", self->rc_mode, AV_DICT_DONT_OVERWRITE);
+     }
+     switch (self->platform) {
+         case VAAPI_ENC_PLATFORM_UNCONSTRAINED:
+-            // Unconstrained --> will allow any combination of parameters (valid or invalid)
+-            // this mode is useful for future platform and for debugging.
+-            if (self->b_reference) {
+-                // b_depth
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b_depth", self->b_reference, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->desired_b_depth >= 0) {
+-                // max_b_frames
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bf", self->desired_b_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->super_frame) {
+-                // according to example from https://trac.ffmpeg.org/wiki/Hardware/VAAPI
+-                // -bsf:v vp9_raw_reorder,vp9_superframe
+-                AV_DICT_SET(LST_VAAPI, opts, "bsf", "vp9_raw_reorder,vp9_superframe", AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->max_bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qp) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "quality", self->quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->global_quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "global_quality", self->global_quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->low_power) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_level >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_level", self->loop_filter_level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_sharpness >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_sharpness", self->loop_filter_sharpness, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_opts_unconstrained(self, opts, H264, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                return ret;
++            };
+             break;
+         case VAAPI_ENC_PLATFORM_INTEL:
+             // Intel
+@@ -1586,16 +1266,9 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
+                     // same like 0 but is not sending 'rc_mode'
+                 case VAAPI_ENC_PARAMS_RC_AUTO:
+                     // for auto --> let the driver decide as requested by documentation
+-                    if (self->bit_rate) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-                    }
+-                    if (self->max_bit_rate) {
+-                            AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        }
+-                    if (self->qp) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-                    }
++                    if ((ret = setup_bitrate_qp_opts_unconstrained(self, opts, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                        return ret;
++                    };
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_CONSTQP:
+                 case VAAPI_ENC_PARAMS_RC_ICQ:
+@@ -1606,14 +1279,14 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_CBR:
+                     // for constant bitrate: CBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+                     }
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_VBR:
+                     // for variable bitrate: VBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+@@ -1621,18 +1294,13 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_QVBR:
+                     // for variable bitrate: QVBR we use bitrate + qp
+-                    if (self->bit_rate && self->buff_factor) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-                    }
+-                    if (self->qp) {
+-                        AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-                    }
++                    if ((ret = setup_bitrate_qp_opts_unconstrained(self, opts, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                        return ret;
++                    };
+                     break;
+                 case VAAPI_ENC_PARAMS_RC_AVBR:
+                     // for variable bitrate: AVBR we use bitrate
+-                    if (self->bit_rate && self->buff_factor) {
++                    if (p->bit_rate && self->buff_factor) {
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+                         AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+                     }
+@@ -1641,63 +1309,23 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
+             if (self->low_power) {
+                 AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+             }
+-            if (self->loop_filter_level >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_level", self->loop_filter_level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_sharpness >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_sharpness", self->loop_filter_sharpness, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_baseline_opts_unconstrained(self, opts, VP9))) {
++                return ret;
++            };
+             break;
+         case VAAPI_ENC_PLATFORM_AMD:
+             // AMD --> will allow any combination of parameters
+             // I am unable to confirm this platform because I don't have the HW
+             // Is only going to override bf to 0 (as highlited by the previous implementation)
+-            if (self->bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->max_bit_rate) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qp) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qp", self->qp, AV_DICT_DONT_OVERWRITE);
+-            }
++            if ((ret = setup_common_opts_unconstrained(self, opts, VP9, int_bitrate, int_buffer_size, int_max_bitrate))) {
++                return ret;
++            };
+             AV_DICT_SET_INT(LST_VAAPI, opts, "bf", 0, 0);
+-            if (self->quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "quality", self->quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->global_quality >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "global_quality", self->global_quality, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->low_power) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_level >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_level", self->loop_filter_level, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->loop_filter_sharpness >= 0) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "loop_filter_sharpness", self->loop_filter_sharpness, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->async_depth) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmin) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmin", self->qmin, AV_DICT_DONT_OVERWRITE);
+-            }
+-            if (self->qmax) {
+-                AV_DICT_SET_INT(LST_VAAPI, opts, "qmax", self->qmax, AV_DICT_DONT_OVERWRITE);
+-            }
+             break;
+     }
++    // force keyframe at t=0 and t=1s (used for flashing the encoder)
++    AV_DICT_SET(LST_VAAPI, opts, "force_key_frames", "expr:eq(t,0)+eq(t,1)", AV_DICT_DONT_OVERWRITE);
++    p->has_support_for_filter2 = 1;
+     return 0;
+ }
+ 
+diff --git src/transcoding/codec/profile_class.c src/transcoding/codec/profile_class.c
+index 4af9c1a0ca..7f7c51373f 100644
+--- src/transcoding/codec/profile_class.c
++++ src/transcoding/codec/profile_class.c
+@@ -316,6 +316,16 @@ const codec_profile_class_t codec_profile_class = {
+                 .list     = codec_profile_class_profile_list,
+                 .def.i    = FF_AV_PROFILE_UNKNOWN,
+             },
++            {
++                .type     = PT_INT,
++                .id       = "has_support_for_filter2",
++                .name     = N_("has_support_for_filter2"),
++                .desc     = N_("has_support_for_filter2."),
++                .group    = 1,
++                .opts     = PO_ADVANCED | PO_PHIDDEN | PO_NOSAVE,
++                .off      = offsetof(TVHCodecProfile, has_support_for_filter2),
++                .def.i    = 0,
++            },
+             {}
+         }
+     },
+diff --git src/transcoding/transcode/audio.c src/transcoding/transcode/audio.c
+index 6c6119877a..47bf0f6099 100644
+--- src/transcoding/transcode/audio.c
++++ src/transcoding/transcode/audio.c
+@@ -80,6 +80,67 @@ _audio_context_sample_rate(TVHContext *self, AVDictionary **opts)
+ 
+ 
+ #if LIBAVCODEC_VERSION_MAJOR > 59
++
++static int
++_audio_filters_get_filters(TVHContext *self, char **filters)
++{
++    char sample_rate[32];
++    char sample_fmt[32];
++    char obuf[64], channel_layouts[64];
++    char aformat[128];
++    int aformat_tokens = 0;
++
++    // sample_rate
++    memset(sample_rate, 0, sizeof(sample_rate));
++    if ((self->iavctx->sample_rate != self->oavctx->sample_rate) &&
++        str_snprintf(sample_rate, sizeof(sample_rate), "aresample=%d",
++                    self->oavctx->sample_rate))
++        return -1;    
++
++    // https://ayosec.github.io/ffmpeg-filters-docs/8.1/Filters/Audio/aformat.html
++    // sample_fmt
++    memset(sample_fmt, 0, sizeof(sample_fmt));
++    if (self->iavctx->sample_fmt != self->oavctx->sample_fmt) {
++        if(str_snprintf(sample_fmt, sizeof(sample_fmt), "sample_fmts=%s",
++                     av_get_sample_fmt_name(self->oavctx->sample_fmt)))
++            return -1;
++        else 
++            aformat_tokens++; 
++    }
++
++    // channel_layouts
++    memset(channel_layouts, 0, sizeof(channel_layouts));
++    if (self->iavctx->ch_layout.nb_channels != self->oavctx->ch_layout.nb_channels) {
++        av_channel_layout_describe(&self->oavctx->ch_layout, obuf, sizeof(obuf));
++        if(str_snprintf(channel_layouts, sizeof(channel_layouts), "channel_layouts=%s", obuf)) 
++            return -1;
++        else 
++            aformat_tokens++; 
++    }
++
++    memset(aformat, 0, sizeof(aformat));
++    switch (aformat_tokens) {
++        case 2:
++            // we have to update both settings
++            if(str_snprintf(aformat, sizeof(aformat), "aformat=%s:%s", sample_fmt, channel_layouts))
++                return -1;
++            break;
++        case 1:
++            // we have to update only one setting
++            if(str_snprintf(aformat, sizeof(aformat), "aformat=%s%s", sample_fmt, channel_layouts)) 
++                return -1;
++            break;
++        default:
++            break;
++    }
++
++    // context filters
++    if (!(*filters = str_join(",", sample_rate, aformat, NULL)))
++        return -1;
++    
++    return 0;
++}
++
+ static void
+ _audio_context_channel_layout(TVHContext *self, AVDictionary **opts, AVChannelLayout *dst)
+ {
+@@ -254,6 +315,16 @@ tvh_audio_context_open_encoder(TVHContext *self, AVDictionary **opts)
+ static int
+ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+ {
++#if LIBAVCODEC_VERSION_MAJOR > 59
++    char *filters2 = NULL;
++
++        // filters
++    if (_audio_filters_get_filters(self, &filters2)) {
++        return -1;
++    }
++    
++    tvhinfo(LS_TRANSCODE, "filters: audio: '%s'", filters2);
++#endif
+     char source_args[128];
+     char filters[16];
+     char layout[32];
+@@ -290,21 +361,28 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+ #if LIBAVCODEC_VERSION_MAJOR > 59
+     char ch_layout[64];
+     av_channel_layout_describe(&self->oavctx->ch_layout, ch_layout, sizeof(ch_layout));
+-    
+-    int ret = tvh_context_open_filters(self,
+-        "abuffer", source_args,                           // source
+-        filters,                                          // filters
+-        "abuffersink",                                    // sink
+-        "ch_layouts",   AV_OPT_SET_STRING,                // sink option: channel_layout
+-        sizeof(ch_layout),
+-        ch_layout,
+-        "sample_fmts",  AV_OPT_SET_BIN,                   // sink option: sample_fmt
+-        sizeof(self->oavctx->sample_fmt),
+-        &self->oavctx->sample_fmt,
+-        "sample_rates", AV_OPT_SET_BIN,                   // sink option: sample_rate
+-        sizeof(self->oavctx->sample_rate),
+-        &self->oavctx->sample_rate,
+-        NULL);                                            // _IMPORTANT!_
++    int ret = -1;
++    if (((TVHCodecProfile *)self->profile)->has_support_for_filter2)
++        ret = tvh_context_open_filters2(self,
++            "abuffer",                                             // source
++            (filters2 && filters2[0] != '\0') ? filters2 : "anull",// filters
++            "abuffersink"                                          // sink
++        );
++    else 
++        ret = tvh_context_open_filters(self,
++            "abuffer", source_args,                           // source
++            filters,                                          // filters
++            "abuffersink",                                    // sink
++            "ch_layouts",   AV_OPT_SET_STRING,                // sink option: channel_layout
++            sizeof(ch_layout),
++            ch_layout,
++            "sample_fmts",  AV_OPT_SET_BIN,                   // sink option: sample_fmt
++            sizeof(self->oavctx->sample_fmt),
++            &self->oavctx->sample_fmt,
++            "sample_rates", AV_OPT_SET_BIN,                   // sink option: sample_rate
++            sizeof(self->oavctx->sample_rate),
++            &self->oavctx->sample_rate,
++            NULL);                                            // _IMPORTANT!_
+ #else
+     int ret = tvh_context_open_filters(self,
+         "abuffer", source_args,                           // source
+diff --git src/transcoding/transcode/context.c src/transcoding/transcode/context.c
+index ef1ea10b67..b8ee641998 100644
+--- src/transcoding/transcode/context.c
++++ src/transcoding/transcode/context.c
+@@ -536,7 +536,390 @@ tvh_context_close(TVHContext *self, int flush)
+     }
+ }
+ 
++#if LIBAVCODEC_VERSION_MAJOR > 59
++int
++tvh_context_open_filters2(TVHContext *self,
++                         const char *source_name,
++                         const char *filters, 
++                         const char *sink_name)
++{
++    static const AVClass logclass = {
++        .class_name = "TVHGraph",
++        .version    = 1,
++    };
++    struct {
++        const AVClass *class;
++    } logctx = { &logclass };
++    const AVFilter *iavflt = NULL, *oavflt = NULL;
++    AVFilterInOut *iavfltio = NULL, *oavfltio = NULL;
++    AVBufferSrcParameters *par = NULL;
++    int ret = -1;
++    enum AVMediaType stream_type = AVMEDIA_TYPE_UNKNOWN;
++
++    tvh_context_log(self, LOG_DEBUG, "filters: '%s'", filters);
++
++    if (!(self->avfltgraph = avfilter_graph_alloc()) ||
++        !(iavfltio = avfilter_inout_alloc()) ||
++        !(oavfltio = avfilter_inout_alloc()) ||
++        !(par = av_buffersrc_parameters_alloc())) {
++        ret = AVERROR(ENOMEM);
++        goto finish;
++    }
++
++// source
++    if (!(iavflt = avfilter_get_by_name(source_name))) {
++        tvh_context_log(self, LOG_ERR, "filters: source filter'%s' not found", source_name);
++        ret = AVERROR_FILTER_NOT_FOUND;
++        goto finish;
++    }
++
++    // 1. ALLOCATE (No init yet, so it won't fail due to missing args)
++    self->iavfltctx = avfilter_graph_alloc_filter(self->avfltgraph, iavflt, "in");
++    if (!self->iavfltctx) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to create 'in' filter");
++        goto finish;
++    }
++
++    // additional buffersrc params
++    memset(par, 0, sizeof(AVBufferSrcParameters));
++    
++    switch (self->iavctx->codec_type) {
++        case AVMEDIA_TYPE_VIDEO:
++            stream_type = AVMEDIA_TYPE_VIDEO;
++            break;
++        case AVMEDIA_TYPE_AUDIO:
++            stream_type = AVMEDIA_TYPE_AUDIO;
++            break;
++        default:
++            break;
++    }
++
++    if (stream_type == AVMEDIA_TYPE_UNKNOWN) {
++        ret = -1;
++        tvherror(LS_TRANSCODE, "filter can't process media type: %s", av_get_media_type_string(self->iavctx->codec_type));
++        goto finish;
++    }
++
++    // 2. CONFIGURE PARAMETERS
++    if (stream_type == AVMEDIA_TYPE_VIDEO) {
++        // for Video:
++        int int_pix_fmt = self->iavctx->pix_fmt;
++        AVRational sample_aspect_ratio = self->iavctx->sample_aspect_ratio;
++        //sample_aspect_ratio.num = 0; // force failure
++        if (self->iavframe && (sample_aspect_ratio.num <= 0 || sample_aspect_ratio.den <= 0)) {
++            // try to extract SAR from AVFrame
++            tvh_context_log(self, LOG_DEBUG, "codec %s is not advertising sample_aspect_ratio", self->iavctx->codec->name);
++            sample_aspect_ratio = self->iavframe->sample_aspect_ratio;
++            //sample_aspect_ratio.num = 0; // force failure
++            if (sample_aspect_ratio.num <= 0 || sample_aspect_ratio.den <= 0) {
++                tvh_context_log(self, LOG_DEBUG, "frame %s is not advertising sample_aspect_ratio", self->iavctx->codec->name);
++                if (self->sample_aspect_ratio.num && self->sample_aspect_ratio.den) {
++                    // We have SAR from TVH
++                    sample_aspect_ratio = (AVRational){self->sample_aspect_ratio.num, self->sample_aspect_ratio.den};
++                    tvherror(LS_TRANSCODE, 
++                    //tvh_context_log(self, LOG_DEBUG,
++                        "Manually set SAR to %d/%d based on TVH SAR %d:%d",
++                            sample_aspect_ratio.num, sample_aspect_ratio.den,
++                            self->sample_aspect_ratio.num, self->sample_aspect_ratio.den);
++                }
++                // we feed back the SAR to iavctx
++                self->iavframe->sample_aspect_ratio = sample_aspect_ratio;
++            }
++            if (sample_aspect_ratio.num <= 0 || sample_aspect_ratio.den <= 0) {
++                // set SAR to 1,1
++                tvh_context_log(self, LOG_DEBUG, "input stream is not advertising sample_aspect_ratio, default to {1,1}");
++                // Fallback: If TVH doesn't know, default to square pixels
++                sample_aspect_ratio = (AVRational){1, 1};
++            }
++            // we feed back the SAR to iavctx
++            self->iavctx->sample_aspect_ratio = sample_aspect_ratio;
++        }
++        // Basic video properties
++        par->width                = self->iavctx->width;
++        par->height               = self->iavctx->height;
++        par->sample_aspect_ratio  = sample_aspect_ratio;
++        
++        // CRITICAL: Metadata synchronization (fixes the FFmpeg 7 warnings)
++        par->time_base            = av_make_q(self->iavctx->time_base.num, self->iavctx->time_base.den); // or stream->time_base
++#if LIBAVCODEC_VERSION_MAJOR > 60
++        par->color_range          = self->iavctx->color_range;  // Fixes "range: tv" warning
++        par->color_space          = self->iavctx->colorspace;   // Fixes "csp: unknown" warning
++        // to be added later on
++        //par->color_primaries = self->iavctx->color_primaries;
++        //par->color_trc       = self->iavctx->color_trc;
++#endif
++        // If using hardware acceleration (VAAPI/CUDA/etc), pass the frames context
++        if (self->iavctx->hw_frames_ctx){
++            // Increment the reference count so the filter "owns" a piece of the hardware context
++            par->hw_frames_ctx = av_buffer_ref(self->iavctx->hw_frames_ctx);
++            
++            if (!par->hw_frames_ctx) {
++                // Handle allocation error
++                ret = AVERROR(ENOMEM);
++                goto finish;
++            }
++            AVHWFramesContext *frames_ctx = (AVHWFramesContext*)self->iavctx->hw_frames_ctx->data;
++            int_pix_fmt = (int)frames_ctx->format;
++        }
++        par->format               = int_pix_fmt;
++
++        char logs[256];
++        str_snprintf(logs, sizeof(logs),
++            "filter video in configuration:"
++            " video_size=%dx%d"
++            ",pix_fmt=%s"
++            ",time_base=%d/%d"
++            ",pixel_aspect:%d/%d"
++#if LIBAVCODEC_VERSION_MAJOR > 60
++            ",color_range:%s"
++            ",color_space:%s"
++#endif
++            ,self->iavctx->width, self->iavctx->height
++            ,av_get_pix_fmt_name(self->iavctx->pix_fmt)
++            ,self->iavctx->time_base.num, self->iavctx->time_base.den
++            ,sample_aspect_ratio.num, sample_aspect_ratio.den
++#if LIBAVCODEC_VERSION_MAJOR > 60
++            ,av_color_range_name(self->iavctx->color_range)
++            ,av_color_space_name(self->iavctx->colorspace)
++#endif
++        );
++        tvherror(LS_TRANSCODE, 
++        //tvh_context_log(self, LOG_DEBUG,
++                          "%s", logs);
++
++    } else if (stream_type == AVMEDIA_TYPE_AUDIO) {
++        // for Audio:
++        // Basic audio properties
++        par->format      = self->iavctx->sample_fmt;
++        par->sample_rate = self->iavctx->sample_rate;
++        par->time_base   = (AVRational){1, self->iavctx->sample_rate}; // CRITICAL
++
++        // Copy channel layout (Crucial for FFmpeg 7/8)
++        ret = av_channel_layout_copy(&par->ch_layout, &self->iavctx->ch_layout);
++        if (ret < 0) {
++            tvh_context_log(self, LOG_ERR, "filters: failed to set av_channel_layout with error %d", ret);
++            goto finish;
++        }
++
++        char logs[256];
++        memset(logs, 0, sizeof(logs));
++        char buf[64];
++        memset(buf, 0, sizeof(buf));
++        av_channel_layout_describe(&par->ch_layout, buf, sizeof(buf));
++        str_snprintf(logs, sizeof(logs),
++            "filter audio in configuration:"
++            " ch_layout=%s"
++            ",sample_fmt=%s"
++            ",sample_rate=%d"
++            ",time_base=%d/%d"
++            ,buf
++            ,av_get_sample_fmt_name(par->format)
++            ,par->sample_rate
++            ,par->time_base.num, par->time_base.den
++        );
++        // to be removed later on
++        tvherror(LS_TRANSCODE, 
++        //tvh_context_log(self, LOG_DEBUG,
++                          "%s", logs);
++    } else tvherror(LS_TRANSCODE, "filter can process only 'buffer' and 'abuffer', most likely will fail.");
++
++    // Push the parameters into the uninitialized filter context
++    ret = av_buffersrc_parameters_set(self->iavfltctx, par);
++    if (ret < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to set AVFilterContext parameters with error %d", ret);
++        goto finish;
++    }
+ 
++    // 3. MANUALLY INITIALIZE
++    // Now that the params are inside, we call init with NULL
++    ret = avfilter_init_str(self->iavfltctx, NULL);
++    if (ret < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to initialize AVFilterContext with error %d", ret);
++        goto finish;
++    }
++
++// sink
++    if (!(oavflt = avfilter_get_by_name(sink_name))) {
++        tvh_context_log(self, LOG_ERR, "filters: sink filter '%s' not found", sink_name);
++        ret = AVERROR_FILTER_NOT_FOUND;
++        goto finish;
++    }
++
++    ret = avfilter_graph_create_filter(&self->oavfltctx, oavflt, "out", NULL, NULL, self->avfltgraph);
++    if (ret < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to create 'out' filter with error %d", ret);
++        goto finish;
++    }
++
++    // Endpoints for the filter graph.
++    oavfltio->name       = av_strdup("in");
++    oavfltio->filter_ctx = self->iavfltctx;
++    oavfltio->pad_idx    = 0;
++    oavfltio->next       = NULL;
++
++    iavfltio->name       = av_strdup("out");
++    iavfltio->filter_ctx = self->oavfltctx;
++    iavfltio->pad_idx    = 0;
++    iavfltio->next       = NULL;
++
++    if (!iavfltio->name || !oavfltio->name) {
++        ret = AVERROR(ENOMEM);
++        tvh_context_log(self, LOG_ERR, "filters: fail during end point allocation with error %d", ret);
++        goto finish;
++    }
++
++    // filters
++    ret = tvh_avfilter_graph_parse_ptr(self->avfltgraph, filters, &iavfltio, &oavfltio, &logctx, self->hw_device_octx);
++    if (ret < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to add filters: '%s' with error %d", filters, ret);
++        goto finish;
++    }
++
++    // insert aditional filters required for conversions
++    avfilter_graph_set_auto_convert(self->avfltgraph, AVFILTER_AUTO_CONVERT_ALL);
++
++    //
++    if ((ret = avfilter_graph_config(self->avfltgraph, &logctx)) < 0) {
++        tvh_context_log(self, LOG_ERR, "filters: failed to config filter graph with error %d", ret);
++        goto finish;
++    }
++
++    stream_type = av_buffersink_get_type(self->oavfltctx);
++
++    // 1. CONFIGURE PARAMETERS
++    if (stream_type == AVMEDIA_TYPE_VIDEO) {
++        // for Video:
++        // Extract negotiated parameters from the sink context and pass them to the encoder context.
++        self->oavctx->pix_fmt = av_buffersink_get_format(self->oavfltctx);
++        self->oavctx->width   = av_buffersink_get_w(self->oavfltctx);
++        self->oavctx->height  = av_buffersink_get_h(self->oavfltctx);
++        // Important: The filter graph may change the timebase
++        self->oavctx->time_base = av_buffersink_get_time_base(self->oavfltctx);
++#if LIBAVCODEC_VERSION_MAJOR > 60
++        // Get the output link to access color metadata
++        const AVFilterLink *outlink = self->oavfltctx->inputs[0];
++        // 1. Extract Color Range (MPEG/TV vs JPEG/PC)
++        self->oavctx->color_range = outlink->color_range;
++        // 2. Extract Color Space (e.g., BT.709, BT.2020)
++        self->oavctx->colorspace = outlink->colorspace;
++        // 3. Extract Color Primaries and Transfer Characteristics (Recommended)
++        // to be added later on
++        //self->oavctx->color_primaries = outlink->color_primaries;
++        //self->oavctx->color_trc       = outlink->color_trc;
++#endif
++        // Handle Sample Aspect Ratio (SAR)
++        AVRational sar = av_buffersink_get_sample_aspect_ratio(self->oavfltctx);
++        if (sar.num > 0 && sar.den > 0)
++            self->oavctx->sample_aspect_ratio = sar;
++
++        // 2. THE HARDWARE LINK
++        // Query the hardware frames context from the sink.
++        AVBufferRef *hw_frames_ctx = av_buffersink_get_hw_frames_ctx(self->oavfltctx);
++        
++        if (hw_frames_ctx) {
++            // We must create a new reference to the context. 
++            // The encoder context will take ownership of this reference. 
++            self->oavctx->hw_frames_ctx = av_buffer_ref(hw_frames_ctx);
++            if (!self->oavctx->hw_frames_ctx) {
++                ret = AVERROR(ENOMEM);
++                goto finish;
++            }
++            
++            // Optimization: Some encoders (like VAAPI) benefit from knowing 
++            // the underlying software format being "hidden" by the hardware surface.
++            const AVHWFramesContext *frames_fctx = (AVHWFramesContext *)hw_frames_ctx->data;
++            self->oavctx->sw_pix_fmt = frames_fctx->sw_format;
++            
++            // Log it so you can see it's working
++            tvh_context_log(self, LOG_DEBUG, "filters: filter sink provided HW frames (pix_fmt: %s, sw_pix_fmt: %s)", 
++                av_get_pix_fmt_name(self->oavctx->pix_fmt), av_get_pix_fmt_name(self->oavctx->sw_pix_fmt));
++        }
++        char logs[256];
++        str_snprintf(logs, sizeof(logs),
++            "filter video out configuration:"
++            " video_size=%dx%d"
++            ",pix_fmt=%s"
++            ",time_base=%d/%d"
++            ",pixel_aspect:%d/%d"
++#if LIBAVCODEC_VERSION_MAJOR > 60
++            ",color_range:%s"
++            ",color_space:%s"
++#endif
++            ,self->oavctx->width, self->oavctx->height
++            ,av_get_pix_fmt_name(self->oavctx->pix_fmt)
++            ,self->oavctx->time_base.num, self->oavctx->time_base.den
++            ,self->oavctx->sample_aspect_ratio.num, self->oavctx->sample_aspect_ratio.den
++#if LIBAVCODEC_VERSION_MAJOR > 60
++            ,av_color_range_name(outlink->color_range)
++            ,av_color_space_name(outlink->colorspace)
++#endif
++        );
++        // to be removed later on
++        tvherror(LS_TRANSCODE, 
++        //tvh_context_log(self, LOG_DEBUG,
++                          "%s", logs);
++
++    } else if (stream_type == AVMEDIA_TYPE_AUDIO) {
++        // for Audio:
++        // Extract negotiated parameters from the sink context and pass them to the encoder context.
++        self->oavctx->sample_rate = av_buffersink_get_sample_rate(self->oavfltctx);
++        self->oavctx->sample_fmt = av_buffersink_get_format(self->oavfltctx);
++        self->oavctx->time_base = av_buffersink_get_time_base(self->oavfltctx);
++
++        ret = av_buffersink_get_ch_layout(self->oavfltctx, &self->oavctx->ch_layout);
++        if (ret < 0) {
++            tvh_context_log(self, LOG_ERR, "filters: failed to config AVCodecContext ch_layout with error %d", ret);
++            goto finish;
++        }
++
++        char logs[256];
++        memset(logs, 0, sizeof(logs));
++        char buf[64];
++        memset(buf, 0, sizeof(buf));
++        av_channel_layout_describe(&self->oavctx->ch_layout, buf, sizeof(buf));
++        str_snprintf(logs, sizeof(logs),
++            "filter audio out configuration:"
++            " ch_layout=%s"
++            ",sample_fmt=%s"
++            ",sample_rate=%d"
++            ",time_base=%d/%d"
++            ,buf
++            ,av_get_sample_fmt_name(self->oavctx->sample_fmt)
++            ,self->oavctx->sample_rate
++            ,self->oavctx->time_base.num, self->oavctx->time_base.den
++        );
++        tvherror(LS_TRANSCODE, 
++        //tvh_context_log(self, LOG_DEBUG,
++                          "%s", logs);
++
++    } else tvherror(LS_TRANSCODE, "filter can process only 'buffersink' and 'abuffersink', most likely will fail.");
++
++    if (ret >= 0 && tvhtrace_enabled()) {
++        char *graph = avfilter_graph_dump(self->avfltgraph, NULL);
++        char *str, *token, *saveptr = NULL;
++        for (str = graph; ; str = NULL) {
++          token = strtok_r(str, "\n", &saveptr);
++          if (token == NULL)
++            break;
++          tvh_context_log(self, LOG_TRACE, "filters dump: %s", token);
++        }
++        av_freep(&graph);
++    }
++
++finish:
++    if (par) {
++        av_buffer_unref(&par->hw_frames_ctx);
++        av_freep(&par);
++    }
++    if (iavfltio) {
++        avfilter_inout_free(&iavfltio);
++    }
++    if (oavfltio) {
++        avfilter_inout_free(&oavfltio);
++    }
++    return (ret > 0) ? 0 : ret;
++}
++#endif
+ int
+ tvh_context_open_filters(TVHContext *self,
+                          const char *source_name, const char *source_args,
+@@ -756,6 +1139,7 @@ tvh_context_create(TVHStream *stream, TVHCodecProfile *profile,
+         pktbuf_ref_inc(input_gh);
+         self->input_gh = input_gh;
+     }
++    self->intput_IDR_found = 0;
+     return self;
+ }
+ 
+--- /dev/null
++++ src/transcoding/transcode/graphparser.c
+@@ -0,0 +1,318 @@
++
++/**
++ * The file was lifted from libavfilter/graphparser.c 
++ * and was tested with ffmpeg 6.1.1 --> ffmpeg 8.0.1
++ * all changes are marked with:
++ * ***************** start ***********************
++ * ****************** end ************************
++ */
++
++#include "internals.h"
++#include <libavutil/avstring.h>
++
++#define WHITESPACES " \n\t\r"
++
++#if LIBAVCODEC_VERSION_MAJOR > 59
++
++/**
++ * Parse the name of a link, which has the format "[linkname]".
++ *
++ * @return a pointer (that need to be freed after use) to the name
++ * between parenthesis
++ */
++static char *parse_link_name(const char **buf, void *log_ctx)
++{
++    const char *start = *buf;
++    char *name;
++    (*buf)++;
++
++    name = av_get_token(buf, "]");
++    if (!name)
++        return NULL;
++
++    if (!name[0]) {
++        av_log(log_ctx, AV_LOG_ERROR,
++               "Bad (empty?) label found in the following: \"%s\".\n", start);
++        goto fail;
++    }
++
++    if (**buf != ']') {
++        av_log(log_ctx, AV_LOG_ERROR,
++               "Mismatched '[' found in the following: \"%s\".\n", start);
++    fail:
++        av_freep(&name);
++        return NULL;
++    }
++    (*buf)++;
++
++    return name;
++}
++
++static AVFilterInOut *extract_inout(const char *label, AVFilterInOut **links)
++{
++    AVFilterInOut *ret;
++
++    while (*links && (!(*links)->name || strcmp((*links)->name, label)))
++        links = &((*links)->next);
++
++    ret = *links;
++
++    if (ret) {
++        *links = ret->next;
++        ret->next = NULL;
++    }
++
++    return ret;
++}
++
++static void append_inout(AVFilterInOut **inouts, AVFilterInOut **element)
++{
++    while (*inouts && (*inouts)->next)
++        inouts = &((*inouts)->next);
++
++    if (!*inouts)
++        *inouts = *element;
++    else
++        (*inouts)->next = *element;
++    *element = NULL;
++}
++
++static void pad_params_free(AVFilterPadParams **pfpp)
++{
++    AVFilterPadParams *fpp = *pfpp;
++
++    if (!fpp)
++        return;
++
++    av_freep(&fpp->label);
++
++    av_freep(pfpp);
++}
++
++static int linklabels_parse(void *logctx, const char **linklabels,
++                            AVFilterPadParams ***res, unsigned *nb_res)
++{
++    AVFilterPadParams **pp = NULL;
++    int nb = 0;
++    int ret;
++    unsigned int i;
++
++    while (**linklabels == '[') {
++        char *label;
++        AVFilterPadParams *par;
++
++        label = parse_link_name(linklabels, logctx);
++        if (!label) {
++            ret = AVERROR(EINVAL);
++            goto fail;
++        }
++
++        par = av_mallocz(sizeof(*par));
++        if (!par) {
++            av_freep(&label);
++            ret = AVERROR(ENOMEM);
++            goto fail;
++        }
++
++        par->label = label;
++
++        ret = av_dynarray_add_nofree(&pp, &nb, par);
++        if (ret < 0) {
++            pad_params_free(&par);
++            goto fail;
++        }
++
++        *linklabels += strspn(*linklabels, WHITESPACES);
++    }
++
++    *res    = pp;
++    *nb_res = nb;
++
++    return 0;
++fail:
++    for (i = 0; i < nb; i++)
++        pad_params_free(&pp[i]);
++    av_freep(&pp);
++    return ret;
++}
++
++// print an error message if some options were not found
++static void log_unknown_opt(const AVFilterGraphSegment *seg)
++{
++    size_t i;
++    for (i = 0; i < seg->nb_chains; i++) {
++        const AVFilterChain *ch = seg->chains[i];
++        size_t j;
++        for (j = 0; j < ch->nb_filters; j++) {
++            const AVFilterParams *p = ch->filters[j];
++            const AVDictionaryEntry *e;
++
++            if (!p->filter)
++                continue;
++
++            e = av_dict_iterate(p->opts, NULL);
++
++            if (e) {
++                av_log(p->filter, AV_LOG_ERROR,
++                       "Could not set non-existent option '%s' to value '%s'\n",
++                       e->key, e->value);
++                return;
++            }
++        }
++    }
++
++}
++
++/* original function is avfilter_graph_parse_ptr() and is missing hw_device_octx
++int avfilter_graph_parse_ptr(AVFilterGraph *graph, const char *filters,
++                         AVFilterInOut **open_inputs_ptr, AVFilterInOut **open_outputs_ptr,
++                         void *log_ctx)
++*/
++int tvh_avfilter_graph_parse_ptr(AVFilterGraph *graph, const char *filters,
++                         AVFilterInOut **open_inputs_ptr, AVFilterInOut **open_outputs_ptr,
++                         void *log_ctx,
++                         AVBufferRef *hw_device_octx)
++{
++    AVFilterInOut *user_inputs  = open_inputs_ptr  ? *open_inputs_ptr  : NULL;
++    AVFilterInOut *user_outputs = open_outputs_ptr ? *open_outputs_ptr : NULL;
++
++    AVFilterInOut *inputs = NULL, *outputs = NULL;
++    AVFilterGraphSegment *seg = NULL;
++    AVFilterChain         *ch;
++    AVFilterParams         *p;
++    int ret;
++
++    ret = avfilter_graph_segment_parse(graph, filters, 0, &seg);
++    if (ret < 0)
++        goto end;
++
++    ret = avfilter_graph_segment_create_filters(seg, 0);
++    if (ret < 0)
++        goto end;
++
++    ret = avfilter_graph_segment_apply_opts(seg, 0);
++    if (ret < 0) {
++        if (ret == AVERROR_OPTION_NOT_FOUND)
++            log_unknown_opt(seg);
++        goto end;
++    }
++
++/***************** start ***********************/
++    // append hardware device output ctx
++    size_t i;
++    for (i = 0; i < seg->nb_chains; i++) {
++        AVFilterChain *ch = seg->chains[i];
++        size_t j;
++        for (j = 0; j < ch->nb_filters; j++) {
++            AVFilterParams *p = ch->filters[j];
++            // Check if the filter is 'hwupload'
++            if (p->filter && p->filter->filter && hw_device_octx && strcmp(p->filter->filter->name, "hwupload") == 0) {
++                // Free any existing context and assign the new one
++                av_buffer_unref(&p->filter->hw_device_ctx);
++                p->filter->hw_device_ctx = av_buffer_ref(hw_device_octx);
++                if (!p->filter->hw_device_ctx) {
++                    // Handle allocation failure
++                    av_log(seg->graph, AV_LOG_ERROR, "Unable to allocate hw_device_ctx for filter '%s'\n",p->filter->name);
++                    return AVERROR(ENOMEM);
++                }
++            }
++        }
++    }
++/****************** end ************************/
++
++    ret = avfilter_graph_segment_init(seg, 0);
++    if (ret < 0)
++        goto end;
++
++    /* First input pad, assume it is "[in]" if not specified */
++    p = seg->chains[0]->filters[0];
++    if (p->filter->nb_inputs == 1 && !p->inputs) {
++        const char *tmp = "[in]";
++
++        ret = linklabels_parse(graph, &tmp, &p->inputs, &p->nb_inputs);
++        if (ret < 0)
++            goto end;
++    }
++
++    /* Last output pad, assume it is "[out]" if not specified */
++    ch = seg->chains[seg->nb_chains - 1];
++    p = ch->filters[ch->nb_filters - 1];
++    if (p->filter->nb_outputs == 1 && !p->outputs) {
++        const char *tmp = "[out]";
++
++        ret = linklabels_parse(graph, &tmp, &p->outputs, &p->nb_outputs);
++        if (ret < 0)
++            goto end;
++    }
++
++    ret = avfilter_graph_segment_apply(seg, 0, &inputs, &outputs);
++    avfilter_graph_segment_free(&seg);
++    if (ret < 0)
++        goto end;
++
++    // process user-supplied inputs/outputs
++    while (inputs) {
++        AVFilterInOut *cur, *match = NULL;
++
++        cur       = inputs;
++        inputs    = cur->next;
++        cur->next = NULL;
++
++        if (cur->name)
++            match = extract_inout(cur->name, &user_outputs);
++
++        if (match) {
++            ret = avfilter_link(match->filter_ctx, match->pad_idx,
++                                cur->filter_ctx, cur->pad_idx);
++            avfilter_inout_free(&match);
++            avfilter_inout_free(&cur);
++            if (ret < 0)
++                goto end;
++        } else
++            append_inout(&user_inputs, &cur);
++    }
++    while (outputs) {
++        AVFilterInOut *cur, *match = NULL;
++
++        cur       = outputs;
++        outputs   = cur->next;
++        cur->next = NULL;
++
++        if (cur->name)
++            match = extract_inout(cur->name, &user_inputs);
++
++        if (match) {
++            ret = avfilter_link(cur->filter_ctx, cur->pad_idx,
++                                match->filter_ctx, match->pad_idx);
++            avfilter_inout_free(&match);
++            avfilter_inout_free(&cur);
++            if (ret < 0)
++                goto end;
++        } else
++            append_inout(&user_outputs, &cur);
++    }
++
++end:
++    avfilter_graph_segment_free(&seg);
++
++    if (ret < 0) {
++        av_log(graph, AV_LOG_ERROR, "Error processing filtergraph: %s\n",
++               av_err2str(ret));
++
++        while (graph->nb_filters)
++            avfilter_free(graph->filters[0]);
++        av_freep(&graph->filters);
++    }
++
++    /* clear open_in/outputs only if not passed as parameters */
++    if (open_inputs_ptr) *open_inputs_ptr = user_inputs;
++    else avfilter_inout_free(&user_inputs);
++    if (open_outputs_ptr) *open_outputs_ptr = user_outputs;
++    else avfilter_inout_free(&user_outputs);
++
++    avfilter_inout_free(&inputs);
++    avfilter_inout_free(&outputs);
++
++    return ret;
++}
++#endif
+\ No newline at end of file
+diff --git src/transcoding/transcode/hwaccels/hwaccels.c src/transcoding/transcode/hwaccels/hwaccels.c
+index 99eeabc92c..e0e2f81f7b 100644
+--- src/transcoding/transcode/hwaccels/hwaccels.c
++++ src/transcoding/transcode/hwaccels/hwaccels.c
+@@ -98,18 +98,49 @@ hwaccels_decode_get_format(AVCodecContext *avctx,
+     enum AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
+     const AVPixFmtDescriptor *desc;
+     int i;
++    const enum AVPixelFormat *p;
+ 
+-    for (i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++) {
+-        pix_fmt = pix_fmts[i];
+-        if ((desc = av_pix_fmt_desc_get(pix_fmt))) {
+-            tvhtrace(LS_TRANSCODE, "hwaccels: [%s] trying pix_fmt: %s", avctx->codec->name, desc->name);
+-            if ((desc->flags & AV_PIX_FMT_FLAG_HWACCEL) &&
+-                !hwaccels_decode_setup_context(avctx, pix_fmt)) {
+-                break;
++    TVHContext *ctx = avctx->opaque;
++
++    if ((ctx->profile)->has_support_for_filter2) {
++        // new implementation
++        for (p = pix_fmts; *p != AV_PIX_FMT_NONE; p++) {
++            // 1. Iterate through all HW configs supported by this codec
++            for (i = 0; ; i++) {
++                const AVCodecHWConfig *config = avcodec_get_hw_config(avctx->codec, i);
++                if (!config) break;
++                // 2. If the current format in the list matches a format in a 
++                //    Hardware Device Context config, it's a hardware path.
++                if (config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX &&
++                    *p == config->pix_fmt &&
++                    !hwaccels_decode_setup_context(avctx, *p)) {
++                    // Because it came from a HW_DEVICE_CTX config, we know 
++                    // it's the hardware-accelerated path.
++                    if (!avctx->hw_frames_ctx) {
++                        // hw_frames_ctx is not initialized most likely will fail
++                        tvhwarn(LS_LIBAV,  "Decoder hw_frames_ctx is not available for pix_fmt = %s", av_get_pix_fmt_name(*p));
++                    }
++                    // return last pix_fmt
++                    return *p; 
++                }
++            }
++        }
++        // Fallback to the first available software format if no HW match found
++        return pix_fmts[0];
++    }
++    else {
++        // old implementation
++        for (i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++) {
++            pix_fmt = pix_fmts[i];
++            if ((desc = av_pix_fmt_desc_get(pix_fmt))) {
++                if ((desc->flags & AV_PIX_FMT_FLAG_HWACCEL) &&
++                    !hwaccels_decode_setup_context(avctx, pix_fmt)) {
++                    break;
++                }
+             }
+         }
++        return pix_fmt;
+     }
+-    return pix_fmt;
+ }
+ 
+ 
+diff --git src/transcoding/transcode/hwaccels/vaapi.c src/transcoding/transcode/hwaccels/vaapi.c
+index 1e69604c71..2bc749979e 100644
+--- src/transcoding/transcode/hwaccels/vaapi.c
++++ src/transcoding/transcode/hwaccels/vaapi.c
+@@ -57,18 +57,44 @@ tvhva_context_destroy(TVHVAContext *self)
+ }
+ 
+ 
+-/* decoding ================================================================= */
++/* internal ================================================================= */
+ 
+-static int
+-vaapi_get_buffer2(AVCodecContext *avctx, AVFrame *avframe, int flags)
++// lifted from ffmpeg-6.1.1/doc/examples/vaapi_encode.c line 41
++static int set_hwframe_ctx(AVCodecContext *ctx, AVBufferRef *hw_device_ctx)
+ {
+-    if (!(avctx->codec->capabilities & AV_CODEC_CAP_DR1)) {
+-        return avcodec_default_get_buffer2(avctx, avframe, flags);
++    AVBufferRef *hw_frames_ref;
++    AVHWFramesContext *frames_ctx = NULL;
++    int err = 0;
++
++    if (!(hw_frames_ref = av_hwframe_ctx_alloc(hw_device_ctx))) {
++        tvherror_transcode(LST_VAAPI, "Encode: Failed to create VAAPI frame context.");
++        return AVERROR(ENOMEM);
++    }
++    frames_ctx = (AVHWFramesContext *)(hw_frames_ref->data);
++    frames_ctx->format    = AV_PIX_FMT_VAAPI;
++    frames_ctx->sw_format = AV_PIX_FMT_NV12;
++    frames_ctx->width     = ctx->width;
++    frames_ctx->height    = ctx->height;
++    frames_ctx->initial_pool_size = 20;
++    if ((err = av_hwframe_ctx_init(hw_frames_ref)) < 0) {
++        tvherror_transcode(LST_VAAPI, "Encode: Failed to initialize VAAPI frame context."
++                "Error code: %s",av_err2str(err));
++        av_buffer_unref(&hw_frames_ref);
++        return err;
++    }
++    ctx->hw_frames_ctx = av_buffer_ref(hw_frames_ref);
++    if (!ctx->hw_frames_ctx) {
++        err = AVERROR(ENOMEM);
++        tvherror_transcode(LST_VAAPI, "Encode: Failed to create a hardware device reference."
++                "Error code: %s",av_err2str(err));
+     }
+-    return av_hwframe_get_buffer(avctx->hw_frames_ctx, avframe, 0);
++    av_buffer_unref(&hw_frames_ref);
++    return err;
+ }
+ 
+ 
++/* decoding ================================================================= */
++
+ int
+ vaapi_decode_setup_context(AVCodecContext *avctx)
+ {
+@@ -104,13 +130,19 @@ vaapi_decode_setup_context(AVCodecContext *avctx)
+         self = NULL;
+         return AVERROR(ENOMEM);
+     }
++    // lifted from ffmpeg-6.1.1/doc/examples/vaapi_encode.c line 152
++    /* set hw_frames_ctx for decoder's AVCodecContext */
++    if ((ret = set_hwframe_ctx(avctx, avctx->hw_device_ctx)) < 0) {
++        tvherror_transcode(LST_VAAPI, "Decode: Failed to set hwframe context."
++                                      "Error code: %s", av_err2str(ret));
++        av_buffer_unref(&avctx->hw_device_ctx);
++        return ret;
++    }
+     ctx->hw_accel_ictx = self;
+-    avctx->get_buffer2 = vaapi_get_buffer2;
+     avctx->pix_fmt = AV_PIX_FMT_VAAPI;
+     return 0;
+ }
+ 
+-
+ void
+ vaapi_decode_close_context(AVCodecContext *avctx)
+ {
+@@ -123,7 +155,6 @@ vaapi_decode_close_context(AVCodecContext *avctx)
+     tvhva_context_destroy(ctx->hw_accel_ictx);
+ }
+ 
+-
+ int
+ vaapi_get_scale_filter(AVCodecContext *iavctx, AVCodecContext *oavctx,
+                        char *filter, size_t filter_len)
+@@ -132,7 +163,6 @@ vaapi_get_scale_filter(AVCodecContext *iavctx, AVCodecContext *oavctx,
+     return 0;
+ }
+ 
+-
+ int
+ vaapi_get_deint_filter(AVCodecContext *avctx, char *filter, size_t filter_len)
+ {
+@@ -148,11 +178,9 @@ vaapi_get_deint_filter(AVCodecContext *avctx, char *filter, size_t filter_len)
+                                          mode, rate, enable_auto)) {
+         return -1;
+     }
+-
+     return 0;
+ }
+ 
+-
+ int
+ vaapi_get_denoise_filter(AVCodecContext *avctx, int value, char *filter, size_t filter_len)
+ {
+@@ -160,7 +188,6 @@ vaapi_get_denoise_filter(AVCodecContext *avctx, int value, char *filter, size_t
+     return 0;
+ }
+ 
+-
+ int
+ vaapi_get_sharpness_filter(AVCodecContext *avctx, int value, char *filter, size_t filter_len)
+ {
+@@ -168,41 +195,8 @@ vaapi_get_sharpness_filter(AVCodecContext *avctx, int value, char *filter, size_
+     return 0;
+ }
+ 
+-/* encoding ================================================================= */
+-
+-// lifted from ffmpeg-6.1.1/doc/examples/vaapi_encode.c line 41
+-static int set_hwframe_ctx(AVCodecContext *ctx, AVBufferRef *hw_device_ctx)
+-{
+-    AVBufferRef *hw_frames_ref;
+-    AVHWFramesContext *frames_ctx = NULL;
+-    int err = 0;
+-
+-    if (!(hw_frames_ref = av_hwframe_ctx_alloc(hw_device_ctx))) {
+-        tvherror_transcode(LST_VAAPI, "Encode: Failed to create VAAPI frame context.");
+-        return AVERROR(ENOMEM);
+-    }
+-    frames_ctx = (AVHWFramesContext *)(hw_frames_ref->data);
+-    frames_ctx->format    = AV_PIX_FMT_VAAPI;
+-    frames_ctx->sw_format = AV_PIX_FMT_NV12;
+-    frames_ctx->width     = ctx->width;
+-    frames_ctx->height    = ctx->height;
+-    frames_ctx->initial_pool_size = 20;
+-    if ((err = av_hwframe_ctx_init(hw_frames_ref)) < 0) {
+-        tvherror_transcode(LST_VAAPI, "Encode: Failed to initialize VAAPI frame context."
+-                "Error code: %s",av_err2str(err));
+-        av_buffer_unref(&hw_frames_ref);
+-        return err;
+-    }
+-    ctx->hw_frames_ctx = av_buffer_ref(hw_frames_ref);
+-    if (!ctx->hw_frames_ctx) {
+-        err = AVERROR(ENOMEM);
+-        tvherror_transcode(LST_VAAPI, "Encode: Failed to create a hardware device reference."
+-                "Error code: %s",av_err2str(err));
+-    }
+-    av_buffer_unref(&hw_frames_ref);
+-    return err;
+-}
+ 
++/* encoding ================================================================= */
+ 
+ int
+ vaapi_encode_setup_context(AVCodecContext *avctx)
+@@ -227,7 +221,6 @@ vaapi_encode_setup_context(AVCodecContext *avctx)
+     return ret;
+ }
+ 
+-
+ void
+ vaapi_encode_close_context(AVCodecContext *avctx)
+ {
+diff --git src/transcoding/transcode/internals.h src/transcoding/transcode/internals.h
+index 2bf58b002d..c131a97a56 100644
+--- src/transcoding/transcode/internals.h
++++ src/transcoding/transcode/internals.h
+@@ -168,7 +168,9 @@ struct tvh_context {
+     int64_t duration;
+     int64_t delta;
+     uint8_t sri;
++    uint8_t intput_IDR_found;
+     // hardware acceleration
++    AVRational sample_aspect_ratio;
+     char *hw_accel_device;
+     AVBufferRef *hw_device_ref;
+     void *hw_accel_ictx;
+@@ -184,6 +186,38 @@ tvh_context_get_str_opt(AVDictionary **opts, const char *key, char **value);
+ void
+ tvh_context_close(TVHContext *self, int flush);
+ 
++#if LIBAVCODEC_VERSION_MAJOR > 59
++/**
++ * Add a graph described by a string to a graph.
++ *
++ * In the graph filters description, if the input label of the first
++ * filter is not specified, "in" is assumed; if the output label of
++ * the last filter is not specified, "out" is assumed.
++ *
++ * @param graph   the filter graph where to link the parsed graph context
++ * @param filters string to be parsed
++ * @param inputs  pointer to a linked list to the inputs of the graph, may be NULL.
++ *                If non-NULL, *inputs is updated to contain the list of open inputs
++ *                after the parsing, should be freed with avfilter_inout_free().
++ * @param outputs pointer to a linked list to the outputs of the graph, may be NULL.
++ *                If non-NULL, *outputs is updated to contain the list of open outputs
++ *                after the parsing, should be freed with avfilter_inout_free().
++ * @param log_ctx context used for logging
++ * @param hw_device_octx for hwaccel pixel formats, this should be a reference to the
++ *                       AVHWDeviceContext describing the device used for encoding
++ * @return non negative on success, a negative AVERROR code on error
++ */
++int tvh_avfilter_graph_parse_ptr(AVFilterGraph *graph, const char *filters,
++                         AVFilterInOut **open_inputs_ptr, AVFilterInOut **open_outputs_ptr,
++                         void *log_ctx,
++                         AVBufferRef *hw_device_octx);
++
++int
++tvh_context_open_filters2(TVHContext *self,
++                         const char *source_name,
++                         const char *filters, 
++                         const char *sink_name);
++#endif
+ /* __VA_ARGS__ = NULL terminated list of sink options
+    sink option = (const char *name, av_opt_set_type opt_set_type, int size, const uint8_t *value) */
+ int
+diff --git src/transcoding/transcode/transcoder.c src/transcoding/transcode/transcoder.c
+index 52fe227c63..4217382d11 100644
+--- src/transcoding/transcode/transcoder.c
++++ src/transcoding/transcode/transcoder.c
+@@ -93,6 +93,12 @@ tvh_transcoder_handle(TVHTranscoder *self, th_pkt_t *pkt)
+ 
+     SLIST_FOREACH(stream, &self->streams, link) {
+         if (pkt->pkt_componentindex == stream->index) {
++#if ENABLE_LIBAV
++            // add DAR
++            if (SCT_ISVIDEO(pkt->pkt_type)) {
++                stream->context->sample_aspect_ratio = (AVRational){pkt->v.pkt_sample_aspect_ratio.num, pkt->v.pkt_sample_aspect_ratio.den};
++            }
++#endif
+             err = tvh_stream_handle(stream, pkt);
+             if (err) {
+                 tvh_stream_stop(stream, 0);
+diff --git src/transcoding/transcode/video.c src/transcoding/transcode/video.c
+index 5b3a118639..222dfa8e72 100644
+--- src/transcoding/transcode/video.c
++++ src/transcoding/transcode/video.c
+@@ -320,15 +320,25 @@ tvh_video_context_open_filters(TVHContext *self)
+     if (_video_filters_get_filters(self, &filters)) {
+         return -1;
+     }
++    
++    tvhinfo(LS_TRANSCODE, "filters: video: '%s'", filters);
+ 
+ #if LIBAVCODEC_VERSION_MAJOR > 59
+-    int ret = tvh_context_open_filters(self,
+-        "buffer", source_args,                                  // source
+-        strlen(filters) ? filters : "null",                     // filters
+-        "buffersink",                                           // sink
+-        "pix_fmts", AV_OPT_SET_BIN,                             // sink option: pix_fmt
+-        sizeof(self->oavctx->pix_fmt), &self->oavctx->pix_fmt,
+-        NULL);                                                  // _IMPORTANT!_
++    int ret = -1;
++    if (self->profile->has_support_for_filter2)
++        ret = tvh_context_open_filters2(self,
++            "buffer",                                               // source
++            (filters && filters[0] != '\0') ? filters : "null",     // filters
++            "buffersink"                                            // sink
++        );
++    else
++        ret = tvh_context_open_filters(self,
++            "buffer", source_args,                                  // source
++            strlen(filters) ? filters : "null",                     // filters
++            "buffersink",                                           // sink
++            "pix_fmts", AV_OPT_SET_BIN,                             // sink option: pix_fmt
++            sizeof(self->oavctx->pix_fmt), &self->oavctx->pix_fmt,
++            NULL);                                                  // _IMPORTANT!_
+ #else
+     int ret = tvh_context_open_filters(self,
+         "buffer", source_args,              // source
+@@ -518,6 +528,10 @@ tvh_video_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+     pkt->pkt_duration   = avpkt->duration;
+     pkt->pkt_commercial = self->src_pkt->pkt_commercial;
+     pkt->v.pkt_field      = (self->oavctx->field_order > AV_FIELD_PROGRESSIVE);
++#if ENABLE_LIBAV
++    pkt->v.pkt_sample_aspect_ratio.num = self->src_pkt->v.pkt_sample_aspect_ratio.num;
++    pkt->v.pkt_sample_aspect_ratio.den = self->src_pkt->v.pkt_sample_aspect_ratio.den;
++#endif
+     pkt->v.pkt_aspect_num = self->src_pkt->v.pkt_aspect_num;
+     pkt->v.pkt_aspect_den = self->src_pkt->v.pkt_aspect_den;
+     return 0;
