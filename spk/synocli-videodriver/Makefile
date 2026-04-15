@@ -24,7 +24,8 @@ CHANGELOG += "4. Intel Graphics Compiler (IGC) 1.0.17791.18 (DSM 7.1+).<br/> "
 CHANGELOG += "5. Intel Compute Runtime 24.35.30872.41 (DSM 7.1+).<br/> "
 CHANGELOG += "6. Intel Video Processing Library (Intel VPL) 2.15.0 (DSM 7.1+).<br/> "
 CHANGELOG += "7. MESA Intel Vulkan driver (anv) 23.3.6 (DSM 7.1+)."
-CHANGELOG += "8. Intel GPU Tools (igt) 2.3 (DSM 7.1+)."
+CHANGELOG += "8. libshaderc for accessing glslc functionality (DSM 7.1+)."
+CHANGELOG += "9. Intel GPU Tools (igt) 2.3 (DSM 7.1+)."
 
 include ../../mk/spksrc.common.mk
 
@@ -50,6 +51,7 @@ DEPENDS += cross/clinfo
 DEPENDS += cross/mesa
 DEPENDS += cross/Khronos-Vulkan-Loader
 DEPENDS += cross/Khronos-Vulkan-Tools
+DEPENDS += cross/shaderc
 
 # Enable intel_gpu_top on DSM >= 7.1
 DEPENDS += cross/intel-gpu-tools
