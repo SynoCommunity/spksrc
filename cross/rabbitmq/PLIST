@@ -9,6 +9,5 @@ rsc:lib/rabbitmq_server-3.12.13/sbin/rabbitmq-plugins
 rsc:lib/rabbitmq_server-3.12.13/sbin/rabbitmq-queues
 rsc:lib/rabbitmq_server-3.12.13/sbin/rabbitmq-server
 rsc:lib/rabbitmq_server-3.12.13/sbin/rabbitmq-streams
-rsc:lib/rabbitmq_server-3.12.13/sbin/rabbitmq-tanzu
 rsc:lib/rabbitmq_server-3.12.13/sbin/rabbitmq-upgrade
 rsc:lib/rabbitmq_server-3.12.13/sbin/rabbitmqctl
