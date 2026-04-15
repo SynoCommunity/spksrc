@@ -283,6 +283,8 @@ CONFIGURE_ARGS += --enable-libmfx
 
 # Enable OpenCL and Vulkan acceleration
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
+#CONFIGURE_ARGS += --enable-libglslang  # <-- Mutually exclusive to shaderc
+CONFIGURE_ARGS += --enable-libshaderc
 CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
