@@ -18,4 +18,10 @@ CMAKE_ARGS += -DBUILD_SHARED_LIBS='ON'
 CMAKE_ARGS += -DGLSLANG_TESTS='ON'
 CMAKE_ARGS += -DCMAKE_CXX_STANDARD_LIBRARIES="-lstdc++fs"
 
+POST_EXTRACT_TARGET = glslang_post_extract_target
+
 include ../../mk/spksrc.cross-cmake.mk
+
+.PHONY: glslang_post_extract_target
+glslang_post_extract_target:
+	@cd $(WORK_DIR) && ln -s $(PKG_DIR) $(PKG_NAME)
