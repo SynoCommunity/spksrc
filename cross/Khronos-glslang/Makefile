@@ -16,7 +16,13 @@ CMAKE_ARGS  = -DENABLE_OPT='OFF'
 CMAKE_ARGS += -DALLOW_EXTERNAL_SPIRV_TOOLS='ON'
 CMAKE_ARGS += -DBUILD_SHARED_LIBS='ON'
 CMAKE_ARGS += -DGLSLANG_TESTS='ON'
-CMAKE_ARGS += -DCMAKE_CXX_STANDARD_LIBRARIES="-lstdc++fs"
+
+include ../../mk/spksrc.common.mk
+
+# std::filesystem integration to libstdc++ >= GCC 9
+ifeq ($(call version_lt, $(TC_GCC), 9),1)
+CMAKE_ARGS += -DCMAKE_CXX_STANDARD_LIBRARIES=-lstdc++fs
+endif
 
 POST_EXTRACT_TARGET = glslang_post_extract_target
 
