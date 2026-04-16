@@ -8,7 +8,12 @@ endif
 VIDEODRV_PACKAGE_DIR = $(abspath $(CURDIR)/../../spk/$(VIDEODRV_PACKAGE))
 VIDEODRV_PACKAGE_WORK_DIR = $(VIDEODRV_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
 
-# List of videodriver default dependencies
+# List of videodriver aarch64 default dependencies
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+VIDEODRV_DEPENDS = cross/libdrm
+endif
+
+# List of videodriver x64 default dependencies
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 
 # Common videodrv dependencies
@@ -16,8 +21,9 @@ VIDEODRV_DEPENDS  = cross/libva cross/libva-utils
 VIDEODRV_DEPENDS += cross/intel-vaapi-driver
 VIDEODRV_DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
-# Newer Intel implementations (oneAPI, level-zero) requires gcc >= 5
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
+
+# Newer Intel implementation
 VIDEODRV_DEPENDS += cross/intel-level-zero
 
 # OpenCL
@@ -30,6 +36,13 @@ VIDEODRV_DEPENDS += cross/clinfo
 VIDEODRV_DEPENDS += cross/mesa
 VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Loader
 VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Tools
+VIDEODRV_DEPENDS += cross/shaderc
+
+# Requires GCC >= 12 (C++20 <version> header support)
+ifeq ($(call version_ge, $(TC_GCC), 12),1)
+VIDEODRV_DEPENDS += cross/libplacebo
+endif
+
 endif
 endif
 
@@ -49,6 +62,7 @@ ifneq ($(and $(wildcard $(VIDEODRV_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKE
   export VIDEODRV_PACKAGE_WORK_DIR
   export VIDEODRV_DEPENDS
   export META_DEPENDS
+  OPTIONAL_DEPENDS += $(VIDEODRV_DEPENDS)
   $(eval $(call SPK_BASE_TEMPLATE,VIDEODRV))
 else
   DEPENDS += $(VIDEODRV_DEPENDS)
