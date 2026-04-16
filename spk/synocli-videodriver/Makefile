@@ -53,6 +53,11 @@ DEPENDS += cross/Khronos-Vulkan-Loader
 DEPENDS += cross/Khronos-Vulkan-Tools
 DEPENDS += cross/shaderc
 
+# Requires GCC >= 12 (C++20 <version> header support)
+ifeq ($(call version_ge, $(TC_GCC), 12),1)
+DEPENDS += cross/libplacebo
+endif
+
 # Enable intel_gpu_top on DSM >= 7.1
 DEPENDS += cross/intel-gpu-tools
 
