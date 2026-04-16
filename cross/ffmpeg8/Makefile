@@ -288,6 +288,12 @@ CONFIGURE_ARGS += --enable-libshaderc
 CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
+
+# Requires GCC >= 12 (C++20 <version> header support)
+ifeq ($(call version_ge, $(TC_GCC), 12),1)
+CONFIGURE_ARGS += --enable-libplacebo
+endif
+
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk

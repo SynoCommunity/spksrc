@@ -93,6 +93,7 @@ RUN apt install --no-install-recommends -y \
 	meson \
 	ninja-build \
 	python3 \
+	python3-jinja2 \
 	python3-mako \
 	python3-pip \
 	python3-setuptools \
