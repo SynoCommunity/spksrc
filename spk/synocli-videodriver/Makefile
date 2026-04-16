@@ -39,15 +39,23 @@ SPK_COMMANDS += bin/vainfo
 SPK_COMMANDS += bin/vulkaninfo
 SPK_COMMANDS += bin/lsgpu
 
+# Common videodrv dependencies
 DEPENDS  = cross/libva cross/libva-utils
 DEPENDS += cross/intel-vaapi-driver
 DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
-ifeq ($(call version_ge, ${TCVERSION}, 7),1)
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
 
-# Enable OpenCL only on DSM >= 7.1
+# Newer Intel implementation
+DEPENDS += cross/intel-level-zero
+
+# OpenCL
+DEPENDS += cross/intel-graphics-compiler
 DEPENDS += cross/intel-compute-runtime
+DEPENDS += cross/ocl-icd
 DEPENDS += cross/clinfo
+
+# Vulkan
 DEPENDS += cross/mesa
 DEPENDS += cross/Khronos-Vulkan-Loader
 DEPENDS += cross/Khronos-Vulkan-Tools
