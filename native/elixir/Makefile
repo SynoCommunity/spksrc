@@ -25,5 +25,9 @@ INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 # build fails in native/elixir folder due to ERLANG_BIN_DIR, 
 # but succeeds in dependencies folders (i.e. cross/rabbitmq and spk/rabbitmq)
 ENV += PATH=$$PATH:$(ERLANG_BIN_DIR)
+# build fails in dependencies folders (i.e. spk/rabbitmq) due to missing HOME,
+# but succeeds in native/elixir folder
+ENV += HOME=$(WORK_DIR)
+ENV += LANG=C.UTF-8
 
 include ../../mk/spksrc.native-cc.mk
