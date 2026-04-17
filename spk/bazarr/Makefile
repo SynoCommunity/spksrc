@@ -4,7 +4,7 @@ SPK_REV = 20
 SPK_ICON = src/bazarr.png
 
 PYTHON_PACKAGE = python312
-FFMPEG_PACKAGE = ffmpeg7
+SPK_DEPENDS = ffmpeg7
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
