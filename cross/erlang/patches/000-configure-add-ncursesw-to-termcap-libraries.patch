@@ -1,13 +1,13 @@
 # add ncursesw to termcap libraries to link with ncursesw
 #
---- erts/configure.orig
-+++ erts/configure
-@@ -15563,7 +15563,7 @@
+--- erts/configure.orig	2026-04-07 02:37:12
++++ erts/configure	2026-04-17 09:34:31
+@@ -15793,7 +15793,7 @@
  then :
-
+ 
      # try these libs
 -    termcap_libs="tinfo ncurses curses termcap termlib"
 +    termcap_libs="tinfo ncursesw ncurses curses termcap termlib"
-
+ 
      for termcap_lib in $termcap_libs; do
-	as_ac_Lib=`printf "%s\n" "ac_cv_lib_$termcap_lib""_tgetent" | $as_tr_sh`
+ 	as_ac_Lib=`printf "%s\n" "ac_cv_lib_$termcap_lib""_tgetent" | $as_tr_sh`
