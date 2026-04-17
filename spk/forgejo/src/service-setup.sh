@@ -1,4 +1,4 @@
-GITEA="${SYNOPKG_PKGDEST}/bin/gitea"
+FORGEJO="${SYNOPKG_PKGDEST}/bin/forgejo"
 CFG_FILE="${SYNOPKG_PKGVAR}/conf.ini"
 PATH="/var/packages/git/target/bin:${PATH}"
 
@@ -8,7 +8,7 @@ fi
 
 ENV="PATH=${PATH} HOME=${SYNOPKG_PKGHOME}"
 
-SERVICE_COMMAND="env ${ENV} ${GITEA} web --port ${SERVICE_PORT} --pid ${PID_FILE}"
+SERVICE_COMMAND="env ${ENV} ${FORGEJO} web --port ${SERVICE_PORT} --pid ${PID_FILE}"
 SVC_BACKGROUND=y
 
 service_postinst ()

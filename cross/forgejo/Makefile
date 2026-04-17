@@ -18,15 +18,14 @@ ENV += NPM_CONFIG_USER=root
 
 CGO_ENABLED = 1
 COMPILE_TARGET = forgejo_compile_target
-# forgejo fork from gitea and keep binary name as gitea
-GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/gitea
+GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
 
 export EXTRA_GOFLAGS=-buildvcs=false
 
 include ../../mk/spksrc.cross-go.mk
 
 # PATH must be defined after include of spksrc.cross-go.mk,
-# otherwise WORK_DIR is not defined when building in cross/gitea folder
+# otherwise WORK_DIR is not defined when building in cross/forgejo folder
 PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
 
 SYNOPKG_PKGVAR = /var/packages/$(PKG_NAME)/var
