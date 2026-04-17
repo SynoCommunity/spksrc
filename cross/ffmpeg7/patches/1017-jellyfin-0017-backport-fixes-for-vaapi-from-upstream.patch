@@ -1,3 +1,31 @@
+Index: FFmpeg/libavutil/hwcontext_vaapi.c
+===================================================================
+--- libavutil/hwcontext_vaapi.c
++++ libavutil/hwcontext_vaapi.c
+@@ -1813,6 +1813,7 @@ static int vaapi_device_create(AVHWDevic
+                                "Failed to get DRM device info for device %d.\n", n);
+                         close(priv->drm_fd);
+                         priv->drm_fd = -1;
++                        drmFreeVersion(info);
+                         continue;
+                     }
+ 
+@@ -1824,6 +1825,7 @@ static int vaapi_device_create(AVHWDevic
+                         drmFreeDevice(&device);
+                         close(priv->drm_fd);
+                         priv->drm_fd = -1;
++                        drmFreeVersion(info);
+                         continue;
+                     }
+                     av_log(ctx, AV_LOG_VERBOSE, "Trying to use "
+@@ -1831,6 +1833,7 @@ static int vaapi_device_create(AVHWDevic
+                            "with matching vendor id (%s).\n",
+                            n, vendor_id->value);
+                     drmFreeDevice(&device);
++                    drmFreeVersion(info);
+                     break;
+                 }
+                 drmFreeVersion(info);
 Index: FFmpeg/libavcodec/vaapi_encode.c
 ===================================================================
 --- libavcodec/vaapi_encode.c

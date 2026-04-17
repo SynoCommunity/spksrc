@@ -2,7 +2,7 @@ Index: FFmpeg/configure
 ===================================================================
 --- configure
 +++ configure
-@@ -3317,6 +3317,8 @@ thumbnail_cuda_filter_deps="ffnvcodec"
+@@ -3321,6 +3321,8 @@ thumbnail_cuda_filter_deps="ffnvcodec"
  thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  tonemap_cuda_filter_deps="ffnvcodec const_nan"
  tonemap_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -40,7 +40,7 @@ Index: FFmpeg/libavfilter/vf_transpose_cuda.c
 ===================================================================
 --- /dev/null
 +++ libavfilter/vf_transpose_cuda.c
-@@ -0,0 +1,481 @@
+@@ -0,0 +1,482 @@
 +/*
 + * Copyright (C) 2024 NyanMisaka
 + *
@@ -250,7 +250,7 @@ Index: FFmpeg/libavfilter/vf_transpose_cuda.c
 +    TransposeCUDAContext *s = ctx->priv;
 +    CUcontext dummy, cuda_ctx;
 +    CudaFunctions *cu;
-+    int ret;
++    int flip_wh, ret;
 +
 +    if ((inlink->w >= inlink->h && s->passthrough == TRANSPOSE_PT_TYPE_LANDSCAPE) ||
 +        (inlink->w <= inlink->h && s->passthrough == TRANSPOSE_PT_TYPE_PORTRAIT)) {
@@ -275,16 +275,17 @@ Index: FFmpeg/libavfilter/vf_transpose_cuda.c
 +    case TRANSPOSE_CLOCK_FLIP:
 +        outlink->w = inlink->h;
 +        outlink->h = inlink->w;
++        flip_wh    = 1;
 +        break;
 +    default:
 +        outlink->w = inlink->w;
 +        outlink->h = inlink->h;
++        flip_wh    = 0;
 +        break;
 +    }
 +
-+    if (inlink->sample_aspect_ratio.num)
-+        outlink->sample_aspect_ratio = av_div_q((AVRational) { 1, 1 },
-+                                                inlink->sample_aspect_ratio);
++    if (flip_wh && inlink->sample_aspect_ratio.num)
++        outlink->sample_aspect_ratio = av_inv_q(inlink->sample_aspect_ratio);
 +    else
 +        outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
 +
