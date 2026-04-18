@@ -34,8 +34,8 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8132
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 
-# Admin link for in DSM UI
-ADMIN_PORT = $(SERVICE_PORT)
+# No admin UI - sync server is accessed via client applications (Firefox, etc.)
+NO_SERVICE_SHORTCUT = yes
 
 POST_STRIP_TARGET = ffsync_extra_install
 
