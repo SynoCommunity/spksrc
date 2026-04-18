@@ -1,5 +1,5 @@
 PKG_NAME = diesel
-PKG_VERS = 2.2.12
+PKG_VERS = 2.3.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/diesel-rs/diesel/archive
