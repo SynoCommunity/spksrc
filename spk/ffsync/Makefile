@@ -44,21 +44,6 @@ include ../../mk/spksrc.common.mk
 # [cryptography]
 DEPENDS += cross/openssl3
 
-# [greenlet]
-# version >= 3.1: gcc >= 8   (DSM7.1) Mandatory require full c++20 support
-# version  = 3.0: gcc >= 4.9 (DSM6, comcerto2k) Mandatory require full c++11 support
-# version  = 1.x: gcc <  4.9 (DSM5, DSM6) Last known working version (armv5, hi3535) *** unsupported ***
-ifeq ($(call version_ge, $(TC_GCC), 8),1)
-WHEELS += greenlet==3.2.4
-else ifeq ($(call version_ge, $(TC_GCC), 4.9)$(call version_lt, $(TC_GCC), 5.0),11)
-WHEELS += greenlet==3.0.3
-WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
-endif
-
-# [mysqlclient]
-ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
-ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
-
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
 	@$(MSG) Install config file
