@@ -1,5 +1,5 @@
 PKG_NAME = syncstorage-rs
-PKG_VERS = 0.21.1
+PKG_VERS = 0.22.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VERS}
@@ -51,6 +51,6 @@ syncstorage-rs_post_install:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/tools
 	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tools . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tools
 	@$(MSG) Install DB Migration scripts
-	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations -d $(STAGING_INSTALL_PREFIX)/tokenserver-db/migrations
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations -d $(STAGING_INSTALL_PREFIX)/tokenserver-mysql/migrations
 	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/syncstorage-mysql/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations
-	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tokenserver-db/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tokenserver-db/migrations
+	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tokenserver-mysql/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tokenserver-mysql/migrations
