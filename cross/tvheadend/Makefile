@@ -40,8 +40,8 @@ DEPENDS += cross/uriparser cross/libiconv
 DEPENDS += cross/libdvbcsa cross/dvb-apps
 DEPENDS += cross/libhdhomerun
 
-DEPENDS += cross/curl
 # curl build needs additional configuration for gnutls and libssh2
+DEPENDS += cross/curl
 export BUILD_CURL_WITH="gnutls libssh2 zstd"
 
 GNU_CONFIGURE = 1
@@ -64,32 +64,22 @@ CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 
+# dbus splits its headers between include/ and lib/dbus-1.0/include/
+#    - include/dbus-1.0/ (public) must precede
+#    - lib/dbus-1.0/include/ (arch-specific dbus-arch-deps.h)
+DEPENDS += cross/dbus
+CONFIGURE_ARGS += --enable-dbus_1
+ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/include/dbus-1.0
+ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/lib/dbus-1.0/include
+
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
 endif
 
-# Use media and other libraries through FFMPEG package shared libraries
-ifneq ($(wildcard $(FFMPEG_PACKAGE_ROOT)),)
-MEDIA_LIBS  = fdk-aac.pc
-MEDIA_LIBS += fontconfig.pc
-MEDIA_LIBS += ogg.pc
-MEDIA_LIBS += opus.pc
-MEDIA_LIBS += libpcre2-8.pc
-MEDIA_LIBS += libpcre2-32.pc
-MEDIA_LIBS += libpcre2-posix.pc
-MEDIA_LIBS += theoradec.pc
-MEDIA_LIBS += theoraenc.pc
-MEDIA_LIBS += theora.pc
-MEDIA_LIBS += vorbisenc.pc
-MEDIA_LIBS += vorbisfile.pc
-MEDIA_LIBS += vorbis.pc
-MEDIA_LIBS += vpx.pc
-MEDIA_LIBS += x264.pc
-MEDIA_LIBS += x265.pc
-
-else
+# If libraries through FFMPEG_PACKAGE shared libraries unavailable
+ifeq ($(wildcard $(FFMPEG_PACKAGE_WORK_DIR)),)
 DEPENDS += cross/ffmpeg7
 DEPENDS += cross/fdk-aac
 DEPENDS += cross/fontconfig

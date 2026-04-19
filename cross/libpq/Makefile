@@ -1,5 +1,5 @@
 PKG_NAME = libpq
-PKG_VERS = 16.11
+PKG_VERS = 17.4
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = postgresql-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.postgresql.org/pub/source/v$(PKG_VERS)/

@@ -18,6 +18,8 @@
 # Notes:
 #  - Generation is guarded by MAKECMDGOALS == "" to avoid re-running
 #    during explicit sub-targets (stage1, stage2, clean, …)
+#  - Also guarded against running in toolchain directory which actually
+#    means we're in stage1 and could comtaminate resulting toolchain install
 #  - The -include directive makes the file optional; a missing tc_vars.mk
 #    is silently ignored (TC not yet built)
 #  - STAGE0_DONE sentinel file is touched after generation
@@ -25,18 +27,22 @@
 ###############################################################################
 
 STAGE0_DONE := $(WORK_DIR)/.stage0-tcvars_done
+TC_VARS_MK := $(WORK_DIR)/tc_vars.mk
 
 # Load toolchain variables early (provides TC_GCC, TC_VERS, TC_ARCH etc.)
 # - if TC does not exists then tc_vars.mk is not generated yet
 # - this occurs when MAKECMDGOALS is empty, thur prior to stage1 or stage2
 ifneq ($(ARCH),noarch)
 ifeq ($(MAKECMDGOALS),)
+ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
 ifeq ($(TC),)
 ifeq ($(wildcard $(STAGE0_DONE)),)
-  $(info ===> Generating $(WORK_DIR)/tc_vars.mk (stage0))
+  $(info ===> Generating $(TC_VARS_MK) (stage0))
   $(shell mkdir -p $(WORK_DIR))
-  $(shell $(MAKE) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) MSG= tc_vars > $(WORK_DIR)/tc_vars.mk 2>/dev/null)
+  $(shell $(MAKE) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) MSG= tc_vars > $(TC_VARS_MK) 2>/dev/null)
   $(shell touch $(STAGE0_DONE))
+  $(eval -include $(TC_VARS_MK))
+endif
 endif
 endif
 endif

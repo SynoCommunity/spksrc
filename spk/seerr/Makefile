@@ -1,6 +1,6 @@
 SPK_NAME = seerr
-SPK_VERS = 3.1.0
-SPK_REV = 4
+SPK_VERS = 3.2.0
+SPK_REV = 6
 SPK_ICON = src/seerr.png
 
 DEPENDS = cross/seerr
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 MAINTAINER = SynoCommunity
 DESCRIPTION = "Media request management for Jellyfin, Plex, and Emby with automation integrations."
 DISPLAY_NAME = Seerr
-CHANGELOG = "Update to v3.1.0 - Fix email notifications by adding missing peer dependencies."
+CHANGELOG = "1. Update to v3.2.0 <br/>2. Add PostgreSQL support"
 HOMEPAGE = https://github.com/seerr-team/seerr
 LICENSE = MIT
 
@@ -38,5 +38,6 @@ seerr_install:
 	cp -a $(STAGING_INSTALL_PREFIX)/share/seerr $(STAGING_DIR)/share/
 	install -m 755 -d $(STAGING_DIR)/var/config
 	cp -a $(STAGING_DIR)/share/seerr/config/. $(STAGING_DIR)/var/config/ || true
+	install -m 644 src/seerr.env $(STAGING_DIR)/share/
 	rm -rf $(STAGING_DIR)/share/seerr/config
 	ln -sf /var/packages/$(SPK_NAME)/var/config $(STAGING_DIR)/share/seerr/config

@@ -9,7 +9,6 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = SynoCommunity
@@ -59,4 +58,4 @@ flexget_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/config.yml $(STAGING_DIR)/var/
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

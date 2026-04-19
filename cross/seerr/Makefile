@@ -1,5 +1,5 @@
 PKG_NAME = seerr
-PKG_VERS = 3.1.0
+PKG_VERS = 3.2.0
 PKG_EXT  = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/seerr-team/seerr/archive/refs/tags
@@ -53,7 +53,6 @@ seerr_install:
 	# 2. Install deps + build (pnpm-only phase)
 	# ------------------------------------------------------------
 	$(RUN) pnpm install --frozen-lockfile
-	$(RUN) node $(CURDIR)/src/fix-entity-imports.js
 	$(RUN) COMMIT_TAG=$(PKG_VERS) pnpm build
 
 	# ------------------------------------------------------------
@@ -75,9 +74,9 @@ seerr_install:
 	# ------------------------------------------------------------
 	# 5. Install runtime deps only (npm, flat layout)
 	# ------------------------------------------------------------
-	$(RUN) npm install --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --no-optional
+	$(RUN) npm install --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --omit=optional
 	# Install then-pug (peer dependency of @ladjs/consolidate, needed for email-templates)
-	$(RUN) npm install then-pug@2.0.0 --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --no-optional
+	$(RUN) npm install then-pug@2.0.0 --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --omit=optional
 
 	# ------------------------------------------------------------
 	# 6. Native binaries for target architecture ($(NODE_ARCH))

@@ -102,21 +102,27 @@ EOF
 
         echo "Run migrations for tokenserver_rs"
         ${DIESEL} --database-url "mysql://${DBUSER}:${DBPASS_ENC}@${DBSERVER}/tokenserver_rs" \
-            migration --migration-dir "${SYNOPKG_PKGDEST}/tokenserver-db/migrations" run
+            migration --migration-dir "${SYNOPKG_PKGDEST}/tokenserver-mysql/migrations" run
 
         echo ${separator}
         echo "Add sync endpoint to database"
-        ${MYSQL} -u ${DBUSER} -p"${DBPASS_RAW}" <<EOF
+        # Check if service already exists
+        SYNC_SERVICE_ID=$(${MYSQL} -u ${DBUSER} -p"${DBPASS_RAW}" -N -B -r -e "SELECT id FROM tokenserver_rs.services WHERE service = 'sync-1.5'" 2>/dev/null || true)
+        if [ -z "${SYNC_SERVICE_ID}" ]; then
+            ${MYSQL} -u ${DBUSER} -p"${DBPASS_RAW}" <<EOF
 USE tokenserver_rs
-INSERT INTO services (id, service, pattern) VALUES
-    (1, "sync-1.5", "{node}/1.5/{uid}");
+INSERT INTO services (service, pattern) VALUES
+    ("sync-1.5", "{node}/1.5/{uid}");
 EOF
+            SYNC_SERVICE_ID=$(${MYSQL} -u ${DBUSER} -p"${DBPASS_RAW}" -N -B -r -e "SELECT id FROM tokenserver_rs.services WHERE service = 'sync-1.5'" 2>/dev/null)
+        fi
+        echo "Using service ID: ${SYNC_SERVICE_ID}"
 
         echo "Add syncserver node"
         ${MYSQL} -u ${DBUSER} -p"${DBPASS_RAW}" <<EOF
 USE tokenserver_rs
-INSERT INTO nodes (id, service, node, available, current_load, capacity, downed, backoff) VALUES
-    (1, 1, "${wizard_ffsync_public_url}", 1, 0, 4, 0, 0);
+INSERT INTO nodes (service, node, available, current_load, capacity, downed, backoff) VALUES
+    (${SYNC_SERVICE_ID}, "${wizard_ffsync_public_url}", 1, 0, 4, 0, 0);
 EOF
 
         echo ${separator}

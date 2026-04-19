@@ -5,7 +5,6 @@ SPK_REV = 1
 SPK_ICON = src/python3-pip.png
 
 PYTHON_PACKAGE = python310
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION =  Collection of programs for the Python 3.10 programming language.
@@ -21,7 +20,7 @@ LICENSE  = PSF
 # Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
-# IMPORTANT: WHEELS must be initialized before include of spksrc.python.mk
+# IMPORTANT: WHEELS must be initialized before include of spksrc.spk-meta.mk
 # later additions are ok, but WHEELS must not be empty at this point,
 # otherwise the build of WHEELS is skipped
 WHEELS += src/requirements-abi3.txt
@@ -46,7 +45,7 @@ endif
 
 # [borgbackup]
 # Use OpenSSL path as defined by either
-# spksrc.wheel-env.mk or spksrc.python.mk
+# spksrc.wheel-env.mk or spksrc.spk-meta.mk
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
@@ -161,6 +160,7 @@ ENV += PYCARES_USE_SYSTEM_LIB=1
 # [pycurl]
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
+ENV += PYCURL_OPENSSL_DIR=$(OPENSSL_STAGING_INSTALL_PREFIX)
 
 # [pycryptodome]
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
@@ -211,4 +211,4 @@ WHEELS += rpds_py==0.30.0
 endif
 endif
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

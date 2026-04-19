@@ -71,4 +71,4 @@ deluge_extra_install:
 	install -m 644 src/core.conf $(STAGING_DIR)/var/core.conf
 	install -m 644 src/autoadd.conf $(STAGING_DIR)/var/autoadd.conf
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

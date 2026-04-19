@@ -2,6 +2,13 @@
 #   Invoke make to make a wheel for a python module.
 #   You can do some customization through python-cc.mk
 
+# If meta-spk python not available, build locally
+ifdef PYTHON_PACKAGE
+ifeq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+DEPENDS += cross/$(PYTHON_PACKAGE)
+endif
+endif
+
 # Python module targets
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = nop
