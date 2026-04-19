@@ -1,0 +1,36 @@
+# downgrade go to v1.25.x
+# runtime of go <= 1.26.2 has issue with armv7 and older linux kernels
+# see: https://github.com/golang/go/issues/77930, might be fixed in go1.26.3
+# 
+# smart.go needs a patch too, since it uses a go1.26 feature
+# 
+--- go.mod.orig	2026-04-05 20:14:39.000000000 +0000
++++ go.mod	2026-04-19 15:54:53.757185571 +0000
+@@ -1,6 +1,6 @@
+ module github.com/henrygd/beszel
+ 
+-go 1.26.1
++go 1.25.9
+ 
+ require (
+ 	github.com/blang/semver v3.5.1+incompatible
+
+--- agent/smart.go.orig	2026-04-05 20:14:39.000000000 +0000
++++ agent/smart.go	2026-04-19 16:00:55.783550039 +0000
+@@ -6,7 +6,6 @@
+ import (
+ 	"context"
+ 	"encoding/json"
+-	"errors"
+ 	"fmt"
+ 	"log/slog"
+ 	"os"
+@@ -493,7 +492,7 @@
+ 	output, err := cmd.CombinedOutput()
+ 
+ 	// Check if device is in standby (exit status 2)
+-	if exitErr, ok := errors.AsType[*exec.ExitError](err); ok && exitErr.ExitCode() == 2 {
++	if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 2 {
+ 		if hasExistingData {
+ 			// Device is in standby and we have cached data, keep using cache
+ 			return nil
