@@ -1,6 +1,6 @@
---- lib/erl_interface/src/Makefile.in.orig
-+++ lib/erl_interface/src/Makefile.in
-@@ -108,7 +108,7 @@ endif
+--- lib/erl_interface/src/Makefile.in.orig	2026-04-07 02:37:12
++++ lib/erl_interface/src/Makefile.in	2026-04-17 09:30:58
+@@ -108,7 +108,7 @@
  
  WARNFLAGS += -DEI_NO_DEPR_WARN
  
@@ -9,9 +9,9 @@
  	-DERLANG_OPENSSL_INTEGRATION
  DED_LD = @DED_LD@
  DED_LDFLAGS = @DED_LDFLAGS@
---- erts/emulator/Makefile.in.orig
-+++ erts/emulator/Makefile.in
-@@ -182,7 +182,7 @@ endif
+--- erts/emulator/Makefile.in.orig	2026-04-07 02:37:12
++++ erts/emulator/Makefile.in	2026-04-17 09:33:14
+@@ -182,7 +182,7 @@
  # If type isn't one of the above, it *is* opt type...
  override TYPE=opt
  TYPEMARKER =
