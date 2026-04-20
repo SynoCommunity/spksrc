@@ -1,0 +1,6 @@
+bin:bin/srt-file-transmit
+bin:bin/srt-tunnel
+bin:bin/srt-ffplay
+lnk:lib/libsrt.so
+lnk:lib/libsrt.so.1.5
+lib:lib/libsrt.so.1.5.4

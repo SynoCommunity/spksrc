@@ -605,18 +605,17 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -1114,8 +1162,8 @@ __device__ static inline T Subsample_Bic
+@@ -1015,6 +1063,9 @@ typedef float4 (*coeffs_function_t)(floa
+ 
+ __device__ static inline float4 lanczos_coeffs(float x, float param)
  {
-     float hscale = (float)src_width / (float)dst_width;
-     float vscale = (float)src_height / (float)dst_height;
--    float xi = (xo + 0.5f) * hscale - 0.5f;
--    float yi = (yo + 0.5f) * vscale - 0.5f;
-+    float xi = xo * hscale + 0.5f * hscale - 0.5f; // avoid (x - v + v = x)
-+    float yi = yo * hscale + 0.5f * vscale - 0.5f;
-     float px = floor(xi);
-     float py = floor(yi);
-     float fx = xi - px;
-@@ -1147,7 +1195,9 @@ __device__ static inline T Subsample_Bic
++#if defined(__clang__) && (__clang_major__ >= 11)
++    #pragma clang fp reassociate(off)
++#endif
+     const float pi = 3.141592654f;
+ 
+     float4 res = make_float4(
+@@ -1147,7 +1198,9 @@ __device__ static inline T Subsample_Bic
      cudaTextureObject_t src_tex_2, cudaTextureObject_t src_tex_3, \
      T *dst_0, T *dst_1, T *dst_2, T *dst_3,                       \
      int dst_width, int dst_height, int dst_pitch,                 \
@@ -627,7 +626,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
  
  #define SUBSAMPLE(Convert, T) \
      cudaTextureObject_t src_tex[4] =                    \
-@@ -1159,7 +1209,9 @@ __device__ static inline T Subsample_Bic
+@@ -1159,7 +1212,9 @@ __device__ static inline T Subsample_Bic
      Convert(                                            \
          src_tex, dst, xo, yo,                           \
          dst_width, dst_height, dst_pitch,               \
