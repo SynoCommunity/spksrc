@@ -16,6 +16,7 @@
 #
 #  uniq        : removes duplicate words while preserving order
 #  dedup       : de-duplicates delimiter-separated strings
+#  dedup-files : removes duplicate files while preserving order (via md5sum)
 #  merge       : merges environment variable values from input
 #
 # LOG_WRAPPED  : generic macro to call recipe execution using logging
@@ -57,6 +58,32 @@ dedup = $(shell /bin/bash -c '\
     tr "\n" "$$delimiter" | \
     sed "s/$$delimiter$$//" \
 ')
+
+# Macro: dedup-files
+#        Removes duplicate files from a list by comparing their content (md5sum),
+#        preserving the order of first occurrences and silently discarding
+#        subsequent files whose content has already been seen.
+#        Useful when the same patch may exist under multiple directories.
+#
+# Usage: $(call dedup-files,$(PATCHES))
+#
+# Note:  _seen_md5s and _deduped are reset at each call to avoid
+#        accumulation across multiple invocations.
+define dedup-files
+$(strip \
+  $(eval _seen_md5s :=) \
+  $(eval _deduped :=) \
+  $(foreach file,$(1), \
+    $(eval _md5 := $(shell md5sum $(file) | cut -d' ' -f1)) \
+    $(if $(filter $(_md5),$(_seen_md5s)), \
+      $(info ===> [DEDUP] Skipping duplicate content: $(file)), \
+      $(eval _seen_md5s += $(_md5)) \
+      $(eval _deduped += $(file)) \
+    ) \
+  ) \
+  $(_deduped) \
+)
+endef
 
 # Macro: merge
 #        merges multiple environment variable values from a given input string,
