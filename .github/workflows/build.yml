@@ -1,5 +1,16 @@
 name: Build
 
+# Add package name and optional publish for manual builds
+run-name: >-
+  ${{ github.event_name == 'workflow_dispatch' &&
+      format(
+        '{0} ({1})',
+        (inputs.publish && 'Build and Publish' || 'Build'),
+        inputs.package
+      )
+      || '' }}
+
+
 on:
   workflow_dispatch:
     inputs:
