@@ -368,7 +368,7 @@ tc_flags:
 tc_vars:
 	@echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_WORK_DIR := $(TC_WORK_DIR) ; \
-	echo TC_SYSROOT := $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) ; \
+	echo TC_SYSROOT := $(TC_SYSROOT) ; \
 	echo TC_TARGET := $(TC_TARGET) ; \
 	echo TC_PREFIX := $(TC_PREFIX) ; \
 	echo TC_PATH := $(TC_WORK_DIR)/$(TC_TARGET)/bin/ ; \
