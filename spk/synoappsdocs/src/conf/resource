@@ -1,0 +1,43 @@
+{
+  "webservice": {
+    "services": [
+      {
+        "service": "synoappsdocs",
+        "display_name": "SynoAppsDocs",
+        "type": "static",
+        "root": "synoappsdocs",
+        "backend": 2,
+        "icon": "app/images/synoappsdocs-{0}.png"
+      }
+
+    ],
+    "migrate": {
+      "root": [
+        {
+          "old": "synoappsdocs",
+          "new": "synoappsdocs"
+        }
+      ]
+    },
+    "portals": [
+      {
+        "service": "synoappsdocs",
+        "type": "alias",
+        "name": "Syno Apps Docs",
+        "alias": "synoappsdocs",
+        "app": "com.synocommunity.packages.synoappsdocs"
+      }
+
+    ],
+    "pkg_dir_prepare": [
+      {
+        "source": "/var/packages/synoappsdocs/target/web/docs/",
+        "target": "synoappsdocs",
+        "mode": "0755",
+        "user": "sc-synoappsdocs",
+        "group": "http"
+      }
+
+    ]
+  }
+}
