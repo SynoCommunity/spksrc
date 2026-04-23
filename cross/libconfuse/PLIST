@@ -1,0 +1,3 @@
+lnk:lib/libconfuse.so
+lnk:lib/libconfuse.so.2
+lib:lib/libconfuse.so.2.1.0
