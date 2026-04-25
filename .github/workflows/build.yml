@@ -600,40 +600,96 @@ jobs:
           docker ps -a || true
           docker logs $(docker ps -aq | head -1) 2>&1 | tail -500 > docker_logs.txt || echo "Could not capture docker logs"
 
-      # Collect all build logs from spk package directories
+      # Collect build logs from each spk/<pkg>/ directory:
+      # - top-level logs: build.log, build-<arch>.log, status-*.log, publish-*.log
+      # - work-<arch>-<version>/ logs: config.log, CMakeOutput.log,
+      #   meson-log.txt, ninja.log, etc. (preserving relative path for context)
       - name: Collect Build Logs from SPK directories
         if: always()
         run: |
           echo "=== Collecting build logs from spk directories ==="
           mkdir -p collected_logs
-          
-          # Search for all build logs in spk directories
-          find spk/ -type f \( -name "*.log" -o -name "build-*.log" -o -name "status-*.log" \) -print0 2>/dev/null | while IFS= read -r -d '' logfile; do
-            # Create directory structure in collected_logs
-            relative_path=$(dirname "$logfile")
-            mkdir -p "collected_logs/$relative_path" 2>/dev/null || true
-            # Copy log file
-            cp "$logfile" "collected_logs/$logfile" 2>/dev/null || true
-            echo "Collected: $logfile"
+
+          # Patterns to collect from spk/<pkg>/ (top-level logs)
+          TOP_LEVEL_PATTERNS=(
+            "build-*.log"
+            "status-*.log"
+            "publish-*.log"
+            "build.log"
+          )
+
+          # Patterns to collect recursively inside work-<arch>-<version>/ directories
+          # These cover cmake, meson, autotools, ninja, cargo, etc.
+          WORK_PATTERNS=(
+            "build.log"
+            "config.log"
+            "configure.log"
+            "CMakeOutput.log"
+            "CMakeError.log"
+            "meson-log.txt"
+            "ninja.log"
+            "cargo.log"
+            "*.log"
+          )
+
+          for pkg_dir in spk/*/; do
+            pkg=$(basename "$pkg_dir")
+
+            # ── Top-level package logs (build-<arch>.log, status-build.log …) ──
+            for pattern in "${TOP_LEVEL_PATTERNS[@]}"; do
+              find "$pkg_dir" -maxdepth 1 -type f -name "$pattern" -print0 2>/dev/null \
+              | while IFS= read -r -d '' logfile; do
+                  dest="collected_logs/${pkg}/$(basename "$logfile")"
+                  mkdir -p "$(dirname "$dest")"
+                  cp "$logfile" "$dest"
+                  echo "Collected top-level: $logfile"
+                done
+            done
+
+            # ── Logs inside work-<arch>-<version>/ directories ──
+            find "$pkg_dir" -maxdepth 1 -type d -name "work-*" -print0 2>/dev/null \
+            | while IFS= read -r -d '' work_dir; do
+                work_name=$(basename "$work_dir")
+
+                for pattern in "${WORK_PATTERNS[@]}"; do
+                  find "$work_dir" -type f -name "$pattern" -print0 2>/dev/null \
+                  | while IFS= read -r -d '' logfile; do
+                      # Preserve relative path inside work dir for context
+                      rel="${logfile#${work_dir}/}"
+                      dest="collected_logs/${pkg}/${work_name}/${rel}"
+                      mkdir -p "$(dirname "$dest")"
+                      cp "$logfile" "$dest"
+                      echo "Collected work log: $logfile"
+                    done
+                done
+              done
           done
-          
+
           # Display summary of collected logs
           echo ""
           echo "=== Summary of collected logs ==="
-          find collected_logs -type f -name "*.log" -exec ls -lh {} \; 2>/dev/null | head -50
-          
-          # For current architecture, display last lines of main build logs
+          find collected_logs -type f | sort | while read f; do
+            size=$(du -sh "$f" 2>/dev/null | cut -f1)
+            echo "  $size  $f"
+          done
+
+          # Quick tail of the main build log for this arch
           echo ""
-          echo "=== Last 100 lines of main build log for ${{ matrix.arch }} ==="
-          find spk/ -type f -name "build-${{ matrix.arch }}.log" -exec tail -100 {} \; 2>/dev/null || echo "No build log found for ${{ matrix.arch }}"
-          
+          echo "=== Last 100 lines of build-${{ matrix.arch }}.log ==="
+          find spk/ -maxdepth 2 -type f -name "build-${{ matrix.arch }}.log" \
+            -exec tail -100 {} \; 2>/dev/null \
+            || echo "No build-${{ matrix.arch }}.log found"
+
           echo ""
-          echo "=== Content of status-build.log if exists ==="
-          find spk/ -type f -name "status-build.log" -exec cat {} \; 2>/dev/null || echo "No status-build.log found"
-          
-          # If disk was critical, create a marker file
+          echo "=== status-build.log ==="
+          find spk/ -maxdepth 2 -type f -name "status-build.log" \
+            -exec cat {} \; 2>/dev/null \
+            || echo "No status-build.log found"
+
+          # Disk critical marker
           if [ "${{ env.disk_critical }}" == "true" ]; then
-            echo "Build failed due to critical disk space (>95% full)" > collected_logs/DISK_SPACE_CRITICAL.txt
+            echo "Build failed due to critical disk space (>95% full)" \
+              > collected_logs/DISK_SPACE_CRITICAL.txt
             df -h >> collected_logs/DISK_SPACE_CRITICAL.txt
           fi
 
@@ -650,27 +706,38 @@ jobs:
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
 
-      # Upload diagnostic logs and disk space info in a separate folder for troubleshooting
-      # Continues even if previous steps failed
-      # Diagnostic files (.diag-*) are now isolated from main package summary
-
+      # Assemble flat diagnostics and the full collected_logs tree
+      # into artifacts/diagnostics/ for upload.
       - name: Organize Diagnostic Logs
         if: always()
         continue-on-error: true
         run: |
           echo "=== Organizing diagnostic files ==="
-          mkdir -p artifacts/diagnostics
+          mkdir -p artifacts/diagnostics/collected_logs
 
-          # Copy files in the diagnostics directory
-          for file in disk_usage_start.txt disk_usage_end.txt docker_logs.txt build_errors.txt build_log_errors.txt build_unsupported.txt build_success.txt; do
-              [ -f "$file" ] && cp "$file" "artifacts/diagnostics/$file"
+          # Copy flat diagnostic files
+          for file in disk_usage_start.txt disk_usage_end.txt docker_logs.txt \
+                      build_errors.txt build_log_errors.txt \
+                      build_unsupported.txt build_success.txt; do
+            [ -f "$file" ] && cp "$file" "artifacts/diagnostics/$file"
           done
 
-          # Include all collected logs
-          mkdir -p artifacts/diagnostics/collected_logs
-          cp collected_logs/**/*.log artifacts/diagnostics/collected_logs/ 2>/dev/null || true
-          cp collected_logs/DISK_SPACE_CRITICAL.txt artifacts/diagnostics/collected_logs/ 2>/dev/null || true
+          # Copy collected_logs tree (preserves pkg/work-<arch>/ structure)
+          if [ -d collected_logs ] && [ -n "$(ls -A collected_logs 2>/dev/null)" ]; then
+            cp -r collected_logs/. artifacts/diagnostics/collected_logs/
+            echo "Copied $(find artifacts/diagnostics/collected_logs -type f | wc -l) log files"
+          else
+            echo "No collected logs to copy"
+          fi
 
+          echo "=== Diagnostic artifact contents ==="
+          find artifacts/diagnostics -type f | sort | while read f; do
+            size=$(du -sh "$f" 2>/dev/null | cut -f1)
+            echo "  $size  $f"
+          done
+
+      # Upload per-arch diagnostics (retention: 1 day).
+      # Consolidated across all archs by the consolidate-diagnostics job (retention: 30 days).
       - name: Upload Diagnostic Logs
         if: always()
         continue-on-error: true
@@ -709,5 +776,4 @@ jobs:
           name: Diagnostics
           path: all-diagnostics/**
           if-no-files-found: ignore
-          retention-days: 30
           compression-level: 9
