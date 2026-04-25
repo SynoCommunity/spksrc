@@ -776,5 +776,4 @@ jobs:
           name: Diagnostics
           path: all-diagnostics/**
           if-no-files-found: ignore
-          retention-days: 30
           compression-level: 9
