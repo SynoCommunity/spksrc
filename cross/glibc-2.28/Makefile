@@ -27,7 +27,7 @@ CONFIGURE_ARGS += --disable-build-nscd
 CONFIGURE_ARGS += --disable-nscd
 CONFIGURE_ARGS += --disable-werror
 CONFIGURE_ARGS += --enable-stack-protector=strong
-CONFIGURE_ARGS += --with-headers=$(TC_SYSROOT)/usr/include
+CONFIGURE_ARGS += --with-headers=$(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)
 CONFIGURE_ARGS += ac_cv_prog_MAKEINFO=false
 
 ADDITIONAL_CFLAGS = -O2

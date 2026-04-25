@@ -5,8 +5,13 @@ OPTIONAL_DEPENDS += cross/glibc-2.28
 
 include ../../mk/spksrc.main-depends.mk
 
-ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
+###
+### In theory the version should be an exact match such as:
+###      DEPENDS = cross/glibc-$(TC_GLIBC)
+###
+
+ifeq ($(call version_ge, $(TC_KERNEL), 4)$(call version_ge, $(TC_GCC), 5),11)
 DEPENDS = cross/glibc-latest
-else
+else ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
 DEPENDS = cross/glibc-2.28
 endif
