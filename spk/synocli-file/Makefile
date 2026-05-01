@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 4.0.2
-SPK_REV = 29
+SPK_REV = 30
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -106,14 +106,16 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
 
-CHANGELOG  = "1. Add pigz. <br/>"
-CHANGELOG += "2. Update bat from v0.25.0 to v0.26.1 (except for ARMv5, qoriq and evansport on DSM < 7). <br/>"
-CHANGELOG += "3. Update dos2unix from v7.5.2 to v7.5.3. <br/>"
-CHANGELOG += "4. Update fzf from v0.66.0 to v0.67.0. <br/>"
-CHANGELOG += "5. Update less from v679 to v685. <br/>"
-CHANGELOG += "6. Update lsd from v1.1.5 to v1.2.0 (except for ARMv5). <br/>"
-CHANGELOG += "7. Update nano from v8.6 to v8.7. <br/>"
-CHANGELOG += "8. Update ripgrep from v14.1.1 to v15.1.0 (except for ARMv5 and qoriq). <br/>"
+CHANGELOG  = "1. Update dos2unix from v7.5.3 to v7.5.5. <br/>"
+CHANGELOG += "2. Update fd from v10.3.0 to v10.4.2 (except qoriq arch). <br/>"
+CHANGELOG += "3. Update file from v5.46 to v5.47. <br/>"
+CHANGELOG += "4. Update fzf from v0.67.0 to v0.72.0. <br/>"
+CHANGELOG += "5. Update less from v685 to v692. <br/>"
+CHANGELOG += "6. Update lzip from 1.25 to v1.26 and plzip from v1.12 to v1.13. <br/>"
+CHANGELOG += "7. Update micro from v2.0.14 to v2.0.15. <br/>"
+CHANGELOG += "8. Update nnn from v5.1 to v5.2 (DSM 7+). <br/>"
+CHANGELOG += "9. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
+CHANGELOG += "10. Update tree from v2.2.1 to v2.3.2. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 SERVICE_SETUP = src/service-setup.sh

@@ -1,20 +1,15 @@
-PKG_NAME = sd
-PKG_VERS = 1.0.0
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/chmln/sd/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = sd-main
 
-DEPENDS =
+OPTIONAL_DEPENDS  = cross/sd-latest
+OPTIONAL_DEPENDS += cross/sd-1.0
 
-# linker error: undefined reference to `pthread_setname_np'
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-HOMEPAGE = https://github.com/chmln/sd#readme
-COMMENT  = Intuitive find & replace CLI (sed alternative).
-LICENSE  = MIT
+include ../../mk/spksrc.main-depends.mk
 
-CARGO_BUILD_ARGS = --locked
-
-include ../../mk/spksrc.cross-rust.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+# latest version that builds with rustc 1.72.2 and 1.82.0 (version 1.1.x requires rustc edition 2024, i.e. rustc 1.86.0)
+DEPENDS = cross/sd-1.0
+else
+DEPENDS = cross/sd-latest
+endif
