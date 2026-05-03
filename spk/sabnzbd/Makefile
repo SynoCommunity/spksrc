@@ -56,10 +56,11 @@ DEPENDS += cross/openssl3
 # [orjson]
 # Version = 3.11.1 requires rustc >= 1.82 (qoriq)
 # Version = 3.11.2 requires rustc >= 1.85
+# Version = 3.11.6 requires rustc >= 1.89
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 WHEELS += orjson==3.11.1
 else
-WHEELS += orjson==3.11.3
+WHEELS += orjson==3.11.5
 endif
 
 include ../../mk/spksrc.spk-meta.mk
