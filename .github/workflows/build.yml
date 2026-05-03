@@ -624,12 +624,38 @@ jobs:
             "build.log"
             "config.log"
             "configure.log"
+            "CMakeCache.txt"
             "CMakeOutput.log"
             "CMakeError.log"
+            "install_manifest.txt"
             "meson-log.txt"
+            ".ninja_log"
             "ninja.log"
             "cargo.log"
             "*.log"
+          )
+
+          # Patterns to collect files specific at spk creation time
+          SPK_PATTERNS=(
+            ".copy_done"
+            ".depend_done"
+            ".icon_done"
+            ".strip_done"
+            ".stage0-tcvars_done"
+            ".stage1-tcvars_done"
+            ".stage1-tkvars_done"
+            ".wheel_done"
+            "INFO"
+            "PLIST"
+            "PACKAGE_ICON*"
+            "WIZARD_UIFILES"
+          )
+
+          # Patterns to collect toolchain and toolkit environment
+          TCVARS_PATTERNS=(
+            "tc_vars*.mk"
+            "tc_vars.cmake"
+            "tc_vars.meson-*"
           )
 
           for pkg_dir in spk/*/; do
@@ -646,22 +672,65 @@ jobs:
                 done
             done
 
-            # ── Logs inside work-<arch>-<version>/ directories ──
             find "$pkg_dir" -maxdepth 1 -type d -name "work-*" -print0 2>/dev/null \
             | while IFS= read -r -d '' work_dir; do
                 work_name=$(basename "$work_dir")
+                dest_dir="collected_logs/${pkg}/${work_name}"
+                mkdir -p "$dest_dir"
 
+                # ── Logs inside work-<arch>-<version>/ directories ──
                 for pattern in "${WORK_PATTERNS[@]}"; do
-                  find "$work_dir" -type f -name "$pattern" -print0 2>/dev/null \
-                  | while IFS= read -r -d '' logfile; do
-                      # Preserve relative path inside work dir for context
-                      rel="${logfile#${work_dir}/}"
-                      dest="collected_logs/${pkg}/${work_name}/${rel}"
-                      mkdir -p "$(dirname "$dest")"
-                      cp "$logfile" "$dest"
-                      echo "Collected work log: $logfile"
-                    done
+                  find "$work_dir" -type f -name "$pattern" -print0 2>/dev/null
+                done | sort -zu \
+                | while IFS= read -r -d '' logfile; do
+                    rel="${logfile#${work_dir}/}"
+                    dest="${dest_dir}/${rel}"
+                    mkdir -p "$(dirname "$dest")"
+                    cp "$logfile" "$dest"
+                    echo "Collected work log: $logfile"
                 done
+
+                # ── Toolchain/toolkit environment (tc_vars) ──
+                for pattern in "${TCVARS_PATTERNS[@]}"; do
+                  find "$work_dir" -maxdepth 1 \( -type f -o -type l \) -name "$pattern" -print0 2>/dev/null \
+                  | while IFS= read -r -d '' f; do
+                      cp -L "$f" "$dest_dir/"
+                      echo "Collected tcvars: $f"
+                  done
+                done
+
+                # ── SPK creation state (spk cookies) ──
+                for pattern in "${SPK_PATTERNS[@]}"; do
+                  find "$work_dir" -maxdepth 1 \( -type f -o -type l \) -name "$pattern" -print0 2>/dev/null \
+                  | while IFS= read -r -d '' f; do
+                      cp "$f" "$dest_dir/"
+                      echo "Collected spk state: $f"
+                  done
+                done
+
+                # ── Dependency status cookies (.*_done minus SPK_PATTERNS) ──
+                exclude_args=""
+                for pattern in "${SPK_PATTERNS[@]}"; do
+                  exclude_args="$exclude_args ! -name $pattern"
+                done
+                find "$work_dir" -maxdepth 1 -type f -name ".*_done" $exclude_args -print0 2>/dev/null \
+                | while IFS= read -r -d '' f; do
+                    cp "$f" "$dest_dir/"
+                    echo "Collected status cookie: $f"
+                done
+
+                # ── library build state work-<arch>-<version>/install/.../lib/pkgconfig ──
+                PKGCONFIG_DIR="$work_dir/install/var/packages/$pkg/target/lib/pkgconfig"
+                if [ -d "$PKGCONFIG_DIR" ]; then
+                  find "$PKGCONFIG_DIR" -type f -name "*.pc" -print0 2>/dev/null \
+                  | while IFS= read -r -d '' f; do
+                      rel="${f#${PKGCONFIG_DIR}/}"
+                      dest="collected_logs/${pkg}/${work_name}/pkgconfig/${rel}"
+                      mkdir -p "$(dirname "$dest")"
+                      cp "$f" "$dest"
+                      echo "Collected pkgconfig: $f"
+                  done
+                fi
               done
           done
 
@@ -746,6 +815,7 @@ jobs:
           name: diagnostics-${{ matrix.arch }}
           path: artifacts/diagnostics/
           if-no-files-found: ignore
+          include-hidden-files: true
           retention-days: 1
           compression-level: 9
 
@@ -756,6 +826,7 @@ jobs:
           name: Packages for ${{ matrix.arch }}
           path: packages/*.spk
           if-no-files-found: ignore
+          include-hidden-files: true
 
   consolidate-diagnostics:
     name: Consolidate Diagnostics
@@ -776,4 +847,5 @@ jobs:
           name: Diagnostics
           path: all-diagnostics/**
           if-no-files-found: ignore
+          include-hidden-files: true
           compression-level: 9

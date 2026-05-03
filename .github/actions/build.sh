@@ -173,18 +173,5 @@ for package in ${build_packages}; do
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) FAILED" >> ${BUILD_ERROR_FILE}
     fi
 
-    if [ "$(echo ${packages_to_keep} | grep -ow ${package})" = "" ]; then
-        # Free disk space (but not for packages to keep)
-        make -C ./spk/${package} clean |& tee >(tail -15 >>build.log)
-    else
-        # Free disk space by removing source and staging directories (for packages to keep)
-        # Use the same arch/noarch branching as the build step to ensure correct make target.
-        if [ "${GH_ARCH%%-*}" != "noarch" ]; then
-            make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
-        else
-            make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} clean-source |& tee >(tail -15 >>build.log)
-        fi
-    fi
-
     echo "::endgroup::"
 done
