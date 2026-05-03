@@ -89,12 +89,20 @@
 #  - Output interleaving is avoided to ensure safe parallel execution.
 ###############################################################################
 
+# Allows early access to stage0 environment
+include ../../mk/spksrc.common.mk
+
 # DEPENDS_TYPE filters output by dependency relation type.
 # Traversal always visits all dependency types regardless of this setting.
 # Values: DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS NATIVE_DEPENDS
 # Can be combined: "DEPENDS OPTIONAL_DEPENDS"
-# Default: all types included
-DEPENDS_TYPE ?= DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS NATIVE_DEPENDS
+# Default: all types included with exception of OPTIONAL_DEPEND if
+#          ARCH and TCVERSION exists
+_DEFAULT_DEPENDS_TYPE := DEPENDS BUILD_DEPENDS NATIVE_DEPENDS
+ifeq (,$(and $(ARCH),$(TCVERSION)))
+  _DEFAULT_DEPENDS_TYPE += OPTIONAL_DEPENDS
+endif
+DEPENDS_TYPE ?= $(_DEFAULT_DEPENDS_TYPE)
 
 # -------------------------------------------------------------------
 # ALL_DEPENDS: union of all dependency types — traversal is never filtered.
@@ -106,12 +114,14 @@ DEPENDS_TYPE ?= DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS NATIVE_DEPENDS
 # dep-flat-mk-% extracts the type and path from the target name and emits
 # "TYPE dep/path" so dependency-flat and dependency-list can filter by
 # DEPENDS_TYPE without re-traversing the graph.
+#
+# Also, if ARCH and TCVERSION are set then discard OPTIONAL_DEPENDS.
 # -------------------------------------------------------------------
 ALL_DEPENDS         := $(sort $(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(OPTIONAL_DEPENDS))
 DEP_FLAT_TARGETS_MK := $(strip \
   $(addprefix dep-flat-mk-DEPENDS__,          $(subst /,__,$(DEPENDS))) \
   $(addprefix dep-flat-mk-BUILD_DEPENDS__,    $(subst /,__,$(BUILD_DEPENDS))) \
-  $(addprefix dep-flat-mk-OPTIONAL_DEPENDS__, $(subst /,__,$(OPTIONAL_DEPENDS))) \
+  $(addprefix dep-flat-mk-OPTIONAL_DEPENDS__, $(subst /,__,$(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))) \
   $(addprefix dep-flat-mk-NATIVE_DEPENDS__,   $(subst /,__,$(NATIVE_DEPENDS))))
 
 # -------------------------------------------------------------------
