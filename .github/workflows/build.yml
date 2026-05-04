@@ -667,7 +667,7 @@ jobs:
               | while IFS= read -r -d '' logfile; do
                   dest="collected_logs/${pkg}/$(basename "$logfile")"
                   mkdir -p "$(dirname "$dest")"
-                  cp "$logfile" "$dest"
+                  cp -p "$logfile" "$dest"
                   echo "Collected top-level: $logfile"
                 done
             done
@@ -686,7 +686,7 @@ jobs:
                     rel="${logfile#${work_dir}/}"
                     dest="${dest_dir}/${rel}"
                     mkdir -p "$(dirname "$dest")"
-                    cp "$logfile" "$dest"
+                    cp -p "$logfile" "$dest"
                     echo "Collected work log: $logfile"
                 done
 
@@ -694,7 +694,7 @@ jobs:
                 for pattern in "${TCVARS_PATTERNS[@]}"; do
                   find "$work_dir" -maxdepth 1 \( -type f -o -type l \) -name "$pattern" -print0 2>/dev/null \
                   | while IFS= read -r -d '' f; do
-                      cp -L "$f" "$dest_dir/"
+                      cp -pL "$f" "$dest_dir/"
                       echo "Collected tcvars: $f"
                   done
                 done
@@ -703,7 +703,7 @@ jobs:
                 for pattern in "${SPK_PATTERNS[@]}"; do
                   find "$work_dir" -maxdepth 1 \( -type f -o -type l \) -name "$pattern" -print0 2>/dev/null \
                   | while IFS= read -r -d '' f; do
-                      cp "$f" "$dest_dir/"
+                      cp -p "$f" "$dest_dir/"
                       echo "Collected spk state: $f"
                   done
                 done
@@ -715,7 +715,7 @@ jobs:
                 done
                 find "$work_dir" -maxdepth 1 -type f -name ".*_done" $exclude_args -print0 2>/dev/null \
                 | while IFS= read -r -d '' f; do
-                    cp "$f" "$dest_dir/"
+                    cp -p "$f" "$dest_dir/"
                     echo "Collected status cookie: $f"
                 done
 
@@ -727,7 +727,7 @@ jobs:
                       rel="${f#${PKGCONFIG_DIR}/}"
                       dest="collected_logs/${pkg}/${work_name}/pkgconfig/${rel}"
                       mkdir -p "$(dirname "$dest")"
-                      cp "$f" "$dest"
+                      cp -p "$f" "$dest"
                       echo "Collected pkgconfig: $f"
                   done
                 fi
@@ -788,12 +788,12 @@ jobs:
           for file in disk_usage_start.txt disk_usage_end.txt docker_logs.txt \
                       build_errors.txt build_log_errors.txt \
                       build_unsupported.txt build_success.txt; do
-            [ -f "$file" ] && cp "$file" "artifacts/diagnostics/$file"
+            [ -f "$file" ] && cp -p "$file" "artifacts/diagnostics/$file"
           done
 
           # Copy collected_logs tree (preserves pkg/work-<arch>/ structure)
           if [ -d collected_logs ] && [ -n "$(ls -A collected_logs 2>/dev/null)" ]; then
-            cp -r collected_logs/. artifacts/diagnostics/collected_logs/
+            cp -pr collected_logs/. artifacts/diagnostics/collected_logs/
             echo "Copied $(find artifacts/diagnostics/collected_logs -type f | wc -l) log files"
           else
             echo "No collected logs to copy"
