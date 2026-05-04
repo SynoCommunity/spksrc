@@ -1,12 +1,12 @@
 SPK_NAME = forgejo
-SPK_VERS = 15.0.0
-SPK_REV = 3
+SPK_VERS = 15.0.1
+SPK_REV = 4
 SPK_ICON = src/forgejo.png
 
 MAINTAINER = nhymxu
 DESCRIPTION  = Forgejo is a self-hosted lightweight software forge.
 DISPLAY_NAME = Forgejo
-CHANGELOG = "Update to v15.0.0 LTS"
+CHANGELOG = "Update to v15.0.1"
 
 LICENSE = GPLv3
 
