@@ -5,7 +5,7 @@ OPTIONAL_DEPENDS += cross/ripgrep-14
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 # rustc >= 1.85 required
@@ -19,3 +19,5 @@ endif
 else
 DEPENDS += cross/ripgrep-latest
 endif
+
+include ../../mk/spksrc.main-depends.mk

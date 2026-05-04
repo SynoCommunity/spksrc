@@ -6,10 +6,12 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 OPTIONAL_DEPENDS  = cross/libsigc++-latest
 OPTIONAL_DEPENDS += cross/libsigc++-2.12
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
 DEPENDS = cross/libsigc++-latest
 else
 DEPENDS = cross/libsigc++-2.12
 endif
+
+include ../../mk/spksrc.main-depends.mk

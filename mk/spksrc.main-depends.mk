@@ -4,9 +4,6 @@
 # Do not initialize any environment to avoid variable leakage.
 DEFAULT_ENV = none
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-
 # nothing to download
 download:
 checksum:
@@ -24,6 +21,9 @@ endif
 
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 
