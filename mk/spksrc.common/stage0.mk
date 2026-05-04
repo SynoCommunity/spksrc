@@ -30,14 +30,18 @@ STAGE0_DONE := $(WORK_DIR)/.stage0-tcvars_done
 TC_VARS_MK := $(WORK_DIR)/tc_vars.mk
 
 # Load toolchain variables early (provides TC_GCC, TC_VERS, TC_ARCH etc.)
+# - if ARCH and TCVERSION are set and is not noarch
+# - if MAKECMDGOALS is empty, thus prior to stage1 or stage2 (unless called from dependency-* recipes)
 # - if TC does not exists then tc_vars.mk is not generated yet
-# - this occurs when MAKECMDGOALS is empty, thur prior to stage1 or stage2
-ifneq ($(ARCH),noarch)
-ifeq ($(MAKECMDGOALS),)
+# - do not print info msg if called from dependency-* recipes
+ifneq ($(filter-out noarch,$(ARCH))$(TCVERSION),)
+ifeq ($(filter-out dependency-%,$(MAKECMDGOALS)),)
 ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
 ifeq ($(TC),)
 ifeq ($(wildcard $(STAGE0_DONE)),)
-  $(info ===> Generating $(TC_VARS_MK) (stage0))
+  ifeq ($(filter dependency-%,$(MAKECMDGOALS)),)
+    $(info ===> Generating $(TC_VARS_MK) (stage0))
+  endif
   $(shell mkdir -p $(WORK_DIR))
   $(shell $(MAKE) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) MSG= tc_vars > $(TC_VARS_MK) 2>/dev/null)
   $(shell touch $(STAGE0_DONE))

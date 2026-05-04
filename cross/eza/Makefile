@@ -5,10 +5,12 @@ OPTIONAL_DEPENDS += cross/eza-0.20.18
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 DEPENDS = cross/eza-0.20.18
 else
 DEPENDS = cross/eza-latest
 endif
+
+include ../../mk/spksrc.main-depends.mk

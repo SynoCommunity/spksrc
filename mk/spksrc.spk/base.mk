@@ -60,7 +60,7 @@ $(eval $(1)_LIBS_DEFAULT := $(foreach f,$(wildcard $($(1)_STAGING_INSTALL_PREFIX
 $(eval $(1)_LIBS := $(if $(strip $($(1)_PC)),$(foreach f,$(wildcard $(addprefix $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig/,$($(1)_PC))),$(realpath $(f))),$($(1)_LIBS_DEFAULT)))
 
 # Generate filtered dependency list (exclude all meta package deps)
-$(eval $(1)_DEPENDS_FILTERED := $(sort $(shell $(MAKE) -s dependency-list EXCLUDE_DEPENDS="$(META_DEPENDS)" | cut -f2 -d:)))
+$(eval $(1)_DEPENDS_FILTERED := $(sort $(shell $(MAKE) -s ARCH=$(ARCH) TCVERSION=$(TCVERSION) dependency-list EXCLUDE_DEPENDS="$(META_DEPENDS)" | cut -f2 -d:)))
 
 # From EXCLUDED_NAME, keep only those that are direct deps of this package
 $(eval $(1)_DIRECT_DEPENDS := $(filter $(addprefix cross/,$(EXCLUDED_NAME)),$($(1)_DEPENDS_FILTERED)))
@@ -72,7 +72,7 @@ $(eval DEPENDS := $(call uniq,$($(1)_DIRECT_DEPENDS) $(DEPENDS)))
 $(eval SPK_DEPENDS := $(call dedup,$($(1)_PACKAGE):$(SPK_DEPENDS),:))
 
 # Build list of status cookies to symlink (skip if $(1)_PC is set)
-$(eval $(1)_STATUS_COOKIES := $(sort $(if $(strip $($(1)_PC)),,$(foreach cross,$(filter-out $(EXCLUDED_NAME),$(foreach pkg_name,$(shell $(MAKE) dependency-list -C $(realpath $($(1)_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$($(1)_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $($(1)_PACKAGE_WORK_DIR)/.$(cross)-*_done)))))
+$(eval $(1)_STATUS_COOKIES := $(sort $(if $(strip $($(1)_PC)),,$(foreach cross,$(filter-out $(EXCLUDED_NAME),$(foreach pkg_name,$(shell $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) dependency-list -C $(realpath $($(1)_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$($(1)_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $($(1)_PACKAGE_WORK_DIR)/.$(cross)-*_done)))))
 
 # Register pre-depend hook so _links runs before dependency compilation
 $(eval PRE_DEPEND_TARGET += $(1)_meta_pre_depend)
