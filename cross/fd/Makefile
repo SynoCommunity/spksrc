@@ -14,7 +14,7 @@ UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
 # issues with atomic library
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # latest version that builds for qoriq with rustc 1.87.0 (version 10.4.x requires rustc 1.90.0)
@@ -22,3 +22,5 @@ DEPENDS = cross/fd-10.3
 else
 DEPENDS = cross/fd-latest
 endif
+
+include ../../mk/spksrc.main-depends.mk
