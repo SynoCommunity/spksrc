@@ -51,7 +51,14 @@ POST_STRIP_TARGET = sabnzbd_extra_install
 SPK_COMMANDS = bin/7zz
 
 # [cryptography]
+# Version = 45.0.0 requires rustc >= 1.74.0 (qoriq)
+# Version = 47.0.0 requires rustc >= 1.83.0
 DEPENDS += cross/openssl3
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += cryptography==46.0.7
+else
+WHEELS += cryptography==48.0.0
+endif
 
 # [orjson]
 # Version = 3.11.1 requires rustc >= 1.82 (qoriq)
@@ -61,6 +68,14 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 WHEELS += orjson==3.11.1
 else
 WHEELS += orjson==3.11.5
+endif
+
+# [sabctools]
+# Version = 9.0.0 requires gcc >= 5.0 (C++17)
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS += sabctools==8.2.6
+else
+WHEELS += sabctools==9.4.0
 endif
 
 include ../../mk/spksrc.spk-meta.mk
