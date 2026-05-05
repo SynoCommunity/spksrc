@@ -6,5 +6,5 @@ charset_normalizer==3.4.7
 ct3==3.4.0.post5
 #orjson==3.11.8             ==> supported version depends on rust version
 pyyaml==6.0.3
-#sabctools==9.4.0           ==> supported version depends on gcc version
+sabctools==9.4.0
 ujson==5.12.0

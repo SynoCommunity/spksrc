@@ -13,6 +13,12 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 # unrar not supported
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
+# Ensure C++17 compatibility
+# sabctools >= 9.0.0 requirement
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
+
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = Safihre
@@ -68,14 +74,6 @@ ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 WHEELS += orjson==3.11.1
 else
 WHEELS += orjson==3.11.5
-endif
-
-# [sabctools]
-# Version = 9.0.0 requires gcc >= 5.0 (C++17)
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS += sabctools==8.2.6
-else
-WHEELS += sabctools==9.4.0
 endif
 
 include ../../mk/spksrc.spk-meta.mk
