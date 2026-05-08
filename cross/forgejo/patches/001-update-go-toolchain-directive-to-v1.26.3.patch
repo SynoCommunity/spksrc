@@ -1,0 +1,13 @@
+--- go.mod.orig.mod	2026-04-29 07:05:29
++++ go.mod	2026-05-08 05:07:04
+@@ -1,8 +1,8 @@
+ module forgejo.org
+ 
+-go 1.25.0
++go 1.26.0
+ 
+-toolchain go1.26.2
++toolchain go1.26.3
+ 
+ require (
+ 	code.forgejo.org/f3/gof3/v3 v3.11.15
