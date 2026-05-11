@@ -3,13 +3,13 @@ SPK_VERS = 0.9.0
 SPK_REV = 16
 SPK_ICON = src/kavita.png
 
-DEPENDS = cross/kavita cross/libe_sqlite3
+DEPENDS = cross/kavita
 
 # Arch exclusions for dotnet
 DOTNET_CORE_ARCHS = 1
 
-# Requires glibc 2.28 which is not available in DSM 6 and SRM 1.2
-REQUIRED_MIN_DSM = 7.0
+# Kavita v0.8.9 updated to .NET 10 and requires glibc 2.27 which is not available in DSM 7.1 and SRM 1.2
+REQUIRED_MIN_DSM = 7.2
 REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = SynoCommunity
@@ -33,14 +33,9 @@ ADMIN_PORT = $(SERVICE_PORT)
 
 WIZARDS_DIR = src/wizard/
 
-POST_STRIP_TARGET = kavita_custom_libe_sqlite3 kavita_extra_install
+POST_STRIP_TARGET = kavita_extra_install
 
 include ../../mk/spksrc.spk.mk
-
-.PHONY: kavita_custom_libe_sqlite3
-kavita_custom_libe_sqlite3:
-	@$(MSG) "Replace libe_sqlite3 with version built for DSM"
-	mv -f $(STAGING_DIR)/lib/libe_sqlite3.so $(STAGING_DIR)/share/libe_sqlite3.so
 
 .PHONY: kavita_extra_install
 kavita_extra_install:
