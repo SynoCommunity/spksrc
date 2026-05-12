@@ -1,6 +1,6 @@
 SPK_NAME = qbittorrent
-SPK_VERS = 5.1.4
-SPK_REV = 2
+SPK_VERS = 5.2.0
+SPK_REV = 3
 SPK_ICON = src/qbittorrent.png
 
 DEPENDS = cross/qbittorrent cross/qbittorrent-pwhash
@@ -13,7 +13,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = qBittorrent is a cross-platform free and open-source BitTorrent client with a feature-rich web interface for remote access.
 STARTABLE = yes
 DISPLAY_NAME = qBittorrent
-CHANGELOG = "Fix search functionality by adding Python 3.12 dependency."
+CHANGELOG = "1. Update to qBittorrent 5.2.0."
 
 HOMEPAGE = https://www.qbittorrent.org
 LICENSE  = GPLv2
