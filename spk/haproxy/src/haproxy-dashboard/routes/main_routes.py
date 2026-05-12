@@ -8,11 +8,11 @@ main_bp = Blueprint('main', __name__)
 @requires_auth
 def index():
     if request.method == 'POST':
-        frontend_name = request.form['frontend_name']
-        frontend_ip = request.form['frontend_ip']
-        frontend_port = request.form['frontend_port']
-        lb_method = request.form['lb_method']
-        protocol = request.form['protocol']
+        frontend_name = request.form['frontend_name'].replace('\n', '').replace('\r', '')
+        frontend_ip = request.form['frontend_ip'].replace('\n', '').replace('\r', '')
+        frontend_port = request.form['frontend_port'].replace('\n', '').replace('\r', '')
+        lb_method = request.form['lb_method'].replace('\n', '').replace('\r', '')
+        protocol = request.form['protocol'].replace('\n', '').replace('\r', '')
         backend_name = request.form['backend_name']
         add_header = 'add_header' in request.form if 'add_header' in request.form else ''
         header_name = request.form['header_name']
