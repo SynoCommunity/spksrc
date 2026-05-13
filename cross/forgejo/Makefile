@@ -1,5 +1,5 @@
 PKG_NAME = forgejo
-PKG_VERS = 15.0.1
+PKG_VERS = 15.0.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-src-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://codeberg.org/forgejo/forgejo/releases/download/v$(PKG_VERS)
