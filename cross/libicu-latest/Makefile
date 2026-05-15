@@ -62,7 +62,7 @@ endif
 
 ifeq ($(strip $(DATA_PACKAGING)),archive)
 # add the ICU data file.
-PLIST_TRANSFORM = sed -e '$$a rsc:share/icu/77.1/icudt77l.dat'
+PLIST_TRANSFORM = sed -e '$$a rsc:share/icu/*/icudt*.dat'
 endif
 
 PRE_COMPILE_TARGET = libicu_prepare_dir
