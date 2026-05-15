@@ -1,4 +1,5 @@
 # Generated using the requirements script on May 15, 2026
+# Command: ./generate_requirements.sh "-r requirements.txt" 314
 
 cffi==2.0.0
 charset_normalizer==3.4.7

@@ -1,9 +1,10 @@
 # Generated using the requirements script on May 15, 2026
+# Command: ./generate_requirements.sh "-r requirements.txt" 314
 
 apprise==1.10.0
 babelfish==0.6.1
 blinker==1.9.0
-#certifi==2026.4.22             ==> python312
+#certifi==2026.4.22             ==> python314
 cheroot==11.1.2
 CherryPy==18.10.0
 click==8.3.3
@@ -21,7 +22,7 @@ more_itertools==11.0.2
 notify2==0.3.1
 oauthlib==3.3.1
 paho_mqtt==1.6.1
-#pip==25.0.1                    ==> python312
+#pip==25.3                      ==> python314
 portend==3.2.1
 puremagic==2.2.0
 pycparser==3.0
@@ -33,9 +34,9 @@ rarfile==4.2
 rebulk==3.2.0
 requests==2.33.1
 requests_oauthlib==2.0.0
-#setuptools==82.0.1             ==> python312
+#setuptools==82.0.1             ==> python314
 sgmllib3k==1.0.0
-#six==1.17.0                    ==> python312
+#six==1.17.0                    ==> python314
 tempora==5.8.1
 urllib3==2.6.3
 zc_lockfile==4.0
