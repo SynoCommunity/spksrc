@@ -55,10 +55,17 @@ DATA_PACKAGING = library
 endif
 CONFIGURE_ARGS += --with-data-packaging=$(DATA_PACKAGING)
 
-ifeq ($(strip $(DATA_PACKAGING)),"files")
+ifeq ($(strip $(DATA_PACKAGING)),files)
 # needs a custom install target to successfully build.
 INSTALL_TARGET = libicu_install_with_data_files
 endif
+
+ifeq ($(strip $(DATA_PACKAGING)),archive)
+# add the ICU data file.
+PLIST_TRANSFORM = sed -e '$$a rsc:share/icu/74.2/icudt74l.dat'
+endif
+
+PRE_COMPILE_TARGET = libicu_prepare_dir
 POST_INSTALL_TARGET = libicu_post_install
 
 CONFIGURE_ARGS += --with-cross-build=$(NATIVE_BUILD_DIR) 
@@ -74,6 +81,10 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: libicu_install_with_data_files
 libicu_install_with_data_files:
 	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) ICUPKGDATA_DIR=$(INSTALL_PREFIX)/share install PREFIX=$(INSTALL_PREFIX)
+
+.PHONY: libicu_prepare_dir
+libicu_prepare_dir:
+	@mkdir -p $(WORK_DIR)/$(PKG_DIR)/data/out/tmp
 
 .PHONY: libicu_post_install
 libicu_post_install:
