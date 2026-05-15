@@ -1,4 +1,4 @@
-# Generated using the requirements script on May 5, 2026
+# Generated using the requirements script on May 15, 2026
 
 cffi==2.0.0
 charset_normalizer==3.4.7
@@ -7,4 +7,4 @@ ct3==3.4.0.post5
 #orjson==3.11.8             ==> supported version depends on rust version
 pyyaml==6.0.3
 sabctools==9.4.0
-ujson==5.12.0
+ujson==5.12.1
