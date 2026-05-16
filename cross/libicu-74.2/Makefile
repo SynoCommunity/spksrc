@@ -42,23 +42,18 @@ NATIVE_BUILD_DIR = $(realpath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-nativ
 
 # the packaging can be customized in a dependent package by definition
 # of LIBICU_DATA_PACKAGING_MODE like:
-# export LIBICU_DATA_PACKAGING_MODE=files
+# export LIBICU_DATA_PACKAGING_MODE=archive
 # 
 # valid data packaging values are
 # - library (the default)
 # - archive
-# - files
+
 DATA_PACKAGING = $(LIBICU_DATA_PACKAGING_MODE)
 ifeq ($(strip $(DATA_PACKAGING)),)
 # default data packaging
 DATA_PACKAGING = library
 endif
 CONFIGURE_ARGS += --with-data-packaging=$(DATA_PACKAGING)
-
-ifeq ($(strip $(DATA_PACKAGING)),files)
-# needs a custom install target to successfully build.
-INSTALL_TARGET = libicu_install_with_data_files
-endif
 
 ifeq ($(strip $(DATA_PACKAGING)),archive)
 # add the ICU data file.
@@ -77,10 +72,6 @@ CONFIGURE_ARGS += --disable-tests
 ADDITIONAL_CFLAGS = -O3
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: libicu_install_with_data_files
-libicu_install_with_data_files:
-	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) ICUPKGDATA_DIR=$(INSTALL_PREFIX)/share install PREFIX=$(INSTALL_PREFIX)
 
 .PHONY: libicu_prepare_dir
 libicu_prepare_dir:

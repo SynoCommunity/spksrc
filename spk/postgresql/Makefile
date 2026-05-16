@@ -26,8 +26,7 @@ include ../../mk/spksrc.common.mk
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 # Use ICU archive data packaging to avoid runtime libicudata shared library
-# loading issues observed on DSM ARMv7 systems. Archive mode embeds ICU data
-# at build time and is significantly more stable than library mode in practice.
+# loading issues observed on DSM ARMv7 systems.
 export LIBICU_DATA_PACKAGING_MODE=archive
 
 # PostGIS requires GCC 5+ (GEOS 3.12.3 needs C++14)
