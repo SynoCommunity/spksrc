@@ -1,13 +1,13 @@
 SPK_NAME = postgresql
 SPK_VERS = 17.4
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/postgresql.png
 
 DEPENDS = cross/postgresql
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS spatial database extension for DSM 7+.
-CHANGELOG = "Initial package release."
+CHANGELOG = "Use ICU archive data packaging to avoid ARMv7 runtime issues."
 DISPLAY_NAME = PostgreSQL
 STARTABLE = yes
 
@@ -24,6 +24,10 @@ include ../../mk/spksrc.common.mk
 
 # libicu-74.2 (used for GCC < 5 / DSM 6) doesn't support ARMv5
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+
+# Use ICU archive data packaging to avoid runtime libicudata shared library
+# loading issues observed on DSM ARMv7 systems.
+export LIBICU_DATA_PACKAGING_MODE=archive
 
 # PostGIS requires GCC 5+ (GEOS 3.12.3 needs C++14)
 # Only include postgis if toolchain GCC >= 5.0

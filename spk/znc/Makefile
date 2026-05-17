@@ -1,6 +1,6 @@
 SPK_NAME = znc
 SPK_VERS = 1.10.1
-SPK_REV = 27
+SPK_REV = 28
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
@@ -48,11 +48,9 @@ DEPENDS += cross/znc
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-# bugfix for libicudata error, solution proposed by Steven R. Loomis
-# in https://sourceforge.net/p/icu/mailman/message/36666855/
-export LIBICU_DATA_PACKAGING_MODE=files
-endif
+# Use ICU archive data packaging to avoid runtime libicudata shared library
+# loading issues observed on DSM ARMv7 systems.
+export LIBICU_DATA_PACKAGING_MODE=archive
 
 include ../../mk/spksrc.spk-meta.mk
 
