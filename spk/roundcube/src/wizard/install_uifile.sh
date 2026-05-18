@@ -26,7 +26,6 @@ DATABASE_STEP_TITLE="Roundcube Webmail database configuration"
 HOST_STEP_TITLE="Roundcube Webmail hosts configuration"
 SMTP_STEP_TITLE="Roundcube Webmail SMTP configuration"
 CONFIRM_STEP_TITLE="Roundcube Webmail confirm restore"
-PHP_STEP_TITLE="Multiple PHP profiles"
 RESTORE_BACKUP_FILE="wizard_roundcube_restore"
 BACKUP_FILE_PATH="wizard_backup_file"
 RESTORE_ERROR_TEXT="An empty file path is not allowed when restore is enabled."
@@ -130,14 +129,9 @@ getDeActiveate()
     var hostStep = findStepByTitle(wizardDialog, "${HOST_STEP_TITLE}");
     var smtpStep = findStepByTitle(wizardDialog, "${SMTP_STEP_TITLE}");
     var confirmStep = findStepByTitle(wizardDialog, "${CONFIRM_STEP_TITLE}");
-    var phpStep = findStepByTitle(wizardDialog, "${PHP_STEP_TITLE}");
     var restoreChecked = isRestoreChecked(wizardDialog);
     if (currentStep.headline === "${TYPE_STEP_TITLE}") {
-        if (!phpStep) {
-            smtpStep.nextId = "applyStep";
-        } else {
-            smtpStep.nextId = phpStep.itemId;
-        }
+        smtpStep.nextId = "applyStep";
         if (restoreChecked) {
             dbStep.nextId = confirmStep.itemId;
         } else {
@@ -160,20 +154,6 @@ getPasswordValidator()
 EOF
 )
     echo "$validator" | quote_json
-}
-
-# Check for multiple PHP profiles
-check_php_profiles ()
-{
-    SC_PKG_PREFIX="com-synocommunity-packages-"
-    SC_PKG_NAME="${SC_PKG_PREFIX}${SYNOPKG_PKGNAME}"
-    PHP_CFG_PATH="/usr/syno/etc/packages/WebStation/PHPSettings.json"
-    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ] && \
-        jq -e 'to_entries | map(select((.key | startswith("'"${SC_PKG_PREFIX}"'")) and .key != "'"${SC_PKG_NAME}"'")) | length > 0' "${PHP_CFG_PATH}" >/dev/null; then
-        return 0  # true
-    else
-        return 1  # false
-    fi
 }
 
 PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
@@ -296,22 +276,9 @@ PAGE_ADMIN_CONFIG=$(/bin/cat<<EOF
 EOF
 )
 
-PAGE_PHP_PROFILES=$(/bin/cat<<EOF
-{
-    "step_title": "${PHP_STEP_TITLE}",
-    "items": [{
-        "desc": "Attention: Multiple PHP profiles detected; the package webpage will not display until a DSM restart is performed to load new configurations."
-    }]
-}
-EOF
-)
-
 main () {
     local install_page=""
     install_page=$(page_append "$install_page" "$PAGE_ADMIN_CONFIG")
-    if check_php_profiles; then
-        install_page=$(page_append "$install_page" "$PAGE_PHP_PROFILES")
-    fi
     echo "[$install_page]" > "${SYNOPKG_TEMP_LOGFILE}"
 }
 
