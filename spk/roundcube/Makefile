@@ -34,6 +34,8 @@ DSM_UI_CONFIG = src/app/config
 
 # Roundcube 1.7 requires PHP 8.1+
 SPK_DEPENDS = "WebStation:PHP8.4:MariaDB10:Apache2.4"
+# os_min_ver of Synology PHP8.4
+TC_OS_MIN_VER = 7.2-60096
 CONF_DIR = src/conf/
 
 POST_STRIP_TARGET = roundcube_extra_install
