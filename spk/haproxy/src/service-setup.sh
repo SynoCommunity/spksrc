@@ -23,6 +23,11 @@ service_postinst ()
     # Install the wheels
     install_python_wheels
 
+    # Verify virtualenv was created
+    if [ ! -x "${SYNOPKG_PKGDEST}/env/bin/python3" ]; then
+        echo "ERROR: Python virtualenv creation failed. Dashboard will not be available." >> "${LOG_FILE}"
+    fi
+
     # Create certificate directory
     mkdir -p "${CERT_DIR}"
 
@@ -64,12 +69,11 @@ service_prestart ()
         export HAPROXY_PID="${PID_FILE}"
 
         cd "${DASHBOARD_DIR}"
-        DASHBOARD_PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
-        if [ ! -x "${DASHBOARD_PYTHON}" ]; then
-            echo "Virtualenv python3 not found, falling back to ${PYTHON_DIR}/python3" >> "${LOG_FILE}"
-            DASHBOARD_PYTHON="${PYTHON_DIR}/python3"
+        if [ ! -x "${SYNOPKG_PKGDEST}/env/bin/python3" ]; then
+            echo "ERROR: Virtualenv not created. Python dependencies are missing — dashboard not started." >> "${LOG_FILE}"
+        else
+            "${SYNOPKG_PKGDEST}/env/bin/python3" app.py >> "${LOG_FILE}" 2>&1 &
         fi
-        "${DASHBOARD_PYTHON}" app.py >> "${LOG_FILE}" 2>&1 &
         echo $! > "${DASHBOARD_PID}"
     fi
 }

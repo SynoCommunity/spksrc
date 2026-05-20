@@ -7,6 +7,7 @@ DEPENDS = cross/haproxy
 
 PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+SPK_DEPENDS = "${PYTHON_PACKAGE}"
 
 MAINTAINER = Diaoul
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
