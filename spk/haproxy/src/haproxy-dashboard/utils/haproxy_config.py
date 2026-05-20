@@ -2,6 +2,11 @@ import os
 
 HAPROXY_CFG = os.environ.get('HAPROXY_CFG', '/var/packages/haproxy/var/haproxy.cfg')
 
+def _sanitize(value):
+    if isinstance(value, str):
+        return ''.join(c for c in value if c.isprintable())
+    return value
+
 def is_frontend_exist(frontend_name, frontend_ip, frontend_port):
     try:
         with open(HAPROXY_CFG, 'r') as haproxy_cfg:
@@ -39,6 +44,29 @@ def update_haproxy_config(frontend_name, frontend_ip, frontend_port, lb_method, 
 
     if is_backend_exist(backend_name):
         return f"Backend {backend_name} already exists. Cannot add duplicate."
+
+    frontend_name = _sanitize(frontend_name)
+    frontend_ip = _sanitize(frontend_ip)
+    frontend_port = _sanitize(frontend_port)
+    lb_method = _sanitize(lb_method)
+    protocol = _sanitize(protocol)
+    backend_name = _sanitize(backend_name)
+    health_check_link = _sanitize(health_check_link)
+    header_name = _sanitize(header_name)
+    header_value = _sanitize(header_value)
+    sticky_session_type = _sanitize(sticky_session_type)
+    acl_name = _sanitize(acl_name)
+    acl_action = _sanitize(acl_action)
+    acl_backend_name = _sanitize(acl_backend_name)
+    ssl_cert_path = _sanitize(ssl_cert_path)
+    ban_duration = _sanitize(ban_duration)
+    limit_requests = _sanitize(limit_requests)
+    forbidden_name = _sanitize(forbidden_name)
+    allowed_ip = _sanitize(allowed_ip)
+    forbidden_path = _sanitize(forbidden_path)
+    redirect_domain_name = _sanitize(redirect_domain_name)
+    root_redirect = _sanitize(root_redirect)
+    redirect_to = _sanitize(redirect_to)
 
     with open(HAPROXY_CFG, 'a') as haproxy_cfg:
         haproxy_cfg.write(f"\nfrontend {frontend_name}\n")
@@ -119,11 +147,11 @@ def update_haproxy_config(frontend_name, frontend_ip, frontend_port, lb_method, 
                 haproxy_cfg.write("    tcp-check send QUIT\\r\\n\n")
         # Process all backend servers
         for i, backend_server in enumerate(backend_servers, 1):
-            if len(backend_server) >= 3:  # Ensure we have name, ip and port
-                backend_server_name = backend_server[0] or f"server{i}"
-                backend_server_ip = backend_server[1]
-                backend_server_port = backend_server[2]
-                backend_server_maxconn = backend_server[3] if len(backend_server) > 3 else None
+            if len(backend_server) >= 3:
+                backend_server_name = _sanitize(backend_server[0] or f"server{i}")
+                backend_server_ip = _sanitize(backend_server[1])
+                backend_server_port = _sanitize(backend_server[2])
+                backend_server_maxconn = _sanitize(backend_server[3] if len(backend_server) > 3 else None)
 
                 line = f"    server {backend_server_name} {backend_server_ip}:{backend_server_port} check"
                 if sticky_session and sticky_session_type == 'cookie':
