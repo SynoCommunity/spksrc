@@ -14,7 +14,10 @@ HAPROXY_DASHBOARD_DIR = os.environ.get('HAPROXY_DASHBOARD_DIR', '/var/packages/h
 HAPROXY_CERT = os.environ.get('HAPROXY_CERT', os.path.join(HAPROXY_DASHBOARD_DIR, 'crt/default.pem'))
 HAPROXY_LOG = os.environ.get('HAPROXY_LOG', os.path.join(HAPROXY_DASHBOARD_DIR, 'http-access.log'))
 HAPROXY_STATS_PORT = os.environ.get('HAPROXY_STATS_PORT', '8280')
-DASHBOARD_PORT = int(os.environ.get('DASHBOARD_PORT', '8281'))
+try:
+    DASHBOARD_PORT = int(os.environ.get('DASHBOARD_PORT', '8281'))
+except (ValueError, TypeError):
+    DASHBOARD_PORT = 8281
 
 # Register blueprints
 app.register_blueprint(main_bp)

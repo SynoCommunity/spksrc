@@ -20,7 +20,14 @@ def is_frontend_exist(frontend_name, frontend_ip, frontend_port):
                         frontend_found = False
                 elif frontend_found and line.strip().startswith('bind'):
                     _, bind_info = line.strip().split(' ', 1)
-                    existing_ip, existing_port = bind_info.split(':', 1)
+                    bind_info = bind_info.strip()
+                    # Split port from bind address (handles both IPv4 and [IPv6])
+                    if bind_info.startswith('['):
+                        ip_end = bind_info.find(']')
+                        existing_ip = bind_info[:ip_end + 1]
+                        existing_port = bind_info[ip_end + 1:].lstrip(':')
+                    else:
+                        existing_ip, existing_port = bind_info.rsplit(':', 1) if ':' in bind_info else (bind_info, '')
                     if existing_ip.strip() == frontend_ip and existing_port.strip() == frontend_port:
                         return True
         return False

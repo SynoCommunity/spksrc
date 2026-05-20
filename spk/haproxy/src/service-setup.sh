@@ -30,7 +30,7 @@ service_postinst ()
     # Use python314's openssl since we depend on it at runtime
     OPENSSL="${PYTHON_DIR}/openssl"
     if [ -x "${OPENSSL}" ]; then
-        LD_LIBRARY_PATH="/var/packages/python314/target/lib" ${OPENSSL} req -x509 -newkey rsa:4096 -nodes \
+        LD_LIBRARY_PATH="${PYTHON_DIR}/../lib" ${OPENSSL} req -x509 -newkey rsa:4096 -nodes \
             -keyout "${CERT_DIR}/default.key" \
             -out "${CERT_DIR}/default.crt" \
             -days 7320 -subj "/CN=haproxy-default" 2>/dev/null

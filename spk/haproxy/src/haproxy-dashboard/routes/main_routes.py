@@ -8,15 +8,15 @@ main_bp = Blueprint('main', __name__)
 @requires_auth
 def index():
     if request.method == 'POST':
-        frontend_name = request.form['frontend_name']
-        frontend_ip = request.form['frontend_ip']
-        frontend_port = request.form['frontend_port']
-        lb_method = request.form['lb_method']
-        protocol = request.form['protocol']
-        backend_name = request.form['backend_name']
+        frontend_name = request.form.get('frontend_name', '')
+        frontend_ip = request.form.get('frontend_ip', '')
+        frontend_port = request.form.get('frontend_port', '')
+        lb_method = request.form.get('lb_method', '')
+        protocol = request.form.get('protocol', '')
+        backend_name = request.form.get('backend_name', '')
         add_header = 'add_header' in request.form
-        header_name = request.form['header_name']
-        header_value = request.form['header_value']
+        header_name = request.form.get('header_name', '')
+        header_value = request.form.get('header_value', '')
         
         # Get all backend servers data
         backend_server_names = request.form.getlist('backend_server_names[]')
@@ -25,30 +25,30 @@ def index():
         backend_server_maxconns = request.form.getlist('backend_server_maxconns[]')
 
         is_acl = 'add_acl' in request.form
-        acl_name = request.form['acl'] if 'acl' in request.form else ''
-        acl_action = request.form['acl_action'] if 'acl_action' in request.form else ''
-        acl_backend_name = request.form['backend_name_acl'] if 'backend_name_acl' in request.form else ''
+        acl_name = request.form.get('acl', '')
+        acl_action = request.form.get('acl_action', '')
+        acl_backend_name = request.form.get('backend_name_acl', '')
         use_ssl = 'ssl_checkbox' in request.form
-        ssl_cert_path = request.form['ssl_cert_path']
+        ssl_cert_path = request.form.get('ssl_cert_path', '')
         https_redirect = 'ssl_redirect_checkbox' in request.form
         is_dos = 'add_dos' in request.form
-        ban_duration = request.form["ban_duration"]
-        limit_requests = request.form["limit_requests"]
+        ban_duration = request.form.get('ban_duration', '')
+        limit_requests = request.form.get('limit_requests', '')
         forward_for = 'forward_for_check' in request.form
 
         is_forbidden_path = 'add_acl_path' in request.form
-        forbidden_name = request.form["forbidden_name"]
-        allowed_ip = request.form["allowed_ip"]
-        forbidden_path = request.form["forbidden_path"]
+        forbidden_name = request.form.get('forbidden_name', '')
+        allowed_ip = request.form.get('allowed_ip', '')
+        forbidden_path = request.form.get('forbidden_path', '')
 
         sql_injection_check = 'sql_injection_check' in request.form
         is_xss = 'xss_check' in request.form
         is_remote_upload = 'remote_uploads_check' in request.form
 
         add_path_based = 'add_path_based' in request.form
-        redirect_domain_name = request.form["redirect_domain_name"]
-        root_redirect = request.form["root_redirect"]
-        redirect_to = request.form["redirect_to"]
+        redirect_domain_name = request.form.get('redirect_domain_name', '')
+        root_redirect = request.form.get('root_redirect', '')
+        redirect_to = request.form.get('redirect_to', '')
         is_webshells = 'webshells_check' in request.form
 
         # Combine backend server info into a list of tuples (name, ip, port, maxconns)
@@ -72,7 +72,7 @@ def index():
         if protocol == 'http':
             health_check = 'health_check' in request.form
             if health_check:
-                health_check_link = request.form['health_check_link']
+                health_check_link = request.form.get('health_check_link', '')
 
         health_check_tcp = False
         if protocol == 'tcp':
@@ -83,7 +83,7 @@ def index():
         sticky_session_type = ""
         if 'sticky_session' in request.form:
             sticky_session = True
-            sticky_session_type = request.form['sticky_session_type']
+            sticky_session_type = request.form.get('sticky_session_type', '')
 
         # Update the HAProxy config file
         message = update_haproxy_config(
