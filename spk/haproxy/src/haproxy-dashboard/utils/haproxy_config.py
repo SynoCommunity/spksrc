@@ -12,7 +12,7 @@ def is_frontend_exist(frontend_name, frontend_ip, frontend_port):
         with open(HAPROXY_CFG, 'r') as haproxy_cfg:
             frontend_found = False
             for line in haproxy_cfg:
-                if line.strip().startswith('frontend'):
+                if line.strip().startswith('frontend '):
                     _, existing_frontend_name = line.strip().split(' ', 1)
                     if existing_frontend_name.strip() == frontend_name:
                         frontend_found = True
@@ -32,7 +32,7 @@ def is_backend_exist(backend_name):
         with open(HAPROXY_CFG, 'r') as haproxy_cfg:
             for line in haproxy_cfg:
                 line = line.strip()
-                if line.startswith('backend') and not line.startswith('#'):
+                if line.startswith('backend ') and not line.startswith('#'):
                     parts = line.split()
                     if len(parts) >= 2 and parts[1] == backend_name:
                         return True
@@ -68,10 +68,11 @@ def update_haproxy_config(frontend_name, frontend_ip, frontend_port, lb_method, 
     root_redirect = _sanitize(root_redirect)
     redirect_to = _sanitize(redirect_to)
 
+    if is_frontend_exist(frontend_name, frontend_ip, frontend_port):
+        return "Frontend or Port already exists. Cannot add duplicate."
+
     with open(HAPROXY_CFG, 'a') as haproxy_cfg:
         haproxy_cfg.write(f"\nfrontend {frontend_name}\n")
-        if is_frontend_exist(frontend_name, frontend_ip, frontend_port):
-            return "Frontend or Port already exists. Cannot add duplicate."
         haproxy_cfg.write(f"    bind {frontend_ip}:{frontend_port}")
         if use_ssl:
             haproxy_cfg.write(f" ssl crt {ssl_cert_path}\n")

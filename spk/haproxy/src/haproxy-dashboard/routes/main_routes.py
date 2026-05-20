@@ -14,7 +14,7 @@ def index():
         lb_method = request.form['lb_method']
         protocol = request.form['protocol']
         backend_name = request.form['backend_name']
-        add_header = 'add_header' in request.form if 'add_header' in request.form else ''
+        add_header = 'add_header' in request.form
         header_name = request.form['header_name']
         header_value = request.form['header_value']
         
@@ -31,7 +31,7 @@ def index():
         use_ssl = 'ssl_checkbox' in request.form
         ssl_cert_path = request.form['ssl_cert_path']
         https_redirect = 'ssl_redirect_checkbox' in request.form
-        is_dos = 'add_dos' in request.form if 'add_dos' in request.form else ''
+        is_dos = 'add_dos' in request.form
         ban_duration = request.form["ban_duration"]
         limit_requests = request.form["limit_requests"]
         forward_for = 'forward_for_check' in request.form
@@ -41,15 +41,15 @@ def index():
         allowed_ip = request.form["allowed_ip"]
         forbidden_path = request.form["forbidden_path"]
 
-        sql_injection_check = 'sql_injection_check' in request.form if 'sql_injection_check' in request.form else ''
-        is_xss = 'xss_check' in request.form if 'xss_check' in request.form else ''
-        is_remote_upload = 'remote_uploads_check' in request.form if 'remote_uploads_check' in request.form else ''
+        sql_injection_check = 'sql_injection_check' in request.form
+        is_xss = 'xss_check' in request.form
+        is_remote_upload = 'remote_uploads_check' in request.form
 
         add_path_based = 'add_path_based' in request.form
         redirect_domain_name = request.form["redirect_domain_name"]
         root_redirect = request.form["root_redirect"]
         redirect_to = request.form["redirect_to"]
-        is_webshells = 'webshells_check' in request.form if 'webshells_check' in request.form else ''
+        is_webshells = 'webshells_check' in request.form
 
         # Combine backend server info into a list of tuples (name, ip, port, maxconns)
         backend_servers = []
