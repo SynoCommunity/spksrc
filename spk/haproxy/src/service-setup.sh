@@ -64,7 +64,12 @@ service_prestart ()
         export HAPROXY_PID="${PID_FILE}"
 
         cd "${DASHBOARD_DIR}"
-        "${SYNOPKG_PKGDEST}/env/bin/python3" app.py >> "${LOG_FILE}" 2>&1 &
+        DASHBOARD_PYTHON="${SYNOPKG_PKGDEST}/env/bin/python3"
+        if [ ! -x "${DASHBOARD_PYTHON}" ]; then
+            echo "Virtualenv python3 not found, falling back to ${PYTHON_DIR}/python3" >> "${LOG_FILE}"
+            DASHBOARD_PYTHON="${PYTHON_DIR}/python3"
+        fi
+        "${DASHBOARD_PYTHON}" app.py >> "${LOG_FILE}" 2>&1 &
         echo $! > "${DASHBOARD_PID}"
     fi
 }
