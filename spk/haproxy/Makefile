@@ -13,7 +13,7 @@ MAINTAINER = Diaoul
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
 DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet la haute disponibilité, la répartition de charge et le proxy de services TCP ou HTTP.
 DISPLAY_NAME = HAProxy
-CHANGELOG = "1. Update to HAProxy 3.0.23.<br/>2. Fix missing authentication on dashboard statistics and logs routes.<br/>3. Fix SSTI risk in statistics route (moved to proper template)."
+CHANGELOG = "1. Update to HAProxy 3.0.23. <br/>2. Update Python to 3.14. <br/>3. Fix missing authentication on dashboard routes. <br/>4. Fix missing Python runtime dependency."
 
 HOMEPAGE   = https://haproxy.1wt.eu/
 LICENSE    = GPLv2

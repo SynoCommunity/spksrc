@@ -66,4 +66,4 @@ if __name__ == '__main__':
     import logging
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
-    app.run(host='::', port=DASHBOARD_PORT, ssl_context=ssl_context, debug=False)
+    app.run(host='0.0.0.0', port=DASHBOARD_PORT, ssl_context=ssl_context, debug=False)
