@@ -63,8 +63,8 @@ def index():
                 backend_servers.append((name, ip, port, maxconn))
         
         # Check if frontend or port already exists
-        if is_frontend_exist(frontend_name, frontend_ip, frontend_port):
-            return render_template('index.html', message="Frontend or Port already exists. Cannot add duplicate.")
+        if is_frontend_exist(frontend_name):
+            return render_template('index.html', message="Frontend already exists. Cannot add duplicate.")
 
         # Get health check related fields if the protocol is HTTP
         health_check = False

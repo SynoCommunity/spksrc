@@ -7,28 +7,14 @@ def _sanitize(value):
         return ''.join(c for c in value if c.isprintable())
     return value
 
-def is_frontend_exist(frontend_name, frontend_ip, frontend_port):
+def is_frontend_exist(frontend_name):
     try:
         with open(HAPROXY_CFG, 'r') as haproxy_cfg:
-            frontend_found = False
             for line in haproxy_cfg:
-                if line.strip().startswith('frontend '):
-                    _, existing_frontend_name = line.strip().split(' ', 1)
-                    if existing_frontend_name.strip() == frontend_name:
-                        frontend_found = True
-                    else:
-                        frontend_found = False
-                elif frontend_found and line.strip().startswith('bind'):
-                    _, bind_info = line.strip().split(' ', 1)
-                    bind_info = bind_info.strip()
-                    # Split port from bind address (handles both IPv4 and [IPv6])
-                    if bind_info.startswith('['):
-                        ip_end = bind_info.find(']')
-                        existing_ip = bind_info[:ip_end + 1]
-                        existing_port = bind_info[ip_end + 1:].lstrip(':')
-                    else:
-                        existing_ip, existing_port = bind_info.rsplit(':', 1) if ':' in bind_info else (bind_info, '')
-                    if existing_ip.strip() == frontend_ip and existing_port.strip() == frontend_port:
+                stripped = line.strip()
+                if stripped.startswith('frontend '):
+                    _, existing_name = stripped.split(' ', 1)
+                    if existing_name.strip() == frontend_name:
                         return True
         return False
     except FileNotFoundError:
@@ -48,9 +34,6 @@ def is_backend_exist(backend_name):
         return False
 
 def update_haproxy_config(frontend_name, frontend_ip, frontend_port, lb_method, protocol, backend_name, backend_servers, health_check, health_check_tcp, health_check_link, sticky_session, add_header, header_name, header_value, sticky_session_type, is_acl, acl_name, acl_action, acl_backend_name, use_ssl, ssl_cert_path, https_redirect, is_dos, ban_duration, limit_requests, forward_for, is_forbidden_path, forbidden_name, allowed_ip, forbidden_path, sql_injection_check, is_xss, is_remote_upload, add_path_based, redirect_domain_name, root_redirect, redirect_to, is_webshells):
-
-    if is_backend_exist(backend_name):
-        return f"Backend {backend_name} already exists. Cannot add duplicate."
 
     frontend_name = _sanitize(frontend_name)
     frontend_ip = _sanitize(frontend_ip)
@@ -75,8 +58,11 @@ def update_haproxy_config(frontend_name, frontend_ip, frontend_port, lb_method, 
     root_redirect = _sanitize(root_redirect)
     redirect_to = _sanitize(redirect_to)
 
-    if is_frontend_exist(frontend_name, frontend_ip, frontend_port):
-        return "Frontend or Port already exists. Cannot add duplicate."
+    if is_backend_exist(backend_name):
+        return f"Backend {backend_name} already exists. Cannot add duplicate."
+
+    if is_frontend_exist(frontend_name):
+        return "Frontend already exists. Cannot add duplicate."
 
     with open(HAPROXY_CFG, 'a') as haproxy_cfg:
         haproxy_cfg.write(f"\nfrontend {frontend_name}\n")
