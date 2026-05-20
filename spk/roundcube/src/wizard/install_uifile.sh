@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# for backwards compatability
-if [ -z "${SYNOPKG_PKGDEST_VOL}" ]; then
-    SYNOPKG_PKGDEST_VOL="/volume1"
-fi
-
 quote_json ()
 {
     sed -e 's|\\|\\\\|g' -e 's|\"|\\\"|g'
