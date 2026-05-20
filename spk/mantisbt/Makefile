@@ -1,6 +1,6 @@
 SPK_NAME = mantisbt
-SPK_VERS = 2.28.0
-SPK_REV = 11
+SPK_VERS = 2.28.3
+SPK_REV = 12
 SPK_ICON = src/mantisbt.png
 
 DEPENDS  = cross/mantisbt
@@ -16,7 +16,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = Mantis is an easily deployable, web based bugtracker to aid product bug tracking. It requires PHP, MySQL and a web server. It is simpler than Bugzilla and easily editable.
 DESCRIPTION_FRE = Mantis est un bugtracker web aisément déployable pour faciliter le suivi des bogues. Il nécessite PHP, MySQL et un serveur web. Il est plus simple d\'accès que Bugzilla et facilement modifiable.
 DISPLAY_NAME = MantisBT
-CHANGELOG = "1. Update to v2.28.0.<br/>2. Update PHP dependency to 8.4 for DSM >= 7.2."
+CHANGELOG = "1. Update to v2.28.3."
 
 HOMEPAGE   = https://www.mantisbt.org
 LICENSE    = GPL
