@@ -5,7 +5,7 @@ SPK_ICON = src/haproxy.png
 
 DEPENDS = cross/haproxy
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = Diaoul

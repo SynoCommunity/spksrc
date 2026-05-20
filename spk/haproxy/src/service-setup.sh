@@ -1,5 +1,5 @@
 # HAProxy service setup
-PYTHON_DIR="/var/packages/python312/target/bin"
+PYTHON_DIR="/var/packages/python314/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 export LD_LIBRARY_PATH="${SYNOPKG_PKGDEST}/lib"
 
@@ -27,10 +27,10 @@ service_postinst ()
     mkdir -p "${CERT_DIR}"
 
     # Create a self-signed certificate for HTTPS termination
-    # Use python312's openssl since we depend on it at runtime
+    # Use python314's openssl since we depend on it at runtime
     OPENSSL="${PYTHON_DIR}/openssl"
     if [ -x "${OPENSSL}" ]; then
-        LD_LIBRARY_PATH="/var/packages/python312/target/lib" ${OPENSSL} req -x509 -newkey rsa:4096 -nodes \
+        LD_LIBRARY_PATH="/var/packages/python314/target/lib" ${OPENSSL} req -x509 -newkey rsa:4096 -nodes \
             -keyout "${CERT_DIR}/default.key" \
             -out "${CERT_DIR}/default.crt" \
             -days 7320 -subj "/CN=haproxy-default" 2>/dev/null
