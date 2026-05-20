@@ -12,7 +12,6 @@ MYSQL_USER="${SYNOPKG_PKGNAME}"
 MYSQL_DATABASE="${SYNOPKG_PKGNAME}"
 WEB_DIR="/var/services/web_packages"
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
-SYNOSVC="/usr/syno/sbin/synoservice"
 CFG_FILE="${WEB_ROOT}/config/config.inc.php"
 
 validate_preinst ()
