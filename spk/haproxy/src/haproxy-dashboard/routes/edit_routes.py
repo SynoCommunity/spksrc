@@ -23,7 +23,13 @@ def edit_haproxy_config():
         check_output = check_result.stdout
 
         if check_result.stderr:
-            check_output += f"\n\nWarnings from haproxy:\n{check_result.stderr}"
+            # Filter stderr: show only WARNING lines and validity status, skip NOTICE lines
+            warning_lines = [l for l in check_result.stderr.splitlines() if '[WARNING]' in l]
+            valid = any('Configuration file is valid' in l for l in check_result.stderr.splitlines())
+            if warning_lines:
+                check_output += "\n\nWarnings:\n" + "\n".join(warning_lines)
+            if valid:
+                check_output += "\n\nConfiguration file is valid."
         if check_result.returncode != 0:
             check_output += f"\n\nError occurred during configuration check."
 
