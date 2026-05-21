@@ -25,18 +25,6 @@ BUILD_OPTIONS += USE_PCRE2=1 PCRE2_INC=$(INSTALL_DIR)$(INSTALL_PREFIX)/include P
 BUILD_OPTIONS += USE_LUA=1 LUA_INC=$(INSTALL_DIR)$(INSTALL_PREFIX)/include LUA_LIB=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
 BUILD_OPTIONS += SSL_INC=$(SSL_INC) SSL_LIB=$(SSL_LIB)
 
-include ../../mk/spksrc.common.mk
-
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-# ARMv5 and PPC archs (except QorIQ) have older kernels and need rt library for clock_gettime()
-BUILD_OPTIONS += USE_RT=1
-ADDITIONAL_CFLAGS += -DLUA_32BITS
-endif
-
-ifeq ($(findstring $(ARCH), qoriq),$(ARCH))
-BUILD_OPTIONS += ADDLIB=-latomic
-endif
-
 # Use linux-glibc-legacy target for older glibc compatibility (DSM 7.1 has glibc 2.26)
 # Pass explicit CC and LD for cross-compilation
 COMPILE_MAKE_OPTIONS += TARGET=linux-glibc-legacy $(BUILD_OPTIONS)
