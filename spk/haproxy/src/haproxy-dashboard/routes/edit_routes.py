@@ -22,9 +22,10 @@ def edit_haproxy_config():
         check_result = subprocess.run([haproxy_bin, '-c', '-V', '-f', haproxy_cfg], capture_output=True, text=True)
         check_output = check_result.stdout
 
+        if check_result.stderr:
+            check_output += f"\n\nWarnings from haproxy:\n{check_result.stderr}"
         if check_result.returncode != 0:
-            error_message = check_result.stderr
-            check_output += f"\n\nError occurred:\n{error_message}"
+            check_output += f"\n\nError occurred during configuration check."
 
         if 'save_reload' in request.form and check_result.returncode == 0:
             # Graceful reload: start new HAProxy process and signal old one to finish
