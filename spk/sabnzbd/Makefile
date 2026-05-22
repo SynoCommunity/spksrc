@@ -1,9 +1,10 @@
 SPK_NAME = sabnzbd
 SPK_VERS = 5.0.3
-SPK_REV = 80
+SPK_REV = 81
 SPK_ICON = src/sabnzbd.png
 
 PYTHON_PACKAGE = python314
+SPK_DEPENDS = "${PYTHON_PACKAGE}"
 
 DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
 OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
