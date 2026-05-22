@@ -1,18 +1,19 @@
 SPK_NAME = haproxy
-SPK_VERS = 3.0.15
-SPK_REV = 23
+SPK_VERS = 3.0.23
+SPK_REV = 24
 SPK_ICON = src/haproxy.png
 
 DEPENDS = cross/haproxy
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+SPK_DEPENDS = "${PYTHON_PACKAGE}"
 
 MAINTAINER = Diaoul
 DESCRIPTION = HAProxy is a free, very fast and reliable solution offering high availability, load balancing, and proxying for TCP and HTTP-based applications.
 DESCRIPTION_FRE = HAProxy est un produit libre, performant et fiable qui permet la haute disponibilité, la répartition de charge et le proxy de services TCP ou HTTP.
 DISPLAY_NAME = HAProxy
-CHANGELOG = "1. Major update to HAProxy 3.0.15. <br/>2. Modernize for DSM 7. <br/>3. Update to OpenSSL 3. <br/>4. Add haproxy-dashboard web UI on port 8281."
+CHANGELOG = "1. Update to HAProxy 3.0.23. <br/>2. Migrate to Python 3.14. <br/>3. Fix missing authentication on dashboard routes."
 
 HOMEPAGE   = https://haproxy.1wt.eu/
 LICENSE    = GPLv2
