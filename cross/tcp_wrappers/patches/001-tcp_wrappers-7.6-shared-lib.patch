@@ -1,10 +1,12 @@
 # inspired by  http://www.linuxfromscratch.org/patches/blfs/5.1/tcp_wrappers-7.6-shared-lib-plus-plus.patch
 # adjusted for SynoCommunity
-# - relocate patch file ro source path
+# - relocate patch file to source path
 # - avoid patch and installation of man pages
 # - limit patch to linux target
+# - fix for gnu make > 4.3 (add cflags target)
 # remarks:
 # - only libwrap is used, binaries are lacking to find shared lib at runtime
+# 
 --- Makefile.org	1997-03-21 18:27:21.000000000 +0000
 +++ Makefile	2020-11-07 14:01:31.027674067 +0000
 @@ -1,5 +1,8 @@
@@ -235,7 +237,17 @@
  
  tidy:	clean
  	chmod -R a+r .
-@@ -885,5 +935,6 @@
+@@ -811,6 +861,9 @@
+ 
+ # Internal compilation dependencies.
+ 
++cflags: 
++	@true
++	
+ clean_exit.o: cflags
+ clean_exit.o: tcpd.h
+ diag.o: cflags
+@@ -885,5 +938,6 @@
  update.o: mystdarg.h
  update.o: tcpd.h
  vfprintf.o: cflags
