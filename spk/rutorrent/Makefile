@@ -51,11 +51,11 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
 # Default to PHP 8.4 on DSM 7.2+ (PHP 8.0 not supported)
 TC_OS_MIN_VER = 7.2-60096
-SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4:${PYTHON_PACKAGE}:mediainfo"
+SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4:mediainfo"
 CONF_DIR = src/conf_72
 else
 # Default to PHP 8.0 on DSM 7.0/7.1
-SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4:${PYTHON_PACKAGE}:mediainfo"
+SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4:mediainfo"
 OS_MAX_VER = 7.1-59999
 CONF_DIR = src/conf_7
 endif
