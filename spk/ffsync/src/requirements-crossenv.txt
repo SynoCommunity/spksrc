@@ -8,5 +8,3 @@ cryptography==46.0.7
     # via
     #   syncstorage-rs (pyproject.toml)
     #   pyfxa
-
-
