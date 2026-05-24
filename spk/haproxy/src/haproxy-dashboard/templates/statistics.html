@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}HAProxy Statistics{% endblock %}
+{% block nav_stats %} active{% endblock %}
+{% block extra_css %}
+        .dark-mode .table {
+            color: white;
+        }
+        .dark-mode .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .dark-mode .table-bordered {
+            border-color: #2bb9c7;
+        }
+        .dark-mode .table-bordered th,
+        .dark-mode .table-bordered td {
+            border-color: rgba(43, 185, 199, 0.3);
+        }
+        .dark-mode h1 {
+            color: #2bb9c7;
+        }
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1 class="my-4">HAProxy Statistics</h1>
+        {% if error_message %}
+        <div class="alert alert-warning" role="alert">
+            {{ error_message }}
+        </div>
+        {% endif %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Frontend Name</th>
+                        <th>Server Name</th>
+                        <th>4xx Errors</th>
+                        <th>5xx Errors</th>
+                        <th>Bytes In (MB)</th>
+                        <th>Bytes Out (MB)</th>
+                        <th>Total Connections</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in stats %}
+                    <tr>
+                        <td>{{ stat.frontend_name }}</td>
+                        <td>{{ stat.server_name }}</td>
+                        <td>{{ stat['4xx_errors'] }}</td>
+                        <td>{{ stat['5xx_errors'] }}</td>
+                        <td>{{ stat.bytes_in_mb }}</td>
+                        <td>{{ stat.bytes_out_mb }}</td>
+                        <td>{{ stat.conn_tot }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
