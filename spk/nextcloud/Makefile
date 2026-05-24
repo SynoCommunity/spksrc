@@ -8,7 +8,7 @@ DEPENDS =
 override ARCH=noarch
 
 REQUIRED_MIN_DSM = 7.2
-CONF_DIR = src/conf_72
+CONF_DIR = src/conf
 SPK_DEPENDS = WebStation:PHP8.3:MariaDB10:Apache2.4:redis
 
 # SRM is not supported due lacking webstation, php, mariadb and apache packages
