@@ -1,4 +1,4 @@
-# ARMv5-specific cross-compiled requirements (Python 3.11)
+# ARMv5-specific pure-python requirements (Python 3.11)
 
 appdirs==1.4.4
 arrow==1.4.0

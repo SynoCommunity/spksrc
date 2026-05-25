@@ -5,4 +5,4 @@ borgbackup==1.4.4
 charset_normalizer==3.4.7
 llfuse==1.5.2
 msgpack==1.1.2
-rpds_py==0.21.0
+#rpds_py==0.21.0                ==> supported version depends on rust version
