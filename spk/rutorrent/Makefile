@@ -3,9 +3,6 @@ SPK_VERS = 5.3.1
 SPK_REV = 23
 SPK_ICON = src/rutorrent.png
 
-PYTHON_PACKAGE = python314
-WHEELS = src/requirements-pure.txt
-
 # libtorrent-rakshasa requires C++14 support
 REQUIRED_MIN_DSM = 7.0
 UNSUPPORTED_ARCHS = comcerto2k
@@ -51,11 +48,11 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
 # Default to PHP 8.4 on DSM 7.2+ (PHP 8.0 not supported)
 TC_OS_MIN_VER = 7.2-60096
-SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4:${PYTHON_PACKAGE}:mediainfo"
+SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4:python314:mediainfo"
 CONF_DIR = src/conf_72
 else
 # Default to PHP 8.0 on DSM 7.0/7.1
-SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4:${PYTHON_PACKAGE}:mediainfo"
+SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4:python314:mediainfo"
 OS_MAX_VER = 7.1-59999
 CONF_DIR = src/conf_7
 endif
@@ -68,3 +65,5 @@ include ../../mk/spksrc.spk.mk
 rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/.session $(STAGING_DIR)/tmp
 	install -m 644 src/rtorrent.rc $(STAGING_DIR)/var/rtorrent.rc
+	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
+	install -m 644 src/requirements.txt $(STAGING_DIR)/share/wheelhouse/requirements.txt
