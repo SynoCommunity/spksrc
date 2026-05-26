@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 BUILD_DEPENDS = native/python314
 
-DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
+DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz cross/zstd
 # required for Sleepycat^WOracle Berkeley DB interface
 DEPENDS += cross/berkeleydb
 # required for uuid module
