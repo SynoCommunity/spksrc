@@ -1,0 +1,27 @@
+# Fix fontconfig build when cross-compiling with a newer host GCC
+#
+# meson's cc.preprocess() on fcobjshash.gperf.h dumps all predefined compiler
+# macros into the preprocessed output. cutout.py then passes this verbatim to
+# gperf, which includes them in fcobjshash.gperf. When fcobjs.c includes this
+# generated file, GCC 8.x cross-compiler chokes on the redefined __STDC__,
+# __SIZEOF_INT__, _LP64 and other built-in macros.
+#
+# Fix: filter out all #define lines in cutout.py except legitimate fontconfig
+# macros (FC_*) and system includes/undefs that reference headers or FC_ names.
+#
+# References: https://gitlab.freedesktop.org/fontconfig/fontconfig/-/issues/
+# Affects: fontconfig 2.16.0, host GCC >= 12, cross GCC <= 9
+#
+--- ./src/cutout.py.orig	2025-01-17 15:15:05.000000000 +0000
++++ ./src/cutout.py	2026-05-26 22:53:47.999646381 +0000
+@@ -20,6 +20,10 @@ if __name__== '__main__':
+             if write and l:
+                 stripped = re.sub(r'^\s+', '', l)
+                 stripped = re.sub(r'\s*,\s*', ',', stripped)
++                if re.match(r'^#define ', stripped) and not re.match(r'^#define FC_', stripped):
++                    continue
++                if re.match(r'^#(undef|include)\s+[^"<F]', stripped):
++                    continue
+                 if not stripped.isspace() and stripped:
+                     out.write('%s\n' % stripped)
+ 
