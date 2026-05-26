@@ -21,6 +21,7 @@ service_postinst ()
     # Create a Python virtualenv
     install_python_virtualenv
 
-    # Install the wheels
-    install_python_wheels
+    # Install the wheels (--no-deps prevents pip from resolving transitive
+    # dependencies like greenlet that we intentionally exclude for old GCC)
+    install_python_wheels --no-deps
 }
