@@ -65,9 +65,6 @@ endif
 # [PyYAML]
 DEPENDS += cross/libyaml
 
-# [zstd] - provides libzstd.so needed by python314's _zstd module at runtime
-DEPENDS += cross/zstd
-
 # [rpds-py]
 # Version = 0.24 requires rustc >= 1.82 (qoriq)
 # Version = 0.25 requires rustc >= 1.85
