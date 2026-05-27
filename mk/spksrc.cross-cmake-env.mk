@@ -12,7 +12,7 @@ endif
 # We normally build regular Release
 ifeq ($(strip $(CMAKE_BUILD_TYPE)),)
   ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-    CMAKE_BUILD_TYPE = Debug
+    CMAKE_BUILD_TYPE = RelWithDebInfo
   else
     CMAKE_BUILD_TYPE = Release
   endif
