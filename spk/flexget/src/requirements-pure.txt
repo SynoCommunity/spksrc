@@ -9,7 +9,7 @@ attrs==26.1.0
 babelfish==0.6.1
 beautifulsoup4==4.14.3
 blinker==1.9.0
-certifi==2026.5.20
+#certifi==2026.5.20                     ==> python314
 cheroot==11.1.2
 CherryPy==18.10.0
 click==8.4.1
@@ -44,7 +44,7 @@ markdown_it_py==4.2.0
 mdurl==0.1.2
 more_itertools==11.1.0
 packaging==26.2
-pip==25.3
+#pip==25.3                              ==> python314
 plumbum==1.10.0
 portend==3.2.1
 pygments==2.20.0
@@ -59,10 +59,10 @@ referencing==0.37.0
 requests==2.34.2
 rich==15.0.0
 rpyc==6.0.2
-setuptools==82.0.1
+#setuptools==82.0.1                     ==> python314
 sgmllib3k==1.0.0
 shellingham==1.5.4
-six==1.17.0
+#six==1.17.0                            ==> python314
 socksio==1.0.0
 soupsieve==2.8.4
 tempora==5.9.0
