@@ -10,6 +10,8 @@ UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
 PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
+# Require python314 SPK that ships built-in _zstd module
+SPK_DEPENDS = "python314>=3.14.5-4"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc. It can use different kinds of sources like RSS-feeds, html pages, csv files, search engines and there are even plugins for sites that do not provide any kind of useful feeds.
