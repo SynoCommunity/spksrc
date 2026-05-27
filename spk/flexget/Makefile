@@ -76,25 +76,18 @@ WHEELS += rpds_py==0.30.0
 endif
 
 # [libzstd] - provides libzstd.so needed by python314's _zstd module at runtime
-# WORKAROUND: This block can be removed once python314 SPK is rebuilt with
-# cross/zstd in its DEPENDS (python314 would then ship both _zstd.so and
-# libzstd.so, and its RPATH covers /var/packages/python314/target/lib/).
+# PRE_DEPEND_TARGET clears the install cookie so cross/zstd re-installs to
+# flexget's staging prefix even if already built for python314 (CI caching).
+PRE_DEPEND_TARGET = flexget_pre_depend
 DEPENDS += cross/zstd
 
 include ../../mk/spksrc.spk-meta.mk
+
+.PHONY: flexget_pre_depend
+flexget_pre_depend: depend_msg_target
+	@rm -f "$(abspath $(CURDIR)/../../cross/zstd/work-$(ARCH)-$(TCVERSION)/.zstd-install_done)" 2>/dev/null || true
 
 .PHONY: flexget_extra_install
 flexget_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
 	install -m 644 src/config.yml $(STAGING_DIR)/var/
-	# WORKAROUND: Copy libzstd.so into flexget's lib path (see [libzstd] above).
-	# Remove this block when python314 includes libzstd.so natively.
-	@ZSTD_LIB="$(abspath $(CURDIR)/../../cross/zstd/work-$(ARCH)-$(TCVERSION)/install/usr/local/zstd/lib)" ; \
-	PY314_LIB="$(abspath $(CURDIR)/../../spk/python314/work-$(ARCH)-$(TCVERSION)/install/var/packages/python314/target/lib)" ; \
-	for src in "$$ZSTD_LIB" "$$PY314_LIB"; do \
-		if [ -d "$$src" ] && ls "$$src"/libzstd.so* >/dev/null 2>&1; then \
-			install -d "$(STAGING_DIR)/lib" && \
-			cp -P "$$src"/libzstd.so* "$(STAGING_DIR)/lib/" && \
-			break ; \
-		fi ; \
-	done
