@@ -65,6 +65,9 @@ endif
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# [zstd] - provides libzstd.so needed by python314's _zstd module at runtime
+DEPENDS += cross/zstd
+
 # [rpds-py]
 # Version = 0.24 requires rustc >= 1.82 (qoriq)
 # Version = 0.25 requires rustc >= 1.85
@@ -75,17 +78,7 @@ else
 WHEELS += rpds_py==0.30.0
 endif
 
-# [libzstd] - provides libzstd.so needed by python314's _zstd module at runtime
-# PRE_DEPEND_TARGET clears the install cookie so cross/zstd re-installs to
-# flexget's staging prefix even if already built for python314 (CI caching).
-PRE_DEPEND_TARGET = flexget_pre_depend
-DEPENDS += cross/zstd
-
 include ../../mk/spksrc.spk-meta.mk
-
-.PHONY: flexget_pre_depend
-flexget_pre_depend: depend_msg_target
-	@rm -f "$(abspath $(CURDIR)/../../cross/zstd/work-$(ARCH)-$(TCVERSION)/.zstd-install_done)" 2>/dev/null || true
 
 .PHONY: flexget_extra_install
 flexget_extra_install:
