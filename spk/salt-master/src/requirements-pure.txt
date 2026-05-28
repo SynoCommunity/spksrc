@@ -69,4 +69,4 @@ zc_lockfile==4.0
 zipp==3.23.1
 
 # To allow patching rsax931.py during service setup
-patch-ng==1.18.1
+patch-ng==1.19.1
