@@ -54,6 +54,14 @@ endif
 # [msgpack]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=c11
+WHEELS += msgpack==1.0.5
+else
+WHEELS += msgpack==1.1.2
+endif
+
+# [psutil]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [psutil] -std=c99
 endif
 
 # [pycryptodomex]
@@ -76,7 +84,10 @@ endif
 
 # [yarl]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [yarl] -std=c11
+WHEELS_CFLAGS += [yarl] -std=c11 -DCYTHON_ATOMICS=0
+WHEELS += yarl==1.22.0
+else
+WHEELS += yarl==1.23.0
 endif
 
 # [propcache]
