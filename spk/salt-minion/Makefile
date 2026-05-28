@@ -73,6 +73,7 @@ endif
 DEPENDS += cross/libyaml
 
 # [pyzmq]
+ENV += PYZMQ_LIBSODIUM_CONFIGURE_ARGS=--host=$(TC_TARGET)
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [pyzmq] -std=c11
 endif
