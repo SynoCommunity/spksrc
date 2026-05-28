@@ -1,9 +1,9 @@
 SPK_NAME = salt-master
-SPK_VERS = 3007.11
-SPK_REV = 14
+SPK_VERS = 3008.0
+SPK_REV = 15
 SPK_ICON = src/salt-master.png
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 DEPENDS = cross/saltgui
@@ -15,7 +15,7 @@ REQUIRED_MIN_SRM = 1.3
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Master
-CHANGELOG    = "1. Update to v3007.11"
+CHANGELOG    = "1. Update Salt Master to v3008.0. <br/>2. Migrate to Python 3.14."
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache v2
@@ -96,11 +96,16 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [propcache] -std=c11
 endif
 
+# [protobuf]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CPPFLAGS += [protobuf] -std=c11
+endif
+
+include ../../mk/spksrc.spk-meta.mk
+
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
 	install -m 644 src/app/rsax931.py.patch $(STAGING_DIR)/share
 	install -m 644 src/app/master $(STAGING_DIR)/share
 	install -m 755 -d $(STAGING_DIR)/var/extensions/auth
 	install -m 644 src/app/synology.py $(STAGING_DIR)/var/extensions/auth/synology.py
-
-include ../../mk/spksrc.spk-meta.mk

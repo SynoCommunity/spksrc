@@ -1,9 +1,9 @@
 SPK_NAME = salt-minion
-SPK_VERS = 3007.11
-SPK_REV = 7
+SPK_VERS = 3008.0
+SPK_REV = 8
 SPK_ICON = src/salt-minion.png
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
@@ -13,7 +13,7 @@ REQUIRED_MIN_SRM = 1.3
 MAINTAINER   = SynoCommunity
 DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Minion
-CHANGELOG    = "1. Update to v3007.11"
+CHANGELOG    = "1. Update Salt Minion to v3008.0. <br/>2. Migrate to Python 3.14."
 
 HOMEPAGE     = https://repo.saltproject.io/
 LICENSE      = Apache
@@ -84,10 +84,15 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [propcache] -std=c11
 endif
 
+# [protobuf]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CPPFLAGS += [protobuf] -std=c11
+endif
+
+include ../../mk/spksrc.spk-meta.mk
+
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
 	install -m 644 src/app/rsax931.py.patch $(STAGING_DIR)/share
 	install -m 644 src/app/minion $(STAGING_DIR)/share
 	install -m 644 src/app/proxy $(STAGING_DIR)/share
-
-include ../../mk/spksrc.spk-meta.mk
