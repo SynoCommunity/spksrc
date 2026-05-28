@@ -39,7 +39,8 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [aiohttp] -std=c11 -DCYTHON_ATOMICS=0
 ifeq ($(findstring $(ARCH),comcerto2k),comcerto2k)
-WHEELS_CFLAGS += [aiohttp] -U__ARM_NEON__
+# Built-in llhttp uses ARM NEON not supported on this arch
+ENV += AIOHTTP_NO_EXTENSIONS=1
 endif
 endif
 
