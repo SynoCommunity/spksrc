@@ -53,6 +53,7 @@ python_gnupg==0.5.6
 requests==2.33.1
 rich==15.0.0
 rpm_vercmp==0.1.2
+salt==3008.0
 #setuptools==82.0.1                    ==> python314
 shellingham==1.5.4
 #six==1.17.0                           ==> python314
