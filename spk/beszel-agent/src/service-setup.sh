@@ -3,6 +3,36 @@ export PATH="/usr/local/bin:$PATH"
 KEY_FILE="${SYNOPKG_PKGVAR}/key.pub"
 EXTRA_FS_FILE="${SYNOPKG_PKGVAR}/extra_fs.conf"
 SMART_DEVICES_FILE="${SYNOPKG_PKGVAR}/smart_devices.conf"
+CUSTOM_ENV_FILE="${SYNOPKG_PKGVAR}/custom_env.conf"
+
+
+export_variables_from_file ()
+{
+    if [ -n "$1" ] && [ -r "$1" ]; then
+        while IFS= read -r _line; do
+            if [ -z "${_line}" ] || [ "${_line#\#}" != "${_line}" ]; then
+                continue
+            fi
+            IFS=';'
+            set -- ${_line}
+            IFS=' '
+            for _item in "$@"; do
+                _item="${_item#"${_item%%[![:space:]]*}"}"
+                _item="${_item%"${_item##*[![:space:]]}"}"
+                case "${_item}" in
+                    ""|"#"*)
+                        continue
+                        ;;
+                    *"="*)
+                        _key="${_item%%=*}"
+                        _value="${_item#*=}"
+                        export "${_key}=${_value}"
+                        ;;
+                esac
+            done
+        done < "$1"
+    fi
+}
 
 # Read the public key from the saved file
 if [ -f "${KEY_FILE}" ]; then
@@ -21,6 +51,9 @@ if [ -f "${SMART_DEVICES_FILE}" ]; then
     SMART_DEVS=$(cat "${SMART_DEVICES_FILE}")
     export SMART_DEVICES="${SMART_DEVS}"
 fi
+
+# Read any custom environment variables from file (the file is newline-separated)
+export_variables_from_file "${CUSTOM_ENV_FILE}"
 
 BESZEL_AGENT="${SYNOPKG_PKGDEST}/bin/beszel-agent"
 SERVICE_COMMAND="${BESZEL_AGENT}"
@@ -43,5 +76,10 @@ service_postinst ()
     # Save the SMART devices only if provided
     if [ -n "${wizard_smart_devices}" ]; then
         echo "${wizard_smart_devices}" > "${SMART_DEVICES_FILE}"
+    fi
+
+    # Save any custom environment variables only if provided
+    if [ -n "${wizard_extra_env}" ]; then
+        printf '%s\n' "${wizard_extra_env}" > "${CUSTOM_ENV_FILE}"
     fi
 }

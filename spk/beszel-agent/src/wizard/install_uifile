@@ -49,6 +49,19 @@
         ]
       },
       {
+        "type": "textfield",
+        "desc": "Add extra environment variables for the agent (semicolon-separated KEY=VALUE pairs).",
+        "subitems": [
+          {
+            "key": "wizard_extra_env",
+            "desc": "Extra Environment Variables",
+            "emptyText": "KEY=VALUE;ANOTHER_KEY=another_value",
+            "width": "400",
+            "defaultValue": ""
+          }
+        ]
+      },
+      {
         "desc": "The Beszel agent listens on port 45876 by default. Make sure this port is accessible from your Beszel Hub."
       }
     ]
