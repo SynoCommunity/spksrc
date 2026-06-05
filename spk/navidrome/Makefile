@@ -1,6 +1,6 @@
 SPK_NAME = navidrome
-SPK_VERS = 0.60.3
-SPK_REV = 8
+SPK_VERS = 0.61.2
+SPK_REV = 9
 SPK_ICON = src/navidrome.png
 
 DEPENDS = cross/navidrome
@@ -14,7 +14,7 @@ HOMEPAGE = https://www.navidrome.org/
 DESCRIPTION = 🎧☁ Modern Music Server and Streamer compatible with Subsonic/Airsonic. It gives you freedom to listen to your music collection from any browser or mobile device.
 LICENSE = GPLv3
 DISPLAY_NAME = Navidrome
-CHANGELOG = "Update Navidrome to v0.60.3."
+CHANGELOG = "Update Navidrome to v0.61.2."
 
 STARTABLE = yes
 SERVICE_SETUP = src/service-setup.sh

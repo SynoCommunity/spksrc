@@ -1,9 +1,9 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 4.5.4
-SPK_REV = 79
+SPK_VERS = 5.0.3
+SPK_REV = 80
 SPK_ICON = src/sabnzbd.png
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 
 DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
 OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
@@ -13,6 +13,12 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 # unrar not supported
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
+# Ensure C++17 compatibility
+# sabctools >= 9.0.0 requirement
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
+
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = Safihre
@@ -21,7 +27,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "1. Update to SABnzbd 4.5.4."
+CHANGELOG = "1. Update to SABnzbd 5.0.3. </br>2. Migrate to Python 3.14."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -51,15 +57,23 @@ POST_STRIP_TARGET = sabnzbd_extra_install
 SPK_COMMANDS = bin/7zz
 
 # [cryptography]
+# Version = 45.0.0 requires rustc >= 1.74.0 (qoriq)
+# Version = 47.0.0 requires rustc >= 1.83.0
 DEPENDS += cross/openssl3
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += cryptography==46.0.7
+else
+WHEELS += cryptography==48.0.0
+endif
 
 # [orjson]
 # Version = 3.11.1 requires rustc >= 1.82 (qoriq)
 # Version = 3.11.2 requires rustc >= 1.85
+# Version = 3.11.6 requires rustc >= 1.89
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 WHEELS += orjson==3.11.1
 else
-WHEELS += orjson==3.11.3
+WHEELS += orjson==3.11.5
 endif
 
 include ../../mk/spksrc.spk-meta.mk

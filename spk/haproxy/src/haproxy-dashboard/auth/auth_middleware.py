@@ -42,6 +42,4 @@ def requires_auth(f):
         return f(*args, **kwargs)
     return decorated
 
-def setup_auth(app):
-    # Placeholder for future auth setup if needed
-    pass
+

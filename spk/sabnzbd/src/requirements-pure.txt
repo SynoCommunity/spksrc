@@ -1,42 +1,42 @@
-# Generated using the requirements script on October 23, 2025
+# Generated using the requirements script on May 15, 2026
+# Command: ./generate_requirements.sh "-r requirements.txt" 314
 
-apprise==1.9.5
+apprise==1.10.0
 babelfish==0.6.1
 blinker==1.9.0
-#certifi==2025.10.5             ==> python312
-chardet==5.2.0
-cheroot==11.0.0
+#certifi==2026.4.22             ==> python314
+cheroot==11.1.2
 CherryPy==18.10.0
-click==8.3.0
+click==8.3.3
 configobj==5.0.9
 feedparser==6.0.12
 guessit==3.8.0
-idna==3.11
+idna==3.13
 jaraco.classes==3.4.0
 jaraco.collections==5.0.0
 jaraco.context==4.3.0
-jaraco_functools==4.3.0
+jaraco_functools==4.4.0
 jaraco.text==3.8.1
-markdown==3.9
-more_itertools==10.8.0
+markdown==3.10.2
+more_itertools==11.0.2
 notify2==0.3.1
 oauthlib==3.3.1
 paho_mqtt==1.6.1
-#pip==24.3.1                    ==> python312
+#pip==25.3                      ==> python314
 portend==3.2.1
-puremagic==1.30
-pycparser==2.23
-PyJWT==2.10.1
+puremagic==2.2.0
+pycparser==3.0
+pyjwt==2.12.1
 PySocks==1.7.1
 python_dateutil==2.9.0.post0
-pytz==2025.2
+pytz==2026.1.post1
 rarfile==4.2
 rebulk==3.2.0
-requests==2.32.5
+requests==2.33.1
 requests_oauthlib==2.0.0
-#setuptools==80.9.0             ==> python312
+#setuptools==82.0.1             ==> python314
 sgmllib3k==1.0.0
-#six==1.17.0                    ==> python312
+#six==1.17.0                    ==> python314
 tempora==5.8.1
-urllib3==2.5.0
+urllib3==2.6.3
 zc_lockfile==4.0
