@@ -64,6 +64,12 @@ CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 
+# Enable building of new experimental UI
+CONFIGURE_ARGS += --enable-vue_build
+BUILD_DEPENDS = native/nodejs_22
+# Build environment - use native Node.js from spksrc
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
+
 # dbus splits its headers between include/ and lib/dbus-1.0/include/
 #    - include/dbus-1.0/ (public) must precede
 #    - lib/dbus-1.0/include/ (arch-specific dbus-arch-deps.h)
