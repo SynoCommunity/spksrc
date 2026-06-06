@@ -1,0 +1,12 @@
+Add experimental ffmpeg8 support from PR:
+https://github.com/tvheadend/tvheadend/pull/2089
+
+# Download patch, strip Makefile.ffmpeg section and convert to -p0 format
+# Note: while filterdiff is more efficient it also remove the header, thus using sed in this case
+
+curl -L https://github.com/tvheadend/tvheadend/pull/2117.patch \
+    | sed '/^diff --git a\/Makefile\.ffmpeg/,/^diff --git /{//!d;/^diff --git a\/Makefile\.ffmpeg/d}' \
+    | sed '/Makefile\.ffmpeg/d' \
+    | sed -e 's?--- a/?--- ?1' \
+          -e 's?+++ b/?+++ ?1' \
+    > 101-ffmpeg8-compat.patch
