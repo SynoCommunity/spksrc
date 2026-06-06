@@ -1,6 +1,6 @@
 SPK_NAME = sickchill
 SPK_VERS = 20240301
-SPK_REV = 12
+SPK_REV = 13
 SPK_ICON = src/sickchill.png
 
 PYTHON_PACKAGE = python312
@@ -14,7 +14,7 @@ MAINTAINER = miigotu
 DESCRIPTION = Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 STARTABLE = yes
 DISPLAY_NAME = SickChill
-CHANGELOG = "1. Migrate to Python 3.12."
+CHANGELOG = "1. Maintenance update of packages for Setuptools in Python 3.12.13."
 
 HOMEPAGE = https://sickchill.github.io/
 LICENSE = GPLv3+
