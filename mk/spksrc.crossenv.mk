@@ -228,7 +228,7 @@ crossenv-install-%:
 	@set -o pipefail; { \
 	. $(abspath $(WORK_DIR)/crossenv-$*)/bin/activate ; \
 	if [ -e "$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate" ] ; then \
-	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$*)/build/bin ; \
+	   export PATH=$(abspath $(WORK_DIR)/crossenv-$*)/build/bin:$${PATH} ; \
 	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
 	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate]" ; \
 	   $(MSG) "python: [$$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python)]" ; \
@@ -236,18 +236,50 @@ crossenv-install-%:
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
+	_meson_cross_args=""; \
+	_extra_pip=""; \
+	case "$(WHEEL_NAME)" in \
+	   numpy|scipy|scikit_learn|lap|pandas|numba|llvmlite|msgpack) \
+	      if [ -f "$(WORK_DIR)/tc_vars.meson-cross" ]; then \
+	         _meson_cross_args="--config-settings=setup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-cross"; \
+	      fi ; \
+	      if [ -f "$(WORK_DIR)/tc_vars.meson-properties" ]; then \
+	         _meson_cross_args="$${_meson_cross_args} --config-settings=setup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-properties"; \
+	      fi ;; \
+	   soxr) \
+	      _extra_pip="--config-settings=cmake.args=-DCMAKE_SYSTEM_NAME=Linux;-DCMAKE_CROSSCOMPILING=TRUE"; ;; \
+	esac ; \
 	$(MSG) \
+	   LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib:$${LD_LIBRARY_PATH} \
 	   $$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
 	   $(EXTRA_PIP_ARGS) \
+	   $${_meson_cross_args} \
+	   $${_extra_pip} \
 	   --no-build-isolation \
 	   --disable-pip-version-check \
 	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
+	_meson_cross_args=""; \
+	_extra_pip=""; \
+	case "$(WHEEL_NAME)" in \
+	   numpy|scipy|scikit_learn|lap|pandas|numba|llvmlite|msgpack) \
+	      if [ -f "$(WORK_DIR)/tc_vars.meson-cross" ]; then \
+	         _meson_cross_args="--config-settings=setup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-cross"; \
+	      fi ; \
+	      if [ -f "$(WORK_DIR)/tc_vars.meson-properties" ]; then \
+	         _meson_cross_args="$${_meson_cross_args} --config-settings=setup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-properties"; \
+	      fi ;; \
+	   soxr) \
+	      _extra_pip="--config-settings=cmake.args=-DCMAKE_SYSTEM_NAME=Linux;-DCMAKE_CROSSCOMPILING=TRUE"; ;; \
+	esac ; \
 	$(RUN) \
+	   LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib:$${LD_LIBRARY_PATH} \
 	   PATH=$${PATH} \
 	   $$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python) -m pip install \
 	   --cache-dir $(PIP_CACHE_DIR) \
 	   $(EXTRA_PIP_ARGS) \
+	   $${_meson_cross_args} \
+	   $${_extra_pip} \
 	   --no-build-isolation \
 	   --disable-pip-version-check \
 	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
