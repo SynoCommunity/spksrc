@@ -84,17 +84,19 @@ TC_VAR_MAPPING_MK = \
 TC_VAR_MAPPING_OTHER = \
 	tc_cmake_vars:tc_vars.cmake \
 	tc_meson_cross_vars:tc_vars.meson-cross \
+	tc_meson_properties_vars:tc_vars.meson-properties \
 	tc_meson_native_vars:tc_vars.meson-native
 
 # Common variables to simply calls
 # (e.g. direct call such as 'make work/tc_vars.mk')
-TC_VARS_MK           = $(WORK_DIR)/tc_vars.mk
-TC_VARS_AUTOTOOLS_MK = $(WORK_DIR)/tc_vars.autotools.mk
-TC_VARS_FLAGS_MK     = $(WORK_DIR)/tc_vars.flags.mk
-TC_VARS_RUST_MK      = $(WORK_DIR)/tc_vars.rust.mk
-TC_VARS_CMAKE        = $(WORK_DIR)/tc_vars.cmake
-TC_VARS_MESON_CROSS  = $(WORK_DIR)/tc_vars.meson-cross
-TC_VARS_MESON_NATIVE = $(WORK_DIR)/tc_vars.meson-native
+TC_VARS_MK               = $(WORK_DIR)/tc_vars.mk
+TC_VARS_AUTOTOOLS_MK     = $(WORK_DIR)/tc_vars.autotools.mk
+TC_VARS_FLAGS_MK         = $(WORK_DIR)/tc_vars.flags.mk
+TC_VARS_RUST_MK          = $(WORK_DIR)/tc_vars.rust.mk
+TC_VARS_CMAKE            = $(WORK_DIR)/tc_vars.cmake
+TC_VARS_MESON_CROSS      = $(WORK_DIR)/tc_vars.meson-cross
+TC_VARS_MESON_PROPERTIES = $(WORK_DIR)/tc_vars.meson-properties
+TC_VARS_MESON_NATIVE     = $(WORK_DIR)/tc_vars.meson-native
 
 # Template to generate toolchain rule
 define make_tc_var_rule
@@ -157,6 +159,7 @@ tcvars_target: \
 	$(TC_VARS_RUST_MK) \
 	$(TC_VARS_CMAKE) \
 	$(TC_VARS_MESON_CROSS) \
+	$(TC_VARS_MESON_PROPERTIES) \
 	$(TC_VARS_MESON_NATIVE)
 
 post_tcvars_target: $(TCVARS_TARGET)
@@ -297,6 +300,14 @@ ifeq ($(TC_RUSTUP_TOOLCHAIN),stable)
 else
 	@echo "rust = '$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/bin/rustc'"
 endif
+	@echo "pkgconfig = '$$(which pkg-config)'"
+	@echo "pkg-config = '$$(which pkg-config)'"
+
+.PHONY: tc_meson_properties_vars
+tc_meson_properties_vars:
+	@echo "[properties]" ; \
+	echo "needs_exe_wrapper = true" ; \
+	echo "longdouble_format = '$(if $(findstring $(TC_ARCH),$(PPC_ARCHS)),IEEE_DOUBLE_BE,IEEE_DOUBLE_LE)'"
 
 .PHONY: tc_meson_native_vars
 tc_meson_native_vars:
