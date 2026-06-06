@@ -1,0 +1,9 @@
+pip==24.3.1
+setuptools==82.0.1
+wheel==0.46.3
+#
+build:Cython==3.1.0
+# build:numpy for native import during numba's setup.py
+build:numpy==2.4.3
+#
+cross:numpy==2.4.3
