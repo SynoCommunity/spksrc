@@ -1,7 +1,7 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = 58861264
-SPK_GIT_DATE = 20260108
+SPK_GIT_HASH = 9102efaf
+SPK_GIT_DATE = 20260525
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
 SPK_REV = 47
@@ -9,7 +9,9 @@ SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
 FFMPEG_PACKAGE = ffmpeg7
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
+
+#GCC_DEBUG_INFO := 1
 
 MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
@@ -58,6 +60,9 @@ DEPENDS += python/numpy-latest
 # [pandas]
 DEPENDS += python/pandas
 endif
+
+# [pandas] https://github.com/th0ma7/gracenote2epg/issues/8
+WHEELS += pgeocode==0.5.0
 
 # Export version to the build where version
 # script gets patched accordingly by:
