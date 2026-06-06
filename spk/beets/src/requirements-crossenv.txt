@@ -1,19 +1,24 @@
-# Generated using the requirements script on December 23, 2025
-# Command: ./generate_requirements.sh "beets[beatport,chroma,discogs,embedart,embyupdate,fetchart,kodiupdate,lastgenre,lastimport,lyrics,metasync,plexupdate,replaygain,scrub,sonosupdate]==2.5.1" 312
+# Generated using the requirements script on May 30, 2026
+# Command: ./generate_requirements.sh "beets[autobpm,beatport,chroma,discogs,embedart,embyupdate,fetchart,kodiupdate,lastgenre,lastimport,lyrics,metasync,plexupdate,replaygain,scrub,sonosupdate]==2.11.0" 314
 
-# NOTE: The following plugins were excluded due to being broken or deprecated:
-# absubmit, docs, import, reflink
+# NOTE: Excluded plugins: absubmit, docs, import, reflink (broken/deprecated)
+# NOTE: Excluded plugins: aura, bpd, mpdstats, thumbnails, web (services/desktop)
 
-# NOTE: Excluded plugins that require background services or desktop environments:
-# aura, bpd, mpdstats, thumbnails, web
-
-charset_normalizer==3.4.4
-#dbus_python            ==> python/dbus-python          for plugins: metasync
+audioop_lts==0.2.2
+cffi==2.0.0
+charset_normalizer==3.4.7
+#dbus_python==1.4.0                   ==> python/dbus-python          for plugins: metasync
 jellyfish==1.2.1
-#lap>=0.5.12            ==> python/lap
-lxml==6.0.2
-#numpy>=1.24.4          ==> python/numpy
-#pillow                 ==> python/pillow               for plugins: embedart, fetchart
-#pycairo                ==> python/pycairo
-#pygobject              ==> python/pygobject            for plugins: replaygain
+lap==0.5.13
+llvmlite==0.47.0
+lxml==6.1.1
+msgpack==1.1.2
+numba==0.65.1
+numpy==2.4.3                          # Keep at 2.4.3 to match crossenv configs (numba, scipy, scikit_learn, lap, pandas)
+#pillow==12.2.0                       ==> python/pillow               for plugins: embedart, fetchart
+#pycairo==1.29.0                      ==> python/pycairo
+#pygobject==3.56.3                    ==> python/pygobject            for plugins: replaygain
 pyyaml==6.0.3
+scipy==1.17.1
+scikit_learn==1.8.0
+soxr==1.1.0
