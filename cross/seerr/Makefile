@@ -1,5 +1,5 @@
 PKG_NAME = seerr
-PKG_VERS = 3.2.0
+PKG_VERS = 3.3.0
 PKG_EXT  = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/seerr-team/seerr/archive/refs/tags
@@ -49,6 +49,15 @@ seerr_install:
 		delete j.scripts?.prepare;\
 		fs.writeFileSync(p,JSON.stringify(j,null,2));"
 
+	# Enable cross-arch optional dependency installation
+	$(RUN) node -e "\
+		const fs=require('fs');\
+		const p='package.json';\
+		const j=JSON.parse(fs.readFileSync(p));\
+		j.pnpm = j.pnpm || {};\
+		j.pnpm.supportedArchitectures = { os: ['linux'], cpu: ['x64', 'arm64'] };\
+		fs.writeFileSync(p,JSON.stringify(j,null,2));"
+
 	# ------------------------------------------------------------
 	# 2. Install deps + build (pnpm-only phase)
 	# ------------------------------------------------------------
@@ -56,36 +65,10 @@ seerr_install:
 	$(RUN) COMMIT_TAG=$(PKG_VERS) pnpm build
 
 	# ------------------------------------------------------------
-	# 3. Remove build-time node_modules completely
+	# 3. Native binaries for target architecture ($(NODE_ARCH))
 	# ------------------------------------------------------------
-	$(RUN) rm -rf node_modules
-
-	# ------------------------------------------------------------
-	# 4. Remove pnpm-only metadata (npm cannot parse it)
-	# ------------------------------------------------------------
-	$(RUN) node -e "\
-		const fs=require('fs');\
-		const j=JSON.parse(fs.readFileSync('package.json'));\
-		delete j.pnpm;\
-		delete j.packageManager;\
-		delete j.overrides;\
-		fs.writeFileSync('package.json', JSON.stringify(j,null,2));"
-
-	# ------------------------------------------------------------
-	# 5. Install runtime deps only (npm, flat layout)
-	# ------------------------------------------------------------
-	$(RUN) npm install --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --omit=optional
-	# Install then-pug (peer dependency of @ladjs/consolidate, needed for email-templates)
-	$(RUN) npm install then-pug@2.0.0 --omit=dev --ignore-scripts --legacy-peer-deps --no-audit --no-fund --omit=optional
-
-	# ------------------------------------------------------------
-	# 6. Native binaries for target architecture ($(NODE_ARCH))
-	# ------------------------------------------------------------
-
-	# sqlite3 - download prebuilt napi binary for target arch
-	$(RUN) sh -c "\
-		cd node_modules/sqlite3 && \
-		npx prebuild-install -r napi --platform linux --arch $(NODE_ARCH)"
+	# sqlite3 - download prebuilt napi binary
+	$(RUN) sh -c 'cd node_modules/sqlite3 && npx prebuild-install -r napi --platform linux --arch $(NODE_ARCH)'
 
 	# bcrypt v6.0.0 bundles prebuilts in prebuilds/ dir
 	# Keep only the target architecture prebuild
@@ -96,14 +79,108 @@ seerr_install:
 		node_modules/bcrypt/prebuilds/win32-arm64 \
 		node_modules/bcrypt/prebuilds/win32-x64 \
 		node_modules/bcrypt/lib
-	@if [ "$(NODE_ARCH)" = "x64" ]; then \
+	$(RUN) bash -c 'if [ "$(NODE_ARCH)" = "x64" ]; then \
 		rm -rf node_modules/bcrypt/prebuilds/linux-arm64; \
 	else \
 		rm -rf node_modules/bcrypt/prebuilds/linux-x64; \
-	fi
+	fi'
 
 	# ------------------------------------------------------------
-	# 7. Cleanup non-runtime artifacts
+	# 4. Remove pnpm-only metadata
+	# ------------------------------------------------------------
+	$(RUN) node -e "\
+		const fs=require('fs');\
+		const j=JSON.parse(fs.readFileSync('package.json'));\
+		delete j.pnpm;\
+		delete j.packageManager;\
+		delete j.overrides;\
+		fs.writeFileSync('package.json', JSON.stringify(j,null,2));"
+
+	# ------------------------------------------------------------
+	# 5. Remove dev-only packages from .pnpm store
+	# ------------------------------------------------------------
+	$(RUN) rm -rf \
+		node_modules/.pnpm/ace-builds@*/ \
+		node_modules/.pnpm/typescript@*/ \
+		node_modules/.pnpm/prettier@*/ \
+		node_modules/.pnpm/eslint@*/ \
+		node_modules/.pnpm/tailwindcss@*/ \
+		node_modules/.pnpm/prettier-plugin*/ \
+		node_modules/.pnpm/@typescript-eslint*/ \
+		node_modules/.pnpm/@eslint*/ \
+		node_modules/.pnpm/ts-node@*/ \
+		node_modules/.pnpm/jest@*/ \
+		node_modules/.pnpm/@jest*/ \
+		node_modules/.pnpm/@testing-library*/ \
+		node_modules/.pnpm/cypress@*/ \
+		node_modules/.pnpm/playwright@*/ \
+		node_modules/.pnpm/storybook@*/ \
+		node_modules/.pnpm/@storybook*/ \
+		node_modules/.pnpm/jsdom@*/ \
+		node_modules/.pnpm/puppeteer@*/ \
+		node_modules/.pnpm/nodemon@*/ \
+		node_modules/.pnpm/supertest@*/ \
+		node_modules/.pnpm/nock@*/ \
+		node_modules/.pnpm/mocha@*/ \
+		node_modules/.pnpm/webpack@*/ \
+		node_modules/.pnpm/postcss@*/ \
+		node_modules/.pnpm/autoprefixer@*/ \
+		node_modules/.pnpm/svgo@*/ \
+		node_modules/.pnpm/wasm-vips@*/ \
+		node_modules/.pnpm/rollup@*/ \
+		node_modules/.pnpm/vite@*/ \
+		node_modules/.pnpm/stylelint@*/ \
+		node_modules/.pnpm/@next+swc-linux-x64-musl@*/ \
+		node_modules/.pnpm/@swc+core-linux-x64-musl@*/ \
+		node_modules/.pnpm/@img+sharp-libvips-linuxmusl-x64@*/ \
+		node_modules/.pnpm/@img+sharp-linuxmusl-x64@*/ \
+		node_modules/.pnpm/@unicode+unicode-17.0.0@*/
+
+	# Remove build-only @babel packages from .pnpm store
+	# (keep only runtime packages needed by email-templates chain)
+	$(RUN) node -e "\
+		const fs = require('fs');\
+		const path = require('path');\
+		const pnpmDir = 'node_modules/.pnpm';\
+		if (!fs.existsSync(pnpmDir)) process.exit(0);\
+		const keep = ['runtime', 'parser', 'types', 'helper-validator-identifier', 'helper-string-parser'];\
+		const dirs = fs.readdirSync(pnpmDir);\
+		for (const d of dirs) {\
+			const m = d.match(/^(@babel\+)(.+)@/);\
+			if (m && keep.indexOf(m[2]) === -1) {\
+				try { fs.rmSync(path.join(pnpmDir, d), { recursive: true, force: true }); } catch(e) {}\
+			}\
+		}"
+
+	# For cross-arch builds:
+	# 1. Remove native binaries for the wrong architecture
+	# 2. Install native binaries for the target architecture
+	$(RUN) bash -c 'if [ "$(NODE_ARCH)" = "arm64" ]; then \
+		rm -rf node_modules/.pnpm/@next+swc-linux-x64*/ \
+			node_modules/.pnpm/@swc+core-linux-x64*/ \
+			node_modules/.pnpm/@img+sharp-linux-x64*/ \
+			node_modules/.pnpm/@img+sharp-libvips-linux-x64*/ \
+			node_modules/.pnpm/@unrs+resolver-binding-linux-x64*/; \
+		sed -i "s/engine-strict=true/engine-strict=false/" .npmrc; \
+		pnpm add @next/swc-linux-arm64-gnu@16.2.6 2>/dev/null; \
+		pnpm add @img/sharp-libvips-linux-arm64@1.2.4 2>/dev/null; \
+		pnpm add @img/sharp-linux-arm64@0.34.5 2>/dev/null; \
+		pnpm add @swc/core-linux-arm64-gnu@1.6.5 2>/dev/null; \
+		sed -i "s/engine-strict=false/engine-strict=true/" .npmrc; \
+	elif [ "$(NODE_ARCH)" = "x64" ]; then \
+		rm -rf node_modules/.pnpm/@next+swc-linux-arm64*/ \
+			node_modules/.pnpm/@swc+core-linux-arm64*/ \
+			node_modules/.pnpm/@img+sharp-linux-arm64*/ \
+			node_modules/.pnpm/@img+sharp-libvips-linux-arm64*/ \
+			node_modules/.pnpm/@unrs+resolver-binding-linux-arm64*/; \
+	fi'
+
+	# Remove dangling top-level symlinks (dev packages whose .pnpm entries were pruned)
+	$(RUN) find node_modules -maxdepth 1 -type l ! -exec test -e {} \; -delete 2>/dev/null || true
+	$(RUN) find node_modules/@* -maxdepth 1 -type l ! -exec test -e {} \; -delete 2>/dev/null || true
+
+	# ------------------------------------------------------------
+	# 6. Cleanup non-runtime artifacts
 	# ------------------------------------------------------------
 	$(RUN) rm -rf \
 		.next/cache \
@@ -118,24 +195,13 @@ seerr_install:
 	$(RUN) rm -rf node_modules/ace-builds
 
 	# Remove node-gyp build tools (not needed at runtime)
-	$(RUN) rm -rf \
-		node_modules/node-gyp \
-		node_modules/sqlite3/node_modules/node-gyp
+	$(RUN) rm -rf node_modules/node-gyp
 
-	# Preserve @babel packages needed for runtime (email-templates chain)
-	# Keep parser, types, runtime, and helper packages needed transitively
-	$(RUN) node -e "\
-		const fs = require('fs');\
-		const path = require('path');\
-		const babelDir = 'node_modules/@babel';\
-		if (!fs.existsSync(babelDir)) { process.exit(0); }\
-		const dirs = fs.readdirSync(babelDir);\
-		const keep = ['runtime', 'parser', 'types', 'helper-validator-identifier', 'helper-string-parser'];\
-		for (const d of dirs) {\
-			if (keep.indexOf(d) === -1) {\
-				try { fs.rmSync(path.join(babelDir, d), { recursive: true, force: true }); } catch(e) {}\
-			}\
-		}"
+	# Remove sqlite3 source tarball (prebuilt binary already downloaded)
+	$(RUN) rm -rf node_modules/.pnpm/sqlite3@*/node_modules/sqlite3/deps
+
+	# Remove musl native variants (DSM uses glibc on all architectures)
+	$(RUN) bash -c 'rm -rf node_modules/.pnpm/*musl*@*/' 2>/dev/null || true
 
 	# Remove @svgr and svgo (webpack SVG loader - build-only)
 	$(RUN) rm -rf \
