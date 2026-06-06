@@ -26,7 +26,14 @@ CONF_DIR = src/conf/
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER = auto
+# Debug builds (GCC_DEBUG_INFO=1) ship a start-up script with an optional gdb
+# crash-backtrace mode (toggle at runtime: touch ${SYNOPKG_PKGVAR}/gdb-debug.flag);
+# release builds get the plain start-up script.
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+SERVICE_SETUP = src/service-setup-dbg.sh
+else
 SERVICE_SETUP = src/service-setup.sh
+endif
 
 # Service configuration
 SERVICE_PORT = 9981
