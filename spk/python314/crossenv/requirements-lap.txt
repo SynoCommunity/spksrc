@@ -1,0 +1,12 @@
+pip==24.3.1
+setuptools==82.0.1
+wheel==0.46.3
+#
+build:Cython==3.1.0
+build:meson==1.10.2
+build:meson-python==0.19.0
+# numpy is required in build env too (brings libraries like libgfortran):
+build:numpy==2.4.3
+#
+wheelhouse:numpy==2.4.3
+cross:build==1.2.2
