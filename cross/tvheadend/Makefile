@@ -76,6 +76,7 @@ include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
+CONFIGURE_ARGS += --enable-qsv
 endif
 
 # If libraries through FFMPEG_PACKAGE shared libraries unavailable
