@@ -8,11 +8,10 @@ PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/fuse3 cross/glib
 
-# fuse3:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 HOMEPAGE = https://github.com/libfuse/sshfs
-COMMENT  = sshfs is a network filesystem client to connect to SSH servers.
-LICENSE  = GPLv2
+COMMENT = sshfs is a network filesystem client to connect to SSH servers.
+LICENSE = GPLv2
 
 include ../../mk/spksrc.cross-meson.mk
