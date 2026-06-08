@@ -4,7 +4,6 @@ PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Ebenderooock/loom/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
-EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 BUILD_DEPENDS = native/go
 
@@ -12,9 +11,12 @@ HOMEPAGE = https://loom.deroock.co.za
 COMMENT  = Loom is a unified, self-hosted media automation server (a Radarr/Sonarr/Prowlarr/Overseerr replacement).
 LICENSE  = AGPL-3.0
 
-# Compiled binary lives at the root of the extracted source tree.
-GO_SRC_DIR = $(EXTRACT_PATH)
-GO_BIN_DIR = $(EXTRACT_PATH)/loom
+# The release tarball wraps everything in a top-level $(PKG_DIR)/ directory, and
+# the framework extracts it into $(WORK_DIR) (the default EXTRACT_PATH), so the
+# Go module root lives at $(WORK_DIR)/$(PKG_DIR). The compiled binary lands at
+# the root of that tree.
+GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)
+GO_BIN_DIR = $(GO_SRC_DIR)/loom
 COMPILE_TARGET = loom_compile
 
 include ../../mk/spksrc.cross-go.mk
