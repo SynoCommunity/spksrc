@@ -1,3 +1,6 @@
+IS_VIDEODRV_SUPPORTED := $(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS))
+
+ifneq ($(IS_VIDEODRV_SUPPORTED),)
 
 # Set default videodriver package name
 ifeq ($(strip $(VIDEODRV_PACKAGE)),)
@@ -66,4 +69,6 @@ ifneq ($(and $(wildcard $(VIDEODRV_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKE
   $(eval $(call SPK_BASE_TEMPLATE,VIDEODRV))
 else
   DEPENDS += $(VIDEODRV_DEPENDS)
+endif
+
 endif
