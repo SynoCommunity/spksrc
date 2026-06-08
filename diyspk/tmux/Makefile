@@ -1,5 +1,5 @@
 SPK_NAME = tmux
-SPK_VERS = 3.6a
+SPK_VERS = 3.6b
 SPK_REV = 1
 SPK_ICON = src/tmux.png
 

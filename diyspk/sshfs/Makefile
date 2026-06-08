@@ -1,5 +1,5 @@
-SPK_NAME = sshfs3
-SPK_VERS = 3.7.5
+SPK_NAME = sshfs
+SPK_VERS = 3.7.6
 SPK_REV = 1
 
 DEPENDS = cross/sshfs

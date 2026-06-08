@@ -1,5 +1,5 @@
 PKG_NAME = tmux
-PKG_VERS = 3.6a
+PKG_VERS = 3.6b
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tmux/tmux/releases/download/$(PKG_VERS)
@@ -8,8 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/ncursesw cross/libevent
 
 HOMEPAGE = https://github.com/tmux/tmux/wiki
-COMMENT  = tmux is a terminal multiplexer, it enables a number of terminals or windows to be accessed and controlled from a single terminal. tmux is intended to be a simple, modern, BSD-licensed alternative to programs such as GNU screen.
-LICENSE  = BSD License
+COMMENT = tmux is a terminal multiplexer, it enables a number of terminals or windows to be accessed and controlled from a single terminal. tmux is intended to be a simple, modern, BSD-licensed alternative to programs such as GNU screen.
+LICENSE = BSD License
 
 GNU_CONFIGURE = 1
 
