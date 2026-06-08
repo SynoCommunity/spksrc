@@ -1,5 +1,5 @@
 PKG_NAME = x265
-PKG_VERS = 4.1
+PKG_VERS = 4.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://bitbucket.org/multicoreware/x265_git/downloads
@@ -43,7 +43,7 @@ endif
 
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 # asm code for HIGH_BIT_DEPTH is not compatible with 32-bit archs
-CMAKE_ARGS_BITLIB += -DENABLE_ASSEMBLY=OFF
+CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
 endif
 
 
@@ -52,14 +52,12 @@ endif
 #    https://github.com/SynoCommunity/spksrc/issues/6597
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DENABLE_PIC=ON
+CMAKE_ARGS += -DNO_ATOMICS=ON
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 CMAKE_ARGS += -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
 endif
-
-
-include ../../mk/spksrc.cross-cmake.mk
 
 # gcc version above 4.8 required to support hdr10plus
 ifeq ($(call version_le, $(TC_GCC), 4.8),1)
@@ -68,6 +66,12 @@ else
 CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
 PLIST_TRANSFORM = cat
 endif
+
+ifeq ($(call version_le, $(TC_GCC), 5),1)
+ADDITIONAL_CXXFLAGS += -Wno-missing-field-initializers
+endif
+
+include ../../mk/spksrc.cross-cmake.mk
 
 .PHONY: x265_pre_configure
 x265_pre_configure: $(CMAKE_TOOLCHAIN_FILE_PKG)
