@@ -1,77 +1,90 @@
 ###############################################################################
 # mk/spksrc.common/stage0.mk
 #
-# Bootstraps minimal toolchain variables before any build stage runs.
+# Bootstraps the toolchain and its environment definitions BEFORE a package's
+# DEPENDS are parsed, so that version_ge($(TC_GCC),...) gated dependencies
+# (shaderc, vulkan, numpy, ...) are evaluated against a real GCC version
+# instead of an empty TC_GCC. This applies to BOTH cross/ packages (cross-cc.mk)
+# and spk/ packages (spk.mk) -- the latter resolve their meta DEPENDS at parse.
 #
-# This file:
-#  - generates $(WORK_DIR)/tc_vars.mk via the toolchain's tc_vars target
-#    when no explicit goal is specified (i.e. before stage1 / stage2)
-#  - skips generation for noarch packages or when the TC is already set
-#  - includes the generated tc_vars.mk (silently, with -include)
+# For the very first package built in a cold tree the toolchain is not yet
+# extracted, so `<cross>-gcc -dumpversion` returns an EMPTY TC_GCC. This file
+# reproduces stage1's two calls (see mk/spksrc.cross-cc.mk) early enough for
+# the DEPENDS parse:
+#   1. build/extract the toolchain into its OWN work dir (target: toolchain)
+#   2. generate tc_vars*.mk into THIS package's WORK_DIR    (target: tcvars)
+# then -include the generated $(WORK_DIR)/tc_vars.mk (provides TC_GCC, ...).
 #
-# Variables produced (via tc_vars.mk):
-#  TC_GCC   : GCC version used by the toolchain
-#  TC_VERS  : toolchain version string
-#  TC_ARCH  : target CPU architecture
-#  (and other toolchain-specific variables exported by tc_vars)
+# Both sub-makes are idempotent (cookie-guarded): once the toolchain is built
+# and tc_vars generated, they are no-ops.
 #
-# Notes:
-#  - Generation is guarded by MAKECMDGOALS == "" to avoid re-running
-#    during explicit sub-targets (stage1, stage2, clean, …)
-#  - Also guarded against running in toolchain directory which actually
-#    means we're in stage1 and could comtaminate resulting toolchain install
-#  - The -include directive makes the file optional; a missing tc_vars.mk
-#    is silently ignored (TC not yet built)
-#  - STAGE0_DONE sentinel file is touched after generation
+# Guards:
+#  - ARCH set and not noarch (or TCVERSION set).
+#  - NOT building inside the toolchain directory: when stage0 spawns the
+#    `toolchain`/`tcvars` sub-makes, their CURDIR contains "toolchain", so this
+#    guard makes stage0 a no-op there -> no recursion, no contamination. (This
+#    is also why we do NOT guard on `$(TC)`: spk.mk sets TC before including
+#    common.mk, and guarding on it would wrongly skip stage0 for every spk,
+#    leaving their TC_GCC-gated DEPENDS empty at parse.)
+#  - Bootstrap (the heavy sub-makes) only runs when no explicit build goal is
+#    given (MAKECMDGOALS empty, or only dependency-% recipes) and STAGE0_DONE is
+#    absent. The real build reaches the package parse via `$(MAKE) ARCH=.. TCVERSION=..`
+#    with NO goal (mk/spksrc.supported.mk build-arch-%), so the bootstrap fires.
+#  - tc_vars.mk is -included unconditionally (broad) so the parse sees TC_GCC
+#    whenever it has already been generated, regardless of goal.
+#
+# Important:
+#  - Do NOT override MSG (e.g. `MSG=`). MSG defaults to `echo "===> "`; blanking
+#    it turns the toolchain_msg recipe line `$(MSG) "Preparing toolchain..."`
+#    into a bare `"Preparing toolchain..."`, which the shell tries to EXECUTE as
+#    a command -> Error 127, aborting the toolchain build before anything is
+#    downloaded/extracted. On a populated tree the toolchain cookie already
+#    exists so toolchain_msg never runs, which is why this stayed hidden on CI.
+#  - The sub-make stdout is redirected to stderr (`>&2`), NOT captured. $(shell)
+#    only captures fd 1, so sending the build output to fd 2 keeps it out of the
+#    makefile parse (no injection / broken parse) while still showing it on the
+#    console and in the build logs. (Using `>/dev/null` would also keep the parse
+#    safe but would hide the toolchain build progress from the console.)
+#  - STAGE0_DONE is only touched once TC_GCC actually resolved; otherwise it is
+#    left unmarked so the next invocation retries instead of freezing an empty
+#    TC_GCC.
 #
 ###############################################################################
 
+# stage0-private sentinel (no collision with the toolchain namespace)
 STAGE0_DONE := $(WORK_DIR)/.stage0-tcvars_done
-TC_VARS_MK := $(WORK_DIR)/tc_vars.mk
 
-# Load toolchain variables early (provides TC_GCC, TC_VERS, TC_ARCH etc.)
-# - if ARCH and TCVERSION are set and is not noarch
-# - if MAKECMDGOALS is empty, thus prior to stage1 or stage2 (unless called from dependency-* recipes)
-# - if TC does not exists then tc_vars.mk is not generated yet
-# - do not print info msg if called from dependency-* recipes
 ifneq ($(filter-out noarch,$(ARCH))$(TCVERSION),)
-ifeq ($(filter-out dependency-%,$(MAKECMDGOALS)),)
 ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
-ifeq ($(TC),)
+
+# Toolchain-namespace vars -- defined INSIDE the "not in toolchain dir" guard so
+# they can never clobber spksrc.toolchain.mk's own definitions during a toolchain
+# build (there ARCH/TCVERSION are empty -> a bogus syno--/work path; and TC_WORK_DIR
+# in particular is `?=` there, so it would keep our wrong value).
+TC_VARS_MK  := $(WORK_DIR)/tc_vars.mk
+TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
+
+# Bootstrap (heavy) only when no explicit build goal and not yet done
+ifeq ($(filter-out dependency-%,$(MAKECMDGOALS)),)
 ifeq ($(wildcard $(STAGE0_DONE)),)
-  ifeq ($(filter dependency-%,$(MAKECMDGOALS)),)
-    $(info ===> Generating $(TC_VARS_MK) (stage0))
+  ifeq ($(wildcard $(TC_VARS_MK)),)
+    $(info ===> Bootstrapping toolchain for $(ARCH)-$(TCVERSION) (stage0))
   endif
   $(shell mkdir -p $(WORK_DIR))
-  # Make sure the cross toolchain is actually extracted BEFORE reading tc_vars: the
-  # tc_vars target derives TC_GCC by running `<cross>-gcc -dumpversion`, which returns
-  # an EMPTY TC_GCC when the toolchain binaries are not unpacked yet. For the very first
-  # package built in a clean tree the toolchain is still cold at this point, so an empty
-  # TC_GCC would silently drop every version_gt($(TC_GCC),...) gated DEPENDS (shaderc,
-  # vulkan, opencl, ...). Reproduce stage1 here (it is cookie-guarded -> no-op once the
-  # toolchain is built): first build/extract the toolchain into its own work dir, then
-  # generate the tc_vars*.mk set into this package WORK_DIR -- exactly the two calls
-  # cross-cc.mk / spk.mk used to do at stage1, but early enough for the DEPENDS parse.
-  # `tcvars` WRITES $(WORK_DIR)/tc_vars*.mk itself (it does not echo to stdout like the
-  # `tc_vars` target), so no `> file` redirection. stdout is sent to /dev/null only to
-  # keep the sub-make's output from being captured by $(shell) and injected into this
-  # makefile (which would break the parse); stderr is left ALONE so real toolchain
-  # build/extract errors stay visible in the build log.
-  TC_WORK_DIR := $(abspath $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/work)
-  $(shell $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) MSG= toolchain >/dev/null)
-  $(shell $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) MSG= tcvars >/dev/null)
-  $(eval -include $(TC_VARS_MK))
-  # Only mark stage0 done once TC_GCC actually resolved (the toolchain gcc was present).
-  # Otherwise leave it UNMARKED so the next make invocation regenerates, instead of
-  # freezing an empty TC_GCC that would silently drop every version_gt($(TC_GCC),...)
-  # gated DEPENDS for the very first package built in a cold tree.
-  ifneq ($(strip $(TC_GCC)),)
-  $(shell touch $(STAGE0_DONE))
-  endif
-endif
-endif
-endif
+  $(shell $(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) toolchain >&2)
+  $(shell $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION) tcvars >&2)
 endif
 endif
 
--include $(WORK_DIR)/tc_vars.mk
+# Load toolchain variables for the parse (provides TC_GCC, TC_VERS, ...)
+-include $(TC_VARS_MK)
+
+# Checkpoint once TC_GCC actually resolved so the bootstrap is not retried
+ifeq ($(wildcard $(STAGE0_DONE)),)
+ifneq ($(strip $(TC_GCC)),)
+  $(shell touch $(STAGE0_DONE))
+endif
+endif
+
+endif
+endif
