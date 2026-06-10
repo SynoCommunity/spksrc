@@ -16,6 +16,7 @@ lnk:bin/jinfo
 lnk:bin/jlink
 lnk:bin/jmap
 lnk:bin/jmod
+lnk:bin/jnativescan
 lnk:bin/jpackage
 lnk:bin/jps
 lnk:bin/jrunscript
@@ -50,9 +51,9 @@ rsc:jvm/openjdk-25.0.3/jmods/java.net.http.jmod
 rsc:jvm/openjdk-25.0.3/jmods/java.prefs.jmod
 rsc:jvm/openjdk-25.0.3/jmods/java.rmi.jmod
 rsc:jvm/openjdk-25.0.3/jmods/java.scripting.jmod
+rsc:jvm/openjdk-25.0.3/jmods/java.se.jmod
 rsc:jvm/openjdk-25.0.3/jmods/java.security.jgss.jmod
 rsc:jvm/openjdk-25.0.3/jmods/java.security.sasl.jmod
-rsc:jvm/openjdk-25.0.3/jmods/java.se.jmod
 rsc:jvm/openjdk-25.0.3/jmods/java.smartcardio.jmod
 rsc:jvm/openjdk-25.0.3/jmods/java.sql.jmod
 rsc:jvm/openjdk-25.0.3/jmods/java.sql.rowset.jmod
@@ -146,6 +147,8 @@ lib:jvm/openjdk-25.0.3/lib/libprefs.so
 lib:jvm/openjdk-25.0.3/lib/librmi.so
 lib:jvm/openjdk-25.0.3/lib/libsaproc.so
 lib:jvm/openjdk-25.0.3/lib/libsctp.so
+lib:jvm/openjdk-25.0.3/lib/libsimdsort.so
+lib:jvm/openjdk-25.0.3/lib/libsleef.so
 lib:jvm/openjdk-25.0.3/lib/libsyslookup.so
 lib:jvm/openjdk-25.0.3/lib/libverify.so
 lib:jvm/openjdk-25.0.3/lib/libzip.so

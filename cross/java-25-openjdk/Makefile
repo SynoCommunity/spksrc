@@ -1,7 +1,7 @@
 PKG_NAME       = java-25-openjdk
 JAVA_REPO_NAME = jdk25u
 JAVA_NAME      = jdk
-JAVA_RELEASE   = 8
+JAVA_RELEASE   = 9
 JAVA_VERSION   = 25.0.3
 PKG_VERS       = $(JAVA_VERSION).$(JAVA_RELEASE)
 PKG_EXT        = tar.gz
@@ -9,8 +9,16 @@ PKG_DIST_NAME  = $(JAVA_NAME)-$(JAVA_VERSION)+$(JAVA_RELEASE).$(PKG_EXT)
 PKG_DIST_SITE  = https://github.com/openjdk/jdk25u/archive
 PKG_DIR        = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 
+# gcc < 10.0 is not officially supported
+# DSM 7.1 toolchain: WARNING: You are using gcc 8.5.0 which is older than 10.0. This is not a supported configuration.
+REQUIRED_MIN_DSM = 7.2
+REQUIRED_MIN_DSM = 1.3
+# Java 25 does not support 32 bit architectures
+# if we really want it, we could try the debian patches for 32-bit support
+UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+
 # build instructions:
-# https://openjdk.java.net/groups/build/doc/building.html
+# https://github.com/openjdk/jdk/blob/master/doc/building.md
 
 BUILD_DEPENDS  = native/openjdk-25
 # Dependencies required at build time only:
@@ -21,11 +29,6 @@ BUILD_DEPENDS += cross/libXrender
 BUILD_DEPENDS += cross/libXrandr
 BUILD_DEPENDS += cross/libXtst
 BUILD_DEPENDS += cross/libXt
-
-# REMARKS:
-# for a (currently) unknown reason, building in the cross folder fails
-# - it does not find system libraries like libjpeg, libpng, ...
-# but building as package dependency in the spk folder works.
 
 # Dependencies used as system dependencies:
 DEPENDS  = cross/alsa-lib
@@ -84,11 +87,11 @@ CONFIGURE_ARGS += NM=$(TC_PATH)/$(TC_PREFIX)nm
 CONFIGURE_ARGS += OBJCOPY=$(TC_PATH)/$(TC_PREFIX)objcopy
 CONFIGURE_ARGS += OBJDUMP=$(TC_PATH)/$(TC_PREFIX)objdump
 
-# Build images twice, second time with newly built JDK
-COMPILE_MAKE_OPTIONS += product-images
+# Build image twice, second time with newly built JDK
+COMPILE_MAKE_OPTIONS += jdk-image
 
 # debian patches
-# https://udd.debian.org/patches.cgi?src=openjdk-25&version=25.0.5%2B11-1
+# https://udd.debian.org/patches.cgi?src=openjdk-25&version=25.0.3%2B9-2~deb13u1
 PATCHES_LEVEL = 1
 
 # Filter out any -jN since java's configure will autodetect number of CPU's
@@ -98,19 +101,13 @@ COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 
-ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-# force cross compilation
-CONFIGURE_ARGS += --build=x86_64-pc-linux-gnu
-#PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
-
-# ABI profile for ARM builds:
-#   arm-vfp-sflt, arm-vfp-hflt, arm-sflt, armv5-vfp-sflt, armv6-vfp-hflt, aarch64
-else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --with-abi-profile=aarch64
-# PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d'
-else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --with-abi-profile=arm-vfp-hflt
-# PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/server\/classes/d' -e '/jmods\/jdk.internal.vm/d'
+# remove targets not created for aarch64
+PLIST_TRANSFORM = sed -e '/lib\/libjsvml/d' -e '/lib\/libsimdsort/d' -e '/lib\/server\/classes/d'
+else
+# remove targets not created for x64
+PLIST_TRANSFORM = sed -e '/lib\/libsleef/d'
 endif
 
 .PHONY: java-25-openjdk_pre_configure
@@ -118,10 +115,10 @@ java-25-openjdk_pre_configure:
 	@$(MSG) "- Make configure script executable"
 	@cd $(WORK_DIR)/$(PKG_DIR) && chmod +x ./configure
 
-JDK_IMAGE_DIR=$(WORK_DIR)/$(PKG_DIR)/build/linux-x86_64-server-release/images/jdk
+JDK_IMAGE_DIR=$(WORK_DIR)/$(PKG_DIR)/build/linux-*-server-release/images/jdk
 .PHONY: java-25-openjdk_install
 java-25-openjdk_install:
-	@$(MSG) "- Copy jdk image to JDK_IMAGE_DIR"
+	@$(MSG) "- Install jdk"
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@cp -rpf $(JDK_IMAGE_DIR)/* $(STAGING_INSTALL_PREFIX)/jvm/openjdk-$(JAVA_VERSION)/
 	@$(MSG) "- Link binaries into bin folder"

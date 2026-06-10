@@ -1,5 +1,5 @@
 SPK_NAME = java-25-openjdk
-JAVA_RELEASE = 8
+JAVA_RELEASE = 9
 JAVA_VERSION = 25.0.3
 SPK_VERS = $(JAVA_VERSION).$(JAVA_RELEASE)
 SPK_REV = 1
@@ -7,10 +7,11 @@ SPK_ICON = src/java-openjdk.png
 
 DEPENDS = cross/java-25-openjdk
 
-# gcc >= 5.0 required
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
+# gcc < 10.0 is not officially supported
+REQUIRED_MIN_DSM = 7.2
 REQUIRED_MIN_SRM = 1.3
+# 32 bit archs are not supported
+UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = OpenJDK version $(JAVA_VERSION)+$(JAVA_RELEASE). OpenJDK 25 is the open-source reference implementation of version 25 of the Java SE Platform as specified by JSR 400 in the Java Community Process.
@@ -40,6 +41,7 @@ SPK_COMMANDS += bin/jinfo
 SPK_COMMANDS += bin/jlink
 SPK_COMMANDS += bin/jmap
 SPK_COMMANDS += bin/jmod
+SPK_COMMANDS += bin/jnativescan
 SPK_COMMANDS += bin/jpackage
 SPK_COMMANDS += bin/jps
 SPK_COMMANDS += bin/jrunscript
