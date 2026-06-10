@@ -12,7 +12,7 @@ PKG_DIR        = $(JAVA_REPO_NAME)-$(JAVA_NAME)-$(JAVA_VERSION)-$(JAVA_RELEASE)
 # gcc < 10.0 is not officially supported
 # DSM 7.1 toolchain: WARNING: You are using gcc 8.5.0 which is older than 10.0. This is not a supported configuration.
 REQUIRED_MIN_DSM = 7.2
-REQUIRED_MIN_DSM = 1.3
+REQUIRED_MIN_DSM = 1.3
 # Java 25 does not support 32 bit architectures
 # if we really want it, we could try the debian patches for 32-bit support
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)
@@ -20,8 +20,8 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 # build instructions:
 # https://github.com/openjdk/jdk/blob/master/doc/building.md
 
-BUILD_DEPENDS  = native/openjdk-25
 # Dependencies required at build time only:
+BUILD_DEPENDS  = native/openjdk-25
 BUILD_DEPENDS += cross/cups
 BUILD_DEPENDS += cross/alsa-lib
 BUILD_DEPENDS += cross/libX11
@@ -70,6 +70,8 @@ CONFIGURE_ARGS += --with-freetype-lib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
 CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
 CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
+CONFIGURE_ARGS += --disable-dtrace
+CONFIGURE_ARGS += --disable-precompiled-headers
 
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
