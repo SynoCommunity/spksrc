@@ -11,9 +11,25 @@ GROUP="sc-download"
 # These could change depending on previous package settings
 SERVICE_COMMAND="${NZBGET} -c ${CFG_FILE} -o WebDir=${WEBDIR} -o LockFile=${PID_FILE} -D"
 
+validate_preinst ()
+{
+    # For specific version only: verify the release exists before installation begins.
+    if [ -n "${wizard_specific_release}" ] && [ "${wizard_specific_release}" = true ]; then
+        if [ -z "${wizard_specific_release_version}" ]; then
+            echo "No version specified. Please enter a version number."
+            exit 1
+        fi
+        wget --quiet --spider "https://github.com/nzbgetcom/nzbget/releases/download/v${wizard_specific_release_version}/nzbget-${wizard_specific_release_version}-bin-linux.run"
+        if [ $? -ne 0 ]; then
+            echo "NZBGet version ${wizard_specific_release_version} not found. Please verify the version exists at https://github.com/nzbgetcom/nzbget/releases"
+            exit 1
+        fi
+    fi
+}
+
 service_postinst ()
 {
-    # Download current NZBGet (stable or testing)
+    # Download current NZBGet (stable, testing, or specific version)
     if [ -n "${wizard_stable_release}" ] && [ "${wizard_stable_release}" = true ]; then
         echo "Download nzbget installer: latest"
         wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.com/download/nzbget-latest-bin-linux.run"
@@ -21,6 +37,10 @@ service_postinst ()
     if [ -n "${wizard_testing_release}" ] && [ "${wizard_testing_release}" = true ]; then
         echo "Download nzbget installer: latest-testing"
         wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.com/download/nzbget-latest-testing-bin-linux.run"
+    fi
+    if [ -n "${wizard_specific_release}" ] && [ "${wizard_specific_release}" = true ]; then
+        echo "Download nzbget installer: ${wizard_specific_release_version}"
+        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://github.com/nzbgetcom/nzbget/releases/download/v${wizard_specific_release_version}/nzbget-${wizard_specific_release_version}-bin-linux.run"
     fi
 
     # Abort if download failed
