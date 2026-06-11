@@ -1,0 +1,28 @@
+# fix openssl library version
+# e.g. print "3.5.6" instead of "3.5.0f"
+# 
+--- src/FeatureConfig.cc.orig	2023-11-15 09:49:41.000000000 +0000
++++ src/FeatureConfig.cc	2026-06-10 18:31:44.674599606 +0000
+@@ -214,11 +214,17 @@
+   res += "GnuTLS/" GNUTLS_VERSION " ";
+ #endif // HAVE_LIBGNUTLS
+ #ifdef HAVE_OPENSSL
+-  res += fmt("OpenSSL/%ld.%ld.%ld", OPENSSL_VERSION_NUMBER >> 28,
+-             (OPENSSL_VERSION_NUMBER >> 20) & 0xff,
+-             (OPENSSL_VERSION_NUMBER >> 12) & 0xff);
+-  if ((OPENSSL_VERSION_NUMBER >> 4) & 0xff) {
+-    res += 'a' + ((OPENSSL_VERSION_NUMBER >> 4) & 0xff) - 1;
++  if ((OPENSSL_VERSION_NUMBER >> 28) > 1) {
++    res += fmt("OpenSSL/%ld.%ld.%ld", OPENSSL_VERSION_NUMBER >> 28,
++               (OPENSSL_VERSION_NUMBER >> 20) & 0xff,
++               (OPENSSL_VERSION_NUMBER >> 4) & 0xff);
++  } else {
++    res += fmt("OpenSSL/%ld.%ld.%ld", OPENSSL_VERSION_NUMBER >> 28,
++               (OPENSSL_VERSION_NUMBER >> 20) & 0xff,
++               (OPENSSL_VERSION_NUMBER >> 12) & 0xff);
++    if ((OPENSSL_VERSION_NUMBER >> 4) & 0xff) {
++      res += 'a' + ((OPENSSL_VERSION_NUMBER >> 4) & 0xff) - 1;
++    }
+   }
+   res += " ";
+ #endif // HAVE_OPENSSL
