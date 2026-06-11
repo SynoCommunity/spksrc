@@ -158,7 +158,9 @@ rsc:jvm/openjdk-25.0.3/lib/psfontj2d.properties
 rsc:jvm/openjdk-25.0.3/lib/security/blocked.certs
 rsc:jvm/openjdk-25.0.3/lib/security/cacerts
 rsc:jvm/openjdk-25.0.3/lib/security/public_suffix_list.dat
+rsc:jvm/openjdk-25.0.3/lib/server/classes_coh.jsa
 rsc:jvm/openjdk-25.0.3/lib/server/classes.jsa
+rsc:jvm/openjdk-25.0.3/lib/server/classes_nocoops_coh.jsa
 rsc:jvm/openjdk-25.0.3/lib/server/classes_nocoops.jsa
 lib:jvm/openjdk-25.0.3/lib/server/libjsig.so
 lib:jvm/openjdk-25.0.3/lib/server/libjvm.so
