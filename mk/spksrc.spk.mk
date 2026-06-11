@@ -569,7 +569,7 @@ spkclean:
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
-	       work-*/.stage0-tcvars_done \
+	       work-*/.stage0-bootstrap_done \
 	       work-*/.stage1-tcvars_done \
 	       work-*/.stage1-tkvars_done \
 	       work-*/.wheel_done \
