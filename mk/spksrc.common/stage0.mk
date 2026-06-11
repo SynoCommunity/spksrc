@@ -46,11 +46,13 @@
 # them -> every cmake/autotools dependant breaks (libpng "Could NOT find
 # ZLIB", IGC "Could NOT find SPIRVLLVMTranslator", ...).
 #
-# Guards: ARCH non-noarch (or TCVERSION set); skipped inside toolchain/
-# (recursion; do NOT guard on $(TC): spk.mk sets it before common.mk);
-# bootstrap only fires on empty MAKECMDGOALS (or dependency-%), which is how
-# the real build parses packages (supported.mk build-arch-%). Native builds
-# run under `env -i` (depend.mk) -> ARCH empty -> excluded.
+# Guards: ARCH non-noarch AND TCVERSION both required (a sub-make carrying
+# TCVERSION alone would derive a bogus toolchain/syno--<vers> work path and
+# attempt to bootstrap it); skipped inside toolchain/ (recursion; do NOT
+# guard on $(TC): spk.mk sets it before common.mk); bootstrap only fires on
+# empty MAKECMDGOALS (or dependency-%), which is how the real build parses
+# packages (supported.mk build-arch-%). Native builds run under `env -i`
+# (depend.mk) -> ARCH empty -> excluded.
 #
 # Gotchas: never pass MSG= to the sub-make (a blank MSG turns recipe message
 # lines into shell commands -> Error 127 before anything is extracted). The
@@ -59,7 +61,8 @@
 #
 ###############################################################################
 
-ifneq ($(filter-out noarch,$(ARCH))$(TCVERSION),)
+ifneq ($(strip $(filter-out noarch,$(ARCH))),)
+ifneq ($(strip $(TCVERSION)),)
 ifeq ($(filter toolchain,$(subst /, ,$(CURDIR))),)
 
 # Toolchain-namespace vars -- defined INSIDE the "not in toolchain dir" guard so
@@ -84,5 +87,6 @@ endif
 # Load toolchain-identity variables for the parse (TC_GCC, TC_VERS, ...)
 -include $(TC_WORK_DIR)/tc_vars.mk
 
+endif
 endif
 endif

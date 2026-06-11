@@ -70,6 +70,7 @@ done
 # actual installation state of cargo/rust within the distrib folder.
 rm -f toolchain/syno-${GH_ARCH}/work/.toolchain*_done
 rm -f toolchain/syno-${GH_ARCH}/work/.stage[01]-*_done
+rm -f toolchain/syno-${GH_ARCH}/work/tc_vars.*
 
 # ===========================================================================
 # 2. Select packages to build for this arch
