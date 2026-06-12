@@ -74,9 +74,13 @@ SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 # spksrc.wheel-env.mk or spksrc.spk-meta.mk
 ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
-ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
+# BORG_LIBLZ4_PREFIX: prefer the Python install prefix (where lz4 was
+# installed during stage-1), fall back to own staging prefix.
+_prefixed := $(abspath $(WORK_DIR)/../../../spk/$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION)/install/var/packages/$(PYTHON_PACKAGE)/target)
+ENV += BORG_LIBLZ4_PREFIX=$(or $(wildcard $(_prefixed)),$(STAGING_INSTALL_PREFIX))
+ENV += PKG_CONFIG_PATH=$(or $(wildcard $(_prefixed)/lib/pkgconfig),$(STAGING_INSTALL_PREFIX)/lib/pkgconfig)
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_INSTALL_PREFIX)"
 
 # [borgbackup]
