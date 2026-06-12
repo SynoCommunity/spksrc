@@ -1,9 +1,9 @@
-# Generated using the requirements script on May 15, 2026
+# Generated using the requirements script on June 12, 2026
 # Command: ./generate_requirements.sh "-r requirements.txt" 314
 
 cffi==2.0.0
 charset_normalizer==3.4.7
-#cryptography==48.0.0       ==> supported version depends on rust version
+#cryptography==48.0.1       ==> supported version depends on rust version
 ct3==3.4.0.post5
 #orjson==3.11.8             ==> supported version depends on rust version
 pyyaml==6.0.3
