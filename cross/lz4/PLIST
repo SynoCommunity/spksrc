@@ -1,3 +1,6 @@
+rsc:include/lz4.h
+rsc:include/lz4hc.h
+rsc:include/lz4frame.h
 lnk:lib/liblz4.so
 lnk:lib/liblz4.so.1
 lib:lib/liblz4.so.1.10.0
