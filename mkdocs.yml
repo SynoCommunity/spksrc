@@ -1,6 +1,6 @@
-site_name: spksrc Documentation
-site_description: Cross-compilation framework for building Synology NAS packages
-site_url: https://synocommunity.github.io/spksrc/
+site_name: SynoCommunity Documentation
+site_description: Documentation for building and contributing Synology NAS packages with SynoCommunity
+site_url: https://docs.synocommunity.com/
 repo_url: https://github.com/SynoCommunity/spksrc
 repo_name: SynoCommunity/spksrc
 edit_uri: edit/master/docs/
@@ -22,17 +22,23 @@ theme:
     - content.tabs.link
   palette:
     - scheme: default
-      primary: blue
-      accent: blue
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: blue
-      accent: blue
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  font:
+    text: Helvetica Neue, Arial, sans-serif
+    code: Roboto Mono
+
+extra_css:
+  - stylesheets/custom.css
 
 plugins:
   - search

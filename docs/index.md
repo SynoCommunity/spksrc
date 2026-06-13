@@ -1,8 +1,6 @@
-# spksrc Documentation
+# SynoCommunity Documentation
 
-Welcome to the documentation for **spksrc**, the cross-compilation framework for building Synology NAS packages.
-
-spksrc powers the [SynoCommunity](https://synocommunity.com) package repository, providing hundreds of community-maintained packages for Synology DiskStation and RackStation devices.
+Welcome to the documentation for **SynoCommunity**, home of [spksrc](https://github.com/SynoCommunity/spksrc) — the cross-compilation framework that powers the SynoCommunity package repository, providing hundreds of community-maintained packages for Synology DiskStation and RackStation devices.
 
 ## Quick Links
 
@@ -36,7 +34,7 @@ spksrc powers the [SynoCommunity](https://synocommunity.com) package repository,
 
 ## What is spksrc?
 
-spksrc is a cross-compilation framework that:
+spksrc is the cross-compilation framework behind SynoCommunity's packages. It:
 
 - **Builds software** for multiple CPU architectures (x64, ARM, PowerPC)
 - **Packages applications** as SPK files installable via Synology Package Center
@@ -57,4 +55,4 @@ spksrc is a cross-compilation framework that:
 
 ## Contributing
 
-spksrc is open source and welcomes contributions. See our [Contributing Guide](contributing/index.md) to get started.
+SynoCommunity is open source and welcomes contributions. See our [Contributing Guide](contributing/index.md) to get started.
