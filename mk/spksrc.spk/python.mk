@@ -40,5 +40,9 @@ else
   export PYTHON_PACKAGE
   export PYTHON_PACKAGE_DIR
   BUILD_DEPENDS := $(call uniq,$(PYTHON_DEPENDS) $(BUILD_DEPENDS))
-  SPK_DEPENDS := $(call dedup,$(PYTHON_PACKAGE):$(SPK_DEPENDS),:)
+  # Only prepend bare python package if SPK_DEPENDS doesn't already have
+  # an entry for it (e.g. with a version constraint like python314>=3.14.5-4)
+  ifeq ($(filter $(PYTHON_PACKAGE) $(PYTHON_PACKAGE)=% $(PYTHON_PACKAGE)<% $(PYTHON_PACKAGE)>%,$(subst :, ,$(subst ",,$(SPK_DEPENDS)))),)
+    SPK_DEPENDS := $(call dedup,$(PYTHON_PACKAGE):$(SPK_DEPENDS),:)
+  endif
 endif
