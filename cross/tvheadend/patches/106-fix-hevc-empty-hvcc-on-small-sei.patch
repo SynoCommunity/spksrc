@@ -1,0 +1,52 @@
+From: Vincent Fortier <th0ma7@gmail.com>
+Date: Mon, 01 Jun 2026
+Subject: [PATCH] parsers/hevc: don't drop the whole hvcC when an optional SEI fails
+
+isom_write_hvcc() builds the HEVC configuration record (hvcC) by feeding each
+parameter-set NAL to hvcc_add_nal_unit(). VPS, SPS, PPS and SEI shared the same
+error path: any hvcc_add_nal_unit() failure did "goto end", skipping hvcc_write()
+and producing an EMPTY hvcC.
+
+hevc_qsv emits a very small (~6 byte) prefix SEI NAL that hvcc_add_nal_unit()
+rejects, so the entire hvcC came out empty. In a transcoded stream this means the
+MKV CodecPrivate / MP4 hvcC is 0 bytes: the HEVC track carries no decoder config,
+players fall back to in-band parameter sets (or fail outright) -> "audio only".
+hevc_vaapi emits a larger SEI that happens to parse, so it was unaffected.
+
+Confirmed by tracing isom_write_hvcc():
+  hevc_qsv:   add VPS ret=0, add SPS ret=0, add PPS ret=0, add SEI(len=6) ret=-1
+              -> hvcc_write never reached -> CodecPrivate=0
+  hevc_vaapi: add VPS/SPS/PPS/SEI(len=76) all ret=0 -> CodecPrivate=206
+
+SEI is optional in the hvcC. Keep VPS/SPS/PPS mandatory (bail on failure), but add
+SEI on a best-effort basis and ignore failures, so a malformed/tiny SEI no longer
+discards the configuration record. h264 (avcC) is unaffected.
+
+Suggested-by: Claude Opus 4.8 (Anthropic AI <https://anthropic.com>)
+Signed-off-by: Vincent Fortier <th0ma7@gmail.com>
+
+--- src/parsers/parser_hevc.c.orig	2026-05-19 20:37:17.000000000 +0000
++++ src/parsers/parser_hevc.c	2026-06-01 11:45:00.000000000 +0000
+@@ -1164,12 +1164,20 @@
+         case HEVC_NAL_VPS:
+         case HEVC_NAL_SPS:
+         case HEVC_NAL_PPS:
+-        case HEVC_NAL_SEI_PREFIX:
+-        case HEVC_NAL_SEI_SUFFIX:
++            /* VPS/SPS/PPS are mandatory: a parse failure means we cannot build a
++             * valid hvcC, so bail out. */
+             ret = hvcc_add_nal_unit(buf, len, &hvcc);
+             if (ret < 0)
+                 goto end;
+             break;
++        case HEVC_NAL_SEI_PREFIX:
++        case HEVC_NAL_SEI_SUFFIX:
++            /* SEI is optional in the hvcC. Some encoders (notably hevc_qsv) emit a
++             * tiny SEI NAL that hvcc_add_nal_unit() rejects; that must NOT discard
++             * the whole configuration record (which left an empty hvcC/CodecPrivate
++             * and an undecodable HEVC track). Add it best-effort and ignore errors. */
++            hvcc_add_nal_unit(buf, len, &hvcc);
++            break;
+         default:
+             break;
+         }

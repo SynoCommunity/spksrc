@@ -1,0 +1,139 @@
+From: Vincent Fortier <th0ma7@gmail.com>
+Date: Mon, 02 Jun 2026
+Subject: [PATCH] transcoding/qsv: derive and cache the QSV hw device (decode+encode)
+
+Origin of this change: investigation of a reported QSV transcoding startup
+latency (streams taking ~9-30s to begin vs ~2s for VAAPI). Instrumented timing
+plus gdb backtraces showed two things:
+
+  1. The bulk of the measured delay was a MEASUREMENT ARTIFACT of running
+     tvheadend under gdb with a breakpoint on vaCreateSurfaces: that breakpoint
+     fires once per allocated VA surface (hundreds of times during MFX init),
+     and each gdb stop/continue adds ~90ms, inflating a ~15ms operation to tens
+     of seconds. With no gdb, an A/B test showed qsv_decode_setup_context()
+     already completes in 6-16ms on the original code, so it is NOT a real
+     bottleneck and no "latency fix" is warranted.
+
+  2. While confirming the above, two genuine inefficiencies surfaced in the QSV
+     hwaccel setup: a brand-new QSV device was created via av_hwdevice_ctx_create
+     (.., "auto", ..) on EVERY get_format() call, for BOTH the decoder and the
+     encoder, and was never shared or cached. VAAPI, by contrast, opens its
+     device from ctx->hw_accel_device. The "auto" path also runs the full libvpl
+     dispatch each time.
+
+This change addresses (2) only: build the QSV device ONCE, derived from a VAAPI
+device (the Intel QSV runtime sits on top of VAAPI on this hardware), and cache
+it process-wide behind a tvh_mutex_t, handing out reference-counted copies to the
+decoder and the encoder. It falls back to the original "auto" device if
+derivation is unsupported, and is released in qsv_done(). The surface pool size
+is intentionally left at 32, matching the active VAAPI path (vaapi.c). No
+behavioural change beyond device sharing; it removes redundant device creations
+and gives decode+encode a single shared device.
+
+--- src/transcoding/transcode/hwaccels/qsv.c.orig
++++ src/transcoding/transcode/hwaccels/qsv.c
+@@ -32,6 +32,49 @@
+     AVBufferRef *hw_device_ref;
+ } TVHQSVContext;
+ 
++// Shared QSV hardware device, derived once from a VAAPI device and cached for
++// the lifetime of the process (see the patch header). The original code created
++// a fresh "auto" QSV device on every get_format() for both decode and encode;
++// here it is built once and reference-counted out to every user.
++static AVBufferRef *tvh_qsv_device_cache = NULL;
++static tvh_mutex_t tvh_qsv_device_lock = TVH_THREAD_MUTEX_INITIALIZER;
++
++// Return a new reference to the shared QSV device, creating it on first use.
++// On this hardware the Intel QSV runtime sits on top of VAAPI, so the device is
++// derived from a (cheap) VAAPI device; if derivation is unsupported we fall back
++// to the plain "auto" QSV device. Returns NULL on failure; the caller owns the ref.
++static AVBufferRef *
++tvh_qsv_device_get(const char *vaapi_device)
++{
++    AVBufferRef *ref = NULL, *vaapi_ref = NULL;
++    int err = 0;
++
++    tvh_mutex_lock(&tvh_qsv_device_lock);
++    if (!tvh_qsv_device_cache) {
++        err = av_hwdevice_ctx_create(&vaapi_ref, AV_HWDEVICE_TYPE_VAAPI,
++                                     (vaapi_device && *vaapi_device) ? vaapi_device : NULL,
++                                     NULL, 0);
++        if (err >= 0) {
++            err = av_hwdevice_ctx_create_derived(&tvh_qsv_device_cache,
++                                                 AV_HWDEVICE_TYPE_QSV, vaapi_ref, 0);
++            av_buffer_unref(&vaapi_ref);
++        }
++        if (err < 0) {
++            tvh_qsv_device_cache = NULL;
++            err = av_hwdevice_ctx_create(&tvh_qsv_device_cache,
++                                         AV_HWDEVICE_TYPE_QSV, "auto", NULL, 0);
++            tvhtrace_transcode(LST_QSV, "QSV device: %s",
++                               err < 0 ? "creation FAILED" : "created via 'auto' fallback");
++        } else {
++            tvhtrace_transcode(LST_QSV, "QSV device: derived from VAAPI (cached)");
++        }
++    }
++    if (tvh_qsv_device_cache)
++        ref = av_buffer_ref(tvh_qsv_device_cache);
++    tvh_mutex_unlock(&tvh_qsv_device_lock);
++    return ref;
++}
++
+ 
+ /* TVHQSVContext ============================================================= */
+ 
+@@ -144,21 +187,18 @@
+         tvherror_transcode(LST_QSV, "Decode: Failed to allocate QSV context (TVHQSVContext)");
+         return AVERROR(ENOMEM);
+     }
+-    // lifted from ffmpeg-6.1.1/doc/examples/vaapi_transcode.c line 237
+-    // 1. Create Device Context
+-    // Open QSV device and create an AVHWDeviceContext for it
+-    if ((ret = av_hwdevice_ctx_create(&self->hw_device_ref, AV_HWDEVICE_TYPE_QSV, "auto", NULL, 0))) {
+-        tvherror_transcode(LST_QSV, "Decode: Failed to Open QSV device and create an AVHWDeviceContext "
+-                            "with error code: %s", av_err2str(ret));
++    // 1. Obtain the shared (cached, VAAPI-derived) QSV device.
++    self->hw_device_ref = tvh_qsv_device_get(ctx->hw_accel_device);
++    if (!self->hw_device_ref) {
++        tvherror_transcode(LST_QSV, "Decode: Failed to obtain QSV device");
+         tvh_qsv_context_destroy(self);
+-        return ret;
++        return AVERROR(ENODEV);
+     }
+ 
+-    // lifted from ffmpeg-6.1.1/doc/examples/vaapi_transcode.c line 95
+     /* set hw_frames_ctx for decoder's AVCodecContext */
+     avctx->hw_device_ctx = av_buffer_ref(self->hw_device_ref);
+     if (!avctx->hw_device_ctx) {
+-        tvherror_transcode(LST_QSV, "Decode: Failed to create a hardware device reference using 'auto'");
++        tvherror_transcode(LST_QSV, "Decode: Failed to create a hardware device reference");
+         tvh_qsv_context_destroy(self);
+         return AVERROR(ENOMEM);
+     }
+@@ -330,11 +370,11 @@
+     // this is required in case encode is called twice
+     if (ctx->hw_device_octx)
+         av_buffer_unref(&ctx->hw_device_octx);
+-    // 1. Create Device Context
+-    // Open QSV device and create an AVHWDeviceContext for it
+-    if ((ret = av_hwdevice_ctx_create(&ctx->hw_device_octx, AV_HWDEVICE_TYPE_QSV, "auto", NULL, 0))) {
+-        tvherror_transcode(LST_QSV, "Encode: Failed to Open QSV device and create an AVHWDeviceContext"
+-                "Error code: %s",av_err2str(ret));
++    // 1. Share the cached (VAAPI-derived) QSV device with the decoder.
++    ctx->hw_device_octx = tvh_qsv_device_get(ctx->hw_accel_device);
++    if (!ctx->hw_device_octx) {
++        ret = AVERROR(ENODEV);
++        tvherror_transcode(LST_QSV, "Encode: Failed to obtain QSV device");
+         return ret;
+     }
+     avctx->hw_device_ctx = av_buffer_ref(ctx->hw_device_octx);
+@@ -378,5 +418,8 @@
+ void
+ qsv_done()
+ {
+-    /* nothing to do */
++    // Release the process-wide cached QSV device.
++    tvh_mutex_lock(&tvh_qsv_device_lock);
++    av_buffer_unref(&tvh_qsv_device_cache);
++    tvh_mutex_unlock(&tvh_qsv_device_lock);
+ }

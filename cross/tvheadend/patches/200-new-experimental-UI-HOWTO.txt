@@ -1,0 +1,9 @@
+Add experimental vue UI support from PR:
+https://github.com/tvheadend/tvheadend/pull/2098
+
+# Download patch and convert to -p0 format
+# Note: while filterdiff is more efficient it also remove the header, thus using sed in this case
+curl -L https://github.com/tvheadend/tvheadend/pull/2098.patch \
+    | sed -e 's?--- a/?--- ?1' \
+          -e 's?+++ b/?+++ ?1' \
+    > 201-new-experimental-UI.patch

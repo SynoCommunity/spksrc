@@ -1,5 +1,5 @@
 PKG_NAME = OpenBLAS
-PKG_VERS = 0.3.30
+PKG_VERS = 0.3.33
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/OpenMathLib/OpenBLAS/releases/download/v$(PKG_VERS)

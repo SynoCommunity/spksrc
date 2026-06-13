@@ -1,22 +1,24 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = 58861264
-SPK_GIT_DATE = 20260108
+SPK_GIT_HASH = 9102efaf
+SPK_GIT_DATE = 20260525
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
-SPK_REV = 47
+SPK_REV = 48
 SPK_ICON = src/tvheadend.png
 DSM_UI_DIR = app
 
 FFMPEG_PACKAGE = ffmpeg7
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
+
+#GCC_DEBUG_INFO := 1
 
 MAINTAINER = th0ma7
 DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD and Android supporting DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP and HDHomeRun as input sources. Tvheadend offers HTTP, HTSP and SAT IP streaming.
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 58861264 as of January 8th 2026<br/>2. Enablement of dbus"
+CHANGELOG = "1. Update to latest git version 9102efaf of May 25th 2026<br/>2. Update all python wheels<br/>3. Fix for gracenote2epg install<br/>4. Enablement of dbus<br/>5. Experimental migration to ffmpeg 8.1<br/>6. Enable new experimental vue UI<br/>7. Update libhdhomerun to 20260313<br/>8. Migrate to python 3.14"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
@@ -24,7 +26,14 @@ CONF_DIR = src/conf/
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER = auto
+# Debug builds (GCC_DEBUG_INFO=1) ship a start-up script with an optional gdb
+# crash-backtrace mode (toggle at runtime: touch ${SYNOPKG_PKGVAR}/gdb-debug.flag);
+# release builds get the plain start-up script.
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+SERVICE_SETUP = src/service-setup-dbg.sh
+else
 SERVICE_SETUP = src/service-setup.sh
+endif
 
 # Service configuration
 SERVICE_PORT = 9981
@@ -76,6 +85,9 @@ DEPENDS += python/numpy-latest
 # [pandas]
 DEPENDS += python/pandas
 endif
+
+# [pandas] https://github.com/th0ma7/gracenote2epg/issues/8
+WHEELS += pgeocode==0.5.0
 
 # Export version to the build where version
 # script gets patched accordingly by:
