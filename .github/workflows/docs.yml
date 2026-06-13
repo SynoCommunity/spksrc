@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - docs-migration
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
