@@ -18,6 +18,7 @@ LICENSE  = MIT
 CMAKE_ARGS += -DLWS_WITHOUT_TESTAPPS=ON
 CMAKE_ARGS += -DDISABLE_WERROR=ON
 CMAKE_ARGS += -DLWS_WITH_STATIC=OFF
+CMAKE_ARGS += -DLWS_HAVE_LIBCAP=OFF
 
 # mosquitto needs external poll feature:
 # warning "libwebsockets is not compiled with LWS_WITH_EXTERNAL_POLL support. Websocket performance will be unusable." [-Wcpp]
