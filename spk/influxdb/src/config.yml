@@ -1,0 +1,5 @@
+http-bind-address: ":8186"
+reporting-disabled: true
+bolt-path: "/var/packages/influxdb/var/.influxdbv2/influxd.bolt"
+engine-path: "/var/packages/influxdb/var/.influxdbv2/engine"
+sqlite-path: "/var/packages/influxdb/var/.influxdbv2/influxd.sqlite"
