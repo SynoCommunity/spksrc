@@ -1,21 +1,17 @@
 # Use -buildvcs=false to disable VCS stamping to avoid: error obtaining VCS status: exit status 128 
 # 
---- Makefile.orig	2022-07-24 21:14:52.000000000 +0000
-+++ Makefile	2023-07-23 11:05:37.211921139 +0000
-@@ -16,13 +16,13 @@
+--- Makefile.orig	2025-12-31 11:47:43.000000000 +0000
++++ Makefile	2026-04-29 16:07:24.566418709 +0000
+@@ -24,10 +24,10 @@
  build: generate build-quick
  
  build-quick:
--	go build -trimpath -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
-+	go build -trimpath -buildvcs=false -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
+-	CGO_ENABLED=$(CGO_ENABLED) go build -trimpath -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
++	CGO_ENABLED=$(CGO_ENABLED) go build -trimpath -buildvcs=false -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
  
  build-dbg:
--	go build -trimpath -ldflags "-s -w $(ADDITIONAL_GO_LINKER_FLAGS) $(DEBUGVAR)" ./cmd/micro
-+	go build -trimpath -buildvcs=false -ldflags "-s -w $(ADDITIONAL_GO_LINKER_FLAGS) $(DEBUGVAR)" ./cmd/micro
+-	CGO_ENABLED=$(CGO_ENABLED) go build -trimpath -ldflags "$(ADDITIONAL_GO_LINKER_FLAGS) $(DEBUGVAR)" ./cmd/micro
++	CGO_ENABLED=$(CGO_ENABLED) go build -trimpath -buildvcs=false -ldflags "$(ADDITIONAL_GO_LINKER_FLAGS) $(DEBUGVAR)" ./cmd/micro
  
- build-tags: fetch-tags generate
--	go build -trimpath -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
-+	go build -trimpath -buildvcs=false -ldflags "-s -w $(GOVARS) $(ADDITIONAL_GO_LINKER_FLAGS)" ./cmd/micro
- 
- build-all: build
+ build-tags: fetch-tags build
  
