@@ -1,0 +1,76 @@
+diff -uprN ../linuxtv.orig/v4l/Makefile v4l/Makefile
+--- ../linuxtv.orig/v4l/Makefile	2021-02-08 10:24:43.000000000 +0000
++++ v4l/Makefile	2021-03-13 14:39:19.674250245 +0000
+@@ -51,13 +51,17 @@ default:: prepare
+ 	@echo Kernel build directory is $(OUTDIR)
+ 	$(MAKE) -C ../linux apply_patches
+ 	$(MAKE) -C $(OUTDIR) M=$(PWD) $(MYCFLAGS) modules
++ifneq ($(strip $(CROSS_COMPILE)),y)
+ 	./scripts/rmmod.pl check
++endif
+ #	$(MAKE) checkpatch
+ 
+ mismatch:: prepare
+ 	@echo Kernel build directory is $(OUTDIR)
+ 	$(MAKE) -Wfatal-errors -C $(OUTDIR) M=$(PWD) $(MYCFLAGS) CONFIG_DEBUG_SECTION_MISMATCH=y modules
++ifneq ($(strip $(CROSS_COMPILE)),y)
+ 	./scripts/rmmod.pl check
++endif
+ 
+ # Anything in this target shouldn't be build in parallel.
+ prepare:: config-compat.h Makefile.media links
+@@ -66,9 +70,16 @@ prepare:: config-compat.h Makefile.media
+ # Object specific rules
+ 
+ # Targets which don't need Makefile.media's rules
++ifneq ($(strip $(CROSS_COMPILE)),y)
++no-makefile-media-targets := %config clean distclean snapshot snap \
++	tarball release %links \
++	start insmod load stop rmmod unload reload \
++	card% update push %commit help debug cx88-ivtv lxdialog
++else ifeq ($(strip $(CROSS_COMPILE)),y)
+ no-makefile-media-targets := %config clean distclean snapshot snap \
+-	tarball release %links start insmod load stop rmmod unload reload \
++	tarball release %links \
+ 	card% update push %commit help debug cx88-ivtv lxdialog
++endif
+ 
+ # Targets which don't need .myconfig to exist, to keep us from including it
+ no-dot-config-targets := $(no-makefile-media-targets) %install remove
+@@ -188,7 +199,11 @@ ifeq ($(inst-m),)
+   inst-m	:= $(obj-m)
+ endif
+ 
++ifneq ($(strip $(CROSS_COMPILE)),y)
+ v4l_modules := $(shell /sbin/lsmod|cut -d' ' -f1 ) $(patsubst %.ko,%,$(inst-m))
++else ifeq ($(strip $(CROSS_COMPILE)),y)
++v4l_modules := 
++endif
+ 
+ #################################################
+ # locales seem to cause trouble sometimes.
+@@ -416,7 +431,9 @@ old-install:: rminstall
+ 	-install -d $(DEST)
+ 	-install -m 644 -c $(inst-m) $(DEST)
+ 
++ifneq ($(strip $(CROSS_COMPILE)),y)
+ 	/sbin/depmod -a ${KERNELRELEASE}
++endif
+ 
+ #################################################
+ # Tree management rules
+diff -uprN ../linuxtv.orig/v4l/scripts/make_makefile.pl v4l/scripts/make_makefile.pl
+--- ../linuxtv.orig/v4l/scripts/make_makefile.pl	2021-02-08 10:24:43.000000000 +0000
++++ v4l/scripts/make_makefile.pl	2021-03-13 14:39:47.238414024 +0000
+@@ -258,7 +258,10 @@ while (my ($dir, $files) = each %instdir
+ 	print OUT "fi;\n\n";
+ }
+ print OUT "\t@echo\n";
+-print OUT "\t/sbin/depmod -a \$(KERNELRELEASE) \$(if \$(DESTDIR),-b \$(DESTDIR))\n\n";
++print OUT "ifneq (\$(strip \$(CROSS_COMPILE)),y)\n";
++print OUT "\t/sbin/depmod -a \$(KERNELRELEASE) \$(if \$(DESTDIR),-b \$(DESTDIR))\n";
++print OUT "endif\n";
++print OUT "\t@echo\n";
+ 
+ # Creating Remove rule
+ print OUT "media-rminstall::\n";
