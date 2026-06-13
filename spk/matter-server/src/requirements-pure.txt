@@ -1,0 +1,42 @@
+aenum==3.1.16
+aiohappyeyeballs==2.6.1
+aiorun==2025.1.1
+aiosignal==1.4.0
+asttokens==3.0.1
+async_timeout==5.0.1
+atomicwrites==1.4.1		# dependency not found with generate requirements script
+attrs==25.4.0
+coloredlogs==15.0.1
+construct==2.10.70
+dacite==1.9.2
+decorator==5.2.1
+deprecation==2.1.0
+ecdsa==0.19.1
+executing==2.2.1
+home_assistant_chip_clusters==2025.7.0
+humanfriendly==10.0
+idna==3.11
+ifaddr==0.2.0           # dependency of zeroconf (not found with generate requirements script)
+ipdb==0.13.13
+ipython==9.9.0
+ipython_pygments_lexers==1.1.1
+jedi==0.19.2
+markdown_it_py==4.0.0
+matplotlib_inline==0.2.1
+mdurl==0.1.2
+packaging==26.0
+parso==0.8.5
+pexpect==4.9.0
+#pip==25.0.1            # => python312
+prompt_toolkit==3.0.52
+ptyprocess==0.7.0
+pure_eval==0.2.3
+pycparser==3.0
+pygments==2.19.2
+python_matter_server==8.1.2
+rich==14.2.0
+six==1.17.0
+stack_data==0.6.3
+traitlets==5.14.3
+typing_extensions==4.15.0
+wcwidth==0.3.2
