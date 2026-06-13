@@ -9,6 +9,7 @@ copyright: Copyright &copy; 2012 - 2026 SynoCommunity
 
 theme:
   name: material
+  favicon: assets/favicon.ico
   features:
     - navigation.tabs
     - navigation.sections
@@ -87,6 +88,7 @@ markdown_extensions:
   - pymdownx.tilde
 
 extra:
+  homepage: https://synocommunity.com
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/SynoCommunity/spksrc
