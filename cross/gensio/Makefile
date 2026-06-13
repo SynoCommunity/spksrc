@@ -1,5 +1,5 @@
 PKG_NAME = gensio
-PKG_VERS = 2.8.15
+PKG_VERS = 3.0.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cminyard/gensio/archive

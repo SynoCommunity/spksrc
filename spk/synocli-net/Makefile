@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
-SPK_VERS = 2.6
-SPK_REV = 21
+SPK_VERS = 10.0
+SPK_REV = 22
 SPK_ICON = src/synocli-net.png
 
 DEPENDS  = cross/tmux
@@ -14,13 +14,13 @@ DEPENDS += cross/etherwake
 DEPENDS += cross/inetutils
 DEPENDS += cross/netcat
 DEPENDS += cross/imapfilter
+DEPENDS += cross/sshfs
+DEPENDS += cross/nmap
 
 OPTIONAL_DEPENDS  = cross/screen cross/screen5
-OPTIONAL_DEPENDS += cross/sshfs2 cross/sshfs3 
 OPTIONAL_DEPENDS += cross/ser2net
 OPTIONAL_DEPENDS += cross/bind_9.20 cross/bind_9.18 cross/bind_9.16
 OPTIONAL_DEPENDS += cross/aria2
-OPTIONAL_DEPENDS += cross/nmap cross/nmap_7.92
 
 include ../../mk/spksrc.common.mk
 
@@ -59,23 +59,8 @@ endif
 
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-
 DEPENDS += cross/ser2net
 OPTIONAL_DESC := $(OPTIONAL_DESC)", ser2net"
-
-DEPENDS += cross/nmap
-else
-DEPENDS += cross/nmap_7.92
-endif
-
-ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_ge,${TCVERSION},3.0),11)
-# DSM 3.x - 5.x
-DEPENDS += cross/sshfs2
-else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-# qoriq DSM 6.x
-DEPENDS += cross/sshfs2
-else
-DEPENDS += cross/sshfs3
 endif
 
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
@@ -90,18 +75,22 @@ MAINTAINER = ymartin59
 DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilities: screen, tmux, socat, nmap, arp-scan, mtr \(My traceroute\), links, rsync, xxhsum, autossh \(including openssh, sftp and scp\), etherwake, telnet, whois, sshfs, IMAPFilter$(OPTIONAL_DESC)."
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
-CHANGELOG  = "1. Add IMAPFilter v2.8.3. <br/>"
-CHANGELOG += "2. Update bind to v9.20.11 (DSM 7); v9.18.38 (DSM 6); v9.16.50 (armv5 and armv7l). <br/>"
-CHANGELOG += "3. Update inetutils from v2.5 to v2.6. <br/>"
-CHANGELOG += "4. Update mtr from v0.95 to v0.96. <br/>"
-CHANGELOG += "5. Update nmap from v7.95 to v7.97. <br/>"
-CHANGELOG += "6. Update screen to v5.0.1 (DSM 7 only). <br/>"
-CHANGELOG += "7. Update ser2net from v4.6.3 to v4.6.5. <br/>"
-CHANGELOG += "8. Update socat from v1.8.0.2 to v1.8.0.3."
+
+WIKI_URL = "\<a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet\"\>FAQ SynoCliFile\</a\>"
+
+CHANGELOG  = "1. Update bind v9.18.38 to v9.18.48 and v9.20.11 to v9.20.22. <br/>"
+CHANGELOG += "2. Update inetutils from v2.6 to v2.7. <br/>"
+CHANGELOG += "3. Update nmap from v7.97 to v7.99 (ARMv5 and qoriq are limited to v7.98). <br/>"
+CHANGELOG += "4. Update rsync from v3.4.1 to v3.4.4. <br/>"
+CHANGELOG += "5. Update ser2net from v4.6.5 to v4.6.6. <br/>"
+CHANGELOG += "6. Update socat from v1.8.0.3 to v1.8.1.1. <br/>"
+CHANGELOG += "7. Update sshfs3 from v3.7.3 to v3.7.6. <br/>"
+CHANGELOG += "8. Update tmux from v3.5a to v3.6b. <br/>"
+CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
-LICENSE  = Each tool is licensed under it\'s respective license.
+LICENSE = Each tool is licensed under it\'s respective license.
 
 SPK_COMMANDS  = bin/screen
 SPK_COMMANDS += bin/tmux
@@ -109,8 +98,6 @@ SPK_COMMANDS += bin/nmap bin/nping bin/ncat
 SPK_COMMANDS += bin/arp-scan bin/arp-fingerprint
 SPK_COMMANDS += bin/links
 SPK_COMMANDS += bin/sshfs
-SPK_COMMANDS += bin/fusermount bin/fusermount3
-SPK_COMMANDS += sbin/mount.fuse sbin/mount.fuse3
 SPK_COMMANDS += bin/socat bin/socat1 bin/procan bin/filan
 SPK_COMMANDS += bin/socat-broker.sh bin/socat-chain.sh bin/socat-mux.sh
 SPK_COMMANDS += bin/rsync
