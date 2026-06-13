@@ -108,41 +108,57 @@ cross-compile-wheel-%:
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
-	   export PATH=$$(echo $${PATH}:$(call merge, $(ENV), PATH, :):$(CROSSENV_PATH)/build/bin | awk -v RS=':' '!seen[$$0]++' | paste -sd ':') ; \
-	   $(MSG) "PATH: [$${PATH}]" ; \
-	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
-	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
-	   $(MSG) "python: [$$(which cross-python)]" ; \
-	else \
-	   echo "ERROR: crossenv not found!" ; \
-	   exit 2 ; \
-	fi ; \
-	if [ "$(PIP_GLOBAL_OPTION)" ]; then \
-	   pip_global_option=$$(echo $(PIP_GLOBAL_OPTION) | sed 's/=\([^ ]*\)/="\1"/g; s/[^ ]*/--global-option=&/g') ; \
-	   pip_global_option=$${pip_global_option}" --no-use-pep517" ; \
+	   export PATH=$$(echo $(CROSSENV_PATH)/build/bin:$${PATH}:$(call merge, $(ENV), PATH, :) | awk -v RS=':' '!seen[$$0]++' | paste -sd ':') ; \
+	   _cross_npymath="$(CROSSENV_PATH)/cross/$(PYTHON_LIB_DIR)/site-packages/numpy/_core/lib/libnpymath.a"; \
+	   _build_npymath="$(CROSSENV_PATH)/build/$(PYTHON_LIB_DIR)/site-packages/numpy/_core/lib/libnpymath.a"; \
+	   if [ -f "$${_cross_npymath}" ] && [ -f "$${_build_npymath}" ] && [ "$(WHEEL_NAME)" != "numpy" ]; then \
+	      echo "===>  Fixing npymath: $${_cross_npymath} -> $${_build_npymath}"; \
+	      cp -f "$${_cross_npymath}" "$${_build_npymath}"; \
+	   fi ; \
+	   extra_args=""; \
+	_pip_args="$(PIP_WHEEL_ARGS_CROSSENV)"; \
+	case "$(WHEEL_NAME)" in \
+	   numpy|scipy|scikit_learn|lap|pandas|numba|llvmlite|msgpack) \
+	      extra_args="$(MESON_CROSS_ARGS)" ;; \
+	   soxr) \
+	      _pip_args="wheel --no-color --disable-pip-version-check --cache-dir $(PIP_CACHE_DIR) --no-binary :all: --no-index --find-links $(PIP_DISTRIB_DIR) --no-deps --wheel-dir $(WHEELHOUSE) --config-settings=cmake.args=-DCMAKE_SYSTEM_NAME=Linux;-DCMAKE_CROSSCOMPILING=TRUE"; \
+	      extra_args="" ;; \
+	esac ; \
+	_numpy_pkgdir=""; \
+	if [ -d "$(CROSSENV_PATH)/cross/$(PYTHON_LIB_DIR)/site-packages/numpy/_core/lib/pkgconfig" ]; then \
+	   _numpy_pkgdir="$(CROSSENV_PATH)/cross/$(PYTHON_LIB_DIR)/site-packages/numpy/_core/lib/pkgconfig"; \
 	fi ; \
 	$(MSG) \
 	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
+	   PKG_CONFIG_PATH="$${_numpy_pkgdir}:$(STAGING_INSTALL_PREFIX)/lib/pkgconfig" \
+	   PYTHONPATH=$(CROSSENV_PATH)/build/$(PYTHON_LIB_DIR)/site-packages:$${PYTHONPATH} \
+	   LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib:$${LD_LIBRARY_PATH} \
 	   PATH=$${PATH} \
 	   CMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) \
-	   MESON_CROSS_FILE=$(MESON_CROSS_FILE) \
-	   $$(which cross-python) -m pip \
-	   $(PIP_WHEEL_ARGS_CROSSENV) \
+	   MESON_CROSS_FILE=$${MESON_CROSS_FILE} \
+	   $(CROSSENV_PATH)/bin/cross-python -m pip \
+	   $${_pip_args} \
 	   $${pip_global_option} \
 	   --no-build-isolation \
+	   $${extra_args} \
 	   $(ABI3) \
 	   $(REQUIREMENT) ; \
 	$(RUN) \
 	   _PYTHON_HOST_PLATFORM="$(TC_TARGET)" \
-	   PATH=$${PATH} \
+	   PKG_CONFIG_PATH="$${_numpy_pkgdir}:$(STAGING_INSTALL_PREFIX)/lib/pkgconfig" \
+	   PYTHONPATH=$(CROSSENV_PATH)/build/$(PYTHON_LIB_DIR)/site-packages:$${PYTHONPATH} \
+	   LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib:$${LD_LIBRARY_PATH} \
+	   PATH="$(CROSSENV_PATH)/build/bin:$(CROSSENV_PATH)/cross/bin:$${PATH}" \
 	   CMAKE_TOOLCHAIN_FILE=$(CMAKE_TOOLCHAIN_FILE) \
-	   MESON_CROSS_FILE=$(MESON_CROSS_FILE) \
-	   $$(which cross-python) -m pip \
-	   $(PIP_WHEEL_ARGS_CROSSENV) \
+	   MESON_CROSS_FILE=$${MESON_CROSS_FILE} \
+	   $(CROSSENV_PATH)/bin/cross-python -m pip \
+	   $${_pip_args} \
 	   $${pip_global_option} \
 	   --no-build-isolation \
+	   $${extra_args} \
 	   $(ABI3) \
-	   $(REQUIREMENT)
+	   $(REQUIREMENT) ; \
+	fi
 
 pure-build-wheel-%: SHELL:=/bin/bash
 pure-build-wheel-%:

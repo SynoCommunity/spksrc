@@ -24,8 +24,6 @@ $(MESON_CROSS_FILE_PKG):
 generate_meson_crossfile_pkg: SHELL:=/bin/bash
 generate_meson_crossfile_pkg:
 	@cat $(MESON_CROSS_FILE_WRK)
-	@echo "pkgconfig = '$$(which pkg-config)'"
-	@echo "pkg-config = '$$(which pkg-config)'"
 ifeq ($(strip $(MESON_PYTHON)),1)
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@. $(CROSSENV) ; \

@@ -1,6 +1,11 @@
 #
 # Configuration for python wheel build
 #
+# Pass meson cross file only when cross-compiling (different arch than host)
+ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+MESON_CROSS_ARGS = -Csetup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-cross \
+	-Csetup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-properties
+endif
 
 ### python wheel requirement processing
 include ../../mk/spksrc.python-requirement.mk
