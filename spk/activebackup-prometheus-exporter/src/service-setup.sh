@@ -1,0 +1,4 @@
+AB_EXPORTER="${SYNOPKG_PKGDEST}/bin/activebackup-prometheus-exporter"
+SERVICE_COMMAND="${AB_EXPORTER} -port ${SERVICE_PORT}"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y
