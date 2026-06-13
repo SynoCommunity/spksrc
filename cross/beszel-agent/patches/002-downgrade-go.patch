@@ -1,0 +1,14 @@
+# upgrade go to v1.26.3
+# runtime of go <= 1.26.2 has issue with armv7 and older linux kernels
+# see: https://github.com/golang/go/issues/77930, that is fixed in go1.26.3
+#
+--- go.mod.orig	2026-04-05 20:14:39.000000000 +0000
++++ go.mod	2026-05-07 21:34:22.265135076 +0000
+@@ -1,6 +1,6 @@
+ module github.com/henrygd/beszel
+
+-go 1.26.1
++go 1.26.3
+
+ require (
+ 	github.com/blang/semver v3.5.1+incompatible
