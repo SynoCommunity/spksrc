@@ -463,7 +463,7 @@ $(STAGING_DIR)/$(DSM_UI_DIR)/config:
 	$(create_target_dir)
 	@echo '{}' | jq --arg name "${DISPLAY_NAME}" \
 		--arg desc "${SERVICE_DESC}" \
-		--arg id "com.synocommunity.packages.${SPK_NAME}" \
+		--arg id "${DSM_APP_NAME}" \
 		--arg icon "images/${SPK_NAME}-{0}.png" \
 		--arg prot "${SERVICE_PORT_PROTOCOL}" \
 		--arg port "${SERVICE_PORT}" \
