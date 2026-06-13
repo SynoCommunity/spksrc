@@ -1,0 +1,3 @@
+lnk:lib/libcryptopp.so
+lnk:lib/libcryptopp.so.8
+lib:lib/libcryptopp.so.8.9.0

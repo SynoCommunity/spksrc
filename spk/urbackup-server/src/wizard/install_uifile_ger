@@ -1,0 +1,26 @@
+[{
+    "step_title": "Grundkonfiguration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Verzeichnis für Backup Dateien. Hier werden Backup Dateien der Clients gespeichert. Dieser 'Gemeinsame Ordner' wird bei Bedarf durch die Installation angelegt.",
+        "subitems": [{
+            "key": "wizard_backup_dir",
+            "desc": "Sicherungsverzeichnis",
+            "defaultValue": "urbackup",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Unterverzeichnisse sind nicht erlaubt."
+              }
+            }
+          }
+        ]
+      }, {
+        "desc": ""
+      }, {
+        "desc": "Der Urbackup Server wird unter DSM unter dem internern service user <b>'sc-urbackup-server'</b> ausgeführt. Dieser user erhält durch die Installation die nötigen Berechtigungen auf den hier konfigurierten Gemeinsamen Ordner. Wenn der Backup Pfad später geändert wird, muss sichergestellt werden, dass 'sc-urbackup-server' darauf zugreifen kann.<br>Bitte <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> für entsprechende Detailinformationen beachten."
+      }
+    ]
+  }
+]
