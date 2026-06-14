@@ -1,43 +1,38 @@
-# Generated using the requirements script on April 20, 2025
+# Generated using the requirements script on June 14, 2026
+# Command: ./generate_requirements.sh sickchill==2024.3.1 312
 
 appdirs==1.4.4
 babelfish==0.6.1
-beautifulsoup4==4.14.3
+beautifulsoup4==4.15.0
 beekeeper_alt==2022.9.3
 bencode.py==4.0.0
-cachecontrol==0.14.2
-#certifi                            ==> python312
-chardet==5.2.0
+cachecontrol==0.14.4
+#certifi==2026.5.20                   ==> python312
 cinemagoer==2023.5.1
-click==8.1.8
+click==8.4.1
 configobj==5.0.9
-decorator==5.2.1
+decorator==5.3.1
 deluge_client==1.10.2
-dogpile.cache==1.3.4
-enzyme==0.5.2
+dogpile_cache==1.5.0
+enzyme==0.4.1
 future==1.0.0
 gntp==1.0.3
 guessit==3.8.0
-html5lib==1.1
-idna==3.10
+idna==3.18
 ifaddr==0.2.0
-imagesize==1.4.1
+imagesize==1.5.0
 ipaddress==1.0.23
-Js2Py==0.74
 jsonrpclib_pelix==0.4.3.4
 kodipydent_alt==2022.9.3
-mako==1.3.10
-markdown2==2.5.3
+mako==1.3.12
+markdown2==2.5.5
 new_rtorrent_python==1.0.1a0
-oauthlib==3.2.2
+oauthlib==3.3.1
 packaging==23.2
-pbr==6.1.1
-#pip                                ==> python312
+#pip==25.0.1                          ==> python312
 profilehooks==1.13.0
 putio_py==8.8.0
-pycparser==2.22
-pyjsparser==2.7.1
-pymediainfo==7.0.1
+pycparser==3.0
 pynma==1.0
 pyOpenSSL==24.3.0
 pysrt==1.1.2
@@ -45,29 +40,27 @@ python3_fanart==2.0.0
 python_dateutil==2.9.0.post0
 python_slugify==8.0.4
 python_twitter==3.5
-pytz==2025.2
+pytz==2026.2
 qbittorrent_api==2024.12.71
 rarfile==4.2
 rebulk==3.2.0
-requests==2.32.3
+requests==2.34.2
 requests_oauthlib==2.0.0
-Send2Trash==1.8.3
-#setuptools                         ==> python312
+send2trash==2.1.0
+#setuptools==82.0.1                   ==> python312
 sickchill==2024.3.1
-#six                                ==> python312
-soupsieve==2.6
-stevedore==5.4.1
+#six==1.17.0                          ==> python312
+soupsieve==2.8.4
+stevedore==5.8.0
 subliminal==2.1.0
 text_unidecode==1.3
 timeago==1.0.16
-tmdbsimple==2.9.1
+tmdbsimple==2.9.6
 tus_py==1.3.4
 tvdbsimple==1.0.6
-typing_extensions==4.13.2
-tzlocal==5.3.1
-Unidecode==1.3.8
-urllib3==2.4.0
+typing_extensions==4.15.0
+Unidecode==1.4.0
+urllib3==2.7.0
 validators==0.22.0
-webencodings==0.5.1
 win_inet_pton==1.1.0
-xmltodict==0.14.2
+xmltodict==1.0.4

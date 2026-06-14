@@ -41,9 +41,9 @@ DEPENDS += cross/openssl3
 
 # [greenlet]
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
-WHEELS += src/requirements-crossenv-greenlet-v3.txt
+WHEELS += greenlet==3.5.1
 else
-WHEELS += src/requirements-crossenv-greenlet-v3-gcc4.txt
+WHEELS += greenlet==3.0.3
 WHEELS_CPPFLAGS += [greenlet] -std=c++11 -fpermissive
 endif
 
@@ -52,15 +52,21 @@ DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [lxml] -std=c11
+WHEELS += lxml==5.4.0
+else
+WHEELS += lxml==6.1.1
 endif
 
 # [msgpack]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=c11
+WHEELS += msgpack==1.0.5
+else
+WHEELS += msgpack==1.2.0
 endif
+
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: sickchill_extra_install
 sickchill_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-
-include ../../mk/spksrc.spk-meta.mk
