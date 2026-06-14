@@ -1,0 +1,35 @@
+Transcoding rework for ffmpeg 6-8 + QSV/V4L2-M2M/NVDEC hwaccels.
+
+Main PR:
+  https://github.com/tvheadend/tvheadend/pull/2133
+
+Continuation of upstream PRs:
+  https://github.com/tvheadend/tvheadend/pull/2089
+  https://github.com/tvheadend/tvheadend/pull/2117
+
+This is now maintained as a single consolidated patch (100-transcoding-2089-2117.patch)
+generated from the local working branch rather than from the upstream PR .patch files.
+The old approach (downloading 2117.patch and splitting the individual 101-110 patches)
+is kept disabled as *.patch.DISABLE for reference only.
+
+# Regenerate the patch from the working tree. The base MUST equal the
+# cross/tvheadend Makefile PKG_GIT_HASH (the distrib tarball the patch applies to),
+# otherwise upstream commits between the old base and the new base leak into the
+# patch and show up as "Reversed (or previously applied) patch detected".
+
+HASH=$(sed -n 's/^PKG_GIT_HASH = //p' ../Makefile)   # current distrib base
+cd <tvheadend git worktree>
+git diff --no-prefix ${HASH}..HEAD > \
+    <spksrc>/cross/tvheadend/patches/100-transcoding-2089-2117.patch
+
+Alternative directly from the github PR:
+curl -L https://github.com/tvheadend/tvheadend/pull/2133.patch \
+    | sed '/^diff --git a\/Makefile\.ffmpeg/,/^diff --git /{//!d;/^diff --git a\/Makefile\.ffmpeg/d}' \
+    | sed '/Makefile\.ffmpeg/d' \
+    | sed -e 's?--- a/?--- ?1' \
+          -e 's?+++ b/?+++ ?1' \
+    > 100-transcoding-2089-2117.patch
+
+# Verify it applies -p0 against a pristine distrib copy before building:
+#   tar xzf distrib/tvheadend-git${HASH}.tar.gz -C /tmp/check
+#   cd /tmp/check/tvheadend-${HASH} && patch -p0 --dry-run < <patch>

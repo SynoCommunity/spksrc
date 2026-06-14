@@ -1,141 +1,13 @@
-From 20e7eda55cd2a0d70b438d8e12079c15cbd2fb0c Mon Sep 17 00:00:00 2001
-From: Ukn Unknown <4031821+uknunknown@users.noreply.github.com>
-Date: Sun, 17 May 2026 21:32:50 -0700
-Subject: [PATCH] transcoding update to filter2
-
-- send mpegts_flags=nit starting ffmpeg 5.0
-- fixes [1997](https://github.com/tvheadend/tvheadend/issues/1997)
-- https://github.com/tvheadend/tvheadend/issues/1997
-- leverage ffnvcodec/nvEncodeAPI.h constants
-- update the presets with new introduced values (P1-P7)
-- update presets deprecated with proper values
-- bring nvenc closer to vaapi format: qp, maxrate, bit_rate_scale_factor
-- defined new set of variables for new settings (with docstrincs)
-- update the avDictionary set from string to integer
-- updated the order of the settings to match the vaapi order
-- consolidated common settings for h264 and hevc
-- applied filters from vaapi to nvenc for rc_mode setting
-- removed profile from nvenc.c because is handled by profile_class.c: tvh_codec_profile_base_open(TVHCodecProfile *self, AVDictionary **opts)
-- replaced quality with cq (because nvenc doesn't have quality)
-- update to ffmpeg 7.1.3 (with patch for vaapi)
-- this PR is implementing the changes from: https://github.com/tvheadend/tvheadend/issues/1869 and https://github.com/tvheadend/tvheadend/issues/1833
-- fixed MPEG-PS (DVD)/av-lib and a hardcoded time_base
-- added a worst case fallback to (90000,1)
-
-- update the filter initialization from avfilter_graph_create_filter() to avfilter_graph_alloc_filter() +  avfilter_init_str(()
-- transition audio filter to aformat for audio conversions.
-- used avfilter_graph_alloc_filter() and avfilter_init_str to allow attach of hw_device_ctx to upload filter
-- use codec_type to separate audio from video processing
-- updated with a more robust implementation how get_format() is selecting pixel format
-- cleaned up vaapi
-- added parsing for height and width from Sequence Header and Extension Header
-- transfer of sample_aspect_ratio from h264 and hevc and compute that form DAR for mpeg2
-- add sample_aspect_ratio to to elementary_info (esstream) and th_pkt
-- fixed bug for not searching if beginning or end was found during search in src/plumbing/globalheaders.c
-- fixing PTS_MASK + 1 for wrapping around in src/plumbing/globalheaders.c
-- workaround for time stamp discontinuity V4L2 decoder
-- fixed a bug in src/muxer/muxer_libav.c where DAR was pushed into SAR
-- separated states ENCODE and DECODE in 6 in order to get granularity to build filter before encoder is opened.
-- added asetpts filter in audio path
-- removed initialize encoder from decoder because filter has to override the encoder buffers.
-- moved the string concatenation from video.c to vaapi.c. This will allow different separation strings and will allow separations of settings between hardware accels
-- move also download and upload to hwaccel.c (to be forwarded to hwaccels if needed)
-- changed the dispatch from hwaccell to other accels, to AVHWDeviceType because is more robust with many decoders/encoders implemented
-- VAAPI does not have a standalone decoder named mpeg2_vaapi h264_vaapi hevc_vaapi vp9_vaapi
-- if filter will change the frame rate we have to rescale PTS/DTS/duration
-- if frame rate is not set we compute it from pkt_duration (instead of default to 30)
-- we only use avpkt->duration if is set
-- update tvh_pkt_t->pkt_duration and parser_es_r->es_frame_duration to int64_t to match AVPacket->duration
-- load input framerate from esstream, as backup use src_pkt
-- added QSV and V4L2 (for raspberry pi 4)
-- added encoder_hwaccel_type that will help with enablement of features in UI based on what encoder is used
-- combined two controls (hwaccel and hwaccel_details) into one (decoder_hwaccel_type)
-- introduced "asetpts=N/SR/TB" to normalize PTS (on/off/auto)
-- after ssc is copied continue to update the parameters from pkt
-- add also a elementary_info_t to tvh_context to update more parameters from iavctx in decode phase
----
- Makefile                                      |  15 +
- configure                                     |  22 +
- data/conf/transcoder/profiles                 |   6 +-
- src/api/api_service.c                         |   2 +-
- src/dvr/dvr_rec.c                             |   2 +-
- src/esstream.h                                |  15 +-
- src/htsp_server.c                             |   4 +-
- src/muxer.h                                   |   6 +-
- src/muxer/muxer_libav.c                       | 207 ++--
- src/packet.c                                  |   2 +-
- src/packet.h                                  |   5 +-
- src/parsers/parser_h264.c                     |  10 +
- src/parsers/parser_hevc.c                     |  10 +
- src/parsers/parsers.c                         | 346 ++++++-
- src/parsers/parsers.h                         |   2 +-
- src/plumbing/globalheaders.c                  | 175 +++-
- src/plumbing/tsfix.c                          |   4 +-
- src/profile.c                                 |   4 +
- src/service.c                                 |   2 +-
- src/timeshift.c                               |   2 +-
- src/transcoding/codec.h                       |  14 +-
- src/transcoding/codec/codec.c                 |  18 +
- src/transcoding/codec/codecs/aac.c            |  12 +-
- src/transcoding/codec/codecs/flac.c           |   1 +
- .../codec/codecs/libs/libfdk_aac.c            |  31 +
- src/transcoding/codec/codecs/libs/libopus.c   |  32 +-
- src/transcoding/codec/codecs/libs/libtheora.c |  12 +
- src/transcoding/codec/codecs/libs/libvorbis.c |   9 +-
- src/transcoding/codec/codecs/libs/libvpx.c    |  11 +
- src/transcoding/codec/codecs/libs/libx26x.c   |  30 +-
- src/transcoding/codec/codecs/libs/nvenc.c     | 509 +++++++---
- src/transcoding/codec/codecs/libs/omx.c       |  10 +
- src/transcoding/codec/codecs/libs/qsv.c       | 952 ++++++++++++++++++
- src/transcoding/codec/codecs/libs/v4l2-m2m.c  | 155 +++
- src/transcoding/codec/codecs/libs/vaapi.c     | 943 +++++++----------
- src/transcoding/codec/codecs/mp2.c            |   2 +
- src/transcoding/codec/codecs/mpeg2video.c     |  13 +
- src/transcoding/codec/codecs/vorbis.c         |   8 +-
- src/transcoding/codec/internals.h             | 271 ++++-
- src/transcoding/codec/profile.c               |  16 +-
- src/transcoding/codec/profile_audio_class.c   |  23 +
- src/transcoding/codec/profile_class.c         |  10 +
- src/transcoding/codec/profile_video_class.c   |  94 +-
- src/transcoding/transcode/audio.c             | 393 +++++++-
- src/transcoding/transcode/context.c           | 781 +++++++++++++-
- src/transcoding/transcode/helpers.c           |  16 +-
- src/transcoding/transcode/hwaccels/hwaccels.c | 312 ++++--
- src/transcoding/transcode/hwaccels/hwaccels.h |  27 +-
- src/transcoding/transcode/hwaccels/nv.c       | 284 ++++++
- src/transcoding/transcode/hwaccels/nv.h       |  55 +
- src/transcoding/transcode/hwaccels/qsv.c      | 382 +++++++
- src/transcoding/transcode/hwaccels/qsv.h      |  58 ++
- src/transcoding/transcode/hwaccels/v4l2-m2m.c | 112 +++
- src/transcoding/transcode/hwaccels/v4l2-m2m.h |  54 +
- src/transcoding/transcode/hwaccels/vaapi.c    | 388 ++++---
- src/transcoding/transcode/hwaccels/vaapi.h    |  21 +-
- src/transcoding/transcode/internals.h         |  64 +-
- src/transcoding/transcode/stream.c            |  95 +-
- src/transcoding/transcode/transcoder.c        |  20 +
- src/transcoding/transcode/video.c             | 468 +++++----
- src/tvhlog.c                                  |   2 +
- src/tvhlog.h                                  |   2 +
- src/webui/static/app/codec.js                 | 290 ++++--
- support/patches/ffmpeg.vaapi.diff             |  13 +
- support/patches/ffmpeg.vaapi2.diff            |  34 +
- 66 files changed, 6403 insertions(+), 1525 deletions(-)
- create mode 100644 src/transcoding/codec/codecs/libs/qsv.c
- create mode 100644 src/transcoding/codec/codecs/libs/v4l2-m2m.c
- create mode 100644 src/transcoding/transcode/hwaccels/nv.c
- create mode 100644 src/transcoding/transcode/hwaccels/nv.h
- create mode 100644 src/transcoding/transcode/hwaccels/qsv.c
- create mode 100644 src/transcoding/transcode/hwaccels/qsv.h
- create mode 100644 src/transcoding/transcode/hwaccels/v4l2-m2m.c
- create mode 100644 src/transcoding/transcode/hwaccels/v4l2-m2m.h
- create mode 100644 support/patches/ffmpeg.vaapi.diff
- create mode 100644 support/patches/ffmpeg.vaapi2.diff
-
-diff --git a/Makefile b/Makefile
-index 5e9688fbb4..e7f522d414 100644
+# Consolidated snapshot of the transcoding_updates_2089_2117 branch:
+# continuation of upstream PRs #2089 and #2117 (filter2 rework, QSV/V4L2-M2M/
+# NVDEC hwaccels, ffmpeg 6-8 support) + follow-up fixes + review fixes.
+# Generated with: git diff --no-prefix bb09b4faed80eb4ddc20da945d397b9f36e49fdd..HEAD
+# Base = cross/tvheadend Makefile PKG_GIT_HASH (bb09b4faed80eb4ddc20da945d397b9f36e49fdd).
+diff --git Makefile Makefile
+index 3ee0f628e..f9e45b681 100644
 --- Makefile
 +++ Makefile
-@@ -534,20 +534,35 @@ endif
+@@ -534,20 +534,38 @@ endif
  ifeq ($(CONFIG_VAAPI),yes)
  LIBS-CODECS += vaapi
  endif
@@ -145,13 +17,18 @@ index 5e9688fbb4..e7f522d414 100644
  ifeq ($(CONFIG_NVENC),yes)
  LIBS-CODECS += nvenc
  endif
- ifeq ($(CONFIG_OMX),yes)
- LIBS-CODECS += omx
- endif
+-ifeq ($(CONFIG_OMX),yes)
+-LIBS-CODECS += omx
 +ifeq ($(CONFIG_V4L2M2M),yes)
 +LIBS-CODECS += v4l2-m2m
-+endif
+ endif
  SRCS-CODECS += $(foreach lib,$(LIBS-CODECS),src/transcoding/codec/codecs/libs/$(lib).c)
++# shared DRM device enumeration, used by the VAAPI and QSV profile classes
++ifeq ($(CONFIG_VAAPI),yes)
++SRCS-CODECS += src/transcoding/codec/codecs/libs/drmdev.c
++else ifeq ($(CONFIG_QSV),yes)
++SRCS-CODECS += src/transcoding/codec/codecs/libs/drmdev.c
++endif
  
  #hwaccels
  ifeq ($(CONFIG_HWACCELS),yes)
@@ -171,22 +48,45 @@ index 5e9688fbb4..e7f522d414 100644
  endif
  
  # libav
-diff --git a/configure b/configure
-index 9f2b342cd9..ba5b6320c9 100755
+diff --git configure configure
+index 9f2b342cd..a04fd9fd1 100755
 --- configure
 +++ configure
-@@ -55,8 +55,10 @@ OPTIONS=(
+@@ -55,8 +55,9 @@ OPTIONS=(
    "libopus_static:yes"
    "nvenc:no"
    "vaapi:auto"
 +  "qsv:no"
    "mmal:no"
-   "omx:no"
+-  "omx:no"
 +  "v4l2m2m:no"
    "inotify:auto"
    "epoll:auto"
    "pcre:auto"
-@@ -723,6 +725,26 @@ if enabled_or_auto vaapi; then
+@@ -665,22 +666,6 @@ if enabled ffmpeg_static; then
+     disable nvenc
+   fi
+ 
+-  # omx
+-  if enabled omx; then
+-    OLDCFLAGS=$CFLAGS
+-    if [ -d "/opt/vc/include" ]; then
+-      CFLAGS="-I/opt/vc/include $CFLAGS"
+-    fi
+-    check_cc_header "bcm_host" omx_rpi
+-    if enabled omx_rpi; then
+-      CFLAGS="-I/opt/vc/include/IL $OLDCFLAGS"
+-      enable mmal
+-    else
+-      CFLAGS=$OLDCFLAGS
+-    fi
+-    check_cc_header OMX_Core omx || die "OpenMAX IL not found"
+-  fi
+-
+ else
+ 
+   if enabled_or_auto libav; then
+@@ -723,6 +708,26 @@ if enabled_or_auto vaapi; then
    fi
  fi
  
@@ -213,26 +113,301 @@ index 9f2b342cd9..ba5b6320c9 100755
  #
  # Inotify
  #
-diff --git a/data/conf/transcoder/profiles b/data/conf/transcoder/profiles
-index 9e56dd4c4e..4010bad504 100644
+diff --git data/conf/transcoder/codecs data/conf/transcoder/codecs
+index 6aa232be9..1328f618e 100644
+--- data/conf/transcoder/codecs
++++ data/conf/transcoder/codecs
+@@ -1,27 +1,125 @@
+ [
+     {
+-	"description": "WEBTV codec VP8",
+-	"name": "webtv-vp8",
+-	"codec_name": "libvpx",
+-	"height": 384,
++        "description": "WEBTV codec VP8",
++        "name": "webtv-vp8",
++        "codec_name": "libvpx",
++        "height": 384,
+         "deadline": 1,
+         "crf": 28,
+         "cpu-used": 8
+     },
+     {
+-	"description": "WEBTV codec H264",
+-	"name": "webtv-h264",
+-	"codec_name": "libx264",
+-	"height": 384
++        "description": "WEBTV codec VP8 VAAPI",
++        "name": "webtv-vp8-vaapi",
++        "codec_name": "vp8_vaapi",
++        "height": 384,
++        "bit_rate": 1500,
++        "max_bit_rate": 2000,
++        "hwaccel": true,
++        "decoder_hwaccel_type": 3
+     },
+     {
+-	"description": "WEBTV codec Vorbis",
+-	"name": "webtv-vorbis",
+-	"codec_name": "vorbis"
++        "description": "WEBTV codec VP9",
++        "name": "webtv-vp9",
++        "codec_name": "libvpx-vp9",
++        "height": 384,
++        "deadline": 1,
++        "crf": 28,
++        "cpu-used": 8
++    },
++    {
++        "description": "WEBTV codec VP9 VAAPI",
++        "name": "webtv-vp9-vaapi",
++        "codec_name": "vp9_vaapi",
++        "height": 384,
++        "bit_rate": 1500,
++        "max_bit_rate": 2000,
++        "hwaccel": true,
++        "decoder_hwaccel_type": 3
++    },
++    {
++        "description": "WEBTV codec H264",
++        "name": "webtv-h264",
++        "codec_name": "libx264",
++        "height": 384,
++        "preset": "faster",
++        "tune": "zerolatency"
++    },
++    {
++        "description": "WEBTV codec H264 QSV",
++        "name": "webtv-h264-qsv",
++        "codec_name": "h264_qsv",
++        "height": 384,
++        "bit_rate": 1500,
++        "max_bit_rate": 2000,
++        "hwaccel": true,
++        "decoder_hwaccel_type": 5
++    },
++    {
++        "description": "WEBTV codec H264 VAAPI",
++        "name": "webtv-h264-vaapi",
++        "codec_name": "h264_vaapi",
++        "height": 384,
++        "bit_rate": 1500,
++        "max_bit_rate": 2000,
++        "hwaccel": true,
++        "decoder_hwaccel_type": 3
++    },
++    {
++        "description": "WEBTV codec HEVC",
++        "name": "webtv-hevc",
++        "codec_name": "libx265",
++        "height": 384,
++        "preset": "faster",
++        "tune": "zerolatency"
++    },
++    {
++        "description": "WEBTV codec HEVC QSV",
++        "name": "webtv-hevc-qsv",
++        "codec_name": "hevc_qsv",
++        "height": 384,
++        "bit_rate": 1500,
++        "max_bit_rate": 2000,
++        "hwaccel": true,
++        "decoder_hwaccel_type": 5
++    },
++    {
++        "description": "WEBTV codec HEVC VAAPI",
++        "name": "webtv-hevc-vaapi",
++        "codec_name": "hevc_vaapi",
++        "height": 384,
++        "bit_rate": 1500,
++        "max_bit_rate": 2000,
++        "hwaccel": true,
++        "decoder_hwaccel_type": 3
++    },
++    {
++        "description": "WEBTV codec Vorbis",
++        "name": "webtv-vorbis",
++        "codec_name": "vorbis",
++        "channel_layout": 3
++    },
++    {
++        "description": "WEBTV codec libVorbis",
++        "name": "webtv-libvorbis",
++        "codec_name": "libvorbis",
++        "channel_layout": 3
++    },
++    {
++        "description": "WEBTV codec AAC",
++        "name": "webtv-aac",
++        "codec_name": "aac",
++        "coder": "twoloop",
++        "sample_rate": 48000,
++        "channel_layout": 3
+     },
+     {
+-	"description": "WEBTV codec AAC",
+-	"name": "webtv-aac",
+-	"codec_name": "aac"
++        "description": "WEBTV codec libOpus",
++        "name": "webtv-libopus",
++        "codec_name": "libopus",
++        "bit_rate": 128,
++        "vbr": 2,
++        "complexity": 10,
++        "channel_layout": 3
+     }
+ ]
+diff --git data/conf/transcoder/profiles data/conf/transcoder/profiles
+index 9e56dd4c4..5f5f86584 100644
 --- data/conf/transcoder/profiles
 +++ data/conf/transcoder/profiles
-@@ -21,10 +21,10 @@
- 	"container": 1
+@@ -1,30 +1,124 @@
+ [
+     {
+-	"comment": "WEBTV profile VP8/Vorbis/WEBM",
+-	"name": "webtv-vp8-vorbis-webm",
+-	"pro_vcodec": "webtv-vp8",
+-	"pro_acodec": "webtv-vorbis",
+-	"container": 6
++        "comment": "WEBTV profile VP8 VAAPI/Vorbis/WEBM",
++        "container": 6,
++        "pro_vcodec": "webtv-vp8-vaapi",
++        "pro_acodec": "webtv-vorbis",
++        "name": "webtv-vp8-vaapi-vorbis-webm",
++        "enabled": false
+     },
+     {
+-	"comment": "WEBTV profile H264/AAC/MPEG-TS",
+-	"name": "webtv-h264-aac-mpegts",
+-	"pro_vcodec": "webtv-h264",
+-	"pro_acodec": "webtv-aac",
+-	"container": 2
++        "comment": "WEBTV profile VP8 Software/Vorbis/WEBM",
++        "container": 6,
++        "pro_vcodec": "webtv-vp8",
++        "pro_acodec": "webtv-vorbis",
++        "name": "webtv-vp8-software-vorbis-webm"
+     },
+     {
+-	"comment": "WEBTV profile H264/AAC/Matroska",
+-	"name": "webtv-h264-aac-matroska",
+-	"pro_vcodec": "webtv-h264",
+-	"pro_acodec": "webtv-aac",
+-	"container": 1
++        "comment": "WEBTV profile VP9 VAAPI/Vorbis/WEBM",
++        "container": 6,
++        "pro_vcodec": "webtv-vp9-vaapi",
++        "pro_acodec": "webtv-vorbis",
++        "name": "webtv-vp9-vaapi-vorbis-webm",
++        "enabled": false
      },
      {
 -	"comment": "WEBTV profile H264/Vorbis/MP4",
 -	"name": "webtv-h264-vorbis-mp4",
-+	"comment": "WEBTV profile H264/AAC/MP4",
-+	"name": "webtv-h264-aac-mp4",
- 	"pro_vcodec": "webtv-h264",
+-	"pro_vcodec": "webtv-h264",
 -	"pro_acodec": "webtv-vorbis",
-+	"pro_acodec": "webtv-aac",
- 	"container": 9
+-	"container": 9
++        "comment": "WEBTV profile VP9 Software/Vorbis/WEBM",
++        "container": 6,
++        "pro_vcodec": "webtv-vp9",
++        "pro_acodec": "webtv-vorbis",
++        "name": "webtv-vp9-software-vorbis-webm"
++    },
++    {
++        "comment": "WEBTV profile H264 QSV/AAC/Matroska",
++        "container": 1,
++        "pro_vcodec": "webtv-h264-qsv",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-h264-qsv-aac-matroska",
++        "enabled": false
++    },
++    {
++        "comment": "WEBTV profile H264 VAAPI/AAC/Matroska",
++        "container": 1,
++        "pro_vcodec": "webtv-h264-vaapi",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-h264-vaapi-aac-matroska",
++        "enabled": false
++    },
++    {
++        "comment": "WEBTV profile H264 Software/AAC/Matroska",
++        "container": 1,
++        "pro_vcodec": "webtv-h264",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-h264-software-aac-matroska"
++    },
++    {
++        "comment": "WEBTV profile H264 QSV/AAC/MP4",
++        "container": 9,
++        "pro_vcodec": "webtv-h264-qsv",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-h264-qsv-aac-mp4",
++        "enabled": false
++    },
++    {
++        "comment": "WEBTV profile H264 VAAPI/AAC/MP4",
++        "container": 9,
++        "pro_vcodec": "webtv-h264-vaapi",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-h264-vaapi-aac-mp4",
++        "enabled": false
++    },
++    {
++        "comment": "WEBTV profile H264 Software/AAC/MP4",
++        "container": 9,
++        "pro_vcodec": "webtv-h264",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-h264-software-aac-mp4"
++    },
++    {
++        "comment": "WEBTV profile HEVC QSV/AAC/Matroska",
++        "container": 1,
++        "pro_vcodec": "webtv-hevc-qsv",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-hevc-qsv-aac-matroska",
++        "enabled": false
++    },
++    {
++        "comment": "WEBTV profile HEVC VAAPI/AAC/Matroska",
++        "container": 1,
++        "pro_vcodec": "webtv-hevc-vaapi",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-hevc-vaapi-aac-matroska",
++        "enabled": false
++    },
++    {
++        "comment": "WEBTV profile HEVC Software/AAC/Matroska",
++        "container": 1,
++        "pro_vcodec": "webtv-hevc",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-hevc-software-aac-matroska"
++    },
++    {
++        "comment": "WEBTV profile HEVC QSV/AAC/MP4",
++        "container": 9,
++        "pro_vcodec": "webtv-hevc-qsv",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-hevc-qsv-aac-mp4",
++        "enabled": false
++    },
++    {
++        "comment": "WEBTV profile HEVC VAAPI/AAC/MP4",
++        "container": 9,
++        "pro_vcodec": "webtv-hevc-vaapi",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-hevc-vaapi-aac-mp4",
++        "enabled": false
++    },
++    {
++        "comment": "WEBTV profile HEVC Software/AAC/MP4",
++        "container": 9,
++        "pro_vcodec": "webtv-hevc",
++        "pro_acodec": "webtv-aac",
++        "name": "webtv-hevc-software-aac-mp4"
      }
  ]
-diff --git a/src/api/api_service.c b/src/api/api_service.c
-index d74ba410ea..48d1a93cef 100644
+diff --git src/api/api_service.c src/api/api_service.c
+index d74ba410e..48d1a93ce 100644
 --- src/api/api_service.c
 +++ src/api/api_service.c
 @@ -87,7 +87,7 @@ api_service_streams_get_one ( elementary_stream_t *es, int use_filter )
@@ -244,11 +419,11 @@ index d74ba410ea..48d1a93cef 100644
      htsmsg_add_u32(e, "aspect_num",     es->es_aspect_num);
      htsmsg_add_u32(e, "aspect_den",     es->es_aspect_den);
    } else if (es->es_type == SCT_CA) {
-diff --git a/src/dvr/dvr_rec.c b/src/dvr/dvr_rec.c
-index 680e1c36be..1a2b8c20e2 100644
+diff --git src/dvr/dvr_rec.c src/dvr/dvr_rec.c
+index 02f887e37..60160c434 100644
 --- src/dvr/dvr_rec.c
 +++ src/dvr/dvr_rec.c
-@@ -1490,7 +1490,7 @@ dvr_rec_start(dvr_entry_t *de, const streaming_start_t *ss)
+@@ -1499,7 +1499,7 @@ dvr_rec_start(dvr_entry_t *de, const streaming_start_t *ss)
  
        htsmsg_add_u32(e, "width",      ssc->es_width);
        htsmsg_add_u32(e, "height",     ssc->es_height);
@@ -257,8 +432,8 @@ index 680e1c36be..1a2b8c20e2 100644
        htsmsg_add_u32(e, "aspect_num", ssc->es_aspect_num);
        htsmsg_add_u32(e, "aspect_den", ssc->es_aspect_den);
      } else {
-diff --git a/src/esstream.h b/src/esstream.h
-index 592a6933dc..b7a0e749bb 100644
+diff --git src/esstream.h src/esstream.h
+index 592a6933d..b7a0e749b 100644
 --- src/esstream.h
 +++ src/esstream.h
 @@ -22,6 +22,9 @@
@@ -296,8 +471,8 @@ index 592a6933dc..b7a0e749bb 100644
  
    char es_lang[4];           /* ISO 639 2B 3-letter language code */
    uint8_t es_audio_type;     /* Audio type */
-diff --git a/src/htsp_server.c b/src/htsp_server.c
-index 2837efd3b4..fefd5e5968 100644
+diff --git src/htsp_server.c src/htsp_server.c
+index 2837efd3b..fefd5e596 100644
 --- src/htsp_server.c
 +++ src/htsp_server.c
 @@ -4199,7 +4199,7 @@ htsp_stream_deliver(htsp_subscription_t *hs, th_pkt_t *pkt)
@@ -318,8 +493,8 @@ index 2837efd3b4..fefd5e5968 100644
                         ts_rescale(ssc->es_frame_duration, 1000000));
        if (ssc->es_aspect_num)
          htsmsg_add_u32(c, "aspect_num", ssc->es_aspect_num);
-diff --git a/src/muxer.h b/src/muxer.h
-index 55a9a29471..6e5939bd2a 100644
+diff --git src/muxer.h src/muxer.h
+index 55a9a2947..6e5939bd2 100644
 --- src/muxer.h
 +++ src/muxer.h
 @@ -42,7 +42,11 @@ typedef enum {
@@ -335,11 +510,32 @@ index 55a9a29471..6e5939bd2a 100644
  } muxer_container_type_t;
  
  typedef enum {
-diff --git a/src/muxer/muxer_libav.c b/src/muxer/muxer_libav.c
-index 92bdf6a3d3..89c4521a95 100644
+diff --git src/muxer/muxer_libav.c src/muxer/muxer_libav.c
+index 92bdf6a3d..45273203b 100644
 --- src/muxer/muxer_libav.c
 +++ src/muxer/muxer_libav.c
-@@ -81,6 +81,20 @@ lav_muxer_write(void *opaque, uint8_t *buf, int buf_size)
+@@ -72,15 +72,39 @@ lav_muxer_write(void *opaque, uint8_t *buf, int buf_size)
+   }
+ 
+   r = write(lm->lm_fd, buf, buf_size);
+-  if (r != buf_size)
++  if (r != buf_size) {
++    /* A failed write to the client socket on a normal disconnect (EPIPE/
++     * ECONNRESET) is an end-of-streaming notification, not a muxer fault.
++     * Flag it as EOS like the pass/mkv muxers do, so the webui stops quietly
++     * instead of logging a misleading "muxer reported errors". Real write
++     * failures (e.g. ENOSPC while recording) still count without m_eos.
++     * errno is only meaningful when write() actually failed (r < 0); on a
++     * short write it may hold a stale value, so guard on r < 0. */
++    if (r < 0 && MC_IS_EOS_ERROR(errno))
++      lm->m_eos = 1;
+     lm->m_errors++;
+-  
++  }
++
+   /* No room to notify about errors here. */
+   /* We need to complete av_write_trailer() to free */
+   /* all associated structures. */
    return buf_size;
  }
  
@@ -360,7 +556,7 @@ index 92bdf6a3d3..89c4521a95 100644
  
  /**
   * Add a stream to the muxer
-@@ -111,6 +125,9 @@ lav_muxer_add_stream(lav_muxer_t *lm,
+@@ -111,6 +135,9 @@ lav_muxer_add_stream(lav_muxer_t *lm,
      break;
  
    case MC_MPEGPS:
@@ -370,7 +566,7 @@ index 92bdf6a3d3..89c4521a95 100644
      c->rc_buffer_size = 224*1024*8;
      //Fall-through
    case MC_MPEGTS:
-@@ -124,7 +141,8 @@ lav_muxer_add_stream(lav_muxer_t *lm,
+@@ -124,7 +151,8 @@ lav_muxer_add_stream(lav_muxer_t *lm,
    }
  
    if(ssc->ssc_gh) {
@@ -380,7 +576,7 @@ index 92bdf6a3d3..89c4521a95 100644
        sbuf_t hdr;
        sbuf_init(&hdr);
        if (ssc->es_type == SCT_H264) {
-@@ -172,55 +190,56 @@ lav_muxer_add_stream(lav_muxer_t *lm,
+@@ -172,55 +200,56 @@ lav_muxer_add_stream(lav_muxer_t *lm,
      c->width      = ssc->es_width;
      c->height     = ssc->es_height;
  
@@ -398,12 +594,12 @@ index 92bdf6a3d3..89c4521a95 100644
 +      // Fallback to default timebase
 +      st->time_base = mpeg_tc;
      }
-+    // The function reduces the fraction num/den to dst_num/dst_den
-+    // Note the inversion here! Timebase is 1/FPS
-+    av_reduce(&c->time_base.den, &c->time_base.num, st->time_base.num, ssc->es_frame_duration, INT_MAX);
++    // Encoder time_base = 1/FPS = frame duration in seconds =
++    // (st->time_base.num * es_frame_duration) / st->time_base.den, reduced.
++    av_reduce(&c->time_base.num, &c->time_base.den,
++              (int64_t)st->time_base.num * ssc->es_frame_duration, st->time_base.den, INT_MAX);
 +
-+    // to be removed when we remove has_support_for_filter2
-+    tvhinfo(LS_LIBAV,  "Muxer: sample aspect ratio = %d/%d", ssc->es_sample_aspect_ratio.num, ssc->es_sample_aspect_ratio.den);
++    tvhtrace(LS_LIBAV,  "Muxer: sample aspect ratio = %d/%d", ssc->es_sample_aspect_ratio.num, ssc->es_sample_aspect_ratio.den);
 +    c->sample_aspect_ratio.num = ssc->es_sample_aspect_ratio.num;
 +    c->sample_aspect_ratio.den = ssc->es_sample_aspect_ratio.den;
  
@@ -475,7 +671,7 @@ index 92bdf6a3d3..89c4521a95 100644
    } else if(SCT_ISSUBTITLE(ssc->es_type)) {
      c->codec_type = AVMEDIA_TYPE_SUBTITLE;
      avcodec_parameters_from_context(st->codecpar, c);
-@@ -300,6 +319,24 @@ lav_muxer_support_stream(muxer_container_type_t mc,
+@@ -300,6 +329,24 @@ lav_muxer_support_stream(muxer_container_type_t mc,
      ret |= (type == SCT_AC4);
      break;
  
@@ -500,7 +696,7 @@ index 92bdf6a3d3..89c4521a95 100644
    default:
      break;
    }
-@@ -343,6 +380,44 @@ lav_muxer_mime(muxer_t* m, const struct streaming_start *ss)
+@@ -343,6 +390,44 @@ lav_muxer_mime(muxer_t* m, const struct streaming_start *ss)
      return muxer_container_type2mime(MC_UNKNOWN, 0);
  }
  
@@ -545,7 +741,7 @@ index 92bdf6a3d3..89c4521a95 100644
  
  /**
   * Init the muxer with streams
-@@ -369,28 +444,7 @@ lav_muxer_init(muxer_t* m, struct streaming_start *ss, const char *name)
+@@ -369,28 +454,7 @@ lav_muxer_init(muxer_t* m, struct streaming_start *ss, const char *name)
  
    oc = lm->lm_oc;
  
@@ -575,7 +771,21 @@ index 92bdf6a3d3..89c4521a95 100644
    fmt = lm->lm_oc->oformat;
    if(avformat_alloc_output_context2(&oc, fmt, muxer_name, NULL) < 0) {
      tvherror(LS_LIBAV,  "Can't find the '%s' muxer", muxer_name);
-@@ -465,9 +519,11 @@ lav_muxer_init(muxer_t* m, struct streaming_start *ss, const char *name)
+@@ -447,7 +511,12 @@ lav_muxer_init(muxer_t* m, struct streaming_start *ss, const char *name)
+   }
+ 
+   if(lm->m_config.m_type == MC_AVMP4) {
+-    av_dict_set(&opts, "frag_duration", "1", 0);
++    /* frag_duration is in microseconds: "1" fragments after every frame
++       (a moof+mdat per picture), whose per-frame overhead back-pressures
++       the streaming chain and makes playback stutter over time. Fragment
++       once per second instead -- far less overhead, latency still well
++       under the player buffer. */
++    av_dict_set(&opts, "frag_duration", "1000000", 0);
+     av_dict_set(&opts, "ism_lookahead", "0", 0);
+   }
+ 
+@@ -465,9 +534,11 @@ lav_muxer_init(muxer_t* m, struct streaming_start *ss, const char *name)
          tvhdebug(LS_LIBAV,  "MPEGTS: mpegts_pmt_start_pid = %s", mpegts_info);
          av_dict_set(&opts, "mpegts_pmt_start_pid", mpegts_info, 0);
        }
@@ -587,7 +797,7 @@ index 92bdf6a3d3..89c4521a95 100644
      }
      else {
        // we transfer as many parameters as possible
-@@ -501,7 +557,9 @@ lav_muxer_init(muxer_t* m, struct streaming_start *ss, const char *name)
+@@ -501,7 +572,9 @@ lav_muxer_init(muxer_t* m, struct streaming_start *ss, const char *name)
          tvhdebug(LS_LIBAV,  "MPEGTS: mpegts_original_network_id = %s", mpegts_info);
          av_dict_set(&opts, "mpegts_original_network_id", mpegts_info, 0);
        }
@@ -597,7 +807,7 @@ index 92bdf6a3d3..89c4521a95 100644
        av_dict_set(&opts, "mpegts_copyts", "1", 0);
      }
    }
-@@ -771,7 +829,7 @@ muxer_t*
+@@ -771,7 +844,7 @@ muxer_t*
  lav_muxer_create(const muxer_config_t *m_cfg,
                   const muxer_hints_t *hints)
  {
@@ -606,7 +816,7 @@ index 92bdf6a3d3..89c4521a95 100644
    lav_muxer_t *lm;
  #if LIBAVCODEC_VERSION_MAJOR > 58
    const AVOutputFormat *fmt;
-@@ -779,29 +837,10 @@ lav_muxer_create(const muxer_config_t *m_cfg,
+@@ -779,29 +852,10 @@ lav_muxer_create(const muxer_config_t *m_cfg,
    AVOutputFormat *fmt;
  #endif
  
@@ -639,8 +849,25 @@ index 92bdf6a3d3..89c4521a95 100644
      return NULL;
    }
  
-diff --git a/src/packet.c b/src/packet.c
-index a61593c934..214e7e2156 100644
+diff --git src/muxer/muxer_mkv.c src/muxer/muxer_mkv.c
+index 13b437987..20dc09636 100644
+--- src/muxer/muxer_mkv.c
++++ src/muxer/muxer_mkv.c
+@@ -283,8 +283,10 @@ mk_build_tracks(mk_muxer_t *mk, streaming_start_t *ss)
+     tr->sri = ssc->es_sri;
+     tr->nextpts = PTS_UNSET;
+ 
+-    if (mk->webm && ssc->es_type != SCT_VP8 && ssc->es_type != SCT_VORBIS)
+-      tvhwarn(LS_MKV, "WEBM format supports only VP8+VORBIS streams (detected %s)",
++    if (mk->webm &&
++        ssc->es_type != SCT_VP8 && ssc->es_type != SCT_VP9 &&
++        ssc->es_type != SCT_VORBIS && ssc->es_type != SCT_OPUS)
++      tvhwarn(LS_MKV, "WEBM format supports only VP8/VP9 video and Vorbis/Opus audio (detected %s)",
+               streaming_component_type2txt(ssc->es_type));
+ 
+     switch(ssc->es_type) {
+diff --git src/packet.c src/packet.c
+index a61593c93..214e7e215 100644
 --- src/packet.c
 +++ src/packet.c
 @@ -182,7 +182,7 @@ pkt_trace_(const char *file, int line, int subsys, th_pkt_t *pkt,
@@ -652,8 +879,8 @@ index a61593c934..214e7e2156 100644
             fmt ? fmt : "",
             fmt ? " (" : "",
             pkt->pkt_componentindex,
-diff --git a/src/packet.h b/src/packet.h
-index c6a507e32c..af25ad692f 100644
+diff --git src/packet.h src/packet.h
+index c6a507e32..af25ad692 100644
 --- src/packet.h
 +++ src/packet.h
 @@ -53,7 +53,7 @@ typedef struct th_pkt {
@@ -675,8 +902,8 @@ index c6a507e32c..af25ad692f 100644
      } v;
      struct {
        uint8_t pkt_keyframe;
-diff --git a/src/parsers/parser_h264.c b/src/parsers/parser_h264.c
-index ade299a633..e0d3b8a3f6 100644
+diff --git src/parsers/parser_h264.c src/parsers/parser_h264.c
+index ade299a63..e0d3b8a3f 100644
 --- src/parsers/parser_h264.c
 +++ src/parsers/parser_h264.c
 @@ -444,6 +444,11 @@ h264_decode_slice_header(parser_es_t *st, bitstream_t *bs, int *pkttype,
@@ -703,11 +930,34 @@ index ade299a633..e0d3b8a3f6 100644
      st->es_aspect_num = 0;
      st->es_aspect_den = 1;
    }
-diff --git a/src/parsers/parser_hevc.c b/src/parsers/parser_hevc.c
-index c46de5a2bd..e9a6e9c4fa 100644
+diff --git src/parsers/parser_hevc.c src/parsers/parser_hevc.c
+index c46de5a2b..c9b8bd26b 100644
 --- src/parsers/parser_hevc.c
 +++ src/parsers/parser_hevc.c
-@@ -1713,6 +1713,11 @@ hevc_decode_slice_header(parser_es_t *st, bitstream_t *bs, int *pkttype)
+@@ -1164,12 +1164,20 @@ int isom_write_hvcc(sbuf_t *pb, const uint8_t *data, int size)
+         case HEVC_NAL_VPS:
+         case HEVC_NAL_SPS:
+         case HEVC_NAL_PPS:
+-        case HEVC_NAL_SEI_PREFIX:
+-        case HEVC_NAL_SEI_SUFFIX:
++            /* VPS/SPS/PPS are mandatory: a parse failure means we cannot build a
++             * valid hvcC, so bail out. */
+             ret = hvcc_add_nal_unit(buf, len, &hvcc);
+             if (ret < 0)
+                 goto end;
+             break;
++        case HEVC_NAL_SEI_PREFIX:
++        case HEVC_NAL_SEI_SUFFIX:
++            /* SEI is optional in the hvcC. Some encoders (notably hevc_qsv) emit a
++             * tiny SEI NAL that hvcc_add_nal_unit() rejects; that must NOT discard
++             * the whole configuration record (which left an empty hvcC/CodecPrivate
++             * and an undecodable HEVC track). Add it best-effort and ignore errors. */
++            hvcc_add_nal_unit(buf, len, &hvcc);
++            break;
+         default:
+             break;
+         }
+@@ -1713,6 +1721,11 @@ hevc_decode_slice_header(parser_es_t *st, bitstream_t *bs, int *pkttype)
      parser_set_stream_vparam(st, width, height, d);
  
    if (sps->vui.sar.num && sps->vui.sar.den) {
@@ -719,7 +969,7 @@ index c46de5a2bd..e9a6e9c4fa 100644
      width  *= sps->vui.sar.num;
      height *= sps->vui.sar.den;
      if (width && height) {
-@@ -1721,6 +1726,11 @@ hevc_decode_slice_header(parser_es_t *st, bitstream_t *bs, int *pkttype)
+@@ -1721,6 +1734,11 @@ hevc_decode_slice_header(parser_es_t *st, bitstream_t *bs, int *pkttype)
        st->es_aspect_den = height / v;
      }
    } else {
@@ -731,11 +981,11 @@ index c46de5a2bd..e9a6e9c4fa 100644
      st->es_aspect_num = 0;
      st->es_aspect_den = 1;
    }
-diff --git a/src/parsers/parsers.c b/src/parsers/parsers.c
-index 7c20d01d21..e9b7504a1a 100644
+diff --git src/parsers/parsers.c src/parsers/parsers.c
+index 7c20d01d2..e96600cc5 100644
 --- src/parsers/parsers.c
 +++ src/parsers/parsers.c
-@@ -144,6 +144,10 @@ parser_deliver(parser_t *t, parser_es_t *st, th_pkt_t *pkt)
+@@ -144,6 +144,10 @@ deliver:
    if (SCT_ISVIDEO(pkt->pkt_type)) {
      pkt->v.pkt_aspect_num = st->es_aspect_num;
      pkt->v.pkt_aspect_den = st->es_aspect_den;
@@ -761,7 +1011,7 @@ index 7c20d01d21..e9b7504a1a 100644
             st->es_index, width, height, duration, st->es_width, st->es_height,
             st->es_frame_duration, st->es_meta_change);
    if(st->es_width == 0 && st->es_height == 0 && st->es_frame_duration < 2) {
-@@ -1131,13 +1134,35 @@ parser_set_stream_vparam(parser_es_t *st, int width, int height,
+@@ -1131,13 +1134,42 @@ parser_set_stream_vparam(parser_es_t *st, int width, int height,
    }
  }
  
@@ -775,13 +1025,20 @@ index 7c20d01d21..e9b7504a1a 100644
 +     Now that we have the intended display area, we can refine the SAR 
 +     calculation if we already have the DAR from the 0xB3 header. */
 +  if (st->es_aspect_num && st->es_aspect_den && width > 0 && height > 0) {
-+    // SAR = (DAR_num * display_height) / (DAR_den * display_width)
-+    uint32_t sample_aspect_ratio_num = st->es_aspect_num * height;
-+    uint32_t sample_aspect_ratio_den = st->es_aspect_den * width;
-+    // Note: You should simplify this fraction via GCD.
-+    uint32_t v = gcdU32(sample_aspect_ratio_num, sample_aspect_ratio_den);
-+    st->es_sample_aspect_ratio.num = sample_aspect_ratio_num / v;
-+    st->es_sample_aspect_ratio.den = sample_aspect_ratio_den / v;
++    if (st->es_aspect_num == 1 && st->es_aspect_den == 1) {
++      /* aspect_ratio_information = 1 signals square samples (ISO/IEC 13818-2
++         table 6-3): the SAR is 1:1 directly, not a DAR to derive it from. */
++      st->es_sample_aspect_ratio.num = 1;
++      st->es_sample_aspect_ratio.den = 1;
++    } else {
++      // SAR = (DAR_num * display_height) / (DAR_den * display_width)
++      uint32_t sample_aspect_ratio_num = st->es_aspect_num * height;
++      uint32_t sample_aspect_ratio_den = st->es_aspect_den * width;
++      // Note: You should simplify this fraction via GCD.
++      uint32_t v = gcdU32(sample_aspect_ratio_num, sample_aspect_ratio_den);
++      st->es_sample_aspect_ratio.num = sample_aspect_ratio_num / v;
++      st->es_sample_aspect_ratio.den = sample_aspect_ratio_den / v;
++    }
 +  }
 +#endif
 +  parser_set_stream_vparam(st, width, height, duration);
@@ -802,7 +1059,7 @@ index 7c20d01d21..e9b7504a1a 100644
      {0,1},
      {0,1},
      {0,1},
-@@ -1153,35 +1178,199 @@ static const uint8_t mpeg2_aspect[16][2]={
+@@ -1153,35 +1185,196 @@ static const uint8_t mpeg2_aspect[16][2]={
  
  
  /**
@@ -824,7 +1081,8 @@ index 7c20d01d21..e9b7504a1a 100644
  {
 -  int width, height, aspect, duration;
 -
-+  int aspect, duration;
++  int aspect;
++  int duration;
 +  /* 1. Check for minimum required bits. 
 +     The Sequence Header core (up to VBV size) is 61 bits long.
 +     If we have less, we return RESET to wait for more data. */
@@ -996,23 +1254,19 @@ index 7c20d01d21..e9b7504a1a 100644
 +  skip_bits(bs, 1); // Marker bit; TODO: maybe we sould check if is '1'
 +  int display_height = read_bits(bs, 14);
 +
-+  if (display_width > 0 && display_height > 0) {
-+    // update raw fields of es_width and st->es_height
-+    st->es_width_12b  = display_width  & 0xFFFu;
-+    st->es_height_12b = display_height & 0xFFFu;
-+    st->es_width_2b   = (display_width  & 0x3000u) >> 12;
-+    st->es_height_2b  = (display_height & 0x3000u) >> 12;
-+
-+    /* 6. Commit Parameters:
-+    Update the stream context with the newly parsed width, height, and duration. */
-+    parser_combine_stream_vparam(st, st->es_frame_duration);
-+  }
++  /* display_horizontal/vertical_size describe the intended display
++     rectangle (pan&scan), NOT the coded frame size: they must not be
++     written into the es_width/es_height raw fields, which the sequence
++     header resets every GOP (the values would oscillate and corrupt the
++     SAR derived from them in parser_combine_stream_vparam()). */
++  tvhtrace(LS_PARSER, "mpeg2 display extension: display=%dx%d (coded=%dx%d)",
++           display_width, display_height, st->es_width, st->es_height);
 +
 +  /* Return APPEND to signal that parsing of this header is complete. */
    return PARSER_APPEND;
  }
  
-@@ -1229,6 +1418,21 @@ parser_global_data_move(parser_es_t *st, const uint8_t *data, size_t len, int re
+@@ -1229,6 +1422,21 @@ parser_global_data_move(parser_es_t *st, const uint8_t *data, size_t len, int re
   * 'steal' the st->es_buffer and use it as 'pkt' buffer
   *
   */
@@ -1034,7 +1288,7 @@ index 7c20d01d21..e9b7504a1a 100644
  static int
  parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
                   uint32_t next_startcode, int sc_offset)
-@@ -1237,15 +1441,16 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+@@ -1237,15 +1445,16 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
    bitstream_t bs;
    int frametype;
    th_pkt_t *pkt;
@@ -1055,7 +1309,7 @@ index 7c20d01d21..e9b7504a1a 100644
      if(len < 9)
        return PARSER_RESET;
  
-@@ -1253,16 +1458,17 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+@@ -1253,16 +1462,17 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
      return PARSER_RESET;
  
    case 0x00:
@@ -1077,7 +1331,7 @@ index 7c20d01d21..e9b7504a1a 100644
      pkt = pkt_alloc(st->es_type, NULL, 0, st->es_curpts, st->es_curdts, t->prs_current_pcr);
      pkt->v.pkt_frametype = frametype;
      pkt->pkt_duration = st->es_frame_duration;
-@@ -1274,13 +1480,15 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+@@ -1274,13 +1484,15 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
      if(st->es_curdts != PTS_UNSET)
        st->es_curdts += st->es_frame_duration;
  
@@ -1095,7 +1349,7 @@ index 7c20d01d21..e9b7504a1a 100644
      if(!st->es_buf.sb_err) {
        if(parse_mpeg2video_seq_start(t, st, &bs) != PARSER_APPEND)
          return PARSER_RESET;
-@@ -1291,45 +1499,102 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+@@ -1291,45 +1503,102 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
      return PARSER_DROP;
  
    case 0xb5:
@@ -1205,7 +1459,7 @@ index 7c20d01d21..e9b7504a1a 100644
        if (metalen) {
          pkt->pkt_payload = pktbuf_alloc(NULL, metalen + st->es_buf.sb_ptr - 4);
          memcpy(pktbuf_ptr(pkt->pkt_payload), pktbuf_ptr(pkt->pkt_meta), metalen);
-@@ -1340,7 +1605,7 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+@@ -1340,7 +1609,7 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
          sbuf_steal_data(&st->es_buf);
        }
        pkt->pkt_duration = st->es_frame_duration;
@@ -1214,7 +1468,7 @@ index 7c20d01d21..e9b7504a1a 100644
        if (st->es_priv) {
          if (!TAILQ_EMPTY(&st->es_backlog))
            parser_do_backlog(t, st, NULL, pkt->pkt_meta);
-@@ -1357,19 +1622,22 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
+@@ -1357,19 +1626,22 @@ parse_mpeg2video(parser_t *t, parser_es_t *st, size_t len,
      break;
  
    case 0xb8:
@@ -1240,8 +1494,8 @@ index 7c20d01d21..e9b7504a1a 100644
    return PARSER_APPEND;
  }
  
-diff --git a/src/parsers/parsers.h b/src/parsers/parsers.h
-index 404d69dd50..49d0cb9d84 100644
+diff --git src/parsers/parsers.h src/parsers/parsers.h
+index 404d69dd5..49d0cb9d8 100644
 --- src/parsers/parsers.h
 +++ src/parsers/parsers.h
 @@ -134,7 +134,7 @@ void parse_mpeg_ts(parser_t *t, parser_es_t *st, const uint8_t *data,
@@ -1253,8 +1507,8 @@ index 404d69dd50..49d0cb9d84 100644
  
  extern const unsigned int mpeg2video_framedurations[16];
  
-diff --git a/src/plumbing/globalheaders.c b/src/plumbing/globalheaders.c
-index ecd560ec66..e62c3e2ff7 100644
+diff --git src/plumbing/globalheaders.c src/plumbing/globalheaders.c
+index ecd560ec6..732b55e65 100644
 --- src/plumbing/globalheaders.c
 +++ src/plumbing/globalheaders.c
 @@ -34,9 +34,12 @@ typedef struct globalheaders {
@@ -1290,10 +1544,10 @@ index ecd560ec66..e62c3e2ff7 100644
 + * (or 5-byte for SBR) AudioSpecificConfig (AAC-LC) using the packet's sample rate 
 + * index and channel configuration. This is required for many decoders to initialize 
 + * correctly.
-+ *
+  *
 + * @param ssc  The streaming start component context to be updated.
 + * @param pkt  The input packet containing raw media data and technical attributes.
-  *
++ *
 + * @note This function returns immediately if ssc->ssc_gh is already set.
   */
  static void
@@ -1399,24 +1653,19 @@ index ecd560ec66..e62c3e2ff7 100644
   */
  static int
  header_complete(streaming_start_component_t *ssc, int not_so_picky)
-@@ -137,7 +207,16 @@ header_complete(streaming_start_component_t *ssc, int not_so_picky)
+@@ -137,6 +207,11 @@ header_complete(streaming_start_component_t *ssc, int not_so_picky)
      return 0;
  
    if(is_video) {
-+// TO BE REMOVED LATER
-+#if LOGGING
-+#if ENABLE_LIBAV
-+tvherror(LS_GLOBALHEADERS, "not_so_picky = %d, ssc->es_sample_aspect_ratio = %d/%d", not_so_picky, ssc->es_sample_aspect_ratio.num, ssc->es_sample_aspect_ratio.den);
-+#endif
-+#endif
++    /* note: es_sample_aspect_ratio is deliberately NOT required here: only
++       the H264/HEVC/MPEG-2 parsers ever provide it (and H264 without VUI
++       aspect info leaves it 0), so gating on it would stall every other
++       video stream for the full MAX_SCAN_TIME; consumers treat 0 as
++       "unknown" and default to 1:1. */
      if(!not_so_picky && (ssc->es_aspect_num == 0 || ssc->es_aspect_den == 0 ||
-+#if ENABLE_LIBAV
-+                         ssc->es_sample_aspect_ratio.num == 0 || ssc->es_sample_aspect_ratio.den == 0 || 
-+#endif
                           ssc->es_width == 0 || ssc->es_height == 0))
        return 0;
-   }
-@@ -145,6 +224,12 @@ header_complete(streaming_start_component_t *ssc, int not_so_picky)
+@@ -145,6 +220,12 @@ header_complete(streaming_start_component_t *ssc, int not_so_picky)
    if(is_audio && !ssc->es_channels)
      return 0;
  
@@ -1429,7 +1678,7 @@ index ecd560ec66..e62c3e2ff7 100644
    if(ssc->ssc_gh == NULL && gh_require_meta(ssc->es_type))
      return 0;
  
-@@ -153,47 +238,105 @@ header_complete(streaming_start_component_t *ssc, int not_so_picky)
+@@ -153,50 +234,110 @@ header_complete(streaming_start_component_t *ssc, int not_so_picky)
  
  
  /**
@@ -1453,7 +1702,8 @@ index ecd560ec66..e62c3e2ff7 100644
    th_pktref_t *l = TAILQ_LAST(&gh->gh_holdq, th_pktref_queue);
    streaming_start_component_t *ssc;
    int64_t diff;
-+  int8_t found_f = 0, found_l = 0;
++  int8_t found_f = 0;
++  int8_t found_l = 0;
  
    /*
     * Find only packets which require the meta data. Ignore others.
@@ -1496,8 +1746,18 @@ index ecd560ec66..e62c3e2ff7 100644
 +    /* Move to the previous packet in the queue */
      l = TAILQ_PREV(l, th_pktref_queue, pr_link);
    }
--
-+  /* * 3. Calculate Delay Difference:
++  /*
++   * 3. Edge Case - Empty Transcoder Packet:
++   * special noop packet from transcoder, increase decision limit.
++   * If the queue resolved to a single packet (first == last) and it has no actual
++   * media payload, artificially return a delay of 1. This prevents the system from
++   * treating it as a standard zero-delay scenario. Checked before the found_f/found_l
++   * gate below, which would otherwise return 0 when only one packet is queued.
++   */
++  if (l == f && l->pr_pkt->pkt_payload == NULL)
++    return 1;
+ 
++  /* * 4. Calculate Delay Difference:
 +   * If both a first and last packet with valid timestamps were found, compute the delay.
 +   */
    if (l->pr_pkt->pkt_dts != PTS_UNSET && f->pr_pkt->pkt_dts != PTS_UNSET) {
@@ -1530,17 +1790,14 @@ index ecd560ec66..e62c3e2ff7 100644
      diff = 0;
    }
  
-   /* special noop packet from transcoder, increase decision limit */
-+  /* * 4. Edge Case - Empty Transcoder Packet:
-+   * special noop packet from transcoder, increase decision limit.
-+   * If the queue resolved to a single packet (first == last) and it has no actual 
-+   * media payload, artificially return a delay of 1. This prevents the system from 
-+   * treating it as a standard zero-delay scenario.
-+   */
-   if (l == f && l->pr_pkt->pkt_payload == NULL)
-     return 1;
+-  /* special noop packet from transcoder, increase decision limit */
+-  if (l == f && l->pr_pkt->pkt_payload == NULL)
+-    return 1;
+-
+   return diff;
+ }
  
-@@ -238,6 +381,10 @@ headers_complete(globalheaders_t *gh)
+@@ -238,6 +379,10 @@ headers_complete(globalheaders_t *gh)
         * - maximal timeout is reached without metadata
         */
        if(threshold || (qd[i] <= 0 && qd_max > (MAX_NOPKT_TIME * 90))) {
@@ -1551,8 +1808,8 @@ index ecd560ec66..e62c3e2ff7 100644
  	ssc->ssc_disabled = 1;
          tvhdebug(LS_GLOBALHEADERS, "gh disable stream %d %s%s%s (PID %i) threshold %d qd %"PRId64" qd_max %"PRId64,
               ssc->es_index, streaming_component_type2txt(ssc->es_type),
-diff --git a/src/plumbing/tsfix.c b/src/plumbing/tsfix.c
-index 405178bbff..b43d1010b0 100644
+diff --git src/plumbing/tsfix.c src/plumbing/tsfix.c
+index 405178bbf..b43d1010b 100644
 --- src/plumbing/tsfix.c
 +++ src/plumbing/tsfix.c
 @@ -596,7 +596,7 @@ tsfix_input_packet(tsfix_t *tf, streaming_message_t *sm)
@@ -1573,11 +1830,33 @@ index 405178bbff..b43d1010b0 100644
  		streaming_component_type2txt(tfs->tfs_type),
  		tfs->tfs_last_dts_in, pdur, pkt->pkt_dts, pkt->pkt_pts);
      }
-diff --git a/src/profile.c b/src/profile.c
-index 7d2277c719..9c1674c35d 100644
+diff --git src/profile.c src/profile.c
+index 7d2277c71..17a0cf779 100644
 --- src/profile.c
 +++ src/profile.c
-@@ -2312,6 +2312,10 @@ profile_class_mc_list ( void *o, const char *lang )
+@@ -779,13 +779,18 @@ profile_sharer_deliver(profile_chain_t *prch, streaming_message_t *sm)
+      * time correction here
+      */
+     if (pkt->pkt_pts >= prch->prch_ts_delta &&
+-        pkt->pkt_dts >= prch->prch_ts_delta &&
+-        pkt->pkt_pcr >= prch->prch_ts_delta) {
++        pkt->pkt_dts >= prch->prch_ts_delta) {
+       th_pkt_t *n = pkt_copy_shallow(pkt);
+       pkt_ref_dec(pkt);
+       n->pkt_pts -= prch->prch_ts_delta;
+       n->pkt_dts -= prch->prch_ts_delta;
+-      n->pkt_pcr -= prch->prch_ts_delta;
++      // pkt_pcr can legitimately lag pts/dts (notably for transcoded audio, whose
++      // pcr trails its dts by several seconds). Gating the drop on pcr discarded
++      // the whole audio track on a late sharer join (rapid same-channel profile
++      // switch), so globalheaders timed out and disabled audio -> MP4 video-only.
++      // Gate only on pts/dts; clamp the rebased pcr so it never underflows.
++      n->pkt_pcr = (pkt->pkt_pcr >= prch->prch_ts_delta) ?
++                     pkt->pkt_pcr - prch->prch_ts_delta : 0;
+       sm->sm_data = n;
+     } else {
+       pkt_trace(LS_PROFILE, pkt, "packet drop (delta %"PRId64")", prch->prch_ts_delta);
+@@ -2312,6 +2317,10 @@ profile_class_mc_list ( void *o, const char *lang )
      { N_("Matroska (mkv)/av-lib"),        MC_AVMATROSKA },
      { N_("WEBM/av-lib"),                  MC_AVWEBM },
      { N_("MP4/av-lib"),                   MC_AVMP4 },
@@ -1588,8 +1867,8 @@ index 7d2277c719..9c1674c35d 100644
    };
    return strtab2htsmsg(tab, 1, lang);
  }
-diff --git a/src/service.c b/src/service.c
-index c65301666f..34062d0ba0 100644
+diff --git src/service.c src/service.c
+index c65301666..34062d0ba 100644
 --- src/service.c
 +++ src/service.c
 @@ -1664,7 +1664,7 @@ void service_save ( service_t *t, htsmsg_t *m )
@@ -1601,8 +1880,8 @@ index c65301666f..34062d0ba0 100644
      }
  
      htsmsg_add_msg(list, NULL, sub);
-diff --git a/src/timeshift.c b/src/timeshift.c
-index be5655318c..10009262e7 100644
+diff --git src/timeshift.c src/timeshift.c
+index be5655318..10009262e 100644
 --- src/timeshift.c
 +++ src/timeshift.c
 @@ -51,7 +51,7 @@ timeshift_packet_log0
@@ -1614,8 +1893,8 @@ index be5655318c..10009262e7 100644
             ts->id, source,
             pkt->pkt_componentindex,
             SCT_ISVIDEO(pkt->pkt_type) ? pkt_frametype_to_char(pkt->v.pkt_frametype) : '-',
-diff --git a/src/transcoding/codec.h b/src/transcoding/codec.h
-index a16e2a3118..e42a3b6ec4 100644
+diff --git src/transcoding/codec.h src/transcoding/codec.h
+index a16e2a311..e42a3b6ec 100644
 --- src/transcoding/codec.h
 +++ src/transcoding/codec.h
 @@ -93,6 +93,15 @@ struct tvh_codec_profile {
@@ -1646,11 +1925,11 @@ index a16e2a3118..e42a3b6ec4 100644
  
  const enum AVPixelFormat *
  tvh_codec_profile_video_get_pix_fmts(TVHCodecProfile *self);
-diff --git a/src/transcoding/codec/codec.c b/src/transcoding/codec/codec.c
-index 6e5d1e3e78..b966f779b8 100644
+diff --git src/transcoding/codec/codec.c src/transcoding/codec/codec.c
+index 6e5d1e3e7..8739d939d 100644
 --- src/transcoding/codec/codec.c
 +++ src/transcoding/codec/codec.c
-@@ -69,6 +69,11 @@ extern TVHCodec tvh_codec_vaapi_vp8;
+@@ -69,13 +69,18 @@ extern TVHCodec tvh_codec_vaapi_vp8;
  extern TVHCodec tvh_codec_vaapi_vp9;
  #endif
  
@@ -1662,18 +1941,79 @@ index 6e5d1e3e78..b966f779b8 100644
  #if ENABLE_NVENC
  extern TVHCodec tvh_codec_nvenc_h264;
  extern TVHCodec tvh_codec_nvenc_hevc;
-@@ -78,6 +83,10 @@ extern TVHCodec tvh_codec_nvenc_hevc;
- extern TVHCodec tvh_codec_omx_h264;
  #endif
  
+-#if ENABLE_OMX
+-extern TVHCodec tvh_codec_omx_h264;
 +#if ENABLE_V4L2M2M
 +extern TVHCodec tvh_codec_v4l2m2m_h264;
+ #endif
+ 
+ 
+@@ -115,11 +120,32 @@ codec_get_title(const AVCodec *self)
+ 
+ /* TVHCodec ================================================================= */
+ 
++/* The AVCodec config fields (pix_fmts, sample_fmts, supported_samplerates,
++   ch_layouts) are deprecated since lavc 61.13 (ffmpeg 7.1) in favor of
++   avcodec_get_supported_config(), which keeps the same semantics: the list
++   uses the same config-specific terminator and NULL means "all supported". */
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
++static const void *
++tvh_codec_get_supported_config(const AVCodec *codec, enum AVCodecConfig config)
++{
++    const void *configs = NULL;
++
++    if (avcodec_get_supported_config(NULL, codec, config, 0, &configs, NULL) < 0)
++        return NULL;
++    return configs;
++}
 +#endif
 +
+ static void
+ tvh_codec_video_init(TVHVideoCodec *self, const AVCodec *codec)
+ {
+     if (!self->pix_fmts) {
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
++        self->pix_fmts =
++            tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_PIX_FORMAT);
++#else
+         self->pix_fmts = codec->pix_fmts;
++#endif
+     }
+ }
  
- /* AVCodec ================================================================== */
+@@ -131,15 +157,28 @@ tvh_codec_audio_init(TVHAudioCodec *self, const AVCodec *codec)
+     };
  
-@@ -320,6 +329,11 @@ tvh_codecs_register()
+     if (!self->sample_fmts) {
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
++        self->sample_fmts =
++            tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_SAMPLE_FORMAT);
++#else
+         self->sample_fmts = codec->sample_fmts;
++#endif
+     }
+     if (!self->sample_rates) {
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
++        self->sample_rates =
++            tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_SAMPLE_RATE);
++#else
+         self->sample_rates = codec->supported_samplerates;
++#endif
+         if (!self->sample_rates)
+             self->sample_rates = default_sample_rates;
+     }
+     if (!self->channel_layouts) {
+-#if LIBAVCODEC_VERSION_MAJOR > 59
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
++        self->channel_layouts =
++            tvh_codec_get_supported_config(codec, AV_CODEC_CONFIG_CHANNEL_LAYOUT);
++#elif LIBAVCODEC_VERSION_MAJOR > 59
+         self->channel_layouts = codec->ch_layouts;
+ #else
+         self->channel_layouts = codec->channel_layouts;
+@@ -320,13 +359,18 @@ tvh_codecs_register()
      }
  #endif
  
@@ -1685,19 +2025,17 @@ index 6e5d1e3e78..b966f779b8 100644
  #if ENABLE_NVENC
      tvh_codec_register(&tvh_codec_nvenc_h264);
      tvh_codec_register(&tvh_codec_nvenc_hevc);
-@@ -328,6 +342,10 @@ tvh_codecs_register()
- #if ENABLE_OMX
-     tvh_codec_register(&tvh_codec_omx_h264);
  #endif
-+
+ 
+-#if ENABLE_OMX
+-    tvh_codec_register(&tvh_codec_omx_h264);
 +#if ENABLE_V4L2M2M
 +    tvh_codec_register(&tvh_codec_v4l2m2m_h264);
-+#endif
+ #endif
  }
  
- 
-diff --git a/src/transcoding/codec/codecs/aac.c b/src/transcoding/codec/codecs/aac.c
-index 07ef1d6cd5..efbe8fa0f2 100644
+diff --git src/transcoding/codec/codecs/aac.c src/transcoding/codec/codecs/aac.c
+index 07ef1d6cd..efbe8fa0f 100644
 --- src/transcoding/codec/codecs/aac.c
 +++ src/transcoding/codec/codecs/aac.c
 @@ -40,7 +40,8 @@ static const AVChannelLayout aac_channel_layouts[] = {
@@ -1731,8 +2069,8 @@ index 07ef1d6cd5..efbe8fa0f2 100644
      return 0;
  }
  
-diff --git a/src/transcoding/codec/codecs/flac.c b/src/transcoding/codec/codecs/flac.c
-index 6022f537b5..ad96ce934c 100644
+diff --git src/transcoding/codec/codecs/flac.c src/transcoding/codec/codecs/flac.c
+index 6022f537b..ad96ce934 100644
 --- src/transcoding/codec/codecs/flac.c
 +++ src/transcoding/codec/codecs/flac.c
 @@ -61,6 +61,7 @@ static int
@@ -1743,8 +2081,149 @@ index 6022f537b5..ad96ce934c 100644
      return 0;
  }
  
-diff --git a/src/transcoding/codec/codecs/libs/libfdk_aac.c b/src/transcoding/codec/codecs/libs/libfdk_aac.c
-index ba8efa6cb5..214e588059 100644
+diff --git src/transcoding/codec/codecs/libs/drmdev.c src/transcoding/codec/codecs/libs/drmdev.c
+new file mode 100644
+index 000000000..1696a193a
+--- /dev/null
++++ src/transcoding/codec/codecs/libs/drmdev.c
+@@ -0,0 +1,98 @@
++/*
++ *  tvheadend - Codec Profiles - shared DRM device enumeration
++ *
++ *  Copyright (C) 2016 Tvheadend
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "drmdev.h"
++
++#include <fcntl.h>
++#include <unistd.h>
++#include <limits.h>
++#include <string.h>
++#include <stdio.h>
++#include <sys/ioctl.h>
++
++#if defined(__linux__)
++#include <linux/types.h>
++#include <asm/ioctl.h>
++#else
++#include <sys/ioccom.h>
++#include <sys/types.h>
++typedef size_t   __kernel_size_t;
++#endif
++
++typedef struct drm_version {
++   int version_major;        /**< Major version */
++   int version_minor;        /**< Minor version */
++   int version_patchlevel;   /**< Patch level */
++   __kernel_size_t name_len; /**< Length of name buffer */
++   char *name;               /**< Name of driver */
++   __kernel_size_t date_len; /**< Length of date buffer */
++   char *date;               /**< User-space buffer to hold date */
++   __kernel_size_t desc_len; /**< Length of desc buffer */
++   char *desc;               /**< User-space buffer to hold desc */
++} drm_version_t;
++
++#define DRM_IOCTL_VERSION _IOWR('d', 0x00, struct drm_version)
++
++static int
++tvh_probe_drm_device(const char *device, char *name, size_t namelen)
++{
++    drm_version_t dv;
++    char dname[128];
++    int fd;
++
++    if ((fd = open(device, O_RDWR)) < 0)
++        return -1;
++    memset(&dv, 0, sizeof(dv));
++    memset(dname, 0, sizeof(dname));
++    dv.name = dname;
++    dv.name_len = sizeof(dname)-1;
++    if (ioctl(fd, DRM_IOCTL_VERSION, &dv) < 0) {
++        close(fd);
++        return -1;
++    }
++    snprintf(name, namelen, "%s v%d.%d.%d (%s)",
++             dv.name, dv.version_major, dv.version_minor,
++             dv.version_patchlevel, device);
++    close(fd);
++    return 0;
++}
++
++htsmsg_t *
++tvh_drm_device_list(void *obj, const char *lang)
++{
++    htsmsg_t *result = htsmsg_create_list();
++    char device[PATH_MAX];
++    char name[128];
++    int i, dev_num;
++
++    for (i = 0; i < 32; i++) {
++        dev_num = i + 128;
++        snprintf(device, sizeof(device), "/dev/dri/renderD%d", dev_num);
++        if (tvh_probe_drm_device(device, name, sizeof(name)) == 0)
++            htsmsg_add_msg(result, NULL, htsmsg_create_key_val(device, name));
++    }
++    for (i = 0; i < 32; i++) {
++        // card nodes are numbered from 0 (render nodes from 128)
++        dev_num = i;
++        snprintf(device, sizeof(device), "/dev/dri/card%d", dev_num);
++        if (tvh_probe_drm_device(device, name, sizeof(name)) == 0)
++            htsmsg_add_msg(result, NULL, htsmsg_create_key_val(device, name));
++    }
++    return result;
++}
+diff --git src/transcoding/codec/codecs/libs/drmdev.h src/transcoding/codec/codecs/libs/drmdev.h
+new file mode 100644
+index 000000000..aed6045d7
+--- /dev/null
++++ src/transcoding/codec/codecs/libs/drmdev.h
+@@ -0,0 +1,31 @@
++/*
++ *  tvheadend - Codec Profiles - shared DRM device enumeration
++ *
++ *  Copyright (C) 2016 Tvheadend
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef TVH_TRANSCODING_CODEC_DRMDEV_H__
++#define TVH_TRANSCODING_CODEC_DRMDEV_H__
++
++#include "htsmsg.h"
++
++/* idnode property "list" callback enumerating the available /dev/dri render
++   and card nodes via the DRM VERSION ioctl. Shared by the VAAPI and QSV codec
++   profile classes. */
++htsmsg_t *
++tvh_drm_device_list(void *obj, const char *lang);
++
++#endif // TVH_TRANSCODING_CODEC_DRMDEV_H__
+diff --git src/transcoding/codec/codecs/libs/libfdk_aac.c src/transcoding/codec/codecs/libs/libfdk_aac.c
+index ba8efa6cb..214e58805 100644
 --- src/transcoding/codec/codecs/libs/libfdk_aac.c
 +++ src/transcoding/codec/codecs/libs/libfdk_aac.c
 @@ -22,6 +22,35 @@
@@ -1797,8 +2276,8 @@ index ba8efa6cb5..214e588059 100644
      .profile_destroy = tvh_codec_profile_audio_destroy,
 +    .channel_layouts = libfdk_aac_channel_layouts,
  };
-diff --git a/src/transcoding/codec/codecs/libs/libopus.c b/src/transcoding/codec/codecs/libs/libopus.c
-index bc4f14589e..f11c877164 100644
+diff --git src/transcoding/codec/codecs/libs/libopus.c src/transcoding/codec/codecs/libs/libopus.c
+index bc4f14589..f11c87716 100644
 --- src/transcoding/codec/codecs/libs/libopus.c
 +++ src/transcoding/codec/codecs/libs/libopus.c
 @@ -41,9 +41,31 @@ tvh_codec_profile_libopus_open(tvh_codec_profile_libopus_t *self,
@@ -1849,27 +2328,19 @@ index bc4f14589e..f11c877164 100644
      .profile_destroy = tvh_codec_profile_audio_destroy,
 +    .channel_layouts = libopus_channel_layouts,
  };
-diff --git a/src/transcoding/codec/codecs/libs/libtheora.c b/src/transcoding/codec/codecs/libs/libtheora.c
-index 46e5561948..2bdd51acca 100644
+diff --git src/transcoding/codec/codecs/libs/libtheora.c src/transcoding/codec/codecs/libs/libtheora.c
+index 46e556194..634f50663 100644
 --- src/transcoding/codec/codecs/libs/libtheora.c
 +++ src/transcoding/codec/codecs/libs/libtheora.c
-@@ -26,6 +26,7 @@
- static int
- tvh_codec_profile_libtheora_open(TVHCodecProfile *self, AVDictionary **opts)
- {
-+    //const TVHVideoCodecProfile *vp = (TVHVideoCodecProfile *)self;
-     // bit_rate or global_quality
-     if (self->bit_rate) {
-         AV_DICT_SET_BIT_RATE(LST_LIBTHEORA, opts, self->bit_rate);
-@@ -33,6 +34,7 @@ tvh_codec_profile_libtheora_open(TVHCodecProfile *self, AVDictionary **opts)
+@@ -33,6 +33,7 @@ tvh_codec_profile_libtheora_open(TVHCodecProfile *self, AVDictionary **opts)
      else {
          AV_DICT_SET_GLOBAL_QUALITY(LST_LIBTHEORA, opts, self->qscale, 6);
      }
-+    ((TVHCodecProfile *)self)->has_support_for_filter2 = 1;
++    self->has_support_for_filter2 = 1;
      return 0;
  }
  
-@@ -64,6 +66,16 @@ static const codec_profile_class_t codec_profile_libtheora_class = {
+@@ -64,6 +65,16 @@ static const codec_profile_class_t codec_profile_libtheora_class = {
                  .intextra = INTEXTRA_RANGE(0, 10, 1),
                  .def.d    = 0,
              },
@@ -1886,8 +2357,8 @@ index 46e5561948..2bdd51acca 100644
              {}
          }
      },
-diff --git a/src/transcoding/codec/codecs/libs/libvorbis.c b/src/transcoding/codec/codecs/libs/libvorbis.c
-index 50cede84b0..626c4bd868 100644
+diff --git src/transcoding/codec/codecs/libs/libvorbis.c src/transcoding/codec/codecs/libs/libvorbis.c
+index 50cede84b..e3428bd86 100644
 --- src/transcoding/codec/codecs/libs/libvorbis.c
 +++ src/transcoding/codec/codecs/libs/libvorbis.c
 @@ -24,7 +24,7 @@
@@ -1913,7 +2384,7 @@ index 50cede84b0..626c4bd868 100644
      else {
          AV_DICT_SET_GLOBAL_QUALITY(LST_LIBVORBIS, opts, self->qscale, 5);
      }
-+    ((TVHCodecProfile *)self)->has_support_for_filter2 = 1;
++    self->has_support_for_filter2 = 1;
      return 0;
  }
  
@@ -1927,8 +2398,8 @@ index 50cede84b0..626c4bd868 100644
      .profile_destroy = tvh_codec_profile_audio_destroy,
 +    .channel_layouts = libvorbis_channel_layouts,
  };
-diff --git a/src/transcoding/codec/codecs/libs/libvpx.c b/src/transcoding/codec/codecs/libs/libvpx.c
-index 218f939e7e..2660d8d820 100644
+diff --git src/transcoding/codec/codecs/libs/libvpx.c src/transcoding/codec/codecs/libs/libvpx.c
+index 218f939e7..2660d8d82 100644
 --- src/transcoding/codec/codecs/libs/libvpx.c
 +++ src/transcoding/codec/codecs/libs/libvpx.c
 @@ -46,6 +46,7 @@ tvh_codec_profile_libvpx_open(tvh_codec_profile_libvpx_t *self,
@@ -1956,8 +2427,8 @@ index 218f939e7e..2660d8d820 100644
              {}
          }
      },
-diff --git a/src/transcoding/codec/codecs/libs/libx26x.c b/src/transcoding/codec/codecs/libs/libx26x.c
-index 3457a32f29..afd94e2132 100644
+diff --git src/transcoding/codec/codecs/libs/libx26x.c src/transcoding/codec/codecs/libs/libx26x.c
+index 3457a32f2..afd94e213 100644
 --- src/transcoding/codec/codecs/libs/libx26x.c
 +++ src/transcoding/codec/codecs/libs/libx26x.c
 @@ -102,6 +102,16 @@ static const codec_profile_class_t codec_profile_libx26x_class = {
@@ -2027,8 +2498,8 @@ index 3457a32f29..afd94e2132 100644
      return 0;
  }
  
-diff --git a/src/transcoding/codec/codecs/libs/nvenc.c b/src/transcoding/codec/codecs/libs/nvenc.c
-index ca437de53d..e47ec747d4 100644
+diff --git src/transcoding/codec/codecs/libs/nvenc.c src/transcoding/codec/codecs/libs/nvenc.c
+index ca437de53..03304f5b7 100644
 --- src/transcoding/codec/codecs/libs/nvenc.c
 +++ src/transcoding/codec/codecs/libs/nvenc.c
 @@ -21,11 +21,15 @@
@@ -2189,7 +2660,7 @@ index ca437de53d..e47ec747d4 100644
  } tvh_codec_profile_nvenc_t;
  
  static int
-@@ -113,83 +213,195 @@ tvh_codec_profile_nvenc_open(tvh_codec_profile_nvenc_t *self,
+@@ -113,83 +213,197 @@ tvh_codec_profile_nvenc_open(tvh_codec_profile_nvenc_t *self,
          {"slow",        PRESET_SLOW},
          {"medium",      PRESET_MEDIUM},
          {"fast",        PRESET_FAST},
@@ -2231,10 +2702,10 @@ index ca437de53d..e47ec747d4 100644
 +    };
 +#if NVENCAPI_MAJOR_VERSION >= 10
 +    static const struct strtab tunetab[] = {
-+        {"hq",	            NV_ENC_PARAMS_RC_CONSTQP},
-+        {"ll",              NV_ENC_PARAMS_RC_VBR},
-+        {"ull",             NV_ENC_PARAMS_RC_CBR},
-+        {"lossless",        NV_ENC_PARAMS_RC_VBR_MINQP},
++        {"hq",	            NV_ENC_TUNING_INFO_HIGH_QUALITY},
++        {"ll",              NV_ENC_TUNING_INFO_LOW_LATENCY},
++        {"ull",             NV_ENC_TUNING_INFO_ULTRA_LOW_LATENCY},
++        {"lossless",        NV_ENC_TUNING_INFO_LOSSLESS},
      };
 +#endif
      const char *s;
@@ -2262,8 +2733,10 @@ index ca437de53d..e47ec747d4 100644
 +            AV_DICT_SET(LST_NVENC, opts, "rc", s, 0);
 +        }
 +    
-+    int int_bitrate = (int)((self->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
-+    int int_max_bitrate = (int)((self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(self->size.den) - 480.0) / 480.0)));
++    // height 0 means keep the original resolution: scale as 480 (factor 1.0)
++    double out_height = (self->size.den > 0) ? (double)(self->size.den) : 480.0;
++    int int_bitrate = (int)((self->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * (out_height - 480.0) / 480.0)));
++    int int_max_bitrate = (int)((self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * (out_height - 480.0) / 480.0)));
 +    int int_qp = self->qp;
 +    int int_cq = self->cq;
 +    // disable fields based on rc mode to match the UI behavior
@@ -2422,7 +2895,7 @@ index ca437de53d..e47ec747d4 100644
  static const codec_profile_class_t codec_profile_nvenc_class = {
      {
          .ic_super      = (idclass_t *)&codec_profile_video_class,
-@@ -198,28 +410,18 @@ static const codec_profile_class_t codec_profile_nvenc_class = {
+@@ -198,28 +412,18 @@ static const codec_profile_class_t codec_profile_nvenc_class = {
          .ic_properties = (const property_t[]){
              {
                  .type     = PT_INT,
@@ -2456,7 +2929,7 @@ index ca437de53d..e47ec747d4 100644
                  .name     = N_("Preset"),
                  .group    = 3,
                  .desc     = N_("Override the preset rate control."),
-@@ -228,29 +430,19 @@ static const codec_profile_class_t codec_profile_nvenc_class = {
+@@ -228,29 +432,19 @@ static const codec_profile_class_t codec_profile_nvenc_class = {
                  .list     = codec_profile_nvenc_class_preset_list,
                  .def.i    = PRESET_DEFAULT,
              },
@@ -2495,7 +2968,7 @@ index ca437de53d..e47ec747d4 100644
              {
                  .type     = PT_INT,
                  .id       = "gop_size",     // Don't change
-@@ -264,8 +456,8 @@ static const codec_profile_class_t codec_profile_nvenc_class = {
+@@ -264,8 +458,8 @@ static const codec_profile_class_t codec_profile_nvenc_class = {
              },
              {
                  .type     = PT_INT,
@@ -2506,7 +2979,7 @@ index ca437de53d..e47ec747d4 100644
                  .group    = 3,
                  .desc     = N_("Override the preset rate control."),
                  .opts     = PO_EXPERT,
-@@ -273,6 +465,102 @@ static const codec_profile_class_t codec_profile_nvenc_class = {
+@@ -273,6 +467,102 @@ static const codec_profile_class_t codec_profile_nvenc_class = {
                  .list     = codec_profile_nvenc_class_rc_list,
                  .def.i    = NV_ENC_PARAMS_RC_AUTO,
              },
@@ -2609,7 +3082,7 @@ index ca437de53d..e47ec747d4 100644
              {}
          }
      },
-@@ -295,15 +583,8 @@ static int
+@@ -295,15 +585,8 @@ static int
  tvh_codec_profile_nvenc_h264_open(tvh_codec_profile_nvenc_t *self,
                                    AVDictionary **opts)
  {
@@ -2626,7 +3099,7 @@ index ca437de53d..e47ec747d4 100644
          {"1.0",           NV_ENC_LEVEL_H264_1},
          {"1.0b",          NV_ENC_LEVEL_H264_1b},
          {"1.1",           NV_ENC_LEVEL_H264_11},
-@@ -320,9 +601,11 @@ tvh_codec_profile_nvenc_h264_open(tvh_codec_profile_nvenc_t *self,
+@@ -320,9 +603,11 @@ tvh_codec_profile_nvenc_h264_open(tvh_codec_profile_nvenc_t *self,
          {"4.2",           NV_ENC_LEVEL_H264_42},
          {"5.0",           NV_ENC_LEVEL_H264_5},
          {"5.1",           NV_ENC_LEVEL_H264_51},
@@ -2638,7 +3111,7 @@ index ca437de53d..e47ec747d4 100644
      };
  
      const char *s;
-@@ -331,20 +614,16 @@ tvh_codec_profile_nvenc_h264_open(tvh_codec_profile_nvenc_t *self,
+@@ -331,20 +616,16 @@ tvh_codec_profile_nvenc_h264_open(tvh_codec_profile_nvenc_t *self,
          (s = val2str(self->level, leveltab)) != NULL) {
          AV_DICT_SET(LST_NVENC, opts, "level", s, 0);
      }
@@ -2663,7 +3136,7 @@ index ca437de53d..e47ec747d4 100644
      return 0;
  }
  
-@@ -352,7 +631,7 @@ static htsmsg_t *
+@@ -352,7 +633,7 @@ static htsmsg_t *
  codec_profile_nvenc_class_level_list_h264(void *obj, const char *lang)
  {
      static const struct strtab tab[] = {
@@ -2672,7 +3145,7 @@ index ca437de53d..e47ec747d4 100644
          {N_("1.0"),           NV_ENC_LEVEL_H264_1},
          {N_("1.0b"),          NV_ENC_LEVEL_H264_1b},
          {N_("1.1"),           NV_ENC_LEVEL_H264_11},
-@@ -369,13 +648,17 @@ codec_profile_nvenc_class_level_list_h264(void *obj, const char *lang)
+@@ -369,13 +650,17 @@ codec_profile_nvenc_class_level_list_h264(void *obj, const char *lang)
          {N_("4.2"),           NV_ENC_LEVEL_H264_42},
          {N_("5.0"),           NV_ENC_LEVEL_H264_5},
          {N_("5.1"),           NV_ENC_LEVEL_H264_51},
@@ -2690,7 +3163,7 @@ index ca437de53d..e47ec747d4 100644
  static const codec_profile_class_t codec_profile_nvenc_h264_class = {
      {
          .ic_super      = (idclass_t *)&codec_profile_nvenc_class,
-@@ -384,9 +667,9 @@ static const codec_profile_class_t codec_profile_nvenc_h264_class = {
+@@ -384,9 +669,9 @@ static const codec_profile_class_t codec_profile_nvenc_h264_class = {
          .ic_properties = (const property_t[]){
              {
                  .type     = PT_INT,
@@ -2702,7 +3175,7 @@ index ca437de53d..e47ec747d4 100644
                  .desc     = N_("Override the preset level."),
                  .opts     = PO_EXPERT,
                  .off      = offsetof(tvh_codec_profile_nvenc_t, level),
-@@ -405,6 +688,8 @@ TVHVideoCodec tvh_codec_nvenc_h264 = {
+@@ -405,6 +690,8 @@ TVHVideoCodec tvh_codec_nvenc_h264 = {
      .size     = sizeof(tvh_codec_profile_nvenc_t),
      .idclass  = &codec_profile_nvenc_h264_class,
      .profiles = nvenc_h264_profiles,
@@ -2711,7 +3184,7 @@ index ca437de53d..e47ec747d4 100644
  };
  
  
-@@ -421,14 +706,8 @@ static int
+@@ -421,14 +708,8 @@ static int
  tvh_codec_profile_nvenc_hevc_open(tvh_codec_profile_nvenc_t *self,
                                    AVDictionary **opts)
  {
@@ -2727,7 +3200,7 @@ index ca437de53d..e47ec747d4 100644
          {"1.0",           NV_ENC_LEVEL_HEVC_1},
          {"2.0",           NV_ENC_LEVEL_HEVC_2},
          {"2.1",           NV_ENC_LEVEL_HEVC_21},
-@@ -439,9 +718,11 @@ tvh_codec_profile_nvenc_hevc_open(tvh_codec_profile_nvenc_t *self,
+@@ -439,9 +720,11 @@ tvh_codec_profile_nvenc_hevc_open(tvh_codec_profile_nvenc_t *self,
          {"5.0",           NV_ENC_LEVEL_HEVC_5},
          {"5.1",           NV_ENC_LEVEL_HEVC_51},
          {"5.2",           NV_ENC_LEVEL_HEVC_52},
@@ -2739,7 +3212,7 @@ index ca437de53d..e47ec747d4 100644
      };
  
      const char *s;
-@@ -450,20 +731,16 @@ tvh_codec_profile_nvenc_hevc_open(tvh_codec_profile_nvenc_t *self,
+@@ -450,20 +733,16 @@ tvh_codec_profile_nvenc_hevc_open(tvh_codec_profile_nvenc_t *self,
          (s = val2str(self->level, leveltab)) != NULL) {
          AV_DICT_SET(LST_NVENC, opts, "level", s, 0);
          }
@@ -2764,7 +3237,7 @@ index ca437de53d..e47ec747d4 100644
      return 0;
  }
  
-@@ -471,7 +748,7 @@ static htsmsg_t *
+@@ -471,7 +750,7 @@ static htsmsg_t *
  codec_profile_nvenc_class_level_list_hevc(void *obj, const char *lang)
  {
      static const struct strtab tab[] = {
@@ -2773,7 +3246,7 @@ index ca437de53d..e47ec747d4 100644
          {N_("1.0"),           NV_ENC_LEVEL_HEVC_1},
          {N_("2.0"),           NV_ENC_LEVEL_HEVC_2},
          {N_("2.1"),           NV_ENC_LEVEL_HEVC_21},
-@@ -482,13 +759,17 @@ codec_profile_nvenc_class_level_list_hevc(void *obj, const char *lang)
+@@ -482,13 +761,17 @@ codec_profile_nvenc_class_level_list_hevc(void *obj, const char *lang)
          {N_("5.0"),           NV_ENC_LEVEL_HEVC_5},
          {N_("5.1"),           NV_ENC_LEVEL_HEVC_51},
          {N_("5.2"),           NV_ENC_LEVEL_HEVC_52},
@@ -2791,7 +3264,7 @@ index ca437de53d..e47ec747d4 100644
  static const codec_profile_class_t codec_profile_nvenc_hevc_class = {
      {
          .ic_super      = (idclass_t *)&codec_profile_nvenc_class,
-@@ -497,9 +778,9 @@ static const codec_profile_class_t codec_profile_nvenc_hevc_class = {
+@@ -497,9 +780,9 @@ static const codec_profile_class_t codec_profile_nvenc_hevc_class = {
          .ic_properties = (const property_t[]){
              {
                  .type     = PT_INT,
@@ -2803,33 +3276,142 @@ index ca437de53d..e47ec747d4 100644
                  .desc     = N_("Override the preset level."),
                  .opts     = PO_EXPERT,
                  .off      = offsetof(tvh_codec_profile_nvenc_t, level),
-diff --git a/src/transcoding/codec/codecs/libs/omx.c b/src/transcoding/codec/codecs/libs/omx.c
-index b6dc4b19d1..88b1d42f97 100644
+diff --git src/transcoding/codec/codecs/libs/omx.c src/transcoding/codec/codecs/libs/omx.c
+deleted file mode 100644
+index b6dc4b19d..000000000
 --- src/transcoding/codec/codecs/libs/omx.c
-+++ src/transcoding/codec/codecs/libs/omx.c
-@@ -97,6 +97,16 @@ static const codec_profile_class_t codec_profile_omx_class = {
-                 .off      = offsetof(tvh_codec_profile_omx_t, zerocopy),
-                 .def.i    = 0,
-             },
-+            {
-+                .type     = PT_INT,
-+                .id       = "encoder_hwaccel_type",
-+                .name     = N_("Encoder hardware acceleration type"),
-+                .desc     = N_("Encoder hardware acceleration type"),
-+                .group    = 2,
-+                .opts     = PO_PHIDDEN,
-+                .off      = offsetof(TVHVideoCodecProfile, encoder_hwaccel_type),
-+                .def.i    = 100, //AV_HWDEVICE_TYPE_OMX
-+            },
-             {}
-         }
-     },
-diff --git a/src/transcoding/codec/codecs/libs/qsv.c b/src/transcoding/codec/codecs/libs/qsv.c
++++ /dev/null
+@@ -1,124 +0,0 @@
+-/*
+- *  tvheadend - Codec Profiles
+- *
+- *  Copyright (C) 2016 Tvheadend
+- *
+- *  This program is free software: you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation, either version 3 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-
+-#include "transcoding/codec/internals.h"
+-
+-
+-/* omx ====================================================================== */
+-
+-typedef struct {
+-    TVHVideoCodecProfile;
+-    char *libname;
+-    char *libprefix;
+-    int zerocopy;
+-} tvh_codec_profile_omx_t;
+-
+-
+-static int
+-tvh_codec_profile_omx_open(tvh_codec_profile_omx_t *self, AVDictionary **opts)
+-{
+-    AV_DICT_SET_FLAGS_GLOBAL_HEADER(LST_OMX, opts);
+-    // bit_rate
+-    if (self->bit_rate) {
+-        AV_DICT_SET_BIT_RATE(LST_OMX, opts, self->bit_rate);
+-    }
+-    if (self->libname && strlen(self->libname)) {
+-        AV_DICT_SET(LST_OMX, opts, "omx_libname", self->libname, 0);
+-    }
+-    if (self->libprefix && strlen(self->libprefix)) {
+-        AV_DICT_SET(LST_OMX, opts, "omx_libprefix", self->libprefix, 0);
+-    }
+-    AV_DICT_SET_INT(LST_OMX, opts, "zerocopy", self->zerocopy, 0);
+-    return 0;
+-}
+-
+-
+-static const codec_profile_class_t codec_profile_omx_class = {
+-    {
+-        .ic_super   = (idclass_t *)&codec_profile_video_class,
+-        .ic_class   = "codec_profile_omx",
+-        .ic_caption = N_("omx_h264"),
+-        .ic_properties = (const property_t[]){
+-            {
+-                .type     = PT_DBL,
+-                .id       = "bit_rate",
+-                .name     = N_("Bitrate (kb/s) (0=auto)"),
+-                .desc     = N_("Constant bitrate (CBR) mode."),
+-                .group    = 3,
+-                .get_opts = codec_profile_class_get_opts,
+-                .off      = offsetof(TVHCodecProfile, bit_rate),
+-                .def.d    = 0,
+-            },
+-            {
+-                .type     = PT_STR,
+-                .id       = "omx_libname",
+-                .name     = N_("Library name"),
+-                .desc     = N_("OpenMAX library name."),
+-                .group    = 5,
+-                .opts     = PO_EXPERT,
+-                .get_opts = codec_profile_class_get_opts,
+-                .off      = offsetof(tvh_codec_profile_omx_t, libname),
+-            },
+-            {
+-                .type     = PT_STR,
+-                .id       = "omx_libprefix",
+-                .name     = N_("Library prefix"),
+-                .desc     = N_("OpenMAX library prefix."),
+-                .group    = 5,
+-                .opts     = PO_EXPERT,
+-                .get_opts = codec_profile_class_get_opts,
+-                .off      = offsetof(tvh_codec_profile_omx_t, libprefix),
+-            },
+-            {
+-                .type     = PT_BOOL,
+-                .id       = "zerocopy",
+-                .name     = N_("Zerocopy"),
+-                .desc     = N_("Try to avoid copying input frames if possible."),
+-                .group    = 5,
+-                .opts     = PO_EXPERT,
+-                .get_opts = codec_profile_class_get_opts,
+-                .off      = offsetof(tvh_codec_profile_omx_t, zerocopy),
+-                .def.i    = 0,
+-            },
+-            {}
+-        }
+-    },
+-    .open = (codec_profile_open_meth)tvh_codec_profile_omx_open,
+-};
+-
+-
+-/* h264_omx ================================================================= */
+-
+-static void
+-tvh_codec_profile_omx_destroy(TVHCodecProfile *_self)
+-{
+-    tvh_codec_profile_omx_t *self = (tvh_codec_profile_omx_t *)_self;
+-    tvh_codec_profile_video_destroy(_self);
+-    free(self->libname);
+-    free(self->libprefix);
+-}
+-
+-TVHVideoCodec tvh_codec_omx_h264 = {
+-    .name    = "h264_omx",
+-    .size    = sizeof(tvh_codec_profile_omx_t),
+-    .idclass = &codec_profile_omx_class,
+-    .profile_init = tvh_codec_profile_video_init,
+-    .profile_destroy = tvh_codec_profile_omx_destroy,
+-};
+diff --git src/transcoding/codec/codecs/libs/qsv.c src/transcoding/codec/codecs/libs/qsv.c
 new file mode 100644
-index 0000000000..ec5f201a71
+index 000000000..036e943cd
 --- /dev/null
 +++ src/transcoding/codec/codecs/libs/qsv.c
-@@ -0,0 +1,952 @@
+@@ -0,0 +1,888 @@
 +/*
 + *  tvheadend - Codec Profiles
 + *
@@ -2851,8 +3433,7 @@ index 0000000000..ec5f201a71
 +
 +
 +#include "transcoding/codec/internals.h"
-+#include <fcntl.h>
-+#include <sys/ioctl.h>
++#include "transcoding/codec/codecs/libs/drmdev.h"
 +
 +#include "idnode.h"
 +#include "htsmsg.h"
@@ -2933,78 +3514,6 @@ index 0000000000..ec5f201a71
 +/* qsv ==================================================================== */
 +
 +
-+#if defined(__linux__)
-+#include <linux/types.h>
-+#include <asm/ioctl.h>
-+#else
-+#include <sys/ioccom.h>
-+#include <sys/types.h>
-+typedef size_t   __kernel_size_t;
-+#endif
-+
-+typedef struct drm_version {
-+   int version_major;        /**< Major version */
-+   int version_minor;        /**< Minor version */
-+   int version_patchlevel;   /**< Patch level */
-+   __kernel_size_t name_len; /**< Length of name buffer */
-+   char *name;               /**< Name of driver */
-+   __kernel_size_t date_len; /**< Length of date buffer */
-+   char *date;               /**< User-space buffer to hold date */
-+   __kernel_size_t desc_len; /**< Length of desc buffer */
-+   char *desc;               /**< User-space buffer to hold desc */
-+} drm_version_t;
-+
-+#define DRM_IOCTL_VERSION _IOWR('d', 0x00, struct drm_version)
-+
-+
-+static int
-+probe_vaapi_device(const char *device, char *name, size_t namelen)
-+{
-+    drm_version_t dv;
-+    char dname[128];
-+    int fd;
-+
-+    if ((fd = open(device, O_RDWR)) < 0)
-+        return -1;
-+    memset(&dv, 0, sizeof(dv));
-+    memset(dname, 0, sizeof(dname));
-+    dv.name = dname;
-+    dv.name_len = sizeof(dname)-1;
-+    if (ioctl(fd, DRM_IOCTL_VERSION, &dv) < 0) {
-+        close(fd);
-+        return -1;
-+    }
-+    snprintf(name, namelen, "%s v%d.%d.%d (%s)",
-+             dv.name, dv.version_major, dv.version_minor,
-+             dv.version_patchlevel, device);
-+    close(fd);
-+    return 0;
-+}
-+
-+static htsmsg_t *
-+tvh_codec_profile_vaapi_device_list(void *obj, const char *lang)
-+{
-+    static const char *renderD_fmt = "/dev/dri/renderD%d";
-+    static const char *card_fmt = "/dev/dri/card%d";
-+    htsmsg_t *result = htsmsg_create_list();
-+    char device[PATH_MAX];
-+    char name[128];
-+    int i, dev_num;
-+
-+    for (i = 0; i < 32; i++) {
-+        dev_num = i + 128;
-+        snprintf(device, sizeof(device), renderD_fmt, dev_num);
-+        if (probe_vaapi_device(device, name, sizeof(name)) == 0)
-+            htsmsg_add_msg(result, NULL, htsmsg_create_key_val(device, name));
-+    }
-+    for (i = 0; i < 32; i++) {
-+        dev_num = i + 128;
-+        snprintf(device, sizeof(device), card_fmt, dev_num);
-+        if (probe_vaapi_device(device, name, sizeof(name)) == 0)
-+            htsmsg_add_msg(result, NULL, htsmsg_create_key_val(device, name));
-+    }
-+    return result;
-+}
 +
 +static int
 +tvh_codec_profile_qsv_open(tvh_codec_profile_qsv_t *self,
@@ -3053,9 +3562,11 @@ index 0000000000..ec5f201a71
 +    if (self->buff_factor <= 0) {
 +        self->buff_factor = 3;
 +    }
-+    *bitrate = (int)((p->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(vp->size.den) - 480.0) / 480.0)));
-+    *buffer_size = (int)((p->bit_rate) * 2048.0 * self->buff_factor * (1.0 + self->bit_rate_scale_factor * ((double)(vp->size.den) - 480.0) / 480));
-+    *max_bitrate = (int)((self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(vp->size.den) - 480.0) / 480.0)));
++    // height 0 means keep the original resolution: scale as 480 (factor 1.0)
++    double out_height = (vp->size.den > 0) ? (double)(vp->size.den) : 480.0;
++    *bitrate = (int)((p->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * (out_height - 480.0) / 480.0)));
++    *buffer_size = (int)((p->bit_rate) * 2048.0 * self->buff_factor * (1.0 + self->bit_rate_scale_factor * (out_height - 480.0) / 480));
++    *max_bitrate = (int)((self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * (out_height - 480.0) / 480.0)));
 +    // force max_bitrate to be >= with bitrate (to avoid crash)
 +    if (*bitrate > *max_bitrate) {
 +        tvherror_transcode(LST_QSV, "Bitrate %d kbps is greater than Max bitrate %d kbps, increase Max bitrate to %d kbps", 
@@ -3091,10 +3602,17 @@ index 0000000000..ec5f201a71
 + */
 +static int
 +setup_baseline_opts(const tvh_codec_profile_qsv_t *self, AVDictionary **opts, enum CODEC codec){
-+    if ((self->low_power == 0) && (self->desired_b_depth)) {
-+        // max_b_frames
-+        AV_DICT_SET_INT(LST_QSV, opts, "bf", self->desired_b_depth, AV_DICT_DONT_OVERWRITE);
-+    }
++    // Always pin the max B-frame count for QSV so the encoder never falls back to
++    // its aggressive default (hevc_qsv: GopRefDist=5, BRefType=pyramid), whose
++    // reorder delay makes frames arrive late ("picture is too late to be displayed")
++    // and degrades live quality (pixellation).
++    //  - low-power (VDEnc): B-frames are frequently unsupported, so force bf=0
++    //    regardless of desired_b_depth.
++    //  - normal path: use desired_b_depth (default 0 -> no B-frames, matching the
++    //    VAAPI encoders; set it >0 in the profile to re-enable B-frames).
++    AV_DICT_SET_INT(LST_QSV, opts, "bf",
++                    self->low_power ? 0 : self->desired_b_depth,
++                    AV_DICT_DONT_OVERWRITE);
 +    if (self->b_strategy) {
 +        AV_DICT_SET_INT(LST_QSV, opts, "b_strategy", self->b_strategy, AV_DICT_DONT_OVERWRITE);
 +    }
@@ -3196,7 +3714,7 @@ index 0000000000..ec5f201a71
 +                .desc     = N_("Device name (e.g. /dev/dri/renderD128)."),
 +                .group    = 3,
 +                .off      = offsetof(TVHCodecProfile, device),
-+                .list     = tvh_codec_profile_vaapi_device_list,
++                .list     = tvh_drm_device_list,
 +            },
 +            {
 +                .type     = PT_BOOL,
@@ -3782,12 +4300,12 @@ index 0000000000..ec5f201a71
 +  -tile_cols         <int>        E..V....... Number of columns for tiled encoding (from 0 to 32) (default 0)
 +  -tile_rows         <int>        E..V....... Number of rows for tiled encoding (from 0 to 4) (default 0)
 +*/
-diff --git a/src/transcoding/codec/codecs/libs/v4l2-m2m.c b/src/transcoding/codec/codecs/libs/v4l2-m2m.c
+diff --git src/transcoding/codec/codecs/libs/v4l2-m2m.c src/transcoding/codec/codecs/libs/v4l2-m2m.c
 new file mode 100644
-index 0000000000..81fa6a3bd6
+index 000000000..0eb2cfef6
 --- /dev/null
 +++ src/transcoding/codec/codecs/libs/v4l2-m2m.c
-@@ -0,0 +1,155 @@
+@@ -0,0 +1,153 @@
 +/*
 + *  tvheadend - Codec Profiles
 + *
@@ -3846,8 +4364,6 @@ index 0000000000..81fa6a3bd6
 +    // Encoder does not support b-frames yet, setting to 0
 +    AV_DICT_SET_INT(LST_V4l2M2M, opts, "bf", 0, 0);
 +
-+    //AV_DICT_SET_INT(LST_V4l2M2M, opts, "qmin", 23, 0);
-+    //AV_DICT_SET_INT(LST_V4l2M2M, opts, "qmax", 32, 0);
 +
 +    if (self->num_output_buffers > -1){
 +        AV_DICT_SET_INT(LST_V4l2M2M, opts, "num_output_buffers", self->num_output_buffers, 0);
@@ -3944,11 +4460,21 @@ index 0000000000..81fa6a3bd6
 +    .profile_destroy = tvh_codec_profile_v4l2m2m_destroy,
 +};
 \ No newline at end of file
-diff --git a/src/transcoding/codec/codecs/libs/vaapi.c b/src/transcoding/codec/codecs/libs/vaapi.c
-index 7ee2de5816..21fbc94f7e 100644
+diff --git src/transcoding/codec/codecs/libs/vaapi.c src/transcoding/codec/codecs/libs/vaapi.c
+index 7ee2de581..20fc25c31 100644
 --- src/transcoding/codec/codecs/libs/vaapi.c
 +++ src/transcoding/codec/codecs/libs/vaapi.c
-@@ -93,6 +93,12 @@
+@@ -19,8 +19,7 @@
+ 
+ 
+ #include "transcoding/codec/internals.h"
+-#include <fcntl.h>
+-#include <sys/ioctl.h>
++#include "transcoding/codec/codecs/libs/drmdev.h"
+ 
+ #include "idnode.h"
+ #include "htsmsg.h"
+@@ -93,6 +92,12 @@
      (vainfo_encoder_maxBfreames(VAINFO_##codec) << UI_MAX_B_FRAMES_OFFSET) + \
      (vainfo_encoder_maxQuality(VAINFO_##codec) << UI_MAX_QUALITY_OFFSET)
  
@@ -3961,15 +4487,86 @@ index 7ee2de5816..21fbc94f7e 100644
  /* hts ==================================================================== */
  
  static htsmsg_t *
-@@ -224,6 +230,7 @@ typedef struct drm_version {
+@@ -201,78 +206,6 @@ hevc_level_get_list( void *o, const char *lang )
  
- #define DRM_IOCTL_VERSION _IOWR('d', 0x00, struct drm_version)
+ /* vaapi ==================================================================== */
  
-+/* internal ==================================================================== */
+-#if defined(__linux__)
+-#include <linux/types.h>
+-#include <asm/ioctl.h>
+-#else
+-#include <sys/ioccom.h>
+-#include <sys/types.h>
+-typedef size_t   __kernel_size_t;
+-#endif
+-
+-typedef struct drm_version {
+-   int version_major;        /**< Major version */
+-   int version_minor;        /**< Minor version */
+-   int version_patchlevel;   /**< Patch level */
+-   __kernel_size_t name_len; /**< Length of name buffer */
+-   char *name;               /**< Name of driver */
+-   __kernel_size_t date_len; /**< Length of date buffer */
+-   char *date;               /**< User-space buffer to hold date */
+-   __kernel_size_t desc_len; /**< Length of desc buffer */
+-   char *desc;               /**< User-space buffer to hold desc */
+-} drm_version_t;
+-
+-#define DRM_IOCTL_VERSION _IOWR('d', 0x00, struct drm_version)
+-
+-
+-static int
+-probe_vaapi_device(const char *device, char *name, size_t namelen)
+-{
+-    drm_version_t dv;
+-    char dname[128];
+-    int fd;
+-
+-    if ((fd = open(device, O_RDWR)) < 0)
+-        return -1;
+-    memset(&dv, 0, sizeof(dv));
+-    memset(dname, 0, sizeof(dname));
+-    dv.name = dname;
+-    dv.name_len = sizeof(dname)-1;
+-    if (ioctl(fd, DRM_IOCTL_VERSION, &dv) < 0) {
+-        close(fd);
+-        return -1;
+-    }
+-    snprintf(name, namelen, "%s v%d.%d.%d (%s)",
+-             dv.name, dv.version_major, dv.version_minor,
+-             dv.version_patchlevel, device);
+-    close(fd);
+-    return 0;
+-}
+-
+-static htsmsg_t *
+-tvh_codec_profile_vaapi_device_list(void *obj, const char *lang)
+-{
+-    static const char *renderD_fmt = "/dev/dri/renderD%d";
+-    static const char *card_fmt = "/dev/dri/card%d";
+-    htsmsg_t *result = htsmsg_create_list();
+-    char device[PATH_MAX];
+-    char name[128];
+-    int i, dev_num;
+-
+-    for (i = 0; i < 32; i++) {
+-        dev_num = i + 128;
+-        snprintf(device, sizeof(device), renderD_fmt, dev_num);
+-        if (probe_vaapi_device(device, name, sizeof(name)) == 0)
+-            htsmsg_add_msg(result, NULL, htsmsg_create_key_val(device, name));
+-    }
+-    for (i = 0; i < 32; i++) {
+-        dev_num = i + 128;
+-        snprintf(device, sizeof(device), card_fmt, dev_num);
+-        if (probe_vaapi_device(device, name, sizeof(name)) == 0)
+-            htsmsg_add_msg(result, NULL, htsmsg_create_key_val(device, name));
+-    }
+-    return result;
+-}
  
- static int
- probe_vaapi_device(const char *device, char *name, size_t namelen)
-@@ -308,11 +315,245 @@ static int
+ #define TVH_CODEC_PROFILE_VAAPI_CODEC_UI(codec_ui, codec_name) \
+     static const int tvh_codec_profile_vaapi_##codec_ui##_ui(void) \
+@@ -308,11 +241,248 @@ static int
  tvh_codec_profile_vaapi_open(tvh_codec_profile_vaapi_t *self,
                               AVDictionary **opts)
  {
@@ -3978,9 +4575,9 @@ index 7ee2de5816..21fbc94f7e 100644
      // pix_fmt
 -    AV_DICT_SET_PIX_FMT(LST_VAAPI, opts, self->pix_fmt, AV_PIX_FMT_VAAPI);
 +    AV_DICT_SET_PIX_FMT(LST_VAAPI, opts, vp->pix_fmt, AV_PIX_FMT_VAAPI);
-+    return 0;
-+}
-+
+     return 0;
+ }
+ 
 +/**
 + * Derive VAAPI encoder rate-control numbers from the UI profile and output height.
 + *
@@ -4016,9 +4613,11 @@ index 7ee2de5816..21fbc94f7e 100644
 +    if (self->buff_factor <= 0) {
 +        self->buff_factor = 3;
 +    }
-+    *bitrate = (int)((p->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(vp->size.den) - 480.0) / 480.0)));
-+    *buffer_size = (int)((p->bit_rate) * 2048.0 * self->buff_factor * (1.0 + self->bit_rate_scale_factor * ((double)(vp->size.den) - 480.0) / 480));
-+    *max_bitrate = (int)((self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * ((double)(vp->size.den) - 480.0) / 480.0)));
++    // height 0 means keep the original resolution: scale as 480 (factor 1.0)
++    double out_height = (vp->size.den > 0) ? (double)(vp->size.den) : 480.0;
++    *bitrate = (int)((p->bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * (out_height - 480.0) / 480.0)));
++    *buffer_size = (int)((p->bit_rate) * 2048.0 * self->buff_factor * (1.0 + self->bit_rate_scale_factor * (out_height - 480.0) / 480));
++    *max_bitrate = (int)((self->max_bit_rate) * 1024.0 * (1.0 + (self->bit_rate_scale_factor * (out_height - 480.0) / 480.0)));
 +    // force max_bitrate to be >= with bitrate (to avoid crash)
 +    if (*bitrate > *max_bitrate) {
 +        tvherror_transcode(LST_VAAPI, "Bitrate %d kbps is greater than Max bitrate %d kbps, increase Max bitrate to %d kbps", 
@@ -4060,8 +4659,13 @@ index 7ee2de5816..21fbc94f7e 100644
 +    if (self->async_depth) {
 +        AV_DICT_SET_INT(LST_VAAPI, opts, "async_depth", self->async_depth, AV_DICT_DONT_OVERWRITE);
 +    }
++    // Only send an explicit level when it is a real H264/HEVC level value.
++    // Valid levels are > 0 (h264: 10..62, hevc: 30..186); the "skip" sentinel is
++    // -100 and an unset level field defaults to 0. Both mean "let the encoder pick
++    // the level from resolution/bitrate". Sending level=0 makes the VAAPI driver
++    // fail every frame with VA_STATUS_ERROR_ENCODING_ERROR (24).
 +    if ((codec == H264 || codec == HEVC) &&
-+        self->level != -100) {
++        self->level > 0) {
 +            AV_DICT_SET_INT(LST_VAAPI, opts, "level", self->level, AV_DICT_DONT_OVERWRITE);
 +    }
 +    if (self->qmin) {
@@ -4120,9 +4724,8 @@ index 7ee2de5816..21fbc94f7e 100644
 + * 3. If @c quality >= 0, sets @c quality.
 + * 4. @c VP8 / @c VP9 only — if @c global_quality >= 0, sets @c global_quality.
 + * 5. If @c low_power is non-zero, sets @c low_power.
-+ * 6. @ref setup_baseline_opts_unconstrained — note: this is invoked with a hard-coded
-+ *    @c H264 @p codec argument, not the outer @p codec, so VP9/HEVC baseline fields
-+ *    (e.g. @c level / @c qmin) follow the H264 branch rules inside that helper.
++ * 6. @ref setup_baseline_opts_unconstrained — invoked with the outer @p codec, so
++ *    the baseline fields (e.g. @c level / @c qmin) follow each codec's own rules.
 + *
 + * @param self         VAAPI profile.
 + * @param opts         Encoder option dictionary.
@@ -4168,17 +4771,14 @@ index 7ee2de5816..21fbc94f7e 100644
 + * Does the following in order:
 + * - If @c b_reference is non-zero, set @c b_depth.
 + * - If @c desired_b_depth >= 0, set @c bf (max B-frames).
-+ * - For @c VP8 or @c VP9, if @c super_frame is enabled, set @c bsf to
++ * - For @c VP9, if @c super_frame is enabled, set @c bsf to
 + *   @c "vp9_raw_reorder,vp9_superframe" (per FFmpeg VAAPI VP9 notes).
-+ * - Calls @ref setup_common_opts_unconstrained with a hard-coded @c H264 @c codec
-+ *   argument for the inner layer—not the outer @p codec—so the common / baseline
-+ *   branch behaves like the H264 path regardless of whether you are configuring
-+ *   VP9, HEVC, etc. (worth revisiting if that is unintentional).
++ * - Calls @ref setup_common_opts_unconstrained with the outer @p codec, so the
++ *   common / baseline branches follow each codec's own rules.
 + *
 + * @param self         VAAPI profile.
 + * @param opts         Encoder option dictionary.
-+ * @param codec        Which codec is being set up (@c H264, @c HEVC, @c VP8, @c VP9, …);
-+ *                     only affects the VP super-frame @c bsf branch today.
++ * @param codec        Which codec is being set up (@c H264, @c HEVC, @c VP8, @c VP9, …).
 + * @param bitrate      Passed through to @ref setup_common_opts_unconstrained.
 + * @param buffer_size  Passed through to @ref setup_common_opts_unconstrained.
 + * @param max_bitrate  Passed through to @ref setup_common_opts_unconstrained.
@@ -4199,7 +4799,7 @@ index 7ee2de5816..21fbc94f7e 100644
 +        // max_b_frames
 +        AV_DICT_SET_INT(LST_VAAPI, opts, "bf", self->desired_b_depth, AV_DICT_DONT_OVERWRITE);
 +    }
-+    if ((codec == VP8 || codec == VP9) &&
++    if (codec == VP9 &&
 +        self->super_frame) {
 +            // according to example from https://trac.ffmpeg.org/wiki/Hardware/VAAPI
 +            // -bsf:v vp9_raw_reorder,vp9_superframe
@@ -4208,15 +4808,24 @@ index 7ee2de5816..21fbc94f7e 100644
 +    if ((ret = setup_common_opts_unconstrained(self, opts, codec, bitrate, buffer_size, max_bitrate))) {
 +        return ret;
 +    }
-     return 0;
- }
- 
++    return 0;
++}
++
 +/* external ==================================================================== */
 +
  // NOTE:
  // the names below are used in codec.js (/src/webui/static/app/codec.js)
  static const codec_profile_class_t codec_profile_vaapi_class = {
-@@ -515,6 +756,16 @@ static const codec_profile_class_t codec_profile_vaapi_class = {
+@@ -339,7 +509,7 @@ static const codec_profile_class_t codec_profile_vaapi_class = {
+                 .desc     = N_("Device name (e.g. /dev/dri/renderD128)."),
+                 .group    = 3,
+                 .off      = offsetof(TVHCodecProfile, device),
+-                .list     = tvh_codec_profile_vaapi_device_list,
++                .list     = tvh_drm_device_list,
+             },
+             {
+                 .type     = PT_BOOL,
+@@ -515,6 +685,16 @@ static const codec_profile_class_t codec_profile_vaapi_class = {
                  .intextra = INTEXTRA_RANGE(-1, 15, 1),
                  .def.i    = 0,
              },
@@ -4233,7 +4842,7 @@ index 7ee2de5816..21fbc94f7e 100644
              {}
          }
      },
-@@ -535,114 +786,22 @@ static int
+@@ -535,114 +715,22 @@ static int
  tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
                                    AVDictionary **opts)
  {
@@ -4358,7 +4967,7 @@ index 7ee2de5816..21fbc94f7e 100644
              }
              break;
          case VAAPI_ENC_PLATFORM_INTEL:
-@@ -673,15 +832,8 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
+@@ -673,15 +761,8 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
                      // same like 0 but is not sending 'rc_mode'
                  case VAAPI_ENC_PARAMS_RC_AUTO:
                      // for auto --> let the driver decide as requested by documentation
@@ -4376,7 +4985,7 @@ index 7ee2de5816..21fbc94f7e 100644
                      }
                      break;
                  case VAAPI_ENC_PARAMS_RC_CONSTQP:
-@@ -693,14 +845,14 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
+@@ -693,14 +774,14 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
                      break;
                  case VAAPI_ENC_PARAMS_RC_CBR:
                      // for constant bitrate: CBR we use bitrate
@@ -4393,7 +5002,7 @@ index 7ee2de5816..21fbc94f7e 100644
                          AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
-@@ -708,18 +860,13 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
+@@ -708,18 +789,13 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
                      break;
                  case VAAPI_ENC_PARAMS_RC_QVBR:
                      // for variable bitrate: QVBR we use bitrate + qp
@@ -4415,7 +5024,7 @@ index 7ee2de5816..21fbc94f7e 100644
                          AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
                      }
-@@ -737,54 +884,23 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
+@@ -737,54 +813,23 @@ tvh_codec_profile_vaapi_h264_open(tvh_codec_profile_vaapi_t *self,
              if (self->low_power) {
                  AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
              }
@@ -4477,7 +5086,7 @@ index 7ee2de5816..21fbc94f7e 100644
      return 0;
  }
  
-@@ -858,106 +974,21 @@ static int
+@@ -858,106 +903,21 @@ static int
  tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
                                    AVDictionary **opts)
  {
@@ -4593,7 +5202,7 @@ index 7ee2de5816..21fbc94f7e 100644
              }
              break;
          case VAAPI_ENC_PLATFORM_INTEL:
-@@ -975,15 +1006,8 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
+@@ -975,15 +935,8 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
                      // same like 0 but is not sending 'rc_mode'
                  case VAAPI_ENC_PARAMS_RC_AUTO:
                      // for auto --> let the driver decide as requested by documentation
@@ -4611,7 +5220,7 @@ index 7ee2de5816..21fbc94f7e 100644
                      }
                      break;
                  case VAAPI_ENC_PARAMS_RC_CONSTQP:
-@@ -995,14 +1019,14 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
+@@ -995,14 +948,14 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
                      break;
                  case VAAPI_ENC_PARAMS_RC_CBR:
                      // for constant bitrate: CBR we use bitrate
@@ -4628,7 +5237,7 @@ index 7ee2de5816..21fbc94f7e 100644
                          AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
-@@ -1010,18 +1034,13 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
+@@ -1010,18 +963,13 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
                      break;
                  case VAAPI_ENC_PARAMS_RC_QVBR:
                      // for variable bitrate: QVBR we use bitrate + qp
@@ -4650,7 +5259,7 @@ index 7ee2de5816..21fbc94f7e 100644
                          AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
                      }
-@@ -1036,57 +1055,23 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
+@@ -1036,57 +984,23 @@ tvh_codec_profile_vaapi_hevc_open(tvh_codec_profile_vaapi_t *self,
              if (self->low_power) {
                  AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
              }
@@ -4715,7 +5324,7 @@ index 7ee2de5816..21fbc94f7e 100644
      return 0;
  }
  
-@@ -1168,85 +1153,21 @@ static int
+@@ -1168,85 +1082,21 @@ static int
  tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
                                    AVDictionary **opts)
  {
@@ -4810,7 +5419,7 @@ index 7ee2de5816..21fbc94f7e 100644
              }
              break;
          case VAAPI_ENC_PLATFORM_INTEL:
-@@ -1270,15 +1191,8 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
+@@ -1270,15 +1120,8 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
                      // same like 0 but is not sending 'rc_mode'
                  case VAAPI_ENC_PARAMS_RC_AUTO:
                      // for auto --> let the driver decide as requested by documentation
@@ -4828,7 +5437,7 @@ index 7ee2de5816..21fbc94f7e 100644
                      }
                      break;
                  case VAAPI_ENC_PARAMS_RC_CONSTQP:
-@@ -1290,14 +1204,14 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
+@@ -1290,14 +1133,14 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
                      break;
                  case VAAPI_ENC_PARAMS_RC_CBR:
                      // for constant bitrate: CBR we use bitrate
@@ -4845,7 +5454,7 @@ index 7ee2de5816..21fbc94f7e 100644
                          AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
-@@ -1305,18 +1219,13 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
+@@ -1305,18 +1148,13 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
                      break;
                  case VAAPI_ENC_PARAMS_RC_QVBR:
                      // for variable bitrate: QVBR we use bitrate + qp
@@ -4867,7 +5476,7 @@ index 7ee2de5816..21fbc94f7e 100644
                          AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
                      }
-@@ -1325,63 +1234,24 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
+@@ -1325,63 +1163,24 @@ tvh_codec_profile_vaapi_vp8_open(tvh_codec_profile_vaapi_t *self,
              if (self->low_power) {
                  AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
              }
@@ -4939,7 +5548,7 @@ index 7ee2de5816..21fbc94f7e 100644
      return 0;
  }
  
-@@ -1474,90 +1344,21 @@ static int
+@@ -1474,90 +1273,21 @@ static int
  tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
                                    AVDictionary **opts)
  {
@@ -5039,7 +5648,7 @@ index 7ee2de5816..21fbc94f7e 100644
              }
              break;
          case VAAPI_ENC_PLATFORM_INTEL:
-@@ -1586,15 +1387,8 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
+@@ -1586,15 +1316,8 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
                      // same like 0 but is not sending 'rc_mode'
                  case VAAPI_ENC_PARAMS_RC_AUTO:
                      // for auto --> let the driver decide as requested by documentation
@@ -5057,7 +5666,7 @@ index 7ee2de5816..21fbc94f7e 100644
                      }
                      break;
                  case VAAPI_ENC_PARAMS_RC_CONSTQP:
-@@ -1606,14 +1400,14 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
+@@ -1606,14 +1329,14 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
                      break;
                  case VAAPI_ENC_PARAMS_RC_CBR:
                      // for constant bitrate: CBR we use bitrate
@@ -5074,7 +5683,7 @@ index 7ee2de5816..21fbc94f7e 100644
                          AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "bufsize", int_buffer_size, AV_DICT_DONT_OVERWRITE);
-@@ -1621,18 +1415,13 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
+@@ -1621,18 +1344,13 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
                      break;
                  case VAAPI_ENC_PARAMS_RC_QVBR:
                      // for variable bitrate: QVBR we use bitrate + qp
@@ -5096,7 +5705,7 @@ index 7ee2de5816..21fbc94f7e 100644
                          AV_DICT_SET_INT(LST_VAAPI, opts, "b", int_bitrate, AV_DICT_DONT_OVERWRITE);
                          AV_DICT_SET_INT(LST_VAAPI, opts, "maxrate", int_max_bitrate, AV_DICT_DONT_OVERWRITE);
                      }
-@@ -1641,63 +1430,23 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
+@@ -1641,63 +1359,23 @@ tvh_codec_profile_vaapi_vp9_open(tvh_codec_profile_vaapi_t *self,
              if (self->low_power) {
                  AV_DICT_SET_INT(LST_VAAPI, opts, "low_power", self->low_power, AV_DICT_DONT_OVERWRITE);
              }
@@ -5167,15 +5776,15 @@ index 7ee2de5816..21fbc94f7e 100644
      return 0;
  }
  
-diff --git a/src/transcoding/codec/codecs/mp2.c b/src/transcoding/codec/codecs/mp2.c
-index 7cd2f22fbc..8ce901b3dc 100644
+diff --git src/transcoding/codec/codecs/mp2.c src/transcoding/codec/codecs/mp2.c
+index 7cd2f22fb..683df4ce5 100644
 --- src/transcoding/codec/codecs/mp2.c
 +++ src/transcoding/codec/codecs/mp2.c
 @@ -31,6 +31,7 @@ tvh_codec_profile_mp2_open(TVHCodecProfile *self, AVDictionary **opts)
      if (self->bit_rate) {
          AV_DICT_SET_BIT_RATE(LST_MP2, opts, self->bit_rate);
      }
-+    ((TVHCodecProfile *)self)->has_support_for_filter2 = 1;
++    self->has_support_for_filter2 = 1;
      return 0;
  }
  
@@ -5187,8 +5796,8 @@ index 7cd2f22fbc..8ce901b3dc 100644
      .profile_init = tvh_codec_profile_audio_init,
      .profile_destroy = tvh_codec_profile_audio_destroy,
  };
-diff --git a/src/transcoding/codec/codecs/mpeg2video.c b/src/transcoding/codec/codecs/mpeg2video.c
-index 6662f6dd8c..f383ff6c57 100644
+diff --git src/transcoding/codec/codecs/mpeg2video.c src/transcoding/codec/codecs/mpeg2video.c
+index 6662f6dd8..8aaeb1562 100644
 --- src/transcoding/codec/codecs/mpeg2video.c
 +++ src/transcoding/codec/codecs/mpeg2video.c
 @@ -33,6 +33,9 @@ tvh_codec_profile_mpeg2video_open(TVHCodecProfile *self, AVDictionary **opts)
@@ -5197,7 +5806,7 @@ index 6662f6dd8c..f383ff6c57 100644
      }
 +    // MPEG2 only knows max b frames of 2
 +    AV_DICT_SET_INT(LST_VAAPI, opts, "bf", 2, AV_DICT_DONT_OVERWRITE);
-+    ((TVHCodecProfile *)self)->has_support_for_filter2 = 1;
++    self->has_support_for_filter2 = 1;
      return 0;
  }
  
@@ -5218,15 +5827,15 @@ index 6662f6dd8c..f383ff6c57 100644
              {}
          }
      },
-diff --git a/src/transcoding/codec/codecs/vorbis.c b/src/transcoding/codec/codecs/vorbis.c
-index 4d084e5658..e38d0a1273 100644
+diff --git src/transcoding/codec/codecs/vorbis.c src/transcoding/codec/codecs/vorbis.c
+index 4d084e565..a87c90569 100644
 --- src/transcoding/codec/codecs/vorbis.c
 +++ src/transcoding/codec/codecs/vorbis.c
 @@ -27,14 +27,17 @@ static int
  tvh_codec_profile_vorbis_open(TVHCodecProfile *self, AVDictionary **opts)
  {
      AV_DICT_SET_GLOBAL_QUALITY(LST_VORBIS, opts, self->qscale, 5);
-+    ((TVHCodecProfile *)self)->has_support_for_filter2 = 1;
++    self->has_support_for_filter2 = 1;
      return 0;
  }
  
@@ -5250,8 +5859,8 @@ index 4d084e5658..e38d0a1273 100644
      .profile_init    = tvh_codec_profile_audio_init,
      .profile_destroy = tvh_codec_profile_audio_destroy,
      .channel_layouts = vorbis_channel_layouts,
-diff --git a/src/transcoding/codec/internals.h b/src/transcoding/codec/internals.h
-index a76fb15c35..c83b475e8b 100644
+diff --git src/transcoding/codec/internals.h src/transcoding/codec/internals.h
+index a76fb15c3..c83b475e8 100644
 --- src/transcoding/codec/internals.h
 +++ src/transcoding/codec/internals.h
 @@ -189,15 +189,15 @@
@@ -5628,20 +6237,32 @@ index a76fb15c35..c83b475e8b 100644
  } TVHAudioCodecProfile;
  
  
-diff --git a/src/transcoding/codec/profile.c b/src/transcoding/codec/profile.c
-index 2e1dff4447..ca818ca387 100644
+diff --git src/transcoding/codec/profile.c src/transcoding/codec/profile.c
+index 2e1dff444..f031c2daa 100644
 --- src/transcoding/codec/profile.c
 +++ src/transcoding/codec/profile.c
-@@ -276,24 +276,12 @@ tvh_codec_profile_video_destroy(TVHCodecProfile *_self)
+@@ -153,6 +153,12 @@ tvh_codec_profile_create(htsmsg_t *conf, const char *uuid, int save)
+         tvherror(LS_CODEC, "failed to insert idnode");
+         return EINVAL;
+     }
++    /* migrate the pre-"decoder_hwaccel_type" config: "hwaccel" was a bool
++       enabling hardware-accelerated decoding */
++    if (!htsmsg_field_find(conf, "decoder_hwaccel_type") &&
++        htsmsg_get_bool_or_default(conf, "hwaccel", 0)) {
++        htsmsg_set_s32(conf, "decoder_hwaccel_type", AV_AUTO_DEVICE_TYPE);
++    }
+     idnode_load(&profile->idnode, conf);
+     LIST_INSERT_HEAD(&tvh_codec_profiles, profile, link);
+     if (save) {
+@@ -276,24 +282,12 @@ tvh_codec_profile_video_destroy(TVHCodecProfile *_self)
  }
  
  int
 -tvh_codec_profile_video_get_hwaccel(TVHCodecProfile *self)
-+tvh_codec_profile_video_get_decoder_hwaccel_type(TVHCodecProfile *self)
- {
-     TVHCodec *codec = tvh_codec_profile_get_codec(self);
-     if (codec && tvh_codec_is_enabled(codec) &&
-         tvh_codec_get_type(codec) == AVMEDIA_TYPE_VIDEO) {
+-{
+-    TVHCodec *codec = tvh_codec_profile_get_codec(self);
+-    if (codec && tvh_codec_is_enabled(codec) &&
+-        tvh_codec_get_type(codec) == AVMEDIA_TYPE_VIDEO) {
 -        return ((TVHVideoCodecProfile *)self)->hwaccel;
 -    }
 -    return -1;
@@ -5650,17 +6271,18 @@ index 2e1dff4447..ca818ca387 100644
 -
 -int
 -tvh_codec_profile_video_get_hwaccel_details(TVHCodecProfile *self)
--{
--    TVHCodec *codec = tvh_codec_profile_get_codec(self);
--    if (codec && tvh_codec_is_enabled(codec) &&
--        tvh_codec_get_type(codec) == AVMEDIA_TYPE_VIDEO) {
++tvh_codec_profile_video_get_decoder_hwaccel_type(TVHCodecProfile *self)
+ {
+     TVHCodec *codec = tvh_codec_profile_get_codec(self);
+     if (codec && tvh_codec_is_enabled(codec) &&
+         tvh_codec_get_type(codec) == AVMEDIA_TYPE_VIDEO) {
 -        return ((TVHVideoCodecProfile *)self)->hwaccel_details;
 +        return ((TVHVideoCodecProfile *)self)->decoder_hwaccel_type;
      }
      return -1;
  }
-diff --git a/src/transcoding/codec/profile_audio_class.c b/src/transcoding/codec/profile_audio_class.c
-index 8896d26ed3..cf599848d3 100644
+diff --git src/transcoding/codec/profile_audio_class.c src/transcoding/codec/profile_audio_class.c
+index 8896d26ed..cf599848d 100644
 --- src/transcoding/codec/profile_audio_class.c
 +++ src/transcoding/codec/profile_audio_class.c
 @@ -24,6 +24,17 @@
@@ -5700,11 +6322,28 @@ index 8896d26ed3..cf599848d3 100644
              {}
          }
      },
-diff --git a/src/transcoding/codec/profile_class.c b/src/transcoding/codec/profile_class.c
-index 4af9c1a0ca..7f7c51373f 100644
+diff --git src/transcoding/codec/profile_class.c src/transcoding/codec/profile_class.c
+index 4af9c1a0c..b8d32ebc8 100644
 --- src/transcoding/codec/profile_class.c
 +++ src/transcoding/codec/profile_class.c
-@@ -316,6 +316,16 @@ const codec_profile_class_t codec_profile_class = {
+@@ -111,8 +111,14 @@ static int
+ tvh_codec_profile_base_open(TVHCodecProfile *self, AVDictionary **opts)
+ {
+     AV_DICT_SET_TVH_REQUIRE_META(LST_NONE, opts, 1);
+-    // profile is set and is available
+-    if (self->profile != FF_AV_PROFILE_UNKNOWN &&
++    // profile is set and is available.
++    // Profile 0 is AAC Main, but it is also the zeroed value of a profile
++    // loaded from a config without an explicit "profile" field (the class
++    // default FF_AV_PROFILE_UNKNOWN is only applied to brand-new nodes). The
++    // native aac encoder rejects Main ("Profile not supported!" -> EINVAL),
++    // so only emit a positive (explicitly chosen) profile and let the encoder
++    // pick its own default otherwise.
++    if (self->profile > 0 &&
+         _is_profile_available(self->codec, self->profile)) {
+         AV_DICT_SET_INT(LST_CODEC, opts, "profile", self->profile, 0);
+     }
+@@ -316,6 +322,16 @@ const codec_profile_class_t codec_profile_class = {
                  .list     = codec_profile_class_profile_list,
                  .def.i    = FF_AV_PROFILE_UNKNOWN,
              },
@@ -5721,8 +6360,8 @@ index 4af9c1a0ca..7f7c51373f 100644
              {}
          }
      },
-diff --git a/src/transcoding/codec/profile_video_class.c b/src/transcoding/codec/profile_video_class.c
-index 376635beae..79a71d6103 100644
+diff --git src/transcoding/codec/profile_video_class.c src/transcoding/codec/profile_video_class.c
+index 376635bea..42bf1f587 100644
 --- src/transcoding/codec/profile_video_class.c
 +++ src/transcoding/codec/profile_video_class.c
 @@ -34,18 +34,25 @@ scaling_mode_get_list( void *o, const char *lang )
@@ -5800,7 +6439,7 @@ index 376635beae..79a71d6103 100644
      // crf
      if (self->crf) {
          AV_DICT_SET_INT(LST_VIDEO, opts, "crf", self->crf, AV_DICT_DONT_OVERWRITE);
-@@ -285,23 +316,14 @@ const codec_profile_class_t codec_profile_video_class = {
+@@ -285,24 +316,15 @@ const codec_profile_class_t codec_profile_video_class = {
                  .list     = scaling_mode_get_list,
                  .def.i    = 0,
              },
@@ -5824,11 +6463,13 @@ index 376635beae..79a71d6103 100644
                  .group    = 2,
 -                .off      = offsetof(TVHVideoCodecProfile, hwaccel_details),
 -                .list     = hwaccel_get_list,
+-                .def.i    = 0,
 +                .off      = offsetof(TVHVideoCodecProfile, decoder_hwaccel_type),
 +                .list     = decoder_hwaccel_type_get_list,
-                 .def.i    = 0,
++                .def.i    = AV_AUTO_DEVICE_TYPE,
              },
              {
+                 .type     = PT_BOOL,
 @@ -328,6 +350,34 @@ const codec_profile_class_t codec_profile_video_class = {
                  .list     = deinterlace_vaapi_mode_get_list,
                  .def.i    = VAAPI_DEINT_MODE_DEFAULT,
@@ -5864,8 +6505,8 @@ index 376635beae..79a71d6103 100644
  #endif
              {
                  .type     = PT_INT,
-diff --git a/src/transcoding/transcode/audio.c b/src/transcoding/transcode/audio.c
-index 6c6119877a..01f1f1d627 100644
+diff --git src/transcoding/transcode/audio.c src/transcoding/transcode/audio.c
+index 6c6119877..49835f754 100644
 --- src/transcoding/transcode/audio.c
 +++ src/transcoding/transcode/audio.c
 @@ -19,6 +19,7 @@
@@ -6129,7 +6770,7 @@ index 6c6119877a..01f1f1d627 100644
  #else
      int ret = tvh_context_open_filters(self,
          "abuffer", source_args,                           // source
-@@ -317,26 +507,55 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+@@ -317,26 +507,53 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
          "sample_rates", &self->oavctx->sample_rate,       // sink option: sample_rate
          sizeof(self->oavctx->sample_rate),
          NULL);                                            // _IMPORTANT!_
@@ -6170,8 +6811,7 @@ index 6c6119877a..01f1f1d627 100644
  static int
  tvh_audio_context_open(TVHContext *self, TVHOpenPhase phase, AVDictionary **opts)
  {
-+    // TODO : remove later on
-+    tvh_context_log(self, LOG_ERR, "tvh_audio_context_open() TVHOpenPhase = %d ", phase);
++    tvh_context_log(self, LOG_TRACE, "tvh_audio_context_open() TVHOpenPhase = %d ", phase);
      switch (phase) {
 -        case OPEN_ENCODER:
 +        case PREPARE_ENCODER:
@@ -6187,39 +6827,34 @@ index 6c6119877a..01f1f1d627 100644
 +            if (!(self->oavctx->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE) &&
 +                (self->oavctx->frame_size > 0)){
 +                av_buffersink_set_frame_size(self->oavfltctx, self->oavctx->frame_size);
-+                // TODO : remove later on
-+                tvh_context_log(self, LOG_ERR, "av_buffersink_set_frame_size(%d)", self->oavctx->frame_size);
++                tvh_context_log(self, LOG_TRACE, "av_buffersink_set_frame_size(%d)", self->oavctx->frame_size);
 +            }
 +            break;
          default:
              break;
      }
-@@ -347,17 +566,38 @@ tvh_audio_context_open(TVHContext *self, TVHOpenPhase phase, AVDictionary **opts
- static int
- tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
- {
-+    //tvh_context_log(self, LOG_WARNING, "AVPacket->pts = %"PRId64" ", avpkt->pts);
+@@ -350,14 +567,35 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
      int64_t prev_pts = self->pts;
      int64_t new_pts = avpkt->pts - self->duration;
--
+ 
 -    // rounding error?
 -    if (new_pts - 10 <= prev_pts && new_pts + 10 >= prev_pts) {
 -      prev_pts = new_pts;
-+    
-+    int64_t drift = new_pts - prev_pts;
++    int64_t drift = (prev_pts != AV_NOPTS_VALUE) ? new_pts - prev_pts : INT64_MAX;
 +
 +    if (drift < 0)
 +        drift = -drift;
 +
-+    // Tolerance: 3 AC3 frames at 48 kHz (3 × 1536 = 4608 samples).
++    // Tolerance: 3 AC3 frames at 48 kHz (3 x 1536 = 4608 samples), expressed
++    // in the 90 kHz packet timebase: 4608 samples / 48000 Hz * 90000 = 8640.
 +    // IPTV streams often have slightly irregular packet durations causing
-+    // sub-frame PTS drift of up to 2880 samples (2 AC3 frames).  Rather than
++    // sub-frame PTS drift of up to 2 AC3 frames.  Rather than
 +    // hard-jumping self->pts on every small deviation (which produces an
 +    // audible skip), absorb deviations up to 3 frames by correcting
 +    // self->duration instead, keeping the clock continuous.  Only log +
 +    // hard-reset for genuine discontinuities larger than that.
 +    // Small drift: re-anchor duration, keep PTS (AC3 etc.)
-+    if (prev_pts && drift <= 4608) {
++    if (prev_pts != AV_NOPTS_VALUE && drift <= 8640) {
 +        self->duration = avpkt->pts - prev_pts + avpkt->duration;
 +        self->pts = prev_pts;
 +        return 0;
@@ -6228,8 +6863,8 @@ index 6c6119877a..01f1f1d627 100644
 -    if (prev_pts != (self->pts = new_pts) && prev_pts > 12000) {
 -        tvh_context_log(self, LOG_WARNING, "Detected framedrop in audio (%"PRId64" != %"PRId64")", prev_pts, new_pts);
 +    // Real problems only — not filter vs packet offset
-+    if (prev_pts > 0) {
-+        if (new_pts < prev_pts - 4608) {
++    if (prev_pts != AV_NOPTS_VALUE) {
++        if (new_pts < prev_pts - 8640) {
 +            tvh_context_log(self, LOG_WARNING, "Audio PTS went backward (%" PRId64 " -> %" PRId64 ")", prev_pts, new_pts);
 +        } else if (new_pts - prev_pts > 90000 * 2) {  // > 2 s gap @ 90 kHz
 +            tvh_context_log(self, LOG_WARNING, "Audio discontinuity (%" PRId64 " -> %" PRId64 "), gap=%" PRId64, prev_pts, new_pts, new_pts - prev_pts);
@@ -6239,7 +6874,7 @@ index 6c6119877a..01f1f1d627 100644
      self->duration += avpkt->duration;
      return 0;
  }
-@@ -366,10 +606,80 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
+@@ -366,10 +604,90 @@ tvh_audio_context_decode(TVHContext *self, AVPacket *avpkt)
  static int
  tvh_audio_context_encode(TVHContext *self, AVFrame *avframe)
  {
@@ -6278,7 +6913,7 @@ index 6c6119877a..01f1f1d627 100644
 +    if (flt_pts == AV_NOPTS_VALUE) {
 +        if (self->last_flt_pts && avframe->nb_samples > 0) {
 +            flt_pts = self->last_flt_pts + av_rescale_q(avframe->nb_samples, av_make_q(1, self->oavctx->sample_rate), src_time_base);
-+        } else if (self->pts != AV_NOPTS_VALUE && self->pts != 0) {
++        } else if (self->pts != AV_NOPTS_VALUE) {
 +            flt_pts = self->pts;  // first frame: decode packet timeline
 +        } else {
 +            return AVERROR(EINVAL);
@@ -6287,8 +6922,18 @@ index 6c6119877a..01f1f1d627 100644
 +    }
 +    //check for duplicate PTS from the filter
 +    if (flt_pts != AV_NOPTS_VALUE && self->last_flt_pts &&
-+        flt_pts <= self->last_flt_pts)
-+        return AVERROR(EAGAIN);
++        flt_pts <= self->last_flt_pts) {
++        // a backward jump beyond 2 seconds is a source PTS discontinuity:
++        // resync the timeline instead of dropping audio until it catches up
++        if (self->last_flt_pts - flt_pts >
++            av_rescale_q(2, av_make_q(1, 1), src_time_base)) {
++            tvh_context_log(self, LOG_WARNING,
++                "audio PTS discontinuity (%"PRId64" -> %"PRId64"), resyncing",
++                self->last_flt_pts, flt_pts);
++        } else {
++            return AVERROR(EAGAIN);
++        }
++    }
 +    // Track last PTS in filter/input time_base
 +    self->last_flt_pts = flt_pts;
 +    // Rescale PTS: filter time_base -> encoder time_base (1/sample_rate)
@@ -6324,7 +6969,7 @@ index 6c6119877a..01f1f1d627 100644
      return 0;
  }
  
-@@ -384,7 +694,19 @@ tvh_audio_context_ship(TVHContext *self, AVPacket *avpkt)
+@@ -384,7 +702,19 @@ tvh_audio_context_ship(TVHContext *self, AVPacket *avpkt)
  static int
  tvh_audio_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
  {
@@ -6345,7 +6990,7 @@ index 6c6119877a..01f1f1d627 100644
  #if LIBAVCODEC_VERSION_MAJOR > 59
      pkt->a.pkt_channels = self->oavctx->ch_layout.nb_channels;
  #else
-@@ -394,7 +716,6 @@ tvh_audio_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+@@ -394,7 +724,6 @@ tvh_audio_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
      return 0;
  }
  
@@ -6353,8 +6998,8 @@ index 6c6119877a..01f1f1d627 100644
  TVHContextType TVHAudioContext = {
      .media_type = AVMEDIA_TYPE_AUDIO,
      .open       = tvh_audio_context_open,
-diff --git a/src/transcoding/transcode/context.c b/src/transcoding/transcode/context.c
-index ef1ea10b67..803fa9ae7d 100644
+diff --git src/transcoding/transcode/context.c src/transcoding/transcode/context.c
+index ef1ea10b6..be87e5ef8 100644
 --- src/transcoding/transcode/context.c
 +++ src/transcoding/transcode/context.c
 @@ -19,6 +19,13 @@
@@ -6371,34 +7016,11 @@ index ef1ea10b67..803fa9ae7d 100644
  
  #include <libavutil/opt.h>
  
-@@ -190,10 +197,76 @@ _context_encode(TVHContext *self, AVFrame *avframe)
+@@ -190,10 +197,52 @@ _context_encode(TVHContext *self, AVFrame *avframe)
      return ret;*/
  }
  
-+/* ORIGINAL implementation*/
-+/*
-+static int
-+_context_meta(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
-+{
-+    if ((avpkt->flags & AV_PKT_FLAG_KEY) == 0)
-+        return 0;
-+    if (self->require_meta) {
-+        if (self->helper && self->helper->meta) {
-+            self->require_meta = self->helper->meta(self, avpkt, pkt);
-+            if (self->require_meta == 0)
-+                self->require_meta = 1;
-+        }
-+        else if (self->oavctx->extradata_size) {
-+            pkt->pkt_meta = pktbuf_alloc(self->oavctx->extradata,
-+                                         self->oavctx->extradata_size);
-+            self->require_meta = (pkt->pkt_meta) ? 1 : -1;
-+        }
-+    }
-+    return (self->require_meta < 0) ? -1 : 0;
-+}
-+*/
-+
- 
+-
  static int
  _context_meta(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
  {
@@ -6448,13 +7070,13 @@ index ef1ea10b67..803fa9ae7d 100644
      if ((avpkt->flags & AV_PKT_FLAG_KEY) == 0)
          return 0;
      if (self->require_meta) {
-@@ -209,7 +282,113 @@ _context_meta(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+@@ -209,8 +258,114 @@ _context_meta(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
          }
      }
      return (self->require_meta < 0) ? -1 : 0;
 +#endif
-+}
-+
+ }
+ 
 +#if LIBAVCODEC_VERSION_MAJOR > 59
 +/**
 + * Builds a linear filter graph from a comma-separated string,
@@ -6557,12 +7179,13 @@ index ef1ea10b67..803fa9ae7d 100644
 +cleanup:
 +    av_free(str_copy);
 +    return ret;
- }
++}
 +#endif
- 
++
  
  static int
-@@ -259,51 +438,203 @@ tvh_context_setup(TVHContext *self, const AVCodec *iavcodec, const AVCodec *oavc
+ _context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+@@ -259,51 +414,203 @@ tvh_context_setup(TVHContext *self, const AVCodec *iavcodec, const AVCodec *oavc
  
  
  // open
@@ -6741,10 +7364,10 @@ index ef1ea10b67..803fa9ae7d 100644
      }
 -    if (opts) {
 -        av_dict_free(&opts);
-+    if (!(ret) && (ret = tvh_context_open(self, OPEN_FILTERS))){
++    if (!ret && (ret = tvh_context_open(self, OPEN_FILTERS))){
 +        tvh_context_log(self, LOG_ERR, "OPEN_FILTERS returned error: %d", ret);
 +    }
-+    if (!(ret) && (ret = tvh_context_open(self, OPEN_ENCODER))){
++    if (!ret && (ret = tvh_context_open(self, OPEN_ENCODER))){
 +        tvh_context_log(self, LOG_ERR, "OPEN_ENCODER returned error: %d", ret);
 +    }
 +    return ret;
@@ -6775,15 +7398,15 @@ index ef1ea10b67..803fa9ae7d 100644
 +    if ((ret = tvh_context_open(self, PREPARE_DECODER))){
 +        tvh_context_log(self, LOG_ERR, "PREPARE_DECODER returned error: %d", ret);
 +    }
-+    if (!(ret) && (ret = tvh_context_open(self, OPEN_DECODER))){
++    if (!ret && (ret = tvh_context_open(self, OPEN_DECODER))){
 +        tvh_context_log(self, LOG_ERR, "OPEN_DECODER returned error: %d", ret);
 +    }
-+    if (!(ret) && (ret = tvh_context_open(self, NOTIFY_GLOBALHEADER))){
++    if (!ret && (ret = tvh_context_open(self, NOTIFY_GLOBALHEADER))){
 +        tvh_context_log(self, LOG_ERR, "NOTIFY_GLOBALHEADER returned error: %d", ret);
      }
      return ret;
  }
-@@ -319,7 +650,30 @@ tvh_context_pack(TVHContext *self, AVPacket *avpkt)
+@@ -319,7 +626,30 @@ tvh_context_pack(TVHContext *self, AVPacket *avpkt)
      if (self->helper && self->helper->pack) {
          pkt = self->helper->pack(self, avpkt);
      } else {
@@ -6815,16 +7438,70 @@ index ef1ea10b67..803fa9ae7d 100644
      }
      if (!pkt) {
          tvh_context_log(self, LOG_ERR, "failed to create packet");
-@@ -422,7 +776,7 @@ tvh_context_encode(TVHContext *self, AVFrame *avframe)
+@@ -373,6 +703,9 @@ tvh_context_receive_packet(TVHContext *self)
+ }
+ 
+ 
++// Number of consecutive encode failures tolerated before the stream is stopped.
++#define TVH_MAX_ENCODE_ERRORS 3
++
+ static int
+ tvh_context_encode_frame(TVHContext *self, AVFrame *avframe)
+ {
+@@ -388,8 +721,39 @@ tvh_context_encode_frame(TVHContext *self, AVFrame *avframe)
+     if (!ret) {
+         ret = tvh_context_receive_packet(self);
+     }
++    if (ret == AVERROR(EAGAIN)) {
++        // _context_encode dropped the frame on purpose (e.g. duplicate PTS
++        // from the filter): not an encoder failure, don't count it towards
++        // TVH_MAX_ENCODE_ERRORS.
++        if (avframe)
++            av_frame_unref(avframe);
++        return 0;
++    }
+     if ((ret = (ret == AVERROR_EOF) ? 0 : ret)) {
+         av_frame_unref(avframe);
++        // Track consecutive encode failures. A hardware encoder (e.g. h264_vaapi)
++        // can enter a persistent error state and return -EIO on every frame; without
++        // a recovery path tvheadend would loop forever calling this on each input
++        // packet. avframe is NULL only during flush, which must not count as an error.
++        if (avframe) {
++            self->encode_errors++;
++            tvh_context_log(self, LOG_WARNING,
++                "encode error %d/%d", self->encode_errors, TVH_MAX_ENCODE_ERRORS);
++            if (self->encode_errors >= TVH_MAX_ENCODE_ERRORS) {
++                tvh_context_log(self, LOG_ERR,
++                    "too many consecutive encode errors, stopping stream");
++                self->encode_errors = 0;
++                // Return a fatal error that tvh_context_decode() does NOT remap to 0
++                // (unlike EAGAIN/EINVAL/EIO/INVALIDDATA). It then propagates up to
++                // tvh_transcoder_handle(), which calls tvh_stream_stop() to tear the
++                // stream down cleanly via tvh_context_close(). Do not free oavctx here:
++                // teardown is the stop path's responsibility, and freeing it would let
++                // a later packet re-enter tvh_context_encode() with oavctx == NULL.
++                ret = AVERROR(ENODEV);
++            }
++        }
++    } else {
++        self->encode_errors = 0;
+     }
+     return ret;
+ }
+@@ -421,8 +785,10 @@ tvh_context_encode(TVHContext *self, AVFrame *avframe)
+ {
      int ret = 0;
  
-     if (!avcodec_is_open(self->oavctx)) {
+-    if (!avcodec_is_open(self->oavctx)) {
 -        ret = tvh_context_open(self, OPEN_ENCODER);
++    // Guard against a NULL encoder context: avcodec_is_open() dereferences its
++    // argument, so a missing oavctx would otherwise segfault here.
++    if (!self->oavctx || !avcodec_is_open(self->oavctx)) {
 +        ret = tvh_context_open_encoder(self);
      }
      if (!ret && !(ret = tvh_context_push_frame(self, avframe))) {
          while ((ret = tvh_context_pull_frame(self, self->oavframe)) != AVERROR(EAGAIN)) {
-@@ -477,7 +831,7 @@ tvh_context_decode(TVHContext *self, AVPacket *avpkt)
+@@ -477,7 +843,7 @@ tvh_context_decode(TVHContext *self, AVPacket *avpkt)
      int ret = 0;
  
      if (!avcodec_is_open(self->iavctx)) {
@@ -6833,7 +7510,7 @@ index ef1ea10b67..803fa9ae7d 100644
      }
      if (!ret && !(ret = _context_decode(self, avpkt))) {
          ret = tvh_context_decode_packet(self, avpkt);
-@@ -536,7 +890,375 @@ tvh_context_close(TVHContext *self, int flush)
+@@ -536,7 +902,371 @@ tvh_context_close(TVHContext *self, int flush)
      }
  }
  
@@ -6871,7 +7548,7 @@ index ef1ea10b67..803fa9ae7d 100644
 +        ret = AVERROR_FILTER_NOT_FOUND;
 +        goto finish;
 +    }
-+
+ 
 +    // 1. ALLOCATE (No init yet, so it won't fail due to missing args)
 +    self->iavfltctx = avfilter_graph_alloc_filter(self->avfltgraph, iavflt, "in");
 +    if (!self->iavfltctx) {
@@ -6968,9 +7645,7 @@ index ef1ea10b67..803fa9ae7d 100644
 +#endif
 +        );
 +        // to be removed when we remove has_support_for_filter2
-+        tvhinfo(LS_TRANSCODE, 
-+        //tvh_context_log(self, LOG_DEBUG,
-+                          "%s", logs);
++        tvhinfo(LS_TRANSCODE, "%s", logs);
 +
 +    } else if (stream_type == AVMEDIA_TYPE_AUDIO) {
 +        // for Audio:
@@ -7003,9 +7678,7 @@ index ef1ea10b67..803fa9ae7d 100644
 +            ,par->time_base.num, par->time_base.den
 +        );
 +        // to be removed when we remove has_support_for_filter2
-+        tvhinfo(LS_TRANSCODE, 
-+        //tvh_context_log(self, LOG_DEBUG,
-+                          "%s", logs);
++        tvhinfo(LS_TRANSCODE, "%s", logs);
 +    } else tvherror(LS_TRANSCODE, "filter can process only 'buffer' and 'abuffer', most likely will fail.");
 +
 +    // Push the parameters into the uninitialized filter context
@@ -7145,9 +7818,7 @@ index ef1ea10b67..803fa9ae7d 100644
 +#endif
 +        );
 +        // to be removed when we remove has_support_for_filter2
-+        tvhinfo(LS_TRANSCODE, 
-+        //tvh_context_log(self, LOG_DEBUG,
-+                          "%s", logs);
++        tvhinfo(LS_TRANSCODE, "%s", logs);
 +
 +    } else if (stream_type == AVMEDIA_TYPE_AUDIO) {
 +        // for Audio:
@@ -7180,15 +7851,15 @@ index ef1ea10b67..803fa9ae7d 100644
 +            ,self->oavctx->time_base.num, self->oavctx->time_base.den
 +        );
 +        // to be removed when we remove has_support_for_filter2
-+        tvhinfo(LS_TRANSCODE, 
-+        //tvh_context_log(self, LOG_DEBUG,
-+                          "%s", logs);
++        tvhinfo(LS_TRANSCODE, "%s", logs);
 +
 +    } else tvherror(LS_TRANSCODE, "filter can process only 'buffersink' and 'abuffersink', most likely will fail.");
 +
 +    if (ret >= 0 && tvhtrace_enabled()) {
 +        char *graph = avfilter_graph_dump(self->avfltgraph, NULL);
-+        char *str, *token, *saveptr = NULL;
++        char *str;
++        char *token;
++        char *saveptr = NULL;
 +        for (str = graph; ; str = NULL) {
 +          token = strtok_r(str, "\n", &saveptr);
 +          if (token == NULL)
@@ -7197,9 +7868,11 @@ index ef1ea10b67..803fa9ae7d 100644
 +        }
 +        av_freep(&graph);
 +    }
- 
++
 +finish:
 +    if (par) {
++        // ch_layout may hold an allocation from av_channel_layout_copy()
++        av_channel_layout_uninit(&par->ch_layout);
 +        av_buffer_unref(&par->hw_frames_ctx);
 +        av_freep(&par);
 +    }
@@ -7209,7 +7882,27 @@ index ef1ea10b67..803fa9ae7d 100644
  int
  tvh_context_open_filters(TVHContext *self,
                           const char *source_name, const char *source_args,
-@@ -778,14 +1500,6 @@ tvh_context_destroy(TVHContext *self)
+@@ -660,7 +1390,9 @@ tvh_context_open_filters(TVHContext *self,
+ 
+     if (ret >= 0 && tvhtrace_enabled()) {
+         char *graph = avfilter_graph_dump(self->avfltgraph, NULL);
+-        char *str, *token, *saveptr = NULL;
++        char *str;
++        char *token;
++        char *saveptr = NULL;
+         for (str = graph; ; str = NULL) {
+           token = strtok_r(str, "\n", &saveptr);
+           if (token == NULL)
+@@ -748,6 +1480,8 @@ tvh_context_create(TVHStream *stream, TVHCodecProfile *profile,
+     }
+     self->stream = stream;
+     self->profile = profile;
++    // 0 is a valid pts: the "no pts seen yet" sentinel must be AV_NOPTS_VALUE
++    self->pts = AV_NOPTS_VALUE;
+     if (tvh_context_setup(self, iavcodec, oavcodec)) {
+         tvh_context_destroy(self);
+         return NULL;
+@@ -778,14 +1512,6 @@ tvh_context_destroy(TVHContext *self)
              pktbuf_ref_dec(self->input_gh);
              self->input_gh = NULL;
          }
@@ -7224,7 +7917,7 @@ index ef1ea10b67..803fa9ae7d 100644
          if (self->oavctx) {
              avcodec_free_context(&self->oavctx); // frees extradata
              self->oavctx = NULL;
-@@ -794,6 +1508,17 @@ tvh_context_destroy(TVHContext *self)
+@@ -794,6 +1520,17 @@ tvh_context_destroy(TVHContext *self)
              avcodec_free_context(&self->iavctx);
              self->iavctx = NULL;
          }
@@ -7242,8 +7935,8 @@ index ef1ea10b67..803fa9ae7d 100644
          self->type = NULL;
          self->profile = NULL;
          self->stream = NULL;
-diff --git a/src/transcoding/transcode/helpers.c b/src/transcoding/transcode/helpers.c
-index 025512f63c..ac0b87acfb 100644
+diff --git src/transcoding/transcode/helpers.c src/transcoding/transcode/helpers.c
+index 025512f63..187ecf151 100644
 --- src/transcoding/transcode/helpers.c
 +++ src/transcoding/transcode/helpers.c
 @@ -239,8 +239,22 @@ static TVHContextHelper TVHMPEG2VIDEOEncoder = {
@@ -7254,12 +7947,12 @@ index 025512f63c..ac0b87acfb 100644
 +    int condition = 0;
 +    if (self->use_pkt_data_new_extradata) {
 +        // when we use AV_PKT_DATA_NEW_EXTRADATA we need to bypass the AV_PKT_FLAG_KEY condition
-+        condition = ((avpkt->size > 6));
++        condition = (avpkt->size > 6);
 +    }
 +    else {
 +        condition = ((avpkt->flags & AV_PKT_FLAG_KEY) && (avpkt->size > 6));
 +    }
-+    if ((condition) &&
++    if (condition &&
 +        (RB32(avpkt->data) == 0x00000001 || RB24(avpkt->data) == 0x000001))
 +#else
      if ((avpkt->flags & AV_PKT_FLAG_KEY) && (avpkt->size > 6) &&
@@ -7270,8 +7963,8 @@ index 025512f63c..ac0b87acfb 100644
          const uint8_t *p = avpkt->data;
          const uint8_t *end = p + avpkt->size;
          const uint8_t *nal_start, *nal_end;
-diff --git a/src/transcoding/transcode/hwaccels/hwaccels.c b/src/transcoding/transcode/hwaccels/hwaccels.c
-index 99eeabc92c..50a7674328 100644
+diff --git src/transcoding/transcode/hwaccels/hwaccels.c src/transcoding/transcode/hwaccels/hwaccels.c
+index 99eeabc92..ad7d56687 100644
 --- src/transcoding/transcode/hwaccels/hwaccels.c
 +++ src/transcoding/transcode/hwaccels/hwaccels.c
 @@ -20,10 +20,22 @@
@@ -7423,10 +8116,14 @@ index 99eeabc92c..50a7674328 100644
      for (i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++) {
          pix_fmt = pix_fmts[i];
          if ((desc = av_pix_fmt_desc_get(pix_fmt))) {
-@@ -113,134 +217,120 @@ hwaccels_decode_get_format(AVCodecContext *avctx,
- }
- 
- 
+@@ -109,138 +213,144 @@ hwaccels_decode_get_format(AVCodecContext *avctx,
+             }
+         }
+     }
+-    return pix_fmt;
+-}
+-
+-
 -void
 -hwaccels_decode_close_context(AVCodecContext *avctx)
 -{
@@ -7443,10 +8140,21 @@ index 99eeabc92c..50a7674328 100644
 -                break;
 -        }
 -        ctx->hw_accel_ictx = NULL;
--    }
--}
--
--
++    // The hardware setup failed at runtime (e.g. unusable /dev/dri) and a
++    // software format was selected: forget the hardware intent so the filter
++    // chain is built for software frames instead of failing graph config.
++    if (ctx->iavhwdevtype != AV_HWDEVICE_TYPE_NONE &&
++        (pix_fmt == AV_PIX_FMT_NONE ||
++         !((desc = av_pix_fmt_desc_get(pix_fmt)) &&
++           (desc->flags & AV_PIX_FMT_FLAG_HWACCEL)))) {
++        tvhwarn(LS_TRANSCODE, "hwaccels: [%s] hardware decoding unavailable, "
++                "falling back to software decoding", avctx->codec->name);
++        ctx->iavhwdevtype = AV_HWDEVICE_TYPE_NONE;
+     }
++    return pix_fmt;
+ }
+ 
+ 
  int
 -hwaccels_get_scale_filter(AVCodecContext *iavctx, AVCodecContext *oavctx,
 -                          char *filter, size_t filter_len)
@@ -7501,7 +8209,6 @@ index 99eeabc92c..50a7674328 100644
 +    switch (self->oavhwdevtype) {
 +#if ENABLE_NVENC
 +        case AV_HWDEVICE_TYPE_CUDA:
-+            return nv_get_download(self, skip_format, filter, filter_len);
  #endif
 -            default:
 -                break;
@@ -7522,18 +8229,28 @@ index 99eeabc92c..50a7674328 100644
 -            case AV_PIX_FMT_VAAPI:
 -                return vaapi_get_denoise_filter(avctx, value, filter, filter_len);
 +        case AV_HWDEVICE_TYPE_VAAPI:
-+            return vaapi_get_download(self, skip_format, filter, filter_len);
  #endif
 -            default:
 -                break;
 -        }
++#if ENABLE_QSV
++        case AV_HWDEVICE_TYPE_QSV:
++#endif
++#if ENABLE_NVENC || ENABLE_VAAPI || ENABLE_QSV
++            // CUDA/VAAPI/QSV: download hw frames to the encoder's sw pixel format
++            if (skip_format) {
++                if (str_snprintf(filter, filter_len, "hwdownload"))
++                    return -1;
++            }
++            else if (str_snprintf(filter, filter_len, "hwdownload,format=pix_fmts=%s",
++                                  av_get_pix_fmt_name(self->oavctx->sw_pix_fmt))) {
++                return -1;
++            }
++            break;
++#endif
 +#if ENABLE_V4L2M2M
 +        case AV_HWDEVICE_TYPE_DRM:
 +            return v4l2m2m_get_download(self, filter, filter_len);
-+#endif
-+#if ENABLE_QSV
-+        case AV_HWDEVICE_TYPE_QSV:
-+            return qsv_get_download(self, skip_format, filter, filter_len);
 +#endif
 +        default:
 +        // for now we use default for software encoder
@@ -7638,7 +8355,7 @@ index 99eeabc92c..50a7674328 100644
  #endif
          default:
              break;
-@@ -250,17 +340,36 @@ hwaccels_encode_setup_context(AVCodecContext *avctx)
+@@ -250,17 +360,36 @@ hwaccels_encode_setup_context(AVCodecContext *avctx)
  
  
  void
@@ -7679,18 +8396,21 @@ index 99eeabc92c..50a7674328 100644
  }
  
  
-@@ -275,6 +384,9 @@ hwaccels_init(void)
+@@ -275,6 +404,12 @@ hwaccels_init(void)
  void
  hwaccels_done(void)
  {
 +#if ENABLE_NVENC
 +    nv_done();
 +#endif
++#if ENABLE_QSV
++    qsv_done();
++#endif
  #if ENABLE_VAAPI
      vaapi_done();
  #endif
-diff --git a/src/transcoding/transcode/hwaccels/hwaccels.h b/src/transcoding/transcode/hwaccels/hwaccels.h
-index 4313f8b3be..caeff4064f 100644
+diff --git src/transcoding/transcode/hwaccels/hwaccels.h src/transcoding/transcode/hwaccels/hwaccels.h
+index 4313f8b3b..caeff4064 100644
 --- src/transcoding/transcode/hwaccels/hwaccels.h
 +++ src/transcoding/transcode/hwaccels/hwaccels.h
 @@ -33,33 +33,20 @@ enum AVPixelFormat
@@ -7743,12 +8463,12 @@ index 4313f8b3be..caeff4064f 100644
 +hwaccels_context_destroy(TVHContext *self);
  
  #endif // TVH_TRANSCODING_TRANSCODE_HWACCELS_H__
-diff --git a/src/transcoding/transcode/hwaccels/nv.c b/src/transcoding/transcode/hwaccels/nv.c
+diff --git src/transcoding/transcode/hwaccels/nv.c src/transcoding/transcode/hwaccels/nv.c
 new file mode 100644
-index 0000000000..0edd5dae67
+index 000000000..38281f3cc
 --- /dev/null
 +++ src/transcoding/transcode/hwaccels/nv.c
-@@ -0,0 +1,284 @@
+@@ -0,0 +1,267 @@
 +/*
 + *  tvheadend - Transcoding
 + *
@@ -7817,7 +8537,7 @@ index 0000000000..0edd5dae67
 +    frames_ctx->initial_pool_size = 20;
 +    if ((err = av_hwframe_ctx_init(hw_frames_ref)) < 0) {
 +        tvherror_transcode(LST_NVENC, "Decode: Failed to initialize CUDA frame context."
-+                "Error code: %s",av_err2str(err));
++                " Error code: %s",av_err2str(err));
 +        av_buffer_unref(&hw_frames_ref);
 +        return err;
 +    }
@@ -7825,7 +8545,7 @@ index 0000000000..0edd5dae67
 +    if (!ctx->hw_frames_ctx) {
 +        err = AVERROR(ENOMEM);
 +        tvherror_transcode(LST_NVENC, "Decode: Failed to create a hardware frame context."
-+                "Error code: %s",av_err2str(err));
++                " Error code: %s",av_err2str(err));
 +    }
 +    av_buffer_unref(&hw_frames_ref);
 +    return err;
@@ -7890,7 +8610,7 @@ index 0000000000..0edd5dae67
 +    // set hw_frames_ctx for decoder's AVCodecContext
 +    if ((ret = set_hwframe_ctx(avctx, avctx->hw_device_ctx)) < 0) {
 +        tvherror_transcode(LST_NVENC, "Decode: Failed to set hwframe context."
-+                                      "Error code: %s", av_err2str(ret));
++                                      " Error code: %s", av_err2str(ret));
 +        av_buffer_unref(&avctx->hw_device_ctx);
 +        // unref hw_device_ref
 +        av_buffer_unref(&self->hw_device_ref);
@@ -7967,23 +8687,6 @@ index 0000000000..0edd5dae67
 +    return 0;
 +}
 +
-+int
-+nv_get_download(TVHContext *self, int skip_format, char *filter, size_t filter_len)
-+{
-+    if (skip_format) {
-+        if (str_snprintf(filter, filter_len, "hwdownload")) {
-+            return -1;
-+        }
-+    }
-+    else {
-+        if (str_snprintf(filter, filter_len, "hwdownload,format=pix_fmts=%s",
-+                        av_get_pix_fmt_name(self->oavctx->sw_pix_fmt))) {
-+            return -1;
-+        }
-+    }
-+    return 0;
-+}
-+
 +/* encoding ================================================================= */
 +
 +int
@@ -7998,7 +8701,7 @@ index 0000000000..0edd5dae67
 +    // Open NV device and create an AVHWDeviceContext for it
 +    if ((ret = av_hwdevice_ctx_create(&ctx->hw_device_octx, AV_HWDEVICE_TYPE_CUDA, NULL, NULL, 0)) < 0) {
 +        tvherror_transcode(LST_NVENC, "Encode: Failed to open CUDA device and create an AVHWDeviceContext for it."
-+                "Error code: %s",av_err2str(ret));
++                " Error code: %s",av_err2str(ret));
 +        return ret;
 +    }
 +    avctx->hw_device_ctx = av_buffer_ref(ctx->hw_device_octx);
@@ -8007,7 +8710,7 @@ index 0000000000..0edd5dae67
 +        ctx->hw_device_octx = NULL;
 +        ret = AVERROR(ENOMEM);
 +        tvherror_transcode(LST_NVENC, "Encode: Failed to create a hardware device context."
-+                "Error code: %s",av_err2str(ret));
++                " Error code: %s",av_err2str(ret));
 +        return ret;
 +    }
 +
@@ -8034,12 +8737,12 @@ index 0000000000..0edd5dae67
 +    /* nothing to do */
 +}
 \ No newline at end of file
-diff --git a/src/transcoding/transcode/hwaccels/nv.h b/src/transcoding/transcode/hwaccels/nv.h
+diff --git src/transcoding/transcode/hwaccels/nv.h src/transcoding/transcode/hwaccels/nv.h
 new file mode 100644
-index 0000000000..0560e20199
+index 000000000..7ff1ad799
 --- /dev/null
 +++ src/transcoding/transcode/hwaccels/nv.h
-@@ -0,0 +1,55 @@
+@@ -0,0 +1,52 @@
 +/*
 + *  tvheadend - Transcoding
 + *
@@ -8077,9 +8780,6 @@ index 0000000000..0560e20199
 +int
 +nv_get_filters(TVHContext *self, char *filter, size_t filter_len);
 +
-+int
-+nv_get_download(TVHContext *self, int skip_format, char *filter, size_t filter_len);
-+
 +/* encoding ================================================================= */
 +
 +int
@@ -8096,12 +8796,12 @@ index 0000000000..0560e20199
 +
 +#endif // TVH_TRANSCODING_TRANSCODE_HWACCELS_NV_H__
 \ No newline at end of file
-diff --git a/src/transcoding/transcode/hwaccels/qsv.c b/src/transcoding/transcode/hwaccels/qsv.c
+diff --git src/transcoding/transcode/hwaccels/qsv.c src/transcoding/transcode/hwaccels/qsv.c
 new file mode 100644
-index 0000000000..26d767dddf
+index 000000000..a12f4fc70
 --- /dev/null
 +++ src/transcoding/transcode/hwaccels/qsv.c
-@@ -0,0 +1,382 @@
+@@ -0,0 +1,409 @@
 +/*
 + *  tvheadend - Transcoding
 + *
@@ -8135,6 +8835,50 @@ index 0000000000..26d767dddf
 +typedef struct tvh_qsv_context_t {
 +    AVBufferRef *hw_device_ref;
 +} TVHQSVContext;
++
++// Shared QSV hardware device, derived once from a VAAPI device and cached for
++// the lifetime of the process (see the patch header). The original code created
++// a fresh "auto" QSV device on every get_format() for both decode and encode;
++// here it is built once and reference-counted out to every user.
++static AVBufferRef *tvh_qsv_device_cache = NULL;
++static tvh_mutex_t tvh_qsv_device_lock = TVH_THREAD_MUTEX_INITIALIZER;
++
++// Return a new reference to the shared QSV device, creating it on first use.
++// On this hardware the Intel QSV runtime sits on top of VAAPI, so the device is
++// derived from a (cheap) VAAPI device; if derivation is unsupported we fall back
++// to the plain "auto" QSV device. Returns NULL on failure; the caller owns the ref.
++static AVBufferRef *
++tvh_qsv_device_get(const char *vaapi_device)
++{
++    AVBufferRef *ref = NULL;
++    AVBufferRef *vaapi_ref = NULL;
++    int err = 0;
++
++    tvh_mutex_lock(&tvh_qsv_device_lock);
++    if (!tvh_qsv_device_cache) {
++        err = av_hwdevice_ctx_create(&vaapi_ref, AV_HWDEVICE_TYPE_VAAPI,
++                                     (vaapi_device && *vaapi_device) ? vaapi_device : NULL,
++                                     NULL, 0);
++        if (err >= 0) {
++            err = av_hwdevice_ctx_create_derived(&tvh_qsv_device_cache,
++                                                 AV_HWDEVICE_TYPE_QSV, vaapi_ref, 0);
++            av_buffer_unref(&vaapi_ref);
++        }
++        if (err < 0) {
++            tvh_qsv_device_cache = NULL;
++            err = av_hwdevice_ctx_create(&tvh_qsv_device_cache,
++                                         AV_HWDEVICE_TYPE_QSV, "auto", NULL, 0);
++            tvhtrace_transcode(LST_QSV, "QSV device: %s",
++                               err < 0 ? "creation FAILED" : "created via 'auto' fallback");
++        } else {
++            tvhtrace_transcode(LST_QSV, "QSV device: derived from VAAPI (cached)");
++        }
++    }
++    if (tvh_qsv_device_cache)
++        ref = av_buffer_ref(tvh_qsv_device_cache);
++    tvh_mutex_unlock(&tvh_qsv_device_lock);
++    return ref;
++}
 +
 +
 +/* TVHQSVContext ============================================================= */
@@ -8174,7 +8918,7 @@ index 0000000000..26d767dddf
 +    frames_ctx->initial_pool_size = 32; // Pre-allocate 32 surfaces
 +    if ((err = av_hwframe_ctx_init(hw_frames_ref)) < 0) {
 +        tvherror_transcode(LST_QSV, "Decode: Failed to initialize QSV frame context."
-+                "Error code: %s",av_err2str(err));
++                " Error code: %s",av_err2str(err));
 +        av_buffer_unref(&hw_frames_ref);
 +        return err;
 +    }
@@ -8182,7 +8926,7 @@ index 0000000000..26d767dddf
 +    if (!ctx->hw_frames_ctx) {
 +        err = AVERROR(ENOMEM);
 +        tvherror_transcode(LST_QSV, "Decode: Failed to create a hardware frame context."
-+                "Error code: %s",av_err2str(err));
++                " Error code: %s",av_err2str(err));
 +    }
 +    av_buffer_unref(&hw_frames_ref);
 +    return err;
@@ -8248,21 +8992,18 @@ index 0000000000..26d767dddf
 +        tvherror_transcode(LST_QSV, "Decode: Failed to allocate QSV context (TVHQSVContext)");
 +        return AVERROR(ENOMEM);
 +    }
-+    // lifted from ffmpeg-6.1.1/doc/examples/vaapi_transcode.c line 237
-+    // 1. Create Device Context
-+    // Open QSV device and create an AVHWDeviceContext for it
-+    if ((ret = av_hwdevice_ctx_create(&self->hw_device_ref, AV_HWDEVICE_TYPE_QSV, "auto", NULL, 0))) {
-+        tvherror_transcode(LST_QSV, "Decode: Failed to Open QSV device and create an AVHWDeviceContext "
-+                            "with error code: %s", av_err2str(ret));
++    // 1. Obtain the shared (cached, VAAPI-derived) QSV device.
++    self->hw_device_ref = tvh_qsv_device_get(ctx->hw_accel_device);
++    if (!self->hw_device_ref) {
++        tvherror_transcode(LST_QSV, "Decode: Failed to obtain QSV device");
 +        tvh_qsv_context_destroy(self);
-+        return ret;
++        return AVERROR(ENODEV);
 +    }
 +
-+    // lifted from ffmpeg-6.1.1/doc/examples/vaapi_transcode.c line 95
 +    /* set hw_frames_ctx for decoder's AVCodecContext */
 +    avctx->hw_device_ctx = av_buffer_ref(self->hw_device_ref);
 +    if (!avctx->hw_device_ctx) {
-+        tvherror_transcode(LST_QSV, "Decode: Failed to create a hardware device reference using 'auto'");
++        tvherror_transcode(LST_QSV, "Decode: Failed to create a hardware device reference");
 +        tvh_qsv_context_destroy(self);
 +        return AVERROR(ENOMEM);
 +    }
@@ -8315,7 +9056,7 @@ index 0000000000..26d767dddf
 +    /* set hw_frames_ctx for decoder's AVCodecContext */
 +    if ((ret = set_hwframe_ctx(avctx, avctx->hw_device_ctx)) < 0) {
 +        tvherror_transcode(LST_QSV, "Decode: Failed to set hwframe context."
-+                                      "Error code: %s", av_err2str(ret));
++                                      " Error code: %s", av_err2str(ret));
 +        av_buffer_unref(&avctx->hw_device_ctx);
 +        tvh_qsv_context_destroy(self);
 +        return ret;
@@ -8406,23 +9147,6 @@ index 0000000000..26d767dddf
 +}
 +
 +
-+int
-+qsv_get_download(TVHContext *self, int skip_format, char *filter, size_t filter_len)
-+{
-+    if (skip_format) {
-+        if (str_snprintf(filter, filter_len, "hwdownload")) {
-+            return -1;
-+        }
-+    }
-+    else {
-+        if (str_snprintf(filter, filter_len, "hwdownload,format=pix_fmts=%s",
-+                        av_get_pix_fmt_name(self->oavctx->sw_pix_fmt))) {
-+            return -1;
-+        }
-+    }
-+    return 0;
-+}
-+
 +/* encoding ================================================================= */
 +
 +int
@@ -8434,11 +9158,11 @@ index 0000000000..26d767dddf
 +    // this is required in case encode is called twice
 +    if (ctx->hw_device_octx)
 +        av_buffer_unref(&ctx->hw_device_octx);
-+    // 1. Create Device Context
-+    // Open QSV device and create an AVHWDeviceContext for it
-+    if ((ret = av_hwdevice_ctx_create(&ctx->hw_device_octx, AV_HWDEVICE_TYPE_QSV, "auto", NULL, 0))) {
-+        tvherror_transcode(LST_QSV, "Encode: Failed to Open QSV device and create an AVHWDeviceContext"
-+                "Error code: %s",av_err2str(ret));
++    // 1. Share the cached (VAAPI-derived) QSV device with the decoder.
++    ctx->hw_device_octx = tvh_qsv_device_get(ctx->hw_accel_device);
++    if (!ctx->hw_device_octx) {
++        ret = AVERROR(ENODEV);
++        tvherror_transcode(LST_QSV, "Encode: Failed to obtain QSV device");
 +        return ret;
 +    }
 +    avctx->hw_device_ctx = av_buffer_ref(ctx->hw_device_octx);
@@ -8447,7 +9171,7 @@ index 0000000000..26d767dddf
 +        ctx->hw_device_octx = NULL;
 +        ret = AVERROR(ENOMEM);
 +        tvherror_transcode(LST_QSV, "Encode: Failed to create a hardware device context."
-+                "Error code: %s",av_err2str(ret));
++                " Error code: %s",av_err2str(ret));
 +        return ret;
 +    }
 +    
@@ -8482,14 +9206,17 @@ index 0000000000..26d767dddf
 +void
 +qsv_done()
 +{
-+    /* nothing to do */
++    // Release the process-wide cached QSV device.
++    tvh_mutex_lock(&tvh_qsv_device_lock);
++    av_buffer_unref(&tvh_qsv_device_cache);
++    tvh_mutex_unlock(&tvh_qsv_device_lock);
 +}
-diff --git a/src/transcoding/transcode/hwaccels/qsv.h b/src/transcoding/transcode/hwaccels/qsv.h
+diff --git src/transcoding/transcode/hwaccels/qsv.h src/transcoding/transcode/hwaccels/qsv.h
 new file mode 100644
-index 0000000000..cee18abf9c
+index 000000000..cc2fe989d
 --- /dev/null
 +++ src/transcoding/transcode/hwaccels/qsv.h
-@@ -0,0 +1,58 @@
+@@ -0,0 +1,55 @@
 +/*
 + *  tvheadend - Transcoding
 + *
@@ -8527,9 +9254,6 @@ index 0000000000..cee18abf9c
 +int
 +qsv_get_filters(TVHContext *self, char *filter, size_t filter_len);
 +
-+int
-+qsv_get_download(TVHContext *self, int skip_format, char *filter, size_t filter_len);
-+
 +/* encoding ================================================================= */
 +
 +int
@@ -8548,9 +9272,9 @@ index 0000000000..cee18abf9c
 +
 +
 +#endif // TVH_TRANSCODING_TRANSCODE_HWACCELS_QSV_H__
-diff --git a/src/transcoding/transcode/hwaccels/v4l2-m2m.c b/src/transcoding/transcode/hwaccels/v4l2-m2m.c
+diff --git src/transcoding/transcode/hwaccels/v4l2-m2m.c src/transcoding/transcode/hwaccels/v4l2-m2m.c
 new file mode 100644
-index 0000000000..4190235316
+index 000000000..419023531
 --- /dev/null
 +++ src/transcoding/transcode/hwaccels/v4l2-m2m.c
 @@ -0,0 +1,112 @@
@@ -8666,9 +9390,9 @@ index 0000000000..4190235316
 +{
 +    /* nothing to do */
 +}
-diff --git a/src/transcoding/transcode/hwaccels/v4l2-m2m.h b/src/transcoding/transcode/hwaccels/v4l2-m2m.h
+diff --git src/transcoding/transcode/hwaccels/v4l2-m2m.h src/transcoding/transcode/hwaccels/v4l2-m2m.h
 new file mode 100644
-index 0000000000..6b8510aef1
+index 000000000..6b8510aef
 --- /dev/null
 +++ src/transcoding/transcode/hwaccels/v4l2-m2m.h
 @@ -0,0 +1,54 @@
@@ -8726,8 +9450,8 @@ index 0000000000..6b8510aef1
 +v4l2m2m_done(void);
 +
 +#endif // TVH_TRANSCODING_TRANSCODE_HWACCELS_V4L2M2M_H__
-diff --git a/src/transcoding/transcode/hwaccels/vaapi.c b/src/transcoding/transcode/hwaccels/vaapi.c
-index 1e69604c71..f348ace6a1 100644
+diff --git src/transcoding/transcode/hwaccels/vaapi.c src/transcoding/transcode/hwaccels/vaapi.c
+index 1e69604c7..dae10cd45 100644
 --- src/transcoding/transcode/hwaccels/vaapi.c
 +++ src/transcoding/transcode/hwaccels/vaapi.c
 @@ -17,35 +17,26 @@
@@ -8769,7 +9493,7 @@ index 1e69604c71..f348ace6a1 100644
  {
      if (self) {
          if (self->hw_device_ref) {
-@@ -57,152 +48,292 @@ tvhva_context_destroy(TVHVAContext *self)
+@@ -57,152 +48,275 @@ tvhva_context_destroy(TVHVAContext *self)
  }
  
  
@@ -8783,7 +9507,9 @@ index 1e69604c71..f348ace6a1 100644
 +    AVBufferRef *hw_frames_ref;
 +    AVHWFramesContext *frames_ctx = NULL;
 +    int err = 0;
-+
+ 
+-static int
+-vaapi_get_buffer2(AVCodecContext *avctx, AVFrame *avframe, int flags)
 +    if (!(hw_frames_ref = av_hwframe_ctx_alloc(hw_device_ctx))) {
 +        tvherror_transcode(LST_VAAPI, "Decode: Failed to create VAAPI frame context.");
 +        return AVERROR(ENOMEM);
@@ -8796,7 +9522,7 @@ index 1e69604c71..f348ace6a1 100644
 +    frames_ctx->initial_pool_size = 20;
 +    if ((err = av_hwframe_ctx_init(hw_frames_ref)) < 0) {
 +        tvherror_transcode(LST_VAAPI, "Decode: Failed to initialize VAAPI frame context."
-+                "Error code: %s",av_err2str(err));
++                " Error code: %s",av_err2str(err));
 +        av_buffer_unref(&hw_frames_ref);
 +        return err;
 +    }
@@ -8804,15 +9530,13 @@ index 1e69604c71..f348ace6a1 100644
 +    if (!ctx->hw_frames_ctx) {
 +        err = AVERROR(ENOMEM);
 +        tvherror_transcode(LST_VAAPI, "Decode: Failed to create a hardware frame context."
-+                "Error code: %s",av_err2str(err));
++                " Error code: %s",av_err2str(err));
 +    }
 +    av_buffer_unref(&hw_frames_ref);
 +    return err;
 +}
 +#endif
- 
--static int
--vaapi_get_buffer2(AVCodecContext *avctx, AVFrame *avframe, int flags)
++
 +static int vaapi_get_scale_filter(AVCodecContext *iavctx, int height, char *filter, size_t filter_len)
  {
 -    if (!(avctx->codec->capabilities & AV_CODEC_CAP_DR1)) {
@@ -8967,7 +9691,7 @@ index 1e69604c71..f348ace6a1 100644
 +    /* set hw_frames_ctx for decoder's AVCodecContext */
 +    if ((ret = set_hwframe_ctx(avctx, avctx->hw_device_ctx)) < 0) {
 +        tvherror_transcode(LST_VAAPI, "Decode: Failed to set hwframe context."
-+                                      "Error code: %s", av_err2str(ret));
++                                      " Error code: %s", av_err2str(ret));
          av_buffer_unref(&avctx->hw_device_ctx);
 +        tvh_va_context_destroy(self);
 +        return ret;
@@ -9048,7 +9772,39 @@ index 1e69604c71..f348ace6a1 100644
 +            len = strnlen(filter, filter_len);
 +            snprintf(filter + len, filter_len - len, "%s%s", (len > 0) ? "," : "", hw_deint);
 +        }
-+    }
+     }
+-
+-    return 0;
+-}
+-
+-
+-int
+-vaapi_get_denoise_filter(AVCodecContext *avctx, int value, char *filter, size_t filter_len)
+-{
+-    snprintf(filter, filter_len, "denoise_vaapi=%d", value);
+-    return 0;
+-}
+-
+-
+-int
+-vaapi_get_sharpness_filter(AVCodecContext *avctx, int value, char *filter, size_t filter_len)
+-{
+-    snprintf(filter, filter_len, "sharpness_vaapi=%d", value);
+-    return 0;
+-}
+-
+-/* encoding ================================================================= */
+-
+-// lifted from ffmpeg-6.1.1/doc/examples/vaapi_encode.c line 41
+-static int set_hwframe_ctx(AVCodecContext *ctx, AVBufferRef *hw_device_ctx)
+-{
+-    AVBufferRef *hw_frames_ref;
+-    AVHWFramesContext *frames_ctx = NULL;
+-    int err = 0;
+-
+-    if (!(hw_frames_ref = av_hwframe_ctx_alloc(hw_device_ctx))) {
+-        tvherror_transcode(LST_VAAPI, "Encode: Failed to create VAAPI frame context.");
+-        return AVERROR(ENOMEM);
 +    
 +    memset(hw_scale, 0, sizeof(hw_scale));
 +    if (filter_scale){ 
@@ -9060,7 +9816,18 @@ index 1e69604c71..f348ace6a1 100644
 +            len = strnlen(filter, filter_len);
 +            snprintf(filter + len, filter_len - len, "%s%s", (len > 0) ? "," : "", hw_scale);
 +        }
-+    }
+     }
+-    frames_ctx = (AVHWFramesContext *)(hw_frames_ref->data);
+-    frames_ctx->format    = AV_PIX_FMT_VAAPI;
+-    frames_ctx->sw_format = AV_PIX_FMT_NV12;
+-    frames_ctx->width     = ctx->width;
+-    frames_ctx->height    = ctx->height;
+-    frames_ctx->initial_pool_size = 20;
+-    if ((err = av_hwframe_ctx_init(hw_frames_ref)) < 0) {
+-        tvherror_transcode(LST_VAAPI, "Encode: Failed to initialize VAAPI frame context."
+-                "Error code: %s",av_err2str(err));
+-        av_buffer_unref(&hw_frames_ref);
+-        return err;
 +    
 +    memset(hw_denoise, 0, sizeof(hw_denoise));
 +    if (filter_denoise) { 
@@ -9073,7 +9840,12 @@ index 1e69604c71..f348ace6a1 100644
 +            snprintf(filter + len, filter_len - len, "%s%s", (len > 0) ? "," : "", hw_denoise);
 +        }
      }
- 
+-    ctx->hw_frames_ctx = av_buffer_ref(hw_frames_ref);
+-    if (!ctx->hw_frames_ctx) {
+-        err = AVERROR(ENOMEM);
+-        tvherror_transcode(LST_VAAPI, "Encode: Failed to create a hardware device reference."
+-                "Error code: %s",av_err2str(err));
++
 +    memset(hw_sharpness, 0, sizeof(hw_sharpness));
 +    if (filter_sharpness){
 +        if (vaapi_get_sharpness_filter(self->iavctx, filter_sharpness, hw_sharpness, sizeof(hw_sharpness))){
@@ -9083,66 +9855,6 @@ index 1e69604c71..f348ace6a1 100644
 +        else {
 +            len = strnlen(filter, filter_len);
 +            snprintf(filter + len, filter_len - len, "%s%s", (len > 0) ? "," : "", hw_sharpness);
-+        }
-+    }
-     return 0;
- }
- 
--
--int
--vaapi_get_denoise_filter(AVCodecContext *avctx, int value, char *filter, size_t filter_len)
--{
--    snprintf(filter, filter_len, "denoise_vaapi=%d", value);
--    return 0;
--}
--
--
- int
--vaapi_get_sharpness_filter(AVCodecContext *avctx, int value, char *filter, size_t filter_len)
--{
--    snprintf(filter, filter_len, "sharpness_vaapi=%d", value);
--    return 0;
--}
--
--/* encoding ================================================================= */
--
--// lifted from ffmpeg-6.1.1/doc/examples/vaapi_encode.c line 41
--static int set_hwframe_ctx(AVCodecContext *ctx, AVBufferRef *hw_device_ctx)
-+vaapi_get_download(TVHContext *self, int skip_format, char *filter, size_t filter_len)
- {
--    AVBufferRef *hw_frames_ref;
--    AVHWFramesContext *frames_ctx = NULL;
--    int err = 0;
--
--    if (!(hw_frames_ref = av_hwframe_ctx_alloc(hw_device_ctx))) {
--        tvherror_transcode(LST_VAAPI, "Encode: Failed to create VAAPI frame context.");
--        return AVERROR(ENOMEM);
--    }
--    frames_ctx = (AVHWFramesContext *)(hw_frames_ref->data);
--    frames_ctx->format    = AV_PIX_FMT_VAAPI;
--    frames_ctx->sw_format = AV_PIX_FMT_NV12;
--    frames_ctx->width     = ctx->width;
--    frames_ctx->height    = ctx->height;
--    frames_ctx->initial_pool_size = 20;
--    if ((err = av_hwframe_ctx_init(hw_frames_ref)) < 0) {
--        tvherror_transcode(LST_VAAPI, "Encode: Failed to initialize VAAPI frame context."
--                "Error code: %s",av_err2str(err));
--        av_buffer_unref(&hw_frames_ref);
--        return err;
-+    if (skip_format) {
-+        if (str_snprintf(filter, filter_len, "hwdownload")) {
-+            return -1;
-+        }
-     }
--    ctx->hw_frames_ctx = av_buffer_ref(hw_frames_ref);
--    if (!ctx->hw_frames_ctx) {
--        err = AVERROR(ENOMEM);
--        tvherror_transcode(LST_VAAPI, "Encode: Failed to create a hardware device reference."
--                "Error code: %s",av_err2str(err));
-+    else {
-+        if (str_snprintf(filter, filter_len, "hwdownload,format=pix_fmts=%s",
-+                        av_get_pix_fmt_name(self->oavctx->sw_pix_fmt))) {
-+            return -1;
 +        }
      }
 -    av_buffer_unref(&hw_frames_ref);
@@ -9154,7 +9866,7 @@ index 1e69604c71..f348ace6a1 100644
  
  int
  vaapi_encode_setup_context(AVCodecContext *avctx)
-@@ -210,46 +341,47 @@ vaapi_encode_setup_context(AVCodecContext *avctx)
+@@ -210,46 +324,47 @@ vaapi_encode_setup_context(AVCodecContext *avctx)
      TVHContext *ctx = avctx->opaque;
      int ret = 0;
  
@@ -9167,7 +9879,8 @@ index 1e69604c71..f348ace6a1 100644
 +    // Open VAAPI device and create an AVHWDeviceContext for it
      if ((ret = av_hwdevice_ctx_create(&ctx->hw_device_octx, AV_HWDEVICE_TYPE_VAAPI, NULL, NULL, 0)) < 0) {
          tvherror_transcode(LST_VAAPI, "Encode: Failed to open VAAPI device and create an AVHWDeviceContext for it."
-                 "Error code: %s",av_err2str(ret));
+-                "Error code: %s",av_err2str(ret));
++                " Error code: %s",av_err2str(ret));
          return ret;
      }
 -    // lifted from ffmpeg-6.1.1/doc/examples/vaapi_encode.c line 152
@@ -9181,7 +9894,7 @@ index 1e69604c71..f348ace6a1 100644
 +        ctx->hw_device_octx = NULL;
 +        ret = AVERROR(ENOMEM);
 +        tvherror_transcode(LST_VAAPI, "Encode: Failed to create a hardware device context."
-+                "Error code: %s",av_err2str(ret));
++                " Error code: %s",av_err2str(ret));
 +        return ret;
      }
 +    
@@ -9226,11 +9939,11 @@ index 1e69604c71..f348ace6a1 100644
 -    tvhva_done();
 +    /* nothing to do */
  }
-diff --git a/src/transcoding/transcode/hwaccels/vaapi.h b/src/transcoding/transcode/hwaccels/vaapi.h
-index c4e14bc5ad..8aea1b0216 100644
+diff --git src/transcoding/transcode/hwaccels/vaapi.h src/transcoding/transcode/hwaccels/vaapi.h
+index c4e14bc5a..e5f4abd7e 100644
 --- src/transcoding/transcode/hwaccels/vaapi.h
 +++ src/transcoding/transcode/hwaccels/vaapi.h
-@@ -32,33 +32,22 @@
+@@ -32,33 +32,19 @@
  int
  vaapi_decode_setup_context(AVCodecContext *avctx);
  
@@ -9243,14 +9956,13 @@ index c4e14bc5ad..8aea1b0216 100644
 -int
 -vaapi_get_deint_filter(AVCodecContext *avctx, char *filter, size_t filter_len);
 -
- int
+-int
 -vaapi_get_denoise_filter(AVCodecContext *avctx, int value, char *filter, size_t filter_len);
-+vaapi_get_filters(TVHContext *self, char *filter, size_t filter_len);
- 
+-
  int
 -vaapi_get_sharpness_filter(AVCodecContext *avctx, int value, char *filter, size_t filter_len);
 -
-+vaapi_get_download(TVHContext *self, int skip_format, char *filter, size_t filter_len);
++vaapi_get_filters(TVHContext *self, char *filter, size_t filter_len);
  
  /* encoding ================================================================= */
  
@@ -9269,8 +9981,8 @@ index c4e14bc5ad..8aea1b0216 100644
  void
  vaapi_done(void);
  
-diff --git a/src/transcoding/transcode/internals.h b/src/transcoding/transcode/internals.h
-index 2bf58b002d..c6c1e9279c 100644
+diff --git src/transcoding/transcode/internals.h src/transcoding/transcode/internals.h
+index 2bf58b002..af83e1ea6 100644
 --- src/transcoding/transcode/internals.h
 +++ src/transcoding/transcode/internals.h
 @@ -48,12 +48,13 @@ typedef struct tvh_context_type TVHContextType;
@@ -9291,7 +10003,7 @@ index 2bf58b002d..c6c1e9279c 100644
  } TVHOpenPhase;
  
  #if LIBAVCODEC_VERSION_MAJOR > 59
-@@ -165,14 +166,30 @@ struct tvh_context {
+@@ -165,14 +166,33 @@ struct tvh_context {
      int require_meta;
      int64_t pts;
      // only for audio
@@ -9320,10 +10032,13 @@ index 2bf58b002d..c6c1e9279c 100644
 +    // V4L2 is using AV_PKT_DATA_NEW_EXTRADATA so we need to change the conditions used for extradata
 +    // to signal that we set this variable to 1
 +    uint8_t use_pkt_data_new_extradata;
++    // consecutive encode-failure counter; once it reaches TVH_MAX_ENCODE_ERRORS
++    // the stream is torn down cleanly instead of looping forever (or crashing).
++    int encode_errors;
  };
  
  int
-@@ -184,6 +201,43 @@ tvh_context_get_str_opt(AVDictionary **opts, const char *key, char **value);
+@@ -184,6 +204,43 @@ tvh_context_get_str_opt(AVDictionary **opts, const char *key, char **value);
  void
  tvh_context_close(TVHContext *self, int flush);
  
@@ -9367,8 +10082,8 @@ index 2bf58b002d..c6c1e9279c 100644
  /* __VA_ARGS__ = NULL terminated list of sink options
     sink option = (const char *name, av_opt_set_type opt_set_type, int size, const uint8_t *value) */
  int
-diff --git a/src/transcoding/transcode/stream.c b/src/transcoding/transcode/stream.c
-index 35f69004c3..f6292949ad 100644
+diff --git src/transcoding/transcode/stream.c src/transcoding/transcode/stream.c
+index 35f69004c..40bd8c6af 100644
 --- src/transcoding/transcode/stream.c
 +++ src/transcoding/transcode/stream.c
 @@ -63,18 +63,19 @@ tvh_stream_setup(TVHStream *self, TVHCodecProfile *profile, tvh_ssc_t *ssc)
@@ -9466,7 +10181,7 @@ index 35f69004c3..f6292949ad 100644
 +                // Instead, VAAPI uses the standard software decoder (e.g., mpeg2video) and "accelerates" it by attaching a hardware device context to it.
 +            icodec = avcodec_find_decoder(icodec_id);
 +
-+            for (int i = 0;; i++) {
++            for (int i = 0; icodec; i++) {
 +                const AVCodecHWConfig *config = avcodec_get_hw_config(icodec, i);
 +                if (!config) break;
 +                if (config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX &&
@@ -9515,11 +10230,11 @@ index 35f69004c3..f6292949ad 100644
      ssc->ssc_gh = NULL;
      return 0;
  }
-diff --git a/src/transcoding/transcode/transcoder.c b/src/transcoding/transcode/transcoder.c
-index 52fe227c63..64d4904742 100644
+diff --git src/transcoding/transcode/transcoder.c src/transcoding/transcode/transcoder.c
+index 52fe227c6..5ca63a9eb 100644
 --- src/transcoding/transcode/transcoder.c
 +++ src/transcoding/transcode/transcoder.c
-@@ -93,6 +93,26 @@ tvh_transcoder_handle(TVHTranscoder *self, th_pkt_t *pkt)
+@@ -93,6 +93,27 @@ tvh_transcoder_handle(TVHTranscoder *self, th_pkt_t *pkt)
  
      SLIST_FOREACH(stream, &self->streams, link) {
          if (pkt->pkt_componentindex == stream->index) {
@@ -9533,7 +10248,8 @@ index 52fe227c63..64d4904742 100644
 +                        avcodec_is_open(stream->context->iavctx))
 +                        stream->context->iavctx->sample_aspect_ratio = sar;
 +                }
-+                if ((!stream->context->iavctx->framerate.num || !stream->context->iavctx->framerate.den) && (pkt->pkt_duration > 1)) {
++                if (stream->context->iavctx &&
++                    (!stream->context->iavctx->framerate.num || !stream->context->iavctx->framerate.den) && (pkt->pkt_duration > 1)) {
 +                    int fdur = (pkt->pkt_duration > INT_MAX) ? INT_MAX : (int)pkt->pkt_duration;
 +                    if (fdur > 0) {
 +                        AVRational fr = av_make_q(90000, fdur);
@@ -9546,11 +10262,11 @@ index 52fe227c63..64d4904742 100644
              err = tvh_stream_handle(stream, pkt);
              if (err) {
                  tvh_stream_stop(stream, 0);
-diff --git a/src/transcoding/transcode/video.c b/src/transcoding/transcode/video.c
-index 5b3a118639..56ffcdd28a 100644
+diff --git src/transcoding/transcode/video.c src/transcoding/transcode/video.c
+index 5b3a11863..a93da116c 100644
 --- src/transcoding/transcode/video.c
 +++ src/transcoding/transcode/video.c
-@@ -25,18 +25,95 @@
+@@ -25,18 +25,82 @@
  #endif
  
  
@@ -9584,15 +10300,18 @@ index 5b3a118639..56ffcdd28a 100644
 +get_encoder_hw_device_type(AVCodecContext *avctx)
  {
 -    const AVPixFmtDescriptor *desc;
-+    //const AVPixFmtDescriptor *desc;
- 
+-
+-    if ((desc = av_pix_fmt_desc_get(pix_fmt)) &&
+-        (desc->flags & AV_PIX_FMT_FLAG_HWACCEL)) {
+-        return 1;
 +    // first we try to detect the hadrware pix_fmt using codec name
 +#if ENABLE_NVENC
 +    // check NVDEC/NVENC encoder
 +    if (avctx->codec && 
 +        (strstr(avctx->codec->name, "h264_nvenc") || strstr(avctx->codec->name, "hevc_nvenc"))) {
 +            return AV_HWDEVICE_TYPE_CUDA;
-+    }
+     }
+-    return 0;
 +#endif
 +#if ENABLE_VAAPI
 +    // check VAAPI encoder
@@ -9615,18 +10334,6 @@ index 5b3a118639..56ffcdd28a 100644
 +            return AV_HWDEVICE_TYPE_DRM;
 +    }
 +#endif
-+// TODO: to be removed later on
-+// START to be removed when we remove has_support_for_filter2
-+#if 0
-+    // backup we return to old method
-+    enum AVPixelFormat pix_fmt = avctx->pix_fmt;
-     if ((desc = av_pix_fmt_desc_get(pix_fmt)) &&
-         (desc->flags & AV_PIX_FMT_FLAG_HWACCEL)) {
-         return 1;
-     }
--    return 0;
-+#endif
-+// END to be removed when we remove has_support_for_filter2
 +    return AV_HWDEVICE_TYPE_NONE;
  }
 +#endif
@@ -9650,7 +10357,7 @@ index 5b3a118639..56ffcdd28a 100644
  static int
  _video_get_sw_deint_filter(TVHContext *self, char *deint, size_t deint_len)
  {
-@@ -48,118 +125,112 @@ _video_get_sw_deint_filter(TVHContext *self, char *deint, size_t deint_len)
+@@ -48,118 +112,115 @@ _video_get_sw_deint_filter(TVHContext *self, char *deint, size_t deint_len)
      return 0;
  }
  
@@ -9808,6 +10515,7 @@ index 5b3a118639..56ffcdd28a 100644
 +        // setup the hardware filter on each hwaccel
 +        hwaccels_decode_get_filters(self, hw_filters, sizeof(hw_filters))){
 +            tvherror(LS_TRANSCODE, "filters: video: function hwaccels_get_filter() returned with error.");
++            return -1;
      }
 -#endif
 -
@@ -9824,12 +10532,14 @@ index 5b3a118639..56ffcdd28a 100644
 +        // setup the download filter
 +        hwaccels_download(self, download, sizeof(download), skip_download_format)){
 +            tvherror(LS_TRANSCODE, "filters: video: function hwaccels_download() returned with error.");
++            return -1;
 +    }
 +    memset(upload, 0, sizeof(upload));
 +    if (filter_upload &&
 +        // setup the upload filter
 +        hwaccels_upload(self, upload, sizeof(upload))){
 +            tvherror(LS_TRANSCODE, "filters: video: function hwaccels_upload() returned with error.");
++            return -1;
      }
 -#endif
 -
@@ -9844,7 +10554,7 @@ index 5b3a118639..56ffcdd28a 100644
      memset(download, 0, sizeof(download));
      if (filter_download &&
          str_snprintf(download, sizeof(download), "hwdownload,format=pix_fmts=%s",
-@@ -174,29 +245,89 @@ _video_filters_get_filters(TVHContext *self, char **filters)
+@@ -174,29 +235,91 @@ _video_filters_get_filters(TVHContext *self, char **filters)
                       av_get_pix_fmt_name(self->oavctx->pix_fmt))) {
          return -1;
      }
@@ -9897,8 +10607,10 @@ index 5b3a118639..56ffcdd28a 100644
 +    }
 +#endif
 +    if ((!self->iavctx->framerate.num || !self->iavctx->framerate.den) &&
-+        es->es_frame_duration > 1)
-+        self->iavctx->framerate = av_make_q(90000, (int)es->es_frame_duration);
++        es->es_frame_duration > 1) {
++        int fdur = (es->es_frame_duration > INT_MAX) ? INT_MAX : (int)es->es_frame_duration;
++        self->iavctx->framerate = av_make_q(90000, fdur);
++    }
 +}
 +
 +
@@ -9940,7 +10652,7 @@ index 5b3a118639..56ffcdd28a 100644
      return 0;
  }
  
-@@ -222,76 +353,43 @@ tvh_video_context_notify_gh(TVHContext *self)
+@@ -222,76 +345,80 @@ tvh_video_context_notify_gh(TVHContext *self)
  static int
  tvh_video_context_open_encoder(TVHContext *self, AVDictionary **opts)
  {
@@ -9975,21 +10687,8 @@ index 5b3a118639..56ffcdd28a 100644
 -            if (hwaccels_initialize_encoder_from_decoder(self->iavctx, self->oavctx)) {
 -                return -1;
 -            }
--        }
--        else {
--            // decoder is sw
--            // --> we initialize as recommended in:
--            // ffmpeg-6.1.1/doc/examples/vaapi_encode.c line 145
--            if (hwaccels_encode_setup_context(self->oavctx)) {
--                return -1;
--            }
--        }
--    }
- #endif // from ENABLE_HWACCELS
- 
--    // XXX: is this a safe assumption?
--    if (!self->iavctx->framerate.num) {
--        self->iavctx->framerate = av_make_q(30, 1);
++#endif // from ENABLE_HWACCELS
++
 +    // check frame rate
 +    if (!self->iavctx->framerate.num || !self->iavctx->framerate.den) {
 +        // compute frame rate from pkt_duration (probably es_frame_duration was 0)
@@ -9998,13 +10697,61 @@ index 5b3a118639..56ffcdd28a 100644
 +            AVRational fr = av_make_q(90000, fdur);
 +            av_reduce(&fr.num, &fr.den, fr.num, fr.den, INT_MAX);
 +            self->iavctx->framerate = fr;
+         }
+-        else {
+-            // decoder is sw
+-            // --> we initialize as recommended in:
+-            // ffmpeg-6.1.1/doc/examples/vaapi_encode.c line 145
+-            if (hwaccels_encode_setup_context(self->oavctx)) {
+-                return -1;
++    }
++
++#if LIBAVCODEC_VERSION_MAJOR <= 59
++    /* Legacy path: tvh_context_open_filters2() does not exist, so the encoder
++       geometry and timing cannot be taken from the negotiated buffersink and
++       must be configured here, as before the filter2 rework. */
++    {
++        TVHVideoCodecProfile *vprofile = (TVHVideoCodecProfile *)self->profile;
++        int field_rate = (vprofile->deinterlace &&
++                          vprofile->deinterlace_field_rate) ? 2 : 1;
++        AVRational ticks_per_frame;
++        int ticks_per_frame_tmp;
++
++        if (!self->oavctx->width) {
++            if (vprofile->size.num > 0 && vprofile->size.den > 0) {
++                self->oavctx->width  = vprofile->size.num;
++                self->oavctx->height = vprofile->size.den;
++            } else {
++                self->oavctx->width  = self->iavctx->width;
++                self->oavctx->height = self->iavctx->height;
+             }
+         }
++        // XXX: is this a safe assumption?
++        if (!self->iavctx->framerate.num) {
++            self->iavctx->framerate = av_make_q(30, 1);
 +        }
++        // take into account double rate i.e. field-based deinterlacers
++        self->oavctx->framerate =
++            av_mul_q(self->iavctx->framerate, (AVRational) { field_rate, 1 });
++        // We assume 90kHz as timebase which is mandatory for MPEG-TS
++        ticks_per_frame_tmp =
++            (90000 * self->oavctx->framerate.den) / self->oavctx->framerate.num;
++        ticks_per_frame = av_make_q(ticks_per_frame_tmp, 1);
++        self->oavctx->time_base =
++            av_inv_q(av_mul_q(self->oavctx->framerate, ticks_per_frame));
++        self->oavctx->sample_aspect_ratio = self->iavctx->sample_aspect_ratio;
      }
+-#endif // from ENABLE_HWACCELS
++#endif
+ 
+-    // XXX: is this a safe assumption?
+-    if (!self->iavctx->framerate.num) {
+-        self->iavctx->framerate = av_make_q(30, 1);
+-    }
 -    self->oavctx->framerate = av_mul_q(self->iavctx->framerate, (AVRational) { field_rate, 1 }); //take into account double rate i.e. field-based deinterlacers
 -    int ticks_per_frame_tmp = (90000 * self->oavctx->framerate.den) / self->oavctx->framerate.num; // We assume 90kHz as timebase which is mandatory for MPEG-TS
 -    ticks_per_frame = av_make_q(ticks_per_frame_tmp, 1);
 -    self->oavctx->time_base = av_inv_q(av_mul_q(self->oavctx->framerate, ticks_per_frame));
-+
      if (gop_size) {
          // gop was set by the user
          self->oavctx->gop_size = gop_size;
@@ -10035,7 +10782,7 @@ index 5b3a118639..56ffcdd28a 100644
      return 0;
  }
  
-@@ -302,6 +400,8 @@ tvh_video_context_open_filters(TVHContext *self)
+@@ -302,6 +429,8 @@ tvh_video_context_open_filters(TVHContext *self)
      char source_args[128];
      char *filters = NULL;
  
@@ -10044,7 +10791,7 @@ index 5b3a118639..56ffcdd28a 100644
      // source args
      memset(source_args, 0, sizeof(source_args));
      if (str_snprintf(source_args, sizeof(source_args),
-@@ -318,17 +418,29 @@ tvh_video_context_open_filters(TVHContext *self)
+@@ -318,17 +447,29 @@ tvh_video_context_open_filters(TVHContext *self)
  
      // filters
      if (_video_filters_get_filters(self, &filters)) {
@@ -10081,7 +10828,7 @@ index 5b3a118639..56ffcdd28a 100644
  #else
      int ret = tvh_context_open_filters(self,
          "buffer", source_args,              // source
-@@ -342,18 +454,37 @@ tvh_video_context_open_filters(TVHContext *self)
+@@ -342,18 +483,36 @@ tvh_video_context_open_filters(TVHContext *self)
      return ret;
  }
  
@@ -10107,8 +10854,7 @@ index 5b3a118639..56ffcdd28a 100644
  static int
  tvh_video_context_open(TVHContext *self, TVHOpenPhase phase, AVDictionary **opts)
  {
-+    // TODO : remove later on
-+    tvh_context_log(self, LOG_ERR, "tvh_video_context_open() TVHOpenPhase = %d ", phase);
++    tvh_context_log(self, LOG_TRACE, "tvh_video_context_open() TVHOpenPhase = %d ", phase);
      switch (phase) {
 -        case OPEN_DECODER:
 +        case PREPARE_DECODER:
@@ -10124,7 +10870,7 @@ index 5b3a118639..56ffcdd28a 100644
              return tvh_video_context_open_filters(self);
          default:
              break;
-@@ -366,6 +497,7 @@ static int
+@@ -366,6 +525,7 @@ static int
  tvh_video_context_encode(TVHContext *self, AVFrame *avframe)
  {
      if (!self || !self->oavctx) {
@@ -10132,7 +10878,7 @@ index 5b3a118639..56ffcdd28a 100644
          return -1;
      }
  
-@@ -373,16 +505,13 @@ tvh_video_context_encode(TVHContext *self, AVFrame *avframe)
+@@ -373,16 +533,14 @@ tvh_video_context_encode(TVHContext *self, AVFrame *avframe)
  #if LIBAVUTIL_VERSION_MAJOR >= 58
      // FFmpeg 6.x+ — proper duration field and reliable time_base attached to deint filter
      int64_t *frame_duration = &avframe->duration;
@@ -10146,7 +10892,8 @@ index 5b3a118639..56ffcdd28a 100644
 -            "No valid input link found, falling back to scaled encoder time_base {%d/%d}",
 -            src_time_base.num, src_time_base.den);
 +    // we protect against null pointers
-+    if (!self->oavfltctx || self->oavfltctx->nb_inputs == 0 || !self->oavfltctx->inputs[0]) {
++    if (!self->oavfltctx || self->oavfltctx->nb_inputs == 0 ||
++        !self->oavfltctx->inputs || !self->oavfltctx->inputs[0]) {
 +        tvherror(LS_TRANSCODE, "tvh_video_context_encode: oavfltctx is not initialized or is not initialized properly");
 +        return -1;
      }
@@ -10155,14 +10902,11 @@ index 5b3a118639..56ffcdd28a 100644
  #else
      // FFmpeg 4.x–5.x — older API, VAAPI filter time_base not API exposed
      int64_t *frame_duration = &avframe->pkt_duration;
-@@ -515,9 +644,15 @@ tvh_video_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+@@ -515,9 +673,12 @@ tvh_video_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
                              pict_type);
              break;
      }
 -    pkt->pkt_duration   = avpkt->duration;
-+    // only if packet duration is valid we passed on
-+    if (avpkt->duration > 0)
-+        pkt->pkt_duration = avpkt->duration;
      pkt->pkt_commercial = self->src_pkt->pkt_commercial;
      pkt->v.pkt_field      = (self->oavctx->field_order > AV_FIELD_PROGRESSIVE);
 +#if ENABLE_LIBAV
@@ -10172,7 +10916,7 @@ index 5b3a118639..56ffcdd28a 100644
      pkt->v.pkt_aspect_num = self->src_pkt->v.pkt_aspect_num;
      pkt->v.pkt_aspect_den = self->src_pkt->v.pkt_aspect_den;
      return 0;
-@@ -527,10 +662,7 @@ tvh_video_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
+@@ -527,10 +688,7 @@ tvh_video_context_wrap(TVHContext *self, AVPacket *avpkt, th_pkt_t *pkt)
  static void
  tvh_video_context_close(TVHContext *self)
  {
@@ -10180,40 +10924,42 @@ index 5b3a118639..56ffcdd28a 100644
 -    hwaccels_encode_close_context(self->oavctx);
 -    hwaccels_decode_close_context(self->iavctx);
 -#endif
-+
++    /* nothing to do */
  }
  
  
-diff --git a/src/tvhlog.c b/src/tvhlog.c
-index 6d10501056..e840181475 100644
+diff --git src/tvhlog.c src/tvhlog.c
+index 6d1050105..d17991954 100644
 --- src/tvhlog.c
 +++ src/tvhlog.c
-@@ -210,7 +210,9 @@ tvhlog_subsys_t tvhlog_transcode_subsystems[] = {
+@@ -209,8 +209,9 @@ tvhlog_subsys_t tvhlog_transcode_subsystems[] = {
+     [LST_LIBVPX]        = { "libvpx",        N_("LIB VPX") },
      [LST_LIBX26X]       = { "libx26x",       N_("LIB x264_x265") },
      [LST_NVENC]         = { "nvenc",         N_("NVENC") },
-     [LST_OMX]           = { "omx",           N_("OMX") },
+-    [LST_OMX]           = { "omx",           N_("OMX") },
 +    [LST_V4l2M2M]       = { "v4l2",          N_("V4L2-API") },
      [LST_VAAPI]         = { "vaapi",         N_("VA-API") },
 +    [LST_QSV]           = { "qsv",           N_("QSV-API") },
      [LST_VAINFO]        = { "vainfo",        N_("VAINFO") },
  };
  
-diff --git a/src/tvhlog.h b/src/tvhlog.h
-index b1edd6b67a..f15219fff1 100644
+diff --git src/tvhlog.h src/tvhlog.h
+index b1edd6b67..8ff358a0c 100644
 --- src/tvhlog.h
 +++ src/tvhlog.h
-@@ -225,7 +225,9 @@ enum {
+@@ -224,8 +224,9 @@ enum {
+     LST_LIBVPX,
      LST_LIBX26X,
      LST_NVENC,
-     LST_OMX,
+-    LST_OMX,
 +    LST_V4l2M2M,
      LST_VAAPI,
 +    LST_QSV,
      LST_VAINFO,
      LST_LAST     /* keep this last */
  };
-diff --git a/src/webui/static/app/codec.js b/src/webui/static/app/codec.js
-index cf2cc658fa..e7f76131e6 100644
+diff --git src/webui/static/app/codec.js src/webui/static/app/codec.js
+index cf2cc658f..9342ef47f 100644
 --- src/webui/static/app/codec.js
 +++ src/webui/static/app/codec.js
 @@ -26,61 +26,85 @@ function genericCBRvsVBR(form) {
@@ -10417,7 +11163,7 @@ index cf2cc658fa..e7f76131e6 100644
  
  function update_vaapi_ui(form) {
      // first time we have to call this manually
-@@ -263,22 +352,23 @@ function update_vaapi_ui(form) {
+@@ -263,22 +352,22 @@ function update_vaapi_ui(form) {
              updateLowPower(form);
          });
  
@@ -10444,14 +11190,13 @@ index cf2cc658fa..e7f76131e6 100644
 +        enable_hwaccels_details(form);
          form.findField('deinterlace').on('check', function(checkbox, value) {
 -            update_deinterlace_details(form);
-+            //update_deinterlace_details(form);
 +            enable_hwaccels_details(form);
          });
 +    }
  
      // on desired_b_depth change
      if (form.findField('desired_b_depth'))
-@@ -293,6 +383,69 @@ function update_vaapi_ui(form) {
+@@ -293,6 +382,69 @@ function update_vaapi_ui(form) {
          });
  }
  
@@ -10521,7 +11266,7 @@ index cf2cc658fa..e7f76131e6 100644
  var codec_profile_forms = {
      'default': function(form) {
          var name_field = form.findField('name');
-@@ -301,7 +454,7 @@ var codec_profile_forms = {
+@@ -301,7 +453,7 @@ var codec_profile_forms = {
  
      'codec_profile_mpeg2video': function(form) {
          genericCBRvsVBR(form);
@@ -10530,7 +11275,7 @@ index cf2cc658fa..e7f76131e6 100644
      },
  
      'codec_profile_mp2': function(form) {
-@@ -410,12 +563,12 @@ var codec_profile_forms = {
+@@ -410,12 +562,12 @@ var codec_profile_forms = {
  
      'codec_profile_libx264': function(form) {
          genericCBRvsVBR(form);
@@ -10545,7 +11290,7 @@ index cf2cc658fa..e7f76131e6 100644
      },
  
      'codec_profile_libvpx': function(form) {
-@@ -429,7 +582,7 @@ var codec_profile_forms = {
+@@ -429,7 +581,7 @@ var codec_profile_forms = {
          }
  
          genericCBRvsVBR(form);
@@ -10554,7 +11299,7 @@ index cf2cc658fa..e7f76131e6 100644
          var quality_field = form.findField('deadline');
          var speed_field = form.findField('cpu-used');
          updateSpeed(quality_field, speed_field);
-@@ -442,7 +595,10 @@ var codec_profile_forms = {
+@@ -442,7 +594,10 @@ var codec_profile_forms = {
          });
      },
  
@@ -10566,7 +11311,7 @@ index cf2cc658fa..e7f76131e6 100644
  
      'codec_profile_libvorbis': genericCBRvsVBR,
  
-@@ -538,12 +694,24 @@ var codec_profile_forms = {
+@@ -538,12 +693,24 @@ var codec_profile_forms = {
      },
  
      'codec_profile_nvenc_h264': function(form) { 
@@ -10594,9 +11339,9 @@ index cf2cc658fa..e7f76131e6 100644
  };
  
  
-diff --git a/support/patches/ffmpeg.vaapi.diff b/support/patches/ffmpeg.vaapi.diff
+diff --git support/patches/ffmpeg.vaapi.diff support/patches/ffmpeg.vaapi.diff
 new file mode 100644
-index 0000000000..695ad6c8d3
+index 000000000..695ad6c8d
 --- /dev/null
 +++ support/patches/ffmpeg.vaapi.diff
 @@ -0,0 +1,13 @@
@@ -10613,9 +11358,9 @@ index 0000000000..695ad6c8d3
 +             ctx->dts_pts_diff = ctx->pic_end->pts - ctx->first_pts;
 +     }
 + 
-diff --git a/support/patches/ffmpeg.vaapi2.diff b/support/patches/ffmpeg.vaapi2.diff
+diff --git support/patches/ffmpeg.vaapi2.diff support/patches/ffmpeg.vaapi2.diff
 new file mode 100644
-index 0000000000..8083c10524
+index 000000000..8083c1052
 --- /dev/null
 +++ support/patches/ffmpeg.vaapi2.diff
 @@ -0,0 +1,34 @@
