@@ -47,7 +47,7 @@ rebulk==3.2.0
 requests==2.34.2
 requests_oauthlib==2.0.0
 send2trash==2.1.0
-#setuptools==82.0.1                   ==> python312
+setuptools==81.0.0
 sickchill==2024.3.1
 #six==1.17.0                          ==> python312
 soupsieve==2.8.4
