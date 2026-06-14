@@ -101,6 +101,7 @@ on:
 jobs:
   prepare:
     name: Prepare for Build
+    if: github.repository == 'SynoCommunity/spksrc' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
@@ -368,7 +369,7 @@ jobs:
     name: Build
     needs: [prepare, set-defaults]
     runs-on: ubuntu-latest
-    if: ${{ needs.set-defaults.outputs.has_entries == 'true' }}
+    if: needs.set-defaults.outputs.has_entries == 'true'
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}

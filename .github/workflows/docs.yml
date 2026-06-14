@@ -21,6 +21,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
+    if: github.repository == 'SynoCommunity/spksrc'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -44,12 +45,12 @@ jobs:
       - name: Build documentation
         run: mkdocs build --strict
       - name: Upload artifact
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/docs-migration')
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./site
   deploy:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/docs-migration')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
     environment:
