@@ -46,7 +46,7 @@ jobs:
         run: mkdocs build --strict
       - name: Upload artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./site
   deploy:
