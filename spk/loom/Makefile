@@ -22,8 +22,8 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 
 # Loom serves its web UI and API over plain HTTP on this port; put it behind the
-# DSM reverse proxy for TLS. Default upstream listen port is 8989.
-SERVICE_PORT = 8989
+# DSM reverse proxy for TLS. Default upstream listen port is 1925.
+SERVICE_PORT = 1925
 SERVICE_PORT_TITLE = Loom Web UI
 ADMIN_PORT = $(SERVICE_PORT)
 ADMIN_URL = /

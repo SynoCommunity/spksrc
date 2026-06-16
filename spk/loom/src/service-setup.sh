@@ -10,7 +10,7 @@ LOOM="${SYNOPKG_PKGDEST}/bin/loom"
 
 export LOOM_CONFIG_DIR="${SYNOPKG_PKGVAR}"
 export LOOM_DATA_DIR="${SYNOPKG_PKGVAR}"
-export LOOM_HTTP_ADDR=":${SERVICE_PORT:-8989}"
+export LOOM_HTTP_ADDR=":${SERVICE_PORT:-1925}"
 # Some Go libraries fall back to $HOME for caches; keep them inside our var dir.
 export HOME="${SYNOPKG_PKGVAR}"
 
