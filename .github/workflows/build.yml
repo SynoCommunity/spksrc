@@ -101,7 +101,6 @@ on:
 jobs:
   prepare:
     name: Prepare for Build
-    if: github.repository == 'SynoCommunity/spksrc' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
@@ -836,7 +835,7 @@ jobs:
     if: always()
     steps:
       - name: Download all diagnostic artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: diagnostics-*
           path: all-diagnostics
