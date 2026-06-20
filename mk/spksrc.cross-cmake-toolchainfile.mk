@@ -75,4 +75,4 @@ endif
 	echo "set(CMAKE_INSTALL_RPATH_USE_LINK_PATH $(CMAKE_INSTALL_RPATH_USE_LINK_PATH))" ; \
 	echo
 	@echo "# set pkg-config path" ; \
-	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(abspath $(PKG_CONFIG_LIBDIR))")'
+	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(subst $(space),:,$(abspath $(subst :,$(space),$(PKG_CONFIG_LIBDIR))))")'
