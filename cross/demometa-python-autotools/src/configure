@@ -1,0 +1,33 @@
+#!/bin/sh
+# Minimal hand-rolled configure for the autotools/configure channel of the
+# meta cross-dependency test. Resolves python-meta libs via pkg-config (which
+# reads PKG_CONFIG_LIBDIR from the environment) and fills in Makefile.in.
+# Accepts the standard --prefix/--host/--build args spksrc passes; ignores all
+# but --prefix.
+
+prefix=/usr/local
+for arg in "$@"; do
+	case "$arg" in
+		--prefix=*) prefix="${arg#--prefix=}" ;;
+		*) ;;
+	esac
+done
+
+: "${CC:=cc}"
+: "${PKG_CONFIG:=pkg-config}"
+
+DEPS_CFLAGS=$($PKG_CONFIG --cflags libzstd sqlite3) || { echo "configure: pkg-config failed for libzstd/sqlite3" >&2; exit 1; }
+DEPS_LIBS=$($PKG_CONFIG --libs libzstd sqlite3)     || { echo "configure: pkg-config failed for libzstd/sqlite3" >&2; exit 1; }
+
+sed \
+	-e "s|@CC@|${CC}|g" \
+	-e "s|@EXTRA_CFLAGS@|${CFLAGS}|g" \
+	-e "s|@EXTRA_LDFLAGS@|${LDFLAGS}|g" \
+	-e "s|@DEPS_CFLAGS@|${DEPS_CFLAGS}|g" \
+	-e "s|@DEPS_LIBS@|${DEPS_LIBS}|g" \
+	-e "s|@prefix@|${prefix}|g" \
+	Makefile.in > Makefile
+
+echo "configure: Makefile generated (CC=${CC})"
+echo "configure:   DEPS_CFLAGS=${DEPS_CFLAGS}"
+echo "configure:   DEPS_LIBS=${DEPS_LIBS}"

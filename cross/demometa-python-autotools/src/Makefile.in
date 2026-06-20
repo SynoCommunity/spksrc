@@ -1,0 +1,19 @@
+CC = @CC@
+EXTRA_CFLAGS = @EXTRA_CFLAGS@
+EXTRA_LDFLAGS = @EXTRA_LDFLAGS@
+DEPS_CFLAGS = @DEPS_CFLAGS@
+DEPS_LIBS = @DEPS_LIBS@
+prefix = @prefix@
+DESTDIR =
+
+all: demometa-python-autotools
+
+demometa-python-autotools: main.c
+	$(CC) $(EXTRA_CFLAGS) $(DEPS_CFLAGS) -o $@ main.c $(EXTRA_LDFLAGS) $(DEPS_LIBS)
+
+install: demometa-python-autotools
+	mkdir -p $(DESTDIR)$(prefix)/bin
+	cp demometa-python-autotools $(DESTDIR)$(prefix)/bin/
+
+clean:
+	rm -f demometa-python-autotools
