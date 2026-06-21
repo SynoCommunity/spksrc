@@ -1,6 +1,10 @@
 ifndef SPKSRC_SPK_BASE_MK
 SPKSRC_SPK_BASE_MK := 1
 
+# meta_env target (generates the inspectable tc_vars.meta.mk), used by the
+# $(1)_meta_pre_depend hook below.
+include ../../mk/spksrc.spk/meta.mk
+
 # Define excluded library / package list
 # Note: covers both bare and lib-prefixed variants (e.g. lzma.pc AND liblzma.pc)
 EXCLUDED_LIBS = %bzip2.pc %lzma.pc %zlib.pc
@@ -106,22 +110,5 @@ $(1)_links: $(1)_msg
 	@$(foreach _done,$($(1)_STATUS_COOKIES),ln -sf $(_done) $(WORK_DIR) ;)
 
 endef
-
-# Materialize the meta cross-dependency environment into an inspectable
-# artifact (tc_vars.meta.mk, cleaned by spkclean's tc_vars*.mk glob).
-# Output-only in this phase: the live variables
-# (accumulator + cross-env.mk) drive the build; this file is for `cat`
-# inspection and to replace the opacity of the scattered $(eval export).
-# Shared across namespaces (not $(1)-prefixed); written once with the fully
-# accumulated environment.
-.PHONY: meta_env
-meta_env:
-	@mkdir -p $(WORK_DIR)
-	@echo "# Generated meta cross-dependency environment - $(NAME)"          > $(WORK_DIR)/tc_vars.meta.mk
-	@echo "META_PKGCONFIG_DIRS := $(strip $(META_PKGCONFIG_DIRS))"          >> $(WORK_DIR)/tc_vars.meta.mk
-	@echo "PKG_CONFIG_LIBDIR := $(PKG_CONFIG_LIBDIR)"                       >> $(WORK_DIR)/tc_vars.meta.mk
-	@echo "ADDITIONAL_CFLAGS += $(ADDITIONAL_CFLAGS)"                       >> $(WORK_DIR)/tc_vars.meta.mk
-	@echo "ADDITIONAL_LDFLAGS += $(ADDITIONAL_LDFLAGS)"                     >> $(WORK_DIR)/tc_vars.meta.mk
-	@echo "OPENSSL_STAGING_INSTALL_PREFIX := $(OPENSSL_STAGING_INSTALL_PREFIX)" >> $(WORK_DIR)/tc_vars.meta.mk
 
 endif # ifndef SPKSRC_SPK_BASE_MK
