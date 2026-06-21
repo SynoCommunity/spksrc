@@ -15,6 +15,13 @@ TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).
 # Include them (optional include)
 -include $(TC_VARS_FILES)
 
+# OpenSSL root for find_package(OpenSSL), which does NOT consult pkg-config.
+# Derive it from the ordered PKG_CONFIG_LIBDIR: the first directory that
+# actually provides libssl.so wins (same local-first precedence as pkg-config),
+# else the local staging. meson and autotools need no equivalent - they resolve
+# openssl through pkg-config (openssl.pc) directly.
+CMAKE_OPENSSL_ROOT_DIR = $(abspath $(firstword $(foreach d,$(subst :,$(space),$(PKG_CONFIG_LIBDIR)),$(if $(wildcard $(patsubst %/lib/pkgconfig,%,$(d))/lib/libssl.so),$(patsubst %/lib/pkgconfig,%,$(d)),)) $(STAGING_INSTALL_PREFIX)))
+
 .PHONY: $(CMAKE_TOOLCHAIN_FILE_PKG)
 $(CMAKE_TOOLCHAIN_FILE_PKG):
 ifeq ($(wildcard $(CMAKE_BUILD_DIR)),)
@@ -76,7 +83,7 @@ endif
 	echo
 	@echo "# set pkg-config path" ; \
 	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(subst $(space),:,$(abspath $(subst :,$(space),$(PKG_CONFIG_LIBDIR))))")'
-	@echo "# OpenSSL root: shared meta openssl if present, else local staging." ; \
-	echo "# Lets find_package(OpenSSL) resolve it without per-package -DOPENSSL_*," ; \
-	echo "# and works the same for a standalone cross/ build (no meta)." ; \
-	echo 'set(OPENSSL_ROOT_DIR "$(abspath $(or $(OPENSSL_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX)))")'
+	@echo "# OpenSSL root: first PKG_CONFIG_LIBDIR dir providing libssl.so, else" ; \
+	echo "# local staging - lets find_package(OpenSSL) resolve it without" ; \
+	echo "# per-package -DOPENSSL_*, in meta and standalone builds alike." ; \
+	echo 'set(OPENSSL_ROOT_DIR "$(CMAKE_OPENSSL_ROOT_DIR)")'
