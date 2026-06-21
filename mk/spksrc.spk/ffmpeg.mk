@@ -16,18 +16,6 @@ OPTIONAL_DEPENDS += $(FFMPEG_DEPENDS)
 # exists for the stage2 SPK_BASE_TEMPLATE parse.
 BUILD_DEPENDS := $(call uniq,spk/$(FFMPEG_PACKAGE) $(BUILD_DEPENDS))
 
-# Re-use all default ffmpeg mandatory libraries
-FFMPEG_PC  = libavcodec.pc
-FFMPEG_PC += libavfilter.pc
-FFMPEG_PC += libavformat.pc
-FFMPEG_PC += libavutil.pc
-FFMPEG_PC += libpostproc.pc
-FFMPEG_PC += libswresample.pc
-FFMPEG_PC += libswscale.pc
-# Also include openssl
-FFMPEG_PC += libssl.pc
-FFMPEG_PC += openssl.pc
-
 # $(1)_meta hook required by base.mk; no extra action for this meta.
 .PHONY: FFMPEG_meta
 FFMPEG_meta: ;
