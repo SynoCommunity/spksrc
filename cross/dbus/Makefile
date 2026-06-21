@@ -13,8 +13,8 @@ LICENSE = Academic Free License v2.1 or GPLv2
 
 CMAKE_ARGS += -DDBUS_BUILD_TESTS=OFF
 CMAKE_ARGS += -DDBUS_ENABLE_XML_DOCS=OFF
-# When built against python spk package
-CMAKE_ARGS += -DEXPAT_INCLUDE_DIR=$(or $(PYTHON_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/include
-CMAKE_ARGS += -DEXPAT_LIBRARY=$(or $(PYTHON_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/lib/libexpat.so
+# EXPAT is located by find_package(EXPAT) via CMAKE_FIND_ROOT_PATH: the local
+# staging (cross/libexpat) for a standalone build, or the python meta staging
+# when shared - no explicit -DEXPAT_* path needed.
 
 include ../../mk/spksrc.cross-cmake.mk
