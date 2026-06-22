@@ -33,15 +33,10 @@ $(eval $(1)_STAGING_INSTALL_PREFIX := $(realpath $($(1)_PACKAGE_WORK_DIR)/instal
 $(eval export $(1)_INSTALL_PREFIX)
 $(eval export $(1)_STAGING_INSTALL_PREFIX)
 
-# Accumulate this meta's pkgconfig dir for the ordered PKG_CONFIG_LIBDIR.
-# Local staging stays first (wins); meta dirs are appended in call order and
-# consumed by cross-env.mk once all meta .mk files have run.
-#
-# Add-if-absent (not +=) and exported: cross/ dependency builds run as sub-makes
-# that do NOT re-run SPK_BASE_TEMPLATE, so they must inherit this list from the
-# environment to get the meta pkgconfig dirs (the old symlink-flatten reached
-# them via the shared staging dir; the ordered list must too). The add-if-absent
-# guard keeps the SPK's own re-parsing sub-makes from appending duplicates.
+# Accumulate this meta's pkgconfig dir (add-if-absent) for the ordered
+# PKG_CONFIG_LIBDIR. Exported so cross/ sub-makes - which don't re-run
+# SPK_BASE_TEMPLATE - inherit the list from the environment. Local staging
+# stays first (wins).
 $(eval META_PKGCONFIG_DIRS := $(META_PKGCONFIG_DIRS) $(filter-out $(META_PKGCONFIG_DIRS),$(if $(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig),$($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig,)))
 $(eval export META_PKGCONFIG_DIRS)
 
