@@ -1,8 +1,8 @@
 ifndef SPKSRC_SPK_BASE_MK
 SPKSRC_SPK_BASE_MK := 1
 
-# meta_env target (generates the inspectable tc_vars.meta.mk), used by the
-# $(1)_meta_pre_depend hook below.
+# TC_VARS_META_MK file-target (generates the inspectable tc_vars.meta.mk),
+# used by the $(1)_meta_pre_depend hook below.
 include ../../mk/spksrc.spk/meta.mk
 
 # Define excluded library / package list
@@ -94,7 +94,7 @@ $(eval $(1)_STATUS_COOKIES := $(sort $(if $(strip $($(1)_PC)),,$(foreach cross,$
 $(eval PRE_DEPEND_TARGET += $(1)_meta_pre_depend)
 
 .PHONY: $(1)_meta_pre_depend
-$(1)_meta_pre_depend: $(1)_links $(1)_meta meta_env
+$(1)_meta_pre_depend: $(1)_links $(1)_meta $(TC_VARS_META_MK)
 
 .PHONY: $(1)_msg
 $(1)_msg:
