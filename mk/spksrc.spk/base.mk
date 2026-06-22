@@ -29,6 +29,12 @@ $(eval $(1)_STAGING_INSTALL_PREFIX := $(realpath $($(1)_PACKAGE_WORK_DIR)/instal
 $(eval export $(1)_INSTALL_PREFIX)
 $(eval export $(1)_STAGING_INSTALL_PREFIX)
 
+# Accumulate this meta's pkgconfig dir for the ordered PKG_CONFIG_LIBDIR.
+# Local staging stays first (wins); meta dirs are appended in call order and
+# consumed by cross-env.mk once all meta .mk files have run. Not exported:
+# sub-makes re-parse and re-accumulate, so exporting would double the list.
+$(eval META_PKGCONFIG_DIRS += $(if $(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig),$($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig,))
+
 # Set build flags so the package can find headers and libs at compile time,
 # and the dynamic linker will find them at runtime on the NAS.
 $(eval ADDITIONAL_CFLAGS    += $(if $(wildcard $($(1)_STAGING_INSTALL_PREFIX)),-I$($(1)_STAGING_INSTALL_PREFIX)/include,))
@@ -78,7 +84,7 @@ $(eval $(1)_STATUS_COOKIES := $(sort $(if $(strip $($(1)_PC)),,$(foreach cross,$
 $(eval PRE_DEPEND_TARGET += $(1)_meta_pre_depend)
 
 .PHONY: $(1)_meta_pre_depend
-$(1)_meta_pre_depend: $(1)_links $(1)_meta
+$(1)_meta_pre_depend: $(1)_links $(1)_meta meta_env
 
 .PHONY: $(1)_msg
 $(1)_msg:
@@ -94,5 +100,22 @@ $(1)_links: $(1)_msg
 	@$(foreach _done,$($(1)_STATUS_COOKIES),ln -sf $(_done) $(WORK_DIR) ;)
 
 endef
+
+# Materialize the meta cross-dependency environment into an inspectable
+# artifact (tc_vars.meta.mk, cleaned by spkclean's tc_vars*.mk glob).
+# Output-only in this phase: the live variables
+# (accumulator + cross-env.mk) drive the build; this file is for `cat`
+# inspection and to replace the opacity of the scattered $(eval export).
+# Shared across namespaces (not $(1)-prefixed); written once with the fully
+# accumulated environment.
+.PHONY: meta_env
+meta_env:
+	@mkdir -p $(WORK_DIR)
+	@echo "# Generated meta cross-dependency environment - $(NAME)"          > $(WORK_DIR)/tc_vars.meta.mk
+	@echo "META_PKGCONFIG_DIRS := $(strip $(META_PKGCONFIG_DIRS))"          >> $(WORK_DIR)/tc_vars.meta.mk
+	@echo "PKG_CONFIG_LIBDIR := $(PKG_CONFIG_LIBDIR)"                       >> $(WORK_DIR)/tc_vars.meta.mk
+	@echo "ADDITIONAL_CFLAGS += $(ADDITIONAL_CFLAGS)"                       >> $(WORK_DIR)/tc_vars.meta.mk
+	@echo "ADDITIONAL_LDFLAGS += $(ADDITIONAL_LDFLAGS)"                     >> $(WORK_DIR)/tc_vars.meta.mk
+	@echo "OPENSSL_STAGING_INSTALL_PREFIX := $(OPENSSL_STAGING_INSTALL_PREFIX)" >> $(WORK_DIR)/tc_vars.meta.mk
 
 endif # ifndef SPKSRC_SPK_BASE_MK
