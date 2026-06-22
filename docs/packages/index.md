@@ -243,7 +243,6 @@ The following is a complete list of all 183+ packages available in the SynoCommu
     | prusa-slicer | 3D Printing |
     | ps3netsrv | Media Server |
     | pyload | Downloads |
-    | python310 | Runtime |
     | python311 | Runtime |
     | python312 | Runtime |
     | qbittorrent | Downloads |
