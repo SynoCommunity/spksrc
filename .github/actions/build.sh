@@ -33,7 +33,7 @@ set -o pipefail
 ffmpeg_versions=(5 6 7 8)
 
 # python minor versions whose build artifacts must be preserved for dependents
-python_versions=(310 311 312 313 314)
+python_versions=(311 312 313 314)
 
 # DSM versions above the default builds that require filtered package lists.
 # Must match the min_dsm_versions array in prepare.sh.
