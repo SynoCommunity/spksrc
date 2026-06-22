@@ -76,3 +76,7 @@ endif
 	echo
 	@echo "# set pkg-config path" ; \
 	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(subst $(space),:,$(abspath $(subst :,$(space),$(PKG_CONFIG_LIBDIR))))")'
+	@echo "# OpenSSL root: shared meta openssl if present, else local staging." ; \
+	echo "# Lets find_package(OpenSSL) resolve it without per-package -DOPENSSL_*," ; \
+	echo "# and works the same for a standalone cross/ build (no meta)." ; \
+	echo 'set(OPENSSL_ROOT_DIR "$(abspath $(or $(OPENSSL_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX)))")'
