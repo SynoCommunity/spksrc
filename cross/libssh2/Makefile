@@ -15,14 +15,8 @@ CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 CMAKE_ARGS += -DBUILD_STATIC_LIBS=OFF
 CMAKE_ARGS += -DBUILD_EXAMPLES=OFF
 CMAKE_ARGS += -DBUILD_TESTING=OFF
-ifneq ($(wildcard $(OPENSSL_STAGING_INSTALL_PREFIX)),)
-CMAKE_ARGS += -DOPENSSL_INCLUDE_DIR=$(OPENSSL_STAGING_INSTALL_PREFIX)/include
-CMAKE_ARGS += -DOPENSSL_SSL_LIBRARY=$(OPENSSL_STAGING_INSTALL_PREFIX)/lib/libssl.so
-CMAKE_ARGS += -DOPENSSL_CRYPTO_LIBRARY=$(OPENSSL_STAGING_INSTALL_PREFIX)/lib/libcrypto.so
-else
-CMAKE_ARGS += -DOPENSSL_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include
-CMAKE_ARGS += -DOPENSSL_SSL_LIBRARY=$(STAGING_INSTALL_PREFIX)/lib/libssl.so
-CMAKE_ARGS += -DOPENSSL_CRYPTO_LIBRARY=$(STAGING_INSTALL_PREFIX)/lib/libcrypto.so
-endif
+# OpenSSL is resolved by find_package(OpenSSL) via the central OPENSSL_ROOT_DIR
+# emitted in the cmake toolchain file (meta openssl if shared, else local
+# staging where cross/openssl3 installs) - no per-package -DOPENSSL_* needed.
 
 include ../../mk/spksrc.cross-cmake.mk
