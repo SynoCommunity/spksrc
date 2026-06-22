@@ -1,0 +1,25 @@
+[
+   {
+      "step_title": "Beszel Agent Configuration",
+      "items": [
+         {
+            "type": "textfield",
+            "desc": "Provide the SSH public key of the Bezel Hub you want to add this system to.",
+            "subitems": [
+               {
+                  "key": "wizard_pub_key",
+                  "desc": "Public Key",
+                  "defaultValue": "",
+                  "width": 520,
+                  "validator": {
+                     "allowBlank": false
+                     }
+               }
+            ]
+         },
+         {
+            "desc": "The bezel agent is listening on the default port 45876."
+         }
+      ]
+   }
+]
