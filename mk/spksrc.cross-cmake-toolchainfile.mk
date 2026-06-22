@@ -22,6 +22,13 @@ TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).
 # openssl through pkg-config (openssl.pc) directly.
 CMAKE_OPENSSL_ROOT_DIR = $(abspath $(firstword $(foreach d,$(subst :,$(space),$(PKG_CONFIG_LIBDIR)),$(if $(wildcard $(patsubst %/lib/pkgconfig,%,$(d))/lib/libssl.so),$(patsubst %/lib/pkgconfig,%,$(d)),)) $(STAGING_INSTALL_PREFIX)))
 
+# Meta staging roots to add to CMAKE_FIND_ROOT_PATH so cmake's find_library /
+# find_path / find_package locate shared META libraries (e.g. a package whose
+# FindXxx.cmake searches for libavcodec). cmake find_*() re-roots under
+# CMAKE_FIND_ROOT_PATH with MODE=ONLY, so the absolute meta staging roots must
+# be listed there; the consumer staging (the base value) stays first.
+CMAKE_META_FIND_ROOTS = $(foreach d,$(META_PKGCONFIG_DIRS),$(abspath $(patsubst %/lib/pkgconfig,%,$(d))))
+
 .PHONY: $(CMAKE_TOOLCHAIN_FILE_PKG)
 $(CMAKE_TOOLCHAIN_FILE_PKG):
 ifeq ($(wildcard $(CMAKE_BUILD_DIR)),)
@@ -87,3 +94,7 @@ endif
 	echo "# local staging - lets find_package(OpenSSL) resolve it without" ; \
 	echo "# per-package -DOPENSSL_*, in meta and standalone builds alike." ; \
 	echo 'set(OPENSSL_ROOT_DIR "$(CMAKE_OPENSSL_ROOT_DIR)")'
+ifneq ($(strip $(CMAKE_META_FIND_ROOTS)),)
+	@echo "# add meta staging roots for find_library/find_path/find_package" ; \
+	$(foreach r,$(CMAKE_META_FIND_ROOTS),echo 'list(APPEND CMAKE_FIND_ROOT_PATH "$(r)")' ;)
+endif
