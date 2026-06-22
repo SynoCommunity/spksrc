@@ -30,10 +30,4 @@ DEPENDS = cross/ffmpeg7
 CMAKE_RPATH =
 endif
 
-# chromaprint's cmake/modules/FindFFmpeg.cmake locates the libav* headers and
-# libraries via find_path/find_library (not pkg-config). They are found through
-# CMAKE_FIND_ROOT_PATH, which now includes the meta staging roots (shared ffmpeg)
-# and the local staging (standalone cross/ffmpeg7) - so no per-component
-# -DFFMPEG_LIBAV* (nor -DFFMPEG_ROOT) is needed.
-
 include ../../mk/spksrc.cross-cmake.mk

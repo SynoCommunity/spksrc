@@ -28,8 +28,6 @@ CMAKE_ARGS += -DINSTALL_LIBDIR=lib
 #   - DISABLE unsupported mysql-connector-c
 CMAKE_ARGS += -DWITH_MYSQLCOMPAT=ON
 
-# OpenSSL resolved via the central OPENSSL_ROOT_DIR (cmake toolchain file);
-# find_package(OpenSSL) does not use pkg-config.
 DEPENDS += cross/openssl3
 CMAKE_ARGS += -DWITH_SSL=ON
 

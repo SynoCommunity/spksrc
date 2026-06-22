@@ -15,8 +15,5 @@ CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
 CMAKE_ARGS += -DBUILD_STATIC_LIBS=OFF
 CMAKE_ARGS += -DBUILD_EXAMPLES=OFF
 CMAKE_ARGS += -DBUILD_TESTING=OFF
-# OpenSSL is resolved by find_package(OpenSSL) via the central OPENSSL_ROOT_DIR
-# emitted in the cmake toolchain file (meta openssl if shared, else local
-# staging where cross/openssl3 installs) - no per-package -DOPENSSL_* needed.
 
 include ../../mk/spksrc.cross-cmake.mk

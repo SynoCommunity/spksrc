@@ -16,6 +16,5 @@ CMAKE_ARGS  = -DCMAKE_BUILD_TYPE=Release
 CMAKE_ARGS += -DBUILD_EXAMPLES=OFF
 CMAKE_ARGS += -DBUILD_TESTING=OFF
 CMAKE_ARGS += -DBUILD_STATIC_LIBS=OFF
-# OpenSSL resolved via the central OPENSSL_ROOT_DIR (cmake toolchain file).
 
 include ../../mk/spksrc.cross-cmake.mk

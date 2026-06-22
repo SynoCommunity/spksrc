@@ -15,18 +15,12 @@ TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).
 # Include them (optional include)
 -include $(TC_VARS_FILES)
 
-# OpenSSL root for find_package(OpenSSL), which does NOT consult pkg-config.
-# Derive it from the ordered PKG_CONFIG_LIBDIR: the first directory that
-# actually provides libssl.so wins (same local-first precedence as pkg-config),
-# else the local staging. meson and autotools need no equivalent - they resolve
-# openssl through pkg-config (openssl.pc) directly.
+# OpenSSL root for find_package(OpenSSL) (which ignores pkg-config): first
+# PKG_CONFIG_LIBDIR dir providing libssl.so (local-first), else local staging.
 CMAKE_OPENSSL_ROOT_DIR = $(abspath $(firstword $(foreach d,$(subst :,$(space),$(PKG_CONFIG_LIBDIR)),$(if $(wildcard $(patsubst %/lib/pkgconfig,%,$(d))/lib/libssl.so),$(patsubst %/lib/pkgconfig,%,$(d)),)) $(STAGING_INSTALL_PREFIX)))
 
-# Meta staging roots to add to CMAKE_FIND_ROOT_PATH so cmake's find_library /
-# find_path / find_package locate shared META libraries (e.g. a package whose
-# FindXxx.cmake searches for libavcodec). cmake find_*() re-roots under
-# CMAKE_FIND_ROOT_PATH with MODE=ONLY, so the absolute meta staging roots must
-# be listed there; the consumer staging (the base value) stays first.
+# Meta staging roots for CMAKE_FIND_ROOT_PATH: cmake find_*() re-roots under it
+# (MODE=ONLY), so meta libs (absolute) must be listed there to be found.
 CMAKE_META_FIND_ROOTS = $(foreach d,$(META_PKGCONFIG_DIRS),$(abspath $(patsubst %/lib/pkgconfig,%,$(d))))
 
 .PHONY: $(CMAKE_TOOLCHAIN_FILE_PKG)
@@ -90,11 +84,9 @@ endif
 	echo
 	@echo "# set pkg-config path" ; \
 	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(subst $(space),:,$(abspath $(subst :,$(space),$(PKG_CONFIG_LIBDIR))))")'
-	@echo "# OpenSSL root: first PKG_CONFIG_LIBDIR dir providing libssl.so, else" ; \
-	echo "# local staging - lets find_package(OpenSSL) resolve it without" ; \
-	echo "# per-package -DOPENSSL_*, in meta and standalone builds alike." ; \
+	@echo "# OpenSSL root (find_package(OpenSSL) ignores pkg-config)" ; \
 	echo 'set(OPENSSL_ROOT_DIR "$(CMAKE_OPENSSL_ROOT_DIR)")'
 ifneq ($(strip $(CMAKE_META_FIND_ROOTS)),)
-	@echo "# add meta staging roots for find_library/find_path/find_package" ; \
+	@echo "# meta staging roots for find_library/find_path/find_package" ; \
 	$(foreach r,$(CMAKE_META_FIND_ROOTS),echo 'list(APPEND CMAKE_FIND_ROOT_PATH "$(r)")' ;)
 endif
