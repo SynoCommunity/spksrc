@@ -1,6 +1,10 @@
 ifndef SPKSRC_SPK_BASE_MK
 SPKSRC_SPK_BASE_MK := 1
 
+# TC_VARS_META_MK file-target (generates the inspectable tc_vars.meta.mk),
+# used by the $(1)_meta_pre_depend hook below.
+include ../../mk/spksrc.spk/meta.mk
+
 # Define excluded library / package list
 # Note: covers both bare and lib-prefixed variants (e.g. lzma.pc AND liblzma.pc)
 EXCLUDED_LIBS = %bzip2.pc %lzma.pc %zlib.pc
@@ -28,6 +32,13 @@ $(eval $(1)_INSTALL_PREFIX         := /var/packages/$($(1)_PACKAGE)/target)
 $(eval $(1)_STAGING_INSTALL_PREFIX := $(realpath $($(1)_PACKAGE_WORK_DIR)/install/$($(1)_INSTALL_PREFIX)))
 $(eval export $(1)_INSTALL_PREFIX)
 $(eval export $(1)_STAGING_INSTALL_PREFIX)
+
+# Accumulate this meta's pkgconfig dir (add-if-absent) for the ordered
+# PKG_CONFIG_LIBDIR. Exported so cross/ sub-makes - which don't re-run
+# SPK_BASE_TEMPLATE - inherit the list from the environment. Local staging
+# stays first (wins).
+$(eval META_PKGCONFIG_DIRS := $(META_PKGCONFIG_DIRS) $(filter-out $(META_PKGCONFIG_DIRS),$(if $(wildcard $($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig),$($(1)_STAGING_INSTALL_PREFIX)/lib/pkgconfig,)))
+$(eval export META_PKGCONFIG_DIRS)
 
 # Set build flags so the package can find headers and libs at compile time,
 # and the dynamic linker will find them at runtime on the NAS.
@@ -78,7 +89,7 @@ $(eval $(1)_STATUS_COOKIES := $(sort $(if $(strip $($(1)_PC)),,$(foreach cross,$
 $(eval PRE_DEPEND_TARGET += $(1)_meta_pre_depend)
 
 .PHONY: $(1)_meta_pre_depend
-$(1)_meta_pre_depend: $(1)_links $(1)_meta
+$(1)_meta_pre_depend: $(1)_links $(1)_meta $(TC_VARS_META_MK)
 
 .PHONY: $(1)_msg
 $(1)_msg:
