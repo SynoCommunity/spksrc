@@ -1,4 +1,9 @@
-Mark package as no longer supported
+Package no longer supported - will not receive further updates.
 
-Only package left is homeassistant which
-probably will not receive any further updates
+Home Assistant has deprecated the "Core" installation method (running inside a
+Python virtual environment), which is exactly how this Synology package runs.
+Support ended with release 2025.12: the Core method no longer receives updates,
+including security updates. Only Home Assistant OS and Home Assistant Container
+remain supported.
+
+Ref: https://www.home-assistant.io/blog/2025/05/22/deprecating-core-and-supervised-installation-methods-and-32-bit-systems/
