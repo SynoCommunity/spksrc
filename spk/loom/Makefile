@@ -1,5 +1,5 @@
 SPK_NAME = loom
-SPK_VERS = 0.1.0
+SPK_VERS = 0.2.1
 SPK_REV = 1
 SPK_ICON = src/loom.png
 
@@ -15,7 +15,7 @@ DISPLAY_NAME = Loom
 
 DESCRIPTION = Loom is a unified, self-hosted media automation server. It searches indexers, drives your download clients, imports and organizes movies and TV, and ships a built-in web UI and request portal — a single-binary replacement for the Radarr/Sonarr/Prowlarr/Overseerr stack.
 
-CHANGELOG = "Initial release: single-binary media automation server with embedded web UI."
+CHANGELOG = "Update to Loom 0.2.1: Rain-based torrent backend with hardened magnet/metadata resolution, more robust imports, and numerous stability fixes. The built-in torrent kind is disabled in this single-binary package (it requires an external Rain sidecar); use a standalone download client such as qBittorrent or Transmission."
 
 STARTABLE = yes
 SERVICE_USER = auto
@@ -26,7 +26,6 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 1925
 SERVICE_PORT_TITLE = Loom Web UI
 ADMIN_PORT = $(SERVICE_PORT)
-ADMIN_URL = /
 
 FWPORTS = src/loom.sc
 
