@@ -134,7 +134,44 @@ fi
 # Initialize remaining packages list for tracking build progress
 remaining_packages="${build_packages}"
 
+# Build-time budget: stop at a package boundary before GitHub's 6h job kill so
+# the completed .spk and diagnostics still upload, and so we can report what was
+# left to build. Tunable via BUILD_BUDGET_SECONDS (default 5h45m); 0 disables it.
+build_budget=${BUILD_BUDGET_SECONDS:-20700}
+build_start=$(date +%s)
+: "${BUILD_REMAINING_FILE:=build_remaining.txt}"
+: "${BUILD_TIMEOUT_FILE:=build_timeout.txt}"
+budget_hit=0
+
 for package in ${build_packages}; do
+    # Persist not-yet-completed packages (current + pending) for the checkpoint.
+    echo "${remaining_packages}" | tr ' ' '\n' | grep -v '^$' > "${BUILD_REMAINING_FILE}"
+
+    # Stop at this package boundary if the build-time budget is exhausted, so the
+    # always() upload steps still run before the 6h job kill.
+    elapsed=$(( $(date +%s) - build_start ))
+    if [ "${build_budget}" -gt 0 ] && [ "${elapsed}" -ge "${build_budget}" ]; then
+        budget_hit=1
+        echo "::warning::Build-time budget (${build_budget}s) reached after ${elapsed}s; stopping before '${package}'"
+        {
+            echo "arch: ${GH_ARCH}"
+            echo "budget_seconds: ${build_budget}"
+            echo "elapsed_seconds: ${elapsed}"
+            echo "stopped_before: ${package}"
+            echo "remaining: ${remaining_packages}"
+        } > "${BUILD_TIMEOUT_FILE}"
+        break
+    fi
+
+    # Hard time cap for this package = remaining budget, so a long in-progress
+    # build is killed rather than overrunning the 6h job limit (a boundary check
+    # alone lets the current package finish, which can exceed the budget). timeout
+    # returns 124 (TERM) or 137 (KILL after the -k grace) when it fires.
+    build_cap=
+    if [ "${build_budget}" -gt 0 ]; then
+        build_cap="timeout -k 60 $(( build_budget - elapsed ))"
+    fi
+
     # Remove current package from remaining list at the start of each iteration
     remaining_packages=$(echo "${remaining_packages}" | tr ' ' '\n' | grep -vx "${package}" | tr '\n' ' ')
     echo "::group:: ---- build ${package}"
@@ -143,10 +180,10 @@ for package in ${build_packages}; do
     if [ "${GH_ARCH%%-*}" != "noarch" ]; then
         if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
             echo "$ make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
-            make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+            ${build_cap} make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
         else
             echo "$ make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
-            make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+            ${build_cap} make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
         fi
     else
         if [ "${GH_ARCH}" = "noarch" ]; then
@@ -156,14 +193,32 @@ for package in ${build_packages}; do
         fi
         # noarch package must be first built then published
         echo "$ make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package}" >>build.log
-        make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        ${build_cap} make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} |& tee >(tail -15 >>build.log)
 
         if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
             echo "$ make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
-            make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+            ${build_cap} make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
         fi
     fi
     result=$?
+
+    # Killed by the time cap = budget reached mid-build -> stop cleanly so the
+    # always() upload steps still run. The killed package is already listed in
+    # build_remaining.txt (written at the top of this iteration).
+    if [ "${build_budget}" -gt 0 ] && { [ ${result} -eq 124 ] || [ ${result} -eq 137 ]; }; then
+        budget_hit=1
+        elapsed=$(( $(date +%s) - build_start ))
+        echo "::warning::Build-time budget (${build_budget}s) reached during '${package}' (${elapsed}s); killed the in-progress build."
+        {
+            echo "arch: ${GH_ARCH}"
+            echo "budget_seconds: ${build_budget}"
+            echo "elapsed_seconds: ${elapsed}"
+            echo "stopped_during: ${package}"
+            echo "remaining: ${package} ${remaining_packages}"
+        } > "${BUILD_TIMEOUT_FILE}"
+        echo "::endgroup::"
+        break
+    fi
 
     # For a build to succeed a <package>_<arch>-<version>.spk must also be generated
     if [ ${result} -eq 0 ] && [ "$(ls -1 ./packages/$(sed -n -e '/^SPK_NAME/ s/.*= *//p' spk/${package}/Makefile)_*.spk 2>/dev/null)" ]; then
@@ -176,3 +231,8 @@ for package in ${build_packages}; do
 
     echo "::endgroup::"
 done
+
+# Clear the remaining list on a full pass (all packages processed).
+if [ "${budget_hit}" -eq 0 ]; then
+    : > "${BUILD_REMAINING_FILE}"
+fi
