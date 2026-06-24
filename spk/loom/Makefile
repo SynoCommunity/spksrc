@@ -15,7 +15,7 @@ DISPLAY_NAME = Loom
 
 DESCRIPTION = Loom is a unified, self-hosted media automation server. It searches indexers, drives your download clients, imports and organizes movies and TV, and ships a built-in web UI and request portal — a single-binary replacement for the Radarr/Sonarr/Prowlarr/Overseerr stack.
 
-CHANGELOG = "Update to Loom 0.2.1: Rain-based torrent backend with hardened magnet/metadata resolution, more robust imports, and numerous stability fixes. The built-in torrent kind is disabled in this single-binary package (it requires an external Rain sidecar); use a standalone download client such as qBittorrent or Transmission."
+CHANGELOG = "Initial package release."
 
 STARTABLE = yes
 SERVICE_USER = auto
