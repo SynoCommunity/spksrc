@@ -15,13 +15,10 @@ TC_VARS_FILES := $(wildcard $(foreach b,$(DEFAULT_ENV),$(WORK_DIR)/tc_vars.$(b).
 # Include them (optional include)
 -include $(TC_VARS_FILES)
 
-# Ordered PKG_CONFIG_LIBDIR for the cmake channel (local first, then meta dirs).
-# PR #3 hoists this ordering into cross-env.mk for all channels.
-CMAKE_PKG_CONFIG_LIBDIR = $(PKG_CONFIG_LIBDIR)$(if $(strip $(META_PKGCONFIG_DIRS)),:$(subst $(space),:,$(strip $(META_PKGCONFIG_DIRS))))
-
-# OpenSSL root for find_package(OpenSSL) (which ignores pkg-config): first
-# PKG_CONFIG_LIBDIR dir providing libssl.so (local-first), else local staging.
-CMAKE_OPENSSL_ROOT_DIR = $(abspath $(firstword $(foreach d,$(subst :,$(space),$(CMAKE_PKG_CONFIG_LIBDIR)),$(if $(wildcard $(patsubst %/lib/pkgconfig,%,$(d))/lib/libssl.so),$(patsubst %/lib/pkgconfig,%,$(d)),)) $(STAGING_INSTALL_PREFIX)))
+# OpenSSL root for find_package(OpenSSL) (which ignores pkg-config): first dir of
+# the ordered PKG_CONFIG_LIBDIR (cross-env.mk) providing libssl.so (local-first),
+# else local staging.
+CMAKE_OPENSSL_ROOT_DIR = $(abspath $(firstword $(foreach d,$(subst :,$(space),$(PKG_CONFIG_LIBDIR)),$(if $(wildcard $(patsubst %/lib/pkgconfig,%,$(d))/lib/libssl.so),$(patsubst %/lib/pkgconfig,%,$(d)),)) $(STAGING_INSTALL_PREFIX)))
 
 # Meta staging roots for CMAKE_FIND_ROOT_PATH: cmake find_*() re-roots under it
 # (MODE=ONLY), so meta libs (absolute) must be listed there to be found.
@@ -87,7 +84,7 @@ endif
 	echo "set(CMAKE_INSTALL_RPATH_USE_LINK_PATH $(CMAKE_INSTALL_RPATH_USE_LINK_PATH))" ; \
 	echo
 	@echo "# set pkg-config path" ; \
-	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(subst $(space),:,$(abspath $(subst :,$(space),$(CMAKE_PKG_CONFIG_LIBDIR))))")'
+	echo 'set(ENV{PKG_CONFIG_LIBDIR} "$(subst $(space),:,$(abspath $(subst :,$(space),$(PKG_CONFIG_LIBDIR))))")'
 	@echo "# OpenSSL root (find_package(OpenSSL) ignores pkg-config)" ; \
 	echo 'set(OPENSSL_ROOT_DIR "$(CMAKE_OPENSSL_ROOT_DIR)")'
 ifneq ($(strip $(CMAKE_META_FIND_ROOTS)),)
