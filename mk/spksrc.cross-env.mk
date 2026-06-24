@@ -30,8 +30,17 @@ ENV += INSTALL_PREFIX=$(INSTALL_PREFIX)
 # Ordered: local staging first (wins), then the meta pkgconfig dirs accumulated
 # and exported by SPK_BASE_TEMPLATE. Shared by autotools/meson (via ENV) and the
 # cmake toolchain file - pkg-config takes the first match, so local overrides meta.
-PKG_CONFIG_LIBDIR = $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig$(if $(strip $(META_PKGCONFIG_DIRS)),:$(subst $(space),:,$(strip $(META_PKGCONFIG_DIRS))))
+PKG_CONFIG_LIBDIR = $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig$(if $(strip $(META_PKG_CONFIG_LIBDIR)),:$(subst $(space),:,$(strip $(META_PKG_CONFIG_LIBDIR))))
 ENV += PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR)
+
+# OpenSSL prefix: single source of truth, derived from the ordered
+# PKG_CONFIG_LIBDIR (first dir providing libssl.so, local-first; else local
+# staging) - same scan as the cmake OPENSSL_ROOT_DIR. Replaces the per-namespace
+# detection (base.mk) and the crossenv.mk/wheel-env.mk fallbacks. Recursive (=),
+# not exported, so each make (incl. the wheel build) derives it with its own META.
+ifeq ($(strip $(OPENSSL_STAGING_INSTALL_PREFIX)),)
+OPENSSL_STAGING_INSTALL_PREFIX = $(firstword $(foreach d,$(subst :,$(space),$(PKG_CONFIG_LIBDIR)),$(if $(wildcard $(patsubst %/lib/pkgconfig,%,$(d))/lib/libssl.so),$(patsubst %/lib/pkgconfig,%,$(d)),)) $(STAGING_INSTALL_PREFIX))
+endif
 
 # Core toolchain variable definitions
 #

@@ -22,7 +22,7 @@ CMAKE_OPENSSL_ROOT_DIR = $(abspath $(firstword $(foreach d,$(subst :,$(space),$(
 
 # Meta staging roots for CMAKE_FIND_ROOT_PATH: cmake find_*() re-roots under it
 # (MODE=ONLY), so meta libs (absolute) must be listed there to be found.
-CMAKE_META_FIND_ROOTS = $(foreach d,$(META_PKGCONFIG_DIRS),$(abspath $(patsubst %/lib/pkgconfig,%,$(d))))
+CMAKE_META_FIND_ROOTS = $(foreach d,$(META_PKG_CONFIG_LIBDIR),$(abspath $(patsubst %/lib/pkgconfig,%,$(d))))
 
 .PHONY: $(CMAKE_TOOLCHAIN_FILE_PKG)
 $(CMAKE_TOOLCHAIN_FILE_PKG):

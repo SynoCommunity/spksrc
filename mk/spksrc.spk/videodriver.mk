@@ -52,23 +52,21 @@ endif
 META_DEPENDS += $(VIDEODRV_DEPENDS)
 OPTIONAL_DEPENDS += $(VIDEODRV_DEPENDS)
 
-# Always export these variables - they use deferred expansion so
-# they will resolve correctly at recipe execution time even when
-# VIDEODRV_PACKAGE is set conditionally after include.
+# Build the meta source spk/$(VIDEODRV_PACKAGE) in spk-stage1 so its work dir
+# exists for the stage2 SPK_BASE_TEMPLATE parse.
+BUILD_DEPENDS := $(call uniq,spk/$(VIDEODRV_PACKAGE) $(BUILD_DEPENDS))
 
+# $(1)_meta hook required by base.mk; no extra action for this meta.
 .PHONY: VIDEODRV_meta
 VIDEODRV_meta: ;
 
+# Export the meta package name (read by consumers / sub-makes).
+export VIDEODRV_PACKAGE
+
+# Share the meta's libraries at spk-stage2 (its work dir is built by stage1).
 ifneq ($(and $(wildcard $(VIDEODRV_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKECMDGOALS))),)
-  export VIDEODRV_PACKAGE
-  export VIDEODRV_PACKAGE_DIR
   export VIDEODRV_PACKAGE_WORK_DIR
-  export VIDEODRV_DEPENDS
-  export META_DEPENDS
-  OPTIONAL_DEPENDS += $(VIDEODRV_DEPENDS)
   $(eval $(call SPK_BASE_TEMPLATE,VIDEODRV))
-else
-  DEPENDS += $(VIDEODRV_DEPENDS)
 endif
 
 endif
