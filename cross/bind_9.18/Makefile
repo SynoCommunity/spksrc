@@ -1,5 +1,5 @@
 PKG_NAME = bind
-PKG_VERS = 9.18.48
+PKG_VERS = 9.18.50
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.isc.org/isc/bind9/$(PKG_VERS)

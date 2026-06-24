@@ -12,7 +12,7 @@
  
 -SUBDIRS = lib $(SWIG_DIR) $(CPLUSPLUS_DIR) include $(GLIB_DIR) $(TCL_DIR) \
 -	tests tools examples
-+SUBDIRS = lib $(SWIG_DIR) $(CPLUSPLUS_DIR) include $(GLIB_DIR) $(TCL_DIR)
++SUBDIRS = lib $(SWIG_DIR) $(CPLUSPLUS_DIR) include $(GLIB_DIR) $(TCL_DIR) tools examples
  if INSTALL_DOC
  SUBDIRS += man
  endif

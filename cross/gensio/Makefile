@@ -1,5 +1,5 @@
 PKG_NAME = gensio
-PKG_VERS = 3.0.1
+PKG_VERS = 3.0.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/cminyard/gensio/archive
@@ -33,4 +33,4 @@ endif
 
 .PHONY: gensio_pre_configure
 gensio_pre_configure:
-	@$(RUN) autoreconf -i
+	@$(RUN) ; autoreconf -i

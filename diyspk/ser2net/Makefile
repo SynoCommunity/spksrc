@@ -17,5 +17,10 @@ HOMEPAGE = http://ser2net.sourceforge.net/
 LICENSE = GPLv2
 
 SPK_COMMANDS = sbin/ser2net
+# tools of gensio:
+SPK_COMMANDS += bin/gensiot
+SPK_COMMANDS += bin/gsh
+SPK_COMMANDS += bin/gtlssh
+SPK_COMMANDS += bin/gtlssh-keygen
 
 include ../../mk/spksrc.spk.mk
