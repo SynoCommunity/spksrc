@@ -1,6 +1,6 @@
 SPK_NAME = ffmpeg7
 SPK_VERS = 7.1.4
-SPK_REV = 8
+SPK_REV = 9
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to version 7.1.4<br/>2. Update to v7.1.4-3 jellyfin-ffmpeg patches<br/>2. Add aarch64 libdrm support<br/>3. Enable vulkan shaderc and placebo"
 
