@@ -27,7 +27,10 @@
 ENV += WORK_DIR=$(WORK_DIR)
 ENV += INSTALL_PREFIX=$(INSTALL_PREFIX)
 
-PKG_CONFIG_LIBDIR = $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig
+# Ordered: local staging first (wins), then the meta pkgconfig dirs accumulated
+# and exported by SPK_BASE_TEMPLATE. Shared by autotools/meson (via ENV) and the
+# cmake toolchain file - pkg-config takes the first match, so local overrides meta.
+PKG_CONFIG_LIBDIR = $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig$(if $(strip $(META_PKGCONFIG_DIRS)),:$(subst $(space),:,$(strip $(META_PKGCONFIG_DIRS))))
 ENV += PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR)
 
 # Core toolchain variable definitions

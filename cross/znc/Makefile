@@ -43,11 +43,6 @@ endif
 CMAKE_ARGS += -DWANT_SYSTEMD=false
 CMAKE_ARGS += -DWANT_TCL=false
 CMAKE_ARGS += -DWANT_PERL=false
-ifneq ($(wildcard $(OPENSSL_STAGING_INSTALL_PREFIX)),)
-CMAKE_ARGS += -DOPENSSL_INCLUDE_DIR=$(OPENSSL_STAGING_INSTALL_PREFIX)/include
-CMAKE_ARGS += -DOPENSSL_SSL_LIBRARY=$(OPENSSL_STAGING_INSTALL_PREFIX)/lib/libssl.so
-CMAKE_ARGS += -DOPENSSL_CRYPTO_LIBRARY=$(OPENSSL_STAGING_INSTALL_PREFIX)/lib/libcrypto.so
-endif
 
 # For ZNC to build using github-action, enforce adding Python & OpenSSL include directories
 ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
