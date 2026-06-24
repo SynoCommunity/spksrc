@@ -1,18 +1,18 @@
 SPK_NAME = borgbackup
-SPK_VERS = 1.4.3
-SPK_REV = 21
+SPK_VERS = 1.4.4
+SPK_REV = 22
 SPK_ICON = src/borgbackup.png
 
 # Include common.mk first to get ARCH definitions
 include ../../mk/spksrc.common.mk
 
-# Build for ARMv5 and ARMv7L using Python 3.11; all others use Python 3.12
+# Build for ARMv5 and ARMv7L using Python 3.11; all others use Python 3.14
 # This must be set BEFORE including spksrc.spk-meta.mk to avoid adding
-# ARMv5 to UNSUPPORTED_ARCHS when using python312
+# ARMv5 to UNSUPPORTED_ARCHS when using python314
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),)
 PYTHON_PACKAGE = python311
 else
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 endif
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
@@ -36,21 +36,19 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # 
 # # 4. Generate the requirements file, restricting version of rpds-py for compatibility
 # # rpds-py >= 0.22.3 requires rustc >= 1.80
-# ./generate_requirements.sh "borgbackup[llfuse] borgmatic emborg rpds-py==0.22.3" 312
+# ./generate_requirements.sh "borgbackup[llfuse] borgmatic emborg rpds-py==0.21.0" 311
+# ./generate_requirements.sh "borgbackup[llfuse] borgmatic emborg" 314
 # 
 # # 5. Post-generation
 # # The script will create three files (pure, cross, and combined) for the Borg deployment
-# # with Python 3.12. Use the pure and cross requirement files as the base for your PR.
+# # with Python 3.14. Use the pure and cross requirement files as the base for your PR.
 
-# Wheels: pure-python requirements (all architectures)
-WHEELS = src/requirements-pure.txt
-
-# Cross-compiled requirements vary by architecture
+# Wheels: Python requirements vary by architecture
 # ARMv5 uses rpds_py pinned to 0.21.0 for Cargo.lock v3 compatibility with Rust 1.77.2
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS += src/requirements-crossenv-armv5.txt
+WHEELS += src/requirements-pure-armv5.txt src/requirements-crossenv-armv5.txt
 else
-WHEELS += src/requirements-crossenv.txt
+WHEELS += src/requirements-pure.txt src/requirements-crossenv.txt
 endif
 
 # Force building pure-python wheels (issue #5204)
@@ -61,7 +59,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update borgmatic to v2.1.2.<br/>2. Refresh Python dependencies."
+CHANGELOG = "1. Update Borg to v1.4.4. <br/>2. Update borgmatic to v2.1.5. <br/>3. Refresh Python dependencies."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
@@ -76,9 +74,13 @@ SPK_USR_LOCAL_LINKS = bin:env/bin/borg bin:env/bin/borgmatic bin:env/bin/emborg
 # spksrc.wheel-env.mk or spksrc.spk-meta.mk
 ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
-ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
+# BORG_LIBLZ4_PREFIX: prefer the Python install prefix (where lz4 was
+# installed during stage-1), fall back to own staging prefix.
+_prefixed := $(abspath $(WORK_DIR)/../../../spk/$(PYTHON_PACKAGE)/work-$(ARCH)-$(TCVERSION)/install/var/packages/$(PYTHON_PACKAGE)/target)
+ENV += BORG_LIBLZ4_PREFIX=$(or $(wildcard $(_prefixed)),$(STAGING_INSTALL_PREFIX))
+ENV += PKG_CONFIG_PATH=$(or $(wildcard $(_prefixed)/lib/pkgconfig),$(STAGING_INSTALL_PREFIX)/lib/pkgconfig)
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_INSTALL_PREFIX)"
 
 # [borgbackup]
@@ -103,15 +105,24 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=gnu99
 endif
 
-# [ruamel_yaml_clib]
-# GCC < 5.0 requires gnu99 for Cython-generated code (see borgbackup above).
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [ruamel_yaml_clib] -std=gnu99
+# [rpds-py]
+# Version = 0.21 requires rustc >= 1.77 (armv5)
+# Version = 0.24 requires rustc >= 1.82 (qoriq)
+# Version = 0.25 requires rustc >= 1.85
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+WHEELS += rpds_py==0.21.0
+else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
+WHEELS += rpds_py==0.24.0
+else
+WHEELS += rpds_py==0.30.0
 endif
+endif
+
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: borgbackup_extra_install
 borgbackup_extra_install:
 	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
 	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup
-
-include ../../mk/spksrc.spk-meta.mk

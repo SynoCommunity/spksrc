@@ -1,9 +1,9 @@
 PKG_NAME = qbittorrent
-PKG_VERS = 5.2.1
+PKG_VERS = 5.2.2
 PKG_EXT =
 PKG_DIST_NAME = $(PKG_DIST_ARCH)-qbittorrent-nox
 PKG_DIST_FILE = $(PKG_DIST_ARCH)-qbittorrent-nox-$(PKG_VERS)
-PKG_DIST_SITE = https://github.com/userdocs/qbittorrent-nox-static/releases/download/release-$(PKG_VERS)_v2.0.12
+PKG_DIST_SITE = https://github.com/userdocs/qbittorrent-nox-static/releases/download/release-$(PKG_VERS)_v2.0.13
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

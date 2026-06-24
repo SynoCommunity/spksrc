@@ -36,8 +36,6 @@ endif
 # Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
 CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
 
-# Enable Synology specific -hls_seek_time option and other optimizations
-CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
 # Compiler workaround to enable DTS-HD MA stream decoding
 CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 # Remove some of the noise while compiling

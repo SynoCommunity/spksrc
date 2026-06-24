@@ -33,7 +33,7 @@ set -o pipefail
 ffmpeg_versions=(5 6 7 8)
 
 # python minor versions whose build artifacts must be preserved for dependents
-python_versions=(310 311 312 313 314)
+python_versions=(311 312 314)
 
 # DSM versions above the default builds that require filtered package lists.
 # Must match the min_dsm_versions array in prepare.sh.
@@ -70,6 +70,7 @@ done
 # actual installation state of cargo/rust within the distrib folder.
 rm -f toolchain/syno-${GH_ARCH}/work/.toolchain*_done
 rm -f toolchain/syno-${GH_ARCH}/work/.stage[01]-*_done
+rm -f toolchain/syno-${GH_ARCH}/work/tc_vars.*
 
 # ===========================================================================
 # 2. Select packages to build for this arch

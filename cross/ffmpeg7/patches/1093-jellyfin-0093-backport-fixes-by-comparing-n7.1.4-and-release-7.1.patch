@@ -1,0 +1,127 @@
+--- libavformat/dashdec.c
++++ libavformat/dashdec.c
+@@ -446,7 +446,7 @@ static int open_url(AVFormatContext *s,
+     av_freep(pb);
+     av_dict_copy(&tmp, *opts, 0);
+     av_dict_copy(&tmp, opts2, 0);
+-    ret = ffio_open_whitelist(pb, url, AVIO_FLAG_READ, c->interrupt_callback, &tmp, s->protocol_whitelist, s->protocol_blacklist);
++    ret = s->io_open(s, pb, url, AVIO_FLAG_READ, &tmp);
+     if (ret >= 0) {
+         // update cookies on http response with setcookies.
+         char *new_cookies = NULL;
+@@ -1242,7 +1242,7 @@ static int parse_manifest(AVFormatContex
+         close_in = 1;
+ 
+         av_dict_copy(&opts, c->avio_opts, 0);
+-        ret = ffio_open_whitelist(&in, url, AVIO_FLAG_READ, c->interrupt_callback, &opts, s->protocol_whitelist, s->protocol_blacklist);
++        ret = s->io_open(s, &in, url, AVIO_FLAG_READ, &opts);
+         av_dict_free(&opts);
+         if (ret < 0)
+             return ret;
+@@ -1385,7 +1385,7 @@ cleanup:
+ 
+     av_bprint_finalize(&buf, NULL);
+     if (close_in) {
+-        avio_close(in);
++        ff_format_io_close(s, &in);
+     }
+     return ret;
+ }
+--- libavformat/dashenc.c
++++ libavformat/dashenc.c
+@@ -619,7 +619,7 @@ static void dash_free(AVFormatContext *s
+             if (!c->single_file)
+                 ffio_free_dyn_buf(&os->ctx->pb);
+             else
+-                avio_close(os->ctx->pb);
++                ff_format_io_close(s, &os->ctx->pb);
+         }
+         ff_format_io_close(s, &os->out);
+         avformat_free_context(os->ctx);
+@@ -1586,7 +1586,7 @@ static int dash_init(AVFormatContext *s)
+             ret = s->io_open(s, &os->out, filename, AVIO_FLAG_WRITE, &opts);
+         } else {
+             ctx->url = av_strdup(filename);
+-            ret = avio_open2(&ctx->pb, filename, AVIO_FLAG_WRITE, NULL, &opts);
++            ret = s->io_open(s, &ctx->pb, filename, AVIO_FLAG_WRITE, &opts);
+         }
+         av_dict_free(&opts);
+         if (ret < 0)
+--- libavformat/demux.c
++++ libavformat/demux.c
+@@ -364,7 +364,7 @@ fail:
+     ff_id3v2_free_extra_meta(&id3v2_extra_meta);
+     av_dict_free(&tmp);
+     if (s->pb && !(s->flags & AVFMT_FLAG_CUSTOM_IO))
+-        avio_closep(&s->pb);
++        ff_format_io_close(s, &s->pb);
+     avformat_free_context(s);
+     *ps = NULL;
+     return ret;
+--- libavformat/hlsenc.c
++++ libavformat/hlsenc.c
+@@ -777,7 +777,7 @@ static int do_encrypt(AVFormatContext *s
+             return ret;
+         avio_seek(pb, 0, SEEK_CUR);
+         avio_write(pb, key, KEYSIZE);
+-        avio_close(pb);
++        ff_format_io_close(s, &pb);
+     }
+     return 0;
+ }
+@@ -1215,9 +1215,7 @@ static int parse_playlist(AVFormatContex
+     const char *end;
+     double discont_program_date_time = 0;
+ 
+-    if ((ret = ffio_open_whitelist(&in, url, AVIO_FLAG_READ,
+-                                   &s->interrupt_callback, NULL,
+-                                   s->protocol_whitelist, s->protocol_blacklist)) < 0)
++    if ((ret = s->io_open(s, &in, url, AVIO_FLAG_READ, NULL)) < 0)
+         return ret;
+ 
+     ff_get_chomp_line(in, line, sizeof(line));
+@@ -1313,7 +1311,7 @@ static int parse_playlist(AVFormatContex
+     }
+ 
+ fail:
+-    avio_close(in);
++    ff_format_io_close(s, &in);
+     return ret;
+ }
+ 
+--- libavformat/oggparsecelt.c
++++ libavformat/oggparsecelt.c
+@@ -27,6 +27,9 @@
+ #include "internal.h"
+ #include "oggdec.h"
+ 
++/* CELT-over-Ogg streams use at most a couple of vorbiscomment "extra" headers. */
++#define CELT_MAX_EXTRA_HEADERS 16
++
+ struct oggcelt_private {
+     int extra_headers_left;
+ };
+@@ -62,6 +65,12 @@ static int celt_header(AVFormatContext *
+         overlap          = AV_RL32(p + 48);
+         /* unused bytes per packet field skipped */
+         extra_headers    = AV_RL32(p + 56);
++        if (extra_headers > CELT_MAX_EXTRA_HEADERS) {
++            av_log(s, AV_LOG_ERROR,
++                   "Too many CELT extra headers (%u)\n", extra_headers);
++            av_free(priv);
++            return AVERROR_INVALIDDATA;
++        }
+         st->codecpar->codec_type     = AVMEDIA_TYPE_AUDIO;
+         st->codecpar->codec_id       = AV_CODEC_ID_CELT;
+         st->codecpar->sample_rate    = sample_rate;
+--- libavformat/version.h
++++ libavformat/version.h
+@@ -32,7 +32,7 @@
+ #include "version_major.h"
+ 
+ #define LIBAVFORMAT_VERSION_MINOR   7
+-#define LIBAVFORMAT_VERSION_MICRO 102
++#define LIBAVFORMAT_VERSION_MICRO 103
+ 
+ #define LIBAVFORMAT_VERSION_INT AV_VERSION_INT(LIBAVFORMAT_VERSION_MAJOR, \
+                                                LIBAVFORMAT_VERSION_MINOR, \

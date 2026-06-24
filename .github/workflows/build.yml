@@ -368,7 +368,7 @@ jobs:
     name: Build
     needs: [prepare, set-defaults]
     runs-on: ubuntu-latest
-    if: ${{ needs.set-defaults.outputs.has_entries == 'true' }}
+    if: needs.set-defaults.outputs.has_entries == 'true'
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}
@@ -450,7 +450,7 @@ jobs:
         if: ${{ contains(matrix.arch,'qoriq') == false }}
         with:
           path: toolchain/*/work
-          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
+          key: toolchain-${{ matrix.arch }}-v4-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
 
       # Check disk space after toolchain cache restore
       - name: Disk Space After Cache Restore
@@ -835,7 +835,7 @@ jobs:
     if: always()
     steps:
       - name: Download all diagnostic artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: diagnostics-*
           path: all-diagnostics
