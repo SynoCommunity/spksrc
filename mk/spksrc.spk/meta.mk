@@ -11,7 +11,7 @@ $(TC_VARS_META_MK):
 	@$(MSG) "Generating $(TC_VARS_META_MK)"
 	@mkdir -p $(WORK_DIR)
 	@echo "# Generated meta cross-dependency environment - $(NAME)"              > $@
-	@echo "META_PKGCONFIG_DIRS := $(strip $(META_PKGCONFIG_DIRS))"              >> $@
+	@echo "META_PKG_CONFIG_LIBDIR := $(strip $(META_PKG_CONFIG_LIBDIR))"              >> $@
 	@echo "PKG_CONFIG_LIBDIR := $(PKG_CONFIG_LIBDIR)"                           >> $@
 	@echo "ADDITIONAL_CFLAGS += $(ADDITIONAL_CFLAGS)"                           >> $@
 	@echo "ADDITIONAL_LDFLAGS += $(ADDITIONAL_LDFLAGS)"                         >> $@

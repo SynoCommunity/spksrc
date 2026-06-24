@@ -17,6 +17,11 @@ PYTHON_DEPENDS += cross/$(PYTHON_PACKAGE)
 META_DEPENDS += $(PYTHON_DEPENDS)
 OPTIONAL_DEPENDS += $(PYTHON_DEPENDS)
 
+# Build the meta source spk/$(PYTHON_PACKAGE) in spk-stage1 so its work dir
+# exists for the stage2 SPK_BASE_TEMPLATE parse (distinct from
+# cross/$(PYTHON_PACKAGE), the embeddable python library).
+BUILD_DEPENDS := $(call uniq,spk/$(PYTHON_PACKAGE) $(BUILD_DEPENDS))
+
 .PHONY: PYTHON_meta
 PYTHON_meta:
 	@# EXCEPTION: Do not symlink cross/* wheel builds
@@ -29,16 +34,14 @@ PYTHON_meta:
 	   fi ; \
 	done
 
+# Export the python package name for every goal (used by the crossenv / wheel
+# machinery).
+export PYTHON_PACKAGE
+export PYTHON_PACKAGE_DIR
+
+# Share the meta's libraries at spk-stage2, where its work dir exists (built by
+# stage1); SPK_BASE_TEMPLATE runs $(shell)/realpath that require the built meta.
 ifneq ($(and $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKECMDGOALS))),)
-  export PYTHON_PACKAGE
-  export PYTHON_PACKAGE_DIR
   export PYTHON_PACKAGE_WORK_DIR
-  export PYTHON_DEPENDS
-  export META_DEPENDS
   $(eval $(call SPK_BASE_TEMPLATE,PYTHON))
-else
-  export PYTHON_PACKAGE
-  export PYTHON_PACKAGE_DIR
-  BUILD_DEPENDS := $(call uniq,$(PYTHON_DEPENDS) $(BUILD_DEPENDS))
-  SPK_DEPENDS := $(call dedup,$(PYTHON_PACKAGE):$(SPK_DEPENDS),:)
 endif

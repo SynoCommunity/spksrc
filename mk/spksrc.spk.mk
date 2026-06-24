@@ -507,7 +507,8 @@ TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
 TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
 .PHONY: spk-stage1
-spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
+# spk-meta-source (the meta SOURCE build loop) lives in spksrc.depend.mk
+spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE) spk-meta-source
 
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):

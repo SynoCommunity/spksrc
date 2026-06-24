@@ -12,6 +12,10 @@ FFMPEG_DEPENDS += cross/$(FFMPEG_PACKAGE)
 META_DEPENDS += $(FFMPEG_DEPENDS)
 OPTIONAL_DEPENDS += $(FFMPEG_DEPENDS)
 
+# Build the meta source spk/$(FFMPEG_PACKAGE) in spk-stage1 so its work dir
+# exists for the stage2 SPK_BASE_TEMPLATE parse.
+BUILD_DEPENDS := $(call uniq,spk/$(FFMPEG_PACKAGE) $(BUILD_DEPENDS))
+
 # Re-use all default ffmpeg mandatory libraries
 FFMPEG_PC  = libavcodec.pc
 FFMPEG_PC += libavfilter.pc
@@ -24,24 +28,15 @@ FFMPEG_PC += libswscale.pc
 FFMPEG_PC += libssl.pc
 FFMPEG_PC += openssl.pc
 
-# Create symbolic links against:
-#    - any other pkg_config files defined using $(MEDIA_LIBS) - see cross/tvheadend
+# $(1)_meta hook required by base.mk; no extra action for this meta.
 .PHONY: FFMPEG_meta
-ifneq ($(wildcard $(FFMPEG_PACKAGE_WORK_DIR)),)
-FFMPEG_meta:
-	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	@$(foreach lib,$(addprefix $(FFMPEG_STAGING_INSTALL_PREFIX)/lib/pkgconfig/,$(MEDIA_LIBS)),ln -sf $(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
-else
 FFMPEG_meta: ;
-endif
 
+# Export the meta package name (read by consumers / sub-makes).
+export FFMPEG_PACKAGE
+
+# Share the meta's libraries at spk-stage2 (its work dir is built by stage1).
 ifneq ($(and $(wildcard $(FFMPEG_PACKAGE_WORK_DIR)),$(filter spk-stage2,$(MAKECMDGOALS))),)
-  export FFMPEG_PACKAGE
-  export FFMPEG_PACKAGE_DIR
   export FFMPEG_PACKAGE_WORK_DIR
-  export FFMPEG_DEPENDS
-  export FFMPEG_LIBS
   $(eval $(call SPK_BASE_TEMPLATE,FFMPEG))
-else
-  DEPENDS += $(FFMPEG_DEPENDS)
 endif
