@@ -19,9 +19,9 @@ CONFIGURE_ARGS  = --without-zenmap
 CONFIGURE_ARGS += --without-ndiff
 CONFIGURE_ARGS += --with-liblua=included
 CONFIGURE_ARGS += --with-libpcre=included
-ifneq ($(wildcard $(OPENSSL_STAGING_INSTALL_PREFIX)),)
+# openssl prefix from the single source of truth (cross-env.mk scan): the shared
+# meta staging if present, else the local staging (cross/openssl3).
 CONFIGURE_ARGS += --with-openssl=$(OPENSSL_STAGING_INSTALL_PREFIX)
-endif
 
 ADDITIONAL_CPPFLAGS = -O3
 
