@@ -133,14 +133,6 @@ ifeq ($(PYTHON_STAGING_INSTALL_PREFIX),)
 PYTHON_STAGING_INSTALL_PREFIX = $(STAGING_INSTALL_PREFIX)
 endif
 
-# set OPENSSL_*_PREFIX if unset
-ifeq ($(strip $(OPENSSL_STAGING_INSTALL_PREFIX)),)
-OPENSSL_STAGING_INSTALL_PREFIX = $(PYTHON_STAGING_INSTALL_PREFIX)
-endif
-ifeq ($(strip $(OPENSSL_INSTALL_PREFIX)),)
-OPENSSL_INSTALL_PREFIX = $(PYTHON_INSTALL_PREFIX)
-endif
-
 # Mandatory for rustc wheel building at crossenv preparation time
 # --> Using python-cc.mk defined variable when cross-compiling wheels at subsequent steps!
 export PYO3_CROSS_LIB_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/lib/

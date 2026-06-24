@@ -44,6 +44,27 @@ native-depend: native-depend_msg_target
 	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
 	done
 
+# Build meta SOURCE packages (spk/*) listed in BUILD_DEPENDS. Invoked from
+# spk-stage1 (spksrc.spk.mk) so the meta work dir exists for the stage2 parse
+# that activates SPK_BASE_TEMPLATE. Only spk/* are built here (cross/* and
+# native/* are built by depend_target below, which filters out spk/*). Each
+# meta is a self-contained `arch-` build run under an isolated env (env -i) so
+# the consumer's INSTALL_PREFIX/exports don't leak into it, and is skipped when
+# its install staging already exists (re-running arch- on a built package is
+# not idempotent at the packaging step). No-op when BUILD_DEPENDS has no spk/*.
+.PHONY: spk-meta-source
+spk-meta-source:
+	@set -e; \
+	for metasrc in $(filter spk/%,$(BUILD_DEPENDS)); do \
+	   if [ -d ../../$$metasrc/work-$(ARCH)-$(TCVERSION)/install ]; then \
+	      $(MSG) "Stage1: meta source $$metasrc already built for $(ARCH)-$(TCVERSION)" ; \
+	   else \
+	      $(MSG) "Stage1: building meta source $$metasrc for $(ARCH)-$(TCVERSION)" ; \
+	      env -i PATH="$(PATH)" HOME="$(HOME)" \
+	         $(MAKE) --no-print-directory -C ../../$$metasrc arch-$(ARCH)-$(TCVERSION) ; \
+	   fi ; \
+	done
+
 depend_msg_target:
 	@$(MSG) "Processing dependencies of $(NAME)"
 
@@ -67,7 +88,7 @@ endif
 	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) -C ../../$$depend ; \
 	done
 	@set -e; \
-	for depend in $(filter-out native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
+	for depend in $(filter-out native/% spk/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done
