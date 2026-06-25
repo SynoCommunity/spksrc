@@ -1,0 +1,20 @@
+# fix for older gcc not supporting __has_attribute()
+# 
+--- lib/util.h.orig	2025-12-20 23:18:40.000000000 +0000
++++ lib/util.h	2026-01-31 12:21:27.970196010 +0000
+@@ -40,10 +40,15 @@
+ 		((type *)(__mptr - offsetof(type, member))); \
+ 	})
+ 
++#if defined __has_attribute
+ #if __has_attribute(__fallthrough__)
+ #define fallthrough __attribute__((__fallthrough__))
+ #else
+ #define fallthrough do {} while (0)
+ #endif
++#else
++#define fallthrough do {} while (0)
++#endif
++
+ 
+ #endif /* FUSE_UTIL_H_ */
