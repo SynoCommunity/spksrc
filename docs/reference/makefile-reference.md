@@ -101,7 +101,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `ADDITIONAL_LDFLAGS` | Extra linker flags |
 | `ADDITIONAL_RUSTFLAGS` | Extra Rust compiler flags |
 | `ADDITIONAL_EXTRACTFLAGS` | Extra parameters for the extract command |
-| `COMPILE_MAKE_OPTIONS` | Extra arguments passed to `make` at compile |
+| `COMPILE_MAKE_OPTIONS` | Extra arguments passed to `make` at compile (autotools / plain GNU make only — CMake uses `cmake --build`, Meson uses `ninja`) |
 | `COMPILE_TARGET` | Override default compile target |
 | `PRE_COMPILE_TARGET` | Target to run before compile |
 | `POST_COMPILE_TARGET` | Target to run after compile |
@@ -112,7 +112,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | Variable | Description |
 |----------|-------------|
 | `INSTALL_TARGET` | Override install target (default: `install`) |
-| `INSTALL_MAKE_OPTIONS` | Options passed to make install |
+| `INSTALL_MAKE_OPTIONS` | Options passed to `make install` (autotools / plain GNU make only) |
 | `PRE_INSTALL_TARGET` | Target to run before install |
 | `POST_INSTALL_TARGET` | Target to run after install |
 
