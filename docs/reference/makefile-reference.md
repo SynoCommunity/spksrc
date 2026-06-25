@@ -75,8 +75,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MESON_USE_CROSS_FILE` | 1 | Use generated cross file |
-| `MESON_ARGS` | | Additional Meson arguments |
+| `CONFIGURE_ARGS` | | Meson options, passed to `meson setup` |
 | `MESON_BUILD_TYPE` | release | Build type |
 
 ### Compilation
@@ -282,8 +281,10 @@ DEFAULT_TC = 7.1 6.2.4
 # Parallel build configuration
 PARALLEL_MAKE = max
 
-# Proxy settings
-WGET_ARGS = -e use_proxy=yes -e http_proxy=http://proxy:3128
+# Proxy settings (the downloader uses wget, which honours these standard
+# environment variables)
+export http_proxy = http://proxy:3128
+export https_proxy = http://proxy:3128
 ```
 
 ## See Also
