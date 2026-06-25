@@ -48,23 +48,9 @@ OPTIONAL_DEPENDS += python/pandas
 
 WHEELS += src/requirements-pure.txt
 
-# Use media and other libraries from FFMPEG_PACKAGE shared libraries
-MEDIA_LIBS  = fdk-aac.pc
-MEDIA_LIBS += fontconfig.pc
-MEDIA_LIBS += ogg.pc
-MEDIA_LIBS += opus.pc
-MEDIA_LIBS += libpcre2-8.pc
-MEDIA_LIBS += libpcre2-32.pc
-MEDIA_LIBS += libpcre2-posix.pc
-MEDIA_LIBS += theoradec.pc
-MEDIA_LIBS += theoraenc.pc
-MEDIA_LIBS += theora.pc
-MEDIA_LIBS += vorbisenc.pc
-MEDIA_LIBS += vorbisfile.pc
-MEDIA_LIBS += vorbis.pc
-MEDIA_LIBS += vpx.pc
-MEDIA_LIBS += x264.pc
-MEDIA_LIBS += x265.pc
+# Media/other libraries from the ffmpeg meta (and videodriver for fontconfig /
+# libpcre2) are resolved via the ordered PKG_CONFIG_LIBDIR - no MEDIA_LIBS list
+# to symlink anymore (FFMPEG_meta is a no-op since spksrc.spk/ffmpeg.mk).
 
 include ../../mk/spksrc.common.mk
 
