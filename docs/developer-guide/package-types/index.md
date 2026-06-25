@@ -6,7 +6,7 @@ spksrc supports various package types, each with specific build requirements and
 
 | Type | Include File | Use Case |
 |------|--------------|----------|
-| Python | `spksrc.python.mk` | Applications with Python wheels |
+| Python | `spksrc.spk.mk` + `WHEELS` | Applications with Python wheels |
 | Go | `spksrc.cross-go.mk` | Single-binary Go applications |
 | Rust | `spksrc.cross-rust.mk` | Rust applications |
 | Web | `spksrc.spk.mk` + WebStation | PHP/HTML web applications |

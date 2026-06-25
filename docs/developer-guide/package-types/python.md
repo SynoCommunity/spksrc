@@ -58,11 +58,11 @@ SPK_REV = 1
 PYTHON_PACKAGE = python312
 SPK_DEPENDS = "python312"
 
-# Wheel requirements
+# Wheel requirements (activates wheel cross-compilation)
 WHEELS = src/requirements-pure.txt
 WHEELS += src/requirements-crossenv.txt
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk.mk
 ```
 
 ### Advanced Wheel Options

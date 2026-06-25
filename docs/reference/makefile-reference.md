@@ -14,6 +14,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `PKG_DIST_NAME` | Yes | Archive filename | `$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)` |
 | `PKG_DIST_SITE` | Yes | Download URL base | `https://example.com/releases` |
 | `PKG_DIST_FILE` | No | Local filename (if different) | `curl-source.tar.gz` |
+| `PKG_DIST_ARCH` | No | Architecture-specific source designator | `$(PKG_DIST_ARCH_$(ARCH))` |
 | `PKG_DIR` | Yes | Directory after extraction | `$(PKG_NAME)-$(PKG_VERS)` |
 
 ### SPK Package Variables (`spk/`)
@@ -70,6 +71,10 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `CMAKE_USE_TOOLCHAIN_FILE` | 1 | Use generated toolchain file |
 | `CMAKE_ARGS` | | Additional CMake arguments |
 | `CMAKE_BUILD_TYPE` | Release | Build type |
+| `CMAKE_USE_NINJA` | | Build with Ninja instead of Make |
+| `CMAKE_USE_NASM` | | Build the native NASM assembler first |
+| `CMAKE_DISABLE_EXE_LINKER_FLAGS` | | Drop `CMAKE_EXE_LINKER_FLAGS` |
+| `USE_NATIVE_CMAKE` | | Build with the latest stable native CMake |
 
 ### Meson
 
@@ -77,6 +82,14 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 |----------|---------|-------------|
 | `CONFIGURE_ARGS` | | Meson options, passed to `meson setup` |
 | `MESON_BUILD_TYPE` | release | Build type |
+
+### Rust (Cargo)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CARGO_BUILD_ARGS` | | Additional `cargo build` arguments |
+| `CARGO_INSTALL_ARGS` | | Additional `cargo install` arguments |
+| `RUST_SRC_DIR` | | Build path when the crate is not at the source root |
 
 ### Compilation
 
@@ -86,6 +99,9 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `ADDITIONAL_CXXFLAGS` | Extra C++ compiler flags |
 | `ADDITIONAL_CPPFLAGS` | Extra preprocessor flags |
 | `ADDITIONAL_LDFLAGS` | Extra linker flags |
+| `ADDITIONAL_RUSTFLAGS` | Extra Rust compiler flags |
+| `ADDITIONAL_EXTRACTFLAGS` | Extra parameters for the extract command |
+| `COMPILE_MAKE_OPTIONS` | Extra arguments passed to `make` at compile |
 | `COMPILE_TARGET` | Override default compile target |
 | `PRE_COMPILE_TARGET` | Target to run before compile |
 | `POST_COMPILE_TARGET` | Target to run after compile |
@@ -113,6 +129,8 @@ These variables apply to `spk/` packages with services.
 | `STARTABLE` | Whether package can be started | `yes` (default), `no` |
 | `FWPORTS` | Firewall port definitions | `src/transmission.sc` |
 | `SPK_COMMANDS` | Commands for usr-local-linker | `bin/transmission-daemon` |
+| `SPK_USR_LOCAL_LINKS` | Symlinks for non-standard tool locations | `bin/foo:/usr/local/bin/foo` |
+| `INSTALL_REPLACE_PACKAGES` | Packages removed on install | `oldpkg` |
 
 ## Web Interface Variables
 
@@ -199,6 +217,19 @@ Available after toolchain is loaded:
 | `ARMv7_ARCHS` | ARM 32-bit architecture names |
 | `ARMv8_ARCHS` | ARM 64-bit architecture names |
 | `UNSUPPORTED_ARCHS` | Architectures to exclude |
+| `UNSUPPORTED_ARCHS_TCVERSION` | Architecture/DSM-version pairs to exclude |
+
+## Version & Build Constraints
+
+| Variable | Description |
+|----------|-------------|
+| `REQUIRED_MIN_DSM` | Skip if the DSM toolchain is below this version |
+| `REQUIRED_MAX_DSM` | Skip if the DSM toolchain is above this version |
+| `REQUIRED_MIN_SRM` | Skip if the SRM toolchain is below this version |
+| `OS_MIN_VER` | Minimum DSM version shown in Package Center |
+| `REQUIRE_TOOLKIT` | Download/extract the DSM development toolkit |
+| `REQUIRE_KERNEL` | Prepare the DSM kernel source for module builds |
+| `KERNEL_ROOT` | Kernel source tree root directory |
 
 ## Make Targets
 
@@ -225,8 +256,9 @@ Available after toolchain is loaded:
 | `depend` | Build dependencies |
 | `copy` | Copy dependencies to staging |
 | `strip` | Strip debug symbols |
-| `cat` | Generate INFO, icons, scripts |
-| `spk` | Create final .spk file |
+| `icon` | Process icons and generate the INFO file |
+| `wizards` | Process install/upgrade wizard templates |
+| `package` | Assemble the final `.spk` file |
 | `clean` | Remove work directory |
 
 ### Architecture-Specific Targets
@@ -280,6 +312,12 @@ DEFAULT_TC = 7.1 6.2.4
 
 # Parallel build configuration
 PARALLEL_MAKE = max
+
+# Per-compile timing statistics
+PSTAT = 1
+
+# Skip GitHub maintainer API lookups (e.g. offline builds)
+DISABLE_GITHUB_MAINTAINER = 1
 
 # Proxy settings (the downloader uses wget, which honours these standard
 # environment variables)

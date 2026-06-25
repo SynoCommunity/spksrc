@@ -36,7 +36,6 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.cross-env.mk` | Cross-compilation environment setup |
 | `spksrc.toolchain.mk` | Toolchain build and tc_vars generation |
 | `spksrc.toolkit.mk` | Toolkit management |
-| `spksrc.toolkit-flags.mk` | Toolkit-specific compiler flags |
 
 ### Build System Adapters
 
@@ -69,8 +68,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 | File | Purpose |
 |------|--------|
-| `spksrc.python.mk` | Python package main include |
-| `spksrc.python-module.mk` | Python module building |
+| `spksrc.python-module.mk` | Python wheel module main include |
 | `spksrc.wheel.mk` | Wheel package orchestration |
 | `spksrc.wheel-download.mk` | Wheel downloading |
 | `spksrc.wheel-compile.mk` | Wheel compilation |
