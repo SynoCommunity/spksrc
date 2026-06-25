@@ -225,3 +225,4 @@ nav:
     - contributing/index.md
     - Development Process: contributing/development-process.md
     - Pull Requests: contributing/pull-requests.md
+    - Package Lifecycle Policy: contributing/package-lifecycle.md
