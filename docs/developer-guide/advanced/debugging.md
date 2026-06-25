@@ -31,12 +31,24 @@ ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include
 
 ## Python/Wheel Debugging
 
-```bash
-# Verbose wheel build
-make WHEEL_VERBOSE=1 arch-x64-7.2
+Wheels are processed from the `WHEELS` list and land in `work-<arch>-<tcversion>/wheelhouse`. Run these from the package directory:
 
-# Build single wheel
-WHEEL="package==version" make wheel-x64-7.2
+```bash
+# Build every wheel in WHEELS for one arch/toolchain
+make wheel-x64-7.2
+
+# Build a single wheel (overrides WHEELS)
+make WHEELS="package==version" wheel-x64-7.2
+
+# Re-fetch the wheel sources listed in the requirement files
+make download-wheels
+
+# Create / refresh the crossenv used to cross-compile wheels
+make crossenv-x64-7.2
+
+# Clean wheels / crossenv
+make wheelclean
+make wheelcleanall
 ```
 
 ## Runtime Debugging

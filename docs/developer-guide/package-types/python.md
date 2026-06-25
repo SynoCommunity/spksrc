@@ -65,6 +65,16 @@ WHEELS += src/requirements-crossenv.txt
 include ../../mk/spksrc.python.mk
 ```
 
+### Advanced Wheel Options
+
+| Variable | Purpose |
+|----------|---------|
+| `WHEELS_BUILD_ARGS` | Extra `pip` arguments passed when building wheels |
+| `WHEELS_CPPFLAGS` | Extra `CPPFLAGS` for compiling C-extension wheels |
+| `PYTHON_LIMITED_API` | Limited API/ABI tag for `requirements-abi3.txt` wheels (e.g. `cp37`) |
+| `WHEEL_DEFAULT_PREFIX` | Default wheel type when a requirement file is not one of the recognized names (set to `pure` to treat it as pure-python) |
+| `WHEELS_PURE_PYTHON_PACKAGING_ENABLE` | Bundle pure-python wheels into the SPK instead of downloading them at install time |
+
 ### Service Setup
 
 Configure the service to use the correct Python version:
@@ -114,6 +124,25 @@ WHEEL="lxml-5.2.2" make crossenv-x64-7.2
 
 # Clean crossenv
 make crossenvclean
+```
+
+### Building Wheels
+
+Wheels are processed from the `WHEELS` list into `work-<arch>-<version>/wheelhouse`:
+
+```bash
+# Build every wheel in WHEELS for one arch/toolchain
+make wheel-x64-7.2
+
+# Build a single wheel (overrides WHEELS)
+make WHEELS="package==version" wheel-x64-7.2
+
+# Download the wheel sources only
+make download-wheels
+
+# Clean compiled wheels (and the shared download cache)
+make wheelclean
+make wheelcleanall
 ```
 
 ### Debugging Wheel Builds

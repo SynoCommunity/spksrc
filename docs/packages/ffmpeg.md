@@ -74,6 +74,20 @@ For Intel-based Synology devices with DSM 7.1+, hardware transcoding is availabl
 - Vulkan support (kernel 5.10+ required)
 - OpenCL support
 
+### Verify FFmpeg Hardware Acceleration Support
+
+Before validating individual acceleration paths, confirm that FFmpeg itself was built with hardware acceleration support. The frameworks are enabled at build time — if a method is missing here, FFmpeg cannot use it regardless of driver availability.
+
+```bash
+ffmpeg7 -hide_banner -hwaccels
+# Hardware acceleration methods:
+# vaapi    (Intel media driver)
+# qsv      (Intel Quick Sync Video)
+# drm      (direct render node access)
+# opencl   (GPU compute filters)
+# vulkan   (work-in-progress)
+```
+
 ### Validate Detection of Your GPU
 
 ```bash
@@ -193,6 +207,31 @@ ffmpeg7 -hide_banner -v verbose -init_hw_device vulkan
 # Failed to set value 'vulkan' for option 'init_hw_device'
 ```
 
+### Choosing an Acceleration Path
+
+| Acceleration | Primary use case |
+|--------------|------------------|
+| VA-API | Hardware decode/encode and basic video processing |
+| QSV | High-performance Intel video processing and encoding |
+| OpenCL | GPU-accelerated image and video compute filters |
+| CPU | Fallback / reference / maximum compatibility |
+
+### Performance Comparison (CPU vs GPU)
+
+Benchmarks on the same system using FFmpeg 7.0.3 with identical input, duration, filters and output settings:
+
+| Path | FPS | Speed | Real time | Relative to CPU |
+|------|-----|-------|-----------|-----------------|
+| CPU | 13 | 0.419× | 23.9 s | baseline |
+| VA-API | 17 | 0.559× | 17.9 s | ~1.3× faster |
+| OpenCL | 21 | 0.686× | 14.6 s | ~1.6× faster |
+| QSV | 23 | 0.773× | 12.9 s | ~1.8× faster |
+
+- **CPU**: reference baseline, slowest but lowest memory usage
+- **VA-API**: moderate speedup, best suited for decode/encode acceleration
+- **OpenCL**: good acceleration for GPU-based filters, higher memory usage
+- **QSV**: best overall performance on Intel GPUs
+
 ## Usage with Other Packages
 
 Many media packages depend on FFmpeg:
@@ -202,18 +241,20 @@ Many media packages depend on FFmpeg:
 - [Home Assistant](homeassistant.md) - Camera streams
 - [Navidrome](navidrome.md) - Audio transcoding
 
-## Building Custom FFmpeg
+## Using FFmpeg in a package
 
-The spksrc framework supports building FFmpeg with custom options. Key Makefile variables:
+A package selects which FFmpeg version to build against with `FFMPEG_PACKAGE` and includes the ffmpeg meta makefile, which provides FFmpeg's libraries through the shared staging (see [Build Architecture](../framework/architecture.md#meta-package-dependencies)):
 
 ```makefile
-# Enable specific codecs
-FFMPEG_CODEC_X264 = 1
-FFMPEG_CODEC_X265 = 1
-FFMPEG_CODEC_LIBVPX = 1
+FFMPEG_PACKAGE = ffmpeg7
+include ../../mk/spksrc.spk/ffmpeg.mk
+```
 
-# Enable hardware acceleration
-FFMPEG_VAAPI = 1
+The FFmpeg build itself is defined in `cross/ffmpeg<major>` (e.g. `cross/ffmpeg7`). Codecs and features are enabled there through standard FFmpeg `CONFIGURE_ARGS`, and the codec libraries are pulled in as dependencies, for example:
+
+```makefile
+CONFIGURE_ARGS += --enable-gpl --enable-version3 --enable-shared
+OPTIONAL_DEPENDS += cross/openh264 cross/libaom cross/svt-av1
 ```
 
 ## Related Packages

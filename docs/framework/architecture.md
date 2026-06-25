@@ -24,7 +24,11 @@ block
 
 ## Cross-Compilation Stages
 
-Cross-compilation in spksrc is divided into two distinct stages:
+Cross-compilation in spksrc runs in three stages. Stage 0 happens at *parse time*; stages 1 and 2 run as *recipes*.
+
+### Stage 0: Toolchain Pre-bootstrap
+
+At parse time — before a package's `DEPENDS` are evaluated — stage 0 (`mk/spksrc.common/stage0.mk`) bootstraps the toolchain in its own work directory and loads its `tc_vars.mk`, so `TC_GCC` (and `TC_VERS`, `TC_KERNEL`, ...) are known. This lets `version_ge($(TC_GCC),...)`-gated dependencies (shaderc, vulkan, numpy, ...) evaluate against a real compiler version on a cold tree. It records `.stage0-bootstrap_done` and deliberately does **not** generate the package's own `tc_vars*`, which embed `INSTALL_PREFIX`-derived paths only available at recipe time.
 
 ### Stage 1: Toolchain Bootstrap
 
@@ -40,7 +44,7 @@ Stage 1 ensures the cross-compilation toolchain is ready:
    - `tc_vars.cmake` - CMake toolchain file
    - `tc_vars.meson-*` - Meson cross/native configuration files
 
-Stage 1 is idempotent—if the `.tcvars_done` cookie exists, it's skipped.
+Stage 1 runs as a recipe and is the sole generator of the package's `tc_vars*` (those embed `INSTALL_PREFIX`-derived paths from the build environment). For `spk/` packages it also builds the meta sources (`spk-meta-source`). It is idempotent—if the `.stage1-tcvars_done` cookie exists, it's skipped.
 
 ### Stage 2: Package Build
 
@@ -137,6 +141,37 @@ Python packages use the wheel system for cross-compilation:
 WHEELS = src/requirements.txt
 ```
 
+### Meta Package Dependencies
+
+Large shared libraries are provided by *meta packages* — `ffmpeg7`, `python312`,
+and `synocli-videodriver` — that a consumer reuses instead of rebuilding. The
+meta to use is selected by a single variable:
+
+```makefile
+FFMPEG_PACKAGE   = ffmpeg7              # e.g. spk/tvheadend
+PYTHON_PACKAGE   = python312            # any wheel consumer
+VIDEODRV_PACKAGE = synocli-videodriver
+```
+
+Including the matching `mk/spksrc.spk/{ffmpeg,python,videodriver}.mk` builds the
+meta source in stage 1 and, during SPK assembly (stage 2), wires its staging
+area into the consumer's build through `SPK_BASE_TEMPLATE`:
+
+- **`PKG_CONFIG_LIBDIR` (ordered)** — the consumer's own staging first, then each
+  meta's `lib/pkgconfig` (`META_PKG_CONFIG_LIBDIR`). pkg-config takes the first
+  match, so a local copy always wins over the meta's. The same ordered path is
+  shared by autotools, meson, and the cmake toolchain file.
+- **`OPENSSL_STAGING_INSTALL_PREFIX` / `OPENSSL_ROOT_DIR`** — a single OpenSSL
+  prefix derived from that ordered path (cmake's `find_package(OpenSSL)` ignores
+  pkg-config, so the prefix is baked into the toolchain file).
+- **`CMAKE_FIND_ROOT_PATH`** — includes the meta staging roots so cmake's
+  `find_package` / `find_path` / `find_library` locate meta-provided headers and
+  libraries (e.g. FFmpeg, EXPAT) without per-package hints.
+
+Because the meta's `lib/pkgconfig` is on `PKG_CONFIG_LIBDIR` directly, a consumer
+needs neither per-`.pc` symlinks nor per-package `-DOPENSSL_*` / `-DEXPAT_*` /
+`-DFFMPEG_*` hints: the meta's libraries are resolved centrally.
+
 ## Environment Configuration
 
 The build environment is configured through layered includes:
@@ -155,7 +190,9 @@ The framework exports numerous variables to configure cross-compilation:
 | `CC`, `CXX` | Cross-compiler paths |
 | `CFLAGS`, `CXXFLAGS` | Compiler flags |
 | `LDFLAGS` | Linker flags |
-| `PKG_CONFIG_PATH` | pkg-config search path |
+| `PKG_CONFIG_LIBDIR` | Ordered pkg-config search path (local staging, then meta staging) |
+| `META_PKG_CONFIG_LIBDIR` | Meta packages' `lib/pkgconfig` dirs, exported to `cross/` sub-makes |
+| `OPENSSL_STAGING_INSTALL_PREFIX` | Single OpenSSL prefix shared by autotools and cmake |
 | `STAGING_INSTALL_PREFIX` | Installation prefix |
 
 ## Parallel Build Support
