@@ -1,8 +1,8 @@
 # Disable build of examples
-# The build of examples fails to find libgensiomdns.so.6
+# The build of examples fails to find libgensiomdns.so.*
 # so simply remove the examples subdir from Makefiles
 # 
-# Additionally remove the tests and tools subdirs
+# Additionally remove the tests and man subdirs
 # 
 --- Makefile.am.orig	2025-11-16 22:38:44.000000000 +0000
 +++ Makefile.am	2026-01-30 19:24:00.543967098 +0000
@@ -12,13 +12,13 @@
  
 -SUBDIRS = lib $(SWIG_DIR) $(CPLUSPLUS_DIR) include $(GLIB_DIR) $(TCL_DIR) \
 -	tests tools examples
-+SUBDIRS = lib $(SWIG_DIR) $(CPLUSPLUS_DIR) include $(GLIB_DIR) $(TCL_DIR) tools examples
++SUBDIRS = lib $(SWIG_DIR) $(CPLUSPLUS_DIR) include $(GLIB_DIR) $(TCL_DIR) tools
  if INSTALL_DOC
  SUBDIRS += man
  endif
  
 -DIST_SUBDIRS = lib swig c++ include glib tcl tests tools examples man
-+DIST_SUBDIRS = lib swig c++ include glib tcl
++DIST_SUBDIRS = lib swig c++ include glib tcl tools
  
  EXTRA_DIST = README.rst reconf ISSUES TODO
  

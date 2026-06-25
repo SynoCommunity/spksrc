@@ -15,6 +15,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
 
 DEPENDS = cross/openssl3
+DEPENDS += cross/glib
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = gensio_pre_configure

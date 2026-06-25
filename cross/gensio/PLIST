@@ -9,6 +9,9 @@ lib:lib/libgensio.so.14.1.1
 lnk:lib/libgensiocpp.so
 lnk:lib/libgensiocpp.so.14
 lib:lib/libgensiocpp.so.14.1.1
+lnk:lib/libgensioglib.so
+lnk:lib/libgensioglib.so.14
+lib:lib/libgensioglib.so.14.1.1
 lnk:lib/libgensiomdns.so
 lnk:lib/libgensiomdns.so.14
 lib:lib/libgensiomdns.so.14.1.1
