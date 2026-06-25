@@ -1,6 +1,6 @@
 SPK_NAME = uptime-kuma
-SPK_VERS = 2.3.2
-SPK_REV = 3
+SPK_VERS = 2.4.0
+SPK_REV = 4
 SPK_ICON = src/uptime-kuma.png
 
 DEPENDS = cross/uptime-kuma
@@ -23,7 +23,7 @@ DESCRIPTION_JPN = セルフホスト型監視ツール。HTTP\(s\)、TCP、Ping�
 DESCRIPTION_SPN = Herramienta de monitoreo autoalojada. Monitoree HTTP\(s\), TCP, Ping, DNS, contenedores Docker, servidores de juegos y más con 87+ proveedores de notificaciones.
 HOMEPAGE = https://uptime.kuma.pet
 LICENSE = MIT
-CHANGELOG = "Update to 2.3.2."
+CHANGELOG = "1. Update to 2.4.0."
 
 STARTABLE = yes
 SERVICE_USER = auto
