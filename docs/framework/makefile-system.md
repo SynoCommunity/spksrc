@@ -138,13 +138,14 @@ spksrc.spk.mk (spk/ packages — the standard SPK entry point)
 ├── spksrc.pre-check.mk
 ├── spksrc.cross/env-default.mk
 ├── spksrc.depend.mk
-├── spksrc.wheel.mk
-├── spksrc.spk/copy.mk
-├── spksrc.spk/strip.mk
-├── spksrc.service.mk
-├── spksrc.spk/icon.mk
+├── spksrc.wheel.mk            # wheel orchestration (subtree below)
+├── spksrc.service.mk         # service config (subtree below)
 ├── spksrc.supported.mk
-└── spksrc.spk/publish.mk
+└── spksrc.spk/
+    ├── copy.mk               # dependency copying to staging
+    ├── strip.mk              # binary stripping
+    ├── icon.mk               # icon processing
+    └── publish.mk            # publish to package server
 
 spksrc.spk-meta.mk (meta-consumer spk/ packages: FFMPEG/PYTHON/VIDEODRV_PACKAGE)
 │   # a thin wrapper that sets up the meta(s), then includes spksrc.spk.mk above
