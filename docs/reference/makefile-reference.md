@@ -41,7 +41,6 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `CHANGELOG` | SPK | No | Changes in this version |
 | `HELPURL` | SPK | No | Help/documentation URL |
 | `SUPPORTURL` | SPK | No | Support URL |
-| `BETA` | SPK | No | Set to 1 for beta packages |
 
 ## Dependency Variables
 

@@ -244,7 +244,6 @@ The read-only toolchain paths (`TC_PATH`, `TC_INCLUDE`, `TC_LIBRARY`, `TC_PREFIX
 
 | Variable | Description |
 |----------|-------------|
-| `BETA` | Set to `1` to mark as beta release |
 | `ADMIN_PORT` | Port for admin interface |
 | `ADMIN_PROTOCOL` | Protocol (http/https) for admin interface |
 | `ADMIN_URL` | Custom admin URL path |
