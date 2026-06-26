@@ -51,6 +51,31 @@ TC_DIST_NAME = $(TC_DIST_SITE_PATH)/Intel%20x86%20Linux%204.4.302%20%28x86_64-GP
 include ../../mk/spksrc.toolchain.mk
 ```
 
+`spksrc.toolchain.mk` is the entry point; the implementation lives under `mk/spksrc.toolchain/`:
+
+| File | Purpose |
+|------|---------|
+| `tc-base.mk` | Core toolchain build/extract logic |
+| `tc-url.mk` | Download URL handling |
+| `tc-versions.mk` | Version/identity resolution |
+| `tc-normalize.mk` | Path/triplet normalization |
+| `tc-flags.mk` | Compiler/linker flag derivation |
+| `tc-rust.mk` | Rust toolchain setup |
+| `tc_vars.mk` | Generates the `tc_vars*` files |
+
+## Toolkit
+
+A *toolkit* is the matching Synology DSM development toolkit (sysroot of DSM libraries/headers), enabled per-package with `REQUIRE_TOOLKIT = 1`. It is **not part of the normal build flow** — `spksrc.toolkit.mk` is only pulled in when a package requests it, mirroring the toolchain structure under `mk/spksrc.toolkit/`:
+
+| File | Purpose |
+|------|---------|
+| `tk-base.mk` | Core toolkit download/extract logic |
+| `tk-url.mk` | Download URL handling |
+| `tk-versions.mk` | Version/identity resolution |
+| `tk-normalize.mk` | Path normalization |
+| `tk-flags.mk` | Flag derivation |
+| `tk_vars.mk` | Generates the `tk_vars*` files |
+
 ## tc_vars Files
 
 The toolchain build generates several `tc_vars*.mk` files that configure cross-compilation:
@@ -136,32 +161,10 @@ RUSTFLAGS = -C linker=$(TC_CC)
 
 ## Supported Architectures
 
-spksrc supports the following architecture families:
+The complete list of architecture families, platform codenames, architecture groups (`ARM_ARCHS`, `x64_ARCHS`, `64bit_ARCHS`, ...) and the Synology models they map to is maintained in the reference:
 
-### 64-bit Architectures
-
-| Architecture | CPU Family | Common Models |
-|-------------|------------|---------------|
-| x64 | Intel 64-bit | DS923+, DS1621+, RS1221+ |
-| aarch64 | ARM 64-bit | DS223, DS423+, RS422+ |
-
-### 32-bit Architectures (Legacy)
-
-| Architecture | CPU Family | Common Models |
-|-------------|------------|---------------|
-| armv7 | ARM 32-bit | DS218, DS418 |
-| i686 | Intel 32-bit | DS216j, DS218j |
-
-### Generic Architectures
-
-Generic architectures build for multiple targets:
-
-| Generic | Expands To |
-|---------|------------|
-| arm5 | 88f6281, 88f6282 |
-| arm7 | alpine, alpine4k, armada370, armada375, armada38x, armadaxp, comcerto2k, monaco |
-| arm8 | rtd1296, rtd1619b, armv8 |
-| ppc | ppc853x, ppc854x, qoriq |
+- [Reference: Architectures](../reference/architectures.md)
+- [Reference: Model ↔ Architecture](../reference/model-architecture.md)
 
 ## Adding New Toolchain Support
 

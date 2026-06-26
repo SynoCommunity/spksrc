@@ -36,30 +36,45 @@ Example: `x64-7.2` = Intel 64-bit, DSM 7.2 toolchain
 
 ## Architecture Groups
 
-spksrc defines groups for conditional logic:
+spksrc classifies every platform codename into groups used for conditional logic, defined in `mk/spksrc.common/archs.mk`. The generic build arch of each family is shown in the comments.
 
-### 64-bit Architectures
+### Architecture families
+
 ```makefile
-64bit_ARCHS = x64 aarch64 armv8
+x64_ARCHS    # Intel/AMD 64-bit (build arch: x64)
+             #   x64 apollolake avoton braswell broadwell(nk...) bromolow
+             #   cedarview denverton epyc7002 geminilake(nk) grantley purley
+             #   kvmx64 dockerx64 v1000(nk) r1000(nk) x86 x86_64
+ARM_ARCHS    # all ARM = ARMv5_ARCHS + ARMv7_ARCHS + ARMv7L_ARCHS + ARMv8_ARCHS
+PPC_ARCHS    # powerpc ppc824x ppc853x ppc854x qoriq
+i686_ARCHS   # evansport (Intel 32-bit, build arch: i686)
 ```
 
-### 32-bit Architectures
+### ARM variants
+
 ```makefile
-32bit_ARCHS = x86 armv7 armv7l qoriq comcerto2k ppc853x
+ARMv5_ARCHS  = 88f6281                                       # build arch: armv5
+ARMv7_ARCHS  = armv7 alpine alpine4k armada370 armada375 \
+               armada38x armadaxp monaco comcerto2k ...      # build arch: armv7
+ARMv7L_ARCHS = hi3535                                        # build arch: armv7l
+ARMv8_ARCHS  = aarch64 rtd1296 rtd1619b armada37xx ...       # build arch: aarch64
 ```
 
-### ARM Architectures
+### Bitness groupings
+
 ```makefile
-ARM_ARCHS = aarch64 armv8 armv7 armv7l
-ARMv7_ARCHS = armv7 armv7l
-ARMv8_ARCHS = aarch64 armv8
+32bit_ARCHS = ARMv5_ARCHS + ARMv7_ARCHS + ARMv7L_ARCHS + i686_ARCHS + PPC_ARCHS
+64bit_ARCHS = ARMv8_ARCHS + x64_ARCHS
 ```
 
-### Intel Architectures
+### Generic & deprecated
+
 ```makefile
-x64_ARCHS = x64
-x86_ARCHS = x86
+GENERIC_ARCHS  = armv7 aarch64 x64        # used by multi-arch packages
+OLD_PPC_ARCHS  = powerpc ppc824x ppc853x ppc854x   # deprecated PowerPC
 ```
+
+For the per-platform Synology model mapping, see [Model ↔ Architecture](model-architecture.md).
 
 ## Toolchain Versions
 
@@ -73,56 +88,9 @@ x86_ARCHS = x86
 
 ## Model to Architecture Mapping
 
-spksrc identifies each Synology platform by its CPU codename (`apollolake`, `geminilake`, `rtd1296`, ...); these are grouped into the generic build architectures used to compile packages (`mk/spksrc.common/archs.mk`). The table below maps the common current platforms to their build architecture and example models.
+The Synology model ↔ platform/architecture mapping — with a family filter and a model search — now lives on its own page:
 
-For the authoritative CPU of a specific model, see Synology's [**What kind of CPU does my NAS have?**](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/General/What_kind_of_CPU_does_my_NAS_have).
-
-Use the controls to filter by build architecture or search for a platform or model:
-
-<p>
-  <label>Build arch:
-    <select id="archFilter" onchange="filterArchTable()">
-      <option value="">All</option>
-      <option value="x64">x64 (Intel/AMD 64-bit)</option>
-      <option value="aarch64">aarch64 (ARM 64-bit)</option>
-    </select>
-  </label>
-  &nbsp;
-  <input id="archSearch" type="text" placeholder="Search platform or model…" oninput="filterArchTable()" size="28">
-</p>
-
-<table id="archTable" markdown="0">
-  <thead>
-    <tr><th>Platform</th><th>Build arch</th><th>CPU</th><th>Integrated GPU</th><th>Example models</th></tr>
-  </thead>
-  <tbody>
-    <tr data-arch="x64" data-gpu="yes"><td>geminilake</td><td>x64</td><td>Intel</td><td>Intel UHD Graphics 605 (Gen9.5)</td><td>DS224+, DS423+, DVA1622, DS220+, DS420+, DS720+, DS920+, DS1520+</td></tr>
-    <tr data-arch="x64" data-gpu="yes"><td>apollolake</td><td>x64</td><td>Intel</td><td>Intel HD Graphics 500/505 (Gen9, Broxton)</td><td>DS620slim, DS1019+, DS218+, DS418play, DS718+, DS918+</td></tr>
-    <tr data-arch="x64" data-gpu="no"><td>denverton</td><td>x64</td><td>Intel Atom C3000</td><td>—</td><td>DVA3221, RS820+, DS2419+, DS1819+, DVA3219, RS2818RP+, RS2418+, DS1618+</td></tr>
-    <tr data-arch="x64" data-gpu="yes"><td>v1000</td><td>x64</td><td>AMD Ryzen</td><td>AMD Radeon Vega</td><td>FS2500, RS2423+, DS1823xs+, DS2422+, RS822+, RS2821RP+, RS2421+, RS1221+, DS1621+, DS1821+</td></tr>
-    <tr data-arch="x64" data-gpu="yes"><td>r1000</td><td>x64</td><td>AMD Ryzen</td><td>AMD Radeon Vega</td><td>DS923+, DS723+, DS1522+, RS422+</td></tr>
-    <tr data-arch="x64" data-gpu="no"><td>broadwell</td><td>x64</td><td>Intel Xeon-D</td><td>—</td><td>FS3400, FS2017, RS3618xs, RS18017xs+, RS4017xs+, RS3617xs+, DS3617xs</td></tr>
-    <tr data-arch="x64" data-gpu="no"><td>avoton</td><td>x64</td><td>Intel Atom C2000</td><td>—</td><td>RS1219+, RS818+, DS1817+, DS1517+, RS2416+, DS415+, DS1515+, DS1815+, DS2415+, RS815+</td></tr>
-    <tr data-arch="aarch64" data-gpu="no"><td>rtd1296</td><td>aarch64</td><td>Realtek</td><td>ARM Mali-T820 (not used for transcoding)</td><td>DS420j, DS220j, RS819, DS418j, DS418, DS218, DS218play, DS118</td></tr>
-    <tr data-arch="aarch64" data-gpu="no"><td>armada37xx</td><td>aarch64</td><td>Marvell</td><td>—</td><td>DS120j, DS119j</td></tr>
-  </tbody>
-</table>
-
-Hardware transcoding through the [SynoCli Video Driver](../packages/synocli-videodriver.md) targets **Intel iGPUs** (`apollolake`, `geminilake`); the AMD Radeon Vega (`v1000`/`r1000`) and ARM Mali GPUs are present but not driven by that Intel VA-API/QSV stack.
-
-<script>
-function filterArchTable() {
-  var a = document.getElementById('archFilter').value.toLowerCase();
-  var q = document.getElementById('archSearch').value.toLowerCase();
-  document.querySelectorAll('#archTable tbody tr').forEach(function (r) {
-    var okArch = !a || r.getAttribute('data-arch') === a;
-    var okText = !q || r.textContent.toLowerCase().indexOf(q) >= 0;
-    r.style.display = (okArch && okText) ? '' : 'none';
-  });
-}
-</script>
-
-Older PowerPC platforms (`powerpc`, `ppc824x`, `ppc853x`, `ppc854x`) and other legacy families are listed under [Architecture Groups](#architecture-groups). The complete platform-to-family mapping is defined in `mk/spksrc.common/archs.mk`.
+- [Reference: Model ↔ Architecture](model-architecture.md)
 
 ## Using Architecture Conditions
 

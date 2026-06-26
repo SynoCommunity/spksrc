@@ -156,6 +156,7 @@ nav:
   - Reference:
     - reference/index.md
     - Architectures: reference/architectures.md
+    - Model ↔ Architecture: reference/model-architecture.md
     - Ports: reference/ports.md
     - Makefile Reference: reference/makefile-reference.md
     - Permissions: reference/permissions.md
