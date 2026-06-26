@@ -150,7 +150,7 @@ endif
 include ../../mk/spksrc.common.mk
 
 ### Include common rules
-include ../../mk/spksrc.common-rules.mk
+include ../../mk/spksrc.rules.mk
 
 # Common kernel variables
 include ../../mk/spksrc.kernel/base.mk
@@ -250,8 +250,3 @@ all:
 .PHONY: kernel_post_extract_target
 kernel_post_extract_target:
 	mv $(WORK_DIR)/$(KERNEL_PREFIX) $(WORK_DIR)/$(PKG_DIR)
-
-####
-
-### For make digests
-include ../../mk/spksrc.rules/generate-digests.mk

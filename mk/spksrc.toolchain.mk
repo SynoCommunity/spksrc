@@ -118,7 +118,7 @@ endif
 include ../../mk/spksrc.common.mk
 
 ### Include common rules
-include ../../mk/spksrc.common-rules.mk
+include ../../mk/spksrc.rules.mk
 
 #####
 
@@ -214,6 +214,3 @@ $(TOOLCHAIN_COOKIE): $(POST_TOOLCHAIN_TARGET)
 else
 toolchain: ;
 endif
-
-### For make digests
-include ../../mk/spksrc.rules/generate-digests.mk

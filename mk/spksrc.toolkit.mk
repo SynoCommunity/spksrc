@@ -79,7 +79,7 @@ endif
 include ../../mk/spksrc.common.mk
 
 ### Include common rules
-include ../../mk/spksrc.common-rules.mk
+include ../../mk/spksrc.rules.mk
 
 #####
 
@@ -176,6 +176,3 @@ $(TOOLKIT_COOKIE): $(POST_TOOLKIT_TARGET)
 else
 toolkit: ;
 endif
-
-### For make digests
-include ../../mk/spksrc.rules/generate-digests.mk

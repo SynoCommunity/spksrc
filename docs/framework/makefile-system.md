@@ -17,6 +17,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 | File | Purpose |
 |------|--------|
+| `spksrc.rules.mk` | Rules entry point (`clean`, `smart-clean`, `changelog`, `rustup`); aggregates `dependency-tree.mk` + `generate-digests.mk` |
 | `spksrc.rules/depend.mk` | Dependency resolution and build |
 | `spksrc.rules/dependency-tree.mk` | Dependency graph |
 | `spksrc.rules/generate-digests.mk` | Digests generation |
@@ -139,6 +140,8 @@ spksrc.build/
 └── ninja.mk                  # ninja helper (cmake/meson)
 
 # Rules — shared targets / orchestration, included by the entry points
+spksrc.rules.mk               # rules entry point: clean/changelog targets,
+                              # aggregates dependency-tree.mk + generate-digests.mk
 spksrc.rules/
 ├── depend.mk                 # dependency resolution/build
 ├── dependency-tree.mk        # dependency graph
