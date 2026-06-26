@@ -159,6 +159,25 @@ WHEEL="cryptography==41.0.0" make crossenv-x64-7.2
 ls spk/myapp/work-x64-7.2/crossenv-default/cross/lib/python3.12/site-packages/
 ```
 
+### Crossenv Requirement Files
+
+Each Python meta carries the crossenv definitions used to compile wheels, under `spk/<python_package>/crossenv/` (e.g. `spk/python312/crossenv/`). When building a wheel, the framework selects the **most specific** matching file:
+
+1. `requirements-<wheel>-<version>.txt` — one exact version (e.g. `requirements-numpy-1.26.4.txt`)
+2. `requirements-<wheel>.txt` — any version of that wheel
+3. `requirements-default.txt` — used for everything else
+
+Within a file, each line targets a part of the crossenv via a prefix:
+
+| Prefix | Installed into | Purpose |
+|--------|----------------|---------|
+| *(none)* | — | the wheel(s) to produce; the pinned `pip` / `setuptools` / `wheel` sit here |
+| `build:` | the **build** (host) Python | tools that compile the wheel (Cython, meson, hatchling, maturin, setuptools-scm, ...) |
+| `cross:` | the **cross** (target) Python | build-time deps the wheel needs present in the target environment (cffi, pybind11, ...) |
+| `wheelhouse:` | the **cross** Python, from the local wheelhouse | install an already-compiled wheel for the target architecture — typically one **not published on PyPI** (e.g. a `numpy` built earlier in the same run) |
+
+`pure:`, `abi3:` and `crossenv:` may also be used to force a given wheel's build type.
+
 ## Creating an Exception Wheel (`python/`)
 
 When a wheel is poorly handled by the default pip build — it needs meson, patches, or other cross packages — create a dedicated module under `python/`.
