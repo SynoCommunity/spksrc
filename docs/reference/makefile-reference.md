@@ -195,6 +195,8 @@ Available after toolchain is loaded:
 |----------|-------------|
 | `TC` | Toolchain identifier (syno-x64-7.2) |
 | `TC_PATH` | Path to toolchain binaries |
+| `TC_INCLUDE` | Toolchain include path |
+| `TC_LIBRARY` | Toolchain library path |
 | `TC_PREFIX` | Cross-compiler prefix |
 | `TC_TARGET` | Target triplet (x86_64-pc-linux-gnu) |
 | `TC_SYSROOT` | Toolchain sysroot path |

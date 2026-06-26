@@ -237,9 +237,8 @@ endif
 | `INSTALL_DIR` | Installation destination |
 | `STAGING_INSTALL_PREFIX` | Path prefix for installed files |
 | `INSTALL_PREFIX` | Runtime prefix on NAS |
-| `TC_PATH` | Toolchain path |
-| `TC_INCLUDE` | Toolchain include path |
-| `TC_LIBRARY` | Toolchain library path |
+
+The read-only toolchain paths (`TC_PATH`, `TC_INCLUDE`, `TC_LIBRARY`, `TC_PREFIX`, ...) are advanced and documented in [Makefile Reference: Toolchain Variables](../../reference/makefile-reference.md#toolchain-variables-read-only).
 
 ## SPK-Specific Variables
 
