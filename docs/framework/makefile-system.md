@@ -103,112 +103,106 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 ## Include Hierarchy
 
-Understanding the include hierarchy is critical for framework development. `spksrc.common.mk` (and the files under `spksrc.common/`) is auto-loaded by every entry point — see [Macros](../reference/macros.md) for what it brings in and why:
+The framework is organized as **entry-point `.mk` files at the `mk/` root** plus, for each subsystem, a `spksrc.<name>/` directory of helper files. `spksrc.common.mk` is auto-loaded by every entry point (see [Macros](../reference/macros.md)):
 
 ```
-spksrc.common.mk                 # auto-loaded by every entry point — see Macros for details
-├── spksrc.common/
-│   ├── macros.mk                # GNU Make helper macros (loaded first)
-│   ├── stage0.mk                # parse-time toolchain pre-bootstrap (TC_GCC)
-│   ├── archs.mk                 # architecture classification / groups
-│   └── logs.mk                  # logging helpers
-└── spksrc.directories.mk        # work/staging/distrib directory layout
+# Foundation — auto-loaded by every entry point (see Macros); entry points
+# also pull in the shared Core and Build Pipeline files listed above.
+spksrc.common.mk
+spksrc.common/
+├── archs.mk                  # architecture classification / groups
+├── logs.mk                   # logging helpers
+├── macros.mk                 # GNU Make helper macros
+└── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
 
-spksrc.cross-cc.mk (cross/ packages)
-├── spksrc.directories.mk
-├── spksrc.common.mk
-├── spksrc.pre-check.mk
-├── spksrc.cross/env-default.mk
-│   └── tc_vars*.mk (generated)
-├── spksrc.download.mk
-├── spksrc.depend.mk
-├── spksrc.status.mk
-├── spksrc.checksum.mk
-├── spksrc.extract.mk
-├── spksrc.patch.mk
-├── spksrc.configure.mk
-├── spksrc.compile.mk
-├── spksrc.install.mk
-├── spksrc.plist.mk
-└── spksrc.supported.mk
+# Cross-compilation entry points (a cross/ package includes one)
+spksrc.cross-cc.mk            # autotools / plain C/C++
+spksrc.cross-cmake.mk         # CMake
+spksrc.cross-dotnet.mk        # .NET
+spksrc.cross-go.mk            # Go
+spksrc.cross-meson.mk         # Meson
+spksrc.cross-rust.mk          # Rust
+spksrc.cross/                 # environment setup loaded by the entry points above
+├── cmake-toolchainfile.mk    # generated CMake toolchain file
+├── env-cmake.mk
+├── env-default.mk            # base cross env
+├── env-dotnet.mk
+├── env-go.mk
+├── env-meson.mk
+├── env-rust.mk
+└── meson-crossfile.mk        # generated Meson cross file
 
-spksrc.spk.mk (spk/ packages — the standard SPK entry point)
-├── spksrc.directories.mk
-├── spksrc.common.mk
-├── spksrc.pre-check.mk
-├── spksrc.cross/env-default.mk
-├── spksrc.depend.mk
-├── spksrc.wheel.mk            # wheel orchestration (subtree below)
-├── spksrc.service.mk         # service config (subtree below)
-├── spksrc.supported.mk
-└── spksrc.spk/
-    ├── copy.mk               # dependency copying to staging
-    ├── strip.mk              # binary stripping
-    ├── icon.mk               # icon processing
-    └── publish.mk            # publish to package server
+# Native build entry points
+spksrc.native-cc.mk
+spksrc.native-cmake.mk
+spksrc.native-install.mk
+spksrc.native-meson.mk
+spksrc.native/
+├── env-cmake.mk
+├── env-default.mk            # base native env
+└── env-meson.mk
 
-spksrc.spk-meta.mk (meta-consumer spk/ packages: FFMPEG/PYTHON/VIDEODRV_PACKAGE)
-│   # a thin wrapper that sets up the meta(s), then includes spksrc.spk.mk above
-└── spksrc.spk-meta/
-    ├── base.mk                 # SPK_BASE_TEMPLATE
-    ├── videodriver.mk          # included when VIDEODRV_PACKAGE is set
-    ├── python.mk               # included when PYTHON_PACKAGE is set
-    ├── ffmpeg.mk               # included when FFMPEG_PACKAGE is set
-    └── meta.mk                 # generates tc_vars.meta.mk (pulled in by base.mk)
+# SPK assembly entry point
+spksrc.spk.mk
+spksrc.spk/
+├── copy.mk                   # dependency copying to staging
+├── icon.mk                   # icon processing
+├── publish.mk                # publish to package server
+└── strip.mk                  # binary stripping
 
-spksrc.wheel.mk (wheel orchestration — included by spksrc.spk.mk)
-└── spksrc.wheel/
-    ├── env.mk                  # wheel build environment
-    ├── requirement.mk          # requirement-file processing
-    ├── download.mk             # wheel source download
-    ├── compile.mk              # wheel compilation
-    └── install.mk              # wheel installation
+# Meta-consumer entry point (sets up the meta(s), then includes spksrc.spk.mk)
+spksrc.spk-meta.mk
+spksrc.spk-meta/
+├── base.mk                   # SPK_BASE_TEMPLATE
+├── ffmpeg.mk                 # when FFMPEG_PACKAGE is set
+├── meta.mk                   # generates tc_vars.meta.mk
+├── python.mk                 # when PYTHON_PACKAGE is set
+└── videodriver.mk            # when VIDEODRV_PACKAGE is set
 
-spksrc.service.mk (service config — included by spksrc.spk.mk)
-└── spksrc.service/
-    ├── installer.dsm5/6/7      # per-DSM installer templates
-    ├── installer.functions     # shared installer helpers
-    ├── start-stop-status       # service control template
-    ├── create_links            # symlink creation helper
-    ├── privilege-installasroot # privilege template
-    ├── non-startable           # non-service package template
-    └── use_alternate_tmpdir(.dsm7)
+# Service configuration entry point
+spksrc.service.mk
+spksrc.service/
+├── create_links
+├── installer.dsm5
+├── installer.dsm6
+├── installer.dsm7
+├── installer.functions
+├── non-startable
+├── privilege-installasroot
+├── start-stop-status
+├── testcase
+├── use_alternate_tmpdir
+└── use_alternate_tmpdir.dsm7
 
-spksrc.toolchain.mk (toolchain/ entry point)
-└── spksrc.toolchain/
-    ├── tc-base.mk              # build / extract
-    ├── tc-url.mk               # download URLs
-    ├── tc-versions.mk          # version / identity resolution
-    ├── tc-normalize.mk         # path / triplet normalization
-    ├── tc-flags.mk             # compiler / linker flag derivation
-    ├── tc-rust.mk              # rust toolchain setup
-    └── tc_vars.mk              # generates the tc_vars* files
+# Python wheel entry point
+spksrc.wheel.mk
+spksrc.wheel/
+├── compile.mk
+├── download.mk
+├── env.mk
+├── install.mk
+└── requirement.mk
 
-spksrc.toolkit.mk (toolkit/ entry point — only via REQUIRE_TOOLKIT, not the normal flow)
-└── spksrc.toolkit/
-    ├── tk-base.mk
-    ├── tk-url.mk
-    ├── tk-versions.mk
-    ├── tk-normalize.mk
-    ├── tk-flags.mk
-    └── tk_vars.mk              # generates the tk_vars* files
+# Toolchain entry point
+spksrc.toolchain.mk
+spksrc.toolchain/
+├── tc-base.mk
+├── tc-flags.mk
+├── tc-normalize.mk
+├── tc-rust.mk
+├── tc-url.mk
+├── tc-versions.mk
+└── tc_vars.mk                # generates the tc_vars* files
 
-spksrc.cross-{cmake,meson,go,rust,dotnet}.mk (build-system entry points)
-└── spksrc.cross/
-    ├── env-default.mk          # base cross env (also used by spksrc.cross-cc.mk)
-    ├── env-cmake.mk            # CMake environment
-    ├── cmake-toolchainfile.mk  # generated CMake toolchain file
-    ├── env-meson.mk            # Meson environment
-    ├── meson-crossfile.mk      # generated Meson cross file
-    ├── env-go.mk               # Go environment
-    ├── env-rust.mk             # Rust environment
-    └── env-dotnet.mk           # .NET environment
-
-spksrc.native-{cc,cmake,meson}.mk (native build entry points)
-└── spksrc.native/
-    ├── env-default.mk          # base native env
-    ├── env-cmake.mk            # native CMake environment
-    └── env-meson.mk            # native Meson environment
+# Toolkit entry point (only via REQUIRE_TOOLKIT)
+spksrc.toolkit.mk
+spksrc.toolkit/
+├── tk-base.mk
+├── tk-flags.mk
+├── tk-normalize.mk
+├── tk-url.mk
+├── tk-versions.mk
+└── tk_vars.mk                # generates the tk_vars* files
 ```
 
 ## Key Implementation Details
