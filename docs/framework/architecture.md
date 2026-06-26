@@ -203,7 +203,7 @@ needs neither per-`.pc` symlinks nor per-package `-DOPENSSL_*` / `-DEXPAT_*` /
 The build environment is configured through layered includes:
 
 1. **spksrc.common.mk** - Base settings and utilities
-2. **spksrc.cross-env.mk** - Cross-compilation environment
+2. **spksrc.cross/env-default.mk** - Cross-compilation environment
 3. **tc_vars.mk** - Toolchain-specific variables
 4. **Build system specific** - CMake, meson, autotools adapters
 

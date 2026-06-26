@@ -33,7 +33,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.cross-cc.mk` | Main cross-compilation entry point |
-| `spksrc.cross-env.mk` | Cross-compilation environment setup |
+| `spksrc.cross/env-default.mk` | Cross-compilation environment setup |
 | `spksrc.toolchain.mk` | Toolchain build and tc_vars generation |
 | `spksrc.toolkit.mk` | Toolkit management |
 
@@ -42,24 +42,24 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.cross-cmake.mk` | CMake cross-compilation |
-| `spksrc.cross-cmake-env.mk` | CMake environment setup |
-| `spksrc.cross-cmake-toolchainfile.mk` | CMake toolchain file generation |
+| `spksrc.cross/env-cmake.mk` | CMake environment setup |
+| `spksrc.cross/cmake-toolchainfile.mk` | CMake toolchain file generation |
 | `spksrc.cross-meson.mk` | Meson cross-compilation |
-| `spksrc.cross-meson-env.mk` | Meson environment setup |
-| `spksrc.cross-meson-crossfile.mk` | Meson cross file generation |
+| `spksrc.cross/env-meson.mk` | Meson environment setup |
+| `spksrc.cross/meson-crossfile.mk` | Meson cross file generation |
 | `spksrc.cross-go.mk` | Go cross-compilation |
-| `spksrc.cross-go-env.mk` | Go environment setup |
+| `spksrc.cross/env-go.mk` | Go environment setup |
 | `spksrc.cross-rust.mk` | Rust cross-compilation |
-| `spksrc.cross-rust-env.mk` | Rust environment setup |
+| `spksrc.cross/env-rust.mk` | Rust environment setup |
 | `spksrc.cross-dotnet.mk` | .NET cross-compilation |
-| `spksrc.cross-dotnet-env.mk` | .NET environment setup |
+| `spksrc.cross/env-dotnet.mk` | .NET environment setup |
 
 ### Native Builds
 
 | File | Purpose |
 |------|--------|
 | `spksrc.native-cc.mk` | Native compilation entry point |
-| `spksrc.native-env.mk` | Native build environment |
+| `spksrc.native/env-default.mk` | Native build environment |
 | `spksrc.native-cmake.mk` | Native CMake builds |
 | `spksrc.native-meson.mk` | Native Meson builds |
 | `spksrc.native-install.mk` | Native installation |
@@ -118,7 +118,7 @@ spksrc.cross-cc.mk (cross/ packages)
 ├── spksrc.directories.mk
 ├── spksrc.common.mk
 ├── spksrc.pre-check.mk
-├── spksrc.cross-env.mk
+├── spksrc.cross/env-default.mk
 │   └── tc_vars*.mk (generated)
 ├── spksrc.download.mk
 ├── spksrc.depend.mk
@@ -136,7 +136,7 @@ spksrc.spk.mk (spk/ packages — the standard SPK entry point)
 ├── spksrc.directories.mk
 ├── spksrc.common.mk
 ├── spksrc.pre-check.mk
-├── spksrc.cross-env.mk
+├── spksrc.cross/env-default.mk
 ├── spksrc.depend.mk
 ├── spksrc.wheel.mk
 ├── spksrc.spk/copy.mk
@@ -191,6 +191,23 @@ spksrc.toolkit.mk (toolkit/ entry point — only via REQUIRE_TOOLKIT, not the no
     ├── tk-normalize.mk
     ├── tk-flags.mk
     └── tk_vars.mk              # generates the tk_vars* files
+
+spksrc.cross-{cmake,meson,go,rust,dotnet}.mk (build-system entry points)
+└── spksrc.cross/
+    ├── env-default.mk          # base cross env (also used by spksrc.cross-cc.mk)
+    ├── env-cmake.mk            # CMake environment
+    ├── cmake-toolchainfile.mk  # generated CMake toolchain file
+    ├── env-meson.mk            # Meson environment
+    ├── meson-crossfile.mk      # generated Meson cross file
+    ├── env-go.mk               # Go environment
+    ├── env-rust.mk             # Rust environment
+    └── env-dotnet.mk           # .NET environment
+
+spksrc.native-{cc,cmake,meson}.mk (native build entry points)
+└── spksrc.native/
+    ├── env-default.mk          # base native env
+    ├── env-cmake.mk            # native CMake environment
+    └── env-meson.mk            # native Meson environment
 ```
 
 ## Key Implementation Details
@@ -229,7 +246,7 @@ cross-stage2:
     # Standard pipeline: depend → configure → compile → install → plist
 ```
 
-### spksrc.cross-env.mk
+### spksrc.cross/env-default.mk
 
 Sets up the cross-compilation environment by loading tc_vars files:
 
@@ -279,13 +296,13 @@ To add support for a new build system:
 ### Example: Meson Support
 
 ```makefile
-# spksrc.cross-meson-env.mk - Environment setup
+# spksrc.cross/env-meson.mk - Environment setup
 MESON_CROSS_FILE = $(WORK_DIR)/tc_vars.meson-cross
 ENV += MESON_CROSS_FILE=$(MESON_CROSS_FILE)
 
 # spksrc.cross-meson.mk - Build logic
-include ../../mk/spksrc.cross-meson-env.mk
-include ../../mk/spksrc.cross-meson-crossfile.mk
+include ../../mk/spksrc.cross/env-meson.mk
+include ../../mk/spksrc.cross/meson-crossfile.mk
 
 configure_target:
     meson setup --cross-file $(MESON_CROSS_FILE) ...
