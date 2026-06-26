@@ -171,7 +171,7 @@ Within a file, each line targets a part of the crossenv via a prefix:
 
 | Prefix | Installed into | Purpose |
 |--------|----------------|---------|
-| *(none)* | — | the wheel(s) to produce; the pinned `pip` / `setuptools` / `wheel` sit here |
+| *(none)* | **both** the build and the cross Python | bootstrap packages — the pinned `pip` / `setuptools` / `wheel` (also the default version used for `cross:` when not overridden) |
 | `build:` | the **build** (host) Python | tools that compile the wheel (Cython, meson, hatchling, maturin, setuptools-scm, ...) |
 | `cross:` | the **cross** (target) Python | build-time deps the wheel needs present in the target environment (cffi, pybind11, ...) |
 | `wheelhouse:` | the **cross** Python, from the local wheelhouse | install an already-compiled wheel for the target architecture — typically one **not published on PyPI** (e.g. a `numpy` built earlier in the same run) |
