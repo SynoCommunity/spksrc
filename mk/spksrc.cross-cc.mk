@@ -55,7 +55,7 @@
 # │                          cross-stage2                                │
 # │  (package build using cross-env)                                     │
 # │                                                                      │
-# │   spksrc.cross-env.mk                                                │
+# │   spksrc.cross/env-default.mk                                                │
 # │        │                                                             │
 # │        ├─ loads tc_vars.mk (always)                                  │
 # │        ├─ loads tc_vars.<env>.mk based on DEFAULT_ENV                │
@@ -108,7 +108,7 @@ include ../../mk/spksrc.common.mk
 
 include ../../mk/spksrc.pre-check.mk
 
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
 include ../../mk/spksrc.download.mk
 

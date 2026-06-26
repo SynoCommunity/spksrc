@@ -28,10 +28,10 @@ include ../../mk/spksrc.wheel/env.mk
 include ../../mk/spksrc.crossenv.mk
 
 ## meson specific configurations
-include ../../mk/spksrc.cross-cmake-env.mk
+include ../../mk/spksrc.cross/env-cmake.mk
 
 ## meson specific configurations
-#include ../../mk/spksrc.cross-meson-env.mk
+#include ../../mk/spksrc.cross/env-meson.mk
 
 include ../../mk/spksrc.wheel/download.mk
 

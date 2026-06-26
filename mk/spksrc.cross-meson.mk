@@ -34,10 +34,10 @@ include ../../mk/spksrc.common.mk
 ###
 
 # meson specific configurations
-include ../../mk/spksrc.cross-meson-env.mk
+include ../../mk/spksrc.cross/env-meson.mk
 
 # meson cross-file usage definition
-include ../../mk/spksrc.cross-meson-crossfile.mk
+include ../../mk/spksrc.cross/meson-crossfile.mk
 
 # configure using meson
 ifeq ($(strip $(CONFIGURE_TARGET)),)

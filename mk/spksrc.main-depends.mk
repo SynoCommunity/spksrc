@@ -37,7 +37,7 @@ endif
 include ../../mk/spksrc.pre-check.mk
 
 # for common env variables
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
 # for dependency evaluation
 include ../../mk/spksrc.depend.mk

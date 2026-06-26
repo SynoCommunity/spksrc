@@ -36,7 +36,7 @@ include ../../mk/spksrc.directories.mk
 include ../../mk/spksrc.common.mk
 
 ##### rust specific configurations
-include ../../mk/spksrc.cross-rust-env.mk
+include ../../mk/spksrc.cross/env-rust.mk
 
 # configure is used to install rust targets
 CONFIGURE_TARGET = nop

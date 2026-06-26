@@ -26,7 +26,7 @@
 #  status      : echo status to logging facility
 #  rustc       : install rust toolchain components
 #  depend      : resolve and build toolchain dependencies (if any)
-#  tcvars      : generate tc_vars*.mk files for spksrc.cross-env.mk
+#  tcvars      : generate tc_vars*.mk files for spksrc.cross/env-default.mk
 #
 # Variables:
 #  TC_NAME           : Toolchain name (optional, used with generic archs)

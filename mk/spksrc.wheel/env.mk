@@ -6,7 +6,7 @@
 include ../../mk/spksrc.wheel/requirement.mk
 
 ##### rust specific configurations
-include ../../mk/spksrc.cross-rust-env.mk
+include ../../mk/spksrc.cross/env-rust.mk
 
 # fallback by default to native/python*
 PIP ?= pip

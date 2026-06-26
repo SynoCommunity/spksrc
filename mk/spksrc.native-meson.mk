@@ -32,10 +32,10 @@ CONFIGURE_TARGET = meson_configure_target
 endif
 
 # Load native environment before meson-specific configs
-include ../../mk/spksrc.native-env.mk
+include ../../mk/spksrc.native/env-default.mk
 
 # meson specific configurations
-include ../../mk/spksrc.native-meson-env.mk
+include ../../mk/spksrc.native/env-meson.mk
 
 # call-up ninja build process
 include ../../mk/spksrc.ninja.mk

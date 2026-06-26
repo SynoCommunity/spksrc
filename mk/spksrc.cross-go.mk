@@ -37,7 +37,7 @@ include ../../mk/spksrc.directories.mk
 include ../../mk/spksrc.common.mk
 
 ##### golang specific configurations
-include ../../mk/spksrc.cross-go-env.mk
+include ../../mk/spksrc.cross/env-go.mk
 
 # avoid run of make configure
 ifeq ($(strip $(CONFIGURE_TARGET)),)

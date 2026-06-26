@@ -108,7 +108,7 @@ include ../../mk/spksrc.pre-check.mk
 
 # Even though this makefile doesn't cross compile,
 # we need this to setup the cross environment.
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
 include ../../mk/spksrc.depend.mk
 

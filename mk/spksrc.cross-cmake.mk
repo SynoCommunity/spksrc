@@ -34,10 +34,10 @@ include ../../mk/spksrc.common.mk
 ###
 
 # cmake specific configurations
-include ../../mk/spksrc.cross-cmake-env.mk
+include ../../mk/spksrc.cross/env-cmake.mk
 
 # cmake toolchain-file usage definition
-include ../../mk/spksrc.cross-cmake-toolchainfile.mk
+include ../../mk/spksrc.cross/cmake-toolchainfile.mk
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)

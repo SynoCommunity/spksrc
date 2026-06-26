@@ -181,7 +181,7 @@ TC ?= syno$(KERNEL_ARCH_SUFFIX)
 
 #####
 
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
 include ../../mk/spksrc.status.mk
 

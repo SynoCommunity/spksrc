@@ -23,7 +23,7 @@ include ../../mk/spksrc.directories.mk
 include ../../mk/spksrc.common.mk
 
 # cmake specific configurations
-include ../../mk/spksrc.native-cmake-env.mk
+include ../../mk/spksrc.native/env-cmake.mk
 
 #####
 

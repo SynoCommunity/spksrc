@@ -40,7 +40,7 @@ include ../../mk/spksrc.directories.mk
 include ../../mk/spksrc.common.mk
 
 ##### dotnet specific configurations
-include ../../mk/spksrc.cross-dotnet-env.mk
+include ../../mk/spksrc.cross/env-dotnet.mk
 
 # avoid run of make configure & make install
 CONFIGURE_TARGET = nop
