@@ -64,6 +64,41 @@ sudo cat /var/log/synopkg.log | grep <pkg>
 
 ```
 
+## Debugging with GDB (debug symbols)
+
+To analyse a crash or get a usable backtrace, build the package **with debug symbols** and debug it on the NAS with `gdb` from the **synocli-devel** package.
+
+**1. Build with debug info.** Set `GCC_DEBUG_INFO = 1` in the package's (or the relevant `cross/`) Makefile and rebuild. This keeps debugging information instead of an optimized/stripped build:
+
+- autotools → `--enable-debug`
+- CMake → `CMAKE_BUILD_TYPE = RelWithDebInfo` (+ `GCC_DEBUG_FLAGS`)
+- meson → debug build type
+
+```makefile
+GCC_DEBUG_INFO = 1
+```
+
+**2. Install `synocli-devel` on the NAS.** It provides `gdb`, `gdbserver` and `gdb-add-index` (linked under `/usr/local/bin`).
+
+**3. Debug.** Run the binary under `gdb`, or attach to the running service and capture a backtrace:
+
+```bash
+# Attach to a running service
+sudo gdb -p $(pgrep -f /var/packages/<pkg>/target/bin/<binary>)
+
+# …or run it directly
+gdb --args /var/packages/<pkg>/target/bin/<binary> <args>
+
+# In gdb, after the crash:
+(gdb) bt full
+```
+
+For larger remote sessions, `gdbserver` on the NAS paired with a cross `gdb` on the build host works as well.
+
+!!! tip "Examples in the issue tracker"
+    - [#5419](https://github.com/SynoCommunity/spksrc/issues/5419), [#6640](https://github.com/SynoCommunity/spksrc/issues/6640), [#5222](https://github.com/SynoCommunity/spksrc/issues/5222) — gdb backtraces from SynoCommunity packages
+    - [tvheadend#1927](https://github.com/tvheadend/tvheadend/issues/1927) — an upstream issue resolved with a backtrace
+
 ## Package Contents
 
 ```bash
