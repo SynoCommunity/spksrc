@@ -104,10 +104,24 @@ env:
   # .spk/diagnostics still upload and the remaining packages are reported.
   BUILD_BUDGET_SECONDS: "20700"
 
+# Cancel a previous, now-superseded run when a new commit lands on the same
+# branch or pull request, instead of letting both full build matrices run to
+# completion. The event_name is part of the group so push, pull_request and
+# manual workflow_dispatch runs never cancel one another; a manual build &
+# publish (workflow_dispatch) is additionally never auto-cancelled.
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
 jobs:
   prepare:
     name: Prepare for Build
     runs-on: ubuntu-latest
+    # Skip the automatic push/pull_request build on forks: a fork PR is already
+    # built by the pull_request event in the SynoCommunity/spksrc base repo, so
+    # also building it from the fork's push event would duplicate the whole
+    # matrix. workflow_dispatch on a fork is unaffected (different code path).
+    if: github.repository == 'SynoCommunity/spksrc' || github.event_name == 'workflow_dispatch'
     outputs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
       noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
@@ -848,7 +862,7 @@ jobs:
     name: Consolidate Diagnostics
     needs: build
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && (github.repository == 'SynoCommunity/spksrc' || github.event_name == 'workflow_dispatch')
     steps:
       - name: Download all diagnostic artifacts
         uses: actions/download-artifact@v8
