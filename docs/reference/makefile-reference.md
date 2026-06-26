@@ -209,15 +209,13 @@ Available after toolchain is loaded:
 
 | Variable | Description |
 |----------|-------------|
-| `ARCH` | Target architecture (x64, aarch64, armv7) |
-| `TCVERSION` | DSM version (7.2, 7.1, 6.2.4) |
-| `TC_ARCH` | Architecture list for generic archs |
-| `GENERIC_ARCHS` | List of generic architecture names |
-| `x64_ARCHS` | Intel 64-bit architecture names |
-| `ARMv7_ARCHS` | ARM 32-bit architecture names |
-| `ARMv8_ARCHS` | ARM 64-bit architecture names |
-| `UNSUPPORTED_ARCHS` | Architectures to exclude |
+| `ARCH` | Target architecture / platform codename being built |
+| `TCVERSION` | DSM toolchain version (7.2, 7.1, 6.2.4, ...) |
+| `TC_ARCH` | Generic build arch of the current platform |
+| `UNSUPPORTED_ARCHS` | Architectures/platforms to exclude from this package |
 | `UNSUPPORTED_ARCHS_TCVERSION` | Architecture/DSM-version pairs to exclude |
+
+The architecture **groups** (`x64_ARCHS`, `ARMv7_ARCHS`, `ARMv8_ARCHS`, `ARM_ARCHS`, `PPC_ARCHS`, `32bit_ARCHS`, `64bit_ARCHS`, ...) are listed in [Reference: Architectures](architectures.md#architecture-groups); their use in `ifeq` conditions is shown in [Makefile Variables](../developer-guide/packaging/makefile-variables.md#architecture-groups).
 
 ## Version & Build Constraints
 
