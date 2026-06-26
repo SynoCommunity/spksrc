@@ -82,6 +82,9 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.spk.mk` | Main SPK package assembly |
+| `spksrc.spk-meta.mk` | Meta-consumer entry point: sets up the ffmpeg/python/videodriver meta(s), then includes `spksrc.spk.mk` |
+| `spksrc.spk/base.mk` | `SPK_BASE_TEMPLATE` — wires a meta's staging into the consumer |
+| `spksrc.spk/meta.mk` | Generates `tc_vars.meta.mk`, an inspectable diagnostic of the meta env (never `-include`d) |
 | `spksrc.copy.mk` | Dependency copying to staging |
 | `spksrc.strip.mk` | Binary stripping |
 | `spksrc.icon.mk` | Icon processing |
@@ -100,14 +103,16 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 ## Include Hierarchy
 
-Understanding the include hierarchy is critical for framework development:
+Understanding the include hierarchy is critical for framework development. `spksrc.common.mk` (and the files under `spksrc.common/`) is auto-loaded by every entry point — see [Macros](../reference/macros.md) for what it brings in and why:
 
 ```
-spksrc.common.mk
-└── spksrc.common/
-    ├── archs.mk      # Architecture classification
-    ├── logs.mk       # Logging helpers
-    └── macros.mk     # GNU Make utility macros
+spksrc.common.mk                 # auto-loaded by every entry point — see Macros for details
+├── spksrc.common/
+│   ├── macros.mk                # GNU Make helper macros (loaded first)
+│   ├── stage0.mk                # parse-time toolchain pre-bootstrap (TC_GCC)
+│   ├── archs.mk                 # architecture classification / groups
+│   └── logs.mk                  # logging helpers
+└── spksrc.directories.mk        # work/staging/distrib directory layout
 
 spksrc.cross-cc.mk (cross/ packages)
 ├── spksrc.directories.mk
@@ -117,24 +122,57 @@ spksrc.cross-cc.mk (cross/ packages)
 │   └── tc_vars*.mk (generated)
 ├── spksrc.download.mk
 ├── spksrc.depend.mk
+├── spksrc.status.mk
 ├── spksrc.checksum.mk
 ├── spksrc.extract.mk
 ├── spksrc.patch.mk
 ├── spksrc.configure.mk
 ├── spksrc.compile.mk
 ├── spksrc.install.mk
-└── spksrc.plist.mk
+├── spksrc.plist.mk
+└── spksrc.supported.mk
 
-spksrc.spk.mk (spk/ packages)
-├── spksrc.common.mk
+spksrc.spk.mk (spk/ packages — the standard SPK entry point)
 ├── spksrc.directories.mk
+├── spksrc.common.mk
 ├── spksrc.pre-check.mk
 ├── spksrc.cross-env.mk
 ├── spksrc.depend.mk
 ├── spksrc.wheel.mk
 ├── spksrc.copy.mk
 ├── spksrc.strip.mk
-└── spksrc.service.mk
+├── spksrc.service.mk
+├── spksrc.icon.mk
+├── spksrc.supported.mk
+└── spksrc.publish.mk
+
+spksrc.spk-meta.mk (meta-consumer spk/ packages: FFMPEG/PYTHON/VIDEODRV_PACKAGE)
+│   # a thin wrapper that sets up the meta(s), then includes spksrc.spk.mk above
+└── spksrc.spk/
+    ├── base.mk                 # SPK_BASE_TEMPLATE
+    ├── videodriver.mk          # included when VIDEODRV_PACKAGE is set
+    ├── python.mk               # included when PYTHON_PACKAGE is set
+    ├── ffmpeg.mk               # included when FFMPEG_PACKAGE is set
+    └── meta.mk                 # generates tc_vars.meta.mk (pulled in by base.mk)
+
+spksrc.toolchain.mk (toolchain/ entry point)
+└── spksrc.toolchain/
+    ├── tc-base.mk              # build / extract
+    ├── tc-url.mk               # download URLs
+    ├── tc-versions.mk          # version / identity resolution
+    ├── tc-normalize.mk         # path / triplet normalization
+    ├── tc-flags.mk             # compiler / linker flag derivation
+    ├── tc-rust.mk              # rust toolchain setup
+    └── tc_vars.mk              # generates the tc_vars* files
+
+spksrc.toolkit.mk (toolkit/ entry point — only via REQUIRE_TOOLKIT, not the normal flow)
+└── spksrc.toolkit/
+    ├── tk-base.mk
+    ├── tk-url.mk
+    ├── tk-versions.mk
+    ├── tk-normalize.mk
+    ├── tk-flags.mk
+    └── tk_vars.mk              # generates the tk_vars* files
 ```
 
 ## Key Implementation Details
@@ -287,5 +325,5 @@ make -C spk/mypackage ARCH=x64 TCVERSION=7.2 --debug=m 2>&1 | grep 'Reading make
 ## Related Documentation
 
 - [Architecture](architecture.md) - Build pipeline overview
-- [Toolchains](toolchains.md) - Toolchain management
+- [Toolchains](toolchain.md) - Toolchain management
 - [Developer Guide: Build Rules](../developer-guide/packaging/build-rules.md) - Using build system includes

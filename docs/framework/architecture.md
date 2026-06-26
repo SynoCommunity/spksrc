@@ -274,5 +274,5 @@ The `MSG` macro provides consistent message formatting:
 ## Related Documentation
 
 - [Makefile System](makefile-system.md) - Detailed mk/*.mk documentation
-- [Toolchains](toolchains.md) - Toolchain management details
+- [Toolchains](toolchain.md) - Toolchain management details
 - [Developer Guide: Build Workflow](../developer-guide/basics/build-workflow.md) - Using make targets

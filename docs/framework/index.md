@@ -20,17 +20,20 @@ spksrc is a GNU Make-based build framework that:
 
 ## Key Concepts
 
-### Two-Stage Build Process
+### Three-Stage Build Process
 
-Every cross-compilation build in spksrc follows a two-stage process:
+Every cross-compilation build in spksrc runs in three stages — stage 0 at parse time, stages 1 and 2 as recipes (see [Architecture](architecture.md#cross-compilation-stages) for details):
 
 ```mermaid
 block
   columns 1
-  toolchain["Stage 1: Toolchain<br>Downloads and prepares the cross-compilation toolchain<br>Generates tc_vars*.mk files with environment settings"]
+  bootstrap["Stage 0: Pre-bootstrap (parse time)<br>Bootstraps the toolchain to expose TC_GCC<br>so version-gated dependencies parse correctly"]
+  space
+  toolchain["Stage 1: Toolchain (recipe time)<br>Builds the toolchain and generates the package tc_vars*<br>(for spk: also builds the meta sources)"]
   space
   package["Stage 2: Package<br>Builds the package using the cross-compilation environment<br>download → extract → patch → configure → compile → install → plist"]
 
+  bootstrap --> toolchain
   toolchain --> package
 ```
 
@@ -65,7 +68,7 @@ These cookies allow builds to resume from where they left off and prevent redund
 
 - **[Architecture](architecture.md)** - Detailed build pipeline and stage interactions
 - **[Makefile System](makefile-system.md)** - Deep dive into the mk/*.mk files
-- **[Toolchains](toolchains.md)** - How toolchains are managed and used
+- **[Toolchains](toolchain.md)** - How toolchains are managed and used
 
 ## Related Documentation
 

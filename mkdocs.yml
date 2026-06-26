@@ -152,11 +152,14 @@ nav:
     - framework/index.md
     - Architecture: framework/architecture.md
     - Makefile System: framework/makefile-system.md
-    - Toolchains: framework/toolchains.md
+    - Toolchain: framework/toolchain.md
+    - Toolkit: framework/toolkit.md
   - Reference:
     - reference/index.md
     - Architectures: reference/architectures.md
+    - Model ↔ Architecture: reference/model-architecture.md
     - Ports: reference/ports.md
+    - Macros: reference/macros.md
     - Makefile Reference: reference/makefile-reference.md
     - Permissions: reference/permissions.md
     - DSM APIs: reference/dsm-apis.md
@@ -167,7 +170,6 @@ nav:
       - FFmpeg: packages/ffmpeg.md
       - Jellyfin: packages/jellyfin.md
       - Navidrome: packages/navidrome.md
-      - GStreamer: packages/gstreamer.md
     - Downloads:
       - Transmission: packages/transmission.md
       - ruTorrent: packages/rutorrent.md
@@ -206,7 +208,6 @@ nav:
       - SynoKernel USB Serial: packages/synokernel-usbserial.md
     - Other:
       - MinIO: packages/minio.md
-      - Matrix Synapse: packages/matrix-synapse.md
       - Salt: packages/salt.md
       - Beets: packages/beets.md
       - Flexget: packages/flexget.md
@@ -216,10 +217,10 @@ nav:
       - Adminer: packages/adminer.md
       - BicBucStriim: packages/bicbucstriim.md
       - Comskip: packages/comskip.md
-      - Debian Chroot: packages/debian-chroot.md
       - File Browser: packages/file-browser.md
       - Node Exporter: packages/node-exporter.md
       - OpenList: packages/openlist.md
+    - Archived:
       - SickBeard Custom: packages/sickbeard-custom.md
   - Contributing:
     - contributing/index.md

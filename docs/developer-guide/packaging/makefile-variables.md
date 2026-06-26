@@ -6,7 +6,7 @@ This page documents the Makefile variables used in spksrc packages.
     For a complete reference of all variables and targets, see [Makefile Reference](../../reference/makefile-reference.md).
 
 !!! warning "Include Order Matters"
-    Any `ifeq` conditionals using architecture variables (like `ARMv7_ARCHS`, `x64_ARCHS`, etc.) must appear **after** `include ../../mk/spksrc.common.mk` or the relevant `spksrc.cross-*.mk` file. These variables are defined by the included makefiles and will be empty if referenced before the include.
+    Architecture variables (`ARMv7_ARCHS`, `x64_ARCHS`, etc.) and the helper macros are defined by `spksrc.common.mk`, which loads the architecture classification and macros early (see [Macros](../../reference/macros.md)). Any `ifeq` using them must therefore appear **after** `include ../../mk/spksrc.common.mk` (or the relevant `spksrc.cross-*.mk`, which includes it) — referenced before the include they are empty.
 
 ## Package Identification
 
@@ -193,16 +193,44 @@ REQUIRED_MIN_DSM = 7.0
 
 ### Architecture Groups
 
-| Group | Contains |
-|-------|----------|
-| `x64_ARCHS` | Intel 64-bit |
-| `ARMv7_ARCHS` | ARM 32-bit |
-| `ARMv7L_ARCHS` | ARM 32-bit low-end |
-| `ARMv8_ARCHS` | ARM 64-bit |
-| `ARM_ARCHS` | All ARM architectures |
-| `PPC_ARCHS` | PowerPC |
-| `32bit_ARCHS` | All 32-bit |
-| `64bit_ARCHS` | All 64-bit |
+spksrc provides groups such as `x64_ARCHS`, `ARMv7_ARCHS`, `ARMv8_ARCHS`, `ARM_ARCHS`, `PPC_ARCHS`, `32bit_ARCHS` and `64bit_ARCHS`. The complete, authoritative list (with the platform codenames each contains) is in [Reference: Architectures](../../reference/architectures.md#architecture-groups).
+
+Use them in `ifeq` to enable code per architecture. The groups are available **after** including a spksrc entry point (or `spksrc.common.mk`):
+
+```makefile
+include ../../mk/spksrc.common.mk
+
+# Only build a feature on 64-bit targets
+ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --enable-feature
+endif
+
+# x64-only dependency
+ifneq ($(findstring $(ARCH),$(x64_ARCHS)),)
+DEPENDS += cross/intel-media-driver
+endif
+
+# Exclude a whole family from the build
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+```
+
+### Version Conditions
+
+The `version_*` [macros](../../reference/macros.md#version-comparison) gate code on a toolchain (or any version) — they return `1` when true:
+
+```makefile
+include ../../mk/spksrc.common.mk
+
+# Newer toolchains only
+ifeq ($(call version_ge,$(TC_GCC),12),1)
+DEPENDS += cross/libplacebo
+endif
+
+# Workaround for old compilers
+ifeq ($(call version_lt,$(TC_GCC),5.0),1)
+ADDITIONAL_CFLAGS += -std=gnu99
+endif
+```
 
 ## Path Variables (Available During Build)
 
@@ -213,15 +241,11 @@ REQUIRED_MIN_DSM = 7.0
 | `INSTALL_DIR` | Installation destination |
 | `STAGING_INSTALL_PREFIX` | Path prefix for installed files |
 | `INSTALL_PREFIX` | Runtime prefix on NAS |
-| `TC_PATH` | Toolchain path |
-| `TC_INCLUDE` | Toolchain include path |
-| `TC_LIBRARY` | Toolchain library path |
 
 ## SPK-Specific Variables
 
 | Variable | Description |
 |----------|-------------|
-| `BETA` | Set to `1` to mark as beta release |
 | `ADMIN_PORT` | Port for admin interface |
 | `ADMIN_PROTOCOL` | Protocol (http/https) for admin interface |
 | `ADMIN_URL` | Custom admin URL path |
@@ -268,17 +292,11 @@ For custom URL paths or descriptions, create `src/app/config`:
 }
 ```
 
-Install it in the Makefile:
+Point `DSM_UI_CONFIG` at that file — the framework installs it as the package's `app/config`, overriding the auto-generated one:
 
 ```makefile
 DSM_UI_DIR = app
+DSM_UI_CONFIG = src/app/config
 ADMIN_PORT = 8080
 ADMIN_URL = /admin
-
-POST_STRIP_TARGET = mypackage_extra_install
-
-.PHONY: mypackage_extra_install
-mypackage_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
 ```

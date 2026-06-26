@@ -51,6 +51,8 @@ TC_DIST_NAME = $(TC_DIST_SITE_PATH)/Intel%20x86%20Linux%204.4.302%20%28x86_64-GP
 include ../../mk/spksrc.toolchain.mk
 ```
 
+`spksrc.toolchain.mk` is the entry point; its implementation under `mk/spksrc.toolchain/` is detailed in the [Makefile System include hierarchy](makefile-system.md#include-hierarchy). The matching DSM development toolkit is covered on the [Toolkit](toolkit.md) page.
+
 ## tc_vars Files
 
 The toolchain build generates several `tc_vars*.mk` files that configure cross-compilation:
@@ -136,32 +138,10 @@ RUSTFLAGS = -C linker=$(TC_CC)
 
 ## Supported Architectures
 
-spksrc supports the following architecture families:
+The complete list of architecture families, platform codenames, architecture groups (`ARM_ARCHS`, `x64_ARCHS`, `64bit_ARCHS`, ...) and the Synology models they map to is maintained in the reference:
 
-### 64-bit Architectures
-
-| Architecture | CPU Family | Common Models |
-|-------------|------------|---------------|
-| x64 | Intel 64-bit | DS923+, DS1621+, RS1221+ |
-| aarch64 | ARM 64-bit | DS223, DS423+, RS422+ |
-
-### 32-bit Architectures (Legacy)
-
-| Architecture | CPU Family | Common Models |
-|-------------|------------|---------------|
-| armv7 | ARM 32-bit | DS218, DS418 |
-| i686 | Intel 32-bit | DS216j, DS218j |
-
-### Generic Architectures
-
-Generic architectures build for multiple targets:
-
-| Generic | Expands To |
-|---------|------------|
-| arm5 | 88f6281, 88f6282 |
-| arm7 | alpine, alpine4k, armada370, armada375, armada38x, armadaxp, comcerto2k, monaco |
-| arm8 | rtd1296, rtd1619b, armv8 |
-| ppc | ppc853x, ppc854x, qoriq |
+- [Reference: Architectures](../reference/architectures.md)
+- [Reference: Model ↔ Architecture](../reference/model-architecture.md)
 
 ## Adding New Toolchain Support
 

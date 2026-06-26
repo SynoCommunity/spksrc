@@ -23,7 +23,6 @@ These packages have detailed documentation available:
 | [FFmpeg](ffmpeg.md) | Complete multimedia framework |
 | [Jellyfin](jellyfin.md) | Media streaming server |
 | [Navidrome](navidrome.md) | Music streaming server |
-| [GStreamer](gstreamer.md) | Multimedia framework |
 | [Comskip](comskip.md) | Commercial detector for recorded TV |
 
 ### Download Clients
@@ -84,7 +83,6 @@ These packages have detailed documentation available:
 | Package | Description |
 |---------|-------------|
 | [MinIO](minio.md) | S3-compatible object storage |
-| [Matrix Synapse](matrix-synapse.md) | Matrix homeserver |
 | [Mozilla Sync](mozilla-sync.md) | Firefox Sync server |
 | [Salt](salt.md) | Infrastructure automation |
 
@@ -114,9 +112,16 @@ These packages have detailed documentation available:
 |---------|-------------|
 | [DSM Utilities](dsm-utilities.md) | Helpful DSM configuration for packages |
 | [Adminer](adminer.md) | Database management |
-| [Debian Chroot](debian-chroot.md) | Debian environment |
 | [File Browser](file-browser.md) | Web file browser |
 | [Node Exporter](node-exporter.md) | Prometheus metrics exporter |
+
+### Archived
+
+These packages are no longer built or published (see the [Package Lifecycle Policy](../contributing/package-lifecycle.md)):
+
+| Package | Description |
+|---------|-------------|
+| [SickBeard Custom](sickbeard-custom.md) | SickBeard fork selector |
 
 ## All Packages
 
@@ -150,7 +155,6 @@ The following is a complete list of all 183+ packages available in the SynoCommu
     | couchpotatoserver | Media Management |
     | couchpotatoserver-custom | Media Management |
     | curaengine | 3D Printing |
-    | debian-chroot | Development |
     | deluge | Downloads |
     | demoservice | Development |
     | denyhost | Security |
@@ -184,7 +188,6 @@ The following is a complete list of all 183+ packages available in the SynoCommu
     | gnupg | Security |
     | go | Runtime |
     | gpac | Media |
-    | gstreamer | Media |
     | haproxy | Network |
     | headphones | Media Management |
     | headphones-custom | Media Management |
