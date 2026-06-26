@@ -113,9 +113,17 @@ These packages have detailed documentation available:
 |---------|-------------|
 | [DSM Utilities](dsm-utilities.md) | Helpful DSM configuration for packages |
 | [Adminer](adminer.md) | Database management |
-| [Debian Chroot](debian-chroot.md) | Debian environment |
 | [File Browser](file-browser.md) | Web file browser |
 | [Node Exporter](node-exporter.md) | Prometheus metrics exporter |
+
+### Archived
+
+These packages are no longer built or published (see the [Package Lifecycle Policy](../contributing/package-lifecycle.md)):
+
+| Package | Description |
+|---------|-------------|
+| [Debian Chroot](debian-chroot.md) | Debian environment |
+| [SickBeard Custom](sickbeard-custom.md) | SickBeard fork selector |
 
 ## All Packages
 

@@ -1,5 +1,8 @@
 # Debian Chroot
 
+!!! warning "Archived"
+    This package is **archived** — no longer built or published. Existing installs keep working but receive no updates. See the [Package Lifecycle Policy](../contributing/package-lifecycle.md).
+
 Debian is a free operating system (OS) that comes with over 29000 packages, precompiled software bundled up in a nice format for easy installation on your DiskStation.
 
 Debian Chroot allows you to benefit from the Debian OS inside your DiskStation, alongside DSM. **This package is intended for advanced users only.**
