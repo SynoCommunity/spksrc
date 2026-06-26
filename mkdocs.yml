@@ -216,7 +216,6 @@ nav:
       - Adminer: packages/adminer.md
       - BicBucStriim: packages/bicbucstriim.md
       - Comskip: packages/comskip.md
-      - Debian Chroot: packages/debian-chroot.md
       - File Browser: packages/file-browser.md
       - Node Exporter: packages/node-exporter.md
       - OpenList: packages/openlist.md

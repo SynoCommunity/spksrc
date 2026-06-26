@@ -112,7 +112,6 @@ These packages have detailed documentation available:
 |---------|-------------|
 | [DSM Utilities](dsm-utilities.md) | Helpful DSM configuration for packages |
 | [Adminer](adminer.md) | Database management |
-| [Debian Chroot](debian-chroot.md) | Debian environment |
 | [File Browser](file-browser.md) | Web file browser |
 | [Node Exporter](node-exporter.md) | Prometheus metrics exporter |
 
@@ -156,7 +155,6 @@ The following is a complete list of all 183+ packages available in the SynoCommu
     | couchpotatoserver | Media Management |
     | couchpotatoserver-custom | Media Management |
     | curaengine | 3D Printing |
-    | debian-chroot | Development |
     | deluge | Downloads |
     | demoservice | Development |
     | denyhost | Security |
