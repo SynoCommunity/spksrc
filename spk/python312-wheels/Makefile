@@ -41,8 +41,8 @@ OPTIONAL_DEPENDS += python/scipy
 include ../../mk/spksrc.common.mk
 
 # [borgbackup]
-# Use OpenSSL path as defined by either
-# spksrc.wheel/env.mk or spksrc.spk-meta.mk
+# Use the OpenSSL path from the single source of truth:
+# spksrc.cross/env-default.mk (included via spksrc.cross-cc.mk).
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"

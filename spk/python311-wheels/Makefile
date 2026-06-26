@@ -51,8 +51,8 @@ WHEELS += atom==0.12.1
 endif
 
 # [borgbackup]
-# Use OpenSSL path as defined by either
-# spksrc.wheel/env.mk or spksrc.spk-meta.mk
+# Use the OpenSSL path from the single source of truth:
+# spksrc.cross/env-default.mk (included via spksrc.cross-cc.mk).
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
