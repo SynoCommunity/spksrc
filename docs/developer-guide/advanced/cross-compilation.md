@@ -58,4 +58,4 @@ file spk/<pkg>/work-x64-7.2/install/var/packages/<pkg>/target/bin/<binary>
 For details on how the cross-compilation framework works internally, see:
 
 - [Framework Architecture](../../framework/architecture.md) - Build pipeline and stages
-- [Framework Toolchains](../../framework/toolchains.md) - Toolchain management internals
+- [Framework Toolchains](../../framework/toolchain.md) - Toolchain management internals

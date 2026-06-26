@@ -51,30 +51,7 @@ TC_DIST_NAME = $(TC_DIST_SITE_PATH)/Intel%20x86%20Linux%204.4.302%20%28x86_64-GP
 include ../../mk/spksrc.toolchain.mk
 ```
 
-`spksrc.toolchain.mk` is the entry point; the implementation lives under `mk/spksrc.toolchain/`:
-
-| File | Purpose |
-|------|---------|
-| `tc-base.mk` | Core toolchain build/extract logic |
-| `tc-url.mk` | Download URL handling |
-| `tc-versions.mk` | Version/identity resolution |
-| `tc-normalize.mk` | Path/triplet normalization |
-| `tc-flags.mk` | Compiler/linker flag derivation |
-| `tc-rust.mk` | Rust toolchain setup |
-| `tc_vars.mk` | Generates the `tc_vars*` files |
-
-## Toolkit
-
-A *toolkit* is the matching Synology DSM development toolkit (sysroot of DSM libraries/headers), enabled per-package with `REQUIRE_TOOLKIT = 1`. It is **not part of the normal build flow** — `spksrc.toolkit.mk` is only pulled in when a package requests it, mirroring the toolchain structure under `mk/spksrc.toolkit/`:
-
-| File | Purpose |
-|------|---------|
-| `tk-base.mk` | Core toolkit download/extract logic |
-| `tk-url.mk` | Download URL handling |
-| `tk-versions.mk` | Version/identity resolution |
-| `tk-normalize.mk` | Path normalization |
-| `tk-flags.mk` | Flag derivation |
-| `tk_vars.mk` | Generates the `tk_vars*` files |
+`spksrc.toolchain.mk` is the entry point; its implementation under `mk/spksrc.toolchain/` is detailed in the [Makefile System include hierarchy](makefile-system.md#include-hierarchy). The matching DSM development toolkit is covered on the [Toolkit](toolkit.md) page.
 
 ## tc_vars Files
 

@@ -68,7 +68,7 @@ These cookies allow builds to resume from where they left off and prevent redund
 
 - **[Architecture](architecture.md)** - Detailed build pipeline and stage interactions
 - **[Makefile System](makefile-system.md)** - Deep dive into the mk/*.mk files
-- **[Toolchains](toolchains.md)** - How toolchains are managed and used
+- **[Toolchains](toolchain.md)** - How toolchains are managed and used
 
 ## Related Documentation
 
