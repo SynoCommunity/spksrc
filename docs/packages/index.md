@@ -23,7 +23,6 @@ These packages have detailed documentation available:
 | [FFmpeg](ffmpeg.md) | Complete multimedia framework |
 | [Jellyfin](jellyfin.md) | Media streaming server |
 | [Navidrome](navidrome.md) | Music streaming server |
-| [GStreamer](gstreamer.md) | Multimedia framework |
 | [Comskip](comskip.md) | Commercial detector for recorded TV |
 
 ### Download Clients
@@ -184,7 +183,6 @@ The following is a complete list of all 183+ packages available in the SynoCommu
     | gnupg | Security |
     | go | Runtime |
     | gpac | Media |
-    | gstreamer | Media |
     | haproxy | Network |
     | headphones | Media Management |
     | headphones-custom | Media Management |

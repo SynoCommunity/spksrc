@@ -167,7 +167,6 @@ nav:
       - FFmpeg: packages/ffmpeg.md
       - Jellyfin: packages/jellyfin.md
       - Navidrome: packages/navidrome.md
-      - GStreamer: packages/gstreamer.md
     - Downloads:
       - Transmission: packages/transmission.md
       - ruTorrent: packages/rutorrent.md

@@ -82,6 +82,9 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.spk.mk` | Main SPK package assembly |
+| `spksrc.spk-meta.mk` | Meta-consumer entry point: sets up the ffmpeg/python/videodriver meta(s), then includes `spksrc.spk.mk` |
+| `spksrc.spk/base.mk` | `SPK_BASE_TEMPLATE` — wires a meta's staging into the consumer |
+| `spksrc.spk/meta.mk` | Generates `tc_vars.meta.mk`, an inspectable diagnostic of the meta env (never `-include`d) |
 | `spksrc.copy.mk` | Dependency copying to staging |
 | `spksrc.strip.mk` | Binary stripping |
 | `spksrc.icon.mk` | Icon processing |
@@ -104,10 +107,11 @@ Understanding the include hierarchy is critical for framework development:
 
 ```
 spksrc.common.mk
-└── spksrc.common/
-    ├── archs.mk      # Architecture classification
-    ├── logs.mk       # Logging helpers
-    └── macros.mk     # GNU Make utility macros
+├── spksrc.common/macros.mk   # GNU Make utility macros (loaded first)
+├── spksrc.directories.mk     # Work/staging/distrib directory layout
+├── spksrc.common/stage0.mk   # Parse-time toolchain pre-bootstrap (TC_GCC)
+├── spksrc.common/archs.mk    # Architecture classification / groups
+└── spksrc.common/logs.mk     # Logging helpers
 
 spksrc.cross-cc.mk (cross/ packages)
 ├── spksrc.directories.mk
@@ -117,24 +121,37 @@ spksrc.cross-cc.mk (cross/ packages)
 │   └── tc_vars*.mk (generated)
 ├── spksrc.download.mk
 ├── spksrc.depend.mk
+├── spksrc.status.mk
 ├── spksrc.checksum.mk
 ├── spksrc.extract.mk
 ├── spksrc.patch.mk
 ├── spksrc.configure.mk
 ├── spksrc.compile.mk
 ├── spksrc.install.mk
-└── spksrc.plist.mk
+├── spksrc.plist.mk
+└── spksrc.supported.mk
 
 spksrc.spk.mk (spk/ packages)
-├── spksrc.common.mk
 ├── spksrc.directories.mk
+├── spksrc.common.mk
 ├── spksrc.pre-check.mk
 ├── spksrc.cross-env.mk
 ├── spksrc.depend.mk
 ├── spksrc.wheel.mk
 ├── spksrc.copy.mk
 ├── spksrc.strip.mk
-└── spksrc.service.mk
+├── spksrc.service.mk
+├── spksrc.icon.mk
+├── spksrc.supported.mk
+└── spksrc.publish.mk
+
+spksrc.spk-meta.mk (meta-consumer spk/ packages: FFMPEG/PYTHON/VIDEODRV_PACKAGE)
+├── spksrc.common.mk
+├── spksrc.spk/base.mk        # SPK_BASE_TEMPLATE + meta.mk (tc_vars.meta.mk)
+├── spksrc.spk/python.mk      # included when PYTHON_PACKAGE is set
+├── spksrc.spk/ffmpeg.mk      # included when FFMPEG_PACKAGE is set
+├── spksrc.spk/videodriver.mk # included when VIDEODRV_PACKAGE is set
+└── spksrc.spk.mk
 ```
 
 ## Key Implementation Details
