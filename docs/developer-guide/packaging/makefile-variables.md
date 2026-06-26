@@ -198,6 +198,8 @@ spksrc provides groups such as `x64_ARCHS`, `ARMv7_ARCHS`, `ARMv8_ARCHS`, `ARM_A
 Use them in `ifeq` to enable code per architecture. The groups are available **after** including a spksrc entry point (or `spksrc.common.mk`):
 
 ```makefile
+include ../../mk/spksrc.common.mk
+
 # Only build a feature on 64-bit targets
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-feature
@@ -217,6 +219,8 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
 The `version_*` [macros](../../reference/macros.md#version-comparison) gate code on a toolchain (or any version) — they return `1` when true:
 
 ```makefile
+include ../../mk/spksrc.common.mk
+
 # Newer toolchains only
 ifeq ($(call version_ge,$(TC_GCC),12),1)
 DEPENDS += cross/libplacebo
@@ -237,8 +241,6 @@ endif
 | `INSTALL_DIR` | Installation destination |
 | `STAGING_INSTALL_PREFIX` | Path prefix for installed files |
 | `INSTALL_PREFIX` | Runtime prefix on NAS |
-
-The read-only toolchain paths (`TC_PATH`, `TC_INCLUDE`, `TC_LIBRARY`, `TC_PREFIX`, ...) are advanced and documented in [Makefile Reference: Toolchain Variables](../../reference/makefile-reference.md#toolchain-variables-read-only).
 
 ## SPK-Specific Variables
 
