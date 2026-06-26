@@ -148,11 +148,12 @@ spksrc.spk.mk (spk/ packages — the standard SPK entry point)
 
 spksrc.spk-meta.mk (meta-consumer spk/ packages: FFMPEG/PYTHON/VIDEODRV_PACKAGE)
 │   # a thin wrapper that sets up the meta(s), then includes spksrc.spk.mk above
-├── spksrc.common.mk
-├── spksrc.spk/base.mk          # SPK_BASE_TEMPLATE + meta.mk (tc_vars.meta.mk)
-├── spksrc.spk/python.mk        # included when PYTHON_PACKAGE is set
-├── spksrc.spk/ffmpeg.mk        # included when FFMPEG_PACKAGE is set
-└── spksrc.spk/videodriver.mk   # included when VIDEODRV_PACKAGE is set
+└── spksrc.spk/
+    ├── base.mk                 # SPK_BASE_TEMPLATE
+    ├── videodriver.mk          # included when VIDEODRV_PACKAGE is set
+    ├── python.mk               # included when PYTHON_PACKAGE is set
+    ├── ffmpeg.mk               # included when FFMPEG_PACKAGE is set
+    └── meta.mk                 # generates tc_vars.meta.mk (pulled in by base.mk)
 
 spksrc.toolchain.mk (toolchain/ entry point)
 └── spksrc.toolchain/
