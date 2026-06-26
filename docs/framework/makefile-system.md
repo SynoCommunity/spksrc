@@ -11,9 +11,19 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.common.mk` | Base settings, utilities, parallel build config |
-| `spksrc.directories.mk` | Work directory paths |
-| `spksrc.pre-check.mk` | Pre-build validation |
-| `spksrc.status.mk` | Build status tracking |
+| `spksrc.common/directories.mk` | Work directory paths |
+
+### Rules
+
+| File | Purpose |
+|------|--------|
+| `spksrc.rules/depend.mk` | Dependency resolution and build |
+| `spksrc.rules/dependency-tree.mk` | Dependency graph |
+| `spksrc.rules/generate-digests.mk` | Digests generation |
+| `spksrc.rules/pre-check.mk` | Pre-build validation |
+| `spksrc.rules/status.mk` | Build status tracking |
+| `spksrc.rules/supported.mk` | Arch/version support (`build-arch-*` targets) |
+| `spksrc.rules/tests.mk` | Test harness rules |
 
 ### Build Pipeline
 
@@ -111,6 +121,7 @@ The framework is organized as **entry-point `.mk` files at the `mk/` root** plus
 spksrc.common.mk
 spksrc.common/
 ├── archs.mk                  # architecture classification / groups
+├── directories.mk            # work/staging/distrib directory layout
 ├── logs.mk                   # logging helpers
 ├── macros.mk                 # GNU Make helper macros
 └── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
@@ -126,6 +137,16 @@ spksrc.build/
 ├── install.mk                # install to staging
 ├── plist.mk                  # package list generation
 └── ninja.mk                  # ninja helper (cmake/meson)
+
+# Rules — shared targets / orchestration, included by the entry points
+spksrc.rules/
+├── depend.mk                 # dependency resolution/build
+├── dependency-tree.mk        # dependency graph
+├── generate-digests.mk       # digests generation
+├── pre-check.mk              # pre-build validation
+├── status.mk                 # build status tracking
+├── supported.mk              # arch/version support (build-arch-* targets)
+└── tests.mk                  # test harness rules
 
 # Cross-compilation entry points (a cross/ package includes one)
 spksrc.cross-cc.mk            # autotools / plain C/C++
