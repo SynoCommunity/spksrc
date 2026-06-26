@@ -290,17 +290,11 @@ For custom URL paths or descriptions, create `src/app/config`:
 }
 ```
 
-Install it in the Makefile:
+Point `DSM_UI_CONFIG` at that file — the framework installs it as the package's `app/config`, overriding the auto-generated one:
 
 ```makefile
 DSM_UI_DIR = app
+DSM_UI_CONFIG = src/app/config
 ADMIN_PORT = 8080
 ADMIN_URL = /admin
-
-POST_STRIP_TARGET = mypackage_extra_install
-
-.PHONY: mypackage_extra_install
-mypackage_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
 ```
