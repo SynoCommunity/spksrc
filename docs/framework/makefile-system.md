@@ -19,14 +19,14 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 | File | Purpose |
 |------|--------|
-| `spksrc.download.mk` | Source download from URLs/Git |
-| `spksrc.checksum.mk` | Archive integrity verification |
-| `spksrc.extract.mk` | Archive extraction |
-| `spksrc.patch.mk` | Patch application |
-| `spksrc.configure.mk` | Configure stage orchestration |
-| `spksrc.compile.mk` | Compilation orchestration |
-| `spksrc.install.mk` | Installation to staging |
-| `spksrc.plist.mk` | Package list generation |
+| `spksrc.build/download.mk` | Source download from URLs/Git |
+| `spksrc.build/checksum.mk` | Archive integrity verification |
+| `spksrc.build/extract.mk` | Archive extraction |
+| `spksrc.build/patch.mk` | Patch application |
+| `spksrc.build/configure.mk` | Configure stage orchestration |
+| `spksrc.build/compile.mk` | Compilation orchestration |
+| `spksrc.build/install.mk` | Installation to staging |
+| `spksrc.build/plist.mk` | Package list generation |
 
 ### Cross-Compilation
 
@@ -107,13 +107,25 @@ The framework is organized as **entry-point `.mk` files at the `mk/` root** plus
 
 ```
 # Foundation — auto-loaded by every entry point (see Macros); entry points
-# also pull in the shared Core and Build Pipeline files listed above.
+# also pull in the shared Core files and the build pipeline below.
 spksrc.common.mk
 spksrc.common/
 ├── archs.mk                  # architecture classification / groups
 ├── logs.mk                   # logging helpers
 ├── macros.mk                 # GNU Make helper macros
 └── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
+
+# Build pipeline — the per-package steps, included by the cross/spk/kernel entry points
+spksrc.build/
+├── download.mk               # source download
+├── checksum.mk               # archive verification
+├── extract.mk                # archive extraction
+├── patch.mk                  # patch application
+├── configure.mk              # configure
+├── compile.mk                # compile
+├── install.mk                # install to staging
+├── plist.mk                  # package list generation
+└── ninja.mk                  # ninja helper (cmake/meson)
 
 # Cross-compilation entry points (a cross/ package includes one)
 spksrc.cross-cc.mk            # autotools / plain C/C++
@@ -284,7 +296,7 @@ To add support for a new build system:
    - Include the environment file
    - Define configure/compile targets
 
-3. **Update spksrc.configure.mk**:
+3. **Update spksrc.build/configure.mk**:
    - Add detection for the new build system
    - Include the new makefile when detected
 
