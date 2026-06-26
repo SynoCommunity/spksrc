@@ -57,7 +57,7 @@ endif
 # Define where is located the crossenv
 CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME))-$(PKG_VERS) $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME)) $(WORK_DIR)/crossenv-default))
 
-# If using spksrc.spk/python.mk with PYTHON_STAGING_INSTALL_PREFIX defined
+# If using spksrc.spk-meta/python.mk with PYTHON_STAGING_INSTALL_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
 # wheels can find openssl and other libraries
 
@@ -133,10 +133,10 @@ install_meson_python_wheel:
 include ../../mk/spksrc.crossenv.mk
 
 ## python wheel specific configurations
-include ../../mk/spksrc.wheel-env.mk
+include ../../mk/spksrc.wheel/env.mk
 
 ## install wheel specific routines
-include ../../mk/spksrc.wheel-install.mk
+include ../../mk/spksrc.wheel/install.mk
 
 ###
 

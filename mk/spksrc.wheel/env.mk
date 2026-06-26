@@ -3,7 +3,7 @@
 #
 
 ### python wheel requirement processing
-include ../../mk/spksrc.python-requirement.mk
+include ../../mk/spksrc.wheel/requirement.mk
 
 ##### rust specific configurations
 include ../../mk/spksrc.cross-rust-env.mk

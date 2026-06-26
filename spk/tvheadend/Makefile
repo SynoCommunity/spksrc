@@ -50,7 +50,7 @@ WHEELS += src/requirements-pure.txt
 
 # Media/other libraries from the ffmpeg meta (and videodriver for fontconfig /
 # libpcre2) are resolved via the ordered PKG_CONFIG_LIBDIR - no MEDIA_LIBS list
-# to symlink anymore (FFMPEG_meta is a no-op since spksrc.spk/ffmpeg.mk).
+# to symlink anymore (FFMPEG_meta is a no-op since spksrc.spk-meta/ffmpeg.mk).
 
 include ../../mk/spksrc.common.mk
 

@@ -33,7 +33,7 @@ PYTHON_LIB_CROSS            = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/bui
 
 # wheel crossenv definitions: 
 # *** Not to be confused with dynamically-created crossenv for building wheels ***
-#   Use PYTHON_PACKAGE_DIR from spksrc.spk/python.mk
+#   Use PYTHON_PACKAGE_DIR from spksrc.spk-meta/python.mk
 #   OR use local to current package build crossenv definition directory
 CROSSENV_CONFIG_PATH = $(realpath $(or $(PYTHON_PACKAGE_DIR),$(WORK_DIR)/..)/crossenv)
 CROSSENV_CONFIG_DEFAULT = $(CROSSENV_CONFIG_PATH)/requirements-default.txt

@@ -22,7 +22,7 @@ WHEEL_GOAL := $(if $(filter download-wheels,$(MAKECMDGOALS)),download-wheels,whe
 WHEEL_COOKIE = $(WORK_DIR)/.wheel_done
 
 ## python wheel specific configurations
-include ../../mk/spksrc.wheel-env.mk
+include ../../mk/spksrc.wheel/env.mk
 
 ## python wheel specific configurations
 include ../../mk/spksrc.crossenv.mk
@@ -33,13 +33,13 @@ include ../../mk/spksrc.cross-cmake-env.mk
 ## meson specific configurations
 #include ../../mk/spksrc.cross-meson-env.mk
 
-include ../../mk/spksrc.wheel-download.mk
+include ../../mk/spksrc.wheel/download.mk
 
 wheel_compile: wheel_download
-include ../../mk/spksrc.wheel-compile.mk
+include ../../mk/spksrc.wheel/compile.mk
 
 wheel_install: wheel_compile
-include ../../mk/spksrc.wheel-install.mk
+include ../../mk/spksrc.wheel/install.mk
 
 ##
 

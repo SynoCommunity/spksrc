@@ -211,9 +211,9 @@ ifneq ($(strip $(SERVICE_OPTIONS)),)
 endif
 ifeq ($(strip $(USE_ALTERNATE_TMPDIR)),1)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-	@cat $(SPKSRC_MK)spksrc.service.use_alternate_tmpdir.dsm7 >> $@
+	@cat $(SPKSRC_MK)spksrc.service/use_alternate_tmpdir.dsm7 >> $@
 else
-	@cat $(SPKSRC_MK)spksrc.service.use_alternate_tmpdir >> $@
+	@cat $(SPKSRC_MK)spksrc.service/use_alternate_tmpdir >> $@
 endif
 endif
 ifneq ($(strip $(SERVICE_SETUP)),)
@@ -229,8 +229,8 @@ endif
 # - data share worker (DSM 7, optional for DSM 6)
 # - usr local links (DSM >= 6.0-5941)
 # - certificate config (DSM < 7, restricted to only Synology's packages since DSM 7)
-# for DSM<6.0 link creation is provided by spksrc.service.create_links
-# and other facilities are defined in the generic installer (spksrc.service.installer.dsm5)
+# for DSM<6.0 link creation is provided by spksrc.service/create_links
+# and other facilities are defined in the generic installer (spksrc.service/installer.dsm5)
 ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
 $(DSM_CONF_DIR)/resource:
 	$(create_target_dir)
@@ -295,7 +295,7 @@ ifneq ($(strip $(SPK_COMMANDS) $(SPK_USR_LOCAL_LINKS)),)
 	@echo "# List of commands to create links for" >> $@
 	@echo "SPK_COMMANDS=\"${SPK_COMMANDS}\"" >> $@
 	@echo "SPK_USR_LOCAL_LINKS=\"${SPK_USR_LOCAL_LINKS}\"" >> $@
-	@cat $(SPKSRC_MK)spksrc.service.create_links >> $@
+	@cat $(SPKSRC_MK)spksrc.service/create_links >> $@
 endif
 endif
 
@@ -307,18 +307,18 @@ SERVICE_FILES += $(DSM_SCRIPTS_DIR)/service-setup
 # Control use of generic installer
 ifeq ($(strip $(INSTALLER_SCRIPT)),)
 DSM_SCRIPT_FILES += functions
-$(DSM_SCRIPTS_DIR)/functions: $(SPKSRC_MK)spksrc.service.installer.functions
+$(DSM_SCRIPTS_DIR)/functions: $(SPKSRC_MK)spksrc.service/installer.functions
 	@$(dsm_script_copy)
 
 DSM_SCRIPT_FILES += installer
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm7
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service/installer.dsm7
 	@$(dsm_script_copy)
 else ifeq ($(call version_ge, ${TCVERSION}, 6.0),1)
-$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm6
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service/installer.dsm6
 	@$(dsm_script_copy)
 else
-$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service.installer.dsm5
+$(DSM_SCRIPTS_DIR)/installer: $(SPKSRC_MK)spksrc.service/installer.dsm5
 	@$(dsm_script_copy)
 endif
 endif
@@ -328,10 +328,10 @@ endif
 ifeq ($(strip $(SSS_SCRIPT)),)
 DSM_SCRIPT_FILES += start-stop-status
 ifeq ($(STARTABLE),no)
-$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.non-startable
+$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service/non-startable
 	@$(dsm_script_copy)
 else
-$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service.start-stop-status
+$(DSM_SCRIPTS_DIR)/start-stop-status: $(SPKSRC_MK)spksrc.service/start-stop-status
 	@$(dsm_script_copy)
 endif
 endif
@@ -368,9 +368,9 @@ endif
 
 # DSM <= 6 and SERVICE_USER defined
 else ifneq ($(strip $(SERVICE_USER)),)
-$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service.privilege-installasroot
+$(DSM_CONF_DIR)/privilege: $(SPKSRC_MK)spksrc.service/privilege-installasroot
 	@$(dsm_resource_copy)
-	@$(MSG) "(privilege) spksrc.service.privilege-installasroot"
+	@$(MSG) "(privilege) spksrc.service/privilege-installasroot"
 ifneq ($(strip $(SYSTEM_GROUP)),)
 # options: http, system
 	@jq '."join-groupname" = "$(SYSTEM_GROUP)"' $@ | sponge $@

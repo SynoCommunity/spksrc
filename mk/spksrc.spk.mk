@@ -116,10 +116,10 @@ copy: depend
 include ../../mk/spksrc.wheel.mk
 
 copy: wheel
-include ../../mk/spksrc.copy.mk
+include ../../mk/spksrc.spk/copy.mk
 
 strip: copy
-include ../../mk/spksrc.strip.mk
+include ../../mk/spksrc.spk/strip.mk
 
 
 # Scripts
@@ -159,7 +159,7 @@ include ../../mk/spksrc.service.mk
 
 icon: strip
 ifneq ($(strip $(SPK_ICON)),)
-include ../../mk/spksrc.icon.mk
+include ../../mk/spksrc.spk/icon.mk
 endif
 
 ifeq ($(strip $(MAINTAINER)),)
@@ -632,6 +632,6 @@ pythoncleanall: pythonclean
 include ../../mk/spksrc.supported.mk
 
 ### For managing make publish-all-<supported|latest>
-include ../../mk/spksrc.publish.mk
+include ../../mk/spksrc.spk/publish.mk
 
 ###

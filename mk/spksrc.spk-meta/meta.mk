@@ -2,7 +2,7 @@ ifndef SPKSRC_SPK_META_MK
 SPKSRC_SPK_META_MK := 1
 
 # Inspectable diagnostic artifact (tc_vars.meta.mk, never -included) of the meta
-# env accumulated by SPK_BASE_TEMPLATE. Under spksrc.spk/ (not toolchain/) as it
+# env accumulated by SPK_BASE_TEMPLATE. Under spksrc.spk-meta/ (not toolchain/) as it
 # depends on the per-consumer meta graph, known only at spk-stage2. Cached
 # file-target named like tc_vars.* (cleaned by spkclean); meta_env is an alias.
 TC_VARS_META_MK = $(WORK_DIR)/tc_vars.meta.mk
