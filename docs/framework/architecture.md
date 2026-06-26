@@ -177,11 +177,11 @@ meta to use is selected by a single variable:
 FFMPEG_PACKAGE   = ffmpeg7              # e.g. spk/tvheadend
 PYTHON_PACKAGE   = python312            # any wheel consumer
 VIDEODRV_PACKAGE = synocli-videodriver
+
+include ../../mk/spksrc.spk-meta.mk
 ```
 
-Including the matching `mk/spksrc.spk/{ffmpeg,python,videodriver}.mk` builds the
-meta source in stage 1 and, during SPK assembly (stage 2), wires its staging
-area into the consumer's build through `SPK_BASE_TEMPLATE`:
+A consumer includes `mk/spksrc.spk-meta.mk` (not the per-meta files directly); based on which `*_PACKAGE` variables are set, `spk-meta.mk` pulls in the matching `spksrc.spk/{python,ffmpeg,videodriver}.mk` (then `spksrc.spk.mk`). That builds the meta source in stage 1 and, during SPK assembly (stage 2), wires its staging area into the consumer's build through `SPK_BASE_TEMPLATE`:
 
 - **`PKG_CONFIG_LIBDIR` (ordered)** — the consumer's own staging first, then each
   meta's `lib/pkgconfig` (`META_PKG_CONFIG_LIBDIR`). pkg-config takes the first

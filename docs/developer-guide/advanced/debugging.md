@@ -46,9 +46,11 @@ make download-wheels
 # Create / refresh the crossenv used to cross-compile wheels
 make crossenv-x64-7.2
 
-# Clean wheels / crossenv
-make wheelclean
-make wheelcleanall
+# Cleanup (increasing scope)
+make wheelclean         # built wheels + wheel status cookies
+make crossenvclean      # the above + the crossenv dirs and their cookies
+make wheelcleancache    # the local pip cache (work-*/pip)
+make crossenvcleanall   # everything: wheels, crossenv, and all caches
 ```
 
 ## Runtime Debugging

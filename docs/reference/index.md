@@ -30,6 +30,6 @@ This section provides reference documentation for spksrc development.
 | Meson | `spksrc.cross-meson.mk` |
 | Go | `spksrc.cross-go.mk` |
 | Rust | `spksrc.cross-rust.mk` |
-| Python (wheel module) | `spksrc.python-module.mk` |
+| Python wheel (exception, under `python/`) | `spksrc.python-wheel.mk` / `spksrc.python-wheel-meson.mk` |
 
 For external Synology documentation and resources, see [DSM APIs](dsm-apis.md).

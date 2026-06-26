@@ -68,8 +68,9 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 | File | Purpose |
 |------|--------|
-| `spksrc.python-module.mk` | Python wheel module main include |
-| `spksrc.wheel.mk` | Wheel package orchestration |
+| `spksrc.python-wheel.mk` | Main include for an exception wheel under `python/` (pip/crossenv) |
+| `spksrc.python-wheel-meson.mk` | Same, for meson-built wheels |
+| `spksrc.wheel.mk` | Wheel package orchestration (via `spksrc.spk.mk`) |
 | `spksrc.wheel-download.mk` | Wheel downloading |
 | `spksrc.wheel-compile.mk` | Wheel compilation |
 | `spksrc.wheel-install.mk` | Wheel installation |

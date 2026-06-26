@@ -64,10 +64,11 @@ include ../../mk/spksrc.python-module.mk
 # Standard SPK
 include ../../mk/spksrc.spk.mk
 
-# Python-based SPK: same include, with WHEELS set to activate
-# wheel cross-compilation
+# Meta / Python-based SPK: set the *_PACKAGE (and WHEELS) and include
+# spksrc.spk-meta.mk, which pulls in the matching meta + wheel routines
+PYTHON_PACKAGE = python312
 WHEELS = src/requirements-crossenv.txt
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.spk-meta.mk
 ```
 
 ## Customization Hooks

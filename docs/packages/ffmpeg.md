@@ -243,11 +243,11 @@ Many media packages depend on FFmpeg:
 
 ## Using FFmpeg in a package
 
-A package selects which FFmpeg version to build against with `FFMPEG_PACKAGE` and includes the ffmpeg meta makefile, which provides FFmpeg's libraries through the shared staging (see [Build Architecture](../framework/architecture.md#meta-package-dependencies)):
+A package selects which FFmpeg version to build against with `FFMPEG_PACKAGE` and includes `spksrc.spk-meta.mk`, which provides FFmpeg's libraries through the shared staging (see [Build Architecture](../framework/architecture.md#meta-package-dependencies)):
 
 ```makefile
 FFMPEG_PACKAGE = ffmpeg7
-include ../../mk/spksrc.spk/ffmpeg.mk
+include ../../mk/spksrc.spk-meta.mk
 ```
 
 The FFmpeg build itself is defined in `cross/ffmpeg<major>` (e.g. `cross/ffmpeg7`). Codecs and features are enabled there through standard FFmpeg `CONFIGURE_ARGS`, and the codec libraries are pulled in as dependencies, for example:
