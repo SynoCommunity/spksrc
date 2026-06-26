@@ -13,7 +13,6 @@
 #
 
 # Setup common directories
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk

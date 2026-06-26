@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.generate-digests.mk
+# spksrc.rules/generate-digests.mk
 #
 # Generate digests file for downloaded distribution files.
 #

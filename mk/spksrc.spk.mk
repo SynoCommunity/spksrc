@@ -53,8 +53,6 @@ endif
 endif
 endif
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -104,13 +102,13 @@ DEFAULT_ENV = none
 
 #####
 
-include ../../mk/spksrc.pre-check.mk
+include ../../mk/spksrc.rules/pre-check.mk
 
 # Even though this makefile doesn't cross compile,
 # we need this to setup the cross environment.
 include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/depend.mk
 
 copy: depend
 include ../../mk/spksrc.wheel.mk
@@ -507,7 +505,7 @@ TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
 TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
 .PHONY: spk-stage1
-# spk-meta-source (the meta SOURCE build loop) lives in spksrc.depend.mk
+# spk-meta-source (the meta SOURCE build loop) lives in spksrc.rules/depend.mk
 spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE) spk-meta-source
 
 ifneq ($(strip $(TC)),)
@@ -629,7 +627,7 @@ pythoncleanall: pythonclean
 	rm -fr work-*/[Pp]ython* work-*/.python*
 
 ### For managing make all-<supported|latest>
-include ../../mk/spksrc.supported.mk
+include ../../mk/spksrc.rules/supported.mk
 
 ### For managing make publish-all-<supported|latest>
 include ../../mk/spksrc.spk/publish.mk

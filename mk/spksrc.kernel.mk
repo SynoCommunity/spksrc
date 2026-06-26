@@ -145,7 +145,6 @@ endif
 #####
 
 # Common directories
-include ../../mk/spksrc.directories.mk
 
 ### Include common definitions
 include ../../mk/spksrc.common.mk
@@ -183,7 +182,7 @@ TC ?= syno$(KERNEL_ARCH_SUFFIX)
 
 include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.status.mk
+include ../../mk/spksrc.rules/status.mk
 
 include ../../mk/spksrc.build/download.mk
 
@@ -255,4 +254,4 @@ kernel_post_extract_target:
 ####
 
 ### For make digests
-include ../../mk/spksrc.generate-digests.mk
+include ../../mk/spksrc.rules/generate-digests.mk

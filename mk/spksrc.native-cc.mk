@@ -16,7 +16,6 @@ DIST_EXT      = $(PKG_EXT)
 ARCH_SUFFIX  := -native
 
 # Setup common directories
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -31,9 +30,9 @@ include ../../mk/spksrc.native/env-default.mk
 
 include ../../mk/spksrc.build/download.mk
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/depend.mk
 
-include ../../mk/spksrc.status.mk
+include ../../mk/spksrc.rules/status.mk
 
 checksum: download
 include ../../mk/spksrc.build/checksum.mk

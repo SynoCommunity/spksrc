@@ -98,23 +98,21 @@ endif
 
 .DEFAULT_GOAL := all
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
 #####
 
-include ../../mk/spksrc.pre-check.mk
+include ../../mk/spksrc.rules/pre-check.mk
 
 include ../../mk/spksrc.cross/env-default.mk
 
 include ../../mk/spksrc.build/download.mk
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/depend.mk
 
-include ../../mk/spksrc.status.mk
+include ../../mk/spksrc.rules/status.mk
 
 checksum: download
 include ../../mk/spksrc.build/checksum.mk
@@ -187,6 +185,6 @@ all:
 ####
 
 ### For arch-* and all-<supported|latest>
-include ../../mk/spksrc.supported.mk
+include ../../mk/spksrc.rules/supported.mk
 
 ####
