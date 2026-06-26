@@ -130,7 +130,7 @@ endian = 'little'
 Rust cross-compilation settings:
 
 ```makefile
-CARGO_TARGET = x86_64-unknown-linux-gnu
+RUST_TARGET = x86_64-unknown-linux-gnu
 RUSTFLAGS = -C linker=$(TC_CC)
 ```
 

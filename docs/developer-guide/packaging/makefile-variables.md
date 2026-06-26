@@ -91,21 +91,30 @@ SPK_CONFLICT = "transmission"
 
 These variables apply to `cross/` package Makefiles.
 
-### Configure Options
+### Build System Selection
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `GNU_CONFIGURE` | 0 | Set to 1 for autoconf packages |
-| `CMAKE_USE` | 0 | Set to 1 for CMake packages |
-| `MESON_USE` | 0 | Set to 1 for Meson packages |
-| `CONFIGURE_ARGS` | | Arguments passed to configure |
-| `CMAKE_ARGS` | | Arguments passed to CMake |
-| `MESON_ARGS` | | Arguments passed to Meson |
+A cross package's build system is chosen by which `mk/spksrc.cross-*.mk` it includes; the arguments are then passed through the matching variable:
+
+| Build system | Include | Arguments variable |
+|--------------|---------|--------------------|
+| autotools | `spksrc.cross-cc.mk` + `GNU_CONFIGURE = 1` | `CONFIGURE_ARGS` |
+| CMake | `spksrc.cross-cmake.mk` | `CMAKE_ARGS` |
+| Meson | `spksrc.cross-meson.mk` | `CONFIGURE_ARGS` (passed to `meson setup`) |
 
 ```makefile
+# autotools
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-shared --disable-static
 CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX)
+
+include ../../mk/spksrc.cross-cc.mk
+```
+
+```makefile
+# Meson (CONFIGURE_ARGS is forwarded to `meson setup`)
+CONFIGURE_ARGS = -Dtests=disabled
+
+include ../../mk/spksrc.cross-meson.mk
 ```
 
 ### Compiler Flags
@@ -124,14 +133,16 @@ ADDITIONAL_LDFLAGS = -Wl,-rpath,/var/packages/mypackage/target/lib
 
 ### Make Options
 
+These apply to the **autotools / plain GNU make** build path only (`spksrc.compile.mk` / `spksrc.install.mk`). CMake builds with `cmake --build` and Meson with `ninja`, so neither reads these.
+
 | Variable | Description |
 |----------|-------------|
-| `MAKE_ARGS` | Arguments passed to make compile |
-| `INSTALL_ARGS` | Arguments passed to make install |
+| `COMPILE_MAKE_OPTIONS` | Extra arguments passed to `make` at compile |
+| `INSTALL_MAKE_OPTIONS` | Extra arguments passed to `make` at install |
 | `INSTALL_TARGET` | Make target for installation (default: install) |
 
 ```makefile
-MAKE_ARGS = DESTDIR=$(INSTALL_DIR)
+COMPILE_MAKE_OPTIONS = V=1
 INSTALL_TARGET = install-strip
 ```
 
@@ -210,9 +221,7 @@ REQUIRED_MIN_DSM = 7.0
 
 | Variable | Description |
 |----------|-------------|
-| `RELOAD_UI` | Set to `yes` to reload DSM UI after install |
 | `BETA` | Set to `1` to mark as beta release |
-| `SPK_ICON_256` | Path to 256x256 icon (optional) |
 | `ADMIN_PORT` | Port for admin interface |
 | `ADMIN_PROTOCOL` | Protocol (http/https) for admin interface |
 | `ADMIN_URL` | Custom admin URL path |
