@@ -158,6 +158,7 @@ nav:
     - Architectures: reference/architectures.md
     - Model ↔ Architecture: reference/model-architecture.md
     - Ports: reference/ports.md
+    - Macros: reference/macros.md
     - Makefile Reference: reference/makefile-reference.md
     - Permissions: reference/permissions.md
     - DSM APIs: reference/dsm-apis.md

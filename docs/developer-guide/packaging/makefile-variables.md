@@ -193,16 +193,40 @@ REQUIRED_MIN_DSM = 7.0
 
 ### Architecture Groups
 
-| Group | Contains |
-|-------|----------|
-| `x64_ARCHS` | Intel 64-bit |
-| `ARMv7_ARCHS` | ARM 32-bit |
-| `ARMv7L_ARCHS` | ARM 32-bit low-end |
-| `ARMv8_ARCHS` | ARM 64-bit |
-| `ARM_ARCHS` | All ARM architectures |
-| `PPC_ARCHS` | PowerPC |
-| `32bit_ARCHS` | All 32-bit |
-| `64bit_ARCHS` | All 64-bit |
+spksrc provides groups such as `x64_ARCHS`, `ARMv7_ARCHS`, `ARMv8_ARCHS`, `ARM_ARCHS`, `PPC_ARCHS`, `32bit_ARCHS` and `64bit_ARCHS`. The complete, authoritative list (with the platform codenames each contains) is in [Reference: Architectures](../../reference/architectures.md#architecture-groups).
+
+Use them in `ifeq` to enable code per architecture. The groups are available **after** including a spksrc entry point (or `spksrc.common.mk`):
+
+```makefile
+# Only build a feature on 64-bit targets
+ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --enable-feature
+endif
+
+# x64-only dependency
+ifneq ($(findstring $(ARCH),$(x64_ARCHS)),)
+DEPENDS += cross/intel-media-driver
+endif
+
+# Exclude a whole family from the build
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+```
+
+### Version Conditions
+
+The `version_*` [macros](../../reference/macros.md#version-comparison) gate code on a toolchain (or any version) — they return `1` when true:
+
+```makefile
+# Newer toolchains only
+ifeq ($(call version_ge,$(TC_GCC),12),1)
+DEPENDS += cross/libplacebo
+endif
+
+# Workaround for old compilers
+ifeq ($(call version_lt,$(TC_GCC),5.0),1)
+ADDITIONAL_CFLAGS += -std=gnu99
+endif
+```
 
 ## Path Variables (Available During Build)
 
