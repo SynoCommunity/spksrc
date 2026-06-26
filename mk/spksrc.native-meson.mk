@@ -38,7 +38,7 @@ include ../../mk/spksrc.native/env-default.mk
 include ../../mk/spksrc.native/env-meson.mk
 
 # call-up ninja build process
-include ../../mk/spksrc.ninja.mk
+include ../../mk/spksrc.build/ninja.mk
 
 #####
 

@@ -29,29 +29,29 @@ include ../../mk/spksrc.common.mk
 
 include ../../mk/spksrc.native/env-default.mk
 
-include ../../mk/spksrc.download.mk
+include ../../mk/spksrc.build/download.mk
 
 include ../../mk/spksrc.depend.mk
 
 include ../../mk/spksrc.status.mk
 
 checksum: download
-include ../../mk/spksrc.checksum.mk
+include ../../mk/spksrc.build/checksum.mk
 
 extract: checksum depend status
-include ../../mk/spksrc.extract.mk
+include ../../mk/spksrc.build/extract.mk
 
 patch: extract
-include ../../mk/spksrc.patch.mk
+include ../../mk/spksrc.build/patch.mk
 
 configure: patch
-include ../../mk/spksrc.configure.mk
+include ../../mk/spksrc.build/configure.mk
 
 compile: configure
-include ../../mk/spksrc.compile.mk
+include ../../mk/spksrc.build/compile.mk
 
 install: compile
-include ../../mk/spksrc.install.mk
+include ../../mk/spksrc.build/install.mk
 
 ###
 

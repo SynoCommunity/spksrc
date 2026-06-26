@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.checksum.mk
+# spksrc.build/checksum.mk
 #
 # Verify checksums of downloaded distribution files.
 #

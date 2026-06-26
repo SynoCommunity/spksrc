@@ -45,7 +45,7 @@ CONFIGURE_TARGET = meson_configure_target
 endif
 
 # call-up ninja build process
-include ../../mk/spksrc.ninja.mk
+include ../../mk/spksrc.build/ninja.mk
 
 ###
 

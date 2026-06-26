@@ -128,19 +128,19 @@ include ../../mk/spksrc.toolkit/tk-versions.mk
 include ../../mk/spksrc.status.mk
 
 download:
-include ../../mk/spksrc.download.mk
+include ../../mk/spksrc.build/download.mk
 
 checksum: download
-include ../../mk/spksrc.checksum.mk
+include ../../mk/spksrc.build/checksum.mk
 
 extract: checksum
-include ../../mk/spksrc.extract.mk
+include ../../mk/spksrc.build/extract.mk
 
 normalize: extract
 include ../../mk/spksrc.toolkit/tk-normalize.mk
 
 patch: normalize
-include ../../mk/spksrc.patch.mk
+include ../../mk/spksrc.build/patch.mk
 
 include ../../mk/spksrc.toolkit/tk_vars.mk
 

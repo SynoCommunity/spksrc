@@ -43,10 +43,10 @@ include ../../mk/spksrc.cross/env-default.mk
 include ../../mk/spksrc.depend.mk
 
 install: depend
-include ../../mk/spksrc.install.mk
+include ../../mk/spksrc.build/install.mk
 
 plist: install
-include ../../mk/spksrc.plist.mk
+include ../../mk/spksrc.build/plist.mk
 
 all: install plist
 

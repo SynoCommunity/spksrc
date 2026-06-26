@@ -28,7 +28,7 @@ TOOLCHAIN_DIR = $(BASE_DISTRIB_DIR)/toolchain
 TOOLKIT_DIR = $(BASE_DISTRIB_DIR)/toolkit
 KERNEL_DIR = $(BASE_DISTRIB_DIR)/kernel
 PACKAGES_DIR = $(CURDIR)/../../packages
-# Default download location, see spksrc.download.mk
+# Default download location, see spksrc.build/download.mk
 ifeq ($(strip $(DISTRIB_DIR)),)
 DISTRIB_DIR = $(BASE_DISTRIB_DIR)
 endif

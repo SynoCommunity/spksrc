@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.download.mk
+# spksrc.build/download.mk
 #
 # Download $(URLS) from the wild internet, and place them in $(DISTRIB_DIR).
 #
