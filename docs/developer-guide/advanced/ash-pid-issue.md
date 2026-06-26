@@ -76,7 +76,7 @@ If DSM 5/SRM support is not required, this issue doesn't apply:
 
 ## Framework Code Reference
 
-The relevant code is in `mk/spksrc.service.start-stop-status`:
+The relevant code is in `mk/spksrc.service/start-stop-status`:
 
 ```bash
 # DSM < 6 code path (problematic with ash)

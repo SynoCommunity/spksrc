@@ -71,10 +71,10 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.python-wheel.mk` | Main include for an exception wheel under `python/` (pip/crossenv) |
 | `spksrc.python-wheel-meson.mk` | Same, for meson-built wheels |
 | `spksrc.wheel.mk` | Wheel package orchestration (via `spksrc.spk.mk`) |
-| `spksrc.wheel-download.mk` | Wheel downloading |
-| `spksrc.wheel-compile.mk` | Wheel compilation |
-| `spksrc.wheel-install.mk` | Wheel installation |
-| `spksrc.wheel-env.mk` | Wheel environment setup |
+| `spksrc.wheel/download.mk` | Wheel downloading |
+| `spksrc.wheel/compile.mk` | Wheel compilation |
+| `spksrc.wheel/install.mk` | Wheel installation |
+| `spksrc.wheel/env.mk` | Wheel environment setup |
 | `spksrc.crossenv.mk` | Cross-compilation virtual environment |
 
 ### SPK Package Creation
@@ -83,11 +83,11 @@ The `mk/` directory contains all makefile includes, organized by function:
 |------|--------|
 | `spksrc.spk.mk` | Main SPK package assembly |
 | `spksrc.spk-meta.mk` | Meta-consumer entry point: sets up the ffmpeg/python/videodriver meta(s), then includes `spksrc.spk.mk` |
-| `spksrc.spk/base.mk` | `SPK_BASE_TEMPLATE` — wires a meta's staging into the consumer |
-| `spksrc.spk/meta.mk` | Generates `tc_vars.meta.mk`, an inspectable diagnostic of the meta env (never `-include`d) |
-| `spksrc.copy.mk` | Dependency copying to staging |
-| `spksrc.strip.mk` | Binary stripping |
-| `spksrc.icon.mk` | Icon processing |
+| `spksrc.spk-meta/base.mk` | `SPK_BASE_TEMPLATE` — wires a meta's staging into the consumer |
+| `spksrc.spk-meta/meta.mk` | Generates `tc_vars.meta.mk`, an inspectable diagnostic of the meta env (never `-include`d) |
+| `spksrc.spk/copy.mk` | Dependency copying to staging |
+| `spksrc.spk/strip.mk` | Binary stripping |
+| `spksrc.spk/icon.mk` | Icon processing |
 | `spksrc.service.mk` | Service configuration generation |
 | `spksrc.install-resources.mk` | Resource file installation |
 
@@ -95,11 +95,11 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 | File | Purpose |
 |------|--------|
-| `spksrc.service.installer.dsm6` | DSM 6 installer template |
-| `spksrc.service.installer.dsm7` | DSM 7 installer template |
-| `spksrc.service.installer.functions` | Common installer functions |
-| `spksrc.service.start-stop-status` | Service control template |
-| `spksrc.service.create_links` | Symlink creation helper |
+| `spksrc.service/installer.dsm6` | DSM 6 installer template |
+| `spksrc.service/installer.dsm7` | DSM 7 installer template |
+| `spksrc.service/installer.functions` | Common installer functions |
+| `spksrc.service/start-stop-status` | Service control template |
+| `spksrc.service/create_links` | Symlink creation helper |
 
 ## Include Hierarchy
 
@@ -139,21 +139,39 @@ spksrc.spk.mk (spk/ packages — the standard SPK entry point)
 ├── spksrc.cross-env.mk
 ├── spksrc.depend.mk
 ├── spksrc.wheel.mk
-├── spksrc.copy.mk
-├── spksrc.strip.mk
+├── spksrc.spk/copy.mk
+├── spksrc.spk/strip.mk
 ├── spksrc.service.mk
-├── spksrc.icon.mk
+├── spksrc.spk/icon.mk
 ├── spksrc.supported.mk
-└── spksrc.publish.mk
+└── spksrc.spk/publish.mk
 
 spksrc.spk-meta.mk (meta-consumer spk/ packages: FFMPEG/PYTHON/VIDEODRV_PACKAGE)
 │   # a thin wrapper that sets up the meta(s), then includes spksrc.spk.mk above
-└── spksrc.spk/
+└── spksrc.spk-meta/
     ├── base.mk                 # SPK_BASE_TEMPLATE
     ├── videodriver.mk          # included when VIDEODRV_PACKAGE is set
     ├── python.mk               # included when PYTHON_PACKAGE is set
     ├── ffmpeg.mk               # included when FFMPEG_PACKAGE is set
     └── meta.mk                 # generates tc_vars.meta.mk (pulled in by base.mk)
+
+spksrc.wheel.mk (wheel orchestration — included by spksrc.spk.mk)
+└── spksrc.wheel/
+    ├── env.mk                  # wheel build environment
+    ├── requirement.mk          # requirement-file processing
+    ├── download.mk             # wheel source download
+    ├── compile.mk              # wheel compilation
+    └── install.mk              # wheel installation
+
+spksrc.service.mk (service config — included by spksrc.spk.mk)
+└── spksrc.service/
+    ├── installer.dsm5/6/7      # per-DSM installer templates
+    ├── installer.functions     # shared installer helpers
+    ├── start-stop-status       # service control template
+    ├── create_links            # symlink creation helper
+    ├── privilege-installasroot # privilege template
+    ├── non-startable           # non-service package template
+    └── use_alternate_tmpdir(.dsm7)
 
 spksrc.toolchain.mk (toolchain/ entry point)
 └── spksrc.toolchain/
