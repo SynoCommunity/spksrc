@@ -86,7 +86,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.wheel/compile.mk` | Wheel compilation |
 | `spksrc.wheel/install.mk` | Wheel installation |
 | `spksrc.wheel/env.mk` | Wheel environment setup |
-| `spksrc.crossenv.mk` | Cross-compilation virtual environment |
+| `spksrc.python-crossenv.mk` | Cross-compilation virtual environment |
 
 ### SPK Package Creation
 

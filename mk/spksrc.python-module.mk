@@ -79,7 +79,7 @@ all: install fix_shebang_python_module
 ###
 
 # Allow generating per-wheel crossenv
-include ../../mk/spksrc.crossenv.mk
+include ../../mk/spksrc.python-crossenv.mk
 
 ## python wheel specific configurations
 include ../../mk/spksrc.wheel/env.mk

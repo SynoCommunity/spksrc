@@ -27,7 +27,7 @@
 #        1- crossenv-install-default          -> install in default crossenv/build|cross
 #        2- crossenv-install-<name>-<version> -> install in wheel specific crossenv-<name>-<version>/build|cross (version is optional)
 #   Once the the WHEEL_* variables are fully populated, calls
-#   crossenv-install-% from spksrc.crossenv.mk which will install
+#   crossenv-install-% from spksrc.python-crossenv.mk which will install
 #   the wheels in the appropriate crossenv sub-target (e.g. build/cross).
 #
 #   When called the MAKECMDGOALS is such as:

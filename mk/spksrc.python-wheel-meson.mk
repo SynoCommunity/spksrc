@@ -129,7 +129,7 @@ install_meson_python_wheel:
 ###
 
 # Use crossenv
-include ../../mk/spksrc.crossenv.mk
+include ../../mk/spksrc.python-crossenv.mk
 
 ## python wheel specific configurations
 include ../../mk/spksrc.wheel/env.mk

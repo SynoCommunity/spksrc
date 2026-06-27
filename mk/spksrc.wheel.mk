@@ -25,7 +25,7 @@ WHEEL_COOKIE = $(WORK_DIR)/.wheel_done
 include ../../mk/spksrc.wheel/env.mk
 
 ## python wheel specific configurations
-include ../../mk/spksrc.crossenv.mk
+include ../../mk/spksrc.python-crossenv.mk
 
 ## meson specific configurations
 include ../../mk/spksrc.cross/env-cmake.mk
