@@ -1,31 +1,17 @@
 {
+    "_comment": "Root privileges required for: (1) binding to privileged port 53/DNS, (2) modifying /etc/cron.d for blocklist updates, (3) modifying /etc/dhcpd for DNS forwarding",
     "defaults": {
         "run-as": "package"
     },
     "username": "sc-dnscrypt-proxy",
-    "ctrl-script": [{
-        "action": "preinst",
-        "run-as": "root"
-    }, {
-        "action": "postinst",
-        "run-as": "root"
-    }, {
-        "action": "preuninst",
-        "run-as": "root"
-    }, {
-        "action": "postuninst",
-        "run-as": "root"
-    }, {
-        "action": "preupgrade",
-        "run-as": "root"
-    }, {
-        "action": "postupgrade",
-        "run-as": "root"
-    }, {
-        "action": "start",
-        "run-as": "root"
-    }, {
-        "action": "stop",
-        "run-as": "root"
-    }]
+    "ctrl-script": [
+        { "action": "preinst", "run-as": "root" },
+        { "action": "postinst", "run-as": "root" },
+        { "action": "preuninst", "run-as": "root" },
+        { "action": "postuninst", "run-as": "root" },
+        { "action": "preupgrade", "run-as": "root" },
+        { "action": "postupgrade", "run-as": "root" },
+        { "action": "start", "run-as": "root" },
+        { "action": "stop", "run-as": "root" }
+    ]
 }

@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/amfenc.c
-===================================================================
 --- libavcodec/amfenc.c
 +++ libavcodec/amfenc.c
 @@ -102,19 +102,6 @@ static int amf_save_hdr_metadata(AVCodec
@@ -192,8 +190,6 @@ Index: FFmpeg/libavcodec/amfenc.c
              }
          }
      } while (block_and_wait);
-Index: FFmpeg/libavcodec/amfenc.h
-===================================================================
 --- libavcodec/amfenc.h
 +++ libavcodec/amfenc.h
 @@ -68,6 +68,7 @@ typedef struct AmfContext {
@@ -221,8 +217,6 @@ Index: FFmpeg/libavcodec/amfenc.h
  
      // HEVC - specific options
  
-Index: FFmpeg/libavcodec/amfenc_av1.c
-===================================================================
 --- libavcodec/amfenc_av1.c
 +++ libavcodec/amfenc_av1.c
 @@ -28,6 +28,22 @@
@@ -425,8 +419,6 @@ Index: FFmpeg/libavcodec/amfenc_av1.c
      .p.wrapper_name   = "amf",
      .hw_configs     = ff_amfenc_hw_configs,
  };
-Index: FFmpeg/libavcodec/amfenc_h264.c
-===================================================================
 --- libavcodec/amfenc_h264.c
 +++ libavcodec/amfenc_h264.c
 @@ -27,6 +27,20 @@
@@ -555,8 +547,6 @@ Index: FFmpeg/libavcodec/amfenc_h264.c
      .color_ranges   = AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG,
      .p.wrapper_name = "amf",
      .hw_configs     = ff_amfenc_hw_configs,
-Index: FFmpeg/libavcodec/amfenc_hevc.c
-===================================================================
 --- libavcodec/amfenc_hevc.c
 +++ libavcodec/amfenc_hevc.c
 @@ -26,6 +26,21 @@

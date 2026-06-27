@@ -1,6 +1,6 @@
 PKG_NAME = Stockfish
 PKG_SHORT_NAME = sf
-PKG_VERS = 11
+PKG_VERS = 16
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_SHORT_NAME)_$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/official-stockfish/$(PKG_NAME)/archive
@@ -14,7 +14,7 @@ LICENSE  = GPLv2/GPLv3
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = stockfish_install
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Toolchains lacking c++11 compiler ar not supported
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
@@ -28,7 +28,7 @@ endif
 include ../../mk/spksrc.cross-cc.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-	BUILD_ARCH=arm64
+	BUILD_ARCH=armv8
 endif
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 	BUILD_ARCH=armv7

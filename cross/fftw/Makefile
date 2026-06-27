@@ -18,7 +18,7 @@ CONFIGURE_ARGS += --disable-doc
 CONFIGURE_ARGS += --disable-fortran
 ADDITIONAL_CFLAGS = -O
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-neon

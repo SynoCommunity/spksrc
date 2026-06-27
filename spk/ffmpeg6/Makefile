@@ -28,11 +28,10 @@ VIDEODRIVER = on
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-SPK_DEPENDS = "synocli-videodriver"
 SERVICE_SETUP = src/service-setup.sh
 endif
 
-include ../../mk/spksrc.videodriver.mk
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:

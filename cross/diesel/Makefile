@@ -1,5 +1,5 @@
 PKG_NAME = diesel
-PKG_VERS = 2.2.12
+PKG_VERS = 2.3.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/diesel-rs/diesel/archive
@@ -37,7 +37,7 @@ include ../../mk/spksrc.cross-rust.mk
 # pass mysql client version (needed by mysqlclient-sys crate)
 # Use same conditional as mariadb-connector-c to select correct version
 ifeq ($(call version_ge, $(TC_GCC), 5),1)
-ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)cross/mariadb-connector-c-latest/Makefile)
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)/cross/mariadb-connector-c-latest/Makefile)
 else
-ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)cross/mariadb-connector-c-3.3.11/Makefile)
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)/cross/mariadb-connector-c-3.3.11/Makefile)
 endif

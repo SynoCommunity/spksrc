@@ -1,6 +1,6 @@
 SPK_NAME = seerr
-SPK_VERS = 2.7.3
-SPK_REV = 1
+SPK_VERS = 3.3.0
+SPK_REV = 7
 SPK_ICON = src/seerr.png
 
 DEPENDS = cross/seerr
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 MAINTAINER = SynoCommunity
 DESCRIPTION = "Media request management for Jellyfin, Plex, and Emby with automation integrations."
 DISPLAY_NAME = Seerr
-CHANGELOG = "Initial Seerr package"
+CHANGELOG = "1. Update to v3.3.0"
 HOMEPAGE = https://github.com/seerr-team/seerr
 LICENSE = MIT
 
@@ -38,5 +38,6 @@ seerr_install:
 	cp -a $(STAGING_INSTALL_PREFIX)/share/seerr $(STAGING_DIR)/share/
 	install -m 755 -d $(STAGING_DIR)/var/config
 	cp -a $(STAGING_DIR)/share/seerr/config/. $(STAGING_DIR)/var/config/ || true
+	install -m 644 src/seerr.env $(STAGING_DIR)/share/
 	rm -rf $(STAGING_DIR)/share/seerr/config
 	ln -sf /var/packages/$(SPK_NAME)/var/config $(STAGING_DIR)/share/seerr/config

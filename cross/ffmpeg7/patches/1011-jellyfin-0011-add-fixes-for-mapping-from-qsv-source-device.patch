@@ -1,5 +1,3 @@
-Index: FFmpeg/libavutil/hwcontext.c
-===================================================================
 --- libavutil/hwcontext.c
 +++ libavutil/hwcontext.c
 @@ -84,21 +84,6 @@ static const char *const hw_type_names[]
@@ -99,8 +97,6 @@ Index: FFmpeg/libavutil/hwcontext.c
                  ret = av_hwdevice_ctx_init(dst_ref);
                  if (ret < 0)
                      goto fail;
-Index: FFmpeg/libavutil/hwcontext.h
-===================================================================
 --- libavutil/hwcontext.h
 +++ libavutil/hwcontext.h
 @@ -38,6 +38,7 @@ enum AVHWDeviceType {
@@ -111,8 +107,6 @@ Index: FFmpeg/libavutil/hwcontext.h
  };
  
  /**
-Index: FFmpeg/libavutil/hwcontext_internal.h
-===================================================================
 --- libavutil/hwcontext_internal.h
 +++ libavutil/hwcontext_internal.h
 @@ -164,4 +164,25 @@ extern const HWContextType ff_hwcontext_
@@ -141,8 +135,6 @@ Index: FFmpeg/libavutil/hwcontext_internal.h
 +} FFHWDeviceContext;
 +
  #endif /* AVUTIL_HWCONTEXT_INTERNAL_H */
-Index: FFmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
 @@ -379,7 +379,7 @@ static void qsv_frames_uninit(AVHWFrames

@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/qsv_internal.h
-===================================================================
 --- libavcodec/qsv_internal.h
 +++ libavcodec/qsv_internal.h
 @@ -100,6 +100,7 @@ typedef struct QSVFrame {
@@ -10,8 +8,6 @@ Index: FFmpeg/libavcodec/qsv_internal.h
  
      struct QSVFrame *next;
  } QSVFrame;
-Index: FFmpeg/libavcodec/qsvenc.c
-===================================================================
 --- libavcodec/qsvenc.c
 +++ libavcodec/qsvenc.c
 @@ -1900,6 +1900,10 @@ static void clear_unused_frames(QSVEncCo
@@ -65,8 +61,6 @@ Index: FFmpeg/libavcodec/qsvenc.c
          }
      } else {
          /* make a copy if the input is not padded as libmfx requires */
-Index: FFmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
 @@ -2142,11 +2142,25 @@ static int qsv_frames_derive_to(AVHWFram

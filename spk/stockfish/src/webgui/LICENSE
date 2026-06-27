@@ -1,0 +1,49 @@
+Stockfish Web GUI
+Copyright (C) 2026 SynoCommunity
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+---
+
+Third-Party Components
+======================
+
+chessboard.js v1.0.0
+--------------------
+MIT License - Copyright (c) 2019 Chris Oakman
+https://github.com/oakmac/chessboardjs
+
+chess.js
+--------
+BSD 2-Clause License - Copyright (c) 2023 Jeff Hlywa
+https://github.com/jhlywa/chess.js
+
+jQuery v3.7.1
+-------------
+MIT License - Copyright OpenJS Foundation
+https://jquery.com/
+
+ws (WebSocket library)
+----------------------
+MIT License - Copyright (c) 2011 Einar Otto Stangvik
+https://github.com/websockets/ws
+
+Chess piece images
+------------------
+Public Domain - From chessboard.js project
+
+Sound effects
+-------------
+Inspired by Lichess (AGPL-3.0)
+https://github.com/lichess-org/lila

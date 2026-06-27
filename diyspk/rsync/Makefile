@@ -1,5 +1,5 @@
 SPK_NAME = rsync
-SPK_VERS = 3.4.1
+SPK_VERS = 3.4.4
 SPK_REV = 1
 
 DEPENDS = cross/rsync

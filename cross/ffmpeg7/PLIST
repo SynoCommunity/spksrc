@@ -8,10 +8,10 @@ lnk:lib/libavdevice.so.61
 lib:lib/libavdevice.so.61.3.100
 lnk:lib/libavfilter.so
 lnk:lib/libavfilter.so.10
-lib:lib/libavfilter.so.10.4.100
+lib:lib/libavfilter.so.10.5.100
 lnk:lib/libavformat.so
 lnk:lib/libavformat.so.61
-lib:lib/libavformat.so.61.7.100
+lib:lib/libavformat.so.61.7.103
 lnk:lib/libavutil.so
 lnk:lib/libavutil.so.59
 lib:lib/libavutil.so.59.39.100

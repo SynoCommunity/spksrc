@@ -1,5 +1,3 @@
-Index: FFmpeg/libavformat/movenc.c
-===================================================================
 --- libavformat/movenc.c
 +++ libavformat/movenc.c
 @@ -3202,7 +3202,7 @@ static int mov_write_stbl_tag(AVFormatCo

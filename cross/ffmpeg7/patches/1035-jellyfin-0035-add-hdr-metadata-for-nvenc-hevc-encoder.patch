@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/nvenc.c
-===================================================================
 --- libavcodec/nvenc.c
 +++ libavcodec/nvenc.c
 @@ -24,6 +24,7 @@

@@ -6,8 +6,7 @@ PKG_DIST_SITE = https://github.com/kornelski/pngquant/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# seems to be the same bug as in former cross/bat (see #6052)
-DEPENDS = cross/zlib-ng
+DEPENDS = cross/zlib
 # with zlib dependency, there is a linker error
 #DEPENDS += cross/libpng
 DEPENDS += cross/libimagequant-source
@@ -16,10 +15,21 @@ HOMEPAGE = https://pngquant.org/
 COMMENT  = pngquant is a command-line utility and a library for lossy compression of PNG images.
 LICENSE  = GPL
 
-GNU_CONFIGURE = 1
-ADDITIONAL_CFLAGS = -O3 -std=c11
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-PRE_COMPILE_TARGET = pngquant_pre_compile
+include ../../mk/spksrc.common.mk
+
+# Fails on older gcc for its internal dependencies
+ifeq ($(call version_lt, $(TC_GCC), 5),1)
+ADDITIONAL_CFLAGS = -O3 -std=c99
+endif
+
+# Fails with recent libz-sys version 1.1.26
+# Enforce a specific libz-sys crate version
+CRATE_VERSION_LIBZSYS = 1.1.25
+CARGO_INSTALL_ARGS += --locked
+
+POST_EXTRACT_TARGET = pngquant_post_extract
 
 include ../../mk/spksrc.cross-rust.mk
 
@@ -32,8 +42,10 @@ include ../../mk/spksrc.cross-rust.mk
 LIBIMAGEQUANT_SOURCE_FOLDER = $(dir $(wildcard $(WORK_DIR)/libimagequant-*/))
 SUBMODULE_FOLDER = $(WORK_DIR)/$(PKG_DIR)/lib
 
-.PHONY: pngquant_pre_compile
-pngquant_pre_compile:
+.PHONY: pngquant_post_extract
+pngquant_post_extract:
 	@$(MSG) "Link libimagequant '$(LIBIMAGEQUANT_SOURCE_FOLDER)' into folder '$(SUBMODULE_FOLDER)'"
 	@rm -rf $(SUBMODULE_FOLDER)
 	@ln -sf $(LIBIMAGEQUANT_SOURCE_FOLDER) $(SUBMODULE_FOLDER)
+	@cd $(WORK_DIR)/$(PKG_DIR) && \
+	   CARGO_HOME=$(CARGO_HOME) cargo update libz-sys --precise $(CRATE_VERSION_LIBZSYS)

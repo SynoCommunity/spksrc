@@ -1,0 +1,4 @@
+bin:bin/vvencapp
+lnk:lib/libvvenc.so
+lnk:lib/libvvenc.so.1.14
+lib:lib/libvvenc.so.1.14.0

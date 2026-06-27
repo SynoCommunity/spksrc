@@ -1,6 +1,6 @@
 SPK_NAME = nextcloud
-SPK_VERS = 32.0.2
-SPK_REV = 1
+SPK_VERS = 33.0.3
+SPK_REV = 4
 SPK_ICON = src/nextcloud.png
 
 DEPENDS =
@@ -8,8 +8,8 @@ DEPENDS =
 override ARCH=noarch
 
 REQUIRED_MIN_DSM = 7.2
-CONF_DIR = src/conf_72
-SPK_DEPENDS = WebStation:PHP8.2:MariaDB10:Apache2.4:redis
+CONF_DIR = src/conf
+SPK_DEPENDS = WebStation:PHP8.3:MariaDB10:Apache2.4:redis
 
 # SRM is not supported due lacking webstation, php, mariadb and apache packages
 REQUIRED_MIN_SRM = 3.0
@@ -17,7 +17,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = Nextcloud is a self-hosted productivity platform giving you control over your data with web, desktop and mobile access.
 DISPLAY_NAME = Nextcloud
-CHANGELOG = "Initial packaging for Nextcloud 32.0.2."
+CHANGELOG = "Update to v33.0.3."
 HOMEPAGE = https://nextcloud.com/
 
 LICENSE = AGPLv3

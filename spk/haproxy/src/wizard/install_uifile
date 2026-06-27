@@ -1,15 +1,15 @@
 [{
-    "step_title": "Basic configuration",
+    "step_title": "HAProxy Configuration",
     "items": [{
         "type": "textfield",
-        "desc": "Administrator's login. Defaults to admin",
+        "desc": "Username for HAProxy dashboard and stats page (default: admin)",
         "subitems": [{
             "key": "wizard_user",
-            "desc": "User name"
+            "desc": "Username"
         }]
     }, {
         "type": "password",
-        "desc": "Administrator's password. Defaults to admin",
+        "desc": "Password (default: admin)",
         "subitems": [{
             "key": "wizard_passwd",
             "desc": "Password"

@@ -1,0 +1,55 @@
+{
+    "webservice": {
+        "migrate": {
+            "root": [
+                {
+                    "new": "tt-rss",
+                    "old": "tt-rss"
+                }
+            ]
+        },
+        "pkg_dir_prepare": [
+            {
+                "group": "http",
+                "mode": "0755",
+                "source": "/var/packages/tt-rss/target/share/tt-rss",
+                "target": "tt-rss",
+                "user": "sc-tt-rss"
+            }
+        ],
+        "portals": [
+            {
+                "alias": "tt-rss",
+                "app": "com.synocommunity.packages.tt-rss",
+                "name": "Tiny Tiny RSS",
+                "service": "tt-rss",
+                "type": "alias"
+            }
+        ],
+        "services": [
+            {
+                "backend": 2,
+                "display_name": "Tiny Tiny RSS",
+                "icon": "app/images/tt-rss-{0}.png",
+                "php": {
+                    "backend": 13,
+                    "extensions": [
+                        "curl",
+                        "gd",
+                        "intl",
+                        "posix",
+                        "pdo_pgsql",
+                        "pgsql"
+                    ],
+                    "group": "http",
+                    "profile_desc": "PHP Profile for tt-rss",
+                    "profile_name": "tt-rss Profile",
+                    "user": "sc-tt-rss"
+                },
+                "root": "tt-rss",
+                "service": "tt-rss",
+                "type": "apache_php"
+            }
+        ]
+    }
+}

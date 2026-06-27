@@ -1,5 +1,3 @@
-Index: FFmpeg/libavutil/hwcontext_videotoolbox.c
-===================================================================
 --- libavutil/hwcontext_videotoolbox.c
 +++ libavutil/hwcontext_videotoolbox.c
 @@ -825,6 +825,14 @@ static int vt_device_create(AVHWDeviceCo

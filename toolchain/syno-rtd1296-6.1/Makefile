@@ -9,4 +9,4 @@ TC_DIST_SITE_PATH = Intel%20x86%20Linux%204.4.15%20%28Rtd1296%29
 TC_TARGET = aarch64-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

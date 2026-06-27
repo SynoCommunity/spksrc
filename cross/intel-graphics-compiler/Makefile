@@ -71,6 +71,15 @@ CMAKE_ARGS += -DCMAKE_BUILD_RPATH="$(LLVM_LIB_DIR)"
 GCC_NO_DEBUG_INFO = 1
 
 # -----------------------------------------------------------------------------
+# Fix warnings-as-errors for stricter compilers (DSM >= 7.2 with GCC 12+)
+# -----------------------------------------------------------------------------
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_ge, $(TC_GCC), 12),1)
+ADDITIONAL_CXXFLAGS += -Wno-error=missing-template-keyword
+ADDITIONAL_CXXFLAGS += -Wno-error=uninitialized
+endif
+
+# -----------------------------------------------------------------------------
 # Include the common cross-cmake rules
 # -----------------------------------------------------------------------------
 include ../../mk/spksrc.cross-cmake.mk

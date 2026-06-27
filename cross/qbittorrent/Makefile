@@ -1,8 +1,9 @@
 PKG_NAME = qbittorrent
-PKG_VERS = 5.1.4
+PKG_VERS = 5.2.2
 PKG_EXT =
 PKG_DIST_NAME = $(PKG_DIST_ARCH)-qbittorrent-nox
-PKG_DIST_SITE = https://github.com/userdocs/qbittorrent-nox-static/releases/download/release-$(PKG_VERS)_v2.0.11
+PKG_DIST_FILE = $(PKG_DIST_ARCH)-qbittorrent-nox-$(PKG_VERS)
+PKG_DIST_SITE = https://github.com/userdocs/qbittorrent-nox-static/releases/download/release-$(PKG_VERS)_v2.0.13
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
@@ -17,7 +18,7 @@ INSTALL_TARGET = qbittorrent_install
 # Available: x86_64, aarch64, armv7, x86
 PKG_DIST_ARCH_LIST = x86_64 aarch64 armv7 x86
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = x86_64
@@ -37,4 +38,4 @@ include ../../mk/spksrc.install-resources.mk
 .PHONY: qbittorrent_install
 qbittorrent_install:
 	@mkdir -p $(STAGING_INSTALL_PREFIX)/bin
-	@install -m 755 $(DISTRIB_DIR)/$(PKG_DIST_NAME) $(STAGING_INSTALL_PREFIX)/bin/qbittorrent-nox
+	@install -m 755 $(DISTRIB_DIR)/$(PKG_DIST_FILE) $(STAGING_INSTALL_PREFIX)/bin/qbittorrent-nox

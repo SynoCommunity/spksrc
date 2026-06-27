@@ -8,7 +8,7 @@ DEPENDS = cross/ympd
 
 MAINTAINER = hgy59
 DESCRIPTION = ympd: Standalone MPD Web GUI written in C, utilizing Websockets and Bootstrap/JS.
-CHANGELOG = "Fix service start for DSM 5 / SRM."
+CHANGELOG = "1. Configure MPD socket connection for music directory and playlist directory support. <br/>2. Fix cross-compilation with CMake toolchain file."
 
 DISPLAY_NAME = MPD Web GUI
 
@@ -22,11 +22,4 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 ADMIN_PORT = $(SERVICE_PORT)
 
-POST_STRIP_TARGET = ympd_extra_install
-
 include ../../mk/spksrc.spk.mk
-
-.PHONY: ympd_extra_install
-ympd_extra_install:
-	@$(MSG) Install service script
-	@install -m 755 src/start.sh $(STAGING_DIR)/bin/

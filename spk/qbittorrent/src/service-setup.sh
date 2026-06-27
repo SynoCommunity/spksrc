@@ -50,3 +50,18 @@ service_postinst() {
         echo "Downloads: ${share_path}/complete"
     fi
 }
+
+service_restore() {
+    # Ensure Python path for search functionality points to the correct version
+    PYTHON_PATH="/var/packages/python314/target/bin/python3"
+    if grep -q 'pythonExecutablePath=' "${CFG_FILE}" 2>/dev/null; then
+        CURRENT_PATH=$(grep 'pythonExecutablePath=' "${CFG_FILE}" | sed 's/.*=//')
+        if [ "${CURRENT_PATH}" != "${PYTHON_PATH}" ]; then
+            sed -i "s|pythonExecutablePath=.*|pythonExecutablePath=${PYTHON_PATH}|" "${CFG_FILE}"
+            echo "Updated Python search path to $(basename $(dirname $(dirname ${PYTHON_PATH})))"
+        fi
+    elif grep -q '^\[Preferences\]' "${CFG_FILE}"; then
+        sed -i '/^\[Preferences\]/a Search\\pythonExecutablePath='"${PYTHON_PATH}" "${CFG_FILE}"
+        echo "Added Python search path"
+    fi
+}

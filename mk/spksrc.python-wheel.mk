@@ -2,6 +2,13 @@
 #   Invoke make to make a wheel for a python module.
 #   You can do some customization through python-cc.mk
 
+# If meta-spk python not available, build locally
+ifdef PYTHON_PACKAGE
+ifeq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+DEPENDS += cross/$(PYTHON_PACKAGE)
+endif
+endif
+
 # Python module targets
 ifeq ($(strip $(CONFIGURE_TARGET)),)
 CONFIGURE_TARGET = nop
@@ -22,11 +29,11 @@ include ../../mk/spksrc.cross-cc.mk
 # Define where is located the crossenv
 CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME))-$(PKG_VERS) $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME)) $(WORK_DIR)/crossenv-default))
 
-# If using spksrc.python.mk with PYTHON_STAGING_PREFIX defined
+# If using spksrc.python.mk with PYTHON_STAGING_INSTALL_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
 # wheels can find openssl and other libraries
-ifneq ($(wildcard $(PYTHON_STAGING_PREFIX)),)
-STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_PREFIX)
+ifneq ($(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)),)
+STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_INSTALL_PREFIX)
 endif
 
 ### Prepare crossenv

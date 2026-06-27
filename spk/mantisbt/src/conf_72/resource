@@ -42,12 +42,13 @@
                 "display_name": "MantisBT",
                 "icon": "app/images/mantisbt-{0}.png",
                 "php": {
-                    "backend": 11,
+                    "backend": 13,
                     "extensions": [
                         "curl",
                         "gd",
                         "ldap",
                         "mysqli",
+                        "openssl",
                         "pdo_mysql",
                         "soap",
                         "zlib"

@@ -1,0 +1,11 @@
+--- arch/x86/tools/relocs.c-orig	2017-08-02 19:17:13.000000000 +0000
++++ arch/x86/tools/relocs.c	2026-03-08 21:50:24.818129470 +0000
+@@ -692,7 +692,7 @@ static void walk_relocs(int (*process)(s
+  *
+  */
+ static int per_cpu_shndx	= -1;
+-Elf_Addr per_cpu_load_addr;
++static Elf_Addr per_cpu_load_addr;
+ 
+ static void percpu_init(void)
+ {

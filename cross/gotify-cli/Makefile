@@ -16,7 +16,7 @@ INSTALL_TARGET = gotify-cli_install
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = amd64 386 arm-7 arm64
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = amd64
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

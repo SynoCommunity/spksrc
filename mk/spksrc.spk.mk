@@ -26,9 +26,6 @@
 #  DSM_SCRIPT_FILES             List of script files that are in the scripts folder within the spk file.
 #
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
@@ -50,11 +47,17 @@ SPK_NAME_ARCH = $(ARCH)
 endif
 SPK_TCVERS = $(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
+ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
+TK = $(TC)
+endif
 endif
 endif
 
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 ifeq ($(ARCH),noarch)
 ifneq ($(strip $(TCVERSION)),)
@@ -497,7 +500,42 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons s
 
 package: $(SPK_FILE_NAME)
 
-all: package
+# -----------------------------------------------------------------------------
+# Stage1: Toolchain (MANDATORY) + Toolkit (OPTIONAL) bootstrap
+# -----------------------------------------------------------------------------
+TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
+TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
+
+.PHONY: spk-stage1
+# spk-meta-source (the meta SOURCE build loop) lives in spksrc.depend.mk
+spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE) spk-meta-source
+
+ifneq ($(strip $(TC)),)
+$(TCVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+else
+$(TCVARS_DONE): ;
+endif
+
+# $(TK) is only being set if REQUIRE_TOOLKIT=1
+ifneq ($(strip $(TK)),)
+$(TKVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) toolkit
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) tkvars
+else
+$(TKVARS_DONE): ;
+endif
+
+# -----------------------------------------------------------------------------
+# Stage2: Define package as a real target that does the work
+# -----------------------------------------------------------------------------
+.PHONY: spk-stage2
+spk-stage2: package
+
+all:
+	$(call LOG_WRAPPED,spk-stage1)
+	$(call LOG_WRAPPED,spk-stage2)
 
 
 ### spk-specific clean rules
@@ -532,11 +570,14 @@ spkclean:
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
+	       work-*/.stage0-bootstrap_done \
+	       work-*/.stage1-tcvars_done \
+	       work-*/.stage1-tkvars_done \
 	       work-*/.wheel_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
-	       work-*/tc_vars.mk \
+	       work-*/tc_vars*.mk \
 	       work-*/tc_vars.cmake \
 	       work-*/tc_vars.meson-* \
 	       work-*/package.tgz \

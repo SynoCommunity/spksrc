@@ -4,7 +4,6 @@ SPK_REV = 12
 SPK_ICON = src/beets.png
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 
 # numpy, pygobject
 REQUIRED_MIN_DSM = 7.1
@@ -70,4 +69,4 @@ DEPENDS += python/numpy_1.26
 # [lap] - depends on [numpy]
 DEPENDS += python/lap
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk

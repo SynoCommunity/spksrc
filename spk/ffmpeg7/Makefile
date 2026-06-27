@@ -1,10 +1,11 @@
 SPK_NAME = ffmpeg7
-SPK_VERS = 7.1.3
-SPK_REV = 6
+SPK_VERS = 7.1.4
+SPK_REV = 8
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to using updated synocli-videodriver package.<br/>2. No longer support ARMv7L (hi3535) architecture"
+CHANGELOG = "1. Update to version 7.1.4<br/>2. Update to v7.1.4-3 jellyfin-ffmpeg patches<br/>2. Add aarch64 libdrm support<br/>3. Enable vulkan shaderc and placebo"
 
 DEPENDS = cross/ffmpeg7
+VIDEODRV_PACKAGE = synocli-videodriver
 
 # requires c11 and proper atomic using gcc-4.9+ support
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
@@ -30,11 +31,7 @@ SERVICE_USER = auto
 VIDEODRIVER = on
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-SPK_DEPENDS = "synocli-videodriver"
-endif
-
-include ../../mk/spksrc.videodriver.mk
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:

@@ -10,4 +10,4 @@ TC_TARGET = powerpc-e500v2-linux-gnuspe
 TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

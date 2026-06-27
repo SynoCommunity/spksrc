@@ -1,11 +1,11 @@
 SPK_NAME = synocli-devel
-SPK_VERS = 1.4
-SPK_REV = 5
+SPK_VERS = 1.5
+SPK_REV = 6
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Update LLVM to 21.1.8 (DSM7\).<br/>2. Update to GDB 17.1 (DSM7\).<br/>3. Update binutils to v2.45.<br/>4. Update automake to 1.18.1.<br/>5. Update strace to 6.18."
+CHANGELOG = "1. Update LLVM to 22.1.3 (DSM7\).<br/>2. Update binutils to 2.46.0<br/>3. Update autoconf to 2.73.<br/>4. Update strace to 6.19."
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.18.1, autoconf 2.71$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.18
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.18.1, autoconf 2.73$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.19
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -16,7 +16,7 @@ SPK_DEPENDS = "Perl"
 
 OPTIONAL_DEPENDS = cross/llvm
 
-include ../../mk/spksrc.spk.mk
+include ../../mk/spksrc.common.mk
 
 ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 DEPENDS += cross/llvm
@@ -63,10 +63,10 @@ SPK_COMMANDS += bin/automake-1.18
 ##
 ifeq ($(call version_lt, $(TC_GCC), 4.4),1)
 OPTIONAL_DESC += ", binutils 2.32"
-else ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)`
+else ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 OPTIONAL_DESC += ", binutils 2.41"
 else
-OPTIONAL_DESC += ", binutils 2.45"
+OPTIONAL_DESC += ", binutils 2.46.0"
 endif
 SPK_COMMANDS += bin/addr2line
 SPK_COMMANDS += bin/ar
@@ -85,7 +85,6 @@ endif
 SPK_COMMANDS += bin/gprof
 SPK_COMMANDS += bin/ld
 SPK_COMMANDS += bin/ld.bfd
-SPK_COMMANDS += bin/ld.gold
 SPK_COMMANDS += bin/nm
 SPK_COMMANDS += bin/objcopy
 SPK_COMMANDS += bin/objdump
@@ -118,8 +117,8 @@ endif
 ##
 ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
-OPTIONAL_DESC += ", LLVM 21.1.8"
-SPK_COMMANDS += bin/clang-21
+OPTIONAL_DESC += ", LLVM 22.1.3"
+SPK_COMMANDS += bin/clang-22
 else
 OPTIONAL_DESC += ", LLVM 9.0.1"
 SPK_COMMANDS += bin/clang-9
@@ -132,7 +131,6 @@ SPK_COMMANDS += bin/clang-cpp
 SPK_COMMANDS += bin/clang-extdef-mapping
 SPK_COMMANDS += bin/clang-format
 SPK_COMMANDS += bin/clang-refactor
-SPK_COMMANDS += bin/clang-rename
 SPK_COMMANDS += bin/clang-scan-deps
 SPK_COMMANDS += bin/git-clang-format
 SPK_COMMANDS += bin/hmaptool
@@ -146,7 +144,6 @@ SPK_COMMANDS += bin/llvm-objdump
 SPK_COMMANDS += bin/llvm-profdata
 SPK_COMMANDS += bin/llvm-ranlib
 SPK_COMMANDS += bin/llvm-rc
-SPK_COMMANDS += bin/llvm-readelf
 SPK_COMMANDS += bin/llvm-readobj
 SPK_COMMANDS += bin/llvm-size
 SPK_COMMANDS += bin/llvm-strings
@@ -177,3 +174,5 @@ SPK_COMMANDS += bin/libtree
 ##
 SPK_COMMANDS += bin/strace
 SPK_COMMANDS += bin/strace-log-merge
+
+include ../../mk/spksrc.spk.mk

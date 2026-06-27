@@ -1,5 +1,3 @@
-Index: FFmpeg/fftools/Makefile
-===================================================================
 --- fftools/Makefile
 +++ fftools/Makefile
 @@ -40,6 +40,12 @@ endef
@@ -15,8 +13,6 @@ Index: FFmpeg/fftools/Makefile
  all: $(AVPROGS)
  
  fftools/ffprobe.o fftools/cmdutils.o: libavutil/ffversion.h | fftools
-Index: FFmpeg/fftools/fftoolsres.rc
-===================================================================
 --- fftools/fftoolsres.rc
 +++ fftools/fftoolsres.rc
 @@ -1,2 +1,34 @@

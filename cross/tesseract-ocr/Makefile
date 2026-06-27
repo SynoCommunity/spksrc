@@ -15,7 +15,7 @@ LICENSE  = Apache License 2.0
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = LIBLEPT_HEADERSDIR=$(STAGING_INSTALL_PREFIX)/include/leptonica
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # workaround and experimental c++ features for g++ compiler:

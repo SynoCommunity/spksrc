@@ -9,7 +9,6 @@ FFMPEG_PACKAGE = ffmpeg7
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 DEPENDS = cross/comskip
-SPK_DEPENDS = $(FFMPEG_PACKAGE)
 
 STARTABLE = no
 
@@ -26,7 +25,7 @@ SPK_COMMANDS = bin/comskip
 
 POST_STRIP_TARGET = comskip_extra_install
 
-include ../../mk/spksrc.ffmpeg.mk
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: comskip_extra_install
 

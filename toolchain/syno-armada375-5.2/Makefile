@@ -11,4 +11,4 @@ TC_SYSROOT = $(TC_TARGET)/libc
 TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 TC_EXTRA_CFLAGS = -mhard-float -mfpu=vfpv3
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

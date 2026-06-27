@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/avcodec.h
-===================================================================
 --- libavcodec/avcodec.h
 +++ libavcodec/avcodec.h
 @@ -2185,6 +2185,13 @@ typedef struct AVHWAccel {
@@ -16,8 +14,6 @@ Index: FFmpeg/libavcodec/avcodec.h
   * @}
   */
  
-Index: FFmpeg/libavcodec/options_table.h
-===================================================================
 --- libavcodec/options_table.h
 +++ libavcodec/options_table.h
 @@ -412,6 +412,7 @@ static const AVOption avcodec_options[]
@@ -28,8 +24,6 @@ Index: FFmpeg/libavcodec/options_table.h
  {NULL},
  };
  
-Index: FFmpeg/libavcodec/videotoolbox.c
-===================================================================
 --- libavcodec/videotoolbox.c
 +++ libavcodec/videotoolbox.c
 @@ -985,6 +985,23 @@ static int videotoolbox_start(AVCodecCon

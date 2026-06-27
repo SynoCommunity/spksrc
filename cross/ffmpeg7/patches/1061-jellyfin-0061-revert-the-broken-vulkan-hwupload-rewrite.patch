@@ -1,5 +1,3 @@
-Index: FFmpeg/libavutil/hwcontext_vulkan.c
-===================================================================
 --- libavutil/hwcontext_vulkan.c
 +++ libavutil/hwcontext_vulkan.c
 @@ -139,9 +139,6 @@ typedef struct VulkanFramesPriv {
@@ -605,8 +603,6 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
      }
  }
  
-Index: FFmpeg/libavutil/vulkan.c
-===================================================================
 --- libavutil/vulkan.c
 +++ libavutil/vulkan.c
 @@ -887,8 +887,11 @@ int ff_vk_alloc_mem(FFVulkanContext *s,

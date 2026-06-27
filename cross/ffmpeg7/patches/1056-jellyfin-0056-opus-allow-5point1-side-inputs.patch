@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/libopusenc.c
-===================================================================
 --- libavcodec/libopusenc.c
 +++ libavcodec/libopusenc.c
 @@ -197,6 +197,10 @@ static int libopus_check_vorbis_layout(A

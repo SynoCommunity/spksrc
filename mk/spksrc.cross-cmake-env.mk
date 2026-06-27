@@ -12,7 +12,7 @@ endif
 # We normally build regular Release
 ifeq ($(strip $(CMAKE_BUILD_TYPE)),)
   ifeq ($(strip $(GCC_DEBUG_INFO)),1)
-    CMAKE_BUILD_TYPE = Debug
+    CMAKE_BUILD_TYPE = RelWithDebInfo
   else
     CMAKE_BUILD_TYPE = Release
   endif
@@ -32,7 +32,7 @@ endif
 # will define the cross-compiled environment
 # for the target build
 CMAKE_SYSTEM_NAME = Linux
-_CMAKE_TOOLCHAIN_LOCATION = $(WORK_DIR)/$(TC_TARGET)/bin/
+_CMAKE_TOOLCHAIN_LOCATION = $(TC_WORK_DIR)/$(TC_TARGET)/bin/
 _CMAKE_TOOLCHAIN_PREFIX = $(TC_PREFIX)
 CMAKE_FIND_ROOT_PATH = $(INSTALL_DIR)$(INSTALL_PREFIX)
 CMAKE_FIND_ROOT_PATH_MODE_PROGRAM = NEVER

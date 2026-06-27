@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/qsvenc.c
-===================================================================
 --- libavcodec/qsvenc.c
 +++ libavcodec/qsvenc.c
 @@ -701,6 +701,13 @@ static int check_enc_param(AVCodecContex

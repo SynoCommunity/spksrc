@@ -19,7 +19,7 @@ COMMENT = The systemd System and Service Manager provides an array of system com
 # we take libraries only (tools are GPLv2)
 LICENSE = LGPLv2.1
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/libcap_2.51
 else

@@ -22,7 +22,6 @@ BUILD_DEPENDS += cross/libXrender
 # Dependencies used as system dependencies:
 DEPENDS  = cross/alsa-lib
 DEPENDS += cross/fontconfig
-DEPENDS += cross/libffi
 DEPENDS += cross/zlib
 DEPENDS += cross/libpng
 DEPENDS += cross/libjpeg
@@ -33,8 +32,8 @@ HOMEPAGE = https://openjdk.org/projects/jdk/17/
 COMMENT  = OpenJDK 17 is the open-source reference implementation of version 17 of the Java SE Platform as specified by JSR 390 in the Java Community Process.
 LICENSE  = GPLv2 with the Classpath Exception
 
-# Use our own configure since the one supplied by openjdk has no shebang
-CONFIGURE_TARGET = java-17-openjdk_configure
+# Make configure script executable
+PRE_CONFIGURE_TARGET = java-17-openjdk_pre_configure
 
 # Force openjdk to install into the package install folder
 PRE_COMPILE_TARGET = java-17-openjdk_pre_compile
@@ -63,10 +62,9 @@ CONFIGURE_ARGS += --with-fontconfig=$(INSTALL_DIR)/$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-freetype=system
 CONFIGURE_ARGS += --with-freetype-include=$(INSTALL_DIR)/$(INSTALL_PREFIX)/include/freetype2
 CONFIGURE_ARGS += --with-freetype-lib=$(INSTALL_DIR)/$(INSTALL_PREFIX)/lib
-CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
-CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
-CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
-CONFIGURE_ARGS += --with-libffi=$(INSTALL_DIR)/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += --with-extra-cflags="$(CFLAGS) $(ADDITIONAL_CFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
+CONFIGURE_ARGS += --with-extra-cxxflags="$(CPPFLAGS) $(ADDITIONAL_CPPFLAGS) -fno-stack-protector -Wno-deprecated-declarations"
+CONFIGURE_ARGS += --with-extra-ldflags="$(LDFLAGS) $(ADDITIONAL_LDFLAGS) -ljpeg -Xlinker -z -Xlinker relro -Xlinker -Bsymbolic-functions"
 CONFIGURE_ARGS += --disable-manpages
 # Disable all GUI related
 CONFIGURE_ARGS += --enable-headless-only
@@ -77,12 +75,12 @@ CONFIGURE_ARGS += --with-vendor-bug-url=https://github.com/SynoCommunity/spksrc/
 CONFIGURE_ARGS += --with-vendor-vm-bug-url=https://github.com/SynoCommunity/spksrc/issues
 
 # arguments not taken from environment
-CONFIGURE_ARGS += READELF=$(READELF)
-CONFIGURE_ARGS += AR=$(AR)
-CONFIGURE_ARGS += STRIP=$(STRIP)
-CONFIGURE_ARGS += NM=$(NM)
-CONFIGURE_ARGS += OBJCOPY=$(OBJCOPY)
-CONFIGURE_ARGS += OBJDUMP=$(OBJDUMP)
+CONFIGURE_ARGS += READELF=$(TC_PATH)/$(TC_PREFIX)readelf
+CONFIGURE_ARGS += AR=$(TC_PATH)/$(TC_PREFIX)ar
+CONFIGURE_ARGS += STRIP=$(TC_PATH)/$(TC_PREFIX)strip
+CONFIGURE_ARGS += NM=$(TC_PATH)/$(TC_PREFIX)nm
+CONFIGURE_ARGS += OBJCOPY=$(TC_PATH)/$(TC_PREFIX)objcopy
+CONFIGURE_ARGS += OBJDUMP=$(TC_PATH)/$(TC_PREFIX)objdump
 
 # Build images twice, second time with newly built JDK
 COMPILE_MAKE_OPTIONS += product-images
@@ -103,12 +101,10 @@ ifneq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PLIST_TRANSFORM = sed -e '/lib\/libjsvml.so/d'
 endif
 
-.PHONY: java-17-openjdk_configure
-# Use CONFIGURE_ARGS instead of REAL_CONFIGURE_ARGS to ignore TC_CONFIGURE_ARGS
-# Disable the normal host build target triplets since openjdk uses its own openjdk-target
-# Avoid the use of $(RUN) since configure complains about env variables
-java-17-openjdk_configure:
-	cd $(WORK_DIR)/$(PKG_DIR) && bash ./configure $(CONFIGURE_ARGS)
+.PHONY: java-17-openjdk_pre_configure
+java-17-openjdk_pre_configure:
+	@$(MSG) "- Make configure script executable"
+	@cd $(WORK_DIR)/$(PKG_DIR) && chmod +x ./configure
 
 .PHONY: java-17-openjdk_pre_compile
 # As DESTDIR is not supported we must patch the make file for make install.

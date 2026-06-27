@@ -9,4 +9,4 @@ TC_DIST_SITE_PATH = HiSilicon%20Hi3535%20Linux%203.4.35
 TC_TARGET = arm-cortexa9-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

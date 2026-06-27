@@ -1,0 +1,10 @@
+BASIC_CONFIGURATION_TITLE: "Configuration de ruTorrent"
+
+DOWNLOAD_SHARE_DESC: "Dossier partagé pour les téléchargements. Ce dossier sera créé s'il n'existe pas. Pour utiliser un volume spécifique, créez le partage avant l'installation."
+DOWNLOAD_SHARE_LABEL: "Dossier partagé"
+DOWNLOAD_SHARE_VALIDATION_ERROR: "Les sous-répertoires ne sont pas pris en charge."
+
+WATCH_DIR_DESC: "Optionnel: Surveiller un répertoire pour les fichiers torrent et les ajouter automatiquement. Le chemin est relatif au dossier de téléchargements. Laisser vide pour désactiver."
+WATCH_DIR_LABEL: "Répertoire surveillé"
+
+DSM_PERMISSIONS_TEXT: "ruTorrent s'exécute en tant qu'utilisateur de service interne <b>sc-rutorrent</b> dans DSM. Le dossier de téléchargements est configuré lors de l'installation pour être accessible par cet utilisateur. Veuillez lire <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\\\">Permission Management</a> pour plus de détails."

@@ -21,7 +21,7 @@ GNU_CONFIGURE = 1
 # tesseract integration requires c++17, but fails to build...
 CONFIGURE_ARGS += --without-tesseract
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Fix brotli C90 compatibility issue with older toolchains
 # The embedded brotli library uses C99-style mixed declarations

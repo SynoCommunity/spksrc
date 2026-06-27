@@ -1,0 +1,10 @@
+[
+  {
+    "step_title": "Uptime Kuma Upgrade",
+    "items": [
+      {
+        "desc": "Your monitoring data will be preserved during the upgrade.<br><br><b>Recommended:</b> Back up <code>/var/packages/uptime-kuma/var/</code> before proceeding using Hyper Backup or manual copy.<br><br>The service will restart automatically when complete."
+      }
+    ]
+  }
+]

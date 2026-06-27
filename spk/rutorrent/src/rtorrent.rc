@@ -1,3 +1,6 @@
+# Run in daemon mode (no ncurses UI)
+system.daemon.set = true
+
 scgi_port = localhost:@service_port@
 directory = @download_dir@
 session = /var/packages/rutorrent/var/.session

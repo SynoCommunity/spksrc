@@ -17,7 +17,7 @@
 #  WHEEL_VERSION           Version of wheel to process (can be empty)
 
 # Defined using PYTHON_PACKAGE_WORK_DIR from spksrc.python.mk or use local work directory
-PYTHON_WORK_DIR = $(or $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(wildcard $(WORK_DIR)))
+PYTHON_WORK_DIR = $(or $(wildcard $(PYTHON_PACKAGE_WORK_DIR)),$(WORK_DIR))
 
 # Other Python spk/python* related variables
 PYTHON_PKG_VERS             = $(or $(lastword $(subst -, ,$(notdir $(patsubst %/,%,$(wildcard $(PYTHON_WORK_DIR)/Python-[0-9]*))))),$(SPK_VERS))
@@ -32,8 +32,9 @@ PYTHON_LIB_NATIVE           = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/bui
 PYTHON_LIB_CROSS            = $(abspath $(PYTHON_WORK_DIR)/$(PYTHON_PKG_DIR)/build/lib.linux-$(shell expr "$(TC_TARGET)" : '\([^-]*\)' )-$(PYTHON_PKG_VERS_MAJOR_MINOR))
 
 # wheel crossenv definitions: 
-#   Use PYTHON_PACKAGE_DIR from spksrc.python.mk
-#   OR if empty then we are building spk/python3*
+# *** Not to be confused with dynamically-created crossenv for building wheels ***
+#   Use PYTHON_PACKAGE_DIR from spksrc.spk/python.mk
+#   OR use local to current package build crossenv definition directory
 CROSSENV_CONFIG_PATH = $(realpath $(or $(PYTHON_PACKAGE_DIR),$(WORK_DIR)/..)/crossenv)
 CROSSENV_CONFIG_DEFAULT = $(CROSSENV_CONFIG_PATH)/requirements-default.txt
 CROSSENV_PATH = $(abspath $(WORK_DIR)/crossenv-$(CROSSENV_WHEEL)/)
@@ -124,25 +125,12 @@ crossenv-%:
 
 ####
 
-# Determine the correct Python install prefix:
-# - If PYTHON_PACKAGE_WORK_DIR exists (pre-built python package available),
-#   use the python package's install prefix by replacing SPK_NAME with PYTHON_PACKAGE
-# - Otherwise (python is built as a dependency), use the current package's install prefix
-ifneq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
-PYTHON_INSTALL_PREFIX = $(subst $(SPK_NAME),$(PYTHON_PACKAGE),$(INSTALL_PREFIX))
-else
+# If python paths not-defined then use package default
+ifeq ($(PYTHON_INSTALL_PREFIX),)
 PYTHON_INSTALL_PREFIX = $(INSTALL_PREFIX)
 endif
-
-# Equivalent to STAGING_INSTALL_PREFIX relative to found python install
 ifeq ($(PYTHON_STAGING_INSTALL_PREFIX),)
-PYTHON_STAGING_INSTALL_PREFIX = $(abspath $(PYTHON_WORK_DIR)/install/$(PYTHON_INSTALL_PREFIX))
-endif
-
-# set OPENSSL_*_PREFIX if unset
-ifeq ($(strip $(OPENSSL_STAGING_PREFIX)),)
-OPENSSL_STAGING_PREFIX = $(PYTHON_STAGING_INSTALL_PREFIX)
-OPENSSL_PREFIX = $(PYTHON_INSTALL_PREFIX)
+PYTHON_STAGING_INSTALL_PREFIX = $(STAGING_INSTALL_PREFIX)
 endif
 
 # Mandatory for rustc wheel building at crossenv preparation time
@@ -151,8 +139,8 @@ export PYO3_CROSS_LIB_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/lib/
 export PYO3_CROSS_INCLUDE_DIR = $(PYTHON_STAGING_INSTALL_PREFIX)/include/
 # Mandatory of using OPENSSL_*_DIR starting with cryptography version >= 40
 # https://docs.rs/openssl/latest/openssl/#automatic
-export OPENSSL_LIB_DIR = $(OPENSSL_STAGING_PREFIX)/lib/
-export OPENSSL_INCLUDE_DIR = $(OPENSSL_STAGING_PREFIX)/include/
+export OPENSSL_LIB_DIR = $(OPENSSL_STAGING_INSTALL_PREFIX)/lib/
+export OPENSSL_INCLUDE_DIR = $(OPENSSL_STAGING_INSTALL_PREFIX)/include/
 
 # set PYTHONPATH for spksrc.python-module.mk
 export PYTHONPATH = $(PYTHON_LIB_NATIVE):$(PYTHON_STAGING_INSTALL_PREFIX)/lib/python$(PYTHON_PKG_VERS_MAJOR_MINOR)/site-packages/

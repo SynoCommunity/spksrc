@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/videotoolbox.c
-===================================================================
 --- libavcodec/videotoolbox.c
 +++ libavcodec/videotoolbox.c
 @@ -124,7 +124,7 @@ static int videotoolbox_postproc_frame(v
