@@ -104,14 +104,15 @@ env:
   # .spk/diagnostics still upload and the remaining packages are reported.
   BUILD_BUDGET_SECONDS: "20700"
 
-# Cancel a previous, now-superseded run when a new commit lands on the same
-# branch or pull request, instead of letting both full build matrices run to
-# completion. The event_name is part of the group so push, pull_request and
-# manual workflow_dispatch runs never cancel one another; a manual build &
-# publish (workflow_dispatch) is additionally never auto-cancelled.
+# Cancel a previous, now-superseded run only while a pull request is still a
+# Draft, so iterative pushes during development don't pile up. Non-draft PR
+# builds and master/push builds are never cancelled — every merged commit keeps
+# its own build result on master — and workflow_dispatch (manual build &
+# publish) is never cancelled either. The event_name is part of the group so
+# push, pull_request and workflow_dispatch runs never cancel one another.
 concurrency:
   group: build-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
-  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft }}
 
 jobs:
   # Decide whether the build should run at all. Upstream events (pull_request,
