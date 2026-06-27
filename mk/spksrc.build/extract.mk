@@ -1,13 +1,20 @@
-### Extract rules
-#   Extract the $(DIST_FILE) in $(EXTRACT_PATH)
+###############################################################################
+# spksrc.build/extract.mk
+#
+# Extract the $(DIST_FILE) in $(EXTRACT_PATH)
 # Override EXTRACT_PATH to specify path to use instead of $(WORK_DIR)
+#
 # Targets are executed in the following order:
 #  extract_msg_target
 #  pre_extract_target   (override with PRE_EXTRACT_TARGET)
 #  extract_target       (override with EXTRACT_TARGET)
 #  post_extract_target  (override with POST_EXTRACT_TARGET)
+#
 # Variables:
 #  ADDITIONAL_EXTRACTFLAGS  Additional extract flags being passed
+#
+###############################################################################
+
 EXTRACT_PATH ?= $(WORK_DIR)
 
 # Extract commands (optionally use TAR_CMD="fakeroot tar" as workaround on OSX)

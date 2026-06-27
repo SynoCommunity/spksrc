@@ -1,4 +1,9 @@
+###############################################################################
+# spksrc.cross/meson-crossfile.mk
+#
 # meson cross-file definitions
+#
+###############################################################################
 
 # Per-dependency configuration for meson build
 MESON_CROSS_FILE_NAME = $(ARCH)-crossfile.meson

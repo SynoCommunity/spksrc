@@ -1,3 +1,10 @@
+###############################################################################
+# spksrc.spk-meta/base.mk
+#
+# SPK_BASE_TEMPLATE: wires a meta package's staging into the consumer SPK
+# (shared build-skip status cookies, environment and dependency hooks).
+###############################################################################
+
 ifndef SPKSRC_SPK_BASE_MK
 SPKSRC_SPK_BASE_MK := 1
 

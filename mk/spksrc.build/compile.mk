@@ -1,12 +1,18 @@
-### Compile rules
-#   Invoke make to (cross-) compile the software.
+###############################################################################
+# spksrc.build/compile.mk
+#
+# Invoke make to (cross-) compile the software.
+#
 # Targets are executed in the following order:
 #  compile_msg_target
 #  pre_compile_target      (override with PRE_COMPILE_TARGET)
 #  compile_target          (override with COMPILE_TARGET)
 #  post_compile_target     (override with POST_COMPILE_TARGET)
+#
 # Variables:
 #  COMPILE_MAKE_OPTIONS    Additional parameters to add to make command
+#
+###############################################################################
 
 COMPILE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)compile_done
 

@@ -1,7 +1,9 @@
-# -------------------------------------------------------------------
+###############################################################################
 # spksrc.spk-meta.mk
-# Meta-SPK wrapper for optional package inclusions (ffmpeg, videodriver, python)
-# -------------------------------------------------------------------
+#
+# Meta-consumer SPK entry point: sets up the optional ffmpeg / python /
+# videodriver meta(s) for the package, then includes spksrc.spk.mk.
+###############################################################################
 
 # Common makefiles
 include ../../mk/spksrc.common.mk

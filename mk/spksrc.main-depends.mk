@@ -1,5 +1,9 @@
+###############################################################################
+# spksrc.main-depends.mk
+#
 # include this file for dummy modules that evaluate dependent packages only
 #
+###############################################################################
 
 # Do not initialize any environment to avoid variable leakage.
 DEFAULT_ENV = none

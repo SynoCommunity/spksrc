@@ -1,8 +1,12 @@
-# Build CMake programs
+###############################################################################
+# spksrc.build/ninja.mk
 #
-# prerequisites:
-# - cross/module depends on meson + ninja
+# Ninja build helper for the CMake and Meson build paths (pkg-config wiring
+# plus the ninja compile/install invocation).
 #
+# Prerequisites:
+#  - the package build system is cmake or meson (depends on native ninja)
+###############################################################################
 
 # Force path to pkg-config for cross-building
 ENV += PKG_CONFIG=/usr/bin/pkg-config

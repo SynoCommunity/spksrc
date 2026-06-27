@@ -1,11 +1,16 @@
+###############################################################################
+# spksrc.install-resources.mk
+#
 # Install arch independent resources
 #
 # This makefile extends spksrc.cross-cc.mk but skips configure and compile steps
 #
 # packages using this have to:
-# - implement a custom INSTALL_TARGET to copy the required files to the 
+# - implement a custom INSTALL_TARGET to copy the required files to the
 #   target location under $(STAGING_INSTALL_PREFIX)
 # - create a PLIST file to include the target file(s)/folder(s)
+#
+###############################################################################
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)

@@ -1,4 +1,9 @@
+###############################################################################
+# spksrc.cross/env-meson.mk
+#
 # meson cross-compilation definitions
+#
+###############################################################################
 
 # Force meson environment, bypassing default autotools settings.
 DEFAULT_ENV ?= meson

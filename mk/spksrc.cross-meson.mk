@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.cross-meson.mk
+#
 # Build Meson programs
 #
 # This makefile extends spksrc.cross-cc.mk with Meson-specific functionality
@@ -5,6 +8,7 @@
 # prerequisites:
 # - cross/module depends on meson + ninja
 #
+###############################################################################
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)

@@ -1,15 +1,21 @@
-### Dependency rules
-#   Build all dependencies listed in DEPENDS.
+###############################################################################
+# spksrc.rules/depend.mk
+#
+# Build all dependencies listed in DEPENDS.
+#
 # Targets are executed in the following order:
 #  depend_msg_target
 #  pre_depend_target   (override with PRE_DEPEND_TARGET)
 #  depend_target       (override with DEPEND_TARGET)
 #  post_depend_target  (override with POST_DEPEND_TARGET)
+#
 # Variables:
 #  DEPENDS             List of dependencies to go through
 #  REQUIRE_KERNEL      If set, will compile kernel modules and allow
 #                      use of KERNEL_DIR
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
+#
+###############################################################################
 
 ### For managing kernel modules dependent builds
 include ../../mk/spksrc.kernel/depend.mk

@@ -1,4 +1,9 @@
-###
+###############################################################################
+# spksrc.native/env-default.mk
+#
+# Base environment for host-native builds (compiler, flags and install paths
+# for tools built to run on the build host, not cross-compiled).
+###############################################################################
 
 PKG_CONFIG_LIBDIR = $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib/pkgconfig
 

@@ -1,4 +1,9 @@
+###############################################################################
+# spksrc.cross/cmake-toolchainfile.mk
+#
 # CMake toolchain-file definitions
+#
+###############################################################################
 
 # Per-dependency configuration for CMake build
 CMAKE_TOOLCHAIN_FILE_NAME = $(ARCH)-toolchain.cmake

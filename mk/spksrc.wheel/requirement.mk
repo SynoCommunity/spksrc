@@ -1,6 +1,7 @@
-### requirement rules
+###############################################################################
+# spksrc.wheel/requirement.mk
 #
-#   Part of the python wheel cross-compiling is managing the requirements.
+# Part of the python wheel cross-compiling is managing the requirements.
 #   These are processed here being passed using the REQUIREMENT variable
 #   in the form of a:
 #     1- <PATH>/requirement.txt                     -> requirement file
@@ -51,6 +52,7 @@
 #  requirement_target       (override with REQUIREMENT_TARGET)
 #  post_requirement_target  (override with POST_REQUIREMENT_TARGET)
 #
+###############################################################################
 
 # Default to "requirement" when no explicit make goals are specified
 REQUIREMENT_GOAL := $(if $(MAKECMDGOALS),$(MAKECMDGOALS),requirement)

@@ -1,6 +1,10 @@
+###############################################################################
+# spksrc.rules/pre-check.mk
+#
 # Common requirement checks
+#
 # Variables:
-#  BUILD_UNSUPPORTED_FILE  Set by github build action to collect 
+#  BUILD_UNSUPPORTED_FILE  Set by github build action to collect
 #                          and suppress errors for unsupported packages.
 #  REQUIRED_MIN_DSM        Set to define minimal supported DSM version for a package.
 #  REQUIRED_MAX_DSM        Set to define maximal supported DSM version for a package.
@@ -8,6 +12,7 @@
 #  INSTALLER_SCRIPT        Used before introduction of generic installer. Not recommended anymore,
 #                          use SERVICE_SETUP instead, this includes support for DSM >= 7.
 #
+###############################################################################
 
 # disable checks for dependency targets
 ifneq ($(DEPENDENCY_WALK),1)

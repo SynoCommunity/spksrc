@@ -1,4 +1,6 @@
-### Wheel rules
+###############################################################################
+# spksrc.wheel/download.mk
+#
 # Download wheels for modules listed in WHEELS.
 # These are being pre-processed thru spksrc.wheel.mk
 # along with spksrc.requirement.mk so 1 wheel at
@@ -15,6 +17,8 @@
 #  WHEEL_TYPE              Type of wheel to process (abi3, crossenv, pure)
 #  WHEEL_URL               URL usually of type git+https://
 #  WHEEL_VERSION           Version of wheel to process (can be empty)
+#
+###############################################################################
 
 ifeq ($(WHEEL_VERSION),)
 WHEEL_DOWNLOAD_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_download-$(WHEEL_NAME)_done

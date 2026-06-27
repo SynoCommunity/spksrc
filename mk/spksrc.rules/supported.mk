@@ -1,4 +1,9 @@
-####
+###############################################################################
+# spksrc.rules/supported.mk
+#
+# Architecture / version support gating; provides the build-arch-* and
+# *-supported targets used to iterate buildable archs for a package.
+###############################################################################
 
 ### Include common rules
 include ../../mk/spksrc.rules.mk

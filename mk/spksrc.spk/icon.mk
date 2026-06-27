@@ -1,7 +1,12 @@
-### Package Icon creation
+###############################################################################
+# spksrc.spk/icon.mk
+#
+# Package Icon creation
 #   Create package icons for SPK
-#   Icons are created if DSM_UI_DIR is set in 
+#   Icons are created if DSM_UI_DIR is set in
 #   spk/Makefile, otherwise skipped.
+#
+###############################################################################
 
 # Targets are executed in the following order:
 #  icon_msg_target

@@ -1,3 +1,9 @@
+###############################################################################
+# spksrc.spk-meta/python.mk
+#
+# Python meta integration: selects the python* meta and its constraints
+# when PYTHON_PACKAGE is set.
+###############################################################################
 
 # Set default python package name
 ifeq ($(strip $(PYTHON_PACKAGE)),)

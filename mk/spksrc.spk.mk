@@ -1,4 +1,7 @@
-### Rules to create the spk package
+###############################################################################
+# spksrc.spk.mk
+#
+# Rules to create the spk package
 #   Most of the rules are imported from spksrc.*.mk files
 #
 # Variables:
@@ -14,7 +17,7 @@
 #  INSTALLER_SCRIPT             (optional) Use installer script from given file
 #  CONF_DIR                     (optional) To provide a package specific conf folder with files (e.g. privilege file)
 #  LICENSE_FILE                 (optional) Add licence from given file
-# 
+#
 # Internal variables used in this file:
 #  NAME                         The internal name of the package.
 #                               Note that all synocoummunity packages use lowercase names.
@@ -25,6 +28,7 @@
 #  SPK_CONTENT                  List of files and folders that are added to package.tgz within the spk file.
 #  DSM_SCRIPT_FILES             List of script files that are in the scripts folder within the spk file.
 #
+###############################################################################
 
 # Configure the included makefiles
 NAME = $(SPK_NAME)

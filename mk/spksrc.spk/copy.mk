@@ -1,16 +1,23 @@
-### Copy rules
-#   Copy files from the installation directory to the staging directory,
+###############################################################################
+# spksrc.spk/copy.mk
+#
+# Copy files from the installation directory to the staging directory,
 #   ready to be packed.
+#
 # Targets are executed in the following order:
 #  copy_msg_target
 #  pre_copy_target   (override with PRE_COPY_TARGET)
 #  copy_target       (override with COPY_TARGET)
 #  post_copy_target  (override with POST_COPY_TARGET)
+#
 # Variables:
 #  STAGING_DIR:      Files will be copied in this directory
-#  DEPENDS:          List of dependencies, used to build $(WORK_DIR)/PLIST 
+#  DEPENDS:          List of dependencies, used to build $(WORK_DIR)/PLIST
+#
 # Files:
 #  $(WORK_DIR)/PLIST List of files to copy to the staging directory
+#
+###############################################################################
 
 INSTALL_PLIST = $(WORK_DIR)/PLIST
 

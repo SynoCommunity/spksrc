@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.cross-cmake.mk
+#
 # Build CMake programs
 #
 # This makefile extends spksrc.cross-cc.mk with CMake-specific functionality
@@ -5,6 +8,7 @@
 # prerequisites:
 # - cross/module depends on cmake
 #
+###############################################################################
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
