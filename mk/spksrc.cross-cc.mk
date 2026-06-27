@@ -108,30 +108,15 @@ include ../../mk/spksrc.rules/pre-check.mk
 
 include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.build/download.mk
-
 include ../../mk/spksrc.rules/depend.mk
 
 include ../../mk/spksrc.rules/status.mk
 
-checksum: download
-include ../../mk/spksrc.build/checksum.mk
+# Standard build pipeline (download -> ... -> install)
+include ../../mk/spksrc.build.mk
 
-extract: checksum depend status
-include ../../mk/spksrc.build/extract.mk
-
-patch: extract
-include ../../mk/spksrc.build/patch.mk
-
-configure: patch
-include ../../mk/spksrc.build/configure.mk
-
-compile: configure
-include ../../mk/spksrc.build/compile.mk
-
-install: compile
-include ../../mk/spksrc.build/install.mk
-
+# plist: appended after the shared pipeline (native is not packaged, so it is
+# not part of spksrc.build.mk)
 plist: install
 include ../../mk/spksrc.build/plist.mk
 

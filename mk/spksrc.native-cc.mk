@@ -28,29 +28,12 @@ include ../../mk/spksrc.common.mk
 
 include ../../mk/spksrc.native/env-default.mk
 
-include ../../mk/spksrc.build/download.mk
-
 include ../../mk/spksrc.rules/depend.mk
 
 include ../../mk/spksrc.rules/status.mk
 
-checksum: download
-include ../../mk/spksrc.build/checksum.mk
-
-extract: checksum depend status
-include ../../mk/spksrc.build/extract.mk
-
-patch: extract
-include ../../mk/spksrc.build/patch.mk
-
-configure: patch
-include ../../mk/spksrc.build/configure.mk
-
-compile: configure
-include ../../mk/spksrc.build/compile.mk
-
-install: compile
-include ../../mk/spksrc.build/install.mk
+# Standard build pipeline (download -> ... -> install)
+include ../../mk/spksrc.build.mk
 
 ###
 
