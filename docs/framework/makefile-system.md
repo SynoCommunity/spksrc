@@ -30,6 +30,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 | File | Purpose |
 |------|--------|
+| `spksrc.build.mk` | Standard build pipeline aggregator (download → install); included by `spksrc.cross-cc.mk` and `spksrc.native-cc.mk` |
 | `spksrc.build/download.mk` | Source download from URLs/Git |
 | `spksrc.build/checksum.mk` | Archive integrity verification |
 | `spksrc.build/extract.mk` | Archive extraction |
@@ -127,7 +128,9 @@ spksrc.common/
 ├── macros.mk                 # GNU Make helper macros
 └── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
 
-# Build pipeline — the per-package steps, included by the cross/spk/kernel entry points
+# Build pipeline — the per-package steps
+spksrc.build.mk               # standard pipeline aggregator (download -> install),
+                              # included by spksrc.cross-cc.mk and spksrc.native-cc.mk
 spksrc.build/
 ├── download.mk               # source download
 ├── checksum.mk               # archive verification
@@ -136,7 +139,7 @@ spksrc.build/
 ├── configure.mk              # configure
 ├── compile.mk                # compile
 ├── install.mk                # install to staging
-├── plist.mk                  # package list generation
+├── plist.mk                  # package list generation (cross/kernel/main-depends; not in build.mk)
 └── ninja.mk                  # ninja helper (cmake/meson)
 
 # Rules — shared targets / orchestration, included by the entry points
