@@ -20,7 +20,7 @@ PRE_CONFIGURE_TARGET = s3backer_pre_configure
 
 CONFIGURE_ARGS = --disable-static
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 ADDITIONAL_CFLAGS = -D_FILE_OFFSET_BITS=64
 endif

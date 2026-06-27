@@ -1,20 +1,71 @@
-# Nextcloud service setup for DSM 7 with PHP 8.2
+# Nextcloud service setup for DSM 7 with PHP 8.3
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
 WEB_DIR="/var/services/web_packages"
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
+NEXTCLOUD_VERSION="${SYNOPKG_PKGVER%%-*}"
+NEXTCLOUD_ARCHIVE="nextcloud-${NEXTCLOUD_VERSION}.tar.bz2"
+NEXTCLOUD_URL="https://download.nextcloud.com/server/releases/${NEXTCLOUD_ARCHIVE}"
+NEXTCLOUD_SHA256="5c1052f860b35aa56b24bc2613a6bea0c22313b9fbd02bb0247c1f0b9dbf77d2"
 
 if [ -z "${SYNOPKG_PKGTMP}" ]; then
     SYNOPKG_PKGTMP="${SYNOPKG_PKGDEST_VOL}/@tmp"
 fi
 
 # PHP CLI used for all maintenance tasks
-PHP_BIN="/usr/local/bin/php82"
+PHP_BIN="/usr/local/bin/php83"
 MYSQL="/usr/local/mariadb10/bin/mysql"
 MYSQLDUMP="/usr/local/mariadb10/bin/mysqldump"
 MYSQL_DATABASE="${SYNOPKG_PKGNAME}"
 MYSQL_USER="nc_${wizard_nextcloud_admin_username}"
+
+stage_nextcloud_sources() {
+    TMP_ARCHIVE_DIR="${SYNOPKG_PKGTMP}/${SYNOPKG_PKGNAME}-archive"
+    ${MKDIR} "${TMP_ARCHIVE_DIR}"
+    ARCHIVE_PATH="${TMP_ARCHIVE_DIR}/${NEXTCLOUD_ARCHIVE}"
+
+    if [ ! -f "${ARCHIVE_PATH}" ]; then
+        echo "[nextcloud] Fetching ${NEXTCLOUD_URL}"
+        if ! curl -fL --connect-timeout 30 --retry 2 --retry-delay 5 -o "${ARCHIVE_PATH}.tmp" "${NEXTCLOUD_URL}"; then
+            ${RM} "${ARCHIVE_PATH}.tmp"
+            echo "[nextcloud] ERROR: Download failed" >&2
+            return 1
+        fi
+        if [ -n "${NEXTCLOUD_SHA256}" ]; then
+            if ! echo "${NEXTCLOUD_SHA256}  ${ARCHIVE_PATH}.tmp" | sha256sum -c - >/dev/null 2>&1; then
+                ${RM} "${ARCHIVE_PATH}.tmp"
+                echo "[nextcloud] ERROR: Checksum verification failed" >&2
+                return 1
+            fi
+        fi
+        mv "${ARCHIVE_PATH}.tmp" "${ARCHIVE_PATH}"
+        chmod 600 "${ARCHIVE_PATH}"
+    fi
+
+    if ! ${MKDIR} "${WEB_ROOT}"; then
+        echo "[nextcloud] ERROR: Failed to prepare web root" >&2
+        return 1
+    fi
+
+    for path in "${WEB_ROOT}"/* "${WEB_ROOT}"/.[!.]* "${WEB_ROOT}"/..?*; do
+        if [ -e "${path}" ]; then
+            if ! ${RM} "${path}"; then
+                echo "[nextcloud] ERROR: Failed to clean ${path}" >&2
+                return 1
+            fi
+        fi
+    done
+
+    if ! tar -xjf "${ARCHIVE_PATH}" -C "${WEB_ROOT}" --strip-components 1; then
+        echo "[nextcloud] ERROR: Failed to extract archive" >&2
+        return 1
+    fi
+
+    if ! chown -R "${EFF_USER}:http" "${WEB_ROOT}" 2>/dev/null; then
+        echo "[nextcloud] WARNING: Failed to adjust ownership" >&2
+    fi
+}
 
 exec_occ() {
     # Call Nextcloud's occ tool with consistent PHP options
@@ -157,8 +208,11 @@ validate_preinst() {
 }
 
 service_postinst() {
-    # Handle fresh install and optional restore once files are unpacked
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        # Populate WEB_ROOT before we invoke occ or import backups
+        if ! stage_nextcloud_sources; then
+            return 1
+        fi
         DATA_DIR="${SHARE_PATH}/data"
         ${MKDIR} "${DATA_DIR}"
         if [ "${wizard_nextcloud_restore}" = "true" ] && [ -n "${wizard_backup_file}" ]; then
@@ -257,10 +311,27 @@ service_save ()
 
 service_restore ()
 {
-    # Restore config/themes and finish upgrade with maintenance routines
+    # Restore config/themes/custom_apps and finish upgrade with maintenance routines
+    if ! stage_nextcloud_sources; then
+        return 1
+    fi
     rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/config/" "${WEB_ROOT}/config/" 2>&1
     if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes" ]; then
         rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/themes/" "${WEB_ROOT}/themes/" 2>&1
+    fi
+    if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/custom_apps" ]; then
+        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/custom_apps/" "${WEB_ROOT}/custom_apps/" 2>&1
+    fi
+    # Restore user-installed apps that are not part of the base distribution
+    if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps" ]; then
+        # Merge apps directory - only copy apps that don't exist in the fresh install
+        # This preserves user-installed apps while allowing bundled apps to be updated
+        for app_dir in "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/apps"/*/; do
+            app_name=$(basename "${app_dir}")
+            if [ -n "${app_name}" ] && [ ! -d "${WEB_ROOT}/apps/${app_name}" ]; then
+                rsync -aX "${app_dir}" "${WEB_ROOT}/apps/${app_name}/" 2>&1
+            fi
+        done
     fi
     exec_occ maintenance:mode --off
     exec_occ upgrade

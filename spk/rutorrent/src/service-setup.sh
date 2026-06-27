@@ -1,16 +1,13 @@
-# Package
-PACKAGE="rutorrent"
-
-# Define python312 binary path
-PYTHON_DIR="/var/packages/python312/target/bin"
-# Add local bin, virtualenv along with python312 to the default PATH
+# Define python314 binary path
+PYTHON_DIR="/var/packages/python314/target/bin"
+# Add local bin, virtualenv along with python314 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 
 GROUP="synocommunity"
 APACHE_USER="http"
 APACHE_GROUP=${APACHE_USER}
 
-RUTORRENT_WEB_DIR="/var/services/web_packages/${PACKAGE}"
+RUTORRENT_WEB_DIR="/var/services/web_packages/${SYNOPKG_PKGNAME}"
 # rtorrent configuration file location
 RTORRENT_RC=${RUTORRENT_WEB_DIR}/conf/rtorrent.rc
 
@@ -22,13 +19,17 @@ else
 fi
 
 MEDIAINFO_BIN="/var/packages/mediainfo/target/bin/mediainfo"
+# Set HOME for rtorrent to find .rtorrent.rc symlink
+HOME="${SYNOPKG_PKGVAR}"
+export HOME
+export LD_LIBRARY_PATH="${SYNOPKG_PKGDEST}/lib"
 
 SVC_BACKGROUND=y
 PID_FILE="${SYNOPKG_PKGVAR}/rtorrent.pid"
 LOG_FILE="${SYNOPKG_PKGVAR}/rtorrent.log"
 SVC_WRITE_PID=y
 
-SERVICE_COMMAND="env RUTORRENT_WEB_DIR=${RUTORRENT_WEB_DIR} SYNOPKG_PKGVAR=${SYNOPKG_PKGVAR} SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST} ${SERVICE_COMMAND}"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/rtorrent -n -o import=${RTORRENT_RC}"
 
 fix_shared_folders_rights()
 {
@@ -117,7 +118,7 @@ configure_external_programs()
     set_external_program_path 'dumptorrent' "${SYNOPKG_PKGDEST}/bin/dumptorrent" "${SYNOPKG_PKGDEST}/bin/dumptorrent"
 }
 
-service_postinst ()
+service_postinst()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         # Allow direct-user access to rtorrent configuration file
@@ -125,25 +126,23 @@ service_postinst ()
         ln -s -T -f "${RTORRENT_RC}" "${SYNOPKG_PKGVAR}/.rtorrent.rc"
 
         # Configure files
-        TOP_DIR=${wizard_download_dir##/}
         MAX_MEMORY=$(awk '/MemTotal/{memory=$2*1024*0.25; if (memory > 512*1024*1024) memory=512*1024*1024; printf "%0.f", memory}' /proc/meminfo)
 
         sed -i \
             -e "s|^\([[:space:]]*\)\$scgi_port =.*|\1\$scgi_port = ${SERVICE_PORT};|" \
             -e "s|^\([[:space:]]*\)\$log_file =.*|\1\$log_file = '${SYNOPKG_PKGDEST}/tmp/errors.log';|" \
-            -e "s|^\([[:space:]]*\)\$topDirectory =.*|\1\$topDirectory = '/${TOP_DIR}/';|" \
+            -e "s|^\([[:space:]]*\)\$topDirectory =.*|\1\$topDirectory = '${SHARE_PATH}/';|" \
             -e "s|^\([[:space:]]*\)\$tempDirectory =.*|\1\$tempDirectory = '${SYNOPKG_PKGDEST}/tmp/';|" \
             "${RUTORRENT_WEB_DIR}/conf/config.php"
 
-        cleaned_download_dir=${wizard_download_dir%/}
-        sed -i -e "s|@download_dir@|${cleaned_download_dir}|g" \
+        sed -i -e "s|@download_dir@|${SHARE_PATH}|g" \
             -e "s|@max_memory@|$MAX_MEMORY|g" \
             -e "s|@service_port@|${SERVICE_PORT}|g" \
             "${RTORRENT_RC}"
 
         if [ -n "${wizard_watch_dir}" ]; then
             cleaned_watch_dir=${wizard_watch_dir#/}
-            effective_watch_dir="${cleaned_download_dir}/${cleaned_watch_dir}"
+            effective_watch_dir="${SHARE_PATH}/${cleaned_watch_dir}"
             mkdir -p "${effective_watch_dir}"
             sed -i -e "s|@watch_dir@|${effective_watch_dir}|g" ${RTORRENT_RC}
         else
@@ -152,10 +151,6 @@ service_postinst ()
 
         # Refresh external tool paths (php versioning, mediainfo relocation, etc.)
         configure_external_programs
-        
-        # Configure plugins
-        sed -i -e "s|\$pathToExternals\['dumptorrent'\] = '';|\$pathToExternals['dumptorrent'] = '${SYNOPKG_PKGDEST}/bin/dumptorrent';|g" \
-            "${RUTORRENT_WEB_DIR}/plugins/dump/conf.php"
 
         mkdir -p "${RUTORRENT_WEB_DIR}/share"
         # Allow read/write/execute over the share web_packages/rutorrent/share directory
@@ -230,8 +225,12 @@ service_restore ()
     cp -apf "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc" "${RTORRENT_RC}"
     rm "${SYNOPKG_TEMP_UPGRADE_FOLDER}/rtorrent.rc"
 
-    # Drop legacy execute hooks that pointed to php74 initplugins, no longer valid
+    # Upgrade migrations for rtorrent.rc: drop legacy PHP 7.4 execute hooks,
+    # and ensure daemon mode is enabled (required for running without screen)
     sed -i -e "/\/var\/packages\/PHP7\.4\/target\/usr\/local\/bin\/php74/d" "${RTORRENT_RC}"
+    if ! grep -q "^system\.daemon\.set" "${RTORRENT_RC}"; then
+        sed -i '1i # Run in daemon mode (no ncurses UI)\nsystem.daemon.set = true\n' "${RTORRENT_RC}"
+    fi
 
     echo "Restoring rutorrent web shared directory ${RUTORRENT_WEB_DIR}/share"
     cp -ap -t "${RUTORRENT_WEB_DIR}" -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/share"

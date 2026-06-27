@@ -10,7 +10,7 @@
         "icon": "app/images/adminer-{0}.png",
         "php": {
           "profile_name": "adminer Profile",
-          "profile_desc": "PHP 8.0 Profile for adminer",
+          "profile_desc": "PHP Profile for adminer",
           "backend": 9,
           "extensions": [
             "mysqli",

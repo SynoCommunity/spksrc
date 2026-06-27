@@ -1,5 +1,5 @@
 PKG_NAME = python311
-PKG_VERS = 3.11.14
+PKG_VERS = 3.11.15
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -35,7 +35,7 @@ CONFIGURE_ARGS += --with-computed-gotos=yes
 CONFIGURE_ARGS += --with-build-python=$(PYTHON_NATIVE)
 CONFIGURE_ARGS += --disable-test-modules
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # optionally generate optimized code
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)

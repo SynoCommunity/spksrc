@@ -1,11 +1,10 @@
 SPK_NAME   = octoprint
-SPK_VERS   = 1.11.3
-SPK_REV    = 14
+SPK_VERS   = 1.11.5
+SPK_REV    = 15
 SPK_ICON   = src/octoprint.png
 DSM_UI_DIR = app
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE)"
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
@@ -21,7 +20,7 @@ ADMIN_PORT   = $(SERVICE_PORT)
 DISPLAY_NAME = OctoPrint
 HOMEPAGE     = https://octoprint.org/
 LICENSE      = AGPLv3
-CHANGELOG    = "Update OctoPrint to v1.11.3."
+CHANGELOG    = "Update OctoPrint to v1.11.5."
 
 # SERVICE_COMMAND is in src/service-setup.sh
 STARTABLE     = yes
@@ -36,7 +35,7 @@ USE_ALTERNATE_TMPDIR = 1
 # [frozendict]
 WHEELS_CFLAGS = [frozendict] --std=c99
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: octoprint_extra_install
 octoprint_extra_install:

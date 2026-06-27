@@ -1,35 +1,40 @@
 SPK_NAME = shairport-sync
-SPK_VERS = 2.3.11
-SPK_REV = 2
+SPK_VERS = 4.3.7
+SPK_REV = 3
 SPK_ICON = src/shairport-sync.png
 
-DEPENDS =  cross/busybox cross/shairport-sync
+DEPENDS = cross/shairport-sync
+
+# Require AudioStation for USB audio driver support on DSM 6
+SPK_DEPENDS = "AudioStation"
+
+# DSM 6 only - DSM 7 does not allow packages to run as root
+# which is required for ALSA device access
+REQUIRED_MAX_DSM = 6.999
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = Use Synology NAS as an AirPlay receiver. Requires USB soundcard or speakers.
+DESCRIPTION = AirPlay 2 audio player. Stream audio wirelessly from Apple devices to your Synology NAS using Apple\'s latest AirPlay 2 protocol. Features include multi-room audio, Siri integration, and improved reliability. Requires USB soundcard or speakers connected to your NAS.
 DISPLAY_NAME = Shairport Sync
-BETA = 1
-CHANGELOG = "Initial SynoCommunity Release"
+CHANGELOG = "1. Update to v4.3.7 with AirPlay 2 support.<br/>2. Added NQPTP daemon for AirPlay 2 timing.<br/>3. DSM 6 only - requires AudioStation for USB audio drivers."
 
 HOMEPAGE = https://github.com/mikebrady/shairport-sync
-LICENSE  =
+LICENSE = GPL
 
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
+STARTABLE = yes
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+CONF_DIR = src/conf
 
-FWPORTS          = src/${SPK_NAME}.sc
-
-INSTALL_PREFIX = /usr/local/$(SPK_NAME)
+FWPORTS = src/shairport-sync.sc
+WIZARDS_DIR = src/wizard
 
 POST_STRIP_TARGET = shairport_extra_install
-
-BUSYBOX_CONFIG = daemon
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
 
 include ../../mk/spksrc.spk.mk
 
 .PHONY: shairport_extra_install
 shairport_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa/alsa.conf
-	install -m 644 src/shairport-sync.conf $(STAGING_DIR)/var/shairport-sync.conf
+	install -m 755 -d $(STAGING_DIR)/share
+	install -m 644 src/alsa.conf $(STAGING_DIR)/share/alsa.conf
+	install -m 644 src/shairport-sync.conf.template $(STAGING_DIR)/share/shairport-sync.conf.template

@@ -9,11 +9,10 @@
 #  DEPENDS             List of dependencies to go through
 #  REQUIRE_KERNEL      If set, will compile kernel modules and allow
 #                      use of KERNEL_DIR
-#  REQUIRE_TOOLKIT     If set, will download and extract matching toolkit
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
 
 ### For managing kernel modules dependent builds
-include ../../mk/spksrc.kernel-modules.mk
+include ../../mk/spksrc.kernel/depend.mk
 
 DEPEND_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)depend_done
 
@@ -33,12 +32,6 @@ else
 $(POST_DEPEND_TARGET): $(DEPEND_TARGET)
 endif
 
-ifeq ($(strip $(REQUIRE_TOOLKIT)),)
-TOOLKIT_DEPEND = 
-else
-TOOLKIT_DEPEND = toolkit/syno-$(ARCH)-$(TCVERSION)
-endif
-
 native-depend_msg_target:
 	@$(MSG) "Processing NATIVE dependencies of $(NAME)"
 
@@ -46,19 +39,30 @@ native-depend_msg_target:
 # parallalizing build for every arch targets
 native-depend: native-depend_msg_target
 	@set -e; \
-	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
-	do                          \
-	  env $(ENV) WORK_DIR= $(MAKE) -C ../../$$native ; \
+	for native in $$($(MAKE) -s dependency-flat DEPENDS_TYPE="DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS" | grep "^native/"); \
+	do \
+	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
 	done
+
+# Build meta SOURCE packages (spk/*) listed in BUILD_DEPENDS. Invoked from
+# spk-stage1 (spksrc.spk.mk) so the meta work dir exists for the stage2 parse
+# that activates SPK_BASE_TEMPLATE. Only spk/* are built here (cross/* and
+# native/* are built by depend_target below, which filters out spk/*). Each
+# meta is a self-contained `arch-` build run under an isolated env (env -i) so
+# the consumer's INSTALL_PREFIX/exports don't leak into it, and is skipped when
+# its install staging already exists (re-running arch- on a built package is
+# not idempotent at the packaging step). No-op when BUILD_DEPENDS has no spk/*.
+.PHONY: spk-meta-source
+spk-meta-source:
 	@set -e; \
-	for depend in $(NATIVE_DEPENDS); \
-	do                          \
-	  env $(ENV) WORK_DIR=$(WORK_DIR) $(MAKE) -C ../../$$depend ; \
-	done
-	@set -e; \
-	for depend in $(filter-out native/%,$(BUILD_DEPENDS) $(OPTIONAL_DEPENDS) $(DEPENDS)); \
-	do                          \
-	  env $(ENV) $(MAKE) -C ../../$$depend native-depend; \
+	for metasrc in $(filter spk/%,$(BUILD_DEPENDS)); do \
+	   if [ -d ../../$$metasrc/work-$(ARCH)-$(TCVERSION)/install ]; then \
+	      $(MSG) "Stage1: meta source $$metasrc already built for $(ARCH)-$(TCVERSION)" ; \
+	   else \
+	      $(MSG) "Stage1: building meta source $$metasrc for $(ARCH)-$(TCVERSION)" ; \
+	      env -i PATH="$(PATH)" HOME="$(HOME)" \
+	         $(MAKE) --no-print-directory -C ../../$$metasrc arch-$(ARCH)-$(TCVERSION) ; \
+	   fi ; \
 	done
 
 depend_msg_target:
@@ -68,24 +72,24 @@ pre_depend_target: depend_msg_target
 
 depend_target: $(PRE_DEPEND_TARGET)
 ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-# As depend is also ran at toolchain-time, ensure to skip kernel-modules
+# As depend is also ran at toolchain-time, ensure to skip kernel-depend
 ifeq ($(filter toolchain,$(shell basename $(abspath $(CURDIR)/../))),)
-depend_target: kernel-modules
+depend_target: kernel-depend
 endif
 endif
 	@set -e; \
 	for native in $(filter native/%,$(BUILD_DEPENDS) $(DEPENDS)); \
-	do                          \
-	  env $(ENV) WORK_DIR= LOGGING_ENABLED= $(MAKE) -C ../../$$native ; \
+	do \
+	  env -i PATH=$(PATH) LOG_DIR=$(LOG_DIR) $(MAKE) -C ../../$$native ; \
 	done
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \
-	do                          \
-	  env $(ENV) WORK_DIR=$(WORK_DIR) $(MAKE) -C ../../$$depend ; \
+	do \
+	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) -C ../../$$depend ; \
 	done
 	@set -e; \
-	for depend in $(filter-out native/%,$(TOOLKIT_DEPEND) $(BUILD_DEPENDS) $(DEPENDS)); \
-	do                          \
+	for depend in $(filter-out native/% spk/%,$(BUILD_DEPENDS) $(DEPENDS)); \
+	do \
 	  env $(ENV) $(MAKE) -C ../../$$depend ; \
 	done
 	
@@ -101,4 +105,3 @@ $(DEPEND_COOKIE): $(POST_DEPEND_TARGET)
 else
 depend: ;
 endif
-

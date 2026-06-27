@@ -18,7 +18,7 @@ CONFIGURE_ARGS += --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 CONFIGURE_ARGS += --enable-gold=yes
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # embedspu is a tool to "Embed an SPU ELF executable into a PowerPC object file"
 # and hence built only for PPC_ARCHS.

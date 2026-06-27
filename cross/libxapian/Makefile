@@ -1,8 +1,8 @@
 PKG_NAME = xapian-core
-PKG_VERS = 1.4.29
+PKG_VERS = 1.4.31
 PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://oligarchy.co.uk/xapian/$(PKG_VERS)
+PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).orig.$(PKG_EXT)
+PKG_DIST_SITE = http://deb.debian.org/debian/pool/main/x/xapian-core
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libuuid cross/zlib

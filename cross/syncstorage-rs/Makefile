@@ -1,5 +1,5 @@
 PKG_NAME = syncstorage-rs
-PKG_VERS = 0.21.1
+PKG_VERS = 0.23.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VERS}
@@ -33,12 +33,17 @@ ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
 # to find dependencies of libmysqlclient (libz)
 ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
 
-# pass mysql client version for non-x86 archs
-ENV += MYSQLCLIENT_VERSION=$(lastword $(subst -, ,$(wildcard $(WORK_DIR)/mariadb-connector-c-[0-9]*)))
-
 POST_INSTALL_TARGET = syncstorage-rs_post_install
 
 include ../../mk/spksrc.cross-rust.mk
+
+# pass mysql client version (needed by mysqlclient-sys crate)
+# Use same conditional as mariadb-connector-c to select correct version
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)/cross/mariadb-connector-c-latest/Makefile)
+else
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)/cross/mariadb-connector-c-3.3.11/Makefile)
+endif
 
 .PHONY: syncstorage-rs_post_install
 syncstorage-rs_post_install:
@@ -46,6 +51,6 @@ syncstorage-rs_post_install:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/tools
 	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tools . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tools
 	@$(MSG) Install DB Migration scripts
-	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations -d $(STAGING_INSTALL_PREFIX)/tokenserver-db/migrations
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations -d $(STAGING_INSTALL_PREFIX)/tokenserver-mysql/migrations
 	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/syncstorage-mysql/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations
-	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tokenserver-db/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tokenserver-db/migrations
+	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tokenserver-mysql/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tokenserver-mysql/migrations

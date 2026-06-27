@@ -1,12 +1,11 @@
 # include this file for dummy modules that evaluate dependent packages only
 #
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
+# Do not initialize any environment to avoid variable leakage.
+DEFAULT_ENV = none
 
 # nothing to download
 download:
-download-all:
 checksum:
 
 # Configure the included makefiles
@@ -22,6 +21,9 @@ endif
 
 # Common directories (must be set after ARCH_SUFFIX)
 include ../../mk/spksrc.directories.mk
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 
@@ -39,7 +41,6 @@ include ../../mk/spksrc.cross-env.mk
 
 # for dependency evaluation
 include ../../mk/spksrc.depend.mk
-
 
 install: depend
 include ../../mk/spksrc.install.mk

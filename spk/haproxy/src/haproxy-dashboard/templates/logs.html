@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Log Entries{% endblock %}
+{% block nav_logs %} active{% endblock %}
+{% block extra_css %}
+        .log-entry {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        h3 {
+            color: grey;
+        }
+        .collapse-trigger {
+            cursor: pointer;
+        }
+        .dark-mode #status_header {
+            color: #2bb9c7;
+        }
+        .dark-mode .log-entry {
+            box-shadow: 0 0 15px 5px rgba(43, 185, 199, 0.05);
+            background-color: #1E2C42;
+            border: none;
+        }
+        .dark-mode #requested_url {
+            color: #2bb9c7;
+        }
+{% endblock %}
+{% block content %}
+    <h3 style="margin-top: 30px; margin-bottom: 30px; margin-left: 10%;" id="status_header">Status 403 Forbidden Log Entries</h3>
+    <div>
+        {% for entry in entries %}
+        <div class="log-entry" style="padding: 20px; width: 80%; margin-left: 10%; margin-bottom: 1%;">
+            <p><strong>Time Stamp:</strong> {{ entry['timestamp'] }}</p>
+            <p><strong>IP Address:</strong> {{ entry['ip_address'] }}</p>
+            <p><strong>HTTP Method:</strong> {{ entry['http_method'] }}</p>
+            <p id="requested_url"><strong>Requested URL:</strong> {{ entry['requested_url'] }}</p>
+            {% if entry['xss_alert'] %}
+            <p class="collapse-trigger" data-toggle="collapse" data-target="#xssCollapse{{ loop.index }}">XSS Alert <span class="text-danger">(Click to show details)</span></p>
+            <div id="xssCollapse{{ loop.index }}" class="collapse">
+                <p style="color: red"><strong>{{ entry['xss_alert'] }}</strong></p>
+            </div>
+            {% endif %}
+            {% if entry['sql_alert'] %}
+            <p class="collapse-trigger" data-toggle="collapse" data-target="#sqlCollapse{{ loop.index }}">SQL Alert <span class="text-danger">(Click to show details)</span></p>
+            <div id="sqlCollapse{{ loop.index }}" class="collapse">
+                <p style="color: red"><strong>{{ entry['sql_alert'] }}</strong></p>
+            </div>
+            {% endif %}
+            {% if entry['put_method'] %}
+            <p class="collapse-trigger" data-toggle="collapse" data-target="#putMethodCollapse{{ loop.index }}">PUT Method Alert <span class="text-danger">(Click to show details)</span></p>
+            <div id="putMethodCollapse{{ loop.index }}" class="collapse">
+                <p style="color: red"><strong>{{ entry['put_method'] }}</strong></p>
+            </div>
+            {% endif %}
+            {% if entry['illegal_resource'] %}
+            <p class="collapse-trigger" data-toggle="collapse" data-target="#illegalResourceCollapse{{ loop.index }}">Illegal Resource Access Alert <span class="text-danger">(Click to show details)</span></p>
+            <div id="illegalResourceCollapse{{ loop.index }}" class="collapse">
+                <p style="color: red"><strong>{{ entry['illegal_resource'] }}</strong></p>
+            </div>
+            {% endif %}
+            {% if entry['webshell_alert'] %}
+            <p class="collapse-trigger" data-toggle="collapse" data-target="#webshellCollapse{{ loop.index }}">WebShell Attack Alert <span class="text-danger">(Click to show details)</span></p>
+            <div id="webshellCollapse{{ loop.index }}" class="collapse">
+                <p style="color: red"><strong>{{ entry['webshell_alert'] }}</strong></p>
+            </div>
+            {% endif %}
+            <p><strong>Status Code:</strong> 403</p>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -58,7 +58,7 @@ libe_sqlite3_download:
 .PHONY: libe_sqlite3_compile
 libe_sqlite3_compile:
 	@$(MSG) "compile libe_sqlite3"
-	@cd $(WORK_DIR) ; $(ENV) ; $${CC} $${CFLAGS} sqlite3/sqlite3.c  stubs/stubs.c
+	@$(RUN) sh -c '$$CC $$CFLAGS sqlite3/sqlite3.c  stubs/stubs.c'
 
 .PHONY: libe_sqlite3_install
 libe_sqlite3_install:

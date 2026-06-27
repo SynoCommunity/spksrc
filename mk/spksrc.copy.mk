@@ -46,7 +46,8 @@ copy_target: .SHELLFLAGS := -o pipefail -c
 copy_target: $(PRE_COPY_TARGET) $(INSTALL_PLIST)
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@$(MSG) [DSM7+] Copy target to staging, discard var directory
-	@(mkdir -p $(STAGING_DIR) && cd $(STAGING_INSTALL_PREFIX) && tar cpf - $$(cat $(INSTALL_PLIST) | sed -e '/^.*:var\/.*/d' -e 's/^.*://g')) | \
+	@mkdir -p $(STAGING_DIR)
+	@(cd $(STAGING_INSTALL_PREFIX) && tar cpf - $$(cat $(INSTALL_PLIST) | sed -e '/^.*:var\/.*/d' -e 's/^.*://g')) | \
 	  tar xpf - -C $(STAGING_DIR)
 	@$(MSG) "[DSM7+] Copy and merge var and target/var to $(STAGING_DIR)/var"
 	@if [ "$$(cat $(INSTALL_PLIST) | sed -n 's?^.*:var/??p')" ] ; then \

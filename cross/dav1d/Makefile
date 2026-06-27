@@ -1,5 +1,5 @@
 PKG_NAME = dav1d
-PKG_VERS = 1.4.2
+PKG_VERS = 1.5.3
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.videolan.org/pub/videolan/dav1d/$(PKG_VERS)
@@ -18,7 +18,7 @@ CONFIGURE_ARGS += -Denable_examples=false
 CONFIGURE_ARGS += -Denable_docs=false
 ADDITIONAL_CFLAGS = -O
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))

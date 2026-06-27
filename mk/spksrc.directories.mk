@@ -1,3 +1,15 @@
+
+# Determine MKDIR from this file's own location in MAKEFILE_LIST, regardless
+# of CURDIR or the caller's directory structure (works under github-action
+# where the workspace root may differ from the spksrc directory name).
+# MKDIR must use := for immediate evaluation before any further includes
+# alter MAKEFILE_LIST. BASEDIR uses ?= to allow override from the command line.
+MKDIR  := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+BASEDIR ?= $(abspath $(MKDIR)/..)
+
+# Include macro definitions
+include $(BASEDIR)/mk/spksrc.common/macros.mk
+
 # * all goes in $(WORK_DIR) : work-arch (for noarch: work-all or work-dsm7), in the current directory
 # * it will be installed in $(INSTALL_PREFIX) on the target system (/usr/local/transmission)
 # * each source package is unpacked in $(WORK_DIR)

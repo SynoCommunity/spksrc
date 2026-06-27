@@ -1,18 +1,18 @@
 SPK_NAME = mpd
-SPK_VERS = 0.23.15
-SPK_REV = 2
+SPK_VERS = 0.24.8
+SPK_REV = 4
 SPK_ICON = src/mpd.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/mpd
+DEPENDS = cross/mpd cross/mpc
 
-REQUIRED_MIN_DSM = 7.0
+REQUIRED_MIN_DSM = 7.2
 UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
 
 MAINTAINER = hgy59
 DESCRIPTION = Music Player Daemon \(MPD\) is a flexible, powerful, server-side application for playing music. Through plugins and libraries it can play a variety of sound files while being controlled by its network protocol.
-CHANGELOG = "Update mpd to v0.23.15, available for DSM 7 only."
+CHANGELOG = "1. Update MPD to v0.24.8 (requires DSM 7.2+ for C++20 support). <br/>2. Include mpc command-line client for diagnostics."
 
 DISPLAY_NAME = Music Player Daemon
 
@@ -29,6 +29,8 @@ NO_SERVICE_SHORTCUT = yes
 
 SERVICE_WIZARD_SHARENAME = wizard_music_folder
 FWPORTS = src/mpd.sc
+
+SPK_COMMANDS = bin/mpc
 
 POST_STRIP_TARGET = mpd_extra_install
 

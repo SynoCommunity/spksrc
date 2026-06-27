@@ -1,5 +1,6 @@
 KERNEL_ARCH = armada375
 KERNEL_VERS = 6.1
+# Default build 15284 unavailable
 KERNEL_BUILD = 15152
 KERNEL_DIST = linux-3.x
 KERNEL_BASE_ARCH = arm

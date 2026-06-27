@@ -1,5 +1,5 @@
 PKG_NAME = libjxl
-PKG_VERS = 0.7.2
+PKG_VERS = 0.11.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/libjxl/libjxl/archive/

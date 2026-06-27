@@ -1,11 +1,10 @@
 SPK_NAME = znc
 SPK_VERS = 1.10.1
-SPK_REV = 27
+SPK_REV = 28
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "python312"
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Advanced IRC bouncer. An IRC bouncer is nothing more than an IRC proxy. ZNC will always be connected in your chat rooms, and will be the gateway between your clients, and your IRC servers. You can, for instance, consult messages while you were offline or hide your identity.
@@ -47,15 +46,13 @@ ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
 
 DEPENDS += cross/znc
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-# bugfix for libicudata error, solution proposed by Steven R. Loomis
-# in https://sourceforge.net/p/icu/mailman/message/36666855/
-export LIBICU_DATA_PACKAGING_MODE=files
-endif
+# Use ICU archive data packaging to avoid runtime libicudata shared library
+# loading issues observed on DSM ARMv7 systems.
+export LIBICU_DATA_PACKAGING_MODE=archive
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: znc_extra_install
 znc_extra_install:

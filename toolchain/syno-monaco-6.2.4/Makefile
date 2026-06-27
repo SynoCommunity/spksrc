@@ -4,10 +4,10 @@ TC_KERNEL = 3.10.105
 TC_GLIBC = 2.20
 
 TC_DIST = monaco-gcc493_glibc220_hard-GPL
-TC_DIST_SITE_PATH = STMicroelectronics%20Monaco%20Linux%203.10.105
+TC_DIST_SITE_PATH = toolchains%2Fdsm6.2.4
 
 TC_TARGET = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot
 TC_EXTRA_CFLAGS = -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

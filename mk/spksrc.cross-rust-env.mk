@@ -1,5 +1,4 @@
-# Configuration for rust compiler
-#
+# rustc cross-compilation definitions
 
 RUSTUP_QORIQ_TOOLCHAIN = 1.82.0
 
@@ -63,10 +62,6 @@ RUST_TARGET = x86_64-unknown-linux-gnu
 endif
 ifeq ($(findstring $(RUST_ARCH), $(i686_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = i686-unknown-linux-gnu
-endif
-
-ifeq ($(RUST_TARGET),)
-$(error Arch $(RUST_ARCH) not supported)
 endif
 
 # By default use the default toolchain if unset

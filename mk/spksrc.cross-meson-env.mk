@@ -1,5 +1,8 @@
 # meson cross-compilation definitions
 
+# Force meson environment, bypassing default autotools settings.
+DEFAULT_ENV ?= meson
+
 # Set default base meson directory
 # Exceptionnally it is under a sub-directory (ex: zstd)
 ifeq ($(strip $(MESON_BASE_DIR)),)

@@ -110,9 +110,9 @@ cross-compile-wheel-%:
 	if [ -e "$(CROSSENV)" ] ; then \
 	   export PATH=$$(echo $${PATH}:$(call merge, $(ENV), PATH, :):$(CROSSENV_PATH)/build/bin | awk -v RS=':' '!seen[$$0]++' | paste -sd ':') ; \
 	   $(MSG) "PATH: [$${PATH}]" ; \
+	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
 	   $(MSG) "crossenv: [$(CROSSENV)]" ; \
 	   $(MSG) "python: [$$(which cross-python)]" ; \
-	   $(MSG) "maturin: [$$(which maturin)]" ; \
 	else \
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
@@ -158,8 +158,8 @@ pure-build-wheel-%:
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
-	$(MSG) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
-	$(RUN) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION))
+	$(MSG) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) --no-build-isolation $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION)) ; \
+	$(RUN) $$(which build-python) -m pip $(PIP_WHEEL_ARGS) --no-build-isolation $(or $(WHEEL_URL),$(WHEEL_NAME)==$(WHEEL_VERSION))
 
 post_wheel_compile_target: $(WHEEL_COMPILE_TARGET)
 

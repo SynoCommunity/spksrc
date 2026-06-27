@@ -16,7 +16,7 @@ INSTALL_TARGET = readarr_install
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = x86 x64 arm arm64
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = x86
 else ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))

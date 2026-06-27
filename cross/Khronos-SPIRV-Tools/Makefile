@@ -1,5 +1,5 @@
 PKG_NAME = SPIRV-Tools
-PKG_VERS = 2024.2
+PKG_VERS = 2025.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -18,13 +18,14 @@ CMAKE_ARGS += -DSPIRV_WERROR=OFF
 CMAKE_ARGS += -DSPIRV_TOOLS_BUILD_STATIC=OFF
 CMAKE_ARGS += -DSPIRV-Headers_SOURCE_DIR=$(WORK_DIR)/SPIRV-Headers
 
-include ../../mk/spksrc.cross-cmake.mk
+include ../../mk/spksrc.common.mk
 
-# Using gcc-8 we must use: make LDLIBS=-lstdc++fs
-# or by adding the following
-ifeq ($(call version_le, $(TC_GCC), 9),1)
+# std::filesystem integration to libstdc++ >= GCC 9
+ifeq ($(call version_lt, $(TC_GCC), 9),1)
 CMAKE_ARGS += -DCMAKE_CXX_STANDARD_LIBRARIES=-lstdc++fs
 endif
+
+include ../../mk/spksrc.cross-cmake.mk
 
 .PHONY: SPIRV-Tools_post_extract_target
 SPIRV-Tools_post_extract_target:

@@ -1,8 +1,8 @@
 PKG_NAME = dnscrypt-proxy
-PKG_VERS = 2.0.44
+PKG_VERS = 2.1.15
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/jedisct1/dnscrypt-proxy/archive
+PKG_DIST_SITE = https://github.com/DNSCrypt/dnscrypt-proxy/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
@@ -17,7 +17,7 @@ BUILD_DEPENDS = native/go
 NATIVE_GO = native/go
 endif
 
-HOMEPAGE = https://github.com/jedisct1/dnscrypt-proxy
+HOMEPAGE = https://github.com/DNSCrypt/dnscrypt-proxy
 COMMENT  = A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTP/2.
 LICENSE  = ISC
 
@@ -32,4 +32,4 @@ include ../../mk/spksrc.cross-go.mk
 dnscrypt_post_install:
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/blocklist
 	install -m 644 $(GO_SRC_DIR)/example-* $(STAGING_INSTALL_PREFIX)
-	install -m 644 $(GO_SRC_DIR)/../utils/generate-domains-blacklists/* $(STAGING_INSTALL_PREFIX)/blocklist
+	install -m 644 $(GO_SRC_DIR)/../utils/generate-domains-blocklist/* $(STAGING_INSTALL_PREFIX)/blocklist

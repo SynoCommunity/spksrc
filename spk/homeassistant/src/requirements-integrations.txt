@@ -1,0 +1,32 @@
+# additional requirements for some integrations
+
+pyatv==0.16.1
+yalexs-ble==3.1.2
+axis==65
+pydaikin==2.17.1
+denonavr==1.2.0
+greeclimate==2.1.0
+python-izone==1.2.9
+pytradfri==9.0.1
+python-miio==0.5.12
+
+# additionally installed to fix restfull integrations
+asyncio==3.4.3
+
+# preinstall to patch for dependency 'opuslib'
+voip_utils==0.3.4
+
+
+# further dependencies
+android_backup==0.2.0
+annotated-types==0.7.0
+asyncstdlib==3.13.1
+croniter==6.0.0
+ftfy==6.3.1
+opuslib==3.0.1
+pydantic==2.12.2
+srptools==1.0.1
+tabulate==0.9.0
+tinytag==2.2.0
+typing-inspection==0.4.2
+xmltodict==0.13.0

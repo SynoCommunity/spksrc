@@ -8,7 +8,7 @@ SPK_ICON = src/duplicity.png
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS) $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 PYTHON_PACKAGE = python312
-SPK_DEPENDS = "$(PYTHON_PACKAGE):gnupg>=2.1.6"
+SPK_DEPENDS = "gnupg>=2.1.6"
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 DEPENDS = cross/librsync cross/duply
@@ -33,17 +33,10 @@ SPK_COMMANDS = bin/duply bin/duplicity
 SPK_USR_LOCAL_LINKS  = bin:env/bin/duplicity
 SPK_USR_LOCAL_LINKS += bin:bin/duply
 
+include ../../mk/spksrc.common.mk
+
 # [cryptography]
 DEPENDS += cross/openssl3
-
-# [PyNaCl]
-DEPENDS += cross/libsodium
-ENV += SODIUM_INSTALL=system
-
-# [PyYAML]
-DEPENDS += cross/libyaml
-
-include ../../mk/spksrc.python.mk
 
 # [lxml]
 DEPENDS += cross/libxml2
@@ -57,6 +50,15 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CPPFLAGS = [protobuf] -std=c11
 endif
 
+# [PyNaCl]
+DEPENDS += cross/libsodium
+ENV += SODIUM_INSTALL=system
+
+# [PyYAML]
+DEPENDS += cross/libyaml
+
 # [duplicity]
 #   - To be built last
 DEPENDS += python/duplicity
+
+include ../../mk/spksrc.spk-meta.mk

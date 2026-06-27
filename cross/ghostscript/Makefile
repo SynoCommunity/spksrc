@@ -1,6 +1,6 @@
 PKG_NAME = ghostscript
 PKG_REALNAME = ghostpdl
-PKG_VERS = 10.05.0
+PKG_VERS = 10.06.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_REALNAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$(subst .,,$(PKG_VERS))
@@ -21,7 +21,14 @@ GNU_CONFIGURE = 1
 # tesseract integration requires c++17, but fails to build...
 CONFIGURE_ARGS += --without-tesseract
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
+
+# Fix brotli C90 compatibility issue with older toolchains
+# The embedded brotli library uses C99-style mixed declarations
+ifneq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),)
+ADDITIONAL_CFLAGS = -Wno-error=declaration-after-statement
+endif
+
 ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
 CONFIGURE_ARGS += --disable-neon
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))

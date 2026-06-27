@@ -1,5 +1,5 @@
 PKG_NAME = gdb
-PKG_VERS = 14.2
+PKG_VERS = 17.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/gdb
@@ -15,7 +15,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --enable-host-shared
 CONFIGURE_ARGS += --with-system-zlib
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 # sim/ppc is broken
@@ -31,8 +31,8 @@ PLIST_TRANSFORM_SED_ARGS += -e 's?lib:lib/libinproctrace.so??g'
 endif
 endif
 
-ifneq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))
-# binary only created for arm
+# binary only created for aarch64
+ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PLIST_TRANSFORM_SED_ARGS += -e 's?bin:bin/run??g'
 endif
 

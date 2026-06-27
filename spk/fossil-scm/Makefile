@@ -1,6 +1,6 @@
 SPK_NAME = fossil-scm
-SPK_VERS = 2.17
-SPK_REV = 3
+SPK_VERS = 2.27
+SPK_REV = 4
 SPK_ICON = src/fossil-scm.png
 
 DEPENDS = cross/fossil-scm
@@ -10,7 +10,7 @@ DISPLAY_NAME = Fossil SCM
 
 DESCRIPTION = "Fossil is a simple, high-reliability, distributed software configuration management system."
 STARTABLE = no
-CHANGELOG = "1. Update fossil-scm to 2.17.<br/>2. Update openssl to 1.1.1l."
+CHANGELOG = "1. Update fossil-scm to 2.27. <br/>2. Update openssl to version 3."
 
 HOMEPAGE = https://www.fossil-scm.org/
 LICENSE  = 2-clause BSD

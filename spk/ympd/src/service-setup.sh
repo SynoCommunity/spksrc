@@ -1,7 +1,4 @@
 
-# pass variables by env
-export PID_FILE=${PID_FILE}
-export SERVICE_PORT=${SERVICE_PORT}
-export SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST}
-
-SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/start.sh"
+SERVICE_COMMAND="${SYNOPKG_PKGDEST}/bin/ympd -h /var/packages/mpd/var/mpd.socket -w ${SERVICE_PORT}"
+SVC_BACKGROUND=y
+SVC_WRITE_PID=y

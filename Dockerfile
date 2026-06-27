@@ -36,6 +36,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	gettext \
 	gfortran \
 	git \
+	glslang-tools \
 	gobject-introspection \
 	gperf \
 	imagemagick \
@@ -72,6 +73,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	rsync \
 	ruby-mustache \
 	scons \
+	spirv-tools \
 	subversion \
 	sudo \
 	swig \
@@ -91,6 +93,7 @@ RUN apt install --no-install-recommends -y \
 	meson \
 	ninja-build \
 	python3 \
+	python3-jinja2 \
 	python3-mako \
 	python3-pip \
 	python3-setuptools \

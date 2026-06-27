@@ -11,8 +11,4 @@ HOMEPAGE = https://pugixml.org/
 COMMENT  = Light-weight, simple and fast XML parser for C++ with XPath support.
 LICENSE  = MIT
 
-GNU_CONFIGURE = 1
-
-CMAKE_USE_TOOLCHAIN_FILE = OFF
-
 include ../../mk/spksrc.cross-cmake.mk

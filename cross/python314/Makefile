@@ -1,5 +1,5 @@
 PKG_NAME = python314
-PKG_VERS = 3.14.0
+PKG_VERS = 3.14.5
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
 BUILD_DEPENDS = native/python314
 
-DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
+DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz cross/zstd
 # required for Sleepycat^WOracle Berkeley DB interface
 DEPENDS += cross/berkeleydb
 # required for uuid module

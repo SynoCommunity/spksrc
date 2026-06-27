@@ -1,5 +1,7 @@
 PKG_NAME = pandas
-PKG_VERS = 2.3.2
+# Moving to pandas>=3.x requires gcc>=11
+# due to numpy genereted headers using newer API
+PKG_VERS = 2.3.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/pandas
@@ -15,7 +17,14 @@ LICENSE  = 3-Clause BSD license
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
 
-# Allows compatibility with numpy API 1.x / 2.x
-DEPENDS  = python/numpy_1.26
+OPTIONAL_DEPENDS  = python/numpy
+OPTIONAL_DEPENDS  = python/numpy-latest
+
+# On older python 3.10/3.11 keep using numpy 2.2.x
+ifneq ($(filter %310 %311,$(PYTHON_PACKAGE)),)
+DEPENDS  = python/numpy
+else
+DEPENDS  = python/numpy-latest
+endif
 
 include ../../mk/spksrc.python-wheel-meson.mk

@@ -2,6 +2,6 @@ TK_ARCH = alpine4k
 TK_VERS = 7.2
 
 TK_TARGET = arm-unknown-linux-gnueabi
-TK_SYSROOT = sysroot
+TK_SYSROOT = $(TK_TARGET)/sysroot
 
 include ../../mk/spksrc.toolkit.mk

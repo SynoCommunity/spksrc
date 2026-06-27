@@ -2,6 +2,6 @@ bin:bin/MP4Box
 bin:bin/gpac
 lib:lib/gpac/gm_validator.so
 lnk:lib/libgpac.so
-lnk:lib/libgpac.so.12
-lib:lib/libgpac.so.12.10.1
+lnk:lib/libgpac.so.16
+lib:lib/libgpac.so.16.5.0
 rsc:share/gpac/

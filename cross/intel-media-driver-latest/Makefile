@@ -1,5 +1,6 @@
 PKG_NAME = intel-media
-PKG_VERS = 24.2.5
+# Last supported version to match gmmlib 22.5
+PKG_VERS = 24.4.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/intel/media-driver/archive
@@ -32,3 +33,16 @@ include ../../mk/spksrc.cross-cmake.mk
 CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(WORK_DIR)/install/$(INSTALL_PREFIX)
 CMAKE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
 CMAKE_ARGS += -Wno-dev
+
+# Reduce build-time binary size
+GCC_NO_DEBUG_INFO = 1
+
+# Deactivate unecessary GPU generations (only Gen8/Gen9 needed)
+#CMAKE_ARGS += -DGEN8=OFF
+#CMAKE_ARGS += -DGEN11=OFF
+#CMAKE_ARGS += -DGEN12=OFF
+#CMAKE_ARGS += -DMTL=OFF
+#CMAKE_ARGS += -DARL=OFF
+#CMAKE_ARGS += -DLNL=OFF
+#CMAKE_ARGS += -DBMG=OFF
+#CMAKE_ARGS += -DPTL=OFF

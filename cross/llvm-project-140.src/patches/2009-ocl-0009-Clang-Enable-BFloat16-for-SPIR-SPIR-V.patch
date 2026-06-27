@@ -1,0 +1,26 @@
+From a82f420c0f26413bb9d991a823e690f8f5475977 Mon Sep 17 00:00:00 2001
+From: Wenju He <wenju.he@intel.com>
+Date: Fri, 21 Nov 2025 04:54:53 +0100
+Subject: [PATCH 2/2] [Clang] Enable BFloat16 for SPIR/SPIR-V
+
+---
+ clang/lib/Basic/Targets/SPIR.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/clang/lib/Basic/Targets/SPIR.h b/clang/lib/Basic/Targets/SPIR.h
+index a40d4b3ca27e..9541ad5b1af9 100644
+--- a/clang/lib/Basic/Targets/SPIR.h
++++ b/clang/lib/Basic/Targets/SPIR.h
+@@ -92,6 +92,9 @@ protected:
+     UseAddrSpaceMapMangling = true;
+     HasLegalHalfType = true;
+     HasFloat16 = true;
++    HasBFloat16 = true;
++    BFloat16Width = BFloat16Align = 16;
++    BFloat16Format = &llvm::APFloat::BFloat();
+     // Define available target features
+     // These must be defined in sorted order!
+     NoAsmVariants = true;
+-- 
+2.39.1
+

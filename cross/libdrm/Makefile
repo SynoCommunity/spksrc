@@ -1,5 +1,5 @@
 PKG_NAME = libdrm
-PKG_VERS = 2.4.123
+PKG_VERS = 2.4.131
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://dri.freedesktop.org/libdrm
@@ -23,7 +23,7 @@ CONFIGURE_ARGS += -Dvmwgfx=disabled
 # - freedreno 	(all ARM CPU)
 # - intel	(all intel CPU)
 # - radeon	(all 64bit intel CPU)
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 PLIST_TRANSFORM = grep -v -e libdrm_intel -e libdrm_amdgpu -e libdrm_radeon -e libdrm_etnaviv -e libdrm_freedreno
 endif

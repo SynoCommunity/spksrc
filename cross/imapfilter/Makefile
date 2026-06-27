@@ -1,5 +1,5 @@
 PKG_NAME = imapfilter
-PKG_VERS = 2.8.3
+PKG_VERS = 2.8.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/lefcha/imapfilter/archive
@@ -20,7 +20,7 @@ ENV += SHAREDIR="$(INSTALL_PREFIX)/share/imapfilter"
 ENV += SSLCAPATH="/etc/ssl/certs"
 ENV += SSLCAFILE="/etc/ssl/certs/ca-certificates.crt"
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 ADDITIONAL_CFLAGS = -DLUA_USE_C89

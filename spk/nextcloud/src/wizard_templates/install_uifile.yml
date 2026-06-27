@@ -1,5 +1,5 @@
 NEXTCLOUD_INSTALL_RESTORE_STEP_TITLE: "Nextcloud installation type"
-NEXTCLOUD_INSTALL_RESTORE_DESCRIPTION: "For the installation, you have the option to either create a new instance or restore from a backup archive."
+NEXTCLOUD_INSTALL_RESTORE_DESCRIPTION: "For the installation, you have the option to either create a new instance or restore from a backup archive. During install the package will download the Nextcloud server files; this archive is large and the step may take several minutes to complete."
 NEXTCLOUD_INSTALL_LABEL: "Install new deployment"
 NEXTCLOUD_RESTORE_LABEL: "Restore from archive"
 NEXTCLOUD_BACKUP_FILE_LOCATION_DESCRIPTION: "Please provide the complete path to the archive you wish to restore."

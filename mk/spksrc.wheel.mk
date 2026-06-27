@@ -16,7 +16,7 @@
 #                  spksrc.spk.mk: MAKECMDGOALS is empty (needs to be set to wheel)
 # make wheel-<arch>-<tcversion> : MAKECMDGOALS is wheel
 #          make download-wheels : MAKECMDGOALS is download-wheels
-WHEEL_GOAL := $(if $(MAKECMDGOALS),$(MAKECMDGOALS),wheel)
+WHEEL_GOAL := $(if $(filter download-wheels,$(MAKECMDGOALS)),download-wheels,wheel)
 
 # Completion status file
 WHEEL_COOKIE = $(WORK_DIR)/.wheel_done

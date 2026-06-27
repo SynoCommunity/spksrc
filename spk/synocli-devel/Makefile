@@ -1,11 +1,11 @@
 SPK_NAME = synocli-devel
-SPK_VERS = 1.3
-SPK_REV = 4
+SPK_VERS = 1.5
+SPK_REV = 6
 SPK_ICON = src/synocli-devel.png
-CHANGELOG = "1. Fix autoconf to use installed m4 command.<br/>2. Update autoconf to v2.72.<br/>3. Update binutils to v2.42.<br/>4. Update gdb to v14.2.<br/>5. Update strace to v6.9."
+CHANGELOG = "1. Update LLVM to 22.1.3 (DSM7\).<br/>2. Update binutils to 2.46.0<br/>3. Update autoconf to 2.73.<br/>4. Update strace to 6.19."
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.65.5, autoconf 2.71, binutils 2.40$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.5
+DESCRIPTION = SynoCli Development Tools provides a set of command-line utilities for system development and debugging: automake 1.18.1, autoconf 2.73$(OPTIONAL_DESC), make 4.4.1, pkg-config 0.29.2, libtree 3.1.1, strace 6.19
 DISPLAY_NAME = SynoCli Development Tools
 STARTABLE = no
 
@@ -54,13 +54,20 @@ SPK_COMMANDS += bin/m4
 ## automake
 ##
 SPK_COMMANDS += bin/aclocal
-SPK_COMMANDS += bin/aclocal-1.16
+SPK_COMMANDS += bin/aclocal-1.18
 SPK_COMMANDS += bin/automake
-SPK_COMMANDS += bin/automake-1.16
+SPK_COMMANDS += bin/automake-1.18
 
 ##
 ## binutils
 ##
+ifeq ($(call version_lt, $(TC_GCC), 4.4),1)
+OPTIONAL_DESC += ", binutils 2.32"
+else ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
+OPTIONAL_DESC += ", binutils 2.41"
+else
+OPTIONAL_DESC += ", binutils 2.46.0"
+endif
 SPK_COMMANDS += bin/addr2line
 SPK_COMMANDS += bin/ar
 SPK_COMMANDS += bin/as
@@ -78,7 +85,6 @@ endif
 SPK_COMMANDS += bin/gprof
 SPK_COMMANDS += bin/ld
 SPK_COMMANDS += bin/ld.bfd
-SPK_COMMANDS += bin/ld.gold
 SPK_COMMANDS += bin/nm
 SPK_COMMANDS += bin/objcopy
 SPK_COMMANDS += bin/objdump
@@ -93,8 +99,10 @@ SPK_COMMANDS += bin/strip
 ##
 ifeq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 OPTIONAL_DESC += ", gdb 7.12.1"
+else ifeq ($(call version_lt, $(TC_GCC), 5),1)
+OPTIONAL_DESC += ", gdb 14.2"
 else
-OPTIONAL_DESC += ", gdb 13.2"
+OPTIONAL_DESC += ", gdb 17.1"
 endif
 SPK_COMMANDS += bin/gcore
 SPK_COMMANDS += bin/gdb
@@ -109,8 +117,8 @@ endif
 ##
 ifneq ($(call version_lt, $(TC_GCC), 4.8.1),1)
 ifeq ($(call version_ge, $(TC_GCC), 5.1),1)
-OPTIONAL_DESC += ", LLVM 16.0.6"
-SPK_COMMANDS += bin/clang-16
+OPTIONAL_DESC += ", LLVM 22.1.3"
+SPK_COMMANDS += bin/clang-22
 else
 OPTIONAL_DESC += ", LLVM 9.0.1"
 SPK_COMMANDS += bin/clang-9
@@ -123,7 +131,6 @@ SPK_COMMANDS += bin/clang-cpp
 SPK_COMMANDS += bin/clang-extdef-mapping
 SPK_COMMANDS += bin/clang-format
 SPK_COMMANDS += bin/clang-refactor
-SPK_COMMANDS += bin/clang-rename
 SPK_COMMANDS += bin/clang-scan-deps
 SPK_COMMANDS += bin/git-clang-format
 SPK_COMMANDS += bin/hmaptool
@@ -137,7 +144,6 @@ SPK_COMMANDS += bin/llvm-objdump
 SPK_COMMANDS += bin/llvm-profdata
 SPK_COMMANDS += bin/llvm-ranlib
 SPK_COMMANDS += bin/llvm-rc
-SPK_COMMANDS += bin/llvm-readelf
 SPK_COMMANDS += bin/llvm-readobj
 SPK_COMMANDS += bin/llvm-size
 SPK_COMMANDS += bin/llvm-strings
@@ -168,6 +174,5 @@ SPK_COMMANDS += bin/libtree
 ##
 SPK_COMMANDS += bin/strace
 SPK_COMMANDS += bin/strace-log-merge
-
 
 include ../../mk/spksrc.spk.mk

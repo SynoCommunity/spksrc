@@ -1,0 +1,123 @@
+Index: FFmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -7870,7 +7870,7 @@ if enabled x86; then
+     esac
+ elif enabled_any aarch64 ppc64 && ! enabled bigendian; then
+     case $target_os in
+-        linux)
++        linux|mingw32*|mingw64*|win32|win64)
+             ;;
+         *)
+             disable ffnvcodec cuvid nvdec nvenc
+Index: FFmpeg/libavcodec/cuviddec.c
+===================================================================
+--- libavcodec/cuviddec.c
++++ libavcodec/cuviddec.c
+@@ -164,9 +164,17 @@ static int CUDAAPI cuvid_handle_video_se
+         avctx->height = cuinfo.display_area.bottom - cuinfo.display_area.top;
+     }
+ 
+-    // target width/height need to be multiples of two
+-    cuinfo.ulTargetWidth = avctx->width = (avctx->width + 1) & ~1;
+-    cuinfo.ulTargetHeight = avctx->height = (avctx->height + 1) & ~1;
++    // NVDEC target dimensions must be even-aligned for internal surface allocation.
++    // For chroma-subsampled formats (420/422), the output dimensions must also be
++    // even. For monochrome/444, keep the original output dimensions and only
++    // even-align the NVDEC target — the frame copy will crop to avctx dimensions.
++    cuinfo.ulTargetWidth  = (avctx->width + 1) & ~1;
++    cuinfo.ulTargetHeight = (avctx->height + 1) & ~1;
++    if (format->chroma_format == cudaVideoChromaFormat_420 ||
++        format->chroma_format == cudaVideoChromaFormat_422) {
++        avctx->width  = cuinfo.ulTargetWidth;
++        avctx->height = cuinfo.ulTargetHeight;
++    }
+ 
+     // aspect ratio conversion, 1:1, depends on scaled resolution
+     cuinfo.target_rect.left = 0;
+@@ -916,7 +924,7 @@ static av_cold int cuvid_decode_init(AVC
+     if (probe_desc && probe_desc->nb_components)
+         probed_bit_depth = probe_desc->comp[0].depth;
+ 
+-    if (probe_desc && !probe_desc->log2_chroma_w && !probe_desc->log2_chroma_h)
++    if (probe_desc && probe_desc->nb_components > 1 && !probe_desc->log2_chroma_w && !probe_desc->log2_chroma_h)
+         is_yuv444 = 1;
+ 
+ #ifdef NVDEC_HAVE_422_SUPPORT
+@@ -1103,7 +1111,7 @@ static av_cold int cuvid_decode_init(AVC
+     // Skip first 4 bytes of AV1CodecConfigurationRecord to keep configOBUs
+     // only, otherwise cuvidParseVideoData report unknown error.
+     if (avctx->codec->id == AV_CODEC_ID_AV1 &&
+-            extradata_size > 4 &&
++            extradata_size >= 4 &&
+             extradata[0] & 0x80) {
+         extradata += 4;
+         extradata_size -= 4;
+Index: FFmpeg/libavcodec/nvdec.c
+===================================================================
+--- libavcodec/nvdec.c
++++ libavcodec/nvdec.c
+@@ -732,8 +732,18 @@ int ff_nvdec_frame_params(AVCodecContext
+     chroma_444 = supports_444 && cuvid_chroma_format == cudaVideoChromaFormat_444;
+ 
+     frames_ctx->format            = AV_PIX_FMT_CUDA;
+-    frames_ctx->width             = (avctx->coded_width + 1) & ~1;
+-    frames_ctx->height            = (avctx->coded_height + 1) & ~1;
++    // NVDEC target dimensions must be even-aligned for internal surface allocation.
++    // For chroma-subsampled formats (420/422), the output dimensions must also be
++    // even. For monochrome/444, keep the original output dimensions and only
++    // even-align the NVDEC target — the frame copy will crop to avctx dimensions.
++    if (cuvid_chroma_format == cudaVideoChromaFormat_420 ||
++        cuvid_chroma_format == cudaVideoChromaFormat_422) {
++        frames_ctx->width         = (avctx->coded_width  + 1) & ~1;
++        frames_ctx->height        = (avctx->coded_height + 1) & ~1;
++    } else {
++        frames_ctx->width         = avctx->coded_width;
++        frames_ctx->height        = avctx->coded_height;
++    }
+     /*
+      * We add two extra frames to the pool to account for deinterlacing filters
+      * holding onto their frames.
+Index: FFmpeg/libavcodec/nvenc.c
+===================================================================
+--- libavcodec/nvenc.c
++++ libavcodec/nvenc.c
+@@ -683,7 +683,9 @@ static int nvenc_check_capabilities(AVCo
+ 
+ #ifdef NVENC_HAVE_MVHEVC
+     ctx->multiview_supported = nvenc_check_cap(avctx, NV_ENC_CAPS_SUPPORT_MVHEVC_ENCODE) > 0;
+-    if(ctx->profile == NV_ENC_HEVC_PROFILE_MULTIVIEW_MAIN && !ctx->multiview_supported) {
++    if (avctx->codec_id == AV_CODEC_ID_HEVC &&
++        ctx->profile == NV_ENC_HEVC_PROFILE_MULTIVIEW_MAIN &&
++        !ctx->multiview_supported) {
+         av_log(avctx, AV_LOG_WARNING, "Multiview not supported by the device\n");
+         return AVERROR(ENOSYS);
+     }
+@@ -1359,6 +1361,11 @@ static av_cold int nvenc_setup_h264_conf
+         case NV_ENC_H264_PROFILE_BASELINE:
+             cc->profileGUID = NV_ENC_H264_PROFILE_BASELINE_GUID;
+             avctx->profile = AV_PROFILE_H264_BASELINE;
++            if (cc->frameIntervalP > 1) {
++                av_log(avctx, AV_LOG_WARNING,
++                       "B-frames are not supported by H.264 Baseline profile, disabling.\n");
++                cc->frameIntervalP = 1;
++            }
+             break;
+         case NV_ENC_H264_PROFILE_MAIN:
+             cc->profileGUID = NV_ENC_H264_PROFILE_MAIN_GUID;
+Index: FFmpeg/libavfilter/vf_scale_cuda.h
+===================================================================
+--- libavfilter/vf_scale_cuda.h
++++ libavfilter/vf_scale_cuda.h
+@@ -24,9 +24,8 @@
+ #define AVFILTER_SCALE_CUDA_H
+ 
+ #if defined(__CUDACC__) || defined(__CUDA__)
+-#include <stdint.h>
+ typedef cudaTextureObject_t CUtexObject;
+-typedef uint8_t* CUdeviceptr;
++typedef unsigned char* CUdeviceptr;
+ #else
+ #include <ffnvcodec/dynlink_cuda.h>
+ #endif

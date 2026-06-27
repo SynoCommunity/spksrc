@@ -9,4 +9,4 @@ TC_DIST_SITE_PATH = AMD%20x86%20Linux%20Linux%205.10.55%20%28epyc7002%29
 TC_TARGET = x86_64-pc-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sys-root
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk
