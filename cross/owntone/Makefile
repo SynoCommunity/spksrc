@@ -1,15 +1,14 @@
 PKG_NAME = owntone
-PKG_VERS = 29.0
+PKG_VERS = 29.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/owntone/owntone-server/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# https://github.com/owntone/owntone-server/releases/download/29.0/owntone-29.0.tar.xz
-# ffmpeg7 requires c11 support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# ffmpeg7:
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 # archs lacking SO_REUSEPORT in sockets.h
-UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS) $(PPC_ARCHS) $(i686_ARCHS) comcerto2k
+UNSUPPORTED_ARCHS += $(PPC_ARCHS) $(i686_ARCHS) comcerto2k
 
 # build instructions:
 # https://owntone.github.io/owntone-server/building/
@@ -20,7 +19,6 @@ DEPENDS += cross/curl
 DEPENDS += cross/libunistring
 DEPENDS += cross/libconfuse
 DEPENDS += cross/libsodium
-DEPENDS += cross/mxml
 DEPENDS += cross/libxml2
 DEPENDS += cross/sqlite
 DEPENDS += cross/libevent

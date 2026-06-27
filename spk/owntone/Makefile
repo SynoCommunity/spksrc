@@ -1,5 +1,5 @@
 SPK_NAME = owntone
-SPK_VERS = 29.0
+SPK_VERS = 29.2
 SPK_REV = 1
 SPK_ICON = src/owntone.png
 
@@ -10,7 +10,7 @@ SPK_DEPENDS = $(FFMPEG_PACKAGE)
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS) $(i686_ARCHS) comcerto2k
 
 
-MAINTAINER = SynoCommunity
+MAINTAINER = hgy59
 # TODO: add limitations to DESCRIPTION
 # - mdns does not work under DSM
 # - 
@@ -35,7 +35,7 @@ ADMIN_PORT = $(SERIVCE_PORT)
 
 POST_STRIP_TARGET = owntone_extra_install
 
-include ../../mk/spksrc.ffmpeg.mk
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: owntone_extra_install
 owntone_extra_install:
