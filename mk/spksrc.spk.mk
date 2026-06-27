@@ -413,7 +413,7 @@ wizards:
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@$(MSG) "Create default DSM7 uninstall wizard"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $(SPKSRC_MK)wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(MKDIR)/wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 ifeq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
