@@ -23,6 +23,7 @@ THE SOFTWARE.
 """
 
 import os
+import pipes
 import sys
 import time
 import logging
@@ -52,13 +53,14 @@ def main():
 
     device_name = output.replace('DeviceName: ', '').strip().replace(' ', '-')
     mount_dir = os.path.join(VOLUME_DIR, device_name)
-    output = os.popen('mount | grep %s' % device_name).read().strip()
+    quoted_name = pipes.quote(device_name)
+    output = os.popen('mount | grep %s' % quoted_name).read().strip()
     if len(output) > 0:
         logger.error('%s is already mounted! (%s)' % (device_name, output))
         return
 
     output = os.popen(
-        'synoshare --get %s | grep Comment' % device_name).read().strip()
+        'synoshare --get %s | grep Comment' % quoted_name).read().strip()
     if output.find('Comment') >= 0:
         logger.info('Share - %s exists. (%s)' % (device_name, output))
         if output.find('iOS Access') < 0:
@@ -78,7 +80,7 @@ def main():
         return
 
     # magic: we have to enter the folder first time
-    os.system('cd %s && ls' % mount_dir)
+    os.system('cd %s && ls' % pipes.quote(mount_dir))
     notify('%s is ready for access in FileStation.' % device_name)
 
 if __name__ == '__main__':
