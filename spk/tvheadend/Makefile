@@ -18,7 +18,7 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 80729d2f of June 23rd 2026<br/>2. Update all python wheels<br/>3. Fix for gracenote2epg install<br/>4. Enablement of dbus<br/>5. Experimental migration to ffmpeg 8.1<br/>6. Enable new experimental vue UI<br/>7. Update libhdhomerun to 20260313<br/>8. Migrate to python 3.14"
+CHANGELOG = "1. Update to latest git version 80729d2f of June 23rd 2026<br/>2. Update all python wheels<br/>3. Update to gracenote2epg 2.0<br/>4. Enablement of dbus<br/>5. Experimental migration to ffmpeg 8.1<br/>6. Enable new experimental vue UI<br/>7. Update libhdhomerun to 20260313<br/>8. Migrate to python 3.14<br/>9. Removal of zap2epg as replaced with gracenote2epg"
 HOMEPAGE = https://tvheadend.org/
 LICENSE = GPL v3
 
@@ -35,8 +35,6 @@ else
 SERVICE_SETUP = src/service-setup.sh
 endif
 
-POST_SERVICE_TARGET = tvh_post_service
-
 # Service configuration
 SERVICE_PORT = 9981
 SERVICE_PORT_TITLE = Tvheadend (HTTP)
@@ -52,36 +50,20 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 DEPENDS  = cross/tvheadend
 DEPENDS += cross/dtv-scan-tables
 DEPENDS += cross/docker-tvheadend
-DEPENDS += cross/zap2epg
-
-OPTIONAL_DEPENDS += python/numpy-latest
-OPTIONAL_DEPENDS += python/pandas
 
 WHEELS += src/requirements-pure.txt
-
-include ../../mk/spksrc.common.mk
-
-# Optional gracenote2epg dependencies
-ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
-# [numpy]
-DEPENDS += python/numpy-latest
-
-# [pandas]
-DEPENDS += python/pandas
-endif
-
-# [pandas] https://github.com/th0ma7/gracenote2epg/issues/8
-WHEELS += pgeocode==0.5.0
 
 # Export version to the build where version
 # script gets patched accordingly by:
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
 
+POST_SERVICE_TARGET = tvh_post_service
+
+include ../../mk/spksrc.spk-meta.mk
+
 .PHONY: tvh_post_service
 tvh_post_service:
 	sed -i -e 's/_PYTHON_PACKAGE_/$(PYTHON_PACKAGE)/g' \
 	       -e 's/_FFMPEG_PACKAGE_/$(FFMPEG_PACKAGE)/g' \
 	           $(WORK_DIR)/scripts/service-setup
-
-include ../../mk/spksrc.spk-meta.mk
