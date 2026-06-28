@@ -1,4 +1,9 @@
+###############################################################################
+# spksrc.rules/tests.mk
+#
 # Framework testing common rules, shared by all makefiles
+#
+###############################################################################
 
 include mk/spksrc.common.mk
 

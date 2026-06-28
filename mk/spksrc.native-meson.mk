@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.native-meson.mk
+#
 # Build native Meson programs
 #
 # This makefile extends spksrc.native-cc.mk with Meson-specific functionality
@@ -5,6 +8,7 @@
 # prerequisites:
 # - native/module depends on meson + ninja
 #
+###############################################################################
 
 # Package dependent (same as native-cc.mk)
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)

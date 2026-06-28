@@ -1,6 +1,10 @@
-### Python module rules
-#   Invoke make to (cross-) compile a python extension module. 
+###############################################################################
+# spksrc.python-module.mk
+#
+# Invoke make to (cross-) compile a python extension module.
 # You can do some customization through python-cc.mk
+#
+###############################################################################
 
 # Python module targets
 ifeq ($(strip $(CONFIGURE_TARGET)),)

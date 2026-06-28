@@ -1,7 +1,10 @@
-### Install rules
-#   Install the freshly compiled software, and correct the pkg_config files.
+###############################################################################
+# spksrc.build/install.mk
+#
+# Install the freshly compiled software, and correct the pkg_config files.
 #   This installation will be used to configure and compile other pieces of softwares. This is
 #   not the target directory, theses files are copied in the stating directory.
+#
 # Targets are executed in the following order:
 #  install_msg_target
 #  $(PRE_INSTALL_PLIST)
@@ -10,15 +13,19 @@
 #  post_install_target              (override with POST_INSTALL_TARGET)
 #  $(INSTALL_PLIST)
 #  install_correct_lib_files
+#
 # Variables:
 #  INSTALL_PREFIX                   Target directory where the software will be run.
 #  INSTALL_DIR                      Where to install files. INSTALL_PREFIX will be added.
 #  STAGING_INSTALL_PREFIX           Where to install files, in extenso.
 #  INSTALL_MAKE_OPTIONS             Parameters to add to make command
 #                                   (default: install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX))
+#
 # Files:
 #  $(WORK_DIR)/$(PKG_NAME).plist    List of files installed. Can be used to build the PLIST file
 #                                   of each software.
+#
+###############################################################################
 
 INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)install_done
 

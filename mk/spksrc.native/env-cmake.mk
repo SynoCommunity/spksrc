@@ -1,6 +1,9 @@
+###############################################################################
+# spksrc.native/env-cmake.mk
 #
 # Configuration for NATIVE CMake build
 #
+###############################################################################
 
 ifeq ($(strip $(filter -DCMAKE_BUILD_TYPE=%,$(CMAKE_ARGS))),)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=Release

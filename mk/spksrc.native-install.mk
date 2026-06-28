@@ -1,9 +1,14 @@
+###############################################################################
+# spksrc.native-install.mk
+#
 # include this file to install native package without building from source
 # adjusted for native packages based on spksrc.install-resources.mk
 #
 # native packages using this have to:
-# - implement a custom INSTALL_TARGET to copy the required files to the 
+# - implement a custom INSTALL_TARGET to copy the required files to the
 #   target location under $(STAGING_INSTALL_PREFIX)
+#
+###############################################################################
 
 # Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)

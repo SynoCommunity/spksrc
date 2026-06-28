@@ -1,3 +1,9 @@
+###############################################################################
+# spksrc.spk-meta/ffmpeg.mk
+#
+# FFmpeg meta integration: selects the ffmpeg* meta and its staging when
+# FFMPEG_PACKAGE is set.
+###############################################################################
 
 # Set default ffmpeg package name
 ifeq ($(strip $(FFMPEG_PACKAGE)),)

@@ -1,17 +1,24 @@
-### Strip rules
-#   Strip the binary files (exec and libs) in the staging directory. 
+###############################################################################
+# spksrc.spk/strip.mk
+#
+# Strip the binary files (exec and libs) in the staging directory.
+#
 # Targets are executed in the following order:
 #  strip_msg_target
 #  pre_strip_target   (override with PRE_STRIP_TARGET)
 #  strip_target       (override with STRIP_TARGET)
 #  post_strip_target  (override with POST_STRIP_TARGET)
+#
 # Variables:
 #  TC                 If set, TC_ENV will be parsed to find the strip utility.
 #  TC_ENV             List of variables defining the build environment.
 #  STAGING_DIR        Directory where the strip files.
+#
 # Files
 #  $(INSTALL_PLIST)  Pair of type:filepath, type can be bin, lib, lnk, or rsc. Only bin and lib
-#                    files will be stripped. 
+#                    files will be stripped.
+#
+###############################################################################
 
 # Prefer target strip if present, otherwise fallback to host strip
 STRIP := $(or $(wildcard $(TC_PATH)/$(TC_PREFIX)strip),strip)

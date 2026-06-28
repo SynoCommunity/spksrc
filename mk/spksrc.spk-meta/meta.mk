@@ -1,3 +1,10 @@
+###############################################################################
+# spksrc.spk-meta/meta.mk
+#
+# Generates tc_vars.meta.mk, an inspectable snapshot of the meta build
+# environment accumulated by SPK_BASE_TEMPLATE (never -included).
+###############################################################################
+
 ifndef SPKSRC_SPK_META_MK
 SPKSRC_SPK_META_MK := 1
 

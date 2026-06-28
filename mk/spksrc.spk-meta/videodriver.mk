@@ -1,3 +1,10 @@
+###############################################################################
+# spksrc.spk-meta/videodriver.mk
+#
+# Video-driver meta integration: selects the videodriver meta on supported
+# archs when VIDEODRV_PACKAGE is set.
+###############################################################################
+
 IS_VIDEODRV_SUPPORTED := $(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS))
 
 ifneq ($(IS_VIDEODRV_SUPPORTED),)

@@ -1,11 +1,15 @@
-### crossenv rules
-#   Creates a crossenv for cross-compiling wheels.
+###############################################################################
+# spksrc.python-crossenv.mk
+#
+# Creates a crossenv for cross-compiling wheels.
 #   Uses "default" as fallback and create a symlink
 #   between $(WORK_DIR)/crossenv -> crossenv-default.
 #   Otherwise uses wheel <name>-<version>, then
 #   fallback to wheel <name> only.
 #   It also generates a crossenv specific python-cc.mk
 #   located under $(WORK_DIR)/crossenv-<wheel>/build.
+#
+###############################################################################
 
 # Targets are executed in the following order:
 #  crossenv_msg_target

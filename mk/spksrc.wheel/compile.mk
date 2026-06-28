@@ -1,5 +1,7 @@
-### Wheel rules
-# Compile wheels for modules listed in WHEELS. 
+###############################################################################
+# spksrc.wheel/compile.mk
+#
+# Compile wheels for modules listed in WHEELS.
 #
 # Targets are executed in the following order:
 #  wheel_compile_msg_target
@@ -12,6 +14,8 @@
 #  WHEEL_TYPE              Type of wheel to process (abi3, crossenv, pure)
 #  WHEEL_URL               URL usually of type git+https://
 #  WHEEL_VERSION           Version of wheel to process (can be empty)
+#
+###############################################################################
 
 ifeq ($(WHEEL_VERSION),)
 WHEEL_COMPILE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_compile-$(WHEEL_NAME)_done

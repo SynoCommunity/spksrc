@@ -1,17 +1,23 @@
-### Configure rules
-#   Run the GNU configure script or any similar configure tool. 
+###############################################################################
+# spksrc.build/configure.mk
+#
+# Run the GNU configure script or any similar configure tool.
+#
 # Targets are executed in the following order:
 #  configure_msg_target
 #  pre_configure_target    (override with PRE_CONFIGURE_TARGET)
 #  configure_target        (override with CONFIGURE_TARGET)
 #  post_configure_target   (override with POST_CONFIGURE_TARGET)
+#
 # Variables:
 #  GNU_CONFIGURE           If set, configure is assumed to be an autoconf generated script
 #                          which accepts --host=, --build, and --prefix= options.
 #  TC_CONFIGURE_ARGS       --host/--build pair to pass to configure.
 #  INSTALL_PREFIX          Directory for the --prefix option of configure.
 #  INSTALL_DIR             Where the install (at build time) will be done. INSTALL_PREFIX
-#                          will be added. 
+#                          will be added.
+#
+###############################################################################
 
 CONFIGURE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)configure_done
 

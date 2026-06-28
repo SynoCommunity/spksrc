@@ -1,13 +1,15 @@
-### Status rules
-# Only serves as a placeholder to avoid repetition of
-# already processed dependencies when running through
-# the dependency tree and printing to $(STATUS_LOG)
-# 
+###############################################################################
+# spksrc.rules/status.mk
+#
+# Build status tracking: a placeholder target that records already-processed
+# dependencies while walking the dependency tree, to avoid repeating them in
+# $(STATUS_LOG).
+#
 # Targets are executed in the following order:
 #  pre_status_target    (override with PRE_STATUS_TARGET)
 #  status_target        (override with STATUS_TARGET)
 #  post_status_target   (override with POST_STATUS_TARGET)
-# Variables: none
+###############################################################################
 
 STATUS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)status_done
 

@@ -1,4 +1,9 @@
-###
+###############################################################################
+# spksrc.spk/publish.mk
+#
+# Publish built packages to the package server
+# (publish-all-<supported|latest> targets).
+###############################################################################
 
 # make publish-all-<supported|latest>
 ifeq (publish,$(findstring publish,$(subst -, ,$(firstword $(MAKECMDGOALS)))))

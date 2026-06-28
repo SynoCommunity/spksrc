@@ -1,5 +1,5 @@
 ###############################################################################
-# mk/spksrc.common.mk
+# spksrc.common.mk
 #
 # Defines common build settings and utilities shared by all spksrc makefiles.
 #

@@ -1,5 +1,9 @@
+###############################################################################
+# spksrc.cross/env-dotnet.mk
+#
 # Configuration for dotnet build
 #
+###############################################################################
 
 # NOTE: 32bit (x86) is not supported:
 # https://github.com/dotnet/core/issues/5403

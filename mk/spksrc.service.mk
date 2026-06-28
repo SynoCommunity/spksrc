@@ -1,4 +1,6 @@
-### Service rules
+###############################################################################
+# spksrc.service.mk
+#
 # Generate service support files in SPK:
 #   scripts/installer
 #   scripts/start-stop-status
@@ -20,16 +22,16 @@
 #  SERVICE_PORT                  for generation of service port firewall config file (*.sc) and for dsm-ui config file
 #  FWPORTS                       (optional) custom firewall port/rules file
 #  DSM_UI_DIR                    defaults to app. May be defined different for custom DSM UI integration
-#  
+#
 #  SERVICE_CERT                  (optional) configure DSM certificate management for this service name from the firewall config file (*.sc)
 #  SERVICE_CERT_RELOAD           (optional) package-relative path to a script for reloading the service after certificate changes
 #
 #  SERVICE_WIZARD_SHARENAME      (optional) this is the name of wizard-varible to define folder name of SHARE_PATH (uses DSM data share worker for DSM 6 and DSM 7)
 #  SERVICE_WIZARD_SHARE          (deprecated) name of wizard-varible to define SHARE_PATH
 #  USE_DATA_SHARE_WORKER         (deprecated, optional) use DSM data share worker for SERVICE_WIZARD_SHARE for DSM 6 too
-#  SERVICE_WIZARD_GROUP          (not supported anymore) name of wizard-variable to define the GROUP 
+#  SERVICE_WIZARD_GROUP          (not supported anymore) name of wizard-variable to define the GROUP
 #                                SERVICE_WIZARD_GROUP is not supported anymore (not compatible with DSM 7 and DSM 6 using resource worker)
-# 
+#
 #  SERVICE_USER                  (optional) runtime user account for generic service support.
 #                                "auto" is the only value supported with DSM 7 and defines sc-${SPK_NAME} as service user.
 #  SPK_GROUP                     (optional) defines the group to use in privilege resource file
@@ -45,7 +47,7 @@
 #  SSS_SCRIPT                    (optional) custom script file for service start/stop/status when the generic
 #                                           installer generated script (SERVICE_SETUP) is not usable.
 #  INSTALLER_SCRIPT              (deprecated) installer script file before introduction of generic installer
-# 
+#
 # Variables for the dsm-ui config file (app/config) the definition for the app icon in the DSM UI and its properties.
 #                                The app icon (i.e. the app/config file) is created, when SERVICE_PORT or DSM_UI_CONF is defined
 #                                and can be disabled by definition of NO_SERVICE_SHORTCUT
@@ -56,6 +58,7 @@
 #  SERVICE_TYPE                  service type for dsm-ui config file, default = "url"
 #  SERVICE_DESC                  service desc for dsm-ui config file, i.e. the tooltip on the app icon (default = $(DESCRIPTION))
 #
+###############################################################################
 
 ifeq ($(strip $(PRE_SERVICE_TARGET)),)
 PRE_SERVICE_TARGET = pre_service_target

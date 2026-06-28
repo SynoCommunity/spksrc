@@ -1,15 +1,21 @@
-### Patch rules
-#   Apply local patch to a directory tree. Patches will be applied from the software directory,
+###############################################################################
+# spksrc.build/patch.mk
+#
+# Apply local patch to a directory tree. Patches will be applied from the software directory,
 #   using patch -p0 <.
+#
 # Targets are executed in the following order:
 #  patch_msg_target
 #  pre_patch_target   (override with PRE_PATCH_TARGET)
 #  patch_target       (override with PATCH_TARGET)
 #  post_patch_target  (override with POST_PATCH_TARGET)
+#
 # Variables:
 #  PATCHES_LEVEL      Level of the patches to apply (default = 0)
 #  PATCHES            List of patches to apply. If not defined, will apply patch files in the
 #                     patches directory.
+#
+###############################################################################
 
 ifeq ($(strip $(PATCHES_LEVEL)),)
 PATCHES_LEVEL = 0

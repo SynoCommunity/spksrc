@@ -1,4 +1,9 @@
+###############################################################################
+# spksrc.cross/env-cmake.mk
+#
 # CMake cross-compilation definitions
+#
+###############################################################################
 
 # Force CMake environment, bypassing default autotools settings.
 DEFAULT_ENV ?= cmake

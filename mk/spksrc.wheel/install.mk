@@ -1,4 +1,6 @@
-### Wheel rules
+###############################################################################
+# spksrc.wheel/install.mk
+#
 # Install wheels for modules listed in WHEELS.
 #    1) Add $(WHEEL_NAME)==$(WHEEL_VERSION) to related $(WHEELHOUSE)/requirements-$(WHEEL_TYPE).txt file
 #   2a) Copy all $(WHEELHOUSE)/requirements-$(WHEEL_TYPE).txt files to $(STAGING_INSTALL_WHEELHOUSE) directory
@@ -20,6 +22,8 @@
 #  WHEEL_TYPE              Type of wheel to process (abi3, cross, crossenv, pure)
 #  WHEEL_URL               URL usually of type git+https://
 #  WHEEL_VERSION           Version of wheel to process (can be empty)
+#
+###############################################################################
 
 ifeq ($(WHEEL_VERSION),)
 WHEEL_INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)wheel_install-$(WHEEL_NAME)_done

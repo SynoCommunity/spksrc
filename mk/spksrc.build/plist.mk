@@ -1,7 +1,11 @@
-### plist rule
-# 
+###############################################################################
+# spksrc.build/plist.mk
+#
+# Generate the package file list (PLIST) from the install manifest.
+#
 # Variables:
 #  PLIST_TRANSFORM    Command to transform PLIST (default: cat)
+###############################################################################
 
 INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)plist_done
 

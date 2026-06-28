@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.python-wheel-meson.mk
+#
 # python-meson wheel build
 #
 # By default uses $(CROSSENV)/bin/cross-python -m build
@@ -11,6 +14,7 @@
 #     pip: --config-settings=install-args='<value>'
 #   build: -Cinstall-args='<value>'
 #
+###############################################################################
 
 # Setup common directories
 

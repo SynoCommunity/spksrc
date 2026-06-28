@@ -1,8 +1,11 @@
+###############################################################################
+# spksrc.native-cmake.mk
 #
 # Build NATIVE CMake programs
 #
 # This makefile extends spksrc.native-cc.mk with CMake-specific functionality
 #
+###############################################################################
 
 # Package dependent (same as native-cc.mk)
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)

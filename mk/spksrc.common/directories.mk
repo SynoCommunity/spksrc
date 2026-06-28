@@ -1,6 +1,11 @@
-
+###############################################################################
+# spksrc.common/directories.mk
+#
+# Work / staging / install / distrib directory layout and install prefixes.
+#
 # BASEDIR and the helper macros are provided by spksrc.common.mk, which sets
 # MKDIR/BASEDIR and loads macros.mk before including this file.
+###############################################################################
 
 # * all goes in $(WORK_DIR) : work-arch (for noarch: work-all or work-dsm7), in the current directory
 # * it will be installed in $(INSTALL_PREFIX) on the target system (/usr/local/transmission)

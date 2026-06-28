@@ -1,5 +1,7 @@
-### Wheel rules
-# Process wheels for modules listed in WHEELS. 
+###############################################################################
+# spksrc.wheel.mk
+#
+# Process wheels for modules listed in WHEELS.
 #   1. wheel_download
 #   2. wheel_compile
 #   3. wheel_install
@@ -9,8 +11,11 @@
 #  pre_wheel_target   (override with PRE_WHEEL_TARGET)
 #  wheel_target (override with WHEEL_TARGET)
 #  post_wheel_target  (override with POST_WHEEL_TARGET)
+#
 # Variables:
 #  WHEELS             List of wheels to go through
+#
+###############################################################################
 
 # When wheel is called from:
 #                  spksrc.spk.mk: MAKECMDGOALS is empty (needs to be set to wheel)

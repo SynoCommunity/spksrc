@@ -1,5 +1,5 @@
 ###############################################################################
-# mk/spksrc.common/archs.mk
+# spksrc.common/archs.mk
 #
 # Defines architecture and toolchain classification variables for spksrc.
 #
