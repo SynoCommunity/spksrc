@@ -29,14 +29,12 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
 ##### rust specific configurations
-include ../../mk/spksrc.cross-rust-env.mk
+include ../../mk/spksrc.cross/env-rust.mk
 
 # configure is used to install rust targets
 CONFIGURE_TARGET = nop

@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.cross-env.mk
+# spksrc.cross/env-default.mk
 #
 # Defines the cross-compilation build environment.
 #

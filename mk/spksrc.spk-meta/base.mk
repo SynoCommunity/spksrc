@@ -3,7 +3,7 @@ SPKSRC_SPK_BASE_MK := 1
 
 # TC_VARS_META_MK file-target (generates the inspectable tc_vars.meta.mk),
 # used by the $(1)_meta_pre_depend hook below.
-include ../../mk/spksrc.spk/meta.mk
+include ../../mk/spksrc.spk-meta/meta.mk
 
 # Low-level libs kept out of the meta build-skip status-cookie sharing so a
 # consumer can build its own copy when it declares the dependency.

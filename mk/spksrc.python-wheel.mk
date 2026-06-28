@@ -84,19 +84,19 @@ install_python_wheel_target:
 ###
 
 # Use crossenv
-include ../../mk/spksrc.crossenv.mk
+include ../../mk/spksrc.python-crossenv.mk
 
 ## python wheel specific configurations
-include ../../mk/spksrc.wheel-env.mk
+include ../../mk/spksrc.wheel/env.mk
 
 ## install wheel specific routines
-include ../../mk/spksrc.wheel-install.mk
+include ../../mk/spksrc.wheel/install.mk
 
 ###
 
 post_compile_target: $(COMPILE_TARGET)
 
-# Call spksrc.compile.mk cookie creation recipe
+# Call spksrc.build/compile.mk cookie creation recipe
 ifeq ($(wildcard $(COMPILE_COOKIE)),)
 compile: $(COMPILE_COOKIE)
 endif
@@ -105,7 +105,7 @@ endif
 
 post_install_target: $(INSTALL_TARGET)
 
-# Call spksrc.install.mk cookie creation recipe
+# Call spksrc.build/install.mk cookie creation recipe
 ifeq ($(wildcard $(INSTALL_COOKIE)),)
 install: $(INSTALL_COOKIE)
 

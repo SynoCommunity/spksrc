@@ -133,7 +133,7 @@ ADDITIONAL_LDFLAGS = -Wl,-rpath,/var/packages/mypackage/target/lib
 
 ### Make Options
 
-These apply to the **autotools / plain GNU make** build path only (`spksrc.compile.mk` / `spksrc.install.mk`). CMake builds with `cmake --build` and Meson with `ninja`, so neither reads these.
+These apply to the **autotools / plain GNU make** build path only (`spksrc.build/compile.mk` / `spksrc.build/install.mk`). CMake builds with `cmake --build` and Meson with `ninja`, so neither reads these.
 
 | Variable | Description |
 |----------|-------------|

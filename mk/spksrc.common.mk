@@ -53,7 +53,7 @@ endif
 include $(BASEDIR)/mk/spksrc.common/macros.mk
 
 # Common directories (must be set after ARCH_SUFFIX)
-include $(BASEDIR)/mk/spksrc.directories.mk
+include $(BASEDIR)/mk/spksrc.common/directories.mk
 
 # Setup minimal toolchain environment variables
 include $(BASEDIR)/mk/spksrc.common/stage0.mk

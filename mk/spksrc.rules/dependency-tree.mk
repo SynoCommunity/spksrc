@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.dependency-tree.mk
+# spksrc.rules/dependency-tree.mk
 #
 # Provides targets to inspect, traverse, and list package dependencies.
 #

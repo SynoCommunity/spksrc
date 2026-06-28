@@ -181,7 +181,7 @@ VIDEODRV_PACKAGE = synocli-videodriver
 include ../../mk/spksrc.spk-meta.mk
 ```
 
-A consumer includes `mk/spksrc.spk-meta.mk` (not the per-meta files directly); based on which `*_PACKAGE` variables are set, `spk-meta.mk` pulls in the matching `spksrc.spk/{python,ffmpeg,videodriver}.mk` (then `spksrc.spk.mk`). That builds the meta source in stage 1 and, during SPK assembly (stage 2), wires its staging area into the consumer's build through `SPK_BASE_TEMPLATE`:
+A consumer includes `mk/spksrc.spk-meta.mk` (not the per-meta files directly); based on which `*_PACKAGE` variables are set, `spk-meta.mk` pulls in the matching `spksrc.spk-meta/{python,ffmpeg,videodriver}.mk` (then `spksrc.spk.mk`). That builds the meta source in stage 1 and, during SPK assembly (stage 2), wires its staging area into the consumer's build through `SPK_BASE_TEMPLATE`:
 
 - **`PKG_CONFIG_LIBDIR` (ordered)** — the consumer's own staging first, then each
   meta's `lib/pkgconfig` (`META_PKG_CONFIG_LIBDIR`). pkg-config takes the first
@@ -203,7 +203,7 @@ needs neither per-`.pc` symlinks nor per-package `-DOPENSSL_*` / `-DEXPAT_*` /
 The build environment is configured through layered includes:
 
 1. **spksrc.common.mk** - Base settings and utilities
-2. **spksrc.cross-env.mk** - Cross-compilation environment
+2. **spksrc.cross/env-default.mk** - Cross-compilation environment
 3. **tc_vars.mk** - Toolchain-specific variables
 4. **Build system specific** - CMake, meson, autotools adapters
 

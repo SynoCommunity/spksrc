@@ -30,14 +30,12 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
 ##### golang specific configurations
-include ../../mk/spksrc.cross-go-env.mk
+include ../../mk/spksrc.cross/env-go.mk
 
 # avoid run of make configure
 ifeq ($(strip $(CONFIGURE_TARGET)),)
