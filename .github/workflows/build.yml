@@ -104,10 +104,58 @@ env:
   # .spk/diagnostics still upload and the remaining packages are reported.
   BUILD_BUDGET_SECONDS: "20700"
 
+# Cancel a previous, now-superseded run only while a pull request is still a
+# Draft, so iterative pushes during development don't pile up. Non-draft PR
+# builds and master/push builds are never cancelled — every merged commit keeps
+# its own build result on master — and workflow_dispatch (manual build &
+# publish) is never cancelled either. The event_name is part of the group so
+# push, pull_request and workflow_dispatch runs never cancel one another.
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft }}
+
 jobs:
+  # Decide whether the build should run at all. Upstream events (pull_request,
+  # or push to SynoCommunity/spksrc) and manual workflow_dispatch always build.
+  # A fork's own push build is skipped while the branch has an open *draft* PR
+  # upstream: during development the authoritative full build still runs on the
+  # upstream PR, so re-running the fork's narrow build only wastes runner time.
+  # A push event carries no PR context, hence the API lookup here.
+  gate:
+    name: Gate
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.check.outputs.should_build }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.repository }}" = "SynoCommunity/spksrc" ] || \
+             [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Upstream or manual run -> build."
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Fork push: look up the branch's open PR in the upstream repo and skip
+          # the build while that PR is a draft. Any lookup failure falls back to
+          # building (fail-open).
+          draft=$(gh api \
+            "/repos/SynoCommunity/spksrc/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}&state=open" \
+            --jq '[.[].draft] | first // false' 2>/dev/null || echo false)
+          if [ "$draft" = "true" ]; then
+            echo "Fork push for a draft PR (${{ github.ref_name }}) -> skip build."
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Fork push, PR not draft (or none) -> build."
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
+          fi
+
   prepare:
     name: Prepare for Build
     runs-on: ubuntu-latest
+    needs: gate
+    if: needs.gate.outputs.should_build == 'true'
     outputs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
       noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
@@ -135,8 +183,8 @@ jobs:
         run: |
           git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
           echo "spk_packages=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Get changed spk_packages and dependency_folders of last commit for push
         if: github.event_name == 'push'
@@ -144,8 +192,8 @@ jobs:
         run: |
           git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
           echo "spk_packages=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Evaluate dependencies
         id: dependencies
@@ -846,9 +894,9 @@ jobs:
 
   consolidate-diagnostics:
     name: Consolidate Diagnostics
-    needs: build
+    needs: [gate, build]
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && needs.gate.outputs.should_build == 'true'
     steps:
       - name: Download all diagnostic artifacts
         uses: actions/download-artifact@v8
