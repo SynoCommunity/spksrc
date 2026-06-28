@@ -10,6 +10,13 @@ include ../../mk/spksrc.common.mk
 # exports its pkgconfig dir so the cross/ test probe resolves videodriver libs.
 VIDEODRV_PACKAGE = synocli-videodriver
 
+# The dbus-1 lib probed here is only pulled into the videodriver meta on x64 +
+# DSM 7.x (via the Intel tool stack); aarch64 gets only the minimal libdrm base,
+# and the DSM 6.2.4 x64 toolchain does not build that stack. Restrict the
+# harness to x64 / DSM 7.1+, where dbus-1 actually resolves.
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
+
 # cmake probe that pkg-config-resolves dbus-1 from the videodriver meta
 DEPENDS = cross/demometa-videodriver-cmake
 

@@ -10,6 +10,10 @@ include ../../mk/spksrc.common.mk
 # its pkgconfig dir so the cross/ test probes below resolve python-meta libs.
 PYTHON_PACKAGE = python314
 
+# Mirror python314's UNSUPPORTED_ARCHS: the harness must not be attempted where
+# the meta cannot build (its staging would be missing at spk-meta-source).
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+
 # cmake, meson and autotools probes that pkg-config-resolve libzstd/sqlite3 from the meta
 DEPENDS = cross/demometa-python-cmake cross/demometa-python-meson cross/demometa-python-autotools
 

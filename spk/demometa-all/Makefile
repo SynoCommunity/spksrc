@@ -12,6 +12,12 @@ include ../../mk/spksrc.common.mk
 PYTHON_PACKAGE = python314
 VIDEODRV_PACKAGE = synocli-videodriver
 
+# Probes both python (libzstd) and videodriver (dbus-1) at once. dbus-1 is only
+# in the videodriver meta on x64 + DSM 7.x (Intel tool stack), so the combined
+# harness can only run there; restrict to x64 / DSM 7.1+.
+REQUIRED_MIN_DSM = 7.1
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(ARMv8_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
+
 DEPENDS = cross/demometa-all-cmake
 
 MAINTAINER = SynoCommunity

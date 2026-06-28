@@ -11,6 +11,10 @@ include ../../mk/spksrc.common.mk
 # itself pulls synocli-videodriver, which the meta wrapper also picks up.)
 FFMPEG_PACKAGE = ffmpeg7
 
+# Mirror ffmpeg7's UNSUPPORTED_ARCHS: the harness must not be attempted where
+# the meta cannot build (its staging would be missing at spk-meta-source).
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+
 # cmake probe that pkg-config-resolves libavcodec/libavformat from the meta
 DEPENDS = cross/demometa-ffmpeg-cmake
 
