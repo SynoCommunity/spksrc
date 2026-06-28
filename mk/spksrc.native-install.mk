@@ -1,53 +1,26 @@
 ###############################################################################
 # spksrc.native-install.mk
 #
-# include this file to install native package without building from source
-# adjusted for native packages based on spksrc.install-resources.mk
+# Install-only native build: skip configure and compile, going straight from
+# patch to install with a package-provided INSTALL_TARGET (e.g. to stage a
+# prebuilt native tool). Mirrors spksrc.cross-install.mk for cross packages.
 #
-# native packages using this have to:
-# - implement a custom INSTALL_TARGET to copy the required files to the
-#   target location under $(STAGING_INSTALL_PREFIX)
-#
+# Packages using this must define a custom INSTALL_TARGET that copies the
+# required files under $(STAGING_INSTALL_PREFIX).
 ###############################################################################
 
-# Package dependent
-URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
-NAME          = $(PKG_NAME)
-COOKIE_PREFIX = $(PKG_NAME)-
-ifneq ($(PKG_DIST_FILE),)
-LOCAL_FILE    = $(PKG_DIST_FILE)
-else
-LOCAL_FILE    = $(PKG_DIST_NAME)
+# Skip configure and compile. These must be set before including
+# spksrc.native-cc.mk, where configure.mk / compile.mk read them at parse time.
+CONFIGURE_TARGET = nop
+COMPILE_TARGET   = nop
+
+# native-cc.mk does not include plist.mk, so default the PLIST transform here.
+ifeq ($(strip $(PLIST_TRANSFORM)),)
+PLIST_TRANSFORM = cat
 endif
-DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
-DIST_EXT      = $(PKG_EXT)
-
-# Setup common directories
-
-# Common makefiles
-include ../../mk/spksrc.common.mk
-
-#####
 
 ifneq ($(REQUIRE_KERNEL),)
-  @$(error native-install cannot be used when REQUIRE_KERNEL is set)
+$(error native-install cannot be used when REQUIRE_KERNEL is set)
 endif
 
-#####
-
-# native-install specific: skip configure and compile steps
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
-
-# INSTALL_TARGET must be provided by the including makefile
-
-#####
-
-ifeq ($(strip $(PLIST_TRANSFORM)),)
-PLIST_TRANSFORM= cat
-endif
-
-#####
-
-# Include base native-cc makefile for common functionality
 include ../../mk/spksrc.native-cc.mk

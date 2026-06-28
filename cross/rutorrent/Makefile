@@ -15,7 +15,7 @@ LICENSE  = GPLv3
 EXTRACT_PATH = $(WORK_DIR)
 INSTALL_TARGET = rutorrent_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: rutorrent_install
 rutorrent_install:

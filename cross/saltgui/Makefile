@@ -14,7 +14,7 @@ LICENSE  = MIT
 
 INSTALL_TARGET = saltgui_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: saltgui_install
 saltgui_install:

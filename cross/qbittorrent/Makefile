@@ -33,7 +33,7 @@ endif
 # Unsupported architectures (no static binary available)
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS) $(ARMv5_ARCHS)
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: qbittorrent_install
 qbittorrent_install:

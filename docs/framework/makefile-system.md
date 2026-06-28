@@ -45,6 +45,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | File | Purpose |
 |------|--------|
 | `spksrc.cross-cc.mk` | Main cross-compilation entry point |
+| `spksrc.cross-install.mk` | Install-only cross build (skip configure/compile) |
 | `spksrc.cross/env-default.mk` | Cross-compilation environment setup |
 | `spksrc.toolchain.mk` | Toolchain build and tc_vars generation |
 | `spksrc.toolkit.mk` | Toolkit management |
@@ -74,7 +75,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.native/env-default.mk` | Native build environment |
 | `spksrc.native-cmake.mk` | Native CMake builds |
 | `spksrc.native-meson.mk` | Native Meson builds |
-| `spksrc.native-install.mk` | Native installation |
+| `spksrc.native-install.mk` | Install-only native build (skip configure/compile) |
 
 ### Python/Wheel System
 
@@ -101,7 +102,6 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.spk/strip.mk` | Binary stripping |
 | `spksrc.spk/icon.mk` | Icon processing |
 | `spksrc.service.mk` | Service configuration generation |
-| `spksrc.install-resources.mk` | Resource file installation |
 
 ### Service Scripts (Templates)
 
