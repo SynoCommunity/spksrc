@@ -35,6 +35,8 @@ else
 SERVICE_SETUP = src/service-setup.sh
 endif
 
+POST_SERVICE_TARGET = tvh_post_service
+
 # Service configuration
 SERVICE_PORT = 9981
 SERVICE_PORT_TITLE = Tvheadend (HTTP)
@@ -75,5 +77,11 @@ WHEELS += pgeocode==0.5.0
 # script gets patched accordingly by:
 # 000-fix-version.patch from cross/tvheadend
 export TVH_VERS
+
+.PHONY: tvh_post_service
+tvh_post_service:
+	sed -i -e 's/_PYTHON_PACKAGE_/$(PYTHON_PACKAGE)/g' \
+	       -e 's/_FFMPEG_PACKAGE_/$(FFMPEG_PACKAGE)/g' \
+	           $(WORK_DIR)/scripts/service-setup
 
 include ../../mk/spksrc.spk-meta.mk

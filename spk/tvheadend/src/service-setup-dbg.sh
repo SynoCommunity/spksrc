@@ -7,9 +7,9 @@
 # -----------------------------------------------------------------------------
 
 # Define python binary path
-PYTHON_DIR="/var/packages/python314/target/bin"
+PYTHON_DIR="/var/packages/_PYTHON_PACKAGE_/target/bin"
 # Define ffmpeg binary path
-FFMPEG_DIR="/var/packages/ffmpeg7/target/bin"
+FFMPEG_DIR="/var/packages/_FFMPEG_PACKAGE_/target/bin"
 # Add local bin, virtualenv along with ffmpeg and python to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${FFMPEG_DIR}:${PATH}"
 
@@ -52,7 +52,7 @@ tvh_gdb_command ()
     dir="${SYNOPKG_PKGVAR}/gdb-debug"
     log="${dir}/gdb-live.log"
     cmd="${dir}/gdb-commands.gdb"
-    solib="${SYNOPKG_PKGDEST}/lib:/var/packages/synocli-videodriver/target/lib:/var/packages/ffmpeg7/target/lib:/lib:/usr/lib"
+    solib="${SYNOPKG_PKGDEST}/lib:/var/packages/synocli-videodriver/target/lib:/var/packages/_FFMPEG_PACKAGE_/target/lib:/lib:/usr/lib"
     mkdir -p "${dir}"
     cat > "${cmd}" << GDBEOF
 set pagination off
