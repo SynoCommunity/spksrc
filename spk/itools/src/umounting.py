@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python3
 
 """
 Copyright (c) 2018 BingJing Chang
@@ -23,6 +23,7 @@ THE SOFTWARE.
 """
 
 import os
+import subprocess
 import sys
 import time
 import logging
@@ -36,7 +37,7 @@ def main():
     if os.fork() != 0:
         sys.exit()
     time.sleep(3)
-    output = os.popen('mount').read()
+    output = subprocess.run('mount', capture_output=True, text=True).stdout
     for line in filter(lambda x: x.find('ifuse') == 0, output.split('\n')):
         path = line.split()[2]
         logger.info('Unmounting %s ...' % path)
