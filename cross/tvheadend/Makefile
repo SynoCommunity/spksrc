@@ -2,8 +2,8 @@ PKG_NAME = tvheadend
 PKG_VERS = 4.3
 PKG_EXT = tar.gz
 # no official release since v4.2.8 (Jan 12, 2019)
-# git hash from Janueary 8th 2026
-PKG_GIT_HASH = 5886126420d729672098a3895469d6f83aebba94
+# git hash from June 23rd 2026
+PKG_GIT_HASH = 80729d2f6f4b9bd11ceaf8835699c82e6bfed630
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
@@ -64,6 +64,12 @@ CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 
+# Enable building of new experimental UI
+CONFIGURE_ARGS += --enable-vue_build
+BUILD_DEPENDS = native/nodejs_22
+# Build environment - use native Node.js from spksrc
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
+
 # dbus splits its headers between include/ and lib/dbus-1.0/include/
 #    - include/dbus-1.0/ (public) must precede
 #    - lib/dbus-1.0/include/ (arch-specific dbus-arch-deps.h)
@@ -76,6 +82,7 @@ include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
+CONFIGURE_ARGS += --enable-qsv
 endif
 
 # If libraries through FFMPEG_PACKAGE shared libraries unavailable
