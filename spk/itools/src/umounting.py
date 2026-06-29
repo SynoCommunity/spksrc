@@ -27,23 +27,23 @@ import subprocess
 import sys
 import time
 import logging
-from lockfile import locked
+from filelock import FileLock
 from logging.handlers import RotatingFileHandler
 from common import *
 
 
-@locked(LOCKFILE)
 def main():
-    if os.fork() != 0:
-        sys.exit()
-    time.sleep(3)
-    output = subprocess.run('mount', capture_output=True, text=True).stdout
-    for line in filter(lambda x: x.find('ifuse') == 0, output.split('\n')):
-        path = line.split()[2]
-        logger.info('Unmounting %s ...' % path)
-        umount(path)
-        logger.info('Deleting DSM share named %s...' % os.path.basename(path))
-        del_share(path)
+    with FileLock(LOCKFILE):
+        if os.fork() != 0:
+            sys.exit()
+        time.sleep(3)
+        output = subprocess.run('mount', capture_output=True, text=True).stdout
+        for line in filter(lambda x: x.find('ifuse') == 0, output.split('\n')):
+            path = line.split()[2]
+            logger.info('Unmounting %s ...' % path)
+            umount(path)
+            logger.info('Deleting DSM share named %s...' % os.path.basename(path))
+            del_share(path)
 
 if __name__ == '__main__':
     logger.info('--- umounting.py started ---')

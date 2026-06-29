@@ -27,7 +27,7 @@ import sys
 import time
 import logging
 import subprocess
-from lockfile import locked
+from filelock import FileLock
 from logging.handlers import RotatingFileHandler
 
 INSTALL_DIR = '/var/packages/itools'
