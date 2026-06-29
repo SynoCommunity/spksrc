@@ -20,4 +20,4 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: libyaml_post_install
 libyaml_post_install:
-	ln -sf libyaml.so $(STAGING_INSTALL_PREFIX)/lib/libyaml-0.so
+	ln -sf libyaml-0.so.2.0.9 $(STAGING_INSTALL_PREFIX)/lib/libyaml-0.so
