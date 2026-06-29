@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python3
 
 """
 Copyright (c) 2018 BingJing Chang
@@ -53,7 +53,7 @@ def run(cmd):
         logger.info('stderr: %s' % err)
         return p.returncode
     except Exception as e:
-        logger.error('exception: %s' % e.message)
+        logger.error('exception: %s' % str(e))
     return -1
 
 
