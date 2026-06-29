@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python3
 
 """
 Copyright (c) 2018 BingJing Chang
@@ -23,7 +23,8 @@ THE SOFTWARE.
 """
 
 import os
-import pipes
+import shlex
+import subprocess
 import sys
 import time
 import logging
@@ -35,8 +36,10 @@ from common import *
 @locked(LOCKFILE)
 def main():
     time.sleep(3)
-    for i in xrange(12):
-        output = os.popen('ideviceinfo | grep DeviceName').read()
+    for i in range(12):
+        output = subprocess.run(
+            'ideviceinfo | grep DeviceName',
+            shell=True, capture_output=True, text=True).stdout
         if output.find('DeviceName: ') == 0:
             break
         if i == 1:
@@ -44,7 +47,7 @@ def main():
         logger.error(
             'Could not get device info. ' +
             "Maybe it's prompting user agreement." +
-            'Sleep 5 seconds. Try Count: (%d/12)' % (i + 1, 12))
+            'Sleep 5 seconds. Try Count: (%d/12)' % (i + 1))
         time.sleep(5)
 
     if output.find('DeviceName: ') != 0:
@@ -53,14 +56,17 @@ def main():
 
     device_name = output.replace('DeviceName: ', '').strip().replace(' ', '-')
     mount_dir = os.path.join(VOLUME_DIR, device_name)
-    quoted_name = pipes.quote(device_name)
-    output = os.popen('mount | grep %s' % quoted_name).read().strip()
+    quoted_name = shlex.quote(device_name)
+    output = subprocess.run(
+        'mount | grep %s' % quoted_name,
+        shell=True, capture_output=True, text=True).stdout.strip()
     if len(output) > 0:
         logger.error('%s is already mounted! (%s)' % (device_name, output))
         return
 
-    output = os.popen(
-        'synoshare --get %s | grep Comment' % quoted_name).read().strip()
+    output = subprocess.run(
+        'synoshare --get %s | grep Comment' % quoted_name,
+        shell=True, capture_output=True, text=True).stdout.strip()
     if output.find('Comment') >= 0:
         logger.info('Share - %s exists. (%s)' % (device_name, output))
         if output.find('iOS Access') < 0:
@@ -80,7 +86,7 @@ def main():
         return
 
     # magic: we have to enter the folder first time
-    os.system('cd %s && ls' % pipes.quote(mount_dir))
+    subprocess.run(['ls', mount_dir], capture_output=True)
     notify('%s is ready for access in FileStation.' % device_name)
 
 if __name__ == '__main__':
