@@ -42,9 +42,20 @@ CMAKE_ARGS += -DENABLE_EXPORTER_PROMETHEUS_REMOTE_WRITE=OFF
 CMAKE_ARGS += -DENABLE_LIBBACKTRACE=OFF
 CMAKE_ARGS += -DENABLE_BUNDLED_PROTOBUF=ON
 
+POST_PATCH_TARGET = netdata_post_patch
 COMPILE_TARGET = netdata_compile
 
 include ../../mk/spksrc.cross-cmake.mk
+
+.PHONY: netdata_post_patch
+netdata_post_patch:
+	@$(MSG) Patching CMakeLists.txt for writable paths
+	cd $(WORK_DIR)/$(PKG_DIR) && sed \
+		-e 's?set(CACHE_DIR "${NETDATA_RUNTIME_PREFIX}/var/cache/netdata")?set(CACHE_DIR "$(INSTALL_PREFIX_VAR)/cache/netdata")?' \
+		-e 's?set(CONFIG_DIR "${NETDATA_RUNTIME_PREFIX}/etc/netdata")?set(CONFIG_DIR "$(INSTALL_PREFIX_VAR)/etc/netdata")?' \
+		-e 's?set(LOG_DIR "${NETDATA_RUNTIME_PREFIX}/var/log/netdata")?set(LOG_DIR "$(INSTALL_PREFIX_VAR)/log/netdata")?' \
+		-e 's?set(VARLIB_DIR "${NETDATA_RUNTIME_PREFIX}/var/lib/netdata")?set(VARLIB_DIR "$(INSTALL_PREFIX_VAR)/lib/netdata")?' \
+		-i.bak CMakeLists.txt
 
 .PHONY: netdata_compile
 netdata_compile:
