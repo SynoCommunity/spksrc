@@ -13,7 +13,7 @@ SVC_WRITE_PID=y
 
 service_postinst ()
 {
-    easy_install lockfile
+    pip3 install filelock
     ln -s ${SYNOPKG_PKGDEST_VOL} ${VOLUME_DIR}
 }
 
