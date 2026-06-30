@@ -28,7 +28,6 @@ import sys
 import time
 import logging
 from filelock import FileLock
-from logging.handlers import RotatingFileHandler
 from common import *
 
 
