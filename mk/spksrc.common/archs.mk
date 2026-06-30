@@ -1,5 +1,5 @@
 ###############################################################################
-# mk/spksrc.common/archs.mk
+# spksrc.common/archs.mk
 #
 # Defines architecture and toolchain classification variables for spksrc.
 #
@@ -44,7 +44,7 @@ AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell ec
 # SRM - Synology Router Manager
 SRM_ARMv7_ARCHS = northstarplus ipq806x dakota hawkeye
 SRM_ARMv8_ARCHS = cypress
-# required in spksrc.pre-check.mk
+# required in spksrc.rules/pre-check.mk
 SRM_ARCHS = $(SRM_ARMv7_ARCHS) $(SRM_ARMv8_ARCHS)
 
 # DSM - all ARMv7 except SRM specific archs

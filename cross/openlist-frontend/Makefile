@@ -15,4 +15,4 @@ HOMEPAGE = https://docs.oplist.org/
 COMMENT = The front-end of OpenList, powered by SolidJS.
 LICENSE = MIT
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk

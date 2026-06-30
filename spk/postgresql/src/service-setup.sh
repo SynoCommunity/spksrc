@@ -35,19 +35,19 @@ validate_preuninst()
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ "${wizard_pg_dump_database}" = "true" ]; then
         # Validate password by attempting to connect
         # Start server temporarily for validation
-        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} -l ${LOG_FILE} start"
+        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} -l ${LOG_FILE} start" >/dev/null
 
         export PGPASSWORD="${wizard_pg_password}"
         if ! "${SYNOPKG_PKGDEST}/bin/psql" -h localhost -p "${SERVICE_PORT}" -U "${EFF_USER}" -d postgres -c "SELECT 1" > /dev/null 2>&1; then
             unset PGPASSWORD
-            run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop"
+            run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop" >/dev/null
             echo "Incorrect PostgreSQL administrator password"
             exit 1
         fi
         unset PGPASSWORD
 
         # Stop server after validation
-        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop"
+        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop" >/dev/null
 
         if [ -z "${PG_BACKUP}" ]; then
             echo "Error: Backup directory path is empty."
@@ -103,7 +103,7 @@ service_postinst()
         run_as_user "sed -e \"s/^#listen_addresses = 'localhost'/listen_addresses = '*'/g\" -i ${CFG_FILE}"
 
         # Start server temporarily to create roles
-        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} -l ${LOG_FILE} start"
+        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} -l ${LOG_FILE} start" >/dev/null
 
         # Set password for the system user (peer auth allows connection without password via Unix socket)
         run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c \"ALTER ROLE \\\"${EFF_USER}\\\" WITH PASSWORD '${PG_PASSWORD}';\""
@@ -123,7 +123,7 @@ service_postinst()
         run_as_user "sed -e 's/^local.*all.*all.*peer$/local   all             ${EFF_USER}                           peer\\nlocal   all             all                                     scram-sha-256/' -i ${HBA_FILE}"
 
         # Stop server (will be started by DSM)
-        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop"
+        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop" >/dev/null
     fi
 }
 
@@ -132,7 +132,7 @@ service_preuninst()
     # Backup databases on user's request
     if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ "${wizard_pg_dump_database}" = "true" ]; then
         # Start server for backup
-        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} -l ${LOG_FILE} start"
+        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} -l ${LOG_FILE} start" >/dev/null
 
         # Create backup directories (running as root has write access to shared folders)
         mkdir -p "${PG_BACKUP_CONF_DIR}"
@@ -153,6 +153,6 @@ service_preuninst()
         unset PGPASSWORD
 
         # Stop server
-        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop"
+        run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} stop" >/dev/null
     fi
 }

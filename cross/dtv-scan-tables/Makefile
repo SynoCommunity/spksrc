@@ -16,4 +16,4 @@ LICENSE  = GPLv2
 
 INSTALL_MAKE_OPTIONS = DATADIR=$(STAGING_INSTALL_PREFIX)/share/tvheadend/data DVBV5DIR=dvb-scan install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk

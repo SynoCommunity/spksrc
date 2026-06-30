@@ -24,7 +24,7 @@ ENV += HUSKY=0
 ENV += HUSKY_SKIP_INSTALL=1
 ENV += SKIP_GIT_INSTALL_HOOKS=1
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 # Map spksrc ARCH to Node.js arch for native module downloads
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))

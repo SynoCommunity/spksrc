@@ -6,6 +6,10 @@ build:Cython==3.0.12                     # keep older version for gcc <= 4.9.x
 build:flit==3.12.0
 build:flit_core==3.12.0
 build:hatch-fancy-pypi-readme==25.1.0
+# Pin before hatch-vcs: else it pulls setuptools-scm 10.1.x (needs vcs-versioning>=2,
+# which dropped parse_version and breaks the build). Freeze the known-good pair.
+build:setuptools-scm==10.0.5
+build:vcs-versioning==1.1.1
 build:hatch-vcs==0.5.0
 build:hatchling==1.29.0
 build:maturin==1.12.6
@@ -16,7 +20,6 @@ build:poetry==2.3.2
 build:scikit-build==0.19.0
 build:scikit-build-core==0.12.2
 build:setuptools-rust==1.12.1
-build:setuptools-scm==10.0.5
 #
 cross:build==1.4.2
 cross:cffi==2.0.0

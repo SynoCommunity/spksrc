@@ -1,0 +1,72 @@
+Index: FFmpeg/libavfilter/qsvvpp.c
+===================================================================
+--- libavfilter/qsvvpp.c
++++ libavfilter/qsvvpp.c
+@@ -70,6 +70,36 @@ static const struct {
+ #endif
+ };
+ 
++extern int ff_qsvvpp_check_dynamic_pool_supported(AVHWDeviceContext *device_ctx);
++
++int ff_qsvvpp_check_dynamic_pool_supported(AVHWDeviceContext *device_ctx)
++{
++    AVQSVDeviceContext *device_hwctx;
++    mfxIMPL impl;
++    mfxVersion ver;
++    int ret;
++
++    if (!device_ctx || device_ctx->type != AV_HWDEVICE_TYPE_QSV)
++        return AVERROR(EINVAL);
++
++    device_hwctx = device_ctx->hwctx;
++
++    ret = MFXQueryIMPL(device_hwctx->session, &impl);
++    if (ret == MFX_ERR_NONE)
++        ret = MFXQueryVersion(device_hwctx->session, &ver);
++    if (ret != MFX_ERR_NONE)
++        return AVERROR_UNKNOWN;
++
++    if (!QSV_RUNTIME_VERSION_ATLEAST(ver, 2, 9))
++        return AVERROR(ENOSYS);
++
++    if (!(MFX_IMPL_VIA_VAAPI == MFX_IMPL_VIA_MASK(impl) ||
++          MFX_IMPL_VIA_D3D11 == MFX_IMPL_VIA_MASK(impl)))
++        return AVERROR(ENOSYS);
++
++    return 0;
++}
++
+ int ff_qsvvpp_print_iopattern(void *log_ctx, int mfx_iopattern,
+                               const char *extra_string)
+ {
+Index: FFmpeg/libavfilter/vf_hwupload.c
+===================================================================
+--- libavfilter/vf_hwupload.c
++++ libavfilter/vf_hwupload.c
+@@ -32,6 +32,10 @@
+ #include "formats.h"
+ #include "video.h"
+ 
++#if CONFIG_QSVVPP
++extern int ff_qsvvpp_check_dynamic_pool_supported(AVHWDeviceContext *device_ctx);
++#endif
++
+ typedef struct HWUploadContext {
+     const AVClass *class;
+ 
+@@ -165,6 +169,15 @@ static int hwupload_config_output(AVFilt
+         ctx->hwframes->user_opaque = &texDesc;
+ #endif
+ 
++#if CONFIG_QSVVPP
++    if (ctx->hwframes->format == AV_PIX_FMT_QSV) {
++        AVHWDeviceContext *qsv_ctx = (AVHWDeviceContext *)ctx->hwdevice_ref->data;
++        if (!ff_qsvvpp_check_dynamic_pool_supported(qsv_ctx)) {
++            ctx->hwframes->initial_pool_size = 0;
++        }
++    }
++#endif
++
+     err = av_hwframe_ctx_init(ctx->hwframes_ref);
+     if (err < 0)
+         goto fail;

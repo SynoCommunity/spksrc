@@ -14,7 +14,7 @@ EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
 INSTALL_TARGET = ariang_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: ariang_install
 ariang_install:

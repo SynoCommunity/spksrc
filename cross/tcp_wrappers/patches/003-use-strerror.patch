@@ -1,0 +1,83 @@
+# use strerror_r() instead of deprecated sys_nerr and sys_errlist.
+# 
+# - sys_nerr/sys_errlist are finally removed in glibc 2.32
+# 
+--- percent_m.c.orig	1994-12-28 16:42:37.000000000 +0000
++++ percent_m.c	2026-06-11 10:19:52.545384485 +0000
+@@ -13,10 +13,6 @@
+ #include <string.h>
+ 
+ extern int errno;
+-#ifndef SYS_ERRLIST_DEFINED
+-extern char *sys_errlist[];
+-extern int sys_nerr;
+-#endif
+ 
+ #include "mystdarg.h"
+ 
+@@ -29,11 +25,7 @@
+ 
+     while (*bp = *cp)
+ 	if (*cp == '%' && cp[1] == 'm') {
+-	    if (errno < sys_nerr && errno > 0) {
+-		strcpy(bp, sys_errlist[errno]);
+-	    } else {
+-		sprintf(bp, "Unknown error %d", errno);
+-	    }
++	    strcpy(bp, strerror(errno));
+ 	    bp += strlen(bp);
+ 	    cp += 2;
+ 	} else {
+
+--- tli.c.orig	1997-03-21 18:27:26.000000000 +0000
++++ tli.c	2026-06-11 10:28:08.103624483 +0000
+@@ -40,8 +40,6 @@
+ 
+ extern char *nc_sperror();
+ extern int errno;
+-extern char *sys_errlist[];
+-extern int sys_nerr;
+ extern int t_errno;
+ extern char *t_errlist[];
+ extern int t_nerr;
+@@ -305,12 +303,8 @@
+ 	    return (t_errlist[t_errno]);
+ 	}
+     } else {
+-	if (errno < 0 || errno >= sys_nerr) {
+-	    sprintf(buf, "Unknown UNIX error %d", errno);
+-	    return (buf);
+-	} else {
+-	    return (sys_errlist[errno]);
+-	}
++	strcpy(buf, strerror(errno));
++	return (buf);
+     }
+ }
+ 
+--- tli-sequent.c.orig	1994-12-28 16:42:51.000000000 +0000
++++ tli-sequent.c	2026-06-11 10:28:48.311869435 +0000
+@@ -31,8 +31,6 @@
+ #include <string.h>
+ 
+ extern int errno;
+-extern char *sys_errlist[];
+-extern int sys_nerr;
+ extern int t_errno;
+ extern char *t_errlist[];
+ extern int t_nerr;
+@@ -157,12 +155,8 @@
+ 	    return (t_errlist[t_errno]);
+ 	}
+     } else {
+-	if (errno < 0 || errno >= sys_nerr) {
+-	    sprintf(buf, "Unknown UNIX error %d", errno);
+-	    return (buf);
+-	} else {
+-	    return (sys_errlist[errno]);
+-	}
++	strcpy(buf, strerror(errno));
++	return (buf);
+     }
+ }
+ 

@@ -44,7 +44,7 @@
 # Notes:
 #  - This makefile only emits configuration files; it does not build anything.
 #  - All output is written to $(WORK_DIR).
-#  - tc_vars files are consumed by spksrc.cross-env.mk and package builds.
+#  - tc_vars files are consumed by spksrc.cross/env-default.mk and package builds.
 #  - The tcvars target is idempotent and skipped if the cookie exists.
 #
 ###############################################################################
@@ -59,9 +59,9 @@ TCVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)stage1-tcvars_done
 
 # Include cross-compilation definitions
 # (provides arch-specific variables for toolchain generation)
-include ../../mk/spksrc.cross-cmake-env.mk
-include ../../mk/spksrc.cross-meson-env.mk
-include ../../mk/spksrc.cross-rust-env.mk
+include ../../mk/spksrc.cross/env-cmake.mk
+include ../../mk/spksrc.cross/env-meson.mk
+include ../../mk/spksrc.cross/env-rust.mk
 
 #####
 

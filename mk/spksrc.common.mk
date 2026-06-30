@@ -1,5 +1,5 @@
 ###############################################################################
-# mk/spksrc.common.mk
+# spksrc.common.mk
 #
 # Defines common build settings and utilities shared by all spksrc makefiles.
 #
@@ -30,7 +30,7 @@
 #
 #   mk/spksrc.common.mk
 #   └── mk/spksrc.common/
-#       ├── stage0.mk  : setup $(WORK_DIR)/tc_vars.mk for minimal init
+#       ├── stage0.mk  : bootstrap toolchain & load its tc_vars (TC_GCC, ...)
 #       ├── archs.mk   : architecture and toolchain classification
 #       ├── logs.mk    : build log paths and logging helpers
 #       └── macros.mk  : generic GNU Make helper macros
@@ -53,7 +53,7 @@ endif
 include $(BASEDIR)/mk/spksrc.common/macros.mk
 
 # Common directories (must be set after ARCH_SUFFIX)
-include $(BASEDIR)/mk/spksrc.directories.mk
+include $(BASEDIR)/mk/spksrc.common/directories.mk
 
 # Setup minimal toolchain environment variables
 include $(BASEDIR)/mk/spksrc.common/stage0.mk
