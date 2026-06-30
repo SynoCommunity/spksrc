@@ -1,0 +1,13 @@
+[
+  {
+    "step_title": "Post-Installation Instructions",
+    "items": [
+      {
+        "desc": "Netdata's <strong>apps.plugin</strong> needs <strong>root privileges</strong> to collect disk I/O and process metrics, but Synology blocks this for unsigned packages."
+      },
+      {
+        "desc": "After the package starts, you can enable full process monitoring by running this command in SSH:<br/><br/><code>netdata-fix</code><br/><br/>It will prompt for your DSM password, apply the fix, and tell you to restart the package."
+      }
+    ]
+  }
+]
