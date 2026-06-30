@@ -51,10 +51,10 @@ include ../../mk/spksrc.cross-cmake.mk
 netdata_post_patch:
 	@$(MSG) Patching CMakeLists.txt for writable paths
 	cd $(WORK_DIR)/$(PKG_DIR) && sed \
-		-e 's?set(CACHE_DIR "${NETDATA_RUNTIME_PREFIX}/var/cache/netdata")?set(CACHE_DIR "$(INSTALL_PREFIX_VAR)/cache/netdata")?' \
-		-e 's?set(CONFIG_DIR "${NETDATA_RUNTIME_PREFIX}/etc/netdata")?set(CONFIG_DIR "$(INSTALL_PREFIX_VAR)/etc/netdata")?' \
-		-e 's?set(LOG_DIR "${NETDATA_RUNTIME_PREFIX}/var/log/netdata")?set(LOG_DIR "$(INSTALL_PREFIX_VAR)/log/netdata")?' \
-		-e 's?set(VARLIB_DIR "${NETDATA_RUNTIME_PREFIX}/var/lib/netdata")?set(VARLIB_DIR "$(INSTALL_PREFIX_VAR)/lib/netdata")?' \
+		-e 's?set(CACHE_DIR "$${NETDATA_RUNTIME_PREFIX}/var/cache/netdata")?set(CACHE_DIR "$(INSTALL_PREFIX_VAR)/cache/netdata")?' \
+		-e 's?set(CONFIG_DIR "$${NETDATA_RUNTIME_PREFIX}/etc/netdata")?set(CONFIG_DIR "$(INSTALL_PREFIX_VAR)/etc/netdata")?' \
+		-e 's?set(LOG_DIR "$${NETDATA_RUNTIME_PREFIX}/var/log/netdata")?set(LOG_DIR "$(INSTALL_PREFIX_VAR)/log/netdata")?' \
+		-e 's?set(VARLIB_DIR "$${NETDATA_RUNTIME_PREFIX}/var/lib/netdata")?set(VARLIB_DIR "$(INSTALL_PREFIX_VAR)/lib/netdata")?' \
 		-i.bak CMakeLists.txt
 
 .PHONY: netdata_compile
