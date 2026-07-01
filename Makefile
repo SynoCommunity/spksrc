@@ -25,18 +25,18 @@ HELP_AWK = awk -v topic="$(HELP_TOPIC)" ' \
 	    desc = $$0; sub(/.*\#\#[ \t]*/, "", desc); \
 	    if (topic == "" || index(tolower(section " " name), tolower(topic))) { \
 	      if (section != cur) { printf "\n\033[1m%s\033[0m\n", section; cur = section } \
-	      printf "  \033[36m%-17s\033[0m %s\n", name, desc; matched++ \
+	      printf "  \033[36m%-20s\033[0m %s\n", name, desc; matched++ \
 	    } \
 	  } \
 	  END { \
 	    if (matched == 0) { printf "\nNo target matches \"%s\".\n", topic } \
 	    else if (topic == "") { \
 	      printf "\n\033[1mPer-package (pattern) targets\033[0m\n"; \
-	      printf "  \033[36m%-17s\033[0m %s\n", "<spk>", "build one SPK (e.g. make tvheadend)"; \
-	      printf "  \033[36m%-17s\033[0m %s\n", "spk-<spk>-<arch>", "build one SPK for one arch (make spk-tvheadend-x64-7.1)"; \
-	      printf "  \033[36m%-17s\033[0m %s\n", "native-<name>", "build one native tool (e.g. make native-cmake)"; \
-	      printf "  \033[36m%-17s\033[0m %s\n", "toolchain-<arch>", "build one toolchain (make toolchain-x64-7.1)"; \
-	      printf "  \033[36m%-17s\033[0m %s\n", "kernel-<arch>", "build one kernel module set" \
+	      printf "  \033[36m%-28s\033[0m %s\n", "<spk>", "build one SPK (e.g. make tvheadend)"; \
+	      printf "  \033[36m%-28s\033[0m %s\n", "spk-<spk>-<arch>-<tcversion>", "build one SPK for one arch (make spk-tvheadend-x64-7.1)"; \
+	      printf "  \033[36m%-28s\033[0m %s\n", "native-<name>", "build one native tool (e.g. make native-cmake)"; \
+	      printf "  \033[36m%-28s\033[0m %s\n", "toolchain-<arch>", "build one toolchain (make toolchain-x64-7.1)"; \
+	      printf "  \033[36m%-28s\033[0m %s\n", "kernel-<arch>", "build one kernel module set" \
 	    } \
 	    printf "\nUse \033[36mmake help-<topic>\033[0m to filter (e.g. \033[36mmake help-clean\033[0m)\n\n" \
 	  }' $(MAKEFILE_LIST)

@@ -1,10 +1,11 @@
 ###############################################################################
 # spksrc.common/help.mk
 #
-# Package-level, context-aware `make help`. Included via spksrc.common.mk, it
-# only defines the target inside a package directory (cross/, spk/, native/,
-# toolchain/, kernel/) - detected from the parent directory name - so it never
-# collides with the orchestration help defined in the spksrc root Makefile.
+# Package-level, context-aware `make help`. Included via spksrc.common.mk (after
+# 'default: all' so it never becomes the default goal), it only defines the
+# target inside a package directory (cross/, spk/, native/, toolchain/,
+# toolkit/, kernel/, diyspk/, python/) - detected from the parent directory
+# name - so it never collides with the orchestration help in the root Makefile.
 ###############################################################################
 
 # spksrc.common.mk may be included more than once by a package; guard so the
@@ -15,47 +16,63 @@ SPKSRC_HELP_MK := 1
 # Name of the directory that contains this package (cross / spk / native / ...).
 SPKSRC_TREE := $(notdir $(patsubst %/,%,$(dir $(CURDIR))))
 
-ifneq ($(filter $(SPKSRC_TREE),cross spk native toolchain kernel),)
+ifneq ($(filter $(SPKSRC_TREE),cross spk native toolchain toolkit kernel diyspk python),)
 
-# The plain build pipeline; spk/ and cross/ additionally generate a PLIST.
+# Build lifecycle steps; spk/cross/diyspk additionally generate a PLIST.
 HELP_STEPS := download checksum extract patch configure compile install
-ifneq ($(filter $(SPKSRC_TREE),cross spk),)
+ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
 HELP_STEPS += plist
 endif
 
 .PHONY: help
 help:
 	@printf "\n\033[1m%s\033[0m  (%s package)\n" "$(or $(SPK_NAME),$(PKG_NAME),$(notdir $(CURDIR)))" "$(SPKSRC_TREE)"
+ifeq ($(SPKSRC_TREE),python)
+	@printf "\n  \033[33m%s\033[0m\n" "built only as an spk dependency - it has no direct build here"
+else
 	@printf "\n\033[1mBuild\033[0m\n"
-	@printf "  \033[36m%-20s\033[0m %s\n" "all" "build this package (default)"
-ifneq ($(filter $(SPKSRC_TREE),cross spk native),)
-	@printf "  \033[36m%-20s\033[0m %s\n" "<step>" "run one build step, in order:"
-	@printf "  %-20s   %s\n" "" "$(HELP_STEPS)"
+	@printf "  \033[36m%-22s\033[0m %s\n" "all" "build this package (default target)"
+ifneq ($(filter $(SPKSRC_TREE),cross spk kernel diyspk),)
+	@printf "  \033[36m%-22s\033[0m %s\n" "arch-<arch>-<tcvers>" "build for one arch/version (e.g. arch-x64-7.1)"
+endif
+ifneq ($(filter $(SPKSRC_TREE),toolchain toolkit),)
+	@printf "  \033[36m%-22s\033[0m %s\n" "download" "fetch the source archive"
+else
+	@printf "  \033[36m%-22s\033[0m %s\n" "<step>" "run one build step, in order:"
+	@printf "  %-22s   %s\n" "" "$(HELP_STEPS)"
+endif
+ifeq ($(SPKSRC_TREE),toolchain)
+	@printf "  \033[36m%-22s\033[0m %s\n" "tc_vars" "show the toolchain variables (TC_GCC, ...)"
+endif
+ifeq ($(SPKSRC_TREE),toolkit)
+	@printf "  \033[36m%-22s\033[0m %s\n" "tk_vars" "show the toolkit variables"
+endif
+ifneq ($(filter $(SPKSRC_TREE),cross spk kernel diyspk),)
+	@printf "  \033[33m%s\033[0m\n" "  all and every <step> except download/digests need ARCH=<arch> TCVERSION=<tcvers>"
 endif
 ifneq ($(filter $(SPKSRC_TREE),cross spk),)
-	@printf "\n\033[1mMulti-arch\033[0m\n"
-	@printf "  \033[36m%-20s\033[0m %s\n" "arch-<arch>-<tcvers>" "build one arch/version (e.g. arch-x64-7.1)"
-	@printf "  \033[36m%-20s\033[0m %s\n" "all-supported" "build every supported arch"
-	@printf "  \033[36m%-20s\033[0m %s\n" "all-latest" "build the latest toolchains only"
-	@printf "  \033[36m%-20s\033[0m %s\n" "supported" "list the supported arch-version pairs"
-	@printf "  \033[36m%-20s\033[0m %s\n" "latest" "list the latest arch-version pairs"
-	@printf "  \033[33m%s\033[0m\n" "  needs 'make setup' once at the spksrc root first"
-else ifeq ($(SPKSRC_TREE),native)
-	@printf "\n  \033[33m%s\033[0m\n" "host-native single build - no arch matrix"
+	@printf "\n\033[1mMulti-arch\033[0m  (needs 'make setup' once at the spksrc root first)\n"
+	@printf "  \033[36m%-22s\033[0m %s\n" "all-supported" "build for every supported arch"
+	@printf "  \033[36m%-22s\033[0m %s\n" "all-latest" "build for the latest toolchains only"
 endif
-ifeq ($(SPKSRC_TREE),spk)
+ifneq ($(filter $(SPKSRC_TREE),spk diyspk),)
 	@printf "\n\033[1mPython wheels\033[0m\n"
-	@printf "  \033[36m%-20s\033[0m %s\n" "wheel" "build the Python wheels listed in WHEELS"
-	@printf "  \033[36m%-20s\033[0m %s\n" "download-wheels" "download the wheel sources only"
-	@printf "  \033[36m%-20s\033[0m %s\n" "crossenv" "build the cross-compilation Python venv"
-	@printf "  \033[36m%-20s\033[0m %s\n" "crossenv-install-<w>" "install one wheel into a named crossenv"
+	@printf "  \033[36m%-22s\033[0m %s\n" "wheel" "build the Python wheels listed in WHEELS"
+	@printf "  \033[36m%-22s\033[0m %s\n" "download-wheels" "download the wheel sources only"
+	@printf "  \033[36m%-22s\033[0m %s\n" "crossenv" "build the cross-compilation Python venv"
+	@printf "  \033[36m%-22s\033[0m %s\n" "crossenv-install-<w>" "install one wheel into a named crossenv"
+endif
 endif
 	@printf "\n\033[1mInspect\033[0m\n"
-	@printf "  \033[36m%-20s\033[0m %s\n" "dependency-tree" "print the resolved dependency graph"
+	@printf "  \033[36m%-22s\033[0m %s\n" "dependency-tree" "print the resolved dependency graph"
+	@printf "  \033[36m%-22s\033[0m %s\n" "dependency-flat" "flat, de-duplicated dependency list"
+	@printf "  \033[36m%-22s\033[0m %s\n" "dependency-list" "raw per-package dependency list"
+ifneq ($(SPKSRC_TREE),python)
 	@printf "\n\033[1mMaintenance\033[0m\n"
-	@printf "  \033[36m%-20s\033[0m %s\n" "clean" "remove all work directories"
-	@printf "  \033[36m%-20s\033[0m %s\n" "smart-clean" "remove only this package's source and cookies"
-	@printf "  \033[36m%-20s\033[0m %s\n" "digests" "regenerate the digests file"
+	@printf "  \033[36m%-22s\033[0m %s\n" "clean" "remove all work directories"
+	@printf "  \033[36m%-22s\033[0m %s\n" "smart-clean" "remove this package's source and cookies (needs ARCH+TCVERSION)"
+	@printf "  \033[36m%-22s\033[0m %s\n" "digests" "regenerate the digests file"
+endif
 	@printf "\nRun \033[36mmake help\033[0m at the spksrc root for repo-wide targets (setup, ...)\n\n"
 
 endif
