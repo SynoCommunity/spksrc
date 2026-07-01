@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python3
 
 """
 Copyright (c) 2018 BingJing Chang
@@ -20,29 +20,34 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+History:
+2026 migrated to python3
+
 """
 
 import os
+import subprocess
 import sys
 import time
 import logging
-from lockfile import locked
-from logging.handlers import RotatingFileHandler
+from filelock import FileLock
 from common import *
 
+lock = FileLock(LOCKFILE)
 
-@locked(LOCKFILE)
 def main():
-    if os.fork() != 0:
-        sys.exit()
-    time.sleep(3)
-    output = os.popen('mount').read()
-    for line in filter(lambda x: x.find('ifuse') == 0, output.split('\n')):
-        path = line.split()[2]
-        logger.info('Unmounting %s ...' % path)
-        umount(path)
-        logger.info('Deleting DSM share named %s...' % os.path.basename(path))
-        del_share(path)
+    with lock:
+        if os.fork() != 0:
+            sys.exit()
+        time.sleep(3)
+        output = subprocess.run('mount', capture_output=True, text=True).stdout
+        for line in filter(lambda x: x.find('ifuse') == 0, output.split('\n')):
+            path = line.split()[2]
+            logger.info('Unmounting %s ...' % path)
+            umount(path)
+            logger.info('Deleting DSM share named %s...' % os.path.basename(path))
+            del_share(path)
 
 if __name__ == '__main__':
     logger.info('--- umounting.py started ---')
