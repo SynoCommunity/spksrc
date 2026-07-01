@@ -37,7 +37,10 @@ include ../../mk/spksrc.rules/pre-check.mk
 include ../../mk/spksrc.cross/env-default.mk
 include ../../mk/spksrc.rules/depend.mk
 
-# Package whatever the dependencies staged.
+# A virtual package has no source, so there is nothing to `make install`: the
+# real files are staged by the dependencies. Skip the install step (nop) and
+# just run the plist/packaging machinery over whatever the dependencies staged.
+INSTALL_TARGET = nop
 install: depend
 include ../../mk/spksrc.build/install.mk
 
