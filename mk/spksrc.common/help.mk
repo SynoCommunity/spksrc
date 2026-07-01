@@ -76,11 +76,13 @@ endif
 	@printf "  \033[36m%-24s\033[0m %s\n" "dependency-flat" "flat, de-duplicated dependency list"
 	@printf "  \033[36m%-24s\033[0m %s\n" "dependency-list" "raw per-package dependency list"
 ifneq ($(SPKSRC_TREE),python)
-	@printf "\n\033[1mMaintenance\033[0m\n"
-	@printf "  \033[36m%-24s\033[0m %s\n" "download" "fetch the source archive(s)"
+	@printf "\n\033[1mCleanup\033[0m\n"
 	@printf "  \033[36m%-24s\033[0m %s\n" "clean" "remove all work directories"
 	@printf "  \033[36m%-24s\033[0m %s\n" "smart-clean" "remove this package's source and cookies (needs ARCH+TCVERSION)"
-	@printf "  \033[36m%-24s\033[0m %s\n" "digests" "regenerate the digests file"
+	@printf "\n\033[1mMaintenance\033[0m\n"
+	@printf "  \033[36m%-24s\033[0m %s\n" "download" "fetch the source archive(s)"
+	@printf "  \033[36m%-24s\033[0m %s\n" "digests" "regenerate the digests file (auto-runs download)"
+	@printf "  \033[33m%s\033[0m\n" "  to refresh digests: make clean, delete the file in distrib/, then make digests"
 endif
 	@printf "\nRun \033[36mmake help\033[0m at the spksrc root for repo-wide targets (setup, ...)\n\n"
 
