@@ -1,4 +1,4 @@
-PKG_NAME = libvpx-main
+PKG_NAME = libvpx-virtual
 
 OPTIONAL_DEPENDS  = cross/libvpx-latest
 OPTIONAL_DEPENDS += cross/libvpx-1.14
@@ -12,4 +12,4 @@ else
 DEPENDS = cross/libvpx-1.14
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

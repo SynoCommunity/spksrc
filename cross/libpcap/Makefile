@@ -1,4 +1,4 @@
-PKG_NAME = libpcap-main
+PKG_NAME = libpcap-virtual
 
 OPTIONAL_DEPENDS  = cross/libpcap-latest
 OPTIONAL_DEPENDS += cross/libpcap-1.9
@@ -11,4 +11,4 @@ else
 DEPENDS = cross/libpcap-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

@@ -46,6 +46,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 |------|--------|
 | `spksrc.cross-cc.mk` | Main cross-compilation entry point |
 | `spksrc.cross-install.mk` | Install-only cross build (skip configure/compile) |
+| `spksrc.cross-virtual.mk` | Source-less cross package that only aggregates `DEPENDS` |
 | `spksrc.cross/env-default.mk` | Cross-compilation environment setup |
 | `spksrc.toolchain.mk` | Toolchain build and tc_vars generation |
 | `spksrc.toolkit.mk` | Toolkit management |
@@ -139,7 +140,7 @@ spksrc.build/
 ├── configure.mk              # configure
 ├── compile.mk                # compile
 ├── install.mk                # install to staging
-├── plist.mk                  # package list generation (cross/kernel/main-depends; not in build.mk)
+├── plist.mk                  # package list generation (cross/kernel/cross-virtual; not in build.mk)
 └── ninja.mk                  # ninja helper (cmake/meson)
 
 # Rules — shared targets / orchestration, included by the entry points
