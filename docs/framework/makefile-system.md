@@ -130,6 +130,7 @@ spksrc.common.mk
 spksrc.common/
 ├── archs.mk                  # architecture classification / groups
 ├── directories.mk            # work/staging/distrib directory layout
+├── help.mk                   # context-aware `make help` inside a package
 ├── logs.mk                   # logging helpers
 ├── macros.mk                 # GNU Make helper macros
 └── stage0.mk                 # parse-time toolchain pre-bootstrap (TC_GCC)
