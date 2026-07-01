@@ -25,8 +25,9 @@ HELP_STEPS += plist
 endif
 
 # Python wheel targets apply to spk/diyspk packages that set PYTHON_PACKAGE or
-# are themselves a python3* package.
-HELP_PYTHON := $(strip $(PYTHON_PACKAGE))$(filter python3%,$(SPK_NAME) $(PKG_NAME))
+# are themselves a python3* package. Deferred (=) so it is evaluated when the
+# recipe runs: PYTHON_PACKAGE is often set *after* spksrc.common.mk is included.
+HELP_PYTHON = $(strip $(PYTHON_PACKAGE))$(filter python3%,$(SPK_NAME) $(PKG_NAME))
 
 .PHONY: help
 help:
@@ -58,14 +59,16 @@ ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
 	@printf "  \033[36m%-24s\033[0m %s\n" "all-latest" "build for the latest toolchains only"
 endif
 ifneq ($(filter $(SPKSRC_TREE),spk diyspk),)
-ifneq ($(HELP_PYTHON),)
-	@printf "\n\033[1mPython wheels\033[0m  (set WHEELS=\"pkg==ver\" to (re)build a single wheel on demand)\n"
-	@printf "  \033[36m%-24s\033[0m %s\n" "wheel-<arch>-<tcvers>" "build the package's wheels for one arch"
-	@printf "  \033[36m%-24s\033[0m %s\n" "crossenv-<arch>-<tcvers>" "build the cross-compilation Python venv"
-	@printf "  \033[36m%-24s\033[0m %s\n" "download-wheels" "download the wheel sources only"
-	@printf "  \033[36m%-24s\033[0m %s\n" "wheelclean" "remove wheel build state (run before rebuilding)"
-	@printf "  \033[36m%-24s\033[0m %s\n" "crossenvclean" "remove the crossenv and wheel state"
-endif
+	@if [ -n "$(HELP_PYTHON)" ]; then \
+	  printf "\n\033[1mPython wheels\033[0m  (WHEELS=\"pkg1==ver pkg2==ver ...\" restricts the (re)build to those wheels; unset rebuilds all of the package's wheels, or its default crossenv)\n" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "wheel-<arch>-<tcvers>" "build the package's wheels for one arch" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "crossenv-<arch>-<tcvers>" "build the cross-compilation Python venv" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "download-wheels" "download the wheel sources only" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "wheelclean" "remove wheel build state (run before rebuilding)" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "wheelcleancache" "also drop the shared wheel download cache" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "crossenvclean" "remove the crossenv and wheel state" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "crossenvcleanall" "remove the crossenv, wheels and cache" ; \
+	fi
 endif
 endif
 	@printf "\n\033[1mInspect\033[0m\n"
