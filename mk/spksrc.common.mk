@@ -62,6 +62,9 @@ include $(BASEDIR)/mk/spksrc.common/stage0.mk
 include $(BASEDIR)/mk/spksrc.common/archs.mk
 include $(BASEDIR)/mk/spksrc.common/logs.mk
 
+# Context-aware `make help` (only activates inside a package directory)
+include $(BASEDIR)/mk/spksrc.common/help.mk
+
 # Load local configuration
 LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 -include $(LOCAL_CONFIG_MK)
