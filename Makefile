@@ -1,4 +1,8 @@
 
+# Base definitions. Included explicitly (not relied upon via tests.mk) so the
+# root targets and `make help` do not depend on the still-evolving tests.mk.
+include mk/spksrc.common.mk
+
 # Include framework self-test
 include mk/spksrc.rules/tests.mk
 include mk/spksrc.rules/dependency-tree.mk

@@ -27,26 +27,35 @@ endif
 help:
 	@printf "\n\033[1m%s\033[0m  (%s package)\n" "$(or $(SPK_NAME),$(PKG_NAME),$(notdir $(CURDIR)))" "$(SPKSRC_TREE)"
 	@printf "\n\033[1mBuild\033[0m\n"
-	@printf "  \033[36m%-14s\033[0m %s\n" "all" "build this package (default)"
+	@printf "  \033[36m%-20s\033[0m %s\n" "all" "build this package (default)"
 ifneq ($(filter $(SPKSRC_TREE),cross spk native),)
-	@printf "  \033[36m%-14s\033[0m %s\n" "<step>" "run one build step, in order:"
-	@printf "  %-14s   %s\n" "" "$(HELP_STEPS)"
+	@printf "  \033[36m%-20s\033[0m %s\n" "<step>" "run one build step, in order:"
+	@printf "  %-20s   %s\n" "" "$(HELP_STEPS)"
 endif
 ifneq ($(filter $(SPKSRC_TREE),cross spk),)
 	@printf "\n\033[1mMulti-arch\033[0m\n"
-	@printf "  \033[36m%-14s\033[0m %s\n" "arch-<arch>" "build one arch (e.g. arch-x64-7.1)"
-	@printf "  \033[36m%-14s\033[0m %s\n" "all-supported" "build every supported arch"
-	@printf "  \033[36m%-14s\033[0m %s\n" "all-latest" "build the latest toolchains only"
-	@printf "  \033[36m%-14s\033[0m %s\n" "supported" "list the supported arch-version pairs"
-	@printf "  \033[36m%-14s\033[0m %s\n" "latest" "list the latest arch-version pairs"
+	@printf "  \033[36m%-20s\033[0m %s\n" "arch-<arch>-<tcvers>" "build one arch/version (e.g. arch-x64-7.1)"
+	@printf "  \033[36m%-20s\033[0m %s\n" "all-supported" "build every supported arch"
+	@printf "  \033[36m%-20s\033[0m %s\n" "all-latest" "build the latest toolchains only"
+	@printf "  \033[36m%-20s\033[0m %s\n" "supported" "list the supported arch-version pairs"
+	@printf "  \033[36m%-20s\033[0m %s\n" "latest" "list the latest arch-version pairs"
 	@printf "  \033[33m%s\033[0m\n" "  needs 'make setup' once at the spksrc root first"
 else ifeq ($(SPKSRC_TREE),native)
 	@printf "\n  \033[33m%s\033[0m\n" "host-native single build - no arch matrix"
 endif
+ifeq ($(SPKSRC_TREE),spk)
+	@printf "\n\033[1mPython wheels\033[0m\n"
+	@printf "  \033[36m%-20s\033[0m %s\n" "wheel" "build the Python wheels listed in WHEELS"
+	@printf "  \033[36m%-20s\033[0m %s\n" "download-wheels" "download the wheel sources only"
+	@printf "  \033[36m%-20s\033[0m %s\n" "crossenv" "build the cross-compilation Python venv"
+	@printf "  \033[36m%-20s\033[0m %s\n" "crossenv-install-<w>" "install one wheel into a named crossenv"
+endif
+	@printf "\n\033[1mInspect\033[0m\n"
+	@printf "  \033[36m%-20s\033[0m %s\n" "dependency-tree" "print the resolved dependency graph"
 	@printf "\n\033[1mMaintenance\033[0m\n"
-	@printf "  \033[36m%-14s\033[0m %s\n" "clean" "remove all work directories"
-	@printf "  \033[36m%-14s\033[0m %s\n" "smart-clean" "remove only this package's source and cookies"
-	@printf "  \033[36m%-14s\033[0m %s\n" "digests" "regenerate the digests file"
+	@printf "  \033[36m%-20s\033[0m %s\n" "clean" "remove all work directories"
+	@printf "  \033[36m%-20s\033[0m %s\n" "smart-clean" "remove only this package's source and cookies"
+	@printf "  \033[36m%-20s\033[0m %s\n" "digests" "regenerate the digests file"
 	@printf "\nRun \033[36mmake help\033[0m at the spksrc root for repo-wide targets (setup, ...)\n\n"
 
 endif
