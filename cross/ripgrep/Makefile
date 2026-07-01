@@ -1,4 +1,4 @@
-PKG_NAME = ripgrep-main
+PKG_NAME = ripgrep-virtual
 
 OPTIONAL_DEPENDS  = cross/ripgrep-latest
 OPTIONAL_DEPENDS += cross/ripgrep-14
@@ -20,4 +20,4 @@ else
 DEPENDS += cross/ripgrep-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

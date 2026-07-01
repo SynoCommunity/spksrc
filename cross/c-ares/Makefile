@@ -1,4 +1,4 @@
-PKG_NAME = c-ares-main
+PKG_NAME = c-ares-virtual
 
 OPTIONAL_DEPENDS  = cross/c-ares-latest
 OPTIONAL_DEPENDS += cross/c-ares-1.28
@@ -11,4 +11,4 @@ else
 DEPENDS = cross/c-ares-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

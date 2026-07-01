@@ -1,4 +1,4 @@
-PKG_NAME = mediainfo-main
+PKG_NAME = mediainfo-virtual
 
 OPTIONAL_DEPENDS  = cross/mediainfo-latest
 OPTIONAL_DEPENDS += cross/mediainfo-25.04
@@ -14,4 +14,4 @@ else
 DEPENDS = cross/mediainfo-25.04
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

@@ -1,4 +1,4 @@
-PKG_NAME = z3-main
+PKG_NAME = z3-virtual
 
 OPTIONAL_DEPENDS += cross/z3-4.11
 OPTIONAL_DEPENDS += cross/z3-4.7
@@ -11,4 +11,4 @@ else
 DEPENDS = cross/z3-4.7
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

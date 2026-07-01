@@ -1,4 +1,4 @@
-PKG_NAME = glibc-main
+PKG_NAME = glibc-virtual
 
 OPTIONAL_DEPENDS  = cross/glibc-latest
 OPTIONAL_DEPENDS += cross/glibc-2.28
@@ -16,4 +16,4 @@ else ifeq ($(call version_ge, $(TC_KERNEL), 3.10),1)
 DEPENDS = cross/glibc-2.28
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk
