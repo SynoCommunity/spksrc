@@ -41,21 +41,23 @@ SVC_WRITE_PID=y
 
 service_postinst ()
 {
-    printf 'SKIP_SYSTEMD=true\n' > "${ENV_FILE}"
+    if [ "${SYNOPKG_PKG_STATUS}" == "INSTALL" ]; then
+        printf 'SKIP_SYSTEMD=true\n' > "${ENV_FILE}"
 
-    if [ -n "${wizard_pub_key}" ]; then
-        printf 'KEY=%s\n' "${wizard_pub_key}" >> "${ENV_FILE}"
-    fi
+        if [ -n "${wizard_pub_key}" ]; then
+            printf 'KEY=%s\n' "${wizard_pub_key}" >> "${ENV_FILE}"
+        fi
 
-    if [ -n "${wizard_extra_fs}" ]; then
-        printf 'EXTRA_FILESYSTEMS=%s\n' "${wizard_extra_fs}" >> "${ENV_FILE}"
-    fi
+        if [ -n "${wizard_extra_fs}" ]; then
+            printf 'EXTRA_FILESYSTEMS=%s\n' "${wizard_extra_fs}" >> "${ENV_FILE}"
+        fi
 
-    if [ -n "${wizard_smart_devices}" ]; then
-        printf 'SMART_DEVICES=%s\n' "${wizard_smart_devices}" >> "${ENV_FILE}"
-    fi
+        if [ -n "${wizard_smart_devices}" ]; then
+            printf 'SMART_DEVICES=%s\n' "${wizard_smart_devices}" >> "${ENV_FILE}"
+        fi
 
-    if [ -n "${wizard_extra_env}" ]; then
-        printf '%s\n' "${wizard_extra_env}" >> "${ENV_FILE}"
+        if [ -n "${wizard_extra_env}" ]; then
+            printf '%s\n' "${wizard_extra_env}" >> "${ENV_FILE}"
+        fi
     fi
 }
