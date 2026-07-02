@@ -79,7 +79,7 @@ SPK_VERS = 1.0.0
 SPK_REV = 1
 
 # Bundle a Python interpreter (must be set BEFORE spksrc.spk-meta.mk)
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 
 # Requirement files to build/bundle (activates wheel processing)
 WHEELS  = src/requirements-pure.txt
@@ -90,7 +90,7 @@ include ../../mk/spksrc.spk-meta.mk
 
 Setting `PYTHON_PACKAGE` and including `spksrc.spk-meta.mk` bundles the chosen
 Python and pulls in the wheel routines (`spk-meta.mk` includes `spksrc.spk.mk`);
-the `python312` dependency is added automatically. `PYTHON_PACKAGE` **must** be
+the `python314` dependency is added automatically. `PYTHON_PACKAGE` **must** be
 set before the `include`.
 
 ### Advanced wheel options
@@ -119,7 +119,7 @@ Point the service at the bundled Python and let the helper build the runtime
 virtualenv from the wheelhouse:
 
 ```bash
-PYTHON_DIR="/var/packages/python312/target/bin"
+PYTHON_DIR="/var/packages/python314/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${PATH}"
 
 service_postinst() {
@@ -144,7 +144,7 @@ The cross-compiled Python is built as part of the normal package build. To build
 it explicitly first:
 
 ```bash
-make -C spk/python312 ARCH=x64 TCVERSION=7.2
+make -C spk/python314 ARCH=x64 TCVERSION=7.2
 make -C spk/myapp     ARCH=x64 TCVERSION=7.2
 ```
 
@@ -204,7 +204,7 @@ make crossenvcleanall   # wheelcleanall + crossenvclean (everything)
 ### Crossenv requirement files
 
 Each Python meta carries the crossenv definitions used to compile wheels, under
-`spk/<python_package>/crossenv/` (e.g. `spk/python312/crossenv/`). When building
+`spk/<python_package>/crossenv/` (e.g. `spk/python314/crossenv/`). When building
 a wheel, the framework selects the **most specific** matching file:
 
 1. `requirements-<wheel>-<version>.txt` — one exact version (e.g. `requirements-numpy-1.26.4.txt`)
@@ -316,8 +316,8 @@ Check the wheel filenames on [PyPI](https://pypi.org/):
 | Filename pattern | Type |
 |------------------|------|
 | `*-py3-none-any.whl` / `*-py2.py3-none-any.whl` | Pure Python |
-| `*-cp312-cp312-manylinux*.whl` | Needs cross-compilation (crossenv) |
-| `*-cp312-abi3-*.whl` | ABI3 limited |
+| `*-cp314-cp314-manylinux*.whl` | Needs cross-compilation (crossenv) |
+| `*-cp314-abi3-*.whl` | ABI3 limited |
 
 ### Troubleshooting
 
@@ -332,8 +332,7 @@ Check the wheel filenames on [PyPI](https://pypi.org/):
 ## Examples
 
 - [borgbackup](https://github.com/SynoCommunity/spksrc/tree/master/spk/borgbackup) — SPK with pure + crossenv requirement files, per-wheel `WHEELS_CFLAGS`, and `WHEELS_PURE_PYTHON_PACKAGING_ENABLE`
-- [homeassistant](https://github.com/SynoCommunity/spksrc/tree/master/spk/homeassistant) — large application with many wheels and `python/` dependencies
-- [python312-wheels](https://github.com/SynoCommunity/spksrc/tree/master/spk/python312-wheels) — wheel testing package
+- [python314-wheels](https://github.com/SynoCommunity/spksrc/tree/master/spk/python314-wheels) — wheel testing package exercising many wheel types and `python/` dependencies
 
 ## See also
 
