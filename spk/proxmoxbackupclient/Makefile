@@ -13,7 +13,7 @@ DESCRIPTION = Proxmox backup client written in golang \(under development\).
 CHANGELOG = "Initial package release."
 
 HOMEPAGE = https://github.com/tizbac/proxmoxbackupclient_go/
-LICENSE  = GPLv2
+LICENSE  = GPLv3
 
 STARTABLE = No
 
