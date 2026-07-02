@@ -50,6 +50,7 @@ POST_INSTALL_TARGET = tvheadend_post_install
 
 CONFIGURE_ARGS  = --python=/usr/bin/python3
 CONFIGURE_ARGS += --enable-imagecache --enable-bundle --enable-trace --release
+CONFIGURE_ARGS += --enable-imagecache_audit
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 CONFIGURE_ARGS += --enable-dvbcsa --enable-pngquant
 CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
