@@ -191,12 +191,10 @@ make WHEEL_NAME=lxml WHEEL_VERSION=5.2.2 crossenv-x64-7.2
 
 ### Cleanup
 
-Targets in increasing scope:
-
 ```bash
 make wheelclean         # built wheels + wheel status cookies
-make wheelcleancache    # also drop the local pip cache (work-*/pip)
-make wheelcleanall      # also drop the shared download cache (distrib/pip)
+make wheelcleancache    # the local pip cache only (work-*/pip)
+make wheelcleanall      # wheelclean + wheelcleancache + the shared cache (distrib/pip)
 make crossenvclean      # wheelclean + the crossenv dirs and their cookies
 make crossenvcleanall   # wheelcleanall + crossenvclean (everything)
 ```

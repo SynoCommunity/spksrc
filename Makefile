@@ -136,7 +136,7 @@ prepare: downloads  ## Download sources and build all toolchains
 downloads:  ## Download all cross/ package sources
 	@for dl in $(dir $(wildcard cross/*/Makefile)) ; \
 	do \
-	    $(MAKE) -C $${tc} download ; \
+	    $(MAKE) -C $${dl} download ; \
 	done
 
 natives:  ## Build all native/ tools

@@ -16,6 +16,10 @@ SPKSRC_HELP_MK := 1
 # Name of the directory that contains this package (cross / spk / native / ...).
 SPKSRC_TREE := $(notdir $(patsubst %/,%,$(dir $(CURDIR))))
 
+# Never activate at the repo root (the root Makefile has its own help), even if
+# the spksrc checkout happens to live under a parent directory named like a
+# package tree (e.g. /home/user/spk/spksrc).
+ifneq ($(CURDIR),$(BASEDIR))
 ifneq ($(filter $(SPKSRC_TREE),cross spk native toolchain toolkit kernel diyspk python),)
 
 # Build lifecycle steps; spk/cross/diyspk additionally generate a PLIST.
@@ -70,9 +74,10 @@ ifneq ($(filter $(SPKSRC_TREE),spk diyspk),)
 	  printf "  \033[36m%-24s\033[0m %s\n" "crossenv-<arch>-<tcvers>" "build the cross-compilation Python venv" ; \
 	  printf "  \033[36m%-24s\033[0m %s\n" "download-wheels" "download the wheel sources only" ; \
 	  printf "  \033[36m%-24s\033[0m %s\n" "wheelclean" "remove wheel build state (run before rebuilding)" ; \
-	  printf "  \033[36m%-24s\033[0m %s\n" "wheelcleancache" "also drop the shared wheel download cache" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "wheelcleancache" "remove the local pip cache only (work-*/pip)" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "wheelcleanall" "wheelclean + caches, incl. the shared distrib/pip" ; \
 	  printf "  \033[36m%-24s\033[0m %s\n" "crossenvclean" "remove the crossenv and wheel state" ; \
-	  printf "  \033[36m%-24s\033[0m %s\n" "crossenvcleanall" "remove the crossenv, wheels and cache" ; \
+	  printf "  \033[36m%-24s\033[0m %s\n" "crossenvcleanall" "remove the crossenv, wheels and all caches" ; \
 	fi
 endif
 endif
@@ -90,6 +95,8 @@ ifneq ($(SPKSRC_TREE),python)
 	@printf "  \033[33m%s\033[0m\n" "  to refresh digests: make clean, delete the file in distrib/, then make digests"
 endif
 	@printf "\nRun \033[36mmake help\033[0m at the spksrc root for repo-wide targets (setup, ...)\n\n"
+
+endif
 
 endif
 
