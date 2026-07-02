@@ -36,7 +36,14 @@ endif
 
 ifndef LOG_DIR
 LOG_DIR = $(CURDIR)
+# Exported so that a package build's dependency sub-makes aggregate their logs
+# under the invoked package directory. Do NOT export at the repo root: the root
+# Makefile only orchestrates (it cd's into each package), so pinning LOG_DIR to
+# the root here would send every package's build logs to the repo root instead
+# of the package directory (build-<arch>.log, status-build.log, ...).
+ifneq ($(CURDIR),$(BASEDIR))
 export LOG_DIR
+endif
 endif
 
 ifndef INSTALL_DIR
