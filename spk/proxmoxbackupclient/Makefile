@@ -1,5 +1,5 @@
 SPK_NAME = proxmoxbackupclient
-SPK_VERS = 0.0.5
+SPK_VERS = 1.1.3
 SPK_REV = 1
 SPK_ICON = src/proxmox.png
 
@@ -15,7 +15,7 @@ CHANGELOG = "Initial package release."
 HOMEPAGE = https://github.com/tizbac/proxmoxbackupclient_go/
 LICENSE  = GPLv3
 
-STARTABLE = No
+STARTABLE = no
 
 SPK_COMMANDS = bin/proxmoxbackupgo
 
