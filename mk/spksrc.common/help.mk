@@ -44,15 +44,16 @@ ifneq ($(filter $(SPKSRC_TREE),cross spk native diyspk),)
 	@printf "  \033[36m%-24s\033[0m %s\n" "<step>" "run one build step, in order:"
 	@printf "  %-24s   %s\n" "" "$(HELP_STEPS)"
 endif
+ifneq ($(filter $(SPKSRC_TREE),cross spk kernel diyspk),)
+	@printf "  \033[33m%s\033[0m\n" "  all and every <step> except download need ARCH=<arch> TCVERSION=<tcvers>"
+endif
 ifeq ($(SPKSRC_TREE),toolchain)
 	@printf "  \033[36m%-24s\033[0m %s\n" "tc_vars" "show the toolchain variables (TC_GCC, ...)"
 endif
 ifeq ($(SPKSRC_TREE),toolkit)
 	@printf "  \033[36m%-24s\033[0m %s\n" "tk_vars" "show the toolkit variables"
 endif
-ifneq ($(filter $(SPKSRC_TREE),cross spk kernel diyspk),)
-	@printf "  \033[33m%s\033[0m\n" "  all and every <step> except download need ARCH=<arch> TCVERSION=<tcvers>"
-endif
+	@printf "  \033[36m%-24s\033[0m %s\n" "rustup <args>" "run rustup for the rust toolchain (e.g. make rustup show)"
 ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
 	@printf "\n\033[1mMulti-arch\033[0m  (needs 'make setup' once at the spksrc root first)\n"
 	@printf "  \033[36m%-24s\033[0m %s\n" "all-supported" "build for every supported arch"
