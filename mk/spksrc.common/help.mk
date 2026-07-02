@@ -58,6 +58,10 @@ ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
 	@printf "\n\033[1mMulti-arch\033[0m  (needs 'make setup' once at the spksrc root first)\n"
 	@printf "  \033[36m%-24s\033[0m %s\n" "all-supported" "build for every supported arch"
 	@printf "  \033[36m%-24s\033[0m %s\n" "all-latest" "build for the latest toolchains only"
+ifneq ($(filter $(SPKSRC_TREE),spk diyspk),)
+	@printf "  \033[36m%-24s\033[0m %s\n" "publish-all-supported" "build and publish every supported arch (needs PUBLISH_URL/PUBLISH_API_KEY)"
+	@printf "  \033[36m%-24s\033[0m %s\n" "publish-all-latest" "build and publish the latest toolchains only"
+endif
 endif
 ifneq ($(filter $(SPKSRC_TREE),spk diyspk),)
 	@if [ -n "$(HELP_PYTHON)" ]; then \
