@@ -4,35 +4,45 @@ This page documents the build targets and rules available in spksrc.
 
 ## Build Targets
 
+Run `make help` inside any package directory for the authoritative,
+context-aware list. The tables below summarize the common targets.
+
 ### Cross Package Targets
 
 Run from `cross/<package>/` directory:
 
 | Target | Description |
 |--------|-------------|
-| `all` | Build everything (default) |
-| `download` | Download source archive |
-| `checksum` | Verify checksums |
-| `extract` | Extract source archive |
-| `patch` | Apply patches |
-| `configure` | Run configure script |
-| `compile` | Compile the source |
-| `install` | Install to staging |
-| `plist` | Generate PLIST file |
-| `clean` | Remove build artifacts |
+| `all` | Build everything (default; needs `ARCH=<arch> TCVERSION=<tcvers>`) |
+| `arch-<arch>-<tcvers>` | Build for one arch/version (e.g. `arch-x64-7.2`) |
+| `download` `checksum` `extract` `patch` `configure` `compile` `install` `plist` | Individual build lifecycle steps, in order |
+| `all-supported` / `all-latest` | Build for every supported / latest toolchain (needs `make setup` first) |
+| `dependency-tree` / `dependency-flat` / `dependency-list` | Inspect the dependency graph |
+| `clean` | Remove all work directories |
+| `smart-clean` | Remove this package's source and cookies (needs `ARCH`+`TCVERSION`) |
+| `digests` | Regenerate the digests file (auto-runs `download`) |
+| `rustup <args>` | Run rustup for the rust toolchain (e.g. `make rustup show`) |
 
 ### SPK Package Targets
 
-Run from `spk/<package>/` directory:
+Run from `spk/<package>/` directory (`diyspk/` behaves the same):
 
 | Target | Description |
 |--------|-------------|
-| `all` | Build SPK (default) |
-| `arch-<arch>-<version>` | Build for specific architecture (e.g., `arch-x64-7.2`) |
-| `all-supported` | Build for all architectures in `DEFAULT_TC` |
-| `package` | Create SPK file |
-| `publish` | Publish to package server |
-| `clean` | Remove build artifacts |
+| `all` | Build the SPK (default; needs `ARCH=<arch> TCVERSION=<tcvers>`) |
+| `arch-<arch>-<tcvers>` | Build for one arch/version (e.g. `arch-x64-7.2`) |
+| `all-supported` / `all-latest` | Build for every supported / latest toolchain (needs `make setup` first) |
+| `package` | Create the SPK file |
+| `dependency-tree` / `dependency-flat` / `dependency-list` | Inspect the dependency graph |
+| `clean` / `smart-clean` | Remove work directories / this package's source and cookies |
+| `download` / `digests` | Fetch source archive(s) / regenerate digests |
+| `rustup <args>` | Run rustup for the rust toolchain (e.g. `make rustup show`) |
+
+For Python SPKs (those setting `PYTHON_PACKAGE` or named `python3*`), additional
+wheel/crossenv targets are available — see
+[Python Packages](../package-types/python.md): `wheel-<arch>-<tcvers>`,
+`crossenv-<arch>-<tcvers>`, `download-wheels`, `wheelclean`, `wheelcleancache`,
+`crossenvclean`, `crossenvcleanall`.
 
 ## Build System Includes
 
@@ -53,10 +63,12 @@ include ../../mk/spksrc.cross-go.mk
 
 # Rust package
 include ../../mk/spksrc.cross-rust.mk
-
-# Python wheel
-include ../../mk/spksrc.python-module.mk
 ```
+
+For Python modules built as wheels under `python/` (numpy, pillow, ...), use
+`spksrc.python-wheel.mk` (or `spksrc.python-wheel-meson.mk` for meson builds);
+`spksrc.python-module.mk` builds a cross-compiled Python extension instead. See
+[Python Packages](../package-types/python.md).
 
 ### SPK Packaging
 
