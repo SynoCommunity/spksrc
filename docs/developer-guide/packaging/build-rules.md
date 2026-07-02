@@ -32,7 +32,7 @@ Run from `spk/<package>/` directory (`diyspk/` behaves the same):
 | `all` | Build the SPK (default; needs `ARCH=<arch> TCVERSION=<tcvers>`) |
 | `arch-<arch>-<tcvers>` | Build for one arch/version (e.g. `arch-x64-7.2`) |
 | `all-supported` / `all-latest` | Build for every supported / latest toolchain (needs `make setup` first) |
-| `publish-all-supported` / `publish-all-latest` | Build and publish every supported / latest arch (needs `PUBLISH_URL`+`PUBLISH_API_KEY` in `local.mk`) |
+| `publish-all-supported` / `publish-all-latest` | Build and publish every supported / latest arch (run `make setup-synocommunity` first, then set `PUBLISH_API_KEY` in `local.mk`) |
 | `package` | Create the SPK file |
 | `dependency-tree` / `dependency-flat` / `dependency-list` | Inspect the dependency graph |
 | `clean` / `smart-clean` | Remove work directories / this package's source and cookies |
