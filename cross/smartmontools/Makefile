@@ -1,5 +1,5 @@
 PKG_NAME = smartmontools
-PKG_VERS = 7.4
+PKG_VERS = 7.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/smartmontools/smartmontools/releases/download/RELEASE_$(subst .,_,$(PKG_VERS))

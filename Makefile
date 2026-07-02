@@ -1,6 +1,7 @@
 
 # Include framework self-test
-include mk/spksrc.test-rules.mk
+include mk/spksrc.rules/tests.mk
+include mk/spksrc.rules/dependency-tree.mk
 
 AVAILABLE_TCS = $(notdir $(wildcard toolchain/syno-*))
 AVAILABLE_ARCHS = $(notdir $(subst syno-,/,$(AVAILABLE_TCS)))
@@ -69,19 +70,6 @@ native-%: native/%/Makefile
 
 native-%-clean: native/%/Makefile
 	cd $(dir $^) && env $(MAKE) clean
-
-# build dependency tree for all packages
-# - exclude broken packages
-dependency-tree:
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
-	do \
-	    $(MAKE) --no-print-directory -C $${spk} dependency-tree ; \
-	done
-
-# build dependency list for all packages
-# - broken packages are excluded
-dependency-list:
-	@mk/dependency-list.sh
 
 # define a template that instantiates a 'python3-avoton-6.1' -style target for
 # every ($2) arch, every ($1) spk
@@ -170,7 +158,7 @@ local.mk:
 	@echo "# Option to disable the use of github API to get the real name and url of the maintainer" >> $@
 	@echo "# define it for local builds when you reach the API rate limit" >> $@
 	@echo "DISABLE_GITHUB_MAINTAINER =" >> $@
-	@echo "#PSTAT = on" >> $@
+	@echo "PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
 
 dsm-%: local.mk

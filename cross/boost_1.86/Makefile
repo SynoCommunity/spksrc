@@ -39,7 +39,7 @@ space:= $(empty) $(empty)
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS += --with-toolset=gcc --with-libraries=$(subst $(space),$(comma),$(sort $(BOOST_LIBRARIES))) --prefix=$(STAGING_INSTALL_PREFIX)
 
-ADDITIONAL_CXXFLAGS = -Wno-deprecated-declarations
+ADDITIONAL_CXXFLAGS += -Wno-deprecated-declarations
 
 ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 CONFIGURE_ARGS += --with-python=$(WORK_DIR)/../../../native/$(PYTHON_NAME)/work-native/install/usr/local/bin/$(PYTHON_NAME)
@@ -73,7 +73,7 @@ boost_configure:
 boost_pre_compile:
 	@# Recreate user-config.jam to include python-cc.mk on second run
 	@rm -rf $(WORK_DIR)/$(PKG_DIR)/user-config.jam
-	@echo "using gcc : ${TC_GCC} : ${CXX} : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS) $(ADDITIONAL_CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam
+	@$(RUN) sh -c 'echo "using gcc : ${TC_GCC} : $${CXX} : <address-model>\"$(ADDRESS_MODEL)\" <cflags>\"$(CFLAGS)\" <cxxflags>\"$(CXXFLAGS) $(ADDITIONAL_CXXFLAGS)\" <linkflags>\"$(LDFLAGS)\" <link>\"shared\" ; " > $(WORK_DIR)/$(PKG_DIR)/user-config.jam'
 ifneq ($(strip $(WITH_PYTHON_LIBRARY)),)
 	@echo "using python : $(PYTHON_VERSION) : : $(or $(PYTHON_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL_PREFIX))/$(PYTHON_INC_DIR) ;" >> $(WORK_DIR)/$(PKG_DIR)/user-config.jam
 endif

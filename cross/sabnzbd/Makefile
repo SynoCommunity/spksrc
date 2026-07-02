@@ -1,5 +1,5 @@
 PKG_NAME = SABnzbd
-PKG_VERS = 4.5.1
+PKG_VERS = 5.0.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/sabnzbd/sabnzbd/releases/download/$(PKG_VERS)
@@ -13,7 +13,7 @@ LICENSE  = GPL
 
 INSTALL_TARGET = sabnzbd_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 # The tests and po folders take 5MB of space and are not used
 sabnzbd_install:

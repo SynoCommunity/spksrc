@@ -1,13 +1,14 @@
 SPK_NAME = ffmpeg7
-SPK_VERS = 7.0.2
-SPK_REV = 2
+SPK_VERS = 7.1.4
+SPK_REV = 8
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Fix issue on ppc-qoriq arch"
+CHANGELOG = "1. Update to version 7.1.4<br/>2. Update to v7.1.4-3 jellyfin-ffmpeg patches<br/>2. Add aarch64 libdrm support<br/>3. Enable vulkan shaderc and placebo"
 
 DEPENDS = cross/ffmpeg7
+VIDEODRV_PACKAGE = synocli-videodriver
 
-# requires c11 support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# requires c11 and proper atomic using gcc-4.9+ support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg
@@ -30,11 +31,7 @@ SERVICE_USER = auto
 VIDEODRIVER = on
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-SPK_DEPENDS = "synocli-videodriver"
-endif
-
-include ../../mk/spksrc.videodriver.mk
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:

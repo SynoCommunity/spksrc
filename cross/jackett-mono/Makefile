@@ -1,5 +1,5 @@
 PKG_NAME = Jackett
-PKG_VERS = 0.22.534
+PKG_VERS = 0.24.726
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).Binaries.Mono.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Jackett/Jackett/releases/download/v$(PKG_VERS)
@@ -14,7 +14,7 @@ LICENSE  = GPLv2
 
 INSTALL_TARGET = jackett_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: jackett_install
 jackett_install:

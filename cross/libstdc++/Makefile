@@ -16,7 +16,7 @@ LICENSE  = GPLv3
 
 INSTALL_TARGET = libstdc++6_install
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = amd64 armhf arm64 armel i386
@@ -37,7 +37,7 @@ PKG_DIST_ARCH = i386
 LIB_DIR = i386-linux-gnu
 endif
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: libstdc++6_install
 libstdc++6_install:

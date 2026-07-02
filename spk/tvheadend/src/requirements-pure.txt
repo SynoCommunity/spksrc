@@ -1,4 +1,15 @@
-#certifi==2021.5.30 ==> python312
-chardet==5.2.0
-requests==2.32.3
-urllib3==2.3.0
+charset-normalizer==3.4.2
+gracenote2epg==1.6.0
+idna==3.10
+langdetect==1.0.9
+polib==1.2.0
+requests==2.32.4
+urllib3==2.5.0
+
+# Additional wheels for gracenote2epg[full] >= 1.6.0
+#numpy==2.2.6                   # python/numpy
+#pandas==2.3.2                  # python/pandas
+pgeocode==0.5.0
+python-dateutil==2.9.0.post0
+pytz==2025.2
+tzdata==2025.2

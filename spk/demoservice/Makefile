@@ -1,6 +1,6 @@
 SPK_NAME = demoservice
-SPK_VERS = 1.2
-SPK_REV = 8
+SPK_VERS = 1.3
+SPK_REV = 9
 SPK_ICON = src/demoservice.png
 
 override ARCH=noarch
@@ -8,7 +8,7 @@ override ARCH=noarch
 MAINTAINER = ymartin59
 DESCRIPTION = Demonstration package to show installer script capabilities when requiring non-root user for background service and show configuration/creation of shared folder for package user.
 DISPLAY_NAME = Demo Service
-CHANGELOG = "1. Use redesigned shared folder handling.<br>2. Fix service command to work on SRM and DSM 5.<br/>3. Use Pyhton 3 when available in path."
+CHANGELOG = "1. Use Port 18888 for SRM compatibility."
 
 LICENSE = GPLv2
 
@@ -27,7 +27,7 @@ STARTABLE = yes
 SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 
 # Service configuration
-SERVICE_PORT = 8888
+SERVICE_PORT = 18888
 SERVICE_PORT_TITLE = $(DISPLAY_NAME) (HTTP)
 SERVICE_DESC = Demo Service Package
 

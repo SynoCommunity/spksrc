@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.python-wheel-meson.mk
+#
 # python-meson wheel build
 #
 # By default uses $(CROSSENV)/bin/cross-python -m build
@@ -11,10 +14,21 @@
 #     pip: --config-settings=install-args='<value>'
 #   build: -Cinstall-args='<value>'
 #
+###############################################################################
+
+# Setup common directories
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
+
+###
+
+# If meta-spk python not available, build locally
+ifdef PYTHON_PACKAGE
+ifeq ($(wildcard $(PYTHON_PACKAGE_WORK_DIR)),)
+DEPENDS += cross/$(PYTHON_PACKAGE)
+endif
+endif
 
 ###
 
@@ -22,15 +36,15 @@ include ../../mk/spksrc.directories.mk
 MESON_PYTHON = 1
 
 # meson specific configurations
-include ../../mk/spksrc.cross-meson-env.mk
+include ../../mk/spksrc.cross/env-meson.mk
 
 # meson cross-file usage definition
-include ../../mk/spksrc.cross-meson-crossfile.mk
+include ../../mk/spksrc.cross/meson-crossfile.mk
 
 # 1- Prepare the crossenv
 # 2- Generate the per-dependency cross-file definition
 ifeq ($(strip $(CONFIGURE_TARGET)),)
-CONFIGURE_TARGET = prepare_crossenv $(MESON_CROSS_FILE_PKG)
+CONFIGURE_TARGET = prepare_crossenv meson_generate_crossfile
 endif
 
 ifeq ($(strip $(COMPILE_TARGET)),)
@@ -46,11 +60,12 @@ endif
 # Define where is located the crossenv
 CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME))-$(PKG_VERS) $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME)) $(WORK_DIR)/crossenv-default))
 
-# If using spksrc.python.mk with PYTHON_STAGING_PREFIX defined
+# If using spksrc.spk-meta/python.mk with PYTHON_STAGING_INSTALL_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
 # wheels can find openssl and other libraries
-ifneq ($(wildcard $(PYTHON_STAGING_PREFIX)),)
-STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_PREFIX)
+
+ifneq ($(wildcard $(PYTHON_STAGING_INSTALL_PREFIX)),)
+STAGING_INSTALL_PREFIX := $(PYTHON_STAGING_INSTALL_PREFIX)
 endif
 
 ###
@@ -118,13 +133,13 @@ install_meson_python_wheel:
 ###
 
 # Use crossenv
-include ../../mk/spksrc.crossenv.mk
+include ../../mk/spksrc.python-crossenv.mk
 
 ## python wheel specific configurations
-include ../../mk/spksrc.wheel-env.mk
+include ../../mk/spksrc.wheel/env.mk
 
 ## install wheel specific routines
-include ../../mk/spksrc.wheel-install.mk
+include ../../mk/spksrc.wheel/install.mk
 
 ###
 

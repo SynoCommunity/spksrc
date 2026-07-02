@@ -1,5 +1,5 @@
 GITEA="${SYNOPKG_PKGDEST}/bin/gitea"
-CONF_FILE="${SYNOPKG_PKGVAR}/conf.ini"
+CFG_FILE="${SYNOPKG_PKGVAR}/conf.ini"
 PATH="/var/packages/git/target/bin:${PATH}"
 
 if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ]; then

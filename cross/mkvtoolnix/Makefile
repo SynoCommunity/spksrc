@@ -17,6 +17,7 @@ REQUIRED_MIN_DSM = 7.1
 
 # comcerto2k has older toolchain than other DSM 7.1 archs
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 BUILD_DEPENDS = native/ruby
 # build cross/libicu before cross/boost to build libboost_regex with unicode support
@@ -26,8 +27,8 @@ DEPENDS += cross/flac cross/file
 DEPENDS += cross/libebml cross/libmatroska
 DEPENDS += cross/pcre2
 
-HOMEPAGE = https://mkvtoolnix.download/index.html
-COMMENT  = MKVToolNix is a set of tools to create, alter and inspect Matroska files.
+HOMEPAGE = https://mkvtoolnix.org/
+COMMENT  = MKVToolNix - Ultimate Tool for Editing and Merging MKV Files.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1

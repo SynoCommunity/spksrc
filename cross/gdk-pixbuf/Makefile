@@ -9,7 +9,7 @@ DEPENDS = cross/glib cross/libpng cross/libjpeg cross/libtiff
 
 HOMEPAGE = https://docs.gtk.org/gdk-pixbuf/
 COMMENT  = gdk-pixbuf is an image loading library which is used by GTK.
-LICENSE  =
+LICENSE  = GPLv2.1+
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = -Dtests=false -Dinstalled_tests=false

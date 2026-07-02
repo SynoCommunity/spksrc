@@ -1,5 +1,5 @@
 PKG_NAME = wallabag
-PKG_VERS = 2.6.12
+PKG_VERS = 2.6.14
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/wallabag/$(PKG_NAME)/releases/download/$(PKG_VERS)
@@ -13,7 +13,7 @@ LICENSE  = MIT
 
 INSTALL_TARGET = wallabag_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: wallabag_install
 wallabag_install:

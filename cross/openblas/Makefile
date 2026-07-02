@@ -1,5 +1,5 @@
 PKG_NAME = OpenBLAS
-PKG_VERS = 0.3.29
+PKG_VERS = 0.3.30
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/OpenMathLib/OpenBLAS/releases/download/v$(PKG_VERS)
@@ -22,6 +22,10 @@ ADDITIONAL_CFLAGS  = -Wno-unused-variable
 ADDITIONAL_CFLAGS += -Wno-unused-function
 ADDITIONAL_CFLAGS += -Wno-maybe-uninitialized
 ADDITIONAL_CFLAGS += -Wno-parentheses
+
+ifeq ($(GCC_DEBUG_INFO),1)
+  CMAKE_ARGS += -DOPENBLAS_DEBUG_SUFFIX=OFF
+endif
 
 include ../../mk/spksrc.common.mk
 

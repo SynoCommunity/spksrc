@@ -1,6 +1,5 @@
 KERNEL_ARCH = qoriq
 KERNEL_VERS = 6.1
-KERNEL_BUILD = 15152
 KERNEL_DIST = linux-2.6.32
 KERNEL_CONFIG = synoconfigs/ppcQorIQ
 KERNEL_BASE_ARCH = powerpc

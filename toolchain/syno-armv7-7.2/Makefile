@@ -15,4 +15,4 @@ TC_SYSROOT = $(TC_TARGET)/sysroot
 # ensure gnu/hard-float.h is used
 TC_EXTRA_CFLAGS = -D__ARM_PCS_VFP=1
 
-include ../../mk/spksrc.tc.mk
+include ../../mk/spksrc.toolchain.mk

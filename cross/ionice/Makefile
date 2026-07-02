@@ -1,17 +1,16 @@
 PKG_NAME = ionice
 PKG_REAL_NAME = util-linux
-PKG_VERS = 2.40.1
-PKG_VERS_MAJOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
+PKG_VERS = 2.41.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/$(PKG_REAL_NAME)/v$(PKG_VERS_MAJOR)
-# use dedicated folder to build independent of other libraries built from util-linux (i.e. libuuid, libmount, libblkid, ionice, misc-util-linux)
+PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/util-linux/v$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
+# use dedicated folder to build independent of other libraries built from util-linux (i.e. ionice, libblkid, libmount, libuuid, misc-util-linux)
 PKG_DIR = $(PKG_NAME)/$(PKG_REAL_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
 DEPENDS =
 
-HOMEPAGE = https://github.com/karelzak/util-linux
+HOMEPAGE = https://github.com/util-linux/util-linux
 COMMENT  = Random collection of Linux utilities. We use this only to build ionice out of util-linux.
 LICENSE  = GPLv2
 
@@ -21,13 +20,13 @@ CONFIGURE_ARGS += --without-ncurses
 CONFIGURE_ARGS += --without-python
 CONFIGURE_ARGS += --disable-asciidoc
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifneq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-year2038
 endif
 
 # build ionice only (schedutils = ionice, chrt, taskset)
-# chrt, taskset and uclampset are disabled by patch to avoid configure error
+# chrt, taskset and uclampset are disabled by patch to avoid configure errors
 CONFIGURE_ARGS += --disable-all-programs --enable-schedutils
 
 ADDITIONAL_CFLAGS = -O

@@ -8,13 +8,13 @@ host = "0.0.0.0"
 # defined by SynoCommunity Package
 port = {{TCP_PORT}}
 
-syncstorage.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@{{DB_SERVER}}/syncstorage_rs"
+syncstorage.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@{{DB_SERVER}}/syncstorage_rs?socket={{DB_SOCKET}}"
 syncstorage.enable_quota = 0
 syncstorage.enabled = true
 syncstorage.limits.max_total_records = 1666 # See issues #298/#333
 
 # token
-tokenserver.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@{{DB_SERVER}}/tokenserver_rs"
+tokenserver.database_url = "mysql://{{SQL_USER}}:{{SQL_PASS}}@{{DB_SERVER}}/tokenserver_rs?socket={{DB_SOCKET}}"
 tokenserver.enabled = true 
 tokenserver.fxa_email_domain = "api.accounts.firefox.com"
 tokenserver.fxa_metrics_hash_secret = "{{METRICS_HASH_SECRET}}"

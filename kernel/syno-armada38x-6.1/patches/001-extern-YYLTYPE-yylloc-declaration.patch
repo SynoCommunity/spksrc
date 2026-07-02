@@ -1,0 +1,11 @@
+--- scripts/dtc/dtc-lexer.lex.c_shipped-ORIG	2015-07-29 04:01:05.000000000 +0000
++++ scripts/dtc/dtc-lexer.lex.c_shipped	2026-03-08 23:15:47.294278215 +0000
+@@ -637,7 +637,7 @@ char *yytext;
+ #include "srcpos.h"
+ #include "dtc-parser.tab.h"
+ 
+-YYLTYPE yylloc;
++extern YYLTYPE yylloc;
+ 
+ /* CAUTION: this will stop working if we ever use yyless() or yyunput() */
+ #define	YY_USER_ACTION \

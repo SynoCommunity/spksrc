@@ -1,9 +1,9 @@
-# enable ionice only for enable-schedutils
+# To build ionice only, we must disable the build of taskset, chrt and uclampset,
+# but there are no specific configure args to do this.
 # 
-# 
---- configure.orig	2024-05-06 08:20:58.337712600 +0000
-+++ configure	2024-06-21 19:41:48.828192227 +0000
-@@ -41220,7 +41220,7 @@
+--- configure.orig	2025-06-24 07:57:03.242764100 +0000
++++ configure	2025-07-27 07:40:37.556764691 +0000
+@@ -43091,7 +43091,7 @@
  
  
  
@@ -12,7 +12,7 @@
  
  
  
-@@ -41376,7 +41376,7 @@
+@@ -43373,7 +43373,7 @@
  
  
  
@@ -21,7 +21,7 @@
  
  
  
-@@ -41505,7 +41505,7 @@
+@@ -43505,7 +43505,7 @@
  
  
  

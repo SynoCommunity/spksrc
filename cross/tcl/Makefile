@@ -14,7 +14,7 @@ LICENSE  = https://tcl.tk/software/tcltk/license.html
 
 GNU_CONFIGURE = 1
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Enable 64-bit support in Tcl for 64-bit architectures
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))

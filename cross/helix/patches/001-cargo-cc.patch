@@ -1,0 +1,12 @@
+# force use of patched cc crate
+# 
+--- Cargo.toml.orig	2025-07-18 15:07:04.000000000 +0000
++++ Cargo.toml	2025-11-30 20:34:27.697100736 +0000
+@@ -60,3 +60,7 @@
+ homepage = "https://helix-editor.com"
+ license = "MPL-2.0"
+ rust-version = "1.82"
++
++# Helix cross-build configuration
++[patch.crates-io]
++cc = { path = ".cargo/patches/cc/cc-1.2.29" }

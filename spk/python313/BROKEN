@@ -1,0 +1,9 @@
+Package no longer supported.
+
+python313 was only used by spk/homeassistant, which is now unsupported: Home
+Assistant deprecated the "Core" (Python virtual environment) installation method
+this package relied on. From release 2025.12 onwards only the official Home
+Assistant OS / Container images are supported, with no further Core updates
+(security included). With no remaining consumer, python313 is dropped too.
+
+Ref: https://www.home-assistant.io/blog/2025/05/22/deprecating-core-and-supervised-installation-methods-and-32-bit-systems/

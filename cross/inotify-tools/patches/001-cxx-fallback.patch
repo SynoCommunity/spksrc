@@ -1,0 +1,40 @@
+--- configure.ac
++++ configure.ac
+@@ -13,6 +13,22 @@
+ 
+ # Checks for programs.
+ AC_PROG_CXX
++AC_CACHE_CHECK([whether $CXX accepts -std=c++17],
++  [inotify_cv_cxx17],
++  [AC_LANG_PUSH([C++])
++   inotify_cv_cxx17=no
++   save_CXXFLAGS="$CXXFLAGS"
++   CXXFLAGS="$CXXFLAGS -std=c++17"
++   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <vector>],
++                                      [std::vector<int> v;])],
++                     [inotify_cv_cxx17=yes])
++   CXXFLAGS="$save_CXXFLAGS"
++   AC_LANG_POP([C++])])
++CXX_STD_FLAG="-std=c++11"
++if test "x$inotify_cv_cxx17" = "xyes"; then
++  CXX_STD_FLAG="-std=c++17"
++fi
++AC_SUBST([CXX_STD_FLAG])
+ AC_PROG_LN_S
+ AM_INIT_AUTOMAKE
+ LT_INIT
+--- src/Makefile.am
++++ src/Makefile.am
+@@ -4,10 +4,10 @@
+ 
+ if IS_CLANG
+ AM_CFLAGS = -std=c99 -fno-exceptions -Wall -Wextra -Wshadow -Werror -Wno-unused-command-line-argument -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
+-AM_CPPFLAGS = -std=c++17 -fno-exceptions -Wall -Wextra -Wshadow -Werror -Wno-unused-command-line-argument -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
++AM_CPPFLAGS = @CXX_STD_FLAG@ -fno-exceptions -Wall -Wextra -Wshadow -Werror -Wno-unused-command-line-argument -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
+ else
+ AM_CFLAGS = -std=c99 -fno-exceptions -Wall -Wextra -Wshadow -Werror -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
+-AM_CPPFLAGS = -std=c++17 -fno-exceptions -Wall -Wextra -Wshadow -Werror -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
++AM_CPPFLAGS = @CXX_STD_FLAG@ -fno-exceptions -Wall -Wextra -Wshadow -Werror -I../libinotifytools/src -I$(srcdir)/../libinotifytools/src
+ endif
+ 
+ LDADD = ../libinotifytools/src/libinotifytools.la

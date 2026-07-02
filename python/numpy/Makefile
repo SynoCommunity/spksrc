@@ -1,7 +1,8 @@
-PKG_NAME = numpy_$(PKG_VERS)
-PKG_REAL_NAME = numpy
 # Reminder to update wheelhouse:numpy==<version>
 # in python31*/crossenv/requirements-scipy.txt
+PKG_NAME = numpy_$(PKG_VERS)
+PKG_REAL_NAME = numpy
+# version >= 2.3 -> Requires gcc >= 9.4 -> DSM-7.2
 PKG_VERS = 2.2.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -26,6 +27,7 @@ LICENSE  = NumPy Developers
 # Requires gcc>=8.4 to build sucesfully
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
 include ../../mk/spksrc.common.mk
 

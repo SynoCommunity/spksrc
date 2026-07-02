@@ -1,5 +1,5 @@
 PKG_NAME = pugixml
-PKG_VERS = 1.14
+PKG_VERS = 1.15
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/zeux/pugixml/releases/download/v$(PKG_VERS)
@@ -10,9 +10,5 @@ DEPENDS =
 HOMEPAGE = https://pugixml.org/
 COMMENT  = Light-weight, simple and fast XML parser for C++ with XPath support.
 LICENSE  = MIT
-
-GNU_CONFIGURE = 1
-
-CMAKE_USE_TOOLCHAIN_FILE = OFF
 
 include ../../mk/spksrc.cross-cmake.mk

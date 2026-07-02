@@ -1,5 +1,5 @@
 PKG_NAME = gpac
-PKG_VERS = 2.2.1
+PKG_VERS = 26.02.0
 GPAC_GIT_REVISION = "1 (SynoCommunity)"
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)

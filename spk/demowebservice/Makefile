@@ -1,16 +1,19 @@
 SPK_NAME = demowebservice
 SPK_VERS = 1.0
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/demowebservice.png
 
 DEPENDS =
+
+# SRM is not supported due lacking webstation package
+REQUIRED_MIN_SRM = 3.0
 
 override ARCH=noarch
 
 MAINTAINER = hgy59
 DESCRIPTION = Demopackage to show how to create a web service \(web application\)
 DISPLAY_NAME = Demo Web Service
-CHANGELOG = "Initial package release"
+CHANGELOG = "Use service port 18889 instead of 8889"
 
 LICENSE = MIT
 
@@ -43,7 +46,7 @@ CONF_DIR = src/conf_php$(PHP_VERSION)/
 # Disable the creation of app/config file:
 NO_SERVICE_SHORTCUT = y
 # create firewall rules, since we add a port based "Web Portal"
-SERVICE_PORT = 8889
+SERVICE_PORT = 18889
 endif
 
 # apache-web dependency is not used:

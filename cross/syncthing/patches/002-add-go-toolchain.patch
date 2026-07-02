@@ -1,0 +1,11 @@
+--- syncthing/go.mod.orig	2026-04-07 09:54:21
++++ syncthing/go.mod	2026-05-09 06:23:43
+@@ -2,6 +2,8 @@
+ 
+ go 1.25.0
+ 
++toolchain go1.26.3
++
+ require (
+ 	github.com/AudriusButkevicius/recli v0.0.7
+ 	github.com/alecthomas/kong v1.14.0

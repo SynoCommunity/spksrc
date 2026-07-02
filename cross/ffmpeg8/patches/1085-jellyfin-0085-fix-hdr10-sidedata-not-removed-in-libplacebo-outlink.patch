@@ -1,0 +1,21 @@
+Index: FFmpeg/libavfilter/vf_libplacebo.c
+===================================================================
+--- libavfilter/vf_libplacebo.c
++++ libavfilter/vf_libplacebo.c
+@@ -1478,6 +1478,16 @@ static int libplacebo_config_output(AVFi
+     AVHWFramesContext *hwfc;
+     AVVulkanFramesContext *vkfc;
+ 
++    if (!((s->color_primaries == -1 &&
++           s->color_trc == -1) ||
++          (s->color_primaries == AVCOL_PRI_BT2020 &&
++           s->color_trc == AVCOL_TRC_SMPTE2084))) {
++        av_frame_side_data_remove(&outlink->side_data, &outlink->nb_side_data,
++                                  AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
++        av_frame_side_data_remove(&outlink->side_data, &outlink->nb_side_data,
++                                  AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
++    }
++
+     /* Frame dimensions */
+     RET(ff_scale_eval_dimensions(s, s->w_expr, s->h_expr, inlink, outlink,
+                                  &outlink->w, &outlink->h));

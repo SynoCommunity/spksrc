@@ -15,7 +15,7 @@ LICENSE  = GPLv3
 GNU_CONFIGURE = 1
 ADDITIONAL_CFLAGS = -O3
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-sse

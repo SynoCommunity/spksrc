@@ -1,5 +1,5 @@
 PKG_NAME = llvm-project
-PKG_VERS = 14.0.5
+PKG_VERS = 14.0.6
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$(PKG_VERS)

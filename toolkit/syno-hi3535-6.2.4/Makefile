@@ -1,7 +1,8 @@
 TK_ARCH = hi3535
-TK_VERS = 6.2
+TK_VERS = 6.2.4
+TK_DIST_VERS = 6.2
 
 TK_TARGET = arm-cortexa9-linux-gnueabi
-TK_SYSROOT = sysroot
+TK_SYSROOT = $(TK_TARGET)/sysroot
 
 include ../../mk/spksrc.toolkit.mk

@@ -1,4 +1,7 @@
-### Rules to create the spk package
+###############################################################################
+# spksrc.spk.mk
+#
+# Rules to create the spk package
 #   Most of the rules are imported from spksrc.*.mk files
 #
 # Variables:
@@ -14,7 +17,7 @@
 #  INSTALLER_SCRIPT             (optional) Use installer script from given file
 #  CONF_DIR                     (optional) To provide a package specific conf folder with files (e.g. privilege file)
 #  LICENSE_FILE                 (optional) Add licence from given file
-# 
+#
 # Internal variables used in this file:
 #  NAME                         The internal name of the package.
 #                               Note that all synocoummunity packages use lowercase names.
@@ -25,15 +28,13 @@
 #  SPK_CONTENT                  List of files and folders that are added to package.tgz within the spk file.
 #  DSM_SCRIPT_FILES             List of script files that are in the scripts folder within the spk file.
 #
-
-# Common makefiles
-include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
+###############################################################################
 
 # Configure the included makefiles
 NAME = $(SPK_NAME)
 
 ifneq ($(ARCH),)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 ifneq ($(ARCH),noarch)
 # arch specific packages
 ifneq ($(SPK_PACKAGE_ARCHS),)
@@ -49,10 +50,16 @@ ifeq ($(SPK_NAME_ARCH),)
 SPK_NAME_ARCH = $(ARCH)
 endif
 SPK_TCVERS = $(TCVERSION)
-ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
+ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
+TK = $(TC)
 endif
 endif
+endif
+
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 ifeq ($(ARCH),noarch)
 ifneq ($(strip $(TCVERSION)),)
@@ -77,7 +84,6 @@ else
 SPK_TCVERS = srm
 TC_OS_MIN_VER = 1.1-6931
 endif
-ARCH_SUFFIX = -$(SPK_TCVERS)
 endif
 endif
 
@@ -95,21 +101,27 @@ SPK_FILE_NAME = $(PACKAGES_DIR)/$(SPK_NAME)_$(SPK_NAME_ARCH)-$(SPK_TCVERS)_$(SPK
 
 #####
 
-include ../../mk/spksrc.pre-check.mk
+# Do not initialize any environment to avoid variable leakage.
+DEFAULT_ENV = none
 
-# Even though this makefile doesn't cross compile, we need this to setup the cross environment.
-include ../../mk/spksrc.cross-env.mk
+#####
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/pre-check.mk
+
+# Even though this makefile doesn't cross compile,
+# we need this to setup the cross environment.
+include ../../mk/spksrc.cross/env-default.mk
+
+include ../../mk/spksrc.rules/depend.mk
 
 copy: depend
 include ../../mk/spksrc.wheel.mk
 
 copy: wheel
-include ../../mk/spksrc.copy.mk
+include ../../mk/spksrc.spk/copy.mk
 
 strip: copy
-include ../../mk/spksrc.strip.mk
+include ../../mk/spksrc.spk/strip.mk
 
 
 # Scripts
@@ -149,7 +161,7 @@ include ../../mk/spksrc.service.mk
 
 icon: strip
 ifneq ($(strip $(SPK_ICON)),)
-include ../../mk/spksrc.icon.mk
+include ../../mk/spksrc.spk/icon.mk
 endif
 
 ifeq ($(strip $(MAINTAINER)),)
@@ -405,7 +417,7 @@ wizards:
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@$(MSG) "Create default DSM7 uninstall wizard"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $(SPKSRC_MK)wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(MKDIR)/wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 ifeq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
@@ -490,7 +502,42 @@ $(SPK_FILE_NAME): $(WORK_DIR)/package.tgz $(WORK_DIR)/INFO info-checksum icons s
 
 package: $(SPK_FILE_NAME)
 
-all: package
+# -----------------------------------------------------------------------------
+# Stage1: Toolchain (MANDATORY) + Toolkit (OPTIONAL) bootstrap
+# -----------------------------------------------------------------------------
+TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
+TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
+
+.PHONY: spk-stage1
+# spk-meta-source (the meta SOURCE build loop) lives in spksrc.rules/depend.mk
+spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE) spk-meta-source
+
+ifneq ($(strip $(TC)),)
+$(TCVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+else
+$(TCVARS_DONE): ;
+endif
+
+# $(TK) is only being set if REQUIRE_TOOLKIT=1
+ifneq ($(strip $(TK)),)
+$(TKVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) toolkit
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) tkvars
+else
+$(TKVARS_DONE): ;
+endif
+
+# -----------------------------------------------------------------------------
+# Stage2: Define package as a real target that does the work
+# -----------------------------------------------------------------------------
+.PHONY: spk-stage2
+spk-stage2: package
+
+all:
+	$(call LOG_WRAPPED,spk-stage1)
+	$(call LOG_WRAPPED,spk-stage2)
 
 
 ### spk-specific clean rules
@@ -525,11 +572,14 @@ spkclean:
 	       work-*/.depend_done \
 	       work-*/.icon_done \
 	       work-*/.strip_done \
+	       work-*/.stage0-bootstrap_done \
+	       work-*/.stage1-tcvars_done \
+	       work-*/.stage1-tkvars_done \
 	       work-*/.wheel_done \
 	       work-*/conf \
 	       work-*/scripts \
 	       work-*/staging \
-	       work-*/tc_vars.mk \
+	       work-*/tc_vars*.mk \
 	       work-*/tc_vars.cmake \
 	       work-*/tc_vars.meson-* \
 	       work-*/package.tgz \
@@ -538,6 +588,7 @@ spkclean:
 	       work-*/PACKAGE_ICON* \
 	       work-*/WIZARD_UIFILES
 
+wheelclean: SHELL:=/bin/bash
 wheelclean: spkclean
 	rm -fr work*/.wheel_done \
 	       work*/.wheel_*_done \
@@ -546,9 +597,10 @@ wheelclean: spkclean
 	@make --no-print-directory dependency-flat | sort -u | grep '\(cross\|python\)/' | while read depend ; do \
 	   makefile="../../$${depend}/Makefile" ; \
 	   if grep -q 'spksrc\.python-wheel\(-meson\)\?\.mk' $${makefile} ; then \
-	      pkgstr=$$(grep ^PKG_NAME $${makefile}) ; \
-	      pkgname=$$(echo $${pkgstr#*=} | xargs) ; \
-	      echo "rm -fr work-*/$${pkgname}*\\n       work-*/.$${pkgname}-*" ; \
+	      pkgvers=$$(grep ^PKG_VERS $${makefile} | cut -d= -f2 | xargs) ; \
+	      pkgname=$$(grep ^PKG_NAME $${makefile} | cut -d= -f2 | xargs) ; \
+	      pkgname=$${pkgname//\$$\(PKG_VERS\)/$${pkgvers}} ; \
+	      echo -ne "rm -fr work-*/$${pkgname}* \\ \\n       work-*/.$${pkgname}-* \\n" ; \
 	      rm -fr work-*/$${pkgname}* \
                      work-*/.$${pkgname}-* ; \
 	   fi ; \
@@ -579,9 +631,9 @@ pythoncleanall: pythonclean
 	rm -fr work-*/[Pp]ython* work-*/.python*
 
 ### For managing make all-<supported|latest>
-include ../../mk/spksrc.supported.mk
+include ../../mk/spksrc.rules/supported.mk
 
 ### For managing make publish-all-<supported|latest>
-include ../../mk/spksrc.publish.mk
+include ../../mk/spksrc.spk/publish.mk
 
 ###

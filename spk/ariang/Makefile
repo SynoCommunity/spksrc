@@ -8,6 +8,9 @@ DEPENDS = cross/ariang
 
 SPK_DEPENDS = "WebStation>=2.1.0"
 
+# SRM is not supported due lacking webstation package
+REQUIRED_MIN_SRM = 3.0
+
 MAINTAINER = vitkabele
 DESCRIPTION = AriaNg, a modern web frontend making aria2 easier to use.
 ADMIN_URL = /ariang/

@@ -15,7 +15,7 @@ HOMEPAGE = http://site.icu-project.org/home
 COMMENT  = International Components for Unicode.
 LICENSE  = https://www.unicode.org/copyright.html#License
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # Compiler too old, stdc++11 is required.
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
@@ -42,12 +42,12 @@ NATIVE_BUILD_DIR = $(realpath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-nativ
 
 # the packaging can be customized in a dependent package by definition
 # of LIBICU_DATA_PACKAGING_MODE like:
-# export LIBICU_DATA_PACKAGING_MODE=files
+# export LIBICU_DATA_PACKAGING_MODE=archive
 # 
 # valid data packaging values are
 # - library (the default)
 # - archive
-# - files
+
 DATA_PACKAGING = $(LIBICU_DATA_PACKAGING_MODE)
 ifeq ($(strip $(DATA_PACKAGING)),)
 # default data packaging
@@ -55,10 +55,12 @@ DATA_PACKAGING = library
 endif
 CONFIGURE_ARGS += --with-data-packaging=$(DATA_PACKAGING)
 
-ifeq ($(strip $(DATA_PACKAGING)),"files")
-# needs a custom install target to successfully build.
-INSTALL_TARGET = libicu_install_with_data_files
+ifeq ($(strip $(DATA_PACKAGING)),archive)
+# add the ICU data file.
+PLIST_TRANSFORM = sed -e '$$a rsc:share/icu/*/icudt*.dat'
 endif
+
+PRE_COMPILE_TARGET = libicu_prepare_dir
 POST_INSTALL_TARGET = libicu_post_install
 
 CONFIGURE_ARGS += --with-cross-build=$(NATIVE_BUILD_DIR) 
@@ -71,9 +73,9 @@ ADDITIONAL_CFLAGS = -O3
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: libicu_install_with_data_files
-libicu_install_with_data_files:
-	$(RUN) $(MAKE) DESTDIR=$(INSTALL_DIR) ICUPKGDATA_DIR=$(INSTALL_PREFIX)/share install PREFIX=$(INSTALL_PREFIX)
+.PHONY: libicu_prepare_dir
+libicu_prepare_dir:
+	@mkdir -p $(WORK_DIR)/$(PKG_DIR)/data/out/tmp
 
 .PHONY: libicu_post_install
 libicu_post_install:

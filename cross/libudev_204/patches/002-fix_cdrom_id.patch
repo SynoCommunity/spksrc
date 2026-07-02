@@ -1,0 +1,20 @@
+# Most of the toolchains have SG_FLAG_UNUSED_LUN_INHIBIT instead of SG_FLAG_LUN_INHIBIT
+# As defined in scsi/sg.h of sysroot includes
+# 
+# Some toolchains have the expected SG_FLAG_LUN_INHIBIT defined, 
+# so we can't globally replace SG_FLAG_LUN_INHIBIT by SG_FLAG_UNUSED_LUN_INHIBIT
+# 
+--- src/udev/cdrom_id/cdrom_id.c.orig	2013-05-09 13:45:50.000000000 +0000
++++ src/udev/cdrom_id/cdrom_id.c	2025-09-21 19:46:15.895246924 +0000
+@@ -161,7 +161,11 @@
+         cmd->sg_io.mx_sb_len = sizeof(cmd->_sense);
+         cmd->sg_io.cmdp = cmd->cgc.cmd;
+         cmd->sg_io.sbp = cmd->_sense.u;
++#if defined(SG_FLAG_LUN_INHIBIT)        
+         cmd->sg_io.flags = SG_FLAG_LUN_INHIBIT | SG_FLAG_DIRECT_IO;
++#else
++        cmd->sg_io.flags = SG_FLAG_UNUSED_LUN_INHIBIT | SG_FLAG_DIRECT_IO;
++#endif        
+ }
+ 
+ static void scsi_cmd_set(struct udev *udev, struct scsi_cmd *cmd, size_t i, unsigned char arg)

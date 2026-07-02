@@ -1,5 +1,14 @@
-DB_MIGRATION_TITLE:                 Migration de la base de donnée de tt-rss
-ROOT_PASSWORD_INPUT_DESCRIPTIONS:   "Saisissez les mot de passes root de vos installations Maria DB:"
-ENTER_TT-RSS_PASSWORD:              Un nouvel utilisateur 'ttrss' va être créé. Saisissez un mot de passe pour l'utilisateur 'ttrss'.
-TT-RSS_PASSWORD_DESCRIPTION:        Mot de passe Ttrss
-NO_DB_MIGRATION_DESCRIPTION:        Votre version actuelle ne requiert pas de migration. Procéder sans étapes de migration.
+POSTGRESQL_SETTINGS_TITLE: "Configuration de la base de donnees PostgreSQL"
+POSTGRESQL_USERNAME_DESC: "Nom d'utilisateur pour le serveur PostgreSQL (defaut: pgadmin)"
+POSTGRESQL_USERNAME_LABEL: "Nom d'utilisateur"
+POSTGRESQL_PASSWORD_DESC: "Mot de passe pour l'utilisateur admin PostgreSQL"
+POSTGRESQL_PASSWORD_LABEL: "Mot de passe"
+POSTGRESQL_PORT_DESC: "Numero de port (defaut: 5433)"
+POSTGRESQL_PORT_LABEL: "Port"
+ENTER_TTRSS_PASSWORD: "Mot de passe utilisateur de base de donnee"
+TTRSS_PASSWORD_DESC: "Mot de passe pour l'utilisateur ttrss"
+INVALID_TTRSS_PASSWORD: "Mot de passe invalide. Assurez-vous qu'il comprend au moins une lettre majuscule, une lettre minuscule, un chiffre, un caractere special et qu'il a une longueur minimale de 10 caracteres."
+MIGRATION_SETTINGS_TITLE: "Migration MariaDB"
+MIGRATION_NOTICE_DESC: "Les flux seront exportes de MariaDB et importes dans PostgreSQL. Le mot de passe admin sera reinitialise au mot de passe par defaut. Les autres utilisateurs devront reinitialiser leurs mots de passe - apres la migration, connectez-vous en tant qu'admin et allez dans Preferences (menu Utilisateurs) pour reinitialiser."
+ENTER_MARIADB_ROOT_PASSWORD: "Mot de passe root MariaDB"
+MARIADB_ROOT_PASSWORD_DESC: "Mot de passe pour l'utilisateur root MariaDB"

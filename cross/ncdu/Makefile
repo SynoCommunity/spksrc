@@ -1,8 +1,10 @@
 PKG_NAME = ncdu
 PKG_VERS = 1.22
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://dev.yorhel.nl/download
+PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).orig.$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+#PKG_DIST_SITE = https://dev.yorhel.nl/download
+PKG_DIST_SITE = http://deb.debian.org/debian/pool/main/n/ncdu
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # ncdu 2.x is written in Zig and needs a Zig compiler to build with.

@@ -6,7 +6,7 @@ SC_PKG_NAME="${SC_PKG_PREFIX}${SYNOPKG_PKGNAME}"
 
 WEB_DIR="/var/services/web_packages"
 # for backwards compatability
-if [ $SYNOPKG_DSM_VERSION_MAJOR -lt 7 ];then
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
     WEB_DIR="/var/services/web"
 fi
 if [ -z "${SYNOPKG_PKGTMP}" ]; then
@@ -21,7 +21,7 @@ MYSQL_USER="oc_${wizard_owncloud_admin_username}"
 WEB_ROOT="${WEB_DIR}/${SYNOPKG_PKGNAME}"
 SYNOSVC="/usr/syno/sbin/synoservice"
 
-if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
     WEB_USER="http"
     WEB_GROUP="http"
 fi
@@ -35,26 +35,26 @@ version_greater_equal() {
 
 set_owncloud_permissions ()
 {
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         DIRAPP=$1
         DIRDATA=$2
         echo "Setting the correct ownership and permissions of the files and folders in ${DIRAPP}"
         # Set the ownership for all files and folders to http:http
-        find -L ${DIRAPP} -type d -print0 | xargs -0 chown ${WEB_USER}:${WEB_GROUP} 2>/dev/null
-        find -L ${DIRAPP} -type f -print0 | xargs -0 chown ${WEB_USER}:${WEB_GROUP} 2>/dev/null
+        find -L "${DIRAPP}" -type d -print0 | xargs -0 chown "${WEB_USER}":"${WEB_GROUP}" 2>/dev/null
+        find -L "${DIRAPP}" -type f -print0 | xargs -0 chown "${WEB_USER}":"${WEB_GROUP}" 2>/dev/null
         # Use chmod on files and directories with different permissions
         # For all files use 0640
-        find -L ${DIRAPP} -type f -print0 | xargs -0 chmod 640 2>/dev/null
+        find -L "${DIRAPP}" -type f -print0 | xargs -0 chmod 640 2>/dev/null
         # For all directories use 0750
-        find -L ${DIRAPP} -type d -print0 | xargs -0 chmod 750 2>/dev/null
+        find -L "${DIRAPP}" -type d -print0 | xargs -0 chmod 750 2>/dev/null
         # For external data directory
         if [ -n "${DIRDATA}" ] && [ -d "${DIRDATA}" ]; then
-            chown -R ${WEB_USER}:${WEB_GROUP} ${DIRDATA} 2>/dev/null
-            find -L ${DIRDATA} -type f -print0 | xargs -0 chmod 640 2>/dev/null
-            find -L ${DIRDATA} -type d -print0 | xargs -0 chmod 750 2>/dev/null
+            chown -R "${WEB_USER}":"${WEB_GROUP}" "${DIRDATA}" 2>/dev/null
+            find -L "${DIRDATA}" -type f -print0 | xargs -0 chmod 640 2>/dev/null
+            find -L "${DIRDATA}" -type d -print0 | xargs -0 chmod 750 2>/dev/null
         fi
         # Set the occ command to executable
-        chmod +x ${DIRAPP}/occ 2>/dev/null
+        chmod +x "${DIRAPP}/occ" 2>/dev/null
     else
         echo "Notice: set_owncloud_permissions() is no longer required on DSM 7."
     fi
@@ -64,7 +64,7 @@ exec_occ() {
     PHP="/usr/local/bin/php74"
     OCC="${WEB_ROOT}/occ"
     COMMAND="${PHP} ${OCC} $*"
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         # Escape backslashes for DSM 6
         ESCAPED_COMMAND=$(echo "$COMMAND" | sed 's/\\/\\\\/g')
         /bin/su "$WEB_USER" -s /bin/sh -c "$ESCAPED_COMMAND"
@@ -100,7 +100,7 @@ setup_owncloud_instance()
             if echo "$line" | grep -qE ':5000|:5001'; then
                 # Remove ":5000" or ":5001" from the line and update the trusted_domains array
                 new_line=$(echo "$line" | sed -E 's/(:5000|:5001)//')
-                exec_occ config:system:set trusted_domains $line_number --value="$new_line"
+                exec_occ config:system:set trusted_domains "$line_number" --value="$new_line"
             fi
             line_number=$((line_number + 1))
         done
@@ -115,7 +115,7 @@ setup_owncloud_instance()
             if [ -n "$val" ]; then
                 # Check if the domain is already in the trusted domains
                 if ! echo "$DOMAINS" | grep -qx "$val"; then
-                    exec_occ config:system:set trusted_domains $line_number --value="$val"
+                    exec_occ config:system:set trusted_domains "$line_number" --value="$val"
                     line_number=$((line_number + 1))
                 fi
             fi
@@ -157,7 +157,7 @@ setup_owncloud_instance()
 validate_preinst ()
 {
     # Check for modification to PHP template defaults on DSM 6
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         WS_TMPL_DIR="/var/packages/WebStation/target/misc"
         WS_TMPL_FILE="php74_fpm.mustache"
         WS_TMPL_PATH="${WS_TMPL_DIR}/${WS_TMPL_FILE}"
@@ -174,11 +174,11 @@ validate_preinst ()
             echo "Incorrect MariaDB 'root' password"
             exit 1
         fi
-        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^${MYSQL_USER}$ > /dev/null 2>&1; then
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" mysql -e "SELECT User FROM user" | grep ^"${MYSQL_USER}"$ > /dev/null 2>&1; then
             echo "MariaDB user '${MYSQL_USER}' already exists"
             exit 1
         fi
-        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^${MYSQL_DATABASE}$ > /dev/null 2>&1; then
+        if ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "SHOW DATABASES" | grep ^"${MYSQL_DATABASE}"$ > /dev/null 2>&1; then
             echo "MariaDB database '${MYSQL_DATABASE}' already exists"
             exit 1
         fi
@@ -211,15 +211,15 @@ validate_preinst ()
 service_postinst ()
 {
     # Web interface setup for DSM 6 -- used by INSTALL and UPGRADE
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         # Install the web interface
         echo "Installing web interface"
-        ${MKDIR} ${WEB_ROOT}
-        rsync -aX ${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}/ ${WEB_ROOT} 2>&1
+        ${MKDIR} "${WEB_ROOT}"
+        rsync -aX "${SYNOPKG_PKGDEST}/share/${SYNOPKG_PKGNAME}/" "${WEB_ROOT}" 2>&1
 
         # Install web configurations
         TEMPDIR="${SYNOPKG_PKGTMP}/web"
-        ${MKDIR} ${TEMPDIR}
+        ${MKDIR} "${TEMPDIR}"
         WS_CFG_DIR="/usr/syno/etc/packages/WebStation"
         WS_CFG_FILE="WebStation.json"
         WS_CFG_PATH="${WS_CFG_DIR}/${WS_CFG_FILE}"
@@ -228,15 +228,16 @@ service_postinst ()
         PHP_CFG_PATH="${WS_CFG_DIR}/${PHP_CFG_FILE}"
         TMP_PHP_CFG_PATH="${TEMPDIR}/${PHP_CFG_FILE}"
         PHP_PROF_NAME="Default PHP 7.4 Profile"
-        WS_BACKEND="$(jq -r '.default.backend' ${WS_CFG_PATH})"
-        WS_PHP="$(jq -r '.default.php' ${WS_CFG_PATH})"
+        WS_BACKEND="$(jq -r '.default.backend' "${WS_CFG_PATH}")"
+        WS_PHP="$(jq -r '.default.php' "${WS_CFG_PATH}")"
         RESTART_APACHE="no"
         RSYNC_ARCH_ARGS="--backup --suffix=.bak --remove-source-files"
         # Check if Apache is the selected back-end
         if [ ! "$WS_BACKEND" = "2" ]; then
             echo "Set Apache as the back-end server"
-            jq '.default.backend = 2' ${WS_CFG_PATH} > ${TMP_WS_CFG_PATH}
-            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
+            jq '.default.backend = 2' "${WS_CFG_PATH}" > "${TMP_WS_CFG_PATH}"
+            # shellcheck disable=SC2086  # RSYNC_ARCH_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_WS_CFG_PATH}" "${WS_CFG_DIR}/" 2>&1
             RESTART_APACHE="yes"
         fi
         # Check if default PHP profile is selected
@@ -244,21 +245,23 @@ service_postinst ()
             echo "Enable default PHP profile"
             # Locate default PHP profile
             PHP_PROF_ID="$(jq -r '. | to_entries[] | select(.value | type == "object" and .profile_desc == "'"$PHP_PROF_NAME"'") | .key' "${PHP_CFG_PATH}")"
-            jq ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}" > ${TMP_WS_CFG_PATH}
-            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_WS_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
+            jq ".default.php = \"$PHP_PROF_ID\"" "${WS_CFG_PATH}" > "${TMP_WS_CFG_PATH}"
+            # shellcheck disable=SC2086  # RSYNC_ARCH_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_WS_CFG_PATH}" "${WS_CFG_DIR}/" 2>&1
             RESTART_APACHE="yes"
         fi
         # Check for PHP profile
         if ! jq -e ".[\"${SC_PKG_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Add PHP profile for ${SC_DNAME}"
-            jq --slurpfile newProfile ${SYNOPKG_PKGDEST}/web/${SYNOPKG_PKGNAME}.json '.["'"${SC_PKG_NAME}"'"] = $newProfile[0]' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
-            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
+            jq --slurpfile newProfile "${SYNOPKG_PKGDEST}/web/${SYNOPKG_PKGNAME}.json" '.["'"${SC_PKG_NAME}"'"] = $newProfile[0]' "${PHP_CFG_PATH}" > "${TMP_PHP_CFG_PATH}"
+            # shellcheck disable=SC2086  # RSYNC_ARCH_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_PHP_CFG_PATH}" "${WS_CFG_DIR}/" 2>&1
             RESTART_APACHE="yes"
         fi
         # Check for Apache config
         if [ ! -f "/usr/local/etc/apache24/sites-enabled/${SYNOPKG_PKGNAME}.conf" ]; then
             echo "Add Apache config for ${SC_DNAME}"
-            rsync -aX ${SYNOPKG_PKGDEST}/web/${SYNOPKG_PKGNAME}.conf /usr/local/etc/apache24/sites-enabled/ 2>&1
+            rsync -aX "${SYNOPKG_PKGDEST}/web/${SYNOPKG_PKGNAME}.conf" /usr/local/etc/apache24/sites-enabled/ 2>&1
             RESTART_APACHE="yes"
         fi
         # Restart Apache if configs have changed
@@ -271,12 +274,12 @@ service_postinst ()
             fi
         fi
         # Clean-up temporary files
-        ${RM} ${TEMPDIR}
+        ${RM} "${TEMPDIR}"
     fi
 
     # Fix permissions
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        set_owncloud_permissions ${WEB_ROOT}
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+        set_owncloud_permissions "${WEB_ROOT}"
     fi
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
@@ -285,8 +288,8 @@ service_postinst ()
         # Create data directory
         ${MKDIR} "${DATA_DIR}"
         # Fix permissions
-        if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            chown -R ${WEB_USER}:${WEB_GROUP} ${DATA_DIR} 2>/dev/null
+        if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+            chown -R "${WEB_USER}":"${WEB_GROUP}" "${DATA_DIR}" 2>/dev/null
         fi
 
         # Check restore action
@@ -297,8 +300,8 @@ service_postinst ()
             ${MKDIR} "${TEMPDIR}"
             tar -xzf "${wizard_backup_file}" -C "${TEMPDIR}" 2>&1
             # Fix file ownership
-            if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-                chown -R ${WEB_USER}:${WEB_GROUP} ${TEMPDIR} 2>/dev/null
+            if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+                chown -R "${WEB_USER}":"${WEB_GROUP}" "${TEMPDIR}" 2>/dev/null
             fi
 
             # Restore configuration files and directories
@@ -317,7 +320,7 @@ service_postinst ()
             ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e "CREATE DATABASE ${MYSQL_DATABASE}; GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${db_user}'@'localhost' IDENTIFIED BY '${db_password}';" 2>&1
 
             echo "Restoring database ${MYSQL_DATABASE} from backup"
-            ${MYSQL} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} < ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+            ${MYSQL} -u root -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" < "${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql" 2>&1
 
             # Update the systems data-fingerprint after a backup is restored
             exec_occ maintenance:data-fingerprint -n
@@ -350,32 +353,36 @@ service_postinst ()
         fi
 
         # Fix permissions
-        if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-            set_owncloud_permissions ${WEB_ROOT} ${DATA_DIR}
+        if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+            set_owncloud_permissions "${WEB_ROOT}" "${DATA_DIR}"
         fi
     fi
 }
 
 validate_preuninst ()
 {
-    # Check database
-    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit > /dev/null 2>&1; then
-        echo "Incorrect MariaDB 'root' password"
-        exit 1
-    fi
-    # Check export directory
-    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ] && [ -n "${wizard_export_path}" ]; then
-        if [ ! -d "${wizard_export_path}" ]; then
-            # If the export path directory does not exist, create it
-            ${MKDIR} "${wizard_export_path}" || {
-                # If mkdir fails, print an error message and exit
-                echo "Error: Unable to create directory ${wizard_export_path}. Check permissions."
-                exit 1
-            }
-        elif [ ! -w "${wizard_export_path}" ]; then
-            # If the export path directory is not writable, print an error message and exit
-            echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
+    if [ "${SYNOPKG_PKG_STATUS}" = "UNINSTALL" ]; then
+        # Check database
+        if ! ${MYSQL} -u root -p"${wizard_mysql_password_root}" -e quit >/dev/null 2>&1; then
+            echo "Incorrect MariaDB 'root' password"
             exit 1
+        fi
+        # Check export directory
+        if [ -n "${wizard_export_path}" ]; then
+            if [ ! -d "${wizard_export_path}" ]; then
+                echo "Error: Export directory ${wizard_export_path} does not exist"
+                exit 1
+            fi
+            if [ ! -w "${wizard_export_path}" ]; then
+                echo "Error: Unable to write to directory ${wizard_export_path}. Check permissions."
+                exit 1
+            fi
+            # Ensure the configured data directory exists before attempting a backup
+            DATADIR="$(exec_occ config:system:get datadirectory 2>/dev/null)"
+            if [ -z "${DATADIR}" ] || [ ! -d "${DATADIR}" ]; then
+                echo "Expected data directory missing; aborting uninstall backup"
+                exit 1
+            fi
         fi
     fi
 }
@@ -402,7 +409,7 @@ service_preuninst ()
         # Backup the Database
         echo "Copying previous database from ${MYSQL_DATABASE}"
         ${MKDIR} "${TEMPDIR}/database"
-        ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" ${MYSQL_DATABASE} > ${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql 2>&1
+        ${MYSQLDUMP} -u root -p"${wizard_mysql_password_root}" "${MYSQL_DATABASE}" > "${TEMPDIR}/database/${MYSQL_DATABASE}-dbbackup.sql" 2>&1
 
         # Backup Directories
         echo "Copying previous configuration from ${WEB_ROOT}"
@@ -424,6 +431,7 @@ service_preuninst ()
 
         # Move archive to export directory
         RSYNC_BAK_ARGS="--backup --suffix=.bak"
+        # shellcheck disable=SC2086  # RSYNC_BAK_ARGS is intentionally a multi-word arg list
         rsync -aX ${RSYNC_BAK_ARGS} "${SYNOPKG_PKGTMP}/$archive_name" "${wizard_export_path}/" 2>&1
         echo "Backup file copied successfully to ${wizard_export_path}."
 
@@ -452,14 +460,14 @@ service_preuninst ()
 service_postuninst ()
 {
     # Web interface removal for DSM 6 -- used by UNINSTALL and UPGRADE
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         # Remove the web interface
         echo "Removing web interface"
-        ${RM} ${WEB_ROOT}
+        ${RM} "${WEB_ROOT}"
 
         # Remove web configurations
         TEMPDIR="${SYNOPKG_PKGTMP}/web"
-        ${MKDIR} ${TEMPDIR}
+        ${MKDIR} "${TEMPDIR}"
         WS_CFG_DIR="/usr/syno/etc/packages/WebStation"
         PHP_CFG_FILE="PHPSettings.json"
         PHP_CFG_PATH="${WS_CFG_DIR}/${PHP_CFG_FILE}"
@@ -469,15 +477,16 @@ service_postuninst ()
         # Check for PHP profile
         if jq -e ".[\"${SC_PKG_NAME}\"]" "${PHP_CFG_PATH}" >/dev/null; then
             echo "Removing PHP profile for ${SC_DNAME}"
-            jq 'del(.["'"${SC_PKG_NAME}"'"])' ${PHP_CFG_PATH} > ${TMP_PHP_CFG_PATH}
-            rsync -aX ${RSYNC_ARCH_ARGS} ${TMP_PHP_CFG_PATH} ${WS_CFG_DIR}/ 2>&1
+            jq 'del(.["'"${SC_PKG_NAME}"'"])' "${PHP_CFG_PATH}" > "${TMP_PHP_CFG_PATH}"
+            # shellcheck disable=SC2086  # RSYNC_ARCH_ARGS is intentionally a multi-word arg list
+            rsync -aX ${RSYNC_ARCH_ARGS} "${TMP_PHP_CFG_PATH}" "${WS_CFG_DIR}/" 2>&1
             ${RM} "${WS_CFG_DIR}/php_profile/${SC_PKG_NAME}"
             RESTART_APACHE="yes"
         fi
         # Check for Apache config
         if [ -f "/usr/local/etc/apache24/sites-enabled/${SYNOPKG_PKGNAME}.conf" ]; then
             echo "Removing Apache config for ${SC_DNAME}"
-            ${RM} /usr/local/etc/apache24/sites-enabled/${SYNOPKG_PKGNAME}.conf
+            ${RM} "/usr/local/etc/apache24/sites-enabled/${SYNOPKG_PKGNAME}.conf"
             RESTART_APACHE="yes"
         fi
         # Restart Apache if configs have changed
@@ -490,7 +499,7 @@ service_postuninst ()
             fi
         fi
         # Clean-up temporary files
-        ${RM} ${TEMPDIR}
+        ${RM} "${TEMPDIR}"
     fi
 }
 
@@ -520,6 +529,13 @@ validate_preupgrade ()
         echo "Please migrate your previous database from ${DATABASE_TYPE} to mariadb (mysql) before performing upgrade."
         exit 1
     fi
+
+    # Ensure data directory is present before proceeding
+    DATADIR="$(exec_occ config:system:get datadirectory 2>/dev/null)"
+    if [ -z "${DATADIR}" ] || [ ! -d "${DATADIR}" ]; then
+        echo "Expected data directory missing; aborting upgrade"
+        exit 1
+    fi
 }
 
 service_save ()
@@ -542,21 +558,21 @@ service_save ()
     fi
 
     # Backup configuration and data
-    [ -d ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} ] && ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
+    [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" ] && ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
     echo "Backup existing distribution to ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
-    ${MKDIR} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
-    rsync -aX ${WEB_ROOT}/ ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME} 2>&1
+    ${MKDIR} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
+    rsync -aX "${WEB_ROOT}/" "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}" 2>&1
 }
 
 service_restore ()
 {
     # Validate data directory for restore
-    if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory ]; then
-        DATAPATH=$(cat ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory)
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory" ]; then
+        DATAPATH=$(cat "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory")
         # Data directory inside owncloud directory and needs to be restored
         echo "Restore previous data directory from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}"
-        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH} ${WEB_ROOT}/ 2>&1
-        ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory
+        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/${DATAPATH}" "${WEB_ROOT}/" 2>&1
+        ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/.datadirectory"
     fi
 
     # Restore the configuration files
@@ -575,11 +591,11 @@ service_restore ()
         fi
     done
     
-    if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ]; then
-        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini ${WEB_ROOT}/ 2>&1
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini" ]; then
+        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.user.ini" "${WEB_ROOT}/" 2>&1
     fi
-    if [ -f ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ]; then
-        rsync -aX -I ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess ${WEB_ROOT}/ 2>&1
+    if [ -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess" ]; then
+        rsync -aX -I "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}/.htaccess" "${WEB_ROOT}/" 2>&1
     fi
 
     echo "Restore manually installed apps from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
@@ -606,8 +622,8 @@ service_restore ()
     done
 
     # Fix permissions
-    if [ ${SYNOPKG_DSM_VERSION_MAJOR} -lt 7 ]; then
-        set_owncloud_permissions ${WEB_ROOT}
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
+        set_owncloud_permissions "${WEB_ROOT}"
     fi
 
     # Disable maintenance mode
@@ -624,5 +640,5 @@ service_restore ()
     fi
     
     # Remove upgrade backup files
-    ${RM} ${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}
+    ${RM} "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${SYNOPKG_PKGNAME}"
 }

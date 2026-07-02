@@ -1,5 +1,5 @@
 PKG_NAME = pydantic-core
-PKG_VERS = 2.27.2
+PKG_VERS = 2.41.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)

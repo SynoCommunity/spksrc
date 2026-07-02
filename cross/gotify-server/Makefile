@@ -1,10 +1,12 @@
 PKG_NAME = gotify-server
-PKG_VERS = 2.1.4
+PKG_VERS = 2.8.0
 PKG_EXT = zip
 PKG_DIST_NAME = gotify-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/gotify/server/releases/download/v$(PKG_VERS)
+PKG_DIST_FILE = gotify-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# Requires GLIBC 2.34+ (DSM 7.2+)
+REQUIRED_MIN_DSM = 7.2
 
 HOMEPAGE = https://gotify.net/
 COMMENT  = A simple server for sending and receiving messages
@@ -15,7 +17,7 @@ INSTALL_TARGET = gotify-server_install
 # use digests with multiple files
 PKG_DIST_ARCH_LIST = amd64 386 arm-7 arm64
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = amd64
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
@@ -26,7 +28,7 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
 endif
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: gotify-server_install
 gotify-server_install:

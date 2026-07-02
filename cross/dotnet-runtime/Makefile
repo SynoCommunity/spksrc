@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/$(
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 
 # use digests with multiple files and individual dist names
 # both lists must have the same order
@@ -30,7 +30,7 @@ LICENSE  = MIT
 
 INSTALL_TARGET = dotnet_runtime_custom_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: dotnet_runtime_custom_install
 dotnet_runtime_custom_install:

@@ -1,5 +1,5 @@
 PKG_NAME = syncstorage-rs
-PKG_VERS = 0.18.3
+PKG_VERS = 0.23.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VERS}
@@ -8,15 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # for openssl-sys
 DEPENDS = cross/openssl3
 # for mysqlclient-sys
-DEPENDS += cross/mysql-connector-c
+DEPENDS += cross/mariadb-connector-c
 
-# OLD_PPC_ARCHS are not supported for Rust builds
-# Rust has support for qoriq, but the "ring" dependency has issue(s) with big-endian targets
-# see: https://github.com/briansmith/ring/issues/1555 (and referenced issues)
-# There is an update in https://github.com/briansmith/ring/pull/1677 for (64-bit) PPC
-# this might fix ring for 32-bit PPC (qoriq) too.
-# An update of ring (>= 0.17.0) is required, syncstorage-rs 0.14.3 has locked ring to 0.16.20.
-# 
 # powerpc archs are not supported
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
@@ -44,12 +37,20 @@ POST_INSTALL_TARGET = syncstorage-rs_post_install
 
 include ../../mk/spksrc.cross-rust.mk
 
+# pass mysql client version (needed by mysqlclient-sys crate)
+# Use same conditional as mariadb-connector-c to select correct version
+ifeq ($(call version_ge, $(TC_GCC), 5),1)
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)/cross/mariadb-connector-c-latest/Makefile)
+else
+ENV += MYSQLCLIENT_VERSION=$(shell sed -n 's/^PKG_VERS = //p' $(BASEDIR)/cross/mariadb-connector-c-3.3.11/Makefile)
+endif
+
 .PHONY: syncstorage-rs_post_install
 syncstorage-rs_post_install:
 	@$(MSG) Install Tools
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/tools
 	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tools . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tools
 	@$(MSG) Install DB Migration scripts
-	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations -d $(STAGING_INSTALL_PREFIX)/tokenserver-db/migrations
+	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations -d $(STAGING_INSTALL_PREFIX)/tokenserver-mysql/migrations
 	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/syncstorage-mysql/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/syncstorage-mysql/migrations
-	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tokenserver-db/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tokenserver-db/migrations
+	@tar -cf - -C $(WORK_DIR)/$(PKG_DIR)/tokenserver-mysql/migrations . | tar -xf - -C $(STAGING_INSTALL_PREFIX)/tokenserver-mysql/migrations

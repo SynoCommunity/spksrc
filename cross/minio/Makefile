@@ -10,7 +10,15 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(PKG_NAME)
 PKG_DIR = $(PKG_NAME)-$(PKG_DIST_PREFIX)
 
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+include ../../mk/spksrc.common.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/go_1.23
+NATIVE_GO = native/go_1.23
+else
 BUILD_DEPENDS = native/go
+NATIVE_GO = native/go
+endif
 
 HOMEPAGE = https://min.io/
 COMMENT  = MinIO is a high performance object storage server compatible with Amazon S3 APIs.

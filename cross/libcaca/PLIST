@@ -10,6 +10,6 @@ lnk:lib/libcaca.so
 lnk:lib/libcaca++.so
 lnk:lib/libcaca.so.0
 lnk:lib/libcaca++.so.0
-lib:lib/libcaca.so.0.99.18
-lib:lib/libcaca++.so.0.99.18
+lib:lib/libcaca.so.0.99.20
+lib:lib/libcaca++.so.0.99.20
 rsc:share/libcaca/caca.txt

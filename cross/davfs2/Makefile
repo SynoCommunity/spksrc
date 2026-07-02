@@ -1,5 +1,5 @@
 PKG_NAME = davfs2
-PKG_VERS = 1.7.1
+PKG_VERS = 1.7.2
 PKG_EXT = tar.gz
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -11,7 +11,7 @@ DESCRIPTION = Mount a WebDAV resource as a regular file system
 HOMEPAGE = https://savannah.nongnu.org/projects/davfs2
 LICENSE  = GPLv3
 
-export ssbindir=$(STAGING_INSTALL_PREFIX)/sbin/
+export sbindir=$(STAGING_INSTALL_PREFIX)/sbin/
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-neon=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
@@ -33,4 +33,4 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: davfs2_post_configure
 davfs2_post_configure:
 	@$(MSG) Patch Makefile.in for older gcc
-	@$(RUN) sed -e "s#-fstack-protector-strong#-fstack-protector-all#g" -i src/Makefile.in
+	@$(RUN) sed -e "s#-fstack-protector-strong#-fstack-protector-all#g" -i.bak src/Makefile.in

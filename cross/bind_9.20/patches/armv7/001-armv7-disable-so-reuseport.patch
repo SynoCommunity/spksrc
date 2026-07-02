@@ -1,0 +1,44 @@
+# Ignore whether SO_REUSEPORT is defined
+# 
+# SO_REUSEPORT is not supported in all ARMv7 cpu toolchains 
+# provided in toolchain .../usr/include/asm-generic/socket.h
+# 
+# see issue https://github.com/SynoCommunity/spksrc/issues/6441
+# 
+--- lib/isc/include/isc/netmgr.h.orig	2026-03-31 17:18:58.284866800 +0000
++++ lib/isc/include/isc/netmgr.h	2026-04-18 20:46:12.681875097 +0000
+@@ -27,10 +27,6 @@
+ 
+ /* Add -DISC_NETMGR_TRACE=1 to CFLAGS for detailed reference tracing */
+ 
+-#if defined(SO_REUSEPORT_LB) || (defined(SO_REUSEPORT) && defined(__linux__))
+-#define HAVE_SO_REUSEPORT_LB 1
+-#endif
+-
+ /*
+  * Convenience macros to specify on how many threads should socket listen
+  */
+--- lib/isc/netmgr/netmgr.c.orig	2026-03-31 17:18:58.292867100 +0000
++++ lib/isc/netmgr/netmgr.c	2026-04-18 20:46:46.335653000 +0000
+@@ -192,11 +192,7 @@
+ 	atomic_init(&netmgr->port_low6, 0);
+ 	atomic_init(&netmgr->port_high6, 65535);
+ 
+-#if HAVE_SO_REUSEPORT_LB
+-	netmgr->load_balance_sockets = true;
+-#else
+ 	netmgr->load_balance_sockets = false;
+-#endif
+ 
+ 	/*
+ 	 * Default TCP timeout values.
+@@ -385,9 +381,6 @@
+ isc_nm_setloadbalancesockets(isc_nm_t *mgr, ISC_ATTR_UNUSED bool enabled) {
+ 	REQUIRE(VALID_NM(mgr));
+ 
+-#if HAVE_SO_REUSEPORT_LB
+-	mgr->load_balance_sockets = enabled;
+-#endif
+ }
+ 
+ void

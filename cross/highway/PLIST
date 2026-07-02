@@ -1,0 +1,6 @@
+lnk:lib/libhwy.so
+lnk:lib/libhwy.so.1
+lib:lib/libhwy.so.1.3.0
+lnk:lib/libhwy_contrib.so
+lnk:lib/libhwy_contrib.so.1
+lib:lib/libhwy_contrib.so.1.3.0

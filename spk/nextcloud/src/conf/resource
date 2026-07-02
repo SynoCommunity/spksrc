@@ -1,0 +1,94 @@
+{
+  "webservice": {
+    "migrate": {
+      "root": [
+        {
+          "new": "nextcloud",
+          "old": "nextcloud"
+        }
+      ]
+    },
+    "pkg_dir_prepare": [
+      {
+        "group": "http",
+        "mode": "0750",
+        "source": "/var/packages/nextcloud/target/share/nextcloud",
+        "target": "nextcloud",
+        "user": "sc-nextcloud"
+      }
+    ],
+    "portals": [
+      {
+        "alias": "nextcloud",
+        "app": "com.synocommunity.packages.nextcloud",
+        "display_name": "Nextcloud",
+        "name": "Nextcloud",
+        "service": "Nextcloud",
+        "type": "alias"
+      }
+    ],
+    "services": [
+      {
+        "backend": 2,
+        "display_name": "Nextcloud",
+        "icon": "app/images/nextcloud-{0}.png",
+        "php": {
+          "backend": 12,
+          "connect_timeout": 120,
+          "extensions": [
+            "curl",
+            "exif",
+            "ftp",
+            "gd",
+            "gmp",
+            "iconv",
+            "imagick",
+            "imap",
+            "intl",
+            "ldap",
+            "memcached",
+            "openssl",
+            "pdo_mysql",
+            "phar",
+            "posix",
+            "redis",
+            "sodium",
+            "sysvsem",
+            "zip",
+            "zlib"
+          ],
+          "group": "http",
+          "php_settings": {
+            "error_log": "/var/packages/nextcloud/var/php_errors.log",
+            "memory_limit": "512M",
+            "post_max_size": "16G",
+            "opcache.interned_strings_buffer": "32",
+            "upload_max_filesize": "16G",
+            "pdo_mysql.default_socket": "/run/mysqld/mysqld10.sock"
+          },
+          "profile_desc": "PHP profile for Nextcloud",
+          "profile_name": "Nextcloud",
+          "user": "sc-nextcloud"
+        },
+        "read_timeout": 3600,
+        "root": "nextcloud",
+        "send_timeout": 120,
+        "service": "Nextcloud",
+        "type": "apache_php"
+      }
+    ]
+  },
+  "data-share": {
+    "shares": [
+      {
+        "name": "{{wizard_data_share}}",
+        "permission": {
+          "rw": [
+            "sc-nextcloud"
+          ]
+        },
+        "once": true
+      }
+    ]
+  }
+}

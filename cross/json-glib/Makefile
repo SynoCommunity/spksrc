@@ -1,5 +1,5 @@
 PKG_NAME = json-glib
-PKG_VERS = 1.6.6
+PKG_VERS = 1.8.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/GNOME/json-glib/archive
@@ -13,6 +13,7 @@ COMMENT  = JSON-GLib implements a full JSON parser and generator using GLib and 
 LICENSE  = LGPLv2.1
 
 CONFIGURE_ARGS  = -Dgtk_doc=disabled
+CONFIGURE_ARGS += -Dintrospection=disabled
 CONFIGURE_ARGS += -Dman=false
 CONFIGURE_ARGS += -Dtests=false
 

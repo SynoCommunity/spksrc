@@ -11,7 +11,15 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_DIST_NAME)
 EXTRACT_PATH = $(WORK_DIR)/src/github.com/$(REAL_PKG_NAME)
 PKG_DIR = $(REAL_PKG_NAME)-$(PKG_DIST_PREFIX)
 
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+include ../../mk/spksrc.common.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/go_1.23
+NATIVE_GO = native/go_1.23
+else
 BUILD_DEPENDS = native/go
+NATIVE_GO = native/go
+endif
 
 HOMEPAGE = https://min.io/
 COMMENT  = MinIO Client (mc) provides a modern alternative to UNIX commands like ls, cat, cp, mirror, diff, find etc. It supports filesystems and Amazon S3 compatible cloud storage service (AWS Signature v2 and v4).

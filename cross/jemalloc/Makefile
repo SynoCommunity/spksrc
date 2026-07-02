@@ -1,11 +1,13 @@
 PKG_NAME = jemalloc
-PKG_VERS = 5.2.1
+PKG_VERS = 5.3.0
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jemalloc/jemalloc/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
+
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 # jemalloc is a development tool, replacing standard allocator to diagnose memory leaks.
 # It is not included in any package, except to produce test packages for troubleshooting.

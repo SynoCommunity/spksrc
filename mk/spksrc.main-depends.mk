@@ -1,13 +1,15 @@
+###############################################################################
+# spksrc.main-depends.mk
+#
 # include this file for dummy modules that evaluate dependent packages only
 #
+###############################################################################
 
-# Common makefiles
-include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
+# Do not initialize any environment to avoid variable leakage.
+DEFAULT_ENV = none
 
 # nothing to download
 download:
-download-all:
 checksum:
 
 # Configure the included makefiles
@@ -15,11 +17,15 @@ NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
 
 ifneq ($(ARCH),)
-ifneq ($(ARCH),noarch)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+ifneq ($(ARCH),noarch)
 TC = syno$(ARCH_SUFFIX)
 endif
 endif
+
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 
@@ -30,25 +36,24 @@ endif
 #####
 
 # to check for supported archs and DSM versions
-include ../../mk/spksrc.pre-check.mk
+include ../../mk/spksrc.rules/pre-check.mk
 
 # for common env variables
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
 # for dependency evaluation
-include ../../mk/spksrc.depend.mk
-
+include ../../mk/spksrc.rules/depend.mk
 
 install: depend
-include ../../mk/spksrc.install.mk
+include ../../mk/spksrc.build/install.mk
 
 plist: install
-include ../../mk/spksrc.plist.mk
+include ../../mk/spksrc.build/plist.mk
 
 all: install plist
 
 
 ### For managing make all-<supported|latest>
-include ../../mk/spksrc.supported.mk
+include ../../mk/spksrc.rules/supported.mk
 
 ####

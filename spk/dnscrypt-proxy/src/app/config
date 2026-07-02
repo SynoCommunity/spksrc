@@ -1,0 +1,16 @@
+{
+    ".url": {
+        "com.synocommunity.packages.dnscrypt-proxy": {
+            "type": "url",
+            "icon": "images/dnscrypt-proxy-{0}.png",
+            "title": "DNSCrypt-Proxy",
+            "desc": "DNSCrypt-Proxy Monitoring Dashboard",
+            "protocol": "http",
+            "port": "8153",
+            "url": "/",
+            "allUsers": false,
+            "grantPrivilege": "all",
+            "advanceGrantPrivilege": true
+        }
+    }
+}

@@ -1,90 +1,98 @@
-# Common definitions, shared by all makefiles
+###############################################################################
+# spksrc.common.mk
+#
+# Defines common build settings and utilities shared by all spksrc makefiles.
+#
+# This file:
+#  - establishes the base directory for the build environment
+#  - loads shared architecture, logging, and macro definitions
+#  - loads optional local configuration overrides (local.mk)
+#  - defines common build helpers and default targets
+#  - configures parallel build behavior
+#
+# Variables:
+#  BASEDIR        : root directory of the spksrc tree
+#  RUN            : helper to execute commands in package build environment
+#  MSG            : standardized build message prefix
+#  LANGUAGES      : supported localization languages
+#
+#  PARALLEL_MAKE  : parallel build mode (nop / max / N)
+#  NCPUS          : number of CPUs used for parallel builds
+#
+# Targets:
+#  default        : alias for the 'all' target
+#
+# Notes:
+#  - Parallel build mode is auto-detected unless explicitly set
+#  - This file is intended to be the single entry point for common build definitions
+#
+# Common include structure:
+#
+#   mk/spksrc.common.mk
+#   └── mk/spksrc.common/
+#       ├── stage0.mk  : bootstrap toolchain & load its tc_vars (TC_GCC, ...)
+#       ├── archs.mk   : architecture and toolchain classification
+#       ├── logs.mk    : build log paths and logging helpers
+#       └── macros.mk  : generic GNU Make helper macros
+#
+###############################################################################
+
+# Determine MKDIR from this file's own location in MAKEFILE_LIST, regardless
+# of CURDIR or the caller's directory structure (works under github-action
+# where the workspace root may differ from the spksrc directory name).
+# MKDIR must use := for immediate evaluation before any further includes
+# alter MAKEFILE_LIST. BASEDIR uses ?= to allow override from the command line.
+MKDIR  := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+BASEDIR ?= $(abspath $(MKDIR)/..)
+
+ifneq ($(ARCH),)
+ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+endif
+
+# Load macros early
+include $(BASEDIR)/mk/spksrc.common/macros.mk
+
+# Common directories (must be set after ARCH_SUFFIX)
+include $(BASEDIR)/mk/spksrc.common/directories.mk
+
+# Setup minimal toolchain environment variables
+include $(BASEDIR)/mk/spksrc.common/stage0.mk
+
+# Load common definitions
+include $(BASEDIR)/mk/spksrc.common/archs.mk
+include $(BASEDIR)/mk/spksrc.common/logs.mk
+
+# Load local configuration
+LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
+-include $(LOCAL_CONFIG_MK)
 
 ###
 
-# Set basedir in case called from spkrc/ or from normal sub-dir
-# Note that github-action uses workspace/ in place of spksrc/
-ifeq ($(BASEDIR),)
-ifeq ($(filter spksrc workspace,$(shell basename $(CURDIR))),)
-BASEDIR = ../../
-endif
-endif
-
-# For legacy reasons keep $(PWD) call
-PWD := $(CURDIR)
-
-# all will be the default target, regardless of what is defined in the other
-# makefiles.
+# all will be the default target, regardless of what is defined
 default: all
 
 # Stop on first error
 SHELL := $(SHELL) -e
 
-# Display message in a consistent way
-MSG = echo "===> "
+# For legacy reasons keep $(PWD) call
+PWD := $(CURDIR)
 
 # Launch command in the working dir of the package source and the right environment
 RUN = cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV)
 
-# fallback by default to native/python*
-PIP ?= pip
+# Display message in a consistent way
+MSG = echo "===> "
 
-# System default pip outside from build environment
-PIP_SYSTEM = $(shell which pip)
-
-# System default pip outside from build environment
-PIP_NATIVE = $(WORK_DIR)/../../../native/$(or $(PYTHON_PACKAGE),$(SPK_NAME))/work-native/install/usr/local/bin/pip
-
-# Why ask for the same thing twice? Always cache downloads
-PIP_CACHE_OPT ?= --find-links $(PIP_DISTRIB_DIR) --cache-dir $(PIP_CACHE_DIR)
-PIP_WHEEL_ARGS = wheel --disable-pip-version-check --no-binary :all: $(PIP_CACHE_OPT) --no-deps --wheel-dir $(WHEELHOUSE)
-# Adding --no-index only for crossenv
-# to force using localy downloaded version
-PIP_WHEEL_ARGS_CROSSENV = $(PIP_WHEEL_ARGS) --no-index
-
-# BROKEN: https://github.com/pypa/pip/issues/1884
-# Current implementation is a work-around for the
-# lack of proper source download support from pip
-PIP_DOWNLOAD_ARGS = download --no-index --find-links $(PIP_DISTRIB_DIR) --disable-pip-version-check --no-binary :all: --no-deps --dest $(PIP_DISTRIB_DIR) --no-build-isolation --exists-action w
+# Utility variables
+empty :=
+space := $(empty) $(empty)
+# For literal ',' in $(eval ...) contexts interpreted as individual arguments -> $(eval -Wl$(,)--rpath-link$(,)/some/path)
+, := ,
 
 # Available languages
 LANGUAGES = chs cht csy dan enu fre ger hun ita jpn krn nld nor plk ptb ptg rus spn sve trk
 
-# Available toolchains formatted as '{ARCH}-{TC}'
-AVAILABLE_TOOLCHAINS = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)toolchain/syno-*))))
-AVAILABLE_TCVERSIONS = $(sort $(foreach arch,$(AVAILABLE_TOOLCHAINS),$(shell echo ${arch} | cut -f2 -d'-')))
-
-# Available toolchains formatted as '{ARCH}-{TC}'
-AVAILABLE_KERNEL = $(subst syno-,,$(sort $(notdir $(wildcard $(BASEDIR)kernel/syno-*))))
-AVAILABLE_KERNEL_VERSIONS = $(sort $(foreach arch,$(AVAILABLE_KERNEL),$(shell echo ${arch} | cut -f2 -d'-')))
-
-# Global arch definitions
-include $(BASEDIR)mk/spksrc.archs.mk
-
-# Load local configuration
-LOCAL_CONFIG_MK = $(BASEDIR)local.mk
-ifneq ($(wildcard $(LOCAL_CONFIG_MK)),)
-include $(LOCAL_CONFIG_MK)
-endif
-
-# Filter to exclude TC versions greater than DEFAULT_TC (from local configuration)
-TCVERSION_DUPES = $(addprefix %,$(filter-out $(DEFAULT_TC),$(AVAILABLE_TCVERSIONS)))
-
-# remove unsupported (outdated) archs
-ARCHS_DUPES_DEPRECATED += $(addsuffix %,$(DEPRECATED_ARCHS))
-
-# Filter for all-supported
-ARCHS_DUPES = $(ARCHS_WITH_GENERIC_SUPPORT) $(ARCHS_DUPES_DEPRECATED) $(TCVERSION_DUPES)
-
-# supported: used for all-supported target
-SUPPORTED_ARCHS = $(sort $(filter-out $(ARCHS_DUPES), $(AVAILABLE_TOOLCHAINS)))
-
-# default: used for all-latest target
-LATEST_ARCHS = $(foreach arch,$(sort $(basename $(subst -,.,$(basename $(subst .,,$(SUPPORTED_ARCHS)))))),$(arch)-$(notdir $(subst -,/,$(sort $(filter %$(lastword $(notdir $(subst -,/,$(sort $(filter $(arch)%, $(AVAILABLE_TOOLCHAINS)))))),$(sort $(filter $(arch)%, $(AVAILABLE_TOOLCHAINS))))))))
-
-# legacy: used for all-legacy and when kernel support is used
-#         all archs except generic archs
-LEGACY_ARCHS = $(sort $(filter-out $(addsuffix %,$(GENERIC_ARCHS)), $(AVAILABLE_TOOLCHAINS)))
+###
 
 # Set parallel build mode
 ifeq ($(PARALLEL_MAKE),)
@@ -114,63 +122,3 @@ NCPUS = $(shell grep -c ^processor /proc/cpuinfo)
 else
 NCPUS = $(PARALLEL_MAKE)
 endif
-
-# Enable stats over parallel build mode
-ifneq ($(filter 1 on ON,$(PSTAT)),)
-PSTAT_TIME = time -o $(PSTAT_LOG) --append
-endif
-
-# Always send PSTAT output to proper log file
-# independantly from active Makefile location
-ifeq ($(filter cross diyspk spk,$(shell basename $(dir $(abspath $(dir $$PWD))))),)
-CROSSENV_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build-$(ARCH)-$(TCVERSION)-crossenv.log
-PSTAT_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/status-build.log
-WHEEL_LOG = $(shell pwdx $$(ps -o ppid= $$(echo $$PPID)) | cut -f2 -d:)/build-$(ARCH)-$(TCVERSION)-wheel.log
-else ifneq ($(wildcard $(WORK_DIR)),)
-CROSSENV_LOG = $(WORK_DIR)/../build-$(ARCH)-$(TCVERSION)-crossenv.log
-PSTAT_LOG = $(WORK_DIR)/../status-build.log
-WHEEL_LOG = $(WORK_DIR)/../build-$(ARCH)-$(TCVERSION)-wheel.log
-else
-CROSSENV_LOG = $(CURDIR)/build-$(ARCH)-$(TCVERSION)-crossenv.log
-PSTAT_LOG = $(CURDIR)/status-build.log
-WHEEL_LOG = $(CURDIR)/build-$(ARCH)-$(TCVERSION)-wheel.log
-endif
-
-# Terminal colors
-RED=$$(tput setaf 1)
-GREEN=$$(tput setaf 2)
-NC=$$(tput sgr0)
-
-# Macro: Version Comparison
-version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
-version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
-version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
-version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
-
-# Macro: dedup
-#        removes duplicate entries from a specified delimiter,
-#        preserving the order of unique elements.
-dedup = $(shell /bin/bash -c '\
-    input="$$(echo "$1" | xargs)"; \
-    delimiter="$$(echo "$2" | xargs)"; \
-    echo "$$input" | \
-    tr "$$delimiter" "\n" | \
-    awk '\''!seen[$$0]++ {print $$0}'\'' | \
-    tr "\n" "$$delimiter" | \
-    sed "s/$$delimiter$$//" \
-')
-
-# Macro: merge
-#        merges multiple environment variable values from a given input string,
-#        inverting their order and separating them with a specified delimiter
-merge = $(shell /bin/bash -c '\
-    input="$$(echo "$1" | xargs)"; \
-    var_name="$$(echo "$2" | xargs)"; \
-    delimiter="$$(echo "$3" | xargs)"; \
-    echo "$$input" | \
-    grep -o "$$var_name=[^ ]*" | \
-    tac | \
-    sed "s/^$$var_name=//" | \
-    tr "\n" "$$delimiter" | \
-    sed "s/$$delimiter$$//" \
-')

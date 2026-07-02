@@ -1,5 +1,5 @@
 PKG_NAME = lsof
-PKG_VERS = 4.99.3
+PKG_VERS = 4.99.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/lsof-org/lsof/releases/download/$(PKG_VERS)

@@ -8,6 +8,8 @@ SPK_DEPENDS = "mono>=5.8"
 
 # Mono is not supported on ppc platforms. See cross/mono/Makefile for details.
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+# cross/mediainfo:
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/

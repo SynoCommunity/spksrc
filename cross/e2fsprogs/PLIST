@@ -4,7 +4,6 @@ bin:bin/lsattr
 rsc:bin/mk_cmds
 rsc:etc/e2scrub.conf
 rsc:etc/mke2fs.conf
-rsc:libexec/e2fsprogs/e2scrub_all_cron
 lib:lib/e2initrd_helper
 lnk:lib/libblkid.so
 lnk:lib/libblkid.so.1
@@ -21,6 +20,7 @@ lib:lib/libext2fs.so.2.4
 lnk:lib/libss.so
 lnk:lib/libss.so.2
 lib:lib/libss.so.2.0
+rsc:libexec/e2fsprogs/e2scrub_all_cron
 bin:sbin/badblocks
 bin:sbin/blkid
 bin:sbin/debugfs

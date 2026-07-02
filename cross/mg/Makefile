@@ -15,8 +15,9 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS  = --sysconfdir=$(INSTALL_PREFIX)/var
 CONFIGURE_ARGS += --without-docs
 CONFIGURE_ARGS += --without-tutorial
+PRE_CONFIGURE_TARGET = mg_pre_configure
 
-include ../../mk/spksrc.archs.mk
+include ../../mk/spksrc.common.mk
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 # old gcc does not support option -flto
 CONFIGURE_ARGS += --enable-size-optimizations
@@ -25,3 +26,7 @@ ADDITIONAL_CFLAGS = -Os
 endif
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: mg_pre_configure
+mg_pre_configure:
+	$(RUN) autoreconf -ivf -Werror

@@ -1,6 +1,6 @@
 PKG_NAME = owncloud
-PKG_VERS = 10.15.2
-PKG_DATE = 20250311
+PKG_VERS = 10.16.3
+PKG_DATE = 20260522
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-complete-$(PKG_DATE).$(PKG_EXT)
 PKG_DIST_SITE = https://download.owncloud.com/server/stable
@@ -14,7 +14,7 @@ LICENSE  = AGPLv3
 
 INSTALL_TARGET = owncloud_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: owncloud_install
 owncloud_install:
