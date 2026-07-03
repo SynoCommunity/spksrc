@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/netdata/netdata/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/openssl3 cross/curl cross/lz4 cross/zstd cross/libuuid cross/libuv cross/libyaml
+DEPENDS = cross/openssl3 cross/curl cross/lz4 cross/zstd cross/libuuid cross/libuv cross/libyaml cross/procps-ng
 BUILD_DEPENDS = native/protoc_33 cross/aclk-schemas
 
 HOMEPAGE = https://www.netdata.cloud
