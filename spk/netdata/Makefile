@@ -25,7 +25,7 @@ SERVICE_PORT = $(ADMIN_PORT)
 SERVICE_PORT_TITLE = Netdata (HTTP)
 FWPORTS = src/netdata.sc
 WIZARDS_DIR = src/wizard/
-SPK_COMMANDS = bin/netdata-fix
+SPK_COMMANDS = bin/netdata-fix bin/pgrep
 
 POST_STRIP_TARGET = netdata_extra_install
 
