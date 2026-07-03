@@ -16,7 +16,7 @@ LICENSE  = https://dejavu-fonts.github.io/License.html
 
 INSTALL_TARGET = dejavu_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: dejavu_install
 dejavu_install:

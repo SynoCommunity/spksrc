@@ -1,4 +1,4 @@
-PKG_NAME = libheif-main
+PKG_NAME = libheif-virtual
 
 OPTIONAL_DEPENDS  = cross/libheif-latest
 OPTIONAL_DEPENDS += cross/libheif-1.18
@@ -14,4 +14,4 @@ else
 DEPENDS = cross/libheif-1.18
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

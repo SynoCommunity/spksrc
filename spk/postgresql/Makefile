@@ -1,13 +1,13 @@
 SPK_NAME = postgresql
-SPK_VERS = 17.4
-SPK_REV = 2
+SPK_VERS = 17.10
+SPK_REV = 3
 SPK_ICON = src/postgresql.png
 
 DEPENDS = cross/postgresql
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS spatial database extension for DSM 7+.
-CHANGELOG = "Use ICU archive data packaging to avoid ARMv7 runtime issues."
+CHANGELOG = "1. Update PostgreSQL to 17.10."
 DISPLAY_NAME = PostgreSQL
 STARTABLE = yes
 

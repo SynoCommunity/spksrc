@@ -1,6 +1,6 @@
-# Define python312 binary path
-PYTHON_DIR="/var/packages/python312/target/bin"
-# Add local bin, virtualenv along with python312 to the default PATH
+# Define python314 binary path
+PYTHON_DIR="/var/packages/python314/target/bin"
+# Add local bin, virtualenv along with python314 to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/usr/bin:${PYTHON_DIR}:${PATH}"
 
 GROUP="synocommunity"

@@ -1,5 +1,5 @@
 ###############################################################################
-# mk/spksrc.common/macros.mk
+# spksrc.common/macros.mk
 #
 # Defines generic GNU Make helper macros used across spksrc.
 #

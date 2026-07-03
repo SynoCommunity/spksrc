@@ -1,5 +1,5 @@
 PKG_NAME = jellyfin-web
-PKG_VERS = 10.11.9
+PKG_VERS = 10.11.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jellyfin/jellyfin-web/archive
@@ -14,7 +14,7 @@ LICENSE  = GPLv2
 
 INSTALL_TARGET = jellyfin_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 ENV += NPM_CONFIG_USER=root
 PATH := $(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(PATH)

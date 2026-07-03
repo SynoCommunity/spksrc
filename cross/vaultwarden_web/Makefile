@@ -14,7 +14,7 @@ LICENSE = GPLv3
 
 INSTALL_TARGET = vaultwarden_web_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: vaultwarden_web_install
 vaultwarden_web_install:

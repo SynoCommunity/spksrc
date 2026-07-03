@@ -1,45 +1,73 @@
-# Requirements for salt==3007.11 from:
-# https://github.com/saltstack/salt/blob/v3007.11/requirements/static/pkg/py3.12/linux.txt
+# Generated using the requirements script on May 28, 2026
+# Command: ./generate_requirements.sh "-r /tmp/salt-3008.0-linux.txt" 314
+# Upstream: https://raw.githubusercontent.com/saltstack/salt/v3008.0/requirements/static/pkg/py3.14/linux.txt
 
+aiohappyeyeballs==2.6.1
 aiosignal==1.4.0
-attrs==23.2.0
-autocommand==2.2.2
-#certifi==2024.7.4              ==> python312
-charset_normalizer==3.2.0
-cheroot==10.0.0
-CherryPy==18.8.0
-contextvars==2.4
-croniter==2.0.5
-distro==1.8.0
-idna==3.7
-importlib_metadata==8.7.0
-jaraco.collections==4.1.0
-jaraco.context==4.3.0
-jaraco.functools==4.1.0
-jaraco.text==4.0.0
+annotated_doc==0.0.4
+apache_libcloud==3.9.1
+attrs==26.1.0
+#certifi==2026.4.22                    ==> python314
+charset_normalizer==3.4.7
+cheroot==11.1.2
+CherryPy==18.10.0
+click==8.3.3
+croniter==6.2.2
+#distlib==0.4.0                        ==> python314 (virtualenv dependency)
+distro==1.9.0
+#filelock==3.29.0                      ==> python314 (virtualenv dependency)
+gitdb==4.0.12
+gitpython==3.1.49
+googleapis_common_protos==1.75.0
+idna==3.13
+importlib_metadata==8.7.1
+jaraco_collections==5.2.1
+jaraco_context==6.1.2
+jaraco_functools==4.4.0
+jaraco_text==4.2.0
 jinja2==3.1.6
-jmespath==1.0.1
+jmespath==1.1.0
 looseversion==1.3.0
-more_itertools==5.0.0
-networkx==3.1
+markdown_it_py==4.0.0
+mdurl==0.1.2
+more_itertools==11.0.2
+opentelemetry_api==1.41.1
+opentelemetry_exporter_otlp_proto_common==1.41.1
+opentelemetry_exporter_otlp_proto_http==1.41.1
+opentelemetry_exporter_prometheus==0.62b1
+opentelemetry_proto==1.41.1
+opentelemetry_sdk==1.41.1
+opentelemetry_semantic_conventions==0.62b1
 packaging==24.0
-#pip                            ==> python312
-portend==3.1.0
-pycparser==2.21
-pyOpenSSL==24.0.0
-python_dateutil==2.8.2
-python_gnupg==0.5.2
-pytz==2024.1
-requests==2.32.5
+#pip==26.1.1                           ==> python314
+#platformdirs==4.9.6                   ==> python314 (virtualenv dependency)
+portend==3.2.1
+prometheus_client==0.25.0
+pyasn1==0.6.3
+pycparser==3.0
+pygments==2.20.0
+pyopenssl==26.2.0
+python_dateutil==2.9.0.post0
+python_discovery==1.3.0
+python_gnupg==0.5.6
+requests==2.33.1
+rich==15.0.0
 rpm_vercmp==0.1.2
-salt==3007.11
-#setuptools                     ==> python312
-#six==1.16.0                    ==> python312
-tempora==5.3.0
-typing_extensions==4.14.1
-urllib3==2.6.3
-zc.lockfile==3.0.post1
-zipp==3.23.0
+salt==3008.0
+#setuptools==82.0.1                    ==> python314
+shellingham==1.5.4
+#six==1.17.0                           ==> python314
+smmap==5.0.3
+tempora==5.9.0
+truststore==0.10.4
+typer==0.25.1
+typer_slim==0.24.0
+typing_extensions==4.15.0
+urllib3==2.7.0
+#virtualenv==21.3.1                    ==> python314
+vultr==1.0.1
+zc_lockfile==4.0
+zipp==3.23.1
 
 # To allow patching rsax931.py during service setup
-patch-ng==1.18.1
+patch-ng==1.19.1

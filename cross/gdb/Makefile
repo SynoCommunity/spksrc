@@ -1,4 +1,4 @@
-PKG_NAME = gdb-main
+PKG_NAME = gdb-virtual
 
 OPTIONAL_DEPENDS  = cross/gdb-latest
 OPTIONAL_DEPENDS += cross/gdb-7.12
@@ -14,4 +14,4 @@ else
 DEPENDS += cross/gdb-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

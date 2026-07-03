@@ -1,4 +1,4 @@
-PKG_NAME = binutils-main
+PKG_NAME = binutils-virtual
 
 OPTIONAL_DEPENDS  = cross/binutils-latest
 OPTIONAL_DEPENDS += cross/binutils-2.41
@@ -16,4 +16,4 @@ else
 DEPENDS = cross/binutils-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

@@ -249,7 +249,7 @@
  {
      int x = blockIdx.x * blockDim.x + threadIdx.x;
      int y = blockIdx.y * blockDim.y + threadIdx.y;
-@@ -42,13 +44,59 @@ __global__ void Overlay_Cuda(
+@@ -42,12 +44,59 @@ __global__ void Overlay_Cuda(
      int overlay_x = x - x_position;
      int overlay_y = y - y_position;
  
@@ -306,9 +306,9 @@
 +        overlay_alpha, alpha_linesize, \
 +        alpha_adj_x, alpha_adj_y, \
 +        need_unpremul, overlay_full); \
- }
- 
++}
++
 +OVERLAY_VARIANT(uchar, unsigned char)
 +OVERLAY_VARIANT(ushort, unsigned short)
 +
-+}
+ }

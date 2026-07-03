@@ -29,4 +29,4 @@ LICENSE  = GPLv2
 # source is extracted directly to the install folder
 INSTALL_TARGET = nop
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk

@@ -98,10 +98,64 @@ on:
       - 'python/**'
       - 'native/**'
 
+env:
+  # Per-arch build-time budget (seconds): 20700 = 5h45m, below GitHub's 6h job
+  # kill. build.sh hard-stops the in-progress build at this ceiling so completed
+  # .spk/diagnostics still upload and the remaining packages are reported.
+  BUILD_BUDGET_SECONDS: "20700"
+
+# Cancel a previous, now-superseded run only while a pull request is still a
+# Draft, so iterative pushes during development don't pile up. Non-draft PR
+# builds and master/push builds are never cancelled — every merged commit keeps
+# its own build result on master — and workflow_dispatch (manual build &
+# publish) is never cancelled either. The event_name is part of the group so
+# push, pull_request and workflow_dispatch runs never cancel one another.
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft }}
+
 jobs:
+  # Decide whether the build should run at all. Upstream events (pull_request,
+  # or push to SynoCommunity/spksrc) and manual workflow_dispatch always build.
+  # A fork's own push build is skipped while the branch has an open *draft* PR
+  # upstream: during development the authoritative full build still runs on the
+  # upstream PR, so re-running the fork's narrow build only wastes runner time.
+  # A push event carries no PR context, hence the API lookup here.
+  gate:
+    name: Gate
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.check.outputs.should_build }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.repository }}" = "SynoCommunity/spksrc" ] || \
+             [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Upstream or manual run -> build."
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Fork push: look up the branch's open PR in the upstream repo and skip
+          # the build while that PR is a draft. Any lookup failure falls back to
+          # building (fail-open).
+          draft=$(gh api \
+            "/repos/SynoCommunity/spksrc/pulls?head=${{ github.repository_owner }}:${{ github.ref_name }}&state=open" \
+            --jq '[.[].draft] | first // false' 2>/dev/null || echo false)
+          if [ "$draft" = "true" ]; then
+            echo "Fork push for a draft PR (${{ github.ref_name }}) -> skip build."
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Fork push, PR not draft (or none) -> build."
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
+          fi
+
   prepare:
     name: Prepare for Build
     runs-on: ubuntu-latest
+    needs: gate
+    if: needs.gate.outputs.should_build == 'true'
     outputs:
       arch_packages: ${{ steps.dependencies.outputs.arch_packages }}
       noarch_packages: ${{ steps.dependencies.outputs.noarch_packages }}
@@ -118,7 +172,7 @@ jobs:
       distrib_hash: ${{ steps.distrib-hash.outputs.hash }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -129,8 +183,8 @@ jobs:
         run: |
           git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
           echo "spk_packages=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff --no-commit-id --name-only -r origin/master...${{github.event.pull_request.head.sha}} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Get changed spk_packages and dependency_folders of last commit for push
         if: github.event_name == 'push'
@@ -138,8 +192,8 @@ jobs:
         run: |
           git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs
           echo "spk_packages=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^spk/\K[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs
-          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs
+          echo "dependency_folders=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -oP "^(cross|python|native)/[^\/]*" | sort -u | xargs)" >> $GITHUB_OUTPUT
 
       - name: Evaluate dependencies
         id: dependencies
@@ -151,7 +205,7 @@ jobs:
 
       - name: Restore distrib cache
         id: cache-restore
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: distrib
           # Use a placeholder key that will never match for the exact key,
@@ -201,7 +255,7 @@ jobs:
 
       - name: Save distrib cache
         if: steps.cache-check.outputs.save_cache == 'true'
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: distrib
           key: distrib-${{ steps.distrib-hash.outputs.hash }}
@@ -368,13 +422,13 @@ jobs:
     name: Build
     needs: [prepare, set-defaults]
     runs-on: ubuntu-latest
-    if: ${{ needs.set-defaults.outputs.has_entries == 'true' }}
+    if: needs.set-defaults.outputs.has_entries == 'true'
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.set-defaults.outputs.matrix) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Free up disk space on GitHub runner before build starts
       - name: Free Disk Space (Ubuntu)
@@ -445,12 +499,12 @@ jobs:
           df -h / | tail -1 | awk '{print "Available space: " $4}'
 
       - name: Cache toolchains
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
         if: ${{ contains(matrix.arch,'qoriq') == false }}
         with:
           path: toolchain/*/work
-          key: toolchain-${{ matrix.arch }}-v3-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
+          key: toolchain-${{ matrix.arch }}-v4-${{ hashFiles(format('toolchain/syno-{0}/digests',matrix.arch)) }}
 
       # Check disk space after toolchain cache restore
       - name: Disk Space After Cache Restore
@@ -459,7 +513,7 @@ jobs:
           df -h
 
       - name: Restore distrib cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: distrib
           # Use a placeholder key that will never match for the exact key,
@@ -479,6 +533,10 @@ jobs:
         # We don't want to stop the build on errors.
         # Errors are reported in "Build Status"
         continue-on-error: true
+        # Hard backstop below the 6h job kill in case build.sh's own budget can't
+        # stop in time (e.g. a single package hangs); the always() steps below
+        # still run and upload whatever completed.
+        timeout-minutes: 350
         uses: docker://ghcr.io/synocommunity/spksrc:latest
         with:
           entrypoint: ./.github/actions/build.sh
@@ -498,6 +556,9 @@ jobs:
           BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+          BUILD_BUDGET_SECONDS: ${{ env.BUILD_BUDGET_SECONDS }}
+          BUILD_REMAINING_FILE: /github/workspace/build_remaining.txt
+          BUILD_TIMEOUT_FILE: /github/workspace/build_timeout.txt
 
       # Check disk space after build completes (success or failure)
       - name: Disk Space After Build
@@ -774,6 +835,8 @@ jobs:
           BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
           BUILD_UNSUPPORTED_FILE: /github/workspace/build_unsupported.txt
           BUILD_SUCCESS_FILE: /github/workspace/build_success.txt
+          BUILD_REMAINING_FILE: /github/workspace/build_remaining.txt
+          BUILD_TIMEOUT_FILE: /github/workspace/build_timeout.txt
 
       # Assemble flat diagnostics and the full collected_logs tree
       # into artifacts/diagnostics/ for upload.
@@ -787,7 +850,8 @@ jobs:
           # Copy flat diagnostic files
           for file in disk_usage_start.txt disk_usage_end.txt docker_logs.txt \
                       build_errors.txt build_log_errors.txt \
-                      build_unsupported.txt build_success.txt; do
+                      build_unsupported.txt build_success.txt \
+                      build_remaining.txt build_timeout.txt; do
             [ -f "$file" ] && cp -p "$file" "artifacts/diagnostics/$file"
           done
 
@@ -830,12 +894,12 @@ jobs:
 
   consolidate-diagnostics:
     name: Consolidate Diagnostics
-    needs: build
+    needs: [gate, build]
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && needs.gate.outputs.should_build == 'true'
     steps:
       - name: Download all diagnostic artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: diagnostics-*
           path: all-diagnostics

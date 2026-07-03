@@ -1,5 +1,5 @@
 PKG_NAME = srt
-PKG_VERS = 1.5.4
+PKG_VERS = 1.5.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Haivision/srt/archive

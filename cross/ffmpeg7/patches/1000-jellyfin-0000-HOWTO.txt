@@ -6,18 +6,18 @@ $ git clone https://github.com/jellyfin/jellyfin-ffmpeg.git
 $ cd jellyfin-ffmpeg
 
 Checkout the tag associated with current ffmpeg version
-$ git tag --list | grep 7.1.3
-$ git checkout v7.1.3-6
+$ git tag --list | grep 7.1.4
+$ git checkout v7.1.4-3
 
 If there were deleted files from earlier manipulations
 $ git restore .
 $ git status
-HEAD detached at v7.1.3-6
+HEAD detached at v7.1.4-3
 nothing to commit, working tree clean
 
 Check that current ffmpeg matches jellyfin version
 $ cat VERSION 
-7.1.3
+7.1.4
 
 Modify patches to be in -p0 mode:
 $ cd debian/patches
@@ -34,8 +34,8 @@ Copy new patches:
 $ cp ~/jellyfin-ffmpeg/debian/patches/10*.patch .
 
 Test the patches on a clean ffmpeg tree:
-$ tar -jxvf ffmpeg-7.1.3.tar.bz2 
-$ cd ffmpeg-7.1.3/
+$ tar -jxvf ffmpeg-7.1.4.tar.bz2 
+$ cd ffmpeg-7.1.4/
 $ ls -1d ~/ffmpeg8/spksrc/cross/ffmpeg7/patches/*.patch | while read LINE; do patch -p0 < $LINE; done
 
 Add them to spksrc repository:

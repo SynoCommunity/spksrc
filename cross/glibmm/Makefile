@@ -1,4 +1,4 @@
-PKG_NAME = glibmm-main
+PKG_NAME = glibmm-virtual
 
 OPTIONAL_DEPENDS  = cross/glibmm-latest
 OPTIONAL_DEPENDS += cross/glibmm-2.66
@@ -13,4 +13,4 @@ else
 DEPENDS += cross/glibmm-2.66
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

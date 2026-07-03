@@ -1,0 +1,491 @@
+Index: FFmpeg/libavfilter/drawutils.c
+===================================================================
+--- libavfilter/drawutils.c
++++ libavfilter/drawutils.c
+@@ -461,7 +461,7 @@ void ff_blend_rectangle(FFDrawContext *d
+ 
+ static void blend_pixel16(uint8_t *dst, unsigned src, unsigned alpha,
+                           const uint8_t *mask, int mask_linesize, int l2depth,
+-                          unsigned w, unsigned h, unsigned shift, unsigned xm0)
++                          unsigned w, unsigned h, unsigned shift, unsigned xm0, int srca_opaque)
+ {
+     unsigned t = 0;
+     unsigned xmshf = 3 - l2depth;
+@@ -480,12 +480,13 @@ static void blend_pixel16(uint8_t *dst,
+         mask += mask_linesize;
+     }
+     alpha = (t >> shift) * alpha;
++    src = srca_opaque ? ((1 << 16) - 1) : src;
+     AV_WL16(dst, ((0x10001 - alpha) * value + alpha * src) >> 16);
+ }
+ 
+ static void blend_pixel(uint8_t *dst, unsigned src, unsigned alpha,
+                         const uint8_t *mask, int mask_linesize, int l2depth,
+-                        unsigned w, unsigned h, unsigned shift, unsigned xm0)
++                        unsigned w, unsigned h, unsigned shift, unsigned xm0, int srca_opaque)
+ {
+     unsigned t = 0;
+     unsigned xmshf = 3 - l2depth;
+@@ -503,6 +504,7 @@ static void blend_pixel(uint8_t *dst, un
+         mask += mask_linesize;
+     }
+     alpha = (t >> shift) * alpha;
++    src = srca_opaque ? 255 : src;
+     *dst = ((0x1010101 - alpha) * *dst + alpha * src) >> 24;
+ }
+ 
+@@ -510,48 +512,130 @@ static void blend_line_hv16(uint8_t *dst
+                             unsigned src, unsigned alpha,
+                             const uint8_t *mask, int mask_linesize, int l2depth, int w,
+                             unsigned hsub, unsigned vsub,
+-                            int xm, int left, int right, int hband)
++                            int xm, int left, int right, int hband, int srca_opaque)
+ {
+ 
+     if (left) {
+         blend_pixel16(dst, src, alpha, mask, mask_linesize, l2depth,
+-                      left, hband, hsub + vsub, xm);
++                      left, hband, hsub + vsub, xm, srca_opaque);
+         dst += dst_delta;
+         xm += left;
+     }
+     for (int x = 0; x < w; x++) {
+         blend_pixel16(dst, src, alpha, mask, mask_linesize, l2depth,
+-                      1 << hsub, hband, hsub + vsub, xm);
++                      1 << hsub, hband, hsub + vsub, xm, srca_opaque);
+         dst += dst_delta;
+         xm += 1 << hsub;
+     }
+     if (right)
+         blend_pixel16(dst, src, alpha, mask, mask_linesize, l2depth,
+-                      right, hband, hsub + vsub, xm);
++                      right, hband, hsub + vsub, xm, srca_opaque);
+ }
+ 
+ static void blend_line_hv(uint8_t *dst, int dst_delta,
+                           unsigned src, unsigned alpha,
+                           const uint8_t *mask, int mask_linesize, int l2depth, int w,
+                           unsigned hsub, unsigned vsub,
+-                          int xm, int left, int right, int hband)
++                          int xm, int left, int right, int hband, int srca_opaque)
+ {
+ 
+     if (left) {
+         blend_pixel(dst, src, alpha, mask, mask_linesize, l2depth,
+-                    left, hband, hsub + vsub, xm);
++                    left, hband, hsub + vsub, xm, srca_opaque);
+         dst += dst_delta;
+         xm += left;
+     }
+     for (int x = 0; x < w; x++) {
+         blend_pixel(dst, src, alpha, mask, mask_linesize, l2depth,
+-                    1 << hsub, hband, hsub + vsub, xm);
++                    1 << hsub, hband, hsub + vsub, xm, srca_opaque);
+         dst += dst_delta;
+         xm += 1 << hsub;
+     }
+     if (right)
+         blend_pixel(dst, src, alpha, mask, mask_linesize, l2depth,
+-                    right, hband, hsub + vsub, xm);
++                    right, hband, hsub + vsub, xm, srca_opaque);
++}
++
++static void blend_pixel_unpremul_rgb32(
++    uint8_t *dst0, uint8_t *dst1, uint8_t *dst2, uint8_t *dst3,
++    unsigned src[4], unsigned alpha,
++    const uint8_t *mask, int mask_linesize, int l2depth,
++    unsigned w, unsigned h, unsigned shift, unsigned xm0,
++    int srca_opaque, int limited)
++{
++    unsigned t = 0;
++    unsigned xmshf = 3 - l2depth;
++    unsigned xmmod = 7 >> l2depth;
++    unsigned mbits = (1 << (1 << l2depth)) - 1;
++    unsigned mmult = 255 / mbits;
++    const uint8_t offset = limited ? 16 : 0;
++
++    for (unsigned y = 0; y < h; y++) {
++        unsigned xm = xm0;
++        for (unsigned x = 0; x < w; x++) {
++            t += ((mask[xm >> xmshf] >> ((~xm & xmmod) << l2depth)) & mbits)
++                 * mmult;
++            xm++;
++        }
++        mask += mask_linesize;
++    }
++    alpha = (t >> shift) * alpha;
++
++    // premul
++    *dst0 = ((((*dst0 - offset) * (((*dst3 >> 1) & 1) + *dst3)) + 128) >> 8) + offset;
++    *dst1 = ((((*dst1 - offset) * (((*dst3 >> 1) & 1) + *dst3)) + 128) >> 8) + offset;
++    *dst2 = ((((*dst2 - offset) * (((*dst3 >> 1) & 1) + *dst3)) + 128) >> 8) + offset;
++
++    // blend mask with source alpha set to opaque
++    src[3] = srca_opaque ? 255 : src[3];
++    *dst0 = ((0x1010101 - alpha) * *dst0 + alpha * src[0]) >> 24;
++    *dst1 = ((0x1010101 - alpha) * *dst1 + alpha * src[1]) >> 24;
++    *dst2 = ((0x1010101 - alpha) * *dst2 + alpha * src[2]) >> 24;
++    *dst3 = ((0x1010101 - alpha) * *dst3 + alpha * src[3]) >> 24;
++
++    // unpremul
++    if (*dst3 > 0 && *dst3 < 255) {
++        *dst0 = FFMIN(FFMAX(*dst0 - offset, 0) * 255 / *dst3 + offset, 255);
++        *dst1 = FFMIN(FFMAX(*dst1 - offset, 0) * 255 / *dst3 + offset, 255);
++        *dst2 = FFMIN(FFMAX(*dst2 - offset, 0) * 255 / *dst3 + offset, 255);
++    }
++}
++
++static void blend_line_hv_unpremul_rgb32(
++    uint8_t *dst0, uint8_t *dst1, uint8_t *dst2, uint8_t *dst3,
++    int dst_delta, unsigned src[4], unsigned alpha,
++    const uint8_t *mask, int mask_linesize, int l2depth, int w,
++    unsigned hsub, unsigned vsub,
++    int xm, int left, int right, int hband,
++    int srca_opaque, int limited)
++{
++    if (left) {
++        blend_pixel_unpremul_rgb32(
++	    dst0, dst1, dst2, dst3,
++            src, alpha, mask, mask_linesize, l2depth,
++            left, hband, hsub + vsub, xm, srca_opaque, limited);
++        dst0 += dst_delta;
++        dst1 += dst_delta;
++        dst2 += dst_delta;
++        dst3 += dst_delta;
++        xm += left;
++    }
++    for (int x = 0; x < w; x++) {
++        blend_pixel_unpremul_rgb32(
++            dst0, dst1, dst2, dst3,
++            src, alpha, mask, mask_linesize, l2depth,
++            1 << hsub, hband, hsub + vsub, xm, srca_opaque, limited);
++        dst0 += dst_delta;
++        dst1 += dst_delta;
++        dst2 += dst_delta;
++        dst3 += dst_delta;
++        xm += 1 << hsub;
++    }
++    if (right)
++        blend_pixel_unpremul_rgb32(
++            dst0, dst1, dst2, dst3,
++            src, alpha, mask, mask_linesize, l2depth,
++            right, hband, hsub + vsub, xm, srca_opaque, limited);
+ }
+ 
+ void ff_blend_mask(FFDrawContext *draw, FFDrawColor *color,
+@@ -589,13 +673,79 @@ void ff_blend_mask(FFDrawContext *draw,
+         y_sub = y0;
+         subsampling_bounds(draw->hsub[plane], &x_sub, &w_sub, &left, &right);
+         subsampling_bounds(draw->vsub[plane], &y_sub, &h_sub, &top, &bottom);
++
++        if ((draw->flags & FF_DRAW_MASK_UNPREMUL_RGB32) &&
++            nb_planes == 1 && nb_comp == 4 &&
++            (draw->format == AV_PIX_FMT_RGB32 ||
++             draw->format == AV_PIX_FMT_BGR32 ||
++             draw->format == AV_PIX_FMT_RGB32_1 ||
++             draw->format == AV_PIX_FMT_BGR32_1)) {
++            const int srca_opaque = !!(draw->flags & FF_DRAW_MASK_SRC_ALPHA_OPAQUE);
++            const int limited = draw->range == AVCOL_RANGE_MPEG;
++            const int depth = draw->desc->comp[0].depth;
++            int offset[4], index[4];
++            uint8_t *pdst[4];
++            unsigned src[4];
++
++            for (unsigned comp = 0; comp < nb_comp; comp++) {
++                av_assert0(draw->desc->comp[comp].plane == plane);
++
++                offset[comp] = draw->desc->comp[comp].offset;
++                index[comp] = offset[comp] / ((depth + 7) / 8);
++                pdst[comp] = p0 + offset[comp];
++                src[comp] = color->comp[plane].u8[index[comp]];
++            }
++
++            m = mask;
++            if (top) {
++                blend_line_hv_unpremul_rgb32(
++                    pdst[0], pdst[1], pdst[2], pdst[3], draw->pixelstep[plane],
++                    src, alpha,
++                    m, mask_linesize, l2depth, w_sub,
++                    draw->hsub[plane], draw->vsub[plane],
++                    xm0, left, right, top, srca_opaque, limited);
++
++                for (unsigned comp = 0; comp < nb_comp; comp++)
++                    pdst[comp] += dst_linesize[plane];
++                m += top * mask_linesize;
++            }
++            for (int y = 0; y < h_sub; y++) {
++                blend_line_hv_unpremul_rgb32(
++                    pdst[0], pdst[1], pdst[2], pdst[3], draw->pixelstep[plane],
++                    src, alpha,
++                    m, mask_linesize, l2depth, w_sub,
++                    draw->hsub[plane], draw->vsub[plane],
++                    xm0, left, right, 1 << draw->vsub[plane], srca_opaque, limited);
++
++                for (unsigned comp = 0; comp < nb_comp; comp++)
++                    pdst[comp] += dst_linesize[plane];
++                m += mask_linesize << draw->vsub[plane];
++            }
++            if (bottom) {
++                blend_line_hv_unpremul_rgb32(
++                    pdst[0], pdst[1], pdst[2], pdst[3], draw->pixelstep[plane],
++                    src, alpha,
++                    m, mask_linesize, l2depth, w_sub,
++                    draw->hsub[plane], draw->vsub[plane],
++                    xm0, left, right, bottom, srca_opaque, limited);
++            }
++            break;
++        }
++
+         for (unsigned comp = 0; comp < nb_comp; comp++) {
+             const int depth = draw->desc->comp[comp].depth;
+             const int offset = draw->desc->comp[comp].offset;
+             const int index = offset / ((depth + 7) / 8);
++            int srca_opaque = !!(draw->flags & FF_DRAW_MASK_SRC_ALPHA_OPAQUE);
+ 
+             if (draw->desc->comp[comp].plane != plane)
+                 continue;
++
++            if (comp == draw->desc->nb_components - 1)
++                srca_opaque = (draw->desc->flags & AV_PIX_FMT_FLAG_ALPHA) ? srca_opaque : 0;
++            else
++                srca_opaque = 0;
++
+             p = p0 + offset;
+             m = mask;
+             if (top) {
+@@ -604,13 +754,13 @@ void ff_blend_mask(FFDrawContext *draw,
+                                   color->comp[plane].u8[index], alpha,
+                                   m, mask_linesize, l2depth, w_sub,
+                                   draw->hsub[plane], draw->vsub[plane],
+-                                  xm0, left, right, top);
++                                  xm0, left, right, top, srca_opaque);
+                 } else {
+                     blend_line_hv16(p, draw->pixelstep[plane],
+                                     color->comp[plane].u16[index], alpha,
+                                     m, mask_linesize, l2depth, w_sub,
+                                     draw->hsub[plane], draw->vsub[plane],
+-                                    xm0, left, right, top);
++                                    xm0, left, right, top, srca_opaque);
+                 }
+                 p += dst_linesize[plane];
+                 m += top * mask_linesize;
+@@ -621,7 +771,7 @@ void ff_blend_mask(FFDrawContext *draw,
+                                   color->comp[plane].u8[index], alpha,
+                                   m, mask_linesize, l2depth, w_sub,
+                                   draw->hsub[plane], draw->vsub[plane],
+-                                  xm0, left, right, 1 << draw->vsub[plane]);
++                                  xm0, left, right, 1 << draw->vsub[plane], srca_opaque);
+                     p += dst_linesize[plane];
+                     m += mask_linesize << draw->vsub[plane];
+                 }
+@@ -631,7 +781,7 @@ void ff_blend_mask(FFDrawContext *draw,
+                                     color->comp[plane].u16[index], alpha,
+                                     m, mask_linesize, l2depth, w_sub,
+                                     draw->hsub[plane], draw->vsub[plane],
+-                                    xm0, left, right, 1 << draw->vsub[plane]);
++                                    xm0, left, right, 1 << draw->vsub[plane], srca_opaque);
+                     p += dst_linesize[plane];
+                     m += mask_linesize << draw->vsub[plane];
+                 }
+@@ -642,13 +792,13 @@ void ff_blend_mask(FFDrawContext *draw,
+                                   color->comp[plane].u8[index], alpha,
+                                   m, mask_linesize, l2depth, w_sub,
+                                   draw->hsub[plane], draw->vsub[plane],
+-                                  xm0, left, right, bottom);
++                                  xm0, left, right, bottom, srca_opaque);
+                 } else {
+                     blend_line_hv16(p, draw->pixelstep[plane],
+                                     color->comp[plane].u16[index], alpha,
+                                     m, mask_linesize, l2depth, w_sub,
+                                     draw->hsub[plane], draw->vsub[plane],
+-                                    xm0, left, right, bottom);
++                                    xm0, left, right, bottom, srca_opaque);
+                 }
+             }
+         }
+Index: FFmpeg/libavfilter/drawutils.h
+===================================================================
+--- libavfilter/drawutils.h
++++ libavfilter/drawutils.h
+@@ -61,7 +61,17 @@ typedef struct FFDrawColor {
+ /**
+   * Process alpha pixel component.
+   */
+-#define FF_DRAW_PROCESS_ALPHA 1
++#define FF_DRAW_PROCESS_ALPHA         (1 << 0)
++
++/**
++  * Set source alpha opaque when blending masks.
++  */
++#define FF_DRAW_MASK_SRC_ALPHA_OPAQUE (1 << 1)
++
++/**
++  * Unpremultiply when blending masks on RGB32/BGR32.
++  */
++#define FF_DRAW_MASK_UNPREMUL_RGB32   (1 << 2)
+ 
+ /**
+  * Init a draw context.
+Index: FFmpeg/libavfilter/vf_subtitles.c
+===================================================================
+--- libavfilter/vf_subtitles.c
++++ libavfilter/vf_subtitles.c
+@@ -38,6 +38,7 @@
+ #include "libavutil/avstring.h"
+ #include "libavutil/mem.h"
+ #include "libavutil/opt.h"
++#include "libavutil/pixdesc.h"
+ 
+ #include "filters.h"
+ #include "drawutils.h"
+@@ -64,6 +65,9 @@ typedef struct AssContext {
+     int shaping;
+     FFDrawContext draw;
+     int wrap_unicode;
++    int sub2video;
++    int last_image;
++    int64_t max_pts, max_ts_ms;
+ } AssContext;
+ 
+ #define OFFSET(x) offsetof(AssContext, x)
+@@ -74,7 +78,12 @@ typedef struct AssContext {
+     {"f",              "set the filename of file to read",                         OFFSET(filename),   AV_OPT_TYPE_STRING,     {.str = NULL},  0, 0, FLAGS }, \
+     {"original_size",  "set the size of the original video (used to scale fonts)", OFFSET(original_w), AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL},  0, 0, FLAGS }, \
+     {"fontsdir",       "set the directory containing the fonts to read",           OFFSET(fontsdir),   AV_OPT_TYPE_STRING,     {.str = NULL},  0, 0, FLAGS }, \
+-    {"alpha",          "enable processing of alpha channel",                       OFFSET(alpha),      AV_OPT_TYPE_BOOL,       {.i64 = 0   },         0,        1, FLAGS }, \
++    {"alpha",          "enable processing of alpha channel",                       OFFSET(alpha),      AV_OPT_TYPE_BOOL,       {.i64 = 0   },  0, 1, FLAGS }, \
++    {"sub2video",      "enable textual subtitle to video mode",                    OFFSET(sub2video),  AV_OPT_TYPE_BOOL,       {.i64 = 0   },  0, 1, FLAGS }, \
++    {"shaping",        "set shaping engine",                                       OFFSET(shaping),    AV_OPT_TYPE_INT,        {.i64 = ASS_SHAPING_COMPLEX }, -1, 1, FLAGS, .unit = "shaping_mode"}, \
++        {"auto",       NULL,              0, AV_OPT_TYPE_CONST, {.i64 = -1},                  INT_MIN, INT_MAX, FLAGS, .unit = "shaping_mode"}, \
++        {"simple",     "simple shaping",  0, AV_OPT_TYPE_CONST, {.i64 = ASS_SHAPING_SIMPLE},  INT_MIN, INT_MAX, FLAGS, .unit = "shaping_mode"}, \
++        {"complex",    "complex shaping", 0, AV_OPT_TYPE_CONST, {.i64 = ASS_SHAPING_COMPLEX}, INT_MIN, INT_MAX, FLAGS, .unit = "shaping_mode"}, \
+ 
+ /* libass supports a log level ranging from 0 to 7 */
+ static const int ass_libavfilter_log_level_map[] = {
+@@ -184,12 +193,28 @@ static int config_input(AVFilterLink *in
+ {
+     AVFilterContext *ctx = inlink->dst;
+     AssContext *ass = ctx->priv;
++    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
++    int draw_flags = ass->alpha ? FF_DRAW_PROCESS_ALPHA : 0;
+     int ret;
+ 
++    if (ass->sub2video && inlink->alpha_mode != AVALPHA_MODE_PREMULTIPLIED) {
++        if ((desc->flags & AV_PIX_FMT_FLAG_ALPHA) &&
++            (desc->flags & (AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_RGB)))
++            draw_flags |= FF_DRAW_MASK_SRC_ALPHA_OPAQUE | FF_DRAW_PROCESS_ALPHA;
++
++        if (inlink->format == AV_PIX_FMT_RGB32 ||
++            inlink->format == AV_PIX_FMT_BGR32 ||
++            inlink->format == AV_PIX_FMT_RGB32_1 ||
++            inlink->format == AV_PIX_FMT_BGR32_1)
++            draw_flags |= FF_DRAW_MASK_UNPREMUL_RGB32;
++    }
++
+     ret = ff_draw_init2(&ass->draw, inlink->format,
++                        (desc->flags & AV_PIX_FMT_FLAG_RGB) ? inlink->colorspace :
+                         ass_get_color_space(ass->track->YCbCrMatrix, inlink->colorspace),
++                        (desc->flags & AV_PIX_FMT_FLAG_RGB) ? inlink->color_range :
+                         ass_get_color_range(ass->track->YCbCrMatrix, inlink->color_range),
+-                        inlink->alpha_mode, ass->alpha ? FF_DRAW_PROCESS_ALPHA : 0);
++                        inlink->alpha_mode, draw_flags);
+     if (ret < 0) {
+         av_log(ctx, AV_LOG_ERROR, "Failed to initialize FFDrawContext\n");
+         return ret;
+@@ -206,6 +231,8 @@ static int config_input(AVFilterLink *in
+     if (ass->shaping != -1)
+         ass_set_shaper(ass->renderer, ass->shaping);
+ 
++    ass->max_pts = ass->max_ts_ms / (av_q2d(inlink->time_base) * 1000);
++
+     return 0;
+ }
+ 
+@@ -234,20 +261,44 @@ static int filter_frame(AVFilterLink *in
+ {
+     AVFilterContext *ctx = inlink->dst;
+     AVFilterLink *outlink = ctx->outputs[0];
++    FilterLink *outl = ff_filter_link(outlink);
+     AssContext *ass = ctx->priv;
+     int detect_change = 0;
+-    double time_ms = picref->pts * av_q2d(inlink->time_base) * 1000;
++    int64_t time_ms = picref->pts * av_q2d(inlink->time_base) * 1000;
+     ASS_Image *image = ass_render_frame(ass->renderer, ass->track,
+                                         time_ms, &detect_change);
+ 
++    if (ass->sub2video) {
++        if (!image && !ass->last_image && picref->pts <= ass->max_pts && outl->current_pts != AV_NOPTS_VALUE) {
++            av_log(ctx, AV_LOG_DEBUG, "sub2video skip pts:%"PRId64"\n", picref->pts);
++            av_frame_free(&picref);
++            return 0;
++        }
++        ass->last_image = image != NULL;
++    }
++
+     if (detect_change)
+-        av_log(ctx, AV_LOG_DEBUG, "Change happened at time ms:%f\n", time_ms);
++        av_log(ctx, AV_LOG_DEBUG, "Change happened at time ms:%"PRId64"\n", time_ms);
+ 
+     overlay_ass_image(ass, picref, image);
+ 
+     return ff_filter_frame(outlink, picref);
+ }
+ 
++static void get_max_timestamp(AVFilterContext *ctx)
++{
++    AssContext *ass = ctx->priv;
++    int i;
++
++    ass->max_ts_ms = 0;
++    if (ass->track) {
++        for (i = 0; i < ass->track->n_events; i++) {
++            ASS_Event *event = ass->track->events + i;
++            ass->max_ts_ms = FFMAX(event->Start + event->Duration, ass->max_ts_ms);
++        }
++    }
++}
++
+ static const AVFilterPad ass_inputs[] = {
+     {
+         .name             = "default",
+@@ -262,10 +313,6 @@ static const AVFilterPad ass_inputs[] =
+ 
+ static const AVOption ass_options[] = {
+     COMMON_OPTIONS
+-    {"shaping", "set shaping engine", OFFSET(shaping), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 1, FLAGS, .unit = "shaping_mode"},
+-        {"auto", NULL,                 0, AV_OPT_TYPE_CONST, {.i64 = -1},                  INT_MIN, INT_MAX, FLAGS, .unit = "shaping_mode"},
+-        {"simple",  "simple shaping",  0, AV_OPT_TYPE_CONST, {.i64 = ASS_SHAPING_SIMPLE},  INT_MIN, INT_MAX, FLAGS, .unit = "shaping_mode"},
+-        {"complex", "complex shaping", 0, AV_OPT_TYPE_CONST, {.i64 = ASS_SHAPING_COMPLEX}, INT_MIN, INT_MAX, FLAGS, .unit = "shaping_mode"},
+     {NULL},
+ };
+ 
+@@ -289,6 +336,9 @@ static av_cold int init_ass(AVFilterCont
+                ass->filename);
+         return AVERROR(EINVAL);
+     }
++
++    get_max_timestamp(ctx);
++
+     return 0;
+ }
+ 
+@@ -310,8 +360,8 @@ const FFFilter ff_vf_ass = {
+ static const AVOption subtitles_options[] = {
+     COMMON_OPTIONS
+     {"charenc",      "set input character encoding", OFFSET(charenc),      AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS},
+-    {"stream_index", "set stream index",             OFFSET(stream_index), AV_OPT_TYPE_INT,    { .i64 = -1 }, -1,       INT_MAX,  FLAGS},
+-    {"si",           "set stream index",             OFFSET(stream_index), AV_OPT_TYPE_INT,    { .i64 = -1 }, -1,       INT_MAX,  FLAGS},
++    {"stream_index", "set stream index",             OFFSET(stream_index), AV_OPT_TYPE_INT,    { .i64 = -1 }, -1, INT_MAX, FLAGS},
++    {"si",           "set stream index",             OFFSET(stream_index), AV_OPT_TYPE_INT,    { .i64 = -1 }, -1, INT_MAX, FLAGS},
+     {"force_style",  "force subtitle style",         OFFSET(force_style),  AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS},
+ #if FF_ASS_FEATURE_WRAP_UNICODE
+     {"wrap_unicode", "break lines according to the Unicode Line Breaking Algorithm", OFFSET(wrap_unicode), AV_OPT_TYPE_BOOL, { .i64 = -1 }, -1, 1, FLAGS },
+@@ -540,6 +590,8 @@ static av_cold int init_subtitles(AVFilt
+         avsubtitle_free(&sub);
+     }
+ 
++    get_max_timestamp(ctx);
++
+ end:
+     av_dict_free(&codec_opts);
+     avcodec_free_context(&dec_ctx);
