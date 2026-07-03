@@ -1,5 +1,5 @@
 SPK_NAME = ntfy
-SPK_VERS = 2.16.0
+SPK_VERS = 2.26.0
 SPK_REV = 1
 SPK_ICON = src/ntfy.png
 
@@ -11,7 +11,7 @@ MAINTAINER = hgy59
 DISPLAY_NAME = ntfy
 DESCRIPTION = Send push notifications to your phone or desktop using PUT/POST.
 HOMEPAGE = https://ntfy.sh/
-LICENSE  = Apache-2.0 and GPLv2
+LICENSE = Apache-2.0 and GPLv2
 CHANGELOG = "Initial package release."
 
 STARTABLE = yes

@@ -1,7 +1,7 @@
 PKG_NAME = ntfy
-PKG_VERS = 2.16.0
+PKG_VERS = 2.25.0
 # keep the commit in sync with version $(PKG_VERS)
-PKG_COMMIT = 4b474a89b7803e8f974f888021612c2c49cce734
+PKG_COMMIT = df6f1f3ee1887ccc8a840363193622271576ed79
 PKG_DATE = $(shell date +%s)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
@@ -20,8 +20,8 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
 HOMEPAGE = https://ntfy.sh/
-COMMENT  = Send push notifications to your phone or desktop using PUT/POST.
-LICENSE  = Apache-2.0 and GPLv2
+COMMENT = Send push notifications to your phone or desktop using PUT/POST.
+LICENSE = Apache-2.0 and GPLv2
 
 COMPILE_TARGET = ntfy_compile
 INSTALL_TARGET = ntfy_install
