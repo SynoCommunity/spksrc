@@ -1,5 +1,8 @@
-FROM debian:buster
-MAINTAINER SynoCommunity <https://synocommunity.com>
+FROM debian:trixie
+LABEL description="Framework for maintaining and compiling native community packages for Synology devices"
+LABEL maintainer="SynoCommunity <https://github.com/SynoCommunity/spksrc/graphs/contributors>"
+LABEL url="https://synocommunity.com"
+LABEL vcs-url="https://github.com/SynoCommunity/spksrc"
 
 ENV LANG C.UTF-8
 
@@ -7,71 +10,120 @@ ENV LANG C.UTF-8
 RUN dpkg --add-architecture i386
 
 # Install required packages (in sync with README.rst instructions)
-RUN apt-get update && apt-get install --no-install-recommends -y \
-		autoconf-archive \
-		autogen \
-		automake \
-		bc \
-		bison \
-		build-essential \
-		check \
-		cmake \
-		curl \
-		cython \
-		debootstrap \
-		ed \
-		expect \
-		fakeroot \
-		flex \
-		g++-multilib \
-		gawk \
-		gettext \
-		git \
-		gperf \
-		imagemagick \
-		intltool \
-		jq \
-		libbz2-dev \
-		libc6-i386 \
-		libcppunit-dev \
-		libffi-dev \
-		libgc-dev \
-		libgmp3-dev \
-		libltdl-dev \
-		libmount-dev \
-		libncurses-dev \
-		libpcre3-dev \
-		libssl-dev \
-		libtool \
-		libunistring-dev \
-		lzip \
-		mercurial \
-		ncurses-dev \
-		ninja-build \
-		php \
-		pkg-config \
-		python3 \
-		python3-distutils \
-		rename \
-		scons \
-		subversion \
-		swig \
-		texinfo \
-		unzip \
-		xmlto \
-		zlib1g-dev && \
-	apt-get clean && \
+# ATTENTION: the total length of the following RUN command must not exceed 1024 characters
+RUN apt update && apt install --no-install-recommends -y \
+	autoconf-archive \
+	autogen \
+	automake \
+	autopoint \
+	bash \
+	bash-completion \
+	bc \
+	bison \
+	build-essential \
+	check \
+	cmake \
+	curl \
+	cython3 \
+	debootstrap \
+	ed \
+	expect \
+	fakeroot \
+	flex \
+	gh \
+	g++-multilib \
+	gawk \
+	gettext \
+	gfortran \
+	git \
+	glslang-tools \
+	gobject-introspection \
+	gperf \
+	imagemagick \
+	intltool \
+	jq \
+	libbz2-dev \
+	libc6-i386 \
+	libcppunit-dev \
+	libelf-dev \
+	libffi-dev \
+	libgc-dev \
+	libgmp3-dev \
+	libicu76 \
+	libltdl-dev \
+	libmount-dev \
+	libncurses-dev \
+	libpcre2-dev \
+	libssl-dev \
+	libtool \
+	libtool-bin \
+	libunistring-dev \
+	lzip \
+	man-db \
+	manpages-dev \
+	plocate \
+	moreutils \
+	nasm \
+	p7zip \
+	patchelf \
+	php \
+	pkg-config \
+	rename \
+	ripgrep \
+	rsync \
+	ruby-mustache \
+	scons \
+	spirv-tools \
+	subversion \
+	sudo \
+	swig \
+	texinfo \
+	time \
+	tree \
+	unzip \
+	xmlto \
+	yasm \
+	zip \
+	zlib1g-dev
+
+# Python based apps
+RUN apt install --no-install-recommends -y \
+	httpie \
+	mercurial \
+	meson \
+	ninja-build \
+	python3 \
+	python3-jinja2 \
+	python3-mako \
+	python3-pip \
+	python3-setuptools \
+	python3-virtualenv \
+	python3-yaml
+
+###
+### Keeping backport channel management for later use
+###
+
+# Add backport channel
+RUN echo "deb http://deb.debian.org/debian trixie-backports main" > /etc/apt/sources.list.d/backports.list && \
+    echo "Package: *\nPin: release a=trixie-backports\nPin-Priority: 100" > /etc/apt/preferences.d/99-backports
+
+# Update package list & install needed package from backport
+RUN apt-get update
+###RUN apt-get install -y -t trixie-backports meson
+
+# Clean-up apt db
+RUN apt clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install setuptools, wheel and pip for Python3
-RUN wget https://bootstrap.pypa.io/get-pip.py -O - | python3
-RUN pip3 install meson==0.56.0
+# Update locate db
+RUN updatedb
 
-# Install setuptools, pip, virtualenv, wheel and httpie for Python2
-RUN wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O - | python
-RUN pip install virtualenv httpie
+# Add user
+RUN adduser --disabled-password --gecos '' user && \
+	adduser user sudo && \
+	echo "%user ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/users
 
 # Volume pointing to spksrc sources
 VOLUME /spksrc
-
 WORKDIR /spksrc

@@ -4,12 +4,11 @@ SPK_REV = 2
 SPK_ICON = src/jappix.png
 DSM_UI_DIR = app
 
-DEPENDS  = cross/$(SPK_NAME)
+DEPENDS  = cross/jappix
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Jappix, a full-featured XMPP web-client \(Jappix Desktop, Jappix Mobile \& Jappix Mini\). Jappix is a fresh new open social platform which enables you to create your own cloud, wherever you want to. People must be able to get in touch with all their friends on a free decentralized network!
 ADMIN_URL = /jappix/
-RELOAD_UI = yes
 STARTABLE = no
 DISPLAY_NAME = Jappix
 CHANGELOG = "1. DSM 5.0 compatibility"
@@ -28,8 +27,8 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = jappix_extra_install
 
-# Pure PHP package, make sure ARCH is not defined
-override ARCH=
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

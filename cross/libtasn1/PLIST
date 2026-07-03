@@ -3,4 +3,4 @@ bin:bin/asn1Decoding
 bin:bin/asn1Parser
 lnk:lib/libtasn1.so
 lnk:lib/libtasn1.so.6
-lib:lib/libtasn1.so.6.6.0
+lib:lib/libtasn1.so.6.6.3

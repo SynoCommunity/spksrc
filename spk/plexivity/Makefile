@@ -13,7 +13,6 @@ WHEELS = src/requirements.txt
 MAINTAINER = cytec
 DESCRIPTION = plexivity is a simple alternative for plexWatch. It connects with your Plex Media Server and is able to notify you on activity.
 ADMIN_PORT = 6060
-RELOAD_UI = yes
 DISPLAY_NAME = plexivity
 
 HOMEPAGE   = http://raphaelmutschler.de/work/plexivity/
@@ -28,8 +27,8 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 
 POST_STRIP_TARGET = plexivity_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+# Pure Python package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

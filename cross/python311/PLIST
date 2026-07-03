@@ -1,0 +1,14 @@
+lnk:bin/2to3
+rsc:bin/2to3-3.11
+lnk:bin/idle3
+rsc:bin/idle3.11
+lnk:bin/pydoc3
+rsc:bin/pydoc3.11
+lnk:bin/python3
+bin:bin/python3.11
+rsc:etc/mime.types
+rsc:include/python3.11/pyconfig.h
+lnk:lib/libpython3.11.so
+lib:lib/libpython3.11.so.1.0
+lib:lib/libpython3.so
+rsc:lib/python3.11

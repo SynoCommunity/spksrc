@@ -1,8 +1,8 @@
 bin:bin/aserver
-lib:lib/alsa-lib/smixer/smixer-ac97.so
-lib:lib/alsa-lib/smixer/smixer-hda.so
-lib:lib/alsa-lib/smixer/smixer-sbase.so
 lnk:lib/libasound.so
 lnk:lib/libasound.so.2
 lib:lib/libasound.so.2.0.0
+lnk:lib/libatopology.so
+lnk:lib/libatopology.so.2
+lib:lib/libatopology.so.2.0.0
 rsc:share/alsa

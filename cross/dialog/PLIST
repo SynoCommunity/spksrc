@@ -1,0 +1,4 @@
+bin:bin/dialog
+lnk:lib/libdialog.so
+lib:lib/libdialog.so.1.3
+lnk:lib/libdialog.so.15.0.0

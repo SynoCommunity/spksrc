@@ -1,5 +1,5 @@
 PKG_NAME = duply
-PKG_VERS = 2.3.1
+PKG_VERS = 2.5.5
 PKG_SHORT_VERS = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tgz
 PKG_DIST_NAME = $(PKG_NAME)_$(PKG_VERS).$(PKG_EXT)
@@ -14,7 +14,7 @@ LICENSE  = GPLv2
 
 INSTALL_TARGET = duply_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: duply_install
 duply_install:

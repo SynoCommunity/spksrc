@@ -1,60 +1,69 @@
 SPK_NAME = rutorrent
-SPK_VERS = 3.10
-SPK_REV = 10
+SPK_VERS = 5.3.1
+SPK_REV = 23
 SPK_ICON = src/rutorrent.png
-DSM_UI_DIR = app
 
-# some dependents require C++11 support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PCC_ARCHS)
-# unsupported with cross/rtorrent
-UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
+# libtorrent-rakshasa requires C++14 support
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
+# SRM is not supported due lacking webstation, php and apache packages
+REQUIRED_MIN_SRM = 3.0
 
-DEPENDS = cross/busybox cross/curl cross/procps-ng cross/mediainfo cross/rtorrent cross/rutorrent cross/screen cross/unzip
-DEPENDS += cross/sox
-
-MAINTAINER = smaarn
+MAINTAINER = SynoCommunity
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
-ADMIN_URL = /rutorrent/
-RELOAD_UI = yes
-STARTABLE = yes
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Update rutorrent to 3.10<br/>2. Update rtorrent to 0.9.8<br/>3. Update openssl to 1.1<br/>4. Fix bug issue no. 4295<br/>5. Move rtorrent configuration file to web volume for direct user access"
+CHANGELOG = "1. Upgrade ruTorrent to v5.3.1. <br/>2. Upgrade rtorrent/libtorrent to v0.16.11. <br/>3. Migrate to PHP 8.4 on DSM 7.2+."
 
-HOMEPAGE   = https://github.com/Novik/ruTorrent
-LICENSE    = GPLv3
+HOMEPAGE = https://github.com/Novik/ruTorrent
+LICENSE = GPLv3
 
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
+SERVICE_WIZARD_SHARENAME = wizard_data_share
+
+SYSTEM_GROUP = http
+
+STARTABLE = yes
 SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+SERVICE_PORT = 8050
+SERVICE_PORT_TITLE = ruTorrent RPC
 
-SERVICE_SETUP        = src/service-setup.sh
-SERVICE_WIZARD_SHARE = wizard_download_dir
+ADMIN_URL = /rutorrent/
 
-SERVICE_COMMAND  = /var/packages/$(SPK_NAME)/target/bin/rtorrent-daemon
-FWPORTS          = src/$(SPK_NAME).sc
-CONF_DIR         = src/conf/
-WIZARDS_DIR      = src/wizard/
+DSM_UI_DIR = app
+DSM_UI_CONFIG = src/app/config
 
-INSTALL_DEP_SERVICES = apache-web
-START_DEP_SERVICES = apache-web
-INSTUNINST_RESTART_SERVICES = apache-web
+# pgrep commandline tool (used by _tasks plugin) see #4234
+DEPENDS += cross/procps-ng
+
+# include bin/curl from cross/curl
+DEPENDS += cross/curl
+export CURL_INCLUDE_EXECUTABLE=1
+
+# Remaining dependencies
+DEPENDS += cross/dumptorrent cross/rtorrent cross/rutorrent cross/sox cross/unzip
+
+include ../../mk/spksrc.common.mk
+
+ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
+# Default to PHP 8.4 on DSM 7.2+ (PHP 8.0 not supported)
+TC_OS_MIN_VER = 7.2-60096
+SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4:python314:mediainfo"
+CONF_DIR = src/conf_72
+else
+# Default to PHP 8.0 on DSM 7.0/7.1
+SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4:python314:mediainfo"
+OS_MAX_VER = 7.1-59999
+CONF_DIR = src/conf_7
+endif
 
 POST_STRIP_TARGET = rutorrent_extra_install
 
-BUSYBOX_CONFIG = usrmng nice procutils
-ENV += BUSYBOX_CONFIG="$(BUSYBOX_CONFIG)"
-
 include ../../mk/spksrc.spk.mk
-
-SPK_DEPENDS = "python3>=3.7.7:php5.6"
 
 .PHONY: rutorrent_extra_install
 rutorrent_extra_install:
-	install -m 755 -d $(STAGING_DIR)/bin
-	install -m 755 src/bin/rtorrent-daemon $(STAGING_DIR)/bin/rtorrent-daemon
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 644 src/.rtorrent.rc $(STAGING_DIR)/var/
-	install -m 755 -d $(STAGING_DIR)/var/.session
-	install -m 775 -d $(STAGING_DIR)/tmp
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
-	install -m 755 -d $(STAGING_DIR)/etc/php/conf.d/
-	install -m 644 src/etc/php/conf.d/com.synocommunity.rutorrent.ini $(STAGING_DIR)/etc/php/conf.d/com.synocommunity.rutorrent.ini
+	install -m 755 -d $(STAGING_DIR)/var/.session $(STAGING_DIR)/tmp
+	install -m 644 src/rtorrent.rc $(STAGING_DIR)/var/rtorrent.rc
+	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
+	install -m 644 src/requirements.txt $(STAGING_DIR)/share/wheelhouse/requirements.txt

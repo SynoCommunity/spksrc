@@ -1,0 +1,10 @@
+bin:bin/zvbi-atsc-cc
+bin:bin/zvbi-chains
+bin:bin/zvbi-ntsc-cc
+lnk:lib/libzvbi-chains.so
+lnk:lib/libzvbi-chains.so.0
+lib:lib/libzvbi-chains.so.0.0.0
+lnk:lib/libzvbi.so
+lnk:lib/libzvbi.so.0
+lib:lib/libzvbi.so.0.13.2
+bin:sbin/zvbid

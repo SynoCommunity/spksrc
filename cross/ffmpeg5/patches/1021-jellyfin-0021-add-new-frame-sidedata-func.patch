@@ -1,0 +1,131 @@
+Index: jellyfin-ffmpeg/libavutil/frame.c
+===================================================================
+--- libavutil/frame.c
++++ libavutil/frame.c
+@@ -253,6 +253,36 @@ int av_frame_get_buffer(AVFrame *frame,
+     return AVERROR(EINVAL);
+ }
+ 
++int av_frame_copy_side_data(AVFrame* dst, const AVFrame* src, int flags)
++{
++    for (unsigned i = 0; i < src->nb_side_data; i++) {
++        const AVFrameSideData *sd_src = src->side_data[i];
++        AVFrameSideData *sd_dst;
++        if (   sd_src->type == AV_FRAME_DATA_PANSCAN
++            && (src->width != dst->width || src->height != dst->height))
++            continue;
++        if (flags & AV_FRAME_COPY_PROPS_FORCECOPY) {
++            sd_dst = av_frame_new_side_data(dst, sd_src->type,
++                                            sd_src->size);
++            if (!sd_dst) {
++                wipe_side_data(dst);
++                return AVERROR(ENOMEM);
++            }
++            memcpy(sd_dst->data, sd_src->data, sd_src->size);
++        } else {
++            AVBufferRef *ref = av_buffer_ref(sd_src->buf);
++            sd_dst = av_frame_new_side_data_from_buf(dst, sd_src->type, ref);
++            if (!sd_dst) {
++                av_buffer_unref(&ref);
++                wipe_side_data(dst);
++                return AVERROR(ENOMEM);
++            }
++        }
++        av_dict_copy(&sd_dst->metadata, sd_src->metadata, 0);
++    }
++    return 0;
++}
++
+ static int frame_copy_props(AVFrame *dst, const AVFrame *src, int force_copy)
+ {
+     int ret, i;
+@@ -291,31 +321,9 @@ static int frame_copy_props(AVFrame *dst
+ 
+     av_dict_copy(&dst->metadata, src->metadata, 0);
+ 
+-    for (i = 0; i < src->nb_side_data; i++) {
+-        const AVFrameSideData *sd_src = src->side_data[i];
+-        AVFrameSideData *sd_dst;
+-        if (   sd_src->type == AV_FRAME_DATA_PANSCAN
+-            && (src->width != dst->width || src->height != dst->height))
+-            continue;
+-        if (force_copy) {
+-            sd_dst = av_frame_new_side_data(dst, sd_src->type,
+-                                            sd_src->size);
+-            if (!sd_dst) {
+-                wipe_side_data(dst);
+-                return AVERROR(ENOMEM);
+-            }
+-            memcpy(sd_dst->data, sd_src->data, sd_src->size);
+-        } else {
+-            AVBufferRef *ref = av_buffer_ref(sd_src->buf);
+-            sd_dst = av_frame_new_side_data_from_buf(dst, sd_src->type, ref);
+-            if (!sd_dst) {
+-                av_buffer_unref(&ref);
+-                wipe_side_data(dst);
+-                return AVERROR(ENOMEM);
+-            }
+-        }
+-        av_dict_copy(&sd_dst->metadata, sd_src->metadata, 0);
+-    }
++    if (ret = av_frame_copy_side_data(dst, src,
++        force_copy ? AV_FRAME_COPY_PROPS_FORCECOPY : 0) < 0)
++        return ret;
+ 
+     ret = av_buffer_replace(&dst->opaque_ref, src->opaque_ref);
+     ret |= av_buffer_replace(&dst->private_ref, src->private_ref);
+@@ -702,6 +710,17 @@ void av_frame_remove_side_data(AVFrame *
+     }
+ }
+ 
++void av_frame_remove_all_side_data(AVFrame *frame)
++{
++    int i;
++
++    for (i = frame->nb_side_data - 1; i >= 0; i--) {
++        free_side_data(&frame->side_data[i]);
++        frame->side_data[i] = frame->side_data[frame->nb_side_data - 1];
++        frame->nb_side_data--;
++    }
++}
++
+ const char *av_frame_side_data_name(enum AVFrameSideDataType type)
+ {
+     switch(type) {
+Index: jellyfin-ffmpeg/libavutil/frame.h
+===================================================================
+--- libavutil/frame.h
++++ libavutil/frame.h
+@@ -829,6 +829,21 @@ int av_frame_copy(AVFrame *dst, const AV
+  */
+ int av_frame_copy_props(AVFrame *dst, const AVFrame *src);
+ 
++/** Copy actual data buffers instead of references.
++ */
++#define AV_FRAME_COPY_PROPS_FORCECOPY  1
++
++/**
++ * Copy only side-data from src to dst.
++ *
++ * @param dst a frame to which the side data should be copied.
++ * @param src a frame from which to copy the side data.
++ * @param flags flags of type AV_FRAME_COPY_PROPS_*, controlling copy behavior.
++ *
++ * @return >= 0 on success, a negative AVERROR on error.
++ */
++int av_frame_copy_side_data(AVFrame* dst, const AVFrame* src, int flags);
++
+ /**
+  * Get the buffer reference a given data plane is stored in.
+  *
+@@ -880,6 +895,10 @@ AVFrameSideData *av_frame_get_side_data(
+  */
+ void av_frame_remove_side_data(AVFrame *frame, enum AVFrameSideDataType type);
+ 
++/**
++ * Remove and free all side data in this frame.
++ */
++void av_frame_remove_all_side_data(AVFrame *frame);
+ 
+ /**
+  * Flags for frame cropping.

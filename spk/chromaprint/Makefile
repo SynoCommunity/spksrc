@@ -1,40 +1,24 @@
 SPK_NAME = chromaprint
-SPK_VERS = 1.5.0
-SPK_REV = 15
+SPK_VERS = 1.6.0
+SPK_REV = 25
 SPK_ICON = src/chromaprint.png
 
-DEPENDS = cross/$(SPK_NAME)
+FFMPEG_PACKAGE = ffmpeg7
+DEPENDS = cross/chromaprint
+
+# ffmpeg-7 no longer support 88f6281 (armv5) and ffmpeg-7.1 hi3535 (armv7l)
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 STARTABLE = no
 
-MAINTAINER = ymartin59
+MAINTAINER = SynoCommunity
 DESCRIPTION = Chromaprint is the core component of the AcoustID project. It\'s a client-side library that implements a custom algorithm for extracting fingerprints from any audio source.
 DISPLAY_NAME = Chromaprint
-CHANGELOG = "1. Update to ffmpeg 4.3.2"
+CHANGELOG = "1. Update to FFMPEG 7.1.3"
 
 HOMEPAGE   = https://acoustid.org/chromaprint
 LICENSE    = LGPL2.1+
 
-# Reuse FFmpeg libraries
-export FFMPEG_DIR = $(shell pwd)/../ffmpeg/work-$(ARCH)-$(TCVERSION)/install/var/packages/ffmpeg/target
-
-ifneq ($(wildcard $(FFMPEG_DIR)),)
-export ADDITIONAL_LDFLAGS = -Wl,--rpath-link,$(FFMPEG_DIR)/lib -Wl,--rpath,/var/packages/ffmpeg/target/lib
-PRE_DEPEND_TARGET = chromaprint_pre_depend
-SPK_DEPENDS = "ffmpeg>4.2"
-endif
-
 SPK_COMMANDS = bin/fpcalc
 
-include ../../mk/spksrc.spk.mk
-
-.PHONY: chromaprint_pre_depend
-
-# From library detection at cmake/modules/FindFFmpeg.cmake
-FFMPEG_LIBS = libavcodec.pc
-FFMPEG_LIBS += libavformat.pc
-FFMPEG_LIBS += libavutil.pc
-
-chromaprint_pre_depend:
-	mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/
-	$(foreach lib,$(FFMPEG_LIBS),ln -sf $(FFMPEG_DIR)/lib/pkgconfig/$(lib) $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/ ;)
+include ../../mk/spksrc.spk-meta.mk

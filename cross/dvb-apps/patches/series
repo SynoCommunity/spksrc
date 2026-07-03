@@ -1,0 +1,13 @@
+uk-CrystalPalace.diff
+01_README.scan.dpatch
+02_dtv-scan-tables.patch
+09_x_zap_flush_stdout.dpatch
+15_stdint_include.dpatch
+apps_manpages.patch
+alevt.patch
+dbug606728.diff
+use-ldflags.patch
+fix-build-libpng16.patch
+dst_test-no-set-id.patch
+glibc-stime.patch
+gcc-10-sid-redefinition.patch

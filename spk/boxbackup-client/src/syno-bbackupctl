@@ -1,2 +1,0 @@
-#!/bin/sh
-/usr/local/boxbackup-client/sbin/bbackupctl -c /usr/local/boxbackup-client/var/bbackupd.conf "$@"

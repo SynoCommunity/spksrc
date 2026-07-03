@@ -1,0 +1,14 @@
+# Avoid definition of MBEDTLS_AESCE_C for aarch64 with gcc < 6 
+# to avoid #error "Minimum version of GCC for MBEDTLS_AESCE_C is 6.0."
+# 
+--- include/mbedtls/mbedtls_config.h.orig	2025-03-20 09:33:09.000000000 +0000
++++ include/mbedtls/mbedtls_config.h	2025-03-31 09:36:43.690846905 +0000
+@@ -2342,7 +2342,7 @@
+  *
+  * This module adds support for the AES Armv8-A Cryptographic Extensions on Armv8 systems.
+  */
+-#define MBEDTLS_AESCE_C
++//#define MBEDTLS_AESCE_C
+ 
+ /**
+  * \def MBEDTLS_AES_C

@@ -1,0 +1,14 @@
+# fix opng_print_fsize_ratio
+# avoid use of opng_ulratio when OPNG_LLONG_T_DEFINED is not defined
+# 
+--- src/optipng/optim.c.orig	2025-05-20 21:39:10.000000000 +0200
++++ src/optipng/optim.c	2025-10-18 15:37:26.880922145 +0200
+@@ -218,7 +218,7 @@
+ static void
+ opng_print_fsize_ratio(opng_fsize_t num, opng_fsize_t denom)
+ {
+-#if OPNG_FSIZE_MAX <= ULONG_MAX
++#ifndef OPNG_LLONG_T_DEFINED
+ #define RATIO_TYPE struct opng_ulratio
+ #define RATIO_CONV_FN opng_ulratio_to_factor_string
+ #else

@@ -1,0 +1,2 @@
+NEXTCLOUD_UPGRADE_NOTICE_STEP_TITLE: "Nextcloud upgrade"
+NEXTCLOUD_UPGRADE_NOTICE_DESCRIPTION: "During upgrade the package will download the Nextcloud server files; this archive is large and the step may take several minutes to complete."

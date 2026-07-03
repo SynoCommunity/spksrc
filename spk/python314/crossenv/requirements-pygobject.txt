@@ -1,0 +1,8 @@
+pip==24.3.1
+setuptools==78.1.0
+wheel==0.45.1
+#
+build:meson-python==0.17.1
+#
+wheelhouse:pycairo==1.28.0
+cross:build==1.2.2

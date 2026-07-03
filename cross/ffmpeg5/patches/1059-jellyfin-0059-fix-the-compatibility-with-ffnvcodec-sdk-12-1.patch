@@ -1,0 +1,147 @@
+Index: jellyfin-ffmpeg/configure
+===================================================================
+--- configure
++++ configure
+@@ -6984,7 +6984,7 @@ enabled nvenc &&
+     test_cc -I$source_path <<EOF || disable nvenc
+ #include <ffnvcodec/nvEncodeAPI.h>
+ NV_ENCODE_API_FUNCTION_LIST flist;
+-void f(void) { struct { const GUID guid; } s[] = { { NV_ENC_PRESET_HQ_GUID } }; }
++void f(void) { struct { const GUID guid; } s[] = { { NV_ENC_CODEC_H264_GUID } }; }
+ int main(void) { return 0; }
+ EOF
+ 
+Index: jellyfin-ffmpeg/libavcodec/nvenc.c
+===================================================================
+--- libavcodec/nvenc.c
++++ libavcodec/nvenc.c
+@@ -41,9 +41,14 @@
+ #define CHECK_CU(x) FF_CUDA_CHECK_DL(avctx, dl_fn->cuda_dl, x)
+ 
+ #define NVENC_CAP 0x30
++
++#ifndef NVENC_NO_DEPRECATED_RC
+ #define IS_CBR(rc) (rc == NV_ENC_PARAMS_RC_CBR ||             \
+                     rc == NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ || \
+                     rc == NV_ENC_PARAMS_RC_CBR_HQ)
++#else
++#define IS_CBR(rc) (rc == NV_ENC_PARAMS_RC_CBR)
++#endif
+ 
+ const enum AVPixelFormat ff_nvenc_pix_fmts[] = {
+     AV_PIX_FMT_YUV420P,
+@@ -877,6 +882,7 @@ static void nvenc_override_rate_control(
+     case NV_ENC_PARAMS_RC_CONSTQP:
+         set_constqp(avctx);
+         return;
++#ifndef NVENC_NO_DEPRECATED_RC
+     case NV_ENC_PARAMS_RC_VBR_MINQP:
+         if (avctx->qmin < 0) {
+             av_log(avctx, AV_LOG_WARNING,
+@@ -887,12 +893,15 @@ static void nvenc_override_rate_control(
+         }
+         /* fall through */
+     case NV_ENC_PARAMS_RC_VBR_HQ:
++#endif
+     case NV_ENC_PARAMS_RC_VBR:
+         set_vbr(avctx);
+         break;
+     case NV_ENC_PARAMS_RC_CBR:
++#ifndef NVENC_NO_DEPRECATED_RC
+     case NV_ENC_PARAMS_RC_CBR_HQ:
+     case NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ:
++#endif
+         break;
+     }
+ 
+@@ -1149,12 +1158,14 @@ static av_cold int nvenc_setup_h264_conf
+ 
+     h264->outputPictureTimingSEI = 1;
+ 
++#ifndef NVENC_NO_DEPRECATED_RC
+     if (cc->rcParams.rateControlMode == NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ ||
+         cc->rcParams.rateControlMode == NV_ENC_PARAMS_RC_CBR_HQ ||
+         cc->rcParams.rateControlMode == NV_ENC_PARAMS_RC_VBR_HQ) {
+         h264->adaptiveTransformMode = NV_ENC_H264_ADAPTIVE_TRANSFORM_ENABLE;
+         h264->fmoMode = NV_ENC_H264_FMO_DISABLE;
+     }
++#endif
+ 
+     if (ctx->flags & NVENC_LOSSLESS) {
+         h264->qpPrimeYZeroTransformBypassFlag = 1;
+Index: jellyfin-ffmpeg/libavcodec/nvenc.h
+===================================================================
+--- libavcodec/nvenc.h
++++ libavcodec/nvenc.h
+@@ -77,6 +77,11 @@ typedef void ID3D11Device;
+ #define NVENC_HAVE_SINGLE_SLICE_INTRA_REFRESH
+ #endif
+ 
++// SDK 12.1 compile time feature checks
++#if NVENCAPI_CHECK_VERSION(12, 1)
++#define NVENC_NO_DEPRECATED_RC
++#endif
++
+ typedef struct NvencSurface
+ {
+     NV_ENC_INPUT_PTR input_surface;
+Index: jellyfin-ffmpeg/libavcodec/nvenc_h264.c
+===================================================================
+--- libavcodec/nvenc_h264.c
++++ libavcodec/nvenc_h264.c
+@@ -100,6 +100,7 @@ static const AVOption options[] = {
+     { "constqp",      "Constant QP mode",                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_PARAMS_RC_CONSTQP },                   0, 0, VE, "rc" },
+     { "vbr",          "Variable bitrate mode",              0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_PARAMS_RC_VBR },                       0, 0, VE, "rc" },
+     { "cbr",          "Constant bitrate mode",              0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_PARAMS_RC_CBR },                       0, 0, VE, "rc" },
++#ifndef NVENC_NO_DEPRECATED_RC
+     { "vbr_minqp",    "Variable bitrate mode with MinQP (deprecated)", 0,         AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR_MINQP) },            0, 0, VE, "rc" },
+     { "ll_2pass_quality", "Multi-pass optimized for image quality (deprecated)",
+                                                             0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_2_PASS_QUALITY) },       0, 0, VE, "rc" },
+@@ -109,6 +110,17 @@ static const AVOption options[] = {
+     { "cbr_ld_hq",    "Constant bitrate low delay high quality mode", 0,          AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ) },      0, 0, VE, "rc" },
+     { "cbr_hq",       "Constant bitrate high quality mode", 0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR_HQ) },               0, 0, VE, "rc" },
+     { "vbr_hq",       "Variable bitrate high quality mode", 0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR_HQ) },               0, 0, VE, "rc" },
++#else
++    { "vbr_minqp",    "Variable bitrate mode with MinQP (deprecated)", 0,         AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR) },                  0, 0, VE, "rc" },
++    { "ll_2pass_quality", "Multi-pass optimized for image quality (deprecated)",
++                                                            0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR) },                  0, 0, VE, "rc" },
++    { "ll_2pass_size", "Multi-pass optimized for constant frame size (deprecated)",
++                                                            0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR) },                  0, 0, VE, "rc" },
++    { "vbr_2pass",    "Multi-pass variable bitrate mode (deprecated)", 0,         AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR) },                  0, 0, VE, "rc" },
++    { "cbr_ld_hq",    "Constant bitrate low delay high quality mode", 0,          AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR) },                  0, 0, VE, "rc" },
++    { "cbr_hq",       "Constant bitrate high quality mode", 0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR) },                  0, 0, VE, "rc" },
++    { "vbr_hq",       "Variable bitrate high quality mode", 0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR) },                  0, 0, VE, "rc" },
++#endif
+     { "rc-lookahead", "Number of frames to look ahead for rate-control",
+                                                             OFFSET(rc_lookahead), AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, INT_MAX, VE },
+     { "surfaces",     "Number of concurrent surfaces",      OFFSET(nb_surfaces),  AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, MAX_REGISTERED_FRAMES, VE },
+Index: jellyfin-ffmpeg/libavcodec/nvenc_hevc.c
+===================================================================
+--- libavcodec/nvenc_hevc.c
++++ libavcodec/nvenc_hevc.c
+@@ -89,6 +89,7 @@ static const AVOption options[] = {
+     { "constqp",      "Constant QP mode",                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_PARAMS_RC_CONSTQP },                   0, 0, VE, "rc" },
+     { "vbr",          "Variable bitrate mode",              0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_PARAMS_RC_VBR },                       0, 0, VE, "rc" },
+     { "cbr",          "Constant bitrate mode",              0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_PARAMS_RC_CBR },                       0, 0, VE, "rc" },
++#ifndef NVENC_NO_DEPRECATED_RC
+     { "vbr_minqp",    "Variable bitrate mode with MinQP (deprecated)", 0,         AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR_MINQP) },            0, 0, VE, "rc" },
+     { "ll_2pass_quality", "Multi-pass optimized for image quality (deprecated)",
+                                                             0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_2_PASS_QUALITY) },       0, 0, VE, "rc" },
+@@ -98,6 +99,17 @@ static const AVOption options[] = {
+     { "cbr_ld_hq",    "Constant bitrate low delay high quality mode", 0,          AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR_LOWDELAY_HQ) },      0, 0, VE, "rc" },
+     { "cbr_hq",       "Constant bitrate high quality mode", 0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR_HQ) },               0, 0, VE, "rc" },
+     { "vbr_hq",       "Variable bitrate high quality mode", 0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR_HQ) },               0, 0, VE, "rc" },
++#else
++    { "vbr_minqp",    "Variable bitrate mode with MinQP (deprecated)", 0,         AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR) },                  0, 0, VE, "rc" },
++    { "ll_2pass_quality", "Multi-pass optimized for image quality (deprecated)",
++                                                            0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR) },                  0, 0, VE, "rc" },
++    { "ll_2pass_size", "Multi-pass optimized for constant frame size (deprecated)",
++                                                            0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR) },                  0, 0, VE, "rc" },
++    { "vbr_2pass",    "Multi-pass variable bitrate mode (deprecated)", 0,         AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR) },                  0, 0, VE, "rc" },
++    { "cbr_ld_hq",    "Constant bitrate low delay high quality mode", 0,          AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR) },                  0, 0, VE, "rc" },
++    { "cbr_hq",       "Constant bitrate high quality mode", 0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_CBR) },                  0, 0, VE, "rc" },
++    { "vbr_hq",       "Variable bitrate high quality mode", 0,                    AV_OPT_TYPE_CONST, { .i64 = RCD(NV_ENC_PARAMS_RC_VBR) },                  0, 0, VE, "rc" },
++#endif
+     { "rc-lookahead", "Number of frames to look ahead for rate-control",
+                                                             OFFSET(rc_lookahead), AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, INT_MAX, VE },
+     { "surfaces",     "Number of concurrent surfaces",      OFFSET(nb_surfaces),  AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, MAX_REGISTERED_FRAMES, VE },

@@ -2,7 +2,9 @@ bin:bin/dirmngr
 bin:bin/dirmngr-client
 bin:bin/gpg
 bin:bin/gpg-agent
+bin:bin/gpg-card
 bin:bin/gpg-connect-agent
+bin:bin/gpg-wks-client
 bin:bin/gpg-wks-server
 bin:bin/gpgconf
 bin:bin/gpgparsemail

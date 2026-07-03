@@ -1,5 +1,0 @@
-bin:bin/pear
-bin:bin/peardev
-bin:bin/pecl
-rsc:share/pear
-rsc:data

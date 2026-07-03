@@ -1,0 +1,17 @@
+Following patches where copied over directly from the IGC source corresponding to current LLVM:
+opencl-clang-ocl-open-140/patches/clang
+
+Latest versions of the patches available by cloning the git repository
+$ git clone https://github.com/intel/opencl-clang.git
+
+Checkout the ocl-open-140 branch
+$ cd opencl-clang
+$ git checkout ocl-open-140
+Branch 'ocl-open-140' set up to track remote branch 'ocl-open-140' from 'origin'.
+Switched to a new branch 'ocl-open-140'
+
+Change to the patch directory
+$ cd patches/clang
+
+Renumber the patches:
+$ i=2001 && ls -1 *.patch | while read LINE; do echo $(printf "%04d" $i)-igc-$LINE; mv $LINE $(printf "%04d" $i)-ocl-$LINE; let i++; done

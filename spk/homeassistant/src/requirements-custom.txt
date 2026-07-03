@@ -1,0 +1,14 @@
+# Home Assistant core
+# requirements-custom.txt
+# 
+# This file is for additional python modules that will be installed on a package update.
+# 
+# For example:
+# When you manually installed a python module with pip, you can add here a line for each module 
+# like "module==version" (or "module>=version", or ...)
+# and it will be installed by the installer on the next package update.
+#
+# This is experimental and has limitations:
+# - probably your custom modules will need updated versions, so you can try to omit the version
+# - you can get unresolvable conflicts with other python modules
+# 

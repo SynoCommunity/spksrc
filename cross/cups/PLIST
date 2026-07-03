@@ -1,0 +1,8 @@
+bin:bin/ippeveprinter
+bin:bin/ipptool
+lib:lib/cups/command/ippevepcl
+lib:lib/cups/command/ippeveps
+lnk:lib/libcupsimage.so
+lib:lib/libcupsimage.so.2
+lnk:lib/libcups.so
+lib:lib/libcups.so.2

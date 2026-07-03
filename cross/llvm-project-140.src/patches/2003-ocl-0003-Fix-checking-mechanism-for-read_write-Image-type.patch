@@ -1,0 +1,34 @@
+From bb5e22800857f7dda9a2491a4f2fc7387d4205b0 Mon Sep 17 00:00:00 2001
+From: Marcin Naczk <marcin.naczk@intel.com>
+Date: Fri, 4 Nov 2022 15:45:17 +0100
+Subject: [PATCH] Fix checking mechanism for read_write Image type
+
+The commit
+https://github.com/llvm/llvm-project/commit/91a0b464a853821734db8b1c521df03f8e2e56e7
+Enabled opencl feature macro __opencl_c_read_write_images
+by default for the SPIR and SPIR-V targets
+therefore the mechanism of checking read_write image type
+should take into account if the target is SPIR or SPIR-V
+---
+ clang/lib/Sema/SemaDeclAttr.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/clang/lib/Sema/SemaDeclAttr.cpp b/clang/lib/Sema/SemaDeclAttr.cpp
+index e76e7c608e0c..2d60d2b03169 100644
+--- a/clang/lib/Sema/SemaDeclAttr.cpp
++++ b/clang/lib/Sema/SemaDeclAttr.cpp
+@@ -7823,8 +7823,9 @@ static void handleOpenCLAccessAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
+       bool ReadWriteImagesUnsupported =
+           (S.getLangOpts().getOpenCLCompatibleVersion() < 200) ||
+           (S.getLangOpts().getOpenCLCompatibleVersion() == 300 &&
+-           !S.getOpenCLOptions().isSupported("__opencl_c_read_write_images",
+-                                             S.getLangOpts()));
++           !S.getOpenCLOptions().isSupported("__opencl_c_read_write_images", S.getLangOpts()) &&
++           !S.getASTContext().getTargetInfo().getTriple().isSPIR() &&
++           !S.getASTContext().getTargetInfo().getTriple().isSPIRV());
+       if (ReadWriteImagesUnsupported || DeclTy->isPipeType()) {
+         S.Diag(AL.getLoc(), diag::err_opencl_invalid_read_write)
+             << AL << PDecl->getType() << DeclTy->isImageType();
+-- 
+2.33.0.windows.1
+

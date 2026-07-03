@@ -1,44 +1,31 @@
 [
   {
-    "step_title": "Exemple de configuration pour demoservice",
+    "step_title": "Configuration de démonstration",
     "items": [
       {
         "type": "textfield",
-        "desc": "Configuration de téléchargement",
+        "desc": "Veuillez spécifier un dossier partagé pour ce package. Ce partage est créé à l'installation lorsqu'il n'existe pas déjà.",
         "subitems": [
           {
-            "key": "wizard_download_dir",
-            "desc": "Répertoire cible",
-            "defaultValue": "/volume1/downloads",
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared Folder",
+            "defaultValue": "demo-share",
             "validator": {
               "allowBlank": false,
               "regex": {
-                "expr": "/^\\\/volume[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                "errorText": "Le chemin doit commencer par /volume?/ avec ? le numéro du volume (1-99)"
-              }
-            }
-          },
-          {
-            "key": "wizard_group",
-            "desc": "Groupe DSM",
-            "defaultValue": "sc-download",
-            "validator": {
-              "allowBlank": false,
-              "regex": {
-                "expr": "/^[^<>:*/?\"]*$/",
-                "errorText": "Caractère non autorisé dans le nom de groupe"
-              }
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Les sous-répertoires ne sont pas pris en charge."              }
             }
           }
         ]
-      }
-    ]
-  },
-  {
-    "step_title": "Attention! DSM Permissions",
-    "items": [
-      {
-         "desc": "Les autorisations sont gérées avec le groupe <b>'sc-download'</b> dans DSM.<br>Le groupe 'utilisateurs' n'est plus utilisé à partir de DSM 6.<br>L'utilisateur du paquet (= demoservice) n'apparaîtra pas sur la plupart des paramètres d'interface utilisateur. Y compris ce qui suit: <br>- Afficheur d'autorisation de privilège d'application <br>- Sélecteur d'utilisateur chroot FPT <br>- File Stations's- Changer de propriétaire <br>- Shared Links Manager -> Activer le partage sécurisé <br><br>Les seules exceptions sont: <br>- Panneau de configuration> Dossier partagé> Edition> Autorisation> Utilisateur interne du système <br>- Éditeur ACL"
+      }, {
+        "desc": ""
+      }, {
+        "desc": "Si vous laissez le programme d'installation créer le dossier partagé, il est créé sous le même volume que celui où le package est installé.<br/>Si vous souhaitez utiliser un volume différent pour le partage, vous devez auparavant créer le dossier partagé dans le panneau de configuration DSM et saisir le nom du partage existant dans le champ ci-dessus."
+      }, {
+        "desc": ""
+      }, {
+         "desc": "Ce package s'exécute en tant qu'utilisateur de service interne <b>'sc-demoservice'</b> dans DSM. Le dossier partagé ci-dessus est configuré au moment de l'installation pour être accessible par cet utilisateur.<p>Veuillez lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
       }
     ]
   }

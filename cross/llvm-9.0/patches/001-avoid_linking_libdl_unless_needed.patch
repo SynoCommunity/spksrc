@@ -1,0 +1,25 @@
+#-----------------------------------------------------
+# FAILED: libclang.so.9 undefined reference to dladdr
+#
+# This patch avoid linking libdl unless needed. Otherwise this
+# is causing linking libclang.so to fail with undefined reference
+# to dladdr due to missing -ldl
+#
+# Source: https://reviews.llvm.org/D80492
+#  Patch: https://reviews.llvm.org/rG0073c293a401774ac96b4b3d27f05e13f379f98e
+#-----------------------------------------------------
+diff -uprN ../llvm-project-9.0.1-orig/clang/tools/libclang/CMakeLists.txt ./clang/tools/libclang/CMakeLists.txt
+--- ../llvm-project-9.0.1-orig/clang/tools/libclang/CMakeLists.txt	2019-12-11 19:15:30.000000000 +0000
++++ ./clang/tools/libclang/CMakeLists.txt	2023-03-08 01:45:24.182286008 +0000
+@@ -58,9 +58,8 @@ if (TARGET clangTidyPlugin)
+   endif()
+ endif ()
+ 
+-find_library(DL_LIBRARY_PATH dl)
+-if (DL_LIBRARY_PATH)
+-  list(APPEND LIBS dl)
++if (HAVE_LIBDL)
++  list(APPEND LIBS ${CMAKE_DL_LIBS})
+ endif()
+ 
+ option(LIBCLANG_BUILD_STATIC

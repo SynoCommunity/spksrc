@@ -1,0 +1,13 @@
+# sources of official release 0.3 contain old dev version
+# 
+--- configure.ac.orig	2015-11-24 11:03:45.000000000 +0000
++++ configure.ac	2025-04-05 19:45:06.119392462 +0000
+@@ -2,7 +2,7 @@
+ # Process this file with autoconf to produce a configure script.
+ 
+ AC_PREREQ([2.64])
+-AC_INIT(gpart, 0.2.3-dev, https://github.com/baruch/gpart/issues)
++AC_INIT(gpart, 0.3, https://github.com/baruch/gpart/issues)
+ AM_INIT_AUTOMAKE([1.11])
+ AC_CONFIG_SRCDIR([src/gpart.c])
+ AC_CONFIG_HEADERS([config.h])

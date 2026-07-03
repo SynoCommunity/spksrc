@@ -1,0 +1,75 @@
+name: Package request
+description: Request for a new package
+title: "[Package Request] "
+labels: request
+body:
+  - type: input
+    id: package-name
+    attributes:
+      label: Software Name
+      description: What sould we call the package?
+      placeholder: Jellyfin
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Brief Description
+      description: Please tell us what the software is about or what it does.
+      placeholder: Jellyfin is the volunteer-built media solution that puts you in control of your media. It is an alternative to the proprietary Emby and Plex.
+    validations:
+      required: true
+  - type: input
+    id: website
+    attributes:
+      label: Website
+      description: Where can we find th homepage of the software?
+      placeholder: https://jellyfin.org/
+    validations:
+      required: true
+  - type: input
+    id: documentation
+    attributes:
+      label: Documentation
+      description: Where can we find the documentaions for the software?
+      placeholder: ex. https://docs.jellyfin.org/
+    validations:
+      required: false
+  - type: input
+    id: build-instructions
+    attributes:
+      label: Build/Installation documentation
+      description: How do we compile the Software?
+      placeholder: https://jellyfin.org/docs/general/administration/building.html
+    validations:
+      required: true
+  - type: input
+    id: source-code
+    attributes:
+      label: Source code
+      description: A link to the source code, typically a Git reposetory or tarball
+      placeholder: https://github.com/jellyfin/jellyfin
+    validations:
+      required: true
+  - type: dropdown
+    id: license
+    attributes:
+      label: OpenSource License
+      description: What is the OpenSource license of the project?
+      options:
+        - MIT
+        - BSD-2-clause
+        - GPLv2
+        - GPLv3
+        - Apache
+        - other (please specify below)
+    validations:
+      required: true
+  - type: input
+    id: license-other
+    attributes:
+      label: Other License
+      description: Other [Common licenses](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository#searching-github-by-license-type)
+      placeholder: ex. GPLv2 or a link to the licence file
+    validations:
+      required: false

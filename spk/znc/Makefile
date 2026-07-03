@@ -1,30 +1,29 @@
 SPK_NAME = znc
-SPK_VERS = 1.8.2
-SPK_REV = 17
+SPK_VERS = 1.10.1
+SPK_REV = 28
 SPK_ICON = src/znc.png
 DSM_UI_DIR = app
 
-DEPENDS = cross/$(SPK_NAME)
-SPK_DEPENDS = "python3>=3.7.7-15"
+PYTHON_PACKAGE = python312
 
-MAINTAINER = worstje
+MAINTAINER = SynoCommunity
 DESCRIPTION = Advanced IRC bouncer. An IRC bouncer is nothing more than an IRC proxy. ZNC will always be connected in your chat rooms, and will be the gateway between your clients, and your IRC servers. You can, for instance, consult messages while you were offline or hide your identity.
 DESCRIPTION_FRE = Bouncer IRC avancé. Un bouncer IRC n\’est en fait qu\’un proxy IRC. ZNC restera connecté en permanence à vos salons de discussions et fera office de passerelle entre vos clients et vos serveurs IRC. Vous pourrez, par exemple, consultez des messages diffusés en votre absence ou masquer votre identité.
 DESCRIPTION_SPN = IRC bouncer avanzado. Un IRC bouncer no es más que un proxy para IRC. ZNC estará siempre conectado a tus canales, y hará de puerta de enlace entre tus clientes y tus servidores IRC. Puedes, por ejemplo, consultar mensajes mientras estuviste desconectado o esconder tu identidad.
-RELOAD_UI = yes
 DISPLAY_NAME = ZNC
-CHANGELOG = "Update znc to v1.8.2."
+CHANGELOG = "1. Update to ZNC 1.10.1.<br/>2. Migrate to Python 3.12<br/>3. Updated version only supported on DSM7 and newer<br/>4. Enablement of i18n+boost, icu and cyrus-sasl<br/>5. Fix issue with multiple rpath<br/>6. Fix issue with libargon2 celeron CPU compatibility"
 
 STARTABLE = yes
 HOMEPAGE = https://wiki.znc.in/
 LICENSE  = Apache License 2.0
 
-# Ensure C++11 compatibility
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PCC_ARCHS)
+# Ensure C++17 compatibility
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
 
-
-WIZARDS_DIR = src/wizard/
-CONF_DIR = src/conf/
+WIZARDS_DIR = src/wizard
+CONF_DIR = src/conf
 
 # 'auto' reserved value grabs SPK_NAME
 SERVICE_USER = auto
@@ -39,13 +38,25 @@ ADMIN_PORT = ${SERVICE_PORT}
 
 POST_STRIP_TARGET = znc_extra_install
 
-include ../../mk/spksrc.spk.mk
+# Boost must be built from spk
+DEPENDS = cross/boost_1.86
+export BOOST_BUILD_PATH="$(WORK_DIR)/boost_1_86_0"
+export BOOST_LIBRARIES="locale"
+ENV += PATH=$(BOOST_BUILD_PATH):$(PATH)
+
+DEPENDS += cross/znc
+
+include ../../mk/spksrc.common.mk
+
+# Use ICU archive data packaging to avoid runtime libicudata shared library
+# loading issues observed on DSM ARMv7 systems.
+export LIBICU_DATA_PACKAGING_MODE=archive
+
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: znc_extra_install
 znc_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/var/modules
-	install -m 755 -d $(STAGING_DIR)/var/configs
+	install -m 755 -d $(STAGING_DIR)/var/modules $(STAGING_DIR)/var/configs
 	install -m 644 src/znc.conf $(STAGING_DIR)/var/configs/znc.conf
 	install -m 644 src/oidentd.conf ${STAGING_DIR}/var/configs/oidentd.conf
 	ln -sf /etc/ssl/certs $(STAGING_DIR)/certs

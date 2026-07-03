@@ -1,39 +1,60 @@
-[{
-    "step_title": "ejabberd Configuration",
-    "items": [{
-        "type": "textfield",
-        "desc": "Administrator account.",
-        "subitems": [{
-            "key": "wizard_ejabberd_admin_username",
-            "desc": "Account",
-            "defaultValue": "admin",
-            "validator": {
-                "allowBlank": false
+[
+    {
+        "step_title": "ejabberd Administrator Account",
+        "items": [
+            {
+                "desc": "ejabberd is an XMPP server for instant messaging. Configure the administrator account for the web admin interface."
+            },
+            {
+                "type": "textfield",
+                "desc": "Administrator username (without @domain)",
+                "subitems": [
+                    {
+                        "key": "wizard_ejabberd_admin_username",
+                        "desc": "Username",
+                        "defaultValue": "admin",
+                        "validator": {
+                            "allowBlank": false
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "desc": "Administrator password (minimum 4 characters)",
+                "subitems": [
+                    {
+                        "key": "wizard_ejabberd_admin_password",
+                        "desc": "Password",
+                        "validator": {
+                            "allowBlank": false,
+                            "minLength": 4
+                        }
+                    }
+                ]
             }
-        }]
-    }, {
-        "type": "password",
-        "desc": "Administrator's password. Special characters are not supported.",
-        "subitems": [{
-            "key": "wizard_ejabberd_admin_password",
-            "desc": "Password of Administrator (default is admin).",
-            "defaultValue": "admin",
-            "validator": {
-                "allowBlank": false
+        ]
+    },
+    {
+        "step_title": "ejabberd Server Domain",
+        "items": [
+            {
+                "desc": "Configure the XMPP domain for this server. Users will log in with username@domain (e.g., admin@localhost)."
+            },
+            {
+                "type": "textfield",
+                "desc": "XMPP domain",
+                "subitems": [
+                    {
+                        "key": "wizard_ejabberd_hostname",
+                        "desc": "Domain",
+                        "defaultValue": "localhost",
+                        "validator": {
+                            "allowBlank": false
+                        }
+                    }
+                ]
             }
-        }]
-    }, {
-        "type": "textfield",
-        "desc": "Served hostname.",
-        "subitems": [{
-            "key": "wizard_ejabberd_hostname",
-            "desc": "Domain",
-            "defaultValue": "localhost",
-            "validator": {
-                "allowBlank": false
-            }
-        }]
-    }, {
-        "desc": "Note: To log in, use 'account@domain' (default: admin@localhost)"
-    }]
-}]
+        ]
+    }
+]

@@ -1,0 +1,70 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2024 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+From 16e85fd401f5e433142c516b85c3f873eaee0f4f Mon Sep 17 00:00:00 2001
+From: Victor Mustya <victor.mustya@intel.com>
+Date: Tue, 16 Jan 2024 14:13:05 -0800
+Subject: [InstCombine] Only fold bitcast(fptrunc) if destination type matches
+ fptrunc result type. (#77046)
+
+It's not enough to just make sure destination type is floating point,
+because the following chain may be incorrectly optimized:
+```LLVM
+  %trunc = fptrunc float %src to bfloat
+  %cast = bitcast bfloat %trunc to half
+```
+Before the fix, the instruction sequence mentioned above used to be
+translated into single fptrunc instruction as follows:
+```LLVM
+  %trunc = fptrunc float %src to half
+```
+
+Such transformation was semantically incorrect.
+---
+ llvm/lib/IR/Instructions.cpp                |  4 ++--
+ llvm/test/Transforms/InstCombine/fptrunc.ll | 13 +++++++++++++
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/lib/IR/Instructions.cpp b/llvm/lib/IR/Instructions.cpp
+index 7798af3b19b9..b397013a21da 100644
+--- a/llvm/lib/IR/Instructions.cpp
++++ b/llvm/lib/IR/Instructions.cpp
+@@ -3018,8 +3018,8 @@ unsigned CastInst::isEliminableCastPair(
+       return 0;
+     case 4:
+       // No-op cast in second op implies firstOp as long as the DestTy
+-      // is floating point.
+-      if (DstTy->isFloatingPointTy())
++      // matches MidTy.
++      if (DstTy == MidTy)
+         return firstOp;
+       return 0;
+     case 5:
+diff --git a/llvm/test/Transforms/InstCombine/fptrunc.ll b/llvm/test/Transforms/InstCombine/fptrunc.ll
+index c04c4b5c66c4..197148690808 100644
+--- a/llvm/test/Transforms/InstCombine/fptrunc.ll
++++ b/llvm/test/Transforms/InstCombine/fptrunc.ll
+@@ -190,3 +190,16 @@ define half @ItoFtoF_u25_f32_f16(i25 %i) {
+   %r = fptrunc float %x to half
+   ret half %r
+ }
++
++; Negative test - bitcast bfloat to half is not optimized
++
++define half @fptrunc_to_bfloat_bitcast_to_half(float %src) {
++; CHECK-LABEL: @fptrunc_to_bfloat_bitcast_to_half(
++; CHECK-NEXT:    [[TRUNC:%.*]] = fptrunc float [[SRC:%.*]] to bfloat
++; CHECK-NEXT:    [[CAST:%.*]] = bitcast bfloat [[TRUNC]] to half
++; CHECK-NEXT:    ret half [[CAST]]
++;
++  %trunc = fptrunc float %src to bfloat
++  %cast = bitcast bfloat %trunc to half
++  ret half %cast
++}
+--
+2.34.1

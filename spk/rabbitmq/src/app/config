@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.rabbitmq": {
+            "title": "RabbitMQ",
+            "desc": "RabbitMQ Management",
+            "icon": "images/rabbitmq-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "15672",
+            "url": "/",
+            "allUsers": true,
+            "grantPrivilege": "local"
+        }
+    }
+}

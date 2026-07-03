@@ -1,0 +1,10 @@
+bin:bin/openssl
+lib:lib/engines-3/afalg.so
+lib:lib/engines-3/capi.so
+lib:lib/engines-3/loader_attic.so
+lib:lib/engines-3/padlock.so
+lnk:lib/libcrypto.so
+lib:lib/libcrypto.so.3
+lnk:lib/libssl.so
+lib:lib/libssl.so.3
+lib:lib/ossl-modules/legacy.so

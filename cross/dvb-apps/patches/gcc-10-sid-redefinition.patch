@@ -1,0 +1,10 @@
+--- linuxtv-dvb-apps-1.1.1+rev1500.orig/util/alevt/vbi.c
++++ linuxtv-dvb-apps-1.1.1+rev1500/util/alevt/vbi.c
+@@ -35,7 +35,6 @@ static void dvb_handler(struct vbi *vbi,
+ 
+ static u8 *rawbuf; // one common buffer for raw vbi data
+ static int rawbuf_size; // its current size
+-u_int16_t sid;
+ static char *vbi_names[]
+ 	= { "/dev/vbi", "/dev/vbi0", "/dev/video0", "/dev/dvb/adapter0/demux0",
+ 	NULL }; // default device names if none was given at the command line

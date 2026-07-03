@@ -1,0 +1,19 @@
+# HG changeset patch
+# User enevill
+# Date 1520877434 0
+#      Mon Mar 12 17:57:14 2018 +0000
+# Node ID 81265b23c488c7fd03ebaee04d1802fc0ada737e
+# Parent  ecd91135d645bed6620abbd76ce30a906b6d7d44
+8199220: Zero build broken after 8195103, 8191102 and 8189871
+Reviewed-by: dholmes, stuefe, eosterlund, glaubitz, coleenp
+
+--- a/src/hotspot/share/utilities/debug.hpp
++++ b/src/hotspot/share/utilities/debug.hpp
+@@ -185,6 +185,7 @@ void warning(const char* format, ...) AT
+ // use of an array type.
+ 
+ template<bool x> struct STATIC_ASSERT_FAILURE;
++template<> struct STATIC_ASSERT_FAILURE<false> { enum { value = 0 }; };
+ template<> struct STATIC_ASSERT_FAILURE<true> { enum { value = 1 }; };
+ 
+ #define STATIC_ASSERT(Cond) \

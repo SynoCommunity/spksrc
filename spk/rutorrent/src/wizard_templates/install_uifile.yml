@@ -1,0 +1,10 @@
+BASIC_CONFIGURATION_TITLE: "ruTorrent configuration"
+
+DOWNLOAD_SHARE_DESC: "Shared folder for downloads. This folder will be created if it does not exist. To use a specific volume, create the share before installation."
+DOWNLOAD_SHARE_LABEL: "Shared folder"
+DOWNLOAD_SHARE_VALIDATION_ERROR: "Subdirectories are not supported."
+
+WATCH_DIR_DESC: "Optional: Watch a directory for torrent files and add them automatically. The path is relative to the downloads folder. Leave empty to disable."
+WATCH_DIR_LABEL: "Watch directory"
+
+DSM_PERMISSIONS_TEXT: "ruTorrent runs as internal service user <b>sc-rutorrent</b> in DSM. The downloads folder is configured at installation to be accessible by this user. Please read <a target=\\\"_blank\\\" href=\\\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\\\">Permission Management</a> for details."

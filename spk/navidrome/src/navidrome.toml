@@ -1,0 +1,169 @@
+# For all available configuration options see:
+# https://www.navidrome.org/docs/usage/configuration-options/#available-options
+# For security considerations see:
+# https://www.navidrome.org/docs/usage/security/
+#
+# Note: Since v0.58.0, Navidrome supports multiple music libraries.
+# Additional libraries can be configured through the web UI.
+
+# Folder where your music library is stored. Can be read-only
+MusicFolder = "@@wizard_music_folder@@"
+
+# Folder to store application data (DB, cache...)
+DataFolder = "/var/packages/navidrome/var"
+
+# Optional: Folder for cache files (transcoding, images). Defaults to DataFolder/cache
+# CacheFolder = ""
+
+# Database connection string. Default uses SQLite in DataFolder.
+# For PostgreSQL: "host=localhost port=5432 user=navidrome password=secret dbname=navidrome"
+# DbPath = ""
+
+# Configure periodic scans using "cron" syntax. To disable it altogether, set it to "0"
+# ScanSchedule = "@every 1m"
+
+# Log level. Useful for troubleshooting. Possible values: error, warn, info, debug, trace
+# LogLevel = "info"
+
+# Whether or not sensitive information (like tokens and passwords) should be redacted (hidden) in the logs
+# EnableLogRedacting = true
+
+# IP address the server will bind to
+# Address = 0.0.0.0
+
+# Enables transcoding configuration in the UI
+# EnableTranscodingConfig = false
+
+# Size of transcoding cache. Set to "0" to disable cache
+# TranscodingCacheSize = "100MB"
+
+# Size of image (art work) cache. Set to "0" to disable cache
+# ImageCacheSize = "100MB"
+
+# Enable/disable .m3u playlist auto-import
+# AutoImportPlaylists = true
+
+# Where to search for and import playlists from. Can be a list of folders/globs (separated by :). Paths are relative to MusicFolder
+# PlaylistsPath = ".:**/**"
+
+# Base URL (only the path part) to configure Navidrome behind a proxy (ex: /music)
+# BaseUrl = ""
+
+# Change background image used in the Login page
+# UILoginBackgroundUrl = "random music image from Unsplash.com"
+
+# Add a welcome message to the login screen
+# UIWelcomeMessage = ""
+
+# Sets the default theme used by the UI when logging in from a new browser
+# DefaultTheme = "Dark"
+
+# Controls whether the player in the UI will animate the album cover (rotation)
+# EnableCoverAnimation = true
+
+# List of ignored articles when sorting/indexing artists
+# IgnoredArticles = "The El La Los Las Le Les Os As O A Der Die Das"
+
+# Match query strings anywhere in searchable fields, not only in word boundaries
+# SearchFullString = false
+
+# Uses music files' modification time when sorting by "Recently Added". Otherwise use import time
+# RecentlyAddedByModTime = false
+
+# Configure the order to look for cover art images. Use special embedded value to get embedded images from the audio files
+# CoverArtPriority = "embedded, cover.*, folder.*, front.*"
+
+# Set JPEG quality percentage for resized cover art images
+# CoverJpegQuality = 75
+
+# Enable the option in the UI to download music/albums/artists/playlists from the server
+# EnableDownloads = true
+
+# How long Navidrome will wait before closing web ui idle sessions
+# SessionTimeout = "24h"
+
+# How many login requests can be processed from a single IP during the AuthWindowLength
+# AuthRequestLimit = 5
+
+# Window Length for the authentication rate limit
+# AuthWindowLength = "20s"
+
+#
+# Scanner options
+#
+
+# Select metadata extractor implementation. Options: taglib or ffmpeg
+# Scanner.Extractor = "taglib"
+
+# Whether to follow symlinks when scanning directories
+# Scanner.FollowSymlinks = false
+
+# Purge missing files from database. Values: "never", "always", "full"
+# Scanner.PurgeMissing = "never"
+
+#
+# Backup options (new in v0.59.0)
+#
+
+# Number of backups to keep
+# Backup.Count = 5
+
+# Path to store backups. Defaults to DataFolder
+# Backup.Path = ""
+
+# Backup schedule using cron syntax. Default: daily at 4am
+# Backup.Schedule = "0 4 * * *"
+
+#
+# External services
+#
+
+# Set this to false to completely disable ALL external integrations
+# EnableExternalServices = true
+
+# Last.fm integration
+# LastFM.Enabled = true
+# LastFM.ApiKey = "Navidrome project's shared ApiKey"
+# LastFM.Secret = "Navidrome project's shared Secret"
+# LastFM.Language = "en"
+
+# Spotify integration (for artist images)
+# Spotify.ID = ""
+# Spotify.Secret = ""
+
+# Deezer integration (for artist images, new in v0.60.0)
+# Deezer.Enabled = true
+# Deezer.Language = "en"
+
+# ListenBrainz integration
+# ListenBrainz.Enabled = true
+
+#
+# User interface options
+#
+
+# Use Gravatar images as the user profile image
+# EnableGravatar = false
+
+# Enable toggling "Heart"/"Loved" for songs/albums/artists in the UI
+# EnableFavourites = true
+
+# Enable 5-star ratings in the UI
+# EnableStarRating = true
+
+# Enable regular users to edit their details and change their password
+# EnableUserEditing = true
+
+#
+# Security options
+#
+
+# Passphrase used to encrypt passwords in the DB
+# For details see: https://www.navidrome.org/docs/usage/security/#encrypted-passwords
+# PasswordEncryptionKey = "-"
+
+# HTTP header containing user name from authenticated proxy
+# ReverseProxyUserHeader = "Remote-User"
+
+# Comma separated list of IP CIDRs which are allowed to use reverse proxy authentication
+# ReverseProxyWhitelist = ""

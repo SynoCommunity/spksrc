@@ -1,0 +1,70 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2023 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+From 6d6c78dd486c0ed1995bab48ac8cd7ecf1d926b8 Mon Sep 17 00:00:00 2001
+From: Benjamin Kramer <benny.kra@googlemail.com>
+Date: Mon, 13 Jun 2022 14:31:43 +0200
+Subject: [InstCombine] Only fold trunc(ext) pairs to bitcast if the source and
+ destination types are the same
+
+This used to be always the case, but the addition of bfloat to the type
+matrix makes this invalid.
+---
+ llvm/lib/IR/Instructions.cpp                 | 10 ++++++----
+ llvm/test/Transforms/InstCombine/fpextend.ll | 11 +++++++++++
+ 2 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/llvm/lib/IR/Instructions.cpp b/llvm/lib/IR/Instructions.cpp
+index 7798af3b19b9..2f68807bb8bc 100644
+--- a/llvm/lib/IR/Instructions.cpp
++++ b/llvm/lib/IR/Instructions.cpp
+@@ -3060,16 +3060,18 @@ unsigned CastInst::isEliminableCastPair(
+       return 0;
+     }
+     case 8: {
+-      // ext, trunc -> bitcast,    if the SrcTy and DstTy are same size
++      // ext, trunc -> bitcast,    if the SrcTy and DstTy are the same
+       // ext, trunc -> ext,        if sizeof(SrcTy) < sizeof(DstTy)
+       // ext, trunc -> trunc,      if sizeof(SrcTy) > sizeof(DstTy)
+       unsigned SrcSize = SrcTy->getScalarSizeInBits();
+       unsigned DstSize = DstTy->getScalarSizeInBits();
+-      if (SrcSize == DstSize)
++      if (SrcTy == DstTy)
+         return Instruction::BitCast;
+-      else if (SrcSize < DstSize)
++      if (SrcSize < DstSize)
+         return firstOp;
+-      return secondOp;
++      if (SrcSize > DstSize)
++        return secondOp;
++      return 0;
+     }
+     case 9:
+       // zext, sext -> zext, because sext can't sign extend after zext
+diff --git a/llvm/test/Transforms/InstCombine/fpextend.ll b/llvm/test/Transforms/InstCombine/fpextend.ll
+index 9fe85e983fb7..6b8fe928ff8a 100644
+--- a/llvm/test/Transforms/InstCombine/fpextend.ll
++++ b/llvm/test/Transforms/InstCombine/fpextend.ll
+@@ -429,3 +429,14 @@ define double @FtoItoFtoF_f32_su32_f32_f64(float %f) {
+   %r = fpext float %x to double
+   ret double %r
+ }
++
++define half @bf16_to_f32_to_f16(bfloat %a) nounwind {
++; CHECK-LABEL: @bf16_to_f32_to_f16(
++; CHECK-NEXT:    [[Y:%.*]] = fpext bfloat [[A:%.*]] to float
++; CHECK-NEXT:    [[Z:%.*]] = fptrunc float [[Y]] to half
++; CHECK-NEXT:    ret half [[Z]]
++;
++  %y = fpext bfloat %a to float
++  %z = fptrunc float %y to half
++  ret half %z
++}
+-- 
+2.34.1
+

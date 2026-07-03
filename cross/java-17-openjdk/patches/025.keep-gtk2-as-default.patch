@@ -1,0 +1,55 @@
+Description: Revert upstream default to GTK2
+ OpenJDK 11 uses GTK3 by default for the GTK Look and Feel but it still
+ has too many pending issues and artifacts and is not on par with GTK2
+ support. This patch is the reverse of the upstream commit which ensures
+ that GTK2 is tried before GTK3.
+
+ When GTK3 becomes better supported we should drop this and update the
+ dlopen_jre_depends variable in debian/rules accordingly.
+Origin: upstream, http://hg.openjdk.java.net/jdk-updates/jdk11u/rev/3e3696a308e1
+Bug: https://bugs.openjdk.java.net/browse/JDK-8198649, 
+     https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8198654
+Bug-Ubuntu: https://launchpad.net/bugs/1770278
+Forwarded: not-needed
+Applied-Upstream: http//hg.openjdk.java.net/jdk-updates/jdk11u/rev/3e3696a308e1
+Reviewed-by: <name and email of a reviewer, optional>
+Last-Update: 2019-03-27 <YYYY-MM-DD, last update of the meta-information, optional>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+
+# HG changeset patch
+# User prr
+# Date 1521484190 25200
+# Node ID 3e3696a308e1674a1056d5ff0d660e7fb0d08286
+# Parent  79f6a4dc221e6290723e773813969de422733545
+8198649: Switch AWT/Swing's default GTK version to 3
+Reviewed-by: psadhukhan, kaddepalli
+
+--- a/src/java.desktop/unix/native/libawt_xawt/awt/gtk_interface.c
++++ b/src/java.desktop/unix/native/libawt_xawt/awt/gtk_interface.c
+@@ -50,18 +50,18 @@ typedef struct {
+ 
+ static GtkLib gtk_libs[] = {
+     {
+-        GTK_3,
+-        JNI_LIB_NAME("gtk-3"),
+-        VERSIONED_JNI_LIB_NAME("gtk-3", "0"),
+-        &gtk3_load,
+-        &gtk3_check
+-    },
+-    {
+         GTK_2,
+         JNI_LIB_NAME("gtk-x11-2.0"),
+         VERSIONED_JNI_LIB_NAME("gtk-x11-2.0", "0"),
+         &gtk2_load,
+         &gtk2_check
++    },
++    {
++        GTK_3,
++        JNI_LIB_NAME("gtk-3"),
++        VERSIONED_JNI_LIB_NAME("gtk-3", "0"),
++        &gtk3_load,
++        &gtk3_check
+     }
+ };
+ 

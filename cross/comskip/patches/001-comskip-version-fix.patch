@@ -1,0 +1,11 @@
+--- comskip.h-orig	2025-01-25 15:00:27.000000000 +0000
++++ comskip.h	2025-04-06 11:51:42.101617176 +0000
+@@ -2,7 +2,7 @@
+ #define COMSKIP
+ #endif
+ #ifdef _WIN32
+-#define PACKAGE_STRING " Comskip 0.82.011"
++#define PACKAGE_STRING " Comskip 0.83"
+ #endif
+ #define _UNICODE
+ 

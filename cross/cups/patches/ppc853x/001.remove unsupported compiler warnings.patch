@@ -1,0 +1,13 @@
+# remove unsupported compiler warnings
+# 
+--- cups-2.3.3/config-scripts/cups-compiler.orig.m4	2020-04-27 18:04:29.000000000 +0000
++++ cups-2.3.3/config-scripts/cups-compiler.m4	2021-08-20 22:09:30.464237499 +0000
+@@ -169,7 +169,7 @@
+ 	fi
+ 
+ 	# Add useful warning options for tracking down problems...
+-	WARNING_OPTIONS="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion"
++	WARNING_OPTIONS="-Wall -Wno-format-y2k -Wunused -Wsign-conversion"
+ 
+ 	# Test GCC version for certain warning flags since -Werror
+ 	# doesn't trigger...

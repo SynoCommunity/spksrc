@@ -1,19 +1,29 @@
-[{
-    "step_title": "Emplacement des fichiers PS3",
-    "items": [{
-        "type": "textfield",
-        "desc": "Chemin vers le répertoire contenant les fichiers PS3. Par défaut: /volume1/PS3",
-        "subitems": [{
-            "key": "wizard_dir",
-            "desc": "Emplacement des fichiers",
-            "defaultValue": "/volume1/PS3",
-            "validator": {
-                "allowBlank": false,
-                "regex": {
-                    "expr": "/^\\\/volume\\w*[0-9]{1,2}\\\/[^<>: */?\"]*/",
-                    "errorText": "Le chemin doit commencer par /volume?/ ou /volumeUSB?/ avec ? le numéro du volume (1-99)."
+[
+    {
+        "step_title": "Emplacement des fichiers PS3",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Veuillez spécifier un dossier partagé pour ce paquet.",
+                "subitems": [
+                    {
+                        "key": "wizard_shared_folder_name",
+                        "desc": "Shared Folder",
+                        "defaultValue": "PS3",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[\\w _-]+$/",
+                                "errorText": "Les sous-répertoires ne sont pas pris en charge."              
+                            }
+                        }
+                    }
+                ]
+                }, {
+                    "desc": "Si vous laissez le programme d'installation créer le dossier partagé, il est créé sous le même volume que celui où le paquet est installé. Si vous souhaitez utiliser un volume différent pour le partage, vous devez créer le dossier partagé dans le panneau de configuration DSM avant, et saisir le nom du partage existant dans le champ ci-dessus."
+                }, {
+                    "desc": ""
                 }
-            }
-        }]
-    }]
-}]
+        ]
+    }
+]

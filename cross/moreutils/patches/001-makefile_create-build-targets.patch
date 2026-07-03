@@ -1,0 +1,38 @@
+# create build targets for each tool
+# 
+
+--- Makefile.orig	2021-12-21 19:39:00.000000000 +0000
++++ Makefile	2022-11-19 19:37:50.240222872 +0000
+@@ -23,6 +23,32 @@
+ 	$(MAKE) -C is_utf8/
+ 	cp is_utf8/isutf8 .
+ 
++
++ifdata:
++	$(CC) $(CFLAGS) -o ifdata ifdata.c $(LDFLAGS)
++
++ifne:
++	$(CC) $(CFLAGS) -o ifne ifne.c $(LDFLAGS)
++
++pee:
++	$(CC) $(CFLAGS) -o pee pee.c $(LDFLAGS)
++
++sponge:
++	$(CC) $(CFLAGS) -o sponge sponge.c $(LDFLAGS)
++
++mispipe:
++	$(CC) $(CFLAGS) -o mispipe mispipe.c $(LDFLAGS)
++
++lckdo:
++	$(CC) $(CFLAGS) -o lckdo lckdo.c $(LDFLAGS)
++
++parallel:
++	$(CC) $(CFLAGS) -o parallel parallel.c $(LDFLAGS)
++
++errno: errno.o
++	$(CC) $(CFLAGS) -o errno errno.o $(LDFLAGS)
++
++
+ install:
+ 	mkdir -p $(DESTDIR)$(PREFIX)/bin
+ 	$(INSTALL_BIN) $(BINS) $(DESTDIR)$(PREFIX)/bin

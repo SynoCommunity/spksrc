@@ -1,0 +1,22 @@
+# DP: fixes an uninitialized memory issue in adlc
+--- a/src/hotspot/share/adlc/formsopt.cpp
++++ b/src/hotspot/share/adlc/formsopt.cpp
+@@ -436,6 +436,10 @@
+ //==============================Frame Handling=================================
+ //------------------------------FrameForm--------------------------------------
+ FrameForm::FrameForm() {
++  _sync_stack_slots = NULL;
++  _inline_cache_reg = NULL;
++  _interpreter_frame_pointer_reg = NULL;
++  _cisc_spilling_operand_name = NULL;
+   _frame_pointer = NULL;
+   _c_frame_pointer = NULL;
+   _alignment = NULL;
+@@ -444,7 +448,6 @@
+   _varargs_C_out_slots_killed = NULL;
+   _return_value = NULL;
+   _c_return_value = NULL;
+-  _interpreter_frame_pointer_reg = NULL;
+ }
+ 
+ FrameForm::~FrameForm() {

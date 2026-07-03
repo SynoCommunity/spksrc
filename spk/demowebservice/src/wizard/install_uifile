@@ -1,0 +1,45 @@
+[
+  {
+    "step_title": "Demo Web Service Configuration",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Please specify a shared folder for this package. This share is created at installation when it does not already exist.",
+        "subitems": [
+          {
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared Folder",
+            "defaultValue": "demo-share",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[\\w _-]+$/",
+                "errorText": "Subdirectories are not supported."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "desc": ""
+      },
+      {
+        "desc": "This package runs as internal service user <b>'sc-demowebservice'</b> in DSM. The shared folder above is configured at installation time to be accessible by this user.<p>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      }
+    ]
+  },
+  {
+    "step_title": "Miscellaneous Remarks",
+    "items": [
+      {
+        "desc": "<b>On DSM 6</b><br/>In <b>Web Station</b> you can use any web server (apache or nginx) and you must configure a PHP profile for this demo to work."
+      },
+      {
+        "desc": "<b>On DSM 7</b><br/>This demowebservice will be accessible by path (http://&lt;local ip&gt;/demowebservice) or by port (http://&lt;local ip&gt;:8889) on your diskstation.<p>The port based \"Web Portal\" allows reverse proxy configuration for this demo. Alas configuration of a reverse proxy does not work by the package installer and you would have to manually create a reverse proxy for http://localhost:8889."
+      },
+      {
+        "desc": "<b>PHP open_basedir</b><br/>If this demowebservice can not display the content of the shared folder, you might have configured a non empty <b><tt>open_basedir</tt></b> in the PHP profile. To solve this, you must add the path of the shared folder. On DSM 7 a specific PHP profile with an empty open_basedir is installed, but on other systems you might face this restriction depending on the PHP profile used."
+      }
+    ]
+  }
+]

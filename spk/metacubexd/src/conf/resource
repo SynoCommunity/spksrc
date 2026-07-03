@@ -1,0 +1,32 @@
+{
+	"webservice": {
+		"services": [
+			{
+				"service": "metacubexd",
+				"display_name": "MetaCubeXD",
+				"icon": "app/images/metacubexd-{0}.png",
+				"type": "static",
+				"root": "metacubexd"
+			}
+		],
+		"portals": [
+			{
+				"service": "metacubexd",
+				"name": "metacubexd",
+				"display_name":"MetaCubeXD",
+				"type": "alias",
+				"alias": "metacubexd",
+				"app": "com.synocommunity.packages.metacubexd"
+			}
+		],
+		"pkg_dir_prepare": [
+			{
+				"source": "/var/packages/metacubexd/target/web",
+				"target": "metacubexd",
+				"mode": "0755",
+				"group": "http",
+				"user": "sc-metacubexd"
+			}
+		]
+	}
+}

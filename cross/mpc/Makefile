@@ -1,19 +1,17 @@
 PKG_NAME = mpc
-PKG_VERS = 1.1.0
+PKG_VERS = 0.35
 PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.gnu.org/gnu/mpc
+PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://github.com/MusicPlayerDaemon/mpc/archive
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/gmp cross/mpfr
+DEPENDS = cross/libmpdclient cross/libiconv
 
-HOMEPAGE = http://www.multiprecision.org/mpc/home.html
-COMMENT  = C library for the arithmetic of complex numbers with arbitrarily high precision and correct rounding of the result.
-LICENSE  = LGPLv3
+HOMEPAGE = https://www.musicpd.org/clients/mpc/
+COMMENT  = Command-line client for MPD
+LICENSE  = GPLv2
 
-GNU_CONFIGURE = 1
+ADDITIONAL_LDFLAGS = -liconv
 
-CONFIGURE_ARGS = --with-gmp=$(STAGING_INSTALL_PREFIX)
-CONFIGURE_ARGS += --with-mpfr=$(STAGING_INSTALL_PREFIX)
-
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-meson.mk

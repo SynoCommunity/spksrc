@@ -8,12 +8,21 @@
             "desc": "Allowed networks",
             "defaultValue": "192.168.0.0/16 172.16.0.0/12 10.0.0.0/8",
             "validator": {
-                "allowBlank": false,
-                "regex": {
-                    "expr": "/^[0-9 \\.\\\/]*$/",
-                    "errorText": "invalid network definition"
-                }
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[0-9 \\.\\\/]*$/",
+                "errorText": "invalid network definition"
+              }
             }
-        }]
-    }]
-}]
+          }
+        ]
+      }
+    ]
+  }, {
+    "step_title": "PHP Extensions",
+    "items": [{
+        "desc": "On DSM &lt; 7 ensure you have activated the following PHP extensions in the default PHP profile:<br/>mysqli, pgsql, pdo_mysql, pdo_pgsql, pdo_dblib, pdo_sqlite."
+      }
+    ]
+  }
+]

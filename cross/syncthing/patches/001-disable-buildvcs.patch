@@ -1,0 +1,14 @@
+# disable VCS stamping 
+# - due to nested repos it is not possible to embed vcs info with github build action
+# 
+--- syncthing/build.go.orig	2026-04-07 09:54:21
++++ syncthing/build.go	2026-05-09 06:24:34
+@@ -540,6 +540,8 @@
+ 		// https://github.com/go-delve/delve/issues/79
+ 		args = append(args, "-gcflags", "all=-N -l")
+ 	}
++
++	args = append(args, "-buildvcs=false")
+ 
+ 	return append(args, pkgs...)
+ }

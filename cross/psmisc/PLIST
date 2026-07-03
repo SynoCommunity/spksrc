@@ -1,0 +1,5 @@
+bin:bin/fuser
+bin:bin/peekfd
+bin:bin/prtstat
+bin:bin/pslog
+bin:bin/pstree

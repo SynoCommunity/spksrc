@@ -1,0 +1,31 @@
+# search for ncursesw and link with libncursesw instead of ncurses
+# 
+--- configure.orig	2023-07-25 15:30:09.000000000 +0000
++++ configure	2023-10-03 18:25:31.772342129 +0000
+@@ -7923,14 +7923,14 @@
+ 
+ 				  if test $support_curses -eq 0; then
+ 
+-				     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for initscr in -lncurses" >&5
+-printf %s "checking for initscr in -lncurses... " >&6; }
++				     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for initscr in -lncursesw" >&5
++printf %s "checking for initscr in -lncursesw... " >&6; }
+ if test ${ac_cv_lib_ncurses_initscr+y}
+ then :
+   printf %s "(cached) " >&6
+ else $as_nop
+   ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lncurses  $LIBS"
++LIBS="-lncursesw  $LIBS"
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
+@@ -7961,7 +7961,7 @@
+ then :
+ 
+ 						  support_curses=1
+-						  curseslib="ncurses"
++						  curseslib="ncursesw"
+ 
+ else $as_nop
+    support_curses=0

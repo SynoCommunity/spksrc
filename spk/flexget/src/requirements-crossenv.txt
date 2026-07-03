@@ -1,0 +1,12 @@
+# Generated using the requirements script on May 26, 2026
+# Command: ./generate_requirements.sh "flexget[deluge,qbittorrent,transmission,telegram]" 314
+
+brotli==1.2.0
+charset_normalizer==3.4.7
+#greenlet==3.5.1                    ==> supported version depends on gcc version
+markupsafe==3.0.3
+#pendulum==3.2.0                    ==> python/pendulum
+psutil==7.2.2
+pyyaml==6.0.3
+#rpds_py==0.30.0                    ==> supported version depends on rust version
+sqlalchemy==2.0.50

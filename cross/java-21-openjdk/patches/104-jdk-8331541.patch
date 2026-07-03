@@ -1,0 +1,34 @@
+https://sources.debian.org/src/openjdk-21/21.0.5+11-1/debian/patches/jdk-8331541.patch
+
+Description: 8331541: [i386] linking with libjvm.so fails after JDK-8283326
+ i386 declaration of _SafeFetch32_impl contains an underscore
+ that causes an undefined symbol in libjvm.so.
+ Disable -Wl,--allow-shlib-undefined link flag that allowed the
+ build to succeed.
+Author: Vladimir Petko <vladimir.petko@canonical.com>
+Origin: https://github.com/openjdk/jdk/pull/19048
+Bug: https://bugs.openjdk.org/browse/JDK-8331541
+Applied-Upstream: commit:2d622152b07bba0aba8fd5b1e24293e28d6e69f5
+Last-Update: 2024-05-02
+
+--- a/make/autoconf/flags-ldflags.m4
++++ b/make/autoconf/flags-ldflags.m4
+@@ -133,7 +133,6 @@ AC_DEFUN([FLAGS_SETUP_LDFLAGS_HELPER],
+ 
+   # Setup LDFLAGS for linking executables
+   if test "x$TOOLCHAIN_TYPE" = xgcc; then
+-    EXECUTABLE_LDFLAGS="$EXECUTABLE_LDFLAGS -Wl,--allow-shlib-undefined"
+     # Enabling pie on 32 bit builds prevents the JVM from allocating a continuous
+     # java heap.
+     if test "x$OPENJDK_TARGET_CPU_BITS" != "x32"; then
+--- a/src/hotspot/os_cpu/linux_x86/safefetch_linux_x86_32.S
++++ b/src/hotspot/os_cpu/linux_x86/safefetch_linux_x86_32.S
+@@ -32,7 +32,7 @@
+     #  8(%esp) : default value
+     #  4(%esp) : crash address
+     #  0(%esp) : return pc
+-    .type _SafeFetch32_impl,@function
++    .type SafeFetch32_impl,@function
+ SafeFetch32_impl:
+     movl 4(%esp),%ecx         # load address from stack
+ _SafeFetch32_fault:

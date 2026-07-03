@@ -1,28 +1,26 @@
 PKG_NAME = jellyfin-web
-PKG_VERS = 10.7.2
+PKG_VERS = 10.11.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jellyfin/jellyfin-web/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
+BUILD_DEPENDS = native/nodejs_22
+
 HOMEPAGE = https://jellyfin.org
-COMMENT  = Jellyfin Web is the frontend used for most of the clients available for end users
+COMMENT  = Jellyfin Web is the frontend used for most of the clients available for end users.
 LICENSE  = GPLv2
 
-.PHONY: jellyfin_compile_target
-BUILD_DEPENDS = native/nodejs
+INSTALL_TARGET = jellyfin_install
 
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = jellyfin_compile_target
-INSTALL_TARGET = nop
-
-include ../../mk/spksrc.cross-dotnet.mk
+include ../../mk/spksrc.cross-install.mk
 
 ENV += NPM_CONFIG_USER=root
-PATH := $(WORK_DIR)/../../../native/nodejs/work-native/node/bin:$(PATH)
+PATH := $(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(PATH)
 
-jellyfin_compile_target:
-	install -m 755 -d $(STAGING_INSTALL_PREFIX)/web
+.PHONY: jellyfin_install
+jellyfin_install:
 	$(RUN) npm install && npm run build:production
-	cp -R $(WORK_DIR)/$(PKG_NAME)-$(PKG_VERS)/dist/* $(STAGING_INSTALL_PREFIX)/web
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/web
+	cp -R $(WORK_DIR)/$(PKG_DIR)/dist/* $(STAGING_INSTALL_PREFIX)/web/

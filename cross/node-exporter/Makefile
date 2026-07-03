@@ -1,24 +1,28 @@
 PKG_NAME = node_exporter
-PKG_VERS = 0.18.1
+PKG_VERS = 1.10.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/prometheus/node_exporter/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = native/go
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
+include ../../mk/spksrc.common.mk
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+BUILD_DEPENDS = native/go_1.23
+NATIVE_GO = native/go_1.23
+else
+BUILD_DEPENDS = native/go
+NATIVE_GO = native/go
+endif
 
 HOMEPAGE = https://github.com/prometheus/node_exporter
-COMMENT  = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels
-LICENSE  = Apache License 2.0
+COMMENT  = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.
+LICENSE  = Apache 2.0
 
-COMPILE_TARGET = node_exporter_compile
+COMPILE_MAKE_OPTIONS += build
 
 CGO_ENABLED = 1
 GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)
 
 include ../../mk/spksrc.cross-go.mk
-
-
-node_exporter_compile:
-	$(RUN) make build

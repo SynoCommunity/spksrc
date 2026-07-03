@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<typemap>
+
+  <type
+     format="ttf"
+     name="DejaVuSansMonoBOb"
+     fullname="DejaVu Sans Mono Bold Oblique"
+     family="DejaVu Sans Mono"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSansMono-BoldOblique.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansMonoB"
+     fullname="DejaVu Sans Mono Bold"
+     family="DejaVu Sans Mono"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSansMono-Bold.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansB"
+     fullname="DejaVu Sans Bold"
+     family="DejaVu Sans"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSans-Bold.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansCOb"
+     fullname="DejaVu Sans Condensed Oblique"
+     family="DejaVu Sans Condensed"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSansCondensed-Oblique.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuMathTeXGyre"
+     fullname="DejaVuMathTeXGyre-Regular"
+     family="DejaVu Math TeX Gyre"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuMathTeXGyre.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSerifI"
+     fullname="DejaVu Serif Italic"
+     family="DejaVu Serif"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSerif-Italic.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansC"
+     fullname="DejaVu Sans Condensed"
+     family="DejaVu Sans Condensed"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSansCondensed.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSans"
+     fullname="DejaVu Sans"
+     family="DejaVu Sans"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSans.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSerifCB"
+     fullname="DejaVu Serif Condensed Bold"
+     family="DejaVu Serif Condensed"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSerifCondensed-Bold.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSerifB"
+     fullname="DejaVu Serif Bold"
+     family="DejaVu Serif"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSerif-Bold.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSerifCI"
+     fullname="DejaVu Serif Condensed Italic"
+     family="DejaVu Serif Condensed"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSerifCondensed-Italic.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSerif"
+     fullname="DejaVu Serif"
+     family="DejaVu Serif"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSerif.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSerifC"
+     fullname="DejaVu Serif Condensed"
+     family="DejaVu Serif Condensed"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSerifCondensed.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansOb"
+     fullname="DejaVu Sans Oblique"
+     family="DejaVu Sans"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSans-Oblique.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansBOb"
+     fullname="DejaVu Sans Bold Oblique"
+     family="DejaVu Sans"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSans-BoldOblique.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansMonoOb"
+     fullname="DejaVu Sans Mono Oblique"
+     family="DejaVu Sans Mono"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSansMono-Oblique.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansMono"
+     fullname="DejaVu Sans Mono"
+     family="DejaVu Sans Mono"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSansMono.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansCBOb"
+     fullname="DejaVu Sans Condensed Bold Oblique"
+     family="DejaVu Sans Condensed"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSansCondensed-BoldOblique.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansExtraLight"
+     fullname="DejaVu Sans ExtraLight"
+     family="DejaVu Sans Light"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSans-ExtraLight.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSerifCBI"
+     fullname="DejaVu Serif Condensed Bold Italic"
+     family="DejaVu Serif Condensed"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSerifCondensed-BoldItalic.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSerifBI"
+     fullname="DejaVu Serif Bold Italic"
+     family="DejaVu Serif"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSerif-BoldItalic.ttf"
+     />
+
+  <type
+     format="ttf"
+     name="DejaVuSansCB"
+     fullname="DejaVu Sans Condensed Bold"
+     family="DejaVu Sans Condensed"
+     glyphs="/var/packages/imagemagick/target/share/dejavu/fonts/DejaVuSansCondensed-Bold.ttf"
+     />
+
+</typemap>

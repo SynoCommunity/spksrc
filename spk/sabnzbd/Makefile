@@ -1,15 +1,25 @@
 SPK_NAME = sabnzbd
-SPK_VERS = 3.2.1
-SPK_REV = 48
+SPK_VERS = 5.0.4
+SPK_REV = 81
 SPK_ICON = src/sabnzbd.png
 
-BUILD_DEPENDS = cross/python38 cross/setuptools cross/pip cross/wheel
-DEPENDS = cross/busybox cross/par2cmdline cross/unrar cross/p7zip cross/$(SPK_NAME)
-SPK_DEPENDS = "python38>=3.8.1-1"
+PYTHON_PACKAGE = python314
 
-# To generate full requirements.txt, extend SABnzbd's own
-# requirements.txt with the depedencies of cherrypy and cheroot
-WHEELS = src/requirements.txt
+DEPENDS = cross/ionice cross/coreutils cross/par2cmdline-turbo cross/7zz cross/sabnzbd
+OPTIONAL_DEPENDS = cross/unrar7 cross/unrar
+
+# python311 not supported
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# unrar not supported
+UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+
+# Ensure C++17 compatibility
+# sabctools >= 9.0.0 requirement
+REQUIRED_MIN_DSM = 7.0
+UNSUPPORTED_ARCHS = comcerto2k
+REQUIRED_MIN_SRM = 1.3
+
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 MAINTAINER = Safihre
 DESCRIPTION = SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.
@@ -17,7 +27,7 @@ DESCRIPTION_FRE = SABnzbd rend Usenet aussi simple et automatisé que possible. 
 DESCRIPTION_SPN = SABnzbd hace que Usenet sea lo más simple posible, automatizando todo lo que se puede. Todo lo que tienes que hacer es agregar un archivo .nzb. SABnzbd empieza desde ahí. Tus archivos serán automáticamente descargados, verificados, reparados, descomprimidos y archivados.
 DISPLAY_NAME = SABnzbd
 STARTABLE = yes
-CHANGELOG = "Update SABnzbd to 3.2.1 and restore ionice. Requires the Python 3.8 package."
+CHANGELOG = "1. Update SABnzbd to 5.0.4."
 
 HOMEPAGE  = https://sabnzbd.org
 LICENSE   = GPL
@@ -25,7 +35,7 @@ LICENSE   = GPL
 WIZARDS_DIR = src/wizard/
 
 SERVICE_USER = auto
-SERVICE_WIZARD_SHARE = wizard_download_dir
+SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8080
 SERVICE_PORT_TITLE = $(DISPLAY_NAME)
@@ -33,16 +43,46 @@ SERVICE_PORT_TITLE = $(DISPLAY_NAME)
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)
 
+include ../../mk/spksrc.common.mk
+ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
+DEPENDS += cross/unrar
+else ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
+DEPENDS += cross/unrar
+else
+DEPENDS += cross/unrar7
+endif
+
 POST_STRIP_TARGET = sabnzbd_extra_install
 
-# Add nice and ionice commands
-ENV += BUSYBOX_CONFIG="nice ionice"
+SPK_COMMANDS = bin/7zz
 
-include ../../mk/spksrc.spk.mk
+# [cryptography]
+# Version = 45.0.0 requires rustc >= 1.74.0 (qoriq)
+# Version = 47.0.0 requires rustc >= 1.83.0
+DEPENDS += cross/openssl3
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += cryptography==46.0.7
+else
+WHEELS += cryptography==48.0.1
+endif
+
+# [orjson]
+# Version = 3.11.1 requires rustc >= 1.82 (qoriq)
+# Version = 3.11.2 requires rustc >= 1.85
+# Version = 3.11.6 requires rustc >= 1.89
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+WHEELS += orjson==3.11.1
+else
+WHEELS += orjson==3.11.5
+endif
+
+include ../../mk/spksrc.spk-meta.mk
+
+# prefer native python tools (pip, maturin, ...) used for orjson
+ENV += PATH=$(realpath $(WORK_DIR)/../../../native/$(PYTHON_PACKAGE)/work-native/install/usr/local/bin):$(PATH)
 
 .PHONY: sabnzbd_extra_install
 sabnzbd_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
 	install -m 755 -d $(STAGING_DIR)/var/scripts
 	install -m 755 src/SabToSyno.py $(STAGING_DIR)/var/scripts/SabToSyno.py
 	install -m 600 src/config.ini $(STAGING_DIR)/var/config.ini

@@ -1,0 +1,16 @@
+# make INSTALL_PATH configurable
+# 
+--- Makefile.orig	2018-05-30 16:17:22.000000000 +0000
++++ Makefile	2025-06-15 07:02:38.233946411 +0000
+@@ -19,9 +19,9 @@
+ endif
+ 
+ ifneq ($(OSTYPE),beos)
+-INSTALL_PATH= /usr/local/bin
++INSTALL_PATH?= /usr/local/bin
+ else
+-INSTALL_PATH= $(HOME)/config/bin
++INSTALL_PATH?= $(HOME)/config/bin
+ endif
+ 
+ # BeOS doesn't have libm (it's all in libroot)

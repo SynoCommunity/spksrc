@@ -4,7 +4,7 @@ bin:bin/mutt_pgpring
 rsc:bin/muttbug
 bin:bin/pgpewrap
 rsc:bin/smime_keys
-rsc:etc/Muttrc
-rsc:etc/mime.types
-rsc:etc/mime.types.dist
+rsc:var/Muttrc
+rsc:var/mime.types
+rsc:var/mime.types.dist
 rsc:share/

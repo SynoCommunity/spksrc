@@ -2,7 +2,4 @@ bin:bin/file
 lnk:lib/libmagic.so
 lnk:lib/libmagic.so.1
 lib:lib/libmagic.so.1.0.0
-rsc:share/man/man1/file.1
-rsc:share/man/man3/libmagic.3
-rsc:share/man/man4/magic.4
 rsc:share/misc/magic.mgc

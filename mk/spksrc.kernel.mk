@@ -1,16 +1,127 @@
-# Common makefiles
-include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
-
-# Common kernel variables
-include ../../mk/spksrc.kernel-flags.mk
+###############################################################################
+# spksrc.kernel.mk
+#
+# Provides the complete kernel build logic for spksrc.
+#
+# This makefile supports two distinct execution modes:
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# 1) Standalone Kernel Mode (Reference Mode)
+#    Invoked from: spksrc/kernel
+#
+#    Purpose:
+#      - Download and extract Synology kernel sources
+#      - Maintain a reference kernel source tree
+#
+#    Working directory:
+#      work
+#
+#    Extracted source tree:
+#      work/linux
+#
+#    Characteristics:
+#      - No package context
+#      - No architecture-specific work directory suffix
+#      - Similar conceptual role to toolchain/ or toolkit/
+#      - Used primarily as a canonical kernel source reference
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# 2) Package Module Mode (Packaging Mode)
+#    Invoked from: spksrc/spk/<package>
+#    Requires: REQUIRE_KERNEL_MODULE=1
+#
+#    Purpose:
+#      - Prepare kernel source tree for external module compilation
+#      - Build modules as part of SPK package generation
+#
+#    Working directory:
+#      work-<arch>-<tcversion>
+#
+#    Extracted source tree:
+#      work-<arch>-<tcversion>/linux-<arch>-<tcversion>
+#
+#    Characteristics:
+#      - Architecture-specific build
+#      - Integrated with cross-compilation environment
+#      - Kernel tree is local to the package build
+#      - Modules are compiled for packaging into SPK
+#
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Build Pipeline
+#
+# Stage 1: Toolchain bootstrap (MANDATORY)
+#   - Ensures the matching toolchain exists
+#   - Generates tc_vars* files in the active WORK_DIR
+#
+# Stage 2: Kernel build
+#   - download → checksum → extract → patch
+#   - relocate source tree (kernel_post_extract_target)
+#   - kernel_configure
+#   - kernel_module (if enabled)
+#   - kernel_headers (optional)
+#   - install → plist
+#
+# Stage separation guarantees that:
+#   - The toolchain environment is fully materialized before kernel logic runs
+#   - tc_vars* files are generated once per WORK_DIR
+#   - Toolchain and kernel builds remain strictly separated
+#
+# Key Variables:
+#   KERNEL_NAME               Kernel identifier (syno-<arch>-<version>)
+#   KERNEL_VERS               Synology OS version (DSM / SRM)
+#   KERNEL_ARCH               Target architecture
+#   REQUIRE_KERNEL_MODULE     Enables packaging/module mode
+#   KERNEL_ARCH_SUFFIX        Derived arch/version suffix
+#   KERNEL_COOKIE             Build completion marker
+#
+# Important Behavioral Differences:
+#   - PKG_NAME and PKG_DIR vary depending on REQUIRE_KERNEL_MODULE
+#   - WORK_DIR differs between standalone and packaging modes
+#   - Extracted kernel tree location depends on invocation context
+#
+# Notes:
+#  - The kernel build is idempotent when guarded by cookies.
+#  - Logging is centralized via LOG_WRAPPED.
+#  - cross-env.mk consumes tc_vars* generated during Stage1.
+#  - Kernel source relocation is handled by kernel_post_extract_target.
+#
+# Common include structure:
+#
+#   spksrc.kernel.mk
+#   └── spksrc.kernel/
+#
+#       Core kernel build logic (directly included by spksrc.kernel.mk):
+#       ├── base.mk       : Set default kernel environment variables
+#       ├── configure.mk  : Prepare kernel sources & set .config
+#       ├── module.mk     : Compile kernel modules for SPK
+#       ├── headers.mk    : Install kernel headers to staging/include
+#       ├── url.mk        : Kernel download URLs
+#       └── versions.mk   : Kernel versions per architecture / DSM
+#
+#       Framework support (invoked externally by the build framework):
+#       ├── depend.mk     : Loop over generic architectures and sub-archs
+#       └── required.mk   : Check if kernel/module is required by dependencies
+#
+###############################################################################
 
 # Configure the included makefiles
 NAME          = $(KERNEL_NAME)
-COOKIE_PREFIX = linux-
 URLS          = $(KERNEL_DIST_SITE)/$(KERNEL_DIST_NAME)
+COOKIE_PREFIX = $(PKG_NAME)-
+
+ifneq ($(strip $(REQUIRE_KERNEL_MODULE)),)
+PKG_NAME      = linux-$(subst syno-,,$(NAME))
+PKG_DIR       = $(PKG_NAME)
+else
 PKG_NAME      = linux
 PKG_DIR       = $(PKG_NAME)
+endif
+
+# kernel download variables
+include ../../mk/spksrc.kernel/url.mk
+include ../../mk/spksrc.kernel/versions.mk
+
 ifneq ($(KERNEL_DIST_FILE),)
 LOCAL_FILE    = $(KERNEL_DIST_FILE)
 # download.mk uses PKG_DIST_FILE
@@ -25,112 +136,117 @@ EXTRACT_CMD   = $(EXTRACT_CMD.$(KERNEL_EXT)) --skip-old-files --strip-components
 
 #####
 
-# Configure the included makefiles
-PRE_CONFIGURE_TARGET = kernel_pre_configure_target
-CONFIGURE_TARGET     = kernel_configure_target
-PRE_COMPILE_TARGET   = kernel_module_prepare_target
-ifeq ($(strip $(REQUIRE_KERNEL_MODULE)),)
-COMPILE_TARGET       = nop
+ifneq ($(KERNEL_ARCH),)
+KERNEL_ARCH_SUFFIX := -$(KERNEL_ARCH)-$(KERNEL_VERS)
 else
-COMPILE_TARGET       = kernel_module_compile_target
+KERNEL_ARCH_SUFFIX := -$(ARCH)-$(TCVERSION)
 endif
-# spksrc.install.mk called for PRE_INSTALL_PLIST
-# in order to generate a work*/linux.plist.auto
-# later used by spksr.plist.mk to generate the
-# diff based on .ko kernel objects
-INSTALL_TARGET       = nop
 
 #####
 
-TC ?= syno-$(KERNEL_ARCH)-$(KERNEL_VERS)
+# Common directories
+
+### Include common definitions
+include ../../mk/spksrc.common.mk
+
+### Include common rules
+include ../../mk/spksrc.rules.mk
+
+# Common kernel variables
+include ../../mk/spksrc.kernel/base.mk
+
+# Constants
+default: all
 
 #####
 
-include ../../mk/spksrc.cross-env.mk
+# Mark toolchain installation as completed using status cookie
+KERNEL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)kernel_done
 
-include ../../mk/spksrc.download.mk
+KERNEL = syno$(KERNEL_ARCH_SUFFIX)
+
+#####
+
+# Prior to interacting with the kernel files
+# move the kernel source tree to its final destination
+POST_EXTRACT_TARGET      = kernel_post_extract_target
+
+# By default do not install kernel headers
+INSTALL_TARGET           = nop
+
+#####
+
+TC ?= syno$(KERNEL_ARCH_SUFFIX)
+
+#####
+
+include ../../mk/spksrc.cross/env-default.mk
+
+include ../../mk/spksrc.rules/status.mk
+
+include ../../mk/spksrc.build/download.mk
 
 checksum: download
-include ../../mk/spksrc.checksum.mk
+include ../../mk/spksrc.build/checksum.mk
 
-extract: checksum
-include ../../mk/spksrc.extract.mk
+extract: checksum status
+include ../../mk/spksrc.build/extract.mk
 
 patch: extract
-include ../../mk/spksrc.patch.mk
+include ../../mk/spksrc.build/patch.mk
 
-configure: patch
-include ../../mk/spksrc.configure.mk
+kernel_configure: patch
+include ../../mk/spksrc.kernel/configure.mk
 
-compile: configure
-include ../../mk/spksrc.compile.mk
+kernel_module: kernel_configure
+include ../../mk/spksrc.kernel/module.mk
 
-install: compile
-include ../../mk/spksrc.install.mk
+install: kernel_module
+include ../../mk/spksrc.kernel/headers.mk
+
+install: kernel_headers
+include ../../mk/spksrc.build/install.mk
 
 plist: install
-include ../../mk/spksrc.plist.mk
+include ../../mk/spksrc.build/plist.mk
 
-clean:
-	rm -fr work work-*
+# -----------------------------------------------------------------------------
+# Stage1: Toolchain (MANDATORY)
+#  - First call builds the toolchain (download / extract / patch / build)
+#  - Second call generates tc_vars* files in the kernel WORK_DIR
+# -----------------------------------------------------------------------------
+TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
 
-all: install plist
+.PHONY: kernel-stage1
+kernel-stage1: $(TCVARS_DONE)
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-.PHONY: kernel_pre_configure_target
-
-kernel_pre_configure_target:
-	mv $(WORK_DIR)/$(KERNEL_DIST) $(WORK_DIR)/linux
-
-.PHONY: kernel_configure_target
-
-kernel_configure_target: 
-	@$(MSG) "Updating kernel Makefile"
-	$(RUN) sed -i -r 's,^CROSS_COMPILE\s*.+,CROSS_COMPILE\t= $(TC_PATH)$(TC_PREFIX),' Makefile
-	$(RUN) sed -i -r 's,^ARCH\s*.+,ARCH\t= $(KERNEL_ARCH),' Makefile
-# Add "+" to EXTRAVERSION for kernels version >= 4.4
-ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
-	$(RUN) sed -i -r -e 's,^EXTRAVERSION\s*.+,&+,' -e 's,=\+,= \+,' Makefile
-endif
-	test -e $(WORK_DIR)/arch/$(KERNEL_ARCH) || $(RUN) ln -sf $(KERNEL_BASE_ARCH) arch/$(KERNEL_ARCH)
-	@$(MSG) "Cleaning the kernel source"
-	$(RUN) $(MAKE) mrproper
-	@$(MSG) "Applying $(KERNEL_CONFIG) configuration"
-	$(RUN) cp $(KERNEL_CONFIG) .config
-	@$(MSG) "Set any new symbols to their default value"
-# olddefconfig is not available < 3.8
-ifeq ($(call version_lt, ${TC_KERNEL}, 3.8),1)
-	@$(MSG) "oldconfig OLD style... $(TC_KERNEL) < 3.8"
-	$(RUN) yes "" | $(MAKE) oldconfig
+ifneq ($(strip $(TC)),)
+$(TCVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
-	$(RUN) $(MAKE) olddefconfig
+$(TCVARS_DONE): ;
 endif
 
-.PHONY: kernel_module_prepare_target
 
-kernel_module_prepare_target:
-	@$(MSG) "DISTRIB_DIR = $(DISTRIB_DIR)"
-	@$(MSG) "Prepare kernel source for module build"
-	$(RUN) $(MAKE) modules_prepare
-# Call to make kernelversion is not available for kernel <= 3.0
-ifeq ($(call version_ge, ${TC_KERNEL}, 3),1)
-	@$(MSG) "Get kernel version"
-	$(RUN) $(MAKE) kernelversion
-endif
+# -----------------------------------------------------------------------------
+# Stage2: kernel cross build
+#  - Executes full build pipeline up to plist generation
+# -----------------------------------------------------------------------------
+.PHONY: kernel-stage2
+kernel-stage2: install plist
 
-.PHONY: kernel_module_compile_target
+# all wraps both stages with logging to ensure:
+#  - consistent output formatting
+#  - proper error propagation
+.PHONY: all
+all:
+	@mkdir -p $(WORK_DIR)
+	$(call LOG_WRAPPED,kernel-stage1)
+	$(call LOG_WRAPPED,kernel-stage2)
 
-kernel_module_compile_target:
-	@for module in $(REQUIRE_KERNEL_MODULE); \
-	do \
-	  $(MAKE) kernel_module_build module=$$module ; \
-	done
+####
 
-kernel_module_build:
-	@$(MSG) Building kernel module module=$(module)
-	$(RUN) LDFLAGS="" $(MAKE) -C $(WORK_DIR)/linux INSTALL_MOD_PATH=$(STAGING_INSTALL_PREFIX) modules M=$(word 2,$(subst :, ,$(module))) $(firstword $(subst :, ,$(module)))=m $(lastword $(subst :, ,$(module))).ko
-	$(RUN) cat $(word 2,$(subst :, ,$(module)))/modules.order >> $(WORK_DIR)/linux/modules.order
-	$(RUN) mkdir -p $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
-	install -m 644 $(WORK_DIR)/linux/$(word 2,$(subst :, ,$(module)))/$(lastword $(subst :, ,$(module))).ko $(STAGING_INSTALL_PREFIX)/lib/modules/$(TC_KERNEL)/kernel/$(word 2,$(subst :, ,$(module)))
+.PHONY: kernel_post_extract_target
+kernel_post_extract_target:
+	mv $(WORK_DIR)/$(KERNEL_PREFIX) $(WORK_DIR)/$(PKG_DIR)

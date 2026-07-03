@@ -1,0 +1,14 @@
+# There is a syntax error affecting gcc < 5 (i.e. DSM 6 builds)
+# mismatched parentheses in definition of LONG64
+# 
+--- include/X11/Xtos.h.orig	2024-11-17 04:44:07.000000000 +0000
++++ include/X11/Xtos.h	2025-01-16 06:07:21.651837413 +0000
+@@ -64,7 +64,7 @@
+     defined(__s390x__) || \
+     (defined(__hppa__) && defined(__LP64__)) || \
+     defined(__amd64__) || defined(amd64) || \
+-    defined(__powerpc64__))
++    defined(__powerpc64__)
+ #define LONG64
+ #endif
+ 

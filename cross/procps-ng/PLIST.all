@@ -1,0 +1,17 @@
+bin:bin/free
+bin:bin/hugetop
+bin:bin/pgrep
+bin:bin/pkill
+bin:bin/pmap
+bin:bin/ps
+bin:bin/pwdx
+bin:bin/slabtop
+bin:bin/tload
+bin:bin/top
+bin:bin/uptime
+bin:bin/vmstat
+bin:bin/watch
+lnk:lib/libproc2.so
+lnk:lib/libproc2.so.1
+lib:lib/libproc2.so.1.0.0
+bin:sbin/sysctl

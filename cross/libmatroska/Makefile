@@ -1,8 +1,8 @@
 PKG_NAME = libmatroska
-PKG_VERS = 1.5.2
+PKG_VERS = 1.7.1
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://dl.matroska.org/downloads/$(PKG_NAME)
+PKG_DIST_SITE = https://dl.matroska.org/downloads/libmatroska
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libebml

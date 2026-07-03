@@ -1,0 +1,28 @@
+[{
+    "step_title": "Settings for MPD server",
+    "items": [{
+        "type": "textfield",
+        "desc": "Music shared folder",
+        "subitems": [{
+            "key": "wizard_music_folder",
+            "desc": "Music shared folder",
+            "defaultValue": "music",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[^<>: */?\"]*/",
+                "errorText": "Share name must be a folder name only. Path separators, spaces and other special chars are not allowed."
+              }
+            }
+          }
+        ]
+      }, {
+        "desc": "If you let the installer create the shared folder, it is created under the same volume as the package is installed. If you want to use a different volume for the share, you must create the shared folder in DSM Control Panel before, and enter the name of the existing share in the field above."
+      }, {
+        "desc": ""
+      }, {
+        "desc": "The folder will be created on demand as regular DSM shared folder for the service user <b>sc-mpd</b>. For details about the DSM permissions see <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a>.<p/>"
+      }
+    ]
+  }
+]

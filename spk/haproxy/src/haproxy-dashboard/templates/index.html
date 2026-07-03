@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}HAProxy Configurator{% endblock %}
+{% block nav_index %} active{% endblock %}
+{% block extra_css %}
+        #frontend_container,
+        #backend_container {
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .dark-mode input[type=text],
+        .dark-mode input[type=number],
+        .dark-mode #protocol,
+        .dark-mode #lb_method {
+            color: white;
+            background-color: #25354e;
+            border: none;
+        }
+        .dark-mode #frontend_container,
+        .dark-mode #backend_container {
+            box-shadow: 0 0 15px 5px rgba(43, 185, 199, 0.05);
+        }
+        .dark-mode #succes_btn {
+            background-color: #2bb9c7;
+            border: none;
+        }
+{% endblock %}
+{% block content %}
+    <div class="container mt-4">
+        <div style="border-radius: 5px; padding: 20px;" class="container mt-5" id="frontend_container">
+            <label style="margin: 20px auto; font-size: 18px; font-weight: bold;"><i style="margin: 8px;" class="fas fa-globe"></i> Add New Frontend:</label><br>
+            {% if message %}
+            <div class="alert {% if 'already exists' in message %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
+            <form method="post" action="/">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="frontend_name">Frontend Name:</label>
+                        <input type="text" class="form-control" name="frontend_name" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="frontend_ip">Frontend IP:</label>
+                        <input type="text" class="form-control" name="frontend_ip" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="frontend_port">Frontend Port:</label>
+                        <input type="number" class="form-control" name="frontend_port" required>
+                    </div>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="ssl_checkbox" name="ssl_checkbox">
+                    <label class="form-check-label" for="ssl_checkbox"><i style="margin: 8px;" class="fas fa-lock"></i>Use SSL Certificate</label>
+                </div>
+                <div class="form-group" style="display: none;" id="ssl_fields">
+                    <label for="ssl_cert_path">SSL Certificate Path:</label>
+                    <input type="text" id="ssl_cert_path" class="form-control" name="ssl_cert_path">
+                    <div style="padding-bottom: 15px;" class="form-check">
+                        <input type="checkbox" class="form-check-input" id="ssl_redirect_checkbox" name="ssl_redirect_checkbox">
+                        <label class="form-check-label" for="ssl_redirect_checkbox"><i style="margin: 8px;" class="fas fa-arrow-circle-right"></i>Add Redirect to HTTPS</label>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;" class="form-group">
+                    <label for="lb_method">Load Balancing Method:</label>
+                    <select class="form-control" name="lb_method" id="lb_method">
+                        <option value="roundrobin">Round Robin</option>
+                        <option value="leastconn">Least Connections</option>
+                        <option value="source">Source</option>
+                        <option value="wrr">WRR</option>
+                        <option value="wlc">WLC</option>
+                        <option value="random">Random</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="protocol">Protocol:</label>
+                    <select class="form-control" name="protocol" id="protocol" required>
+                        <option value="" disabled selected>--Select mode--</option>
+                        <option value="tcp">TCP</option>
+                        <option value="http">HTTP</option>
+                    </select>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="add_dos" id="add_dos">
+                    <label style="margin-bottom: 10px;" class="form-check-label" for="add_dos"><i style="margin: 8px;" class="fas fa-shield-alt"></i> Add DOS Protection</label>
+                </div>
+                <div class="form-group" id="dos_fields" style="display: none; padding-bottom: 20px;">
+                    <label for="limit_requests">Limit Requests, e.g: 20:</label>
+                    <input type="text" class="form-control" name="limit_requests">
+                    <label for="ban_duration">IP Ban Duration(in seconds, e.g: 15s):</label>
+                    <input type="text" class="form-control" name="ban_duration">
+                </div>
+                <div style="margin-top: 8px; padding-bottom: 15px; display: none;" class="form-check" id="sql_injection_container">
+                    <input type="checkbox" class="form-check-input" id="sql_injection_check" name="sql_injection_check">
+                    <label class="form-check-label" for="sql_injection_check"><i style="margin: 8px;" class="fas fa-shield-alt"></i>Activate SQL Injection Protection</label>
+                </div>
+                <div style="margin-top: 8px; padding-bottom: 15px; display: none;" class="form-check" id="XSS_container">
+                    <input type="checkbox" class="form-check-input" id="xss_check" name="xss_check">
+                    <label class="form-check-label" for="xss_check"><i style="margin: 8px;" class="fas fa-shield-alt"></i>Activate XSS Protection</label>
+                </div>
+                <div style="margin-top: 8px; padding-bottom: 15px; display: none;" class="form-check" id="remote_uploads_container">
+                    <input type="checkbox" class="form-check-input" id="remote_uploads_check" name="remote_uploads_check">
+                    <label class="form-check-label" for="remote_uploads_check"><i style="margin: 8px;" class="fas fa-shield-alt"></i>Activate Remote File Upload Protection</label>
+                </div>
+                <div style="margin-top: 8px; padding-bottom: 15px; display: none;" class="form-check" id="webshells_container">
+                    <input type="checkbox" class="form-check-input" id="webshells_check" name="webshells_check">
+                    <label class="form-check-label" for="webshells_check"><i style="margin: 8px;" class="fas fa-shield-alt"></i>Activate Webshells Protection</label>
+                </div>
+                <div class="form-check" style="margin-top: 8px;">
+                    <input type="checkbox" class="form-check-input" name="add_acl" id="add_acl">
+                    <label style="margin-bottom: 10px;" class="form-check-label" for="add_acl"><i style="margin: 8px;" class="fas fa-user-lock"></i> Add ACL for Frontend</label>
+                </div>
+                <div class="form-group" id="acl_fields" style="display: none; padding-bottom: 20px;">
+                    <label for="acl">ACL:</label>
+                    <input type="text" class="form-control" name="acl" placeholder="example: acl_name">
+                    <label for="acl_action">ACL Action:</label>
+                    <input type="text" class="form-control" name="acl_action" placeholder="example: hdr(host) -i test.com">
+                    <label for="backend_name_acl">Backend Name:</label>
+                    <input type="text" class="form-control" name="backend_name_acl" placeholder="example: somebackend">
+                </div>
+                <div class="form-check" id="forbidden_acl_container" style="display: none; margin-top: 8px;">
+                    <input type="checkbox" class="form-check-input" name="add_acl_path" id="add_acl_path">
+                    <label style="margin-bottom: 10px;" class="form-check-label" for="add_acl_path"><i style="margin: 8px;" class="fas fa-ban"></i> Block Sensitive Path</label>
+                </div>
+                <div class="form-group" id="forbidden_fields" style="display: none; padding-bottom: 20px;">
+                    <label for="forbidden_name">ACL Name:</label>
+                    <input type="text" class="form-control" name="forbidden_name" id="forbidden_name">
+                    <label for="allowed_ip">Allowed IP Addresses(e.g: 192.168.3.13 193.168.3.14):</label>
+                    <input type="text" class="form-control" name="allowed_ip">
+                    <label for="forbidden_path">Path(e.g: /admin):</label>
+                    <input type="text" class="form-control" name="forbidden_path">
+                </div>
+                <div class="form-check" id="path_based_container" style="display: none; margin-top: 8px;">
+                    <input type="checkbox" class="form-check-input" name="add_path_based" id="add_path_based">
+                    <label style="margin-bottom: 10px;" class="form-check-label" for="add_path_based"><i style="margin: 8px;" class="fas fa-arrow-circle-right"></i>Add Path Based Redirect</label>
+                </div>
+                <div class="form-group" id="base_redirect_fields" style="display: none; padding-bottom: 20px;">
+                    <label for="redirect_domain_name">Domain to be redirected:</label>
+                    <input type="text" class="form-control" name="redirect_domain_name" id="redirect_domain_name" placeholder="e.g: test2.com or test2.com:8888">
+                    <label for="root_redirect">Root Path To Be Redirected:</label>
+                    <input type="text" class="form-control" name="root_redirect" placeholder="e.g: /">
+                    <label for="redirect_to">Redirect To Path:</label>
+                    <input type="text" class="form-control" name="redirect_to" placeholder="e.g: /test">
+                </div>
+                <div style="margin-top: 8px; padding-bottom: 15px; display: none;" class="form-check" id="forward_for_container">
+                    <input type="checkbox" class="form-check-input" id="forward_for_check" name="forward_for_check">
+                    <label class="form-check-label" for="forward_for_check"><i style="margin: 8px;" class="fas fa-network-wired"></i>Use option forwardfor</label>
+                </div>
+                <div style="border-radius: 5px; padding: 20px; margin-bottom: 20px;" class="container mt-5" id="backend_container">
+                    <div class="form-group">
+                        <label style="margin-top: 40px; margin-bottom: 30px; font-size: 18px; font-weight: bold;"><i style="margin-right: 8px;" class="fas fa-sitemap"></i> Backend Servers Pool:</label><br>
+                        <div class="form-group" id="health_check_container_http" style="display: none;">
+                            <input type="checkbox" name="health_check" id="health_check" onchange="toggleHealthCheck()">
+                            <label for="health_check"><i style="margin: 8px;" class="fas fa-heartbeat"></i>Enable Health Check <strong>(HTTP mode only)</strong></label>
+                        </div>
+                        <div class="form-group" id="health_check_field" style="display: none;">
+                            <label for="health_check_link">Health Check URL:</label>
+                            <input type="text" class="form-control" name="health_check_link">
+                        </div>
+                        <div class="form-group" id="health_check_container_tcp" style="display: none;">
+                            <input type="checkbox" name="health_check2" id="health_check2" onchange="toggleHealthCheck2()">
+                            <label for="health_check2"><i style="margin: 8px;" class="fas fa-heartbeat"></i>Enable Health Check <strong>(TCP mode)</strong></label>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" name="sticky_session" id="sticky_session" onclick="toggleStickySession()">
+                            <label for="sticky_session"><i style="margin: 8px;" class="fas fa-link"></i> Enable Sticky Session</label>
+                        </div>
+                        <div class="form-group" id="sticky_session_field" style="display: none;">
+                            <label for="sticky_session_type">Session Persistence Type:</label>
+                            <select class="form-control" name="sticky_session_type">
+                                <option value="cookie">Cookie SERVERID</option>
+                                <option value="stick-table">Stick-Table ip</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" name="add_header" id="add_header" onclick="toggleCustomHeader()">
+                            <label for="add_header"><i style="margin: 8px;" class="fas fa-reply"></i> Add Custom Header</label>
+                        </div>
+                        <div class="form-group" id="header_field" style="display: none;">
+                            <label for="header_name">Header Name:</label>
+                            <input type="text" class="form-control" name="header_name" placeholder="e.g: X-Client-IP">
+                            <label for="header_value">Header Value:</label>
+                            <input type="text" class="form-control" name="header_value" placeholder="e.g: test">
+                        </div>
+                        <div class="form-group">
+                            <label for="backend_name">Backend Name:</label>
+                            <input type="text" class="form-control" name="backend_name" required>
+                        </div>
+                        <div id="backend_servers_container">
+                            <div class="form-row backend-server-row">
+                                <div class="form-group col-md-3">
+                                    <label for="name1">Backend Server Name:</label>
+                                    <input type="text" id="name1" class="form-control" name="backend_server_names[]" placeholder="server1" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="ip1">Backend Server IP:</label>
+                                    <input type="text" id="ip1" class="form-control" name="backend_server_ips[]" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="port1">Backend Server Port:</label>
+                                    <input type="number" id="port1" class="form-control" name="backend_server_ports[]" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="maxconn1">MaxConn:</label>
+                                    <input type="number" id="maxconn1" class="form-control" name="backend_server_maxconns[]">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="addBackendServer()">+ Add Backend Server</button>
+                        <input type="submit" id="success_btn" class="btn btn-success" value="Submit">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    let serverCount = 1;
+    function addBackendServer() {
+        serverCount++;
+        const container = document.getElementById('backend_servers_container');
+        const row = document.createElement('div');
+        row.classList.add('form-row', 'backend-server-row', 'mt-2');
+        row.innerHTML = `
+            <div class="form-group col-md-3">
+                <label for="name${serverCount}">Backend Server Name:</label>
+                <input type="text" id="name${serverCount}" class="form-control" name="backend_server_names[]" placeholder="server${serverCount}" required>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="ip${serverCount}">Backend Server IP:</label>
+                <input type="text" id="ip${serverCount}" class="form-control" name="backend_server_ips[]" required>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="port${serverCount}">Backend Server Port:</label>
+                <input type="number" id="port${serverCount}" class="form-control" name="backend_server_ports[]" required>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="maxconn${serverCount}">MaxConn:</label>
+                <input type="number" id="maxconn${serverCount}" class="form-control" name="backend_server_maxconns[]">
+                <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeBackendServer(this)">Remove</button>
+            </div>`;
+        container.appendChild(row);
+    }
+    function removeBackendServer(button) {
+        const row = button.closest('.backend-server-row');
+        if (document.querySelectorAll('.backend-server-row').length > 1) {
+            row.remove();
+        } else {
+            alert("You must have at least one backend server.");
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Protocol change handlers
+        document.getElementById('protocol').addEventListener('change', function() {
+            const protocol = this.value;
+            document.getElementById('health_check_container_http').style.display = protocol === 'http' ? 'block' : 'none';
+            document.getElementById('health_check_container_tcp').style.display = protocol === 'tcp' ? 'block' : 'none';
+            ['sql_injection_container','XSS_container','remote_uploads_container','webshells_container',
+             'forward_for_container','forbidden_acl_container','path_based_container'].forEach(function(id) {
+                document.getElementById(id).style.display = protocol === 'http' ? 'block' : 'none';
+            });
+        });
+        // SSL checkbox
+        document.getElementById('ssl_checkbox').addEventListener('change', function() {
+            document.getElementById('ssl_fields').style.display = this.checked ? 'block' : 'none';
+        });
+        // Toggle handlers
+        document.getElementById('add_dos').addEventListener('change', function() {
+            document.getElementById('dos_fields').style.display = this.checked ? 'block' : 'none';
+        });
+        document.getElementById('add_acl').addEventListener('change', function() {
+            document.getElementById('acl_fields').style.display = this.checked ? 'block' : 'none';
+        });
+        document.getElementById('add_acl_path').addEventListener('change', function() {
+            document.getElementById('forbidden_fields').style.display = this.checked ? 'block' : 'none';
+        });
+        document.getElementById('add_path_based').addEventListener('change', function() {
+            document.getElementById('base_redirect_fields').style.display = this.checked ? 'block' : 'none';
+        });
+        // Auto-dismiss success alert
+        setTimeout(function() {
+            const alert = document.querySelector('.alert');
+            if (alert) alert.classList.add('hide');
+        }, 5000);
+    });
+</script>
+{% endblock %}

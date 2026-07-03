@@ -1,5 +1,6 @@
 bin:bin/db_archive
 bin:bin/db_checkpoint
+bin:bin/db_convert
 bin:bin/db_deadlock
 bin:bin/db_dump
 bin:bin/db_hotbackup

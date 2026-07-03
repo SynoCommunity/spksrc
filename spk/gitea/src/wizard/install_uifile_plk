@@ -1,0 +1,31 @@
+[
+    {
+        "step_title": "Konfiguracja Gitea",
+        "items": [
+            {
+                "type": "textfield",
+                "desc": "Wybierz folder współdzielony. Jeśli jeszcze nie istnieje, zostanie stworzony podczas instalacji.",
+                "subitems": [
+                    {
+                        "key": "wizard_shared_folder_name",
+                        "desc": "Folder wspóldzielony",
+                        "defaultValue": "gitea-share",
+                        "validator": {
+                            "allowBlank": false,
+                            "regex": {
+                                "expr": "/^[\\w _-]+$/",
+                                "errorText": "Podkatalogi nie są obsługiwane."              
+                            }
+                        }
+                    }
+                ]
+                }, {
+                    "desc": "Jeśli zezwolisz instalatorowi na utworzenie folderu współdzielonego, zostanie on utworzony na tym samym wolumenie, na którym instalowany jest pakiet. Jeśli chcesz użyć innego wolumenu, musisz wcześniej utworzyć folder współdzielony w Panelu Sterowania DSM i wpisać nazwę istniejącego folderu współdzielonego w powyższym polu."
+                }, {
+                    "desc": ""
+                }, {
+                    "desc": "Ten pakiet uruchamia się jako użytkownik usługi wewnętrznej <b>'sc-gitea'</b> w DSM. Powyższy folder współdzielony jest skonfigurowany podczas instalacji tak, aby był dostępny dla tego użytkownika. Przeczytaj <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Zarządzanie uprawnieniami</a>, aby uzyskać szczegółowe informacje."
+                }
+        ]
+    }
+]

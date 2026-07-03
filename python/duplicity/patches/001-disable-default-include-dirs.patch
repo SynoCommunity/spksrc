@@ -1,0 +1,17 @@
+--- setup.py-orig	2025-02-15 18:05:10.000000000 +0000
++++ setup.py	2025-04-13 13:36:06.519570773 +0000
+@@ -85,10 +85,10 @@ if os.environ.get("READTHEDOCS", None) i
+         )
+ 
+     # add standard locs
+-    incdir_list.append("/usr/local/include")
+-    libdir_list.append("/usr/local/lib")
+-    incdir_list.append("/usr/include")
+-    libdir_list.append("/usr/lib")
++    #incdir_list.append("/usr/local/include")
++    #libdir_list.append("/usr/local/lib")
++    #incdir_list.append("/usr/include")
++    #libdir_list.append("/usr/lib")
+ 
+     # build the librsync extension
+     ext_modules = [

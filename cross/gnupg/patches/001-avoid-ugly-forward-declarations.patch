@@ -1,0 +1,31 @@
+# use explicit type to avoid ugly forward declarations
+# - otherwise we get 'redefinition of typedef' errors with gcc of OLD_PPC_ARCHS
+# 
+--- g10/keydb-private.h.orig	2023-04-04 08:28:39.000000000 +0000
++++ g10/keydb-private.h	2023-06-20 14:59:32.881451742 +0000
+@@ -24,14 +24,6 @@
+ #include <assuan.h>
+ #include "../common/membuf.h"
+ 
+-
+-/* Ugly forward declarations.  */
+-struct keyring_handle;
+-typedef struct keyring_handle *KEYRING_HANDLE;
+-struct keybox_handle;
+-typedef struct keybox_handle *KEYBOX_HANDLE;
+-
+-
+ /* This is for keydb.c and only used in non-keyboxd mode. */
+ #define MAX_KEYDB_RESOURCES 40
+ 
+@@ -48,8 +40,8 @@
+ {
+   KeydbResourceType type;
+   union {
+-    KEYRING_HANDLE kr;
+-    KEYBOX_HANDLE kb;
++    struct keyring_handle * kr;
++    struct keybox_handle * kb;
+   } u;
+   void *token;
+ };

@@ -1,0 +1,15 @@
+--- Makefile.orig	2014-01-09 19:24:24.000000000 +0000
++++ Makefile	2023-01-08 23:22:21.701713854 +0000
+@@ -11,9 +11,9 @@
+ LIBDIR=$(DESTDIR)$(libdir)
+ MANDIR=$(DESTDIR)$(mandir)
+ 
+-CC=$(CROSS_COMPILE)gcc
+-LD=$(CROSS_COMPILE)ld
+-AR=$(CROSS_COMPILE)ar
++CC ?= $(CROSS_COMPILE)gcc
++LD ?= $(CROSS_COMPILE)ld
++AR ?= $(CROSS_COMPILE)ar
+ 
+ SYS=posix
+ CRYPTO=OPENSSL

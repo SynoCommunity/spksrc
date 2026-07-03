@@ -1,0 +1,2 @@
+bin:bin/strace
+rsc:bin/strace-log-merge

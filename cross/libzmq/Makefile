@@ -1,5 +1,5 @@
 PKG_NAME = libzmq
-PKG_VERS = 4.3.3
+PKG_VERS = 4.3.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/zeromq/libzmq/archive
@@ -14,10 +14,14 @@ LICENSE  = GPLv3
 
 include ../../mk/spksrc.cross-cmake.mk
 
+# Flags to be added to CMake toolchain file
 ifeq ($(findstring $(ARCH), 88f6281 ppc853x),$(ARCH))
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS=-lrt
-CMAKE_ARGS += -DCMAKE_C_FLAGS=-std=gnu99
+ADDITIONAL_CFLAGS += -std=gnu99
+ADDITIONAL_CXXFLAGS += -lrt
 endif
 
 # Build ZeroMQ with encryption support
 CMAKE_ARGS += -DWITH_LIBSODIUM=ON
+
+# Disable benchmarking performance tools
+CMAKE_ARGS += -DWITH_PERF_TOOL=OFF

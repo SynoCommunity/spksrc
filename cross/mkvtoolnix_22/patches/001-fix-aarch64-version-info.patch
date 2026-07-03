@@ -1,0 +1,11 @@
+--- src/common/os.h.orig	2018-04-01 15:27:20.000000000 +0000
++++ src/common/os.h	2022-04-04 05:39:28.904134871 +0000
+@@ -51,7 +51,7 @@
+ # endif
+ #endif
+ 
+-#if (defined(SYS_WINDOWS) && defined(_WIN64)) || (!defined(SYS_WINDOWS) && (defined(__x86_64__) || defined(__ppc64__)))
++#if (defined(SYS_WINDOWS) && defined(_WIN64)) || (!defined(SYS_WINDOWS) && (defined(__x86_64__) || defined(__aarch64__) || defined(__ppc64__)))
+ # define ARCH_64BIT
+ #else
+ # define ARCH_32BIT

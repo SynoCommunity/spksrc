@@ -1,0 +1,30 @@
+#!/bin/sh
+# RabbitMQ CLI wrapper for DSM
+# Erlang requires the cookie to be mode 400 (owner read-only).
+# CLI tools must run as the package user to access the cookie.
+
+PKG_USER="sc-rabbitmq"
+PKG_DIR="/var/packages/rabbitmq"
+CMD_NAME=$(basename "$0")
+
+# Find the actual command (glob must be unquoted to expand)
+for cmd in ${PKG_DIR}/target/lib/rabbitmq_server-*/sbin/${CMD_NAME}; do
+    [ -f "$cmd" ] && break
+done
+
+if [ ! -f "$cmd" ]; then
+    echo "Error: Cannot find $CMD_NAME" >&2
+    exit 1
+fi
+
+# Change to package directory to avoid permission errors on CWD
+cd "${PKG_DIR}/target" || exit 1
+
+# Inform user about sudo requirement
+if ! sudo -n true 2>/dev/null; then
+    echo "RabbitMQ CLI tools require administrator privileges."
+    echo "Enter your DSM password when prompted."
+fi
+
+# Execute as package user with required environment
+exec sudo -u "$PKG_USER" HOME="${PKG_DIR}/var" "$cmd" "$@"

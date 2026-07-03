@@ -1,0 +1,27 @@
+Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
+===================================================================
+--- libavfilter/vf_tonemap_opencl.c
++++ libavfilter/vf_tonemap_opencl.c
+@@ -333,6 +333,7 @@ static int tonemap_opencl_init(AVFilterC
+     cl_uint max_compute_units, device_vendor_id;
+     cl_int cle;
+     cl_mem_flags dovi_buf_flags = CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR;
++    char *device_vendor = NULL;
+     char *device_name = NULL;
+     char *device_exts = NULL;
+     int i, j, err;
+@@ -407,6 +408,14 @@ static int tonemap_opencl_init(AVFilterC
+                 }
+                 av_free(device_name);
+             }
++        } else if (device_is_integrated == CL_TRUE) {
++            device_vendor = check_opencl_device_str(ctx->ocf.hwctx->device_id, CL_DEVICE_VENDOR);
++            device_name = check_opencl_device_str(ctx->ocf.hwctx->device_id, CL_DEVICE_NAME);
++            if (!strstr(device_vendor, "ARM") &&
++                !strstr(device_name, "Mali"))
++                ctx->tradeoff = 0;
++            av_free(device_vendor);
++            av_free(device_name);
+         } else {
+             ctx->tradeoff = 0;
+         }

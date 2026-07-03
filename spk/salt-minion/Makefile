@@ -1,41 +1,111 @@
 SPK_NAME = salt-minion
-SPK_VERS = 3001.1
-SPK_REV = 1
+SPK_VERS = 3008.0
+SPK_REV = 8
 SPK_ICON = src/salt-minion.png
 
-PIP = $(WORK_DIR)/../../../native/python3/work-native/install/usr/local/bin/pip
-BUILD_DEPENDS = cross/python3
-SPK_DEPENDS = "python3>=3.7"
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+PYTHON_PACKAGE = python314
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-# Requirements file generation
-# /usr/local/python3/bin/python3 -mvirtualenv --python=python3  salt-env
-# virtualenv --python=python3  salt-env
-# source salt-env/bin/activate
-# pip install salt
-# pip freeze > requirements.txt
-WHEELS = src/requirements.txt
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# SRM 1.2 toolchains fail to build wheel pyzmq
+REQUIRED_MIN_SRM = 1.3
 
-MAINTAINER = SynoCommunity
-DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
-RELOAD_UI = yes
+MAINTAINER   = SynoCommunity
+DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Minion
-CHANGELOG = "Update to 3001.1"
+CHANGELOG    = "1. Update Salt Minion to v3008.0. <br/>2. Migrate to Python 3.14."
 
-HOMEPAGE   = https://www.saltstack.com/
-LICENSE    = Apache
+HOMEPAGE     = https://repo.saltproject.io/
+LICENSE      = Apache
+#LICENSE_FILE = $(WORK_DIR)/salt-$(SPK_VERS)/LICENSE
 
 POST_STRIP_TARGET = salt-minion_extra_install
 
 # Service configuration
-CONF_DIR = src/conf
-SERVICE_USER = auto
+SERVICE_USER  = auto
 SERVICE_SETUP = src/service-setup.sh
-STARTABLE = yes
+STARTABLE     = yes
 
-include ../../mk/spksrc.spk.mk
+SPK_USR_LOCAL_LINKS  = bin:env/bin/salt-call
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-minion
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-proxy
+SPK_USR_LOCAL_LINKS += bin:env/bin/spm
+
+USE_ALTERNATE_TMPDIR = 1
+
+include ../../mk/spksrc.common.mk
+
+# [aiohttp]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [aiohttp] -std=c11 -DCYTHON_ATOMICS=0
+ifeq ($(findstring $(ARCH),comcerto2k),comcerto2k)
+# Built-in llhttp uses ARM NEON not supported on this arch
+ENV += AIOHTTP_NO_EXTENSIONS=1
+endif
+endif
+
+# [cryptography]
+DEPENDS += cross/openssl3
+
+# [frozenlist]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CXXFLAGS += [frozenlist] -std=c++11
+endif
+
+# [msgpack]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [msgpack] -std=c11
+WHEELS += msgpack==1.0.5
+else
+WHEELS += msgpack==1.1.2
+endif
+
+# [psutil]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [psutil] -std=c99
+endif
+
+# [pycryptodomex]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [pycryptodomex] -std=c11
+endif
+
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# [pyzmq]
+ENV += PYZMQ_LIBSODIUM_CONFIGURE_ARGS=--host=$(TC_TARGET)
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [pyzmq] -std=c11
+endif
+
+# [timelib]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [timelib] -std=c11
+endif
+
+# [yarl]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [yarl] -std=c11 -DCYTHON_ATOMICS=0
+WHEELS += yarl==1.22.0
+else
+WHEELS += yarl==1.23.0
+endif
+
+# [propcache]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [propcache] -std=c11
+endif
+
+# [protobuf]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CPPFLAGS += [protobuf] -std=c11
+endif
+
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: salt-minion_extra_install
 salt-minion_extra_install:
-	install -m 644 src/rsax931.py.patch $(STAGING_DIR)/share
-	install -m 644 src/minion.conf $(STAGING_DIR)/share
+	install -m 644 src/app/rsax931.py.patch $(STAGING_DIR)/share
+	install -m 644 src/app/minion $(STAGING_DIR)/share
+	install -m 644 src/app/proxy $(STAGING_DIR)/share

@@ -1,0 +1,9 @@
+pip==24.3.1
+setuptools==75.4.0
+wheel==0.45.0
+#
+build:build==1.2.2
+build:Cython==3.0.11
+build:pip-tools==7.4.1
+#
+cross:expandvars==0.12.0

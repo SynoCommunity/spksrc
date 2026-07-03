@@ -1,0 +1,39 @@
+Description: jlink: Hash of module differs to expected hash recorded in java.base
+ The cause is the use of dh_strip_nondeterminism late in the build
+ process.  This reorganises the jmod files, which in turn changes their
+ SHA256 checksums.  This would not be a problem, except that the
+ checksums are saved in java.base.jmod *before* the use of
+ dh_strip_nondeterminism.  Performing this stripping immediately after
+ each jmod file is created results in the checksums being consistent
+ throughout.
+Author: Julian Gilbey <jdg@debian.org>
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=944738
+Forwarded: not-needed
+
+--- a/make/CreateJmods.gmk
++++ b/make/CreateJmods.gmk
+@@ -230,6 +230,15 @@
+ 
+ # Create jmods in the support dir and then move them into place to keep the
+ # module path in $(IMAGES_OUTPUTDIR)/jmods valid at all times.
++# strip-nondeterminism requires the same timestamp as
++# dh_strip_nondeterminism uses, so we determine this first.
++# Fall back to the original behavior if the tools are missing for backports
++DSN_TIMESTAMP := $(shell perl -MDebian::Debhelper::Dh_Lib -e 'print get_source_date_epoch()' 2>/dev/null)
++ifneq (,$(DSN_TIMESTAMP))
++  ifneq (,$(wildcard /bin/strip-nondeterminism /usr/bin/strip-nondeterminism))
++    use_strip_ndt = yes
++  endif
++endif
+ $(eval $(call SetupExecute, create_$(JMOD_FILE), \
+     WARN := Creating $(INTERIM_MSG)$(JMOD_FILE), \
+     DEPS := $(DEPS), \
+@@ -241,7 +250,7 @@
+         --module-path $(JMODS_DIR) $(JMOD_FLAGS) \
+         $(JMOD_SOURCE_DATE) \
+         $(JMODS_SUPPORT_DIR)/$(JMOD_FILE), \
+-    POST_COMMAND := $(MV) $(JMODS_SUPPORT_DIR)/$(JMOD_FILE) $(JMODS_DIR)/$(JMOD_FILE), \
++    POST_COMMAND := $(if $(use_strip_ndt),strip-nondeterminism --timestamp $(DSN_TIMESTAMP) $(JMODS_SUPPORT_DIR)/$(JMOD_FILE) && )$(MV) $(JMODS_SUPPORT_DIR)/$(JMOD_FILE) $(JMODS_DIR)/$(JMOD_FILE), \
+ ))
+ 
+ TARGETS += $(create_$(JMOD_FILE))

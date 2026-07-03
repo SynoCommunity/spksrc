@@ -1,0 +1,8 @@
+TK_ARCH = monaco
+TK_VERS = 6.2.4
+TK_DIST_VERS = 6.2
+
+TK_TARGET = arm-unknown-linux-gnueabi
+TK_SYSROOT = $(TK_TARGET)/sysroot
+
+include ../../mk/spksrc.toolkit.mk

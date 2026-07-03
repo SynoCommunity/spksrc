@@ -1,0 +1,22 @@
+# avoid linking with libatomic for ARMv5_ARCHS and OLD_PPC_ARCHS
+# 
+--- Configurations/10-main.conf.orig	2025-04-08 13:09:06.000000000 +0000
++++ Configurations/10-main.conf	2025-05-10 08:01:20.490639698 +0000
+@@ -705,7 +705,7 @@
+     },
+ 
+     "linux-ppc" => {
+-        inherit_from     => [ "linux-latomic" ],
++        inherit_from     => [ "linux-generic32" ],
+         asm_arch         => 'ppc32',
+         perlasm_scheme   => "linux32",
+         lib_cppflags     => add("-DB_ENDIAN"),
+@@ -760,7 +760,7 @@
+         #
+         # ./Configure linux-armv4 -march=armv6 -D__ARM_MAX_ARCH__=8
+         #
+-        inherit_from     => [ "linux-latomic" ],
++        inherit_from     => [ "linux-generic32" ],
+         asm_arch         => 'armv4',
+         perlasm_scheme   => "linux32",
+     },

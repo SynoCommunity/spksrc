@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Config>
   <Branch>master</Branch>
-  <UpdateMechanism>BuiltIn</UpdateMechanism>
   <LaunchBrowser>False</LaunchBrowser>
   <Port>8310</Port>
-  <SslPort>8311</SslPort>
+  <UpdateAutomatically>True</UpdateAutomatically>
+  <UpdateMechanism>BuiltIn</UpdateMechanism>
 </Config>

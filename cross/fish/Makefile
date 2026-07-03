@@ -1,19 +1,76 @@
 PKG_NAME = fish
-PKG_VERS = 3.2.2
+PKG_VERS = 4.5.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/fish-shell/fish-shell/releases/download/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/ncursesw cross/pcre2
+DEPENDS =
+
+# fish 4.x requires Rust 2024 edition (1.85+); ARMv5 is capped at 1.77.2 in framework
+# PPC uses SPE ABI (powerpc-unknown-linux-gnuspe) which Rust doesn't support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
 
 HOMEPAGE = https://fishshell.com
 COMMENT = fish is a smart and user-friendly command line shell for Linux, macOS, and the rest of the family.
-LICENSE = Custom
+LICENSE = GPL-2.0
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+POST_INSTALL_TARGET = fish_post_install
+
+ENV += FISH_BUILD_DOCS=0
+
+include ../../mk/spksrc.common.mk
+
+# fish fails to build with message localization (gettext)
+CMAKE_ARGS = -DWITH_MESSAGE_LOCALIZATION=OFF
+
+# fish >= 4.0.0 requires rust
+# IMPORTANT:
+# fish must still be built with cmake
+# direct builds with cargo/rust (using spksrc.cross-rust.mk) create
+# experimental static versions without data files
+
+# keep cross tools in ENV for cargo to find CC and LD of toolchain
+CMAKE_USE_TOOLCHAIN_FILE = OFF
+
+# define RUST_TARGET similar to spksrc.cross/env-rust.mk
+# REMARKS: including spksrc.cross/env-rust.mk would break the build
+ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS)),$(ARCH))
+RUST_TARGET = armv7-unknown-linux-gnueabihf
+endif
+ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+RUST_TARGET = armv7-unknown-linux-gnueabi
+endif
+ifeq ($(findstring $(ARCH), $(ARMv8_ARCHS)),$(ARCH))
+RUST_TARGET = aarch64-unknown-linux-gnu
+endif
+ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
+RUST_TARGET = x86_64-unknown-linux-gnu
+endif
+ifeq ($(findstring $(ARCH), $(i686_ARCHS)),$(ARCH))
+RUST_TARGET = i686-unknown-linux-gnu
+endif
+
+# CMake Warning at cmake/FindRust.cmake:719 (message):
+#   CMake is in cross-compiling mode, but the cargo target-triple could not be
+#   inferred.Falling back to the default host target.  Please consider manually
+#   setting `Rust_CARGO_TARGET`.
+CMAKE_ARGS += -DRust_CARGO_TARGET=$(RUST_TARGET)
+
+# Export cross-compiler paths for cc-rs crate used by pcre2-sys
+# The cc-rs crate looks for CC_<target> (with underscores) to find the compiler
+ENV += CC_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)gcc
+ENV += CXX_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)g++
+ENV += AR_$(shell echo $(RUST_TARGET) | tr - _)=$(TC_PATH)$(TC_PREFIX)ar
+# pcre2-sys uses C99 features; older GCC (< 5.0) defaults to C89
+ENV += CFLAGS_$(shell echo $(RUST_TARGET) | tr - _)=-std=c99
+# Set cross-linker for Rust cargo builds
+ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr a-z- A-Z_)_LINKER=$(TC_PATH)$(TC_PREFIX)gcc
 
 include ../../mk/spksrc.cross-cmake.mk
 
-CMAKE_ARGS += -DCURSES_NCURSES_LIBRARY=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib/libncursesw.so
-CMAKE_ARGS += -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH"
+.PHONY: fish_post_install
+fish_post_install:
+	@$(MSG) "Install license.rst (referenced in LICENSE file in package)"
+	@install -d $(STAGING_INSTALL_PREFIX)/doc_src
+	@install --m 755 $(WORK_DIR)/$(PKG_DIR)/doc_src/license.rst $(STAGING_INSTALL_PREFIX)/doc_src/

@@ -1,0 +1,22 @@
+# Avoid compiler error:
+# linkfiles.c:146:3: error: a label can only be part of a statement and a declaration is not a statement
+#   int src_fd, dest_fd;
+# 
+--- linkfiles.c.orig	2025-08-21 19:48:43.000000000 +0000
++++ linkfiles.c	2025-08-21 20:03:49.238051191 +0000
+@@ -142,6 +142,7 @@
+ 	/* Clone link or reflink */
+ 	case 2:
+ #if defined __linux__ && defined FICLONE
++		{
+ 		/* Linux FICLONE (reflink copy) */
+ 		int src_fd, dest_fd;
+ 		if (batch->files[0].dirent == NULL) goto error_bad_params;
+@@ -169,6 +170,7 @@
+ 			continue;
+ 		}
+ 		close(src_fd);
++		}
+ #else /* not __linux__ */
+ 		jc_errno = ENOTSUP;
+ 		return -1;

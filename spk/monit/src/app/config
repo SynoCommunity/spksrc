@@ -1,8 +1,8 @@
 {
     ".url": {
         "com.synocommunity.packages.monit": {
-            "title": "monit",
-            "desc": "monit",
+            "title": "Monit",
+            "desc": "Monit Web UI",
             "icon": "images/monit-{0}.png",
             "type": "url",
             "protocol": "http",

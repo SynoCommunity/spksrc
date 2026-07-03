@@ -1,0 +1,22 @@
+https://sources.debian.org/src/openjdk-21/21.0.5+11-1/debian/patches/jdk-8334895-proposed.patch
+
+Description: set default compatible cds alignment to auto for arm64
+ ARM64 requires cds alignment option to be enabled if CDS is enabled.
+ Setting it to true will enable the option even if CDS is disabled
+ causing a configuration error. Setting option to auto allows one to
+ enable it only when CDS is enabled.
+Author: Vladimir Petko <vladimir.petko@canonical.com>
+Bug: https://bugs.openjdk.org/browse/JDK-8334895
+Last-Update: 2024-06-25
+
+--- a/make/autoconf/jdk-options.m4
++++ b/make/autoconf/jdk-options.m4
+@@ -197,7 +197,7 @@ AC_DEFUN_ONCE([JDKOPT_SETUP_JDK_OPTIONS]
+   # three different page sizes: 4K, 64K, and if run on Mac m1 hardware, 16K.
+   COMPATIBLE_CDS_ALIGNMENT_DEFAULT=false
+   if test "x$OPENJDK_TARGET_OS" = "xlinux" && test "x$OPENJDK_TARGET_CPU" = "xaarch64"; then
+-    COMPATIBLE_CDS_ALIGNMENT_DEFAULT=true
++    COMPATIBLE_CDS_ALIGNMENT_DEFAULT=auto
+   fi
+   AC_SUBST(COMPATIBLE_CDS_ALIGNMENT_DEFAULT)
+ 

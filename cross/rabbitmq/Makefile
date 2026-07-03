@@ -1,11 +1,14 @@
 PKG_NAME = rabbitmq
-PKG_VERS = 3.8.16
+PKG_VERS = 3.13.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-server-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rabbitmq/rabbitmq-server/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-server-$(PKG_VERS)
 
-BUILD_DEPENDS = native/erlang native/elixir native/rsync native/zip
+BUILD_DEPENDS = native/erlang native/elixir
+
+# Elixir protocol consolidation has race conditions under parallel make
+DISABLE_PARALLEL_MAKE = 1
 
 DEPENDS =
 
@@ -15,18 +18,28 @@ LICENSE  = MPL 2.0
 
 ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
 ELIXIR_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/elixir/work-native/install/usr/local/bin)
-RSYNC_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/rsync/work-native/install/usr/local/bin)
-ZIP_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/zip/work-native/install/usr/local/bin)
 
 # Build requires native erlang and elixir
-# Install requires native rsync and zip
-ENV += PATH=$$PATH:$(ERLANG_BIN_DIR):$(ELIXIR_BIN_DIR):$(RSYNC_BIN_DIR):$(ZIP_BIN_DIR)
+ENV += PATH=$$PATH:$(ERLANG_BIN_DIR):$(ELIXIR_BIN_DIR)
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = rabbitmq_install
+INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
+
+# we need a git tag that matches the rabbitmq version
+# to prevent to use an unrelated tag of the spksrc repo (at time of writing this is "mono-5.20.1.34-17dsm7")
+# as there are sub projects that take the version from the git repositry with "git describe --tag"
+PRE_CONFIGURE_TARGET = rabbitmq_pre_configure
+POST_INSTALL_TARGET = rabbitmq_post_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-.PHONY: rabbitmq_install
-rabbitmq_install:
-	$(RUN) DESTDIR=$(INSTALL_DIR) $(MAKE) install PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
+.PHONY rabbitmq_pre_configure:
+rabbitmq_pre_configure:
+	@$(MSG) "Temporary create a version tag v$(PKG_VERS)"
+	@git tag -f v$(PKG_VERS)
+
+.PHONY rabbitmq_post_install:
+rabbitmq_post_install:
+	@$(MSG) "Remove the temporary version tag v$(PKG_VERS)"
+	@git tag -d v$(PKG_VERS) 2>/dev/null || true
+	

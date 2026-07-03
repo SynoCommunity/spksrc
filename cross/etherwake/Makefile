@@ -8,8 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS).orig
 DEPENDS =
 
 # homepage is not reachable anymore
-HOMEPAGE = www.scyld.com/wakeonlan.html
-COMMENT  = Generate and transmit a Wake-On-LAN (WOL) Magic Packet
+HOMEPAGE = http://www.scyld.com/wakeonlan.html
+COMMENT  = Generate and transmit a Wake-On-LAN (WOL) Magic Packet.
 LICENSE  = GPL
 
 CONFIGURE_TARGET = nop

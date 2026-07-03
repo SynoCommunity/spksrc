@@ -1,0 +1,14 @@
+#
+# let configure find -lncursesw for readline
+#
+--- configure.orig	2022-04-11 15:28:12.000000000 +0000
++++ configure	2024-01-19 21:37:28.945316208 +0000
+@@ -19547,7 +19547,7 @@
+ 			READLINE_LIB="$readline"
+ 			break
+ 		fi
+-		for lib in -lterminfo -ltermcap -lncurses -lcurses
++		for lib in -lncursesw -lterminfo -ltermcap -lncurses -lcurses
+ 		do
+ 			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for readline with $readline $lib" >&5
+ $as_echo "$as_me: checking for readline with $readline $lib" >&6;}

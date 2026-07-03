@@ -1,16 +1,14 @@
 {
     ".url": {
         "com.synocommunity.packages.cops": {
-            "type": "url",
-            "title": "COPS",
+            "allUsers": true,
             "desc": "Calibre OPDS (and HTML) PHP Server : light alternative to Calibre content server / Calibre2OPDS",
-            "allUsers": true,
             "icon": "images/cops-{0}.png",
-            "protocol": "http",
-            "url": "/cops",
             "port": "80",
-            "allUsers": true,
-            "grantPrivilege": "local"
+            "protocol": "http",
+            "title": "COPS",
+            "type": "url",
+            "url": "/cops"
         }
     }
 }

@@ -1,34 +1,82 @@
-[{
-    "step_title": "dnscrypt-proxy configuration",
-    "items": [{
-        "desc": "Configuration file is located at: /var/packages/dnscrypt-proxy/target/var/dnscrypt-proxy.toml"
-    }, {
-        "type": "singleselect",
-        "desc": "IPv6 servers:",
-        "subitems": [{
-            "key": "wizard_ipv6",
-            "desc": "Enable servers with IPv6 support (a IPv6 connection is required)",
-            "defaultValue": false
-        }, {
-            "key": "wizard_noipv6",
-            "desc": "Disable IPv6 servers",
-            "defaultValue": true
-        }]
-    }, {
-        "type": "textfield",
-        "subitems": [{
-            "key": "wizard_servers",
-            "desc": "Server Names",
-            "defaultValue": "",
-            "validator": {
-                "allowBlank": true,
-                "regex": {
-                    "expr": "/^((('[\\w_\\-\\.]+', )+'[\\w_\\-\\.]+')|('[\\w_\\-\\.]+'))$/",
-                    "errorText": "Please use the following format: 'cloudflare', 'google'"
-                }
+[
+    {
+        "step_title": "DNS Settings",
+        "items": [
+            {
+                "desc": "Configure your encrypted DNS settings."
+            },
+            {
+                "type": "singleselect",
+                "desc": "<b>IPv6 Support</b><br>Enable only if your network has IPv6 connectivity",
+                "subitems": [
+                    {
+                        "key": "wizard_noipv6",
+                        "desc": "Disabled",
+                        "defaultValue": true
+                    },
+                    {
+                        "key": "wizard_ipv6",
+                        "desc": "Enabled",
+                        "defaultValue": false
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "desc": "<b>Preferred Servers</b> (optional)<br>Leave blank for auto-selection, or specify servers like 'cloudflare', 'google'",
+                "subitems": [
+                    {
+                        "key": "wizard_servers",
+                        "desc": "Server names",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true,
+                            "regex": {
+                                "expr": "/^((('[\\\\w_\\\\-\\\\.]+', )+'[\\\\w_\\\\-\\\\.]+')|('[\\\\w_\\\\-\\\\.]+'))$/",
+                                "errorText": "Use format: 'cloudflare', 'google'"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "desc": "<a target=\"_blank\" href=\"https://dnscrypt.info/public-servers\">View available servers</a>"
             }
-        }]
-    }, {
-        "desc": "If empty the proxy will automatically pick the fastest, working servers from the list. https://dnscrypt.info/public-servers"
-    }]
-}]
+        ]
+    },
+    {
+        "step_title": "Monitoring Dashboard",
+        "items": [
+            {
+                "desc": "Configure access to the built-in monitoring dashboard on port 8153.<br>Leave password blank to disable authentication."
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_ui_user",
+                        "desc": "Username",
+                        "defaultValue": "admin",
+                        "validator": {
+                            "allowBlank": false,
+                            "minLength": 1
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "password",
+                "subitems": [
+                    {
+                        "key": "wizard_ui_pass",
+                        "desc": "Password",
+                        "defaultValue": "",
+                        "validator": {
+                            "allowBlank": true
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]

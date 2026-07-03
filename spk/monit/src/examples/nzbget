@@ -1,6 +1,6 @@
 #default file provided by monit spk
 
-check process nzbget with pidfile /usr/local/nzbget/var/nzbget.pid
+check process nzbget with pidfile /var/packages/nzbget/var/nzbget.pid
     start program = "/var/packages/nzbget/scripts/start-stop-status start"
     stop program = "/var/packages/nzbget/scripts/start-stop-status stop"
     if failed host localhost port 6789 then restart

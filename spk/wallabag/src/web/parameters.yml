@@ -1,0 +1,57 @@
+parameters:
+    database_driver: pdo_mysql
+    database_driver_class: ~
+    database_host: localhost
+    database_port: ~
+    database_name: @database_name@
+    database_user: wallabag
+    database_password: @database_password@
+    # For SQLite, database_path should be "%kernel.project_dir%/data/db/wallabag.sqlite"
+    database_path: null
+    database_table_prefix: wallabag_
+    database_socket: /run/mysqld/mysqld10.sock
+    # with PostgreSQL and SQLite, you must set "utf8"
+    database_charset: utf8mb4
+
+    domain_name: '@protocol_and_domain_name@'
+    server_name: 'Your wallabag instance'
+
+    mailer_dsn: 'smtp://127.0.0.1'
+    
+    locale: en
+
+    # A secret key that's used to generate certain security-related tokens
+    secret: @wallabag_secret@
+
+    # two factor stuff
+    twofactor_auth: false
+    twofactor_sender: no-reply@wallabag.org
+
+    # fosuser stuff
+    fosuser_registration: false
+    fosuser_confirmation: false
+
+    # how long the access token should live in seconds for the API
+    fos_oauth_server_access_token_lifetime: 3600
+    # how long the refresh token should life in seconds for the API
+    fos_oauth_server_refresh_token_lifetime: 1209600
+
+    from_email: no-reply@wallabag.org
+
+    rss_limit: 50
+    # RabbitMQ processing
+    rabbitmq_host: localhost
+    rabbitmq_port: 5672
+    rabbitmq_user: guest
+    rabbitmq_password: guest
+    rabbitmq_prefetch_count: 10
+
+    # Redis processing
+    redis_scheme: tcp
+    redis_host: localhost
+    redis_port: 6379
+    redis_path: null
+    redis_password: null
+
+    # sentry logging
+    sentry_dsn: ~

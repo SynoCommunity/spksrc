@@ -1,0 +1,271 @@
+Index: jellyfin-ffmpeg/fftools/Makefile
+===================================================================
+--- fftools/Makefile
++++ fftools/Makefile
+@@ -10,7 +10,6 @@ ALLAVPROGS   = $(AVBASENAMES:%=%$(PROGSS
+ ALLAVPROGS_G = $(AVBASENAMES:%=%$(PROGSSUF)_g$(EXESUF))
+ 
+ OBJS-ffmpeg                        += fftools/ffmpeg_opt.o fftools/ffmpeg_filter.o fftools/ffmpeg_hw.o
+-OBJS-ffmpeg-$(CONFIG_LIBMFX)       += fftools/ffmpeg_qsv.o
+ ifndef CONFIG_VIDEOTOOLBOX
+ OBJS-ffmpeg-$(CONFIG_VDA)          += fftools/ffmpeg_videotoolbox.o
+ endif
+Index: jellyfin-ffmpeg/fftools/ffmpeg.h
+===================================================================
+--- fftools/ffmpeg.h
++++ fftools/ffmpeg.h
+@@ -60,7 +60,6 @@ enum HWAccelID {
+     HWACCEL_AUTO,
+     HWACCEL_GENERIC,
+     HWACCEL_VIDEOTOOLBOX,
+-    HWACCEL_QSV,
+ };
+ 
+ typedef struct HWAccel {
+Index: jellyfin-ffmpeg/fftools/ffmpeg_hw.c
+===================================================================
+--- fftools/ffmpeg_hw.c
++++ fftools/ffmpeg_hw.c
+@@ -353,6 +353,18 @@ int hw_device_setup_for_decode(InputStre
+         } else if (ist->hwaccel_id == HWACCEL_GENERIC) {
+             type = ist->hwaccel_device_type;
+             dev = hw_device_get_by_type(type);
++
++            // When "-qsv_device device" is used, an internal QSV device named
++            // as "__qsv_device" is created. Another QSV device is created too
++            // if "-init_hw_device qsv=name:device" is used. There are 2 QSV devices
++            // if both "-qsv_device device" and "-init_hw_device qsv=name:device"
++            // are used, hw_device_get_by_type(AV_HWDEVICE_TYPE_QSV) returns NULL.
++            // To keep back-compatibility with the removed ad-hoc libmfx setup code,
++            // call hw_device_get_by_name("__qsv_device") to select the internal QSV
++            // device.
++            if (!dev && type == AV_HWDEVICE_TYPE_QSV)
++                dev = hw_device_get_by_name("__qsv_device");
++
+             if (!dev)
+                 err = hw_device_init_from_type(type, NULL, &dev);
+         } else {
+Index: jellyfin-ffmpeg/fftools/ffmpeg_opt.c
+===================================================================
+--- fftools/ffmpeg_opt.c
++++ fftools/ffmpeg_opt.c
+@@ -137,9 +137,6 @@ const HWAccel hwaccels[] = {
+ #if CONFIG_VIDEOTOOLBOX
+     { "videotoolbox", videotoolbox_init, HWACCEL_VIDEOTOOLBOX, AV_PIX_FMT_VIDEOTOOLBOX },
+ #endif
+-#if CONFIG_LIBMFX
+-    { "qsv",   qsv_init,   HWACCEL_QSV,   AV_PIX_FMT_QSV },
+-#endif
+     { 0 },
+ };
+ HWDevice *filter_hw_device;
+@@ -569,6 +566,23 @@ static int opt_vaapi_device(void *optctx
+ }
+ #endif
+ 
++#if CONFIG_QSV
++static int opt_qsv_device(void *optctx, const char *opt, const char *arg)
++{
++    const char *prefix = "qsv=__qsv_device:hw_any,child_device=";
++    int err;
++    char *tmp = av_asprintf("%s%s", prefix, arg);
++
++    if (!tmp)
++        return AVERROR(ENOMEM);
++
++    err = hw_device_init_from_string(tmp, NULL);
++    av_free(tmp);
++
++    return err;
++}
++#endif
++
+ static int opt_init_hw_device(void *optctx, const char *opt, const char *arg)
+ {
+     if (!strcmp(arg, "list")) {
+@@ -893,6 +907,12 @@ static void add_input_streams(OptionsCon
+                     "with old commandlines. This behaviour is DEPRECATED and will be removed "
+                     "in the future. Please explicitly set \"-hwaccel_output_format cuda\".\n");
+                 ist->hwaccel_output_format = AV_PIX_FMT_CUDA;
++            } else if (!hwaccel_output_format && hwaccel && !strcmp(hwaccel, "qsv")) {
++                av_log(NULL, AV_LOG_WARNING,
++                    "WARNING: defaulting hwaccel_output_format to qsv for compatibility "
++                    "with old commandlines. This behaviour is DEPRECATED and will be removed "
++                    "in the future. Please explicitly set \"-hwaccel_output_format qsv\".\n");
++                ist->hwaccel_output_format = AV_PIX_FMT_QSV;
+             } else if (hwaccel_output_format) {
+                 ist->hwaccel_output_format = av_get_pix_fmt(hwaccel_output_format);
+                 if (ist->hwaccel_output_format == AV_PIX_FMT_NONE) {
+@@ -3814,7 +3834,7 @@ const OptionDef options[] = {
+ #endif
+ 
+ #if CONFIG_QSV
+-    { "qsv_device", HAS_ARG | OPT_STRING | OPT_EXPERT, { &qsv_device },
++    { "qsv_device", HAS_ARG | OPT_EXPERT, { .func_arg = opt_qsv_device },
+         "set QSV hardware device (DirectX adapter index, DRM path or X11 display name)", "device"},
+ #endif
+ 
+Index: jellyfin-ffmpeg/fftools/ffmpeg_qsv.c
+===================================================================
+--- fftools/ffmpeg_qsv.c
++++ /dev/null
+@@ -1,110 +0,0 @@
+-/*
+- * This file is part of FFmpeg.
+- *
+- * FFmpeg is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2.1 of the License, or (at your option) any later version.
+- *
+- * FFmpeg is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with FFmpeg; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+- */
+-
+-#include <mfx/mfxvideo.h>
+-#include <stdlib.h>
+-
+-#include "libavutil/dict.h"
+-#include "libavutil/hwcontext.h"
+-#include "libavutil/hwcontext_qsv.h"
+-#include "libavutil/mem.h"
+-#include "libavutil/opt.h"
+-#include "libavcodec/qsv.h"
+-
+-#include "ffmpeg.h"
+-
+-static AVBufferRef *hw_device_ctx;
+-char *qsv_device = NULL;
+-
+-static int qsv_get_buffer(AVCodecContext *s, AVFrame *frame, int flags)
+-{
+-    InputStream *ist = s->opaque;
+-
+-    return av_hwframe_get_buffer(ist->hw_frames_ctx, frame, 0);
+-}
+-
+-static void qsv_uninit(AVCodecContext *s)
+-{
+-    InputStream *ist = s->opaque;
+-    av_buffer_unref(&ist->hw_frames_ctx);
+-}
+-
+-static int qsv_device_init(InputStream *ist)
+-{
+-    int err;
+-    AVDictionary *dict = NULL;
+-
+-    if (qsv_device) {
+-        err = av_dict_set(&dict, "child_device", qsv_device, 0);
+-        if (err < 0)
+-            return err;
+-    }
+-
+-    err = av_hwdevice_ctx_create(&hw_device_ctx, AV_HWDEVICE_TYPE_QSV,
+-                                 ist->hwaccel_device, dict, 0);
+-    if (err < 0) {
+-        av_log(NULL, AV_LOG_ERROR, "Error creating a QSV device\n");
+-        goto err_out;
+-    }
+-
+-err_out:
+-    if (dict)
+-        av_dict_free(&dict);
+-
+-    return err;
+-}
+-
+-int qsv_init(AVCodecContext *s)
+-{
+-    InputStream *ist = s->opaque;
+-    AVHWFramesContext *frames_ctx;
+-    AVQSVFramesContext *frames_hwctx;
+-    int ret;
+-
+-    if (!hw_device_ctx) {
+-        ret = qsv_device_init(ist);
+-        if (ret < 0)
+-            return ret;
+-    }
+-
+-    av_buffer_unref(&ist->hw_frames_ctx);
+-    ist->hw_frames_ctx = av_hwframe_ctx_alloc(hw_device_ctx);
+-    if (!ist->hw_frames_ctx)
+-        return AVERROR(ENOMEM);
+-
+-    frames_ctx   = (AVHWFramesContext*)ist->hw_frames_ctx->data;
+-    frames_hwctx = frames_ctx->hwctx;
+-
+-    frames_ctx->width             = FFALIGN(s->coded_width,  32);
+-    frames_ctx->height            = FFALIGN(s->coded_height, 32);
+-    frames_ctx->format            = AV_PIX_FMT_QSV;
+-    frames_ctx->sw_format         = s->sw_pix_fmt;
+-    frames_ctx->initial_pool_size = 64 + s->extra_hw_frames;
+-    frames_hwctx->frame_type      = MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
+-
+-    ret = av_hwframe_ctx_init(ist->hw_frames_ctx);
+-    if (ret < 0) {
+-        av_log(NULL, AV_LOG_ERROR, "Error initializing a QSV frame pool\n");
+-        return ret;
+-    }
+-
+-    ist->hwaccel_get_buffer = qsv_get_buffer;
+-    ist->hwaccel_uninit     = qsv_uninit;
+-
+-    return 0;
+-}
+Index: jellyfin-ffmpeg/libavcodec/qsvdec.c
+===================================================================
+--- libavcodec/qsvdec.c
++++ libavcodec/qsvdec.c
+@@ -89,7 +89,7 @@ static const AVCodecHWConfigInternal *co
+         .public = {
+             .pix_fmt     = AV_PIX_FMT_QSV,
+             .methods     = AV_CODEC_HW_CONFIG_METHOD_HW_FRAMES_CTX |
+-                           AV_CODEC_HW_CONFIG_METHOD_AD_HOC,
++                           AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX,
+             .device_type = AV_HWDEVICE_TYPE_QSV,
+         },
+         .hwaccel = NULL,
+@@ -238,6 +238,35 @@ static int qsv_decode_preinit(AVCodecCon
+         q->nb_ext_buffers = user_ctx->nb_ext_buffers;
+     }
+ 
++    if (avctx->hw_device_ctx && !avctx->hw_frames_ctx && ret == AV_PIX_FMT_QSV) {
++        AVHWFramesContext *hwframes_ctx;
++        AVQSVFramesContext *frames_hwctx;
++
++        avctx->hw_frames_ctx = av_hwframe_ctx_alloc(avctx->hw_device_ctx);
++
++        if (!avctx->hw_frames_ctx) {
++            av_log(avctx, AV_LOG_ERROR, "av_hwframe_ctx_alloc failed\n");
++            return AVERROR(ENOMEM);
++        }
++
++        hwframes_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
++        frames_hwctx = hwframes_ctx->hwctx;
++        hwframes_ctx->width             = FFALIGN(avctx->coded_width,  32);
++        hwframes_ctx->height            = FFALIGN(avctx->coded_height, 32);
++        hwframes_ctx->format            = AV_PIX_FMT_QSV;
++        hwframes_ctx->sw_format         = avctx->sw_pix_fmt;
++        hwframes_ctx->initial_pool_size = 64 + avctx->extra_hw_frames;
++        frames_hwctx->frame_type        = MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
++
++        ret = av_hwframe_ctx_init(avctx->hw_frames_ctx);
++
++        if (ret < 0) {
++            av_log(NULL, AV_LOG_ERROR, "Error initializing a QSV frame pool\n");
++            av_buffer_unref(&avctx->hw_frames_ctx);
++            return ret;
++        }
++    }
++
+     if (avctx->hw_frames_ctx) {
+         AVHWFramesContext    *frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
+         AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;

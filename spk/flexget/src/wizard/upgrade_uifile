@@ -1,6 +1,6 @@
 [{
     "step_title": "FlexGet Documentation",
     "items": [{
-        "desc": "Warning: your configuration may require changes after update. Please refer to <a target=\"_blank\" href=\"https://flexget.com/Configuration\">documentation</a> for FlexGet configuration."
+        "desc": "Warning: your configuration may require changes after update. Please refer to <a target=\"_blank\" href=\"https://flexget.com/Configuration\">documentation</a> for FlexGet configuration.<br><br>In order to setup your default password please refer to <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Flexget\">SynoCommunity wiki</a>"
     }]
 }]

@@ -1,0 +1,11 @@
+--- admin/install.php.orig	2025-03-01 19:16:14
++++ admin/install.php	2025-03-05 09:55:48
+@@ -478,7 +478,7 @@
+ 		Checking URL to installation
+ 	</td>
+ 	<?php
+-		$t_url_check = '';
++		$t_url_check = 'GOOD';
+ 		$t_hard_fail = false;
+ 		if( !$f_path ) {
+ 			# Empty URL - warn admin about security risk

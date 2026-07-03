@@ -63,7 +63,7 @@
     -->
     <hostname>localhost</hostname>
 
-    <!-- You may have multiple <listener> elements -->
+    <!-- You may have multiple <listen-socket> elements -->
     <listen-socket>
         <port>8000</port>
         <!-- <bind-address>127.0.0.1</bind-address> -->
@@ -97,7 +97,7 @@
 
     <!-- Relaying
          You don't need this if you only have one server.
-         Please refer to the config for a detailed explanation.
+         Please refer to the documentation for a detailed explanation.
     -->
     <!--<master-server>127.0.0.1</master-server>-->
     <!--<master-server-port>8001</master-server-port>-->
@@ -189,16 +189,19 @@
 
     <fileserve>1</fileserve>
 
+    <!-- location of mime types file used for file serving -->
+    <mime-types>/var/packages/icecast/var/mime.types</mime-types>
+
     <paths>
         <!-- basedir is only used if chroot is enabled -->
-        <basedir>/usr/local/icecast/share/icecast</basedir>
+        <basedir>/var/packages/icecast/target/share/icecast</basedir>
 
         <!-- Note that if <chroot> is turned on below, these paths must both
              be relative to the new root, not the original root -->
-        <logdir>/usr/local/icecast/var/log</logdir>
-        <webroot>/usr/local/icecast/share/icecast/web</webroot>
-        <adminroot>/usr/local/icecast/share/icecast/admin</adminroot>
-        <pidfile>/usr/local/icecast/var/icecast.pid</pidfile>
+        <logdir>/var/packages/icecast/var/log</logdir>
+        <webroot>/var/packages/icecast/target/share/icecast/web</webroot>
+        <adminroot>/var/packages/icecast/target/share/icecast/admin</adminroot>
+        <pidfile>/var/packages/icecast/var/icecast.pid</pidfile>
 
         <!-- Aliases: treat requests for 'source' path as being for 'dest' path
              May be made specific to a port or bound address using the "port"
@@ -214,7 +217,7 @@
         <alias source="/" destination="/status.xsl"/>
         <!-- The certificate file needs to contain both public and private part.
              Both should be PEM encoded.
-        <ssl-certificate>/usr/local/share/icecast/icecast.pem</ssl-certificate>
+        <ssl-certificate>/var/packages/icecast/target/share/icecast/icecast.pem</ssl-certificate>
         -->
     </paths>
 
@@ -236,8 +239,8 @@
         <chroot>0</chroot>
         <!--
         <changeowner>
-            <user>icecast</user>
-            <group>root</group>
+            <user>nobody</user>
+            <group>nogroup</group>
         </changeowner>
         -->
     </security>

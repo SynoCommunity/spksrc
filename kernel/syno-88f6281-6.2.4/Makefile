@@ -1,0 +1,8 @@
+KERNEL_ARCH = 88f6281
+KERNEL_VERS = 6.2.4
+KERNEL_DIST = linux-2.6.32
+KERNEL_BASE_ARCH = arm
+KERNEL_URL_DIR = 6281
+KERNEL_URL_VERSION = 6.2
+
+include ../../mk/spksrc.kernel.mk

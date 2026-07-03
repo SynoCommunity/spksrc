@@ -1,0 +1,15 @@
+# ARMv5 archs do not support -std=c11 but build with -std=c99
+# - downgrade to -std=c99
+# - add rt library to provide clock_gettime
+# 
+--- Makefile.orig	2021-04-13 11:05:13.000000000 +0000
++++ Makefile	2023-06-28 23:49:46.281099894 +0000
+@@ -115,7 +115,7 @@
+ 	LDLIBS_CURSES ?= -lncurses
+ endif
+ 
+-CFLAGS += -std=c11 -Wall -Wextra -Wshadow
++CFLAGS += -std=c99 -Wall -Wextra -Wshadow -lrt
+ CFLAGS += $(CFLAGS_OPTIMIZATION)
+ CFLAGS += $(CFLAGS_CURSES)
+ 

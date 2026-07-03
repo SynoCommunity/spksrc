@@ -1,0 +1,17 @@
+# fix for older gcc not supporting __has_attribute()
+# 
+--- lib/isc/include/isc/attributes.h.orig	2026-01-09 14:44:04.857039500 +0100
++++ lib/isc/include/isc/attributes.h	2026-01-30 16:28:53.663812116 +0100
+@@ -83,8 +83,12 @@
+ 
+ #define ISC_ATTR_UNUSED __attribute__((__unused__))
+ 
++#if defined __has_attribute
+ #if __has_attribute(__nonnull__)
+ #define ISC_ATTR_NONNULL(...) __attribute__((__nonnull__(__VA_ARGS__)))
+ #else
+ #define ISC_ATTR_NONNULL(...)
+ #endif
++#else
++#define ISC_ATTR_NONNULL(...)
++#endif

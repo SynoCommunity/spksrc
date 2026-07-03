@@ -1,0 +1,6 @@
+[{
+    "step_title": "Updating Prowlarr",
+    "items": [{
+        "desc": "Keep Prowlarr up-to-date by using Prowlarr's built-in updater.<br>Navigate to System>Updates in the Prowlarr UI."
+    }]
+}]

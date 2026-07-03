@@ -1,0 +1,29 @@
+# Adjust Makefile options
+# - disable git: we build inside the git repository of spksrc and not mergerfs
+# - allow ENV variables for installation paths (DESTDIR, PREFIX)
+# 
+--- Makefile.orig	2024-02-29 23:33:57.000000000 +0000
++++ Makefile	2025-04-04 09:27:02.380826415 +0000
+@@ -30,11 +30,6 @@
+ PKGCONFIG = pkg-config
+ 
+ GIT_REPO = 0
+-ifneq ($(shell $(GIT) --version 2> /dev/null),)
+-ifeq  ($(shell test -e .git; echo $$?),0)
+-GIT_REPO = 1
+-endif
+-endif
+ 
+ USE_XATTR = 1
+ UGID_USE_RWLOCK = 0
+@@ -97,8 +92,8 @@
+     -lrt
+ 
+ # https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
+-DESTDIR       =
+-PREFIX        = /usr/local
++DESTDIR       ?=
++PREFIX        ?= /usr/local
+ EXEC_PREFIX   = $(PREFIX)
+ DATAROOTDIR   = $(PREFIX)/share
+ DATADIR       = $(DATAROOTDIR)

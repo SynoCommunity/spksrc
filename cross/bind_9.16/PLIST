@@ -1,0 +1,4 @@
+bin:bin/arpaname
+bin:bin/delv
+bin:bin/dig
+bin:bin/mdig

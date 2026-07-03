@@ -1,0 +1,52 @@
+Index: FFmpeg/libavformat/mpegts.c
+===================================================================
+--- libavformat/mpegts.c
++++ libavformat/mpegts.c
+@@ -2263,6 +2263,7 @@ int ff_parse_mpeg2_descriptor(AVFormatCo
+                 sti->need_parsing = AVSTREAM_PARSE_FULL;
+                 sti->need_context_update = 1;
+             }
++            break;
+         }
+         if (ext_desc_tag == SUPPLEMENTARY_AUDIO_DESCRIPTOR) {
+             int flags;
+@@ -2300,22 +2301,14 @@ int ff_parse_mpeg2_descriptor(AVFormatCo
+                 if (language[0])
+                     av_dict_set(&st->metadata, "language", language, 0);
+             }
++            break;
+         }
+-        break;
+-    case AC3_DESCRIPTOR:
+-        {
+-            int component_type_flag = get8(pp, desc_end) & (1 << 7);
+-            if (component_type_flag) {
+-                int component_type = get8(pp, desc_end);
+-                int service_type_mask = 0x38;  // 0b00111000
+-                int service_type = ((component_type & service_type_mask) >> 3);
+-                if (service_type == 0x02 /* 0b010 */) {
+-                    st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
+-                    av_log(ts ? ts->stream : fc, AV_LOG_DEBUG, "New track disposition for id %u: %u\n", st->id, st->disposition);
+-                }
+-            }
++        if (ext_desc_tag == AC4_DESCRIPTOR) {
++            st->codecpar->codec_id = AV_CODEC_ID_AC4;
++            st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
+         }
+         break;
++    case AC3_DESCRIPTOR:
+     case ENHANCED_AC3_DESCRIPTOR:
+         {
+             int component_type_flag = get8(pp, desc_end) & (1 << 7);
+Index: FFmpeg/libavformat/mpegts.h
+===================================================================
+--- libavformat/mpegts.h
++++ libavformat/mpegts.h
+@@ -228,6 +228,7 @@ https://developer.apple.com/library/arch
+ /* DVB descriptor_tag_extension values from
+    ETSI EN 300 468 Table 109: Possible locations of extended descriptors */
+ #define SUPPLEMENTARY_AUDIO_DESCRIPTOR 0x06
++#define AC4_DESCRIPTOR 0x15
+ 
+ /** see "Dolby Vision Streams Within the MPEG-2 Transport Stream Format"
+ https://professional.dolby.com/siteassets/content-creation/dolby-vision-for-content-creators/dolby-vision-bitstreams-in-mpeg-2-transport-stream-multiplex-v1.2.pdf */

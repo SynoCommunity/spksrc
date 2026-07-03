@@ -10,9 +10,10 @@ DEPENDS += cross/e2fsprogs cross/ntfs-3g_ntfsprogs cross/libewf cross/progsreise
 
 HOMEPAGE = https://www.cgsecurity.org/wiki/TestDisk
 COMMENT  = TestDisk is powerful free data recovery software.
-LICENSE  = 
+LICENSE  = GPLv2+
 
 GNU_CONFIGURE = 1
+CONFIGURE_ARGS = --disable-qt
 
 ADDITIONAL_CFLAGS = -O -Wno-unused-parameter -Wno-attributes -Wno-cast-align -Wno-sign-compare -Wno-inline
 

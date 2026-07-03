@@ -11,7 +11,6 @@ MAINTAINER = Diaoul
 DESCRIPTION = Maraschino is a simple web interface that acts as a nice overview/front page for your XBMC HTPC. It has many modules: Media library browser, SABnzbd+, SickBeard, XBMC controller, Diskspace, Weather, Transmission and so on.
 DESCRIPTION_FRE = Maraschino est une interface web qui sert de vue d\'ensemble/page d\'accueil à votre HTPC XBMC. Il dispose de multiple modules: Bibliothèque multimédia, SABnzbd+, SickBeard, Controlleur XBMC, Espace disque, Météo, Transmission et bien d\'autres.
 ADMIN_PORT = 8260
-RELOAD_UI = yes
 DISPLAY_NAME = Maraschino
 CHANGELOG = "1. Update to latest version<br>2. Enable built-in updater"
 
@@ -28,8 +27,8 @@ INSTALL_PREFIX = /usr/local/$(SPK_NAME)
 COPY_TARGET = nop
 POST_STRIP_TARGET = maraschino_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+# Pure Python package, make sure ARCH is noarch
+override ARCH=noarch
 
 include ../../mk/spksrc.spk.mk
 

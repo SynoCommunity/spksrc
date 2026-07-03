@@ -1,5 +1,5 @@
 PKG_NAME = uriparser
-PKG_VERS = 0.9.5
+PKG_VERS = 0.9.6
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/uriparser/uriparser/releases/download/$(PKG_NAME)-$(PKG_VERS)

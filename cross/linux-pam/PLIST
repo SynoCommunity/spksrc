@@ -1,0 +1,9 @@
+lnk:lib/libpam.so
+lnk:lib/libpam.so.0
+lib:lib/libpam.so.0.85.1
+lnk:lib/libpam_misc.so
+lnk:lib/libpam_misc.so.0
+lib:lib/libpam_misc.so.0.82.1
+lnk:lib/libpamc.so
+lnk:lib/libpamc.so.0
+lib:lib/libpamc.so.0.82.1

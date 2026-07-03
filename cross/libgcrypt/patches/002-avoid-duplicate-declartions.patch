@@ -1,0 +1,18 @@
+# Remove typedefs for mpi_ptr_t and mpi_size_t
+# 
+# The definitions were moved to mpi.h in libgcrypt v1.11.1, but not removed in mpi-internal.h
+# - newer gcc do not complain about "duplicate typedefs with the same type"
+# - old gcc (< 4.4) fail to build without this patch
+# 
+--- mpi/mpi-internal.h.orig	2025-03-17 09:55:24.000000000 +0000
++++ mpi/mpi-internal.h	2025-07-26 19:20:46.298413009 +0000
+@@ -69,9 +69,6 @@
+ #endif
+ 
+ 
+-typedef mpi_limb_t *mpi_ptr_t; /* pointer to a limb */
+-typedef int mpi_size_t;        /* (must be a signed type) */
+-
+ #define ABS(x) (x >= 0 ? x : -x)
+ #define MIN(l,o) ((l) < (o) ? (l) : (o))
+ #define MAX(h,i) ((h) > (i) ? (h) : (i))

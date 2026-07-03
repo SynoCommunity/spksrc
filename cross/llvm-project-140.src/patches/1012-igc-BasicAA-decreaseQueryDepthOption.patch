@@ -1,0 +1,54 @@
+/*========================== begin_copyright_notice ============================
+
+Copyright (C) 2023 Intel Corporation
+
+SPDX-License-Identifier: MIT
+
+============================= end_copyright_notice ===========================*/
+
+/*========================== begin_copyright_notice ============================
+
+Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+See https://llvm.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 with LLVM-exception
+
+============================= end_copyright_notice ===========================*/
+
+# Description
+#
+# Add an option that would allow us to roll back the limit of recursive AA
+# queries, and thus avoid stack overflows for LoopOpt-intensive cases. The
+# patch retains the default value set within LLORG commit 1d9f4903c.
+# TODO: Once upstreamed, update with LLORG revision & adjust per community review.
+# A better, but heavier long-term fix would involve a complete rework of
+# BasicAA iteration logic so as to avoid recursion altogether.
+
+diff --git a/llvm/lib/Analysis/BasicAliasAnalysis.cpp b/llvm/lib/Analysis/BasicAliasAnalysis.cpp
+index 0a0b53796..76365c38a 100644
+--- a/llvm/lib/Analysis/BasicAliasAnalysis.cpp
++++ b/llvm/lib/Analysis/BasicAliasAnalysis.cpp
+@@ -69,6 +69,11 @@ using namespace llvm;
+ static cl::opt<bool> EnableRecPhiAnalysis("basic-aa-recphi", cl::Hidden,
+                                           cl::init(true));
+
++/// Limit depth of reqursive AA queries. The limit is set to be large enough so
++/// that it's hit very rarely, yet small enough to avoid stack overflows.
++static cl::opt<unsigned> AAQueryDepthLimit("basic-aa-max-query-depth", cl::Hidden,
++                                           cl::init(512));
++
+ /// SearchLimitReached / SearchTimes shows how often the limit of
+ /// to decompose GEPs is reached. It will affect the precision
+ /// of basic alias analysis.
+@@ -1628,10 +1633,8 @@ AliasResult BasicAAResult::aliasCheck(const Value *V1, LocationSize V1Size,
+   }
+
+   // FIXME: If this depth limit is hit, then we may cache sub-optimal results
+-  // for recursive queries. For this reason, this limit is chosen to be large
+-  // enough to be very rarely hit, while still being small enough to avoid
+-  // stack overflows.
+-  if (AAQI.Depth >= 512)
++  // for recursive queries.
++  if (AAQI.Depth >= AAQueryDepthLimit)
+     return AliasResult::MayAlias;
+
+   // Check the cache before climbing up use-def chains. This also terminates

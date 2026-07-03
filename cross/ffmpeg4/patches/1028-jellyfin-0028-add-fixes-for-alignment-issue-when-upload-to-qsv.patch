@@ -1,0 +1,96 @@
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
+===================================================================
+--- libavutil/hwcontext_qsv.c
++++ libavutil/hwcontext_qsv.c
+@@ -47,6 +47,7 @@
+ #include "pixfmt.h"
+ #include "pixdesc.h"
+ #include "time.h"
++#include "imgutils.h"
+ 
+ #define QSV_VERSION_ATLEAST(MAJOR, MINOR)   \
+     (MFX_VERSION_MAJOR > (MAJOR) ||         \
+@@ -90,6 +91,7 @@ typedef struct QSVFramesContext {
+ 
+     mfxExtOpaqueSurfaceAlloc opaque_alloc;
+     mfxExtBuffer *ext_buffers[1];
++    AVFrame realigned_tmp_frame;
+ } QSVFramesContext;
+ 
+ static const struct {
+@@ -226,6 +228,7 @@ static void qsv_frames_uninit(AVHWFrames
+     av_freep(&s->surface_ptrs);
+     av_freep(&s->surfaces_internal);
+     av_freep(&s->handle_pairs_internal);
++    av_frame_unref(&s->realigned_tmp_frame);
+     av_buffer_unref(&s->child_frames_ref);
+ }
+ 
+@@ -1036,7 +1039,7 @@ static int qsv_transfer_data_to(AVHWFram
+     mfxStatus err;
+     int ret = 0;
+     /* make a copy if the input is not padded as libmfx requires */
+-    AVFrame tmp_frame;
++    AVFrame *tmp_frame = &s->realigned_tmp_frame;
+     const AVFrame *src_frame;
+     int realigned = 0;
+ 
+@@ -1067,22 +1070,37 @@ static int qsv_transfer_data_to(AVHWFram
+ 
+     if (src->height & 15 || src->linesize[0] & 15) {
+         realigned = 1;
+-        memset(&tmp_frame, 0, sizeof(tmp_frame));
+-        tmp_frame.format         = src->format;
+-        tmp_frame.width          = FFALIGN(src->width, 16);
+-        tmp_frame.height         = FFALIGN(src->height, 16);
+-        ret = av_frame_get_buffer(&tmp_frame, 0);
+-        if (ret < 0)
+-            return ret;
+-
+-        ret = av_frame_copy(&tmp_frame, src);
++        if (tmp_frame->format != src->format ||
++            tmp_frame->width  != FFALIGN(src->width, 16) ||
++            tmp_frame->height != FFALIGN(src->height, 16)) {
++            ptrdiff_t linesize[4] = {tmp_frame->linesize[0],
++                                     tmp_frame->linesize[1],
++                                     tmp_frame->linesize[2],
++                                     tmp_frame->linesize[3]};
++            av_frame_unref(tmp_frame);
++
++            tmp_frame->format = src->format;
++            tmp_frame->width  = FFALIGN(src->width, 16);
++            tmp_frame->height = FFALIGN(src->height, 16);
++            ret = av_frame_get_buffer(tmp_frame, 0);
++            if (ret < 0)
++                return ret;
++
++            ret = av_image_fill_black(tmp_frame->data, linesize, tmp_frame->format,
++                                    0, tmp_frame->width, tmp_frame->height);
++            if (ret < 0) {
++                av_frame_unref(tmp_frame);
++                return ret;
++            }
++        }
++        ret = av_frame_copy(tmp_frame, src);
+         if (ret < 0) {
+-            av_frame_unref(&tmp_frame);
++            av_frame_unref(tmp_frame);
+             return ret;
+         }
+     }
+ 
+-    src_frame = realigned ? &tmp_frame : src;
++    src_frame = realigned ? tmp_frame : src;
+ 
+     if (!s->session_upload) {
+         if (s->child_frames_ref)
+@@ -1114,9 +1132,6 @@ static int qsv_transfer_data_to(AVHWFram
+         return AVERROR_UNKNOWN;
+     }
+ 
+-    if (realigned)
+-        av_frame_unref(&tmp_frame);
+-
+     return 0;
+ }
+ 

@@ -1,106 +1,107 @@
 #!/bin/bash
 
-# github action to build the packages depending on changed files
-# 
+# Part of github build action
+#
+# Build the packages depending on evaluated packages (see prepare.sh)
+#
 # Functions:
-# - Build all packages depending on files defined in ${GH_FILES}.
+# - Build all packages depending on files defined in ${ARCH_PACKAGES} or ${NOARCH_PACKAGES}.
 # - Build for arch defined by ${GH_ARCH} (e.g. x64-6.1, noarch, ...).
-# - Successfully built packages are logged to $BUILD_SUCCESS_FILE.
+# - For DSM versions above the default builds, packages declared for that minimum
+#   DSM version are built (driven by MIN_DSM<V>_PACKAGES env vars). If no
+#   DSM-restricted packages are present, standard packages are built instead,
+#   allowing packages that behave differently per DSM version (but declare no
+#   minimum) to be built on all selected toolchains.
+# - Successfully built packages are logged to ${BUILD_SUCCESS_FILE}.
 # - Failed builds are logged to ${BUILD_ERROR_FILE} and annotated as error.
+# - For failed builds, the make command and the latest 15 lines of the build output are written to ${BUILD_ERROR_LOGFILE}.
 # - The build output is structured into log groups by package.
-# - As the disk space in the workflow environment is limitted, we clean the 
+# - As the disk space in the workflow environment is limited, we clean the
 #   work folder of each package after build. At 2020.06 this limit is 14GB.
-# - ffmpeg is not cleaned to be available for dependents.
-# - Therefore ffmpeg is built first if triggered by its own or a dependent.
+# - Packages in PACKAGES_TO_KEEP are not fully cleaned so dependents can reuse
+#   their artifacts (shared libs, python wheels, etc.).
+# - Therefore synocli-videodriver is built first if triggered by ffmpeg5-7.
+# - Therefore ffmpeg and python are built before their dependents (see prepare.sh).
 
+set -o pipefail
+
+# ===========================================================================
+# Configuration — keep in sync with prepare.sh
+# ===========================================================================
+
+# ffmpeg versions whose build artifacts must be preserved for dependents
+ffmpeg_versions=(5 6 7 8)
+
+# python minor versions whose build artifacts must be preserved for dependents
+python_versions=(311 312 314)
+
+# DSM versions above the default builds that require filtered package lists.
+# Must match the min_dsm_versions array in prepare.sh.
+min_dsm_versions=(7.2 7.3)
+
+# ===========================================================================
+
+# ===========================================================================
+# 1. Initialize build environment
+# ===========================================================================
 echo "::group:: ---- initialize build"
 make setup-synocommunity
-sed -i -e "s|#PARALLEL_MAKE=.*|PARALLEL_MAKE=4|" local.mk
+sed -i -e "s|#PARALLEL_MAKE\s*=.*|PARALLEL_MAKE=max|" \
+    -e "s|PUBLISH_API_KEY\s*=.*|PUBLISH_API_KEY=$API_KEY|" \
+    local.mk
+# Git >= 2.35.2 stops directory traversals when ownership changes from the current user (in response to CVE-2022-24765).
+# This prevents errors on nested repos that might have different file owner.
+git config --global --add safe.directory "/github/workspace"
 echo "::endgroup::"
-
-echo "::group:: ---- find dependent packages"
-
-# filter for changes made in the spk directories and take unique package name (without spk folder)
-SPK_TO_BUILD=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(spk)/\K[^\/]*" | sort -u | tr '\n' ' ')
-
-# filter for changes made in the cross and native directories and take unique package name (including cross or native folder)
-DEPENDENT_PACKAGES=$(echo "${GH_FILES}" | tr ' ' '\n' | grep -oP "(cross|native)/[^\/]*" | sort -u | tr '\n' ' ')
-
-# get dependency list
-# dependencies in this list include the cross or native folder (i.e. native/python cross/glib)
-echo "Building dependency list..."
-DEPENDENCY_LIST=
-for package in $(find spk/ -maxdepth 1 -type d | cut -c 5- | sort)
-do
-    DEPENDENCY_LIST+=$(make -s -C spk/${package} dependency-list)$'\n'
-done
-
-# search for dependent spk packages
-for package in ${DEPENDENT_PACKAGES}
-do
-    echo "===> Searching for dependent package: ${package}"
-    packages=$(echo "${DEPENDENCY_LIST}" | grep -w "${package}" | grep -o ".*:" | tr ':' ' ' | sort -u | tr '\n' ' ')
-    echo "===> Found: ${packages}"
-    SPK_TO_BUILD+=${packages}
-done
-
-# fix for packages with different names
-if [ "$(echo ${SPK_TO_BUILD} | grep -ow nzbdrone)" != "" ]; then
-    SPK_TO_BUILD+=sonarr
-fi
-if [ "$(echo ${SPK_TO_BUILD} | grep -ow python)" != "" ]; then
-    SPK_TO_BUILD+=python2
-fi
-
-# remove duplicate packages
-packages=$(printf %s "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
-
-
-# find all packages that depend on spk/ffmpeg is built before.
-all_ffmpeg_packages=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "export FFMPEG_DIR" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
-
-# if ffmpeg or one of its dependents is to build, ensure 
-# ffmpeg is first package in the list of packages to build.
-for package in ${packages}
-do
-    if [ "$(echo ffmpeg ${all_ffmpeg_packages} | grep -ow ${package})" != "" ]; then
-        packages_without_ffmpeg=$(echo "${packages}" | tr ' ' '\n' | grep -v "ffmpeg" | tr '\n' ' ')
-        packages="ffmpeg ${packages_without_ffmpeg}"
-        break;
-    fi
-done
-
-
-# find all noarch packages
-all_noarch=$(find spk/ -maxdepth 2 -mindepth 2 -name "Makefile" -exec grep -Ho "override ARCH" {} \; | grep -Po ".*spk/\K[^/]*" | sort | tr '\n' ' ')
-
-# separate noarch and arch specific packages 
-# and filter out packages that are removed or do not exist (e.g. nzbdrone)
-arch_packages=
-noarch_packages=
-for package in ${packages}
-do
-    if [ -f "./spk/${package}/Makefile" ]; then
-        if [ "$(echo ${all_noarch} | grep -ow ${package})" = "" ]; then
-            arch_packages+="${package} "
-        else
-            noarch_packages+="${package} "
-        fi
-    fi
-done
 
 echo "===> TARGET: ${GH_ARCH}"
-echo "===> ARCH   packages: ${arch_packages}"
-echo "===> NOARCH packages: ${noarch_packages}"
-echo "::endgroup::"
+echo "===> ARCH   packages: ${ARCH_PACKAGES}"
+echo "===> NOARCH packages: ${NOARCH_PACKAGES}"
+for version in "${min_dsm_versions[@]}"; do
+    v=${version//.}
+    arch_var="ARCH_MIN_DSM${v^^}_PACKAGES"
+    noarch_var="NOARCH_MIN_DSM${v^^}_PACKAGES"
+    echo "===> ${arch_var}: ${!arch_var}"
+    echo "===> ${noarch_var}: ${!noarch_var}"
+done
+
+# Remove toolchain status files to enforce re-building toolchain including cargo/rust.
+# This fixes issues on github-action where toolchain caching omits the
+# actual installation state of cargo/rust within the distrib folder.
+rm -f toolchain/syno-${GH_ARCH}/work/.toolchain*_done
+rm -f toolchain/syno-${GH_ARCH}/work/.stage[01]-*_done
+rm -f toolchain/syno-${GH_ARCH}/work/tc_vars.*
+
+# ===========================================================================
+# 2. Select packages to build for this arch
+# ===========================================================================
+
+# Extract DSM version from GH_ARCH (e.g., "x64-7.2" -> "7.2", "noarch-7.2" -> "7.2")
+DSM_VERSION="${GH_ARCH##*-}"
 
 if [ "${GH_ARCH%%-*}" = "noarch" ]; then
-    build_packages=${noarch_packages}
+    build_packages=${NOARCH_PACKAGES}
+    for version in "${min_dsm_versions[@]}"; do
+        if [ "${DSM_VERSION}" = "${version}" ]; then
+            v=${version//.}
+            var="NOARCH_MIN_DSM${v^^}_PACKAGES"
+            # No DSM-restricted packages — fall back to standard noarch packages
+            build_packages="${!var:-${NOARCH_PACKAGES}}"
+            break
+        fi
+    done
 else
-    build_packages=${arch_packages}
+    build_packages=${ARCH_PACKAGES}
+    for version in "${min_dsm_versions[@]}"; do
+        if [ "${DSM_VERSION}" = "${version}" ]; then
+            v=${version//.}
+            var="ARCH_MIN_DSM${v^^}_PACKAGES"
+            # No DSM-restricted packages — fall back to standard arch packages
+            build_packages="${!var:-${ARCH_PACKAGES}}"
+            break
+        fi
+    done
 fi
-
-echo ""
 
 if [ -z "${build_packages}" ]; then
     echo "===> No packages to build. <==="
@@ -109,36 +110,129 @@ fi
 
 echo "===> PACKAGES to Build: ${build_packages}"
 
-# Build
-PACKAGES_TO_KEEP="ffmpeg"
-for package in ${build_packages}
-do
+# ===========================================================================
+# 3. Build each package
+# ===========================================================================
+
+# Packages whose build artifacts must be preserved for dependents.
+# synocli-videodriver and ffmpeg are kept for their shared libs;
+# python is kept for its wheels. All others are fully cleaned after build.
+packages_to_keep="synocli-videodriver"
+for i in "${ffmpeg_versions[@]}"; do
+    packages_to_keep+=" ffmpeg${i}"
+done
+for py_ver in "${python_versions[@]}"; do
+    packages_to_keep+=" python${py_ver}"
+done
+
+# Publish to synocommunity.com when the API key is set
+MAKE_ARGS=
+if [ -n "$API_KEY" ] && [ "$PUBLISH" == "true" ]; then
+    MAKE_ARGS="publish-"
+fi
+
+# Initialize remaining packages list for tracking build progress
+remaining_packages="${build_packages}"
+
+# Build-time budget: stop at a package boundary before GitHub's 6h job kill so
+# the completed .spk and diagnostics still upload, and so we can report what was
+# left to build. Tunable via BUILD_BUDGET_SECONDS (default 5h45m); 0 disables it.
+build_budget=${BUILD_BUDGET_SECONDS:-20700}
+build_start=$(date +%s)
+: "${BUILD_REMAINING_FILE:=build_remaining.txt}"
+: "${BUILD_TIMEOUT_FILE:=build_timeout.txt}"
+budget_hit=0
+
+for package in ${build_packages}; do
+    # Persist not-yet-completed packages (current + pending) for the checkpoint.
+    echo "${remaining_packages}" | tr ' ' '\n' | grep -v '^$' > "${BUILD_REMAINING_FILE}"
+
+    # Stop at this package boundary if the build-time budget is exhausted, so the
+    # always() upload steps still run before the 6h job kill.
+    elapsed=$(( $(date +%s) - build_start ))
+    if [ "${build_budget}" -gt 0 ] && [ "${elapsed}" -ge "${build_budget}" ]; then
+        budget_hit=1
+        echo "::warning::Build-time budget (${build_budget}s) reached after ${elapsed}s; stopping before '${package}'"
+        {
+            echo "arch: ${GH_ARCH}"
+            echo "budget_seconds: ${build_budget}"
+            echo "elapsed_seconds: ${elapsed}"
+            echo "stopped_before: ${package}"
+            echo "remaining: ${remaining_packages}"
+        } > "${BUILD_TIMEOUT_FILE}"
+        break
+    fi
+
+    # Hard time cap for this package = remaining budget, so a long in-progress
+    # build is killed rather than overrunning the 6h job limit (a boundary check
+    # alone lets the current package finish, which can exceed the budget). timeout
+    # returns 124 (TERM) or 137 (KILL after the -k grace) when it fires.
+    build_cap=
+    if [ "${build_budget}" -gt 0 ]; then
+        build_cap="timeout -k 60 $(( build_budget - elapsed ))"
+    fi
+
+    # Remove current package from remaining list at the start of each iteration
+    remaining_packages=$(echo "${remaining_packages}" | tr ' ' '\n' | grep -vx "${package}" | tr '\n' ' ')
     echo "::group:: ---- build ${package}"
+    echo >build.log
 
     if [ "${GH_ARCH%%-*}" != "noarch" ]; then
-        # use TCVERSION and ARCH to get real exit codes.
-        make TCVERSION=${GH_ARCH##*-} ARCH=${GH_ARCH%%-*} -C ./spk/${package}
+        if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
+            echo "$ make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
+            ${build_cap} make ${MAKE_ARGS}arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        else
+            echo "$ make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package}" >>build.log
+            ${build_cap} make arch-${GH_ARCH%%-*}-${GH_ARCH##*-} -C ./spk/${package} |& tee >(tail -15 >>build.log)
+        fi
     else
         if [ "${GH_ARCH}" = "noarch" ]; then
             TCVERSION=
         else
             TCVERSION=${GH_ARCH##*-}
         fi
-        make TCVERSION=${TCVERSION} ARCH= -C ./spk/${package}
+        # noarch package must be first built then published
+        echo "$ make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package}" >>build.log
+        ${build_cap} make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} |& tee >(tail -15 >>build.log)
+
+        if [ "${package}" == "${PACKAGE_TO_PUBLISH}" ]; then
+            echo "$ make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} ${MAKE_ARGS%%-}" >>build.log
+            ${build_cap} make TCVERSION=${TCVERSION} ARCH=noarch -C ./spk/${package} ${MAKE_ARGS%%-} |& tee >(tail -15 >>build.log)
+        fi
     fi
     result=$?
 
-    if [ ${result} -eq 0 ];
-    then
-        echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE"   >> ${BUILD_SUCCESS_FILE}
-    else
-        echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) FAILED" >> ${BUILD_ERROR_FILE}
+    # Killed by the time cap = budget reached mid-build -> stop cleanly so the
+    # always() upload steps still run. The killed package is already listed in
+    # build_remaining.txt (written at the top of this iteration).
+    if [ "${build_budget}" -gt 0 ] && { [ ${result} -eq 124 ] || [ ${result} -eq 137 ]; }; then
+        budget_hit=1
+        elapsed=$(( $(date +%s) - build_start ))
+        echo "::warning::Build-time budget (${build_budget}s) reached during '${package}' (${elapsed}s); killed the in-progress build."
+        {
+            echo "arch: ${GH_ARCH}"
+            echo "budget_seconds: ${build_budget}"
+            echo "elapsed_seconds: ${elapsed}"
+            echo "stopped_during: ${package}"
+            echo "remaining: ${package} ${remaining_packages}"
+        } > "${BUILD_TIMEOUT_FILE}"
+        echo "::endgroup::"
+        break
     fi
 
-    if [ "$(echo ${PACKAGES_TO_KEEP} | grep -ow ${package})" = "" ]; then
-        # free disk space (but not for packages to keep)
-        make -C ./spk/${package} clean
+    # For a build to succeed a <package>_<arch>-<version>.spk must also be generated
+    if [ ${result} -eq 0 ] && [ "$(ls -1 ./packages/$(sed -n -e '/^SPK_NAME/ s/.*= *//p' spk/${package}/Makefile)_*.spk 2>/dev/null)" ]; then
+        echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE" >> ${BUILD_SUCCESS_FILE}
+    # Ensure it's not a false-positive due to pre-check
+    elif tail -15 build.log | grep -viq 'spksrc.rules/pre-check.mk'; then
+        cat build.log >> ${BUILD_ERROR_LOGFILE}
+        echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) FAILED" >> ${BUILD_ERROR_FILE}
     fi
 
     echo "::endgroup::"
 done
+
+# Clear the remaining list on a full pass (all packages processed).
+if [ "${budget_hit}" -eq 0 ]; then
+    : > "${BUILD_REMAINING_FILE}"
+fi

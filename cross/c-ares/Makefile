@@ -1,17 +1,14 @@
-PKG_NAME = c-ares
-PKG_VERS = 1.17.1
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://c-ares.haxx.se/download
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = c-ares-virtual
 
-DEPENDS =
+OPTIONAL_DEPENDS  = cross/c-ares-latest
+OPTIONAL_DEPENDS += cross/c-ares-1.28
 
-HOMEPAGE = https://c-ares.haxx.se/
-COMMENT  = c-ares is a C library for asynchronous DNS requests (including name resolves).
-LICENSE  = MIT
+include ../../mk/spksrc.common.mk
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = CFLAGS="$(TC_EXTRA_CFLAGS)"
+ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+DEPENDS = cross/c-ares-1.28
+else
+DEPENDS = cross/c-ares-latest
+endif
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-virtual.mk

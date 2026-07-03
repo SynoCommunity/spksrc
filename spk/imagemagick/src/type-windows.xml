@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<typemap>
+
+  <type
+     format="type1"
+     name="NimbusMonoB"
+     fullname="Nimbus Mono Bold"
+     family="Nimbus Mono"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n022004l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n022004l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusRomanNo9I"
+     fullname="Nimbus Roman No9 Regular Italic"
+     family="Nimbus Roman No9"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n021023l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n021023l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusRomanNo9M"
+     fullname="Nimbus Roman No9 Medium"
+     family="Nimbus Roman No9"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n021004l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n021004l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusMono"
+     fullname="Nimbus Mono Regular"
+     family="Nimbus Mono"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n022003l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n022003l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusRomanNo9MI"
+     fullname="Nimbus Roman No9 Medium Italic"
+     family="Nimbus Roman No9"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n021024l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n021024l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSansBI"
+     fullname="Nimbus Sans Bold Italic"
+     family="Nimbus Sans"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n019024l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n019024l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusRomanNo9"
+     fullname="Nimbus Roman No9 Regular"
+     family="Nimbus Roman No9"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n021003l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n021003l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSansB"
+     fullname="Nimbus Sans Bold"
+     family="Nimbus Sans"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n019004l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n019004l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusMonoBOb"
+     fullname="Nimbus Mono Bold Oblique"
+     family="Nimbus Mono"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n022024l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n022024l.afm"
+     />
+
+  <type
+     format="type1"
+     name="StandardSymbols"
+     fullname="Standard Symbols"
+     family="Standard Symbols"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/s050000l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/s050000l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSans"
+     fullname="Nimbus Sans Regular"
+     family="Nimbus Sans"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n019003l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n019003l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusSansI"
+     fullname="Nimbus Sans Regular Italic"
+     family="Nimbus Sans"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n019023l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n019023l.afm"
+     />
+
+  <type
+     format="type1"
+     name="NimbusMonoOb"
+     fullname="Nimbus Mono Regular Oblique"
+     family="Nimbus Mono"
+     glyphs="/var/packages/imagemagick/target/share/libwmf/fonts/n022023l.pfb"
+     metrics="/var/packages/imagemagick/target/share/libwmf/fonts/n022023l.afm"
+     />
+
+</typemap>

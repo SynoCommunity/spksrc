@@ -1,0 +1,14 @@
+# remove tests and doc folders from build
+# - soelim tool is not available to create documentation
+# 
+--- Makefile.in.orig	2022-07-14 17:07:29.000000000 +0000
++++ Makefile.in	2022-12-30 16:12:11.732557163 +0000
+@@ -13,7 +13,7 @@
+ ## top-level directory of the distribution or, alternatively, at
+ ## <http://www.OpenLDAP.org/license.html>.
+ 
+-SUBDIRS= include libraries clients servers tests doc
++SUBDIRS= include libraries clients servers
+ CLEANDIRS=
+ INSTALLDIRS= 
+ 

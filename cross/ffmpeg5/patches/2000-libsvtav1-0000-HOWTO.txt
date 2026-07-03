@@ -1,0 +1,19 @@
+Project page: https://gitlab.com/AOMediaCodec/SVT-AV1
+Patches: https://gitlab.com/AOMediaCodec/SVT-AV1/-/tree/master/ffmpeg_plugin?ref_type=heads
+
+Extract svt-av1 git repository
+$ git clone https://gitlab.com/AOMediaCodec/SVT-AV1.git
+
+Modify patches to be in -p0 mode:
+$ cd SVT-AV1/ffmpeg_plugin/n5.1/
+$ sed -i -e 's?--- a/?--- ?1' \
+         -e 's?+++ b/?+++ ?1' \
+         *.patch
+
+Rename the patches:
+$ i=2001 && ls -1 *.patch | while read LINE; do echo $(printf "%04d" $i)-libsvtav1-$LINE; mv $LINE $(printf "%04d" $i)-libsvtav1-$LINE; let i++; done
+
+Test the patches on a clean ffmpeg tree:
+$ tar -jxvf ffmpeg-5.1.5.tar.bz2 
+$ cd ffmpeg-5.1.5/
+$ ls -1d ~/SVT-AV1/ffmpeg_plugin/n5.1/20*.patch | while read LINE; do patch -p0 < $LINE; done

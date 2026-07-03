@@ -1,0 +1,238 @@
+# migrate source files for openssl 1.1.x
+# based on https://github.com/JudgeZarbi/RTMPDump-OpenSSL-1.1
+# 
+# openssl backward compatibility: https://wiki.openssl.org/index.php/OpenSSL_1.1.0_Changes#Backward_compatibility
+# - All structures in libssl public header files have been removed so that they are "opaque" to library users. 
+#   You should use the provided accessor functions instead.
+# 
+
+--- dh.h.orig	2014-01-09 19:24:24.000000000 +0000
++++ dh.h	2018-03-12 01:46:09.000000000 +0000
+@@ -79,6 +79,7 @@
+ #elif defined(USE_GNUTLS)
+ #include <gmp.h>
+ #include <nettle/bignum.h>
++#include <gnutls/crypto.h>
+ typedef mpz_ptr MP_t;
+ #define MP_new(m)	m = malloc(sizeof(*m)); mpz_init2(m, 1)
+ #define MP_set_w(mpi, w)	mpz_set_ui(mpi, w)
+@@ -104,21 +105,62 @@
+ #define	MDH_new()	calloc(1,sizeof(MDH))
+ #define MDH_free(dh)	do {MP_free(((MDH*)(dh))->p); MP_free(((MDH*)(dh))->g); MP_free(((MDH*)(dh))->pub_key); MP_free(((MDH*)(dh))->priv_key); free(dh);} while(0)
+ 
+-extern MP_t gnutls_calc_dh_secret(MP_t *priv, MP_t g, MP_t p);
+-extern MP_t gnutls_calc_dh_key(MP_t y, MP_t x, MP_t p);
++static int MDH_generate_key(MDH *dh)
++{
++  int num_bytes;
++  uint32_t seed;
++  gmp_randstate_t rs;
++
++  num_bytes = (mpz_sizeinbase(dh->p, 2) + 7) / 8 - 1;
++  if (num_bytes <= 0 || num_bytes > 18000)
++    return 0;
++
++  dh->priv_key = calloc(1, sizeof(*dh->priv_key));
++  if (!dh->priv_key)
++    return 0;
++  mpz_init2(dh->priv_key, 1);
++  gnutls_rnd(GNUTLS_RND_RANDOM, &seed, sizeof(seed));
++  gmp_randinit_mt(rs);
++  gmp_randseed_ui(rs, seed);
++  mpz_urandomb(dh->priv_key, rs, num_bytes);
++  gmp_randclear(rs);
++
++  dh->pub_key = calloc(1, sizeof(*dh->pub_key));
++  if (!dh->pub_key)
++    return 0;
++  mpz_init2(dh->pub_key, 1);
++  if (!dh->pub_key) {
++    mpz_clear(dh->priv_key);
++    free(dh->priv_key);
++    return 0;
++  }
++
++  mpz_powm(dh->pub_key, dh->g, dh->priv_key, dh->p);
++
++  return 1;
++}
+ 
+-#define MDH_generate_key(dh)	(dh->pub_key = gnutls_calc_dh_secret(&dh->priv_key, dh->g, dh->p))
+ static int MDH_compute_key(uint8_t *secret, size_t len, MP_t pub, MDH *dh)
+ {
+-  MP_t sec = gnutls_calc_dh_key(pub, dh->priv_key, dh->p);
+-  if (sec)
+-    {
+-	  MP_setbin(sec, secret, len);
+-	  MP_free(sec);
+-	  return 0;
+-	}
+-  else
++  mpz_ptr k;
++  int num_bytes;
++
++  num_bytes = (mpz_sizeinbase(dh->p, 2) + 7) / 8;
++  if (num_bytes <= 0 || num_bytes > 18000)
+     return -1;
++
++  k = calloc(1, sizeof(*k));
++  if (!k)
++    return -1;
++  mpz_init2(k, 1);
++
++  mpz_powm(k, pub, dh->priv_key, dh->p);
++  nettle_mpz_get_str_256(len, secret, k);
++  mpz_clear(k);
++  free(k);
++
++  /* return the length of the shared secret key like DH_compute_key */
++  return len;
+ }
+ 
+ #else /* USE_OPENSSL */
+@@ -208,23 +250,27 @@
+   size_t res;
+   MDH *dh = MDH_new();
+ 
++
+   if (!dh)
+     goto failed;
+ 
+-  MP_new(dh->g);
++  const BIGNUM *p;
++  const BIGNUM *g;
++  DH_get0_pqg(dh,&p,NULL,&g);
++  MP_new(g);
+ 
+-  if (!dh->g)
++  if (!g)
+     goto failed;
+ 
+-  MP_gethex(dh->p, P1024, res);	/* prime P1024, see dhgroups.h */
++  MP_gethex(p, P1024, res);	/* prime P1024, see dhgroups.h */
+   if (!res)
+     {
+       goto failed;
+     }
+ 
+-  MP_set_w(dh->g, 2);	/* base 2 */
++  MP_set_w(g, 2);	/* base 2 */
+ 
+-  dh->length = nKeyBits;
++  DH_set_length(dh, nKeyBits);
+   return dh;
+ 
+ failed:
+@@ -251,12 +297,15 @@
+       MP_gethex(q1, Q1024, res);
+       assert(res);
+ 
+-      res = isValidPublicKey(dh->pub_key, dh->p, q1);
++      BIGNUM *pub_key, *priv_key, *p;
++      DH_get0_key(dh, &pub_key, &priv_key);
++      DH_get0_pqg(dh,&p,NULL,NULL);
++      res = isValidPublicKey(pub_key, p, q1);
+       if (!res)
+ 	{
+-	  MP_free(dh->pub_key);
+-	  MP_free(dh->priv_key);
+-	  dh->pub_key = dh->priv_key = 0;
++	  MP_free(pub_key);
++	  MP_free(priv_key);
++          DH_set0_key(dh, 0, 0);
+ 	}
+ 
+       MP_free(q1);
+@@ -272,15 +321,17 @@
+ DHGetPublicKey(MDH *dh, uint8_t *pubkey, size_t nPubkeyLen)
+ {
+   int len;
+-  if (!dh || !dh->pub_key)
++  BIGNUM *pub_key;
++  DH_get0_key(dh, &pub_key, NULL);
++  if (!dh || !pub_key)
+     return 0;
+ 
+-  len = MP_bytes(dh->pub_key);
++  len = MP_bytes(pub_key);
+   if (len <= 0 || len > (int) nPubkeyLen)
+     return 0;
+ 
+   memset(pubkey, 0, nPubkeyLen);
+-  MP_setbin(dh->pub_key, pubkey + (nPubkeyLen - len), len);
++  MP_setbin(pub_key, pubkey + (nPubkeyLen - len), len);
+   return 1;
+ }
+ 
+@@ -322,7 +373,9 @@
+   MP_gethex(q1, Q1024, len);
+   assert(len);
+ 
+-  if (isValidPublicKey(pubkeyBn, dh->p, q1))
++  BIGNUM *p;
++  DH_get0_pqg(dh,&p,NULL,NULL);
++  if (isValidPublicKey(pubkeyBn, p, q1))
+     res = MDH_compute_key(secret, nPubkeyLen, pubkeyBn, dh);
+   else
+     res = -1;
+
+--- handshake.h.orig	2014-01-09 19:24:24.000000000 +0000
++++ handshake.h	2018-03-12 01:46:09.000000000 +0000
+@@ -69,9 +69,9 @@
+ #if OPENSSL_VERSION_NUMBER < 0x0090800 || !defined(SHA256_DIGEST_LENGTH)
+ #error Your OpenSSL is too old, need 0.9.8 or newer with SHA256
+ #endif
+-#define HMAC_setup(ctx, key, len)	HMAC_CTX_init(&ctx); HMAC_Init_ex(&ctx, key, len, EVP_sha256(), 0)
+-#define HMAC_crunch(ctx, buf, len)	HMAC_Update(&ctx, buf, len)
+-#define HMAC_finish(ctx, dig, dlen)	HMAC_Final(&ctx, dig, &dlen); HMAC_CTX_cleanup(&ctx)
++#define HMAC_setup(ctx, key, len)	HMAC_Init_ex(ctx, key, len, EVP_sha256(), 0)
++#define HMAC_crunch(ctx, buf, len)	HMAC_Update(ctx, buf, len)
++#define HMAC_finish(ctx, dig, dlen)	HMAC_Final(ctx, dig, &dlen); HMAC_CTX_free(ctx)
+ 
+ typedef RC4_KEY *	RC4_handle;
+ #define RC4_alloc(h)	*h = malloc(sizeof(RC4_KEY))
+@@ -117,7 +117,7 @@
+ {
+   uint8_t digest[SHA256_DIGEST_LENGTH];
+   unsigned int digestLen = 0;
+-  HMAC_CTX ctx;
++  HMAC_CTX *ctx = HMAC_CTX_new();
+ 
+   RC4_alloc(rc4keyIn);
+   RC4_alloc(rc4keyOut);
+@@ -266,7 +266,7 @@
+ 	   size_t keylen, uint8_t *digest)
+ {
+   unsigned int digestLen;
+-  HMAC_CTX ctx;
++  HMAC_CTX *ctx = HMAC_CTX_new();
+ 
+   HMAC_setup(ctx, key, keylen);
+   HMAC_crunch(ctx, message, messageLen);
+
+--- hashswf.c.orig	2014-01-09 19:24:24.000000000 +0000
++++ hashswf.c	2018-03-12 01:46:09.000000000 +0000
+@@ -57,10 +57,10 @@
+ #include <openssl/sha.h>
+ #include <openssl/hmac.h>
+ #include <openssl/rc4.h>
+-#define HMAC_setup(ctx, key, len)	HMAC_CTX_init(&ctx); HMAC_Init_ex(&ctx, (unsigned char *)key, len, EVP_sha256(), 0)
+-#define HMAC_crunch(ctx, buf, len)	HMAC_Update(&ctx, (unsigned char *)buf, len)
+-#define HMAC_finish(ctx, dig, dlen)	HMAC_Final(&ctx, (unsigned char *)dig, &dlen);
+-#define HMAC_close(ctx)	HMAC_CTX_cleanup(&ctx)
++#define HMAC_setup(ctx, key, len)	HMAC_Init_ex(ctx, (unsigned char *)key, len, EVP_sha256(), 0)
++#define HMAC_crunch(ctx, buf, len)	HMAC_Update(ctx, (unsigned char *)buf, len)
++#define HMAC_finish(ctx, dig, dlen)	HMAC_Final(ctx, (unsigned char *)dig, &dlen);
++#define HMAC_close(ctx)	HMAC_CTX_free(ctx)
+ #endif
+ 
+ extern void RTMP_TLS_Init();
+@@ -289,7 +289,7 @@
+ struct info
+ {
+   z_stream *zs;
+-  HMAC_CTX ctx;
++  HMAC_CTX *ctx;
+   int first;
+   int zlib;
+   int size;

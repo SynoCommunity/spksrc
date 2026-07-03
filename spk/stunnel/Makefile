@@ -1,17 +1,15 @@
 SPK_NAME = stunnel
-SPK_VERS = 5.57
-SPK_REV = 1
+SPK_VERS = 5.77
+SPK_REV = 3
 SPK_ICON = src/stunnel.png
 
-DEPENDS = cross/$(SPK_NAME)
-
-BETA = 1
+DEPENDS = cross/stunnel
 
 MAINTAINER = hgy59
 DESCRIPTION = "Stunnel is a proxy designed to add TLS encryption functionality to existing clients and servers without any changes in the programs\' code."
 DISPLAY_NAME = stunnel TLS Proxy
 STARTABLE = no
-CHANGELOG = "Initial package release<br/>This is an experimental release. Please provide issues and package improvements at <a href="https://github.com/SynoCommunity/spksrc/issues">SynoCommunity</a>"
+CHANGELOG = "Update stunnel to v5.77 and OpenSSL to v3.5.4."
 
 HOMEPAGE = https://www.stunnel.org/
 LICENSE  = GPLv2+

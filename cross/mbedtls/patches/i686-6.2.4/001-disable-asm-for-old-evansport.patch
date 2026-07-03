@@ -1,0 +1,32 @@
+# Disable ASM for x86 archs with gcc < 5
+# - gcc as assembler does not work and nasm is not used
+# 
+--- include/mbedtls/mbedtls_config.h.orig	2025-03-20 09:33:09.000000000 +0000
++++ include/mbedtls/mbedtls_config.h	2025-03-31 10:12:48.655120609 +0000
+@@ -49,7 +49,7 @@
+  *
+  * Comment to disable the use of assembly code.
+  */
+-#define MBEDTLS_HAVE_ASM
++//#define MBEDTLS_HAVE_ASM
+ 
+ /**
+  * \def MBEDTLS_NO_UDBL_DIVISION
+@@ -2316,7 +2316,7 @@
+  *
+  * This modules adds support for the AES-NI instructions on x86.
+  */
+-#define MBEDTLS_AESNI_C
++//#define MBEDTLS_AESNI_C
+ 
+ /**
+  * \def MBEDTLS_AESCE_C
+@@ -3089,7 +3089,7 @@
+  *
+  * This modules adds support for the VIA PadLock on x86.
+  */
+-#define MBEDTLS_PADLOCK_C
++//#define MBEDTLS_PADLOCK_C
+ 
+ /**
+  * \def MBEDTLS_PEM_PARSE_C

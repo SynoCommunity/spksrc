@@ -1,0 +1,13 @@
+# Generated using the requirements script on June 14, 2026
+# Command: ./generate_requirements.sh sickchill==2024.3.1 312
+
+cffi==2.0.0
+chardet==7.4.3
+charset_normalizer==3.4.7
+cryptography==44.0.3
+#greenlet==3.5.1                ==> supported version depends on gcc version
+#lxml==6.1.1                    ==> supported version depends on gcc version
+markupsafe==3.0.3
+#msgpack==1.2.0                 ==> supported version depends on gcc version
+sqlalchemy==2.0.50
+tornado==6.5.7

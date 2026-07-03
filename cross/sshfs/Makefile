@@ -1,17 +1,21 @@
-PKG_NAME = sshfs
-PKG_VERS = 2.10
-PKG_EXT = tar.gz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/libfuse/sshfs/releases/download/sshfs-$(PKG_VERS)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = sshfs-virtual
 
-DEPENDS = cross/fuse cross/glib
+OPTIONAL_DEPENDS  = cross/sshfs-latest
+OPTIONAL_DEPENDS += cross/sshfs-2
+OPTIONAL_DEPENDS += cross/sshfs-3.7.3
 
-HOMEPAGE = https://github.com/libfuse/sshfs
-COMMENT  = sshfs is a network filesystem client to connect to SSH servers
-LICENSE  = GPLv2
+include ../../mk/spksrc.common.mk
 
-GNU_CONFIGURE = 1
+ifeq ($(call version_lt,${TCVERSION},6.0)$(call version_ge,${TCVERSION},3.0),11)
+# DSM 3.x - 5.x
+DEPENDS = cross/sshfs-2
+else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+# qoriq DSM 6.x
+DEPENDS = cross/sshfs-2
+else ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+DEPENDS = cross/sshfs-3.7.3
+else
+DEPENDS = cross/sshfs-latest
+endif
 
-include ../../mk/spksrc.cross-cc.mk
-
+include ../../mk/spksrc.cross-virtual.mk

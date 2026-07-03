@@ -2,7 +2,7 @@ PKG_NAME = urw-base35-fonts
 PKG_VERS = 20151005
 PKG_EXT = zip
 PKG_DIST_NAME = urw-base35-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://ftp.icm.edu.pl/pub/unix/postscript/ghostscript/fonts
+PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/sources
 # download and extract only
 EXTRACT_PATH = $(WORK_DIR)/share/fonts
 
@@ -17,7 +17,7 @@ LICENSE  = AGPLv3
 
 INSTALL_TARGET = urw-base35-fonts_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: urw-base35-fonts_install
 urw-base35-fonts_install:

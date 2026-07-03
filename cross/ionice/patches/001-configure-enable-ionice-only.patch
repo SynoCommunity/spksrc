@@ -1,0 +1,32 @@
+# To build ionice only, we must disable the build of taskset, chrt and uclampset,
+# but there are no specific configure args to do this.
+# 
+--- configure.orig	2025-06-24 07:57:03.242764100 +0000
++++ configure	2025-07-27 07:40:37.556764691 +0000
+@@ -43091,7 +43091,7 @@
+ 
+ 
+ 
+-  enable_taskset=$enable_schedutils
++  enable_taskset=no
+ 
+ 
+ 
+@@ -43373,7 +43373,7 @@
+ 
+ 
+ 
+-  enable_chrt=$enable_schedutils
++  enable_chrt=no
+ 
+ 
+ 
+@@ -43505,7 +43505,7 @@
+ 
+ 
+ 
+-  enable_uclampset=$enable_schedutils
++  enable_uclampset=no
+ 
+ 
+ 

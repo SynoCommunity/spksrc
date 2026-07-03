@@ -1,0 +1,41 @@
+[
+  {
+    "step_title": "Important Installation Notes",
+    "items": [
+      {
+        "desc": "This package needs to be run as root, but Synology prohibits this for packages that have not been verified by them."
+      },
+      {
+        "desc": "Please continue the installation until the package fails to start and shows 'Please try again later or contact the package developer' in the Package Center."
+      },
+      {
+        "desc": "Then you need to ssh into DSM and execute the command:<br/><code>sudo sed 's/package/root/g' -i /var/packages/qemu-ga/conf/privilege</code>"
+      },
+      {
+        "desc": "Finally press <strong>Repair</strong> in the Package Center, or manually start the package in the ssh session with:<br/><code>sudo synopkg start qemu-ga</code>"
+      }
+    ]
+  },
+  {
+    "step_title": "Optional Parameter Configuration",
+    "items": [
+      {
+        "desc": "You can specify an alternate serial port for the agent. <b>Leave it empty to use the default.</b> When running under VirtualDSM you might want to use the 2nd serial port <code>/dev/vport2p1</code>."
+      },
+      {
+        "type": "textfield",
+        "desc": "If you want to modify (or remove) the custom port later, you can edit (or remove) the file <br/><code>/var/packages/qemu-ga/var/custom_port.txt</code>.<br/>Remarks: this port is only added to the start command when it exists in the system.",
+        "subitems": [
+          {
+            "key": "wizard_custom_port",
+            "desc": "Custom Serial Port",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": true
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

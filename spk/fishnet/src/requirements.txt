@@ -1,9 +1,0 @@
-# please update SPK_VERS in spk/fishnet/Makefile to match the fishnet version defined here
-fishnet==1.18.1
-
-# dependencies
-requests==2.24.0
-urllib3==1.25.9
-chardet==3.0.4
-idna==2.10
-certifi

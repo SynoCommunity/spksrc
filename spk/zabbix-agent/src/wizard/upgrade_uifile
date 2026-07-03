@@ -1,0 +1,10 @@
+[
+  {
+    "step_title": "Zabbix Agent Update",
+    "items": [
+      {
+        "desc": "Your existing configuration will be preserved.<br/><br/>To modify settings, edit: <code>/var/packages/zabbix-agent/var/zabbix_agentd.conf</code><br/>Then restart the package to apply changes.<br/><br/>See <a target=\"_blank\" href=\"https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd\">Zabbix documentation</a> for all options."
+      }
+    ]
+  }
+]

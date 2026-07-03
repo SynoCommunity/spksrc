@@ -1,38 +1,124 @@
 SPK_NAME = salt-master
-SPK_VERS = 2015.5.11
-SPK_REV = 9
+SPK_VERS = 3008.0
+SPK_REV = 15
 SPK_ICON = src/salt-master.png
 
-DEPENDS =
-WHEELS = src/requirements.txt
-SPK_DEPENDS = "python>2.7.8-10"
+PYTHON_PACKAGE = python314
+WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-MAINTAINER = SynoCommunity
-DESCRIPTION = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
-RELOAD_UI = yes
+DEPENDS = cross/saltgui
+
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# SRM 1.2 toolchains fail to build wheel pyzmq
+REQUIRED_MIN_SRM = 1.3
+
+MAINTAINER   = SynoCommunity
+DESCRIPTION  = Salt, a new approach to infrastructure management, is easy enough to get running in minutes, scalable enough to manage tens of thousands of servers, and fast enough to communicate with those servers in seconds.
 DISPLAY_NAME = Salt Master
-CHANGELOG = "1. Update to 2015.5.11<br/>2. Fix salt-api<br/>3. Update dependencies"
+CHANGELOG    = "1. Update Salt Master to v3008.0. <br/>2. Migrate to Python 3.14."
 
-HOMEPAGE   = https://www.saltstack.com/
-LICENSE    = Apache v2
-
-INSTALLER_SCRIPT = src/installer.sh
-SSS_SCRIPT       = src/dsm-control.sh
-FWPORTS          = src/${SPK_NAME}.sc
+HOMEPAGE     = https://repo.saltproject.io/
+LICENSE      = Apache v2
+#LICENSE_FILE = $(WORK_DIR)/salt-$(SPK_VERS)/LICENSE
 
 POST_STRIP_TARGET = salt-master_extra_install
 
-# Pure Python package, make sure ARCH is not defined
-override ARCH=
+# Service configuration
+SERVICE_USER       = auto
+SERVICE_SETUP      = src/service-setup.sh
+STARTABLE          = yes
+FWPORTS            = src/app/salt-master.sc
+SERVICE_PORT       = 8282
+SERVICE_PORT_TITLE = Salt Master UI
 
-include ../../mk/spksrc.spk.mk
+# Admin link for in DSM UI
+ADMIN_PORT = $(SERVICE_PORT)
+
+SPK_USR_LOCAL_LINKS  = bin:env/bin/salt
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-api
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-cp
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-key
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-master
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-run
+SPK_USR_LOCAL_LINKS += bin:env/bin/salt-ssh
+SPK_USR_LOCAL_LINKS += bin:env/bin/spm
+
+USE_ALTERNATE_TMPDIR = 1
+
+include ../../mk/spksrc.common.mk
+
+# [aiohttp]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [aiohttp] -std=c11 -DCYTHON_ATOMICS=0
+ifeq ($(findstring $(ARCH),comcerto2k),comcerto2k)
+# Built-in llhttp uses ARM NEON not supported on this arch
+ENV += AIOHTTP_NO_EXTENSIONS=1
+endif
+endif
+
+# [cryptography]
+DEPENDS += cross/openssl3
+
+# [frozenlist]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CXXFLAGS += [frozenlist] -std=c++11
+endif
+
+# [msgpack]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [msgpack] -std=c11
+WHEELS += msgpack==1.0.5
+else
+WHEELS += msgpack==1.1.2
+endif
+
+# [psutil]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [psutil] -std=c99
+endif
+
+# [pycryptodomex]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [pycryptodomex] -std=c11
+endif
+
+# [PyYAML]
+DEPENDS += cross/libyaml
+
+# [pyzmq]
+ENV += PYZMQ_LIBSODIUM_CONFIGURE_ARGS=--host=$(TC_TARGET)
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [pyzmq] -std=c11
+endif
+
+# [timelib]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [timelib] -std=c11
+endif
+
+# [yarl]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [yarl] -std=c11 -DCYTHON_ATOMICS=0
+WHEELS += yarl==1.22.0
+else
+WHEELS += yarl==1.23.0
+endif
+
+# [propcache]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CFLAGS += [propcache] -std=c11
+endif
+
+# [protobuf]
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+WHEELS_CPPFLAGS += [protobuf] -std=c11
+endif
+
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: salt-master_extra_install
 salt-master_extra_install:
-	install -m 755 -d $(STAGING_DIR)/var
-	install -m 755 -d $(STAGING_DIR)/etc
-	install -m 644 src/master $(STAGING_DIR)/etc/master
-	install -m 755 -d $(STAGING_DIR)/share/extensions
-	install -m 755 -d $(STAGING_DIR)/share/extensions/auth
-	install -m 644 src/synology.py $(STAGING_DIR)/share/extensions/auth/synology.py
-
+	install -m 644 src/app/rsax931.py.patch $(STAGING_DIR)/share
+	install -m 644 src/app/master $(STAGING_DIR)/share
+	install -m 755 -d $(STAGING_DIR)/var/extensions/auth
+	install -m 644 src/app/synology.py $(STAGING_DIR)/var/extensions/auth/synology.py

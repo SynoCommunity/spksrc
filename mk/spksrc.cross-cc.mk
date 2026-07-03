@@ -1,8 +1,80 @@
-# Common makefiles
-include ../../mk/spksrc.common.mk
-include ../../mk/spksrc.directories.mk
+###############################################################################
+# spksrc.cross-cc.mk
+#
+# Provides the main cross-compilation entry point for spksrc dependencies.
+#
+# This makefile orchestrates a two-stage build process:
+#
+#   Stage 1: Toolchain bootstrap
+#     - Ensures the toolchain for the target architecture exists
+#     - Generates all tc_vars* files in $(WORK_DIR)
+#
+#   Stage 2: Package cross-compilation
+#     - Sets up the cross-compilation environment
+#     - Executes the standard spksrc build pipeline:
+#         download → extract → patch → configure → compile → install → plist
+#
+# Stage separation guarantees that:
+#   - The toolchain is fully built before any package logic runs
+#   - tc_vars* files are generated exactly once and reused
+#
+# Main targets:
+#   cross-stage1 : Builds toolchain and generates tc_vars*
+#   cross-stage2 : Builds the package using cross-env
+#   all          : Runs both stages with logging
+#
+# Variables:
+#   TC               : Toolchain identifier (syno-<arch>-<tcversion>)
+#   TC_WORK_DIR      : Toolchain working directory
+#   TCVARS_DONE      : Cookie indicating tc_vars generation completed
+#   TK               : Toolkit identifier (syno-<arch>-<tcversion>)
+#   TK_WORK_DIR      : Toolkit working directory
+#   TKVARS_DONE      : Cookie indicating tk_vars generation completed
+#
+# Notes:
+#   - This file is the canonical entry point for cross builds.
+#   - cross-env.mk consumes tc_vars* generated during Stage1.
+#   - Logging is centralized via LOG_WRAPPED for consistent output.
+#
+###############################################################################
+# Cross-compilation orchestration overview
+#
+# This makefile provides a two-stage cross-compilation pipeline.
+#
+# ┌──────────────────────────────────────────────────────────────────────┐
+# │                          cross-stage1                                │
+# │  (toolchain bootstrap & environment materialization)                 │
+# │                                                                      │
+# │   make -C toolchain/<TC> toolchain  (MANDATORY)                      │
+# │   make -C toolchain/<TC> toolkit    (OPTIONAL)                       │
+# └──────────────────────────────────────────────────────────────────────┘
+#                                  │
+#                                  │ (cookie exists)
+#                                  ▼
+# ┌──────────────────────────────────────────────────────────────────────┐
+# │                          cross-stage2                                │
+# │  (package build using cross-env)                                     │
+# │                                                                      │
+# │   spksrc.cross/env-default.mk                                                │
+# │        │                                                             │
+# │        ├─ loads tc_vars.mk (always)                                  │
+# │        ├─ loads tc_vars.<env>.mk based on DEFAULT_ENV                │
+# │        ├─ exports TC_ENV into ENV                                    │
+# │        │                                                             │
+# │        └─ loads tk_vars.mk (optional)                                │
+# │                                                                      │
+# │   Standard spksrc pipeline:                                          │
+# │     depend → configure → compile → install → plist                   │
+# └──────────────────────────────────────────────────────────────────────┘
+#
+# Notes:
+#  - cross-stage1 is idempotent (guarded by .stage1-tcvars_done and .stage1-tkvars_done)
+#  - cross-stage2 never builds the toolchain nor toolkit
+#  - toolchain and toolkit package builds are strictly separated
+###############################################################################
 
-# Configure the included makefiles
+
+# Variables
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
 NAME          = $(PKG_NAME)
 COOKIE_PREFIX = $(PKG_NAME)-
@@ -16,69 +88,88 @@ DIST_EXT      = $(PKG_EXT)
 
 ifneq ($(ARCH),)
 ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
+ifneq ($(ARCH),noarch)
 TC = syno$(ARCH_SUFFIX)
+ifeq ($(strip $(REQUIRE_TOOLKIT)),1)
+TK = $(TC)
+endif
+endif
 endif
 
+.DEFAULT_GOAL := all
+
+
+# Common makefiles
+include ../../mk/spksrc.common.mk
 
 #####
 
-include ../../mk/spksrc.pre-check.mk
+include ../../mk/spksrc.rules/pre-check.mk
 
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.download.mk
+include ../../mk/spksrc.rules/depend.mk
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/status.mk
 
-checksum: download
-include ../../mk/spksrc.checksum.mk
+# Standard build pipeline (download -> ... -> install)
+include ../../mk/spksrc.build.mk
 
-extract: checksum depend
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-configure: patch
-include ../../mk/spksrc.configure.mk
-
-compile: configure
-include ../../mk/spksrc.compile.mk
-
-install: compile
-include ../../mk/spksrc.install.mk
-
+# plist: appended after the shared pipeline (native is not packaged, so it is
+# not part of spksrc.build.mk)
 plist: install
-include ../../mk/spksrc.plist.mk
+include ../../mk/spksrc.build/plist.mk
 
+#####
 
-### Clean rules
-smart-clean:
-	rm -rf $(WORK_DIR)/$(PKG_DIR)
-	rm -f $(WORK_DIR)/.$(COOKIE_PREFIX)*
+# -----------------------------------------------------------------------------
+# Stage1: Toolchain (MANDATORY) + Toolkit (OPTIONAL) bootstrap
+#  - First call builds the toolchain / toolkit (download / extract / patch / build)
+#  - Second call generates tc_vars* and tk_vars.mk files in the package WORK_DIR
+# -----------------------------------------------------------------------------
+TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
+TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
-clean:
-	rm -fr work work-*
+.PHONY: cross-stage1
+cross-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
 
+ifneq ($(strip $(TC)),)
+$(TCVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+else
+$(TCVARS_DONE): ;
+endif
 
-all: install plist
+# $(TK) is only being set if REQUIRE_TOOLKIT=1
+ifneq ($(strip $(TK)),)
+$(TKVARS_DONE):
+	@$(MAKE) WORK_DIR=$(TK_WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) toolkit
+	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolkit/$(TK) tkvars
+else
+$(TKVARS_DONE): ;
+endif
 
-### For make kernel-required (used by spksrc.spk.mk)
-include ../../mk/spksrc.kernel-required.mk
+# -----------------------------------------------------------------------------
+# Stage2: Package cross build
+#  - Relies on cross-env.mk for environment setup
+#  - Executes full build pipeline up to plist generation
+# -----------------------------------------------------------------------------
+.PHONY: cross-stage2
+cross-stage2: install plist
 
-### For make digests
-include ../../mk/spksrc.generate-digests.mk
-
-### For make dependency-tree
-include ../../mk/spksrc.dependency-tree.mk
-
-.PHONY: all-archs
-all-archs: $(addprefix arch-,$(AVAILABLE_TOOLCHAINS))
+# all wraps both stages with logging to ensure:
+#  - consistent output formatting
+#  - proper error propagation
+.PHONY: all
+all:
+	@mkdir -p $(WORK_DIR)
+	$(call LOG_WRAPPED,cross-stage1)
+	$(call LOG_WRAPPED,cross-stage2)
 
 ####
 
-arch-%:
-	@$(MSG) Building package for arch $*
-	-@MAKEFLAGS= $(MAKE) ARCH=$(basename $(subst -,.,$(basename $(subst .,,$*)))) TCVERSION=$(if $(findstring $*,$(basename $(subst -,.,$(basename $(subst .,,$*))))),$(DEFAULT_TC),$(notdir $(subst -,/,$*)))
+### For arch-* and all-<supported|latest>
+include ../../mk/spksrc.rules/supported.mk
 
 ####

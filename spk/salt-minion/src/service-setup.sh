@@ -1,33 +1,39 @@
-PYTHON_DIR="/var/packages/python3/target/bin"
-PATH="${SYNOPKG_PKGDEST}/bin:${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${PATH}"
-VIRTUALENV="${PYTHON_DIR}/python3 -m venv"
-PYTHON="${SYNOPKG_PKGDEST=}/env/bin/python"
-LANGUAGE="env LANG=en_US.UTF-8"
-SALT_MINION="${SYNOPKG_PKGDEST}/env/bin/salt-minion"
-PID_FILE="${SYNOPKG_PKGDEST}/var/run/salt-minion.pid"
+# Define python314 binary path
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:/var/packages/python314/target/bin:${PATH}"
+export LANG=en_US.UTF-8
 
-SERVICE_COMMAND="${SALT_MINION} -c ${SYNOPKG_PKGDEST}/var -d"
+SALT_CONFIG="/var/packages/${SYNOPKG_PKGNAME}/etc"
 
-service_postinst ()
+SERVICE_COMMAND="salt-minion --pid-file ${PID_FILE} -c ${SALT_CONFIG} -d"
+
+service_postinst()
 {
-    # Create a Python virtualenv
-    ${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
+    install_python_virtualenv
+    install_python_wheels
 
-    # Install wheels
-    wheelhouse=${SYNOPKG_PKGDEST}/share/wheelhouse
-    ${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --force-reinstall --no-index --find-links ${wheelhouse} ${wheelhouse}/*.whl
+    # Patch rsax931.py to find libcrypto from python314
+    python ${SYNOPKG_PKGDEST}/env/lib/python3.14/site-packages/patch_ng.py \
+           --directory=${SYNOPKG_PKGDEST}/env/lib/python3.14/site-packages/salt/utils \
+           ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
 
-    # Patch rsax931.py file to find libcrypto lib
-    # (Rely on patch util bundled with python3's busybox)
-    ${PYTHON_DIR}/bin/patch ${SYNOPKG_PKGDEST}/env/lib/python3.7/site-packages/salt/utils/rsax931.py < ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
+    # Initialize configuration directory
+    install -m 755 -d "${SALT_CONFIG}/minion.d"
+    [ -f "${SALT_CONFIG}/minion" ] || install -m 644 "${SYNOPKG_PKGDEST}/share/minion" "${SALT_CONFIG}/minion"
+    [ -f "${SALT_CONFIG}/proxy" ] || install -m 644 "${SYNOPKG_PKGDEST}/share/proxy" "${SALT_CONFIG}/proxy"
 
-    # Prepare salt-minion config in /var/salt
-    install -m 755 -d ${SYNOPKG_PKGDEST}/var
-    install -m 755 -d ${SYNOPKG_PKGDEST}/var/minion.d
-    install -m 644 ${SYNOPKG_PKGDEST}/share/minion.conf ${SYNOPKG_PKGDEST}/var
-    echo "pidfile: ${PID_FILE}" > ${SYNOPKG_PKGDEST}/var/minion.d/02_pidfile.conf
-    # Populate salt master address and minion_id only if file don't already exist
-    test -f ${SYNOPKG_PKGDEST}/var/minion.d/99-master-address.conf || echo "master: salt" > ${SYNOPKG_PKGDEST}/var/minion.d/99-master-address.conf
-    test -f ${SYNOPKG_PKGDEST}/var/minion.d/98-minion-id.conf || echo "id: myname" > ${SYNOPKG_PKGDEST}/var/minion.d/98-minion-id.conf
+    # Create default configuration (only if not already present)
+    for conf in \
+        "01_pidfile.conf:pidfile: run" \
+        "02_sockdir.conf:sock_dir: run/minion" \
+        "03_cachedir.conf:cachedir: cache" \
+        "04_logging.conf:log_file: ${SYNOPKG_PKGNAME}.log" \
+        "05_loglevel.conf:log_level_logfile: info" \
+        "06_pkidir.conf:pki_dir: pki/minion" \
+        "07_rootdir.conf:root_dir: ${SYNOPKG_PKGVAR}" \
+        "98-minion-id.conf:id: $(hostname -s)" \
+        "99-master-address.conf:master: localhost"
+    do
+        file="${SALT_CONFIG}/minion.d/${conf%%:*}"
+        [ -f "$file" ] || echo "${conf#*:}" > "$file"
+    done
 }
-
