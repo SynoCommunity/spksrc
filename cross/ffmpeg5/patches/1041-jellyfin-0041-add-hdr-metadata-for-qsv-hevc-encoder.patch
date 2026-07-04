@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/qsvenc_hevc.c
-===================================================================
 --- libavcodec/qsvenc_hevc.c
 +++ libavcodec/qsvenc_hevc.c
 @@ -26,6 +26,7 @@

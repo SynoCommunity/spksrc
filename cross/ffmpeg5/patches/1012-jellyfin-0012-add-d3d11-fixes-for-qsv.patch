@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
-===================================================================
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
 @@ -295,6 +295,10 @@ static int d3d11va_frames_init(AVHWFrame
@@ -13,8 +11,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
      } else if (!(texDesc.BindFlags & D3D11_BIND_RENDER_TARGET) && texDesc.ArraySize > 0) {
          hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &hwctx->texture);
          if (FAILED(hr)) {
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
 @@ -1603,14 +1603,10 @@ static int qsv_device_create(AVHWDeviceC

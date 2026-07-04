@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -6984,7 +6984,7 @@ enabled nvenc &&
@@ -11,8 +9,6 @@ Index: jellyfin-ffmpeg/configure
  int main(void) { return 0; }
  EOF
  
-Index: jellyfin-ffmpeg/libavcodec/nvenc.c
-===================================================================
 --- libavcodec/nvenc.c
 +++ libavcodec/nvenc.c
 @@ -41,9 +41,14 @@
@@ -69,8 +65,6 @@ Index: jellyfin-ffmpeg/libavcodec/nvenc.c
  
      if (ctx->flags & NVENC_LOSSLESS) {
          h264->qpPrimeYZeroTransformBypassFlag = 1;
-Index: jellyfin-ffmpeg/libavcodec/nvenc.h
-===================================================================
 --- libavcodec/nvenc.h
 +++ libavcodec/nvenc.h
 @@ -77,6 +77,11 @@ typedef void ID3D11Device;
@@ -85,8 +79,6 @@ Index: jellyfin-ffmpeg/libavcodec/nvenc.h
  typedef struct NvencSurface
  {
      NV_ENC_INPUT_PTR input_surface;
-Index: jellyfin-ffmpeg/libavcodec/nvenc_h264.c
-===================================================================
 --- libavcodec/nvenc_h264.c
 +++ libavcodec/nvenc_h264.c
 @@ -100,6 +100,7 @@ static const AVOption options[] = {
@@ -115,8 +107,6 @@ Index: jellyfin-ffmpeg/libavcodec/nvenc_h264.c
      { "rc-lookahead", "Number of frames to look ahead for rate-control",
                                                              OFFSET(rc_lookahead), AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, INT_MAX, VE },
      { "surfaces",     "Number of concurrent surfaces",      OFFSET(nb_surfaces),  AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, MAX_REGISTERED_FRAMES, VE },
-Index: jellyfin-ffmpeg/libavcodec/nvenc_hevc.c
-===================================================================
 --- libavcodec/nvenc_hevc.c
 +++ libavcodec/nvenc_hevc.c
 @@ -89,6 +89,7 @@ static const AVOption options[] = {

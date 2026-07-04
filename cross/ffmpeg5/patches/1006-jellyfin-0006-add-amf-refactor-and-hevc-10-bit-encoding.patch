@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -6993,7 +6993,7 @@ fi
@@ -11,8 +9,6 @@ Index: jellyfin-ffmpeg/configure
  
  # Funny iconv installations are not unusual, so check it after all flags have been set
  if enabled libc_iconv; then
-Index: jellyfin-ffmpeg/libavcodec/Makefile
-===================================================================
 --- libavcodec/Makefile
 +++ libavcodec/Makefile
 @@ -65,7 +65,7 @@ OBJS = ac3_parser.o
@@ -33,8 +29,6 @@ Index: jellyfin-ffmpeg/libavcodec/Makefile
  SKIPHEADERS-$(CONFIG_D3D11VA)          += d3d11va.h dxva2_internal.h
  SKIPHEADERS-$(CONFIG_DXVA2)            += dxva2.h dxva2_internal.h
  SKIPHEADERS-$(CONFIG_JNI)              += ffjni.h
-Index: jellyfin-ffmpeg/libavcodec/amf.c
-===================================================================
 --- /dev/null
 +++ libavcodec/amf.c
 @@ -0,0 +1,371 @@
@@ -409,8 +403,6 @@ Index: jellyfin-ffmpeg/libavcodec/amf.c
 +    return res;
 +}
 +#endif
-Index: jellyfin-ffmpeg/libavcodec/amf.h
-===================================================================
 --- /dev/null
 +++ libavcodec/amf.h
 @@ -0,0 +1,156 @@
@@ -570,8 +562,6 @@ Index: jellyfin-ffmpeg/libavcodec/amf.h
 +#endif
 +
 +#endif /* AVCODEC_AMF_H */
-Index: jellyfin-ffmpeg/libavcodec/amfenc.c
-===================================================================
 --- libavcodec/amfenc.c
 +++ libavcodec/amfenc.c
 @@ -16,229 +16,56 @@
@@ -1468,8 +1458,6 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.c
      return ret;
  }
  
-Index: jellyfin-ffmpeg/libavcodec/amfenc.h
-===================================================================
 --- libavcodec/amfenc.h
 +++ libavcodec/amfenc.h
 @@ -1,64 +1,46 @@
@@ -1631,8 +1619,6 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc.h
 -
 -#endif //AVCODEC_AMFENC_H
 +#endif /* AVCODEC_AMFENC_H */
-Index: jellyfin-ffmpeg/libavcodec/amfenc_h264.c
-===================================================================
 --- libavcodec/amfenc_h264.c
 +++ libavcodec/amfenc_h264.c
 @@ -16,112 +16,104 @@
@@ -2126,8 +2112,6 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc_h264.c
      .p.wrapper_name = "amf",
      .hw_configs     = ff_amfenc_hw_configs,
  };
-Index: jellyfin-ffmpeg/libavcodec/amfenc_hevc.c
-===================================================================
 --- libavcodec/amfenc_hevc.c
 +++ libavcodec/amfenc_hevc.c
 @@ -22,73 +22,91 @@

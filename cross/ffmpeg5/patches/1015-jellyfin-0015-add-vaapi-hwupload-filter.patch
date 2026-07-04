@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -328,6 +328,7 @@ OBJS-$(CONFIG_HUESATURATION_FILTER)
@@ -10,8 +8,6 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_HWUPLOAD_FILTER)               += vf_hwupload.o
  OBJS-$(CONFIG_HYSTERESIS_FILTER)             += vf_hysteresis.o framesync.o
  OBJS-$(CONFIG_ICCDETECT_FILTER)              += vf_iccdetect.o fflcms2.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -309,6 +309,7 @@ extern const AVFilter ff_vf_hwdownload;
@@ -22,8 +18,6 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_hysteresis;
  extern const AVFilter ff_vf_iccdetect;
  extern const AVFilter ff_vf_iccgen;
-Index: jellyfin-ffmpeg/libavfilter/vf_hwupload_vaapi.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_hwupload_vaapi.c
 @@ -0,0 +1,193 @@

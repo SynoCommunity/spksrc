@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.c
-===================================================================
 --- libavfilter/vf_overlay_cuda.c
 +++ libavfilter/vf_overlay_cuda.c
 @@ -49,6 +49,8 @@
@@ -178,8 +176,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.c
      if (err < 0) {
          CHECK_CU(cu->cuCtxPopCurrent(&dummy));
          return err;
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.cu
-===================================================================
 --- libavfilter/vf_overlay_cuda.cu
 +++ libavfilter/vf_overlay_cuda.cu
 @@ -18,14 +18,15 @@
@@ -204,7 +200,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.cu
      int alpha_adj_x, int alpha_adj_y)
  {
      int x = blockIdx.x * blockDim.x + threadIdx.x;
-@@ -44,11 +45,44 @@ __global__ void Overlay_Cuda(
+@@ -44,10 +44,43 @@
  
      float alpha = 1.0;
      if (alpha_linesize) {
@@ -246,8 +242,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.cu
 +        overlay_alpha, alpha_linesize, \
 +        alpha_adj_x, alpha_adj_y); \
  }
- 
++
 +OVERLAY_VARIANT(uchar, unsigned char)
 +OVERLAY_VARIANT(ushort, unsigned short)
 +
-+}
