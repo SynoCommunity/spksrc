@@ -48,7 +48,6 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 # ARCH specific
 OPTIONAL_DEPENDS  = cross/openh264
 OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/svt-av1
 # GCC specific
 OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/rubberband
@@ -217,11 +216,6 @@ DEPENDS += cross/svt-hevc
 CONFIGURE_ARGS += --enable-libsvthevc
 endif
 
-# Add SVT-AV1 codec to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/svt-av1
-CONFIGURE_ARGS += --enable-libsvtav1
-endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
