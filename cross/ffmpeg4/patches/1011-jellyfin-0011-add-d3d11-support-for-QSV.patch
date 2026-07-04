@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/qsv.c
-===================================================================
 --- libavcodec/qsv.c
 +++ libavcodec/qsv.c
 @@ -36,6 +36,8 @@
@@ -124,8 +122,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsv.c
      }
      if (!handle) {
          av_log(avctx, AV_LOG_VERBOSE, "No supported hw handle could be retrieved "
-Index: jellyfin-ffmpeg/libavcodec/qsv_internal.h
-===================================================================
 --- libavcodec/qsv_internal.h
 +++ libavcodec/qsv_internal.h
 @@ -62,7 +62,7 @@
@@ -137,8 +133,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsv_internal.h
  
      AVFrame *locked_frame;
      AVFrame *hw_frame;
-Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
-===================================================================
 --- libavfilter/qsvvpp.c
 +++ libavfilter/qsvvpp.c
 @@ -68,11 +68,7 @@ struct QSVVPPContext {
@@ -203,8 +197,6 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
      if (ret < 0)
          return ff_qsvvpp_print_error(avctx, ret, "Error getting the session handle");
      else if (ret > 0) {
-Index: jellyfin-ffmpeg/libavfilter/vf_deinterlace_qsv.c
-===================================================================
 --- libavfilter/vf_deinterlace_qsv.c
 +++ libavfilter/vf_deinterlace_qsv.c
 @@ -42,6 +42,8 @@
@@ -265,8 +257,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_deinterlace_qsv.c
      if (err < 0)
          return ff_qsvvpp_print_error(ctx, err, "Error getting the session handle");
      else if (err > 0) {
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_qsv.c
-===================================================================
 --- libavfilter/vf_scale_qsv.c
 +++ libavfilter/vf_scale_qsv.c
 @@ -70,6 +70,7 @@ enum var_name {
@@ -335,8 +325,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_qsv.c
      if (err < 0)
          return ff_qsvvpp_print_error(ctx, err, "Error getting the session handle");
      else if (err > 0) {
-Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
-===================================================================
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
 @@ -112,6 +112,8 @@ static void d3d11va_frames_uninit(AVHWFr
@@ -412,8 +400,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
      ctx->internal->pool_internal = av_buffer_pool_init2(sizeof(AVD3D11FrameDescriptor),
                                                          ctx, d3d11va_pool_alloc, NULL);
      if (!ctx->internal->pool_internal)
-Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
-===================================================================
 --- libavutil/hwcontext_d3d11va.h
 +++ libavutil/hwcontext_d3d11va.h
 @@ -164,6 +164,17 @@ typedef struct AVD3D11VAFramesContext {
@@ -434,8 +420,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
  } AVD3D11VAFramesContext;
  
  #endif /* AVUTIL_HWCONTEXT_D3D11VA_H */
-Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
-===================================================================
 --- libavutil/hwcontext_opencl.c
 +++ libavutil/hwcontext_opencl.c
 @@ -2249,7 +2249,8 @@ static int opencl_map_from_qsv(AVHWFrame
@@ -448,8 +432,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
      } else
  #endif
          if (src->format == AV_PIX_FMT_VAAPI) {
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
 @@ -27,9 +27,13 @@

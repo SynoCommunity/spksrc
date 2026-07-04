@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -495,6 +495,7 @@ OBJS-$(CONFIG_ZSCALE_FILTER)
@@ -10,8 +8,6 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_CELLAUTO_FILTER)               += vsrc_cellauto.o
  OBJS-$(CONFIG_COLOR_FILTER)                  += vsrc_testsrc.o
  OBJS-$(CONFIG_COREIMAGESRC_FILTER)           += vf_coreimage.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -472,6 +472,7 @@ extern AVFilter ff_vf_zscale;
@@ -22,8 +18,6 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern AVFilter ff_vsrc_cellauto;
  extern AVFilter ff_vsrc_color;
  extern AVFilter ff_vsrc_coreimagesrc;
-Index: jellyfin-ffmpeg/libavfilter/vsrc_alphasrc.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vsrc_alphasrc.c
 @@ -0,0 +1,165 @@

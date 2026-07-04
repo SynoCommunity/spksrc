@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 4.4.4
+PKG_VERS = 4.4.8
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -29,10 +29,15 @@ CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
 
 # Compiler workaround to enable DTS-HD MA stream decoding
 CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
-# Synology default optimization
-CONFIGURE_ARGS += --extra-cflags=-O3
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+  CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
+else
+  # Synology default optimization (no LTO here: legacy toolchains)
+  CONFIGURE_ARGS += --extra-cflags=-O3
+  CONFIGURE_ARGS += --disable-debug
+endif
 
 include ../../mk/spksrc.common.mk
 
@@ -45,13 +50,7 @@ OPTIONAL_DEPENDS += cross/libaom
 OPTIONAL_DEPENDS += cross/libvpx
 OPTIONAL_DEPENDS += cross/libzimg
 OPTIONAL_DEPENDS += cross/openh264
-OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/svt-hevc
-OPTIONAL_DEPENDS += cross/libva
-OPTIONAL_DEPENDS += cross/libva-utils
-OPTIONAL_DEPENDS += cross/intel-vaapi-driver
-OPTIONAL_DEPENDS += cross/intel-media-driver
-OPTIONAL_DEPENDS += cross/intel-mediasdk
 OPTIONAL_DEPENDS += cross/twolame
 OPTIONAL_DEPENDS += cross/x264
 OPTIONAL_DEPENDS += cross/x265
@@ -191,11 +190,6 @@ DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
 
-# Add SVT-AV1 codec to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/svt-av1
-CONFIGURE_ARGS += --enable-libsvtav1
-endif
 
 # Add SVT-HEVC codec to x64
 # Patch for support from:
@@ -235,8 +229,14 @@ endif
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
+# VAAPI/QSV/OpenCL runtimes come from the synocli-videodriver package
+# (VIDEODRV_PACKAGE in spk/ffmpeg4), replacing the previously embedded
+# libva/intel driver stack.
 CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx --enable-libdrm
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
+CONFIGURE_ARGS += --enable-opencl
+CONFIGURE_ARGS += --enable-v4l2-m2m
+endif
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
