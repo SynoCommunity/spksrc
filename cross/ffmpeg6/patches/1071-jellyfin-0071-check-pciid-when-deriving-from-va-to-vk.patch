@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_vulkan.c
-===================================================================
 --- libavutil/hwcontext_vulkan.c
 +++ libavutil/hwcontext_vulkan.c
 @@ -1581,17 +1581,33 @@ static int vulkan_device_derive(AVHWDevi

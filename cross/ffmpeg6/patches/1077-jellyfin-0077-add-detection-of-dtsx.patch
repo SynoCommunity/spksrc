@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/avcodec.h
-===================================================================
 --- libavcodec/avcodec.h
 +++ libavcodec/avcodec.h
 @@ -1584,12 +1584,14 @@ typedef struct AVCodecContext {
@@ -23,8 +21,6 @@ Index: jellyfin-ffmpeg/libavcodec/avcodec.h
  
  #define FF_PROFILE_MPEG2_422    0
  #define FF_PROFILE_MPEG2_HIGH   1
-Index: jellyfin-ffmpeg/libavcodec/dca_syncwords.h
-===================================================================
 --- libavcodec/dca_syncwords.h
 +++ libavcodec/dca_syncwords.h
 @@ -33,4 +33,7 @@
@@ -35,8 +31,6 @@ Index: jellyfin-ffmpeg/libavcodec/dca_syncwords.h
 +#define    DCA_SYNCWORD_XLL_X_IMAX           0xF14000D0U
 +
  #endif /* AVCODEC_DCA_SYNCWORDS_H */
-Index: jellyfin-ffmpeg/libavcodec/dca_xll.c
-===================================================================
 --- libavcodec/dca_xll.c
 +++ libavcodec/dca_xll.c
 @@ -18,6 +18,7 @@
@@ -87,8 +81,6 @@ Index: jellyfin-ffmpeg/libavcodec/dca_xll.c
      avctx->bit_rate = 0;
  
      frame->nb_samples = nsamples = s->nframesamples << (s->nfreqbands - 1);
-Index: jellyfin-ffmpeg/libavcodec/dca_xll.h
-===================================================================
 --- libavcodec/dca_xll.h
 +++ libavcodec/dca_xll.h
 @@ -135,6 +135,9 @@ typedef struct DCAXllDecoder {
@@ -101,8 +93,6 @@ Index: jellyfin-ffmpeg/libavcodec/dca_xll.h
      int     output_mask;
      int32_t *output_samples[DCA_SPEAKER_COUNT];
  } DCAXllDecoder;
-Index: jellyfin-ffmpeg/libavcodec/profiles.c
-===================================================================
 --- libavcodec/profiles.c
 +++ libavcodec/profiles.c
 @@ -36,12 +36,14 @@ const AVProfile ff_aac_profiles[] = {

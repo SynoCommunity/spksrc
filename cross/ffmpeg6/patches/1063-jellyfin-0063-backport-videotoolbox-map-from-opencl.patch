@@ -1,4 +1,4 @@
-diff --git configure configure
+diff --git a/configure b/configure
 index 197f762b58..efcb4c4e49 100755
 --- configure
 +++ configure
@@ -22,7 +22,7 @@ index 197f762b58..efcb4c4e49 100755
  enabled vdpau &&
      check_cpp_condition vdpau vdpau/vdpau.h "defined VDP_DECODER_PROFILE_MPEG4_PART2_ASP"
 
-diff --git libavutil/hwcontext_opencl.c libavutil/hwcontext_opencl.c
+diff --git a/libavutil/hwcontext_opencl.c b/libavutil/hwcontext_opencl.c
 index de093fffb1..efd8d0e094 100644
 --- libavutil/hwcontext_opencl.c
 +++ libavutil/hwcontext_opencl.c

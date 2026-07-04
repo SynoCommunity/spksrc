@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/qsv.c
-===================================================================
 --- libavcodec/qsv.c
 +++ libavcodec/qsv.c
 @@ -685,18 +685,31 @@ static int qsv_create_mfx_session(AVCode
@@ -40,8 +38,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsv.c
  
  #ifdef AVCODEC_QSV_LINUX_SESSION_HANDLE
      ret = ff_qsv_set_display_handle(avctx, qs);
-Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
-===================================================================
 --- libavcodec/qsvenc.c
 +++ libavcodec/qsvenc.c
 @@ -838,7 +838,9 @@ static int init_video_param(AVCodecConte
@@ -148,8 +144,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
              pict_type = AV_PICTURE_TYPE_NONE;
              av_log(avctx, AV_LOG_WARNING, "Unknown FrameType, set pict_type to AV_PICTURE_TYPE_NONE.\n");
          } else {
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
 @@ -663,6 +663,7 @@ static mfxStatus frame_get_hdl(mfxHDL pt

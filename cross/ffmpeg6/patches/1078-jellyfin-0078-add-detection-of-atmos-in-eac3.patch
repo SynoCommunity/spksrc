@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/ac3dec.c
-===================================================================
 --- libavcodec/ac3dec.c
 +++ libavcodec/ac3dec.c
 @@ -1714,6 +1714,7 @@ skip:
@@ -10,8 +8,6 @@ Index: jellyfin-ffmpeg/libavcodec/ac3dec.c
      }
  
      if (!avctx->sample_rate) {
-Index: jellyfin-ffmpeg/libavcodec/ac3dec.h
-===================================================================
 --- libavcodec/ac3dec.h
 +++ libavcodec/ac3dec.h
 @@ -102,6 +102,7 @@ typedef struct AC3DecodeContext {
@@ -22,8 +18,6 @@ Index: jellyfin-ffmpeg/libavcodec/ac3dec.h
      int dolby_surround_mode;                ///< dolby surround mode                    (dsurmod)
      int dolby_surround_ex_mode;             ///< dolby surround ex mode                 (dsurexmod)
      int dolby_headphone_mode;               ///< dolby headphone mode                   (dheadphonmod)
-Index: jellyfin-ffmpeg/libavcodec/ac3dec_float.c
-===================================================================
 --- libavcodec/ac3dec_float.c
 +++ libavcodec/ac3dec_float.c
 @@ -33,6 +33,7 @@
@@ -42,8 +36,6 @@ Index: jellyfin-ffmpeg/libavcodec/ac3dec_float.c
      .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
  };
  #endif
-Index: jellyfin-ffmpeg/libavcodec/avcodec.h
-===================================================================
 --- libavcodec/avcodec.h
 +++ libavcodec/avcodec.h
 @@ -1593,6 +1593,8 @@ typedef struct AVCodecContext {
@@ -55,8 +47,6 @@ Index: jellyfin-ffmpeg/libavcodec/avcodec.h
  #define FF_PROFILE_MPEG2_422    0
  #define FF_PROFILE_MPEG2_HIGH   1
  #define FF_PROFILE_MPEG2_SS     2
-Index: jellyfin-ffmpeg/libavcodec/codec_desc.c
-===================================================================
 --- libavcodec/codec_desc.c
 +++ libavcodec/codec_desc.c
 @@ -2931,6 +2931,7 @@ static const AVCodecDescriptor codec_des
@@ -67,8 +57,6 @@ Index: jellyfin-ffmpeg/libavcodec/codec_desc.c
      },
      {
          .id        = AV_CODEC_ID_SIPR,
-Index: jellyfin-ffmpeg/libavcodec/eac3dec.c
-===================================================================
 --- libavcodec/eac3dec.c
 +++ libavcodec/eac3dec.c
 @@ -464,7 +464,16 @@ static int ff_eac3_parse_header(AC3Decod
@@ -89,8 +77,6 @@ Index: jellyfin-ffmpeg/libavcodec/eac3dec.c
          }
      }
  
-Index: jellyfin-ffmpeg/libavcodec/profiles.c
-===================================================================
 --- libavcodec/profiles.c
 +++ libavcodec/profiles.c
 @@ -47,6 +47,11 @@ const AVProfile ff_dca_profiles[] = {
@@ -105,8 +91,6 @@ Index: jellyfin-ffmpeg/libavcodec/profiles.c
  const AVProfile ff_dnxhd_profiles[] = {
    { FF_PROFILE_DNXHD,      "DNXHD"},
    { FF_PROFILE_DNXHR_LB,   "DNXHR LB"},
-Index: jellyfin-ffmpeg/libavcodec/profiles.h
-===================================================================
 --- libavcodec/profiles.h
 +++ libavcodec/profiles.h
 @@ -58,6 +58,7 @@

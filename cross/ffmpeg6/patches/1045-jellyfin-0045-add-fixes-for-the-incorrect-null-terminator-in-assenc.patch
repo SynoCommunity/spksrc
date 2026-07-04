@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavformat/assenc.c
-===================================================================
 --- libavformat/assenc.c
 +++ libavformat/assenc.c
 @@ -25,6 +25,7 @@

@@ -1,10 +1,14 @@
 SPK_NAME = ffmpeg6
 SPK_VERS = 6.0.1
-SPK_REV = 5
+SPK_REV = 6
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to version 6.0.1<br/>2. Update Jellyfin upstream patches<br/>3. Update Intel Media Driver 2024Q2 Release (DSM7 only)<br/>4. Revert DSM7 to MFX intead of Intel Video Processing Library (Intel-VPL) as unsupported by Jellyfin<br/>5. Enable OpenCL on Intel platforms (DSM7 only)<br/>6. Update to latest version of x264 (fix for \#6176)<br/>6. Now using new synocli-videodriver package"
+CHANGELOG = "1. Update to jellyfin-ffmpeg v6.0.1-8 patchset<br/>2. Now using new synocli-videodriver package<br/>3. Align package with ffmpeg7/ffmpeg8"
 
 DEPENDS = cross/ffmpeg6
+VIDEODRV_PACKAGE = synocli-videodriver
+
+# requires c11 and proper atomic using gcc-4.9+ support
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg
@@ -25,10 +29,6 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_ge, $(TCVERSION), 7.0),1)
 SERVICE_USER = auto
 VIDEODRIVER = on
-endif
-
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-SERVICE_SETUP = src/service-setup.sh
 endif
 
 include ../../mk/spksrc.spk-meta.mk

@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavformat/mpegtsenc.c
-===================================================================
 --- libavformat/mpegtsenc.c
 +++ libavformat/mpegtsenc.c
 @@ -23,6 +23,7 @@

@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
-===================================================================
 --- libavfilter/vf_overlay_vaapi.c
 +++ libavfilter/vf_overlay_vaapi.c
 @@ -236,8 +236,9 @@ static int overlay_vaapi_blend(FFFrameSy

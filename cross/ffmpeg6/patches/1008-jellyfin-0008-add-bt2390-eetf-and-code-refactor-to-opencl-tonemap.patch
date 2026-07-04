@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/opencl.c
-===================================================================
 --- libavfilter/opencl.c
 +++ libavfilter/opencl.c
 @@ -170,7 +170,7 @@ int ff_opencl_filter_load_program(AVFilt
@@ -20,8 +18,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl.c
          av_bprintf(buf, "\n");
      }
      av_bprintf(buf, "};\n");
-Index: jellyfin-ffmpeg/libavfilter/opencl.h
-===================================================================
 --- libavfilter/opencl.h
 +++ libavfilter/opencl.h
 @@ -206,17 +206,17 @@ do {
@@ -61,8 +57,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl.h
   * Create a buffer with the given information.
   *
   * The buffer variable in the context structure must be named <buffer_name>.
-Index: jellyfin-ffmpeg/libavfilter/opencl/colorspace_common.cl
-===================================================================
 --- libavfilter/opencl/colorspace_common.cl
 +++ libavfilter/opencl/colorspace_common.cl
 @@ -17,7 +17,17 @@
@@ -298,8 +292,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/colorspace_common.cl
 +    return (float3)(rr, gg, bb);
  }
 +#endif
-Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
-===================================================================
 --- libavfilter/opencl/tonemap.cl
 +++ libavfilter/opencl/tonemap.cl
 @@ -16,54 +16,60 @@
@@ -384,7 +376,7 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
      float j = tone_param;
      float a, b;
  
-@@ -71,202 +77,335 @@ float mobius(float s, float peak) {
+@@ -71,202 +77,339 @@ float mobius(float s, float peak) {
          return s;
  
      a = -j * j * (peak - 1.0f) / (j * j - 2.0f * j + peak);
@@ -467,7 +459,11 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 +    float4 sig_g = fmax(*g4, FLOAT_EPS), sig_go = sig_g;
 +    float4 sig_b = fmax(*b4, FLOAT_EPS), sig_bo = sig_b;
 +#else
++  #ifdef TONE_MODE_MAX
 +    float4 sig = fmax(fmax(*r4, fmax(*g4, *b4)), FLOAT_EPS);
++  #else
++    float4 sig = fmax((*r4 * 0.2627f + *g4 * 0.678f + *b4 * 0.0593f), FLOAT_EPS);
++  #endif
 +    float4 sig_o = sig;
 +#endif
  
@@ -886,8 +882,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 +    write_imagef(dst2, (int2)(xi, yi), (float4)(chroma.y, chroma.z, 0.0f, 1.0f));
 +#endif
  }
-Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
-===================================================================
 --- libavfilter/vf_tonemap_opencl.c
 +++ libavfilter/vf_tonemap_opencl.c
 @@ -1,4 +1,4 @@
@@ -935,7 +929,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
  enum TonemapAlgorithm {
      TONEMAP_NONE,
-@@ -45,7 +56,14 @@ enum TonemapAlgorithm {
+@@ -45,7 +56,15 @@ enum TonemapAlgorithm {
      TONEMAP_REINHARD,
      TONEMAP_HABLE,
      TONEMAP_MOBIUS,
@@ -947,11 +941,12 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 +enum TonemapMode {
 +    TONEMAP_MODE_MAX,
 +    TONEMAP_MODE_RGB,
++    TONEMAP_MODE_LUM,
 +    TONEMAP_MODE_COUNT,
  };
  
  typedef struct TonemapOpenCLContext {
-@@ -56,23 +74,44 @@ typedef struct TonemapOpenCLContext {
+@@ -56,23 +75,44 @@ typedef struct TonemapOpenCLContext {
      enum AVColorPrimaries primaries, primaries_in, primaries_out;
      enum AVColorRange range, range_in, range_out;
      enum AVChromaLocation chroma_loc;
@@ -1000,7 +995,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  };
  
  static const char *const delinearize_funcs[AVCOL_TRC_NB] = {
-@@ -80,7 +119,7 @@ static const char *const delinearize_fun
+@@ -80,7 +120,7 @@ static const char *const delinearize_fun
      [AVCOL_TRC_BT2020_10] = "inverse_eotf_bt1886",
  };
  
@@ -1009,7 +1004,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      [TONEMAP_NONE]     = "direct",
      [TONEMAP_LINEAR]   = "linear",
      [TONEMAP_GAMMA]    = "gamma",
-@@ -88,8 +127,54 @@ static const char *const tonemap_func[TO
+@@ -88,8 +128,54 @@ static const char *const tonemap_func[TO
      [TONEMAP_REINHARD] = "reinhard",
      [TONEMAP_HABLE]    = "hable",
      [TONEMAP_MOBIUS]   = "mobius",
@@ -1064,7 +1059,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  static int get_rgb2rgb_matrix(enum AVColorPrimaries in, enum AVColorPrimaries out,
                                double rgb2rgb[3][3]) {
      double rgb2xyz[3][3], xyz2rgb[3][3];
-@@ -108,23 +193,149 @@ static int get_rgb2rgb_matrix(enum AVCol
+@@ -108,23 +194,149 @@ static int get_rgb2rgb_matrix(enum AVCol
      return 0;
  }
  
@@ -1223,7 +1218,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      switch(ctx->tonemap) {
      case TONEMAP_GAMMA:
-@@ -144,48 +355,148 @@ static int tonemap_opencl_init(AVFilterC
+@@ -144,48 +356,148 @@ static int tonemap_opencl_init(AVFilterC
      if (isnan(ctx->param))
          ctx->param = 1.0f;
  
@@ -1363,7 +1358,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 +
 +    if (ctx->tonemap_mode == TONEMAP_MODE_RGB)
 +        av_bprintf(&header, "#define TONE_MODE_RGB\n");
-+    else
++    else if (ctx->tonemap_mode == TONEMAP_MODE_MAX)
 +        av_bprintf(&header, "#define TONE_MODE_MAX\n");
 +
 +    if (ctx->in_planes > 2)
@@ -1387,7 +1382,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      if (ctx->range_in == AVCOL_RANGE_JPEG)
          av_bprintf(&header, "#define FULL_RANGE_IN\n");
  
-@@ -199,19 +510,41 @@ static int tonemap_opencl_init(AVFilterC
+@@ -199,19 +511,41 @@ static int tonemap_opencl_init(AVFilterC
      else
          ff_opencl_print_const_matrix_3x3(&header, "rgb2rgb", rgb2rgb);
  
@@ -1436,7 +1431,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
                 ctx->colorspace_out, av_color_space_name(ctx->colorspace_out));
          goto fail;
      }
-@@ -219,24 +552,23 @@ static int tonemap_opencl_init(AVFilterC
+@@ -219,24 +553,23 @@ static int tonemap_opencl_init(AVFilterC
      ff_fill_rgb2yuv_table(luma_dst, rgb2yuv);
      ff_opencl_print_const_matrix_3x3(&header, "yuv_matrix", rgb2yuv);
  
@@ -1476,7 +1471,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      av_log(avctx, AV_LOG_DEBUG, "Generated OpenCL header:\n%s\n", header.str);
      opencl_sources[0] = header.str;
-@@ -254,46 +586,171 @@ static int tonemap_opencl_init(AVFilterC
+@@ -254,46 +587,171 @@ static int tonemap_opencl_init(AVFilterC
      CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create OpenCL "
                       "command queue %d.\n", cle);
  
@@ -1667,7 +1662,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      ret = ff_opencl_filter_config_output(outlink);
      if (ret < 0)
          return ret;
-@@ -308,13 +765,46 @@ static int launch_kernel(AVFilterContext
+@@ -308,13 +766,46 @@ static int launch_kernel(AVFilterContext
      size_t global_work[2];
      size_t local_work[2];
      cl_int cle;
@@ -1716,7 +1711,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      local_work[0]  = 16;
      local_work[1]  = 16;
-@@ -338,13 +828,10 @@ static int tonemap_opencl_filter_frame(A
+@@ -338,13 +829,10 @@ static int tonemap_opencl_filter_frame(A
      AVFilterContext    *avctx = inlink->dst;
      AVFilterLink     *outlink = avctx->outputs[0];
      TonemapOpenCLContext *ctx = avctx->priv;
@@ -1731,7 +1726,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      av_log(ctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
             av_get_pix_fmt_name(input->format),
-@@ -363,9 +850,6 @@ static int tonemap_opencl_filter_frame(A
+@@ -363,9 +851,6 @@ static int tonemap_opencl_filter_frame(A
      if (err < 0)
          goto fail;
  
@@ -1741,7 +1736,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      if (ctx->trc != -1)
          output->color_trc = ctx->trc;
      if (ctx->primaries != -1)
-@@ -385,72 +869,92 @@ static int tonemap_opencl_filter_frame(A
+@@ -385,72 +870,92 @@ static int tonemap_opencl_filter_frame(A
      ctx->range_out = output->color_range;
      ctx->chroma_loc = output->chroma_location;
  
@@ -1874,7 +1869,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      av_frame_free(&input);
      av_frame_free(&output);
      return err;
-@@ -458,24 +962,9 @@ fail:
+@@ -458,24 +963,9 @@ fail:
  
  static av_cold void tonemap_opencl_uninit(AVFilterContext *avctx)
  {
@@ -1901,7 +1896,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      ff_opencl_filter_uninit(avctx);
  }
-@@ -483,37 +972,47 @@ static av_cold void tonemap_opencl_unini
+@@ -483,37 +973,48 @@ static av_cold void tonemap_opencl_unini
  #define OFFSET(x) offsetof(TonemapOpenCLContext, x)
  #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
  static const AVOption tonemap_opencl_options[] = {
@@ -1946,8 +1941,9 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
 +        { "mobius",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MOBIUS },            0, 0, FLAGS, "tonemap" },
 +        { "bt2390",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_BT2390 },            0, 0, FLAGS, "tonemap" },
 +    { "tonemap_mode", "Tonemap mode selection", OFFSET(tonemap_mode), AV_OPT_TYPE_INT, { .i64 = TONEMAP_MODE_MAX }, TONEMAP_MODE_MAX, TONEMAP_MODE_COUNT - 1, FLAGS, "tonemap_mode" },
-+        { "max",      0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_MAX },          0, 0, FLAGS, "tonemap_mode" },
-+        { "rgb",      0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_RGB },          0, 0, FLAGS, "tonemap_mode" },
++        { "max", "Brightest channel based tonemap",  0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_MAX }, 0, 0, FLAGS, "tonemap_mode" },
++        { "rgb", "Per-channel based tonemap",        0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_RGB }, 0, 0, FLAGS, "tonemap_mode" },
++        { "lum", "Relative luminance based tonemap", 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_LUM }, 0, 0, FLAGS, "tonemap_mode" },
 +    { "transfer", "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, { .i64 = AVCOL_TRC_BT709 }, -1, INT_MAX, FLAGS, "transfer" },
 +    { "t",        "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, { .i64 = AVCOL_TRC_BT709 }, -1, INT_MAX, FLAGS, "transfer" },
 +        { "bt709",            0,       0,                 AV_OPT_TYPE_CONST, { .i64 = AVCOL_TRC_BT709 },         0, 0, FLAGS, "transfer" },

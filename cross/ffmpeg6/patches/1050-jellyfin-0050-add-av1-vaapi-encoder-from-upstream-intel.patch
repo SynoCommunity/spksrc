@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3261,6 +3261,8 @@ av1_qsv_decoder_select="qsvdec"
@@ -19,8 +17,6 @@ Index: jellyfin-ffmpeg/configure
  fi
  
  if enabled_all opencl libdrm ; then
-Index: jellyfin-ffmpeg/libavcodec/Makefile
-===================================================================
 --- libavcodec/Makefile
 +++ libavcodec/Makefile
 @@ -255,6 +255,7 @@ OBJS-$(CONFIG_AV1_CUVID_DECODER)       +
@@ -31,8 +27,6 @@ Index: jellyfin-ffmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_AVRN_DECODER)            += avrndec.o
  OBJS-$(CONFIG_AVRP_DECODER)            += r210dec.o
  OBJS-$(CONFIG_AVRP_ENCODER)            += r210enc.o
-Index: jellyfin-ffmpeg/libavcodec/allcodecs.c
-===================================================================
 --- libavcodec/allcodecs.c
 +++ libavcodec/allcodecs.c
 @@ -838,6 +838,7 @@ extern const FFCodec ff_av1_nvenc_encode
@@ -43,8 +37,6 @@ Index: jellyfin-ffmpeg/libavcodec/allcodecs.c
  extern const FFCodec ff_libopenh264_encoder;
  extern const FFCodec ff_libopenh264_decoder;
  extern const FFCodec ff_h264_amf_encoder;
-Index: jellyfin-ffmpeg/libavcodec/av1.h
-===================================================================
 --- libavcodec/av1.h
 +++ libavcodec/av1.h
 @@ -175,6 +175,13 @@ enum {
@@ -61,8 +53,6 @@ Index: jellyfin-ffmpeg/libavcodec/av1.h
  // Sequence Headers are actually unbounded because one can use
  // an arbitrary number of leading zeroes when encoding via uvlc.
  // The following estimate is based around using the lowest number
-Index: jellyfin-ffmpeg/libavcodec/av1_levels.c
-===================================================================
 --- /dev/null
 +++ libavcodec/av1_levels.c
 @@ -0,0 +1,92 @@
@@ -158,8 +148,6 @@ Index: jellyfin-ffmpeg/libavcodec/av1_levels.c
 +
 +    return NULL;
 +}
-Index: jellyfin-ffmpeg/libavcodec/av1_levels.h
-===================================================================
 --- /dev/null
 +++ libavcodec/av1_levels.h
 @@ -0,0 +1,58 @@
@@ -221,8 +209,6 @@ Index: jellyfin-ffmpeg/libavcodec/av1_levels.h
 +                                             float fps);
 +
 +#endif /* AVCODEC_AV1_LEVELS_H */
-Index: jellyfin-ffmpeg/libavcodec/cbs.c
-===================================================================
 --- libavcodec/cbs.c
 +++ libavcodec/cbs.c
 @@ -111,8 +111,9 @@ av_cold int ff_cbs_init(CodedBitstreamCo
@@ -512,8 +498,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs.c
 +        }
 +    }
 +}
-Index: jellyfin-ffmpeg/libavcodec/cbs.h
-===================================================================
 --- libavcodec/cbs.h
 +++ libavcodec/cbs.h
 @@ -26,6 +26,7 @@
@@ -652,8 +636,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs.h
 +                            int64_t value);
  
  #endif /* AVCODEC_CBS_H */
-Index: jellyfin-ffmpeg/libavcodec/cbs_av1.c
-===================================================================
 --- libavcodec/cbs_av1.c
 +++ libavcodec/cbs_av1.c
 @@ -31,10 +31,8 @@ static int cbs_av1_read_uvlc(CodedBitstr
@@ -1184,8 +1166,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs_av1.c
          skip_put_bytes(pbc, header_size);
  
          if (td) {
-Index: jellyfin-ffmpeg/libavcodec/cbs_av1.h
-===================================================================
 --- libavcodec/cbs_av1.h
 +++ libavcodec/cbs_av1.h
 @@ -392,6 +392,7 @@ typedef struct AV1RawOBU {
@@ -1196,8 +1176,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs_av1.h
  
      union {
          AV1RawSequenceHeader sequence_header;
-Index: jellyfin-ffmpeg/libavcodec/cbs_av1_syntax_template.c
-===================================================================
 --- libavcodec/cbs_av1_syntax_template.c
 +++ libavcodec/cbs_av1_syntax_template.c
 @@ -1018,9 +1018,9 @@ static int FUNC(read_tx_mode)(CodedBitst
@@ -1212,8 +1190,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs_av1_syntax_template.c
  
      return 0;
  }
-Index: jellyfin-ffmpeg/libavcodec/cbs_bsf.c
-===================================================================
 --- libavcodec/cbs_bsf.c
 +++ libavcodec/cbs_bsf.c
 @@ -123,6 +123,11 @@ int ff_cbs_bsf_generic_init(AVBSFContext
@@ -1228,8 +1204,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs_bsf.c
      if (bsf->par_in->extradata) {
          err = ff_cbs_read_extradata(ctx->input, frag, bsf->par_in);
          if (err < 0) {
-Index: jellyfin-ffmpeg/libavcodec/cbs_h2645.c
-===================================================================
 --- libavcodec/cbs_h2645.c
 +++ libavcodec/cbs_h2645.c
 @@ -34,41 +34,38 @@ static int cbs_read_ue_golomb(CodedBitst
@@ -1494,8 +1468,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs_h2645.c
  #undef xu
  #undef xi
  #undef xue
-Index: jellyfin-ffmpeg/libavcodec/cbs_internal.h
-===================================================================
 --- libavcodec/cbs_internal.h
 +++ libavcodec/cbs_internal.h
 @@ -133,6 +133,12 @@ typedef struct CodedBitstreamType {
@@ -1634,8 +1606,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs_internal.h
  #define TYPE_LIST(...) { __VA_ARGS__ }
  #define CBS_UNIT_TYPE_POD(type_, structure) { \
          .nb_unit_types  = 1, \
-Index: jellyfin-ffmpeg/libavcodec/cbs_mpeg2.c
-===================================================================
 --- libavcodec/cbs_mpeg2.c
 +++ libavcodec/cbs_mpeg2.c
 @@ -40,8 +40,6 @@
@@ -1688,8 +1658,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs_mpeg2.c
  #undef xuia
  #undef xsi
  #undef nextbits
-Index: jellyfin-ffmpeg/libavcodec/cbs_vp9.c
-===================================================================
 --- libavcodec/cbs_vp9.c
 +++ libavcodec/cbs_vp9.c
 @@ -28,11 +28,10 @@ static int cbs_vp9_read_s(CodedBitstream
@@ -1947,8 +1915,6 @@ Index: jellyfin-ffmpeg/libavcodec/cbs_vp9.c
  #undef xf
  #undef xs
  #undef increment
-Index: jellyfin-ffmpeg/libavcodec/trace_headers_bsf.c
-===================================================================
 --- libavcodec/trace_headers_bsf.c
 +++ libavcodec/trace_headers_bsf.c
 @@ -44,6 +44,8 @@ static int trace_headers_init(AVBSFConte
@@ -1960,8 +1926,6 @@ Index: jellyfin-ffmpeg/libavcodec/trace_headers_bsf.c
  
      if (bsf->par_in->extradata) {
          CodedBitstreamFragment *frag = &ctx->fragment;
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode.c
-===================================================================
 --- libavcodec/vaapi_encode.c
 +++ libavcodec/vaapi_encode.c
 @@ -276,21 +276,34 @@ static int vaapi_encode_issue(AVCodecCon
@@ -2505,8 +2469,6 @@ Index: jellyfin-ffmpeg/libavcodec/vaapi_encode.c
  
      av_freep(&ctx->codec_sequence_params);
      av_freep(&ctx->codec_picture_params);
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode.h
-===================================================================
 --- libavcodec/vaapi_encode.h
 +++ libavcodec/vaapi_encode.h
 @@ -49,6 +49,7 @@ enum {
@@ -2590,8 +2552,6 @@ Index: jellyfin-ffmpeg/libavcodec/vaapi_encode.h
  };
  
  typedef struct VAAPIEncodeType {
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_av1.c
-===================================================================
 --- /dev/null
 +++ libavcodec/vaapi_encode_av1.c
 @@ -0,0 +1,949 @@
@@ -3544,8 +3504,6 @@ Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_av1.c
 +    .hw_configs     = ff_vaapi_encode_hw_configs,
 +    .p.wrapper_name = "vaapi",
 +};
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_h264.c
-===================================================================
 --- libavcodec/vaapi_encode_h264.c
 +++ libavcodec/vaapi_encode_h264.c
 @@ -614,7 +614,7 @@ static int vaapi_encode_h264_init_pictur
@@ -3701,8 +3659,6 @@ Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_h264.c
          // Forward reference for B-frame.
          av_assert0(pic->type == PICTURE_TYPE_B);
          vslice->RefPicList1[0] = vpic->ReferenceFrames[1];
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_h265.c
-===================================================================
 --- libavcodec/vaapi_encode_h265.c
 +++ libavcodec/vaapi_encode_h265.c
 @@ -783,7 +783,7 @@ static int vaapi_encode_h265_init_pictur
@@ -3831,8 +3787,6 @@ Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_h265.c
          // Forward reference for B-frame.
          av_assert0(pic->type == PICTURE_TYPE_B);
          vslice->ref_pic_list1[0] = vpic->reference_frames[1];
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_mpeg2.c
-===================================================================
 --- libavcodec/vaapi_encode_mpeg2.c
 +++ libavcodec/vaapi_encode_mpeg2.c
 @@ -458,12 +458,12 @@ static int vaapi_encode_mpeg2_init_pictu
@@ -3851,8 +3805,6 @@ Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_mpeg2.c
          break;
      default:
          av_assert0(0 && "invalid picture type");
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_vp8.c
-===================================================================
 --- libavcodec/vaapi_encode_vp8.c
 +++ libavcodec/vaapi_encode_vp8.c
 @@ -86,7 +86,7 @@ static int vaapi_encode_vp8_init_picture
@@ -3881,8 +3833,6 @@ Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_vp8.c
          break;
      default:
          av_assert0(0 && "invalid picture type");
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_vp9.c
-===================================================================
 --- libavcodec/vaapi_encode_vp9.c
 +++ libavcodec/vaapi_encode_vp9.c
 @@ -96,15 +96,15 @@ static int vaapi_encode_vp9_init_picture

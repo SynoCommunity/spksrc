@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/qsv.c
-===================================================================
 --- libavcodec/qsv.c
 +++ libavcodec/qsv.c
 @@ -196,7 +196,7 @@ int ff_qsv_print_warning(void *log_ctx,
@@ -43,8 +41,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsv.c
      default:
          return AVERROR(ENOSYS);
      }
-Index: jellyfin-ffmpeg/libavcodec/qsv_internal.h
-===================================================================
 --- libavcodec/qsv_internal.h
 +++ libavcodec/qsv_internal.h
 @@ -57,6 +57,8 @@
@@ -64,8 +60,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsv_internal.h
  
      struct QSVFrame *next;
  } QSVFrame;
-Index: jellyfin-ffmpeg/libavcodec/qsvdec.c
-===================================================================
 --- libavcodec/qsvdec.c
 +++ libavcodec/qsvdec.c
 @@ -42,13 +42,16 @@
@@ -267,8 +261,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsvdec.c
  }
  
  static int qsv_process_data(AVCodecContext *avctx, QSVContext *q,
-Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
-===================================================================
 --- libavcodec/qsvenc.c
 +++ libavcodec/qsvenc.c
 @@ -680,7 +680,9 @@ static int is_strict_gop(QSVEncContext *
@@ -408,8 +400,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
      HW_CONFIG_ENCODER_DEVICE(NV12, QSV),
      HW_CONFIG_ENCODER_DEVICE(P010, QSV),
      NULL,
-Index: jellyfin-ffmpeg/libavcodec/qsvenc_av1.c
-===================================================================
 --- libavcodec/qsvenc_av1.c
 +++ libavcodec/qsvenc_av1.c
 @@ -149,10 +149,13 @@ FFCodec ff_av1_qsv_encoder = {
@@ -427,8 +417,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc_av1.c
      .p.wrapper_name   = "qsv",
      .hw_configs     = ff_qsv_enc_hw_configs,
  };
-Index: jellyfin-ffmpeg/libavcodec/qsvenc_h264.c
-===================================================================
 --- libavcodec/qsvenc_h264.c
 +++ libavcodec/qsvenc_h264.c
 @@ -201,6 +201,8 @@ const FFCodec ff_h264_qsv_encoder = {
@@ -440,8 +428,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc_h264.c
                                                      AV_PIX_FMT_NONE },
      .p.priv_class   = &class,
      .defaults       = qsv_enc_defaults,
-Index: jellyfin-ffmpeg/libavcodec/qsvenc_hevc.c
-===================================================================
 --- libavcodec/qsvenc_hevc.c
 +++ libavcodec/qsvenc_hevc.c
 @@ -400,6 +400,8 @@ const FFCodec ff_hevc_qsv_encoder = {
@@ -453,8 +439,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc_hevc.c
                                                      AV_PIX_FMT_BGRA,
                                                      AV_PIX_FMT_X2RGB10,
                                                      AV_PIX_FMT_VUYX,
-Index: jellyfin-ffmpeg/libavcodec/qsvenc_jpeg.c
-===================================================================
 --- libavcodec/qsvenc_jpeg.c
 +++ libavcodec/qsvenc_jpeg.c
 @@ -92,6 +92,8 @@ const FFCodec ff_mjpeg_qsv_encoder = {
@@ -466,8 +450,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc_jpeg.c
                                                      AV_PIX_FMT_NONE },
      .p.priv_class   = &class,
      .defaults       = qsv_enc_defaults,
-Index: jellyfin-ffmpeg/libavcodec/qsvenc_mpeg2.c
-===================================================================
 --- libavcodec/qsvenc_mpeg2.c
 +++ libavcodec/qsvenc_mpeg2.c
 @@ -104,6 +104,8 @@ const FFCodec ff_mpeg2_qsv_encoder = {
@@ -479,8 +461,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc_mpeg2.c
                                                      AV_PIX_FMT_NONE },
      .p.priv_class   = &class,
      .defaults       = qsv_enc_defaults,
-Index: jellyfin-ffmpeg/libavcodec/qsvenc_vp9.c
-===================================================================
 --- libavcodec/qsvenc_vp9.c
 +++ libavcodec/qsvenc_vp9.c
 @@ -116,6 +116,8 @@ const FFCodec ff_vp9_qsv_encoder = {
@@ -492,8 +472,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc_vp9.c
                                                      AV_PIX_FMT_NONE },
      .p.priv_class   = &class,
      .defaults       = qsv_enc_defaults,
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
 @@ -115,7 +115,6 @@ static const struct {
@@ -528,10 +506,11 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
      default:
          return MFX_ERR_UNSUPPORTED;
      }
-@@ -1878,11 +1874,23 @@ static int qsv_frames_derive_to(AVHWFram
+@@ -1878,11 +1874,25 @@ static int qsv_frames_derive_to(AVHWFram
      return 0;
  }
  
++#if CONFIG_VAAPI
 +static void qsv_umap_from_vaapi(AVHWFramesContext *dst_fc,
 +                                 HWMapDescriptor *hwmap)
 +{
@@ -541,6 +520,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 +    av_freep(&new_sur->Data.MemId);
 +    av_freep(&new_sur);
 +}
++#endif
 +
  static int qsv_map_to(AVHWFramesContext *dst_ctx,
                        AVFrame *dst, const AVFrame *src, int flags)
@@ -552,7 +532,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
  
      for (i = 0; i < hwctx->nb_surfaces && index < 0; i++) {
          switch(src->format) {
-@@ -1921,21 +1929,77 @@ static int qsv_map_to(AVHWFramesContext
+@@ -1921,21 +1931,77 @@ static int qsv_map_to(AVHWFramesContext
          }
      }
      if (index < 0) {
@@ -585,17 +565,17 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 +            }
 +            *(VASurfaceID*)(new_hdlpair->first) = (VASurfaceID)(uintptr_t)src->data[3];
 +            new_sur->Data.MemId = new_hdlpair;
-+
-+            err = ff_hwframe_map_create(dst->hw_frames_ctx, dst, src,
-+                                        &qsv_umap_from_vaapi,
-+                                        (void*)new_sur);
-+            if (err)
-+                goto qsv_map_to_err;
  
 -    err = ff_hwframe_map_create(dst->hw_frames_ctx,
 -                                dst, src, NULL, NULL);
 -    if (err)
 -        return err;
++            err = ff_hwframe_map_create(dst->hw_frames_ctx, dst, src,
++                                        &qsv_umap_from_vaapi,
++                                        (void*)new_sur);
++            if (err)
++                goto qsv_map_to_err;
++
 +            av_log(dst_ctx, AV_LOG_DEBUG, "Trying to map from a surface which "
 +                "is not in the mapped frames context, so create a new surface\n");
 +        }

@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode.c
-===================================================================
 --- libavcodec/vaapi_encode.c
 +++ libavcodec/vaapi_encode.c
 @@ -2714,6 +2714,17 @@ static av_cold int vaapi_encode_create_r
@@ -20,8 +18,6 @@ Index: jellyfin-ffmpeg/libavcodec/vaapi_encode.c
      if (ctx->surface_width  < constraints->min_width  ||
          ctx->surface_height < constraints->min_height ||
          ctx->surface_width  > constraints->max_width ||
-Index: jellyfin-ffmpeg/libavutil/hwcontext.h
-===================================================================
 --- libavutil/hwcontext.h
 +++ libavutil/hwcontext.h
 @@ -478,6 +478,13 @@ typedef struct AVHWFramesConstraints {
@@ -38,8 +34,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext.h
  } AVHWFramesConstraints;
  
  /**
-Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
-===================================================================
 --- libavutil/hwcontext_vaapi.c
 +++ libavutil/hwcontext_vaapi.c
 @@ -276,6 +276,14 @@ static int vaapi_frames_get_constraints(

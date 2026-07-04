@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
-===================================================================
 --- libavfilter/vf_overlay_vulkan.c
 +++ libavfilter/vf_overlay_vulkan.c
 @@ -31,6 +31,7 @@ typedef struct OverlayVulkanContext {
@@ -472,8 +470,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vulkan.c
      { NULL },
  };
  
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_vulkan.c
-===================================================================
 --- libavfilter/vf_scale_vulkan.c
 +++ libavfilter/vf_scale_vulkan.c
 @@ -220,14 +220,17 @@ static av_cold int init_filter(AVFilterC

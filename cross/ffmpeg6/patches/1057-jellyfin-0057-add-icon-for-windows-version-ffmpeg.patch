@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/fftools/Makefile
-===================================================================
 --- fftools/Makefile
 +++ fftools/Makefile
 @@ -35,6 +35,12 @@ endef
@@ -15,8 +13,6 @@ Index: jellyfin-ffmpeg/fftools/Makefile
  all: $(AVPROGS)
  
  fftools/ffprobe.o fftools/cmdutils.o: libavutil/ffversion.h | fftools
-Index: jellyfin-ffmpeg/fftools/fftoolsres.rc
-===================================================================
 --- fftools/fftoolsres.rc
 +++ fftools/fftoolsres.rc
 @@ -1,2 +1,34 @@

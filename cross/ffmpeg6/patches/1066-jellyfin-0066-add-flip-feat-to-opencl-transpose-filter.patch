@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/opencl/transpose.cl
-===================================================================
 --- libavfilter/opencl/transpose.cl
 +++ libavfilter/opencl/transpose.cl
 @@ -26,8 +26,10 @@ kernel void transpose(__write_only image
@@ -15,8 +13,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/transpose.cl
      float4 data = read_imagef(src, sampler, (int2)(xin, yin));
  
      if (x < size.x && y < size.y)
-Index: jellyfin-ffmpeg/libavfilter/vf_transpose_opencl.c
-===================================================================
 --- libavfilter/vf_transpose_opencl.c
 +++ libavfilter/vf_transpose_opencl.c
 @@ -101,8 +101,20 @@ static int transpose_opencl_config_outpu

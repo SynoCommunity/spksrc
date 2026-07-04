@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/dxva2.c
-===================================================================
 --- libavcodec/dxva2.c
 +++ libavcodec/dxva2.c
 @@ -43,6 +43,12 @@ DEFINE_GUID(ff_DXVA2_ModeVC1_D,
@@ -149,8 +147,6 @@ Index: jellyfin-ffmpeg/libavcodec/dxva2.c
      frames_ctx->width = FFALIGN(avctx->coded_width, surface_alignment);
      frames_ctx->height = FFALIGN(avctx->coded_height, surface_alignment);
      frames_ctx->initial_pool_size = num_surfaces;
-Index: jellyfin-ffmpeg/libavcodec/dxva2_hevc.c
-===================================================================
 --- libavcodec/dxva2_hevc.c
 +++ libavcodec/dxva2_hevc.c
 @@ -28,10 +28,60 @@
@@ -287,8 +283,6 @@ Index: jellyfin-ffmpeg/libavcodec/dxva2_hevc.c
                                      scale ? &ctx_pic->qm : NULL, scale ? sizeof(ctx_pic->qm) : 0,
                                      commit_bitstream_and_slice_buffer);
      return ret;
-Index: jellyfin-ffmpeg/libavcodec/hevcdec.c
-===================================================================
 --- libavcodec/hevcdec.c
 +++ libavcodec/hevcdec.c
 @@ -453,6 +453,13 @@ static enum AVPixelFormat get_format(HEV

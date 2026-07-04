@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
-===================================================================
 --- libavfilter/qsvvpp.c
 +++ libavfilter/qsvvpp.c
 @@ -167,7 +167,7 @@ int ff_qsvvpp_print_warning(void *log_ct
@@ -32,8 +30,6 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
          out_frame->queued++;
          aframe = (QSVAsyncFrame){ sync, out_frame };
          av_fifo_write(s->async_fifo, &aframe, 1);
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
-===================================================================
 --- libavfilter/vf_overlay_qsv.c
 +++ libavfilter/vf_overlay_qsv.c
 @@ -228,40 +228,51 @@ static int config_overlay_input(AVFilter
@@ -142,8 +138,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
          AV_PIX_FMT_QSV,
          AV_PIX_FMT_NONE
      };
-Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
-===================================================================
 --- libavfilter/vf_vpp_qsv.c
 +++ libavfilter/vf_vpp_qsv.c
 @@ -344,6 +344,30 @@ static mfxStatus get_mfx_version(const A

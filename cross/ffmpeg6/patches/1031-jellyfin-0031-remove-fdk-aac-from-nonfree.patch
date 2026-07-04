@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -1774,7 +1774,6 @@ EXTERNAL_LIBRARY_GPL_LIST="

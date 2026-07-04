@@ -120,11 +120,9 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
  create mode 100644 libavfilter/metal/vf_overlay_videotoolbox.metal
  create mode 100644 libavfilter/vf_overlay_videotoolbox.m
 
-diff --git configure configure
-index 23066efa32..a7c349d126 100755
 --- configure
 +++ configure
-@@ -3720,6 +3720,7 @@ overlay_qsv_filter_select="qsvvpp"
+@@ -3722,6 +3722,7 @@ overlay_qsv_filter_select="qsvvpp"
  overlay_vaapi_filter_deps="vaapi VAProcPipelineCaps_blend_flags"
  overlay_vulkan_filter_deps="vulkan spirv_compiler"
  overlay_rkrga_filter_deps="rkrga"
@@ -132,14 +130,12 @@ index 23066efa32..a7c349d126 100755
  owdenoise_filter_deps="gpl"
  pad_opencl_filter_deps="opencl"
  pan_filter_deps="swresample"
-diff --git doc/filters.texi doc/filters.texi
-index e0436a5755..bfb77562cb 100644
 --- doc/filters.texi
 +++ doc/filters.texi
-@@ -19033,6 +19033,58 @@ See @ref{framesync}.
-
+@@ -18351,6 +18351,58 @@ See @ref{framesync}.
+ 
  This filter also supports the @ref{framesync} options.
-
+ 
 +@section overlay_videotoolbox
 +
 +Overlay one video on top of another.
@@ -193,13 +189,11 @@ index e0436a5755..bfb77562cb 100644
 +@end itemize
 +
  @section owdenoise
-
+ 
  Apply Overcomplete Wavelet denoiser.
-diff --git libavfilter/Makefile libavfilter/Makefile
-index f6c1d641d6..ea1389ab57 100644
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -401,6 +401,9 @@ OBJS-$(CONFIG_OVERLAY_OPENCL_FILTER)         += vf_overlay_opencl.o opencl.o \
+@@ -403,6 +403,9 @@ OBJS-$(CONFIG_OVERLAY_OPENCL_FILTER)
  OBJS-$(CONFIG_OVERLAY_QSV_FILTER)            += vf_overlay_qsv.o framesync.o
  OBJS-$(CONFIG_OVERLAY_VAAPI_FILTER)          += vf_overlay_vaapi.o framesync.o vaapi_vpp.o
  OBJS-$(CONFIG_OVERLAY_VULKAN_FILTER)         += vf_overlay_vulkan.o vulkan.o vulkan_filter.o
@@ -209,11 +203,9 @@ index f6c1d641d6..ea1389ab57 100644
  OBJS-$(CONFIG_OVERLAY_RKRGA_FILTER)          += vf_overlay_rkrga.o framesync.o
  OBJS-$(CONFIG_OWDENOISE_FILTER)              += vf_owdenoise.o
  OBJS-$(CONFIG_PAD_FILTER)                    += vf_pad.o
-diff --git libavfilter/allfilters.c libavfilter/allfilters.c
-index 149bf50997..ec9d975ecb 100644
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -378,6 +378,7 @@ extern const AVFilter ff_vf_overlay_vaapi;
+@@ -380,6 +380,7 @@ extern const AVFilter ff_vf_overlay_vaap
  extern const AVFilter ff_vf_overlay_vulkan;
  extern const AVFilter ff_vf_overlay_cuda;
  extern const AVFilter ff_vf_overlay_rkrga;
@@ -221,31 +213,27 @@ index 149bf50997..ec9d975ecb 100644
  extern const AVFilter ff_vf_owdenoise;
  extern const AVFilter ff_vf_pad;
  extern const AVFilter ff_vf_pad_opencl;
-diff --git libavfilter/metal/utils.h libavfilter/metal/utils.h
-index 7350d42a35..d79c79751c 100644
 --- libavfilter/metal/utils.h
 +++ libavfilter/metal/utils.h
-@@ -55,5 +55,4 @@ CVMetalTextureRef ff_metal_texture_from_pixbuf(void *avclass,
+@@ -55,5 +55,4 @@ CVMetalTextureRef ff_metal_texture_from_
                                                 int plane,
                                                 MTLPixelFormat format)
                                                 API_AVAILABLE(macos(10.11), ios(8.0));
 -
  #endif /* AVFILTER_METAL_UTILS_H */
-diff --git libavfilter/metal/utils.m libavfilter/metal/utils.m
-index f365d3ceea..db5c5f6f10 100644
 --- libavfilter/metal/utils.m
 +++ libavfilter/metal/utils.m
-@@ -55,6 +55,9 @@ CVMetalTextureRef ff_metal_texture_from_pixbuf(void *ctx,
+@@ -55,6 +55,9 @@ CVMetalTextureRef ff_metal_texture_from_
  {
      CVMetalTextureRef tex = NULL;
      CVReturn ret;
 +    bool is_planer = CVPixelBufferIsPlanar(pixbuf);
 +    size_t width = is_planer ? CVPixelBufferGetWidthOfPlane(pixbuf, plane) : CVPixelBufferGetWidth(pixbuf);
 +    size_t height = is_planer ? CVPixelBufferGetHeightOfPlane(pixbuf, plane) : CVPixelBufferGetHeight(pixbuf);
-
+ 
      ret = CVMetalTextureCacheCreateTextureFromImage(
          NULL,
-@@ -62,8 +65,8 @@ CVMetalTextureRef ff_metal_texture_from_pixbuf(void *ctx,
+@@ -62,8 +65,8 @@ CVMetalTextureRef ff_metal_texture_from_
          pixbuf,
          NULL,
          format,
@@ -256,12 +244,9 @@ index f365d3ceea..db5c5f6f10 100644
          plane,
          &tex
      );
-diff --git libavfilter/metal/vf_overlay_videotoolbox.metal libavfilter/metal/vf_overlay_videotoolbox.metal
-new file mode 100644
-index 0000000000..936e57e03e
 --- /dev/null
 +++ libavfilter/metal/vf_overlay_videotoolbox.metal
-@@ -0,0 +1,58 @@
+@@ -0,0 +1,99 @@
 +/*
 + * Copyright (C) 2024 Gnattu OC <gnattuoc@me.com>
 + *
@@ -320,16 +305,50 @@ index 0000000000..936e57e03e
 +        dest.write(result_color, gid);
 +    }
 +}
-Index: libavfilter/vf_overlay_videotoolbox.m
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git libavfilter/vf_overlay_videotoolbox.m libavfilter/vf_overlay_videotoolbox.m
-new file mode 100644
---- /dev/null	(revision 913e5ef1730481306c9607c554aea3043ea0ecd4)
-+++ libavfilter/vf_overlay_videotoolbox.m	(revision 913e5ef1730481306c9607c554aea3043ea0ecd4)
-@@ -0,0 +1,609 @@
++
++/*
++ * Blend shader for sperated yuv main and bgra mask
++ */
++kernel void blend_shader_bgra_overlay(
++                                      texture2d<float, access::read> source_y [[ texture(0) ]],
++                                      texture2d<float, access::read> source_uv [[ texture(1) ]],
++                                      texture2d<float, access::read> mask [[ texture(2) ]],
++                                      texture2d<float, access::write> dest_y [[ texture(3) ]],
++                                      texture2d<float, access::write> dest_uv [[ texture(4) ]],
++                                      constant mtlBlendParams& params [[ buffer(5) ]],
++                                      uint2 gid [[ thread_position_in_grid ]])
++{
++    const auto mask_size = uint2(mask.get_width(),
++                                 mask.get_height());
++    const auto loc_overlay = uint2(params.x_position, params.y_position);
++    const auto loc_uv = gid >> 1;
++    if (gid.x <  loc_overlay.x ||
++        gid.y <  loc_overlay.y ||
++        gid.x >= mask_size.x + loc_overlay.x ||
++        gid.y >= mask_size.y + loc_overlay.y)
++    {
++        float4 source_color_y = source_y.read(gid);
++        float4 source_color_uv = source_uv.read(loc_uv);
++        dest_y.write(source_color_y, gid);
++        dest_uv.write(source_color_uv, loc_uv);
++    } else {
++        float4 source_color_y = source_y.read(gid);
++        float4 source_color_uv = source_uv.read(loc_uv);
++        float4 mask_color = mask.read(gid - loc_overlay);
++        float y_overlay = 0.183 * mask_color.r + 0.614 * mask_color.g + 0.062 * mask_color.b + 0.0625f;
++        float u_overlay = -0.101 * mask_color.r - 0.339 * mask_color.g + 0.439 * mask_color.b + 0.5f;
++        float v_overlay = 0.439 * mask_color.r - 0.399 * mask_color.g - 0.040 * mask_color.b + 0.5f;
++        float alpha_color = mask_color.a;
++        float3 main_color = float3(source_color_y.x, source_color_uv.x, source_color_uv.y);
++        float3 overlay_color = float3(y_overlay, u_overlay, v_overlay);
++        float3 result_color = main_color * (1.0f - alpha_color) + (overlay_color * alpha_color);
++        dest_y.write(float4(result_color.x, 0.0f, 0.0f, 1.0f), gid);
++        dest_uv.write(float4(result_color.y, result_color.z, 0.0f, 1.0f), loc_uv);
++    }
++}
+--- /dev/null
++++ libavfilter/vf_overlay_videotoolbox.m
+@@ -0,0 +1,749 @@
 +/*
 + * Copyright (C) 2024 Gnattu OC <gnattuoc@me.com>
 + *
@@ -454,6 +473,43 @@ new file mode 100644
 +    [(__bridge id<MTLComputeCommandEncoder>)encoder setTexture: dst atIndex: 2];
 +    [(__bridge id<MTLComputeCommandEncoder>)encoder setBuffer: ctx->mtl_params_buffer offset: 0 atIndex: 3];
 +    ff_metal_compute_encoder_dispatch(ctx->mtl_device, ctx->mtl_pipeline, (__bridge id<MTLComputeCommandEncoder>)encoder, dst.width, dst.height);
++    [(__bridge id<MTLComputeCommandEncoder>)encoder endEncoding];
++
++    [(__bridge id<MTLCommandBuffer>)buffer commit];
++    [(__bridge id<MTLCommandBuffer>)buffer waitUntilCompleted];
++
++    ff_objc_release(&encoder);
++    ff_objc_release(&buffer);
++}
++
++static void call_kernel_bgra_overlay(AVFilterContext *avctx,
++                                    id<MTLTexture> dst_y,
++                                    id<MTLTexture> dst_uv,
++                                    id<MTLTexture> main_y,
++                                    id<MTLTexture> main_uv,
++                                    id<MTLTexture> overlay,
++                                    uint x_position,
++                                    uint y_position) API_AVAILABLE(macos(10.11), ios(9.0))
++{
++    OverlayVideoToolboxContext *ctx = avctx->priv;
++    // Both the command buffer and encoder are auto-released by objc on default.
++    // Use CFBridgingRetain to get a more C-like behavior.
++    id<MTLCommandBuffer> buffer = CFBridgingRetain(ctx->mtl_queue.commandBuffer);
++    id<MTLComputeCommandEncoder> encoder = CFBridgingRetain((__bridge id<MTLCommandBuffer>)buffer.computeCommandEncoder);
++
++    MtlBlendParams *params = (MtlBlendParams *)ctx->mtl_params_buffer.contents;
++    *params = (MtlBlendParams) {
++        .x_position = x_position,
++        .y_position = y_position,
++    };
++
++    [(__bridge id<MTLComputeCommandEncoder>)encoder setTexture: main_y atIndex: 0];
++    [(__bridge id<MTLComputeCommandEncoder>)encoder setTexture: main_uv atIndex: 1];
++    [(__bridge id<MTLComputeCommandEncoder>)encoder setTexture: overlay atIndex: 2];
++    [(__bridge id<MTLComputeCommandEncoder>)encoder setTexture: dst_y atIndex: 3];
++    [(__bridge id<MTLComputeCommandEncoder>)encoder setTexture: dst_uv atIndex: 4];
++    [(__bridge id<MTLComputeCommandEncoder>)encoder setBuffer: ctx->mtl_params_buffer offset: 0 atIndex: 5];
++    ff_metal_compute_encoder_dispatch(ctx->mtl_device, ctx->mtl_pipeline, (__bridge id<MTLComputeCommandEncoder>)encoder, dst_y.width, dst_y.height);
 +    [(__bridge id<MTLComputeCommandEncoder>)encoder endEncoding];
 +
 +    [(__bridge id<MTLCommandBuffer>)buffer commit];
@@ -619,6 +675,87 @@ new file mode 100644
 +    CFRelease(main);
 +    CFRelease(overlay);
 +    CFRelease(dst);
++
++    return ff_filter_frame(outlink, output);
++}
++
++static int overlay_vt_blend_bgra_overlay(FFFrameSync *fs) API_AVAILABLE(macos(10.11), ios(9.0))
++{
++    AVFilterContext *avctx = fs->parent;
++    OverlayVideoToolboxContext *ctx = avctx->priv;
++    AVFilterLink *outlink = avctx->outputs[0];
++    AVFilterLink *inlink_main = avctx->inputs[0];
++    AVFilterLink *inlink_overlay = avctx->inputs[1];
++    AVFrame *input_main, *input_overlay;
++    AVFrame *output;
++    AVHWFramesContext *frames_ctx = (AVHWFramesContext*)inlink_main->hw_frames_ctx->data;
++    AVHWFramesContext *frames_ctx_overlay = (AVHWFramesContext*)inlink_overlay->hw_frames_ctx->data;
++    const AVPixFmtDescriptor *in_main_desc;
++
++    CVMetalTextureRef main_y, main_uv, dst_y, dst_uv, overlay;
++    id<MTLTexture> tex_main_y, tex_main_uv, tex_overlay, tex_dst_y, tex_dst_uv;
++
++    MTLPixelFormat mtl_format_y, mtl_format_uv;
++    OSType cv_format;
++    int ret;
++    int i, overlay_planes = 0;
++
++    in_main_desc = av_pix_fmt_desc_get(frames_ctx->sw_format);
++
++    // read main and overlay frames from inputs
++    ret = ff_framesync_get_frame(fs, 0, &input_main, 0);
++    if (ret < 0)
++        return ret;
++    ret = ff_framesync_get_frame(fs, 1, &input_overlay, 0);
++    if (ret < 0)
++        return ret;
++
++    if (!input_main)
++        return AVERROR_BUG;
++
++    output = ff_get_video_buffer(outlink, outlink->w, outlink->h);
++    if (!output)
++        return AVERROR(ENOMEM);
++
++    ret = av_frame_copy_props(output, input_main);
++    if (ret < 0)
++        return ret;
++
++    if (!input_overlay) {
++        ret = transfer_pixel_buffer(ctx, (CVPixelBufferRef)input_main->data[3], (CVPixelBufferRef)output->data[3]);
++        if (ret < 0)
++            return ret;
++        return ff_filter_frame(outlink, output);
++    }
++
++    mtl_format_y = (in_main_desc->comp[0].depth + in_main_desc->comp[0].shift) > 8 ? MTLPixelFormatR16Unorm : MTLPixelFormatR8Unorm;
++    mtl_format_uv = (in_main_desc->comp[0].depth + in_main_desc->comp[0].shift) > 8 ? MTLPixelFormatRG16Unorm : MTLPixelFormatRG8Unorm;
++    main_y = ff_metal_texture_from_pixbuf(avctx, ctx->texture_cache, (CVPixelBufferRef)input_main->data[3], 0, mtl_format_y);
++    main_uv = ff_metal_texture_from_pixbuf(avctx, ctx->texture_cache, (CVPixelBufferRef)input_main->data[3], 1, mtl_format_uv);
++    overlay = ff_metal_texture_from_pixbuf(avctx, ctx->texture_cache, (CVPixelBufferRef)input_overlay->data[3], 0, MTLPixelFormatBGRA8Unorm);
++    dst_y = ff_metal_texture_from_pixbuf(avctx, ctx->texture_cache, (CVPixelBufferRef)output->data[3], 0, mtl_format_y);
++    dst_uv = ff_metal_texture_from_pixbuf(avctx, ctx->texture_cache, (CVPixelBufferRef)output->data[3], 1, mtl_format_uv);
++
++    if (!overlay || !main_y || !main_uv || !dst_y || !dst_uv) {
++        return AVERROR(ENOSYS);
++    }
++
++    tex_main_y = CVMetalTextureGetTexture(main_y);
++    tex_main_uv = CVMetalTextureGetTexture(main_uv);
++    tex_overlay  = CVMetalTextureGetTexture(overlay);
++    tex_dst_y = CVMetalTextureGetTexture(dst_y);
++    tex_dst_uv = CVMetalTextureGetTexture(dst_uv);
++
++    call_kernel_bgra_overlay(avctx,
++                             tex_dst_y, tex_dst_uv,
++                             tex_main_y, tex_main_uv,
++                             tex_overlay,
++                             ctx->x_position, ctx->y_position);
++    CFRelease(main_y);
++    CFRelease(main_uv);
++    CFRelease(overlay);
++    CFRelease(dst_y);
++    CFRelease(dst_uv);
 +
 +    return ff_filter_frame(outlink, output);
 +}
@@ -824,6 +961,28 @@ new file mode 100644
 +        return AVERROR(ENOSYS);
 +    }
 +
++    // Use fast code path for BGRA overlay
++    if (overlay_frames->sw_format == AV_PIX_FMT_BGRA) {
++        NSError *err = nil;
++        ff_objc_release(&ctx->mtl_pipeline);
++        ff_objc_release(&ctx->mtl_function);
++        ctx->mtl_function = [ctx->mtl_library newFunctionWithName: @"blend_shader_bgra_overlay"];
++        if (!ctx->mtl_function) {
++            av_log(avctx, AV_LOG_ERROR, "Failed to create Metal function!\n");
++            overlay_videotoolbox_uninit(avctx);
++            return AVERROR_EXTERNAL;
++        }
++        ctx->mtl_pipeline = [ctx->mtl_device
++            newComputePipelineStateWithFunction: ctx->mtl_function
++                                          error: &err];
++        if (err) {
++            av_log(ctx, AV_LOG_ERROR, "Failed to create Metal compute pipeline: %s\n", err.description.UTF8String);
++            overlay_videotoolbox_uninit(avctx);
++            return AVERROR_EXTERNAL;
++        }
++        ctx->fs.on_event = &overlay_vt_blend_bgra_overlay;
++    }
++
 +    ctx->device_ref = av_buffer_ref(main_frames->device_ref);
 +    if (!ctx->device_ref) {
 +        av_log(ctx, AV_LOG_ERROR, "A device reference create failed.\n");
@@ -939,4 +1098,3 @@ new file mode 100644
 +    FILTER_OUTPUTS(overlay_videotoolbox_outputs),
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};
-

@@ -1,11 +1,9 @@
 Subject: [PATCH] avfilter: add scale_vt for videotoolbox pix_fmt
 ---
-Index: configure
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
-diff --git configure configure
+diff --git a/configure b/configure
 --- configure	(revision 6c90fcd9e606c1222271f5f867f761abeafbe51e)
 +++ configure	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
 @@ -3833,6 +3833,7 @@
@@ -16,12 +14,10 @@ diff --git configure configure
  scale_vulkan_filter_deps="vulkan spirv_compiler"
  vpp_qsv_filter_deps="libmfx"
  vpp_qsv_filter_select="qsvvpp"
-Index: doc/filters.texi
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
-diff --git doc/filters.texi doc/filters.texi
+diff --git a/doc/filters.texi b/doc/filters.texi
 --- doc/filters.texi	(revision 6c90fcd9e606c1222271f5f867f761abeafbe51e)
 +++ doc/filters.texi	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
 @@ -21184,6 +21184,27 @@
@@ -52,12 +48,10 @@ diff --git doc/filters.texi doc/filters.texi
  @section scharr
  Apply scharr operator to input video stream.
 
-Index: libavfilter/Makefile
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
-diff --git libavfilter/Makefile libavfilter/Makefile
+diff --git a/libavfilter/Makefile b/libavfilter/Makefile
 --- libavfilter/Makefile	(revision 393b03d3db8a085d3b56631b334d474da390cab1)
 +++ libavfilter/Makefile	(date 1708782013235)
 @@ -452,6 +452,7 @@
@@ -68,12 +62,10 @@ diff --git libavfilter/Makefile libavfilter/Makefile
  OBJS-$(CONFIG_SCALE_VULKAN_FILTER)           += vf_scale_vulkan.o vulkan.o vulkan_filter.o
  OBJS-$(CONFIG_SCALE_RKRGA_FILTER)            += vf_vpp_rkrga.o scale_eval.o
  OBJS-$(CONFIG_SCALE2REF_FILTER)              += vf_scale.o scale_eval.o
-Index: libavfilter/allfilters.c
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
-diff --git libavfilter/allfilters.c libavfilter/allfilters.c
+diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
 --- libavfilter/allfilters.c	(revision 393b03d3db8a085d3b56631b334d474da390cab1)
 +++ libavfilter/allfilters.c	(date 1708782072996)
 @@ -424,6 +424,7 @@
@@ -84,9 +76,7 @@ diff --git libavfilter/allfilters.c libavfilter/allfilters.c
  extern const AVFilter ff_vf_scale_vulkan;
  extern const AVFilter ff_vf_scale_rkrga;
  extern const AVFilter ff_vf_scale2ref;
-Index: libavfilter/vf_scale_vt.c
-===================================================================
-diff --git libavfilter/vf_scale_vt.c libavfilter/vf_scale_vt.c
+diff --git a/libavfilter/vf_scale_vt.c b/libavfilter/vf_scale_vt.c
 new file mode 100644
 --- /dev/null	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)
 +++ libavfilter/vf_scale_vt.c	(revision c2c96c4c2419859c4d1b11e6f907e58afb6dfa3c)

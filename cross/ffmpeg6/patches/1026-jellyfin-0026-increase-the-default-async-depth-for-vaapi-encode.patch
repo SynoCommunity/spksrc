@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode.h
-===================================================================
 --- libavcodec/vaapi_encode.h
 +++ libavcodec/vaapi_encode.h
 @@ -486,7 +486,7 @@ int ff_vaapi_encode_close(AVCodecContext

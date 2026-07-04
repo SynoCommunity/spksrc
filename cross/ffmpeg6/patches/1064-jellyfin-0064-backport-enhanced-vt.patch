@@ -4,7 +4,7 @@ The 6.0.1's VT has a broken implementation and handles HEVC in an inefficient wa
 This backport brings full range color and HDR passthrough for VideoToolbox
 
 ---
-diff --git tests/fate/hevc.mak tests/fate/hevc.mak
+diff --git a/tests/fate/hevc.mak b/tests/fate/hevc.mak
 index 20c2e5b..c5df8ea 100644
 --- tests/fate/hevc.mak
 +++ tests/fate/hevc.mak
@@ -18,12 +18,10 @@ index 20c2e5b..c5df8ea 100644
  fate-hevc-skiploopfilter: CMD = framemd5 -skip_loop_filter nokey -i $(TARGET_SAMPLES)/hevc-conformance/SAO_D_Samsung_5.bit -sws_flags bitexact
  FATE_HEVC-$(call FRAMEMD5, HEVC, HEVC, HEVC_PARSER) += fate-hevc-skiploopfilter
 --
-Index: libavutil/hwcontext_videotoolbox.h
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
-diff --git libavutil/hwcontext_videotoolbox.h libavutil/hwcontext_videotoolbox.h
+diff --git a/libavutil/hwcontext_videotoolbox.h b/libavutil/hwcontext_videotoolbox.h
 --- libavutil/hwcontext_videotoolbox.h	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
 +++ libavutil/hwcontext_videotoolbox.h	(date 1708790792432)
 @@ -39,9 +39,12 @@
@@ -41,12 +39,10 @@ diff --git libavutil/hwcontext_videotoolbox.h libavutil/hwcontext_videotoolbox.h
 
  /**
   * Convert a VideoToolbox (actually CoreVideo) format to AVPixelFormat.
-Index: libavutil/hwcontext_videotoolbox.c
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
-diff --git libavutil/hwcontext_videotoolbox.c libavutil/hwcontext_videotoolbox.c
+diff --git a/libavutil/hwcontext_videotoolbox.c b/libavutil/hwcontext_videotoolbox.c
 --- libavutil/hwcontext_videotoolbox.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
 +++ libavutil/hwcontext_videotoolbox.c	(date 1708790750454)
 @@ -43,6 +43,7 @@
@@ -138,12 +134,10 @@ diff --git libavutil/hwcontext_videotoolbox.c libavutil/hwcontext_videotoolbox.c
      .frames_init          = vt_frames_init,
      .frames_get_buffer    = vt_get_buffer,
      .frames_get_constraints = vt_frames_get_constraints,
-Index: libavcodec/videotoolboxenc.c
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
-diff --git libavcodec/videotoolboxenc.c libavcodec/videotoolboxenc.c
+diff --git a/libavcodec/videotoolboxenc.c b/libavcodec/videotoolboxenc.c
 --- libavcodec/videotoolboxenc.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
 +++ libavcodec/videotoolboxenc.c	(date 1708796449800)
 @@ -37,6 +37,7 @@
@@ -1304,12 +1298,10 @@ diff --git libavcodec/videotoolboxenc.c libavcodec/videotoolboxenc.c
      .p.wrapper_name   = "videotoolbox",
 +    .hw_configs       = vt_encode_hw_configs,
  };
-Index: libavcodec/hevc_parser.c
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
-diff --git libavcodec/hevc_parser.c libavcodec/hevc_parser.c
+diff --git a/libavcodec/hevc_parser.c b/libavcodec/hevc_parser.c
 --- libavcodec/hevc_parser.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
 +++ libavcodec/hevc_parser.c	(date 1708801757137)
 @@ -278,6 +278,8 @@
@@ -1330,12 +1322,10 @@ diff --git libavcodec/hevc_parser.c libavcodec/hevc_parser.c
                      return i - 5;
                  }
              }
-Index: libavcodec/videotoolbox.c
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
-diff --git libavcodec/videotoolbox.c libavcodec/videotoolbox.c
+diff --git a/libavcodec/videotoolbox.c b/libavcodec/videotoolbox.c
 --- libavcodec/videotoolbox.c	(revision e389681a74defdcd337ac32b61a41aed34009fc8)
 +++ libavcodec/videotoolbox.c	(date 1708803163338)
 @@ -77,8 +77,8 @@

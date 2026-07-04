@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.c
-===================================================================
 --- libavfilter/vf_overlay_cuda.c
 +++ libavfilter/vf_overlay_cuda.c
 @@ -50,6 +50,8 @@
@@ -178,8 +176,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.c
      if (err < 0) {
          CHECK_CU(cu->cuCtxPopCurrent(&dummy));
          return err;
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.cu
-===================================================================
 --- libavfilter/vf_overlay_cuda.cu
 +++ libavfilter/vf_overlay_cuda.cu
 @@ -18,14 +18,15 @@

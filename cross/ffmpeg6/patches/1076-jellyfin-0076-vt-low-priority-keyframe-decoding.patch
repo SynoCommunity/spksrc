@@ -1,10 +1,8 @@
 Subject: [PATCH] lavcvideotoolbox: Add low_priority key_frame_only decoding
 ---
-Index: libavcodec/avcodec.h
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
 diff --git a/libavcodec/avcodec.h b/libavcodec/avcodec.h
 --- libavcodec/avcodec.h	(revision 019c5b13ace26af67613d27f333104e90bde8b31)
 +++ libavcodec/avcodec.h	(revision c58e99fd3e45d898d4726456f6bddb0453592bac)
@@ -22,11 +20,9 @@ diff --git a/libavcodec/avcodec.h b/libavcodec/avcodec.h
  /**
   * @}
   */
-Index: libavcodec/options_table.h
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
 diff --git a/libavcodec/options_table.h b/libavcodec/options_table.h
 --- libavcodec/options_table.h	(revision 019c5b13ace26af67613d27f333104e90bde8b31)
 +++ libavcodec/options_table.h	(revision c58e99fd3e45d898d4726456f6bddb0453592bac)
@@ -38,11 +34,9 @@ diff --git a/libavcodec/options_table.h b/libavcodec/options_table.h
  {NULL},
  };
 
-Index: libavcodec/videotoolbox.c
 IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
-===================================================================
 diff --git a/libavcodec/videotoolbox.c b/libavcodec/videotoolbox.c
 --- libavcodec/videotoolbox.c	(revision 019c5b13ace26af67613d27f333104e90bde8b31)
 +++ libavcodec/videotoolbox.c	(revision c58e99fd3e45d898d4726456f6bddb0453592bac)

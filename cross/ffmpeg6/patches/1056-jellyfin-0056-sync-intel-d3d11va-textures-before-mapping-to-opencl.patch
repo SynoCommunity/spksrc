@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/dxva2.c
-===================================================================
 --- libavcodec/dxva2.c
 +++ libavcodec/dxva2.c
 @@ -714,8 +714,10 @@ int ff_dxva2_common_frame_params(AVCodec
@@ -13,8 +11,6 @@ Index: jellyfin-ffmpeg/libavcodec/dxva2.c
      }
  #endif
  
-Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
-===================================================================
 --- libavfilter/qsvvpp.c
 +++ libavfilter/qsvvpp.c
 @@ -598,6 +598,9 @@ static int init_vpp_session(AVFilterCont
@@ -27,8 +23,6 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
          ret = av_hwframe_ctx_init(out_frames_ref);
          if (ret < 0) {
              av_buffer_unref(&out_frames_ref);
-Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
-===================================================================
 --- libavutil/hwcontext_d3d11va.h
 +++ libavutil/hwcontext_d3d11va.h
 @@ -183,6 +183,11 @@ typedef struct AVD3D11VAFramesContext {
@@ -43,8 +37,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
  } AVD3D11VAFramesContext;
  
  #endif /* AVUTIL_HWCONTEXT_D3D11VA_H */
-Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
-===================================================================
 --- libavutil/hwcontext_opencl.c
 +++ libavutil/hwcontext_opencl.c
 @@ -167,6 +167,10 @@ typedef struct OpenCLFramesContext {
@@ -249,7 +241,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 +        frames_priv->sync_point && frames_priv->sync_tex_2x2) {
 +        opencl_sync_d3d11_texture(frames_priv,
 +                                  device_hwctx,
-+                                  src->data[0], index,
++                                  (ID3D11Texture2D *)src->data[0], index,
 +                                  dst_fc);
 +    }
 +
@@ -279,8 +271,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
      for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
          AVOpenCLFrameDescriptor *desc = &frames_priv->mapped_frames[i];
          desc->nb_planes = nb_planes;
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
 @@ -1868,6 +1868,7 @@ static int qsv_frames_derive_to(AVHWFram
@@ -291,8 +281,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
          }
          break;
  #endif
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.h
-===================================================================
 --- libavutil/hwcontext_qsv.h
 +++ libavutil/hwcontext_qsv.h
 @@ -64,6 +64,11 @@ typedef struct AVQSVFramesContext {

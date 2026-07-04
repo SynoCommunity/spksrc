@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/fftools/ffmpeg.c
-===================================================================
 --- fftools/ffmpeg.c
 +++ fftools/ffmpeg.c
 @@ -130,6 +130,9 @@ static int trigger_fix_sub_duration_hear
@@ -122,8 +120,6 @@ Index: jellyfin-ffmpeg/fftools/ffmpeg.c
  static BenchmarkTimeStamps get_benchmark_time_stamps(void)
  {
      BenchmarkTimeStamps time_stamps = { av_gettime_relative() };
-Index: jellyfin-ffmpeg/fftools/ffmpeg.h
-===================================================================
 --- fftools/ffmpeg.h
 +++ fftools/ffmpeg.h
 @@ -766,6 +766,9 @@ extern int recast_media;
@@ -136,8 +132,6 @@ Index: jellyfin-ffmpeg/fftools/ffmpeg.h
  void term_init(void);
  void term_exit(void);
  
-Index: jellyfin-ffmpeg/fftools/ffmpeg_demux.c
-===================================================================
 --- fftools/ffmpeg_demux.c
 +++ fftools/ffmpeg_demux.c
 @@ -253,6 +253,11 @@ static void *input_thread(void *arg)

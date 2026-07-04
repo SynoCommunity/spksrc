@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavutil/frame.c
-===================================================================
 --- libavutil/frame.c
 +++ libavutil/frame.c
 @@ -259,9 +259,39 @@ FF_ENABLE_DEPRECATION_WARNINGS
@@ -96,8 +94,6 @@ Index: jellyfin-ffmpeg/libavutil/frame.c
  const char *av_frame_side_data_name(enum AVFrameSideDataType type)
  {
      switch(type) {
-Index: jellyfin-ffmpeg/libavutil/frame.h
-===================================================================
 --- libavutil/frame.h
 +++ libavutil/frame.h
 @@ -866,6 +866,21 @@ int av_frame_copy(AVFrame *dst, const AV

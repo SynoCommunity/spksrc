@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_h265.c
-===================================================================
 --- libavcodec/vaapi_encode_h265.c
 +++ libavcodec/vaapi_encode_h265.c
 @@ -452,8 +452,9 @@ static int vaapi_encode_h265_init_sequen

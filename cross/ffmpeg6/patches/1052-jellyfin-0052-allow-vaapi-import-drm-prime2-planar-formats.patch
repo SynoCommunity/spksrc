@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
-===================================================================
 --- libavutil/hwcontext_vaapi.c
 +++ libavutil/hwcontext_vaapi.c
 @@ -150,6 +150,7 @@ static const VAAPIFormatDescriptor vaapi

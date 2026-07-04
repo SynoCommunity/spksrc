@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavformat/webvttenc.c
-===================================================================
 --- libavformat/webvttenc.c
 +++ libavformat/webvttenc.c
 @@ -50,8 +50,8 @@ static int webvtt_write_header(AVFormatC

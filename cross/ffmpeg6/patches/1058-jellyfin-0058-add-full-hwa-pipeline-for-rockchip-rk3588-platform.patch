@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -349,6 +349,7 @@ External library support:
@@ -84,7 +82,7 @@ Index: jellyfin-ffmpeg/configure
  mpeg4_v4l2m2m_decoder_deps="v4l2_m2m mpeg4_v4l2_m2m"
  mpeg4_v4l2m2m_encoder_deps="v4l2_m2m mpeg4_v4l2_m2m"
 +mpeg4_rkmpp_decoder_deps="rkmpp"
-+mpeg4_rkmpp_decoder_select="mpeg4_unpack_bframes_bsf"
++mpeg4_rkmpp_decoder_select="mpeg4_unpack_bframes_bsf dump_extradata_bsf"
  msmpeg4_crystalhd_decoder_select="crystalhd"
  vc1_crystalhd_decoder_select="crystalhd"
  vc1_cuvid_decoder_deps="cuvid"
@@ -140,8 +138,8 @@ Index: jellyfin-ffmpeg/configure
                                 { enabled libdrm ||
                                   die "ERROR: rkmpp requires --enable-libdrm"; }
                               }
-+enabled rkrga             && require rkrga rga/RgaApi.h c_RkRgaBlit -lrga &&
-+                             { require rkrga rga/im2d.h querystring -lrga &&
++enabled rkrga             && require_pkg_config rkrga librga rga/RgaApi.h c_RkRgaBlit &&
++                             { require_pkg_config rkrga librga rga/im2d.h querystring &&
 +                               { enabled rkmpp ||
 +                                 die "ERROR: rkrga requires --enable-rkmpp"; }
 +                             }
@@ -157,66 +155,6 @@ Index: jellyfin-ffmpeg/configure
          enable opencl_drm_arm
  fi
  
-Index: jellyfin-ffmpeg/libavcodec/allcodecs.c
-===================================================================
---- libavcodec/allcodecs.c
-+++ libavcodec/allcodecs.c
-@@ -150,6 +150,7 @@ extern const FFCodec ff_h263i_decoder;
- extern const FFCodec ff_h263p_encoder;
- extern const FFCodec ff_h263p_decoder;
- extern const FFCodec ff_h263_v4l2m2m_decoder;
-+extern const FFCodec ff_h263_rkmpp_decoder;
- extern const FFCodec ff_h264_decoder;
- extern const FFCodec ff_h264_crystalhd_decoder;
- extern const FFCodec ff_h264_v4l2m2m_decoder;
-@@ -212,13 +213,16 @@ extern const FFCodec ff_mpeg4_decoder;
- extern const FFCodec ff_mpeg4_crystalhd_decoder;
- extern const FFCodec ff_mpeg4_v4l2m2m_decoder;
- extern const FFCodec ff_mpeg4_mmal_decoder;
-+extern const FFCodec ff_mpeg4_rkmpp_decoder;
- extern const FFCodec ff_mpegvideo_decoder;
- extern const FFCodec ff_mpeg1_v4l2m2m_decoder;
-+extern const FFCodec ff_mpeg1_rkmpp_decoder;
- extern const FFCodec ff_mpeg2_mmal_decoder;
- extern const FFCodec ff_mpeg2_crystalhd_decoder;
- extern const FFCodec ff_mpeg2_v4l2m2m_decoder;
- extern const FFCodec ff_mpeg2_qsv_decoder;
- extern const FFCodec ff_mpeg2_mediacodec_decoder;
-+extern const FFCodec ff_mpeg2_rkmpp_decoder;
- extern const FFCodec ff_msa1_decoder;
- extern const FFCodec ff_mscc_decoder;
- extern const FFCodec ff_msmpeg4v1_decoder;
-@@ -839,6 +843,7 @@ extern const FFCodec ff_av1_qsv_decoder;
- extern const FFCodec ff_av1_qsv_encoder;
- extern const FFCodec ff_av1_amf_encoder;
- extern const FFCodec ff_av1_vaapi_encoder;
-+extern const FFCodec ff_av1_rkmpp_decoder;
- extern const FFCodec ff_libopenh264_encoder;
- extern const FFCodec ff_libopenh264_decoder;
- extern const FFCodec ff_h264_amf_encoder;
-@@ -850,6 +855,7 @@ extern const FFCodec ff_h264_qsv_encoder
- extern const FFCodec ff_h264_v4l2m2m_encoder;
- extern const FFCodec ff_h264_vaapi_encoder;
- extern const FFCodec ff_h264_videotoolbox_encoder;
-+extern const FFCodec ff_h264_rkmpp_encoder;
- extern const FFCodec ff_hevc_amf_encoder;
- extern const FFCodec ff_hevc_cuvid_decoder;
- extern const FFCodec ff_hevc_mediacodec_decoder;
-@@ -860,10 +866,12 @@ extern const FFCodec ff_hevc_qsv_encoder
- extern const FFCodec ff_hevc_v4l2m2m_encoder;
- extern const FFCodec ff_hevc_vaapi_encoder;
- extern const FFCodec ff_hevc_videotoolbox_encoder;
-+extern const FFCodec ff_hevc_rkmpp_encoder;
- extern const FFCodec ff_libkvazaar_encoder;
- extern const FFCodec ff_mjpeg_cuvid_decoder;
- extern const FFCodec ff_mjpeg_qsv_encoder;
- extern const FFCodec ff_mjpeg_qsv_decoder;
-+extern const FFCodec ff_mjpeg_rkmpp_encoder;
- extern const FFCodec ff_mjpeg_vaapi_encoder;
- extern const FFCodec ff_mp3_mf_encoder;
- extern const FFCodec ff_mpeg1_cuvid_decoder;
-Index: jellyfin-ffmpeg/libavcodec/Makefile
-===================================================================
 --- libavcodec/Makefile
 +++ libavcodec/Makefile
 @@ -256,6 +256,7 @@ OBJS-$(CONFIG_AV1_MEDIACODEC_DECODER)  +
@@ -283,8 +221,62 @@ Index: jellyfin-ffmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_MPL2_DECODER)            += mpl2dec.o ass.o
  OBJS-$(CONFIG_MSA1_DECODER)            += mss3.o
  OBJS-$(CONFIG_MSCC_DECODER)            += mscc.o
-Index: jellyfin-ffmpeg/libavcodec/rkmppdec.c
-===================================================================
+--- libavcodec/allcodecs.c
++++ libavcodec/allcodecs.c
+@@ -150,6 +150,7 @@ extern const FFCodec ff_h263i_decoder;
+ extern const FFCodec ff_h263p_encoder;
+ extern const FFCodec ff_h263p_decoder;
+ extern const FFCodec ff_h263_v4l2m2m_decoder;
++extern const FFCodec ff_h263_rkmpp_decoder;
+ extern const FFCodec ff_h264_decoder;
+ extern const FFCodec ff_h264_crystalhd_decoder;
+ extern const FFCodec ff_h264_v4l2m2m_decoder;
+@@ -212,13 +213,16 @@ extern const FFCodec ff_mpeg4_decoder;
+ extern const FFCodec ff_mpeg4_crystalhd_decoder;
+ extern const FFCodec ff_mpeg4_v4l2m2m_decoder;
+ extern const FFCodec ff_mpeg4_mmal_decoder;
++extern const FFCodec ff_mpeg4_rkmpp_decoder;
+ extern const FFCodec ff_mpegvideo_decoder;
+ extern const FFCodec ff_mpeg1_v4l2m2m_decoder;
++extern const FFCodec ff_mpeg1_rkmpp_decoder;
+ extern const FFCodec ff_mpeg2_mmal_decoder;
+ extern const FFCodec ff_mpeg2_crystalhd_decoder;
+ extern const FFCodec ff_mpeg2_v4l2m2m_decoder;
+ extern const FFCodec ff_mpeg2_qsv_decoder;
+ extern const FFCodec ff_mpeg2_mediacodec_decoder;
++extern const FFCodec ff_mpeg2_rkmpp_decoder;
+ extern const FFCodec ff_msa1_decoder;
+ extern const FFCodec ff_mscc_decoder;
+ extern const FFCodec ff_msmpeg4v1_decoder;
+@@ -839,6 +843,7 @@ extern const FFCodec ff_av1_qsv_decoder;
+ extern const FFCodec ff_av1_qsv_encoder;
+ extern const FFCodec ff_av1_amf_encoder;
+ extern const FFCodec ff_av1_vaapi_encoder;
++extern const FFCodec ff_av1_rkmpp_decoder;
+ extern const FFCodec ff_libopenh264_encoder;
+ extern const FFCodec ff_libopenh264_decoder;
+ extern const FFCodec ff_h264_amf_encoder;
+@@ -850,6 +855,7 @@ extern const FFCodec ff_h264_qsv_encoder
+ extern const FFCodec ff_h264_v4l2m2m_encoder;
+ extern const FFCodec ff_h264_vaapi_encoder;
+ extern const FFCodec ff_h264_videotoolbox_encoder;
++extern const FFCodec ff_h264_rkmpp_encoder;
+ extern const FFCodec ff_hevc_amf_encoder;
+ extern const FFCodec ff_hevc_cuvid_decoder;
+ extern const FFCodec ff_hevc_mediacodec_decoder;
+@@ -860,10 +866,12 @@ extern const FFCodec ff_hevc_qsv_encoder
+ extern const FFCodec ff_hevc_v4l2m2m_encoder;
+ extern const FFCodec ff_hevc_vaapi_encoder;
+ extern const FFCodec ff_hevc_videotoolbox_encoder;
++extern const FFCodec ff_hevc_rkmpp_encoder;
+ extern const FFCodec ff_libkvazaar_encoder;
+ extern const FFCodec ff_mjpeg_cuvid_decoder;
+ extern const FFCodec ff_mjpeg_qsv_encoder;
+ extern const FFCodec ff_mjpeg_qsv_decoder;
++extern const FFCodec ff_mjpeg_rkmpp_encoder;
+ extern const FFCodec ff_mjpeg_vaapi_encoder;
+ extern const FFCodec ff_mp3_mf_encoder;
+ extern const FFCodec ff_mpeg1_cuvid_decoder;
 --- libavcodec/rkmppdec.c
 +++ libavcodec/rkmppdec.c
 @@ -1,6 +1,7 @@
@@ -1661,10 +1653,8 @@ Index: jellyfin-ffmpeg/libavcodec/rkmppdec.c
 +DEFINE_RKMPP_DECODER(mpeg2, MPEG2VIDEO, NULL)
 +#endif
 +#if CONFIG_MPEG4_RKMPP_DECODER
-+DEFINE_RKMPP_DECODER(mpeg4, MPEG4, "mpeg4_unpack_bframes")
++DEFINE_RKMPP_DECODER(mpeg4, MPEG4, "dump_extra,mpeg4_unpack_bframes")
 +#endif
-Index: jellyfin-ffmpeg/libavcodec/rkmppdec.h
-===================================================================
 --- /dev/null
 +++ libavcodec/rkmppdec.h
 @@ -0,0 +1,153 @@
@@ -1821,8 +1811,6 @@ Index: jellyfin-ffmpeg/libavcodec/rkmppdec.h
 +};
 +
 +#endif /* AVCODEC_RKMPPDEC_H */
-Index: jellyfin-ffmpeg/libavcodec/rkmppenc.c
-===================================================================
 --- /dev/null
 +++ libavcodec/rkmppenc.c
 @@ -0,0 +1,1103 @@
@@ -2929,8 +2917,6 @@ Index: jellyfin-ffmpeg/libavcodec/rkmppenc.c
 +#if CONFIG_MJPEG_RKMPP_ENCODER
 +DEFINE_RKMPP_ENCODER(mjpeg, MJPEG, mjpeg)
 +#endif
-Index: jellyfin-ffmpeg/libavcodec/rkmppenc.h
-===================================================================
 --- /dev/null
 +++ libavcodec/rkmppenc.h
 @@ -0,0 +1,276 @@
@@ -3210,36 +3196,6 @@ Index: jellyfin-ffmpeg/libavcodec/rkmppenc.h
 +};
 +
 +#endif /* AVCODEC_RKMPPENC_H */
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
-===================================================================
---- libavfilter/allfilters.c
-+++ libavfilter/allfilters.c
-@@ -379,6 +379,7 @@ extern const AVFilter ff_vf_overlay_qsv;
- extern const AVFilter ff_vf_overlay_vaapi;
- extern const AVFilter ff_vf_overlay_vulkan;
- extern const AVFilter ff_vf_overlay_cuda;
-+extern const AVFilter ff_vf_overlay_rkrga;
- extern const AVFilter ff_vf_owdenoise;
- extern const AVFilter ff_vf_pad;
- extern const AVFilter ff_vf_pad_opencl;
-@@ -424,6 +425,7 @@ extern const AVFilter ff_vf_scale_opencl
- extern const AVFilter ff_vf_scale_qsv;
- extern const AVFilter ff_vf_scale_vaapi;
- extern const AVFilter ff_vf_scale_vulkan;
-+extern const AVFilter ff_vf_scale_rkrga;
- extern const AVFilter ff_vf_scale2ref;
- extern const AVFilter ff_vf_scale2ref_npp;
- extern const AVFilter ff_vf_scdet;
-@@ -509,6 +511,7 @@ extern const AVFilter ff_vf_vif;
- extern const AVFilter ff_vf_vignette;
- extern const AVFilter ff_vf_vmafmotion;
- extern const AVFilter ff_vf_vpp_qsv;
-+extern const AVFilter ff_vf_vpp_rkrga;
- extern const AVFilter ff_vf_vstack;
- extern const AVFilter ff_vf_w3fdif;
- extern const AVFilter ff_vf_waveform;
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -29,6 +29,7 @@ OBJS-$(HAVE_THREADS)
@@ -3282,8 +3238,32 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  SKIPHEADERS-$(CONFIG_OPENCL)                 += opencl.h
  SKIPHEADERS-$(CONFIG_VAAPI)                  += vaapi_vpp.h
  SKIPHEADERS-$(CONFIG_VULKAN)                 += vulkan.h vulkan_filter.h
-Index: jellyfin-ffmpeg/libavfilter/rkrga_common.c
-===================================================================
+--- libavfilter/allfilters.c
++++ libavfilter/allfilters.c
+@@ -379,6 +379,7 @@ extern const AVFilter ff_vf_overlay_qsv;
+ extern const AVFilter ff_vf_overlay_vaapi;
+ extern const AVFilter ff_vf_overlay_vulkan;
+ extern const AVFilter ff_vf_overlay_cuda;
++extern const AVFilter ff_vf_overlay_rkrga;
+ extern const AVFilter ff_vf_owdenoise;
+ extern const AVFilter ff_vf_pad;
+ extern const AVFilter ff_vf_pad_opencl;
+@@ -424,6 +425,7 @@ extern const AVFilter ff_vf_scale_opencl
+ extern const AVFilter ff_vf_scale_qsv;
+ extern const AVFilter ff_vf_scale_vaapi;
+ extern const AVFilter ff_vf_scale_vulkan;
++extern const AVFilter ff_vf_scale_rkrga;
+ extern const AVFilter ff_vf_scale2ref;
+ extern const AVFilter ff_vf_scale2ref_npp;
+ extern const AVFilter ff_vf_scdet;
+@@ -509,6 +511,7 @@ extern const AVFilter ff_vf_vif;
+ extern const AVFilter ff_vf_vignette;
+ extern const AVFilter ff_vf_vmafmotion;
+ extern const AVFilter ff_vf_vpp_qsv;
++extern const AVFilter ff_vf_vpp_rkrga;
+ extern const AVFilter ff_vf_vstack;
+ extern const AVFilter ff_vf_w3fdif;
+ extern const AVFilter ff_vf_waveform;
 --- /dev/null
 +++ libavfilter/rkrga_common.c
 @@ -0,0 +1,1249 @@
@@ -4536,8 +4516,6 @@ Index: jellyfin-ffmpeg/libavfilter/rkrga_common.c
 +
 +    return 0;
 +}
-Index: jellyfin-ffmpeg/libavfilter/rkrga_common.h
-===================================================================
 --- /dev/null
 +++ libavfilter/rkrga_common.h
 @@ -0,0 +1,127 @@
@@ -4668,8 +4646,6 @@ Index: jellyfin-ffmpeg/libavfilter/rkrga_common.h
 +                          AVFilterLink *inlink_pat, AVFrame *picref_pat);
 +
 +#endif /* AVFILTER_RKRGA_COMMON_H */
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_rkrga.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_overlay_rkrga.c
 @@ -0,0 +1,368 @@
@@ -5041,8 +5017,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_rkrga.c
 +    .preinit        = rgaoverlay_framesync_preinit,
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};
-Index: jellyfin-ffmpeg/libavfilter/vf_vpp_rkrga.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_vpp_rkrga.c
 @@ -0,0 +1,578 @@
@@ -5624,8 +5598,32 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_rkrga.c
 +};
 +
 +#endif
-Index: jellyfin-ffmpeg/libavutil/hwcontext.c
-===================================================================
+--- libavutil/Makefile
++++ libavutil/Makefile
+@@ -50,6 +50,7 @@ HEADERS = adler32.h
+           hwcontext_videotoolbox.h                                      \
+           hwcontext_vdpau.h                                             \
+           hwcontext_vulkan.h                                            \
++          hwcontext_rkmpp.h                                             \
+           imgutils.h                                                    \
+           intfloat.h                                                    \
+           intreadwrite.h                                                \
+@@ -196,6 +197,7 @@ OBJS-$(CONFIG_VAAPI)
+ OBJS-$(CONFIG_VIDEOTOOLBOX)             += hwcontext_videotoolbox.o
+ OBJS-$(CONFIG_VDPAU)                    += hwcontext_vdpau.o
+ OBJS-$(CONFIG_VULKAN)                   += hwcontext_vulkan.o
++OBJS-$(CONFIG_RKMPP)                    += hwcontext_rkmpp.o
+ 
+ OBJS-$(!CONFIG_VULKAN)                  += hwcontext_stub.o
+ 
+@@ -218,6 +220,7 @@ SKIPHEADERS-$(CONFIG_VDPAU)            +
+ SKIPHEADERS-$(CONFIG_VULKAN)           += hwcontext_vulkan.h vulkan.h   \
+                                           vulkan_functions.h            \
+                                           vulkan_loader.h
++SKIPHEADERS-$(CONFIG_RKMPP)            += hwcontext_rkmpp.h
+ 
+ TESTPROGS = adler32                                                     \
+             aes                                                         \
 --- libavutil/hwcontext.c
 +++ libavutil/hwcontext.c
 @@ -63,6 +63,9 @@ static const HWContextType * const hw_ta
@@ -5646,8 +5644,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext.c
  };
  
  enum AVHWDeviceType av_hwdevice_find_type_by_name(const char *name)
-Index: jellyfin-ffmpeg/libavutil/hwcontext.h
-===================================================================
 --- libavutil/hwcontext.h
 +++ libavutil/hwcontext.h
 @@ -37,6 +37,7 @@ enum AVHWDeviceType {
@@ -5658,8 +5654,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext.h
  };
  
  typedef struct AVHWDeviceInternal AVHWDeviceInternal;
-Index: jellyfin-ffmpeg/libavutil/hwcontext_internal.h
-===================================================================
 --- libavutil/hwcontext_internal.h
 +++ libavutil/hwcontext_internal.h
 @@ -174,5 +174,6 @@ extern const HWContextType ff_hwcontext_
@@ -5669,8 +5663,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_internal.h
 +extern const HWContextType ff_hwcontext_type_rkmpp;
  
  #endif /* AVUTIL_HWCONTEXT_INTERNAL_H */
-Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
-===================================================================
 --- libavutil/hwcontext_opencl.c
 +++ libavutil/hwcontext_opencl.c
 @@ -83,6 +83,16 @@ typedef CL_API_ENTRY cl_mem(CL_API_CALL
@@ -5746,8 +5738,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
              region.origin = plane->offset;
              region.size   = image_desc.image_row_pitch *
                              image_desc.image_height;
-Index: jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.c
-===================================================================
 --- /dev/null
 +++ libavutil/hwcontext_rkmpp.c
 @@ -0,0 +1,598 @@
@@ -5935,7 +5925,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.c
 +        const int pixel_width = av_get_padded_bits_per_pixel(pixdesc) / 8;
 +        linesize = FFALIGN(linesize / pixel_width, 8) * pixel_width;
 +    } else if (is_yuv && is_fully_planar) {
-+        linesize = FFALIGN(linesize, 16);
++        linesize = FFALIGN(linesize, 8);
 +    } else
 +        linesize = FFALIGN(linesize, 64);
 +
@@ -6349,8 +6339,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.c
 +        AV_PIX_FMT_NONE
 +    },
 +};
-Index: jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.h
-===================================================================
 --- /dev/null
 +++ libavutil/hwcontext_rkmpp.h
 @@ -0,0 +1,110 @@
@@ -6464,36 +6452,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.h
 +} AVRKMPPDeviceContext;
 +
 +#endif /* AVUTIL_HWCONTEXT_RKMPP_H */
-Index: jellyfin-ffmpeg/libavutil/Makefile
-===================================================================
---- libavutil/Makefile
-+++ libavutil/Makefile
-@@ -50,6 +50,7 @@ HEADERS = adler32.h
-           hwcontext_videotoolbox.h                                      \
-           hwcontext_vdpau.h                                             \
-           hwcontext_vulkan.h                                            \
-+          hwcontext_rkmpp.h                                             \
-           imgutils.h                                                    \
-           intfloat.h                                                    \
-           intreadwrite.h                                                \
-@@ -196,6 +197,7 @@ OBJS-$(CONFIG_VAAPI)
- OBJS-$(CONFIG_VIDEOTOOLBOX)             += hwcontext_videotoolbox.o
- OBJS-$(CONFIG_VDPAU)                    += hwcontext_vdpau.o
- OBJS-$(CONFIG_VULKAN)                   += hwcontext_vulkan.o
-+OBJS-$(CONFIG_RKMPP)                    += hwcontext_rkmpp.o
- 
- OBJS-$(!CONFIG_VULKAN)                  += hwcontext_stub.o
- 
-@@ -218,6 +220,7 @@ SKIPHEADERS-$(CONFIG_VDPAU)            +
- SKIPHEADERS-$(CONFIG_VULKAN)           += hwcontext_vulkan.h vulkan.h   \
-                                           vulkan_functions.h            \
-                                           vulkan_loader.h
-+SKIPHEADERS-$(CONFIG_RKMPP)            += hwcontext_rkmpp.h
- 
- TESTPROGS = adler32                                                     \
-             aes                                                         \
-Index: jellyfin-ffmpeg/libavutil/pixdesc.c
-===================================================================
 --- libavutil/pixdesc.c
 +++ libavutil/pixdesc.c
 @@ -2717,6 +2717,30 @@ static const AVPixFmtDescriptor av_pix_f
@@ -6527,8 +6485,6 @@ Index: jellyfin-ffmpeg/libavutil/pixdesc.c
  };
  
  static const char * const color_range_names[] = {
-Index: jellyfin-ffmpeg/libavutil/pixfmt.h
-===================================================================
 --- libavutil/pixfmt.h
 +++ libavutil/pixfmt.h
 @@ -189,8 +189,8 @@ enum AVPixelFormat {
@@ -6560,8 +6516,6 @@ Index: jellyfin-ffmpeg/libavutil/pixfmt.h
  #define AV_PIX_FMT_AYUV64     AV_PIX_FMT_NE(AYUV64BE, AYUV64LE)
  #define AV_PIX_FMT_P010       AV_PIX_FMT_NE(P010BE,  P010LE)
  #define AV_PIX_FMT_P012       AV_PIX_FMT_NE(P012BE,  P012LE)
-Index: jellyfin-ffmpeg/libswscale/input.c
-===================================================================
 --- libswscale/input.c
 +++ libswscale/input.c
 @@ -793,6 +793,39 @@ static void nv21ToUV_c(uint8_t *dstU, ui
@@ -6626,8 +6580,6 @@ Index: jellyfin-ffmpeg/libswscale/input.c
      case AV_PIX_FMT_P010LE:
      case AV_PIX_FMT_P210LE:
      case AV_PIX_FMT_P410LE:
-Index: jellyfin-ffmpeg/libswscale/swscale_unscaled.c
-===================================================================
 --- libswscale/swscale_unscaled.c
 +++ libswscale/swscale_unscaled.c
 @@ -221,6 +221,61 @@ static int nv24ToPlanarWrapper(SwsContex
@@ -6712,8 +6664,6 @@ Index: jellyfin-ffmpeg/libswscale/swscale_unscaled.c
      /* yuv2bgr */
      if ((srcFormat == AV_PIX_FMT_YUV420P || srcFormat == AV_PIX_FMT_YUV422P ||
           srcFormat == AV_PIX_FMT_YUVA420P) && isAnyRGB(dstFormat) &&
-Index: jellyfin-ffmpeg/libswscale/utils.c
-===================================================================
 --- libswscale/utils.c
 +++ libswscale/utils.c
 @@ -228,6 +228,8 @@ static const FormatEntry format_entries[
@@ -6725,8 +6675,6 @@ Index: jellyfin-ffmpeg/libswscale/utils.c
      [AV_PIX_FMT_P010LE]      = { 1, 1 },
      [AV_PIX_FMT_P010BE]      = { 1, 1 },
      [AV_PIX_FMT_P012LE]      = { 1, 1 },
-Index: jellyfin-ffmpeg/tests/ref/fate/imgutils
-===================================================================
 --- tests/ref/fate/imgutils
 +++ tests/ref/fate/imgutils
 @@ -262,3 +262,5 @@ rgbf32be        planes: 1, linesizes: 76
@@ -6735,8 +6683,6 @@ Index: jellyfin-ffmpeg/tests/ref/fate/imgutils
  rgbaf32le       planes: 1, linesizes: 1024   0   0   0, plane_sizes: 49152     0     0     0, plane_offsets:     0     0     0, total_size: 49152
 +nv15            planes: 2, linesizes:  80  80   0   0, plane_sizes:  3840  1920     0     0, plane_offsets:  3840     0     0, total_size: 5760
 +nv20            planes: 2, linesizes:  80  80   0   0, plane_sizes:  3840  3840     0     0, plane_offsets:  3840     0     0, total_size: 7680
-Index: jellyfin-ffmpeg/tests/ref/fate/sws-pixdesc-query
-===================================================================
 --- tests/ref/fate/sws-pixdesc-query
 +++ tests/ref/fate/sws-pixdesc-query
 @@ -59,6 +59,8 @@ isNBPS:
