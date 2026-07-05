@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg8
-SPK_VERS = 8.1.1
-SPK_REV = 1
+SPK_VERS = 8.1.2
+SPK_REV = 2
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Initial package release"
+CHANGELOG = "1. Update to version 8.1.2"
 
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver
