@@ -210,8 +210,10 @@ DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
 
-# Add SVT-HEVC codec (plugin patch 0004) to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
+# Add SVT-HEVC codec to x64
+# Patch for support from:
+# https://github.com/OpenVisualCloud/SVT-HEVC/tree/master/ffmpeg_plugin
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-hevc
 CONFIGURE_ARGS += --enable-libsvthevc
 endif
