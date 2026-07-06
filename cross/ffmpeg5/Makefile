@@ -213,7 +213,7 @@ endif
 # Add SVT-HEVC codec to x64
 # Patch for support from:
 # https://github.com/OpenVisualCloud/SVT-HEVC/tree/master/ffmpeg_plugin
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-hevc
 CONFIGURE_ARGS += --enable-libsvthevc
 endif
