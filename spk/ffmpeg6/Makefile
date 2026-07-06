@@ -1,5 +1,6 @@
 SPK_NAME = ffmpeg6
 SPK_VERS = 6.0.1
+SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
 SPK_REV = 6
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to jellyfin-ffmpeg v6.0.1-8 patchset<br/>2. Now using new synocli-videodriver package<br/>3. Align package with ffmpeg7/ffmpeg8"
@@ -21,8 +22,8 @@ LICENSE  = GPLv3
 
 POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
-SPK_COMMANDS  = bin/ffprobe
-SPK_COMMANDS += bin/$(SPK_NAME)
+SPK_COMMANDS  = bin/ffprobe$(SKG_MINOR_VERS)
+SPK_COMMANDS += bin/ffmpeg$(SKG_MINOR_VERS)
 
 include ../../mk/spksrc.common.mk
 
@@ -35,4 +36,5 @@ include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:
-	cd $(STAGING_DIR)/bin && ln -sf ffmpeg $(SPK_NAME)
+	cd $(STAGING_DIR)/bin && ln -sf ffprobe ffprobe$(SKG_MINOR_VERS)
+	cd $(STAGING_DIR)/bin && ln -sf ffmpeg ffmpeg$(SKG_MINOR_VERS)

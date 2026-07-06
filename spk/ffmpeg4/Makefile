@@ -1,5 +1,6 @@
-SPK_NAME = ffmpeg4
+SPK_NAME = ffmpeg
 SPK_VERS = 4.4.8
+SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
 SPK_REV = 51
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to version 4.4.8<br/>2. Update to jellyfin-ffmpeg v4.4.1-4 patchset<br/>3. Now using new synocli-videodriver package<br/>4. Align package with ffmpeg7/ffmpeg8"
@@ -18,8 +19,8 @@ LICENSE  = GPLv3
 
 POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
-SPK_COMMANDS  = bin/ffprobe
-SPK_COMMANDS += bin/$(SPK_NAME)
+SPK_COMMANDS  = bin/ffprobe$(SKG_MINOR_VERS)
+SPK_COMMANDS += bin/ffmpeg$(SKG_MINOR_VERS)
 
 include ../../mk/spksrc.common.mk
 
@@ -32,4 +33,5 @@ include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:
-	cd $(STAGING_DIR)/bin && ln -sf ffmpeg $(SPK_NAME)
+	cd $(STAGING_DIR)/bin && ln -sf ffprobe ffprobe$(SKG_MINOR_VERS)
+	cd $(STAGING_DIR)/bin && ln -sf ffmpeg ffmpeg$(SKG_MINOR_VERS)
