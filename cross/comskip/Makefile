@@ -7,7 +7,7 @@ PKG_DIST_SITE = https://github.com/erikkaashoek/Comskip/archive
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/argtable
-OPTIONAL_DEPENDS = cross/ffmpeg7
+OPTIONAL_DEPENDS = cross/ffmpeg8
 
 HOMEPAGE = https://www.kaashoek.com/comskip
 COMMENT  = Commercial detector
