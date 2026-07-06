@@ -263,6 +263,7 @@ endif
 
 # Requires GCC >= 12 (C++20 <version> header support)
 ifeq ($(call version_ge, $(TC_GCC), 12),1)
+DEPENDS += cross/libplacebo
 CONFIGURE_ARGS += --enable-libplacebo
 endif
 
