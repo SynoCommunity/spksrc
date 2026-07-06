@@ -1,6 +1,6 @@
 SPK_NAME = synocli-videodriver
 SPK_VERS = 1.5
-SPK_REV = 6
+SPK_REV = 7
 SPK_ICON = src/SynoPackagegreen-videodriver.png
 
 MAINTAINER = th0ma7
@@ -26,6 +26,7 @@ CHANGELOG += "6. Intel Video Processing Library (Intel VPL) 2.15.0 (DSM 7.1+).<b
 CHANGELOG += "7. MESA Intel Vulkan driver (anv) 23.3.6 (DSM 7.1+)."
 CHANGELOG += "8. libshaderc for accessing glslc functionality (DSM 7.1+)."
 CHANGELOG += "9. Intel GPU Tools (igt) 2.3 (DSM 7.1+)."
+CHANGELOG += "10. Bump package version for DSM-7.2+ release."
 
 OPTIONAL_DEPENDS  = cross/intel-level-zero
 OPTIONAL_DEPENDS += cross/intel-graphics-compiler
