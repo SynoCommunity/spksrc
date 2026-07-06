@@ -1,5 +1,6 @@
 SPK_NAME = ffmpeg8
 SPK_VERS = 8.1.2
+SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
 SPK_REV = 2
 SPK_ICON = src/ffmpeg.png
 CHANGELOG = "1. Update to version 8.1.2"
@@ -21,8 +22,8 @@ LICENSE  = GPLv3
 
 POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
-SPK_COMMANDS  = bin/ffprobe
-SPK_COMMANDS += bin/$(SPK_NAME)
+SPK_COMMANDS  = bin/ffprobe$(SKG_MINOR_VERS)
+SPK_COMMANDS += bin/ffmpeg$(SKG_MINOR_VERS)
 
 include ../../mk/spksrc.common.mk
 
@@ -35,4 +36,5 @@ include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:
-	cd $(STAGING_DIR)/bin && ln -sf ffmpeg $(SPK_NAME)
+	cd $(STAGING_DIR)/bin && ln -sf ffprobe ffprobe$(SKG_MINOR_VERS)
+	cd $(STAGING_DIR)/bin && ln -sf ffmpeg ffmpeg$(SKG_MINOR_VERS)
