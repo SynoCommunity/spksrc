@@ -122,7 +122,7 @@ The following ports are used by SynoCommunity packages.
 
 <script>
 function filterPortTable() {
-  var f = document.getElementById('catFilter').value.toLowerCase();
+  var f = document.getElementById('catFilter').value;
   var q = document.getElementById('portSearch').value.toLowerCase();
   document.querySelectorAll('#portTable tbody tr').forEach(function (r) {
     var okCat = !f || r.getAttribute('data-category') === f;

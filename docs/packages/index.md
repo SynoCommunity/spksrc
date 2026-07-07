@@ -108,49 +108,5 @@ function filterPkgTable() {
   });
 }
 </script>
-| [Adminer](adminer.md) | Web Apps | Database management |
-| [Aria2](aria2.md) | Downloads | Multi-protocol download utility |
-| [Beets](beets.md) | Media | Music library management |
-| [BorgBackup](borgbackup.md) | Backup | Deduplicating backup |
-| [Borgmatic](borgmatic.md) | Backup | BorgBackup automation |
-| [Cloudflared](cloudflared.md) | Network | Cloudflare Tunnel client |
-| [Comskip](comskip.md) | Media | Commercial detector for recorded TV |
-| [Deluge](deluge.md) | Downloads | Feature-rich BitTorrent client |
-| [DNSCrypt Proxy](dnscrypt-proxy.md) | Network | DNS encryption proxy |
-| [DSM Utilities](dsm-utilities.md) | Utilities | Helpful DSM configuration for packages |
-| [Duplicity](duplicity.md) | Backup | Encrypted bandwidth-efficient backup |
-| [FFmpeg](ffmpeg.md) | Media | Complete multimedia framework |
-| [File Browser](file-browser.md) | Web Apps | Web file browser |
-| [Flexget](flexget.md) | Media Management | Multipurpose automation |
-| [Git](git.md) | Development | Version control system |
-| [Google Authenticator](google-authenticator.md) | Security | PAM module for two-factor authentication |
-| [Home Assistant](homeassistant.md) | Home Automation | Home automation platform |
-| [Jellyfin](jellyfin.md) | Media Server | Media streaming server |
-| [Kiwix](kiwix.md) | Media Server | Offline Wikipedia and content server |
-| [Loom](loom.md) | Media Server | Federated and encrypted live streaming |
-| [MinIO](minio.md) | Storage | S3-compatible object storage |
-| [Mono](mono.md) | Runtime | .NET runtime |
-| [Mosh](mosh.md) | CLI | Mobile shell for intermittent connectivity |
-| [Mosquitto](mosquitto.md) | Home Automation | MQTT message broker |
-| [Mozilla Sync](mozilla-sync.md) | Web Apps | Firefox Sync server |
-| [Navidrome](navidrome.md) | Media Server | Music streaming server |
-| [Node Exporter](node-exporter.md) | Monitoring | Prometheus metrics exporter |
-| [ownCloud](owncloud.md) | Web Apps | File sync and share platform |
-| [Rclone](rclone.md) | Backup | Cloud storage sync tool |
-| [ruTorrent](rutorrent.md) | Downloads | Web-based BitTorrent client |
-| [Salt](salt.md) | Automation | Infrastructure automation |
-| [SickBeard Custom](sickbeard-custom.md) | Media Management | SickBeard fork selector (archived) |
-| [SynoCli Devel](synocli-devel.md) | CLI | Development tools |
-| [SynoCli Disk](synocli-disk.md) | CLI | Disk utilities |
-| [SynoCli File](synocli-file.md) | CLI | File management tools |
-| [SynoCli Kernel](synocli-kernel.md) | CLI | Kernel module management |
-| [SynoCli Misc](synocli-misc.md) | CLI | Miscellaneous utilities |
-| [SynoCli Monitor](synocli-monitor.md) | CLI | System monitoring tools |
-| [SynoCli Net](synocli-net.md) | CLI | Network utilities |
-| [SynoCli VideoDriver](synocli-videodriver.md) | CLI | Intel GPU drivers for hardware transcoding |
-| [SynoKernel USB Serial](synokernel-usbserial.md) | Kernel | USB serial adapter drivers |
-| [Syncthing](syncthing.md) | Sync | Continuous file synchronization |
-| [Transmission](transmission.md) | Downloads | Lightweight BitTorrent client |
-| [Vaultwarden](vaultwarden.md) | Security | Bitwarden-compatible password manager |
 
 For the most up-to-date list of packages, visit [synocommunity.com/packages](https://synocommunity.com/packages).
