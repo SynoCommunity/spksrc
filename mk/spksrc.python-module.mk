@@ -1,6 +1,10 @@
-### Python module rules
-#   Invoke make to (cross-) compile a python extension module. 
+###############################################################################
+# spksrc.python-module.mk
+#
+# Invoke make to (cross-) compile a python extension module.
 # You can do some customization through python-cc.mk
+#
+###############################################################################
 
 # Python module targets
 ifeq ($(strip $(CONFIGURE_TARGET)),)
@@ -79,7 +83,7 @@ all: install fix_shebang_python_module
 ###
 
 # Allow generating per-wheel crossenv
-include ../../mk/spksrc.crossenv.mk
+include ../../mk/spksrc.python-crossenv.mk
 
 ## python wheel specific configurations
-include ../../mk/spksrc.wheel-env.mk
+include ../../mk/spksrc.wheel/env.mk

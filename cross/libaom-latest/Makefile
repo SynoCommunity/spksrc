@@ -1,5 +1,5 @@
 PKG_NAME = libaom
-PKG_VERS = 3.13.1
+PKG_VERS = 3.14.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://storage.googleapis.com/aom-releases

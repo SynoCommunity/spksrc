@@ -1,5 +1,3 @@
-Index: FFmpeg/libavutil/hwcontext_vulkan.c
-===================================================================
 --- libavutil/hwcontext_vulkan.c
 +++ libavutil/hwcontext_vulkan.c
 @@ -90,6 +90,9 @@ typedef struct VulkanDevicePriv {
@@ -147,8 +145,6 @@ Index: FFmpeg/libavutil/hwcontext_vulkan.c
          }
      }
  
-Index: FFmpeg/libavutil/vulkan.c
-===================================================================
 --- libavutil/vulkan.c
 +++ libavutil/vulkan.c
 @@ -185,7 +185,7 @@ int ff_vk_load_props(FFVulkanContext *s)
@@ -160,8 +156,6 @@ Index: FFmpeg/libavutil/vulkan.c
          };
      }
  
-Index: FFmpeg/libavutil/vulkan_functions.h
-===================================================================
 --- libavutil/vulkan_functions.h
 +++ libavutil/vulkan_functions.h
 @@ -33,10 +33,8 @@ typedef enum FFVulkanExtensions {

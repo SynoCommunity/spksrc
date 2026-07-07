@@ -1,0 +1,26 @@
+# ARMv5-specific pure-python requirements (Python 3.11)
+
+appdirs==1.4.4
+arrow==1.4.0
+attrs==26.1.0
+borgmatic==2.1.5
+#certifi==2026.5.20                     ==> python311
+docopt==0.6.2
+emborg==1.42
+idna==3.16
+inform==1.36
+jsonschema==4.25.1
+jsonschema_specifications==2025.9.1
+nestedtext==3.8
+packaging==26.2
+#pip==24.0                              ==> python311
+python_dateutil==2.9.0.post0
+quantiphy==2.21
+referencing==0.37.0
+requests==2.34.2
+ruamel_yaml==0.19.1
+#setuptools==79.0.1                     ==> python311
+#six==1.17.0                            ==> python311
+typing_extensions==4.15.0
+tzdata==2026.2
+urllib3==2.7.0

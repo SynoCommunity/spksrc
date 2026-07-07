@@ -1,7 +1,7 @@
 PKG_NAME = cops
-PKG_VERS = 3.8.2
+PKG_VERS = 4.0.2
 PKG_EXT = zip
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-php82.$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-php84.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mikespub-org/seblucas-cops/releases/download/$(PKG_VERS)
 PKG_DIR = cops
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_DIR)
@@ -14,7 +14,7 @@ LICENSE  = GPLv2
 
 INSTALL_TARGET = cops_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: cops_install
 cops_install:

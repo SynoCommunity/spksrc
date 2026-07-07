@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/bsf/dovi_rpu.c
-===================================================================
 --- libavcodec/bsf/dovi_rpu.c
 +++ libavcodec/bsf/dovi_rpu.c
 @@ -84,7 +84,8 @@ static int dovi_rpu_update_fragment_hevc

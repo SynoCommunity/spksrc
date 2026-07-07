@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3863,6 +3863,7 @@ boxblur_opencl_filter_deps="opencl gpl"
@@ -10,8 +8,6 @@ Index: FFmpeg/configure
  bwdif_vulkan_filter_deps="vulkan spirv_compiler"
  chromaber_vulkan_filter_deps="vulkan spirv_compiler"
  color_vulkan_filter_deps="vulkan spirv_compiler"
-Index: FFmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -219,6 +219,10 @@ OBJS-$(CONFIG_BOXBLUR_OPENCL_FILTER)
@@ -25,8 +21,6 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_BWDIF_VULKAN_FILTER)           += vf_bwdif_vulkan.o yadif_common.o vulkan.o vulkan_filter.o
  OBJS-$(CONFIG_CAS_FILTER)                    += vf_cas.o
  OBJS-$(CONFIG_CCREPACK_FILTER)               += vf_ccrepack.o
-Index: FFmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -201,6 +201,7 @@ extern const AVFilter ff_vf_boxblur;
@@ -37,8 +31,6 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_bwdif_vulkan;
  extern const AVFilter ff_vf_cas;
  extern const AVFilter ff_vf_ccrepack;
-Index: FFmpeg/libavfilter/metal/vf_bwdif_videotoolbox.metal
-===================================================================
 --- /dev/null
 +++ libavfilter/metal/vf_bwdif_videotoolbox.metal
 @@ -0,0 +1,271 @@
@@ -313,8 +305,6 @@ Index: FFmpeg/libavfilter/metal/vf_bwdif_videotoolbox.metal
 +    dst.write(pred.xyyy, pos);
 +}
 +
-Index: FFmpeg/libavfilter/vf_bwdif_videotoolbox.m
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_bwdif_videotoolbox.m
 @@ -0,0 +1,448 @@

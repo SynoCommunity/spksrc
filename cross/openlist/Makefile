@@ -1,5 +1,5 @@
 PKG_NAME = OpenList
-PKG_VERS = 4.2.1
+PKG_VERS = 4.2.2
 # must match PKG_VERS of cross/openlist-frontend (adjust if different)
 WEB_VERSION = $(PKG_VERS)
 PKG_EXT = tar.gz

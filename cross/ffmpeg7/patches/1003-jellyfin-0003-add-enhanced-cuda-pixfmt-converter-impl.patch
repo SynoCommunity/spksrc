@@ -1,5 +1,33 @@
-Index: FFmpeg/libavfilter/dither_matrix.h
-===================================================================
+--- libavfilter/cuda/vector_helpers.cuh
++++ libavfilter/cuda/vector_helpers.cuh
+@@ -109,4 +109,27 @@ inline __device__ float4 lerp_scalar<flo
+     );
+ }
+ 
++template<typename T>
++inline __device__ T saturate_rintf(T a, float factor) {
++    return rintf(__saturatef(a) * factor);
++}
++
++template<>
++inline __device__ float2 saturate_rintf<float2>(float2 a, float factor) {
++    return make_float2(
++        saturate_rintf(a.x, factor),
++        saturate_rintf(a.y, factor)
++    );
++}
++
++template<>
++inline __device__ float4 saturate_rintf<float4>(float4 a, float factor) {
++    return make_float4(
++        saturate_rintf(a.x, factor),
++        saturate_rintf(a.y, factor),
++        saturate_rintf(a.z, factor),
++        saturate_rintf(a.w, factor)
++    );
++}
++
+ #endif
 --- /dev/null
 +++ libavfilter/dither_matrix.h
 @@ -0,0 +1,272 @@
@@ -275,8 +303,6 @@ Index: FFmpeg/libavfilter/dither_matrix.h
 +};
 +
 +#endif /* AVFILTER_DITHER_MATRIX_H */
-Index: FFmpeg/libavfilter/vf_scale_cuda.c
-===================================================================
 --- libavfilter/vf_scale_cuda.c
 +++ libavfilter/vf_scale_cuda.c
 @@ -23,6 +23,7 @@
@@ -332,7 +358,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
          CHECK_CU(cu->cuCtxPopCurrent(&dummy));
      }
  
-@@ -275,6 +290,68 @@ static av_cold int init_processing_chain
+@@ -275,6 +290,69 @@ static av_cold int init_processing_chain
      return 0;
  }
  
@@ -362,7 +388,8 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
 +  #define CU_TRSF_NORMALIZED_COORDINATES 2
 +#endif
 +    CUDA_TEXTURE_DESC tex_desc = {
-+        .addressMode = { CU_TR_ADDRESS_MODE_WRAP },
++        .addressMode = { CU_TR_ADDRESS_MODE_WRAP,
++                         CU_TR_ADDRESS_MODE_WRAP },
 +        .filterMode = CU_TR_FILTER_MODE_POINT,
 +        .flags = CU_TRSF_NORMALIZED_COORDINATES,
 +    };
@@ -401,7 +428,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
  static av_cold int cudascale_load_functions(AVFilterContext *ctx)
  {
      CUDAScaleContext *s = ctx->priv;
-@@ -383,6 +460,11 @@ static av_cold int cudascale_config_prop
+@@ -383,6 +461,11 @@ static av_cold int cudascale_config_prop
      s->hwctx = device_hwctx;
      s->cu_stream = s->hwctx->stream;
  
@@ -413,7 +440,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
      if (inlink->sample_aspect_ratio.num) {
          outlink->sample_aspect_ratio = av_mul_q((AVRational){outlink->h*inlink->w,
                                                               outlink->w*inlink->h},
-@@ -418,11 +500,15 @@ static int call_resize_kernel(AVFilterCo
+@@ -418,11 +501,15 @@ static int call_resize_kernel(AVFilterCo
          (CUdeviceptr)out_frame->data[2], (CUdeviceptr)out_frame->data[3]
      };
  
@@ -430,7 +457,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
      };
  
      return CHECK_CU(cu->cuLaunchKernel(func,
-@@ -446,6 +532,7 @@ static int scalecuda_resize(AVFilterCont
+@@ -446,6 +533,7 @@ static int scalecuda_resize(AVFilterCont
  
      for (i = 0; i < s->in_planes; i++) {
          CUDA_TEXTURE_DESC tex_desc = {
@@ -438,8 +465,6 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.c
              .filterMode = s->interp_use_linear ?
                            CU_TR_FILTER_MODE_LINEAR :
                            CU_TR_FILTER_MODE_POINT,
-Index: FFmpeg/libavfilter/vf_scale_cuda.cu
-===================================================================
 --- libavfilter/vf_scale_cuda.cu
 +++ libavfilter/vf_scale_cuda.cu
 @@ -29,6 +29,19 @@ using subsample_function_t = T (*)(cudaT
@@ -605,18 +630,39 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
      }
  
      DEF_F(Convert_uv, out_T_uv)
-@@ -1114,8 +1162,8 @@ __device__ static inline T Subsample_Bic
+@@ -1015,6 +1063,9 @@ typedef float4 (*coeffs_function_t)(floa
+ 
+ __device__ static inline float4 lanczos_coeffs(float x, float param)
  {
-     float hscale = (float)src_width / (float)dst_width;
-     float vscale = (float)src_height / (float)dst_height;
--    float xi = (xo + 0.5f) * hscale - 0.5f;
--    float yi = (yo + 0.5f) * vscale - 0.5f;
-+    float xi = xo * hscale + 0.5f * hscale - 0.5f; // avoid (x - v + v = x)
-+    float yi = yo * hscale + 0.5f * vscale - 0.5f;
-     float px = floor(xi);
-     float py = floor(yi);
-     float fx = xi - px;
-@@ -1147,7 +1195,9 @@ __device__ static inline T Subsample_Bic
++#if defined(__clang__) && (__clang_major__ >= 11)
++    #pragma clang fp reassociate(off)
++#endif
+     const float pi = 3.141592654f;
+ 
+     float4 res = make_float4(
+@@ -1129,12 +1180,15 @@ __device__ static inline T Subsample_Bic
+ #define PIX(x, y) tex2D<floatT>(tex, (x), (y))
+ 
+     return from_floatN<T, floatT>(
+-        apply_coeffs<floatT>(coeffsY,
+-            apply_coeffs<floatT>(coeffsX, PIX(px - 1, py - 1), PIX(px, py - 1), PIX(px + 1, py - 1), PIX(px + 2, py - 1)),
+-            apply_coeffs<floatT>(coeffsX, PIX(px - 1, py    ), PIX(px, py    ), PIX(px + 1, py    ), PIX(px + 2, py    )),
+-            apply_coeffs<floatT>(coeffsX, PIX(px - 1, py + 1), PIX(px, py + 1), PIX(px + 1, py + 1), PIX(px + 2, py + 1)),
+-            apply_coeffs<floatT>(coeffsX, PIX(px - 1, py + 2), PIX(px, py + 2), PIX(px + 1, py + 2), PIX(px + 2, py + 2))
+-        ) * factor
++        saturate_rintf(
++            apply_coeffs<floatT>(coeffsY,
++                apply_coeffs<floatT>(coeffsX, PIX(px - 1, py - 1), PIX(px, py - 1), PIX(px + 1, py - 1), PIX(px + 2, py - 1)),
++                apply_coeffs<floatT>(coeffsX, PIX(px - 1, py    ), PIX(px, py    ), PIX(px + 1, py    ), PIX(px + 2, py    )),
++                apply_coeffs<floatT>(coeffsX, PIX(px - 1, py + 1), PIX(px, py + 1), PIX(px + 1, py + 1), PIX(px + 2, py + 1)),
++                apply_coeffs<floatT>(coeffsX, PIX(px - 1, py + 2), PIX(px, py + 2), PIX(px + 1, py + 2), PIX(px + 2, py + 2))
++            ),
++            factor
++        )
+     );
+ 
+ #undef PIX
+@@ -1147,7 +1201,9 @@ __device__ static inline T Subsample_Bic
      cudaTextureObject_t src_tex_2, cudaTextureObject_t src_tex_3, \
      T *dst_0, T *dst_1, T *dst_2, T *dst_3,                       \
      int dst_width, int dst_height, int dst_pitch,                 \
@@ -627,7 +673,7 @@ Index: FFmpeg/libavfilter/vf_scale_cuda.cu
  
  #define SUBSAMPLE(Convert, T) \
      cudaTextureObject_t src_tex[4] =                    \
-@@ -1159,7 +1209,9 @@ __device__ static inline T Subsample_Bic
+@@ -1159,7 +1215,9 @@ __device__ static inline T Subsample_Bic
      Convert(                                            \
          src_tex, dst, xo, yo,                           \
          dst_width, dst_height, dst_pitch,               \

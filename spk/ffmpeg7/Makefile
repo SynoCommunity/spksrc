@@ -1,8 +1,8 @@
 SPK_NAME = ffmpeg7
-SPK_VERS = 7.1.3
-SPK_REV = 6
+SPK_VERS = 7.1.5
+SPK_REV = 9
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to using updated synocli-videodriver package.<br/>2. No longer support ARMv7L (hi3535) architecture"
+CHANGELOG = "1. Update to version 7.1.5"
 
 DEPENDS = cross/ffmpeg7
 VIDEODRV_PACKAGE = synocli-videodriver

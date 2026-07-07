@@ -27,7 +27,7 @@
 # Notes:
 #  - This makefile only emits configuration files; it does not build anything.
 #  - All output is written to $(WORK_DIR).
-#  - tk_vars.mk is consumed by spksrc.cross-env.mk and package builds.
+#  - tk_vars.mk is consumed by spksrc.cross/env-default.mk and package builds.
 #  - The tkvars target is idempotent and skipped if the cookie exists.
 #
 ###############################################################################

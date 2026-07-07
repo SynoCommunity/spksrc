@@ -1,11 +1,11 @@
 SPK_NAME = ffsync
-SPK_VERS = 0.22.3
-SPK_REV = 11
+SPK_VERS = 0.23.0
+SPK_REV = 12
 SPK_ICON = src/ffsync.png
 
 DEPENDS = cross/syncstorage-rs cross/diesel
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)
@@ -21,7 +21,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = An implementation of the Mozilla Sync-1.5 Server protocol used by the sync service in Firefox 29 and later. You can use Mozilla Sync Server to exchange browser data \(bookmarks, history, open tabs, passwords, add-ons, and the like\) between \'clients\' in a manner that respects a user\'s security and privacy. The service runs on port 8132.
 DISPLAY_NAME = Mozilla Sync Server
-CHANGELOG = "1. Update Mozilla Sync Server package to v0.22.3."
+CHANGELOG = "1. Update Mozilla Sync Server package to v0.23.0. <br/>2. Migrate to Python 3.14."
 
 HOMEPAGE = https://mozilla-services.readthedocs.io/en/latest/howtos/run-sync-1.5.html
 LICENSE = MPL 2.0
@@ -39,10 +39,10 @@ NO_SERVICE_SHORTCUT = yes
 
 POST_STRIP_TARGET = ffsync_extra_install
 
-include ../../mk/spksrc.common.mk
-
 # [cryptography]
 DEPENDS += cross/openssl3
+
+include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: ffsync_extra_install
 ffsync_extra_install:
@@ -52,5 +52,3 @@ ffsync_extra_install:
 	@$(MSG) Patch binaries built with rust to find shared libraries
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib:/var/packages/$(PYTHON_PACKAGE)/target/lib $(STAGING_DIR)/bin/syncserver
 	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/diesel
-
-include ../../mk/spksrc.spk-meta.mk

@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/decode.c
-===================================================================
 --- libavcodec/decode.c
 +++ libavcodec/decode.c
 @@ -207,6 +207,9 @@ static int decode_bsfs_init(AVCodecConte

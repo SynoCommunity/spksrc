@@ -1,5 +1,5 @@
 PKG_NAME = mantisbt
-PKG_VERS = 2.28.0
+PKG_VERS = 2.28.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://sourceforge.net/projects/$(PKG_NAME)/files/mantis-stable/$(PKG_VERS)
@@ -18,7 +18,7 @@ INSTALL_TARGET = mantisbt_install
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: mantisbt_install
 mantisbt_install:

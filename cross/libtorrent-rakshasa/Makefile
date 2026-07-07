@@ -1,5 +1,5 @@
 PKG_NAME = libtorrent
-PKG_VERS = 0.15.7
+PKG_VERS = 0.16.11
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rakshasa/rtorrent/releases/download/v$(PKG_VERS)
@@ -19,7 +19,6 @@ LICENSE  = GPLv2
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS = --disable-instrumentation
-CONFIGURE_ARGS += --with-zlib=$(STAGING_INSTALL_PREFIX)
 
 # disable some compiler warnings:
 ADDITIONAL_CXXFLAGS = -Wno-deprecated-declarations -Wno-deprecated -Wno-terminate -Wno-sign-compare

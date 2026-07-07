@@ -1,0 +1,4 @@
+bin:bin/vmaf
+lnk:lib/libvmaf.so
+lnk:lib/libvmaf.so.3
+lib:lib/libvmaf.so.3.0.0

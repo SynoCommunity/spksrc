@@ -1,6 +1,6 @@
 SPK_NAME = vim
-SPK_VERS = 9.1
-SPK_REV = 8
+SPK_VERS = 9.2
+SPK_REV = 9
 SPK_ICON = src/vim.png
 
 DEPENDS = cross/vim
@@ -12,7 +12,7 @@ DESCRIPTION_FRE = Vim est un éditeur de texte avancé basé sur Vi \(unix\) ave
 DISPLAY_NAME = Vim
 STARTABLE = no
 
-CHANGELOG = "1. Update vim to v9.1. <br/>2. Finally remove python feature."
+CHANGELOG = "1. Update vim to v9.2."
 
 HOMEPAGE = https://www.vim.org/
 LICENSE  = Charityware

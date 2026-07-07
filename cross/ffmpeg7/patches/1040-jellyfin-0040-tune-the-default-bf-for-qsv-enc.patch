@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/qsvenc_av1.c
-===================================================================
 --- libavcodec/qsvenc_av1.c
 +++ libavcodec/qsvenc_av1.c
 @@ -201,8 +201,8 @@ static const AVClass class = {
@@ -13,8 +11,6 @@ Index: FFmpeg/libavcodec/qsvenc_av1.c
      { "refs",      "0"    },
      { NULL },
  };
-Index: FFmpeg/libavcodec/qsvenc_h264.c
-===================================================================
 --- libavcodec/qsvenc_h264.c
 +++ libavcodec/qsvenc_h264.c
 @@ -180,8 +180,8 @@ static const AVClass class = {
@@ -28,8 +24,6 @@ Index: FFmpeg/libavcodec/qsvenc_h264.c
      { "qmin",      "-1"    },
      { "qmax",      "-1"    },
      { "trellis",   "-1"    },
-Index: FFmpeg/libavcodec/qsvenc_hevc.c
-===================================================================
 --- libavcodec/qsvenc_hevc.c
 +++ libavcodec/qsvenc_hevc.c
 @@ -381,8 +381,8 @@ static const AVClass class = {

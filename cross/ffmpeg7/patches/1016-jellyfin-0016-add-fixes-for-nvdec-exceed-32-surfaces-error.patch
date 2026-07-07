@@ -1,17 +1,30 @@
-Index: FFmpeg/libavcodec/nvdec.c
-===================================================================
 --- libavcodec/nvdec.c
 +++ libavcodec/nvdec.c
-@@ -300,8 +300,10 @@ static int nvdec_init_hwframes(AVCodecCo
-     frames_ctx = (AVHWFramesContext*)(*out_frames_ref)->data;
+@@ -399,8 +399,8 @@ int ff_nvdec_decode_init(AVCodecContext
+     params.OutputFormat        = output_format;
+     params.CodecType           = cuvid_codec_type;
+     params.ChromaFormat        = cuvid_chroma_format;
+-    params.ulNumDecodeSurfaces = frames_ctx->initial_pool_size;
+-    params.ulNumOutputSurfaces = unsafe_output ? frames_ctx->initial_pool_size : 1;
++    params.ulNumDecodeSurfaces = FFMIN(frames_ctx->initial_pool_size, 32);
++    params.ulNumOutputSurfaces = unsafe_output ? FFMIN(frames_ctx->initial_pool_size, 64) : 1;
  
-     if (dummy) {
--        // Copied from ff_decode_get_hw_frames_ctx for compatibility
--        frames_ctx->initial_pool_size += 3;
-+        // The function above guarantees 1 work surface, We must guarantee 4 work surfaces.
-+        // (the absolute minimum), so add the missing count without exceeding the maximum
-+        // recommended for nvdec.
-+        frames_ctx->initial_pool_size = FFMIN(frames_ctx->initial_pool_size + 3, 32);
+     ret = nvdec_decoder_create(&ctx->decoder, frames_ctx->device_ref, &params, avctx);
+     if (ret < 0) {
+@@ -424,7 +424,7 @@ int ff_nvdec_decode_init(AVCodecContext
+         ret = AVERROR(ENOMEM);
+         goto fail;
+     }
+-    pool->dpb_size = frames_ctx->initial_pool_size;
++    pool->dpb_size = FFMIN(frames_ctx->initial_pool_size, 32);
  
-         frames_ctx->free = nvdec_free_dummy;
-         frames_ctx->pool = av_buffer_pool_init(0, nvdec_alloc_dummy);
+     ctx->decoder_pool = ff_refstruct_pool_alloc_ext(sizeof(unsigned int), 0, pool,
+                                                     nvdec_decoder_frame_init,
+@@ -529,7 +529,6 @@ static int nvdec_retrieve_data(void *log
+         goto copy_fail;
+ 
+     unmap_data->idx = cf->idx;
+-    unmap_data->idx_ref = ff_refstruct_ref(cf->idx_ref);
+     unmap_data->decoder = ff_refstruct_ref(cf->decoder);
+ 
+     av_pix_fmt_get_chroma_sub_sample(hwctx->sw_format, &shift_h, &shift_v);

@@ -1,5 +1,5 @@
 PKG_NAME = kavita
-PKG_VERS = 0.8.9.1
+PKG_VERS = 0.9.0.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Kareadita/Kavita/releases/download/v$(PKG_VERS)
@@ -26,7 +26,7 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
 endif
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: kavita_install
 kavita_install:

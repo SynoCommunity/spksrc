@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -358,6 +358,7 @@ External library support:
@@ -130,7 +128,7 @@ Index: FFmpeg/configure
  postproc_deps="avutil gpl"
  postproc_suggest="libm stdatomic"
  swresample_deps="avutil"
-@@ -7140,11 +7156,16 @@ enabled openssl           && { { check_p
+@@ -7142,11 +7158,16 @@ enabled openssl           && { { check_p
                                 check_lib openssl openssl/ssl.h SSL_library_init -lssl -lcrypto -lws2_32 -lgdi32 ||
                                 die "ERROR: openssl not found"; }
  enabled pocketsphinx      && require_pkg_config pocketsphinx pocketsphinx pocketsphinx/pocketsphinx.h ps_init
@@ -149,7 +147,7 @@ Index: FFmpeg/configure
  enabled vapoursynth       && require_headers "vapoursynth/VSScript4.h vapoursynth/VapourSynth4.h"
  
  
-@@ -7346,7 +7367,7 @@ fi
+@@ -7348,7 +7369,7 @@ fi
  if enabled_all opencl libdrm ; then
      check_type "CL/cl_intel.h" "clCreateImageFromFdINTEL_fn" &&
          enable opencl_drm_beignet
@@ -158,8 +156,6 @@ Index: FFmpeg/configure
          enable opencl_drm_arm
  fi
  
-Index: FFmpeg/libavcodec/Makefile
-===================================================================
 --- libavcodec/Makefile
 +++ libavcodec/Makefile
 @@ -268,6 +268,7 @@ OBJS-$(CONFIG_AV1_MEDIACODEC_ENCODER)  +
@@ -227,8 +223,6 @@ Index: FFmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_MPL2_DECODER)            += mpl2dec.o ass.o
  OBJS-$(CONFIG_MSA1_DECODER)            += mss3.o
  OBJS-$(CONFIG_MSCC_DECODER)            += mscc.o
-Index: FFmpeg/libavcodec/allcodecs.c
-===================================================================
 --- libavcodec/allcodecs.c
 +++ libavcodec/allcodecs.c
 @@ -146,6 +146,7 @@ extern const FFCodec ff_h263i_decoder;
@@ -286,8 +280,6 @@ Index: FFmpeg/libavcodec/allcodecs.c
  extern const FFCodec ff_mp3_mediacodec_decoder;
  extern const FFCodec ff_mp3_mf_encoder;
  extern const FFCodec ff_mpeg1_cuvid_decoder;
-Index: FFmpeg/libavcodec/rkmppdec.c
-===================================================================
 --- libavcodec/rkmppdec.c
 +++ libavcodec/rkmppdec.c
 @@ -1,6 +1,7 @@
@@ -299,7 +291,7 @@ Index: FFmpeg/libavcodec/rkmppdec.c
   *
   * This file is part of FFmpeg.
   *
-@@ -19,551 +20,1484 @@
+@@ -19,551 +20,1483 @@
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
   */
  
@@ -886,7 +878,6 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +    return 0;
 +
 +fail:
-+    rkmpp_decode_close(avctx);
 +    return ret;
 +}
 +
@@ -2193,11 +2184,9 @@ Index: FFmpeg/libavcodec/rkmppdec.c
 +#if CONFIG_MJPEG_RKMPP_DECODER
 +DEFINE_RKMPP_DECODER(mjpeg, MJPEG, NULL)
 +#endif
-Index: FFmpeg/libavcodec/rkmppdec.h
-===================================================================
 --- /dev/null
 +++ libavcodec/rkmppdec.h
-@@ -0,0 +1,179 @@
+@@ -0,0 +1,180 @@
 +/*
 + * Copyright (c) 2017 Lionel CHAZALLON
 + * Copyright (c) 2023 Huseyin BIYIK
@@ -2371,17 +2360,16 @@ Index: FFmpeg/libavcodec/rkmppdec.h
 +    .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_AVOID_PROBING | \
 +                      AV_CODEC_CAP_HARDWARE, \
 +    .caps_internal  = FF_CODEC_CAP_NOT_INIT_THREADSAFE | \
++                      FF_CODEC_CAP_INIT_CLEANUP | \
 +                      FF_CODEC_CAP_SETS_FRAME_PROPS, \
 +    .hw_configs     = rkmpp_dec_hw_configs, \
 +    .p.wrapper_name = "rkmpp", \
 +};
 +
 +#endif /* AVCODEC_RKMPPDEC_H */
-Index: FFmpeg/libavcodec/rkmppenc.c
-===================================================================
 --- /dev/null
 +++ libavcodec/rkmppenc.c
-@@ -0,0 +1,1311 @@
+@@ -0,0 +1,1312 @@
 +/*
 + * Copyright (c) 2023 Huseyin BIYIK
 + * Copyright (c) 2023 NyanMisaka
@@ -3400,8 +3388,10 @@ Index: FFmpeg/libavcodec/rkmppenc.c
 +    }
 +
 +    mpp_buf = mpp_frame_get_buffer(mpp_frame);
-+    if (!mpp_buf)
-+        return AVERROR(ENOMEM);
++    if (!mpp_buf) {
++        ret = AVERROR(ENOMEM);
++        goto exit;
++    }
 +
 +    /* mark buffer as unused (idx < 0) */
 +    mpp_buffer_set_index(mpp_buf, -1);
@@ -3680,7 +3670,6 @@ Index: FFmpeg/libavcodec/rkmppenc.c
 +    if (mpp_pkt)
 +        mpp_packet_deinit(&mpp_pkt);
 +
-+    rkmpp_encode_close(avctx);
 +    return ret;
 +}
 +
@@ -3693,8 +3682,6 @@ Index: FFmpeg/libavcodec/rkmppenc.c
 +#if CONFIG_MJPEG_RKMPP_ENCODER
 +DEFINE_RKMPP_ENCODER(mjpeg, MJPEG, mjpeg)
 +#endif
-Index: FFmpeg/libavcodec/rkmppenc.h
-===================================================================
 --- /dev/null
 +++ libavcodec/rkmppenc.h
 @@ -0,0 +1,322 @@
@@ -4020,8 +4007,6 @@ Index: FFmpeg/libavcodec/rkmppenc.h
 +};
 +
 +#endif /* AVCODEC_RKMPPENC_H */
-Index: FFmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -29,6 +29,7 @@ OBJS-$(HAVE_THREADS)
@@ -4064,8 +4049,6 @@ Index: FFmpeg/libavfilter/Makefile
  SKIPHEADERS-$(CONFIG_OPENCL)                 += opencl.h
  SKIPHEADERS-$(CONFIG_VAAPI)                  += vaapi_vpp.h stack_internal.h
  SKIPHEADERS-$(CONFIG_VULKAN)                 += vulkan.h vulkan_filter.h
-Index: FFmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -391,6 +391,7 @@ extern const AVFilter ff_vf_overlay_qsv;
@@ -4092,11 +4075,9 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_vstack;
  extern const AVFilter ff_vf_w3fdif;
  extern const AVFilter ff_vf_waveform;
-Index: FFmpeg/libavfilter/rkrga_common.c
-===================================================================
 --- /dev/null
 +++ libavfilter/rkrga_common.c
-@@ -0,0 +1,1425 @@
+@@ -0,0 +1,1439 @@
 +/*
 + * Copyright (c) 2023 NyanMisaka
 + *
@@ -4681,6 +4662,20 @@ Index: FFmpeg/libavfilter/rkrga_common.c
 +        goto fail;
 +    }
 +    out_frame->frame->crop_top = 0;
++    if ((in0_info->rotate_mode & 0x04) == 0x04 /* HAL_TRANSFORM_ROT_90 */ ||
++        (in0_info->rotate_mode & 0x07) == 0x07 /* HAL_TRANSFORM_ROT_270 */) {
++        av_reduce(&out_frame->frame->sample_aspect_ratio.den,
++                  &out_frame->frame->sample_aspect_ratio.num,
++                  (int64_t)in->sample_aspect_ratio.num * outlink->w * inlink->w,
++                  (int64_t)in->sample_aspect_ratio.den * outlink->h * inlink->h,
++                  INT_MAX);
++    } else {
++        av_reduce(&out_frame->frame->sample_aspect_ratio.num,
++                  &out_frame->frame->sample_aspect_ratio.den,
++                  (int64_t)in->sample_aspect_ratio.num * outlink->h * inlink->w,
++                  (int64_t)in->sample_aspect_ratio.den * outlink->w * inlink->h,
++                  INT_MAX);
++    }
 +
 +    if ((ret = av_hwframe_get_buffer(hw_frame_ctx, out_frame->frame, 0)) < 0) {
 +        av_log(ctx, AV_LOG_ERROR, "Cannot allocate an internal frame: %d\n", ret);
@@ -5522,8 +5517,6 @@ Index: FFmpeg/libavfilter/rkrga_common.c
 +
 +    return 0;
 +}
-Index: FFmpeg/libavfilter/rkrga_common.h
-===================================================================
 --- /dev/null
 +++ libavfilter/rkrga_common.h
 @@ -0,0 +1,131 @@
@@ -5658,8 +5651,6 @@ Index: FFmpeg/libavfilter/rkrga_common.h
 +                          AVFilterLink *inlink_pat, AVFrame *picref_pat);
 +
 +#endif /* AVFILTER_RKRGA_COMMON_H */
-Index: FFmpeg/libavfilter/vf_overlay_rkrga.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_overlay_rkrga.c
 @@ -0,0 +1,377 @@
@@ -6040,8 +6031,6 @@ Index: FFmpeg/libavfilter/vf_overlay_rkrga.c
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +    .flags          = AVFILTER_FLAG_HWDEVICE,
 +};
-Index: FFmpeg/libavfilter/vf_vpp_rkrga.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_vpp_rkrga.c
 @@ -0,0 +1,582 @@
@@ -6627,8 +6616,6 @@ Index: FFmpeg/libavfilter/vf_vpp_rkrga.c
 +};
 +
 +#endif
-Index: FFmpeg/libavutil/Makefile
-===================================================================
 --- libavutil/Makefile
 +++ libavutil/Makefile
 @@ -52,6 +52,7 @@ HEADERS = adler32.h
@@ -6655,8 +6642,6 @@ Index: FFmpeg/libavutil/Makefile
  
  TESTPROGS = adler32                                                     \
              aes                                                         \
-Index: FFmpeg/libavutil/hwcontext.c
-===================================================================
 --- libavutil/hwcontext.c
 +++ libavutil/hwcontext.c
 @@ -66,6 +66,9 @@ static const HWContextType * const hw_ta
@@ -6677,8 +6662,6 @@ Index: FFmpeg/libavutil/hwcontext.c
  };
  
  enum AVHWDeviceType av_hwdevice_find_type_by_name(const char *name)
-Index: FFmpeg/libavutil/hwcontext.h
-===================================================================
 --- libavutil/hwcontext.h
 +++ libavutil/hwcontext.h
 @@ -38,6 +38,7 @@ enum AVHWDeviceType {
@@ -6689,8 +6672,6 @@ Index: FFmpeg/libavutil/hwcontext.h
      AV_HWDEVICE_TYPE_NB,          ///< number of hw device types, not part of API/ABI.
  };
  
-Index: FFmpeg/libavutil/hwcontext_internal.h
-===================================================================
 --- libavutil/hwcontext_internal.h
 +++ libavutil/hwcontext_internal.h
 @@ -163,6 +163,7 @@ extern const HWContextType ff_hwcontext_
@@ -6701,8 +6682,6 @@ Index: FFmpeg/libavutil/hwcontext_internal.h
  
  typedef struct FFHWDeviceContext {
      /**
-Index: FFmpeg/libavutil/hwcontext_opencl.c
-===================================================================
 --- libavutil/hwcontext_opencl.c
 +++ libavutil/hwcontext_opencl.c
 @@ -83,6 +83,16 @@ typedef CL_API_ENTRY cl_mem(CL_API_CALL
@@ -6804,8 +6783,6 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
  
              region.origin = plane->offset;
              region.size   = image_desc.image_row_pitch *
-Index: FFmpeg/libavutil/hwcontext_rkmpp.c
-===================================================================
 --- /dev/null
 +++ libavutil/hwcontext_rkmpp.c
 @@ -0,0 +1,603 @@
@@ -7412,8 +7389,6 @@ Index: FFmpeg/libavutil/hwcontext_rkmpp.c
 +        AV_PIX_FMT_NONE
 +    },
 +};
-Index: FFmpeg/libavutil/hwcontext_rkmpp.h
-===================================================================
 --- /dev/null
 +++ libavutil/hwcontext_rkmpp.h
 @@ -0,0 +1,153 @@
@@ -7570,8 +7545,6 @@ Index: FFmpeg/libavutil/hwcontext_rkmpp.h
 +} AVRKMPPDeviceContext;
 +
 +#endif /* AVUTIL_HWCONTEXT_RKMPP_H */
-Index: FFmpeg/libavutil/pixdesc.c
-===================================================================
 --- libavutil/pixdesc.c
 +++ libavutil/pixdesc.c
 @@ -2791,6 +2791,30 @@ static const AVPixFmtDescriptor av_pix_f
@@ -7605,8 +7578,6 @@ Index: FFmpeg/libavutil/pixdesc.c
  };
  
  static const char * const color_range_names[] = {
-Index: FFmpeg/libavutil/pixfmt.h
-===================================================================
 --- libavutil/pixfmt.h
 +++ libavutil/pixfmt.h
 @@ -196,8 +196,8 @@ enum AVPixelFormat {
@@ -7638,8 +7609,6 @@ Index: FFmpeg/libavutil/pixfmt.h
  #define AV_PIX_FMT_AYUV64     AV_PIX_FMT_NE(AYUV64BE, AYUV64LE)
  #define AV_PIX_FMT_P010       AV_PIX_FMT_NE(P010BE,  P010LE)
  #define AV_PIX_FMT_P012       AV_PIX_FMT_NE(P012BE,  P012LE)
-Index: FFmpeg/libswscale/input.c
-===================================================================
 --- libswscale/input.c
 +++ libswscale/input.c
 @@ -793,6 +793,39 @@ static void nv21ToUV_c(uint8_t *dstU, ui
@@ -7704,8 +7673,6 @@ Index: FFmpeg/libswscale/input.c
      case AV_PIX_FMT_P010LE:
      case AV_PIX_FMT_P210LE:
      case AV_PIX_FMT_P410LE:
-Index: FFmpeg/libswscale/swscale_unscaled.c
-===================================================================
 --- libswscale/swscale_unscaled.c
 +++ libswscale/swscale_unscaled.c
 @@ -265,6 +265,61 @@ static int nv24ToYuv420Wrapper(SwsContex
@@ -7790,8 +7757,6 @@ Index: FFmpeg/libswscale/swscale_unscaled.c
      /* yuv2bgr */
      if ((srcFormat == AV_PIX_FMT_YUV420P || srcFormat == AV_PIX_FMT_YUV422P ||
           srcFormat == AV_PIX_FMT_YUVA420P) && isAnyRGB(dstFormat) &&
-Index: FFmpeg/libswscale/utils.c
-===================================================================
 --- libswscale/utils.c
 +++ libswscale/utils.c
 @@ -231,6 +231,8 @@ static const FormatEntry format_entries[
@@ -7803,8 +7768,6 @@ Index: FFmpeg/libswscale/utils.c
      [AV_PIX_FMT_P010LE]      = { 1, 1 },
      [AV_PIX_FMT_P010BE]      = { 1, 1 },
      [AV_PIX_FMT_P012LE]      = { 1, 1 },
-Index: FFmpeg/tests/ref/fate/imgutils
-===================================================================
 --- tests/ref/fate/imgutils
 +++ tests/ref/fate/imgutils
 @@ -269,6 +269,8 @@ p412be          planes: 2, linesizes: 12
@@ -7822,8 +7785,6 @@ Index: FFmpeg/tests/ref/fate/imgutils
  gbrap14le       total_size:  24576,  black_unknown_crc: 0x13bde353,  black_tv_crc: 0x13bde353,  black_pc_crc: 0x13bde353
 +nv15            total_size:   5760,  black_unknown_crc: 0x6b5fdb58,  black_tv_crc: 0x6b5fdb58,  black_pc_crc: 0x660a512c
 +nv20            total_size:   7680,  black_unknown_crc: 0x171f53da,  black_tv_crc: 0x171f53da,  black_pc_crc: 0xfcf5cda3
-Index: FFmpeg/tests/ref/fate/sws-pixdesc-query
-===================================================================
 --- tests/ref/fate/sws-pixdesc-query
 +++ tests/ref/fate/sws-pixdesc-query
 @@ -61,6 +61,8 @@ isNBPS:

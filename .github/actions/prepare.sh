@@ -30,10 +30,10 @@ set -o pipefail
 # ===========================================================================
 
 # ffmpeg versions to manage build order for
-ffmpeg_versions=(5 6 7)
+ffmpeg_versions=(5 6 7 8)
 
 # python minor versions to manage build order for
-python_versions=(310 311 312 313 314)
+python_versions=(311 312 314)
 
 # DSM versions above the default builds (6.2.4, 7.1) that require special handling.
 # Packages declaring REQUIRED_MIN_DSM equal to one of these will only be built

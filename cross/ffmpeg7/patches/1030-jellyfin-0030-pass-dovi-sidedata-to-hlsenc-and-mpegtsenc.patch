@@ -1,5 +1,3 @@
-Index: FFmpeg/libavformat/dovi_isom.c
-===================================================================
 --- libavformat/dovi_isom.c
 +++ libavformat/dovi_isom.c
 @@ -124,3 +124,74 @@ void ff_isom_put_dvcc_dvvc(void *logctx,
@@ -77,8 +75,6 @@ Index: FFmpeg/libavformat/dovi_isom.c
 +
 +    return 0;
 +}
-Index: FFmpeg/libavformat/dovi_isom.h
-===================================================================
 --- libavformat/dovi_isom.h
 +++ libavformat/dovi_isom.h
 @@ -33,4 +33,12 @@ int ff_isom_parse_dvcc_dvvc(void *logctx
@@ -94,8 +90,6 @@ Index: FFmpeg/libavformat/dovi_isom.h
 +                                 const AVCodecParameters *codec_par, int codec_tag);
 +
  #endif /* AVFORMAT_DOVI_ISOM_H */
-Index: FFmpeg/libavformat/hlsenc.c
-===================================================================
 --- libavformat/hlsenc.c
 +++ libavformat/hlsenc.c
 @@ -850,7 +850,7 @@ static int hls_mux_init(AVFormatContext
@@ -128,8 +122,6 @@ Index: FFmpeg/libavformat/hlsenc.c
          st->sample_aspect_ratio = vs->streams[i]->sample_aspect_ratio;
          st->time_base = vs->streams[i]->time_base;
          av_dict_copy(&st->metadata, vs->streams[i]->metadata, 0);
-Index: FFmpeg/libavformat/matroskaenc.c
-===================================================================
 --- libavformat/matroskaenc.c
 +++ libavformat/matroskaenc.c
 @@ -1724,7 +1724,8 @@ static void mkv_write_blockadditionmappi
@@ -142,8 +134,6 @@ Index: FFmpeg/libavformat/matroskaenc.c
          ebml_master mapping;
          uint8_t buf[ISOM_DVCC_DVVC_SIZE];
          uint32_t type;
-Index: FFmpeg/libavformat/movenc.c
-===================================================================
 --- libavformat/movenc.c
 +++ libavformat/movenc.c
 @@ -2809,7 +2809,9 @@ static int mov_write_video_tag(AVFormatC
@@ -173,8 +163,6 @@ Index: FFmpeg/libavformat/movenc.c
      { AV_CODEC_ID_AAC,             MKTAG('m', 'p', '4', 'a') },
      { AV_CODEC_ID_ALAC,            MKTAG('a', 'l', 'a', 'c') },
      { AV_CODEC_ID_MP4ALS,          MKTAG('m', 'p', '4', 'a') },
-Index: FFmpeg/libavformat/mpegtsenc.c
-===================================================================
 --- libavformat/mpegtsenc.c
 +++ libavformat/mpegtsenc.c
 @@ -23,6 +23,7 @@

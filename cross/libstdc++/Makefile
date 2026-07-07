@@ -37,7 +37,7 @@ PKG_DIST_ARCH = i386
 LIB_DIR = i386-linux-gnu
 endif
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: libstdc++6_install
 libstdc++6_install:

@@ -1,5 +1,3 @@
-Index: FFmpeg/fftools/ffmpeg_filter.c
-===================================================================
 --- fftools/ffmpeg_filter.c
 +++ fftools/ffmpeg_filter.c
 @@ -2651,7 +2651,8 @@ static void sub2video_heartbeat(InputFil
@@ -12,8 +10,6 @@ Index: FFmpeg/fftools/ffmpeg_filter.c
          sub2video_push_ref(ifp, pts2);
  }
  
-Index: FFmpeg/tests/ref/fate/filter-overlay-dvdsub-2397
-===================================================================
 --- tests/ref/fate/filter-overlay-dvdsub-2397
 +++ tests/ref/fate/filter-overlay-dvdsub-2397
 @@ -489,12 +489,12 @@
@@ -31,8 +27,6 @@ Index: FFmpeg/tests/ref/fate/filter-overlay-dvdsub-2397
  1,       3952,       3952,       10,     2013, 0x0e5db67e
  1,       3962,       3962,       10,     2013, 0xfc9baf97
  0,        119,        119,        1,   518400, 0x588534fc
-Index: FFmpeg/tests/ref/fate/sub2video
-===================================================================
 --- tests/ref/fate/sub2video
 +++ tests/ref/fate/sub2video
 @@ -68,8 +68,7 @@

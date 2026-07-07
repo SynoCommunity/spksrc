@@ -1,7 +1,7 @@
 PKG_NAME = x264
 PKG_VERS = 20250608-stable
 PKG_EXT = tar.gz
-PKG_GIT_HASH = b35605ace3ddf7c1a5d67a2eb553f034aef41d55
+PKG_GIT_HASH = 0480cb05fa188d37ae87e8f4fd8f1aea3711f7ee
 PKG_DIST_NAME = $(PKG_NAME)-master.$(PKG_EXT)
 PKG_DIST_SITE = https://code.videolan.org/videolan/x264/-/archive/$(PKG_GIT_HASH)
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)

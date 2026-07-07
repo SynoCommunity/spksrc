@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.native-meson.mk
+#
 # Build native Meson programs
 #
 # This makefile extends spksrc.native-cc.mk with Meson-specific functionality
@@ -5,6 +8,7 @@
 # prerequisites:
 # - native/module depends on meson + ninja
 #
+###############################################################################
 
 # Package dependent (same as native-cc.mk)
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -19,7 +23,6 @@ DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 # Setup common directories
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -32,13 +35,13 @@ CONFIGURE_TARGET = meson_configure_target
 endif
 
 # Load native environment before meson-specific configs
-include ../../mk/spksrc.native-env.mk
+include ../../mk/spksrc.native/env-default.mk
 
 # meson specific configurations
-include ../../mk/spksrc.native-meson-env.mk
+include ../../mk/spksrc.native/env-meson.mk
 
 # call-up ninja build process
-include ../../mk/spksrc.ninja.mk
+include ../../mk/spksrc.build/ninja.mk
 
 #####
 

@@ -25,7 +25,7 @@
 #  status      : echo status to logging facility
 #  patch       : normalize and patch extracted toolkit sources
 #  depend      : resolve and build toolkit dependencies (if any)
-#  tkvars      : generate tk_vars.mk for spksrc.cross-env.mk
+#  tkvars      : generate tk_vars.mk for spksrc.cross/env-default.mk
 #
 # Variables:
 #  TK_NAME           : Toolkit name (optional, used with generic archs)
@@ -74,13 +74,12 @@ endif
 #####
 
 # Common directories
-include ../../mk/spksrc.directories.mk
 
 ### Include common definitions
 include ../../mk/spksrc.common.mk
 
 ### Include common rules
-include ../../mk/spksrc.common-rules.mk
+include ../../mk/spksrc.rules.mk
 
 #####
 
@@ -118,29 +117,29 @@ endif
 
 #####
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/depend.mk
 
 include ../../mk/spksrc.toolkit/tk-base.mk
 include ../../mk/spksrc.toolkit/tk-flags.mk
 include ../../mk/spksrc.toolkit/tk-url.mk
 include ../../mk/spksrc.toolkit/tk-versions.mk
 
-include ../../mk/spksrc.status.mk
+include ../../mk/spksrc.rules/status.mk
 
 download:
-include ../../mk/spksrc.download.mk
+include ../../mk/spksrc.build/download.mk
 
 checksum: download
-include ../../mk/spksrc.checksum.mk
+include ../../mk/spksrc.build/checksum.mk
 
 extract: checksum
-include ../../mk/spksrc.extract.mk
+include ../../mk/spksrc.build/extract.mk
 
 normalize: extract
 include ../../mk/spksrc.toolkit/tk-normalize.mk
 
 patch: normalize
-include ../../mk/spksrc.patch.mk
+include ../../mk/spksrc.build/patch.mk
 
 include ../../mk/spksrc.toolkit/tk_vars.mk
 
@@ -177,6 +176,3 @@ $(TOOLKIT_COOKIE): $(POST_TOOLKIT_TARGET)
 else
 toolkit: ;
 endif
-
-### For make digests
-include ../../mk/spksrc.generate-digests.mk

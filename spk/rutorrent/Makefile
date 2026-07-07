@@ -1,10 +1,7 @@
 SPK_NAME = rutorrent
-SPK_VERS = 5.2.10
-SPK_REV = 22
+SPK_VERS = 5.3.1
+SPK_REV = 23
 SPK_ICON = src/rutorrent.png
-
-PYTHON_PACKAGE = python312
-WHEELS = src/requirements-pure.txt
 
 # libtorrent-rakshasa requires C++14 support
 REQUIRED_MIN_DSM = 7.0
@@ -15,7 +12,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = ruTorrent is a front-end for the popular Bittorrent client rTorrent. rTorrent is a BitTorrent client for ncurses, using the libtorrent library. The client and library is written in C++ with emphasis on speed and efficiency, while delivering equivalent features to those found in GUI based clients in an ncurses client.
 DISPLAY_NAME = ruTorrent
-CHANGELOG = "1. Upgrade ruTorrent to v5.2.10, rtorrent/libtorrent to v0.15.7. <br/>2. Improve stability and reduce package size."
+CHANGELOG = "1. Upgrade ruTorrent to v5.3.1. <br/>2. Upgrade rtorrent/libtorrent to v0.16.11. <br/>3. Migrate to PHP 8.4 on DSM 7.2+."
 
 HOMEPAGE = https://github.com/Novik/ruTorrent
 LICENSE = GPLv3
@@ -49,12 +46,13 @@ DEPENDS += cross/dumptorrent cross/rtorrent cross/rutorrent cross/sox cross/unzi
 include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
-# Default to PHP 8.2 on DSM 7.2+ (PHP 8.0 not supported)
-SPK_DEPENDS = "WebStation:PHP8.2:Apache2.4:${PYTHON_PACKAGE}:mediainfo"
+# Default to PHP 8.4 on DSM 7.2+ (PHP 8.0 not supported)
+TC_OS_MIN_VER = 7.2-60096
+SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4:python314:mediainfo"
 CONF_DIR = src/conf_72
 else
 # Default to PHP 8.0 on DSM 7.0/7.1
-SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4:${PYTHON_PACKAGE}:mediainfo"
+SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4:python314:mediainfo"
 OS_MAX_VER = 7.1-59999
 CONF_DIR = src/conf_7
 endif
@@ -67,3 +65,5 @@ include ../../mk/spksrc.spk.mk
 rutorrent_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var/.session $(STAGING_DIR)/tmp
 	install -m 644 src/rtorrent.rc $(STAGING_DIR)/var/rtorrent.rc
+	install -m 755 -d $(STAGING_DIR)/share/wheelhouse
+	install -m 644 src/requirements.txt $(STAGING_DIR)/share/wheelhouse/requirements.txt

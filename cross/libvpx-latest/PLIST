@@ -1,0 +1,4 @@
+lnk:lib/libvpx.so
+lnk:lib/libvpx.so.12
+lnk:lib/libvpx.so.12.0
+lib:lib/libvpx.so.12.0.0
