@@ -110,7 +110,7 @@ CHANGELOG  = "1. Update dos2unix from v7.5.3 to v7.5.6. <br/>"
 CHANGELOG += "2. Update fd from v10.3.0 to v10.4.2 (except qoriq arch). <br/>"
 CHANGELOG += "3. Update file from v5.46 to v5.48. <br/>"
 CHANGELOG += "4. Update fzf from v0.67.0 to v0.73.1. <br/>"
-CHANGELOG += "5. Update less from v685 to v692. <br/>"
+CHANGELOG += "5. Update less from v685 to v704. <br/>"
 CHANGELOG += "6. Update lzip from 1.25 to v1.26 and plzip from v1.12 to v1.13. <br/>"
 CHANGELOG += "7. Update micro from v2.0.14 to v2.0.15. <br/>"
 CHANGELOG += "8. Update nano from v8.7 to v9.0. <br/>"
@@ -124,7 +124,7 @@ SERVICE_SETUP = src/service-setup.sh
 HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
 LICENSE  = Each tool is licensed under it's respective license.
 
-SPK_COMMANDS  = bin/less bin/lessecho bin/lesskey
+SPK_COMMANDS  = bin/less libexec/lessecho bin/lesskey
 SPK_COMMANDS += bin/tree
 SPK_COMMANDS += bin/jdupes
 SPK_COMMANDS += bin/mc bin/mcdiff bin/mcview bin/mcedit
