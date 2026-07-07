@@ -12,4 +12,10 @@ HOMEPAGE = https://github.com/Haivision/srt
 COMMENT  = Secure Reliable Transport (SRT) is a transport protocol for ultra low (sub-second) latency live video and audio streaming, as well as for generic bulk data transfer1. SRT is available as an open-source technology with the code on GitHub, a published Internet Draft, and a growing community of SRT users.
 LICENSE  = MPLv2.0 License
 
+include ../../mk/spksrc.common.mk
+
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+PLIST_TRANSFORM = sed -e '/bin\/srt-file-transmit/d' -e '/bin\/srt-tunnel/d'
+endif
+
 include ../../mk/spksrc.cross-cmake.mk
