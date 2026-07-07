@@ -304,7 +304,7 @@ CONFIGURE_ARGS += --enable-libmfx
 
 # Enable OpenCL and Vulkan acceleration
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
-CONFIGURE_ARGS += --enable-libglslang
+#CONFIGURE_ARGS += --enable-libglslang <<-- Uses older API
 CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
