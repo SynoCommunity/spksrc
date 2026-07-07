@@ -14,4 +14,4 @@ else
 DEPENDS = cross/sd-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

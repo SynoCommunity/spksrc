@@ -23,4 +23,4 @@ else
 DEPENDS = cross/fd-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk
