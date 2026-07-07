@@ -41,6 +41,9 @@ theme:
 extra_css:
   - stylesheets/custom.css
 
+exclude_docs: |
+  packages/_template.md
+
 plugins:
   - search
   - tags
@@ -158,68 +161,70 @@ nav:
     - reference/index.md
     - Architectures: reference/architectures.md
     - Model ↔ Architecture: reference/model-architecture.md
-    - Ports: reference/ports.md
+    - System Ports: reference/system-ports.md
+    - Package Ports: reference/package-ports.md
     - Macros: reference/macros.md
     - Makefile Reference: reference/makefile-reference.md
     - Permissions: reference/permissions.md
     - DSM APIs: reference/dsm-apis.md
   - Packages:
     - packages/index.md
-    - DSM Utilities: packages/dsm-utilities.md
     - Media:
       - FFmpeg: packages/ffmpeg.md
       - Jellyfin: packages/jellyfin.md
       - Navidrome: packages/navidrome.md
+      - Loom: packages/loom.md
     - Downloads:
-      - Transmission: packages/transmission.md
-      - ruTorrent: packages/rutorrent.md
-      - Deluge: packages/deluge.md
       - Aria2: packages/aria2.md
+      - Deluge: packages/deluge.md
+      - ruTorrent: packages/rutorrent.md
+      - Transmission: packages/transmission.md
     - Home Automation:
       - Home Assistant: packages/homeassistant.md
       - Mosquitto: packages/mosquitto.md
     - File Management:
-      - Syncthing: packages/syncthing.md
-      - ownCloud: packages/owncloud.md
-      - Rclone: packages/rclone.md
       - BorgBackup: packages/borgbackup.md
       - Borgmatic: packages/borgmatic.md
       - Duplicity: packages/duplicity.md
+      - ownCloud: packages/owncloud.md
+      - Rclone: packages/rclone.md
+      - Syncthing: packages/syncthing.md
     - Network & Security:
-      - Vaultwarden: packages/vaultwarden.md
-      - DNSCrypt Proxy: packages/dnscrypt-proxy.md
-      - Cloudflared: packages/cloudflared.md
       - AdGuard Home: packages/adguardhome.md
+      - Cloudflared: packages/cloudflared.md
+      - DNSCrypt Proxy: packages/dnscrypt-proxy.md
       - Mosh: packages/mosh.md
+      - Vaultwarden: packages/vaultwarden.md
     - Arr Stack:
       - Radarr/Sonarr: packages/radarr-sonarr.md
     - Development:
       - Git: packages/git.md
       - Mono: packages/mono.md
     - CLI Tools:
-      - SynoCli Kernel: packages/synocli-kernel.md
-      - SynoCli Net: packages/synocli-net.md
-      - SynoCli File: packages/synocli-file.md
-      - SynoCli Disk: packages/synocli-disk.md
-      - SynoCli Monitor: packages/synocli-monitor.md
-      - SynoCli Misc: packages/synocli-misc.md
       - SynoCli Devel: packages/synocli-devel.md
+      - SynoCli Disk: packages/synocli-disk.md
+      - SynoCli File: packages/synocli-file.md
+      - SynoCli Kernel: packages/synocli-kernel.md
+      - SynoCli Misc: packages/synocli-misc.md
+      - SynoCli Monitor: packages/synocli-monitor.md
+      - SynoCli Net: packages/synocli-net.md
       - SynoCli VideoDriver: packages/synocli-videodriver.md
       - SynoKernel USB Serial: packages/synokernel-usbserial.md
     - Other:
-      - MinIO: packages/minio.md
-      - Salt: packages/salt.md
-      - Beets: packages/beets.md
-      - Flexget: packages/flexget.md
-      - Kiwix: packages/kiwix.md
-      - Google Authenticator: packages/google-authenticator.md
-      - Mozilla Sync: packages/mozilla-sync.md
       - Adminer: packages/adminer.md
+      - Beets: packages/beets.md
       - BicBucStriim: packages/bicbucstriim.md
       - Comskip: packages/comskip.md
+      - DSM Utilities: packages/dsm-utilities.md
       - File Browser: packages/file-browser.md
+      - Flexget: packages/flexget.md
+      - Google Authenticator: packages/google-authenticator.md
+      - Kiwix: packages/kiwix.md
+      - MinIO: packages/minio.md
+      - Mozilla Sync: packages/mozilla-sync.md
       - Node Exporter: packages/node-exporter.md
       - OpenList: packages/openlist.md
+      - Salt: packages/salt.md
     - Archived:
       - SickBeard Custom: packages/sickbeard-custom.md
   - Contributing:

@@ -8,305 +8,149 @@ tags:
 
 # Package Catalog
 
-SynoCommunity provides a wide variety of open-source packages for Synology NAS devices. Browse by category or search for specific packages.
+SynoCommunity provides a wide variety of open-source packages for Synology NAS devices.
 
 Packages with detailed documentation are linked below. For packages without dedicated pages, see the [spksrc repository](https://github.com/SynoCommunity/spksrc/tree/master/spk) for package sources.
 
-## Highlighted Packages
+## Documented Packages
 
-These packages have detailed documentation available:
+<p>
+  <label>Category:
+    <select id="pkgCatFilter" onchange="filterPkgTable()">
+      <option value="">All</option>
+      <option value="Backup">Backup</option>
+      <option value="CLI">CLI</option>
+      <option value="Development">Development</option>
+      <option value="Downloads">Downloads</option>
+      <option value="Home Automation">Home Automation</option>
+      <option value="Kernel">Kernel</option>
+      <option value="Media">Media</option>
+      <option value="Media Management">Media Management</option>
+      <option value="Media Server">Media Server</option>
+      <option value="Monitoring">Monitoring</option>
+      <option value="Network">Network</option>
+      <option value="Runtime">Runtime</option>
+      <option value="Security">Security</option>
+      <option value="Storage">Storage</option>
+      <option value="Sync">Sync</option>
+      <option value="Utilities">Utilities</option>
+      <option value="Web Apps">Web Apps</option>
+    </select>
+  </label>
+  &nbsp;
+  <input id="pkgSearch" type="text" placeholder="Search package…" oninput="filterPkgTable()" size="30">
+</p>
 
-### Media
+<table id="pkgTable" markdown="0">
+  <thead>
+    <tr><th>Package</th><th>Category</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr data-category="Network"><td><a href="adguardhome.md">AdGuard Home</a></td><td>Network</td><td>Network-wide ad blocking</td></tr>
+    <tr data-category="Web Apps"><td><a href="adminer.md">Adminer</a></td><td>Web Apps</td><td>Database management</td></tr>
+    <tr data-category="Downloads"><td><a href="aria2.md">Aria2</a></td><td>Downloads</td><td>Multi-protocol download utility</td></tr>
+    <tr data-category="Media"><td><a href="beets.md">Beets</a></td><td>Media</td><td>Music library management</td></tr>
+    <tr data-category="Web Apps"><td><a href="bicbucstriim.md">BicBucStriim</a></td><td>Web Apps</td><td>eBook server</td></tr>
+    <tr data-category="Backup"><td><a href="borgbackup.md">BorgBackup</a></td><td>Backup</td><td>Deduplicating backup</td></tr>
+    <tr data-category="Backup"><td><a href="borgmatic.md">Borgmatic</a></td><td>Backup</td><td>BorgBackup automation</td></tr>
+    <tr data-category="Network"><td><a href="cloudflared.md">Cloudflared</a></td><td>Network</td><td>Cloudflare Tunnel client</td></tr>
+    <tr data-category="Media"><td><a href="comskip.md">Comskip</a></td><td>Media</td><td>Commercial detector for recorded TV</td></tr>
+    <tr data-category="Downloads"><td><a href="deluge.md">Deluge</a></td><td>Downloads</td><td>Feature-rich BitTorrent client</td></tr>
+    <tr data-category="Network"><td><a href="dnscrypt-proxy.md">DNSCrypt Proxy</a></td><td>Network</td><td>DNS encryption proxy</td></tr>
+    <tr data-category="Utilities"><td><a href="dsm-utilities.md">DSM Utilities</a></td><td>Utilities</td><td>Helpful DSM configuration for packages</td></tr>
+    <tr data-category="Backup"><td><a href="duplicity.md">Duplicity</a></td><td>Backup</td><td>Encrypted bandwidth-efficient backup</td></tr>
+    <tr data-category="Media"><td><a href="ffmpeg.md">FFmpeg</a></td><td>Media</td><td>Complete multimedia framework</td></tr>
+    <tr data-category="Web Apps"><td><a href="file-browser.md">File Browser</a></td><td>Web Apps</td><td>Web file browser</td></tr>
+    <tr data-category="Media Management"><td><a href="flexget.md">Flexget</a></td><td>Media Management</td><td>Multipurpose automation</td></tr>
+    <tr data-category="Development"><td><a href="git.md">Git</a></td><td>Development</td><td>Version control system</td></tr>
+    <tr data-category="Security"><td><a href="google-authenticator.md">Google Authenticator</a></td><td>Security</td><td>PAM module for two-factor authentication</td></tr>
+    <tr data-category="Home Automation"><td><a href="homeassistant.md">Home Assistant</a></td><td>Home Automation</td><td>Home automation platform</td></tr>
+    <tr data-category="Media Server"><td><a href="jellyfin.md">Jellyfin</a></td><td>Media Server</td><td>Media streaming server</td></tr>
+    <tr data-category="Media Server"><td><a href="kiwix.md">Kiwix</a></td><td>Media Server</td><td>Offline Wikipedia and content server</td></tr>
+    <tr data-category="Media Server"><td><a href="loom.md">Loom</a></td><td>Media Server</td><td>Federated and encrypted live streaming</td></tr>
+    <tr data-category="Storage"><td><a href="minio.md">MinIO</a></td><td>Storage</td><td>S3-compatible object storage</td></tr>
+    <tr data-category="Runtime"><td><a href="mono.md">Mono</a></td><td>Runtime</td><td>.NET runtime</td></tr>
+    <tr data-category="CLI"><td><a href="mosh.md">Mosh</a></td><td>CLI</td><td>Mobile shell for intermittent connectivity</td></tr>
+    <tr data-category="Home Automation"><td><a href="mosquitto.md">Mosquitto</a></td><td>Home Automation</td><td>MQTT message broker</td></tr>
+    <tr data-category="Web Apps"><td><a href="mozilla-sync.md">Mozilla Sync</a></td><td>Web Apps</td><td>Firefox Sync server</td></tr>
+    <tr data-category="Media Server"><td><a href="navidrome.md">Navidrome</a></td><td>Media Server</td><td>Music streaming server</td></tr>
+    <tr data-category="Monitoring"><td><a href="node-exporter.md">Node Exporter</a></td><td>Monitoring</td><td>Prometheus metrics exporter</td></tr>
+    <tr data-category="Web Apps"><td><a href="openlist.md">OpenList</a></td><td>Web Apps</td><td>Web bookmark management</td></tr>
+    <tr data-category="Web Apps"><td><a href="owncloud.md">ownCloud</a></td><td>Web Apps</td><td>File sync and share platform</td></tr>
+    <tr data-category="Media Management"><td><a href="radarr-sonarr.md">Radarr/Sonarr</a></td><td>Media Management</td><td>Movie &amp; TV series management</td></tr>
+    <tr data-category="Backup"><td><a href="rclone.md">Rclone</a></td><td>Backup</td><td>Cloud storage sync tool</td></tr>
+    <tr data-category="Downloads"><td><a href="rutorrent.md">ruTorrent</a></td><td>Downloads</td><td>Web-based BitTorrent client</td></tr>
+    <tr data-category="Automation"><td><a href="salt.md">Salt</a></td><td>Automation</td><td>Infrastructure automation</td></tr>
+    <tr data-category="Media Management"><td><a href="sickbeard-custom.md">SickBeard Custom</a></td><td>Media Management</td><td>SickBeard fork selector (archived)</td></tr>
+    <tr data-category="Sync"><td><a href="syncthing.md">Syncthing</a></td><td>Sync</td><td>Continuous file synchronization</td></tr>
+    <tr data-category="CLI"><td><a href="synocli-devel.md">SynoCli Devel</a></td><td>CLI</td><td>Development tools</td></tr>
+    <tr data-category="CLI"><td><a href="synocli-disk.md">SynoCli Disk</a></td><td>CLI</td><td>Disk utilities</td></tr>
+    <tr data-category="CLI"><td><a href="synocli-file.md">SynoCli File</a></td><td>CLI</td><td>File management tools</td></tr>
+    <tr data-category="CLI"><td><a href="synocli-kernel.md">SynoCli Kernel</a></td><td>CLI</td><td>Kernel module management</td></tr>
+    <tr data-category="CLI"><td><a href="synocli-misc.md">SynoCli Misc</a></td><td>CLI</td><td>Miscellaneous utilities</td></tr>
+    <tr data-category="CLI"><td><a href="synocli-monitor.md">SynoCli Monitor</a></td><td>CLI</td><td>System monitoring tools</td></tr>
+    <tr data-category="CLI"><td><a href="synocli-net.md">SynoCli Net</a></td><td>CLI</td><td>Network utilities</td></tr>
+    <tr data-category="CLI"><td><a href="synocli-videodriver.md">SynoCli VideoDriver</a></td><td>CLI</td><td>Intel GPU drivers for hardware transcoding</td></tr>
+    <tr data-category="Kernel"><td><a href="synokernel-usbserial.md">SynoKernel USB Serial</a></td><td>Kernel</td><td>USB serial adapter drivers</td></tr>
+    <tr data-category="Downloads"><td><a href="transmission.md">Transmission</a></td><td>Downloads</td><td>Lightweight BitTorrent client</td></tr>
+    <tr data-category="Security"><td><a href="vaultwarden.md">Vaultwarden</a></td><td>Security</td><td>Bitwarden-compatible password manager</td></tr>
+  </tbody>
+</table>
 
-| Package | Description |
-|---------|-------------|
-| [FFmpeg](ffmpeg.md) | Complete multimedia framework |
-| [Jellyfin](jellyfin.md) | Media streaming server |
-| [Navidrome](navidrome.md) | Music streaming server |
-| [Comskip](comskip.md) | Commercial detector for recorded TV |
+<script>
+function filterPkgTable() {
+  var f = document.getElementById('pkgCatFilter').value;
+  var q = document.getElementById('pkgSearch').value.toLowerCase();
+  document.querySelectorAll('#pkgTable tbody tr').forEach(function (r) {
+    var okCat = !f || r.getAttribute('data-category') === f;
+    var okText = !q || r.textContent.toLowerCase().indexOf(q) >= 0;
+    r.style.display = okCat && okText ? '' : 'none';
+  });
+}
+</script>
+| [Adminer](adminer.md) | Web Apps | Database management |
+| [Aria2](aria2.md) | Downloads | Multi-protocol download utility |
+| [Beets](beets.md) | Media | Music library management |
+| [BorgBackup](borgbackup.md) | Backup | Deduplicating backup |
+| [Borgmatic](borgmatic.md) | Backup | BorgBackup automation |
+| [Cloudflared](cloudflared.md) | Network | Cloudflare Tunnel client |
+| [Comskip](comskip.md) | Media | Commercial detector for recorded TV |
+| [Deluge](deluge.md) | Downloads | Feature-rich BitTorrent client |
+| [DNSCrypt Proxy](dnscrypt-proxy.md) | Network | DNS encryption proxy |
+| [DSM Utilities](dsm-utilities.md) | Utilities | Helpful DSM configuration for packages |
+| [Duplicity](duplicity.md) | Backup | Encrypted bandwidth-efficient backup |
+| [FFmpeg](ffmpeg.md) | Media | Complete multimedia framework |
+| [File Browser](file-browser.md) | Web Apps | Web file browser |
+| [Flexget](flexget.md) | Media Management | Multipurpose automation |
+| [Git](git.md) | Development | Version control system |
+| [Google Authenticator](google-authenticator.md) | Security | PAM module for two-factor authentication |
+| [Home Assistant](homeassistant.md) | Home Automation | Home automation platform |
+| [Jellyfin](jellyfin.md) | Media Server | Media streaming server |
+| [Kiwix](kiwix.md) | Media Server | Offline Wikipedia and content server |
+| [Loom](loom.md) | Media Server | Federated and encrypted live streaming |
+| [MinIO](minio.md) | Storage | S3-compatible object storage |
+| [Mono](mono.md) | Runtime | .NET runtime |
+| [Mosh](mosh.md) | CLI | Mobile shell for intermittent connectivity |
+| [Mosquitto](mosquitto.md) | Home Automation | MQTT message broker |
+| [Mozilla Sync](mozilla-sync.md) | Web Apps | Firefox Sync server |
+| [Navidrome](navidrome.md) | Media Server | Music streaming server |
+| [Node Exporter](node-exporter.md) | Monitoring | Prometheus metrics exporter |
+| [ownCloud](owncloud.md) | Web Apps | File sync and share platform |
+| [Rclone](rclone.md) | Backup | Cloud storage sync tool |
+| [ruTorrent](rutorrent.md) | Downloads | Web-based BitTorrent client |
+| [Salt](salt.md) | Automation | Infrastructure automation |
+| [SickBeard Custom](sickbeard-custom.md) | Media Management | SickBeard fork selector (archived) |
+| [SynoCli Devel](synocli-devel.md) | CLI | Development tools |
+| [SynoCli Disk](synocli-disk.md) | CLI | Disk utilities |
+| [SynoCli File](synocli-file.md) | CLI | File management tools |
+| [SynoCli Kernel](synocli-kernel.md) | CLI | Kernel module management |
+| [SynoCli Misc](synocli-misc.md) | CLI | Miscellaneous utilities |
+| [SynoCli Monitor](synocli-monitor.md) | CLI | System monitoring tools |
+| [SynoCli Net](synocli-net.md) | CLI | Network utilities |
+| [SynoCli VideoDriver](synocli-videodriver.md) | CLI | Intel GPU drivers for hardware transcoding |
+| [SynoKernel USB Serial](synokernel-usbserial.md) | Kernel | USB serial adapter drivers |
+| [Syncthing](syncthing.md) | Sync | Continuous file synchronization |
+| [Transmission](transmission.md) | Downloads | Lightweight BitTorrent client |
+| [Vaultwarden](vaultwarden.md) | Security | Bitwarden-compatible password manager |
 
-### Download Clients
-
-| Package | Description |
-|---------|-------------|
-| [Transmission](transmission.md) | Lightweight BitTorrent client |
-| [ruTorrent](rutorrent.md) | Web-based BitTorrent client |
-| [Deluge](deluge.md) | Feature-rich BitTorrent client |
-| [Aria2](aria2.md) | Multi-protocol download utility |
-
-### Home Automation
-
-| Package | Description |
-|---------|-------------|
-| [Home Assistant](homeassistant.md) | Home automation platform |
-| [Mosquitto](mosquitto.md) | MQTT message broker |
-
-### File Management & Backup
-
-| Package | Description |
-|---------|-------------|
-| [Syncthing](syncthing.md) | Continuous file synchronization |
-| [ownCloud](owncloud.md) | File sync and share platform |
-| [Rclone](rclone.md) | Cloud storage sync tool |
-| [BorgBackup](borgbackup.md) | Deduplicating backup |
-| [Borgmatic](borgmatic.md) | BorgBackup automation |
-| [Duplicity](duplicity.md) | Encrypted bandwidth-efficient backup |
-
-### Network & Security
-
-| Package | Description |
-|---------|-------------|
-| [Vaultwarden](vaultwarden.md) | Bitwarden-compatible password manager |
-| [DNSCrypt Proxy](dnscrypt-proxy.md) | DNS encryption proxy |
-| [Cloudflared](cloudflared.md) | Cloudflare Tunnel client |
-| [AdGuard Home](adguardhome.md) | Network-wide ad blocking |
-| [Mosh](mosh.md) | Mobile shell for intermittent connectivity |
-
-### Media Management (Arr Stack)
-
-| Package | Description |
-|---------|-------------|
-| [Radarr/Sonarr](radarr-sonarr.md) | Movie & TV series management |
-| [Beets](beets.md) | Music library management |
-| [Flexget](flexget.md) | Multipurpose automation |
-
-### Development
-
-| Package | Description |
-|---------|-------------|
-| [Git](git.md) | Version control system |
-| [Mono](mono.md) | .NET runtime |
-| [Google Authenticator](google-authenticator.md) | PAM module for 2FA |
-
-### Storage & Databases
-
-| Package | Description |
-|---------|-------------|
-| [MinIO](minio.md) | S3-compatible object storage |
-| [Mozilla Sync](mozilla-sync.md) | Firefox Sync server |
-| [Salt](salt.md) | Infrastructure automation |
-
-### Offline Content
-
-| Package | Description |
-|---------|-------------|
-| [Kiwix](kiwix.md) | Offline Wikipedia and content server |
-
-### CLI Tools
-
-| Package | Description |
-|---------|-------------|
-| [SynoCli Kernel](synocli-kernel.md) | Kernel module management |
-| [SynoCli Net](synocli-net.md) | Network utilities |
-| [SynoCli File](synocli-file.md) | File management tools |
-| [SynoCli Disk](synocli-disk.md) | Disk utilities |
-| [SynoCli Monitor](synocli-monitor.md) | System monitoring tools |
-| [SynoCli Misc](synocli-misc.md) | Miscellaneous utilities |
-| [SynoCli Devel](synocli-devel.md) | Development tools |
-| [SynoCli VideoDriver](synocli-videodriver.md) | Intel GPU drivers for hardware transcoding |
-| [SynoKernel USB Serial](synokernel-usbserial.md) | USB serial adapter drivers |
-
-### Other Documented Packages
-
-| Package | Description |
-|---------|-------------|
-| [DSM Utilities](dsm-utilities.md) | Helpful DSM configuration for packages |
-| [Adminer](adminer.md) | Database management |
-| [File Browser](file-browser.md) | Web file browser |
-| [Node Exporter](node-exporter.md) | Prometheus metrics exporter |
-
-### Archived
-
-These packages are no longer built or published (see the [Package Lifecycle Policy](../contributing/package-lifecycle.md)):
-
-| Package | Description |
-|---------|-------------|
-| [SickBeard Custom](sickbeard-custom.md) | SickBeard fork selector |
-
-## All Packages
-
-The following is a complete list of all 183+ packages available in the SynoCommunity repository. Packages are listed by their SPK name.
-
-??? info "Complete Package List (click to expand)"
-
-    | Package | Category |
-    |---------|----------|
-    | adminer | Web Apps |
-    | adguardhome | Network |
-    | aria2 | Downloads |
-    | ariang | Downloads |
-    | autoconf | Development |
-    | automake | Development |
-    | bash | CLI |
-    | bazarr | Media Management |
-    | beets | Media |
-    | bicbucstriim | Web Apps |
-    | borgbackup | Backup |
-    | borgmatic | Backup |
-    | bottom | CLI |
-    | byobu | CLI |
-    | cherokee | Web Server |
-    | chromaprint | Media |
-    | clamav | Security |
-    | cloudflared | Network |
-    | cloudsync | Utilities |
-    | comskip | Media |
-    | cops | Web Apps |
-    | couchpotatoserver | Media Management |
-    | couchpotatoserver-custom | Media Management |
-    | curaengine | 3D Printing |
-    | deluge | Downloads |
-    | demoservice | Development |
-    | denyhost | Security |
-    | dnscrypt-proxy | Network |
-    | docker | Containers |
-    | docker-compose | Containers |
-    | domoticz | Home Automation |
-    | dotnet | Runtime |
-    | duplicity | Backup |
-    | duperemove | Utilities |
-    | emby | Media Server |
-    | erlang | Runtime |
-    | eza | CLI |
-    | fd | CLI |
-    | fengoffice | Web Apps |
-    | ffmpeg4 | Media |
-    | ffmpeg5 | Media |
-    | ffmpeg6 | Media |
-    | ffmpeg7 | Media |
-    | file-browser | Web Apps |
-    | fish | CLI |
-    | flexget | Media Management |
-    | fossil-scm | Development |
-    | fuse3 | Utilities |
-    | garage | Storage |
-    | gateone | Web Apps |
-    | gentoo-chroot | Development |
-    | ghostscript | Media |
-    | git | Development |
-    | gitea | Development |
-    | gnupg | Security |
-    | go | Runtime |
-    | gpac | Media |
-    | haproxy | Network |
-    | headphones | Media Management |
-    | headphones-custom | Media Management |
-    | homeassistant | Home Automation |
-    | homebridge | Home Automation |
-    | htpcmanager | Media Management |
-    | icecast | Media Server |
-    | imagemagick | Media |
-    | inotify-tools | Utilities |
-    | itools | Utilities |
-    | jackett | Media Management |
-    | java-17-openjdk | Runtime |
-    | java-21-openjdk | Runtime |
-    | jellyfin | Media Server |
-    | kavita | Media Server |
-    | kiwix | Media Server |
-    | lazylibrarian | Media Management |
-    | less | CLI |
-    | lidarr | Media Management |
-    | links | CLI |
-    | liquidsoap | Media |
-    | logitechmediaserver | Media Server |
-    | mantisbt | Web Apps |
-    | mc | CLI |
-    | mediainfo | Media |
-    | meilisearch | Search |
-    | memcached | Database |
-    | minio | Storage |
-    | mkvtoolnix | Media |
-    | mono | Runtime |
-    | mosh | CLI |
-    | mosquitto | Home Automation |
-    | mpd | Media Server |
-    | mylar | Media Management |
-    | mympd | Media Server |
-    | nanobox | Utilities |
-    | navidrome | Media Server |
-    | neovim | CLI |
-    | nginx | Web Server |
-    | nnn | CLI |
-    | node | Runtime |
-    | node-exporter | Monitoring |
-    | nzbget | Downloads |
-    | nzbhydra | Downloads |
-    | nzbmegasearch | Downloads |
-    | octoprint | 3D Printing |
-    | ombi | Media Management |
-    | openlist | Web Apps |
-    | openssl3 | Security |
-    | oscam | Utilities |
-    | owncloud | Web Apps |
-    | php | Runtime |
-    | pigpio | Hardware |
-    | plexpy | Media |
-    | prowlarr | Media Management |
-    | prusa-slicer | 3D Printing |
-    | ps3netsrv | Media Server |
-    | pyload | Downloads |
-    | python311 | Runtime |
-    | python312 | Runtime |
-    | qbittorrent | Downloads |
-    | rabbitmq | Messaging |
-    | radarr | Media Management |
-    | readarr | Media Management |
-    | rclone | Backup |
-    | redis | Database |
-    | restic | Backup |
-    | roundcube | Web Apps |
-    | rsnapshot | Backup |
-    | rustdesk-server | Remote Access |
-    | rutorrent | Downloads |
-    | sabnzbd | Downloads |
-    | salt-master | Automation |
-    | salt-minion | Automation |
-    | saltpad | Automation |
-    | screen | CLI |
-    | seerr | Media Management |
-    | selfoss | Web Apps |
-    | shairport-sync | Media Server |
-    | sickchill | Media Management |
-    | sickrage | Media Management |
-    | sonarr | Media Management |
-    | sonarr3 | Media Management |
-    | squid | Network |
-    | squidguard | Network |
-    | stash | Web Apps |
-    | stockfish | Games |
-    | subliminal | Media Management |
-    | synapse | Communication |
-    | syncthing | Sync |
-    | syno-magnet | Downloads |
-    | synocli-devel | CLI |
-    | synocli-disk | CLI |
-    | synocli-dns | CLI |
-    | synocli-file | CLI |
-    | synocli-kernel | CLI |
-    | synocli-misc | CLI |
-    | synocli-monitor | CLI |
-    | synocli-net | CLI |
-    | synocli-videodriver | CLI |
-    | synokernel-linuxtv | Kernel |
-    | synokernel-usbserial | Kernel |
-    | tailscale | Network |
-    | tcl | Runtime |
-    | textpattern | Web Apps |
-    | timewarrior | CLI |
-    | tmux | CLI |
-    | transmission | Downloads |
-    | tt-rss | Web Apps |
-    | tvheadend | Media Server |
-    | unison | Sync |
-    | urbackup-server | Backup |
-    | vaultwarden | Security |
-    | vim | CLI |
-    | wallabag | Web Apps |
-    | webstation | Web Server |
-    | wireshark | Network |
-    | ympd | Media Server |
-    | znc | Communication |
-    | zsh | CLI |
-
-For the most up-to-date list of packages, visit the [SynoCommunity Package Repository](https://packages.synocommunity.com/).
+For the most up-to-date list of packages, visit [synocommunity.com/packages](https://synocommunity.com/packages).

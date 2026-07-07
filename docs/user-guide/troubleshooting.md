@@ -121,7 +121,7 @@ sudo servicetool --remove-configure-file --package [Package_Name].sc
     - Via Package Center: Stop, then Start
     - Via SSH: `synopkg restart <package-name>`
 
-4. Check for port conflicts (see [Ports](../reference/ports.md))
+4. Check for port conflicts (see [Ports](../reference/system-ports.md))
 
 ### "Failed to Start" After DSM Update
 
