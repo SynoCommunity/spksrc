@@ -1,5 +1,5 @@
 SPK_NAME = fzf
-SPK_VERS = 0.72.0
+SPK_VERS = 0.73.1
 SPK_REV = 1
 SPK_ICON = src/fzf.png
 
