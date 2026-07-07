@@ -46,10 +46,20 @@ CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 # ARCH specific
 OPTIONAL_DEPENDS  = cross/openh264
 OPTIONAL_DEPENDS += cross/libaom
+OPTIONAL_DEPENDS += cross/svt-hevc
 # GCC specific
+OPTIONAL_DEPENDS += cross/chromaprint-fftw
+OPTIONAL_DEPENDS += cross/dav1d
 OPTIONAL_DEPENDS += cross/frei0r
+OPTIONAL_DEPENDS += cross/libass
+OPTIONAL_DEPENDS += cross/librabbitmq
+OPTIONAL_DEPENDS += cross/librist
+OPTIONAL_DEPENDS += cross/libvmaf_1.5
+OPTIONAL_DEPENDS += cross/libvmaf_2.3
+OPTIONAL_DEPENDS += cross/libzimg
 OPTIONAL_DEPENDS += cross/rubberband
-OPTIONAL_DEPENDS += cross/libvmaf
+OPTIONAL_DEPENDS += cross/shine
+OPTIONAL_DEPENDS += cross/snappy
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
@@ -99,7 +109,7 @@ endif
 DEPENDS += cross/codec2
 CONFIGURE_ARGS += --enable-libcodec2
 
-DEP--disable-asmENDS += cross/libdc1394
+DEPENDS += cross/libdc1394
 CONFIGURE_ARGS += --enable-libdc1394
 
 DEPENDS += cross/fontconfig
@@ -154,10 +164,8 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/speex
 CONFIGURE_ARGS += --enable-libspeex
 
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
 DEPENDS += cross/libsrt
 CONFIGURE_ARGS += --enable-libsrt
-endif
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
@@ -167,7 +175,10 @@ DEPENDS += cross/twolame
 CONFIGURE_ARGS += --enable-libtwolame
 
 ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/libvmaf
+DEPENDS += cross/libvmaf_2.3
+CONFIGURE_ARGS += --enable-libvmaf
+else ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/libvmaf_1.5
 CONFIGURE_ARGS += --enable-libvmaf
 endif
 
@@ -237,6 +248,8 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --disable-neon
+# Needed for libsrt
+CONFIGURE_ARGS += --extra-ldflags="-lrt"
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
