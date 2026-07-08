@@ -16,6 +16,17 @@ include ../../mk/spksrc.spk-meta/meta.mk
 # consumer can build its own copy when it declares the dependency.
 EXCLUDED_NAME = bzip2 xz zlib
 
+# Operator used to pin the meta package version in install_dep_packages.
+# Symbolic so it can be overridden from the command line for testing:
+#   make META_DEP_OP=eq arch-x64-7.1   (eq | ge | le | gt | lt)
+# Note: >= and <= require DSM 4.2+ (fine, spksrc minimum is way above)
+META_DEP_OP ?= ge
+META_DEP_OP_STR_ge = \\\\>\\\\=
+META_DEP_OP_STR_eq = \\\\=
+META_DEP_OP_STR_le = \\\\<\\\\=
+META_DEP_OP_STR_gt = \\\\>
+META_DEP_OP_STR_lt = \\\\<
+
 # -------------------------------------------------------------------
 # SPK_BASE_TEMPLATE
 #
@@ -36,6 +47,10 @@ define SPK_BASE_TEMPLATE
 # Set installation prefix variables for this namespace
 $(eval $(1)_INSTALL_PREFIX         := /var/packages/$($(1)_PACKAGE)/target)
 $(eval $(1)_STAGING_INSTALL_PREFIX := $(realpath $($(1)_PACKAGE_WORK_DIR)/install/$($(1)_INSTALL_PREFIX)))
+# Version of the meta package itself, read from its own spk Makefile
+# ($(SPK_VERS)/$(SPK_REV) at this point belong to the consumer package)
+$(eval $(1)_SPK_MAKEFILE           := $(realpath $($(1)_PACKAGE_WORK_DIR)/..)/Makefile)
+$(eval $(1)_VERSION                := $(shell sed -n 's/^SPK_VERS[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE))-$(shell sed -n 's/^SPK_REV[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE)))
 $(eval export $(1)_INSTALL_PREFIX)
 $(eval export $(1)_STAGING_INSTALL_PREFIX)
 
@@ -74,7 +89,7 @@ $(eval DEPENDS := $(call uniq,$($(1)_DIRECT_DEPENDS) $(DEPENDS)))
 # Register this meta package as an SPK dependency (no duplicates)
 # Only prepend bare package name if SPK_DEPENDS doesn't already have
 # an entry for it (e.g. with a version constraint like python314>=3.14.5-4)
-$(if $(filter $($(1)_PACKAGE) $($(1)_PACKAGE)=% $($(1)_PACKAGE)<% $($(1)_PACKAGE)>%,$(subst :, ,$(subst ",,$(SPK_DEPENDS)))),,$(eval SPK_DEPENDS := $(call dedup,$($(1)_PACKAGE):$(SPK_DEPENDS),:)))
+$(if $(filter $($(1)_PACKAGE) $($(1)_PACKAGE)=% $($(1)_PACKAGE)<% $($(1)_PACKAGE)>%,$(subst :, ,$(subst ",,$(SPK_DEPENDS)))),,$(eval SPK_DEPENDS := $(call dedup,$($(1)_PACKAGE)$(META_DEP_OP_STR_$(META_DEP_OP))$($(1)_VERSION):$(SPK_DEPENDS),:)))
 
 # Build list of status cookies to symlink
 $(eval $(1)_STATUS_COOKIES := $(sort $(foreach cross,$(filter-out $(EXCLUDED_NAME),$(foreach pkg_name,$(shell $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) dependency-list -C $(realpath $($(1)_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$($(1)_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $($(1)_PACKAGE_WORK_DIR)/.$(cross)-*_done))))
