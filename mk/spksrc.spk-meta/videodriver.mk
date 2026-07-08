@@ -26,8 +26,9 @@ endif
 # List of videodriver x64 default dependencies
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 
-# Common videodrv dependencies
-VIDEODRV_DEPENDS  = cross/libva cross/libva-utils
+# Common videodrv dependencies (libraries only: the diagnostic tools
+# live in spk/synocli-videodriver-tools and are not shared with consumers)
+VIDEODRV_DEPENDS  = cross/libva
 VIDEODRV_DEPENDS += cross/intel-vaapi-driver
 VIDEODRV_DEPENDS += cross/intel-media-driver cross/intel-mediasdk
 
@@ -40,12 +41,10 @@ VIDEODRV_DEPENDS += cross/intel-level-zero
 VIDEODRV_DEPENDS += cross/intel-graphics-compiler
 VIDEODRV_DEPENDS += cross/intel-compute-runtime
 VIDEODRV_DEPENDS += cross/ocl-icd
-VIDEODRV_DEPENDS += cross/clinfo
 
 # Vulkan
 VIDEODRV_DEPENDS += cross/mesa
 VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Loader
-VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Tools
 VIDEODRV_DEPENDS += cross/shaderc
 
 # Requires GCC >= 12 (C++20 <version> header support)
