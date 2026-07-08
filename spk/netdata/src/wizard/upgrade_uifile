@@ -1,0 +1,10 @@
+[
+  {
+    "step_title": "Upgrade Instructions",
+    "items": [
+      {
+        "desc": "If you see \"Permission denied\" for <code>/proc/*/io</code> in the logs after upgrading, run:<br/><br/><code>netdata-fix</code><br/><br/>It will prompt for your DSM password, re-apply the fix, and tell you to restart the package."
+      }
+    ]
+  }
+]

@@ -115,6 +115,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Messaging"><td>15672</td><td>RabbitMQ</td><td>Messaging</td><td>Management UI</td></tr>
     <tr data-category="Development"><td>18888</td><td>Demo Service</td><td>Development</td><td>Demo</td></tr>
     <tr data-category="Development"><td>18889</td><td>Demo Web Service</td><td>Development</td><td>Demo</td></tr>
+    <tr data-category="Monitoring"><td>19999</td><td>Netdata</td><td>Monitoring</td><td>Dashboard</td></tr>
     <tr data-category="Backup"><td>51515</td><td>Kopia</td><td>Backup</td><td>Web interface</td></tr>
 
   </tbody>

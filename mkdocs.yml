@@ -169,38 +169,15 @@ nav:
     - DSM APIs: reference/dsm-apis.md
   - Packages:
     - packages/index.md
-    - Media:
-      - FFmpeg: packages/ffmpeg.md
-      - Jellyfin: packages/jellyfin.md
-      - Navidrome: packages/navidrome.md
-      - Loom: packages/loom.md
-    - Downloads:
-      - Aria2: packages/aria2.md
-      - Deluge: packages/deluge.md
-      - ruTorrent: packages/rutorrent.md
-      - Transmission: packages/transmission.md
-    - Home Automation:
-      - Home Assistant: packages/homeassistant.md
-      - Mosquitto: packages/mosquitto.md
-    - File Management:
+    - Automation:
+      - Salt: packages/salt.md
+    - Backup:
       - BorgBackup: packages/borgbackup.md
       - Borgmatic: packages/borgmatic.md
       - Duplicity: packages/duplicity.md
-      - ownCloud: packages/owncloud.md
       - Rclone: packages/rclone.md
-      - Syncthing: packages/syncthing.md
-    - Network & Security:
-      - AdGuard Home: packages/adguardhome.md
-      - Cloudflared: packages/cloudflared.md
-      - DNSCrypt Proxy: packages/dnscrypt-proxy.md
+    - CLI:
       - Mosh: packages/mosh.md
-      - Vaultwarden: packages/vaultwarden.md
-    - Arr Stack:
-      - Radarr/Sonarr: packages/radarr-sonarr.md
-    - Development:
-      - Git: packages/git.md
-      - Mono: packages/mono.md
-    - CLI Tools:
       - SynoCli Devel: packages/synocli-devel.md
       - SynoCli Disk: packages/synocli-disk.md
       - SynoCli File: packages/synocli-file.md
@@ -209,22 +186,55 @@ nav:
       - SynoCli Monitor: packages/synocli-monitor.md
       - SynoCli Net: packages/synocli-net.md
       - SynoCli VideoDriver: packages/synocli-videodriver.md
+    - Development:
+      - Git: packages/git.md
+    - Downloads:
+      - Aria2: packages/aria2.md
+      - Deluge: packages/deluge.md
+      - ruTorrent: packages/rutorrent.md
+      - Transmission: packages/transmission.md
+    - Home Automation:
+      - Home Assistant: packages/homeassistant.md
+      - Mosquitto: packages/mosquitto.md
+    - Kernel:
       - SynoKernel USB Serial: packages/synokernel-usbserial.md
-    - Other:
-      - Adminer: packages/adminer.md
+    - Media:
       - Beets: packages/beets.md
-      - BicBucStriim: packages/bicbucstriim.md
       - Comskip: packages/comskip.md
-      - DSM Utilities: packages/dsm-utilities.md
-      - File Browser: packages/file-browser.md
+      - FFmpeg: packages/ffmpeg.md
+    - Media Management:
       - Flexget: packages/flexget.md
-      - Google Authenticator: packages/google-authenticator.md
+      - Radarr/Sonarr: packages/radarr-sonarr.md
+    - Media Server:
+      - Jellyfin: packages/jellyfin.md
       - Kiwix: packages/kiwix.md
-      - MinIO: packages/minio.md
-      - Mozilla Sync: packages/mozilla-sync.md
+      - Loom: packages/loom.md
+      - Navidrome: packages/navidrome.md
+    - Monitoring:
+      - Netdata: packages/netdata.md
       - Node Exporter: packages/node-exporter.md
+    - Network:
+      - AdGuard Home: packages/adguardhome.md
+      - Cloudflared: packages/cloudflared.md
+      - DNSCrypt Proxy: packages/dnscrypt-proxy.md
+    - Runtime:
+      - Mono: packages/mono.md
+    - Security:
+      - Google Authenticator: packages/google-authenticator.md
+      - Vaultwarden: packages/vaultwarden.md
+    - Storage:
+      - MinIO: packages/minio.md
+    - Sync:
+      - Syncthing: packages/syncthing.md
+    - Utilities:
+      - DSM Utilities: packages/dsm-utilities.md
+    - Web Apps:
+      - Adminer: packages/adminer.md
+      - BicBucStriim: packages/bicbucstriim.md
+      - File Browser: packages/file-browser.md
+      - Mozilla Sync: packages/mozilla-sync.md
       - OpenList: packages/openlist.md
-      - Salt: packages/salt.md
+      - ownCloud: packages/owncloud.md
     - Archived:
       - SickBeard Custom: packages/sickbeard-custom.md
   - Contributing:
