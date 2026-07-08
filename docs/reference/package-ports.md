@@ -38,6 +38,7 @@ The following ports are used by SynoCommunity packages.
     <tr><th>Port</th><th>Package</th><th>Category</th><th>Description</th></tr>
   </thead>
   <tbody>
+    <tr data-category="Monitoring"><td>19999</td><td>Netdata</td><td>Monitoring</td><td>Dashboard</td></tr>
     <tr data-category="Network"><td>53</td><td>dnscrypt-proxy</td><td>Network</td><td>DNS encryption proxy</td></tr>
     <tr data-category="Utilities"><td>667</td><td>darkstat</td><td>Network</td><td>Network statistics</td></tr>
     <tr data-category="Home Automation"><td>1883</td><td>mosquitto</td><td>Home Automation</td><td>MQTT broker</td></tr>

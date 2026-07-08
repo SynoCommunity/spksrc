@@ -223,6 +223,7 @@ nav:
       - MinIO: packages/minio.md
       - Mozilla Sync: packages/mozilla-sync.md
       - Node Exporter: packages/node-exporter.md
+      - Netdata: packages/netdata.md
       - OpenList: packages/openlist.md
       - Salt: packages/salt.md
     - Archived:
