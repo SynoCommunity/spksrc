@@ -105,14 +105,18 @@ env:
   BUILD_BUDGET_SECONDS: "20700"
 
 # Cancel a previous, now-superseded run only while a pull request is still a
-# Draft, so iterative pushes during development don't pile up. Non-draft PR
-# builds and master/push builds are never cancelled — every merged commit keeps
-# its own build result on master — and workflow_dispatch (manual build &
-# publish) is never cancelled either. The event_name is part of the group so
-# push, pull_request and workflow_dispatch runs never cancel one another.
+# Draft, so iterative pushes during development don't pile up. Every other run
+# (non-draft PR, master/push, manual workflow_dispatch) gets a unique per-run
+# group: a shared concurrency group always constrains — at most one running
+# plus one pending run, with older pending runs evicted — even when
+# cancel-in-progress is false, which would serialize non-draft PR builds,
+# silently drop queued master builds and forbid parallel manual builds.
 concurrency:
-  group: build-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft }}
+  group: >-
+    ${{ github.event_name == 'pull_request' && github.event.pull_request.draft
+        && format('build-{0}-{1}', github.workflow, github.ref)
+        || format('build-run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == true }}
 
 jobs:
   # Decide whether the build should run at all. Upstream events (pull_request,
