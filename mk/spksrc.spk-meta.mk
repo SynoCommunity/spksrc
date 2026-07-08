@@ -29,7 +29,7 @@ ifneq ($(or $(findstring synocli-videodriver,$(FFMPEG_RPATH)),$(VIDEODRV_PACKAGE
   # objects but don't register it in install_dep_packages — the ffmpeg
   # meta already carries the version-pinned videodriver dependency.
   ifeq ($(strip $(VIDEODRV_PACKAGE)),)
-    VIDEODRV_INDIRECT = 1
+    VIDEODRV_INDIRECT_DEPENDS = 1
   endif
   include ../../mk/spksrc.spk-meta/videodriver.mk
 endif

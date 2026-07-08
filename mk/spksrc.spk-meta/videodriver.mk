@@ -18,45 +18,28 @@ endif
 VIDEODRV_PACKAGE_DIR = $(abspath $(CURDIR)/../../spk/$(VIDEODRV_PACKAGE))
 VIDEODRV_PACKAGE_WORK_DIR = $(VIDEODRV_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
 
-# List of videodriver aarch64 default dependencies
-ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-VIDEODRV_DEPENDS = cross/libdrm
-endif
-
-# List of videodriver x64 default dependencies
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-
-# Common videodrv dependencies (libraries only: the diagnostic tools
-# live in spk/synocli-videodriver-tools and are not shared with consumers)
-VIDEODRV_DEPENDS  = cross/libva
-VIDEODRV_DEPENDS += cross/intel-vaapi-driver
-VIDEODRV_DEPENDS += cross/intel-media-driver cross/intel-mediasdk
-
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
-
-# Newer Intel implementation
-VIDEODRV_DEPENDS += cross/intel-level-zero
-
-# OpenCL
-VIDEODRV_DEPENDS += cross/intel-graphics-compiler
-VIDEODRV_DEPENDS += cross/intel-compute-runtime
-VIDEODRV_DEPENDS += cross/ocl-icd
-
-# Vulkan
-VIDEODRV_DEPENDS += cross/mesa
-VIDEODRV_DEPENDS += cross/Khronos-Vulkan-Loader
-VIDEODRV_DEPENDS += cross/shaderc
-
-# Requires GCC >= 12 (C++20 <version> header support)
-ifeq ($(call version_ge, $(TC_GCC), 12),1)
-VIDEODRV_DEPENDS += cross/libplacebo
-endif
-
-endif
-endif
+# Videodriver library dependency list (single source of truth, also
+# consumed by spk/synocli-videodriver/Makefile). Libraries only: the
+# diagnostic tools live in spk/synocli-videodriver-tools.
+include ../../mk/spksrc.spk-meta/videodriver-depends.mk
 
 META_DEPENDS += $(VIDEODRV_DEPENDS)
 OPTIONAL_DEPENDS += $(VIDEODRV_DEPENDS)
+
+# Ship the GPU diagnostic tools with every DIRECT videodriver consumer
+# (x64, DSM 7.1+ — the only targets the tools package exists for). Indirect
+# consumers (videodriver via the ffmpeg rpath) rely on the ffmpeg chain,
+# and the tools package itself must not depend on itself.
+VIDEODRV_TOOLS_PACKAGE = synocli-videodriver-tools
+ifeq ($(strip $(VIDEODRV_INDIRECT_DEPENDS)),)
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TCVERSION), 7.1),1)
+ifneq ($(SPK_NAME),$(VIDEODRV_TOOLS_PACKAGE))
+SPK_DEPENDS := $(if $(strip $(SPK_DEPENDS)),$(SPK_DEPENDS):$(VIDEODRV_TOOLS_PACKAGE),$(VIDEODRV_TOOLS_PACKAGE))
+endif
+endif
+endif
+endif
 
 # Build the meta source spk/$(VIDEODRV_PACKAGE) in spk-stage1 so its work dir
 # exists for the stage2 SPK_BASE_TEMPLATE parse.

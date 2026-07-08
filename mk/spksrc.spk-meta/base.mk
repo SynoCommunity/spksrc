@@ -22,10 +22,6 @@ EXCLUDED_NAME = bzip2 xz zlib
 # redirect. One escaping level only — this value stays within make.
 META_DEP_OP ?= \>\=
 
-# Helpers to rebuild a colon-separated SPK_DEPENDS from a word list
-META_EMPTY :=
-META_SPACE := $(META_EMPTY) $(META_EMPTY)
-
 # -------------------------------------------------------------------
 # SPK_BASE_TEMPLATE
 #
@@ -91,11 +87,11 @@ $(eval DEPENDS := $(call uniq,$($(1)_DIRECT_DEPENDS) $(DEPENDS)))
 #  - a bare entry (e.g. "ffmpeg8" from the consumer Makefile) is replaced
 #    by the pinned one;
 #  - SPK_DEPENDS is rebuilt unquoted so the INFO quoting stays well-formed.
-# Skipped when the meta is only an indirect dependency (see $(1)_INDIRECT,
+# Skipped when the meta is only an indirect dependency (see $(1)_INDIRECT_DEPENDS,
 # e.g. videodriver pulled in through the ffmpeg rpath): the direct meta
 # carries the pin, DSM resolves the chain transitively.
 $(eval $(1)_SPK_DEP_LIST := $(subst :, ,$(subst ",,$(SPK_DEPENDS))))
-$(if $($(1)_INDIRECT)$(filter $($(1)_PACKAGE)=% $($(1)_PACKAGE)<% $($(1)_PACKAGE)>%,$($(1)_SPK_DEP_LIST)),,$(eval SPK_DEPENDS := $(subst $(META_SPACE),:,$(strip $($(1)_PACKAGE)$(META_DEP_OP)$($(1)_VERSION) $(filter-out $($(1)_PACKAGE),$($(1)_SPK_DEP_LIST))))))
+$(if $($(1)_INDIRECT_DEPENDS)$(filter $($(1)_PACKAGE)=% $($(1)_PACKAGE)<% $($(1)_PACKAGE)>%,$($(1)_SPK_DEP_LIST)),,$(eval SPK_DEPENDS := $(subst $(space),:,$(strip $($(1)_PACKAGE)$(META_DEP_OP)$($(1)_VERSION) $(filter-out $($(1)_PACKAGE),$($(1)_SPK_DEP_LIST))))))
 
 # Build list of status cookies to symlink
 $(eval $(1)_STATUS_COOKIES := $(sort $(foreach cross,$(filter-out $(EXCLUDED_NAME),$(foreach pkg_name,$(shell $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) dependency-list -C $(realpath $($(1)_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$($(1)_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $($(1)_PACKAGE_WORK_DIR)/.$(cross)-*_done))))

@@ -32,14 +32,6 @@ SERVICE_USER = auto
 VIDEODRIVER = on
 endif
 
-# GPU diagnostic tools alongside the driver libraries
-# (package only exists for x64 on DSM 7.1+)
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-ifeq ($(call version_ge, $(TCVERSION), 7.1),1)
-SPK_DEPENDS = "synocli-videodriver-tools"
-endif
-endif
-
 include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: $(SPK_NAME)_extra_install

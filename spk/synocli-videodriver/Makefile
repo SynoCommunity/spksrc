@@ -28,53 +28,13 @@ CHANGELOG += "8. libshaderc for accessing glslc functionality (DSM 7.1+).<br/>"
 CHANGELOG += "9. Re-publish for DSM 7.2+.<br/>"
 CHANGELOG += "10. Diagnostic tools (vainfo, clinfo, vulkaninfo, lsgpu, intel_gpu_top) moved to synocli-videodriver-tools: this package now ships libraries only.<br/>"
 
-OPTIONAL_DEPENDS  = cross/intel-level-zero
-OPTIONAL_DEPENDS += cross/intel-graphics-compiler
-OPTIONAL_DEPENDS += cross/intel-compute-runtime
-OPTIONAL_DEPENDS += cross/ocl-icd
-OPTIONAL_DEPENDS += cross/mesa
-OPTIONAL_DEPENDS += cross/Khronos-Vulkan-Loader
-OPTIONAL_DEPENDS += cross/shaderc
-OPTIONAL_DEPENDS += cross/libplacebo
-OPTIONAL_DEPENDS += cross/intel-libvpl
-
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-DEPENDS  = cross/libdrm
-endif
+# Library dependency list shared with the consumer-side meta integration
+# (single source of truth: mk/spksrc.spk-meta/videodriver-depends.mk)
+include ../../mk/spksrc.spk-meta/videodriver-depends.mk
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-
-# Common videodrv dependencies
-DEPENDS  = cross/libva
-DEPENDS += cross/intel-vaapi-driver
-DEPENDS += cross/intel-media-driver cross/intel-mediasdk
-
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
-
-# Newer Intel implementation
-DEPENDS += cross/intel-level-zero
-
-# OpenCL
-DEPENDS += cross/intel-graphics-compiler
-DEPENDS += cross/intel-compute-runtime
-DEPENDS += cross/ocl-icd
-
-# Vulkan
-DEPENDS += cross/mesa
-DEPENDS += cross/Khronos-Vulkan-Loader
-DEPENDS += cross/shaderc
-
-# Enable Intel libVPL only on DSM 7
-# -->> can not use libmfx and libvpl together in ffmpeg
-#      Jellyfin requires QSV provided by libmfx
-DEPENDS += cross/intel-libvpl
-
-# endif TCVERSION >= 7
-endif
-
-# endif x64
-endif
+DEPENDS = $(VIDEODRV_DEPENDS)
+OPTIONAL_DEPENDS = $(VIDEODRV_OPTIONAL_DEPENDS)
 
 include ../../mk/spksrc.spk.mk
