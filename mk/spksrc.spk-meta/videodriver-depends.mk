@@ -7,6 +7,8 @@
 # Libraries only: the diagnostic tools live in spk/synocli-videodriver-tools.
 ###############################################################################
 
+# Include guard: both the videodriver spk Makefile and videodriver.mk may end
+# up including this file within the same parse; define the lists only once.
 ifndef SPKSRC_VIDEODRV_DEPENDS_MK
 SPKSRC_VIDEODRV_DEPENDS_MK := 1
 
@@ -49,8 +51,15 @@ endif
 # endif x64
 endif
 
-# Flat superset of the conditional entries above, for OPTIONAL_DEPENDS
-VIDEODRV_OPTIONAL_DEPENDS  = cross/intel-level-zero
+# Flat superset of every possible VIDEODRV_DEPENDS variant, for
+# OPTIONAL_DEPENDS: with ARCH/TCVERSION unset all conditionals above
+# resolve empty, and the dependency discovery (dependency-tree.mk)
+# relies on OPTIONAL_DEPENDS covering all toolchains.
+VIDEODRV_OPTIONAL_DEPENDS  = cross/libdrm
+VIDEODRV_OPTIONAL_DEPENDS += cross/libva
+VIDEODRV_OPTIONAL_DEPENDS += cross/intel-vaapi-driver
+VIDEODRV_OPTIONAL_DEPENDS += cross/intel-media-driver cross/intel-mediasdk
+VIDEODRV_OPTIONAL_DEPENDS += cross/intel-level-zero
 VIDEODRV_OPTIONAL_DEPENDS += cross/intel-graphics-compiler
 VIDEODRV_OPTIONAL_DEPENDS += cross/intel-compute-runtime
 VIDEODRV_OPTIONAL_DEPENDS += cross/ocl-icd

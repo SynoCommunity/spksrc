@@ -23,8 +23,11 @@ VIDEODRV_PACKAGE_WORK_DIR = $(VIDEODRV_PACKAGE_DIR)/work-$(ARCH)-$(TCVERSION)
 # diagnostic tools live in spk/synocli-videodriver-tools.
 include ../../mk/spksrc.spk-meta/videodriver-depends.mk
 
+# META_DEPENDS: the arch-resolved list actually provided by the meta
+# (used as EXCLUDE_DEPENDS in the consumer build). OPTIONAL_DEPENDS: the
+# all-toolchains superset, for arch-less dependency discovery.
 META_DEPENDS += $(VIDEODRV_DEPENDS)
-OPTIONAL_DEPENDS += $(VIDEODRV_DEPENDS)
+OPTIONAL_DEPENDS += $(VIDEODRV_OPTIONAL_DEPENDS)
 
 # Ship the GPU diagnostic tools with every DIRECT videodriver consumer
 # (x64, DSM 7.1+ — the only targets the tools package exists for). Indirect
