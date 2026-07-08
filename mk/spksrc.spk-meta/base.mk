@@ -17,15 +17,14 @@ include ../../mk/spksrc.spk-meta/meta.mk
 EXCLUDED_NAME = bzip2 xz zlib
 
 # Operator used to pin the meta package version in install_dep_packages.
-# Symbolic so it can be overridden from the command line for testing:
-#   make META_DEP_OP=eq arch-x64-7.1   (eq | ge | le | gt | lt)
-# Note: >= and <= require DSM 4.2+ (fine, spksrc minimum is way above)
-META_DEP_OP ?= ge
-META_DEP_OP_STR_ge = \\\\>\\\\=
-META_DEP_OP_STR_eq = \\\\=
-META_DEP_OP_STR_le = \\\\<\\\\=
-META_DEP_OP_STR_gt = \\\\>
-META_DEP_OP_STR_lt = \\\\<
+# Backslash-escaped: the INFO recipe echoes SPK_DEPENDS unquoted at shell
+# level (the surrounding \" are literal characters), so a bare > would
+# redirect. One escaping level only — this value stays within make.
+META_DEP_OP ?= \>\=
+
+# Helpers to rebuild a colon-separated SPK_DEPENDS from a word list
+META_EMPTY :=
+META_SPACE := $(META_EMPTY) $(META_EMPTY)
 
 # -------------------------------------------------------------------
 # SPK_BASE_TEMPLATE
@@ -86,10 +85,17 @@ $(eval $(1)_DIRECT_DEPENDS := $(filter $(addprefix cross/,$(EXCLUDED_NAME)),$($(
 # Inject direct deps into the package DEPENDS list
 $(eval DEPENDS := $(call uniq,$($(1)_DIRECT_DEPENDS) $(DEPENDS)))
 
-# Register this meta package as an SPK dependency (no duplicates)
-# Only prepend bare package name if SPK_DEPENDS doesn't already have
-# an entry for it (e.g. with a version constraint like python314>=3.14.5-4)
-$(if $(filter $($(1)_PACKAGE) $($(1)_PACKAGE)=% $($(1)_PACKAGE)<% $($(1)_PACKAGE)>%,$(subst :, ,$(subst ",,$(SPK_DEPENDS)))),,$(eval SPK_DEPENDS := $(call dedup,$($(1)_PACKAGE)$(META_DEP_OP_STR_$(META_DEP_OP))$($(1)_VERSION):$(SPK_DEPENDS),:)))
+# Register this meta package as a version-pinned SPK dependency:
+#  - an entry that already carries an explicit version constraint
+#    (e.g. python314>=3.14.5-4) is left untouched;
+#  - a bare entry (e.g. "ffmpeg8" from the consumer Makefile) is replaced
+#    by the pinned one;
+#  - SPK_DEPENDS is rebuilt unquoted so the INFO quoting stays well-formed.
+# Skipped when the meta is only an indirect dependency (see $(1)_INDIRECT,
+# e.g. videodriver pulled in through the ffmpeg rpath): the direct meta
+# carries the pin, DSM resolves the chain transitively.
+$(eval $(1)_SPK_DEP_LIST := $(subst :, ,$(subst ",,$(SPK_DEPENDS))))
+$(if $($(1)_INDIRECT)$(filter $($(1)_PACKAGE)=% $($(1)_PACKAGE)<% $($(1)_PACKAGE)>%,$($(1)_SPK_DEP_LIST)),,$(eval SPK_DEPENDS := $(subst $(META_SPACE),:,$(strip $($(1)_PACKAGE)$(META_DEP_OP)$($(1)_VERSION) $(filter-out $($(1)_PACKAGE),$($(1)_SPK_DEP_LIST))))))
 
 # Build list of status cookies to symlink
 $(eval $(1)_STATUS_COOKIES := $(sort $(foreach cross,$(filter-out $(EXCLUDED_NAME),$(foreach pkg_name,$(shell $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) dependency-list -C $(realpath $($(1)_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$($(1)_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $($(1)_PACKAGE_WORK_DIR)/.$(cross)-*_done))))
