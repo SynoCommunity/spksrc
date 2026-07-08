@@ -72,10 +72,10 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Storage"><td><a href="minio/">MinIO</a></td><td>Storage</td><td>S3-compatible object storage</td></tr>
     <tr data-category="Runtime"><td><a href="mono/">Mono</a></td><td>Runtime</td><td>.NET runtime</td></tr>
     <tr data-category="CLI"><td><a href="mosh/">Mosh</a></td><td>CLI</td><td>Mobile shell for intermittent connectivity</td></tr>
-    <tr data-category="Monitoring"><td><a href="netdata/">Netdata</a></td><td>Monitoring</td><td>Real-time performance monitoring</td></tr>
     <tr data-category="Home Automation"><td><a href="mosquitto/">Mosquitto</a></td><td>Home Automation</td><td>MQTT message broker</td></tr>
     <tr data-category="Web Apps"><td><a href="mozilla-sync/">Mozilla Sync</a></td><td>Web Apps</td><td>Firefox Sync server</td></tr>
     <tr data-category="Media Server"><td><a href="navidrome/">Navidrome</a></td><td>Media Server</td><td>Music streaming server</td></tr>
+    <tr data-category="Monitoring"><td><a href="netdata/">Netdata</a></td><td>Monitoring</td><td>Real-time performance monitoring</td></tr>
     <tr data-category="Monitoring"><td><a href="node-exporter/">Node Exporter</a></td><td>Monitoring</td><td>Prometheus metrics exporter</td></tr>
     <tr data-category="Web Apps"><td><a href="openlist/">OpenList</a></td><td>Web Apps</td><td>Web bookmark management</td></tr>
     <tr data-category="Web Apps"><td><a href="owncloud/">ownCloud</a></td><td>Web Apps</td><td>File sync and share platform</td></tr>
