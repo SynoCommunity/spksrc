@@ -1,6 +1,6 @@
 --- libavcodec/vaapi_encode_h265.c
 +++ libavcodec/vaapi_encode_h265.c
-@@ -452,8 +452,9 @@ static int vaapi_encode_h265_init_sequen
+@@ -452,8 +452,9 @@ static int vaapi_encode_h265_init_sequence_params(AVCodecContext *avctx)
      sps->log2_min_luma_transform_block_size_minus2   = 0;
      sps->log2_diff_max_min_luma_transform_block_size = 3;
      // Full transform hierarchy allowed (2-5).

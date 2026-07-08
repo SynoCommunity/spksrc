@@ -1,18 +1,16 @@
-Subject: [PATCH] avfilter: add vf_tonemap_videotoolbox
----
 --- configure
 +++ configure
-@@ -3772,6 +3772,7 @@ tinterlace_pad_test_deps="tinterlace_fil
+@@ -3841,6 +3841,7 @@ tinterlace_pad_test_deps="tinterlace_filter"
  tonemap_filter_deps="const_nan"
  tonemap_vaapi_filter_deps="vaapi VAProcFilterParameterBufferHDRToneMapping"
  tonemap_opencl_filter_deps="opencl const_nan"
 +tonemap_videotoolbox_filter_deps="metal corevideo videotoolbox const_nan"
  transpose_opencl_filter_deps="opencl"
  transpose_vaapi_filter_deps="vaapi VAProcPipelineCaps_rotation_flags"
- transpose_vulkan_filter_deps="vulkan spirv_compiler"
+ transpose_vt_filter_deps="videotoolbox VTPixelRotationSessionCreate"
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -521,6 +521,9 @@ OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)
+@@ -532,6 +532,9 @@ OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o opencl.o \
  OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.ptx.o \
                                                  cuda/host_util.o
  OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
@@ -24,7 +22,7 @@ Subject: [PATCH] avfilter: add vf_tonemap_videotoolbox
  OBJS-$(CONFIG_TRANSPOSE_CUDA_FILTER)         += vf_transpose_cuda.o vf_transpose_cuda.ptx.o \
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -487,6 +487,7 @@ extern const AVFilter ff_vf_tonemap;
+@@ -496,6 +496,7 @@ extern const AVFilter ff_vf_tonemap;
  extern const AVFilter ff_vf_tonemap_cuda;
  extern const AVFilter ff_vf_tonemap_opencl;
  extern const AVFilter ff_vf_tonemap_vaapi;

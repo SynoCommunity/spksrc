@@ -1,31 +1,24 @@
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
-@@ -2128,7 +2128,6 @@ static int qsv_device_create(AVHWDeviceC
+@@ -2164,6 +2164,8 @@ static int qsv_device_create(AVHWDeviceContext *ctx, const char *device,
+                    "\"%s\".\n", e->value);
+             return AVERROR(EINVAL);
          }
-     } else if (CONFIG_VAAPI) {
-         child_device_type = AV_HWDEVICE_TYPE_VAAPI;
--#if QSV_ONEVPL
++    } else if (CONFIG_VAAPI) {
++        child_device_type = AV_HWDEVICE_TYPE_VAAPI;
+ #if QSV_ONEVPL
      } else if (CONFIG_D3D11VA) {  // Use D3D11 by default if d3d11va is enabled
          av_log(ctx, AV_LOG_VERBOSE,
-                "Defaulting child_device_type to AV_HWDEVICE_TYPE_D3D11VA for oneVPL."
-@@ -2137,16 +2136,6 @@ static int qsv_device_create(AVHWDeviceC
+@@ -2183,8 +2185,6 @@ static int qsv_device_create(AVHWDeviceContext *ctx, const char *device,
+     } else if (CONFIG_D3D11VA) {
          child_device_type = AV_HWDEVICE_TYPE_D3D11VA;
-     } else if (CONFIG_DXVA2) {
-         child_device_type = AV_HWDEVICE_TYPE_DXVA2;
--#else
--    } else if (CONFIG_DXVA2) {
--        av_log(NULL, AV_LOG_WARNING,
--                "WARNING: defaulting child_device_type to AV_HWDEVICE_TYPE_DXVA2 for compatibility "
--                "with old commandlines. This behaviour will be removed "
--                "in the future. Please explicitly set device type via \"-init_hw_device\" option.\n");
--        child_device_type = AV_HWDEVICE_TYPE_DXVA2;
--    } else if (CONFIG_D3D11VA) {
--        child_device_type = AV_HWDEVICE_TYPE_D3D11VA;
--#endif
+ #endif
+-    } else if (CONFIG_VAAPI) {
+-        child_device_type = AV_HWDEVICE_TYPE_VAAPI;
      } else {
          av_log(ctx, AV_LOG_ERROR, "No supported child device type is enabled\n");
          return AVERROR(ENOSYS);
-@@ -2202,7 +2191,14 @@ static int qsv_device_create(AVHWDeviceC
+@@ -2250,7 +2250,14 @@ static int qsv_device_create(AVHWDeviceContext *ctx, const char *device,
  
      impl = choose_implementation(device, child_device_type);
  

@@ -1,6 +1,6 @@
 --- configure
 +++ configure
-@@ -3149,6 +3149,8 @@ thumbnail_cuda_filter_deps="ffnvcodec"
+@@ -3211,6 +3211,8 @@ thumbnail_cuda_filter_deps="ffnvcodec"
  thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  tonemap_cuda_filter_deps="ffnvcodec const_nan"
  tonemap_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -11,7 +11,7 @@
  overlay_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -523,6 +523,8 @@ OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)
+@@ -534,6 +534,8 @@ OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.p
  OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
  OBJS-$(CONFIG_TPAD_FILTER)                   += vf_tpad.o
  OBJS-$(CONFIG_TRANSPOSE_FILTER)              += vf_transpose.o
@@ -22,7 +22,7 @@
  OBJS-$(CONFIG_TRANSPOSE_VAAPI_FILTER)        += vf_transpose_vaapi.o vaapi_vpp.o
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -489,6 +489,7 @@ extern const AVFilter ff_vf_tonemap_open
+@@ -498,6 +498,7 @@ extern const AVFilter ff_vf_tonemap_opencl;
  extern const AVFilter ff_vf_tonemap_vaapi;
  extern const AVFilter ff_vf_tpad;
  extern const AVFilter ff_vf_transpose;

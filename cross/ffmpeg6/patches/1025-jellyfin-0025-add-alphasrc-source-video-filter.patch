@@ -1,6 +1,6 @@
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -570,6 +570,7 @@ OBJS-$(CONFIG_XSTACK_QSV_FILTER)
+@@ -585,6 +585,7 @@ OBJS-$(CONFIG_XSTACK_QSV_FILTER)             += vf_stack_qsv.o framesync.o
  
  OBJS-$(CONFIG_ALLRGB_FILTER)                 += vsrc_testsrc.o
  OBJS-$(CONFIG_ALLYUV_FILTER)                 += vsrc_testsrc.o
@@ -10,14 +10,14 @@
  OBJS-$(CONFIG_COLORCHART_FILTER)             += vsrc_testsrc.o
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -534,6 +534,7 @@ extern const AVFilter ff_vf_xstack_qsv;
+@@ -547,6 +547,7 @@ extern const AVFilter ff_vf_xstack_qsv;
  
  extern const AVFilter ff_vsrc_allrgb;
  extern const AVFilter ff_vsrc_allyuv;
 +extern const AVFilter ff_vsrc_alphasrc;
  extern const AVFilter ff_vsrc_cellauto;
  extern const AVFilter ff_vsrc_color;
- extern const AVFilter ff_vsrc_colorchart;
+ extern const AVFilter ff_vsrc_color_vulkan;
 --- /dev/null
 +++ libavfilter/vsrc_alphasrc.c
 @@ -0,0 +1,164 @@

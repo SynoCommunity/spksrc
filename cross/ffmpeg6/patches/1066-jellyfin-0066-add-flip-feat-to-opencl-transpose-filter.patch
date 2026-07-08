@@ -1,6 +1,6 @@
 --- libavfilter/opencl/transpose.cl
 +++ libavfilter/opencl/transpose.cl
-@@ -26,8 +26,10 @@ kernel void transpose(__write_only image
+@@ -26,8 +26,10 @@ kernel void transpose(__write_only image2d_t dst,
      int x = get_global_id(0);
      int y = get_global_id(1);
  
@@ -15,7 +15,7 @@
      if (x < size.x && y < size.y)
 --- libavfilter/vf_transpose_opencl.c
 +++ libavfilter/vf_transpose_opencl.c
-@@ -101,8 +101,20 @@ static int transpose_opencl_config_outpu
+@@ -101,8 +101,20 @@ static int transpose_opencl_config_output(AVFilterLink *outlink)
          return AVERROR(EINVAL);
      }
  
@@ -38,7 +38,7 @@
      ret = ff_opencl_filter_config_output(outlink);
      if (ret < 0)
          return ret;
-@@ -114,10 +126,8 @@ static int transpose_opencl_config_outpu
+@@ -114,10 +126,8 @@ static int transpose_opencl_config_output(AVFilterLink *outlink)
          outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
  
      av_log(avctx, AV_LOG_VERBOSE,
@@ -51,7 +51,7 @@
      return 0;
  }
  
-@@ -235,11 +245,14 @@ static av_cold void transpose_opencl_uni
+@@ -235,11 +245,14 @@ static av_cold void transpose_opencl_uninit(AVFilterContext *avctx)
  #define OFFSET(x) offsetof(TransposeOpenCLContext, x)
  #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
  static const AVOption transpose_opencl_options[] = {

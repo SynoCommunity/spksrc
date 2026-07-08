@@ -1,6 +1,6 @@
 --- libavcodec/hevc_mp4toannexb_bsf.c
 +++ libavcodec/hevc_mp4toannexb_bsf.c
-@@ -121,7 +121,7 @@ static int hevc_mp4toannexb_filter(AVBSF
+@@ -121,7 +121,7 @@ static int hevc_mp4toannexb_filter(AVBSFContext *ctx, AVPacket *out)
      HEVCBSFContext *s = ctx->priv_data;
      AVPacket *in;
      GetByteContext gb;
@@ -9,7 +9,7 @@
      int got_irap = 0;
      int i, ret = 0;
  
-@@ -155,10 +155,13 @@ static int hevc_mp4toannexb_filter(AVBSF
+@@ -155,10 +155,13 @@ static int hevc_mp4toannexb_filter(AVBSFContext *ctx, AVPacket *out)
          }
  
          nalu_type = (bytestream2_peek_byte(&gb) >> 1) & 0x3f;

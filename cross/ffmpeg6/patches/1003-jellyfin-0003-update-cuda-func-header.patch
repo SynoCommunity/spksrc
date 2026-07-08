@@ -163,7 +163,7 @@
  {
      float4 ret;
      asm("tex.2d.v4.f32.f32 {%0, %1, %2, %3}, [%4, {%5, %6}];" :
-@@ -156,37 +147,41 @@ inline __device__ float4 tex2D<float4>(c
+@@ -156,37 +147,41 @@ inline __device__ float4 tex2D<float4>(cudaTextureObject_t texObject, float x, f
  }
  
  template<>

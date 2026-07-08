@@ -1,6 +1,6 @@
 --- libavfilter/buffersrc.c
 +++ libavfilter/buffersrc.c
-@@ -65,9 +65,9 @@ typedef struct BufferSourceContext {
+@@ -67,9 +67,9 @@ typedef struct BufferSourceContext {
  
  #define CHECK_VIDEO_PARAM_CHANGE(s, c, width, height, format, pts)\
      if (c->w != width || c->h != height || c->pix_fmt != format) {\

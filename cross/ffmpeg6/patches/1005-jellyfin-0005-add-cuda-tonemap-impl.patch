@@ -1,6 +1,6 @@
 --- configure
 +++ configure
-@@ -3143,6 +3143,8 @@ scale_cuda_filter_deps="ffnvcodec"
+@@ -3205,6 +3205,8 @@ scale_cuda_filter_deps="ffnvcodec"
  scale_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  thumbnail_cuda_filter_deps="ffnvcodec"
  thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -9,7 +9,7 @@
  transpose_npp_filter_deps="ffnvcodec libnpp"
  overlay_cuda_filter_deps="ffnvcodec"
  overlay_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
-@@ -3911,7 +3913,7 @@ enable doc
+@@ -3988,7 +3990,7 @@ enable doc
  enable faan faandct faanidct
  enable large_tests
  enable optimizations
@@ -18,7 +18,7 @@
  enable runtime_cpudetect
  enable safe_bitstream_reader
  enable static
-@@ -4456,7 +4458,7 @@ if enabled cuda_nvcc; then
+@@ -4536,7 +4538,7 @@ if enabled cuda_nvcc; then
      nvccflags_default="-gencode arch=compute_30,code=sm_30 -O2"
  else
      nvcc_default="clang"
@@ -27,7 +27,7 @@
      NVCC_C=""
  fi
  
-@@ -6458,7 +6460,7 @@ fi
+@@ -6590,7 +6592,7 @@ fi
  if enabled cuda_nvcc; then
      nvccflags="$nvccflags -ptx"
  else
@@ -48,7 +48,7 @@
  LDFLAGS    := $(ALLFFLIBS:%=$(LD_PATH)lib%) $(LDFLAGS)
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -509,6 +509,8 @@ OBJS-$(CONFIG_TMIX_FILTER)
+@@ -521,6 +521,8 @@ OBJS-$(CONFIG_TMIX_FILTER)                   += vf_mix.o framesync.o
  OBJS-$(CONFIG_TONEMAP_FILTER)                += vf_tonemap.o
  OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o opencl.o \
                                                  opencl/tonemap.o opencl/colorspace_common.o
@@ -59,7 +59,7 @@
  OBJS-$(CONFIG_TRANSPOSE_FILTER)              += vf_transpose.o
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -478,6 +478,7 @@ extern const AVFilter ff_vf_tmedian;
+@@ -488,6 +488,7 @@ extern const AVFilter ff_vf_tmedian;
  extern const AVFilter ff_vf_tmidequalizer;
  extern const AVFilter ff_vf_tmix;
  extern const AVFilter ff_vf_tonemap;
@@ -69,7 +69,7 @@
  extern const AVFilter ff_vf_tpad;
 --- libavfilter/colorspace.c
 +++ libavfilter/colorspace.c
-@@ -51,6 +51,18 @@ void ff_matrix_invert_3x3(const double i
+@@ -51,6 +51,18 @@ void ff_matrix_invert_3x3(const double in[3][3], double out[3][3])
      }
  }
  
@@ -88,7 +88,7 @@
  void ff_matrix_mul_3x3(double dst[3][3],
                 const double src1[3][3], const double src2[3][3])
  {
-@@ -191,3 +203,154 @@ void ff_update_hdr_metadata(AVFrame *in,
+@@ -191,3 +203,154 @@ void ff_update_hdr_metadata(AVFrame *in, double peak)
              metadata->max_luminance = av_d2q(peak * REFERENCE_WHITE, 10000);
      }
  }
@@ -288,7 +288,7 @@
  void ff_matrix_mul_3x3(double dst[3][3],
                 const double src1[3][3], const double src2[3][3]);
  void ff_matrix_mul_3x3_vec(double dst[3], const double vec[3], const double mat[3][3]);
-@@ -38,4 +70,19 @@ void ff_fill_rgb2yuv_table(const AVLumaC
+@@ -38,4 +70,19 @@ void ff_fill_rgb2yuv_table(const AVLumaCoefficients *coeffs,
  double ff_determine_signal_peak(AVFrame *in);
  void ff_update_hdr_metadata(AVFrame *in, double peak);
  

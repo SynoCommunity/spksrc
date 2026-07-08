@@ -9,7 +9,7 @@
      AV_PIX_FMT_NONE,
  };
  
-@@ -101,12 +103,15 @@ typedef struct OverlayCUDAContext {
+@@ -105,12 +107,15 @@ typedef struct OverlayCUDAContext {
      enum AVPixelFormat in_format_overlay;
      enum AVPixelFormat in_format_main;
  
@@ -26,7 +26,7 @@
      CUstream cu_stream;
  
      FFFrameSync fs;
-@@ -181,7 +186,10 @@ static int set_expr(AVExpr **pexpr, cons
+@@ -185,7 +190,10 @@ static int set_expr(AVExpr **pexpr, const char *expr, const char *option, void *
  static int formats_match(const enum AVPixelFormat format_main, const enum AVPixelFormat format_overlay) {
      switch(format_main) {
      case AV_PIX_FMT_NV12:
@@ -38,7 +38,7 @@
      case AV_PIX_FMT_YUV420P:
          return format_overlay == AV_PIX_FMT_YUV420P ||
                 format_overlay == AV_PIX_FMT_YUVA420P;
-@@ -196,11 +204,13 @@ static int formats_match(const enum AVPi
+@@ -200,11 +208,13 @@ static int formats_match(const enum AVPixelFormat format_main, const enum AVPixe
  static int overlay_cuda_call_kernel(
      OverlayCUDAContext *ctx,
      int x_position, int y_position,
@@ -55,7 +55,7 @@
      int alpha_adj_x, int alpha_adj_y) {
  
      CudaFunctions *cu = ctx->hwctx->internal->cuda_dl;
-@@ -208,14 +218,18 @@ static int overlay_cuda_call_kernel(
+@@ -212,14 +222,18 @@ static int overlay_cuda_call_kernel(
      void* kernel_args[] = {
          &x_position, &y_position,
          &main_data, &main_linesize,
@@ -75,7 +75,7 @@
          DIV_UP(main_width, BLOCK_X), DIV_UP(main_height, BLOCK_Y), 1,
          BLOCK_X, BLOCK_Y, 1,
          0, ctx->cu_stream, kernel_args, NULL));
-@@ -290,11 +304,13 @@ static int overlay_cuda_blend(FFFrameSyn
+@@ -300,11 +314,13 @@ FF_ENABLE_DEPRECATION_WARNINGS
  
      overlay_cuda_call_kernel(ctx,
          ctx->x_position, ctx->y_position,
@@ -92,7 +92,7 @@
  
      // overlay rest planes depending on pixel format
  
-@@ -302,29 +318,42 @@ static int overlay_cuda_blend(FFFrameSyn
+@@ -312,29 +328,42 @@ FF_ENABLE_DEPRECATION_WARNINGS
      case AV_PIX_FMT_NV12:
          overlay_cuda_call_kernel(ctx,
              ctx->x_position, ctx->y_position / 2,
@@ -152,7 +152,7 @@
          break;
      default:
          av_log(ctx, AV_LOG_ERROR, "Passed unsupported overlay pixel format\n");
-@@ -450,6 +479,8 @@ static int overlay_cuda_config_output(AV
+@@ -462,6 +491,8 @@ static int overlay_cuda_config_output(AVFilterLink *outlink)
          return AVERROR(ENOSYS);
      }
  
@@ -161,7 +161,7 @@
      // check overlay input formats
  
      if (!frames_ctx_overlay) {
-@@ -503,7 +534,13 @@ static int overlay_cuda_config_output(AV
+@@ -515,7 +546,13 @@ static int overlay_cuda_config_output(AVFilterLink *outlink)
          return err;
      }
  
@@ -200,15 +200,14 @@
      int alpha_adj_x, int alpha_adj_y)
  {
      int x = blockIdx.x * blockDim.x + threadIdx.x;
-@@ -44,11 +45,44 @@ __global__ void Overlay_Cuda(
+@@ -44,10 +45,44 @@ __global__ void Overlay_Cuda(
  
      float alpha = 1.0;
      if (alpha_linesize) {
 -        alpha = overlay_alpha[alpha_adj_x * overlay_x  + alpha_adj_y * overlay_y * alpha_linesize] / 255.0f;
 +        alpha = overlay_alpha[alpha_adj_x * overlay_x + alpha_adj_y * overlay_y * alpha_linesize] / 255.0f;
-     }
- 
--    main[x + y*main_linesize] = alpha * overlay[overlay_x + overlay_y * overlay_linesize] + (1.0f - alpha) * main[x + y*main_linesize];
++    }
++
 +    int main_pos = main_adj_x * x + y * (main_linesize / sizeof(*main)) + (main_adj_x > 1 ? main_offset : 0);
 +    if (main_depth > 8) {
 +        T0 overlay_res = (T0)(alpha * overlay[overlay_x + overlay_y * overlay_linesize]) << (main_depth - 8);
@@ -216,11 +215,12 @@
 +        main[main_pos] = (T0)(overlay_res + main_res) << main_shift;
 +    } else {
 +        main[main_pos] = alpha * overlay[overlay_x + overlay_y * overlay_linesize] + (1.0f - alpha) * main[main_pos];
-+    }
- }
- 
-+extern "C" {
+     }
++}
 +
++extern "C" {
+ 
+-    main[x + y*main_linesize] = alpha * overlay[overlay_x + overlay_y * overlay_linesize] + (1.0f - alpha) * main[x + y*main_linesize];
 +#define OVERLAY_VARIANT(NAME, TYPE0) \
 +__global__ void Overlay_Cuda_ ## NAME( \
 +    int x_position, int y_position, \
@@ -246,4 +246,4 @@
 +OVERLAY_VARIANT(uchar, unsigned char)
 +OVERLAY_VARIANT(ushort, unsigned short)
 +
-+}
+ }

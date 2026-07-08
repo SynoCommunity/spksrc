@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 6.0.1
+PKG_VERS = 6.1.6
 PKG_MINOR_VERS = $(firstword $(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -46,6 +46,7 @@ OPTIONAL_DEPENDS  = cross/openh264
 OPTIONAL_DEPENDS += cross/libaom
 # GCC specific
 OPTIONAL_DEPENDS += cross/frei0r
+OPTIONAL_DEPENDS += cross/libjxl
 OPTIONAL_DEPENDS += cross/rubberband
 OPTIONAL_DEPENDS += cross/libvmaf
 
@@ -105,6 +106,11 @@ CONFIGURE_ARGS += --enable-libfribidi
 
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
+
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/libjxl
+CONFIGURE_ARGS += --enable-libjxl
+endif
 
 DEPENDS += cross/opencore-amr
 CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb

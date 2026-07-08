@@ -1,13 +1,3 @@
---- tests/ref/fate/source
-+++ tests/ref/fate/source
-@@ -22,6 +22,7 @@ compat/djgpp/math.h
- compat/float/float.h
- compat/float/limits.h
- libavcodec/bitstream_template.h
-+libavfilter/dither_matrix.h
- tools/decode_simple.h
- Use of av_clip() where av_clip_uintp2() could be used:
- Use of av_clip() where av_clip_intp2() could be used:
 --- /dev/null
 +++ libavfilter/dither_matrix.h
 @@ -0,0 +1,267 @@
@@ -290,24 +280,25 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
-@@ -20,10 +23,10 @@
+@@ -20,9 +23,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
  
 -#include <float.h>
  #include <stdio.h>
- #include <string.h>
++#include <string.h>
  
 +#include "libavutil/avassert.h"
- #include "libavutil/avstring.h"
++#include "libavutil/avstring.h"
  #include "libavutil/common.h"
  #include "libavutil/hwcontext.h"
-@@ -34,13 +37,13 @@
+ #include "libavutil/hwcontext_cuda_internal.h"
+@@ -32,12 +37,13 @@
  #include "libavutil/pixdesc.h"
  
  #include "avfilter.h"
 +#include "dither_matrix.h"
- #include "formats.h"
++#include "formats.h"
  #include "internal.h"
  #include "scale_eval.h"
  #include "video.h"
@@ -317,16 +308,18 @@
  
  static const enum AVPixelFormat supported_formats[] = {
      AV_PIX_FMT_YUV420P,
-@@ -49,8 +52,6 @@ static const enum AVPixelFormat supporte
+@@ -46,10 +52,6 @@ static const enum AVPixelFormat supported_formats[] = {
      AV_PIX_FMT_P010,
      AV_PIX_FMT_P016,
      AV_PIX_FMT_YUV444P16,
 -    AV_PIX_FMT_0RGB32,
 -    AV_PIX_FMT_0BGR32,
+-    AV_PIX_FMT_RGB32,
+-    AV_PIX_FMT_BGR32,
  };
  
  #define DIV_UP(a, b) ( ((a) + (b) - 1) / (b) )
-@@ -59,27 +60,13 @@ static const enum AVPixelFormat supporte
+@@ -58,27 +60,13 @@ static const enum AVPixelFormat supported_formats[] = {
  
  #define CHECK_CU(x) FF_CUDA_CHECK_DL(ctx, s->hwctx->internal->cuda_dl, x)
  
@@ -356,7 +349,7 @@
  
      AVBufferRef *frames_ctx;
      AVFrame     *frame;
-@@ -91,6 +78,7 @@ typedef struct CUDAScaleContext {
+@@ -90,6 +78,7 @@ typedef struct CUDAScaleContext {
       * Output sw format. AV_PIX_FMT_NONE for no conversion.
       */
      enum AVPixelFormat format;
@@ -364,7 +357,7 @@
  
      char *w_expr;               ///< width  expression string
      char *h_expr;               ///< height expression string
-@@ -100,21 +88,56 @@ typedef struct CUDAScaleContext {
+@@ -99,21 +88,56 @@ typedef struct CUDAScaleContext {
  
      CUcontext   cu_ctx;
      CUmodule    cu_module;
@@ -427,7 +420,7 @@
      s->frame = av_frame_alloc();
      if (!s->frame)
          return AVERROR(ENOMEM);
-@@ -130,13 +153,22 @@ static av_cold void cudascale_uninit(AVF
+@@ -129,13 +153,22 @@ static av_cold void cudascale_uninit(AVFilterContext *ctx)
  {
      CUDAScaleContext *s = ctx->priv;
  
@@ -455,7 +448,7 @@
          CHECK_CU(cu->cuCtxPopCurrent(&dummy));
      }
  
-@@ -192,32 +224,6 @@ static int format_is_supported(enum AVPi
+@@ -191,32 +224,6 @@ static int format_is_supported(enum AVPixelFormat fmt)
      return 0;
  }
  
@@ -488,7 +481,7 @@
  static av_cold int init_processing_chain(AVFilterContext *ctx, int in_width, int in_height,
                                           int out_width, int out_height)
  {
-@@ -249,7 +255,8 @@ static av_cold int init_processing_chain
+@@ -248,7 +255,8 @@ static av_cold int init_processing_chain(AVFilterContext *ctx, int in_width, int
          return AVERROR(ENOSYS);
      }
  
@@ -498,7 +491,7 @@
  
      if (s->passthrough && in_width == out_width && in_height == out_height && in_format == out_format) {
          s->frames_ctx = av_buffer_ref(ctx->inputs[0]->hw_frames_ctx);
-@@ -261,10 +268,6 @@ static av_cold int init_processing_chain
+@@ -260,10 +268,6 @@ static av_cold int init_processing_chain(AVFilterContext *ctx, int in_width, int
          ret = init_hwframe_ctx(s, in_frames_ctx->device_ref, out_width, out_height);
          if (ret < 0)
              return ret;
@@ -509,7 +502,7 @@
      }
  
      ctx->outputs[0]->hw_frames_ctx = av_buffer_ref(s->frames_ctx);
-@@ -274,74 +277,60 @@ static av_cold int init_processing_chain
+@@ -273,74 +277,60 @@ static av_cold int init_processing_chain(AVFilterContext *ctx, int in_width, int
      return 0;
  }
  
@@ -622,7 +615,7 @@
      return ret;
  }
  
-@@ -352,12 +341,50 @@ static av_cold int cudascale_config_prop
+@@ -351,12 +341,50 @@ static av_cold int cudascale_config_props(AVFilterLink *outlink)
      CUDAScaleContext *s  = ctx->priv;
      AVHWFramesContext     *frames_ctx = (AVHWFramesContext*)inlink->hw_frames_ctx->data;
      AVCUDADeviceContext *device_hwctx = frames_ctx->device_ctx->hwctx;
@@ -673,7 +666,7 @@
      if ((ret = ff_scale_eval_dimensions(s,
                                          s->w_expr, s->h_expr,
                                          inlink, outlink,
-@@ -378,6 +405,56 @@ static av_cold int cudascale_config_prop
+@@ -377,6 +405,56 @@ static av_cold int cudascale_config_props(AVFilterLink *outlink)
      if (ret < 0)
          return ret;
  
@@ -730,7 +723,7 @@
      if (inlink->sample_aspect_ratio.num) {
          outlink->sample_aspect_ratio = av_mul_q((AVRational){outlink->h*inlink->w,
                                                               outlink->w*inlink->h},
-@@ -386,118 +463,93 @@ static av_cold int cudascale_config_prop
+@@ -385,118 +463,93 @@ static av_cold int cudascale_config_props(AVFilterLink *outlink)
          outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
      }
  
@@ -814,9 +807,8 @@
 -    CudaFunctions *cu = s->hwctx->internal->cuda_dl;
 -    CUcontext dummy, cuda_ctx = s->hwctx->cuda_ctx;
 -    int i, ret;
- 
+-
 -    CUtexObject tex[4] = { 0, 0, 0, 0 };
-+#define DEPTH_BYTES(depth) (((depth) + 7) / 8)
  
 -    ret = CHECK_CU(cu->cuCtxPushCurrent(cuda_ctx));
 -    if (ret < 0)
@@ -871,6 +863,8 @@
 -                                 out->linesize[1]);
 -        if (ret < 0)
 -            goto exit;
++#define DEPTH_BYTES(depth) (((depth) + 7) / 8)
++
 +    call_resize_kernel(ctx, s->cu_func_luma, 1,
 +                       in->data[0], in->width, in->height, in->linesize[0],
 +                       out->data[0], out->width, out->height, out->linesize[0],
@@ -912,7 +906,7 @@
  }
  
  static int cudascale_scale(AVFilterContext *ctx, AVFrame *out, AVFrame *in)
-@@ -584,21 +636,15 @@ static AVFrame *cudascale_get_video_buff
+@@ -583,21 +636,15 @@ static AVFrame *cudascale_get_video_buffer(AVFilterLink *inlink, int w, int h)
  #define OFFSET(x) offsetof(CUDAScaleContext, x)
  #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM)
  static const AVOption options[] = {
@@ -942,7 +936,7 @@
      { NULL },
  };
  
-@@ -611,9 +657,9 @@ static const AVClass cudascale_class = {
+@@ -610,9 +657,9 @@ static const AVClass cudascale_class = {
  
  static const AVFilterPad cudascale_inputs[] = {
      {
@@ -955,7 +949,7 @@
          .get_buffer.video = cudascale_get_video_buffer,
      },
  };
-@@ -627,14 +673,14 @@ static const AVFilterPad cudascale_outpu
+@@ -626,14 +673,14 @@ static const AVFilterPad cudascale_outputs[] = {
  };
  
  const AVFilter ff_vf_scale_cuda = {
@@ -983,7 +977,7 @@
   *
   * Permission is hereby granted, free of charge, to any person obtaining a
   * copy of this software and associated documentation files (the "Software"),
-@@ -20,1217 +20,174 @@
+@@ -20,1306 +20,174 @@
   * DEALINGS IN THE SOFTWARE.
   */
  
@@ -1217,22 +1211,17 @@
 -        DEFAULT_DST(1) = SUB_F(uv, 1);
 -    }
 -};
-+#define SHIFTDOWN(val) (dstbase)(val >> abs(2 + shift))
-+#define SHIFTUP(val)   (dstbase)(val << abs(-shift - 2))
- 
+-
 -struct Convert_nv12_yuv444p
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift1_d
- {
+-{
 -    static const int in_bit_depth = 8;
 -    typedef uchar in_T;
 -    typedef uchar2 in_T_uv;
 -    typedef uchar out_T;
 -    typedef uchar out_T_uv;
-+    typedef DST dstbase;
- 
+-
 -    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
+-    {
 -        DEFAULT_DST(0) = SUB_F(y, 0);
 -    }
 -
@@ -1345,83 +1334,38 @@
 -    {
 -        DEFAULT_DST(0) = SUB_F(y, 0);
 -    }
-+        unsigned ret = (unsigned)i1 + (unsigned)i2 + (unsigned)i3 + (unsigned)i4 + ((1 + d) >> (sizeof(SRC) * 8 - dither + 3));
- 
+-
 -    DEF_F(Convert_uv, out_T_uv)
 -    {
 -        DEFAULT_DST(1) = make_uchar2(
 -            SUB_F(uv, 1),
 -            SUB_F(uv, 2)
 -        );
-+        if (shift > -2)
-+            return SHIFTDOWN(ret);
-+        else
-+            return SHIFTUP(ret);
-     }
- };
- 
+-    }
+-};
+-
 -struct Convert_yuv444p_yuv444p
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift1
- {
+-{
 -    static const int in_bit_depth = 8;
 -    typedef uchar in_T;
 -    typedef uchar in_T_uv;
 -    typedef uchar out_T;
 -    typedef uchar out_T_uv;
-+    typedef DST dstbase;
- 
+-
 -    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
+-    {
 -        DEFAULT_DST(0) = SUB_F(y, 0);
 -    }
-+        unsigned ret = (unsigned)i1 + (unsigned)i2 + (unsigned)i3 + (unsigned)i4 + 2;
- 
+-
 -    DEF_F(Convert_uv, out_T_uv)
 -    {
 -        DEFAULT_DST(1) = SUB_F(uv, 1);
 -        DEFAULT_DST(2) = SUB_F(uv, 2);
-+        if (shift > -2)
-+            return SHIFTDOWN(ret);
-+        else
-+            return SHIFTUP(ret);
-     }
- };
- 
--struct Convert_yuv444p_p010le
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift2
- {
--    static const int in_bit_depth = 8;
--    typedef uchar in_T;
--    typedef uchar in_T_uv;
--    typedef ushort out_T;
--    typedef ushort2 out_T_uv;
-+    typedef decltype(DST::x) dstbase;
- 
--    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
--        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_10bit);
 -    }
-+        unsigned retx = (unsigned)i1.x + (unsigned)i2.x + (unsigned)i3.x + (unsigned)i4.x + 2;
-+        unsigned rety = (unsigned)i1.y + (unsigned)i2.y + (unsigned)i3.y + (unsigned)i4.y + 2;
- 
--    DEF_F(Convert_uv, out_T_uv)
--    {
--        DEFAULT_DST(1) = make_ushort2(
--            conv_8to16(SUB_F(uv, 1), mask_10bit),
--            conv_8to16(SUB_F(uv, 2), mask_10bit)
--        );
-+        if (shift > -2)
-+            return { SHIFTDOWN(retx), SHIFTDOWN(rety) };
-+        else
-+            return { SHIFTUP(retx),   SHIFTUP(rety)   };
-     }
- };
- 
--struct Convert_yuv444p_p016le
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift2_x
- {
+-};
+-
+-struct Convert_yuv444p_p010le
+-{
 -    static const int in_bit_depth = 8;
 -    typedef uchar in_T;
 -    typedef uchar in_T_uv;
@@ -1429,8 +1373,29 @@
 -    typedef ushort2 out_T_uv;
 -
 -    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
+-    {
+-        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_10bit);
+-    }
+-
+-    DEF_F(Convert_uv, out_T_uv)
+-    {
+-        DEFAULT_DST(1) = make_ushort2(
+-            conv_8to16(SUB_F(uv, 1), mask_10bit),
+-            conv_8to16(SUB_F(uv, 2), mask_10bit)
+-        );
+-    }
+-};
+-
+-struct Convert_yuv444p_p016le
+-{
+-    static const int in_bit_depth = 8;
+-    typedef uchar in_T;
+-    typedef uchar in_T_uv;
+-    typedef ushort out_T;
+-    typedef ushort2 out_T_uv;
+-
+-    DEF_F(Convert, out_T)
+-    {
 -        DEFAULT_DST(0) = conv_8to16(SUB_F(y, 0), mask_16bit);
 -    }
 -
@@ -1440,13 +1405,11 @@
 -            conv_8to16(SUB_F(uv, 1), mask_16bit),
 -            conv_8to16(SUB_F(uv, 2), mask_16bit)
 -        );
-+        return add_conv_shift1<unsigned, DST, shift, dither>()(i1.x, i2.x, i3.x, i4.x, d);
-     }
- };
- 
+-    }
+-};
+-
 -struct Convert_yuv444p_yuv444p16le
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift2_y
- {
+-{
 -    static const int in_bit_depth = 8;
 -    typedef uchar in_T;
 -    typedef uchar in_T_uv;
@@ -1459,67 +1422,48 @@
 -    }
 -
 -    DEF_F(Convert_uv, out_T_uv)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
+-    {
 -        DEFAULT_DST(1) = conv_8to16(SUB_F(uv, 1), mask_16bit);
 -        DEFAULT_DST(2) = conv_8to16(SUB_F(uv, 2), mask_16bit);
-+        return add_conv_shift1<unsigned, DST, shift, dither>()(i1.y, i2.y, i3.y, i4.y, d);
-     }
- };
- 
+-    }
+-};
+-
 -// p010le->X
 -
 -struct Convert_p010le_yuv420p
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift3
- {
+-{
 -    static const int in_bit_depth = 10;
 -    typedef ushort in_T;
 -    typedef ushort2 in_T_uv;
 -    typedef uchar out_T;
 -    typedef uchar out_T_uv;
-+    typedef decltype(DST::x) dstbase;
- 
+-
 -    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
+-    {
 -        DEFAULT_DST(0) = conv_10to8(SUB_F(y, 0));
 -    }
-+        unsigned retx = (unsigned)i1.x + (unsigned)i2.x + (unsigned)i3.x + (unsigned)i4.x + 2;
-+        unsigned rety = (unsigned)i1.y + (unsigned)i2.y + (unsigned)i3.y + (unsigned)i4.y + 2;
-+        unsigned retz = (unsigned)i1.z + (unsigned)i2.z + (unsigned)i3.z + (unsigned)i4.z + 2;
- 
+-
 -    DEF_F(Convert_uv, out_T_uv)
 -    {
 -        in_T_uv res = SUB_F(uv, 1);
 -        DEFAULT_DST(1) = conv_10to8(res.x);
 -        DEFAULT_DST(2) = conv_10to8(res.y);
-+        if (shift > -2)
-+            return { SHIFTDOWN(retx), SHIFTDOWN(rety), SHIFTDOWN(retz) };
-+        else
-+            return { SHIFTUP(retx),   SHIFTUP(rety),   SHIFTUP(retz)   };
-     }
- };
- 
+-    }
+-};
+-
 -struct Convert_p010le_nv12
-+template<class SRC, class DST, int shift, int dither> struct add_conv_shift4
- {
+-{
 -    static const int in_bit_depth = 10;
 -    typedef ushort in_T;
 -    typedef ushort2 in_T_uv;
 -    typedef uchar out_T;
 -    typedef uchar2 out_T_uv;
-+    typedef decltype(DST::x) dstbase;
- 
+-
 -    DEF_F(Convert, out_T)
-+    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
-     {
+-    {
 -        DEFAULT_DST(0) = conv_10to8(SUB_F(y, 0));
 -    }
-+        unsigned retx = (unsigned)i1.x + (unsigned)i2.x + (unsigned)i3.x + (unsigned)i4.x + 2;
-+        unsigned rety = (unsigned)i1.y + (unsigned)i2.y + (unsigned)i3.y + (unsigned)i4.y + 2;
-+        unsigned retz = (unsigned)i1.z + (unsigned)i2.z + (unsigned)i3.z + (unsigned)i4.z + 2;
-+        unsigned retw = (unsigned)i1.w + (unsigned)i2.w + (unsigned)i3.w + (unsigned)i4.w + 2;
- 
+-
 -    DEF_F(Convert_uv, out_T_uv)
 -    {
 -        in_T_uv res = SUB_F(uv, 1);
@@ -1527,13 +1471,9 @@
 -            conv_10to8(res.x),
 -            conv_10to8(res.y)
 -        );
-+        if (shift > -2)
-+            return { SHIFTDOWN(retx), SHIFTDOWN(rety), SHIFTDOWN(retz), SHIFTDOWN(retw) };
-+        else
-+            return { SHIFTUP(retx),   SHIFTUP(rety),   SHIFTUP(retz),   SHIFTUP(retw)   };
-     }
- };
- 
+-    }
+-};
+-
 -struct Convert_p010le_yuv444p
 -{
 -    static const int in_bit_depth = 10;
@@ -1757,7 +1697,9 @@
 -    typedef ushort in_T_uv;
 -    typedef uchar out_T;
 -    typedef uchar out_T_uv;
--
++#define SHIFTDOWN(val) (dstbase)(val >> abs(2 + shift))
++#define SHIFTUP(val)   (dstbase)(val << abs(-shift - 2))
+ 
 -    DEF_F(Convert, out_T)
 -    {
 -        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
@@ -1771,71 +1713,97 @@
 -};
 -
 -struct Convert_yuv444p16le_nv12
--{
++template<class SRC, class DST, int shift, int dither> struct add_conv_shift1_d
+ {
 -    static const int in_bit_depth = 16;
 -    typedef ushort in_T;
 -    typedef ushort in_T_uv;
 -    typedef uchar out_T;
 -    typedef uchar2 out_T_uv;
--
++    typedef DST dstbase;
+ 
 -    DEF_F(Convert, out_T)
--    {
++    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
+     {
 -        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
 -    }
--
++        unsigned ret = (unsigned)i1 + (unsigned)i2 + (unsigned)i3 + (unsigned)i4 + ((1 + d) >> (sizeof(SRC) * 8 - dither + 3));
+ 
 -    DEF_F(Convert_uv, out_T_uv)
 -    {
 -        DEFAULT_DST(1) = make_uchar2(
 -            conv_16to8(SUB_F(uv, 1)),
 -            conv_16to8(SUB_F(uv, 2))
 -        );
--    }
--};
--
++        if (shift > -2)
++            return SHIFTDOWN(ret);
++        else
++            return SHIFTUP(ret);
+     }
+ };
+ 
 -struct Convert_yuv444p16le_yuv444p
--{
++template<class SRC, class DST, int shift, int dither> struct add_conv_shift1
+ {
 -    static const int in_bit_depth = 16;
 -    typedef ushort in_T;
 -    typedef ushort in_T_uv;
 -    typedef uchar out_T;
 -    typedef uchar out_T_uv;
--
++    typedef DST dstbase;
+ 
 -    DEF_F(Convert, out_T)
--    {
++    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
+     {
 -        DEFAULT_DST(0) = conv_16to8(SUB_F(y, 0));
 -    }
--
++        unsigned ret = (unsigned)i1 + (unsigned)i2 + (unsigned)i3 + (unsigned)i4 + 2;
+ 
 -    DEF_F(Convert_uv, out_T_uv)
 -    {
 -        DEFAULT_DST(1) = conv_16to8(SUB_F(uv, 1));
 -        DEFAULT_DST(2) = conv_16to8(SUB_F(uv, 2));
--    }
--};
--
++        if (shift > -2)
++            return SHIFTDOWN(ret);
++        else
++            return SHIFTUP(ret);
+     }
+ };
+ 
 -struct Convert_yuv444p16le_p010le
--{
++template<class SRC, class DST, int shift, int dither> struct add_conv_shift2
+ {
 -    static const int in_bit_depth = 16;
 -    typedef ushort in_T;
 -    typedef ushort in_T_uv;
 -    typedef ushort out_T;
 -    typedef ushort2 out_T_uv;
--
++    typedef decltype(DST::x) dstbase;
+ 
 -    DEF_F(Convert, out_T)
--    {
++    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
+     {
 -        DEFAULT_DST(0) = conv_16to10(SUB_F(y, 0));
 -    }
--
++        unsigned retx = (unsigned)i1.x + (unsigned)i2.x + (unsigned)i3.x + (unsigned)i4.x + 2;
++        unsigned rety = (unsigned)i1.y + (unsigned)i2.y + (unsigned)i3.y + (unsigned)i4.y + 2;
+ 
 -    DEF_F(Convert_uv, out_T_uv)
 -    {
 -        DEFAULT_DST(1) = make_ushort2(
 -            conv_16to10(SUB_F(uv, 1)),
 -            conv_16to10(SUB_F(uv, 2))
 -        );
--    }
--};
--
++        if (shift > -2)
++            return { SHIFTDOWN(retx), SHIFTDOWN(rety) };
++        else
++            return { SHIFTUP(retx),   SHIFTUP(rety)   };
+     }
+ };
+ 
 -struct Convert_yuv444p16le_p016le
--{
++template<class SRC, class DST, int shift, int dither> struct add_conv_shift2_x
+ {
 -    static const int in_bit_depth = 16;
 -    typedef ushort in_T;
 -    typedef ushort in_T_uv;
@@ -1848,16 +1816,19 @@
 -    }
 -
 -    DEF_F(Convert_uv, out_T_uv)
--    {
++    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
+     {
 -        DEFAULT_DST(1) = make_ushort2(
 -            SUB_F(uv, 1),
 -            SUB_F(uv, 2)
 -        );
--    }
--};
--
++        return add_conv_shift1<unsigned, DST, shift, dither>()(i1.x, i2.x, i3.x, i4.x, d);
+     }
+ };
+ 
 -struct Convert_yuv444p16le_yuv444p16le
--{
++template<class SRC, class DST, int shift, int dither> struct add_conv_shift2_y
+ {
 -    static const int in_bit_depth = 16;
 -    typedef ushort in_T;
 -    typedef ushort in_T_uv;
@@ -1870,15 +1841,144 @@
 -    }
 -
 -    DEF_F(Convert_uv, out_T_uv)
--    {
++    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
+     {
 -        DEFAULT_DST(1) = SUB_F(uv, 1);
 -        DEFAULT_DST(2) = SUB_F(uv, 2);
++        return add_conv_shift1<unsigned, DST, shift, dither>()(i1.y, i2.y, i3.y, i4.y, d);
+     }
+ };
+ 
+-#define DEF_CONVERT_IDENTITY(fmt1, fmt2)\
+-                                        \
+-struct Convert_##fmt1##_##fmt2          \
+-{                                       \
+-    static const int in_bit_depth = 8;  \
+-    typedef uchar4 in_T;                \
+-    typedef uchar in_T_uv;              \
+-    typedef uchar4 out_T;               \
+-    typedef uchar out_T_uv;             \
+-                                        \
+-    DEF_F(Convert, out_T)               \
+-    {                                   \
+-        DEFAULT_DST(0) = SUB_F(y, 0);   \
+-    }                                   \
+-                                        \
+-    DEF_F(Convert_uv, out_T_uv)         \
+-    {                                   \
+-    }                                   \
+-};                                      \
+-
+-#define DEF_CONVERT_REORDER(fmt1, fmt2) \
+-                                        \
+-struct Convert_##fmt1##_##fmt2          \
+-{                                       \
+-    static const int in_bit_depth = 8;  \
+-    typedef uchar4 in_T;                \
+-    typedef uchar in_T_uv;              \
+-    typedef uchar4 out_T;               \
+-    typedef uchar out_T_uv;             \
+-                                        \
+-    DEF_F(Convert, out_T)               \
+-    {                                   \
+-        uchar4 res = SUB_F(y, 0);       \
+-        DEFAULT_DST(0) = make_uchar4(   \
+-            res.z,                      \
+-            res.y,                      \
+-            res.x,                      \
+-            res.w                       \
+-        );                              \
+-    }                                   \
+-                                        \
+-    DEF_F(Convert_uv, out_T_uv)         \
+-    {                                   \
+-    }                                   \
+-};                                      \
+-
+-#define DEF_CONVERT_RGB(fmt1, fmt2)     \
+-                                        \
+-DEF_CONVERT_IDENTITY(fmt1, fmt1)        \
+-DEF_CONVERT_REORDER (fmt1, fmt2)        \
+-DEF_CONVERT_REORDER (fmt2, fmt1)        \
+-DEF_CONVERT_IDENTITY(fmt2, fmt2)
+-
+-DEF_CONVERT_RGB(rgb0, bgr0)
+-DEF_CONVERT_RGB(rgba, bgra)
+-DEF_CONVERT_IDENTITY(rgba, rgb0)
+-DEF_CONVERT_IDENTITY(bgra, bgr0)
+-DEF_CONVERT_REORDER(rgba, bgr0)
+-DEF_CONVERT_REORDER(bgra, rgb0)
+-
+-struct Convert_bgr0_bgra
++template<class SRC, class DST, int shift, int dither> struct add_conv_shift3
+ {
+-    static const int in_bit_depth = 8;
+-    typedef uchar4 in_T;
+-    typedef uchar in_T_uv;
+-    typedef uchar4 out_T;
+-    typedef uchar out_T_uv;
++    typedef decltype(DST::x) dstbase;
+ 
+-    DEF_F(Convert, out_T)
++    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
+     {
+-        uchar4 res = SUB_F(y, 0);
+-        DEFAULT_DST(0) = make_uchar4(
+-            res.x,
+-            res.y,
+-            res.z,
+-            1
+-        );
 -    }
--};
--
--// bgr0->X
--
--struct Convert_bgr0_bgr0
++        unsigned retx = (unsigned)i1.x + (unsigned)i2.x + (unsigned)i3.x + (unsigned)i4.x + 2;
++        unsigned rety = (unsigned)i1.y + (unsigned)i2.y + (unsigned)i3.y + (unsigned)i4.y + 2;
++        unsigned retz = (unsigned)i1.z + (unsigned)i2.z + (unsigned)i3.z + (unsigned)i4.z + 2;
+ 
+-    DEF_F(Convert_uv, out_T_uv)
+-    {
++        if (shift > -2)
++            return { SHIFTDOWN(retx), SHIFTDOWN(rety), SHIFTDOWN(retz) };
++        else
++            return { SHIFTUP(retx),   SHIFTUP(rety),   SHIFTUP(retz)   };
+     }
+ };
+ 
+-struct Convert_bgr0_rgba
++template<class SRC, class DST, int shift, int dither> struct add_conv_shift4
+ {
+-    static const int in_bit_depth = 8;
+-    typedef uchar4 in_T;
+-    typedef uchar in_T_uv;
+-    typedef uchar4 out_T;
+-    typedef uchar out_T_uv;
++    typedef decltype(DST::x) dstbase;
+ 
+-    DEF_F(Convert, out_T)
++    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
+     {
+-        uchar4 res = SUB_F(y, 0);
+-        DEFAULT_DST(0) = make_uchar4(
+-            res.z,
+-            res.y,
+-            res.x,
+-            1
+-        );
+-    }
++        unsigned retx = (unsigned)i1.x + (unsigned)i2.x + (unsigned)i3.x + (unsigned)i4.x + 2;
++        unsigned rety = (unsigned)i1.y + (unsigned)i2.y + (unsigned)i3.y + (unsigned)i4.y + 2;
++        unsigned retz = (unsigned)i1.z + (unsigned)i2.z + (unsigned)i3.z + (unsigned)i4.z + 2;
++        unsigned retw = (unsigned)i1.w + (unsigned)i2.w + (unsigned)i3.w + (unsigned)i4.w + 2;
+ 
+-    DEF_F(Convert_uv, out_T_uv)
+-    {
++        if (shift > -2)
++            return { SHIFTDOWN(retx), SHIFTDOWN(rety), SHIFTDOWN(retz), SHIFTDOWN(retw) };
++        else
++            return { SHIFTUP(retx),   SHIFTUP(rety),   SHIFTUP(retz),   SHIFTUP(retw)   };
+     }
+ };
+ 
+-struct Convert_rgb0_bgra
 +template<class SRC, class DST, template<class, class, int, int> class conv, int pitch, int shift, int dither>
 +__inline__ __device__ void Subsample_Bilinear(cudaTextureObject_t tex,
 +                                   DST *dst,
@@ -1891,19 +1991,20 @@
 -    typedef uchar in_T_uv;
 -    typedef uchar4 out_T;
 -    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
 +    int xo = blockIdx.x * blockDim.x + threadIdx.x;
 +    int yo = blockIdx.y * blockDim.y + threadIdx.y;
  
--    DEF_F(Convert_uv, out_T_uv)
+-    DEF_F(Convert, out_T)
 +    if (yo < dst_height && xo < dst_width)
      {
+-        uchar4 res = SUB_F(y, 0);
+-        DEFAULT_DST(0) = make_uchar4(
+-            res.z,
+-            res.y,
+-            res.x,
+-            1
+-        );
 -    }
--};
 +        float hscale = (float)src_width / (float)dst_width;
 +        float vscale = (float)src_height / (float)dst_height;
 +        float xi = (xo + 0.5f) * hscale;
@@ -1914,76 +2015,36 @@
 +        // Convert weights to two bilinear weights -> {wh,1.0,wh} -> {wh,0.5,0} + {0,0.5,wh}
 +        float dx = wh / (0.5f + wh);
 +        float dy = wv / (0.5f + wv);
-+
+ 
+-    DEF_F(Convert_uv, out_T_uv)
+-    {
+-    }
+-};
 +        SRC i0 = tex2D<SRC>(tex, xi-dx, yi-dy);
 +        SRC i1 = tex2D<SRC>(tex, xi+dx, yi-dy);
 +        SRC i2 = tex2D<SRC>(tex, xi-dx, yi+dy);
 +        SRC i3 = tex2D<SRC>(tex, xi+dx, yi+dy);
  
--struct Convert_bgr0_rgb0
+-struct Convert_rgb0_rgba
 -{
 -    static const int in_bit_depth = 8;
 -    typedef uchar4 in_T;
 -    typedef uchar in_T_uv;
 -    typedef uchar4 out_T;
 -    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        uchar4 res = SUB_F(y, 0);
--        DEFAULT_DST(0) = make_uchar4(
--            res.z,
--            res.y,
--            res.x,
--            res.w
--        );
--    }
 +        ushort ditherVal = dither ? tex2D<ushort>(ditherTex, xo, yo) : 0;
  
--    DEF_F(Convert_uv, out_T_uv)
--    {
-+        dst[yo*(dst_pitch / sizeof(DST))+xo*pitch] = conv<SRC, DST, shift, dither>()(i0, i1, i2, i3, ditherVal);
-     }
--};
--
--// rgb0->X
--
--struct Convert_rgb0_bgr0
--{
--    static const int in_bit_depth = 8;
--    typedef uchar4 in_T;
--    typedef uchar in_T_uv;
--    typedef uchar4 out_T;
--    typedef uchar out_T_uv;
--
 -    DEF_F(Convert, out_T)
 -    {
 -        uchar4 res = SUB_F(y, 0);
 -        DEFAULT_DST(0) = make_uchar4(
--            res.z,
--            res.y,
 -            res.x,
--            res.w
+-            res.y,
+-            res.z,
+-            1
 -        );
--    }
--
--    DEF_F(Convert_uv, out_T_uv)
--    {
--    }
--};
--
--struct Convert_rgb0_rgb0
--{
--    static const int in_bit_depth = 8;
--    typedef uchar4 in_T;
--    typedef uchar in_T_uv;
--    typedef uchar4 out_T;
--    typedef uchar out_T_uv;
--
--    DEF_F(Convert, out_T)
--    {
--        DEFAULT_DST(0) = SUB_F(y, 0);
--    }
++        dst[yo*(dst_pitch / sizeof(DST))+xo*pitch] = conv<SRC, DST, shift, dither>()(i0, i1, i2, i3, ditherVal);
+     }
 -
 -    DEF_F(Convert_uv, out_T_uv)
 -    {
@@ -2027,8 +2088,8 @@
 -    res.w = 1.0f - res.x - res.y - res.z;
 -
 -    return res;
--}
--
+ }
+ 
 -template<typename V>
 -__device__ static inline V apply_coeffs(float4 coeffs, V c0, V c1, V c2, V c3)
 -{
@@ -2038,8 +2099,8 @@
 -    res  += c3 * coeffs.w;
 -
 -    return res;
- }
- 
+-}
+-
 -template<typename T>
 -__device__ static inline T Subsample_Nearest(cudaTextureObject_t tex,
 -                                             int xo, int yo,
@@ -2166,6 +2227,12 @@
 -    NEAREST_KERNEL_RAW(p016le_ ## C)      \
 -    NEAREST_KERNEL_RAW(yuv444p16le_ ## C)
 -
+-#define NEAREST_KERNELS_RGB(C) \
+-    NEAREST_KERNEL_RAW(rgb0_ ## C)  \
+-    NEAREST_KERNEL_RAW(bgr0_ ## C)  \
+-    NEAREST_KERNEL_RAW(rgba_ ## C)  \
+-    NEAREST_KERNEL_RAW(bgra_ ## C)  \
+-
 -NEAREST_KERNELS(yuv420p)
 -NEAREST_KERNELS(nv12)
 -NEAREST_KERNELS(yuv444p)
@@ -2173,11 +2240,10 @@
 -NEAREST_KERNELS(p016le)
 -NEAREST_KERNELS(yuv444p16le)
 -
--NEAREST_KERNEL_RAW(bgr0_bgr0)
--NEAREST_KERNEL_RAW(rgb0_rgb0)
--NEAREST_KERNEL_RAW(bgr0_rgb0)
--NEAREST_KERNEL_RAW(rgb0_bgr0)
--
+-NEAREST_KERNELS_RGB(rgb0)
+-NEAREST_KERNELS_RGB(bgr0)
+-NEAREST_KERNELS_RGB(rgba)
+-NEAREST_KERNELS_RGB(bgra)
 -
 -#define BILINEAR_KERNEL(C, S) \
 -    __global__ void Subsample_Bilinear_##C##S(                      \
@@ -2201,6 +2267,12 @@
 -    BILINEAR_KERNEL_RAW(p016le_ ## C)      \
 -    BILINEAR_KERNEL_RAW(yuv444p16le_ ## C)
 -
+-#define BILINEAR_KERNELS_RGB(C)     \
+-    BILINEAR_KERNEL_RAW(rgb0_ ## C) \
+-    BILINEAR_KERNEL_RAW(bgr0_ ## C) \
+-    BILINEAR_KERNEL_RAW(rgba_ ## C) \
+-    BILINEAR_KERNEL_RAW(bgra_ ## C)
+-
 -BILINEAR_KERNELS(yuv420p)
 -BILINEAR_KERNELS(nv12)
 -BILINEAR_KERNELS(yuv444p)
@@ -2208,10 +2280,10 @@
 -BILINEAR_KERNELS(p016le)
 -BILINEAR_KERNELS(yuv444p16le)
 -
--BILINEAR_KERNEL_RAW(bgr0_bgr0)
--BILINEAR_KERNEL_RAW(rgb0_rgb0)
--BILINEAR_KERNEL_RAW(bgr0_rgb0)
--BILINEAR_KERNEL_RAW(rgb0_bgr0)
+-BILINEAR_KERNELS_RGB(rgb0)
+-BILINEAR_KERNELS_RGB(bgr0)
+-BILINEAR_KERNELS_RGB(rgba)
+-BILINEAR_KERNELS_RGB(bgra)
 -
 -#define BICUBIC_KERNEL(C, S) \
 -    __global__ void Subsample_Bicubic_##C##S(                                        \
@@ -2235,6 +2307,12 @@
 -    BICUBIC_KERNEL_RAW(p016le_ ## C)      \
 -    BICUBIC_KERNEL_RAW(yuv444p16le_ ## C)
 -
+-#define BICUBIC_KERNELS_RGB(C)      \
+-    BICUBIC_KERNEL_RAW(rgb0_ ## C)  \
+-    BICUBIC_KERNEL_RAW(bgr0_ ## C)  \
+-    BICUBIC_KERNEL_RAW(rgba_ ## C)  \
+-    BICUBIC_KERNEL_RAW(bgra_ ## C)
+-
 -BICUBIC_KERNELS(yuv420p)
 -BICUBIC_KERNELS(nv12)
 -BICUBIC_KERNELS(yuv444p)
@@ -2242,11 +2320,10 @@
 -BICUBIC_KERNELS(p016le)
 -BICUBIC_KERNELS(yuv444p16le)
 -
--BICUBIC_KERNEL_RAW(bgr0_bgr0)
--BICUBIC_KERNEL_RAW(rgb0_rgb0)
--BICUBIC_KERNEL_RAW(bgr0_rgb0)
--BICUBIC_KERNEL_RAW(rgb0_bgr0)
--
+-BICUBIC_KERNELS_RGB(rgb0)
+-BICUBIC_KERNELS_RGB(bgr0)
+-BICUBIC_KERNELS_RGB(rgba)
+-BICUBIC_KERNELS_RGB(bgra)
 -
 -#define LANCZOS_KERNEL(C, S) \
 -    __global__ void Subsample_Lanczos_##C##S(                                        \
@@ -2257,30 +2334,6 @@
 -                       Subsample_Bicubic<Convert_## C ::in_T_uv, lanczos_coeffs> >), \
 -                  Convert_##C::out_T##S) \
 -    }
--
--#define LANCZOS_KERNEL_RAW(C) \
--    LANCZOS_KERNEL(C,)   \
--    LANCZOS_KERNEL(C,_uv)
--
--#define LANCZOS_KERNELS(C) \
--    LANCZOS_KERNEL_RAW(yuv420p_ ## C)     \
--    LANCZOS_KERNEL_RAW(nv12_ ## C)        \
--    LANCZOS_KERNEL_RAW(yuv444p_ ## C)     \
--    LANCZOS_KERNEL_RAW(p010le_ ## C)      \
--    LANCZOS_KERNEL_RAW(p016le_ ## C)      \
--    LANCZOS_KERNEL_RAW(yuv444p16le_ ## C)
--
--LANCZOS_KERNELS(yuv420p)
--LANCZOS_KERNELS(nv12)
--LANCZOS_KERNELS(yuv444p)
--LANCZOS_KERNELS(p010le)
--LANCZOS_KERNELS(p016le)
--LANCZOS_KERNELS(yuv444p16le)
--
--LANCZOS_KERNEL_RAW(bgr0_bgr0)
--LANCZOS_KERNEL_RAW(rgb0_rgb0)
--LANCZOS_KERNEL_RAW(bgr0_rgb0)
--LANCZOS_KERNEL_RAW(rgb0_bgr0)
 +#define VARIANT(SRC, DST, CONV, SHIFT, PITCH, DITHER, NAME) \
 +__global__ void Subsample_Bilinear_ ## NAME(cudaTextureObject_t tex, \
 +                                    DST *dst, \
@@ -2291,7 +2344,10 @@
 +    Subsample_Bilinear<SRC, DST, CONV, PITCH, SHIFT, DITHER>(tex, dst, dst_width, dst_height, dst_pitch, \
 +                                                             src_width, src_height, ditherTex); \
 +}
-+
+ 
+-#define LANCZOS_KERNEL_RAW(C) \
+-    LANCZOS_KERNEL(C,)   \
+-    LANCZOS_KERNEL(C,_uv)
 +#define VARIANTSET2(SRC, DST, SHIFT, NAME) \
 +    VARIANT(SRC,      DST,      add_conv_shift1_d, SHIFT, 1, (sizeof(DST) < sizeof(SRC)) ? sizeof(DST) : 0, NAME) \
 +    VARIANT(SRC,      DST,      add_conv_shift1,   SHIFT, 1, 0, NAME ## _c) \
@@ -2300,18 +2356,40 @@
 +    VARIANT(SRC ## 2, DST,      add_conv_shift2_x, SHIFT, 1, 0, NAME ## _2_u) \
 +    VARIANT(SRC ## 2, DST,      add_conv_shift2_y, SHIFT, 1, 0, NAME ## _2_v) \
 +    VARIANT(SRC ## 4, DST ## 4, add_conv_shift4,   SHIFT, 1, 0, NAME ## _4)
-+
+ 
+-#define LANCZOS_KERNELS(C) \
+-    LANCZOS_KERNEL_RAW(yuv420p_ ## C)     \
+-    LANCZOS_KERNEL_RAW(nv12_ ## C)        \
+-    LANCZOS_KERNEL_RAW(yuv444p_ ## C)     \
+-    LANCZOS_KERNEL_RAW(p010le_ ## C)      \
+-    LANCZOS_KERNEL_RAW(p016le_ ## C)      \
+-    LANCZOS_KERNEL_RAW(yuv444p16le_ ## C)
 +#define VARIANTSET(SRC, DST, SRCSIZE, DSTSIZE) \
 +    VARIANTSET2(SRC, DST, (SRCSIZE - DSTSIZE), SRCSIZE ## _ ## DSTSIZE)
-+
+ 
+-#define LANCZOS_KERNELS_RGB(C)      \
+-    LANCZOS_KERNEL_RAW(rgb0_ ## C)  \
+-    LANCZOS_KERNEL_RAW(bgr0_ ## C)  \
+-    LANCZOS_KERNEL_RAW(rgba_ ## C)  \
+-    LANCZOS_KERNEL_RAW(bgra_ ## C)
 +// Straight no-conversion
 +VARIANTSET(uchar,  uchar,  8,  8)
 +VARIANTSET(ushort, ushort, 16, 16)
-+
+ 
+-LANCZOS_KERNELS(yuv420p)
+-LANCZOS_KERNELS(nv12)
+-LANCZOS_KERNELS(yuv444p)
+-LANCZOS_KERNELS(p010le)
+-LANCZOS_KERNELS(p016le)
+-LANCZOS_KERNELS(yuv444p16le)
 +// Conversion between 8- and 16-bit
 +VARIANTSET(uchar,  ushort, 8,  16)
 +VARIANTSET(ushort, uchar,  16, 8)
  
+-LANCZOS_KERNELS_RGB(rgb0)
+-LANCZOS_KERNELS_RGB(bgr0)
+-LANCZOS_KERNELS_RGB(rgba)
+-LANCZOS_KERNELS_RGB(bgra)
  }
 --- libavfilter/vf_scale_cuda.h
 +++ /dev/null
@@ -2344,3 +2422,13 @@
 -#define SCALE_CUDA_PARAM_DEFAULT 999999.0f
 -
 -#endif
+--- tests/ref/fate/source
++++ tests/ref/fate/source
+@@ -25,6 +25,7 @@ compat/float/limits.h
+ libavcodec/bitstream_template.h
+ libavcodec/vulkan_video_codec_av1std_decode_mesa.h
+ libavcodec/vulkan_video_codec_av1std_mesa.h
++libavfilter/dither_matrix.h
+ tools/decode_simple.h
+ Use of av_clip() where av_clip_uintp2() could be used:
+ Use of av_clip() where av_clip_intp2() could be used:

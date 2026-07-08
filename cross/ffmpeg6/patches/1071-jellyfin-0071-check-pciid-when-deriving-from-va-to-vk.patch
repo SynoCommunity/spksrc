@@ -1,9 +1,11 @@
 --- libavutil/hwcontext_vulkan.c
 +++ libavutil/hwcontext_vulkan.c
-@@ -1581,17 +1581,33 @@ static int vulkan_device_derive(AVHWDevi
+@@ -1596,18 +1596,33 @@ static int vulkan_device_derive(AVHWDeviceContext *ctx,
  #if CONFIG_VAAPI
      case AV_HWDEVICE_TYPE_VAAPI: {
          AVVAAPIDeviceContext *src_hwctx = src_ctx->hwctx;
+-
+-        const char *vendor = vaQueryVendorString(src_hwctx->display);
 +        VADisplay dpy = src_hwctx->display;
 +#if VA_CHECK_VERSION(1, 15, 0)
 +        VAStatus vas;
@@ -12,8 +14,8 @@
 +        };
 +#endif
 +        const char *vendor;
+         int use_linear_images = 0;
  
--        const char *vendor = vaQueryVendorString(src_hwctx->display);
 -        if (!vendor) {
 -            av_log(ctx, AV_LOG_ERROR, "Unable to get device info from VAAPI!\n");
 -            return AVERROR_EXTERNAL;
@@ -31,15 +33,13 @@
 +                return AVERROR_EXTERNAL;
 +            }
  
--        if (strstr(vendor, "Intel"))
--            dev_select.vendor_id = 0x8086;
--        if (strstr(vendor, "AMD"))
+-        if (strstr(vendor, "AMD")) {
 -            dev_select.vendor_id = 0x1002;
-+            if (strstr(vendor, "Intel"))
-+                dev_select.vendor_id = 0x8086;
-+            if (strstr(vendor, "AMD"))
+-            use_linear_images = 1;
++            if (strstr(vendor, "AMD")) {
 +                dev_select.vendor_id = 0x1002;
-+        }
++                use_linear_images = 1;
++            }
+         }
  
-         return vulkan_device_create_internal(ctx, &dev_select, opts, flags);
-     }
+         /* AMD VA-API encoders require linear contiguous (multiplane) surface */

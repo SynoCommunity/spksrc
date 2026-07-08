@@ -1,6 +1,6 @@
 --- libavcodec/dxva2.c
 +++ libavcodec/dxva2.c
-@@ -615,6 +615,16 @@ int ff_dxva2_common_frame_params(AVCodec
+@@ -615,6 +615,16 @@ int ff_dxva2_common_frame_params(AVCodecContext *avctx,
      else
          surface_alignment = 16;
  
@@ -19,7 +19,7 @@
  
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
-@@ -545,6 +545,35 @@ static void d3d11va_device_uninit(AVHWDe
+@@ -563,6 +563,35 @@ static void d3d11va_device_uninit(AVHWDeviceContext *hwdev)
      }
  }
  
@@ -55,7 +55,7 @@
  static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
                                   AVDictionary *opts, int flags)
  {
-@@ -608,6 +637,9 @@ static int d3d11va_device_create(AVHWDev
+@@ -661,6 +690,9 @@ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
          ID3D10Multithread_Release(pMultithread);
      }
  

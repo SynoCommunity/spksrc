@@ -1,6 +1,6 @@
 --- libavfilter/vf_scale_vaapi.c
 +++ libavfilter/vf_scale_vaapi.c
-@@ -212,7 +212,7 @@ static const AVOption scale_vaapi_option
+@@ -224,7 +224,7 @@ static const AVOption scale_vaapi_options[] = {
      { "format", "Output video format (software format of hardware frames)",
        OFFSET(output_format_string), AV_OPT_TYPE_STRING, .flags = FLAGS },
      { "mode", "Scaling mode",

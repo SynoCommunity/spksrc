@@ -1,6 +1,6 @@
 --- fftools/Makefile
 +++ fftools/Makefile
-@@ -35,6 +35,12 @@ endef
+@@ -37,6 +37,12 @@ endef
  
  $(foreach P,$(AVPROGS-yes),$(eval $(call DOFFTOOL,$(P))))
  

@@ -1,6 +1,6 @@
 --- libavutil/frame.c
 +++ libavutil/frame.c
-@@ -259,9 +259,39 @@ FF_ENABLE_DEPRECATION_WARNINGS
+@@ -260,6 +260,36 @@ FF_ENABLE_DEPRECATION_WARNINGS
      return AVERROR(EINVAL);
  }
  
@@ -36,16 +36,12 @@
 +
  static int frame_copy_props(AVFrame *dst, const AVFrame *src, int force_copy)
  {
--    int ret, i;
-+    int ret;
- 
-     dst->key_frame              = src->key_frame;
-     dst->pict_type              = src->pict_type;
-@@ -310,31 +340,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
+     int ret;
+@@ -327,31 +357,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
  
      av_dict_copy(&dst->metadata, src->metadata, 0);
  
--    for (i = 0; i < src->nb_side_data; i++) {
+-    for (int i = 0; i < src->nb_side_data; i++) {
 -        const AVFrameSideData *sd_src = src->side_data[i];
 -        AVFrameSideData *sd_dst;
 -        if (   sd_src->type == AV_FRAME_DATA_PANSCAN
@@ -76,7 +72,7 @@
  
      ret = av_buffer_replace(&dst->opaque_ref, src->opaque_ref);
      ret |= av_buffer_replace(&dst->private_ref, src->private_ref);
-@@ -793,6 +801,17 @@ void av_frame_remove_side_data(AVFrame *
+@@ -928,6 +936,17 @@ void av_frame_remove_side_data(AVFrame *frame, enum AVFrameSideDataType type)
      }
  }
  
@@ -96,7 +92,7 @@
      switch(type) {
 --- libavutil/frame.h
 +++ libavutil/frame.h
-@@ -866,6 +866,21 @@ int av_frame_copy(AVFrame *dst, const AV
+@@ -958,6 +958,21 @@ int av_frame_copy(AVFrame *dst, const AVFrame *src);
   */
  int av_frame_copy_props(AVFrame *dst, const AVFrame *src);
  
@@ -118,7 +114,7 @@
  /**
   * Get the buffer reference a given data plane is stored in.
   *
-@@ -918,6 +933,10 @@ AVFrameSideData *av_frame_get_side_data(
+@@ -1010,6 +1025,10 @@ AVFrameSideData *av_frame_get_side_data(const AVFrame *frame,
   */
  void av_frame_remove_side_data(AVFrame *frame, enum AVFrameSideDataType type);
  

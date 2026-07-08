@@ -1,6 +1,6 @@
 --- libavfilter/avfilter.h
 +++ libavfilter/avfilter.h
-@@ -532,6 +532,7 @@ struct AVFilterLink {
+@@ -541,6 +541,7 @@ struct AVFilterLink {
      int w;                      ///< agreed upon image width
      int h;                      ///< agreed upon image height
      AVRational sample_aspect_ratio; ///< agreed upon sample aspect ratio
@@ -10,7 +10,7 @@
      /**
 --- libavfilter/opencl.c
 +++ libavfilter/opencl.c
-@@ -76,6 +76,9 @@ int ff_opencl_filter_config_input(AVFilt
+@@ -75,6 +75,9 @@ int ff_opencl_filter_config_input(AVFilterLink *inlink)
      if (!ctx->output_height)
          ctx->output_height = inlink->h;
  
@@ -20,7 +20,7 @@
      return 0;
  }
  
-@@ -124,6 +127,9 @@ int ff_opencl_filter_config_output(AVFil
+@@ -123,6 +126,9 @@ int ff_opencl_filter_config_output(AVFilterLink *outlink)
      outlink->w = ctx->output_width;
      outlink->h = ctx->output_height;
  
@@ -43,7 +43,7 @@
  #include "avfilter.h"
  #include "formats.h"
  #include "internal.h"
-@@ -122,6 +126,12 @@ static int hwmap_config_output(AVFilterL
+@@ -122,6 +126,12 @@ static int hwmap_config_output(AVFilterLink *outlink)
                  goto fail;
              }
  
@@ -56,7 +56,7 @@
          } else if (inlink->format == hwfc->format &&
                     (desc->flags & AV_PIX_FMT_FLAG_HWACCEL) &&
                     ctx->reverse) {
-@@ -144,8 +154,20 @@ static int hwmap_config_output(AVFilterL
+@@ -144,8 +154,20 @@ static int hwmap_config_output(AVFilterLink *outlink)
              frames->width     = hwfc->width;
              frames->height    = hwfc->height;
  
@@ -92,7 +92,7 @@
  #include "avfilter.h"
  #include "formats.h"
  #include "internal.h"
-@@ -151,6 +155,12 @@ static int hwupload_config_output(AVFilt
+@@ -151,6 +155,12 @@ static int hwupload_config_output(AVFilterLink *outlink)
      if (avctx->extra_hw_frames >= 0)
          ctx->hwframes->initial_pool_size = 2 + avctx->extra_hw_frames;
  
@@ -107,7 +107,7 @@
          goto fail;
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
-@@ -213,7 +213,7 @@ static AVBufferRef *d3d11va_alloc_single
+@@ -223,7 +223,7 @@ static AVBufferRef *d3d11va_alloc_single(AVHWFramesContext *ctx)
          .ArraySize  = 1,
          .Usage      = D3D11_USAGE_DEFAULT,
          .BindFlags  = hwctx->BindFlags,
@@ -116,7 +116,7 @@
      };
  
      hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &tex);
-@@ -277,9 +277,17 @@ static int d3d11va_frames_init(AVHWFrame
+@@ -287,9 +287,17 @@ static int d3d11va_frames_init(AVHWFramesContext *ctx)
          .ArraySize  = ctx->initial_pool_size,
          .Usage      = D3D11_USAGE_DEFAULT,
          .BindFlags  = hwctx->BindFlags,

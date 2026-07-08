@@ -1,6 +1,6 @@
 --- libavcodec/vaapi_encode.c
 +++ libavcodec/vaapi_encode.c
-@@ -2714,6 +2714,17 @@ static av_cold int vaapi_encode_create_r
+@@ -2714,6 +2714,17 @@ static av_cold int vaapi_encode_create_recon_frames(AVCodecContext *avctx)
      av_log(avctx, AV_LOG_DEBUG, "Using %s as format of "
             "reconstructed frames.\n", av_get_pix_fmt_name(recon_format));
  
@@ -36,7 +36,7 @@
  /**
 --- libavutil/hwcontext_vaapi.c
 +++ libavutil/hwcontext_vaapi.c
-@@ -276,6 +276,14 @@ static int vaapi_frames_get_constraints(
+@@ -276,6 +276,14 @@ static int vaapi_frames_get_constraints(AVHWDeviceContext *hwdev,
              case VASurfaceAttribMaxHeight:
                  constraints->max_height = attr_list[i].value.value.i;
                  break;

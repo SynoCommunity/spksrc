@@ -1,32 +1,17 @@
 --- configure
 +++ configure
-@@ -7195,8 +7195,23 @@ check_optflags -fno-signed-zeros
- 
- if enabled lto; then
+@@ -7367,6 +7367,10 @@ if [ -n "$lto" ]; then
      test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
--    check_cflags  -flto
--    check_ldflags -flto $cpuflags
-+    if test "$cc_type" = "clang"; then
-+        check_cflags  -flto=thin
-+        check_ldflags -flto=thin $cpuflags
-+        # Clang's LTO fails on Windows, when there are references outside
-+        # of inline assembly to nonlocal labels defined within inline assembly,
-+        # see https://github.com/llvm/llvm-project/issues/76046.
-+        case $target_os in
-+        mingw*|win*)
-+            disable inline_asm_nonlocal_labels
-+            ;;
-+        esac
-+    else
-+        check_cflags  -flto
-+        check_ldflags -flto $cpuflags
+     check_cflags  $lto
+     check_ldflags $lto $cpuflags
++    if test "$cc_type" != "clang"; then
 +        check_cflags  -flto=auto
 +        check_ldflags -flto=auto $cpuflags
 +    fi
      disable inline_asm_direct_symbol_refs
  fi
  
-@@ -7235,7 +7250,9 @@ if enabled icc; then
+@@ -7405,7 +7409,9 @@ if enabled icc; then
              disable aligned_stack
      fi
  elif enabled gcc; then

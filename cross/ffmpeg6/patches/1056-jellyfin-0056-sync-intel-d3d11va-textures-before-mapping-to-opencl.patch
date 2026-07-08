@@ -1,6 +1,6 @@
 --- libavcodec/dxva2.c
 +++ libavcodec/dxva2.c
-@@ -714,8 +714,10 @@ int ff_dxva2_common_frame_params(AVCodec
+@@ -714,8 +714,10 @@ int ff_dxva2_common_frame_params(AVCodecContext *avctx,
  #if CONFIG_D3D11VA
      if (frames_ctx->format == AV_PIX_FMT_D3D11) {
          AVD3D11VAFramesContext *frames_hwctx = frames_ctx->hwctx;
@@ -13,7 +13,7 @@
  
 --- libavfilter/qsvvpp.c
 +++ libavfilter/qsvvpp.c
-@@ -598,6 +598,9 @@ static int init_vpp_session(AVFilterCont
+@@ -629,6 +629,9 @@ static int init_vpp_session(AVFilterContext *avctx, QSVVPPContext *s)
              out_frames_ctx->initial_pool_size += avctx->extra_hw_frames;
          out_frames_hwctx->frame_type      = s->out_mem_mode;
  
@@ -50,7 +50,7 @@
  } OpenCLFramesContext;
  
  static void CL_CALLBACK opencl_error_callback(const char *errinfo,
-@@ -1788,7 +1792,12 @@ static void opencl_frames_uninit(AVHWFra
+@@ -1788,7 +1792,12 @@ static void opencl_frames_uninit(AVHWFramesContext *hwfc)
          av_freep(&priv->mapped_frames);
      }
  #endif
@@ -147,7 +147,7 @@
  #if CONFIG_LIBMFX
  
  static void opencl_unmap_from_d3d11_qsv(AVHWFramesContext *dst_fc,
-@@ -2603,6 +2688,13 @@ static void opencl_unmap_from_d3d11_qsv(
+@@ -2603,6 +2688,13 @@ static void opencl_unmap_from_d3d11_qsv(AVHWFramesContext *dst_fc,
  static int opencl_map_from_d3d11_qsv(AVHWFramesContext *dst_fc, AVFrame *dst,
                                       const AVFrame *src, int flags)
  {
@@ -161,7 +161,7 @@
      AVOpenCLDeviceContext    *dst_dev = dst_fc->device_ctx->hwctx;
      OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->internal->priv;
      OpenCLFramesContext  *frames_priv = dst_fc->internal->priv;
-@@ -2630,6 +2722,14 @@ static int opencl_map_from_d3d11_qsv(AVH
+@@ -2630,6 +2722,14 @@ static int opencl_map_from_d3d11_qsv(AVHWFramesContext *dst_fc, AVFrame *dst,
          return AVERROR(EINVAL);
      }
  
@@ -187,7 +187,7 @@
      AVOpenCLDeviceContext    *dst_dev = dst_fc->device_ctx->hwctx;
      AVQSVFramesContext     *src_hwctx = src_fc->hwctx;
      OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->internal->priv;
-@@ -2709,8 +2813,8 @@ static int opencl_frames_derive_from_d3d
+@@ -2709,8 +2813,8 @@ static int opencl_frames_derive_from_d3d11_qsv(AVHWFramesContext *dst_fc,
      cl_int cle;
      int err, i, p, nb_planes = 2;
  
@@ -198,7 +198,7 @@
  
      if (src_fc->sw_format != AV_PIX_FMT_NV12 &&
          src_fc->sw_format != AV_PIX_FMT_P010) {
-@@ -2725,6 +2829,14 @@ static int opencl_frames_derive_from_d3d
+@@ -2725,6 +2829,14 @@ static int opencl_frames_derive_from_d3d11_qsv(AVHWFramesContext *dst_fc,
          return AVERROR(EINVAL);
      }
  
@@ -213,7 +213,7 @@
      if (!(src_hwctx->frame_type & MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET) ||
          (src_hwctx->frame_type & MFX_MEMTYPE_VIDEO_MEMORY_PROCESSOR_TARGET) ||
          (src_hwctx->frame_type & MFX_MEMTYPE_FROM_VPPOUT)) {
-@@ -2748,6 +2860,8 @@ static int opencl_frames_derive_from_d3d
+@@ -2748,6 +2860,8 @@ static int opencl_frames_derive_from_d3d11_qsv(AVHWFramesContext *dst_fc,
      for (i = 0; i < frames_priv->nb_mapped_frames; i++) {
          AVOpenCLFrameDescriptor *desc = &frames_priv->mapped_frames[i];
          desc->nb_planes = nb_planes;
@@ -222,7 +222,7 @@
  
          for (p = 0; p < nb_planes; p++) {
              UINT subresource = 2 * i + p;
-@@ -2816,6 +2930,10 @@ static void opencl_unmap_from_d3d11(AVHW
+@@ -2816,6 +2930,10 @@ static void opencl_unmap_from_d3d11(AVHWFramesContext *dst_fc,
  static int opencl_map_from_d3d11(AVHWFramesContext *dst_fc, AVFrame *dst,
                                   const AVFrame *src, int flags)
  {
@@ -233,7 +233,7 @@
      OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->internal->priv;
      OpenCLFramesContext  *frames_priv = dst_fc->internal->priv;
      AVOpenCLFrameDescriptor *desc;
-@@ -2846,6 +2964,14 @@ static int opencl_map_from_d3d11(AVHWFra
+@@ -2846,6 +2964,14 @@ static int opencl_map_from_d3d11(AVHWFramesContext *dst_fc, AVFrame *dst,
      mem_objs = device_priv->d3d11_map_amd ? &desc->planes[nb_planes]
                                            : desc->planes;
  
@@ -256,7 +256,7 @@
      AVOpenCLDeviceContext    *dst_dev = dst_fc->device_ctx->hwctx;
      AVD3D11VAFramesContext *src_hwctx = src_fc->hwctx;
      OpenCLDeviceContext  *device_priv = dst_fc->device_ctx->internal->priv;
-@@ -2928,6 +3055,14 @@ static int opencl_frames_derive_from_d3d
+@@ -2928,6 +3055,14 @@ static int opencl_frames_derive_from_d3d11(AVHWFramesContext *dst_fc,
      if (!frames_priv->mapped_frames)
          return AVERROR(ENOMEM);
  
@@ -273,7 +273,7 @@
          desc->nb_planes = nb_planes;
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
-@@ -1868,6 +1868,7 @@ static int qsv_frames_derive_to(AVHWFram
+@@ -1889,6 +1889,7 @@ static int qsv_frames_derive_to(AVHWFramesContext *dst_ctx,
              } else {
                  dst_hwctx->frame_type |= MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
              }

@@ -1,138 +1,16 @@
-From patchwork Wed Feb 21 01:53:42 2024
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Patchwork-Submitter: Gnattu OC <gnattuoc@me.com>
-X-Patchwork-Id: 46405
-Delivered-To: ffmpegpatchwork2@gmail.com
-Received: by 2002:a05:6a20:1b29:b0:19e:cdac:8cce with SMTP id ch41csp44637pzb;
-        Tue, 20 Feb 2024 17:54:51 -0800 (PST)
-X-Forwarded-Encrypted: i=2;
- AJvYcCWVmg9uSOgXDSptUDycJzvuzMfBW0nwtmNODnO5Os0h0qImKu6Joi8mZvHLrSdqYuv4qliU+iuam5MemURDp4D/gHKPhZypuqWRnQ==
-X-Google-Smtp-Source:
- AGHT+IEnKKUHOZtH/lX3bS/zOhFfTlOltIDmAde6mFLv6NfQLCC1aaS/PPVbCiTfCg8miXQS/JkZ
-X-Received: by 2002:a17:906:cd1a:b0:a3e:4093:89df with SMTP id
- oz26-20020a170906cd1a00b00a3e409389dfmr6408355ejb.74.1708480491363;
-        Tue, 20 Feb 2024 17:54:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1708480491; cv=none;
-        d=google.com; s=arc-20160816;
-        b=kJWQpkwS2M3eutHiGxO5RWdw0OXgXeYIQBqag0jK22IcBmYGEw25YfNIZgNKz2xAIK
-         ZQV6aN+cDYX52RJt+GT5SFHUjK32leIwWlfh0SsOQxiv6yWD3WDCFZnFnmRA1prFU+5R
-         Sf0IL8IVE275Jh7r3mm0t/ov4KH6Am6AB4NjZk9dTWqN4kB/5K7n/U/qITukrTOj2Ed2
-         fFM47Gld65XO18c9cp9v3N2OtepCv2+/395Lm3/YBo415ZndWGOrq+YE0E5p1T8aojli
-         E76HCYiDS5cbpF5tFxx6wG37/CbmndhdJmUsREMX6OcdxJhzqoE4wtg3VtHdjmnJZFl7
-         y/AA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com;
- s=arc-20160816;
-        h=sender:errors-to:content-transfer-encoding:cc:reply-to:from
-         :list-subscribe:list-help:list-post:list-archive:list-unsubscribe
-         :list-id:precedence:subject:mime-version:message-id:date:to
-         :delivered-to;
-        bh=omrfyeNpcLW9uawHsYmpqZqpdEwsP7g9Flsbi9eSxXA=;
-        fh=2gWgGvVN03792RqC4MXCXsB/4cbAJUKJ5Jr7thIsQ3A=;
-        b=qs0c2W8oNWcsdzgZKs/yyA96g899aSzc+0cPDDl56XEy6wnk9nOSyCc/yIQxqeDSV9
-         f3ilmLM4/jxwh3RL8n0agvvsAYuWGAZ8hDhlwfVXiYoy0OKI5eQrKr5i4IaolOiiYpKc
-         i4pLbn2oM5Nm8F+pS1TRUFm01V2X1hDnumYVNc7oJGUM5X4F0jzIGAiN6KJaL4WGIVBr
-         85KWfcjcx7VkeCUU/+ogzZoIR8GFNoAgFvbwRYITrEZhDoUIEN6tTHE/JyhPAF0KbFPM
-         hZmlcLFo9WxlIXDKq13Lzdf7XY1c29fUkXtsLq5kvVpV6jgoMHJWU9sx7j3/y3ASc3Mm
-         hI7A==;
-        dara=google.com
-ARC-Authentication-Results: i=1; mx.google.com;
-       spf=pass (google.com: domain of ffmpeg-devel-bounces@ffmpeg.org
- designates 79.124.17.100 as permitted sender)
- smtp.mailfrom=ffmpeg-devel-bounces@ffmpeg.org
-Return-Path: <ffmpeg-devel-bounces@ffmpeg.org>
-Received: from ffbox0-bg.mplayerhq.hu (ffbox0-bg.ffmpeg.org. [79.124.17.100])
-        by mx.google.com with ESMTP id
- nb18-20020a1709071c9200b00a3ef1214742si1392017ejc.85.2024.02.20.17.54.50;
-        Tue, 20 Feb 2024 17:54:51 -0800 (PST)
-Received-SPF: pass (google.com: domain of ffmpeg-devel-bounces@ffmpeg.org
- designates 79.124.17.100 as permitted sender) client-ip=79.124.17.100;
-Authentication-Results: mx.google.com;
-       spf=pass (google.com: domain of ffmpeg-devel-bounces@ffmpeg.org
- designates 79.124.17.100 as permitted sender)
- smtp.mailfrom=ffmpeg-devel-bounces@ffmpeg.org
-Received: from [127.0.1.1] (localhost [127.0.0.1])
-	by ffbox0-bg.mplayerhq.hu (Postfix) with ESMTP id 3F09568D085;
-	Wed, 21 Feb 2024 03:54:47 +0200 (EET)
-X-Original-To: ffmpeg-devel@ffmpeg.org
-Delivered-To: ffmpeg-devel@ffmpeg.org
-Received: from mr85p00im-zteg06021501.me.com (mr85p00im-zteg06021501.me.com
- [17.58.23.183])
- by ffbox0-bg.mplayerhq.hu (Postfix) with ESMTPS id B898368C74E
- for <ffmpeg-devel@ffmpeg.org>; Wed, 21 Feb 2024 03:54:40 +0200 (EET)
-Received: from Yakumo-Yukari.lan.lan (mr38p00im-dlb-asmtp-mailmevip.me.com
- [17.57.152.18])
- by mr85p00im-zteg06021501.me.com (Postfix) with ESMTPSA id B44942794090;
- Wed, 21 Feb 2024 01:54:37 +0000 (UTC)
-To: ffmpeg-devel@ffmpeg.org
-Date: Wed, 21 Feb 2024 09:53:42 +0800
-Message-Id: <20240221015342.5450-1-gnattuoc@me.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-145)
-MIME-Version: 1.0
-X-Proofpoint-ORIG-GUID: 0zEgxigYbdxf8WO7rCxYHRqRobHUPHuf
-X-Proofpoint-GUID: 0zEgxigYbdxf8WO7rCxYHRqRobHUPHuf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-20_06,2024-02-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- bulkscore=0 spamscore=0
- phishscore=0 mlxlogscore=999 suspectscore=0 mlxscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2402210013
-Subject: [FFmpeg-devel] [PATCH v3] avfilter: add vf_overlay_videotoolbox
-X-BeenThere: ffmpeg-devel@ffmpeg.org
-X-Mailman-Version: 2.1.29
-Precedence: list
-List-Id: FFmpeg development discussions and patches <ffmpeg-devel.ffmpeg.org>
-List-Unsubscribe: <https://ffmpeg.org/mailman/options/ffmpeg-devel>,
- <mailto:ffmpeg-devel-request@ffmpeg.org?subject=unsubscribe>
-List-Archive: <https://ffmpeg.org/pipermail/ffmpeg-devel>
-List-Post: <mailto:ffmpeg-devel@ffmpeg.org>
-List-Help: <mailto:ffmpeg-devel-request@ffmpeg.org?subject=help>
-List-Subscribe: <https://ffmpeg.org/mailman/listinfo/ffmpeg-devel>,
- <mailto:ffmpeg-devel-request@ffmpeg.org?subject=subscribe>
-X-Patchwork-Original-From: gnattu via ffmpeg-devel <ffmpeg-devel@ffmpeg.org>
-From: Gnattu OC <gnattuoc@me.com>
-Reply-To: FFmpeg development discussions and patches <ffmpeg-devel@ffmpeg.org>
-Cc: gnattu <gnattuoc@me.com>
-Errors-To: ffmpeg-devel-bounces@ffmpeg.org
-Sender: "ffmpeg-devel" <ffmpeg-devel-bounces@ffmpeg.org>
-X-TUID: 0+JgYL+d/2FH
-
-Overlay filter for VideoToolbox hwframes. Unlike most hardware
-overlay filters, this filter does not require the two inputs to
-have the same pixel format; instead, it will perform format
-conversion automatically with hardware accelerated methods.
-
-Signed-off-by: Gnattu OC <gnattuoc@me.com>
----
- Changelog                                     |   1 +
- configure                                     |   1 +
- doc/filters.texi                              |  52 ++
- libavfilter/Makefile                          |   3 +
- libavfilter/allfilters.c                      |   1 +
- libavfilter/metal/utils.h                     |   1 -
- libavfilter/metal/utils.m                     |   7 +-
- .../metal/vf_overlay_videotoolbox.metal       |  58 ++
- libavfilter/vf_overlay_videotoolbox.m         | 551 ++++++++++++++++++
- 9 files changed, 672 insertions(+), 3 deletions(-)
- create mode 100644 libavfilter/metal/vf_overlay_videotoolbox.metal
- create mode 100644 libavfilter/vf_overlay_videotoolbox.m
-
 --- configure
 +++ configure
-@@ -3722,6 +3722,7 @@ overlay_qsv_filter_select="qsvvpp"
+@@ -3777,6 +3777,7 @@ overlay_opencl_filter_deps="opencl"
+ overlay_qsv_filter_deps="libmfx"
+ overlay_qsv_filter_select="qsvvpp"
  overlay_vaapi_filter_deps="vaapi VAProcPipelineCaps_blend_flags"
- overlay_vulkan_filter_deps="vulkan spirv_compiler"
- overlay_rkrga_filter_deps="rkrga"
 +overlay_videotoolbox_filter_deps="metal corevideo coreimage videotoolbox"
+ overlay_vulkan_filter_deps="vulkan spirv_compiler"
  owdenoise_filter_deps="gpl"
  pad_opencl_filter_deps="opencl"
- pan_filter_deps="swresample"
 --- doc/filters.texi
 +++ doc/filters.texi
-@@ -18351,6 +18351,58 @@ See @ref{framesync}.
+@@ -18902,6 +18902,58 @@ See @ref{framesync}.
  
  This filter also supports the @ref{framesync} options.
  
@@ -193,37 +71,29 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
  Apply Overcomplete Wavelet denoiser.
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -403,6 +403,9 @@ OBJS-$(CONFIG_OVERLAY_OPENCL_FILTER)
+@@ -412,6 +412,9 @@ OBJS-$(CONFIG_OVERLAY_OPENCL_FILTER)         += vf_overlay_opencl.o opencl.o \
+                                                 opencl/overlay.o framesync.o
  OBJS-$(CONFIG_OVERLAY_QSV_FILTER)            += vf_overlay_qsv.o framesync.o
  OBJS-$(CONFIG_OVERLAY_VAAPI_FILTER)          += vf_overlay_vaapi.o framesync.o vaapi_vpp.o
- OBJS-$(CONFIG_OVERLAY_VULKAN_FILTER)         += vf_overlay_vulkan.o vulkan.o vulkan_filter.o
-+OBJS-$(CONFIG_OVERLAY_VIDEOTOOLBOX_FILTER)     += vf_overlay_videotoolbox.o framesync.o \
++OBJS-$(CONFIG_OVERLAY_VIDEOTOOLBOX_FILTER)   += vf_overlay_videotoolbox.o framesync.o \
 +                                                metal/vf_overlay_videotoolbox.metallib.o \
 +                                                metal/utils.o
- OBJS-$(CONFIG_OVERLAY_RKRGA_FILTER)          += vf_overlay_rkrga.o framesync.o
+ OBJS-$(CONFIG_OVERLAY_VULKAN_FILTER)         += vf_overlay_vulkan.o vulkan.o vulkan_filter.o
  OBJS-$(CONFIG_OWDENOISE_FILTER)              += vf_owdenoise.o
  OBJS-$(CONFIG_PAD_FILTER)                    += vf_pad.o
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -380,6 +380,7 @@ extern const AVFilter ff_vf_overlay_vaap
+@@ -386,6 +386,7 @@ extern const AVFilter ff_vf_overlay;
+ extern const AVFilter ff_vf_overlay_opencl;
+ extern const AVFilter ff_vf_overlay_qsv;
+ extern const AVFilter ff_vf_overlay_vaapi;
++extern const AVFilter ff_vf_overlay_videotoolbox;
  extern const AVFilter ff_vf_overlay_vulkan;
  extern const AVFilter ff_vf_overlay_cuda;
- extern const AVFilter ff_vf_overlay_rkrga;
-+extern const AVFilter ff_vf_overlay_videotoolbox;
  extern const AVFilter ff_vf_owdenoise;
- extern const AVFilter ff_vf_pad;
- extern const AVFilter ff_vf_pad_opencl;
---- libavfilter/metal/utils.h
-+++ libavfilter/metal/utils.h
-@@ -55,5 +55,4 @@ CVMetalTextureRef ff_metal_texture_from_
-                                                int plane,
-                                                MTLPixelFormat format)
-                                                API_AVAILABLE(macos(10.11), ios(8.0));
--
- #endif /* AVFILTER_METAL_UTILS_H */
 --- libavfilter/metal/utils.m
 +++ libavfilter/metal/utils.m
-@@ -55,6 +55,9 @@ CVMetalTextureRef ff_metal_texture_from_
+@@ -55,6 +55,9 @@ CVMetalTextureRef ff_metal_texture_from_pixbuf(void *ctx,
  {
      CVMetalTextureRef tex = NULL;
      CVReturn ret;
@@ -233,7 +103,7 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
  
      ret = CVMetalTextureCacheCreateTextureFromImage(
          NULL,
-@@ -62,8 +65,8 @@ CVMetalTextureRef ff_metal_texture_from_
+@@ -62,8 +65,8 @@ CVMetalTextureRef ff_metal_texture_from_pixbuf(void *ctx,
          pixbuf,
          NULL,
          format,
@@ -348,7 +218,7 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
 +}
 --- /dev/null
 +++ libavfilter/vf_overlay_videotoolbox.m
-@@ -0,0 +1,749 @@
+@@ -0,0 +1,758 @@
 +/*
 + * Copyright (C) 2024 Gnattu OC <gnattuoc@me.com>
 + *
@@ -371,10 +241,11 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
 +
 +#include <CoreImage/CoreImage.h>
 +#include <VideoToolbox/VideoToolbox.h>
-+#include "internal.h"
++#include "filters.h"
 +#include "metal/utils.h"
 +#include "framesync.h"
 +#include "libavutil/hwcontext.h"
++#include "libavutil/hwcontext_videotoolbox.h"
 +#include "libavutil/pixdesc.h"
 +#include "libavutil/opt.h"
 +#include "libavutil/objc.h"
@@ -545,10 +416,12 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
 +    AVFilterLink *outlink = avctx->outputs[0];
 +    AVFilterLink *inlink_main = avctx->inputs[0];
 +    AVFilterLink *inlink_overlay = avctx->inputs[1];
++    FilterLink   *inl_main = ff_filter_link(inlink_main);
++    FilterLink   *inl_overlay = ff_filter_link(inlink_overlay);
 +    AVFrame *input_main, *input_overlay;
 +    AVFrame *output;
-+    AVHWFramesContext *frames_ctx = (AVHWFramesContext*)inlink_main->hw_frames_ctx->data;
-+    AVHWFramesContext *frames_ctx_overlay = (AVHWFramesContext*)inlink_overlay->hw_frames_ctx->data;
++    AVHWFramesContext *frames_ctx = (AVHWFramesContext*)inl_main->hw_frames_ctx->data;
++    AVHWFramesContext *frames_ctx_overlay = (AVHWFramesContext*)inl_overlay->hw_frames_ctx->data;
 +    const AVPixFmtDescriptor *in_overlay_desc;
 +
 +    CVMetalTextureRef main, dst, overlay;
@@ -686,10 +559,12 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
 +    AVFilterLink *outlink = avctx->outputs[0];
 +    AVFilterLink *inlink_main = avctx->inputs[0];
 +    AVFilterLink *inlink_overlay = avctx->inputs[1];
++    FilterLink   *inl_main = ff_filter_link(inlink_main);
++    FilterLink   *inl_overlay = ff_filter_link(inlink_overlay);
 +    AVFrame *input_main, *input_overlay;
 +    AVFrame *output;
-+    AVHWFramesContext *frames_ctx = (AVHWFramesContext*)inlink_main->hw_frames_ctx->data;
-+    AVHWFramesContext *frames_ctx_overlay = (AVHWFramesContext*)inlink_overlay->hw_frames_ctx->data;
++    AVHWFramesContext *frames_ctx = (AVHWFramesContext*)inl_main->hw_frames_ctx->data;
++    AVHWFramesContext *frames_ctx_overlay = (AVHWFramesContext*)inl_overlay->hw_frames_ctx->data;
 +    const AVPixFmtDescriptor *in_main_desc;
 +
 +    CVMetalTextureRef main_y, main_uv, dst_y, dst_uv, overlay;
@@ -917,23 +792,26 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
 +
 +static int do_config_output(AVFilterLink *link) API_AVAILABLE(macos(10.11), ios(9.0))
 +{
++    FilterLink   *outl = ff_filter_link(link);
 +    AVFilterContext *avctx = link->src;
 +    AVFilterLink *inlink_main = avctx->inputs[0];
 +    AVFilterLink *inlink_overlay = avctx->inputs[1];
++    FilterLink   *inl_main = ff_filter_link(inlink_main);
++    FilterLink   *inl_overlay = ff_filter_link(inlink_overlay);
 +    OverlayVideoToolboxContext *ctx = avctx->priv;
 +    AVHWFramesContext *main_frames, *output_frames, *overlay_frames;
 +    AVBufferRef *input_ref, *overlay_ref;
 +    int ret = 0;
 +
-+    if (!inlink_main->hw_frames_ctx ||
-+        !inlink_overlay->hw_frames_ctx) {
++    if (!inl_main->hw_frames_ctx ||
++        !inl_overlay->hw_frames_ctx) {
 +        av_log(avctx, AV_LOG_ERROR, "An input HW frames reference is "
 +               "required to associate the processing device.\n");
 +        return AVERROR(EINVAL);
 +    }
 +
-+    input_ref = inlink_main->hw_frames_ctx;
-+    overlay_ref = inlink_overlay->hw_frames_ctx;
++    input_ref = inl_main->hw_frames_ctx;
++    overlay_ref = inl_overlay->hw_frames_ctx;
 +    main_frames = (AVHWFramesContext*)input_ref->data;
 +    overlay_frames = (AVHWFramesContext*)overlay_ref->data;
 +    av_assert0(main_frames);
@@ -989,8 +867,8 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
 +        return AVERROR(ENOMEM);
 +    }
 +
-+    link->hw_frames_ctx = av_hwframe_ctx_alloc(ctx->device_ref);
-+    if (!link->hw_frames_ctx) {
++    outl->hw_frames_ctx = av_hwframe_ctx_alloc(ctx->device_ref);
++    if (!outl->hw_frames_ctx) {
 +        av_log(avctx, AV_LOG_ERROR, "Failed to create HW frame context "
 +               "for output.\n");
 +        ret = AVERROR(ENOMEM);
@@ -998,18 +876,19 @@ Signed-off-by: Gnattu OC <gnattuoc@me.com>
 +    }
 +    ctx->hwframe_ctx_allocated = 1;
 +
-+    output_frames = (AVHWFramesContext*)link->hw_frames_ctx->data;
++    output_frames = (AVHWFramesContext*)outl->hw_frames_ctx->data;
 +
 +    output_frames->format    = AV_PIX_FMT_VIDEOTOOLBOX;
 +    output_frames->sw_format = main_frames->sw_format;
 +    output_frames->width     = inlink_main->w;
 +    output_frames->height    = inlink_main->h;
++    ((AVVTFramesContext *)output_frames->hwctx)->color_range = ((AVVTFramesContext *)main_frames->hwctx)->color_range;
 +
 +    ret = ff_filter_init_hw_frames(avctx, link, 1);
 +    if (ret < 0)
 +        return ret;
 +
-+    ret = av_hwframe_ctx_init(link->hw_frames_ctx);
++    ret = av_hwframe_ctx_init(outl->hw_frames_ctx);
 +    if (ret < 0) {
 +        av_log(avctx, AV_LOG_ERROR, "Failed to initialise VideoToolbox frame "
 +               "context for output: %d\n", ret);

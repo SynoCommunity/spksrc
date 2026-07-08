@@ -9,7 +9,7 @@
      int res = 0;
      AVStream *st = avformat_new_stream(s, NULL);
  
-@@ -72,6 +72,7 @@ static int webvtt_read_header(AVFormatCo
+@@ -72,6 +72,7 @@ static int webvtt_read_header(AVFormatContext *s)
      st->disposition |= webvtt->kind;
  
      av_bprint_init(&cue,    0, AV_BPRINT_SIZE_UNLIMITED);
@@ -17,7 +17,7 @@
  
      for (;;) {
          int i;
-@@ -89,12 +90,18 @@ static int webvtt_read_header(AVFormatCo
+@@ -91,12 +92,18 @@ static int webvtt_read_header(AVFormatContext *s)
          p = identifier = cue.str;
          pos = avio_tell(s->pb);
  
@@ -37,7 +37,7 @@
          /* optional cue identifier (can be a number like in SRT or some kind of
           * chaptering id) */
          for (i = 0; p[i] && p[i] != '\n' && p[i] != '\r'; i++) {
-@@ -161,10 +168,15 @@ static int webvtt_read_header(AVFormatCo
+@@ -163,10 +170,15 @@ static int webvtt_read_header(AVFormatContext *s)
          SET_SIDE_DATA(settings,   AV_PKT_DATA_WEBVTT_SETTINGS);
      }
  
@@ -55,7 +55,7 @@
  
 --- libavformat/webvttenc.c
 +++ libavformat/webvttenc.c
-@@ -59,6 +59,18 @@ static int webvtt_write_header(AVFormatC
+@@ -59,6 +59,18 @@ static int webvtt_write_header(AVFormatContext *ctx)
  
      avio_printf(pb, "WEBVTT\n");
  

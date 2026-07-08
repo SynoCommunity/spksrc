@@ -1,6 +1,6 @@
 --- libavformat/webvttenc.c
 +++ libavformat/webvttenc.c
-@@ -50,8 +50,8 @@ static int webvtt_write_header(AVFormatC
+@@ -50,8 +50,8 @@ static int webvtt_write_header(AVFormatContext *ctx)
      AVCodecParameters *par = ctx->streams[0]->codecpar;
      AVIOContext *pb = ctx->pb;
  
@@ -11,7 +11,7 @@
          return AVERROR(EINVAL);
      }
  
-@@ -69,6 +69,9 @@ static int webvtt_write_packet(AVFormatC
+@@ -69,6 +69,9 @@ static int webvtt_write_packet(AVFormatContext *ctx, AVPacket *pkt)
      int id_size_int, settings_size_int;
      uint8_t *id, *settings;
  

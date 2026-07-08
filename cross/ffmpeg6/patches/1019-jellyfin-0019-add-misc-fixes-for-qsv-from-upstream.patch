@@ -1,6 +1,6 @@
 --- libavcodec/qsv.c
 +++ libavcodec/qsv.c
-@@ -196,7 +196,7 @@ int ff_qsv_print_warning(void *log_ctx,
+@@ -196,7 +196,7 @@ int ff_qsv_print_warning(void *log_ctx, mfxStatus err,
  {
      const char *desc;
      int ret = qsv_map_error(err, &desc);
@@ -9,41 +9,9 @@
      return ret;
  }
  
-@@ -208,7 +208,6 @@ enum AVPixelFormat ff_qsv_map_fourcc(uin
-     case MFX_FOURCC_P8:   return AV_PIX_FMT_PAL8;
-     case MFX_FOURCC_A2RGB10: return AV_PIX_FMT_X2RGB10;
-     case MFX_FOURCC_RGB4: return AV_PIX_FMT_BGRA;
--#if CONFIG_VAAPI
-     case MFX_FOURCC_YUY2: return AV_PIX_FMT_YUYV422;
-     case MFX_FOURCC_Y210: return AV_PIX_FMT_Y210;
-     case MFX_FOURCC_AYUV: return AV_PIX_FMT_VUYX;
-@@ -218,7 +217,6 @@ enum AVPixelFormat ff_qsv_map_fourcc(uin
-     case MFX_FOURCC_Y216: return AV_PIX_FMT_Y212;
-     case MFX_FOURCC_Y416: return AV_PIX_FMT_XV36;
- #endif
--#endif
-     }
-     return AV_PIX_FMT_NONE;
- }
-@@ -245,7 +243,6 @@ int ff_qsv_map_pixfmt(enum AVPixelFormat
-         *fourcc = MFX_FOURCC_RGB4;
-         *shift = 0;
-         return AV_PIX_FMT_BGRA;
--#if CONFIG_VAAPI
-     case AV_PIX_FMT_YUV422P:
-     case AV_PIX_FMT_YUYV422:
-         *fourcc = MFX_FOURCC_YUY2;
-@@ -278,7 +275,6 @@ int ff_qsv_map_pixfmt(enum AVPixelFormat
-         *shift = 1;
-         return AV_PIX_FMT_XV36;
- #endif
--#endif
-     default:
-         return AVERROR(ENOSYS);
-     }
 --- libavcodec/qsv_internal.h
 +++ libavcodec/qsv_internal.h
-@@ -57,6 +57,8 @@
+@@ -56,6 +56,8 @@
  
  #define QSV_MAX_FRAME_EXT_PARAMS 4
  
@@ -52,7 +20,7 @@
  #define QSV_VERSION_ATLEAST(MAJOR, MINOR)   \
      (MFX_VERSION_MAJOR > (MAJOR) ||         \
       MFX_VERSION_MAJOR == (MAJOR) && MFX_VERSION_MINOR >= (MINOR))
-@@ -99,6 +101,7 @@ typedef struct QSVFrame {
+@@ -98,6 +100,7 @@ typedef struct QSVFrame {
  
      int queued;
      int used;
@@ -93,7 +61,7 @@
  } QSVContext;
  
  static const AVCodecHWConfigInternal *const qsv_hw_configs[] = {
-@@ -694,6 +702,147 @@ static int qsv_export_hdr_side_data(AVCo
+@@ -697,6 +705,147 @@ static int qsv_export_hdr_side_data(AVCodecContext *avctx, mfxExtMasteringDispla
  
  #endif
  
@@ -241,7 +209,7 @@
  static int qsv_decode(AVCodecContext *avctx, QSVContext *q,
                        AVFrame *frame, int *got_frame,
                        const AVPacket *avpkt)
-@@ -803,6 +952,10 @@ static int qsv_decode(AVCodecContext *av
+@@ -806,6 +955,10 @@ static int qsv_decode(AVCodecContext *avctx, QSVContext *q,
  
          outsurf = &aframe.frame->surface;
  
@@ -252,7 +220,7 @@
          frame->pts = MFX_PTS_TO_PTS(outsurf->Data.TimeStamp, avctx->pkt_timebase);
  #if QSV_VERSION_ATLEAST(1, 34)
          if ((avctx->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN) &&
-@@ -873,6 +1026,8 @@ static void qsv_decode_close_qsvcontext(
+@@ -880,6 +1033,8 @@ static void qsv_decode_close_qsvcontext(QSVContext *q)
      av_buffer_unref(&q->frames_ctx.hw_frames_ctx);
      av_buffer_unref(&q->frames_ctx.mids_buf);
      av_buffer_pool_uninit(&q->pool);
@@ -263,7 +231,7 @@
  static int qsv_process_data(AVCodecContext *avctx, QSVContext *q,
 --- libavcodec/qsvenc.c
 +++ libavcodec/qsvenc.c
-@@ -680,7 +680,9 @@ static int is_strict_gop(QSVEncContext *
+@@ -679,7 +679,9 @@ static int is_strict_gop(QSVEncContext *q) {
  
  static int init_video_param_jpeg(AVCodecContext *avctx, QSVEncContext *q)
  {
@@ -274,7 +242,7 @@
                                     avctx->sw_pix_fmt : avctx->pix_fmt;
      const AVPixFmtDescriptor *desc;
      int ret;
-@@ -746,7 +748,9 @@ static int init_video_param_jpeg(AVCodec
+@@ -745,7 +747,9 @@ static int init_video_param_jpeg(AVCodecContext *avctx, QSVEncContext *q)
  
  static int init_video_param(AVCodecContext *avctx, QSVEncContext *q)
  {
@@ -285,18 +253,7 @@
                                     avctx->sw_pix_fmt : avctx->pix_fmt;
      const AVPixFmtDescriptor *desc;
      float quant;
-@@ -1118,6 +1122,10 @@ static int init_video_param(AVCodecConte
-                 q->extco3.MaxFrameSizeI = q->max_frame_size_i;
-             if (q->max_frame_size_p >= 0)
-                 q->extco3.MaxFrameSizeP = q->max_frame_size_p;
-+            if (sw_format == AV_PIX_FMT_BGRA &&
-+                (q->profile == MFX_PROFILE_HEVC_REXT ||
-+                q->profile == MFX_PROFILE_UNKNOWN))
-+                q->extco3.TargetChromaFormatPlus1 = MFX_CHROMAFORMAT_YUV444 + 1;
- 
-             q->extco3.ScenarioInfo = q->scenario;
-         } else if (avctx->codec_id == AV_CODEC_ID_AV1) {
-@@ -1618,7 +1626,31 @@ int ff_qsv_enc_init(AVCodecContext *avct
+@@ -1624,7 +1628,31 @@ int ff_qsv_enc_init(AVCodecContext *avctx, QSVEncContext *q)
  
      if (avctx->hw_frames_ctx) {
          AVHWFramesContext    *frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
@@ -329,7 +286,7 @@
  
          if (!iopattern) {
  #if QSV_HAVE_OPAQUE
-@@ -1773,6 +1805,10 @@ static void clear_unused_frames(QSVEncCo
+@@ -1779,6 +1807,10 @@ static void clear_unused_frames(QSVEncContext *q)
              memset(&cur->enc_ctrl, 0, sizeof(cur->enc_ctrl));
              cur->enc_ctrl.Payload = cur->payloads;
              cur->enc_ctrl.ExtParam = cur->extparam;
@@ -340,7 +297,7 @@
              if (cur->frame->format == AV_PIX_FMT_QSV) {
                  av_frame_unref(cur->frame);
              }
-@@ -1887,19 +1923,42 @@ static int submit_frame(QSVEncContext *q
+@@ -1949,19 +1981,42 @@ static int submit_frame(QSVEncContext *q, const AVFrame *frame,
      if (ret < 0)
          return ret;
  
@@ -391,7 +348,7 @@
          }
      } else {
          /* make a copy if the input is not padded as libmfx requires */
-@@ -2597,6 +2656,8 @@ int ff_qsv_enc_close(AVCodecContext *avc
+@@ -2661,6 +2716,8 @@ int ff_qsv_enc_close(AVCodecContext *avctx, QSVEncContext *q)
  
  const AVCodecHWConfigInternal *const ff_qsv_enc_hw_configs[] = {
      HW_CONFIG_ENCODER_FRAMES(QSV,  QSV),
@@ -474,39 +431,7 @@
      .defaults       = qsv_enc_defaults,
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
-@@ -115,7 +115,6 @@ static const struct {
-     { AV_PIX_FMT_BGRA, MFX_FOURCC_RGB4, 0 },
-     { AV_PIX_FMT_P010, MFX_FOURCC_P010, 1 },
-     { AV_PIX_FMT_PAL8, MFX_FOURCC_P8,   0 },
--#if CONFIG_VAAPI
-     { AV_PIX_FMT_YUYV422,
-                        MFX_FOURCC_YUY2, 0 },
-     { AV_PIX_FMT_UYVY422,
-@@ -144,7 +143,6 @@ static const struct {
-     { AV_PIX_FMT_XV36,
-                        MFX_FOURCC_Y416, 1 },
- #endif
--#endif
- };
- 
- extern int ff_qsv_get_surface_base_handle(mfxFrameSurface1 *surf,
-@@ -1526,7 +1524,6 @@ static int map_frame_to_surface(const AV
-         surface->Data.R = frame->data[0] + 2;
-         surface->Data.A = frame->data[0] + 3;
-         break;
--#if CONFIG_VAAPI
-     case AV_PIX_FMT_YUYV422:
-         surface->Data.Y = frame->data[0];
-         surface->Data.U = frame->data[0] + 1;
-@@ -1563,7 +1560,6 @@ static int map_frame_to_surface(const AV
-         surface->Data.U = frame->data[0];
-         surface->Data.V = frame->data[0] + 2;
-         break;
--#endif
-     default:
-         return MFX_ERR_UNSUPPORTED;
-     }
-@@ -1878,11 +1874,25 @@ static int qsv_frames_derive_to(AVHWFram
+@@ -1907,11 +1907,25 @@ static int qsv_frames_derive_to(AVHWFramesContext *dst_ctx,
      return 0;
  }
  
@@ -532,7 +457,7 @@
  
      for (i = 0; i < hwctx->nb_surfaces && index < 0; i++) {
          switch(src->format) {
-@@ -1921,21 +1931,77 @@ static int qsv_map_to(AVHWFramesContext
+@@ -1950,21 +1964,77 @@ static int qsv_map_to(AVHWFramesContext *dst_ctx,
          }
      }
      if (index < 0) {

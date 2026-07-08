@@ -1,17 +1,6 @@
---- libavcodec/kbdwin.h
-+++ libavcodec/kbdwin.h
-@@ -24,7 +24,7 @@
- /**
-  * Maximum window size for ff_kbd_window_init.
-  */
--#define FF_KBD_WINDOW_MAX 1024
-+#define FF_KBD_WINDOW_MAX 2048
- 
- /**
-  * Generate a Kaiser-Bessel Derived Window.
 --- libavcodec/Makefile
 +++ libavcodec/Makefile
-@@ -201,6 +201,7 @@ OBJS-$(CONFIG_AC3_ENCODER)             +
+@@ -200,6 +200,7 @@ OBJS-$(CONFIG_AC3_ENCODER)             += ac3enc_float.o ac3enc.o ac3tab.o \
                                            ac3.o kbdwin.o
  OBJS-$(CONFIG_AC3_FIXED_ENCODER)       += ac3enc_fixed.o ac3enc.o ac3tab.o ac3.o kbdwin.o
  OBJS-$(CONFIG_AC3_MF_ENCODER)          += mfenc.o mf_utils.o
@@ -19,16 +8,6 @@
  OBJS-$(CONFIG_ACELP_KELVIN_DECODER)    += g729dec.o lsp.o celp_math.o celp_filters.o acelp_filters.o acelp_pitch_delay.o acelp_vectors.o g729postfilter.o
  OBJS-$(CONFIG_AGM_DECODER)             += agm.o jpegquanttables.o
  OBJS-$(CONFIG_AIC_DECODER)             += aic.o
---- libavcodec/allcodecs.c
-+++ libavcodec/allcodecs.c
-@@ -434,6 +434,7 @@ extern const FFCodec ff_ac3_encoder;
- extern const FFCodec ff_ac3_decoder;
- extern const FFCodec ff_ac3_fixed_encoder;
- extern const FFCodec ff_ac3_fixed_decoder;
-+extern const FFCodec ff_ac4_decoder;
- extern const FFCodec ff_acelp_kelvin_decoder;
- extern const FFCodec ff_alac_encoder;
- extern const FFCodec ff_alac_decoder;
 --- /dev/null
 +++ libavcodec/ac4dec.c
 @@ -0,0 +1,5900 @@
@@ -618,137 +597,137 @@
 +
 +    avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
 +
-+    INIT_VLC_STATIC(&channel_mode_vlc, 9, sizeof(channel_mode_bits),
++    VLC_INIT_STATIC(&channel_mode_vlc, 9, sizeof(channel_mode_bits),
 +                    channel_mode_bits, 1, 1, channel_mode_codes, 2, 2, 512);
-+    INIT_VLC_STATIC(&bitrate_indicator_vlc, 5, sizeof(bitrate_indicator_bits),
++    VLC_INIT_STATIC(&bitrate_indicator_vlc, 5, sizeof(bitrate_indicator_bits),
 +                    bitrate_indicator_bits, 1, 1, bitrate_indicator_codes, 1, 1, 32);
-+    INIT_VLC_STATIC(&scale_factors_vlc, 9, sizeof(scale_factors_bits),
++    VLC_INIT_STATIC(&scale_factors_vlc, 9, sizeof(scale_factors_bits),
 +                    scale_factors_bits, 1, 1, scale_factors_codes, 1, 1, 850);
-+    INIT_VLC_STATIC(&snf_vlc, 6, sizeof(snf_bits),
++    VLC_INIT_STATIC(&snf_vlc, 6, sizeof(snf_bits),
 +                    snf_bits, 1, 1, snf_codes, 1, 1, 70);
 +
-+    INIT_VLC_STATIC(&asf_codebook_vlc[0], 9, sizeof(asf_codebook_1_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[0], 9, sizeof(asf_codebook_1_bits),
 +                    asf_codebook_1_bits, 1, 1, asf_codebook_1_codes, 1, 1, 542);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[1], 9, sizeof(asf_codebook_2_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[1], 9, sizeof(asf_codebook_2_bits),
 +                    asf_codebook_2_bits, 1, 1, asf_codebook_2_codes, 1, 1, 512);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[2], 9, sizeof(asf_codebook_3_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[2], 9, sizeof(asf_codebook_3_bits),
 +                    asf_codebook_3_bits, 1, 1, asf_codebook_3_codes, 1, 1, 612);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[3], 9, sizeof(asf_codebook_4_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[3], 9, sizeof(asf_codebook_4_bits),
 +                    asf_codebook_4_bits, 1, 1, asf_codebook_4_codes, 1, 1, 544);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[4], 9, sizeof(asf_codebook_5_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[4], 9, sizeof(asf_codebook_5_bits),
 +                    asf_codebook_5_bits, 1, 1, asf_codebook_5_codes, 1, 1, 576);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[5], 9, sizeof(asf_codebook_6_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[5], 9, sizeof(asf_codebook_6_bits),
 +                    asf_codebook_6_bits, 1, 1, asf_codebook_6_codes, 1, 1, 546);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[6], 9, sizeof(asf_codebook_7_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[6], 9, sizeof(asf_codebook_7_bits),
 +                    asf_codebook_7_bits, 1, 1, asf_codebook_7_codes, 1, 1, 542);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[7], 9, sizeof(asf_codebook_8_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[7], 9, sizeof(asf_codebook_8_bits),
 +                    asf_codebook_8_bits, 1, 1, asf_codebook_8_codes, 1, 1, 522);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[8], 9, sizeof(asf_codebook_9_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[8], 9, sizeof(asf_codebook_9_bits),
 +                    asf_codebook_9_bits, 1, 1, asf_codebook_9_codes, 1, 1, 670);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[9], 9, sizeof(asf_codebook_10_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[9], 9, sizeof(asf_codebook_10_bits),
 +                    asf_codebook_10_bits, 1, 1, asf_codebook_10_codes, 1, 1, 604);
-+    INIT_VLC_STATIC(&asf_codebook_vlc[10], 9, sizeof(asf_codebook_11_bits),
++    VLC_INIT_STATIC(&asf_codebook_vlc[10], 9, sizeof(asf_codebook_11_bits),
 +                    asf_codebook_11_bits, 1, 1, asf_codebook_11_codes, 1, 1, 674);
 +
-+    INIT_VLC_STATIC(&aspx_int_class_vlc, 5, sizeof(aspx_int_class_bits),
++    VLC_INIT_STATIC(&aspx_int_class_vlc, 5, sizeof(aspx_int_class_bits),
 +                    aspx_int_class_bits, 1, 1, aspx_int_class_codes, 1, 1, 32);
 +
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[0][0][0], 9, sizeof(aspx_hcb_env_level_15_f0_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[0][0][0], 9, sizeof(aspx_hcb_env_level_15_f0_bits),
 +                    aspx_hcb_env_level_15_f0_bits, 1, 1, aspx_hcb_env_level_15_f0_codes, 4, 4, 1024);
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[0][0][1], 9, sizeof(aspx_hcb_env_level_15_df_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[0][0][1], 9, sizeof(aspx_hcb_env_level_15_df_bits),
 +                    aspx_hcb_env_level_15_df_bits, 1, 1, aspx_hcb_env_level_15_df_codes, 4, 4, 1888);
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[0][0][2], 9, sizeof(aspx_hcb_env_level_15_dt_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[0][0][2], 9, sizeof(aspx_hcb_env_level_15_dt_bits),
 +                    aspx_hcb_env_level_15_dt_bits, 1, 1, aspx_hcb_env_level_15_dt_codes, 4, 4, 1368);
 +
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[0][1][0], 9, sizeof(aspx_hcb_env_level_30_f0_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[0][1][0], 9, sizeof(aspx_hcb_env_level_30_f0_bits),
 +                    aspx_hcb_env_level_30_f0_bits, 1, 1, aspx_hcb_env_level_30_f0_codes, 4, 4, 772);
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[0][1][1], 9, sizeof(aspx_hcb_env_level_30_df_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[0][1][1], 9, sizeof(aspx_hcb_env_level_30_df_bits),
 +                    aspx_hcb_env_level_30_df_bits, 1, 1, aspx_hcb_env_level_30_df_codes, 4, 4, 1624);
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[0][1][2], 9, sizeof(aspx_hcb_env_level_30_dt_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[0][1][2], 9, sizeof(aspx_hcb_env_level_30_dt_bits),
 +                    aspx_hcb_env_level_30_dt_bits, 1, 1, aspx_hcb_env_level_30_dt_codes, 4, 4, 1598);
 +
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[1][0][0], 9, sizeof(aspx_hcb_env_balance_15_f0_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[1][0][0], 9, sizeof(aspx_hcb_env_balance_15_f0_bits),
 +                    aspx_hcb_env_balance_15_f0_bits, 1, 1, aspx_hcb_env_balance_15_f0_codes, 4, 4, 644);
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[1][0][1], 9, sizeof(aspx_hcb_env_balance_15_df_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[1][0][1], 9, sizeof(aspx_hcb_env_balance_15_df_bits),
 +                    aspx_hcb_env_balance_15_df_bits, 1, 1, aspx_hcb_env_balance_15_df_codes, 4, 4, 1056);
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[1][0][2], 9, sizeof(aspx_hcb_env_balance_15_dt_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[1][0][2], 9, sizeof(aspx_hcb_env_balance_15_dt_bits),
 +                    aspx_hcb_env_balance_15_dt_bits, 1, 1, aspx_hcb_env_balance_15_dt_codes, 4, 4, 616);
 +
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[1][1][0], 9, sizeof(aspx_hcb_env_balance_30_f0_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[1][1][0], 9, sizeof(aspx_hcb_env_balance_30_f0_bits),
 +                    aspx_hcb_env_balance_30_f0_bits, 1, 1, aspx_hcb_env_balance_30_f0_codes, 2, 2, 520);
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[1][1][1], 9, sizeof(aspx_hcb_env_balance_30_df_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[1][1][1], 9, sizeof(aspx_hcb_env_balance_30_df_bits),
 +                    aspx_hcb_env_balance_30_df_bits, 1, 1, aspx_hcb_env_balance_30_df_codes, 4, 4, 768);
-+    INIT_VLC_STATIC(&aspx_codebook_signal_vlc[1][1][2], 9, sizeof(aspx_hcb_env_balance_30_dt_bits),
++    VLC_INIT_STATIC(&aspx_codebook_signal_vlc[1][1][2], 9, sizeof(aspx_hcb_env_balance_30_dt_bits),
 +                    aspx_hcb_env_balance_30_dt_bits, 1, 1, aspx_hcb_env_balance_30_dt_codes, 2, 2, 576);
 +
-+    INIT_VLC_STATIC(&aspx_codebook_noise_vlc[0][0], 9, sizeof(aspx_hcb_noise_level_f0_bits),
++    VLC_INIT_STATIC(&aspx_codebook_noise_vlc[0][0], 9, sizeof(aspx_hcb_noise_level_f0_bits),
 +                    aspx_hcb_noise_level_f0_bits, 1, 1, aspx_hcb_noise_level_f0_codes, 2, 2, 672);
-+    INIT_VLC_STATIC(&aspx_codebook_noise_vlc[0][1], 9, sizeof(aspx_hcb_noise_level_df_bits),
++    VLC_INIT_STATIC(&aspx_codebook_noise_vlc[0][1], 9, sizeof(aspx_hcb_noise_level_df_bits),
 +                    aspx_hcb_noise_level_df_bits, 1, 1, aspx_hcb_noise_level_df_codes, 4, 4, 1024);
-+    INIT_VLC_STATIC(&aspx_codebook_noise_vlc[0][2], 9, sizeof(aspx_hcb_noise_level_dt_bits),
++    VLC_INIT_STATIC(&aspx_codebook_noise_vlc[0][2], 9, sizeof(aspx_hcb_noise_level_dt_bits),
 +                    aspx_hcb_noise_level_dt_bits, 1, 1, aspx_hcb_noise_level_dt_codes, 2, 2, 768);
 +
-+    INIT_VLC_STATIC(&aspx_codebook_noise_vlc[1][0], 9, sizeof(aspx_hcb_noise_balance_f0_bits),
++    VLC_INIT_STATIC(&aspx_codebook_noise_vlc[1][0], 9, sizeof(aspx_hcb_noise_balance_f0_bits),
 +                    aspx_hcb_noise_balance_f0_bits, 1, 1, aspx_hcb_noise_balance_f0_codes, 2, 2, 516);
-+    INIT_VLC_STATIC(&aspx_codebook_noise_vlc[1][1], 9, sizeof(aspx_hcb_noise_balance_df_bits),
++    VLC_INIT_STATIC(&aspx_codebook_noise_vlc[1][1], 9, sizeof(aspx_hcb_noise_balance_df_bits),
 +                    aspx_hcb_noise_balance_df_bits, 1, 1, aspx_hcb_noise_balance_df_codes, 2, 2, 536);
-+    INIT_VLC_STATIC(&aspx_codebook_noise_vlc[1][2], 9, sizeof(aspx_hcb_noise_balance_dt_bits),
++    VLC_INIT_STATIC(&aspx_codebook_noise_vlc[1][2], 9, sizeof(aspx_hcb_noise_balance_dt_bits),
 +                    aspx_hcb_noise_balance_dt_bits, 1, 1, aspx_hcb_noise_balance_dt_codes, 2, 2, 530);
 +
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[0][1][0], 9, sizeof(acpl_hcb_alpha_coarse_f0_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[0][1][0], 9, sizeof(acpl_hcb_alpha_coarse_f0_bits),
 +                    acpl_hcb_alpha_coarse_f0_bits, 1, 1, acpl_hcb_alpha_coarse_f0_codes, 2, 2, 516);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[0][1][1], 9, sizeof(acpl_hcb_alpha_coarse_df_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[0][1][1], 9, sizeof(acpl_hcb_alpha_coarse_df_bits),
 +                    acpl_hcb_alpha_coarse_df_bits, 1, 1, acpl_hcb_alpha_coarse_df_codes, 4, 4, 1032);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[0][1][2], 9, sizeof(acpl_hcb_alpha_coarse_dt_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[0][1][2], 9, sizeof(acpl_hcb_alpha_coarse_dt_bits),
 +                    acpl_hcb_alpha_coarse_dt_bits, 1, 1, acpl_hcb_alpha_coarse_dt_codes, 4, 4, 642);
 +
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[0][0][0], 9, sizeof(acpl_hcb_alpha_fine_f0_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[0][0][0], 9, sizeof(acpl_hcb_alpha_fine_f0_bits),
 +                    acpl_hcb_alpha_fine_f0_bits, 1, 1, acpl_hcb_alpha_fine_f0_codes, 2, 2, 530);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[0][0][1], 9, sizeof(acpl_hcb_alpha_fine_df_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[0][0][1], 9, sizeof(acpl_hcb_alpha_fine_df_bits),
 +                    acpl_hcb_alpha_fine_df_bits, 1, 1, acpl_hcb_alpha_fine_df_codes, 4, 4, 1176);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[0][0][2], 9, sizeof(acpl_hcb_alpha_fine_dt_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[0][0][2], 9, sizeof(acpl_hcb_alpha_fine_dt_bits),
 +                    acpl_hcb_alpha_fine_dt_bits, 1, 1, acpl_hcb_alpha_fine_dt_codes, 4, 4, 1158);
 +
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[1][1][0], 9, sizeof(acpl_hcb_beta_coarse_f0_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[1][1][0], 9, sizeof(acpl_hcb_beta_coarse_f0_bits),
 +                    acpl_hcb_beta_coarse_f0_bits, 1, 1, acpl_hcb_beta_coarse_f0_codes, 1, 1, 512);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[1][1][1], 9, sizeof(acpl_hcb_beta_coarse_df_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[1][1][1], 9, sizeof(acpl_hcb_beta_coarse_df_bits),
 +                    acpl_hcb_beta_coarse_df_bits, 1, 1, acpl_hcb_beta_coarse_df_codes, 1, 1, 512);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[1][1][2], 9, sizeof(acpl_hcb_beta_coarse_dt_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[1][1][2], 9, sizeof(acpl_hcb_beta_coarse_dt_bits),
 +                    acpl_hcb_beta_coarse_dt_bits, 1, 1, acpl_hcb_beta_coarse_dt_codes, 1, 1, 512);
 +
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[1][0][0], 9, sizeof(acpl_hcb_beta_fine_f0_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[1][0][0], 9, sizeof(acpl_hcb_beta_fine_f0_bits),
 +                    acpl_hcb_beta_fine_f0_bits, 1, 1, acpl_hcb_beta_fine_f0_codes, 1, 1, 512);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[1][0][1], 9, sizeof(acpl_hcb_beta_fine_df_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[1][0][1], 9, sizeof(acpl_hcb_beta_fine_df_bits),
 +                    acpl_hcb_beta_fine_df_bits, 1, 1, acpl_hcb_beta_fine_df_codes, 4, 4, 528);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[1][0][2], 9, sizeof(acpl_hcb_beta_fine_dt_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[1][0][2], 9, sizeof(acpl_hcb_beta_fine_dt_bits),
 +                    acpl_hcb_beta_fine_dt_bits, 1, 1, acpl_hcb_beta_fine_dt_codes, 4, 4, 576);
 +
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[2][1][0], 9, sizeof(acpl_hcb_beta3_coarse_f0_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[2][1][0], 9, sizeof(acpl_hcb_beta3_coarse_f0_bits),
 +                    acpl_hcb_beta3_coarse_f0_bits, 1, 1, acpl_hcb_beta3_coarse_f0_codes, 1, 1, 512);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[2][1][1], 9, sizeof(acpl_hcb_beta3_coarse_df_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[2][1][1], 9, sizeof(acpl_hcb_beta3_coarse_df_bits),
 +                    acpl_hcb_beta3_coarse_df_bits, 1, 1, acpl_hcb_beta3_coarse_df_codes, 4, 4, 528);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[2][1][2], 9, sizeof(acpl_hcb_beta3_coarse_dt_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[2][1][2], 9, sizeof(acpl_hcb_beta3_coarse_dt_bits),
 +                    acpl_hcb_beta3_coarse_dt_bits, 1, 1, acpl_hcb_beta3_coarse_dt_codes, 2, 2, 576);
 +
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[2][0][0], 9, sizeof(acpl_hcb_beta3_fine_f0_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[2][0][0], 9, sizeof(acpl_hcb_beta3_fine_f0_bits),
 +                    acpl_hcb_beta3_fine_f0_bits, 1, 1, acpl_hcb_beta3_fine_f0_codes, 1, 1, 512);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[2][0][1], 9, sizeof(acpl_hcb_beta3_fine_df_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[2][0][1], 9, sizeof(acpl_hcb_beta3_fine_df_bits),
 +                    acpl_hcb_beta3_fine_df_bits, 1, 1, acpl_hcb_beta3_fine_df_codes, 4, 4, 580);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[2][0][2], 9, sizeof(acpl_hcb_beta3_fine_dt_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[2][0][2], 9, sizeof(acpl_hcb_beta3_fine_dt_bits),
 +                    acpl_hcb_beta3_fine_dt_bits, 1, 1, acpl_hcb_beta3_fine_dt_codes, 4, 4, 768);
 +
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[3][1][0], 9, sizeof(acpl_hcb_gamma_coarse_f0_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[3][1][0], 9, sizeof(acpl_hcb_gamma_coarse_f0_bits),
 +                    acpl_hcb_gamma_coarse_f0_bits, 1, 1, acpl_hcb_gamma_coarse_f0_codes, 2, 2, 528);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[3][1][1], 9, sizeof(acpl_hcb_gamma_coarse_df_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[3][1][1], 9, sizeof(acpl_hcb_gamma_coarse_df_bits),
 +                    acpl_hcb_gamma_coarse_df_bits, 1, 1, acpl_hcb_gamma_coarse_df_codes, 4, 4, 644);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[3][1][2], 9, sizeof(acpl_hcb_gamma_coarse_dt_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[3][1][2], 9, sizeof(acpl_hcb_gamma_coarse_dt_bits),
 +                    acpl_hcb_gamma_coarse_dt_bits, 1, 1, acpl_hcb_gamma_coarse_dt_codes, 4, 4, 896);
 +
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[3][0][0], 9, sizeof(acpl_hcb_gamma_fine_f0_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[3][0][0], 9, sizeof(acpl_hcb_gamma_fine_f0_bits),
 +                    acpl_hcb_gamma_fine_f0_bits, 1, 1, acpl_hcb_gamma_fine_f0_codes, 4, 4, 544);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[3][0][1], 9, sizeof(acpl_hcb_gamma_fine_df_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[3][0][1], 9, sizeof(acpl_hcb_gamma_fine_df_bits),
 +                    acpl_hcb_gamma_fine_df_bits, 1, 1, acpl_hcb_gamma_fine_df_codes, 4, 4, 1026);
-+    INIT_VLC_STATIC(&acpl_codebook_vlc[3][0][2], 9, sizeof(acpl_hcb_gamma_fine_dt_bits),
++    VLC_INIT_STATIC(&acpl_codebook_vlc[3][0][2], 9, sizeof(acpl_hcb_gamma_fine_dt_bits),
 +                    acpl_hcb_gamma_fine_dt_bits, 1, 1, acpl_hcb_gamma_fine_dt_codes, 4, 4, 1792);
 +
 +    for (int j = 0; j < 8; j++) {
@@ -762,7 +741,7 @@
 +            if ((ret = av_tx_init(&s->tx_ctx[j][i], &s->tx_fn[j][i], AV_TX_FLOAT_MDCT, 1, N_w, &scale, 0)))
 +                return ret;
 +
-+            ff_kbd_window_init(s->kbd_window[j][i], alpha, N_w);
++            avpriv_kbd_window_init(s->kbd_window[j][i], alpha, N_w);
 +        }
 +    }
 +
@@ -7600,183 +7579,30 @@
 +};
 +
 +#endif /* AVCODEC_AC4DECDATA_H */
---- libavcodec/codec_desc.c
-+++ libavcodec/codec_desc.c
-@@ -3369,6 +3369,13 @@ static const AVCodecDescriptor codec_des
-         .long_name = NULL_IF_CONFIG_SMALL("RKA (RK Audio)"),
-         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY | AV_CODEC_PROP_LOSSLESS,
-     },
-+    {
-+        .id        = AV_CODEC_ID_AC4,
-+        .type      = AVMEDIA_TYPE_AUDIO,
-+        .name      = "ac4",
-+        .long_name = NULL_IF_CONFIG_SMALL("AC-4"),
-+        .props     = AV_CODEC_PROP_LOSSY,
-+    },
+--- libavcodec/allcodecs.c
++++ libavcodec/allcodecs.c
+@@ -438,6 +438,7 @@ extern const FFCodec ff_ac3_encoder;
+ extern const FFCodec ff_ac3_decoder;
+ extern const FFCodec ff_ac3_fixed_encoder;
+ extern const FFCodec ff_ac3_fixed_decoder;
++extern const FFCodec ff_ac4_decoder;
+ extern const FFCodec ff_acelp_kelvin_decoder;
+ extern const FFCodec ff_alac_encoder;
+ extern const FFCodec ff_alac_decoder;
+--- libavcodec/kbdwin.h
++++ libavcodec/kbdwin.h
+@@ -24,7 +24,7 @@
+ /**
+  * Maximum window size for avpriv_kbd_window_init.
+  */
+-#define FF_KBD_WINDOW_MAX 1024
++#define FF_KBD_WINDOW_MAX 2048
  
-     /* subtitle codecs */
-     {
---- libavcodec/codec_id.h
-+++ libavcodec/codec_id.h
-@@ -538,6 +538,7 @@ enum AVCodecID {
-     AV_CODEC_ID_FTR,
-     AV_CODEC_ID_WAVARC,
-     AV_CODEC_ID_RKA,
-+    AV_CODEC_ID_AC4,
- 
-     /* subtitle codecs */
-     AV_CODEC_ID_FIRST_SUBTITLE = 0x17000,          ///< A dummy ID pointing at the start of subtitle codecs.
---- libavformat/Makefile
-+++ libavformat/Makefile
-@@ -76,6 +76,7 @@ OBJS-$(CONFIG_AA_DEMUXER)
- OBJS-$(CONFIG_AAC_DEMUXER)               += aacdec.o apetag.o img2.o rawdec.o
- OBJS-$(CONFIG_AAX_DEMUXER)               += aaxdec.o
- OBJS-$(CONFIG_AC3_DEMUXER)               += ac3dec.o rawdec.o
-+OBJS-$(CONFIG_AC4_DEMUXER)               += ac4dec.o
- OBJS-$(CONFIG_AC3_MUXER)                 += rawenc.o
- OBJS-$(CONFIG_ACE_DEMUXER)               += acedec.o
- OBJS-$(CONFIG_ACM_DEMUXER)               += acm.o rawdec.o
---- /dev/null
-+++ libavformat/ac4dec.c
-@@ -0,0 +1,105 @@
-+/*
-+ * RAW AC-4 demuxer
-+ * Copyright (c) 2019 Paul B Mahol
-+ *
-+ * This file is part of FFmpeg.
-+ *
-+ * FFmpeg is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * FFmpeg is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with FFmpeg; if not, write to the Free Software
-+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-+ */
-+
-+#include "libavutil/avassert.h"
-+#include "libavutil/crc.h"
-+#include "avformat.h"
-+#include "demux.h"
-+#include "rawdec.h"
-+
-+static int ac4_probe(const AVProbeData *p)
-+{
-+    const uint8_t *buf = p->buf;
-+    int left = p->buf_size;
-+    int max_frames = 0;
-+
-+    while (left > 7) {
-+        int size;
-+
-+        if (buf[0] == 0xAC &&
-+            (buf[1] == 0x40 ||
-+             buf[1] == 0x41)) {
-+            size = (buf[2] << 8) | buf[3];
-+            if (size == 0xFFFF)
-+                size = 3 + ((buf[4] << 16) | (buf[5] << 8) | buf[6]);
-+            size += 4;
-+            if (buf[1] == 0x41)
-+                size += 2;
-+            max_frames++;
-+            left -= size;
-+            buf += size;
-+        } else {
-+            break;
-+        }
-+    }
-+
-+    return FFMIN(AVPROBE_SCORE_MAX, max_frames * 7);
-+}
-+
-+static int ac4_read_header(AVFormatContext *s)
-+{
-+    AVStream *st;
-+
-+    st = avformat_new_stream(s, NULL);
-+    if (!st)
-+        return AVERROR(ENOMEM);
-+
-+    st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
-+    st->codecpar->codec_id   = AV_CODEC_ID_AC4;
-+
-+    return 0;
-+}
-+
-+static int ac4_read_packet(AVFormatContext *s, AVPacket *pkt)
-+{
-+    AVIOContext *pb = s->pb;
-+    int64_t pos;
-+    uint16_t sync;
-+    int ret, size;
-+
-+    if (avio_feof(s->pb))
-+        return AVERROR_EOF;
-+
-+    pos  = avio_tell(s->pb);
-+    sync = avio_rb16(pb);
-+    size = avio_rb16(pb);
-+    if (size == 0xffff)
-+        size = avio_rb24(pb);
-+
-+    ret = av_get_packet(pb, pkt, size);
-+    pkt->pos = pos;
-+    pkt->stream_index = 0;
-+
-+    if (sync == 0xAC41)
-+        avio_skip(pb, 2);
-+
-+    return ret;
-+}
-+
-+AVInputFormat ff_ac4_demuxer = {
-+    .name           = "ac4",
-+    .long_name      = NULL_IF_CONFIG_SMALL("raw AC-4"),
-+    .read_probe     = ac4_probe,
-+    .read_header    = ac4_read_header,
-+    .read_packet    = ac4_read_packet,
-+    .flags          = AVFMT_GENERIC_INDEX,
-+    .extensions     = "ac4",
-+};
---- libavformat/allformats.c
-+++ libavformat/allformats.c
-@@ -34,6 +34,7 @@ extern const AVInputFormat  ff_aac_demux
- extern const AVInputFormat  ff_aax_demuxer;
- extern const AVInputFormat  ff_ac3_demuxer;
- extern const FFOutputFormat ff_ac3_muxer;
-+extern const AVInputFormat  ff_ac4_demuxer;
- extern const AVInputFormat  ff_ace_demuxer;
- extern const AVInputFormat  ff_acm_demuxer;
- extern const AVInputFormat  ff_act_demuxer;
---- libavformat/isom_tags.c
-+++ libavformat/isom_tags.c
-@@ -298,6 +298,7 @@ const AVCodecTag ff_codec_movaudio_tags[
-     { AV_CODEC_ID_DTS,             MKTAG('d', 't', 's', 'e') }, /* DTS Express */
-     { AV_CODEC_ID_DTS,             MKTAG('D', 'T', 'S', ' ') }, /* non-standard */
-     { AV_CODEC_ID_EAC3,            MKTAG('e', 'c', '-', '3') }, /* ETSI TS 102 366 Annex F (only valid in ISOBMFF) */
-+    { AV_CODEC_ID_AC4,             MKTAG('a', 'c', '-', '4') },
-     { AV_CODEC_ID_DVAUDIO,         MKTAG('v', 'd', 'v', 'a') },
-     { AV_CODEC_ID_DVAUDIO,         MKTAG('d', 'v', 'c', 'a') },
-     { AV_CODEC_ID_GSM,             MKTAG('a', 'g', 's', 'm') },
---- libavformat/mpegts.c
-+++ libavformat/mpegts.c
-@@ -859,6 +859,7 @@ static const StreamType HLS_SAMPLE_ENC_t
- static const StreamType REGD_types[] = {
-     { MKTAG('d', 'r', 'a', 'c'), AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_DIRAC },
-     { MKTAG('A', 'C', '-', '3'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AC3   },
-+    { MKTAG('A', 'C', '-', '4'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_AC4   },
-     { MKTAG('B', 'S', 'S', 'D'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_S302M },
-     { MKTAG('D', 'T', 'S', '1'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS   },
-     { MKTAG('D', 'T', 'S', '2'), AVMEDIA_TYPE_AUDIO, AV_CODEC_ID_DTS   },
+ /**
+  * Generate a Kaiser-Bessel Derived Window.
 --- libavcodec/utils.c
 +++ libavcodec/utils.c
-@@ -634,7 +634,8 @@ static int get_audio_frame_duration(enum
+@@ -612,7 +612,8 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
      case AV_CODEC_ID_ATRAC3P:      return 2048;
      case AV_CODEC_ID_MP2:
      case AV_CODEC_ID_MUSEPACK7:    return 1152;
@@ -7786,3 +7612,23 @@
      case AV_CODEC_ID_FTR:          return 1024;
      }
  
+--- libavformat/Makefile
++++ libavformat/Makefile
+@@ -76,6 +76,7 @@ OBJS-$(CONFIG_AA_DEMUXER)                += aadec.o
+ OBJS-$(CONFIG_AAC_DEMUXER)               += aacdec.o apetag.o img2.o rawdec.o
+ OBJS-$(CONFIG_AAX_DEMUXER)               += aaxdec.o
+ OBJS-$(CONFIG_AC3_DEMUXER)               += ac3dec.o rawdec.o
++OBJS-$(CONFIG_AC4_DEMUXER)               += ac4dec.o
+ OBJS-$(CONFIG_AC3_MUXER)                 += rawenc.o
+ OBJS-$(CONFIG_AC4_DEMUXER)               += ac4dec.o
+ OBJS-$(CONFIG_AC4_MUXER)                 += ac4enc.o
+--- libavformat/isom_tags.c
++++ libavformat/isom_tags.c
+@@ -305,6 +305,7 @@ const AVCodecTag ff_codec_movaudio_tags[] = {
+     { AV_CODEC_ID_DTS,             MKTAG('d', 't', 's', 'e') }, /* DTS Express */
+     { AV_CODEC_ID_DTS,             MKTAG('D', 'T', 'S', ' ') }, /* non-standard */
+     { AV_CODEC_ID_EAC3,            MKTAG('e', 'c', '-', '3') }, /* ETSI TS 102 366 Annex F (only valid in ISOBMFF) */
++    { AV_CODEC_ID_AC4,             MKTAG('a', 'c', '-', '4') },
+     { AV_CODEC_ID_DVAUDIO,         MKTAG('v', 'd', 'v', 'a') },
+     { AV_CODEC_ID_DVAUDIO,         MKTAG('d', 'v', 'c', 'a') },
+     { AV_CODEC_ID_GSM,             MKTAG('a', 'g', 's', 'm') },
