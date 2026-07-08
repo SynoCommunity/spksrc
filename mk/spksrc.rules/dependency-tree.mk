@@ -72,7 +72,7 @@
 #                       is excluded; otherwise all types are included.
 #  DEP_FLAT_TARGETS_MK: Annotated dep-flat-mk-% targets for all dependencies.
 #                       Uses deferred expansion (=) so that DEPENDS defined
-#                       after the include of this file (e.g. in main-depends
+#                       after the include of this file (e.g. in cross-virtual
 #                       packages) are captured correctly at evaluation time.
 #               RUN_ID: Unique identifier for the current dependency traversal run.
 #   DEP_FLAT_STAMP_DIR: Temporary directory used to cache visited dependencies.
@@ -106,10 +106,10 @@
 #    ensure all possible dependencies across all toolchains are discovered.
 #    Packages with conditional dependencies must define OPTIONAL_DEPENDS as a
 #    superset of all possible DEPENDS variants for this to work correctly.
-#  - Packages using spksrc.main-depends.mk that require toolchain macros
+#  - Packages using spksrc.cross-virtual.mk that require toolchain macros
 #    (version_ge, TC_GCC, TC_KERNEL, etc.) before their conditional DEPENDS
 #    must include spksrc.common.mk early, then define their DEPENDS, and
-#    include spksrc.main-depends.mk last. Example:
+#    include spksrc.cross-virtual.mk last. Example:
 #        OPTIONAL_DEPENDS = cross/foo-latest cross/foo-1.0
 #        include ../../mk/spksrc.common.mk
 #        ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
@@ -117,7 +117,7 @@
 #        else
 #        DEPENDS = cross/foo-1.0
 #        endif
-#        include ../../mk/spksrc.main-depends.mk
+#        include ../../mk/spksrc.cross-virtual.mk
 #  - ALL_DEPENDS and DEP_FLAT_TARGETS_MK use deferred expansion (=) rather
 #    than immediate expansion (:=) so that DEPENDS assigned after the include
 #    of this file are visible when these variables are first used.
@@ -161,7 +161,7 @@ DEPENDS_TYPE ?= $(_DEFAULT_DEPENDS_TYPE)
 #
 # Both variables use deferred expansion (=) rather than immediate (:=) so
 # that DEPENDS defined after the include of this file — as is required for
-# packages using spksrc.main-depends.mk — are visible when these variables
+# packages using spksrc.cross-virtual.mk — are visible when these variables
 # are first evaluated (i.e. when dependency-flat-mk resolves its prerequisites).
 # -------------------------------------------------------------------
 ALL_DEPENDS         = $(sort $(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))

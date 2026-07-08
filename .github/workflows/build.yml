@@ -205,7 +205,7 @@ jobs:
 
       - name: Restore distrib cache
         id: cache-restore
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: distrib
           # Use a placeholder key that will never match for the exact key,
@@ -255,7 +255,7 @@ jobs:
 
       - name: Save distrib cache
         if: steps.cache-check.outputs.save_cache == 'true'
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: distrib
           key: distrib-${{ steps.distrib-hash.outputs.hash }}
@@ -499,7 +499,7 @@ jobs:
           df -h / | tail -1 | awk '{print "Available space: " $4}'
 
       - name: Cache toolchains
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         # Do not cache qoriq toolchain. It must be built every time to install custom rust toolchain
         if: ${{ contains(matrix.arch,'qoriq') == false }}
         with:
@@ -513,7 +513,7 @@ jobs:
           df -h
 
       - name: Restore distrib cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: distrib
           # Use a placeholder key that will never match for the exact key,

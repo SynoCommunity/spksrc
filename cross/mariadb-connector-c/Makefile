@@ -1,4 +1,4 @@
-PKG_NAME = mariadb-connector-c-main
+PKG_NAME = mariadb-connector-c-virtual
 
 OPTIONAL_DEPENDS  = cross/mariadb-connector-c-latest
 OPTIONAL_DEPENDS += cross/mariadb-connector-c-3.3.11
@@ -11,4 +11,4 @@ else
 DEPENDS = cross/mariadb-connector-c-3.3.11
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

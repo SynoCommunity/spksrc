@@ -1,4 +1,4 @@
-PKG_NAME = libaom-main
+PKG_NAME = libaom-virtual
 
 OPTIONAL_DEPENDS  = cross/libaom-latest
 OPTIONAL_DEPENDS += cross/libaom-3.8
@@ -14,4 +14,4 @@ else
 DEPENDS = cross/libaom-3.8
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

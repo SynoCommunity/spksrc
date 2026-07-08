@@ -16,6 +16,8 @@
 #                           (2 or more entries enable multi-arch orchestration)
 #  PKG_DIST_ARCH          : Optional current distribution architecture
 #                           (single element used during leaf execution)
+#  PKG_DIST_MIRRORS       : Optional per-package fallback base URLs; the file
+#                           name is appended to each and tried in turn.
 #
 # Files:
 #  $(WORK_DIR)/.$(COOKIE_PREFIX)download_done
@@ -27,6 +29,11 @@
 #
 # Notes:
 #  - The download target is idempotent and guarded by a completion cookie.
+#  - Per download method, the actual work lives in a DOWNLOAD_<METHOD> macro
+#    (git / svn / hg / http) selected by PKG_DOWNLOAD_METHOD; download_target
+#    only loops over $(URLS) and dispatches to the right macro.
+#  - For plain (http) downloads a failed mirror is retried on the next mirror
+#    (see the mirror table below) before giving up.
 #  - When PKG_DIST_ARCH is unset, a single generic cookie is used, preserving
 #    the classic single-archive behavior.
 #  - When PKG_DIST_ARCH is set, the cookie is architecture-specific, allowing
@@ -93,12 +100,36 @@ manual_dl_target:
 
 pre_download_target: download_msg
 
-download_target: $(PRE_DOWNLOAD_TARGET)
-	@mkdir -p $(DISTRIB_DIR)
-	@cd $(DISTRIB_DIR) &&  for url in $(URLS) ; \
-	do \
-	  case "$(PKG_DOWNLOAD_METHOD)" in \
-	    git) \
+# ---------------------------------------------------------------------------
+# Mirror table (plain http downloads)
+#
+# A download is first attempted from its original URL (only SourceForge project
+# pages are canonicalised to a downloadable host); on failure the same path is
+# retried from each mirror base below, in order. This table is the single source
+# of truth for mirrors - there is no per-family URL rewrite - so for GNU the
+# geo-redirector ftpmirror.gnu.org is just another entry. A mirror candidate is
+# built by replacing everything up to and including the family's tree-root marker
+# with the mirror base, so mirrors that host the tree under a different prefix
+# are handled correctly. PKG_DIST_MIRRORS adds extra per-package base URLs (file
+# name appended). Non-matching URLs (e.g. GitHub) just use the single original URL.
+# ---------------------------------------------------------------------------
+# Per-host wget attempts. The overall work is bounded: at most
+# (number of mirror candidates) x DOWNLOAD_TRIES attempts, and the candidate
+# list is finite (primary URL + the family mirrors + PKG_DIST_MIRRORS, then
+# de-duplicated), so a failing download can never loop indefinitely.
+DOWNLOAD_TRIES      ?= 2
+GNU_MIRRORS         ?= https://ftpmirror.gnu.org/gnu https://ftp.gnu.org/gnu https://mirrors.kernel.org/gnu https://mirror.csclub.uwaterloo.ca/gnu
+SOURCEFORGE_MIRRORS ?= https://downloads.sourceforge.net/project https://netcologne.dl.sourceforge.net/project https://phoenixnap.dl.sourceforge.net/project
+GNOME_MIRRORS       ?= https://download.gnome.org/sources https://mirror.csclub.uwaterloo.ca/gnome/sources
+XORG_MIRRORS        ?= https://www.x.org/releases https://mirror.csclub.uwaterloo.ca/x.org/releases
+KERNEL_MIRRORS      ?= https://cdn.kernel.org/pub https://mirrors.kernel.org/pub https://www.kernel.org/pub
+PKG_DIST_MIRRORS    ?=
+
+# ---------------------------------------------------------------------------
+# Per-method download macros, spliced into download_target's case below.
+# Each ends with ';;' to close its case entry.
+# ---------------------------------------------------------------------------
+define DOWNLOAD_GIT
 	      localFolder=$(NAME)-git$(PKG_GIT_HASH) ; \
 	      localFile=$${localFolder}.tar.gz ; \
 	      exec 6> /tmp/git.$${localFolder}.lock ; \
@@ -116,8 +147,10 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        rm -fr $${localFolder} ; \
 	      fi ; \
 	      flock -u 6 ; \
-	      ;; \
-	    svn) \
+	      ;;
+endef
+
+define DOWNLOAD_SVN
 	      if [ "$(PKG_SVN_REV)" = "HEAD" ]; then \
 	        rev=$$(svn info --xml $${url} | xmllint --xpath 'string(/info/entry/@revision)' -) ; \
 	      else \
@@ -145,8 +178,10 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        rm -f $${localHead} ; \
 	        ln -s $${localFile} $${localHead} ; \
 	      fi ; \
-	      ;; \
-	    hg) \
+	      ;;
+endef
+
+define DOWNLOAD_HG
 	      if [ "$(PKG_HG_REV)" = "tip" ]; then \
 	        rev=$$(hg identify -r "tip" $${url}) ; \
 	      else \
@@ -174,14 +209,15 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        rm -f $${localTip} ; \
 	        ln -s $${localFile} $${localTip} ; \
 	      fi ; \
-	      ;; \
-	    *) \
+	      ;;
+endef
+
+define DOWNLOAD_HTTP
 	      localFile=$(PKG_DIST_FILE) ; \
 	      if [ -z "$${localFile}" ]; then \
 	        localFile=$$(basename $${url}) ; \
 	      fi ; \
-	      url=$$(echo $${url} | sed -E -e 's#//ftp\.gnu\.org/#//ftpmirror.gnu.org/#g' \
-	                                   -e 's#//sourceforge\.net/projects/([^/]+)/files/#//downloads.sourceforge.net/project/\1/#g' \
+	      url=$$(echo $${url} | sed -E -e 's#//sourceforge\.net/projects/([^/]+)/files/#//downloads.sourceforge.net/project/\1/#g' \
 	                                   -e 's#//downloads\.sourceforge\.net/projects/([^/]+)/files/#//downloads.sourceforge.net/project/\1/#g') ; \
 	      exec 9> /tmp/wget.$${localFile}.lock ; \
 	      flock --timeout $(FLOCK_TIMEOUT) --exclusive 9 || exit 1 ; \
@@ -191,15 +227,55 @@ download_target: $(PRE_DOWNLOAD_TARGET)
 	        $(MSG) "  File $${localFile} already downloaded" ; \
 	      else \
 	        rm -f $${localFile}.part ; \
-	        $(MSG) "  wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 --retry-connrefused --max-redirect=20 --content-disposition --retry-on-http-error=429,500,502,503,504 -nv -O $${localFile} -nc $${url}" ; \
-	        wget --secure-protocol=TLSv1_2 --timeout=30 --tries=3 --waitretry=15 \
-	             --retry-connrefused --max-redirect=20 --content-disposition \
-	             --retry-on-http-error=429,500,502,503,504 \
-	             -nv -O $${localFile}.part -nc $${url} ; \
+	        mirrorUrls="$${url}" ; \
+	        marker="" ; mirrorBases="" ; \
+	        case "$${url}" in \
+	          *//ftpmirror.gnu.org/gnu/*|*//ftp.gnu.org/gnu/*)  marker="/gnu/" ;     mirrorBases="$(GNU_MIRRORS)" ;; \
+	          *//downloads.sourceforge.net/project/*)           marker="/project/" ; mirrorBases="$(SOURCEFORGE_MIRRORS)" ;; \
+	          *//download.gnome.org/sources/*)                  marker="/sources/" ; mirrorBases="$(GNOME_MIRRORS)" ;; \
+	          *//www.x.org/releases/*|*//x.org/releases/*)      marker="/releases/" ; mirrorBases="$(XORG_MIRRORS)" ;; \
+	          *//www.kernel.org/pub/*|*//cdn.kernel.org/pub/*)  marker="/pub/" ;     mirrorBases="$(KERNEL_MIRRORS)" ;; \
+	        esac ; \
+	        if [ -n "$${marker}" ]; then \
+	          tail=$${url#*$${marker}} ; \
+	          for b in $${mirrorBases} ; do mirrorUrls="$${mirrorUrls} $${b%/}/$${tail}" ; done ; \
+	        fi ; \
+	        for m in $(PKG_DIST_MIRRORS) ; do mirrorUrls="$${mirrorUrls} $${m%/}/$${localFile}" ; done ; \
+	        uniqUrls="" ; \
+	        for u in $${mirrorUrls} ; do case " $${uniqUrls} " in *" $${u} "*) ;; *) uniqUrls="$${uniqUrls} $${u}" ;; esac ; done ; \
+	        mirrorUrls="$${uniqUrls}" ; \
+	        downloaded=0 ; \
+	        for tryUrl in $${mirrorUrls} ; do \
+	          $(MSG) "  wget -O $${localFile} $${tryUrl}" ; \
+	          if wget --secure-protocol=TLSv1_2 --timeout=30 --tries=$(DOWNLOAD_TRIES) --waitretry=10 \
+	                  --retry-connrefused --max-redirect=20 --content-disposition \
+	                  --retry-on-http-error=429,500,502,503,504 \
+	                  -nv -O $${localFile}.part -nc $${tryUrl} ; then \
+	            downloaded=1 ; break ; \
+	          fi ; \
+	          $(MSG) "  ==> download failed, trying next mirror" ; \
+	          rm -f $${localFile}.part ; \
+	        done ; \
+	        if [ $${downloaded} -ne 1 ]; then \
+	          $(MSG) "*** All mirrors failed for $${localFile}. Stop." ; \
+	          flock -u 9 ; \
+	          exit 1 ; \
+	        fi ; \
 	        mv $${localFile}.part $${localFile} ; \
 	      fi ; \
 	      flock -u 9 ; \
-	      ;; \
+	      ;;
+endef
+
+download_target: $(PRE_DOWNLOAD_TARGET)
+	@mkdir -p $(DISTRIB_DIR)
+	@cd $(DISTRIB_DIR) && for url in $(URLS) ; \
+	do \
+	  case "$(PKG_DOWNLOAD_METHOD)" in \
+	    git) $(DOWNLOAD_GIT) \
+	    svn) $(DOWNLOAD_SVN) \
+	    hg)  $(DOWNLOAD_HG) \
+	    *)   $(DOWNLOAD_HTTP) \
 	  esac ; \
 	done
 
