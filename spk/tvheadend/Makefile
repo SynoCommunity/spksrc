@@ -1,7 +1,7 @@
 SPK_NAME = tvheadend
 SPK_SHORT_VERS = 4.3
-SPK_GIT_HASH = 80729d2f
-SPK_GIT_DATE = 20260623
+SPK_GIT_HASH = 8ddfe279
+SPK_GIT_DATE = 20260709
 SPK_VERS = $(SPK_SHORT_VERS).$(SPK_GIT_DATE)
 TVH_VERS = $(SPK_SHORT_VERS)~$(SPK_GIT_HASH)
 SPK_REV = 48
@@ -18,8 +18,15 @@ DESCRIPTION = Tvheadend is a TV streaming server and recorder for Linux, FreeBSD
 DESCRIPTION_FRE = Tvheadend est un serveur de streaming et enregistreur TV pour Linux, FreeBSD et Android prenant en charge DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, ISDB-T, IPTV, SAT IP et HDHomeRun comme sources d\'entrée. Tvheadend offre le streaming HTTP, HTSP et SAT IP.
 DISPLAY_NAME = Tvheadend
 STARTABLE = yes
-CHANGELOG = "1. Update to latest git version 80729d2f of June 23rd 2026<br/>2. Update all python wheels<br/>3. Update to gracenote2epg 2.0<br/>4. Enablement of dbus<br/>5. Experimental migration to ffmpeg 8.1<br/>6. Enable new experimental vue UI<br/>7. Update libhdhomerun to 20260313<br/>8. Migrate to python 3.14<br/>9. Removal of zap2epg as replaced with gracenote2epg"
-HOMEPAGE = https://tvheadend.org/
+CHANGELOG  = "1. Update to latest git version 8ddfe279 of July 9th 2026<br/>"
+CHANGELOG += "2. Update all python wheels<br/>"
+CHANGELOG += "3. Update to gracenote2epg 2.0<br/>"
+CHANGELOG += "4. Enablement of dbus<br/>"
+CHANGELOG += "5. Experimental migration to ffmpeg 8.1<br/>"
+CHANGELOG += "6. New Vue web UI (now upstream in tvheadend)<br/>"
+CHANGELOG += "7. Update libhdhomerun to 20260313<br/>"
+CHANGELOG += "8. Migrate to python 3.14<br/>"
+CHANGELOG += "9. Removal of zap2epg as replaced with gracenote2epg<br/>"
 LICENSE = GPL v3
 
 CONF_DIR = src/conf/
