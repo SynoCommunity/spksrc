@@ -41,16 +41,15 @@ CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
-# ARCH specific
-OPTIONAL_DEPENDS  = cross/openh264
+OPTIONAL_DEPENDS  = cross/frei0r
 OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/svt-av1
-# GCC specific
-OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libjxl
 OPTIONAL_DEPENDS += cross/liblc3
-OPTIONAL_DEPENDS += cross/rubberband
+OPTIONAL_DEPENDS += cross/libplacebo
 OPTIONAL_DEPENDS += cross/libvmaf
+OPTIONAL_DEPENDS += cross/openh264
+OPTIONAL_DEPENDS += cross/rubberband
+OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/vvenc
 
 # Define x86asm
