@@ -27,26 +27,26 @@ include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 
-SPK_COMMANDS  = bin/clinfo
-SPK_COMMANDS += bin/vainfo
-SPK_COMMANDS += bin/vulkaninfo
-SPK_COMMANDS += bin/lsgpu
-SPK_COMMANDS += bin/intel_gpu_top
-
 # VA-API
 DEPENDS  = cross/libva-utils
+SPK_COMMANDS  = bin/vainfo
 
 # OpenCL
 DEPENDS += cross/clinfo
+SPK_COMMANDS += bin/clinfo
 
 # Vulkan
 DEPENDS += cross/Khronos-Vulkan-Tools
+SPK_COMMANDS += bin/vulkaninfo
 
-# Intel GPU Tools (igt): intel_gpu_top, lsgpu, ...
+# Intel GPU Tools (igt)
 DEPENDS += cross/intel-gpu-tools
+SPK_COMMANDS += bin/lsgpu
+SPK_COMMANDS += bin/intel_gpu_top
 
 # Intel Video Processing Library (Intel VPL) tools
 DEPENDS += cross/intel-libvpl-tools
+SPK_COMMANDS += bin/vpl-inspect
 
 endif
 endif
