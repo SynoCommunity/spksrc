@@ -16,6 +16,16 @@ DEPENDS += cross/Khronos-Vulkan-Tools
 DEPENDS += cross/shaderc
 
 CONFIGURE_ARGS += -Dopengl=disabled
-CONFIGURE_ARGS += -Dvulkan-registry=$(STAGING_INSTALL_PREFIX)/share/vulkan/registry/vk.xml
+
+# vk.xml is installed by cross/Khronos-Vulkan-Headers. When libplacebo is built
+# as part of a videodriver meta consumer (e.g. ffmpeg on DSM 7.2, where GCC>=12
+# enables libplacebo), Vulkan-Headers is shared through the meta build cookies
+# and only installed into the videodriver staging, not libplacebo's own — so
+# look there as well. The local staging takes precedence for standalone builds.
+# (evaluated when CONFIGURE_ARGS is expanded at configure time, i.e. after depend)
+VULKAN_REGISTRY = $(firstword $(wildcard \
+	$(STAGING_INSTALL_PREFIX)/share/vulkan/registry/vk.xml \
+	$(VIDEODRV_STAGING_INSTALL_PREFIX)/share/vulkan/registry/vk.xml))
+CONFIGURE_ARGS += -Dvulkan-registry=$(VULKAN_REGISTRY)
 
 include ../../mk/spksrc.cross-meson.mk
