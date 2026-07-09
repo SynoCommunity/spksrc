@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg8
 SPK_VERS = 8.1.2
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
 SPK_REV = 2
-SPK_ICON = src/ffmpeg.png
+SPK_ICON = src/ffmpeg8.png
 CHANGELOG = "1. Update to version 8.1.2"
 
 DEPENDS = cross/ffmpeg8

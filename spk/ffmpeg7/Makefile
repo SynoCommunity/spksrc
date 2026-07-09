@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg7
 SPK_VERS = 7.1.5
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
 SPK_REV = 9
-SPK_ICON = src/ffmpeg.png
+SPK_ICON = src/ffmpeg7.png
 CHANGELOG = "1. Update to version 7.1.5"
 
 DEPENDS = cross/ffmpeg7
