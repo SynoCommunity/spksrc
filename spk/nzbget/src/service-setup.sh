@@ -13,39 +13,28 @@ KERNEL_PINNED_VERSION="26.2"
 # These could change depending on previous package settings
 SERVICE_COMMAND="${NZBGET} -c ${CFG_FILE} -o WebDir=${WEBDIR} -o LockFile=${PID_FILE} -D"
 
+is_pre_3_2_kernel ()
+{
+    KERNEL_MAJOR=$(uname -r | cut -d. -f1)
+    KERNEL_MINOR=$(uname -r | cut -d. -f2)
+
+    [ "${KERNEL_MAJOR}" -lt 3 ] || { [ "${KERNEL_MAJOR}" -eq 3 ] && [ "${KERNEL_MINOR}" -lt 2 ]; }
+}
+
 validate_preinst ()
 {
-    # Treat a filled version field as specific release selected, regardless of checkbox state
-    if [ -n "${wizard_specific_release_version}" ]; then
-        wizard_specific_release=true
-    fi
-
-    # For specific version only: verify the release exists before installation begins.
-    if [ -n "${wizard_specific_release}" ] && [ "${wizard_specific_release}" = true ]; then
-        if [ -z "${wizard_specific_release_version}" ]; then
-            echo "No version specified. Please enter a version number."
-            exit 1
-        fi
-        wget --quiet --spider "https://github.com/nzbgetcom/nzbget/releases/download/v${wizard_specific_release_version}/nzbget-${wizard_specific_release_version}-bin-linux.run"
-        if [ $? -ne 0 ]; then
-            echo "NZBGet version ${wizard_specific_release_version} not found. Please verify the version exists at https://github.com/nzbgetcom/nzbget/releases"
-            exit 1
-        fi
+    # Latest (testing) installer is not compatible with kernels older than 3.2.
+    if [ -n "${wizard_testing_release}" ] && [ "${wizard_testing_release}" = true ] && is_pre_3_2_kernel; then
+        echo "Latest testing NZBGet is not supported on kernel $(uname -r) (< 3.2). Select stable instead."
+        exit 1
     fi
 }
 
 service_postinst ()
 {
-    # Treat a filled version field as specific release selected, regardless of checkbox state
-    if [ -n "${wizard_specific_release_version}" ]; then
-        wizard_specific_release=true
-    fi
-
-    # Download current NZBGet (stable, testing, or specific version)
+    # Download current NZBGet (stable or testing)
     if [ -n "${wizard_stable_release}" ] && [ "${wizard_stable_release}" = true ]; then
-        KERNEL_MAJOR=$(uname -r | cut -d. -f1)
-        KERNEL_MINOR=$(uname -r | cut -d. -f2)
-        if [ "${KERNEL_MAJOR}" -lt 3 ] || { [ "${KERNEL_MAJOR}" -eq 3 ] && [ "${KERNEL_MINOR}" -lt 2 ]; }; then
+        if is_pre_3_2_kernel; then
             echo "Download nzbget installer: ${KERNEL_PINNED_VERSION} (kernel $(uname -r) < 3.2)"
             wget --quiet --output-document="${NZBGET_INSTALLER}" "https://github.com/nzbgetcom/nzbget/releases/download/v${KERNEL_PINNED_VERSION}/nzbget-${KERNEL_PINNED_VERSION}-bin-linux.run"
         else
@@ -56,10 +45,6 @@ service_postinst ()
     if [ -n "${wizard_testing_release}" ] && [ "${wizard_testing_release}" = true ]; then
         echo "Download nzbget installer: latest-testing"
         wget --quiet --output-document="${NZBGET_INSTALLER}" "https://nzbget.com/download/nzbget-latest-testing-bin-linux.run"
-    fi
-    if [ -n "${wizard_specific_release}" ] && [ "${wizard_specific_release}" = true ]; then
-        echo "Download nzbget installer: ${wizard_specific_release_version}"
-        wget --quiet --output-document="${NZBGET_INSTALLER}" "https://github.com/nzbgetcom/nzbget/releases/download/v${wizard_specific_release_version}/nzbget-${wizard_specific_release_version}-bin-linux.run"
     fi
 
     # Abort if download failed
@@ -83,6 +68,11 @@ service_postinst ()
         echo "The installer failed to install NZBGet. Please report the log below to SynoCommunity:"
         echo "${INST_LOG}"
         exit 1
+    fi
+
+    # Remove package-info.json from WebDir on pre-3.2 kernels to disable internal updater
+    if is_pre_3_2_kernel; then
+        rm -f "${WEBDIR}/package-info.json"
     fi
 
     # Make a copy of the config file created by the current installer
