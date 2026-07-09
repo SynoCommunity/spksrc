@@ -1,4 +1,4 @@
-PKG_NAME = nmap-main
+PKG_NAME = nmap-virtual
 
 OPTIONAL_DEPENDS  = cross/nmap-latest
 OPTIONAL_DEPENDS += cross/nmap-7.98
@@ -14,4 +14,4 @@ else
 DEPENDS = cross/nmap-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

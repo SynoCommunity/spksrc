@@ -1,4 +1,4 @@
-PKG_NAME = libicu-main
+PKG_NAME = libicu-virtual
 
 OPTIONAL_DEPENDS  = cross/libicu-latest
 OPTIONAL_DEPENDS += cross/libicu-74.2
@@ -12,4 +12,4 @@ else
 DEPENDS = cross/libicu-74.2
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

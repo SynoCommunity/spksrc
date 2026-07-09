@@ -1,6 +1,6 @@
 SPK_NAME = synocli-videodriver
 SPK_VERS = 1.5
-SPK_REV = 6
+SPK_REV = 8
 SPK_ICON = src/SynoPackagegreen-videodriver.png
 
 MAINTAINER = th0ma7
@@ -23,75 +23,18 @@ CHANGELOG += "3. Intel Level-Zero 1.17.42 (DSM 7.1+).<br/> "
 CHANGELOG += "4. Intel Graphics Compiler (IGC) 1.0.17791.18 (DSM 7.1+).<br/> "
 CHANGELOG += "5. Intel Compute Runtime 24.35.30872.41 (DSM 7.1+).<br/> "
 CHANGELOG += "6. Intel Video Processing Library (Intel VPL) 2.15.0 (DSM 7.1+).<br/> "
-CHANGELOG += "7. MESA Intel Vulkan driver (anv) 23.3.6 (DSM 7.1+)."
-CHANGELOG += "8. libshaderc for accessing glslc functionality (DSM 7.1+)."
-CHANGELOG += "9. Intel GPU Tools (igt) 2.3 (DSM 7.1+)."
-
-OPTIONAL_DEPENDS  = cross/intel-level-zero
-OPTIONAL_DEPENDS += cross/intel-graphics-compiler
-OPTIONAL_DEPENDS += cross/intel-compute-runtime
-OPTIONAL_DEPENDS += cross/ocl-icd
-OPTIONAL_DEPENDS += cross/clinfo
-OPTIONAL_DEPENDS += cross/mesa
-OPTIONAL_DEPENDS += cross/Khronos-Vulkan-Loader
-OPTIONAL_DEPENDS += cross/Khronos-Vulkan-Tools
-OPTIONAL_DEPENDS += cross/shaderc
-OPTIONAL_DEPENDS += cross/libplacebo
-OPTIONAL_DEPENDS += cross/intel-gpu-tools
-OPTIONAL_DEPENDS += cross/intel-libvpl
-OPTIONAL_DEPENDS += cross/intel-libvpl-tools
+CHANGELOG += "7. MESA Intel Vulkan driver (anv) 23.3.6 (DSM 7.1+).<br/>"
+CHANGELOG += "8. libshaderc for accessing glslc functionality (DSM 7.1+).<br/>"
+CHANGELOG += "9. Re-publish for DSM 7.2+.<br/>"
+CHANGELOG += "10. Diagnostic tools (vainfo, clinfo, vulkaninfo, lsgpu, intel_gpu_top) moved to synocli-videodriver-tools: this package now ships libraries only.<br/>"
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-DEPENDS  = cross/libdrm
-endif
+# Library dependency list shared with the consumer-side meta integration
+# (single source of truth: mk/spksrc.spk-meta/videodriver-depends.mk)
+include ../../mk/spksrc.spk-meta/videodriver-depends.mk
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-SPK_COMMANDS  = bin/clinfo
-SPK_COMMANDS += bin/vainfo
-SPK_COMMANDS += bin/vulkaninfo
-SPK_COMMANDS += bin/lsgpu
-
-# Common videodrv dependencies
-DEPENDS  = cross/libva cross/libva-utils
-DEPENDS += cross/intel-vaapi-driver
-DEPENDS += cross/intel-media-driver cross/intel-mediasdk
-
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
-
-# Newer Intel implementation
-DEPENDS += cross/intel-level-zero
-
-# OpenCL
-DEPENDS += cross/intel-graphics-compiler
-DEPENDS += cross/intel-compute-runtime
-DEPENDS += cross/ocl-icd
-DEPENDS += cross/clinfo
-
-# Vulkan
-DEPENDS += cross/mesa
-DEPENDS += cross/Khronos-Vulkan-Loader
-DEPENDS += cross/Khronos-Vulkan-Tools
-DEPENDS += cross/shaderc
-
-# Requires GCC >= 12 (C++20 <version> header support)
-ifeq ($(call version_ge, $(TC_GCC), 12),1)
-DEPENDS += cross/libplacebo
-endif
-
-# Enable intel_gpu_top on DSM >= 7.1
-DEPENDS += cross/intel-gpu-tools
-
-# Enable Intel libVPL only on DSM 7
-# -->> can not use libmfx and libvpl together in ffmpeg
-#      Jellyfin requires QSV provided by libmfx
-DEPENDS += cross/intel-libvpl cross/intel-libvpl-tools
-
-# endif TCVERSION >= 7
-endif
-
-# endif x64
-endif
+DEPENDS = $(VIDEODRV_DEPENDS)
+OPTIONAL_DEPENDS = $(VIDEODRV_OPTIONAL_DEPENDS)
 
 include ../../mk/spksrc.spk.mk

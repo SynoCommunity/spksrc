@@ -1,4 +1,4 @@
-PKG_NAME = libsigc++-main
+PKG_NAME = libsigc++-virtual
 
 # support for c++11 language features is required for libsigc++-2.12
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
@@ -14,4 +14,4 @@ else
 DEPENDS = cross/libsigc++-2.12
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

@@ -1,0 +1,21 @@
+#!/bin/sh
+PKG_NAME="netdata"
+PKG_DIR="/var/packages/${PKG_NAME}"
+PLUGIN="${PKG_DIR}/target/usr/libexec/netdata/plugins.d/apps.plugin"
+
+if [ ! -f "${PLUGIN}" ]; then
+    echo "Error: Cannot find ${PLUGIN}" >&2
+    exit 1
+fi
+
+if ! sudo -n true 2>/dev/null; then
+    echo "This operation requires administrator privileges."
+    echo "Enter your DSM password when prompted."
+fi
+
+sudo chown root:synocommunity "${PLUGIN}" 2>/dev/null
+sudo chmod 4750 "${PLUGIN}"
+
+echo ""
+echo "Done. Restart netdata to enable full process monitoring."
+echo "Run: sudo synopkg restart ${PKG_NAME}"

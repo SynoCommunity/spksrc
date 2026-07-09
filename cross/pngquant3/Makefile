@@ -24,12 +24,13 @@ ifeq ($(call version_lt, $(TC_GCC), 5),1)
 ADDITIONAL_CFLAGS = -O3 -std=c99
 endif
 
-# Fails with recent libz-sys version 1.1.26
-# Enforce a specific libz-sys crate version
+# Enforce specific crate versions
+POST_EXTRACT_TARGET = pngquant_post_extract
 CRATE_VERSION_LIBZSYS = 1.1.25
 CARGO_INSTALL_ARGS += --locked
-
-POST_EXTRACT_TARGET = pngquant_post_extract
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+CRATE_VERSION_JOBSERVER = 0.1.34
+endif
 
 include ../../mk/spksrc.cross-rust.mk
 
@@ -47,5 +48,7 @@ pngquant_post_extract:
 	@$(MSG) "Link libimagequant '$(LIBIMAGEQUANT_SOURCE_FOLDER)' into folder '$(SUBMODULE_FOLDER)'"
 	@rm -rf $(SUBMODULE_FOLDER)
 	@ln -sf $(LIBIMAGEQUANT_SOURCE_FOLDER) $(SUBMODULE_FOLDER)
-	@cd $(WORK_DIR)/$(PKG_DIR) && \
-	   CARGO_HOME=$(CARGO_HOME) cargo update libz-sys --precise $(CRATE_VERSION_LIBZSYS)
+	@cd $(WORK_DIR)/$(PKG_DIR) && CARGO_HOME=$(CARGO_HOME) cargo update libz-sys --precise $(CRATE_VERSION_LIBZSYS)
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+	@cd $(WORK_DIR)/$(PKG_DIR) && CARGO_HOME=$(CARGO_HOME) cargo update jobserver --precise $(CRATE_VERSION_JOBSERVER)
+endif

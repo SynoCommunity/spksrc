@@ -1,4 +1,4 @@
-PKG_NAME = intel-gmmlib-main
+PKG_NAME = intel-gmmlib-virtual
 
 OPTIONAL_DEPENDS  = cross/intel-gmmlib-latest
 OPTIONAL_DEPENDS += cross/intel-gmmlib-22.3
@@ -11,4 +11,4 @@ else
 DEPENDS = cross/intel-gmmlib-22.3
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

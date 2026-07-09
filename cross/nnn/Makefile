@@ -1,4 +1,4 @@
-PKG_NAME = nnn-main
+PKG_NAME = nnn-virtual
 
 OPTIONAL_DEPENDS  = cross/nnn-latest
 OPTIONAL_DEPENDS += cross/nnn-4.8
@@ -17,4 +17,4 @@ else
 DEPENDS += cross/nnn-4.0
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

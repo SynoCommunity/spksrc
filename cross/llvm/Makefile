@@ -1,4 +1,4 @@
-PKG_NAME = llvm-main
+PKG_NAME = llvm-virtual
 
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
@@ -13,4 +13,4 @@ else
 DEPENDS = cross/llvm-9.0
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

@@ -11,6 +11,9 @@ HOMEPAGE = https://pendulum.eustace.io
 COMMENT  = Python datetimes made easy.
 LICENSE  = MIT
 
+# Prevent PYO3_USE_ABI3_FORWARD_COMPATIBILITY leaking in from parent make
+unexport PYO3_USE_ABI3_FORWARD_COMPATIBILITY
+
 # toolchains lacking atomic support
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
 

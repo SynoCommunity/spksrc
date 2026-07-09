@@ -1,4 +1,4 @@
-PKG_NAME = libva-utils-main
+PKG_NAME = libva-utils-virtual
 
 OPTIONAL_DEPENDS  = cross/libva-utils-latest
 OPTIONAL_DEPENDS += cross/libva-utils-2.17
@@ -11,4 +11,4 @@ else
 DEPENDS = cross/libva-utils-2.17
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

@@ -18,7 +18,7 @@
 #   - plist is intentionally NOT part of this shared pipeline: native build-host
 #     tools are not packaged, so spksrc.native-cc.mk has no plist step (it uses a
 #     cat_PLIST stub). The packaged entry points that need it (spksrc.cross-cc.mk,
-#     spksrc.kernel.mk, spksrc.main-depends.mk) include spksrc.build/plist.mk
+#     spksrc.kernel.mk, spksrc.cross-virtual.mk) include spksrc.build/plist.mk
 #     themselves, so plist stays under spksrc.build/ as a build-pipeline step.
 ###############################################################################
 

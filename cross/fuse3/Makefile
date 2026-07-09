@@ -1,4 +1,4 @@
-PKG_NAME = fuse3-main
+PKG_NAME = fuse3-virtual
 
 OPTIONAL_DEPENDS  = cross/fuse3-latest
 OPTIONAL_DEPENDS += cross/fuse3.16
@@ -13,4 +13,4 @@ else
 DEPENDS = cross/fuse3-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

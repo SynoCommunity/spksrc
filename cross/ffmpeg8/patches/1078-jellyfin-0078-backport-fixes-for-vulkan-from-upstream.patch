@@ -2,21 +2,22 @@ Index: FFmpeg/libavcodec/vulkan_encode.c
 ===================================================================
 --- libavcodec/vulkan_encode.c
 +++ libavcodec/vulkan_encode.c
-@@ -772,14 +772,6 @@ av_cold int ff_vulkan_encode_init(AVCode
-         return AVERROR(EINVAL);
+@@ -872,15 +872,7 @@
+     } else if (ret != VK_SUCCESS) {
+         return AVERROR_EXTERNAL;
      }
  
 -    if ((ctx->enc_caps.supportedEncodeFeedbackFlags & feedback_flags) !=
 -        feedback_flags) {
--        av_log (avctx, AV_LOG_ERROR,
--                "Driver does not support required encode feedback flags "
--                "(BUFFER_OFFSET and BYTES_WRITTEN).\n");
+-        av_log(avctx, AV_LOG_ERROR,
+-               "Driver does not support required encode feedback flags "
+-               "(BUFFER_OFFSET and BYTES_WRITTEN).\n");
 -        return AVERROR(ENOTSUP);
 -    }
 -
-     ctx->base.op = &vulkan_base_encode_ops;
-     ctx->codec = codec;
- 
+     err = init_rc(avctx, ctx);
+     if (err < 0)
+         return err;
 @@ -881,6 +873,14 @@ av_cold int ff_vulkan_encode_init(AVCode
          return AVERROR_EXTERNAL;
      }

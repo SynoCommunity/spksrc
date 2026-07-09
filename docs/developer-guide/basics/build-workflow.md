@@ -34,6 +34,29 @@ block
 
 ## Basic Commands
 
+### Discovering targets (`make help`)
+
+`make help` is context-aware — run it wherever you are:
+
+```bash
+# At the spksrc root: repository-wide orchestration targets
+make help
+make help-clean          # filter the list by section or name
+
+# Inside a package: the targets relevant to that package
+make -C spk/transmission help
+make -C cross/curl help
+```
+
+At the root it lists the orchestration targets (`setup`, `all`, `clean`,
+digests, lint, …) grouped by section; `make help-<topic>` filters them.
+Inside a package (`cross/`, `spk/`, `native/`, `toolchain/`, `toolkit/`,
+`kernel/`, `diyspk/`) it lists that package's build lifecycle, the multi-arch
+targets (`all-supported`, `arch-<arch>-<tcvers>`, …), the inspection and
+maintenance targets, and — for Python SPKs — the wheel/crossenv targets. Only
+documented targets are shown, so the internal `pre_*` / `post_*` / `*_msg`
+hooks stay hidden.
+
 ### Build a Package
 
 ```bash

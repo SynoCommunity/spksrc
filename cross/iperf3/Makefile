@@ -1,4 +1,4 @@
-PKG_NAME = iperf3-main
+PKG_NAME = iperf3-virtual
 
 # libatomics is required for iperf3 >= 3.16
 OPTIONAL_DEPENDS  = cross/iperf3-latest
@@ -14,4 +14,4 @@ else
 DEPENDS = cross/iperf3-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

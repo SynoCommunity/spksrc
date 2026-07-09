@@ -1,4 +1,4 @@
-PKG_NAME = intel-media-main
+PKG_NAME = intel-media-virtual
 
 OPTIONAL_DEPENDS  = cross/intel-media-driver-latest
 OPTIONAL_DEPENDS += cross/intel-media-driver-22.5
@@ -11,4 +11,4 @@ else
 DEPENDS = cross/intel-media-driver-22.5
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

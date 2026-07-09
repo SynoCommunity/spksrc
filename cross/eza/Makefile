@@ -1,4 +1,4 @@
-PKG_NAME = eza-main
+PKG_NAME = eza-virtual
 
 OPTIONAL_DEPENDS  = cross/eza-latest
 OPTIONAL_DEPENDS += cross/eza-0.20.18
@@ -13,4 +13,4 @@ else
 DEPENDS = cross/eza-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

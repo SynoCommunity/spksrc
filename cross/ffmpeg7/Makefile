@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 7.1.4
+PKG_VERS = 7.1.5
 PKG_MINOR_VERS = $(firstword $(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -36,22 +36,20 @@ endif
 # Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
 CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
 
-# Enable Synology specific -hls_seek_time option and other optimizations
 # Compiler workaround to enable DTS-HD MA stream decoding
 CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
-# ARCH specific
-OPTIONAL_DEPENDS  = cross/openh264
+OPTIONAL_DEPENDS  = cross/frei0r
 OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/svt-av1
-# GCC specific
-OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libjxl
 OPTIONAL_DEPENDS += cross/liblc3
-OPTIONAL_DEPENDS += cross/rubberband
+OPTIONAL_DEPENDS += cross/libplacebo
 OPTIONAL_DEPENDS += cross/libvmaf
+OPTIONAL_DEPENDS += cross/openh264
+OPTIONAL_DEPENDS += cross/rubberband
+OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/vvenc
 
 # Define x86asm
@@ -290,6 +288,7 @@ endif
 
 # Requires GCC >= 12 (C++20 <version> header support)
 ifeq ($(call version_ge, $(TC_GCC), 12),1)
+DEPENDS += cross/libplacebo
 CONFIGURE_ARGS += --enable-libplacebo
 endif
 

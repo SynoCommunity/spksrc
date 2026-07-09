@@ -71,6 +71,12 @@ LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 # all will be the default target, regardless of what is defined
 default: all
 
+# Context-aware `make help` (only activates inside a package directory).
+# Included after 'default: all' so the help target never becomes the default
+# goal (it would otherwise shadow the build when running e.g. `make` or a
+# recursive arch build).
+include $(BASEDIR)/mk/spksrc.common/help.mk
+
 # Stop on first error
 SHELL := $(SHELL) -e
 
