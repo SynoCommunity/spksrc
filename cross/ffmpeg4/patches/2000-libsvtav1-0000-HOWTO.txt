@@ -17,3 +17,9 @@ Test the patches on a clean ffmpeg tree:
 $ tar -jxvf ffmpeg-4.4.4.tar.bz2 
 $ cd ffmpeg-4.4.4/
 $ ls -1d ~/SVT-AV1/ffmpeg_plugin/n4.4/20*.patch | while read LINE; do patch -p0 < $LINE; done
+
+Local addition (not from the upstream ffmpeg_plugin sets):
+- 2026-libsvtav1-0026-support-svt-av1-3.x-and-4.x-API.patch
+  Version guards for SVT-AV1 >= 3.0.0 (2-argument svt_av1_enc_init_handle)
+  and >= 4.0.0 (aq_mode replaces enable_adaptive_quantization), modeled on
+  the ffmpeg 8.1 libsvtav1 wrapper. Required to build against svt-av1 4.x.

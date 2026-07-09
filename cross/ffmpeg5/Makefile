@@ -45,13 +45,13 @@ CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
-# ARCH specific
-OPTIONAL_DEPENDS  = cross/openh264
+OPTIONAL_DEPENDS  = cross/frei0r
+OPTIONAL_DEPENDS += cross/openh264
 OPTIONAL_DEPENDS += cross/libaom
-# GCC specific
-OPTIONAL_DEPENDS += cross/frei0r
-OPTIONAL_DEPENDS += cross/rubberband
 OPTIONAL_DEPENDS += cross/libvmaf
+OPTIONAL_DEPENDS += cross/rubberband
+OPTIONAL_DEPENDS += cross/svt-av1
+OPTIONAL_DEPENDS += cross/svt-hevc
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
@@ -208,6 +208,12 @@ endif
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
+endif
+
+# Add SVT-AV1 codec to supported ARCH
+ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
+DEPENDS += cross/svt-av1
+CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
 # Add SVT-HEVC codec to x64
