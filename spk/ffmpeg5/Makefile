@@ -2,7 +2,7 @@ SPK_NAME = ffmpeg5
 SPK_VERS = 5.1.10
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
 SPK_REV = 7
-SPK_ICON = src/ffmpeg.png
+SPK_ICON = src/ffmpeg5.png
 CHANGELOG = "1. Update to version 5.1.10<br/>2. Update to jellyfin-ffmpeg v5.1.4-3 patchset<br/>3. Now using new synocli-videodriver package<br/>4. Align package with ffmpeg7/ffmpeg8"
 
 DEPENDS = cross/ffmpeg5
