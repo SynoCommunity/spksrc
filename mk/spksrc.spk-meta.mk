@@ -24,6 +24,13 @@ ifdef FFMPEG_PACKAGE
 endif
 
 ifneq ($(or $(findstring synocli-videodriver,$(FFMPEG_RPATH)),$(VIDEODRV_PACKAGE)),)
+  # Only an indirect dependency when pulled in through the ffmpeg rpath
+  # (consumer did not declare VIDEODRV_PACKAGE itself): share the build
+  # objects but don't register it in install_dep_packages — the ffmpeg
+  # meta already carries the version-pinned videodriver dependency.
+  ifeq ($(strip $(VIDEODRV_PACKAGE)),)
+    VIDEODRV_INDIRECT_DEPENDS = 1
+  endif
   include ../../mk/spksrc.spk-meta/videodriver.mk
 endif
 
