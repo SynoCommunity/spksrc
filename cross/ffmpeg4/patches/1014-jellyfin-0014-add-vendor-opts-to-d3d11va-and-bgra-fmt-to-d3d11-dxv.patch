@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
-===================================================================
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
 @@ -83,11 +83,12 @@ static const struct {
@@ -79,8 +77,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
              IDXGIFactory2_Release(pDXGIFactory);
          }
      }
-Index: jellyfin-ffmpeg/libavutil/hwcontext_dxva2.c
-===================================================================
 --- libavutil/hwcontext_dxva2.c
 +++ libavutil/hwcontext_dxva2.c
 @@ -83,6 +83,7 @@ static const struct {

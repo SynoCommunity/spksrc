@@ -1,30 +1,16 @@
-Subject: [PATCH] avfilter: add vf_tonemap_videotoolbox
----
-Index: configure
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/configure b/configure
---- configure	(revision 2e3649a10ff797e360eb9fd5d389dfa6611dea59)
-+++ configure	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
-@@ -3748,6 +3748,7 @@
+--- configure
++++ configure
+@@ -3841,6 +3841,7 @@ tinterlace_pad_test_deps="tinterlace_filter"
  tonemap_filter_deps="const_nan"
  tonemap_vaapi_filter_deps="vaapi VAProcFilterParameterBufferHDRToneMapping"
  tonemap_opencl_filter_deps="opencl const_nan"
 +tonemap_videotoolbox_filter_deps="metal corevideo videotoolbox const_nan"
  transpose_opencl_filter_deps="opencl"
  transpose_vaapi_filter_deps="vaapi VAProcPipelineCaps_rotation_flags"
- transpose_vulkan_filter_deps="vulkan spirv_compiler"
-Index: libavfilter/Makefile
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/libavfilter/Makefile b/libavfilter/Makefile
---- libavfilter/Makefile	(revision 2e3649a10ff797e360eb9fd5d389dfa6611dea59)
-+++ libavfilter/Makefile	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
-@@ -510,6 +510,9 @@
+ transpose_vt_filter_deps="videotoolbox VTPixelRotationSessionCreate"
+--- libavfilter/Makefile
++++ libavfilter/Makefile
+@@ -532,6 +532,9 @@ OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o opencl.o \
  OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.ptx.o \
                                                  cuda/host_util.o
  OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
@@ -34,16 +20,9 @@ diff --git a/libavfilter/Makefile b/libavfilter/Makefile
  OBJS-$(CONFIG_TPAD_FILTER)                   += vf_tpad.o
  OBJS-$(CONFIG_TRANSPOSE_FILTER)              += vf_transpose.o
  OBJS-$(CONFIG_TRANSPOSE_CUDA_FILTER)         += vf_transpose_cuda.o vf_transpose_cuda.ptx.o \
-                                                 cuda/load_helper.o
-Index: libavfilter/allfilters.c
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
---- libavfilter/allfilters.c	(revision 2e3649a10ff797e360eb9fd5d389dfa6611dea59)
-+++ libavfilter/allfilters.c	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
-@@ -480,6 +480,7 @@
+--- libavfilter/allfilters.c
++++ libavfilter/allfilters.c
+@@ -496,6 +496,7 @@ extern const AVFilter ff_vf_tonemap;
  extern const AVFilter ff_vf_tonemap_cuda;
  extern const AVFilter ff_vf_tonemap_opencl;
  extern const AVFilter ff_vf_tonemap_vaapi;
@@ -51,16 +30,9 @@ diff --git a/libavfilter/allfilters.c b/libavfilter/allfilters.c
  extern const AVFilter ff_vf_tpad;
  extern const AVFilter ff_vf_transpose;
  extern const AVFilter ff_vf_transpose_cuda;
-Index: libavfilter/metal/vf_tonemap_videotoolbox.metal
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/libavfilter/metal/vf_tonemap_videotoolbox.metal b/libavfilter/metal/vf_tonemap_videotoolbox.metal
-new file mode 100644
---- /dev/null	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
-+++ libavfilter/metal/vf_tonemap_videotoolbox.metal	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
-@@ -0,0 +1,688 @@
+--- /dev/null
++++ libavfilter/metal/vf_tonemap_videotoolbox.metal
+@@ -0,0 +1,725 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
 + *
@@ -142,12 +114,23 @@ new file mode 100644
 +constant short linearize_type [[function_constant(36)]];
 +constant short delinearize_type [[function_constant(37)]];
 +
++enum AVChromaLocation {
++    AVCHROMA_LOC_UNSPECIFIED,
++    AVCHROMA_LOC_LEFT,
++    AVCHROMA_LOC_CENTER,
++    AVCHROMA_LOC_TOPLEFT,
++    AVCHROMA_LOC_TOP,
++    AVCHROMA_LOC_BOTTOMLEFT,
++    AVCHROMA_LOC_BOTTOM,
++    AVCHROMA_LOC_NB
++};
++
 +float3 get_chroma_sample(float3 a, float3 b, float3 c,float3 d) {
-+    if (chroma_loc == 1) return (((a) + (c)) * 0.5f);
-+    if (chroma_loc == 3) return a;
-+    if (chroma_loc == 4) return (((a) + (b)) * 0.5f);
-+    if (chroma_loc == 5) return c;
-+    if (chroma_loc == 6) return (((c) + (d)) * 0.5f);
++    if (chroma_loc == AVCHROMA_LOC_LEFT) return (((a) + (c)) * 0.5f);
++    if (chroma_loc == AVCHROMA_LOC_TOPLEFT) return a;
++    if (chroma_loc == AVCHROMA_LOC_TOP) return (((a) + (b)) * 0.5f);
++    if (chroma_loc == AVCHROMA_LOC_BOTTOMLEFT) return c;
++    if (chroma_loc == AVCHROMA_LOC_BOTTOM) return (((c) + (d)) * 0.5f);
 +    return (((a) + (b) + (c) + (d)) * 0.25f);
 +}
 +
@@ -287,7 +270,9 @@ new file mode 100644
 +
 +float rgb2y(float r, float g, float b) {
 +    float y = (r*yuv_matrix_1[0]) + (g*yuv_matrix_1[1]) + (b*yuv_matrix_1[2]);
-+    y = (219.0f * y + 16.0f) / 255.0f;
++    if (!is_full_range_out) {
++        y = (219.0f * y + 16.0f) / 255.0f;
++    }
 +    return y;
 +}
 +
@@ -355,6 +340,18 @@ new file mode 100644
 +
 +//------------
 +// Tonemapping methods
++enum TonemapAlgorithm {
++    TONEMAP_NONE,
++    TONEMAP_LINEAR,
++    TONEMAP_GAMMA,
++    TONEMAP_CLIP,
++    TONEMAP_REINHARD,
++    TONEMAP_HABLE,
++    TONEMAP_MOBIUS,
++    TONEMAP_BT2390,
++    TONEMAP_COUNT,
++};
++
 +float hable_f(float in) {
 +    float a = 0.15f, b = 0.50f, c = 0.10f, d = 0.20f, e = 0.02f, f = 0.30f;
 +    return (in * (in * a + b * c) + d * e) / (in * (in * a + b) + d * f) - e / f;
@@ -419,28 +416,28 @@ new file mode 100644
 +}
 +
 +float tonemap(float s, float peak, float target_peak) {
-+    if (tonemap_func_type == 1) {
++    if (tonemap_func_type == TONEMAP_NONE) {
 +        return direct(s, peak, target_peak);
 +    }
-+    if (tonemap_func_type == 2) {
++    if (tonemap_func_type == TONEMAP_LINEAR) {
 +        return linear(s, peak, target_peak);
 +    }
-+    if (tonemap_func_type == 3) {
++    if (tonemap_func_type == TONEMAP_GAMMA) {
 +        return gamma(s, peak, target_peak);
 +    }
-+    if (tonemap_func_type == 4) {
++    if (tonemap_func_type == TONEMAP_CLIP) {
 +        return clip(s, peak, target_peak);
 +    }
-+    if (tonemap_func_type == 5) {
++    if (tonemap_func_type == TONEMAP_REINHARD) {
 +        return reinhard(s, peak, target_peak);
 +    }
-+    if (tonemap_func_type == 6) {
++    if (tonemap_func_type == TONEMAP_HABLE) {
 +        return hable(s, peak, target_peak);
 +    }
-+    if (tonemap_func_type == 7) {
++    if (tonemap_func_type == TONEMAP_MOBIUS) {
 +        return mobius(s, peak, target_peak);
 +    }
-+    if (tonemap_func_type == 8) {
++    if (tonemap_func_type == TONEMAP_BT2390) {
 +        return bt2390(s, peak, target_peak);
 +    }
 +    return direct(s, peak, target_peak);
@@ -459,9 +456,17 @@ new file mode 100644
 +    sig.w = tonemap(sig.w, peak, target_peak); \
 +}
 +    if (is_tone_mode_rgb) {
-+        float4 sig_r = fmax(*r4, FLOAT_EPS), sig_ro = sig_r;
-+        float4 sig_g = fmax(*g4, FLOAT_EPS), sig_go = sig_g;
-+        float4 sig_b = fmax(*b4, FLOAT_EPS), sig_bo = sig_b;
++        float4 sig_r = fmax(*r4, FLOAT_EPS);
++        float4 sig_g = fmax(*g4, FLOAT_EPS);
++        float4 sig_b = fmax(*b4, FLOAT_EPS);
++        if (is_tone_func_bt2390) {
++            sig_r = fmin(sig_r, peak);
++            sig_g = fmin(sig_g, peak);
++            sig_b = fmin(sig_b, peak);
++        }
++        float4 sig_ro = sig_r;
++        float4 sig_go = sig_g;
++        float4 sig_bo = sig_b;
 +        // Desaturate the color using a coefficient dependent on the signal level
 +        if (desat_param > 0.0f) {
 +            float4 sig = fmax(fmax(*r4, fmax(*g4, *b4)), FLOAT_EPS);
@@ -475,9 +480,6 @@ new file mode 100644
 +        if (is_tone_func_bt2390) {
 +            float src_peak_delin_pq = inverse_eotf_st2084(peak);
 +            float dst_peak_delin_pq = inverse_eotf_st2084(1.0f);
-+            sig_r = fmin(sig_r, dst_peak_delin_pq);
-+            sig_g = fmin(sig_g, dst_peak_delin_pq);
-+            sig_b = fmin(sig_b, dst_peak_delin_pq);
 +            MAP_FOUR_PIXELS(sig_r, src_peak_delin_pq, dst_peak_delin_pq)
 +            MAP_FOUR_PIXELS(sig_g, src_peak_delin_pq, dst_peak_delin_pq)
 +            MAP_FOUR_PIXELS(sig_b, src_peak_delin_pq, dst_peak_delin_pq)
@@ -496,7 +498,15 @@ new file mode 100644
 +        *g4 *= factor_g;
 +        *b4 *= factor_b;
 +    } else {
-+        float4 sig = fmax(fmax(*r4, fmax(*g4, *b4)), FLOAT_EPS);
++        float4 sig;
++        if (is_tone_mode_max) {
++            sig = fmax(fmax3(*r4, *g4, *b4), FLOAT_EPS);
++        } else {
++            sig = fmax((*r4 * 0.2627f + *g4 * 0.678f + *b4 * 0.0593f), FLOAT_EPS);
++        }
++        if (is_tone_func_bt2390) {
++            sig = fmin(sig, peak);
++        }
 +        float4 sig_o = sig;
 +        if (desat_param > 0.0f) {
 +            float4 luma = get_luma_dst4(*r4, *g4, *b4);
@@ -509,7 +519,6 @@ new file mode 100644
 +        if (is_tone_func_bt2390) {
 +            float src_peak_delin_pq = inverse_eotf_st2084(peak);
 +            float dst_peak_delin_pq = inverse_eotf_st2084(1.0f);
-+            sig = fmin(sig, src_peak_delin_pq);
 +            MAP_FOUR_PIXELS(sig, src_peak_delin_pq, dst_peak_delin_pq)
 +        } else {
 +            MAP_FOUR_PIXELS(sig, peak, 1.0f)
@@ -749,16 +758,9 @@ new file mode 100644
 +        dst2.write(float4(chroma.y, chroma.z, 0.0f, 1.0f), uint2(xi, yi));
 +    }
 +}
-Index: libavfilter/vf_tonemap_videotoolbox.m
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/libavfilter/vf_tonemap_videotoolbox.m b/libavfilter/vf_tonemap_videotoolbox.m
-new file mode 100644
---- /dev/null	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
-+++ libavfilter/vf_tonemap_videotoolbox.m	(revision bcb63879b775fef8085a5311f045dc1cc4960a98)
-@@ -0,0 +1,1106 @@
+--- /dev/null
++++ libavfilter/vf_tonemap_videotoolbox.m
+@@ -0,0 +1,1136 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
 + *
@@ -827,6 +829,7 @@ new file mode 100644
 +enum TonemapMode {
 +    TONEMAP_MODE_MAX,
 +    TONEMAP_MODE_RGB,
++    TONEMAP_MODE_LUM,
 +    TONEMAP_MODE_COUNT,
 +};
 +
@@ -1229,7 +1232,7 @@ new file mode 100644
 +    tonemap_func_type = (short)ctx->tonemap;
 +    is_tone_func_bt2390 = ctx->tonemap == TONEMAP_BT2390;
 +    is_tone_mode_rgb = ctx->tonemap_mode == TONEMAP_MODE_RGB;
-+    is_tone_mode_max = !is_tone_mode_rgb;
++    is_tone_mode_max = ctx->tonemap_mode == TONEMAP_MODE_MAX;
 +    is_non_semi_planar_in = ctx->in_planes > 2;
 +    is_non_semi_planar_out = ctx->out_planes > 2;
 +    enable_dither = ctx->in_desc->comp[0].depth > ctx->out_desc->comp[0].depth;
@@ -1777,6 +1780,34 @@ new file mode 100644
 +    if (ctx->trc_out != AVCOL_TRC_SMPTE2084) {
 +        av_frame_remove_side_data(output, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
 +        av_frame_remove_side_data(output, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
++    } else {
++        CGColorSpaceRef colorspace = NULL;
++        CFStringRef colormatrix = kCVImageBufferYCbCrMatrix_ITU_R_2020;
++        CFStringRef colorpri = kCVImageBufferColorPrimaries_ITU_R_2020;
++        CFStringRef colortrc = kCVImageBufferTransferFunction_SMPTE_ST_2084_PQ;
++        CFMutableDictionaryRef attachments = CFDictionaryCreateMutable(NULL, 4,
++                                                                       &kCFTypeDictionaryKeyCallBacks,
++                                                                       &kCFTypeDictionaryValueCallBacks);
++        if (!attachments) {
++            err = AVERROR(ENOMEM);
++            goto fail;
++        }
++        CFDictionarySetValue(attachments, kCVImageBufferYCbCrMatrixKey, colormatrix);
++        CFDictionarySetValue(attachments, kCVImageBufferColorPrimariesKey, colorpri);
++        CFDictionarySetValue(attachments, kCVImageBufferTransferFunctionKey, colortrc);
++        colorspace = CVImageBufferCreateColorSpaceFromAttachments(attachments);
++        if (colorspace) {
++            CFDictionarySetValue(attachments, kCVImageBufferCGColorSpaceKey, colorspace);
++            CFRelease(colorspace);
++        } else {
++            av_log(avctx, AV_LOG_WARNING, "Unable to set proper colorspace for the CVImageBuffer.\n");
++        }
++        CVBufferSetAttachments(
++            (CVPixelBufferRef)output->data[3],
++            attachments,
++            kCVAttachmentMode_ShouldPropagate);
++        CFRelease(attachments);
++        ff_update_hdr_metadata(output, 100.0f);
 +    }
 +
 +    av_frame_remove_side_data(output, AV_FRAME_DATA_DOVI_RPU_BUFFER);
@@ -1805,8 +1836,9 @@ new file mode 100644
 +        { "mobius",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MOBIUS },            0, 0, FLAGS, "tonemap" },
 +        { "bt2390",   0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_BT2390 },            0, 0, FLAGS, "tonemap" },
 +    { "tonemap_mode", "Tonemap mode selection", OFFSET(tonemap_mode), AV_OPT_TYPE_INT, { .i64 = TONEMAP_MODE_MAX }, TONEMAP_MODE_MAX, TONEMAP_MODE_COUNT - 1, FLAGS, "tonemap_mode" },
-+        { "max",      0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_MAX },          0, 0, FLAGS, "tonemap_mode" },
-+        { "rgb",      0, 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_RGB },          0, 0, FLAGS, "tonemap_mode" },
++        { "max",      "Brightest channel based tonemap",  0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_MAX },     0, 0, FLAGS, "tonemap_mode" },
++        { "rgb",      "Per-channel based tonemap",        0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_RGB },     0, 0, FLAGS, "tonemap_mode" },
++        { "lum",      "Relative luminance based tonemap", 0, AV_OPT_TYPE_CONST, { .i64 = TONEMAP_MODE_LUM },     0, 0, FLAGS, "tonemap_mode" },
 +    { "transfer", "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, { .i64 = AVCOL_TRC_BT709 }, -1, INT_MAX, FLAGS, "transfer" },
 +    { "t",        "Set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, { .i64 = AVCOL_TRC_BT709 }, -1, INT_MAX, FLAGS, "transfer" },
 +        { "bt709",            0,       0,                 AV_OPT_TYPE_CONST, { .i64 = AVCOL_TRC_BT709 },         0, 0, FLAGS, "transfer" },

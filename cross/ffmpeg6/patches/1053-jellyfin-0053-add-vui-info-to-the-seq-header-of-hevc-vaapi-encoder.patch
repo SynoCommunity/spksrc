@@ -1,8 +1,6 @@
-Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_h265.c
-===================================================================
 --- libavcodec/vaapi_encode_h265.c
 +++ libavcodec/vaapi_encode_h265.c
-@@ -691,7 +691,25 @@ static int vaapi_encode_h265_init_sequen
+@@ -691,7 +691,25 @@ static int vaapi_encode_h265_init_sequence_params(AVCodecContext *avctx)
              sps->log2_min_pcm_luma_coding_block_size_minus3 +
              sps->log2_diff_max_min_pcm_luma_coding_block_size,
  

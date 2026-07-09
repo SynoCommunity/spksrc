@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
-===================================================================
 --- libavfilter/vf_tonemap_vaapi.c
 +++ libavfilter/vf_tonemap_vaapi.c
 @@ -39,7 +39,13 @@ typedef struct HDRVAAPIContext {
@@ -16,7 +14,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
  
      AVFrameSideData    *src_display;
      AVFrameSideData    *src_light;
-@@ -52,7 +58,7 @@ static int tonemap_vaapi_save_metadata(A
+@@ -52,7 +58,7 @@ static int tonemap_vaapi_save_metadata(AVFilterContext *avctx, AVFrame *input_fr
      AVContentLightMetadata *light_meta;
  
      if (input_frame->color_trc != AVCOL_TRC_SMPTE2084) {
@@ -25,7 +23,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
      }
  
      ctx->src_display = av_frame_get_side_data(input_frame,
-@@ -60,8 +66,7 @@ static int tonemap_vaapi_save_metadata(A
+@@ -60,8 +66,7 @@ static int tonemap_vaapi_save_metadata(AVFilterContext *avctx, AVFrame *input_fr
      if (ctx->src_display) {
          hdr_meta = (AVMasteringDisplayMetadata *)ctx->src_display->data;
          if (!hdr_meta) {
@@ -35,7 +33,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
          }
  
          if (hdr_meta->has_luminance) {
-@@ -118,8 +123,7 @@ static int tonemap_vaapi_save_metadata(A
+@@ -118,8 +123,7 @@ static int tonemap_vaapi_save_metadata(AVFilterContext *avctx, AVFrame *input_fr
                     ctx->in_metadata.white_point_y);
          }
      } else {
@@ -45,7 +43,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
      }
  
      ctx->src_light = av_frame_get_side_data(input_frame,
-@@ -127,8 +131,7 @@ static int tonemap_vaapi_save_metadata(A
+@@ -127,8 +131,7 @@ static int tonemap_vaapi_save_metadata(AVFilterContext *avctx, AVFrame *input_fr
      if (ctx->src_light) {
          light_meta = (AVContentLightMetadata *)ctx->src_light->data;
          if (!light_meta) {
@@ -55,7 +53,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
          }
  
          ctx->in_metadata.max_content_light_level = light_meta->MaxCLL;
-@@ -146,6 +149,107 @@ static int tonemap_vaapi_save_metadata(A
+@@ -146,6 +149,107 @@ static int tonemap_vaapi_save_metadata(AVFilterContext *avctx, AVFrame *input_fr
      return 0;
  }
  
@@ -163,7 +161,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
  static int tonemap_vaapi_set_filter_params(AVFilterContext *avctx, AVFrame *input_frame)
  {
      VAAPIVPPContext *vpp_ctx   = avctx->priv;
-@@ -208,15 +312,26 @@ static int tonemap_vaapi_build_filter_pa
+@@ -208,15 +312,26 @@ static int tonemap_vaapi_build_filter_params(AVFilterContext *avctx)
          return AVERROR(EINVAL);
      }
  
@@ -199,7 +197,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
      }
  
      hdrtm_param.type = VAProcFilterHighDynamicRangeToneMapping;
-@@ -241,6 +356,8 @@ static int tonemap_vaapi_filter_frame(AV
+@@ -241,6 +356,8 @@ static int tonemap_vaapi_filter_frame(AVFilterLink *inlink, AVFrame *input_frame
      VAProcPipelineParameterBuffer params;
      int err;
  
@@ -208,7 +206,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
      av_log(avctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
             av_get_pix_fmt_name(input_frame->format),
             input_frame->width, input_frame->height, input_frame->pts);
-@@ -250,9 +367,11 @@ static int tonemap_vaapi_filter_frame(AV
+@@ -250,9 +367,11 @@ static int tonemap_vaapi_filter_frame(AVFilterLink *inlink, AVFrame *input_frame
          return AVERROR(EINVAL);
      }
  
@@ -223,7 +221,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
  
      err = tonemap_vaapi_set_filter_params(avctx, input_frame);
      if (err < 0)
-@@ -289,6 +408,21 @@ static int tonemap_vaapi_filter_frame(AV
+@@ -289,6 +408,21 @@ static int tonemap_vaapi_filter_frame(AVFilterLink *inlink, AVFrame *input_frame
      if (ctx->color_matrix != AVCOL_SPC_UNSPECIFIED)
          output_frame->colorspace = ctx->color_matrix;
  
@@ -245,7 +243,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
      err = ff_vaapi_vpp_init_params(avctx, &params,
                                     input_frame, output_frame);
      if (err < 0)
-@@ -358,6 +492,60 @@ static av_cold int tonemap_vaapi_init(AV
+@@ -361,6 +495,60 @@ static av_cold int tonemap_vaapi_init(AVFilterContext *avctx)
      STRING_OPTION(color_transfer,  color_transfer,  AVCOL_TRC_UNSPECIFIED);
      STRING_OPTION(color_matrix,    color_space,     AVCOL_SPC_UNSPECIFIED);
  
@@ -306,7 +304,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
      return 0;
  }
  
-@@ -383,10 +571,13 @@ static const AVOption tonemap_vaapi_opti
+@@ -386,10 +574,13 @@ static const AVOption tonemap_vaapi_options[] = {
      { "t",        "Output color transfer characteristics set",
        OFFSET(color_transfer_string),  AV_OPT_TYPE_STRING,
        { .str = NULL }, .flags = FLAGS, "transfer" },

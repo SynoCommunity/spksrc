@@ -1,8 +1,6 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_subtitles.c
-===================================================================
 --- libavfilter/vf_subtitles.c
 +++ libavfilter/vf_subtitles.c
-@@ -55,10 +55,13 @@
+@@ -55,10 +55,13 @@ typedef struct AssContext {
      char *force_style;
      int stream_index;
      int alpha;
@@ -16,7 +14,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_subtitles.c
      FFDrawContext draw;
  } AssContext;
  
-@@ -70,7 +73,8 @@
+@@ -70,7 +73,8 @@ typedef struct AssContext {
      {"f",              "set the filename of file to read",                         OFFSET(filename),   AV_OPT_TYPE_STRING,     {.str = NULL},  0, 0, FLAGS }, \
      {"original_size",  "set the size of the original video (used to scale fonts)", OFFSET(original_w), AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL},  0, 0, FLAGS }, \
      {"fontsdir",       "set the directory containing the fonts to read",           OFFSET(fontsdir),   AV_OPT_TYPE_STRING,     {.str = NULL},  0, 0, FLAGS }, \
@@ -26,7 +24,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_subtitles.c
  
  /* libass supports a log level ranging from 0 to 7 */
  static const int ass_libavfilter_log_level_map[] = {
-@@ -158,6 +162,8 @@
+@@ -158,6 +158,8 @@
      if (ass->shaping != -1)
          ass_set_shaper(ass->renderer, ass->shaping);
  
@@ -35,7 +33,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_subtitles.c
      return 0;
  }
  
-@@ -188,18 +194,41 @@
+@@ -181,18 +192,41 @@ static int filter_frame(AVFilterLink *in
      AVFilterLink *outlink = ctx->outputs[0];
      AssContext *ass = ctx->priv;
      int detect_change = 0;
@@ -79,7 +77,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_subtitles.c
  static const AVFilterPad ass_inputs[] = {
      {
          .name             = "default",
-@@ -250,6 +279,9 @@
+@@ -243,6 +277,9 @@ static av_cold int init_ass(AVFilterCont
                 ass->filename);
          return AVERROR(EINVAL);
      }
@@ -89,7 +87,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_subtitles.c
      return 0;
  }
  
-@@ -271,8 +303,8 @@
+@@ -264,8 +301,8 @@ AVFilter ff_vf_ass = {
  static const AVOption subtitles_options[] = {
      COMMON_OPTIONS
      {"charenc",      "set input character encoding", OFFSET(charenc),      AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS},
@@ -100,7 +98,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_subtitles.c
      {"force_style",  "force subtitle style",         OFFSET(force_style),  AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS},
      {NULL},
  };
-@@ -480,6 +512,8 @@
+@@ -473,6 +510,8 @@ static av_cold int init_subtitles(AVFilt
          avsubtitle_free(&sub);
      }
  

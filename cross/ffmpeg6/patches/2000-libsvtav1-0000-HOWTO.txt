@@ -1,0 +1,12 @@
+Project page: https://gitlab.com/AOMediaCodec/SVT-AV1
+Patches: https://gitlab.com/AOMediaCodec/SVT-AV1/-/tree/master/ffmpeg_plugin?ref_type=heads
+
+The upstream ffmpeg_plugin/n6.1 patches (version guard for external params,
+EOS without one-frame delay / SVT-AV1 2.0.0 API) are already merged in the
+ffmpeg 6.1.6 stable release: no upstream patch import is needed.
+
+Local addition:
+- 2001-libsvtav1-0001-support-svt-av1-3.x-and-4.x-API.patch
+  Version guards for SVT-AV1 >= 3.0.0 (2-argument svt_av1_enc_init_handle)
+  and >= 4.0.0 (aq_mode replaces enable_adaptive_quantization), modeled on
+  the ffmpeg 8.1 libsvtav1 wrapper. Required to build against svt-av1 4.x.

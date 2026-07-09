@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_vaapi.c
-===================================================================
 --- libavfilter/vf_scale_vaapi.c
 +++ libavfilter/vf_scale_vaapi.c
 @@ -212,7 +212,7 @@ static const AVOption scale_vaapi_option

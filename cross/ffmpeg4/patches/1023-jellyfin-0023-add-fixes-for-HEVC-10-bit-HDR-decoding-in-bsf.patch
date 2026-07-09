@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/hevc_mp4toannexb_bsf.c
-===================================================================
 --- libavcodec/hevc_mp4toannexb_bsf.c
 +++ libavcodec/hevc_mp4toannexb_bsf.c
 @@ -121,7 +121,7 @@ static int hevc_mp4toannexb_filter(AVBSF

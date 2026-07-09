@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/fftools/Makefile
-===================================================================
 --- fftools/Makefile
 +++ fftools/Makefile
 @@ -17,6 +17,9 @@ OBJS-ffmpeg +=                  \
@@ -25,8 +23,6 @@ Index: jellyfin-ffmpeg/fftools/Makefile
  all: $(AVPROGS)
  
  fftools/ffprobe.o fftools/cmdutils.o: libavutil/ffversion.h | fftools
-Index: jellyfin-ffmpeg/fftools/fftools.manifest
-===================================================================
 --- /dev/null
 +++ fftools/fftools.manifest
 @@ -0,0 +1,9 @@
@@ -39,8 +35,6 @@ Index: jellyfin-ffmpeg/fftools/fftools.manifest
 +    </asmv3:windowsSettings>
 +  </asmv3:application>
 +</assembly>
-Index: jellyfin-ffmpeg/fftools/fftoolsres.rc
-===================================================================
 --- /dev/null
 +++ fftools/fftoolsres.rc
 @@ -0,0 +1,34 @@

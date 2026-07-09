@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3579,6 +3579,7 @@ fspp_filter_deps="gpl"
@@ -10,8 +8,6 @@ Index: jellyfin-ffmpeg/configure
  interlace_filter_deps="gpl"
  kerndeint_filter_deps="gpl"
  ladspa_filter_deps="ladspa libdl"
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -297,6 +297,7 @@ OBJS-$(CONFIG_HUE_FILTER)
@@ -22,8 +18,6 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_HWUPLOAD_FILTER)               += vf_hwupload.o
  OBJS-$(CONFIG_HYSTERESIS_FILTER)             += vf_hysteresis.o framesync.o
  OBJS-$(CONFIG_IDENTITY_FILTER)               += vf_identity.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -282,6 +282,7 @@ extern AVFilter ff_vf_hwdownload;
@@ -34,8 +28,6 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern AVFilter ff_vf_hysteresis;
  extern AVFilter ff_vf_identity;
  extern AVFilter ff_vf_idet;
-Index: jellyfin-ffmpeg/libavfilter/vf_hwupload_vaapi.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_hwupload_vaapi.c
 @@ -0,0 +1,196 @@

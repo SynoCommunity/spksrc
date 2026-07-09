@@ -1,10 +1,12 @@
 SPK_NAME = ffmpeg
-SPK_VERS = 4.4.4
-SPK_REV = 50
+SPK_VERS = 4.4.8
+SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
+SPK_REV = 51
 SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Update to version 4.4.4<br/>2. Fix permissions on DSM6<br/>3. Update Intel Media Driver 2023Q1 Release (DSM7 only)<br/>4. Update jellyfin and libsvtav1 patches along with multiple dependencies<br/>5. Update to latest version of x264 (fix for \#6176) - rev50 UNRELEASED"
+CHANGELOG = "1. Update to version 4.4.8<br/>2. Update to jellyfin-ffmpeg v4.4.1-4 patchset<br/>3. Now using new synocli-videodriver package<br/>4. Align package with ffmpeg7/ffmpeg8"
 
 DEPENDS = cross/ffmpeg4
+VIDEODRV_PACKAGE = synocli-videodriver
 
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg
@@ -15,10 +17,10 @@ STARTABLE = no
 HOMEPAGE = https://www.ffmpeg.org/
 LICENSE  = GPLv3
 
-POST_STRIP_TARGET = ffmpeg4_extra_install
+POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
-SPK_COMMANDS  = bin/ffmpeg
-SPK_COMMANDS += bin/ffmpeg4
+SPK_COMMANDS  = bin/ffprobe$(SKG_MINOR_VERS)
+SPK_COMMANDS += bin/ffmpeg$(SKG_MINOR_VERS)
 
 include ../../mk/spksrc.common.mk
 
@@ -27,13 +29,9 @@ SERVICE_USER = auto
 VIDEODRIVER = on
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-SERVICE_SETUP = src/service-setup.sh
-SPK_COMMANDS += bin/vainfo
-endif
+include ../../mk/spksrc.spk-meta.mk
 
-include ../../mk/spksrc.spk.mk
-
-.PHONY: ffmpeg4_extra_install
-ffmpeg4_extra_install:
-	cd $(STAGING_DIR)/bin && ln -sf ffmpeg ffmpeg4
+.PHONY: $(SPK_NAME)_extra_install
+$(SPK_NAME)_extra_install:
+	cd $(STAGING_DIR)/bin && ln -sf ffprobe ffprobe$(SKG_MINOR_VERS)
+	cd $(STAGING_DIR)/bin && ln -sf ffmpeg ffmpeg$(SKG_MINOR_VERS)

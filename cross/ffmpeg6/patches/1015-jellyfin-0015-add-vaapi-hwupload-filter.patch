@@ -1,8 +1,6 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
-@@ -3680,6 +3680,7 @@ gblur_vulkan_filter_deps="vulkan spirv_c
+@@ -3750,6 +3750,7 @@ gblur_vulkan_filter_deps="vulkan spirv_compiler"
  hflip_vulkan_filter_deps="vulkan spirv_compiler"
  histeq_filter_deps="gpl"
  hqdn3d_filter_deps="gpl"
@@ -10,11 +8,9 @@ Index: jellyfin-ffmpeg/configure
  iccdetect_filter_deps="lcms2"
  iccgen_filter_deps="lcms2"
  interlace_filter_deps="gpl"
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -336,6 +336,7 @@ OBJS-$(CONFIG_HUESATURATION_FILTER)
+@@ -345,6 +345,7 @@ OBJS-$(CONFIG_HUESATURATION_FILTER)          += vf_huesaturation.o
  OBJS-$(CONFIG_HWDOWNLOAD_FILTER)             += vf_hwdownload.o
  OBJS-$(CONFIG_HWMAP_FILTER)                  += vf_hwmap.o
  OBJS-$(CONFIG_HWUPLOAD_CUDA_FILTER)          += vf_hwupload_cuda.o
@@ -22,11 +18,9 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_HWUPLOAD_FILTER)               += vf_hwupload.o
  OBJS-$(CONFIG_HYSTERESIS_FILTER)             += vf_hysteresis.o framesync.o
  OBJS-$(CONFIG_ICCDETECT_FILTER)              += vf_iccdetect.o fflcms2.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -315,6 +315,7 @@ extern const AVFilter ff_vf_hwdownload;
+@@ -322,6 +322,7 @@ extern const AVFilter ff_vf_hwdownload;
  extern const AVFilter ff_vf_hwmap;
  extern const AVFilter ff_vf_hwupload;
  extern const AVFilter ff_vf_hwupload_cuda;
@@ -34,8 +28,6 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_hysteresis;
  extern const AVFilter ff_vf_iccdetect;
  extern const AVFilter ff_vf_iccgen;
-Index: jellyfin-ffmpeg/libavfilter/vf_hwupload_vaapi.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_hwupload_vaapi.c
 @@ -0,0 +1,193 @@

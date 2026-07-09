@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/opencl/overlay.cl
-===================================================================
 --- libavfilter/opencl/overlay.cl
 +++ libavfilter/opencl/overlay.cl
 @@ -16,15 +16,24 @@
@@ -142,8 +140,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/overlay.cl
  
          float4 val = in_overlay * in_alpha.x + in_main * (1.0f - in_alpha.x);
          write_imagef(dst, loc, val);
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
-===================================================================
 --- libavfilter/vf_overlay_opencl.c
 +++ libavfilter/vf_overlay_opencl.c
 @@ -28,72 +28,113 @@

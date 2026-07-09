@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/compat/cuda/cuda_runtime.h
-===================================================================
 --- compat/cuda/cuda_runtime.h
 +++ compat/cuda/cuda_runtime.h
 @@ -24,6 +24,7 @@
