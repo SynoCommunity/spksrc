@@ -103,6 +103,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Media Management"><td>8899</td><td>SickRage</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Media Management"><td>8989</td><td>Sonarr</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Storage"><td>9001</td><td>MinIO</td><td>Storage</td><td>Web interface</td></tr>
+    <tr data-category="Utilities"><td>9010</td><td>webhook</td><td>Utilities</td><td>Web interface</td></tr>
     <tr data-category="Downloads"><td>9091</td><td>Transmission</td><td>Downloads</td><td>Web interface</td></tr>
     <tr data-category="Monitoring"><td>9100</td><td>node_exporter</td><td>Monitoring</td><td>Metrics</td></tr>
     <tr data-category="Media Management"><td>9117</td><td>Jackett</td><td>Media Management</td><td>Web interface</td></tr>
