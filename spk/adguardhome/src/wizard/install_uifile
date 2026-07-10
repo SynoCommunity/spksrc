@@ -1,8 +1,19 @@
-[{
-    "step_title": "Install Instructions",
-    "items": [{
-        "desc": "Please <b style=\"color: red\">unselect 'Run after installation'</b>, To run adguard you need to first run the following command via SSH and everytime there is an update"
-    }, {
-        "desc": "<code style=\"user-select: all\">setcap 'CAP_NET_BIND_SERVICE=+eip CAP_NET_RAW=+eip' /var/packages/adguardhome/target/bin/adguardhome</code>"
-    }]
-}]
+[
+  {
+    "step_title": "Important Installation Notes",
+    "items": [
+      {
+        "desc": "This package needs to bind to privileged ports (53/UDP) for DNS to work, but Synology prohibits this for unsigned packages."
+      },
+      {
+        "desc": "Please unselect <b>Run after installation</b> — the package will fail to start until the fix is applied."
+      },
+      {
+        "desc": "After installation, ssh into DSM and run:<br/><code style=\"user-select: all\">/var/packages/adguardhome/target/bin/adguardhome-fix</code>"
+      },
+      {
+        "desc": "The script will prompt for your DSM password and start the package automatically."
+      }
+    ]
+  }
+]
