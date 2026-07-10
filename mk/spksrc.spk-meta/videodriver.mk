@@ -30,13 +30,13 @@ META_DEPENDS += $(VIDEODRV_DEPENDS)
 OPTIONAL_DEPENDS += $(VIDEODRV_OPTIONAL_DEPENDS)
 
 # Ship the GPU diagnostic tools with every DIRECT videodriver consumer
-# (x64, DSM 7.1+ — the only targets the tools package exists for). Indirect
-# consumers (videodriver via the ffmpeg rpath) rely on the ffmpeg chain,
-# and the tools package itself must not depend on itself.
+# (x64, DSM 6.2.4+ — where the tools package exists; on 6.2.4 it provides
+# vainfo only). Indirect consumers (videodriver via the ffmpeg rpath) rely
+# on the ffmpeg chain, and the tools package itself must not depend on itself.
 VIDEODRV_TOOLS_PACKAGE = synocli-videodriver-tools
 ifeq ($(strip $(VIDEODRV_INDIRECT_DEPENDS)),)
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-ifeq ($(call version_ge, $(TCVERSION), 7.1),1)
+ifeq ($(call version_ge, $(TCVERSION), 6.2.4),1)
 ifneq ($(SPK_NAME),$(VIDEODRV_TOOLS_PACKAGE))
 SPK_DEPENDS := $(if $(strip $(SPK_DEPENDS)),$(SPK_DEPENDS):$(VIDEODRV_TOOLS_PACKAGE),$(VIDEODRV_TOOLS_PACKAGE))
 endif
