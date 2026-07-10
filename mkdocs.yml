@@ -10,6 +10,7 @@ copyright: Copyright &copy; 2012 - 2026 SynoCommunity
 theme:
   name: material
   favicon: assets/favicon.ico
+  logo: assets/synocommunity.svg
   features:
     - navigation.tabs
     - navigation.sections
