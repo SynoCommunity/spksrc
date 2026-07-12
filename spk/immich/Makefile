@@ -4,7 +4,7 @@ SPK_REV = 1
 SPK_ICON = src/immich.png
 
 DEPENDS = cross/immich cross/immich-geodata
-SPK_DEPENDS = "Node.js_v22:postgresql>=17.10-4:redis:Perl:python314"
+SPK_DEPENDS = "Node.js_v22:postgresql>=17.10-4:redis:Perl:python314:ffmpeg7"
 
 REQUIRED_MIN_DSM = 7.2
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)

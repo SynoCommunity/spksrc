@@ -38,6 +38,7 @@ service_prestart()
     export DB_PORT=5433
     export DB_USERNAME=immich
     export REDIS_HOSTNAME=localhost
+    export PATH="/var/packages/ffmpeg7/target/bin:${PATH}"
 
     SERVICE_COMMAND="${NODE} ${SERVER_LAUNCHER}"
 
@@ -117,8 +118,8 @@ service_postinst ()
             mkdir -p "${MEDIA_PATH}/${folder}"
             touch "${MEDIA_PATH}/${folder}/.immich"
         done
-        mkdir -p "${SYNOPKG_PKGVAR}/geodata"
         printf '%s' "${wizard_pg_password_immich}" > "${PG_PASS_FILE}"
+        chmod 600 "${PG_PASS_FILE}"
     fi
 
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
