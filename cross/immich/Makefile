@@ -67,8 +67,6 @@ immich_install:
 	# Remove "type": "module" from deployed package.json (server dist is CommonJS)
 	$(RUN) sed -i '/"type": "module"/d' immich-deploy/package.json
 
-
-
 	# ------------------------------------------------------------
 	# 6. Remove non-runtime files from deploy
 	# ------------------------------------------------------------
@@ -111,7 +109,7 @@ immich_install:
 	$(RUN) find immich-deploy/node_modules -type d -name "*musl*" -exec rm -rf {} + 2>/dev/null || true
 
 	# ------------------------------------------------------------
-	# 6b. Patch hardcoded PostgreSQL binary paths
+	# 6a. Patch hardcoded PostgreSQL binary paths
 	# ------------------------------------------------------------
 	# Immich assumes Linux paths like /usr/lib/postgresql/*/bin/pg_dump
 	# DSM has these at /usr/local/bin/ via SPK_COMMANDS symlinks
