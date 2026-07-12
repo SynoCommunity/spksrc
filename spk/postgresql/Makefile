@@ -6,7 +6,7 @@ SPK_ICON = src/postgresql.png
 DEPENDS = cross/postgresql
 
 MAINTAINER = DigitalBox98
-DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS spatial database extension for DSM 7+.
+DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS and pgvector extensions for DSM 7+.
 CHANGELOG = "1. Update PostgreSQL to 17.10. <br/>2. Add pgvector extension."
 DISPLAY_NAME = PostgreSQL
 STARTABLE = yes
