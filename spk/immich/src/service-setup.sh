@@ -90,11 +90,6 @@ validate_preuninst ()
                 exit 1
             fi
 
-            if [ -e "${wizard_dbexport_path}/${PG_DATABASE}.sql" ]; then
-                echo "File ${wizard_dbexport_path}/${PG_DATABASE}.sql already exists. Please choose a different location or remove the existing file."
-                exit 1
-            fi
-
             parent_dir="$(dirname "${wizard_dbexport_path}")"
             if [ ! -w "${parent_dir}" ]; then
                 echo "Cannot write to ${parent_dir}. Please check permissions."
