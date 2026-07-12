@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.postgresql.org/pub/source/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/openssl3 cross/libxml2 cross/libxslt cross/readline cross/libicu
+DEPENDS = cross/zlib cross/openssl3 cross/libxml2 cross/libxslt cross/readline cross/libicu cross/ossp-uuid
 
 HOMEPAGE = https://www.postgresql.org
 COMMENT  = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance
@@ -16,6 +16,7 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-template=linux 
 CONFIGURE_ARGS += --with-openssl
 CONFIGURE_ARGS += --without-python
+CONFIGURE_ARGS += --with-uuid=ossp
 
 # PostgreSQL includes its own time zone database, which it requires for date and time operations. 
 # This time zone database is in fact compatible with the IANA time zone database provided by many 
@@ -43,4 +44,12 @@ ENV += MAKELEVEL=
 # Cross-compilation configure test assumes 'no' since it can't run test programs
 CONFIGURE_ARGS += LDFLAGS_EX_BE="-Wl,--export-dynamic"
 
+POST_INSTALL_TARGET = postgresql_contrib_install
+
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: postgresql_contrib_install
+postgresql_contrib_install:
+	@$(MSG) "Building contrib modules"
+	$(RUN) bash -c 'for m in unaccent cube earthdistance pg_trgm uuid-ossp; do make PG_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/pg_config -C contrib/$$m all || exit 1; done'
+	$(RUN) bash -c 'for m in unaccent cube earthdistance pg_trgm uuid-ossp; do make PG_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/pg_config -C contrib/$$m DESTDIR= pkglibdir=$(STAGING_INSTALL_PREFIX)/lib datadir=$(STAGING_INSTALL_PREFIX)/share includedir_server=$(STAGING_INSTALL_PREFIX)/include/server install || exit 1; done'
