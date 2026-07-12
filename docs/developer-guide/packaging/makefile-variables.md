@@ -101,6 +101,14 @@ A cross package's build system is chosen by which `mk/spksrc.cross-*.mk` it incl
 | CMake | `spksrc.cross-cmake.mk` | `CONFIGURE_ARGS` |
 | Meson | `spksrc.cross-meson.mk` | `CONFIGURE_ARGS` (passed to `meson setup`) |
 
+All three build systems also honour `ADDITIONAL_CONFIGURE_ARGS`, appended right
+after `CONFIGURE_ARGS` on the configure/cmake/`meson setup` command line. It is
+never set by the framework. Prefer `CONFIGURE_ARGS +=`; reach for
+`ADDITIONAL_CONFIGURE_ARGS` only when a package reuses `CONFIGURE_ARGS` for its
+own extra configure invocations and needs args that go to the framework's
+invocation *only* (see `cross/x265`, whose 10/12-bit sub-builds share
+`CONFIGURE_ARGS` but must not receive the final-build link flags).
+
 ```makefile
 # autotools
 GNU_CONFIGURE = 1

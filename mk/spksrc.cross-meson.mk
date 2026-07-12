@@ -56,10 +56,10 @@ meson_configure_target: meson_generate_crossfile
 	@$(MSG) - Meson configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
 	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
-	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
+	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	@$(MSG) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
-	$(RUN) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	@$(MSG) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
+	$(RUN) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
 
 ###
 

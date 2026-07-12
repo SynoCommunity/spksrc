@@ -60,6 +60,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 |----------|---------|-------------|
 | `GNU_CONFIGURE` | 0 | Set to 1 to use autoconf |
 | `CONFIGURE_ARGS` | | Arguments for configure script |
+| `ADDITIONAL_CONFIGURE_ARGS` | | Extra args appended after `CONFIGURE_ARGS` (autotools / CMake / Meson); for the framework invocation only |
 | `PRE_CONFIGURE_TARGET` | | Target to run before configure |
 | `POST_CONFIGURE_TARGET` | | Target to run after configure |
 
