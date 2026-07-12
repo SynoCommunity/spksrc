@@ -74,7 +74,7 @@ cmake_configure_target:
 	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
 	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CONFIGURE_ARGS) $(ADDITIONAL_CMAKE_ARGS) $(CMAKE_DIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
 
