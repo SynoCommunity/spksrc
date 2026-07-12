@@ -68,7 +68,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CMAKE_USE_TOOLCHAIN_FILE` | 1 | Use generated toolchain file |
-| `CMAKE_ARGS` | | Additional CMake arguments |
+| `CONFIGURE_ARGS` | | Additional CMake arguments |
 | `CMAKE_BUILD_TYPE` | Release | Build type |
 | `CMAKE_USE_NINJA` | | Build with Ninja instead of Make |
 | `CMAKE_USE_NASM` | | Build the native NASM assembler first |

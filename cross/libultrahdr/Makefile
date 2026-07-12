@@ -16,6 +16,6 @@ HOMEPAGE = https://developer.android.com/media/platform/hdr-image-format
 COMMENT  = Ultra HDR is a true HDR image format, and is backcompatible. libultrahdr is the reference codec for the Ultra HDR format. The codecs that support the format can render the HDR intent of the image on HDR displays; other codecs can still decode and display the SDR intent of the image.
 LICENSE  = Apache 2.0
 
-CMAKE_ARGS += -DUHDR_BUILD_EXAMPLES=OFF
+CONFIGURE_ARGS += -DUHDR_BUILD_EXAMPLES=OFF
 
 include ../../mk/spksrc.cross-cmake.mk

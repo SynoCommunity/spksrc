@@ -13,10 +13,10 @@ LICENSE  = 3-Clause BSD
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-CMAKE_ARGS  = -DBUILD_SHARED_LIBS=ON
+CONFIGURE_ARGS  = -DBUILD_SHARED_LIBS=ON
 # numpy uses very slow internal functions when BLAS and LAPACK are not available.
-CMAKE_ARGS += -DBUILD_WITHOUT_LAPACK=OFF
-CMAKE_ARGS += -DBUILD_TESTING=OFF
+CONFIGURE_ARGS += -DBUILD_WITHOUT_LAPACK=OFF
+CONFIGURE_ARGS += -DBUILD_TESTING=OFF
 
 ADDITIONAL_CFLAGS  = -Wno-unused-variable
 ADDITIONAL_CFLAGS += -Wno-unused-function
@@ -24,7 +24,7 @@ ADDITIONAL_CFLAGS += -Wno-maybe-uninitialized
 ADDITIONAL_CFLAGS += -Wno-parentheses
 
 ifeq ($(GCC_DEBUG_INFO),1)
-  CMAKE_ARGS += -DOPENBLAS_DEBUG_SUFFIX=OFF
+  CONFIGURE_ARGS += -DOPENBLAS_DEBUG_SUFFIX=OFF
 endif
 
 include ../../mk/spksrc.common.mk
@@ -38,34 +38,34 @@ ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 # Issue discussed in https://github.com/OpenMathLib/OpenBLAS/issues/388
 # See also debian/patches/arm-gcc-flags.patch which is related.
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
-CMAKE_ARGS += -DTARGET=ARMV6
+CONFIGURE_ARGS += -DTARGET=ARMV6
 else
 # completly disable use of vpf
-CMAKE_ARGS += -DTARGET=ARMV5
+CONFIGURE_ARGS += -DTARGET=ARMV5
 endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DTARGET=ARMV5
+CONFIGURE_ARGS += -DTARGET=ARMV5
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DTARGET=ARMV8
+CONFIGURE_ARGS += -DTARGET=ARMV8
 endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 # most of the x64 ARCHS are atom SoC types (Pineview, Cedarview, Braswell, Denverton, Apollolake)
-CMAKE_ARGS += -DTARGET=ATOM
+CONFIGURE_ARGS += -DTARGET=ATOM
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DTARGET=ATOM
+CONFIGURE_ARGS += -DTARGET=ATOM
 endif
 
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DBINARY=64
+CONFIGURE_ARGS += -DBINARY=64
 else
-CMAKE_ARGS += -DBINARY=32
+CONFIGURE_ARGS += -DBINARY=32
 endif
 
 include ../../mk/spksrc.cross-cmake.mk

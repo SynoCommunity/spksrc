@@ -98,7 +98,7 @@ A cross package's build system is chosen by which `mk/spksrc.cross-*.mk` it incl
 | Build system | Include | Arguments variable |
 |--------------|---------|--------------------|
 | autotools | `spksrc.cross-cc.mk` + `GNU_CONFIGURE = 1` | `CONFIGURE_ARGS` |
-| CMake | `spksrc.cross-cmake.mk` | `CMAKE_ARGS` |
+| CMake | `spksrc.cross-cmake.mk` | `CONFIGURE_ARGS` |
 | Meson | `spksrc.cross-meson.mk` | `CONFIGURE_ARGS` (passed to `meson setup`) |
 
 ```makefile

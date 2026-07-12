@@ -22,7 +22,7 @@ ENV += FISH_BUILD_DOCS=0
 include ../../mk/spksrc.common.mk
 
 # fish fails to build with message localization (gettext)
-CMAKE_ARGS = -DWITH_MESSAGE_LOCALIZATION=OFF
+CONFIGURE_ARGS = -DWITH_MESSAGE_LOCALIZATION=OFF
 
 # fish >= 4.0.0 requires rust
 # IMPORTANT:
@@ -55,7 +55,7 @@ endif
 #   CMake is in cross-compiling mode, but the cargo target-triple could not be
 #   inferred.Falling back to the default host target.  Please consider manually
 #   setting `Rust_CARGO_TARGET`.
-CMAKE_ARGS += -DRust_CARGO_TARGET=$(RUST_TARGET)
+CONFIGURE_ARGS += -DRust_CARGO_TARGET=$(RUST_TARGET)
 
 # Export cross-compiler paths for cc-rs crate used by pcre2-sys
 # The cc-rs crate looks for CC_<target> (with underscores) to find the compiler

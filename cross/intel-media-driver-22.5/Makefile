@@ -24,15 +24,15 @@ include ../../mk/spksrc.cross-cmake.mk
 
 # intel-media-driver specific args
 # for succesfull build
-CMAKE_ARGS += -DCMAKE_INSTALL_PREFIX=$(WORK_DIR)/install/$(INSTALL_PREFIX)
-CMAKE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
-CMAKE_ARGS += -Wno-dev
+CONFIGURE_ARGS += -DCMAKE_INSTALL_PREFIX=$(WORK_DIR)/install/$(INSTALL_PREFIX)
+CONFIGURE_ARGS += -DMEDIA_RUN_TEST_SUITE=OFF
+CONFIGURE_ARGS += -Wno-dev
 
 # Disable Ice Lake (GEN11) & DG1/DG2 (GEN12)
 # on older platforms
 ifeq ($(call version_lt, $(TCVERSION), 7),1)
-CMAKE_ARGS += -DGEN11=OFF
-CMAKE_ARGS += -DGEN12=OFF
+CONFIGURE_ARGS += -DGEN11=OFF
+CONFIGURE_ARGS += -DGEN12=OFF
 endif
 
 # Flags to be added to CMake toolchain file

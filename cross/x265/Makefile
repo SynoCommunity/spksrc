@@ -34,16 +34,16 @@ include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 ifeq ($(call version_ge, $(TCVERSION), 7.1),1)
 # asm code is now compatible with arm64/aarch64 for DSM >= 7.1 (except i8mm instructions)
-CMAKE_ARGS += -DENABLE_NEON_I8MM=OFF
+CONFIGURE_ARGS += -DENABLE_NEON_I8MM=OFF
 else
 # https://bitbucket.org/multicoreware/x265_git/issues/549/fail-to-build-for-aarch64-and-armhf
-CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
+CONFIGURE_ARGS += -DENABLE_ASSEMBLY=OFF
 endif
 endif
 
 ifeq ($(findstring $(ARCH),$(32bit_ARCHS)),$(ARCH))
 # asm code for HIGH_BIT_DEPTH is not compatible with 32-bit archs
-CMAKE_ARGS += -DENABLE_ASSEMBLY=OFF
+CONFIGURE_ARGS += -DENABLE_ASSEMBLY=OFF
 endif
 
 
@@ -51,19 +51,19 @@ endif
 #    https://github.com/SynoCommunity/spksrc/issues/5314
 #    https://github.com/SynoCommunity/spksrc/issues/6597
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DENABLE_PIC=ON
-CMAKE_ARGS += -DNO_ATOMICS=ON
+CONFIGURE_ARGS += -DENABLE_PIC=ON
+CONFIGURE_ARGS += -DNO_ATOMICS=ON
 endif
 
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
+CONFIGURE_ARGS += -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy
 endif
 
 # gcc version above 4.8 required to support hdr10plus
 ifeq ($(call version_le, $(TC_GCC), 4.8),1)
 PLIST_TRANSFORM = sed -e '/:lib\/libhdr10plus.so/d'
 else
-CMAKE_ARGS += -DENABLE_HDR10_PLUS=ON
+CONFIGURE_ARGS += -DENABLE_HDR10_PLUS=ON
 PLIST_TRANSFORM = cat
 endif
 
@@ -76,9 +76,9 @@ include ../../mk/spksrc.cross-cmake.mk
 .PHONY: x265_pre_configure
 x265_pre_configure: $(CMAKE_TOOLCHAIN_FILE_PKG)
 	@$(MSG) Configure 12BIT libraries
-	$(RUN_CMAKE) cmake -S $(WORK_DIR)/$(PKG_DIR)/source -B $(CMAKE_BUILD_12B) $(CMAKE_ARGS) $(CMAKE_ARGS_BITLIB) -DMAIN12=ON -G Ninja
+	$(RUN_CMAKE) cmake -S $(WORK_DIR)/$(PKG_DIR)/source -B $(CMAKE_BUILD_12B) $(CONFIGURE_ARGS) $(CMAKE_ARGS_BITLIB) -DMAIN12=ON -G Ninja
 	@$(MSG) Configure 10BIT libraries
-	$(RUN_CMAKE) cmake -S $(WORK_DIR)/$(PKG_DIR)/source -B $(CMAKE_BUILD_10B) $(CMAKE_ARGS) $(CMAKE_ARGS_BITLIB) -G Ninja
+	$(RUN_CMAKE) cmake -S $(WORK_DIR)/$(PKG_DIR)/source -B $(CMAKE_BUILD_10B) $(CONFIGURE_ARGS) $(CMAKE_ARGS_BITLIB) -G Ninja
 
 .PHONY: x265_pre_compile
 x265_pre_compile:

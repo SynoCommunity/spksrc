@@ -28,13 +28,13 @@ ENV += PATH=$(LLVM_BIN_DIR):$$PATH
 # -----------------------------------------------------------------------------
 # CMake arguments
 # -----------------------------------------------------------------------------
-CMAKE_ARGS += -DLIBCLC_TARGETS_TO_BUILD="spirv-mesa3d-;spirv64-mesa3d-"
+CONFIGURE_ARGS += -DLIBCLC_TARGETS_TO_BUILD="spirv-mesa3d-;spirv64-mesa3d-"
 
-CMAKE_ARGS += -DLLVM_CONFIG=$(LLVM_BIN_DIR)/llvm-config
-CMAKE_ARGS += -DLLVM_CLANG=$(LLVM_BIN_DIR)/clang
-CMAKE_ARGS += -DLLVM_LINK=$(LLVM_BIN_DIR)/llvm-link
-CMAKE_ARGS += -DLLVM_AS=$(LLVM_BIN_DIR)/llvm-as
-CMAKE_ARGS += -DLLVM_SPIRV=$(LLVM_BIN_DIR)/llvm-spirv
+CONFIGURE_ARGS += -DLLVM_CONFIG=$(LLVM_BIN_DIR)/llvm-config
+CONFIGURE_ARGS += -DLLVM_CLANG=$(LLVM_BIN_DIR)/clang
+CONFIGURE_ARGS += -DLLVM_LINK=$(LLVM_BIN_DIR)/llvm-link
+CONFIGURE_ARGS += -DLLVM_AS=$(LLVM_BIN_DIR)/llvm-as
+CONFIGURE_ARGS += -DLLVM_SPIRV=$(LLVM_BIN_DIR)/llvm-spirv
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules

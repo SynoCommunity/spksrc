@@ -39,31 +39,31 @@ igc_post_extract_target:
 # CMake arguments
 # -----------------------------------------------------------------------------
 # [llvm]
-CMAKE_ARGS += -DIGC_OPTION__LLVM_MODE=Prebuilds
-CMAKE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
+CONFIGURE_ARGS += -DIGC_OPTION__LLVM_MODE=Prebuilds
+CONFIGURE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
 
 # [Khronos-SPIRV-Headers]
-CMAKE_ARGS += -DIGC_BUILD__SPIRV_ENABLED=ON
-CMAKE_ARGS += -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
+CONFIGURE_ARGS += -DIGC_BUILD__SPIRV_ENABLED=ON
+CONFIGURE_ARGS += -DIGC_OPTION__USE_PREINSTALLED_SPIRV_HEADERS='ON'
 
 # [Khronos-SPIRV-Tools]
-CMAKE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
+CONFIGURE_ARGS += -DIGC_OPTION__SPIRV_TOOLS_MODE='Prebuilds'
 
 # [vc-intrinsics]
-CMAKE_ARGS += -DIGC_BUILD__VC_ENABLED=ON
-CMAKE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Prebuilds'
+CONFIGURE_ARGS += -DIGC_BUILD__VC_ENABLED=ON
+CONFIGURE_ARGS += -DIGC_OPTION__VC_INTRINSICS_MODE='Prebuilds'
 
 # -----------------------------------------------------------------------------
 # Access to native/llvm-14.0 spcific binaries
 # -----------------------------------------------------------------------------
-CMAKE_ARGS += -DCLANG_EXE=$(LLVM_BIN_DIR)/clang
-CMAKE_ARGS += -DLLVM_AS_EXE=$(LLVM_BIN_DIR)/llvm-as
-CMAKE_ARGS += -DLLVM_LINK_EXE=$(LLVM_BIN_DIR)/llvm-link
-CMAKE_ARGS += -DLLVM_OPT_EXE=$(LLVM_BIN_DIR)/opt
+CONFIGURE_ARGS += -DCLANG_EXE=$(LLVM_BIN_DIR)/clang
+CONFIGURE_ARGS += -DLLVM_AS_EXE=$(LLVM_BIN_DIR)/llvm-as
+CONFIGURE_ARGS += -DLLVM_LINK_EXE=$(LLVM_BIN_DIR)/llvm-link
+CONFIGURE_ARGS += -DLLVM_OPT_EXE=$(LLVM_BIN_DIR)/opt
 
 # For native build-time tools to link against LLVM libraries
 # 'CMCLTranslatorTool', 'elf_packager', 'vcb', 'libBiFManager.so', etc.
-CMAKE_ARGS += -DCMAKE_BUILD_RPATH="$(LLVM_LIB_DIR)"
+CONFIGURE_ARGS += -DCMAKE_BUILD_RPATH="$(LLVM_LIB_DIR)"
 
 # -----------------------------------------------------------------------------
 # Reduce build-time binary size

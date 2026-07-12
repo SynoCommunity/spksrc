@@ -19,30 +19,30 @@ LICENSE  = Apache 2.0
 ifeq ($(strip $(PYTHON_PACKAGE)),)
 BUILD_DEPENDS = cross/python312
 endif
-CMAKE_ARGS += -DWANT_PYTHON=true
+CONFIGURE_ARGS += -DWANT_PYTHON=true
 DEPENDS = cross/zlib
 
 DEPENDS += cross/openssl3
-CMAKE_ARGS += -DWANT_OPENSSL=true
+CONFIGURE_ARGS += -DWANT_OPENSSL=true
 
 DEPENDS += cross/libicu
-CMAKE_ARGS += -DWANT_ICU=true
+CONFIGURE_ARGS += -DWANT_ICU=true
 
 DEPENDS += cross/argon2
-CMAKE_ARGS += -DWANT_ARGON=true
+CONFIGURE_ARGS += -DWANT_ARGON=true
 
 DEPENDS += cross/cyrus-sasl
-CMAKE_ARGS += -DWANT_CYRUS=true
+CONFIGURE_ARGS += -DWANT_CYRUS=true
 
 # Boost mandatory for i18n and
 # can only be built from spk
 ifneq ($(strip $(BOOST_BUILD_PATH)),)
-CMAKE_ARGS += -DWANT_I18N=true
+CONFIGURE_ARGS += -DWANT_I18N=true
 endif
 
-CMAKE_ARGS += -DWANT_SYSTEMD=false
-CMAKE_ARGS += -DWANT_TCL=false
-CMAKE_ARGS += -DWANT_PERL=false
+CONFIGURE_ARGS += -DWANT_SYSTEMD=false
+CONFIGURE_ARGS += -DWANT_TCL=false
+CONFIGURE_ARGS += -DWANT_PERL=false
 
 # For ZNC to build using github-action, enforce adding Python & OpenSSL include directories
 ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))

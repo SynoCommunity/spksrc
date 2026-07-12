@@ -16,6 +16,6 @@ LICENSE  = MIT
 # Limit compile/link-time storage space (and faster build-time)
 GCC_NO_DEBUG_INFO = 1
 
-CMAKE_ARGS += -DRUN_TEST_SUITE=OFF
+CONFIGURE_ARGS += -DRUN_TEST_SUITE=OFF
 
 include ../../mk/spksrc.cross-cmake.mk
