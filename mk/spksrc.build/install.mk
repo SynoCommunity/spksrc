@@ -18,8 +18,11 @@
 #  INSTALL_PREFIX                   Target directory where the software will be run.
 #  INSTALL_DIR                      Where to install files. INSTALL_PREFIX will be added.
 #  STAGING_INSTALL_PREFIX           Where to install files, in extenso.
-#  INSTALL_MAKE_OPTIONS             Parameters to add to make command
-#                                   (default: install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX))
+#  INSTALL_ARGS                     Extra arguments for the install step: the make
+#                                   command for autotools / plain GNU make (default
+#                                   when unset: install DESTDIR=$(INSTALL_DIR)
+#                                   prefix=$(INSTALL_PREFIX)); appended as-is to
+#                                   cmake --install and ninja install.
 #
 # Files:
 #  $(WORK_DIR)/$(PKG_NAME).plist    List of files installed. Can be used to build the PLIST file
@@ -32,9 +35,6 @@ INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)install_done
 INSTALL_PLIST = $(WORK_DIR)/$(PKG_NAME).plist
 PRE_INSTALL_PLIST = $(INSTALL_PLIST).tmp
 
-ifeq ($(strip $(INSTALL_MAKE_OPTIONS)),)
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
-endif
 
 # Define find search path for creating plist
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
@@ -75,7 +75,7 @@ $(PRE_INSTALL_PLIST):
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
 install_target: $(PRE_INSTALL_TARGET)
-	$(RUN) $(MAKE) $(INSTALL_MAKE_OPTIONS)
+	$(RUN) $(MAKE) $(if $(strip $(INSTALL_ARGS)),$(INSTALL_ARGS),install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX))
 
 post_install_target: $(INSTALL_TARGET)
 ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)

@@ -13,6 +13,6 @@ LICENSE = MIT
 
 CONFIGURE_TARGET = nop
 COMPILE_ARGS = linux
-INSTALL_MAKE_OPTIONS = install INSTALL_TOP=$(INSTALL_DIR)
+INSTALL_ARGS = install INSTALL_TOP=$(INSTALL_DIR)
 
 include ../../mk/spksrc.native-cc.mk

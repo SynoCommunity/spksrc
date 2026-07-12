@@ -31,7 +31,7 @@ ADDITIONAL_CPPFLAGS += -O
 PRE_CONFIGURE_TARGET = git_pre_configure
 POST_INSTALL_TARGET = git_post_install
 
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 # compiling needs access to curl-config from cross/curl
 ENV += PATH=$$PATH:$(STAGING_INSTALL_PREFIX)/bin
@@ -45,7 +45,7 @@ git_pre_configure:
 .PHONY: git_post_install
 git_post_install:
 	@$(MSG) Compile and install git-subtree
-	@$(RUN) $(MAKE) -C contrib/subtree/ $(INSTALL_MAKE_OPTIONS)
+	@$(RUN) $(MAKE) -C contrib/subtree/ $(INSTALL_ARGS)
 	@$(MSG) Install gitconfig
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
 	@install -m 644 src/gitconfig $(STAGING_INSTALL_PREFIX)/etc/gitconfig

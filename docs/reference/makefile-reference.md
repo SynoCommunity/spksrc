@@ -112,7 +112,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | Variable | Description |
 |----------|-------------|
 | `INSTALL_TARGET` | Override install target (default: `install`) |
-| `INSTALL_MAKE_OPTIONS` | Options passed to `make install` (autotools / plain GNU make only) |
+| `INSTALL_ARGS` | Extra arguments for the install step: the make command for autotools / plain GNU make (defaults to `install DESTDIR=… prefix=…`), appended as-is to `cmake --install` and `ninja install` |
 | `PRE_INSTALL_TARGET` | Target to run before install |
 | `POST_INSTALL_TARGET` | Target to run after install |
 

@@ -107,9 +107,9 @@ cmake_compile_target:
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
-	$(RUN) cmake --install $(CMAKE_BUILD_DIR)
+	$(RUN) cmake --install $(CMAKE_BUILD_DIR) $(INSTALL_ARGS)
 else
-	$(RUN) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR)
+	$(RUN) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR) $(INSTALL_ARGS)
 endif
 
 .PHONY: cmake_post_install_target

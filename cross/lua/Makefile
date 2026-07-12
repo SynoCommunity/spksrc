@@ -12,7 +12,7 @@ COMMENT = Lua is a powerful, efficient, lightweight, embeddable scripting langua
 LICENSE = MIT
 
 CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install INSTALL_TOP=$(STAGING_INSTALL_PREFIX)
+INSTALL_ARGS = install INSTALL_TOP=$(STAGING_INSTALL_PREFIX)
 
 COMPILE_ARGS += linux-readline
 COMPILE_ARGS += CC="$(TC_PATH)$(TC_PREFIX)gcc -fPIC \$$(ALLFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/readline"

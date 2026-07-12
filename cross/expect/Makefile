@@ -21,7 +21,7 @@ CONFIGURE_ARGS += ac_cv_func_setpgrp_void=yes
 
 # avoid build/install of examples (SCRIPTS) and doc
 COMPILE_ARGS = binaries libraries
-INSTALL_MAKE_OPTIONS = install-binaries install-libraries SCRIPTS= DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+INSTALL_ARGS = install-binaries install-libraries SCRIPTS= DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 ADDITIONAL_CFLAGS = -O2
 

@@ -141,17 +141,17 @@ ADDITIONAL_LDFLAGS = -Wl,-rpath,/var/packages/mypackage/target/lib
 
 ### Compile and Install Arguments
 
-`COMPILE_ARGS` carries extra arguments for the compile step across every build system. For autotools / plain GNU make it is the make command; for CMake and Meson it is appended as-is to `cmake --build` and `ninja` respectively.
+`COMPILE_ARGS` and `INSTALL_ARGS` carry extra arguments for the compile and install steps across every build system. For autotools / plain GNU make each is the make command (`INSTALL_ARGS` defaults to `install DESTDIR=… prefix=…` when unset); for CMake and Meson they are appended as-is to `cmake --build` / `cmake --install` and `ninja` / `ninja install` respectively.
 
 | Variable | Description |
 |----------|-------------|
 | `COMPILE_ARGS` | Extra arguments for the compile step (make / cmake --build / ninja) |
-| `INSTALL_MAKE_OPTIONS` | Extra arguments passed to `make` at install |
+| `INSTALL_ARGS` | Extra arguments for the install step (make / cmake --install / ninja install) |
 | `INSTALL_TARGET` | Make target for installation (default: install) |
 
 ```makefile
 COMPILE_ARGS = V=1
-INSTALL_TARGET = install-strip
+INSTALL_ARGS = install-strip DESTDIR=$(INSTALL_DIR)
 ```
 
 ## Service Configuration

@@ -17,6 +17,6 @@ CONFIGURE_ARGS = --with-gmp=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --disable-static
 
 COMPILE_ARGS += SUBDIRS=src
-INSTALL_MAKE_OPTIONS = install SUBDIRS=src DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+INSTALL_ARGS = install SUBDIRS=src DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk

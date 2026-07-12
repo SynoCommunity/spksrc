@@ -23,7 +23,7 @@ else
 CONFIGURE_TARGET = nop
 endif
 
-INSTALL_MAKE_OPTIONS = install PREFIX=$(STAGING_INSTALL_PREFIX)
+INSTALL_ARGS = install PREFIX=$(STAGING_INSTALL_PREFIX)
 
 # use jemalloc for intel archs
 ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(i686_ARCHS)),$(ARCH))

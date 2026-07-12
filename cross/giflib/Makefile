@@ -13,7 +13,7 @@ LICENSE  = MIT
 
 CONFIGURE_TARGET = nop
 COMPILE_ARGS = shared-lib
-INSTALL_MAKE_OPTIONS = PREFIX=$(INSTALL_DIR)$(INSTALL_PREFIX) install-shared-lib
+INSTALL_ARGS = PREFIX=$(INSTALL_DIR)$(INSTALL_PREFIX) install-shared-lib
 
 include ../../mk/spksrc.cross-cc.mk
 
