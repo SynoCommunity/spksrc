@@ -14,7 +14,7 @@ COMMENT    = HAProxy is a free, very fast and reliable solution offering high av
 LICENSE    = GPLv2
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = haproxy_install
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 
 # OpenSSL paths
 SSL_INC = $(INSTALL_DIR)$(INSTALL_PREFIX)/include
@@ -32,7 +32,3 @@ COMPILE_ARGS += CC=$(TC_PATH)$(TC_PREFIX)gcc LD=$(TC_PATH)$(TC_PREFIX)gcc
 COMPILE_ARGS += CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: haproxy_install
-haproxy_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)

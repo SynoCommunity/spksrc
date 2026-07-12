@@ -36,7 +36,7 @@ CONFIGURE_ARGS += LIBS="-lssl -lcrypto -lpthread -lm"
 COMPILE_ARGS = -j1 CC="$(TC_PATH)$(TC_PREFIX)gcc"
 
 PRE_CONFIGURE_TARGET = postgis_pre_configure
-INSTALL_TARGET = postgis_install
+INSTALL_ARGS = install DESTDIR="" bindir=$(STAGING_INSTALL_PREFIX)/bin mandir=$(STAGING_INSTALL_PREFIX)/share/man
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -54,7 +54,3 @@ postgis_pre_configure:
 	    -e 's|@CROSS_CC@|$(TC_PATH)$(TC_PREFIX)gcc|g' \
 	    $(CURDIR)/src/pg_config_wrapper.sh.in > $(PG_CONFIG_WRAPPER)
 	chmod +x $(PG_CONFIG_WRAPPER)
-
-.PHONY: postgis_install
-postgis_install:
-	$(RUN) $(MAKE) install DESTDIR="" bindir=$(STAGING_INSTALL_PREFIX)/bin mandir=$(STAGING_INSTALL_PREFIX)/share/man
