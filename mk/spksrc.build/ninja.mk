@@ -73,7 +73,7 @@ ninja_compile_target:
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 endif
-	$(RUN) ninja -C $(NINJA_BUILD_DIR)
+	$(RUN) ninja -C $(NINJA_BUILD_DIR) $(COMPILE_ARGS)
 
 .PHONY: ninja_install_target
 

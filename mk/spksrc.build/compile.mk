@@ -10,7 +10,9 @@
 #  post_compile_target     (override with POST_COMPILE_TARGET)
 #
 # Variables:
-#  COMPILE_MAKE_OPTIONS    Additional parameters to add to make command
+#  COMPILE_ARGS            Extra arguments for the compile step. Replaces the
+#                          make command for autotools/plain make; appended as-is
+#                          to cmake --build and ninja.
 #
 ###############################################################################
 
@@ -42,9 +44,9 @@ pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET)
 ifeq ($(filter $(NCPUS),0 1),)
-	@$(RUN) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(MAKE) -j$(NCPUS) $(COMPILE_ARGS)
 else
-	@$(RUN) $(MAKE) $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(MAKE) $(COMPILE_ARGS)
 endif
 
 

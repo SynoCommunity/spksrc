@@ -99,7 +99,7 @@ cmake_configure_target: cmake_generate_toolchain_file
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	$(RUN) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	$(RUN) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS) $(COMPILE_ARGS)
 
 .PHONY: cmake_install_target
 

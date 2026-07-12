@@ -93,7 +93,7 @@ endif
 # https://github.com/util-linux/util-linux/issues/2416
 # This is a workaround to use ncursesw without tinfo:
 # - still required for util-linux v2.41.1
-COMPILE_MAKE_OPTIONS = NCURSES_LIBS="-lncursesw"
+COMPILE_ARGS = NCURSES_LIBS="-lncursesw"
 
 include ../../mk/spksrc.cross-cc.mk
 

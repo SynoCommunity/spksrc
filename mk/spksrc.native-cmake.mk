@@ -81,7 +81,7 @@ cmake_configure_target:
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS) $(COMPILE_ARGS)
 
 .PHONY: cmake_install_target
 

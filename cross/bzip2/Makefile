@@ -16,7 +16,7 @@ POST_INSTALL_TARGET = bzip2_post_install
 
 ADDITIONAL_CFLAGS = -fpic -fPIC -O3 -D_FILE_OFFSET_BITS=64
 
-COMPILE_MAKE_OPTIONS = -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
+COMPILE_ARGS = -f Makefile-libbz2_so PREFIX=$(INSTALL_PREFIX)
 INSTALL_MAKE_OPTIONS = install PREFIX=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk

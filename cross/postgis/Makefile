@@ -33,7 +33,7 @@ CONFIGURE_ARGS += LIBS="-lssl -lcrypto -lpthread -lm"
 
 # Disable parallel build (SQL file generation race conditions)
 # Override CC since PGXS hardcodes gcc
-COMPILE_MAKE_OPTIONS = -j1 CC="$(TC_PATH)$(TC_PREFIX)gcc"
+COMPILE_ARGS = -j1 CC="$(TC_PATH)$(TC_PREFIX)gcc"
 
 PRE_CONFIGURE_TARGET = postgis_pre_configure
 INSTALL_TARGET = postgis_install

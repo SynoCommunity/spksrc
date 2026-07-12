@@ -16,7 +16,7 @@ INSTALL_TARGET = libhdhomerun_install
 
 include ../../mk/spksrc.cross-cc.mk
 
-COMPILE_MAKE_OPTIONS = CROSS_COMPILE=$(abspath $(CURDIR)/../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX))
+COMPILE_ARGS = CROSS_COMPILE=$(abspath $(CURDIR)/../../toolchain/syno-$(ARCH)-$(TCVERSION)/work/$(TC_TARGET)/bin/$(TC_PREFIX))
 
 .PHONY: libhdhomerun_install
 libhdhomerun_install:

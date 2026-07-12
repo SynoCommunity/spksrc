@@ -101,7 +101,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `ADDITIONAL_LDFLAGS` | Extra linker flags |
 | `ADDITIONAL_RUSTFLAGS` | Extra Rust compiler flags |
 | `ADDITIONAL_EXTRACTFLAGS` | Extra parameters for the extract command |
-| `COMPILE_MAKE_OPTIONS` | Extra arguments passed to `make` at compile (autotools / plain GNU make only — CMake uses `cmake --build`, Meson uses `ninja`) |
+| `COMPILE_ARGS` | Extra arguments for the compile step: the make command for autotools / plain GNU make, appended as-is to `cmake --build` and `ninja` |
 | `COMPILE_TARGET` | Override default compile target |
 | `PRE_COMPILE_TARGET` | Target to run before compile |
 | `POST_COMPILE_TARGET` | Target to run after compile |

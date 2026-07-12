@@ -41,7 +41,7 @@ glibc_configure_target:
 
 .PHONY: glibc_compile_taget
 glibc_compile_taget:
-	@$(RUN) && cd ../$(PKG_DIR)-build && env $(ENV) $(PSTAT_TIME) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) && cd ../$(PKG_DIR)-build && env $(ENV) $(PSTAT_TIME) $(MAKE) -j$(NCPUS) $(COMPILE_ARGS)
 
 .PHONY: glibc_install_target
 glibc_install_target:

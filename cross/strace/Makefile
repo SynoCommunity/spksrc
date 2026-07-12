@@ -47,7 +47,7 @@ $(error Arch $(ARCH) not expected)
 endif
 
 CONFIGURE_ARGS += ARCH=$(STRACE_ARCH)
-COMPILE_MAKE_OPTIONS = ARCH=$(STRACE_ARCH)
+COMPILE_ARGS = ARCH=$(STRACE_ARCH)
 INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX) ARCH=$(STRACE_ARCH)
 
 include ../../mk/spksrc.cross-cc.mk

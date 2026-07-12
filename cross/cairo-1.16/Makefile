@@ -31,8 +31,8 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: cairo_compile
 cairo_compile:
 	@$(MSG) Build without tests
-	@$(RUN) $(MAKE) -C src  $(COMPILE_MAKE_OPTIONS)
-	@$(RUN) $(MAKE) -C util $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(MAKE) -C src  $(COMPILE_ARGS)
+	@$(RUN) $(MAKE) -C util $(COMPILE_ARGS)
 
 .PHONY: cairo_install
 cairo_install:

@@ -46,12 +46,12 @@ ifeq ($(BUILD_ARCH),)
 $(error "ARCH $(ARCH) not expected.")
 endif
 
-COMPILE_MAKE_OPTIONS = build ARCH=$(BUILD_ARCH)
+COMPILE_ARGS = build ARCH=$(BUILD_ARCH)
 ifeq (g++,$(CXX))
 # workaround for: CXX not fully qualified when building in cross folder
-COMPILE_MAKE_OPTIONS += COMPCXX=$(TC_PATH)$(TC_PREFIX)$(CXX)
+COMPILE_ARGS += COMPCXX=$(TC_PATH)$(TC_PREFIX)$(CXX)
 else
-COMPILE_MAKE_OPTIONS += COMPCXX=$(CXX)
+COMPILE_ARGS += COMPCXX=$(CXX)
 endif
 
 

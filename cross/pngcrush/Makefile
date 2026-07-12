@@ -13,7 +13,7 @@ LICENSE  = 3-clause BSD
 
 CONFIGURE_TARGET = nop
 
-COMPILE_MAKE_OPTIONS = -f Makefile-nolib LIBS="-L$(STAGING_INSTALL_PREFIX) -lpng -lz"
+COMPILE_ARGS = -f Makefile-nolib LIBS="-L$(STAGING_INSTALL_PREFIX) -lpng -lz"
 INSTALL_MAKE_OPTIONS = -f Makefile-nolib install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 # libpng >= 1.6.41

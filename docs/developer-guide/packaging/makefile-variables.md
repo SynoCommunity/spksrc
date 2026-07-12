@@ -139,18 +139,18 @@ ADDITIONAL_CFLAGS = -O3 -DNDEBUG
 ADDITIONAL_LDFLAGS = -Wl,-rpath,/var/packages/mypackage/target/lib
 ```
 
-### Make Options
+### Compile and Install Arguments
 
-These apply to the **autotools / plain GNU make** build path only (`spksrc.build/compile.mk` / `spksrc.build/install.mk`). CMake builds with `cmake --build` and Meson with `ninja`, so neither reads these.
+`COMPILE_ARGS` carries extra arguments for the compile step across every build system. For autotools / plain GNU make it is the make command; for CMake and Meson it is appended as-is to `cmake --build` and `ninja` respectively.
 
 | Variable | Description |
 |----------|-------------|
-| `COMPILE_MAKE_OPTIONS` | Extra arguments passed to `make` at compile |
+| `COMPILE_ARGS` | Extra arguments for the compile step (make / cmake --build / ninja) |
 | `INSTALL_MAKE_OPTIONS` | Extra arguments passed to `make` at install |
 | `INSTALL_TARGET` | Make target for installation (default: install) |
 
 ```makefile
-COMPILE_MAKE_OPTIONS = V=1
+COMPILE_ARGS = V=1
 INSTALL_TARGET = install-strip
 ```
 
