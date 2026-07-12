@@ -1,11 +1,13 @@
---- Makefile.orig	2024-11-26 00:55:17.000000000 +0000
-+++ Makefile	2025-01-03 23:05:51.677704322 +0000
-@@ -36,7 +36,7 @@
- LDFLAGS?=-s
- #CFLAGS?=-ggdb
+--- Makefile.orig	2026-03-16 22:38:08.000000000 +0000
++++ Makefile	2026-04-29 16:23:47.503175377 +0000
+@@ -37,8 +37,8 @@
+ #LDFLAGS?=-s
+ CFLAGS?=-ggdb
  CFLAGS?=-O3
--CFLAGS+=-std=c11 -Wpedantic -Wall -Wextra -Wstrict-prototypes -Wshadow -Wconversion
-+#CFLAGS+=-std=c11 -Wpedantic -Wall -Wextra -Wstrict-prototypes -Wshadow -Wconversion
+-CFLAGS+=-std=c11 -Wpedantic -Wall -Wextra -Wstrict-prototypes -Wshadow -Wconversion \
+-	-Wdiscarded-qualifiers
++#CFLAGS+=-std=c11 -Wpedantic -Wall -Wextra -Wstrict-prototypes -Wshadow -Wconversion \
++#	-Wdiscarded-qualifiers
  # _LARGEFILE64_SOURCE may be considered obsolete
  CPPFLAGS+=-DLARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
  

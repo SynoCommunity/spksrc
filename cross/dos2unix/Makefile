@@ -1,13 +1,13 @@
 PKG_NAME = dos2unix
-PKG_VERS = 7.5.3
+PKG_VERS = 7.5.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://waterlan.home.xs4all.nl/dos2unix
+PKG_DIST_SITE = https://waterlander.net/dos2unix/files/
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-HOMEPAGE = https://waterlan.home.xs4all.nl/dos2unix.html
+HOMEPAGE = https://waterlander.net/dos2unix/
 COMMENT  = Convert text files with DOS or Mac line breaks to Unix line breaks and vice versa.
 LICENSE  = FreeBSD style
 
