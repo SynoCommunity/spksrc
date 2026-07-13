@@ -33,8 +33,34 @@ internal_update_supported() {
     fi
 }
 
+# Ensure package_info UpdateMethod matches DSM capabilities at runtime.
+# Packages built for TCVERSION < 7.2 ship with UpdateMethod=External to
+# protect the custom libe_sqlite3.so on DSM 6–7.1. On DSM 7.2+, the
+# updater overwrites bin/ entirely and the upstream GLIBC ≥ 2.28 build
+# works as-is, so we can safely enable built-in updates.
+configure_update_method() {
+    info_file="${SYNOPKG_PKGDEST}/share/Prowlarr/package_info"
+    [ -f "$info_file" ] || return 0
+
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -ge 7 ] && \
+       [ "${SYNOPKG_DSM_VERSION_MINOR:-0}" -ge 2 ] 2>/dev/null || \
+       [ "${SYNOPKG_DSM_VERSION_MAJOR}" -gt 7 ]; then
+        # DSM 7.2+: allow built-in updater
+        if grep -q '^UpdateMethod=External' "$info_file" 2>/dev/null; then
+            echo "DSM 7.2+ detected, enabling built-in updater"
+            sed -i '/^UpdateMethod=External$/d' "$info_file"
+        fi
+    else
+        # DSM < 7.2: protect from updater overwriting custom libe_sqlite3
+        grep -q '^UpdateMethod=External' "$info_file" 2>/dev/null || \
+            echo "UpdateMethod=External" >> "$info_file"
+    fi
+}
+
 service_postinst ()
 {
+    configure_update_method
+
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
         if internal_update_supported; then
             # make Prowlarr do an update check on start
@@ -61,6 +87,8 @@ service_preupgrade ()
 
 service_postupgrade ()
 {
+    configure_update_method
+
     # restore Prowlarr distribution
     if [ -d "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/share" ]; then
         echo "Restore previous distribution from ${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup"
