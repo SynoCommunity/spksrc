@@ -85,11 +85,11 @@ $(PRE_INSTALL_PLIST):
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
 install_target: $(PRE_INSTALL_TARGET)
-	$(RUN) $(MAKE) $(INSTALL_ARGS)
+	$(BUILD_RUN) $(MAKE) $(INSTALL_ARGS)
 
 post_install_target: $(INSTALL_TARGET)
 ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)
-	$(RUN) $(MAKE) distclean
+	$(BUILD_RUN) $(MAKE) distclean
 endif
 
 $(INSTALL_PLIST):

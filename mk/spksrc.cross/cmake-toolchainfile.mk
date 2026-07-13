@@ -8,7 +8,7 @@
 # Per-dependency configuration for CMake build
 CMAKE_TOOLCHAIN_FILE_NAME = $(ARCH)-toolchain.cmake
 CMAKE_TOOLCHAIN_FILE_WRK = $(WORK_DIR)/tc_vars.cmake
-CMAKE_TOOLCHAIN_FILE_PKG = $(CMAKE_BUILD_DIR)/$(CMAKE_TOOLCHAIN_FILE_NAME)
+CMAKE_TOOLCHAIN_FILE_PKG = $(BUILD_DIR)/$(CMAKE_TOOLCHAIN_FILE_NAME)
 
 
 ifeq ($(strip $(CMAKE_USE_TOOLCHAIN_FILE)),ON)
@@ -31,9 +31,9 @@ CMAKE_META_FIND_ROOTS = $(foreach d,$(META_PKG_CONFIG_LIBDIR),$(abspath $(patsub
 
 .PHONY: $(CMAKE_TOOLCHAIN_FILE_PKG)
 $(CMAKE_TOOLCHAIN_FILE_PKG):
-ifeq ($(wildcard $(CMAKE_BUILD_DIR)),)
-	@$(MSG) Creating CMake build directory: $(CMAKE_BUILD_DIR)
-	@mkdir --parents $(CMAKE_BUILD_DIR)
+ifeq ($(wildcard $(BUILD_DIR)),)
+	@$(MSG) Creating CMake build directory: $(BUILD_DIR)
+	@mkdir --parents $(BUILD_DIR)
 endif
 	@$(MSG) Generating $(CMAKE_TOOLCHAIN_FILE_PKG)
 	@env $(ENV) $(MAKE) --no-print-directory cmake_pkg_toolchain > $(CMAKE_TOOLCHAIN_FILE_PKG) 2>/dev/null;

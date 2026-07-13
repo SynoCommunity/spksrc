@@ -15,8 +15,8 @@ MESON_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)
 endif
 
 # Set default build directory
-ifeq ($(strip $(MESON_BUILD_DIR)),)
-MESON_BUILD_DIR = $(MESON_BASE_DIR)/builddir
+ifeq ($(strip $(BUILD_DIR)),)
+BUILD_DIR = $(MESON_BASE_DIR)/builddir
 endif
 
 # Set other build options

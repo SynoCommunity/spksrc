@@ -71,7 +71,8 @@ configure_msg:
 pre_configure_target: configure_msg
 
 configure_target:  $(PRE_CONFIGURE_TARGET)
-	$(RUN) ./configure $(REAL_CONFIGURE_ARGS)
+	@test -z "$(BUILD_DIR)" || mkdir -p $(BUILD_DIR)
+	$(BUILD_RUN) $(CONFIGURE_SCRIPT) $(REAL_CONFIGURE_ARGS)
 
 post_configure_target: $(CONFIGURE_TARGET)
 

@@ -129,8 +129,8 @@ ifeq ($(strip $(CMAKE_BASE_DIR)),)
 endif
 
 # set default build directory
-ifeq ($(strip $(CMAKE_BUILD_DIR)),)
-  CMAKE_BUILD_DIR = $(CMAKE_BASE_DIR)/build
+ifeq ($(strip $(BUILD_DIR)),)
+  BUILD_DIR = $(CMAKE_BASE_DIR)/build
 endif
 
 # Define per arch specific common options

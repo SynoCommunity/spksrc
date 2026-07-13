@@ -52,9 +52,9 @@ pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET)
 ifeq ($(filter $(NCPUS),0 1),)
-	@$(RUN) $(MAKE) $(if $(findstring -j,$(COMPILE_ARGS)),,-j$(NCPUS)) $(COMPILE_ARGS)
+	@$(BUILD_RUN) $(MAKE) $(if $(findstring -j,$(COMPILE_ARGS)),,-j$(NCPUS)) $(COMPILE_ARGS)
 else
-	@$(RUN) $(MAKE) $(COMPILE_ARGS)
+	@$(BUILD_RUN) $(MAKE) $(COMPILE_ARGS)
 endif
 
 

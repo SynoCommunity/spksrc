@@ -61,6 +61,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `GNU_CONFIGURE` | 0 | Set to 1 to use autoconf |
 | `CONFIGURE_ARGS` | | Arguments for configure script |
 | `ADDITIONAL_CONFIGURE_ARGS` | | Extra args appended after `CONFIGURE_ARGS` (autotools / CMake / Meson); for the framework invocation only |
+| `BUILD_DIR` | | Opt-in out-of-tree build directory; unset builds in-source |
 | `PRE_CONFIGURE_TARGET` | | Target to run before configure |
 | `POST_CONFIGURE_TARGET` | | Target to run after configure |
 
@@ -70,6 +71,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 |----------|---------|-------------|
 | `CMAKE_USE_TOOLCHAIN_FILE` | 1 | Use generated toolchain file |
 | `CONFIGURE_ARGS` | | Additional CMake arguments |
+| `BUILD_DIR` | `$(WORK_DIR)/$(PKG_DIR)/build` | Out-of-tree build directory |
 | `CMAKE_BUILD_TYPE` | Release | Build type |
 | `CMAKE_USE_NINJA` | | Build with Ninja instead of Make |
 | `CMAKE_USE_NASM` | | Build the native NASM assembler first |
@@ -81,6 +83,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CONFIGURE_ARGS` | | Meson options, passed to `meson setup` |
+| `BUILD_DIR` | `$(WORK_DIR)/$(PKG_DIR)/builddir` | Out-of-tree build directory |
 | `MESON_BUILD_TYPE` | release | Build type |
 
 ### Rust (Cargo)

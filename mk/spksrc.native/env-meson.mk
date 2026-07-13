@@ -9,8 +9,8 @@
 # COMPILE_ARGS / INSTALL_ARGS defaults are not applied to native meson builds.
 DEFAULT_ENV ?= meson
 
-ifeq ($(strip $(MESON_BUILD_DIR)),)
-MESON_BUILD_DIR = builddir
+ifeq ($(strip $(BUILD_DIR)),)
+BUILD_DIR = builddir
 endif
 
 # Set other build options
