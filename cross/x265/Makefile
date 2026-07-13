@@ -15,7 +15,7 @@ PRE_COMPILE_TARGET = x265_pre_compile
 CMAKE_SOURCE_DIR = source
 
 # Build directories for default, 12 and 10 bit depth
-CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)/buildAll
+BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)/buildAll
 CMAKE_BUILD_12B = $(WORK_DIR)/$(PKG_DIR)/build12bit
 CMAKE_BUILD_10B = $(WORK_DIR)/$(PKG_DIR)/build10bit
 
@@ -86,5 +86,5 @@ x265_pre_compile:
 	@$(RUN) ninja -C $(CMAKE_BUILD_12B)
 	@$(MSG) Build 10BIT libraries
 	@$(RUN) ninja -C $(CMAKE_BUILD_10B)
-	@$(RUN) ln -sf $(CMAKE_BUILD_12B)/libx265.a $(CMAKE_BUILD_DIR)/libx265_main12.a
-	@$(RUN) ln -sf $(CMAKE_BUILD_10B)/libx265.a $(CMAKE_BUILD_DIR)/libx265_main10.a
+	@$(RUN) ln -sf $(CMAKE_BUILD_12B)/libx265.a $(BUILD_DIR)/libx265_main12.a
+	@$(RUN) ln -sf $(CMAKE_BUILD_10B)/libx265.a $(BUILD_DIR)/libx265_main10.a

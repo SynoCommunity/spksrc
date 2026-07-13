@@ -71,8 +71,8 @@ include ../../mk/spksrc.cross-cmake.mk
 .PHONY: mariadb_post_install
 mariadb_post_install:
 	@cd $(WORK_DIR) && ln -s $(PKG_DIR) $(PKG_NAME)
-	install -m 755 -d $(CMAKE_BUILD_DIR)/NATIVE/bin
-	install -m 755 $(CURDIR)/mariadb_config $(CMAKE_BUILD_DIR)/NATIVE/bin
-	@sed -i -e 's%@STAGING_INSTALL_PREFIX@%$(STAGING_INSTALL_PREFIX)%g' $(CMAKE_BUILD_DIR)/NATIVE/bin/mariadb_config
-	@sed -i -e 's%@VERSION@%$(PKG_VERS)%g' $(CMAKE_BUILD_DIR)/NATIVE/bin/mariadb_config
-	@sed -i -e 's%@SOCKET@%$(MYSQL_DB_SOCKET)%g' $(CMAKE_BUILD_DIR)/NATIVE/bin/mariadb_config
+	install -m 755 -d $(BUILD_DIR)/NATIVE/bin
+	install -m 755 $(CURDIR)/mariadb_config $(BUILD_DIR)/NATIVE/bin
+	@sed -i -e 's%@STAGING_INSTALL_PREFIX@%$(STAGING_INSTALL_PREFIX)%g' $(BUILD_DIR)/NATIVE/bin/mariadb_config
+	@sed -i -e 's%@VERSION@%$(PKG_VERS)%g' $(BUILD_DIR)/NATIVE/bin/mariadb_config
+	@sed -i -e 's%@SOCKET@%$(MYSQL_DB_SOCKET)%g' $(BUILD_DIR)/NATIVE/bin/mariadb_config

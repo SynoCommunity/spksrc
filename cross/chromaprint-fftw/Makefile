@@ -17,7 +17,7 @@ DEPENDS = cross/fftw
 # compiler too old
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)
+BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)
 
 include ../../mk/spksrc.cross-cmake.mk
 

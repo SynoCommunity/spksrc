@@ -24,4 +24,4 @@ include ../../mk/spksrc.cross-cmake.mk
 .PHONY: umurmur_install
 umurmur_install:
 	install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
-	install -m 755 $(CMAKE_BUILD_DIR)/bin/umurmurd $(STAGING_INSTALL_PREFIX)/bin
+	install -m 755 $(BUILD_DIR)/bin/umurmurd $(STAGING_INSTALL_PREFIX)/bin

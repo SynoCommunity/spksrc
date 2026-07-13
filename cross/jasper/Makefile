@@ -21,6 +21,6 @@ CONFIGURE_ARGS += -DCMAKE_C_FLAGS_RELEASE="-O"
 # Avoid build dir within source:
 # The useof an in-source build is not officially supported and is 
 # therefore disallowed by default. 
-CMAKE_BUILD_DIR = $(abspath $(CMAKE_BASE_DIR)/../jasper.build)
+BUILD_DIR = $(abspath $(CMAKE_BASE_DIR)/../jasper.build)
 
 include ../../mk/spksrc.cross-cmake.mk

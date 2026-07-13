@@ -86,4 +86,4 @@ include ../../mk/spksrc.cross-cmake.mk
 
 # Requires access to:
 #   Build time (IGC/Release/CMCLTranslatorTool): 'CMCLTranslatorTool', 'elf_packager', 'vcb'
-ENV += PATH=$(CMAKE_BUILD_DIR)/IGC/$(CMAKE_BUILD_TYPE):$$PATH
+ENV += PATH=$(BUILD_DIR)/IGC/$(CMAKE_BUILD_TYPE):$$PATH
