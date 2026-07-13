@@ -9,9 +9,9 @@ HOMEPAGE = https://uriparser.github.io/
 COMMENT  = Strictly RFC 3986 compliant URI parsing and handling library written in C89 ("ANSI C").
 LICENSE  = 3-Clause BSD
 
-CMAKE_ARGS  = -DCMAKE_BUILD_TYPE=Release
-CMAKE_ARGS += -DURIPARSER_BUILD_DOCS=OFF
+CONFIGURE_ARGS  = -DCMAKE_BUILD_TYPE=Release
+CONFIGURE_ARGS += -DURIPARSER_BUILD_DOCS=OFF
 # Requires Gtest
-CMAKE_ARGS += -DURIPARSER_BUILD_TESTS=OFF
+CONFIGURE_ARGS += -DURIPARSER_BUILD_TESTS=OFF
 
 include ../../mk/spksrc.cross-cmake.mk

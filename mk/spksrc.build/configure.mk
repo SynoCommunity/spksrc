@@ -57,6 +57,12 @@ ifneq ($(strip $(GNU_CONFIGURE)),)
 endif
 REAL_CONFIGURE_ARGS += $(CONFIGURE_ARGS)
 
+# Extra args appended after CONFIGURE_ARGS on the configure command line only
+# (never set by the framework). Same extension slot as cmake/meson; lets a
+# package feed args to this invocation without polluting a CONFIGURE_ARGS it may
+# reuse for its own auxiliary configure calls.
+REAL_CONFIGURE_ARGS += $(ADDITIONAL_CONFIGURE_ARGS)
+
 configure_msg:
 	@$(MSG) "Configuring for $(NAME)"
 	@$(MSG)     - Configure ARGS: $(REAL_CONFIGURE_ARGS)

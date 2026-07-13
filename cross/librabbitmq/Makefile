@@ -12,9 +12,9 @@ HOMEPAGE = https://github.com/alanxz/rabbitmq-c
 COMMENT  = This is a C-language AMQP client library for use with v2.0+ of the RabbitMQ broker.
 LICENSE  = MIT
 
-CMAKE_ARGS  = -DCMAKE_BUILD_TYPE=Release
-CMAKE_ARGS += -DBUILD_EXAMPLES=OFF
-CMAKE_ARGS += -DBUILD_TESTING=OFF
-CMAKE_ARGS += -DBUILD_STATIC_LIBS=OFF
+CONFIGURE_ARGS  = -DCMAKE_BUILD_TYPE=Release
+CONFIGURE_ARGS += -DBUILD_EXAMPLES=OFF
+CONFIGURE_ARGS += -DBUILD_TESTING=OFF
+CONFIGURE_ARGS += -DBUILD_STATIC_LIBS=OFF
 
 include ../../mk/spksrc.cross-cmake.mk

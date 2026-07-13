@@ -15,8 +15,8 @@ HOMEPAGE = https://google.github.io/highway/
 COMMENT  = Performance-portable, length-agnostic SIMD with runtime dispatch.
 LICENSE  = Apache 2.0 / 3-Clause BSD
 
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
-CMAKE_ARGS += -DHWY_ENABLE_TESTS=OFF
-CMAKE_ARGS += -DHWY_ENABLE_EXAMPLES=OFF
+CONFIGURE_ARGS += -DBUILD_SHARED_LIBS=ON
+CONFIGURE_ARGS += -DHWY_ENABLE_TESTS=OFF
+CONFIGURE_ARGS += -DHWY_ENABLE_EXAMPLES=OFF
 
 include ../../mk/spksrc.cross-cmake.mk

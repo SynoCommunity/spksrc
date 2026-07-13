@@ -156,7 +156,7 @@ This will run:
 ### CMake
 
 ```makefile
-CMAKE_ARGS = -DBUILD_SHARED_LIBS=ON
+CONFIGURE_ARGS = -DBUILD_SHARED_LIBS=ON
 
 include ../../mk/spksrc.cross-cmake.mk
 ```

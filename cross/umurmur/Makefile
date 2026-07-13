@@ -15,9 +15,9 @@ LICENSE  = 3-clause BSD
 # 'cmake install' does not handle INSTALL_PREFIX/DESTDIR as expected.
 INSTALL_TARGET = umurmur_install
 
-CMAKE_ARGS = -DSSL=mbedtls
+CONFIGURE_ARGS = -DSSL=mbedtls
 # let cmake find include and library of mbedtls
-CMAKE_ARGS += -DCMAKE_STAGING_PREFIX=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += -DCMAKE_STAGING_PREFIX=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cmake.mk
 

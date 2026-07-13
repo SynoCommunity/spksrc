@@ -17,6 +17,6 @@ LICENSE  = MIT
 
 GNU_CONFIGURE = 1
 
-CMAKE_ARGS += -DBUILD_TESTING=OFF
+CONFIGURE_ARGS += -DBUILD_TESTING=OFF
 
 include ../../mk/spksrc.cross-cmake.mk

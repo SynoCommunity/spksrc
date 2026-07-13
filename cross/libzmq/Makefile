@@ -21,7 +21,7 @@ ADDITIONAL_CXXFLAGS += -lrt
 endif
 
 # Build ZeroMQ with encryption support
-CMAKE_ARGS += -DWITH_LIBSODIUM=ON
+CONFIGURE_ARGS += -DWITH_LIBSODIUM=ON
 
 # Disable benchmarking performance tools
-CMAKE_ARGS += -DWITH_PERF_TOOL=OFF
+CONFIGURE_ARGS += -DWITH_PERF_TOOL=OFF

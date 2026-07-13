@@ -92,7 +92,7 @@ cmake_configure_target: cmake_generate_toolchain_file
 	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
 	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
 	@$(RUN) rm -rf CMakeCache.txt CMakeFiles
-	$(RUN) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS) $(CMAKE_DIR)
+	$(RUN) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
 

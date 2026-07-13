@@ -18,7 +18,7 @@ REQUIRED_MIN_SRM = 1.3
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DVVENC_ENABLE_ARM_SIMD=FALSE
+CONFIGURE_ARGS += -DVVENC_ENABLE_ARM_SIMD=FALSE
 endif
 
 include ../../mk/spksrc.cross-cmake.mk

@@ -14,15 +14,15 @@ BUILD_DEPENDS = cross/Khronos-SPIRV-Headers
 
 POST_EXTRACT_TARGET = SPIRV-Tools_post_extract_target
 
-CMAKE_ARGS += -DSPIRV_WERROR=OFF
-CMAKE_ARGS += -DSPIRV_TOOLS_BUILD_STATIC=OFF
-CMAKE_ARGS += -DSPIRV-Headers_SOURCE_DIR=$(WORK_DIR)/SPIRV-Headers
+CONFIGURE_ARGS += -DSPIRV_WERROR=OFF
+CONFIGURE_ARGS += -DSPIRV_TOOLS_BUILD_STATIC=OFF
+CONFIGURE_ARGS += -DSPIRV-Headers_SOURCE_DIR=$(WORK_DIR)/SPIRV-Headers
 
 include ../../mk/spksrc.common.mk
 
 # std::filesystem integration to libstdc++ >= GCC 9
 ifeq ($(call version_lt, $(TC_GCC), 9),1)
-CMAKE_ARGS += -DCMAKE_CXX_STANDARD_LIBRARIES=-lstdc++fs
+CONFIGURE_ARGS += -DCMAKE_CXX_STANDARD_LIBRARIES=-lstdc++fs
 endif
 
 include ../../mk/spksrc.cross-cmake.mk

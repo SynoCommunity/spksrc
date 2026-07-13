@@ -17,9 +17,9 @@ HOMEPAGE = https://www.mosquitto.org/
 COMMENT  = Eclipse Mosquitto is an open source (EPL/EDL licensed) message broker that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
 LICENSE  = EPL 1.0 and EDL 1.0
 
-CMAKE_ARGS += -DWITH_WEBSOCKETS=ON
-CMAKE_ARGS += -DWITH_SRV=ON
-CMAKE_ARGS += -DDOCUMENTATION=OFF
+CONFIGURE_ARGS += -DWITH_WEBSOCKETS=ON
+CONFIGURE_ARGS += -DWITH_SRV=ON
+CONFIGURE_ARGS += -DDOCUMENTATION=OFF
 
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt,$(TC_GCC),5),1)
