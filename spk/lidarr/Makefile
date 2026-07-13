@@ -1,6 +1,6 @@
 SPK_NAME = lidarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 17
+SPK_REV = 18
 SPK_ICON = src/lidarr.png
 
 OPTIONAL_DEPENDS = cross/libstdc++ cross/libe_sqlite3
@@ -12,7 +12,7 @@ DOTNET_CORE_ARCHS = 1
 MAINTAINER = Team Lidarr
 MAINTAINER_URL = https://lidarr.audio/
 DESCRIPTION  = Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
-CHANGELOG = "1. Update Lidarr to v3.1.0.4875."
+CHANGELOG = "1. Update Lidarr to v3.1.0.4875. 2. Dynamic update method: allow built-in auto-updates on DSM 7.2+."
 DISPLAY_NAME = Lidarr
 HOMEPAGE = https://lidarr.audio/
 LICENSE  = GPLv3
@@ -45,8 +45,6 @@ ifeq ($(call version_lt, ${TCVERSION}, 7.2),1)
 # Use libe_sqlite3 built for GLIBC 2.20–2.26 (DSM 6–7.1) instead of upstream ≥ 2.28
 DEPENDS += cross/libe_sqlite3
 POST_STRIP_TARGET += lidarr_custom_libe_sqlite3
-# Disable auto-update for DSM < 7.2
-LIDARR_UPDATE = disabled
 endif
 
 POST_STRIP_TARGET += lidarr_extra_install
@@ -67,7 +65,3 @@ lidarr_extra_install:
 	@install -m 755 -d $(STAGING_DIR)/var/.config/Lidarr
 	@install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Lidarr/config.xml
 	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Lidarr/package_info
-	@if [ "$(LIDARR_UPDATE)" = "disabled" ]; then \
-		$(MSG) "Disable auto-update in package_info." ; \
-		echo "UpdateMethod=External" >> $(STAGING_DIR)/share/Lidarr/package_info ; \
-	fi
