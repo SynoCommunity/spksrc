@@ -141,12 +141,17 @@ ADDITIONAL_LDFLAGS = -Wl,-rpath,/var/packages/mypackage/target/lib
 
 ### Compile and Install Arguments
 
-`COMPILE_ARGS` and `INSTALL_ARGS` carry extra arguments for the compile and install steps across every build system. For autotools / plain GNU make each is the make command (`INSTALL_ARGS` defaults to `install DESTDIR=… prefix=…` when unset); for CMake and Meson they are appended as-is to `cmake --build` / `cmake --install` and `ninja` / `ninja install` respectively.
+`COMPILE_ARGS` and `INSTALL_ARGS` carry extra arguments for the compile and install steps across every build system. For autotools / plain GNU make each is the make command; for CMake and Meson they are appended as-is to `cmake --build` / `cmake --install` and `ninja` / `ninja install` respectively.
+
+On the classic gnu-make build path only (not CMake or Meson) both variables have a sensible default when a package leaves them unset, so package-specific make routines can reference them directly:
+
+- `COMPILE_ARGS` defaults to `-j$(NCPUS)` (parallel jobs).
+- `INSTALL_ARGS` defaults to `install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)`.
 
 | Variable | Description |
 |----------|-------------|
-| `COMPILE_ARGS` | Extra arguments for the compile step (make / cmake --build / ninja) |
-| `INSTALL_ARGS` | Extra arguments for the install step (make / cmake --install / ninja install) |
+| `COMPILE_ARGS` | Extra arguments for the compile step (make / cmake --build / ninja); defaults to `-j$(NCPUS)` on the make path |
+| `INSTALL_ARGS` | Extra arguments for the install step (make / cmake --install / ninja install); defaults to `install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)` on the make path |
 | `INSTALL_TARGET` | Make target for installation (default: install) |
 
 ```makefile

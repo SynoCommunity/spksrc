@@ -35,6 +35,16 @@ INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)install_done
 INSTALL_PLIST = $(WORK_DIR)/$(PKG_NAME).plist
 PRE_INSTALL_PLIST = $(INSTALL_PLIST).tmp
 
+# Sensible default for the classic gnu-make install path only: the standard
+# make install command. Excluded for cmake/meson (via DEFAULT_ENV) and for the
+# python pip / meson-python installers, whose *_python_* INSTALL_TARGET reads
+# INSTALL_ARGS itself. Gives INSTALL_ARGS a usable value so package-specific
+# make routines can reference $(INSTALL_ARGS) directly.
+ifeq ($(filter cmake meson,$(DEFAULT_ENV)),)
+ifeq ($(findstring python,$(INSTALL_TARGET)),)
+INSTALL_ARGS ?= install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+endif
+endif
 
 # Define find search path for creating plist
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
@@ -75,7 +85,7 @@ $(PRE_INSTALL_PLIST):
 pre_install_target: install_msg_target $(PRE_INSTALL_PLIST)
 
 install_target: $(PRE_INSTALL_TARGET)
-	$(RUN) $(MAKE) $(if $(strip $(INSTALL_ARGS)),$(INSTALL_ARGS),install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX))
+	$(RUN) $(MAKE) $(INSTALL_ARGS)
 
 post_install_target: $(INSTALL_TARGET)
 ifeq ($(strip $(GCC_NO_DEBUG_INFO)),1)

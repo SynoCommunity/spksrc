@@ -101,7 +101,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `ADDITIONAL_LDFLAGS` | Extra linker flags |
 | `ADDITIONAL_RUSTFLAGS` | Extra Rust compiler flags |
 | `ADDITIONAL_EXTRACTFLAGS` | Extra parameters for the extract command |
-| `COMPILE_ARGS` | Extra arguments for the compile step: the make command for autotools / plain GNU make, appended as-is to `cmake --build` and `ninja` |
+| `COMPILE_ARGS` | Extra arguments for the compile step: the make command for autotools / plain GNU make (defaults to `-j$(NCPUS)`), appended as-is to `cmake --build` and `ninja` |
 | `COMPILE_TARGET` | Override default compile target |
 | `PRE_COMPILE_TARGET` | Target to run before compile |
 | `POST_COMPILE_TARGET` | Target to run after compile |

@@ -18,6 +18,14 @@
 
 COMPILE_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)compile_done
 
+# Sensible default for the classic gnu-make build path only (not cmake/meson,
+# selected via DEFAULT_ENV): parallel jobs. This gives COMPILE_ARGS a usable
+# value so package-specific make routines can simply reference $(COMPILE_ARGS)
+# and inherit -j (e.g. cross/cairo-1.16, cross/glibc-*).
+ifeq ($(filter cmake meson,$(DEFAULT_ENV)),)
+COMPILE_ARGS ?= $(if $(filter $(NCPUS),0 1),,-j$(NCPUS))
+endif
+
 ifeq ($(strip $(PRE_COMPILE_TARGET)),)
 PRE_COMPILE_TARGET = pre_compile_target
 else
@@ -44,7 +52,7 @@ pre_compile_target: compile_msg
 
 compile_target:  $(PRE_COMPILE_TARGET)
 ifeq ($(filter $(NCPUS),0 1),)
-	@$(RUN) $(MAKE) -j$(NCPUS) $(COMPILE_ARGS)
+	@$(RUN) $(MAKE) $(if $(findstring -j,$(COMPILE_ARGS)),,-j$(NCPUS)) $(COMPILE_ARGS)
 else
 	@$(RUN) $(MAKE) $(COMPILE_ARGS)
 endif

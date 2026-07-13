@@ -37,5 +37,5 @@ cairo_compile:
 .PHONY: cairo_install
 cairo_install:
 	@$(MSG) Install without building tests
-	@$(RUN) $(MAKE) -C src  install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
-	@$(RUN) $(MAKE) -C util install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+	@$(RUN) $(MAKE) -C src  $(INSTALL_ARGS)
+	@$(RUN) $(MAKE) -C util $(INSTALL_ARGS)

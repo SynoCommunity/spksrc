@@ -5,6 +5,10 @@
 #
 ###############################################################################
 
+# Declare the build system (mirrors the cross env-cmake.mk) so the gnu-make
+# COMPILE_ARGS / INSTALL_ARGS defaults are not applied to native cmake builds.
+DEFAULT_ENV ?= cmake
+
 ifeq ($(strip $(filter -DCMAKE_BUILD_TYPE=%,$(CONFIGURE_ARGS))),)
 CONFIGURE_ARGS += -DCMAKE_BUILD_TYPE=Release
 endif
