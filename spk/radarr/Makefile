@@ -1,6 +1,6 @@
 SPK_NAME = radarr
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 26
+SPK_REV = 27
 SPK_ICON = src/radarr.png
 
 OPTIONAL_DEPENDS = cross/libstdc++ cross/libe_sqlite3
@@ -12,7 +12,7 @@ DOTNET_CORE_ARCHS = 1
 MAINTAINER = Team Radarr
 MAINTAINER_URL = https://radarr.video/
 DESCRIPTION = Radarr is a movie collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new movies and will interface with clients and indexers to grab, sort, and rename them. It can also be configured to automatically upgrade the quality of existing files in the library when a better quality format becomes available.
-CHANGELOG = "1. Update Radarr to v6.2.1.10461."
+CHANGELOG = "1. Dynamically set UpdateMethod based on DSM version, enabling self-update on DSM 7.2+."
 DISPLAY_NAME = Radarr
 HOMEPAGE = https://radarr.video/
 LICENSE = GPLv3
@@ -45,8 +45,6 @@ ifeq ($(call version_lt, ${TCVERSION}, 7.2),1)
 # Use libe_sqlite3 built for GLIBC 2.20–2.26 (DSM 6–7.1) instead of upstream ≥ 2.28
 DEPENDS += cross/libe_sqlite3
 POST_STRIP_TARGET += radarr_custom_libe_sqlite3
-# Disable auto-update for DSM < 7.2
-RADARR_UPDATE = disabled
 endif
 
 POST_STRIP_TARGET += radarr_extra_install
@@ -67,7 +65,3 @@ radarr_extra_install:
 	@install -m 755 -d $(STAGING_DIR)/var/.config/Radarr
 	@install -m 644 src/config.xml $(STAGING_DIR)/var/.config/Radarr/config.xml
 	@echo "PackageVersion=$(PACKAGE_VERSION)\nPackageAuthor=$(PACKAGE_AUTHOR)" > $(STAGING_DIR)/share/Radarr/package_info
-	@if [ "$(RADARR_UPDATE)" = "disabled" ]; then \
-		$(MSG) "Disable auto-update in package_info." ; \
-		echo "UpdateMethod=External" >> $(STAGING_DIR)/share/Radarr/package_info ; \
-	fi

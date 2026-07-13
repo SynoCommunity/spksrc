@@ -23,22 +23,41 @@ SVC_BACKGROUND=y
 SVC_WAIT_TIMEOUT=90
 
 internal_update_supported() {
-    info_file="${SYNOPKG_PKGINST_TEMP_DIR}/share/Radarr/package_info"
+    # DSM >= 7.2: Radarr can self-update (upstream libe_sqlite3.so is GLIBC 2.28+ compatible)
+    # DSM < 7.2: Radarr cannot self-update (custom libe_sqlite3.so must be preserved)
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -gt 7 ] || \
+       { [ "${SYNOPKG_DSM_VERSION_MAJOR}" -eq 7 ] && [ "${SYNOPKG_DSM_VERSION_MINOR}" -ge 2 ]; }; then
+        return 0    # Supported
+    else
+        return 1    # Not supported
+    fi
+}
 
-    # If the file doesn't exist, assume update is supported
+configure_update_method() {
+    # Dynamically set UpdateMethod in package_info based on DSM version.
+    # Package is built without UpdateMethod so the default is BuiltIn.
+    # On DSM < 7.2 we must block Radarr's self-updater because it would
+    # overwrite the custom libe_sqlite3.so (built for GLIBC 2.20–2.26)
+    # with the upstream version requiring GLIBC >= 2.28, causing a crash.
+    local info_file="${SYNOPKG_PKGDEST}/share/Radarr/package_info"
     [ -f "$info_file" ] || return 0
 
-    # If the file contains "UpdateMethod=External", updates are NOT supported
-    if grep -q '^UpdateMethod=External' "$info_file" 2>/dev/null; then
-        return 1    # Not supported
+    if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -gt 7 ] || \
+       { [ "${SYNOPKG_DSM_VERSION_MAJOR}" -eq 7 ] && [ "${SYNOPKG_DSM_VERSION_MINOR}" -ge 2 ]; }; then
+        # DSM >= 7.2: remove External so Radarr defaults to BuiltIn
+        sed -i '/^UpdateMethod=External$/d' "$info_file"
     else
-        return 0    # Supported
+        # DSM < 7.2: ensure External is set
+        grep -q '^UpdateMethod=External' "$info_file" 2>/dev/null || \
+            echo "UpdateMethod=External" >> "$info_file"
     fi
 }
 
 service_postinst ()
 {
     if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
+        configure_update_method
+
         if internal_update_supported; then
             # Make Radarr do an update check on start to avoid possible Radarr
             # downgrade when synocommunity package is updated
@@ -82,6 +101,8 @@ service_postupgrade ()
         # prevent overwrite of updated package_info
         rsync -aX --exclude=package_info "${SYNOPKG_TEMP_UPGRADE_FOLDER}/backup/share/" "${SYNOPKG_PKGDEST}/share" 2>&1
     fi
+
+    configure_update_method
 
     if [ "${SYNOPKG_DSM_VERSION_MAJOR}" -lt 7 ]; then
         set_unix_permissions "${SYNOPKG_PKGDEST}/share"
