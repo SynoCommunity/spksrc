@@ -23,7 +23,9 @@ ifneq ($(DEPENDENCY_WALK),1)
 # required for packages that have folder name different to SPK_NAME (sonarr -> nzbget, mono_58 -> mono)
 SPK_FOLDER = $(notdir $(CURDIR))
 
-ifneq ($(wildcard BROKEN),)
+# A package is disabled by dropping a BROKEN or DISABLED file in its folder
+# (both are treated identically).
+ifneq ($(strip $(wildcard BROKEN) $(wildcard DISABLED)),)
   ifneq ($(BUILD_UNSUPPORTED_FILE),)
     $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Broken package >> $(BUILD_UNSUPPORTED_FILE))
   endif
