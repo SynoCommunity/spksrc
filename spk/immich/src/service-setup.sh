@@ -38,7 +38,7 @@ service_prestart()
     export DB_PORT=5433
     export DB_USERNAME=immich
     export REDIS_HOSTNAME=localhost
-    export PATH="/var/packages/ffmpeg7/target/bin:${PATH}"
+    export PATH="/var/packages/ffmpeg8/target/bin:${PATH}"
 
     SERVICE_COMMAND="${NODE} ${SERVER_LAUNCHER}"
 
