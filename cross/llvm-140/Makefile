@@ -22,7 +22,7 @@ DEPENDS = cross/zlib
 # -----------------------------------------------------------------------------
 # Directories
 # -----------------------------------------------------------------------------
-CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_NAME).build
+BUILD_DIR = $(WORK_DIR)/$(PKG_NAME).build
 CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 LLVM_BIN_DIR = $(abspath $(PWD)/../../native/llvm-14.0/work-native/install/usr/local/bin)
 

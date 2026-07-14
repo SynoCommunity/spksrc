@@ -22,6 +22,20 @@
 #     themselves, so plist stays under spksrc.build/ as a build-pipeline step.
 ###############################################################################
 
+# Out-of-tree build directory support. cmake and meson always build in a
+# separate $(BUILD_DIR) (provided by their env files). The autotools / plain
+# GNU make path builds in-source by default and opts in to an out-of-tree build
+# by setting BUILD_DIR: the make steps then run from it via BUILD_RUN, with the
+# configure script invoked from the source tree. Empty BUILD_DIR keeps the
+# historical in-source build.
+ifneq ($(strip $(BUILD_DIR)),)
+BUILD_RUN        = cd $(BUILD_DIR) && env $(ENV)
+CONFIGURE_SCRIPT = $(WORK_DIR)/$(PKG_DIR)/configure
+else
+BUILD_RUN        = $(RUN)
+CONFIGURE_SCRIPT = ./configure
+endif
+
 include ../../mk/spksrc.build/download.mk
 
 checksum: download

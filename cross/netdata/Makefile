@@ -67,11 +67,11 @@ netdata_compile:
 	fi
 	@$(MSG) Patching protobuf rules for native protoc
 	@PROTOC=$$(realpath $(WORK_DIR)/../../../native/protoc_33/work-native/bin/protoc 2>/dev/null); \
-	NINJA=$(CMAKE_BUILD_DIR)/build.ninja; \
+	NINJA=$(BUILD_DIR)/build.ninja; \
 	if [ -n "$$PROTOC" ] && [ -f "$$NINJA" ]; then \
 		sed -i "s|protobuf::protoc|$$PROTOC|g" $$NINJA; \
 		sed -i '/protoc/s|-I\([^ ]*\)/src/aclk/aclk-schemas[[:space:]]|-I\1/src/aclk/aclk-schemas/proto |g' $$NINJA; \
 		sed -i '/protoc/s|--cpp_out=\([^ ]*\)/src/aclk/aclk-schemas[[:space:]]|--cpp_out=\1/src/aclk/aclk-schemas/proto |g' $$NINJA; \
 		sed -i '/INCLUDES.*src\/aclk\/aclk-schemas/s|\(-I[^ ]*src/aclk/aclk-schemas\)\([[:space:]]\)|\1\2\1/proto\2|g' $$NINJA; \
 	fi
-	$(RUN) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	$(RUN) cmake --build $(BUILD_DIR) -j $(NCPUS)

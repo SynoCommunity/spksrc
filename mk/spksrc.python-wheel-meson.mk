@@ -98,7 +98,7 @@ build_meson_python_wheel:
 	   $$(which cross-python) -m build -w -n -x . \
 	   $(foreach arg,$(CONFIGURE_ARGS),-Csetup-args=\"$(arg)\" ) \
 	   $(foreach arg,$(INSTALL_ARGS),-Cinstall-args=\"$(arg)\" ) \
-	   -Cbuilddir=\"$(MESON_BUILD_DIR)\" \
+	   -Cbuilddir=\"$(BUILD_DIR)\" \
 	   --outdir $(WHEELHOUSE) \
 	   --verbose ; \
 	cd $(MESON_BASE_DIR) && env $(ENV_MESON) \
@@ -107,7 +107,7 @@ build_meson_python_wheel:
 	   $$(which cross-python) -m build -w -n -x . \
 	   $(foreach arg,$(CONFIGURE_ARGS),-Csetup-args="$(arg)" ) \
 	   $(foreach arg,$(INSTALL_ARGS),-Cinstall-args="$(arg)" ) \
-	   -Cbuilddir="$(MESON_BUILD_DIR)" \
+	   -Cbuilddir="$(BUILD_DIR)" \
 	   --outdir $(WHEELHOUSE) \
 	   --verbose ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false

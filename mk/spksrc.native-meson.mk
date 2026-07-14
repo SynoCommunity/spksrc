@@ -52,10 +52,10 @@ include ../../mk/spksrc.build/ninja.mk
 meson_configure_target:
 	@$(MSG) - Meson configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
-	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
+	@$(MSG)    - Build path = $(BUILD_DIR)
 	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
 
 #####
 

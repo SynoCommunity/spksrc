@@ -14,10 +14,7 @@ ENV += PKG_CONFIG=/usr/bin/pkg-config
 # CMake - begin
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
 
-# Set default build directory
-ifeq ($(strip $(NINJA_BUILD_DIR)),)
-NINJA_BUILD_DIR = $(CMAKE_BUILD_DIR)
-endif
+# BUILD_DIR is already provided by env-cmake.mk / env-meson.mk
 
 # set default use destdir
 ifeq ($(strip $(NINJA_USE_DESTDIR)),)
@@ -35,8 +32,7 @@ endif
 # Meson - begin (default)
 else
 
-# Set default build directory
-NINJA_BUILD_DIR = $(MESON_BUILD_DIR)
+# BUILD_DIR is already provided by env-meson.mk
 # set default use destdir
 NINJA_USE_DESTDIR = 1
 # set default destdir directory
@@ -69,11 +65,11 @@ endif
 # default ninja compile:
 ninja_compile_target:
 	@$(MSG) - Ninja compile
-	@$(MSG)    - Ninja build path = $(NINJA_BUILD_DIR)
+	@$(MSG)    - Ninja build path = $(BUILD_DIR)
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 endif
-	$(RUN) ninja -C $(NINJA_BUILD_DIR) $(COMPILE_ARGS)
+	$(RUN) ninja -C $(BUILD_DIR) $(COMPILE_ARGS)
 
 .PHONY: ninja_install_target
 
@@ -83,9 +79,9 @@ ninja_install_target:
 	@$(MSG)    - Ninja installation path = $(NINJA_DESTDIR)
 	@$(MSG)    - Ninja use DESTDIR = $(NINJA_USE_DESTDIR)
 ifeq ($(strip $(NINJA_USE_DESTDIR)),0)
-	$(RUN) ninja -C $(NINJA_BUILD_DIR) install $(INSTALL_ARGS)
+	$(RUN) ninja -C $(BUILD_DIR) install $(INSTALL_ARGS)
 else
-	$(RUN) DESTDIR=$(NINJA_DESTDIR) ninja -C $(NINJA_BUILD_DIR) install $(INSTALL_ARGS)
+	$(RUN) DESTDIR=$(NINJA_DESTDIR) ninja -C $(BUILD_DIR) install $(INSTALL_ARGS)
 endif
 
 .PHONY: ninja_post_install_target
@@ -93,6 +89,6 @@ endif
 # default ninja post-install: clean
 ninja_post_install_target:
 	@$(MSG) - Ninja post-install \(clean\)
-	-$(RUN) ninja -C $(NINJA_BUILD_DIR) clean || true
-	$(RUN) rm -f $(NINJA_BUILD_DIR)/build.ninja
-	$(RUN) rm -f $(NINJA_BUILD_DIR)/compile_commands.json
+	-$(RUN) ninja -C $(BUILD_DIR) clean || true
+	$(RUN) rm -f $(BUILD_DIR)/build.ninja
+	$(RUN) rm -f $(BUILD_DIR)/compile_commands.json

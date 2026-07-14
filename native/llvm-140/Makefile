@@ -18,7 +18,7 @@ BUILD_DEPENDS += cross/llvm-project-140.src
 # -----------------------------------------------------------------------------
 # Directories
 # -----------------------------------------------------------------------------
-CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_NAME).build
+BUILD_DIR = $(WORK_DIR)/$(PKG_NAME).build
 CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 
 # -----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 # -----------------------------------------------------------------------------
 POST_INSTALL_TARGET = llvm_post_install_target
 llvm_post_install_target:
-	$(RUN) install -m 755 $(CMAKE_BUILD_DIR)/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
+	$(RUN) install -m 755 $(BUILD_DIR)/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
 
 # -----------------------------------------------------------------------------
 # CMake arguments

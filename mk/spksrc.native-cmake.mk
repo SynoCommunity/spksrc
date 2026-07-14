@@ -70,18 +70,18 @@ cmake_configure_target:
 	@$(MSG)    - Use NASM = $(CMAKE_USE_NASM)
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
-	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
+	@$(MSG)    - Path BUILD_DIR = $(BUILD_DIR)
 	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
 	$(RUN) rm -rf CMakeCache.txt CMakeFiles
-	$(RUN) mkdir --parents $(CMAKE_BUILD_DIR)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS) $(CMAKE_DIR)
+	$(RUN) mkdir --parents $(BUILD_DIR)
+	cd $(BUILD_DIR) && env $(ENV) cmake -S $(CMAKE_SOURCE_DIR) -B $(BUILD_DIR) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
 
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS) $(COMPILE_ARGS)
+	env $(ENV) cmake --build $(BUILD_DIR) -j $(NCPUS) $(COMPILE_ARGS)
 
 .PHONY: cmake_install_target
 
@@ -89,9 +89,9 @@ cmake_compile_target:
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install $(INSTALL_ARGS)
+	cd $(BUILD_DIR) && env $(ENV) $(MAKE) install $(INSTALL_ARGS)
 else
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR) $(INSTALL_ARGS)
+	cd $(BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR) $(INSTALL_ARGS)
 endif
 
 #####
