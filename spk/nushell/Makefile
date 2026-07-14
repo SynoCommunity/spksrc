@@ -1,6 +1,6 @@
 SPK_NAME = nushell
-SPK_VERS = 0.109.1
-SPK_REV = 2
+SPK_VERS = 0.112.2
+SPK_REV = 3
 SPK_ICON = src/nushell.png
 
 DEPENDS = cross/nushell
@@ -11,7 +11,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = A new type of shell. This package includes the nushell plugins 'inc' 'polars' 'gstat' 'formats' and 'query' and a script 'nu_install_plugins.sh'.
 DISPLAY_NAME = nu
 STARTABLE = no
-CHANGELOG = "Update Nushell to 0.109.1"
+CHANGELOG = "1. Update Nushell to 0.112.2.<br/>2. Pin the bundled plugins to the same version as the shell."
 
 HOMEPAGE = https://www.nushell.sh/
 LICENSE = MIT
