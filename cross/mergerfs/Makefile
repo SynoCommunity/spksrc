@@ -16,7 +16,7 @@ CONFIGURE_TARGET = nop
 PRE_COMPILE_TARGET = mergerfs_pre_compile
 
 # needs uppercase PREFIX
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
 

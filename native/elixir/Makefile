@@ -19,7 +19,7 @@ DISABLE_PARALLEL_MAKE = 1
 ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
 
 CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 
 # REMARKS: 
 # build fails in native/elixir folder due to ERLANG_BIN_DIR, 

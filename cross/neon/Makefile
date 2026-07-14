@@ -22,7 +22,7 @@ CONFIGURE_ARGS += --with-ssl=openssl
 PRE_CONFIGURE_TARGET = neon_pre_configure
 POST_INSTALL_TARGET = neon_post_install
 
-INSTALL_MAKE_OPTIONS = install-lib install-headers install-config DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+INSTALL_ARGS = install-lib install-headers install-config DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk
 

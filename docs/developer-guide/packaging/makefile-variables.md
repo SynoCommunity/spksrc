@@ -139,19 +139,24 @@ ADDITIONAL_CFLAGS = -O3 -DNDEBUG
 ADDITIONAL_LDFLAGS = -Wl,-rpath,/var/packages/mypackage/target/lib
 ```
 
-### Make Options
+### Compile and Install Arguments
 
-These apply to the **autotools / plain GNU make** build path only (`spksrc.build/compile.mk` / `spksrc.build/install.mk`). CMake builds with `cmake --build` and Meson with `ninja`, so neither reads these.
+`COMPILE_ARGS` and `INSTALL_ARGS` carry extra arguments for the compile and install steps across every build system. For autotools / plain GNU make each is the make command; for CMake and Meson they are appended as-is to `cmake --build` / `cmake --install` and `ninja` / `ninja install` respectively.
+
+On the classic gnu-make build path only (not CMake or Meson) both variables have a sensible default when a package leaves them unset, so package-specific make routines can reference them directly:
+
+- `COMPILE_ARGS` defaults to `-j$(NCPUS)` (parallel jobs).
+- `INSTALL_ARGS` defaults to `install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)`.
 
 | Variable | Description |
 |----------|-------------|
-| `COMPILE_MAKE_OPTIONS` | Extra arguments passed to `make` at compile |
-| `INSTALL_MAKE_OPTIONS` | Extra arguments passed to `make` at install |
+| `COMPILE_ARGS` | Extra arguments for the compile step (make / cmake --build / ninja); defaults to `-j$(NCPUS)` on the make path |
+| `INSTALL_ARGS` | Extra arguments for the install step (make / cmake --install / ninja install); defaults to `install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)` on the make path |
 | `INSTALL_TARGET` | Make target for installation (default: install) |
 
 ```makefile
-COMPILE_MAKE_OPTIONS = V=1
-INSTALL_TARGET = install-strip
+COMPILE_ARGS = V=1
+INSTALL_ARGS = install-strip DESTDIR=$(INSTALL_DIR)
 ```
 
 ## Service Configuration

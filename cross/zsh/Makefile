@@ -32,7 +32,7 @@ else
 	BUILD_MSG = "Building zsh with dynamically linked modules."
 endif
 
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 

@@ -5,6 +5,10 @@
 #
 ###############################################################################
 
+# Declare the build system (mirrors the cross env-meson.mk) so the gnu-make
+# COMPILE_ARGS / INSTALL_ARGS defaults are not applied to native meson builds.
+DEFAULT_ENV ?= meson
+
 ifeq ($(strip $(MESON_BUILD_DIR)),)
 MESON_BUILD_DIR = builddir
 endif

@@ -20,7 +20,7 @@ HOMEPAGE = https://github.com/prometheus/node_exporter
 COMMENT  = Prometheus exporter for hardware and OS metrics exposed by *NIX kernels.
 LICENSE  = Apache 2.0
 
-COMPILE_MAKE_OPTIONS += build
+COMPILE_ARGS += build
 
 CGO_ENABLED = 1
 GO_BIN_DIR = $(WORK_DIR)/$(PKG_DIR)/$(PKG_NAME)

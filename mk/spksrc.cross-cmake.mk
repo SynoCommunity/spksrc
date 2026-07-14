@@ -99,7 +99,7 @@ cmake_configure_target: cmake_generate_toolchain_file
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	$(RUN) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	$(RUN) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS) $(COMPILE_ARGS)
 
 .PHONY: cmake_install_target
 
@@ -107,9 +107,9 @@ cmake_compile_target:
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
-	$(RUN) cmake --install $(CMAKE_BUILD_DIR)
+	$(RUN) cmake --install $(CMAKE_BUILD_DIR) $(INSTALL_ARGS)
 else
-	$(RUN) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR)
+	$(RUN) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR) $(INSTALL_ARGS)
 endif
 
 .PHONY: cmake_post_install_target

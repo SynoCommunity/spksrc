@@ -14,7 +14,7 @@ COMMENT  = TLS/SSL and crypto library.
 LICENSE  = Apache-2.0
 
 CONFIGURE_TARGET = openssl3_configure
-INSTALL_MAKE_OPTIONS = install_sw DESTDIR=$(INSTALL_DIR)
+INSTALL_ARGS = install_sw DESTDIR=$(INSTALL_DIR)
 
 CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --openssldir=$(OPENSSL_DATA_DIR)

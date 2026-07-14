@@ -81,7 +81,7 @@ cmake_configure_target:
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	env $(ENV) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS) $(COMPILE_ARGS)
 
 .PHONY: cmake_install_target
 
@@ -89,9 +89,9 @@ cmake_compile_target:
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install $(INSTALL_ARGS)
 else
-	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR)
+	cd $(CMAKE_BUILD_DIR) && env $(ENV) $(MAKE) install DESTDIR=$(CMAKE_DESTDIR) $(INSTALL_ARGS)
 endif
 
 #####
