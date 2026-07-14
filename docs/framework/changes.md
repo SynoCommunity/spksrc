@@ -8,6 +8,45 @@ entry is collapsed to its date and title; expand it (▸) for what changed, why,
 and a link to the pull request. Efforts that span several pull requests are a
 single entry with the individual PRs nested inside.
 
+## Highlights — the short version
+
+If you only read one thing, read this. The details are in the dated log below.
+
+- **`make help` knows your package.** Run it inside any package directory for a
+  context-aware list of the targets and variables that actually apply there:
+
+    ```bash
+    cd cross/curl && make help
+    ```
+
+- **Every build system uses the same variable names now.** CMake no longer has
+  its own `CMAKE_ARGS`: pass configure options through **`CONFIGURE_ARGS`** for
+  autotools, CMake *and* Meson alike. Compile and install options are likewise
+  unified on **`COMPILE_ARGS`** and **`INSTALL_ARGS`** (the old
+  `COMPILE_MAKE_OPTIONS` / `INSTALL_MAKE_OPTIONS` are gone). See
+  [Build System Selection](../developer-guide/packaging/makefile-variables.md#build-system-selection)
+  and
+  [Compile and Install Arguments](../developer-guide/packaging/makefile-variables.md#compile-and-install-arguments).
+
+- **A build directory is one variable.** `CMAKE_BUILD_DIR` / `MESON_BUILD_DIR` /
+  `NINJA_BUILD_DIR` are unified on **`BUILD_DIR`**, which also opts an autotools
+  package into an out-of-tree build.
+
+- **Flaky download host? Add a mirror.** Set **`PKG_DIST_MIRRORS`** to one or
+  more fallback base URLs; each is tried in turn and still checked against
+  `digests`. See
+  [Source downloads and mirrors](../developer-guide/packaging/makefile-variables.md#source-downloads-and-mirrors).
+
+- **`include ../../mk/spksrc.common.mk` before any macro call.** The
+  `version_*` macros (and friends) are only defined once `spksrc.common.mk` is
+  included, so a Makefile must include it **before** the first `version_ge`,
+  `version_lt`, … it uses.
+
+- **Turning a package off? Prefer `DISABLED` over `BROKEN`.** A `DISABLED` file
+  in a package folder skips it exactly like `BROKEN`, but reads as an
+  intentional choice rather than a failure. Put the reason in the file. See the
+  [package lifecycle](../contributing/package-lifecycle.md) guide.
+
 ---
 
 ??? note "July 13th 2026 — Build-variable standardization (3 PRs)"
@@ -110,30 +149,92 @@ single entry with the individual PRs nested inside.
       [Source downloads and mirrors](../developer-guide/packaging/makefile-variables.md#source-downloads-and-mirrors).
     - Pull request: [#7254](https://github.com/SynoCommunity/spksrc/pull/7254)
 
-??? note "July 1st 2026 — `spksrc.cross-virtual.mk` rename (#7251)"
-    Renamed `spksrc.main-depends.mk` to describe what it is — the entry point for
-    virtual (dependency-only) packages.
+??? note "January 29th – July 1st 2026 — Reorganize `mk/` into functional submodules (8 PRs)"
+    `mk/` was a flat pile of `spksrc.*.mk` files. Over six months it was
+    reorganized so related logic lives together in concern-based submodules,
+    while the entry-point files a package Makefile actually `include`s
+    (`spksrc.cross-cc.mk`, `spksrc.spk.mk`, `spksrc.cross-cmake.mk`, …) stay at
+    the root. This was not one big-bang move but a sequence of PRs, each carving
+    out one concern at a time.
 
-    Pull request: [#7251](https://github.com/SynoCommunity/spksrc/pull/7251)
+    Final layout:
 
-??? note "June 28th 2026 — Reorganize `mk/` into functional submodules (#7237)"
-    The flat `mk/` directory was reorganized into concern-based submodules
-    (`spksrc.spk-meta/`, `spksrc.service/`, `spksrc.wheel/`, `spksrc.cross/`,
-    `spksrc.native/`, `spksrc.build/`, …) so related logic lives together.
+    ```text
+    mk/
+    ├── spksrc.cross-cc.mk        ┐  entry points a Makefile includes
+    ├── spksrc.cross-cmake.mk     │  stay at the root (unchanged include paths)
+    ├── spksrc.spk.mk             ┘
+    ├── spksrc.common/     archs, directories, macros, logs, stage0
+    ├── spksrc.build/      per-step recipes: configure, compile, install, patch, …
+    ├── spksrc.cross/      cross-build env per build system: cmake, meson, rust, go
+    ├── spksrc.native/     native-build env per build system
+    ├── spksrc.rules/      depend, dependency-tree, pre-check, digests, tests
+    ├── spksrc.spk/        spk assembly: copy, icon, strip, publish
+    ├── spksrc.spk-meta/   meta initiators: ffmpeg, python, videodriver
+    ├── spksrc.service/    DSM service scripts and installers
+    ├── spksrc.wheel/      python wheel build/install
+    ├── spksrc.toolchain/  toolchain fetch + tc_vars generation
+    ├── spksrc.toolkit/    build-host toolkit (mirrors toolchain)
+    └── spksrc.kernel/     kernel-module build support
+    ```
 
-    Pull request: [#7237](https://github.com/SynoCommunity/spksrc/pull/7237)
+    ??? note "`spksrc.common/` — split `common.mk` (#6906)"
+        Split the overloaded `spksrc.common.mk` into `spksrc.common/`
+        (`archs.mk`, `macros.mk`, `logs.mk`, …) and had every `cross/` and `spk/`
+        Makefile include `spksrc.common.mk` before any `version_*` macro call.
+
+        Pull request: [#6906](https://github.com/SynoCommunity/spksrc/pull/6906)
+
+    ??? note "`spksrc.toolchain/` (#6914)"
+        Moved `spksrc.tc.mk` and the toolchain logic into `spksrc.toolchain/`
+        (`tc-base.mk`, `tc-versions.mk`, `tc_vars.mk`, …).
+
+        Pull request: [#6914](https://github.com/SynoCommunity/spksrc/pull/6914)
+
+    ??? note "`spksrc.toolkit/` (#6973)"
+        Reorganized the build-host toolkit the same way, mirroring the toolchain
+        layout (`tk-base.mk`, `tk-versions.mk`, `tk_vars.mk`, …).
+
+        Pull request: [#6973](https://github.com/SynoCommunity/spksrc/pull/6973)
+
+    ??? note "`spksrc.kernel/` (#6994)"
+        Split kernel-module support into `spksrc.kernel/` (`base.mk`,
+        `headers.mk`, `module.mk`, `versions.mk`, …).
+
+        Pull request: [#6994](https://github.com/SynoCommunity/spksrc/pull/6994)
+
+    ??? note "`spksrc.spk-meta/` — meta initiators (#7008)"
+        Split the ffmpeg / python / videodriver meta initiators out of the
+        monolithic mk files into `spksrc.spk/` and `spksrc.spk-meta/`, and renamed
+        the meta-spk initiator to `spksrc.spk-meta.mk`.
+
+        Pull request: [#7008](https://github.com/SynoCommunity/spksrc/pull/7008)
+
+    ??? note "The bulk: build / cross / native / rules / service / wheel (#7237)"
+        The largest move: carved the remaining per-step recipes, per-build-system
+        env files, rules, service scripts and wheel logic into
+        `spksrc.build/`, `spksrc.cross/`, `spksrc.native/`, `spksrc.rules/`,
+        `spksrc.service/` and `spksrc.wheel/`.
+
+        Pull request: [#7237](https://github.com/SynoCommunity/spksrc/pull/7237)
+
+    ??? note "`spksrc.cross-install.mk` rename (#7243)"
+        Renamed `install-resources.mk` and slimmed the install wrappers so the
+        cross/native install paths share one implementation.
+
+        Pull request: [#7243](https://github.com/SynoCommunity/spksrc/pull/7243)
+
+    ??? note "`spksrc.cross-virtual.mk` rename (#7251)"
+        Renamed `spksrc.main-depends.mk` to describe what it is — the entry point
+        for virtual (dependency-only) packages.
+
+        Pull request: [#7251](https://github.com/SynoCommunity/spksrc/pull/7251)
 
 ??? note "June 28th 2026 — Boxed `*.mk` file headers (#7242)"
     Standardized every `*.mk` header to one boxed format, so each file states its
     purpose, inputs and outputs consistently.
 
     Pull request: [#7242](https://github.com/SynoCommunity/spksrc/pull/7242)
-
-??? note "June 28th 2026 — `spksrc.cross-install.mk` rename (#7243)"
-    Renamed `install-resources.mk` and slimmed the install wrappers so the
-    cross/native install paths share one implementation.
-
-    Pull request: [#7243](https://github.com/SynoCommunity/spksrc/pull/7243)
 
 ??? note "June 22nd–25th 2026 — Meta cross-dependency environment (4 PRs)"
     How a "meta" package (ffmpeg, videodriver, python) exposes its
@@ -168,6 +269,84 @@ single entry with the individual PRs nested inside.
 
 ??? note "June 10th 2026 — Stage-0 toolchain bootstrap (#7184)"
     Bootstrap the toolchain before deriving `TC_GCC`, so version-gated
-    dependencies (`version_ge TC_GCC …`) parse correctly on a cold tree.
+    dependencies (`version_ge TC_GCC …`) parse correctly on a cold tree. This
+    refines the stage0 minimal environment introduced in March (see below).
 
     Pull request: [#7184](https://github.com/SynoCommunity/spksrc/pull/7184)
+
+??? note "January – May 2026 — Faster, parallel dependency resolution (5 PRs)"
+    Dependency resolution used to run through a shell script
+    (`mk/dependency-list.sh`) walked serially. It is now a pure-Makefile
+    implementation (`spksrc.rules/dependency-tree.mk`) that the framework can
+    walk in parallel.
+
+    ??? note "Faster `dependency-flat` (#6894)"
+        Rewrote the flat dependency walk and fixed a basename collision in the
+        parallel walk (packages of the same name in different directories, e.g.
+        `native/erlang` and `cross/erlang`, shared a done-file).
+
+        Pull request: [#6894](https://github.com/SynoCommunity/spksrc/pull/6894)
+
+    ??? note "Pure-Makefile dependency-tree (#6952)"
+        Replaced the legacy `dependency-list.sh` with
+        `spksrc.dependency-tree.mk`, consolidating resolution into the framework
+        and enabling parallel builds — up to ~2.9× faster.
+
+        Pull request: [#6952](https://github.com/SynoCommunity/spksrc/pull/6952)
+
+    ??? note "`EXCLUDE_DEPENDS` and `DEPENDS_TYPE` (#7028)"
+        Added a way to prune a subtree from the traversal (`EXCLUDE_DEPENDS`) and
+        to filter the output by relation type (`DEPENDS_TYPE`).
+
+        Pull request: [#7028](https://github.com/SynoCommunity/spksrc/pull/7028)
+
+    ??? note "Query a specific `ARCH` / `TCVERSION` (#7121, #7124)"
+        Let the dependency tree be computed for a specific arch and DSM version,
+        so version-gated dependencies resolve as they would in a real build.
+
+        Pull requests: [#7121](https://github.com/SynoCommunity/spksrc/pull/7121),
+        [#7124](https://github.com/SynoCommunity/spksrc/pull/7124)
+
+??? note "April 19th – 22nd 2026 — Deduplicate applied patches (2 PRs)"
+    - **What:** a patch listed both as an `arch` and as a `group` (armv7, x64
+      could be both) was applied twice. `spksrc.build/patch.mk` now guarantees
+      each patch appears once in `PATCHES`, with md5sum-based deduplication.
+    - **Why:** applying a patch twice either fails or double-applies a hunk; the
+      build should be independent of how a patch happened to be listed.
+    - Pull requests: [#7098](https://github.com/SynoCommunity/spksrc/pull/7098),
+      [#7104](https://github.com/SynoCommunity/spksrc/pull/7104)
+
+??? note "April 5th – 7th 2026 — Standardize meta package variable names (4 PRs)"
+    The ffmpeg, videodriver and python "meta" packages each exposed their install
+    prefix under a differently-shaped variable name.
+
+    - **What:** standardized the `*_INSTALL_PREFIX` variables —
+      `VIDEODRV_*INSTALL_PREFIX` (#7043), `FFMPEG_*INSTALL_PREFIX` (#7044),
+      `PYTHON_*INSTALL_PREFIX` (#7045) — and the surrounding python / openssl /
+      ffmpeg / videodriver variable names (#7041).
+    - **Why:** a consumer of any meta package now finds the same variable shape
+      regardless of which one it depends on. This is the naming half of the meta
+      cross-dependency environment (the June 22nd–25th entry above).
+    - Pull requests: [#7041](https://github.com/SynoCommunity/spksrc/pull/7041),
+      [#7043](https://github.com/SynoCommunity/spksrc/pull/7043),
+      [#7044](https://github.com/SynoCommunity/spksrc/pull/7044),
+      [#7045](https://github.com/SynoCommunity/spksrc/pull/7045)
+
+??? note "March – April 2026 — stage0 minimal environment (3 PRs)"
+    - **What:** `spksrc.common/stage0.mk` loads a minimal environment early —
+      just enough for the `version_*` macros and `TC_GCC` — so a package Makefile
+      can call `version_*` before the full toolchain environment exists (#7031),
+      with a more robust `BASEDIR` detection (#7032) and a follow-up fix for a
+      subtle ordering bug (#7078).
+    - **Why:** it keeps the full toolchain environment from leaking into the
+      dependency traversal, and lets version-gated `DEPENDS` parse on a cold
+      tree. The stage-0 toolchain bootstrap (#7184, above) builds on this.
+    - Pull requests: [#7031](https://github.com/SynoCommunity/spksrc/pull/7031),
+      [#7032](https://github.com/SynoCommunity/spksrc/pull/7032),
+      [#7078](https://github.com/SynoCommunity/spksrc/pull/7078)
+
+??? note "February 7th 2026 — Multi-arch download orchestration (#6947)"
+    Auto-orchestrate the download, checksum and digest steps across all of a
+    package's distribution architectures, instead of handling one arch at a time.
+
+    Pull request: [#6947](https://github.com/SynoCommunity/spksrc/pull/6947)
