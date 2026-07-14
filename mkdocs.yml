@@ -158,6 +158,7 @@ nav:
     - Makefile System: framework/makefile-system.md
     - Toolchain: framework/toolchain.md
     - Toolkit: framework/toolkit.md
+    - Changes: framework/changes.md
   - Reference:
     - reference/index.md
     - Architectures: reference/architectures.md
