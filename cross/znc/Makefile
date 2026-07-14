@@ -1,10 +1,18 @@
 PKG_NAME = znc
-PKG_VERS = 1.10.1
+PKG_VERS = 1.10.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-# use synocommunity "abandoned sources" 
-# original site https://znc.in/releases/archive does not work
-PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/sources
+PKG_DIST_SITE = https://znc.in/releases
+# znc.in is upstream, but flaky: its TLS certificate expired on 2026-07-14 and
+# downloads fail on it until it is renewed. Gentoo serves the same tarball under
+# its upstream name, so fall back there meanwhile. The subdirectory is the first
+# two hex digits of the blake2b hash of the file name, so it must be recomputed
+# on a version bump; a stale one just 404s and we fall through.
+# Debian cannot be used: it renames the file to znc_$(PKG_VERS).orig.tar.gz, and
+# a mirror base is only ever appended with PKG_DIST_NAME.
+# GitHub is not an option either: znc publishes no release assets, and its git
+# archive ships an empty third_party/Csocket submodule, so it cannot build.
+PKG_DIST_MIRRORS = https://distfiles.gentoo.org/distfiles/c9
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Ensure C++17 compatibility
