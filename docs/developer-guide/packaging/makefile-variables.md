@@ -66,7 +66,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 ```makefile
 # Include these in the SPK
-DEPENDS = cross/curl cross/openssl
+DEPENDS = cross/curl cross/openssl3
 
 # Only needed during build
 BUILD_DEPENDS = native/cmake

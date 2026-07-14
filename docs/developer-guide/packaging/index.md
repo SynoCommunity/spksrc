@@ -122,7 +122,7 @@ make -C spk/mypackage ARCH=x64 TCVERSION=7.2
 
 ```makefile
 # Cross package dependencies
-DEPENDS = cross/zlib cross/openssl
+DEPENDS = cross/zlib cross/openssl3
 
 # SPK dependencies (installed packages)
 SPK_DEPENDS = "WebStation>=3.0"

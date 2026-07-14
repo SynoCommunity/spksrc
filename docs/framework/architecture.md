@@ -146,7 +146,7 @@ spksrc handles three types of dependencies:
 Listed in the Makefile, these are built before the current package:
 
 ```makefile
-DEPENDS = cross/openssl cross/zlib
+DEPENDS = cross/openssl3 cross/zlib
 ```
 
 The framework recursively builds each dependency, installs it to the staging area, and makes it available to subsequent builds.

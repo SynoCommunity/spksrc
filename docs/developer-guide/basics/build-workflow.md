@@ -129,7 +129,7 @@ When you build `spk/transmission`:
 
 1. spksrc checks if `cross/transmission` is built
 2. If not, it builds `cross/transmission` first
-3. `cross/transmission` depends on `cross/curl`, `cross/openssl`, etc.
+3. `cross/transmission` depends on `cross/curl`, `cross/openssl3`, etc.
 4. Dependencies are built recursively
 
 ### Force Rebuild Dependencies

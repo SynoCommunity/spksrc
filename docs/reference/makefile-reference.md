@@ -46,7 +46,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 
 | Variable | Description | Example |
 |----------|-------------|--------|
-| `DEPENDS` | Cross packages to build and include | `cross/curl cross/openssl` |
+| `DEPENDS` | Cross packages to build and include | `cross/curl cross/openssl3` |
 | `BUILD_DEPENDS` | Packages needed only during build | `native/cmake` |
 | `NATIVE_DEPENDS` | Native tools for build host | `native/ninja` |
 | `SPK_DEPENDS` | SPK packages required at runtime | `"WebStation>=3.0"` |
