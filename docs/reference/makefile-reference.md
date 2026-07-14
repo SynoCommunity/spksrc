@@ -14,6 +14,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `PKG_DIST_NAME` | Yes | Archive filename | `$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)` |
 | `PKG_DIST_SITE` | Yes | Download URL base | `https://example.com/releases` |
 | `PKG_DIST_FILE` | No | Local filename (if different) | `curl-source.tar.gz` |
+| `PKG_DIST_MIRRORS` | No | Fallback base URLs, tried in turn if `PKG_DIST_SITE` fails ([details](../developer-guide/packaging/makefile-variables.md#source-downloads-and-mirrors)) | `https://github.com/SynoCommunity/spksrc/releases/download/sources` |
 | `PKG_DIST_ARCH` | No | Architecture-specific source designator | `$(PKG_DIST_ARCH_$(ARCH))` |
 | `PKG_DIR` | Yes | Directory after extraction | `$(PKG_NAME)-$(PKG_VERS)` |
 
