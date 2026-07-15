@@ -35,13 +35,9 @@ include ../../mk/spksrc.native-toolchain.mk
 GCC8_STAGE = $(INSTALL_DIR)$(INSTALL_PREFIX)
 
 # gcc must use the co-built (or stock) binutils: point --with-build-time-tools
-# at it and put it on PATH for the build.
+# at it and put it on PATH for the build. The host compiler (CC/CXX/...) comes
+# from the native env-default, which now selects it positively.
 ENV += PATH=$(TC_BINUTILS):$$PATH
-# The native env empties CC/CXX/AR/... (to force fresh configure detection), but
-# building gcc itself needs the HOST toolchain (host programs + build tools like
-# genparams). Restore them for this package.
-ENV += CC=gcc CXX=g++ CPP="gcc -E" CC_FOR_BUILD=gcc CXX_FOR_BUILD=g++
-ENV += AR=ar AS=as LD=ld NM=nm RANLIB=ranlib OBJCOPY=objcopy OBJDUMP=objdump READELF=readelf STRIP=strip
 
 # GNU_CONFIGURE already adds --prefix=$(INSTALL_PREFIX).
 CONFIGURE_ARGS  = --target=$(TC_TARGET)
