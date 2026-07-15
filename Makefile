@@ -216,6 +216,9 @@ local.mk:
 	@echo "DISABLE_GITHUB_MAINTAINER =" >> $@
 	@echo "PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
+	@echo "# Force the stock Synology gcc even when a gcc overlay (e.g. gcc8) is" >> $@
+	@echo "# installed on the toolchain; uncomment to build against the base toolchain." >> $@
+	@echo "#LEGACY_TOOLCHAIN = 1" >> $@
 
 dsm-%: local.mk
 	@echo "Setting default toolchain version to DSM-$*"
