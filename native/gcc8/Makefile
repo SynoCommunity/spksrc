@@ -62,7 +62,7 @@ COMPILE_ARGS = MAKEINFO=missing
 INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX) MAKEINFO=missing
 
 .PHONY: gcc8_prepare
-gcc8_prepare:
+gcc8_prepare: tc-extract
 	# co-build a clean binutils 2.30 for this exact arch when the toolchain's
 	# own binutils is an old broken vendor fork (see BINUTILS_MODE in the mk).
 	@if [ "$(BINUTILS_MODE)" = "cobuild" ]; then \
