@@ -343,10 +343,19 @@ tc_rust_vars:
 # <prefix>gcc-<ver> and <prefix>g++-<ver> exist; empty otherwise (the stock
 # gcc's own versioned alias has no matching versioned g++, so a plain toolchain
 # is unaffected). Applied to the gcc-family tools (cc/cxx/cpp/fc) below.
+#
+# LEGACY_TOOLCHAIN=1 forces the stock Synology gcc even when an overlay is
+# present: it empties the suffix, so a package that must build against the base
+# toolchain (or that a newer gcc breaks) can opt out per package. Forwarded to
+# this generation by cross-cc.mk / native-cc.mk / kernel.mk.
+ifeq ($(strip $(LEGACY_TOOLCHAIN)),)
 _TC_GCC_BIN       := $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
 _TC_GCC_VERSIONED := $(patsubst $(_TC_GCC_BIN)gcc-%,%,$(wildcard $(_TC_GCC_BIN)gcc-[0-9]*))
 _TC_GCC_PAIRED    := $(foreach v,$(_TC_GCC_VERSIONED),$(if $(wildcard $(_TC_GCC_BIN)g++-$(v)),$(v)))
 TC_GCC_SUFFIX     := $(if $(_TC_GCC_PAIRED),-$(lastword $(sort $(_TC_GCC_PAIRED))))
+else
+TC_GCC_SUFFIX     :=
+endif
 
 .PHONY: tc_autotools_vars
 tc_autotools_vars:
