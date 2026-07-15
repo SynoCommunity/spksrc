@@ -43,7 +43,11 @@ else
 endif
 CROSSENV_LOG = $(LOG_DIR)/build$(ARCH_SUFFIX)-crossenv.log
 WHEEL_LOG    = $(LOG_DIR)/build$(ARCH_SUFFIX)-wheel.log
-NATIVE_LOG   = $(LOG_DIR)/build-native-$(PKG_NAME).log
+# native-toolchain packages build one (arch, DSM) per work-<arch>-<vers> dir, so
+# their logs are per-arch too; a plain native package (work-native) keeps the
+# single name. Derived from WORK_DIR, so it does not depend on TC_ARCH (which is
+# also a kernel/spk variable).
+NATIVE_LOG   = $(LOG_DIR)/build-native-$(PKG_NAME)$(patsubst work-%,-%,$(filter-out work-native,$(notdir $(WORK_DIR)))).log
 STATUS_LOG   = $(LOG_DIR)/status-build.log
 
 # Enable stats over parallel build mode
