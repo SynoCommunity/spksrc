@@ -88,19 +88,29 @@ gcc8_post_install: $(INSTALL_TARGET)
 
 ##############################################################################
 # Packaging (llvm-14.0-build style): tar the gcc-8.5 tree for hosting; consumed
-# by the toolchain overlay toolchain/syno-<arch>-<vers>-gcc8. Only the gcc /
-# target parts are archived (the NATIVE_DEPENDS host math libs are left out).
+# by the toolchain overlay toolchain/syno-<arch>-<vers>-gcc8.
 #   make TC_ARCH=<arch> TC_VERS=<vers> build-archive
+#
+# Archive the whole install prefix EXCEPT host docs (share/var) and the
+# NATIVE_DEPENDS math libraries (gmp/mpfr/mpc/isl) that get installed into this
+# same prefix. Exclusion, not a dir allow-list, because the C++ headers and
+# runtime libs live in different places depending on the target: cross archs put
+# them under <triple>/ (include/c++, lib/libstdc++), while a host==target arch
+# (x86_64/i686, where the build host and the target share a triple) uses the
+# native layout include/c++ and lib/. The old allow-list captured only the cross
+# layout, so x86 overlays shipped without libstdc++ headers.
 ##############################################################################
 GCC8_ARCHIVE = gcc8-$(TC_TARGET)-$(TC_VERS).txz
-GCC8_ARCHIVE_DIRS = bin libexec lib/gcc $(TC_TARGET)
+GCC8_ARCHIVE_EXCLUDES  = --exclude=./share --exclude=./var --exclude='*/pkgconfig'
+GCC8_ARCHIVE_EXCLUDES += --exclude='*/libgmp*' --exclude='*/libmpfr*' --exclude='*/libmpc*' --exclude='*/libisl*'
+GCC8_ARCHIVE_EXCLUDES += --exclude='*/gmp.h' --exclude='*/mpfr.h' --exclude='*/mpf2mpfr.h' --exclude='*/mpc.h' --exclude='./include/isl'
 .PHONY: build-archive
 build-archive:
 	@$(MSG) "Archiving gcc-8.5 for $(TC_ARCH)-$(TC_VERS) -> $(GCC8_ARCHIVE)"
 ifeq ($(wildcard $(GCC8_STAGE)/bin/$(TC_TARGET)-gcc-8.5),)
 	$(error "gcc-8.5 not installed; run 'make TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS)' first")
 endif
-	tar -C $(GCC8_STAGE) -cJf $(GCC8_ARCHIVE) $(GCC8_ARCHIVE_DIRS)
+	tar -C $(GCC8_STAGE) $(GCC8_ARCHIVE_EXCLUDES) -cJf $(GCC8_ARCHIVE) .
 
 ##############################################################################
 # Convenience: build gcc8 for EVERY toolchain of a given DSM version.
