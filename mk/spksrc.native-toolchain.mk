@@ -48,20 +48,20 @@ TC_SYSROOT_DIR = $(patsubst %/usr/include/,%,$(dir $(firstword $(wildcard \
 TC_EXTRA_CFLAGS := $(shell grep -E '^TC_EXTRA_CFLAGS' $(TC_DIR)/Makefile 2>/dev/null | sed 's/.*= *//')
 
 # ---- binutils policy ---------------------------------------------------------
-# Reuse the toolchain's own binutils (it matches its glibc) EXCEPT for the old
-# broken vendor forks (DSM-6.2.4 ARM/PPC + comcerto2k, all glibc <= 2.20) which
-# gcc-8.5 cannot drive; those co-build a clean binutils 2.30 -- the DSM-7.1/7.2
-# default -- so the rebuilt toolchains stay aligned with the Synology standard.
-# A newer binutils targeting an older glibc is fine (the constraint runs the
-# other way: a binutils must be new enough for its glibc, e.g. glibc 2.26 needs
-# >= 2.26).
-# Derived: co-build only for ARM/PPC toolchains whose glibc <= 2.20 (their stock
-# binutils are old vendor forks gcc-8.5 cannot drive). x86 (any DSM) and every
-# glibc >= 2.21 toolchain (DSM 7.0+ already ship binutils 2.30) reuse. Lazy (=)
-# so version_le (from macros.mk, included below) is available at expansion time.
+# Co-build a clean binutils 2.30 (the DSM-7.1/7.2 default) whenever the
+# toolchain's stock binutils is too old to link what gcc-8.5 emits, and reuse it
+# otherwise. The cutoff is glibc <= 2.20, which is exactly DSM <= 6.2.4 (plus the
+# comcerto2k orphan): those toolchains ship binutils <= 2.25, and gcc-8.5 emits
+# relocations they cannot handle -- the ARM/PPC vendor forks reject a full gcc-8.5
+# invocation (-march=armv7-a+mp+sec, -me500), and even the x86 Linaro 2.25 ld
+# fails on R_X86_64_GOTPCRELX (0x2a, added in binutils 2.26), e.g. linking the
+# static libstdc++fs.a for std::filesystem. DSM 7.0+ ship binutils 2.30, new
+# enough, so they reuse. A newer binutils targeting an older glibc is fine; the
+# constraint only runs the other way (a binutils must be new enough for its
+# glibc/compiler). Lazy (=) so version_le (macros.mk, included below) resolves at
+# expansion time.
 TC_GLIBC     := $(shell grep -E '^TC_GLIBC' $(TC_DIR)/Makefile 2>/dev/null | sed 's/.*= *//')
-TC_IS_ARMPPC := $(shell echo $(TC_TARGET) | grep -ciE 'arm|aarch64|powerpc')
-BINUTILS_MODE = $(if $(filter-out 0,$(TC_IS_ARMPPC)),$(if $(call version_le,$(TC_GLIBC),2.20),cobuild,reuse),reuse)
+BINUTILS_MODE = $(if $(call version_le,$(TC_GLIBC),2.20),cobuild,reuse)
 # bin dir gcc must use: the toolchain's own (reuse) or the co-built 2.30
 # (cobuild, installed by native/binutils-2.30). Lazy $(if ...) — NOT an ifeq —
 # so BINUTILS_MODE resolves at expansion time (version_le is only available once
