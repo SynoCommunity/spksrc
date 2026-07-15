@@ -189,6 +189,7 @@ endif
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "CC" ] ; then \
 	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
@@ -209,6 +210,7 @@ endif
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "CC" ] ; then \
 	    printf "set(%-35s %s)\n" CMAKE_C_COMPILER_FOR_BUILD $$(which $${source}) ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
@@ -279,6 +281,7 @@ tc_meson_cross_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
 	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
@@ -305,6 +308,7 @@ tc_meson_native_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "cc" ]; then \
 	    echo "c = '$$(which $${source})'" ; \
 	    echo "$${target} = '$$(which $${source})'" ; \
@@ -333,6 +337,17 @@ tc_rust_vars:
 	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
 	echo RUST_TARGET := $(RUST_TARGET)
 
+# Prefer a newer gcc overlay dropped beside the stock gcc (e.g. a
+# toolchain/syno-<arch>-<vers>-gcc8 overlay installs <prefix>gcc-8.5 +
+# <prefix>g++-8.5). TC_GCC_SUFFIX = the highest -<ver> for which BOTH
+# <prefix>gcc-<ver> and <prefix>g++-<ver> exist; empty otherwise (the stock
+# gcc's own versioned alias has no matching versioned g++, so a plain toolchain
+# is unaffected). Applied to the gcc-family tools (cc/cxx/cpp/fc) below.
+_TC_GCC_BIN       := $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
+_TC_GCC_VERSIONED := $(patsubst $(_TC_GCC_BIN)gcc-%,%,$(wildcard $(_TC_GCC_BIN)gcc-[0-9]*))
+_TC_GCC_PAIRED    := $(foreach v,$(_TC_GCC_VERSIONED),$(if $(wildcard $(_TC_GCC_BIN)g++-$(v)),$(v)))
+TC_GCC_SUFFIX     := $(if $(_TC_GCC_PAIRED),-$(lastword $(sort $(_TC_GCC_PAIRED))))
+
 .PHONY: tc_autotools_vars
 tc_autotools_vars:
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
@@ -341,6 +356,7 @@ tc_autotools_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  echo TC_ENV += $${target}=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
 	  if [ "$${target}" = "CC" ] ; then \
 	    gcc_version=$$(eval $$(echo $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
@@ -384,6 +400,7 @@ tc_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "CC" ] ; then \
 	    gcc_version=$$(eval $$(echo $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
 	  fi ; \
