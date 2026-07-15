@@ -16,6 +16,8 @@ COMMENT  = GNU binutils 2.30 (the DSM-7.1/7.2 default) rebuilt as a clean cross-
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
+# Extract the target toolchain first so --with-sysroot resolves (see tc-extract).
+PRE_CONFIGURE_TARGET = tc-extract
 CONFIGURE_ARGS  = --target=$(TC_TARGET)
 CONFIGURE_ARGS += --program-prefix=$(TC_TARGET)-
 CONFIGURE_ARGS += --with-sysroot=$(TC_SYSROOT_DIR)

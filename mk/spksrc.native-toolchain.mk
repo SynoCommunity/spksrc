@@ -70,6 +70,16 @@ TC_BINUTILS_REUSE   = $(TC_WORK)/bin
 TC_BINUTILS_COBUILD = $(abspath $(CURDIR)/../binutils-2.30/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin)
 TC_BINUTILS = $(if $(filter reuse,$(BINUTILS_MODE)),$(TC_BINUTILS_REUSE),$(TC_BINUTILS_COBUILD))
 
+# The target toolchain must be extracted before its sysroot exists: native
+# packages do not bootstrap the toolchain the way cross packages do (cross-stage1).
+# TC_SYSROOT_DIR is a recursively-expanded (=) wildcard, so once this target has
+# run the sysroot resolves at configure/build time. Idempotent; include it as a
+# PRE_CONFIGURE_TARGET prerequisite in the consuming package.
+.PHONY: tc-extract
+tc-extract:
+	@$(MSG) "native-toolchain: ensuring $(TC) is extracted (sysroot for $(TC_ARCH)-$(TC_VERS))"
+	@$(MAKE) --no-print-directory -C ../../toolchain/$(TC) toolchain
+
 # ---- per-arch ABI (GCC 8.5): derived dynamically from the toolchain's own
 # stock gcc + modern-GCC fixups. Pure make, no table maintained anywhere, no
 # toolchain Makefile edits. Provides GCC8_TARGET_ABI (uses TC_WORK/TC_TARGET).
