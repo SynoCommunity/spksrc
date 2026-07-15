@@ -70,18 +70,21 @@ gcc8_prepare: tc-extract
 
 .PHONY: gcc8_post_install
 gcc8_post_install: $(INSTALL_TARGET)
-	# For cobuild archs the stock binutils is too old to assemble what gcc-8.5
-	# emits at RUNTIME (e.g. cortex-a9 -> -march=armv7-a+mp+sec). Bundle the
-	# co-built binutils into gcc-8.5's PRIVATE exec dir; the driver finds them
-	# there (relative to itself, before the tooldir/PATH) -> self-contained and
-	# portable, no clash with the stock toolchain's own assembler.
-	@if [ "$(BINUTILS_MODE)" = "cobuild" ] ; then \
-	  gccexec=$(GCC8_STAGE)/libexec/gcc/$(TC_TARGET)/$(PKG_VERS) ; \
-	  for tool in as ld ld.bfd nm ar ranlib objcopy objdump strip ; do \
-	    [ -x "$(TC_BINUTILS)/$(TC_TARGET)-$$tool" ] && cp -a "$(TC_BINUTILS)/$(TC_TARGET)-$$tool" "$$gccexec/$$tool" ; \
-	  done ; \
-	  $(MSG) "gcc8: bundled co-built binutils into $$gccexec (cobuild arch)" ; \
-	fi
+	# Bundle the assembler/linker gcc-8.5 was built against into its PRIVATE
+	# exec dir, for EVERY arch. Deployed standalone (in its own install prefix),
+	# gcc-8.5's driver looks for `as`/`ld` in libexec/gcc/<target>/<ver>/ before
+	# the tooldir/PATH, but nothing there provides them: for cobuild archs the
+	# stock binutils is too old to assemble what gcc-8.5 emits (e.g. cortex-a9
+	# -> -march=armv7-a+mp+sec), and for reuse archs gcc looks for an unprefixed
+	# `as` and falls back to the HOST assembler (which cannot target a non-x86
+	# arch -> `as: unrecognized option '-EL'` on aarch64). Bundling from
+	# TC_BINUTILS (the co-built binutils for cobuild, the toolchain's own for
+	# reuse) makes the overlay self-contained and relocatable in either case.
+	@gccexec=$(GCC8_STAGE)/libexec/gcc/$(TC_TARGET)/$(PKG_VERS) ; \
+	for tool in as ld ld.bfd nm ar ranlib objcopy objdump strip ; do \
+	  [ -x "$(TC_BINUTILS)/$(TC_TARGET)-$$tool" ] && cp -a "$(TC_BINUTILS)/$(TC_TARGET)-$$tool" "$$gccexec/$$tool" ; \
+	done ; \
+	$(MSG) "gcc8: bundled binutils ($(BINUTILS_MODE)) into $$gccexec"
 
 ##############################################################################
 # Packaging (llvm-14.0-build style): tar the gcc-8.5 tree for hosting; consumed
