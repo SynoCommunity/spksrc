@@ -85,6 +85,9 @@ endif
 	@printf "  \033[36m%-24s\033[0m %s\n" "dependency-tree" "print the resolved dependency graph"
 	@printf "  \033[36m%-24s\033[0m %s\n" "dependency-flat" "flat, de-duplicated dependency list"
 	@printf "  \033[36m%-24s\033[0m %s\n" "dependency-list" "raw per-package dependency list"
+	@printf "  \033[33m%s\033[0m\n" "  DEPENDS_TYPE=\"DEPENDS BUILD_DEPENDS OPTIONAL_DEPENDS NATIVE_DEPENDS\" filters flat/list output"
+	@printf "  \033[33m%s\033[0m\n" "  EXCLUDE_DEPENDS=\"cross/foo ...\" skips those dependencies and their subtrees"
+	@printf "  \033[33m%s\033[0m\n" "  ARCH=... TCVERSION=... resolves the graph in that toolchain context"
 ifneq ($(SPKSRC_TREE),python)
 	@printf "\n\033[1mCleanup\033[0m\n"
 	@printf "  \033[36m%-24s\033[0m %s\n" "clean" "remove all work directories"
