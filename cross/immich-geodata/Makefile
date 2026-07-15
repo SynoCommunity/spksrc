@@ -14,15 +14,13 @@ POST_EXTRACT_TARGET = immich_geodata_post_extract
 # Upstream geodata files are live datasets that change regularly
 # Skip checksum verification since the digests would constantly need updating
 CHECKSUM_TARGET = nop
-CONFIGURE_TARGET = nop
-COMPILE_TARGET = nop
 INSTALL_TARGET = immich_geodata_install
 
 ADMIN1_URL = http://download.geonames.org/export/dump/admin1CodesASCII.txt
 ADMIN2_URL = http://download.geonames.org/export/dump/admin2Codes.txt
 COUNTRIES_URL = https://github.com/nvkelso/natural-earth-vector/raw/master/geojson/ne_10m_admin_0_countries.geojson
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: immich_geodata_post_extract
 immich_geodata_post_extract:
