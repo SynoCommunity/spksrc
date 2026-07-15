@@ -31,7 +31,7 @@ PGSQL_INC    = $(dir $(PG_CONFIG))../include
 # a minimal pg_config wrapper that only fixes --pgxs (native pg_config
 # returns a path without the postgresql/ subdirectory).
 PRE_COMPILE_TARGET = pgvector_pre_compile
-COMPILE_MAKE_OPTIONS = -j1 \
+COMPILE_ARGS = -j1 \
 	PG_CONFIG=$(WORK_DIR)/pg_config_wrapper \
 	PG_CPPFLAGS="-I$(PGSQL_INC)/server -I$(PGSQL_INC)" \
 	CC="$(TC_PATH)$(TC_PREFIX)gcc" \
