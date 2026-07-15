@@ -45,6 +45,35 @@ wheel/crossenv targets are available — see
 `crossenv-<arch>-<tcvers>`, `download-wheels`, `wheelclean`, `wheelcleancache`,
 `crossenvclean`, `crossenvcleanall`.
 
+### Inspecting the dependency graph
+
+`dependency-tree`, `dependency-flat` and `dependency-list` share three optional
+variables (they do not apply to `dependency-tree`, which always prints the full
+traversal):
+
+| Variable | Effect |
+|----------|--------|
+| `DEPENDS_TYPE` | Filter the output by relation type. Values: `DEPENDS`, `BUILD_DEPENDS`, `OPTIONAL_DEPENDS`, `NATIVE_DEPENDS`; combine them with spaces. Defaults to all types, or `DEPENDS BUILD_DEPENDS NATIVE_DEPENDS` when `ARCH`+`TCVERSION` are set. The traversal always visits every applicable type; this only filters what is printed. |
+| `EXCLUDE_DEPENDS` | Space-separated list of dependencies to skip. An excluded dependency **and its entire subtree** are pruned from the walk — e.g. `EXCLUDE_DEPENDS="cross/ffmpeg7"`. |
+| `ARCH` + `TCVERSION` | Resolve the graph in a specific toolchain context, so version-gated and conditional `DEPENDS` evaluate as they would in a real build. Set both. When set, `OPTIONAL_DEPENDS` is excluded by default. |
+
+```bash
+# Runtime dependencies only, resolved for x64 / DSM 7.2
+make dependency-flat DEPENDS_TYPE="DEPENDS" ARCH=x64 TCVERSION=7.2
+
+# The tree without a heavy meta package and everything under it
+make dependency-list EXCLUDE_DEPENDS="cross/ffmpeg7"
+```
+
+From the **spksrc root**, `dependency-list-spk` runs `dependency-list` for every
+`spk/` package in parallel and aggregates the result. It honors the same three
+variables:
+
+```bash
+# Every spk's runtime deps, resolved for x64 / DSM 7.2
+make dependency-list-spk DEPENDS_TYPE="DEPENDS" ARCH=x64 TCVERSION=7.2
+```
+
 ## Build System Includes
 
 ### Cross Compilation

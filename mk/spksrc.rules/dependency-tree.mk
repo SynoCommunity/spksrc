@@ -212,11 +212,13 @@ $(SPK_LIST_STAMP_DIR):
 # -------------------------------------------------------------------
 ifeq ($(AT_ROOT_LEVEL),1)
 
+##@ Inspect
+
 # At root level, only dependency-list-spk is available.
 # ARCH and TCVERSION are forwarded when provided so each package is
 # evaluated in the correct toolchain context.
 .PHONY: dependency-list-spk
-dependency-list-spk: | $(SPK_LIST_STAMP_DIR)
+dependency-list-spk: | $(SPK_LIST_STAMP_DIR)  ## Resolved deps for every spk; honors DEPENDS_TYPE, EXCLUDE_DEPENDS, ARCH, TCVERSION
 	@$(MAKE) -j $(nproc) --silent --no-print-directory \
 		$(if $(ARCH),ARCH=$(ARCH)) \
 		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
