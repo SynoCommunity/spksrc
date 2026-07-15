@@ -190,6 +190,7 @@ nav:
       - SynoCli VideoDriver: packages/synocli-videodriver.md
     - Development:
       - Git: packages/git.md
+      - PostgreSQL: packages/postgresql.md
     - Downloads:
       - Aria2: packages/aria2.md
       - Deluge: packages/deluge.md

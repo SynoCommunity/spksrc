@@ -79,6 +79,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Monitoring"><td><a href="node-exporter/">Node Exporter</a></td><td>Monitoring</td><td>Prometheus metrics exporter</td></tr>
     <tr data-category="Web Apps"><td><a href="openlist/">OpenList</a></td><td>Web Apps</td><td>Web bookmark management</td></tr>
     <tr data-category="Web Apps"><td><a href="owncloud/">ownCloud</a></td><td>Web Apps</td><td>File sync and share platform</td></tr>
+    <tr data-category="Development"><td><a href="postgresql/">PostgreSQL</a></td><td>Development</td><td>Relational database with PostGIS and pgvector</td></tr>
     <tr data-category="Media Management"><td><a href="radarr-sonarr/">Radarr/Sonarr</a></td><td>Media Management</td><td>Movie &amp; TV series management</td></tr>
     <tr data-category="Backup"><td><a href="rclone/">Rclone</a></td><td>Backup</td><td>Cloud storage sync tool</td></tr>
     <tr data-category="Downloads"><td><a href="rutorrent/">ruTorrent</a></td><td>Downloads</td><td>Web-based BitTorrent client</td></tr>
