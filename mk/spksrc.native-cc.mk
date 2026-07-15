@@ -35,13 +35,6 @@ include ../../mk/spksrc.rules/depend.mk
 
 include ../../mk/spksrc.rules/status.mk
 
-# Strip legacy libtool archives (.la) for native builds by default: they are
-# unneeded for host tools / static helper libs and actively break the multi-
-# DESTDIR native dependency chain (a dependency's staged .la path gets double-
-# prefixed by a downstream package's libtool). No native package currently
-# ships a .la. Opt out per package with NATIVE_KEEP_LA = 1 (e.g. libltdl plugins).
-INSTALL_REMOVE_LA ?= $(if $(NATIVE_KEEP_LA),,1)
-
 # Standard build pipeline (download -> ... -> install)
 include ../../mk/spksrc.build.mk
 

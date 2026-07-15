@@ -35,6 +35,17 @@ INSTALL_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)install_done
 INSTALL_PLIST = $(WORK_DIR)/$(PKG_NAME).plist
 PRE_INSTALL_PLIST = $(INSTALL_PLIST).tmp
 
+# Native builds (host tools / static helper libs) strip legacy libtool archives
+# (.la) by default rather than path-correcting them: the .la are unneeded and
+# actively break the multi-DESTDIR native dependency chain, where a dependency's
+# staged .la path gets double-prefixed by a downstream package's libtool. Detect
+# the native tree here (same idiom as logs.mk) so the behaviour is self-contained
+# in the file that handles .la. Opt out per package with NATIVE_KEEP_LA = 1
+# (e.g. libltdl plugins). Cross builds keep the path-correction default.
+ifeq ($(notdir $(abspath $(CURDIR)/..)),native)
+INSTALL_REMOVE_LA ?= $(if $(NATIVE_KEEP_LA),,1)
+endif
+
 # Sensible default for the classic gnu-make install path only: the standard
 # make install command. Excluded for cmake/meson (via DEFAULT_ENV) and for the
 # python pip / meson-python installers, whose *_python_* INSTALL_TARGET reads
