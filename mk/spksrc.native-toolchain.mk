@@ -13,7 +13,8 @@
 # Provides (for the including package's CONFIGURE_ARGS):
 #   TC_TARGET      target triple (read from the toolchain Makefile)
 #   TC_SYSROOT_DIR the toolchain sysroot (glibc + headers)
-#   TC_BINUTILS    bin dir of the binutils gcc must use (reuse|co-built)
+#   TC_BINUTILS_BIN bin dir of the binutils gcc must use (reuse|co-built)
+#   TC_BINUTILS    binutils version recorded in the archive name (e.g. 2.30)
 #   GCC8_TARGET_ABI  arch ABI flags, GCC-8.5-sanitized (gcc only)
 #   TC_EXTRA_CFLAGS  reused verbatim from the toolchain (dynamic, not repeated)
 #
@@ -48,27 +49,35 @@ TC_SYSROOT_DIR = $(patsubst %/usr/include/,%,$(dir $(firstword $(wildcard \
 TC_EXTRA_CFLAGS := $(shell grep -E '^TC_EXTRA_CFLAGS' $(TC_DIR)/Makefile 2>/dev/null | sed 's/.*= *//')
 
 # ---- binutils policy ---------------------------------------------------------
-# Co-build a clean binutils 2.30 (the DSM-7.1/7.2 default) whenever the
-# toolchain's stock binutils is too old to link what gcc-8.5 emits, and reuse it
-# otherwise. The cutoff is glibc <= 2.20, which is exactly DSM <= 6.2.4 (plus the
-# comcerto2k orphan): those toolchains ship binutils <= 2.25, and gcc-8.5 emits
-# relocations they cannot handle -- the ARM/PPC vendor forks reject a full gcc-8.5
-# invocation (-march=armv7-a+mp+sec, -me500), and even the x86 Linaro 2.25 ld
-# fails on R_X86_64_GOTPCRELX (0x2a, added in binutils 2.26), e.g. linking the
-# static libstdc++fs.a for std::filesystem. DSM 7.0+ ship binutils 2.30, new
-# enough, so they reuse. A newer binutils targeting an older glibc is fine; the
-# constraint only runs the other way (a binutils must be new enough for its
-# glibc/compiler). Lazy (=) so version_le (macros.mk, included below) resolves at
-# expansion time.
+# binutils version co-built for / expected from the toolchain. 2.30 is the
+# DSM-7.1/7.2 default -- matching it is the whole point. Change it here only:
+# everything below (the native/binutils-<vers> package, the archive name) derives
+# from BINUTILS_VERS.
+BINUTILS_VERS = 2.30
+BINUTILS_DIR  = $(abspath $(CURDIR)/../binutils-$(BINUTILS_VERS))
+# Recorded in the gcc-8.5 archive name, like TC_GLIBC / TC_VERS.
+TC_BINUTILS   = $(BINUTILS_VERS)
+
+# Co-build a clean binutils whenever the toolchain's stock binutils is too old to
+# link what gcc-8.5 emits, and reuse it otherwise. The cutoff is glibc <= 2.20,
+# which is exactly DSM <= 6.2.4 (plus the comcerto2k orphan): those toolchains
+# ship binutils <= 2.25, and gcc-8.5 emits relocations they cannot handle -- the
+# ARM/PPC vendor forks reject a full gcc-8.5 invocation (-march=armv7-a+mp+sec,
+# -me500), and even the x86 Linaro 2.25 ld fails on R_X86_64_GOTPCRELX (0x2a,
+# added in binutils 2.26), e.g. linking the static libstdc++fs.a for
+# std::filesystem. DSM 7.0+ already ship a new-enough binutils, so they reuse. A
+# newer binutils targeting an older glibc is fine; the constraint only runs the
+# other way (a binutils must be new enough for its glibc/compiler). Lazy (=) so
+# version_le (macros.mk, included below) resolves at expansion time.
 TC_GLIBC     := $(shell grep -E '^TC_GLIBC' $(TC_DIR)/Makefile 2>/dev/null | sed 's/.*= *//')
 BINUTILS_MODE = $(if $(call version_le,$(TC_GLIBC),2.20),cobuild,reuse)
-# bin dir gcc must use: the toolchain's own (reuse) or the co-built 2.30
-# (cobuild, installed by native/binutils-2.30). Lazy $(if ...) — NOT an ifeq —
-# so BINUTILS_MODE resolves at expansion time (version_le is only available once
+# bin dir gcc must use: the toolchain's own (reuse) or the co-built one (cobuild,
+# installed by native/binutils-<vers>). Lazy $(if ...) — NOT an ifeq — so
+# BINUTILS_MODE resolves at expansion time (version_le is only available once
 # macros.mk is included below); a parse-time ifeq would wrongly read "reuse".
-TC_BINUTILS_REUSE   = $(TC_WORK)/bin
-TC_BINUTILS_COBUILD = $(abspath $(CURDIR)/../binutils-2.30/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin)
-TC_BINUTILS = $(if $(filter reuse,$(BINUTILS_MODE)),$(TC_BINUTILS_REUSE),$(TC_BINUTILS_COBUILD))
+TC_BINUTILS_BIN_REUSE   = $(TC_WORK)/bin
+TC_BINUTILS_BIN_COBUILD = $(BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin
+TC_BINUTILS_BIN = $(if $(filter reuse,$(BINUTILS_MODE)),$(TC_BINUTILS_BIN_REUSE),$(TC_BINUTILS_BIN_COBUILD))
 
 # The target toolchain must be extracted before its sysroot exists: native
 # packages do not bootstrap the toolchain the way cross packages do (cross-stage1).
