@@ -1,6 +1,6 @@
 SPK_NAME = dnsacme
-SPK_VERS = 1.0.4
-SPK_REV = 2
+SPK_VERS = 1.0.7
+SPK_REV = 3
 SPK_ICON = src/dnsacme.png
 
 DEPENDS = cross/dnsacme
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 MAINTAINER = mritd
 DESCRIPTION = DNS-01 ACME certificate manager with Synology DSM certificate deployment.
 DISPLAY_NAME = DNSACME
-CHANGELOG = "Initial package release."
+CHANGELOG = "Use DNSACME as the default certificate description."
 
 HOMEPAGE = https://github.com/mritd/dnsacme
 LICENSE = Apache-2.0

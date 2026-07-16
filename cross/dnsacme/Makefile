@@ -1,5 +1,5 @@
 PKG_NAME = dnsacme
-PKG_VERS = 1.0.4
+PKG_VERS = 1.0.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mritd/dnsacme/archive/refs/tags
