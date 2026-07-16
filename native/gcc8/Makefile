@@ -133,22 +133,47 @@ gcc8_post_install: $(INSTALL_TARGET)
 	$(MSG) "gcc8: bundled binutils ($(BINUTILS_MODE)) into $$gccexec"
 
 ##############################################################################
-# Build gcc8 for EVERY toolchain of a given DSM version.
-#   make all-6.2.4     make all-7.0
+# Build gcc8 for EVERY real toolchain of a given DSM version.
+#
+#   make all-6.2.4                 one arch at a time
+#   make GCC8_JOBS=5 all-6.2.4     5 archs at a time (each still max threads)
+#
+# Concurrency is expressed with xargs -P, deliberately NOT with make's -j: -j goes
+# into MAKEFLAGS and propagates down into every sub-make, parallelising package
+# and toolchain targets that are not written for it. That is not hypothetical --
+# it races the toolchain's rust_toml against its own extract (writing into work/
+# before extract creates it). It is also why native-cc.mk sets .NOTPARALLEL and
+# why spksrc.common.mk forces PARALLEL_MAKE=nop as soon as it sees -j.
+#
+# So each arch stays a plain serial make that keeps PARALLEL_MAKE=max for its own
+# compile step, and only the archs run concurrently. That is safe because they
+# share nothing: depend.mk builds NATIVE_DEPENDS inside the consumer's own
+# WORK_DIR, so every arch gets its own gmp/mpfr/mpc/isl next to its gcc, on top of
+# its own staging and co-built binutils.
+#
+# GCC8_JOBS x PARALLEL_MAKE is the real job count. A gcc build only keeps ~9 of
+# 24 cores busy on its own (long serial configure/link phases), so a handful of
+# concurrent archs is what actually fills the machine.
+#
+# Virtual/generic archs are skipped: an arch whose name is not its TC_DIST prefix
+# while that canonical sibling has its own toolchain (aarch64 -> rtd1296,
+# armv7 -> armada38x, x86 -> x64) merely shares the canonical toolchain, so
+# building it would duplicate the canonical archive. The prefix test alone is not
+# enough -- 88f6281 ships as '6281-...' and has no '6281' sibling, so it is real.
 ##############################################################################
+GCC8_TC_DIST    = $(shell sed -n 's/^TC_DIST *= *//p' ../../toolchain/syno-$(1)-$(2)/Makefile 2>/dev/null)
+GCC8_TC_CANON   = $(firstword $(subst -, ,$(call GCC8_TC_DIST,$(1),$(2))))
+GCC8_IS_VIRTUAL = $(if $(filter $(1),$(call GCC8_TC_CANON,$(1),$(2))),,$(wildcard ../../toolchain/syno-$(call GCC8_TC_CANON,$(1),$(2))-$(2)))
+GCC8_REAL_ARCHS = $(foreach a,$(patsubst syno-%-$(1),%,$(notdir $(wildcard ../../toolchain/syno-*-$(1)))),$(if $(call GCC8_IS_VIRTUAL,$(a),$(1)),,$(a)))
+
+GCC8_JOBS ?= 1
+
 .PHONY: all-%
 all-%:
-	@for tc in $(sort $(notdir $(wildcard ../../toolchain/syno-*-$*))); do \
-	  arch=$$(echo $$tc | sed 's/^syno-//; s/-$*$$//') ; \
-	  dist=$$(sed -n 's/^TC_DIST *= *//p' ../../toolchain/$$tc/Makefile) ; \
-	  canon=$${dist%%-*} ; \
-	  if [ "$$arch" != "$$canon" ] && [ -d ../../toolchain/syno-$$canon-$* ]; then \
-	    $(MSG) "----- gcc8: skip virtual $$arch-$* (shares the $$canon toolchain) -----" ; \
-	    continue ; \
-	  fi ; \
-	  $(MSG) "===== gcc8: $$arch-$* =====" ; \
-	  $(MAKE) --no-print-directory arch-$${arch}-$* || exit 1 ; \
-	done
+	@$(MSG) "gcc8: all-$* -- $(words $(call GCC8_REAL_ARCHS,$*)) archs, $(GCC8_JOBS) at a time"
+	@echo "$(sort $(call GCC8_REAL_ARCHS,$*))" | tr ' ' '\n' | \
+	   xargs -P $(GCC8_JOBS) -I@ $(MAKE) --no-print-directory arch-@-$*
+	@$(MSG) "gcc8: all-$* complete"
 
 ##############################################################################
 # Build gcc8 for a SPECIFIC toolchain of a given DSM version.
@@ -156,5 +181,6 @@ all-%:
 ##############################################################################
 .PHONY: arch-%
 arch-%:
-	  $(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) all
-	  $(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) build-archive
+	@$(MSG) "===== gcc8: $* ====="
+	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) all
+	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) build-archive
