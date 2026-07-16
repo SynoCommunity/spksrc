@@ -67,25 +67,38 @@ INSTALL_TARGET = nop
 POST_INSTALL_TARGET = gcc8_overlay_post_install
 include ../../mk/spksrc.native-install.mk
 
-# On a host==target toolchain (x86_64/i686) gcc-8.5's own libstdc++ lands in the
-# native lib dir, but the driver resolves the base toolchain's STOCK libstdc++
-# from the sysroot, which lacks the C++17 symbols (e.g. the codecvt referenced by
-# static std::filesystem -> undefined reference). Point the resolved libstdc++ at
-# gcc-8.5's newest one, keeping the stock as .legacy. No-op on cross archs (and on
-# re-runs), where gcc already resolves gcc-8.5's libstdc++.
+# gcc-8.5's own libstdc++ lands in the overlay's lib dir, but the driver keeps
+# resolving the base toolchain's STOCK libstdc++ out of the sysroot, which has
+# none of the C++17 symbols. Both flavours have to be repointed:
+#   libstdc++.so.6  dynamic link -- the common case
+#   libstdc++.a     -static-libstdc++; without it, gcc-8.5's libstdc++fs.a (the
+#                   std::filesystem implementation) links against the stock 4.9.3
+#                   libstdc++ and dies on undefined __codecvt_utf8_base /
+#                   operator delete(void*, size_t)
+# Point whatever the driver resolves at gcc-8.5's copy, keeping the stock as
+# .legacy. Idempotent (guarded by cmp) and a no-op wherever gcc-8.5 already
+# resolves its own.
 .PHONY: gcc8_overlay_post_install
 gcc8_overlay_post_install:
 	@gxx=\$(EXTRACT_PATH)/bin/\$(TC_TARGET)-g++-8.5 ; \\
-	new=\$\$(ls \$(EXTRACT_PATH)/lib*/libstdc++.so.6.0.* 2>/dev/null | grep -v -- -gdb.py | sort -V | tail -1) ; \\
-	cur=\$\$(\$\$gxx -print-file-name=libstdc++.so.6 2>/dev/null) ; curreal=\$\$(readlink -f "\$\$cur" 2>/dev/null) ; \\
-	if [ -n "\$\$new" ] && [ -n "\$\$curreal" ] && ! cmp -s "\$\$curreal" "\$\$new" ; then \\
-	  d=\$\$(dirname "\$\$curreal") ; b=\$\$(basename "\$\$new") ; \\
+	for lib in libstdc++.so.6 libstdc++.a ; do \\
+	  case "\$\$lib" in \\
+	    *.so.6) new=\$\$(ls \$(EXTRACT_PATH)/lib*/libstdc++.so.6.0.* 2>/dev/null | grep -v -- -gdb.py | sort -V | tail -1) ;; \\
+	    *.a)    new=\$\$(ls \$(EXTRACT_PATH)/lib*/libstdc++.a 2>/dev/null | head -1) ;; \\
+	  esac ; \\
+	  cur=\$\$(\$\$gxx -print-file-name=\$\$lib 2>/dev/null) ; curreal=\$\$(readlink -f "\$\$cur" 2>/dev/null) ; \\
+	  if [ -z "\$\$new" ] || [ -z "\$\$curreal" ] || [ ! -f "\$\$curreal" ] || cmp -s "\$\$curreal" "\$\$new" ; then \\
+	    \$(MSG) "gcc8 overlay: \$\$lib already resolves to gcc-8.5's (no-op)" ; \\
+	    continue ; \\
+	  fi ; \\
 	  [ -f "\$\$curreal.legacy" ] || cp -a "\$\$curreal" "\$\$curreal.legacy" ; \\
-	  cp -f "\$\$new" "\$\$d/\$\$b" ; ln -sf "\$\$b" "\$\$d/libstdc++.so.6" ; ln -sf "\$\$b" "\$\$d/libstdc++.so" ; \\
-	  \$(MSG) "gcc8 overlay: pointed \$\$d/libstdc++.so.6 at \$\$b (stock kept as .legacy)" ; \\
-	else \\
-	  \$(MSG) "gcc8 overlay: gcc-8.5 already resolves its own libstdc++ (no-op)" ; \\
-	fi
+	  case "\$\$lib" in \\
+	    *.so.6) d=\$\$(dirname "\$\$curreal") ; b=\$\$(basename "\$\$new") ; \\
+	            cp -f "\$\$new" "\$\$d/\$\$b" ; ln -sf "\$\$b" "\$\$d/libstdc++.so.6" ; ln -sf "\$\$b" "\$\$d/libstdc++.so" ;; \\
+	    *.a)    cp -f "\$\$new" "\$\$curreal" ;; \\
+	  esac ; \\
+	  \$(MSG) "gcc8 overlay: pointed \$\$lib at gcc-8.5's (stock kept as .legacy)" ; \\
+	done
 EOF
     n=$((n+1))
   done
