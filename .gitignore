@@ -56,3 +56,6 @@ local.mk
 
 # native archive outputs (build-archive, mk/spksrc.native/archive.mk)
 native/gcc8/*.txz
+
+# editor swap files
+*.swp

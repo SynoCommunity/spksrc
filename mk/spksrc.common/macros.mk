@@ -112,7 +112,7 @@ define LOG_WRAPPED
     fi \
 ' || { \
     $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" \
-        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(1)") \
+        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(STATUS_ARCH)" "$(1)") \
         | tee --append $(STATUS_LOG) ; \
     exit 1 ; \
 }
