@@ -452,6 +452,7 @@ tc_vars:
 	  fi ; \
 	done ; \
 	echo TC_GCC := $${gcc_version} ; \
+	echo TC_GCC_SUFFIX := $(TC_GCC_SUFFIX) ; \
 	echo TC_GLIBC := $(TC_GLIBC)
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)

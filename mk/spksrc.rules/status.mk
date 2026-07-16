@@ -34,17 +34,24 @@ endif
 
 pre_status_target:
 
+# Trailing "(gcc-<ver>)" naming the compiler actually used, but only when it is not
+# the toolchain's stock one -- a legacy build stays exactly as it reads today.
+# TC_GCC_SUFFIX comes from the generated tc_vars.mk and is non-empty precisely when
+# an overlay was selected, so it doubles as the condition. Reading a dependency
+# chain then shows, line by line, which ones were built with the newer gcc.
+STATUS_GCC = $(if $(strip $(TC_GCC_SUFFIX)), (gcc$(strip $(TC_GCC_SUFFIX))))
+
 status_target:  $(PRE_STATUS_TARGET)
 ifeq ($(notdir $(abspath $(CURDIR)/..)),native)
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(STATUS_ARCH)" "$(NAME)") | tee --append $(STATUS_LOG)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s%s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(STATUS_ARCH)" "$(NAME)" "$(STATUS_GCC)") | tee --append $(STATUS_LOG)
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolchain)
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(TC_NAME)))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s%s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(TC_NAME)))-$(TC_VERS)" "toolchain" "$(STATUS_GCC)") | tee --append $(STATUS_LOG)
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolkit)
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(TK_NAME)))-$(TK_VERS)" "toolkit") | tee --append $(STATUS_LOG)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s%s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(TK_NAME)))-$(TK_VERS)" "toolkit" "$(STATUS_GCC)") | tee --append $(STATUS_LOG)
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),kernel)
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(KERNEL_NAME)))-$(KERNEL_VERS)" "kernel") | tee --append $(STATUS_LOG)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s%s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(KERNEL_NAME)))-$(KERNEL_VERS)" "kernel" "$(STATUS_GCC)") | tee --append $(STATUS_LOG)
 else
-	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") | tee --append $(STATUS_LOG)
+	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s%s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)" "$(STATUS_GCC)") | tee --append $(STATUS_LOG)
 endif
 
 post_status_target: $(STATUS_TARGET)
