@@ -1,6 +1,6 @@
 SPK_NAME = dnsacme
 SPK_VERS = 1.0.7
-SPK_REV = 3
+SPK_REV = 1
 SPK_ICON = src/dnsacme.png
 
 DEPENDS = cross/dnsacme
