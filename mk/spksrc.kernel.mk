@@ -223,7 +223,7 @@ kernel-stage1: $(TCVARS_DONE)
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
 	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
-	@$(MAKE) WORK_DIR=$(WORK_DIR) LEGACY_TOOLCHAIN=$(LEGACY_TOOLCHAIN) --no-print-directory -C ../../toolchain/$(TC) tcvars
+	@$(MAKE) WORK_DIR=$(WORK_DIR) LEGACY_TOOLCHAIN=$(LEGACY_TOOLCHAIN) TC_GCC_VERSION=$(TC_GCC_VERSION) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
 $(TCVARS_DONE): ;
 endif

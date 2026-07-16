@@ -337,22 +337,41 @@ tc_rust_vars:
 	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
 	echo RUST_TARGET := $(RUST_TARGET)
 
-# Prefer a newer gcc overlay dropped beside the stock gcc (e.g. a
-# toolchain/syno-<arch>-<vers>-gcc8 overlay installs <prefix>gcc-8.5 +
-# <prefix>g++-8.5). TC_GCC_SUFFIX = the highest -<ver> for which BOTH
-# <prefix>gcc-<ver> and <prefix>g++-<ver> exist; empty otherwise (the stock
-# gcc's own versioned alias has no matching versioned g++, so a plain toolchain
-# is unaffected). Applied to the gcc-family tools (cc/cxx/cpp/fc) below.
+# Which gcc a build uses. An overlay (toolchain/syno-<arch>-<vers>-gcc8) installs
+# <prefix>gcc-8.5 + <prefix>g++-8.5 beside the stock gcc; TC_GCC_SUFFIX is the
+# -<ver> appended to the gcc-family tools (cc/cxx/cpp/fc) below, empty for stock.
 #
-# LEGACY_TOOLCHAIN=1 forces the stock Synology gcc even when an overlay is
-# present: it empties the suffix, so a package that must build against the base
-# toolchain (or that a newer gcc breaks) can opt out per package. Forwarded to
-# this generation by cross-cc.mk / native-cc.mk / kernel.mk.
-ifeq ($(strip $(LEGACY_TOOLCHAIN)),)
+# TC_GCC_VERSION selects it and defaults to 'legacy', so an installed overlay
+# stays INACTIVE: deploying one changes no existing package's compiler. Any other
+# value asks for that gcc.
+#
+# Resolution is per arch: the newest gcc installed in THIS toolchain that is <=
+# the requested version wins. That is what lets one fleet-wide default cover archs
+# whose newest overlay stops earlier -- ask for 12 and qoriq still gets 8.5, since
+# PowerPC SPE was dropped in gcc 9 -- and it degrades to the stock compiler on a
+# toolchain that has no overlay at all.
+#
+#   cross/foo/Makefile   TC_GCC_VERSION = 8.5     per package
+#   local.mk             TC_GCC_VERSION ?= 8.5    fleet-wide. '?=' matters: local.mk
+#                                                 is read after a package's own
+#                                                 assignments, so '=' would silently
+#                                                 override every package.
+#   command line         make TC_GCC_VERSION=8.5 ...
+#
+# LEGACY_TOOLCHAIN=1 forces the stock gcc and beats all of the above, so a package
+# a newer gcc breaks can pin itself once the fleet-wide default has moved on.
+# Both are forwarded to this generation by cross-cc.mk / native-cc.mk / kernel.mk.
+TC_GCC_VERSION ?= legacy
+
+ifeq ($(strip $(LEGACY_TOOLCHAIN))$(filter legacy,$(strip $(TC_GCC_VERSION))),)
 _TC_GCC_BIN       := $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
 _TC_GCC_VERSIONED := $(patsubst $(_TC_GCC_BIN)gcc-%,%,$(wildcard $(_TC_GCC_BIN)gcc-[0-9]*))
+# The stock gcc's own versioned alias has no matching versioned g++, so pairing
+# keeps a plain toolchain unaffected and only ever selects a real overlay.
 _TC_GCC_PAIRED    := $(foreach v,$(_TC_GCC_VERSIONED),$(if $(wildcard $(_TC_GCC_BIN)g++-$(v)),$(v)))
-TC_GCC_SUFFIX     := $(if $(_TC_GCC_PAIRED),-$(lastword $(sort $(_TC_GCC_PAIRED))))
+_TC_GCC_USABLE    := $(foreach v,$(_TC_GCC_PAIRED),$(if $(call version_le,$(v),$(TC_GCC_VERSION)),$(v)))
+# Version sort, not make's: $(sort 8.5 12) is lexicographic and would answer 8.5.
+TC_GCC_SUFFIX     := $(if $(_TC_GCC_USABLE),-$(lastword $(shell printf '%s\n' $(_TC_GCC_USABLE) | sort -V)))
 else
 TC_GCC_SUFFIX     :=
 endif

@@ -216,9 +216,13 @@ local.mk:
 	@echo "DISABLE_GITHUB_MAINTAINER =" >> $@
 	@echo "PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
-	@echo "# Force the stock Synology gcc even when a gcc overlay (e.g. gcc8) is" >> $@
-	@echo "# installed on the toolchain; uncomment to build against the base toolchain." >> $@
-	@echo "#LEGACY_TOOLCHAIN = 1" >> $@
+	@echo "# Which gcc to build with, fleet-wide. 'legacy' (the default) keeps each" >> $@
+	@echo "# toolchain's stock compiler, so an installed gcc overlay stays inactive." >> $@
+	@echo "# Set a version to prefer an overlay: it is clamped per arch to the newest" >> $@
+	@echo "# gcc that toolchain actually has, so 12 still gets 8.5 on qoriq. Keep the" >> $@
+	@echo "# '?=' -- local.mk is read after a package's own assignments, so '=' would" >> $@
+	@echo "# override every package. A package pins itself back with LEGACY_TOOLCHAIN = 1." >> $@
+	@echo "#TC_GCC_VERSION ?= 8.5" >> $@
 
 dsm-%: local.mk
 	@echo "Setting default toolchain version to DSM-$*"
