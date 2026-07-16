@@ -59,7 +59,12 @@ else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolkit)
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),kernel)
   DEFAULT_LOG = $(LOG_DIR)/build-$(STATUS_ARCH).log
 else ifeq ($(notdir $(abspath $(CURDIR)/..)),native)
-  DEFAULT_LOG = $(LOG_DIR)/build-$(STATUS_ARCH).log
+  # A native package always runs on the HOST. When it is parametrized by
+  # (arch, DSM) it merely *targets* that arch (it is a cross-compiler, an
+  # assembler, ...) -- it is NOT built to run on it, unlike cross/spk/diyspk. So
+  # keep the build-native prefix, which a cross log never has, and only append the
+  # target when there is one: build-native.log, or build-native-<arch>-<vers>.log.
+  DEFAULT_LOG = $(LOG_DIR)/build-native$(patsubst work-%,-%,$(filter-out work-native,$(notdir $(WORK_DIR)))).log
 else
   DEFAULT_LOG = $(LOG_DIR)/build$(or $(ARCH_SUFFIX),-noarch-$(TCVERSION)).log
 endif
