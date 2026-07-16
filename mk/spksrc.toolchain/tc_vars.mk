@@ -359,19 +359,31 @@ tc_rust_vars:
 #   command line         make TC_GCC_VERSION=8.5 ...
 #
 # LEGACY_TOOLCHAIN=1 forces the stock gcc and beats all of the above, so a package
-# a newer gcc breaks can pin itself once the fleet-wide default has moved on.
+# a newer gcc breaks can pin itself once the fleet-wide default has moved on. It is
+# a boolean (1/on/ON), so 0 means "do not force" and the choice falls back to
+# TC_GCC_VERSION -- which lets a package vary both per arch after including the
+# framework, where ARCH is known:
+#
+#   ifeq ($(ARCH),qoriq)
+#   LEGACY_TOOLCHAIN = 1
+#   else
+#   LEGACY_TOOLCHAIN = 0
+#   TC_GCC_VERSION = 8.5
+#   endif
+#
 # Both are forwarded to this generation by cross-cc.mk / native-cc.mk / kernel.mk.
 TC_GCC_VERSION ?= legacy
 
-ifeq ($(strip $(LEGACY_TOOLCHAIN))$(filter legacy,$(strip $(TC_GCC_VERSION))),)
+_TC_LEGACY := $(if $(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),1,$(filter legacy,$(strip $(TC_GCC_VERSION))))
+
+ifeq ($(strip $(_TC_LEGACY)),)
 _TC_GCC_BIN       := $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
 _TC_GCC_VERSIONED := $(patsubst $(_TC_GCC_BIN)gcc-%,%,$(wildcard $(_TC_GCC_BIN)gcc-[0-9]*))
 # The stock gcc's own versioned alias has no matching versioned g++, so pairing
 # keeps a plain toolchain unaffected and only ever selects a real overlay.
 _TC_GCC_PAIRED    := $(foreach v,$(_TC_GCC_VERSIONED),$(if $(wildcard $(_TC_GCC_BIN)g++-$(v)),$(v)))
 _TC_GCC_USABLE    := $(foreach v,$(_TC_GCC_PAIRED),$(if $(call version_le,$(v),$(TC_GCC_VERSION)),$(v)))
-# Version sort, not make's: $(sort 8.5 12) is lexicographic and would answer 8.5.
-TC_GCC_SUFFIX     := $(if $(_TC_GCC_USABLE),-$(lastword $(shell printf '%s\n' $(_TC_GCC_USABLE) | sort -V)))
+TC_GCC_SUFFIX     := $(if $(_TC_GCC_USABLE),-$(call version_max,$(_TC_GCC_USABLE)))
 else
 TC_GCC_SUFFIX     :=
 endif

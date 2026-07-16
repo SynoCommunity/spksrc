@@ -13,6 +13,7 @@
 #  version_ge  : true if version A >= version B
 #  version_lt  : true if version A <  version B
 #  version_gt  : true if version A >  version B
+#  version_max : highest version of a list
 #
 #  uniq        : removes duplicate words while preserving order
 #  dedup       : de-duplicates delimiter-separated strings
@@ -30,6 +31,7 @@
 # Macro: Version Comparison
 version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
+version_max = $(lastword $(shell printf '%s\n' $(1) | sort -V))
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 
