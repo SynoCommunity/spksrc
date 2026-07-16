@@ -12,7 +12,7 @@ PKG_VERS = 8.5.0
 PKG_EXT  = txz
 # Name/site come from native/gcc8 (print-archive-name); a virtual arch reuses the
 # canonical arch's archive (bromolow), extracted into its own toolchain.
-PKG_DIST_NAME = bromolow-gcc850_binutils230_glibc226_x86_64-GPL-dsm70.txz
+PKG_DIST_NAME = bromolow-gcc850_binutils230_glibc226_x86_64-GPL-dsm70-v2.txz
 PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/toolchains%2Fdsm7.0
 
 EXTRACT_PATH = $(abspath ../$(TC_BASE)/work/$(TC_TARGET))

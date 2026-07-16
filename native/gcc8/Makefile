@@ -45,7 +45,19 @@ POST_INSTALL_TARGET  = gcc8_post_install
 # lib/. Strip target objects (libstdc++, libgcc, crt*.o) with the arch's OWN
 # strip, host binaries (driver, cc1/cc1plus, bundled binutils) with the host one.
 ##############################################################################
-NATIVE_ARCHIVE = $(TC_ARCH)-gcc$(subst .,,$(PKG_VERS))_binutils$(subst .,,$(TC_BINUTILS))_glibc$(subst .,,$(TC_GLIBC))_$(firstword $(subst -, ,$(TC_TARGET)))-GPL-dsm$(subst .,,$(TC_VERS)).txz
+# Archive revision, appended to the name. Bump it whenever a rebuild changes what
+# is inside the archive without changing any of the versions already encoded in
+# the name (gcc, binutils, glibc, DSM). Two reasons: a rebuild then lands under a
+# new name instead of silently replacing a file consumers may have cached under
+# the old checksum, and a bad batch stays identifiable, so it can be pulled
+# without touching the good one.
+#   v1  initial layout
+#   v2  --enable-version-specific-runtime-libs: runtimes moved from lib64/ to
+#       lib/gcc/<target>/<version>/, so the overlay no longer overwrites the
+#       toolchain's stock libstdc++
+GCC8_REV = v2
+
+NATIVE_ARCHIVE = $(TC_ARCH)-gcc$(subst .,,$(PKG_VERS))_binutils$(subst .,,$(TC_BINUTILS))_glibc$(subst .,,$(TC_GLIBC))_$(firstword $(subst -, ,$(TC_TARGET)))-GPL-dsm$(subst .,,$(TC_VERS))-$(GCC8_REV).txz
 NATIVE_ARCHIVE_SENTINEL = $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/$(TC_TARGET)-gcc-8.5
 NATIVE_ARCHIVE_STRIP = 1
 NATIVE_ARCHIVE_STRIP_TARGET = $(TC_BINUTILS_BIN)/$(TC_TARGET)-strip
