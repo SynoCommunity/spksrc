@@ -151,9 +151,18 @@ gcc8_post_install: $(INSTALL_TARGET)
 # WORK_DIR, so every arch gets its own gmp/mpfr/mpc/isl next to its gcc, on top of
 # its own staging and co-built binutils.
 #
-# GCC8_JOBS x PARALLEL_MAKE is the real job count. A gcc build only keeps ~9 of
-# 24 cores busy on its own (long serial configure/link phases), so a handful of
-# concurrent archs is what actually fills the machine.
+# GCC8_JOBS x PARALLEL_MAKE is the real job count, and it pays off far less than
+# it looks. A gcc build only keeps ~9 of 24 cores busy on its own (long serial
+# configure/link phases), so some concurrency does help -- but every arch here
+# builds the *same* thing, so their compile peaks line up instead of interleaving.
+# Measured on a 24-core host, 53 archs:
+#
+#   GCC8_JOBS=1   4.2 min/arch   load ~9
+#   GCC8_JOBS=5   2.4 min/arch   load ~60     <- 6x the load for 1.75x the work
+#
+# Unlike an spk build, whose dependencies have heterogeneous load profiles and
+# take -j5 happily, gcc is homogeneous and heavy: treat it like boost or llvm and
+# keep this low. 2-3 captures most of the gain without thrashing the machine.
 #
 # Virtual/generic archs are skipped: an arch whose name is not its TC_DIST prefix
 # while that canonical sibling has its own toolchain (aarch64 -> rtd1296,
