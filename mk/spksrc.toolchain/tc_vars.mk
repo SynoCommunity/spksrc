@@ -341,27 +341,30 @@ tc_rust_vars:
 # <prefix>gcc-8.5 + <prefix>g++-8.5 beside the stock gcc; TC_GCC_SUFFIX is the
 # -<ver> appended to the gcc-family tools (cc/cxx/cpp/fc) below, empty for stock.
 #
-# TC_GCC_VERSION selects it and defaults to 'legacy', so an installed overlay
-# stays INACTIVE: deploying one changes no existing package's compiler. Any other
-# value asks for that gcc.
+# LEGACY_TOOLCHAIN decides, and defaults to 1: an installed overlay stays
+# INACTIVE, so deploying one changes no existing package's compiler.
 #
-# Resolution is per arch: the newest gcc installed in THIS toolchain that is <=
-# the requested version wins. That is what lets one fleet-wide default cover archs
-# whose newest overlay stops earlier -- ask for 12 and qoriq still gets 8.5, since
-# PowerPC SPE was dropped in gcc 9 -- and it degrades to the stock compiler on a
-# toolchain that has no overlay at all.
+#   LEGACY_TOOLCHAIN = 1   the toolchain's stock gcc, always -- TC_GCC_VERSION is
+#                          not even looked at (default)
+#   LEGACY_TOOLCHAIN = 0   the newest gcc this toolchain has
+#   + TC_GCC_VERSION = 8.5 exactly that gcc, or a hard error
 #
-#   cross/foo/Makefile   TC_GCC_VERSION = 8.5     per package
-#   local.mk             TC_GCC_VERSION ?= 8.5    fleet-wide. '?=' matters: local.mk
+# 'newest' is per arch and needs no special-casing: qoriq ends at gcc 8.5 (PowerPC
+# SPE was dropped in gcc 9) while others may reach further, so one fleet-wide
+# LEGACY_TOOLCHAIN = 0 gives each arch the best it actually has. A toolchain with
+# no overlay at all stays on its stock gcc.
+#
+# TC_GCC_VERSION is a pin, not a preference: it fails rather than silently
+# building with a different compiler than the one asked for.
+#
+#   cross/foo/Makefile   LEGACY_TOOLCHAIN = 0     per package
+#   local.mk             LEGACY_TOOLCHAIN ?= 0    fleet-wide. '?=' matters: local.mk
 #                                                 is read after a package's own
 #                                                 assignments, so '=' would silently
 #                                                 override every package.
-#   command line         make TC_GCC_VERSION=8.5 ...
+#   command line         make LEGACY_TOOLCHAIN=0 ...
 #
-# LEGACY_TOOLCHAIN=1 forces the stock gcc and beats all of the above, so a package
-# a newer gcc breaks can pin itself once the fleet-wide default has moved on. It is
-# a boolean (1/on/ON), so 0 means "do not force" and the choice falls back to
-# TC_GCC_VERSION -- which lets a package vary both per arch after including the
+# Both are booleans/values a package may set per arch, after including the
 # framework, where ARCH is known:
 #
 #   ifeq ($(ARCH),qoriq)
@@ -372,18 +375,21 @@ tc_rust_vars:
 #   endif
 #
 # Both are forwarded to this generation by cross-cc.mk / native-cc.mk / kernel.mk.
-TC_GCC_VERSION ?= legacy
+LEGACY_TOOLCHAIN ?= 1
 
-_TC_LEGACY := $(if $(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),1,$(filter legacy,$(strip $(TC_GCC_VERSION))))
-
-ifeq ($(strip $(_TC_LEGACY)),)
+ifeq ($(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),)
 _TC_GCC_BIN       := $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
 _TC_GCC_VERSIONED := $(patsubst $(_TC_GCC_BIN)gcc-%,%,$(wildcard $(_TC_GCC_BIN)gcc-[0-9]*))
 # The stock gcc's own versioned alias has no matching versioned g++, so pairing
 # keeps a plain toolchain unaffected and only ever selects a real overlay.
 _TC_GCC_PAIRED    := $(foreach v,$(_TC_GCC_VERSIONED),$(if $(wildcard $(_TC_GCC_BIN)g++-$(v)),$(v)))
-_TC_GCC_USABLE    := $(foreach v,$(_TC_GCC_PAIRED),$(if $(call version_le,$(v),$(TC_GCC_VERSION)),$(v)))
-TC_GCC_SUFFIX     := $(if $(_TC_GCC_USABLE),-$(call version_max,$(_TC_GCC_USABLE)))
+ifeq ($(strip $(TC_GCC_VERSION)),)
+TC_GCC_SUFFIX     := $(if $(_TC_GCC_PAIRED),-$(call version_max,$(_TC_GCC_PAIRED)))
+else ifeq ($(filter $(strip $(TC_GCC_VERSION)),$(_TC_GCC_PAIRED)),)
+$(error TC_GCC_VERSION=$(strip $(TC_GCC_VERSION)) requested for $(TC_ARCH)-$(TC_VERS), but that toolchain provides: $(or $(strip $(_TC_GCC_PAIRED)),no gcc overlay at all))
+else
+TC_GCC_SUFFIX     := -$(strip $(TC_GCC_VERSION))
+endif
 else
 TC_GCC_SUFFIX     :=
 endif

@@ -149,38 +149,58 @@ existing sysroot and extracts it next to the stock gcc, leaving glibc untouched.
 
 ### Choosing the compiler
 
-An overlay being *installed* does not make it *used*. **`TC_GCC_VERSION`** decides,
-and defaults to `legacy` — the toolchain's stock compiler — so deploying an
+An overlay being *installed* does not make it *used*. **`LEGACY_TOOLCHAIN`**
+decides, and defaults to `1` — the toolchain's stock compiler — so deploying an
 overlay changes nothing until something asks for it.
 
 ```makefile
 # cross/foo/Makefile -- this package needs C++17
-TC_GCC_VERSION = 8.5
+LEGACY_TOOLCHAIN = 0
 ```
 
-| Where | How | Scope |
-|-------|-----|-------|
-| package `Makefile` | `TC_GCC_VERSION = 8.5` | that package |
-| `local.mk` | `TC_GCC_VERSION ?= 8.5` | fleet-wide default |
-| command line | `make TC_GCC_VERSION=8.5 …` | one invocation |
+| Value | Compiler |
+|-------|----------|
+| `LEGACY_TOOLCHAIN = 1` | the toolchain's stock gcc, always — `TC_GCC_VERSION` is not even looked at (**default**) |
+| `LEGACY_TOOLCHAIN = 0` | the newest gcc that toolchain has |
+| `+ TC_GCC_VERSION = 8.5` | exactly that gcc, or a hard error |
+
+**"Newest" is per architecture, which is the point**: qoriq ends at gcc 8.5
+(PowerPC SPE was dropped in gcc 9) while other archs may reach further, so a
+single fleet-wide `LEGACY_TOOLCHAIN = 0` gives every arch the best it actually
+has, with no special-casing. A toolchain with no overlay stays on its stock gcc.
+
+`TC_GCC_VERSION` is a **pin, not a preference**. If that exact gcc is not
+installed for the arch, the build stops:
+
+```
+TC_GCC_VERSION=12 requested for qoriq-6.2.4, but that toolchain provides: 8.5
+```
+
+It fails rather than silently building with a compiler you did not ask for. Use
+it when a package genuinely requires one version; use `LEGACY_TOOLCHAIN = 0`
+when you just want "something modern".
+
+| Where | Scope |
+|-------|-------|
+| package `Makefile` | that package |
+| `local.mk` (`LEGACY_TOOLCHAIN ?= 0`) | fleet-wide default |
+| command line | one invocation |
 
 The `?=` in `local.mk` is not optional: `local.mk` is read *after* a package's own
 assignments, so a plain `=` would silently override every package.
 
-**The request is clamped per architecture** to the newest gcc that toolchain
-actually has. Ask for `12` fleet-wide and qoriq still builds with `8.5`, because
-PowerPC SPE was dropped in gcc 9 and its overlay stops there; a toolchain with no
-overlay at all quietly stays on its stock compiler. So one default can cover a
-fleet whose archs do not all reach the same gcc.
+Both can be varied per arch inside a package, after including the framework —
+that is where `ARCH` is known:
 
-### Pinning a package back to the stock compiler
+```makefile
+include ../../mk/spksrc.cross-cc.mk
 
-**`LEGACY_TOOLCHAIN = 1`** forces the stock gcc and beats everything above —
-useful when the fleet-wide default has moved on but one package does not survive
-the newer compiler:
-
-```bash
-make LEGACY_TOOLCHAIN=1 -C spk/tvheadend arch-x64-6.2.4
+ifeq ($(ARCH),qoriq)
+LEGACY_TOOLCHAIN = 1        # this one does not survive the newer gcc
+else
+LEGACY_TOOLCHAIN = 0
+TC_GCC_VERSION = 8.5
+endif
 ```
 
 ## tc_vars Files
