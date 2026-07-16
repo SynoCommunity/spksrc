@@ -176,9 +176,6 @@ include ../../mk/spksrc.toolchain/tc-normalize.mk
 patch: normalize
 include ../../mk/spksrc.build/patch.mk
 
-rustc: patch
-include ../../mk/spksrc.toolchain/tc-rust.mk
-
 ##############################################################################
 # gcc overlay
 #
@@ -186,25 +183,29 @@ include ../../mk/spksrc.toolchain/tc-rust.mk
 # newer gcc built against THIS toolchain's own sysroot and extracts it next to
 # the stock gcc (see native/gcc8). glibc is untouched: only the compiler moves.
 #
-# It has to land after the toolchain is extracted and patched -- it installs into
-# that tree -- and before tc_vars is generated, because the generator selects the
-# newest gcc it can see (TC_GCC_SUFFIX in spksrc.toolchain/tc_vars.mk). Ordering
-# is expressed with dependencies rather than the order of _all's prerequisites,
+# It lands after the toolchain is extracted and patched -- it installs into that
+# tree -- and before rustc, so a rustc rebuilt for this toolchain (e.g. qoriq)
+# gets the newer compiler too, and before tc_vars, which selects the newest gcc
+# it can see (TC_GCC_SUFFIX in spksrc.toolchain/tc_vars.mk). Ordering is
+# expressed with dependencies rather than the order of _all's prerequisites,
 # which make is free to reorder.
 #
-# A no-op for a toolchain with no overlay (7.1+ already ship gcc 8.5). Note the
-# overlay is deployed even under LEGACY_TOOLCHAIN=1: that flag makes tc_vars
-# ignore the newer gcc, so it can be flipped per package without rebuilding the
-# toolchain.
+# A no-op for a toolchain with no overlay (7.1+ already ship gcc 8.5). The
+# overlay is deployed even under LEGACY_TOOLCHAIN=1: it adds a second compiler
+# without touching the stock one, and that flag only decides which of the two
+# tc_vars picks -- so it can be flipped per package without rebuilding anything.
 ##############################################################################
 TC_OVERLAY_DIR := $(wildcard $(CURDIR)-gcc8)
 
 .PHONY: tc-overlay
-tc-overlay: rustc
+tc-overlay: patch
 ifneq ($(strip $(TC_OVERLAY_DIR)),)
 	@$(MSG) "Deploying gcc overlay $(notdir $(TC_OVERLAY_DIR))"
 	@$(MAKE) --no-print-directory -C $(TC_OVERLAY_DIR)
 endif
+
+rustc: tc-overlay
+include ../../mk/spksrc.toolchain/tc-rust.mk
 
 include ../../mk/spksrc.toolchain/tc_vars.mk
 

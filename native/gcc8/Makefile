@@ -90,6 +90,15 @@ CONFIGURE_ARGS += $(GCC8_TARGET_ABI)
 CONFIGURE_ARGS += --enable-languages=c,c++,fortran
 CONFIGURE_ARGS += --enable-__cxa_atexit
 CONFIGURE_ARGS += --enable-threads=posix
+# Install libstdc++/libgcc under $(libdir)/gcc/$(target)/$(version)/ instead of
+# $(libdir). This is what lets the overlay coexist with the toolchain's stock gcc
+# rather than fight it: each compiler resolves the runtime from its own versioned
+# directory, so gcc-8.5 gets its C++17-capable libstdc++ while the stock gcc keeps
+# the one in the sysroot -- untouched. Without it both compilers resolve the same
+# sysroot libstdc++, and the only way to satisfy gcc-8.5 is to overwrite it, which
+# silently breaks LEGACY_TOOLCHAIN=1 (the stock gcc would then link against the
+# newer libstdc++).
+CONFIGURE_ARGS += --enable-version-specific-runtime-libs
 CONFIGURE_ARGS += --disable-multilib
 CONFIGURE_ARGS += --disable-bootstrap
 CONFIGURE_ARGS += --disable-nls
