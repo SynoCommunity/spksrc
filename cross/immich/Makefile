@@ -6,10 +6,7 @@ PKG_DIST_SITE = https://github.com/immich-app/immich/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/nodejs_22 native/pnpm
-
-# extism-js (host tool) is needed at build time to compile immich-plugin-core to WASM
-EXTISM_JS_VERSION = 1.6.0
+BUILD_DEPENDS = native/nodejs_22 native/pnpm native/extism-js native/binaryen
 
 HOMEPAGE = https://immich.app
 COMMENT  = Self-hosted photo and video backup solution.
@@ -17,7 +14,7 @@ LICENSE  = GPLv3
 
 INSTALL_TARGET = immich_install
 POST_INSTALL_TARGET = immich_post_install
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(WORK_DIR)/tools:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(WORK_DIR)/../../../native/extism-js/work-native/install/usr/local/bin:$(WORK_DIR)/../../../native/binaryen/work-native/install/usr/local/bin:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ENV += HUSKY=0
@@ -46,23 +43,6 @@ immich_install:
 	# 2. Install all deps (needed for building)
 	# ------------------------------------------------------------
 	$(RUN) pnpm install --frozen-lockfile
-
-	# ------------------------------------------------------------
-	# 2a. Download extism-js (host tool for plugin WASM build)
-	# ------------------------------------------------------------
-	mkdir -p $(WORK_DIR)/tools
-	@if [ ! -x $(WORK_DIR)/tools/extism-js ]; then \
-		echo "Downloading extism-js v$(EXTISM_JS_VERSION)..."; \
-		wget -q -O - https://github.com/extism/js-pdk/releases/download/v$(EXTISM_JS_VERSION)/extism-js-x86_64-linux-v$(EXTISM_JS_VERSION).gz \
-		| gunzip -c > $(WORK_DIR)/tools/extism-js && chmod +x $(WORK_DIR)/tools/extism-js; \
-	fi
-	@if [ ! -x $(WORK_DIR)/tools/wasm-opt ]; then \
-		echo "Downloading binaryen (wasm tools)..."; \
-		mkdir -p $(WORK_DIR)/tools && \
-		wget -q -O $(WORK_DIR)/tools/binaryen.tar.gz https://github.com/WebAssembly/binaryen/releases/download/version_124/binaryen-version_124-x86_64-linux.tar.gz && \
-		tar -xzf $(WORK_DIR)/tools/binaryen.tar.gz -C $(WORK_DIR)/tools --strip-components=2 binaryen-version_124/bin/ && \
-		rm -f $(WORK_DIR)/tools/binaryen.tar.gz; \
-	fi
 
 	# ------------------------------------------------------------
 	# 3. Build (order: sdk -> plugin-sdk -> plugin-core -> cli -> server -> web)
