@@ -106,7 +106,8 @@ service_preuninst ()
         mkdir -p "${wizard_dbexport_path}"
         PG_VERSION=$("${PG_PGDUMP}" --version 2>/dev/null | sed 's/.* \([0-9]*\)\..*/\1/' || echo "17")
         TIMESTAMP=$(date +%Y%m%dT%H%M%S)
-        FILENAME="immich-db-backup-${TIMESTAMP}-v3.0.3-pg${PG_VERSION}.sql.gz"
+        IMMICH_VERSION="${SYNOPKG_PKGVER%-*}"
+        FILENAME="immich-db-backup-${TIMESTAMP}-v${IMMICH_VERSION}-pg${PG_VERSION}.sql.gz"
         PGPASSWORD="${wizard_pg_password_immich}" ${PG_PGDUMP} -h "${PG_HOST}" -p "${PG_PORT}" -U "${PG_USER}" -d "${PG_DATABASE}" | gzip > "${wizard_dbexport_path}/${FILENAME}"
     fi
 }
