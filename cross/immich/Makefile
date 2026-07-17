@@ -8,13 +8,16 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/nodejs_22 native/pnpm
 
+# extism-js (host tool) is needed at build time to compile immich-plugin-core to WASM
+EXTISM_JS_VERSION = 1.6.0
+
 HOMEPAGE = https://immich.app
 COMMENT  = Self-hosted photo and video backup solution.
 LICENSE  = GPLv3
 
 INSTALL_TARGET = immich_install
 POST_INSTALL_TARGET = immich_post_install
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(WORK_DIR)/tools:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ENV += HUSKY=0
@@ -45,10 +48,28 @@ immich_install:
 	$(RUN) pnpm install --frozen-lockfile
 
 	# ------------------------------------------------------------
-	# 3. Build (order: sdk -> plugin-sdk -> cli -> server -> web)
+	# 2a. Download extism-js (host tool for plugin WASM build)
+	# ------------------------------------------------------------
+	mkdir -p $(WORK_DIR)/tools
+	@if [ ! -x $(WORK_DIR)/tools/extism-js ]; then \
+		echo "Downloading extism-js v$(EXTISM_JS_VERSION)..."; \
+		wget -q -O - https://github.com/extism/js-pdk/releases/download/v$(EXTISM_JS_VERSION)/extism-js-x86_64-linux-v$(EXTISM_JS_VERSION).gz \
+		| gunzip -c > $(WORK_DIR)/tools/extism-js && chmod +x $(WORK_DIR)/tools/extism-js; \
+	fi
+	@if [ ! -x $(WORK_DIR)/tools/wasm-opt ]; then \
+		echo "Downloading binaryen (wasm tools)..."; \
+		mkdir -p $(WORK_DIR)/tools && \
+		wget -q -O $(WORK_DIR)/tools/binaryen.tar.gz https://github.com/WebAssembly/binaryen/releases/download/version_124/binaryen-version_124-x86_64-linux.tar.gz && \
+		tar -xzf $(WORK_DIR)/tools/binaryen.tar.gz -C $(WORK_DIR)/tools --strip-components=2 binaryen-version_124/bin/ && \
+		rm -f $(WORK_DIR)/tools/binaryen.tar.gz; \
+	fi
+
+	# ------------------------------------------------------------
+	# 3. Build (order: sdk -> plugin-sdk -> plugin-core -> cli -> server -> web)
 	# ------------------------------------------------------------
 	$(RUN) pnpm --filter @immich/sdk run build
 	$(RUN) pnpm --filter @immich/plugin-sdk run build
+	$(RUN) pnpm --filter @immich/plugin-core run build
 	$(RUN) pnpm --filter @immich/cli run build
 	$(RUN) pnpm --filter immich run build
 	$(RUN) pnpm --filter immich-web run build
@@ -109,7 +130,7 @@ immich_install:
 	$(RUN) find immich-deploy/node_modules -type d -name "*musl*" -exec rm -rf {} + 2>/dev/null || true
 
 	# ------------------------------------------------------------
-	# 6a. Patch hardcoded PostgreSQL binary paths
+	# 7. Patch hardcoded PostgreSQL binary paths
 	# ------------------------------------------------------------
 	# Immich assumes Linux paths like /usr/lib/postgresql/*/bin/pg_dump
 	# DSM has these at /usr/local/bin/ via SPK_COMMANDS symlinks
@@ -117,7 +138,7 @@ immich_install:
 		immich-deploy/dist/services/database-backup.service.js 2>/dev/null || true
 
 	# ------------------------------------------------------------
-	# 7. Install to staging
+	# 8. Install to staging
 	# ------------------------------------------------------------
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/immich
 	cp -a $(WORK_DIR)/$(PKG_DIR)/immich-deploy/* $(STAGING_INSTALL_PREFIX)/share/immich/
@@ -130,9 +151,13 @@ immich_install:
 	# Install ML Python source (bundled with the main app, used by optional ML worker)
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/immich/immich-ml
 	cp -a $(WORK_DIR)/$(PKG_DIR)/machine-learning-src/immich_ml $(STAGING_INSTALL_PREFIX)/share/immich/immich-ml/
+	# Install plugin-core (built-in workflow plugin)
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/immich/plugins/immich-plugin-core/dist
+	cp -a $(WORK_DIR)/$(PKG_DIR)/packages/plugin-core/dist/* $(STAGING_INSTALL_PREFIX)/share/immich/plugins/immich-plugin-core/dist/
+	cp -a $(WORK_DIR)/$(PKG_DIR)/packages/plugin-core/manifest.json $(STAGING_INSTALL_PREFIX)/share/immich/plugins/immich-plugin-core/
 
 	# ------------------------------------------------------------
-	# 8. Generate PLIST
+	# 9. Generate PLIST
 	# ------------------------------------------------------------
 	( cd $(STAGING_INSTALL_PREFIX) && \
 		find share/immich -type f -o -type l | sort ) \
