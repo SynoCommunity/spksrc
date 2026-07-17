@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 MAINTAINER = mritd
 DESCRIPTION = DNS-01 ACME certificate manager with Synology DSM certificate deployment.
 DISPLAY_NAME = DNSACME
-CHANGELOG = "Use DNSACME as the default certificate description."
+CHANGELOG = "Initial package release."
 
 HOMEPAGE = https://github.com/mritd/dnsacme
 LICENSE = Apache-2.0
