@@ -1,6 +1,6 @@
 SPK_NAME = immich
-SPK_VERS = 3.0.2
-SPK_REV = 1
+SPK_VERS = 3.0.3
+SPK_REV = 2
 SPK_ICON = src/immich.png
 
 DEPENDS = cross/immich cross/immich-geodata
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Immich
 DESCRIPTION = Self-hosted photo and video backup solution.
-CHANGELOG = "1. Initial release of Immich v3.0.2."
+CHANGELOG = "1. Update Immich to v3.0.3."
 HOMEPAGE = https://immich.app
 LICENSE = GPLv3
 

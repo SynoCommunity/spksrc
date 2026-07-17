@@ -1,5 +1,5 @@
 PKG_NAME = immich
-PKG_VERS = 3.0.2
+PKG_VERS = 3.0.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/immich-app/immich/archive/refs/tags
