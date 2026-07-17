@@ -1,12 +1,12 @@
 PKG_NAME = immich
-PKG_VERS = 3.0.2
+PKG_VERS = 3.0.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/immich-app/immich/archive/refs/tags
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-BUILD_DEPENDS = native/nodejs_22 native/pnpm
+BUILD_DEPENDS = native/nodejs_22 native/pnpm native/extism-js native/binaryen
 
 HOMEPAGE = https://immich.app
 COMMENT  = Self-hosted photo and video backup solution.
@@ -14,7 +14,7 @@ LICENSE  = GPLv3
 
 INSTALL_TARGET = immich_install
 POST_INSTALL_TARGET = immich_post_install
-ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$$PATH
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(WORK_DIR)/../../../native/pnpm/work-native/bin:$(WORK_DIR)/../../../native/extism-js/work-native/install/usr/local/bin:$(WORK_DIR)/../../../native/binaryen/work-native/install/usr/local/bin:$$PATH
 ENV += COREPACK_ENABLE_AUTO_PIN=0
 ENV += COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ENV += HUSKY=0
@@ -45,10 +45,11 @@ immich_install:
 	$(RUN) pnpm install --frozen-lockfile
 
 	# ------------------------------------------------------------
-	# 3. Build (order: sdk -> plugin-sdk -> cli -> server -> web)
+	# 3. Build (order: sdk -> plugin-sdk -> plugin-core -> cli -> server -> web)
 	# ------------------------------------------------------------
 	$(RUN) pnpm --filter @immich/sdk run build
 	$(RUN) pnpm --filter @immich/plugin-sdk run build
+	$(RUN) pnpm --filter @immich/plugin-core run build
 	$(RUN) pnpm --filter @immich/cli run build
 	$(RUN) pnpm --filter immich run build
 	$(RUN) pnpm --filter immich-web run build
@@ -109,7 +110,7 @@ immich_install:
 	$(RUN) find immich-deploy/node_modules -type d -name "*musl*" -exec rm -rf {} + 2>/dev/null || true
 
 	# ------------------------------------------------------------
-	# 6a. Patch hardcoded PostgreSQL binary paths
+	# 7. Patch hardcoded PostgreSQL binary paths
 	# ------------------------------------------------------------
 	# Immich assumes Linux paths like /usr/lib/postgresql/*/bin/pg_dump
 	# DSM has these at /usr/local/bin/ via SPK_COMMANDS symlinks
@@ -117,7 +118,7 @@ immich_install:
 		immich-deploy/dist/services/database-backup.service.js 2>/dev/null || true
 
 	# ------------------------------------------------------------
-	# 7. Install to staging
+	# 8. Install to staging
 	# ------------------------------------------------------------
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/immich
 	cp -a $(WORK_DIR)/$(PKG_DIR)/immich-deploy/* $(STAGING_INSTALL_PREFIX)/share/immich/
@@ -130,9 +131,13 @@ immich_install:
 	# Install ML Python source (bundled with the main app, used by optional ML worker)
 	install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/immich/immich-ml
 	cp -a $(WORK_DIR)/$(PKG_DIR)/machine-learning-src/immich_ml $(STAGING_INSTALL_PREFIX)/share/immich/immich-ml/
+	# Install plugin-core (built-in workflow plugin)
+	install -m 755 -d $(STAGING_INSTALL_PREFIX)/share/immich/plugins/immich-plugin-core/dist
+	cp -a $(WORK_DIR)/$(PKG_DIR)/packages/plugin-core/dist/* $(STAGING_INSTALL_PREFIX)/share/immich/plugins/immich-plugin-core/dist/
+	cp -a $(WORK_DIR)/$(PKG_DIR)/packages/plugin-core/manifest.json $(STAGING_INSTALL_PREFIX)/share/immich/plugins/immich-plugin-core/
 
 	# ------------------------------------------------------------
-	# 8. Generate PLIST
+	# 9. Generate PLIST
 	# ------------------------------------------------------------
 	( cd $(STAGING_INSTALL_PREFIX) && \
 		find share/immich -type f -o -type l | sort ) \
