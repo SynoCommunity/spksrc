@@ -1,11 +1,14 @@
 PKG_NAME = git
-PKG_VERS = 2.53.0
+PKG_VERS = 2.55.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://kernel.org/pub/software/scm/git
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libexpat cross/zlib cross/openssl3 cross/libssh2 cross/curl cross/pcre2
+
+# fsmonitor daemon requires inotify_init1 (glibc >= 2.9)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://git-scm.com
 COMMENT  = Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.
@@ -36,6 +39,7 @@ INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 # compiling needs access to curl-config from cross/curl
 ENV += PATH=$$PATH:$(STAGING_INSTALL_PREFIX)/bin
 
+ENV += NO_RUST=1
 include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: git_pre_configure
