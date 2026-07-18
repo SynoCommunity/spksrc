@@ -6,7 +6,7 @@ SPK_ICON = src/forgejo.png
 MAINTAINER = nhymxu
 DESCRIPTION  = Forgejo is a self-hosted lightweight software forge.
 DISPLAY_NAME = Forgejo
-CHANGELOG = "1. Update to v16.0.0"
+CHANGELOG = "1. Update to <a target=\"_blank\" href=\"https://codeberg.org/forgejo/forgejo/src/branch/forgejo/release-notes-published/16.0.0.md\">v16.0.0</a>"
 
 LICENSE = GPLv3
 
