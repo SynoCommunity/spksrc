@@ -1,17 +1,20 @@
 SPK_NAME = git
-SPK_VERS = 2.53.0
-SPK_REV = 40
+SPK_VERS = 2.55.0
+SPK_REV = 41
 SPK_ICON = src/git.png
 
 DEPENDS = cross/git
 OPTIONAL_DEPENDS = cross/git-lfs
+
+# fsmonitor daemon requires inotify_init1 (glibc >= 2.9)
+UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.
 DESCRIPTION_FRE = Git est un système de gestion de révision rapide, extensible et distribué avec un ensemble de commandes inhabituellement riche qui fournit à la fois des opérations de haut niveau et un accès complet aux structures de bas niveau.
 STARTABLE = no
 DISPLAY_NAME = Git
-CHANGELOG = "1. Update git to v2.53.0. <br/>2. Add PCRE2 support for Perl-compatible regular expressions (git grep -P)."
+CHANGELOG = "1. Update git to v2.55.0."
 
 HOMEPAGE = https://git-scm.com
 LICENSE  = GPLv2
