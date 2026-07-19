@@ -14,7 +14,6 @@ LICENSE  = LGPL2.1+
 
 DEPENDS = cross/fftw
 
-# compiler too old
 # Needs gcc >= 4.8: C++11 features unavailable before gcc 4.8.
 MIN_GCC_VERSION = 4.8
 

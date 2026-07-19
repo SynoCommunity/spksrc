@@ -10,10 +10,7 @@ HOMEPAGE = https://breakfastquay.com/rubberband/
 COMMENT  = An audio time-stretching and pitch-shifting library and utility program.
 LICENSE  = GPL-2.0 license
 
-# Minimum GCC version required is 7
-REQUIRED_MIN_DSM = 7.0
 # Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
 MIN_GCC_VERSION = 7.5
-REQUIRED_MIN_SRM = 1.3
 
 include ../../mk/spksrc.cross-meson.mk

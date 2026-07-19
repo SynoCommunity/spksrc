@@ -6,12 +6,8 @@ PKG_DIST_SITE = https://github.com/libjxl/libjxl/archive/
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# Minimum GCC version required is 7, please update.
-# initial version on Dec 27, 2019 requires gcc >= 6
-REQUIRED_MIN_DSM = 7.0
 # Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
 MIN_GCC_VERSION = 7.5
-REQUIRED_MIN_SRM = 1.3
 
 DEPENDS = cross/libpng cross/brotli cross/lcms2 cross/openexr cross/highway cross/sjpeg-source
 

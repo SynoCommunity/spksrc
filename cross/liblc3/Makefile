@@ -10,7 +10,6 @@ HOMEPAGE = https://github.com/google/liblc3/
 COMMENT  = LC3 and LC3 Plus are audio codecs designed for low-latency audio transport.
 LICENSE  = Apache-2.0 license
 
-# Minimum GCC version required is >= 4.9
 # Needs gcc >= 4.9: includes arm_acle.h, added to gcc in 4.9.
 MIN_GCC_VERSION = 4.9
 

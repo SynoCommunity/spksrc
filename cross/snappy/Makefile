@@ -8,7 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
-# c++11 compiler required
 # Needs gcc >= 4.8: C++11 features unavailable before gcc 4.8.
 MIN_GCC_VERSION = 4.8
 

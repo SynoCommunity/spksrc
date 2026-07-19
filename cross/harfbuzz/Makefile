@@ -7,10 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/freetype cross/glib cross/cairo cross/fontconfig
 
-# Toolchains lacking c++11 compiler are not supported
 # Needs gcc >= 4.8: C++11 features unavailable before gcc 4.8.
 MIN_GCC_VERSION = 4.8
-UNSUPPORTED_ARCHS_TCVERSION = x86-5.2
 
 HOMEPAGE = https://harfbuzz.github.io/
 COMMENT  = HarfBuzz is a text shaping library. Using the HarfBuzz library allows programs to convert a sequence of Unicode input into properly formatted and positioned glyph output—for any writing system and language.
