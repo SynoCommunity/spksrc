@@ -15,7 +15,6 @@ LICENSE  = GPL
 ADDITIONAL_CPPFLAGS = -Os
 
 # Required for linking microbench/util.c on cross toolchains
-ADDITIONAL_LDFLAGS = -lrt
 
 CONFIGURE_ARGS  = -DBUILD_TESTING=OFF
 CONFIGURE_ARGS += -DBUILD_DOCS=OFF

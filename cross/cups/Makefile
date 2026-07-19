@@ -24,7 +24,6 @@ CONFIGURE_ARGS += --libdir=$(INSTALL_PREFIX)/lib
 
 include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-ADDITIONAL_LDFLAGS += -lrt
 endif
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 ADDITIONAL_CFLAGS = -DIP_FREEBIND=15

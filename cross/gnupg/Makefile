@@ -37,7 +37,6 @@ endif
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 # use clock_gettime of librt
-ADDITIONAL_LDFLAGS = -lrt
 endif
 
 include ../../mk/spksrc.cross-cc.mk

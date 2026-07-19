@@ -17,7 +17,6 @@ MESON_BASE_DIR = $(WORK_DIR)/$(PKG_DIR)/build/meson
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-ADDITIONAL_LDFLAGS += -lrt
 endif
 
 ifeq ($(GCC_DEBUG_INFO),1)

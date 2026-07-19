@@ -84,7 +84,6 @@ endif
 
 # for clock_gettime
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-ADDITIONAL_LDFLAGS = -lrt
 endif
 
 # for lsblk and others: ncurses must be built with tinfo

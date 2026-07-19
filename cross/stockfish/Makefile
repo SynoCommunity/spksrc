@@ -19,10 +19,6 @@ include ../../mk/spksrc.common.mk
 # Toolchains lacking c++11 compiler ar not supported
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-# use builtin atomic support
-ADDITIONAL_LDFLAGS = -latomic
-endif
 
 
 include ../../mk/spksrc.cross-cc.mk
