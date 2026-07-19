@@ -10,7 +10,8 @@ DEPENDS =
 OPTIONAL_DEPENDS = native/nasm
 
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
+# Needs gcc >= 7.5: needs C++17 (-std=gnu++17), i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 
 HOMEPAGE = https://www.webmproject.org/code/
 COMMENT  = WebM VP8/VP9 Codec

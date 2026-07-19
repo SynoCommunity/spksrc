@@ -12,7 +12,8 @@ COMMENT  = AOMedia Video 1 (AV1) is an open, royalty-free video coding format de
 LICENSE  = Royalty-free
 
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 
 # Set working directory
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build

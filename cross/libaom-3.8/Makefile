@@ -13,7 +13,8 @@ HOMEPAGE = https://aomedia.googlesource.com/aom/
 COMMENT  = AOMedia Video 1 (AV1) is an open, royalty-free video coding format designed for video transmissions over the Internet.
 LICENSE  = Royalty-free
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# Needs gcc >= 4.8: does not configure under gcc 4.7.3.
+MIN_GCC_VERSION = 4.8
 
 # Set working directory
 PKG_WORK_DIR = $(WORK_DIR)/$(PKG_NAME)_$(PKG_VERS)-build

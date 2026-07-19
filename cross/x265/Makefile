@@ -9,6 +9,9 @@ HOMEPAGE = http://x265.org/
 COMMENT  = x265 is an open source HEVC encoder.
 LICENSE  = GPLv2
 
+# Needs gcc >= 4.8: HDR10+ requires gcc newer than 4.8.
+MIN_GCC_VERSION = 4.8
+
 PRE_CONFIGURE_TARGET = x265_pre_configure
 PRE_COMPILE_TARGET = x265_pre_compile
 

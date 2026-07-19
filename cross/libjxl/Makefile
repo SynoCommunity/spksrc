@@ -9,7 +9,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # Minimum GCC version required is 7, please update.
 # initial version on Dec 27, 2019 requires gcc >= 6
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 REQUIRED_MIN_SRM = 1.3
 
 DEPENDS = cross/libpng cross/brotli cross/lcms2 cross/openexr cross/highway cross/sjpeg-source

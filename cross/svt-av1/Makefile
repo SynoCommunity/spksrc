@@ -15,7 +15,9 @@ LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 ADDITIONAL_LDFLAGS =  -lm
 POST_INSTALL_TARGET = svt-av1_post_install_target
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+# SVT-AV1 is 64-bit only (its configure refuses 32-bit) and does not build under gcc 4.7.3.
+REQUIRE_64BIT = 1
+MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.cross-cmake.mk
 

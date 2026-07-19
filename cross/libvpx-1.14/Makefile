@@ -9,7 +9,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 OPTIONAL_DEPENDS = native/nasm
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# Needs gcc >= 4.6: compiles as C++11, which gcc 4.3.7 rejects as experimental.
+MIN_GCC_VERSION = 4.6
 
 HOMEPAGE = https://www.webmproject.org/code/
 COMMENT  = WebM VP8/VP9 Codec
