@@ -45,6 +45,15 @@ ifneq ($(REQUIRE_KERNEL),)
   endif
 endif
 
+# Refuse an arch whose toolchain cannot meet MIN_GCC_VERSION / MIN_GLIBC_VERSION
+# (see spksrc.common/tc-capability.mk). Says why, not just where.
+ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED)),)
+  ifneq (,$(BUILD_UNSUPPORTED_FILE))
+    $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Arch '$(ARCH)-$(TCVERSION)' unsupported: $(TC_CAPABILITY_UNSUPPORTED) >> $(BUILD_UNSUPPORTED_FILE))
+  endif
+  @$(error Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME): $(TC_CAPABILITY_UNSUPPORTED))
+endif
+
 # Check whether package supports ARCH
 ifneq ($(UNSUPPORTED_ARCHS),)
   ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
@@ -52,6 +61,25 @@ ifneq ($(UNSUPPORTED_ARCHS),)
       $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Arch '$(ARCH)' is not a supported architecture >> $(BUILD_UNSUPPORTED_FILE))
     endif
     @$(error Arch '$(ARCH)' is not a supported architecture)
+  endif
+endif
+
+# Refuse a 32-bit arch for a package that requires 64-bit (REQUIRE_64BIT = 1).
+# A capability-style declaration -- the package states it needs a 64-bit target
+# rather than enumerating the 32-bit archs it cannot run on.
+#
+# Guarded on a non-empty ARCH: an empty ARCH is not in $(64bit_ARCHS) either, so
+# without this the arch-less passes (the source download step, which fetches the
+# arch-independent tarball) would abort here. UNSUPPORTED_ARCHS is immune by
+# construction -- findstring of an empty needle never matches -- so match it.
+ifeq ($(strip $(REQUIRE_64BIT)),1)
+  ifneq ($(strip $(ARCH)),)
+  ifeq (,$(findstring $(ARCH),$(64bit_ARCHS)))
+    ifneq (,$(BUILD_UNSUPPORTED_FILE))
+      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Arch '$(ARCH)' requires a 64-bit architecture >> $(BUILD_UNSUPPORTED_FILE))
+    endif
+    @$(error Arch '$(ARCH)' is not supported by $(SPK_NAME)$(PKG_NAME): requires a 64-bit architecture)
+  endif
   endif
 endif
 

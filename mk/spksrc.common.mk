@@ -60,6 +60,7 @@ include $(BASEDIR)/mk/spksrc.common/stage0.mk
 
 # Load common definitions
 include $(BASEDIR)/mk/spksrc.common/archs.mk
+include $(BASEDIR)/mk/spksrc.common/tc-capability.mk
 include $(BASEDIR)/mk/spksrc.common/logs.mk
 
 # Load local configuration
