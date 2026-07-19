@@ -11,4 +11,7 @@ TC_SYSROOT = $(TC_TARGET)/libc
 TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 TC_EXTRA_CFLAGS = -mhard-float -mfpu=vfpv3-d16
 
+# glibc 2.15 predates clock_gettime in libc (2.17).
+TC_EXTRA_LDFLAGS = -lrt
+
 include ../../mk/spksrc.toolchain.mk

@@ -72,7 +72,26 @@ FFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_FFLA
 FFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 endif
 
+# Does this toolchain's gcc ship libatomic? Ask it, rather than tabulate.
+#
+# A target without native 64-bit atomics (ARMv5, PowerPC e500v2) makes gcc emit
+# calls into libatomic, which the link then has to resolve. But the library only
+# ships from gcc 4.7 on, and handing -latomic to an older gcc is fatal ("cannot
+# find -latomic"). Availability is the exact criterion, not a proxy: a gcc old
+# enough to lack libatomic also predates the __atomic_* builtins, emits __sync_*
+# instead, and so never needs the library. One question answers both.
+TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
+
+# Link flags a TOOLCHAIN declares for itself, beside TC_EXTRA_CFLAGS: what the
+# target needs from the linker, stated once where it is known. Packages carry this
+# today as arch lists -- cups enumerates ARMv5/old-PPC to add -lrt (exactly the
+# toolchains whose glibc predates 2.17, when clock_gettime moved into libc), flac
+# adds -lrt everywhere. -latomic is dropped when the gcc does not ship it, so a
+# toolchain can declare it once and every build links exactly as before.
+TC_EXTRA_LDFLAGS_SELECTED = $(if $(TC_HAS_LIBATOMIC),$(TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(TC_EXTRA_LDFLAGS)))
+
 LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY)) $(TC_EXTRA_CFLAGS)
+LDFLAGS += $(TC_EXTRA_LDFLAGS_SELECTED)
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath-link,$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath,$(abspath $(INSTALL_PREFIX)/lib)

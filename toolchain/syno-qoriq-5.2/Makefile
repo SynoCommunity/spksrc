@@ -11,4 +11,8 @@ TC_SYSROOT = $(TC_TARGET)
 TC_INCLUDE = $(TC_SYSROOT)/include
 TC_EXTRA_CFLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 
+# glibc 2.8 predates clock_gettime in libc (2.17); the target has no native 64-bit atomics.
+# -latomic is dropped automatically when the gcc does not ship it.
+TC_EXTRA_LDFLAGS = -lrt -latomic
+
 include ../../mk/spksrc.toolchain.mk
