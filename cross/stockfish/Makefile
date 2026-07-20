@@ -14,14 +14,11 @@ LICENSE  = GPLv2/GPLv3
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = stockfish_install
 
-include ../../mk/spksrc.common.mk
 
 # Toolchains lacking c++11 compiler ar not supported
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-
-
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	BUILD_ARCH=armv8
@@ -50,6 +47,7 @@ else
 COMPILE_ARGS += COMPCXX=$(CXX)
 endif
 
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: stockfish_install
 stockfish_install:

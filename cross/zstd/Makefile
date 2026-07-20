@@ -19,7 +19,4 @@ ifeq ($(call version_lt, ${TC_GCC}, 5),1)
 ADDITIONAL_CFLAGS = -std=gnu99
 endif
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-endif
-
 include ../../mk/spksrc.cross-meson.mk

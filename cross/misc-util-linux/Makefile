@@ -82,10 +82,6 @@ CONFIGURE_ARGS += --disable-libblkid --disable-blkid
 PLIST_TRANSFORM = sed -e '/bin\/lsblk/d' -e '/bin\/findmnt/d' -e '/lib\/libmount/d' -e '/lib\/libblkid/d'
 endif
 
-# for clock_gettime
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-endif
-
 # for lsblk and others: ncurses must be built with tinfo
 # this seems to be a bug in util-linux, as most of other libraries fail to find ncurses/termlib
 # dependencies when ncurses is build with lib tinfo

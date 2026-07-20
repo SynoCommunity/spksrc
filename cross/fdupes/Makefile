@@ -13,8 +13,4 @@ LICENSE  = MIT
 
 GNU_CONFIGURE = 1
 
-include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-endif
-
 include ../../mk/spksrc.cross-cc.mk

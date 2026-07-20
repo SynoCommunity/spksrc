@@ -14,8 +14,6 @@ LICENSE  = GPL
 # warning _FORTIFY_SOURCE requires compiling with optimization (-O)
 ADDITIONAL_CPPFLAGS = -Os
 
-# Required for linking microbench/util.c on cross toolchains
-
 CONFIGURE_ARGS  = -DBUILD_TESTING=OFF
 CONFIGURE_ARGS += -DBUILD_DOCS=OFF
 
