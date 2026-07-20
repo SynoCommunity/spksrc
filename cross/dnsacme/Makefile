@@ -1,5 +1,5 @@
 PKG_NAME = dnsacme
-PKG_VERS = 1.0.7
+PKG_VERS = 1.0.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mritd/dnsacme/archive/refs/tags
@@ -7,8 +7,6 @@ PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/go
-
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 
 HOMEPAGE = https://github.com/mritd/dnsacme
 COMMENT  = DNS-01 ACME certificate manager with Synology DSM certificate deployment.
@@ -21,14 +19,12 @@ GO_BUILD_ARGS += -trimpath -tags synology
 GO_LDFLAGS  = -s -w
 GO_LDFLAGS += -X main.commit=v$(PKG_VERS)
 
-INSTALL_TARGET = dnsacme_install
+POST_INSTALL_TARGET = dnsacme_install_ui
 
 include ../../mk/spksrc.cross-go.mk
 
-.PHONY: dnsacme_install
-dnsacme_install:
-	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/bin
-	@install -m 755 $(GO_BIN_DIR) $(STAGING_INSTALL_PREFIX)/bin/
+.PHONY: dnsacme_install_ui
+dnsacme_install_ui:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/ui/images
 	@install -m 644 $(GO_SRC_DIR)/synology/spk/ui/DNSACME.js $(STAGING_INSTALL_PREFIX)/ui/
 	@install -m 755 $(GO_SRC_DIR)/synology/spk/ui/api.cgi $(STAGING_INSTALL_PREFIX)/ui/

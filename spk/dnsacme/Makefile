@@ -1,5 +1,5 @@
 SPK_NAME = dnsacme
-SPK_VERS = 1.0.7
+SPK_VERS = 1.0.8
 SPK_REV = 1
 SPK_ICON = src/dnsacme.png
 
@@ -7,7 +7,7 @@ DEPENDS = cross/dnsacme
 
 REQUIRED_MIN_DSM = 7.0
 REQUIRED_MIN_SRM = 3.0
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = mritd
 DESCRIPTION = DNS-01 ACME certificate manager with Synology DSM certificate deployment.
