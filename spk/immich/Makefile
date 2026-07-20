@@ -1,6 +1,6 @@
 SPK_NAME = immich
 SPK_VERS = 3.0.3
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/immich.png
 
 DEPENDS = cross/immich cross/immich-geodata
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Immich
 DESCRIPTION = Self-hosted photo and video backup solution.
-CHANGELOG = "1. Update Immich to v3.0.3."
+CHANGELOG = "1. Update Immich to v3.0.3. <br/>2. Preserve ML virtualenv across upgrades."
 HOMEPAGE = https://immich.app
 LICENSE = GPLv3
 
@@ -37,3 +37,6 @@ immich_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/bin/server-launcher.js $(STAGING_DIR)/bin/
 	install -m 755 src/bin/immich-ml-launcher.sh $(STAGING_DIR)/bin/
+	@$(MSG) Install runtime config template
+	install -m 755 -d $(STAGING_DIR)/etc
+	install -m 644 src/etc/immich.conf $(STAGING_DIR)/etc/immich.conf
