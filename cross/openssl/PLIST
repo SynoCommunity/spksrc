@@ -1,8 +1,0 @@
-bin:bin/openssl
-lib:lib/engines-1.1/afalg.so
-lib:lib/engines-1.1/capi.so
-lib:lib/engines-1.1/padlock.so
-lnk:lib/libcrypto.so
-lib:lib/libcrypto.so.1.1
-lnk:lib/libssl.so
-lib:lib/libssl.so.1.1

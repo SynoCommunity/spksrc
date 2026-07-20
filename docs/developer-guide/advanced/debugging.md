@@ -20,7 +20,7 @@ make -C spk/<pkg> compile-arch-x64-7.2
 
 **"cannot find -lXXX"** - Missing library dependency
 ```makefile
-DEPENDS = cross/openssl
+DEPENDS = cross/openssl3
 ADDITIONAL_LDFLAGS = -L$(STAGING_INSTALL_PREFIX)/lib
 ```
 

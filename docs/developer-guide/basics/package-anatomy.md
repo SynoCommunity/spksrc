@@ -54,7 +54,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://curl.se/download
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/openssl
+DEPENDS = cross/zlib cross/openssl3
 
 HOMEPAGE = https://curl.se/
 COMMENT  = Command line tool and library for transferring data

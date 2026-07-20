@@ -21,7 +21,7 @@ CARGO_BUILD_ARGS = --features "feature1 feature2"
 ## C Dependencies
 
 ```makefile
-DEPENDS = cross/openssl
+DEPENDS = cross/openssl3
 ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
 ```
 
