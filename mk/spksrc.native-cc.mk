@@ -63,4 +63,7 @@ all:
 ### Include common rules
 include ../../mk/spksrc.rules.mk
 
+### Optional archive packaging (build-archive); no-op unless NATIVE_ARCHIVE is set
+include ../../mk/spksrc.native/archive.mk
+
 ###
