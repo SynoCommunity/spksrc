@@ -2,6 +2,7 @@ TC_ARCH = armadaxp
 TC_VERS = 7.1
 TC_KERNEL = 3.2.101
 TC_GLIBC = 2.26
+TC_GCC = 8.5.0
 
 TC_DIST = armadaxp-gcc850_glibc226_hard-GPL
 TC_DIST_SITE_PATH = Marvell%20Armada%20XP%20Linux%203.2.101

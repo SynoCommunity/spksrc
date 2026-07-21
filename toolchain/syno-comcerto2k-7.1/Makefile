@@ -2,6 +2,7 @@ TC_ARCH = comcerto2k
 TC_VERS = 7.1
 TC_KERNEL = 3.2.101
 TC_GLIBC = 2.20
+TC_GCC = 4.9.3
 
 TC_DIST = comcerto2k-gcc493_glibc220_hard-GPL
 TC_DIST_SITE_PATH = Mindspeed%20Comcerto%202000%20Linux%203.2.101

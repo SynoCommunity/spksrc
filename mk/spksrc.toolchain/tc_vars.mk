@@ -342,9 +342,6 @@ tc_autotools_vars:
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  echo TC_ENV += $${target}=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
-	  if [ "$${target}" = "CC" ] ; then \
-	    gcc_version=$$(eval $$(echo $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
-	  fi ; \
 	done ; \
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
@@ -385,16 +382,9 @@ tc_vars:
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
 	echo TC_ARCH := $(TC_ARCH) ; \
-	for tool in $(TOOLS) ; \
-	do \
-	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
-	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  if [ "$${target}" = "CC" ] ; then \
-	    gcc_version=$$(eval $$(echo $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
-	  fi ; \
-	done ; \
-	echo TC_GCC := $${gcc_version} ; \
-	echo TC_GLIBC := $(TC_GLIBC)
+	echo TC_GCC := $(TC_GCC) ; \
+	echo TC_GLIBC := $(TC_GLIBC) ; \
+	echo TC_KERNEL := $(TC_KERNEL)
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 	@echo TC_KERNEL := $(TC_KERNEL)+

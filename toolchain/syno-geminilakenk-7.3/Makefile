@@ -2,6 +2,7 @@ TC_ARCH = geminilakenk
 TC_VERS = 7.3
 TC_KERNEL = 5.10.55
 TC_GLIBC = 2.36
+TC_GCC = 12.2.0
 
 TC_DIST = geminilakenk-gcc1220_glibc236_x86_64-GPL
 TC_DIST_SITE_PATH = Intel%20x86%20Linux%205.10.55%20%28geminilakenk%29

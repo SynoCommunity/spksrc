@@ -2,6 +2,7 @@ TC_ARCH = armada38x
 TC_VERS = 6.2.4
 TC_KERNEL = 3.10.105
 TC_GLIBC = 2.20
+TC_GCC = 4.9.3
 
 TC_DIST = armada38x-gcc493_glibc220_hard-GPL
 TC_DIST_SITE_PATH = toolchains%2Fdsm6.2.4
