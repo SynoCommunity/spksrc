@@ -1,4 +1,4 @@
-PKG_NAME = forgejo
+PKG_NAME = forgejo-lts
 PKG_VERS = 15.0.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-src-$(PKG_VERS).$(PKG_EXT)
@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS)
 BUILD_DEPENDS = native/go native/nodejs
 
 HOMEPAGE = https://forgejo.org/
-COMMENT  = Forgejo is a self-hosted lightweight software forge.
+COMMENT  = Forgejo is a self-hosted lightweight software forge. LTS version.
 LICENSE  = GPLv3
 
 ENV += NPM_CONFIG_USER=root

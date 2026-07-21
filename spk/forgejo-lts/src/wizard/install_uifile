@@ -1,6 +1,6 @@
 [
     {
-        "step_title": "Forgejo configuration",
+        "step_title": "Forgejo LTS configuration",
         "items": [
             {
                 "type": "textfield",
@@ -9,7 +9,7 @@
                     {
                         "key": "wizard_shared_folder_name",
                         "desc": "Shared Folder",
-                        "defaultValue": "forgejo-share",
+                        "defaultValue": "forgejo-lts-share",
                         "validator": {
                             "allowBlank": false,
                             "regex": {
