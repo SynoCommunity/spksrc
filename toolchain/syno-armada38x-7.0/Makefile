@@ -10,6 +10,6 @@ TC_TARGET = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot
 
 # ensure gnu/hard-float.h is used
-TC_EXTRA_CFLAGS = -D__ARM_PCS_VFP=1
+TC_EXTRA_BUILD_FLAGS = -D__ARM_PCS_VFP=1
 
 include ../../mk/spksrc.toolchain.mk

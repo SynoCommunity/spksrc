@@ -8,6 +8,6 @@ TC_DIST_SITE_PATH = STMicroelectronics%20Monaco%20Linux%203.10.108
 
 TC_TARGET = arm-unknown-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot
-TC_EXTRA_CFLAGS = -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
+TC_EXTRA_BUILD_FLAGS = -mcpu=cortex-a9 -march=armv7-a -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9
 
 include ../../mk/spksrc.toolchain.mk
