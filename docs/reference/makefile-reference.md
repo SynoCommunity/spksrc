@@ -218,6 +218,9 @@ Available after toolchain is loaded:
 | `ARCH` | Target architecture / platform codename being built |
 | `TCVERSION` | DSM toolchain version (7.2, 7.1, 6.2.4, ...) |
 | `TC_ARCH` | Generic build arch of the current platform |
+| `TC_GCC` | gcc version the current toolchain ships (read-only, from its Makefile) |
+| `TC_GLIBC` | glibc version the current toolchain targets (read-only) |
+| `TC_KERNEL` | Kernel version the current toolchain targets (read-only) |
 | `UNSUPPORTED_ARCHS` | Architectures/platforms to exclude from this package |
 | `UNSUPPORTED_ARCHS_TCVERSION` | Architecture/DSM-version pairs to exclude |
 
@@ -227,6 +230,9 @@ The architecture **groups** (`x64_ARCHS`, `ARMv7_ARCHS`, `ARMv8_ARCHS`, `ARM_ARC
 
 | Variable | Description |
 |----------|-------------|
+| `MIN_GCC_VERSION` | Refuse archs whose toolchain gcc is below this (capability floor) |
+| `MIN_GLIBC_VERSION` | Refuse archs whose toolchain glibc is below this (runtime floor) |
+| `REQUIRE_64BIT` | Set to `1` to refuse 32-bit architectures |
 | `REQUIRED_MIN_DSM` | Skip if the DSM toolchain is below this version |
 | `REQUIRED_MAX_DSM` | Skip if the DSM toolchain is above this version |
 | `REQUIRED_MIN_SRM` | Skip if the SRM toolchain is below this version |

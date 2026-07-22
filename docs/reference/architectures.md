@@ -102,8 +102,8 @@ ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-64bit
 endif
 
-# Exclude 32-bit
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+# Needs a 64-bit target (refuses 32-bit archs)
+REQUIRE_64BIT = 1
 
 # ARM-specific
 ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))

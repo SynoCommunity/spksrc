@@ -248,6 +248,45 @@ SPK_COMMANDS = bin/mycommand bin/myother
 
 ## Architecture Support
 
+### Declare a capability floor (preferred)
+
+When a package cannot build on some architectures because of what the
+**toolchain** provides — its compiler, its C library, or the target being
+32-bit — declare that floor instead of listing the architectures by hand. The
+framework checks each floor against the toolchain's own `TC_GCC` / `TC_GLIBC`
+and refuses exactly the architectures that cannot meet it, with a
+human-readable reason.
+
+| Variable | Description |
+|----------|-------------|
+| `MIN_GCC_VERSION` | Needs at least this gcc (e.g. `8`, `4.9`) |
+| `MIN_GLIBC_VERSION` | Needs at least this glibc — a runtime floor no toolchain can lift |
+| `REQUIRE_64BIT` | Set to `1` when the package needs a 64-bit target |
+
+```makefile
+# Needs C++17 → gcc 8 or newer
+MIN_GCC_VERSION = 8
+
+# Needs a 64-bit target (e.g. SVT-AV1)
+REQUIRE_64BIT = 1
+```
+
+Why this over an arch list: a hardcoded list says *where* a package fails, not
+*why*. It has to be rechecked by hand every time a toolchain moves, and it
+cannot express "any architecture whose gcc is older than X". A declared floor
+can, and it stays correct on its own. Unmet floors accumulate, so an arch that
+misses more than one is told about all of them.
+
+The toolchain values these check against — `TC_GCC`, `TC_GLIBC` and `TC_KERNEL`
+— are declared in each toolchain's Makefile and read statically, so a package
+can gate on them before anything is extracted.
+
+### Exclude architectures explicitly
+
+For an exclusion that is **not** a capability floor — a package that is simply
+not wanted on a platform, or a specific arch/DSM-version pairing — use the arch
+lists directly.
+
 | Variable | Description |
 |----------|-------------|
 | `UNSUPPORTED_ARCHS` | Architectures that cannot build this package |
@@ -255,8 +294,8 @@ SPK_COMMANDS = bin/mycommand bin/myother
 | `OS_MIN_VER` | Minimum OS version (alternative to above) |
 
 ```makefile
-# Only works on 64-bit
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+# Not supported on this whole family
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 # Requires DSM 7.0+
 REQUIRED_MIN_DSM = 7.0
