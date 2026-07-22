@@ -149,7 +149,7 @@ else
 endif
 	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
 	(cd $(WORK_DIR)/rust && \
-	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_BUILD_FLAGS)" \
+	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
 	   CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS="$(TC_RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS)" \
 	   RUST_BACKTRACE=full \
 	   ./x build --config $(TC_LOCAL_VARS_RUST))

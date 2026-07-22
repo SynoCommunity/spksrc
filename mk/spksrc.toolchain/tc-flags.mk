@@ -68,14 +68,26 @@ endif
 # instead, and so never needs the library. One question answers both.
 TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
 
+# TC_EXTRA_LDFLAGS carries the ABI to the link and adds what a toolchain declares
+# for the linker. The ABI (TC_EXTRA_BUILD_FLAGS -- the -march/-mcpu/... flags folded
+# into every language just below) must reach the gcc link driver too, so it picks the
+# right multilib and startfiles. On top of that: -lrt for glibc<2.17 (clock_gettime)
+# and -latomic for targets without native 64-bit atomics (ARMv5, PowerPC e500v2),
+# both previously carried as per-package arch lists (cups/flac). -latomic is dropped
+# where the gcc does not ship it -- a gcc that old predates the __atomic_* builtins
+# and emits __sync_* instead, so it never needs the library. Kept lazy via a captured
+# copy: TC_HAS_LIBATOMIC (just above) runs the compiler, not extracted yet while the
+# toolchain is being parsed.
+_TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS)
+TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
+
 # TC_EXTRA_BUILD_FLAGS holds the target's ABI/arch flags (-march, -mcpu, -mfpu,
 # -mfloat-abi, -mthumb, ...). They select the ABI, so they must reach every language
-# AND the link -- passing them only to CFLAGS would silently build C++ or Fortran
-# objects with a different ABI, and the gcc link driver reads them to pick the right
-# multilib and startfiles. Fold them once into each per-language TC_EXTRA_<LANG>FLAGS,
-# which then becomes the single residual list that language reads: the ABI first,
-# then whatever a toolchain adds for that language -- always last in the chain, and
-# a clean place to extend.
+# (and the link, above) -- passing them only to CFLAGS would silently build C++ or
+# Fortran objects with a different ABI. Fold them once into each per-language
+# TC_EXTRA_<LANG>FLAGS, which then becomes the single residual list that language
+# reads: the ABI first, then whatever a toolchain adds for that language -- always
+# last in the chain, and a clean place to extend.
 #
 # TC_EXTRA_RUSTFLAGS is left out on purpose: rustc takes its ABI another way
 # (-Ctarget-cpu, in TC_EXTRA_RUSTFLAGS already), and rust's C dependencies get the
@@ -84,15 +96,6 @@ TC_EXTRA_CFLAGS   := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CFLAGS)
 TC_EXTRA_CPPFLAGS := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CPPFLAGS)
 TC_EXTRA_CXXFLAGS := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CXXFLAGS)
 TC_EXTRA_FFLAGS   := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_FFLAGS)
-
-# TC_EXTRA_LDFLAGS is the same idea for the link: the ABI, plus what a toolchain
-# declares for the linker (cups/flac carried -lrt as arch lists; the glibc<2.17
-# toolchains need it for clock_gettime, ARMv5/PowerPC need -latomic). -latomic is
-# dropped where the gcc does not ship it -- a gcc that old predates the __atomic_*
-# builtins and emits __sync_* instead. Kept lazy via a captured copy: TC_HAS_LIBATOMIC
-# runs the compiler, which is not extracted yet while the toolchain is being parsed.
-_TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS)
-TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
 
 ####
 # Define regular build flags -- each language reads its own residual list, ABI
