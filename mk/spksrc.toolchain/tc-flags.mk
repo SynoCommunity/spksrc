@@ -78,8 +78,17 @@ TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC
 # and emits __sync_* instead, so it never needs the library. Kept lazy via a captured
 # copy: TC_HAS_LIBATOMIC (just above) runs the compiler, not extracted yet while the
 # toolchain is being parsed.
+#
+# These libs are declared toolchain-wide now, not per package, so they would land on
+# every link -- yet most binaries call neither clock_gettime nor an atomic builtin.
+# Wrap them in -Wl,--as-needed so the linker records a librt/libatomic dependency
+# only where the objects actually reference a symbol it provides, and -Wl,--no-as-needed
+# restores the default right after: the policy change is scoped to these two libs and
+# never drops a package library kept only for its side effects.
+_tc_comma := ,
 _TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS)
-TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
+_tc_ld_syslibs = $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
+TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(strip $(_tc_ld_syslibs)),-Wl$(_tc_comma)--as-needed $(_tc_ld_syslibs) -Wl$(_tc_comma)--no-as-needed)
 
 # TC_EXTRA_BUILD_FLAGS holds the target's ABI/arch flags (-march, -mcpu, -mfpu,
 # -mfloat-abi, -mthumb, ...). They select the ABI, so they must reach every language
