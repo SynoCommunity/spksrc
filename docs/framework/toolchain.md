@@ -95,6 +95,14 @@ instead, and so never needs the library — and handing `-latomic` to such a gcc
 fatal *"cannot find -latomic"*. A toolchain lists `-latomic` in its
 `TC_EXTRA_LDFLAGS`; the framework drops it where it would not resolve.
 
+Because these libraries are declared toolchain-wide, they reach every link even
+though most binaries call neither `clock_gettime` nor an atomic builtin. The
+framework therefore wraps them in `-Wl,--as-needed ... -Wl,--no-as-needed`, so the
+linker records a `librt` / `libatomic` dependency only where the objects actually
+reference a symbol it provides. The wrap is scoped to just these two libraries —
+it restores the default immediately after — so it never drops a package library
+that is present only for its side effects.
+
 ## tc_vars Files
 
 The toolchain build generates several `tc_vars*.mk` files that configure cross-compilation:

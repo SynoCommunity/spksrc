@@ -51,7 +51,8 @@ If you only read one thing, read this. The details are in the dated log below.
   once in **`TC_EXTRA_BUILD_FLAGS`**; the framework folds it into every
   `TC_EXTRA_<LANG>FLAGS` and the link, so C, C++, Fortran and the linker all
   agree on the ABI. Link-time libraries (`-lrt`, `-latomic`) live in
-  **`TC_EXTRA_LDFLAGS`**, with `-latomic` auto-dropped where the gcc lacks it.
+  **`TC_EXTRA_LDFLAGS`**, `-latomic` auto-dropped where the gcc lacks it and both
+  linked `--as-needed` so a binary depends on them only when it truly uses them.
   See [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
 
 ---
@@ -68,7 +69,10 @@ If you only read one thing, read this. The details are in the dated log below.
       (ARMv5 / PowerPC, no native 64-bit atomics) moved out of about two dozen
       per-package arch lists into `TC_EXTRA_LDFLAGS`; `-latomic` is kept only when
       the toolchain's gcc actually ships it, detected with
-      `gcc -print-file-name=libatomic.so`.
+      `gcc -print-file-name=libatomic.so`. Both are wrapped in
+      `-Wl,--as-needed ... -Wl,--no-as-needed` so, now that they are declared
+      toolchain-wide, a binary records a `librt` / `libatomic` dependency only when
+      it truly references one.
     - **Why:** passing the ABI only through `CFLAGS` silently built C++ / Fortran
       objects with a different ABI than the C they link against, and the rt/atomic
       arch lists had to be rechecked by hand each time a toolchain moved.
