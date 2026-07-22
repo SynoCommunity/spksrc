@@ -51,8 +51,10 @@ ADMIN_PORT = ${SERVICE_PORT}
 
 # PPC archs except qoriq are not supported
 #    https://tvheadend.org/issues/5060
-# ffmpeg-7 no longer support 88f6281 (armv5) and ffmpeg-7.1 hi3535 (armv7l)
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Depends on ffmpeg8, which needs gcc 4.9 -- refuse any older toolchain (matches
+# ffmpeg8's own MIN_GCC_VERSION). The floor covers armv5 / armv7l / old ppc, whose
+# toolchains predate 4.9, while keeping qoriq (gcc 4.9.3).
+MIN_GCC_VERSION = 4.9
 
 DEPENDS  = cross/tvheadend
 DEPENDS += cross/dtv-scan-tables

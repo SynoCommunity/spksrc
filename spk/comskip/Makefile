@@ -5,8 +5,9 @@ SPK_ICON = src/comskip.png
 
 FFMPEG_PACKAGE = ffmpeg8
 
-# ffmpeg-8 no longer support 88f6281 (armv5) and hi3535 (armv7l)
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Depends on ffmpeg8, which needs gcc 4.9 -- refuse any older toolchain (matches
+# ffmpeg8's own MIN_GCC_VERSION and covers armv5 / armv7l / old ppc dynamically).
+MIN_GCC_VERSION = 4.9
 
 DEPENDS = cross/comskip
 
