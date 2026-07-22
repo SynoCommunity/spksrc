@@ -6,7 +6,7 @@
 #
 #   MIN_GLIBC_VERSION = 2.20    needs glibc 2.20 or newer
 #   MIN_GCC_VERSION   = 8       needs gcc 8 or newer
-#   REQUIRE_64BIT     = 1       needs a 64-bit target   (checked in pre-check.mk)
+#   REQUIRE_64BIT     = 1       needs a 64-bit target
 #
 # This replaces "UNSUPPORTED_ARCHS = <list>" for capability reasons. A hardcoded
 # list says WHERE a package fails, not WHY; it has to be rechecked by hand every
@@ -50,6 +50,20 @@ ifneq ($(strip $(MIN_GCC_VERSION)),)
 ifneq ($(strip $(TC_GCC)),)
 ifeq ($(call version_ge,$(TC_GCC),$(MIN_GCC_VERSION)),)
 TC_CAPABILITY_UNSUPPORTED := gcc $(TC_GCC) < $(MIN_GCC_VERSION)
+endif
+endif
+endif
+
+# ---- 64-bit: an ISA fact the toolchain cannot change ------------------------
+# A package that declares REQUIRE_64BIT = 1 cannot run on a 32-bit arch, whatever
+# the compiler -- so it is a capability like the two floors above, and lands in the
+# same TC_CAPABILITY_UNSUPPORTED. Guarded on a non-empty ARCH: an empty ARCH is not
+# in $(64bit_ARCHS) either, and the arch-less passes (the source download) must not
+# trip on it.
+ifeq ($(strip $(REQUIRE_64BIT)),1)
+ifneq ($(strip $(ARCH)),)
+ifeq (,$(findstring $(ARCH),$(64bit_ARCHS)))
+TC_CAPABILITY_UNSUPPORTED := requires a 64-bit architecture
 endif
 endif
 endif

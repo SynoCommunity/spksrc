@@ -64,25 +64,6 @@ ifneq ($(UNSUPPORTED_ARCHS),)
   endif
 endif
 
-# Refuse a 32-bit arch for a package that requires 64-bit (REQUIRE_64BIT = 1).
-# A capability-style declaration -- the package states it needs a 64-bit target
-# rather than enumerating the 32-bit archs it cannot run on.
-#
-# Guarded on a non-empty ARCH: an empty ARCH is not in $(64bit_ARCHS) either, so
-# without this the arch-less passes (the source download step, which fetches the
-# arch-independent tarball) would abort here. UNSUPPORTED_ARCHS is immune by
-# construction -- findstring of an empty needle never matches -- so match it.
-ifeq ($(strip $(REQUIRE_64BIT)),1)
-  ifneq ($(strip $(ARCH)),)
-  ifeq (,$(findstring $(ARCH),$(64bit_ARCHS)))
-    ifneq (,$(BUILD_UNSUPPORTED_FILE))
-      $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Arch '$(ARCH)' requires a 64-bit architecture >> $(BUILD_UNSUPPORTED_FILE))
-    endif
-    @$(error Arch '$(ARCH)' is not supported by $(SPK_NAME)$(PKG_NAME): requires a 64-bit architecture)
-  endif
-  endif
-endif
-
 ifneq ($(TCVERSION),)
 
 ifneq ($(UNSUPPORTED_ARCHS_TCVERSION),)
