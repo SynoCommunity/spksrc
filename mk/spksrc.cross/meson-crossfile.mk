@@ -62,9 +62,9 @@ ifneq ($(strip $(MESON_BUILTIN_C_ARGS)),)
 	@echo -ne "\t'$(MESON_BUILTIN_C_ARGS)',\n"
 endif
 ifeq ($(GCC_DEBUG_INFO),1)
-	@echo $(call uniq,$(patsubst -O%,,$(CFLAGS) $(GCC_DEBUG_FLAGS) $(ADDITIONAL_CFLAGS) $(TC_EXTRA_BUILD_FLAGS))) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(patsubst -O%,,$(CFLAGS) $(GCC_DEBUG_FLAGS) $(ADDITIONAL_CFLAGS) $(TC_EXTRA_CFLAGS))) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 else
-	@echo $(call uniq,$(CFLAGS) $(ADDITIONAL_CFLAGS) $(TC_EXTRA_BUILD_FLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
+	@echo $(call uniq,$(CFLAGS) $(ADDITIONAL_CFLAGS) $(TC_EXTRA_CFLAGS)) | tr ' ' '\n' | sed -e "s/^/\t'/" -e "s/$$/',/"
 endif
 	@echo -ne "\t]\n"
 	@echo

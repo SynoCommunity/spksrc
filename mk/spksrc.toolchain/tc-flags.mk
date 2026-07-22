@@ -68,50 +68,55 @@ endif
 # instead, and so never needs the library. One question answers both.
 TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
 
-# Link flags a TOOLCHAIN declares for itself, beside TC_EXTRA_BUILD_FLAGS: what the
-# target needs from the linker, stated once where it is known. Packages carry this
-# today as arch lists -- cups enumerates ARMv5/old-PPC to add -lrt (exactly the
-# toolchains whose glibc predates 2.17, when clock_gettime moved into libc), flac
-# adds -lrt everywhere.
+# TC_EXTRA_BUILD_FLAGS holds the target's ABI/arch flags (-march, -mcpu, -mfpu,
+# -mfloat-abi, -mthumb, ...). They select the ABI, so they must reach every language
+# AND the link -- passing them only to CFLAGS would silently build C++ or Fortran
+# objects with a different ABI, and the gcc link driver reads them to pick the right
+# multilib and startfiles. Fold them once into each per-language TC_EXTRA_<LANG>FLAGS,
+# which then becomes the single residual list that language reads: the ABI first,
+# then whatever a toolchain adds for that language -- always last in the chain, and
+# a clean place to extend.
 #
-# -latomic is dropped in place when the gcc does not ship it (a gcc that old also
-# predates the __atomic_* builtins, so it never needs the library), which keeps
-# TC_EXTRA_LDFLAGS the single variable every consumer reads. Done via a captured
-# copy so it stays lazy: TC_HAS_LIBATOMIC runs the compiler, which is not yet
-# extracted while the toolchain itself is being parsed.
+# TC_EXTRA_RUSTFLAGS is left out on purpose: rustc takes its ABI another way
+# (-Ctarget-cpu, in TC_EXTRA_RUSTFLAGS already), and rust's C dependencies get the
+# build flags through CFLAGS_<target> = TC_EXTRA_CFLAGS in tc-rust.mk.
+TC_EXTRA_CFLAGS   := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CFLAGS)
+TC_EXTRA_CPPFLAGS := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CPPFLAGS)
+TC_EXTRA_CXXFLAGS := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CXXFLAGS)
+TC_EXTRA_FFLAGS   := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_FFLAGS)
+
+# TC_EXTRA_LDFLAGS is the same idea for the link: the ABI, plus what a toolchain
+# declares for the linker (cups/flac carried -lrt as arch lists; the glibc<2.17
+# toolchains need it for clock_gettime, ARMv5/PowerPC need -latomic). -latomic is
+# dropped where the gcc does not ship it -- a gcc that old predates the __atomic_*
+# builtins and emits __sync_* instead. Kept lazy via a captured copy: TC_HAS_LIBATOMIC
+# runs the compiler, which is not extracted yet while the toolchain is being parsed.
 _TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS)
-TC_EXTRA_LDFLAGS = $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
+TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
 
 ####
-# Define regular build flags
-#
-# TC_EXTRA_BUILD_FLAGS holds the target's ABI/arch flags (-march, -mcpu, -mfpu,
-# -mfloat-abi, -mthumb, ...). They select the ABI, so they must reach every
-# language AND the link: C, C++, the preprocessor, Fortran, and the gcc link
-# driver, which reads them to pick the right multilib and startfiles. Passing
-# them only to CFLAGS would silently build C++ or Fortran objects with a
-# different ABI. The per-language TC_EXTRA_<LANG>FLAGS beside them are for
-# genuinely language-specific extras (none in the tree today).
+# Define regular build flags -- each language reads its own residual list, ABI
+# already folded in, kept last so a package/toolchain addition stays at the end.
 
 CFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 CFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
-CFLAGS += $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CFLAGS)
+CFLAGS += $(TC_EXTRA_CFLAGS)
 
 CPPFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 CPPFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
-CPPFLAGS += $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CPPFLAGS)
+CPPFLAGS += $(TC_EXTRA_CPPFLAGS)
 
 CXXFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 CXXFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
-CXXFLAGS += $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CXXFLAGS)
+CXXFLAGS += $(TC_EXTRA_CXXFLAGS)
 
 ifneq ($(strip $(TC_HAS_FORTRAN)),)
 FFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 FFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
-FFLAGS += $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_FFLAGS)
+FFLAGS += $(TC_EXTRA_FFLAGS)
 endif
 
-LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY)) $(TC_EXTRA_BUILD_FLAGS)
+LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY))
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath-link,$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath,$(abspath $(INSTALL_PREFIX)/lib)

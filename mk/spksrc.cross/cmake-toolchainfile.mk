@@ -63,7 +63,7 @@ endif
 # every flag source that feeds a given CMake variable in one place -- a holistic
 # view -- rather than hiding half of them inside the upstream *FLAGS.
 	@echo "# set default compiler flags for cross-compiling" ; \
-	echo 'set(CMAKE_C_FLAGS "$(call uniq,$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS) $(TC_EXTRA_BUILD_FLAGS))")' ; \
+	echo 'set(CMAKE_C_FLAGS "$(call uniq,$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS) $(TC_EXTRA_CFLAGS))")' ; \
 	echo 'set(CMAKE_CPP_FLAGS "$(call uniq,$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS) $(TC_EXTRA_CPPFLAGS))")' ; \
 	echo 'set(CMAKE_CXX_FLAGS "$(call uniq,$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS) $(TC_EXTRA_CXXFLAGS))")'
 ifneq ($(strip $(FFLAGS)),)
