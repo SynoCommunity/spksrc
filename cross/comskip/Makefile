@@ -9,6 +9,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/argtable
 OPTIONAL_DEPENDS = cross/ffmpeg8
 
+# Depends on ffmpeg8, which needs gcc 4.9 -- keep the floor consistent with
+# spk/comskip (matches ffmpeg8's own MIN_GCC_VERSION).
+MIN_GCC_VERSION = 4.9
+
 HOMEPAGE = https://www.kaashoek.com/comskip
 COMMENT  = Commercial detector
 LICENSE  = GNU/LGPL

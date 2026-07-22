@@ -15,9 +15,10 @@ LICENSE  = GPLv3
 
 # PPC archs except qoriq are not supported
 # https://tvheadend.org/issues/5060
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# ffmpeg7 requires c11 support
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+# Depends on ffmpeg (7/8), which needs gcc 4.9 -- refuse any older toolchain, to
+# match ffmpeg's own MIN_GCC_VERSION and spk/tvheadend. Covers old ppc, armv5 (no
+# c11) and armv7l dynamically, while keeping qoriq (gcc 4.9.3).
+MIN_GCC_VERSION = 4.9
 
 OPTIONAL_DEPENDS += cross/ffmpeg7
 OPTIONAL_DEPENDS += cross/fdk-aac
