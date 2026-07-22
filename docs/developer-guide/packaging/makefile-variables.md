@@ -281,6 +281,23 @@ The toolchain values these check against — `TC_GCC`, `TC_GLIBC` and `TC_KERNEL
 — are declared in each toolchain's Makefile and read statically, so a package
 can gate on them before anything is extracted.
 
+**Keep the floor consistent between `spk/` and `cross/`.** A floor on an `spk/`
+package belongs on its matching `cross/` package too, so a build is refused at its
+own level instead of failing deep in a dependency. If you add a floor to `spk/foo`,
+add it to `cross/foo` as well.
+
+**Let the essential dependencies set the floor.** Every mandatory dependency must
+build at the floor the package declares; if one of them needs a newer gcc or glibc,
+raise the floor on the package *and* its `cross/` to match. Do **not** push that
+floor onto a shared `cross/` library, though — a library keeps the minimum *it*
+needs, so other packages built against it at a lower floor stay buildable.
+
+**Gate an optional dependency instead of raising the floor.** When a dependency is
+optional, do not lift the whole package's floor for it. Guard it with an `ifeq` (on
+the arch, or a capability group) and keep the configure options that use it inside
+the same block, so the dependency and its flags turn on together — the way optional
+ffmpeg-backed features are wired.
+
 ### Exclude architectures explicitly
 
 For an exclusion that is **not** a capability floor — a package that is simply
