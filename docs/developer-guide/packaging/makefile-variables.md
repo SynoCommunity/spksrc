@@ -191,6 +191,12 @@ ADDITIONAL_CFLAGS = -O3 -DNDEBUG
 ADDITIONAL_LDFLAGS = -Wl,-rpath,/var/packages/mypackage/target/lib
 ```
 
+These `ADDITIONAL_*` variables are **package**-scoped. The **toolchain**-wide
+counterparts — the target ABI in `TC_EXTRA_BUILD_FLAGS` (folded into each
+`TC_EXTRA_<LANG>FLAGS`) and the link flags in `TC_EXTRA_LDFLAGS` (`-lrt` /
+`-latomic`) — are declared by the toolchain, not the package; see
+[Extra flags a toolchain can declare](../../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
+
 ### Compile and Install Arguments
 
 `COMPILE_ARGS` and `INSTALL_ARGS` carry extra arguments for the compile and install steps across every build system. For autotools / plain GNU make each is the make command; for CMake and Meson they are appended as-is to `cmake --build` / `cmake --install` and `ninja` / `ninja install` respectively.

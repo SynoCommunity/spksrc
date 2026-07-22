@@ -47,6 +47,38 @@ If you only read one thing, read this. The details are in the dated log below.
   intentional choice rather than a failure. Put the reason in the file. See the
   [package lifecycle](../contributing/package-lifecycle.md) guide.
 
+- **The target ABI reaches every language now.** A toolchain declares its ABI
+  once in **`TC_EXTRA_BUILD_FLAGS`**; the framework folds it into every
+  `TC_EXTRA_<LANG>FLAGS` and the link, so C, C++, Fortran and the linker all
+  agree on the ABI. Link-time libraries (`-lrt`, `-latomic`) live in
+  **`TC_EXTRA_LDFLAGS`**, with `-latomic` auto-dropped where the gcc lacks it.
+  See [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
+
+---
+
+??? note "July 2026 — Toolchain ABI and link flags reach every language (#7314)"
+    A toolchain's ABI/arch flags now consistently reach every language and the
+    link, and two link-time libraries stopped being hand-maintained arch lists.
+
+    - **What:** a toolchain declares its ABI once in `TC_EXTRA_BUILD_FLAGS`
+      (`-march`, `-mcpu`, `-mfpu`, `-mfloat-abi`, ...); the framework folds it into
+      each `TC_EXTRA_<LANG>FLAGS` (C / CPP / C++ / Fortran) and into
+      `TC_EXTRA_LDFLAGS`, so every language *and* the gcc link driver build with
+      the same ABI. `-lrt` (glibc &lt; 2.17, `clock_gettime`) and `-latomic`
+      (ARMv5 / PowerPC, no native 64-bit atomics) moved out of about two dozen
+      per-package arch lists into `TC_EXTRA_LDFLAGS`; `-latomic` is kept only when
+      the toolchain's gcc actually ships it, detected with
+      `gcc -print-file-name=libatomic.so`.
+    - **Why:** passing the ABI only through `CFLAGS` silently built C++ / Fortran
+      objects with a different ABI than the C they link against, and the rt/atomic
+      arch lists had to be rechecked by hand each time a toolchain moved.
+      `TC_EXTRA_RUSTFLAGS` is left out on purpose — rustc takes its ABI through
+      `-Ctarget-cpu`, and a crate's C dependencies get it via
+      `CFLAGS_<target> = TC_EXTRA_CFLAGS`.
+    - Documented in
+      [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
+    - Pull request: [#7314](https://github.com/SynoCommunity/spksrc/pull/7314)
+
 ---
 
 ??? note "July 13th 2026 — Build-variable standardization (3 PRs)"
