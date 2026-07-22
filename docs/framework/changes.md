@@ -108,8 +108,15 @@ If you only read one thing, read this. The details are in the dated log below.
     - **Why:** a hardcoded arch list says *where* a package fails, not *why*; it
       must be rechecked by hand every time a toolchain moves and cannot express
       "any arch whose gcc is older than X". A declared floor can, and stays
-      correct on its own. `UNSUPPORTED_ARCHS` remains for genuine per-arch
-      exclusions that are not a capability floor.
+      correct on its own.
+    - **Beyond a DSM floor:** `REQUIRED_MIN_DSM` was frequently used as a *proxy*
+      for "needs a recent enough compiler", then topped up with `UNSUPPORTED_ARCHS`
+      for the architectures a single DSM floor still missed — a DSM version does
+      not map to one gcc across every arch, so an older platform can ship an older
+      gcc on the same DSM. `MIN_GCC_VERSION` states the real requirement and covers
+      all of those cases at once, dynamically. `REQUIRED_MIN_DSM` /
+      `REQUIRED_MAX_DSM` / `REQUIRED_MIN_SRM` and `UNSUPPORTED_ARCHS` remain for
+      genuine OS-version and per-arch constraints that are not a capability floor.
     - **Also:** `TC_GCC` is read from the toolchain Makefile instead of running
       `gcc -dumpversion`, so the compiler version is known before anything is
       extracted.
