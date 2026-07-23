@@ -1,5 +1,5 @@
 SPK_NAME = ntfy
-SPK_VERS = 2.26.0
+SPK_VERS = 2.26.3
 SPK_REV = 1
 SPK_ICON = src/ntfy.png
 

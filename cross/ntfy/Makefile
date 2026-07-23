@@ -1,7 +1,7 @@
 PKG_NAME = ntfy
-PKG_VERS = 2.25.0
+PKG_VERS = 2.26.3
 # keep the commit in sync with version $(PKG_VERS)
-PKG_COMMIT = df6f1f3ee1887ccc8a840363193622271576ed79
+PKG_COMMIT = 311138ef7b3314a140d8385e6f4549e1454fa97c
 PKG_DATE = $(shell date +%s)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
