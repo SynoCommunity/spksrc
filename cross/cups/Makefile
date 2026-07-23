@@ -23,6 +23,7 @@ CONFIGURE_ARGS += --with-components=core
 CONFIGURE_ARGS += --libdir=$(INSTALL_PREFIX)/lib
 
 include ../../mk/spksrc.common.mk
+
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 ADDITIONAL_CFLAGS = -DIP_FREEBIND=15
 endif
