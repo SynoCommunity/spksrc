@@ -42,16 +42,19 @@ endif
 ####
 # Define capabilities
 
-# we can't check whether gfortran exists, because toolchain is not yet extracted
-ifeq ($(strip $(firstword $(subst ., ,$(TC_VERS)))),7)
-TC_HAS_FORTRAN = 1
-else ifeq ($(strip $(TC_VERS)),1.3)
-TC_HAS_FORTRAN = 1
-else ifeq ($(strip $(TC_VERS)),6.2.4)
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-TC_HAS_FORTRAN = 1
-endif
-endif
+# Does this toolchain ship a Fortran compiler? Ask it, rather than tabulate per
+# DSM/arch. A hardcoded "7.x, SRM 1.3 and 6.2.4-x64 have Fortran" list is a proxy
+# that only holds for the stock toolchains: it cannot see a compiler swapped in
+# underneath -- a gcc8 overlay, say, adds gfortran to a 6.2.4 arch the list calls
+# Fortran-less. Probing the actual binary stays correct whatever provides it.
+#
+# Lazy on purpose, exactly like TC_HAS_LIBATOMIC below: the ifneq's that read it
+# force the wildcard, and it only needs to be right where it is consumed -- the
+# tc_vars sub-make, which re-parses this file after the toolchain is extracted, so
+# the binary is there to find. Cross packages read the baked tc_vars result and
+# never re-probe. (At the first, pre-extract parse it is empty; that value is not
+# consumed -- the sub-make's is.)
+TC_HAS_FORTRAN = $(if $(wildcard $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gfortran),1)
 
 TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump objcopy readelf
 ifneq ($(strip $(TC_HAS_FORTRAN)),)
