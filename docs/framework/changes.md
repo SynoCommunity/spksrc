@@ -65,6 +65,21 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "July 2026 — Detect Fortran by probing the compiler (#7321)"
+    - **What:** `TC_HAS_FORTRAN` was a static "7.x / SRM 1.3 / 6.2.4-x64 ship
+      gfortran" table; it is now a probe of the actual `gfortran` binary, evaluated
+      (like `TC_HAS_LIBATOMIC`) in the tc_vars sub-make after the toolchain is
+      extracted, so cross packages read the baked result.
+    - **Why:** the table is a proxy for the stock toolchains only -- it cannot see a
+      compiler swapped in underneath, e.g. a gcc overlay that adds gfortran to an
+      arch the table calls Fortran-less. Probing the binary stays correct whatever
+      provides it, and gives the same answer as the table on every stock toolchain
+      today.
+    - No package-facing change.
+    - Pull request: [#7321](https://github.com/SynoCommunity/spksrc/pull/7321)
+
+---
+
 ??? note "July 2026 — Toolchain ABI and link flags reach every language (#7314)"
     A toolchain's ABI/arch flags now consistently reach every language and the
     link, and two link-time libraries stopped being hand-maintained arch lists.
