@@ -51,9 +51,7 @@ ADMIN_PORT = ${SERVICE_PORT}
 
 # PPC archs except qoriq are not supported
 #    https://tvheadend.org/issues/5060
-# Depends on ffmpeg8, which needs gcc 4.9 -- refuse any older toolchain (matches
-# ffmpeg8's own MIN_GCC_VERSION). The floor covers armv5 / armv7l / old ppc, whose
-# toolchains predate 4.9, while keeping qoriq (gcc 4.9.3).
+# ffmpeg8 needs C11 -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
 DEPENDS  = cross/tvheadend

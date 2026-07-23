@@ -16,8 +16,7 @@ LICENSE  = LGPL2.1+
 
 OPTIONAL_DEPENDS = cross/ffmpeg8
 
-# Depends on ffmpeg8, which needs gcc 4.9 -- refuse any older toolchain (matches
-# ffmpeg8's own MIN_GCC_VERSION and covers armv5 / armv7l / old ppc dynamically).
+# ffmpeg8 needs C11 -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
 CONFIGURE_ARGS += -DBUILD_TOOLS=ON

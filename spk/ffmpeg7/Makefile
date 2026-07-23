@@ -8,8 +8,7 @@ CHANGELOG = "1. Update to version 7.1.5"
 DEPENDS = cross/ffmpeg7
 VIDEODRV_PACKAGE = synocli-videodriver
 
-# Needs C11 and working atomics -- gcc 4.9 or newer. The arch list this replaces
-# (ARMv5, ARMv7L, old PowerPC) was exactly the stock gccs below that.
+# Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
 MAINTAINER = th0ma7
