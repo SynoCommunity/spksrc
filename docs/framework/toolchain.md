@@ -142,9 +142,12 @@ CXXFLAGS = $(CFLAGS)
 LDFLAGS  = -L$(STAGING_INSTALL_PREFIX)/lib -Wl,-rpath,$(INSTALL_PREFIX)/lib
 ```
 
-Each language's flags end with its `TC_EXTRA_<LANG>FLAGS`, and `LDFLAGS` with
-`TC_EXTRA_LDFLAGS` — the toolchain-declared ABI and link flags described under
-[Extra flags a toolchain can declare](#extra-flags-a-toolchain-can-declare).
+Each language's flags end with its own `TC_EXTRA_<LANG>FLAGS` — `CFLAGS` ends with
+`TC_EXTRA_CFLAGS`, `CXXFLAGS` with `TC_EXTRA_CXXFLAGS`, and so on — and `LDFLAGS`
+ends with `TC_EXTRA_LDFLAGS`. Each of those already carries the toolchain-declared
+ABI (`TC_EXTRA_BUILD_FLAGS`, folded in as described under
+[Extra flags a toolchain can declare](#extra-flags-a-toolchain-can-declare)), so
+the ABI reaches every compiler *and* the link driver.
 
 ### tc_vars.cmake
 
