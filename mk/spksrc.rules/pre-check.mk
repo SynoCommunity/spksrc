@@ -45,6 +45,15 @@ ifneq ($(REQUIRE_KERNEL),)
   endif
 endif
 
+# Refuse an arch whose toolchain cannot meet MIN_GCC_VERSION / MIN_GLIBC_VERSION
+# (see spksrc.common/tc-capability.mk). Says why, not just where.
+ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED)),)
+  ifneq (,$(BUILD_UNSUPPORTED_FILE))
+    $(shell echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Arch '$(ARCH)-$(TCVERSION)' unsupported: $(TC_CAPABILITY_UNSUPPORTED)" >> $(BUILD_UNSUPPORTED_FILE))
+  endif
+  @$(error Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME): $(TC_CAPABILITY_UNSUPPORTED))
+endif
+
 # Check whether package supports ARCH
 ifneq ($(UNSUPPORTED_ARCHS),)
   ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))

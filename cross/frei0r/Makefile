@@ -12,9 +12,8 @@ HOMEPAGE = https://frei0r.dyne.org/
 COMMENT  = Frei0r is a minimalistic plugin API for video effects.
 LICENSE  = GPL-2.0
 
-REQUIRED_MIN_DSM = 7
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS) comcerto2k
-REQUIRED_MIN_SRM = 1.3
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 
 CMAKE_USE_TOOLCHAIN_FILE = OFF
 

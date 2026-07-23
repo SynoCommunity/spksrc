@@ -15,7 +15,9 @@ LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 ADDITIONAL_LDFLAGS =  -lm
 POST_INSTALL_TARGET = svt-av1_post_install_target
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+# 64-bit only (its configure refuses 32-bit) and needs gcc >= 4.9
+REQUIRE_64BIT = 1
+MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.cross-cmake.mk
 

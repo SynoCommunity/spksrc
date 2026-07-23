@@ -2,6 +2,7 @@ TC_ARCH = alpine
 TC_VERS = 7.3
 TC_KERNEL = 3.10.108
 TC_GLIBC = 2.36
+TC_GCC = 12.2.0
 
 TC_DIST = alpine-gcc1220_glibc236_hard-GPL
 TC_DIST_SITE_PATH = Annapurna%20Alpine%20Linux%203.10.108

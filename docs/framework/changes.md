@@ -19,6 +19,14 @@ If you only read one thing, read this. The details are in the dated log below.
     cd cross/curl && make help
     ```
 
+- **Declare what a package needs, not where it fails.** Instead of
+  hand-maintaining an `UNSUPPORTED_ARCHS` list, state the capability floor:
+  **`MIN_GCC_VERSION`**, **`MIN_GLIBC_VERSION`**, **`REQUIRE_64BIT`**. The
+  framework refuses exactly the architectures whose toolchain cannot meet it,
+  with a human-readable reason, and the gate stays correct on its own as
+  toolchains move. See
+  [Architecture Support](../developer-guide/packaging/makefile-variables.md#architecture-support).
+
 - **Every build system uses the same variable names now.** CMake no longer has
   its own `CMAKE_ARGS`: pass configure options through **`CONFIGURE_ARGS`** for
   autotools, CMake *and* Meson alike. Compile and install options are likewise
@@ -84,6 +92,37 @@ If you only read one thing, read this. The details are in the dated log below.
     - Pull request: [#7314](https://github.com/SynoCommunity/spksrc/pull/7314)
 
 ---
+
+??? note "July 2026 — Declare toolchain capabilities instead of arch lists (#7313)"
+    A package can now say what it *needs* from a toolchain rather than list the
+    architectures where it happens to fail today.
+
+    - **What:** three declarative floors — `MIN_GCC_VERSION`, `MIN_GLIBC_VERSION`
+      and `REQUIRE_64BIT` — checked against the toolchain's own `TC_GCC` /
+      `TC_GLIBC` (and `TC_KERNEL`), now declared in each toolchain Makefile and
+      read statically. An unmet floor makes `pre-check.mk` refuse that
+      architecture with a human-readable reason, and several reasons accumulate
+      (a 32-bit target on an old gcc reports both). About two dozen `cross/`
+      packages and `ffmpeg7/8` dropped their `UNSUPPORTED_ARCHS` arch lists in
+      favour of a floor.
+    - **Why:** a hardcoded arch list says *where* a package fails, not *why*; it
+      must be rechecked by hand every time a toolchain moves and cannot express
+      "any arch whose gcc is older than X". A declared floor can, and stays
+      correct on its own.
+    - **Beyond a DSM floor:** `REQUIRED_MIN_DSM` was frequently used as a *proxy*
+      for "needs a recent enough compiler", then topped up with `UNSUPPORTED_ARCHS`
+      for the architectures a single DSM floor still missed — a DSM version does
+      not map to one gcc across every arch, so an older platform can ship an older
+      gcc on the same DSM. `MIN_GCC_VERSION` states the real requirement and covers
+      all of those cases at once, dynamically. `REQUIRED_MIN_DSM` /
+      `REQUIRED_MAX_DSM` / `REQUIRED_MIN_SRM` and `UNSUPPORTED_ARCHS` remain for
+      genuine OS-version and per-arch constraints that are not a capability floor.
+    - **Also:** `TC_GCC` is read from the toolchain Makefile instead of running
+      `gcc -dumpversion`, so the compiler version is known before anything is
+      extracted.
+    - Documented in
+      [Architecture Support](../developer-guide/packaging/makefile-variables.md#architecture-support).
+    - Pull request: [#7313](https://github.com/SynoCommunity/spksrc/pull/7313)
 
 ??? note "July 13th 2026 — Build-variable standardization (3 PRs)"
     A three-part effort so that every build system (autotools, CMake, Meson)

@@ -11,7 +11,8 @@ HOMEPAGE = https://code.videolan.org/rist/librist
 COMMENT  = A library that can be used to easily add the RIST protocol to your application.
 LICENSE  = BSD 2-Clause "Simplified" License
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# Needs gcc >= 4.8: its atomics fail to build under gcc 4.6.
+MIN_GCC_VERSION = 4.8
 
 include ../../mk/spksrc.common.mk
 

@@ -12,7 +12,8 @@ HOMEPAGE = https://github.com/sekrit-twc/zimg
 COMMENT  = The "z" library implements the commonly required image processing basics of scaling, colorspace conversion, and depth conversion.
 LICENSE  = WTFPL license
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# Needs gcc >= 4.8: C++11 features unavailable before gcc 4.8.
+MIN_GCC_VERSION = 4.8
 
 GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = zimg_pre_configure
