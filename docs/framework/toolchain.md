@@ -53,6 +53,56 @@ include ../../mk/spksrc.toolchain.mk
 
 `spksrc.toolchain.mk` is the entry point; its implementation under `mk/spksrc.toolchain/` is detailed in the [Makefile System include hierarchy](makefile-system.md#include-hierarchy). The matching DSM development toolkit is covered on the [Toolkit](toolkit.md) page.
 
+### Extra flags a toolchain can declare
+
+A toolchain Makefile may add flags that then apply to **every** package built
+with it. Assembled by `mk/spksrc.toolchain/tc-flags.mk`:
+
+| Variable | Purpose |
+|----------|---------|
+| `TC_EXTRA_BUILD_FLAGS` | The target's ABI / arch flags (`-march`, `-mcpu`, `-mfpu`, `-mfloat-abi`, `-mthumb`, ...) |
+| `TC_EXTRA_CFLAGS` / `TC_EXTRA_CPPFLAGS` / `TC_EXTRA_CXXFLAGS` / `TC_EXTRA_FFLAGS` | Per-language extra flags |
+| `TC_EXTRA_LDFLAGS` | Extra link-time flags / libraries (`-lrt`, `-latomic`) |
+| `TC_EXTRA_RUSTFLAGS` | Extra rustc flags (`-Ctarget-cpu=...`) |
+
+**`TC_EXTRA_BUILD_FLAGS` selects the ABI**, so it must reach *every* language and
+the link — not just C. Building C++ or Fortran objects with a different ABI than
+the C objects they link against yields silently broken binaries, and the gcc link
+driver reads these flags to pick the right multilib and startfiles. The framework
+therefore folds `TC_EXTRA_BUILD_FLAGS` once into each `TC_EXTRA_<LANG>FLAGS` (and
+into `TC_EXTRA_LDFLAGS`). Each per-language variable is then the single residual
+list that language reads — the ABI first, then anything the toolchain adds for
+that language, always last in the chain, so it stays a clean place to extend. A
+package's own `ADDITIONAL_<LANG>FLAGS` are separate and package-scoped.
+
+`TC_EXTRA_RUSTFLAGS` is deliberately *not* fed from `TC_EXTRA_BUILD_FLAGS`: rustc
+takes its ABI through `-Ctarget-cpu` (already in `TC_EXTRA_RUSTFLAGS`), and the C
+dependencies of a rust crate receive the ABI through
+`CFLAGS_<target> = TC_EXTRA_CFLAGS`.
+
+**`TC_EXTRA_LDFLAGS` — `-lrt` vs `-latomic`, auto-detected.** Two link-time needs
+were previously hand-carried as per-package architecture lists:
+
+- `-lrt` — glibc &lt; 2.17 keeps `clock_gettime` in a separate `librt`.
+- `-latomic` — targets without native 64-bit atomics (ARMv5, PowerPC e500v2) make
+  gcc emit calls into `libatomic` that the link must resolve.
+
+`-latomic` is kept only when the toolchain's gcc actually ships the library: the
+framework asks `gcc -print-file-name=libatomic.so` (`TC_HAS_LIBATOMIC`) rather than
+tabulating architectures. That is the exact criterion — a gcc old enough to lack
+`libatomic` (before 4.7) also predates the `__atomic_*` builtins, emits `__sync_*`
+instead, and so never needs the library — and handing `-latomic` to such a gcc is a
+fatal *"cannot find -latomic"*. A toolchain lists `-latomic` in its
+`TC_EXTRA_LDFLAGS`; the framework drops it where it would not resolve.
+
+Because these libraries are declared toolchain-wide, they reach every link even
+though most binaries call neither `clock_gettime` nor an atomic builtin. The
+framework therefore wraps them in `-Wl,--as-needed ... -Wl,--no-as-needed`, so the
+linker records a `librt` / `libatomic` dependency only where the objects actually
+reference a symbol it provides. The wrap is scoped to just these two libraries —
+it restores the default immediately after — so it never drops a package library
+that is present only for its side effects.
+
 ## tc_vars Files
 
 The toolchain build generates several `tc_vars*.mk` files that configure cross-compilation:
@@ -91,6 +141,13 @@ CFLAGS   = -I$(STAGING_INSTALL_PREFIX)/include
 CXXFLAGS = $(CFLAGS)
 LDFLAGS  = -L$(STAGING_INSTALL_PREFIX)/lib -Wl,-rpath,$(INSTALL_PREFIX)/lib
 ```
+
+Each language's flags end with its own `TC_EXTRA_<LANG>FLAGS` — `CFLAGS` ends with
+`TC_EXTRA_CFLAGS`, `CXXFLAGS` with `TC_EXTRA_CXXFLAGS`, and so on — and `LDFLAGS`
+ends with `TC_EXTRA_LDFLAGS`. Each of those already carries the toolchain-declared
+ABI (`TC_EXTRA_BUILD_FLAGS`, folded in as described under
+[Extra flags a toolchain can declare](#extra-flags-a-toolchain-can-declare)), so
+the ABI reaches every compiler *and* the link driver.
 
 ### tc_vars.cmake
 

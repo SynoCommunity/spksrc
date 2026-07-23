@@ -374,7 +374,12 @@ tc_vars:
 	echo TC_PATH := $(TC_WORK_DIR)/$(TC_TARGET)/bin/ ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
+	echo TC_EXTRA_BUILD_FLAGS := $(TC_EXTRA_BUILD_FLAGS) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
+	echo TC_EXTRA_CPPFLAGS := $(TC_EXTRA_CPPFLAGS) ; \
+	echo TC_EXTRA_CXXFLAGS := $(TC_EXTRA_CXXFLAGS) ; \
+	echo TC_EXTRA_FFLAGS := $(TC_EXTRA_FFLAGS) ; \
+	echo TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS) ; \
 	echo TC_EXTRA_RUSTFLAGS := $(TC_EXTRA_RUSTFLAGS) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \

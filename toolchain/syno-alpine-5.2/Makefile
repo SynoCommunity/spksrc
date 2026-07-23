@@ -8,6 +8,6 @@ TC_DIST_SITE_PATH = Annapurna%20Alpine%20Linux%203.2.40
 
 TC_TARGET = arm-cortex_a15-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/sysroot
-TC_EXTRA_CFLAGS = -mfloat-abi=hard -mtune=cortex-a15 -mfpu=neon-vfpv4 -mthumb
+TC_EXTRA_BUILD_FLAGS = -mfloat-abi=hard -mtune=cortex-a15 -mfpu=neon-vfpv4 -mthumb
 
 include ../../mk/spksrc.toolchain.mk

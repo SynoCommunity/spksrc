@@ -9,6 +9,9 @@ TC_DIST_SITE_PATH = Marvell%20Armada%20370%20Linux%203.2.40
 TC_TARGET = arm-marvell-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/libc
 TC_LIBRARY = $(TC_SYSROOT)/usr/lib
-TC_EXTRA_CFLAGS = -mhard-float -mfpu=vfpv3-d16
+TC_EXTRA_BUILD_FLAGS = -mhard-float -mfpu=vfpv3-d16
+
+# glibc 2.15 predates clock_gettime in libc (2.17).
+TC_EXTRA_LDFLAGS = -lrt
 
 include ../../mk/spksrc.toolchain.mk

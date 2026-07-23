@@ -57,12 +57,17 @@ ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 	echo
 endif
 endif
+# The TC_EXTRA_* below are in theory redundant: tc-flags.mk already folds
+# TC_EXTRA_BUILD_FLAGS and each TC_EXTRA_<LANG>FLAGS into CFLAGS/CXXFLAGS/... , and
+# uniq drops the duplicate. They are listed anyway, on purpose, so this file shows
+# every flag source that feeds a given CMake variable in one place -- a holistic
+# view -- rather than hiding half of them inside the upstream *FLAGS.
 	@echo "# set default compiler flags for cross-compiling" ; \
-	echo 'set(CMAKE_C_FLAGS "$(call uniq,$(CFLAGS) $(TC_EXTRA_CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS))")' ; \
-	echo 'set(CMAKE_CPP_FLAGS "$(call uniq,$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS))")' ; \
-	echo 'set(CMAKE_CXX_FLAGS "$(call uniq,$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS))")'
+	echo 'set(CMAKE_C_FLAGS "$(call uniq,$(CFLAGS) $(CMAKE_C_FLAGS) $(ADDITIONAL_CFLAGS) $(TC_EXTRA_CFLAGS))")' ; \
+	echo 'set(CMAKE_CPP_FLAGS "$(call uniq,$(CPPFLAGS) $(CMAKE_CPP_FLAGS) $(ADDITIONAL_CPPFLAGS) $(TC_EXTRA_CPPFLAGS))")' ; \
+	echo 'set(CMAKE_CXX_FLAGS "$(call uniq,$(CXXFLAGS) $(CMAKE_CXX_FLAGS) $(ADDITIONAL_CXXFLAGS) $(TC_EXTRA_CXXFLAGS))")'
 ifneq ($(strip $(FFLAGS)),)
-	@echo 'set(CMAKE_Fortran_FLAGS "$(call uniq,$(FFLAGS) $(CMAKE_Fortran_FLAGS) $(ADDITIONAL_FFLAGS))")'
+	@echo 'set(CMAKE_Fortran_FLAGS "$(call uniq,$(FFLAGS) $(CMAKE_Fortran_FLAGS) $(ADDITIONAL_FFLAGS) $(TC_EXTRA_FFLAGS))")'
 endif
 	@echo
 ifeq ($(GCC_DEBUG_INFO),1)
@@ -76,9 +81,9 @@ endif
 	@echo
 endif
 ifneq ($(strip $(CMAKE_DISABLE_EXE_LINKER_FLAGS)),1)
-	@echo 'set(CMAKE_EXE_LINKER_FLAGS "$(call uniq,$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS))")'
+	@echo 'set(CMAKE_EXE_LINKER_FLAGS "$(call uniq,$(LDFLAGS) $(CMAKE_EXE_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS) $(TC_EXTRA_LDFLAGS))")'
 endif
-	@echo 'set(CMAKE_SHARED_LINKER_FLAGS "$(call uniq,$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS))")' ; \
+	@echo 'set(CMAKE_SHARED_LINKER_FLAGS "$(call uniq,$(LDFLAGS) $(CMAKE_SHARED_LINKER_FLAGS) $(ADDITIONAL_LDFLAGS) $(TC_EXTRA_LDFLAGS))")' ; \
 	echo
 ifneq ($(strip $(BUILD_SHARED_LIBS)),)
 	@echo "# build shared library" ; \

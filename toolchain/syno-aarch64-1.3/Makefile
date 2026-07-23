@@ -13,6 +13,6 @@ TC_DIST_SITE_PATH = toolchains%2Fsrm1.3
 
 TC_TARGET = aarch64-unknown-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sysroot
-TC_EXTRA_CFLAGS = -march=armv8-a -mcpu=cortex-a53+crypto
+TC_EXTRA_BUILD_FLAGS = -march=armv8-a -mcpu=cortex-a53+crypto
 
 include ../../mk/spksrc.toolchain.mk

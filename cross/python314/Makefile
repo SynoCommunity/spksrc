@@ -68,7 +68,6 @@ endif
 # Specific to qoriq
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += ac_cv_enable_implicit_function_declaration_error=no
-ADDITIONAL_LDFLAGS += -latomic
 endif
 
 DEPENDS += cross/openssl3

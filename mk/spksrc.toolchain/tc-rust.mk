@@ -150,7 +150,7 @@ endif
 	@(cd $(WORK_DIR)/rust && rm -f config.toml && ./x setup compiler)
 	(cd $(WORK_DIR)/rust && \
 	   CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TC_EXTRA_CFLAGS)" \
-	   CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS="$(TC_RUSTFLAGS)" \
+	   CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS="$(TC_RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS)" \
 	   RUST_BACKTRACE=full \
 	   ./x build --config $(TC_LOCAL_VARS_RUST))
 	rustup toolchain link $(TC_RUSTUP_TOOLCHAIN) $(WORK_DIR)/rust/build/host/stage$(RUSTUP_DEFAULT_TOOLCHAIN_STAGE)
