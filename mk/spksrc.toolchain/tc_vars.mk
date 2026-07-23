@@ -383,8 +383,8 @@ tc_vars:
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
 	echo TC_ARCH := $(TC_ARCH) ; \
 	echo TC_GCC := $(TC_GCC) ; \
-	echo TC_GLIBC := $(TC_GLIBC) ; \
-	echo TC_KERNEL := $(TC_KERNEL)
+	echo TC_GLIBC := $(TC_GLIBC)
+# TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 	@echo TC_KERNEL := $(TC_KERNEL)+
