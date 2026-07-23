@@ -2,7 +2,7 @@ PKG_NAME = ntfy
 PKG_VERS = 2.26.3
 # keep the commit in sync with version $(PKG_VERS)
 PKG_COMMIT = 311138ef7b3314a140d8385e6f4549e1454fa97c
-PKG_DATE = $(shell date +%s)
+PKG_DATE = $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/binwiederhier/ntfy/archive
@@ -36,11 +36,12 @@ include ../../mk/spksrc.cross-go.mk
 # spksrc repo that we are running within.
 # For the same reason we can't use goreleaser either.
 ntfy_compile:
-	@$(MSG) - build cli-linux-server
+	@$(MSG) - build cli-deps-static-sites
 	@cd $(WORK_DIR)/$(PKG_DIR) && mkdir -p dist server/docs server/site && touch server/docs/index.html server/site/app.html
+	@$(MSG) - build cli-linux-server
 	@$(RUN) CGO_ENABLED=1 $(GO) build -o dist/ntfy \
 		-tags sqlite_omit_load_extension,osusergo,netgo \
-		-ldflags "-linkmode=external -extldflags=-static -s -w -X main.version=$(PKG_VERSION) -X main.commit=$(PKG_COMMIT) -X main.date=$(PKG_DATE)"
+		-ldflags "-linkmode=external -extldflags=-static -s -w -X main.version=$(PKG_VERS) -X main.commit=$(PKG_COMMIT) -X main.date=$(PKG_DATE)"
 
 .PHONY: ntfy_install
 ntfy_install:
