@@ -65,6 +65,22 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "July 2026 — Carry the runtime library the binary asks for, by symbol version (#7322)"
+    - **What:** the strip step copies the runtime libraries DSM does not ship
+      (`libatomic`, `libquadmath`, `libgfortran` -- the `TC_LIBS_DEFAULT` list) from
+      the toolchain. It now selects the copy whose **symbol versions** satisfy the
+      binary (`readelf -V` vs `strings`), instead of the first one a plain
+      `find -name` turns up.
+    - **Why:** a find by name returns every copy in the toolchain at once (the
+      sysroot's, the compiler's `lib64`, a multilib) and handed the first to a
+      `basename` expecting one. Choosing by symbol version is correct with the
+      multilib case today and ready for several gcc versions to coexist under a
+      future overlay.
+    - No package-facing change.
+    - Pull request: [#7322](https://github.com/SynoCommunity/spksrc/pull/7322)
+
+---
+
 ??? note "July 2026 — Detect Fortran by probing the compiler (#7321)"
     - **What:** `TC_HAS_FORTRAN` was a static "7.x / SRM 1.3 / 6.2.4-x64 ship
       gfortran" table; it is now a probe of the actual `gfortran` binary, evaluated
