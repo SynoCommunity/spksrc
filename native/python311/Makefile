@@ -19,7 +19,7 @@ CONFIGURE_ARGS += --disable-test-modules
 # Uses system default libssl-dev
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
-COMPILE_MAKE_OPTIONS += all
+COMPILE_ARGS += all
 
 POST_INSTALL_TARGET = python311_native_post_install
 

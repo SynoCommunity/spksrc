@@ -13,6 +13,6 @@ COMMENT  = A tool that turns ldd into a tree and explains how shared libraries a
 LICENSE  = MIT
 
 CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk

@@ -13,7 +13,7 @@ COMMENT  = Erlang is a programming language used to build massively scalable sof
 LICENSE  = Apache 2.0
 
 CONFIGURE_TARGET = erlang_configure
-INSTALL_MAKE_OPTIONS = install INSTALL_PREFIX=
+INSTALL_ARGS = install INSTALL_PREFIX=
 
 CONFIGURE_ARGS  = --without-javac
 CONFIGURE_ARGS += --without-jinterface

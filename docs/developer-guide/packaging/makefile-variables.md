@@ -6,7 +6,7 @@ This page documents the Makefile variables used in spksrc packages.
     For a complete reference of all variables and targets, see [Makefile Reference](../../reference/makefile-reference.md).
 
 !!! warning "Include Order Matters"
-    Any `ifeq` conditionals using architecture variables (like `ARMv7_ARCHS`, `x64_ARCHS`, etc.) must appear **after** `include ../../mk/spksrc.common.mk` or the relevant `spksrc.cross-*.mk` file. These variables are defined by the included makefiles and will be empty if referenced before the include.
+    Architecture variables (`ARMv7_ARCHS`, `x64_ARCHS`, etc.) and the helper macros are defined by `spksrc.common.mk`, which loads the architecture classification and macros early (see [Macros](../../reference/macros.md)). Any `ifeq` using them must therefore appear **after** `include ../../mk/spksrc.common.mk` (or the relevant `spksrc.cross-*.mk`, which includes it) — referenced before the include they are empty.
 
 ## Package Identification
 
@@ -19,6 +19,7 @@ This page documents the Makefile variables used in spksrc packages.
 | `PKG_EXT` | Yes | Source file extension (tar.gz, tar.xz, zip) |
 | `PKG_DIST_NAME` | Yes | Source filename to download |
 | `PKG_DIST_SITE` | Yes | Base URL for download |
+| `PKG_DIST_MIRRORS` | No | Extra base URLs to fall back to (see [Source downloads and mirrors](#source-downloads-and-mirrors)) |
 | `PKG_DIR` | Yes | Directory name after extraction |
 
 Example:
@@ -31,6 +32,57 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://curl.se/download
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 ```
+
+### Source downloads and mirrors
+
+A download is never a single request. The framework builds a list of candidate
+URLs, tries each in turn, and stops at the first success. The list is finite --
+the primary URL, plus the mirrors described below, de-duplicated -- and each
+candidate is retried `DOWNLOAD_TRIES` times (2 by default), so a download that
+cannot succeed fails instead of looping.
+
+**Well-known project mirrors are automatic.** If `PKG_DIST_SITE` points at one
+of the big source hosts, the framework already knows its mirrors and will try
+them without any declaration on your part:
+
+| If the URL is hosted on | Fallbacks are taken from |
+|-------------------------|--------------------------|
+| GNU (`ftp.gnu.org`, `ftpmirror.gnu.org`) | `GNU_MIRRORS` |
+| SourceForge (`downloads.sourceforge.net`) | `SOURCEFORGE_MIRRORS` |
+| GNOME (`download.gnome.org`) | `GNOME_MIRRORS` |
+| X.Org (`www.x.org`) | `XORG_MIRRORS` |
+| kernel.org (`cdn.kernel.org`) | `KERNEL_MIRRORS` |
+
+A candidate is built by replacing everything up to and including the family's
+tree-root marker (`/gnu/`, `/project/`, `/sources/`, ...) with the mirror base,
+so mirrors that host the tree under a different prefix still resolve correctly.
+Any other URL -- GitHub, a project's own server -- simply has no family, and the
+primary URL is used on its own.
+
+**`PKG_DIST_MIRRORS` covers everything else.** It takes a space-separated list of
+*base URLs*; `PKG_DIST_NAME` is appended to each. Use it when upstream is the
+right place to fetch from but cannot be relied on:
+
+```makefile
+PKG_DIST_SITE = https://znc.in/releases
+# znc.in serves the release tarballs, but it has been flaky (its TLS
+# certificate expired on 2026-07-14). Fall back to our own mirror.
+PKG_DIST_MIRRORS = https://github.com/SynoCommunity/spksrc/releases/download/sources
+```
+
+Two things to keep in mind:
+
+- The **file name must match**. The mirror has to serve the file under exactly
+  `PKG_DIST_NAME`. A distribution that repackages the tarball under its own name
+  (Debian's `znc_1.10.2.orig.tar.gz`, say) cannot be used as a mirror base.
+- The **digests still apply**. Every candidate is checked against `digests`, so a
+  mirror serving different bytes fails the build rather than poisoning it. This
+  is what makes it safe to list a third-party mirror at all.
+
+When no mirror serves the right file name, the durable answer is to upload the
+tarball to the SynoCommunity
+[`sources`](https://github.com/SynoCommunity/spksrc/releases/tag/sources)
+release and point `PKG_DIST_MIRRORS` at it.
 
 ### SPK Packages
 
@@ -91,21 +143,38 @@ SPK_CONFLICT = "transmission"
 
 These variables apply to `cross/` package Makefiles.
 
-### Configure Options
+### Build System Selection
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `GNU_CONFIGURE` | 0 | Set to 1 for autoconf packages |
-| `CMAKE_USE` | 0 | Set to 1 for CMake packages |
-| `MESON_USE` | 0 | Set to 1 for Meson packages |
-| `CONFIGURE_ARGS` | | Arguments passed to configure |
-| `CMAKE_ARGS` | | Arguments passed to CMake |
-| `MESON_ARGS` | | Arguments passed to Meson |
+A cross package's build system is chosen by which `mk/spksrc.cross-*.mk` it includes; the arguments are then passed through the matching variable:
+
+| Build system | Include | Arguments variable |
+|--------------|---------|--------------------|
+| autotools | `spksrc.cross-cc.mk` + `GNU_CONFIGURE = 1` | `CONFIGURE_ARGS` |
+| CMake | `spksrc.cross-cmake.mk` | `CONFIGURE_ARGS` |
+| Meson | `spksrc.cross-meson.mk` | `CONFIGURE_ARGS` (passed to `meson setup`) |
+
+All three build systems also honour `ADDITIONAL_CONFIGURE_ARGS`, appended right
+after `CONFIGURE_ARGS` on the configure/cmake/`meson setup` command line. It is
+never set by the framework. Prefer `CONFIGURE_ARGS +=`; reach for
+`ADDITIONAL_CONFIGURE_ARGS` only when a package reuses `CONFIGURE_ARGS` for its
+own extra configure invocations and needs args that go to the framework's
+invocation *only* (see `cross/x265`, whose 10/12-bit sub-builds share
+`CONFIGURE_ARGS` but must not receive the final-build link flags).
 
 ```makefile
+# autotools
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --enable-shared --disable-static
 CONFIGURE_ARGS += --with-ssl=$(STAGING_INSTALL_PREFIX)
+
+include ../../mk/spksrc.cross-cc.mk
+```
+
+```makefile
+# Meson (CONFIGURE_ARGS is forwarded to `meson setup`)
+CONFIGURE_ARGS = -Dtests=disabled
+
+include ../../mk/spksrc.cross-meson.mk
 ```
 
 ### Compiler Flags
@@ -122,17 +191,30 @@ ADDITIONAL_CFLAGS = -O3 -DNDEBUG
 ADDITIONAL_LDFLAGS = -Wl,-rpath,/var/packages/mypackage/target/lib
 ```
 
-### Make Options
+These `ADDITIONAL_*` variables are **package**-scoped. The **toolchain**-wide
+counterparts — the target ABI in `TC_EXTRA_BUILD_FLAGS` (folded into each
+`TC_EXTRA_<LANG>FLAGS`) and the link flags in `TC_EXTRA_LDFLAGS` (`-lrt` /
+`-latomic`) — are declared by the toolchain, not the package; see
+[Extra flags a toolchain can declare](../../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
+
+### Compile and Install Arguments
+
+`COMPILE_ARGS` and `INSTALL_ARGS` carry extra arguments for the compile and install steps across every build system. For autotools / plain GNU make each is the make command; for CMake and Meson they are appended as-is to `cmake --build` / `cmake --install` and `ninja` / `ninja install` respectively.
+
+On the classic gnu-make build path only (not CMake or Meson) both variables have a sensible default when a package leaves them unset, so package-specific make routines can reference them directly:
+
+- `COMPILE_ARGS` defaults to `-j$(NCPUS)` (parallel jobs).
+- `INSTALL_ARGS` defaults to `install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)`.
 
 | Variable | Description |
 |----------|-------------|
-| `MAKE_ARGS` | Arguments passed to make compile |
-| `INSTALL_ARGS` | Arguments passed to make install |
+| `COMPILE_ARGS` | Extra arguments for the compile step (make / cmake --build / ninja); defaults to `-j$(NCPUS)` on the make path |
+| `INSTALL_ARGS` | Extra arguments for the install step (make / cmake --install / ninja install); defaults to `install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)` on the make path |
 | `INSTALL_TARGET` | Make target for installation (default: install) |
 
 ```makefile
-MAKE_ARGS = DESTDIR=$(INSTALL_DIR)
-INSTALL_TARGET = install-strip
+COMPILE_ARGS = V=1
+INSTALL_ARGS = install-strip DESTDIR=$(INSTALL_DIR)
 ```
 
 ## Service Configuration
@@ -166,6 +248,62 @@ SPK_COMMANDS = bin/mycommand bin/myother
 
 ## Architecture Support
 
+### Declare a capability floor (preferred)
+
+When a package cannot build on some architectures because of what the
+**toolchain** provides — its compiler, its C library, or the target being
+32-bit — declare that floor instead of listing the architectures by hand. The
+framework checks each floor against the toolchain's own `TC_GCC` / `TC_GLIBC`
+and refuses exactly the architectures that cannot meet it, with a
+human-readable reason.
+
+| Variable | Description |
+|----------|-------------|
+| `MIN_GCC_VERSION` | Needs at least this gcc (e.g. `8`, `4.9`) |
+| `MIN_GLIBC_VERSION` | Needs at least this glibc — a runtime floor no toolchain can lift |
+| `REQUIRE_64BIT` | Set to `1` when the package needs a 64-bit target |
+
+```makefile
+# Needs C++17 → gcc 8 or newer
+MIN_GCC_VERSION = 8
+
+# Needs a 64-bit target (e.g. SVT-AV1)
+REQUIRE_64BIT = 1
+```
+
+Why this over an arch list: a hardcoded list says *where* a package fails, not
+*why*. It has to be rechecked by hand every time a toolchain moves, and it
+cannot express "any architecture whose gcc is older than X". A declared floor
+can, and it stays correct on its own. Unmet floors accumulate, so an arch that
+misses more than one is told about all of them.
+
+The toolchain values these check against — `TC_GCC`, `TC_GLIBC` and `TC_KERNEL`
+— are declared in each toolchain's Makefile and read statically, so a package
+can gate on them before anything is extracted.
+
+**Keep the floor consistent between `spk/` and `cross/`.** A floor on an `spk/`
+package belongs on its matching `cross/` package too, so a build is refused at its
+own level instead of failing deep in a dependency. If you add a floor to `spk/foo`,
+add it to `cross/foo` as well.
+
+**Let the essential dependencies set the floor.** Every mandatory dependency must
+build at the floor the package declares; if one of them needs a newer gcc or glibc,
+raise the floor on the package *and* its `cross/` to match. Do **not** push that
+floor onto a shared `cross/` library, though — a library keeps the minimum *it*
+needs, so other packages built against it at a lower floor stay buildable.
+
+**Gate an optional dependency instead of raising the floor.** When a dependency is
+optional, do not lift the whole package's floor for it. Guard it with an `ifeq` (on
+the arch, or a capability group) and keep the configure options that use it inside
+the same block, so the dependency and its flags turn on together — the way optional
+ffmpeg-backed features are wired.
+
+### Exclude architectures explicitly
+
+For an exclusion that is **not** a capability floor — a package that is simply
+not wanted on a platform, or a specific arch/DSM-version pairing — use the arch
+lists directly.
+
 | Variable | Description |
 |----------|-------------|
 | `UNSUPPORTED_ARCHS` | Architectures that cannot build this package |
@@ -173,8 +311,8 @@ SPK_COMMANDS = bin/mycommand bin/myother
 | `OS_MIN_VER` | Minimum OS version (alternative to above) |
 
 ```makefile
-# Only works on 64-bit
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+# Not supported on this whole family
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 # Requires DSM 7.0+
 REQUIRED_MIN_DSM = 7.0
@@ -182,16 +320,44 @@ REQUIRED_MIN_DSM = 7.0
 
 ### Architecture Groups
 
-| Group | Contains |
-|-------|----------|
-| `x64_ARCHS` | Intel 64-bit |
-| `ARMv7_ARCHS` | ARM 32-bit |
-| `ARMv7L_ARCHS` | ARM 32-bit low-end |
-| `ARMv8_ARCHS` | ARM 64-bit |
-| `ARM_ARCHS` | All ARM architectures |
-| `PPC_ARCHS` | PowerPC |
-| `32bit_ARCHS` | All 32-bit |
-| `64bit_ARCHS` | All 64-bit |
+spksrc provides groups such as `x64_ARCHS`, `ARMv7_ARCHS`, `ARMv8_ARCHS`, `ARM_ARCHS`, `PPC_ARCHS`, `32bit_ARCHS` and `64bit_ARCHS`. The complete, authoritative list (with the platform codenames each contains) is in [Reference: Architectures](../../reference/architectures.md#architecture-groups).
+
+Use them in `ifeq` to enable code per architecture. The groups are available **after** including a spksrc entry point (or `spksrc.common.mk`):
+
+```makefile
+include ../../mk/spksrc.common.mk
+
+# Only build a feature on 64-bit targets
+ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --enable-feature
+endif
+
+# x64-only dependency
+ifneq ($(findstring $(ARCH),$(x64_ARCHS)),)
+DEPENDS += cross/intel-media-driver
+endif
+
+# Exclude a whole family from the build
+UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS)
+```
+
+### Version Conditions
+
+The `version_*` [macros](../../reference/macros.md#version-comparison) gate code on a toolchain (or any version) — they return `1` when true:
+
+```makefile
+include ../../mk/spksrc.common.mk
+
+# Newer toolchains only
+ifeq ($(call version_ge,$(TC_GCC),12),1)
+DEPENDS += cross/libplacebo
+endif
+
+# Workaround for old compilers
+ifeq ($(call version_lt,$(TC_GCC),5.0),1)
+ADDITIONAL_CFLAGS += -std=gnu99
+endif
+```
 
 ## Path Variables (Available During Build)
 
@@ -202,17 +368,11 @@ REQUIRED_MIN_DSM = 7.0
 | `INSTALL_DIR` | Installation destination |
 | `STAGING_INSTALL_PREFIX` | Path prefix for installed files |
 | `INSTALL_PREFIX` | Runtime prefix on NAS |
-| `TC_PATH` | Toolchain path |
-| `TC_INCLUDE` | Toolchain include path |
-| `TC_LIBRARY` | Toolchain library path |
 
 ## SPK-Specific Variables
 
 | Variable | Description |
 |----------|-------------|
-| `RELOAD_UI` | Set to `yes` to reload DSM UI after install |
-| `BETA` | Set to `1` to mark as beta release |
-| `SPK_ICON_256` | Path to 256x256 icon (optional) |
 | `ADMIN_PORT` | Port for admin interface |
 | `ADMIN_PROTOCOL` | Protocol (http/https) for admin interface |
 | `ADMIN_URL` | Custom admin URL path |
@@ -259,17 +419,11 @@ For custom URL paths or descriptions, create `src/app/config`:
 }
 ```
 
-Install it in the Makefile:
+Point `DSM_UI_CONFIG` at that file — the framework installs it as the package's `app/config`, overriding the auto-generated one:
 
 ```makefile
 DSM_UI_DIR = app
+DSM_UI_CONFIG = src/app/config
 ADMIN_PORT = 8080
 ADMIN_URL = /admin
-
-POST_STRIP_TARGET = mypackage_extra_install
-
-.PHONY: mypackage_extra_install
-mypackage_extra_install:
-	install -m 755 -d $(STAGING_DIR)/app
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
 ```

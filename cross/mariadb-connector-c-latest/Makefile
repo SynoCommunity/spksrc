@@ -17,26 +17,26 @@ POST_INSTALL_TARGET = mariadb_post_install
 CMAKE_DISABLE_EXE_LINKER_FLAGS = 1
 
 # MySQL specific:
-CMAKE_ARGS += -DWITH_UNIT_TESTS=OFF
-CMAKE_ARGS += -DDEFAULT_CHARSET=utf8
-CMAKE_ARGS += -DINSTALL_LIBDIR=lib
+CONFIGURE_ARGS += -DWITH_UNIT_TESTS=OFF
+CONFIGURE_ARGS += -DDEFAULT_CHARSET=utf8
+CONFIGURE_ARGS += -DINSTALL_LIBDIR=lib
 
 # Creates the following two synlinks:
 #   - libmysqlclient.so -> libmariadb.so.3
 #   - libmysqlclient_r.so -> libmariadb.so.3
 # Which in turns conflict with mysql-connector-c
 #   - DISABLE unsupported mysql-connector-c
-CMAKE_ARGS += -DWITH_MYSQLCOMPAT=ON
+CONFIGURE_ARGS += -DWITH_MYSQLCOMPAT=ON
 
 DEPENDS += cross/openssl3
-CMAKE_ARGS += -DWITH_SSL=ON
+CONFIGURE_ARGS += -DWITH_SSL=ON
 
 DEPENDS += cross/zlib
-CMAKE_ARGS += -DWITH_EXTERNAL_ZLIB=ON
+CONFIGURE_ARGS += -DWITH_EXTERNAL_ZLIB=ON
 DEPENDS += cross/libiconv
-CMAKE_ARGS += -DWITH_ICONV=ON
+CONFIGURE_ARGS += -DWITH_ICONV=ON
 DEPENDS += cross/curl
-CMAKE_ARGS += -DWITH_CURL=ON
+CONFIGURE_ARGS += -DWITH_CURL=ON
 
 # custom mariadb socket addr (default MariaDB is usually /tmp/mysql.sock)
 # on DSM 7 (only MariaDB 10 available)
@@ -48,18 +48,18 @@ ifeq ($(MYSQL_DB_SOCKET),)
 # default mysql/mariadb socket for DSM
 MYSQL_DB_SOCKET = /run/mysqld/mysqld.sock
 endif
-CMAKE_ARGS += -DMARIADB_UNIX_ADDR=$(MYSQL_DB_SOCKET)
+CONFIGURE_ARGS += -DMARIADB_UNIX_ADDR=$(MYSQL_DB_SOCKET)
 # Disable default TLS server certificate verification (enabled by default in 3.4.x)
 # to avoid "SSL is required, but the server does not support it" on non-TLS servers.
-CMAKE_ARGS += -DDEFAULT_SSL_VERIFY_SERVER_CERT=OFF
+CONFIGURE_ARGS += -DDEFAULT_SSL_VERIFY_SERVER_CERT=OFF
 
 include ../../mk/spksrc.cross-cmake.mk
 
 .PHONY: mariadb_post_install
 mariadb_post_install:
 	@cd $(WORK_DIR) && ln -s $(PKG_DIR) $(PKG_NAME)
-	install -m 755 -d $(CMAKE_BUILD_DIR)/NATIVE/bin
-	install -m 755 $(CURDIR)/mariadb_config $(CMAKE_BUILD_DIR)/NATIVE/bin
-	@sed -i -e 's%@STAGING_INSTALL_PREFIX@%$(STAGING_INSTALL_PREFIX)%g' $(CMAKE_BUILD_DIR)/NATIVE/bin/mariadb_config
-	@sed -i -e 's%@VERSION@%$(PKG_VERS)%g' $(CMAKE_BUILD_DIR)/NATIVE/bin/mariadb_config
-	@sed -i -e 's%@SOCKET@%$(MYSQL_DB_SOCKET)%g' $(CMAKE_BUILD_DIR)/NATIVE/bin/mariadb_config
+	install -m 755 -d $(BUILD_DIR)/NATIVE/bin
+	install -m 755 $(CURDIR)/mariadb_config $(BUILD_DIR)/NATIVE/bin
+	@sed -i -e 's%@STAGING_INSTALL_PREFIX@%$(STAGING_INSTALL_PREFIX)%g' $(BUILD_DIR)/NATIVE/bin/mariadb_config
+	@sed -i -e 's%@VERSION@%$(PKG_VERS)%g' $(BUILD_DIR)/NATIVE/bin/mariadb_config
+	@sed -i -e 's%@SOCKET@%$(MYSQL_DB_SOCKET)%g' $(BUILD_DIR)/NATIVE/bin/mariadb_config

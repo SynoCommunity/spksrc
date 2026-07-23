@@ -224,7 +224,7 @@ for package in ${build_packages}; do
     if [ ${result} -eq 0 ] && [ "$(ls -1 ./packages/$(sed -n -e '/^SPK_NAME/ s/.*= *//p' spk/${package}/Makefile)_*.spk 2>/dev/null)" ]; then
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) DONE" >> ${BUILD_SUCCESS_FILE}
     # Ensure it's not a false-positive due to pre-check
-    elif tail -15 build.log | grep -viq 'spksrc.pre-check.mk'; then
+    elif tail -15 build.log | grep -viq 'spksrc.rules/pre-check.mk'; then
         cat build.log >> ${BUILD_ERROR_LOGFILE}
         echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - ${package}: (${GH_ARCH}) FAILED" >> ${BUILD_ERROR_FILE}
     fi

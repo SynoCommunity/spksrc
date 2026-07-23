@@ -1,5 +1,5 @@
 ###############################################################################
-# mk/spksrc.common.mk
+# spksrc.common.mk
 #
 # Defines common build settings and utilities shared by all spksrc makefiles.
 #
@@ -53,13 +53,14 @@ endif
 include $(BASEDIR)/mk/spksrc.common/macros.mk
 
 # Common directories (must be set after ARCH_SUFFIX)
-include $(BASEDIR)/mk/spksrc.directories.mk
+include $(BASEDIR)/mk/spksrc.common/directories.mk
 
 # Setup minimal toolchain environment variables
 include $(BASEDIR)/mk/spksrc.common/stage0.mk
 
 # Load common definitions
 include $(BASEDIR)/mk/spksrc.common/archs.mk
+include $(BASEDIR)/mk/spksrc.common/tc-capability.mk
 include $(BASEDIR)/mk/spksrc.common/logs.mk
 
 # Load local configuration
@@ -70,6 +71,12 @@ LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 
 # all will be the default target, regardless of what is defined
 default: all
+
+# Context-aware `make help` (only activates inside a package directory).
+# Included after 'default: all' so the help target never becomes the default
+# goal (it would otherwise shadow the build when running e.g. `make` or a
+# recursive arch build).
+include $(BASEDIR)/mk/spksrc.common/help.mk
 
 # Stop on first error
 SHELL := $(SHELL) -e

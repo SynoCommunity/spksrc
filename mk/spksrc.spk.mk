@@ -1,4 +1,7 @@
-### Rules to create the spk package
+###############################################################################
+# spksrc.spk.mk
+#
+# Rules to create the spk package
 #   Most of the rules are imported from spksrc.*.mk files
 #
 # Variables:
@@ -14,7 +17,7 @@
 #  INSTALLER_SCRIPT             (optional) Use installer script from given file
 #  CONF_DIR                     (optional) To provide a package specific conf folder with files (e.g. privilege file)
 #  LICENSE_FILE                 (optional) Add licence from given file
-# 
+#
 # Internal variables used in this file:
 #  NAME                         The internal name of the package.
 #                               Note that all synocoummunity packages use lowercase names.
@@ -25,6 +28,7 @@
 #  SPK_CONTENT                  List of files and folders that are added to package.tgz within the spk file.
 #  DSM_SCRIPT_FILES             List of script files that are in the scripts folder within the spk file.
 #
+###############################################################################
 
 # Configure the included makefiles
 NAME = $(SPK_NAME)
@@ -53,8 +57,6 @@ endif
 endif
 endif
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -104,22 +106,22 @@ DEFAULT_ENV = none
 
 #####
 
-include ../../mk/spksrc.pre-check.mk
+include ../../mk/spksrc.rules/pre-check.mk
 
 # Even though this makefile doesn't cross compile,
 # we need this to setup the cross environment.
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/depend.mk
 
 copy: depend
 include ../../mk/spksrc.wheel.mk
 
 copy: wheel
-include ../../mk/spksrc.copy.mk
+include ../../mk/spksrc.spk/copy.mk
 
 strip: copy
-include ../../mk/spksrc.strip.mk
+include ../../mk/spksrc.spk/strip.mk
 
 
 # Scripts
@@ -159,7 +161,7 @@ include ../../mk/spksrc.service.mk
 
 icon: strip
 ifneq ($(strip $(SPK_ICON)),)
-include ../../mk/spksrc.icon.mk
+include ../../mk/spksrc.spk/icon.mk
 endif
 
 ifeq ($(strip $(MAINTAINER)),)
@@ -415,7 +417,7 @@ wizards:
 ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
 	@$(MSG) "Create default DSM7 uninstall wizard"
 	@mkdir -p $(DSM_WIZARDS_DIR)
-	@find $(SPKSRC_MK)wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
+	@find $(MKDIR)/wizard -maxdepth 1 -type f -and \( -name "uninstall_uifile" -or -name "uninstall_uifile_???" \) -print -exec cp -f {} $(DSM_WIZARDS_DIR) \;
 ifeq ($(strip $(WIZARDS_DIR)),)
 	$(eval SPK_CONTENT += WIZARD_UIFILES)
 endif
@@ -507,7 +509,7 @@ TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
 TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
 .PHONY: spk-stage1
-# spk-meta-source (the meta SOURCE build loop) lives in spksrc.depend.mk
+# spk-meta-source (the meta SOURCE build loop) lives in spksrc.rules/depend.mk
 spk-stage1: $(TCVARS_DONE) $(TKVARS_DONE) spk-meta-source
 
 ifneq ($(strip $(TC)),)
@@ -629,9 +631,9 @@ pythoncleanall: pythonclean
 	rm -fr work-*/[Pp]ython* work-*/.python*
 
 ### For managing make all-<supported|latest>
-include ../../mk/spksrc.supported.mk
+include ../../mk/spksrc.rules/supported.mk
 
 ### For managing make publish-all-<supported|latest>
-include ../../mk/spksrc.publish.mk
+include ../../mk/spksrc.spk/publish.mk
 
 ###

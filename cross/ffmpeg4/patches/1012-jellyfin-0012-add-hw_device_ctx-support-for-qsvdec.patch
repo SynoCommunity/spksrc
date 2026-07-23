@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/fftools/Makefile
-===================================================================
 --- fftools/Makefile
 +++ fftools/Makefile
 @@ -10,7 +10,6 @@ ALLAVPROGS   = $(AVBASENAMES:%=%$(PROGSS
@@ -10,8 +8,6 @@ Index: jellyfin-ffmpeg/fftools/Makefile
  ifndef CONFIG_VIDEOTOOLBOX
  OBJS-ffmpeg-$(CONFIG_VDA)          += fftools/ffmpeg_videotoolbox.o
  endif
-Index: jellyfin-ffmpeg/fftools/ffmpeg.h
-===================================================================
 --- fftools/ffmpeg.h
 +++ fftools/ffmpeg.h
 @@ -60,7 +60,6 @@ enum HWAccelID {
@@ -22,8 +18,6 @@ Index: jellyfin-ffmpeg/fftools/ffmpeg.h
  };
  
  typedef struct HWAccel {
-Index: jellyfin-ffmpeg/fftools/ffmpeg_hw.c
-===================================================================
 --- fftools/ffmpeg_hw.c
 +++ fftools/ffmpeg_hw.c
 @@ -353,6 +353,18 @@ int hw_device_setup_for_decode(InputStre
@@ -45,8 +39,6 @@ Index: jellyfin-ffmpeg/fftools/ffmpeg_hw.c
              if (!dev)
                  err = hw_device_init_from_type(type, NULL, &dev);
          } else {
-Index: jellyfin-ffmpeg/fftools/ffmpeg_opt.c
-===================================================================
 --- fftools/ffmpeg_opt.c
 +++ fftools/ffmpeg_opt.c
 @@ -137,9 +137,6 @@ const HWAccel hwaccels[] = {
@@ -105,8 +97,6 @@ Index: jellyfin-ffmpeg/fftools/ffmpeg_opt.c
          "set QSV hardware device (DirectX adapter index, DRM path or X11 display name)", "device"},
  #endif
  
-Index: jellyfin-ffmpeg/fftools/ffmpeg_qsv.c
-===================================================================
 --- fftools/ffmpeg_qsv.c
 +++ /dev/null
 @@ -1,110 +0,0 @@
@@ -220,8 +210,6 @@ Index: jellyfin-ffmpeg/fftools/ffmpeg_qsv.c
 -
 -    return 0;
 -}
-Index: jellyfin-ffmpeg/libavcodec/qsvdec.c
-===================================================================
 --- libavcodec/qsvdec.c
 +++ libavcodec/qsvdec.c
 @@ -89,7 +89,7 @@ static const AVCodecHWConfigInternal *co

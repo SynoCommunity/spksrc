@@ -2,8 +2,8 @@ PKG_NAME = tvheadend
 PKG_VERS = 4.3
 PKG_EXT = tar.gz
 # no official release since v4.2.8 (Jan 12, 2019)
-# git hash from Janueary 8th 2026
-PKG_GIT_HASH = 5886126420d729672098a3895469d6f83aebba94
+# git hash from July 9th 2026
+PKG_GIT_HASH = 0ad5b1a3be94199c90e321fe63c13016b038e275
 PKG_DIST_NAME = $(PKG_GIT_HASH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/tvheadend/tvheadend/archive
 PKG_DIST_FILE = $(PKG_NAME)-git$(PKG_GIT_HASH).$(PKG_EXT)
@@ -15,9 +15,8 @@ LICENSE  = GPLv3
 
 # PPC archs except qoriq are not supported
 # https://tvheadend.org/issues/5060
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# ffmpeg7 requires c11 support
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
+# ffmpeg needs C11 -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 OPTIONAL_DEPENDS += cross/ffmpeg7
 OPTIONAL_DEPENDS += cross/fdk-aac
@@ -50,6 +49,7 @@ POST_INSTALL_TARGET = tvheadend_post_install
 
 CONFIGURE_ARGS  = --python=/usr/bin/python3
 CONFIGURE_ARGS += --enable-imagecache --enable-bundle --enable-trace --release
+CONFIGURE_ARGS += --enable-imagecache_audit
 CONFIGURE_ARGS += --disable-bintray_cache --disable-avahi
 CONFIGURE_ARGS += --enable-dvbcsa --enable-pngquant
 CONFIGURE_ARGS += --disable-hdhomerun_static --enable-hdhomerun_client
@@ -64,6 +64,12 @@ CONFIGURE_ARGS += --disable-libx264_static --enable-libx264
 CONFIGURE_ARGS += --disable-libx265_static --enable-libx265
 CONFIGURE_ARGS += --disable-ffmpeg_static --enable-libav
 
+# Enable building of new experimental UI
+CONFIGURE_ARGS += --enable-vue_build
+BUILD_DEPENDS = native/nodejs_22
+# Build environment - use native Node.js from spksrc
+ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
+
 # dbus splits its headers between include/ and lib/dbus-1.0/include/
 #    - include/dbus-1.0/ (public) must precede
 #    - lib/dbus-1.0/include/ (arch-specific dbus-arch-deps.h)
@@ -76,6 +82,7 @@ include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-vaapi
+CONFIGURE_ARGS += --enable-qsv
 endif
 
 # If libraries through FFMPEG_PACKAGE shared libraries unavailable

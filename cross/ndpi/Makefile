@@ -16,7 +16,7 @@ COMMENT  = nDPI is an open source LGPLv3 library for deep-packet inspection. Bas
 LICENSE  = LGPLv3
 
 GNU_CONFIGURE = 1
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR)
 
 PRE_CONFIGURE_TARGET = nDPI_pre_configure
 

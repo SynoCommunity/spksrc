@@ -6,7 +6,6 @@ Web applications integrate with Synology's WebStation for PHP/HTML content.
 
 ```makefile
 ADMIN_URL = /mywebapp/
-RELOAD_UI = yes
 include ../../mk/spksrc.spk.mk
 ```
 

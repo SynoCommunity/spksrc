@@ -36,30 +36,45 @@ Example: `x64-7.2` = Intel 64-bit, DSM 7.2 toolchain
 
 ## Architecture Groups
 
-spksrc defines groups for conditional logic:
+spksrc classifies every platform codename into groups used for conditional logic, defined in `mk/spksrc.common/archs.mk`. The generic build arch of each family is shown in the comments.
 
-### 64-bit Architectures
+### Architecture families
+
 ```makefile
-64bit_ARCHS = x64 aarch64 armv8
+x64_ARCHS    # Intel/AMD 64-bit (build arch: x64)
+             #   x64 apollolake avoton braswell broadwell(nk...) bromolow
+             #   cedarview denverton epyc7002 geminilake(nk) grantley purley
+             #   kvmx64 dockerx64 v1000(nk) r1000(nk) x86 x86_64
+ARM_ARCHS    # all ARM = ARMv5_ARCHS + ARMv7_ARCHS + ARMv7L_ARCHS + ARMv8_ARCHS
+PPC_ARCHS    # powerpc ppc824x ppc853x ppc854x qoriq
+i686_ARCHS   # evansport (Intel 32-bit, build arch: i686)
 ```
 
-### 32-bit Architectures
+### ARM variants
+
 ```makefile
-32bit_ARCHS = x86 armv7 armv7l qoriq comcerto2k ppc853x
+ARMv5_ARCHS  = 88f6281                                       # build arch: armv5
+ARMv7_ARCHS  = armv7 alpine alpine4k armada370 armada375 \
+               armada38x armadaxp monaco comcerto2k ...      # build arch: armv7
+ARMv7L_ARCHS = hi3535                                        # build arch: armv7l
+ARMv8_ARCHS  = aarch64 rtd1296 rtd1619b armada37xx ...       # build arch: aarch64
 ```
 
-### ARM Architectures
+### Bitness groupings
+
 ```makefile
-ARM_ARCHS = aarch64 armv8 armv7 armv7l
-ARMv7_ARCHS = armv7 armv7l
-ARMv8_ARCHS = aarch64 armv8
+32bit_ARCHS = ARMv5_ARCHS + ARMv7_ARCHS + ARMv7L_ARCHS + i686_ARCHS + PPC_ARCHS
+64bit_ARCHS = ARMv8_ARCHS + x64_ARCHS
 ```
 
-### Intel Architectures
+### Generic & deprecated
+
 ```makefile
-x64_ARCHS = x64
-x86_ARCHS = x86
+GENERIC_ARCHS  = armv7 aarch64 x64        # used by multi-arch packages
+OLD_PPC_ARCHS  = powerpc ppc824x ppc853x ppc854x   # deprecated PowerPC
 ```
+
+For the per-platform Synology model mapping, see [Model ↔ Architecture](model-architecture.md).
 
 ## Toolchain Versions
 
@@ -73,62 +88,9 @@ x86_ARCHS = x86
 
 ## Model to Architecture Mapping
 
-### Plus Series (Performance Models)
+The Synology model ↔ platform/architecture mapping — with a family filter and a model search — now lives on its own page:
 
-| Model | Architecture | DSM Support |
-|-------|--------------|-------------|
-| DS224+ | aarch64 | 7.x |
-| DS423+ | aarch64 | 7.x |
-| DS723+ | aarch64 | 7.x |
-| DS923+ | x64 | 7.x |
-| DS1522+ | x64 | 7.x |
-| DS1823xs+ | x64 | 7.x |
-| DS220+ | aarch64 | 7.x |
-| DS720+ | aarch64 | 7.x |
-| DS920+ | aarch64 | 7.x |
-| DS1520+ | aarch64 | 7.x |
-| DS1621+ | x64 | 7.x |
-| DS1821+ | x64 | 7.x |
-| DS3622xs+ | x64 | 7.x |
-
-### Value Series
-
-| Model | Architecture | DSM Support |
-|-------|--------------|-------------|
-| DS223 | armv8 | 7.x |
-| DS423 | armv8 | 7.x |
-| DS224 | armv8 | 7.x |
-| DS218 | armv8 | 6.x-7.x |
-| DS418 | armv8 | 6.x-7.x |
-| DS118 | armv8 | 6.x-7.x |
-
-### J Series (Budget Models)
-
-| Model | Architecture | DSM Support |
-|-------|--------------|-------------|
-| DS223j | armv8 | 7.x |
-| DS220j | armv8 | 7.x |
-| DS218j | armv7 | 6.x-7.x |
-| DS216j | armv7 | 6.x |
-| DS115j | armv7l | 6.x |
-
-### RackStation
-
-| Model | Architecture | DSM Support |
-|-------|--------------|-------------|
-| RS1221+ | x64 | 7.x |
-| RS422+ | armv8 | 7.x |
-| RS1619xs+ | x64 | 7.x |
-| RS3618xs | x64 | 7.x |
-| RS820+ | x64 | 7.x |
-| RS2821RP+ | x64 | 7.x |
-
-### FlashStation
-
-| Model | Architecture | DSM Support |
-|-------|--------------|-------------|
-| FS2500 | x64 | 7.x |
-| FS6400 | x64 | 7.x |
+- [Reference: Model ↔ Architecture](model-architecture.md)
 
 ## Using Architecture Conditions
 
@@ -140,8 +102,8 @@ ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-64bit
 endif
 
-# Exclude 32-bit
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+# Needs a 64-bit target (refuses 32-bit archs)
+REQUIRE_64BIT = 1
 
 # ARM-specific
 ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))

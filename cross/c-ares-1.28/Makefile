@@ -13,7 +13,7 @@ LICENSE  = MIT
 
 POST_CONFIGURE_TARGET = cares_post_configure
 
-CMAKE_ARGS += -DCARES_BUILD_TOOLS=OFF
+CONFIGURE_ARGS += -DCARES_BUILD_TOOLS=OFF
 
 include ../../mk/spksrc.cross-cmake.mk
 

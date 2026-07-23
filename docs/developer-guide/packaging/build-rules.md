@@ -4,35 +4,75 @@ This page documents the build targets and rules available in spksrc.
 
 ## Build Targets
 
+Run `make help` inside any package directory for the authoritative,
+context-aware list. The tables below summarize the common targets.
+
 ### Cross Package Targets
 
 Run from `cross/<package>/` directory:
 
 | Target | Description |
 |--------|-------------|
-| `all` | Build everything (default) |
-| `download` | Download source archive |
-| `checksum` | Verify checksums |
-| `extract` | Extract source archive |
-| `patch` | Apply patches |
-| `configure` | Run configure script |
-| `compile` | Compile the source |
-| `install` | Install to staging |
-| `plist` | Generate PLIST file |
-| `clean` | Remove build artifacts |
+| `all` | Build everything (default; needs `ARCH=<arch> TCVERSION=<tcvers>`) |
+| `arch-<arch>-<tcvers>` | Build for one arch/version (e.g. `arch-x64-7.2`) |
+| `download` `checksum` `extract` `patch` `configure` `compile` `install` `plist` | Individual build lifecycle steps, in order |
+| `all-supported` / `all-latest` | Build for every supported / latest toolchain (needs `make setup` first) |
+| `dependency-tree` / `dependency-flat` / `dependency-list` | Inspect the dependency graph |
+| `clean` | Remove all work directories |
+| `smart-clean` | Remove this package's source and cookies (needs `ARCH`+`TCVERSION`) |
+| `digests` | Regenerate the digests file (auto-runs `download`) |
+| `rustup <args>` | Run rustup for the rust toolchain (e.g. `make rustup show`) |
 
 ### SPK Package Targets
 
-Run from `spk/<package>/` directory:
+Run from `spk/<package>/` directory (`diyspk/` behaves the same):
 
 | Target | Description |
 |--------|-------------|
-| `all` | Build SPK (default) |
-| `arch-<arch>-<version>` | Build for specific architecture (e.g., `arch-x64-7.2`) |
-| `all-supported` | Build for all architectures in `DEFAULT_TC` |
-| `package` | Create SPK file |
-| `publish` | Publish to package server |
-| `clean` | Remove build artifacts |
+| `all` | Build the SPK (default; needs `ARCH=<arch> TCVERSION=<tcvers>`) |
+| `arch-<arch>-<tcvers>` | Build for one arch/version (e.g. `arch-x64-7.2`) |
+| `all-supported` / `all-latest` | Build for every supported / latest toolchain (needs `make setup` first) |
+| `publish-all-supported` / `publish-all-latest` | Build and publish every supported / latest arch (run `make setup-synocommunity` first, then set `PUBLISH_API_KEY` in `local.mk`) |
+| `package` | Create the SPK file |
+| `dependency-tree` / `dependency-flat` / `dependency-list` | Inspect the dependency graph |
+| `clean` / `smart-clean` | Remove work directories / this package's source and cookies |
+| `download` / `digests` | Fetch source archive(s) / regenerate digests |
+| `rustup <args>` | Run rustup for the rust toolchain (e.g. `make rustup show`) |
+
+For Python SPKs (those setting `PYTHON_PACKAGE` or named `python3*`), additional
+wheel/crossenv targets are available — see
+[Python Packages](../package-types/python.md): `wheel-<arch>-<tcvers>`,
+`crossenv-<arch>-<tcvers>`, `download-wheels`, `wheelclean`, `wheelcleancache`,
+`crossenvclean`, `crossenvcleanall`.
+
+### Inspecting the dependency graph
+
+`dependency-tree`, `dependency-flat` and `dependency-list` share three optional
+variables (they do not apply to `dependency-tree`, which always prints the full
+traversal):
+
+| Variable | Effect |
+|----------|--------|
+| `DEPENDS_TYPE` | Filter the output by relation type. Values: `DEPENDS`, `BUILD_DEPENDS`, `OPTIONAL_DEPENDS`, `NATIVE_DEPENDS`; combine them with spaces. Defaults to all types, or `DEPENDS BUILD_DEPENDS NATIVE_DEPENDS` when `ARCH`+`TCVERSION` are set. The traversal always visits every applicable type; this only filters what is printed. |
+| `EXCLUDE_DEPENDS` | Space-separated list of dependencies to skip. An excluded dependency **and its entire subtree** are pruned from the walk — e.g. `EXCLUDE_DEPENDS="cross/ffmpeg7"`. |
+| `ARCH` + `TCVERSION` | Resolve the graph in a specific toolchain context, so version-gated and conditional `DEPENDS` evaluate as they would in a real build. Set both. When set, `OPTIONAL_DEPENDS` is excluded by default. |
+
+```bash
+# Runtime dependencies only, resolved for x64 / DSM 7.2
+make dependency-flat DEPENDS_TYPE="DEPENDS" ARCH=x64 TCVERSION=7.2
+
+# The tree without a heavy meta package and everything under it
+make dependency-list EXCLUDE_DEPENDS="cross/ffmpeg7"
+```
+
+From the **spksrc root**, `dependency-list-spk` runs `dependency-list` for every
+`spk/` package in parallel and aggregates the result. It honors the same three
+variables:
+
+```bash
+# Every spk's runtime deps, resolved for x64 / DSM 7.2
+make dependency-list-spk DEPENDS_TYPE="DEPENDS" ARCH=x64 TCVERSION=7.2
+```
 
 ## Build System Includes
 
@@ -53,10 +93,12 @@ include ../../mk/spksrc.cross-go.mk
 
 # Rust package
 include ../../mk/spksrc.cross-rust.mk
-
-# Python wheel
-include ../../mk/spksrc.python-module.mk
 ```
+
+For Python modules built as wheels under `python/` (numpy, pillow, ...), use
+`spksrc.python-wheel.mk` (or `spksrc.python-wheel-meson.mk` for meson builds);
+`spksrc.python-module.mk` builds a cross-compiled Python extension instead. See
+[Python Packages](../package-types/python.md).
 
 ### SPK Packaging
 
@@ -64,8 +106,11 @@ include ../../mk/spksrc.python-module.mk
 # Standard SPK
 include ../../mk/spksrc.spk.mk
 
-# Python-based SPK
-include ../../mk/spksrc.python.mk
+# Meta / Python-based SPK: set the *_PACKAGE (and WHEELS) and include
+# spksrc.spk-meta.mk, which pulls in the matching meta + wheel routines
+PYTHON_PACKAGE = python312
+WHEELS = src/requirements-crossenv.txt
+include ../../mk/spksrc.spk-meta.mk
 ```
 
 ## Customization Hooks
@@ -140,7 +185,7 @@ This will run:
 ### CMake
 
 ```makefile
-CMAKE_ARGS = -DBUILD_SHARED_LIBS=ON
+CONFIGURE_ARGS = -DBUILD_SHARED_LIBS=ON
 
 include ../../mk/spksrc.cross-cmake.mk
 ```

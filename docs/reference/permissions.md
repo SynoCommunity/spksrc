@@ -142,7 +142,7 @@ synoacltool -del /volume1/data user:sc-transmission
 
 ### fix_shared_folders_rights
 
-The `fix_shared_folders_rights` function (from `spksrc.service.installer.functions`) sets appropriate permissions:
+The `fix_shared_folders_rights` function (from `spksrc.service/installer.functions`) sets appropriate permissions:
 
 ```bash
 fix_shared_folders_rights "${SHARE_PATH}" "${SYNOPKG_PKGNAME}"

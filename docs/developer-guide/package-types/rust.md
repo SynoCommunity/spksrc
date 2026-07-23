@@ -15,8 +15,7 @@ include ../../mk/spksrc.cross-rust.mk
 ## Cargo Configuration
 
 ```makefile
-CARGO_BUILD_FLAGS = --release
-CARGO_BUILD_FLAGS += --features "feature1 feature2"
+CARGO_BUILD_ARGS = --features "feature1 feature2"
 ```
 
 ## C Dependencies

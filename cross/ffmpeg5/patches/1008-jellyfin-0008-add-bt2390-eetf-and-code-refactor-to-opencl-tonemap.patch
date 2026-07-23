@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/opencl.c
-===================================================================
 --- libavfilter/opencl.c
 +++ libavfilter/opencl.c
 @@ -169,7 +169,7 @@ int ff_opencl_filter_load_program(AVFilt
@@ -20,8 +18,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl.c
          av_bprintf(buf, "\n");
      }
      av_bprintf(buf, "};\n");
-Index: jellyfin-ffmpeg/libavfilter/opencl.h
-===================================================================
 --- libavfilter/opencl.h
 +++ libavfilter/opencl.h
 @@ -206,17 +206,17 @@ do {
@@ -61,8 +57,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl.h
   * Create a buffer with the given information.
   *
   * The buffer variable in the context structure must be named <buffer_name>.
-Index: jellyfin-ffmpeg/libavfilter/opencl/colorspace_common.cl
-===================================================================
 --- libavfilter/opencl/colorspace_common.cl
 +++ libavfilter/opencl/colorspace_common.cl
 @@ -17,7 +17,17 @@
@@ -298,8 +292,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/colorspace_common.cl
 +    return (float3)(rr, gg, bb);
  }
 +#endif
-Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
-===================================================================
 --- libavfilter/opencl/tonemap.cl
 +++ libavfilter/opencl/tonemap.cl
 @@ -16,54 +16,60 @@
@@ -886,8 +878,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/tonemap.cl
 +    write_imagef(dst2, (int2)(xi, yi), (float4)(chroma.y, chroma.z, 0.0f, 1.0f));
 +#endif
  }
-Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
-===================================================================
 --- libavfilter/vf_tonemap_opencl.c
 +++ libavfilter/vf_tonemap_opencl.c
 @@ -1,4 +1,4 @@
@@ -1711,21 +1701,28 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
  
      local_work[0]  = 16;
      local_work[1]  = 16;
-@@ -338,13 +823,10 @@ static int tonemap_opencl_filter_frame(A
-     AVFilterContext    *avctx = inlink->dst;
+@@ -339,20 +339,14 @@
      AVFilterLink     *outlink = avctx->outputs[0];
      TonemapOpenCLContext *ctx = avctx->priv;
-+    AVFrameSideData  *dovi_sd = NULL;
      AVFrame *output = NULL;
++    AVFrameSideData  *dovi_sd = NULL;
      cl_int cle;
      int err;
 -    double peak = ctx->peak;
 -
--    AVHWFramesContext *input_frames_ctx =
--        (AVHWFramesContext*)input->hw_frames_ctx->data;
+-    AVHWFramesContext *input_frames_ctx;
  
      av_log(ctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
             av_get_pix_fmt_name(input->format),
+            input->width, input->height, input->pts);
+ 
+-    if (!input->hw_frames_ctx)
+-        return AVERROR(EINVAL);
+-    input_frames_ctx = (AVHWFramesContext*)input->hw_frames_ctx->data;
+-
+     output = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+     if (!output) {
+         err = AVERROR(ENOMEM);
 @@ -363,9 +845,6 @@ static int tonemap_opencl_filter_frame(A
      if (err < 0)
          goto fail;

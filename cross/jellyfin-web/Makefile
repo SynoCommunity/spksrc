@@ -14,7 +14,7 @@ LICENSE  = GPLv2
 
 INSTALL_TARGET = jellyfin_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 ENV += NPM_CONFIG_USER=root
 PATH := $(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$(PATH)

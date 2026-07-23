@@ -9,14 +9,14 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS =
 OPTIONAL_DEPENDS = native/nasm
 
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
+# Needs gcc >= 7.5: needs C++17 (-std=gnu++17), i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 
 HOMEPAGE = https://www.webmproject.org/code/
 COMMENT  = WebM VP8/VP9 Codec
 LICENSE = https://raw.githubusercontent.com/webmproject/libvpx/master/LICENSE
 
-INSTALL_TARGET = libvpx_install
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR)
 
 CONFIGURE_ARGS += --disable-static --enable-shared --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --enable-vp8 --enable-vp9 --disable-examples --disable-docs --disable-unit_tests
@@ -56,7 +56,3 @@ CONFIGURE_ARGS += --target=x86_64-linux-gcc
 endif
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: libvpx_install
-libvpx_install:
-	@$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR)

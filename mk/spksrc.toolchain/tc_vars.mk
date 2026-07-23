@@ -44,7 +44,7 @@
 # Notes:
 #  - This makefile only emits configuration files; it does not build anything.
 #  - All output is written to $(WORK_DIR).
-#  - tc_vars files are consumed by spksrc.cross-env.mk and package builds.
+#  - tc_vars files are consumed by spksrc.cross/env-default.mk and package builds.
 #  - The tcvars target is idempotent and skipped if the cookie exists.
 #
 ###############################################################################
@@ -59,9 +59,9 @@ TCVARS_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)stage1-tcvars_done
 
 # Include cross-compilation definitions
 # (provides arch-specific variables for toolchain generation)
-include ../../mk/spksrc.cross-cmake-env.mk
-include ../../mk/spksrc.cross-meson-env.mk
-include ../../mk/spksrc.cross-rust-env.mk
+include ../../mk/spksrc.cross/env-cmake.mk
+include ../../mk/spksrc.cross/env-meson.mk
+include ../../mk/spksrc.cross/env-rust.mk
 
 #####
 
@@ -342,9 +342,6 @@ tc_autotools_vars:
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
 	  echo TC_ENV += $${target}=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
-	  if [ "$${target}" = "CC" ] ; then \
-	    gcc_version=$$(eval $$(echo $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
-	  fi ; \
 	done ; \
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
@@ -374,22 +371,20 @@ tc_vars:
 	echo TC_PATH := $(TC_WORK_DIR)/$(TC_TARGET)/bin/ ; \
 	echo TC_INCLUDE := $(TC_INCLUDE) ; \
 	echo TC_LIBRARY := $(TC_LIBRARY) ; \
+	echo TC_EXTRA_BUILD_FLAGS := $(TC_EXTRA_BUILD_FLAGS) ; \
 	echo TC_EXTRA_CFLAGS := $(TC_EXTRA_CFLAGS) ; \
+	echo TC_EXTRA_CPPFLAGS := $(TC_EXTRA_CPPFLAGS) ; \
+	echo TC_EXTRA_CXXFLAGS := $(TC_EXTRA_CXXFLAGS) ; \
+	echo TC_EXTRA_FFLAGS := $(TC_EXTRA_FFLAGS) ; \
+	echo TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS) ; \
 	echo TC_EXTRA_RUSTFLAGS := $(TC_EXTRA_RUSTFLAGS) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
 	echo TC_ARCH := $(TC_ARCH) ; \
-	for tool in $(TOOLS) ; \
-	do \
-	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
-	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  if [ "$${target}" = "CC" ] ; then \
-	    gcc_version=$$(eval $$(echo $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} -dumpversion) 2>/dev/null || true) ; \
-	  fi ; \
-	done ; \
-	echo TC_GCC := $${gcc_version} ; \
+	echo TC_GCC := $(TC_GCC) ; \
 	echo TC_GLIBC := $(TC_GLIBC)
+# TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
 	@echo TC_KERNEL := $(TC_KERNEL)+

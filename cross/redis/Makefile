@@ -1,5 +1,5 @@
 PKG_NAME = redis
-PKG_VERS = 8.6.3
+PKG_VERS = 8.8.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.redis.io/releases
@@ -23,7 +23,7 @@ else
 CONFIGURE_TARGET = nop
 endif
 
-INSTALL_MAKE_OPTIONS = install PREFIX=$(STAGING_INSTALL_PREFIX)
+INSTALL_ARGS = install PREFIX=$(STAGING_INSTALL_PREFIX)
 
 # use jemalloc for intel archs
 ifeq ($(findstring $(ARCH),$(x64_ARCHS) $(i686_ARCHS)),$(ARCH))

@@ -1,4 +1,4 @@
-PKG_NAME = sshfs-main
+PKG_NAME = sshfs-virtual
 
 OPTIONAL_DEPENDS  = cross/sshfs-latest
 OPTIONAL_DEPENDS += cross/sshfs-2
@@ -18,4 +18,4 @@ else
 DEPENDS = cross/sshfs-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

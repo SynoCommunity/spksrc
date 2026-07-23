@@ -12,7 +12,7 @@ INSTALL_TARGET = bazarr_custom_install
 HOMEPAGE = https://www.bazarr.media
 LICENSE = GPLv3
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: bazarr_custom_install
 bazarr_custom_install:

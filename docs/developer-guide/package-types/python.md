@@ -1,136 +1,235 @@
 # Python Packages
 
-This guide covers how to create Python-based SPK packages in spksrc using wheel distribution.
+This guide covers how to build Python-based SPK packages in spksrc, how their
+dependencies are distributed as **wheels**, and how to handle the harder wheels
+that live in the dedicated `python/` tree.
 
 ## Overview
 
-Python packages in spksrc use wheels to distribute dependencies alongside your SPK.
+A Python SPK bundles a Python interpreter (a `python3xx` package) plus the
+third-party modules the application needs. Those modules are distributed as
+**wheels** built by the framework:
 
-## Wheel Types
+- **Pure-python** wheels contain no compiled code and work on any architecture.
+  By default they are *not* shipped inside the SPK — they are downloaded with
+  `pip` at installation time.
+- **Compiled** wheels (C / Rust / meson extensions) are cross-compiled at build
+  time and bundled into the SPK's `share/wheelhouse`.
 
-Generally speaking, there are four types of Python packages:
+Most packages describe their wheels with plain `requirements-*.txt` files. The
+few wheels that the default `pip` build cannot handle (they need meson, patches,
+or other cross packages) live as standalone packages under `python/` and are
+pulled in with `DEPENDS += python/<module>`.
 
-| Type | Requirements File | Description |
+## Wheel types
+
+Each wheel type is described by a conventional requirements filename:
+
+| Type | Requirements file | Description |
 |------|-------------------|-------------|
-| Pure Python | `requirements-pure.txt` | Platform-independent |
-| Crossenv | `requirements-crossenv.txt` | Cross-compiled packages with C extensions |
-| ABI3 Limited | `requirements-abi3.txt` | Limited API/ABI compatibility |
-| Cross packages | `requirements-cross.txt` | Auto-generated from `cross/` packages |
+| Pure Python | `requirements-pure.txt` | Platform-independent, no compilation |
+| Crossenv | `requirements-crossenv.txt` | Cross-compiled C extensions |
+| ABI3 limited | `requirements-abi3.txt` | Cross-compiled with the limited API/ABI (`cp3x` / `abi3`) |
+| Exception (cross) | `requirements-cross.txt` | **Auto-generated** — one line per `python/<module>` dependency |
 
-### Wheel Type Details
+**Pure Python** packages are self-contained and architecture-independent.
 
-**Pure Python packages** are platform-independent and self-contained. They don't require compilation and work on any architecture.
+**Crossenv** packages have C extensions that must be compiled with the
+cross-toolchain against a cross-compiled Python, using a *crossenv* environment.
 
-**Crossenv packages** have C extensions that must be compiled with GCC. They require a cross-compiled Python and a crossenv environment.
+**ABI3 limited** packages are crossenv packages that additionally enforce the
+limited API (`--py-limited-api`), producing a single wheel usable across Python
+3.x releases. Set `PYTHON_LIMITED_API` (default `cp37`) to pick the floor.
 
-**ABI3 Limited packages** enforce limited API/ABI compatibility to Python 3.x (`cp3x`) and ABI to Python 3 (`abi3`). Otherwise similar to crossenv packages.
+**Exception wheels** are the hard cases the default `pip` build does not handle
+well — a wheel that must be built with **meson**, one that depends on other
+cross packages at build time, or one that needs patches. These live under
+`python/` (see [The `python/` tree](#the-python-tree-exception-wheels)); you
+never edit `requirements-cross.txt` by hand — the framework writes each
+`python/<module>` into it automatically.
 
-**Cross packages** are packages that either:
+A requirement filename that is none of the recognized names is treated as
+**crossenv** when building for an architecture (and **pure** when no `ARCH` is
+set). Force the type of a whole file with `WHEEL_DEFAULT_PREFIX=pure`, or of a
+single line with a per-line prefix (see
+[Crossenv requirement files](#crossenv-requirement-files)).
 
-- Have C extensions depending on other cross-packages at build time
-- Need patches applied to create a working wheel
+## How spksrc processes wheels
 
-These require creating a new `cross/` package in spksrc.
+For every wheel that must be bundled, the framework:
 
-## How spksrc Handles Wheels
+1. Reads the requirement files listed in `WHEELS`.
+2. Cross-compiles each wheel into `$(WORK_DIR)/wheelhouse`.
+3. Renames wheels to match the target DSM machine name (required for ARM
+   architectures such as `armv5tel` and `armv7l`).
+4. Copies them to `$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/wheelhouse`.
+5. Writes a consolidated `requirements.txt` covering every bundled wheel, used
+   by the runtime virtualenv.
 
-By default, spksrc does **not** include pure-python wheels in the SPK. Instead, they're downloaded at installation time using `pip`.
+Pure-python wheels are downloaded at install time instead of being bundled,
+unless `WHEELS_PURE_PYTHON_PACKAGING_ENABLE = 1` is set.
 
-For other wheel types, spksrc:
+## Creating a Python SPK
 
-1. Stores requirement files in `$(WORK_DIR)/wheelhouse`
-2. Compiles each wheel type and stores originals in `$(WORK_DIR)/wheelhouse`
-3. Renames wheels to match the target DSM machine name (required for ARM architectures like `armv5tel` and `armv7l`)
-4. Copies wheels to `$(INSTALL_DIR)/$(INSTALL_PREFIX)/share/wheelhouse`
-5. Creates a consolidated `requirements.txt` including all wheel types
-
-Any other requirement filename will be treated as crossenv type by default. This can be changed by setting `WHEEL_DEFAULT_PREFIX=pure`.
-
-## Creating a Python Package
-
-### Makefile Setup
+### Makefile setup
 
 ```makefile
 SPK_NAME = myapp
 SPK_VERS = 1.0.0
 SPK_REV = 1
 
-PYTHON_PACKAGE = python312
-SPK_DEPENDS = "python312"
+# Bundle a Python interpreter (must be set BEFORE spksrc.spk-meta.mk)
+PYTHON_PACKAGE = python314
 
-# Wheel requirements
-WHEELS = src/requirements-pure.txt
+# Requirement files to build/bundle (activates wheel processing)
+WHEELS  = src/requirements-pure.txt
 WHEELS += src/requirements-crossenv.txt
 
-include ../../mk/spksrc.python.mk
+include ../../mk/spksrc.spk-meta.mk
 ```
 
-### Service Setup
+Setting `PYTHON_PACKAGE` and including `spksrc.spk-meta.mk` bundles the chosen
+Python and pulls in the wheel routines (`spk-meta.mk` includes `spksrc.spk.mk`);
+the `python314` dependency is added automatically. `PYTHON_PACKAGE` **must** be
+set before the `include`.
 
-Configure the service to use the correct Python version:
+### Advanced wheel options
+
+| Variable | Purpose |
+|----------|---------|
+| `WHEELS_BUILD_ARGS` | Extra options passed to the wheel build (e.g. pip `-C key=value` config settings) |
+| `WHEELS_CFLAGS` / `WHEELS_CPPFLAGS` / `WHEELS_CXXFLAGS` / `WHEELS_LDFLAGS` | Extra compiler/linker flags for C/C++ wheels |
+| `PYTHON_LIMITED_API` | Limited API tag for `requirements-abi3.txt` wheels (default `cp37`) |
+| `WHEEL_DEFAULT_PREFIX` | Type used for an unrecognized requirement filename (`crossenv` with `ARCH`, otherwise `pure`) |
+| `WHEELS_PURE_PYTHON_PACKAGING_ENABLE` | Bundle pure-python wheels into the SPK instead of downloading them at install time |
+
+At the SPK level several wheels are built from the same variable, so the flag
+variables above accept a **per-wheel** `[name] flags` syntax — only the bracket
+whose name matches the wheel being built is applied:
+
+```makefile
+# Applies only to the llfuse and msgpack wheels
+WHEELS_CFLAGS  = [llfuse] -std=gnu99 -DCYTHON_ATOMICS=0
+WHEELS_CFLAGS += [msgpack] -std=gnu99
+```
+
+### Service setup
+
+Point the service at the bundled Python and let the helper build the runtime
+virtualenv from the wheelhouse:
 
 ```bash
-PYTHON_DIR="/var/packages/python312/target/bin"
+PYTHON_DIR="/var/packages/python314/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${PYTHON_DIR}:${PATH}"
 
 service_postinst() {
-    # Framework helper creates virtualenv and installs wheels
+    # Framework helper: creates the virtualenv and installs the bundled wheels
     install_python_virtualenv
 }
 ```
 
-### PLIST Entry
+### PLIST entry
 
-Add the wheelhouse to your PLIST:
+Ship the wheelhouse:
 
 ```
 rsc:share/wheelhouse
 ```
 
-## Build Prerequisites
+## Building and rebuilding wheels
 
-Before building wheels with crossenv, ensure the Python dependency is built first:
+### Prerequisite
+
+The cross-compiled Python is built as part of the normal package build. To build
+it explicitly first:
 
 ```bash
-# Build Python dependency first
-make -C spk/python312 ARCH=x64 TCVERSION=7.2
-
-# Then build your package
-make -C spk/myapp ARCH=x64 TCVERSION=7.2
+make -C spk/python314 ARCH=x64 TCVERSION=7.2
+make -C spk/myapp     ARCH=x64 TCVERSION=7.2
 ```
 
-## Crossenv Commands
+### Selecting what to (re)build with `WHEELS`
 
-### Creating and Managing Crossenv
+`WHEELS` controls which wheels the wheel targets act on:
 
-Crossenv is automatically created during the build process at `spk/<package>/work-<arch>-<version>/crossenv-default`. For manual control:
+| Invocation | Effect |
+|------------|--------|
+| *unset* (use the Makefile's `WHEELS`) | build every wheel the package declares |
+| `WHEELS=""` (explicitly empty) | build nothing — the wheel step is skipped |
+| `WHEELS="pkg1==ver pkg2==ver ..."` | build only those wheels, on demand |
+
+The package's default wheels are built as part of the ordinary
+`make arch-<arch>-<tcvers>` / `make all` build. The explicit
+`make wheel-<arch>-<tcvers>` target **requires** a non-empty `WHEELS` and errors
+with *No python wheel to process* otherwise.
 
 ```bash
-# Create default crossenv
+# Build a single wheel on demand (overrides the Makefile's WHEELS)
+make WHEELS="cryptography==41.0.0" wheel-x64-7.2
+
+# Download the wheel sources only, without building
+make download-wheels
+```
+
+### Crossenv
+
+The crossenv is created automatically during the build, at
+`work-<arch>-<version>/crossenv-default`. For manual control:
+
+```bash
+# Build the default crossenv
 make crossenv-x64-7.2
 
-# Create crossenv for specific wheel (debugging)
-WHEEL="lxml-5.2.2" make crossenv-x64-7.2
-
-# Clean crossenv
-make crossenvclean
+# Build a crossenv for a specific wheel: selects the matching
+# requirements-<name>[-<version>].txt below (see next section)
+make WHEEL_NAME=lxml WHEEL_VERSION=5.2.2 crossenv-x64-7.2
 ```
 
-### Debugging Wheel Builds
+> **Note:** there is no `WHEEL=` variable. A named crossenv is selected with the
+> `WHEEL_NAME` / `WHEEL_VERSION` pair — this is what the framework passes
+> internally when building a `python/<module>` wheel.
+
+### Cleanup
 
 ```bash
-# Debug specific wheel version
-WHEEL="cryptography==41.0.0" make crossenv-x64-7.2
-
-# List installed wheels in crossenv
-ls spk/myapp/work-x64-7.2/crossenv-default/cross/lib/python3.12/site-packages/
+make wheelclean         # built wheels + wheel status cookies
+make wheelcleancache    # the local pip cache only (work-*/pip)
+make wheelcleanall      # wheelclean + wheelcleancache + the shared cache (distrib/pip)
+make crossenvclean      # wheelclean + the crossenv dirs and their cookies
+make crossenvcleanall   # wheelcleanall + crossenvclean (everything)
 ```
 
-## Creating Cross Packages for Wheels
+### Crossenv requirement files
 
-When a Python package needs patches or depends on other cross packages, create a `cross/` package:
+Each Python meta carries the crossenv definitions used to compile wheels, under
+`spk/<python_package>/crossenv/` (e.g. `spk/python314/crossenv/`). When building
+a wheel, the framework selects the **most specific** matching file:
 
-### Cross Package Makefile
+1. `requirements-<wheel>-<version>.txt` — one exact version (e.g. `requirements-numpy-1.26.4.txt`)
+2. `requirements-<wheel>.txt` — any version of that wheel
+3. `requirements-default.txt` — everything else
+
+Within a file, each line targets a part of the crossenv via a prefix:
+
+| Prefix | Installed into | Purpose |
+|--------|----------------|---------|
+| *(none)* | **both** the build and cross Python | bootstrap packages — the pinned `pip` / `setuptools` / `wheel` |
+| `build:` | the **build** (host) Python | tools that compile the wheel (Cython, meson, hatchling, maturin, setuptools-scm, ...) |
+| `cross:` | the **cross** (target) Python | build-time deps the wheel needs in the target environment (cffi, pybind11, ...) |
+| `wheelhouse:` | the **cross** Python, from the local wheelhouse | install an already-compiled wheel — typically one **not on PyPI** (e.g. a `numpy` built earlier in the same run) |
+
+`pure:`, `abi3:` and `crossenv:` may also prefix a line to force that wheel's
+build type.
+
+## The `python/` tree (exception wheels)
+
+When a wheel is poorly handled by the default `pip` build — it needs meson,
+patches, or other cross packages — it is built as a dedicated package under
+`python/` (kept separate from `cross/` so the hard cases are easy to spot). Each
+such package produces exactly one wheel and registers itself into the consuming
+SPK's `requirements-cross.txt` automatically.
+
+### A `python/<module>` Makefile
 
 ```makefile
 PKG_NAME = mywheel
@@ -140,134 +239,101 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/m/mywheel
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/python312
+# Build-time cross dependencies of the C extension
+DEPENDS = cross/libfoo
 
 HOMEPAGE = https://example.com/mywheel
 COMMENT = My Python wheel with C extensions
 LICENSE = MIT
 
+include ../../mk/spksrc.common.mk
+
+# For a meson-built wheel, include spksrc.python-wheel-meson.mk instead
 include ../../mk/spksrc.python-wheel.mk
 ```
 
-### SPK Makefile with Cross Package
+`WHEELS_BUILD_ARGS` and the `WHEELS_*FLAGS` variables apply here too; because a
+`python/` package builds a single wheel, the `[name]` prefix is optional.
+
+**When several versions must coexist**, set `PKG_REAL_NAME` to the real module
+name and encode the version in `PKG_NAME` — the directory name then
+disambiguates the variants:
 
 ```makefile
-BUILD_DEPENDS = cross/python312 cross/mywheel
-
-# The wheel is auto-added to requirements-cross.txt
+PKG_NAME = numpy_$(PKG_VERS)   # directory python/numpy_1.26
+PKG_REAL_NAME = numpy          # the actual wheel/module name
 ```
 
-## Example: Mercurial Package
-
-This example shows a package with both pure-python and cross-compiled dependencies.
-
-**Mercurial** needs cross-compiling (has C extensions) and patches. **Docutils** is pure-python.
-
-### Pure Python Dependency (Docutils)
-
-In `spk/mercurial/src/requirements.txt`:
-
-```
-docutils==0.17.1
-```
-
-### Cross Package (Mercurial)
-
-1. Create `cross/mercurial/Makefile` with `include ../../mk/spksrc.python-wheel.mk`
-2. Add patches to `cross/mercurial/patches/`
-3. Create digests file
-
-### SPK Makefile
+### Referencing it from an SPK
 
 ```makefile
-BUILD_DEPENDS = cross/python312 cross/mercurial
-WHEELS = src/requirements.txt
+# Automatically added to requirements-cross.txt in the wheelhouse
+DEPENDS += python/mywheel
 ```
 
-### Installing Wheels at Runtime
+### Real examples
 
-In your `service-setup.sh`, the `install_python_virtualenv` helper handles this. For manual control:
+- **`python/pillow`** — a setuptools wheel with several cross dependencies
+  (`cross/freetype`, `cross/libjpeg`, ...) whose optional features are toggled
+  through `WHEELS_BUILD_ARGS` (`-C jpeg=enable`, ...).
+- **`python/numpy`** — a meson wheel (`spksrc.python-wheel-meson.mk`) that
+  generates a `--cross-file`, depends on `cross/openblas`, and uses
+  `PKG_REAL_NAME` so `numpy`, `numpy_1.26` and `numpy-latest` can coexist.
 
-```bash
-# Create virtualenv
-${VIRTUALENV} --system-site-packages ${SYNOPKG_PKGDEST}/env
+## Best practices
 
-# Install wheels
-${SYNOPKG_PKGDEST}/env/bin/pip install --no-deps --no-index -U --force-reinstall \
-    -f ${SYNOPKG_PKGDEST}/share/wheelhouse \
-    ${SYNOPKG_PKGDEST}/share/wheelhouse/*.whl
-```
-
-## Best Practices
-
-### Version Pinning
-
-**Always pin exact versions** in requirements files:
+### Pin exact versions
 
 ```
-# Good
+# Good — reproducible
 requests==2.31.0
 urllib3==2.0.4
 
-# Bad - will cause build reproducibility issues
+# Bad — breaks build reproducibility
 requests>=2.0
 urllib3
 ```
 
-### Include All Dependencies
+### Include all dependencies
 
-Don't rely on pip to resolve dependencies at install time. To get the complete list:
+Do not rely on pip resolving dependencies at install time. Generate the full
+set in a local virtualenv:
 
 ```bash
-# In a local virtualenv
 pip install -r requirements.txt
 pip freeze > requirements-complete.txt
 ```
 
-Use the output as your starting point.
+Then remove the build tools (`setuptools`, `pip`, `wheel`) and anything already
+handled as a `DEPENDS` / cross / `python/` package.
 
-### Exclude Build Tools
+### Identify wheel types from the filename
 
-Remove or comment out these from requirements files:
+Check the wheel filenames on [PyPI](https://pypi.org/):
 
-- `setuptools`
-- `pip`
-- `wheel`
-
-Also exclude any packages handled as `DEPENDS` or cross packages.
-
-### Identifying Wheel Types
-
-Check wheel filenames on [PyPI](https://pypi.org/) to determine type:
-
-| Filename Pattern | Type |
+| Filename pattern | Type |
 |------------------|------|
-| `*-py3-none-any.whl` | Pure Python |
-| `*-py2.py3-none-any.whl` | Pure Python |
-| `*-cp312-cp312-manylinux*.whl` | Needs cross-compilation |
-| `*-cp312-abi3-*.whl` | ABI3 limited |
+| `*-py3-none-any.whl` / `*-py2.py3-none-any.whl` | Pure Python |
+| `*-cp314-cp314-manylinux*.whl` | Needs cross-compilation (crossenv) |
+| `*-cp314-abi3-*.whl` | ABI3 limited |
 
 ### Troubleshooting
 
-| Error | Solution |
-|-------|----------|
-| `command 'gcc' failed` | Package needs cross-compilation |
-| Wheel builds but fails at install | Try cross-compiling instead of pure |
-| Missing dependencies at runtime | Run `pip freeze` to get complete deps |
-
-### Build Notes
-
-- Some wheels need `ADDITIONAL_CFLAGS = -Wno-error=format-security`
-- Some source archives (like gevent) don't include generated C code - download from PyPI instead of GitHub
+| Symptom | Likely fix |
+|---------|-----------|
+| `command 'gcc' failed` | The package needs cross-compilation — move it out of `requirements-pure.txt` |
+| Wheel builds but fails at install | Cross-compile it instead of treating it as pure |
+| Missing dependencies at runtime | `pip freeze` to capture the complete dependency set |
+| C extension needs a special flag | Add it via `WHEELS_CFLAGS`/`WHEELS_CPPFLAGS` (with a `[name]` prefix at the SPK level) |
+| Source archive ships no generated C code (e.g. gevent) | Download the sdist from PyPI rather than a GitHub tag |
 
 ## Examples
 
-- [borgbackup](https://github.com/SynoCommunity/spksrc/tree/master/spk/borgbackup) - Comprehensive Python package with cross-compiled dependencies
-- [python312-wheels](https://github.com/SynoCommunity/spksrc/tree/master/spk/python312-wheels) - Wheel testing package
-- [homeassistant](https://github.com/SynoCommunity/spksrc/tree/master/spk/homeassistant) - Large Python application with many dependencies
+- [borgbackup](https://github.com/SynoCommunity/spksrc/tree/master/spk/borgbackup) — SPK with pure + crossenv requirement files, per-wheel `WHEELS_CFLAGS`, and `WHEELS_PURE_PYTHON_PACKAGING_ENABLE`
+- [python314-wheels](https://github.com/SynoCommunity/spksrc/tree/master/spk/python314-wheels) — wheel testing package exercising many wheel types and `python/` dependencies
 
-## See Also
+## See also
 
-- [Wheel Format Documentation](https://wheel.readthedocs.io/)
-- [PyPI](https://pypi.org/) - Python Package Index
-- [Makefile Reference](../../reference/makefile-reference.md) - WHEELS and PYTHON_PACKAGE variables
+- [Wheel format documentation](https://wheel.readthedocs.io/)
+- [PyPI](https://pypi.org/) — Python Package Index
+- [Makefile Reference](../../reference/makefile-reference.md) — `WHEELS`, `PYTHON_PACKAGE` and related variables

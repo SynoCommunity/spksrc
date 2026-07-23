@@ -1,5 +1,5 @@
 ###############################################################################
-# mk/spksrc.common/stage0.mk
+# spksrc.common/stage0.mk
 #
 # Early toolchain bootstrap: resolves TC_GCC (and TC_VERS, TC_KERNEL, ...)
 # BEFORE the package's DEPENDS are parsed, so version_ge($(TC_GCC),...) gated

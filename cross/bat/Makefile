@@ -1,4 +1,4 @@
-PKG_NAME = bat-main
+PKG_NAME = bat-virtual
 
 OPTIONAL_DEPENDS  = cross/bat-latest
 OPTIONAL_DEPENDS += cross/bat-0.25
@@ -13,4 +13,4 @@ else
 DEPENDS = cross/bat-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

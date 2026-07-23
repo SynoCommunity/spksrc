@@ -1,18 +1,19 @@
 SPK_NAME = ffmpeg8
-SPK_VERS = 8.1.1
-SPK_REV = 1
-SPK_ICON = src/ffmpeg.png
-CHANGELOG = "1. Initial package release"
+SPK_VERS = 8.1.2
+SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
+SPK_REV = 2
+SPK_ICON = src/ffmpeg8.png
+CHANGELOG = "1. Update to version 8.1.2"
 
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver
 
-# requires c11 and proper atomic using gcc-4.9+ support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Needs C11 and working atomics -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 MAINTAINER = th0ma7
-DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg
-DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo.  Informations additionnelles concernant le paquet FFmpeg de SynoCommunity disponibles à https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg
+DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://docs.synocommunity.com/packages/ffmpeg/
+DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo.  Informations additionnelles concernant le paquet FFmpeg de SynoCommunity disponibles à https://docs.synocommunity.com/packages/ffmpeg/
 DISPLAY_NAME = FFmpeg $(firstword $(subst ., ,$(SPK_VERS)))
 STARTABLE = no
 
@@ -21,8 +22,8 @@ LICENSE  = GPLv3
 
 POST_STRIP_TARGET = $(SPK_NAME)_extra_install
 
-SPK_COMMANDS  = bin/ffprobe
-SPK_COMMANDS += bin/$(SPK_NAME)
+SPK_COMMANDS  = bin/ffprobe$(SKG_MINOR_VERS)
+SPK_COMMANDS += bin/ffmpeg$(SKG_MINOR_VERS)
 
 include ../../mk/spksrc.common.mk
 
@@ -35,4 +36,5 @@ include ../../mk/spksrc.spk-meta.mk
 
 .PHONY: $(SPK_NAME)_extra_install
 $(SPK_NAME)_extra_install:
-	cd $(STAGING_DIR)/bin && ln -sf ffmpeg $(SPK_NAME)
+	cd $(STAGING_DIR)/bin && ln -sf ffprobe ffprobe$(SKG_MINOR_VERS)
+	cd $(STAGING_DIR)/bin && ln -sf ffmpeg ffmpeg$(SKG_MINOR_VERS)

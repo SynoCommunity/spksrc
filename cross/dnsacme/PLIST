@@ -1,0 +1,11 @@
+bin:bin/dnsacme
+rsc:ui/DNSACME.js
+rsc:ui/api.cgi
+rsc:ui/config
+rsc:ui/images/dnsacme_16.png
+rsc:ui/images/dnsacme_24.png
+rsc:ui/images/dnsacme_32.png
+rsc:ui/images/dnsacme_48.png
+rsc:ui/images/dnsacme_64.png
+rsc:ui/images/dnsacme_72.png
+rsc:ui/images/dnsacme_256.png

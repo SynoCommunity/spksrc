@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.cross-dotnet.mk
+#
 # Build dotnet programs
 #
 # This makefile extends spksrc.cross-cc.mk with .NET-specific functionality
@@ -13,6 +16,8 @@
 # NOTE: Don't strip the self-contained binary!
 #    aka don't use 'bin' for the PLIST use 'rsc' instead.
 #    It *will* break the program.
+#
+###############################################################################
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -33,14 +38,12 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
 ##### dotnet specific configurations
-include ../../mk/spksrc.cross-dotnet-env.mk
+include ../../mk/spksrc.cross/env-dotnet.mk
 
 # avoid run of make configure & make install
 CONFIGURE_TARGET = nop

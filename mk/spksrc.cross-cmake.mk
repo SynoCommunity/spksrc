@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.cross-cmake.mk
+#
 # Build CMake programs
 #
 # This makefile extends spksrc.cross-cc.mk with CMake-specific functionality
@@ -5,6 +8,7 @@
 # prerequisites:
 # - cross/module depends on cmake
 #
+###############################################################################
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -25,8 +29,6 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -34,10 +36,10 @@ include ../../mk/spksrc.common.mk
 ###
 
 # cmake specific configurations
-include ../../mk/spksrc.cross-cmake-env.mk
+include ../../mk/spksrc.cross/env-cmake.mk
 
 # cmake toolchain-file usage definition
-include ../../mk/spksrc.cross-cmake-toolchainfile.mk
+include ../../mk/spksrc.cross/cmake-toolchainfile.mk
 
 # configure using cmake
 ifeq ($(strip $(CONFIGURE_TARGET)),)
@@ -50,7 +52,7 @@ CMAKE_SOURCE_DIR = $(CMAKE_BASE_DIR)
 endif
 
 ifeq ($(strip $(CMAKE_USE_NINJA)),1)
-include ../../mk/spksrc.ninja.mk
+include ../../mk/spksrc.build/ninja.mk
 else
 # compile
 ifeq ($(strip $(COMPILE_TARGET)),)
@@ -87,17 +89,17 @@ cmake_configure_target: cmake_generate_toolchain_file
 	@$(MSG)    - Use DESTDIR = $(CMAKE_USE_DESTDIR)
 	@$(MSG)    - CMake = $(shell which cmake) [$(shell cmake --version | head -1 | awk '{print $$NF}')]
 	@$(MSG)    - Path DESTDIR = $(CMAKE_DESTDIR)
-	@$(MSG)    - Path BUILD_DIR = $(CMAKE_BUILD_DIR)
+	@$(MSG)    - Path BUILD_DIR = $(BUILD_DIR)
 	@$(MSG)    - Path CMAKE_SOURCE_DIR = $(CMAKE_SOURCE_DIR)
 	@$(RUN) rm -rf CMakeCache.txt CMakeFiles
-	$(RUN) cmake -S $(CMAKE_SOURCE_DIR) -B $(CMAKE_BUILD_DIR) $(CMAKE_ARGS) $(ADDITIONAL_CMAKE_ARGS) $(CMAKE_DIR)
+	$(RUN) cmake -S $(CMAKE_SOURCE_DIR) -B $(BUILD_DIR) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS) $(CMAKE_DIR)
 
 .PHONY: cmake_compile_target
 
 # default compile:
 cmake_compile_target:
 	@$(MSG) - CMake compile
-	$(RUN) cmake --build $(CMAKE_BUILD_DIR) -j $(NCPUS)
+	$(RUN) cmake --build $(BUILD_DIR) -j $(NCPUS) $(COMPILE_ARGS)
 
 .PHONY: cmake_install_target
 
@@ -105,9 +107,9 @@ cmake_compile_target:
 cmake_install_target:
 	@$(MSG) - CMake install
 ifeq ($(strip $(CMAKE_USE_DESTDIR)),0)
-	$(RUN) cmake --install $(CMAKE_BUILD_DIR)
+	$(RUN) cmake --install $(BUILD_DIR) $(INSTALL_ARGS)
 else
-	$(RUN) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(CMAKE_BUILD_DIR)
+	$(RUN) DESTDIR=$(CMAKE_DESTDIR) cmake --install $(BUILD_DIR) $(INSTALL_ARGS)
 endif
 
 .PHONY: cmake_post_install_target
@@ -116,7 +118,7 @@ endif
 # only called when GCC_NO_DEBUG_INFO=1
 cmake_post_install_target:
 	@$(MSG) - CMake post-install \(clean\)
-	$(RUN) cmake --build $(CMAKE_BUILD_DIR) --target clean
+	$(RUN) cmake --build $(BUILD_DIR) --target clean
 
 ###
 

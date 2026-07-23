@@ -1,0 +1,28 @@
+# Temporary: drop an import rustc 1.97 rejects, until a release carries the fix.
+#
+# `Send` is in the prelude, so importing it inside `mod id` is redundant. rustc
+# 1.97 started flagging that under `unused_imports`, and vaultwarden builds with
+# `-D unused`, turning it into a hard error:
+#
+#   error: unused import: `std::marker::Send`
+#      --> src/db/models/send.rs:369:9
+#
+# The import was only ever there because the parent module declares a `Send`
+# struct; the prelude still resolves the trait inside the child module, so the
+# line can simply go.
+#
+# Upstream removed it in "Misc updates and fixes" (169aa5efc, PR #7406) as part
+# of flattening `mod id` away. That rework is far larger than what we need here,
+# so drop the import alone and revert this patch once a release ships the fix.
+# 1.36.0 is the latest tag and still carries the line.
+#
+--- src/db/models/send.rs.orig
++++ src/db/models/send.rs
+@@ -366,7 +366,6 @@
+ pub mod id {
+     use derive_more::{AsRef, Deref, Display, From};
+     use macros::{IdFromParam, UuidFromParam};
+-    use std::marker::Send;
+     use std::path::Path;
+ 
+     #[derive(

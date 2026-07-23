@@ -1,0 +1,4 @@
+bin:bin/vmafossexec
+lnk:lib/libvmaf.so
+lnk:lib/libvmaf.so.0
+lib:lib/libvmaf.so.0.0.0

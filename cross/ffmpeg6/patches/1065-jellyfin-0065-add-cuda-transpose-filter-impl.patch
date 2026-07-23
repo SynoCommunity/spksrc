@@ -1,8 +1,6 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
-@@ -3149,6 +3149,8 @@ thumbnail_cuda_filter_deps="ffnvcodec"
+@@ -3211,6 +3211,8 @@ thumbnail_cuda_filter_deps="ffnvcodec"
  thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  tonemap_cuda_filter_deps="ffnvcodec const_nan"
  tonemap_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -11,11 +9,9 @@ Index: jellyfin-ffmpeg/configure
  transpose_npp_filter_deps="ffnvcodec libnpp"
  overlay_cuda_filter_deps="ffnvcodec"
  overlay_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -523,6 +523,8 @@ OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)
+@@ -534,6 +534,8 @@ OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.p
  OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
  OBJS-$(CONFIG_TPAD_FILTER)                   += vf_tpad.o
  OBJS-$(CONFIG_TRANSPOSE_FILTER)              += vf_transpose.o
@@ -24,11 +20,9 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_TRANSPOSE_NPP_FILTER)          += vf_transpose_npp.o
  OBJS-$(CONFIG_TRANSPOSE_OPENCL_FILTER)       += vf_transpose_opencl.o opencl.o opencl/transpose.o
  OBJS-$(CONFIG_TRANSPOSE_VAAPI_FILTER)        += vf_transpose_vaapi.o vaapi_vpp.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -489,6 +489,7 @@ extern const AVFilter ff_vf_tonemap_open
+@@ -498,6 +498,7 @@ extern const AVFilter ff_vf_tonemap_opencl;
  extern const AVFilter ff_vf_tonemap_vaapi;
  extern const AVFilter ff_vf_tpad;
  extern const AVFilter ff_vf_transpose;
@@ -36,8 +30,6 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_transpose_npp;
  extern const AVFilter ff_vf_transpose_opencl;
  extern const AVFilter ff_vf_transpose_vaapi;
-Index: jellyfin-ffmpeg/libavfilter/vf_transpose_cuda.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_transpose_cuda.c
 @@ -0,0 +1,478 @@
@@ -519,8 +511,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_transpose_cuda.c
 +    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_CUDA),
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};
-Index: jellyfin-ffmpeg/libavfilter/vf_transpose_cuda.cu
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_transpose_cuda.cu
 @@ -0,0 +1,61 @@

@@ -1,0 +1,26 @@
+--- uuid.c
++++ uuid.c
+@@ -45,16 +45,16 @@
+ #include <inttypes.h>
+ #include <sys/time.h>
+ #include <sys/types.h>
+-#include <md5.h>
+-#if __has_include(<sha1.h>)
+-#include <sha1.h>
+-#else
+-#include <sha.h>  // FreeBSD
++#include <openssl/md5.h>
++#include <openssl/sha.h>
++#define MD5Init MD5_Init
++#define MD5Update MD5_Update
++#define MD5Final MD5_Final
++#define SHA1_CTX SHA_CTX
++#define SHA1_DIGEST_LENGTH SHA_DIGEST_LENGTH
+ #define SHA1Init SHA1_Init
+ #define SHA1Update SHA1_Update
+ #define SHA1Final SHA1_Final
+-#define SHA1_DIGEST_LENGTH 20
+-#endif
+ 
+ /* own headers (part 2/2) */
+ #include "uuid_random.h"

@@ -187,7 +187,8 @@ Fixes #1234
 
 **Build configuration:**
 
-- Missing `UNSUPPORTED_ARCHS` for incompatible architectures
+- Missing a capability floor (`MIN_GCC_VERSION` / `MIN_GLIBC_VERSION` /
+  `REQUIRE_64BIT`), or `UNSUPPORTED_ARCHS`, for incompatible architectures
 - Incorrect dependency declarations
 - Missing checksums
 

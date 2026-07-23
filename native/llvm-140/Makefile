@@ -18,7 +18,7 @@ BUILD_DEPENDS += cross/llvm-project-140.src
 # -----------------------------------------------------------------------------
 # Directories
 # -----------------------------------------------------------------------------
-CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_NAME).build
+BUILD_DIR = $(WORK_DIR)/$(PKG_NAME).build
 CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 
 # -----------------------------------------------------------------------------
@@ -26,42 +26,42 @@ CMAKE_SOURCE_DIR = $(WORK_DIR)/llvm-project/llvm
 # -----------------------------------------------------------------------------
 POST_INSTALL_TARGET = llvm_post_install_target
 llvm_post_install_target:
-	$(RUN) install -m 755 $(CMAKE_BUILD_DIR)/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
+	$(RUN) install -m 755 $(BUILD_DIR)/bin/clang-tblgen $(STAGING_INSTALL_PREFIX)/bin/clang-tblgen
 
 # -----------------------------------------------------------------------------
 # CMake arguments
 # -----------------------------------------------------------------------------
-CMAKE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
-CMAKE_ARGS += -DCMAKE_BUILD_TYPE=MinSizeRel
-CMAKE_ARGS += -DLLVM_ENABLE_PROJECTS='llvm;clang;lld'
-CMAKE_ARGS += -DLLVM_ENABLE_RTTI=ON
-CMAKE_ARGS += -DLLVM_ENABLE_EH=ON
-CMAKE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
-CMAKE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=OFF
+CONFIGURE_ARGS += -DLLVM_TARGETS_TO_BUILD=X86
+CONFIGURE_ARGS += -DCMAKE_BUILD_TYPE=MinSizeRel
+CONFIGURE_ARGS += -DLLVM_ENABLE_PROJECTS='llvm;clang;lld'
+CONFIGURE_ARGS += -DLLVM_ENABLE_RTTI=ON
+CONFIGURE_ARGS += -DLLVM_ENABLE_EH=ON
+CONFIGURE_ARGS += -DLLVM_BUILD_LLVM_DYLIB=ON
+CONFIGURE_ARGS += -DLLVM_LINK_LLVM_DYLIB=ON
+CONFIGURE_ARGS += -DBUILD_SHARED_LIBS=OFF
 
 # intel-compute-runtime requires compressions support
-CMAKE_ARGS += -DLLVM_ENABLE_ZLIB=ON
+CONFIGURE_ARGS += -DLLVM_ENABLE_ZLIB=ON
 
 # Install headers
-CMAKE_ARGS += -DLLVM_INCLUDE_TOOLS=ON
+CONFIGURE_ARGS += -DLLVM_INCLUDE_TOOLS=ON
 
 # Avoid building and/or installing unecessary tools
-CMAKE_ARGS += -DLLVM_BUILD_TOOLS=ON
-CMAKE_ARGS += -DCLANG_BUILD_TOOLS=ON
-CMAKE_ARGS += -DLLVM_INSTALL_UTILS=ON
-CMAKE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=OFF
+CONFIGURE_ARGS += -DLLVM_BUILD_TOOLS=ON
+CONFIGURE_ARGS += -DCLANG_BUILD_TOOLS=ON
+CONFIGURE_ARGS += -DLLVM_INSTALL_UTILS=ON
+CONFIGURE_ARGS += -DLLVM_INSTALL_TOOLCHAIN_ONLY=OFF
 
 # Build flags
-CMAKE_ARGS += -DCLANG_INCLUDE_DOCS=OFF
-CMAKE_ARGS += -DCLANG_INCLUDE_TESTS=OFF
-CMAKE_ARGS += -DLLVM_BUILD_TESTS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_DOCS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
-CMAKE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
-CMAKE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
+CONFIGURE_ARGS += -DCLANG_INCLUDE_DOCS=OFF
+CONFIGURE_ARGS += -DCLANG_INCLUDE_TESTS=OFF
+CONFIGURE_ARGS += -DLLVM_BUILD_TESTS=OFF
+CONFIGURE_ARGS += -DLLVM_INCLUDE_DOCS=OFF
+CONFIGURE_ARGS += -DLLVM_INCLUDE_TESTS=OFF
+CONFIGURE_ARGS += -DLLVM_INCLUDE_BENCHMARKS=OFF
+CONFIGURE_ARGS += -DLLVM_INCLUDE_GO_TESTS=OFF
+CONFIGURE_ARGS += -DLLVM_INCLUDE_UTILS=OFF
+CONFIGURE_ARGS += -DLLVM_ENABLE_ASSERTIONS=OFF
 
 # [llvm-libunwind]
 # Required to copy libunwind/include/mach-o/compact_unwind_encoding.h
@@ -79,7 +79,7 @@ NATIVE_CXXFLAGS += -Wno-unused-function
 NATIVE_CXXFLAGS += -Wno-variadic-macros
 
 # Docker build workaround
-CMAKE_ARGS += -DCMAKE_CXX_VISIBILITY_PRESET=default
+CONFIGURE_ARGS += -DCMAKE_CXX_VISIBILITY_PRESET=default
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules

@@ -18,7 +18,7 @@ CONFIGURE_ARGS  = --enable-elf-shlibs
 CONFIGURE_ARGS += --disable-libuuid
 
 # build and install libs only
-COMPILE_MAKE_OPTIONS = libs
-INSTALL_MAKE_OPTIONS = install-libs DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+COMPILE_ARGS = libs
+INSTALL_ARGS = install-libs DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk

@@ -14,6 +14,6 @@ HOMEPAGE = https://github.com/crazycat69/dtv-scan-tables
 COMMENT  = Digital TV scan tables.
 LICENSE  = GPLv2
 
-INSTALL_MAKE_OPTIONS = DATADIR=$(STAGING_INSTALL_PREFIX)/share/tvheadend/data DVBV5DIR=dvb-scan install
+INSTALL_ARGS = DATADIR=$(STAGING_INSTALL_PREFIX)/share/tvheadend/data DVBV5DIR=dvb-scan install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk

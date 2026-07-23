@@ -19,7 +19,7 @@ LICENSE  = Apache 2.0
 
 INSTALL_TARGET = sjpeg_source_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: sjpeg_source_install
 sjpeg_source_install:

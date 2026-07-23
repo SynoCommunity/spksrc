@@ -5,7 +5,7 @@ This section provides reference documentation for spksrc development.
 ## In This Section
 
 - **[Architectures](architectures.md)** - CPU architectures and model mappings
-- **[Ports](ports.md)** - Port allocations for Synology and SynoCommunity packages
+- **[System Ports](system-ports.md)** - Port allocations for Synology and SynoCommunity packages
 - **[Makefile Reference](makefile-reference.md)** - Complete variable and target reference
 - **[Permissions](permissions.md)** - Service accounts, ACLs, and access control
 - **[DSM APIs](dsm-apis.md)** - Synology documentation and external resources
@@ -30,6 +30,6 @@ This section provides reference documentation for spksrc development.
 | Meson | `spksrc.cross-meson.mk` |
 | Go | `spksrc.cross-go.mk` |
 | Rust | `spksrc.cross-rust.mk` |
-| Python | `spksrc.python.mk` |
+| Python wheel (exception, under `python/`) | `spksrc.python-wheel.mk` / `spksrc.python-wheel-meson.mk` |
 
 For external Synology documentation and resources, see [DSM APIs](dsm-apis.md).

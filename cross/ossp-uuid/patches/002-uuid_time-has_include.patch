@@ -1,0 +1,13 @@
+--- uuid_time.h
++++ uuid_time.h
+@@ -4,9 +4,7 @@
+ #ifndef __UUID_TIME_H__
+ #define __UUID_TIME_H__
+ 
+-#if __has_include(<sched.h>)
+-#include <sched.h>
+-#endif
++#include <sched.h>
+ 
+ 
+ #ifdef _WIN32

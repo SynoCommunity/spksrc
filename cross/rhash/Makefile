@@ -1,4 +1,4 @@
-PKG_NAME = rhash-main
+PKG_NAME = rhash-virtual
 
 OPTIONAL_DEPENDS  = cross/rhash-latest
 OPTIONAL_DEPENDS += cross/rhash-1.4.5
@@ -11,4 +11,4 @@ else
 DEPENDS = cross/rhash-latest
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

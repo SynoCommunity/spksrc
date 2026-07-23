@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/nvdec.c
-===================================================================
 --- libavcodec/nvdec.c
 +++ libavcodec/nvdec.c
 @@ -303,8 +303,10 @@ static int nvdec_init_hwframes(AVCodecCo

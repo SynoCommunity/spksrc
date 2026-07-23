@@ -15,7 +15,7 @@ LICENSE  = GPL
 
 INSTALL_TARGET = tt-rss_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: tt-rss_install
 tt-rss_install:

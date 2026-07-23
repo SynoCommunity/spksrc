@@ -18,7 +18,7 @@ INSTALL_TARGET = mantisbt_install
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: mantisbt_install
 mantisbt_install:

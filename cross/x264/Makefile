@@ -13,6 +13,9 @@ HOMEPAGE = https://www.videolan.org/developers/x264.html
 COMMENT  = x264 is a free software library and application for encoding video streams into the H.264/MPEG-4 AVC forma
 LICENSE  = GPLv2
 
+# Needs gcc >= 4.6: the configure endian probe trips -Werror=attributes under gcc 4.3.7.
+MIN_GCC_VERSION = 4.6
+
 GNU_CONFIGURE = 1
 
 CONFIGURE_ARGS  = --enable-shared

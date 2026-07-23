@@ -1,5 +1,5 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 8.1.1
+PKG_VERS = 8.1.2
 PKG_MINOR_VERS = $(firstword $(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -10,8 +10,8 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
-# requires c11 and proper atomic using gcc-4.9+ support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Needs C11 and working atomics -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.common.mk
 
@@ -41,16 +41,15 @@ CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
-# ARCH specific
-OPTIONAL_DEPENDS  = cross/openh264
+OPTIONAL_DEPENDS  = cross/frei0r
 OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/svt-av1
-# GCC specific
-OPTIONAL_DEPENDS += cross/frei0r
 OPTIONAL_DEPENDS += cross/libjxl
 OPTIONAL_DEPENDS += cross/liblc3
-OPTIONAL_DEPENDS += cross/rubberband
+OPTIONAL_DEPENDS += cross/libplacebo
 OPTIONAL_DEPENDS += cross/libvmaf
+OPTIONAL_DEPENDS += cross/openh264
+OPTIONAL_DEPENDS += cross/rubberband
+OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/vvenc
 
 # Define x86asm
@@ -225,8 +224,10 @@ DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
 
-# Add SVT-AV1 codec to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
+# SVT-AV1 is 64-bit only -- its configure refuses 32-bit, and it now declares
+# REQUIRE_64BIT, so pulling it on a 32-bit arch (the old list named comcerto2k,
+# alpine and monaco, all ARMv7) fails the whole build. Gate it on the 64-bit archs.
+ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
@@ -289,6 +290,7 @@ endif
 
 # Requires GCC >= 12 (C++20 <version> header support)
 ifeq ($(call version_ge, $(TC_GCC), 12),1)
+DEPENDS += cross/libplacebo
 CONFIGURE_ARGS += --enable-libplacebo
 endif
 

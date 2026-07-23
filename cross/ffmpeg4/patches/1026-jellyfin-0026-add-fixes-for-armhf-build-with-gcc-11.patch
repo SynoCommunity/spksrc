@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -4988,9 +4988,11 @@ elif enabled arm; then

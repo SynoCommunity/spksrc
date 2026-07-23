@@ -1,10 +1,18 @@
 PKG_NAME = znc
-PKG_VERS = 1.10.1
+PKG_VERS = 1.10.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-# use synocommunity "abandoned sources" 
-# original site https://znc.in/releases/archive does not work
-PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/sources
+PKG_DIST_SITE = https://znc.in/releases
+# znc.in is upstream, but flaky: its TLS certificate expired on 2026-07-14 and
+# downloads fail on it until it is renewed. Gentoo serves the same tarball under
+# its upstream name, so fall back there meanwhile. The subdirectory is the first
+# two hex digits of the blake2b hash of the file name, so it must be recomputed
+# on a version bump; a stale one just 404s and we fall through.
+# Debian cannot be used: it renames the file to znc_$(PKG_VERS).orig.tar.gz, and
+# a mirror base is only ever appended with PKG_DIST_NAME.
+# GitHub is not an option either: znc publishes no release assets, and its git
+# archive ships an empty third_party/Csocket submodule, so it cannot build.
+PKG_DIST_MIRRORS = https://distfiles.gentoo.org/distfiles/c9
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Ensure C++17 compatibility
@@ -19,30 +27,30 @@ LICENSE  = Apache 2.0
 ifeq ($(strip $(PYTHON_PACKAGE)),)
 BUILD_DEPENDS = cross/python312
 endif
-CMAKE_ARGS += -DWANT_PYTHON=true
+CONFIGURE_ARGS += -DWANT_PYTHON=true
 DEPENDS = cross/zlib
 
 DEPENDS += cross/openssl3
-CMAKE_ARGS += -DWANT_OPENSSL=true
+CONFIGURE_ARGS += -DWANT_OPENSSL=true
 
 DEPENDS += cross/libicu
-CMAKE_ARGS += -DWANT_ICU=true
+CONFIGURE_ARGS += -DWANT_ICU=true
 
 DEPENDS += cross/argon2
-CMAKE_ARGS += -DWANT_ARGON=true
+CONFIGURE_ARGS += -DWANT_ARGON=true
 
 DEPENDS += cross/cyrus-sasl
-CMAKE_ARGS += -DWANT_CYRUS=true
+CONFIGURE_ARGS += -DWANT_CYRUS=true
 
 # Boost mandatory for i18n and
 # can only be built from spk
 ifneq ($(strip $(BOOST_BUILD_PATH)),)
-CMAKE_ARGS += -DWANT_I18N=true
+CONFIGURE_ARGS += -DWANT_I18N=true
 endif
 
-CMAKE_ARGS += -DWANT_SYSTEMD=false
-CMAKE_ARGS += -DWANT_TCL=false
-CMAKE_ARGS += -DWANT_PERL=false
+CONFIGURE_ARGS += -DWANT_SYSTEMD=false
+CONFIGURE_ARGS += -DWANT_TCL=false
+CONFIGURE_ARGS += -DWANT_PERL=false
 
 # For ZNC to build using github-action, enforce adding Python & OpenSSL include directories
 ADDITIONAL_CPPFLAGS += -I$(PYTHON_STAGING_INSTALL_PREFIX)/include/python3.$(subst python3,,$(PYTHON_PACKAGE))
@@ -89,11 +97,11 @@ znc_update_modules:
 .PHONY: znc_post_install
 znc_post_install:
 	@$(MSG) "Building extra modules"
-	@$(MSG) CMAKE_BUILD_DIR: $(CMAKE_BUILD_DIR)/znc-buildmod
-	@chmod +x $(CMAKE_BUILD_DIR)/znc-buildmod
+	@$(MSG) BUILD_DIR: $(BUILD_DIR)/znc-buildmod
+	@chmod +x $(BUILD_DIR)/znc-buildmod
 	@rm -fr $(WORK_DIR)/modules
 	@cp -R modules $(WORK_DIR)/
 	@$(RUN) sed -i 's|$(INSTALL_PREFIX)|$(STAGING_INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
-	cd $(WORK_DIR)/modules && env $(ENV) sh -c 'CMAKE_PREFIX_PATH=$(STAGING_INSTALL_PREFIX) $(CMAKE_BUILD_DIR)/znc-buildmod $(EXTRA_MODULES)'
+	cd $(WORK_DIR)/modules && env $(ENV) sh -c 'CMAKE_PREFIX_PATH=$(STAGING_INSTALL_PREFIX) $(BUILD_DIR)/znc-buildmod $(EXTRA_MODULES)'
 	@$(RUN) sed -i 's|$(STAGING_INSTALL_PREFIX)|$(INSTALL_PREFIX)|g' $(STAGING_INSTALL_PREFIX)/share/znc/cmake/znc_internal.cmake
 	@install -m 644 $(WORK_DIR)/modules/*.so $(STAGING_INSTALL_PREFIX)/lib/znc/

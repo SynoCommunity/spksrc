@@ -1,13 +1,13 @@
 SPK_NAME = postgresql
 SPK_VERS = 17.10
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/postgresql.png
 
 DEPENDS = cross/postgresql
 
 MAINTAINER = DigitalBox98
-DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS spatial database extension for DSM 7+.
-CHANGELOG = "1. Update PostgreSQL to 17.10."
+DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS and pgvector extensions for DSM 7+.
+CHANGELOG = "1. Update PostgreSQL to 17.10. <br/>2. Add pgvector extension."
 DISPLAY_NAME = PostgreSQL
 STARTABLE = yes
 
@@ -33,6 +33,7 @@ export LIBICU_DATA_PACKAGING_MODE=archive
 # Only include postgis if toolchain GCC >= 5.0
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
 DEPENDS += cross/postgis
+DEPENDS += cross/pgvector
 endif
 
 # Common PostgreSQL commands available via /usr/local/bin/

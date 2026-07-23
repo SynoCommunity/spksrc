@@ -30,7 +30,7 @@ WIZARDS_DIR = src/wizard
 FWPORTS = src/rustdesk-server.sc
 
 # Minimum DSM version
-SPK_MIN_DSM = 6.0
+REQUIRED_MIN_DSM = 6.0
 
 # Install config file template
 POST_STRIP_TARGET = rustdesk_extra_install

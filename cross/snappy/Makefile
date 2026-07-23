@@ -8,21 +8,21 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = 
 
-# c++11 compiler required
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# Needs gcc >= 4.8: C++11 features unavailable before gcc 4.8.
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://google.github.io/snappy/
 COMMENT  = Snappy is a compression/decompression library. It does not aim for maximum compression, or compatibility with any other compression library; instead, it aims for very high speeds and reasonable compression.
 LICENSE  = Copyright 2011, Google Inc.
 
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
-CMAKE_ARGS += -DSNAPPY_BUILD_TESTS=OFF
-CMAKE_ARGS += -DSNAPPY_BUILD_BENCHMARKS=OFF
+CONFIGURE_ARGS += -DBUILD_SHARED_LIBS=ON
+CONFIGURE_ARGS += -DSNAPPY_BUILD_TESTS=OFF
+CONFIGURE_ARGS += -DSNAPPY_BUILD_BENCHMARKS=OFF
 
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),comcerto2k),$(ARCH))
-CMAKE_ARGS += -DSNAPPY_HAVE_NEON=OFF
+CONFIGURE_ARGS += -DSNAPPY_HAVE_NEON=OFF
 endif
 
 include ../../mk/spksrc.cross-cmake.mk

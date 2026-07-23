@@ -1,5 +1,8 @@
 # SickBeard Custom
 
+!!! warning "Archived"
+    This package is **archived** — no longer built or published. Existing installs keep working but receive no updates. See the [Package Lifecycle Policy](../contributing/package-lifecycle.md).
+
 This package is designed to let you select your SickBeard fork to run.
 
 ## Known Forks

@@ -345,7 +345,17 @@ For packages with runtime dependencies (like Erlang-based apps), ensure version 
 
 ### Adding Architecture Support
 
-Use `UNSUPPORTED_ARCHS` to exclude architectures:
+When the limit is a toolchain capability (compiler, C library, or 32-bit),
+declare the floor and let the framework refuse the archs that cannot meet it:
+```makefile
+# Needs C++17 → gcc 8 or newer
+MIN_GCC_VERSION = 8
+
+# Needs a 64-bit target
+REQUIRE_64BIT = 1
+```
+
+For a plain exclusion that is not a capability floor, use `UNSUPPORTED_ARCHS`:
 ```makefile
 # Exclude old PPC architectures
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)

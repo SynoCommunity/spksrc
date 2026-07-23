@@ -1,6 +1,6 @@
 SPK_NAME = qbittorrent
-SPK_VERS = 5.2.2
-SPK_REV = 5
+SPK_VERS = 5.2.3
+SPK_REV = 6
 SPK_ICON = src/qbittorrent.png
 
 DEPENDS = cross/qbittorrent cross/qbittorrent-pwhash
@@ -13,7 +13,7 @@ MAINTAINER = SynoCommunity
 DESCRIPTION = qBittorrent is a cross-platform free and open-source BitTorrent client with a feature-rich web interface for remote access.
 STARTABLE = yes
 DISPLAY_NAME = qBittorrent
-CHANGELOG = "1. Update to qBittorrent 5.2.2."
+CHANGELOG = "1. Update to qBittorrent 5.2.3."
 
 HOMEPAGE = https://www.qbittorrent.org
 LICENSE  = GPLv2

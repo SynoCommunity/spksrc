@@ -1,0 +1,5 @@
+HOWTO:
+curl -L https://github.com/erikkaashoek/Comskip/pull/187.patch \
+    | sed -e 's?--- a/?--- ?1' \
+          -e 's?+++ b/?+++ ?1' \
+    > 001-drop-ticks_per_frame-for-ffmpeg8-compat.patch

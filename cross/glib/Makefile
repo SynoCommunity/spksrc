@@ -1,4 +1,4 @@
-PKG_NAME = glib-main
+PKG_NAME = glib-virtual
 
 OPTIONAL_DEPENDS  = cross/glib-latest
 OPTIONAL_DEPENDS += cross/glib-2.66
@@ -18,4 +18,4 @@ DEPENDS = cross/glib-2.58
 endif
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

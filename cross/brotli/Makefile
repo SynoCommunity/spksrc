@@ -12,6 +12,6 @@ HOMEPAGE = https://github.com/google/brotli/
 COMMENT  = Brotli compression format.
 LICENSE  = MIT
 
-CMAKE_ARGS += -DBROTLI_DISABLE_TESTS=true
+CONFIGURE_ARGS += -DBROTLI_DISABLE_TESTS=true
 
 include ../../mk/spksrc.cross-cmake.mk

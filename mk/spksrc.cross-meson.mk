@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.cross-meson.mk
+#
 # Build Meson programs
 #
 # This makefile extends spksrc.cross-cc.mk with Meson-specific functionality
@@ -5,6 +8,7 @@
 # prerequisites:
 # - cross/module depends on meson + ninja
 #
+###############################################################################
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -25,8 +29,6 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -34,10 +36,10 @@ include ../../mk/spksrc.common.mk
 ###
 
 # meson specific configurations
-include ../../mk/spksrc.cross-meson-env.mk
+include ../../mk/spksrc.cross/env-meson.mk
 
 # meson cross-file usage definition
-include ../../mk/spksrc.cross-meson-crossfile.mk
+include ../../mk/spksrc.cross/meson-crossfile.mk
 
 # configure using meson
 ifeq ($(strip $(CONFIGURE_TARGET)),)
@@ -45,7 +47,7 @@ CONFIGURE_TARGET = meson_configure_target
 endif
 
 # call-up ninja build process
-include ../../mk/spksrc.ninja.mk
+include ../../mk/spksrc.build/ninja.mk
 
 ###
 
@@ -53,11 +55,11 @@ include ../../mk/spksrc.ninja.mk
 meson_configure_target: meson_generate_crossfile
 	@$(MSG) - Meson configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
-	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
-	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
+	@$(MSG)    - Build path = $(BUILD_DIR)
+	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	@$(MSG) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
-	$(RUN) meson setup $(MESON_BASE_DIR) $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	@$(MSG) meson setup $(MESON_BASE_DIR) $(BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
+	$(RUN) meson setup $(MESON_BASE_DIR) $(BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
 
 ###
 

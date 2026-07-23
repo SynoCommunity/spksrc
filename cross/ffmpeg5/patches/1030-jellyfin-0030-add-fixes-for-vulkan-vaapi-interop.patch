@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavutil/vulkan.h
-===================================================================
 --- libavutil/vulkan.h
 +++ libavutil/vulkan.h
 @@ -26,9 +26,10 @@

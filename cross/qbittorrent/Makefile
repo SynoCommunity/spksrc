@@ -1,5 +1,5 @@
 PKG_NAME = qbittorrent
-PKG_VERS = 5.2.2
+PKG_VERS = 5.2.3
 PKG_EXT =
 PKG_DIST_NAME = $(PKG_DIST_ARCH)-qbittorrent-nox
 PKG_DIST_FILE = $(PKG_DIST_ARCH)-qbittorrent-nox-$(PKG_VERS)
@@ -33,7 +33,7 @@ endif
 # Unsupported architectures (no static binary available)
 UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS) $(ARMv5_ARCHS)
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: qbittorrent_install
 qbittorrent_install:

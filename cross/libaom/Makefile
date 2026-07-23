@@ -1,9 +1,9 @@
-PKG_NAME = libaom-main
+PKG_NAME = libaom-virtual
 
 OPTIONAL_DEPENDS  = cross/libaom-latest
 OPTIONAL_DEPENDS += cross/libaom-3.8
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+MIN_GCC_VERSION = 4.8
 
 include ../../mk/spksrc.common.mk
 
@@ -14,4 +14,4 @@ else
 DEPENDS = cross/libaom-3.8
 endif
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.cross-virtual.mk

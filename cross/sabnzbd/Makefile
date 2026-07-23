@@ -13,7 +13,7 @@ LICENSE  = GPL
 
 INSTALL_TARGET = sabnzbd_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 # The tests and po folders take 5MB of space and are not used
 sabnzbd_install:
