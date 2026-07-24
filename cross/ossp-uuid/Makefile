@@ -16,6 +16,9 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-shared --enable-static --with-pic
 CONFIGURE_ARGS += LIBS="-lcrypto"
 ENV += ac_cv_func_SHA1Final=yes
+# Disable getentropy detection (requires kernel 3.17+). Braswell uses kernel
+# 3.10 where the getrandom syscall is unavailable. Fall back to /dev/urandom.
+ENV += ac_cv_func_getentropy=no
 PRE_CONFIGURE_TARGET = ossp_uuid_pre_configure
 
 include ../../mk/spksrc.cross-cc.mk
