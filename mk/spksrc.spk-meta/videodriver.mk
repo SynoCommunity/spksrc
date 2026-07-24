@@ -7,6 +7,16 @@
 
 IS_VIDEODRV_SUPPORTED := $(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS))
 
+# Videodriver is x64/ARMv8 only, AND only on DSM >= 6.2.4 where the GPU stack
+# exists (synocli-videodriver is REQUIRED_MIN_DSM = 6.2.4). Below that -- e.g. a
+# DSM 5.2 x64 resurrected with the gcc overlay -- there is no driver package, so
+# the consumer builds software-only instead of pulling a dep that refuses the DSM.
+ifneq ($(strip $(IS_VIDEODRV_SUPPORTED)),)
+ifneq ($(call version_ge, $(TCVERSION), 6.2.4),1)
+  IS_VIDEODRV_SUPPORTED :=
+endif
+endif
+
 ifneq ($(IS_VIDEODRV_SUPPORTED),)
 
 # Set default videodriver package name
