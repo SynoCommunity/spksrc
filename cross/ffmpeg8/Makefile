@@ -16,6 +16,23 @@ MIN_GCC_VERSION = 4.9
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+# ffmpeg builds the compiler name from --cross-prefix as <prefix>gcc, ignoring the
+# environment CC. With a gcc overlay the real compiler is <prefix>gcc-8.5, so
+# cross-prefix alone picks the stock gcc and configure dies -- on the old archs with
+# "no atomics available" (stdatomic.h arrived in gcc 4.9), on others with "Compiler
+# lacks C11 support".
+#
+# Read the suffix tc_vars baked into the work dir, not the live TC_GCC_SUFFIX make
+# variable: tc_vars.mk recomputes that one and clears it whenever LEGACY_TOOLCHAIN is
+# not propagated into this dependency sub-make, which would silently drop --cc back to
+# the stock gcc while every other package still used the overlay (its CC is baked into
+# the environment and survives). The recorded value is written once, in the mode the
+# whole tree was built with, and cannot drift; it is empty in legacy mode, giving
+# exactly the stock name as before. Same read as the coherence guard in
+# spksrc.common/tc-capability.mk.
+_FF_GCC_SUFFIX = $(shell sed -n 's/^TC_GCC_SUFFIX *:= *//p' $(WORK_DIR)/tc_vars.mk 2>/dev/null)
+CONFIGURE_ARGS += --cc=$(TC_PATH)$(TC_PREFIX)gcc$(_FF_GCC_SUFFIX)
+CONFIGURE_ARGS += --cxx=$(TC_PATH)$(TC_PREFIX)g++$(_FF_GCC_SUFFIX)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
@@ -71,7 +88,7 @@ DEPENDS = cross/cairo
 DEPENDS += cross/chromaprint-fftw
 CONFIGURE_ARGS += --enable-chromaprint
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/frei0r
 CONFIGURE_ARGS += --enable-frei0r
 endif
@@ -109,12 +126,12 @@ CONFIGURE_ARGS += --enable-libfribidi
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/libjxl
 CONFIGURE_ARGS += --enable-libjxl
 endif
 
-ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 4.9),1)
 DEPENDS += cross/liblc3
 CONFIGURE_ARGS += --enable-liblc3
 endif
@@ -134,7 +151,7 @@ CONFIGURE_ARGS += --enable-librabbitmq
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/rubberband
 CONFIGURE_ARGS += --enable-librubberband
 endif
@@ -161,7 +178,7 @@ CONFIGURE_ARGS += --enable-libtheora
 DEPENDS += cross/twolame
 CONFIGURE_ARGS += --enable-libtwolame
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/libvmaf
 CONFIGURE_ARGS += --enable-libvmaf
 endif
@@ -169,7 +186,7 @@ endif
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/vvenc
 CONFIGURE_ARGS += --enable-libvvenc
 endif
@@ -270,7 +287,7 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-vaapi
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+ifeq ($(call version_gt, $(TC_GCC_EFFECTIVE), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
@@ -281,7 +298,7 @@ CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
 
 # Enable OpenCL and Vulkan acceleration
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+ifeq ($(call version_gt, $(TC_GCC_EFFECTIVE), 5),1)
 #CONFIGURE_ARGS += --enable-libglslang  # <-- Mutually exclusive to shaderc
 CONFIGURE_ARGS += --enable-libshaderc
 CONFIGURE_ARGS += --enable-opencl
@@ -289,7 +306,7 @@ CONFIGURE_ARGS += --enable-vulkan
 endif
 
 # Requires GCC >= 12 (C++20 <version> header support)
-ifeq ($(call version_ge, $(TC_GCC), 12),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 12),1)
 DEPENDS += cross/libplacebo
 CONFIGURE_ARGS += --enable-libplacebo
 endif
