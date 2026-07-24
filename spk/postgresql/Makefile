@@ -1,13 +1,13 @@
 SPK_NAME = postgresql
 SPK_VERS = 17.10
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/postgresql.png
 
 DEPENDS = cross/postgresql
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS and pgvector extensions for DSM 7+.
-CHANGELOG = "1. Update PostgreSQL to 17.10. <br/>2. Add pgvector extension."
+CHANGELOG = "1. Update PostgreSQL to 17.10. <br/>2. Add pgvector extension. <br/>3. Fix uuid-ossp on kernel 3.10."
 DISPLAY_NAME = PostgreSQL
 STARTABLE = yes
 
