@@ -62,6 +62,14 @@ LEGACY_TOOLCHAIN ?= 1
 # (TC_GCC_VERSION) or the overlay, falling back to stock.
 TC_GCC_EFFECTIVE := $(if $(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),$(TC_GCC),$(or $(strip $(TC_GCC_VERSION)),$(TC_OVERLAY_GCC),$(TC_GCC)))
 
+# Whether TC_GCC_EFFECTIVE comes from a gcc overlay rather than the toolchain's
+# stock gcc -- the mode (overlay|legacy), known statically here. TC_GCC_SUFFIX in
+# tc_vars only exists once the work dir's tc_vars.mk has been generated, so anything
+# that runs during the dependency walk (the build status line) cannot read it and
+# must use this instead. Overlay is active when the build is not forced legacy and
+# an overlay gcc is actually available to select.
+TC_GCC_IS_OVERLAY := $(if $(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),,$(if $(or $(strip $(TC_GCC_VERSION)),$(strip $(TC_OVERLAY_GCC))),1))
+
 # Reasons accumulate rather than overwrite: an arch can miss more than one
 # capability at once -- a 32-bit target on an old gcc fails REQUIRE_64BIT and
 # MIN_GCC_VERSION together -- and reporting only the last is misleading. They are
