@@ -153,8 +153,12 @@ CONFIGURE_ARGS += --enable-librabbitmq
 endif
 
 ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+# librist uses the htobe*/be*toh macros that <endian.h> only gained in glibc 2.9;
+# the DSM 5.2 ppc853x sysroot is glibc 2.8 and never declares them. Drop it there.
+ifeq ($(call version_ge, $(TC_GLIBC), 2.9),1)
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
+endif
 endif
 
 ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
@@ -178,8 +182,12 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/speex
 CONFIGURE_ARGS += --enable-libspeex
 
+# libsrt, like librist, needs glibc >= 2.9 for the htobe*/be*toh macros (ppc853x
+# 5.2 is glibc 2.8).
+ifeq ($(call version_ge, $(TC_GLIBC), 2.9),1)
 DEPENDS += cross/libsrt
 CONFIGURE_ARGS += --enable-libsrt
+endif
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora

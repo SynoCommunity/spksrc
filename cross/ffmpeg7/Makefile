@@ -148,8 +148,14 @@ CONFIGURE_ARGS += --enable-libopus
 DEPENDS += cross/librabbitmq
 CONFIGURE_ARGS += --enable-librabbitmq
 
+# librist uses the htobe*/be*toh macros that <endian.h> only gained in glibc 2.9;
+# the DSM 5.2 ppc853x sysroot is glibc 2.8 and never declares them (a gcc overlay
+# cannot add a libc header). Drop librist there -- one niche transport short of a
+# full build -- rather than fail the whole tree.
+ifeq ($(call version_ge, $(TC_GLIBC), 2.9),1)
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
+endif
 
 ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/rubberband
@@ -168,8 +174,13 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/speex
 CONFIGURE_ARGS += --enable-libspeex
 
+# libsrt, like librist, calls the htobe*/be*toh macros with no fallback and needs
+# glibc >= 2.9 for them (the DSM 5.2 ppc853x sysroot is glibc 2.8). openssl and
+# libuuid use the same macros but autoconf-detect their absence, so they still build.
+ifeq ($(call version_ge, $(TC_GLIBC), 2.9),1)
 DEPENDS += cross/libsrt
 CONFIGURE_ARGS += --enable-libsrt
+endif
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
@@ -297,7 +308,7 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+ifeq ($(findstring $(ARCH),qoriq ppc853x),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
@@ -310,6 +321,12 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
+
+# GPU / hardware acceleration relies on the videodriver stack (libva, libdrm,
+# libmfx) and the Vulkan/OpenCL runtimes, none of which exist below DSM 6.2.4
+# (synocli-videodriver is REQUIRED_MIN_DSM = 6.2.4). A DSM 5.2 x64 resurrected
+# with the gcc overlay is software-only -- mirror the videodriver meta gate.
+ifeq ($(call version_ge, $(TCVERSION), 6.2.4),1)
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-vaapi
 ifeq ($(call version_gt, $(TC_GCC_EFFECTIVE), 5),1)
@@ -335,6 +352,7 @@ ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 12),1)
 DEPENDS += cross/libplacebo
 CONFIGURE_ARGS += --enable-libplacebo
 endif
+endif # DSM >= 6.2.4 (videodriver / GPU stack)
 
 endif # ifeq x64_ARCHS
 
