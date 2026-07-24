@@ -204,6 +204,20 @@ ifneq ($(strip $(TC_OVERLAY_DIR)),)
 	@$(MAKE) --no-print-directory -C $(TC_OVERLAY_DIR)
 endif
 
+# The overlay extracts INTO this toolchain's tree (its EXTRACT_PATH), but keeps
+# its cookies in its OWN directory. So `clean` here wipes the deployed compiler
+# while the overlay still reports "install is up to date", and the next build
+# silently produces a toolchain with no overlay -- LEGACY_TOOLCHAIN=0 then quietly
+# falls back to the stock gcc. The state lives in two directories; it has to be
+# cleared from both.
+clean: clean-overlay
+
+.PHONY: clean-overlay
+clean-overlay:
+ifneq ($(strip $(TC_OVERLAY_DIR)),)
+	@$(MAKE) --no-print-directory -C $(TC_OVERLAY_DIR) clean
+endif
+
 rustc: tc-overlay
 include ../../mk/spksrc.toolchain/tc-rust.mk
 
