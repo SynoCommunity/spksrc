@@ -46,9 +46,11 @@ cat_PLIST:
 
 ###
 
-# Define _all as a real target that does the work
+# Define _all as a real target that does the work. 'archive' runs after install
+# and is a no-op unless the package declares NATIVE_ARCHIVE_NAME (see
+# spksrc.native/archive.mk).
 .PHONY: _all
-_all: install
+_all: install archive
 
 # all wraps _all with logging
 .PHONY: all
@@ -62,5 +64,8 @@ all:
 
 ### Include common rules
 include ../../mk/spksrc.rules.mk
+
+### Optional archive packaging (build-archive); no-op unless NATIVE_ARCHIVE is set
+include ../../mk/spksrc.native/archive.mk
 
 ###

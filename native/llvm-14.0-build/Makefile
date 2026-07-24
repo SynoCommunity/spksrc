@@ -40,17 +40,15 @@ NATIVE_DEPENDS += native/intel-vc-intrinsics
 NATIVE_DEPENDS += native/intel-opencl-clang-140
 
 # -----------------------------------------------------------------------------
+# Host the build output as a release archive, reused via DEPENDS = native/llvm-14.0
+# instead of rebuilt from source. The shared native-archive helper (included by
+# native-cc.mk) archives it automatically after install; everything else defaults
+# (txz of ./install from work-native, gated on the install bin/), so only the name
+# is declared. Declared before the front-end so the helper sees it.
+# -----------------------------------------------------------------------------
+NATIVE_ARCHIVE_NAME = native-$(PKG_NAME)-$(PKG_VERS)
+
+# -----------------------------------------------------------------------------
 # Include the common native-cmake rules
 # -----------------------------------------------------------------------------
 include ../../mk/spksrc.native-cmake.mk
-
-# -----------------------------------------------------------------------------
-# Recipe to generate an archive of installed directories
-# -----------------------------------------------------------------------------
-.PHONY: build-archive
-build-archive:
-	@$(MSG) "Build archive of install folder"
-ifeq ($(wildcard work-native/install/usr/local/bin/*),)
-	$(error "Installation not found. Please call make first.")
-endif
-	cd work-native && tar -cJf ../native-$(PKG_NAME)-$(PKG_VERS).txz ./install/*

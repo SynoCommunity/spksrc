@@ -65,6 +65,33 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "July 2026 — Host a native build's output as a reusable archive (#7327)"
+    - **What:** a new opt-in step, `spksrc.native/archive.mk` (included by
+      `spksrc.native-cc.mk`), tars a native package's install tree into a release
+      archive after `install`, so an expensive tool is built once and re-consumed
+      via `DEPENDS` instead of rebuilt from source. A package enables it with a
+      single line:
+
+        ```makefile
+        NATIVE_ARCHIVE_NAME = native-$(PKG_NAME)-$(PKG_VERS)
+        ```
+
+      The rest defaults — `NATIVE_ARCHIVE_EXT` (`txz`, mapped to the tar
+      compression like `extract.mk` does in reverse), `NATIVE_ARCHIVE_DIR`
+      (`$(WORK_DIR)`), `NATIVE_ARCHIVE_KEEP` (`./install`) and
+      `NATIVE_ARCHIVE_SENTINEL` (`$(STAGING_INSTALL_PREFIX)/bin`) — with an optional
+      debug-symbol strip and `NATIVE_ARCHIVE_EXCLUDES`. It follows the usual
+      `pre_/archive_target/post_` pattern (override `ARCHIVE_TARGET`, or set it to
+      `nop`), runs automatically from `_all`, is a **no-op unless
+      `NATIVE_ARCHIVE_NAME` is set**, and is idempotent (never re-tars an existing
+      archive). `print-archive-name` lets a generator resolve the name without
+      building.
+    - **Why:** the archive step was open-coded per package (`native/llvm-14.0-build`
+      carried its own `build-archive` recipe); this factors it into one shared,
+      defaulted helper. `native/llvm-14.0-build` adopts it here; the gcc-8.5
+      overlays reuse it in #7324.
+    - Pull request: [#7327](https://github.com/SynoCommunity/spksrc/pull/7327)
+
 ??? note "July 2026 — Carry the runtime library the binary asks for, by symbol version (#7322)"
     - **What:** the strip step copies the runtime libraries DSM does not ship
       (`libatomic`, `libquadmath`, `libgfortran` -- the `TC_LIBS_DEFAULT` list) from

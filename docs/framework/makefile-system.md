@@ -82,6 +82,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.native-cmake.mk` | Native CMake builds |
 | `spksrc.native-meson.mk` | Native Meson builds |
 | `spksrc.native-install.mk` | Install-only native build (skip configure/compile) |
+| `spksrc.native/archive.mk` | Optional post-install archive of the build output, for hosting/reuse (opt-in via `NATIVE_ARCHIVE_NAME`) |
 
 ### Python/Wheel System
 
@@ -184,6 +185,7 @@ spksrc.native-cmake.mk
 spksrc.native-install.mk
 spksrc.native-meson.mk
 spksrc.native/
+├── archive.mk                # optional post-install archive (NATIVE_ARCHIVE_NAME)
 ├── env-cmake.mk
 ├── env-default.mk            # base native env
 └── env-meson.mk
