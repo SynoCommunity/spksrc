@@ -24,7 +24,7 @@ endif
 cat_PLIST:
 	@for depend in $(DEPENDS) ; \
 	do                          \
-	  $(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../$$depend cat_PLIST ; \
+	  $(MAKE) WORK_DIR=$(WORK_DIR) LEGACY_TOOLCHAIN=$(LEGACY_TOOLCHAIN) TC_GCC_VERSION=$(TC_GCC_VERSION) --no-print-directory -C ../../$$depend cat_PLIST ; \
 	done
 	@if [ -f PLIST ] && [ -f $(WORK_DIR)/$(PKG_NAME).plist ] ; \
 	then \

@@ -25,6 +25,18 @@ ifeq ($(strip $(TC_DIST_SITE)),)
 TC_DIST_SITE = $(TC_DIST_SITE_URL)/$(TC_DIST_SITE_PATH)
 endif
 
+# spksrc keeps its own copy of the official toolchains, one release per OS
+# version (tag toolchains/<type><version>, e.g. toolchains/dsm7.0), so a build no
+# longer depends on the vendor keeping a file available. Registered as a fallback
+# rather than the primary: download.mk tries the original URL first, then appends
+# the file name to each PKG_DIST_MIRRORS base in turn. Versions already served
+# from the spksrc release (TC_VERSION_MAP source github.com/SynoCommunity/spksrc,
+# e.g. 6.2.4) are unaffected -- the candidate list is de-duplicated.
+ifeq ($(strip $(TC_DIST_MIRROR_SITE)),)
+TC_DIST_MIRROR_SITE = https://github.com/SynoCommunity/spksrc/releases/download/toolchains%2F$(subst DSM,dsm,$(subst SRM,srm,$(TC_TYPE)))$(TC_VERS)
+endif
+PKG_DIST_MIRRORS += $(TC_DIST_MIRROR_SITE)
+
 ifeq ($(strip $(TC_EXT)),)
 TC_EXT = txz
 endif

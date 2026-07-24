@@ -8,6 +8,10 @@ CHANGELOG = "1. Update to version 4.4.8<br/>2. Update to jellyfin-ffmpeg v4.4.1-
 DEPENDS = cross/ffmpeg4
 VIDEODRV_PACKAGE = synocli-videodriver
 
+# ffmpeg4 still builds on ARMv5 with the stock compiler; 4.6.4 is that gcc under DSM
+# 6.2.4, the real floor. Keep it consistent with cross/ffmpeg4.
+MIN_GCC_VERSION = 4.6.4
+
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://docs.synocommunity.com/packages/ffmpeg/
 DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo.  Informations additionnelles concernant le paquet FFmpeg de SynoCommunity disponibles à https://docs.synocommunity.com/packages/ffmpeg/

@@ -10,9 +10,24 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
+# ffmpeg4 still builds on ARMv5 with the stock compiler -- unlike ffmpeg5+, which
+# need gcc 4.9. Declare that floor: 4.6.4 is exactly the gcc ARMv5 (88f6281) ships
+# under DSM 6.2.4, so every 6.2.4 arch meets it and ARMv5 stays legacy (no overlay
+# forced) while the requirement is still stated rather than left implicit.
+MIN_GCC_VERSION = 4.6.4
+
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+# ffmpeg builds the compiler name from --cross-prefix as <prefix>gcc, ignoring the
+# environment CC. With a gcc overlay the real compiler is <prefix>gcc-8.5, so
+# cross-prefix alone would pick the stock gcc. Point --cc/--cxx at the selected
+# compiler, read drift-proof from the work dir's baked tc_vars; empty in legacy mode
+# (ARMv5's default here), giving exactly the stock name as before. Same read as the
+# coherence guard in spksrc.common/tc-capability.mk.
+_FF_GCC_SUFFIX = $(shell sed -n 's/^TC_GCC_SUFFIX *:= *//p' $(WORK_DIR)/tc_vars.mk 2>/dev/null)
+CONFIGURE_ARGS += --cc=$(TC_PATH)$(TC_PREFIX)gcc$(_FF_GCC_SUFFIX)
+CONFIGURE_ARGS += --cxx=$(TC_PATH)$(TC_PREFIX)g++$(_FF_GCC_SUFFIX)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
@@ -138,8 +153,12 @@ CONFIGURE_ARGS += --enable-librabbitmq
 endif
 
 ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+# librist uses the htobe*/be*toh macros that <endian.h> only gained in glibc 2.9;
+# the DSM 5.2 ppc853x sysroot is glibc 2.8 and never declares them. Drop it there.
+ifeq ($(call version_ge, $(TC_GLIBC), 2.9),1)
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
+endif
 endif
 
 ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
@@ -163,8 +182,12 @@ CONFIGURE_ARGS += --enable-libsoxr
 DEPENDS += cross/speex
 CONFIGURE_ARGS += --enable-libspeex
 
+# libsrt, like librist, needs glibc >= 2.9 for the htobe*/be*toh macros (ppc853x
+# 5.2 is glibc 2.8).
+ifeq ($(call version_ge, $(TC_GLIBC), 2.9),1)
 DEPENDS += cross/libsrt
 CONFIGURE_ARGS += --enable-libsrt
+endif
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
@@ -280,6 +303,13 @@ endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
+# ffmpeg4's v4l2 device builds fine on ARMv5's old kernel headers, but not on the
+# PowerPC ones: the V4L2 multiplanar API (V4L2_CAP_VIDEO_CAPTURE_MPLANE,
+# VIDEO_MAX_PLANES) it pulls in arrived in Linux 3.1, and the PPC toolchains ship
+# 2.6.32. Keyed on the kernel the toolchain provides, scoped to PPC where it bites.
+ifeq ($(call version_lt, $(TC_KERNEL), 3.1),1)
+CONFIGURE_ARGS += --disable-indev=v4l2 --disable-outdev=v4l2
+endif
 ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic

@@ -1,6 +1,0 @@
-Disabled: no new ffmpeg4 SPK release is planned at this time.
-
-Disabling the SPK keeps ffmpeg4 and its large codec dependency tree out of the
-build. Remove this file to build and release ffmpeg4 again if needed.
-
--- th0ma7, 2026-07-13

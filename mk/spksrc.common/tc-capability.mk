@@ -32,6 +32,44 @@ TC_GCC    := $(shell sed -n 's/^TC_GCC *= *//p'    $(_TC_CAP_MK) 2>/dev/null)
 TC_GLIBC  := $(shell sed -n 's/^TC_GLIBC *= *//p'  $(_TC_CAP_MK) 2>/dev/null)
 TC_KERNEL := $(shell sed -n 's/^TC_KERNEL *= *//p' $(_TC_CAP_MK) 2>/dev/null)
 
+# ---- gcc overlay selection --------------------------------------------------
+# A gcc overlay (toolchain/syno-<arch>-<vers>-gcc8) installs a newer gcc beside the
+# stock one, reusing the same sysroot. TC_OVERLAY_GCC is the gcc it can provide
+# (empty when no overlay exists here); TC_GCC (above) stays the stock gcc.
+TC_OVERLAY_GCC := $(if $(wildcard $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)-gcc8),8.5)
+# Was LEGACY_TOOLCHAIN set on purpose (command line / Makefile) rather than defaulted?
+_TC_LEGACY_EXPLICIT := $(if $(filter undefined default,$(origin LEGACY_TOOLCHAIN)),,1)
+
+# Step 1 -- pick the compiler. If the stock gcc is too old for MIN_GCC_VERSION but
+# an overlay would satisfy it, and nobody forced the stock, select the overlay:
+# picking a toolchain that meets a stated requirement is the framework's job, not
+# the package's. An explicit LEGACY_TOOLCHAIN is left untouched here and wins.
+ifneq ($(strip $(MIN_GCC_VERSION)),)
+ifneq ($(strip $(TC_GCC)),)
+ifeq ($(call version_ge,$(TC_GCC),$(MIN_GCC_VERSION)),)
+ifneq ($(call version_ge,$(TC_OVERLAY_GCC),$(MIN_GCC_VERSION)),)
+ifeq ($(_TC_LEGACY_EXPLICIT),)
+LEGACY_TOOLCHAIN := 0
+endif
+endif
+endif
+endif
+endif
+# Default: stock gcc, so an installed overlay stays inactive unless step 1 lifted it.
+LEGACY_TOOLCHAIN ?= 1
+
+# The gcc this build will actually use: the stock one when legacy, else the pin
+# (TC_GCC_VERSION) or the overlay, falling back to stock.
+TC_GCC_EFFECTIVE := $(if $(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),$(TC_GCC),$(or $(strip $(TC_GCC_VERSION)),$(TC_OVERLAY_GCC),$(TC_GCC)))
+
+# Whether TC_GCC_EFFECTIVE comes from a gcc overlay rather than the toolchain's
+# stock gcc -- the mode (overlay|legacy), known statically here. TC_GCC_SUFFIX in
+# tc_vars only exists once the work dir's tc_vars.mk has been generated, so anything
+# that runs during the dependency walk (the build status line) cannot read it and
+# must use this instead. Overlay is active when the build is not forced legacy and
+# an overlay gcc is actually available to select.
+TC_GCC_IS_OVERLAY := $(if $(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),,$(if $(or $(strip $(TC_GCC_VERSION)),$(strip $(TC_OVERLAY_GCC))),1))
+
 # Reasons accumulate rather than overwrite: an arch can miss more than one
 # capability at once -- a 32-bit target on an old gcc fails REQUIRE_64BIT and
 # MIN_GCC_VERSION together -- and reporting only the last is misleading. They are
@@ -57,12 +95,23 @@ endif
 endif
 endif
 
-# ---- gcc: the compiler the toolchain ships ----------------------------------
-# Plain ifeq rather than a nested $(if): version_ge returns empty for false.
+# ---- gcc: judged against the compiler actually selected ---------------------
+# Step 2 -- judge TC_GCC_EFFECTIVE, not the stock gcc. An overlay can lift the
+# floor, but only when it was really picked: a forced LEGACY_TOOLCHAIN=1 or a
+# too-low TC_GCC_VERSION compiles with the stock gcc anyway, and checking "could an
+# overlay satisfy this?" would wave that build through to fail deep in a source
+# file later. Each cause names itself. Plain ifeq rather than a nested $(if):
+# version_ge returns empty for false.
 ifneq ($(strip $(MIN_GCC_VERSION)),)
-ifneq ($(strip $(TC_GCC)),)
-ifeq ($(call version_ge,$(TC_GCC),$(MIN_GCC_VERSION)),)
-TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)gcc $(TC_GCC) < $(MIN_GCC_VERSION)
+ifneq ($(strip $(TC_GCC_EFFECTIVE)),)
+ifeq ($(call version_ge,$(TC_GCC_EFFECTIVE),$(MIN_GCC_VERSION)),)
+ifneq ($(call version_ge,$(TC_OVERLAY_GCC),$(MIN_GCC_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)gcc $(TC_GCC_EFFECTIVE) < $(MIN_GCC_VERSION); the $(TC_OVERLAY_GCC) overlay would satisfy it but the stock gcc was forced (LEGACY_TOOLCHAIN)
+else ifneq ($(strip $(TC_OVERLAY_GCC)),)
+TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)gcc $(TC_GCC_EFFECTIVE) < $(MIN_GCC_VERSION); the $(TC_OVERLAY_GCC) overlay is not enough either
+else
+TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)gcc $(TC_GCC_EFFECTIVE) < $(MIN_GCC_VERSION); no gcc overlay exists for this toolchain
+endif
 endif
 endif
 endif
@@ -77,6 +126,55 @@ ifeq ($(strip $(REQUIRE_64BIT)),1)
 ifneq ($(strip $(ARCH)),)
 ifeq (,$(findstring $(ARCH),$(64bit_ARCHS)))
 TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)requires a 64-bit architecture
+endif
+endif
+endif
+
+# ---- one compiler per chain, and the record has to stay honest --------------
+#
+# A build resolves its compiler once, at the root, and every dependency inherits
+# it: WORK_DIR is guarded by ifndef in directories.mk and handed down through the
+# environment by depend.mk, so the whole tree shares one work dir, one tc_vars and
+# one libstdc++. That is deliberate. A chain that mixed compilers could package
+# two copies of a runtime library, or the copy that does not match the binary
+# asking for it -- and a dependency built by gcc 8.5 asks for GLIBCXX_3.4.21 from
+# a root linked against 3.4.16.
+#
+# The cost of freezing it is that a stale or contradicted record is invisible.
+# Two divergences pass in silence today, and one comparison catches both:
+#
+#   - the mode changed since this work dir was made (a Makefile edited, another
+#     LEGACY_TOOLCHAIN on the command line). tc_vars keeps the old compiler and
+#     the build quietly keeps using it.
+#   - a dependency declares the opposite of the chain it is pulled into. Its
+#     declaration is dropped without a word: cross/zlib carrying
+#     LEGACY_TOOLCHAIN=1, built under a chain on the overlay, comes out compiled
+#     by gcc 8.5.
+#
+# An error, not a silent regeneration: the mode also invalidates what is already
+# built here -- install/ holds libraries from the previous compiler -- so nothing
+# short of a clean makes the tree coherent again. The message has to say so.
+#
+# Skipped in the toolchain context: that is where tc_vars is generated, and a
+# generator must not be stopped by the file it is about to overwrite.
+#
+# Also skipped once the capability check above has already refused this arch. Both
+# fire on the same mistake -- MIN_GCC_VERSION unmet because the stock gcc was
+# forced -- but that one names the cause while this one only reports that the work
+# dir disagrees, which is its consequence. Reporting a symptom over a known cause
+# helps nobody.
+ifeq ($(strip $(TC_CAPABILITY_UNSUPPORTED)),)
+ifneq ($(notdir $(abspath $(CURDIR)/..)),toolchain)
+_TC_VARS_RECORDED := $(wildcard $(WORK_DIR)/tc_vars.mk)
+ifneq ($(_TC_VARS_RECORDED),)
+
+_TC_SUFFIX_IS   := $(strip $(shell sed -n 's/^TC_GCC_SUFFIX *:= *//p' $(_TC_VARS_RECORDED) 2>/dev/null))
+_TC_SUFFIX_WANT := $(if $(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),,$(if $(strip $(TC_GCC_VERSION)),-$(strip $(TC_GCC_VERSION)),$(if $(strip $(TC_OVERLAY_GCC)),-$(strip $(TC_OVERLAY_GCC)))))
+
+ifneq ($(_TC_SUFFIX_IS),$(_TC_SUFFIX_WANT))
+$(error $(or $(strip $(NAME)),$(notdir $(CURDIR))) asks for $(if $(_TC_SUFFIX_WANT),gcc$(_TC_SUFFIX_WANT),the stock gcc) but $(WORK_DIR) was built with $(if $(_TC_SUFFIX_IS),gcc$(_TC_SUFFIX_IS),the stock gcc). One compiler is fixed for a whole dependency chain: mixing them packages runtime libraries that do not match the binaries asking for them. Run 'make clean' to rebuild this chain in one mode -- or align the declaration with it)
+endif
+
 endif
 endif
 endif
