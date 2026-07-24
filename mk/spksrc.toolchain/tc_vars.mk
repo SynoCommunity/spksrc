@@ -284,7 +284,9 @@ tc_meson_cross_vars:
 	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
-	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
+	    echo "# meson's 'cpp' is the C++ compiler; our TOOLS 'cpp' is the C" ; \
+	    echo "# preprocessor -- hence g++ here, plus the overlay suffix if any." ; \
+	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++$(TC_GCC_SUFFIX)'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
 	    echo "fortran = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
