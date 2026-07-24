@@ -10,12 +10,29 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
-# requires c11 and proper atomic using gcc-4.9+ support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Needs C11 and working atomics -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+# ffmpeg builds the compiler name from --cross-prefix as <prefix>gcc, ignoring the
+# environment CC. With a gcc overlay the real compiler is <prefix>gcc-8.5, so
+# cross-prefix alone picks the stock gcc and configure dies -- on the old archs with
+# "no atomics available" (stdatomic.h arrived in gcc 4.9), on others with "Compiler
+# lacks C11 support".
+#
+# Read the suffix tc_vars baked into the work dir, not the live TC_GCC_SUFFIX make
+# variable: tc_vars.mk recomputes that one and clears it whenever LEGACY_TOOLCHAIN is
+# not propagated into this dependency sub-make, which would silently drop --cc back to
+# the stock gcc while every other package still used the overlay (its CC is baked into
+# the environment and survives). The recorded value is written once, in the mode the
+# whole tree was built with, and cannot drift; it is empty in legacy mode, giving
+# exactly the stock name as before. Same read as the coherence guard in
+# spksrc.common/tc-capability.mk.
+_FF_GCC_SUFFIX = $(shell sed -n 's/^TC_GCC_SUFFIX *:= *//p' $(WORK_DIR)/tc_vars.mk 2>/dev/null)
+CONFIGURE_ARGS += --cc=$(TC_PATH)$(TC_PREFIX)gcc$(_FF_GCC_SUFFIX)
+CONFIGURE_ARGS += --cxx=$(TC_PATH)$(TC_PREFIX)g++$(_FF_GCC_SUFFIX)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
@@ -69,7 +86,7 @@ DEPENDS = cross/cairo
 DEPENDS += cross/chromaprint-fftw
 CONFIGURE_ARGS += --enable-chromaprint
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/frei0r
 CONFIGURE_ARGS += --enable-frei0r
 endif
@@ -107,7 +124,7 @@ CONFIGURE_ARGS += --enable-libfribidi
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/libjxl
 CONFIGURE_ARGS += --enable-libjxl
 endif
@@ -127,7 +144,7 @@ CONFIGURE_ARGS += --enable-librabbitmq
 DEPENDS += cross/librist
 CONFIGURE_ARGS += --enable-librist
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/rubberband
 CONFIGURE_ARGS += --enable-librubberband
 endif
@@ -154,7 +171,7 @@ CONFIGURE_ARGS += --enable-libtheora
 DEPENDS += cross/twolame
 CONFIGURE_ARGS += --enable-libtwolame
 
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 7.5),1)
 DEPENDS += cross/libvmaf
 CONFIGURE_ARGS += --enable-libvmaf
 endif
@@ -219,7 +236,31 @@ CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
 
-ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
+# The V4L2 multiplanar API (V4L2_CAP_VIDEO_CAPTURE_MPLANE, VIDEO_MAX_PLANES,
+# v4l2_buffer.m.planes) arrived in Linux 3.1, and ffmpeg's v4l2 device uses it
+# unconditionally. Toolchains that ship older kernel headers (armv5 and the old PPC
+# on 2.6.32) cannot compile it. Keyed on the kernel the toolchain provides rather
+# than on an arch list, so it holds for every such toolchain and needs no upkeep.
+ifeq ($(call version_lt, $(TC_KERNEL), 3.1),1)
+CONFIGURE_ARGS += --disable-indev=v4l2 --disable-outdev=v4l2
+endif
+
+# ARMv5 has no NEON and no thumb2; ported from ffmpeg4, which still declares it.
+# ffmpeg's configure fails outright without an --arch when cross-compiling.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --disable-neon
+endif
+
+# <assert.h> only gained the C11 static_assert macro in glibc 2.16, so even gcc 8.5
+# -- which has the _Static_assert keyword -- fails ffmpeg's C11 static-assert check
+# on older sysroots (glibc 2.15 on armv5). Map the macro to the keyword the compiler
+# does have. A header gap, not a compiler one -- keyed on TC_GLIBC, not the arch.
+ifeq ($(call version_lt, $(TC_GLIBC), 2.16),1)
+CONFIGURE_ARGS += --extra-cflags=-Dstatic_assert=_Static_assert
+endif
+
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
 CONFIGURE_ARGS += --enable-thumb
@@ -255,7 +296,7 @@ ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-vaapi
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+ifeq ($(call version_gt, $(TC_GCC_EFFECTIVE), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
@@ -266,7 +307,7 @@ CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
 
 # Enable OpenCL and Vulkan acceleration
-ifeq ($(call version_gt, $(TC_GCC), 5),1)
+ifeq ($(call version_gt, $(TC_GCC_EFFECTIVE), 5),1)
 #CONFIGURE_ARGS += --enable-libglslang  # <-- Mutually exclusive to shaderc
 CONFIGURE_ARGS += --enable-libshaderc
 CONFIGURE_ARGS += --enable-opencl
@@ -274,7 +315,7 @@ CONFIGURE_ARGS += --enable-vulkan
 endif
 
 # Requires GCC >= 12 (C++20 <version> header support)
-ifeq ($(call version_ge, $(TC_GCC), 12),1)
+ifeq ($(call version_ge, $(TC_GCC_EFFECTIVE), 12),1)
 DEPENDS += cross/libplacebo
 CONFIGURE_ARGS += --enable-libplacebo
 endif
