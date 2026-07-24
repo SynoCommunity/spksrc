@@ -1,5 +1,5 @@
 PKG_NAME = loom
-PKG_VERS = 0.2.2
+PKG_VERS = 0.2.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-source-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Ebenderooock/loom/releases/download/v$(PKG_VERS)
@@ -7,7 +7,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # Pinned upstream release commit so buildinfo.Commit is accurate without hitting
 # the (rate-limited) GitHub API at build time. Bump together with PKG_VERS.
-PKG_COMMIT = 7f34860
+PKG_COMMIT = db8e0ab
 
 BUILD_DEPENDS = native/go
 
