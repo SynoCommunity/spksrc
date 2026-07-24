@@ -1,0 +1,22 @@
+[{
+    "step_title": "Choisir votre variante",
+    "items": [{
+        "type": "textfield",
+        "desc": "Sélectionner le dépôt à utiliser",
+        "subitems": [{
+            "key": "wizard_fork_url",
+            "desc": "Fork URL",
+            "defaultValue": "git://github.com/Tautulli/Tautulli.git",
+            "validator": {
+                "allowBlank": false
+            }
+        }, {
+            "key": "wizard_fork_branch",
+            "desc": "Branche du dépôt",
+            "defaultValue": "master",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }]
+}]
