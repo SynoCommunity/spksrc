@@ -13,6 +13,13 @@ LICENSE  = BSD-3-Clause-Clear license
 # Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
 MIN_GCC_VERSION = 7.5
 
+# Build libvvenc only. The test executables (vvencinterfacetest and friends) link
+# with the C driver -- their source is .c -- so cmake picks C as the link language
+# and omits libstdc++, then fails on the C++ symbols they pull from libvvenc:
+#   vvencinterfacetest: undefined reference to `operator delete(void*, ...)@CXXABI'
+# ffmpeg depends on libvvenc, never on these binaries, so there is nothing to lose.
+CONFIGURE_ARGS += -DVVENC_LIBRARY_ONLY=ON
+
 include ../../mk/spksrc.common.mk
 
 # ARMv5 has no NEON at all, and neither ARMv7L (hi3535) nor the ARMv7 targets we
