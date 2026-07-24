@@ -1,6 +1,6 @@
 SPK_NAME = loom
 SPK_VERS = 0.2.4
-SPK_REV = 1
+SPK_REV = 2
 SPK_ICON = src/loom.png
 
 DEPENDS = cross/loom
