@@ -1,0 +1,3 @@
+# Packages that build a C extension and must be cross-compiled.
+charset_normalizer==3.4.9
+PyYAML==6.0.3

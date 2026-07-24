@@ -1,0 +1,30 @@
+# Pure python wheels. Resolved from "subliminal==2.6.0".
+babelfish==0.6.1
+beautifulsoup4==4.15.0
+certifi==2026.6.17
+chardet==7.4.3
+click==8.4.2
+click-option-group==0.5.9
+decorator==5.3.1
+defusedxml==0.7.1
+dogpile.cache==1.5.0
+enzyme==0.5.2
+guessit==3.8.0
+idna==3.18
+knowit==0.5.11
+platformdirs==4.10.0
+# pymediainfo is a ctypes wrapper: it needs cross/libmediainfo at runtime.
+pymediainfo==7.0.1
+pysubs2==1.8.1
+python-dateutil==2.9.0.post0
+rebulk==3.2.0
+requests==2.34.2
+six==1.17.0
+soupsieve==2.8.4
+srt==3.5.3
+stevedore==5.9.0
+subliminal==2.6.0
+tomlkit==0.15.0
+trakit==0.2.5
+typing_extensions==4.16.0
+urllib3==2.7.0
