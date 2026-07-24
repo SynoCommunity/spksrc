@@ -130,4 +130,53 @@ endif
 endif
 endif
 
+# ---- one compiler per chain, and the record has to stay honest --------------
+#
+# A build resolves its compiler once, at the root, and every dependency inherits
+# it: WORK_DIR is guarded by ifndef in directories.mk and handed down through the
+# environment by depend.mk, so the whole tree shares one work dir, one tc_vars and
+# one libstdc++. That is deliberate. A chain that mixed compilers could package
+# two copies of a runtime library, or the copy that does not match the binary
+# asking for it -- and a dependency built by gcc 8.5 asks for GLIBCXX_3.4.21 from
+# a root linked against 3.4.16.
+#
+# The cost of freezing it is that a stale or contradicted record is invisible.
+# Two divergences pass in silence today, and one comparison catches both:
+#
+#   - the mode changed since this work dir was made (a Makefile edited, another
+#     LEGACY_TOOLCHAIN on the command line). tc_vars keeps the old compiler and
+#     the build quietly keeps using it.
+#   - a dependency declares the opposite of the chain it is pulled into. Its
+#     declaration is dropped without a word: cross/zlib carrying
+#     LEGACY_TOOLCHAIN=1, built under a chain on the overlay, comes out compiled
+#     by gcc 8.5.
+#
+# An error, not a silent regeneration: the mode also invalidates what is already
+# built here -- install/ holds libraries from the previous compiler -- so nothing
+# short of a clean makes the tree coherent again. The message has to say so.
+#
+# Skipped in the toolchain context: that is where tc_vars is generated, and a
+# generator must not be stopped by the file it is about to overwrite.
+#
+# Also skipped once the capability check above has already refused this arch. Both
+# fire on the same mistake -- MIN_GCC_VERSION unmet because the stock gcc was
+# forced -- but that one names the cause while this one only reports that the work
+# dir disagrees, which is its consequence. Reporting a symptom over a known cause
+# helps nobody.
+ifeq ($(strip $(TC_CAPABILITY_UNSUPPORTED)),)
+ifneq ($(notdir $(abspath $(CURDIR)/..)),toolchain)
+_TC_VARS_RECORDED := $(wildcard $(WORK_DIR)/tc_vars.mk)
+ifneq ($(_TC_VARS_RECORDED),)
+
+_TC_SUFFIX_IS   := $(strip $(shell sed -n 's/^TC_GCC_SUFFIX *:= *//p' $(_TC_VARS_RECORDED) 2>/dev/null))
+_TC_SUFFIX_WANT := $(if $(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),,$(if $(strip $(TC_GCC_VERSION)),-$(strip $(TC_GCC_VERSION)),$(if $(strip $(TC_OVERLAY_GCC)),-$(strip $(TC_OVERLAY_GCC)))))
+
+ifneq ($(_TC_SUFFIX_IS),$(_TC_SUFFIX_WANT))
+$(error $(or $(strip $(NAME)),$(notdir $(CURDIR))) asks for $(if $(_TC_SUFFIX_WANT),gcc$(_TC_SUFFIX_WANT),the stock gcc) but $(WORK_DIR) was built with $(if $(_TC_SUFFIX_IS),gcc$(_TC_SUFFIX_IS),the stock gcc). One compiler is fixed for a whole dependency chain: mixing them packages runtime libraries that do not match the binaries asking for them. Run 'make clean' to rebuild this chain in one mode -- or align the declaration with it)
+endif
+
+endif
+endif
+endif
+
 endif # ifneq ARCH/TCVERSION
