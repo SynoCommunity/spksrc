@@ -66,6 +66,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Development"><td><a href="git/">Git</a></td><td>Development</td><td>Version control system</td></tr>
     <tr data-category="Security"><td><a href="google-authenticator/">Google Authenticator</a></td><td>Security</td><td>PAM module for two-factor authentication</td></tr>
     <tr data-category="Home Automation"><td><a href="homeassistant/">Home Assistant</a></td><td>Home Automation</td><td>Home automation platform</td></tr>
+    <tr data-category="Media Server"><td><a href="immich/">Immich</a></td><td>Media Server</td><td>Self-hosted photo and video backup solution</td></tr>
     <tr data-category="Media Server"><td><a href="jellyfin/">Jellyfin</a></td><td>Media Server</td><td>Media streaming server</td></tr>
     <tr data-category="Media Server"><td><a href="kiwix/">Kiwix</a></td><td>Media Server</td><td>Offline Wikipedia and content server</td></tr>
     <tr data-category="Media Server"><td><a href="loom/">Loom</a></td><td>Media Server</td><td>Federated and encrypted live streaming</td></tr>

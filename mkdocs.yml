@@ -209,6 +209,7 @@ nav:
       - Flexget: packages/flexget.md
       - Radarr/Sonarr: packages/radarr-sonarr.md
     - Media Server:
+      - Immich: packages/immich.md
       - Jellyfin: packages/jellyfin.md
       - Kiwix: packages/kiwix.md
       - Loom: packages/loom.md
