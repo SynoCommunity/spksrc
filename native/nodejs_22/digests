@@ -1,3 +1,6 @@
 node-v22.21.1-linux-x64.tar.xz SHA1 9dfebe7af4cf3569c5843fb349cf0961f44eeab6
 node-v22.21.1-linux-x64.tar.xz SHA256 680d3f30b24a7ff24b98db5e96f294c0070f8f9078df658da1bce1b9c9873c88
 node-v22.21.1-linux-x64.tar.xz MD5 0ffa621330b60a0cac9bb6161caf5217
+node-v22.21.1-linux-arm64.tar.xz SHA1 0384777e7e29e58629bb6851ec1c8adf4941d8e8
+node-v22.21.1-linux-arm64.tar.xz SHA256 e660365729b434af422bcd2e8e14228637ecf24a1de2cd7c916ad48f2a0521e1
+node-v22.21.1-linux-arm64.tar.xz MD5 5fc90598f433efa9f48008af2fc3bc0e
