@@ -7,6 +7,10 @@ SPK_ICON = src/python3.png
 # Compiler must support std=c++11
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
 
+# Python 3.14 uses C11 atomics (<stdatomic.h>), which gcc ships from 4.9 on; the
+# DSM 5.2 x86/x64 stock gcc is 4.7.3, so the capability gate lifts it to the overlay.
+MIN_GCC_VERSION = 4.9
+
 DEPENDS  = cross/python314
 
 MAINTAINER = SynoCommunity
