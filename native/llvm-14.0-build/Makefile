@@ -46,7 +46,7 @@ NATIVE_DEPENDS += native/intel-opencl-clang-140
 # (txz of ./install from work-native, gated on the install bin/), so only the name
 # is declared. Declared before the front-end so the helper sees it.
 # -----------------------------------------------------------------------------
-NATIVE_ARCHIVE_NAME = native-$(PKG_NAME)-$(PKG_VERS)
+ARCHIVE_NAME = native-$(PKG_NAME)-$(PKG_VERS)_$(shell date +%Y.%m.%d)
 
 # -----------------------------------------------------------------------------
 # Include the common native-cmake rules
