@@ -45,6 +45,22 @@ wheel/crossenv targets are available — see
 `crossenv-<arch>-<tcvers>`, `download-wheels`, `wheelclean`, `wheelcleancache`,
 `crossenvclean`, `crossenvcleanall`.
 
+### Native Package Targets
+
+Run from `native/<package>/` directory (host tools built once, then reused via
+`NATIVE_DEPENDS`):
+
+| Target | Description |
+|--------|-------------|
+| `all` | Build everything (default): download → … → install, then `archive` |
+| `download` `checksum` `extract` `patch` `configure` `compile` `install` | Individual build lifecycle steps, in order |
+| `build-archive` / `print-archive-name` | Create the reusable archive on demand / print its filename (opt-in via `ARCHIVE_NAME`, see `spksrc.native/archive.mk`) |
+| `nativeclean` | Drop **this** package's build cookies so every step re-runs next `make`, keeping the work dir (source, install, archive). The native counterpart of `spkclean`; leaves dependencies' cookies alone |
+| `clean` / `smart-clean` | Remove all work directories / this package's source and cookies |
+
+To re-run a single step, remove its one cookie, e.g.
+`rm work-native/.<pkg>-archive_done`.
+
 ### Inspecting the dependency graph
 
 `dependency-tree`, `dependency-flat` and `dependency-list` share three optional
