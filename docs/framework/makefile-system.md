@@ -77,12 +77,12 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 | File | Purpose |
 |------|--------|
-| `spksrc.native-cc.mk` | Native compilation entry point |
+| `spksrc.native-cc.mk` | Native compilation entry point (also defines `nativeclean`, the native counterpart of `spkclean`) |
 | `spksrc.native/env-default.mk` | Native build environment |
 | `spksrc.native-cmake.mk` | Native CMake builds |
 | `spksrc.native-meson.mk` | Native Meson builds |
 | `spksrc.native-install.mk` | Install-only native build (skip configure/compile) |
-| `spksrc.native/archive.mk` | Optional post-install archive of the build output, for hosting/reuse (opt-in via `NATIVE_ARCHIVE_NAME`) |
+| `spksrc.native/archive.mk` | Optional post-install archive of the build output, for hosting/reuse (opt-in via `ARCHIVE_NAME`) |
 
 ### Python/Wheel System
 
@@ -185,7 +185,7 @@ spksrc.native-cmake.mk
 spksrc.native-install.mk
 spksrc.native-meson.mk
 spksrc.native/
-├── archive.mk                # optional post-install archive (NATIVE_ARCHIVE_NAME)
+├── archive.mk                # optional post-install archive (ARCHIVE_NAME)
 ├── env-cmake.mk
 ├── env-default.mk            # base native env
 └── env-meson.mk

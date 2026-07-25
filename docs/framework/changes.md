@@ -63,9 +63,16 @@ If you only read one thing, read this. The details are in the dated log below.
   linked `--as-needed` so a binary depends on them only when it truly uses them.
   See [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
 
+- **Build a host tool once, host it, reuse it.** A native package hosts its build
+  output as a release archive with a single line — **`ARCHIVE_NAME`** — so an
+  expensive tool (llvm, the gcc-8.5 overlays) is built once and pulled in via
+  `DEPENDS` instead of rebuilt from source. **`make nativeclean`** drops a native
+  package's build cookies to re-run it from scratch, the native counterpart of
+  `spkclean`.
+
 ---
 
-??? note "July 2026 — Host a native build's output as a reusable archive (#7327)"
+??? note "July 24th 2026 — Host a native build's output as a reusable archive (#7327)"
     - **What:** a new opt-in step, `spksrc.native/archive.mk` (included by
       `spksrc.native-cc.mk`), tars a native package's install tree into a release
       archive after `install`, so an expensive tool is built once and re-consumed
@@ -73,26 +80,29 @@ If you only read one thing, read this. The details are in the dated log below.
       single line:
 
         ```makefile
-        NATIVE_ARCHIVE_NAME = native-$(PKG_NAME)-$(PKG_VERS)
+        ARCHIVE_NAME = native-$(PKG_NAME)-$(PKG_VERS)
         ```
 
-      The rest defaults — `NATIVE_ARCHIVE_EXT` (`txz`, mapped to the tar
-      compression like `extract.mk` does in reverse), `NATIVE_ARCHIVE_DIR`
-      (`$(WORK_DIR)`), `NATIVE_ARCHIVE_KEEP` (`./install`) and
-      `NATIVE_ARCHIVE_SENTINEL` (`$(STAGING_INSTALL_PREFIX)/bin`) — with an optional
-      debug-symbol strip and `NATIVE_ARCHIVE_EXCLUDES`. It follows the usual
-      `pre_/archive_target/post_` pattern (override `ARCHIVE_TARGET`, or set it to
-      `nop`), runs automatically from `_all`, is a **no-op unless
-      `NATIVE_ARCHIVE_NAME` is set**, and is idempotent (never re-tars an existing
-      archive). `print-archive-name` lets a generator resolve the name without
-      building.
+      The rest defaults — `ARCHIVE_EXT` (`txz`, mapped to the tar compression like
+      `extract.mk` does in reverse), `ARCHIVE_DIR` (`$(WORK_DIR)`) and `ARCHIVE_KEEP`
+      (`./install`) — with an optional debug-symbol strip and `ARCHIVE_EXCLUDES`. It
+      follows the usual `pre_/archive_target/post_` pattern (override `ARCHIVE_TARGET`,
+      or set it to `nop`), runs automatically from `_all`, is a **no-op unless
+      `ARCHIVE_NAME` is set**, and is guarded by a status cookie like every other step
+      (`extract`, `compile`, ...) so it runs once per work dir. `print-archive-name`
+      lets a generator resolve the name without building.
+    - **Also:** `nativeclean`, the native counterpart of `spkclean`, drops the master
+      package's build cookies so every step re-runs on the next make while keeping the
+      work dir; and the variables carry no redundant `NATIVE_` prefix (`ARCHIVE_*`,
+      matching `ARCHIVE_CMD` / `ARCHIVE_COOKIE`). The step just runs and lets `tar`
+      fail if nothing was built, rather than pre-checking a sentinel.
     - **Why:** the archive step was open-coded per package (`native/llvm-14.0-build`
       carried its own `build-archive` recipe); this factors it into one shared,
       defaulted helper. `native/llvm-14.0-build` adopts it here; the gcc-8.5
       overlays reuse it in #7324.
     - Pull request: [#7327](https://github.com/SynoCommunity/spksrc/pull/7327)
 
-??? note "July 2026 — Carry the runtime library the binary asks for, by symbol version (#7322)"
+??? note "July 23rd 2026 — Carry the runtime library the binary asks for, by symbol version (#7322)"
     - **What:** the strip step copies the runtime libraries DSM does not ship
       (`libatomic`, `libquadmath`, `libgfortran` -- the `TC_LIBS_DEFAULT` list) from
       the toolchain. It now selects the copy whose **symbol versions** satisfy the
@@ -106,9 +116,7 @@ If you only read one thing, read this. The details are in the dated log below.
     - No package-facing change.
     - Pull request: [#7322](https://github.com/SynoCommunity/spksrc/pull/7322)
 
----
-
-??? note "July 2026 — Detect Fortran by probing the compiler (#7321)"
+??? note "July 23rd 2026 — Detect Fortran by probing the compiler (#7321)"
     - **What:** `TC_HAS_FORTRAN` was a static "7.x / SRM 1.3 / 6.2.4-x64 ship
       gfortran" table; it is now a probe of the actual `gfortran` binary, evaluated
       (like `TC_HAS_LIBATOMIC`) in the tc_vars sub-make after the toolchain is
@@ -121,9 +129,7 @@ If you only read one thing, read this. The details are in the dated log below.
     - No package-facing change.
     - Pull request: [#7321](https://github.com/SynoCommunity/spksrc/pull/7321)
 
----
-
-??? note "July 2026 — Toolchain ABI and link flags reach every language (#7314)"
+??? note "July 23rd 2026 — Toolchain ABI and link flags reach every language (#7314)"
     A toolchain's ABI/arch flags now consistently reach every language and the
     link, and two link-time libraries stopped being hand-maintained arch lists.
 
@@ -149,9 +155,7 @@ If you only read one thing, read this. The details are in the dated log below.
       [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
     - Pull request: [#7314](https://github.com/SynoCommunity/spksrc/pull/7314)
 
----
-
-??? note "July 2026 — Declare toolchain capabilities instead of arch lists (#7313)"
+??? note "July 23rd 2026 — Declare toolchain capabilities instead of arch lists (#7313)"
     A package can now say what it *needs* from a toolchain rather than list the
     architectures where it happens to fail today.
 
