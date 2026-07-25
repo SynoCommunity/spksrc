@@ -13,6 +13,7 @@
 #  version_ge  : true if version A >= version B
 #  version_lt  : true if version A <  version B
 #  version_gt  : true if version A >  version B
+#  version_max : highest version of a list
 #
 #  uniq        : removes duplicate words while preserving order
 #  dedup       : de-duplicates delimiter-separated strings
@@ -30,6 +31,7 @@
 # Macro: Version Comparison
 version_le = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
+version_max = $(lastword $(shell printf '%s\n' $(1) | sort -V))
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 
@@ -112,7 +114,7 @@ define LOG_WRAPPED
     fi \
 ' || { \
     $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" \
-        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(1)") \
+        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(STATUS_ARCH)" "$(1)") \
         | tee --append $(STATUS_LOG) ; \
     exit 1 ; \
 }
