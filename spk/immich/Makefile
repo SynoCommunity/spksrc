@@ -29,6 +29,8 @@ SERVICE_WIZARD_SHARENAME = wizard_media_share
 
 POST_STRIP_TARGET = immich_extra_install
 
+SPK_COMMANDS = bin/immich-admin
+
 include ../../mk/spksrc.spk.mk
 
 .PHONY: immich_extra_install
@@ -37,6 +39,7 @@ immich_extra_install:
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/bin/server-launcher.js $(STAGING_DIR)/bin/
 	install -m 755 src/bin/immich-ml-launcher.sh $(STAGING_DIR)/bin/
+	install -m 755 src/bin/immich-admin $(STAGING_DIR)/bin/
 	@$(MSG) Install runtime config template
 	install -m 755 -d $(STAGING_DIR)/etc
 	install -m 644 src/etc/immich.conf $(STAGING_DIR)/etc/immich.conf
