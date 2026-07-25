@@ -29,6 +29,18 @@ SVC_WRITE_PID=y
 
 SERVICE_COMMAND=""
 
+install_log ()
+{
+    local _msg_="$@"
+    if [ -z "${_msg_}" ]; then
+        while IFS=$'\n' read -r line; do
+            install_log "${line}"
+        done
+    else
+        echo -e "$(date +'%Y/%m/%d %H:%M:%S')\t${_msg_}" 1>&2
+    fi
+}
+
 service_prestart()
 {
     if [ -f "${IMMICH_CONF}" ]; then
@@ -39,8 +51,15 @@ service_prestart()
     SERVICE_COMMAND="${NODE} ${SERVER_LAUNCHER}"
 
     if [ "${IMMICH_MACHINE_LEARNING_ENABLED}" = "true" ]; then
-        SERVICE_COMMAND="${SERVICE_COMMAND}
+        if [ -x "${ML_VENV}/bin/python3" ] && \
+           PYTHONPATH="${SYNOPKG_PKGDEST}/share/immich/immich-ml:${PYTHONPATH}" \
+           "${ML_VENV}/bin/python3" -c "from immich_ml.main import app" 2>/dev/null; then
+            SERVICE_COMMAND="${SERVICE_COMMAND}
 ${MLLAUNCHER}"
+        else
+            install_log "WARNING: ML dependencies incomplete; disabling machine learning for this session."
+            export IMMICH_MACHINE_LEARNING_ENABLED=false
+        fi
     fi
 }
 
