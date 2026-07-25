@@ -115,6 +115,14 @@ pre_rustc_target: rustc_msg
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path ; \
 	flock -u 5
 
+# The target test is anchored on both sides: "rustup target list" prints one target
+# per line, with " (installed)" appended, and rust target names are prefixes of one
+# another -- armv7-unknown-linux-gnueabi is a prefix of armv7-unknown-linux-gnueabihf.
+# An unanchored "^$(RUST_TARGET)" therefore matches the OTHER target's line too, and
+# the "installed" test below then reads a state that belongs to a different target:
+# a gnueabi arch can conclude "already installed" from the gnueabihf line, skip the
+# install, and only fail later when something links against a rust-std that was never
+# put there.
 rustc_target: $(PRE_RUSTC_TARGET) $(TC_LOCAL_VARS_RUST)
 	@$(MSG) "rustup toolchain install $(RUSTUP_DEFAULT_TOOLCHAIN)" ; \
 	exec 5> /tmp/tc-rustc.lock ; \
@@ -124,7 +132,7 @@ rustc_target: $(PRE_RUSTC_TARGET) $(TC_LOCAL_VARS_RUST)
 	rustup toolchain install $(RUSTUP_DEFAULT_TOOLCHAIN) ; \
 	$(MSG) "rustup default $(RUSTUP_DEFAULT_TOOLCHAIN)" ; \
 	rustup default $(RUSTUP_DEFAULT_TOOLCHAIN) ; \
-	TARGET_STATUS=$$(rustup target list --toolchain $(TC_RUSTUP_TOOLCHAIN) 2>/dev/null | grep "^$(RUST_TARGET)") || true ; \
+	TARGET_STATUS=$$(rustup target list --toolchain $(TC_RUSTUP_TOOLCHAIN) 2>/dev/null | grep -E "^$(RUST_TARGET)( |$$)") || true ; \
 	if echo "$$TARGET_STATUS" | grep -q "installed" ; then \
 	   $(MSG) "Rust target $(RUST_TARGET) already installed — skipping" ; \
 	   rustup show ; \
