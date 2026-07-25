@@ -151,7 +151,7 @@ service_postinst ()
                 fastapi uvicorn gunicorn pydantic pydantic-settings \
                 python-multipart rich aiocache rapidocr 2>&1 || true
             # insightface pulls in opencv-python (GUI); force back to headless
-            "${ML_VENV}/bin/pip3" install --force-reinstall --no-cache-dir opencv-python-headless 2>&1 || true
+            "${ML_VENV}/bin/pip3" install --force-reinstall --no-deps --no-cache-dir opencv-python-headless 2>&1 || true
         fi
     fi
 }
@@ -193,7 +193,7 @@ service_postupgrade ()
             huggingface-hub numpy orjson pillow tokenizers \
             fastapi uvicorn gunicorn pydantic pydantic-settings \
             python-multipart rich aiocache rapidocr 2>&1 || true
-        "${ML_VENV}/bin/pip3" install --force-reinstall --no-cache-dir opencv-python-headless 2>&1 || true
+        "${ML_VENV}/bin/pip3" install --force-reinstall --no-deps --no-cache-dir opencv-python-headless 2>&1 || true
     fi
 }
 
