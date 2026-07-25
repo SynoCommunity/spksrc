@@ -48,11 +48,25 @@ TC_LIBRARY_PATH = $(realpath $(TC_PATH)..)/$(TC_LIBRARY)
 # to carry starts here rather than at the sysroot lib alone.
 TC_TOOLCHAIN_ROOT = $(realpath $(TC_PATH)..)
 
-# Runtime libraries DSM does not ship, so any binary that needs one has to carry it
-# from the toolchain. libstdc++/libgcc_s are deliberately NOT here: DSM ships them,
-# and carrying a newer copy only matters once a gcc overlay can outpace the DSM one
-# -- that arrives with the overlay, as a separate TC_LIBS_OVERLAY list.
+# Libraries a package may have to carry from the toolchain because DSM does not
+# provide what the binary needs. The two lists differ by WHY a copy is needed, which
+# is what decides when to take one:
+#
+#   TC_LIBS_DEFAULT  DSM ships no copy at all, so any binary that needs one must
+#                    carry it. Historical list, behaviour unchanged.
+#
+#   TC_LIBS_OVERLAY  DSM ships a copy -- so a copy is carried ONLY when a binary asks
+#                    for a symbol version that copy does not provide. This could not
+#                    happen while the compiler was always the toolchain's own; a gcc
+#                    overlay makes it routine: gcc 8.5 emits references to
+#                    GLIBCXX_3.4.21 while the DSM 6.2.4 libstdc++ stops at 3.4.16, so
+#                    the binary links here and then fails to start on the NAS.
 TC_LIBS_DEFAULT = libatomic.so libquadmath.so libgfortran.so
+TC_LIBS_OVERLAY = libstdc++.so libgcc_s.so
+
+# What the NAS itself provides: the sysroot mirrors the running system, so it is the
+# reference for "does DSM already satisfy this binary?" (the TC_LIBS_OVERLAY test).
+TC_SYSROOT_LIBDIR = $(TC_LIBRARY_PATH)
 
 .PHONY: strip strip_msg
 .PHONY: $(PRE_STRIP_TARGET) $(STRIP_TARGET) $(POST_STRIP_TARGET)
@@ -81,10 +95,17 @@ _versions_needed_() { \
       want && /Name:/ { for (i = 1; i <= NF; i++) if ($$i == "Name:") print $$(i+1) }' ; \
 } ; \
 _select_tclib_() { \
-   _tclib_="$$1" ; _bin_="$$2" ; \
+   _tclib_="$$1" ; _bin_="$$2" ; _policy_="$$3" ; \
    _soname_=$$(objdump -p "$$_bin_" 2>/dev/null | awk '/NEEDED/ { print $$2 }' | grep -F "$$_tclib_" | head -1) ; \
    [ -n "$$_soname_" ] || return 1 ; \
    _need_=$$(_versions_needed_ "$$_bin_" "$$_soname_") ; \
+   if [ "$$_policy_" = "version" ] ; then \
+      _nas_=$$(realpath -e $(TC_SYSROOT_LIBDIR)/$$_soname_ 2>/dev/null) ; \
+      if [ -n "$$_nas_" ] && _provides_ "$$_nas_" $$_need_ ; then \
+         echo "===>      $$_soname_: DSM copy already provides what $$(basename $$_bin_) asks for" >&2 ; \
+         return 1 ; \
+      fi ; \
+   fi ; \
    for _cand_ in $$(find $(TC_TOOLCHAIN_ROOT) -name "$$_tclib_" 2>/dev/null | xargs -r realpath 2>/dev/null | sort -u) ; do \
       if _provides_ "$$_cand_" $$_need_ ; then echo "$$_cand_" ; return 0 ; fi ; \
    done ; \
@@ -106,12 +127,13 @@ endef
 
 include_toolchain_specific_libraries:
 	@$(_tclib_helpers) ; \
-	for tclib in $(TC_LIBS_DEFAULT); do \
-	echo  "===> SEARCHING for $${tclib}" ; \
+	for tclib in $(TC_LIBS_DEFAULT) $(TC_LIBS_OVERLAY); do \
+	case " $(TC_LIBS_OVERLAY) " in *" $${tclib} "*) _policy_=version ;; *) _policy_=always ;; esac ; \
+	echo  "===> SEARCHING for $${tclib} ($${_policy_})" ; \
 	cat $(INSTALL_PLIST) | sed 's/:/ /' | while read type file ; do \
 	  case $${type} in \
 	    lib|bin) \
-	         _src_=$$(_select_tclib_ "$${tclib}" "$(STAGING_DIR)/$${file}" || true) ; \
+	         _src_=$$(_select_tclib_ "$${tclib}" "$(STAGING_DIR)/$${file}" "$${_policy_}" || true) ; \
 	         if [ -n "$${_src_}" ]; then \
 	            echo  "===>  Found in $${file} for library dependency from toolchain ($${tclib})" ; \
 	            _install_tclib_ "$${tclib}" "$${_src_}" ; \
@@ -124,7 +146,7 @@ include_toolchain_specific_libraries:
 	   for shlib in $$(zipinfo -1 $${wheel} *.so 2>/dev/null) ; do \
 	      _tmp_=$$(mktemp -d -p $(WORK_DIR)/wheelhouse) ; \
 	      unzip -qq -d $${_tmp_} $${wheel} $${shlib} ; \
-	      _src_=$$(_select_tclib_ "$${tclib}" "$${_tmp_}/$${shlib}" || true) ; \
+	      _src_=$$(_select_tclib_ "$${tclib}" "$${_tmp_}/$${shlib}" "$${_policy_}" || true) ; \
 	      if [ -n "$${_src_}" ]; then \
 	         echo  "===>  Found in $$(basename $${wheel}) for library dependency from toolchain ($${tclib})" ; \
 	         _install_tclib_ "$${tclib}" "$${_src_}" ; \
