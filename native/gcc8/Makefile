@@ -36,7 +36,7 @@ POST_INSTALL_TARGET  = gcc8_post_install
 #   make TC_ARCH=<arch> TC_VERS=<vers> build-archive
 #
 # Declared BEFORE the native front-end include so the helper (pulled in by
-# native-cc.mk) sees NATIVE_ARCHIVE; the '=' refs resolve later. Keep the whole
+# native-cc.mk) sees ARCHIVE_NAME; the '=' refs resolve later. Keep the whole
 # install prefix EXCEPT host docs (share/var) and the NATIVE_DEPENDS math libs
 # (gmp/mpfr/mpc/isl) installed into the same prefix. Exclusion, not a dir
 # allow-list, because the C++ headers / runtime libs live in different places per
@@ -60,23 +60,28 @@ POST_INSTALL_TARGET  = gcc8_post_install
 #       the absolute path of the machine that built the archive
 GCC8_REV = v3
 
-NATIVE_ARCHIVE = $(TC_ARCH)-gcc$(subst .,,$(PKG_VERS))_binutils$(subst .,,$(TC_BINUTILS))_glibc$(subst .,,$(TC_GLIBC))_$(firstword $(subst -, ,$(TC_TARGET)))-GPL-dsm$(subst .,,$(TC_VERS))-$(GCC8_REV).txz
-NATIVE_ARCHIVE_SENTINEL = $(INSTALL_DIR)$(INSTALL_PREFIX)/bin/$(TC_TARGET)-gcc-8.5
-NATIVE_ARCHIVE_STRIP = 1
-NATIVE_ARCHIVE_STRIP_TARGET = $(TC_BINUTILS_BIN)/$(TC_TARGET)-strip
-NATIVE_ARCHIVE_STRIP_TARGET_DIRS = $(TC_TARGET) lib/gcc/$(TC_TARGET)
-NATIVE_ARCHIVE_EXCLUDES  = --exclude=./share
-NATIVE_ARCHIVE_EXCLUDES += --exclude=./var
-NATIVE_ARCHIVE_EXCLUDES += --exclude='*/pkgconfig'
-NATIVE_ARCHIVE_EXCLUDES += --exclude='*/libgmp*'
-NATIVE_ARCHIVE_EXCLUDES += --exclude='*/libmpfr*'
-NATIVE_ARCHIVE_EXCLUDES += --exclude='*/libmpc*'
-NATIVE_ARCHIVE_EXCLUDES += --exclude='*/libisl*'
-NATIVE_ARCHIVE_EXCLUDES += --exclude='*/gmp.h'
-NATIVE_ARCHIVE_EXCLUDES += --exclude='*/mpfr.h'
-NATIVE_ARCHIVE_EXCLUDES += --exclude='*/mpf2mpfr.h'
-NATIVE_ARCHIVE_EXCLUDES += --exclude='*/mpc.h'
-NATIVE_ARCHIVE_EXCLUDES += --exclude='./include/isl'
+# ARCHIVE_NAME is the base name without extension; ARCHIVE_EXT (txz) adds it.
+ARCHIVE_NAME = $(TC_ARCH)-gcc$(subst .,,$(PKG_VERS))_binutils$(subst .,,$(TC_BINUTILS))_glibc$(subst .,,$(TC_GLIBC))_$(firstword $(subst -, ,$(TC_TARGET)))-GPL-dsm$(subst .,,$(TC_VERS))-$(GCC8_REV)
+# The helper defaults ARCHIVE_DIR/KEEP to $(WORK_DIR)/./install; gcc-8.5 is archived
+# from the install prefix itself (KEEP=. of $(GCC8_STAGE)) so the tree unpacks
+# straight over the base toolchain -- keep those two explicit.
+ARCHIVE_DIR  = $(GCC8_STAGE)
+ARCHIVE_KEEP = .
+ARCHIVE_STRIP = 1
+ARCHIVE_STRIP_TARGET = $(TC_BINUTILS_BIN)/$(TC_TARGET)-strip
+ARCHIVE_STRIP_TARGET_DIRS = $(TC_TARGET) lib/gcc/$(TC_TARGET)
+ARCHIVE_EXCLUDES  = --exclude=./share
+ARCHIVE_EXCLUDES += --exclude=./var
+ARCHIVE_EXCLUDES += --exclude='*/pkgconfig'
+ARCHIVE_EXCLUDES += --exclude='*/libgmp*'
+ARCHIVE_EXCLUDES += --exclude='*/libmpfr*'
+ARCHIVE_EXCLUDES += --exclude='*/libmpc*'
+ARCHIVE_EXCLUDES += --exclude='*/libisl*'
+ARCHIVE_EXCLUDES += --exclude='*/gmp.h'
+ARCHIVE_EXCLUDES += --exclude='*/mpfr.h'
+ARCHIVE_EXCLUDES += --exclude='*/mpf2mpfr.h'
+ARCHIVE_EXCLUDES += --exclude='*/mpc.h'
+ARCHIVE_EXCLUDES += --exclude='./include/isl'
 
 include ../../mk/spksrc.native-toolchain.mk
 
