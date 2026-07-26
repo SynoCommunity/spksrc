@@ -12,16 +12,16 @@ LICENSE = Copyright (c) 2015-2024 The Khronos Group Inc.
 
 DEPENDS = cross/Khronos-SPIRV-Tools
 
-CMAKE_ARGS  = -DENABLE_OPT='OFF'
-CMAKE_ARGS += -DALLOW_EXTERNAL_SPIRV_TOOLS='ON'
-CMAKE_ARGS += -DBUILD_SHARED_LIBS='ON'
-CMAKE_ARGS += -DGLSLANG_TESTS='ON'
+CONFIGURE_ARGS  = -DENABLE_OPT='OFF'
+CONFIGURE_ARGS += -DALLOW_EXTERNAL_SPIRV_TOOLS='ON'
+CONFIGURE_ARGS += -DBUILD_SHARED_LIBS='ON'
+CONFIGURE_ARGS += -DGLSLANG_TESTS='ON'
 
 include ../../mk/spksrc.common.mk
 
 # std::filesystem integration to libstdc++ >= GCC 9
 ifeq ($(call version_lt, $(TC_GCC), 9),1)
-CMAKE_ARGS += -DCMAKE_CXX_STANDARD_LIBRARIES=-lstdc++fs
+CONFIGURE_ARGS += -DCMAKE_CXX_STANDARD_LIBRARIES=-lstdc++fs
 endif
 
 POST_EXTRACT_TARGET = glslang_post_extract_target

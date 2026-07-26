@@ -13,7 +13,7 @@ COMMENT  = An IMAP mail filtering utility using the Lua programming language as 
 LICENSE  = MIT
 
 CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 POST_INSTALL_TARGET = imapfilter_post_install
 
 ENV += SHAREDIR="$(INSTALL_PREFIX)/share/imapfilter"

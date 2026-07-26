@@ -7,16 +7,15 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# Minimum GCC version required is 7
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 
 HOMEPAGE = https://google.github.io/highway/
 COMMENT  = Performance-portable, length-agnostic SIMD with runtime dispatch.
 LICENSE  = Apache 2.0 / 3-Clause BSD
 
-CMAKE_ARGS += -DBUILD_SHARED_LIBS=ON
-CMAKE_ARGS += -DHWY_ENABLE_TESTS=OFF
-CMAKE_ARGS += -DHWY_ENABLE_EXAMPLES=OFF
+CONFIGURE_ARGS += -DBUILD_SHARED_LIBS=ON
+CONFIGURE_ARGS += -DHWY_ENABLE_TESTS=OFF
+CONFIGURE_ARGS += -DHWY_ENABLE_EXAMPLES=OFF
 
 include ../../mk/spksrc.cross-cmake.mk

@@ -1,0 +1,77 @@
+[{
+    "step_title": "PostgreSQL Configuration",
+    "items": [{
+        "desc": "Immich requires a PostgreSQL database. Enter the admin credentials to create the database, and a password for the Immich database user."
+    }, {
+        "type": "textfield",
+        "desc": "Admin username (default: pgadmin)",
+        "subitems": [{
+            "key": "wizard_pg_username_admin",
+            "desc": "Username",
+            "defaultValue": "pgadmin",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "desc": "Admin password",
+        "subitems": [{
+            "key": "wizard_pg_password_admin",
+            "desc": "Password",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "desc": "Immich database password",
+        "subitems": [{
+            "key": "wizard_pg_password_immich",
+            "desc": "Database password",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*?{}()\\[\\]\\-=_+\\;'\":<>/,.])[A-Za-z\\d!@#$%^&*?{}()\\[\\]\\-=_+\\;'\":<>/,.]{10,}$/",
+                    "errorText": "Password must be at least 10 characters and include: uppercase, lowercase, number, and special character."
+                }
+            }
+        }]
+    }]
+}, {
+    "step_title": "Media Storage",
+    "items": [{
+        "desc": "Specify a shared folder for photo and video storage. This share is created if it does not already exist."
+    }, {
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_media_share",
+            "desc": "Shared folder",
+            "defaultValue": "immich-media",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^[\\w _-]+$/",
+                    "errorText": "Shared folder name must not contain path separators or special characters."
+                }
+            }
+        }]
+    }]
+}, {
+    "step_title": "Machine Learning",
+    "items": [{
+        "desc": "Optional: enables smart search, facial recognition, and OCR. Downloads ~300 MB of ML dependencies on first install."
+    }, {
+        "type": "singleselect",
+        "desc": "Enable Machine Learning",
+        "subitems": [{
+            "key": "wizard_enable_ml",
+            "desc": "Enabled",
+            "defaultValue": false
+        }, {
+            "key": "wizard_disable_ml",
+            "desc": "Disabled",
+            "defaultValue": true
+        }]
+    }]
+}]

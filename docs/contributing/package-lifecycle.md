@@ -12,13 +12,13 @@ When a package should no longer be offered for new installations, it follows **o
 
 ## The two tracks at a glance
 
-| | **Disabled** (`BROKEN`) | **Retired** (archived) |
+| | **Disabled** (`BROKEN` / `DISABLED`) | **Retired** (archived) |
 |---|---|---|
 | Git repository | source **kept** (dormant) | source **removed** |
 | Built / published | no | no |
 | On the [package site](https://synocommunity.com/packages) | no longer offered | shown as **archived** |
 | Basis for the decision | no longer supported **upstream**, but plausibly revivable | **too old and obviously obsolete** |
-| Reversible? | yes — remove the `BROKEN` file | only by re-introducing the package |
+| Reversible? | yes — remove the `BROKEN` / `DISABLED` file | only by re-introducing the package |
 
 In both cases, **existing installations keep working** — they simply receive no further updates.
 
@@ -32,7 +32,7 @@ A package stays active as long as it broadly satisfies all of the following:
 - **It is the preferred version** — not superseded by a newer package.
 - **It has a path to maintenance** — issues can realistically be fixed (an active maintainer, or a community-fixable build).
 
-## Track 1 — Disabled (`BROKEN`, kept in git)
+## Track 1 — Disabled (`BROKEN` / `DISABLED`, kept in git)
 
 For packages that **upstream no longer supports** (or whose upstream dropped the installation method SynoCommunity relies on), but that are recent or relevant enough to keep **dormant and revivable**.
 
@@ -46,7 +46,7 @@ The source is **kept in the tree** so the work is preserved and the package can 
 
 ### How to disable
 
-Create `spk/<package>/BROKEN` with a short, dated reason and a reference where applicable:
+Create a marker file in the package folder — either `spk/<package>/BROKEN` or `spk/<package>/DISABLED`; both are accepted and have the same effect. Use `DISABLED` when the package is intentionally turned off (e.g. no release planned) and `BROKEN` when it is actually failing — pick whichever reads best. Give it a short, dated reason and a reference where applicable:
 
 ```text
 Package no-longer maintained - superseded by ffmpeg7
@@ -57,11 +57,11 @@ Package no-longer maintained - superseded by ffmpeg7
 ref: https://www.home-assistant.io/blog/2025/05/22/deprecating-core-...
 ```
 
-The build framework skips any package that has a `BROKEN` file, and CI stops publishing it.
+The build framework skips any package that has a `BROKEN` or `DISABLED` file, and CI stops publishing it.
 
 ### Reactivating
 
-Removing the `BROKEN` file re-enables the package. This is appropriate when the blocking cause is resolved (upstream resumes support, a compatible runtime returns, the build is fixed) **and** a maintainer commits to keeping it working. A reactivation is validated by a normal build (locally or in CI) before merging.
+Removing the `BROKEN` / `DISABLED` file re-enables the package. This is appropriate when the blocking cause is resolved (upstream resumes support, a compatible runtime returns, the build is fixed) **and** a maintainer commits to keeping it working. A reactivation is validated by a normal build (locally or in CI) before merging.
 
 ## Track 2 — Retired (removed from git, archived online)
 

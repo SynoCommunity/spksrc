@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/qsv.c
-===================================================================
 --- libavcodec/qsv.c
 +++ libavcodec/qsv.c
 @@ -201,10 +201,14 @@ enum AVPixelFormat ff_qsv_map_fourcc(uin
@@ -46,8 +44,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsv.c
  #endif
  #endif
      default:
-Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
-===================================================================
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
 @@ -85,6 +85,10 @@ static const struct {
@@ -61,8 +57,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
      { DXGI_FORMAT_B8G8R8A8_UNORM, AV_PIX_FMT_BGRA },
      // Special opaque formats. The pix_fmt is merely a place holder, as the
      // opaque format cannot be accessed directly.
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
 @@ -100,12 +100,18 @@ static const struct {
@@ -110,8 +104,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
  #endif
      default:
          return MFX_ERR_UNSUPPORTED;
-Index: jellyfin-ffmpeg/libavutil/pixdesc.c
-===================================================================
 --- libavutil/pixdesc.c
 +++ libavutil/pixdesc.c
 @@ -228,6 +228,41 @@ static const AVPixFmtDescriptor av_pix_f
@@ -156,8 +148,6 @@ Index: jellyfin-ffmpeg/libavutil/pixdesc.c
      [AV_PIX_FMT_RGB24] = {
          .name = "rgb24",
          .nb_components = 3,
-Index: jellyfin-ffmpeg/libavutil/pixfmt.h
-===================================================================
 --- libavutil/pixfmt.h
 +++ libavutil/pixfmt.h
 @@ -358,6 +358,10 @@ enum AVPixelFormat {
@@ -179,8 +169,6 @@ Index: jellyfin-ffmpeg/libavutil/pixfmt.h
  #define AV_PIX_FMT_X2RGB10    AV_PIX_FMT_NE(X2RGB10BE, X2RGB10LE)
  
  /**
-Index: jellyfin-ffmpeg/libswscale/input.c
-===================================================================
 --- libswscale/input.c
 +++ libswscale/input.c
 @@ -573,6 +573,25 @@ static void y210le_Y_c(uint8_t *dst, con
@@ -229,8 +217,6 @@ Index: jellyfin-ffmpeg/libswscale/input.c
      case AV_PIX_FMT_X2RGB10LE:
          c->lumToYV12 =rgb30leToY_c;
          break;
-Index: jellyfin-ffmpeg/libswscale/output.c
-===================================================================
 --- libswscale/output.c
 +++ libswscale/output.c
 @@ -2492,6 +2492,53 @@ yuv2ya8_X_c(SwsContext *c, const int16_t
@@ -297,8 +283,6 @@ Index: jellyfin-ffmpeg/libswscale/output.c
      case AV_PIX_FMT_AYUV64LE:
          *yuv2packedX = yuv2ayuv64le_X_c;
          break;
-Index: jellyfin-ffmpeg/libswscale/swscale_unscaled.c
-===================================================================
 --- libswscale/swscale_unscaled.c
 +++ libswscale/swscale_unscaled.c
 @@ -403,6 +403,41 @@ static int yuyvToYuv422Wrapper(SwsContex
@@ -355,8 +339,6 @@ Index: jellyfin-ffmpeg/libswscale/swscale_unscaled.c
      /* uint Y to float Y */
      if (srcFormat == AV_PIX_FMT_GRAY8 && dstFormat == AV_PIX_FMT_GRAYF32){
          c->swscale = uint_y_to_float_y_wrapper;
-Index: jellyfin-ffmpeg/libswscale/utils.c
-===================================================================
 --- libswscale/utils.c
 +++ libswscale/utils.c
 @@ -271,6 +271,7 @@ static const FormatEntry format_entries[

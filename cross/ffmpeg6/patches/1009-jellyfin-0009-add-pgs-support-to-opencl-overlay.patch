@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/opencl/overlay.cl
-===================================================================
 --- libavfilter/opencl/overlay.cl
 +++ libavfilter/opencl/overlay.cl
 @@ -16,15 +16,24 @@
@@ -34,7 +32,7 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/overlay.cl
      int2 overlay_size = get_image_dim(overlay);
      int2 loc = (int2)(get_global_id(0), get_global_id(1));
  
-@@ -41,15 +50,15 @@ __kernel void overlay_no_alpha(__write_o
+@@ -41,15 +50,15 @@ __kernel void overlay_no_alpha(__write_only image2d_t dst,
      }
  }
  
@@ -58,7 +56,7 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/overlay.cl
      int2 overlay_size = get_image_dim(overlay);
      int2 loc = (int2)(get_global_id(0), get_global_id(1));
  
-@@ -63,24 +72,50 @@ __kernel void overlay_internal_alpha(__w
+@@ -63,24 +72,50 @@ __kernel void overlay_internal_alpha(__write_only image2d_t dst,
          int2 loc_overlay  = (int2)(x_position, y_position);
          float4 in_main    = read_imagef(main,    sampler, loc);
          float4 in_overlay = read_imagef(overlay, sampler, loc - loc_overlay);
@@ -121,7 +119,7 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/overlay.cl
      int2 loc = (int2)(get_global_id(0), get_global_id(1));
  
      if (loc.x <  x_position ||
-@@ -90,13 +125,14 @@ __kernel void overlay_external_alpha(__w
+@@ -90,13 +125,14 @@ __kernel void overlay_external_alpha(__write_only image2d_t dst,
          float4 val = read_imagef(main, sampler, loc);
          write_imagef(dst, loc, val);
      } else {
@@ -142,8 +140,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/overlay.cl
  
          float4 val = in_overlay * in_alpha.x + in_main * (1.0f - in_alpha.x);
          write_imagef(dst, loc, val);
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
-===================================================================
 --- libavfilter/vf_overlay_opencl.c
 +++ libavfilter/vf_overlay_opencl.c
 @@ -27,72 +27,117 @@
@@ -228,7 +224,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
  {
      OverlayOpenCLContext *ctx = avctx->priv;
      cl_int cle;
--    const char *source = ff_opencl_source_overlay;
+-    const char *source = ff_source_overlay_cl;
 -    const char *kernel;
 -    const AVPixFmtDescriptor *main_desc, *overlay_desc;
 -    int err, i, main_planes, overlay_planes;
@@ -295,11 +291,11 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
 +    av_log(avctx, AV_LOG_DEBUG, "Using kernel %s.\n", ctx->kernel_name);
  
 -    err = ff_opencl_filter_load_program(avctx, &source, 1);
-+    err = ff_opencl_filter_load_program(avctx, &ff_opencl_source_overlay, 1);
++    err = ff_opencl_filter_load_program(avctx, &ff_source_overlay_cl, 1);
      if (err < 0)
          goto fail;
  
-@@ -102,10 +147,20 @@ static int overlay_opencl_load(AVFilterC
+@@ -102,10 +147,20 @@ static int overlay_opencl_load(AVFilterContext *avctx,
      CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create OpenCL "
                       "command queue %d.\n", cle);
  
@@ -442,7 +438,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
  
      err = ff_framesync_get_frame(fs, 0, &input_main, 0);
      if (err < 0)
-@@ -136,14 +283,14 @@ static int overlay_opencl_blend(FFFrameS
+@@ -136,14 +283,14 @@ static int overlay_opencl_blend(FFFrameSync *fs)
      if (err < 0)
          return err;
  
@@ -453,18 +449,18 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
 -            (AVHWFramesContext*)input_overlay->hw_frames_ctx->data;
 +    if (!input_main)
 +        return AVERROR_BUG;
-+
-+    if (!input_overlay)
-+        passthrough = 1;
  
 -        err = overlay_opencl_load(avctx, main_fc->sw_format,
 -                                  overlay_fc->sw_format);
++    if (!input_overlay)
++        passthrough = 1;
++
 +    if (!ctx->initialised) {
 +        err = overlay_opencl_load(avctx);
          if (err < 0)
              return err;
      }
-@@ -154,54 +301,10 @@ static int overlay_opencl_blend(FFFrameS
+@@ -154,54 +301,10 @@ static int overlay_opencl_blend(FFFrameSync *fs)
          goto fail;
      }
  
@@ -522,7 +518,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
      }
  
      cle = clFinish(ctx->command_queue);
-@@ -216,6 +319,9 @@ static int overlay_opencl_blend(FFFrameS
+@@ -216,6 +319,9 @@ static int overlay_opencl_blend(FFFrameSync *fs)
      return ff_filter_frame(outlink, output);
  
  fail:
@@ -532,7 +528,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
      av_frame_free(&output);
      return err;
  }
-@@ -224,8 +330,49 @@ static int overlay_opencl_config_output(
+@@ -224,8 +330,49 @@ static int overlay_opencl_config_output(AVFilterLink *outlink)
  {
      AVFilterContext *avctx = outlink->src;
      OverlayOpenCLContext *ctx = avctx->priv;
@@ -582,7 +578,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
      err = ff_opencl_filter_config_output(outlink);
      if (err < 0)
          return err;
-@@ -234,6 +381,11 @@ static int overlay_opencl_config_output(
+@@ -234,6 +381,11 @@ static int overlay_opencl_config_output(AVFilterLink *outlink)
      if (err < 0)
          return err;
  
@@ -594,7 +590,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
      return ff_framesync_configure(&ctx->fs);
  }
  
-@@ -265,6 +417,20 @@ static av_cold void overlay_opencl_unini
+@@ -265,6 +417,20 @@ static av_cold void overlay_opencl_uninit(AVFilterContext *avctx)
                     "kernel: %d.\n", cle);
      }
  
@@ -615,7 +611,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
      if (ctx->command_queue) {
          cle = clReleaseCommandQueue(ctx->command_queue);
          if (cle != CL_SUCCESS)
-@@ -279,11 +445,20 @@ static av_cold void overlay_opencl_unini
+@@ -279,11 +445,20 @@ static av_cold void overlay_opencl_uninit(AVFilterContext *avctx)
  
  #define OFFSET(x) offsetof(OverlayOpenCLContext, x)
  #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
@@ -636,3 +632,9 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_opencl.c
      { NULL },
  };
  
+@@ -322,5 +497,4 @@ const AVFilter ff_vf_overlay_opencl = {
+     FILTER_OUTPUTS(overlay_opencl_outputs),
+     FILTER_SINGLE_PIXFMT(AV_PIX_FMT_OPENCL),
+     .flags_internal  = FF_FILTER_FLAG_HWFRAME_AWARE,
+-    .flags          = AVFILTER_FLAG_HWDEVICE,
+ };

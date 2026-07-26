@@ -13,7 +13,7 @@ HOMEPAGE = https://www.libssh.org/
 COMMENT  = libssh is a multiplatform C library implementing the SSHv2 protocol on client and server side.
 LICENSE  = LGPL v2.1
 
-CMAKE_ARGS += -DWITH_EXAMPLES=OFF
+CONFIGURE_ARGS += -DWITH_EXAMPLES=OFF
 POST_EXTRACT_TARGET = libssh_post-extract
 
 include ../../mk/spksrc.cross-cmake.mk

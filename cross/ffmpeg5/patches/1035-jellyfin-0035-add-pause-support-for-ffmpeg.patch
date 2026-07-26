@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/fftools/ffmpeg.c
-===================================================================
 --- fftools/ffmpeg.c
 +++ fftools/ffmpeg.c
 @@ -130,6 +130,9 @@ typedef struct BenchmarkTimeStamps {

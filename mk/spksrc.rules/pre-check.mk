@@ -23,7 +23,9 @@ ifneq ($(DEPENDENCY_WALK),1)
 # required for packages that have folder name different to SPK_NAME (sonarr -> nzbget, mono_58 -> mono)
 SPK_FOLDER = $(notdir $(CURDIR))
 
-ifneq ($(wildcard BROKEN),)
+# A package is disabled by dropping a BROKEN or DISABLED file in its folder
+# (both are treated identically).
+ifneq ($(strip $(wildcard BROKEN) $(wildcard DISABLED)),)
   ifneq ($(BUILD_UNSUPPORTED_FILE),)
     $(shell echo $(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Broken package >> $(BUILD_UNSUPPORTED_FILE))
   endif
@@ -41,6 +43,15 @@ ifneq ($(REQUIRE_KERNEL),)
       @$(error Generic arch '$(ARCH)' cannot be used when REQUIRE_KERNEL is set unless using REQUIRE_KERNEL_MODULE)
     endif
   endif
+endif
+
+# Refuse an arch whose toolchain cannot meet MIN_GCC_VERSION / MIN_GLIBC_VERSION
+# (see spksrc.common/tc-capability.mk). Says why, not just where.
+ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED)),)
+  ifneq (,$(BUILD_UNSUPPORTED_FILE))
+    $(shell echo "$(date --date=now +"%Y.%m.%d %H:%M:%S") - $(SPK_FOLDER): Arch '$(ARCH)-$(TCVERSION)' unsupported: $(TC_CAPABILITY_UNSUPPORTED)" >> $(BUILD_UNSUPPORTED_FILE))
+  endif
+  @$(error Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME): $(TC_CAPABILITY_UNSUPPORTED))
 endif
 
 # Check whether package supports ARCH

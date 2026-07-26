@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_vulkan.c
-===================================================================
 --- libavutil/hwcontext_vulkan.c
 +++ libavutil/hwcontext_vulkan.c
 @@ -111,6 +111,9 @@ typedef struct VulkanDevicePriv {

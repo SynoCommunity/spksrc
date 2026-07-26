@@ -1,8 +1,6 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
-===================================================================
 --- libavutil/hwcontext_vaapi.c
 +++ libavutil/hwcontext_vaapi.c
-@@ -150,6 +150,7 @@ static const VAAPIFormatDescriptor vaapi
+@@ -150,6 +150,7 @@ static const VAAPIFormatDescriptor vaapi_format_map[] = {
      MAP(XRGB, RGB32,   0RGB, 0),
  #ifdef VA_FOURCC_X2R10G10B10
      MAP(X2R10G10B10, RGB32_10, X2RGB10, 0),
@@ -33,7 +31,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
  #if defined(VA_FOURCC_XYUV) && defined(DRM_FORMAT_XYUV8888)
      DRM_MAP(XYUV, 1, DRM_FORMAT_XYUV8888),
  #endif
-@@ -1094,12 +1101,6 @@ static int vaapi_map_from_drm(AVHWFrames
+@@ -1094,12 +1101,6 @@ static int vaapi_map_from_drm(AVHWFramesContext *src_fc, AVFrame *dst,
  
      desc = (AVDRMFrameDescriptor*)src->data[0];
  
@@ -46,7 +44,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
      va_fourcc = 0;
      for (i = 0; i < FF_ARRAY_ELEMS(vaapi_drm_format_map); i++) {
          if (desc->nb_layers != vaapi_drm_format_map[i].nb_layer_formats)
-@@ -1239,6 +1240,12 @@ static int vaapi_map_from_drm(AVHWFrames
+@@ -1239,6 +1240,12 @@ static int vaapi_map_from_drm(AVHWFramesContext *src_fc, AVFrame *dst,
                                 buffer_attrs, FF_ARRAY_ELEMS(buffer_attrs));
      }
  #else

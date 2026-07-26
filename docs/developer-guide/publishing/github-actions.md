@@ -28,7 +28,9 @@ The CI determines which packages to build by:
 
 - Checking files changed in the PR
 - Following dependency chains (if `cross/libfoo` changes, all packages using it rebuild)
-- Respecting `UNSUPPORTED_ARCHS` settings
+- Respecting capability floors (`MIN_GCC_VERSION` / `MIN_GLIBC_VERSION` /
+  `REQUIRE_64BIT`), OS-version constraints (`REQUIRED_MIN_DSM` /
+  `REQUIRED_MAX_DSM` / `REQUIRED_MIN_SRM`) and `UNSUPPORTED_ARCHS` settings
 
 ## Workflow Files
 
@@ -131,7 +133,10 @@ For manual publishing without CI, see [Manual Publishing](manual-publishing.md).
 
 **Architecture-specific failures:**
 
-- Check `UNSUPPORTED_ARCHS` in package Makefile
+- Check the capability floors (`MIN_GCC_VERSION` / `MIN_GLIBC_VERSION` /
+  `REQUIRE_64BIT`), the OS-version constraints (`REQUIRED_MIN_DSM` /
+  `REQUIRED_MAX_DSM` / `REQUIRED_MIN_SRM`) and `UNSUPPORTED_ARCHS` in the package
+  Makefile
 - Review architecture-specific patches
 - Examine cross-compilation flags
 

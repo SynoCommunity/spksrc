@@ -14,18 +14,11 @@ LICENSE  = GPLv2/GPLv3
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = stockfish_install
 
-include ../../mk/spksrc.common.mk
 
 # Toolchains lacking c++11 compiler ar not supported
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-# use builtin atomic support
-ADDITIONAL_LDFLAGS = -latomic
-endif
-
-
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 	BUILD_ARCH=armv8
@@ -46,14 +39,15 @@ ifeq ($(BUILD_ARCH),)
 $(error "ARCH $(ARCH) not expected.")
 endif
 
-COMPILE_MAKE_OPTIONS = build ARCH=$(BUILD_ARCH)
+COMPILE_ARGS = build ARCH=$(BUILD_ARCH)
 ifeq (g++,$(CXX))
 # workaround for: CXX not fully qualified when building in cross folder
-COMPILE_MAKE_OPTIONS += COMPCXX=$(TC_PATH)$(TC_PREFIX)$(CXX)
+COMPILE_ARGS += COMPCXX=$(TC_PATH)$(TC_PREFIX)$(CXX)
 else
-COMPILE_MAKE_OPTIONS += COMPCXX=$(CXX)
+COMPILE_ARGS += COMPCXX=$(CXX)
 endif
 
+include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: stockfish_install
 stockfish_install:

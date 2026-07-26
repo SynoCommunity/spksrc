@@ -14,6 +14,6 @@ HOMEPAGE = https://intel.github.io/libvpl/latest/index.html
 COMMENT  = Intel® Video Processing Library (Intel® VPL) tools provide access to hardware accelerated video decode, encode, and frame processing capabilities on Intel® GPUs from the command line.
 LICENSE  = MIT
 
-CMAKE_ARGS += -DTOOLS_ENABLE_X11=OFF
+CONFIGURE_ARGS += -DTOOLS_ENABLE_X11=OFF
 
 include ../../mk/spksrc.cross-cmake.mk

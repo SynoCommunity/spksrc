@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
 @@ -47,6 +47,7 @@

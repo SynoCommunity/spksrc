@@ -25,7 +25,7 @@ GNU_CONFIGURE = 1
 PRE_CONFIGURE_TARGET = mtr_pre_configure
 
 # avoid creation of exec hooks
-INSTALL_MAKE_OPTIONS = install-sbinPROGRAMS DESTDIR=$(INSTALL_DIR)
+INSTALL_ARGS = install-sbinPROGRAMS DESTDIR=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 

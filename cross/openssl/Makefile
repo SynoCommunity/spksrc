@@ -13,7 +13,7 @@ LICENSE  = Apache-2.0
 
 CONFIGURE_TARGET = openssl_configure
 
-INSTALL_MAKE_OPTIONS = install_sw DESTDIR=$(INSTALL_DIR)
+INSTALL_ARGS = install_sw DESTDIR=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 

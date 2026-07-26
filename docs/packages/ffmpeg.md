@@ -15,19 +15,23 @@ FFmpeg provides a set of command line tools to process audio and video media fil
 Commands are located in `/usr/local/ffmpeg<version>/bin` and libraries are required by
 other packages. In DSM 7.0+, they are located in `/volume1/@appstore/ffmpeg<version>/bin`.
 
-Symbolic links are made available through `/usr/local/bin` where the latest installed version becomes the default:
+Versioned symbolic links are made available through `/usr/local/bin`, one pair per installed version (no unversioned `ffmpeg`/`ffprobe` link):
 
-- `ffmpeg4`
-- `ffmpeg5`
-- `ffmpeg6`
-- `ffmpeg7`
-- `ffmpeg` → Last installed version
+- `ffmpeg4`, `ffmpeg5`, `ffmpeg6`, `ffmpeg7`, `ffmpeg8`
+- `ffprobe4`, `ffprobe5`, `ffprobe6`, `ffprobe7`, `ffprobe8`
+
+```bash
+ls -l /usr/local/bin/ff*
+# ffmpeg8  -> /var/packages/ffmpeg8/target/bin/ffmpeg8
+# ffprobe8 -> /var/packages/ffmpeg8/target/bin/ffprobe8
+# ...
+```
 
 ## Package Information
 
 | Property | Value |
 |----------|-------|
-| Package Name | ffmpeg4, ffmpeg5, ffmpeg6, ffmpeg7 |
+| Package Name | ffmpeg4, ffmpeg5, ffmpeg6, ffmpeg7, ffmpeg8 |
 | Upstream | [ffmpeg.org](https://ffmpeg.org/) |
 | License | LGPL/GPL |
 
@@ -192,20 +196,54 @@ This confirms OpenCL runtime and GPU compute path are operational.
 
 ### Vulkan Acceleration
 
-Vulkan may work on Synology models using a 5.10 kernel or newer using <https://github.com/007revad/Transcode_for_x25>.
+FFmpeg's Vulkan filters (`libplacebo`, `scale_vulkan`, `overlay_vulkan`, ...) run
+on the Vulkan device provided by the [SynoCli Video Driver](synocli-videodriver.md)
+(Mesa `anv`). Whether they are **runtime-usable** depends on the Synology **kernel**,
+and there are two distinct failure tiers.
 
-Vulkan fails on older Synology models:
+**Tier 1 — Vulkan does not initialize at all (oldest models):**
 ```bash
 /var/packages/synocli-videodriver/target/bin/vulkaninfo
 # ERROR: VK_ERROR_INITIALIZATION_FAILED
-```
 
-FFmpeg Vulkan initialization failure on older models:
-```bash
-ffmpeg7 -hide_banner -v verbose -init_hw_device vulkan
+ffmpeg8 -hide_banner -v verbose -init_hw_device vulkan
 # [AVHWDeviceContext @ ...] Device creation failure: VK_ERROR_INITIALIZATION_FAILED
 # Failed to set value 'vulkan' for option 'init_hw_device'
 ```
+
+**Tier 2 — Vulkan initializes, but filters fail (e.g. DS918+, Apollo Lake, DSM kernel 4.4.302+):**
+
+Here `vulkaninfo` sees the GPU and `ffmpeg -init_hw_device vulkan` succeeds, but any
+filter that uploads a frame to the GPU fails, because FFmpeg needs to export an
+**external Vulkan semaphore** for CPU↔GPU synchronization and the 4.4 kernel does not
+provide the required support (DRM `syncobj` / `sync_file` timeline export):
+
+```bash
+export VK_ICD_FILENAMES=/var/packages/synocli-videodriver/target/etc/vulkan/icd.d/intel_icd.x86_64.json
+vulkaninfo --summary        # OK: GPU0 = Intel(R) HD Graphics 500 (APL 2), Mesa anv 23.3.6
+
+ffmpeg8 -init_hw_device vulkan=vk:0 -filter_hw_device vk \
+  -f lavfi -i testsrc=size=1920x1080:rate=25:duration=3 \
+  -vf "format=yuv420p,hwupload,libplacebo=w=1280:h=720,hwdownload,format=yuv420p" -f null -
+# Failed to create semaphore: VK_ERROR_INVALID_EXTERNAL_HANDLE
+# [Parsed_hwupload_1] Failed to configure output pad on Parsed_hwupload_1
+# Error reinitializing filters!
+```
+
+This is a platform/kernel limitation, not a packaging issue: `libplacebo` is built and
+loadable (`ffmpeg8 -buildconf | grep libplacebo`), but the Vulkan frame pipeline cannot
+run. It affects **all** Vulkan filters, not just `libplacebo`.
+
+!!! note "It may work on newer Synology models"
+    Models shipping a newer kernel (5.10+, e.g. via
+    <https://github.com/007revad/Transcode_for_x25>) may expose the external-semaphore
+    support that the Vulkan filters need. If Vulkan filtering works on your NAS, please
+    [open an issue on spksrc](https://github.com/SynoCommunity/spksrc/issues) with your
+    model, DSM version, `uname -r` and the `ffmpeg ... libplacebo ...` result so we can
+    document the working configurations.
+
+For a functional HDR→SDR / GPU filtering path on current Synology kernels, use **OpenCL**
+(`tonemap_opencl`, see above) or **VA-API**, which do not require external-semaphore export.
 
 ### Choosing an Acceleration Path
 

@@ -19,7 +19,7 @@ COMMENT  = 7-Zip is a file archiver with a high compression ratio.
 LICENSE = https://github.com/ip7z/7zip/blob/main/DOC/License.txt
 
 CONFIGURE_TARGET = nop
-COMPILE_MAKE_OPTIONS = -f makefile.gcc
+COMPILE_ARGS = -f makefile.gcc
 
 PATCH_TARGET = 7z_patch
 INSTALL_TARGET = 7z_install

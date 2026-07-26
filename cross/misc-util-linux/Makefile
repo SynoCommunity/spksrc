@@ -82,18 +82,13 @@ CONFIGURE_ARGS += --disable-libblkid --disable-blkid
 PLIST_TRANSFORM = sed -e '/bin\/lsblk/d' -e '/bin\/findmnt/d' -e '/lib\/libmount/d' -e '/lib\/libblkid/d'
 endif
 
-# for clock_gettime
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-ADDITIONAL_LDFLAGS = -lrt
-endif
-
 # for lsblk and others: ncurses must be built with tinfo
 # this seems to be a bug in util-linux, as most of other libraries fail to find ncurses/termlib
 # dependencies when ncurses is build with lib tinfo
 # https://github.com/util-linux/util-linux/issues/2416
 # This is a workaround to use ncursesw without tinfo:
 # - still required for util-linux v2.41.1
-COMPILE_MAKE_OPTIONS = NCURSES_LIBS="-lncursesw"
+COMPILE_ARGS = NCURSES_LIBS="-lncursesw"
 
 include ../../mk/spksrc.cross-cc.mk
 

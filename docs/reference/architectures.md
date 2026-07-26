@@ -19,18 +19,18 @@ Example: `x64-7.2` = Intel 64-bit, DSM 7.2 toolchain
 
 | Architecture | CPU Family | Description | Example Models |
 |--------------|------------|-------------|----------------|
-| `x64` | Intel 64-bit | x86-64 processors | DS923+, RS1221+ |
-| `aarch64` | ARM 64-bit | ARM Cortex-A57 (Marvell) | DS220+, DS720+, DS920+ |
-| `armv8` | ARM 64-bit | ARM Cortex-A55 (Realtek) | DS223, DS423, RS422+ |
+| `x64` | Intel 64-bit / AMD 64-bit | x86-64 processors | DS220+, DS720+, DS920+, DS923+, RS1221+ |
+| `aarch64` | ARM 64-bit | ARM Cortex-A55 (Realtek) / Cortex-A57 (Marvell) | DS223, DS423, DS218, DS220j |
 
 ## Legacy Architectures (DSM 6.x)
 
 | Architecture | CPU Family | Description | Example Models |
 |--------------|------------|-------------|----------------|
-| `x86` | Intel 32-bit | x86 processors | DS216play |
-| `armv7` | ARM 32-bit | Various ARM v7 | DS218j, DS418 |
-| `armv7l` | ARM 32-bit | Low-end ARM v7 | DS115j |
-| `qoriq` | QorIQ | Freescale QorIQ | DS215j |
+| `x86` | Intel 32-bit | Intel Atom D400/D500 series | DS712+, DS1511+, DS2411+ |
+| `i686` | Intel 32-bit | Intel Atom CE5300 (Evansport) | DS214play, DS415play |
+| `armv7` | ARM 32-bit | Various ARM v7 | DS218j, DS115j, DS116 |
+| `armv7l` | ARM 32-bit | HiSilicon (surveillance) | hi3535 models |
+| `qoriq` | QorIQ | Freescale QorIQ | DS413, DS213+ |
 | `comcerto2k` | Comcerto | Mindspeed Comcerto | DS414j |
 | `ppc853x` | PowerPC | PowerPC 85xx | DS109j |
 
@@ -102,8 +102,8 @@ ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --enable-64bit
 endif
 
-# Exclude 32-bit
-UNSUPPORTED_ARCHS = $(32bit_ARCHS)
+# Needs a 64-bit target (refuses 32-bit archs)
+REQUIRE_64BIT = 1
 
 # ARM-specific
 ifeq ($(findstring $(ARCH),$(ARM_ARCHS)),$(ARCH))

@@ -20,8 +20,8 @@ CONFIGURE_ARGS = cross_compiling=yes
 CONFIGURE_ARGS += ac_cv_func_setpgrp_void=yes
 
 # avoid build/install of examples (SCRIPTS) and doc
-COMPILE_MAKE_OPTIONS = binaries libraries
-INSTALL_MAKE_OPTIONS = install-binaries install-libraries SCRIPTS= DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+COMPILE_ARGS = binaries libraries
+INSTALL_ARGS = install-binaries install-libraries SCRIPTS= DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
 
 ADDITIONAL_CFLAGS = -O2
 

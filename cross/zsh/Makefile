@@ -1,11 +1,11 @@
 PKG_NAME = zsh
-PKG_VERS = 5.9
+PKG_VERS = 5.9.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.zsh.org/pub
+PKG_DIST_SITE = https://downloads.sourceforge.net/project/zsh/zsh/$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/ncursesw cross/gdbm cross/pcre
+DEPENDS = cross/ncursesw cross/gdbm cross/pcre2
 OPTIONAL_DEPENDS = cross/libcap
 
 HOMEPAGE = https://www.zsh.org/
@@ -32,7 +32,7 @@ else
 	BUILD_MSG = "Building zsh with dynamically linked modules."
 endif
 
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk
 

@@ -19,16 +19,16 @@ HOMEPAGE = https://www.openexr.com/
 COMMENT  = OpenEXR provides the specification and reference implementation of the EXR file format, the professional-grade image storage format of the motion picture industry.
 LICENSE  = 3-Clause BSD
 
-CMAKE_ARGS += -DBUILD_TESTING=OFF
-CMAKE_ARGS += -DPYILMBASE_ENABLE=OFF
-CMAKE_ARGS += -DOPENEXR_BUILD_UTILS=OFF
-CMAKE_ARGS += -DINSTALL_OPENEXR_EXAMPLES=OFF
-CMAKE_ARGS += -DINSTALL_OPENEXR_DOCS=OFF
+CONFIGURE_ARGS += -DBUILD_TESTING=OFF
+CONFIGURE_ARGS += -DPYILMBASE_ENABLE=OFF
+CONFIGURE_ARGS += -DOPENEXR_BUILD_UTILS=OFF
+CONFIGURE_ARGS += -DINSTALL_OPENEXR_EXAMPLES=OFF
+CONFIGURE_ARGS += -DINSTALL_OPENEXR_DOCS=OFF
 
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, $(TCVERSION), 7.0),1)
 # default is c++14, supported by DSM >= 7 only
-CMAKE_ARGS += -DCMAKE_CXX_STANDARD=11
+CONFIGURE_ARGS += -DCMAKE_CXX_STANDARD=11
 endif
 
 include ../../mk/spksrc.cross-cmake.mk

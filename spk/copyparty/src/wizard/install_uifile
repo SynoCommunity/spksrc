@@ -1,0 +1,45 @@
+[{
+    "step_title": "Administrator Account",
+    "items": [{
+        "desc": "Create the administrator account for copyparty."
+    }, {
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_admin_user",
+            "desc": "Admin username",
+            "defaultValue": "admin",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "subitems": [{
+            "key": "wizard_admin_password",
+            "desc": "Password (defaults to admin)",
+            "defaultValue": "admin",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }]
+}, {
+    "step_title": "Storage Configuration",
+    "items": [{
+        "desc": "Specify a shared folder for copyparty to serve files from. This share is created if it does not already exist."
+    }, {
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_media_share",
+            "desc": "Shared folder name",
+            "defaultValue": "copyparty",
+            "validator": {
+                "allowBlank": false,
+                "regex": {
+                    "expr": "/^[\\w _-]+$/",
+                    "errorText": "Shared folder name must not contain path separators or special characters."
+                }
+            }
+        }]
+    }]
+}]

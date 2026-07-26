@@ -1,0 +1,6 @@
+Disabled: no new ffmpeg6 SPK release is planned at this time.
+
+Disabling the SPK keeps ffmpeg6 and its large codec dependency tree out of the
+build. Remove this file to build and release ffmpeg6 again if needed.
+
+-- th0ma7, 2026-07-13

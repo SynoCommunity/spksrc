@@ -14,12 +14,12 @@ LICENSE  = LGPL2.1+
 
 DEPENDS = cross/fftw
 
-# compiler too old
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# Needs gcc >= 4.8: C++11 features unavailable before gcc 4.8.
+MIN_GCC_VERSION = 4.8
 
-CMAKE_BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)
+BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)
 
 include ../../mk/spksrc.cross-cmake.mk
 
-CMAKE_ARGS += -DBUILD_TOOLS=OFF
-CMAKE_ARGS += -DBUILD_TESTS=OFF
+CONFIGURE_ARGS += -DBUILD_TOOLS=OFF
+CONFIGURE_ARGS += -DBUILD_TESTS=OFF

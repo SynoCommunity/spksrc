@@ -12,8 +12,8 @@ HOMEPAGE = http://librsync.sourcefrog.net
 COMMENT  = remote delta-compression library.
 LICENSE  = LPGL-2.1
 
-CMAKE_ARGS += -D BZIP2_LIBRARIES=$(STAGING_INSTALL_PREFIX)/lib
-CMAKE_ARGS += -D ZLIB_LIBRARY=$(STAGING_INSTALL_PREFIX)/lib
-CMAKE_ARGS += -Wno-dev
+CONFIGURE_ARGS += -D BZIP2_LIBRARIES=$(STAGING_INSTALL_PREFIX)/lib
+CONFIGURE_ARGS += -D ZLIB_LIBRARY=$(STAGING_INSTALL_PREFIX)/lib
+CONFIGURE_ARGS += -Wno-dev
 
 include ../../mk/spksrc.cross-cmake.mk

@@ -15,7 +15,7 @@ LICENSE = GPLv3
 CONFIGURE_TARGET = nop
 INSTALL_TARGET = ps3netsrv_install
 
-COMPILE_MAKE_OPTIONS = -f Makefile.linux
+COMPILE_ARGS = -f Makefile.linux
 
 include ../../mk/spksrc.cross-cc.mk
 

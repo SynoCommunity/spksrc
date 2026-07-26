@@ -16,6 +16,12 @@ include ../../mk/spksrc.spk-meta/meta.mk
 # consumer can build its own copy when it declares the dependency.
 EXCLUDED_NAME = bzip2 xz zlib
 
+# Operator used to pin the meta package version in install_dep_packages.
+# Backslash-escaped: the INFO recipe echoes SPK_DEPENDS unquoted at shell
+# level (the surrounding \" are literal characters), so a bare > would
+# redirect. One escaping level only — this value stays within make.
+META_DEP_OP ?= \>\=
+
 # -------------------------------------------------------------------
 # SPK_BASE_TEMPLATE
 #
@@ -36,6 +42,10 @@ define SPK_BASE_TEMPLATE
 # Set installation prefix variables for this namespace
 $(eval $(1)_INSTALL_PREFIX         := /var/packages/$($(1)_PACKAGE)/target)
 $(eval $(1)_STAGING_INSTALL_PREFIX := $(realpath $($(1)_PACKAGE_WORK_DIR)/install/$($(1)_INSTALL_PREFIX)))
+# Version of the meta package itself, read from its own spk Makefile
+# ($(SPK_VERS)/$(SPK_REV) at this point belong to the consumer package)
+$(eval $(1)_SPK_MAKEFILE           := $(realpath $($(1)_PACKAGE_WORK_DIR)/..)/Makefile)
+$(eval $(1)_VERSION                := $(shell sed -n 's/^SPK_VERS[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE))-$(shell sed -n 's/^SPK_REV[[:space:]]*=[[:space:]]*//p' $($(1)_SPK_MAKEFILE)))
 $(eval export $(1)_INSTALL_PREFIX)
 $(eval export $(1)_STAGING_INSTALL_PREFIX)
 
@@ -71,10 +81,17 @@ $(eval $(1)_DIRECT_DEPENDS := $(filter $(addprefix cross/,$(EXCLUDED_NAME)),$($(
 # Inject direct deps into the package DEPENDS list
 $(eval DEPENDS := $(call uniq,$($(1)_DIRECT_DEPENDS) $(DEPENDS)))
 
-# Register this meta package as an SPK dependency (no duplicates)
-# Only prepend bare package name if SPK_DEPENDS doesn't already have
-# an entry for it (e.g. with a version constraint like python314>=3.14.5-4)
-$(if $(filter $($(1)_PACKAGE) $($(1)_PACKAGE)=% $($(1)_PACKAGE)<% $($(1)_PACKAGE)>%,$(subst :, ,$(subst ",,$(SPK_DEPENDS)))),,$(eval SPK_DEPENDS := $(call dedup,$($(1)_PACKAGE):$(SPK_DEPENDS),:)))
+# Register this meta package as a version-pinned SPK dependency:
+#  - an entry that already carries an explicit version constraint
+#    (e.g. python314>=3.14.5-4) is left untouched;
+#  - a bare entry (e.g. "ffmpeg8" from the consumer Makefile) is replaced
+#    by the pinned one;
+#  - SPK_DEPENDS is rebuilt unquoted so the INFO quoting stays well-formed.
+# Skipped when the meta is only an indirect dependency (see $(1)_INDIRECT_DEPENDS,
+# e.g. videodriver pulled in through the ffmpeg rpath): the direct meta
+# carries the pin, DSM resolves the chain transitively.
+$(eval $(1)_SPK_DEP_LIST := $(subst :, ,$(subst ",,$(SPK_DEPENDS))))
+$(if $($(1)_INDIRECT_DEPENDS)$(filter $($(1)_PACKAGE)=% $($(1)_PACKAGE)<% $($(1)_PACKAGE)>%,$($(1)_SPK_DEP_LIST)),,$(eval SPK_DEPENDS := $(subst $(space),:,$(strip $($(1)_PACKAGE)$(META_DEP_OP)$($(1)_VERSION) $(filter-out $($(1)_PACKAGE),$($(1)_SPK_DEP_LIST))))))
 
 # Build list of status cookies to symlink
 $(eval $(1)_STATUS_COOKIES := $(sort $(foreach cross,$(filter-out $(EXCLUDED_NAME),$(foreach pkg_name,$(shell $(MAKE) ARCH=$(ARCH) TCVERSION=$(TCVERSION) dependency-list -C $(realpath $($(1)_PACKAGE_WORK_DIR)/../) 2>/dev/null | grep ^$($(1)_PACKAGE) | cut -f2 -d:),$(shell sed -n 's/^PKG_NAME = \(.*\)/\1/p' $(realpath $(CURDIR)/../../$(pkg_name)/Makefile)))),$(wildcard $($(1)_PACKAGE_WORK_DIR)/.$(cross)-*_done))))

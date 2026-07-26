@@ -14,6 +14,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `PKG_DIST_NAME` | Yes | Archive filename | `$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)` |
 | `PKG_DIST_SITE` | Yes | Download URL base | `https://example.com/releases` |
 | `PKG_DIST_FILE` | No | Local filename (if different) | `curl-source.tar.gz` |
+| `PKG_DIST_MIRRORS` | No | Fallback base URLs, tried in turn if `PKG_DIST_SITE` fails ([details](../developer-guide/packaging/makefile-variables.md#source-downloads-and-mirrors)) | `https://github.com/SynoCommunity/spksrc/releases/download/sources` |
 | `PKG_DIST_ARCH` | No | Architecture-specific source designator | `$(PKG_DIST_ARCH_$(ARCH))` |
 | `PKG_DIR` | Yes | Directory after extraction | `$(PKG_NAME)-$(PKG_VERS)` |
 
@@ -60,6 +61,8 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 |----------|---------|-------------|
 | `GNU_CONFIGURE` | 0 | Set to 1 to use autoconf |
 | `CONFIGURE_ARGS` | | Arguments for configure script |
+| `ADDITIONAL_CONFIGURE_ARGS` | | Extra args appended after `CONFIGURE_ARGS` (autotools / CMake / Meson); for the framework invocation only |
+| `BUILD_DIR` | | Opt-in out-of-tree build directory; unset builds in-source |
 | `PRE_CONFIGURE_TARGET` | | Target to run before configure |
 | `POST_CONFIGURE_TARGET` | | Target to run after configure |
 
@@ -68,7 +71,8 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CMAKE_USE_TOOLCHAIN_FILE` | 1 | Use generated toolchain file |
-| `CMAKE_ARGS` | | Additional CMake arguments |
+| `CONFIGURE_ARGS` | | Additional CMake arguments |
+| `BUILD_DIR` | `$(WORK_DIR)/$(PKG_DIR)/build` | Out-of-tree build directory |
 | `CMAKE_BUILD_TYPE` | Release | Build type |
 | `CMAKE_USE_NINJA` | | Build with Ninja instead of Make |
 | `CMAKE_USE_NASM` | | Build the native NASM assembler first |
@@ -80,6 +84,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CONFIGURE_ARGS` | | Meson options, passed to `meson setup` |
+| `BUILD_DIR` | `$(WORK_DIR)/$(PKG_DIR)/builddir` | Out-of-tree build directory |
 | `MESON_BUILD_TYPE` | release | Build type |
 
 ### Rust (Cargo)
@@ -100,7 +105,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `ADDITIONAL_LDFLAGS` | Extra linker flags |
 | `ADDITIONAL_RUSTFLAGS` | Extra Rust compiler flags |
 | `ADDITIONAL_EXTRACTFLAGS` | Extra parameters for the extract command |
-| `COMPILE_MAKE_OPTIONS` | Extra arguments passed to `make` at compile (autotools / plain GNU make only — CMake uses `cmake --build`, Meson uses `ninja`) |
+| `COMPILE_ARGS` | Extra arguments for the compile step: the make command for autotools / plain GNU make (defaults to `-j$(NCPUS)`), appended as-is to `cmake --build` and `ninja` |
 | `COMPILE_TARGET` | Override default compile target |
 | `PRE_COMPILE_TARGET` | Target to run before compile |
 | `POST_COMPILE_TARGET` | Target to run after compile |
@@ -111,7 +116,7 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | Variable | Description |
 |----------|-------------|
 | `INSTALL_TARGET` | Override install target (default: `install`) |
-| `INSTALL_MAKE_OPTIONS` | Options passed to `make install` (autotools / plain GNU make only) |
+| `INSTALL_ARGS` | Extra arguments for the install step: the make command for autotools / plain GNU make (defaults to `install DESTDIR=… prefix=…`), appended as-is to `cmake --install` and `ninja install` |
 | `PRE_INSTALL_TARGET` | Target to run before install |
 | `POST_INSTALL_TARGET` | Target to run after install |
 
@@ -213,6 +218,9 @@ Available after toolchain is loaded:
 | `ARCH` | Target architecture / platform codename being built |
 | `TCVERSION` | DSM toolchain version (7.2, 7.1, 6.2.4, ...) |
 | `TC_ARCH` | Generic build arch of the current platform |
+| `TC_GCC` | gcc version the current toolchain ships (read-only, from its Makefile) |
+| `TC_GLIBC` | glibc version the current toolchain targets (read-only) |
+| `TC_KERNEL` | Kernel version the current toolchain targets (read-only) |
 | `UNSUPPORTED_ARCHS` | Architectures/platforms to exclude from this package |
 | `UNSUPPORTED_ARCHS_TCVERSION` | Architecture/DSM-version pairs to exclude |
 
@@ -222,6 +230,9 @@ The architecture **groups** (`x64_ARCHS`, `ARMv7_ARCHS`, `ARMv8_ARCHS`, `ARM_ARC
 
 | Variable | Description |
 |----------|-------------|
+| `MIN_GCC_VERSION` | Refuse archs whose toolchain gcc is below this (capability floor) |
+| `MIN_GLIBC_VERSION` | Refuse archs whose toolchain glibc is below this (runtime floor) |
+| `REQUIRE_64BIT` | Set to `1` to refuse 32-bit architectures |
 | `REQUIRED_MIN_DSM` | Skip if the DSM toolchain is below this version |
 | `REQUIRED_MAX_DSM` | Skip if the DSM toolchain is above this version |
 | `REQUIRED_MIN_SRM` | Skip if the SRM toolchain is below this version |

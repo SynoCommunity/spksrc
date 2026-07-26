@@ -12,6 +12,9 @@ HOMEPAGE = https://github.com/toots/shine
 COMMENT  = Super fast fixed-point MP3 encoder.
 LICENSE  = GPLv2
 
+# Needs gcc >= 4.6: calls __builtin_bswap16, absent before gcc 4.6.
+MIN_GCC_VERSION = 4.6
+
 PRE_CONFIGURE_TARGET = shine_pre_configure
 CONFIGURE_ARGS  = --includedir=$(INSTALL_DIR)/$(INSTALL_PREFIX)/include
 CONFIGURE_ARGS += --disable-static

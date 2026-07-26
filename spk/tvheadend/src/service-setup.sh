@@ -1,8 +1,8 @@
-# Define python312 binary path
-PYTHON_DIR="/var/packages/python312/target/bin"
+# Define python binary path
+PYTHON_DIR="/var/packages/_PYTHON_PACKAGE_/target/bin"
 # Define ffmpeg binary path
-FFMPEG_DIR="/var/packages/ffmpeg7/target/bin"
-# Add local bin, virtualenv along with ffmpeg and python312 to the default PATH
+FFMPEG_DIR="/var/packages/_FFMPEG_PACKAGE_/target/bin"
+# Add local bin, virtualenv along with ffmpeg and python to the default PATH
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${FFMPEG_DIR}:${PATH}"
 
 # Service configuration. Change http and htsp ports here and in conf/tvheadend.sc for non-standard ports
@@ -12,18 +12,28 @@ HTSP=9982
 # Replace generic service startup, run service in background
 GRPN=$(id -gn ${EFF_USER})
 UPGRADE_CFG_DIR="${SYNOPKG_PKGVAR}/dvr/config"
-SERVICE_COMMAND="tvheadend -f -C -u ${EFF_USER} -g ${GRPN} --http_port ${HTTP} --htsp_port ${HTSP} -c ${SYNOPKG_PKGVAR} -p ${PID_FILE} -l ${LOG_FILE} --debug \"\""
-SVC_BACKGROUND=yes
+
+TVH_BIN="${SYNOPKG_PKGDEST}/bin/tvheadend"
 
 # Group configuration to manage permissions of recording folders
 GROUP=sc-media
 
+# Base arguments
+TVH_ARGS="-f -C -u ${EFF_USER} -g ${GRPN} \
+    --http_port ${HTTP} --htsp_port ${HTSP} \
+    -c ${SYNOPKG_PKGVAR} \
+    -p ${PID_FILE} \
+    -l ${LOG_FILE} \
+    --nobackup"
+
+SVC_BACKGROUND=yes
+SERVICE_COMMAND="${TVH_BIN} ${TVH_ARGS}"
+
+
 service_postinst ()
 {
-    # EPG Grabber (zap2epg) - Create a Python virtualenv
+    # Create a Python virtualenv and install wheel (EPG Grabber)
     install_python_virtualenv
-
-    # EPG Grabber (zap2epg) - Install the Python wheels
     install_python_wheels
 }
 

@@ -111,6 +111,14 @@ service_postinst()
         # Create administrator role from wizard (peer auth via Unix socket)
         run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c \"CREATE ROLE ${PG_USERNAME} PASSWORD '${PG_PASSWORD}' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN REPLICATION BYPASSRLS;\""
 
+        # Enable contrib extensions in template1 (inherited by all new databases)
+        for ext in unaccent cube earthdistance pg_trgm "uuid-ossp" vector; do
+            if "${SYNOPKG_PKGDEST}/bin/psql" -h "${SYNOPKG_PKGVAR}" -p "${SERVICE_PORT}" -d postgres -c "SELECT 1 FROM pg_available_extensions WHERE name = '${ext}'" -t > /dev/null 2>&1; then
+                run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d template1 -c 'CREATE EXTENSION IF NOT EXISTS ${ext};'"
+                run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c 'CREATE EXTENSION IF NOT EXISTS ${ext};'"
+            fi
+        done
+
         # Enable PostGIS extension if available (requires GCC 5+ toolchain build)
         if "${SYNOPKG_PKGDEST}/bin/psql" -h "${SYNOPKG_PKGVAR}" -p "${SERVICE_PORT}" -d postgres -c "SELECT 1 FROM pg_available_extensions WHERE name = 'postgis' AND installed_version IS NOT NULL" -t > /dev/null 2>&1; then
             run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d template1 -c 'CREATE EXTENSION IF NOT EXISTS postgis;'"
