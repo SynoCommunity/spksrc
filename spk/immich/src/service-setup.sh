@@ -41,6 +41,33 @@ install_log ()
     fi
 }
 
+setup_proxy ()
+{
+    [ -f /etc/proxy.conf ] || return 0
+    . /etc/proxy.conf
+    [ "${proxy_enabled}" = "yes" ] || return 0
+
+    if [ -n "${http_host}" ] && [ -n "${http_port}" ]; then
+        if [ "${auth_enabled}" = "yes" ] && [ -n "${proxy_user}" ]; then
+            PROXY_HTTP="http://${proxy_user}:${proxy_pwd}@${http_host}:${http_port}"
+        else
+            PROXY_HTTP="http://${http_host}:${http_port}"
+        fi
+        export http_proxy="${PROXY_HTTP}"
+        export HTTP_PROXY="${PROXY_HTTP}"
+    fi
+    if [ -n "${https_host}" ] && [ -n "${https_port}" ]; then
+        if [ "${auth_enabled}" = "yes" ] && [ -n "${proxy_user}" ]; then
+            PROXY_HTTPS="http://${proxy_user}:${proxy_pwd}@${https_host}:${https_port}"
+        else
+            PROXY_HTTPS="http://${https_host}:${https_port}"
+        fi
+        export https_proxy="${PROXY_HTTPS}"
+        export HTTPS_PROXY="${PROXY_HTTPS}"
+    fi
+    install_log "Using proxy ${http_host}:${http_port} for HTTP and ${https_host}:${https_port} for HTTPS"
+}
+
 service_prestart()
 {
     if [ -f "${IMMICH_CONF}" ]; then
@@ -163,6 +190,7 @@ service_postinst ()
             PGPASSWORD="${PG_ADMIN_PASS}" ${PG_PSQL} -h "${PG_HOST}" -p "${PG_PORT}" -U "${PG_ADMIN_USER}" -d "${PG_DATABASE}" -c "CREATE EXTENSION IF NOT EXISTS \"${ext}\";" 2>/dev/null || true
         done
         if [ "${wizard_enable_ml}" = "true" ]; then
+            setup_proxy
             /var/packages/python314/target/bin/python3 -m venv "${ML_VENV}" 2>&1 || true
             "${ML_VENV}/bin/pip3" install --no-cache-dir \
                 onnxruntime opencv-python-headless insightface \
@@ -207,6 +235,7 @@ service_postupgrade ()
 
     # Upgrade ML wheels if ML is installed
     if [ -x "${ML_VENV}/bin/python3" ]; then
+        setup_proxy
         "${ML_VENV}/bin/pip3" install --upgrade --no-cache-dir \
             onnxruntime opencv-python-headless insightface \
             huggingface-hub numpy orjson pillow tokenizers \
