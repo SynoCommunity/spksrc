@@ -48,6 +48,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Network"><td>3000</td><td>ntopng</td><td>Network</td><td>Web interface</td></tr>
     <tr data-category="Utilities"><td>3001</td><td>uptime-kuma</td><td>Utilities</td><td>Uptime monitoring</td></tr>
     <tr data-category="Media Server"><td>3003</td><td>Immich</td><td>Media Server</td><td>Machine Learning</td></tr>
+    <tr data-category="Storage"><td>3923</td><td>Copyparty</td><td>Storage</td><td>Web interface</td></tr>
     <tr data-category="Media Server"><td>4533</td><td>Navidrome</td><td>Media Server</td><td>Web interface</td></tr>
     <tr data-category="Downloads"><td>5050</td><td>Couchpotato</td><td>Downloads</td><td>Web interface</td></tr>
     <tr data-category="Downloads"><td>5053</td><td>Couchpotato (custom)</td><td>Downloads</td><td>Web interface</td></tr>
