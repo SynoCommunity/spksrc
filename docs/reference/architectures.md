@@ -26,10 +26,10 @@ Example: `x64-7.2` = Intel 64-bit, DSM 7.2 toolchain
 
 | Architecture | CPU Family | Description | Example Models |
 |--------------|------------|-------------|----------------|
-| `x86` | Intel 32-bit | x86 processors | DS216play |
-| `armv7` | ARM 32-bit | Various ARM v7 | DS218j, DS418 |
-| `armv7l` | ARM 32-bit | Low-end ARM v7 | DS115j |
-| `qoriq` | QorIQ | Freescale QorIQ | DS215j |
+| `x86` | Intel 32-bit | x86 processors | DS214play, DS415play |
+| `armv7` | ARM 32-bit | Various ARM v7 | DS218j, DS115j, DS116 |
+| `armv7l` | ARM 32-bit | HiSilicon (surveillance) | hi3535 models |
+| `qoriq` | QorIQ | Freescale QorIQ | DS413, DS213+ |
 | `comcerto2k` | Comcerto | Mindspeed Comcerto | DS414j |
 | `ppc853x` | PowerPC | PowerPC 85xx | DS109j |
 

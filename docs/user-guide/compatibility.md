@@ -33,11 +33,11 @@ Synology NAS devices use different CPU architectures. Packages are built for eac
 
 | Architecture | CPU Type | Example Models |
 |--------------|----------|----------------|
-| `x86` | Intel 32-bit | DS216play, DS116 |
-| `armv7` | ARM 32-bit | DS218j, DS115j |
-| `qoriq` | Freescale QorIQ | DS215j, RS214 |
+| `x86` (i686) | Intel 32-bit | DS214play, DS415play |
+| `armv7` | ARM 32-bit | DS218j, DS115j, DS116, DS216play |
+| `qoriq` | Freescale QorIQ | DS413, DS213+ |
 | `comcerto2k` | Mindspeed Comcerto | DS414j |
-| `ppc853x` | PowerPC | DS109j, DS209 |
+| `ppc853x` | PowerPC | DS109j, DS209, DS410, DS210+ |
 
 !!! note "Legacy Support"
     Legacy architectures receive security updates but limited new package development.
