@@ -19,9 +19,8 @@ Example: `x64-7.2` = Intel 64-bit, DSM 7.2 toolchain
 
 | Architecture | CPU Family | Description | Example Models |
 |--------------|------------|-------------|----------------|
-| `x64` | Intel 64-bit | x86-64 processors | DS923+, RS1221+ |
-| `aarch64` | ARM 64-bit | ARM Cortex-A57 (Marvell) | DS220+, DS720+, DS920+ |
-| `armv8` | ARM 64-bit | ARM Cortex-A55 (Realtek) | DS223, DS423, RS422+ |
+| `x64` | Intel 64-bit / AMD 64-bit | x86-64 processors | DS220+, DS720+, DS920+, DS923+, RS1221+ |
+| `aarch64` | ARM 64-bit | ARM Cortex-A55 (Realtek) / Cortex-A57 (Marvell) | DS223, DS423, DS218, DS220j |
 
 ## Legacy Architectures (DSM 6.x)
 
