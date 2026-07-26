@@ -77,6 +77,8 @@ service_prestart()
 
     SERVICE_COMMAND="${NODE} ${SERVER_LAUNCHER}"
 
+    setup_proxy
+
     if [ "${IMMICH_MACHINE_LEARNING_ENABLED}" = "true" ]; then
         if [ -x "${ML_VENV}/bin/python3" ] && \
            PYTHONPATH="${SYNOPKG_PKGDEST}/share/immich/immich-ml:${PYTHONPATH}" \
