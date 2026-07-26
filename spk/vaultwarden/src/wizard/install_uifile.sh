@@ -6,7 +6,7 @@ cat <<EOF > $SYNOPKG_TEMP_LOGFILE
 [{
     "step_title": "Vaultwarden server configuration",
     "items": [{
-        "desc": "<span style='color:#cc0000;font-weight:bold'>&#9888; HTTPS Required:</span> Vaultwarden uses the Web Crypto API which requires a secure context. You must configure a reverse proxy with SSL before accessing the web interface.<br><br>See the <a href='https://github.com/SynoCommunity/spksrc/wiki/Vaultwarden' target='_blank'>Vaultwarden wiki page</a> for setup instructions."
+        "desc": "<span style='color:#cc0000;font-weight:bold'>&#9888; HTTPS Required:</span> Vaultwarden uses the Web Crypto API which requires a secure context. You must configure a reverse proxy with SSL before accessing the web interface.<br><br>See the <a href='https://docs.synocommunity.com/packages/vaultwarden/' target='_blank'>Vaultwarden documentation page</a> for setup instructions."
       }, {
         "type": "textfield",
         "subitems": [{
