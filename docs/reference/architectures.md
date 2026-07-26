@@ -26,7 +26,8 @@ Example: `x64-7.2` = Intel 64-bit, DSM 7.2 toolchain
 
 | Architecture | CPU Family | Description | Example Models |
 |--------------|------------|-------------|----------------|
-| `x86` | Intel 32-bit | x86 processors | DS214play, DS415play |
+| `x86` | Intel 32-bit | Intel Atom D400/D500 series | DS712+, DS1511+, DS2411+ |
+| `i686` | Intel 32-bit | Intel Atom CE5300 (Evansport) | DS214play, DS415play |
 | `armv7` | ARM 32-bit | Various ARM v7 | DS218j, DS115j, DS116 |
 | `armv7l` | ARM 32-bit | HiSilicon (surveillance) | hi3535 models |
 | `qoriq` | QorIQ | Freescale QorIQ | DS413, DS213+ |
