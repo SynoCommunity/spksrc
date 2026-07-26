@@ -59,8 +59,8 @@ For the authoritative CPU of a specific model, see Synology's [**What kind of CP
     <tr data-family="armv7"><td>alpine</td><td>ARMv7</td><td>armv7</td><td>Annapurna AL-314/AL-514</td><td>—</td><td>DS1517, DS1817, DS2015xs, DS715</td></tr>
     <tr data-family="armv7"><td>alpine4k</td><td>ARMv7</td><td>armv7</td><td>Annapurna AL-212</td><td>—</td><td>DS416, DS215+</td></tr>
     <tr data-family="armv7"><td>monaco</td><td>ARMv7</td><td>armv7</td><td>STM STiH412</td><td>—</td><td>DS216play</td></tr>
-    <tr data-family="armv7"><td>comcerto2k</td><td>ARMv7</td><td>armv7</td><td>Mindspeed Comcerto C2000</td><td>—</td><td>DS414j, RS214</td></tr>
-    <tr data-family="armv7"><td>armada370 / armada375 / armadaxp</td><td>ARMv7</td><td>armv7</td><td>Marvell Armada 370/375/XP</td><td>—</td><td>DS115j, DS215j, DS214, DS414, RS814</td></tr>
+    <tr data-family="armv7"><td>comcerto2k</td><td>ARMv7</td><td>armv7</td><td>Mindspeed Comcerto C2000</td><td>—</td><td>DS414j</td></tr>
+    <tr data-family="armv7"><td>armada370 / armada375 / armadaxp</td><td>ARMv7</td><td>armv7</td><td>Marvell Armada 370/375/XP</td><td>—</td><td>DS115j, DS215j, DS214, DS414, RS814, RS214</td></tr>
     <tr data-family="armv7l"><td>hi3535</td><td>ARMv7L</td><td>armv7l</td><td>HiSilicon</td><td>—</td><td>(surveillance / legacy models)</td></tr>
     <tr data-family="armv5"><td>88f6281</td><td>ARMv5</td><td>armv5</td><td>Marvell Kirkwood 88F628x</td><td>—</td><td>DS112, DS212, DS411, DS413j, DS211, DS111 (legacy)</td></tr>
     <tr data-family="ppc"><td>qoriq</td><td>PowerPC</td><td>qoriq</td><td>Freescale QorIQ</td><td>—</td><td>DS213+, DS413, RS812</td></tr>

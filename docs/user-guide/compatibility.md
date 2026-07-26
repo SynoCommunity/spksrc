@@ -93,7 +93,6 @@ When browsing packages in **Package Center** on your NAS, it automatically shows
 |-------|--------------|-------------|
 | DS223 | armv8 | 7.x |
 | DS423 | armv8 | 7.x |
-| DS224 | armv8 | 7.x |
 | DS218 | armv8 | 6.x-7.x |
 | DS418 | armv8 | 6.x-7.x |
 
