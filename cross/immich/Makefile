@@ -8,6 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 BUILD_DEPENDS = native/nodejs_22 native/pnpm native/extism-js native/binaryen
 
+DEPENDS = cross/libvips
+
 HOMEPAGE = https://immich.app
 COMMENT  = Self-hosted photo and video backup solution.
 LICENSE  = GPLv3
@@ -36,13 +38,14 @@ immich_install:
 	# ------------------------------------------------------------
 	# 1. Disable prepare scripts, save ML subproject
 	# ------------------------------------------------------------
-	$(RUN) cp -a machine-learning machine-learning-src
-	$(RUN) rm -rf machine-learning
+	$(RUN) bash -c 'if [ -d machine-learning ]; then cp -a machine-learning machine-learning-src; rm -rf machine-learning; fi'
 
 	# ------------------------------------------------------------
 	# 2. Install all deps (needed for building)
 	# ------------------------------------------------------------
-	$(RUN) pnpm install --frozen-lockfile
+	$(RUN) pnpm install --frozen-lockfile --ignore-scripts
+	# Ensure target-arch sharp prebuilt is available (frozen lockfile skips non-host platforms)
+	$(RUN) pnpm add @img/sharp-linux-$(NODE_ARCH)@0.34.5 --filter immich --ignore-scripts 2>/dev/null || true
 
 	# ------------------------------------------------------------
 	# 3. Build (order: sdk -> plugin-sdk -> plugin-core -> cli -> server -> web)
@@ -58,7 +61,7 @@ immich_install:
 	# 4. Deploy production-only copy using pnpm deploy
 	# ------------------------------------------------------------
 	$(RUN) rm -rf immich-deploy
-	$(RUN) pnpm --filter immich deploy immich-deploy --frozen-lockfile
+	$(RUN) pnpm --filter immich deploy immich-deploy --frozen-lockfile --ignore-scripts
 
 	# ------------------------------------------------------------
 	# 5. Add web build to deploy dir
@@ -99,12 +102,12 @@ immich_install:
 
 	# Keep only target-arch native binaries
 	$(RUN) bash -c 'if [ "$(NODE_ARCH)" = "x64" ]; then \
-		find immich-deploy/node_modules -name "*.node" -path "*/linux/arm64/*" -delete 2>/dev/null; \
-		find immich-deploy/node_modules -name "*.node" -path "*/linux-arm64*" -delete 2>/dev/null; \
+		find immich-deploy/node_modules -name "*.node" -path "*/linux/arm64/*" -delete; \
+		find immich-deploy/node_modules -name "*.node" -path "*/linux-arm64*" -delete; \
 	else \
-		find immich-deploy/node_modules -name "*.node" -path "*/linux/x64/*" -delete 2>/dev/null; \
-		find immich-deploy/node_modules -name "*.node" -path "*/linux-x64*" -delete 2>/dev/null; \
-	fi' || true
+		find immich-deploy/node_modules -name "*.node" -path "*/linux/x64/*" -delete; \
+		find immich-deploy/node_modules -name "*.node" -path "*/linux-x64*" -delete; \
+	fi'
 
 	# Remove musl variants
 	$(RUN) find immich-deploy/node_modules -type d -name "*musl*" -exec rm -rf {} + 2>/dev/null || true
@@ -143,10 +146,18 @@ immich_install:
 		find share/immich -type f -o -type l | sort ) \
 		> $(WORK_DIR)/$(PKG_NAME).plist
 
-	printf 'rsc:share/immich\n' > $(WORK_DIR)/PLIST
-
 .PHONY: immich_post_install
 immich_post_install:
+	@$(MSG) "Redirect sharp RPATH to target/lib for HEIC-enabled libvips"
+	SHARP_NODE=$$(find $(STAGING_INSTALL_PREFIX)/share/immich/node_modules -name "sharp-linux-$(NODE_ARCH).node" 2>/dev/null | head -1); \
+	if [ -n "$$SHARP_NODE" ]; then \
+	  patchelf --set-rpath /var/packages/immich/target/lib "$$SHARP_NODE"; \
+	else \
+	  $(MSG) "Warning: sharp-linux-$(NODE_ARCH).node not found, skipping RPATH fix" >&2; \
+	fi
+	@$(MSG) "Removing build-time and wrong-arch native binaries"
+	find $(STAGING_INSTALL_PREFIX)/share/immich/node_modules/.pnpm -name "*.node" ! -name "sharp-linux-$(NODE_ARCH).node" ! -path "*bcrypt*" -delete 2>/dev/null || true; \
+	find $(STAGING_INSTALL_PREFIX)/share/immich/node_modules/.pnpm -path "*bcrypt*" -name "*.node" ! -path "*linux-$(NODE_ARCH)*" -delete 2>/dev/null || true
 	@$(MSG) "Removing dev-only packages from node_modules"
 	bash -c 'for pkg in typescript eslint @typescript-eslint @swc @esbuild @rolldown vitest jsdom; do \
 		case $$pkg in @*) d=".pnpm/$${pkg#@}"; d="$${d/\//+}@*"; rm -rf $(STAGING_INSTALL_PREFIX)/share/immich/node_modules/$${pkg} $(STAGING_INSTALL_PREFIX)/share/immich/node_modules/$${d} 2>/dev/null ;; \

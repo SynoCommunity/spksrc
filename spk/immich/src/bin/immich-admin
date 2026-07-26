@@ -1,0 +1,19 @@
+#!/bin/sh
+# Immich admin CLI wrapper for DSM
+
+PKG_USER="sc-immich"
+PKG_DIR="/var/packages/immich"
+CONF="${PKG_DIR}/etc/immich.conf"
+IMMICH_DIR="${PKG_DIR}/target/share/immich"
+NODE="/var/packages/Node.js_v22/target/usr/local/bin/node"
+
+if ! sudo -n true 2>/dev/null; then
+    echo "Immich CLI tools require administrator privileges."
+    echo "Enter your DSM password when prompted."
+fi
+
+# Build env vars from config (sudo resets the environment on DSM)
+ENV_VARS=$(sudo cat "${CONF}" 2>/dev/null)
+
+exec sudo -u "${PKG_USER}" ${ENV_VARS} \
+    "${NODE}" "${IMMICH_DIR}/dist/main.js" immich-admin "$@"
