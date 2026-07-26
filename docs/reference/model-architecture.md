@@ -45,12 +45,12 @@ For the authoritative CPU of a specific model, see Synology's [**What kind of CP
     <tr data-family="x64"><td>broadwellnk</td><td>x64</td><td>x64</td><td>Intel Xeon-D</td><td>—</td><td>DS1621xs+, RS4021xs+, RS1619xs+, DS3622xs+, SA3400</td></tr>
     <tr data-family="x64"><td>broadwellnkv2</td><td>x64</td><td>x64</td><td>Intel Xeon-D</td><td>—</td><td>SA3610, SA3410, FS3410</td></tr>
     <tr data-family="x64"><td>broadwellntbap</td><td>x64</td><td>x64</td><td>Intel Xeon-D (dual-controller)</td><td>—</td><td>SA3400D, SA3200D</td></tr>
-    <tr data-family="x64"><td>bromolow</td><td>x64</td><td>x64</td><td>Intel Xeon / Core i3</td><td>—</td><td>RS3614xs, DS3612xs, DS3615xs, DS1813+</td></tr>
+    <tr data-family="x64"><td>bromolow</td><td>x64</td><td>x64</td><td>Intel Xeon / Core i3</td><td>—</td><td>RS3614xs+, DS3612xs, DS3615xs, RS3413xs+, DS3611xs</td></tr>
     <tr data-family="x64"><td>v1000</td><td>x64</td><td>x64</td><td>AMD Ryzen V1500B/V1780B</td><td>—</td><td>DS1621+, DS1821+, RS1221+, DS1823xs+, RS822+</td></tr>
     <tr data-family="x64"><td>v1000nk</td><td>x64</td><td>x64</td><td>AMD Ryzen V1500B/V1780B</td><td>—</td><td>DS1825+, DS1525+, DS925+, RS2825RP+, RS2423RP+II</td></tr>
     <tr data-family="x64"><td>r1000</td><td>x64</td><td>x64</td><td>AMD Ryzen R1600</td><td>—</td><td>DS923+, DS723+, DS1522+, RS422+</td></tr>
     <tr data-family="x64"><td>r1000nk</td><td>x64</td><td>x64</td><td>AMD Ryzen R1600</td><td>—</td><td>DS725+</td></tr>
-    <tr data-family="x64"><td>epyc7002 / purley / grantley</td><td>x64</td><td>x64</td><td>Intel Xeon / AMD EPYC</td><td>—</td><td>SA6400, FS6400, HD6500, FS2500, RS18017xs+</td></tr>
+    <tr data-family="x64"><td>epyc7002 / purley / grantley</td><td>x64</td><td>x64</td><td>Intel Xeon / AMD EPYC</td><td>—</td><td>SA6400, FS6400, HD6500, FS3017</td></tr>
     <tr data-family="x64"><td>dockerx64 / kvmx64</td><td>x64</td><td>x64</td><td>Virtual</td><td>—</td><td>Docker / KVM virtualisation hosts</td></tr>
     <tr data-family="armv8"><td>rtd1296</td><td>ARMv8</td><td>aarch64</td><td>Realtek</td><td>ARM Mali-T820 (not used for transcoding)</td><td>DS420j, DS220j, RS819, DS418, DS218, DS118</td></tr>
     <tr data-family="armv8"><td>rtd1619b</td><td>ARMv8</td><td>aarch64</td><td>Realtek</td><td>ARM Mali (not used for transcoding)</td><td>DS223, DS223j, DS423, DS124</td></tr>
