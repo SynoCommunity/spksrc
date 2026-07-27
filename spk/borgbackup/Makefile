@@ -1,6 +1,6 @@
 SPK_NAME = borgbackup
 SPK_VERS = 1.4.4
-SPK_REV = 22
+SPK_REV = 23
 SPK_ICON = src/borgbackup.png
 
 # Include common.mk first to get ARCH definitions
@@ -59,7 +59,7 @@ DESCRIPTION = BorgBackup \(short: Borg\) is a deduplicating backup program. Opti
 
 DISPLAY_NAME = Borg
 STARTABLE = no
-CHANGELOG = "1. Update Borg to v1.4.4. <br/>2. Update borgmatic to v2.1.5. <br/>3. Refresh Python dependencies."
+CHANGELOG = "1. Update Borg to v1.4.4. <br/>2. Update borgmatic to v2.1.5. <br/>3. Refresh Python dependencies. <br/>4. Fix jsonschema/rpds-py dependency conflict."
 
 HOMEPAGE = https://borgbackup.readthedocs.io
 LICENSE  = 3-Clause BSD
@@ -109,14 +109,18 @@ endif
 # Version = 0.21 requires rustc >= 1.77 (armv5)
 # Version = 0.24 requires rustc >= 1.82 (qoriq)
 # Version = 0.25 requires rustc >= 1.85
+# jsonschema is pinned to match — 4.26+ requires rpds-py>=0.25.0
 ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += rpds_py==0.21.0
+WHEELS += jsonschema==4.25.1
 else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
 WHEELS += rpds_py==0.24.0
+WHEELS += jsonschema==4.25.1
 else
 WHEELS += rpds_py==0.30.0
+WHEELS += jsonschema==4.26.0
 endif
 endif
 

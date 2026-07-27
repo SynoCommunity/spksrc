@@ -9,7 +9,7 @@ docopt==0.6.2
 emborg==1.42
 idna==3.16
 inform==1.36
-jsonschema==4.26.0
+#jsonschema==4.26.0                     ==> per-arch version in WHEELS (4.25.1 for armv5/PPC)
 jsonschema_specifications==2025.9.1
 nestedtext==3.8
 packaging==26.2
