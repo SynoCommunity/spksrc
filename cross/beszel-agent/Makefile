@@ -17,7 +17,7 @@ LICENSE  = MIT
 
 UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
-COMPILE_MAKE_OPTIONS = OS=$(GOOS) ARCH=$(GO_ARCH) build-agent
+COMPILE_ARGS = OS=$(GOOS) ARCH=$(GO_ARCH) build-agent
 INSTALL_TARGET = install_beszel
 
 include ../../mk/spksrc.cross-go.mk
