@@ -224,7 +224,7 @@ crossenv-install-%:
 	@set -o pipefail; { \
 	. $(abspath $(WORK_DIR)/crossenv-$*)/bin/activate ; \
 	if [ -e "$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate" ] ; then \
-	   export PATH=$(abspath $(WORK_DIR)/crossenv-$*)/build/bin:$${PATH} ; \
+	   export PATH=$${PATH}:$(abspath $(WORK_DIR)/crossenv-$*)/build/bin ; \
 	   $(MSG) "environment: [$(DEFAULT_ENV)]" ; \
 	   $(MSG) "crossenv: [$(abspath $(WORK_DIR)/crossenv-$*)/bin/activate]" ; \
 	   $(MSG) "python: [$$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python)]" ; \
@@ -243,6 +243,7 @@ crossenv-install-%:
 	         _meson_cross_args="$${_meson_cross_args} --config-settings=setup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-properties"; \
 	      fi ;; \
 	   soxr) \
+	      export SETUPTOOLS_SCM_PRETEND_VERSION="$(WHEEL_VERSION)"; \
 	      _extra_pip="--config-settings=cmake.args=-DCMAKE_SYSTEM_NAME=Linux;-DCMAKE_CROSSCOMPILING=TRUE"; ;; \
 	esac ; \
 	$(MSG) \
@@ -266,8 +267,19 @@ crossenv-install-%:
 	         _meson_cross_args="$${_meson_cross_args} --config-settings=setup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-properties"; \
 	      fi ;; \
 	   soxr) \
+	      export SETUPTOOLS_SCM_PRETEND_VERSION="$(WHEEL_VERSION)"; \
 	      _extra_pip="--config-settings=cmake.args=-DCMAKE_SYSTEM_NAME=Linux;-DCMAKE_CROSSCOMPILING=TRUE"; ;; \
 	esac ; \
+	$(MSG) \
+	   LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib:$${LD_LIBRARY_PATH} \
+	   $$(which $(if $(filter wheelhouse,$(WHEEL_TYPE)),cross,$(WHEEL_TYPE))-python) -m pip install \
+	   --cache-dir $(PIP_CACHE_DIR) \
+	   $(EXTRA_PIP_ARGS) \
+	   $${_meson_cross_args} \
+	   $${_extra_pip} \
+	   --no-build-isolation \
+	   --disable-pip-version-check \
+	   $(WHEEL_NAME)==$(WHEEL_VERSION) ; \
 	$(RUN) \
 	   LD_LIBRARY_PATH=$(STAGING_INSTALL_PREFIX)/lib:$${LD_LIBRARY_PATH} \
 	   PATH=$${PATH} \
