@@ -14,11 +14,8 @@ UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 BUILD_DEPENDS = native/go
 
 HOMEPAGE = https://github.com/tizbac/proxmoxbackupclient_go/
-COMMENT  = In development proxmox backup client written in golang, aimed at windows compatibility.
-LICENSE  = GPL v3
-
-# REMARKS:
-# we patch the sources to get rid of windows dependencies.
+COMMENT = In development proxmox backup client written in golang, aimed at windows compatibility.
+LICENSE = GPLv3
 
 CGO_ENABLED = 1
 GO_SRC_DIR = $(WORK_DIR)/$(PKG_DIR)/directorybackup
