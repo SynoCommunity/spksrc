@@ -295,7 +295,7 @@ tc_meson_cross_vars:
 	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}'" ; \
 	  fi ; \
 	done
-@echo "cargo = '$(CARGO_HOME)/bin/cargo'" ; \
+	@echo "cargo = '$(CARGO_HOME)/bin/cargo'" ; \
 	echo "rust = '$(CARGO_HOME)/bin/rustc'"
 	@echo "pkgconfig = '$$(which pkg-config)'"
 	@echo "pkg-config = '$$(which pkg-config)'"

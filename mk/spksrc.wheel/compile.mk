@@ -112,7 +112,7 @@ cross-compile-wheel-%:
 	$(foreach e,$(shell cat $(CROSSENV_WHEEL_PATH)/build/python-cc.mk),$(eval $(e)))
 	@. $(CROSSENV) ; \
 	if [ -e "$(CROSSENV)" ] ; then \
-	   export PATH=$$(echo $(CROSSENV_PATH)/build/bin:$${PATH}:$(call merge, $(ENV), PATH, :) | awk -v RS=':' '!seen[$$0]++' | paste -sd ':') ; \
+	   export PATH=$$(echo $${PATH}:$(CROSSENV_PATH)/build/bin:$(call merge, $(ENV), PATH, :) | awk -v RS=':' '!seen[$$0]++' | paste -sd ':') ; \
 	   _cross_npymath="$(CROSSENV_PATH)/cross/$(PYTHON_LIB_DIR)/site-packages/numpy/_core/lib/libnpymath.a"; \
 	   _build_npymath="$(CROSSENV_PATH)/build/$(PYTHON_LIB_DIR)/site-packages/numpy/_core/lib/libnpymath.a"; \
 	   if [ -f "$${_cross_npymath}" ] && [ -f "$${_build_npymath}" ] && [ "$(WHEEL_NAME)" != "numpy" ]; then \
@@ -125,6 +125,7 @@ cross-compile-wheel-%:
 	   numpy|scipy|scikit_learn|lap|pandas|numba|llvmlite|msgpack) \
 	      extra_args="$(MESON_CROSS_ARGS)" ;; \
 	   soxr) \
+	      export SETUPTOOLS_SCM_PRETEND_VERSION="$(WHEEL_VERSION)"; \
 	      _pip_args="wheel --no-color --disable-pip-version-check --cache-dir $(PIP_CACHE_DIR) --no-binary :all: --no-index --find-links $(PIP_DISTRIB_DIR) --no-deps --wheel-dir $(WHEELHOUSE) --config-settings=cmake.args=-DCMAKE_SYSTEM_NAME=Linux;-DCMAKE_CROSSCOMPILING=TRUE"; \
 	      extra_args="" ;; \
 	esac ; \
