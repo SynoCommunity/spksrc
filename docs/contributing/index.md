@@ -74,25 +74,7 @@ See [Development Process](development-process.md) for the full workflow from for
 
 ### Commit Messages
 
-Use clear, descriptive commit messages:
-
-```
-{DISPLAY_NAME}: brief description of change
-
-Detailed explanation if needed. Reference issues with #123.
-```
-
-Use the `DISPLAY_NAME` from the package's `spk/*/Makefile` (e.g., "Transmission", "Python 3.12").
-
-Examples:
-
-```
-Transmission: Update to v4.0.5
-
-Python 3.12: Fix wheel building for armv5
-
-docs: add troubleshooting section for PHP packages
-```
+Use the `DISPLAY_NAME` from the package's `spk/*/Makefile` as the commit prefix. See [Development Process](development-process.md) for format details and examples.
 
 ### Pull Request Guidelines
 
@@ -101,7 +83,7 @@ docs: add troubleshooting section for PHP packages
 - **Testing**: Describe how you tested the changes
 - **Screenshots**: Include for UI changes or wizard updates
 
-See [Pull Request Guidelines](pull-requests.md) for detailed requirements.
+See [Pull Request Guidelines](pull-requests.md) for detailed requirements and the PR template.
 
 ## Communication
 
