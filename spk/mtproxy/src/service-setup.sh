@@ -1,7 +1,7 @@
-CFG_FILE="${SYNOPKG_PKGDEST}/var/mtproxy.conf"
+CFG_FILE="${SYNOPKG_PKGVAR}/mtproxy.conf"
 BIN="${SYNOPKG_PKGDEST}/bin/mtproto-proxy"
-AES_PWD_FILE="${SYNOPKG_PKGDEST}/var/secret.conf"
-RULES_FILE="${SYNOPKG_PKGDEST}/var/rules.conf"
+AES_PWD_FILE="${SYNOPKG_PKGVAR}/secret.conf"
+RULES_FILE="${SYNOPKG_PKGVAR}/rules.conf"
 
 if [ -r "${CFG_FILE}" ]; then
     . "${CFG_FILE}"
