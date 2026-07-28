@@ -4,6 +4,7 @@ IMMICH_BUILD_DATA="${SYNOPKG_PKGDEST}/share/immich"
 
 # External dependencies
 NODE="/var/packages/Node.js_v22/target/usr/local/bin/node"
+PYTHON="/var/packages/python314/target/bin/python3"
 FFMPEG_DIR="/var/packages/ffmpeg8/target/bin"
 
 # PostgreSQL connection
@@ -66,6 +67,34 @@ setup_proxy ()
         export HTTPS_PROXY="${PROXY_HTTPS}"
     fi
     install_log "Using proxy ${http_host}:${http_port} for HTTP and ${https_host}:${https_port} for HTTPS"
+}
+
+install_ml_packages()
+{
+    "${ML_VENV}/bin/pip3" install --upgrade --no-cache-dir \
+        onnxruntime \
+        opencv-python-headless \
+        insightface \
+        huggingface-hub \
+        numpy \
+        orjson \
+        pillow \
+        tokenizers \
+        fastapi \
+        uvicorn \
+        gunicorn \
+        pydantic \
+        pydantic-settings \
+        python-multipart \
+        rich \
+        aiocache \
+        rapidocr 2>&1
+    # insightface pulls in opencv-python (GUI); force back to headless
+    "${ML_VENV}/bin/pip3" install \
+        --force-reinstall \
+        --no-deps \
+        --no-cache-dir \
+        opencv-python-headless 2>&1
 }
 
 service_prestart()
@@ -191,16 +220,17 @@ service_postinst ()
         for ext in vector unaccent cube earthdistance pg_trgm uuid-ossp; do
             PGPASSWORD="${PG_ADMIN_PASS}" ${PG_PSQL} -h "${PG_HOST}" -p "${PG_PORT}" -U "${PG_ADMIN_USER}" -d "${PG_DATABASE}" -c "CREATE EXTENSION IF NOT EXISTS \"${ext}\";" 2>/dev/null || true
         done
+
         if [ "${wizard_enable_ml}" = "true" ]; then
             setup_proxy
-            /var/packages/python314/target/bin/python3 -m venv "${ML_VENV}" 2>&1 || true
-            "${ML_VENV}/bin/pip3" install --no-cache-dir \
-                onnxruntime opencv-python-headless insightface \
-                huggingface-hub numpy orjson pillow tokenizers \
-                fastapi uvicorn gunicorn pydantic pydantic-settings \
-                python-multipart rich aiocache rapidocr 2>&1 || true
-            # insightface pulls in opencv-python (GUI); force back to headless
-            "${ML_VENV}/bin/pip3" install --force-reinstall --no-deps --no-cache-dir opencv-python-headless 2>&1 || true
+            ${PYTHON} -m venv "${ML_VENV}" 2>&1
+            if [ "${wizard_enable_pip_mirror}" = "true" ] && [ -n "${wizard_pip_index_url}" ]; then
+                "${ML_VENV}/bin/pip3" config set \
+                    --site \
+                    global.index-url \
+                    "${wizard_pip_index_url}"
+            fi
+            install_ml_packages
         fi
     fi
 }
@@ -238,12 +268,7 @@ service_postupgrade ()
     # Upgrade ML wheels if ML is installed
     if [ -x "${ML_VENV}/bin/python3" ]; then
         setup_proxy
-        "${ML_VENV}/bin/pip3" install --upgrade --no-cache-dir \
-            onnxruntime opencv-python-headless insightface \
-            huggingface-hub numpy orjson pillow tokenizers \
-            fastapi uvicorn gunicorn pydantic pydantic-settings \
-            python-multipart rich aiocache rapidocr 2>&1 || true
-        "${ML_VENV}/bin/pip3" install --force-reinstall --no-deps --no-cache-dir opencv-python-headless 2>&1 || true
+        install_ml_packages
     fi
 }
 
