@@ -28,7 +28,7 @@ SynoCommunity is a community-driven project that provides open-source packages f
 ### Community Support
 
 - **Issue Triage** - Help categorize and reproduce bug reports
-- **User Support** - Answer questions in discussions and issues
+- **User Support** - Answer questions in issues
 - **Testing** - Test packages on different hardware and DSM versions
 
 ## Getting Started
@@ -93,12 +93,6 @@ See [Pull Request Guidelines](pull-requests.md) for detailed requirements and th
 - Package-specific problems
 - Build failures
 
-### GitHub Discussions
-
-- General questions
-- Ideas and proposals
-- Community announcements
-
 ### Discord
 
 - Real-time chat with maintainers and contributors
@@ -126,4 +120,3 @@ All contributors are expected to follow the [Contributor Covenant Code of Conduc
 - [Package Lifecycle Policy](package-lifecycle.md)
 - [Developer Guide](../developer-guide/index.md)
 - [GitHub Issues](https://github.com/SynoCommunity/spksrc/issues)
-- [GitHub Discussions](https://github.com/SynoCommunity/spksrc/discussions)
