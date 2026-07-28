@@ -141,6 +141,7 @@ All contributors are expected to follow the [Contributor Covenant Code of Conduc
 
 - [Development Process](development-process.md)
 - [Pull Request Guidelines](pull-requests.md)
+- [Package Lifecycle Policy](package-lifecycle.md)
 - [Developer Guide](../developer-guide/index.md)
 - [GitHub Issues](https://github.com/SynoCommunity/spksrc/issues)
 - [GitHub Discussions](https://github.com/SynoCommunity/spksrc/discussions)
