@@ -11,6 +11,8 @@ tags:
 
 Jellyfin is a free software media system that puts you in control of managing and streaming your media.
 
+![Jellyfin playback screenshot](../assets/images/jellyfin-playback.jpg)
+
 ## Package Information
 
 | Property | Value |
