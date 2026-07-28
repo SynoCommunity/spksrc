@@ -1,9 +1,10 @@
 PKG_NAME = libpciaccess
-PKG_VERS = 0.18.1
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://xorg.freedesktop.org/archive/individual/lib
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_VERS = 0.19
+PKG_EXT = tar.bz2
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/archive/$(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
@@ -14,3 +15,8 @@ LICENSE  = https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/blob/master/CO
 ADDITIONAL_CFLAGS = -O
 
 include ../../mk/spksrc.cross-meson.mk
+
+# 0.19 uses a C99 for-loop init; pin gnu99 (gcc 4.x defaults to gnu89).
+ifeq ($(call version_ge,$(TC_GCC),4.9),1)
+CONFIGURE_ARGS += -Dc_std=gnu99
+endif
