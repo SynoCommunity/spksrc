@@ -1,6 +1,6 @@
 SPK_NAME = seerr
 SPK_VERS = 3.4.0
-SPK_REV = 1
+SPK_REV = 8
 SPK_ICON = src/seerr.png
 
 DEPENDS = cross/seerr
