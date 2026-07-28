@@ -117,13 +117,13 @@ pre_download_target: download_msg
 # (number of mirror candidates) x DOWNLOAD_TRIES attempts, and the candidate
 # list is finite (primary URL + the family mirrors + PKG_DIST_MIRRORS, then
 # de-duplicated), so a failing download can never loop indefinitely.
-DOWNLOAD_TRIES      ?= 2
-GNU_MIRRORS         ?= https://ftpmirror.gnu.org/gnu https://ftp.gnu.org/gnu https://mirrors.kernel.org/gnu https://mirror.csclub.uwaterloo.ca/gnu
-SOURCEFORGE_MIRRORS ?= https://downloads.sourceforge.net/project https://netcologne.dl.sourceforge.net/project https://phoenixnap.dl.sourceforge.net/project
-GNOME_MIRRORS       ?= https://download.gnome.org/sources https://mirror.csclub.uwaterloo.ca/gnome/sources
-XORG_MIRRORS        ?= https://www.x.org/releases https://mirror.csclub.uwaterloo.ca/x.org/releases
-KERNEL_MIRRORS      ?= https://cdn.kernel.org/pub https://mirrors.kernel.org/pub https://www.kernel.org/pub
-PKG_DIST_MIRRORS    ?=
+DOWNLOAD_TRIES     ?= 2
+MIRROR_GNU         ?= https://ftpmirror.gnu.org/gnu https://ftp.gnu.org/gnu https://mirrors.kernel.org/gnu https://mirror.csclub.uwaterloo.ca/gnu
+MIRROR_SOURCEFORGE ?= https://downloads.sourceforge.net/project https://netcologne.dl.sourceforge.net/project https://phoenixnap.dl.sourceforge.net/project
+MIRROR_GNOME       ?= https://download.gnome.org/sources https://mirror.csclub.uwaterloo.ca/gnome/sources
+MIRROR_KERNEL      ?= https://cdn.kernel.org/pub https://mirrors.kernel.org/pub https://www.kernel.org/pub
+MIRROR_SAVANNAH    ?= https://download.savannah.gnu.org/releases https://download-mirror.savannah.gnu.org/releases
+PKG_DIST_MIRRORS   ?=
 
 # ---------------------------------------------------------------------------
 # Per-method download macros, spliced into download_target's case below.
@@ -230,11 +230,11 @@ define DOWNLOAD_HTTP
 	        mirrorUrls="$${url}" ; \
 	        marker="" ; mirrorBases="" ; \
 	        case "$${url}" in \
-	          *//ftpmirror.gnu.org/gnu/*|*//ftp.gnu.org/gnu/*)  marker="/gnu/" ;     mirrorBases="$(GNU_MIRRORS)" ;; \
-	          *//downloads.sourceforge.net/project/*)           marker="/project/" ; mirrorBases="$(SOURCEFORGE_MIRRORS)" ;; \
-	          *//download.gnome.org/sources/*)                  marker="/sources/" ; mirrorBases="$(GNOME_MIRRORS)" ;; \
-	          *//www.x.org/releases/*|*//x.org/releases/*)      marker="/releases/" ; mirrorBases="$(XORG_MIRRORS)" ;; \
-	          *//www.kernel.org/pub/*|*//cdn.kernel.org/pub/*)  marker="/pub/" ;     mirrorBases="$(KERNEL_MIRRORS)" ;; \
+	          *//ftpmirror.gnu.org/gnu/*|*//ftp.gnu.org/gnu/*)  marker="/gnu/" ;     mirrorBases="$(MIRROR_GNU)" ;; \
+	          *//downloads.sourceforge.net/project/*)           marker="/project/" ; mirrorBases="$(MIRROR_SOURCEFORGE)" ;; \
+	          *//download.gnome.org/sources/*)                  marker="/sources/" ; mirrorBases="$(MIRROR_GNOME)" ;; \
+	          *//www.kernel.org/pub/*|*//cdn.kernel.org/pub/*)  marker="/pub/" ;     mirrorBases="$(MIRROR_KERNEL)" ;; \
+	          *//download.savannah.gnu.org/releases/*)          marker="/releases/" ; mirrorBases="$(MIRROR_SAVANNAH)" ;; \
 	        esac ; \
 	        if [ -n "$${marker}" ]; then \
 	          tail=$${url#*$${marker}} ; \
