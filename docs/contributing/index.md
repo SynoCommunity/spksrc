@@ -74,25 +74,7 @@ See [Development Process](development-process.md) for the full workflow from for
 
 ### Commit Messages
 
-Use clear, descriptive commit messages:
-
-```
-{DISPLAY_NAME}: brief description of change
-
-Detailed explanation if needed. Reference issues with #123.
-```
-
-Use the `DISPLAY_NAME` from the package's `spk/*/Makefile` (e.g., "Transmission", "Python 3.12").
-
-Examples:
-
-```
-Transmission: Update to v4.0.5
-
-Python 3.12: Fix wheel building for armv5
-
-docs: add troubleshooting section for PHP packages
-```
+Use the `DISPLAY_NAME` from the package's `spk/*/Makefile` as the commit prefix. See [Development Process](development-process.md) for format details and examples.
 
 ### Pull Request Guidelines
 
@@ -101,7 +83,7 @@ docs: add troubleshooting section for PHP packages
 - **Testing**: Describe how you tested the changes
 - **Screenshots**: Include for UI changes or wizard updates
 
-See [Pull Request Guidelines](pull-requests.md) for detailed requirements.
+See [Pull Request Guidelines](pull-requests.md) for detailed requirements and the PR template.
 
 ## Communication
 
@@ -117,10 +99,13 @@ See [Pull Request Guidelines](pull-requests.md) for detailed requirements.
 - Ideas and proposals
 - Community announcements
 
-### IRC/Matrix
+### Discord
 
-- Real-time chat with maintainers
+- Real-time chat with maintainers and contributors
 - Quick questions and debugging help
+- Use the `#package-dev` channel for development discussions
+
+[Join the SynoCommunity Discord](https://discord.gg/nnN9fgE7EF)
 
 ## Recognition
 
@@ -132,17 +117,13 @@ Contributors are recognized in:
 
 ## Code of Conduct
 
-We are committed to providing a welcoming and inclusive environment. Please:
-
-- Be respectful and considerate
-- Welcome newcomers and help them learn
-- Focus on constructive feedback
-- Respect differing viewpoints and experiences
+All contributors are expected to follow the [Contributor Covenant Code of Conduct](https://github.com/SynoCommunity/spksrc?tab=coc-ov-file). We are committed to providing a welcoming and inclusive environment.
 
 ## Quick Links
 
 - [Development Process](development-process.md)
 - [Pull Request Guidelines](pull-requests.md)
+- [Package Lifecycle Policy](package-lifecycle.md)
 - [Developer Guide](../developer-guide/index.md)
 - [GitHub Issues](https://github.com/SynoCommunity/spksrc/issues)
 - [GitHub Discussions](https://github.com/SynoCommunity/spksrc/discussions)
