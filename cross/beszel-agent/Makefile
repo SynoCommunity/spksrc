@@ -6,6 +6,7 @@ PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/henrygd/beszel/archive/refs/tags
 PKG_DIST_FILE = $(REAL_PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 
+# use different folders for beszel-agent and beszel-hub
 PKG_DIR = $(PKG_NAME)/$(REAL_PKG_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
