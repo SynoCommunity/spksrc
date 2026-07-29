@@ -1,5 +1,5 @@
 PKG_NAME = erlang
-PKG_VERS = 25.3
+PKG_VERS = 26.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = OTP-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/erlang/otp/archive
@@ -13,7 +13,7 @@ COMMENT  = Erlang is a programming language used to build massively scalable sof
 LICENSE  = Apache 2.0
 
 CONFIGURE_TARGET = erlang_configure
-INSTALL_MAKE_OPTIONS = install INSTALL_PREFIX=
+INSTALL_ARGS = install INSTALL_PREFIX=
 
 CONFIGURE_ARGS  = --without-javac
 CONFIGURE_ARGS += --without-jinterface

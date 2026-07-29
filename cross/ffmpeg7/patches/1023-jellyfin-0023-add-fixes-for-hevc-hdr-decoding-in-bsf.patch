@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/bsf/hevc_mp4toannexb.c
-===================================================================
 --- libavcodec/bsf/hevc_mp4toannexb.c
 +++ libavcodec/bsf/hevc_mp4toannexb.c
 @@ -127,6 +127,7 @@ static int hevc_mp4toannexb_filter(AVBSF
@@ -26,8 +24,6 @@ Index: FFmpeg/libavcodec/bsf/hevc_mp4toannexb.c
          extra_size    = add_extradata * ctx->par_out->extradata_size;
          got_irap     |= is_irap;
  
-Index: FFmpeg/tests/fate/hevc.mak
-===================================================================
 --- tests/fate/hevc.mak
 +++ tests/fate/hevc.mak
 @@ -233,7 +233,7 @@ FATE_HEVC-$(call ALLYES, HEVC_DEMUXER MO

@@ -1,6 +1,6 @@
 PKG_NAME = ncursesw
 DIST_NAME = ncurses
-PKG_VERS = 6.5
+PKG_VERS = 6.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(DIST_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.gnu.org/gnu/ncurses

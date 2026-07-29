@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -2467,6 +2467,7 @@ TYPES_LIST="
@@ -27,8 +25,6 @@ Index: FFmpeg/configure
      check_func_headers CoreVideo/CVPixelBuffer.h kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange "-framework CoreVideo"
      check_func_headers CoreVideo/CVPixelBuffer.h kCVPixelFormatType_422YpCbCr8BiPlanarVideoRange "-framework CoreVideo"
      check_func_headers CoreVideo/CVPixelBuffer.h kCVPixelFormatType_422YpCbCr10BiPlanarVideoRange "-framework CoreVideo"
-Index: FFmpeg/libavcodec/Makefile
-===================================================================
 --- libavcodec/Makefile
 +++ libavcodec/Makefile
 @@ -1018,6 +1018,7 @@ OBJS-$(CONFIG_AV1_D3D12VA_HWACCEL)
@@ -39,8 +35,6 @@ Index: FFmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_AV1_VULKAN_HWACCEL)         += vulkan_decode.o vulkan_av1.o
  OBJS-$(CONFIG_H263_VAAPI_HWACCEL)         += vaapi_mpeg4.o
  OBJS-$(CONFIG_H263_VIDEOTOOLBOX_HWACCEL)  += videotoolbox.o
-Index: FFmpeg/libavcodec/av1dec.c
-===================================================================
 --- libavcodec/av1dec.c
 +++ libavcodec/av1dec.c
 @@ -541,6 +541,7 @@ static int get_pixel_format(AVCodecConte
@@ -128,8 +122,6 @@ Index: FFmpeg/libavcodec/av1dec.c
  #if CONFIG_AV1_VULKAN_HWACCEL
          HWACCEL_VULKAN(av1),
  #endif
-Index: FFmpeg/libavcodec/av1dec.h
-===================================================================
 --- libavcodec/av1dec.h
 +++ libavcodec/av1dec.h
 @@ -114,7 +114,8 @@ typedef struct AV1DecContext {
@@ -142,8 +134,6 @@ Index: FFmpeg/libavcodec/av1dec.h
  
      // AVOptions
      int operating_point;
-Index: FFmpeg/libavcodec/hwaccels.h
-===================================================================
 --- libavcodec/hwaccels.h
 +++ libavcodec/hwaccels.h
 @@ -26,6 +26,7 @@ extern const struct FFHWAccel ff_av1_dxv
@@ -154,8 +144,6 @@ Index: FFmpeg/libavcodec/hwaccels.h
  extern const struct FFHWAccel ff_av1_vulkan_hwaccel;
  extern const struct FFHWAccel ff_h263_vaapi_hwaccel;
  extern const struct FFHWAccel ff_h263_videotoolbox_hwaccel;
-Index: FFmpeg/libavcodec/videotoolbox.c
-===================================================================
 --- libavcodec/videotoolbox.c
 +++ libavcodec/videotoolbox.c
 @@ -56,6 +56,10 @@ enum { kCMVideoCodecType_HEVC = 'hvc1' }
@@ -220,8 +208,6 @@ Index: FFmpeg/libavcodec/videotoolbox.c
      default :
          break;
      }
-Index: FFmpeg/libavcodec/videotoolbox_av1.c
-===================================================================
 --- /dev/null
 +++ libavcodec/videotoolbox_av1.c
 @@ -0,0 +1,105 @@
@@ -330,8 +316,6 @@ Index: FFmpeg/libavcodec/videotoolbox_av1.c
 +    .uninit         = ff_videotoolbox_uninit,
 +    .priv_data_size = sizeof(VTContext),
 +};
-Index: FFmpeg/libavcodec/vt_internal.h
-===================================================================
 --- libavcodec/vt_internal.h
 +++ libavcodec/vt_internal.h
 @@ -56,6 +56,9 @@ int ff_videotoolbox_frame_params(AVCodec

@@ -1,5 +1,5 @@
-# Define python312 binary path
-PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:/var/packages/python312/target/bin:${PATH}"
+# Define python314 binary path
+PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:/var/packages/python314/target/bin:${PATH}"
 export LANG=en_US.UTF-8
 
 SALT_CONFIG="/var/packages/${SYNOPKG_PKGNAME}/etc"
@@ -11,9 +11,9 @@ service_postinst()
     install_python_virtualenv
     install_python_wheels
 
-    # Patch rsax931.py to find libcrypto from python312
-    python ${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/patch_ng.py \
-           --directory=${SYNOPKG_PKGDEST}/env/lib/python3.12/site-packages/salt/utils \
+    # Patch rsax931.py to find libcrypto from python314
+    python ${SYNOPKG_PKGDEST}/env/lib/python3.14/site-packages/patch_ng.py \
+           --directory=${SYNOPKG_PKGDEST}/env/lib/python3.14/site-packages/salt/utils \
            ${SYNOPKG_PKGDEST}/share/rsax931.py.patch
 
     # Initialize configuration directory

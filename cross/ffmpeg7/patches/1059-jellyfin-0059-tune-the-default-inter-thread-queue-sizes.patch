@@ -1,5 +1,3 @@
-Index: FFmpeg/fftools/ffmpeg_sched.h
-===================================================================
 --- fftools/ffmpeg_sched.h
 +++ fftools/ffmpeg_sched.h
 @@ -257,7 +257,10 @@ int sch_add_mux(Scheduler *sch, SchThrea
@@ -14,8 +12,6 @@ Index: FFmpeg/fftools/ffmpeg_sched.h
  
  /**
   * Add a muxed stream for a previously added muxer.
-Index: FFmpeg/tests/ref/fate/ffmpeg-fix_sub_duration_heartbeat
-===================================================================
 --- tests/ref/fate/ffmpeg-fix_sub_duration_heartbeat
 +++ tests/ref/fate/ffmpeg-fix_sub_duration_heartbeat
 @@ -33,3 +33,8 @@

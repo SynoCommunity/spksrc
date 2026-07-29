@@ -28,7 +28,7 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
 endif
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: gotify-server_install
 gotify-server_install:

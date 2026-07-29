@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/cuviddec.c
-===================================================================
 --- libavcodec/cuviddec.c
 +++ libavcodec/cuviddec.c
 @@ -336,7 +336,8 @@ static int CUDAAPI cuvid_handle_picture_
@@ -21,8 +19,6 @@ Index: jellyfin-ffmpeg/libavcodec/cuviddec.c
          frame->width = avctx->width;
          frame->height = avctx->height;
          if (avctx->pkt_timebase.num && avctx->pkt_timebase.den)
-Index: jellyfin-ffmpeg/libavcodec/nvenc.c
-===================================================================
 --- libavcodec/nvenc.c
 +++ libavcodec/nvenc.c
 @@ -210,8 +210,14 @@ static void nvenc_map_preset(NvencContex
@@ -59,8 +55,6 @@ Index: jellyfin-ffmpeg/libavcodec/nvenc.c
  
      hevc->disableSPSPPS = (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? 1 : 0;
      hevc->repeatSPSPPS  = (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? 0 : 1;
-Index: jellyfin-ffmpeg/libavfilter/vf_yadif_cuda.c
-===================================================================
 --- libavfilter/vf_yadif_cuda.c
 +++ libavfilter/vf_yadif_cuda.c
 @@ -297,10 +297,9 @@ static int config_output(AVFilterLink *l

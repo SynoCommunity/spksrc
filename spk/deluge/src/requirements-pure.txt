@@ -17,6 +17,6 @@ pycparser==3.0
 pyopenssl==26.0.0
 pyxdg==0.28
 service_identity==24.2.0
-#setuptools               ==> python312
+setuptools==81.0.0        # pinned version to fix #7115
 twisted==25.5.0
 typing_extensions==4.15.0

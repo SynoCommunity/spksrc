@@ -67,7 +67,7 @@ def parse_log_file(log_file_path):
             # Strip syslog priority tag if present (e.g., <134>)
             line = re.sub(r'^<\d+>', '', line)
             if " 403 " in line:  # Check if the line contains " 403 " indicating a 403 status code
-                match = re.search(r'(\w+\s+\d+\s\d+:\d+:\d+).*\s(\d+\.\d+\.\d+\.\d+).*"\s*(GET|POST|PUT|DELETE)\s+([^"]+)"', line)
+                match = re.search(r'(\w+\s+\d+\s\d+:\d+:\d+).*\s((?:\d+\.\d+\.\d+\.\d+)|(?:\[[^\]]+\])).*"\s*(GET|POST|PUT|DELETE)\s+([^"]+)"', line)
                 if match:
                     timestamp = match.group(1)  # Extract the date and time
                     ip_address = match.group(2)
@@ -82,12 +82,12 @@ def parse_log_file(log_file_path):
                         sql_alert = 'Possible SQL Injection Attempt Was Made.'
                     else:
                         sql_alert = ''
-                    if "PUT" in line:
+                    if http_method == "PUT":
                         put_method = 'Possible Remote File Upload Attempt Was Made.'
                     else:
                         put_method = ''
 
-                    if "admin" in line:
+                    if "admin" in requested_url.lower():
                         illegal_resource = 'Possible Illegal Resource Access Attempt Was Made.'
                     else:
                         illegal_resource = ''

@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -5601,7 +5601,7 @@ elif enabled x86; then
@@ -22,8 +20,6 @@ Index: FFmpeg/configure
      check_cflags -Werror=format-security
      check_cflags -Werror=implicit-function-declaration
      check_cflags -Werror=missing-prototypes
-Index: FFmpeg/libavcodec/huffyuvdsp.c
-===================================================================
 --- libavcodec/huffyuvdsp.c
 +++ libavcodec/huffyuvdsp.c
 @@ -16,6 +16,13 @@
@@ -40,8 +36,6 @@ Index: FFmpeg/libavcodec/huffyuvdsp.c
  #include <stdint.h>
  
  #include "config.h"
-Index: FFmpeg/libavcodec/huffyuvenc.c
-===================================================================
 --- libavcodec/huffyuvenc.c
 +++ libavcodec/huffyuvenc.c
 @@ -28,6 +28,13 @@
@@ -58,8 +52,6 @@ Index: FFmpeg/libavcodec/huffyuvenc.c
  #include "config_components.h"
  
  #include "avcodec.h"
-Index: FFmpeg/libavcodec/x86/cabac.h
-===================================================================
 --- libavcodec/x86/cabac.h
 +++ libavcodec/x86/cabac.h
 @@ -183,6 +183,9 @@ av_noinline

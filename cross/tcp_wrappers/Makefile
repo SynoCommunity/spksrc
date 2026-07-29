@@ -16,8 +16,8 @@ HOMEPAGE = http://www.linuxfromscratch.org/blfs/view/5.1/basicnet/tcpwrappers.ht
 COMMENT  = The tcpwrappers package provides daemon wrapper programs that report the name of the client requesting network services and the requested service. 
 LICENSE  = BSD
 
-COMPILE_MAKE_OPTIONS += REAL_DAEMON_DIR=$(STAGING_INSTALL_PREFIX)
-COMPILE_MAKE_OPTIONS += linux
+COMPILE_ARGS += REAL_DAEMON_DIR=$(STAGING_INSTALL_PREFIX)
+COMPILE_ARGS += linux
 
 POST_EXTRACT_TARGET = tcp_wrappers_post_extract
 CONFIGURE_TARGET = nop

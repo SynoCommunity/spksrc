@@ -1,5 +1,5 @@
 PKG_NAME = uptime-kuma
-PKG_VERS = 2.2.1
+PKG_VERS = 2.4.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/louislam/uptime-kuma/archive/refs/tags
@@ -20,7 +20,7 @@ ENV += PATH=$(WORK_DIR)/../../../native/nodejs_22/work-native/node/bin:$$PATH
 # Uptime Kuma pre-built frontend dist URL
 DIST_URL = https://github.com/louislam/uptime-kuma/releases/download/$(PKG_VERS)/dist.tar.gz
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: uptime_kuma_install
 uptime_kuma_install:

@@ -1,0 +1,22 @@
+Index: FFmpeg/fftools/ffmpeg_demux.c
+===================================================================
+--- fftools/ffmpeg_demux.c
++++ fftools/ffmpeg_demux.c
+@@ -534,7 +534,7 @@ static void readrate_sleep(Demuxer *d)
+             ds->lag = lag;
+             ds->resume_wc = now;
+             ds->resume_pts = pts;
+-            av_log_once(ds, AV_LOG_WARNING, AV_LOG_DEBUG, &resume_warn,
++            av_log_once(ds, AV_LOG_VERBOSE, AV_LOG_DEBUG, &resume_warn,
+                         "Resumed reading at pts %0.3f with rate %0.3f after a lag of %0.3fs\n",
+                         (float)pts/AV_TIME_BASE, d->readrate_catchup, (float)lag/AV_TIME_BASE);
+         }
+@@ -2152,7 +2152,7 @@ int ifile_open(const OptionsContext *o,
+                    d->readrate_initial_burst);
+             return AVERROR(EINVAL);
+         }
+-        d->readrate_catchup = o->readrate_catchup ? o->readrate_catchup : d->readrate * 1.05;
++        d->readrate_catchup = o->readrate_catchup ? o->readrate_catchup : d->readrate * 100;
+         if (d->readrate_catchup < d->readrate) {
+             av_log(d, AV_LOG_ERROR,
+                    "Option -readrate_catchup is %0.3f; it must be at least equal to %0.3f.\n",

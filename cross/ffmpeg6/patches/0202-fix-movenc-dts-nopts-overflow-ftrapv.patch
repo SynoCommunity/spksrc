@@ -1,0 +1,37 @@
+Subject: [PATCH] avformat/movenc: guard against AV_NOPTS_VALUE in
+         mov_flush_fragment dts arithmetic
+
+In mov_flush_fragment(), the computation of track->track_duration
+performs dts - track->start_dts without checking whether either
+operand is AV_NOPTS_VALUE (INT64_MIN). With -ftrapv enabled, this
+signed integer overflow triggers abort() via __subvdi3.
+
+The pts != AV_NOPTS_VALUE check was already present but the equivalent
+guard for dts and track->start_dts was missing.
+
+Fix by skipping the track duration update when pkt->dts is
+AV_NOPTS_VALUE, and guarding the subtraction when track->start_dts
+is AV_NOPTS_VALUE.
+
+Detected with --enable-ftrapv on Intel Apollo Lake hardware during
+h264_vaapi transcoding of IPTV streams after encoder context reset.
+
+Suggested-by: Claude Sonnet 4.6 (Anthropic AI <https://anthropic.com>)
+Signed-off-by: Vincent Fortier <th0ma7@gmail.com>
+
+--- libavformat/movenc.c.orig	2026-05-30 20:10:26.399269531 +0000
++++ libavformat/movenc.c	2026-05-30 20:11:37.129673506 +0000
+@@ -6304,9 +6304,12 @@ static int mov_flush_fragment(AVFormatCo
+                 ff_get_muxer_ts_offset(s, i, &offset);
+                 pts = pkt->pts + offset;
+                 dts = pkt->dts + offset;
++                if (dts == AV_NOPTS_VALUE)
++                    continue;
+                 if (track->dts_shift != AV_NOPTS_VALUE)
+                     dts += track->dts_shift;
+-                track->track_duration = dts - track->start_dts;
++                if (track->start_dts != AV_NOPTS_VALUE)
++                    track->track_duration = dts - track->start_dts;
+                 if (pts != AV_NOPTS_VALUE)
+                     track->end_pts = pts;
+                 else

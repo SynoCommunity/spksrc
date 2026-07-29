@@ -1,11 +1,14 @@
 PKG_NAME = rabbitmq
-PKG_VERS = 3.12.13
+PKG_VERS = 3.13.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-server-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rabbitmq/rabbitmq-server/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-server-$(PKG_VERS)
 
 BUILD_DEPENDS = native/erlang native/elixir
+
+# Elixir protocol consolidation has race conditions under parallel make
+DISABLE_PARALLEL_MAKE = 1
 
 DEPENDS =
 
@@ -20,7 +23,7 @@ ELIXIR_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/elixir/work-native/insta
 ENV += PATH=$$PATH:$(ERLANG_BIN_DIR):$(ELIXIR_BIN_DIR)
 
 CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
 
 # we need a git tag that matches the rabbitmq version
 # to prevent to use an unrelated tag of the spksrc repo (at time of writing this is "mono-5.20.1.34-17dsm7")
@@ -38,5 +41,5 @@ rabbitmq_pre_configure:
 .PHONY rabbitmq_post_install:
 rabbitmq_post_install:
 	@$(MSG) "Remove the temporary version tag v$(PKG_VERS)"
-	@git tag -d v$(PKG_VERS)
+	@git tag -d v$(PKG_VERS) 2>/dev/null || true
 	

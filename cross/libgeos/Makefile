@@ -10,7 +10,7 @@ COMMENT = GEOS (Geometry Engine - Open Source) is a C/C++ library for computatio
 LICENSE = LGPL-2.1
 
 # Disable tests to avoid cross-compilation issues and speed up build
-CMAKE_ARGS = -DBUILD_TESTING=OFF
+CONFIGURE_ARGS = -DBUILD_TESTING=OFF
 
 # GEOS uses CMake
 include ../../mk/spksrc.cross-cmake.mk

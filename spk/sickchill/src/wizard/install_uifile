@@ -1,5 +1,5 @@
 [{
-    "step_title": "Setup credentials (You can edit these after install in the application settings)",
+    "step_title": "Setup credentials",
     "items": [{
         "type": "textfield",
         "desc": "HTTP username (set blank for no login)",

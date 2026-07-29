@@ -1,8 +1,7 @@
-# Cross-compiled requirements for borgbackup (Python 3.11/3.12)
+# Cross-compiled requirements for borgbackup (Python 3.14)
 
-borgbackup==1.4.3
-charset_normalizer==3.4.4
+borgbackup==1.4.4
+charset_normalizer==3.4.7
 llfuse==1.5.2
 msgpack==1.1.2
-rpds_py==0.22.3
-ruamel_yaml_clib==0.2.15
+#rpds_py==0.30.0                ==> supported version depends on rust version

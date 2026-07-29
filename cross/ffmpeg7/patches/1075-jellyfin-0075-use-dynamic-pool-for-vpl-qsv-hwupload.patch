@@ -1,5 +1,3 @@
-Index: FFmpeg/libavfilter/qsvvpp.c
-===================================================================
 --- libavfilter/qsvvpp.c
 +++ libavfilter/qsvvpp.c
 @@ -70,6 +70,36 @@ static const struct {
@@ -39,8 +37,6 @@ Index: FFmpeg/libavfilter/qsvvpp.c
  int ff_qsvvpp_print_iopattern(void *log_ctx, int mfx_iopattern,
                                const char *extra_string)
  {
-Index: FFmpeg/libavfilter/vf_hwupload.c
-===================================================================
 --- libavfilter/vf_hwupload.c
 +++ libavfilter/vf_hwupload.c
 @@ -32,6 +32,10 @@

@@ -66,6 +66,13 @@ if [ -z "${DOWNLOAD_PACKAGES:-}" ]; then
 else
     echo "===> Downloading packages: ${DOWNLOAD_PACKAGES}"
     for current in ${DOWNLOAD_PACKAGES}; do
+        # spk/* meta sources have no 'download' target; built via 'arch-'.
+        case "${current}" in
+            spk/*)
+                echo "  -> ${current}: meta source (built via arch-), skipping download"
+                continue
+                ;;
+        esac
         download_with_retry "${current}" "download"
     done
 fi

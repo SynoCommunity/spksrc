@@ -1,5 +1,3 @@
-Index: FFmpeg/libavutil/hwcontext_vulkan.c
-===================================================================
 --- libavutil/hwcontext_vulkan.c
 +++ libavutil/hwcontext_vulkan.c
 @@ -64,6 +64,13 @@

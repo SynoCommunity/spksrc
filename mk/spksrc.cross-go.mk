@@ -1,15 +1,19 @@
+###############################################################################
+# spksrc.cross-go.mk
+#
 # Build go programs
 #
 # This makefile extends spksrc.cross-cc.mk with Go-specific functionality
-# 
+#
 # prerequisites:
 # - cross/module depends on native/go or native/go_1.23 only
 # - module does not require kernel (REQUIRE_KERNEL)
-# 
+#
 # remarks:
 # - Restriction for minimal DSM version is not supported (toolchains are not used for go builds)
 # - CONFIGURE_TARGET is not supported/bypassed
-# 
+#
+###############################################################################
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -30,14 +34,12 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
 ##### golang specific configurations
-include ../../mk/spksrc.cross-go-env.mk
+include ../../mk/spksrc.cross/env-go.mk
 
 # avoid run of make configure
 ifeq ($(strip $(CONFIGURE_TARGET)),)

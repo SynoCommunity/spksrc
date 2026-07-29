@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.native-meson.mk
+#
 # Build native Meson programs
 #
 # This makefile extends spksrc.native-cc.mk with Meson-specific functionality
@@ -5,6 +8,7 @@
 # prerequisites:
 # - native/module depends on meson + ninja
 #
+###############################################################################
 
 # Package dependent (same as native-cc.mk)
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -19,7 +23,6 @@ DIST_FILE     = $(DISTRIB_DIR)/$(LOCAL_FILE)
 DIST_EXT      = $(PKG_EXT)
 
 # Setup common directories
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -32,13 +35,13 @@ CONFIGURE_TARGET = meson_configure_target
 endif
 
 # Load native environment before meson-specific configs
-include ../../mk/spksrc.native-env.mk
+include ../../mk/spksrc.native/env-default.mk
 
 # meson specific configurations
-include ../../mk/spksrc.native-meson-env.mk
+include ../../mk/spksrc.native/env-meson.mk
 
 # call-up ninja build process
-include ../../mk/spksrc.ninja.mk
+include ../../mk/spksrc.build/ninja.mk
 
 #####
 
@@ -49,10 +52,10 @@ include ../../mk/spksrc.ninja.mk
 meson_configure_target:
 	@$(MSG) - Meson configure
 	@$(MSG)    - Dependencies = $(DEPENDS)
-	@$(MSG)    - Build path = $(MESON_BUILD_DIR)
-	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS)
+	@$(MSG)    - Build path = $(BUILD_DIR)
+	@$(MSG)    - Configure ARGS = $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
 	@$(MSG)    - Install prefix = $(INSTALL_PREFIX)
-	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(MESON_BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS)
+	cd $(WORK_DIR)/$(PKG_DIR) && env $(ENV) meson $(BUILD_DIR) -Dprefix=$(INSTALL_PREFIX) $(CONFIGURE_ARGS) $(ADDITIONAL_CONFIGURE_ARGS)
 
 #####
 

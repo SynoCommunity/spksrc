@@ -1,5 +1,3 @@
-Index: FFmpeg/libswscale/swscale_unscaled.c
-===================================================================
 --- libswscale/swscale_unscaled.c
 +++ libswscale/swscale_unscaled.c
 @@ -396,7 +396,7 @@ static int planar8ToP01xleWrapper(SwsCon
@@ -23,22 +21,16 @@ Index: FFmpeg/libswscale/swscale_unscaled.c
              }
              src[1] += srcStride[1];
              src[2] += srcStride[2];
-Index: FFmpeg/tests/ref/fate/filter-pixdesc-p010le
-===================================================================
 --- tests/ref/fate/filter-pixdesc-p010le
 +++ tests/ref/fate/filter-pixdesc-p010le
 @@ -1 +1 @@
 -pixdesc-p010le      7b4a503997eb4e14cba80ee52db85e39
 +pixdesc-p010le      0268fd44f63022e21ada69704534fc85
-Index: FFmpeg/tests/ref/fate/filter-pixdesc-p016le
-===================================================================
 --- tests/ref/fate/filter-pixdesc-p016le
 +++ tests/ref/fate/filter-pixdesc-p016le
 @@ -1 +1 @@
 -pixdesc-p016le      ed04897de0a6788bb3458e7365f10d36
 +pixdesc-p016le      0268fd44f63022e21ada69704534fc85
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-copy
-===================================================================
 --- tests/ref/fate/filter-pixfmts-copy
 +++ tests/ref/fate/filter-pixfmts-copy
 @@ -63,11 +63,11 @@ nv21                335d85c9af6110f26ae9
@@ -55,8 +47,6 @@ Index: FFmpeg/tests/ref/fate/filter-pixfmts-copy
  p210be              847e9c6e292b17349e69570829252b3e
  p210le              c06e4b76cf504e908128081f92b60ce2
  p212be              4df641ed058718ad27a01889f923b04f
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-crop
-===================================================================
 --- tests/ref/fate/filter-pixfmts-crop
 +++ tests/ref/fate/filter-pixfmts-crop
 @@ -61,11 +61,11 @@ nv21                1bcfc197f4fb95de85ba
@@ -73,8 +63,6 @@ Index: FFmpeg/tests/ref/fate/filter-pixfmts-crop
  p210be              2947f43774352ef61f9e83777548c7c5
  p210le              74fcd5a32eee687eebe002c884103963
  p212be              c983aa869bae2c70e7b01810902ffc05
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-field
-===================================================================
 --- tests/ref/fate/filter-pixfmts-field
 +++ tests/ref/fate/filter-pixfmts-field
 @@ -63,11 +63,11 @@ nv21                7294574037cc7f9373ef
@@ -91,8 +79,6 @@ Index: FFmpeg/tests/ref/fate/filter-pixfmts-field
  p210be              58d46f566ab28e3bcfb715c7aa53cf58
  p210le              8d68f7655a3d76f2f8436bd25beb3973
  p212be              a8901966c5bc111e9e62d3989b0b666b
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-hflip
-===================================================================
 --- tests/ref/fate/filter-pixfmts-hflip
 +++ tests/ref/fate/filter-pixfmts-hflip
 @@ -61,11 +61,11 @@ nv21                9f10dfff8963dc327d33
@@ -109,8 +95,6 @@ Index: FFmpeg/tests/ref/fate/filter-pixfmts-hflip
  p210be              6f5a76d6467b86d55fe5589d3af8a7ea
  p210le              b6982912b2376371edea4fccf99fe40c
  p212be              9ffa4664543233ec7c9b99a627cb7003
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-il
-===================================================================
 --- tests/ref/fate/filter-pixfmts-il
 +++ tests/ref/fate/filter-pixfmts-il
 @@ -63,11 +63,11 @@ nv21                ab586d8781246b5a32d8
@@ -127,8 +111,6 @@ Index: FFmpeg/tests/ref/fate/filter-pixfmts-il
  p210be              29ec4e8912d456cd15203a96487c42e8
  p210le              c695064fb9f2cc4e35957d4d649cc281
  p212be              ee6f88801823da3d617fb9e073e88068
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-null
-===================================================================
 --- tests/ref/fate/filter-pixfmts-null
 +++ tests/ref/fate/filter-pixfmts-null
 @@ -63,11 +63,11 @@ nv21                335d85c9af6110f26ae9
@@ -145,8 +127,6 @@ Index: FFmpeg/tests/ref/fate/filter-pixfmts-null
  p210be              847e9c6e292b17349e69570829252b3e
  p210le              c06e4b76cf504e908128081f92b60ce2
  p212be              4df641ed058718ad27a01889f923b04f
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-pad
-===================================================================
 --- tests/ref/fate/filter-pixfmts-pad
 +++ tests/ref/fate/filter-pixfmts-pad
 @@ -28,9 +28,9 @@ nv16                d3a50501d2ea8535489f
@@ -161,8 +141,6 @@ Index: FFmpeg/tests/ref/fate/filter-pixfmts-pad
  p210le              680912c059de39c3401cac856bd1b0c1
  p212le              a2f88017bcce2383ba60bc4872e639ba
  p216le              8718662e226a4581561e7bb532af2d83
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-scale
-===================================================================
 --- tests/ref/fate/filter-pixfmts-scale
 +++ tests/ref/fate/filter-pixfmts-scale
 @@ -63,11 +63,11 @@ nv21                c74bb1c10dbbdee8a1f6
@@ -179,8 +157,6 @@ Index: FFmpeg/tests/ref/fate/filter-pixfmts-scale
  p210be              2cc6dfcf5e006c8ed5238988a06fd45e
  p210le              04efb8f14a9d98417af40954a06aa187
  p212be              611c6e267e7a694ce89467779e44060b
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-transpose
-===================================================================
 --- tests/ref/fate/filter-pixfmts-transpose
 +++ tests/ref/fate/filter-pixfmts-transpose
 @@ -60,11 +60,11 @@ nv21                292adaf5271c5c8516b7
@@ -197,8 +173,6 @@ Index: FFmpeg/tests/ref/fate/filter-pixfmts-transpose
  p410be              8b3e0ccb31b6a20ff00a29253fb2dec3
  p410le              4e5f78dfccda9a6387e81354a56a033a
  p412be              88e4578d2c6d99399a6cf1db9e4c0553
-Index: FFmpeg/tests/ref/fate/filter-pixfmts-vflip
-===================================================================
 --- tests/ref/fate/filter-pixfmts-vflip
 +++ tests/ref/fate/filter-pixfmts-vflip
 @@ -63,11 +63,11 @@ nv21                2909feacd27bebb080c8

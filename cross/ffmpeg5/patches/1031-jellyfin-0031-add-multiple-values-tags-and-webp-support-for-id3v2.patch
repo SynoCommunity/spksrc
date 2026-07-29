@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavformat/id3v2.c
-===================================================================
 --- libavformat/id3v2.c
 +++ libavformat/id3v2.c
 @@ -135,6 +135,7 @@ const CodecMime ff_id3v2_mime_tags[] = {

@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -1876,7 +1876,6 @@ EXTERNAL_LIBRARY_GPL_LIST="

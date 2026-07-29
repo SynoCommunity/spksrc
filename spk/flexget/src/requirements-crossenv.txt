@@ -1,15 +1,12 @@
-# Generated using the requirements script on May 31, 2025
+# Generated using the requirements script on May 26, 2026
+# Command: ./generate_requirements.sh "flexget[deluge,qbittorrent,transmission,telegram]" 314
 
-Brotli==1.1.0
-charset_normalizer==3.4.2
-#greenlet==3.2.2                    ==> supported version depends on gcc version
-MarkupSafe==3.0.2
-#pendulum==3.1.0                    ==> python/pendulum
-psutil==7.0.0
-PyYAML==6.0.2
-# rpds_py==0.25.1: "rpds@1.1.1 requires rustc 1.85.0"
-# rpds_py==0.24.0 is the latest version that builds with rustc 1.82.0 (for qoriq)
-# jsonschema requires rpds-py>=0.7.1
-rpds_py==0.24.0
-sqlalchemy==2.0.41
-zstandard==0.23.0
+brotli==1.2.0
+charset_normalizer==3.4.7
+#greenlet==3.5.1                    ==> supported version depends on gcc version
+markupsafe==3.0.3
+#pendulum==3.2.0                    ==> python/pendulum
+psutil==7.2.2
+pyyaml==6.0.3
+#rpds_py==0.30.0                    ==> supported version depends on rust version
+sqlalchemy==2.0.50

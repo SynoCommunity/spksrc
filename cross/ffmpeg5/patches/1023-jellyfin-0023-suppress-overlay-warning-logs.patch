@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/buffersrc.c
-===================================================================
 --- libavfilter/buffersrc.c
 +++ libavfilter/buffersrc.c
 @@ -68,9 +68,9 @@ typedef struct BufferSourceContext {

@@ -14,7 +14,7 @@ LICENSE  = GPLv3
 
 INSTALL_TARGET = nop
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: libimagequant_install
 libimagequant_install:

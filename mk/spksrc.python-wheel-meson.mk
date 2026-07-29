@@ -1,3 +1,6 @@
+###############################################################################
+# spksrc.python-wheel-meson.mk
+#
 # python-meson wheel build
 #
 # By default uses $(CROSSENV)/bin/cross-python -m build
@@ -11,9 +14,9 @@
 #     pip: --config-settings=install-args='<value>'
 #   build: -Cinstall-args='<value>'
 #
+###############################################################################
 
 # Setup common directories
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -33,10 +36,10 @@ endif
 MESON_PYTHON = 1
 
 # meson specific configurations
-include ../../mk/spksrc.cross-meson-env.mk
+include ../../mk/spksrc.cross/env-meson.mk
 
 # meson cross-file usage definition
-include ../../mk/spksrc.cross-meson-crossfile.mk
+include ../../mk/spksrc.cross/meson-crossfile.mk
 
 # 1- Prepare the crossenv
 # 2- Generate the per-dependency cross-file definition
@@ -57,7 +60,7 @@ endif
 # Define where is located the crossenv
 CROSSENV_WHEEL_PATH = $(firstword $(wildcard $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME))-$(PKG_VERS) $(WORK_DIR)/crossenv-$(or $(PKG_REAL_NAME),$(PKG_NAME)) $(WORK_DIR)/crossenv-default))
 
-# If using spksrc.spk/python.mk with PYTHON_STAGING_INSTALL_PREFIX defined
+# If using spksrc.spk-meta/python.mk with PYTHON_STAGING_INSTALL_PREFIX defined
 # then redirect STAGING_INSTALL_PREFIX so rust
 # wheels can find openssl and other libraries
 
@@ -95,7 +98,7 @@ build_meson_python_wheel:
 	   $$(which cross-python) -m build -w -n -x . \
 	   $(foreach arg,$(CONFIGURE_ARGS),-Csetup-args=\"$(arg)\" ) \
 	   $(foreach arg,$(INSTALL_ARGS),-Cinstall-args=\"$(arg)\" ) \
-	   -Cbuilddir=\"$(MESON_BUILD_DIR)\" \
+	   -Cbuilddir=\"$(BUILD_DIR)\" \
 	   --outdir $(WHEELHOUSE) \
 	   --verbose ; \
 	cd $(MESON_BASE_DIR) && env $(ENV_MESON) \
@@ -104,7 +107,7 @@ build_meson_python_wheel:
 	   $$(which cross-python) -m build -w -n -x . \
 	   $(foreach arg,$(CONFIGURE_ARGS),-Csetup-args="$(arg)" ) \
 	   $(foreach arg,$(INSTALL_ARGS),-Cinstall-args="$(arg)" ) \
-	   -Cbuilddir="$(MESON_BUILD_DIR)" \
+	   -Cbuilddir="$(BUILD_DIR)" \
 	   --outdir $(WHEELHOUSE) \
 	   --verbose ; \
 	} > >(tee --append $(WHEEL_LOG)) 2>&1 ; [ $${PIPESTATUS[0]} -eq 0 ] || false
@@ -130,13 +133,13 @@ install_meson_python_wheel:
 ###
 
 # Use crossenv
-include ../../mk/spksrc.crossenv.mk
+include ../../mk/spksrc.python-crossenv.mk
 
 ## python wheel specific configurations
-include ../../mk/spksrc.wheel-env.mk
+include ../../mk/spksrc.wheel/env.mk
 
 ## install wheel specific routines
-include ../../mk/spksrc.wheel-install.mk
+include ../../mk/spksrc.wheel/install.mk
 
 ###
 

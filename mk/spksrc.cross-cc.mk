@@ -55,7 +55,7 @@
 # │                          cross-stage2                                │
 # │  (package build using cross-env)                                     │
 # │                                                                      │
-# │   spksrc.cross-env.mk                                                │
+# │   spksrc.cross/env-default.mk                                                │
 # │        │                                                             │
 # │        ├─ loads tc_vars.mk (always)                                  │
 # │        ├─ loads tc_vars.<env>.mk based on DEFAULT_ENV                │
@@ -98,44 +98,27 @@ endif
 
 .DEFAULT_GOAL := all
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
 #####
 
-include ../../mk/spksrc.pre-check.mk
+include ../../mk/spksrc.rules/pre-check.mk
 
-include ../../mk/spksrc.cross-env.mk
+include ../../mk/spksrc.cross/env-default.mk
 
-include ../../mk/spksrc.download.mk
+include ../../mk/spksrc.rules/depend.mk
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/status.mk
 
-include ../../mk/spksrc.status.mk
+# Standard build pipeline (download -> ... -> install)
+include ../../mk/spksrc.build.mk
 
-checksum: download
-include ../../mk/spksrc.checksum.mk
-
-extract: checksum depend status
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-configure: patch
-include ../../mk/spksrc.configure.mk
-
-compile: configure
-include ../../mk/spksrc.compile.mk
-
-install: compile
-include ../../mk/spksrc.install.mk
-
+# plist: appended after the shared pipeline (native is not packaged, so it is
+# not part of spksrc.build.mk)
 plist: install
-include ../../mk/spksrc.plist.mk
+include ../../mk/spksrc.build/plist.mk
 
 #####
 
@@ -187,6 +170,6 @@ all:
 ####
 
 ### For arch-* and all-<supported|latest>
-include ../../mk/spksrc.supported.mk
+include ../../mk/spksrc.rules/supported.mk
 
 ####

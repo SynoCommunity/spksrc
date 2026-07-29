@@ -1,0 +1,46 @@
+Index: FFmpeg/libavfilter/vf_overlay_vaapi.c
+===================================================================
+--- libavfilter/vf_overlay_vaapi.c
++++ libavfilter/vf_overlay_vaapi.c
+@@ -194,6 +194,14 @@ static int overlay_vaapi_blend(FFFrameSy
+     if (err < 0)
+         goto fail;
+ 
++    if (input_overlay) {
++        /* call vaapi_vpp_colour_properties() for overlay */
++        err = ff_vaapi_vpp_init_params(avctx, &params[1],
++                                       input_overlay, output);
++        if (err < 0)
++            goto fail;
++    }
++
+     err = ff_vaapi_vpp_init_params(avctx, &params[0],
+                                    input_main, output);
+     if (err < 0)
+@@ -228,8 +236,6 @@ static int overlay_vaapi_blend(FFFrameSy
+                    "will crop the overlay image according based on the main image.\n");
+         }
+ 
+-        memcpy(&params[1], &params[0], sizeof(params[0]));
+-
+         blend_state.flags         = ctx->blend_flags;
+         blend_state.global_alpha  = ctx->blend_alpha;
+         params[1].blend_state = &blend_state;
+@@ -237,6 +243,7 @@ static int overlay_vaapi_blend(FFFrameSy
+         params[1].surface       = (VASurfaceID)(uintptr_t)input_overlay->data[3];
+         params[1].surface_region = NULL;
+         params[1].output_region = &overlay_region;
++        params[1].output_background_color = 0;
+     }
+ 
+     err = ff_vaapi_vpp_render_pictures(avctx, params, input_overlay ? 2 : 1, output);
+@@ -312,7 +319,8 @@ static int overlay_vaapi_config_input_ov
+         ctx->blend_alpha  = ctx->alpha;
+     }
+ 
+-    if (have_alpha_planar(inlink))
++    if (have_alpha_planar(inlink) &&
++        inlink->alpha_mode == AVALPHA_MODE_PREMULTIPLIED)
+         ctx->blend_flags |= VA_BLEND_PREMULTIPLIED_ALPHA;
+ 
+     return 0;

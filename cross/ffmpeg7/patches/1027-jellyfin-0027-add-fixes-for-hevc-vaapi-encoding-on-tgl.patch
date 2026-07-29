@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/hw_base_encode_h265.c
-===================================================================
 --- libavcodec/hw_base_encode_h265.c
 +++ libavcodec/hw_base_encode_h265.c
 @@ -216,8 +216,9 @@ int ff_hw_base_encode_init_params_h265(F

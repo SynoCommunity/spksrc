@@ -1,8 +1,6 @@
-Index: jellyfin-ffmpeg/libavcodec/qsv.c
-===================================================================
 --- libavcodec/qsv.c
 +++ libavcodec/qsv.c
-@@ -834,7 +834,7 @@ static mfxStatus qsv_frame_alloc(mfxHDL
+@@ -839,7 +839,7 @@ static mfxStatus qsv_frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
          AVHWFramesContext *frames_ctx = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
          AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
          mfxFrameInfo      *i  = &req->Info;
@@ -11,7 +9,7 @@ Index: jellyfin-ffmpeg/libavcodec/qsv.c
  
          if (i->Width  > i1->Width  || i->Height > i1->Height ||
              i->FourCC != i1->FourCC || i->ChromaFormat != i1->ChromaFormat) {
-@@ -949,7 +949,7 @@ static mfxStatus qsv_frame_lock(mfxHDL p
+@@ -954,7 +954,7 @@ static mfxStatus qsv_frame_lock(mfxHDL pthis, mfxMemId mid, mfxFrameData *ptr)
      if (!qsv_mid->hw_frame->hw_frames_ctx)
          goto fail;
  
@@ -20,11 +18,9 @@ Index: jellyfin-ffmpeg/libavcodec/qsv.c
      qsv_mid->surf.Data.MemId = qsv_mid->handle_pair;
  
      /* map the data to the system memory */
-Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
-===================================================================
 --- libavcodec/qsvenc.c
 +++ libavcodec/qsvenc.c
-@@ -721,8 +721,8 @@ static int init_video_param_jpeg(AVCodec
+@@ -720,8 +720,8 @@ static int init_video_param_jpeg(AVCodecContext *avctx, QSVEncContext *q)
      if (avctx->hw_frames_ctx) {
          AVHWFramesContext *frames_ctx    = (AVHWFramesContext *)avctx->hw_frames_ctx->data;
          AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
@@ -35,7 +31,7 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
      }
  
      if (avctx->framerate.den > 0 && avctx->framerate.num > 0) {
-@@ -845,8 +845,8 @@ static int init_video_param(AVCodecConte
+@@ -846,8 +846,8 @@ static int init_video_param(AVCodecContext *avctx, QSVEncContext *q)
      if (avctx->hw_frames_ctx) {
          AVHWFramesContext *frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
          AVQSVFramesContext *frames_hwctx = frames_ctx->hwctx;
@@ -46,11 +42,9 @@ Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
      }
  
      if (avctx->framerate.den > 0 && avctx->framerate.num > 0) {
-Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
-===================================================================
 --- libavfilter/qsvvpp.c
 +++ libavfilter/qsvvpp.c
-@@ -307,7 +307,7 @@ static int fill_frameinfo_by_link(mfxFra
+@@ -307,7 +307,7 @@ static int fill_frameinfo_by_link(mfxFrameInfo *frameinfo, AVFilterLink *link)
  
          frames_ctx   = (AVHWFramesContext *)link->hw_frames_ctx->data;
          frames_hwctx = frames_ctx->hwctx;
@@ -59,11 +53,9 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
      } else {
          pix_fmt = link->format;
          desc = av_pix_fmt_desc_get(pix_fmt);
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
-===================================================================
 --- libavutil/hwcontext_qsv.c
 +++ libavutil/hwcontext_qsv.c
-@@ -611,7 +611,7 @@ static mfxStatus frame_alloc(mfxHDL pthi
+@@ -614,7 +614,7 @@ static mfxStatus frame_alloc(mfxHDL pthis, mfxFrameAllocRequest *req,
      QSVFramesContext       *s = ctx->internal->priv;
      AVQSVFramesContext *hwctx = ctx->hwctx;
      mfxFrameInfo *i  = &req->Info;
@@ -72,7 +64,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
  
      if (!(req->Type & MFX_MEMTYPE_VIDEO_MEMORY_PROCESSOR_TARGET) ||
          !(req->Type & (MFX_MEMTYPE_FROM_VPPIN | MFX_MEMTYPE_FROM_VPPOUT)) ||
-@@ -1159,7 +1159,7 @@ static int qsv_init_internal_session(AVH
+@@ -1189,7 +1189,7 @@ static int qsv_init_internal_session(AVHWFramesContext *ctx,
                                MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
      par.AsyncDepth = 1;
  
@@ -81,7 +73,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
  
      /* Apparently VPP requires the frame rate to be set to some value, otherwise
       * init will fail (probably for the framerate conversion filter). Since we
-@@ -1248,6 +1248,14 @@ static int qsv_frames_init(AVHWFramesCon
+@@ -1278,6 +1278,14 @@ static int qsv_frames_init(AVHWFramesContext *ctx)
      }
  #endif
  
@@ -96,7 +88,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
      s->session_download = NULL;
      s->session_upload   = NULL;
  
-@@ -1776,13 +1784,7 @@ static int qsv_frames_derive_to(AVHWFram
+@@ -1809,13 +1817,7 @@ static int qsv_frames_derive_to(AVHWFramesContext *dst_ctx,
  {
      QSVFramesContext *s = dst_ctx->internal->priv;
      AVQSVFramesContext *dst_hwctx = dst_ctx->hwctx;
@@ -111,7 +103,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
  
      switch (src_ctx->device_ctx->type) {
  #if CONFIG_VAAPI
-@@ -1798,11 +1800,20 @@ static int qsv_frames_derive_to(AVHWFram
+@@ -1831,11 +1833,20 @@ static int qsv_frames_derive_to(AVHWFramesContext *dst_ctx,
              if (!s->surfaces_internal)
                  return AVERROR(ENOMEM);
              for (i = 0; i < src_hwctx->nb_surfaces; i++) {
@@ -133,7 +125,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
              dst_hwctx->nb_surfaces = src_hwctx->nb_surfaces;
              dst_hwctx->frame_type  = MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
          }
-@@ -1821,7 +1832,11 @@ static int qsv_frames_derive_to(AVHWFram
+@@ -1854,7 +1865,11 @@ static int qsv_frames_derive_to(AVHWFramesContext *dst_ctx,
              if (!s->surfaces_internal)
                  return AVERROR(ENOMEM);
              for (i = 0; i < src_ctx->initial_pool_size; i++) {
@@ -146,7 +138,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
                  s->handle_pairs_internal[i].first = (mfxMemId)src_hwctx->texture_infos[i].texture;
                  if (src_hwctx->BindFlags & D3D11_BIND_RENDER_TARGET) {
                      s->handle_pairs_internal[i].second = (mfxMemId)MFX_INFINITE;
-@@ -1830,6 +1845,11 @@ static int qsv_frames_derive_to(AVHWFram
+@@ -1863,6 +1878,11 @@ static int qsv_frames_derive_to(AVHWFramesContext *dst_ctx,
                  }
                  s->surfaces_internal[i].Data.MemId = (mfxMemId)&s->handle_pairs_internal[i];
              }
@@ -158,7 +150,7 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
              dst_hwctx->nb_surfaces = src_ctx->initial_pool_size;
              if (src_hwctx->BindFlags & D3D11_BIND_RENDER_TARGET) {
                  dst_hwctx->frame_type |= MFX_MEMTYPE_VIDEO_MEMORY_PROCESSOR_TARGET;
-@@ -1852,11 +1872,20 @@ static int qsv_frames_derive_to(AVHWFram
+@@ -1885,11 +1905,20 @@ static int qsv_frames_derive_to(AVHWFramesContext *dst_ctx,
              if (!s->surfaces_internal)
                  return AVERROR(ENOMEM);
              for (i = 0; i < src_hwctx->nb_surfaces; i++) {
@@ -180,8 +172,6 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
              dst_hwctx->nb_surfaces = src_hwctx->nb_surfaces;
              if (src_hwctx->surface_type == DXVA2_VideoProcessorRenderTarget)
                  dst_hwctx->frame_type = MFX_MEMTYPE_VIDEO_MEMORY_PROCESSOR_TARGET;
-Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.h
-===================================================================
 --- libavutil/hwcontext_qsv.h
 +++ libavutil/hwcontext_qsv.h
 @@ -54,6 +54,12 @@ typedef struct AVQSVFramesContext {

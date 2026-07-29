@@ -16,10 +16,10 @@ include ../../mk/spksrc.cross-cmake.mk
 
 # intel-mediasdk specific args
 # for succesfull build
-CMAKE_ARGS += -DMFX_PLUGINS_DIR=$(INSTALL_PREFIX)/lib
-CMAKE_ARGS += -DBUILD_SAMPLES=OFF
-CMAKE_ARGS += -DBUILD_TUTORIALS=OFF
-CMAKE_ARGS += -Wno-dev
+CONFIGURE_ARGS += -DMFX_PLUGINS_DIR=$(INSTALL_PREFIX)/lib
+CONFIGURE_ARGS += -DBUILD_SAMPLES=OFF
+CONFIGURE_ARGS += -DBUILD_TUTORIALS=OFF
+CONFIGURE_ARGS += -Wno-dev
 
 # Flags to be added to CMake toolchain file
 ifeq ($(call version_lt, ${TC_GCC}, 5),1)

@@ -1,5 +1,3 @@
-Index: FFmpeg/libavutil/hwcontext_vulkan.c
-===================================================================
 --- libavutil/hwcontext_vulkan.c
 +++ libavutil/hwcontext_vulkan.c
 @@ -968,7 +968,7 @@ static const char *vk_dev_type(enum VkPh

@@ -30,10 +30,10 @@ set -o pipefail
 # ===========================================================================
 
 # ffmpeg versions to manage build order for
-ffmpeg_versions=(5 6 7)
+ffmpeg_versions=(5 6 7 8)
 
 # python minor versions to manage build order for
-python_versions=(310 311 312 313 314)
+python_versions=(311 312 314)
 
 # DSM versions above the default builds (6.2.4, 7.1) that require special handling.
 # Packages declaring REQUIRED_MIN_DSM equal to one of these will only be built
@@ -176,14 +176,14 @@ fi
 # Remove duplicate packages
 packages=$(printf '%s' "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
-# Remove BROKEN packages (marked with a BROKEN file) or invalid packages (no Makefile
-# and not in dependency list). Packages with a BROKEN file are always skipped regardless
-# of their presence in the dependency list.
+# Remove disabled packages (marked with a BROKEN or DISABLED file) or invalid packages
+# (no Makefile and not in dependency list). Packages with a BROKEN or DISABLED file are
+# always skipped regardless of their presence in the dependency list.
 filtered_packages=
 for package in ${packages}; do
-    if [ -f "./spk/${package}/BROKEN" ]; then
-        broken_reason=$(cat "./spk/${package}/BROKEN")
-        echo "===> Skipping BROKEN package: ${package} (${broken_reason})"
+    if [ -f "./spk/${package}/BROKEN" ] || [ -f "./spk/${package}/DISABLED" ]; then
+        broken_reason=$(cat "./spk/${package}/BROKEN" "./spk/${package}/DISABLED" 2>/dev/null)
+        echo "===> Skipping disabled package: ${package} (${broken_reason})"
     elif ! grep -q "^${package}:" "${DEPENDENCY_LIST}" && [ ! -f "./spk/${package}/Makefile" ]; then
         echo "===> Skipping invalid package (no Makefile, not in dependency list): ${package}"
     else

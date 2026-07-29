@@ -1,0 +1,54 @@
+Index: FFmpeg/libavcodec/qsvenc.c
+===================================================================
+--- libavcodec/qsvenc.c
++++ libavcodec/qsvenc.c
+@@ -1840,6 +1840,9 @@ int ff_qsv_enc_init(AVCodecContext *avct
+         return ret;
+     }
+ 
++    // Update AVCodecContext with actual encoding parameters
++    avctx->has_b_frames = q->param.mfx.GopRefDist > 1 ? q->param.mfx.GopRefDist - 1 : 0;
++
+     q->avctx = avctx;
+ 
+     return 0;
+@@ -2497,7 +2500,8 @@ static int encode_frame(AVCodecContext *
+     pkt.bs->Data      = pkt.pkt.data;
+     pkt.bs->MaxLength = pkt.pkt.size;
+ 
+-    if (avctx->codec_id == AV_CODEC_ID_H264) {
++    if (avctx->codec_id == AV_CODEC_ID_H264 ||
++        avctx->codec_id == AV_CODEC_ID_HEVC) {
+         enc_info = av_mallocz(sizeof(*enc_info));
+         if (!enc_info)
+             goto nomem;
+@@ -2563,7 +2567,8 @@ free:
+         av_freep(&pkt.sync);
+         av_packet_unref(&pkt.pkt);
+         av_freep(&pkt.bs);
+-        if (avctx->codec_id == AV_CODEC_ID_H264) {
++        if (avctx->codec_id == AV_CODEC_ID_H264 ||
++            avctx->codec_id == AV_CODEC_ID_HEVC) {
+             av_freep(&enc_info);
+             av_freep(&enc_buf);
+         }
+@@ -2684,7 +2689,8 @@ int ff_qsv_encode(AVCodecContext *avctx,
+             return AVERROR_INVALIDDATA;
+         }
+ 
+-        if (avctx->codec_id == AV_CODEC_ID_H264) {
++        if (avctx->codec_id == AV_CODEC_ID_H264 ||
++            avctx->codec_id == AV_CODEC_ID_HEVC) {
+             enc_buf = qpkt.bs->ExtParam;
+             enc_info = (mfxExtAVCEncodedFrameInfo *)(*enc_buf);
+             ff_encode_add_stats_side_data(&qpkt.pkt,
+@@ -2728,7 +2734,8 @@ int ff_qsv_enc_close(AVCodecContext *avc
+     if (q->async_fifo) {
+         QSVPacket pkt;
+         while (av_fifo_read(q->async_fifo, &pkt, 1) >= 0) {
+-            if (avctx->codec_id == AV_CODEC_ID_H264) {
++            if (avctx->codec_id == AV_CODEC_ID_H264 ||
++                avctx->codec_id == AV_CODEC_ID_HEVC) {
+                 mfxExtBuffer **enc_buf = pkt.bs->ExtParam;
+                 mfxExtAVCEncodedFrameInfo *enc_info = (mfxExtAVCEncodedFrameInfo *)(*enc_buf);
+                 av_freep(&enc_info);

@@ -13,7 +13,7 @@ LICENSE  = MIT
 
 INSTALL_TARGET = wallabag_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: wallabag_install
 wallabag_install:

@@ -1,4 +1,4 @@
-PKG_NAME = nnn-main
+PKG_NAME = nnn-virtual
 
 OPTIONAL_DEPENDS  = cross/nnn-latest
 OPTIONAL_DEPENDS += cross/nnn-4.8
@@ -6,7 +6,7 @@ OPTIONAL_DEPENDS += cross/nnn-4.0
 
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
 DEPENDS += cross/nnn-latest
@@ -16,3 +16,5 @@ else
 # 32-bit archs for DSM<7
 DEPENDS += cross/nnn-4.0
 endif
+
+include ../../mk/spksrc.cross-virtual.mk

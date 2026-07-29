@@ -1,4 +1,4 @@
-PYTHON_DIR="/var/packages/python312/target/bin"
+PYTHON_DIR="/var/packages/python314/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 CONFIG_FILE="${SYNOPKG_PKGVAR}/config.yml"
@@ -21,6 +21,7 @@ service_postinst ()
     # Create a Python virtualenv
     install_python_virtualenv
 
-    # Install the wheels
-    install_python_wheels
+    # Install the wheels (--no-deps prevents pip from resolving transitive
+    # dependencies like greenlet that we intentionally exclude for old GCC)
+    install_python_wheels --no-deps
 }

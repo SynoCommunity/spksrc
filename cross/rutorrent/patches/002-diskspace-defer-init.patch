@@ -1,0 +1,31 @@
+--- plugins/diskspace/init.js	2026-05-19 15:44:49.236225818 +0000
++++ plugins/diskspace/init.js	2026-05-19 15:44:58.260226446 +0000
+@@ -1,4 +1,4 @@
+-plugin.loadLang();
++plugin.loadLang(true);
+ plugin.loadMainCSS();
+ 
+ plugin.setValue = function( full, free )
+@@ -12,18 +12,19 @@
+ 	if(plugin.freeBytesInMeter) $("#meter-disk-text").text(theConverter.bytes(free));
+ 	else $("#meter-disk-text").text(percent+'%');
+ 	$("#meter-disk-pane").prop("title",
+-		theUILang.diskUsage
++		(typeof theUILang.diskUsage !== 'undefined')
++		? theUILang.diskUsage
+ 			.replace(/%USED%/, theConverter.bytes(used))
+ 			.replace(/%TOTAL%/, theConverter.bytes(full))
+ 			.replace(/%FREE%/, theConverter.bytes(free))
+-	);
++		: theConverter.bytes(used) + '/' + theConverter.bytes(full) + ' (' + theConverter.bytes(free) + ' free)');
+ 
+ 	if($.noty && plugin.allStuffLoaded)
+ 	{
+ 		if((free<plugin.notifySpaceLimit) && !plugin.noty)
+ 			plugin.noty = $.noty(
+ 			{
+-				text: theUILang.diskNotification, 
++				text: theUILang.diskNotification || 'Warning: Low disk space', 
+ 				layout : 'bottomLeft',
+ 				type: 'error',
+ 				timeout : false,

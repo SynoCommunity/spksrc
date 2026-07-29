@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
-===================================================================
 --- libavfilter/vf_tonemap_vaapi.c
 +++ libavfilter/vf_tonemap_vaapi.c
 @@ -41,7 +41,13 @@ typedef struct HDRVAAPIContext {

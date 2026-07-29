@@ -1,6 +1,6 @@
 SPK_NAME = monitoring-plugins
-SPK_VERS = 2.3.1
-SPK_REV = 2
+SPK_VERS = 2.4.0
+SPK_REV = 3
 SPK_ICON = src/monitoring-plugins.png
 
 DEPENDS = cross/monitoring-plugins
@@ -9,22 +9,25 @@ SPK_DEPENDS = Perl
 
 MAINTAINER = Gagi2k
 DESCRIPTION = Standard plugins for Icinga, Naemon, Nagios, Shinken, Sensu, and other monitoring applications.
-CHANGELOG = "1. Update monitoring-plugins to v2.3.1<br/>2. Add Perl package as requirement.<br/>3. Link the check commands to /usr/local/bin."
+CHANGELOG = "1. Update monitoring-plugins to v2.4.0"
 STARTABLE = no
 DISPLAY_NAME = Monitoring Plugins
 
 HOMEPAGE = https://www.monitoring-plugins.org
 LICENSE  = GPLv3
 
-SPK_COMMANDS  = bin/check_breeze
+SPK_COMMANDS  = bin/check_apt
+SPK_COMMANDS += bin/check_breeze
 SPK_COMMANDS += bin/check_clamd
 SPK_COMMANDS += bin/check_cluster
+SPK_COMMANDS += bin/check_dhcp
 SPK_COMMANDS += bin/check_disk
 SPK_COMMANDS += bin/check_disk_smb
 SPK_COMMANDS += bin/check_dummy
 SPK_COMMANDS += bin/check_file_age
 SPK_COMMANDS += bin/check_ftp
 SPK_COMMANDS += bin/check_http
+SPK_COMMANDS += bin/check_icmp
 SPK_COMMANDS += bin/check_ide_smart
 SPK_COMMANDS += bin/check_ifoperstatus
 SPK_COMMANDS += bin/check_ifstatus

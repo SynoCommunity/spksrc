@@ -47,7 +47,9 @@ CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --enable-ipv6
 CONFIGURE_ARGS += --with-zlib=$(STAGING_INSTALL_PREFIX)
 CONFIGURE_ARGS += --with-libpthread=$(STAGING_INSTALL_PREFIX)
-CONFIGURE_ARGS += --with-openssl=$(STAGING_INSTALL_PREFIX)
+# openssl prefix from the single source of truth (cross-env.mk scan): the shared
+# meta staging if present, else the local staging (cross/openssl3).
+CONFIGURE_ARGS += --with-openssl=$(OPENSSL_STAGING_INSTALL_PREFIX)
 # --with-libcurl must define curl-config and not the directory (ERROR: checking for the version of libcurl... ./configure: line 18672: .../install/usr/local/zabbix-agent: Is a directory)
 CONFIGURE_ARGS += --with-libcurl=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 CONFIGURE_ARGS += --with-libpcre2=$(STAGING_INSTALL_PREFIX)

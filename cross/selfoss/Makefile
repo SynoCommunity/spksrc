@@ -13,7 +13,7 @@ LICENSE  = GPLv3
 
 INSTALL_TARGET = selfoss_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: selfoss_install
 selfoss_install:

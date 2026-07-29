@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}HAProxy Dashboard{% endblock %}</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/all.min.css" rel="stylesheet">
+    <style>
+        header {
+            background-color: #f2f2f2;
+            padding: 20px;
+            display: flex;
+            padding-left: 100px;
+            align-items: center;
+        }
+        .logo {
+            width: 300px;
+            height: auto;
+        }
+        .menu-link {
+            text-decoration: none;
+            padding: 10px 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        .menu-link:hover {
+            background-color: #3B444B;
+            color: white;
+            text-decoration: none;
+        }
+        .menu-link.active {
+            background-color: #3B444B;
+            color: white;
+        }
+        .dark-mode {
+            background-color: #121B2E;
+            color: white;
+        }
+        .dark-mode header {
+            background-color: #25354e;
+            color: white;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .dark-mode .menu-link {
+            color: white;
+        }
+        .dark-mode .logo {
+            color: #2bb9c7;
+        }
+        .dark-mode .menu-link:hover {
+            color: #2bb9c7;
+        }
+        .dark-mode .menu-link.active {
+            color: #2bb9c7;
+            border-bottom: 2px solid #2bb9c7;
+            background-color: transparent;
+        }
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+<header>
+    <a href="/home" style="text-decoration: none;">
+        <h3 style="font-size: 22px;" class="logo">
+            <i style="margin: 8px;" class="fas fa-globe"></i>HAProxy Dashboard
+        </h3>
+    </a>
+    <a href="/home" class="menu-link{% block nav_home %}{% endblock %}">Home</a>
+    <a href="/" class="menu-link{% block nav_index %}{% endblock %}">Add Frontend & Backend</a>
+    <a href="/edit" class="menu-link{% block nav_edit %}{% endblock %}">Edit HAProxy Config</a>
+    <a href="/logs" class="menu-link{% block nav_logs %}{% endblock %}">Security Events</a>
+    <a href="/statistics" class="menu-link{% block nav_stats %}{% endblock %}">Statistics</a>
+    <a href="http://{{ request.host.split(':')[0] }}:{{ stats_port }}/" class="menu-link">HAProxy Stats</a>
+    <div class="custom-control custom-switch ml-auto">
+        <input type="checkbox" class="custom-control-input" id="darkModeSwitch">
+        <label class="custom-control-label" for="darkModeSwitch">Dark Mode</label>
+    </div>
+</header>
+
+{% block content %}{% endblock %}
+
+<script src="/static/js/jquery.slim.min.js"></script>
+<script src="/static/js/popper.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script>
+    function toggleDarkMode() {
+        const body = document.body;
+        body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+    }
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkModeSwitch').checked = true;
+    }
+    document.getElementById('darkModeSwitch').addEventListener('change', toggleDarkMode);
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

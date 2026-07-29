@@ -33,7 +33,7 @@ include ../../mk/spksrc.spk.mk
 
 .PHONY: imagemagick_patch_rpath
 # some binaries and libraries contain the full installation path in RPATH (.../spk/imagemagick/...)
-# this might be caused by incomplete implementation of install_correct_lib_files target in spksrc.install.mk
+# this might be caused by incomplete implementation of install_correct_lib_files target in spksrc.build/install.mk
 # or false paths in generated pkgconfig files
 imagemagick_patch_rpath:
 	@$(MSG) "Patching binaries and libraries of $(SPK_NAME) (some have bad library rpath)."

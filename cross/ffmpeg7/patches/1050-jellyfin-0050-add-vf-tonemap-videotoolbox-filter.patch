@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3976,6 +3976,7 @@ tinterlace_merge_test_deps="tinterlace_f
@@ -10,8 +8,6 @@ Index: FFmpeg/configure
  tonemap_opencl_filter_deps="opencl const_nan"
  transpose_opencl_filter_deps="opencl"
  transpose_vaapi_filter_deps="vaapi VAProcPipelineCaps_rotation_flags"
-Index: FFmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -537,6 +537,9 @@ OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)
@@ -24,8 +20,6 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_TPAD_FILTER)                   += vf_tpad.o
  OBJS-$(CONFIG_TRANSPOSE_FILTER)              += vf_transpose.o
  OBJS-$(CONFIG_TRANSPOSE_NPP_FILTER)          += vf_transpose_npp.o
-Index: FFmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -502,6 +502,7 @@ extern const AVFilter ff_vf_tonemap;
@@ -36,8 +30,6 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_tpad;
  extern const AVFilter ff_vf_transpose;
  extern const AVFilter ff_vf_transpose_npp;
-Index: FFmpeg/libavfilter/metal/vf_tonemap_videotoolbox.metal
-===================================================================
 --- /dev/null
 +++ libavfilter/metal/vf_tonemap_videotoolbox.metal
 @@ -0,0 +1,921 @@
@@ -962,8 +954,6 @@ Index: FFmpeg/libavfilter/metal/vf_tonemap_videotoolbox.metal
 +        dst2.write(float4(chroma.y, chroma.z, 0.0f, 1.0f), uint2(xi, yi));
 +    }
 +}
-Index: FFmpeg/libavfilter/vf_tonemap_videotoolbox.m
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_tonemap_videotoolbox.m
 @@ -0,0 +1,1211 @@

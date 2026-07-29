@@ -1,0 +1,13 @@
+Index: FFmpeg/libavcodec/videotoolbox.c
+===================================================================
+--- libavcodec/videotoolbox.c
++++ libavcodec/videotoolbox.c
+@@ -124,7 +124,7 @@ static int videotoolbox_postproc_frame(v
+     if (!ref->pixbuf) {
+         av_log(avctx, AV_LOG_ERROR, "No frame decoded?\n");
+         av_frame_unref(frame);
+-        return AVERROR_EXTERNAL;
++        return 0;
+     }
+
+     frame->crop_right = 0;

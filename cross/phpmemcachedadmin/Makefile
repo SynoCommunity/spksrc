@@ -19,7 +19,7 @@ LICENSE  = Apache 2.0
 EXTRACT_PATH = $(WORK_DIR)
 INSTALL_TARGET = phpmemcachedadmin_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 CONFIG_FOLDER = var/phpmemcachedadmin.config
 

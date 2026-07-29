@@ -1,5 +1,5 @@
 PKG_NAME = python314
-PKG_VERS = 3.14.3
+PKG_VERS = 3.14.5
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -19,7 +19,7 @@ CONFIGURE_ARGS += --disable-test-modules
 # Uses system default libssl-dev
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
-COMPILE_MAKE_OPTIONS += all
+COMPILE_ARGS += all
 
 POST_INSTALL_TARGET = python314_native_post_install
 

@@ -12,7 +12,7 @@ COMMENT = Lua is a powerful, efficient, lightweight, embeddable scripting langua
 LICENSE = MIT
 
 CONFIGURE_TARGET = nop
-COMPILE_MAKE_OPTIONS = linux
-INSTALL_MAKE_OPTIONS = install INSTALL_TOP=$(INSTALL_DIR)
+COMPILE_ARGS = linux
+INSTALL_ARGS = install INSTALL_TOP=$(INSTALL_DIR)
 
 include ../../mk/spksrc.native-cc.mk

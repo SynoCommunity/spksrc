@@ -13,7 +13,7 @@ COMMENT  = Shared code used by several utilities written by Jody Bruchon.
 LICENSE  = MIT
 
 CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 
 ifeq ($(findstring $(ARCH),x86),$(ARCH))
 # for x86-5.2

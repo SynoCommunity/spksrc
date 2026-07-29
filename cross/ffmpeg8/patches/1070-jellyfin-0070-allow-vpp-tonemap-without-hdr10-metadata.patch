@@ -1,0 +1,159 @@
+Index: FFmpeg/libavfilter/vf_tonemap_vaapi.c
+===================================================================
+--- libavfilter/vf_tonemap_vaapi.c
++++ libavfilter/vf_tonemap_vaapi.c
+@@ -56,7 +56,7 @@ static int tonemap_vaapi_save_metadata(A
+     AVContentLightMetadata *light_meta;
+ 
+     if (input_frame->color_trc != AVCOL_TRC_SMPTE2084) {
+-        av_log(avctx, AV_LOG_WARNING, "Only support HDR10 as input for vaapi tone-mapping\n");
++        av_log(avctx, AV_LOG_DEBUG, "Only support HDR10 as input for vaapi tone-mapping\n");
+     }
+ 
+     ctx->src_display = av_frame_get_side_data(input_frame,
+@@ -122,8 +122,7 @@ static int tonemap_vaapi_save_metadata(A
+                    ctx->in_metadata.white_point_y);
+         }
+     } else {
+-        av_log(avctx, AV_LOG_ERROR, "No mastering display data from input\n");
+-        return AVERROR(EINVAL);
++        av_log(avctx, AV_LOG_DEBUG, "No mastering display data from input\n");
+     }
+ 
+     ctx->src_light = av_frame_get_side_data(input_frame,
+@@ -150,23 +149,20 @@ static int tonemap_vaapi_save_metadata(A
+     return 0;
+ }
+ 
+-static int tonemap_vaapi_update_sidedata(AVFilterContext *avctx, AVFrame *output_frame)
++static int tonemap_vaapi_update_sidedata(AVFilterContext *avctx,
++                                         AVFrameSideData *metadata,
++                                         AVFrameSideData *metadata_lt)
+ {
+     HDRVAAPIContext *ctx = avctx->priv;
+-    AVFrameSideData *metadata;
+     AVMasteringDisplayMetadata *hdr_meta;
+-    AVFrameSideData *metadata_lt;
+     AVContentLightMetadata *hdr_meta_lt;
+     int i;
+     const int mapping[3] = {1, 2, 0};  //green, blue, red
+     const int chroma_den = 50000;
+     const int luma_den   = 10000;
+ 
+-    metadata = av_frame_new_side_data(output_frame,
+-                                      AV_FRAME_DATA_MASTERING_DISPLAY_METADATA,
+-                                      sizeof(AVMasteringDisplayMetadata));
+-    if (!metadata)
+-        return AVERROR(ENOMEM);
++    if (!metadata || !metadata_lt)
++        return AVERROR(EINVAL);
+ 
+     hdr_meta = (AVMasteringDisplayMetadata *)metadata->data;
+ 
+@@ -210,12 +206,6 @@ static int tonemap_vaapi_update_sidedata
+            ctx->out_metadata.max_display_mastering_luminance,
+            ctx->out_metadata.min_display_mastering_luminance);
+ 
+-    metadata_lt = av_frame_new_side_data(output_frame,
+-                                         AV_FRAME_DATA_CONTENT_LIGHT_LEVEL,
+-                                         sizeof(AVContentLightMetadata));
+-    if (!metadata_lt)
+-        return AVERROR(ENOMEM);
+-
+     hdr_meta_lt = (AVContentLightMetadata *)metadata_lt->data;
+ 
+     hdr_meta_lt->MaxCLL = FFMIN(ctx->out_metadata.max_content_light_level, 65535);
+@@ -396,7 +386,14 @@ static int tonemap_vaapi_filter_frame(AV
+         output_frame->colorspace = ctx->color_matrix;
+ 
+     if (ctx->mastering_display) {
+-        err = tonemap_vaapi_update_sidedata(avctx, output_frame);
++        AVFrameSideData *sd, *sd_lt;
++        sd = av_frame_new_side_data(output_frame,
++                                    AV_FRAME_DATA_MASTERING_DISPLAY_METADATA,
++                                    sizeof(AVMasteringDisplayMetadata));
++        sd_lt = av_frame_new_side_data(output_frame,
++                                       AV_FRAME_DATA_CONTENT_LIGHT_LEVEL,
++                                       sizeof(AVContentLightMetadata));
++        err = tonemap_vaapi_update_sidedata(avctx, sd, sd_lt);
+         if (err < 0)
+             goto fail;
+     }
+@@ -457,6 +454,20 @@ static av_cold int tonemap_vaapi_init(AV
+         }
+     }
+ 
++    return 0;
++}
++
++static int tonemap_vaapi_config_output(AVFilterLink *outlink)
++{
++    AVFilterContext *avctx = outlink->src;
++    HDRVAAPIContext *ctx   = avctx->priv;
++    int update_sd = 0, drop_sd = 0;
++    int err;
++
++    err = ff_vaapi_vpp_config_output(outlink);
++    if (err < 0)
++        return err;
++
+ #define STRING_OPTION(var_name, func_name, default_value) do { \
+         if (ctx->var_name ## _string) { \
+             int var = av_ ## func_name ## _from_name(ctx->var_name ## _string); \
+@@ -505,6 +516,47 @@ static av_cold int tonemap_vaapi_init(AV
+         }
+     }
+ 
++    if (ctx->output_format_string) {
++        enum AVPixelFormat fmt = av_get_pix_fmt(ctx->output_format_string);
++        const AVPixFmtDescriptor *pix_desc = av_pix_fmt_desc_get(fmt);
++
++        if (!pix_desc || (pix_desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
++            return AVERROR(EINVAL);
++
++        if (pix_desc->comp[0].depth < 10)
++            drop_sd = 1;
++        else if (ctx->mastering_display)
++            update_sd = 1;
++        else
++            drop_sd = 1;
++    } else {
++        if (ctx->mastering_display)
++            update_sd = 1;
++        else
++            drop_sd = 1;
++    }
++
++    if (drop_sd) {
++        av_frame_side_data_remove(&outlink->side_data, &outlink->nb_side_data,
++                                  AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
++        av_frame_side_data_remove(&outlink->side_data, &outlink->nb_side_data,
++                                  AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
++    }
++    if (update_sd) {
++        AVFrameSideData *sd, *sd_lt;
++        sd = av_frame_side_data_new(&outlink->side_data, &outlink->nb_side_data,
++                                    AV_FRAME_DATA_MASTERING_DISPLAY_METADATA,
++                                    sizeof(AVMasteringDisplayMetadata),
++                                    AV_FRAME_SIDE_DATA_FLAG_UNIQUE);
++        sd_lt = av_frame_side_data_new(&outlink->side_data, &outlink->nb_side_data,
++                                       AV_FRAME_DATA_CONTENT_LIGHT_LEVEL,
++                                       sizeof(AVContentLightMetadata),
++                                       AV_FRAME_SIDE_DATA_FLAG_UNIQUE);
++        err = tonemap_vaapi_update_sidedata(avctx, sd, sd_lt);
++        if (err < 0)
++            return err;
++    }
++
+     return 0;
+ }
+ 
+@@ -555,7 +607,7 @@ static const AVFilterPad tonemap_vaapi_o
+     {
+         .name = "default",
+         .type = AVMEDIA_TYPE_VIDEO,
+-        .config_props = &ff_vaapi_vpp_config_output,
++        .config_props = &tonemap_vaapi_config_output,
+     },
+ };
+ 

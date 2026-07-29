@@ -1,5 +1,3 @@
-Index: FFmpeg/libavfilter/opencl.c
-===================================================================
 --- libavfilter/opencl.c
 +++ libavfilter/opencl.c
 @@ -19,6 +19,7 @@
@@ -40,7 +38,7 @@ Index: FFmpeg/libavfilter/opencl.c
  int ff_opencl_filter_load_program(AVFilterContext *avctx,
                                    const char **program_source_array,
                                    int nb_strings)
-@@ -171,8 +195,42 @@ int ff_opencl_filter_load_program(AVFilt
+@@ -171,8 +195,40 @@ int ff_opencl_filter_load_program(AVFilt
          return AVERROR(EIO);
      }
  
@@ -50,8 +48,8 @@ Index: FFmpeg/libavfilter/opencl.c
 +        char *device_vendor = check_opencl_device_str(ctx->hwctx->device_id, CL_DEVICE_VENDOR);
 +        char *device_name = check_opencl_device_str(ctx->hwctx->device_id, CL_DEVICE_NAME);
 +
-+        if (strstr(device_vendor, "ARM") &&
-+            (strstr(device_name, "Mali") || strstr(device_name, "Immortalis"))) {
++        if (device_vendor && strstr(device_vendor, "ARM") &&
++            device_name && strstr(device_name, "Mali")) {
 +            av_freep(&device_vendor);
 +            av_freep(&device_name);
 +
@@ -71,10 +69,8 @@ Index: FFmpeg/libavfilter/opencl.c
 +                return AVERROR(EIO);
 +            }
 +        }
-+        if (device_vendor)
-+            av_freep(&device_vendor);
-+        if (device_name)
-+            av_freep(&device_name);
++        av_freep(&device_vendor);
++        av_freep(&device_name);
 +    }
 +#endif
 +
@@ -84,7 +80,7 @@ Index: FFmpeg/libavfilter/opencl.c
      if (cle != CL_SUCCESS) {
          av_log(avctx, AV_LOG_ERROR, "Failed to build program: %d.\n", cle);
  
-@@ -333,7 +391,7 @@ void ff_opencl_print_const_matrix_3x3(AV
+@@ -333,7 +389,7 @@ void ff_opencl_print_const_matrix_3x3(AV
      av_bprintf(buf, "__constant float %s[9] = {\n", name_str);
      for (i = 0; i < 3; i++) {
          for (j = 0; j < 3; j++)
@@ -93,8 +89,6 @@ Index: FFmpeg/libavfilter/opencl.c
          av_bprintf(buf, "\n");
      }
      av_bprintf(buf, "};\n");
-Index: FFmpeg/libavfilter/opencl.h
-===================================================================
 --- libavfilter/opencl.h
 +++ libavfilter/opencl.h
 @@ -206,17 +206,17 @@ do {
@@ -134,8 +128,6 @@ Index: FFmpeg/libavfilter/opencl.h
   * Create a buffer with the given information.
   *
   * The buffer variable in the context structure must be named <buffer_name>.
-Index: FFmpeg/libavfilter/opencl/colorspace_common.cl
-===================================================================
 --- libavfilter/opencl/colorspace_common.cl
 +++ libavfilter/opencl/colorspace_common.cl
 @@ -16,8 +16,21 @@
@@ -499,8 +491,6 @@ Index: FFmpeg/libavfilter/opencl/colorspace_common.cl
 +
 +    return crgb;
  }
-Index: FFmpeg/libavfilter/opencl/tonemap.cl
-===================================================================
 --- libavfilter/opencl/tonemap.cl
 +++ libavfilter/opencl/tonemap.cl
 @@ -16,54 +16,89 @@
@@ -1794,8 +1784,6 @@ Index: FFmpeg/libavfilter/opencl/tonemap.cl
 +    c = lrgb2yuv(c);
 +    lut[idx] = clamp(c, 0.0f, 1.0f);
  }
-Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
-===================================================================
 --- libavfilter/vf_tonemap_opencl.c
 +++ libavfilter/vf_tonemap_opencl.c
 @@ -1,4 +1,4 @@
@@ -1832,15 +1820,16 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
  #include "video.h"
  #include "colorspace.h"
 +#include "dither_matrix.h"
-+
-+#define OPENCL_SOURCE_NB 3
-+
-+#define REF_WHITE_SCALE (REFERENCE_WHITE / REFERENCE_WHITE_ALT)
  
 -// TODO:
 -// - separate peak-detection from tone-mapping kernel to solve
 -//    one-frame-delay issue.
 -// - more format support
++#define OPENCL_SOURCE_NB 3
+ 
+-#define DETECTION_FRAMES 63
++#define REF_WHITE_SCALE (REFERENCE_WHITE / REFERENCE_WHITE_ALT)
++
 +static const enum AVPixelFormat supported_formats[] = {
 +    AV_PIX_FMT_YUV420P,
 +    AV_PIX_FMT_YUV420P16,
@@ -1849,8 +1838,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +    AV_PIX_FMT_P010,
 +    AV_PIX_FMT_P016,
 +};
- 
--#define DETECTION_FRAMES 63
++
 +static const int colorspaces_out[] = {
 +    AVCOL_SPC_UNSPECIFIED,
 +    AVCOL_SPC_BT709,
@@ -1956,7 +1944,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
  };
  
  static int get_rgb2rgb_matrix(enum AVColorPrimaries in, enum AVColorPrimaries out,
-@@ -108,90 +173,458 @@ static int get_rgb2rgb_matrix(enum AVCol
+@@ -108,90 +173,453 @@ static int get_rgb2rgb_matrix(enum AVCol
      return 0;
  }
  
@@ -2173,9 +2161,8 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +    int i, j, err;
  
 -    av_bprint_init(&header, 1024, AV_BPRINT_SIZE_AUTOMATIC);
-+    if (ctx->tonemap_mode == TONEMAP_MODE_AUTO) {
++    if (ctx->tonemap_mode == TONEMAP_MODE_AUTO)
 +        ctx->tonemap_mode = TONEMAP_MODE_ITP;
-+    }
  
      switch(ctx->tonemap) {
      case TONEMAP_GAMMA:
@@ -2257,10 +2244,8 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +            if (!strstr(device_vendor, "ARM") &&
 +                !strstr(device_name, "Mali"))
 +                ctx->tradeoff = 0;
-+            if (device_vendor)
-+                av_freep(&device_vendor);
-+            if (device_name)
-+                av_freep(&device_name);
++            av_freep(&device_vendor);
++            av_freep(&device_name);
 +        } else {
 +            ctx->tradeoff = 0;
 +        }
@@ -2272,7 +2257,6 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +    // for low perf device, only do reshaping for pure dovi
 +    if (ctx->tradeoff && ctx->dovi && !ctx->is_pure_dovi) {
 +        av_freep(&ctx->dovi);
-+        ctx->dovi = NULL;
 +        ctx->apply_dovi = 0;
 +    }
 +
@@ -2307,8 +2291,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +            dovi_buf_flags |= CL_MEM_FORCE_HOST_MEMORY_INTEL;
 +    }
 +
-+    if (device_exts)
-+        av_freep(&device_exts);
++    av_freep(&device_exts);
 +
 +    av_log(ctx, AV_LOG_DEBUG, "Tonemapping transfer from %s to %s\n",
             av_color_transfer_name(ctx->trc_in),
@@ -2444,7 +2427,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
      av_bprintf(&header, "#define chroma_loc %d\n", (int)ctx->chroma_loc);
  
      if (rgb2rgb_passthrough)
-@@ -199,19 +632,41 @@ static int tonemap_opencl_init(AVFilterC
+@@ -199,19 +627,41 @@ static int tonemap_opencl_init(AVFilterC
      else
          ff_opencl_print_const_matrix_3x3(&header, "rgb2rgb", rgb2rgb);
  
@@ -2493,7 +2476,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
                 ctx->colorspace_out, av_color_space_name(ctx->colorspace_out));
          goto fail;
      }
-@@ -219,24 +674,13 @@ static int tonemap_opencl_init(AVFilterC
+@@ -219,24 +669,13 @@ static int tonemap_opencl_init(AVFilterC
      ff_fill_rgb2yuv_table(luma_dst, rgb2yuv);
      ff_opencl_print_const_matrix_3x3(&header, "yuv_matrix", rgb2yuv);
  
@@ -2523,7 +2506,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
  
      av_log(avctx, AV_LOG_DEBUG, "Generated OpenCL header:\n%s\n", header.str);
      opencl_sources[0] = header.str;
-@@ -254,46 +698,216 @@ static int tonemap_opencl_init(AVFilterC
+@@ -254,46 +693,231 @@ static int tonemap_opencl_init(AVFilterC
      CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to create OpenCL "
                       "command queue %d.\n", cle);
  
@@ -2562,6 +2545,10 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +
 +        cle = clWaitForEvents(1, &event);
 +        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to wait for event completion: %d.\n", cle);
++        if (event) {
++            clReleaseEvent(event);
++            event = NULL;
++        }
 +    }
 +
 +    if (ctx->tradeoff) {
@@ -2608,20 +2595,25 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
      av_bprint_finalize(&header, NULL);
 -    if (ctx->util_mem)
 -        clReleaseMemObject(ctx->util_mem);
-+    if (ctx->dovi_buf)
-+        clReleaseMemObject(ctx->dovi_buf);
-     if (ctx->command_queue)
-         clReleaseCommandQueue(ctx->command_queue);
+-    if (ctx->command_queue)
+-        clReleaseCommandQueue(ctx->command_queue);
++    av_freep(&device_vendor);
++    av_freep(&device_name);
++    av_freep(&device_exts);
++    if (event)
++        clReleaseEvent(event);
      if (ctx->kernel)
          clReleaseKernel(ctx->kernel);
 +    if (ctx->lut_generation_kernel)
 +        clReleaseKernel(ctx->lut_generation_kernel);
-+    if (event)
-+        clReleaseEvent(event);
 +    if (ctx->dither_image)
 +        clReleaseMemObject(ctx->dither_image);
 +    if (ctx->lut_buffer)
 +        clReleaseMemObject(ctx->lut_buffer);
++    if (ctx->dovi_buf)
++        clReleaseMemObject(ctx->dovi_buf);
++    if (ctx->command_queue)
++        clReleaseCommandQueue(ctx->command_queue);
      return err;
  }
  
@@ -2660,6 +2652,14 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +        if (cle != CL_SUCCESS)
 +            av_log(avctx, AV_LOG_ERROR, "Failed to release "
 +                                        "lut_generation_kernel: %d.\n", cle);
++    }
++
++    if (ctx->ocf.program) {
++        cle = clReleaseProgram(ctx->ocf.program);
++        if (cle != CL_SUCCESS)
++            av_log(avctx, AV_LOG_ERROR, "Failed to release "
++                   "program: %d.\n", cle);
++        ctx->ocf.program = NULL;
 +    }
 +
 +    if (ctx->dither_image) {
@@ -2760,7 +2760,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
      ret = ff_opencl_filter_config_output(outlink);
      if (ret < 0)
          return ret;
-@@ -308,13 +922,49 @@ static int launch_kernel(AVFilterContext
+@@ -308,13 +932,49 @@ static int launch_kernel(AVFilterContext
      size_t global_work[2];
      size_t local_work[2];
      cl_int cle;
@@ -2775,7 +2775,13 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +        err = AVERROR(EIO);
 +        goto fail;
 +    }
-+
+ 
+-    CL_SET_KERNEL_ARG(kernel, 0, cl_mem, &output->data[0]);
+-    CL_SET_KERNEL_ARG(kernel, 1, cl_mem, &input->data[0]);
+-    CL_SET_KERNEL_ARG(kernel, 2, cl_mem, &output->data[1]);
+-    CL_SET_KERNEL_ARG(kernel, 3, cl_mem, &input->data[1]);
+-    CL_SET_KERNEL_ARG(kernel, 4, cl_mem, &ctx->util_mem);
+-    CL_SET_KERNEL_ARG(kernel, 5, cl_float, &peak);
 +    if (ctx->in_planes > 2 && !input->data[2]) {
 +        err = AVERROR(EIO);
 +        goto fail;
@@ -2805,18 +2811,12 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
 +    if (ctx->dovi_buf) {
 +        CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_mem, &ctx->dovi_buf);
 +    }
- 
--    CL_SET_KERNEL_ARG(kernel, 0, cl_mem, &output->data[0]);
--    CL_SET_KERNEL_ARG(kernel, 1, cl_mem, &input->data[0]);
--    CL_SET_KERNEL_ARG(kernel, 2, cl_mem, &output->data[1]);
--    CL_SET_KERNEL_ARG(kernel, 3, cl_mem, &input->data[1]);
--    CL_SET_KERNEL_ARG(kernel, 4, cl_mem, &ctx->util_mem);
--    CL_SET_KERNEL_ARG(kernel, 5, cl_float, &peak);
++
 +    CL_SET_KERNEL_ARG(kernel, idx_arg++, cl_float, &peak);
  
      local_work[0]  = 16;
      local_work[1]  = 16;
-@@ -338,12 +988,10 @@ static int tonemap_opencl_filter_frame(A
+@@ -338,12 +998,10 @@ static int tonemap_opencl_filter_frame(A
      AVFilterContext    *avctx = inlink->dst;
      AVFilterLink     *outlink = avctx->outputs[0];
      TonemapOpenCLContext *ctx = avctx->priv;
@@ -2830,7 +2830,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
  
      av_log(ctx, AV_LOG_DEBUG, "Filter input: %s, %ux%u (%"PRId64").\n",
             av_get_pix_fmt_name(input->format),
-@@ -351,7 +999,6 @@ static int tonemap_opencl_filter_frame(A
+@@ -351,7 +1009,6 @@ static int tonemap_opencl_filter_frame(A
  
      if (!input->hw_frames_ctx)
          return AVERROR(EINVAL);
@@ -2838,7 +2838,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
  
      output = ff_get_video_buffer(outlink, outlink->w, outlink->h);
      if (!output) {
-@@ -363,17 +1010,65 @@ static int tonemap_opencl_filter_frame(A
+@@ -363,17 +1020,65 @@ static int tonemap_opencl_filter_frame(A
      if (err < 0)
          goto fail;
  
@@ -2910,7 +2910,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
  
      ctx->trc_in = input->color_trc;
      ctx->trc_out = output->color_trc;
-@@ -385,72 +1080,50 @@ static int tonemap_opencl_filter_frame(A
+@@ -385,72 +1090,50 @@ static int tonemap_opencl_filter_frame(A
      ctx->range_out = output->color_range;
      ctx->chroma_loc = output->chroma_location;
  
@@ -3006,7 +3006,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
      av_frame_free(&input);
      av_frame_free(&output);
      return err;
-@@ -458,62 +1131,101 @@ fail:
+@@ -458,62 +1141,101 @@ fail:
  
  static av_cold void tonemap_opencl_uninit(AVFilterContext *avctx)
  {
@@ -3155,7 +3155,7 @@ Index: FFmpeg/libavfilter/vf_tonemap_opencl.c
      { NULL }
  };
  
-@@ -541,11 +1253,12 @@ const AVFilter ff_vf_tonemap_opencl = {
+@@ -541,11 +1263,12 @@ const AVFilter ff_vf_tonemap_opencl = {
      .description    = NULL_IF_CONFIG_SMALL("Perform HDR to SDR conversion with tonemapping."),
      .priv_size      = sizeof(TonemapOpenCLContext),
      .priv_class     = &tonemap_opencl_class,

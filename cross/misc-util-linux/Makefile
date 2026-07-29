@@ -3,8 +3,8 @@ PKG_REAL_NAME = util-linux
 PKG_VERS = 2.41.4
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/$(PKG_REAL_NAME)/v$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
-# use dedicated folder to build independent of other libraries built from util-linux (i.e. libuuid, libmount, libblkid)
+PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/util-linux/v$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
+# use dedicated folder to build independent of other libraries built from util-linux (i.e. ionice, libblkid, libmount, libuuid, misc-util-linux)
 PKG_DIR = $(PKG_NAME)/$(PKG_REAL_NAME)-$(PKG_VERS)
 EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 
@@ -82,18 +82,13 @@ CONFIGURE_ARGS += --disable-libblkid --disable-blkid
 PLIST_TRANSFORM = sed -e '/bin\/lsblk/d' -e '/bin\/findmnt/d' -e '/lib\/libmount/d' -e '/lib\/libblkid/d'
 endif
 
-# for clock_gettime
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-ADDITIONAL_LDFLAGS = -lrt
-endif
-
 # for lsblk and others: ncurses must be built with tinfo
 # this seems to be a bug in util-linux, as most of other libraries fail to find ncurses/termlib
 # dependencies when ncurses is build with lib tinfo
 # https://github.com/util-linux/util-linux/issues/2416
 # This is a workaround to use ncursesw without tinfo:
 # - still required for util-linux v2.41.1
-COMPILE_MAKE_OPTIONS = NCURSES_LIBS="-lncursesw"
+COMPILE_ARGS = NCURSES_LIBS="-lncursesw"
 
 include ../../mk/spksrc.cross-cc.mk
 

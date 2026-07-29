@@ -1,0 +1,5 @@
+bin:bin/ncat
+bin:bin/nmap
+bin:bin/nping
+rsc:share/ncat
+rsc:share/nmap

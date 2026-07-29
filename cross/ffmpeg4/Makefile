@@ -1,5 +1,6 @@
 PKG_NAME = ffmpeg
-PKG_VERS = 4.4.4
+PKG_VERS = 4.4.8
+PKG_MINOR_VERS = $(firstword $(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.ffmpeg.org/releases
@@ -9,60 +10,58 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
+include ../../mk/spksrc.common.mk
+
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
-CONFIGURE_ARGS += --extra-cflags="-I$(WORK_DIR)/install$(INSTALL_PREFIX)/include"
-CONFIGURE_ARGS += --extra-ldflags="-L$(WORK_DIR)/install$(INSTALL_PREFIX)/lib"
-CONFIGURE_ARGS += --extra-libs="-lxml2 -ldl -lm" --pkg-config=/usr/bin/pkg-config --ranlib=$(RANLIB)
+CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
+CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
 CONFIGURE_ARGS += --enable-shared
 CONFIGURE_ARGS += --enable-gpl --enable-version3
 CONFIGURE_ARGS += --enable-avresample
-CONFIGURE_ARGS += --disable-debug
 CONFIGURE_ARGS += --disable-static
 CONFIGURE_ARGS += --disable-doc
+ifeq ($(strip $(GCC_DEBUG_INFO)),1)
+  CONFIGURE_ARGS += --enable-debug=3 --disable-stripping --assert-level=2 --enable-ftrapv --disable-optimizations
+else
+  CONFIGURE_ARGS += --extra-cflags=-O3
+  CONFIGURE_ARGS += --disable-debug
+  ifneq ($(findstring $(ARCH), $(ARMv5_ARCHS) $(i686_ARCHS)),$(ARCH))
+    CONFIGURE_ARGS += --enable-lto
+  endif
+endif
 
-# Must match $(SPK_REV) from spk/ffmpeg4/Makefile
-CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg4/Makefile)
+# Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
+CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
 
-# Enable Synology specific -hls_seek_time option and other optimizations
+# Enable the Synology VideoStation compatibility code added by the
+# SYNO-* patch series (hls_seek_time, smooth streaming, srt tags, ...)
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
 
 # Compiler workaround to enable DTS-HD MA stream decoding
 CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
-# Synology default optimization
-CONFIGURE_ARGS += --extra-cflags=-O3
 # Remove some of the noise while compiling
 CONFIGURE_ARGS += --extra-cflags=-Wno-deprecated-declarations
 
-include ../../mk/spksrc.common.mk
-
-OPTIONAL_DEPENDS  = native/nasm
-OPTIONAL_DEPENDS += cross/chromaprint-fftw
+OPTIONAL_DEPENDS  = cross/chromaprint-fftw
 OPTIONAL_DEPENDS += cross/dav1d
 OPTIONAL_DEPENDS += cross/frei0r
-OPTIONAL_DEPENDS += cross/libass
 OPTIONAL_DEPENDS += cross/libaom
-OPTIONAL_DEPENDS += cross/libvpx
+OPTIONAL_DEPENDS += cross/libass
+OPTIONAL_DEPENDS += cross/librabbitmq
+OPTIONAL_DEPENDS += cross/librist
+OPTIONAL_DEPENDS += cross/libvmaf_1.5
+OPTIONAL_DEPENDS += cross/libvmaf_2.3
 OPTIONAL_DEPENDS += cross/libzimg
 OPTIONAL_DEPENDS += cross/openh264
+OPTIONAL_DEPENDS += cross/rubberband
+OPTIONAL_DEPENDS += cross/shine
+OPTIONAL_DEPENDS += cross/snappy
 OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/svt-hevc
-OPTIONAL_DEPENDS += cross/libva
-OPTIONAL_DEPENDS += cross/libva-utils
-OPTIONAL_DEPENDS += cross/intel-vaapi-driver
-OPTIONAL_DEPENDS += cross/intel-media-driver
-OPTIONAL_DEPENDS += cross/intel-mediasdk
-OPTIONAL_DEPENDS += cross/twolame
-OPTIONAL_DEPENDS += cross/x264
-OPTIONAL_DEPENDS += cross/x265
-OPTIONAL_DEPENDS += cross/shine
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
-BUILD_DEPENDS = native/nasm
-NASM_PATH = $(abspath $(PWD)/../../native/nasm/work-native/install/usr/local/bin)
-ENV += AS=$(NASM_PATH)/nasm
-ENV += PATH=$(NASM_PATH):$$PATH
 CONFIGURE_ARGS += --x86asmexe=nasm
 
 # Allow ASM on aarch64, disable on all others
@@ -70,12 +69,47 @@ else ifneq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --disable-asm
 endif
 
+# build cario first, otherwise cross/cairo fails to build for x64-6.* arch
+# It does not fail for x64-7.* when cario is prebuilt with videodriver.
+# The failing seems related to parallel builds and occurs since cairo is built with meson
+# due lacking videodriver build include path for cairo.
+# cairo is dependency of harfbuzz, dependency of libass
+DEPENDS = cross/cairo
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/chromaprint-fftw
+CONFIGURE_ARGS += --enable-chromaprint
+endif
+
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/frei0r
+CONFIGURE_ARGS += --enable-frei0r
+endif
+
+DEPENDS += cross/gnutls
+CONFIGURE_ARGS += --enable-gnutls
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/libass
+CONFIGURE_ARGS += --enable-libass
+endif
+
+DEPENDS += cross/libbluray
+CONFIGURE_ARGS += --enable-libbluray
+
+DEPENDS += cross/libcaca
+CONFIGURE_ARGS += --enable-libcaca
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/dav1d
+CONFIGURE_ARGS += --enable-libdav1d
+endif
+
 DEPENDS += cross/codec2
 CONFIGURE_ARGS += --enable-libcodec2
 
-DEPENDS += cross/libxml2
-CONFIGURE_ARGS += --enable-libxml2
-CONFIGURE_ARGS += --enable-demuxer=dash
+DEPENDS += cross/libdc1394
+CONFIGURE_ARGS += --enable-libdc1394
 
 DEPENDS += cross/fontconfig
 CONFIGURE_ARGS += --enable-libfontconfig
@@ -86,94 +120,95 @@ CONFIGURE_ARGS += --enable-libfreetype
 DEPENDS += cross/fribidi
 CONFIGURE_ARGS += --enable-libfribidi
 
-DEPENDS += cross/openjpeg
-CONFIGURE_ARGS += --enable-libopenjpeg
-
 DEPENDS += cross/lame
 CONFIGURE_ARGS += --enable-libmp3lame
 
-DEPENDS += cross/libbluray
-CONFIGURE_ARGS += --enable-libbluray
+DEPENDS += cross/opencore-amr
+CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
+
+DEPENDS += cross/openjpeg
+CONFIGURE_ARGS += --enable-libopenjpeg
+
+DEPENDS += cross/opus
+CONFIGURE_ARGS += --enable-libopus
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/librabbitmq
+CONFIGURE_ARGS += --enable-librabbitmq
+endif
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/librist
+CONFIGURE_ARGS += --enable-librist
+endif
+
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/rubberband
+CONFIGURE_ARGS += --enable-librubberband
+endif
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/shine
+CONFIGURE_ARGS += --enable-libshine
+endif
+
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/snappy
+CONFIGURE_ARGS += --enable-libsnappy
+endif
+
+DEPENDS += cross/soxr
+CONFIGURE_ARGS += --enable-libsoxr
 
 DEPENDS += cross/speex
 CONFIGURE_ARGS += --enable-libspeex
+
+DEPENDS += cross/libsrt
+CONFIGURE_ARGS += --enable-libsrt
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
 CONFIGURE_ARGS += --enable-libtheora
 
-DEPENDS += cross/libcaca
-CONFIGURE_ARGS += --enable-libcaca
+DEPENDS += cross/twolame
+CONFIGURE_ARGS += --enable-libtwolame
 
-DEPENDS += cross/libdc1394
-CONFIGURE_ARGS += --enable-libdc1394
+ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
+DEPENDS += cross/libvmaf_2.3
+CONFIGURE_ARGS += --enable-libvmaf
+else ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+DEPENDS += cross/libvmaf_1.5
+CONFIGURE_ARGS += --enable-libvmaf
+endif
 
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
 
+DEPENDS += cross/libvpx
+CONFIGURE_ARGS += --enable-libvpx
+
 DEPENDS += cross/libwebp
 CONFIGURE_ARGS += --enable-libwebp
 
-DEPENDS += cross/libzmq
-CONFIGURE_ARGS += --enable-libzmq
-
-DEPENDS += cross/gnutls
-CONFIGURE_ARGS += --enable-gnutls
-
-ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/openh264
-CONFIGURE_ARGS += --enable-libopenh264
-endif
-
-DEPENDS += cross/opus
-CONFIGURE_ARGS += --enable-libopus
-
-DEPENDS += cross/soxr
-CONFIGURE_ARGS += --enable-libsoxr
-
-DEPENDS += cross/opencore-amr
-CONFIGURE_ARGS += --enable-libopencore-amrnb --enable-libopencore-amrwb
-
-DEPENDS += cross/librabbitmq
-CONFIGURE_ARGS += --enable-librabbitmq
-
-DEPENDS += cross/twolame
-CONFIGURE_ARGS += --enable-libtwolame
-
-DEPENDS += cross/zvbi
-CONFIGURE_ARGS += --enable-libzvbi
-
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
 
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --enable-libx265
 
-DEPENDS += cross/libvpx
-CONFIGURE_ARGS += --enable-libvpx
+DEPENDS += cross/libxml2
+CONFIGURE_ARGS += --enable-libxml2 --enable-demuxer=dash
 
-DEPENDS += cross/shine
-CONFIGURE_ARGS += --enable-libshine
-
-# end ifneq $(OLD_PPC_ARCHS)
-endif
-
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/chromaprint-fftw
-CONFIGURE_ARGS += --enable-chromaprint
-
-DEPENDS += cross/dav1d
-CONFIGURE_ARGS += --enable-libdav1d
-
-DEPENDS += cross/librist
-CONFIGURE_ARGS += --enable-librist
-
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
 DEPENDS += cross/libzimg
 CONFIGURE_ARGS += --enable-libzimg
-
-# end ifneq $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 endif
+
+DEPENDS += cross/libzmq
+CONFIGURE_ARGS += --enable-libzmq
+
+DEPENDS += cross/zvbi
+CONFIGURE_ARGS += --enable-libzvbi
 
 #
 # fdk-acc is now considered compatible with (L)GPL.
@@ -186,6 +221,16 @@ endif
 DEPENDS += cross/fdk-aac
 CONFIGURE_ARGS += --enable-libfdk-aac --enable-nonfree
 
+##
+## ARCH SPECIFIC
+##
+
+ifneq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/openh264
+CONFIGURE_ARGS += --enable-libopenh264
+endif
+
+# Add libaom to supported ARCH
 ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
@@ -205,23 +250,32 @@ DEPENDS += cross/svt-hevc
 CONFIGURE_ARGS += --enable-libsvthevc
 endif
 
-##
-## ARCH SPECIFIC
-##
-
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --disable-neon
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --disable-neon
+# Needed for libsrt
+CONFIGURE_ARGS += --extra-ldflags="-lrt"
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm --enable-neon --enable-thumb --disable-armv6 --disable-armv6t2 --disable-vfp --disable-armv5te
-ifneq ($(findstring $(ARCH),alpine),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --enable-neon
+CONFIGURE_ARGS += --enable-thumb
+CONFIGURE_ARGS += --disable-armv5te
+CONFIGURE_ARGS += --disable-armv6
+CONFIGURE_ARGS += --disable-armv6t2
+CONFIGURE_ARGS += --disable-vfp
+ifeq ($(findstring $(ARCH),alpine),$(ARCH))
 CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
 endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
-CONFIGURE_ARGS += --arch=arm64 --enable-neon --enable-thumb
+CONFIGURE_ARGS += --arch=arm64
+CONFIGURE_ARGS += --enable-neon
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-thumb
+CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
@@ -234,29 +288,32 @@ CONFIGURE_ARGS += --cpu=e500 --disable-altivec
 endif
 endif
 
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-DEPENDS += cross/libva cross/libva-utils cross/intel-vaapi-driver cross/intel-media-driver cross/intel-mediasdk
-CONFIGURE_ARGS += --arch=x86_64 --enable-vaapi --enable-libmfx --enable-libdrm
+ifeq ($(findstring $(ARCH),evansport),$(ARCH))
+CONFIGURE_ARGS += --arch=x86
+CONFIGURE_ARGS += --cpu=atom
 endif
 
-ifeq ($(findstring $(ARCH),evansport),$(ARCH))
-CONFIGURE_ARGS += --arch=x86 --cpu=atom
+ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=x86_64
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-vaapi
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
+CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
+
+# libmfx and libvpl cannot be enabled together:
+#   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
+#   - libvpl (oneVPL) → Gen12+, no Synology NAS has that
+CONFIGURE_ARGS += --enable-libmfx
+#CONFIGURE_ARGS += --enable-libvpl
+
+# Enable OpenCL and Vulkan acceleration
+ifeq ($(call version_gt, $(TC_GCC), 5),1)
+#CONFIGURE_ARGS += --enable-libglslang <<-- Uses older API
+CONFIGURE_ARGS += --enable-opencl
+CONFIGURE_ARGS += --enable-vulkan
+endif
+
+endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk
-
-##
-## GCC SPECIFIC
-##
-
-# libass requires harfbuzz which in turns requires c++ from gcc >= 4.8 (88f6281-6.1 = gcc-4.6.4)
-ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
-DEPENDS += cross/libass
-CONFIGURE_ARGS += --enable-libass
-endif
-
-# Newer frei0r requires newer gcc
-ifeq ($(call version_ge, $(TC_GCC), 7.5),1)
-DEPENDS += cross/frei0r
-CONFIGURE_ARGS += --enable-frei0r
-endif

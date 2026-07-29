@@ -12,6 +12,6 @@ HOMEPAGE = https://www.rowetel.com/
 COMMENT  = Codec 2 is an open source (LGPL 2.1) low bit rate speech codec.
 LICENSE  = LGPL 2.1
 
-CMAKE_ARGS = -DUNITTEST=FALSE
+CONFIGURE_ARGS = -DUNITTEST=FALSE
 
 include ../../mk/spksrc.cross-cmake.mk

@@ -4,8 +4,8 @@ SPK_REV = 13
 SPK_ICON = src/headphones.png
 
 DEPENDS =
-PYTHON_PACKAGE = python312
-SPK_DEPENDS = "${PYTHON_PACKAGE}:git"
+
+SPK_DEPENDS = "python312:git"
 
 MAINTAINER = Diaoul
 DESCRIPTION = Headphones is an automatic NZB and torrent downloader for music. Mark albums as wanted and have them downloaded as soon as they are available. Different quality settings are possible, including lossless. With Headphones you can also manage your music library automatically: move, tag, rename and index for your DiskStation.
@@ -21,7 +21,7 @@ STARTABLE  = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 8181
-SERVICE_PORT_TITLE = $(DISPLAY_NAME)
+SERVICE_PORT_TITLE = Headphones Web UI
 
 # Admin link for in DSM UI
 ADMIN_PORT = $(SERVICE_PORT)

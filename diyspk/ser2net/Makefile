@@ -1,5 +1,5 @@
 SPK_NAME = ser2net
-SPK_VERS = 4.6.5
+SPK_VERS = 4.6.6
 SPK_REV = 1
 SPK_ICON = src/ser2net.png
 
@@ -17,5 +17,10 @@ HOMEPAGE = http://ser2net.sourceforge.net/
 LICENSE = GPLv2
 
 SPK_COMMANDS = sbin/ser2net
+# tools of gensio:
+SPK_COMMANDS += bin/gensiot
+SPK_COMMANDS += bin/gsh
+SPK_COMMANDS += bin/gtlssh
+SPK_COMMANDS += bin/gtlssh-keygen
 
 include ../../mk/spksrc.spk.mk

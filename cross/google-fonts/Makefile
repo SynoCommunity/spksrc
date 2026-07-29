@@ -16,7 +16,7 @@ LICENSE  = Most of the fonts in the collection use the SIL Open Font License, v1
 
 INSTALL_TARGET = google-fonts_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: google-fonts_install
 # exclude folder with duplicate font NotoSansNKo-Regular.ttf

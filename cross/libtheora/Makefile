@@ -1,6 +1,6 @@
 PKG_NAME = libtheora
-PKG_VERS = 1.1.1
-PKG_EXT = tar.bz2
+PKG_VERS = 1.2.0
+PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://downloads.xiph.org/releases/theora
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
@@ -17,5 +17,16 @@ CONFIGURE_ARGS  = --disable-static
 CONFIGURE_ARGS += --disable-examples
 CONFIGURE_ARGS += --disable-spec
 ADDITIONAL_CFLAGS = -Os
+
+include ../../mk/spksrc.common.mk
+
+# libtheora 1.2.0's ARM assembly contains NEON instructions that the ARMv5
+# assembler rejects ("selected processor does not support ARM mode"). Disable
+# the assembly on ARMv5 (matches Debian, which builds armel with --disable-asm).
+# ARMv7+ assemble fine once the upstream-missing arm/{armenc.c,armloop.s} are
+# restored (see patches/001-arm-missing-files.patch).
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --disable-asm
+endif
 
 include ../../mk/spksrc.cross-cc.mk

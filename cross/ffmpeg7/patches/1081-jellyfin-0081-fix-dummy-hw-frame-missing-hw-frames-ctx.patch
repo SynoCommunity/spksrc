@@ -1,5 +1,3 @@
-Index: FFmpeg/fftools/ffmpeg_filter.c
-===================================================================
 --- fftools/ffmpeg_filter.c
 +++ fftools/ffmpeg_filter.c
 @@ -2384,10 +2384,21 @@ static int close_output(OutputFilterPriv

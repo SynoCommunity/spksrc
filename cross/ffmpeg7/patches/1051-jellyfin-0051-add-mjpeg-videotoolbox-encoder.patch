@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3525,6 +3525,8 @@ h264_videotoolbox_encoder_deps="pthreads
@@ -11,8 +9,6 @@ Index: FFmpeg/configure
  prores_videotoolbox_encoder_deps="pthreads"
  prores_videotoolbox_encoder_select="videotoolbox_encoder"
  libaom_av1_decoder_deps="libaom"
-Index: FFmpeg/libavcodec/Makefile
-===================================================================
 --- libavcodec/Makefile
 +++ libavcodec/Makefile
 @@ -518,6 +518,7 @@ OBJS-$(CONFIG_MJPEGB_DECODER)          +
@@ -23,8 +19,6 @@ Index: FFmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_MJPEG_RKMPP_DECODER)     += rkmppdec.o
  OBJS-$(CONFIG_MJPEG_RKMPP_ENCODER)     += rkmppenc.o
  OBJS-$(CONFIG_MLP_DECODER)             += mlpdec.o mlpdsp.o
-Index: FFmpeg/libavcodec/allcodecs.c
-===================================================================
 --- libavcodec/allcodecs.c
 +++ libavcodec/allcodecs.c
 @@ -875,6 +875,7 @@ extern const FFCodec ff_mjpeg_cuvid_deco
@@ -35,8 +29,6 @@ Index: FFmpeg/libavcodec/allcodecs.c
  extern const FFCodec ff_mjpeg_rkmpp_decoder;
  extern const FFCodec ff_mjpeg_rkmpp_encoder;
  extern const FFCodec ff_mp3_mediacodec_decoder;
-Index: FFmpeg/libavcodec/videotoolboxenc.c
-===================================================================
 --- libavcodec/videotoolboxenc.c
 +++ libavcodec/videotoolboxenc.c
 @@ -546,6 +546,7 @@ static CMVideoCodecType get_cm_codec_typ

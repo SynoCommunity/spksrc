@@ -1,0 +1,114 @@
+Index: FFmpeg/libavcodec/dca_core.c
+===================================================================
+--- libavcodec/dca_core.c
++++ libavcodec/dca_core.c
+@@ -2370,8 +2370,14 @@ int ff_dca_core_filter_frame(DCACoreDeco
+         return ret;
+ 
+     // Set profile, bit rate, etc
+-    if (s->ext_audio_mask & DCA_EXSS_MASK)
+-        avctx->profile = AV_PROFILE_DTS_HD_HRA;
++    if (s->ext_audio_mask & DCA_EXSS_MASK) {
++        if (dca->exss.x_imax_syncword_present)
++            avctx->profile = AV_PROFILE_DTS_HD_HRA_X_IMAX;
++        else if (dca->exss.x_syncword_present)
++            avctx->profile = AV_PROFILE_DTS_HD_HRA_X;
++        else
++            avctx->profile = AV_PROFILE_DTS_HD_HRA;
++    }
+     else if (s->ext_audio_mask & (DCA_CSS_XXCH | DCA_CSS_XCH))
+         avctx->profile = AV_PROFILE_DTS_ES;
+     else if (s->ext_audio_mask & DCA_CSS_X96)
+Index: FFmpeg/libavcodec/dca_exss.c
+===================================================================
+--- libavcodec/dca_exss.c
++++ libavcodec/dca_exss.c
+@@ -19,6 +19,9 @@
+  */
+ 
+ #include "dcadec.h"
++#include "libavutil/intreadwrite.h"
++
++#include "dca_syncwords.h"
+ 
+ static void parse_xll_parameters(DCAExssParser *s, DCAExssAsset *asset)
+ {
+@@ -379,6 +382,9 @@ int ff_dca_exss_parse(DCAExssParser *s,
+ {
+     int i, ret, offset, wide_hdr, header_size;
+ 
++    s->x_syncword_present = 0;
++    s->x_imax_syncword_present = 0;
++
+     if ((ret = init_get_bits8(&s->gb, data, size)) < 0)
+         return ret;
+ 
+@@ -510,5 +516,15 @@ int ff_dca_exss_parse(DCAExssParser *s,
+         return AVERROR_INVALIDDATA;
+     }
+ 
++    if (s->exss_size - offset >= 10 && AV_RB48(data + offset) == DCA_SYNCWORD_X_AFTER_ASSETS) {
++        unsigned int extradata_syncword = AV_RB32(data + offset + 6);
++
++        if (extradata_syncword == DCA_SYNCWORD_XLL_X) {
++            s->x_syncword_present = 1;
++        } else if ((extradata_syncword >> 1) == (DCA_SYNCWORD_XLL_X_IMAX >> 1)) {
++            s->x_imax_syncword_present = 1;
++        }
++    }
++
+     return 0;
+ }
+Index: FFmpeg/libavcodec/dca_exss.h
+===================================================================
+--- libavcodec/dca_exss.h
++++ libavcodec/dca_exss.h
+@@ -84,6 +84,9 @@ typedef struct DCAExssParser {
+     int     nmixoutconfigs;         ///< Number of mixing configurations
+     int     nmixoutchs[4];          ///< Speaker layout mask for mixer output channels
+ 
++    int     x_syncword_present;     ///< DTS:X extension syncword detected
++    int     x_imax_syncword_present;///< DTS:X IMAX extension syncword detected
++
+     DCAExssAsset   assets[1];    ///< Audio asset descriptors
+ } DCAExssParser;
+ 
+Index: FFmpeg/libavcodec/dca_syncwords.h
+===================================================================
+--- libavcodec/dca_syncwords.h
++++ libavcodec/dca_syncwords.h
+@@ -33,6 +33,7 @@
+ #define    DCA_SYNCWORD_SUBSTREAM_CORE       0x02B09261U
+ #define    DCA_SYNCWORD_REV1AUX              0x9A1105A0U
+ 
++#define    DCA_SYNCWORD_X_AFTER_ASSETS       0x3A429B0A0011ULL
+ #define    DCA_SYNCWORD_XLL_X                0x02000850U
+ #define    DCA_SYNCWORD_XLL_X_IMAX           0xF14000D0U
+ 
+Index: FFmpeg/libavcodec/defs.h
+===================================================================
+--- libavcodec/defs.h
++++ libavcodec/defs.h
+@@ -88,7 +88,9 @@
+ #define AV_PROFILE_DTS_ES             30
+ #define AV_PROFILE_DTS_96_24          40
+ #define AV_PROFILE_DTS_HD_HRA         50
++#define AV_PROFILE_DTS_HD_HRA_X       51
++#define AV_PROFILE_DTS_HD_HRA_X_IMAX  52
+ #define AV_PROFILE_DTS_HD_MA          60
+ #define AV_PROFILE_DTS_EXPRESS        70
+ #define AV_PROFILE_DTS_HD_MA_X        61
+ #define AV_PROFILE_DTS_HD_MA_X_IMAX   62
+Index: FFmpeg/libavcodec/profiles.c
+===================================================================
+--- libavcodec/profiles.c
++++ libavcodec/profiles.c
+@@ -42,6 +42,8 @@ const AVProfile ff_dca_profiles[] = {
+     { AV_PROFILE_DTS_ES,             "DTS-ES"                 },
+     { AV_PROFILE_DTS_96_24,          "DTS 96/24"              },
+     { AV_PROFILE_DTS_HD_HRA,         "DTS-HD HRA"             },
++    { AV_PROFILE_DTS_HD_HRA_X,       "DTS-HD HRA + DTS:X"     },
++    { AV_PROFILE_DTS_HD_HRA_X_IMAX,  "DTS-HD HRA + DTS:X IMAX"},
+     { AV_PROFILE_DTS_HD_MA,          "DTS-HD MA"              },
+     { AV_PROFILE_DTS_HD_MA_X,        "DTS-HD MA + DTS:X"      },
+     { AV_PROFILE_DTS_HD_MA_X_IMAX,   "DTS-HD MA + DTS:X IMAX" },

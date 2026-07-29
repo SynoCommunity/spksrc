@@ -1,5 +1,5 @@
 PKG_NAME = haproxy
-PKG_VERS = 3.0.15
+PKG_VERS = 3.0.23
 PKG_MAIN_VERS=$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -14,7 +14,7 @@ COMMENT    = HAProxy is a free, very fast and reliable solution offering high av
 LICENSE    = GPLv2
 
 CONFIGURE_TARGET = nop
-INSTALL_TARGET = haproxy_install
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 
 # OpenSSL paths
 SSL_INC = $(INSTALL_DIR)$(INSTALL_PREFIX)/include
@@ -25,26 +25,10 @@ BUILD_OPTIONS += USE_PCRE2=1 PCRE2_INC=$(INSTALL_DIR)$(INSTALL_PREFIX)/include P
 BUILD_OPTIONS += USE_LUA=1 LUA_INC=$(INSTALL_DIR)$(INSTALL_PREFIX)/include LUA_LIB=$(INSTALL_DIR)$(INSTALL_PREFIX)/lib
 BUILD_OPTIONS += SSL_INC=$(SSL_INC) SSL_LIB=$(SSL_LIB)
 
-include ../../mk/spksrc.common.mk
-
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
-# ARMv5 and PPC archs (except QorIQ) have older kernels and need rt library for clock_gettime()
-BUILD_OPTIONS += USE_RT=1
-ADDITIONAL_CFLAGS += -DLUA_32BITS
-endif
-
-ifeq ($(findstring $(ARCH), qoriq),$(ARCH))
-BUILD_OPTIONS += ADDLIB=-latomic
-endif
-
 # Use linux-glibc-legacy target for older glibc compatibility (DSM 7.1 has glibc 2.26)
 # Pass explicit CC and LD for cross-compilation
-COMPILE_MAKE_OPTIONS += TARGET=linux-glibc-legacy $(BUILD_OPTIONS)
-COMPILE_MAKE_OPTIONS += CC=$(TC_PATH)$(TC_PREFIX)gcc LD=$(TC_PATH)$(TC_PREFIX)gcc
-COMPILE_MAKE_OPTIONS += CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+COMPILE_ARGS += TARGET=linux-glibc-legacy $(BUILD_OPTIONS)
+COMPILE_ARGS += CC=$(TC_PATH)$(TC_PREFIX)gcc LD=$(TC_PATH)$(TC_PREFIX)gcc
+COMPILE_ARGS += CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: haproxy_install
-haproxy_install:
-	$(RUN) $(MAKE) install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)

@@ -1,9 +1,9 @@
-PKG_NAME = pngquant-main
+PKG_NAME = pngquant-virtual
 
 OPTIONAL_DEPENDS  = cross/pngquant3
 OPTIONAL_DEPENDS += cross/pngquant2
 
-include ../../mk/spksrc.main-depends.mk
+include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
 # std=c11 not fully supported
@@ -13,3 +13,5 @@ DEPENDS = cross/pngquant2
 else
 DEPENDS = cross/pngquant3
 endif
+
+include ../../mk/spksrc.cross-virtual.mk

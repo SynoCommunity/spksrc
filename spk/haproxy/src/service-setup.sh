@@ -1,5 +1,5 @@
 # HAProxy service setup
-PYTHON_DIR="/var/packages/python312/target/bin"
+PYTHON_DIR="/var/packages/python314/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 export LD_LIBRARY_PATH="${SYNOPKG_PKGDEST}/lib"
 
@@ -23,14 +23,19 @@ service_postinst ()
     # Install the wheels
     install_python_wheels
 
+    # Verify virtualenv was created
+    if [ ! -x "${SYNOPKG_PKGDEST}/env/bin/python3" ]; then
+        echo "ERROR: Python virtualenv creation failed. Dashboard will not be available." >> "${LOG_FILE}"
+    fi
+
     # Create certificate directory
     mkdir -p "${CERT_DIR}"
 
     # Create a self-signed certificate for HTTPS termination
-    # Use python312's openssl since we depend on it at runtime
+    # Use python314's openssl since we depend on it at runtime
     OPENSSL="${PYTHON_DIR}/openssl"
     if [ -x "${OPENSSL}" ]; then
-        LD_LIBRARY_PATH="/var/packages/python312/target/lib" ${OPENSSL} req -x509 -newkey rsa:4096 -nodes \
+        LD_LIBRARY_PATH="${PYTHON_DIR}/../lib" ${OPENSSL} req -x509 -newkey rsa:4096 -nodes \
             -keyout "${CERT_DIR}/default.key" \
             -out "${CERT_DIR}/default.crt" \
             -days 7320 -subj "/CN=haproxy-default" 2>/dev/null
@@ -64,7 +69,11 @@ service_prestart ()
         export HAPROXY_PID="${PID_FILE}"
 
         cd "${DASHBOARD_DIR}"
-        "${SYNOPKG_PKGDEST}/env/bin/python3" app.py >> "${LOG_FILE}" 2>&1 &
+        if [ ! -x "${SYNOPKG_PKGDEST}/env/bin/python3" ]; then
+            echo "ERROR: Virtualenv not created. Python dependencies are missing — dashboard not started." >> "${LOG_FILE}"
+        else
+            "${SYNOPKG_PKGDEST}/env/bin/python3" app.py >> "${LOG_FILE}" 2>&1 &
+        fi
         echo $! > "${DASHBOARD_PID}"
     fi
 }

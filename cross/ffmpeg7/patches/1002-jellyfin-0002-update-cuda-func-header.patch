@@ -1,5 +1,3 @@
-Index: FFmpeg/compat/cuda/cuda_runtime.h
-===================================================================
 --- compat/cuda/cuda_runtime.h
 +++ compat/cuda/cuda_runtime.h
 @@ -24,6 +24,7 @@
@@ -165,7 +163,7 @@ Index: FFmpeg/compat/cuda/cuda_runtime.h
  {
      float4 ret;
      asm("tex.2d.v4.f32.f32 {%0, %1, %2, %3}, [%4, {%5, %6}];" :
-@@ -156,37 +147,41 @@ inline __device__ float4 tex2D<float4>(c
+@@ -156,37 +147,42 @@ inline __device__ float4 tex2D<float4>(c
  }
  
  template<>
@@ -216,6 +214,7 @@ Index: FFmpeg/compat/cuda/cuda_runtime.h
 +static __inline__ __device__ float fabs(float a) { return __builtin_fabsf(a); }
 +static __inline__ __device__ double fabs(double a) { return __builtin_fabs(a); }
 +static __inline__ __device__ float sqrtf(float a) { return __builtin_sqrtf(a); }
++static __inline__ __device__ float rintf(float a) { return __builtin_rintf(a); }
 +
 +static __inline__ __device__ float __saturatef(float a) { return __nvvm_saturate_f(a); }
 +static __inline__ __device__ float __sinf(float a) { return __nvvm_sin_approx_f(a); }

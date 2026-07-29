@@ -1,6 +1,9 @@
+###############################################################################
+# spksrc.native-cc.mk
 #
 # Default NATIVE make programs
 #
+###############################################################################
 
 # Package dependent
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -16,7 +19,6 @@ DIST_EXT      = $(PKG_EXT)
 ARCH_SUFFIX  := -native
 
 # Setup common directories
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
@@ -27,31 +29,14 @@ include ../../mk/spksrc.common.mk
 
 #####
 
-include ../../mk/spksrc.native-env.mk
+include ../../mk/spksrc.native/env-default.mk
 
-include ../../mk/spksrc.download.mk
+include ../../mk/spksrc.rules/depend.mk
 
-include ../../mk/spksrc.depend.mk
+include ../../mk/spksrc.rules/status.mk
 
-include ../../mk/spksrc.status.mk
-
-checksum: download
-include ../../mk/spksrc.checksum.mk
-
-extract: checksum depend status
-include ../../mk/spksrc.extract.mk
-
-patch: extract
-include ../../mk/spksrc.patch.mk
-
-configure: patch
-include ../../mk/spksrc.configure.mk
-
-compile: configure
-include ../../mk/spksrc.compile.mk
-
-install: compile
-include ../../mk/spksrc.install.mk
+# Standard build pipeline (download -> ... -> install)
+include ../../mk/spksrc.build.mk
 
 ###
 
@@ -61,9 +46,11 @@ cat_PLIST:
 
 ###
 
-# Define _all as a real target that does the work
+# Define _all as a real target that does the work. 'archive' runs after install
+# and is a no-op unless the package declares ARCHIVE_NAME (see
+# spksrc.native/archive.mk).
 .PHONY: _all
-_all: install
+_all: install archive
 
 # all wraps _all with logging
 .PHONY: all
@@ -76,6 +63,18 @@ all:
 ####
 
 ### Include common rules
-include ../../mk/spksrc.common-rules.mk
+include ../../mk/spksrc.rules.mk
+
+# nativeclean -- like spkclean: re-run every step next make, keeping the work dir.
+# Only the master package's cookies, listed (not a glob): a shared-work-dir dep
+# whose name extends this one's (llvm -> llvm-140) must keep its own.
+.PHONY: nativeclean
+nativeclean:
+	rm -f $(DOWNLOAD_COOKIE) $(CHECKSUM_COOKIE) $(EXTRACT_COOKIE) $(PATCH_COOKIE) \
+	      $(DEPEND_COOKIE) $(CONFIGURE_COOKIE) $(COMPILE_COOKIE) $(INSTALL_COOKIE) \
+	      $(STATUS_COOKIE) $(ARCHIVE_COOKIE)
+
+### Optional archive packaging (build-archive); no-op unless ARCHIVE is set
+include ../../mk/spksrc.native/archive.mk
 
 ###

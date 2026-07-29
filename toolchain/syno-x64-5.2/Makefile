@@ -4,6 +4,7 @@ TC_ARCH = apollolake avoton braswell broadwell broadwellnk bromolow cedarview de
 TC_VERS = 5.2
 TC_KERNEL = 3.2.40
 TC_GLIBC = 2.17
+TC_GCC = 4.7.3
 
 TC_DIST = x64-gcc473_glibc217_x86_64-GPL
 TC_DIST_SITE_URL = https://github.com/SynoCommunity/spksrc/releases/download/

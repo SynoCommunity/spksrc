@@ -1,5 +1,3 @@
-Index: FFmpeg/libavformat/segment.c
-===================================================================
 --- libavformat/segment.c
 +++ libavformat/segment.c
 @@ -89,6 +89,7 @@ typedef struct SegmentContext {

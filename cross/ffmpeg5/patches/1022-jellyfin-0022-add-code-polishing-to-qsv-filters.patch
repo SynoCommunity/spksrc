@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/qsv.c
-===================================================================
 --- libavcodec/qsv.c
 +++ libavcodec/qsv.c
 @@ -171,7 +171,7 @@ int ff_qsv_print_warning(void *log_ctx,
@@ -11,8 +9,6 @@ Index: jellyfin-ffmpeg/libavcodec/qsv.c
      return ret;
  }
  
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -252,7 +252,7 @@ OBJS-$(CONFIG_DECONVOLVE_FILTER)
@@ -33,8 +29,6 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_SCALE_VAAPI_FILTER)            += vf_scale_vaapi.o scale_eval.o vaapi_vpp.o
  OBJS-$(CONFIG_SCALE_VULKAN_FILTER)           += vf_scale_vulkan.o vulkan.o vulkan_filter.o
  OBJS-$(CONFIG_SCALE2REF_FILTER)              += vf_scale.o scale_eval.o
-Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
-===================================================================
 --- libavfilter/qsvvpp.c
 +++ libavfilter/qsvvpp.c
 @@ -145,7 +145,7 @@ int ff_qsvvpp_print_warning(void *log_ct
@@ -211,8 +205,6 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
      if (ret < 0)
          return ff_qsvvpp_print_error(ctx, ret, "Error running VPP");
      else if (ret > 0)
-Index: jellyfin-ffmpeg/libavfilter/qsvvpp.h
-===================================================================
 --- libavfilter/qsvvpp.h
 +++ libavfilter/qsvvpp.h
 @@ -48,6 +48,8 @@ typedef struct QSVFrame {
@@ -254,8 +246,6 @@ Index: jellyfin-ffmpeg/libavfilter/qsvvpp.h
  
  /* vpp filter frame and call the cb if needed */
  int ff_qsvvpp_filter_frame(QSVVPPContext *vpp, AVFilterLink *inlink, AVFrame *frame);
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
-===================================================================
 --- libavfilter/vf_overlay_qsv.c
 +++ libavfilter/vf_overlay_qsv.c
 @@ -57,10 +57,9 @@ enum var_name {
@@ -402,8 +392,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
          AV_PIX_FMT_QSV,
          AV_PIX_FMT_NONE
      };
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_qsv.c
-===================================================================
 --- libavfilter/vf_scale_qsv.c
 +++ /dev/null
 @@ -1,664 +0,0 @@
@@ -1071,8 +1059,6 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_qsv.c
 -
 -    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 -};
-Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
-===================================================================
 --- libavfilter/vf_vpp_qsv.c
 +++ libavfilter/vf_vpp_qsv.c
 @@ -45,9 +45,7 @@

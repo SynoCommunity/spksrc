@@ -1,5 +1,5 @@
 PKG_NAME = kopia
-PKG_VERS = 0.22.3
+PKG_VERS = 0.23.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/kopia/kopia/releases/download/v$(PKG_VERS)
@@ -25,7 +25,7 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
 endif
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: kopia_install
 kopia_install:

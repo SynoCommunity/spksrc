@@ -1,5 +1,5 @@
 PKG_NAME = postgis
-PKG_VERS = 3.5.2
+PKG_VERS = 3.5.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.osgeo.org/postgis/source
@@ -16,7 +16,7 @@ GNU_CONFIGURE = 1
 
 # Cross-compilation requires a pg_config wrapper that returns cross-compiled
 # paths for libraries but uses native PGXS for building
-PG_VERSION = 17.4
+PG_VERSION = 17.10
 PG_CONFIG_WRAPPER = $(WORK_DIR)/pg_config_wrapper
 NATIVE_PG_DIR = $(realpath $(WORK_DIR)/../../../native/postgresql/work-native/install/usr/local)
 
@@ -33,10 +33,10 @@ CONFIGURE_ARGS += LIBS="-lssl -lcrypto -lpthread -lm"
 
 # Disable parallel build (SQL file generation race conditions)
 # Override CC since PGXS hardcodes gcc
-COMPILE_MAKE_OPTIONS = -j1 CC="$(TC_PATH)$(TC_PREFIX)gcc"
+COMPILE_ARGS = -j1 CC="$(TC_PATH)$(TC_PREFIX)gcc"
 
 PRE_CONFIGURE_TARGET = postgis_pre_configure
-INSTALL_TARGET = postgis_install
+INSTALL_ARGS = install DESTDIR="" bindir=$(STAGING_INSTALL_PREFIX)/bin mandir=$(STAGING_INSTALL_PREFIX)/share/man
 
 include ../../mk/spksrc.cross-cc.mk
 
@@ -54,7 +54,3 @@ postgis_pre_configure:
 	    -e 's|@CROSS_CC@|$(TC_PATH)$(TC_PREFIX)gcc|g' \
 	    $(CURDIR)/src/pg_config_wrapper.sh.in > $(PG_CONFIG_WRAPPER)
 	chmod +x $(PG_CONFIG_WRAPPER)
-
-.PHONY: postgis_install
-postgis_install:
-	$(RUN) $(MAKE) install DESTDIR=""

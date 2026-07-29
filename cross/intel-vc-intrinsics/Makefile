@@ -20,7 +20,7 @@ DEPENDS = cross/Khronos-SPIRV-LLVM-Translator-140
 export VC_INTRINSICS_IN_TREE_INSTALL=FALSE
 
 # External build: To configure VC Intrinsics with prebuilt LLVM
-CMAKE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
+CONFIGURE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
 
 POST_EXTRACT_TARGET = vc-intrinsics_post_extract_target
 vc-intrinsics_post_extract_target:

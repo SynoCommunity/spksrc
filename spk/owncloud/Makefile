@@ -1,6 +1,6 @@
 SPK_NAME = owncloud
-SPK_VERS = 10.16.0
-SPK_REV = 24
+SPK_VERS = 10.16.3
+SPK_REV = 25
 SPK_ICON = src/owncloud.png
 
 DEPENDS = cross/owncloud
@@ -15,7 +15,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = ownCloud is a personal cloud which runs on your own server and gives you freedom and control over your own data.
 DISPLAY_NAME = ownCloud
-CHANGELOG = "1. Update ownCloud to 10.16.0."
+CHANGELOG = "1. Update ownCloud to 10.16.3."
 HOMEPAGE = https://owncloud.com/
 
 LICENSE = AGPLv3

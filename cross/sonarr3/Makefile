@@ -13,7 +13,7 @@ LICENSE  = GNU GPL v3
 
 INSTALL_TARGET = sonarr_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: sonarr_install
 sonarr_install:

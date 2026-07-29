@@ -1,0 +1,12 @@
+[{
+    "step_title": "Post-upgrade steps",
+    "items": [{
+        "desc": "After upgrading, all stable feature flags must be enabled for full compatibility with future RabbitMQ upgrades."
+    }, {
+        "desc": "To enable all stable feature flags, run: <b>rabbitmqctl enable_feature_flag all</b>"
+    }, {
+        "desc": "You can also enable them from the Management UI under <b>Admin &gt; Feature flags</b>."
+    }, {
+        "desc": "See <a target=\"_blank\" href=\"https://www.rabbitmq.com/docs/feature-flags\">https://www.rabbitmq.com/docs/feature-flags</a> for details."
+    }]
+}]

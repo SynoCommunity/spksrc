@@ -1,5 +1,3 @@
-Index: FFmpeg/fftools/ffmpeg.c
-===================================================================
 --- fftools/ffmpeg.c
 +++ fftools/ffmpeg.c
 @@ -95,6 +95,9 @@ typedef struct BenchmarkTimeStamps {
@@ -109,8 +107,6 @@ Index: FFmpeg/fftools/ffmpeg.c
  static BenchmarkTimeStamps get_benchmark_time_stamps(void)
  {
      BenchmarkTimeStamps time_stamps = { av_gettime_relative() };
-Index: FFmpeg/fftools/ffmpeg.h
-===================================================================
 --- fftools/ffmpeg.h
 +++ fftools/ffmpeg.h
 @@ -748,6 +748,9 @@ extern int recast_media;
@@ -123,8 +119,6 @@ Index: FFmpeg/fftools/ffmpeg.h
  void term_init(void);
  void term_exit(void);
  
-Index: FFmpeg/fftools/ffmpeg_demux.c
-===================================================================
 --- fftools/ffmpeg_demux.c
 +++ fftools/ffmpeg_demux.c
 @@ -704,6 +704,11 @@ static int input_thread(void *arg)

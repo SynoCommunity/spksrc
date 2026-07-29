@@ -1,5 +1,3 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3979,7 +3979,7 @@ tonemap_vaapi_filter_deps="vaapi VAProcF
@@ -11,8 +9,6 @@ Index: FFmpeg/configure
  transpose_vulkan_filter_deps="vulkan spirv_compiler"
  unsharp_opencl_filter_deps="opencl"
  uspp_filter_deps="gpl avcodec"
-Index: FFmpeg/libavfilter/vf_transpose_vt.c
-===================================================================
 --- libavfilter/vf_transpose_vt.c
 +++ /dev/null
 @@ -1,291 +0,0 @@
@@ -307,8 +303,6 @@ Index: FFmpeg/libavfilter/vf_transpose_vt.c
 -    .flags          = AVFILTER_FLAG_HWDEVICE,
 -    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 -};
-Index: FFmpeg/libavfilter/vf_transpose_vt.m
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_transpose_vt.m
 @@ -0,0 +1,383 @@

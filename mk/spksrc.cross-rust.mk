@@ -1,14 +1,18 @@
+###############################################################################
+# spksrc.cross-rust.mk
+#
 # Build rust programs
 #
 # This makefile extends spksrc.cross-cc.mk with Rust-specific functionality
-# 
+#
 # prerequisites:
 # - module does not require kernel (REQUIRE_KERNEL)
-# 
+#
 # remarks:
 # - CONFIGURE_TARGET is not supported (used for rust target installation)
 # - build and install is done in one step
-# 
+#
+###############################################################################
 
 # Configure the included makefiles
 URLS          = $(PKG_DIST_SITE)/$(PKG_DIST_NAME)
@@ -29,14 +33,12 @@ TC = syno$(ARCH_SUFFIX)
 endif
 endif
 
-# Common directories (must be set after ARCH_SUFFIX)
-include ../../mk/spksrc.directories.mk
 
 # Common makefiles
 include ../../mk/spksrc.common.mk
 
 ##### rust specific configurations
-include ../../mk/spksrc.cross-rust-env.mk
+include ../../mk/spksrc.cross/env-rust.mk
 
 # configure is used to install rust targets
 CONFIGURE_TARGET = nop

@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/dxva2.c
-===================================================================
 --- libavcodec/dxva2.c
 +++ libavcodec/dxva2.c
 @@ -298,12 +298,13 @@ static void dxva_list_guids_debug(AVCode
@@ -245,8 +243,6 @@ Index: FFmpeg/libavcodec/dxva2.c
      if (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD) {
          D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
          ID3D11VideoDecoderOutputView_GetDesc((ID3D11VideoDecoderOutputView*) surface, &viewDesc);
-Index: FFmpeg/libavcodec/dxva2_internal.h
-===================================================================
 --- libavcodec/dxva2_internal.h
 +++ libavcodec/dxva2_internal.h
 @@ -100,6 +100,7 @@ typedef struct FFDXVASharedContext {
@@ -257,8 +253,6 @@ Index: FFmpeg/libavcodec/dxva2_internal.h
  #endif
  
  #if CONFIG_DXVA2
-Index: FFmpeg/libavutil/hwcontext_d3d11va.c
-===================================================================
 --- libavutil/hwcontext_d3d11va.c
 +++ libavutil/hwcontext_d3d11va.c
 @@ -318,7 +318,8 @@ static int d3d11va_frames_init(AVHWFrame
@@ -271,8 +265,6 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.c
          hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &hwctx->texture);
          if (FAILED(hr)) {
              av_log(ctx, AV_LOG_ERROR, "Could not create the texture (%lx)\n", (long)hr);
-Index: FFmpeg/libavutil/hwcontext_d3d11va.h
-===================================================================
 --- libavutil/hwcontext_d3d11va.h
 +++ libavutil/hwcontext_d3d11va.h
 @@ -188,6 +188,11 @@ typedef struct AVD3D11VAFramesContext {

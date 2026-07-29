@@ -1,5 +1,5 @@
 PKG_NAME = openssl3
-PKG_VERS = 3.5.6
+PKG_VERS = 3.5.7
 PKG_EXT = tar.gz
 PKG_DIST_NAME = openssl-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.openssl.org/source
@@ -14,7 +14,7 @@ COMMENT  = TLS/SSL and crypto library.
 LICENSE  = Apache-2.0
 
 CONFIGURE_TARGET = openssl3_configure
-INSTALL_MAKE_OPTIONS = install_sw DESTDIR=$(INSTALL_DIR)
+INSTALL_ARGS = install_sw DESTDIR=$(INSTALL_DIR)
 
 CONFIGURE_ARGS  = --prefix=$(INSTALL_PREFIX)
 CONFIGURE_ARGS += --openssldir=$(OPENSSL_DATA_DIR)

@@ -30,7 +30,7 @@ LICENSE  = MIT
 
 INSTALL_TARGET = dotnet_runtime_custom_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: dotnet_runtime_custom_install
 dotnet_runtime_custom_install:

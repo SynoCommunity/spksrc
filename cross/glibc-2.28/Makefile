@@ -15,9 +15,11 @@ GNU_CONFIGURE = 1
 
 include ../../mk/spksrc.common.mk
 
-CONFIGURE_TARGET = glibc_configure_target
-COMPILE_TARGET = glibc_compile_taget
-INSTALL_TARGET = glibc_install_target
+# glibc must be built outside its source tree: opt in to an out-of-tree build.
+BUILD_DIR = $(WORK_DIR)/$(PKG_DIR)-build
+
+# glibc sets its prefix at configure time, so install only needs DESTDIR.
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR)
 
 CONFIGURE_ARGS  = --enable-shared
 CONFIGURE_ARGS += --enable-kernel=$(word 1,$(subst ., ,$(TC_KERNEL))).$(word 2,$(subst ., ,$(TC_KERNEL)))
@@ -27,22 +29,9 @@ CONFIGURE_ARGS += --disable-build-nscd
 CONFIGURE_ARGS += --disable-nscd
 CONFIGURE_ARGS += --disable-werror
 CONFIGURE_ARGS += --enable-stack-protector=strong
-CONFIGURE_ARGS += --with-headers=$(TC_SYSROOT)/usr/include
+CONFIGURE_ARGS += --with-headers=$(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)
 CONFIGURE_ARGS += ac_cv_prog_MAKEINFO=false
 
 ADDITIONAL_CFLAGS = -O2
 
 include ../../mk/spksrc.cross-cc.mk
-
-.PHONY: glibc_configure_target
-glibc_configure_target:
-	@mkdir $(WORK_DIR)/$(PKG_DIR)-build
-	$(RUN) && cd ../$(PKG_DIR)-build && env $(ENV) ../$(PKG_DIR)/configure $(REAL_CONFIGURE_ARGS)
-
-.PHONY: glibc_compile_taget
-glibc_compile_taget:
-	@$(RUN) && cd ../$(PKG_DIR)-build && env $(ENV) $(PSTAT_TIME) $(MAKE) -j$(NCPUS) $(COMPILE_MAKE_OPTIONS)
-
-.PHONY: glibc_install_target
-glibc_install_target:
-	@$(RUN) && cd ../$(PKG_DIR)-build && env $(ENV) $(MAKE) install DESTDIR=$(INSTALL_DIR)

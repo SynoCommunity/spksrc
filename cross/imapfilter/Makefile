@@ -1,5 +1,5 @@
 PKG_NAME = imapfilter
-PKG_VERS = 2.8.3
+PKG_VERS = 2.8.5
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/lefcha/imapfilter/archive
@@ -13,7 +13,7 @@ COMMENT  = An IMAP mail filtering utility using the Lua programming language as 
 LICENSE  = MIT
 
 CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX)
 POST_INSTALL_TARGET = imapfilter_post_install
 
 ENV += SHAREDIR="$(INSTALL_PREFIX)/share/imapfilter"

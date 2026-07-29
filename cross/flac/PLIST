@@ -1,8 +1,8 @@
 bin:bin/flac
 bin:bin/metaflac
 lnk:lib/libFLAC++.so
-lnk:lib/libFLAC++.so.10
-lib:lib/libFLAC++.so.10.0.1
+lnk:lib/libFLAC++.so.11
+lib:lib/libFLAC++.so.11.0.0
 lnk:lib/libFLAC.so
-lnk:lib/libFLAC.so.12
-lib:lib/libFLAC.so.12.1.0
+lnk:lib/libFLAC.so.14
+lib:lib/libFLAC.so.14.0.0

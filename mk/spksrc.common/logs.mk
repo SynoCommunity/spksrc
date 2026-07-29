@@ -1,5 +1,5 @@
 ###############################################################################
-# mk/spksrc.common/logs.mk
+# spksrc.common/logs.mk
 #
 # Defines logging-related variables and helpers for spksrc builds.
 #

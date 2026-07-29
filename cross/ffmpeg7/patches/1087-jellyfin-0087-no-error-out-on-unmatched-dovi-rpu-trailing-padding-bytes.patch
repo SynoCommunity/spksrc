@@ -1,5 +1,3 @@
-Index: FFmpeg/libavcodec/dovi_rpudec.c
-===================================================================
 --- libavcodec/dovi_rpudec.c
 +++ libavcodec/dovi_rpudec.c
 @@ -188,8 +188,7 @@ static int parse_ext_v1(DOVIContext *s,

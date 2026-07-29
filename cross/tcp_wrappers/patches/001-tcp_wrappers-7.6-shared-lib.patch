@@ -1,12 +1,14 @@
 # inspired by  http://www.linuxfromscratch.org/patches/blfs/5.1/tcp_wrappers-7.6-shared-lib-plus-plus.patch
+# now found on https://www.trac.clfs.org/browser/scripts/patches/tcp_wrappers-7.6-gcc34-1.patch?rev=2cf9b0737362a720eeaad3ed09d813ca926eaefb
 # adjusted for SynoCommunity
-# - relocate patch file ro source path
+# - relocate patch file to source path
 # - avoid patch and installation of man pages
 # - limit patch to linux target
+# - NETGROUP not defined (libnsl not found with TCVERSION >= 7.2)
 # remarks:
 # - only libwrap is used, binaries are lacking to find shared lib at runtime
---- Makefile.org	1997-03-21 18:27:21.000000000 +0000
-+++ Makefile	2020-11-07 14:01:31.027674067 +0000
+--- Makefile.orig	1997-03-21 18:27:21.000000000 +0000
++++ Makefile	2026-06-11 10:40:16.372922281 +0000
 @@ -1,5 +1,8 @@
  # @(#) Makefile 1.23 97/03/21 19:27:20
  
@@ -16,19 +18,18 @@
  what:
  	@echo
  	@echo "Usage: edit the REAL_DAEMON_DIR definition in the Makefile then:"
-@@ -143,8 +146,9 @@
+@@ -143,8 +146,8 @@
  
  linux:
  	@make REAL_DAEMON_DIR=$(REAL_DAEMON_DIR) STYLE=$(STYLE) \
 -	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ=setenv.o \
 -	NETGROUP= TLI= EXTRA_CFLAGS="-DBROKEN_SO_LINGER" all
-+	LIBS=-lnsl RANLIB=ranlib ARFLAGS=rv AUX_OBJ=weak_symbols.o \
-+	NETGROUP=-DNETGROUP TLI= VSYSLOG= BUGS= all \
-+	EXTRA_CFLAGS="-DSYS_ERRLIST_DEFINED -DHAVE_WEAKSYMS -D_REENTRANT"
++	LIBS= RANLIB=ranlib ARFLAGS=rv AUX_OBJ=weak_symbols.o \
++	NETGROUP= TLI= EXTRA_CFLAGS="-DHAVE_WEAKSYMS -D_REENTRANT" all
  
  # This is good for many SYSV+BSD hybrids with NIS, probably also for HP-UX 7.x.
  hpux hpux8 hpux9 hpux10:
-@@ -391,7 +395,7 @@
+@@ -391,7 +394,7 @@
  # the ones provided with this source distribution. The environ.c module
  # implements setenv(), getenv(), and putenv().
  
@@ -37,7 +38,7 @@
  #AUX_OBJ= environ.o
  #AUX_OBJ= environ.o strcasecmp.o
  
-@@ -454,7 +458,8 @@
+@@ -454,7 +457,8 @@
  # host name aliases. Compile with -DSOLARIS_24_GETHOSTBYNAME_BUG to work
  # around this. The workaround does no harm on other Solaris versions.
  
@@ -47,16 +48,7 @@
  #BUGS = -DGETPEERNAME_BUG -DBROKEN_FGETS -DINET_ADDR_BUG
  #BUGS = -DGETPEERNAME_BUG -DBROKEN_FGETS -DSOLARIS_24_GETHOSTBYNAME_BUG
  
-@@ -464,7 +469,7 @@
- # If your system supports NIS or YP-style netgroups, enable the following
- # macro definition. Netgroups are used only for host access control.
- #
--#NETGROUP= -DNETGROUP
-+NETGROUP= -DNETGROUP
- 
- ###############################################################
- # System dependencies: whether or not your system has vsyslog()
-@@ -514,7 +519,7 @@
+@@ -514,7 +518,7 @@
  #
  # The LOG_XXX names below are taken from the /usr/include/syslog.h file.
  
@@ -65,7 +57,7 @@
  
  # The syslog priority at which successful connections are logged.
  
-@@ -610,7 +615,7 @@
+@@ -610,7 +614,7 @@
  # Paranoid mode implies hostname lookup. In order to disable hostname
  # lookups altogether, see the next section.
  
@@ -74,7 +66,7 @@
  
  ########################################
  # Optional: turning off hostname lookups
-@@ -623,7 +628,7 @@
+@@ -623,7 +627,7 @@
  # In order to perform selective hostname lookups, disable paranoid
  # mode (see previous section) and comment out the following definition.
  
@@ -83,7 +75,7 @@
  
  #############################################
  # Optional: Turning on host ADDRESS checking
-@@ -649,7 +654,7 @@
+@@ -649,7 +653,7 @@
  # source-routed traffic in the kernel. Examples: 4.4BSD derivatives,
  # Solaris 2.x, and Linux. See your system documentation for details.
  #
@@ -92,7 +84,7 @@
  
  ## End configuration options
  ############################
-@@ -657,20 +662,37 @@
+@@ -657,20 +661,37 @@
  # Protection against weird shells or weird make programs.
  
  SHELL	= /bin/sh
@@ -132,7 +124,7 @@
  FROM_OBJ= fromhost.o
  
  KIT	= README miscd.c tcpd.c fromhost.c hosts_access.c shell_cmd.c \
-@@ -684,46 +706,73 @@
+@@ -684,46 +705,73 @@
  	refuse.c tcpdchk.8 setenv.c inetcf.c inetcf.h scaffold.c \
  	scaffold.h tcpdmatch.8 README.NIS
  
@@ -225,7 +217,7 @@
  
  shar:	$(KIT)
  	@shar $(KIT)
-@@ -739,7 +788,8 @@
+@@ -739,7 +787,8 @@
  
  clean:
  	rm -f tcpd miscd safe_finger tcpdmatch tcpdchk try-from *.[oa] core \
@@ -235,7 +227,7 @@
  
  tidy:	clean
  	chmod -R a+r .
-@@ -885,5 +935,6 @@
+@@ -885,5 +934,6 @@
  update.o: mystdarg.h
  update.o: tcpd.h
  vfprintf.o: cflags

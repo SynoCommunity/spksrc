@@ -1,0 +1,56 @@
+Index: FFmpeg/fftools/Makefile
+===================================================================
+--- fftools/Makefile
++++ fftools/Makefile
+@@ -40,6 +40,12 @@ endef
+ 
+ $(foreach P,$(AVPROGS-yes),$(eval $(call DOFFTOOL,$(P))))
+ 
++ifdef HAVE_GNU_WINDRES
++ifneq (,$(wildcard fftools/fftools.ico))
++CC_DEPFLAGS += -DHAVE_FFTOOLS_ICO
++endif
++endif
++
+ all: $(AVPROGS)
+ 
+ fftools/ffprobe.o fftools/cmdutils.o: libavutil/ffversion.h | fftools
+Index: FFmpeg/fftools/fftoolsres.rc
+===================================================================
+--- fftools/fftoolsres.rc
++++ fftools/fftoolsres.rc
+@@ -1,2 +1,34 @@
+ #include <windows.h>
++#include "libavutil/version.h"
++#include "libavutil/ffversion.h"
++#include "config.h"
++
+ 1 RT_MANIFEST fftools.manifest
++
++#ifdef HAVE_FFTOOLS_ICO
++1 ICON fftools.ico
++#endif
++
++1 VERSIONINFO
++FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
++FILEOS          VOS_NT_WINDOWS32
++FILETYPE        VFT_APP
++{
++    BLOCK "StringFileInfo"
++    {
++        BLOCK "040904B0"
++        {
++            VALUE "CompanyName",      "FFmpeg Project"
++            VALUE "FileDescription",  "FFmpeg command-line tools"
++            VALUE "FileVersion",      FFMPEG_VERSION
++            VALUE "LegalCopyright",   "Copyright (C) " AV_STRINGIFY(CONFIG_THIS_YEAR) " FFmpeg Project"
++            VALUE "ProductName",      "FFmpeg"
++            VALUE "ProductVersion",   FFMPEG_VERSION
++        }
++    }
++
++    BLOCK "VarFileInfo"
++    {
++        VALUE "Translation", 0x0409, 0x04B0
++    }
++}

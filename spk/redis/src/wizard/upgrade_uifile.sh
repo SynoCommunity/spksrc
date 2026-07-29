@@ -3,9 +3,9 @@
 OLD_SPK_REV="${SYNOPKG_OLD_PKGVER##*-}"
 
 # display this wizard page only for updates from redis < 7.x
-if [ -n ${OLD_SPK_REV} ] && [ ${OLD_SPK_REV} -lt 11 ]; then
+if [ -n "${OLD_SPK_REV}" ] && [ "${OLD_SPK_REV}" -lt 11 ]; then
 
-cat <<EOF > $SYNOPKG_TEMP_LOGFILE
+cat <<EOF > "$SYNOPKG_TEMP_LOGFILE"
 [{
     "step_title": "Update Configuration from ${SYNOPKG_OLD_PKGVER}",
     "items": [{

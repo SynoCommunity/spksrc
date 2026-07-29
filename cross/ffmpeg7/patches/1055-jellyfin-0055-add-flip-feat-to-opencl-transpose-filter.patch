@@ -1,5 +1,3 @@
-Index: FFmpeg/libavfilter/opencl/transpose.cl
-===================================================================
 --- libavfilter/opencl/transpose.cl
 +++ libavfilter/opencl/transpose.cl
 @@ -26,8 +26,10 @@ kernel void transpose(__write_only image
@@ -15,11 +13,17 @@ Index: FFmpeg/libavfilter/opencl/transpose.cl
      float4 data = read_imagef(src, sampler, (int2)(xin, yin));
  
      if (x < size.x && y < size.y)
-Index: FFmpeg/libavfilter/vf_transpose_opencl.c
-===================================================================
 --- libavfilter/vf_transpose_opencl.c
 +++ libavfilter/vf_transpose_opencl.c
-@@ -103,8 +103,20 @@ static int transpose_opencl_config_outpu
+@@ -32,6 +32,7 @@
+ typedef struct TransposeOpenCLContext {
+     OpenCLFilterContext ocf;
+     int                   initialised;
++    int                   flip_wh;
+     int passthrough;    ///< PassthroughType, landscape passthrough mode enabled
+     int dir;            ///< TransposeDir
+     cl_kernel             kernel;
+@@ -103,23 +104,34 @@ static int transpose_opencl_config_outpu
          return AVERROR(EINVAL);
      }
  
@@ -32,17 +36,25 @@ Index: FFmpeg/libavfilter/vf_transpose_opencl.c
 +    case TRANSPOSE_CLOCK_FLIP:
 +        s->ocf.output_width  = inlink->h;
 +        s->ocf.output_height = inlink->w;
++        s->flip_wh           = 1;
 +        break;
 +    default:
 +        s->ocf.output_width  = inlink->w;
 +        s->ocf.output_height = inlink->h;
++        s->flip_wh           = 0;
 +        break;
 +    }
 +
      ret = ff_opencl_filter_config_output(outlink);
      if (ret < 0)
          return ret;
-@@ -116,10 +128,8 @@ static int transpose_opencl_config_outpu
+ 
+-    if (inlink->sample_aspect_ratio.num)
+-        outlink->sample_aspect_ratio = av_div_q((AVRational) { 1, 1 },
+-                                                inlink->sample_aspect_ratio);
++    if (s->flip_wh && inlink->sample_aspect_ratio.num)
++        outlink->sample_aspect_ratio = av_inv_q(inlink->sample_aspect_ratio);
+     else
          outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
  
      av_log(avctx, AV_LOG_VERBOSE,
@@ -55,6 +67,22 @@ Index: FFmpeg/libavfilter/vf_transpose_opencl.c
      return 0;
  }
  
+@@ -163,12 +175,10 @@ static int transpose_opencl_filter_frame
+     if (err < 0)
+         goto fail;
+ 
+-    if (input->sample_aspect_ratio.num == 0) {
++    if (ctx->flip_wh && input->sample_aspect_ratio.num)
++        output->sample_aspect_ratio = av_inv_q(input->sample_aspect_ratio);
++    else
+         output->sample_aspect_ratio = input->sample_aspect_ratio;
+-    } else {
+-        output->sample_aspect_ratio.num = input->sample_aspect_ratio.den;
+-        output->sample_aspect_ratio.den = input->sample_aspect_ratio.num;
+-    }
+ 
+     if (!ctx->initialised) {
+         err = transpose_opencl_init(avctx);
 @@ -237,11 +247,14 @@ static av_cold void transpose_opencl_uni
  #define OFFSET(x) offsetof(TransposeOpenCLContext, x)
  #define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)

@@ -1,8 +1,6 @@
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
-@@ -3935,6 +3935,7 @@ rubberband_filter_deps="librubberband"
+@@ -3939,6 +3939,7 @@ rubberband_filter_deps="librubberband"
  sab_filter_deps="gpl swscale"
  scale2ref_filter_deps="swscale"
  scale_filter_deps="swscale"
@@ -10,8 +8,6 @@ Index: FFmpeg/configure
  scale_qsv_filter_deps="libmfx"
  scale_qsv_filter_select="qsvvpp"
  scdet_filter_select="scene_sad"
-Index: FFmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -461,6 +461,7 @@ OBJS-$(CONFIG_SCALE_FILTER)
@@ -22,8 +18,6 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_SCALE_QSV_FILTER)              += vf_vpp_qsv.o
  OBJS-$(CONFIG_SCALE_VAAPI_FILTER)            += vf_scale_vaapi.o scale_eval.o vaapi_vpp.o
  OBJS-$(CONFIG_SCALE_VT_FILTER)               += vf_scale_vt.o scale_eval.o
-Index: FFmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -433,6 +433,7 @@ extern const AVFilter ff_vf_sab;
@@ -34,8 +28,6 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_scale_qsv;
  extern const AVFilter ff_vf_scale_vaapi;
  extern const AVFilter ff_vf_scale_vt;
-Index: FFmpeg/libavfilter/opencl/scale.cl
-===================================================================
 --- /dev/null
 +++ libavfilter/opencl/scale.cl
 @@ -0,0 +1,318 @@
@@ -357,8 +349,6 @@ Index: FFmpeg/libavfilter/opencl/scale.cl
 +  #endif
 +}
 +#endif
-Index: FFmpeg/libavfilter/opencl_source.h
-===================================================================
 --- libavfilter/opencl_source.h
 +++ libavfilter/opencl_source.h
 @@ -29,6 +29,7 @@ extern const char *ff_source_nlmeans_cl;
@@ -369,11 +359,9 @@ Index: FFmpeg/libavfilter/opencl_source.h
  extern const char *ff_source_tonemap_cl;
  extern const char *ff_source_transpose_cl;
  extern const char *ff_source_unsharp_cl;
-Index: FFmpeg/libavfilter/vf_scale_opencl.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_scale_opencl.c
-@@ -0,0 +1,931 @@
+@@ -0,0 +1,942 @@
 +/*
 + * Copyright (c) 2018 Gabriel Machado
 + * Copyright (c) 2021 NyanMisaka
@@ -986,6 +974,13 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +    if (ret < 0)
 +        return ret;
 +
++    if (inlink->sample_aspect_ratio.num)
++        outlink->sample_aspect_ratio = av_mul_q((AVRational){outlink->h * inlink->w,
++                                                             outlink->w * inlink->h},
++                                                inlink->sample_aspect_ratio);
++    else
++        outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
++
 +    return 0;
 +}
 +
@@ -1153,6 +1148,10 @@ Index: FFmpeg/libavfilter/vf_scale_opencl.c
 +        goto fail;
 +    output->width  = outlink->w;
 +    output->height = outlink->h;
++    av_reduce(&output->sample_aspect_ratio.num, &output->sample_aspect_ratio.den,
++              (int64_t)input->sample_aspect_ratio.num * outlink->h * inlink->w,
++              (int64_t)input->sample_aspect_ratio.den * outlink->w * inlink->h,
++              INT_MAX);
 +
 +    if (ctx->in_fmt == AV_PIX_FMT_NV15 && !(ctx->src_w == ctx->dst_w && ctx->src_h == ctx->dst_h)) {
 +        /* for scaling P010 compact: 1st pass conv & 2nd pass scale */

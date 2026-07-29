@@ -1,0 +1,47 @@
+From: Vincent Fortier
+Date: Fri, 30 May 2026
+Subject: [PATCH] avcodec/hw_base_encode: fix DPB/ref overflow when pick_next
+         is re-entered after an encode failure
+
+When op->issue fails, the picture is never marked encode_issued, so
+hw_base_encode_pick_next() is re-entered on the same picture on the next
+call and re-runs the DPB / reference / prev setup at the end of the
+function. hw_base_encode_add_ref() does not de-duplicate, so every
+re-entry appends again and eventually trips an av_assert0():
+  - nb_dpb_pics overflow (hw_base_encode.c:61) -- the originally reported
+    case, with a closed-GOP IDR where only the self-DPB add runs;
+  - for non-IDR pictures the setup also re-adds the forward reference, and
+    hw_base_encode_add_ref(pic, ..., 0, 0, 1) then hits av_assert0(!pic->prev)
+    because pic->prev is already set from the previous attempt (the L0/L1
+    ref adds likewise grow nb_refs).
+
+pick_next() always adds the picture to its own DPB first, so a non-zero
+nb_dpb_pics means the setup already ran; in that case just return the
+already-prepared picture instead of building it again.
+
+Reproducible with h264_vaapi on Intel Apollo Lake after repeated
+VA_STATUS_ERROR_ENCODING_ERROR (code 24) failures on a 1280x720@60fps
+MPEG2 IPTV input stream.
+
+Suggested-by: Claude Sonnet 4.6 (Anthropic AI <https://anthropic.com>)
+Signed-off-by: Vincent Fortier <th0ma7@gmail.com>
+
+--- libavcodec/hw_base_encode.c.orig
++++ libavcodec/hw_base_encode.c
+@@ -325,6 +325,16 @@
+     pic->is_reference = 1;
+     *pic_out = pic;
+ 
++    /* If pic was already set up on a previous call, return it unchanged. After an
++     * encode failure (op->issue error) the picture is never marked encode_issued, so
++     * pick_next() is re-entered on it; re-running the DPB/reference/prev setup below
++     * would re-add entries -- hw_base_encode_add_ref() does not de-duplicate -- until
++     * an av_assert0() fires (nb_dpb_pics or nb_refs overflow, or the !pic->prev
++     * assert for non-IDR pictures). The self-DPB add always makes nb_dpb_pics >= 1, so
++     * a non-zero value means the setup already ran. */
++    if (pic->nb_dpb_pics)
++        return 0;
++
+     hw_base_encode_add_ref(pic, pic, 0, 1, 0);
+     if (pic->type != FF_HW_PICTURE_TYPE_IDR) {
+         // TODO: apply both previous and forward multi reference for all vaapi encoders.

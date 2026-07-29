@@ -1,5 +1,5 @@
 PKG_NAME = Sonarr
-PKG_VERS = 4.0.16.2944
+PKG_VERS = 4.0.19.2979
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME).main.$(PKG_VERS).linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Sonarr/Sonarr/releases/download/v$(PKG_VERS)
@@ -25,7 +25,7 @@ else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
 endif
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: sonarr_install
 sonarr_install:

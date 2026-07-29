@@ -1,5 +1,3 @@
-Index: FFmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -593,6 +593,7 @@ OBJS-$(CONFIG_DRAWBOX_VAAPI_FILTER)
@@ -10,8 +8,6 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_CELLAUTO_FILTER)               += vsrc_cellauto.o
  OBJS-$(CONFIG_COLOR_FILTER)                  += vsrc_testsrc.o
  OBJS-$(CONFIG_COLORCHART_FILTER)             += vsrc_testsrc.o
-Index: FFmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -556,6 +556,7 @@ extern const AVFilter ff_vf_drawbox_vaap
@@ -22,8 +18,6 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vsrc_cellauto;
  extern const AVFilter ff_vsrc_color;
  extern const AVFilter ff_vsrc_color_vulkan;
-Index: FFmpeg/libavfilter/vsrc_alphasrc.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vsrc_alphasrc.c
 @@ -0,0 +1,165 @@

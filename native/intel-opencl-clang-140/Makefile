@@ -44,17 +44,17 @@ opencl-clang_post_extract_target:
 # -----------------------------------------------------------------------------
 # CMake arguments
 # -----------------------------------------------------------------------------
-CMAKE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
-CMAKE_ARGS += -DOPENCL_CLANG_BUILD_EXTERNAL=ON
-CMAKE_ARGS += -DLLVMSPIRV_INCLUDED_IN_LLVM=OFF
-CMAKE_ARGS += -DSPIRV_TRANSLATOR_DIR=$(STAGING_INSTALL_PREFIX)
+CONFIGURE_ARGS += -DLLVM_DIR=$(STAGING_INSTALL_PREFIX)/lib/cmake/llvm
+CONFIGURE_ARGS += -DOPENCL_CLANG_BUILD_EXTERNAL=ON
+CONFIGURE_ARGS += -DLLVMSPIRV_INCLUDED_IN_LLVM=OFF
+CONFIGURE_ARGS += -DSPIRV_TRANSLATOR_DIR=$(STAGING_INSTALL_PREFIX)
 
 # Use native LLVM tools to avoid circular dependencies
-CMAKE_ARGS += -DLLVM_TABLEGEN_EXE=$(LLVM_BIN_DIR)/llvm-tblgen
-CMAKE_ARGS += -DCLANG_COMMAND=$(LLVM_BIN_DIR)/clang
+CONFIGURE_ARGS += -DLLVM_TABLEGEN_EXE=$(LLVM_BIN_DIR)/llvm-tblgen
+CONFIGURE_ARGS += -DCLANG_COMMAND=$(LLVM_BIN_DIR)/clang
 
 # [intel-opencl-clang-140]
-CMAKE_ARGS += -DAPPLY_PATCHES='OFF'
+CONFIGURE_ARGS += -DAPPLY_PATCHES='OFF'
 
 # -----------------------------------------------------------------------------
 # Include the common cross-cmake rules

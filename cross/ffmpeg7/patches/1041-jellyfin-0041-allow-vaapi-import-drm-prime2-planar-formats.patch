@@ -1,5 +1,3 @@
-Index: FFmpeg/libavutil/hwcontext_vaapi.c
-===================================================================
 --- libavutil/hwcontext_vaapi.c
 +++ libavutil/hwcontext_vaapi.c
 @@ -170,6 +170,9 @@ static const VAAPIFormatDescriptor vaapi
