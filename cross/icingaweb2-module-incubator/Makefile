@@ -14,7 +14,7 @@ LICENSE  = GPL-2.0
 
 INSTALL_TARGET = incubator_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: incubator_install
 incubator_install:

@@ -41,16 +41,16 @@ etc/init.d/icinga2
 etc/logrotate.d/icinga2
 etc/sysconfig/icinga2
 lib/icinga2/libmysql_shim.so
-lib/icinga2/libmysql_shim.so.2.15.2
+lib/icinga2/libmysql_shim.so.2.16.4
 lib/icinga2/libpgsql_shim.so
-lib/icinga2/libpgsql_shim.so.2.15.2
+lib/icinga2/libpgsql_shim.so.2.16.4
 lib/icinga2/prepare-dirs
 lib/icinga2/safe-reload
 lib/icinga2/sbin/icinga2
 sbin/icinga2
 share/doc/icinga2/AUTHORS
 share/doc/icinga2/CHANGELOG.md
-share/doc/icinga2/COPYING
+share/doc/icinga2/LICENSE.md
 share/doc/icinga2/NEWS
 share/doc/icinga2/README.md
 share/doc/icinga2/markdown/01-about.md
@@ -174,6 +174,7 @@ share/icinga2/include/plugins-contrib.d/network-services.conf
 share/icinga2/include/plugins-contrib.d/operating-system.conf
 share/icinga2/include/plugins-contrib.d/raid-controller.conf
 share/icinga2/include/plugins-contrib.d/smart-attributes.conf
+share/icinga2/include/plugins-contrib.d/smart-advanced.conf
 share/icinga2/include/plugins-contrib.d/storage.conf
 share/icinga2/include/plugins-contrib.d/systemd.conf
 share/icinga2/include/plugins-contrib.d/virtualization.conf

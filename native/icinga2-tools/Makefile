@@ -1,9 +1,9 @@
 PKG_NAME = icinga2-tools
-PKG_VERS = 2.15.2
+PKG_VERS = 2.16.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Icinga/icinga2/archive/refs/tags
-PKG_DIST_FILE = icinga2-2.15.2.tar.gz
+PKG_DIST_FILE = icinga2-$(PKG_VERS).tar.gz
 PKG_DIR = icinga2-$(PKG_VERS)
 
 DEPENDS =

@@ -14,7 +14,7 @@ LICENSE  = MIT
 
 INSTALL_TARGET = icinga_php_library_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: icinga_php_library_install
 icinga_php_library_install:

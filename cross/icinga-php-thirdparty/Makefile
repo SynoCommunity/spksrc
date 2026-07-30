@@ -1,5 +1,5 @@
 PKG_NAME = icinga-php-thirdparty
-PKG_VERS = 0.12.1
+PKG_VERS = 1.0.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
@@ -14,7 +14,7 @@ LICENSE  = Multiple
 
 INSTALL_TARGET = icinga_php_thirdparty_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: icinga_php_thirdparty_install
 icinga_php_thirdparty_install:
