@@ -6,13 +6,13 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-# Compiler must support std=c++11
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# Python 3.13 needs C11 <stdatomic.h> (and C++11); gcc ships stdatomic.h >= 4.8
+MIN_GCC_VERSION = 4.8
 
 BUILD_DEPENDS = native/python313
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
-# required for Sleepycat^WOracle Berkeley DB interface
+# required for Sleepycat Oracle Berkeley DB interface
 DEPENDS += cross/berkeleydb
 # required for uuid module
 DEPENDS += cross/libuuid
