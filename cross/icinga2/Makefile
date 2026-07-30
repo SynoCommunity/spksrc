@@ -1,5 +1,5 @@
 PKG_NAME = icinga2
-PKG_VERS = 2.15.2
+PKG_VERS = 2.16.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Icinga/icinga2/archive/refs/tags
@@ -23,7 +23,7 @@ DEPENDS += cross/libpq
 
 HOMEPAGE = https://icinga.com/
 COMMENT  = Icinga 2 is an open source monitoring system that checks the availability of your network resources.
-LICENSE  = GPLv2
+LICENSE  = GPLv3
 
 # Boost configuration
 BOOST_LIBRARIES = coroutine context date_time filesystem iostreams thread program_options regex system
@@ -44,6 +44,7 @@ ADDITIONAL_CONFIGURE_ARGS += -DICINGA2_WITH_TESTS=OFF
 ADDITIONAL_CONFIGURE_ARGS += -DUSE_SYSTEMD=OFF
 ADDITIONAL_CONFIGURE_ARGS += -DICINGA2_GIT_VERSION_INFO=OFF
 ADDITIONAL_CONFIGURE_ARGS += -DICINGA2_UNITY_BUILD=ON
+ADDITIONAL_CONFIGURE_ARGS += -DICINGA2_WITH_OPENTELEMETRY=OFF
 
 # Boost paths
 ADDITIONAL_CONFIGURE_ARGS += -DBOOST_ROOT=$(STAGING_INSTALL_PREFIX)

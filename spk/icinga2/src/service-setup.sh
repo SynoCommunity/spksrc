@@ -35,8 +35,8 @@ copy_config()
     shift 2
     cp "${src}" "${dest}"
     while [ $# -gt 0 ]; do
-        sed -i "s|$1|g" "${dest}"
-        shift
+        sed -i "s|$1|$2|g" "${dest}"
+        shift 2
     done
 }
 

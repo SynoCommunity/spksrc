@@ -14,7 +14,7 @@ LICENSE  = GPLv2
 
 INSTALL_TARGET = icinga_director_install
 
-include ../../mk/spksrc.install-resources.mk
+include ../../mk/spksrc.cross-install.mk
 
 .PHONY: icinga_director_install
 icinga_director_install:

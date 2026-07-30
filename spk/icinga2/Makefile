@@ -1,5 +1,5 @@
 SPK_NAME = icinga2
-SPK_VERS = 2.15.2
+SPK_VERS = 2.16.4
 SPK_REV = 1
 SPK_ICON = src/icinga2.png
 
@@ -12,12 +12,12 @@ UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga 2 is an open source monitoring system which checks the availability of your network resources, notifies users of outages, and generates performance data for reporting.
-CHANGELOG = "Initial release of Icinga 2 v2.15.2"
+CHANGELOG = "1. Update Icinga 2 to v2.16.4"
 
 DISPLAY_NAME = Icinga 2
 
 HOMEPAGE = https://icinga.com/
-LICENSE = GPLv2
+LICENSE = GPLv3
 
 STARTABLE = yes
 SERVICE_USER = auto

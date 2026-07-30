@@ -1,5 +1,5 @@
 SPK_NAME = icinga2-agent
-SPK_VERS = 2.15.2
+SPK_VERS = 2.16.4
 SPK_REV = 1
 SPK_ICON = src/icinga2.png
 
@@ -11,12 +11,12 @@ UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga 2 agent connects to an Icinga 2 master server for distributed monitoring.
-CHANGELOG = "Initial release of Icinga 2 Agent"
+CHANGELOG = "1. Update Icinga 2 Agent to v2.16.4"
 
 DISPLAY_NAME = Icinga 2 Agent
 
 HOMEPAGE = https://icinga.com/
-LICENSE = GPLv2
+LICENSE = GPLv3
 
 STARTABLE = yes
 SERVICE_USER = auto
