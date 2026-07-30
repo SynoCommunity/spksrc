@@ -1,5 +1,5 @@
 SPK_NAME = seerr
-SPK_VERS = 3.4.0
+SPK_VERS = 3.4.1
 SPK_REV = 8
 SPK_ICON = src/seerr.png
 
@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 MAINTAINER = SynoCommunity
 DESCRIPTION = "Media request management for Jellyfin, Plex, and Emby with automation integrations."
 DISPLAY_NAME = Seerr
-CHANGELOG = "1. Update to v3.4.0 (security fix: avatar image proxy path traversal)"
+CHANGELOG = "1. Update to v3.4.1"
 HOMEPAGE = https://github.com/seerr-team/seerr
 LICENSE = MIT
 
