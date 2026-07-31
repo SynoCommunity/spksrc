@@ -18,6 +18,6 @@
     }, {
       "desc": "Navidrome runs as internal service user <b>sc-navidrome</b> in DSM. The shared music folder above is configured at installation time to be accessible by this user."
     }, {
-      "desc": "If you manually change the music folder, make sure <b>sc-navidrome</b> has read permissions. Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      "desc": "If you manually change the music folder, make sure <b>sc-navidrome</b> has read permissions. Please read <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> for details."
     }]
 }]
