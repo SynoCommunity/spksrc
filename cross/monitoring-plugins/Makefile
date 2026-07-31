@@ -10,6 +10,9 @@ HOMEPAGE = https://www.monitoring-plugins.org
 COMMENT  = Standard plugins for Icinga, Naemon, Nagios, Shinken, Sensu, and other monitoring applications.
 LICENSE  = GPLv3
 
+# v3.0.x uses C11 _Generic which needs GCC >= 4.9
+MIN_GCC_VERSION = 4.9
+
 DEPENDS = cross/openssl3
 
 GNU_CONFIGURE = 1

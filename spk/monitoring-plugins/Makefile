@@ -7,6 +7,9 @@ DEPENDS = cross/monitoring-plugins
 
 SPK_DEPENDS = Perl
 
+# v3.0.x uses C11 _Generic which needs GCC >= 4.9
+MIN_GCC_VERSION = 4.9
+
 MAINTAINER = Gagi2k
 DESCRIPTION = Standard plugins for Icinga, Naemon, Nagios, Shinken, Sensu, and other monitoring applications.
 CHANGELOG = "1. Update monitoring-plugins to v3.0.2"
