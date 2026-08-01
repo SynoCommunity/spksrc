@@ -217,6 +217,7 @@ nav:
       - Loom: packages/loom.md
       - Navidrome: packages/navidrome.md
     - Monitoring:
+      - Icinga: packages/icinga.md
       - Netdata: packages/netdata.md
       - Node Exporter: packages/node-exporter.md
     - Network:
