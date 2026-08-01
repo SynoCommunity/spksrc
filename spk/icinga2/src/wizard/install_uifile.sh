@@ -48,7 +48,7 @@ PAGE_DATABASE_SETUP=$(/bin/cat<<EOF
              }
         }]
     }, {
-        "desc": "<b>Note:</b> After installation, run the following commands as root to enable ping checks:<br><code>sudo chmod +s /bin/ping</code> and <code>sudo chmod +s /bin/ping6</code>"
+        "desc": "<b>Note:</b> After installation, enable ping checks by running this command: <code style=\"user-select: all\">fix-ping</code>"
     }]
 }
 EOF
