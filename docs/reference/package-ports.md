@@ -58,6 +58,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Communication"><td>5280</td><td>ejabberd</td><td>Communication</td><td>HTTP admin</td></tr>
     <tr data-category="Development"><td>5433</td><td>PostgreSQL</td><td>Development</td><td>Database</td></tr>
     <tr data-category="Media Server"><td>5500</td><td>Kavita</td><td>Media Server</td><td>Web interface</td></tr>
+    <tr data-category="Monitoring"><td>5665</td><td>Icinga 2</td><td>Monitoring</td><td>Agent-to-master</td></tr>
     <tr data-category="Media Management"><td>6060</td><td>Plexivity</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Development"><td>6379</td><td>Redis</td><td>Development</td><td>Database</td></tr>
     <tr data-category="Media Management"><td>6767</td><td>Bazarr</td><td>Media Management</td><td>Web interface</td></tr>
