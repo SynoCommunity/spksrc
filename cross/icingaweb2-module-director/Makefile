@@ -1,5 +1,5 @@
 PKG_NAME = icinga-director
-PKG_VERS = 1.11.8
+PKG_VERS = 1.11.9
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Icinga/icingaweb2-module-director/archive/refs/tags

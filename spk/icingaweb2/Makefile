@@ -1,5 +1,5 @@
 SPK_NAME = icingaweb2
-SPK_VERS = 2.12.6
+SPK_VERS = 2.14.0
 SPK_REV = 1
 SPK_ICON = src/icingaweb2.png
 
@@ -7,15 +7,16 @@ DEPENDS  = cross/icingaweb2
 # Pure PHP package, make sure ARCH is noarch
 override ARCH=noarch
 
-REQUIRED_MIN_DSM = 7.1
+REQUIRED_MIN_DSM = 7.2
+REQUIRED_MIN_SRM = 3.0
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga Web 2 is a powerful PHP framework for web applications that provides the frontend for Icinga 2 monitoring.
 DISPLAY_NAME = Icinga Web 2
-CHANGELOG = "Initial release of Icinga Web 2 v2.12.6"
+CHANGELOG = "Initial release of Icinga Web 2"
 
 HOMEPAGE = https://icinga.com/
-LICENSE = GPLv2
+LICENSE = GPL-3.0-only
 
 WIZARDS_TEMPLATES_DIR = src/wizard_templates
 
@@ -31,16 +32,9 @@ STARTABLE = yes
 
 include ../../mk/spksrc.common.mk
 
-# DSM 7.2+: Use PHP 8.2
-ifeq ($(call version_ge, ${TCVERSION}, 7.2),1)
-SPK_DEPENDS = "WebStation:PHP8.2:Apache2.4:MariaDB10:icinga2"
-CONF_DIR = src/conf_72/
-else ifeq ($(call version_ge, ${TCVERSION}, 7.0),1)
-# DSM 7.0/7.1: Use PHP 8.0
-SPK_DEPENDS = "WebStation:PHP8.0:Apache2.4:MariaDB10:icinga2"
-OS_MAX_VER = 7.1-59999
-CONF_DIR = src/conf_7/
-endif
+# Icinga Web >= 2.13 requires PHP 8.2 (uses 8.4)
+SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4:MariaDB10:icinga2"
+CONF_DIR = src/conf/
 
 POST_STRIP_TARGET = icingaweb2_extra_install
 

@@ -12,7 +12,7 @@ UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga 2 is an open source monitoring system which checks the availability of your network resources, notifies users of outages, and generates performance data for reporting.
-CHANGELOG = "1. Update Icinga 2 to v2.16.4"
+CHANGELOG = "Initial release of Icinga 2"
 
 DISPLAY_NAME = Icinga 2
 

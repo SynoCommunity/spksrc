@@ -8,12 +8,8 @@ SERVICE_COMMAND="${SYNOPKG_PKGDEST}/share/icingaweb2/bin/icingacli director daem
 SVC_BACKGROUND=y
 SVC_WRITE_PID=y
 
-# PHP binary (DSM 7.0+ only)
-if [ "${SYNOPKG_DSM_VERSION_MINOR}" -ge 2 ]; then
-    PHP="/usr/local/bin/php82"
-else
-    PHP="/usr/local/bin/php80"
-fi
+# PHP binary (Icinga Web >= 2.13 requires PHP 8.2; uses 8.4)
+PHP="/usr/local/bin/php84"
 
 # MariaDB paths
 MYSQL="/usr/local/mariadb10/bin/mysql"
@@ -41,8 +37,8 @@ copy_config()
     shift 2
     cp "${src}" "${dest}"
     while [ $# -gt 0 ]; do
-        sed -i "s|$1|g" "${dest}"
-        shift
+        sed -i "s|$1|$2|g" "${dest}"
+        shift 2
     done
 }
 
@@ -134,9 +130,6 @@ service_postinst ()
         DB_PASS="${wizard_db_pass}"
         setup_icingaweb2_database
         import_icingaweb2_schema
-        if [ -n "${wizard_admin_user}" ] && [ -n "${wizard_admin_pass}" ]; then
-            create_admin_user
-        fi
 
         # Create directories for storage and configuration
         mkdir -p "${ICINGAWEB2_STORAGE_DIR}"
@@ -200,6 +193,11 @@ service_postinst ()
         if id sc-icingaweb2 >/dev/null 2>&1; then
             chown -R sc-icingaweb2:http "${ICINGAWEB_CONFIGDIR}"
             chown sc-icingaweb2:http "${ICINGAWEB2_STORAGE_DIR}"
+        fi
+
+        # Create admin user (requires resources.ini/config to be in place)
+        if [ -n "${wizard_admin_user}" ] && [ -n "${wizard_admin_pass}" ]; then
+            create_admin_user
         fi
 
         # Run Director database migration, kickstart API sync, and agent template setup

@@ -118,6 +118,35 @@ try {
         }
     }
 
+    // Ensure an auto-deploy ConfigJob exists so new agent registrations are
+    // deployed automatically by the Director background daemon
+    $job = $connection->fetchRow(
+        $connection->select()
+            ->from('director_job', ['id'])
+            ->where('job_name', 'config auto deploy')
+    );
+
+    if (!$job) {
+        echo "Creating auto-deploy config job...\n";
+        $connection->insert('director_job', [
+            'job_name'     => 'config auto deploy',
+            'job_class'    => 'Icinga\Module\Director\Job\ConfigJob',
+            'disabled'     => 'n',
+            'run_interval' => 900,
+        ]);
+        $job = $connection->fetchRow(
+            $connection->select()
+                ->from('director_job', ['id'])
+                ->where('job_name', 'config auto deploy')
+        );
+        $connection->insert('director_job_setting', [
+            'job_id'        => $job->id,
+            'setting_name'  => 'deploy_when_changed',
+            'setting_value' => 'y',
+        ]);
+        echo "Auto-deploy config job created\n";
+    }
+
     // Save API key to file for agents to use
     if (!is_dir($configDir)) {
         mkdir($configDir, 0750, true);

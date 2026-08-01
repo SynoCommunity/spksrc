@@ -25,7 +25,7 @@
 			"display_name": "Icinga Web 2",
 			"icon": "app/images/icingaweb2-{0}.png",
 			"php": {
-				"backend": 9,
+				"backend": 13,
 				"extensions": [
 					"curl",
 					"gd",
