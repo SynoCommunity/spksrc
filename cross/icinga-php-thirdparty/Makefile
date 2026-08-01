@@ -25,6 +25,5 @@ icinga_php_thirdparty_install:
 	cp $(WORK_DIR)/$(PKG_DIR)/VERSION $(STAGING_INSTALL_PREFIX)/share/icinga-php/vendor/
 	cp $(WORK_DIR)/$(PKG_DIR)/AssetLoader.php $(STAGING_INSTALL_PREFIX)/share/icinga-php/vendor/
 	cp -r $(WORK_DIR)/$(PKG_DIR)/asset $(STAGING_INSTALL_PREFIX)/share/icinga-php/vendor/
-	cp -r $(WORK_DIR)/$(PKG_DIR)/patches $(STAGING_INSTALL_PREFIX)/share/icinga-php/vendor/
-	cp $(WORK_DIR)/$(PKG_DIR)/LICENSE $(STAGING_INSTALL_PREFIX)/share/icinga-php/vendor/
+	cp $(WORK_DIR)/$(PKG_DIR)/LICENSE.md $(STAGING_INSTALL_PREFIX)/share/icinga-php/vendor/
 	cp $(WORK_DIR)/$(PKG_DIR)/README.md $(STAGING_INSTALL_PREFIX)/share/icinga-php/vendor/

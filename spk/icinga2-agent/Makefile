@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = comcerto2k
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = Icinga 2 agent connects to an Icinga 2 master server for distributed monitoring.
-CHANGELOG = "1. Update Icinga 2 Agent to v2.16.4"
+CHANGELOG = "Initial release of Icinga 2 Agent"
 
 DISPLAY_NAME = Icinga 2 Agent
 
