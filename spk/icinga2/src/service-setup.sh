@@ -156,9 +156,6 @@ service_postinst()
             find "${SYNOPKG_PKGVAR}/etc/icinga2" -type f -exec chmod 640 {} \;
             find "${SYNOPKG_PKGVAR}/etc/icinga2" -type d -exec chmod 750 {} \;
 
-            # Use custom hosts.conf with mail notifications disabled
-            cp "${TEMPLATES_DIR}/hosts.conf" "${SYNOPKG_PKGVAR}/etc/icinga2/conf.d/hosts.conf"
-
             # Enable API feature
             ln -sf ../features-available/api.conf "${SYNOPKG_PKGVAR}/etc/icinga2/features-enabled/api.conf"
 
@@ -176,6 +173,12 @@ service_postinst()
             chmod 640 "${SYNOPKG_PKGVAR}/etc/icingaweb2/api-credentials.txt"
         fi
     fi
+
+    # Refresh hosts.conf from the package template on install and upgrade.
+    # It is a package-owned sample config; user hosts belong in separate
+    # conf.d files (or Director), per Icinga documentation.
+    cp "${TEMPLATES_DIR}/hosts.conf" "${SYNOPKG_PKGVAR}/etc/icinga2/conf.d/hosts.conf"
+    chmod 640 "${SYNOPKG_PKGVAR}/etc/icinga2/conf.d/hosts.conf"
 
     # Generate certificates for API if not present
     if [ ! -d "${SYNOPKG_PKGVAR}/lib/icinga2/certs" ]; then

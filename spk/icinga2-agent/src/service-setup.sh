@@ -113,7 +113,7 @@ service_postinst ()
         master_host="${wizard_master_host}"
         master_port="${wizard_master_port:-5665}"
         agent_name="${wizard_agent_name:-$(hostname)}"
-        plugin_dir="${SYNOPKG_PKGDEST}/target/bin"
+        plugin_dir="${SYNOPKG_PKGDEST}/bin"
 
         # Fetch master's certificate and extract master zone from certificate CN
         mkdir -p "${SYNOPKG_PKGVAR}/lib/icinga2/certs"

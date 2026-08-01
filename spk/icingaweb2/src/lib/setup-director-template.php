@@ -113,6 +113,25 @@ try {
                         'check_command_id' => $cmd->id,
                     ]);
                     echo "Service created: {$svc['name']}\n";
+
+                    // Skip Synology's internal Docker storage from the disk check
+                    // (not accessible to the service user, and not user data)
+                    if ($svc['name'] === 'disk') {
+                        $service = $connection->fetchRow(
+                            $connection->select()
+                                ->from('icinga_service', ['id'])
+                                ->where('object_name', $svc['name'])
+                                ->where('host_id', $hostTemplate->id)
+                        );
+                        if ($service) {
+                            $connection->insert('icinga_service_var', [
+                                'service_id' => $service->id,
+                                'varname'    => 'disk_partitions_excluded',
+                                'varvalue'   => '/volume1/@docker/btrfs',
+                                'format'     => 'string',
+                            ]);
+                        }
+                    }
                 }
             }
         }
