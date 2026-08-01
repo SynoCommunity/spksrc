@@ -27,6 +27,8 @@ WIZARDS_DIR = src/wizard
 
 FWPORTS = src/icinga2.sc
 
+SPK_COMMANDS = bin/fix-ping
+
 POST_STRIP_TARGET = icinga2_extra_install
 
 include ../../mk/spksrc.spk.mk
@@ -39,3 +41,5 @@ icinga2_extra_install:
 	install -m 755 -d $(STAGING_DIR)/share/templates
 	install -m 644 $(CURDIR)/src/templates/*.conf $(STAGING_DIR)/share/templates/
 	install -m 644 $(CURDIR)/src/templates/*.txt $(STAGING_DIR)/share/templates/
+	install -m 755 -d $(STAGING_DIR)/bin
+	install -m 755 $(CURDIR)/src/fix-ping $(STAGING_DIR)/bin/fix-ping
