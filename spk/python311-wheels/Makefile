@@ -4,11 +4,6 @@ SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$
 SPK_REV = 1
 SPK_ICON = src/python3-pip.png
 
-# Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
-# CPython core team, see https://peps.python.org/pep-0011/ for more information.
-# And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 PYTHON_PACKAGE = python311
 
 MAINTAINER = SynoCommunity
@@ -38,6 +33,8 @@ OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
 OPTIONAL_DEPENDS += python/numpy-latest
 OPTIONAL_DEPENDS += python/pandas
+OPTIONAL_DEPENDS += python/pendulum
+OPTIONAL_DEPENDS += python/pygobject
 OPTIONAL_DEPENDS += python/scipy
 
 include ../../mk/spksrc.common.mk
@@ -60,6 +57,7 @@ ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
 DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
 
 # [gevent]
+ifeq ($(call version_ge, $(TC_GCC), 4.4),1)
 DEPENDS += cross/libev cross/c-ares
 ENV += GEVENTSETUP_EMBED_CARES=FALSE
 ENV += GEVENTSETUP_EMBED_LIBEV=FALSE
@@ -67,6 +65,7 @@ ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
 WHEELS += gevent==24.11.1
 else
 WHEELS += gevent==25.9.1
+endif
 endif
 
 # [greenlet]
@@ -85,14 +84,17 @@ endif
 # [llfuse]
 # llfuse<=1.5.1 using gcc<5 requires -std=gnu11 to find "clock_gettime" (-std=gnu99 makes it compatible with older gcc)
 # llfuse>=1.5.2 requires gcc>=7
+ifeq ($(call version_gt, $(TC_GCC), 4.4),1)
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [llfuse] -std=gnu99
 WHEELS += llfuse==1.5.1
 else
 WHEELS += llfuse==1.5.2
 endif
+endif
 
 # [lxml]
+ifeq ($(call version_ge, $(TC_GCC), 4.4),1)
 DEPENDS += cross/libxml2
 DEPENDS += cross/libxslt
 ifeq ($(call version_lt, $(TC_GCC), 4.8),1)
@@ -104,31 +106,35 @@ WHEELS += lxml==5.4.0
 else
 WHEELS += lxml==6.0.2
 endif
+endif
 
 # [mysqlclient]
+ifeq ($(call version_ge, $(TC_GCC), 4.4),1)
+WHEELS += mysqlclient==2.2.8
 DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
+endif
 
 # [numpy]
-# version <= 1.21 (armv5)  Requires python '<3.11,>=3.7' *** unsupported ***
-# version <= 1.22 (armv7l) Last working version
+# version <= 1.21 (armv5,  gcc-4.6)  Requires python '<3.11,>=3.7' *** unsupported ***
+# version <= 1.22 (armv7l, gcc-4.8)  Last working version
 # version <= 1.24 (DSM6, comcerto2k) Last working version with gcc-4.9
-# version >= 1.25 (DSM7)   Mandatory requires c++17
-# version == 1.25.2        BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
-# version >= 1.26 (DSM7)   Mandatory requires gcc >= 8.4
-# version >= 2.3  (DSM7.2) Requires gcc >= 9.4 (using patch for DSM-7.1 compatibility)
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+# version >= 1.25 (DSM-7)            Mandatory requires c++17
+# version == 1.25.2                  BUG only on x86_64 gcc-8.5.0 DSM-7.1 -> Fallback to 1.25.1
+# version >= 1.26 (DSM-7.1)          Mandatory requires gcc >= 8.4
+# version >= 2.3  (DSM-7.2)          Requires gcc >= 9.4 (using patch for DSM-7.1 compatibility)
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
+ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
 WHEELS += numpy==1.22.4
-else ifeq ($(call version_le, $(TC_GCC), 5.0),1)
+else ifeq ($(call version_lt, $(TC_GCC), 8.5),1)
 WHEELS += numpy==1.24.4
 # workaround for compiler bug:
 # https://github.com/numpy/numpy/issues/13622
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 WHEELS_CFLAGS += [numpy] -O0
 endif
-else ifeq ($(call version_ge, $(TC_GCC), 8.5),1)
+else
 DEPENDS += python/numpy_1.26
 DEPENDS += python/numpy
 DEPENDS += python/numpy-latest
@@ -143,7 +149,7 @@ endif
 # [Pendulum]
 # Needs atomic to build
 # Serves as maturin type python-wheel.mk example
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(call version_gt, $(TC_GCC), 4.8),1)
 DEPENDS += python/pendulum
 endif
 
@@ -151,13 +157,19 @@ endif
 DEPENDS += python/pillow
 
 # [psutil]
+ifeq ($(call version_gt, $(TC_GCC), 4.4),1)
+WHEELS += psutil==7.2.2
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [psutil] -std=gnu99
 endif
+endif
 
 # [pycares]
+ifeq ($(call version_gt, $(TC_GCC), 4.4),1)
+WHEELS += pycares==5.0.1
 DEPENDS += cross/c-ares
 ENV += PYCARES_USE_SYSTEM_LIB=1
+endif
 
 # [pycryptodome]
 ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
