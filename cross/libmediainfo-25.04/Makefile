@@ -9,7 +9,7 @@ PKG_DIR = MediaInfoLib-$(PKG_VERS)/Project/GNU/Library
 DEPENDS = cross/libzen cross/zlib
 
 # cross/libzen:
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+MIN_GCC_VERSION = 4.7
 
 HOMEPAGE = https://mediaarea.net/en/MediaInfo
 COMMENT  = MediaInfo is a convenient unified display of the most relevant technical and tag data for video and audio files.
