@@ -4,8 +4,8 @@ SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$
 SPK_REV = 1
 SPK_ICON = src/python3-pip.png
 
-# Compiler must support std=c++11
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# Python 3.12 needs C11 <stdatomic.h> (and C++11); gcc ships stdatomic.h >= 4.8
+MIN_GCC_VERSION = 4.8
 
 PYTHON_PACKAGE = python312
 
@@ -124,11 +124,8 @@ DEPENDS += python/pandas
 endif
 
 # [Pendulum]
-# Needs atomic to build
-# Serves as maturin type python-wheel.mk example
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+# Serves as maturin build type example
 DEPENDS += python/pendulum
-endif
 
 # [Pillow]
 DEPENDS += python/pillow
