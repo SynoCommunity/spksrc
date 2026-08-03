@@ -6,6 +6,6 @@
 },{
     "step_title": "Permissions DSM",
     "items": [{
-        "desc": "Merci de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+        "desc": "Merci de lire <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> pour plus de détails."
     }]
 }]

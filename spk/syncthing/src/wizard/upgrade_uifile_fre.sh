@@ -45,7 +45,7 @@ PAGE_PERMISSIONS=$(/bin/cat<<EOF
     "items": [{
         "desc": "<b>Permissions</b>"
     },{
-        "desc": "Les permissions pour ce paquet sont gérées par le groupe <b>'sc-syncthing'</b>. <br>En utilisant File Station, ajoutez ce groupe à chaque dossier auquel Syncthing devrait avoir accès. <br/>Veuillez lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Gestion des Permissions</a> pour plus de détails."
+        "desc": "Les permissions pour ce paquet sont gérées par le groupe <b>'sc-syncthing'</b>. <br>En utilisant File Station, ajoutez ce groupe à chaque dossier auquel Syncthing devrait avoir accès. <br/>Veuillez lire <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Gestion des Permissions</a> pour plus de détails."
     },{
         "desc": "<b>Personnalisation</b>"
     },{
