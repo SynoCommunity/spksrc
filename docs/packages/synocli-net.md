@@ -25,20 +25,22 @@ SynoCli Network Tools provides essential command-line networking utilities.
 | screen | Terminal multiplexer |
 | tmux | Modern terminal multiplexer |
 | socat | Multipurpose relay |
-| nmap | Network scanner |
+| nmap / nping / ncat | Network scanner and netcat |
 | arp-scan | ARP network scanner |
 | mtr | Network diagnostic tool |
 | links | Text-mode web browser |
 | rsync | Fast file copying |
 | xxhsum | xxHash checksum utility |
 | autossh | Automatic SSH reconnection |
-| openssh | SSH client and server tools |
-| sftp | Secure file transfer |
-| scp | Secure copy |
+| openssh | SSH client and server tools (ssh, scp, sftp, sshd) |
 | etherwake | Wake-on-LAN utility |
 | telnet | Telnet client |
 | whois | Domain lookup |
 | sshfs | Mount filesystems over SSH |
+| ser2net | Serial-to-network proxy |
+| gensiot | Generic socket I/O tools |
+| aria2c | Download utility |
+| dig / delv / mdig | DNS lookup tools |
 | IMAPFilter | IMAP mail filtering |
 
 ## Installation

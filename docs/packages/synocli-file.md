@@ -22,19 +22,37 @@ SynoCli File Tools provides essential file management utilities for the command 
 
 | Tool | Description |
 |------|-------------|
-| mc | Midnight Commander file manager |
-| tree | Directory tree viewer |
-| ncdu | NCurses disk usage analyzer |
 | less | Pager for viewing files |
-| file | File type identification |
+| tree | Directory tree viewer |
+| jdupes | Duplicate file finder |
 | fdupes | Duplicate file finder |
-| jq | JSON processor |
-| rmlint | Duplicate and lint finder |
-| rename | Batch file renaming |
+| rhash | Hash computing/verifying utility |
+| mc | Midnight Commander file manager |
+| nano | Text editor |
+| micro | Modern terminal text editor |
+| mg | Micro (GNU) emacs-like text editor |
+| jupp | Joe's Own Editor (jmacs, joe, jpico, jstar) |
+| rnm | Batch file renamer (regex) |
+| file | File type identification |
+| fzf | Command-line fuzzy finder |
+| rg (ripgrep) | Line-oriented recursive search |
+| fd | Simple, fast alternative to `find` |
+| sd | Intuitive `sed` alternative |
+| bat | Cat clone with syntax highlighting |
+| eza | Modern `ls` replacement |
+| lsd | Modern `ls` replacement |
+| nnn | Terminal file manager |
 | detox | Filename cleanup |
-| nano | Text editor (optional) |
+| rmlint | Duplicate and lint finder |
 | zstd | Zstandard compression |
-| lz4 | LZ4 compression |
+| lzip / plzip | Lossless data compressor (parallel) |
+| pixz | Parallel, indexing `xz` |
+| pigz | Parallel `gzip` |
+| iconv | Character set conversion |
+| dos2unix | Convert line endings |
+| xstow | Symlink farm manager |
+| patch | Apply patches to files |
+| pcre2grep / pcre2test | PCRE2 grep and test tools |
 
 ## Usage Examples
 
@@ -46,32 +64,6 @@ mc
 
 # Use F keys for operations
 # F5: Copy, F6: Move, F8: Delete, F10: Exit
-```
-
-### ncdu - Disk Usage Analyzer
-
-```bash
-# Analyze current directory
-ncdu
-
-# Analyze specific path
-ncdu /volume1/data
-
-# Export results
-ncdu -o report.json /volume1/
-```
-
-### jq - JSON Processing
-
-```bash
-# Pretty print JSON
-cat data.json | jq .
-
-# Extract specific field
-cat data.json | jq '.items[].name'
-
-# Filter results
-jq '.[] | select(.status == "active")' data.json
 ```
 
 ### fdupes - Find Duplicates

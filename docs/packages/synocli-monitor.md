@@ -22,14 +22,23 @@ SynoCli Monitor Tools provides system monitoring and performance analysis utilit
 
 | Tool | Description |
 |------|-------------|
-| nmon | Performance monitor |
-| njmon | JSON performance output |
 | htop | Interactive process viewer |
-| iperf2 | Network bandwidth testing |
-| iperf3 | Modern network testing |
+| btop | Resource monitor (CPU, memory, disks, network) |
+| btm (bottom) | Cross-platform graphical process viewer |
+| nmon / njmon | Performance monitor (JSON output) |
+| iperf2 / iperf3 | Network bandwidth testing |
 | ionice | I/O scheduling priority |
+| iostat | CPU/disk statistics |
+| pgrep | Find processes by name |
+| pmap | Report memory map of a process |
+| watch | Execute commands periodically |
+| pstree | Display process tree |
+| lsof | List open files |
 | cpulimit | CPU usage limiter |
-| net-snmp | SNMP tools (snmpget, snmpwalk, etc.) |
+| bandwhich | Bandwidth utilization viewer |
+| procs | Modern `ps` replacement |
+| net-snmp | SNMP tools (snmpget, snmpwalk, snmptable, etc.) |
+| lm-sensors | Hardware sensors (sensors, sensors-detect, fancontrol) |
 
 ## Usage Examples
 

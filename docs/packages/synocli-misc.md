@@ -22,32 +22,36 @@ SynoCli Misc Tools provides various useful command-line utilities.
 
 | Tool | Description |
 |------|-------------|
-| bc | Calculator |
+| bc / dc | Arbitrary precision calculator |
 | errno | Lookup errno names and descriptions |
 | expect | Automate interactive applications |
+| dialog | Display dialog boxes from shell scripts |
 | parallel | Parallel command execution |
 | cal | Calendar display |
+| col | Filter reverse line feeds |
+| colcrt | Filter for terminal processing |
+| colrm | Remove columns from a file |
+| column | Columnate lists |
 | hexdump | Display file in hexadecimal |
 | lscpu | Display CPU information |
 | lsblk | List block devices |
+| lsipc | IPC information |
+| lsirq | IRQ information |
 | findmnt | Find mounted filesystems |
+| hardlink | Link duplicate files |
+| rev | Reverse lines of a file |
 | wall | Write to all users |
 | whereis | Locate commands |
 | uhubctl | USB hub power control |
 | zramctl | ZRAM management |
-
-### moreutils (pee, sponge, etc.)
-
-| Tool | Description |
-|------|-------------|
-| pee | Tee to pipes |
-| sponge | Soak up stdin, write to file |
-| ts | Timestamp input |
 | ifdata | Get network interface info |
 | ifne | Run command if stdin not empty |
-| isutf8 | Check if file is valid UTF-8 |
-| lckdo | Execute with lock held |
-| mispipe | Pipe preserving exit status |
+| isutf8 | Check if input is valid UTF-8 |
+| lckdo | Execute a command with a lock held |
+| mispipe | Pipe while preserving exit status |
+| pee | Tee standard input to pipes |
+| sponge | Soak up stdin and write to file |
+| ts | Timestamp input lines |
 
 ## Usage Examples
 

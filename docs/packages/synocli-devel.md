@@ -24,6 +24,10 @@ SynoCli Development Tools provides build tools and debugging utilities.
 |------|---------|-------------|
 | automake | 1.18.1 | Makefile generator |
 | autoconf | 2.71 | Configure script generator |
+| binutils | — | Binary tools (ld, as, gold) |
+| gdb | — | GNU debugger |
+| LLVM | — | Compiler and toolchain technologies |
+| m4 | — | Macro processor |
 | make | 4.4.1 | Build automation |
 | pkg-config | 0.29.2 | Library configuration |
 | libtree | 3.1.1 | Library dependency viewer |
