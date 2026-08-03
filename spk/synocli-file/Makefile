@@ -91,7 +91,7 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DOCS_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-file/\"\>FAQ SynoCliFile\</a\>"
+DOCS_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-file/\"\>SynoCli File Tools\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \

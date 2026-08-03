@@ -72,7 +72,7 @@ endif
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-disk/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
-DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliDisk\</a\>"
+DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>SynoCli Disk Tools\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."

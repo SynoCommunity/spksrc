@@ -47,7 +47,7 @@ MAINTAINER = hgy59
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-monitor/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
-DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliMonitor\</a\>"
+DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>SynoCli Monitor Tools\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
