@@ -91,7 +91,7 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-WIKI_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-file/\"\>FAQ SynoCliFile\</a\>"
+DOCS_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-file/\"\>FAQ SynoCliFile\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
@@ -114,7 +114,7 @@ CHANGELOG += "5. Update less from v679 to v685. <br/>"
 CHANGELOG += "6. Update lsd from v1.1.5 to v1.2.0 (except for ARMv5). <br/>"
 CHANGELOG += "7. Update nano from v8.6 to v8.7. <br/>"
 CHANGELOG += "8. Update ripgrep from v14.1.1 to v15.1.0 (except for ARMv5 and qoriq). <br/>"
-CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
+CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
 

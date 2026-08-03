@@ -13,14 +13,14 @@ DEPENDS += cross/dialog
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = SynoCli misc. Tools
 
-WIKI_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-misc/\"\>FAQ SynoCliFile\</a\>"
+DOCS_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-misc/\"\>FAQ SynoCliMisc\</a\>"
 
 DESCRIPTION = "SynoCli misc. Tools provide a set of miscellaneous small command-line utilities: bc, errno, expect, ifdata, ifne, isutf8, lckdo, mispipe, parallel, pee, sponge, ts, cal, col, colcrt, colrm, column, hardlink, findmnt, hexdump, lsblk, lscpu, lsipc, lsirq, rev, wall, whereis, zramctl, uhubctl."
 STARTABLE = no
 
 CHANGELOG  = "1. Add dialog. <br/>"
 CHANGELOG += "2. Update util-linux to v2.41.4. <br/>"
-CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
+CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-misc/
 LICENSE  = Each tool is licensed under it's respective license.

@@ -47,7 +47,7 @@ MAINTAINER = hgy59
 HOMEPAGE = https://docs.synocommunity.com/packages/synocli-monitor/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
-WIKI_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliMonitor\</a\>"
+DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliMonitor\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = SynoCli Monitor Tools provides a set of command-line utilities for system monitoring: nmon, njmon, iperf2, iperf3, htop, ionice, cpulimit, net-snmp tools$(OPTIONAL_DESC).
@@ -58,7 +58,7 @@ CHANGELOG += "2. Update bottom to v0.11.4. </br>"
 CHANGELOG += "3. Update iperf3 to v3.20. </br>"
 CHANGELOG += "4. Update njmon to v90. </br>"
 CHANGELOG += "5. Update nmon v16s. </br>"
-CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
+CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
 
