@@ -554,7 +554,7 @@ jobs:
           PUBLISH: ${{ github.event.inputs.publish }}
           API_KEY: ${{ secrets.PUBLISH_API_KEY }}
           PACKAGE_TO_PUBLISH: ${{ github.event.inputs.package }}
-          # https://github.com/SynoCommunity/spksrc/wiki/Compile-and-build-rules
+          # https://docs.synocommunity.com/developer-guide/packaging/build-rules/
           GH_ARCH: ${{ matrix.arch }}
           BUILD_ERROR_FILE: /github/workspace/build_errors.txt
           BUILD_ERROR_LOGFILE: /github/workspace/build_log_errors.txt
