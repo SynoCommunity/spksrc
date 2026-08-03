@@ -1,0 +1,12 @@
+{
+  "data-share": {
+    "shares": [
+      {
+        "name": "{{wizard_shared_folder_name}}",
+        "permission": {
+          "ro": ["sc-ps3netsrv-plus"]
+        }
+      }
+    ]
+  }
+}

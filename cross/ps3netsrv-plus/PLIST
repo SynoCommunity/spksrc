@@ -1,0 +1,6 @@
+bin:bin/ps3netsrv-plus
+bin:bin/ps3netsrv-go
+lib:bin/libchdr.so
+rsc:app
+rsc:share/licenses
+rsc:share/doc/ps3netsrv-plus
