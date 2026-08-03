@@ -3,7 +3,7 @@
         "step_title": "How to use this package",
         "items": [
             {
-                "desc": "For instructions on how to use this package with your device, please visit our <a target="_blank" href="https://docs.synocommunity.com/packages/google-authenticator/">Google Authenticator package</a>."
+                "desc": "For instructions on how to use this package with your device, please visit our <a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/google-authenticator/\">Google Authenticator package</a>."
             }
         ]
     }
