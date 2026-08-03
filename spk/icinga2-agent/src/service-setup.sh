@@ -174,6 +174,12 @@ service_postinst ()
         copy_config "${SYNOPKG_PKGDEST}/share/templates/api-users.conf" "${SYNOPKG_PKGVAR}/etc/icinga2/conf.d/api-users.conf" \
             "@@API_PASSWORD@@" "${agent_password}"
 
+        # Enable API and checker features (features-available ships in PKGDEST)
+        cp "${SYNOPKG_PKGDEST}/etc/icinga2/features-available/api.conf" "${SYNOPKG_PKGVAR}/etc/icinga2/features-available/api.conf"
+        cp "${SYNOPKG_PKGDEST}/etc/icinga2/features-available/checker.conf" "${SYNOPKG_PKGVAR}/etc/icinga2/features-available/checker.conf"
+        ln -sf ../features-available/api.conf "${SYNOPKG_PKGVAR}/etc/icinga2/features-enabled/api.conf"
+        ln -sf ../features-available/checker.conf "${SYNOPKG_PKGVAR}/etc/icinga2/features-enabled/checker.conf"
+
         # Secure config directory
         find "${SYNOPKG_PKGVAR}/etc/icinga2" -type f -exec chmod 640 {} \;
         find "${SYNOPKG_PKGVAR}/etc/icinga2" -type d -exec chmod 750 {} \;
