@@ -175,10 +175,11 @@ service_postinst ()
         copy_config "${SYNOPKG_PKGDEST}/share/templates/api-users.conf" "${SYNOPKG_PKGVAR}/etc/icinga2/conf.d/api-users.conf" \
             "@@API_PASSWORD@@" "${agent_password}"
 
-        # Enable API and checker features (features-available ships in PKGDEST)
-        cp "${SYNOPKG_PKGDEST}/etc/icinga2/features-available/api.conf" "${SYNOPKG_PKGVAR}/etc/icinga2/features-available/api.conf"
+        # Enable checker feature (features-available ships in PKGDEST)
+        # ApiListener is defined inline in the icinga2.conf template with the
+        # accept_config/accept_commands flags the agent needs, so the api.conf
+        # feature is not enabled here to avoid redefining the ApiListener.
         cp "${SYNOPKG_PKGDEST}/etc/icinga2/features-available/checker.conf" "${SYNOPKG_PKGVAR}/etc/icinga2/features-available/checker.conf"
-        ln -sf ../features-available/api.conf "${SYNOPKG_PKGVAR}/etc/icinga2/features-enabled/api.conf"
         ln -sf ../features-available/checker.conf "${SYNOPKG_PKGVAR}/etc/icinga2/features-enabled/checker.conf"
 
         # Secure config directory
