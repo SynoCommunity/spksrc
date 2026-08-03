@@ -21,7 +21,7 @@
       "desc": ""
     },
     {
-      "desc": "myMPD runs as internal service user <b>'sc-mympd'</b>. Read access to the music folder is required for cover art, lyrics, and other metadata features.<br><br>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+      "desc": "myMPD runs as internal service user <b>'sc-mympd'</b>. Read access to the music folder is required for cover art, lyrics, and other metadata features.<br><br>Please read <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> for details."
     }
   ]
 }]

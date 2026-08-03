@@ -21,7 +21,7 @@
       }, {
         "desc": ""
       }, {
-        "desc": "The folder will be created on demand as regular DSM shared folder for the service user <b>sc-mpd</b>. For details about the DSM permissions see <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a>.<p/>"
+        "desc": "The folder will be created on demand as regular DSM shared folder for the service user <b>sc-mpd</b>. For details about the DSM permissions see <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a>.<p/>"
       }
     ]
   }

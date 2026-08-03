@@ -18,7 +18,7 @@ CHANGELOG = "1. Update to 8.4<br>2. Use amd64 for x86-64 archs"
 
 HOMEPAGE = https://www.debian.org
 LICENSE  = https://www.debian.org/legal/licenses
-HELPURL  = https://github.com/SynoCommunity/spksrc/wiki/Debian-Chroot
+HELPURL  = https://docs.synocommunity.com/developer-guide/setup/
 
 INSTALLER_SCRIPT = src/installer.sh
 SSS_SCRIPT       = src/dsm-control.sh

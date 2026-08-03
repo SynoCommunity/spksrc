@@ -91,7 +91,7 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-WIKI_URL = "\<a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile\"\>FAQ SynoCliFile\</a\>"
+WIKI_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-file/\"\>FAQ SynoCliFile\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
@@ -118,7 +118,7 @@ CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
 
-HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-file/
 LICENSE  = Each tool is licensed under it's respective license.
 
 SPK_COMMANDS  = bin/less bin/lessecho bin/lesskey

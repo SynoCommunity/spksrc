@@ -69,7 +69,7 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", fuse"
 SPK_COMMANDS += bin/fusermount bin/ulockmgr_server
 endif
 
-HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-disk/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
 WIKI_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliDisk\</a\>"

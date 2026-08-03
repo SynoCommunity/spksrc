@@ -76,7 +76,7 @@ DESCRIPTION = "SynoCli Network Tools provides a set of small command-line utilit
 DISPLAY_NAME = SynoCli Network Tools
 STARTABLE = no
 
-WIKI_URL = "\<a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet\"\>FAQ SynoCliFile\</a\>"
+WIKI_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-net/\"\>FAQ SynoCliFile\</a\>"
 
 CHANGELOG  = "1. Update bind v9.18.38 to v9.18.50 and v9.20.11 to v9.20.24. <br/>"
 CHANGELOG += "2. Update inetutils from v2.6 to v2.7. <br/>"
@@ -89,7 +89,7 @@ CHANGELOG += "8. Update tmux from v3.5a to v3.6b. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
 
 
-HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliNet
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-net/
 LICENSE = Each tool is licensed under it\'s respective license.
 
 SPK_COMMANDS  = bin/screen

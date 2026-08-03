@@ -50,7 +50,7 @@
           }
         ]
       }, {
-        "desc": "Permissions for download-related packages are managed with the group <b>'synocommunity'</b> in DSM. Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for further information."
+        "desc": "Permissions for download-related packages are managed with the group <b>'synocommunity'</b> in DSM. Please read <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> for further information."
       }
     ]
   }, {

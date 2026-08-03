@@ -57,7 +57,7 @@
         "desc": "Si le répertoire partagé est inexistant, il sera créé.  Vous pouvez utiliser un partage existant en spécifiant le nom du répertoire destination."
       },
       {
-        "desc": "Le nom d'utilisateur et groupe n'apparaîteront pas dans la plupart des options de configuration de l'interface utilisateur. Prière de lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour d'avantage de détails."
+        "desc": "Le nom d'utilisateur et groupe n'apparaîteront pas dans la plupart des options de configuration de l'interface utilisateur. Prière de lire <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> pour d'avantage de détails."
       }
     ]
   }

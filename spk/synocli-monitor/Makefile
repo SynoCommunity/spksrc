@@ -44,7 +44,7 @@ endif
 
 MAINTAINER = hgy59
 
-HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliMonitor
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-monitor/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
 WIKI_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliMonitor\</a\>"
