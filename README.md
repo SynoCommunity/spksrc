@@ -21,7 +21,7 @@ DSM 7 was released on June 29 2021 as Version 7.0.41890.
 
 ## Contributing
 Before opening a new issue, check the [Troubleshooting guide](https://docs.synocommunity.com/user-guide/troubleshooting/) and search open issues.
-If you can't find an answer, or if you want to open a package request, read [CONTRIBUTING](https://github.com/SynoCommunity/spksrc/blob/master/CONTRIBUTING.md) to make sure you include all the information needed for contributors to handle your request.
+If you can't find an answer, or if you want to open a package request, read [CONTRIBUTING](https://docs.synocommunity.com/contributing/) to make sure you include all the information needed for contributors to handle your request.
 
 
 ## Setup Development Environment
