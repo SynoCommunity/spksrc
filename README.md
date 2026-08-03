@@ -20,7 +20,7 @@ DSM 7 was released on June 29 2021 as Version 7.0.41890.
 
 
 ## Contributing
-Before opening a new issue, check the [FAQ] and search open issues.
+Before opening a new issue, check the [Troubleshooting guide] and search open issues.
 If you can't find an answer, or if you want to open a package request, read [CONTRIBUTING] to make sure you include all the information needed for contributors to handle your request.
 
 
@@ -42,7 +42,7 @@ docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc ghcr.io/synoc
 # If running on macOS:
 docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 ```
-5. From there, follow the instructions in the [Developers HOW TO].
+5. From there, follow the instructions in the [Developer Guide].
 
 
 
@@ -75,7 +75,7 @@ sudo apt install --no-install-recommends -y \
                  python3 python3-mako python3-pip python3-setuptools \
                  python3-virtualenv python3-yaml
 ```
-From there, follow the instructions in the [Developers HOW TO].
+From there, follow the instructions in the [Developer Guide].
 
 
 ### LXC
@@ -125,7 +125,7 @@ lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc
 lxc exec spksrc --user 1001 -- cp /etc/skel/.profile /etc/skel/.bashrc ~spksrc/.
 ```
 
-From there you can connect to your container as `spksrc` and follow the instructions in the [Developers HOW TO].
+From there you can connect to your container as `spksrc` and follow the instructions in the [Developer Guide].
 ```bash
 lxc exec spksrc -- su --login spksrc
 spksrc@spksrc:~$
@@ -175,7 +175,7 @@ EOF"
 
 ## Usage
 Once you have a development environment set up, you can start building packages, create new ones, or improve upon existing packages while making your changes available to other people.
-See the [Developers HOW TO] for information on how to use spksrc.
+See the [Developer Guide] for information on how to use spksrc.
 
 
 ## License
@@ -186,8 +186,8 @@ When not explicitly set, files are placed under a [3 clause BSD license]
 [bug tracker]: https://github.com/SynoCommunity/spksrc/issues
 [CONTRIBUTING]: https://github.com/SynoCommunity/spksrc/blob/master/CONTRIBUTING.md
 [Fork and clone]: https://docs.github.com/en/github/getting-started-with-github/fork-a-repo
-[Developers HOW TO]: https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO
+[Developer Guide]: https://docs.synocommunity.com/developer-guide/
 [Docker installation]: https://docs.docker.com/engine/installation
-[FAQ]: https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions
+[Troubleshooting guide]: https://docs.synocommunity.com/user-guide/troubleshooting/
 [Install Docker with wget]: https://docs.docker.com/linux/step_one
 [SynoCommunity repository]: http://www.synocommunity.com
