@@ -101,6 +101,7 @@ service_postinst ()
     # Create required directories
     mkdir -p "${SYNOPKG_PKGVAR}/etc/icinga2"
     mkdir -p "${SYNOPKG_PKGVAR}/etc/icinga2/conf.d"
+    mkdir -p "${SYNOPKG_PKGVAR}/etc/icinga2/features-available"
     mkdir -p "${SYNOPKG_PKGVAR}/etc/icinga2/features-enabled"
     mkdir -p "${SYNOPKG_PKGVAR}/log/icinga2"
     mkdir -p "${SYNOPKG_PKGVAR}/log/icinga2/crash"
