@@ -20,4 +20,4 @@ Fixes # <!--Optionally, add links to existing issues or other PR's-->
 - [ ] New Package
 - [ ] Package update
 - [ ] Includes small framework changes
-- [ ] This change requires a documentation update (e.g. Wiki)
+- [ ] This change requires a documentation update (e.g. [docs.synocommunity.com](https://docs.synocommunity.com))
