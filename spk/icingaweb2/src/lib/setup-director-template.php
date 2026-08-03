@@ -95,6 +95,7 @@ try {
                 ['name' => 'load', 'display' => 'CPU Load'],
                 ['name' => 'procs', 'display' => 'Processes'],
                 ['name' => 'swap', 'display' => 'Swap Usage'],
+                ['name' => 'icinga', 'display' => 'Icinga 2 Self Check'],
             ];
 
             foreach ($services as $svc) {
