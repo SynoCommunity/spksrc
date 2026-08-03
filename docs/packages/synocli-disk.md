@@ -22,24 +22,24 @@ SynoCli Disk Tools provides essential disk management and recovery utilities.
 
 | Tool | Description |
 |------|-------------|
+| dar | Disk archive (full filesystem backups) |
+| davfs2 | Mount WebDAV shares |
+| ddrescue | Data recovery tool |
+| disktype | Detect disk/image content format |
+| dua | Disk usage analyzer |
+| duf | Disk usage/free utility (better `df`) |
+| dutree | Disk usage analyzer (Rust) |
 | e2fsprogs | ext2/3/4 filesystem utilities (e2fsck, mkfs.ext4, etc.) |
+| gdu | Fast disk usage analyzer (Go) |
+| gpart | Recover damaged partition tables |
+| lsscsi | List SCSI devices |
+| mergerfs | FUSE union filesystem (run as root) |
+| ncdu | NCurses disk usage analyzer |
 | ntfs-3g | NTFS read/write support |
 | ntfsprogs | NTFS utilities |
-| testdisk | Data recovery tool |
-| ncdu | NCurses disk usage analyzer |
-| davfs2 | Mount WebDAV shares |
-| lsscsi | List SCSI devices |
-| ddrescue | Data recovery tool |
-| dar | Disk archive (full filesystem backups) |
-| duf | Disk usage/free utility (better `df`) |
-| gdu | Fast disk usage analyzer (Go) |
-| dua | Disk usage analyzer |
-| dutree | Disk usage analyzer (Rust) |
-| tdu | Top disk usage |
 | smartmontools | SMART disk monitoring (smartctl, smartd) |
-| mergerfs | FUSE union filesystem (run as root) |
-| disktype | Detect disk/image content format |
-| gpart | Recover damaged partition tables |
+| tdu | Top disk usage |
+| testdisk | Data recovery tool |
 
 ## Usage Examples
 

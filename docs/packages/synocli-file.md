@@ -22,37 +22,37 @@ SynoCli File Tools provides essential file management utilities for the command 
 
 | Tool | Description |
 |------|-------------|
-| less | Pager for viewing files |
-| tree | Directory tree viewer |
-| jdupes | Duplicate file finder |
+| bat | Cat clone with syntax highlighting |
+| detox | Filename cleanup |
+| dos2unix | Convert line endings |
+| eza | Modern `ls` replacement |
+| fd | Simple, fast alternative to `find` |
 | fdupes | Duplicate file finder |
-| rhash | Hash computing/verifying utility |
-| mc | Midnight Commander file manager |
-| nano | Text editor |
-| micro | Modern terminal text editor |
-| mg | Micro (GNU) emacs-like text editor |
-| jupp | Joe's Own Editor (jmacs, joe, jpico, jstar) |
-| rnm | Batch file renamer (regex) |
 | file | File type identification |
 | fzf | Command-line fuzzy finder |
-| rg (ripgrep) | Line-oriented recursive search |
-| fd | Simple, fast alternative to `find` |
-| sd | Intuitive `sed` alternative |
-| bat | Cat clone with syntax highlighting |
-| eza | Modern `ls` replacement |
-| lsd | Modern `ls` replacement |
-| nnn | Terminal file manager |
-| detox | Filename cleanup |
-| rmlint | Duplicate and lint finder |
-| zstd | Zstandard compression |
-| lzip / plzip | Lossless data compressor (parallel) |
-| pixz | Parallel, indexing `xz` |
-| pigz | Parallel `gzip` |
 | iconv | Character set conversion |
-| dos2unix | Convert line endings |
-| xstow | Symlink farm manager |
+| jdupes | Duplicate file finder |
+| jupp | Joe's Own Editor (jmacs, joe, jpico, jstar) |
+| less | Pager for viewing files |
+| lsd | Modern `ls` replacement |
+| lzip / plzip | Lossless data compressor (parallel) |
+| mc | Midnight Commander file manager |
+| mg | Micro (GNU) emacs-like text editor |
+| micro | Modern terminal text editor |
+| nano | Text editor |
+| nnn | Terminal file manager |
 | patch | Apply patches to files |
 | pcre2grep / pcre2test | PCRE2 grep and test tools |
+| pigz | Parallel `gzip` |
+| pixz | Parallel, indexing `xz` |
+| rg (ripgrep) | Line-oriented recursive search |
+| rhash | Hash computing/verifying utility |
+| rmlint | Duplicate and lint finder |
+| rnm | Batch file renamer (regex) |
+| sd | Intuitive `sed` alternative |
+| tree | Directory tree viewer |
+| xstow | Symlink farm manager |
+| zstd | Zstandard compression |
 
 ## Usage Examples
 
