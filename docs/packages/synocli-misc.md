@@ -22,32 +22,36 @@ SynoCli Misc Tools provides various useful command-line utilities.
 
 | Tool | Description |
 |------|-------------|
-| bc | Calculator |
+| bc / dc | Arbitrary precision calculator |
+| cal | Calendar display |
+| col | Filter reverse line feeds |
+| colcrt | Filter for terminal processing |
+| colrm | Remove columns from a file |
+| column | Columnate lists |
+| dialog | Display dialog boxes from shell scripts |
 | errno | Lookup errno names and descriptions |
 | expect | Automate interactive applications |
-| parallel | Parallel command execution |
-| cal | Calendar display |
-| hexdump | Display file in hexadecimal |
-| lscpu | Display CPU information |
-| lsblk | List block devices |
 | findmnt | Find mounted filesystems |
-| wall | Write to all users |
-| whereis | Locate commands |
-| uhubctl | USB hub power control |
-| zramctl | ZRAM management |
-
-### moreutils (pee, sponge, etc.)
-
-| Tool | Description |
-|------|-------------|
-| pee | Tee to pipes |
-| sponge | Soak up stdin, write to file |
-| ts | Timestamp input |
+| hardlink | Link duplicate files |
+| hexdump | Display file in hexadecimal |
 | ifdata | Get network interface info |
 | ifne | Run command if stdin not empty |
-| isutf8 | Check if file is valid UTF-8 |
-| lckdo | Execute with lock held |
-| mispipe | Pipe preserving exit status |
+| isutf8 | Check if input is valid UTF-8 |
+| lckdo | Execute a command with a lock held |
+| lsblk | List block devices |
+| lscpu | Display CPU information |
+| lsipc | IPC information |
+| lsirq | IRQ information |
+| mispipe | Pipe while preserving exit status |
+| parallel | Parallel command execution |
+| pee | Tee standard input to pipes |
+| rev | Reverse lines of a file |
+| sponge | Soak up stdin and write to file |
+| ts | Timestamp input lines |
+| uhubctl | USB hub power control |
+| wall | Write to all users |
+| whereis | Locate commands |
+| zramctl | ZRAM management |
 
 ## Usage Examples
 
