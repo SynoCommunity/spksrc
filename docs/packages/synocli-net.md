@@ -9,98 +9,34 @@ tags:
 
 # SynoCli Network Tools
 
-SynoCli Network Tools provides essential command-line networking utilities.
+The `synocli-net` package provides some network related tools to advanced Linux users.
 
-## Package Information
+!!! note
 
-| Property | Value |
-|----------|-------|
-| Package Name | synocli-net |
-| License | Various (GPL, BSD) |
+    With synocli-net >= v2.0 the fritzctl tool is not bundled anymore. The respective github project is archived and it fails to build with newer golang compilers.
 
-## Included Tools
-
-| Tool | Description |
-|------|-------------|
-| aria2c | Download utility |
-| arp-scan | ARP network scanner |
-| autossh | Automatic SSH reconnection |
-| dig / delv / mdig | DNS lookup tools |
-| etherwake | Wake-on-LAN utility |
-| gensiot | Generic socket I/O tools |
-| IMAPFilter | IMAP mail filtering |
-| links | Text-mode web browser |
-| mtr | Network diagnostic tool |
-| nmap / nping / ncat | Network scanner and netcat |
-| openssh | SSH client and server tools (ssh, scp, sftp, sshd) |
-| rsync | Fast file copying |
-| screen | Terminal multiplexer |
-| ser2net | Serial-to-network proxy |
-| socat | Multipurpose relay |
-| sshfs | Mount filesystems over SSH |
-| telnet | Telnet client |
-| tmux | Modern terminal multiplexer |
-| whois | Domain lookup |
-| xxhsum | xxHash checksum utility |
-
-## Installation
-
-1. Install SynoCli Network Tools from Package Center
-2. Tools are added to system PATH
-3. Use via SSH terminal
-
-## Usage Examples
-
-### tmux - Terminal Multiplexer
-
-```bash
-# Start new session
-tmux new -s mysession
-
-# Detach: Ctrl-b d
-# Reattach
-tmux attach -t mysession
-
-# List sessions
-tmux ls
-```
-
-### nmap - Network Scanner
-
-```bash
-# Scan local network
-nmap -sn 192.168.1.0/24
-
-# Scan specific host
-nmap -A 192.168.1.100
-```
-
-### rsync - File Synchronization
-
-```bash
-# Sync local folders
-rsync -avz /source/ /destination/
-
-# Sync to remote
-rsync -avz /local/path/ user@remote:/path/
-```
-
-### mtr - Network Diagnostics
-
-```bash
-# Trace route with statistics
-mtr google.com
-```
-
-### sshfs - Mount Remote Filesystem
-
-```bash
-# Mount remote directory
-sshfs user@remote:/path /local/mountpoint
-
-# Unmount
-fusermount -u /local/mountpoint
-```
+| Tool | Description | License |
+|------|-------------|---------|
+| [nmap (`nmap`, `ncat`, `nping`, `ndiff`)](https://nmap.org/) | Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing. | GPLv2 |
+| [netcat](https://netcat.sourceforge.net/) | Netcat is a featured networking utility which reads and writes data across network connections, using the TCP/IP protocol. | GPLv2 |
+| [tmux](http://tmux.github.io) | tmux is a terminal multiplexer; it enables a number of terminals or windows to be accessed and controlled from a single terminal. tmux is intended to be a simple, modern, BSD-licensed alternative to programs such as GNU screen. | BSD |
+| [screen](http://www.gnu.org/software/screen/) | Screen is a full-screen window manager that multiplexes a physical terminal between several processes, typically interactive shells. | GPLv2 |
+| [sshfs](https://github.com/libfuse/sshfs) | sshfs is a network filesystem client to connect to SSH servers. | GPLv2 |
+| [socat](http://www.dest-unreach.org/socat/) | socat (SOcket CAT) is a command line based utility that establishes two bidirectional byte streams and transfers data between them. Because the streams can be constructed from a large set of different types of data sinks and sources, it can be used for many different purposes. | GPLv2 |
+| [ser2net](http://ser2net.sourceforge.net/) | Serial port to network proxy. ser2net provides a way for a user to connect from a network connection to a serial port. | GPLv2 |
+| [arp-scan](https://github.com/royhills/arp-scan/wiki) | Command-line tool for system discovery and fingerprinting. It constructs and sends ARP requests to the specified IP addresses, and displays any responses that are received. For fingerprinting and resource updates the `Perl` package is required. | MIT |
+| [links](http://links.twibright.com/) | Links is a web browser running in text mode. | GPLv2 |
+| [IMAPFilter](https://github.com/lefcha/imapfilter/) | IMAPFilter is a mail filtering utility. It connects to remote mail servers using IMAP, sends searching queries to the server and processes mailboxes based on the results. It can be used to delete, copy, move, flag, etc. messages residing in mailboxes. IMAPFilter uses the Lua programming language as a configuration and extension language. | MIT |
+| [mtr](https://www.bitwizard.nl/mtr/) | `My traceroute` (mtr) combines the functionality of the 'traceroute' and 'ping' programs in a single network diagnostic tool. | GPLv2 |
+| [etherwake](https://linux.die.net/man/8/ether-wake) | Generate and transmit a Wake-On-LAN (WOL) Magic Packet. | GPL |
+| [aria2 (`aria2c`)](https://aria2.github.io/) | aria2 is a lightweight multi-protocol and multi-source command-line download utility. It supports HTTP/HTTPS, FTP, SFTP, BitTorrent and Metalink. | GPLv2 |
+| [autossh](https://www.harding.motd.ca/autossh/) | Automatically restart SSH sessions and tunnels. | BSD-style |
+| [gensio (`gensiot`, `gsh`, `gtlssh`)](https://github.com/cminyard/gensio) | gensio is a library to abstract stream I/O like serial port, TCP, telnet, UDP, SSL, IPMI SOL, etc. The package provides the `gensiot` generic serial port, `gsh` secure shell and `gtlssh` telnet tools. | GPLv2 |
+| [openssh](https://www.openssh.com/) | Open source version of SSH connectivity tools (`ssh`, `scp`, `sftp`, `sshd`). | BSD-style |
+| `telnet` and `whois` from [inetutils](https://www.gnu.org/software/inetutils/) | GNU network utilities. | GPLv3 |
+| `dig`, `mdig`, `delv` and `arpaname` from [ISC](https://www.isc.org/) | BIND (Berkeley Internet Name Domain) is a complete, highly portable implementation of the DNS (Domain Name System) protocol. | MPL 2.0 |
+| [rsync](https://rsync.samba.org/) | Rsync is a fast and extraordinarily versatile file copying tool. It can copy locally, to/from another host over any remote shell, or to/from a remote rsync daemon. It is famous for its delta-transfer algorithm, which reduces the amount of data sent over the network by sending only the differences between the source files and the existing files in the destination. | GPLv3 |
+| [xxHash (`xxhsum`)](https://xxhash.com/) | xxHash is an extremely fast non-cryptographic hash algorithm, working at RAM speed limit. It is proposed in four flavors (XXH32, XXH64, XXH3_64bits and XXH3_128bits). | 2-Clause BSD |
 
 ## Related Packages
 
