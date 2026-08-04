@@ -13,7 +13,7 @@ The `synocli-disk` package provides some disk related tools to advanced Linux us
 
 | Tool | Description | License |
 |------|-------------|---------|
-| [e2fsprogs](http://e2fsprogs.sourceforge.net/) | Ext2/3/4 filesystem userspace utilities (`e2fsck`, `mkfs.ext4`, `tune2fs`, etc.). | GPL |
+| [e2fsprogs](http://e2fsprogs.sourceforge.net/) | Ext2/Ext3/Ext4 filesystem userspace utilities (`e2fsck`, `mkfs.ext4`, `tune2fs`, etc.). | GPL |
 | [ntfs-3g / ntfsprogs](https://www.tuxera.com/community/open-source-ntfs-3g/) | Third generation read/write NTFS driver and NTFS utilities. | GPLv2 |
 | [TestDisk](https://www.cgsecurity.org/wiki/TestDisk) | TestDisk is powerful free data recovery software. | GPLv2+ |
 | [ncdu](https://dev.yorhel.nl/ncdu) | Ncdu is a disk usage analyzer with an ncurses interface, designed to find space hogs where you don't have an entire graphical setup available. | MIT |
