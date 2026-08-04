@@ -21,7 +21,7 @@ The `synocli-file` package provides some file related tools to advanced Linux us
 | [mc](https://midnight-commander.org/) | GNU Midnight Commander is a visual file manager. It allows you to copy, move and delete files and whole directory trees, search for files and run commands in the subshell. Internal viewer and editor are included. | GNU GPL |
 | [nano](https://www.nano-editor.org/) | nano is a text editor for Unix-like computing systems or operating environments using a command line interface. | GPLv2 |
 | [micro](https://micro-editor.github.io/) | micro is a modern and intuitive terminal-based text editor. | MIT |
-| [rnm](https://neurobin.org/projects/softwares/unix/rnm/) | rnm renames files/directories in bulk using a naming scheme or regex replace, powered by PCRE2. | GPLv3 |
+| [rnm](https://github.com/neurobin/rnm) | rnm renames files/directories in bulk using a naming scheme or regex replace, powered by PCRE2. | GPLv3 |
 | [file](http://www.darwinsys.com/file/) | The file command is a file type guesser, that is, a command-line tool that tells you in words what kind of data a file contains. | [license](https://github.com/file/file/blob/master/COPYING) |
 | [fzf (fuzzy finder)](https://github.com/junegunn/fzf) | A command-line fuzzy finder and interactive Unix filter that can be used with any list; files, command history, processes, hostnames, bookmarks, git commits, etc. | MIT |
 | [detox](http://detox.sourceforge.net/) | Detox cleans up filenames by replacing difficult to work with characters, such as spaces, with standard equivalents, including UTF-8 or Latin-1 (or CP-1252) characters. | BSD |
