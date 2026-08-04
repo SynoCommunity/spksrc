@@ -26,47 +26,38 @@ Cloudflared creates secure tunnels to expose your local services to the internet
 
 ## Installation
 
+### Method 1: Token-based (Simpler)
+
+1. Follow the [Cloudflare Tunnel Setup Guide](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) steps 1.1–1.5
+2. Copy the provided command (e.g. `cloudflared.exe service install <token>`)
+3. Extract only the token part (the long alphanumeric string after `install`)
+4. Install cloudflared from Package Center
+5. Paste the token when prompted during installation
+
+### Method 2: Certificate-based
+
 1. Install cloudflared from Package Center
-2. Authenticate with Cloudflare (see Configuration)
-3. Create and configure your tunnel
-
-## Configuration
-
-### Initial Authentication
-
-SSH to your NAS and run:
-
-```bash
-/var/packages/cloudflared/target/bin/cloudflared tunnel login
-```
-
-This generates a certificate at `~/.cloudflared/cert.pem`.
-
-### Create a Tunnel
-
-```bash
-/var/packages/cloudflared/target/bin/cloudflared tunnel create my-tunnel
-```
-
-### Configure the Tunnel
-
-Create `/var/packages/cloudflared/var/config.yml`:
-
-```yaml
-tunnel: <tunnel-id>
-credentials-file: /var/packages/cloudflared/var/.cloudflared/<tunnel-id>.json
-
-ingress:
-  - hostname: service.yourdomain.com
-    service: http://localhost:8080
-  - service: http_status:404
-```
-
-### DNS Configuration
-
-```bash
-/var/packages/cloudflared/target/bin/cloudflared tunnel route dns my-tunnel service.yourdomain.com
-```
+2. Authenticate with Cloudflare:
+   ```bash
+   /var/packages/cloudflared/target/bin/cloudflared tunnel login
+   ```
+3. Create a tunnel:
+   ```bash
+   /var/packages/cloudflared/target/bin/cloudflared tunnel create my-tunnel
+   ```
+4. Configure `/var/packages/cloudflared/var/config.yml`:
+   ```yaml
+   tunnel: <tunnel-id>
+   credentials-file: /var/packages/cloudflared/var/.cloudflared/<tunnel-id>.json
+   ingress:
+     - hostname: service.yourdomain.com
+       service: http://localhost:8080
+     - service: http_status:404
+   ```
+5. Configure DNS routing:
+   ```bash
+   /var/packages/cloudflared/target/bin/cloudflared tunnel route dns my-tunnel service.yourdomain.com
+   ```
 
 ## Service Management
 
@@ -78,9 +69,24 @@ ingress:
 
 ### Tunnel Not Connecting
 
-1. Verify credentials file exists
+1. Verify your Cloudflare token is correct (alphanumeric, no newlines or spaces)
 2. Check DNS routing is configured
 3. Review logs in `/var/packages/cloudflared/var/log/`
+4. Try reinstalling with **Erase all of the package data files** checked
+
+### Service Stops Unexpectedly
+
+The service may be killed by the OOM (Out of Memory) killer under low memory conditions. Options:
+
+- Monitor memory usage and disable unneeded services
+- Add a scheduled task to restart the service periodically:
+  ```bash
+  synopkg start cloudflared
+  ```
+
+### Client Shows as Outdated
+
+Cloudflare supports the previous year of cloudflared releases — the tunnel will continue working even if the version is not the latest. Updates are published when meaningful changes occur.
 
 ## Related Packages
 

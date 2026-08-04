@@ -60,7 +60,7 @@
           }
         ]
       }, {
-        "desc": "To give applications access to the Google Fonts in the shared folder, please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a>."
+        "desc": "To give applications access to the Google Fonts in the shared folder, please read <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a>."
       }
     ]
   }

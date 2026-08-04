@@ -269,7 +269,7 @@ This typically takes 1-2 hours after merge.
 
 - Check existing PRs for the same package
 - Read recent commits for patterns
-- Ask in discussions if unsure
+- Ask on Discord (`#package-dev`) if unsure
 
 ### During Development
 

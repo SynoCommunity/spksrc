@@ -3,6 +3,6 @@
     "items": [{
         "desc": "The first time Kavita is started it might take a few moments for the interface to become available!"
     }, {
-        "desc": "Before adding a library, ensure permissions are granted to the internal user <b>'sc-kavita'</b> in DSM. Refer to the <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> guide for details."
+        "desc": "Before adding a library, ensure permissions are granted to the internal user <b>'sc-kavita'</b> in DSM. Refer to the <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> guide for details."
     }]
 }]

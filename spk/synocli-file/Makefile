@@ -91,7 +91,7 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-WIKI_URL = "\<a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile\"\>FAQ SynoCliFile\</a\>"
+DOCS_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-file/\"\>SynoCli File Tools\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
@@ -117,11 +117,11 @@ CHANGELOG += "8. Update nano from v8.7 to v9.1. <br/>"
 CHANGELOG += "9. Update nnn from v5.1 to v5.2 (DSM 7+). <br/>"
 CHANGELOG += "10. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
 CHANGELOG += "11. Update tree from v2.2.1 to v2.3.2. <br/>"
-CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
+CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
 
-HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliFile
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-file/
 LICENSE  = Each tool is licensed under it's respective license.
 
 SPK_COMMANDS  = bin/less libexec/lessecho bin/lesskey

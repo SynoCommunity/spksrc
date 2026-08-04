@@ -22,19 +22,37 @@ SynoCli File Tools provides essential file management utilities for the command 
 
 | Tool | Description |
 |------|-------------|
-| mc | Midnight Commander file manager |
-| tree | Directory tree viewer |
-| ncdu | NCurses disk usage analyzer |
-| less | Pager for viewing files |
-| file | File type identification |
-| fdupes | Duplicate file finder |
-| jq | JSON processor |
-| rmlint | Duplicate and lint finder |
-| rename | Batch file renaming |
+| bat | Cat clone with syntax highlighting |
 | detox | Filename cleanup |
-| nano | Text editor (optional) |
+| dos2unix | Convert line endings |
+| eza | Modern `ls` replacement |
+| fd | Simple, fast alternative to `find` |
+| fdupes | Duplicate file finder |
+| file | File type identification |
+| fzf | Command-line fuzzy finder |
+| iconv | Character set conversion |
+| jdupes | Duplicate file finder |
+| jupp | Joe's Own Editor (jmacs, joe, jpico, jstar) |
+| less | Pager for viewing files |
+| lsd | Modern `ls` replacement |
+| lzip / plzip | Lossless data compressor (parallel) |
+| mc | Midnight Commander file manager |
+| mg | Micro (GNU) emacs-like text editor |
+| micro | Modern terminal text editor |
+| nano | Text editor |
+| nnn | Terminal file manager |
+| patch | Apply patches to files |
+| pcre2grep / pcre2test | PCRE2 grep and test tools |
+| pigz | Parallel `gzip` |
+| pixz | Parallel, indexing `xz` |
+| rg (ripgrep) | Line-oriented recursive search |
+| rhash | Hash computing/verifying utility |
+| rmlint | Duplicate and lint finder |
+| rnm | Batch file renamer (regex) |
+| sd | Intuitive `sed` alternative |
+| tree | Directory tree viewer |
+| xstow | Symlink farm manager |
 | zstd | Zstandard compression |
-| lz4 | LZ4 compression |
 
 ## Usage Examples
 
@@ -46,32 +64,6 @@ mc
 
 # Use F keys for operations
 # F5: Copy, F6: Move, F8: Delete, F10: Exit
-```
-
-### ncdu - Disk Usage Analyzer
-
-```bash
-# Analyze current directory
-ncdu
-
-# Analyze specific path
-ncdu /volume1/data
-
-# Export results
-ncdu -o report.json /volume1/
-```
-
-### jq - JSON Processing
-
-```bash
-# Pretty print JSON
-cat data.json | jq .
-
-# Extract specific field
-cat data.json | jq '.items[].name'
-
-# Filter results
-jq '.[] | select(.status == "active")' data.json
 ```
 
 ### fdupes - Find Duplicates

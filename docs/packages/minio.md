@@ -23,8 +23,15 @@ MinIO is a high-performance, S3 compatible object storage solution.
 ## Installation
 
 1. Install MinIO from Package Center
-2. The wizard will ask for data share location
-3. Access web console at `http://your-nas:9001`
+2. The wizard will ask for a shared folder for data storage
+
+   ![Creating the shared folder](../assets/images/minio-shared-folder.png)
+
+3. Configure permissions for the `sc-minio` user
+
+   ![Setting folder permissions](../assets/images/minio-permissions.png)
+
+4. Access web console at `http://your-nas:9001`
 
 ## Configuration
 
