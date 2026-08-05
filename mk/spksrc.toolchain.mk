@@ -178,6 +178,7 @@ include ../../mk/spksrc.build/patch.mk
 
 rustc: patch
 include ../../mk/spksrc.toolchain/tc-rust.mk
+include ../../mk/spksrc.toolchain/rustc.mk
 
 include ../../mk/spksrc.toolchain/tc_vars.mk
 

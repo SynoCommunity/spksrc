@@ -5,31 +5,8 @@
 #
 ###############################################################################
 
-RUSTUP_QORIQ_TOOLCHAIN = 1.82.0
-
-ifeq ($(RUSTUP_DEFAULT_TOOLCHAIN),)
-RUSTUP_DEFAULT_TOOLCHAIN = stable
-endif
-
-# Set to 1 to force building from
-# source Tier-3 toolchains (qoriq)
-# ref: https://rustc-dev-guide.rust-lang.org/building/how-to-build-and-run.html
-ifeq ($(RUST_BUILD_TOOLCHAIN),)
-RUST_BUILD_TOOLCHAIN = 0
-endif
-
-# Versions available: https://releases.rs/docs/
-ifeq ($(RUST_BUILD_VERSION),)
-RUST_BUILD_VERSION = $(RUSTUP_QORIQ_TOOLCHAIN)
-endif
-
-# Enforce using newer cmake when building Tier-3 toolchains
-ifeq ($(RUST_BUILD_TOOLCHAIN),1)
-DEPENDS += native/cmake
-CMAKE_PATH = $(abspath $(WORK_DIR)/../../../native/cmake/work-native/install/usr/local/bin)
-ifeq ($(findstring cmake,$(subst /,,$(subst :,,$(PATH)))),)
-export PATH:=$(CMAKE_PATH):$(PATH)
-endif
+ifeq ($(TC_RUSTC),)
+TC_RUSTC = stable
 endif
 
 # When calling directly from toolchain/syno-<arch>-<version>
@@ -42,34 +19,52 @@ endif
 # When building toolchain Tier-3 arch support
 #   While stage-2 is the truly current compiler, stage-1 suffice our needs
 #   https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html#stage-2-the-truly-current-compiler
-RUSTUP_DEFAULT_TOOLCHAIN_STAGE = 2
+TC_RUSTC_STAGE = 2
 
-# map archs to rust targets
+# map archs to rust targets -- only as a fallback: a toolchain building rustc from
+# source declares RUST_TARGET itself (single source of truth, no drift between the
+# toolchain build and the package build that consumes it).
+ifeq ($(strip $(RUST_TARGET)),)
 ifeq ($(findstring $(RUST_ARCH), $(ARMv5_ARCHS)),$(RUST_ARCH))
-RUSTUP_DEFAULT_TOOLCHAIN = 1.77.2
 RUST_TARGET = armv5te-unknown-linux-gnueabi
 endif
+
 ifeq ($(findstring $(RUST_ARCH), $(ARMv7_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = armv7-unknown-linux-gnueabihf
 endif
+
 ifeq ($(findstring $(RUST_ARCH), $(ARMv7L_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = armv7-unknown-linux-gnueabi
 endif
+
 ifeq ($(findstring $(RUST_ARCH), $(ARMv8_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = aarch64-unknown-linux-gnu
 endif
+
 ifeq ($(findstring $(RUST_ARCH), $(PPC_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = powerpc-unknown-linux-gnuspe
-TC_RUSTUP_TOOLCHAIN = stable-$(RUSTUP_QORIQ_TOOLCHAIN)-$(RUST_TARGET)
 endif
+
 ifeq ($(findstring $(RUST_ARCH), $(x64_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = x86_64-unknown-linux-gnu
 endif
+
 ifeq ($(findstring $(RUST_ARCH), $(i686_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = i686-unknown-linux-gnu
+endif
 endif
 
 # By default use the default toolchain if unset
 ifeq ($(TC_RUSTUP_TOOLCHAIN),)
-TC_RUSTUP_TOOLCHAIN = $(RUSTUP_DEFAULT_TOOLCHAIN)
+TC_RUSTUP_TOOLCHAIN = $(TC_RUSTC)
 endif
+
+# Absolute path of the rustup toolchain dir, used to locate rustc/cargo. A rustup-
+# INSTALLED channel (standard archs, where TC_RUSTUP_TOOLCHAIN = TC_RUSTC = 'stable'
+# or a pinned version) lands under a -<host> suffix; a `rustup toolchain link`ed
+# custom toolchain (TC_RUSTUP_TOOLCHAIN = _RUST_TC_ID, which differs from TC_RUSTC)
+# keeps its exact name.
+RUST_TOOLCHAIN_DIR = $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)$(if $(filter $(TC_RUSTC),$(TC_RUSTUP_TOOLCHAIN)),-x86_64-unknown-linux-gnu)
+
+# RUST_TARGET as a CARGO_TARGET_<triple>_* env suffix: upper-case, - -> _.
+RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
