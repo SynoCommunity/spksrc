@@ -47,7 +47,7 @@
                         "key": "wizard_edge_ip_version",
                         "desc": "Cloudflare Edge IP address version to connect with",
                         "editable": false,
-                        "defaultValue": "4",
+                        "defaultValue": "auto",
                         "store": [ "4", "6", "auto" ],
                         "validator": {
                             "allowBlank": false
