@@ -210,11 +210,67 @@ distrib/
 
 ### View Build Logs
 
-Build output is visible during the build. For detailed logs:
+You do not need to pipe anything: every build already writes a log. The build
+output you see on screen is teed to a log file at the same time, so there is
+always a file to go back to after a failure.
+
+**Logs land in the directory you started the build from.** That directory is the
+"initial directory", and *all dependencies aggregate their output into it* — build
+`spk/tvheadend` and the cross libraries and native tools it pulls in log there
+too, not in their own directories. This is deliberate: one build, one place to
+look.
 
 ```bash
-# Enable verbose mode
-make V=1 ARCH=x64 TCVERSION=7.2 2>&1 | tee build.log
+make -C spk/tvheadend arch-x64-7.2
+ls spk/tvheadend/*.log          # everything about that build is here
+```
+
+Only the outermost build wraps itself in logging; nested dependency builds are
+captured into that same log rather than opening their own.
+
+#### Log file per kind of package
+
+The file name says what was built, and *for what*:
+
+| You build | Log file | Meaning |
+|-----------|----------|---------|
+| `cross/`, `spk/`, `diyspk/` | `build-<arch>-<tcversion>.log` | built **for** that architecture |
+| `toolchain/` | `build-<arch>-<tcversion>.log` | the toolchain for that architecture |
+| `kernel/` | `build-<arch>-<kernelversion>.log` | that kernel |
+| `native/` | `build-native.log` | a host tool — runs on the **build host** |
+
+Plus `status-build.log` in the same directory: one line per stage with a
+timestamp, the parallel-build setting, an `ARCH:` column and the package name —
+handy to see what ran, in what order, and what failed.
+
+#### Advanced: a native package that targets an architecture
+
+A few `native/` packages are parametrized by `(arch, DSM version)` — for example
+`native/gcc8`, which rebuilds gcc as a cross-compiler for one Synology toolchain,
+and its co-built `native/binutils-*`. They get one work directory per target,
+`work-<arch>-<tcversion>`, and one log per target:
+
+```
+build-native-<arch>-<tcversion>.log     e.g. build-native-avoton-6.2.4.log
+```
+
+The `build-native` prefix is what matters here. Such a package still **runs on the
+host** — it only *targets* that architecture, it is not built to run on it — so its
+log must not be mistaken for a `cross/` log of the same arch. Compare:
+
+```
+toolchain/syno-avoton-6.2.4/build-avoton-6.2.4.log         # built FOR avoton
+native/gcc8/build-native-avoton-6.2.4.log                  # runs on the host, targets avoton
+```
+
+This is an atypical case; a normal `native/` package has no target and stays on
+plain `build-native.log`. The `ARCH:` column in `status-build.log` still reports
+the target (`avoton-6.2.4`), since that is what identifies the build.
+
+#### Verbose output
+
+```bash
+make V=1 ARCH=x64 TCVERSION=7.2
 ```
 
 ### Build Individual Stages

@@ -189,6 +189,7 @@ endif
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "CC" ] ; then \
 	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
@@ -209,6 +210,7 @@ endif
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "CC" ] ; then \
 	    printf "set(%-35s %s)\n" CMAKE_C_COMPILER_FOR_BUILD $$(which $${source}) ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
@@ -279,9 +281,12 @@ tc_meson_cross_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
-	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
+	    echo "# meson's 'cpp' is the C++ compiler; our TOOLS 'cpp' is the C" ; \
+	    echo "# preprocessor -- hence g++ here, plus the overlay suffix if any." ; \
+	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++$(TC_GCC_SUFFIX)'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
 	    echo "fortran = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
@@ -305,6 +310,7 @@ tc_meson_native_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  if [ "$${target}" = "cc" ]; then \
 	    echo "c = '$$(which $${source})'" ; \
 	    echo "$${target} = '$$(which $${source})'" ; \
@@ -333,6 +339,63 @@ tc_rust_vars:
 	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
 	echo RUST_TARGET := $(RUST_TARGET)
 
+# Which gcc a build uses. An overlay (toolchain/syno-<arch>-<vers>-gcc8) installs
+# <prefix>gcc-8.5 + <prefix>g++-8.5 beside the stock gcc; TC_GCC_SUFFIX is the
+# -<ver> appended to the gcc-family tools (cc/cxx/cpp/fc) below, empty for stock.
+#
+# LEGACY_TOOLCHAIN decides, and defaults to 1: an installed overlay stays
+# INACTIVE, so deploying one changes no existing package's compiler.
+#
+#   LEGACY_TOOLCHAIN = 1   the toolchain's stock gcc, always -- TC_GCC_VERSION is
+#                          not even looked at (default)
+#   LEGACY_TOOLCHAIN = 0   the newest gcc this toolchain has
+#   + TC_GCC_VERSION = 8.5 exactly that gcc, or a hard error
+#
+# 'newest' is per arch and needs no special-casing: qoriq ends at gcc 8.5 (PowerPC
+# SPE was dropped in gcc 9) while others may reach further, so one fleet-wide
+# LEGACY_TOOLCHAIN = 0 gives each arch the best it actually has. A toolchain with
+# no overlay at all stays on its stock gcc.
+#
+# TC_GCC_VERSION is a pin, not a preference: it fails rather than silently
+# building with a different compiler than the one asked for.
+#
+#   cross/foo/Makefile   LEGACY_TOOLCHAIN = 0     per package
+#   local.mk             LEGACY_TOOLCHAIN ?= 0    fleet-wide. '?=' matters: local.mk
+#                                                 is read after a package's own
+#                                                 assignments, so '=' would silently
+#                                                 override every package.
+#   command line         make LEGACY_TOOLCHAIN=0 ...
+#
+# Both are booleans/values a package may set per arch, after including the
+# framework, where ARCH is known:
+#
+#   ifeq ($(ARCH),qoriq)
+#   LEGACY_TOOLCHAIN = 1
+#   else
+#   LEGACY_TOOLCHAIN = 0
+#   TC_GCC_VERSION = 8.5
+#   endif
+#
+# Both are forwarded to this generation by cross-cc.mk / native-cc.mk / kernel.mk.
+LEGACY_TOOLCHAIN ?= 1
+
+ifeq ($(filter 1 on ON,$(strip $(LEGACY_TOOLCHAIN))),)
+_TC_GCC_BIN       := $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
+_TC_GCC_VERSIONED := $(patsubst $(_TC_GCC_BIN)gcc-%,%,$(wildcard $(_TC_GCC_BIN)gcc-[0-9]*))
+# The stock gcc's own versioned alias has no matching versioned g++, so pairing
+# keeps a plain toolchain unaffected and only ever selects a real overlay.
+_TC_GCC_PAIRED    := $(foreach v,$(_TC_GCC_VERSIONED),$(if $(wildcard $(_TC_GCC_BIN)g++-$(v)),$(v)))
+ifeq ($(strip $(TC_GCC_VERSION)),)
+TC_GCC_SUFFIX     := $(if $(_TC_GCC_PAIRED),-$(call version_max,$(_TC_GCC_PAIRED)))
+else ifeq ($(filter $(strip $(TC_GCC_VERSION)),$(_TC_GCC_PAIRED)),)
+$(error TC_GCC_VERSION=$(strip $(TC_GCC_VERSION)) requested for $(TC_ARCH)-$(TC_VERS), but that toolchain provides: $(or $(strip $(_TC_GCC_PAIRED)),no gcc overlay at all))
+else
+TC_GCC_SUFFIX     := -$(strip $(TC_GCC_VERSION))
+endif
+else
+TC_GCC_SUFFIX     :=
+endif
+
 .PHONY: tc_autotools_vars
 tc_autotools_vars:
 	@echo TC_CONFIGURE_ARGS := --host=$(TC_TARGET) --build=i686-pc-linux ; \
@@ -341,6 +404,7 @@ tc_autotools_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  case "$${source}" in gcc|g++|cpp|gfortran) source="$${source}$(TC_GCC_SUFFIX)" ;; esac ; \
 	  echo TC_ENV += $${target}=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
 	done ; \
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
@@ -383,6 +447,7 @@ tc_vars:
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
 	echo TC_ARCH := $(TC_ARCH) ; \
 	echo TC_GCC := $(TC_GCC) ; \
+	echo TC_GCC_SUFFIX := $(TC_GCC_SUFFIX) ; \
 	echo TC_GLIBC := $(TC_GLIBC)
 # TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
 # Add "+" to EXTRAVERSION for kernels version >= 4.4

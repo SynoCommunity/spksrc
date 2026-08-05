@@ -69,7 +69,12 @@ endif
 # find -latomic"). Availability is the exact criterion, not a proxy: a gcc old
 # enough to lack libatomic also predates the __atomic_* builtins, emits __sync_*
 # instead, and so never needs the library. One question answers both.
-TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
+#
+# Probe the selected compiler ($(TC_GCC_SUFFIX)), not the bare stock gcc: a gcc8
+# overlay on an ARMv5/PowerPC arch emits the __atomic_* calls and ships the library,
+# while the stock gcc beside it (4.6.4 there) predates both -- asking the stock gcc
+# would wrongly drop -latomic and leave the overlay build's __atomic_*_8 unresolved.
+TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc$(TC_GCC_SUFFIX) -print-file-name=libatomic.so 2>/dev/null)),1)
 
 # TC_EXTRA_LDFLAGS carries the ABI to the link and adds what a toolchain declares
 # for the linker. The ABI (TC_EXTRA_BUILD_FLAGS -- the -march/-mcpu/... flags folded
@@ -131,6 +136,31 @@ FFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 FFLAGS += $(TC_EXTRA_FFLAGS)
 endif
 
+# Nothing is passed here to tell the overlay where its sysroot is: gcc-8.5 is built
+# with a sysroot under its own prefix (native/gcc8), which is what makes GCC treat it
+# as relocatable -- the driver recomputes the prefix from where the binary actually
+# is and rebases the sysroot onto it, so the compiler finds the base toolchain's
+# headers and crt*.o on any machine, unaided.
+#
+# Passing it as a --sysroot flag instead was tried and is NOT equivalent: libtool
+# rebuilds the link command from the flags it recognises and drops --sysroot -- the
+# same way it drops the ABI flags -- so every libtool package linked without one and
+# failed on a missing crt1.o. Where the compiler finds its sysroot has to be a
+# property of the compiler, not of the flags a build system chooses to forward.
+
+# When a gcc overlay is selected, its libstdc++ lives in lib/gcc/<target>/<ver>/,
+# outside the sysroot -L below -- and ld searches an explicit -L before the
+# compiler's own dirs, so without this any C++ link silently picks the STOCK
+# libstdc++ and dies on the newer compiler's symbols (std::__cxx11::basic_string,
+# sized operator delete). A C program linking a C++ shared library resolves that
+# lib's NEEDED libstdc++ transitively via --rpath-link, not -L, so the overlay dir
+# goes on both, ahead of the sysroot. Only when an overlay is actually selected
+# (TC_GCC_SUFFIX non-empty); lazy, as TC_GCC_SUFFIX is defined later in tc_vars.mk.
+# patsubst not $(if) for the rpath-link flag, whose commas $(if) would read as
+# argument separators (_tc_comma is defined above).
+TC_OVERLAY_LIBDIR = $(if $(strip $(TC_GCC_SUFFIX)),$(dir $(firstword $(wildcard $(TC_WORK_DIR)/$(TC_TARGET)/lib/gcc/$(TC_TARGET)/*/libstdc++.a))))
+LDFLAGS += $(if $(TC_OVERLAY_LIBDIR),-L$(TC_OVERLAY_LIBDIR))
+LDFLAGS += $(patsubst %,-Wl$(_tc_comma)--rpath-link$(_tc_comma)%,$(TC_OVERLAY_LIBDIR))
 LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY))
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath-link,$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)

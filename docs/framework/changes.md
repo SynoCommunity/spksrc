@@ -102,6 +102,35 @@ If you only read one thing, read this. The details are in the dated log below.
       overlays reuse it in #7324.
     - Pull request: [#7327](https://github.com/SynoCommunity/spksrc/pull/7327)
 
+??? note "July 2026 — Patching is idempotent and never prompts (#7324)"
+    - **What:** the `patch` step now tests each patch with
+      `patch -R --fuzz=0 --dry-run` first: a patch that reverse-applies cleanly
+      (an EXACT match, no fuzz) is already present and is **skipped with a loud
+      warning**, otherwise it is applied with `--batch --forward` so it can never
+      stop to ask a question.
+    - **Why:** `patch_target` is guarded by a cookie in `WORK_DIR`, but `WORK_DIR`
+      is propagated into a dependency's sub-make, so the same tree can legitimately
+      reach the patch step twice — a toolchain resolved by two packages, or the
+      gcc8 overlay whose `tcvars` depends on the patched base tree. On the second
+      pass GNU patch found the patch already applied and asked *"Reversed (or
+      previously applied) patch detected!  Assume -R? [n]"* — an interactive prompt
+      that reads EOF under CI (or the `script` log wrapper) and **hung the build
+      forever**, so the whole architecture burned its time budget having built
+      nothing. Patching an already-patched tree is now a safe no-op. A package that
+      overrides `PATCH_TARGET` (or sets it to `nop`) is unaffected.
+    - **`--fuzz=0` is load-bearing:** the first version of this check used GNU
+      patch's default fuzz (2), which lets a hunk match on surrounding context
+      alone. A patch made mostly of deleted lines — `cross/bzip2`'s, which strips
+      the upstream Makefile's hardcoded `CC=gcc` — reverse-applied "successfully"
+      against a tree that had **never** been patched, a false positive that
+      silently skipped the real patch: bzip2 built with `CC=gcc`, resolving to the
+      CI runner's own compiler instead of the cross one, producing object code the
+      toolchain's linker rejected. Reproduced directly against a pristine
+      bzip2-1.0.8 tree: `patch -R -f --dry-run` exits 0 ("Hunk #1 succeeded ...
+      with fuzz 2"); the same command with `--fuzz=0` exits 1, and still exits 0
+      once the patch is genuinely applied.
+    - Pull request: [#7324](https://github.com/SynoCommunity/spksrc/pull/7324)
+
 ??? note "July 23rd 2026 — Carry the runtime library the binary asks for, by symbol version (#7322)"
     - **What:** the strip step copies the runtime libraries DSM does not ship
       (`libatomic`, `libquadmath`, `libgfortran` -- the `TC_LIBS_DEFAULT` list) from

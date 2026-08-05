@@ -91,12 +91,12 @@ endif
 	@set -e; \
 	for depend in $(NATIVE_DEPENDS); \
 	do \
-	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) $(MAKE) -C ../../$$depend ; \
+	  env $(ENV) WORK_DIR=$(WORK_DIR) INSTALL_PREFIX=$(INSTALL_PREFIX) LEGACY_TOOLCHAIN=$(LEGACY_TOOLCHAIN) TC_GCC_VERSION=$(TC_GCC_VERSION) $(MAKE) -C ../../$$depend ; \
 	done
 	@set -e; \
 	for depend in $(filter-out native/% spk/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do \
-	  env $(ENV) $(MAKE) -C ../../$$depend ; \
+	  env $(ENV) LEGACY_TOOLCHAIN=$(LEGACY_TOOLCHAIN) TC_GCC_VERSION=$(TC_GCC_VERSION) $(MAKE) -C ../../$$depend ; \
 	done
 	
 post_depend_target: $(DEPEND_TARGET)

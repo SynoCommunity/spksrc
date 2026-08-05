@@ -216,6 +216,15 @@ local.mk:
 	@echo "DISABLE_GITHUB_MAINTAINER =" >> $@
 	@echo "PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
+	@echo "# Which gcc to build with, fleet-wide. 1 (the default) keeps each toolchain's" >> $@
+	@echo "# stock compiler, so an installed gcc overlay stays inactive. 0 uses the newest" >> $@
+	@echo "# gcc each toolchain has -- per arch, so qoriq gets 8.5 where others may reach" >> $@
+	@echo "# further. Keep the '?=' -- local.mk is read after a package's own assignments," >> $@
+	@echo "# so '=' would override every package." >> $@
+	@echo "#LEGACY_TOOLCHAIN ?= 0" >> $@
+	@echo "# Pin one exact gcc instead of the newest (only when LEGACY_TOOLCHAIN = 0)." >> $@
+	@echo "# Fails rather than silently building with a different compiler." >> $@
+	@echo "#TC_GCC_VERSION ?= 8.5" >> $@
 
 dsm-%: local.mk
 	@echo "Setting default toolchain version to DSM-$*"
