@@ -159,6 +159,11 @@ service_postinst()
             # Enable API feature
             ln -sf ../features-available/api.conf "${SYNOPKG_PKGVAR}/etc/icinga2/features-enabled/api.conf"
 
+            # Harden the API: require the 'filter-expression' permission for
+            # API users using DSL filter expressions (default from v2.17)
+            cp "${TEMPLATES_DIR}/api.conf" "${SYNOPKG_PKGVAR}/etc/icinga2/features-available/api.conf"
+            chmod 640 "${SYNOPKG_PKGVAR}/etc/icinga2/features-available/api.conf"
+
             # Enable IDO-MySQL feature
             configure_ido_mysql
 
