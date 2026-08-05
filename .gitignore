@@ -53,3 +53,6 @@ local.mk
 # IDEs
 .idea/
 .vscode/
+
+# native toolchain archives (release assets, uploaded not committed)
+native/*/*.txz
