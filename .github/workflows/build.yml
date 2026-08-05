@@ -281,7 +281,10 @@ jobs:
           add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
-          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
+          # TEMP (revert before merge): activate DSM 5.2 so the from-source rust
+          # end-to-end test runs -- ppc853x-5.2 downloads its rust .txz and builds
+          # python311/cryptography through the binutils 2.30 rust-link overlay.
+          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'true' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
