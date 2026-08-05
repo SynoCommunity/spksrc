@@ -119,3 +119,9 @@ Verify the IDO database feature is enabled and the IDO credentials match:
 
 - Confirm the master hostname/port (5665) are reachable and the master's firewall allows inbound connections
 - Confirm the Self-Service API key is correct and the agent host was removed from Director before re-install
+- Directly after agent installation, the agent log may repeat `Unknown endpoint ... Aborting JSON-RPC connection` for up to ~15 minutes. This is expected: the agent retries every ~10 s until the Director's periodic config-sync job (default 900 s) deploys the agent's endpoint/zone objects on the master. No action needed.
+
+### Log warnings that are expected
+
+- `Failed to adjust resource limit ... Operation not permitted` - DSM does not allow the service to raise its resource limits.
+- `Apply rule ... does not match anywhere!` - sample notification rules (master) and the Director `disk`/`load`/`procs`/`swap`/`icinga` apply rules (agent) only match once services or notifications are configured.
