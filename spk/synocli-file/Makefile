@@ -1,5 +1,5 @@
 SPK_NAME = synocli-file
-SPK_VERS = 4.0.2
+SPK_VERS = 4.0.3
 SPK_REV = 30
 SPK_ICON = src/synocli-file.png
 
@@ -33,6 +33,7 @@ OPTIONAL_DEPENDS += cross/bat
 OPTIONAL_DEPENDS += cross/eza
 OPTIONAL_DEPENDS += cross/nnn
 OPTIONAL_DEPENDS += cross/lsd
+OPTIONAL_DEPENDS += cross/ms-edit
 OPTIONAL_DEPENDS += cross/xstow
 
 MAINTAINER = hgy59
@@ -80,6 +81,9 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
 
 DEPENDS += cross/lsd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
+
+DEPENDS += cross/ms-edit
+OPTIONAL_DESC := $(OPTIONAL_DESC)", edit (MS Editor)"
 endif
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
@@ -106,17 +110,18 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
 
-CHANGELOG  = "1. Update dos2unix from v7.5.3 to v7.5.6. <br/>"
-CHANGELOG += "2. Update fd from v10.3.0 to v10.4.2 (except qoriq arch). <br/>"
-CHANGELOG += "3. Update file from v5.46 to v5.48 (fixes ppc archs). <br/>"
-CHANGELOG += "4. Update fzf from v0.67.0 to v0.73.1. <br/>"
-CHANGELOG += "5. Update less from v685 to v704. <br/>"
-CHANGELOG += "6. Update lzip from 1.25 to v1.26 and plzip from v1.12 to v1.13. <br/>"
-CHANGELOG += "7. Update micro from v2.0.14 to v2.0.15. <br/>"
-CHANGELOG += "8. Update nano from v8.7 to v9.1. <br/>"
-CHANGELOG += "9. Update nnn from v5.1 to v5.2 (DSM 7+). <br/>"
-CHANGELOG += "10. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
-CHANGELOG += "11. Update tree from v2.2.1 to v2.3.2. <br/>"
+CHANGELOG  = "1. Add Microsoft Edit v2.0.0. <br/>"
+CHANGELOG += "2. Update dos2unix from v7.5.3 to v7.5.6. <br/>"
+CHANGELOG += "3. Update fd from v10.3.0 to v10.4.2 (except qoriq arch). <br/>"
+CHANGELOG += "4. Update file from v5.46 to v5.48 (fixes ppc archs). <br/>"
+CHANGELOG += "5. Update fzf from v0.67.0 to v0.73.1. <br/>"
+CHANGELOG += "6. Update less from v685 to v704. <br/>"
+CHANGELOG += "7. Update lzip from 1.25 to v1.26 and plzip from v1.12 to v1.13. <br/>"
+CHANGELOG += "8. Update micro from v2.0.14 to v2.0.15. <br/>"
+CHANGELOG += "9. Update nano from v8.7 to v9.1. <br/>"
+CHANGELOG += "10. Update nnn from v5.1 to v5.2 (DSM 7+). <br/>"
+CHANGELOG += "11. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
+CHANGELOG += "12. Update tree from v2.2.1 to v2.3.2. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
@@ -147,6 +152,7 @@ SPK_COMMANDS += bin/mg
 SPK_COMMANDS += bin/bat
 SPK_COMMANDS += bin/eza
 SPK_COMMANDS += bin/lsd
+SPK_COMMANDS += bin/edit
 SPK_COMMANDS += bin/jmacs bin/joe bin/jpico bin/jstar bin/jupp bin/rjoe
 SPK_COMMANDS += bin/nnn
 SPK_COMMANDS += bin/iconv

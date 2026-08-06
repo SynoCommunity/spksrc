@@ -56,6 +56,7 @@ SynoCli File Tools provides essential file related utilities for the command lin
 | Tool | Description | License |
 |------|-------------|---------|
 | [bat](https://github.com/sharkdp/bat#readme) | A cat(1) clone with syntax highlighting and Git integration. | MIT or Apache 2.0 |
+| [edit](https://github.com/microsoft/edit/) | Microsoft Edit - A simple editor for simple needs. <br/> This editor pays homage to the classic MS-DOS Editor, but with a modern interface and input controls similar to VS Code. The goal is to provide an accessible editor that even users largely unfamiliar with terminals can easily use. | MIT |
 | [eza](https://eza.rocks/) | A modern, maintained replacement for `ls`, written in rust. | MIT | 
 | [fd](https://github.com/sharkdp/fd#readme) (fd-file) | `fd` is a program to find entries in your filesystem. It is a simple, fast and user-friendly alternative to `find`. While it does not aim to support all of find's powerful functionality, it provides sensible (opinionated) defaults for a majority of use cases. | Apache 2 / MIT |
 | [lsd](https://github.com/lsd-rs/lsd#readme) (LSDeluxe) | The next gen `ls` command. | Apache 2.0 |
