@@ -31,6 +31,7 @@ WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
 SERVICE_SETUP = src/service-setup.sh
+POST_SERVICE_TARGET = $(SPK_NAME)_extra_install
 
 OPTIONAL_DEPENDS  = python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
@@ -195,3 +196,8 @@ DEPENDS += python/scipy
 endif
 
 include ../../mk/spksrc.spk-meta.mk
+
+.PHONY: $(SPK_NAME)_extra_install
+$(SPK_NAME)_extra_install:
+	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
+	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup
