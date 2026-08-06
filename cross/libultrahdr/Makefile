@@ -9,7 +9,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 DEPENDS = cross/libjpeg
 
 # Requires C++ compiler, supporting at least C++17.
-REQUIRED_MIN_DSM = 7.0
 # C++17 support is only complete in gcc 7 or newer.
 MIN_GCC_VERSION = 7
 

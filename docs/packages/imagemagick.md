@@ -18,31 +18,40 @@ ImageMagick is a software suite to create, edit, compose, or convert bitmap imag
 | Package Name | imagemagick |
 | Upstream | [imagemagick.org](https://imagemagick.org/) |
 | License | [ImageMagick License](https://imagemagick.org/script/license.php) |
-| Default Port | None (CLI tools) |
+
+## DSM's Built-in ImageMagick
+
+DSM ships with an older ImageMagick 6.x pre-installed. Its `compare`, `composite`, `convert`, `identify`, and `montage` commands take priority in the PATH, so running those names executes the DSM version instead of this package's ImageMagick 7 tools.
+
+To use this package's ImageMagick tools:
+
+- Run `magick` with the legacy name as a subcommand, e.g. `magick convert`, `magick identify`, or `magick montage`.
+- Or invoke the full path, e.g. `/var/packages/imagemagick/target/bin/convert`.
 
 ## Included Tools
+
+### ImageMagick tools
 
 | Tool | Description |
 |------|-------------|
 | `magick` | The main ImageMagick 7 command |
+| `mogrify` | Resize, blur, crop, and otherwise modify images in place |
 | `convert` | Convert between image formats (deprecated wrapper) |
 | `identify` | Describe image format and characteristics |
-| `mogrify` | Resize, blur, crop, and otherwise modify images in place |
 | `montage` | Create a composite image from several images |
 | `compare` | Mathematically compare images |
 | `composite` | Overlay one image on another |
+
+### Additional image compression tools
+
+These tools are not part of ImageMagick and are bundled separately with this package.
+
+| Tool | Description |
+|------|-------------|
 | `jpegoptim` | Optimize/compress JPEG files |
 | `optipng` | PNG optimizer that recompresses without losing information |
 | `pngcrush` | Optimize PNG files |
 | `pngquant` | Lossy compression of PNG images |
-
-## Features
-
-- Support for 200+ image formats (including RAW, OpenEXR, SVG, JPEG XL, UHDR/HEIC)
-- Built-in fonts and text rendering
-- Image resizing, cropping, rotating, and filtering
-- Color management (ICC profiles)
-- Batch processing via the command line
 
 ## Usage Examples
 
@@ -61,7 +70,7 @@ magick input.jpg -resize 800x600 output.jpg
 ### Get image information
 
 ```bash
-identify input.jpg
+magick identify input.jpg
 ```
 
 ### Optimize a JPEG
@@ -86,7 +95,3 @@ pngquant --quality=65-80 photo.png
 
 - Configuration: none (command-line tools)
 - Executables: `/var/packages/imagemagick/target/bin/`
-
-## Related Packages
-
-- [SynoCli File Tools](synocli-file.md) - File utilities
