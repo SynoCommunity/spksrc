@@ -119,6 +119,8 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Development"><td>18888</td><td>Demo Service</td><td>Development</td><td>Demo</td></tr>
     <tr data-category="Development"><td>18889</td><td>Demo Web Service</td><td>Development</td><td>Demo</td></tr>
     <tr data-category="Monitoring"><td>19999</td><td>Netdata</td><td>Monitoring</td><td>Dashboard</td></tr>
+    <tr data-category="Sync"><td>21027</td><td>Syncthing</td><td>Sync</td><td>Local discovery</td></tr>
+    <tr data-category="Sync"><td>22000</td><td>Syncthing</td><td>Sync</td><td>BEP (sync)</td></tr>
     <tr data-category="Backup"><td>51515</td><td>Kopia</td><td>Backup</td><td>Web interface</td></tr>
 
   </tbody>

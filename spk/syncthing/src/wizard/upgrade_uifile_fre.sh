@@ -49,7 +49,7 @@ PAGE_PERMISSIONS=$(/bin/cat<<EOF
     },{
         "desc": "<b>Personnalisation</b>"
     },{
-        "desc": "Pour une personnalisation avancée, vous pouvez modifier le fichier <code>/var/packages/syncthing/var/options.conf</code>. Par exemple, vous pouvez définir un dossier <code>HOME</code> personnalisé ou des paramètres supplémentaires pour démarrer Syncthing. <br/>Pour modifier le fichier options, vous avez besoin d'un accès <code>SSH</code> avec un utilisateur privilégié. Pour appliquer vos modifications, vous devez redémarrer Syncthing dans le Centre de Paquets."
+        "desc": "Pour une personnalisation avancée, vous pouvez modifier le fichier <code style=\"user-select: all\">/var/packages/syncthing/var/options.conf</code>. Par exemple, vous pouvez définir un dossier <code>HOME</code> personnalisé ou des paramètres supplémentaires pour démarrer Syncthing. <br/>Pour modifier le fichier options, vous avez besoin d'un accès <code>SSH</code> avec un utilisateur privilégié. Pour appliquer vos modifications, vous devez redémarrer Syncthing dans le Centre de Paquets."
     },{
         "desc": "<b>Cette mise à jour ne modifie pas votre fichier <code>options.conf</code> existant. Veuillez trouver des exemples supplémentaires dans le fichier fourni <code>options.conf.new</code> dans le même dossier.</b>"
     }]
