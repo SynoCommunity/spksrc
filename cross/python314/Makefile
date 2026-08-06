@@ -1,5 +1,5 @@
 PKG_NAME = python314
-PKG_VERS = 3.14.5
+PKG_VERS = 3.14.7
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
@@ -41,11 +41,11 @@ CONFIGURE_ARGS += ac_cv_have_long_long_format=yes
 
 ADDITIONAL_CFLAGS   += -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
-POST_PATCH_TARGET    = python314_post_patch
-PRE_CONFIGURE_TARGET = python314_pre_configure
-COMPILE_TARGET       = python314_compile
-INSTALL_TARGET       = python314_install
-POST_INSTALL_TARGET  = python314_post_install
+POST_PATCH_TARGET    = $(PKG_NAME)_post_patch
+PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
+COMPILE_TARGET       = $(PKG_NAME)_compile
+INSTALL_TARGET       = $(PKG_NAME)_install
+POST_INSTALL_TARGET  = $(PKG_NAME)_post_install
 
 include ../../mk/spksrc.common.mk
 
@@ -87,12 +87,12 @@ include ../../mk/spksrc.cross-cc.mk
 PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python$(PKG_VERS_MAJOR_MINOR))
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 
-.PHONY: python314_post_patch
-python314_post_patch:
+.PHONY: $(PKG_NAME)_post_patch
+$(PKG_NAME)_post_patch:
 	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
 
-.PHONY: python314_pre_configure
-python314_pre_configure:
+.PHONY: $(PKG_NAME)_pre_configure
+$(PKG_NAME)_pre_configure:
 	cp $(PYTHON_NATIVE) $(HOSTPYTHON)
 	$(RUN) autoreconf -ivf -Werror
 	# create phantom header and library to succeed add_dir_to_list in setup.py
@@ -103,16 +103,16 @@ python314_pre_configure:
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h || ln -fs $(STAGING_INSTALL_PREFIX)/include/sqlite3.h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/lib/libsqlite3.so || ln -fs $(STAGING_INSTALL_PREFIX)/lib/libsqlite3.so $(WORK_DIR)/Python-$(PKG_VERS)/lib/
 
-.PHONY: python314_compile
-python314_compile:
+.PHONY: $(PKG_NAME)_compile
+$(PKG_NAME)_compile:
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) -j $(NCPUS)
 
-.PHONY: python314_install
-python314_install:
+.PHONY: $(PKG_NAME)_install
+$(PKG_NAME)_install:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)
 
-.PHONY: python314_post_install
-python314_post_install:
+.PHONY: $(PKG_NAME)_post_install
+$(PKG_NAME)_post_install:
 	$(RUN) sed -i 's|^prefix=.*|prefix=$(STAGING_INSTALL_PREFIX)|' $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/python*.pc

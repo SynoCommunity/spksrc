@@ -14,7 +14,7 @@ DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
-DISPLAY_NAME = Python 3.12
+DISPLAY_NAME = Python 3.$(subst python3,,$(SPK_NAME))
 CHANGELOG = "1. Update to Python 3.12.13"
 
 HOMEPAGE = https://www.python.org
@@ -33,7 +33,7 @@ PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python312_extra_install
 
-SPK_USR_LOCAL_LINKS = bin:bin/python3.12
+SPK_USR_LOCAL_LINKS = bin:bin/python3.$(subst python3,,$(SPK_NAME))
 
 include ../../mk/spksrc.spk.mk
 
