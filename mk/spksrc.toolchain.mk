@@ -177,6 +177,9 @@ patch: normalize
 include ../../mk/spksrc.build/patch.mk
 
 rustc: patch
+# OVERLAY_BINUTILS (base layer) before rustc.mk + tc_vars.mk, which read its vars
+# (the shipped-ld shim path and the -B flag baked into the generated tc_vars).
+include ../../mk/spksrc.toolchain/overlay-binutils.mk
 include ../../mk/spksrc.toolchain/tc-rust.mk
 include ../../mk/spksrc.toolchain/rustc.mk
 
@@ -194,7 +197,7 @@ pre_toolchain_target: toolchain_msg
 
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: status rustc depend tcvars
+_all: status overlay-binutils rustc depend tcvars
 
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target

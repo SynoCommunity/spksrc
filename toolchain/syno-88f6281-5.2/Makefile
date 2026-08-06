@@ -21,7 +21,7 @@ TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 # DEPENDS below.
 RUST_BUILD_TOOLCHAIN = 0
 
-# Base triple tier: rustup ships a std (tier 1/2), so RUST_OVERLAY=0 can fall
+# Base triple tier: rustup ships a std (tier 1/2), so OVERLAY_RUSTC=0 can fall
 # back to the stock rustc (a newer-glibc std). tier 3 would be a hard error.
 RUST_TARGET_TIER = 2
 
