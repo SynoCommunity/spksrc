@@ -32,18 +32,27 @@ TC_RUSTC = 1.82.0
 # not consulted -- single source of truth for the from-source toolchain).
 RUST_TARGET = powerpc-unknown-linux-gnuspe
 
-# ppc853x's 2008 GNU ld 2.18 SEGFAULTS linking modern Rust cdylibs (cryptography).
-# Build rustc with LLVM lld shipped in the sysroot and route package-build links
-# through it (see rustc.mk RUST_LINK_VIA_LLD).
-RUST_LINK_VIA_LLD = 1
+# Route ONLY the Rust package link through a modern binutils (2.30) ld -- the C toolchain
+# keeps the stock vendor gcc 4.3.7 + ld 2.18 (which builds C fine here; only Rust's output
+# breaks it). Both of ppc853x's linkers mangle Rust, confirmed on-device (SynoCommunity#7353):
+#  - the 2008 GNU ld 2.18 leaves Rust std's TLS TPREL16 relocs DYNAMIC (.rela.dyn), which the
+#    glibc-2.8 loader mis-applies -> SIGSEGV on a TLS store in main; it also segfaults
+#    outright linking modern Rust cdylibs;
+#  - LLVM lld links, but leaves a PIE relative relocation unapplied (10974 vs 10975
+#    R_PPC_RELATIVE) -> SIGSEGV jumping through an unrelocated pointer at startup.
+# binutils 2.30 resolves the TLS relocs at link AND emits the full relative-reloc set -> a
+# clean binary. gcc 4.3.7 uses standard -mcpu=8548 flags a modern ld accepts, so this narrow
+# rust-link overlay is safe. NOT the GLOBAL OVERLAY_BINUTILS (that redirects ALL C compilation
+# and is only valid under a matched gcc-8.5 overlay -- see overlay-binutils.mk).
+RUST_LINK_VIA_BINUTILS = 1
 
 # <triple>-<tool> symlink prefixes the built rustc expects (rustc.mk creates them)
 RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
 
-# ppc853x's 2008-era binutils ld rejects the TLSLD reloc LLVM emits for std's
-# thread-local guard. initial-exec makes it emit GOT_TPREL instead (older ld knows
-# it) -- an attempt to build rustc here without a newer ld. Build-only (-Z needs
-# the from-source bootstrap; must not reach the cross rust packages).
+# Build std with initial-exec TLS: it resolves to GOT_TPREL (static TLS), the model
+# that produced the clean, verified on-device binary. Kept even with the 2.30 ld,
+# which resolves it at link with no dynamic TLS relocs. Build-only (-Z needs the
+# from-source bootstrap; must not reach the cross rust packages).
 RUST_BUILD_EXTRA_RUSTFLAGS = -Ztls-model=initial-exec
 
 # glibc 2.8 predates clock_gettime in libc (2.17); the target has no native 64-bit atomics.

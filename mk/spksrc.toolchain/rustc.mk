@@ -57,23 +57,24 @@ _RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC
 # id so mirrors/CDN caches don't serve the stale artifact. Tags the .txz name only.
 RUST_ARCHIVE_REV ?= v1
 
-# Rust overlay, mirroring the gcc-8.5 overlay's LEGACY_TOOLCHAIN but defaulting ON:
-# an arch reaches this block only because it HAS a custom rust overlay, so using it
-# is the point. ON (default) uses the custom from-source build (native/rustc-<vers>)
-# and the Synology-vendored triple (unknown -> synology, resolved from a JSON spec).
-# OFF falls back to the stock rustup rustc + in-tree `unknown` triple -- valid ONLY
-# for a tier-1/2 base triple (rustup ships a std); a tier-3 base (e.g. PowerPC e500)
-# has NO stock std, so RUST_OVERLAY=0 is a hard error there. The toolchain declares
+# Rust overlay (OVERLAY_RUSTC), part of the OVERLAY_<component> family (OVERLAY_BINUTILS,
+# OVERLAY_GCC) but defaulting ON: an arch reaches this block only because it HAS a custom
+# rust overlay, so using it is the point. ON (default) uses the custom from-source build
+# (native/rustc-<vers>) and the Synology-vendored triple (unknown -> synology, resolved
+# from a JSON spec). OFF falls back to the stock rustup rustc + in-tree `unknown` triple --
+# valid ONLY for a tier-1/2 base triple (rustup ships a std); a tier-3 base (e.g. PowerPC
+# e500) has NO stock std, so OVERLAY_RUSTC=0 is a hard error there. The toolchain declares
 # the base triple's tier (RUST_TARGET_TIER). Overridable per package/local.mk/CLI.
-RUST_OVERLAY     ?= 1
+# (RUST_OVERLAY is accepted as a deprecated alias during the OVERLAY_* rename.)
+OVERLAY_RUSTC    ?= $(or $(RUST_OVERLAY),1)
 RUST_TARGET_TIER ?= 3
 
-ifneq ($(filter 1 on ON,$(strip $(RUST_OVERLAY))),)
+ifneq ($(filter 1 on ON,$(strip $(OVERLAY_RUSTC))),)
 # Overlay ON (default): our custom toolchain, synology triple.
 RUST_TARGET         := $(_RUST_SYNO_TARGET)
 TC_RUSTUP_TOOLCHAIN  = $(_RUST_TC_ID)
 else ifeq ($(strip $(RUST_TARGET_TIER)),3)
-$(error rust: RUST_OVERLAY=0 on tier-3 target $(_RUST_BASE_TARGET) -- rustup ships no std for it, there is no stock fallback; keep RUST_OVERLAY=1)
+$(error rust: OVERLAY_RUSTC=0 on tier-3 target $(_RUST_BASE_TARGET) -- rustup ships no std for it, there is no stock fallback; keep OVERLAY_RUSTC=1)
 else
 # Overlay OFF on a tier-1/2 arch: stock rustup rustc + in-tree unknown triple.
 RUST_TARGET         := $(_RUST_BASE_TARGET)
@@ -116,6 +117,28 @@ exec "$(RUST_CC)" -B"$(RUST_LLD_SHIM_DIR)" "$$@"
 endef
 endif
 
+# RUST_LINK_VIA_BINUTILS routes ONLY the Rust package link through the overlay ld, while
+# the C toolchain keeps the stock vendor gcc+ld -- for archs whose stock ld breaks Rust's
+# output but whose stock gcc emits standard flags a modern ld accepts (ppc853x). Declared
+# per-arch in the base toolchain Makefile; independent of the GLOBAL OVERLAY_BINUTILS
+# (that one, for a matched gcc-8.5 pair, redirects ALL compilation via tc_vars -- see
+# overlay-binutils.mk). The link goes through CARGO_TARGET_<triple>_LINKER (= a gcc
+# -B<overlay shim> wrapper): cargo ignores CARGO_TARGET_*_RUSTFLAGS once maturin sets
+# RUSTFLAGS but always honors the linker; GNU ld needs no -Qy filtering, unlike lld.
+# OVERLAY_BINUTILS_SHIM comes from overlay-binutils.mk.
+RUST_LINK_VIA_BINUTILS ?= 0
+ifeq ($(RUST_LINK_VIA_BINUTILS),1)
+RUST_BINUTILS_CC = $(TC_WORK_DIR)/binutils-cc
+TC_RUST_LINKER   = $(RUST_BINUTILS_CC)
+
+define RUST_BINUTILS_CC_SCRIPT
+#!/bin/sh
+# The cross gcc with its ld redirected to the OVERLAY_BINUTILS ld via -B (gcc < 4.8
+# has no -fuse-ld). Used as CARGO_TARGET_<triple>_LINKER for the package build.
+exec "$(RUST_CC)" -B"$(OVERLAY_BINUTILS_SHIM)" "$$@"
+endef
+endif
+
 # Per-step status line (stdout + status-build.log), so the long from-source steps are
 # trackable there like the framework's NAME lines: NAME: toolchain-rust-<step>.
 rustc_status = $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s-%s, NAME: toolchain-rust-%s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(TC_ARCH)" "$(TC_VERS)" "$(1)") | tee --append $(STATUS_LOG)
@@ -138,6 +161,19 @@ $(RUST_LLD_SHIM_DIR):
 	@mkdir -p $@
 else
 rustc-lld-linker: ;
+endif
+
+# Generate the binutils gcc wrapper (hooked from tc-rust.mk post_rustc_target). Cheap
+# + PHONY so the baked absolute path stays current. No shim dir: the -B points straight
+# at the shipped ld dir in the extracted .txz (GNU ld needs no -Qy filtering).
+.PHONY: rustc-binutils-linker
+ifeq ($(RUST_LINK_VIA_BINUTILS),1)
+rustc-binutils-linker:
+	@$(call rustc_status,binutils-linker)
+	$(file >$(RUST_BINUTILS_CC),$(RUST_BINUTILS_CC_SCRIPT))
+	@chmod +x $(RUST_BINUTILS_CC)
+else
+rustc-binutils-linker: ;
 endif
 
 

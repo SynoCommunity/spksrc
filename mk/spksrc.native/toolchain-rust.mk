@@ -36,6 +36,24 @@ RUST_TARGET           := $(subst -unknown-,-synology-,$(RUST_TARGET_JSON_BASE))
 RUST_POSTFIX_ALIASES  := $(call _tc_get,RUST_POSTFIX_ALIASES)
 RUST_LINK_VIA_LLD     := $(or $(call _tc_get,RUST_LINK_VIA_LLD),0)
 
+# RUST_LINK_VIA_BINUTILS (declared per-arch in the base toolchain): BUILD the from-source
+# std with a modern binutils ld, so std's own dynamic objects link with the same modern ld
+# the consumer's package link uses (rustc.mk). Narrow to the Rust link -- the C toolchain
+# stays the stock vendor gcc+ld. ppc853x needs it because both its stock linkers mangle Rust
+# (lld leaves a PIE relative reloc unapplied; 2008 ld 2.18 leaves TLS TPREL16 relocs dynamic,
+# glibc-2.8 mis-applies them). 2.30 is the DSM-7.1/7.2 default. Mutually exclusive with
+# RUST_LINK_VIA_LLD.
+RUST_LINK_VIA_BINUTILS := $(or $(call _tc_get,RUST_LINK_VIA_BINUTILS),0)
+RUST_BINUTILS_VERS     := $(or $(call _tc_get,OVERLAY_BINUTILS_VERS),2.30)
+RUST_BINUTILS_DIR       = $(abspath $(CURDIR)/../binutils-$(RUST_BINUTILS_VERS))
+RUST_BINUTILS_BIN       = $(RUST_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin
+ifeq ($(RUST_LINK_VIA_BINUTILS),1)
+# Build-time: link the target through the co-built ld (so std's own dynamic objects use
+# the modern ld). A gcc -B wrapper, since gcc < 4.8 has no -fuse-ld.
+RUST_BINUTILS_SHIM = $(WORK_DIR)/binutils-shim
+RUST_LINKER        = $(WORK_DIR)/binutils-cc
+endif
+
 RUST_TARGET_JSON_DIR = $(WORK_DIR)/target-spec
 RUST_TARGET_JSON     = $(RUST_TARGET_JSON_DIR)/$(RUST_TARGET).json
 # The stock host rustc BINARY that emits the base spec -- NOT the distrib/cargo/bin
@@ -176,10 +194,11 @@ RUSTC_STAGE1_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)rustc-stage1_done
 RUSTC_STAGE2_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)rustc-stage2_done
 
 # PRE_CONFIGURE: extract the gcc toolchain (tc-extract, generic) and create the
-# <alias>-<tool> symlinks rustc invokes the target tools by (triple name).
+# <alias>-<tool> symlinks rustc invokes the target tools by (triple name). When
+# RUST_LINK_VIA_BINUTILS, also co-build the modern binutils and its build wrapper first.
 PRE_CONFIGURE_TARGET = rustc_prepare
 .PHONY: rustc_prepare
-rustc_prepare: tc-extract
+rustc_prepare: tc-extract $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binutils_cobuild)
 	@$(call rustc_status,prepare)
 	@cd $(TC_DIR)/work/$(TC_TARGET)/bin ; \
 	for gnutool in $$(ls -1) ; do \
@@ -187,6 +206,29 @@ rustc_prepare: tc-extract
 	    [ ! -L "$${alias}-$${gnutool##*-}" ] && ln -sf $${gnutool} "$${alias}-$${gnutool##*-}" || true ; \
 	  done ; \
 	done
+
+# Co-build the modern binutils cross-ld for this (arch, DSM) and emit the build-time
+# gcc wrapper ($(RUST_LINKER)) that routes the target link through it via -B. GNU ld
+# accepts -Qy, so unlike lld no arg filtering is needed -- the wrapper is a plain
+# passthrough.
+define RUST_BINUTILS_CC_SCRIPT
+#!/bin/sh
+# The cross gcc with ld/as redirected to the co-built binutils $(RUST_BINUTILS_VERS)
+# via -B. Used as the [target.*] linker for the from-source build.
+exec "$(RUST_CC)" -B"$(RUST_BINUTILS_SHIM)" "$$@"
+endef
+
+.PHONY: rustc_binutils_cobuild
+rustc_binutils_cobuild:
+	@$(call rustc_status,binutils-cobuild)
+	@# ARCH= TCVERSION= : disable native/binutils' stage0 (see overlay-binutils.mk) so it
+	@# cannot re-bootstrap a toolchain and recurse.
+	$(MAKE) --no-print-directory -C $(RUST_BINUTILS_DIR) ARCH= TCVERSION= TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS)
+	@mkdir -p $(RUST_BINUTILS_SHIM)
+	@ln -sf $(RUST_BINUTILS_BIN)/$(TC_TARGET)-ld $(RUST_BINUTILS_SHIM)/ld
+	@ln -sf $(RUST_BINUTILS_BIN)/$(TC_TARGET)-as $(RUST_BINUTILS_SHIM)/as
+	$(file >$(RUST_LINKER),$(RUST_BINUTILS_CC_SCRIPT))
+	@chmod +x $(RUST_LINKER)
 
 # CONFIGURE: write config.toml (regenerated each run -- cheap, always current).
 CONFIGURE_TARGET = rustc_configure

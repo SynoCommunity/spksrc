@@ -91,7 +91,7 @@ rustc_target: $(PRE_RUSTC_TARGET)
 	$(MSG) "rustup default $(TC_RUSTC)" ; \
 	rustup default $(TC_RUSTC) ; \
 	if [ -n "$(_RUST_BASE_TARGET)" ] && [ "$(RUST_TARGET_TIER)" != "3" ] ; then \
-	   $(MSG) "Installing STOCK base std $(_RUST_BASE_TARGET) (tier $(RUST_TARGET_TIER)) so RUST_OVERLAY=0 stays usable without re-invoking this cookie-locked build" ; \
+	   $(MSG) "Installing STOCK base std $(_RUST_BASE_TARGET) (tier $(RUST_TARGET_TIER)) so OVERLAY_RUSTC=0 stays usable without re-invoking this cookie-locked build" ; \
 	   rustup component add rust-std --target $(_RUST_BASE_TARGET) --toolchain $(TC_RUSTC) || true ; \
 	fi ; \
 	TARGET_STATUS=$$(rustup target list --toolchain $(TC_RUSTUP_TOOLCHAIN) 2>/dev/null | grep "^$(RUST_TARGET)") || true ; \
@@ -112,7 +112,7 @@ rustc_target: $(PRE_RUSTC_TARGET)
 # custom toolchain itself is built by the host-native package native/rustc-<vers>
 # (see rustc.mk header) and downloaded as a .txz that ships lld; this only wires the
 # wrapper that routes cross rust PACKAGE links through it.
-post_rustc_target: $(RUSTC_TARGET) $(if $(filter 1,$(RUST_LINK_VIA_LLD)),rustc-lld-linker)
+post_rustc_target: $(RUSTC_TARGET) $(if $(filter 1,$(RUST_LINK_VIA_LLD)),rustc-lld-linker) $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc-binutils-linker)
 
 ifeq ($(wildcard $(RUSTC_COOKIE)),)
 rustc: $(RUSTC_COOKIE)
