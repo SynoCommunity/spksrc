@@ -1,7 +1,7 @@
 SPK_NAME = python314
-SPK_VERS = 3.14.5
+SPK_VERS = 3.14.7
 SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$(SPK_VERS)))
-SPK_REV = 4
+SPK_REV = 5
 SPK_ICON = src/python3.png
 
 # Needs C11 <stdatomic.h> (and C++11); gcc ships stdatomic.h >= 4.8
@@ -14,7 +14,7 @@ DESCRIPTION = Python Programming Language.
 DESCRIPTION_FRE = Language de programmation Python.
 DESCRIPTION_SPN = Lenguaje de programación Python.
 STARTABLE = no
-DISPLAY_NAME = Python 3.14
+DISPLAY_NAME = Python 3.$(subst python3,,$(SPK_NAME))
 CHANGELOG = "1. Update to Python 3.14.5"
 
 HOMEPAGE = https://www.python.org
@@ -33,7 +33,7 @@ PYTHON_LIB_DIR = lib/python$(SPK_VERS_MAJOR_MINOR)
 
 POST_STRIP_TARGET = python314_extra_install
 
-SPK_USR_LOCAL_LINKS = bin:bin/python3.14
+SPK_USR_LOCAL_LINKS = bin:bin/python3.$(subst python3,,$(SPK_NAME))
 
 include ../../mk/spksrc.spk.mk
 
