@@ -12,7 +12,7 @@ DEPENDS += cross/jpegoptim cross/pngcrush cross/optipng
 MAINTAINER = hgy59
 DESCRIPTION = ImageMagick is a software suite to create, edit, compose, or convert bitmap images.  This package includes some tools for image compression, that are not part of imagemagick: jpegoptim, a utility to optimize/compress JPEG files; OptiPNG is a PNG optimizer that recompresses image files to a smaller size, without losing any information; pngcrush an optimizer for png files; pngquant for lossy compression of PNG images.
 DISPLAY_NAME = ImageMagick
-CHANGELOG = "1. Update ImageMagick to v7.1.2-29."
+CHANGELOG = "1. Update ImageMagick to v7.1.2-29. <br/>2. Update jpegoptim to v1.5.6. "
 
 STARTABLE = no
 
