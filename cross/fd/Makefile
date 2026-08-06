@@ -1,10 +1,7 @@
-PKG_NAME = fd
-PKG_VERS = 10.3.0
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/sharkdp/fd/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = fd-main
+
+OPTIONAL_DEPENDS  = cross/fd-latest
+OPTIONAL_DEPENDS += cross/fd-10.3
 
 # PKG_VERS >= 8.7.1 fails to build for RUST_TARGET = armv7-unknown-linux-gnueabi $(ARMv7L_ARCHS)
 # PKG_VERS <= 8.7.0 fails with newer rustc 1.80.1
@@ -17,10 +14,13 @@ UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
 # issues with atomic library
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
-HOMEPAGE = https://github.com/sharkdp/fd
-COMMENT  = fd is a program to find entries in your filesystem. It is a simple, fast and user-friendly alternative to find. While it does not aim to support all of find's powerful functionality, it provides sensible (opinionated) defaults for a majority of use cases.
-LICENSE  = Apache 2.0 / MIT
+include ../../mk/spksrc.common.mk
 
-CARGO_BUILD_ARGS = --locked --verbose
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+# latest version that builds for qoriq with rustc 1.87.0 (version 10.4.x requires rustc 1.90.0)
+DEPENDS = cross/fd-10.3
+else
+DEPENDS = cross/fd-latest
+endif
 
-include ../../mk/spksrc.cross-rust.mk
+include ../../mk/spksrc.cross-virtual.mk
