@@ -1,0 +1,26 @@
+--- CMakeLists.txt.orig	2026-08-07 13:14:33.606542463 +0000
++++ CMakeLists.txt	2026-08-07 13:14:33.614542319 +0000
+@@ -505,14 +505,18 @@
+ ENDIF(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
+ 
+ IF(USE_PYTHON)
+-  find_package(Python3 3.4 COMPONENTS Development)
+-  IF(Python3_Development_FOUND)
+-    MESSAGE(STATUS "Python3 version ${Python3_VERSION} includes found at: ${Python3_INCLUDE_DIRS}")
++  # Cross-compilation: the cross-built interpreter cannot run on the build host,
++  # so find the development files by path (Python3_ROOT_DIR) instead of using
++  # find_package(Python3), which requires a runnable interpreter.
++  find_path(Python3_INCLUDE_DIRS NAMES Python.h HINTS ${Python3_ROOT_DIR} PATH_SUFFIXES include/python3.14)
++  find_library(Python3_LIBRARIES NAMES python3.14 HINTS ${Python3_ROOT_DIR} PATH_SUFFIXES lib)
++  IF(Python3_INCLUDE_DIRS)
++    MESSAGE(STATUS "Python3 includes found at: ${Python3_INCLUDE_DIRS}")
+     INCLUDE_DIRECTORIES(${Python3_INCLUDE_DIRS})
+     add_definitions(-DENABLE_PYTHON)
+-  ELSE(Python3_Development_FOUND)
++  ELSE(Python3_INCLUDE_DIRS)
+     MESSAGE(FATAL_ERROR "Python3 not found on your system, use USE_PYTHON=NO or sudo apt-get install python3-dev)")
+-  ENDIF(Python3_Development_FOUND)
++  ENDIF(Python3_INCLUDE_DIRS)
+ ENDIF(USE_PYTHON)
+ 
+ CHECK_INCLUDE_FILE (execinfo.h HAVE_EXECINFO_H)
