@@ -2,7 +2,10 @@ PKG_NAME = lua
 PKG_VERS = 5.3.6
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+# lua.org can be unreachable from CI runners, so fall back to the PUC-Rio tecgraf
+# mirror of the official /ftp tree (byte-identical tarball, same checksum).
 PKG_DIST_SITE = https://www.lua.org/ftp
+PKG_DIST_MIRRORS = https://www.tecgraf.puc-rio.br/lua/ftp
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 # domoticz requires Lua 5.3 and pins the version (find_package(Lua 5.3))
