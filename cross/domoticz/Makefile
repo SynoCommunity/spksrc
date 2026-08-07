@@ -40,6 +40,7 @@ CONFIGURE_ARGS += -DPython3_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/python
 CONFIGURE_ARGS += -DPython3_LIBRARY=$(STAGING_INSTALL_PREFIX)/lib/libpython3.14.so
 # open-zwave is deprecated upstream (domoticz recommends zwavejs2mqtt + MQTT auto
 # discovery), so Z-Wave hardware support is intentionally disabled.
+
 # match the stable (master) release channel: version string without build number and "-beta" suffix
 CONFIGURE_ARGS += -DBUILD_MASTER=ON
 # use shared boost libraries (as provided by cross/boost) instead of static ones
