@@ -130,13 +130,24 @@ include ../../mk/spksrc.build/plist.mk
 TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
 TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
+# Package-side default for the rust overlay selector (see rustc.mk OVERLAY_RUSTC).
+# Defined here so it is always set before it is passed to the tcvars regen below --
+# passing an empty OVERLAY_RUSTC= would look like an explicit "off" and error on a
+# tier-3 rust arch. A package (or local.mk / CLI) may override it; only custom-rust
+# archs act on it. RUST_OVERLAY stays accepted as a deprecated alias.
+OVERLAY_RUSTC ?= $(or $(RUST_OVERLAY),1)
+
 .PHONY: cross-stage1
 cross-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
 
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
 	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
-	@$(MAKE) WORK_DIR=$(WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) tcvars
+	@# Pass OVERLAY_RUSTC so the tc_vars generated into THIS package's WORK_DIR reflect
+	@# the package's overlay choice (stock unknown vs the custom synology toolchain) --
+	@# a per-package selector, since the toolchain build itself is cookie-locked. All
+	@# rust toolchains (stock std + overlays) are already installed, so this only picks.
+	@$(MAKE) WORK_DIR=$(WORK_DIR) OVERLAY_RUSTC=$(OVERLAY_RUSTC) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
 $(TCVARS_DONE): ;
 endif

@@ -213,12 +213,9 @@ DEPENDS += python/rencode
 # Require environment variables
 #   PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #   PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# Version = 0.21 requires rustc >= 1.77 (armv5)
-# Version = 0.24 requires rustc >= 1.82 (qoriq)
+# Version = 0.24 requires rustc >= 1.82 (qoriq,armv5,ppc853x)
 # Version = 0.25 requires rustc >= 1.85
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS += rpds_py==0.21.0
-else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(call version_le, $(TC_RUSTC), 1.82),1)
 WHEELS += rpds_py==0.24.0
 else
 WHEELS += rpds_py==0.30.0

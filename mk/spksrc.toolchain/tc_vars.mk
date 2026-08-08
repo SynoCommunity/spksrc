@@ -244,12 +244,8 @@ endif
 	echo "endif()"
 	@echo ; \
 	echo "# Rust compiler and Cargo" ; \
-	echo "set(CARGO  $(RUSTUP_HOME)/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo)"
-ifeq ($(TC_RUSTUP_TOOLCHAIN),stable)
-	@echo "set(RUSTC  $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)-x86_64-unknown-linux-gnu/bin/rustc)"
-else
-	@echo "set(RUSTC  $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/bin/rustc)"
-endif
+	echo "set(CARGO  $(RUST_TOOLCHAIN_DIR)/bin/cargo)" ; \
+	echo "set(RUSTC  $(RUST_TOOLCHAIN_DIR)/bin/rustc)"
 	@echo ; \
 	echo "# Cross target triple" ; \
 	echo "set(RUST_TARGET  $(RUST_TARGET))" ; \
@@ -262,9 +258,9 @@ endif
 	echo "set(ENV{RUSTC} \$${RUSTC})" ; \
 	echo "set(ENV{CARGO} \$${CARGO})" ; \
 	echo "set(ENV{CARGO_BUILD_TARGET} \$${RUST_TARGET})" ; \
-	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER} \$${RUST_LINKER})" ; \
-	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR} \$${RUST_AR})" ; \
-	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS} $(TC_EXTRA_RUSTFLAGS))"
+	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER} \$${RUST_LINKER})" ; \
+	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_AR} \$${RUST_AR})" ; \
+	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS} $(TC_EXTRA_RUSTFLAGS))"
 
 .PHONY: tc_meson_cross_vars
 tc_meson_cross_vars:
@@ -291,12 +287,8 @@ tc_meson_cross_vars:
 	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  fi ; \
 	done
-	@echo "cargo = '$(RUSTUP_HOME)/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo'"
-ifeq ($(TC_RUSTUP_TOOLCHAIN),stable)
-	@echo "rust = '$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)-x86_64-unknown-linux-gnu/bin/rustc'"
-else
-	@echo "rust = '$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/bin/rustc'"
-endif
+	@echo "cargo = '$(RUST_TOOLCHAIN_DIR)/bin/cargo'" ; \
+	echo "rust = '$(RUST_TOOLCHAIN_DIR)/bin/rustc'"
 
 .PHONY: tc_meson_native_vars
 tc_meson_native_vars:
@@ -322,16 +314,23 @@ tc_meson_native_vars:
 
 .PHONY: tc_rust_vars
 tc_rust_vars:
-	@echo TC_ENV += RUSTFLAGS=\"$(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
-	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
+	@# ALL target rustflags go through CARGO_TARGET_<triple>_RUSTFLAGS -- NOT a global
+	@# RUSTFLAGS. cargo gives the global RUSTFLAGS env higher precedence than the
+	@# per-target flags, so a global RUSTFLAGS would SILENTLY DROP the arch codegen
+	@# options ($(TC_EXTRA_RUSTFLAGS): -Ctarget-cpu / -Ctarget-feature, e.g. ppc SPE) --
+	@# and it also wrongly leaked the target sysroot link-args onto the host's build
+	@# scripts / proc-macros. Consolidating here (link-args + arch codegen + the debug
+	@# ADDITIONAL_RUSTFLAGS) applies them to the target only, and nothing outranks them.
+	@echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
+	echo TC_ENV += RUST_TARGET_PATH=\"$(RUST_TOOLCHAIN_DIR)/target-spec\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_EXTRA_RUSTFLAGS)\" ; \
-	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
-	echo RUST_TARGET := $(RUST_TARGET)
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(or $(TC_RUST_LINKER),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo RUST_TARGET := $(RUST_TARGET) ; \
+	echo TC_RUSTC := $(TC_RUSTC)
 
 .PHONY: tc_autotools_vars
 tc_autotools_vars:
@@ -341,25 +340,27 @@ tc_autotools_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  echo TC_ENV += $${target}=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
+	  bindir="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
+	  case "$${source}" in ld|as) [ "$(OVERLAY_BINUTILS)" = "1" ] && bindir="$(OVERLAY_BINUTILS_BIN)" ;; esac ; \
+	  echo TC_ENV += $${target}=\"$${bindir}/$(TC_PREFIX)$${source}\" ; \
 	done ; \
-	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
+	echo TC_ENV += CFLAGS=\"$(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
-	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
+	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
-	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
+	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
 	fi ; \
-	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\"
+	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)\"
 
 .PHONY: tc_flags
 tc_flags:
-	@echo CFLAGS := $(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
+	@echo CFLAGS := $(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
 	echo CPPFLAGS := $(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\) ; \
-	echo CXXFLAGS := $(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
+	echo CXXFLAGS := $(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
-	   echo FFLAGS := $(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\) ; \
+	   echo FFLAGS := $(FFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\) ; \
 	fi ; \
-	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)
+	echo LDFLAGS := $(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)
 
 .PHONY: tc_vars
 tc_vars:

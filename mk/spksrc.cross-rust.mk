@@ -70,15 +70,16 @@ endif
 # Rust specific targets
 .PHONY: rust_install_target
 
-# Default build with rust and install with cargo
-# The cargo call uses tc_vars.mk RUSTUP_TOOLCHAIN variable
-# overriding definition using +stable or +$(RUSTUP_TOOLCHAIN)
-# https://rust-lang.github.io/rustup/environment-variables.html 
+# Default build with rust and install with cargo.
+#
+# Toolchain selection is driven by the RUSTUP_TOOLCHAIN env var that tc_vars.rust.mk
+# name drift entirely.
+# https://rust-lang.github.io/rustup/environment-variables.html
 rust_install_target:
-	@echo "  ==> Cargo install rust package $(PKG_NAME) (rustc +$(TC_RUSTUP_TOOLCHAIN) -vV)"
-	@$(RUN) rustc +$(TC_RUSTUP_TOOLCHAIN) -vV
-	@$(RUN) echo cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
-	$(RUN) cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
+	@echo "  ==> Cargo install rust package $(PKG_NAME) (RUSTUP_TOOLCHAIN selects the toolchain)"
+	@$(RUN) rustc -vV
+	@$(RUN) echo cargo install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
+	$(RUN) cargo install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
 
 ###
 

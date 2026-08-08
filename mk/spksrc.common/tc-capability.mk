@@ -6,6 +6,7 @@
 #
 #   MIN_GLIBC_VERSION = 2.20    needs glibc 2.20 or newer
 #   MIN_GCC_VERSION   = 8       needs gcc 8 or newer
+#   MIN_RUSTC_VERSION = 1.85    needs rustc 1.85 or newer
 #   REQUIRE_64BIT     = 1       needs a 64-bit target
 #
 # This replaces "UNSUPPORTED_ARCHS = <list>" for capability reasons. A hardcoded
@@ -63,6 +64,25 @@ ifneq ($(strip $(MIN_GCC_VERSION)),)
 ifneq ($(strip $(TC_GCC)),)
 ifeq ($(call version_ge,$(TC_GCC),$(MIN_GCC_VERSION)),)
 TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)gcc $(TC_GCC) < $(MIN_GCC_VERSION)
+endif
+endif
+endif
+
+# ---- rustc: the rust version the toolchain pins -----------------------------
+# Custom-rust archs (qoriq/ppc853x/88f6281) pin TC_RUSTC in their toolchain Makefile
+# (e.g. 1.82.0, the last that supports their old glibc), so a package needing a newer
+# rustc is genuinely unsupported there. Read statically like TC_GCC. Standard archs
+# declare no TC_RUSTC (they use rustup 'stable' = the newest), so an empty or 'stable'
+# value satisfies any floor -- no network query to resolve what 'stable' is right now;
+# only a pinned concrete version is compared. A local var, so env-rust.mk's TC_RUSTC
+# (its 'stable' default) is left untouched.
+_TC_CAP_RUSTC := $(shell sed -n 's/^TC_RUSTC *= *//p' $(_TC_CAP_MK) 2>/dev/null)
+ifneq ($(strip $(MIN_RUSTC_VERSION)),)
+ifneq ($(strip $(_TC_CAP_RUSTC)),)
+ifneq ($(strip $(_TC_CAP_RUSTC)),stable)
+ifeq ($(call version_ge,$(_TC_CAP_RUSTC),$(MIN_RUSTC_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)rustc $(_TC_CAP_RUSTC) < $(MIN_RUSTC_VERSION)
+endif
 endif
 endif
 endif
