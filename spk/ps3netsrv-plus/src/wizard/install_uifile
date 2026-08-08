@@ -1,0 +1,84 @@
+[
+  {
+    "step_title": "Library",
+    "invalid_next_disabled_v2": true,
+    "activeate": "",
+    "items": [
+      {
+        "type": "combobox",
+        "subitems": [
+          {
+            "key": "wizard_shared_folder_name",
+            "desc": "Shared folder",
+            "displayField": "name",
+            "valueField": "name",
+            "editable": false,
+            "mode": "remote",
+            "api_store": {
+              "api": "SYNO.Core.Share",
+              "method": "list",
+              "version": 1,
+              "baseParams": {
+                "shareType": "all"
+              },
+              "root": "shares",
+              "idProperty": "name",
+              "fields": [
+                "name",
+                "vol_path"
+              ]
+            },
+            "validator": {
+              "allowBlank": false
+            }
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "subitems": [
+          {
+            "key": "wizard_library_subdir",
+            "desc": "(Optional) Subfolder",
+            "emptyText": "dist/ps3",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": true,
+              "regex": {
+                "expr": "/^(?!\\/)(?!.*(?:^|\\/)\\.\\.(?:\\/|$)).*$/",
+                "errorText": "Enter a relative path that stays inside the selected share."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "desc": "<div id=\"ps3netsrv-folder-picker\"><div style=\"font-size:16px;font-weight:600;line-height:22px;color:#182b3a;margin:0 0 14px\">Choose the shared folder and optional subfolder for your PS3 library</div><div style=\"display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start\"><div style=\"flex:0 0 218px;min-width:0\"><div style=\"margin:0 0 14px\"><select id=\"ps3netsrv-share\" aria-label=\"Shared folder\" style=\"display:block;box-sizing:border-box;width:100%;height:30px;padding:4px 8px;border:1px solid #b8c5ce;border-radius:3px;background:#fff;color:#243746\"></select></div><label style=\"display:block;color:#425563\">(Optional) Subfolder<input id=\"ps3netsrv-subdir\" type=\"text\" placeholder=\"dist/ps3\" style=\"display:block;box-sizing:border-box;width:100%;height:30px;margin-top:6px;padding:4px 8px;border:1px solid #b8c5ce;border-radius:3px;background:#fff;color:#243746\"></label></div><div style=\"flex:1 1 340px;min-width:300px;border:1px solid #c5d0d8;border-radius:3px;background:#fff;overflow:hidden\"><div style=\"display:flex;gap:8px;align-items:center;padding:8px 10px;background:#eaf0f4;border-bottom:1px solid #c5d0d8\"><button type=\"button\" id=\"ps3netsrv-folder-up\" disabled>Up</button><span id=\"ps3netsrv-folder-current\" style=\"flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#334a58\">Select a shared folder</span><span id=\"ps3netsrv-folder-status\" style=\"flex:0 0 auto;white-space:nowrap;color:#536b78\">Choose a shared folder.</span></div><div id=\"ps3netsrv-folder-list\" style=\"background:#fff\"></div></div></div></div>"
+      }
+    ]
+  },
+  {
+    "step_title": "Network",
+    "invalid_next_disabled_v2": true,
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Choose a free TCP port. The webMAN MOD default is 38008.",
+        "subitems": [
+          {
+            "key": "wizard_port",
+            "desc": "NETISO port",
+            "defaultValue": "38008",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[0-9]{4,5}$/",
+                "errorText": "Enter a port between 1024 and 65535."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

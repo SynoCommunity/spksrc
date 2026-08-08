@@ -1,0 +1,23 @@
+{
+  "launcher-v29.cgi": {
+    "SYNO.SDS.ps3netsrvplus.Application": {
+      "type": "app",
+      "title": "ps3netsrv-plus",
+      "desc": "Read-only game server for PS3",
+      "icon": "images/ps3netsrv-plus-{0}.png",
+      "appWindow": "SYNO.SDS.ps3netsrvplus.MainWindow",
+      "allowMultiInstance": false,
+      "allUsers": false,
+      "grantPrivilege": "all",
+      "advanceGrantPrivilege": true,
+      "depend": ["SYNO.SDS.ps3netsrvplus.MainWindow"]
+    },
+    "SYNO.SDS.ps3netsrvplus.MainWindow": {
+      "type": "lib",
+      "title": "ps3netsrv-plus",
+      "icon": "images/ps3netsrv-plus-{0}.png",
+      "depend": ["SYNO.SDS.ps3netsrvplus.Utils"]
+    },
+    "SYNO.SDS.ps3netsrvplus.Utils": []
+  }
+}
