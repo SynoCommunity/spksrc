@@ -44,6 +44,12 @@ else ifeq ($(call version_lt, $(TCVERSION), 6.0)$(call version_ge, $(TCVERSION),
 SUPPORT_CPP11 = 0
 endif
 
+# libgomp from gcc < 4.4 lacks omp_set_max_active_levels (OpenMP 3.0), which
+# ImageMagick >= 7.1.2-29 calls unconditionally when OpenMP is enabled
+ifeq ($(call version_lt, $(TC_GCC), 4.4),1)
+CONFIGURE_ARGS += --disable-openmp
+endif
+
 ifeq ($(SUPPORT_CPP11),1)
 DEPENDS += cross/libheif
 DEPENDS += cross/libraw
