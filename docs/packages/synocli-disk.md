@@ -9,88 +9,42 @@ tags:
 
 # SynoCli Disk Tools
 
-SynoCli Disk Tools provides essential disk management and recovery utilities.
+The `synocli-disk` package provides some disk related tools to advanced Linux users. Most of the tools must be run as privileged user (root) to work or to get access to related resources.
 
-## Package Information
+| Tool | Description | License |
+|------|-------------|---------|
+| [e2fsprogs](http://e2fsprogs.sourceforge.net/) | Ext2/Ext3/Ext4 filesystem userspace utilities (`e2fsck`, `mkfs.ext4`, `tune2fs`, etc.). | GPL |
+| [ntfs-3g / ntfsprogs](https://www.tuxera.com/community/open-source-ntfs-3g/) | Third generation read/write NTFS driver and NTFS utilities. | GPLv2 |
+| [TestDisk](https://www.cgsecurity.org/wiki/TestDisk) | TestDisk is powerful free data recovery software. | GPLv2+ |
+| [ncdu](https://dev.yorhel.nl/ncdu) | Ncdu is a disk usage analyzer with an ncurses interface, designed to find space hogs where you don't have an entire graphical setup available. | MIT |
+| [davfs2](http://savannah.nongnu.org/projects/davfs2) | Mount a WebDAV resource as a regular file system. | GPLv3 |
+| [lsscsi](http://sg.danny.cz/scsi/lsscsi.html) | The lsscsi command lists information about SCSI devices in Linux. | GPLv2 |
+| [dar](http://dar.linux.free.fr/) | DAR is a shell command that backs up from a single file to a whole filesystem, taking care of hard links, Extended Attributes, sparse files, MacOS's file forks, any inode type, etc. | GPLv3 |
+| [ddrescue](http://www.gnu.org/software/ddrescue/) | GNU ddrescue is a data recovery tool. It copies data from one file or block device to another, trying hard to rescue data in case of read errors. | GNU GPL |
+| [duf](https://github.com/muesli/duf) | Disk Usage/Free Utility - a better `df` alternative. | MIT |
+| [gdu](https://github.com/dundee/gdu) | Fast disk usage analyzer with console interface written in Go. | MIT |
+| [dua](https://lib.rs/crates/dua-cli) | A tool to conveniently learn about the disk usage of directories, fast. | MIT |
+| [dutree](https://ownyourbits.com/2018/03/25/analyze-disk-usage-with-dutree/) | A tool to analyze file system usage written in Rust. | GPLv3 |
+| [tdu](https://github.com/josephpaul0/tdu) | Top Disk Usage. Estimates the disk space occupied by all files in a given path and displays a sorted list of the biggest items, similar to the `du -skx` command from GNU Coreutils. | GPLv2 |
+| [smartmontools](https://www.smartmontools.org/) | smartmontools contains two utility programs (`smartctl` and `smartd`) to control and monitor storage systems using SMART. When you call `smartctl` you will get the older version of Synology DSM; to call smartctl of this package, call `smartctl7` (or `/usr/local/bin/smartctl` or `/var/packages/synocli-disk/target/sbin/smartctl`). To update the device database call `update-smart-drivedb`. | GPLv2 |
+| [mergerfs](https://trapexit.github.io/mergerfs/) | mergerfs is a FUSE based union filesystem geared towards simplifying storage and management of files across numerous commodity storage devices. It is similar to mhddfs, unionfs, and aufs. mergerfs must be run as `root`. | ISC |
+| [disktype](https://disktype.sourceforge.net/) | Detects the content format of a disk or disk image by checking for signatures of file systems, partition tables, and boot codes. | MIT |
+| [gpart](https://github.com/baruch/gpart) | Gpart is a small tool which tries to guess what partitions are on a PC type, MBR-partitioned hard disk in case the primary partition table was damaged. | GPLv2 |
 
-| Property | Value |
-|----------|-------|
-| Package Name | synocli-disk |
-| License | Various (GPL, LGPL) |
+### davfs2 - Mount WebDAV Shares
 
-## Included Tools
+Before you can mount webdav folders with davfs2, you have to execute once the following commands [see issue #4466](https://github.com/SynoCommunity/spksrc/issues/4466):
 
-| Tool | Description |
-|------|-------------|
-| dar | Disk archive (full filesystem backups) |
-| davfs2 | Mount WebDAV shares |
-| ddrescue | Data recovery tool |
-| disktype | Detect disk/image content format |
-| dua | Disk usage analyzer |
-| duf | Disk usage/free utility (better `df`) |
-| dutree | Disk usage analyzer (Rust) |
-| e2fsprogs | ext2/3/4 filesystem utilities (e2fsck, mkfs.ext4, etc.) |
-| gdu | Fast disk usage analyzer (Go) |
-| gpart | Recover damaged partition tables |
-| lsscsi | List SCSI devices |
-| mergerfs | FUSE union filesystem (run as root) |
-| ncdu | NCurses disk usage analyzer |
-| ntfs-3g | NTFS read/write support |
-| ntfsprogs | NTFS utilities |
-| smartmontools | SMART disk monitoring (smartctl, smartd) |
-| tdu | Top disk usage |
-| testdisk | Data recovery tool |
-
-## Usage Examples
-
-### testdisk - Data Recovery
-
+Create links in `/usr/sbin`:
 ```bash
-# Launch interactive recovery
-sudo testdisk
-
-# Select disk and follow prompts
-# Can recover deleted partitions and files
+sudo ln -s /usr/local/bin/mount.davfs /usr/sbin/mount.davfs
+sudo ln -s /usr/local/bin/umount.davfs /usr/sbin/umount.davfs
 ```
 
-### ddrescue - Disk Imaging
-
+Create the user `davfs2:davfs2`:
 ```bash
-# Create rescue image of failing disk
-sudo ddrescue /dev/sdb /volume1/backup/disk.img /volume1/backup/disk.log
-
-# Resume interrupted recovery
-sudo ddrescue -r3 /dev/sdb /volume1/backup/disk.img /volume1/backup/disk.log
-```
-
-### davfs2 - Mount WebDAV
-
-```bash
-# Mount WebDAV share
-sudo mount -t davfs https://webdav.server/path /mnt/webdav
-
-# Add to /etc/fstab for persistent mount
-https://webdav.server/path /mnt/webdav davfs user,noauto 0 0
-```
-
-### lsscsi - List SCSI Devices
-
-```bash
-# Show all SCSI devices
-lsscsi
-
-# Verbose output
-lsscsi -v
-```
-
-### e2fsprogs - Filesystem Operations
-
-```bash
-# Check filesystem (must be unmounted)
-sudo e2fsck -f /dev/sdb1
-
-# Show filesystem info
-sudo tune2fs -l /dev/sdb1
+sudo synouser --add davfs2 "" "" 0 "" 0
+sudo synogroup --add davfs2 davfs2
 ```
 
 ## Related Packages
