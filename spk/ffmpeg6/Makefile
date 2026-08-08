@@ -1,9 +1,9 @@
 SPK_NAME = ffmpeg6
 SPK_VERS = 6.1.6
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 7
+SPK_REV = 9
 SPK_ICON = src/ffmpeg6.png
-CHANGELOG = "1. Update ffmpeg to 6.1.6 with the jellyfin v6.0.1-8 patchset ported to 6.1<br/>2. Re-enable libjxl (JPEG-XL)<br/>3. Now using new synocli-videodriver package<br/>4. Align package with ffmpeg7/ffmpeg8"
+CHANGELOG = "1. Restore the SYNO-videostation patches"
 
 DEPENDS = cross/ffmpeg6
 VIDEODRV_PACKAGE = synocli-videodriver
