@@ -1,0 +1,15 @@
+# Icinga Web 2 Apache Configuration
+# Set required environment variables for PHP
+
+SetEnv ICINGAWEB_LIBDIR /var/packages/icingaweb2/target/share/icinga-php
+SetEnv ICINGAWEB_CONFIGDIR /var/packages/icingaweb2/var/etc/icingaweb2
+SetEnv ICINGAWEB_STORAGEDIR /var/packages/icingaweb2/var/storage
+
+RewriteEngine On
+RewriteBase /icingaweb2/
+
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+RewriteRule ^.*$ index.php [NC,L]

@@ -1,0 +1,5 @@
+--- bin/icingacli.orig
++++ bin/icingacli
+@@ -1,1 +1,1 @@
+-#!/usr/bin/env php
++#!/usr/local/bin/php84

@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "com.synocommunity.packages.icingaweb2": {
+            "title": "Icinga Web 2",
+            "desc": "Icinga Web 2 Monitoring Frontend",
+            "icon": "images/icingaweb2-{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "80",
+            "url": "/icingaweb2/",
+            "allUsers": false,
+            "grantPrivilege": "local"
+        }
+    }
+}
