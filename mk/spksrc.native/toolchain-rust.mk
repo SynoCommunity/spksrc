@@ -69,21 +69,25 @@ HOST_RUSTC          ?= $(abspath $(BASE_DISTRIB_DIR)/rustup/toolchains/$(TC_RUST
 # lets x.py resolve the custom target by name. The tweaks:
 #   vendor -> synology         the uniform custom marker
 #   is-builtin dropped         a custom target may not set it
-#   metadata rewritten         identifies as a SynoCommunity custom (tier 3); the
-#                              arch's TC_EXTRA_RUSTFLAGS are recorded in the
-#                              description for REFERENCE only.
-# Nothing arch-functional (cpu/features, linker/ar) is baked into the spec: the
-# codegen options stay in CARGO_TARGET_<triple>_RUSTFLAGS and the tools in
-# CARGO_TARGET_<triple>_LINKER (tc_vars.rust.mk, resolved per-machine via $(BASEDIR)),
-# the canonical channels. (If maturin ever clobbers CARGO_TARGET_*_RUSTFLAGS that is a
-# maturin bug to fix there, not a reason to bake non-relocatable data into the .txz.)
+#   cpu / features baked in    the -Ctarget-cpu / -Ctarget-feature from TC_EXTRA_RUSTFLAGS
+#                              are parsed into the spec's "cpu"/"features" fields.
+#   metadata rewritten         identifies as a SynoCommunity custom (tier 3).
+# WHY cpu/features MUST be in the spec (not only in CARGO_TARGET_<triple>_RUSTFLAGS):
+# x.py/bootstrap does NOT honor CARGO_TARGET_<triple>_RUSTFLAGS when building the STD,
+# so -Ctarget-cpu=e500 was silently dropped there -- the ppc/qoriq std ended up with
+# generic-PowerPC `sync`/`lwsync` (which the e500 traps on as an illegal instruction,
+# LLVM D76614) and generic FP, while the flag DID reach package builds via cargo. The
+# spec is read by BOTH x.py and cargo, and (unlike RUSTFLAGS) maturin cannot clobber it,
+# so it is the correct, single home for the arch's cpu/features. The tools (linker/ar)
+# stay out of the spec -- they are non-relocatable and go via CARGO_TARGET_<triple>_*
+# (tc_vars.rust.mk, resolved per-machine via $(BASEDIR)).
 rustc_prepare: $(RUST_TARGET_JSON)
 $(RUST_TARGET_JSON):
 	@mkdir -p $(@D)
 	@$(MSG) "native-rust: generating target-spec $@ (base $(RUST_TARGET_JSON_BASE) -> vendor synology)"
 	RUSTC_BOOTSTRAP=1 \
 	  $(HOST_RUSTC) -Zunstable-options --print target-spec-json --target $(RUST_TARGET_JSON_BASE) \
-	  | RUST_TARGET_JSON_BASE="$(RUST_TARGET_JSON_BASE)" TC_EXTRA_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS)" python3 -c 'import os,json,sys; d=json.load(sys.stdin); d["vendor"]="synology"; d.pop("is-builtin",None); xf=os.environ.get("TC_EXTRA_RUSTFLAGS","").strip(); desc="SynoCommunity custom rustc toolchain (from %s)"%os.environ["RUST_TARGET_JSON_BASE"]; desc+="; codegen options applied via CARGO_TARGET_<triple>_RUSTFLAGS: %s"%xf if xf else ""; d["metadata"]={"description":desc,"tier":3,"std":True,"host_tools":False}; json.dump(d,sys.stdout,indent=2)' > $@
+	  | RUST_TARGET_JSON_BASE="$(RUST_TARGET_JSON_BASE)" TC_EXTRA_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS)" python3 -c 'import os,json,sys,re; d=json.load(sys.stdin); d["vendor"]="synology"; d.pop("is-builtin",None); xf=os.environ.get("TC_EXTRA_RUSTFLAGS","").strip(); mc=re.search(r"-Ctarget-cpu=(\S+)",xf); d.update({"cpu":mc.group(1)} if mc else {}); mf=re.search(r"-Ctarget-feature=(\S+)",xf); d.update({"features":mf.group(1)} if mf else {}); desc="SynoCommunity custom rustc toolchain (from %s)"%os.environ["RUST_TARGET_JSON_BASE"]; desc+="; cpu/features baked into the spec: %s"%xf if xf else ""; d["metadata"]={"description":desc,"tier":3,"std":True,"host_tools":False}; json.dump(d,sys.stdout,indent=2)' > $@
 # Reuse the exact flags the toolchain declares (qoriq/ppc853x SPE, the ppc853x
 # -Ztls-model build workaround), instead of repeating them here.
 TC_EXTRA_CFLAGS            := $(call _tc_get,TC_EXTRA_CFLAGS)
