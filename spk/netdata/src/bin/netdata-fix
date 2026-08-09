@@ -20,5 +20,6 @@ for PLUGIN in ${PLUGINS}; do
 done
 
 echo ""
-echo "Done. Restart netdata to enable full process and system log monitoring."
-echo "Run: sudo synopkg restart ${PKG_NAME}"
+# Restart netdata to apply the changes
+sudo synopkg restart "${PKG_NAME}"
+echo "Netdata restarted. Process monitoring and system log browsing are enabled."

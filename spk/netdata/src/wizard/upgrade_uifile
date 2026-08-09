@@ -3,7 +3,7 @@
     "step_title": "Upgrade Instructions",
     "items": [
       {
-        "desc": "If you see \"Permission denied\" for <code>/proc/*/io</code> in the logs after upgrading, or system logs are not visible in the UI, run:<br/><br/><code style=\"user-select: all\">netdata-fix</code><br/><br/>It will prompt for your DSM password, re-apply the fix, and tell you to restart the package."
+        "desc": "If you see \"Permission denied\" for <code>/proc/*/io</code> in the logs after upgrading, or system logs are not visible in the UI, run:<br/><br/><code style=\"user-select: all\">netdata-fix</code><br/><br/>It will prompt for your DSM password, re-apply the fix, and restart the package."
       }
     ]
   }
