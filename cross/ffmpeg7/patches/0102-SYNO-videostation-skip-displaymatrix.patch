@@ -45,3 +45,17 @@
      int iods_video_profile;
      int iods_audio_profile;
  
+--- ../ffmpeg-7.1.5-orig/synoconfig.h	2026-07-15 14:51:28.546631081 +0000
++++ ./synoconfig.h	2026-07-15 14:51:28.551301684 +0000
+@@ -14,3 +14,11 @@
+ #if defined(SYNO_VIDEOSTATION)
+ #define SYNO_VIDEOSTATION_HLS_COSTUMIZED_TS_NAME
+ #endif
++
++/* Add skip displaymatrix config to movenc for video station offline transcoding.
++ * add flag "-skip_displaymatrix 1" to mov/mp4 format for skiping writing displaymatrix metadata.
++ * See Video Station #4464
++ */
++#if defined(SYNO_VIDEOSTATION)
++#define SYNO_VIDEOSTATION_SKIP_DISPLAYMATRIX
++#endif
