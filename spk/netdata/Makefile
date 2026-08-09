@@ -1,6 +1,6 @@
 SPK_NAME = netdata
-SPK_VERS = 2.10.3
-SPK_REV = 1
+SPK_VERS = 2.10.4
+SPK_REV = 2
 SPK_ICON = src/netdata.png
 
 DEPENDS = cross/netdata
@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) comcerto2k
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Netdata
 DESCRIPTION = Real-time performance monitoring, done right! Monitor your system with beautiful, interactive dashboards.
-CHANGELOG = "1. Initial release of Netdata v2.10.3."
+CHANGELOG = "1. Update Netdata to v2.10.4."
 
 HOMEPAGE = https://www.netdata.cloud
 LICENSE = GPLv3
