@@ -30,15 +30,17 @@ Install netdata from Package Center. The web dashboard is available at `http://y
 
 ## Post-Install
 
-### Enable Process Monitoring (Optional)
+### Enable Process Monitoring and System Logs (Optional)
 
-Per-process disk I/O monitoring requires `apps.plugin` to run with elevated privileges. DSM 7 blocks setuid binaries from unsigned packages, so this must be applied manually after install:
+Per-process disk I/O monitoring requires `apps.plugin` to run with elevated privileges, and browsing systemd journal logs requires the same for `systemd-journal.plugin`. DSM 7 blocks setuid binaries from unsigned packages, so this must be applied manually after install:
 
 ```bash
 netdata-fix
 ```
 
-This prompts for your DSM password, applies the fix, and tells you to restart the package. It only needs to be run once per install or upgrade.
+This prompts for your DSM password, grants root privileges to both plugins, and tells you to restart the package. It only needs to be run once per install or upgrade.
+
+After running it, process monitoring appears under **Metrics**, and system journal logs are browsable under **Logs** in the web UI.
 
 ### Verify It's Running
 
@@ -81,5 +83,9 @@ Netdata ships with a complete stock configuration at `/var/packages/netdata/targ
 ### Disk I/O not showing per process
 
 Run `netdata-fix` from SSH, then restart the package.
+
+### System logs not appearing
+
+Run `netdata-fix` from SSH, then restart the package. The `systemd-journal.plugin` needs root privileges (via setuid) to read the journal files, which DSM blocks for unsigned packages until the fix is applied.
 
 

@@ -11,7 +11,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) comcerto2k
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Netdata
 DESCRIPTION = Real-time performance monitoring, done right! Monitor your system with beautiful, interactive dashboards.
-CHANGELOG = "1. Update Netdata to v2.10.4."
+CHANGELOG = "1. Update Netdata to v2.10.4. <br/>2. Add systemd journal log viewing."
 
 HOMEPAGE = https://www.netdata.cloud
 LICENSE = GPLv3
