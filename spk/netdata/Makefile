@@ -5,8 +5,10 @@ SPK_ICON = src/netdata.png
 
 DEPENDS = cross/netdata
 
+# netdata compiles C++17 -- gcc 7.5 or newer (verified against the oldest DSM 7 toolchain)
+MIN_GCC_VERSION = 7.5
+
 REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) comcerto2k
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Netdata

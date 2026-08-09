@@ -13,6 +13,9 @@ HOMEPAGE = https://www.netdata.cloud
 COMMENT  = Real-time performance monitoring, done right
 LICENSE  = GPLv3
 
+# netdata compiles C++17 -- gcc 7.5 or newer (verified against the oldest DSM 7 toolchain)
+MIN_GCC_VERSION = 7.5
+
 ACLK_SCHEMAS_DIR = aclk-schemas-$(shell grep "^PKG_VERS " ../aclk-schemas/Makefile | sed 's/.*= //')
 
 CONFIGURE_ARGS  = -DENABLE_PLUGIN_GO=OFF
