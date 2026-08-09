@@ -64,8 +64,8 @@ Navidrome uses FFmpeg for transcoding. Configuration in web UI under Settings �
 
 Navidrome displays synchronized lyrics from embedded tags, `.lrc` sidecar files next to your music, or (for synced lyrics fetched from external providers) a lyrics plugin.
 
-> [!NOTE]
-> The web UI does not display lyrics fetched by plugins — use a third-party client such as Symfonium or DSub. If you only use the web UI, place `.lrc` files next to your music files instead (Navidrome reads them natively).
+!!! note
+    The web UI does not display lyrics fetched by plugins — use a third-party client such as Symfonium or DSub. If you only use the web UI, place `.lrc` files next to your music files instead (Navidrome reads them natively).
 
 ### Installing a Lyrics Plugin
 
@@ -83,6 +83,7 @@ The package data lives in `/var/packages/navidrome/var`, so the plugin folder is
    ```sh
    sudo -u sc-navidrome vi /var/packages/navidrome/var/navidrome.toml
    ```
+
    ```toml
    LyricsPriority = ".ttml,.yaml,.yml,.elrc,.lrc,.srt,.txt,embedded,nd-lyrics"
    ```
