@@ -210,8 +210,10 @@ DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
 
-# Add SVT-AV1 codec to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
+# SVT-AV1 is 64-bit only -- its configure refuses 32-bit, and it now declares
+# REQUIRE_64BIT, so pulling it on a 32-bit arch (the old list named comcerto2k,
+# alpine and monaco, all ARMv7) fails the whole build. Gate it on the 64-bit archs.
+ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
