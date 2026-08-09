@@ -14,6 +14,7 @@ DESCRIPTION = Real-time performance monitoring, done right! Monitor your system 
 CHANGELOG = "1. Update Netdata to v2.10.4. <br/>2. Add systemd journal log viewing."
 
 HOMEPAGE = https://www.netdata.cloud
+HELPURL = https://docs.synocommunity.com/packages/netdata/
 LICENSE = GPLv3
 
 STARTABLE = yes
