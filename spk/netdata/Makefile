@@ -36,3 +36,6 @@ netdata_extra_install:
 	@$(MSG) Install netdata fix script
 	install -m 755 -d $(STAGING_DIR)/bin
 	install -m 755 src/bin/netdata-fix $(STAGING_DIR)/bin/netdata-fix
+	@$(MSG) Install default netdata configuration
+	install -m 755 -d $(STAGING_DIR)/var/etc/netdata
+	install -m 644 src/var/etc/netdata/netdata.conf $(STAGING_DIR)/var/etc/netdata/
