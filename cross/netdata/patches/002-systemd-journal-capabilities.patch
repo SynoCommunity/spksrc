@@ -1,0 +1,11 @@
+--- src/collectors/systemd-journal.plugin/systemd-journal-annotations.c.orig	2026-08-09 16:07:39.979540345 +0000
++++ src/collectors/systemd-journal.plugin/systemd-journal-annotations.c	2026-08-09 16:07:39.983540276 +0000
+@@ -173,7 +173,7 @@
+     [CAP_MAC_ADMIN] = "MAC_ADMIN",
+     [CAP_SYSLOG] = "SYSLOG",
+     [CAP_WAKE_ALARM] = "WAKE_ALARM",
+-    [CAP_BLOCK_SUSPEND] = "BLOCK_SUSPEND",
++    [36 /*CAP_BLOCK_SUSPEND*/] = "BLOCK_SUSPEND",
+     [37 /*CAP_AUDIT_READ*/] = "AUDIT_READ",
+     [38 /*CAP_PERFMON*/] = "PERFMON",
+     [39 /*CAP_BPF*/] = "BPF",
