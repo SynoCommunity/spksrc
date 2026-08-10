@@ -1,10 +1,12 @@
 PKG_NAME = eza
-PKG_VERS = 0.23.5
+PKG_VERS = 0.23.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/eza-community/eza/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+
+# eza 0.23.4 is the latest release that build with rust 1.82
 
 DEPENDS = cross/zlib
 
@@ -12,8 +14,6 @@ DEPENDS = cross/zlib
 UNSUPPORTED_ARCHS  = $(OLD_PPC_ARCHS)
 # eza >= 0.20.19 requires RUST_TOOLCHAIN >= 1.78
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
-# eza >= 0.23.5 requires RUST_TOOLCHAIN >= 1.90
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
 
 HOMEPAGE = https://eza.rocks/
 COMMENT  = A modern replacement for 'ls'.

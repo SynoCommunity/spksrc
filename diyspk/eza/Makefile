@@ -9,6 +9,8 @@ DEPENDS = cross/eza
 include ../../mk/spksrc.common.mk
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 SPK_VERS = 0.20.18
+else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+SPK_VERS = 0.23.4
 endif
 
 MAINTAINER = SynoCommunity
