@@ -81,7 +81,9 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
 
 DEPENDS += cross/lsd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
+endif
 
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/ms-edit
 OPTIONAL_DESC := $(OPTIONAL_DESC)", edit (MS Editor)"
 endif
