@@ -80,9 +80,13 @@ ADDITIONAL_CFLAGS += -I$(or $(VIDEODRV_STAGING_INSTALL_PREFIX),$(STAGING_INSTALL
 
 include ../../mk/spksrc.common.mk
 
+# VA-API / QSV need the videodriver stack (libva), which exists only on DSM 6.2.4+
+# (a DSM 5.2 x64 on the gcc overlay has no driver package) -- mirror ffmpeg's gate.
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TCVERSION), 6.2.4),1)
 CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-qsv
+endif
 endif
 
 # If libraries through FFMPEG_PACKAGE shared libraries unavailable
@@ -98,7 +102,9 @@ DEPENDS += cross/libvpx
 DEPENDS += cross/x264
 DEPENDS += cross/x265
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TCVERSION), 6.2.4),1)
 DEPENDS += cross/libva
+endif
 endif
 endif
 

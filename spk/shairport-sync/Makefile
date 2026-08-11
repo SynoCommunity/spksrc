@@ -5,6 +5,13 @@ SPK_ICON = src/shairport-sync.png
 
 DEPENDS = cross/shairport-sync
 
+# ffmpeg6-audio 6.0.1's x86 inline asm needs gcc >= 4.9; the DSM 5.2 x86/x64 stock
+# gcc is 4.7.3, so lift this chain to the gcc8 overlay on those archs. Other archs
+# build ffmpeg6-audio with --arch=arm/ppc (no x86 asm) and keep their stock gcc.
+ifneq ($(filter $(ARCH),x86 x64),)
+MIN_GCC_VERSION = 4.9
+endif
+
 # Require AudioStation for USB audio driver support on DSM 6
 SPK_DEPENDS = "AudioStation"
 
