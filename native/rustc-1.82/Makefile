@@ -11,9 +11,6 @@ PKG_DIR  = $(PKG_NAME)-$(PKG_VERS)-src
 TC_ARCH ?= ppc853x
 TC_VERS ?= 5.2
 
-# Per-(arch,dsm) archive revision (new structure, CLI-overridable).
-include archive-rev.mk
-
 HOMEPAGE = https://www.rust-lang.org/
 COMMENT  = Rust 1.82 rebuilt from source as a custom cross toolchain (rustc + cargo + host/target std, LLVM from the bundled source) for legacy Synology toolchains rustup ships no usable prebuilt std for (Tier-3 PowerPC e500; ARMv5 on an older glibc). Produces the rust-<id>.txz the toolchain consumer extracts.
 LICENSE  = Apache-2.0, MIT
@@ -31,10 +28,17 @@ LICENSE  = Apache-2.0, MIT
 #   make TC_ARCH=<arch> TC_VERS=<vers> build-archive
 #
 # Declared BEFORE the native front-end include so the helper (pulled in via
-# native-cc.mk) sees ARCHIVE_NAME; the '=' refs (_RUST_TC_ID, RUST_STAGE_DIR,
-# RUST_ARCHIVE_REV) resolve later. ARCHIVE_KEEP = . of the stage dir so the tree
-# unpacks straight into $(RUSTUP_HOME)/toolchains/<id>.
+# native-cc.mk) sees ARCHIVE_NAME; the '=' refs (_RUST_TC_ID, RUST_STAGE_DIR)
+# resolve later. ARCHIVE_KEEP = . of the stage dir so the tree unpacks straight
+# into $(RUSTUP_HOME)/toolchains/<id>.
+#
+# RUST_ARCHIVE_REV tags the .txz name only; bump it -- or pass RUST_ARCHIVE_REV=vN on
+# the command line, then rename -- when re-publishing a rebuilt archive under the same
+# id so mirrors/CDN caches don't serve the stale artifact. Each consumer toolchain
+# (syno-<arch>-<vers>-rust-gcc<gcc>) pins its own current rev the same way (mirrors
+# native/binutils-2.30's BINUTILS_ARCHIVE_REV; no shared/cross-included rev file).
 ##############################################################################
+RUST_ARCHIVE_REV ?= v1
 ARCHIVE_NAME = rust-$(_RUST_TC_ID)-$(RUST_ARCHIVE_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(RUST_STAGE_DIR)

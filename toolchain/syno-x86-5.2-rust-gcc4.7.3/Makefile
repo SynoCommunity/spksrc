@@ -11,9 +11,9 @@ RUST_TARGET      = x86_64-synology-linux-gnu
 RUST_TC_ARCH     = x86
 RUST_TC_VERS     = 5.2
 RUST_TC_GCC      = 4.7.3
-# Archive revision from the native producer structure (single source, CLI-
-# overridable): native/rustc-1.82/archive-rev.mk, keyed on RUST_TC_ARCH/VERS.
-include ../../native/rustc-1.82/archive-rev.mk
+# Archive revision -- static here, CLI-overridable (mirrors binutils' BINUTILS_ARCHIVE_REV;
+# bump when re-publishing a rebuilt .txz under the same id).
+RUST_ARCHIVE_REV ?= v3
 RUST_TC_ID       = $(PKG_VERS)-$(subst -unknown-,-synology-,$(RUST_TARGET))-$(RUST_TC_ARCH)-$(RUST_TC_VERS)-gcc$(RUST_TC_GCC)
 
 CARGO_PATH=$(BASEDIR)/distrib/cargo/bin

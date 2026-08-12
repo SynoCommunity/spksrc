@@ -53,9 +53,6 @@ RUST_CC          ?= $(RUST_TOOL_BIN)gcc$(TC_GCC_SUFFIX)
 _RUST_BASE_TARGET := $(RUST_TARGET)
 _RUST_SYNO_TARGET := $(subst -unknown-,-synology-,$(RUST_TARGET))
 _RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
-# Archive revision -- bump (v2, ...) when re-publishing a rebuilt .txz under the same
-# id so mirrors/CDN caches don't serve the stale artifact. Tags the .txz name only.
-RUST_ARCHIVE_REV ?= v1
 
 # Rust overlay (OVERLAY_RUSTC), part of the OVERLAY_<component> family (OVERLAY_BINUTILS,
 # OVERLAY_GCC) but defaulting ON: an arch reaches this block only because it HAS a custom

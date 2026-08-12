@@ -14,13 +14,12 @@
 # patch) is the framework's, so patches live in native/rustc-<vers>/patches.
 #
 # Read from toolchain/syno-<arch>-<vers>/Makefile (single source of truth):
-#   RUST_TARGET, RUST_POSTFIX_ALIASES, RUST_LINK_VIA_LLD, RUST_ARCHIVE_REV,
+#   RUST_TARGET, RUST_POSTFIX_ALIASES, RUST_LINK_VIA_LLD,
 #   TC_EXTRA_CFLAGS, TC_EXTRA_RUSTFLAGS, RUST_BUILD_EXTRA_RUSTFLAGS
 #
 # Provides (consumed by native/rustc-<vers>/Makefile):
 #   _RUST_TC_ID     shared rustup toolchain id, also the archive base name
 #   RUST_STAGE_DIR  x.py stage output = the toolchain to archive (ARCHIVE_DIR)
-#   RUST_ARCHIVE_REV
 ###############################################################################
 
 # Every custom toolchain uses a Synology-vendored target triple -- a uniform marker
@@ -97,8 +96,8 @@ TC_EXTRA_CFLAGS            := $(call _tc_get,TC_EXTRA_CFLAGS)
 TC_EXTRA_RUSTFLAGS         := $(call _tc_get,TC_EXTRA_RUSTFLAGS)
 RUST_BUILD_EXTRA_RUSTFLAGS := $(call _tc_get,RUST_BUILD_EXTRA_RUSTFLAGS)
 
-# RUST_ARCHIVE_REV comes from native/rustc-<vers>/archive-rev.mk (single source,
-# CLI-overridable), included by the package Makefile before this file.
+# RUST_ARCHIVE_REV is set by the native producer Makefile (RUST_ARCHIVE_REV ?= v1,
+# CLI-overridable), mirroring native/binutils-2.30's BINUTILS_ARCHIVE_REV.
 
 # The rust version is the native package's own PKG_VERS.
 TC_RUSTC        = $(PKG_VERS)
