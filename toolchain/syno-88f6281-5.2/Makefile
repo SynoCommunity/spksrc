@@ -12,13 +12,10 @@ TC_TARGET = arm-marvell-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/libc
 TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 
-# Custom Rust toolchain: rustup's prebuilt armv5te std targets a newer glibc than the
-# DSM 6.2.4 glibc 2.15, so std is (re)built from source against this toolchain. armv5te
-# is a Tier-2 target so RUST_TARGET (armv5te-unknown-linux-gnueabi) needs no aliases.
-# Declares this as a custom-rust arch (enters spksrc.toolchain/rustc.mk). The
-# prebuilt rust-<id>-<rev>.txz is built by native/rustc-$(TC_RUSTC)
-# (make -C native/rustc-1.82 arch-88f6281-5.2) and downloaded via the consumer
-# DEPENDS below.
+# Custom Rust toolchain: rustup's prebuilt armv5te std targets a newer glibc than DSM 5.2's
+# glibc 2.15, so std is (re)built from source here. armv5te is Tier-2, so RUST_TARGET
+# (armv5te-unknown-linux-gnueabi) needs no aliases. Declares a custom-rust arch (enters
+# rustc.mk); the rust-<id>-<rev>.txz is built by native/rustc-1.82 (arch-88f6281-5.2), DEPENDS below.
 RUST_BUILD_TOOLCHAIN = 0
 
 # Base triple tier: rustup ships a std (tier 1/2), so OVERLAY_RUSTC=0 can fall

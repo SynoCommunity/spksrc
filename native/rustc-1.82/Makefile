@@ -49,16 +49,11 @@ NATIVE_TOOLCHAIN = rust
 include ../../mk/spksrc.native-toolchain.mk
 
 ##############################################################################
-# Build rustc for EVERY custom-rust toolchain of a given DSM version (a toolchain
-# is a real rust target iff its Makefile declares RUST_TARGET). Consumer dirs
-# (syno-<arch>-<vers>-rust-gcc<gcc>) are excluded: the version wildcard only
-# matches names ending in -<vers>.
-#
+# Build rustc for EVERY custom-rust toolchain of a DSM version (real rust target iff its
+# Makefile declares RUST_TARGET; consumer -rust-gcc dirs are excluded).
 #   make all-5.2                 one arch at a time
 #   make RUST_JOBS=2 all-6.2.4   2 archs at a time (each still max threads)
-#
-# Concurrency via xargs -P, deliberately NOT make -j (which would propagate into
-# the x.py sub-builds). Keep it low: an LLVM+rustc build is heavy and homogeneous.
+# Concurrency via xargs -P, NOT make -j (which would propagate into the x.py sub-builds).
 ##############################################################################
 RUST_REAL_ARCHS = $(foreach a,$(patsubst syno-%-$(1),%,$(notdir $(wildcard ../../toolchain/syno-*-$(1)))),$(if $(strip $(shell grep -l '^RUST_TARGET' ../../toolchain/syno-$(a)-$(1)/Makefile 2>/dev/null)),$(a)))
 

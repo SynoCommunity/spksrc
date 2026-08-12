@@ -43,25 +43,19 @@ RUST_TOOL_BIN     = $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
 RUST_BUILD_HOST   ?= x86_64-unknown-linux-gnu
 RUST_CC          ?= $(RUST_TOOL_BIN)gcc$(TC_GCC_SUFFIX)
 
-# Base target = the in-tree rust triple (env-rust.mk arch map / toolchain Makefile).
-# The custom "overlay" build uses a Synology-vendored triple (unknown -> synology) --
-# a uniform marker that self-identifies our toolchains and is resolved from a JSON
-# target-spec. The shared toolchain id embeds the synology triple + arch/DSM/gcc; it
-# reads like a normal rustup name (<ver>-<target>) grafted with arch/DSM/gcc (stock
-# vs the gcc-8.5 overlay via effective TC_GCC).
+# The custom "overlay" build uses a Synology-vendored triple (unknown -> synology), a uniform
+# marker resolved from a JSON target-spec. The shared toolchain id embeds it + arch/DSM/gcc,
+# reading like a rustup name (<ver>-<target>) grafted with arch/DSM/gcc (stock or gcc-8.5 overlay).
 _RUST_BASE_TARGET := $(RUST_TARGET)
 _RUST_SYNO_TARGET := $(subst -unknown-,-synology-,$(RUST_TARGET))
 _RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
 
-# Rust overlay (OVERLAY_RUSTC), part of the OVERLAY_<component> family (OVERLAY_BINUTILS,
-# OVERLAY_GCC) but defaulting ON: an arch reaches this block only because it HAS a custom
-# rust overlay, so using it is the point. ON (default) uses the custom from-source build
-# (native/rustc-<vers>) and the Synology-vendored triple (unknown -> synology, resolved
-# from a JSON spec). OFF falls back to the stock rustup rustc + in-tree `unknown` triple --
-# valid ONLY for a tier-1/2 base triple (rustup ships a std); a tier-3 base (e.g. PowerPC
-# e500) has NO stock std, so OVERLAY_RUSTC=0 is a hard error there. The toolchain declares
-# the base triple's tier (RUST_TARGET_TIER). Overridable per package/local.mk/CLI.
-# (RUST_OVERLAY is accepted as a deprecated alias during the OVERLAY_* rename.)
+# Rust overlay (OVERLAY_RUSTC), part of the OVERLAY_<component> family but defaulting ON: an
+# arch reaches this block only because it HAS a custom rust overlay. ON (default) = the custom
+# from-source build + synology triple. OFF falls back to stock rustup rustc + in-tree `unknown`
+# triple -- valid ONLY for a tier-1/2 base (rustup ships a std); on tier-3 (PowerPC e500) there
+# is no stock std, so OVERLAY_RUSTC=0 is a hard error. Tier via RUST_TARGET_TIER; overridable
+# per package/local.mk/CLI. (RUST_OVERLAY = deprecated alias.)
 OVERLAY_RUSTC    ?= $(or $(RUST_OVERLAY),1)
 RUST_TARGET_TIER ?= 3
 

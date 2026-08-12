@@ -22,14 +22,11 @@
 #   RUST_STAGE_DIR  x.py stage output = the toolchain to archive (ARCHIVE_DIR)
 ###############################################################################
 
-# Every custom toolchain uses a Synology-vendored target triple -- a uniform marker
-# that self-identifies our toolchains in `rustup toolchain list` and in the ids /
-# archive names. The toolchain declares the IN-TREE rust triple as RUST_TARGET; we
-# keep that as the JSON base and derive the actual target by swapping the vendor
-# unknown -> synology, then resolve it from a generated JSON target-spec. This also
-# sidesteps the host==target collision on x86/i686 (host stays x86_64-unknown-linux-gnu
-# while the target becomes x86_64-synology-linux-gnu -> two distinct [target.*] in
-# config.toml). Std is cross-built for the synology triple by name via RUST_TARGET_PATH.
+# Every custom toolchain uses a Synology-vendored target triple (a uniform marker in
+# `rustup toolchain list` and in the ids/archive names): the toolchain declares the in-tree
+# triple as RUST_TARGET, and we swap the vendor unknown -> synology and resolve it from a
+# generated JSON target-spec. This also sidesteps the host==target collision on x86/i686
+# (host x86_64-unknown-linux-gnu vs target x86_64-synology-linux-gnu -> two [target.*]).
 RUST_TARGET_JSON_BASE := $(call _tc_get,RUST_TARGET)
 RUST_TARGET           := $(subst -unknown-,-synology-,$(RUST_TARGET_JSON_BASE))
 RUST_POSTFIX_ALIASES  := $(call _tc_get,RUST_POSTFIX_ALIASES)
@@ -51,31 +48,19 @@ endif
 
 RUST_TARGET_JSON_DIR = $(WORK_DIR)/target-spec
 RUST_TARGET_JSON     = $(RUST_TARGET_JSON_DIR)/$(RUST_TARGET).json
-# The stock host rustc BINARY that emits the base spec -- NOT the distrib/cargo/bin
-# rustup proxy: the proxy rejects `--target <t>` for any t whose std is not installed
-# in the channel ("target not found in channel"), even for --print target-spec-json
-# which needs no std (ppc/armv5 bases are built-in but not installed host-side). The
-# real binary prints the built-in spec directly. tc-rust.mk installs this toolchain
-# (default TC_RUSTC) host-side.
+# The stock host rustc BINARY that emits the base spec -- NOT the distrib/cargo/bin rustup
+# proxy, which rejects `--target <t>` for a t whose std is not installed (even for --print
+# target-spec-json, which needs no std). tc-rust.mk installs this toolchain host-side.
 HOST_RUSTC          ?= $(abspath $(BASE_DISTRIB_DIR)/rustup/toolchains/$(TC_RUSTC)-$(RUST_BUILD_HOST)/bin/rustc)
 
-# Emit <RUST_TARGET>.json from the built-in base spec before the build; the
-# PRE_CONFIGURE step (rustc_prepare) depends on it. RUST_TARGET_PATH (set in _X) then
-# lets x.py resolve the custom target by name. The tweaks:
-#   vendor -> synology         the uniform custom marker
-#   is-builtin dropped         a custom target may not set it
-#   cpu / features baked in    the -Ctarget-cpu / -Ctarget-feature from TC_EXTRA_RUSTFLAGS
-#                              are parsed into the spec's "cpu"/"features" fields.
-#   metadata rewritten         identifies as a SynoCommunity custom (tier 3).
-# WHY cpu/features MUST be in the spec (not only in CARGO_TARGET_<triple>_RUSTFLAGS):
-# x.py/bootstrap does NOT honor CARGO_TARGET_<triple>_RUSTFLAGS when building the STD,
-# so -Ctarget-cpu=e500 was silently dropped there -- the ppc/qoriq std ended up with
-# generic-PowerPC `sync`/`lwsync` (which the e500 traps on as an illegal instruction,
-# LLVM D76614) and generic FP, while the flag DID reach package builds via cargo. The
-# spec is read by BOTH x.py and cargo, and (unlike RUSTFLAGS) maturin cannot clobber it,
-# so it is the correct, single home for the arch's cpu/features. The tools (linker/ar)
-# stay out of the spec -- they are non-relocatable and go via CARGO_TARGET_<triple>_*
-# (tc_vars.rust.mk, resolved per-machine via $(BASEDIR)).
+# Emit <RUST_TARGET>.json from the built-in base spec before the build (rustc_prepare depends
+# on it); RUST_TARGET_PATH then lets x.py resolve it by name. Tweaks: vendor -> synology, drop
+# is-builtin, bake cpu/features from TC_EXTRA_RUSTFLAGS's -Ctarget-cpu/-feature, rewrite metadata
+# (tier 3). cpu/features MUST live in the spec (not just CARGO_TARGET_<triple>_RUSTFLAGS): x.py
+# does NOT honor those when building the STD, so -Ctarget-cpu=e500 was silently dropped and the
+# std got generic-PowerPC sync/lwsync (e500 traps as illegal instruction, LLVM D76614). The spec
+# is read by both x.py and cargo and maturin can't clobber it. Linker/ar stay out (non-relocatable,
+# via CARGO_TARGET_<triple>_* in tc_vars.rust.mk).
 rustc_prepare: $(RUST_TARGET_JSON)
 $(RUST_TARGET_JSON):
 	@mkdir -p $(@D)

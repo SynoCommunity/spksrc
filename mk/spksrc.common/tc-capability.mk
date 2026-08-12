@@ -69,13 +69,11 @@ endif
 endif
 
 # ---- rustc: the rust version the toolchain pins -----------------------------
-# Custom-rust archs (qoriq/ppc853x/88f6281) pin TC_RUSTC in their toolchain Makefile
-# (e.g. 1.82.0, the last that supports their old glibc), so a package needing a newer
-# rustc is genuinely unsupported there. Read statically like TC_GCC. Standard archs
-# declare no TC_RUSTC (they use rustup 'stable' = the newest), so an empty or 'stable'
-# value satisfies any floor -- no network query to resolve what 'stable' is right now;
-# only a pinned concrete version is compared. A local var, so env-rust.mk's TC_RUSTC
-# (its 'stable' default) is left untouched.
+# Custom-rust archs (qoriq/ppc853x/88f6281) pin TC_RUSTC (e.g. 1.82.0, the last supporting
+# their old glibc), so a package needing a newer rustc is genuinely unsupported there. Read
+# statically like TC_GCC. Standard archs declare no TC_RUSTC (rustup 'stable' = newest), so an
+# empty/'stable' value satisfies any floor -- only a pinned concrete version is compared, no
+# network query. A local var, so env-rust.mk's TC_RUSTC 'stable' default is untouched.
 _TC_CAP_RUSTC := $(shell sed -n 's/^TC_RUSTC *= *//p' $(_TC_CAP_MK) 2>/dev/null)
 ifneq ($(strip $(MIN_RUSTC_VERSION)),)
 ifneq ($(strip $(_TC_CAP_RUSTC)),)

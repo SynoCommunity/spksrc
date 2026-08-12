@@ -10,12 +10,9 @@
 #   OVERLAY_GCC       gcc-8.5                                     (future, native/gcc8)
 # OVERLAY_GCC and the ppc853x OVERLAY_RUSTC both REQUIRE OVERLAY_BINUTILS (gcc-8.5 emits
 # relocations, and Rust's TLS/PIE output on ppc853x, that the stock 2008 GNU ld 2.18
-# mishandles). Standalone (OVERLAY_BINUTILS=1
-# with the stock gcc) is also valid: a modern ld fixes e.g. the ppc853x dynamic-TPREL
-# TLS bug for plain C too. 2.30 is the DSM-7.1/7.2 default (same version native/gcc8
-# co-builds), new enough for every backend/reloc in play and still targeting the
-# legacy glibc. Declared 0/1 in the base toolchain Makefile; only legacy archs (glibc
-# <= 2.20 / DSM <= 6.2.4) need it -- DSM 7.0+ already ship binutils >= 2.30.
+# mishandles). Standalone (OVERLAY_BINUTILS=1 with stock gcc) is also valid: a modern ld
+# fixes the ppc853x dynamic-TPREL TLS bug for plain C too. 2.30 is the DSM-7.1/7.2 default
+# (native/gcc8 co-builds it); only legacy archs (glibc <= 2.20 / DSM <= 6.2.4) need it.
 #
 # The binutils is PRODUCED by native/binutils-<ver> (co-build + publishable archive,
 # `make -C native/binutils-<ver> arch-<arch>-<vers>`) and CONSUMED here by DOWNLOADING
@@ -23,23 +20,18 @@
 # binutils<ver> (like the rust consumer) -- no per-build recompile in CI.
 ###############################################################################
 
-# TWO distinct uses of the overlay binutils -- keep them separate, because a modern
-# binutils is only safe under a MATCHED modern gcc:
+# TWO distinct uses -- kept separate because a modern binutils is only safe under a MATCHED
+# modern gcc:
 #
-#   OVERLAY_BINUTILS         GLOBAL: the default as/ld for EVERY compilation on the arch
-#                            (baked into tc_vars). Valid ONLY with a matched modern gcc --
-#                            the future gcc-8.5 overlay (OVERLAY_GCC=1 => OVERLAY_BINUTILS=1),
-#                            where gcc-8.5 + binutils-2.30 are an upstream pair. It must NOT
-#                            be turned on under a stock/vendor gcc: a modern binutils rejects
-#                            vendor flags the old gcc emits (e.g. arm-marvell's -mcpu=marvell-f)
-#                            and is an unnecessary mismatch. Default OFF; only gcc8 sets it.
+#   OVERLAY_BINUTILS         GLOBAL: default as/ld for EVERY compilation (baked into tc_vars).
+#                            Valid ONLY with a matched modern gcc (the future gcc-8.5 overlay);
+#                            under a stock/vendor gcc a modern binutils rejects the vendor flags
+#                            it emits (e.g. arm-marvell's -mcpu=marvell-f). Default OFF (gcc8 only).
 #
-#   RUST_LINK_VIA_BINUTILS   NARROW (rustc.mk / base toolchain): routes ONLY the Rust package
-#                            link (CARGO_TARGET_<triple>_LINKER) through the overlay ld. The C
-#                            toolchain stays the stock vendor gcc+ld. Used where the stock ld
-#                            breaks Rust's output but the stock gcc emits standard flags a
-#                            modern ld accepts -- ppc853x (2008 ld 2.18 mangles Rust TLS/PIE;
-#                            gcc 4.3.7 uses standard -mcpu=8548). Explicit per rust arch.
+#   RUST_LINK_VIA_BINUTILS   NARROW: routes ONLY the Rust package link through the overlay ld;
+#                            the C toolchain stays stock vendor gcc+ld. For archs whose stock ld
+#                            breaks Rust but whose stock gcc emits standard flags (ppc853x).
+#                            Default ON for every custom-rust arch.
 #
 # Both draw on the same downloaded binutils (below); they differ only in scope.
 OVERLAY_BINUTILS       ?= 0
