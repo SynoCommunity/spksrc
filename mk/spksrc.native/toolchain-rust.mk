@@ -43,7 +43,10 @@ RUST_LINK_VIA_LLD     := $(or $(call _tc_get,RUST_LINK_VIA_LLD),0)
 # (lld leaves a PIE relative reloc unapplied; 2008 ld 2.18 leaves TLS TPREL16 relocs dynamic,
 # glibc-2.8 mis-applies them). 2.30 is the DSM-7.1/7.2 default. Mutually exclusive with
 # RUST_LINK_VIA_LLD.
-RUST_LINK_VIA_BINUTILS := $(or $(call _tc_get,RUST_LINK_VIA_BINUTILS),0)
+# Default ON: the from-source std is uniformly linked with the binutils 2.30 overlay for
+# every custom-rustc arch (this file only ever builds custom-rustc archs). A toolchain may
+# still set RUST_LINK_VIA_BINUTILS=0 to opt out. Mirrors the consumer default (overlay-binutils.mk).
+RUST_LINK_VIA_BINUTILS := $(or $(call _tc_get,RUST_LINK_VIA_BINUTILS),1)
 RUST_BINUTILS_VERS     := $(or $(call _tc_get,OVERLAY_BINUTILS_VERS),2.30)
 RUST_BINUTILS_DIR       = $(abspath $(CURDIR)/../binutils-$(RUST_BINUTILS_VERS))
 RUST_BINUTILS_BIN       = $(RUST_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)/install/usr/local/bin

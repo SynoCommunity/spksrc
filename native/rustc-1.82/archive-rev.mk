@@ -13,8 +13,8 @@
 # so both the producer and the download resolve the same rev with no per-arch edits
 # outside this file.
 RUST_ARCHIVE_REV_ppc853x-5.2   = v8
-RUST_ARCHIVE_REV_qoriq-6.2.4   = v3
-RUST_ARCHIVE_REV_88f6281-5.2   = v2
+RUST_ARCHIVE_REV_qoriq-6.2.4   = v4
+RUST_ARCHIVE_REV_88f6281-5.2   = v3
 RUST_ARCHIVE_REV_88f6281-6.2.4 = v2
 RUST_ARCHIVE_REV_x86-5.2       = v2
 

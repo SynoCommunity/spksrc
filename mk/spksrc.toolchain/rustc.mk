@@ -118,15 +118,16 @@ endef
 endif
 
 # RUST_LINK_VIA_BINUTILS routes ONLY the Rust package link through the overlay ld, while
-# the C toolchain keeps the stock vendor gcc+ld -- for archs whose stock ld breaks Rust's
-# output but whose stock gcc emits standard flags a modern ld accepts (ppc853x). Declared
-# per-arch in the base toolchain Makefile; independent of the GLOBAL OVERLAY_BINUTILS
-# (that one, for a matched gcc-8.5 pair, redirects ALL compilation via tc_vars -- see
-# overlay-binutils.mk). The link goes through CARGO_TARGET_<triple>_LINKER (= a gcc
-# -B<overlay shim> wrapper): cargo ignores CARGO_TARGET_*_RUSTFLAGS once maturin sets
-# RUSTFLAGS but always honors the linker; GNU ld needs no -Qy filtering, unlike lld.
-# OVERLAY_BINUTILS_SHIM comes from overlay-binutils.mk.
-RUST_LINK_VIA_BINUTILS ?= 0
+# the C toolchain keeps the stock vendor gcc+ld. Default ON for every custom-rustc arch
+# (set in overlay-binutils.mk, included before this file) so our from-source rustc is
+# uniformly linked with binutils 2.30 -- the std build (producer) and the package link both.
+# The ?= 1 here is just the standalone fallback; overlay-binutils.mk normally wins. Independent
+# of the GLOBAL OVERLAY_BINUTILS (that one, for a matched gcc-8.5 pair, redirects ALL
+# compilation via tc_vars -- see overlay-binutils.mk). The link goes through
+# CARGO_TARGET_<triple>_LINKER (= a gcc -B<overlay shim> wrapper): cargo ignores
+# CARGO_TARGET_*_RUSTFLAGS once maturin sets RUSTFLAGS but always honors the linker; GNU ld
+# needs no -Qy filtering, unlike lld. OVERLAY_BINUTILS_SHIM comes from overlay-binutils.mk.
+RUST_LINK_VIA_BINUTILS ?= 1
 ifeq ($(RUST_LINK_VIA_BINUTILS),1)
 RUST_BINUTILS_CC = $(TC_WORK_DIR)/binutils-cc
 TC_RUST_LINKER   = $(RUST_BINUTILS_CC)

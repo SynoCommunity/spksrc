@@ -45,6 +45,16 @@
 OVERLAY_BINUTILS       ?= 0
 OVERLAY_BINUTILS_VERS  ?= 2.30
 
+# RUST_LINK_VIA_BINUTILS defaults ON for every custom-rustc toolchain (RUST_BUILD_TOOLCHAIN
+# declared): our from-source rustc is UNIFORMLY linked with the binutils 2.30 overlay -- the
+# std is built with it (producer, toolchain-rust.mk) and the same overlay is reused as the
+# package CARGO_TARGET_<triple>_LINKER (consumer, rustc.mk). It stays NARROW (rust link only;
+# the C toolchain keeps the stock vendor as/ld), unlike the GLOBAL OVERLAY_BINUTILS above.
+# Overridable per toolchain/CLI. Non-rust archs never enter this branch, so it stays 0 there.
+ifneq ($(strip $(RUST_BUILD_TOOLCHAIN)),)
+RUST_LINK_VIA_BINUTILS ?= 1
+endif
+
 # The per-arch consumer that downloads + extracts the published binutils .txz.
 OVERLAY_BINUTILS_CONSUMER = syno-$(TC_ARCH)-$(TC_VERS)-binutils$(OVERLAY_BINUTILS_VERS)
 OVERLAY_BINUTILS_DIR      = $(BASEDIR)/toolchain/$(OVERLAY_BINUTILS_CONSUMER)
@@ -61,8 +71,8 @@ OVERLAY_BINUTILS_SHIM     = $(OVERLAY_BINUTILS_DIR)/work-native/shim
 OVERLAY_BINUTILS_FLAG     = $(if $(filter 1,$(OVERLAY_BINUTILS)),-B$(OVERLAY_BINUTILS_SHIM))
 
 # Provision the binutils (download the consumer + build the shim) when EITHER use needs
-# it: the global overlay (gcc8) or the narrow rust-link overlay (ppc853x). RUST_LINK_VIA_
-# BINUTILS is declared in the base toolchain Makefile, so it is set here (before rustc.mk).
+# it: the global overlay (gcc8) or the narrow rust-link overlay (default ON for every
+# custom-rustc arch, set just above). Resolved here, before rustc.mk consumes it.
 _OVERLAY_BINUTILS_NEEDED := $(if $(filter 1,$(OVERLAY_BINUTILS))$(filter 1,$(RUST_LINK_VIA_BINUTILS)),1)
 
 .PHONY: overlay-binutils
