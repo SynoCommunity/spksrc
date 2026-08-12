@@ -16,7 +16,7 @@ RUST_ARCHIVE_REV_ppc853x-5.2   = v8
 RUST_ARCHIVE_REV_qoriq-6.2.4   = v4
 RUST_ARCHIVE_REV_88f6281-5.2   = v3
 RUST_ARCHIVE_REV_88f6281-6.2.4 = v3
-RUST_ARCHIVE_REV_x86-5.2       = v2
+RUST_ARCHIVE_REV_x86-5.2       = v3
 
 # CLI override wins (?=). Try the (arch,dsm) from either naming, else v1.
 RUST_ARCHIVE_REV ?= $(or $(RUST_ARCHIVE_REV_$(TC_ARCH)-$(TC_VERS)),$(RUST_ARCHIVE_REV_$(RUST_TC_ARCH)-$(RUST_TC_VERS)),v1)
