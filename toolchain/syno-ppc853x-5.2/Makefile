@@ -44,7 +44,8 @@ RUST_TARGET = powerpc-unknown-linux-gnuspe
 # clean binary. gcc 4.3.7 uses standard -mcpu=8548 flags a modern ld accepts, so this narrow
 # rust-link overlay is safe. NOT the GLOBAL OVERLAY_BINUTILS (that redirects ALL C compilation
 # and is only valid under a matched gcc-8.5 overlay -- see overlay-binutils.mk).
-RUST_LINK_VIA_BINUTILS = 1
+# RUST_LINK_VIA_BINUTILS now defaults ON for every custom-rust arch (overlay-binutils.mk),
+# so it is not set explicitly here; the rationale above is why it must stay on for ppc853x.
 
 # <triple>-<tool> symlink prefixes the built rustc expects (rustc.mk creates them)
 RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
