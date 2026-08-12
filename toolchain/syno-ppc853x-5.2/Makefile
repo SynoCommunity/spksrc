@@ -49,11 +49,16 @@ RUST_LINK_VIA_BINUTILS = 1
 # <triple>-<tool> symlink prefixes the built rustc expects (rustc.mk creates them)
 RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
 
-# Build std with initial-exec TLS: it resolves to GOT_TPREL (static TLS), the model
-# that produced the clean, verified on-device binary. Kept even with the 2.30 ld,
-# which resolves it at link with no dynamic TLS relocs. Build-only (-Z needs the
-# from-source bootstrap; must not reach the cross rust packages).
-RUST_BUILD_EXTRA_RUSTFLAGS = -Ztls-model=initial-exec
+# TLS model: DO NOT set -Ztls-model=initial-exec here. It was tried as a workaround for the
+# old glibc-2.8 + ld-2.18 dynamic-TPREL problem, but it forces every #[thread_local] access
+# through the GOT via the PPC32 "bl .+8; mflr" GOT-base getter. At -O0 (any non-LTO build)
+# LLVM emits that getter WITHOUT saving the incoming LR, so a thread-local accessor such as
+# std's stack_overflow::GUARD call_once returns into its own embedded GOT .long word ->
+# "Illegal instruction" at std::rt::init on every rust binary (SynoCommunity#7353; release+LTO
+# only survives because the accessor gets inlined away). The default (general-dynamic, what
+# qoriq uses and what runs cleanly on this e500v2 silicon) emits DTPREL16/GOT_TLSGD16 with no
+# GOT-base getter, and binutils 2.30 (the RUST_LINK_VIA_BINUTILS overlay) resolves it correctly.
+# So: no RUST_BUILD_EXTRA_RUSTFLAGS -- keep the default TLS model.
 
 # glibc 2.8 predates clock_gettime in libc (2.17); the target has no native 64-bit atomics.
 # -latomic is dropped automatically when the gcc does not ship it.
