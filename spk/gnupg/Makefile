@@ -1,4 +1,3 @@
-# TEMP (revert before merge): touched to exercise the gnupg.org mirror fallback in CI.
 SPK_NAME = gnupg
 SPK_VERS = 2.4.9
 SPK_REV = 8
