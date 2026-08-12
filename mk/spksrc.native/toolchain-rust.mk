@@ -14,7 +14,7 @@
 # patch) is the framework's, so patches live in native/rustc-<vers>/patches.
 #
 # Read from toolchain/syno-<arch>-<vers>/Makefile (single source of truth):
-#   RUST_TARGET, RUST_POSTFIX_ALIASES, RUST_LINK_VIA_LLD,
+#   RUST_TARGET, RUST_POSTFIX_ALIASES,
 #   TC_EXTRA_CFLAGS, TC_EXTRA_RUSTFLAGS, RUST_BUILD_EXTRA_RUSTFLAGS
 #
 # Provides (consumed by native/rustc-<vers>/Makefile):
@@ -33,18 +33,11 @@
 RUST_TARGET_JSON_BASE := $(call _tc_get,RUST_TARGET)
 RUST_TARGET           := $(subst -unknown-,-synology-,$(RUST_TARGET_JSON_BASE))
 RUST_POSTFIX_ALIASES  := $(call _tc_get,RUST_POSTFIX_ALIASES)
-RUST_LINK_VIA_LLD     := $(or $(call _tc_get,RUST_LINK_VIA_LLD),0)
 
-# RUST_LINK_VIA_BINUTILS (declared per-arch in the base toolchain): BUILD the from-source
-# std with a modern binutils ld, so std's own dynamic objects link with the same modern ld
-# the consumer's package link uses (rustc.mk). Narrow to the Rust link -- the C toolchain
-# stays the stock vendor gcc+ld. ppc853x needs it because both its stock linkers mangle Rust
-# (lld leaves a PIE relative reloc unapplied; 2008 ld 2.18 leaves TLS TPREL16 relocs dynamic,
-# glibc-2.8 mis-applies them). 2.30 is the DSM-7.1/7.2 default. Mutually exclusive with
-# RUST_LINK_VIA_LLD.
-# Default ON: the from-source std is uniformly linked with the binutils 2.30 overlay for
-# every custom-rustc arch (this file only ever builds custom-rustc archs). A toolchain may
-# still set RUST_LINK_VIA_BINUTILS=0 to opt out. Mirrors the consumer default (overlay-binutils.mk).
+# RUST_LINK_VIA_BINUTILS: build the from-source std with a modern binutils 2.30 ld (the same
+# ld the consumer's package link uses), narrow to the Rust link -- C stays on vendor gcc+ld.
+# ppc853x needs it: its 2008 ld 2.18 leaves std's TLS TPREL16 relocs dynamic and glibc-2.8
+# mis-applies them. Default ON for every custom-rustc arch; set =0 to opt out.
 RUST_LINK_VIA_BINUTILS := $(or $(call _tc_get,RUST_LINK_VIA_BINUTILS),1)
 RUST_BINUTILS_VERS     := $(or $(call _tc_get,OVERLAY_BINUTILS_VERS),2.30)
 RUST_BINUTILS_DIR       = $(abspath $(CURDIR)/../binutils-$(RUST_BINUTILS_VERS))
@@ -121,8 +114,7 @@ RUST_CC       ?= $(RUST_TOOL_BIN)gcc$(TC_GCC_SUFFIX)
 RUST_CXX      ?= $(RUST_TOOL_BIN)g++$(TC_GCC_SUFFIX)
 RUST_AR       ?= $(RUST_TOOL_BIN)ar
 RUST_RANLIB   ?= $(RUST_TOOL_BIN)ranlib
-# The link driver: gcc by default (which calls its binutils ld). config lld=true
-# additionally ships LLVM lld inside the archive for the package build to use.
+# The link driver: gcc (which calls its binutils ld).
 RUST_LINKER   ?= $(RUST_CC)
 
 _RUST_TARGET_ENV  = $(subst -,_,$(RUST_TARGET))
@@ -159,7 +151,6 @@ $(if $(_RUST_OLD_GCC),optimized-compiler-builtins = false)
 channel = "$(TC_RUSTC)"
 lto = "off"
 debuginfo-level = 0
-$(if $(filter 1,$(RUST_LINK_VIA_LLD)),lld = true)
 
 [llvm]
 download-ci-llvm = false
@@ -214,9 +205,8 @@ rustc_prepare: tc-extract $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binut
 	done
 
 # Co-build the modern binutils cross-ld for this (arch, DSM) and emit the build-time
-# gcc wrapper ($(RUST_LINKER)) that routes the target link through it via -B. GNU ld
-# accepts -Qy, so unlike lld no arg filtering is needed -- the wrapper is a plain
-# passthrough.
+# gcc wrapper ($(RUST_LINKER)) that routes the target link through it via -B. The wrapper
+# is a plain passthrough (GNU ld accepts -Qy, so no arg filtering is needed).
 define RUST_BINUTILS_CC_SCRIPT
 #!/bin/sh
 # The cross gcc with ld/as redirected to the co-built binutils $(RUST_BINUTILS_VERS)

@@ -64,7 +64,7 @@ endif
 
 # The Tier-3 from-source build (config.toml, LLVM/stage builds, archive) lives in
 # the host-native package native/rustc-<vers>; rustc.mk keeps only the consumer /
-# package-build side (toolchain id + lld linker wrapper).
+# package-build side (toolchain id + binutils linker wrapper).
 
 rustc_msg:
 	@$(MSG) "Installing rustc toolchain for $(NAME)"
@@ -108,11 +108,10 @@ rustc_target: $(PRE_RUSTC_TARGET)
 	fi ; \
 	flock -u 5
 
-# rustc-lld-linker (re)generates the lld linker wrapper the package link uses. The
-# custom toolchain itself is built by the host-native package native/rustc-<vers>
-# (see rustc.mk header) and downloaded as a .txz that ships lld; this only wires the
-# wrapper that routes cross rust PACKAGE links through it.
-post_rustc_target: $(RUSTC_TARGET) $(if $(filter 1,$(RUST_LINK_VIA_LLD)),rustc-lld-linker) $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc-binutils-linker)
+# rustc-binutils-linker (re)generates the binutils linker wrapper that routes cross rust
+# PACKAGE links through the binutils 2.30 overlay ld (the toolchain itself is built/downloaded
+# by native/rustc-<vers>; this only wires the wrapper).
+post_rustc_target: $(RUSTC_TARGET) $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc-binutils-linker)
 
 ifeq ($(wildcard $(RUSTC_COOKIE)),)
 rustc: $(RUSTC_COOKIE)

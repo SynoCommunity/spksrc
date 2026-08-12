@@ -9,8 +9,8 @@
 #   OVERLAY_RUSTC     custom from-source rustc                    (rustc.mk)
 #   OVERLAY_GCC       gcc-8.5                                     (future, native/gcc8)
 # OVERLAY_GCC and the ppc853x OVERLAY_RUSTC both REQUIRE OVERLAY_BINUTILS (gcc-8.5 emits
-# relocations, and Rust's TLS/PIE output on ppc853x, that the stock vendor ld -- 2008
-# GNU ld 2.18 on ppc853x -- and LLVM lld both mishandle). Standalone (OVERLAY_BINUTILS=1
+# relocations, and Rust's TLS/PIE output on ppc853x, that the stock 2008 GNU ld 2.18
+# mishandles). Standalone (OVERLAY_BINUTILS=1
 # with the stock gcc) is also valid: a modern ld fixes e.g. the ppc853x dynamic-TPREL
 # TLS bug for plain C too. 2.30 is the DSM-7.1/7.2 default (same version native/gcc8
 # co-builds), new enough for every backend/reloc in play and still targeting the

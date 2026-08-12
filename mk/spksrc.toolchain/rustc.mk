@@ -8,7 +8,7 @@
 # This file is the CONSUMER / package-build side only: it resolves the shared
 # custom rustup toolchain id ($(TC_RUSTUP_TOOLCHAIN) = $(_RUST_TC_ID)) so a cross
 # rust PACKAGE build selects OUR toolchain (not rustup's glibc-newer std), and it
-# (re)generates the lld linker wrapper the package link uses. A toolchain enters
+# (re)generates the binutils linker wrapper the package link uses. A toolchain enters
 # here by DECLARING RUST_BUILD_TOOLCHAIN (0 or 1); standard archs never do.
 #
 # The from-source BUILD of the toolchain (rustc + cargo + host/target std, LLVM
@@ -23,7 +23,6 @@
 # Overlay-ready: RUST_CC / RUST_CXX default to $(TC_PREFIX)gcc$(TC_GCC_SUFFIX), so
 # once TC_GCC_SUFFIX selects the gcc-8.5 overlay the effective TC_GCC lands in the
 # id / consumer-dir names and stock-gcc and overlay-gcc8 artefacts coexist.
-# RUST_LINK_VIA_LLD routes the package link through the shipped LLVM lld.
 #
 # A toolchain sets, before including spksrc.toolchain.mk:
 #   RUST_BUILD_TOOLCHAIN = 0            (download the prebuilt .txz; the norm)
@@ -78,52 +77,10 @@ RUST_TARGET         := $(_RUST_BASE_TARGET)
 TC_RUSTUP_TOOLCHAIN  = $(TC_RUSTC)
 endif
 
-# Some targets' stock binutils ld is too old to link modern Rust cdylibs (ppc853x's
-# 2008 GNU ld 2.18 segfaults). RUST_LINK_VIA_LLD = 1 builds the toolchain with LLVM
-# lld in the sysroot (config lld=true, so it ships inside the .txz) and routes the
-# package link through it. The redirect lives in the LINKER -- a gcc wrapper
-# ($(RUST_LLD_CC)) adding -B$(RUST_LLD_SHIM_DIR) -- because cargo ignores
-# CARGO_TARGET_*_RUSTFLAGS once maturin sets RUSTFLAGS, whereas the linker channel is
-# always honored. The shim drops -Qy (a legacy SysV arg lld rejects); -B is required
-# since gcc < 4.8 has no -fuse-ld. RUST_LLD resolves via the rustup toolchain symlink,
-# so it works in both modes (from-source stage2, or the extracted .txz).
-RUST_LINK_VIA_LLD ?= 0
-ifeq ($(RUST_LINK_VIA_LLD),1)
-RUST_LLD_SHIM_DIR = $(TC_WORK_DIR)/lld-shim
-RUST_LLD_CC       = $(TC_WORK_DIR)/lld-cc
-# $(BASEDIR) (the repo root, stable) rather than $(RUSTUP_HOME) (derived from CURDIR),
-# so the absolute path baked into the lld shim is the same under the CI docker and a
-# local checkout regardless of the invoking directory.
-RUST_LLD          = $(BASEDIR)/distrib/rustup/toolchains/$(_RUST_TC_ID)/lib/rustlib/$(RUST_BUILD_HOST)/bin/gcc-ld/ld.lld
-TC_RUST_LINKER    = $(RUST_LLD_CC)
-
-define RUST_LLD_SHIM_SCRIPT
-#!/bin/sh
-# LLVM lld (ELF), dropping -Qy -- a legacy SysV "ident" arg gcc's link spec passes
-# that lld does not accept. Invoking the ld.lld path selects lld's ELF flavor.
-newargs=""
-for a in "$$@"; do case "$$a" in -Qy) ;; *) newargs="$$newargs $$a" ;; esac; done
-exec "$(RUST_LLD)" $$newargs
-endef
-
-define RUST_LLD_CC_SCRIPT
-#!/bin/sh
-# The cross gcc with its ld redirected to lld via -B (gcc < 4.8 has no -fuse-ld).
-# Used as CARGO_TARGET_<triple>_LINKER for the package build.
-exec "$(RUST_CC)" -B"$(RUST_LLD_SHIM_DIR)" "$$@"
-endef
-endif
-
-# RUST_LINK_VIA_BINUTILS routes ONLY the Rust package link through the overlay ld, while
-# the C toolchain keeps the stock vendor gcc+ld. Default ON for every custom-rustc arch
-# (set in overlay-binutils.mk, included before this file) so our from-source rustc is
-# uniformly linked with binutils 2.30 -- the std build (producer) and the package link both.
-# The ?= 1 here is just the standalone fallback; overlay-binutils.mk normally wins. Independent
-# of the GLOBAL OVERLAY_BINUTILS (that one, for a matched gcc-8.5 pair, redirects ALL
-# compilation via tc_vars -- see overlay-binutils.mk). The link goes through
-# CARGO_TARGET_<triple>_LINKER (= a gcc -B<overlay shim> wrapper): cargo ignores
-# CARGO_TARGET_*_RUSTFLAGS once maturin sets RUSTFLAGS but always honors the linker; GNU ld
-# needs no -Qy filtering, unlike lld. OVERLAY_BINUTILS_SHIM comes from overlay-binutils.mk.
+# RUST_LINK_VIA_BINUTILS routes ONLY the Rust package link through the overlay ld (C stays on
+# vendor gcc+ld). Default ON for every custom-rustc arch (overlay-binutils.mk normally sets it;
+# ?= 1 is the standalone fallback). The link goes through CARGO_TARGET_<triple>_LINKER, a
+# gcc -B<OVERLAY_BINUTILS_SHIM> wrapper, since cargo always honors the linker channel.
 RUST_LINK_VIA_BINUTILS ?= 1
 ifeq ($(RUST_LINK_VIA_BINUTILS),1)
 RUST_BINUTILS_CC = $(TC_WORK_DIR)/binutils-cc
@@ -140,26 +97,6 @@ endif
 # Per-step status line (stdout + status-build.log), so the long from-source steps are
 # trackable there like the framework's NAME lines: NAME: toolchain-rust-<step>.
 rustc_status = $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s-%s, NAME: toolchain-rust-%s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(TC_ARCH)" "$(TC_VERS)" "$(1)") | tee --append $(STATUS_LOG)
-
-# Generate the lld linker shim + gcc wrapper (needed by the package link in BOTH modes;
-# hooked from tc-rust.mk post_rustc_target). PHONY + cheap so the baked absolute paths
-# stay current. The shim dir is an ORDER-ONLY prerequisite, not an in-recipe mkdir:
-# $(file >) writes at recipe-EXPANSION time, which precedes the recipe's own shell
-# commands, so a `mkdir` line would run too late.
-.PHONY: rustc-lld-linker
-ifeq ($(RUST_LINK_VIA_LLD),1)
-rustc-lld-linker: | $(RUST_LLD_SHIM_DIR)
-	@$(call rustc_status,lld-linker)
-	$(file >$(RUST_LLD_SHIM_DIR)/ld,$(RUST_LLD_SHIM_SCRIPT))
-	@chmod +x $(RUST_LLD_SHIM_DIR)/ld
-	$(file >$(RUST_LLD_CC),$(RUST_LLD_CC_SCRIPT))
-	@chmod +x $(RUST_LLD_CC)
-
-$(RUST_LLD_SHIM_DIR):
-	@mkdir -p $@
-else
-rustc-lld-linker: ;
-endif
 
 # Generate the binutils gcc wrapper (hooked from tc-rust.mk post_rustc_target). Cheap
 # + PHONY so the baked absolute path stays current. No shim dir: the -B points straight
