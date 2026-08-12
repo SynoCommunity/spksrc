@@ -70,6 +70,22 @@ OVERLAY_BINUTILS_SHIM     = $(OVERLAY_BINUTILS_DIR)/work-native/shim
 # -- empty for a rust-link-only arch, whose C builds keep the vendor as/ld.
 OVERLAY_BINUTILS_FLAG     = $(if $(filter 1,$(OVERLAY_BINUTILS)),-B$(OVERLAY_BINUTILS_SHIM))
 
+# `make clean` on a custom-rust base toolchain also cleans its downloaded consumers --
+# the rust std (syno-<arch>-<vers>-rust-gcc<gcc>) and this binutils overlay
+# (syno-<arch>-<vers>-binutils<vers>) -- so a rebuild re-extracts them fresh instead of
+# reusing a stale extracted install. This only ADDS a prerequisite to the generic clean
+# (recipe stays in spksrc.rules.mk); the consumers don't declare RUST_BUILD_TOOLCHAIN, so
+# they never recurse. Makes `make clean` in the base toolchain authoritative (CI no longer
+# cleans each consumer by hand).
+ifneq ($(strip $(RUST_BUILD_TOOLCHAIN)),)
+clean: clean-rust-consumers
+.PHONY: clean-rust-consumers
+clean-rust-consumers:
+	@for d in $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust-gcc$(TC_GCC) $(OVERLAY_BINUTILS_DIR) ; do \
+	  if [ -d "$$d" ] ; then $(MSG) "clean consumer $$(basename $$d)" ; $(MAKE) --no-print-directory -C "$$d" clean ; fi ; \
+	done
+endif
+
 # Provision the binutils (download the consumer + build the shim) when EITHER use needs
 # it: the global overlay (gcc8) or the narrow rust-link overlay (default ON for every
 # custom-rustc arch, set just above). Resolved here, before rustc.mk consumes it.
