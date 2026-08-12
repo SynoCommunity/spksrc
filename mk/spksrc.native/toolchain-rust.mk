@@ -164,7 +164,7 @@ _X = cd $(RUST_SRC) && \
      CARGO_TARGET_$(_RUST_TARGET_UENV)_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS) $(RUST_BUILD_EXTRA_RUSTFLAGS)" \
      $(if $(strip $(RUST_BUILD_EXTRA_RUSTFLAGS)),RUSTC_BOOTSTRAP=1) \
      RUST_TARGET_PATH="$(RUST_TARGET_JSON_DIR)" \
-     CARGO_TERM_PROGRESS_WHEN=never RUST_BACKTRACE=full ./x.py
+     CARGO_TERM_PROGRESS_WHEN=never CARGO_TERM_COLOR=never RUST_BACKTRACE=full ./x.py
 
 # ---------------------------------------------------------------------------
 # Framework hooks: the source pipeline (download/extract/patch) is stock; only

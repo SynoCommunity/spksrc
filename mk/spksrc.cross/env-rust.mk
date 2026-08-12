@@ -68,3 +68,8 @@ RUST_TOOLCHAIN_DIR = $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)$(if $(filt
 
 # RUST_TARGET as a CARGO_TARGET_<triple>_* env suffix: upper-case, - -> _.
 RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
+
+# Deterministic cargo output in the build logs: no colors, no progress bar, so log diffs
+# stay readable (hgy59, SynoCommunity#7353).
+ENV += CARGO_TERM_COLOR=never
+ENV += CARGO_TERM_PROGRESS_WHEN=never

@@ -73,21 +73,21 @@ rustc_msg:
 	@$(MSG) "- default PATH: $(PATH)"
 
 pre_rustc_target: rustc_msg
-	@$(MSG) "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain $(TC_RUSTC)" ; \
+	@$(MSG) "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q --no-modify-path --default-toolchain $(TC_RUSTC)" ; \
 	exec 5> /tmp/tc-rustc.lock ; \
 	flock --timeout $(FLOCK_TIMEOUT) --exclusive 5 || exit 1 ; \
 	pid=$$$$ ; \
 	echo "$${pid}" 1>&5 ; \
-	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain $(TC_RUSTC) ; \
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q --no-modify-path --default-toolchain $(TC_RUSTC) ; \
 	flock -u 5
 
 rustc_target: $(PRE_RUSTC_TARGET)
-	@$(MSG) "rustup toolchain install $(TC_RUSTC)" ; \
+	@$(MSG) "rustup -q toolchain install $(TC_RUSTC)" ; \
 	exec 5> /tmp/tc-rustc.lock ; \
 	flock --timeout $(FLOCK_TIMEOUT) --exclusive 5 || exit 1 ; \
 	pid=$$$$ ; \
 	echo "$${pid}" 1>&5 ; \
-	rustup toolchain install $(TC_RUSTC) ; \
+	rustup -q toolchain install $(TC_RUSTC) ; \
 	$(MSG) "rustup default $(TC_RUSTC)" ; \
 	rustup default $(TC_RUSTC) ; \
 	if [ -n "$(_RUST_BASE_TARGET)" ] && [ "$(RUST_TARGET_TIER)" != "3" ] ; then \
