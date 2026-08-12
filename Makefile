@@ -199,6 +199,13 @@ toolchain-%:
 kernel-%:
 	-@cd kernel/syno-$*/ && MAKEFLAGS= $(MAKE)
 
+##@ Rust toolchain (from source)
+
+# Tier-3 / old-glibc archs (ppc853x, qoriq, 88f6281, x86-5.2) run a custom Rust built
+# from source in native/rustc-1.82; see docs/framework/toolchain.md.
+rust-toolchain-%:  ## Rebuild one from-source Rust toolchain: rust-toolchain-<arch>-<dsm>
+	@$(MAKE) -C native/rustc-1.82 arch-$*
+
 ##@ Setup
 
 setup: local.mk dsm-6.2.4 dsm-7.1  ## Create local.mk and set default DSM toolchains

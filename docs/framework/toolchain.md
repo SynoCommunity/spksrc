@@ -252,6 +252,36 @@ distrib/
 
 Once downloaded, toolchains are reused across builds. Delete from `distrib/` to force re-download.
 
+## Custom From-Source Rust Toolchains
+
+A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853x`, `qoriq`) has no prebuilt std at all, and ARMv5 `88f6281` / `x86-5.2` only ship one built against a newer glibc than the DSM toolchain. For these, spksrc builds Rust **from source** (rustc + cargo + host/target std, LLVM from the bundled source) against the arch's own gcc.
+
+### Producer / consumer split
+
+| Piece | Role |
+|-------|------|
+| `native/rustc-<vers>/` | Producer — builds the `rust-<id>-<rev>.txz`. |
+| `toolchain/syno-<arch>-<dsm>-rust-gcc<gcc>/` | Consumer — downloads + extracts that `.txz` (the base toolchain `DEPENDS` on it). |
+| `toolchain/syno-<arch>-<dsm>-binutils2.30/` | binutils 2.30 overlay used for the Rust link only (`RUST_LINK_VIA_BINUTILS`, default ON). |
+
+The base toolchain (`syno-<arch>-<dsm>/`) opts in by declaring `RUST_BUILD_TOOLCHAIN` and a `RUST_TARGET` (a Synology-vendored triple, `…-unknown-…` → `…-synology-…`). The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through binutils 2.30.
+
+### (Re)building and publishing
+
+```bash
+make rust-toolchain-ppc853x-5.2            # one arch (proxy for the line below)
+make -C native/rustc-1.82 arch-ppc853x-5.2 # same thing, direct
+make -C native/rustc-1.82 all-5.2          # every rust arch of a DSM version
+```
+
+The `.txz` name carries a revision. When re-publishing a rebuilt archive under the same id, bump the rev so caches don't serve the stale artifact — pass `RUST_ARCHIVE_REV=vN` (then rename), exactly like `BINUTILS_ARCHIVE_REV`. The current rev lives **statically** in each consumer Makefile (`RUST_ARCHIVE_REV ?= vN`), not in a shared file. To publish a rebuild:
+
+1. Build (optionally with `RUST_ARCHIVE_REV=vN`).
+2. Upload the `.txz` to the release (`pre-releases`, or the `rust/…` asset path).
+3. Bump `RUST_ARCHIVE_REV ?= vN` in the consumer Makefile and refresh its `digests` (`make -C toolchain/syno-<arch>-<dsm>-rust-gcc<gcc> digests`).
+
+`make clean` on the base toolchain cascades to its rust + binutils overlay consumers, so a rebuild re-extracts them fresh.
+
 ## Troubleshooting
 
 ### Toolchain Download Fails
