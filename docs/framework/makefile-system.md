@@ -39,6 +39,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.build/compile.mk` | Compilation orchestration |
 | `spksrc.build/install.mk` | Installation to staging |
 | `spksrc.build/plist.mk` | Package list generation |
+| `spksrc.build/archive.mk` | Optional post-install archive of the build output, for hosting/reuse (opt-in via `ARCHIVE_NAME`) |
 
 ### Cross-Compilation
 
@@ -82,7 +83,6 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.native-cmake.mk` | Native CMake builds |
 | `spksrc.native-meson.mk` | Native Meson builds |
 | `spksrc.native-install.mk` | Install-only native build (skip configure/compile) |
-| `spksrc.native/archive.mk` | Optional post-install archive of the build output, for hosting/reuse (opt-in via `ARCHIVE_NAME`) |
 
 ### Python/Wheel System
 
@@ -148,7 +148,8 @@ spksrc.build/
 ├── compile.mk                # compile
 ├── install.mk                # install to staging
 ├── plist.mk                  # package list generation (cross/kernel/cross-virtual; not in build.mk)
-└── ninja.mk                  # ninja helper (cmake/meson)
+├── ninja.mk                  # ninja helper (cmake/meson)
+└── archive.mk                # optional post-install archive (ARCHIVE_NAME)
 
 # Rules — shared targets / orchestration, included by the entry points
 spksrc.rules.mk               # rules entry point: clean/changelog targets,
@@ -185,7 +186,6 @@ spksrc.native-cmake.mk
 spksrc.native-install.mk
 spksrc.native-meson.mk
 spksrc.native/
-├── archive.mk                # optional post-install archive (ARCHIVE_NAME)
 ├── env-cmake.mk
 ├── env-default.mk            # base native env
 └── env-meson.mk

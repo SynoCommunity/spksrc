@@ -73,7 +73,7 @@ If you only read one thing, read this. The details are in the dated log below.
 ---
 
 ??? note "July 24th 2026 — Host a native build's output as a reusable archive (#7327)"
-    - **What:** a new opt-in step, `spksrc.native/archive.mk` (included by
+    - **What:** a new opt-in step, `spksrc.build/archive.mk` (included by
       `spksrc.native-cc.mk`), tars a native package's install tree into a release
       archive after `install`, so an expensive tool is built once and re-consumed
       via `DEPENDS` instead of rebuilt from source. A package enables it with a
