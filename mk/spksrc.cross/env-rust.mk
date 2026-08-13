@@ -16,11 +16,6 @@ ifneq ($(ARCH),noarch)
 RUST_ARCH = $(or $(ARCH),$(lastword $(subst -, ,$(TC_NAME))),$(TC_ARCH))
 endif
 
-# When building toolchain Tier-3 arch support
-#   While stage-2 is the truly current compiler, stage-1 suffice our needs
-#   https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html#stage-2-the-truly-current-compiler
-TC_RUSTC_STAGE = 2
-
 # map archs to rust targets -- only as a fallback: a toolchain building rustc from
 # source declares RUST_TARGET itself (single source of truth, no drift between the
 # toolchain build and the package build that consumes it).

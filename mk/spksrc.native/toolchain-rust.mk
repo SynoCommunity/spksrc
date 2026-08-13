@@ -79,6 +79,8 @@ RUST_BUILD_EXTRA_RUSTFLAGS := $(call _tc_get,RUST_BUILD_EXTRA_RUSTFLAGS)
 
 # The rust version is the native package's own PKG_VERS.
 TC_RUSTC        = $(PKG_VERS)
+# Build through stage 2 (the truly-current compiler); overridable.
+# https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html
 TC_RUSTC_STAGE ?= 2
 RUST_BUILD_HOST ?= x86_64-unknown-linux-gnu
 
