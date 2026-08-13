@@ -109,7 +109,7 @@ _RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
 
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (toolchain/syno-<arch>-<vers>-rust-gcc<gcc>) and
-# rustc.mk's _RUST_TC_ID on the package-build side.
+# overlay-rustc.mk's _RUST_TC_ID on the package-build side.
 _RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
 
 # Per-step status line, matching the framework's NAME lines so the long x.py steps

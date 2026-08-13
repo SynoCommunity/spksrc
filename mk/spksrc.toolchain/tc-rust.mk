@@ -63,7 +63,7 @@ endif
 .PHONY: $(PRE_RUSTC_TARGET) $(RUSTC_TARGET) $(POST_RUSTC_TARGET)
 
 # The Tier-3 from-source build (config.toml, LLVM/stage builds, archive) lives in
-# the host-native package native/rustc-<vers>; rustc.mk keeps only the consumer /
+# the host-native package native/rustc-<vers>; overlay-rustc.mk keeps only the consumer /
 # package-build side (toolchain id + binutils linker wrapper).
 
 rustc_msg:

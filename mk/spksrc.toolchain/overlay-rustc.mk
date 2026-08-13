@@ -1,5 +1,5 @@
 ###############################################################################
-# spksrc.toolchain/rustc.mk
+# spksrc.toolchain/overlay-rustc.mk
 #
 # Custom Rust toolchain SUPPORT for targets rustup ships no usable prebuilt
 # rust-std for (Tier-3 e.g. PowerPC e500: qoriq, ppc853x; or a Tier-2 whose

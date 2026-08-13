@@ -130,7 +130,7 @@ include ../../mk/spksrc.build/plist.mk
 TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
 TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
-# Package-side default for the rust overlay selector (see rustc.mk OVERLAY_RUSTC).
+# Package-side default for the rust overlay selector (see overlay-rustc.mk OVERLAY_RUSTC).
 # Defined here so it is always set before it is passed to the tcvars regen below --
 # passing an empty OVERLAY_RUSTC= would look like an explicit "off" and error on a
 # tier-3 rust arch. A package (or local.mk / CLI) may override it; only custom-rust
