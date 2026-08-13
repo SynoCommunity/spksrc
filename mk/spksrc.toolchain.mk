@@ -23,10 +23,11 @@
 #  _all
 #
 # which executes:
-#  status      : echo status to logging facility
-#  rustc       : install rust toolchain components
-#  depend      : resolve and build toolchain dependencies (if any)
-#  tcvars      : generate tc_vars*.mk files for spksrc.cross/env-default.mk
+#  status           : echo status to logging facility
+#  overlay-binutils : provision the binutils overlay (as/ld) when needed
+#  overlay-rustc    : rust toolchain -- rustup base (rustup-rustc) + custom overlay
+#  depend           : resolve and build toolchain dependencies (if any)
+#  tcvars           : generate tc_vars*.mk files for spksrc.cross/env-default.mk
 #
 # Variables:
 #  TC_NAME           : Toolchain name (optional, used with generic archs)
@@ -176,7 +177,7 @@ include ../../mk/spksrc.toolchain/tc-normalize.mk
 patch: normalize
 include ../../mk/spksrc.build/patch.mk
 
-rustc: patch
+rustup-rustc: patch
 # OVERLAY_<component> family together, base layer first: overlay-binutils sets the
 # shim path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-rustc + tc_vars read, and
 # overlay-rustc resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
@@ -198,7 +199,7 @@ pre_toolchain_target: toolchain_msg
 
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: status overlay-binutils rustc depend tcvars
+_all: status overlay-binutils overlay-rustc depend tcvars
 
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target

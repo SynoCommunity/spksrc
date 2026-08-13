@@ -59,7 +59,7 @@ else
 $(POST_RUSTC_TARGET): $(RUSTC_TARGET)
 endif
 
-.PHONY: rustc rustc_msg
+.PHONY: rustup-rustc rustc_msg
 .PHONY: $(PRE_RUSTC_TARGET) $(RUSTC_TARGET) $(POST_RUSTC_TARGET)
 
 # The Tier-3 from-source build (config.toml, LLVM/stage builds, archive) lives in
@@ -108,17 +108,16 @@ rustc_target: $(PRE_RUSTC_TARGET)
 	fi ; \
 	flock -u 5
 
-# rustc-binutils-linker (re)generates the binutils linker wrapper that routes cross rust
-# PACKAGE links through the binutils 2.30 overlay ld (the toolchain itself is built/downloaded
-# by native/rustc-<vers>; this only wires the wrapper).
-post_rustc_target: $(RUSTC_TARGET) $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc-binutils-linker)
+# The base rustup install only; the binutils linker wrapper is the rust overlay's own
+# artifact and hangs off overlay-rustc (overlay-rustc.mk), not this base pipeline.
+post_rustc_target: $(RUSTC_TARGET)
 
 ifeq ($(wildcard $(RUSTC_COOKIE)),)
-rustc: $(RUSTC_COOKIE)
+rustup-rustc: $(RUSTC_COOKIE)
 
 $(RUSTC_COOKIE): $(POST_RUSTC_TARGET)
 	$(create_target_dir)
 	@touch -f $@
 else
-rustc: ;
+rustup-rustc: ;
 endif

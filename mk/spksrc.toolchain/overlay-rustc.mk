@@ -31,6 +31,13 @@
 #   RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
 ###############################################################################
 
+# The rust overlay entry -- peer of overlay-binutils / future overlay-gcc. Defined for
+# EVERY rust arch (like overlay-binutils): the rustup base install (rustup-rustc, tc-rust.mk)
+# always, plus this arch's own overlay artifacts (the binutils linker wrapper) added under
+# the custom-rust gate below.
+.PHONY: overlay-rustc
+overlay-rustc: rustup-rustc
+
 # ============================================================================
 # Custom-rust archs only. Gated on RUST_BUILD_TOOLCHAIN being DECLARED (0 or 1);
 # standard archs never enter here.
@@ -92,9 +99,11 @@ endif
 # trackable there like the framework's NAME lines: NAME: toolchain-rust-<step>.
 rustc_status = $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s-%s, NAME: toolchain-rust-%s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(TC_ARCH)" "$(TC_VERS)" "$(1)") | tee --append $(STATUS_LOG)
 
-# Generate the binutils gcc wrapper (hooked from tc-rust.mk post_rustc_target). Cheap
-# + PHONY so the baked absolute path stays current. No shim dir: the -B points straight
-# at the shipped ld dir in the extracted .txz (GNU ld needs no -Qy filtering).
+# The binutils gcc wrapper: this arch's overlay artifact, so it hangs off overlay-rustc
+# (only when the rust link goes through the binutils overlay ld). Cheap + PHONY so the
+# baked absolute path stays current. No shim dir: the -B points straight at the shipped
+# ld dir in the extracted .txz (GNU ld needs no -Qy filtering).
+overlay-rustc: $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc-binutils-linker)
 .PHONY: rustc-binutils-linker
 ifeq ($(RUST_LINK_VIA_BINUTILS),1)
 rustc-binutils-linker:
