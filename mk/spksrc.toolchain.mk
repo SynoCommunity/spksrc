@@ -177,11 +177,12 @@ patch: normalize
 include ../../mk/spksrc.build/patch.mk
 
 rustc: patch
-# OVERLAY_BINUTILS (base layer) before overlay-rustc.mk + tc_vars.mk, which read its vars
-# (the shipped-ld shim path and the -B flag baked into the generated tc_vars).
+# OVERLAY_<component> family together, base layer first: overlay-binutils sets the
+# shim path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-rustc + tc_vars read, and
+# overlay-rustc resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
 include ../../mk/spksrc.toolchain/overlay-binutils.mk
-include ../../mk/spksrc.toolchain/tc-rust.mk
 include ../../mk/spksrc.toolchain/overlay-rustc.mk
+include ../../mk/spksrc.toolchain/tc-rust.mk
 
 include ../../mk/spksrc.toolchain/tc_vars.mk
 
