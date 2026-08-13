@@ -17,7 +17,7 @@ PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/pre-re
 DEPENDS =
 
 HOMEPAGE = https://www.gnu.org/software/binutils/
-COMMENT  = GNU binutils 2.30 overlay (as/ld) for ppc853x-5.2, co-built by native/binutils-2.30 and downloaded here for OVERLAY_BINUTILS (see PR #7353). Replaces a stock vendor binutils too old for current codegen.
+COMMENT  = GNU binutils 2.30 overlay (as/ld) for ppc853x-5.2, co-built by native/binutils-2.30 and downloaded here for the custom-rustc link (RUST_LINK_VIA_BINUTILS, see PR #7353). Only the Rust link routes through it; the C toolchain keeps the stock vendor binutils.
 LICENSE  = GPLv3
 
 INSTALL_TARGET = nop
