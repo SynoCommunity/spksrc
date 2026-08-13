@@ -41,8 +41,8 @@ NATIVE_DEPENDS += native/intel-opencl-clang-140
 
 # -----------------------------------------------------------------------------
 # Host the build output as a release archive, reused via DEPENDS = native/llvm-14.0
-# instead of rebuilt from source. The shared native-archive helper (included by
-# native-cc.mk) archives it automatically after install; everything else defaults
+# instead of rebuilt from source. The shared archive helper (spksrc.build/archive.mk,
+# included by native-cc.mk) archives it automatically after install; else defaults
 # (txz of ./install from work-native, gated on the install bin/), so only the name
 # is declared. Declared before the front-end so the helper sees it.
 # -----------------------------------------------------------------------------

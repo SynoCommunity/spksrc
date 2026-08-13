@@ -1,11 +1,12 @@
 ###############################################################################
-# spksrc.native/archive.mk
+# spksrc.build/archive.mk
 #
-# Optional packaging step for native packages: tar a subset of the install tree
-# into a hosted archive, so an expensive native tool (llvm, the gcc-8.5 overlays,
-# ...) is built once and then re-consumed via DEPENDS instead of rebuilt from
-# source. Included by spksrc.native-cc.mk and run automatically after 'install'
-# (see _all there), idempotently, with an optional debug-symbol strip.
+# Optional packaging step: tar a subset of a build tree into a hosted archive, so
+# an expensive artefact (llvm, the gcc-8.5 overlays, a from-source rustc, ...) is
+# built once and then re-consumed via DEPENDS instead of rebuilt from source.
+# Included by spksrc.native-cc.mk and run automatically after 'install' (see _all
+# there); consumed by the native producers (llvm-14.0-build, rustc-1.82, gcc-8.5
+# overlays). Idempotent via a status cookie, with an optional debug-symbol strip.
 #
 # A pure no-op unless the package declares ARCHIVE_NAME; when it does, the
 # other variables default so a package usually needs that one line only:
@@ -98,15 +99,9 @@ ARCHIVE_STRIP_HOST_DIRS ?= bin libexec
 print-archive-name:
 	@echo $(ARCHIVE)
 
-# The packaging work: an optional debug-symbol strip, then the tar. It lives in
-# archive_target so PRE_/POST_ARCHIVE_TARGET wrap it like every other step's hooks,
-# and so idempotency is the cookie below -- WORK_DIR/.$(COOKIE_PREFIX)archive_done,
-# the same shape as extract/patch/compile/install -- instead of the archive file's
-# presence. No pre-build guard, like every other step: it just runs, and the tar
-# fails (with a "build it first" note) if there is nothing to archive yet.
-# --strip-debug keeps the symbol tables the tools need and only drops the (large)
-# debug sections. Target objects need the arch's OWN strip (the host strip cannot
-# touch them); host binaries use the host strip.
+# Optional debug-symbol strip, then the tar; wrapped by PRE_/POST hooks and made idempotent
+# by the cookie below (like extract/patch/compile/install). --strip-debug drops only debug
+# sections; target objects need the arch's OWN strip (host strip can't touch them).
 archive_target: $(PRE_ARCHIVE_TARGET)
 	@if [ -n "$(strip $(ARCHIVE_STRIP))" ]; then \
 	  $(MSG) "archive: stripping debug symbols -> $(ARCHIVE)" ; \
@@ -122,10 +117,8 @@ archive_target: $(PRE_ARCHIVE_TARGET)
 	@$(ARCHIVE_CMD) $(ARCHIVE) -C $(ARCHIVE_DIR) $(ARCHIVE_EXCLUDES) $(ARCHIVE_KEEP) || \
 	  { $(MSG) "$(PKG_NAME): nothing to archive under $(ARCHIVE_DIR)/$(firstword $(ARCHIVE_KEEP)) -- build it first" ; exit 1 ; }
 
-# Cookie-guarded like every other build step: 'archive' runs in the native _all
-# pipeline (after install), 'build-archive' is the on-demand entry point for
-# generators; both share one cookie, so whichever runs first does the work and the
-# other is a no-op. Remove $(ARCHIVE_COOKIE) to force a rebuild.
+# Cookie-guarded: 'archive' runs in the native _all pipeline (after install), 'build-archive'
+# is the on-demand entry point; both share one cookie. Remove $(ARCHIVE_COOKIE) to force a rebuild.
 ifeq ($(wildcard $(ARCHIVE_COOKIE)),)
 archive build-archive: $(ARCHIVE_COOKIE)
 
