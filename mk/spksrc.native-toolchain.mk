@@ -22,6 +22,7 @@
 #   TC_DIR       toolchain/syno-<arch>-<vers>
 #   _tc_get      $(call _tc_get,VAR) -> VAR as declared in the toolchain Makefile
 #   TC_TARGET    target triple            TC_GCC / TC_GLIBC  toolchain gcc/glibc
+#   TC_EXTRACT_DIR  where tc-extract lands the gcc toolchain (bin/, sysroot, ...)
 #   tc-extract   ensures the gcc toolchain (hence its sysroot) is extracted
 ###############################################################################
 
@@ -44,6 +45,10 @@ _tc_get     = $(shell sed -n 's/^$(1)[[:space:]]*=[[:space:]]*//p' $(TC_DIR)/Mak
 TC_TARGET  := $(call _tc_get,TC_TARGET)
 TC_GCC     := $(call _tc_get,TC_GCC)
 TC_GLIBC   := $(call _tc_get,TC_GLIBC)
+
+# Where tc-extract lands the gcc toolchain (its bin/, sysroot, ...). Shared by the
+# components. NB: distinct from the framework's TC_WORK_DIR (the consumer toolchain).
+TC_EXTRACT_DIR = $(TC_DIR)/work/$(TC_TARGET)
 
 # Per-(arch,dsm) work dir, cross-style; pre-set so native-cc.mk keeps it (the
 # native default would be -native).

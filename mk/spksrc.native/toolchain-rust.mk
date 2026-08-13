@@ -96,7 +96,7 @@ RUST_TOOLS_BIN  = $(RUST_BUILD_ROOT)/host/stage$(TC_RUSTC_STAGE)-tools-bin
 # gcc and (later) '-8.5' for the gcc-8.5 overlay, so both variants coexist under
 # distinct ids/archives.
 TC_GCC_SUFFIX ?=
-RUST_TOOL_BIN  = $(TC_DIR)/work/$(TC_TARGET)/bin/$(TC_TARGET)-
+RUST_TOOL_BIN  = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-
 RUST_CC       ?= $(RUST_TOOL_BIN)gcc$(TC_GCC_SUFFIX)
 RUST_CXX      ?= $(RUST_TOOL_BIN)g++$(TC_GCC_SUFFIX)
 RUST_AR       ?= $(RUST_TOOL_BIN)ar
@@ -184,7 +184,7 @@ PRE_CONFIGURE_TARGET = rustc_prepare
 .PHONY: rustc_prepare
 rustc_prepare: tc-extract $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binutils_cobuild)
 	@$(call rustc_status,prepare)
-	@cd $(TC_DIR)/work/$(TC_TARGET)/bin ; \
+	@cd $(TC_EXTRACT_DIR)/bin ; \
 	for gnutool in $$(ls -1) ; do \
 	  for alias in $(RUST_POSTFIX_ALIASES) ; do \
 	    [ ! -L "$${alias}-$${gnutool##*-}" ] && ln -sf $${gnutool} "$${alias}-$${gnutool##*-}" || true ; \
