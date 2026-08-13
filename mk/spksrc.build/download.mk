@@ -123,6 +123,7 @@ MIRROR_SOURCEFORGE ?= https://downloads.sourceforge.net/project https://netcolog
 MIRROR_GNOME       ?= https://download.gnome.org/sources https://mirror.csclub.uwaterloo.ca/gnome/sources
 MIRROR_KERNEL      ?= https://cdn.kernel.org/pub https://mirrors.kernel.org/pub https://www.kernel.org/pub
 MIRROR_SAVANNAH    ?= https://download.savannah.gnu.org/releases https://download-mirror.savannah.gnu.org/releases
+MIRROR_GNUPG       ?= https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt https://mirrors.dotsrc.org/gcrypt
 PKG_DIST_MIRRORS   ?=
 
 # ---------------------------------------------------------------------------
@@ -235,6 +236,7 @@ define DOWNLOAD_HTTP
 	          *//download.gnome.org/sources/*)                  marker="/sources/" ; mirrorBases="$(MIRROR_GNOME)" ;; \
 	          *//www.kernel.org/pub/*|*//cdn.kernel.org/pub/*)  marker="/pub/" ;     mirrorBases="$(MIRROR_KERNEL)" ;; \
 	          *//download.savannah.gnu.org/releases/*)          marker="/releases/" ; mirrorBases="$(MIRROR_SAVANNAH)" ;; \
+	          *//gnupg.org/ftp/gcrypt/*|*//www.gnupg.org/ftp/gcrypt/*) marker="/gcrypt/" ; mirrorBases="$(MIRROR_GNUPG)" ;; \
 	        esac ; \
 	        if [ -n "$${marker}" ]; then \
 	          tail=$${url#*$${marker}} ; \
