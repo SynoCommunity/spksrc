@@ -244,8 +244,8 @@ endif
 	echo "endif()"
 	@echo ; \
 	echo "# Rust compiler and Cargo" ; \
-	echo "set(CARGO  $(RUST_TOOLCHAIN_DIR)/bin/cargo)" ; \
-	echo "set(RUSTC  $(RUST_TOOLCHAIN_DIR)/bin/rustc)"
+	echo "set(CARGO  $(CARGO_HOME)/bin/cargo)" ; \
+	echo "set(RUSTC  $(CARGO_HOME)/bin/rustc)"
 	@echo ; \
 	echo "# Cross target triple" ; \
 	echo "set(RUST_TARGET  $(RUST_TARGET))" ; \
@@ -287,8 +287,8 @@ tc_meson_cross_vars:
 	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
 	  fi ; \
 	done
-	@echo "cargo = '$(RUST_TOOLCHAIN_DIR)/bin/cargo'" ; \
-	echo "rust = '$(RUST_TOOLCHAIN_DIR)/bin/rustc'"
+	@echo "cargo = '$(CARGO_HOME)/bin/cargo'" ; \
+	echo "rust = '$(CARGO_HOME)/bin/rustc'"
 
 .PHONY: tc_meson_native_vars
 tc_meson_native_vars:
@@ -324,7 +324,7 @@ tc_rust_vars:
 	@echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
-	echo TC_ENV += RUST_TARGET_PATH=\"$(RUST_TOOLCHAIN_DIR)/target-spec\" ; \
+	echo TC_ENV += RUST_TARGET_PATH=\"$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/target-spec\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(or $(TC_RUST_LINKER),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)\" ; \

@@ -54,11 +54,6 @@ ifeq ($(TC_RUSTUP_TOOLCHAIN),)
 TC_RUSTUP_TOOLCHAIN = $(TC_RUSTC)
 endif
 
-# rustup toolchain dir holding bin/{cargo,rustc} + target-spec; tc_vars points CARGO /
-# RUSTC / RUST_TARGET_PATH here. A rustup-INSTALLED channel gets a -<host> suffix, a
-# linked custom toolchain keeps its exact name -- hence the conditional suffix.
-RUST_TOOLCHAIN_DIR = $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)$(if $(filter $(TC_RUSTC),$(TC_RUSTUP_TOOLCHAIN)),-x86_64-unknown-linux-gnu)
-
 # RUST_TARGET as a CARGO_TARGET_<triple>_* env suffix: upper-case, - -> _.
 RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
 
