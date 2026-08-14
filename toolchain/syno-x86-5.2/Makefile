@@ -16,7 +16,6 @@ TC_INCLUDE = $(TC_SYSROOT)/include
 # is built by native/rustc-1.82 (arch-x86-5.2) and downloaded via the consumer DEPENDS.
 # x86_64 is Tier-1 (rustup ships a std), so OVERLAY_RUSTC=0 can fall back to stock rustc.
 RUST_TARGET_TIER = 1
-TC_RUSTC = 1.82.0
 # The synology triple (from the overlay) also avoids the x86_64 host==target collision.
 RUST_POSTFIX_ALIASES = x86_64-synology-linux-gnu x86_64-unknown-linux-gnu
 

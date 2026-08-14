@@ -183,6 +183,12 @@ rustup-rustc: patch
 TC_OVERLAY_RUSTC    := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust-*)
 TC_OVERLAY_BINUTILS := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)-binutils*)
 
+# The custom rust version is the overlay's own PKG_VERS (single source of truth), read from
+# the rust consumer Makefile -- never hardcoded per base toolchain.
+ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
+TC_RUSTC := $(shell sed -n 's/^PKG_VERS[[:space:]]*=[[:space:]]*//p' $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
+endif
+
 # OVERLAY_<component> family together, base layer first: overlay-binutils sets the
 # shim path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-rustc + tc_vars read, and
 # overlay-rustc resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.

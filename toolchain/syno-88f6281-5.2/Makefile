@@ -17,7 +17,6 @@ TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 # (arch-88f6281-5.2) and downloaded via the consumer DEPENDS below.
 # armv5te is Tier-2 (rustup ships a std), so OVERLAY_RUSTC=0 can fall back to stock rustc.
 RUST_TARGET_TIER = 2
-TC_RUSTC = 1.82.0
 
 # glibc 2.15: no clock_gettime in libc (<2.17), no native 64-bit atomics. -latomic auto-dropped.
 TC_EXTRA_LDFLAGS = -lrt -latomic
