@@ -54,17 +54,14 @@ ifeq ($(TC_RUSTUP_TOOLCHAIN),)
 TC_RUSTUP_TOOLCHAIN = $(TC_RUSTC)
 endif
 
-# Absolute path of the rustup toolchain dir, used to locate rustc/cargo. A rustup-
-# INSTALLED channel (standard archs, where TC_RUSTUP_TOOLCHAIN = TC_RUSTC = 'stable'
-# or a pinned version) lands under a -<host> suffix; a `rustup toolchain link`ed
-# custom toolchain (TC_RUSTUP_TOOLCHAIN = _RUST_TC_ID, which differs from TC_RUSTC)
-# keeps its exact name.
+# rustup toolchain dir holding bin/{cargo,rustc} + target-spec; tc_vars points CARGO /
+# RUSTC / RUST_TARGET_PATH here. A rustup-INSTALLED channel gets a -<host> suffix, a
+# linked custom toolchain keeps its exact name -- hence the conditional suffix.
 RUST_TOOLCHAIN_DIR = $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)$(if $(filter $(TC_RUSTC),$(TC_RUSTUP_TOOLCHAIN)),-x86_64-unknown-linux-gnu)
 
 # RUST_TARGET as a CARGO_TARGET_<triple>_* env suffix: upper-case, - -> _.
 RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
 
-# Deterministic cargo output in the build logs: no colors, no progress bar, so log diffs
-# stay readable (hgy59, SynoCommunity#7353).
+# Deterministic cargo output in the build logs
 ENV += CARGO_TERM_COLOR=never
 ENV += CARGO_TERM_PROGRESS_WHEN=never
