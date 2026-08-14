@@ -24,7 +24,6 @@
 #
 # which executes:
 #  status           : echo status to logging facility
-#  overlay-binutils : provision the binutils overlay (as/ld) when needed
 #  overlay-rustc    : rust toolchain -- rustup base (rustup-rustc) + custom overlay
 #  depend           : resolve and build toolchain dependencies (if any)
 #  tcvars           : generate tc_vars*.mk files for spksrc.cross/env-default.mk
@@ -216,7 +215,7 @@ pre_toolchain_target: toolchain_msg
 
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: status overlay-binutils overlay-rustc depend tcvars
+_all: status overlay-rustc depend tcvars
 
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target

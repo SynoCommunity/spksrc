@@ -34,24 +34,21 @@
 OVERLAY_BINUTILS       ?= 0
 OVERLAY_BINUTILS_VERS  ?= 2.30
 
-# RUST_LINK_VIA_BINUTILS defaults ON for every arch with a binutils overlay (the TC_OVERLAY_BINUTILS marker): our from-source rustc is UNIFORMLY linked with the binutils 2.30 overlay -- the
-# std is built with it (producer, toolchain-rust.mk) and the same overlay is reused as the
-# package CARGO_TARGET_<triple>_LINKER (consumer, overlay-rustc.mk). It stays NARROW (rust link only;
-# the C toolchain keeps the stock vendor as/ld), unlike the GLOBAL OVERLAY_BINUTILS above.
-# Overridable per toolchain/CLI. Non-rust archs never enter this branch, so it stays 0 there.
-ifneq ($(strip $(TC_OVERLAY_BINUTILS)),)
+# RUST_LINK_VIA_BINUTILS defaults ON for every custom-rust arch (TC_OVERLAY_RUSTC): the
+# from-source rustc link is routed through the binutils 2.30 overlay -- NARROW (rust link only;
+# C keeps the stock vendor as/ld), unlike the GLOBAL OVERLAY_BINUTILS. Overridable per toolchain/CLI.
+ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
 RUST_LINK_VIA_BINUTILS ?= 1
 endif
 
-# The per-arch consumer that downloads + extracts the published binutils .txz.
-OVERLAY_BINUTILS_CONSUMER = syno-$(TC_ARCH)-$(TC_VERS)-binutils$(OVERLAY_BINUTILS_VERS)
-# The extracted cross tools (<target>-ld, <target>-as, ...). The .txz unpacks
-# usr/local/{bin,...} into work-native/install (the consumer's EXTRACT_PATH = INSTALL_DIR).
-OVERLAY_BINUTILS_BIN      = $(TC_OVERLAY_BINUTILS)/work-native/install/usr/local/bin
-# gcc invokes 'as'/'ld' UNPREFIXED via -B, but the tools are <target>-prefixed, so a
-# shim dir carries unprefixed symlinks. $(BASEDIR)-anchored so the -B path baked into
-# tc_vars is identical under the CI docker and a local checkout.
-OVERLAY_BINUTILS_SHIM     = $(TC_OVERLAY_BINUTILS)/work-native/shim
+# The extracted cross tools (<target>-ld, <target>-as, ...). As a DEPENDS the consumer's
+# WORK_DIR propagates to the base toolchain work dir (TC_WORK_DIR), so its .txz unpacks
+# usr/local/{bin,...} into TC_WORK_DIR/install (consumer EXTRACT_PATH = INSTALL_DIR).
+OVERLAY_BINUTILS_BIN      = $(TC_WORK_DIR)/install/usr/local/bin
+# gcc invokes 'as'/'ld' UNPREFIXED via -B, but the tools are <target>-prefixed, so a shim
+# dir carries unprefixed symlinks (built by the consumer's POST_INSTALL at $(WORK_DIR)/shim =
+# TC_WORK_DIR/shim). Absolute, so the -B path baked into tc_vars is stable across checkouts.
+OVERLAY_BINUTILS_SHIM     = $(TC_WORK_DIR)/shim
 # GLOBAL redirect: appended to CFLAGS/CXXFLAGS/LDFLAGS/FFLAGS in tc_vars so every
 # gcc-driven compile/link uses the overlay as/ld. ONLY for the matched-pair (modern-gcc) case
 # -- empty for a rust-link-only arch, whose C builds keep the vendor as/ld.
@@ -78,27 +75,12 @@ endif
 # custom-rustc arch, set just above). Resolved here, before overlay-rustc.mk consumes it.
 _OVERLAY_BINUTILS_NEEDED := $(if $(filter 1,$(OVERLAY_BINUTILS))$(filter 1,$(RUST_LINK_VIA_BINUTILS)),1)
 
-.PHONY: overlay-binutils
-# Skip during a native-toolchain extract (NATIVE_TOOLCHAIN_EXTRACT=1): when the rust
-# producer (native/rustc-<ver>) extracts THIS toolchain's sysroot it does not need the
-# binutils overlay (it co-builds its own build-time ld), so avoid a needless download --
-# same gate as the base toolchain's rust-consumer DEPENDS.
+# Provision the binutils overlay as a normal DEPENDS: the consumer extracts the .txz and
+# builds the as/ld shim in its POST_INSTALL (symmetric with the rust consumer). Gated on the
+# NEED (OVERLAY_BINUTILS=1 or the rust link), not on wildcard existence. Skipped during a
+# native-toolchain extract (the rust producer co-builds its own build-time ld).
 ifeq ($(_OVERLAY_BINUTILS_NEEDED),1)
-ifeq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
-overlay-binutils: ;
-else
-overlay-binutils:
-	@$(MSG) "OVERLAY_BINUTILS: binutils $(OVERLAY_BINUTILS_VERS) for $(TC_ARCH)-$(TC_VERS) (download via $(OVERLAY_BINUTILS_CONSUMER))"
-	@# A package build invokes the base toolchain with WORK_DIR=<pkg toolchain work> and
-	@# ARCH/TCVERSION as command-line vars; those PROPAGATE into every sub-make. Override
-	@# them for the consumer: WORK_DIR to its OWN work-native (else it extracts into the base
-	@# toolchain's work dir and the shim below dangles), and clear ARCH/TCVERSION so it builds
-	@# as the plain native download it is (the consumer is under toolchain/ so stage0 is inert).
-	@$(MAKE) --no-print-directory -C $(TC_OVERLAY_BINUTILS) ARCH= TCVERSION= WORK_DIR=$(TC_OVERLAY_BINUTILS)/work-native
-	@mkdir -p $(OVERLAY_BINUTILS_SHIM)
-	@ln -sf $(OVERLAY_BINUTILS_BIN)/$(TC_TARGET)-ld $(OVERLAY_BINUTILS_SHIM)/ld
-	@ln -sf $(OVERLAY_BINUTILS_BIN)/$(TC_TARGET)-as $(OVERLAY_BINUTILS_SHIM)/as
+ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
+DEPENDS += toolchain/$(notdir $(TC_OVERLAY_BINUTILS))
 endif
-else
-overlay-binutils: ;
 endif
