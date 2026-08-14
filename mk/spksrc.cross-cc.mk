@@ -130,19 +130,9 @@ include ../../mk/spksrc.build/plist.mk
 TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
 TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
-# Package-side default for the rust overlay selector (see overlay-rustc.mk OVERLAY_RUSTC).
-# Defined here so it is always set before it is passed to the tcvars regen below --
-# passing an empty OVERLAY_RUSTC= would look like an explicit "off" and error on a
-# tier-3 rust arch. A package (or local.mk / CLI) may override it; only custom-rust
-# archs act on it. RUST_OVERLAY stays accepted as a deprecated alias.
-OVERLAY_RUSTC ?= $(or $(RUST_OVERLAY),1)
-
-# Same threading for the GLOBAL binutils overlay (OVERLAY_BINUTILS, default OFF): default
-# it package-side so an empty value is never passed, and hand it to the tcvars regen so its
-# -B flag is baked in consistently. Distinct from the rust-link-only overlay
-# (RUST_LINK_VIA_BINUTILS, on by default for custom rust); OVERLAY_BINUTILS is the as/ld for
-# EVERY compilation and is only usable under a matched modern gcc -- so 0 until then. A
-# package / local.mk / CLI may override it. (Sets the table for the OVERLAY_<component> selectors.)
+# OVERLAY_<component> selectors, defaulted here so an empty value is never passed to the
+# tcvars regen below. Override via package / local.mk / CLI; only custom-rust archs act.
+OVERLAY_RUSTC    ?= 1
 OVERLAY_BINUTILS ?= 0
 
 .PHONY: cross-stage1

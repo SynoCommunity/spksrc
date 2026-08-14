@@ -61,13 +61,9 @@ _RUST_BASE_TARGET := $(RUST_TARGET)
 _RUST_SYNO_TARGET := $(subst -unknown-,-synology-,$(RUST_TARGET))
 _RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
 
-# Rust overlay (OVERLAY_RUSTC), part of the OVERLAY_<component> family but defaulting ON: an
-# arch reaches this block only because it HAS a custom rust overlay. ON (default) = the custom
-# from-source build + synology triple. OFF falls back to stock rustup rustc + in-tree `unknown`
-# triple -- valid ONLY for a tier-1/2 base (rustup ships a std); on tier-3 (PowerPC e500) there
-# is no stock std, so OVERLAY_RUSTC=0 is a hard error. Tier via RUST_TARGET_TIER; overridable
-# per package/local.mk/CLI. (RUST_OVERLAY = deprecated alias.)
-OVERLAY_RUSTC    ?= $(or $(RUST_OVERLAY),1)
+# OVERLAY_RUSTC (default ON): ON = custom from-source build + synology triple; OFF = stock
+# rustup rustc + `unknown` triple, valid ONLY on a tier-1/2 base (tier-3 has no stock std -> error).
+OVERLAY_RUSTC    ?= 1
 RUST_TARGET_TIER ?= 3
 
 ifneq ($(filter 1 on ON,$(strip $(OVERLAY_RUSTC))),)
