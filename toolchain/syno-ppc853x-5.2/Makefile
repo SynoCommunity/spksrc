@@ -59,7 +59,7 @@ RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
 # only survives because the accessor gets inlined away). The default (general-dynamic, what
 # qoriq uses and what runs cleanly on this e500v2 silicon) emits DTPREL16/GOT_TLSGD16 with no
 # GOT-base getter, and binutils 2.30 (the RUST_LINK_VIA_BINUTILS overlay) resolves it correctly.
-# So: no RUST_BUILD_EXTRA_RUSTFLAGS -- keep the default TLS model.
+# So: keep the default TLS model (no build-time -Ztls-model override).
 
 # glibc 2.8 predates clock_gettime in libc (2.17); the target has no native 64-bit atomics.
 # -latomic is dropped automatically when the gcc does not ship it.

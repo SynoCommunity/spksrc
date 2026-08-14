@@ -15,7 +15,7 @@
 #
 # Read from toolchain/syno-<arch>-<vers>/Makefile (single source of truth):
 #   RUST_TARGET, RUST_POSTFIX_ALIASES,
-#   TC_EXTRA_CFLAGS, TC_EXTRA_RUSTFLAGS, RUST_BUILD_EXTRA_RUSTFLAGS
+#   TC_EXTRA_CFLAGS, TC_EXTRA_RUSTFLAGS
 #
 # Provides (consumed by native/rustc-<vers>/Makefile):
 #   _RUST_TC_ID     shared rustup toolchain id, also the archive base name
@@ -68,11 +68,10 @@ $(RUST_TARGET_JSON):
 	RUSTC_BOOTSTRAP=1 \
 	  $(HOST_RUSTC) -Zunstable-options --print target-spec-json --target $(RUST_TARGET_JSON_BASE) \
 	  | RUST_TARGET_JSON_BASE="$(RUST_TARGET_JSON_BASE)" TC_EXTRA_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS)" python3 -c 'import os,json,sys,re; d=json.load(sys.stdin); d["vendor"]="synology"; d.pop("is-builtin",None); xf=os.environ.get("TC_EXTRA_RUSTFLAGS","").strip(); mc=re.search(r"-Ctarget-cpu=(\S+)",xf); d.update({"cpu":mc.group(1)} if mc else {}); mf=re.search(r"-Ctarget-feature=(\S+)",xf); d.update({"features":mf.group(1)} if mf else {}); desc="SynoCommunity custom rustc toolchain (from %s)"%os.environ["RUST_TARGET_JSON_BASE"]; desc+="; cpu/features baked into the spec: %s"%xf if xf else ""; d["metadata"]={"description":desc,"tier":3,"std":True,"host_tools":False}; json.dump(d,sys.stdout,indent=2)' > $@
-# Reuse the exact flags the toolchain declares (qoriq/ppc853x SPE, the ppc853x
-# -Ztls-model build workaround), instead of repeating them here.
-TC_EXTRA_CFLAGS            := $(call _tc_get,TC_EXTRA_CFLAGS)
-TC_EXTRA_RUSTFLAGS         := $(call _tc_get,TC_EXTRA_RUSTFLAGS)
-RUST_BUILD_EXTRA_RUSTFLAGS := $(call _tc_get,RUST_BUILD_EXTRA_RUSTFLAGS)
+# Reuse the exact flags the toolchain declares (qoriq/ppc853x SPE), instead of
+# repeating them here.
+TC_EXTRA_CFLAGS    := $(call _tc_get,TC_EXTRA_CFLAGS)
+TC_EXTRA_RUSTFLAGS := $(call _tc_get,TC_EXTRA_RUSTFLAGS)
 
 # RUST_ARCHIVE_REV is set by the native producer Makefile (RUST_ARCHIVE_REV ?= v1,
 # CLI-overridable), mirroring native/binutils-2.30's BINUTILS_ARCHIVE_REV.
@@ -157,13 +156,10 @@ linker = "$(RUST_LINKER)"
 endef
 
 # ./x wrapper: target CFLAGS/RUSTFLAGS + the selected CC/CXX for the target.
-# RUSTC_BOOTSTRAP is set only when build-only rustflags are present, so their -Z
-# options are accepted by the stable stage compiler.
 _X = cd $(RUST_SRC) && \
      LC_ALL=C \
      CFLAGS_$(_RUST_TARGET_ENV)="$(TC_EXTRA_CFLAGS)" CC_$(_RUST_TARGET_ENV)="$(RUST_CC)" CXX_$(_RUST_TARGET_ENV)="$(RUST_CXX)" \
-     CARGO_TARGET_$(_RUST_TARGET_UENV)_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS) $(RUST_BUILD_EXTRA_RUSTFLAGS)" \
-     $(if $(strip $(RUST_BUILD_EXTRA_RUSTFLAGS)),RUSTC_BOOTSTRAP=1) \
+     CARGO_TARGET_$(_RUST_TARGET_UENV)_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS)" \
      RUST_TARGET_PATH="$(RUST_TARGET_JSON_DIR)" \
      CARGO_TERM_PROGRESS_WHEN=never CARGO_TERM_COLOR=never RUST_BACKTRACE=full ./x.py
 
@@ -253,8 +249,7 @@ $(RUSTC_STAGE2_COOKIE): $(RUSTC_STAGE1_COOKIE)
 	$(_X) build --stage $(TC_RUSTC_STAGE) cargo
 	@#  2. std for BOTH host and target as the LAST sysroot build, so both survive:
 	@#     cargo needs the host std (build scripts/proc-macros) AND the target std to
-	@#     cross-compile ("can't find crate for core/std" otherwise). Through _X so
-	@#     RUST_BUILD_EXTRA_RUSTFLAGS (ppc853x -Ztls-model workaround) reaches the target std.
+	@#     cross-compile ("can't find crate for core/std" otherwise).
 	$(_X) build --stage $(TC_RUSTC_STAGE) library --target $(RUST_BUILD_HOST),$(RUST_TARGET)
 	@#  3. copy cargo in LAST -- step 2 re-staged bin/ and dropped it.
 	@cp -f $(RUST_TOOLS_BIN)/cargo $(RUST_STAGE_DIR)/bin/cargo
