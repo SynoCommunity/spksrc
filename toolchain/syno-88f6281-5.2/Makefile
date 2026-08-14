@@ -18,9 +18,6 @@ TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 # armv5te is Tier-2 (rustup ships a std), so OVERLAY_RUSTC=0 can fall back to stock rustc.
 RUST_TARGET_TIER = 2
 TC_RUSTC = 1.82.0
-# Base (in-tree) triple; the overlay swaps -unknown- -> -synology-. Declared here because
-# the overlay reads it before env-rust.mk's arch map would set it.
-RUST_TARGET = armv5te-unknown-linux-gnueabi
 
 # glibc 2.15: no clock_gettime in libc (<2.17), no native 64-bit atomics. -latomic auto-dropped.
 TC_EXTRA_LDFLAGS = -lrt -latomic

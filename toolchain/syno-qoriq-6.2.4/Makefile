@@ -17,9 +17,6 @@ TC_EXTRA_RUSTFLAGS = -Ctarget-cpu=e500 -Ctarget-feature=+spe
 # Custom-rust arch (the rust consumer dir below is the marker). The rust-<id>.txz is built by
 # native/rustc-1.82 (arch-qoriq-6.2.4) and downloaded via the consumer DEPENDS below.
 TC_RUSTC = 1.82.0
-# Base (in-tree) triple; the overlay swaps -unknown- -> -synology-. Declared here because
-# the overlay reads it before env-rust.mk's arch map would set it.
-RUST_TARGET = powerpc-unknown-linux-gnuspe
 RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
 
 # no native 64-bit atomics; -latomic is auto-dropped when the gcc does not ship it.

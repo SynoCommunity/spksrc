@@ -17,10 +17,7 @@ TC_INCLUDE = $(TC_SYSROOT)/include
 # x86_64 is Tier-1 (rustup ships a std), so OVERLAY_RUSTC=0 can fall back to stock rustc.
 RUST_TARGET_TIER = 1
 TC_RUSTC = 1.82.0
-# Base (in-tree) triple; the overlay swaps -unknown- -> -synology-. The synology form also
-# avoids the host==target collision (host stays x86_64-unknown-linux-gnu). Declared here
-# because the overlay reads it before env-rust.mk's arch map would set it.
-RUST_TARGET = x86_64-unknown-linux-gnu
+# The synology triple (from the overlay) also avoids the x86_64 host==target collision.
 RUST_POSTFIX_ALIASES = x86_64-synology-linux-gnu x86_64-unknown-linux-gnu
 
 include ../../mk/spksrc.toolchain.mk

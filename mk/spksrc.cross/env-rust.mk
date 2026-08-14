@@ -5,6 +5,11 @@
 #
 ###############################################################################
 
+# Include guard: overlay-rustc.mk sources this early (to get RUST_TARGET from the arch
+# map before deriving the synology triple); tc_vars.mk / cross-rust.mk include it again.
+ifndef __ENV_RUST_MK__
+__ENV_RUST_MK__ := 1
+
 ifeq ($(TC_RUSTC),)
 TC_RUSTC = stable
 endif
@@ -60,3 +65,5 @@ RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
 # Deterministic cargo output in the build logs
 ENV += CARGO_TERM_COLOR=never
 ENV += CARGO_TERM_PROGRESS_WHEN=never
+
+endif # __ENV_RUST_MK__

@@ -47,6 +47,11 @@ overlay-rustc: rustup-rustc
 # ============================================================================
 ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
 
+# RUST_TARGET (the in-tree base triple) comes from env-rust.mk's arch map -- the single
+# source of truth. Sourced here (guarded; tc_vars.mk includes it again) so it is set
+# before we derive the synology triple below.
+include ../../mk/spksrc.cross/env-rust.mk
+
 RUST_TOOL_BIN     = $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
 # The build host triple. std is built for it too (not only RUST_TARGET): cargo
 # compiles build scripts and proc-macros for the host while cross-compiling.
