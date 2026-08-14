@@ -15,7 +15,6 @@ TC_LIBRARY = $(TC_SYSROOT)/usr/lib
 # Custom-rust arch: rustup's prebuilt armv5te std targets a newer glibc than DSM 5.2's
 # 2.15, so std is rebuilt from source. The rust-<id>.txz is built by native/rustc-1.82
 # (arch-88f6281-5.2) and downloaded via the consumer DEPENDS below.
-RUST_BUILD_TOOLCHAIN = 0
 # armv5te is Tier-2 (rustup ships a std), so OVERLAY_RUSTC=0 can fall back to stock rustc.
 RUST_TARGET_TIER = 2
 TC_RUSTC = 1.82.0

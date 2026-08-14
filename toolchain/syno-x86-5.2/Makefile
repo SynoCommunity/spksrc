@@ -14,7 +14,6 @@ TC_INCLUDE = $(TC_SYSROOT)/include
 
 # Custom-rust arch: std is cross-built against this DSM-5.2 glibc 2.17. The rust-<id>.txz
 # is built by native/rustc-1.82 (arch-x86-5.2) and downloaded via the consumer DEPENDS.
-RUST_BUILD_TOOLCHAIN = 0
 # x86_64 is Tier-1 (rustup ships a std), so OVERLAY_RUSTC=0 can fall back to stock rustc.
 RUST_TARGET_TIER = 1
 TC_RUSTC = 1.82.0

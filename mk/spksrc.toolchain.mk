@@ -178,6 +178,11 @@ patch: normalize
 include ../../mk/spksrc.build/patch.mk
 
 rustup-rustc: patch
+# Per-component overlay markers: the wildcard-detected consumer dir (empty if the arch has
+# no such overlay), doubling as its path. The legacy archs ship both; standard archs neither.
+TC_OVERLAY_RUSTC    := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust-*)
+TC_OVERLAY_BINUTILS := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)-binutils*)
+
 # OVERLAY_<component> family together, base layer first: overlay-binutils sets the
 # shim path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-rustc + tc_vars read, and
 # overlay-rustc resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.

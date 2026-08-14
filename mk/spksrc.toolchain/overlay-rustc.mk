@@ -13,7 +13,7 @@
 # custom rustup toolchain id ($(TC_RUSTUP_TOOLCHAIN) = $(_RUST_TC_ID)) so a cross
 # rust PACKAGE build selects OUR toolchain (not rustup's glibc-newer std), and it
 # (re)generates the binutils linker wrapper the package link uses. A toolchain enters
-# here by DECLARING RUST_BUILD_TOOLCHAIN (0 or 1); standard archs never do.
+# here when its base ships a rust consumer dir (TC_OVERLAY_RUSTC); standard archs never do.
 #
 # The from-source BUILD of the toolchain (rustc + cargo + host/target std, LLVM
 # from source) no longer lives here -- it moved to the host-native package
@@ -29,7 +29,6 @@
 # letting stock-gcc and a future gcc-overlay variant coexist.
 #
 # A toolchain sets, before including spksrc.toolchain.mk:
-#   RUST_BUILD_TOOLCHAIN = 0            (download the prebuilt .txz; the norm)
 #   TC_RUSTC             = 1.82.0       rust version (matches native/rustc-1.82)
 #   RUST_TARGET          = powerpc-unknown-linux-gnuspe
 #   RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
@@ -43,10 +42,10 @@
 overlay-rustc: rustup-rustc
 
 # ============================================================================
-# Custom-rust archs only. Gated on RUST_BUILD_TOOLCHAIN being DECLARED (0 or 1);
+# Custom-rust archs only (TC_OVERLAY_RUSTC: a rust consumer dir exists);
 # standard archs never enter here.
 # ============================================================================
-ifneq ($(strip $(RUST_BUILD_TOOLCHAIN)),)
+ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
 
 RUST_TOOL_BIN     = $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
 # The build host triple. std is built for it too (not only RUST_TARGET): cargo
@@ -115,4 +114,4 @@ rustc-binutils-linker: ;
 endif
 
 
-endif # custom-rust arch (RUST_BUILD_TOOLCHAIN declared)
+endif # custom-rust arch (TC_OVERLAY_RUSTC)

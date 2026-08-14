@@ -16,9 +16,8 @@ TC_EXTRA_BUILD_FLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 # (empirically flips f64 to soft-float -- the qoriq/ppc SIGILL, #7119/#7304).
 TC_EXTRA_RUSTFLAGS = -Ctarget-cpu=e500 -Ctarget-feature=+spe
 
-# Custom-rust arch (declaration gates the overlay). The rust-<id>.txz is built by
+# Custom-rust arch (the rust consumer dir below is the marker). The rust-<id>.txz is built by
 # native/rustc-1.82 (arch-ppc853x-5.2) and downloaded via the consumer DEPENDS below.
-RUST_BUILD_TOOLCHAIN = 0
 TC_RUSTC = 1.82.0
 # Base (in-tree) triple; the overlay swaps -unknown- -> -synology-. Declared here because
 # the overlay reads it before env-rust.mk's arch map would set it.
