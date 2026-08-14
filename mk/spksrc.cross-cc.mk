@@ -137,6 +137,14 @@ TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 # archs act on it. RUST_OVERLAY stays accepted as a deprecated alias.
 OVERLAY_RUSTC ?= $(or $(RUST_OVERLAY),1)
 
+# Same threading for the GLOBAL binutils overlay (OVERLAY_BINUTILS, default OFF): default
+# it package-side so an empty value is never passed, and hand it to the tcvars regen so its
+# -B flag is baked in consistently. Distinct from the rust-link-only overlay
+# (RUST_LINK_VIA_BINUTILS, on by default for custom rust); OVERLAY_BINUTILS is the as/ld for
+# EVERY compilation and is only usable under a matched modern gcc -- so 0 until then. A
+# package / local.mk / CLI may override it. (Sets the table for the OVERLAY_<component> selectors.)
+OVERLAY_BINUTILS ?= 0
+
 .PHONY: cross-stage1
 cross-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
 
@@ -147,7 +155,7 @@ $(TCVARS_DONE):
 	@# the package's overlay choice (stock unknown vs the custom synology toolchain) --
 	@# a per-package selector, since the toolchain build itself is cookie-locked. All
 	@# rust toolchains (stock std + overlays) are already installed, so this only picks.
-	@$(MAKE) WORK_DIR=$(WORK_DIR) OVERLAY_RUSTC=$(OVERLAY_RUSTC) --no-print-directory -C ../../toolchain/$(TC) tcvars
+	@$(MAKE) WORK_DIR=$(WORK_DIR) OVERLAY_RUSTC=$(OVERLAY_RUSTC) OVERLAY_BINUTILS=$(OVERLAY_BINUTILS) --no-print-directory -C ../../toolchain/$(TC) tcvars
 else
 $(TCVARS_DONE): ;
 endif
