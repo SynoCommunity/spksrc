@@ -20,6 +20,12 @@ LICENSE  = Apache-2.0, MIT
 # LLVM, stage1/stage2) are custom targets in spksrc.native-toolchain-rust.mk; the
 # source pipeline (download/extract/patch) is the framework's, so patches live in
 # ./patches and are applied by the normal patch step.
+#
+# NO manual prerequisite: the Rust link needs a modern binutils (RUST_LINK_VIA_BINUTILS,
+# default ON), so this build CO-BUILDS native/binutils-$(vers) for the SAME arch on the
+# fly (rustc_binutils_cobuild, a rustc_prepare step). It is deliberately NOT a DEPENDS --
+# a DEPENDS could not carry the per-(arch,DSM) parametrization. So `make arch-<arch>-<vers>`
+# is self-contained; you never build binutils separately.
 
 ##############################################################################
 # Packaging via the generic helper (mk/spksrc.build/archive.mk): host the x.py

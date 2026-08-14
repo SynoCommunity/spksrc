@@ -274,6 +274,8 @@ make -C native/rustc-1.82 arch-ppc853x-5.2 # same thing, direct
 make -C native/rustc-1.82 all-5.2          # every rust arch of a DSM version
 ```
 
+You do **not** build binutils separately: the Rust build co-builds `native/binutils-2.30` for the same `(arch, DSM)` automatically (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` — a `DEPENDS` cannot carry the per-arch parametrization — so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so.
+
 The `.txz` name carries a revision. When re-publishing a rebuilt archive under the same id, bump the rev so caches don't serve the stale artifact — pass `RUST_ARCHIVE_REV=vN` (then rename), exactly like `BINUTILS_ARCHIVE_REV`. The current rev lives **statically** in each consumer Makefile (`RUST_ARCHIVE_REV ?= vN`), not in a shared file. To publish a rebuild:
 
 1. Build (optionally with `RUST_ARCHIVE_REV=vN`).

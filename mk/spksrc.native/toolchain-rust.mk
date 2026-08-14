@@ -204,6 +204,11 @@ endef
 .PHONY: rustc_binutils_cobuild
 rustc_binutils_cobuild:
 	@$(call rustc_status,binutils-cobuild)
+	@$(MSG) "*********************************************************************"
+	@$(MSG) "*** Co-building binutils $(RUST_BINUTILS_VERS) for $(TC_ARCH)-$(TC_VERS) (the Rust link overlay)"
+	@$(MSG) "*** Auto-built here per-arch (RUST_LINK_VIA_BINUTILS); NOT a DEPENDS"
+	@$(MSG) "*** PATH: $(RUST_BINUTILS_DIR)/work-$(TC_ARCH)-$(TC_VERS)"
+	@$(MSG) "*********************************************************************"
 	@# ARCH= TCVERSION= : disable native/binutils' stage0 (see overlay-binutils.mk) so it
 	@# cannot re-bootstrap a toolchain and recurse.
 	$(MAKE) --no-print-directory -C $(RUST_BINUTILS_DIR) ARCH= TCVERSION= TC_ARCH=$(TC_ARCH) TC_VERS=$(TC_VERS)
