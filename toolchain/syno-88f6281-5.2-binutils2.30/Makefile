@@ -21,14 +21,5 @@ COMMENT  = GNU binutils 2.30 overlay (as/ld) for 88f6281-5.2, co-built by native
 LICENSE  = GPLv3
 
 INSTALL_TARGET = nop
-POST_INSTALL_TARGET = binutils-shim
 
 include ../../mk/spksrc.native-install.mk
-
-# Build the unprefixed as/ld shim gcc reaches via -B (symmetric with the rust consumer's
-# rustup-link POST_INSTALL). overlay-binutils.mk points OVERLAY_BINUTILS_SHIM at $(WORK_DIR)/shim.
-.PHONY: binutils-shim
-binutils-shim:
-	@mkdir -p $(WORK_DIR)/shim
-	@ln -sf $(INSTALL_DIR)/usr/local/bin/$(BINUTILS_TARGET)-ld $(WORK_DIR)/shim/ld
-	@ln -sf $(INSTALL_DIR)/usr/local/bin/$(BINUTILS_TARGET)-as $(WORK_DIR)/shim/as
