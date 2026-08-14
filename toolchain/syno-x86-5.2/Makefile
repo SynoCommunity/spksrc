@@ -13,17 +13,10 @@ TC_SYSROOT = $(TC_TARGET)/sys-root
 TC_INCLUDE = $(TC_SYSROOT)/include
 
 # Custom-rust arch: std is cross-built against this DSM-5.2 glibc 2.17. The rust-<id>.txz
-# is built by native/rustc-1.82 (arch-x86-5.2) and downloaded via the consumer DEPENDS.
+# is built by native/rustc-1.82 (arch-x86-5.2) and downloaded via the rust consumer dir.
 # x86_64 is Tier-1 (rustup ships a std), so OVERLAY_RUSTC=0 can fall back to stock rustc.
 RUST_TARGET_TIER = 1
 # The synology triple (from the overlay) also avoids the x86_64 host==target collision.
 RUST_POSTFIX_ALIASES = x86_64-synology-linux-gnu x86_64-unknown-linux-gnu
 
 include ../../mk/spksrc.toolchain.mk
-
-# Download the published rust .txz (consumer dir carries gcc<ver> so variants coexist).
-# Skipped during a native-toolchain extract (NATIVE_TOOLCHAIN_EXTRACT=1) to avoid a
-# bootstrap cycle (the consumer would download the archive being produced).
-ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
-DEPENDS = toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust-gcc$(TC_GCC)
-endif

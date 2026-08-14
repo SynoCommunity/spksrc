@@ -12,7 +12,7 @@ TC_SYSROOT = $(TC_TARGET)/libc
 
 # Custom-rust arch: rustup's prebuilt armv5te std targets a newer glibc than DSM 6.2.4's
 # 2.15, so std is rebuilt from source. The rust-<id>.txz is built by native/rustc-1.82
-# (arch-88f6281-6.2.4) and downloaded via the consumer DEPENDS below.
+# (arch-88f6281-6.2.4) and downloaded via the rust consumer dir.
 # armv5te is Tier-2 (rustup ships a std), so OVERLAY_RUSTC=0 can fall back to stock rustc.
 RUST_TARGET_TIER = 2
 
@@ -20,10 +20,3 @@ RUST_TARGET_TIER = 2
 TC_EXTRA_LDFLAGS = -lrt -latomic
 
 include ../../mk/spksrc.toolchain.mk
-
-# Download the published rust .txz (consumer dir carries gcc<ver> so variants coexist).
-# Skipped during a native-toolchain extract (NATIVE_TOOLCHAIN_EXTRACT=1) to avoid a
-# bootstrap cycle (the consumer would download the archive being produced).
-ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
-DEPENDS = toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust-gcc$(TC_GCC)
-endif

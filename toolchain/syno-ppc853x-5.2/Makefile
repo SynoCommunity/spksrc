@@ -17,7 +17,7 @@ TC_EXTRA_BUILD_FLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 TC_EXTRA_RUSTFLAGS = -Ctarget-cpu=e500 -Ctarget-feature=+spe
 
 # Custom-rust arch (the rust consumer dir below is the marker). The rust-<id>.txz is built by
-# native/rustc-1.82 (arch-ppc853x-5.2) and downloaded via the consumer DEPENDS below.
+# native/rustc-1.82 (arch-ppc853x-5.2) and downloaded via the rust consumer dir.
 RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
 
 # ppc853x's stock 2008 ld 2.18 mishandles Rust's TLS/PIE relocs, so the Rust link goes
@@ -28,10 +28,3 @@ RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
 TC_EXTRA_LDFLAGS = -lrt -latomic
 
 include ../../mk/spksrc.toolchain.mk
-
-# Download the published rust .txz (consumer dir carries gcc<ver> so variants coexist).
-# Skipped during a native-toolchain extract (NATIVE_TOOLCHAIN_EXTRACT=1) to avoid a
-# bootstrap cycle (the consumer would download the archive being produced).
-ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
-DEPENDS = toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust-gcc$(TC_GCC)
-endif

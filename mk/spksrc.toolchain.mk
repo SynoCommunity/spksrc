@@ -187,6 +187,12 @@ TC_OVERLAY_BINUTILS := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS
 # the rust consumer Makefile -- never hardcoded per base toolchain.
 ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
 TC_RUSTC := $(shell sed -n 's/^PKG_VERS[[:space:]]*=[[:space:]]*//p' $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
+# Pull the rust overlay .txz via the consumer-dir DEPENDS. Skipped during a native-toolchain
+# extract (NATIVE_TOOLCHAIN_EXTRACT=1) to avoid a bootstrap cycle (the consumer would download
+# the very archive being produced).
+ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
+DEPENDS += toolchain/$(notdir $(firstword $(TC_OVERLAY_RUSTC)))
+endif
 endif
 
 # OVERLAY_<component> family together, base layer first: overlay-binutils sets the
