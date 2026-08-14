@@ -4,15 +4,12 @@
 # OVERLAY_BINUTILS: install a modern GNU binutils for this (arch, DSM) and route
 # EVERY cross compilation through its as/ld -- not just rustc.
 #
-# It is the base layer of the OVERLAY_<component> family:
-#   OVERLAY_BINUTILS  modern as/ld for all packages on the arch   (this file)
-#   OVERLAY_RUSTC     custom from-source rustc                    (overlay-rustc.mk)
-#   OVERLAY_GCC       gcc-8.5                                     (future, native/gcc8)
-# OVERLAY_GCC and the ppc853x OVERLAY_RUSTC both REQUIRE OVERLAY_BINUTILS (gcc-8.5 emits
-# relocations, and Rust's TLS/PIE output on ppc853x, that the stock 2008 GNU ld 2.18
-# mishandles). Standalone (OVERLAY_BINUTILS=1 with stock gcc) is also valid: a modern ld
-# fixes the ppc853x dynamic-TPREL TLS bug for plain C too. 2.30 is the DSM-7.1/7.2 default
-# (native/gcc8 co-builds it); only legacy archs (glibc <= 2.20 / DSM <= 6.2.4) need it.
+# It is the base layer of the OVERLAY_<component> family (with OVERLAY_RUSTC,
+# overlay-rustc.mk). The ppc853x OVERLAY_RUSTC REQUIRES it: Rust's TLS/PIE output there
+# is mishandled by the stock 2008 GNU ld 2.18. Standalone (OVERLAY_BINUTILS=1 with a
+# matched modern gcc) is also valid -- a modern ld fixes the ppc853x dynamic-TPREL TLS
+# bug for plain C too. 2.30 is the DSM-7.1/7.2 default; only legacy archs (glibc <= 2.20
+# / DSM <= 6.2.4) need it.
 #
 # The binutils is PRODUCED by native/binutils-<ver> (co-build + publishable archive,
 # `make -C native/binutils-<ver> arch-<arch>-<vers>`) and CONSUMED here by DOWNLOADING
@@ -24,9 +21,9 @@
 # modern gcc:
 #
 #   OVERLAY_BINUTILS         GLOBAL: default as/ld for EVERY compilation (baked into tc_vars).
-#                            Valid ONLY with a matched modern gcc (the future gcc-8.5 overlay);
-#                            under a stock/vendor gcc a modern binutils rejects the vendor flags
-#                            it emits (e.g. arm-marvell's -mcpu=marvell-f). Default OFF (gcc8 only).
+#                            Valid ONLY with a matched modern gcc; under a stock/vendor gcc a
+#                            modern binutils rejects the vendor flags it emits (e.g. arm-marvell's
+#                            -mcpu=marvell-f). Default OFF.
 #
 #   RUST_LINK_VIA_BINUTILS   NARROW: routes ONLY the Rust package link through the overlay ld;
 #                            the C toolchain stays stock vendor gcc+ld. For archs whose stock ld
@@ -58,7 +55,7 @@ OVERLAY_BINUTILS_BIN      = $(OVERLAY_BINUTILS_DIR)/work-native/install/usr/loca
 # tc_vars is identical under the CI docker and a local checkout.
 OVERLAY_BINUTILS_SHIM     = $(OVERLAY_BINUTILS_DIR)/work-native/shim
 # GLOBAL redirect: appended to CFLAGS/CXXFLAGS/LDFLAGS/FFLAGS in tc_vars so every
-# gcc-driven compile/link uses the overlay as/ld. ONLY for the matched-pair (gcc8) case
+# gcc-driven compile/link uses the overlay as/ld. ONLY for the matched-pair (modern-gcc) case
 # -- empty for a rust-link-only arch, whose C builds keep the vendor as/ld.
 OVERLAY_BINUTILS_FLAG     = $(if $(filter 1,$(OVERLAY_BINUTILS)),-B$(OVERLAY_BINUTILS_SHIM))
 
@@ -79,7 +76,7 @@ clean-rust-consumers:
 endif
 
 # Provision the binutils (download the consumer + build the shim) when EITHER use needs
-# it: the global overlay (gcc8) or the narrow rust-link overlay (default ON for every
+# it: the global overlay (matched modern gcc) or the narrow rust-link overlay (default ON for every
 # custom-rustc arch, set just above). Resolved here, before overlay-rustc.mk consumes it.
 _OVERLAY_BINUTILS_NEEDED := $(if $(filter 1,$(OVERLAY_BINUTILS))$(filter 1,$(RUST_LINK_VIA_BINUTILS)),1)
 

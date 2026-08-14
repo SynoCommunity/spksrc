@@ -92,9 +92,8 @@ RUST_STAGE_DIR  = $(RUST_BUILD_ROOT)/host/stage$(TC_RUSTC_STAGE)
 # stage<N>/bin/. cargo is copied over at the end of the stage2 step.
 RUST_TOOLS_BIN  = $(RUST_BUILD_ROOT)/host/stage$(TC_RUSTC_STAGE)-tools-bin
 
-# The target gcc this rustc is built with. TC_GCC_SUFFIX is empty for the stock
-# gcc and (later) '-8.5' for the gcc-8.5 overlay, so both variants coexist under
-# distinct ids/archives.
+# The target gcc this rustc is built with. TC_GCC_SUFFIX is empty for the stock gcc;
+# a future gcc-overlay variant would set it so both coexist under distinct ids/archives.
 TC_GCC_SUFFIX ?=
 RUST_TOOL_BIN  = $(TC_EXTRACT_DIR)/bin/$(TC_TARGET)-
 RUST_CC       ?= $(RUST_TOOL_BIN)gcc$(TC_GCC_SUFFIX)

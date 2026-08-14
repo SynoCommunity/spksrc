@@ -15,14 +15,14 @@
 # from source) no longer lives here -- it moved to the host-native package
 # native/rustc-<vers> (mk/spksrc.native-toolchain.mk + spksrc.native/toolchain-
 # rust.mk), which goes through the framework's normal download/extract/patch/
-# configure/compile/archive pipeline, like native/gcc8. Produce a .txz with:
+# configure/compile/archive pipeline, like any native toolchain package. Produce a .txz with:
 #   make -C native/rustc-<vers> arch-<arch>-<vers>
 # and the toolchain consumer (toolchain/syno-<arch>-<vers>-rust-gcc<gcc>, pulled
 # in by DEPENDS) downloads and extracts it.
 #
-# Overlay-ready: RUST_CC / RUST_CXX default to $(TC_PREFIX)gcc$(TC_GCC_SUFFIX), so
-# once TC_GCC_SUFFIX selects the gcc-8.5 overlay the effective TC_GCC lands in the
-# id / consumer-dir names and stock-gcc and overlay-gcc8 artefacts coexist.
+# Overlay-ready: RUST_CC / RUST_CXX default to $(TC_PREFIX)gcc$(TC_GCC_SUFFIX), so a
+# TC_GCC_SUFFIX (empty here) lands the effective TC_GCC in the id / consumer-dir names,
+# letting stock-gcc and a future gcc-overlay variant coexist.
 #
 # A toolchain sets, before including spksrc.toolchain.mk:
 #   RUST_BUILD_TOOLCHAIN = 0            (download the prebuilt .txz; the norm)
@@ -31,7 +31,7 @@
 #   RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
 ###############################################################################
 
-# The rust overlay entry -- peer of overlay-binutils / future overlay-gcc. Defined for
+# The rust overlay entry -- peer of overlay-binutils. Defined for
 # EVERY rust arch (like overlay-binutils): the rustup base install (rustup-rustc, tc-rust.mk)
 # always, plus this arch's own overlay artifacts (the binutils linker wrapper) added under
 # the custom-rust gate below.
@@ -52,7 +52,7 @@ RUST_CC          ?= $(RUST_TOOL_BIN)gcc$(TC_GCC_SUFFIX)
 
 # The custom "overlay" build uses a Synology-vendored triple (unknown -> synology), a uniform
 # marker resolved from a JSON target-spec. The shared toolchain id embeds it + arch/DSM/gcc,
-# reading like a rustup name (<ver>-<target>) grafted with arch/DSM/gcc (stock or gcc-8.5 overlay).
+# reading like a rustup name (<ver>-<target>) grafted with arch/DSM/gcc.
 _RUST_BASE_TARGET := $(RUST_TARGET)
 _RUST_SYNO_TARGET := $(subst -unknown-,-synology-,$(RUST_TARGET))
 _RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
