@@ -122,11 +122,12 @@ CHANGELOG += "7. Update jdupes from v1.30.0 to v1.31.1. <br/>"
 CHANGELOG += "8. Update less from v685 to v704. <br/>"
 CHANGELOG += "9. Update lzip from 1.25 to v1.26 and plzip from v1.12 to v1.13. <br/>"
 CHANGELOG += "10. Update micro from v2.0.14 to v2.0.15. <br/>"
-CHANGELOG += "11. Update nano from v8.7 to v9.2. <br/>"
-CHANGELOG += "12. Update nnn from v5.1 to v5.2 (DSM 7+). <br/>"
-CHANGELOG += "13. Update ripgrep from v15.1.0 to v15.2.0. <br/>"
-CHANGELOG += "14. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
-CHANGELOG += "15. Update tree from v2.2.1 to v2.3.2. <br/>"
+CHANGELOG += "11. Update mg from v3.7 to v4.0. <br/>"
+CHANGELOG += "12. Update nano from v8.7 to v9.2. <br/>"
+CHANGELOG += "13. Update nnn from v5.1 to v5.2 (DSM 7+). <br/>"
+CHANGELOG += "14. Update ripgrep from v15.1.0 to v15.2.0. <br/>"
+CHANGELOG += "15. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
+CHANGELOG += "16. Update tree from v2.2.1 to v2.3.2. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
