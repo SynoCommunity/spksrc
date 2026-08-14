@@ -118,7 +118,6 @@ rustc_status = $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s
 # C in optimized-compiler-builtins is compiled by the `cc` crate with -gdwarf-4, an
 # output level gcc predating 4.7 rejects. Below the floor we use the pure-Rust
 # builtins (optimized-compiler-builtins = false) instead, which need no C at all.
-_RUST_OLD_GCC = $(call version_lt,$(TC_GCC),4.7)
 
 define RUST_CONFIG_TOML
 profile = "compiler"
@@ -130,7 +129,7 @@ target = ["$(RUST_BUILD_HOST)", "$(RUST_TARGET)"]
 build-stage = $(TC_RUSTC_STAGE)
 docs = false
 compiler-docs = false
-$(if $(_RUST_OLD_GCC),optimized-compiler-builtins = false)
+$(if $(call version_lt,$(TC_GCC),4.7),optimized-compiler-builtins = false)
 
 [rust]
 channel = "$(TC_RUSTC)"
