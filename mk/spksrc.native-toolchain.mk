@@ -23,6 +23,7 @@
 #   _tc_get      $(call _tc_get,VAR) -> VAR as declared in the toolchain Makefile
 #   TC_TARGET    target triple            TC_GCC / TC_GLIBC  toolchain gcc/glibc
 #   TC_EXTRACT_DIR  where tc-extract lands the gcc toolchain (bin/, sysroot, ...)
+#   TC_SYSROOT_DIR  the extracted toolchain's sysroot (from the declared TC_SYSROOT)
 #   tc-extract   ensures the gcc toolchain (hence its sysroot) is extracted
 ###############################################################################
 
@@ -50,6 +51,13 @@ TC_GLIBC   := $(call _tc_get,TC_GLIBC)
 # components. NB: distinct from the framework's TC_WORK_DIR (the consumer toolchain).
 TC_EXTRACT_DIR = $(TC_DIR)/work/$(TC_TARGET)
 
+# The extracted toolchain's sysroot, composed from the toolchain's declared TC_SYSROOT
+# (single source of truth -- the same value tc_vars emits as SYSROOT). A plain string, so
+# valid before extraction too, unlike a wildcard probe. Used e.g. for binutils --with-sysroot.
+# TC_SYSROOT's declared value references $(TC_TARGET); _tc_get returns it as raw text, so run
+# it through $(eval) to expand that reference (a single make pass would leak a literal $$).
+$(eval TC_SYSROOT_DIR := $(TC_EXTRACT_DIR)/$(call _tc_get,TC_SYSROOT))
+
 # Per-(arch,dsm) work dir, cross-style; pre-set so native-cc.mk keeps it (the
 # native default would be -native).
 WORK_DIR       = $(CURDIR)/work-$(TC_ARCH)-$(TC_VERS)
@@ -66,7 +74,12 @@ tc-extract:
 	@# and that consumer may be the very archive this producer is about to build.
 	@$(MAKE) --no-print-directory -C ../../toolchain/$(TC) NATIVE_TOOLCHAIN_EXTRACT=1 toolchain
 
-# Component-specific logic (config, build/install targets, archive vars).
-include ../../mk/spksrc.native/toolchain-$(NATIVE_TOOLCHAIN).mk
+# Component-specific logic (config, build/install targets, archive vars), when the
+# component needs any -- a component that only sets vars provided above (e.g. binutils,
+# which just uses TC_SYSROOT_DIR) needs no file here.
+_TC_COMPONENT_MK := ../../mk/spksrc.native/toolchain-$(NATIVE_TOOLCHAIN).mk
+ifneq ($(wildcard $(_TC_COMPONENT_MK)),)
+include $(_TC_COMPONENT_MK)
+endif
 
 include ../../mk/spksrc.native-cc.mk
