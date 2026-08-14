@@ -12,35 +12,23 @@ TC_TARGET = x86_64-pc-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sys-root
 TC_INCLUDE = $(TC_SYSROOT)/include
 
-# Declares this as a custom-rust arch (enters spksrc.toolchain/rustc.mk). The
-# prebuilt rust-<id>-<rev>.txz is built by native/rustc-$(TC_RUSTC)
-# (make -C native/rustc-1.82 arch-x86-5.2) and downloaded via the consumer DEPENDS.
+# Custom-rust arch: std is cross-built against this DSM-5.2 glibc 2.17. The rust-<id>.txz
+# is built by native/rustc-1.82 (arch-x86-5.2) and downloaded via the consumer DEPENDS.
 RUST_BUILD_TOOLCHAIN = 0
-
-# Base triple tier: rustup ships a std (tier 1/2), so OVERLAY_RUSTC=0 can fall
-# back to the stock rustc (a newer-glibc std). tier 3 would be a hard error.
+# x86_64 is Tier-1 (rustup ships a std), so OVERLAY_RUSTC=0 can fall back to stock rustc.
 RUST_TARGET_TIER = 1
-
-# Versions available: https://releases.rs/docs/
 TC_RUSTC = 1.82.0
-
-# Declare the IN-TREE rust triple; native-toolchain-rust.mk derives the synology
-# form (x86_64-synology-linux-gnu) + its JSON target-spec. For x86_64 this is also
-# what avoids the host==target collision (host stays x86_64-unknown-linux-gnu, the
-# custom target becomes x86_64-synology-linux-gnu) while std is cross-built against
-# this DSM-5.2 glibc 2.17.
+# Base (in-tree) triple; the overlay swaps -unknown- -> -synology-. The synology form also
+# avoids the host==target collision (host stays x86_64-unknown-linux-gnu). Declared here
+# because the overlay reads it before env-rust.mk's arch map would set it.
 RUST_TARGET = x86_64-unknown-linux-gnu
-
-# <triple>-<tool> symlink prefixes the built rustc may invoke by name.
 RUST_POSTFIX_ALIASES = x86_64-synology-linux-gnu x86_64-unknown-linux-gnu
 
 include ../../mk/spksrc.toolchain.mk
 
-# Download the published prebuilt rustc .txz. The consumer dir carries gcc<ver> so
-# a future gcc-8.5 overlay variant coexists. Skipped while a native toolchain
-# producer extracts this gcc toolchain to BUILD the .txz (tc-extract passes
-# NATIVE_TOOLCHAIN_EXTRACT=1), so the consumer does not try to download the very
-# archive being produced (bootstrap cycle).
+# Download the published rust .txz (consumer dir carries gcc<ver> so variants coexist).
+# Skipped during a native-toolchain extract (NATIVE_TOOLCHAIN_EXTRACT=1) to avoid a
+# bootstrap cycle (the consumer would download the archive being produced).
 ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
 DEPENDS = toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust-gcc$(TC_GCC)
 endif
