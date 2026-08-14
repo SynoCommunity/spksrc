@@ -1,6 +1,10 @@
 ###############################################################################
 # spksrc.toolchain/overlay-rustc.mk
 #
+# OVERLAY_RUSTC: select the custom from-source rustc (+ its binutils link wrapper) for a
+# cross rust PACKAGE build. Member of the OVERLAY_<component> family (base + overview:
+# overlay-binutils.mk).
+#
 # Custom Rust toolchain SUPPORT for targets rustup ships no usable prebuilt
 # rust-std for (Tier-3 e.g. PowerPC e500: qoriq, ppc853x; or a Tier-2 whose
 # prebuilt std targets a newer glibc than the DSM toolchain, e.g. ARMv5 88f6281).
