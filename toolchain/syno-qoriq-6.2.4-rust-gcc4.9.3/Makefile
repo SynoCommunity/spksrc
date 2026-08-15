@@ -12,7 +12,7 @@ RUST_TC_VERS     = 6.2.4
 RUST_TC_GCC      = 4.9.3
 # Archive revision -- static here, CLI-overridable (mirrors binutils' BINUTILS_ARCHIVE_REV;
 # bump when re-publishing a rebuilt .txz under the same id).
-RUST_ARCHIVE_REV ?= v4
+RUST_ARCHIVE_REV ?= v5
 RUST_TC_ID       = $(PKG_VERS)-$(subst -unknown-,-synology-,$(RUST_TARGET))-$(RUST_TC_ARCH)-$(RUST_TC_VERS)-gcc$(RUST_TC_GCC)
 
 CARGO_PATH=$(BASEDIR)/distrib/cargo/bin
