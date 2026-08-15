@@ -69,12 +69,19 @@ endif
 endif
 
 # ---- rustc: the rust version the toolchain pins -----------------------------
-# Custom-rust archs (qoriq/ppc853x/88f6281) pin TC_RUSTC (e.g. 1.82.0, the last supporting
-# their old glibc), so a package needing a newer rustc is genuinely unsupported there. Read
-# statically like TC_GCC. Standard archs declare no TC_RUSTC (rustup 'stable' = newest), so an
-# empty/'stable' value satisfies any floor -- only a pinned concrete version is compared, no
-# network query. A local var, so env-rust.mk's TC_RUSTC 'stable' default is untouched.
+# Custom-rust archs (qoriq/ppc853x/88f6281/x86-5.2) are pinned to the rust version their
+# overlay ships (e.g. 1.82.0, the last supporting their old glibc), so a package needing a
+# newer rustc is genuinely unsupported there. The version is the rust consumer's PKG_VERS
+# (same source of truth as TC_RUSTC in spksrc.toolchain.mk); a toolchain still pinning
+# TC_RUSTC itself is honored too. Standard archs have neither (rustup 'stable' = newest), so
+# an empty/'stable' value satisfies any floor -- only a pinned concrete version is compared,
+# no network query. A local var, so env-rust.mk's TC_RUSTC 'stable' default is untouched.
+_TC_CAP_RUST_MK := $(firstword $(wildcard $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)-rust-*/Makefile))
+ifneq ($(strip $(_TC_CAP_RUST_MK)),)
+_TC_CAP_RUSTC := $(shell sed -n 's/^PKG_VERS *= *//p' $(_TC_CAP_RUST_MK) 2>/dev/null)
+else
 _TC_CAP_RUSTC := $(shell sed -n 's/^TC_RUSTC *= *//p' $(_TC_CAP_MK) 2>/dev/null)
+endif
 ifneq ($(strip $(MIN_RUSTC_VERSION)),)
 ifneq ($(strip $(_TC_CAP_RUSTC)),)
 ifneq ($(strip $(_TC_CAP_RUSTC)),stable)
