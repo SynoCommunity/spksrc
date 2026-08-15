@@ -90,9 +90,13 @@ rustc_target: $(PRE_RUSTC_TARGET)
 	rustup -q toolchain install $(TC_RUSTC) ; \
 	$(MSG) "rustup default $(TC_RUSTC)" ; \
 	rustup default $(TC_RUSTC) ; \
-	if [ -n "$(_RUST_BASE_TARGET)" ] && [ "$(RUST_TARGET_TIER)" != "3" ] ; then \
-	   $(MSG) "Installing STOCK base std $(_RUST_BASE_TARGET) (tier $(RUST_TARGET_TIER)) so OVERLAY_RUSTC=0 stays usable without re-invoking this cookie-locked build" ; \
-	   rustup component add rust-std --target $(_RUST_BASE_TARGET) --toolchain $(TC_RUSTC) || true ; \
+	if [ -n "$(_RUST_BASE_TARGET)" ] ; then \
+	   $(MSG) "Installing STOCK base std $(_RUST_BASE_TARGET) so OVERLAY_RUSTC=0 stays usable without re-invoking this cookie-locked build" ; \
+	   rustup component add rust-std --target $(_RUST_BASE_TARGET) --toolchain $(TC_RUSTC) || { \
+	      $(MSG) "*********************************************************************" ; \
+	      $(MSG) "*** No upstream rust-std for [$(_RUST_BASE_TARGET)]" ; \
+	      $(MSG) "*** OVERLAY_RUSTC=0 unusable here -- continuing with the overlay" ; \
+	      $(MSG) "*********************************************************************" ; } ; \
 	fi ; \
 	TARGET_STATUS=$$(rustup target list --toolchain $(TC_RUSTUP_TOOLCHAIN) 2>/dev/null | grep "^$(RUST_TARGET)") || true ; \
 	if echo "$$TARGET_STATUS" | grep -q "installed" ; then \

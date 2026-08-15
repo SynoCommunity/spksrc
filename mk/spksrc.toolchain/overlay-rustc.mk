@@ -64,18 +64,15 @@ _RUST_SYNO_TARGET := $(subst -unknown-,-synology-,$(RUST_TARGET))
 _RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
 
 # OVERLAY_RUSTC (default ON): ON = custom from-source build + synology triple; OFF = stock
-# rustup rustc + `unknown` triple, valid ONLY on a tier-1/2 base (tier-3 has no stock std -> error).
+# rustup rustc + `unknown` triple, usable only where rustup ships a std (tc-rust.mk reports it).
 OVERLAY_RUSTC    ?= 1
-RUST_TARGET_TIER ?= 3
 
 ifneq ($(filter 1 on ON,$(strip $(OVERLAY_RUSTC))),)
 # Overlay ON (default): our custom toolchain, synology triple.
 RUST_TARGET         := $(_RUST_SYNO_TARGET)
 TC_RUSTUP_TOOLCHAIN  = $(_RUST_TC_ID)
-else ifeq ($(strip $(RUST_TARGET_TIER)),3)
-$(error rust: OVERLAY_RUSTC=0 on tier-3 target $(_RUST_BASE_TARGET) -- rustup ships no std for it, there is no stock fallback; keep OVERLAY_RUSTC=1)
 else
-# Overlay OFF on a tier-1/2 arch: stock rustup rustc + in-tree unknown triple.
+# Overlay OFF: stock rustup rustc + in-tree unknown triple.
 RUST_TARGET         := $(_RUST_BASE_TARGET)
 TC_RUSTUP_TOOLCHAIN  = $(TC_RUSTC)
 endif
