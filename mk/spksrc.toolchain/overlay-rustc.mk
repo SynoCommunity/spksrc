@@ -81,14 +81,9 @@ TC_RUSTUP_TOOLCHAIN  = $(TC_RUSTC)
 endif
 
 # Widened atomics (RUST_MAX_ATOMIC_WIDTH) become __atomic_*_N libcalls, so the Rust link
-# needs libatomic -- the C path already gets it via TC_EXTRA_LDFLAGS.
-ifneq ($(strip $(RUST_MAX_ATOMIC_WIDTH)),)
-ifeq ($(strip $(TC_HAS_LIBATOMIC)),1)
-RUSTFLAGS += -Clink-arg=-latomic
-else
-$(error rust: RUST_MAX_ATOMIC_WIDTH=$(RUST_MAX_ATOMIC_WIDTH) needs libatomic, which gcc $(TC_GCC) does not ship)
-endif
-endif
+# needs libatomic. Lazy like _tc_ld_syslibs: TC_HAS_LIBATOMIC runs the cross gcc, which does
+# not exist yet while the toolchain is still being bootstrapped.
+RUSTFLAGS += $(if $(RUST_MAX_ATOMIC_WIDTH),$(if $(TC_HAS_LIBATOMIC),-Clink-arg=-latomic))
 
 # RUST_LINK_VIA_BINUTILS routes ONLY the Rust package link through the overlay ld (C stays on
 # vendor gcc+ld). Default ON for every custom-rustc arch (overlay-binutils.mk normally sets it;
