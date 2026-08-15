@@ -12,7 +12,7 @@ TC_ARCH ?= ppc853x
 TC_VERS ?= 5.2
 
 HOMEPAGE = https://www.rust-lang.org/
-COMMENT  = Rust 1.82 rebuilt from source as a custom cross toolchain (rustc + cargo + host/target std, LLVM from the bundled source) for legacy Synology toolchains rustup ships no usable prebuilt std for (Tier-3 PowerPC e500; ARMv5 on an older glibc). Produces the rust-<id>.txz the toolchain consumer extracts.
+COMMENT  = A language empowering everyone to build reliable and efficient software.
 LICENSE  = Apache-2.0, MIT
 
 # The source tarball bundles src/llvm-project and vendors every crate, so the whole
@@ -30,7 +30,7 @@ LICENSE  = Apache-2.0, MIT
 ##############################################################################
 # Packaging via the generic helper (mk/spksrc.build/archive.mk): host the x.py
 # stage2 tree (= the rustup toolchain layout), consumed by
-# toolchain/syno-<arch>-<vers>-rust-gcc<gcc>.
+# toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>.
 #   make TC_ARCH=<arch> TC_VERS=<vers> build-archive
 #
 # Declared BEFORE the native front-end include so the helper (pulled in via
@@ -38,14 +38,14 @@ LICENSE  = Apache-2.0, MIT
 # resolve later. ARCHIVE_KEEP = . of the stage dir so the tree unpacks straight
 # into $(RUSTUP_HOME)/toolchains/<id>.
 #
-# RUST_ARCHIVE_REV tags the .txz name only; bump it -- or pass RUST_ARCHIVE_REV=vN on
+# PKG_REV tags the .txz name only; bump it -- or pass PKG_REV=vN on
 # the command line, then rename -- when re-publishing a rebuilt archive under the same
 # id so mirrors/CDN caches don't serve the stale artifact. Each consumer toolchain
-# (syno-<arch>-<vers>-rust-gcc<gcc>) pins its own current rev the same way (mirrors
-# native/binutils-2.30's BINUTILS_ARCHIVE_REV; no shared/cross-included rev file).
+# (syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) pins its own current rev the same way (mirrors
+# native/binutils-2.30's PKG_REV; no shared/cross-included rev file).
 ##############################################################################
-RUST_ARCHIVE_REV ?= v1
-ARCHIVE_NAME = rust-$(_RUST_TC_ID)-$(RUST_ARCHIVE_REV)
+PKG_REV ?= v1
+ARCHIVE_NAME = rust-$(_RUST_TC_ID)-$(PKG_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(RUST_STAGE_DIR)
 ARCHIVE_KEEP = .
@@ -55,13 +55,13 @@ NATIVE_TOOLCHAIN = rust
 include ../../mk/spksrc.native-toolchain.mk
 
 ##############################################################################
-# Build rustc for EVERY custom-rust toolchain of a DSM version (real rust target iff its
-# Makefile declares RUST_TARGET; consumer -rust-gcc dirs are excluded).
+# Build rustc for EVERY custom-rust toolchain of a DSM version (a real rust target iff it
+# has a rust consumer dir -- the same marker as TC_OVERLAY_RUSTC).
 #   make all-5.2                 one arch at a time
 #   make RUST_JOBS=2 all-6.2.4   2 archs at a time (each still max threads)
 # Concurrency via xargs -P, NOT make -j (which would propagate into the x.py sub-builds).
 ##############################################################################
-RUST_REAL_ARCHS = $(foreach a,$(patsubst syno-%-$(1),%,$(notdir $(wildcard ../../toolchain/syno-*-$(1)))),$(if $(strip $(shell grep -l '^RUST_TARGET' ../../toolchain/syno-$(a)-$(1)/Makefile 2>/dev/null)),$(a)))
+RUST_REAL_ARCHS = $(sort $(foreach d,$(wildcard ../../toolchain/syno-*-$(1)_rust-*),$(patsubst syno-%-$(1),%,$(firstword $(subst _, ,$(notdir $(d)))))))
 
 RUST_JOBS ?= 1
 

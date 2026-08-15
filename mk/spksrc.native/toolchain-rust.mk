@@ -79,8 +79,8 @@ TC_EXTRA_RUSTFLAGS := $(call _tc_get,TC_EXTRA_RUSTFLAGS)
 # same probe gates the -latomic link flag (overlay-rustc.mk). Lazy: it runs the cross gcc.
 RUST_MAX_ATOMIC_WIDTH = $(if $(TC_HAS_LIBATOMIC),64)
 
-# RUST_ARCHIVE_REV is set by the native producer Makefile (RUST_ARCHIVE_REV ?= v1,
-# CLI-overridable), mirroring native/binutils-2.30's BINUTILS_ARCHIVE_REV.
+# PKG_REV is set by the native producer Makefile (PKG_REV ?= v1,
+# CLI-overridable), mirroring native/binutils-2.30.
 
 # The rust version is the native package's own PKG_VERS.
 TC_RUSTC        = $(PKG_VERS)
@@ -112,7 +112,7 @@ _RUST_TARGET_ENV  = $(subst -,_,$(RUST_TARGET))
 _RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
 
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
-# name. Must match the consumer (toolchain/syno-<arch>-<vers>-rust-gcc<gcc>) and
+# name. Must match the consumer (toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
 # overlay-rustc.mk's _RUST_TC_ID on the package-build side.
 _RUST_TC_ID = $(TC_RUSTC)-$(RUST_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
 

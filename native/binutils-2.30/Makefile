@@ -11,7 +11,7 @@ TC_ARCH ?= ppc853x
 TC_VERS ?= 5.2
 
 HOMEPAGE = https://www.gnu.org/software/binutils/
-COMMENT  = GNU binutils 2.30 (the DSM-7.1/7.2 default) rebuilt as a clean cross-assembler/linker for a Synology toolchain target. Replaces an old vendor-fork binutils -- e.g. the ppc853x GNU ld 2.18.50 (2008) that segfaults linking Rust cdylibs and mishandles modern codegen -- while still targeting glibc down to the DSM-5.2 vintage. Same version native/gcc8 co-builds, so a merged overlay shares one binutils.
+COMMENT  = GNU Binutils
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
@@ -27,8 +27,8 @@ CONFIGURE_ARGS += --disable-nls --disable-werror --disable-gdb
 # ARCHIVE_NAME; TC_TARGET (=) resolves later. The .txz unpacks usr/local/{bin,...} so an
 # OVERLAY_BINUTILS consumer finds <target>-{ld,as,...} under usr/local/bin. Bump the rev
 # when a rebuilt archive is re-published under the same (arch,DSM,ver) name.
-BINUTILS_ARCHIVE_REV ?= v1
-ARCHIVE_NAME = binutils-$(PKG_VERS)-$(TC_TARGET)-$(TC_ARCH)-$(TC_VERS)-$(BINUTILS_ARCHIVE_REV)
+PKG_REV ?= v1
+ARCHIVE_NAME = binutils-$(PKG_VERS)-$(TC_TARGET)-$(TC_ARCH)-$(TC_VERS)-$(PKG_REV)
 ARCHIVE_EXT  = txz
 ARCHIVE_DIR  = $(WORK_DIR)/install
 ARCHIVE_KEEP = usr/local
