@@ -14,7 +14,7 @@
 # patch) is the framework's, so patches live in native/rustc-<vers>/patches.
 #
 # Read from toolchain/syno-<arch>-<vers>/Makefile: RUST_POSTFIX_ALIASES, TC_EXTRA_CFLAGS,
-# TC_EXTRA_RUSTFLAGS (the base triple comes from the arch map).
+# TC_EXTRA_RUSTFLAGS, RUST_MAX_ATOMIC_WIDTH (the base triple comes from the arch map).
 #
 # Provides (consumed by native/rustc-<vers>/Makefile):
 #   _RUST_TC_ID     shared rustup toolchain id, also the archive base name
@@ -66,11 +66,14 @@ $(RUST_TARGET_JSON):
 	@$(MSG) "native-rust: generating target-spec $@ (base $(RUST_TARGET_JSON_BASE) -> vendor synology)"
 	RUSTC_BOOTSTRAP=1 \
 	  $(HOST_RUSTC) -Zunstable-options --print target-spec-json --target $(RUST_TARGET_JSON_BASE) \
-	  | RUST_TARGET_JSON_BASE="$(RUST_TARGET_JSON_BASE)" TC_EXTRA_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS)" python3 -c 'import os,json,sys,re; d=json.load(sys.stdin); d["vendor"]="synology"; d.pop("is-builtin",None); xf=os.environ.get("TC_EXTRA_RUSTFLAGS","").strip(); mc=re.search(r"-Ctarget-cpu=(\S+)",xf); d.update({"cpu":mc.group(1)} if mc else {}); mf=re.search(r"-Ctarget-feature=(\S+)",xf); d.update({"features":mf.group(1)} if mf else {}); desc="SynoCommunity custom rustc toolchain (from %s)"%os.environ["RUST_TARGET_JSON_BASE"]; desc+="; cpu/features baked into the spec: %s"%xf if xf else ""; d["metadata"]={"description":desc,"tier":3,"std":True,"host_tools":False}; json.dump(d,sys.stdout,indent=2)' > $@
+	  | RUST_TARGET_JSON_BASE="$(RUST_TARGET_JSON_BASE)" TC_EXTRA_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS)" RUST_MAX_ATOMIC_WIDTH="$(RUST_MAX_ATOMIC_WIDTH)" python3 -c 'import os,json,sys,re; d=json.load(sys.stdin); d["vendor"]="synology"; d.pop("is-builtin",None); xf=os.environ.get("TC_EXTRA_RUSTFLAGS","").strip(); mc=re.search(r"-Ctarget-cpu=(\S+)",xf); d.update({"cpu":mc.group(1)} if mc else {}); mf=re.search(r"-Ctarget-feature=(\S+)",xf); d.update({"features":mf.group(1)} if mf else {}); desc="SynoCommunity custom rustc toolchain (from %s)"%os.environ["RUST_TARGET_JSON_BASE"]; desc+="; cpu/features baked into the spec: %s"%xf if xf else ""; maw=os.environ.get("RUST_MAX_ATOMIC_WIDTH","").strip(); d.update({"max-atomic-width":int(maw)} if maw else {}); d["metadata"]={"description":desc,"tier":3,"std":True,"host_tools":False}; json.dump(d,sys.stdout,indent=2)' > $@
 # Reuse the exact flags the toolchain declares (qoriq/ppc853x SPE), instead of
 # repeating them here.
 TC_EXTRA_CFLAGS    := $(call _tc_get,TC_EXTRA_CFLAGS)
 TC_EXTRA_RUSTFLAGS := $(call _tc_get,TC_EXTRA_RUSTFLAGS)
+# Optional spec max-atomic-width override (e.g. 64 to expose AtomicU64 via libatomic
+# libcalls on a 32-bit arch whose gcc ships libatomic).
+RUST_MAX_ATOMIC_WIDTH := $(call _tc_get,RUST_MAX_ATOMIC_WIDTH)
 
 # RUST_ARCHIVE_REV is set by the native producer Makefile (RUST_ARCHIVE_REV ?= v1,
 # CLI-overridable), mirroring native/binutils-2.30's BINUTILS_ARCHIVE_REV.
