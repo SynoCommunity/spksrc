@@ -260,7 +260,7 @@ endif
 	echo "set(ENV{CARGO_BUILD_TARGET} \$${RUST_TARGET})" ; \
 	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER} \$${RUST_LINKER})" ; \
 	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_AR} \$${RUST_AR})" ; \
-	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS} $(TC_EXTRA_RUSTFLAGS))"
+	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS} $(if $(and $(TC_OVERLAY_RUSTC),$(filter 1 on ON,$(OVERLAY_RUSTC))),,$(TC_EXTRA_RUSTFLAGS)))"
 
 .PHONY: tc_meson_cross_vars
 tc_meson_cross_vars:
@@ -321,6 +321,8 @@ tc_rust_vars:
 	@# and it also wrongly leaked the target sysroot link-args onto the host's build
 	@# scripts / proc-macros. Consolidating here (link-args + arch codegen + the debug
 	@# ADDITIONAL_RUSTFLAGS) applies them to the target only, and nothing outranks them.
+	@# TC_EXTRA_RUSTFLAGS is skipped when the rust overlay is on: the JSON spec already
+	@# carries cpu/features, and re-passing them makes rustc warn ("unknown feature: spe").
 	@echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
@@ -328,7 +330,7 @@ tc_rust_vars:
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(or $(TC_RUST_LINKER),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)\" ; \
-	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(TC_EXTRA_RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(and $(TC_OVERLAY_RUSTC),$(filter 1 on ON,$(OVERLAY_RUSTC))),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
 
@@ -378,7 +380,7 @@ tc_vars:
 	echo TC_EXTRA_CXXFLAGS := $(TC_EXTRA_CXXFLAGS) ; \
 	echo TC_EXTRA_FFLAGS := $(TC_EXTRA_FFLAGS) ; \
 	echo TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS) ; \
-	echo TC_EXTRA_RUSTFLAGS := $(TC_EXTRA_RUSTFLAGS) ; \
+	echo TC_EXTRA_RUSTFLAGS := $(if $(and $(TC_OVERLAY_RUSTC),$(filter 1 on ON,$(OVERLAY_RUSTC))),,$(TC_EXTRA_RUSTFLAGS)) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \

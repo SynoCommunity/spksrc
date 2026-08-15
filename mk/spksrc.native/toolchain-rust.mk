@@ -153,11 +153,11 @@ ranlib = "$(RUST_RANLIB)"
 linker = "$(RUST_LINKER)"
 endef
 
-# ./x wrapper: target CFLAGS/RUSTFLAGS + the selected CC/CXX for the target.
+# ./x wrapper: target CFLAGS + the selected CC/CXX. No -Ctarget-cpu/-feature: the JSON spec
+# carries them (passing them again only triggers rustc's "unknown feature" warning).
 _X = cd $(RUST_SRC) && \
      LC_ALL=C \
      CFLAGS_$(_RUST_TARGET_ENV)="$(TC_EXTRA_CFLAGS)" CC_$(_RUST_TARGET_ENV)="$(RUST_CC)" CXX_$(_RUST_TARGET_ENV)="$(RUST_CXX)" \
-     CARGO_TARGET_$(_RUST_TARGET_UENV)_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS)" \
      RUST_TARGET_PATH="$(RUST_TARGET_JSON_DIR)" \
      CARGO_TERM_PROGRESS_WHEN=never CARGO_TERM_COLOR=never RUST_BACKTRACE=full ./x.py
 
