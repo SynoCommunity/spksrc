@@ -13,8 +13,8 @@
 # x.py-specific steps are custom targets; the source pipeline (download/extract/
 # patch) is the framework's, so patches live in native/rustc-<vers>/patches.
 #
-# Read from toolchain/syno-<arch>-<vers>/Makefile: RUST_POSTFIX_ALIASES, TC_EXTRA_CFLAGS,
-# TC_EXTRA_RUSTFLAGS, RUST_MAX_ATOMIC_WIDTH (the base triple comes from the arch map).
+# Read from toolchain/syno-<arch>-<vers>/Makefile: TC_EXTRA_CFLAGS, TC_EXTRA_RUSTFLAGS,
+# RUST_MAX_ATOMIC_WIDTH (triple and tool aliases derive from the arch map).
 #
 # Provides (consumed by native/rustc-<vers>/Makefile):
 #   _RUST_TC_ID     shared rustup toolchain id, also the archive base name
@@ -28,7 +28,9 @@ include ../../mk/spksrc.common/archs.mk
 include ../../mk/spksrc.cross/env-rust.mk
 RUST_TARGET_JSON_BASE := $(RUST_TARGET)
 RUST_TARGET           := $(subst -unknown-,-synology-,$(RUST_TARGET_JSON_BASE))
-RUST_POSTFIX_ALIASES  := $(call _tc_get,RUST_POSTFIX_ALIASES)
+# <triple>-<tool> symlink prefixes the built rustc may invoke by name: both forms of our
+# own triple. Derived, not declared -- no other spelling was ever reached.
+RUST_POSTFIX_ALIASES  := $(RUST_TARGET_JSON_BASE) $(RUST_TARGET)
 
 # RUST_LINK_VIA_BINUTILS: build the from-source std with a modern binutils 2.30 ld (the same
 # ld the consumer's package link uses), narrow to the Rust link -- C stays on vendor gcc+ld.

@@ -18,7 +18,6 @@ TC_EXTRA_RUSTFLAGS = -Ctarget-cpu=e500 -Ctarget-feature=+spe
 
 # Custom-rust arch (the rust consumer dir below is the marker). The rust-<id>.txz is built by
 # native/rustc-1.82 (arch-ppc853x-5.2) and downloaded via the rust consumer dir.
-RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
 
 # ppc853x's stock 2008 ld 2.18 mishandles Rust's TLS/PIE relocs, so the Rust link goes
 # through the binutils 2.30 overlay (RUST_LINK_VIA_BINUTILS, default ON; see
