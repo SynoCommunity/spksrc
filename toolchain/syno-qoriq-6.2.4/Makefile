@@ -16,9 +16,6 @@ TC_EXTRA_RUSTFLAGS = -Ctarget-cpu=e500 -Ctarget-feature=+spe
 
 # Custom-rust arch (the rust consumer dir below is the marker). The rust-<id>.txz is built by
 # native/rustc-1.82 (arch-qoriq-6.2.4) and downloaded via the rust consumer dir.
-# PPC32 has no 64-bit atomics, so core hides AtomicU64 (breaks nucleo/helix). gcc 4.9.3
-# ships libatomic, so widen the spec and let 64-bit atomics be __atomic_*_8 libcalls.
-RUST_MAX_ATOMIC_WIDTH = 64
 
 # no native 64-bit atomics; -latomic is auto-dropped when the gcc does not ship it.
 TC_EXTRA_LDFLAGS = -latomic

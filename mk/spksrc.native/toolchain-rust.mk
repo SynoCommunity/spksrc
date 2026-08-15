@@ -66,6 +66,7 @@ rustc_prepare: $(RUST_TARGET_JSON)
 $(RUST_TARGET_JSON):
 	@mkdir -p $(@D)
 	@$(MSG) "native-rust: generating target-spec $@ (base $(RUST_TARGET_JSON_BASE) -> vendor synology)"
+	@$(if $(RUST_MAX_ATOMIC_WIDTH),$(MSG) "native-rust: gcc ships libatomic -- widening max-atomic-width to $(RUST_MAX_ATOMIC_WIDTH) (AtomicU64 via __atomic_*_8 libcalls)",:)
 	RUSTC_BOOTSTRAP=1 \
 	  $(HOST_RUSTC) -Zunstable-options --print target-spec-json --target $(RUST_TARGET_JSON_BASE) \
 	  | RUST_TARGET_JSON_BASE="$(RUST_TARGET_JSON_BASE)" TC_EXTRA_RUSTFLAGS="$(TC_EXTRA_RUSTFLAGS)" RUST_MAX_ATOMIC_WIDTH="$(RUST_MAX_ATOMIC_WIDTH)" python3 -c 'import os,json,sys,re; d=json.load(sys.stdin); d["vendor"]="synology"; d.pop("is-builtin",None); xf=os.environ.get("TC_EXTRA_RUSTFLAGS","").strip(); mc=re.search(r"-Ctarget-cpu=(\S+)",xf); d.update({"cpu":mc.group(1)} if mc else {}); mf=re.search(r"-Ctarget-feature=(\S+)",xf); d.update({"features":mf.group(1)} if mf else {}); desc="SynoCommunity custom rustc toolchain (from %s)"%os.environ["RUST_TARGET_JSON_BASE"]; desc+="; cpu/features baked into the spec: %s"%xf if xf else ""; maw=os.environ.get("RUST_MAX_ATOMIC_WIDTH","").strip(); d.update({"max-atomic-width":int(maw)} if maw else {}); d["metadata"]={"description":desc,"tier":3,"std":True,"host_tools":False}; json.dump(d,sys.stdout,indent=2)' > $@
@@ -73,9 +74,10 @@ $(RUST_TARGET_JSON):
 # repeating them here.
 TC_EXTRA_CFLAGS    := $(call _tc_get,TC_EXTRA_CFLAGS)
 TC_EXTRA_RUSTFLAGS := $(call _tc_get,TC_EXTRA_RUSTFLAGS)
-# Optional spec max-atomic-width override (e.g. 64 to expose AtomicU64 via libatomic
-# libcalls on a 32-bit arch whose gcc ships libatomic).
-RUST_MAX_ATOMIC_WIDTH := $(call _tc_get,RUST_MAX_ATOMIC_WIDTH)
+# Widen the spec to 64 wherever the gcc ships libatomic: 64-bit atomics then lower to
+# __atomic_*_8 libcalls, exposing AtomicU64 on a 32-bit arch. Derived, not declared -- the
+# same probe gates the -latomic link flag (overlay-rustc.mk). Lazy: it runs the cross gcc.
+RUST_MAX_ATOMIC_WIDTH = $(if $(TC_HAS_LIBATOMIC),64)
 
 # RUST_ARCHIVE_REV is set by the native producer Makefile (RUST_ARCHIVE_REV ?= v1,
 # CLI-overridable), mirroring native/binutils-2.30's BINUTILS_ARCHIVE_REV.

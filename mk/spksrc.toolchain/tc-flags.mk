@@ -61,15 +61,8 @@ ifneq ($(strip $(TC_HAS_FORTRAN)),)
 TOOLS += fc:gfortran
 endif
 
-# Does this toolchain's gcc ship libatomic? Ask it, rather than tabulate.
-#
-# A target without native 64-bit atomics (ARMv5, PowerPC e500v2) makes gcc emit
-# calls into libatomic, which the link then has to resolve. But the library only
-# ships from gcc 4.7 on, and handing -latomic to an older gcc is fatal ("cannot
-# find -latomic"). Availability is the exact criterion, not a proxy: a gcc old
-# enough to lack libatomic also predates the __atomic_* builtins, emits __sync_*
-# instead, and so never needs the library. One question answers both.
-TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
+# TC_HAS_LIBATOMIC (the libatomic probe) lives in spksrc.common/tc-capability.mk,
+# included well before this file and also reachable from the native producers.
 
 # TC_EXTRA_LDFLAGS carries the ABI to the link and adds what a toolchain declares
 # for the linker. The ABI (TC_EXTRA_BUILD_FLAGS -- the -march/-mcpu/... flags folded

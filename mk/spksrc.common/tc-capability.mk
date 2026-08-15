@@ -22,6 +22,19 @@
 # turns that into the arch-refusal error, next to UNSUPPORTED_ARCHS.
 ###############################################################################
 
+# Does this toolchain's gcc ship libatomic? Ask it, rather than tabulate.
+#
+# A target without native 64-bit atomics (ARMv5, PowerPC e500v2) makes gcc emit calls into
+# libatomic, which the link then has to resolve. But the library only ships from gcc 4.7 on,
+# and handing -latomic to an older gcc is fatal ("cannot find -latomic"). Availability is the
+# exact criterion, not a proxy: a gcc old enough to lack libatomic also predates the __atomic_*
+# builtins, emits __sync_* instead, and so never needs the library. One question answers both.
+#
+# Lazy (=), unlike the static reads below: it RUNS the cross gcc, which does not exist yet
+# while the toolchain is still being bootstrapped. Outside the ARCH guard, and keyed on
+# TC_* only, so the native producers (spksrc.native/toolchain-rust.mk) reach it too.
+TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
+
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
 
 _TC_CAP_MK := $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)/Makefile
