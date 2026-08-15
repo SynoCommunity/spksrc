@@ -12,8 +12,4 @@ TC_TARGET = x86_64-pc-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sys-root
 TC_INCLUDE = $(TC_SYSROOT)/include
 
-# Custom-rust arch: std is cross-built against this DSM-5.2 glibc 2.17. The rust-<id>.txz
-# is built by native/rustc-1.82 (arch-x86-5.2) and downloaded via the rust consumer dir.
-# The synology triple (from the overlay) also avoids the x86_64 host==target collision.
-
 include ../../mk/spksrc.toolchain.mk

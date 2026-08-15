@@ -10,11 +10,8 @@ TC_DIST_SITE_PATH = toolchains%2Fdsm6.2.4
 TC_TARGET = arm-marvell-linux-gnueabi
 TC_SYSROOT = $(TC_TARGET)/libc
 
-# Custom-rust arch: rustup's prebuilt armv5te std targets a newer glibc than DSM 6.2.4's
-# 2.15, so std is rebuilt from source. The rust-<id>.txz is built by native/rustc-1.82
-# (arch-88f6281-6.2.4) and downloaded via the rust consumer dir.
-
-# glibc 2.15: no clock_gettime in libc (<2.17), no native 64-bit atomics. -latomic auto-dropped.
+# glibc 2.15 predates clock_gettime in libc (2.17); the target has no native 64-bit atomics.
+# -latomic is dropped automatically when the gcc does not ship it.
 TC_EXTRA_LDFLAGS = -lrt -latomic
 
 include ../../mk/spksrc.toolchain.mk
