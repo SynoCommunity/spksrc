@@ -13,21 +13,20 @@
 # x.py-specific steps are custom targets; the source pipeline (download/extract/
 # patch) is the framework's, so patches live in native/rustc-<vers>/patches.
 #
-# Read from toolchain/syno-<arch>-<vers>/Makefile (single source of truth):
-#   RUST_TARGET, RUST_POSTFIX_ALIASES,
-#   TC_EXTRA_CFLAGS, TC_EXTRA_RUSTFLAGS
+# Read from toolchain/syno-<arch>-<vers>/Makefile: RUST_POSTFIX_ALIASES, TC_EXTRA_CFLAGS,
+# TC_EXTRA_RUSTFLAGS (the base triple comes from the arch map).
 #
 # Provides (consumed by native/rustc-<vers>/Makefile):
 #   _RUST_TC_ID     shared rustup toolchain id, also the archive base name
 #   RUST_STAGE_DIR  x.py stage output = the toolchain to archive (ARCHIVE_DIR)
 ###############################################################################
 
-# Every custom toolchain uses a Synology-vendored target triple (a uniform marker in
-# `rustup toolchain list` and in the ids/archive names): the toolchain declares the in-tree
-# triple as RUST_TARGET, and we swap the vendor unknown -> synology and resolve it from a
-# generated JSON target-spec. This also sidesteps the host==target collision on x86/i686
-# (host x86_64-unknown-linux-gnu vs target x86_64-synology-linux-gnu -> two [target.*]).
-RUST_TARGET_JSON_BASE := $(call _tc_get,RUST_TARGET)
+# Synology-vendored triple (uniform marker in ids/archive names, and it sidesteps the
+# host==target collision on x86). Base triple from the central arch map (keyed on TC_ARCH
+# since ARCH is empty here) -- the same source the consumer uses -- then unknown -> synology.
+include ../../mk/spksrc.common/archs.mk
+include ../../mk/spksrc.cross/env-rust.mk
+RUST_TARGET_JSON_BASE := $(RUST_TARGET)
 RUST_TARGET           := $(subst -unknown-,-synology-,$(RUST_TARGET_JSON_BASE))
 RUST_POSTFIX_ALIASES  := $(call _tc_get,RUST_POSTFIX_ALIASES)
 

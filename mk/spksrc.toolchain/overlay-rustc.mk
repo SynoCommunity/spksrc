@@ -28,10 +28,8 @@
 # TC_GCC_SUFFIX (empty here) lands the effective TC_GCC in the id / consumer-dir names,
 # letting stock-gcc and a future gcc-overlay variant coexist.
 #
-# A toolchain sets, before including spksrc.toolchain.mk:
-#   TC_RUSTC             = 1.82.0       rust version (matches native/rustc-1.82)
-#   RUST_TARGET          = powerpc-unknown-linux-gnuspe
-#   RUST_POSTFIX_ALIASES = powerpc-linux-gnuspe powerpc-unknown-linux-gnuspe
+# A toolchain only declares its arch specifics (e.g. RUST_POSTFIX_ALIASES); the triple comes
+# from env-rust.mk's map and TC_RUSTC from the rust consumer's PKG_VERS.
 ###############################################################################
 
 # The rust overlay entry -- peer of overlay-binutils. Defined for
