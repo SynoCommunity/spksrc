@@ -24,7 +24,8 @@
 #
 # which executes:
 #  status           : echo status to logging facility
-#  overlay-rustc    : rust toolchain -- rustup base (rustup-rustc) + custom overlay
+#  rustup-rustc     : rustup base install (host rustc/cargo)
+#  overlay-rustc    : this arch's custom rust overlay artifacts
 #  depend           : resolve and build toolchain dependencies (if any)
 #  tcvars           : generate tc_vars*.mk files for spksrc.cross/env-default.mk
 #
@@ -213,9 +214,15 @@ toolchain_msg:
 
 pre_toolchain_target: toolchain_msg
 
+# _all's prerequisites are a SEQUENCE, not a set: rustup must be installed before the
+# consumers rustup-link in depend, and tcvars reads what overlay-rustc resolved. Left-to-right
+# order only holds serially, so pin it. Scoped to this instance -- recursively invoked makes
+# (every cross/ and spk/ build) keep their parallelism, and depend already loops serially.
+.NOTPARALLEL:
+
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: status overlay-rustc depend tcvars
+_all: status rustup-rustc overlay-rustc depend tcvars
 
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target

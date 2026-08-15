@@ -32,12 +32,11 @@
 # from env-rust.mk's map and TC_RUSTC from the rust consumer's PKG_VERS.
 ###############################################################################
 
-# The rust overlay entry -- peer of overlay-binutils. Defined for
-# EVERY rust arch (like overlay-binutils): the rustup base install (rustup-rustc, tc-rust.mk)
-# always, plus this arch's own overlay artifacts (the binutils linker wrapper) added under
-# the custom-rust gate below.
+# The rust overlay entry -- peer of overlay-binutils. Empty by default (standard archs have
+# no overlay); the custom-rust gate below hangs this arch's artifacts off it. The rustup base
+# install is a separate _all step (rustup-rustc, tc-rust.mk), sequenced before this one.
 .PHONY: overlay-rustc
-overlay-rustc: rustup-rustc
+overlay-rustc: ;
 
 # ============================================================================
 # Custom-rust archs only (TC_OVERLAY_RUSTC: a rust consumer dir exists);
