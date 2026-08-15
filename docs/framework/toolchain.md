@@ -261,8 +261,8 @@ A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853
 | Piece | Role |
 |-------|------|
 | `native/rustc-<vers>/` | Producer — builds the `rust-<id>-<rev>.txz`. |
-| `toolchain/syno-<arch>-<dsm>-rust-gcc<gcc>/` | Consumer — downloads + extracts that `.txz` (the base toolchain `DEPENDS` on it). |
-| `toolchain/syno-<arch>-<dsm>-binutils2.30/` | binutils 2.30 overlay used for the Rust link only (`RUST_LINK_VIA_BINUTILS`, default ON). |
+| `toolchain/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc>/` | Consumer — downloads + extracts that `.txz` (the base toolchain `DEPENDS` on it). |
+| `toolchain/syno-<arch>-<dsm>_binutils-2.30_gcc-<gcc>/` | binutils 2.30 overlay used for the Rust link only (`RUST_LINK_VIA_BINUTILS`, default ON). |
 
 The base toolchain (`syno-<arch>-<dsm>/`) opts in by declaring `RUST_BUILD_TOOLCHAIN` and a `RUST_TARGET` (a Synology-vendored triple, `…-unknown-…` → `…-synology-…`). The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through binutils 2.30.
 
@@ -280,7 +280,7 @@ The `.txz` name carries a revision. When re-publishing a rebuilt archive under t
 
 1. Build (optionally with `RUST_ARCHIVE_REV=vN`).
 2. Upload the `.txz` to the release (`pre-releases`, or the `rust/…` asset path).
-3. Bump `RUST_ARCHIVE_REV ?= vN` in the consumer Makefile and refresh its `digests` (`make -C toolchain/syno-<arch>-<dsm>-rust-gcc<gcc> digests`).
+3. Bump `PKG_REV ?= vN` in the consumer Makefile and refresh its `digests` (`make -C toolchain/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc> digests`).
 
 `make clean` on the base toolchain cascades to its rust + binutils overlay consumers, so a rebuild re-extracts them fresh.
 

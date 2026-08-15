@@ -21,7 +21,7 @@
 # rust.mk), which goes through the framework's normal download/extract/patch/
 # configure/compile/archive pipeline, like any native toolchain package. Produce a .txz with:
 #   make -C native/rustc-<vers> arch-<arch>-<vers>
-# and the toolchain consumer (toolchain/syno-<arch>-<vers>-rust-gcc<gcc>, pulled
+# and the toolchain consumer (toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>, pulled
 # in by DEPENDS) downloads and extracts it.
 #
 # Overlay-ready: RUST_CC / RUST_CXX default to $(TC_PREFIX)gcc$(TC_GCC_SUFFIX), so a

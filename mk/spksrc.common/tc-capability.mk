@@ -89,7 +89,7 @@ endif
 # TC_RUSTC itself is honored too. Standard archs have neither (rustup 'stable' = newest), so
 # an empty/'stable' value satisfies any floor -- only a pinned concrete version is compared,
 # no network query. A local var, so env-rust.mk's TC_RUSTC 'stable' default is untouched.
-_TC_CAP_RUST_MK := $(firstword $(wildcard $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)-rust-*/Makefile))
+_TC_CAP_RUST_MK := $(firstword $(wildcard $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)_rust-*/Makefile))
 ifneq ($(strip $(_TC_CAP_RUST_MK)),)
 _TC_CAP_RUSTC := $(shell sed -n 's/^PKG_VERS *= *//p' $(_TC_CAP_RUST_MK) 2>/dev/null)
 else

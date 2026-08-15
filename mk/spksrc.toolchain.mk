@@ -179,8 +179,8 @@ include ../../mk/spksrc.build/patch.mk
 rustup-rustc: patch
 # Per-component overlay markers: the wildcard-detected consumer dir (empty if the arch has
 # no such overlay), doubling as its path. The legacy archs ship both; standard archs neither.
-TC_OVERLAY_RUSTC    := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)-rust-*)
-TC_OVERLAY_BINUTILS := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)-binutils*)
+TC_OVERLAY_RUSTC    := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)_rust-*)
+TC_OVERLAY_BINUTILS := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)_binutils-*)
 
 # The custom rust version is the overlay's own PKG_VERS (single source of truth), read from
 # the rust consumer Makefile -- never hardcoded per base toolchain.

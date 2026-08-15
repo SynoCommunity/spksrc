@@ -55,7 +55,7 @@ OVERLAY_BINUTILS_SHIM     = $(TC_WORK_DIR)/shim
 OVERLAY_BINUTILS_FLAG     = $(if $(filter 1,$(OVERLAY_BINUTILS)),-B$(OVERLAY_BINUTILS_SHIM))
 
 # `make clean` on a custom-rust base toolchain also cleans its downloaded consumers --
-# the rust std (syno-<arch>-<vers>-rust-gcc<gcc>) and this binutils overlay
+# the rust std (syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and this binutils overlay
 # (syno-<arch>-<vers>-binutils<vers>) -- so a rebuild re-extracts them fresh instead of
 # reusing a stale extracted install. This only ADDS a prerequisite to the generic clean
 # (recipe stays in spksrc.rules.mk); the consumers go through native-install.mk, not these gates, so

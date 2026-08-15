@@ -41,7 +41,7 @@ else ifeq ($(notdir $(abspath $(CURDIR)/..)),toolchain)
 ifneq ($(strip $(TC_NAME)$(TC_VERS)),)
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(lastword $(subst -, ,$(TC_NAME)))-$(TC_VERS)" "toolchain") | tee --append $(STATUS_LOG)
 else
-	@# A native package that lives under toolchain/ (e.g. the prebuilt syno-<arch>-<vers>-rust-gcc<gcc>
+	@# A native package that lives under toolchain/ (e.g. the prebuilt syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>
 	@# consumers) has no TC_NAME/TC_VERS -- show its own name rather than an empty "toolchain" line.
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(NAME)") | tee --append $(STATUS_LOG)
 endif
