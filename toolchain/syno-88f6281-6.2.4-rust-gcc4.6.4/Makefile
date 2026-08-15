@@ -15,9 +15,6 @@ RUST_TC_GCC      = 4.6.4
 RUST_ARCHIVE_REV ?= v3
 RUST_TC_ID       = $(PKG_VERS)-$(subst -unknown-,-synology-,$(RUST_TARGET))-$(RUST_TC_ARCH)-$(RUST_TC_VERS)-gcc$(RUST_TC_GCC)
 
-CARGO_PATH=$(BASEDIR)/distrib/cargo/bin
-RUSTUP_HOME=$(BASEDIR)/distrib/rustup
-
 PKG_DIST_NAME = rust-$(RUST_TC_ID)-$(RUST_ARCHIVE_REV).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/rust/qoriq
 
@@ -35,8 +32,7 @@ include ../../mk/spksrc.native-install.mk
 .PHONY: rust-postinstall
 rust-postinstall:
 	@$(MSG) "Rust toolchain $(RUST_TC_ID) staged in $(RUSTUP_HOME)/toolchains"
-	@export PATH="$(CARGO_PATH):$${PATH}" ; \
-	export RUSTUP_HOME="$(RUSTUP_HOME)" ; \
+	@export PATH="$(CARGO_HOME)/bin:$${PATH}" ; \
 	which rustup ; \
 	rustup --version ; \
 	rustup toolchain link $(RUST_TC_ID) $(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)) ; \
