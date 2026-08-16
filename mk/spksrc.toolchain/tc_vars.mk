@@ -261,7 +261,7 @@ endif
 	echo "set(ENV{CARGO_BUILD_TARGET} \$${RUST_TARGET})" ; \
 	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER} \$${RUST_LINKER})" ; \
 	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_AR} \$${RUST_AR})" ; \
-	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS} $(if $(and $(TC_OVERLAY_RUSTC),$(filter 1 on ON,$(OVERLAY_RUSTC))),,$(TC_EXTRA_RUSTFLAGS)))"
+	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS} $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)))"
 
 .PHONY: tc_meson_cross_vars
 tc_meson_cross_vars:
@@ -333,7 +333,7 @@ tc_rust_vars:
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(or $(TC_RUST_LINKER),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)\" ; \
-	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(and $(TC_OVERLAY_RUSTC),$(filter 1 on ON,$(OVERLAY_RUSTC))),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
 
@@ -368,6 +368,13 @@ tc_flags:
 	echo LDFLAGS := $(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)
 
 .PHONY: tc_vars
+# TC_OVERLAY_<c> is emitted with ACTIVE semantics -- the consumer dir when the overlay drives
+# THIS build, empty otherwise -- so a generated tc_vars.mk shows what was resolved. (In-tree the
+# same names mean AVAILABLE; nothing on the package side reads them back.) Binutils counts as
+# active only for the GLOBAL overlay: the narrow rust-link use downloads the same archive but
+# touches nothing else, and shows up as CARGO_TARGET_<triple>_LINKER pointing at binutils-cc.
+# The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
+# would inherit the previous run's choice and the switch would go sticky.
 tc_vars:
 	@echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_WORK_DIR := $(TC_WORK_DIR) ; \
@@ -383,13 +390,15 @@ tc_vars:
 	echo TC_EXTRA_CXXFLAGS := $(TC_EXTRA_CXXFLAGS) ; \
 	echo TC_EXTRA_FFLAGS := $(TC_EXTRA_FFLAGS) ; \
 	echo TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS) ; \
-	echo TC_EXTRA_RUSTFLAGS := $(if $(and $(TC_OVERLAY_RUSTC),$(filter 1 on ON,$(OVERLAY_RUSTC))),,$(TC_EXTRA_RUSTFLAGS)) ; \
+	echo TC_EXTRA_RUSTFLAGS := $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
 	echo TC_ARCH := $(TC_ARCH) ; \
 	echo TC_GCC := $(TC_GCC) ; \
-	echo TC_GLIBC := $(TC_GLIBC)
+	echo TC_GLIBC := $(TC_GLIBC) ; \
+	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
+	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS))
 # TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)

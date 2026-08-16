@@ -27,9 +27,10 @@ endif
 # Scoped to toolchain/: the native/* packages that also read this file are already isolated
 # (spksrc.rules/depend.mk invokes them through `env -i`).
 ifneq ($(findstring /toolchain/,$(CURDIR)),)
-# A FIXED name, not work$(ARCH_SUFFIX): ARCH/TCVERSION propagate through MAKEFLAGS too, so the
-# suffix would vary with the caller and the overlay pointers below could not name the directory.
-override WORK_DIR = $(CURDIR)/work-native
+# Plain 'work', matching what every toolchain/ package uses -- and a FIXED name at that:
+# ARCH/TCVERSION propagate through MAKEFLAGS too, so work$(ARCH_SUFFIX) would vary with the
+# caller and the overlay pointers could not name the directory.
+override WORK_DIR = $(CURDIR)/work
 endif
 
 ifneq ($(REQUIRE_KERNEL),)

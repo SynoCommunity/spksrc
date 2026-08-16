@@ -97,7 +97,7 @@ RUSTFLAGS += $(if $(TC_HAS_LIBATOMIC),-Clink-arg=-latomic)
 ifeq ($(RUST_LINK_VIA_BINUTILS),1)
 # In the rust consumer's own dir: it is a rust-overlay artifact, used only as the Rust
 # link's CARGO_TARGET_<triple>_LINKER. Keeps the base toolchain work dir to the vendor's.
-RUST_BINUTILS_CC = $(TC_OVERLAY_RUSTC)/work-native/binutils-cc
+RUST_BINUTILS_CC = $(TC_OVERLAY_RUSTC)/work/binutils-cc
 TC_RUST_LINKER   = $(RUST_BINUTILS_CC)
 
 define RUST_BINUTILS_CC_SCRIPT
