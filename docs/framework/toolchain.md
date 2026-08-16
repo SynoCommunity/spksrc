@@ -264,21 +264,20 @@ A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853
 | `toolchain/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc>/` | Consumer — downloads + extracts that `.txz` (the base toolchain `DEPENDS` on it). |
 | `toolchain/syno-<arch>-<dsm>_binutils-2.30_gcc-<gcc>/` | binutils 2.30 overlay used for the Rust link only (`RUST_LINK_VIA_BINUTILS`, default ON). |
 
-The base toolchain (`syno-<arch>-<dsm>/`) opts in by declaring `RUST_BUILD_TOOLCHAIN` and a `RUST_TARGET` (a Synology-vendored triple, `…-unknown-…` → `…-synology-…`). The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through binutils 2.30.
+A base toolchain (`syno-<arch>-<dsm>/`) opts in simply by having a rust consumer dir beside it (`TC_OVERLAY_RUSTC`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through binutils 2.30.
 
 ### (Re)building and publishing
 
 ```bash
-make rust-toolchain-ppc853x-5.2            # one arch (proxy for the line below)
-make -C native/rustc-1.82 arch-ppc853x-5.2 # same thing, direct
+make -C native/rustc-1.82 arch-ppc853x-5.2  # one arch
 make -C native/rustc-1.82 all-5.2          # every rust arch of a DSM version
 ```
 
 You do **not** build binutils separately: the Rust build co-builds `native/binutils-2.30` for the same `(arch, DSM)` automatically (the `rustc_binutils_cobuild` step, gated on `RUST_LINK_VIA_BINUTILS`). It is intentionally not a `DEPENDS` — a `DEPENDS` cannot carry the per-arch parametrization — so `make arch-<arch>-<vers>` is self-contained. The build prints a `Co-building binutils …` banner when it does so.
 
-The `.txz` name carries a revision. When re-publishing a rebuilt archive under the same id, bump the rev so caches don't serve the stale artifact — pass `RUST_ARCHIVE_REV=vN` (then rename), exactly like `BINUTILS_ARCHIVE_REV`. The current rev lives **statically** in each consumer Makefile (`RUST_ARCHIVE_REV ?= vN`), not in a shared file. To publish a rebuild:
+The `.txz` name carries a revision. When re-publishing a rebuilt archive under the same id, bump the rev so caches don't serve the stale artifact — pass `PKG_REV=vN` (then rename). The current rev lives **statically** in each consumer Makefile (`PKG_REV ?= vN`), not in a shared file. To publish a rebuild:
 
-1. Build (optionally with `RUST_ARCHIVE_REV=vN`).
+1. Build (optionally with `PKG_REV=vN`).
 2. Upload the `.txz` to the release (`pre-releases`, or the `rust/…` asset path).
 3. Bump `PKG_REV ?= vN` in the consumer Makefile and refresh its `digests` (`make -C toolchain/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc> digests`).
 
