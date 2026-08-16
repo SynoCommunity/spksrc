@@ -25,8 +25,8 @@
 # which executes:
 #  status           : echo status to logging facility
 #  rustup-rustc     : rustup base install (host rustc/cargo)
-#  overlay-rustc    : this arch's custom rust overlay artifacts
 #  depend           : resolve and build toolchain dependencies (if any)
+#  overlay-rustc    : this arch's custom rust overlay artifacts (needs depend's consumers)
 #  tcvars           : generate tc_vars*.mk files for spksrc.cross/env-default.mk
 #
 # Variables:
@@ -178,23 +178,17 @@ patch: normalize
 include ../../mk/spksrc.build/patch.mk
 
 rustup-rustc: patch
-# Per-component overlay markers: the wildcard-detected consumer dir (empty if the arch has
-# no such overlay), doubling as its path. The legacy archs ship both; standard archs neither.
-TC_OVERLAY_RUSTC    := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)_rust-*)
-TC_OVERLAY_BINUTILS := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)_binutils-*)
-
-# The custom rust version is the overlay's own PKG_VERS (single source of truth), read from
-# the rust consumer Makefile -- never hardcoded per base toolchain. Pinned ONLY when the
-# overlay is actually selected: OVERLAY_RUSTC=0 must fall back to the stock rustup toolchain
-# ('stable', env-rust.mk's default), not to the overlay's version. Unset counts as ON, matching
-# overlay-rustc.mk's OVERLAY_RUSTC ?= 1 (resolved later, after this point).
-ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
-ifeq ($(filter 0 off OFF,$(strip $(OVERLAY_RUSTC))),)
+# The rust version this toolchain runs: the overlay's own PKG_VERS when the overlay is ACTIVE
+# (single source of truth, never hardcoded per base toolchain); otherwise left to env-rust.mk's
+# 'stable'. Availability/request/active are resolved in spksrc.common/overlay.mk.
+ifeq ($(OVERLAY_RUSTC_ON),1)
 TC_RUSTC := $(shell sed -n 's/^PKG_VERS[[:space:]]*=[[:space:]]*//p' $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
 endif
-# Pull the rust overlay .txz via the consumer-dir DEPENDS. Skipped during a native-toolchain
-# extract (NATIVE_TOOLCHAIN_EXTRACT=1) to avoid a bootstrap cycle (the consumer would download
-# the very archive being produced).
+
+# Pull the rust overlay .txz via the consumer-dir DEPENDS -- whenever one ships, so the archive
+# is provisioned even with the overlay switched off. Skipped during a native-toolchain extract
+# (NATIVE_TOOLCHAIN_EXTRACT=1), which would download the very archive being produced.
+ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
 ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
 DEPENDS += toolchain/$(notdir $(firstword $(TC_OVERLAY_RUSTC)))
 endif
@@ -227,7 +221,7 @@ pre_toolchain_target: toolchain_msg
 
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: status rustup-rustc overlay-rustc depend tcvars
+_all: status rustup-rustc depend overlay-rustc tcvars
 
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target

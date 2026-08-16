@@ -30,29 +30,23 @@
 #                            breaks Rust but whose stock gcc emits standard flags (ppc853x).
 #                            Default ON for every custom-rust arch.
 #
-# Both draw on the same downloaded binutils (below); they differ only in scope.
-OVERLAY_BINUTILS       ?= 0
-OVERLAY_BINUTILS_VERS  ?= 2.30
+# Both draw on the same downloaded binutils; they differ only in scope. The switches and
+# their defaults live in spksrc.common/overlay.mk -- this file only consumes the outcome.
 
-# RUST_LINK_VIA_BINUTILS defaults ON for every custom-rust arch (TC_OVERLAY_RUSTC): the
-# from-source rustc link is routed through the binutils 2.30 overlay -- NARROW (rust link only;
-# C keeps the stock vendor as/ld), unlike the GLOBAL OVERLAY_BINUTILS. Overridable per toolchain/CLI.
-ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
-RUST_LINK_VIA_BINUTILS ?= 1
-endif
-
-# The extracted cross tools (<target>-ld, <target>-as, ...). As a DEPENDS the consumer's
-# WORK_DIR propagates to the base toolchain work dir (TC_WORK_DIR), so its .txz unpacks
-# usr/local/{bin,...} into TC_WORK_DIR/install (consumer EXTRACT_PATH = INSTALL_DIR).
-OVERLAY_BINUTILS_BIN      = $(TC_WORK_DIR)/install/usr/local/bin
-# gcc invokes 'as'/'ld' UNPREFIXED via -B, but the tools are <target>-prefixed, so a shim
-# dir carries unprefixed symlinks (built by the consumer's POST_INSTALL at $(WORK_DIR)/shim =
-# TC_WORK_DIR/shim). Absolute, so the -B path baked into tc_vars is stable across checkouts.
-OVERLAY_BINUTILS_SHIM     = $(TC_WORK_DIR)/shim
+# The extracted cross tools (<target>-ld, <target>-as, ...), inside the CONSUMER's own work
+# dir -- TC_OVERLAY_BINUTILS is that directory. Keeping each overlay self-contained is what
+# lets two versions of one component coexist; only these pointers then decide which is used.
+OVERLAY_BINUTILS_BIN      = $(TC_OVERLAY_BINUTILS)/work-native/install/usr/local/bin
+# gcc invokes 'as'/'ld' UNPREFIXED via -B, but the tools are <target>-prefixed, so a shim dir
+# carries unprefixed symlinks (built by the consumer's POST_INSTALL at $(WORK_DIR)/shim).
+# Absolute, so the -B path baked into tc_vars is stable across checkouts.
+OVERLAY_BINUTILS_SHIM     = $(TC_OVERLAY_BINUTILS)/work-native/shim
 # GLOBAL redirect: appended to CFLAGS/CXXFLAGS/LDFLAGS/FFLAGS in tc_vars so every
 # gcc-driven compile/link uses the overlay as/ld. ONLY for the matched-pair (modern-gcc) case
 # -- empty for a rust-link-only arch, whose C builds keep the vendor as/ld.
-OVERLAY_BINUTILS_FLAG     = $(if $(filter 1,$(OVERLAY_BINUTILS)),-B$(OVERLAY_BINUTILS_SHIM))
+# Only when the GLOBAL overlay is active: a -B into a shim that never gets built would
+# silently leave every compile on the stock as/ld.
+OVERLAY_BINUTILS_FLAG     = $(if $(OVERLAY_BINUTILS_ON),-B$(OVERLAY_BINUTILS_SHIM))
 
 # `make clean` on a custom-rust base toolchain also cleans its downloaded consumers --
 # the rust std (syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and this binutils overlay
@@ -70,17 +64,29 @@ clean-rust-consumers:
 	done
 endif
 
-# Provision the binutils (download the consumer + build the shim) when EITHER use needs
-# it: the global overlay (matched modern gcc) or the narrow rust-link overlay (default ON for every
-# custom-rustc arch, set just above). Resolved here, before overlay-rustc.mk consumes it.
-_OVERLAY_BINUTILS_NEEDED := $(if $(filter 1,$(OVERLAY_BINUTILS))$(filter 1,$(RUST_LINK_VIA_BINUTILS)),1)
 
 # Provision the binutils overlay as a normal DEPENDS: the consumer extracts the .txz and
-# builds the as/ld shim in its POST_INSTALL (symmetric with the rust consumer). Gated on the
-# NEED (OVERLAY_BINUTILS=1 or the rust link), not on wildcard existence. Skipped during a
-# native-toolchain extract (the rust producer co-builds its own build-time ld).
-ifeq ($(_OVERLAY_BINUTILS_NEEDED),1)
+# builds the as/ld shim in its POST_INSTALL (symmetric with the rust consumer). Skipped during
+# a native-toolchain extract (the rust producer co-builds its own build-time ld).
+ifeq ($(OVERLAY_BINUTILS_PROVISION),1)
 ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
 DEPENDS += toolchain/$(notdir $(TC_OVERLAY_BINUTILS))
 endif
+endif
+
+# Report a degraded or risky state. Conditions AND wording both come from
+# spksrc.common/overlay.mk; this only picks which one to print. Hung off tcvars (not _all):
+# the switches are a PER-PACKAGE choice, and _all is skipped once the toolchain cookie exists.
+.PHONY: overlay-binutils-warn
+ifeq ($(OVERLAY_BINUTILS_VERSMISS),1)
+overlay-binutils-warn:
+	@$(OVERLAY_WARN_BINUTILS_VERSMISS)
+else ifeq ($(OVERLAY_BINUTILS_MISSING),1)
+overlay-binutils-warn:
+	@$(OVERLAY_WARN_BINUTILS_MISSING)
+else ifeq ($(OVERLAY_BINUTILS_UNMATCHED),1)
+overlay-binutils-warn:
+	@$(OVERLAY_WARN_BINUTILS_UNMATCHED)
+else
+overlay-binutils-warn: ;
 endif

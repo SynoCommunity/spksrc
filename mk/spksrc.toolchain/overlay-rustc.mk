@@ -33,10 +33,20 @@
 ###############################################################################
 
 # The rust overlay entry -- peer of overlay-binutils. Empty by default (standard archs have
-# no overlay); the custom-rust gate below hangs this arch's artifacts off it. The rustup base
+# no overlay); the custom-rust gate below hangs this arch's ARTIFACTS off it. The rustup base
 # install is a separate _all step (rustup-rustc, tc-rust.mk), sequenced before this one.
 .PHONY: overlay-rustc
 overlay-rustc: ;
+
+# Warnings ride tcvars instead, like overlay-binutils-warn: they report a per-PACKAGE choice,
+# and _all is skipped once the toolchain cookie exists.
+.PHONY: overlay-rustc-warn
+ifeq ($(OVERLAY_RUSTC_VERSMISS),1)
+overlay-rustc-warn:
+	@$(OVERLAY_WARN_RUSTC_VERSMISS)
+else
+overlay-rustc-warn: ;
+endif
 
 # ============================================================================
 # Custom-rust archs only (TC_OVERLAY_RUSTC: a rust consumer dir exists);
@@ -62,11 +72,10 @@ _RUST_BASE_TARGET := $(RUST_TARGET)
 _RUST_SYNO_TARGET := $(subst -unknown-,-synology-,$(RUST_TARGET))
 _RUST_TC_ID = $(TC_RUSTC)-$(_RUST_SYNO_TARGET)-$(TC_ARCH)-$(TC_VERS)-gcc$(TC_GCC)
 
-# OVERLAY_RUSTC (default ON): ON = custom from-source build + synology triple; OFF = stock
-# rustup rustc + `unknown` triple, usable only where rustup ships a std (tc-rust.mk reports it).
-OVERLAY_RUSTC    ?= 1
-
-ifneq ($(filter 1 on ON,$(strip $(OVERLAY_RUSTC))),)
+# ON = custom from-source build + synology triple; OFF = stock rustup rustc + `unknown`
+# triple, usable only where rustup ships a std (tc-rust.mk reports it). The switch and its
+# default live in spksrc.common/overlay.mk.
+ifeq ($(OVERLAY_RUSTC_ON),1)
 # Overlay ON (default): our custom toolchain, synology triple.
 RUST_TARGET         := $(_RUST_SYNO_TARGET)
 TC_RUSTUP_TOOLCHAIN  = $(_RUST_TC_ID)
@@ -82,12 +91,13 @@ endif
 RUSTFLAGS += $(if $(TC_HAS_LIBATOMIC),-Clink-arg=-latomic)
 
 # RUST_LINK_VIA_BINUTILS routes ONLY the Rust package link through the overlay ld (C stays on
-# vendor gcc+ld). Default ON for every custom-rustc arch (overlay-binutils.mk normally sets it;
-# ?= 1 is the standalone fallback). The link goes through CARGO_TARGET_<triple>_LINKER, a
-# gcc -B<OVERLAY_BINUTILS_SHIM> wrapper, since cargo always honors the linker channel.
-RUST_LINK_VIA_BINUTILS ?= 1
+# vendor gcc+ld); defaulted in spksrc.common/overlay.mk. The link goes through
+# CARGO_TARGET_<triple>_LINKER, a gcc -B<OVERLAY_BINUTILS_SHIM> wrapper, since cargo always
+# honors the linker channel.
 ifeq ($(RUST_LINK_VIA_BINUTILS),1)
-RUST_BINUTILS_CC = $(TC_WORK_DIR)/binutils-cc
+# In the rust consumer's own dir: it is a rust-overlay artifact, used only as the Rust
+# link's CARGO_TARGET_<triple>_LINKER. Keeps the base toolchain work dir to the vendor's.
+RUST_BINUTILS_CC = $(TC_OVERLAY_RUSTC)/work-native/binutils-cc
 TC_RUST_LINKER   = $(RUST_BINUTILS_CC)
 
 define RUST_BINUTILS_CC_SCRIPT
@@ -104,8 +114,8 @@ rustc_status = $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s
 
 # The binutils gcc wrapper: this arch's overlay artifact, so it hangs off overlay-rustc
 # (only when the rust link goes through the binutils overlay ld). Cheap + PHONY so the
-# baked absolute path stays current. No shim dir: the -B points straight at the shipped
-# ld dir in the extracted .txz (GNU ld needs no -Qy filtering).
+# baked absolute path stays current. Runs after depend (see _all): it is written INTO the
+# rust consumer's dir and bakes the shim path the binutils consumer creates there.
 overlay-rustc: $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc-binutils-linker)
 .PHONY: rustc-binutils-linker
 ifeq ($(RUST_LINK_VIA_BINUTILS),1)

@@ -189,18 +189,19 @@ endif
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  $(_OVERLAY_TOOL_BINDIR) ; \
 	  if [ "$${target}" = "CC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $${bindir}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $${bindir}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LD" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_LINKER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_LINKER $${bindir}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LDSHARED" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS $$(echo $${source} | cut -f2 -d' ') ; \
+	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS "$$(echo $${source} | cut -f2 -d' ') $(OVERLAY_BINUTILS_FLAG)" ; \
 	  elif [ "$${target}" = "FC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
+	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $${bindir}/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
 	  else \
-	    printf "set(%-25s %s)\n" CMAKE_$${target} $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target} $${bindir}/$(TC_PREFIX)$${source} ; \
 	  fi ; \
 	done ; \
 	echo
@@ -275,16 +276,18 @@ tc_meson_cross_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  $(_OVERLAY_TOOL_BINDIR) ; \
+	  extra="" ; case "$${target}" in ldshared) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
-	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
+	    echo "$${target} = '$${bindir}/$(TC_PREFIX)g++'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
-	    echo "fortran = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "fortran = '$${bindir}/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
-	    echo "c = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
-	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "c = '$${bindir}/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$${bindir}/$(TC_PREFIX)$${source}'" ; \
 	  else \
-	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$${bindir}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}'" ; \
 	  fi ; \
 	done
 	@echo "cargo = '$(CARGO_HOME)/bin/cargo'" ; \
@@ -342,9 +345,9 @@ tc_autotools_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  bindir="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
-	  case "$${source}" in ld|as) [ "$(OVERLAY_BINUTILS)" = "1" ] && bindir="$(OVERLAY_BINUTILS_BIN)" ;; esac ; \
-	  echo TC_ENV += $${target}=\"$${bindir}/$(TC_PREFIX)$${source}\" ; \
+	  $(_OVERLAY_TOOL_BINDIR) ; \
+	  extra="" ; case "$${target}" in LDSHARED) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
+	  echo TC_ENV += $${target}=\"$${bindir}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}\" ; \
 	done ; \
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
@@ -398,7 +401,7 @@ endif
 #####
 
 ifeq ($(wildcard $(TCVARS_COOKIE)),)
-tcvars: generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
+tcvars: overlay-binutils-warn overlay-rustc-warn generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
 
 $(TCVARS_COOKIE): $(POST_TCVARS_TARGET)
 	$(create_target_dir)

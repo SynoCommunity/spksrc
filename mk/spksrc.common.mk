@@ -61,6 +61,9 @@ include $(BASEDIR)/mk/spksrc.common/stage0.mk
 # Load common definitions
 include $(BASEDIR)/mk/spksrc.common/archs.mk
 include $(BASEDIR)/mk/spksrc.common/tc-capability.mk
+
+### Overlay decisions (availability / request / active) -- see the file header
+include $(BASEDIR)/mk/spksrc.common/overlay.mk
 include $(BASEDIR)/mk/spksrc.common/logs.mk
 
 # Load local configuration

@@ -130,18 +130,14 @@ include ../../mk/spksrc.build/plist.mk
 TCVARS_DONE := $(WORK_DIR)/.stage1-tcvars_done
 TKVARS_DONE := $(WORK_DIR)/.stage1-tkvars_done
 
-# OVERLAY_<component> selectors, defaulted here so an empty value is never passed to the
-# tcvars regen below. Override via package / local.mk / CLI; only custom-rust archs act.
-OVERLAY_RUSTC    ?= 1
-OVERLAY_BINUTILS ?= 0
-
 .PHONY: cross-stage1
 cross-stage1: $(TCVARS_DONE) $(TKVARS_DONE)
 
 ifneq ($(strip $(TC)),)
 $(TCVARS_DONE):
 	@$(MAKE) WORK_DIR=$(TC_WORK_DIR) --no-print-directory -C ../../toolchain/$(TC) toolchain
-	@# Pass OVERLAY_RUSTC so the tc_vars generated into THIS package's WORK_DIR reflect
+	@# Forward the OVERLAY_<component> selectors (defaulted in spksrc.common/overlay.mk) so the
+	@# tc_vars generated into THIS package's WORK_DIR reflect
 	@# the package's overlay choice (stock unknown vs the custom synology toolchain) --
 	@# a per-package selector, since the toolchain build itself is cookie-locked. All
 	@# rust toolchains (stock std + overlays) are already installed, so this only picks.
