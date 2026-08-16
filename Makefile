@@ -201,7 +201,7 @@ kernel-%:
 
 ##@ Setup
 
-setup: local.mk dsm-6.2.4 dsm-7.1  ## Create local.mk and set default DSM toolchains
+setup: local.mk overlay-defaults dsm-6.2.4 dsm-7.1  ## Create local.mk and set default DSM toolchains
 
 local.mk:
 	@echo "Creating local configuration \"local.mk\"..."
@@ -216,6 +216,17 @@ local.mk:
 	@echo "DISABLE_GITHUB_MAINTAINER =" >> $@
 	@echo "PSTAT = on" >> $@
 	@echo "#PARALLEL_MAKE = max" >> $@
+	@$(MAKE) --no-print-directory overlay-defaults
+
+# The OVERLAY_<component> switches, written out at their current defaults so local.mk is the
+# one place to change them tree-wide. A plain '=' beats mk/spksrc.common/overlay.mk's '?=',
+# which is read first and still applies when the lines are absent; a command-line
+# OVERLAY_<c>=... beats local.mk in turn, for a one-off build.
+# Idempotent, like dsm-%: an existing local.mk gains the lines without losing anything.
+.PHONY: overlay-defaults
+overlay-defaults: local.mk
+	@grep -q "^OVERLAY_RUSTC" local.mk    || echo "OVERLAY_RUSTC = 1" >> local.mk
+	@grep -q "^OVERLAY_BINUTILS" local.mk || echo "OVERLAY_BINUTILS = 0" >> local.mk
 
 dsm-%: local.mk
 	@echo "Setting default toolchain version to DSM-$*"
