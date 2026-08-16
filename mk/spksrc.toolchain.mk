@@ -184,9 +184,14 @@ TC_OVERLAY_RUSTC    := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS
 TC_OVERLAY_BINUTILS := $(wildcard $(BASEDIR)/toolchain/syno-$(TC_ARCH)-$(TC_VERS)_binutils-*)
 
 # The custom rust version is the overlay's own PKG_VERS (single source of truth), read from
-# the rust consumer Makefile -- never hardcoded per base toolchain.
+# the rust consumer Makefile -- never hardcoded per base toolchain. Pinned ONLY when the
+# overlay is actually selected: OVERLAY_RUSTC=0 must fall back to the stock rustup toolchain
+# ('stable', env-rust.mk's default), not to the overlay's version. Unset counts as ON, matching
+# overlay-rustc.mk's OVERLAY_RUSTC ?= 1 (resolved later, after this point).
 ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
+ifeq ($(filter 0 off OFF,$(strip $(OVERLAY_RUSTC))),)
 TC_RUSTC := $(shell sed -n 's/^PKG_VERS[[:space:]]*=[[:space:]]*//p' $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
+endif
 # Pull the rust overlay .txz via the consumer-dir DEPENDS. Skipped during a native-toolchain
 # extract (NATIVE_TOOLCHAIN_EXTRACT=1) to avoid a bootstrap cycle (the consumer would download
 # the very archive being produced).
