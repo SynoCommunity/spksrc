@@ -289,9 +289,13 @@ toolchain and the package side alike. It keeps three questions apart:
 | `OVERLAY_RUSTC_VERS` | `1.82` | Which build to select, matching the consumer dir name. |
 | `OVERLAY_BINUTILS_VERS` | `2.30` | Idem. |
 
-`make setup` writes the first two into `local.mk`, which is the tree-wide source of truth:
-a plain `=` there beats the `?=` defaults, and a command-line `OVERLAY_<c>=…` beats `local.mk`
-in turn, for a one-off build.
+`make setup` writes the first two into `local.mk`, the tree-wide source of truth. It is read
+*before* `mk/spksrc.common/overlay.mk` and uses `?=`, which gives:
+
+    command line  >  environment  >  local.mk  >  the defaults above
+
+Note the `?=`: a plain `=` in `local.mk` would win over an environment prefix, silently
+ignoring the one-off override below.
 
 ```bash
 OVERLAY_BINUTILS=1 make -C cross/bat-0.25 arch-qoriq-6.2.4   # just this build
