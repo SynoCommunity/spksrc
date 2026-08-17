@@ -332,7 +332,7 @@ tc_rust_vars:
 	echo TC_ENV += RUST_TARGET_PATH=\"$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/target-spec\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
-	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(or $(TC_RUST_LINKER),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
 	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
 	echo RUST_TARGET := $(RUST_TARGET) ; \
 	echo TC_RUSTC := $(TC_RUSTC)
@@ -372,7 +372,7 @@ tc_flags:
 # THIS build, empty otherwise -- so a generated tc_vars.mk shows what was resolved. (In-tree the
 # same names mean AVAILABLE; nothing on the package side reads them back.) Binutils counts as
 # active only for the GLOBAL overlay: the narrow rust-link use downloads the same archive but
-# touches nothing else, and shows up as CARGO_TARGET_<triple>_LINKER pointing at binutils-cc.
+# touches nothing else, and shows up as a -Clink-arg=-B<shim> in the Rust link flags.
 # The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
 # would inherit the previous run's choice and the switch would go sticky.
 tc_vars:

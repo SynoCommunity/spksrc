@@ -25,9 +25,11 @@
 # which executes:
 #  status           : echo status to logging facility
 #  rustup-rustc     : rustup base install (host rustc/cargo)
-#  depend           : resolve and build toolchain dependencies (if any)
-#  overlay-rustc    : this arch's custom rust overlay artifacts (needs depend's consumers)
-#  tcvars           : generate tc_vars*.mk files for spksrc.cross/env-default.mk
+#  depend           : resolve and build toolchain dependencies -- including the overlay
+#                     consumers, which is how the binutils overlay is provisioned (it has
+#                     no build step of its own, only the warnings hung off tcvars)
+#  tcvars           : generate tc_vars*.mk files for spksrc.cross/env-default.mk, and warn
+#                     on a degraded overlay state (per-package, so not on _all directly)
 #
 # Variables:
 #  TC_NAME           : Toolchain name (optional, used with generic archs)
@@ -186,12 +188,9 @@ TC_RUSTC := $(shell sed -n 's/^PKG_VERS[[:space:]]*=[[:space:]]*//p' $(firstword
 endif
 
 # Pull the rust overlay .txz via the consumer-dir DEPENDS -- whenever one ships, so the archive
-# is provisioned even with the overlay switched off. Skipped during a native-toolchain extract
-# (NATIVE_TOOLCHAIN_EXTRACT=1), which would download the very archive being produced.
+# is provisioned even with the overlay switched off.
 ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
-ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
 DEPENDS += toolchain/$(notdir $(firstword $(TC_OVERLAY_RUSTC)))
-endif
 endif
 
 # OVERLAY_<component> family together, base layer first: overlay-binutils sets the
@@ -221,7 +220,7 @@ pre_toolchain_target: toolchain_msg
 
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: status rustup-rustc depend overlay-rustc tcvars
+_all: status rustup-rustc depend tcvars
 
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target

@@ -32,12 +32,6 @@
 # from env-rust.mk's map and TC_RUSTC from the rust consumer's PKG_VERS.
 ###############################################################################
 
-# The rust overlay entry -- peer of overlay-binutils. Empty by default (standard archs have
-# no overlay); the custom-rust gate below hangs this arch's ARTIFACTS off it. The rustup base
-# install is a separate _all step (rustup-rustc, tc-rust.mk), sequenced before this one.
-.PHONY: overlay-rustc
-overlay-rustc: ;
-
 # Warnings ride tcvars instead, like overlay-binutils-warn: they report a per-PACKAGE choice,
 # and _all is skipped once the toolchain cookie exists.
 .PHONY: overlay-rustc-warn
@@ -91,41 +85,12 @@ endif
 RUSTFLAGS += $(if $(TC_HAS_LIBATOMIC),-Clink-arg=-latomic)
 
 # RUST_LINK_VIA_BINUTILS routes ONLY the Rust package link through the overlay ld (C stays on
-# vendor gcc+ld); defaulted in spksrc.common/overlay.mk. The link goes through
-# CARGO_TARGET_<triple>_LINKER, a gcc -B<OVERLAY_BINUTILS_SHIM> wrapper, since cargo always
-# honors the linker channel.
+# vendor gcc+ld); defaulted in spksrc.common/overlay.mk. gcc picks its ld from -B (gcc < 4.8
+# has no -fuse-ld), and that reaches the link driver through the same channel as -latomic above
+# -- so there is no wrapper script to write, and nothing for _all to build. The linker itself
+# stays the plain cross gcc (tc_vars' default).
 ifeq ($(RUST_LINK_VIA_BINUTILS),1)
-# In the rust consumer's own dir: it is a rust-overlay artifact, used only as the Rust
-# link's CARGO_TARGET_<triple>_LINKER. Keeps the base toolchain work dir to the vendor's.
-RUST_BINUTILS_CC = $(TC_OVERLAY_RUSTC)/work/binutils-cc
-TC_RUST_LINKER   = $(RUST_BINUTILS_CC)
-
-define RUST_BINUTILS_CC_SCRIPT
-#!/bin/sh
-# The cross gcc with its ld redirected to the OVERLAY_BINUTILS ld via -B (gcc < 4.8
-# has no -fuse-ld). Used as CARGO_TARGET_<triple>_LINKER for the package build.
-exec "$(RUST_CC)" -B"$(OVERLAY_BINUTILS_SHIM)" "$$@"
-endef
+RUSTFLAGS += -Clink-arg=-B$(OVERLAY_BINUTILS_SHIM)
 endif
-
-# Per-step status line (stdout + status-build.log), so the long from-source steps are
-# trackable there like the framework's NAME lines: NAME: toolchain-rust-<step>.
-rustc_status = $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s-%s, NAME: toolchain-rust-%s\n" "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(TC_ARCH)" "$(TC_VERS)" "$(1)") | tee --append $(STATUS_LOG)
-
-# The binutils gcc wrapper: this arch's overlay artifact, so it hangs off overlay-rustc
-# (only when the rust link goes through the binutils overlay ld). Cheap + PHONY so the
-# baked absolute path stays current. Runs after depend (see _all): it is written INTO the
-# rust consumer's dir and bakes the shim path the binutils consumer creates there.
-overlay-rustc: $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc-binutils-linker)
-.PHONY: rustc-binutils-linker
-ifeq ($(RUST_LINK_VIA_BINUTILS),1)
-rustc-binutils-linker:
-	@$(call rustc_status,binutils-linker)
-	$(file >$(RUST_BINUTILS_CC),$(RUST_BINUTILS_CC_SCRIPT))
-	@chmod +x $(RUST_BINUTILS_CC)
-else
-rustc-binutils-linker: ;
-endif
-
 
 endif # custom-rust arch (TC_OVERLAY_RUSTC)
