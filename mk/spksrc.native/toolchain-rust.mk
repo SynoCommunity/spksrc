@@ -44,7 +44,6 @@ ifeq ($(RUST_LINK_VIA_BINUTILS),1)
 # Build-time: link the target through the co-built ld (so std's own dynamic objects use
 # the modern ld). A gcc -B wrapper, since gcc < 4.8 has no -fuse-ld.
 RUST_BINUTILS_SHIM = $(WORK_DIR)/binutils-shim
-RUST_LINKER        = $(WORK_DIR)/binutils-cc
 endif
 
 RUST_TARGET_JSON_DIR = $(WORK_DIR)/target-spec
@@ -105,11 +104,11 @@ RUST_CC       ?= $(RUST_TOOL_BIN)gcc$(TC_GCC_SUFFIX)
 RUST_CXX      ?= $(RUST_TOOL_BIN)g++$(TC_GCC_SUFFIX)
 RUST_AR       ?= $(RUST_TOOL_BIN)ar
 RUST_RANLIB   ?= $(RUST_TOOL_BIN)ranlib
-# The link driver: gcc (which calls its binutils ld).
-RUST_LINKER   ?= $(RUST_CC)
+# The link driver: the co-built binutils wrapper when the Rust link is routed through the
+# overlay ld, otherwise plain gcc (which calls its own binutils ld).
+RUST_LINKER   ?= $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),$(WORK_DIR)/binutils-cc,$(RUST_CC))
 
 _RUST_TARGET_ENV  = $(subst -,_,$(RUST_TARGET))
-_RUST_TARGET_UENV = $(shell echo $(RUST_TARGET) | tr 'a-z-' 'A-Z_')
 
 # Shared toolchain id: <ver>-<target>-<arch>-<dsm>-gcc<gcc>. Also the archive base
 # name. Must match the consumer (toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>) and
