@@ -189,19 +189,20 @@ endif
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  $(_OVERLAY_TOOL_BINDIR) ; \
+	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
+	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
 	  if [ "$${target}" = "CC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $${bindir}/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $${tcbin}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $${bindir}/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $${tcbin}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LD" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_LINKER $${bindir}/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_LINKER $${tcbin}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LDSHARED" ] ; then \
 	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS "$$(echo $${source} | cut -f2 -d' ') $(OVERLAY_BINUTILS_FLAG)" ; \
 	  elif [ "$${target}" = "FC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $${bindir}/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
+	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $${tcbin}/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
 	  else \
-	    printf "set(%-25s %s)\n" CMAKE_$${target} $${bindir}/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target} $${tcbin}/$(TC_PREFIX)$${source} ; \
 	  fi ; \
 	done ; \
 	echo
@@ -276,18 +277,19 @@ tc_meson_cross_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  $(_OVERLAY_TOOL_BINDIR) ; \
+	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
+	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
 	  extra="" ; case "$${target}" in ldshared) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
-	    echo "$${target} = '$${bindir}/$(TC_PREFIX)g++'" ; \
+	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)g++'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
-	    echo "fortran = '$${bindir}/$(TC_PREFIX)$${source}'" ; \
+	    echo "fortran = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
-	    echo "c = '$${bindir}/$(TC_PREFIX)$${source}'" ; \
-	    echo "$${target} = '$${bindir}/$(TC_PREFIX)$${source}'" ; \
+	    echo "c = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
 	  else \
-	    echo "$${target} = '$${bindir}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}'" ; \
+	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}'" ; \
 	  fi ; \
 	done
 	@echo "cargo = '$(CARGO_HOME)/bin/cargo'" ; \
@@ -345,9 +347,10 @@ tc_autotools_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  $(_OVERLAY_TOOL_BINDIR) ; \
+	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
+	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
 	  extra="" ; case "$${target}" in LDSHARED) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
-	  echo TC_ENV += $${target}=\"$${bindir}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}\" ; \
+	  echo TC_ENV += $${target}=\"$${tcbin}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}\" ; \
 	done ; \
 	echo TC_ENV += CFLAGS=\"$(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\)\" ; \

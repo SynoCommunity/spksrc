@@ -27,7 +27,6 @@
 #   internal  _OVERLAY_TC                the toolchain dir name
 #             _OVERLAY_<c>_ANY           any version, ignoring OVERLAY_<c>_VERS
 #             _OVERLAY_BINUTILS_WANTED   global overlay or the narrow rust link
-#             _OVERLAY_TOOL_BINDIR       shell fragment picking as/ld
 #
 # Warnings are TEXT here; the targets printing them live in
 # spksrc.toolchain/overlay-<c>.mk, since a recipe needs a build context and this
@@ -72,13 +71,6 @@ OVERLAY_BINUTILS_ON  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(if $(filter 1 on O
 # Both uses pull the same archive; they differ only in scope.
 _OVERLAY_BINUTILS_WANTED    = $(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS)))$(filter 1,$(strip $(RUST_LINK_VIA_BINUTILS))),1)
 OVERLAY_BINUTILS_PROVISION  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(_OVERLAY_BINUTILS_WANTED))
-
-# ---- Tool selection, shared by every generator --------------------------------------
-# A shell fragment, not a $(call): the generators loop over $(TOOLS) and resolve $${source}
-# at recipe time. Only as/ld move to the overlay. Shared so the autotools, cmake and meson
-# emitters cannot drift apart -- they did.
-_OVERLAY_TOOL_BINDIR = bindir="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
-	case "$${source}" in ld|as) [ -n "$(OVERLAY_BINUTILS_ON)" ] && bindir="$(OVERLAY_BINUTILS_BIN)" ;; esac
 
 # ---- Degraded states, and what to say about them ------------------------------------
 # Disjoint by construction, so the order they are reported in carries no meaning. There is

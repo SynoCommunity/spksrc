@@ -56,6 +56,10 @@ endif
 # consumed -- the sub-make's is.)
 TC_HAS_FORTRAN = $(if $(wildcard $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gfortran),1)
 
+# The tools a binutils overlay provides, so tc_vars.mk can take those from it when one is
+# active. A future gcc overlay gets its own TC_GCC_TOOLS list the same way.
+TC_BINUTILS_TOOLS = ld as ar nm ranlib strip objdump objcopy readelf
+
 TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump objcopy readelf
 ifneq ($(strip $(TC_HAS_FORTRAN)),)
 TOOLS += fc:gfortran
