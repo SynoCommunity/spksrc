@@ -266,14 +266,11 @@ A few legacy archs cannot use a stock `rustup` std: Tier-3 PowerPC e500 (`ppc853
 
 A base toolchain (`syno-<arch>-<dsm>/`) opts in simply by having a rust consumer dir beside it (`TC_OVERLAY_RUSTC`); the Synology-vendored triple (`…-unknown-…` → `…-synology-…`) is derived from the central arch map. The C toolchain keeps its stock vendor `gcc`+`ld`; only the Rust link routes through binutils 2.30.
 
-Each overlay is self-contained: it unpacks into its **own** consumer directory (`…_rust-…/work/`,
-`…_binutils-…/work/`), never into the base toolchain's. That is what lets a second build of a
-component sit beside the first — only the generated pointers then decide which one is used.
+Each overlay is self-contained: it unpacks into its **own** consumer directory (`…_rust-…/work/`, `…_binutils-…/work/`), never into the base toolchain's. That is what lets a second build of a component sit beside the first — only the generated pointers then decide which one is used.
 
 ### Overlay switches
 
-Every overlay decision is resolved in one place, `mk/spksrc.common/overlay.mk`, read by the
-toolchain and the package side alike. It keeps three questions apart:
+Every overlay decision is resolved in one place, `mk/spksrc.common/overlay.mk`, read by the toolchain and the package side alike. It keeps three questions apart:
 
 | | Variable | Meaning |
 |---|---|---|
@@ -289,23 +286,17 @@ toolchain and the package side alike. It keeps three questions apart:
 | `OVERLAY_RUSTC_VERS` | `1.82` | Which build to select, matching the consumer dir name. |
 | `OVERLAY_BINUTILS_VERS` | `2.30` | Idem. |
 
-`make setup` writes the first two into `local.mk`, the tree-wide source of truth. It is read
-*before* `mk/spksrc.common/overlay.mk` and uses `?=`, which gives:
+`make setup` writes the first two into `local.mk`, the tree-wide source of truth. It is read *before* `mk/spksrc.common/overlay.mk` and uses `?=`, which gives:
 
     command line  >  environment  >  local.mk  >  the defaults above
 
-Note the `?=`: a plain `=` in `local.mk` would win over an environment prefix, silently
-ignoring the one-off override below.
+Note the `?=`: a plain `=` in `local.mk` would win over an environment prefix, silently ignoring the one-off override below.
 
 ```bash
 OVERLAY_BINUTILS=1 make -C cross/bat-0.25 arch-qoriq-6.2.4   # just this build
 ```
 
-A request that cannot be honored never fails the build: it degrades to the stock tools and says
-so, in a banner on the `tcvars` path (the switches are a per-package choice, and the toolchain's
-own `_all` is skipped once its cookie exists). You get one for a component the arch does not
-ship, one for a version it does not have, and one for the global overlay driving a vendor gcc it
-is not matched to.
+A request that cannot be honored never fails the build: it degrades to the stock tools and says so, in a banner on the `tcvars` path (the switches are a per-package choice, and the toolchain's own `_all` is skipped once its cookie exists). You get one for a component the arch does not ship, one for a version it does not have, and one for the global overlay driving a vendor gcc it is not matched to.
 
 Each generated `tc_vars.mk` records what the build actually resolved to:
 
@@ -314,10 +305,7 @@ TC_OVERLAY_RUSTC := …/syno-qoriq-6.2.4_rust-1.82_gcc-4.9.3
 TC_OVERLAY_BINUTILS :=          # empty: the narrow rust link only, not the global overlay
 ```
 
-Both carry **active** semantics — the path when that overlay drives the build, empty otherwise.
-The narrow rust-link use shows up instead as `CARGO_TARGET_<triple>_LINKER` pointing at
-`binutils-cc`. The `OVERLAY_<c>` switches are deliberately not exported: a package includes
-`tc_vars.mk`, so it would inherit the previous run's choice and the switch would go sticky.
+Both carry **active** semantics — the path when that overlay drives the build, empty otherwise. The narrow rust-link use shows up instead as a `-Clink-arg=-B<shim>` in the Rust link flags. The `OVERLAY_<c>` switches are deliberately not exported: a package includes `tc_vars.mk`, so it would inherit the previous run's choice and the switch would go sticky.
 
 ### (Re)building and publishing
 
