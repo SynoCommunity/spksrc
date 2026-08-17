@@ -48,7 +48,7 @@ endif
 # underneath -- a gcc8 overlay, say, adds gfortran to a 6.2.4 arch the list calls
 # Fortran-less. Probing the actual binary stays correct whatever provides it.
 #
-# Lazy on purpose, exactly like TC_HAS_LIBATOMIC below: the ifneq's that read it
+# Lazy on purpose, like TC_HAS_LIBATOMIC: the ifneq's that read it
 # force the wildcard, and it only needs to be right where it is consumed -- the
 # tc_vars sub-make, which re-parses this file after the toolchain is extracted, so
 # the binary is there to find. Cross packages read the baked tc_vars result and
@@ -61,9 +61,6 @@ ifneq ($(strip $(TC_HAS_FORTRAN)),)
 TOOLS += fc:gfortran
 endif
 
-# TC_HAS_LIBATOMIC (the libatomic probe) lives in spksrc.common/tc-capability.mk,
-# included well before this file and also reachable from the native producers.
-
 # TC_EXTRA_LDFLAGS carries the ABI to the link and adds what a toolchain declares
 # for the linker. The ABI (TC_EXTRA_BUILD_FLAGS -- the -march/-mcpu/... flags folded
 # into every language just below) must reach the gcc link driver too, so it picks the
@@ -72,7 +69,7 @@ endif
 # both previously carried as per-package arch lists (cups/flac). -latomic is dropped
 # where the gcc does not ship it -- a gcc that old predates the __atomic_* builtins
 # and emits __sync_* instead, so it never needs the library. Kept lazy via a captured
-# copy: TC_HAS_LIBATOMIC (just above) runs the compiler, not extracted yet while the
+# copy: TC_HAS_LIBATOMIC runs the compiler, not extracted yet while the
 # toolchain is being parsed.
 #
 # These libs are declared toolchain-wide now, not per package, so they would land on
