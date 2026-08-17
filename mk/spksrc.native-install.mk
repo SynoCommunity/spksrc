@@ -19,17 +19,13 @@ ifeq ($(strip $(PLIST_TRANSFORM)),)
 PLIST_TRANSFORM = cat
 endif
 
-# An overlay consumer under toolchain/ is pulled in as a DEPENDS of its BASE toolchain, which
-# spksrc.cross-cc.mk invokes with WORK_DIR= on the command line. That propagates through
-# MAKEFLAGS to every sub-make, so the consumer would unpack into the base toolchain's work dir
-# -- mixing the vendor tools with the overlay, and making two versions of one component unable
-# to coexist. override wins over the command line, so each consumer keeps its own work dir.
-# Scoped to toolchain/: the native/* packages that also read this file are already isolated
-# (spksrc.rules/depend.mk invokes them through `env -i`).
+# An overlay consumer is a DEPENDS of its base toolchain, which cross-cc.mk invokes with
+# WORK_DIR= on the command line; that propagates through MAKEFLAGS and would unpack the
+# consumer into the base toolchain's work dir. override wins over the command line. The name
+# is fixed, not work$(ARCH_SUFFIX): ARCH propagates too, and the overlay pointers must be able
+# to name the directory. Scoped to toolchain/ -- native/* is already isolated by depend.mk's
+# `env -i`.
 ifneq ($(findstring /toolchain/,$(CURDIR)),)
-# Plain 'work', matching what every toolchain/ package uses -- and a FIXED name at that:
-# ARCH/TCVERSION propagate through MAKEFLAGS too, so work$(ARCH_SUFFIX) would vary with the
-# caller and the overlay pointers could not name the directory.
 override WORK_DIR = $(CURDIR)/work
 endif
 

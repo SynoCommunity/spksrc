@@ -68,11 +68,8 @@ include $(BASEDIR)/mk/spksrc.common/logs.mk
 LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 -include $(LOCAL_CONFIG_MK)
 
-### Overlay decisions (availability / request / active) -- see the file header.
-### AFTER local.mk on purpose: both use ?=, so whichever is read first wins, and that
-### must be local.mk. The resulting chain is command line > environment > local.mk >
-### these defaults -- an environment prefix (OVERLAY_BINUTILS=1 make ...) keeps working,
-### which a plain '=' in local.mk would silently override.
+### Overlay decisions -- AFTER local.mk: both use ?=, so the first read wins and that has
+### to be local.mk. Chain: command line > environment > local.mk > these defaults.
 include $(BASEDIR)/mk/spksrc.common/overlay.mk
 
 ###

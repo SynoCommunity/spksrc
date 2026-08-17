@@ -63,16 +63,12 @@ $(eval TC_SYSROOT_DIR := $(TC_EXTRACT_DIR)/$(call _tc_get,TC_SYSROOT))
 WORK_DIR       = $(CURDIR)/work-$(TC_ARCH)-$(TC_VERS)
 INSTALL_PREFIX = /usr/local
 
-# Install the target toolchain -- the whole thing, overlays included, exactly as a cross
-# package would get it: native packages do not bootstrap it the way cross-stage1 does, and a
-# producer legitimately needs more than the vendor gcc (a rustc built ON a gcc overlay needs
-# that overlay installed). Idempotent and cookie-guarded; a component's PRE_CONFIGURE_TARGET
-# depends on it.
+# Install the target toolchain, overlays included -- exactly what a cross package gets. A
+# producer needs more than the vendor gcc (a rustc built ON a gcc overlay needs that overlay).
+# Idempotent and cookie-guarded; a component's PRE_CONFIGURE_TARGET depends on it.
 #
 # Caveat: an arch whose rust consumer pins a rev that was never published cannot resolve its
-# DEPENDS, so the very first archive for a brand-new arch has to be produced with that
-# consumer dir temporarily out of the way. Every later rebuild pins the PREVIOUS published
-# rev and resolves fine.
+# DEPENDS, so its very first archive must be produced with that consumer dir moved aside.
 .PHONY: tc-install
 tc-install:
 	@$(MSG) "native-toolchain: ensuring $(TC) is installed ($(TC_ARCH)-$(TC_VERS))"
