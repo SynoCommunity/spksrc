@@ -1,35 +1,18 @@
 ###############################################################################
 # spksrc.toolchain/overlay-rustc.mk
 #
-# OVERLAY_RUSTC: select the custom from-source rustc (+ its binutils link wrapper) for a
-# cross rust PACKAGE build. Member of the OVERLAY_<component> family (base + overview:
-# overlay-binutils.mk).
+# OVERLAY_RUSTC, consumer side: pick the custom from-source rustc for a cross rust PACKAGE
+# build. Member of the OVERLAY_<component> family; the decisions are in
+# spksrc.common/overlay.mk, this file applies them.
 #
-# Custom Rust toolchain SUPPORT for targets rustup ships no usable prebuilt
-# rust-std for (Tier-3 e.g. PowerPC e500: qoriq, ppc853x; or a Tier-2 whose
-# prebuilt std targets a newer glibc than the DSM toolchain, e.g. ARMv5 88f6281).
+# It resolves the shared rustup toolchain id ($(TC_RUSTUP_TOOLCHAIN) = $(_RUST_TC_ID)) so the
+# build selects OUR toolchain rather than rustup's glibc-newer std, for the targets rustup
+# ships no usable one for: Tier-3 PowerPC e500 (qoriq, ppc853x), or a Tier-2 whose prebuilt
+# std targets a newer glibc than the DSM toolchain (ARMv5 88f6281). An arch enters here when
+# it has a rust consumer dir (TC_OVERLAY_RUSTC); standard archs never do.
 #
-# This file is the CONSUMER / package-build side only: it resolves the shared
-# custom rustup toolchain id ($(TC_RUSTUP_TOOLCHAIN) = $(_RUST_TC_ID)) so a cross
-# rust PACKAGE build selects OUR toolchain (not rustup's glibc-newer std), and it
-# (re)generates the binutils linker wrapper the package link uses. A toolchain enters
-# here when its base ships a rust consumer dir (TC_OVERLAY_RUSTC); standard archs never do.
-#
-# The from-source BUILD of the toolchain (rustc + cargo + host/target std, LLVM
-# from source) no longer lives here -- it moved to the host-native package
-# native/rustc-<vers> (mk/spksrc.native-toolchain.mk + spksrc.native/toolchain-
-# rust.mk), which goes through the framework's normal download/extract/patch/
-# configure/compile/archive pipeline, like any native toolchain package. Produce a .txz with:
+# The toolchain itself is BUILT by native/rustc-<vers> and downloaded by the consumer:
 #   make -C native/rustc-<vers> arch-<arch>-<vers>
-# and the toolchain consumer (toolchain/syno-<arch>-<vers>_rust-<vers>_gcc-<gcc>, pulled
-# in by DEPENDS) downloads and extracts it.
-#
-# Overlay-ready: RUST_CC / RUST_CXX default to $(TC_PREFIX)gcc$(TC_GCC_SUFFIX), so a
-# TC_GCC_SUFFIX (empty here) lands the effective TC_GCC in the id / consumer-dir names,
-# letting stock-gcc and a future gcc-overlay variant coexist.
-#
-# A toolchain only declares its arch specifics (e.g. RUST_POSTFIX_ALIASES); the triple comes
-# from env-rust.mk's map and TC_RUSTC from the rust consumer's PKG_VERS.
 ###############################################################################
 
 # Warnings ride tcvars instead, like overlay-binutils-warn: they report a per-PACKAGE choice,
@@ -52,12 +35,6 @@ ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
 # source of truth. Sourced here (guarded; tc_vars.mk includes it again) so it is set
 # before we derive the synology triple below.
 include ../../mk/spksrc.cross/env-rust.mk
-
-RUST_TOOL_BIN     = $(WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)
-# The build host triple. std is built for it too (not only RUST_TARGET): cargo
-# compiles build scripts and proc-macros for the host while cross-compiling.
-RUST_BUILD_HOST   ?= x86_64-unknown-linux-gnu
-RUST_CC          ?= $(RUST_TOOL_BIN)gcc$(TC_GCC_SUFFIX)
 
 # The custom "overlay" build uses a Synology-vendored triple (unknown -> synology), a uniform
 # marker resolved from a JSON target-spec. The shared toolchain id embeds it + arch/DSM/gcc,
