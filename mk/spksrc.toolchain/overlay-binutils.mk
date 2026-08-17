@@ -33,7 +33,9 @@ OVERLAY_BINUTILS_FLAG     = $(if $(OVERLAY_BINUTILS_ON),-B$(OVERLAY_BINUTILS_SHI
 
 # `make clean` on the base toolchain also cleans whichever overlay consumers it has, so a
 # rebuild re-extracts them instead of reusing a stale install. Only ADDS a prerequisite to the
-# generic clean; the consumers go through native-install.mk, so this never recurses.
+# generic clean; the consumers go through native-install.mk, so this never recurses. The last
+# message labels the base's own rm, which the generic recipe prints unlabelled right after --
+# otherwise it reads as a second pass over the last consumer.
 ifneq ($(strip $(TC_OVERLAY_RUSTC))$(strip $(TC_OVERLAY_BINUTILS)),)
 clean: clean-overlay-consumers
 .PHONY: clean-overlay-consumers
@@ -41,6 +43,7 @@ clean-overlay-consumers:
 	@for d in $(TC_OVERLAY_RUSTC) $(TC_OVERLAY_BINUTILS) ; do \
 	  if [ -d "$$d" ] ; then $(MSG) "clean consumer $$(basename $$d)" ; $(MAKE) --no-print-directory -C "$$d" clean ; fi ; \
 	done
+	@$(MSG) "clean toolchain $(TC)"
 endif
 
 
