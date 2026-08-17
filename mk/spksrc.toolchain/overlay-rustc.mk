@@ -35,9 +35,9 @@
 # Warnings ride tcvars instead, like overlay-binutils-warn: they report a per-PACKAGE choice,
 # and _all is skipped once the toolchain cookie exists.
 .PHONY: overlay-rustc-warn
-ifeq ($(OVERLAY_RUSTC_VERSMISS),1)
+ifeq ($(OVERLAY_RUSTC_VERSION_MISSING),1)
 overlay-rustc-warn:
-	@$(OVERLAY_WARN_RUSTC_VERSMISS)
+	@$(OVERLAY_WARN_RUSTC_VERSION_MISSING)
 else
 overlay-rustc-warn: ;
 endif
