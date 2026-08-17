@@ -15,8 +15,8 @@ COMMENT  = GNU Binutils
 LICENSE  = GPLv3
 
 GNU_CONFIGURE = 1
-# Extract the target toolchain first so --with-sysroot resolves (tc-extract, generic).
-PRE_CONFIGURE_TARGET = tc-extract
+# Install the target toolchain first so --with-sysroot resolves (tc-install, generic).
+PRE_CONFIGURE_TARGET = tc-install
 CONFIGURE_ARGS  = --target=$(TC_TARGET)
 CONFIGURE_ARGS += --program-prefix=$(TC_TARGET)-
 CONFIGURE_ARGS += --with-sysroot=$(TC_SYSROOT_DIR)

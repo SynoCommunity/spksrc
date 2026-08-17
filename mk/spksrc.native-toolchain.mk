@@ -12,7 +12,7 @@
 #
 # This file holds only what is common to any component: the (arch, DSM)
 # parametrization, the toolchain-Makefile reader (_tc_get), the extracted-sysroot
-# fields (TC_TARGET / TC_GCC / TC_GLIBC), the per-arch work dir, and tc-extract.
+# fields (TC_TARGET / TC_GCC / TC_GLIBC), the per-arch work dir, and tc-install.
 # The component-specific logic (config, build/install targets, archive vars) lives
 # in mk/spksrc.native/toolchain-$(NATIVE_TOOLCHAIN).mk, included below; the front-
 # end include of spksrc.native-cc.mk follows it so that specific file can set the
@@ -22,9 +22,9 @@
 #   TC_DIR       toolchain/syno-<arch>-<vers>
 #   _tc_get      $(call _tc_get,VAR) -> VAR as declared in the toolchain Makefile
 #   TC_TARGET    target triple            TC_GCC / TC_GLIBC  toolchain gcc/glibc
-#   TC_EXTRACT_DIR  where tc-extract lands the gcc toolchain (bin/, sysroot, ...)
+#   TC_EXTRACT_DIR  where tc-install lands the gcc toolchain (bin/, sysroot, ...)
 #   TC_SYSROOT_DIR  the extracted toolchain's sysroot (from the declared TC_SYSROOT)
-#   tc-extract   ensures the gcc toolchain (hence its sysroot) is extracted
+#   tc-install   ensures the gcc toolchain (hence its sysroot) is extracted
 ###############################################################################
 
 ifeq ($(strip $(TC_ARCH)),)
@@ -47,7 +47,7 @@ TC_TARGET  := $(call _tc_get,TC_TARGET)
 TC_GCC     := $(call _tc_get,TC_GCC)
 TC_GLIBC   := $(call _tc_get,TC_GLIBC)
 
-# Where tc-extract lands the gcc toolchain (its bin/, sysroot, ...). Shared by the
+# Where tc-install lands the gcc toolchain (its bin/, sysroot, ...). Shared by the
 # components. NB: distinct from the framework's TC_WORK_DIR (the consumer toolchain).
 TC_EXTRACT_DIR = $(TC_DIR)/work/$(TC_TARGET)
 
@@ -63,16 +63,20 @@ $(eval TC_SYSROOT_DIR := $(TC_EXTRACT_DIR)/$(call _tc_get,TC_SYSROOT))
 WORK_DIR       = $(CURDIR)/work-$(TC_ARCH)-$(TC_VERS)
 INSTALL_PREFIX = /usr/local
 
-# The target gcc toolchain must be extracted before its sysroot exists: native
-# packages do not bootstrap the toolchain the way cross packages do (cross-stage1).
-# Idempotent; a component's PRE_CONFIGURE_TARGET depends on it.
-.PHONY: tc-extract
-tc-extract:
-	@$(MSG) "native-toolchain: ensuring $(TC) is extracted ($(TC_ARCH)-$(TC_VERS))"
-	@# NATIVE_TOOLCHAIN_EXTRACT=1 tells the toolchain to skip any component consumer
-	@# DEPENDS (e.g. its rust .txz) -- we only need the gcc toolchain + sysroot here,
-	@# and that consumer may be the very archive this producer is about to build.
-	@$(MAKE) --no-print-directory -C ../../toolchain/$(TC) NATIVE_TOOLCHAIN_EXTRACT=1 toolchain
+# Install the target toolchain -- the whole thing, overlays included, exactly as a cross
+# package would get it: native packages do not bootstrap it the way cross-stage1 does, and a
+# producer legitimately needs more than the vendor gcc (a rustc built ON a gcc overlay needs
+# that overlay installed). Idempotent and cookie-guarded; a component's PRE_CONFIGURE_TARGET
+# depends on it.
+#
+# Caveat: an arch whose rust consumer pins a rev that was never published cannot resolve its
+# DEPENDS, so the very first archive for a brand-new arch has to be produced with that
+# consumer dir temporarily out of the way. Every later rebuild pins the PREVIOUS published
+# rev and resolves fine.
+.PHONY: tc-install
+tc-install:
+	@$(MSG) "native-toolchain: ensuring $(TC) is installed ($(TC_ARCH)-$(TC_VERS))"
+	@$(MAKE) --no-print-directory -C ../../toolchain/$(TC) toolchain
 
 # Component-specific logic (config, build/install targets, archive vars), when the
 # component needs any -- a component that only sets vars provided above (e.g. binutils,

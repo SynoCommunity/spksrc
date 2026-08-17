@@ -66,12 +66,9 @@ endif
 
 
 # Provision the binutils overlay as a normal DEPENDS: the consumer extracts the .txz and
-# builds the as/ld shim in its POST_INSTALL (symmetric with the rust consumer). Skipped during
-# a native-toolchain extract (the rust producer co-builds its own build-time ld).
+# builds the as/ld shim in its POST_INSTALL (symmetric with the rust consumer).
 ifeq ($(OVERLAY_BINUTILS_PROVISION),1)
-ifneq ($(NATIVE_TOOLCHAIN_EXTRACT),1)
 DEPENDS += toolchain/$(notdir $(TC_OVERLAY_BINUTILS))
-endif
 endif
 
 # Report a degraded or risky state. Conditions AND wording both come from

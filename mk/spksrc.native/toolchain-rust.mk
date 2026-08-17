@@ -9,7 +9,7 @@
 # DSM toolchain: ARMv5 88f6281).
 #
 # The generic front-end provides TC_DIR / _tc_get / TC_TARGET / TC_GCC / TC_GLIBC /
-# WORK_DIR / tc-extract and includes spksrc.native-cc.mk after this file. Only the
+# WORK_DIR / tc-install and includes spksrc.native-cc.mk after this file. Only the
 # x.py-specific steps are custom targets; the source pipeline (download/extract/
 # patch) is the framework's, so patches live in native/rustc-<vers>/patches.
 #
@@ -177,12 +177,12 @@ RUSTC_LLVM_COOKIE   = $(WORK_DIR)/.$(COOKIE_PREFIX)rustc-llvm_done
 RUSTC_STAGE1_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)rustc-stage1_done
 RUSTC_STAGE2_COOKIE = $(WORK_DIR)/.$(COOKIE_PREFIX)rustc-stage2_done
 
-# PRE_CONFIGURE: extract the gcc toolchain (tc-extract, generic) and create the
+# PRE_CONFIGURE: extract the gcc toolchain (tc-install, generic) and create the
 # <alias>-<tool> symlinks rustc invokes the target tools by (triple name). When
 # RUST_LINK_VIA_BINUTILS, also co-build the modern binutils and its build wrapper first.
 PRE_CONFIGURE_TARGET = rustc_prepare
 .PHONY: rustc_prepare
-rustc_prepare: tc-extract $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binutils_cobuild)
+rustc_prepare: tc-install $(if $(filter 1,$(RUST_LINK_VIA_BINUTILS)),rustc_binutils_cobuild)
 	@$(call rustc_status,prepare)
 	@cd $(TC_EXTRACT_DIR)/bin ; \
 	for gnutool in $$(ls -1) ; do \
