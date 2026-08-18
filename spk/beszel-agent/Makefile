@@ -19,6 +19,8 @@ SERVICE_SETUP = src/service-setup.sh
 SERVICE_PORT = 45876
 NO_SERVICE_SHORTCUT = y
 
+SYSTEM_GROUP = docker
+
 WIZARDS_DIR = src/wizard/
 
 include ../../mk/spksrc.spk.mk
