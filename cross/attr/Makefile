@@ -1,17 +1,15 @@
-PKG_NAME = attr
-PKG_VERS = 2.5.2
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://download.savannah.gnu.org/releases/attr
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = attr-virtual
 
-DEPENDS =
+OPTIONAL_DEPENDS  = cross/attr-latest
+OPTIONAL_DEPENDS += cross/attr-2.5
 
-HOMEPAGE = https://savannah.nongnu.org/projects/attr/
-COMMENT  = Commands for Manipulating Filesystem Extended Attributes.
-LICENSE  = GPLv2+
+include ../../mk/spksrc.common.mk
 
-GNU_CONFIGURE = 1
-CONFIGURE_ARGS = --disable-static
+ifeq ($(call version_le, $(TC_GCC), 4.4),1)
+# AT_EMPTY_PATH (<fcntl.h>) and #pragma GCC not available
+DEPENDS = cross/attr-2.5
+else
+DEPENDS = cross/attr-latest
+endif
 
-include ../../mk/spksrc.cross-cc.mk
+include ../../mk/spksrc.cross-virtual.mk

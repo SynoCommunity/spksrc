@@ -1,0 +1,22 @@
+# Disable the build of fincore
+# 
+# With older toolchains we get errors like:
+# fts.h:41:3: error: #error "<fts.h> cannot be used with -D_FILE_OFFSET_BITS==64"
+# 
+# There is no configure option to disable fincore that fails to build.
+# And we can't use --disable-libsmartcols, because its required by zramctl.
+# 
+--- configure.ac.orig	2026-06-16 12:01:17.103818700 +0000
++++ configure.ac	2026-08-18 07:57:28.259972643 +0000
+@@ -2226,10 +2226,7 @@
+ UL_REQUIRES_SYSCALL_CHECK([exch], [UL_CHECK_SYSCALL([renameat2])])
+ AM_CONDITIONAL([BUILD_EXCH], [test "x$build_exch" = xyes])
+ 
+-UL_BUILD_INIT([fincore], [check])
+-UL_REQUIRES_LINUX([fincore])
+-UL_REQUIRES_BUILD([fincore], [libsmartcols])
+-AM_CONDITIONAL([BUILD_FINCORE], [test "x$build_fincore" = xyes])
++AM_CONDITIONAL([BUILD_FINCORE], [false])
+ 
+ UL_BUILD_INIT([fsfreeze], [check])
+ UL_REQUIRES_LINUX([fsfreeze])
