@@ -32,7 +32,4 @@ endif
 CARGO_BUILD_ARGS = --locked
 CARGO_BUILD_ARGS += --features pcre2
 
-# let rg find libpcre2-* at runtime
-ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"  
-
 include ../../mk/spksrc.cross-rust.mk
