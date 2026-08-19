@@ -17,7 +17,7 @@ DEPENDS += cross/pixz
 DEPENDS += cross/pigz
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
-DEPENDS += cross/iconv
+DEPENDS += cross/libiconv
 DEPENDS += cross/dos2unix
 DEPENDS += cross/patch
 DEPENDS += cross/rhash
@@ -97,7 +97,11 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DOCS_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-file/\"\>SynoCli File Tools\</a\>"
+
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-file/
+LICENSE = Each tool is licensed under it's respective license.
+
+DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>SynoCli File Tools\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
@@ -128,12 +132,10 @@ CHANGELOG += "13. Update nnn from v5.1 to v5.2 (DSM 7+). <br/>"
 CHANGELOG += "14. Update ripgrep from v15.1.0 to v15.2.0. <br/>"
 CHANGELOG += "15. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
 CHANGELOG += "16. Update tree from v2.2.1 to v2.3.2. <br/>"
+CHANGELOG += "17. Update iconv from version provided in toolchain to v1.19. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
-
-HOMEPAGE = https://docs.synocommunity.com/packages/synocli-file/
-LICENSE  = Each tool is licensed under it's respective license.
 
 SPK_COMMANDS  = bin/less libexec/lessecho bin/lesskey
 SPK_COMMANDS += bin/tree
