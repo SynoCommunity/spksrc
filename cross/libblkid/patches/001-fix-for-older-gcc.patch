@@ -1,0 +1,26 @@
+# fix for older gcc that don't support "__has_include"
+#
+--- include/c.h.orig	2026-06-16 11:39:44.419424500 +0000
++++ include/c.h	2026-08-18 06:55:11.134161354 +0000
+@@ -93,6 +93,12 @@
+ # define UL_HAS_ATTRIBUTE(x) 0
+ #endif
+ 
++#ifdef __has_include
++# define UL_HAS_INCLUDE(x) __has_include(x)
++#else
++# define UL_HAS_INCLUDE(x) 0
++#endif
++
+ /* C-language Attributes are added in C23. */
+ #if defined(__STDC_VERSION__) && (__STDC_VERSION__ > 201710L) && defined(__has_c_attribute)
+ # define UL_HAS_C_ATTRIBUTE(x) __has_c_attribute(x)
+@@ -177,7 +183,7 @@
+ #define UL_BUILD_BUG_ON_ZERO(e) __extension__ (sizeof(struct { int:-!!(e); }))
+ #define BUILD_BUG_ON_NULL(e) ((void *)sizeof(struct { int:-!!(e); }))
+ 
+-#if __has_include(<stdcountof.h>)
++#if UL_HAS_INCLUDE(<stdcountof.h>)
+ #include <stdcountof.h>
+ #define ARRAY_SIZE(arr) countof(arr)
+ #endif
