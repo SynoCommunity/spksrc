@@ -1,0 +1,29 @@
+diff --git src/transcoding/transcode/hwaccels/hwaccels.c src/transcoding/transcode/hwaccels/hwaccels.c
+index 51bb6c749..dc1da077b 100644
+--- src/transcoding/transcode/hwaccels/hwaccels.c
++++ src/transcoding/transcode/hwaccels/hwaccels.c
+@@ -213,6 +213,24 @@ hwaccels_decode_get_format(AVCodecContext *avctx,
+             }
+         }
+     }
++    /* No hardware pixel format could be set up -- either the device is
++       unusable at runtime, or it simply cannot decode this codec (VP9 on a
++       VAAPI device that lacks a VP9 decode entrypoint is the common case).
++       A software format was selected instead, so drop the hardware intent:
++       otherwise the filter graph is still built for hardware frames, graph
++       configuration fails, and the whole subscription dies -- taking the
++       audio stream down with it instead of degrading to audio only. */
++    {
++        TVHContext *tvhctx = avctx->opaque;
++        if (tvhctx && tvhctx->iavhwdevtype != AV_HWDEVICE_TYPE_NONE &&
++            (pix_fmt == AV_PIX_FMT_NONE ||
++             !((desc = av_pix_fmt_desc_get(pix_fmt)) &&
++               (desc->flags & AV_PIX_FMT_FLAG_HWACCEL)))) {
++            tvhwarn(LS_TRANSCODE, "hwaccels: [%s] hardware decoding unavailable, "
++                    "falling back to software decoding", avctx->codec->name);
++            tvhctx->iavhwdevtype = AV_HWDEVICE_TYPE_NONE;
++        }
++    }
+     return pix_fmt;
+ }
+ 

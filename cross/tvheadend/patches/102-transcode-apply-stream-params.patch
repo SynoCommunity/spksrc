@@ -1,0 +1,105 @@
+diff --git src/transcoding/transcode/internals.h src/transcoding/transcode/internals.h
+index 5ab7f2352..63b886f99 100644
+--- src/transcoding/transcode/internals.h
++++ src/transcoding/transcode/internals.h
+@@ -181,6 +181,8 @@ struct tvh_context {
+     enum AVHWDeviceType oavhwdevtype;
+     // used to transport the sample aspect ratio from packets to filter
+     AVRational sample_aspect_ratio;
++    // snapshot of elementary_info_t from streaming_start at transcode setup
++    elementary_info_t es_info;
+     char *hw_accel_device;
+     AVBufferRef *hw_device_ref;
+     void *hw_accel_ictx;
+diff --git src/transcoding/transcode/stream.c src/transcoding/transcode/stream.c
+index dc6654353..0a8790330 100644
+--- src/transcoding/transcode/stream.c
++++ src/transcoding/transcode/stream.c
+@@ -172,6 +172,12 @@ tvh_stream_setup(TVHStream *self, TVHCodecProfile *profile, tvh_ssc_t *ssc)
+     }
+     // video stream HW / SAR setup
+     if (SCT_ISVIDEO(ssc->es_type)) {
++        // snapshot the elementary stream info: the decoder context needs the
++        // geometry/aspect/frame duration the parser already resolved, and it
++        // is not available from the AVCodecContext before the first frames.
++        // Deliberately outside the hwaccel guard below -- a software-only
++        // build needs this just as much.
++        memcpy(&self->context->es_info, ssc, sizeof(elementary_info_t));
+ #if ENABLE_MMAL | ENABLE_V4L2M2M | ENABLE_NVENC | ENABLE_VAAPI | ENABLE_QSV
+         // record decoder hw accel (to be used later on, for filter selection)
+         self->context->iavhwdevtype = avhwdevtype;
+diff --git src/transcoding/transcode/video.c src/transcoding/transcode/video.c
+index 54bf0bc63..5011327e0 100644
+--- src/transcoding/transcode/video.c
++++ src/transcoding/transcode/video.c
+@@ -258,6 +258,50 @@ _video_filters_get_filters(TVHContext *self, char **filters)
+ }
+ 
+ 
++/* Push what the parser already knows about the elementary stream into the
++   decoder context: geometry, sample aspect ratio and frame rate.  The buffer
++   filter source is configured from these fields, so leaving them at zero
++   yields 'Invalid frame dimensions 0x0' and a pixel_aspect of 0/0, and the
++   frames coming out of the graph carry no usable duration -- which then trips
++   the pts-monotonicity guard in tvh_video_context_encode() and drops frames.
++   Hardware paths mostly negotiate this from the frames context, so it is the
++   software encoders that show the damage. */
++static void
++tvh_video_apply_stream_params(TVHContext *self)
++{
++    const elementary_info_t *es = &self->es_info;
++
++    if (es->es_width > 0 && es->es_height > 0) {
++        if (self->iavctx->width <= 0)
++            self->iavctx->width = es->es_width;
++        if (self->iavctx->height <= 0)
++            self->iavctx->height = es->es_height;
++    }
++    if (self->sample_aspect_ratio.num > 0 && self->sample_aspect_ratio.den > 0)
++        self->iavctx->sample_aspect_ratio = self->sample_aspect_ratio;
++#if ENABLE_LIBAV
++    else if (es->es_sample_aspect_ratio.num > 0 && es->es_sample_aspect_ratio.den > 0)
++        self->iavctx->sample_aspect_ratio = es->es_sample_aspect_ratio;
++#endif
++    else if (es->es_aspect_num && es->es_aspect_den &&
++             es->es_width > 0 && es->es_height > 0) {
++        /* display aspect -> sample aspect */
++        AVRational sar;
++        av_reduce(&sar.num, &sar.den,
++                  (int64_t)es->es_aspect_num * es->es_height,
++                  (int64_t)es->es_aspect_den * es->es_width,
++                  INT_MAX);
++        if (sar.num > 0 && sar.den > 0)
++            self->iavctx->sample_aspect_ratio = sar;
++    }
++    if ((!self->iavctx->framerate.num || !self->iavctx->framerate.den) &&
++        es->es_frame_duration > 1) {
++        int fdur = (es->es_frame_duration > INT_MAX) ? INT_MAX : (int)es->es_frame_duration;
++        self->iavctx->framerate = av_make_q(90000, fdur);
++    }
++}
++
++
+ static int
+ tvh_video_context_open_decoder(TVHContext *self, AVDictionary **opts)
+ {
+@@ -284,6 +328,8 @@ tvh_video_context_open_decoder(TVHContext *self, AVDictionary **opts)
+     /* 2) TVHeadend timing convention (fixed) */
+     self->iavctx->time_base = av_make_q(1, 90000); // MPEG-TS uses a fixed timebase of 90kHz
+     self->iavctx->pkt_timebase = self->iavctx->time_base; // to fix the warning: libav: AVCodecContext: Invalid pkt_timebase, passing timestamps as-is.
++    /* 3) Stream metadata from the parser/service snapshot */
++    tvh_video_apply_stream_params(self);
+     return 0;
+ }
+ 
+@@ -395,6 +441,10 @@ tvh_video_context_open_filters(TVHContext *self)
+     char source_args[128];
+     char *filters = NULL;
+ 
++    // re-apply: the decoder may have learned the real geometry since, and the
++    // buffer source below is configured straight from these fields
++    tvh_video_apply_stream_params(self);
++
+     // source args
+     memset(source_args, 0, sizeof(source_args));
+     if (str_snprintf(source_args, sizeof(source_args),
