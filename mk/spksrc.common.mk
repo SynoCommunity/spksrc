@@ -60,7 +60,6 @@ include $(BASEDIR)/mk/spksrc.common/stage0.mk
 
 # Load common definitions
 include $(BASEDIR)/mk/spksrc.common/archs.mk
-include $(BASEDIR)/mk/spksrc.common/tc-capability.mk
 
 include $(BASEDIR)/mk/spksrc.common/logs.mk
 
@@ -71,6 +70,10 @@ LOCAL_CONFIG_MK = $(BASEDIR)/local.mk
 ### Overlay decisions -- AFTER local.mk: both use ?=, so the first read wins and that has
 ### to be local.mk. Chain: command line > environment > local.mk > these defaults.
 include $(BASEDIR)/mk/spksrc.common/overlay.mk
+
+### Toolchain capabilities -- AFTER overlay.mk: TC_RUSTC depends on whether the rust
+### overlay is active, and the MIN_RUSTC_VERSION floor has to agree with it.
+include $(BASEDIR)/mk/spksrc.common/tc-capability.mk
 
 ###
 

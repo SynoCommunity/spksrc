@@ -11,9 +11,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # see: https://github.com/sharkdp/fd/issues/1428
 # we can no longer downgrade to rust 1.77.2 for ARMv7L to build fd 8.7.0
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
-# powerpc archs (except qoriq) are not supported
-# undefined reference to 'pipe2'
-UNSUPPORTED_ARCHS += $(OLD_PPC_ARCHS)
+# pipe2 landed in glibc 2.9
+MIN_GLIBC_VERSION = 2.9
 # issues with atomic library
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 

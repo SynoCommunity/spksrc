@@ -116,6 +116,20 @@ If you only read one thing, read this. The details are in the dated log below.
       that needs a newer toolchain than these pin should say so with `MIN_RUSTC_VERSION`
       / `MIN_GLIBC_VERSION` rather than an arch list. See [Toolchain: custom from-source
       Rust](toolchain.md#custom-from-source-rust-toolchains).
+    - **Choosing instead of refusing:** a floor refuses an arch, but the `cross/<pkg>`
+      virtuals have to pick a version of themselves instead. `TC_RUSTC` is now published
+      beside `TC_GCC` / `TC_GLIBC` / `TC_KERNEL` — the rustc a toolchain pins, or
+      `stable` when it uses rustup's newest — so a virtual routes with
+      `$(call version_ge,$(TC_RUSTC),<vers>)`. `cross/bat`, `cross/ripgrep`, `cross/lsd`
+      and `cross/eza` moved off `$(ARMv5_ARCHS) $(PPC_ARCHS)`, which had been standing in
+      for "pinned to rustc 1.82" and so silently missed `x86-5.2`, a fourth arch this PR
+      pins. `cross/helix` likewise replaced its ARMv7L exclusion with
+      `MIN_GCC_VERSION = 4.9`: its C++ tree-sitter grammars build with `-std=c++14`,
+      which g++ rejects before 4.9. Same story for glibc, where the arch lists already
+      named the missing symbol in a comment: `cross/sd` and `cross/eza` want
+      `pthread_setname_np` (glibc 2.12), `cross/fd` wants `pipe2` (glibc 2.9). Those
+      lists read "except qoriq" while `qoriq-5.2` runs the same glibc 2.8 as `ppc853x`,
+      so the floors refuse one arch the lists let through.
     - Pull request: [#7353](https://github.com/SynoCommunity/spksrc/pull/7353)
 
 ??? note "July 24th 2026 — Host a native build's output as a reusable archive (#7327, #7386)"

@@ -7,10 +7,10 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-DEPENDS = cross/bat-0.25
-else
+ifeq ($(call version_ge,$(TC_RUSTC),1.87),1)
 DEPENDS = cross/bat-latest
+else
+DEPENDS = cross/bat-0.25
 endif
 
 include ../../mk/spksrc.cross-virtual.mk

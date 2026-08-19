@@ -9,6 +9,10 @@
 #   MIN_RUSTC_VERSION = 1.85    needs rustc 1.85 or newer
 #   REQUIRE_64BIT     = 1       needs a 64-bit target
 #
+# A floor REFUSES the arch. Where a package must instead CHOOSE between versions of
+# itself -- the cross/<pkg> virtuals -- compare TC_GCC / TC_GLIBC / TC_KERNEL / TC_RUSTC
+# with version_ge directly.
+#
 # This replaces "UNSUPPORTED_ARCHS = <list>" for capability reasons. A hardcoded
 # list says WHERE a package fails, not WHY; it has to be rechecked by hand every
 # time a toolchain moves, and it cannot express "any arch whose gcc is older than
@@ -83,25 +87,24 @@ endif
 
 # ---- rustc: the rust version the toolchain pins -----------------------------
 # Custom-rust archs (qoriq/ppc853x/88f6281/x86-5.2) are pinned to the rust version their
-# overlay ships (e.g. 1.82.0, the last supporting their old glibc), so a package needing a
-# newer rustc is genuinely unsupported there. The version is the rust consumer's PKG_VERS
-# (same source of truth as TC_RUSTC in spksrc.toolchain.mk); a toolchain still pinning
-# TC_RUSTC itself is honored too. Standard archs have neither (rustup 'stable' = newest), so
-# an empty/'stable' value satisfies any floor -- only a pinned concrete version is compared,
-# no network query. A local var, so env-rust.mk's TC_RUSTC 'stable' default is untouched.
+# overlay ships (1.82.0, the last supporting their old glibc), read from the rust consumer's
+# PKG_VERS; a toolchain still pinning TC_RUSTC itself is honored too.
 _TC_CAP_RUST_MK := $(firstword $(wildcard $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)_rust-*/Makefile))
 ifneq ($(strip $(_TC_CAP_RUST_MK)),)
 _TC_CAP_RUSTC := $(shell sed -n 's/^PKG_VERS *= *//p' $(_TC_CAP_RUST_MK) 2>/dev/null)
 else
 _TC_CAP_RUSTC := $(shell sed -n 's/^TC_RUSTC *= *//p' $(_TC_CAP_MK) 2>/dev/null)
 endif
+
+# Published beside TC_GCC/TC_GLIBC/TC_KERNEL, and never empty: only an ACTIVE overlay pins a
+# version, otherwise the arch really does build on rustup 'stable' -- which sorts above every
+# number, so it clears any floor without a network query.
+# ?=, so spksrc.toolchain.mk keeps the last word inside a toolchain dir.
+TC_RUSTC ?= $(if $(OVERLAY_RUSTC_ON),$(_TC_CAP_RUSTC),stable)
+
 ifneq ($(strip $(MIN_RUSTC_VERSION)),)
-ifneq ($(strip $(_TC_CAP_RUSTC)),)
-ifneq ($(strip $(_TC_CAP_RUSTC)),stable)
-ifeq ($(call version_ge,$(_TC_CAP_RUSTC),$(MIN_RUSTC_VERSION)),)
-TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)rustc $(_TC_CAP_RUSTC) < $(MIN_RUSTC_VERSION)
-endif
-endif
+ifeq ($(call version_ge,$(TC_RUSTC),$(MIN_RUSTC_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)rustc $(TC_RUSTC) < $(MIN_RUSTC_VERSION)
 endif
 endif
 

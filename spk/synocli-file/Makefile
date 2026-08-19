@@ -64,22 +64,28 @@ ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/bat
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
 
-DEPENDS += cross/eza
-OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
-
 DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
 
+DEPENDS += cross/lsd
+OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
+endif
+
+# Ask for these three only where they can accept: same floors their cross packages
+# declare, so the request cannot outrun what will be built (pthread_setname_np, pipe2).
+ifeq ($(call version_ge,$(TC_GLIBC),2.12),1)
+DEPENDS += cross/eza
+OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
+
+DEPENDS += cross/sd
+OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
+endif
+
+ifeq ($(call version_ge,$(TC_GLIBC),2.9),1)
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 endif
-
-DEPENDS += cross/sd
-OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
-
-DEPENDS += cross/lsd
-OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
 endif
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))

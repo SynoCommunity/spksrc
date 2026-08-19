@@ -8,13 +8,11 @@ PKG_DIR = $(PKG_NAME)/helix-term
 
 DEPENDS =
 
-# rust >= 1.82 required
-UNSUPPORTED_ARCHS  = $(ARMv5_ARCHS)
+# the C++ tree-sitter grammars build with -std=c++14, which g++ rejects before 4.9
+MIN_GCC_VERSION = 4.9
 # For more information about this error, try `rustc --explain E0432`.
 # error: could not compile `nucleo` (lib) due to 1 previous error
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
-# some grammars fail to build
-UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 HOMEPAGE = https://helix-editor.com/
 COMMENT  = A post-modern modal text editor.

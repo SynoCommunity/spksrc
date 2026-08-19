@@ -5,7 +5,9 @@ SPK_ICON = src/helix.png
 
 DEPENDS = cross/helix
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)
+# mirrors cross/helix, so an unbuildable arch is reported rather than failed
+MIN_GCC_VERSION = 4.9
+UNSUPPORTED_ARCHS = $(PPC_ARCHS)
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = A post-modern modal text editor.
