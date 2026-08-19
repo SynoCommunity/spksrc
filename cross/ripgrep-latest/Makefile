@@ -1,5 +1,5 @@
 PKG_NAME = ripgrep
-PKG_VERS = 15.1.0
+PKG_VERS = 15.2.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/BurntSushi/ripgrep/archive
@@ -23,6 +23,15 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)
 # upstream/src/pcre2_script_run.c - error: .... only allowed in C99 or C11 mode
 ADDITIONAL_CFLAGS = -std=c11
+endif
+
+ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+# Force compatibility with newer rustc
+# This default feature was removed in Rust 1.94.0
+# Some of the ARMv7 archs do not support VFPv3-D32 (i.e. rust feature +d32)
+# therefore we use VFPv3-D16 (i.e. rust feature -d32)
+# There is an (open) issue in the rust repo https://github.com/rust-lang/rust/issues/159973
+ADDITIONAL_RUSTFLAGS = -C target-feature=-d32
 endif
 
 CARGO_BUILD_ARGS = --locked

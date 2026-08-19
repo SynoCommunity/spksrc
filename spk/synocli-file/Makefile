@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
-SPK_VERS = 4.0.2
-SPK_REV = 29
+SPK_VERS = 4.0.3
+SPK_REV = 30
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -17,7 +17,7 @@ DEPENDS += cross/pixz
 DEPENDS += cross/pigz
 DEPENDS += cross/mg
 DEPENDS += cross/jupp
-DEPENDS += cross/iconv
+DEPENDS += cross/libiconv
 DEPENDS += cross/dos2unix
 DEPENDS += cross/patch
 DEPENDS += cross/rhash
@@ -33,6 +33,7 @@ OPTIONAL_DEPENDS += cross/bat
 OPTIONAL_DEPENDS += cross/eza
 OPTIONAL_DEPENDS += cross/nnn
 OPTIONAL_DEPENDS += cross/lsd
+OPTIONAL_DEPENDS += cross/ms-edit
 OPTIONAL_DEPENDS += cross/xstow
 
 MAINTAINER = hgy59
@@ -82,6 +83,11 @@ DEPENDS += cross/lsd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
 endif
 
+ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+DEPENDS += cross/ms-edit
+OPTIONAL_DESC := $(OPTIONAL_DESC)", edit (MS Editor)"
+endif
+
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/xstow
 OPTIONAL_DESC := $(OPTIONAL_DESC)", xstow"
@@ -91,7 +97,11 @@ endif
 PCRE2_CLI_FULL = 1
 export PCRE2_CLI_FULL
 
-DOCS_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-file/\"\>SynoCli File Tools\</a\>"
+
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-file/
+LICENSE = Each tool is licensed under it's respective license.
+
+DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>SynoCli File Tools\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities: \
@@ -106,22 +116,28 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
 
-CHANGELOG  = "1. Add pigz. <br/>"
-CHANGELOG += "2. Update bat from v0.25.0 to v0.26.1 (except for ARMv5, qoriq and evansport on DSM < 7). <br/>"
-CHANGELOG += "3. Update dos2unix from v7.5.2 to v7.5.3. <br/>"
-CHANGELOG += "4. Update fzf from v0.66.0 to v0.67.0. <br/>"
-CHANGELOG += "5. Update less from v679 to v685. <br/>"
-CHANGELOG += "6. Update lsd from v1.1.5 to v1.2.0 (except for ARMv5). <br/>"
-CHANGELOG += "7. Update nano from v8.6 to v8.7. <br/>"
-CHANGELOG += "8. Update ripgrep from v14.1.1 to v15.1.0 (except for ARMv5 and qoriq). <br/>"
+CHANGELOG  = "1. Add Microsoft Edit v2.0.0. <br/>"
+CHANGELOG += "2. Update dos2unix from v7.5.3 to v7.5.6. <br/>"
+CHANGELOG += "3. Update eza from v1.23.4 to v1.23.5. <br/>"
+CHANGELOG += "4. Update fd from v10.3.0 to v10.4.2 (except qoriq arch). <br/>"
+CHANGELOG += "5. Update file from v5.46 to v5.48 (fixes ppc archs). <br/>"
+CHANGELOG += "6. Update fzf from v0.67.0 to v0.74.2. <br/>"
+CHANGELOG += "7. Update jdupes from v1.30.0 to v1.31.1. <br/>"
+CHANGELOG += "8. Update less from v685 to v704. <br/>"
+CHANGELOG += "9. Update lzip from 1.25 to v1.26 and plzip from v1.12 to v1.13. <br/>"
+CHANGELOG += "10. Update micro from v2.0.14 to v2.0.15. <br/>"
+CHANGELOG += "11. Update mg from v3.7 to v4.0. <br/>"
+CHANGELOG += "12. Update nano from v8.7 to v9.2. <br/>"
+CHANGELOG += "13. Update nnn from v5.1 to v5.2 (DSM 7+). <br/>"
+CHANGELOG += "14. Update ripgrep from v15.1.0 to v15.2.0. <br/>"
+CHANGELOG += "15. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
+CHANGELOG += "16. Update tree from v2.2.1 to v2.3.2. <br/>"
+CHANGELOG += "17. Update iconv from version provided in toolchain to v1.19. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
 
-HOMEPAGE = https://docs.synocommunity.com/packages/synocli-file/
-LICENSE  = Each tool is licensed under it's respective license.
-
-SPK_COMMANDS  = bin/less bin/lessecho bin/lesskey
+SPK_COMMANDS  = bin/less libexec/lessecho bin/lesskey
 SPK_COMMANDS += bin/tree
 SPK_COMMANDS += bin/jdupes
 SPK_COMMANDS += bin/mc bin/mcdiff bin/mcview bin/mcedit
@@ -144,6 +160,7 @@ SPK_COMMANDS += bin/mg
 SPK_COMMANDS += bin/bat
 SPK_COMMANDS += bin/eza
 SPK_COMMANDS += bin/lsd
+SPK_COMMANDS += bin/edit
 SPK_COMMANDS += bin/jmacs bin/joe bin/jpico bin/jstar bin/jupp bin/rjoe
 SPK_COMMANDS += bin/nnn
 SPK_COMMANDS += bin/iconv
