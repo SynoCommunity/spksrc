@@ -1,0 +1,8 @@
+bin:domoticz
+rsc:www
+rsc:scripts
+rsc:plugins
+rsc:dzVents
+rsc:License.txt
+rsc:History.txt
+rsc:server_cert.pem

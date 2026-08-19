@@ -1,0 +1,64 @@
+SPK_NAME = icingaweb2
+SPK_VERS = 2.14.0
+SPK_REV = 1
+SPK_ICON = src/icingaweb2.png
+
+DEPENDS  = cross/icingaweb2
+# Pure PHP package, make sure ARCH is noarch
+override ARCH=noarch
+
+REQUIRED_MIN_DSM = 7.2
+REQUIRED_MIN_SRM = 3.0
+
+MAINTAINER = SynoCommunity
+DESCRIPTION = Icinga Web 2 is a powerful PHP framework for web applications that provides the frontend for Icinga 2 monitoring.
+DISPLAY_NAME = Icinga Web 2
+CHANGELOG = "Initial release of Icinga Web 2"
+
+HOMEPAGE = https://icinga.com/
+LICENSE = GPL-3.0-only
+
+WIZARDS_TEMPLATES_DIR = src/wizard_templates
+
+SYSTEM_GROUP = http
+
+ADMIN_URL = /icingaweb2/
+
+DSM_UI_DIR = app
+DSM_UI_CONFIG = src/app/config
+
+SERVICE_SETUP = src/service-setup.sh
+STARTABLE = yes
+
+include ../../mk/spksrc.common.mk
+
+# Icinga Web >= 2.13 requires PHP 8.2 (uses 8.4)
+SPK_DEPENDS = "WebStation:PHP8.4:Apache2.4:MariaDB10:icinga2"
+CONF_DIR = src/conf/
+
+POST_STRIP_TARGET = icingaweb2_extra_install
+
+include ../../mk/spksrc.spk.mk
+
+.PHONY: icingaweb2_extra_install
+icingaweb2_extra_install:
+	install -m 755 -d $(STAGING_DIR)/web
+	install -m 755 -d $(STAGING_DIR)/share/templates/modules/monitoring
+	install -m 755 -d $(STAGING_DIR)/share/templates/modules/director
+	install -m 644 src/templates/*.ini $(STAGING_DIR)/share/templates/
+	install -m 644 src/templates/modules/monitoring/*.ini $(STAGING_DIR)/share/templates/modules/monitoring/
+	install -m 644 src/templates/modules/director/*.ini $(STAGING_DIR)/share/templates/modules/director/
+	# Install custom index.php wrapper for environment variables
+	install -m 644 src/lib/index.php $(STAGING_DIR)/share/icingaweb2/public/index.php
+	# Install .htaccess for URL rewriting
+	install -m 644 src/lib/htaccess $(STAGING_DIR)/share/icingaweb2/public/.htaccess
+	# Install PHP script for creating admin user programmatically
+	install -m 755 src/lib/create-admin.php $(STAGING_DIR)/share/create-admin.php
+	# Install PHP script for setting up Director agent template
+	install -m 755 src/lib/setup-director-template.php $(STAGING_DIR)/share/setup-director-template.php
+	# Rename original icingacli and install wrapper that sets env vars
+	mv $(STAGING_DIR)/share/icingaweb2/bin/icingacli $(STAGING_DIR)/share/icingaweb2/bin/icingacli.real
+	install -m 755 src/lib/icingacli $(STAGING_DIR)/share/icingaweb2/bin/icingacli
+	# Create package var directory structure for non-startable packages
+	install -m 755 -d $(STAGING_DIR)/var/etc/icingaweb2
+	install -m 755 -d $(STAGING_DIR)/var/storage

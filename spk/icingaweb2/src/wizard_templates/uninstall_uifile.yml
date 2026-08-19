@@ -1,0 +1,4 @@
+ICINGAWEB2_UNINSTALL_STEP_TITLE: "Remove Icinga Web 2 database"
+ICINGAWEB2_UNINSTALL_ATTENTION: "Attention: The 'icingaweb2' database will be removed during package uninstallation. All configuration will be deleted."
+ICINGAWEB2_UNINSTALL_ROOT_PASS_DESC: "Enter your MariaDB 'root' password"
+ICINGAWEB2_UNINSTALL_ROOT_PASS_FIELD: "MariaDB 'root' password"

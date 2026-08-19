@@ -72,8 +72,8 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
-??? note "July 24th 2026 — Host a native build's output as a reusable archive (#7327)"
-    - **What:** a new opt-in step, `spksrc.native/archive.mk` (included by
+??? note "July 24th 2026 — Host a native build's output as a reusable archive (#7327, #7386)"
+    - **What:** a new opt-in step, `spksrc.build/archive.mk` (included by
       `spksrc.native-cc.mk`), tars a native package's install tree into a release
       archive after `install`, so an expensive tool is built once and re-consumed
       via `DEPENDS` instead of rebuilt from source. A package enables it with a
@@ -100,7 +100,11 @@ If you only read one thing, read this. The details are in the dated log below.
       carried its own `build-archive` recipe); this factors it into one shared,
       defaulted helper. `native/llvm-14.0-build` adopts it here; the gcc-8.5
       overlays reuse it in #7324.
-    - Pull request: [#7327](https://github.com/SynoCommunity/spksrc/pull/7327)
+    - **Relocated (#7386):** moved `spksrc.native/archive.mk` →
+      `spksrc.build/archive.mk` — the helper is a shared build step, not native-only
+      (a from-source rustc reuses it in #7353). No behaviour change.
+    - Pull requests: [#7327](https://github.com/SynoCommunity/spksrc/pull/7327),
+      [#7386](https://github.com/SynoCommunity/spksrc/pull/7386)
 
 ??? note "July 23rd 2026 — Carry the runtime library the binary asks for, by symbol version (#7322)"
     - **What:** the strip step copies the runtime libraries DSM does not ship

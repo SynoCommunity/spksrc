@@ -1,0 +1,75 @@
+--- CMakeLists.txt.orig
++++ CMakeLists.txt
+@@ -193,65 +193,13 @@
+ 
+ cmake_dependent_option(ENABLE_NETDATA_JOURNAL_FILE_READER "Enable netdata's journal file reader implementation" False "ENABLE_PLUGIN_SYSTEMD_JOURNAL" False)
+ 
+-# Setup Rust/Corrosion for plugins that need it
+-if(ENABLE_NETDATA_JOURNAL_FILE_READER OR ENABLE_PLUGIN_OTEL OR ENABLE_PLUGIN_OTEL_SIGNAL_VIEWER)
+-    include(FetchContent)
+-    FetchContent_Declare(
+-        Corrosion
+-        GIT_REPOSITORY https://github.com/netdata/corrosion.git
+-        GIT_TAG f3b91559efca32c6b54837866ef35ba98ff5b2ca # stable/v0.5
+-    )
+-    FetchContent_MakeAvailable(Corrosion)
+-
+-    # Corrosion places cargo build artifacts under ${CMAKE_BINARY_DIR}/cargo/
+-    # (see Corrosion.cmake cargo_target_dir). Register it for cleanup so that
+-    # `ninja clean` removes it.  If a future Corrosion version changes this
+-    # path, this line must be updated to match.
+-    set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_BINARY_DIR}/cargo")
+-
+-    if(ENABLE_NETDATA_JOURNAL_FILE_READER)
+-        corrosion_import_crate(MANIFEST_PATH src/crates/jf/Cargo.toml
+-                               CRATES journal_reader_ffi)
+-    endif()
+-
+-    # Import crates from the main cargo workspace
+-    set(_WORKSPACE_CRATES "")
+-    if(ENABLE_PLUGIN_OTEL)
+-        list(APPEND _WORKSPACE_CRATES otel-plugin)
+-    endif()
+-    if(ENABLE_PLUGIN_OTEL_SIGNAL_VIEWER)
+-        list(APPEND _WORKSPACE_CRATES otel-signal-viewer-plugin)
+-    endif()
+-    if(_WORKSPACE_CRATES)
+-        corrosion_import_crate(MANIFEST_PATH src/crates/Cargo.toml
+-                               CRATES ${_WORKSPACE_CRATES})
+-    endif()
+-
+-    if(ENABLE_PLUGIN_OTEL)
+-      if(STATIC_BUILD)
+-        corrosion_add_target_rustflags(otel-plugin --cfg=tracing_unstable "-C" "target-feature=+crt-static")
+-      else()
+-        corrosion_add_target_rustflags(otel-plugin --cfg=tracing_unstable)
+-      endif()
+-    endif()
+-
+-    if(ENABLE_PLUGIN_OTEL_SIGNAL_VIEWER)
+-      set(OTEL_SIGNAL_VIEWER_RUSTFLAGS --cfg=tracing_unstable)
+-
+-      # We depend (transitively) on the `io-uring` crate which doesn't provide
+-      # prebuilt bindings for 32-bit arches. Considering this is a compile-time
+-      # and not a runtime dependency (because we don't use foyer's io-uring
+-      # engine), we can simply skip the check.
+-      if(CMAKE_SIZEOF_VOID_P EQUAL 4 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+-        list(APPEND OTEL_SIGNAL_VIEWER_RUSTFLAGS --cfg=io_uring_skip_arch_check)
+-      endif()
+-
+-      if(STATIC_BUILD)
+-        list(APPEND OTEL_SIGNAL_VIEWER_RUSTFLAGS "-C" "target-feature=+crt-static")
+-      endif()
+-
+-      corrosion_add_target_rustflags(otel-signal-viewer-plugin ${OTEL_SIGNAL_VIEWER_RUSTFLAGS})
+-    endif()
++# The journal reader is cross-compiled as a static library by the spksrc build
++# (see the netdata_compile target in cross/netdata/Makefile), so the Corrosion
++# cmake integration and its network fetch are not needed.
++if(ENABLE_NETDATA_JOURNAL_FILE_READER)
++    add_library(journal_reader_ffi STATIC IMPORTED)
++    set_target_properties(journal_reader_ffi PROPERTIES
++        IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/libjournal_reader_ffi.a")
+ endif()
+ 
+ option(ENABLE_MIMALLOC "Enable mimalloc allocator" OFF)

@@ -7,7 +7,7 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
+ifeq ($(call version_lt, $(TC_GCC), 4.9),1)
 DEPENDS = cross/fuse3.16
 else
 DEPENDS = cross/fuse3-latest
