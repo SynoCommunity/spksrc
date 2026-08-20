@@ -1,0 +1,9 @@
+rsc:bin/rustc
+rsc:bin/cargo
+rsc:bin/rustdoc
+rsc:bin/rustfmt
+rsc:bin/cargo-clippy
+rsc:bin/clippy-driver
+rsc:bin/cargo-fmt
+rsc:share/rust
+rsc:share/rust-support
