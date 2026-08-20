@@ -13,6 +13,10 @@ TC_SYSROOT = $(TC_TARGET)
 TC_INCLUDE = $(TC_SYSROOT)/include
 TC_EXTRA_BUILD_FLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 
+# e500 SPE FP for f32+f64 (efs*/efd*), matching the C toolchain's SPE ABI. NOT +efpu2
+# (empirically flips f64 to soft-float -- the qoriq SIGILL of #7119/#7304).
+TC_EXTRA_RUSTFLAGS = -Ctarget-cpu=e500 -Ctarget-feature=+spe
+
 # glibc 2.8 predates clock_gettime in libc (2.17); the target has no native 64-bit atomics.
 # -latomic is dropped automatically when the gcc does not ship it.
 TC_EXTRA_LDFLAGS = -lrt -latomic

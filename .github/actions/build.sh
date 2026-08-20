@@ -65,12 +65,10 @@ for version in "${min_dsm_versions[@]}"; do
     echo "===> ${noarch_var}: ${!noarch_var}"
 done
 
-# Remove toolchain status files to enforce re-building toolchain including cargo/rust.
-# This fixes issues on github-action where toolchain caching omits the
-# actual installation state of cargo/rust within the distrib folder.
-rm -f toolchain/syno-${GH_ARCH}/work/.toolchain*_done
-rm -f toolchain/syno-${GH_ARCH}/work/.stage[01]-*_done
-rm -f toolchain/syno-${GH_ARCH}/work/tc_vars.*
+# Cleanup toolchains to enforce re-building including cargo/rust. For a custom-rust
+# arch, `make clean` cascades to its rust std + binutils overlay consumers (see
+# mk/spksrc.toolchain/overlay-binutils.mk); a non-rust arch just cleans itself.
+(cd toolchain/syno-${GH_ARCH} && make clean)
 
 # ===========================================================================
 # 2. Select packages to build for this arch

@@ -59,25 +59,34 @@ DEPENDS += cross/micro cross/fzf
 OPTIONAL_DESC := $(OPTIONAL_DESC)", micro (editor), fzf (fuzzy finder)"
 endif
 
-# OLD_PPC archs are not supported with rust
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
-DEPENDS += cross/bat
-OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
-
+# Rust tools, each gated like the cross package it pulls so the request cannot outrun
+# what will be accepted. eza and sd need no gate at all: their only blocker was std's
+# pthread_setname_np, which this PR weak-links, so they now build on ppc853x too.
 DEPENDS += cross/eza
 OPTIONAL_DESC := $(OPTIONAL_DESC)", eza"
 
-DEPENDS += cross/ripgrep
-OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
+DEPENDS += cross/sd
+OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
+
+# bat and fd reach pipe2 through a dependency crate, which std's weak link does not cover
+ifeq ($(call version_ge,$(TC_GLIBC),2.9),1)
+DEPENDS += cross/bat
+OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
 
 ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
 endif
+endif
 
-DEPENDS += cross/sd
-OPTIONAL_DESC := $(OPTIONAL_DESC)", sd (sed alternative)"
+# ripgrep 14 is the PPC fallback and its pcre2 wants -std=c11/c99
+ifeq ($(call version_ge,$(TC_GCC),4.6),1)
+DEPENDS += cross/ripgrep
+OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
+endif
 
+# lsd builds on the other PPC archs but segfaults there at runtime
+ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
 DEPENDS += cross/lsd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", lsd"
 endif

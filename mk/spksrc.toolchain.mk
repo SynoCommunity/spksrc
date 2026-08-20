@@ -23,10 +23,13 @@
 #  _all
 #
 # which executes:
-#  status      : echo status to logging facility
-#  rustc       : install rust toolchain components
-#  depend      : resolve and build toolchain dependencies (if any)
-#  tcvars      : generate tc_vars*.mk files for spksrc.cross/env-default.mk
+#  status           : echo status to logging facility
+#  rustup-rustc     : rustup base install (host rustc/cargo)
+#  depend           : resolve and build toolchain dependencies -- including the overlay
+#                     consumers, which is how the binutils overlay is provisioned (it has
+#                     no build step of its own, only the warnings hung off tcvars)
+#  tcvars           : generate tc_vars*.mk files for spksrc.cross/env-default.mk, and warn
+#                     on a degraded overlay state (per-package, so not on _all directly)
 #
 # Variables:
 #  TC_NAME           : Toolchain name (optional, used with generic archs)
@@ -176,7 +179,25 @@ include ../../mk/spksrc.toolchain/tc-normalize.mk
 patch: normalize
 include ../../mk/spksrc.build/patch.mk
 
-rustc: patch
+rustup-rustc: patch
+# The rust version this toolchain runs: the overlay's own PKG_VERS when the overlay is ACTIVE
+# (single source of truth, never hardcoded per base toolchain); otherwise left to env-rust.mk's
+# 'stable'. Availability/request/active are resolved in spksrc.common/overlay.mk.
+ifeq ($(OVERLAY_RUSTC_ON),1)
+TC_RUSTC := $(shell sed -n 's/^PKG_VERS[[:space:]]*=[[:space:]]*//p' $(firstword $(TC_OVERLAY_RUSTC))/Makefile)
+endif
+
+# Pull the rust overlay .txz via the consumer-dir DEPENDS -- whenever one ships, so the archive
+# is provisioned even with the overlay switched off.
+ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
+DEPENDS += toolchain/$(notdir $(firstword $(TC_OVERLAY_RUSTC)))
+endif
+
+# OVERLAY_<component> family together, base layer first: overlay-binutils sets the
+# shim path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-rustc + tc_vars read, and
+# overlay-rustc resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
+include ../../mk/spksrc.toolchain/overlay-binutils.mk
+include ../../mk/spksrc.toolchain/overlay-rustc.mk
 include ../../mk/spksrc.toolchain/tc-rust.mk
 
 include ../../mk/spksrc.toolchain/tc_vars.mk
@@ -191,9 +212,15 @@ toolchain_msg:
 
 pre_toolchain_target: toolchain_msg
 
+# _all's prerequisites are a SEQUENCE, not a set: rustup must be installed before the
+# consumers rustup-link in depend, and tcvars reads what overlay-rustc resolved. Left-to-right
+# order only holds serially, so pin it. Scoped to this instance -- recursively invoked makes
+# (every cross/ and spk/ build) keep their parallelism, and depend already loops serially.
+.NOTPARALLEL:
+
 # Define _all as a real target that does the work
 .PHONY: _all
-_all: status rustc depend tcvars
+_all: status rustup-rustc depend tcvars
 
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target

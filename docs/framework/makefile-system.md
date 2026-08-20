@@ -234,10 +234,12 @@ spksrc.wheel/
 # Toolchain entry point
 spksrc.toolchain.mk
 spksrc.toolchain/
+├── overlay-binutils.mk       # binutils 2.30 overlay (as/ld); OVERLAY_ family base
+├── overlay-rustc.mk          # custom from-source rustc overlay (OVERLAY_RUSTC)
 ├── tc-base.mk
 ├── tc-flags.mk
 ├── tc-normalize.mk
-├── tc-rust.mk
+├── tc-rust.mk                # rustup base install (rustup-rustc target)
 ├── tc-url.mk
 ├── tc-versions.mk
 └── tc_vars.mk                # generates the tc_vars* files

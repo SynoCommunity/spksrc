@@ -10,5 +10,6 @@ TC_DIST_SITE_PATH = toolchains%2Fdsm5.2
 
 TC_TARGET = x86_64-pc-linux-gnu
 TC_SYSROOT = $(TC_TARGET)/sys-root
+TC_INCLUDE = $(TC_SYSROOT)/include
 
 include ../../mk/spksrc.toolchain.mk

@@ -8,8 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# lsd >= 1.2.0 requires edition2024 (rustc >= 1.85)
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(PPC_ARCHS)
+# lsd >= 1.2.0 requires edition2024
+MIN_RUSTC_VERSION = 1.85
 
 HOMEPAGE = https://github.com/lsd-rs/lsd
 COMMENT  = The next gen ls command.

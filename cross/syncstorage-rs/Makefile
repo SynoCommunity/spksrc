@@ -30,8 +30,6 @@ export MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock
 
 # mysqlclient-sys: to find libmysqlclient
 ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
-# to find dependencies of libmysqlclient (libz)
-ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
 
 POST_INSTALL_TARGET = syncstorage-rs_post_install
 
