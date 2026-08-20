@@ -11,9 +11,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-# pthread_setname_np landed in glibc 2.12
-MIN_GLIBC_VERSION = 2.12
-
 HOMEPAGE = https://eza.rocks/
 COMMENT  = A modern replacement for 'ls'.
 LICENSE  = MIT

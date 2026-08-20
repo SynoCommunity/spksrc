@@ -12,8 +12,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/pcre2
 
-# powerpc archs (except qoriq) are not supported
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# must support -std=C11 or -std=C99
+MIN_GCC_VERSION = 4.6
 
 HOMEPAGE = https://github.com/BurntSushi/ripgrep
 COMMENT  = ripgrep recursively searches directories for a regex pattern.

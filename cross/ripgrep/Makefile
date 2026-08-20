@@ -3,7 +3,8 @@ PKG_NAME = ripgrep-virtual
 OPTIONAL_DEPENDS  = cross/ripgrep-latest
 OPTIONAL_DEPENDS += cross/ripgrep-14
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# mirrors ripgrep-14, the fallback: refuse before routing to a leaf that would
+MIN_GCC_VERSION = 4.6
 
 include ../../mk/spksrc.common.mk
 

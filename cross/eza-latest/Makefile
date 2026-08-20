@@ -8,8 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-# pthread_setname_np landed in glibc 2.12
-MIN_GLIBC_VERSION = 2.12
 # eza 0.23.4 declares MSRV 1.82
 MIN_RUSTC_VERSION = 1.82
 

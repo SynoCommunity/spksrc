@@ -8,9 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# pthread_setname_np landed in glibc 2.12
-MIN_GLIBC_VERSION = 2.12
-
 HOMEPAGE = https://github.com/chmln/sd#readme
 COMMENT  = Intuitive find & replace CLI (sed alternative).
 LICENSE  = MIT

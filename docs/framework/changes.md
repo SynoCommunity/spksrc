@@ -125,11 +125,16 @@ If you only read one thing, read this. The details are in the dated log below.
       for "pinned to rustc 1.82" and so silently missed `x86-5.2`, a fourth arch this PR
       pins. `cross/helix` likewise replaced its ARMv7L exclusion with
       `MIN_GCC_VERSION = 4.9`: its C++ tree-sitter grammars build with `-std=c++14`,
-      which g++ rejects before 4.9. Same story for glibc, where the arch lists already
-      named the missing symbol in a comment: `cross/sd` and `cross/eza` want
-      `pthread_setname_np` (glibc 2.12), `cross/fd` wants `pipe2` (glibc 2.9). Those
-      lists read "except qoriq" while `qoriq-5.2` runs the same glibc 2.8 as `ppc853x`,
-      so the floors refuse one arch the lists let through.
+      which g++ rejects before 4.9. Same story for the `$(OLD_PPC_ARCHS)` exclusions on
+      the rust packages, which already named their reason in a comment: `cross/bat` and
+      `cross/fd` reach `pipe2` through a dependency crate, so they declare
+      `MIN_GLIBC_VERSION = 2.9`; `cross/ripgrep`'s pcre2 wants `-std=c11`, so
+      `MIN_GCC_VERSION = 4.6`. Those lists read "except qoriq" while `qoriq-5.2` runs the
+      same glibc 2.8 and gcc 4.3.7 as `ppc853x`, so the floors refuse an arch the lists
+      let through. `cross/sd` and `cross/eza` lose their exclusion outright: their only
+      blocker was std's own `pthread_setname_np`, which the weak-link patch above
+      resolves, and both are confirmed building and running on ppc853x (@hgy59) — so
+      `synocli-file` ships them there.
     - Pull request: [#7353](https://github.com/SynoCommunity/spksrc/pull/7353)
 
 ??? note "July 24th 2026 — Host a native build's output as a reusable archive (#7327, #7386)"

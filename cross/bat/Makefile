@@ -3,7 +3,8 @@ PKG_NAME = bat-virtual
 OPTIONAL_DEPENDS  = cross/bat-latest
 OPTIONAL_DEPENDS += cross/bat-0.25
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# 'pipe2'
+MIN_GLIBC_VERSION = 2.9
 
 include ../../mk/spksrc.common.mk
 

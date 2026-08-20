@@ -8,8 +8,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/pcre2
 
-# powerpc archs (except qoriq) are not supported
-UNSUPPORTED_ARCHS  = $(OLD_PPC_ARCHS) 
 # Rust edition2024 required
 MIN_RUSTC_VERSION = 1.85
 # asm error:
