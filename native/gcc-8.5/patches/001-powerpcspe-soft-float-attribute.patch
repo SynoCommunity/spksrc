@@ -1,0 +1,24 @@
+# GCC 8 moved the SPE port to config/powerpcspe/ and stubbed TARGET_SPE, TARGET_SPE_ABI
+# and TARGET_E500_DOUBLE to 0 (and TARGET_FPRS to 1) while still accepting -mabi=spe.
+# Objects therefore come out tagged hard float where the vendor e500 gcc tags soft
+# float, and ld warns on every mixed link. Attribute emission only: codegen untouched.
+#
+--- gcc/config/powerpcspe/powerpcspe.c.orig	2026-08-21 18:29:56.748471159 +0000
++++ gcc/config/powerpcspe/powerpcspe.c	2026-08-21 18:29:56.759471387 +0000
+@@ -36644,7 +36644,15 @@
+     {
+       int fp;
+ 
+-      if (TARGET_DF_FPR | TARGET_DF_SPE)
++      /* SPE keeps floating point in the GPRs: there are no FPRs to declare,
++	 and every vendor e500 toolchain tags such objects soft-float (2).
++	 This fork stubs TARGET_SPE/TARGET_SPE_ABI to 0 and TARGET_FPRS to 1
++	 while still honouring -mabi=spe, so TARGET_DF_FPR reads true here and
++	 the object comes out tagged hard-float -- leaving ld to warn on every
++	 link against a vendor library.  Ask the option variable instead.  */
++      if (rs6000_spe_abi)
++	fp = 2;
++      else if (TARGET_DF_FPR | TARGET_DF_SPE)
+ 	fp = 1;
+       else if (TARGET_SF_FPR | TARGET_SF_SPE)
+ 	fp = 3;
