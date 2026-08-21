@@ -98,6 +98,26 @@
             "key": "wizard_testing_release",
             "desc": "Dernière version de test (beta) de NZBGet",
             "defaultValue": false
+          }, {
+            "key": "wizard_specific_release",
+            "desc": "Version spécifique",
+            "defaultValue": false
+          }
+        ]
+      }, {
+        "type": "textfield",
+        "desc": "Numéro de version spécifique (ex. 26.1, minimum 22.0):",
+        "subitems": [{
+            "key": "wizard_specific_release_version",
+            "desc": "Version",
+            "defaultValue": "",
+            "validator": {
+              "allowBlank": true,
+              "regex": {
+                "expr": "/^$|^\\d+\\.\\d+$/",
+                "errorText": "Le format de la version doit être x.y (ex. 26.1)"
+              }
+            }
           }
         ]
       }
