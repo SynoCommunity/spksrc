@@ -12,16 +12,13 @@ LICENSE  = GPLv2
 
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
-# ffmpeg 8 wants C11 static assertions, and static_assert is a LIBC macro -- glibc only
-# grew it in 2.16. The gcc overlay raises the compiler floor, not the libc one, so this
-# has to be said separately or ppc853x/qoriq (2.8) and the 2.15 archs die at configure.
-MIN_GLIBC_VERSION = 2.16
 
 # Build with the gcc 8.5 overlay where the arch ships one: inert on a toolchain
 # that already has 8.5 or newer, and on any arch with no overlay at all.
 OVERLAY_GCC = 1
 
 include ../../mk/spksrc.common.mk
+
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
 # ffmpeg derives its compilers from --cross-prefix and ignores CC/CXX, so it would pick
@@ -31,6 +28,23 @@ CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --pref
 _ffmpeg_tcvar = $(shell sed -n 's|^TC_ENV += $(1)="\(.*\)"$$|\1|p' $(WORK_DIR)/tc_vars.autotools.mk 2>/dev/null)
 CONFIGURE_ARGS += --cc=$(or $(call _ffmpeg_tcvar,CC),$(TC_PATH)$(TC_PREFIX)gcc)
 CONFIGURE_ARGS += --cxx=$(or $(call _ffmpeg_tcvar,CXX),$(TC_PATH)$(TC_PREFIX)g++)
+
+# ffmpeg 8 wants C11 static assertions. static_assert is not a runtime feature, just a
+# macro glibc added to assert.h in 2.16 (`#define static_assert _Static_assert`); the
+# keyword itself comes from the compiler, so define it ourselves on an older libc rather
+# than lose the arch. C only -- in C++ static_assert is a keyword. Via --extra-cflags and
+# not CFLAGS: ffmpeg takes its environment from the generated tc_vars, so appending to the
+# make variable here reaches nothing.
+ifeq ($(call version_lt,$(TC_GLIBC),2.16),1)
+CONFIGURE_ARGS += --extra-cflags=-Dstatic_assert=_Static_assert
+endif
+
+# The v4l2 input device uses the multiplanar API (struct v4l2_plane), which Linux grew in
+# 3.2. The 2.6.32 toolchains -- 88f6281, ppc853x, qoriq -- ship no such header. Asked by
+# kernel version rather than by arch, which is what actually decides it.
+ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
+CONFIGURE_ARGS += --disable-indev=v4l2
+endif
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
@@ -251,6 +265,14 @@ DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
+# ARMv5 (88f6281, Marvell Feroceon): armv5te, soft float. Never listed here because its
+# gcc 4.6.4 kept ffmpeg8 out entirely; the overlay makes it reachable. --cpu=armv5te is
+# what turns off the armv6/v6t2/neon/vfp paths this core does not have.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=armv5te
+endif
+
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
@@ -275,8 +297,6 @@ ifeq ($(findstring $(ARCH),ppc853x qoriq),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
-# ffmpeg-7.1 video4linux2 is no longer compatible
-CONFIGURE_ARGS += --disable-indev=v4l2
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
