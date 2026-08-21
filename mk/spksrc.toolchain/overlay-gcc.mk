@@ -59,7 +59,10 @@ endif
 # this only picks which one to print. Hung off tcvars like the other two: the switches are
 # a PER-PACKAGE choice, and _all is skipped once the toolchain cookie exists.
 .PHONY: overlay-gcc-warn
-ifeq ($(OVERLAY_GCC_VERSION_MISSING),1)
+ifeq ($(OVERLAY_BINUTILS_FORCED),1)
+overlay-gcc-warn:
+	@$(OVERLAY_WARN_BINUTILS_FORCED)
+else ifeq ($(OVERLAY_GCC_VERSION_MISSING),1)
 overlay-gcc-warn:
 	@$(OVERLAY_WARN_GCC_VERSION_MISSING)
 else ifeq ($(OVERLAY_GCC_NO_BINUTILS),1)
