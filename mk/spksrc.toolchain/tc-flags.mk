@@ -82,10 +82,28 @@ endif
 # only where the objects actually reference a symbol it provides, and -Wl,--no-as-needed
 # restores the default right after: the policy change is scoped to these two libs and
 # never drops a package library kept only for its side effects.
+# The ABI flags a build compiles with. The Synology gcc is the reference an overlay must
+# match to stay binary-compatible, so each overlay consumer is SEEDED from the legacy
+# toolchain -- but it carries its own copy, and that copy wins while it is active.
+#
+# The two are identical everywhere today; the indirection is the point. A compiler that
+# spells or defaults differently -- a future gcc-12, or gcc 8.5 already on the archs whose
+# 2008 gcc under-declared its ABI -- is then corrected next to itself, instead of by
+# editing a legacy toolchain every other package still builds against.
+_TC_LEGACY_BUILD_FLAGS := $(TC_EXTRA_BUILD_FLAGS)
+_TC_OVERLAY_BUILD_FLAGS = $(if $(OVERLAY_GCC_ON),$(shell sed -n 's/^TC_EXTRA_BUILD_FLAGS *= *//p' $(TC_OVERLAY_GCC)/Makefile 2>/dev/null))
+TC_EXTRA_BUILD_FLAGS = $(or $(_TC_OVERLAY_BUILD_FLAGS),$(_TC_LEGACY_BUILD_FLAGS))
+
 _tc_comma := ,
 _TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS)
 _tc_ld_syslibs = $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
-TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(strip $(_tc_ld_syslibs)),-Wl$(_tc_comma)--as-needed $(_tc_ld_syslibs) -Wl$(_tc_comma)--no-as-needed)
+
+# LDFLAGS precedes the objects, so --as-needed drops libatomic before anything needs it.
+# Harmless on the 2008 compilers (no libatomic -> filtered above), fatal under gcc 8.5,
+# which emits __atomic_*_8 calls (openssl3/ppc853x). Keep it outside the bracket.
+_tc_ld_atomic  = $(if $(OVERLAY_GCC_ON),$(filter -latomic,$(_tc_ld_syslibs)))
+_tc_ld_needed  = $(filter-out $(_tc_ld_atomic),$(_tc_ld_syslibs))
+TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(strip $(_tc_ld_needed)),-Wl$(_tc_comma)--as-needed $(_tc_ld_needed) -Wl$(_tc_comma)--no-as-needed) $(_tc_ld_atomic)
 
 # TC_EXTRA_BUILD_FLAGS holds the target's ABI/arch flags (-march, -mcpu, -mfpu,
 # -mfloat-abi, -mthumb, ...). They select the ABI, so they must reach every language
@@ -107,24 +125,49 @@ TC_EXTRA_FFLAGS   := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_FFLAGS)
 # Define regular build flags -- each language reads its own residual list, ABI
 # already folded in, kept last so a package/toolchain addition stays at the end.
 
-CFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+# The toolchain's declared include dir. Under a gcc overlay it moves to -idirafter, the
+# END of the search chain, instead of -I at the front.
+#
+# It cannot simply be dropped: it carries headers the sysroot does not (FlexLexer.h,
+# sysfs/ on ppc853x-5.2), and packages do use them. But it cannot stay in front either.
+# On most archs it names the very directory gcc already ends on and is merely redundant;
+# on ppc853x-5.2 it names a different tree -- TC_INCLUDE is <target>/include, the gcc
+# 4.3.7 headers, while the real sysroot is <target>/libc/usr/include -- and ahead of gcc
+# 8.5's own it redeclares what the compiler provides: "redundant redeclaration of
+# 'ftruncate64'", "'INT32_MAX' was not declared". Its stale c++/ subtree is the same trap.
+#
+# -idirafter keeps every header that is only there, and lets gcc's own win wherever both
+# have one. Unlike -L this is not a reordering: gcc orders its include chain correctly by
+# itself, it just must not be overruled from the front.
+TC_INCLUDE_FLAG = $(if $(OVERLAY_GCC_ON),-idirafter ,-I)$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+
+CFLAGS += $(TC_INCLUDE_FLAG)
 CFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 CFLAGS += $(TC_EXTRA_CFLAGS)
 
-CPPFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+CPPFLAGS += $(TC_INCLUDE_FLAG)
 CPPFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 CPPFLAGS += $(TC_EXTRA_CPPFLAGS)
 
-CXXFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+CXXFLAGS += $(TC_INCLUDE_FLAG)
 CXXFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 CXXFLAGS += $(TC_EXTRA_CXXFLAGS)
 
 ifneq ($(strip $(TC_HAS_FORTRAN)),)
-FFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
+FFLAGS += $(TC_INCLUDE_FLAG)
 FFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
 FFLAGS += $(TC_EXTRA_FFLAGS)
 endif
 
+# The gcc overlay's own runtimes come FIRST. --enable-version-specific-runtime-libs puts
+# them in lib/gcc/<target>/<vers>/, and the sysroot below still holds the vendor gcc's
+# libstdc++ -- 2008-era on ppc853x. Left in the default order the link picks that one and
+# fails on the C++11 ABI ("undefined reference to std::__cxx11::basic_string"), because
+# gcc 8.5 compiles into the __cxx11 namespace the old library never had. Wildcard rather
+# than a composed path: the directory only exists once the consumer is extracted.
+ifeq ($(OVERLAY_GCC_ON),1)
+LDFLAGS += $(addprefix -L,$(wildcard $(TC_OVERLAY_GCC)/work/install/usr/local/lib/gcc/$(TC_TARGET)/*))
+endif
 LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY))
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath-link,$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
