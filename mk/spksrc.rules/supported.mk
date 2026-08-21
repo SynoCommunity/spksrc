@@ -61,7 +61,7 @@ pre-build-native:
 	} ; [ $${PIPESTATUS[0]} -eq 0 ] || false
 
 $(TARGET_TYPE)-arch-% &: pre-build-native
-	-@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) arch-$*
+	-@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) $(OVERLAY_SELECTORS) arch-$*
 
 # One walk of the tree. The grep is not redundant with the sed inside dependency-unsupported:
 # stage0's bootstrap notice is an $(info) from the sub-make's PARSE, outside that pipe.
@@ -122,7 +122,7 @@ build-arch-%:
 	@# pipefail: _runlog ends in a pipeline, so without it $$? would be tee's, and a
 	@# failed build would be reported as a success.
 	@set -o pipefail ; \
-	$(call _runlog,MAKEFLAGS= GCC_DEBUG_INFO=$(GCC_DEBUG_INFO) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)),build-$*.log) ; \
+	$(call _runlog,MAKEFLAGS= GCC_DEBUG_INFO=$(GCC_DEBUG_INFO) $(MAKE) $(OVERLAY_SELECTORS) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)),build-$*.log) ; \
 	status=$$? ; \
 	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [END]\n" \
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
@@ -136,7 +136,7 @@ build-noarch-%:
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
 	       | tee --append $(STATUS_LOG)
 	@set -o pipefail ; \
-	$(call _runlog,MAKEFLAGS= $(MAKE) TCVERSION=$* ARCH=noarch,build-noarch-$*.log) ; \
+	$(call _runlog,MAKEFLAGS= $(MAKE) $(OVERLAY_SELECTORS) TCVERSION=$* ARCH=noarch,build-noarch-$*.log) ; \
 	status=$$? ; \
 	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, TCVERSION: %s, NAME: %s [END]\n" \
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
