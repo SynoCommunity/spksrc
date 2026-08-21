@@ -9,8 +9,6 @@ CHANGELOG += "2. Internal build options now follow toolchain capabilities"
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver
 
-# Needs C11 and working atomics -- gcc 4.9 or newer
-
 # Build with the gcc 8.5 overlay where the arch ships one: inert on a toolchain
 # that already has 8.5 or newer, and on any arch with no overlay at all.
 OVERLAY_GCC = 1
