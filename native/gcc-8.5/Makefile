@@ -47,9 +47,12 @@ ARCHIVE_STRIP_TARGET_DIRS = $(TC_TARGET) lib/gcc/$(TC_TARGET)
 # a compiler archive. An exclusion list rather than a dir allow-list, because the
 # C++ headers and runtime libs sit under <triple>/ for a cross arch but under the
 # native include/c++ + lib/ for a host==target one.
-ARCHIVE_EXCLUDES  = --exclude=./share
+ARCHIVE_EXCLUDES  = --exclude=./share/man --exclude=./share/info --exclude=./share/locale --exclude=./share/gcc-$(PKG_VERS)
 ARCHIVE_EXCLUDES += --exclude=./var
 ARCHIVE_EXCLUDES += --exclude='*/pkgconfig'
+# libtool archives bake this build's DESTDIR into libdir; a consumer that follows one
+# looks for a path that only exists here. Consumers drop them too, for archives already out.
+ARCHIVE_EXCLUDES += --exclude='*.la'
 ARCHIVE_EXCLUDES += --exclude='*/libgmp*'
 ARCHIVE_EXCLUDES += --exclude='*/libmpfr*'
 ARCHIVE_EXCLUDES += --exclude='*/libmpc*'
@@ -128,6 +131,29 @@ CONFIGURE_ARGS += --disable-bootstrap
 CONFIGURE_ARGS += --disable-nls
 CONFIGURE_ARGS += --disable-werror
 CONFIGURE_ARGS += --disable-libsanitizer
+
+# Record the ABI this compiler was BUILT with, as the -m flags a package must be given.
+# The base toolchain's TC_EXTRA_BUILD_FLAGS describes the vendor gcc: same intent, but
+# written for a compiler ten years older, and nothing keeps the two in step. A consumer
+# reads this file back so an overlay build is driven by the ABI its own compiler has --
+# and a future rebuild with a different one carries packages along instead of silently
+# disagreeing. Derived from GCC_TARGET_ABI, so there is one source for both.
+GCC_ABI_MFLAGS = $(strip \
+  $(patsubst --with-cpu=%,-mcpu=%,$(filter --with-cpu=%,$(GCC_TARGET_ABI))) \
+  $(patsubst --with-arch=%,-march=%,$(filter --with-arch=%,$(GCC_TARGET_ABI))) \
+  $(if $(findstring arm,$(TC_TARGET)),\
+    $(patsubst --with-float=%,-mfloat-abi=%,$(filter --with-float=%,$(GCC_TARGET_ABI))),\
+    $(patsubst --with-float=%,-m%-float,$(filter --with-float=%,$(GCC_TARGET_ABI)))) \
+  $(patsubst --with-fpu=%,-mfpu=%,$(filter --with-fpu=%,$(GCC_TARGET_ABI))) \
+  $(if $(filter --enable-e500_double,$(GCC_TARGET_ABI)),-mfloat-gprs=double))
+
+POST_INSTALL_TARGET = gcc-record-abi
+
+.PHONY: gcc-record-abi
+gcc-record-abi:
+	@install -d $(INSTALL_DIR)$(INSTALL_PREFIX)/share/spksrc
+	@echo "GCC_OVERLAY_ABI = $(GCC_ABI_MFLAGS)" > $(INSTALL_DIR)$(INSTALL_PREFIX)/share/spksrc/gcc-abi.mk
+	@$(MSG) "gcc-$(PKG_VERS): recorded ABI [$(GCC_ABI_MFLAGS)]"
 
 COMPILE_ARGS  = MAKEINFO=missing
 
