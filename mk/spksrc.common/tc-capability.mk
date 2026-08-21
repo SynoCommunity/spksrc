@@ -75,12 +75,18 @@ endif
 endif
 endif
 
-# ---- gcc: the compiler the toolchain ships ----------------------------------
+# ---- gcc: the compiler a build will actually use ----------------------------
+# The overlay's version when one is ACTIVE, the toolchain's own otherwise: a floor asks
+# what the compiler can do, and an active gcc overlay changes the answer. TC_GCC itself
+# stays the stock version -- it names consumer directories and drives gcc-abi.mk, both of
+# which must keep reading the vendor compiler.
+TC_GCC_EFFECTIVE = $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_VERS),$(TC_GCC))
+
 # Plain ifeq rather than a nested $(if): version_ge returns empty for false.
 ifneq ($(strip $(MIN_GCC_VERSION)),)
-ifneq ($(strip $(TC_GCC)),)
-ifeq ($(call version_ge,$(TC_GCC),$(MIN_GCC_VERSION)),)
-TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)gcc $(TC_GCC) < $(MIN_GCC_VERSION)
+ifneq ($(strip $(TC_GCC_EFFECTIVE)),)
+ifeq ($(call version_ge,$(TC_GCC_EFFECTIVE),$(MIN_GCC_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)gcc $(TC_GCC_EFFECTIVE) < $(MIN_GCC_VERSION)
 endif
 endif
 endif
