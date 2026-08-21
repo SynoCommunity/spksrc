@@ -12,6 +12,10 @@ LICENSE  = GPLv2
 
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
+# ffmpeg 8 wants C11 static assertions, and static_assert is a LIBC macro -- glibc only
+# grew it in 2.16. The gcc overlay raises the compiler floor, not the libc one, so this
+# has to be said separately or ppc853x/qoriq (2.8) and the 2.15 archs die at configure.
+MIN_GLIBC_VERSION = 2.16
 
 # Build with the gcc 8.5 overlay where the arch ships one: inert on a toolchain
 # that already has 8.5 or newer, and on any arch with no overlay at all.
@@ -20,6 +24,13 @@ OVERLAY_GCC = 1
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+# ffmpeg derives its compilers from --cross-prefix and ignores CC/CXX, so it would pick
+# the stock ones under a gcc overlay: configure dies on --cc, and --cxx only shows up at
+# the final LDXX. Take what tc_vars RECORDED for this work dir -- it already resolved
+# overlay vs stock, and knows where each lives.
+_ffmpeg_tcvar = $(shell sed -n 's|^TC_ENV += $(1)="\(.*\)"$$|\1|p' $(WORK_DIR)/tc_vars.autotools.mk 2>/dev/null)
+CONFIGURE_ARGS += --cc=$(or $(call _ffmpeg_tcvar,CC),$(TC_PATH)$(TC_PREFIX)gcc)
+CONFIGURE_ARGS += --cxx=$(or $(call _ffmpeg_tcvar,CXX),$(TC_PATH)$(TC_PREFIX)g++)
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
@@ -258,7 +269,9 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+# ppc853x is the same e500v2 core as qoriq -- same triple, same -mcpu=8548 -- and was
+# simply never listed. Its glibc 2.8 keeps it out today; this stops it being a surprise.
+ifeq ($(findstring $(ARCH),ppc853x qoriq),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
@@ -273,17 +286,23 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-vaapi
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
+# libdrm, libva and Intel MediaSDK all come from the videodriver meta, which
+# spk/synocli-videodriver declares from DSM 6.2.4 on. Asking for them below that
+# stops configure dead ("libmfx not found") instead of simply going without.
+#
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
 #   - libvpl (oneVPL) → Gen12+, no Synology NAS has that
+ifeq ($(call version_ge, $(TCVERSION), 6.2.4),1)
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
+endif
 
 # Enable OpenCL and Vulkan acceleration
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
