@@ -70,6 +70,13 @@ OVERLAY_BINUTILS       ?= 0
 OVERLAY_GCC            ?= 0
 RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(TC_OVERLAY_RUSTC)),1)
 
+# A compiler or linker choice has to hold for a package AND everything it links against:
+# objects from gcc 4.3.7 will not mix with gcc 8.5 C++. depend.mk invokes each dependency
+# with the current environment and these are read with ?=, so exporting them is what
+# carries one package's choice down its whole dependency tree.
+export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
+export OVERLAY_RUSTC_VERS OVERLAY_BINUTILS_VERS OVERLAY_GCC_VERS
+
 # ---- ACTIVE ------------------------------------------------------------------------
 # Lazy (=): local.mk is read before this file, but a switch may also arrive from the
 # environment or the command line. The wildcards above stay immediate.
