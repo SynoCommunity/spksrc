@@ -1,0 +1,10 @@
+[
+  {
+    "step_title": "Information",
+    "items": [
+      {
+        "desc": "SimpleExtJSWidget is a demo DSM widget aimed to document Synology's GUI framework based on ExtJS.<br><br>For more information, you can visit the <a target=\"_blank\" href=\"https://github.com/DigitalBox98/SimpleExtJSApp\">SimpleExtJSApp Github page</a>."
+      }
+    ]
+  }
+]
