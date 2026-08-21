@@ -13,6 +13,10 @@ LICENSE  = GPLv2
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
+# Build with the gcc 8.5 overlay where the arch ships one: inert on a toolchain
+# that already has 8.5 or newer, and on any arch with no overlay at all.
+OVERLAY_GCC = 1
+
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)

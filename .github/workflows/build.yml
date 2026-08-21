@@ -281,7 +281,10 @@ jobs:
           add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
-          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
+          # TEMP (revert before merge): activate DSM 5.2 so the gcc 8.5 overlay is
+          # exercised on the oldest toolchains -- ppc853x-5.2 and x86-5.2 build
+          # ffmpeg8 through it, libstdc++ carried from the overlay.
+          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'true' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
