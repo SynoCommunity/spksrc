@@ -1,0 +1,3 @@
+lnk:lib/libLerc.so
+lnk:lib/libLerc.so.4
+lib:lib/libLerc.so.4.0.0
