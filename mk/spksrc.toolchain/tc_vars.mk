@@ -57,6 +57,7 @@ COOKIE_PREFIX =
 TC_PATH                   = $(TC_WORK_DIR)/$(TC_TARGET)/bin/
 TC_OVERLAY_BINUTILS_PATH  = $(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN)/)
 TC_OVERLAY_GCC_PATH       = $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN)/)
+TC_GCC_SUFFIX             = $(OVERLAY_GCC_SUFFIX)
 
 # The cmake variable a tool fills, given its TOOLS name; the build-host twin is the
 # same with _FOR_BUILD appended. Anything not named here is CMAKE_<name>.
@@ -356,10 +357,6 @@ tc_flags:
 # can write its own fallback -- see the tc macro in spksrc.common/macros.mk, which is what
 # packages should call rather than assembling a path. Trailing slash, like TC_PATH.
 #
-# The GCC arm is inert today: no gcc overlay exists yet, so OVERLAY_GCC_ON is undefined and
-# the value comes out empty. It is emitted anyway so the contract is whole and a gcc
-# overlay needs no change here to switch it on.
-#
 # The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
 # would inherit the previous run's choice and the switch would go sticky.
 tc_vars:
@@ -399,7 +396,7 @@ endif
 #####
 
 ifeq ($(wildcard $(TCVARS_COOKIE)),)
-tcvars: overlay-binutils-warn overlay-rustc-warn generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
+tcvars: overlay-binutils-warn overlay-gcc-warn overlay-rustc-warn overlay-binutils-install overlay-gcc-install generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
 
 $(TCVARS_COOKIE): $(POST_TCVARS_TARGET)
 	$(create_target_dir)
