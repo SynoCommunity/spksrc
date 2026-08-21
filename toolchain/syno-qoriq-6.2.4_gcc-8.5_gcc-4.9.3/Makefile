@@ -12,7 +12,7 @@ TC_EXTRA_BUILD_FLAGS = -mcpu=8548 -mhard-float -mfloat-gprs=double
 PKG_NAME = gcc
 PKG_VERS = 8.5.0
 PKG_EXT  = txz
-PKG_REV ?= v1
+PKG_REV ?= v3
 EXTRACT_PATH = $(INSTALL_DIR)
 
 DEPENDS =
