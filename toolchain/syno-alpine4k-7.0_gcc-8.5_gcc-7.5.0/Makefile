@@ -4,10 +4,15 @@ TC_TARGET = arm-unknown-linux-gnueabi
 # Archive to fetch: this arch's own, or the real arch whose toolchain a meta shares.
 PKG_DIST_ARCH = $(TC_ARCH)
 
+# The ABI a build uses while this overlay is active, in place of the legacy toolchain's.
+# Identical to it today; kept here so a compiler that spells or defaults differently can
+# be corrected in one place, next to the compiler concerned.
+TC_EXTRA_BUILD_FLAGS = -mfloat-abi=hard -mtune=cortex-a15 -mfpu=neon-vfpv4 -mthumb
+
 PKG_NAME = gcc
 PKG_VERS = 8.5.0
 PKG_EXT  = txz
-PKG_REV ?= v1
+PKG_REV ?= v2
 EXTRACT_PATH = $(INSTALL_DIR)
 
 DEPENDS =
@@ -40,6 +45,7 @@ GCC_SYSROOT_DIR  = $(firstword $(wildcard ../$(TC_BASE)/work/$(TC_TARGET)/$(TC_T
 #   as / ld   gcc's driver looks in libexec/gcc/<target>/<vers>/ before PATH, and picks up
 #             the HOST assembler if nothing is there. The -B shim covers compiles that
 #             carry CFLAGS; this covers the ones that do not.
+#   *.la      libtool archives bake the producer's DESTDIR into libdir; unusable here.
 .PHONY: gcc-overlay-link
 gcc-overlay-link:
 	@test -n "$(GCC_SYSROOT_DIR)"  || { $(MSG) "gcc overlay: no sysroot under ../$(TC_BASE)" ; exit 1 ; }
@@ -51,4 +57,5 @@ gcc-overlay-link:
 	 for tool in as ld ; do \
 	   ln -sf $(abspath $(GCC_BINUTILS_DIR))/work/install/usr/local/bin/$(TC_TARGET)-$${tool} $${gccexec}/$${tool} ; \
 	 done
+	@find $(INSTALL_DIR) -name '*.la' -delete
 	@$(MSG) "gcc overlay: linked sysroot + as/ld from $(notdir $(GCC_BINUTILS_DIR))"
