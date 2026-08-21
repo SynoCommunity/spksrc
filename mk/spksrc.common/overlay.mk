@@ -72,7 +72,12 @@ RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(TC_OVERLAY_RUSTC)),1)
 
 # Carried to every sub-make that resolves a toolchain (FWRD_ARGS, spksrc.common.mk). Not
 # RUST_LINK_VIA_BINUTILS: it derives from TC_OVERLAY_RUSTC, which the child reads itself.
-FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS
+FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
+
+# A backstop for a sub-make nobody forwards to, and the only way the _VERS pins travel:
+# objects from gcc 4.3.7 will not mix with gcc 8.5 C++, so a choice must hold tree-wide.
+export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
+export OVERLAY_RUSTC_VERS OVERLAY_BINUTILS_VERS OVERLAY_GCC_VERS
 
 # ---- ACTIVE ------------------------------------------------------------------------
 # Lazy (=): local.mk is read before this file, but a switch may also arrive from the
