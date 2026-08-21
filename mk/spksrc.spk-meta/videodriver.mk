@@ -5,7 +5,10 @@
 # archs when VIDEODRV_PACKAGE is set.
 ###############################################################################
 
-IS_VIDEODRV_SUPPORTED := $(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS))
+# spk/synocli-videodriver declares REQUIRED_MIN_DSM = 6.2.4, so selecting it on an older
+# DSM aborts the consumer's build instead of simply going without. Ask the version here,
+# as the tools block below already does.
+IS_VIDEODRV_SUPPORTED := $(if $(call version_ge,$(TCVERSION),6.2.4),$(findstring $(ARCH),$(x64_ARCHS) $(ARMv8_ARCHS)))
 
 ifneq ($(IS_VIDEODRV_SUPPORTED),)
 
