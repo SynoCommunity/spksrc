@@ -74,7 +74,12 @@ TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-$(OV
 # Ignore a forwarded set: FWRD_ARGS re-emits these on the sub-make command line, which
 # would turn local.mk's default into an apparent refusal in every dependency. The
 # top-level make is the one that sees the real command line, and warns once.
-_OVERLAY_BINUTILS_ASKED := $(if $(_OVERLAY_FORWARDED),,$(if $(findstring command,$(origin OVERLAY_BINUTILS))$(findstring environment,$(origin OVERLAY_BINUTILS)),1))
+#
+# The command line only, not the environment: the switches are exported below, so every
+# sub-make sees them in its environment and would read the export itself as a refusal.
+# Cost: `OVERLAY_BINUTILS=0 make ...` as a shell variable warns nothing. Say it on the
+# command line, where make can tell it apart from what it exported itself.
+_OVERLAY_BINUTILS_ASKED := $(if $(_OVERLAY_FORWARDED),,$(if $(findstring command,$(origin OVERLAY_BINUTILS)),1))
 OVERLAY_RUSTC          ?= 1
 OVERLAY_BINUTILS       ?= 0
 OVERLAY_GCC            ?= 0
@@ -92,6 +97,13 @@ _OVERLAY_FORWARDED := 1
 # objects from gcc 4.3.7 will not mix with gcc 8.5 C++, so a choice must hold tree-wide.
 export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
 export OVERLAY_RUSTC_VERS OVERLAY_BINUTILS_VERS OVERLAY_GCC_VERS
+
+# Exported as a BACKSTOP, not as the mechanism. An exported value arrives with environment
+# origin, which any `OVERLAY_x = ...` in a package Makefile overrides -- so it cannot
+# enforce one compiler across a tree on its own. OVERLAY_SELECTORS above can, because a
+# command-line variable outranks everything. The export only covers a sub-make nobody
+# forwarded to, where inheriting the switch beats inheriting nothing.
+export OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
 
 # ---- ACTIVE ------------------------------------------------------------------------
 # Lazy (=): local.mk is read before this file, but a switch may also arrive from the
