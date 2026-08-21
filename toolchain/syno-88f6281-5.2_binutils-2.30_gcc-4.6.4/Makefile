@@ -1,6 +1,8 @@
 TC_ARCH = 88f6281
 TC_VERS = 5.2
 TC_TARGET = arm-marvell-linux-gnueabi
+# Archive to fetch: this arch's own, or the real arch whose toolchain a meta shares.
+PKG_DIST_ARCH = $(TC_ARCH)
 
 PKG_NAME = binutils
 PKG_VERS = 2.30
@@ -17,7 +19,7 @@ LICENSE  = GPLv3
 INSTALL_TARGET = nop
 POST_INSTALL_TARGET = binutils-shim
 
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-$(TC_TARGET)-$(TC_ARCH)-$(TC_VERS)-$(PKG_REV).$(PKG_EXT)
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS)-$(TC_TARGET)-$(PKG_DIST_ARCH)-$(TC_VERS)-$(PKG_REV).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/SynoCommunity/spksrc/releases/download/pre-releases
 
 include ../../mk/spksrc.native-install.mk
