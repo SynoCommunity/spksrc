@@ -165,8 +165,14 @@ endif
 # fails on the C++11 ABI ("undefined reference to std::__cxx11::basic_string"), because
 # gcc 8.5 compiles into the __cxx11 namespace the old library never had. Wildcard rather
 # than a composed path: the directory only exists once the consumer is extracted.
+#
+# --rpath-link as well as -L: ld does NOT use -L to resolve a shared library's transitive
+# DT_NEEDED. Without it, a C program linking a C++ .so finds libstdc++.so.6 through the
+# sysroot instead -- the vendor's -- and fails on __cxx11 even though -L was right.
 ifeq ($(OVERLAY_GCC_ON),1)
-LDFLAGS += $(addprefix -L,$(wildcard $(TC_OVERLAY_GCC)/work/install/usr/local/lib/gcc/$(TC_TARGET)/*))
+_TC_OVERLAY_GCC_LIBS = $(wildcard $(TC_OVERLAY_GCC)/work/install/usr/local/lib/gcc/$(TC_TARGET)/*)
+LDFLAGS += $(addprefix -L,$(_TC_OVERLAY_GCC_LIBS))
+LDFLAGS += $(addprefix -Wl$(_tc_comma)--rpath-link$(_tc_comma),$(_TC_OVERLAY_GCC_LIBS))
 endif
 LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY))
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
