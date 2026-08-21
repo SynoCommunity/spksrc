@@ -193,10 +193,12 @@ ifneq ($(strip $(TC_OVERLAY_RUSTC)),)
 DEPENDS += toolchain/$(notdir $(firstword $(TC_OVERLAY_RUSTC)))
 endif
 
-# OVERLAY_<component> family together, base layer first: overlay-binutils sets the
-# shim path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-rustc + tc_vars read, and
-# overlay-rustc resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
+# OVERLAY_<component> family together, base layer first: overlay-binutils sets the shim
+# path / -B flag / RUST_LINK_VIA_BINUTILS that overlay-gcc, overlay-rustc and tc_vars all
+# read; overlay-gcc resolves the compiler suffix tc_vars appends; and overlay-rustc
+# resolves TC_RUSTUP_TOOLCHAIN / RUST_TARGET that tc-rust then consumes.
 include ../../mk/spksrc.toolchain/overlay-binutils.mk
+include ../../mk/spksrc.toolchain/overlay-gcc.mk
 include ../../mk/spksrc.toolchain/overlay-rustc.mk
 include ../../mk/spksrc.toolchain/tc-rust.mk
 
