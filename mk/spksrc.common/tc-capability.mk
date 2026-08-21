@@ -6,7 +6,12 @@
 #
 #   MIN_GLIBC_VERSION = 2.20    needs glibc 2.20 or newer
 #   MIN_GCC_VERSION   = 8       needs gcc 8 or newer
+#   MIN_RUSTC_VERSION = 1.85    needs rustc 1.85 or newer
 #   REQUIRE_64BIT     = 1       needs a 64-bit target
+#
+# A floor REFUSES the arch. Where a package must instead CHOOSE between versions of
+# itself -- the cross/<pkg> virtuals -- compare TC_GCC / TC_GLIBC / TC_KERNEL / TC_RUSTC
+# with version_ge directly.
 #
 # This replaces "UNSUPPORTED_ARCHS = <list>" for capability reasons. A hardcoded
 # list says WHERE a package fails, not WHY; it has to be rechecked by hand every
@@ -20,6 +25,19 @@
 # A failing check sets TC_CAPABILITY_UNSUPPORTED to a human sentence; pre-check.mk
 # turns that into the arch-refusal error, next to UNSUPPORTED_ARCHS.
 ###############################################################################
+
+# Does this toolchain's gcc ship libatomic? Ask it, rather than tabulate.
+#
+# A target without native 64-bit atomics (ARMv5, PowerPC e500v2) makes gcc emit calls into
+# libatomic, which the link then has to resolve. But the library only ships from gcc 4.7 on,
+# and handing -latomic to an older gcc is fatal ("cannot find -latomic"). Availability is the
+# exact criterion, not a proxy: a gcc old enough to lack libatomic also predates the __atomic_*
+# builtins, emits __sync_* instead, and so never needs the library. One question answers both.
+#
+# Lazy (=), unlike the static reads below: it RUNS the cross gcc, which does not exist yet
+# while the toolchain is still being bootstrapped. Outside the ARCH guard, and keyed on
+# TC_* only, so the native producers (spksrc.native/toolchain-rust.mk) reach it too.
+TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
 
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
 
@@ -64,6 +82,29 @@ ifneq ($(strip $(TC_GCC)),)
 ifeq ($(call version_ge,$(TC_GCC),$(MIN_GCC_VERSION)),)
 TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)gcc $(TC_GCC) < $(MIN_GCC_VERSION)
 endif
+endif
+endif
+
+# ---- rustc: the rust version the toolchain pins -----------------------------
+# Custom-rust archs (qoriq/ppc853x/88f6281/x86-5.2) are pinned to the rust version their
+# overlay ships (1.82.0, the last supporting their old glibc), read from the rust consumer's
+# PKG_VERS; a toolchain still pinning TC_RUSTC itself is honored too.
+_TC_CAP_RUST_MK := $(firstword $(wildcard $(BASEDIR)/toolchain/syno-$(ARCH)-$(TCVERSION)_rust-*/Makefile))
+ifneq ($(strip $(_TC_CAP_RUST_MK)),)
+_TC_CAP_RUSTC := $(shell sed -n 's/^PKG_VERS *= *//p' $(_TC_CAP_RUST_MK) 2>/dev/null)
+else
+_TC_CAP_RUSTC := $(shell sed -n 's/^TC_RUSTC *= *//p' $(_TC_CAP_MK) 2>/dev/null)
+endif
+
+# Published beside TC_GCC/TC_GLIBC/TC_KERNEL, and never empty: only an ACTIVE overlay pins a
+# version, otherwise the arch really does build on rustup 'stable' -- which sorts above every
+# number, so it clears any floor without a network query.
+# ?=, so spksrc.toolchain.mk keeps the last word inside a toolchain dir.
+TC_RUSTC ?= $(if $(OVERLAY_RUSTC_ON),$(_TC_CAP_RUSTC),stable)
+
+ifneq ($(strip $(MIN_RUSTC_VERSION)),)
+ifeq ($(call version_ge,$(TC_RUSTC),$(MIN_RUSTC_VERSION)),)
+TC_CAPABILITY_UNSUPPORTED := $(TC_CAPABILITY_UNSUPPORTED)$(_tc_cap_join)rustc $(TC_RUSTC) < $(MIN_RUSTC_VERSION)
 endif
 endif
 

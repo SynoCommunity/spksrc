@@ -70,7 +70,72 @@ If you only read one thing, read this. The details are in the dated log below.
   package's build cookies to re-run it from scratch, the native counterpart of
   `spkclean`.
 
+- **Rust builds on the legacy archs, and overlays are a first-class notion.** The archs
+  `rustup` has no usable `rust-std` for — PowerPC e500 (`qoriq`, `ppc853x`), ARMv5
+  `88f6281`, `x86-5.2` — now get a Rust toolchain built from source, published as an
+  archive and pulled in like any other dependency. That fixes long-standing failures on
+  those archs (SPE float, the ppc853x TLS relocations, `AtomicU64`). It also
+  generalises: a component shipped **beside** a base toolchain is an *overlay*, switched
+  with **`OVERLAY_RUSTC`** / **`OVERLAY_BINUTILS`** from `local.mk`, and `make help`
+  shows which are active for your arch.
+
 ---
+
+??? note "August 17th 2026 — Custom from-source Rust toolchains, and the overlay family (#7353)"
+    - **What:** the archs `rustup` ships no usable prebuilt `rust-std` for now build
+      Rust **from source** — `native/rustc-1.82` produces a `rust-<id>-<rev>.txz`, a
+      per-arch consumer under `toolchain/syno-<arch>-<dsm>_rust-<vers>_gcc-<gcc>/`
+      downloads it, and the base toolchain pulls that in through `DEPENDS`. Tier-3
+      PowerPC e500 (`qoriq`, `ppc853x`) has no prebuilt std at all; ARMv5 `88f6281` and
+      `x86-5.2` only ship one built against a newer glibc than DSM provides.
+    - **Why it matters beyond Rust:** it introduces the **`OVERLAY_<component>`** family
+      — a component shipped *beside* a base toolchain rather than replacing it. Rust and
+      binutils 2.30 are the first two; a gcc-8.5 overlay is the next. Every decision is
+      resolved once, in `mk/spksrc.common/overlay.mk`, which keeps three questions
+      apart: *available* (`TC_OVERLAY_<c>` — the consumer dir), *requested*
+      (`OVERLAY_<c>`), *active* (`OVERLAY_<c>_ON`). Conflating them is what produced the
+      bugs this split now prevents.
+    - **Switches**, written to `local.mk` by `make setup` and overridable per build:
+
+        ```bash
+        OVERLAY_BINUTILS=1 make -C cross/bat-0.25 arch-qoriq-6.2.4
+        ```
+
+        with precedence `command line > environment > local.mk > defaults`. A request
+        that cannot be honored degrades to the stock tools and says so in a banner
+        rather than failing. `make help` in `cross/`, `spk/` and `diyspk/` prints the
+        switches, the value in effect, and what it resolves to for your arch.
+    - **Arch issues fixed along the way:** per-target rustflags, so the PowerPC SPE
+      codegen options actually reach the compiler (`-Ctarget-cpu=e500
+      -Ctarget-feature=+spe`, not `+efpu2`) — the qoriq `bat`/`lsd` SIGILL of #7304; the
+      ppc853x TLS/PIE relocations, by routing only the Rust link through binutils 2.30
+      while C keeps the vendor `as`/`ld`; and `AtomicU64` on 32-bit, by widening the
+      target spec wherever the arch's gcc ships `libatomic` (which unblocked `helix` on
+      qoriq).
+    - Package-facing: nothing changes on a standard arch. On a legacy one, a package
+      that needs a newer toolchain than these pin should say so with `MIN_RUSTC_VERSION`
+      / `MIN_GLIBC_VERSION` rather than an arch list. See [Toolchain: custom from-source
+      Rust](toolchain.md#custom-from-source-rust-toolchains).
+    - **Choosing instead of refusing:** a floor refuses an arch, but the `cross/<pkg>`
+      virtuals have to pick a version of themselves instead. `TC_RUSTC` is now published
+      beside `TC_GCC` / `TC_GLIBC` / `TC_KERNEL` — the rustc a toolchain pins, or
+      `stable` when it uses rustup's newest — so a virtual routes with
+      `$(call version_ge,$(TC_RUSTC),<vers>)`. `cross/bat`, `cross/ripgrep`, `cross/lsd`
+      and `cross/eza` moved off `$(ARMv5_ARCHS) $(PPC_ARCHS)`, which had been standing in
+      for "pinned to rustc 1.82" and so silently missed `x86-5.2`, a fourth arch this PR
+      pins. `cross/helix` likewise replaced its ARMv7L exclusion with
+      `MIN_GCC_VERSION = 4.9`: its C++ tree-sitter grammars build with `-std=c++14`,
+      which g++ rejects before 4.9. Same story for the `$(OLD_PPC_ARCHS)` exclusions on
+      the rust packages, which already named their reason in a comment: `cross/bat` and
+      `cross/fd` reach `pipe2` through a dependency crate, so they declare
+      `MIN_GLIBC_VERSION = 2.9`; `cross/ripgrep`'s pcre2 wants `-std=c11`, so
+      `MIN_GCC_VERSION = 4.6`. Those lists read "except qoriq" while `qoriq-5.2` runs the
+      same glibc 2.8 and gcc 4.3.7 as `ppc853x`, so the floors refuse an arch the lists
+      let through. `cross/sd` and `cross/eza` lose their exclusion outright: their only
+      blocker was std's own `pthread_setname_np`, which the weak-link patch above
+      resolves, and both are confirmed building and running on ppc853x (@hgy59) — so
+      `synocli-file` ships them there.
+    - Pull request: [#7353](https://github.com/SynoCommunity/spksrc/pull/7353)
 
 ??? note "July 24th 2026 — Host a native build's output as a reusable archive (#7327, #7386)"
     - **What:** a new opt-in step, `spksrc.build/archive.mk` (included by

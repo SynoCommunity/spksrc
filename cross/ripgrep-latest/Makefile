@@ -8,10 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/pcre2
 
-# powerpc archs (except qoriq) are not supported
-UNSUPPORTED_ARCHS  = $(OLD_PPC_ARCHS) 
-# Rust edition2024 required (rustc >= 1.85)
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS) $(PPC_ARCHS)
+# Rust edition2024 required
+MIN_RUSTC_VERSION = 1.85
 # asm error:
 UNSUPPORTED_ARCHS_TCVERSION = evansport-6.2.4
 
@@ -36,8 +34,5 @@ endif
 
 CARGO_BUILD_ARGS = --locked
 CARGO_BUILD_ARGS += --features pcre2
-
-# let rg find libpcre2-* at runtime
-ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"  
 
 include ../../mk/spksrc.cross-rust.mk

@@ -8,12 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-# linker error:  undefined reference to `pthread_setname_np'
-UNSUPPORTED_ARCHS  = $(OLD_PPC_ARCHS)
-# eza >= 0.20.19 requires RUST_TOOLCHAIN >= 1.78
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 # eza >= 0.23.5 requires RUST_TOOLCHAIN >= 1.90
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+MIN_RUSTC_VERSION = 1.90
 
 HOMEPAGE = https://eza.rocks/
 COMMENT  = A modern replacement for 'ls'.

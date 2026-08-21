@@ -213,15 +213,13 @@ DEPENDS += python/rencode
 # Require environment variables
 #   PYO3_CROSS_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib/
 #   PYO3_CROSS_INCLUDE_DIR=$(STAGING_INSTALL_PREFIX)/include/
-# Version = 0.21 requires rustc >= 1.77 (armv5)
-# Version = 0.24 requires rustc >= 1.82 (qoriq)
-# Version = 0.25 requires rustc >= 1.85
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS += rpds_py==0.21.0
-else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-WHEELS += rpds_py==0.24.0
-else
+# Version >= 0.25 requires rustc >= 1.85 (its archery dep is edition2024), 0.24 needs 1.82.
+# Stated as a floor: "<= 1.82" put the boundary on the wrong side, since version sort ranks
+# 1.82.0 -- what the overlay archs pin -- above 1.82.
+ifeq ($(call version_ge, $(TC_RUSTC), 1.85),1)
 WHEELS += rpds_py==0.30.0
+else
+WHEELS += rpds_py==0.24.0
 endif
 
 # [scipy] - depends on numpy >= 2.x

@@ -1,9 +1,7 @@
-PKG_NAME = sd-main
+PKG_NAME = sd-virtual
 
 OPTIONAL_DEPENDS  = cross/sd-latest
 OPTIONAL_DEPENDS += cross/sd-1.0
-
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 include ../../mk/spksrc.common.mk
 

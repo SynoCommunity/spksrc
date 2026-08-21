@@ -8,19 +8,13 @@ OPTIONAL_DEPENDS += cross/fd-10.3
 # see: https://github.com/sharkdp/fd/issues/1428
 # we can no longer downgrade to rust 1.77.2 for ARMv7L to build fd 8.7.0
 UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
+# pipe2 landed in glibc 2.9
+MIN_GLIBC_VERSION = 2.9
 # issues with atomic library
 UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
 
-# undefined reference to 'pipe2' with glibc 2.8
-MIN_GLIBC_VERSION = 2.9
 
-include ../../mk/spksrc.common.mk
+CARGO_BUILD_ARGS = --locked --verbose
 
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
-# latest version that builds for qoriq with rustc 1.87.0 (version 10.4.x requires rustc 1.90.0)
-DEPENDS = cross/fd-10.3
-else
-DEPENDS = cross/fd-latest
-endif
-
+include ../../mk/spksrc.cross-rust.mk
 include ../../mk/spksrc.cross-virtual.mk

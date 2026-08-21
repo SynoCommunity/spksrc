@@ -11,9 +11,6 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-# linker error:  undefined reference to `pthread_setname_np'
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 HOMEPAGE = https://eza.rocks/
 COMMENT  = A modern replacement for 'ls'.
 LICENSE  = MIT
