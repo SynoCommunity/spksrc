@@ -29,7 +29,11 @@
 
 # Does this toolchain's gcc ship libatomic? Ask it -- a gcc too old to have it also predates
 # __atomic_* and never needs it. Lazy (=), outside the ARCH guard: it runs the cross gcc.
-TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
+#
+# The one a build will USE, not the one shipped: an overlay gcc has libatomic exactly where
+# the vendor one predates it. By wildcard -- packages read this file, overlay-gcc.mk not.
+_TC_LIBATOMIC_CC = $(or $(firstword $(wildcard $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)/work/install/usr/local/bin/$(TC_PREFIX)gcc-[0-9]*))),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)
+TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(_TC_LIBATOMIC_CC) -print-file-name=libatomic.so 2>/dev/null)),1)
 
 # Outside the guard on purpose: the native producers read TC_HAS_LIBATOMIC with no ARCH.
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
