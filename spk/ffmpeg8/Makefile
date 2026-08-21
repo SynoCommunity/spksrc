@@ -11,10 +11,6 @@ VIDEODRV_PACKAGE = synocli-videodriver
 
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
-# ffmpeg 8 wants C11 static assertions, and static_assert is a LIBC macro -- glibc only
-# grew it in 2.16. The gcc overlay raises the compiler floor, not the libc one, so this
-# has to be said separately or ppc853x/qoriq (2.8) and the 2.15 archs die at configure.
-MIN_GLIBC_VERSION = 2.16
 
 # Build with the gcc 8.5 overlay where the arch ships one: inert on a toolchain
 # that already has 8.5 or newer, and on any arch with no overlay at all.
