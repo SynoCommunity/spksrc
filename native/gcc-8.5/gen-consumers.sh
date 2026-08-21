@@ -115,6 +115,7 @@ GCC_SYSROOT_DIR  = \$(firstword \$(wildcard ../\$(TC_BASE)/work/\$(TC_TARGET)/\$
 #   as / ld   gcc's driver looks in libexec/gcc/<target>/<vers>/ before PATH, and picks up
 #             the HOST assembler if nothing is there. The -B shim covers compiles that
 #             carry CFLAGS; this covers the ones that do not.
+#   *.la      libtool archives bake the producer's DESTDIR into libdir; unusable here.
 .PHONY: gcc-overlay-link
 gcc-overlay-link:
 	@test -n "\$(GCC_SYSROOT_DIR)"  || { \$(MSG) "gcc overlay: no sysroot under ../\$(TC_BASE)" ; exit 1 ; }
@@ -126,6 +127,7 @@ gcc-overlay-link:
 	 for tool in as ld ; do \\
 	   ln -sf \$(abspath \$(GCC_BINUTILS_DIR))/work/install/usr/local/bin/\$(TC_TARGET)-\$\${tool} \$\${gccexec}/\$\${tool} ; \\
 	 done
+	@find \$(INSTALL_DIR) -name '*.la' -delete
 	@\$(MSG) "gcc overlay: linked sysroot + as/ld from \$(notdir \$(GCC_BINUTILS_DIR))"
 EOF
     made=$((made+1))
