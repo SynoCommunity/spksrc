@@ -65,6 +65,16 @@ TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-$(OV
 # OVERLAY_GCC            a modern gcc beside the vendor one, selected by version suffix.
 #                        Off by default: installing one must not silently move any
 #                        existing package onto a different compiler.
+#
+# Was binutils REFUSED, or merely left at a default? Only the command line and the
+# environment express a refusal -- local.mk holds a ?= default like this file, so "file"
+# cannot tell the two apart. This decides between forcing binutils on for gcc and warning
+# that the pair was broken on purpose.
+#
+# Ignore a forwarded set: FWRD_ARGS re-emits these on the sub-make command line, which
+# would turn local.mk's default into an apparent refusal in every dependency. The
+# top-level make is the one that sees the real command line, and warns once.
+_OVERLAY_BINUTILS_ASKED := $(if $(_OVERLAY_FORWARDED),,$(if $(findstring command,$(origin OVERLAY_BINUTILS))$(findstring environment,$(origin OVERLAY_BINUTILS)),1))
 OVERLAY_RUSTC          ?= 1
 OVERLAY_BINUTILS       ?= 0
 OVERLAY_GCC            ?= 0
@@ -72,7 +82,11 @@ RUST_LINK_VIA_BINUTILS ?= $(if $(strip $(TC_OVERLAY_RUSTC)),1)
 
 # Carried to every sub-make that resolves a toolchain (FWRD_ARGS, spksrc.common.mk). Not
 # RUST_LINK_VIA_BINUTILS: it derives from TC_OVERLAY_RUSTC, which the child reads itself.
-FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC
+FWRD_VARS += OVERLAY_RUSTC OVERLAY_BINUTILS OVERLAY_GCC _OVERLAY_FORWARDED
+
+# Set after the test above read the real command line, and carried from here on: a child
+# must not mistake the value it was handed for a request of its own.
+_OVERLAY_FORWARDED := 1
 
 # A backstop for a sub-make nobody forwards to, and the only way the _VERS pins travel:
 # objects from gcc 4.3.7 will not mix with gcc 8.5 C++, so a choice must hold tree-wide.
@@ -83,10 +97,17 @@ export OVERLAY_RUSTC_VERS OVERLAY_BINUTILS_VERS OVERLAY_GCC_VERS
 # Lazy (=): local.mk is read before this file, but a switch may also arrive from the
 # environment or the command line. The wildcards above stay immediate.
 OVERLAY_RUSTC_ON     = $(if $(strip $(TC_OVERLAY_RUSTC)),$(if $(filter 1 on ON,$(strip $(OVERLAY_RUSTC))),1))
-# A gcc overlay turns this on whatever OVERLAY_BINUTILS says: gcc reaches as/ld only
-# through OVERLAY_BINUTILS_FLAG, so the pair is one decision, not two. No cycle --
-# OVERLAY_GCC_ON tests availability (TC_OVERLAY_BINUTILS), not this.
+# A gcc overlay turns this on unconditionally: gcc reaches as/ld only through
+# OVERLAY_BINUTILS_FLAG, so the pair is ONE decision. There is deliberately no way to
+# refuse it -- gcc 8.5 on the vendor as/ld cannot assemble what it emits, so obeying such
+# a request would only buy a confusing failure later. A package therefore activates
+# OVERLAY_GCC alone. No cycle: OVERLAY_GCC_ON tests availability, not this.
 OVERLAY_BINUTILS_ON  = $(if $(strip $(TC_OVERLAY_BINUTILS)),$(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS)))$(OVERLAY_GCC_ON),1))
+
+# gcc asked for, binutils explicitly refused. Unsupported: gcc 8.5 then drives the vendor
+# as/ld, which cannot assemble what it emits.
+# Overridden rather than obeyed: say so instead of flipping it in silence.
+OVERLAY_BINUTILS_FORCED = $(if $(_OVERLAY_BINUTILS_ASKED),$(if $(OVERLAY_GCC_ON),$(if $(filter 1 on ON,$(strip $(OVERLAY_BINUTILS))),,1)))
 # GCC additionally requires binutils to be available: it drives as/ld through -B into that
 # overlay's shim, and the vendor ones cannot assemble what a modern gcc emits.
 OVERLAY_GCC_ON       = $(if $(strip $(TC_OVERLAY_GCC)),$(if $(strip $(TC_OVERLAY_BINUTILS)),$(if $(filter 1 on ON,$(strip $(OVERLAY_GCC))),1)))
@@ -134,6 +155,14 @@ $(MSG) "*********************************************************************" ;
 $(MSG) "*** OVERLAY_BINUTILS=1: every compile uses binutils $(OVERLAY_BINUTILS_VERS) as/ld" ; \
 $(MSG) "*** paired with the vendor gcc $(TC_GCC), which it is not matched to." ; \
 $(MSG) "*** Set OVERLAY_GCC=1 to pair it with gcc $(OVERLAY_GCC_VERS) instead." ; \
+$(MSG) "*********************************************************************"
+endef
+
+define OVERLAY_WARN_BINUTILS_FORCED
+$(MSG) "*********************************************************************" ; \
+$(MSG) "*** OVERLAY_BINUTILS=0 ignored: OVERLAY_GCC=1 requires binutils $(OVERLAY_BINUTILS_VERS)" ; \
+$(MSG) "*** gcc $(OVERLAY_GCC_VERS) drives as/ld through it; the vendor ones" ; \
+$(MSG) "*** cannot assemble what it emits. Turn OVERLAY_GCC off for the stock one." ; \
 $(MSG) "*********************************************************************"
 endef
 
