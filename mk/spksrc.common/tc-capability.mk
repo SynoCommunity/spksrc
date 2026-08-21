@@ -37,7 +37,14 @@
 # Lazy (=), unlike the static reads below: it RUNS the cross gcc, which does not exist yet
 # while the toolchain is still being bootstrapped. Outside the ARCH guard, and keyed on
 # TC_* only, so the native producers (spksrc.native/toolchain-rust.mk) reach it too.
-TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc -print-file-name=libatomic.so 2>/dev/null)),1)
+# Ask the compiler the build will USE, not the one the toolchain shipped: an overlay gcc
+# ships libatomic exactly where the vendor one predates it. ppc853x's 4.3.7 answers a bare
+# "libatomic.so" (no such library), gcc 8.5 answers an absolute path -- and that decides
+# whether -latomic is linked, so probing the wrong one leaves __atomic_*_8 unresolved.
+# Found by wildcard rather than through OVERLAY_GCC_SUFFIX: this file is read by packages,
+# where spksrc.toolchain/overlay-gcc.mk is not.
+_TC_LIBATOMIC_CC = $(or $(firstword $(wildcard $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)/work/install/usr/local/bin/$(TC_PREFIX)gcc-[0-9]*))),$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc)
+TC_HAS_LIBATOMIC = $(if $(filter /%,$(shell $(_TC_LIBATOMIC_CC) -print-file-name=libatomic.so 2>/dev/null)),1)
 
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
 
