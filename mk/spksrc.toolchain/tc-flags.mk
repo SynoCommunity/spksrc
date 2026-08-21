@@ -98,12 +98,19 @@ _tc_comma := ,
 _TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS)
 _tc_ld_syslibs = $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
 
-# LDFLAGS precedes the objects, so --as-needed drops libatomic before anything needs it.
-# Harmless on the 2008 compilers (no libatomic -> filtered above), fatal under gcc 8.5,
-# which emits __atomic_*_8 calls (openssl3/ppc853x). Keep it outside the bracket.
-_tc_ld_atomic  = $(if $(OVERLAY_GCC_ON),$(filter -latomic,$(_tc_ld_syslibs)))
-_tc_ld_needed  = $(filter-out $(_tc_ld_atomic),$(_tc_ld_syslibs))
-TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(strip $(_tc_ld_needed)),-Wl$(_tc_comma)--as-needed $(_tc_ld_needed) -Wl$(_tc_comma)--no-as-needed) $(_tc_ld_atomic)
+# LDFLAGS precedes the objects on every link line, and --as-needed keeps a library only if
+# it resolves something already undefined where it is seen. Nothing is, that early, so the
+# whole bracket is dropped and the objects' references go unresolved:
+#
+#   -latomic  gcc 8.5 emits __atomic_*_8 on 32-bit targets  (openssl3/ppc853x)
+#   -lrt      clock_gettime lives there until glibc 2.17     (libsrt/88f6281-6.2.4)
+#
+# The 2008 compilers never reach this: they build far less, and TC_HAS_LIBATOMIC filters
+# -latomic out above. Under the overlay, drop the bracket and link them unconditionally --
+# the cost is a DT_NEEDED that may go unused, against a link that fails outright.
+_tc_ld_always = $(if $(OVERLAY_GCC_ON),$(_tc_ld_syslibs))
+_tc_ld_needed = $(if $(OVERLAY_GCC_ON),,$(_tc_ld_syslibs))
+TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(strip $(_tc_ld_needed)),-Wl$(_tc_comma)--as-needed $(_tc_ld_needed) -Wl$(_tc_comma)--no-as-needed) $(_tc_ld_always)
 
 # TC_EXTRA_BUILD_FLAGS holds the target's ABI/arch flags (-march, -mcpu, -mfpu,
 # -mfloat-abi, -mthumb, ...). They select the ABI, so they must reach every language
