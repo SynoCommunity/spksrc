@@ -1,0 +1,48 @@
+[{
+    "step_title": "Homeserver Configuration",
+    "items": [{
+        "type": "textfield",
+        "desc": "Configure the name for the server. It is important to choose the name for your server before you install Synapse, because it cannot be changed later.",
+        "subitems": [{
+            "key": "wizard_servername",
+            "desc": "Server Name",
+            "emptyText": "homeserver.diskstation.me",
+            "validator": {
+              "allowBlank": false,
+              "regex": {
+                "expr": "/^[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,24}$/i",
+                "errorText": "Invalid server name."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }, {
+    "step_title": "Homeserver Options",
+    "items": [{
+        "type": "multiselect",
+        "desc": "Select whether to create and report homeserver usage statistics.",
+        "subitems": [{
+            "key": "wizard_report_stats",
+            "desc": "Report usage statistics",
+            "defaultValue": true
+          }
+        ]
+      }, {
+        "type": "multiselect",
+        "desc": "Select whether to allow access to the non-TLS HTTP listener. <b>Do not enable unless you know what you are doing</b>.",
+        "subitems": [{
+            "key": "wizard_open_private_ports",
+            "desc": "Open private ports",
+            "defaultValue": false
+          }
+        ]
+      }, {
+        "desc": "<br/>You can modify the listener, usage statistics and other options later in <code>/var/packages/matrix-synapse/var/homeserver.yaml</code>, but you cannot change the server name choosen."
+      }, {
+        "desc": "For configuration details see the SynoCommunity wiki page <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Synapse-homeserver-package\">[matrix] Synapse homeserver</a>."
+      }
+    ]
+  }
+]
