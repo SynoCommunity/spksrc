@@ -11,7 +11,8 @@ HOMEPAGE = https://developer.gnome.org/glib/
 COMMENT  = General-purpose utility library.
 LICENSE  = LGPLv2.1+
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# Only the 2008 PowerPC compiler (4.3.7) was ever excluded here; ARMv5's 4.6.4 builds it.
+MIN_GCC_VERSION = 4.6
 
 # https://docs.gtk.org/glib/building.html
 CONFIGURE_ARGS += -Dgtk_doc=false -Dman=false

@@ -15,7 +15,9 @@ HOMEPAGE = https://pngquant.org/
 COMMENT  = pngquant is a command-line utility and a library for lossy compression of PNG images.
 LICENSE  = GPL
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# "Fails on older gcc for its internal dependencies" (see the -std=c99 workaround below),
+# which is a compiler floor, not a property of these architectures.
+MIN_GCC_VERSION = 4.8
 
 include ../../mk/spksrc.common.mk
 
