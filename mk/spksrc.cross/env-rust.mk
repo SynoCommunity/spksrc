@@ -35,6 +35,12 @@ endif
 
 ifeq ($(findstring $(RUST_ARCH), $(ARMv7L_ARCHS)),$(RUST_ARCH))
 RUST_TARGET = armv7-unknown-linux-gnueabi
+ifeq ($(call version_lt, ${TC_GCC}, 5),1)
+ifeq ($(TC_RUSTC),stable)
+# Rust 1.98 breaks the build with gcc 4.8.3
+TC_RUSTC = 1.97.1
+endif
+endif
 endif
 
 ifeq ($(findstring $(RUST_ARCH), $(ARMv8_ARCHS)),$(RUST_ARCH))
