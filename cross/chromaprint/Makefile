@@ -19,6 +19,13 @@ OPTIONAL_DEPENDS = cross/ffmpeg8
 # ffmpeg8 needs C11 -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
+# ffmpeg8 is built through the gcc 8.5 overlay wherever the vendor compiler falls short,
+# so follow it: same condition, same compiler, one ABI across the chain. Linking an
+# overlay-built ffmpeg8 with the vendor gcc fails on std::__cxx11 and CXXABI symbols its
+# libstdc++ never had. Recursive (=): TC_GCC does not exist until the include below, and
+# overlay.mk's `?=` must still see this assignment.
+OVERLAY_GCC = $(if $(call version_lt,$(TC_GCC),$(MIN_GCC_VERSION)),1)
+
 CONFIGURE_ARGS += -DBUILD_TOOLS=ON
 CONFIGURE_ARGS += -DBUILD_TESTS=OFF
 CONFIGURE_ARGS += -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations"
