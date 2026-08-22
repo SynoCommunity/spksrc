@@ -4,12 +4,10 @@ SPK_REV = 1
 
 DEPENDS = cross/fd
 
-UNSUPPORTED_ARCHS  = $(OLD_PPC_ARCHS)
-UNSUPPORTED_ARCHS += $(ARMv5_ARCHS)
-UNSUPPORTED_ARCHS += $(ARMv7L_ARCHS)
+MIN_GLIBC_VERSION = 2.9
 
 include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(call version_lt,$(TC_RUSTC),1.85),1)
 SPK_VERS = 10.3.0
 endif
 

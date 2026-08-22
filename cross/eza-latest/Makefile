@@ -8,8 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-# eza >= 0.23.5 requires RUST_TOOLCHAIN >= 1.90
-MIN_RUSTC_VERSION = 1.90
+# eza >= 0.23.5 requires Rust Edition 2024
+MIN_RUSTC_VERSION = 1.85
 
 HOMEPAGE = https://eza.rocks/
 COMMENT  = A modern replacement for 'ls'.
