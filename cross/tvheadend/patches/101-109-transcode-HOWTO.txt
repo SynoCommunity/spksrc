@@ -144,12 +144,14 @@ Apply order
     105 needs the -mkv name from 103 and the mpegts profile from 104.
     The rest are independent.
 
-Still open
-    VP9/VAAPI (and any encoder that cannot open on the configured device)
-    advertises its video track, never produces a frame, and the muxer waits for
-    it forever -- so the audio never ships either. Measured: 3,509 bytes in
-    20 s against 4,636,452 for a working profile, with the WebM header
-    declaring both V_VP9 and A_VORBIS. tvh_transcoder_start() already drops a
-    component whose tvh_stream_create() fails, so the mechanism exists; the
-    encoder failure simply is not known until the first packet. Not fixed here,
-    and worth re-testing now that 108 and 109 have both changed the muxer path.
+Resolved along the way
+    VP9/VAAPI: the Gen9 iGPU has no VP9 encode entrypoint, so OPEN_ENCODER
+    fails. #2117 advertised the video track anyway and the muxer then waited
+    for frames that never came, so the audio never shipped either -- 3,509
+    bytes in 20 s, with the WebM header declaring both V_VP9 and A_VORBIS.
+
+    After 108 and 109 the same profile degrades to audio only, which is what
+    #2133 did: 384,598 bytes in 20 s and a header declaring A_VORBIS alone
+    (against 4,599,415 bytes and V_VP8 + A_VORBIS for the working vp8 profile).
+    Not attributed to either patch individually -- no measurement was taken
+    between them -- but the result is reproducible.
