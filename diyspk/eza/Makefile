@@ -7,10 +7,12 @@ UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 DEPENDS = cross/eza
 
 include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-SPK_VERS = 0.20.18
-else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
+DEPENDS = cross/eza-latest
+else ifeq ($(call version_ge,$(TC_RUSTC),1.82),1)
 SPK_VERS = 0.23.4
+else
+SPK_VERS = 0.20.18
 endif
 
 MAINTAINER = SynoCommunity

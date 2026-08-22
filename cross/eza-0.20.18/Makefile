@@ -6,7 +6,6 @@ PKG_DIST_SITE = https://github.com/eza-community/eza/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# Remarks: this is the last version for ARMv5_ARCHS (having Rust 1.77.2)
 # eza >= 0.20.19 requires RUST_TOOLCHAIN >= 1.78
 
 DEPENDS = cross/zlib
