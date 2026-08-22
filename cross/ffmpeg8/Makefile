@@ -13,9 +13,46 @@ LICENSE  = GPLv2
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
+# Build with the gcc 8.5 overlay where the arch ships one: inert on a toolchain
+# that already has 8.5 or newer, and on any arch with no overlay at all.
+# Use the overlay exactly where the vendor compiler falls short of what this package
+# needs -- not everywhere an overlay happens to exist. On an arch that already meets
+# MIN_GCC_VERSION the overlay buys nothing and costs an ABI split: ffmpeg8's libraries
+# would come out gcc 8.5 while chromaprint, comskip and tvheadend keep linking them with
+# the vendor gcc, and fail on std::__cxx11 symbols their libstdc++ never had.
+#
+# Recursive (=): TC_GCC does not exist until spksrc.common.mk is included below, and
+# overlay.mk's `?=` must still see this assignment, so it cannot wait until after.
+OVERLAY_GCC = $(if $(call version_lt,$(TC_GCC),$(MIN_GCC_VERSION)),1)
+
 include ../../mk/spksrc.common.mk
 
+
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+# ffmpeg derives its compilers from --cross-prefix and ignores CC/CXX, so it would pick
+# the stock ones under a gcc overlay: configure dies on --cc, and --cxx only shows up at
+# the final LDXX. Take what tc_vars RECORDED for this work dir -- it already resolved
+# overlay vs stock, and knows where each lives.
+_ffmpeg_tcvar = $(shell sed -n 's|^TC_ENV += $(1)="\(.*\)"$$|\1|p' $(WORK_DIR)/tc_vars.autotools.mk 2>/dev/null)
+CONFIGURE_ARGS += --cc=$(or $(call _ffmpeg_tcvar,CC),$(TC_PATH)$(TC_PREFIX)gcc)
+CONFIGURE_ARGS += --cxx=$(or $(call _ffmpeg_tcvar,CXX),$(TC_PATH)$(TC_PREFIX)g++)
+
+# ffmpeg 8 wants C11 static assertions. static_assert is not a runtime feature, just a
+# macro glibc added to assert.h in 2.16 (`#define static_assert _Static_assert`); the
+# keyword itself comes from the compiler, so define it ourselves on an older libc rather
+# than lose the arch. C only -- in C++ static_assert is a keyword. Via --extra-cflags and
+# not CFLAGS: ffmpeg takes its environment from the generated tc_vars, so appending to the
+# make variable here reaches nothing.
+ifeq ($(call version_lt,$(TC_GLIBC),2.16),1)
+CONFIGURE_ARGS += --extra-cflags=-Dstatic_assert=_Static_assert
+endif
+
+# The v4l2 input device uses the multiplanar API (struct v4l2_plane), which Linux grew in
+# 3.2. The 2.6.32 toolchains -- 88f6281, ppc853x, qoriq -- ship no such header. Asked by
+# kernel version rather than by arch, which is what actually decides it.
+ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
+CONFIGURE_ARGS += --disable-indev=v4l2
+endif
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
@@ -236,6 +273,23 @@ DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
 
+# ARMv7L (hi3535): Cortex-A9 but SOFT float, which is why it has its own arch group
+# instead of sitting with the hard-float ARMv7 ones. Never buildable, never configured.
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=cortex-a9
+CONFIGURE_ARGS += --disable-neon
+CONFIGURE_ARGS += --disable-vfp
+endif
+
+# ARMv5 (88f6281, Marvell Feroceon): armv5te, soft float. Never listed here because its
+# gcc 4.6.4 kept ffmpeg8 out entirely; the overlay makes it reachable. --cpu=armv5te is
+# what turns off the armv6/v6t2/neon/vfp paths this core does not have.
+ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=armv5te
+endif
+
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --enable-neon
@@ -254,12 +308,12 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+# ppc853x is the same e500v2 core as qoriq -- same triple, same -mcpu=8548 -- and was
+# simply never listed. Its glibc 2.8 keeps it out today; this stops it being a surprise.
+ifeq ($(findstring $(ARCH),ppc853x qoriq),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
-# ffmpeg-7.1 video4linux2 is no longer compatible
-CONFIGURE_ARGS += --disable-indev=v4l2
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
@@ -269,17 +323,23 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-vaapi
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
+# libdrm, libva and Intel MediaSDK all come from the videodriver meta, which
+# spk/synocli-videodriver declares from DSM 6.2.4 on. Asking for them below that
+# stops configure dead ("libmfx not found") instead of simply going without.
+#
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
 #   - libvpl (oneVPL) → Gen12+, no Synology NAS has that
+ifeq ($(call version_ge, $(TCVERSION), 6.2.4),1)
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-vaapi
 CONFIGURE_ARGS += --enable-libmfx
 #CONFIGURE_ARGS += --enable-libvpl
+endif
 
 # Enable OpenCL and Vulkan acceleration
 ifeq ($(call version_gt, $(TC_GCC), 5),1)

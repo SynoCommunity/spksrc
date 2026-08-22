@@ -1,7 +1,7 @@
 SPK_NAME = ffmpeg8
 SPK_VERS = 8.1.2
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/ffmpeg8.png
 CHANGELOG = "1. Restore the SYNO-videostation patches"
 
@@ -10,6 +10,18 @@ VIDEODRV_PACKAGE = synocli-videodriver
 
 # Needs C11 and working atomics -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
+
+# Build with the gcc 8.5 overlay where the arch ships one: inert on a toolchain
+# that already has 8.5 or newer, and on any arch with no overlay at all.
+# Use the overlay exactly where the vendor compiler falls short of what this package
+# needs -- not everywhere an overlay happens to exist. On an arch that already meets
+# MIN_GCC_VERSION the overlay buys nothing and costs an ABI split: ffmpeg8's libraries
+# would come out gcc 8.5 while chromaprint, comskip and tvheadend keep linking them with
+# the vendor gcc, and fail on std::__cxx11 symbols their libstdc++ never had.
+#
+# Recursive (=): TC_GCC does not exist until spksrc.common.mk is included below, and
+# overlay.mk's `?=` must still see this assignment, so it cannot wait until after.
+OVERLAY_GCC = $(if $(call version_lt,$(TC_GCC),$(MIN_GCC_VERSION)),1)
 
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://docs.synocommunity.com/packages/ffmpeg/
