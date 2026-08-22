@@ -10,8 +10,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/gnutls
 
-# archs without C++11 support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# archs without C++11 support. Measured on the Synology toolchains, core C++11 fails on
+# gcc 4.6.4 and 4.7.3 and works from 4.8.3, so the arch list becomes that floor.
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://nghttp2.org/nghttp3/
 COMMENT  = HTTP/3 library written in C.

@@ -7,7 +7,9 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpciaccess
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# Same compiler floor the other meson/C11 users in this tree need. Was an arch list
+# covering 4.3.7 and 4.6.4; 4.8.3 builds it.
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://dri.freedesktop.org/wiki/DRM/
 COMMENT = Userspace interface to kernel DRM services.
