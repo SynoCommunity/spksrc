@@ -4,7 +4,7 @@ LABEL maintainer="SynoCommunity <https://github.com/SynoCommunity/spksrc/graphs/
 LABEL url="https://synocommunity.com"
 LABEL vcs-url="https://github.com/SynoCommunity/spksrc"
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 
 # Manage i386 arch
 RUN dpkg --add-architecture i386
@@ -31,7 +31,6 @@ RUN apt update && apt install --no-install-recommends -y \
 	fakeroot \
 	flex \
 	gh \
-	g++-multilib \
 	gawk \
 	gettext \
 	gfortran \
@@ -43,12 +42,14 @@ RUN apt update && apt install --no-install-recommends -y \
 	intltool \
 	jq \
 	libbz2-dev \
-	libc6-i386 \
+	libc6 \
+	libc6:i386 \
 	libcppunit-dev \
 	libelf-dev \
 	libffi-dev \
 	libgc-dev \
 	libgmp3-dev \
+	libicu-dev \
 	libicu76 \
 	libltdl-dev \
 	libmount-dev \
@@ -85,6 +86,13 @@ RUN apt update && apt install --no-install-recommends -y \
 	yasm \
 	zip \
 	zlib1g-dev
+
+# Install amd64 packages (skip on Apple Silicon / arm builds)
+RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+        apt-get update && apt-get install --no-install-recommends -y \
+		g++-multilib \
+		; \
+    fi
 
 # Python based apps
 RUN apt install --no-install-recommends -y \
