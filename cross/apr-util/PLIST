@@ -1,0 +1,3 @@
+lnk:lib/libaprutil.so
+lnk:lib/libaprutil.so.0
+lib:lib/libaprutil.so.0.6.3
