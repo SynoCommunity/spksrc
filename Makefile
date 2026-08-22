@@ -57,7 +57,7 @@ all: $(SUPPORTED_SPKS)  ## Build every supported SPK (long; usually build one <s
 endif
 
 all-noarch:  ## Build every noarch (override ARCH) SPK
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)) $(dir $(wildcard spk/*/DISABLED)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
 	   grep -q "override ARCH" "$${spk}/Makefile" && $(MAKE) -C $${spk} ; \
 	done
@@ -103,7 +103,7 @@ cross-clean:  ## Clean all cross/ work dirs
 	done
 
 spk-clean:  ## Clean all spk/ work dirs
-	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)),$(dir $(wildcard spk/*/Makefile))) ; \
+	@for spk in $(filter-out $(dir $(wildcard spk/*/BROKEN)) $(dir $(wildcard spk/*/DISABLED)),$(dir $(wildcard spk/*/Makefile))) ; \
 	do \
 	    $(MAKE) -C $${spk} clean ; \
 	done
