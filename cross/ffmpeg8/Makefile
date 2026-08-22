@@ -15,7 +15,15 @@ MIN_GCC_VERSION = 4.9
 
 # Build with the gcc 8.5 overlay where the arch ships one: inert on a toolchain
 # that already has 8.5 or newer, and on any arch with no overlay at all.
-OVERLAY_GCC = 1
+# Use the overlay exactly where the vendor compiler falls short of what this package
+# needs -- not everywhere an overlay happens to exist. On an arch that already meets
+# MIN_GCC_VERSION the overlay buys nothing and costs an ABI split: ffmpeg8's libraries
+# would come out gcc 8.5 while chromaprint, comskip and tvheadend keep linking them with
+# the vendor gcc, and fail on std::__cxx11 symbols their libstdc++ never had.
+#
+# Recursive (=): TC_GCC does not exist until spksrc.common.mk is included below, and
+# overlay.mk's `?=` must still see this assignment, so it cannot wait until after.
+OVERLAY_GCC = $(if $(call version_lt,$(TC_GCC),$(MIN_GCC_VERSION)),1)
 
 include ../../mk/spksrc.common.mk
 
@@ -261,6 +269,15 @@ endif
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
+endif
+
+# ARMv7L (hi3535): Cortex-A9 but SOFT float, which is why it has its own arch group
+# instead of sitting with the hard-float ARMv7 ones. Never buildable, never configured.
+ifeq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+CONFIGURE_ARGS += --arch=arm
+CONFIGURE_ARGS += --cpu=cortex-a9
+CONFIGURE_ARGS += --disable-neon
+CONFIGURE_ARGS += --disable-vfp
 endif
 
 # ARMv5 (88f6281, Marvell Feroceon): armv5te, soft float. Never listed here because its
