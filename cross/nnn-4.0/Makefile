@@ -9,8 +9,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 # nnn version 4.0 is the latest version for 32-bit archs on DSM 6 and for comcerto2k
 DEPENDS = cross/ncursesw cross/readline
 
-# compiler too old (-std=c11 required)
-# patch for ARMv5 does not work for OLD_PPC_ARCHS
+# lacking inotify capabilities (IN_NONBLOCK i.e. O_NONBLOCK not supported)
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
 
 HOMEPAGE = https://github.com/jarun/nnn

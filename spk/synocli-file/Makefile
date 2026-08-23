@@ -75,8 +75,11 @@ ifeq ($(call version_ge,$(TC_GLIBC),2.9),1)
 DEPENDS += cross/bat
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
 
+# fd is not supported anymore on ARMv7L
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
+endif
 endif
 
 # ripgrep 14 is the PPC fallback and its pcre2 wants -std=c11/c99
@@ -85,12 +88,14 @@ DEPENDS += cross/ripgrep
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rg (ripgrep)"
 endif
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+# Rust Edition 2024 required
+ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
 DEPENDS += cross/ms-edit
 OPTIONAL_DESC := $(OPTIONAL_DESC)", edit (MS Editor)"
 endif
 
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TC_GCC), 4.8.1),1)
+# A compiler with support for C++11 language features is required.
 DEPENDS += cross/xstow
 OPTIONAL_DESC := $(OPTIONAL_DESC)", xstow"
 endif

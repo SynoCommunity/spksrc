@@ -7,8 +7,8 @@ PKG_DIST_SITE = https://github.com/microsoft/edit/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_REAL_NAME)-$(PKG_VERS)/crates/$(PKG_REAL_NAME)
 
-# rust >= 1.93 / edition 2024 required
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+# Rust Edition 2024 required
+MIN_RUSTC_VERSION = 1.85
 
 HOMEPAGE = https://github.com/microsoft/edit/
 COMMENT = A simple editor for simple needs.
