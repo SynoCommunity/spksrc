@@ -52,10 +52,9 @@ for vers in $VERS_LIST; do
     fi
 
     target=$(sed -n 's/^TC_TARGET *= *//p' "$base/Makefile")
-    tcgcc=$(sed -n 's/^TC_GCC *= *//p'    "$base/Makefile")
-    [ -n "$target" ] && [ -n "$tcgcc" ] || { echo "skip $base (no TC_TARGET/TC_GCC)" >&2; continue; }
+    [ -n "$target" ] || { echo "skip $base (no TC_TARGET)" >&2; continue; }
 
-    ovl="${base}_binutils-${PKG_VERS}_gcc-${tcgcc}"
+    ovl="${base}_binutils-${PKG_VERS}"
     if [ -e "$ovl/Makefile" ]; then kept=$((kept+1)); continue; fi
     mkdir -p "$ovl"
     cat > "$ovl/Makefile" <<EOF

@@ -62,8 +62,8 @@ arch-%:
 # Concurrency via xargs -P, deliberately NOT make's -j: -j goes into MAKEFLAGS and
 # propagates into every sub-make, parallelising toolchain targets not written for it.
 ##############################################################################
-BINUTILS_ARCHS = $(shell ls -d ../../toolchain/syno-*-$(1)_binutils-2.30_gcc-* 2>/dev/null | \
-                    sed 's|.*/syno-||; s|-$(1)_binutils-2.30_gcc-.*||')
+BINUTILS_ARCHS = $(shell ls -d ../../toolchain/syno-*-$(1)_binutils-2.30 2>/dev/null | \
+                    sed 's|.*/syno-||; s|-$(1)_binutils-2.30$$||')
 BINUTILS_JOBS ?= 1
 
 .PHONY: all-%

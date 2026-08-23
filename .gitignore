@@ -5,6 +5,7 @@
 
 # Build artifacts
 native/*/work*
+native/*/*.txz
 native/*/build*
 native/*/status*
 
