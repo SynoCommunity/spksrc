@@ -195,8 +195,8 @@ arch-%:
 # Concurrency via xargs -P, deliberately NOT make's -j: -j goes into MAKEFLAGS and
 # propagates into every sub-make, parallelising toolchain targets not written for it.
 ##############################################################################
-GCC_ARCHS = $(shell ls -d ../../toolchain/syno-*-$(1)_gcc-8.5_gcc-* 2>/dev/null | \
-                    sed 's|.*/syno-||; s|-$(1)_gcc-8.5_gcc-.*||')
+GCC_ARCHS = $(shell ls -d ../../toolchain/syno-*-$(1)_gcc-8.5 2>/dev/null | \
+                    sed 's|.*/syno-||; s|-$(1)_gcc-8.5$$||')
 GCC_JOBS ?= 1
 # A gcc build tree is ~2 GB and only the .txz matters afterwards: 59 of them would fill
 # the disk long before a full batch ends. Kept on failure, so a broken arch stays
