@@ -142,7 +142,8 @@ CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
 
-SPK_COMMANDS  = bin/less libexec/lessecho bin/lesskey
+SPK_COMMANDS  = bin/less bin/lesskey
+SPK_USR_LOCAL_LINKS = bin:libexec/lessecho
 SPK_COMMANDS += bin/tree
 SPK_COMMANDS += bin/jdupes
 SPK_COMMANDS += bin/mc bin/mcdiff bin/mcview bin/mcedit

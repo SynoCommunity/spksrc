@@ -13,6 +13,7 @@ STARTABLE = no
 HOMEPAGE = https://www.gnu.org/software/less/
 LICENSE = GPLv3
 
-SPK_COMMANDS = bin/less libexec/lessecho bin/lesskey
+SPK_COMMANDS = bin/less bin/lesskey
+SPK_USR_LOCAL_LINKS = bin:libexec/lessecho
 
 include ../../mk/spksrc.spk.mk
