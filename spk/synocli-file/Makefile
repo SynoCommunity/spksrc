@@ -138,6 +138,8 @@ CHANGELOG += "14. Update ripgrep from v15.1.0 to v15.2.0. <br/>"
 CHANGELOG += "15. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
 CHANGELOG += "16. Update tree from v2.2.1 to v2.3.2. <br/>"
 CHANGELOG += "17. Update iconv from version provided in toolchain to v1.19. <br/>"
+CHANGELOG += "18. Fix RHash tools and include openssl crypto hashes. <br/>"
+CHANGELOG += "19. Add some rust tools for older models (fd for ARMv5, eza, lsd and sd for ppc853x) and fixes for qoriq (fd, lsd, ripgrep, sd). <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
