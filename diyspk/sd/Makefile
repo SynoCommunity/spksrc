@@ -4,10 +4,8 @@ SPK_REV = 1
 
 DEPENDS = cross/sd
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 include ../../mk/spksrc.common.mk
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
+ifeq ($(call version_lt,$(TC_RUSTC),1.85),1)
 SPK_VERS = 1.0.0
 endif
 

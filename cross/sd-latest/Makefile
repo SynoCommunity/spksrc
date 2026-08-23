@@ -8,7 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+# Rust Edition 2024 required
+MIN_RUSTC_VERSION = 1.85
 
 HOMEPAGE = https://github.com/chmln/sd#readme
 COMMENT = Intuitive find & replace CLI (sed alternative).

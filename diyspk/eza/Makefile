@@ -9,10 +9,8 @@ DEPENDS = cross/eza
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
 DEPENDS = cross/eza-latest
-else ifeq ($(call version_ge,$(TC_RUSTC),1.82),1)
-SPK_VERS = 0.23.4
 else
-SPK_VERS = 0.20.18
+SPK_VERS = 0.23.4
 endif
 
 MAINTAINER = SynoCommunity
