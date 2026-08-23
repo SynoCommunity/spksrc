@@ -69,7 +69,7 @@ for vers in $VERS_LIST; do
       nobinutils=$((nobinutils+1))
     fi
 
-    ovl="${base}_gcc-${OVL_VERS}_gcc-${tcgcc}"
+    ovl="${base}_gcc-${OVL_VERS}"
     if [ -e "$ovl/Makefile" ]; then kept=$((kept+1)); continue; fi
     mkdir -p "$ovl"
     cat > "$ovl/Makefile" <<EOF
