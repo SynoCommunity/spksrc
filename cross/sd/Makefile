@@ -1,17 +1,14 @@
-PKG_NAME = sd
-PKG_VERS = 1.0.0
-PKG_EXT = tar.gz
-PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://github.com/chmln/sd/archive
-PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_NAME = sd-virtual
 
-DEPENDS =
+OPTIONAL_DEPENDS  = cross/sd-latest
+OPTIONAL_DEPENDS += cross/sd-1.0
 
-HOMEPAGE = https://github.com/chmln/sd#readme
-COMMENT  = Intuitive find & replace CLI (sed alternative).
-LICENSE  = MIT
+include ../../mk/spksrc.common.mk
 
-CARGO_BUILD_ARGS = --locked
+ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
+DEPENDS = cross/sd-latest
+else
+DEPENDS = cross/sd-1.0
+endif
 
-include ../../mk/spksrc.cross-rust.mk
+include ../../mk/spksrc.cross-virtual.mk
