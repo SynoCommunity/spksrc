@@ -53,8 +53,8 @@ _OVERLAY_RUSTC_ANY    := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-*)
 _OVERLAY_BINUTILS_ANY := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-*)
 _OVERLAY_GCC_ANY      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-*)
 TC_OVERLAY_RUSTC      := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_rust-$(OVERLAY_RUSTC_VERS)_gcc-*)
-TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS)_gcc-*)
-TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-$(OVERLAY_GCC_VERS)_gcc-*)
+TC_OVERLAY_BINUTILS   := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_binutils-$(OVERLAY_BINUTILS_VERS))
+TC_OVERLAY_GCC        := $(wildcard $(BASEDIR)/toolchain/$(_OVERLAY_TC)_gcc-$(OVERLAY_GCC_VERS))
 
 # ---- REQUESTED (switches) ----------------------------------------------------------
 # OVERLAY_RUSTC          custom from-source rustc + synology triple; 0 is diagnostic only,
