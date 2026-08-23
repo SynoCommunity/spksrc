@@ -18,7 +18,7 @@ DEPENDS = cross/ncursesw cross/readline
 # compiler too old (-std=c11 required)
 MIN_GCC_VERSION = 4.6
 
-# 32 bit archs require glic >= 2.23 (includes comcerto2k on DSM 7)
+# 32 bit archs require glibc >= 2.23 (includes comcerto2k on DSM 7)
 include ../../mk/spksrc.common.mk
 ifeq ($(call version_lt, $(TC_GLIBC), 2.23),1)
 UNSUPPORTED_ARCHS = $(32bit_ARCHS)

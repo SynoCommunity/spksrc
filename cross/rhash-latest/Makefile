@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/rhash/RHash/archive
 PKG_DIST_FILE=$(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS =
+DEPENDS = cross/openssl3
 
 # blake3 and shani not supported (and other changes)
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
@@ -34,8 +34,16 @@ CONFIGURE_ARGS = --target=x86_64-linux
 endif
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX) --enable-symlinks --disable-static
 
-ifeq ($(call version_lt, $(TC_VERSION), 7),1)
-CONFIGURE_ARGS += --extra-cflags=-std=c99
+ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
+# ENV is ignored, CFLAGS must be passed --extra-cflags
+CONFIGURE_ARGS += --extra-cflags="-std=c99 $(CFLAGS)"
+else
+CONFIGURE_ARGS += --extra-cflags="$(CFLAGS)"
 endif
+
+# ENV is ignored, LDFLAGS must be passed with --extra-ldflags
+CONFIGURE_ARGS += --extra-ldflags="$(LDFLAGS)"
+
+CONFIGURE_ARGS += --enable-openssl
 
 include ../../mk/spksrc.cross-cc.mk

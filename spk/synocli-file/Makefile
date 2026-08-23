@@ -36,8 +36,6 @@ OPTIONAL_DEPENDS += cross/xstow
 MAINTAINER = hgy59
 DISPLAY_NAME = SynoCli File Tools
 
-POST_STRIP_TARGET = synocli-file_extra_install
-
 OPTIONAL_DESC =
 
 include ../../mk/spksrc.common.mk
@@ -197,8 +195,3 @@ DEPENDS += cross/rnm
 OPTIONAL_DESC := $(OPTIONAL_DESC)", rnm"
 SPK_COMMANDS += bin/rnm
 endif
-
-.PHONY: synocli-file_extra_install
-synocli-file_extra_install:
-	@$(MSG) "Set library runpath in rhash executable."
-	@patchelf --set-rpath /var/packages/$(SPK_NAME)/target/lib $(STAGING_DIR)/bin/rhash
