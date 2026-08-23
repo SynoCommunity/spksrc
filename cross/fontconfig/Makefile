@@ -3,6 +3,7 @@ PKG_VERS = 2.16.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.freedesktop.org/software/fontconfig/release
+PKG_DIST_MIRRORS = https://ftp.osuosl.org/pub/blfs/conglomeration/fontconfig
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libexpat cross/freetype cross/libuuid

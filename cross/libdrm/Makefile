@@ -3,6 +3,7 @@ PKG_VERS = 2.4.131
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://dri.freedesktop.org/libdrm
+PKG_DIST_MIRRORS = https://ftp.osuosl.org/pub/blfs/conglomeration/libdrm
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpciaccess

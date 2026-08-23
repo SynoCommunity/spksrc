@@ -3,6 +3,7 @@ PKG_VERS = 0.0.6
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.freedesktop.org/software/uchardet/releases
+PKG_DIST_MIRRORS = https://ftp.osuosl.org/pub/blfs/conglomeration/uchardet https://distfiles.macports.org/uchardet
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =

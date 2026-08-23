@@ -3,6 +3,8 @@ PKG_VERS = 1.8.10
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://xorg.freedesktop.org/archive/individual/lib
+PKG_DIST_MIRRORS = https://distfiles.macports.org/xorg-libX11
+PKG_DIST_MIRRORS = https://distfiles.macports.org/xorg-libX11
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/xorgproto cross/libxcb cross/xtrans cross/xorg-sgml-doctools cross/libICE cross/libSM

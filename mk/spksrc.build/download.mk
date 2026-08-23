@@ -124,6 +124,12 @@ MIRROR_GNOME       ?= https://download.gnome.org/sources https://mirror.csclub.u
 MIRROR_KERNEL      ?= https://cdn.kernel.org/pub https://mirrors.kernel.org/pub https://www.kernel.org/pub
 MIRROR_SAVANNAH    ?= https://download.savannah.gnu.org/releases https://download-mirror.savannah.gnu.org/releases
 MIRROR_GNUPG       ?= https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt https://mirrors.dotsrc.org/gcrypt
+# freedesktop.org hosts each project under its own path shape, so there is no common
+# tree-root marker to replace. Its mirrors instead file everything by package name, so
+# these bases carry $(PKG_NAME) and take the file name appended, like PKG_DIST_MIRRORS.
+# A base that does not have the file simply 404s and the next candidate is tried, so a
+# package whose mirror name differs (libX11 -> xorg-libX11) just adds its own.
+MIRROR_FREEDESKTOP ?= https://ftp.osuosl.org/pub/blfs/conglomeration/$(PKG_NAME) https://distfiles.macports.org/$(PKG_NAME)
 PKG_DIST_MIRRORS   ?=
 
 # ---------------------------------------------------------------------------
@@ -229,7 +235,7 @@ define DOWNLOAD_HTTP
 	      else \
 	        rm -f $${localFile}.part ; \
 	        mirrorUrls="$${url}" ; \
-	        marker="" ; mirrorBases="" ; \
+	        marker="" ; mirrorBases="" ; namedBases="" ; \
 	        case "$${url}" in \
 	          *//ftpmirror.gnu.org/gnu/*|*//ftp.gnu.org/gnu/*)  marker="/gnu/" ;     mirrorBases="$(MIRROR_GNU)" ;; \
 	          *//downloads.sourceforge.net/project/*)           marker="/project/" ; mirrorBases="$(MIRROR_SOURCEFORGE)" ;; \
@@ -237,11 +243,13 @@ define DOWNLOAD_HTTP
 	          *//www.kernel.org/pub/*|*//cdn.kernel.org/pub/*)  marker="/pub/" ;     mirrorBases="$(MIRROR_KERNEL)" ;; \
 	          *//download.savannah.gnu.org/releases/*)          marker="/releases/" ; mirrorBases="$(MIRROR_SAVANNAH)" ;; \
 	          *//gnupg.org/ftp/gcrypt/*|*//www.gnupg.org/ftp/gcrypt/*) marker="/gcrypt/" ; mirrorBases="$(MIRROR_GNUPG)" ;; \
+	          *//*.freedesktop.org/*)                          namedBases="$(MIRROR_FREEDESKTOP)" ;; \
 	        esac ; \
 	        if [ -n "$${marker}" ]; then \
 	          tail=$${url#*$${marker}} ; \
 	          for b in $${mirrorBases} ; do mirrorUrls="$${mirrorUrls} $${b%/}/$${tail}" ; done ; \
 	        fi ; \
+	        for b in $${namedBases} ; do mirrorUrls="$${mirrorUrls} $${b%/}/$${localFile}" ; done ; \
 	        for m in $(PKG_DIST_MIRRORS) ; do mirrorUrls="$${mirrorUrls} $${m%/}/$${localFile}" ; done ; \
 	        uniqUrls="" ; \
 	        for u in $${mirrorUrls} ; do case " $${uniqUrls} " in *" $${u} "*) ;; *) uniqUrls="$${uniqUrls} $${u}" ;; esac ; done ; \
