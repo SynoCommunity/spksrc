@@ -8,7 +8,7 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS =
 
-# lsd >= 1.2.0 requires edition2024
+# Rust Edition 2024 required
 MIN_RUSTC_VERSION = 1.85
 
 HOMEPAGE = https://github.com/lsd-rs/lsd

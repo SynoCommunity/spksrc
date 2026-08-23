@@ -5,30 +5,23 @@ PKG_DIST_NAME = $(PKG_NAME)-v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/jarun/nnn/releases/download/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-# REMARKS:
-# nnn version 4.0 is the latest version for 32-bit archs on DSM 6 and for comcerto2k
-# nnn version 4.8 is the latest version for 64-bit archs on DSM 6
-# later versions fail with the following error for all DSM 6 (even 64 bit):
-# error "<fts.h> cannot be used with -D_FILE_OFFSET_BITS==64"
-
-# All DSM 6 toolchains (and DSM 7 of comcerto2k) have identical fts.h file (usr/inluce/fts.h) with this guard:
-#  /* The fts interface is incompatible with the LFS interface which
-#     transparently uses the 64-bit file access functions.  */
-#  #ifdef __USE_FILE_OFFSET64
-#  # error "<fts.h> cannot be used with -D_FILE_OFFSET_BITS==64"
-#  #endif
-
 DEPENDS = cross/ncursesw cross/readline
 
-# compiler too old (-std=c11 required)
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-# comcerto2k is not supported on DSM 6 and DSM 7
-UNSUPPORTED_ARCHS += comcerto2k
+# REMARKS:
+# nnn version 4.8 is the latest version for 64-bit archs on DSM 6
+# 32-bit archs fail with the following error with 32-bit DSM 6 and comcerto2k toolchains:
+# error "<fts.h> cannot be used with -D_FILE_OFFSET_BITS==64"
+# 
+# REASON:
+# on 32-bit platforms fts needs glibc >= 2.23 to support 64-bit file offsets (i.e. files > 2GB)
 
-# 32 bit archs require DSM >= 7
+# compiler too old (-std=c11 required)
+MIN_GCC_VERSION = 4.6
+
+# 32 bit archs require glic >= 2.23 (includes comcerto2k on DSM 7)
 include ../../mk/spksrc.common.mk
-ifeq ($(call version_lt, ${TCVERSION}, 7.0),1)
-UNSUPPORTED_ARCHS += $(32bit_ARCHS)
+ifeq ($(call version_lt, $(TC_GLIBC), 2.23),1)
+UNSUPPORTED_ARCHS = $(32bit_ARCHS)
 endif
 
 HOMEPAGE = https://github.com/jarun/nnn

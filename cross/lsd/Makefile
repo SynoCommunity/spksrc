@@ -3,8 +3,6 @@ PKG_NAME = lsd-virtual
 OPTIONAL_DEPENDS  = cross/lsd-latest
 OPTIONAL_DEPENDS += cross/lsd-1.1
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 include ../../mk/spksrc.common.mk
 
 ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
