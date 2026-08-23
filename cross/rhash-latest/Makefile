@@ -34,8 +34,8 @@ CONFIGURE_ARGS = --target=x86_64-linux
 endif
 CONFIGURE_ARGS += --prefix=$(INSTALL_PREFIX) --enable-symlinks --disable-static
 
+# ENV is ignored, CFLAGS must be passed with --extra-cflags
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-# ENV is ignored, CFLAGS must be passed --extra-cflags
 CONFIGURE_ARGS += --extra-cflags="-std=c99 $(CFLAGS)"
 else
 CONFIGURE_ARGS += --extra-cflags="$(CFLAGS)"
