@@ -108,10 +108,21 @@ pre_download_target: download_msg
 # retried from each mirror base below, in order. This table is the single source
 # of truth for mirrors - there is no per-family URL rewrite - so for GNU the
 # geo-redirector ftpmirror.gnu.org is just another entry. A mirror candidate is
-# built by replacing everything up to and including the family's tree-root marker
-# with the mirror base, so mirrors that host the tree under a different prefix
-# are handled correctly. PKG_DIST_MIRRORS adds extra per-package base URLs (file
-# name appended). Non-matching URLs (e.g. GitHub) just use the single original URL.
+# built in one of two ways, depending on how the family's mirrors are laid out.
+#
+#   mirrorBases  replace everything up to and including the family's tree-root
+#                marker with the mirror base, keeping the rest of the path. For a
+#                family whose mirrors carry the same tree, possibly under a
+#                different prefix: GNU, GNOME, kernel.org, Savannah.
+#   namedBases   append the file name to the base, discarding the path entirely.
+#                For a family with no common tree to mirror -- freedesktop gives
+#                each project its own path shape -- whose mirrors instead file
+#                everything by package name, so the base carries $(PKG_NAME).
+#
+# PKG_DIST_MIRRORS adds extra per-package bases, same file-name-appended rule; it is
+# what a package uses when no family base can reach it. A base that lacks the file
+# just 404s and the next candidate is tried, so overlapping entries cost nothing.
+# Non-matching URLs (e.g. GitHub) just use the single original URL.
 # ---------------------------------------------------------------------------
 # Per-host wget attempts. The overall work is bounded: at most
 # (number of mirror candidates) x DOWNLOAD_TRIES attempts, and the candidate
@@ -124,6 +135,7 @@ MIRROR_GNOME       ?= https://download.gnome.org/sources https://mirror.csclub.u
 MIRROR_KERNEL      ?= https://cdn.kernel.org/pub https://mirrors.kernel.org/pub https://www.kernel.org/pub
 MIRROR_SAVANNAH    ?= https://download.savannah.gnu.org/releases https://download-mirror.savannah.gnu.org/releases
 MIRROR_GNUPG       ?= https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt https://mirrors.dotsrc.org/gcrypt
+MIRROR_FREEDESKTOP ?= https://ftp.osuosl.org/pub/blfs/conglomeration/$(PKG_NAME) https://distfiles.macports.org/$(PKG_NAME)
 PKG_DIST_MIRRORS   ?=
 
 # ---------------------------------------------------------------------------
@@ -229,7 +241,7 @@ define DOWNLOAD_HTTP
 	      else \
 	        rm -f $${localFile}.part ; \
 	        mirrorUrls="$${url}" ; \
-	        marker="" ; mirrorBases="" ; \
+	        marker="" ; mirrorBases="" ; namedBases="" ; \
 	        case "$${url}" in \
 	          *//ftpmirror.gnu.org/gnu/*|*//ftp.gnu.org/gnu/*)  marker="/gnu/" ;     mirrorBases="$(MIRROR_GNU)" ;; \
 	          *//downloads.sourceforge.net/project/*)           marker="/project/" ; mirrorBases="$(MIRROR_SOURCEFORGE)" ;; \
@@ -237,11 +249,13 @@ define DOWNLOAD_HTTP
 	          *//www.kernel.org/pub/*|*//cdn.kernel.org/pub/*)  marker="/pub/" ;     mirrorBases="$(MIRROR_KERNEL)" ;; \
 	          *//download.savannah.gnu.org/releases/*)          marker="/releases/" ; mirrorBases="$(MIRROR_SAVANNAH)" ;; \
 	          *//gnupg.org/ftp/gcrypt/*|*//www.gnupg.org/ftp/gcrypt/*) marker="/gcrypt/" ; mirrorBases="$(MIRROR_GNUPG)" ;; \
+	          *//*.freedesktop.org/*)                          namedBases="$(MIRROR_FREEDESKTOP)" ;; \
 	        esac ; \
 	        if [ -n "$${marker}" ]; then \
 	          tail=$${url#*$${marker}} ; \
 	          for b in $${mirrorBases} ; do mirrorUrls="$${mirrorUrls} $${b%/}/$${tail}" ; done ; \
 	        fi ; \
+	        for b in $${namedBases} ; do mirrorUrls="$${mirrorUrls} $${b%/}/$${localFile}" ; done ; \
 	        for m in $(PKG_DIST_MIRRORS) ; do mirrorUrls="$${mirrorUrls} $${m%/}/$${localFile}" ; done ; \
 	        uniqUrls="" ; \
 	        for u in $${mirrorUrls} ; do case " $${uniqUrls} " in *" $${u} "*) ;; *) uniqUrls="$${uniqUrls} $${u}" ;; esac ; done ; \
