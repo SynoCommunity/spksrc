@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 4.0.3
-SPK_REV = 30
+SPK_REV = 31
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
