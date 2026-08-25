@@ -100,9 +100,11 @@ netdata_compile:
 	NINJA=$(BUILD_DIR)/build.ninja; \
 	if [ -n "$$PROTOC" ] && [ -f "$$NINJA" ]; then \
 		sed -i "s|protobuf::protoc|$$PROTOC|g" $$NINJA; \
-		sed -i '/protoc/s|-I\([^ ]*\)/src/aclk/aclk-schemas[[:space:]]|-I\1/src/aclk/aclk-schemas/proto |g' $$NINJA; \
-		sed -i '/protoc/s|--cpp_out=\([^ ]*\)/src/aclk/aclk-schemas[[:space:]]|--cpp_out=\1/src/aclk/aclk-schemas/proto |g' $$NINJA; \
-		sed -i '/INCLUDES.*src\/aclk\/aclk-schemas/s|\(-I[^ ]*src/aclk/aclk-schemas\)\([[:space:]]\)|\1\2\1/proto\2|g' $$NINJA; \
+		# netdata's cmake points --cpp_out at src/aclk/aclk-schemas/proto, but protoc \
+		# then writes to .../proto/<pkg>/vN -- the ninja build rules expect the \
+		# generated sources at src/aclk/aclk-schemas/<pkg>/vN, so normalize the \
+		# output directory to the build tree's aclk-schemas dir. \
+		sed -i '/protoc/s|--cpp_out=[^ ]*/src/aclk/aclk-schemas[^ ]*|--cpp_out=$(BUILD_DIR)/src/aclk/aclk-schemas|g' $$NINJA; \
 	fi
 	@$(MSG) Building the netdata journal reader
 	@cd $(WORK_DIR)/$(PKG_DIR)/src/crates/jf && export PATH="$$HOME/.cargo/bin:$$PATH" && cargo +$(TC_RUSTUP_TOOLCHAIN) build --release --target $(RUST_TARGET) -p journal_reader_ffi
