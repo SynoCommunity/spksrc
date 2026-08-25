@@ -1,6 +1,6 @@
 SPK_NAME = netdata
-SPK_VERS = 2.10.4
-SPK_REV = 2
+SPK_VERS = 2.11.0
+SPK_REV = 3
 SPK_ICON = src/netdata.png
 
 DEPENDS = cross/netdata
@@ -13,7 +13,7 @@ REQUIRED_MIN_DSM = 7.0
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Netdata
 DESCRIPTION = Real-time performance monitoring, done right! Monitor your system with beautiful, interactive dashboards.
-CHANGELOG = "1. Update Netdata to v2.10.4. <br/>2. Add systemd journal log viewing."
+CHANGELOG = "1. Update Netdata to v2.11.0."
 
 HOMEPAGE = https://www.netdata.cloud
 HELPURL = https://docs.synocommunity.com/packages/netdata/
