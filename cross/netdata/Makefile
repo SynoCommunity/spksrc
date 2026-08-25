@@ -53,24 +53,8 @@ COMPILE_TARGET = netdata_compile
 
 include ../../mk/spksrc.cross-cmake.mk
 # RUST_TARGET / TC_RUSTUP_TOOLCHAIN for cross-compiling the journal reader crate.
-# Defined here rather than including spksrc.cross/env-rust.mk, which can have
-# side effects on cmake-based builds (see cross/fish/Makefile).
-ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS)),$(ARCH))
-RUST_TARGET = armv7-unknown-linux-gnueabihf
-endif
-ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
-RUST_TARGET = armv7-unknown-linux-gnueabi
-endif
-ifeq ($(findstring $(ARCH), $(ARMv8_ARCHS)),$(ARCH))
-RUST_TARGET = aarch64-unknown-linux-gnu
-endif
-ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
-RUST_TARGET = x86_64-unknown-linux-gnu
-endif
-ifeq ($(findstring $(ARCH), $(i686_ARCHS)),$(ARCH))
-RUST_TARGET = i686-unknown-linux-gnu
-endif
-TC_RUSTUP_TOOLCHAIN ?= stable
+# Not provided by the generated tc_vars.mk, so included explicitly.
+include ../../mk/spksrc.cross/env-rust.mk
 
 .PHONY: netdata_post_patch
 netdata_post_patch:
