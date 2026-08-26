@@ -189,18 +189,20 @@ endif
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
+	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
 	  if [ "$${target}" = "CC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_C_COMPILER $${tcbin}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "CPP" -o "$${target}" = "CXX" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target}_COMPILER $${tcbin}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LD" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_LINKER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_LINKER $${tcbin}/$(TC_PREFIX)$${source} ; \
 	  elif [ "$${target}" = "LDSHARED" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS $$(echo $${source} | cut -f2 -d' ') ; \
+	    printf "set(%-25s %s)\n" CMAKE_SHARED_LINKER_FLAGS "$$(echo $${source} | cut -f2 -d' ') $(OVERLAY_BINUTILS_FLAG)" ; \
 	  elif [ "$${target}" = "FC" ] ; then \
-	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
+	    printf "set(%-25s %s)\n" CMAKE_Fortran_COMPILER $${tcbin}/$(TC_PREFIX)$$(echo $${source} | cut -f2 -d' ') ; \
 	  else \
-	    printf "set(%-25s %s)\n" CMAKE_$${target} $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source} ; \
+	    printf "set(%-25s %s)\n" CMAKE_$${target} $${tcbin}/$(TC_PREFIX)$${source} ; \
 	  fi ; \
 	done ; \
 	echo
@@ -244,12 +246,8 @@ endif
 	echo "endif()"
 	@echo ; \
 	echo "# Rust compiler and Cargo" ; \
-	echo "set(CARGO  $(RUSTUP_HOME)/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo)"
-ifeq ($(TC_RUSTUP_TOOLCHAIN),stable)
-	@echo "set(RUSTC  $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)-x86_64-unknown-linux-gnu/bin/rustc)"
-else
-	@echo "set(RUSTC  $(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/bin/rustc)"
-endif
+	echo "set(CARGO  $(CARGO_HOME)/bin/cargo)" ; \
+	echo "set(RUSTC  $(CARGO_HOME)/bin/rustc)"
 	@echo ; \
 	echo "# Cross target triple" ; \
 	echo "set(RUST_TARGET  $(RUST_TARGET))" ; \
@@ -262,9 +260,9 @@ endif
 	echo "set(ENV{RUSTC} \$${RUSTC})" ; \
 	echo "set(ENV{CARGO} \$${CARGO})" ; \
 	echo "set(ENV{CARGO_BUILD_TARGET} \$${RUST_TARGET})" ; \
-	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER} \$${RUST_LINKER})" ; \
-	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR} \$${RUST_AR})" ; \
-	echo "set(ENV{CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS} $(TC_EXTRA_RUSTFLAGS))"
+	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER} \$${RUST_LINKER})" ; \
+	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_AR} \$${RUST_AR})" ; \
+	echo "set(ENV{CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS} $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)))"
 
 .PHONY: tc_meson_cross_vars
 tc_meson_cross_vars:
@@ -279,24 +277,23 @@ tc_meson_cross_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
+	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
+	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
+	  extra="" ; case "$${target}" in ldshared) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
 	  if [ "$${target}" = "cpp" ]; then \
 	    echo "# Ref: https://mesonbuild.com/Machine-files.html#binaries" ; \
-	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)g++'" ; \
+	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)g++'" ; \
 	  elif [ "$${target}" = "fc" ]; then \
-	    echo "fortran = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "fortran = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
 	  elif [ "$${target}" = "cc" ]; then \
-	    echo "c = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
-	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "c = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)$${source}'" ; \
 	  else \
-	    echo "$${target} = '$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}'" ; \
+	    echo "$${target} = '$${tcbin}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}'" ; \
 	  fi ; \
 	done
-	@echo "cargo = '$(RUSTUP_HOME)/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo'"
-ifeq ($(TC_RUSTUP_TOOLCHAIN),stable)
-	@echo "rust = '$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)-x86_64-unknown-linux-gnu/bin/rustc'"
-else
-	@echo "rust = '$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/bin/rustc'"
-endif
+	@echo "cargo = '$(CARGO_HOME)/bin/cargo'" ; \
+	echo "rust = '$(CARGO_HOME)/bin/rustc'"
 
 .PHONY: tc_meson_native_vars
 tc_meson_native_vars:
@@ -322,16 +319,25 @@ tc_meson_native_vars:
 
 .PHONY: tc_rust_vars
 tc_rust_vars:
-	@echo TC_ENV += RUSTFLAGS=\"$(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
-	echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
+	@# ALL target rustflags go through CARGO_TARGET_<triple>_RUSTFLAGS -- NOT a global
+	@# RUSTFLAGS. cargo gives the global RUSTFLAGS env higher precedence than the
+	@# per-target flags, so a global RUSTFLAGS would SILENTLY DROP the arch codegen
+	@# options ($(TC_EXTRA_RUSTFLAGS): -Ctarget-cpu / -Ctarget-feature, e.g. ppc SPE) --
+	@# and it also wrongly leaked the target sysroot link-args onto the host's build
+	@# scripts / proc-macros. Consolidating here (link-args + arch codegen + the debug
+	@# ADDITIONAL_RUSTFLAGS) applies them to the target only, and nothing outranks them.
+	@# TC_EXTRA_RUSTFLAGS is skipped when the rust overlay is on: the JSON spec already
+	@# carries cpu/features, and re-passing them makes rustc warn ("unknown feature: spe").
+	@echo TC_ENV += CARGO_HOME=\"$(realpath $(CARGO_HOME))\" ; \
 	echo TC_ENV += RUSTUP_HOME=\"$(realpath $(RUSTUP_HOME))\" ; \
 	echo TC_ENV += RUSTUP_TOOLCHAIN=\"$(TC_RUSTUP_TOOLCHAIN)\" ; \
+	echo TC_ENV += RUST_TARGET_PATH=\"$(RUSTUP_HOME)/toolchains/$(TC_RUSTUP_TOOLCHAIN)/target-spec\" ; \
 	echo TC_ENV += CARGO_BUILD_TARGET=\"$(RUST_TARGET)\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_LINKER=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
-	echo TC_ENV += CARGO_TARGET_$(shell echo $(RUST_TARGET) | tr - _ | tr a-z A-Z)_RUSTFLAGS=\"$(TC_EXTRA_RUSTFLAGS)\" ; \
-	echo RUSTFLAGS := $(RUSTFLAGS) $$\(ADDITIONAL_RUSTFLAGS\) ; \
-	echo RUST_TARGET := $(RUST_TARGET)
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_AR=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)ar\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_LINKER=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gcc\" ; \
+	echo TC_ENV += CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS=\"$(RUSTFLAGS) $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) $$\(ADDITIONAL_RUSTFLAGS\)\" ; \
+	echo RUST_TARGET := $(RUST_TARGET) ; \
+	echo TC_RUSTC := $(TC_RUSTC)
 
 .PHONY: tc_autotools_vars
 tc_autotools_vars:
@@ -341,27 +347,37 @@ tc_autotools_vars:
 	do \
 	  target=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\1/' | tr [:lower:] [:upper:] ) ; \
 	  source=$$(echo $${tool} | sed 's/\(.*\):\(.*\)/\2/' ) ; \
-	  echo TC_ENV += $${target}=\"$(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)$${source}\" ; \
+	  tcbin="$(TC_WORK_DIR)/$(TC_TARGET)/bin" ; \
+	  case " $(TC_BINUTILS_TOOLS) " in *" $${source} "*) tcbin="$(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN),$${tcbin})" ;; esac ; \
+	  extra="" ; case "$${target}" in LDSHARED) extra="$(OVERLAY_BINUTILS_FLAG)" ;; esac ; \
+	  echo TC_ENV += $${target}=\"$${tcbin}/$(TC_PREFIX)$${source}$${extra:+ $${extra}}\" ; \
 	done ; \
-	echo TC_ENV += CFLAGS=\"$(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
+	echo TC_ENV += CFLAGS=\"$(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\)\" ; \
 	echo TC_ENV += CPPFLAGS=\"$(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\)\" ; \
-	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
+	echo TC_ENV += CXXFLAGS=\"$(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\)\" ; \
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
-	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
+	   echo TC_ENV += FFLAGS=\"$(FFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\)\" ; \
 	fi ; \
-	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)\"
+	echo TC_ENV += LDFLAGS=\"$(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)\"
 
 .PHONY: tc_flags
 tc_flags:
-	@echo CFLAGS := $(CFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
+	@echo CFLAGS := $(CFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CFLAGS\) ; \
 	echo CPPFLAGS := $(CPPFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CPPFLAGS\) ; \
-	echo CXXFLAGS := $(CXXFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
+	echo CXXFLAGS := $(CXXFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_CXXFLAGS\) ; \
 	if [ -n "$(TC_HAS_FORTRAN)" ]; then \
-	   echo FFLAGS := $(FFLAGS) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\) ; \
+	   echo FFLAGS := $(FFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(GCC_DEBUG_FLAGS\) $$\(ADDITIONAL_FFLAGS\) ; \
 	fi ; \
-	echo LDFLAGS := $(LDFLAGS) $$\(ADDITIONAL_LDFLAGS\)
+	echo LDFLAGS := $(LDFLAGS) $(OVERLAY_BINUTILS_FLAG) $$\(ADDITIONAL_LDFLAGS\)
 
 .PHONY: tc_vars
+# TC_OVERLAY_<c> is emitted with ACTIVE semantics -- the consumer dir when the overlay drives
+# THIS build, empty otherwise -- so a generated tc_vars.mk shows what was resolved. (In-tree the
+# same names mean AVAILABLE; nothing on the package side reads them back.) Binutils counts as
+# active only for the GLOBAL overlay: the narrow rust-link use downloads the same archive but
+# touches nothing else, and shows up as a -Clink-arg=-B<shim> in the Rust link flags.
+# The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
+# would inherit the previous run's choice and the switch would go sticky.
 tc_vars:
 	@echo TC_TYPE := $(TC_TYPE) ; \
 	echo TC_WORK_DIR := $(TC_WORK_DIR) ; \
@@ -377,13 +393,15 @@ tc_vars:
 	echo TC_EXTRA_CXXFLAGS := $(TC_EXTRA_CXXFLAGS) ; \
 	echo TC_EXTRA_FFLAGS := $(TC_EXTRA_FFLAGS) ; \
 	echo TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS) ; \
-	echo TC_EXTRA_RUSTFLAGS := $(TC_EXTRA_RUSTFLAGS) ; \
+	echo TC_EXTRA_RUSTFLAGS := $(if $(OVERLAY_RUSTC_ON),,$(TC_EXTRA_RUSTFLAGS)) ; \
 	echo TC_VERS := $(TC_VERS) ; \
 	echo TC_BUILD := $(TC_BUILD) ; \
 	echo TC_OS_MIN_VER := $(TC_OS_MIN_VER) ; \
 	echo TC_ARCH := $(TC_ARCH) ; \
 	echo TC_GCC := $(TC_GCC) ; \
-	echo TC_GLIBC := $(TC_GLIBC)
+	echo TC_GLIBC := $(TC_GLIBC) ; \
+	echo TC_OVERLAY_RUSTC := $(if $(OVERLAY_RUSTC_ON),$(TC_OVERLAY_RUSTC)) ; \
+	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS))
 # TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
@@ -395,7 +413,7 @@ endif
 #####
 
 ifeq ($(wildcard $(TCVARS_COOKIE)),)
-tcvars: generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
+tcvars: overlay-binutils-warn overlay-rustc-warn generate_tc_vars_mk generate_tc_vars_other $(TCVARS_COOKIE)
 
 $(TCVARS_COOKIE): $(POST_TCVARS_TARGET)
 	$(create_target_dir)

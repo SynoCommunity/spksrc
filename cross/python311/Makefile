@@ -6,11 +6,6 @@ PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-# Platform "powerpc-none-linux-gnuspe" with compiler "gcc" is not supported by the
-# CPython core team, see https://peps.python.org/pep-0011/ for more information.
-# And compiler must support std=c++11 (OlD_PPC_ARCHS fail, but ARMv5_ARCHS have no issue).
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
-
 BUILD_DEPENDS = native/python311
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
@@ -41,7 +36,9 @@ include ../../mk/spksrc.common.mk
 ifeq ($(strip $(PYTHON_OPTIMIZE)),1)
 #
 # Enable Link-Time Optimization
+ifeq ($(call version_gt, ${TC_GCC}, 4.4),1)
 CONFIGURE_ARGS += --with-lto
+endif
 #
 # pgo optimization can only be run native platform and now
 # exit on errors which had no impact (and effects) previously.
@@ -69,22 +66,22 @@ CONFIGURE_ARGS += --with-system-ffi
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
-POST_PATCH_TARGET    = python311_post_patch
-PRE_CONFIGURE_TARGET = python311_pre_configure
-COMPILE_TARGET       = python311_compile
-INSTALL_TARGET       = python311_install
+POST_PATCH_TARGET    = $(PKG_NAME)_post_patch
+PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
+COMPILE_TARGET       = $(PKG_NAME)_compile
+INSTALL_TARGET       = $(PKG_NAME)_install
 
 include ../../mk/spksrc.cross-cc.mk
 
 PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python$(PKG_VERS_MAJOR_MINOR))
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 
-.PHONY: python311_post_patch
-python311_post_patch:
+.PHONY: $(PKG_NAME)_post_patch
+$(PKG_NAME)_post_patch:
 	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
 
-.PHONY: python311_pre_configure
-python311_pre_configure:
+.PHONY: $(PKG_NAME)_pre_configure
+$(PKG_NAME)_pre_configure:
 	cp $(PYTHON_NATIVE) $(HOSTPYTHON)
 	$(RUN) autoreconf
 	# create phantom header and library to succeed add_dir_to_list in setup.py
@@ -95,12 +92,12 @@ python311_pre_configure:
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h || ln -fs $(STAGING_INSTALL_PREFIX)/include/sqlite3.h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/lib/libsqlite3.so || ln -fs $(STAGING_INSTALL_PREFIX)/lib/libsqlite3.so $(WORK_DIR)/Python-$(PKG_VERS)/lib/
 
-.PHONY: python311_compile
-python311_compile:
+.PHONY: $(PKG_NAME)_compile
+$(PKG_NAME)_compile:
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) -j $(NCPUS)
 
-.PHONY: python311_install
-python311_install:
+.PHONY: $(PKG_NAME)_install
+$(PKG_NAME)_install:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)

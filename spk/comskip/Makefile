@@ -19,7 +19,7 @@ CHANGELOG = "1. Update to FFMPEG 8.1.2"
 
 HOMEPAGE = https://www.kaashoek.com/comskip/
 LICENSE = LGPL
-HELPURL = https://github.com/SynoCommunity/spksrc/wiki/Comskip
+HELPURL = https://docs.synocommunity.com/packages/comskip/
 
 SPK_COMMANDS = bin/comskip
 

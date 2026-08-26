@@ -1,0 +1,15 @@
+#!/bin/bash
+# fix-ping.sh - Enable Icinga 2 ping checks
+# Prompts for the DSM administrator password and sets the setuid bit on the
+# ping binaries so the (unprivileged) monitoring plugins can use them.
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Requesting DSM administrator privileges..."
+    exec sudo "$0" "$@"
+fi
+
+echo "Setting setuid on ping binaries..."
+chmod +s /bin/ping
+chmod +s /bin/ping6
+
+echo "Done. Ping checks are now enabled."

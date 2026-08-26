@@ -1,0 +1,6 @@
+rsc:bin/libusb-config
+rsc:include/usb.h
+lnk:lib/libusb.so
+lnk:lib/libusb-0.1.so.4
+lib:lib/libusb-0.1.so.4.4.4
+rsc:lib/pkgconfig/libusb.pc

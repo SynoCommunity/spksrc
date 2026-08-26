@@ -37,3 +37,8 @@ libpq_compile:
 .PHONY: libpq_install
 libpq_install:
 	@$(RUN) ; cd src/interfaces && $(MAKE) -C libpq DESTDIR=$(INSTALL_DIR) install prefix=$(INSTALL_PREFIX)
+	@# Install required include files that libpq-fe.h depends on
+	@install -m 644 $(WORK_DIR)/$(PKG_DIR)/src/include/postgres_ext.h $(STAGING_INSTALL_PREFIX)/include/
+	@install -m 644 $(WORK_DIR)/$(PKG_DIR)/src/include/pg_config_ext.h $(STAGING_INSTALL_PREFIX)/include/
+	@# Install pg_config_manual.h needed by monitoring-plugins check_pgsql
+	@install -m 644 $(WORK_DIR)/$(PKG_DIR)/src/include/pg_config_manual.h $(STAGING_INSTALL_PREFIX)/include/

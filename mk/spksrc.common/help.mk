@@ -81,6 +81,19 @@ ifneq ($(filter $(SPKSRC_TREE),spk diyspk),)
 	fi
 endif
 endif
+ifneq ($(filter $(SPKSRC_TREE),cross spk diyspk),)
+	@printf "\n\033[1mOverlays\033[0m  (legacy archs only: a custom rustc / a modern binutils shipped beside the toolchain)\n"
+	@printf "  \033[36m%-24s\033[0m %-62s \033[32m%s\033[0m\n" "OVERLAY_RUSTC=0|1" "custom from-source rustc + synology triple" "current: $(strip $(OVERLAY_RUSTC))"
+	@printf "  \033[36m%-24s\033[0m %-62s \033[32m%s\033[0m\n" "OVERLAY_BINUTILS=0|1" "overlay as/ld for every compile, not just the rust link" "current: $(strip $(OVERLAY_BINUTILS))"
+	@printf "  \033[33m%s\033[0m\n" "  command line > environment > local.mk > built-in defaults -- so 'make setup' puts"
+	@printf "  \033[33m%s\033[0m\n" "  them in local.mk with ?=, and OVERLAY_BINUTILS=1 make ... still overrides for one build"
+	@if [ -n "$(strip $(ARCH))" ]; then \
+	  printf "  \033[33m%s\033[0m\n" "  here ($(ARCH)-$(TCVERSION)): rustc=$(if $(OVERLAY_RUSTC_ON),active,$(if $(strip $(TC_OVERLAY_RUSTC)),off,none)) binutils=$(if $(OVERLAY_BINUTILS_ON),active,$(if $(strip $(TC_OVERLAY_BINUTILS)),off,none))" ; \
+	else \
+	  printf "  \033[33m%s\033[0m\n" "  add ARCH=... TCVERSION=... to see which are active here" ; \
+	fi
+	@printf "  \033[33m%s\033[0m\n" "  details: docs/framework/toolchain.md (Overlay switches)"
+endif
 	@printf "\n\033[1mInspect\033[0m\n"
 	@printf "  \033[36m%-24s\033[0m %s\n" "dependency-tree" "print the resolved dependency graph"
 	@printf "  \033[36m%-24s\033[0m %s\n" "dependency-flat" "flat, de-duplicated dependency list"

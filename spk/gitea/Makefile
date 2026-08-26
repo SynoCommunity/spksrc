@@ -1,26 +1,26 @@
 SPK_NAME = gitea
-SPK_VERS = 1.26.2
-SPK_REV = 29
+SPK_VERS = 1.27.2
+SPK_REV = 30
 SPK_ICON = src/gitea.png
 
 MAINTAINER = wkobiela
 DESCRIPTION  = Gitea is a community managed lightweight code hosting solution written in Go.
 DISPLAY_NAME = Gitea
-CHANGELOG = "1. Update to v1.26.2. <br/>Built with go v1.26.3 and node v24.11.1."
+CHANGELOG = "1. Update to v1.27.2. <br/>2. Security update for CVE-2026-60004."
 
 LICENSE = MIT
 
 DEPENDS = cross/gitea
-SPK_DEPENDS = "git>=2"
+SPK_DEPENDS = "git"
 
-SERVICE_USER         		= auto
-SERVICE_SETUP        		= src/service-setup.sh
-STARTABLE            		= yes
-WIZARDS_DIR          		= src/wizard/
-SERVICE_WIZARD_SHARENAME 	= wizard_shared_folder_name
+SERVICE_USER = auto
+SERVICE_SETUP = src/service-setup.sh
+STARTABLE = yes
+WIZARDS_DIR = src/wizard/
+SERVICE_WIZARD_SHARENAME = wizard_shared_folder_name
 
 SERVICE_PORT = 8418
-SERVICE_PORT_TITLE = $(DISPLAY_NAME) (HTTP)
+SERVICE_PORT_TITLE = gitea UI (HTTP)
 ADMIN_PORT = $(SERVICE_PORT)
 
 POST_STRIP_TARGET = gitea_extra_install

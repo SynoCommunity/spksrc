@@ -1,5 +1,5 @@
 PKG_NAME = netdata
-PKG_VERS = 2.10.3
+PKG_VERS = 2.10.4
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/netdata/netdata/archive/refs/tags
@@ -12,6 +12,9 @@ BUILD_DEPENDS = native/protoc_33 cross/aclk-schemas
 HOMEPAGE = https://www.netdata.cloud
 COMMENT  = Real-time performance monitoring, done right
 LICENSE  = GPLv3
+
+# netdata compiles C++17 -- gcc 7.5 or newer (verified against the oldest DSM 7 toolchain)
+MIN_GCC_VERSION = 7.5
 
 ACLK_SCHEMAS_DIR = aclk-schemas-$(shell grep "^PKG_VERS " ../aclk-schemas/Makefile | sed 's/.*= //')
 
@@ -29,7 +32,6 @@ CONFIGURE_ARGS += -DENABLE_PLUGIN_OTEL_SIGNAL_VIEWER=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_CUPS=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_FREEIPMI=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_EBPF=OFF
-CONFIGURE_ARGS += -DENABLE_PLUGIN_SYSTEMD_JOURNAL=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_SYSTEMD_UNITS=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_XENSTAT=OFF
 CONFIGURE_ARGS += -DENABLE_PLUGIN_NFACCT=OFF
@@ -41,11 +43,39 @@ CONFIGURE_ARGS += -DENABLE_PLUGIN_SLABINFO=OFF
 CONFIGURE_ARGS += -DENABLE_EXPORTER_PROMETHEUS_REMOTE_WRITE=OFF
 CONFIGURE_ARGS += -DENABLE_LIBBACKTRACE=OFF
 CONFIGURE_ARGS += -DENABLE_BUNDLED_PROTOBUF=ON
+# systemd journal log browsing, using netdata's own journal file reader
+# (the Rust journal_reader_ffi static library, see netdata_compile below)
+CONFIGURE_ARGS += -DENABLE_PLUGIN_SYSTEMD_JOURNAL=ON
+CONFIGURE_ARGS += -DENABLE_NETDATA_JOURNAL_FILE_READER=ON
 
 POST_PATCH_TARGET = netdata_post_patch
 COMPILE_TARGET = netdata_compile
 
 include ../../mk/spksrc.cross-cmake.mk
+# RUST_TARGET / TC_RUSTUP_TOOLCHAIN for cross-compiling the journal reader crate.
+# Defined here rather than including spksrc.cross/env-rust.mk, which can have
+# side effects on cmake-based builds (see cross/fish/Makefile).
+RUSTUP_QORIQ_TOOLCHAIN = 1.82.0
+ifeq ($(findstring $(ARCH), $(ARMv7_ARCHS)),$(ARCH))
+RUST_TARGET = armv7-unknown-linux-gnueabihf
+endif
+ifeq ($(findstring $(ARCH), $(ARMv7L_ARCHS)),$(ARCH))
+RUST_TARGET = armv7-unknown-linux-gnueabi
+endif
+ifeq ($(findstring $(ARCH), $(ARMv8_ARCHS)),$(ARCH))
+RUST_TARGET = aarch64-unknown-linux-gnu
+endif
+ifeq ($(findstring $(ARCH), $(PPC_ARCHS)),$(ARCH))
+RUST_TARGET = powerpc-unknown-linux-gnuspe
+TC_RUSTUP_TOOLCHAIN = stable-$(RUSTUP_QORIQ_TOOLCHAIN)-$(RUST_TARGET)
+endif
+ifeq ($(findstring $(ARCH), $(x64_ARCHS)),$(ARCH))
+RUST_TARGET = x86_64-unknown-linux-gnu
+endif
+ifeq ($(findstring $(ARCH), $(i686_ARCHS)),$(ARCH))
+RUST_TARGET = i686-unknown-linux-gnu
+endif
+TC_RUSTUP_TOOLCHAIN ?= stable
 
 .PHONY: netdata_post_patch
 netdata_post_patch:
@@ -74,4 +104,7 @@ netdata_compile:
 		sed -i '/protoc/s|--cpp_out=\([^ ]*\)/src/aclk/aclk-schemas[[:space:]]|--cpp_out=\1/src/aclk/aclk-schemas/proto |g' $$NINJA; \
 		sed -i '/INCLUDES.*src\/aclk\/aclk-schemas/s|\(-I[^ ]*src/aclk/aclk-schemas\)\([[:space:]]\)|\1\2\1/proto\2|g' $$NINJA; \
 	fi
+	@$(MSG) Building the netdata journal reader
+	@cd $(WORK_DIR)/$(PKG_DIR)/src/crates/jf && export PATH="$$HOME/.cargo/bin:$$PATH" && cargo +$(TC_RUSTUP_TOOLCHAIN) build --release --target $(RUST_TARGET) -p journal_reader_ffi
+	@cp $(WORK_DIR)/$(PKG_DIR)/src/crates/jf/target/$(RUST_TARGET)/release/libjournal_reader_ffi.a $(WORK_DIR)/$(PKG_DIR)/
 	$(RUN) cmake --build $(BUILD_DIR) -j $(NCPUS)

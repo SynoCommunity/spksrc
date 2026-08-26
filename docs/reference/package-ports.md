@@ -58,6 +58,7 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Communication"><td>5280</td><td>ejabberd</td><td>Communication</td><td>HTTP admin</td></tr>
     <tr data-category="Development"><td>5433</td><td>PostgreSQL</td><td>Development</td><td>Database</td></tr>
     <tr data-category="Media Server"><td>5500</td><td>Kavita</td><td>Media Server</td><td>Web interface</td></tr>
+    <tr data-category="Monitoring"><td>5665</td><td>Icinga 2</td><td>Monitoring</td><td>Agent-to-master</td></tr>
     <tr data-category="Media Management"><td>6060</td><td>Plexivity</td><td>Media Management</td><td>Web interface</td></tr>
     <tr data-category="Development"><td>6379</td><td>Redis</td><td>Development</td><td>Database</td></tr>
     <tr data-category="Media Management"><td>6767</td><td>Bazarr</td><td>Media Management</td><td>Web interface</td></tr>
@@ -119,6 +120,8 @@ The following ports are used by SynoCommunity packages.
     <tr data-category="Development"><td>18888</td><td>Demo Service</td><td>Development</td><td>Demo</td></tr>
     <tr data-category="Development"><td>18889</td><td>Demo Web Service</td><td>Development</td><td>Demo</td></tr>
     <tr data-category="Monitoring"><td>19999</td><td>Netdata</td><td>Monitoring</td><td>Dashboard</td></tr>
+    <tr data-category="Sync"><td>21027</td><td>Syncthing</td><td>Sync</td><td>Local discovery</td></tr>
+    <tr data-category="Sync"><td>22000</td><td>Syncthing</td><td>Sync</td><td>BEP (sync)</td></tr>
     <tr data-category="Backup"><td>51515</td><td>Kopia</td><td>Backup</td><td>Web interface</td></tr>
 
   </tbody>
