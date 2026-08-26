@@ -10,7 +10,7 @@ PUBLIC_KEY="${SYNOPKG_PKGVAR}/umurmur.crt"
 
 create_certificate ()
 {
-    if [ -f "${PRIVATE_KEY}" ] && [ -f "${PUBLIC_KEY}" ]; then
+    if [ -s "${PRIVATE_KEY}" ] && [ -s "${PUBLIC_KEY}" ]; then
         echo "Found uMurmur certificate. To create a new certificate upon package update you have to delete the existing certificate before."
         return 0
     fi
@@ -37,8 +37,6 @@ service_postinst ()
     # Certificate generation
     create_certificate 2>&1
     if [ $? -ne 0 ]; then
-        touch ${PRIVATE_KEY}
-        touch ${PUBLIC_KEY}
         return 1
     fi
 }
@@ -47,7 +45,7 @@ service_preupgrade ()
 {
     # Migrate to DSM 7 compatible var folder
     if [ -e "${CFG_FILE}" ]; then
-        if $(grep -q "/usr/local/umurmur/var/" "${CFG_FILE}"); then
+        if grep -q "/usr/local/umurmur/var/" "${CFG_FILE}"; then
             echo "Update var folder for DSM 7 compatibility in configuration file."
             sed -e "s,/usr/local/umurmur/var/,/var/packages/umurmur/var/,g" -i "${CFG_FILE}"
         fi
@@ -55,7 +53,7 @@ service_preupgrade ()
 
     # Update log-file name to package name
     if [ -e "${CFG_FILE}" ]; then
-        if $(grep -q "umurmurd.log" "${CFG_FILE}"); then
+        if grep -q "umurmurd.log" "${CFG_FILE}"; then
             echo "Update log file name in configuration file."
             sed -e "s,umurmurd.log,umurmur.log,g" -i "${CFG_FILE}"
         fi
