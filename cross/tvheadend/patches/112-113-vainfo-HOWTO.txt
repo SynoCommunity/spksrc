@@ -1,0 +1,62 @@
+Two fixes to the VAAPI capability probe added by PR #2117, on top of the
+100-109 transcode series.
+
+Context: "Configuration / General / Enable vainfo detection" probes the VAAPI
+driver at startup and registers only the encoders it advertises, so a profile
+cannot be built around an encoder the hardware does not have. The mechanism is
+sound; these are two defects in it.
+
+112-vainfo-no-terminate-on-failed-init.patch
+    src/transcoding/codec/vainfo.c, init()
+
+    The teardown is a fall-through ladder:
+
+        error_entrypoints:
+            free(entrypoints);
+        error_Initialize:
+            vaTerminate(va_dpy);
+        error_open_display:
+            va_close_display_drm(va_dpy);
+
+    and the vaInitialize() failure path does "goto error_Initialize" -- which
+    calls vaTerminate() on a display that was never initialised. libva only
+    defines vaTerminate() for an initialised display; it dereferences driver
+    context that does not exist on that path.
+
+    That is the one case where the probe can take the process down: the DRM
+    device opens (so /dev/dri exists and is readable) but vaInitialize() fails
+    -- a driver/ABI mismatch, a missing i965/iHD backend, a container without
+    the driver mounted. Hardware with no /dev/dri at all is unaffected: that
+    path returns before, at error_open_display.
+
+    Fix: jump to error_open_display instead, skipping vaTerminate(). The label
+    error_Initialize then has no remaining goto, so it is removed as well or
+    -Werror=unused-label fails the build; the vaTerminate() call stays, reached
+    by fall-through from the paths where the display *was* initialised.
+
+113-config-vainfo-own-group.patch
+    src/config.c
+
+    The "Enable vainfo detection" property is declared with .group = 7, and
+    group 7 of the config class is "Ports settings". A VAAPI codec-detection
+    switch is displayed among the port numbers.
+
+    Adds a "Transcoding" group (9 was free) and moves the property there.
+    Cosmetic, no behaviour change.
+
+Not addressed here
+    Startup delay. vainfo_init() runs synchronously inside codec_init(): it
+    opens DRM, calls vaInitialize(), enumerates every profile/entrypoint pair
+    and calls vaGetConfigAttributes() for each encode entrypoint of interest.
+    Codec registration -- and therefore the stream profile list -- waits on all
+    of it. Most of the cost is vaInitialize() itself. Moving the probe off the
+    startup path means registering codecs asynchronously, which changes
+    ordering guarantees; that is a design decision for upstream, not a patch to
+    carry here.
+
+    Per-profile granularity. The probe tracks availability per codec, not per
+    profile: encoder_hevc_isavailable is set if either VAProfileHEVCMain or
+    VAProfileHEVCMain10 advertises VAEntrypointEncSlice. On hardware that
+    encodes HEVC Main but only decodes Main10, hevc_vaapi is correctly kept --
+    it does work -- and a 10-bit profile would still fail at OPEN_ENCODER. No
+    shipped profile requests 10-bit, so this is latent.

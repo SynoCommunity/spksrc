@@ -37,13 +37,13 @@ index 54bf0bc63..5011327e0 100644
  
  
 +/* Push what the parser already knows about the elementary stream into the
-+   decoder context: geometry, sample aspect ratio and frame rate.  The buffer
-+   filter source is configured from these fields, so leaving them at zero
-+   yields 'Invalid frame dimensions 0x0' and a pixel_aspect of 0/0, and the
-+   frames coming out of the graph carry no usable duration -- which then trips
-+   the pts-monotonicity guard in tvh_video_context_encode() and drops frames.
-+   Hardware paths mostly negotiate this from the frames context, so it is the
-+   software encoders that show the damage. */
++   decoder context: geometry, sample aspect ratio and frame rate.  stream.c
++   copies es_sample_aspect_ratio only -- and only in hwaccel builds -- so
++   width, height and frame rate reach the decoder unset, and the buffer
++   filter source is then configured from zeroes: libav reports 'Invalid
++   frame dimensions 0x0' and a pixel_aspect of 0/0.  Hardware paths mostly
++   negotiate geometry from the frames context instead, so it is the software
++   path that ends up running on the unset values. */
 +static void
 +tvh_video_apply_stream_params(TVHContext *self)
 +{
