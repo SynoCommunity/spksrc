@@ -1,5 +1,5 @@
 
-PYTHON_DIR="/var/packages/python313/target/bin"
+PYTHON_DIR="/var/packages/python314/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 HACS_VERS=2.0.5
 
@@ -87,12 +87,10 @@ service_postinst ()
     echo "Patch some packages after installation"
     ### patch integrations
     SITE_PACKAGES=$(realpath ${SYNOPKG_PKGDEST}/env/lib/python*/site-packages)
-    # aioasuswrt==1.5.1 does not exist, let it find aioasuswrt==1.5.4
-    sed -e 's/aioasuswrt==1.5.1/aioasuswrt>=1.5.1,<2.0.0/g' -i.orig ${SITE_PACKAGES}/homeassistant/components/asuswrt/manifest.json
     # opuslib does not find libopus.so with 'find_library'
-    sed -e "s|lib_location = find_library('opus')|lib_location = '${SYNOPKG_PKGDEST}/lib/libopus.so'|g" -i.orig ${SITE_PACKAGES}/opuslib/api/__init__.py
+    sed -e 's|lib_location = find_library("opus")|lib_location = "/var/packages/homeassistant/target/lib/libopus.so"|g' -i.orig ${SITE_PACKAGES}/opuslib_next/api/__init__.py
     # aiodhcpwatcher does not find libpcap.so
-    sed -e "s|find_library(\"pcap\")|\"${SYNOPKG_PKGDEST}/lib/libpcap.so\"|g" -i.orig ${SITE_PACKAGES}/scapy/libs/winpcapy.py
+    sed -e 's|find_library("pcap")|"/var/packages/homeassistant/target/lib/libpcap.so"|g' -i.orig ${SITE_PACKAGES}/scapy/libs/winpcapy.py
 
     echo "Provide chunk for tami4 integration"
     ### install chunk stub required by tami4 integration
@@ -102,8 +100,18 @@ service_postinst ()
     CONSTRAINTS=${SITE_PACKAGES}/homeassistant/package_constraints.txt
     echo ""                                 >> ${CONSTRAINTS}
     echo "# Added by SynoCommunity package" >> ${CONSTRAINTS}
-    echo "pycares==4.11.0"                  >> ${CONSTRAINTS}
-    echo "caio==0.9.24"                     >> ${CONSTRAINTS}
-    echo "scapy==2.6.1"                     >> ${CONSTRAINTS}
-    echo "voip_utils==0.3.4"                >> ${CONSTRAINTS}
+    echo "pycares==5.0.1"                   >> ${CONSTRAINTS}
+    echo "caio==0.9.25"                     >> ${CONSTRAINTS}
+    echo "scapy==2.7.0"                     >> ${CONSTRAINTS}
+    echo "voip_utils==0.4.0"                >> ${CONSTRAINTS}
+    echo "boto3==1.37.1"                    >> ${CONSTRAINTS}
+    echo "botocore==1.37.1"                 >> ${CONSTRAINTS}
+    echo "tenacity==8.5.0"                  >> ${CONSTRAINTS}
+    echo "construct-typing==0.6.2"          >> ${CONSTRAINTS}
+    echo "click==8.1.8"                     >> ${CONSTRAINTS}
+    echo "ical==13.3.0"                     >> ${CONSTRAINTS}
+    echo "wrapt==1.17.3"                    >> ${CONSTRAINTS}
+    echo "websockets==15.0.1"               >> ${CONSTRAINTS}
+    echo "rich==10.16.2"                    >> ${CONSTRAINTS}
+    echo "pysignalr==1.3.0"                 >> ${CONSTRAINTS}
 }

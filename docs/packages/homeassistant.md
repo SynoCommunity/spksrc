@@ -4,9 +4,9 @@
 > ***Home Assistant Core*** will not be supported as installation method from Home Assistant version 2025.12.
 > 
 > See [Deprecating Core and Supervised installation methods, and 32-bit systems](https://www.home-assistant.io/blog/2025/05/22/deprecating-core-and-supervised-installation-methods-and-32-bit-systems/)
-> So there will be no further package releases by SynoCommunity.
+> We still provide packages for 64-bit archs beyond this version, as long as it still works.
 > 
-> **If you want to use newer Homeassistant versions on Synology devices, you need to use docker for the deployment.**
+> **For Home Assistant on Synology devices, the use of container deployment is recommended.**
 > 
 
 > [!IMPORTANT]
@@ -49,11 +49,11 @@ Failed building wheel for py25519
 
 Please submit a
 [request for additonal integration](https://github.com/SynoCommunity/spksrc/issues/new)
-you are
-interested in. We will do our best to get it available in next version update.
+you are interested in and add the label `request/homeassistant-integration`. We will do our best to get it available in next version update.
 
-This section "State of the Default Integrations" reports integrations that are known to work (or fail) and their availability.
+The section "State of the Default Integrations" reports integrations that are known to work (or fail) and their availability.
 Some are supported only on DiskStation models with x86_64 CPU architecture.
+This list is outdated and not maintained anymore.
 
 
 ## Manually edit the Configuration
@@ -88,6 +88,30 @@ For that add your custom modules to the file:
 
 `/var/packages/homeassistant/var/requirements-custom.txt`
 
+You have to run the pip command to manually install modules as user `sc-homeassistant`. So it might be easier to add the modules to `requirements-custom.txt` and manually install homeassistant again (using the downloaded spk file).
+
+The manual installation of python modules is also usefull while development of HA package updates.
+_**Detailed instructions:**_
+
+```
+sudo -i
+
+su sc-homeassistant -s /bin/bash
+
+cd /var/packages/homeassistant/target/env
+
+# use any pip command like:
+
+./bin/pip install --no-deps spotifyaio==2.0.2
+
+./bin/pip freeze > requirements.txt
+
+./bin/pip install pipdeptree
+
+./bin/pipdeptree
+
+# finally restart homeassistant in the package center
+```
 
 
 ## Troubleshooting
@@ -105,20 +129,30 @@ When an integration fails to install within homeassistant, this can often be sol
 ## State of the Default Integrations (Components)
 State as of Home Assistant Package Versions
 
-- _0.114.2-9_
-- _0.118.5-11_
-- _2021.1.5-13_
-- _2021.8.8-14_
-- _2021.9.7-15_
-- _2022.10.5-19_
-- **2023.1.7-20**
-- **2023.7.3-22** WARNING: only aarch64 and x64 archs are used to validate working integrations in the list below. Packages are provided for x64 (x86_64), evansport (i686) and aarch64 (arm64). armv7 and qoriq models are not supported anymore (deactivated per 2025/02/22).
-- 2024.12.5 requires DSM >= 7.1 and supports models with x64, aarch64 and i686 (evansport) architectures. <br/>
+- _0.114.2-9_ <br/> not available anymore
+- _0.118.5-11_ <br/> not available anymore
+- _2021.1.5-13_ <br/> not available anymore
+- _2021.8.8-14_ <br/> not available anymore
+- _2021.9.7-15_ <br/> not available anymore
+- _2022.10.5-19_ <br/> not available anymore
+- _2023.1.7-20_ <br/> not available anymore
+- **2023.7.3-22**  Depends on Python 3.11 <br/>
+  WARNING: only aarch64 and x64 archs are used to validate working integrations in the list below. <br/>
+  Packages are provided for x64 (x86_64), evansport (i686) and aarch64 (arm64). <br/>
+  armv7 and qoriq models are not supported anymore (deactivated per 2025/02/22).
+- **2024.12.5-24** requires DSM >= 7.1 and supports models with x64, aarch64 and i686 (evansport) architectures. <br/>
+  Depends on Python 3.12 <br/>
   _originally planned to provide version 2025.1.4, but this version has a breaking issue (it supports encrypted backups only and those are not decryptable except by restore)_.
-- 2025.11.3 requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br/>
+- **2025.11.3-25** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br/>
+  Depends on Python 3.13 <br/>
   This is the last release of Home Assistant Core that is officially supported. <br/>
   All integrations that can be configured with an UI are supported. The list below is not maintained anymore (state of the list is for v2024.12.5)
+- **2026.7.4-26** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br/>
+  Depends on Python 3.14 <br/>
+  Despite versions after 2025.12.x are not officially supported anymore, it still works and you can ignore the "Unsupported installation method" warning. <br/>
+  All integrations that can be configured with an UI are supported. The list below is not maintained anymore.
 
+_**Supported HA Integrations up to HA 2024.12.5**_
 
 | 🏁	| Name	| HA Version	| Remarks	|
 | :--	| :--------	| :--	| :-----------	|
