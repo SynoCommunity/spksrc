@@ -107,4 +107,11 @@ service_postinst ()
     echo "boto3==1.37.1"                    >> ${CONSTRAINTS}
     echo "botocore==1.37.1"                 >> ${CONSTRAINTS}
     echo "tenacity==8.5.0"                  >> ${CONSTRAINTS}
+    echo "construct-typing==0.6.2"          >> ${CONSTRAINTS}
+    echo "click==8.1.8"                     >> ${CONSTRAINTS}
+    echo "ical==13.3.0"                     >> ${CONSTRAINTS}
+    echo "wrapt==1.17.3"                    >> ${CONSTRAINTS}
+    echo "websockets==15.0.1"               >> ${CONSTRAINTS}
+    echo "rich==10.16.2"                    >> ${CONSTRAINTS}
+    echo "pysignalr==1.3.0"                 >> ${CONSTRAINTS}
 }
