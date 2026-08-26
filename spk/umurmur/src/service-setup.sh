@@ -12,24 +12,24 @@ create_certificate ()
 {
     if [ -f "${PRIVATE_KEY}" ] && [ -f "${PUBLIC_KEY}" ]; then
         echo "Found uMurmur certificate. To create a new certificate upon package update you have to delete the existing certificate before."
-        exit 0
+        return 0
     fi
 
     if [ -z "${OPENSSL}" ]; then
         echo "missing openssl to create certificate for uMurmur."
-        exit 2
+        return 2
     fi
 
     # create certificate (use openssl of DSM)
     ${OPENSSL} req -x509 -newkey rsa:4096 -keyout ${PRIVATE_KEY} -nodes -sha256 -days 3653 -out ${PUBLIC_KEY} -batch -config /etc/ssl/openssl.cnf > /dev/null 2>&1
 
-    # Exit with the right code and an explicit message
+    # Return with the right code and an explicit message
     if [ $? -ne 0 ]; then
-        exit 1
+        return 1
     fi
 
     echo "Certificate for uMurmur successfully created."
-    exit 0
+    return 0
 }
 
 service_postinst ()
@@ -39,7 +39,7 @@ service_postinst ()
     if [ $? -ne 0 ]; then
         touch ${PRIVATE_KEY}
         touch ${PUBLIC_KEY}
-        exit 1
+        return 1
     fi
 }
 
