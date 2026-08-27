@@ -5,10 +5,9 @@ SPK_ICON = src/netdata.png
 
 DEPENDS = cross/netdata
 
-# netdata compiles C++17 -- gcc 7.5 or newer (verified against the oldest DSM 7 toolchain)
+# netdata compiles C++17, which requires gcc 7.5 or newer (verified against the oldest
+# DSM 7 toolchain); older toolchains cannot compile it.
 MIN_GCC_VERSION = 7.5
-
-REQUIRED_MIN_DSM = 7.0
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Netdata
@@ -42,3 +41,5 @@ netdata_extra_install:
 	@$(MSG) Install default netdata configuration
 	install -m 755 -d $(STAGING_DIR)/var/etc/netdata
 	install -m 644 src/var/etc/netdata/netdata.conf $(STAGING_DIR)/var/etc/netdata/
+	@$(MSG) Remove build-time SNMP trap profile generator from package
+	rm -f $(STAGING_DIR)/usr/libexec/netdata/plugins.d/snmp-trap-profile-gen

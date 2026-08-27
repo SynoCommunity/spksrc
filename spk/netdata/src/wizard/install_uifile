@@ -3,7 +3,7 @@
     "step_title": "Post-Installation Instructions",
     "items": [
       {
-        "desc": "Netdata's <strong>apps.plugin</strong> (per-process metrics) and <strong>systemd-journal.plugin</strong> (system log browsing) need <strong>root privileges</strong>, but Synology blocks this for unsigned packages."
+        "desc": "Netdata's <strong>per-process monitoring</strong>, <strong>system log browsing</strong>, <strong>network connections view</strong> and <strong>automatic service discovery</strong> need <strong>root privileges</strong>, but Synology blocks this for unsigned packages."
       },
       {
         "desc": "After the package starts, enable them by running this command in SSH:<br/><br/><code style=\"user-select: all\">netdata-fix</code><br/><br/>It will prompt for your DSM password, apply the fix, and restart the package."
