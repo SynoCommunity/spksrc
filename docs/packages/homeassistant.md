@@ -16,7 +16,7 @@
     - When enabling integrations, please consider that dependent modules that are cross-compiled must either be installed with the package or available in the index (i.e. on pypi.com)
     - The package installation (and update) takes a lot of time (see section below)
 
-### Package Installation and Update
+## Package Installation and Update
 !!! warning "Installation takes a long time"
     This is a huge package and installation may take some time and display an error. <br>
     In this case please press abort and do not retry installation. <br>
@@ -24,13 +24,9 @@
     For systems with low resources it may take up to 60 minutes until the web frontend is running and does not display \"Home Assistant is starting...\" anymore. <br>
     _This is caused by installation of cross-compiled modules included in the package and by modules required for the core system that are downloaded and installed from the internet._
 
-
-
-
 ## Available Integrations
 
 When enabling integrations, only pure-python modules or cross-compiled modules installed with the package will work.
-
 
 Many integrations require additional native Python 3 modules that have to be
 available as (cross-) compiled wheels for the respective DSM architecture.
@@ -54,8 +50,7 @@ The section "State of the Default Integrations" reports integrations that are kn
 Some are supported only on DiskStation models with x86_64 CPU architecture.
 This list is outdated and not maintained anymore.
 
-
-## Manually edit the Configuration
+## Manually editing the Configuration
 
 Some Components are fully configurable in the Home Assistant Frontend, but others are based on manual settings in the configuration file.
 
@@ -70,8 +65,6 @@ sudo nano /var/packages/homeassistant/var/config/configuration.yaml
 ```
 
 When restarting the service after configuration changes, please check the service log in the webui (or in `/var/packages/homeassistant/var/homeassistant.log`).
-
-
 
 ## Manually adding python modules
 
@@ -112,14 +105,12 @@ cd /var/packages/homeassistant/target/env
 # finally restart homeassistant in the package center
 ```
 
-
 ## Troubleshooting
 
 As homeassistant has such a lot of dependent python packages, there are still incompatible packages after installation.
 
 When an integration fails to install within homeassistant, this can often be solved by restarting homeassistant: since Homeassistant Core 2022.10.5 the restart in homeassistant does not work anymore. You have to stop/run in the DSM package center (or `synopkg restart homeassistant` in the shell on an ssh session).
  
-
 
 ## Related discussions
 
