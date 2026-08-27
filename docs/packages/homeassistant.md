@@ -1,37 +1,32 @@
 # SynoCommunity package Home Assistant Core
 
-> [!CAUTION]
-> ***Home Assistant Core*** will not be supported as installation method from Home Assistant version 2025.12.
-> 
-> See [Deprecating Core and Supervised installation methods, and 32-bit systems](https://www.home-assistant.io/blog/2025/05/22/deprecating-core-and-supervised-installation-methods-and-32-bit-systems/)
-> We still provide packages for 64-bit archs beyond this version, as long as it still works.
-> 
-> **For Home Assistant on Synology devices, the use of container deployment is recommended.**
-> 
+!!! danger "Home Assistant Core is not supported as an installation method"
+    ***Home Assistant Core*** will not be supported as installation method from Home Assistant version 2025.12.
 
-> [!IMPORTANT]
-> ***Home Assistant Core*** is a python application and does not contain all Homeassistant features
-> - Addons are not supported
-> - The restart of home assistant within the web UI is not supported anymore. You have to use the DSM Package Center (or shell command) to restart HA
-> - Integrated updates are not supported (except for HACS components)
-> - When enabling integrations, please consider that dependent modules that are cross-compiled must either be installed with the package or available in the index (i.e. on pypi.com)
-> - The package installation (and update) takes a lot of time (see section below)
+    See [Deprecating Core and Supervised installation methods, and 32-bit systems](https://www.home-assistant.io/blog/2025/05/22/deprecating-core-and-supervised-installation-methods-and-32-bit-systems/)
+    We still provide packages for 64-bit archs beyond this version, as long as it still works.
 
-### Package Installation and Update
-> [!WARNING]
-> This is a huge package and installation may take some time and display an error. <br>
-> In this case please press abort and do not retry installation. <br>
-> The package installer will display \"Installing...\" and finally \"Running\". <br>
-> For systems with low resources it may take up to 60 minutes until the web frontend is running and does not display \"Home Assistant is starting...\" anymore. <br>
-> _This is caused by installation of cross-compiled modules included in the package and by modules required for the core system that are downloaded and installed from the internet._
+    **For Home Assistant on Synology devices, the use of container deployment is recommended.**
 
+!!! warning "Limitations"
+    ***Home Assistant Core*** is a python application and does not contain all Homeassistant features
+    - Addons are not supported
+    - The restart of home assistant within the web UI is not supported anymore. You have to use the DSM Package Center (or shell command) to restart HA
+    - Integrated updates are not supported (except for HACS components)
+    - When enabling integrations, please consider that dependent modules that are cross-compiled must either be installed with the package or available in the index (i.e. on pypi.com)
+    - The package installation (and update) takes a lot of time (see section below)
 
-
+## Package Installation and Update
+!!! warning "Installation takes a long time"
+    This is a huge package and installation may take some time and display an error. <br>
+    In this case please press abort and do not retry installation. <br>
+    The package installer will display "Installing..." and finally "Running". <br>
+    For systems with low resources it may take up to 60 minutes until the web frontend is running and does not display "Home Assistant is starting..." anymore. <br>
+    _This is caused by installation of cross-compiled modules included in the package and by modules required for the core system that are downloaded and installed from the internet._
 
 ## Available Integrations
 
 When enabling integrations, only pure-python modules or cross-compiled modules installed with the package will work.
-
 
 Many integrations require additional native Python 3 modules that have to be
 available as (cross-) compiled wheels for the respective DSM architecture.
@@ -55,13 +50,12 @@ The section "State of the Default Integrations" reports integrations that are kn
 Some are supported only on DiskStation models with x86_64 CPU architecture.
 This list is outdated and not maintained anymore.
 
-
-## Manually edit the Configuration
+## Manually editing the Configuration
 
 Some Components are fully configurable in the Home Assistant Frontend, but others are based on manual settings in the configuration file.
 
-To access the configuration file, you need to enable SSH service (Control Panel → Terminal & SNMP → Enable SSH service) to gain access to your system. 
-You need a file editor like the default installed `vi` or `vim`. The installation of `nano` is recommended for beginners (contained in [SynoCli File Tools](https://synocommunity.com/package/synocli-file)). 
+To access the configuration file, you need to enable SSH service (Control Panel → Terminal & SNMP → Enable SSH service) to gain access to your system.
+You need a file editor like the default installed `vi` or `vim`. The installation of `nano` is recommended for beginners (contained in [SynoCli File Tools](synocli-file.md)).
 
 Then use the following command to edit the configuration according to
 [application documentation](https://home-assistant.io/getting-started/configuration/)
@@ -71,8 +65,6 @@ sudo nano /var/packages/homeassistant/var/config/configuration.yaml
 ```
 
 When restarting the service after configuration changes, please check the service log in the webui (or in `/var/packages/homeassistant/var/homeassistant.log`).
-
-
 
 ## Manually adding python modules
 
@@ -100,7 +92,7 @@ su sc-homeassistant -s /bin/bash
 
 cd /var/packages/homeassistant/target/env
 
-# use any pip command like:
+# use any pip command like:
 
 ./bin/pip install --no-deps spotifyaio==2.0.2
 
@@ -113,13 +105,11 @@ cd /var/packages/homeassistant/target/env
 # finally restart homeassistant in the package center
 ```
 
-
 ## Troubleshooting
 
 As homeassistant has such a lot of dependent python packages, there are still incompatible packages after installation.
 
 When an integration fails to install within homeassistant, this can often be solved by restarting homeassistant: since Homeassistant Core 2022.10.5 the restart in homeassistant does not work anymore. You have to stop/run in the DSM package center (or `synopkg restart homeassistant` in the shell on an ssh session).
- 
 
 
 ## Related discussions
@@ -129,27 +119,27 @@ When an integration fails to install within homeassistant, this can often be sol
 ## State of the Default Integrations (Components)
 State as of Home Assistant Package Versions
 
-- _0.114.2-9_ <br/> not available anymore
-- _0.118.5-11_ <br/> not available anymore
-- _2021.1.5-13_ <br/> not available anymore
-- _2021.8.8-14_ <br/> not available anymore
-- _2021.9.7-15_ <br/> not available anymore
-- _2022.10.5-19_ <br/> not available anymore
-- _2023.1.7-20_ <br/> not available anymore
-- **2023.7.3-22**  Depends on Python 3.11 <br/>
-  WARNING: only aarch64 and x64 archs are used to validate working integrations in the list below. <br/>
-  Packages are provided for x64 (x86_64), evansport (i686) and aarch64 (arm64). <br/>
+- _0.114.2-9_ <br> not available anymore
+- _0.118.5-11_ <br> not available anymore
+- _2021.1.5-13_ <br> not available anymore
+- _2021.8.8-14_ <br> not available anymore
+- _2021.9.7-15_ <br> not available anymore
+- _2022.10.5-19_ <br> not available anymore
+- _2023.1.7-20_ <br> not available anymore
+- **2023.7.3-22**  Depends on Python 3.11 <br>
+  WARNING: only aarch64 and x64 archs are used to validate working integrations in the list below. <br>
+  Packages are provided for x64 (x86_64), evansport (i686) and aarch64 (arm64). <br>
   armv7 and qoriq models are not supported anymore (deactivated per 2025/02/22).
-- **2024.12.5-24** requires DSM >= 7.1 and supports models with x64, aarch64 and i686 (evansport) architectures. <br/>
-  Depends on Python 3.12 <br/>
+- **2024.12.5-24** requires DSM >= 7.1 and supports models with x64, aarch64 and i686 (evansport) architectures. <br>
+  Depends on Python 3.12 <br>
   _originally planned to provide version 2025.1.4, but this version has a breaking issue (it supports encrypted backups only and those are not decryptable except by restore)_.
-- **2025.11.3-25** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br/>
-  Depends on Python 3.13 <br/>
-  This is the last release of Home Assistant Core that is officially supported. <br/>
+- **2025.11.3-25** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br>
+  Depends on Python 3.13 <br>
+  This is the last release of Home Assistant Core that is officially supported. <br>
   All integrations that can be configured with an UI are supported. The list below is not maintained anymore (state of the list is for v2024.12.5)
-- **2026.7.4-26** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br/>
-  Depends on Python 3.14 <br/>
-  Despite versions after 2025.12.x are not officially supported anymore, it still works and you can ignore the "Unsupported installation method" warning. <br/>
+- **2026.7.4-26** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br>
+  Depends on Python 3.14 <br>
+  Despite versions after 2025.12.x are not officially supported anymore, it still works and you can ignore the "Unsupported installation method" warning. <br>
   All integrations that can be configured with an UI are supported. The list below is not maintained anymore.
 
 _**Supported HA Integrations up to HA 2024.12.5**_
@@ -741,7 +731,7 @@ _**Supported HA Integrations up to HA 2024.12.5**_
 | ✔️	| Ring	| 0.114.2	| 	|
 | ✔️	| Risco	| 0.118.5	| 	|
 | ✔️	| Rituals Perfume Genie	| 2021.4.6	| 	|
-|   	| RIVM Stookalert	| 2022.10.5	| <= 2023.7.3	|
+|   	| RIVM Stookalert	| 2022.10.5	| <= 2023.7.3	|
 | ✔️	| Roborock	| 2023.7.3	| 	|
 | ✔️	| Roku	| 0.114.2	| 	|
 | ❌️	| Rollease Acmeda Automate	| 0.114.2	| Error: Config flow could not be loaded: 500 Internal Server Error Server got itself in trouble	|
@@ -863,12 +853,12 @@ _**Supported HA Integrations up to HA 2024.12.5**_
 | ⚙	| Third Reality ➜ Add Zigbee device	| 2022.10.5	| Requires Zigbee integration	|
 | ✔️	| Thread	| 2023.7.3	| 	|
 | ✔️	| Tibber	| 0.114.2	| 	|
-| ✔	| Tile	| 2021.1.5	| 	|
-| ✔	| Tilt Hydrometer BLE	| 2022.10.5	| 	|
+| ✔️	| Tile	| 2021.1.5	| 	|
+| ✔️	| Tilt Hydrometer BLE	| 2022.10.5	| 	|
 | ✔️	| Time & Date	| 2024.12.5	| 	|
 | ✔️	| Todoist	| 2024.12.5	| 	|
-| ✔	| TOLO Sauna	| 2022.10.5	| 	|
-| ✔	| Tomorrow.io	| 2022.10.5	| 	|
+| ✔️	| TOLO Sauna	| 2022.10.5	| 	|
+| ✔️	| Tomorrow.io	| 2022.10.5	| 	|
 | ⚙	| Toon	| 0.114.2	| needs manual configuration	|
 | ✔️	| Total Connect	| 2021.4.6	| 	|
 | ✔️	| TP-Link ➜ Add Matter Device	| 2023.7.3	| 	|
