@@ -18,10 +18,10 @@
 
 ## Package Installation and Update
 !!! warning "Installation takes a long time"
-    This is a huge package and installation may take some time and display an error. <br>
-    In this case please press abort and do not retry installation. <br>
-    The package installer will display \"Installing...\" and finally \"Running\". <br>
-    For systems with low resources it may take up to 60 minutes until the web frontend is running and does not display \"Home Assistant is starting...\" anymore. <br>
+    This is a huge package and installation may take some time and display an error. <br/>
+    In this case please press abort and do not retry installation. <br/>
+    The package installer will display "Installing..." and finally "Running". <br/>
+    For systems with low resources it may take up to 60 minutes until the web frontend is running and does not display "Home Assistant is starting..." anymore. <br/>
     _This is caused by installation of cross-compiled modules included in the package and by modules required for the core system that are downloaded and installed from the internet._
 
 ## Available Integrations
@@ -54,8 +54,8 @@ This list is outdated and not maintained anymore.
 
 Some Components are fully configurable in the Home Assistant Frontend, but others are based on manual settings in the configuration file.
 
-To access the configuration file, you need to enable SSH service (Control Panel → Terminal & SNMP → Enable SSH service) to gain access to your system. 
-You need a file editor like the default installed `vi` or `vim`. The installation of `nano` is recommended for beginners (contained in [SynoCli File Tools](https://synocommunity.com/package/synocli-file)). 
+To access the configuration file, you need to enable SSH service (Control Panel → Terminal & SNMP → Enable SSH service) to gain access to your system.
+You need a file editor like the default installed `vi` or `vim`. The installation of `nano` is recommended for beginners (contained in [SynoCli File Tools](synocli-file.md)).
 
 Then use the following command to edit the configuration according to
 [application documentation](https://home-assistant.io/getting-started/configuration/)
@@ -110,7 +110,7 @@ cd /var/packages/homeassistant/target/env
 As homeassistant has such a lot of dependent python packages, there are still incompatible packages after installation.
 
 When an integration fails to install within homeassistant, this can often be solved by restarting homeassistant: since Homeassistant Core 2022.10.5 the restart in homeassistant does not work anymore. You have to stop/run in the DSM package center (or `synopkg restart homeassistant` in the shell on an ssh session).
- 
+
 
 ## Related discussions
 
