@@ -853,12 +853,12 @@ _**Supported HA Integrations up to HA 2024.12.5**_
 | ⚙	| Third Reality ➜ Add Zigbee device	| 2022.10.5	| Requires Zigbee integration	|
 | ✔️	| Thread	| 2023.7.3	| 	|
 | ✔️	| Tibber	| 0.114.2	| 	|
-| ✔	| Tile	| 2021.1.5	| 	|
-| ✔	| Tilt Hydrometer BLE	| 2022.10.5	| 	|
+| ✔️	| Tile	| 2021.1.5	| 	|
+| ✔️	| Tilt Hydrometer BLE	| 2022.10.5	| 	|
 | ✔️	| Time & Date	| 2024.12.5	| 	|
 | ✔️	| Todoist	| 2024.12.5	| 	|
-| ✔	| TOLO Sauna	| 2022.10.5	| 	|
-| ✔	| Tomorrow.io	| 2022.10.5	| 	|
+| ✔️	| TOLO Sauna	| 2022.10.5	| 	|
+| ✔️	| Tomorrow.io	| 2022.10.5	| 	|
 | ⚙	| Toon	| 0.114.2	| needs manual configuration	|
 | ✔️	| Total Connect	| 2021.4.6	| 	|
 | ✔️	| TP-Link ➜ Add Matter Device	| 2023.7.3	| 	|
