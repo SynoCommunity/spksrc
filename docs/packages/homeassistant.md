@@ -18,10 +18,10 @@
 
 ## Package Installation and Update
 !!! warning "Installation takes a long time"
-    This is a huge package and installation may take some time and display an error. <br/>
-    In this case please press abort and do not retry installation. <br/>
-    The package installer will display "Installing..." and finally "Running". <br/>
-    For systems with low resources it may take up to 60 minutes until the web frontend is running and does not display "Home Assistant is starting..." anymore. <br/>
+    This is a huge package and installation may take some time and display an error. <br>
+    In this case please press abort and do not retry installation. <br>
+    The package installer will display "Installing..." and finally "Running". <br>
+    For systems with low resources it may take up to 60 minutes until the web frontend is running and does not display "Home Assistant is starting..." anymore. <br>
     _This is caused by installation of cross-compiled modules included in the package and by modules required for the core system that are downloaded and installed from the internet._
 
 ## Available Integrations
@@ -119,27 +119,27 @@ When an integration fails to install within homeassistant, this can often be sol
 ## State of the Default Integrations (Components)
 State as of Home Assistant Package Versions
 
-- _0.114.2-9_ <br/> not available anymore
-- _0.118.5-11_ <br/> not available anymore
-- _2021.1.5-13_ <br/> not available anymore
-- _2021.8.8-14_ <br/> not available anymore
-- _2021.9.7-15_ <br/> not available anymore
-- _2022.10.5-19_ <br/> not available anymore
-- _2023.1.7-20_ <br/> not available anymore
-- **2023.7.3-22**  Depends on Python 3.11 <br/>
-  WARNING: only aarch64 and x64 archs are used to validate working integrations in the list below. <br/>
-  Packages are provided for x64 (x86_64), evansport (i686) and aarch64 (arm64). <br/>
+- _0.114.2-9_ <br> not available anymore
+- _0.118.5-11_ <br> not available anymore
+- _2021.1.5-13_ <br> not available anymore
+- _2021.8.8-14_ <br> not available anymore
+- _2021.9.7-15_ <br> not available anymore
+- _2022.10.5-19_ <br> not available anymore
+- _2023.1.7-20_ <br> not available anymore
+- **2023.7.3-22**  Depends on Python 3.11 <br>
+  WARNING: only aarch64 and x64 archs are used to validate working integrations in the list below. <br>
+  Packages are provided for x64 (x86_64), evansport (i686) and aarch64 (arm64). <br>
   armv7 and qoriq models are not supported anymore (deactivated per 2025/02/22).
-- **2024.12.5-24** requires DSM >= 7.1 and supports models with x64, aarch64 and i686 (evansport) architectures. <br/>
-  Depends on Python 3.12 <br/>
+- **2024.12.5-24** requires DSM >= 7.1 and supports models with x64, aarch64 and i686 (evansport) architectures. <br>
+  Depends on Python 3.12 <br>
   _originally planned to provide version 2025.1.4, but this version has a breaking issue (it supports encrypted backups only and those are not decryptable except by restore)_.
-- **2025.11.3-25** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br/>
-  Depends on Python 3.13 <br/>
-  This is the last release of Home Assistant Core that is officially supported. <br/>
+- **2025.11.3-25** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br>
+  Depends on Python 3.13 <br>
+  This is the last release of Home Assistant Core that is officially supported. <br>
   All integrations that can be configured with an UI are supported. The list below is not maintained anymore (state of the list is for v2024.12.5)
-- **2026.7.4-26** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br/>
-  Depends on Python 3.14 <br/>
-  Despite versions after 2025.12.x are not officially supported anymore, it still works and you can ignore the "Unsupported installation method" warning. <br/>
+- **2026.7.4-26** requires DSM >= 7.2 and supports models with x64 and aarch64 architectures. <br>
+  Depends on Python 3.14 <br>
+  Despite versions after 2025.12.x are not officially supported anymore, it still works and you can ignore the "Unsupported installation method" warning. <br>
   All integrations that can be configured with an UI are supported. The list below is not maintained anymore.
 
 _**Supported HA Integrations up to HA 2024.12.5**_
