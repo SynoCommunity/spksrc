@@ -1,29 +1,28 @@
 # SynoCommunity package Home Assistant Core
 
-> [!CAUTION]
-> ***Home Assistant Core*** will not be supported as installation method from Home Assistant version 2025.12.
-> 
-> See [Deprecating Core and Supervised installation methods, and 32-bit systems](https://www.home-assistant.io/blog/2025/05/22/deprecating-core-and-supervised-installation-methods-and-32-bit-systems/)
-> We still provide packages for 64-bit archs beyond this version, as long as it still works.
-> 
-> **For Home Assistant on Synology devices, the use of container deployment is recommended.**
-> 
+!!! danger "Home Assistant Core is not supported as an installation method"
+    ***Home Assistant Core*** will not be supported as installation method from Home Assistant version 2025.12.
 
-> [!IMPORTANT]
-> ***Home Assistant Core*** is a python application and does not contain all Homeassistant features
-> - Addons are not supported
-> - The restart of home assistant within the web UI is not supported anymore. You have to use the DSM Package Center (or shell command) to restart HA
-> - Integrated updates are not supported (except for HACS components)
-> - When enabling integrations, please consider that dependent modules that are cross-compiled must either be installed with the package or available in the index (i.e. on pypi.com)
-> - The package installation (and update) takes a lot of time (see section below)
+    See [Deprecating Core and Supervised installation methods, and 32-bit systems](https://www.home-assistant.io/blog/2025/05/22/deprecating-core-and-supervised-installation-methods-and-32-bit-systems/)
+    We still provide packages for 64-bit archs beyond this version, as long as it still works.
+
+    **For Home Assistant on Synology devices, the use of container deployment is recommended.**
+
+!!! warning "Limitations"
+    ***Home Assistant Core*** is a python application and does not contain all Homeassistant features
+    - Addons are not supported
+    - The restart of home assistant within the web UI is not supported anymore. You have to use the DSM Package Center (or shell command) to restart HA
+    - Integrated updates are not supported (except for HACS components)
+    - When enabling integrations, please consider that dependent modules that are cross-compiled must either be installed with the package or available in the index (i.e. on pypi.com)
+    - The package installation (and update) takes a lot of time (see section below)
 
 ### Package Installation and Update
-> [!WARNING]
-> This is a huge package and installation may take some time and display an error. <br>
-> In this case please press abort and do not retry installation. <br>
-> The package installer will display \"Installing...\" and finally \"Running\". <br>
-> For systems with low resources it may take up to 60 minutes until the web frontend is running and does not display \"Home Assistant is starting...\" anymore. <br>
-> _This is caused by installation of cross-compiled modules included in the package and by modules required for the core system that are downloaded and installed from the internet._
+!!! warning "Installation takes a long time"
+    This is a huge package and installation may take some time and display an error. <br>
+    In this case please press abort and do not retry installation. <br>
+    The package installer will display \"Installing...\" and finally \"Running\". <br>
+    For systems with low resources it may take up to 60 minutes until the web frontend is running and does not display \"Home Assistant is starting...\" anymore. <br>
+    _This is caused by installation of cross-compiled modules included in the package and by modules required for the core system that are downloaded and installed from the internet._
 
 
 
@@ -100,7 +99,7 @@ su sc-homeassistant -s /bin/bash
 
 cd /var/packages/homeassistant/target/env
 
-# use any pip command like:
+# use any pip command like:
 
 ./bin/pip install --no-deps spotifyaio==2.0.2
 
@@ -133,7 +132,7 @@ State as of Home Assistant Package Versions
 - _0.118.5-11_ <br/> not available anymore
 - _2021.1.5-13_ <br/> not available anymore
 - _2021.8.8-14_ <br/> not available anymore
-- _2021.9.7-15_ <br/> not available anymore
+- _2021.9.7-15_ <br/> not available anymore
 - _2022.10.5-19_ <br/> not available anymore
 - _2023.1.7-20_ <br/> not available anymore
 - **2023.7.3-22**  Depends on Python 3.11 <br/>
@@ -741,7 +740,7 @@ _**Supported HA Integrations up to HA 2024.12.5**_
 | ✔️	| Ring	| 0.114.2	| 	|
 | ✔️	| Risco	| 0.118.5	| 	|
 | ✔️	| Rituals Perfume Genie	| 2021.4.6	| 	|
-|   	| RIVM Stookalert	| 2022.10.5	| <= 2023.7.3	|
+|   	| RIVM Stookalert	| 2022.10.5	| <= 2023.7.3	|
 | ✔️	| Roborock	| 2023.7.3	| 	|
 | ✔️	| Roku	| 0.114.2	| 	|
 | ❌️	| Rollease Acmeda Automate	| 0.114.2	| Error: Config flow could not be loaded: 500 Internal Server Error Server got itself in trouble	|
