@@ -7,7 +7,7 @@ WEBDIR="${SYNOPKG_PKGDEST}/bin/webui"
 NZBGET_INSTALLER="${SYNOPKG_PKGVAR}/nzbget.run"
 GROUP="sc-download"
 # Version of NZBGet to install for kernel < 3.2
-KERNEL_PINNED_VERSION="26.2"
+KERNEL_PINNED_VERSION="26.3"
 
 # Force-overwrite the PID-file and WebDir setting
 # These could change depending on previous package settings
