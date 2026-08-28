@@ -5,9 +5,6 @@ SPK_ICON = src/vaultwarden.png
 
 DEPENDS = cross/vaultwarden cross/vaultwarden_web
 
-# PPC/ARMv5 are additionally gated by MIN_RUSTC_VERSION in cross/vaultwarden, but
-# listed here so `all-supported` does not attempt to build them
-# issue with dependent component "libmimalloc-sys" (stdatomic.h missing)
 # rust edition 2024 required (see rust-version in vaultwarden Cargo.toml)
 MIN_RUSTC_VERSION = 1.95
 # issue with dependent component "libmimalloc-sys" (stdatomic.h missing)
