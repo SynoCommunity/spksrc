@@ -15,6 +15,7 @@ CHANGELOG = "1. Update uMurmur to v0.4.1. <br/>2. Update mbedtls to 3.6.7"
 STARTABLE = yes
 SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
+FWPORTS = src/umurmur.sc
 
 HOMEPAGE = https://umurmur.net/
 LICENSE = 3-clause BSD
