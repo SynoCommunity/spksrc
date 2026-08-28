@@ -62,7 +62,7 @@ endif
 endif
 
 #
-# optional dependencies to build curl with
+# optional dependencies to build curl with optional features
 #
 # Unlike autotools, cmake defaults several of these to ON and then looks for the library.
 # Each one is therefore stated in both directions -- never left to the default.
@@ -107,19 +107,13 @@ CONFIGURE_ARGS += -DUSE_NGHTTP2=OFF
 endif
 
 ifeq ($(findstring nghttp3,$(BUILD_CURL_WITH)),nghttp3)
-ifneq ($(findstring gnutls,$(BUILD_CURL_WITH)),gnutls)
-$(error "ERROR: For curl with http3 support you must build with gnutls.")
-else
-ifneq ($(HTTP3_SUPPORTED),1)
-ifneq ($(ARCH),)
-$(warning "WARNING: HTTP3 is not supported for ARCH=$(ARCH)")
-endif
-else
-$(warning "WARNING: HTTP3 enabled but marked EXPERIMENTAL. Use with caution!")
+ifeq ($(HTTP3_SUPPORTED),1)
 DEPENDS += cross/ngtcp2 cross/nghttp3
 # USE_NGHTTP3 is turned on by curl itself once USE_NGTCP2 is set.
 CONFIGURE_ARGS += -DUSE_NGTCP2=ON
-endif
+CONFIGURE_ARGS += -DCURL_WITH_MULTI_SSL=OFF
+else ifneq ($(ARCH),)
+$(warning "WARNING: HTTP3 is not supported for ARCH=$(ARCH)")
 endif
 endif
 
