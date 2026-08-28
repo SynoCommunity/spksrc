@@ -10,6 +10,9 @@ DEPENDS = cross/openssl3
 # for mysqlclient-sys
 DEPENDS += cross/mariadb-connector-c
 
+# openssl-sys: to find libssl/libcrypto
+ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
+
 # rust edition 2024 required (see rust-version in Cargo.toml)
 MIN_RUSTC_VERSION = 1.91
 
