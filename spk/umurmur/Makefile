@@ -17,6 +17,9 @@ SERVICE_USER = auto
 SERVICE_SETUP = src/service-setup.sh
 FWPORTS = src/umurmur.sc
 
+# Admin link for in DSM UI
+DSM_UI_CONFIG = src/app/config
+
 HOMEPAGE = https://umurmur.net/
 LICENSE = 3-clause BSD
 
@@ -28,5 +31,4 @@ include ../../mk/spksrc.spk.mk
 umurmur_extra_install:
 	install -m 755 -d $(STAGING_DIR)/var $(STAGING_DIR)/app
 	install -m 644 src/umurmur.conf $(STAGING_DIR)/var/umurmur.conf
-	install -m 644 src/app/config $(STAGING_DIR)/app/config
 	install -m 755 src/app/umurmur.cgi.sh $(STAGING_DIR)/app/umurmur.cgi
