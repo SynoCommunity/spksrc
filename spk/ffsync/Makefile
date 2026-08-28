@@ -8,11 +8,11 @@ DEPENDS = cross/syncstorage-rs cross/diesel
 PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-# PPC/ARMv5 are additionally gated by MIN_RUSTC_VERSION in cross/syncstorage-rs, but
-# listed here so `all-supported` does not attempt to build them
+# rust edition 2024 required (see rust-version in syncstorage-rs Cargo.toml)
+MIN_RUSTC_VERSION = 1.91
 # ARMv7L (hi3535) excluded: aws-lc-sys (rustls) ARMv8 crypto assembly does not
 # assemble on the ARMv7 (Cortex-A9) toolchain
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
 # aarch64-6.2.4 excluded: aws-lc-sys (rustls) requires ARMv8.2+ crypto instructions not
 # available on older Synology ARM CPUs (e.g., Alpine.4x, Alpine.4xL, RT1900acv1, etc.)
 UNSUPPORTED_ARCHS_TCVERSION = aarch64-6.2.4
