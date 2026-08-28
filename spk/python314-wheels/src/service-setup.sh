@@ -1,4 +1,4 @@
-PYTHON_DIR="/var/packages/python313/target/bin"
+PYTHON_DIR="/var/packages/@@PYTHON_PACKAGE@@/target/bin"
 PATH="${SYNOPKG_PKGDEST}/env/bin:${SYNOPKG_PKGDEST}/bin:${PYTHON_DIR}:${PATH}"
 
 service_postinst ()
@@ -7,6 +7,5 @@ service_postinst ()
     install_python_virtualenv
 
     # Install the wheels
-    #install_python_wheels
+    install_python_wheels
 }
-

@@ -14,15 +14,6 @@ LICENSE  = MIT
 # Prevent PYO3_USE_ABI3_FORWARD_COMPATIBILITY leaking in from parent make
 unexport PYO3_USE_ABI3_FORWARD_COMPATIBILITY
 
-# toolchains lacking atomic support
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
-
 PATCHES_LEVEL = 1
-
-include ../../mk/spksrc.common.mk
-
-ifeq ($(call version_le, $(TC_GCC), 5),1)
-ADDITIONAL_CFLAGS = -std=c99
-endif
 
 include ../../mk/spksrc.python-wheel.mk

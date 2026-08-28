@@ -23,7 +23,7 @@ ELIXIR_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/elixir/work-native/insta
 ENV += PATH=$$PATH:$(ERLANG_BIN_DIR):$(ELIXIR_BIN_DIR)
 
 CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) PREFIX=$(INSTALL_PREFIX) RMQ_ROOTDIR=$(INSTALL_PREFIX)
 
 # we need a git tag that matches the rabbitmq version
 # to prevent to use an unrelated tag of the spksrc repo (at time of writing this is "mono-5.20.1.34-17dsm7")

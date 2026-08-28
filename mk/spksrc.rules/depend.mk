@@ -14,6 +14,7 @@
 #  REQUIRE_KERNEL      If set, will compile kernel modules and allow
 #                      use of KERNEL_DIR
 #  BUILD_DEPENDS       List of dependencies to go through, PLIST is ignored
+#  NATIVE_DEPENDS      native/* to build INTO this package's own context
 #
 ###############################################################################
 

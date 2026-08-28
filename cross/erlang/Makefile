@@ -16,7 +16,7 @@ LICENSE  = Apache 2.0
 NATIVE_ERLANG_BIN_DIR = $(realpath $(WORK_DIR)/../../../native/erlang/work-native/install/usr/local/bin)
 ENV = PATH=$$PATH:$(NATIVE_ERLANG_BIN_DIR)
 
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR) INSTALL_PREFIX=
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR) INSTALL_PREFIX=
 
 CONFIGURE_ARGS  = --without-javac
 CONFIGURE_ARGS += --without-jinterface

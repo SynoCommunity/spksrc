@@ -10,9 +10,6 @@ SVC_WRITE_PID=y
 
 GROUP="sc-syncthing"
 
-# include next gen gui
-export STGUIASSETS=${SYNOPKG_PKGDEST}/gui
-
 set_credentials() {
     if [ -n "${wizard_username}" -a -n "${wizard_password}" ]; then
         echo "set user name ${wizard_username} for syncthing Web GUI access"

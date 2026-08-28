@@ -45,6 +45,51 @@ wheel/crossenv targets are available — see
 `crossenv-<arch>-<tcvers>`, `download-wheels`, `wheelclean`, `wheelcleancache`,
 `crossenvclean`, `crossenvcleanall`.
 
+### Native Package Targets
+
+Run from `native/<package>/` directory (host tools built once, then reused via
+`NATIVE_DEPENDS`):
+
+| Target | Description |
+|--------|-------------|
+| `all` | Build everything (default): download → … → install, then `archive` |
+| `download` `checksum` `extract` `patch` `configure` `compile` `install` | Individual build lifecycle steps, in order |
+| `build-archive` / `print-archive-name` | Create the reusable archive on demand / print its filename (opt-in via `ARCHIVE_NAME`, see `spksrc.build/archive.mk`) |
+| `nativeclean` | Drop **this** package's build cookies so every step re-runs next `make`, keeping the work dir (source, install, archive). The native counterpart of `spkclean`; leaves dependencies' cookies alone |
+| `clean` / `smart-clean` | Remove all work directories / this package's source and cookies |
+
+To re-run a single step, remove its one cookie, e.g.
+`rm work-native/.<pkg>-archive_done`.
+
+### Inspecting the dependency graph
+
+`dependency-tree`, `dependency-flat` and `dependency-list` share three optional
+variables (they do not apply to `dependency-tree`, which always prints the full
+traversal):
+
+| Variable | Effect |
+|----------|--------|
+| `DEPENDS_TYPE` | Filter the output by relation type. Values: `DEPENDS`, `BUILD_DEPENDS`, `OPTIONAL_DEPENDS`, `NATIVE_DEPENDS`; combine them with spaces. Defaults to all types, or `DEPENDS BUILD_DEPENDS NATIVE_DEPENDS` when `ARCH`+`TCVERSION` are set. The traversal always visits every applicable type; this only filters what is printed. |
+| `EXCLUDE_DEPENDS` | Space-separated list of dependencies to skip. An excluded dependency **and its entire subtree** are pruned from the walk — e.g. `EXCLUDE_DEPENDS="cross/ffmpeg7"`. |
+| `ARCH` + `TCVERSION` | Resolve the graph in a specific toolchain context, so version-gated and conditional `DEPENDS` evaluate as they would in a real build. Set both. When set, `OPTIONAL_DEPENDS` is excluded by default. |
+
+```bash
+# Runtime dependencies only, resolved for x64 / DSM 7.2
+make dependency-flat DEPENDS_TYPE="DEPENDS" ARCH=x64 TCVERSION=7.2
+
+# The tree without a heavy meta package and everything under it
+make dependency-list EXCLUDE_DEPENDS="cross/ffmpeg7"
+```
+
+From the **spksrc root**, `dependency-list-spk` runs `dependency-list` for every
+`spk/` package in parallel and aggregates the result. It honors the same three
+variables:
+
+```bash
+# Every spk's runtime deps, resolved for x64 / DSM 7.2
+make dependency-list-spk DEPENDS_TYPE="DEPENDS" ARCH=x64 TCVERSION=7.2
+```
+
 ## Build System Includes
 
 ### Cross Compilation
@@ -156,7 +201,7 @@ This will run:
 ### CMake
 
 ```makefile
-CMAKE_ARGS = -DBUILD_SHARED_LIBS=ON
+CONFIGURE_ARGS = -DBUILD_SHARED_LIBS=ON
 
 include ../../mk/spksrc.cross-cmake.mk
 ```

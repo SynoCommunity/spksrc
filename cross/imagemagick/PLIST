@@ -19,7 +19,7 @@ lib:lib/ImageMagick-7.1.2/modules-Q16HDRI/filters/*.so
 rsc:lib/ImageMagick-7.1.2/modules-Q16HDRI/filters/*.la
 lnk:lib/libMagickCore-7.Q16HDRI.so
 lnk:lib/libMagickCore-7.Q16HDRI.so.10
-lib:lib/libMagickCore-7.Q16HDRI.so.10.0.2
+lib:lib/libMagickCore-7.Q16HDRI.so.10.0.3
 lnk:lib/libMagickWand-7.Q16HDRI.so
 lnk:lib/libMagickWand-7.Q16HDRI.so.10
-lib:lib/libMagickWand-7.Q16HDRI.so.10.0.2
+lib:lib/libMagickWand-7.Q16HDRI.so.10.0.3

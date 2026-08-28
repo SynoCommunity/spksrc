@@ -16,6 +16,6 @@ COMMENT  = Extract files from rar archives.
 LICENSE  = freeware
 
 CONFIGURE_TARGET = nop
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(STAGING_INSTALL_PREFIX)
+INSTALL_ARGS = install DESTDIR=$(STAGING_INSTALL_PREFIX)
 
 include ../../mk/spksrc.cross-cc.mk

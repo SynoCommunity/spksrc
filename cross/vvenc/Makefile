@@ -10,15 +10,13 @@ HOMEPAGE = https://www.hhi.fraunhofer.de/en/departments/vca/technologies-and-sol
 COMMENT  = VVenC, the Fraunhofer Versatile Video Encoder, is a fast and efficient software H.266/VVC encoder implementation
 LICENSE  = BSD-3-Clause-Clear license
 
-# Minimum GCC version required is 7
-REQUIRED_MIN_DSM = 7.0
-UNSUPPORTED_ARCHS = comcerto2k
-REQUIRED_MIN_SRM = 1.3
+# Needs gcc >= 7.5: needs C++17, i.e. gcc 7 or newer.
+MIN_GCC_VERSION = 7.5
 
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
-CMAKE_ARGS += -DVVENC_ENABLE_ARM_SIMD=FALSE
+CONFIGURE_ARGS += -DVVENC_ENABLE_ARM_SIMD=FALSE
 endif
 
 include ../../mk/spksrc.cross-cmake.mk

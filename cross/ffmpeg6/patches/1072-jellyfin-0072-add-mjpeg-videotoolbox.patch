@@ -1,10 +1,6 @@
-Subject: [PATCH] lavc/videotoolboxenc: add MJPEG support
----
-Index: FFmpeg/configure
-===================================================================
 --- configure
 +++ configure
-@@ -3347,6 +3347,8 @@ hevc_videotoolbox_encoder_deps="pthreads
+@@ -3412,6 +3412,8 @@ hevc_videotoolbox_encoder_deps="pthreads"
  hevc_videotoolbox_encoder_select="atsc_a53 videotoolbox_encoder"
  prores_videotoolbox_encoder_deps="pthreads"
  prores_videotoolbox_encoder_select="videotoolbox_encoder"
@@ -13,11 +9,9 @@ Index: FFmpeg/configure
  libaom_av1_decoder_deps="libaom"
  libaom_av1_encoder_deps="libaom"
  libaom_av1_encoder_select="extract_extradata_bsf"
-Index: FFmpeg/libavcodec/Makefile
-===================================================================
 --- libavcodec/Makefile
 +++ libavcodec/Makefile
-@@ -504,6 +504,7 @@ OBJS-$(CONFIG_MJPEG_CUVID_DECODER)     +
+@@ -504,6 +504,7 @@ OBJS-$(CONFIG_MJPEG_CUVID_DECODER)     += cuviddec.o
  OBJS-$(CONFIG_MJPEG_QSV_ENCODER)       += qsvenc_jpeg.o
  OBJS-$(CONFIG_MJPEG_RKMPP_ENCODER)     += rkmppenc.o
  OBJS-$(CONFIG_MJPEG_VAAPI_ENCODER)     += vaapi_encode_mjpeg.o
@@ -25,11 +19,9 @@ Index: FFmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_MLP_DECODER)             += mlpdec.o mlpdsp.o
  OBJS-$(CONFIG_MLP_ENCODER)             += mlpenc.o mlp.o
  OBJS-$(CONFIG_MMVIDEO_DECODER)         += mmvideo.o
-Index: FFmpeg/libavcodec/allcodecs.c
-===================================================================
 --- libavcodec/allcodecs.c
 +++ libavcodec/allcodecs.c
-@@ -883,6 +883,7 @@ extern const FFCodec ff_mpeg4_mediacodec
+@@ -891,6 +891,7 @@ extern const FFCodec ff_mpeg4_mediacodec_encoder;
  extern const FFCodec ff_mpeg4_omx_encoder;
  extern const FFCodec ff_mpeg4_v4l2m2m_encoder;
  extern const FFCodec ff_prores_videotoolbox_encoder;
@@ -37,16 +29,14 @@ Index: FFmpeg/libavcodec/allcodecs.c
  extern const FFCodec ff_vc1_cuvid_decoder;
  extern const FFCodec ff_vp8_cuvid_decoder;
  extern const FFCodec ff_vp8_mediacodec_decoder;
-Index: FFmpeg/libavcodec/videotoolboxenc.c
-===================================================================
 --- libavcodec/videotoolboxenc.c
 +++ libavcodec/videotoolboxenc.c
 @@ -547,6 +547,7 @@ static CMVideoCodecType get_cm_codec_type(AVCodecContext *avctx,
-                     else
-                         return MKBETAG('a','p','c','n'); // kCMVideoCodecType_AppleProRes422
-             }
-+        case AV_CODEC_ID_MJPEG: return kCMVideoCodecType_JPEG;
-         default:               return 0;
+             else
+                 return MKBETAG('a','p','c','n'); // kCMVideoCodecType_AppleProRes422
+         }
++    case AV_CODEC_ID_MJPEG: return kCMVideoCodecType_JPEG;
+     default:               return 0;
      }
  }
 @@ -1233,7 +1234,7 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
@@ -61,7 +51,7 @@ Index: FFmpeg/libavcodec/videotoolboxenc.c
 @@ -1347,7 +1348,7 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
          }
      }
-
+ 
 -    if (avctx->gop_size > 0 && avctx->codec_id != AV_CODEC_ID_PRORES) {
 +    if (avctx->gop_size > 0 && avctx->codec_id != AV_CODEC_ID_PRORES && avctx->codec_id != AV_CODEC_ID_MJPEG) {
          CFNumberRef interval = CFNumberCreate(kCFAllocatorDefault,
@@ -70,7 +60,7 @@ Index: FFmpeg/libavcodec/videotoolboxenc.c
 @@ -1496,7 +1497,7 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
          }
      }
-
+ 
 -    if (!vtctx->has_b_frames && avctx->codec_id != AV_CODEC_ID_PRORES) {
 +    if (!vtctx->has_b_frames && avctx->codec_id != AV_CODEC_ID_PRORES && avctx->codec_id != AV_CODEC_ID_MJPEG) {
          status = VTSessionSetProperty(vtctx->session,
@@ -79,7 +69,7 @@ Index: FFmpeg/libavcodec/videotoolboxenc.c
 @@ -2844,6 +2845,13 @@ static const enum AVPixelFormat prores_pix_fmts[] = {
      AV_PIX_FMT_NONE
  };
-
+ 
 +static const enum AVPixelFormat mjpeg_pix_fmts[] = {
 +    AV_PIX_FMT_VIDEOTOOLBOX,
 +    AV_PIX_FMT_NV12,
@@ -90,7 +80,7 @@ Index: FFmpeg/libavcodec/videotoolboxenc.c
  #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
  #define COMMON_OPTIONS \
      { "allow_sw", "Allow software encoding", OFFSET(allow_sw), AV_OPT_TYPE_BOOL, \
-@@ -3004,3 +3012,33 @@ const FFCodec ff_prores_videotoolbox_encoder = {
+@@ -3013,3 +3021,33 @@ const FFCodec ff_prores_videotoolbox_encoder = {
      .p.wrapper_name   = "videotoolbox",
      .hw_configs       = vt_encode_hw_configs,
  };

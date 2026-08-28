@@ -86,7 +86,7 @@ CONFIGURE_ARGS += OBJCOPY=$(TC_PATH)/$(TC_PREFIX)objcopy
 CONFIGURE_ARGS += OBJDUMP=$(TC_PATH)/$(TC_PREFIX)objdump
 
 # Build images twice, second time with newly built JDK
-COMPILE_MAKE_OPTIONS += product-images
+COMPILE_ARGS += product-images
 
 # debian patches
 # https://udd.debian.org/patches.cgi?src=openjdk-21&version=21.0.5%2B11-1
@@ -95,7 +95,7 @@ PATCHES_LEVEL = 1
 # Filter out any -jN since java's configure will autodetect number of CPU's
 # Use make JOBS=N to set number of CPU's in this package
 DISABLE_PARALLEL_MAKE = 1
-COMPILE_MAKE_OPTIONS += JOBS=$(NCPUS)
+COMPILE_ARGS += JOBS=$(NCPUS)
 
 include ../../mk/spksrc.cross-cc.mk
 

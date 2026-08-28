@@ -43,7 +43,7 @@ make setup              # Basic setup with default toolchains
 make setup-synocommunity  # Setup with SynoCommunity defaults (publish URL, distributor info)
 ```
 
-For detailed Docker setup and LXC/LXD alternatives, see the [Developers HOW-TO](https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO).
+For detailed Docker setup and LXC/LXD alternatives, see the [Developer Guide](https://docs.synocommunity.com/developer-guide/).
 
 > **Note:** Native Linux builds are not officially supported. Use Docker or LXC/LXD with Debian to match the build environment.
 
@@ -345,7 +345,17 @@ For packages with runtime dependencies (like Erlang-based apps), ensure version 
 
 ### Adding Architecture Support
 
-Use `UNSUPPORTED_ARCHS` to exclude architectures:
+When the limit is a toolchain capability (compiler, C library, or 32-bit),
+declare the floor and let the framework refuse the archs that cannot meet it:
+```makefile
+# Needs C++17 → gcc 8 or newer
+MIN_GCC_VERSION = 8
+
+# Needs a 64-bit target
+REQUIRE_64BIT = 1
+```
+
+For a plain exclusion that is not a capability floor, use `UNSUPPORTED_ARCHS`:
 ```makefile
 # Exclude old PPC architectures
 UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
@@ -474,8 +484,8 @@ grep -r "cross/openssl" spk/*/Makefile
 
 ## References
 
-- [SynoCommunity Wiki](https://github.com/SynoCommunity/spksrc/wiki)
-- [Developers HOW-TO](https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO)
-- [Using Python Wheels](https://github.com/SynoCommunity/spksrc/wiki/Using-wheels-to-distribute-Python-packages)
-- [Architecture Reference](https://github.com/SynoCommunity/spksrc/wiki/Architecture-per-Synology-model)
-- [FAQ](https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions)
+- [SynoCommunity Docs](https://docs.synocommunity.com)
+- [Developer Guide](https://docs.synocommunity.com/developer-guide/)
+- [Python Packages](https://docs.synocommunity.com/developer-guide/package-types/python/)
+- [Architectures](https://docs.synocommunity.com/reference/architectures/)
+- [Troubleshooting](https://docs.synocommunity.com/user-guide/troubleshooting/)

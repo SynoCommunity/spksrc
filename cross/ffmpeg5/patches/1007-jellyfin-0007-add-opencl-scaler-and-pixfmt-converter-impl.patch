@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3708,6 +3708,7 @@ rubberband_filter_deps="librubberband"
@@ -10,8 +8,6 @@ Index: jellyfin-ffmpeg/configure
  scale_qsv_filter_deps="libmfx"
  scdet_filter_select="scene_sad"
  select_filter_select="scene_sad"
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -418,6 +418,7 @@ OBJS-$(CONFIG_SCALE_FILTER)
@@ -22,8 +18,6 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_SCALE_QSV_FILTER)              += vf_scale_qsv.o
  OBJS-$(CONFIG_SCALE_VAAPI_FILTER)            += vf_scale_vaapi.o scale_eval.o vaapi_vpp.o
  OBJS-$(CONFIG_SCALE_VULKAN_FILTER)           += vf_scale_vulkan.o vulkan.o vulkan_filter.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -400,6 +400,7 @@ extern const AVFilter ff_vf_sab;
@@ -34,8 +28,6 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern const AVFilter ff_vf_scale_qsv;
  extern const AVFilter ff_vf_scale_vaapi;
  extern const AVFilter ff_vf_scale_vulkan;
-Index: jellyfin-ffmpeg/libavfilter/opencl/scale.cl
-===================================================================
 --- /dev/null
 +++ libavfilter/opencl/scale.cl
 @@ -0,0 +1,276 @@
@@ -315,8 +307,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/scale.cl
 +#endif
 +}
 +#endif
-Index: jellyfin-ffmpeg/libavfilter/opencl_source.h
-===================================================================
 --- libavfilter/opencl_source.h
 +++ libavfilter/opencl_source.h
 @@ -27,6 +27,7 @@ extern const char *ff_opencl_source_desh
@@ -327,8 +317,6 @@ Index: jellyfin-ffmpeg/libavfilter/opencl_source.h
  extern const char *ff_opencl_source_pad;
  extern const char *ff_opencl_source_remap;
  extern const char *ff_opencl_source_tonemap;
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_scale_opencl.c
 @@ -0,0 +1,770 @@

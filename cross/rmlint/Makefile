@@ -30,8 +30,8 @@ include ../../mk/spksrc.cross-cc.mk
 
 .PHONY: rmlint_compile rmlint_install
 rmlint_compile:
-	@$(RUN) scons config --prefix=${INSTALL_PREFIX} VERBOSE=0 DEBUG=0 O=release
-	@$(RUN) scons --prefix=${INSTALL_PREFIX} VERBOSE=0 DEBUG=0 O=release
+	@$(RUN) scons config --prefix=$(INSTALL_PREFIX) VERBOSE=0 DEBUG=0 O=release
+	@$(RUN) scons --prefix=$(INSTALL_PREFIX) VERBOSE=0 DEBUG=0 O=release
 
 rmlint_install:
-	@$(RUN) install --mode=755 --target-directory=${INSTALL_DIR}${INSTALL_PREFIX}/bin/ ./rmlint
+	@$(RUN) install --mode=755 --target-directory=$(STAGING_INSTALL_PREFIX)/bin/ ./rmlint

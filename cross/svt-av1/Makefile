@@ -15,19 +15,21 @@ LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 ADDITIONAL_LDFLAGS =  -lm
 POST_INSTALL_TARGET = svt-av1_post_install_target
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+# 64-bit only (its configure refuses 32-bit) and needs gcc >= 4.9
+REQUIRE_64BIT = 1
+MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.cross-cmake.mk
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 ifeq ($(call version_lt, ${TC_GCC}, 5),1)
-CMAKE_ARGS += -DCOMPILE_C_ONLY=ON
+CONFIGURE_ARGS += -DCOMPILE_C_ONLY=ON
 endif
 endif
 
 # GCC 4.9 has incomplete/broken AVX-512 intrinsics support
 ifeq ($(call version_lt, ${TC_GCC}, 5.0),1)
-  CMAKE_ARGS += -DENABLE_AVX512=OFF
+  CONFIGURE_ARGS += -DENABLE_AVX512=OFF
 endif
 
 .PHONY: svt-av1_post_install_target

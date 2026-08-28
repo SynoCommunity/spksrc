@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
 @@ -3058,6 +3058,8 @@ scale_cuda_filter_deps="ffnvcodec"
@@ -20,8 +18,6 @@ Index: jellyfin-ffmpeg/configure
      check_nvcc cuda_llvm
  fi
  
-Index: jellyfin-ffmpeg/ffbuild/common.mak
-===================================================================
 --- ffbuild/common.mak
 +++ ffbuild/common.mak
 @@ -38,6 +38,7 @@ OBJCCFLAGS  = $(CPPFLAGS) $(CFLAGS) $(OB
@@ -32,8 +28,6 @@ Index: jellyfin-ffmpeg/ffbuild/common.mak
  
  HOSTCCFLAGS = $(IFLAGS) $(HOSTCPPFLAGS) $(HOSTCFLAGS)
  LDFLAGS    := $(ALLFFLIBS:%=$(LD_PATH)lib%) $(LDFLAGS)
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
 @@ -448,6 +448,8 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
@@ -45,8 +39,6 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o colorspace.o opencl.o \
                                                  opencl/tonemap.o opencl/colorspace_common.o
  OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
-===================================================================
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
 @@ -429,6 +429,7 @@ extern AVFilter ff_vf_tmedian;
@@ -57,8 +49,6 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern AVFilter ff_vf_tonemap_opencl;
  extern AVFilter ff_vf_tonemap_vaapi;
  extern AVFilter ff_vf_tpad;
-Index: jellyfin-ffmpeg/libavfilter/cuda/colorspace_common.h
-===================================================================
 --- /dev/null
 +++ libavfilter/cuda/colorspace_common.h
 @@ -0,0 +1,219 @@
@@ -281,8 +271,6 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/colorspace_common.h
 +}
 +
 +#endif /* AVFILTER_CUDA_COLORSPACE_COMMON_H */
-Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.c
-===================================================================
 --- /dev/null
 +++ libavfilter/cuda/host_util.c
 @@ -0,0 +1,35 @@
@@ -321,8 +309,6 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.c
 +    return 0;
 +}
 +
-Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.h
-===================================================================
 --- /dev/null
 +++ libavfilter/cuda/host_util.h
 @@ -0,0 +1,29 @@
@@ -355,8 +341,6 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.h
 +
 +#endif /* AVFILTER_CUDA_HOST_UTIL_H */
 +
-Index: jellyfin-ffmpeg/libavfilter/cuda/pixfmt.h
-===================================================================
 --- /dev/null
 +++ libavfilter/cuda/pixfmt.h
 @@ -0,0 +1,209 @@
@@ -569,8 +553,6 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/pixfmt.h
 +
 +#endif /* AVFILTER_CUDA_PIXFMT_H */
 +
-Index: jellyfin-ffmpeg/libavfilter/cuda/shared.h
-===================================================================
 --- /dev/null
 +++ libavfilter/cuda/shared.h
 @@ -0,0 +1,32 @@
@@ -606,8 +588,6 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/shared.h
 +
 +#endif /* AVFILTER_CUDA_SHARED_H */
 +
-Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
-===================================================================
 --- /dev/null
 +++ libavfilter/cuda/tonemap.cu
 @@ -0,0 +1,201 @@
@@ -812,8 +792,6 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
 +}
 +
 +}
-Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.h
-===================================================================
 --- /dev/null
 +++ libavfilter/cuda/tonemap.h
 @@ -0,0 +1,35 @@
@@ -852,8 +830,6 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.h
 +
 +#endif /* AVFILTER_CUDA_TONEMAP_H */
 +
-Index: jellyfin-ffmpeg/libavfilter/cuda/util.h
-===================================================================
 --- /dev/null
 +++ libavfilter/cuda/util.h
 @@ -0,0 +1,55 @@
@@ -912,8 +888,6 @@ Index: jellyfin-ffmpeg/libavfilter/cuda/util.h
 +
 +#endif /* AVFILTER_CUDA_UTIL_H */
 +
-Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
-===================================================================
 --- /dev/null
 +++ libavfilter/vf_tonemap_cuda.c
 @@ -0,0 +1,720 @@

@@ -1,6 +1,6 @@
 SPK_NAME = rustdesk-server
-SPK_VERS = 1.1.15
-SPK_REV = 1
+SPK_VERS = 1.1.16
+SPK_REV = 2
 SPK_ICON = src/rustdesk-server.png
 
 DEPENDS = cross/rustdesk-server
@@ -10,7 +10,7 @@ UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv7L_ARCHS) $(ARMv5_ARCHS)
 MAINTAINER = SynoCommunity
 DESCRIPTION = RustDesk Server provides self-hosted relay and rendezvous services for RustDesk remote desktop clients. An open-source alternative to TeamViewer or AnyDesk server infrastructure.
 DISPLAY_NAME = RustDesk Server
-CHANGELOG = Initial release of RustDesk Server 1.1.15
+CHANGELOG = "Update RustDesk Server to 1.1.16"
 
 HOMEPAGE = https://rustdesk.com/
 LICENSE  = AGPL-3.0
@@ -30,7 +30,7 @@ WIZARDS_DIR = src/wizard
 FWPORTS = src/rustdesk-server.sc
 
 # Minimum DSM version
-SPK_MIN_DSM = 6.0
+REQUIRED_MIN_DSM = 6.0
 
 # Install config file template
 POST_STRIP_TARGET = rustdesk_extra_install

@@ -39,7 +39,7 @@ body:
   id: arch
   attributes:
     label: Device Architecture
-    description: Which CPU Architecture does your NAS have? [You can look up the Architecture for your NAS here](https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures)
+    description: Which CPU Architecture does your NAS have? [You can look up the Architecture for your NAS here](https://docs.synocommunity.com/reference/architectures/)
     options:
       - x86_64
       - AArch64 (ARMv8)

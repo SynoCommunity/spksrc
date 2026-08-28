@@ -1,5 +1,5 @@
 PKG_NAME = 7zz
-PKG_VERS = 24.09
+PKG_VERS = 26.02
 PKG_EXT = tar.xz
 PKG_DIST_NAME = 7z$(subst .,,$(PKG_VERS))-src.$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ip7z/7zip/releases/download/$(PKG_VERS)
@@ -19,7 +19,7 @@ COMMENT  = 7-Zip is a file archiver with a high compression ratio.
 LICENSE = https://github.com/ip7z/7zip/blob/main/DOC/License.txt
 
 CONFIGURE_TARGET = nop
-COMPILE_MAKE_OPTIONS = -f makefile.gcc
+COMPILE_ARGS = -f makefile.gcc
 
 PATCH_TARGET = 7z_patch
 INSTALL_TARGET = 7z_install

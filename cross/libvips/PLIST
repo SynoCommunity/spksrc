@@ -1,0 +1,7 @@
+lnk:lib/libvips.so
+lnk:lib/libvips.so.42
+lib:lib/libvips.so.42.19.3
+lnk:lib/libvips-cpp.so
+lnk:lib/libvips-cpp.so.42
+lib:lib/libvips-cpp.so.42.19.3
+lnk:lib/libvips-cpp.so.8.17.3

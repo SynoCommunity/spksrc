@@ -1,4 +1,4 @@
-# chunk.py – minimal Python 3.13 stub
+# chunk.py – minimal Python 3 stub
 # 
 # Workaround for tami4 integration that depends on Python 2 'chunk' module
 # This is a replacement implementation

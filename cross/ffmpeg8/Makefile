@@ -10,8 +10,8 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
-# requires c11 and proper atomic using gcc-4.9+ support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Needs C11 and working atomics -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.common.mk
 
@@ -35,6 +35,10 @@ endif
 
 # Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
 CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
+
+# Enable the Synology VideoStation compatibility code added by the
+# SYNO-* patch series (hls_seek_time, smooth streaming, srt tags, ...)
+CONFIGURE_ARGS += --extra-cflags=-DSYNO_VIDEOSTATION
 
 # Compiler workaround to enable DTS-HD MA stream decoding
 CONFIGURE_ARGS += --extra-cflags=-fno-if-conversion
@@ -224,8 +228,10 @@ DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
 
-# Add SVT-AV1 codec to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(x64_ARCHS)),$(ARCH))
+# SVT-AV1 is 64-bit only -- its configure refuses 32-bit, and it now declares
+# REQUIRE_64BIT, so pulling it on a 32-bit arch (the old list named comcerto2k,
+# alpine and monaco, all ARMv7) fails the whole build. Gate it on the 64-bit archs.
+ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
 endif
@@ -238,9 +244,6 @@ CONFIGURE_ARGS += --disable-armv5te
 CONFIGURE_ARGS += --disable-armv6
 CONFIGURE_ARGS += --disable-armv6t2
 CONFIGURE_ARGS += --disable-vfp
-ifeq ($(findstring $(ARCH),alpine),$(ARCH))
-CONFIGURE_ARGS += --extra-cflags=-DSYNO_ALPINE_NEON
-endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))

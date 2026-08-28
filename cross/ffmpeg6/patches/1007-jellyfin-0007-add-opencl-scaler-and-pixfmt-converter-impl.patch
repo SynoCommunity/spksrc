@@ -1,8 +1,6 @@
-Index: jellyfin-ffmpeg/configure
-===================================================================
 --- configure
 +++ configure
-@@ -3725,6 +3725,7 @@ rubberband_filter_deps="librubberband"
+@@ -3796,6 +3796,7 @@ rubberband_filter_deps="librubberband"
  sab_filter_deps="gpl swscale"
  scale2ref_filter_deps="swscale"
  scale_filter_deps="swscale"
@@ -10,32 +8,26 @@ Index: jellyfin-ffmpeg/configure
  scale_qsv_filter_deps="libmfx"
  scale_qsv_filter_select="qsvvpp"
  scdet_filter_select="scene_sad"
-Index: jellyfin-ffmpeg/libavfilter/Makefile
-===================================================================
 --- libavfilter/Makefile
 +++ libavfilter/Makefile
-@@ -446,6 +446,7 @@ OBJS-$(CONFIG_SCALE_FILTER)
+@@ -457,6 +457,7 @@ OBJS-$(CONFIG_SCALE_FILTER)                  += vf_scale.o scale_eval.o
  OBJS-$(CONFIG_SCALE_CUDA_FILTER)             += vf_scale_cuda.o scale_eval.o \
                                                  vf_scale_cuda.ptx.o cuda/load_helper.o
  OBJS-$(CONFIG_SCALE_NPP_FILTER)              += vf_scale_npp.o scale_eval.o
 +OBJS-$(CONFIG_SCALE_OPENCL_FILTER)           += vf_scale_opencl.o opencl.o opencl/scale.o scale_eval.o
  OBJS-$(CONFIG_SCALE_QSV_FILTER)              += vf_vpp_qsv.o
  OBJS-$(CONFIG_SCALE_VAAPI_FILTER)            += vf_scale_vaapi.o scale_eval.o vaapi_vpp.o
- OBJS-$(CONFIG_SCALE_VULKAN_FILTER)           += vf_scale_vulkan.o vulkan.o vulkan_filter.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
-===================================================================
+ OBJS-$(CONFIG_SCALE_VT_FILTER)               += vf_scale_vt.o scale_eval.o
 --- libavfilter/allfilters.c
 +++ libavfilter/allfilters.c
-@@ -419,6 +419,7 @@ extern const AVFilter ff_vf_sab;
+@@ -428,6 +428,7 @@ extern const AVFilter ff_vf_sab;
  extern const AVFilter ff_vf_scale;
  extern const AVFilter ff_vf_scale_cuda;
  extern const AVFilter ff_vf_scale_npp;
 +extern const AVFilter ff_vf_scale_opencl;
  extern const AVFilter ff_vf_scale_qsv;
  extern const AVFilter ff_vf_scale_vaapi;
- extern const AVFilter ff_vf_scale_vulkan;
-Index: jellyfin-ffmpeg/libavfilter/opencl/scale.cl
-===================================================================
+ extern const AVFilter ff_vf_scale_vt;
 --- /dev/null
 +++ libavfilter/opencl/scale.cl
 @@ -0,0 +1,276 @@
@@ -315,20 +307,16 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/scale.cl
 +#endif
 +}
 +#endif
-Index: jellyfin-ffmpeg/libavfilter/opencl_source.h
-===================================================================
 --- libavfilter/opencl_source.h
 +++ libavfilter/opencl_source.h
-@@ -27,6 +27,7 @@ extern const char *ff_opencl_source_desh
- extern const char *ff_opencl_source_neighbor;
- extern const char *ff_opencl_source_nlmeans;
- extern const char *ff_opencl_source_overlay;
-+extern const char *ff_opencl_source_scale;
- extern const char *ff_opencl_source_pad;
- extern const char *ff_opencl_source_remap;
- extern const char *ff_opencl_source_tonemap;
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
-===================================================================
+@@ -29,6 +29,7 @@ extern const char *ff_source_nlmeans_cl;
+ extern const char *ff_source_overlay_cl;
+ extern const char *ff_source_pad_cl;
+ extern const char *ff_source_remap_cl;
++extern const char *ff_source_scale_cl;
+ extern const char *ff_source_tonemap_cl;
+ extern const char *ff_source_transpose_cl;
+ extern const char *ff_source_unsharp_cl;
 --- /dev/null
 +++ libavfilter/vf_scale_opencl.c
 @@ -0,0 +1,776 @@
@@ -659,7 +647,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
 +
 +    av_log(avctx, AV_LOG_DEBUG, "Generated OpenCL header:\n%s\n", header.str);
 +    opencl_sources[0] = header.str;
-+    opencl_sources[1] = ff_opencl_source_scale;
++    opencl_sources[1] = ff_source_scale_cl;
 +    err = ff_opencl_filter_load_program(avctx, opencl_sources, OPENCL_SOURCE_NB);
 +
 +    av_bprint_finalize(&header, NULL);

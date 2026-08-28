@@ -4,7 +4,7 @@
     "invalid_next_disabled": true,
     "items": [
       {
-        "desc": "Permissions for the package are managed by a \"System internal user\" named <b>sc-kopia</b>.Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "Permissions for the package are managed by a \"System internal user\" named <b>sc-kopia</b>.Please read <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> for details."
       },
       {
         "type": "textfield",

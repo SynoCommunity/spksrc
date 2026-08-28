@@ -12,6 +12,6 @@ HOMEPAGE = https://github.com/DaveGamble/cJSON
 COMMENT  = Ultralightweight JSON parser in ANSI C.
 LICENSE  = MIT
 
-CMAKE_ARGS += -DENABLE_CJSON_TEST=OFF
+CONFIGURE_ARGS += -DENABLE_CJSON_TEST=OFF
 
 include ../../mk/spksrc.cross-cmake.mk

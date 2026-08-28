@@ -1,19 +1,17 @@
-diff --git configure configure
-index 197f762b58..efcb4c4e49 100755
 --- configure
 +++ configure
-@@ -2460,6 +2460,7 @@ HAVE_LIST="
+@@ -2455,6 +2455,7 @@ HAVE_LIST="
      opencl_dxva2
      opencl_vaapi_beignet
      opencl_vaapi_intel_media
 +    opencl_videotoolbox
      perl
      pod2man
-     texi2html
-@@ -7217,6 +7218,11 @@ if enabled_all opencl d3d11va ; then
+     posix_ioctl
+@@ -7193,6 +7194,11 @@ if enabled_all opencl d3d11va ; then
          enable opencl_d3d11
  fi
-
+ 
 +if enabled_all opencl videotoolbox ; then
 +    check_func_headers OpenCL/cl_gl_ext.h clCreateImageFromIOSurfaceWithPropertiesAPPLE -framework VideoToolbox -framework OpenCL &&
 +        enable opencl_videotoolbox
@@ -21,14 +19,13 @@ index 197f762b58..efcb4c4e49 100755
 +
  enabled vdpau &&
      check_cpp_condition vdpau vdpau/vdpau.h "defined VDP_DECODER_PROFILE_MPEG4_PART2_ASP"
-
-diff --git libavutil/hwcontext_opencl.c libavutil/hwcontext_opencl.c
-index de093fffb1..efd8d0e094 100644
+ 
 --- libavutil/hwcontext_opencl.c
 +++ libavutil/hwcontext_opencl.c
-@@ -96,6 +96,11 @@
+@@ -95,6 +95,11 @@ typedef CL_API_ENTRY cl_mem(CL_API_CALL *clImportMemoryARM_fn)(
+ 
  #endif
-
+ 
 +#if HAVE_OPENCL_VIDEOTOOLBOX
 +#include <OpenCL/cl_gl_ext.h>
 +#include <VideoToolbox/VideoToolbox.h>
@@ -37,11 +34,10 @@ index de093fffb1..efd8d0e094 100644
  #if HAVE_OPENCL_VAAPI_INTEL_MEDIA && CONFIG_LIBMFX
  extern int ff_qsv_get_surface_base_handle(mfxFrameSurface1 *surf,
                                            enum AVHWDeviceType base_dev_typ,
-                                           void **base_handle);
-@@ -1364,6 +1369,12 @@ static int opencl_device_derive(AVHWDeviceContext *hwdev,
+@@ -1435,6 +1440,12 @@ static int opencl_device_derive(AVHWDeviceContext *hwdev,
          break;
  #endif
-
+ 
 +#if HAVE_OPENCL_VIDEOTOOLBOX
 +    case AV_HWDEVICE_TYPE_VIDEOTOOLBOX:
 +        err = opencl_device_create(hwdev, NULL, NULL, 0);
@@ -51,10 +47,10 @@ index de093fffb1..efd8d0e094 100644
      default:
          err = AVERROR(ENOSYS);
          break;
-@@ -2819,6 +2830,85 @@ fail:
-
+@@ -3346,6 +3357,85 @@ fail:
+ 
  #endif
-
+ 
 +#if HAVE_OPENCL_VIDEOTOOLBOX
 +
 +static void opencl_unmap_from_vt(AVHWFramesContext *hwfc,
@@ -137,7 +133,7 @@ index de093fffb1..efd8d0e094 100644
  static int opencl_map_from(AVHWFramesContext *hwfc, AVFrame *dst,
                             const AVFrame *src, int flags)
  {
-@@ -2864,6 +2953,10 @@ static int opencl_map_to(AVHWFramesContext *hwfc, AVFrame *dst,
+@@ -3396,6 +3486,10 @@ static int opencl_map_to(AVHWFramesContext *hwfc, AVFrame *dst,
      case AV_PIX_FMT_DRM_PRIME:
          if (priv->drm_arm_mapping_usable)
              return opencl_map_from_drm_arm(hwfc, dst, src, flags);
@@ -148,7 +144,7 @@ index de093fffb1..efd8d0e094 100644
  #endif
      }
      return AVERROR(ENOSYS);
-@@ -2922,6 +3015,10 @@ static int opencl_frames_derive_to(AVHWFramesContext *dst_fc,
+@@ -3466,6 +3560,10 @@ static int opencl_frames_derive_to(AVHWFramesContext *dst_fc,
          if (!priv->drm_arm_mapping_usable)
              return AVERROR(ENOSYS);
          break;

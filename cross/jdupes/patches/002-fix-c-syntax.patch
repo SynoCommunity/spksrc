@@ -1,0 +1,13 @@
+# avoid compile error:
+# act_linkfiles.c:365:15: error: label at end of compound statement
+# 
+--- act_linkfiles.c.orig	2025-09-26 16:00:49.000000000 +0000
++++ act_linkfiles.c	2026-08-08 05:01:34.631322688 +0000
+@@ -363,6 +363,7 @@
+                 dupelist[x]->flags |= FF_HASHDB_DIRTY | (srcfile->flags & (FF_HASH_PARTIAL | FF_HASH_FULL));
+                 add_hashdb_entry(NULL, 0, dupelist[x], 1);
+               default:
++                break;
+             }
+           }
+ #endif

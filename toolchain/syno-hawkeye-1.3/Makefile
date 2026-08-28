@@ -4,6 +4,7 @@ TC_TYPE = SRM
 # TODO: validate kernel version
 TC_KERNEL = 4.4.60
 TC_GLIBC = 2.32
+TC_GCC = 10.3.0
 
 # REMARKS:
 # This toolchain seems to be broken.

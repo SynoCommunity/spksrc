@@ -1,5 +1,5 @@
 PKG_NAME = c-ares
-PKG_VERS = 1.34.2
+PKG_VERS = 1.34.8
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/c-ares/c-ares/releases/download/v$(PKG_VERS)
@@ -16,7 +16,7 @@ LICENSE  = MIT
 
 POST_CONFIGURE_TARGET = cares_post_configure
 
-CMAKE_ARGS += -DCARES_BUILD_TOOLS=OFF
+CONFIGURE_ARGS += -DCARES_BUILD_TOOLS=OFF
 
 include ../../mk/spksrc.cross-cmake.mk
 

@@ -71,7 +71,7 @@ PAGE_DSM_PERMISSIONS=$(/bin/cat<<EOF
 {
     "step_title": "DSM Permissions",
     "items": [{
-        "desc": "Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "Please read <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> for details."
     },{
         "type": "textfield",
         "subitems": [{

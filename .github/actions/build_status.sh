@@ -43,8 +43,12 @@ echo "UNSUPPORTED (skipped):"
 if [ -f "${BUILD_UNSUPPORTED_FILE}" ]; then
     cat "${BUILD_UNSUPPORTED_FILE}" | awk '!seen[$0]++'
     if [ -f "${BUILD_ERROR_FILE}" ]; then
-        # remove unsupported packages from errors:
-        unsupported_packages=$(cat "${BUILD_UNSUPPORTED_FILE}" | grep -Po "\- \K.*:" | sort -u | tr '\n' '|' | sed -e 's/|$//')
+        # remove unsupported packages from errors: capture only the package name
+        # (up to the first colon). A greedy ".*:" would also swallow a reason that
+        # itself contains a colon -- e.g. "unsupported: glibc ... (a runtime floor:
+        # ...)" -- yielding a bogus name that both fails to match the error line and
+        # injects the reason's parentheses into the grep -Pv pattern below.
+        unsupported_packages=$(cat "${BUILD_UNSUPPORTED_FILE}" | grep -Po "\- \K.*?:" | sort -u | tr '\n' '|' | sed -e 's/|$//')
         cat "${BUILD_ERROR_FILE}" | grep -Pv "\- (${unsupported_packages}) " > "${BUILD_ERROR_FILE}.tmp"
         rm -f "${BUILD_ERROR_FILE}"
         mv "${BUILD_ERROR_FILE}.tmp" "${BUILD_ERROR_FILE}"

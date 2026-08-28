@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/nvenc.c
-===================================================================
 --- libavcodec/nvenc.c
 +++ libavcodec/nvenc.c
 @@ -2034,7 +2034,7 @@ static int nvenc_set_timestamp(AVCodecCo

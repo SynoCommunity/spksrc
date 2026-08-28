@@ -39,6 +39,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 | `spksrc.build/compile.mk` | Compilation orchestration |
 | `spksrc.build/install.mk` | Installation to staging |
 | `spksrc.build/plist.mk` | Package list generation |
+| `spksrc.build/archive.mk` | Optional post-install archive of the build output, for hosting/reuse (opt-in via `ARCHIVE_NAME`) |
 
 ### Cross-Compilation
 
@@ -77,7 +78,7 @@ The `mk/` directory contains all makefile includes, organized by function:
 
 | File | Purpose |
 |------|--------|
-| `spksrc.native-cc.mk` | Native compilation entry point |
+| `spksrc.native-cc.mk` | Native compilation entry point (also defines `nativeclean`, the native counterpart of `spkclean`) |
 | `spksrc.native/env-default.mk` | Native build environment |
 | `spksrc.native-cmake.mk` | Native CMake builds |
 | `spksrc.native-meson.mk` | Native Meson builds |
@@ -147,7 +148,8 @@ spksrc.build/
 ├── compile.mk                # compile
 ├── install.mk                # install to staging
 ├── plist.mk                  # package list generation (cross/kernel/cross-virtual; not in build.mk)
-└── ninja.mk                  # ninja helper (cmake/meson)
+├── ninja.mk                  # ninja helper (cmake/meson)
+└── archive.mk                # optional post-install archive (ARCHIVE_NAME)
 
 # Rules — shared targets / orchestration, included by the entry points
 spksrc.rules.mk               # rules entry point: clean/changelog targets,
@@ -232,10 +234,12 @@ spksrc.wheel/
 # Toolchain entry point
 spksrc.toolchain.mk
 spksrc.toolchain/
+├── overlay-binutils.mk       # binutils 2.30 overlay (as/ld); OVERLAY_ family base
+├── overlay-rustc.mk          # custom from-source rustc overlay (OVERLAY_RUSTC)
 ├── tc-base.mk
 ├── tc-flags.mk
 ├── tc-normalize.mk
-├── tc-rust.mk
+├── tc-rust.mk                # rustup base install (rustup-rustc target)
 ├── tc-url.mk
 ├── tc-versions.mk
 └── tc_vars.mk                # generates the tc_vars* files

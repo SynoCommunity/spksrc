@@ -2,6 +2,7 @@ TC_ARCH = bromolow
 TC_VERS = 7.1
 TC_KERNEL = 3.10.108
 TC_GLIBC = 2.26
+TC_GCC = 8.5.0
 
 TC_DIST = bromolow-gcc850_glibc226_x86_64-GPL
 TC_DIST_SITE_PATH = Intel%20x86%20linux%203.10.108%20%28Bromolow%29

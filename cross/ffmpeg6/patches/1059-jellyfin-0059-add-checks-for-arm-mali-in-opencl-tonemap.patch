@@ -1,8 +1,6 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
-===================================================================
 --- libavfilter/vf_tonemap_opencl.c
 +++ libavfilter/vf_tonemap_opencl.c
-@@ -333,6 +333,7 @@ static int tonemap_opencl_init(AVFilterC
+@@ -334,6 +334,7 @@ static int tonemap_opencl_init(AVFilterContext *avctx)
      cl_uint max_compute_units, device_vendor_id;
      cl_int cle;
      cl_mem_flags dovi_buf_flags = CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR;
@@ -10,7 +8,7 @@ Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_opencl.c
      char *device_name = NULL;
      char *device_exts = NULL;
      int i, j, err;
-@@ -407,6 +408,14 @@ static int tonemap_opencl_init(AVFilterC
+@@ -408,6 +409,14 @@ static int tonemap_opencl_init(AVFilterContext *avctx)
                  }
                  av_free(device_name);
              }

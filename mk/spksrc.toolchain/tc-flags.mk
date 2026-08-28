@@ -39,43 +39,97 @@ ifeq ($(strip $(TC_LIBRARY)),)
 TC_LIBRARY = $(TC_SYSROOT)/lib
 endif
 
-# we can't check whether gfortran exists, because toolchain is not yet extracted
-ifeq ($(strip $(firstword $(subst ., ,$(TC_VERS)))),7)
-TC_HAS_FORTRAN = 1
-else ifeq ($(strip $(TC_VERS)),1.3)
-TC_HAS_FORTRAN = 1
-else ifeq ($(strip $(TC_VERS)),6.2.4)
-ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
-TC_HAS_FORTRAN = 1
-endif
-endif
+####
+# Define capabilities
+
+# Does this toolchain ship a Fortran compiler? Ask it, rather than tabulate per
+# DSM/arch. A hardcoded "7.x, SRM 1.3 and 6.2.4-x64 have Fortran" list is a proxy
+# that only holds for the stock toolchains: it cannot see a compiler swapped in
+# underneath -- a gcc8 overlay, say, adds gfortran to a 6.2.4 arch the list calls
+# Fortran-less. Probing the actual binary stays correct whatever provides it.
+#
+# Lazy on purpose, like TC_HAS_LIBATOMIC: the ifneq's that read it
+# force the wildcard, and it only needs to be right where it is consumed -- the
+# tc_vars sub-make, which re-parses this file after the toolchain is extracted, so
+# the binary is there to find. Cross packages read the baked tc_vars result and
+# never re-probe. (At the first, pre-extract parse it is empty; that value is not
+# consumed -- the sub-make's is.)
+TC_HAS_FORTRAN = $(if $(wildcard $(TC_WORK_DIR)/$(TC_TARGET)/bin/$(TC_PREFIX)gfortran),1)
+
+# The tools a binutils overlay provides, so tc_vars.mk can take those from it when one is
+# active. A future gcc overlay gets its own TC_GCC_TOOLS list the same way.
+TC_BINUTILS_TOOLS = ld as ar nm ranlib strip objdump objcopy readelf
 
 TOOLS = ld ldshared:"gcc -shared" cpp nm cc:gcc as ranlib cxx:g++ ar strip objdump objcopy readelf
 ifneq ($(strip $(TC_HAS_FORTRAN)),)
 TOOLS += fc:gfortran
 endif
 
+# TC_EXTRA_LDFLAGS carries the ABI to the link and adds what a toolchain declares
+# for the linker. The ABI (TC_EXTRA_BUILD_FLAGS -- the -march/-mcpu/... flags folded
+# into every language just below) must reach the gcc link driver too, so it picks the
+# right multilib and startfiles. On top of that: -lrt for glibc<2.17 (clock_gettime)
+# and -latomic for targets without native 64-bit atomics (ARMv5, PowerPC e500v2),
+# both previously carried as per-package arch lists (cups/flac). -latomic is dropped
+# where the gcc does not ship it -- a gcc that old predates the __atomic_* builtins
+# and emits __sync_* instead, so it never needs the library. Kept lazy via a captured
+# copy: TC_HAS_LIBATOMIC runs the compiler, not extracted yet while the
+# toolchain is being parsed.
+#
+# These libs are declared toolchain-wide now, not per package, so they would land on
+# every link -- yet most binaries call neither clock_gettime nor an atomic builtin.
+# Wrap them in -Wl,--as-needed so the linker records a librt/libatomic dependency
+# only where the objects actually reference a symbol it provides, and -Wl,--no-as-needed
+# restores the default right after: the policy change is scoped to these two libs and
+# never drops a package library kept only for its side effects.
+_tc_comma := ,
+_TC_EXTRA_LDFLAGS := $(TC_EXTRA_LDFLAGS)
+_tc_ld_syslibs = $(if $(TC_HAS_LIBATOMIC),$(_TC_EXTRA_LDFLAGS),$(filter-out -latomic,$(_TC_EXTRA_LDFLAGS)))
+TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(if $(strip $(_tc_ld_syslibs)),-Wl$(_tc_comma)--as-needed $(_tc_ld_syslibs) -Wl$(_tc_comma)--no-as-needed)
+
+# TC_EXTRA_BUILD_FLAGS holds the target's ABI/arch flags (-march, -mcpu, -mfpu,
+# -mfloat-abi, -mthumb, ...). They select the ABI, so they must reach every language
+# (and the link, above) -- passing them only to CFLAGS would silently build C++ or
+# Fortran objects with a different ABI. Fold them once into each per-language
+# TC_EXTRA_<LANG>FLAGS, which then becomes the single residual list that language
+# reads: the ABI first, then whatever a toolchain adds for that language -- always
+# last in the chain, and a clean place to extend.
+#
+# TC_EXTRA_RUSTFLAGS is left out on purpose: rustc takes its ABI another way
+# (-Ctarget-cpu, in TC_EXTRA_RUSTFLAGS already), and rust's C dependencies get the
+# build flags through CFLAGS_<target> = TC_EXTRA_CFLAGS in tc-rust.mk.
+TC_EXTRA_CFLAGS   := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CFLAGS)
+TC_EXTRA_CPPFLAGS := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CPPFLAGS)
+TC_EXTRA_CXXFLAGS := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_CXXFLAGS)
+TC_EXTRA_FFLAGS   := $(TC_EXTRA_BUILD_FLAGS) $(TC_EXTRA_FFLAGS)
+
 ####
-# Define regular build flags
+# Define regular build flags -- each language reads its own residual list, ABI
+# already folded in, kept last so a package/toolchain addition stays at the end.
 
-CFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_CFLAGS)
+CFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 CFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
+CFLAGS += $(TC_EXTRA_CFLAGS)
 
-CPPFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_CFLAGS)
+CPPFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 CPPFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
+CPPFLAGS += $(TC_EXTRA_CPPFLAGS)
 
-CXXFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_CFLAGS)
+CXXFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 CXXFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
+CXXFLAGS += $(TC_EXTRA_CXXFLAGS)
 
 ifneq ($(strip $(TC_HAS_FORTRAN)),)
-FFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE)) $(TC_EXTRA_FFLAGS)
+FFLAGS += -I$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_INCLUDE))
 FFLAGS += -I$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/include)
+FFLAGS += $(TC_EXTRA_FFLAGS)
 endif
 
-LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY)) $(TC_EXTRA_CFLAGS)
+LDFLAGS += -L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY))
 LDFLAGS += -L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath-link,$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)
 LDFLAGS += -Wl,--rpath,$(abspath $(INSTALL_PREFIX)/lib)
+LDFLAGS += $(TC_EXTRA_LDFLAGS)
 
 RUSTFLAGS += -Clink-arg=-L$(abspath $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_LIBRARY))
 RUSTFLAGS += -Clink-arg=-L$(abspath $(INSTALL_DIR)/$(INSTALL_PREFIX)/lib)

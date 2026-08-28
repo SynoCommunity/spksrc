@@ -1,19 +1,19 @@
 SPK_NAME = ffmpeg8
 SPK_VERS = 8.1.2
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 2
+SPK_REV = 3
 SPK_ICON = src/ffmpeg8.png
-CHANGELOG = "1. Update to version 8.1.2"
+CHANGELOG = "1. Restore the SYNO-videostation patches"
 
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver
 
-# requires c11 and proper atomic using gcc-4.9+ support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Needs C11 and working atomics -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 MAINTAINER = th0ma7
-DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg
-DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo.  Informations additionnelles concernant le paquet FFmpeg de SynoCommunity disponibles à https://github.com/SynoCommunity/spksrc/wiki/FAQ-FFmpeg
+DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://docs.synocommunity.com/packages/ffmpeg/
+DESCRIPTION_FRE = FFmpeg est une solution complète multiplateforme pour enregistrer, convertir et diffuser du contenu audio et vidéo. Il comprend libavcodec - la principale bibliothèque de codecs audio/vidéo.  Informations additionnelles concernant le paquet FFmpeg de SynoCommunity disponibles à https://docs.synocommunity.com/packages/ffmpeg/
 DISPLAY_NAME = FFmpeg $(firstword $(subst ., ,$(SPK_VERS)))
 STARTABLE = no
 

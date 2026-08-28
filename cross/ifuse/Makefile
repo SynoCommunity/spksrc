@@ -13,6 +13,6 @@ LICENSE  = LGPL-2.1
 
 GNU_CONFIGURE = 1
 # avoid prefix definition for make install
-INSTALL_MAKE_OPTIONS = install DESTDIR=$(INSTALL_DIR)
+INSTALL_ARGS = install DESTDIR=$(INSTALL_DIR)
 
 include ../../mk/spksrc.cross-cc.mk

@@ -4,7 +4,7 @@ SynoCommunity is now on Discord!
 [![Discord](https://img.shields.io/discord/732558169863225384?color=7289DA&label=Discord&logo=Discord&logoColor=white&style=for-the-badge)](https://discord.gg/nnN9fgE7EF)
 
 # spksrc
-spksrc is a cross compilation framework intended to compile and package software for Synology NAS devices. Packages are made available via the [SynoCommunity repository].
+spksrc is a cross compilation framework intended to compile and package software for Synology NAS devices. Packages are made available via the [SynoCommunity repository](http://www.synocommunity.com).
 
 
 # DSM 7
@@ -14,22 +14,22 @@ DSM 7 was released on June 29 2021 as Version 7.0.41890.
   - before the repository deliverd DSM 6 packages for Systems with DSM 7, when no DSM 7 package was available
   - this gave errors like "invalid file format" (or "package requires root privileges")
   - you still get this error when manually installing a DSM 6 package on DSM 7
-* You find the status of the former packages in the issue [#4524] **Meta: DSM7 package status**
+* You find the status of the former packages in the issue [#4524](https://github.com/SynoCommunity/spksrc/issues/4524) **Meta: DSM7 package status**
 * New packages support DSM 7 from initial package version (and some require at least DSM 7).
 * **ATTENTION**: As reported, package configuration settings may be lost following the upgrade to DSM 7 and the execution of a Package repair. Make sure to backup your settings and configuration for your SynoCommunity packages before installation of DSM 7 to facilitate restoration if needed.
 
 
 ## Contributing
-Before opening a new issue, check the [FAQ] and search open issues.
-If you can't find an answer, or if you want to open a package request, read [CONTRIBUTING] to make sure you include all the information needed for contributors to handle your request.
+Before opening a new issue, check the [Troubleshooting guide](https://docs.synocommunity.com/user-guide/troubleshooting/) and search open issues.
+If you can't find an answer, or if you want to open a package request, read [CONTRIBUTING](https://docs.synocommunity.com/contributing/) to make sure you include all the information needed for contributors to handle your request.
 
 
 ## Setup Development Environment
 ### Docker
 *The Docker development environment supports Linux and macOS systems, but not Windows due to limitations of the underlying file system.*
 
-1. [Fork and clone] spksrc: `git clone https://github.com/YOUR-USERNAME/spksrc`
-2. Install Docker on your host OS (see [Docker installation], or use a `wget`-based alternative for linux [Install Docker with wget]).
+1. [Fork and clone](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo) spksrc: `git clone https://github.com/YOUR-USERNAME/spksrc`
+2. Install Docker on your host OS (see [Docker installation](https://docs.docker.com/engine/installation), or use a `wget`-based alternative for linux [Install Docker with wget](https://docs.docker.com/linux/step_one)).
 3. Download the spksrc Docker container: `docker pull ghcr.io/synocommunity/spksrc`
 4. Run the container with the repository mounted into the `/spksrc` directory with the appropriate command for your host Operating System:
 
@@ -42,7 +42,7 @@ docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc ghcr.io/synoc
 # If running on macOS:
 docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 ```
-5. From there, follow the instructions in the [Developers HOW TO].
+5. From there, follow the instructions in the [Developer Guide](https://docs.synocommunity.com/developer-guide/).
 
 
 
@@ -75,7 +75,7 @@ sudo apt install --no-install-recommends -y \
                  python3 python3-mako python3-pip python3-setuptools \
                  python3-virtualenv python3-yaml
 ```
-From there, follow the instructions in the [Developers HOW TO].
+From there, follow the instructions in the [Developer Guide](https://docs.synocommunity.com/developer-guide/).
 
 
 ### LXC
@@ -125,7 +125,7 @@ lxc exec spksrc -- /usr/sbin/adduser --uid 1001 spksrc
 lxc exec spksrc --user 1001 -- cp /etc/skel/.profile /etc/skel/.bashrc ~spksrc/.
 ```
 
-From there you can connect to your container as `spksrc` and follow the instructions in the [Developers HOW TO].
+From there you can connect to your container as `spksrc` and follow the instructions in the [Developer Guide](https://docs.synocommunity.com/developer-guide/).
 ```bash
 lxc exec spksrc -- su --login spksrc
 spksrc@spksrc:~$
@@ -175,19 +175,9 @@ EOF"
 
 ## Usage
 Once you have a development environment set up, you can start building packages, create new ones, or improve upon existing packages while making your changes available to other people.
-See the [Developers HOW TO] for information on how to use spksrc.
+See the [Developer Guide](https://docs.synocommunity.com/developer-guide/) for information on how to use spksrc.
 
 
 ## License
-When not explicitly set, files are placed under a [3 clause BSD license]
+When not explicitly set, files are placed under a [3 clause BSD license](http://www.opensource.org/licenses/BSD-3-Clause)
 
-[3 clause BSD license]: http://www.opensource.org/licenses/BSD-3-Clause
-[#4524]: https://github.com/SynoCommunity/spksrc/issues/4524
-[bug tracker]: https://github.com/SynoCommunity/spksrc/issues
-[CONTRIBUTING]: https://github.com/SynoCommunity/spksrc/blob/master/CONTRIBUTING.md
-[Fork and clone]: https://docs.github.com/en/github/getting-started-with-github/fork-a-repo
-[Developers HOW TO]: https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO
-[Docker installation]: https://docs.docker.com/engine/installation
-[FAQ]: https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions
-[Install Docker with wget]: https://docs.docker.com/linux/step_one
-[SynoCommunity repository]: http://www.synocommunity.com

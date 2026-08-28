@@ -1,5 +1,5 @@
 PKG_NAME = ImageMagick
-PKG_VERS = 7.1.2-7
+PKG_VERS = 7.1.2-29
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/ImageMagick/ImageMagick/archive
@@ -42,6 +42,12 @@ ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(OLD_PPC_ARCHS)),$(ARCH))
 SUPPORT_CPP11 = 0
 else ifeq ($(call version_lt, $(TCVERSION), 6.0)$(call version_ge, $(TCVERSION), 3.0),11)
 SUPPORT_CPP11 = 0
+endif
+
+# libgomp from gcc < 4.4 lacks omp_set_max_active_levels (OpenMP 3.0), which
+# ImageMagick >= 7.1.2-29 calls unconditionally when OpenMP is enabled
+ifeq ($(call version_lt, $(TC_GCC), 4.4),1)
+CONFIGURE_ARGS += --disable-openmp
 endif
 
 ifeq ($(SUPPORT_CPP11),1)

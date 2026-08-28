@@ -1,5 +1,5 @@
 PKG_NAME = python314
-PKG_VERS = 3.14.5
+PKG_VERS = 3.14.7
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
@@ -19,9 +19,9 @@ CONFIGURE_ARGS += --disable-test-modules
 # Uses system default libssl-dev
 CONFIGURE_ARGS += --with-ssl-default-suites=openssl
 
-COMPILE_MAKE_OPTIONS += all
+COMPILE_ARGS += all
 
-POST_INSTALL_TARGET = python314_native_post_install
+POST_INSTALL_TARGET = $(PKG_NAME)_native_post_install
 
 include ../../mk/spksrc.native-cc.mk
 
@@ -32,8 +32,8 @@ PIP_NATIVE = $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/loc
 REQUIREMENTS = src/requirements.txt
 PIP_WHEEL = $(shell grep -h -E "(^pip|^)[<>=]=" $(wildcard $(REQUIREMENTS)))
 
-.PHONY: python314_native_post_install
-python314_native_post_install: $(WORK_DIR)/python-native.mk
+.PHONY: $(PKG_NAME)_native_post_install
+$(PKG_NAME)_native_post_install: $(WORK_DIR)/python-native.mk
 	@$(RUN) wget https://bootstrap.pypa.io/get-pip.py
 ifeq ($(PIP_WHEEL),)
 	@$(MSG) Installing latest pip

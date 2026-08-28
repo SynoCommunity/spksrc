@@ -251,9 +251,11 @@ ifneq ($(strip $(SPK_COMMANDS)),)
 		'."usr-local-linker" = {"bin": $$binaries | split(" ")}' $@ | sponge $@
 endif
 ifneq ($(strip $(SPK_USR_LOCAL_LINKS)),)
-# e.g. SPK_USR_LOCAL_LINKS=etc:var/foo lib:libs/bar
-	@jq --arg links_str '${SPK_USR_LOCAL_LINKS}' \
-		'."usr-local-linker" += ($$links_str | split (" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]) : map(.[1])}) | add )' $@ | sponge $@
+# e.g. SPK_USR_LOCAL_LINKS=etc:var/foo bin:sbin/bars
+# REMARKS: SPK_USR_LOCAL_LINKS must not overwrite existing entries created by SPK_COMMANDS
+	@jq --arg links_str '$(SPK_USR_LOCAL_LINKS)' \
+		'($$links_str | split(" ") | map(split(":")) | group_by(.[0]) | map({(.[0][0]): map(.[1])}) | add) as $$links | ."usr-local-linker" |= (to_entries + ($$links | to_entries) | group_by(.key) | map({key: .[0].key, value: map(.value) | add}) | from_entries)' \
+		$@ | sponge $@
 endif
 ifneq ($(strip $(SERVICE_WIZARD_SHARE)),)
 # e.g. SERVICE_WIZARD_SHARE=wizard_download_dir, for DSM 6 with USE_DATA_SHARE_WORKER = yes

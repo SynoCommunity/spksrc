@@ -1,0 +1,73 @@
+--- src/muxer/muxer_libav.c.orig
++++ src/muxer/muxer_libav.c
+@@ -449,22 +449,6 @@
+   return muxer_name;
+ }
+ 
+-static AVStream *
+-lav_muxer_find_stream(lav_muxer_t *lm, int es_index)
+-{
+-  int i;
+-
+-  if (!lm->lm_oc)
+-    return NULL;
+-
+-  for (i = 0; i < lm->lm_oc->nb_streams; i++) {
+-    if (lm->lm_oc->streams[i]->id == es_index)
+-      return lm->lm_oc->streams[i];
+-  }
+-  return NULL;
+-}
+-
+-
+ /**
+  * Init the muxer with streams
+  */
+@@ -642,34 +626,21 @@
+ lav_muxer_reconfigure(muxer_t* m, const struct streaming_start *ss)
+ {
+   lav_muxer_t *lm = (lav_muxer_t*)m;
+-  int i;
+-
+-  if (!lm->lm_oc || !ss)
+-    return -1;
+-
+-  if (!lm->lm_init)
+-    return 0;
+-
+-  for (i = 0; i < ss->ss_num_components; i++) {
+-    const streaming_start_component_t *ssc = &ss->ss_components[i];
+-    AVStream *st;
+-
+-    if (ssc->ssc_disabled || ssc->ssc_muxer_disabled)
+-      continue;
+ 
+-    if (!lav_muxer_support_stream(lm->m_config.m_type, ssc->es_type))
+-      continue;
+-
+-    st = lav_muxer_find_stream(lm, ssc->es_index);
+-    if (!st) {
+-      tvhdebug(LS_LIBAV, "lav_muxer_reconfigure: no muxer stream for es_index %d",
+-               ssc->es_index);
+-      continue;
+-    }
+-  }
++  /* The libav muxer cannot be reconfigured in place: avformat_write_header()
++     has already emitted ftyp/moov describing the streams it was initialised
++     with, and there is no way to revise that once written. Report the failure
++     so the caller falls back to its own handling, as it always has.
++
++     Returning 0 here (as an earlier revision did) claims a reconfiguration
++     that never happened: the muxer keeps its stale state, the caller's
++     "Unable to reconfigure stream" warning never fires, and a client that
++     joins an already-running shared transcode is served a malformed header --
++     an MP4 whose moov box declares a size of 0, which no player can parse, so
++     neither video nor audio ever start. */
++  lm->m_errors++;
+ 
+-  tvhinfo(LS_LIBAV, "lav_muxer_reconfigure: updated stream parameters");
+-  return 0;
++  return -1;
+ }
+ 
+ 

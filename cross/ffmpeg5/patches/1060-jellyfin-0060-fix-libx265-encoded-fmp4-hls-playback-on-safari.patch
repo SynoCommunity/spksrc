@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavformat/movenc.c
-===================================================================
 --- libavformat/movenc.c
 +++ libavformat/movenc.c
 @@ -2708,7 +2708,7 @@ static int mov_write_stbl_tag(AVFormatCo

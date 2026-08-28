@@ -66,6 +66,9 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Development"><td><a href="git/">Git</a></td><td>Development</td><td>Version control system</td></tr>
     <tr data-category="Security"><td><a href="google-authenticator/">Google Authenticator</a></td><td>Security</td><td>PAM module for two-factor authentication</td></tr>
     <tr data-category="Home Automation"><td><a href="homeassistant/">Home Assistant</a></td><td>Home Automation</td><td>Home automation platform</td></tr>
+    <tr data-category="Monitoring"><td><a href="icinga/">Icinga</a></td><td>Monitoring</td><td>Icinga 2 monitoring platform</td></tr>
+    <tr data-category="Media"><td><a href="imagemagick/">ImageMagick</a></td><td>Media</td><td>Image manipulation and conversion toolkit</td></tr>
+    <tr data-category="Media Server"><td><a href="immich/">Immich</a></td><td>Media Server</td><td>Self-hosted photo and video backup solution</td></tr>
     <tr data-category="Media Server"><td><a href="jellyfin/">Jellyfin</a></td><td>Media Server</td><td>Media streaming server</td></tr>
     <tr data-category="Media Server"><td><a href="kiwix/">Kiwix</a></td><td>Media Server</td><td>Offline Wikipedia and content server</td></tr>
     <tr data-category="Media Server"><td><a href="loom/">Loom</a></td><td>Media Server</td><td>Federated and encrypted live streaming</td></tr>
@@ -79,6 +82,7 @@ Packages with detailed documentation are linked below. For packages without dedi
     <tr data-category="Monitoring"><td><a href="node-exporter/">Node Exporter</a></td><td>Monitoring</td><td>Prometheus metrics exporter</td></tr>
     <tr data-category="Web Apps"><td><a href="openlist/">OpenList</a></td><td>Web Apps</td><td>Web bookmark management</td></tr>
     <tr data-category="Web Apps"><td><a href="owncloud/">ownCloud</a></td><td>Web Apps</td><td>File sync and share platform</td></tr>
+    <tr data-category="Development"><td><a href="postgresql/">PostgreSQL</a></td><td>Development</td><td>Relational database with PostGIS and pgvector</td></tr>
     <tr data-category="Media Management"><td><a href="radarr-sonarr/">Radarr/Sonarr</a></td><td>Media Management</td><td>Movie &amp; TV series management</td></tr>
     <tr data-category="Backup"><td><a href="rclone/">Rclone</a></td><td>Backup</td><td>Cloud storage sync tool</td></tr>
     <tr data-category="Downloads"><td><a href="rutorrent/">ruTorrent</a></td><td>Downloads</td><td>Web-based BitTorrent client</td></tr>

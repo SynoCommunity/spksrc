@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_libplacebo.c
-===================================================================
 --- libavfilter/vf_libplacebo.c
 +++ libavfilter/vf_libplacebo.c
 @@ -90,7 +90,6 @@ typedef struct LibplaceboContext {

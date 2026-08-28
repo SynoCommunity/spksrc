@@ -26,19 +26,18 @@ Synology NAS devices use different CPU architectures. Packages are built for eac
 
 | Architecture | CPU Type | Example Models |
 |--------------|----------|----------------|
-| `x64` | Intel 64-bit | DS923+, DS1823xs+, RS1221+ |
-| `armv8` | ARM 64-bit (Realtek RTD) | DS223, DS423, RS422+ |
-| `aarch64` | ARM 64-bit (Marvell) | DS220+, DS720+, DS920+ |
+| `x64` | Intel 64-bit / AMD 64-bit | DS220+, DS720+, DS920+, DS923+, RS1221+ |
+| `aarch64` | ARM 64-bit | DS223, DS423, DS218, DS220j |
 
 ### Legacy Architectures (DSM 6.x)
 
 | Architecture | CPU Type | Example Models |
 |--------------|----------|----------------|
-| `x86` | Intel 32-bit | DS216play, DS116 |
-| `armv7` | ARM 32-bit (various) | DS218j, DS418 |
-| `qoriq` | Freescale QorIQ | DS215j, RS214 |
+| `x86` / `i686` | Intel 32-bit | DS214play, DS415play, DS712+ |
+| `armv7` | ARM 32-bit | DS218j, DS115j, DS116, DS216play |
+| `qoriq` | Freescale QorIQ | DS413, DS213+ |
 | `comcerto2k` | Mindspeed Comcerto | DS414j |
-| `ppc853x` | PowerPC | DS109j, DS209 |
+| `ppc853x` | PowerPC | DS109j, DS209, DS410, DS210+ |
 
 !!! note "Legacy Support"
     Legacy architectures receive security updates but limited new package development.
@@ -77,16 +76,16 @@ When browsing packages in **Package Center** on your NAS, it automatically shows
 
 | Model | Architecture | DSM Support |
 |-------|--------------|-------------|
-| DS224+ | aarch64 | 7.x |
-| DS423+ | aarch64 | 7.x |
-| DS723+ | aarch64 | 7.x |
+| DS224+ | x64 | 7.x |
+| DS423+ | x64 | 7.x |
+| DS723+ | x64 | 7.x |
 | DS923+ | x64 | 7.x |
 | DS1522+ | x64 | 7.x |
 | DS1823xs+ | x64 | 7.x |
-| DS220+ | aarch64 | 7.x |
-| DS720+ | aarch64 | 7.x |
-| DS920+ | aarch64 | 7.x |
-| DS1520+ | aarch64 | 7.x |
+| DS220+ | x64 | 7.x |
+| DS720+ | x64 | 7.x |
+| DS920+ | x64 | 7.x |
+| DS1520+ | x64 | 7.x |
 
 ### Value Series
 
@@ -94,7 +93,6 @@ When browsing packages in **Package Center** on your NAS, it automatically shows
 |-------|--------------|-------------|
 | DS223 | armv8 | 7.x |
 | DS423 | armv8 | 7.x |
-| DS224 | armv8 | 7.x |
 | DS218 | armv8 | 6.x-7.x |
 | DS418 | armv8 | 6.x-7.x |
 
@@ -112,12 +110,14 @@ When browsing packages in **Package Center** on your NAS, it automatically shows
 | Model | Architecture | DSM Support |
 |-------|--------------|-------------|
 | RS1221+ | x64 | 7.x |
-| RS422+ | armv8 | 7.x |
+| RS422+ | x64 | 7.x |
 | RS1619xs+ | x64 | 7.x |
 | RS3618xs | x64 | 7.x |
 
-!!! info "Complete List"
-    For a complete list of all models and architectures, see [Synology's CPU guide](https://kb.synology.com/en-us/DSM/tutorial/What_kind_of_CPU_does_my_NAS_have).
+!!! info "Complete Lists"
+    - [Reference: Architectures](../reference/architectures.md) — architecture groups, toolchain versions, and conditionals
+    - [Reference: Model ↔ Architecture](../reference/model-architecture.md) — searchable model-to-platform mapping
+    - [Synology's CPU guide](https://kb.synology.com/en-us/DSM/tutorial/What_kind_of_CPU_does_my_NAS_have) — official CPU information per model
 
 ## Package Availability by Architecture
 

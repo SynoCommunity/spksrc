@@ -3,6 +3,7 @@ PKG_VERS = 1.16.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.cairographics.org/releases/
+PKG_DIST_MIRRORS = https://ftp.osuosl.org/pub/blfs/conglomeration/cairo https://distfiles.macports.org/cairo
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/libpng cross/freetype cross/pixman cross/fontconfig cross/glib
@@ -31,11 +32,11 @@ include ../../mk/spksrc.cross-cc.mk
 .PHONY: cairo_compile
 cairo_compile:
 	@$(MSG) Build without tests
-	@$(RUN) $(MAKE) -C src  $(COMPILE_MAKE_OPTIONS)
-	@$(RUN) $(MAKE) -C util $(COMPILE_MAKE_OPTIONS)
+	@$(RUN) $(MAKE) -C src  $(COMPILE_ARGS)
+	@$(RUN) $(MAKE) -C util $(COMPILE_ARGS)
 
 .PHONY: cairo_install
 cairo_install:
 	@$(MSG) Install without building tests
-	@$(RUN) $(MAKE) -C src  install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
-	@$(RUN) $(MAKE) -C util install DESTDIR=$(INSTALL_DIR) prefix=$(INSTALL_PREFIX)
+	@$(RUN) $(MAKE) -C src  $(INSTALL_ARGS)
+	@$(RUN) $(MAKE) -C util $(INSTALL_ARGS)

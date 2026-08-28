@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavcodec/qsv.c
-===================================================================
 --- libavcodec/qsv.c
 +++ libavcodec/qsv.c
 @@ -369,9 +369,17 @@ enum AVPictureType ff_qsv_map_pictype(in

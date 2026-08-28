@@ -5,8 +5,8 @@ SPK_ICON = src/comskip.png
 
 FFMPEG_PACKAGE = ffmpeg8
 
-# ffmpeg-8 no longer support 88f6281 (armv5) and hi3535 (armv7l)
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# ffmpeg8 needs C11 -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 DEPENDS = cross/comskip
 
@@ -19,7 +19,7 @@ CHANGELOG = "1. Update to FFMPEG 8.1.2"
 
 HOMEPAGE = https://www.kaashoek.com/comskip/
 LICENSE = LGPL
-HELPURL = https://github.com/SynoCommunity/spksrc/wiki/Comskip
+HELPURL = https://docs.synocommunity.com/packages/comskip/
 
 SPK_COMMANDS = bin/comskip
 

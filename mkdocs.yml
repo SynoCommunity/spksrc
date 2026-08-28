@@ -10,6 +10,7 @@ copyright: Copyright &copy; 2012 - 2026 SynoCommunity
 theme:
   name: material
   favicon: assets/favicon.ico
+  logo: assets/synocommunity.svg
   features:
     - navigation.tabs
     - navigation.sections
@@ -127,6 +128,7 @@ nav:
       - PLIST Files: developer-guide/packaging/plist.md
       - Service Scripts: developer-guide/packaging/service-scripts.md
       - Wizards: developer-guide/packaging/wizards.md
+      - Help Pages: developer-guide/packaging/help-pages.md
       - Resource Files: developer-guide/packaging/resource-files.md
     - Package Types:
       - developer-guide/package-types/index.md
@@ -157,6 +159,7 @@ nav:
     - Makefile System: framework/makefile-system.md
     - Toolchain: framework/toolchain.md
     - Toolkit: framework/toolkit.md
+    - Changes: framework/changes.md
   - Reference:
     - reference/index.md
     - Architectures: reference/architectures.md
@@ -188,6 +191,7 @@ nav:
       - SynoCli VideoDriver: packages/synocli-videodriver.md
     - Development:
       - Git: packages/git.md
+      - PostgreSQL: packages/postgresql.md
     - Downloads:
       - Aria2: packages/aria2.md
       - Deluge: packages/deluge.md
@@ -202,15 +206,18 @@ nav:
       - Beets: packages/beets.md
       - Comskip: packages/comskip.md
       - FFmpeg: packages/ffmpeg.md
+      - ImageMagick: packages/imagemagick.md
     - Media Management:
       - Flexget: packages/flexget.md
       - Radarr/Sonarr: packages/radarr-sonarr.md
     - Media Server:
+      - Immich: packages/immich.md
       - Jellyfin: packages/jellyfin.md
       - Kiwix: packages/kiwix.md
       - Loom: packages/loom.md
       - Navidrome: packages/navidrome.md
     - Monitoring:
+      - Icinga: packages/icinga.md
       - Netdata: packages/netdata.md
       - Node Exporter: packages/node-exporter.md
     - Network:

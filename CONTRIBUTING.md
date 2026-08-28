@@ -11,9 +11,9 @@ If you have questions, suggestions or you believe you have found a bug, we'd lik
 
 Do:
 
-* Check the [FAQ](https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions);
+* Check the [Troubleshooting guide](https://docs.synocommunity.com/user-guide/troubleshooting/);
 * Search the [bug tracker](https://github.com/SynoCommunity/spksrc/issues) to see if the issue has not already been reported;
-* Check if the package has specific documentation related to it via the [Package Documentation Index](https://github.com/SynoCommunity/spksrc/wiki/Package-Documentation-Index);
+* Check if the package has specific documentation related to it via the [Package Catalog](https://docs.synocommunity.com/packages/);
 * if you're reporting a bug, make sure you include sufficient information. See [Issue Content](https://github.com/SynoCommunity/spksrc/blob/master/CONTRIBUTING.md#issue-content).
 
 Don't:
@@ -34,10 +34,10 @@ Content:
 
 * Describe what you did, what you expected to happen and what actually happened;
 * Which steps to perform to reproduce what happened;
-* Model, arch and DSM version of your NAS. See [Architecture per Synology model](https://github.com/SynoCommunity/spksrc/wiki/Architecture-per-Synology-model);
+* Model, arch and DSM version of your NAS. See [Architectures](https://docs.synocommunity.com/reference/architectures/);
 * Provide log files if available. Sometimes a log is shown in Package Center for that package. There might be a log available at `/usr/local/{package}/var/`;
 * Wrap larger logs between triple backticks (```). Log files over ten lines should be placed on gist.github.com, Pastebin etc., and linked in the issue;
-* If the package doesn't start, try to start the package [via the command line](https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions#how-to-query-package-status-or-start-from-command-line)  and provide the output.
+* If the package doesn't start, try to start the package [via the command line](https://docs.synocommunity.com/user-guide/troubleshooting/#package-wont-start)  and provide the output.
 
 
 Package Requests
@@ -70,7 +70,7 @@ Pull requests to add packages to the [SynoCommunity repository](https://synocomm
 
 Please create a new branch before pulling your request and avoid using the master branch. Pay attention on [How to make a clean pull request](https://github.com/MarcDiethelm/contributing/blob/master/README.md).
 
-Once you have a development environment set up, you can start building packages, create new ones, or improve upon existing packages while making your changes available to other people. See the [Developers HOW-TO](https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO) for information on how to use spksrc.
+Once you have a development environment set up, you can start building packages, create new ones, or improve upon existing packages while making your changes available to other people. See the [Developer Guide](https://docs.synocommunity.com/developer-guide/) for information on how to use spksrc.
 
 #### When creating a Pull Request you get a description from a template like this:
 
@@ -90,7 +90,7 @@ Example:<br>
 _Linked issues:_ fixed #1234
 
 The Checklist is for minimal Tests required for new and updated packages.<br>
-- The Build rule `all-supported` builds the currently supported archs with the default toolchain version. All affected archs must successfully build - or be declared as UNSUPPORTED_ARCHS in the spk/ Makefile of the package.
+- The Build rule `all-supported` builds the currently supported archs with the default toolchain version. All affected archs must successfully build - or be excluded, either by declaring a capability floor (MIN_GCC_VERSION / MIN_GLIBC_VERSION / REQUIRE_64BIT) when the limit is a toolchain capability, or via UNSUPPORTED_ARCHS in the spk/ Makefile of the package.
 - Package upgrade must successfully complete for new packages and upgrades. For new packages, the upgrade can be tested by manually install the same version that is already installed. The install wizzard will show `upgrade` in the dialog title, upgrade wizard pages must work (when available) and manually changed configuration files must be preserved.
 - A new installation must succeed. There must not appear error messages while installation or in the install log file found in `/var/log/packages/{package-name}.og` (for DSM<=5 in `/var/packages/{package-name}/target/var/{package-name}_install.log`).
 

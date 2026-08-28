@@ -1,5 +1,3 @@
-Index: jellyfin-ffmpeg/libavformat/segment.c
-===================================================================
 --- libavformat/segment.c
 +++ libavformat/segment.c
 @@ -87,6 +87,7 @@ typedef struct SegmentContext {
