@@ -1,19 +1,18 @@
 SPK_NAME = netdata
-SPK_VERS = 2.10.4
-SPK_REV = 2
+SPK_VERS = 2.11.0
+SPK_REV = 3
 SPK_ICON = src/netdata.png
 
 DEPENDS = cross/netdata
 
-# netdata compiles C++17 -- gcc 7.5 or newer (verified against the oldest DSM 7 toolchain)
+# netdata compiles C++17, which requires gcc 7.5 or newer (verified against the oldest
+# DSM 7 toolchain); older toolchains cannot compile it.
 MIN_GCC_VERSION = 7.5
-
-REQUIRED_MIN_DSM = 7.0
 
 MAINTAINER = SynoCommunity
 DISPLAY_NAME = Netdata
 DESCRIPTION = Real-time performance monitoring, done right! Monitor your system with beautiful, interactive dashboards.
-CHANGELOG = "1. Update Netdata to v2.10.4. <br/>2. Add systemd journal log viewing."
+CHANGELOG = "1. Update Netdata to v2.11.0. <br/>2. Enable the go.d collector suite with service discovery and the network connections view."
 
 HOMEPAGE = https://www.netdata.cloud
 HELPURL = https://docs.synocommunity.com/packages/netdata/
@@ -42,3 +41,5 @@ netdata_extra_install:
 	@$(MSG) Install default netdata configuration
 	install -m 755 -d $(STAGING_DIR)/var/etc/netdata
 	install -m 644 src/var/etc/netdata/netdata.conf $(STAGING_DIR)/var/etc/netdata/
+	@$(MSG) Remove build-time SNMP trap profile generator from package
+	rm -f $(STAGING_DIR)/usr/libexec/netdata/plugins.d/snmp-trap-profile-gen

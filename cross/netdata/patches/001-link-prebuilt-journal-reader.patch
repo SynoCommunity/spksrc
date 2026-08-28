@@ -1,11 +1,12 @@
---- CMakeLists.txt.orig
-+++ CMakeLists.txt
-@@ -193,65 +193,13 @@
+--- CMakeLists.txt.orig	2026-08-25 13:43:04.883060765 +0000
++++ CMakeLists.txt	2026-08-25 13:45:47.870661493 +0000
+@@ -284,101 +284,16 @@
+ mark_as_advanced(FORCE_LEGACY_LIBBPF)
  
  cmake_dependent_option(ENABLE_NETDATA_JOURNAL_FILE_READER "Enable netdata's journal file reader implementation" False "ENABLE_PLUGIN_SYSTEMD_JOURNAL" False)
- 
+-
 -# Setup Rust/Corrosion for plugins that need it
--if(ENABLE_NETDATA_JOURNAL_FILE_READER OR ENABLE_PLUGIN_OTEL OR ENABLE_PLUGIN_OTEL_SIGNAL_VIEWER)
+-if(ENABLE_NETDATA_JOURNAL_FILE_READER OR ENABLE_PLUGIN_OTEL OR ENABLE_PLUGIN_NETFLOW)
 -    include(FetchContent)
 -    FetchContent_Declare(
 -        Corrosion
@@ -30,8 +31,8 @@
 -    if(ENABLE_PLUGIN_OTEL)
 -        list(APPEND _WORKSPACE_CRATES otel-plugin)
 -    endif()
--    if(ENABLE_PLUGIN_OTEL_SIGNAL_VIEWER)
--        list(APPEND _WORKSPACE_CRATES otel-signal-viewer-plugin)
+-    if(ENABLE_PLUGIN_NETFLOW)
+-        list(APPEND _WORKSPACE_CRATES netflow-plugin)
 -    endif()
 -    if(_WORKSPACE_CRATES)
 -        corrosion_import_crate(MANIFEST_PATH src/crates/Cargo.toml
@@ -44,24 +45,57 @@
 -      else()
 -        corrosion_add_target_rustflags(otel-plugin --cfg=tracing_unstable)
 -      endif()
+-
+-      # The workspace release profile propagates fat LTO, single-codegen-unit,
+-      # and debuginfo settings through the whole dependency graph. On 32-bit
+-      # targets that makes rustc-LLVM exhaust the ~3 GB process address space
+-      # during codegen ("rustc-LLVM ERROR: out of memory"). Override Cargo's
+-      # release profile so the otel-plugin build stays within budget.
+-      if(CMAKE_SIZEOF_VOID_P EQUAL 4 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+-        # We depend (transitively) on the `io-uring` crate which doesn't provide
+-        # prebuilt bindings for 32-bit arches. Considering this is a compile-time
+-        # and not a runtime dependency (because we don't use foyer's io-uring
+-        # engine), we can simply skip the check.
+-        corrosion_add_target_rustflags(otel-plugin --cfg=io_uring_skip_arch_check)
+-        corrosion_set_env_vars(
+-                otel-plugin
+-                "CARGO_PROFILE_RELEASE_DEBUG=0"
+-                "CARGO_PROFILE_RELEASE_LTO=off"
+-                "CARGO_PROFILE_RELEASE_CODEGEN_UNITS=8")
+-      endif()
 -    endif()
 -
--    if(ENABLE_PLUGIN_OTEL_SIGNAL_VIEWER)
--      set(OTEL_SIGNAL_VIEWER_RUSTFLAGS --cfg=tracing_unstable)
+-    if(ENABLE_PLUGIN_NETFLOW)
+-      set(NETFLOW_PLUGIN_RUSTFLAGS "")
+-      set(NETFLOW_PLUGIN_ENV_VARS
+-              "NETDATA_BUILD_CACHE_DIR=${CACHE_DIR}"
+-              "NETDATA_BUILD_LIB_DIR=${VARLIB_DIR}"
+-              "NETDATA_BUILD_STOCK_DATA_DIR=${STOCK_DATA_DIR}")
 -
 -      # We depend (transitively) on the `io-uring` crate which doesn't provide
 -      # prebuilt bindings for 32-bit arches. Considering this is a compile-time
 -      # and not a runtime dependency (because we don't use foyer's io-uring
 -      # engine), we can simply skip the check.
 -      if(CMAKE_SIZEOF_VOID_P EQUAL 4 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
--        list(APPEND OTEL_SIGNAL_VIEWER_RUSTFLAGS --cfg=io_uring_skip_arch_check)
+-        list(APPEND NETFLOW_PLUGIN_RUSTFLAGS --cfg=io_uring_skip_arch_check)
+-        # The workspace release profile still propagates fat LTO, single-codegen-unit,
+-        # and debuginfo settings through Rust dependencies on 32-bit builds. Override
+-        # Cargo's release profile too so the entire dependency graph stays linkable.
+-        list(APPEND NETFLOW_PLUGIN_ENV_VARS
+-                "CARGO_PROFILE_RELEASE_DEBUG=0"
+-                "CARGO_PROFILE_RELEASE_LTO=off"
+-                "CARGO_PROFILE_RELEASE_CODEGEN_UNITS=8")
 -      endif()
 -
 -      if(STATIC_BUILD)
--        list(APPEND OTEL_SIGNAL_VIEWER_RUSTFLAGS "-C" "target-feature=+crt-static")
+-        list(APPEND NETFLOW_PLUGIN_RUSTFLAGS "-C" "target-feature=+crt-static")
 -      endif()
 -
--      corrosion_add_target_rustflags(otel-signal-viewer-plugin ${OTEL_SIGNAL_VIEWER_RUSTFLAGS})
+-      if(NETFLOW_PLUGIN_RUSTFLAGS)
+-        corrosion_add_target_rustflags(netflow-plugin ${NETFLOW_PLUGIN_RUSTFLAGS})
+-      endif()
+-
+-      corrosion_set_env_vars(netflow-plugin ${NETFLOW_PLUGIN_ENV_VARS})
 -    endif()
 +# The journal reader is cross-compiled as a static library by the spksrc build
 +# (see the netdata_compile target in cross/netdata/Makefile), so the Corrosion
@@ -72,4 +106,7 @@
 +        IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/libjournal_reader_ffi.a")
  endif()
  
++
  option(ENABLE_MIMALLOC "Enable mimalloc allocator" OFF)
+ 
+ if(ENABLE_MIMALLOC)
