@@ -10,26 +10,26 @@ PUBLIC_KEY="${SYNOPKG_PKGVAR}/umurmur.crt"
 
 create_certificate ()
 {
-    if [ -f "${PRIVATE_KEY}" ] && [ -f "${PUBLIC_KEY}" ]; then
+    if [ -s "${PRIVATE_KEY}" ] && [ -s "${PUBLIC_KEY}" ]; then
         echo "Found uMurmur certificate. To create a new certificate upon package update you have to delete the existing certificate before."
-        exit 0
+        return 0
     fi
 
     if [ -z "${OPENSSL}" ]; then
         echo "missing openssl to create certificate for uMurmur."
-        exit 2
+        return 2
     fi
 
     # create certificate (use openssl of DSM)
     ${OPENSSL} req -x509 -newkey rsa:4096 -keyout ${PRIVATE_KEY} -nodes -sha256 -days 3653 -out ${PUBLIC_KEY} -batch -config /etc/ssl/openssl.cnf > /dev/null 2>&1
 
-    # Exit with the right code and an explicit message
+    # Return with the right code and an explicit message
     if [ $? -ne 0 ]; then
-        exit 1
+        return 1
     fi
 
     echo "Certificate for uMurmur successfully created."
-    exit 0
+    return 0
 }
 
 service_postinst ()
@@ -37,9 +37,7 @@ service_postinst ()
     # Certificate generation
     create_certificate 2>&1
     if [ $? -ne 0 ]; then
-        touch ${PRIVATE_KEY}
-        touch ${PUBLIC_KEY}
-        exit 1
+        return 1
     fi
 }
 
@@ -47,7 +45,7 @@ service_preupgrade ()
 {
     # Migrate to DSM 7 compatible var folder
     if [ -e "${CFG_FILE}" ]; then
-        if $(grep -q "/usr/local/umurmur/var/" "${CFG_FILE}"); then
+        if grep -q "/usr/local/umurmur/var/" "${CFG_FILE}"; then
             echo "Update var folder for DSM 7 compatibility in configuration file."
             sed -e "s,/usr/local/umurmur/var/,/var/packages/umurmur/var/,g" -i "${CFG_FILE}"
         fi
@@ -55,7 +53,7 @@ service_preupgrade ()
 
     # Update log-file name to package name
     if [ -e "${CFG_FILE}" ]; then
-        if $(grep -q "umurmurd.log" "${CFG_FILE}"); then
+        if grep -q "umurmurd.log" "${CFG_FILE}"; then
             echo "Update log file name in configuration file."
             sed -e "s,umurmurd.log,umurmur.log,g" -i "${CFG_FILE}"
         fi
