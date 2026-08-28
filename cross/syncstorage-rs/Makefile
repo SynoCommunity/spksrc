@@ -10,8 +10,8 @@ DEPENDS = cross/openssl3
 # for mysqlclient-sys
 DEPENDS += cross/mariadb-connector-c
 
-# powerpc archs are not supported
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+# rust edition 2024 required (see rust-version in Cargo.toml)
+MIN_RUSTC_VERSION = 1.91
 
 HOMEPAGE = https://github.com/mozilla-services/syncstorage-rs/
 COMMENT  = Mozilla Sync Storage built with Rust.
