@@ -4,6 +4,10 @@ SPK_REV = 5
 SPK_ICON = src/postgresql.png
 
 DEPENDS = cross/postgresql
+OPTIONAL_DEPENDS = cross/postgis cross/pgvector
+
+# libicu-74.2 (used for GCC < 5 / DSM 6) doesn't support ARMv5
+UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS and pgvector extensions for DSM 7+.
@@ -21,9 +25,6 @@ SERVICE_PORT_TITLE = PostgreSQL
 NO_SERVICE_SHORTCUT = 1
 
 include ../../mk/spksrc.common.mk
-
-# libicu-74.2 (used for GCC < 5 / DSM 6) doesn't support ARMv5
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 # Use ICU archive data packaging to avoid runtime libicudata shared library
 # loading issues observed on DSM ARMv7 systems.
