@@ -1,5 +1,5 @@
 SPK_NAME = beszel-hub
-SPK_VERS = 0.18.7
+SPK_VERS = 0.18.8
 SPK_REV = 1
 SPK_ICON = src/beszel.png
 
