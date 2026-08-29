@@ -9,7 +9,7 @@ DEPENDS = cross/sqlite cross/libtiff cross/curl
 BUILD_DEPENDS = native/sqlite
 
 HOMEPAGE = https://proj.org/
-COMMENT = PROJ is a generic coordinate transformation software
+COMMENT = PROJ is a Cartographic Projections and Coordinate Transformations Library.
 LICENSE = MIT
 
 # PROJ uses CMake
@@ -18,5 +18,6 @@ CONFIGURE_ARGS += -DBUILD_TESTING=OFF
 CONFIGURE_ARGS += -DENABLE_CURL=ON
 CONFIGURE_ARGS += -DENABLE_TIFF=ON
 CONFIGURE_ARGS += -DEXE_SQLITE3=$(NATIVE_SQLITE_DIR)/bin/sqlite3
+CONFIGURE_ARGS += -DCURL_NO_CURL_CMAKE=ON
 
 include ../../mk/spksrc.cross-cmake.mk
