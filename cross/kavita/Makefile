@@ -1,5 +1,5 @@
 PKG_NAME = kavita
-PKG_VERS = 0.9.0.2
+PKG_VERS = 0.9.1.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/Kareadita/Kavita/releases/download/v$(PKG_VERS)
@@ -24,6 +24,9 @@ else ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm
 else ifeq ($(findstring $(ARCH),$(ARMv8_ARCHS)),$(ARCH))
 PKG_DIST_ARCH = arm64
+endif
+ifeq ($(PKG_DIST_ARCH),)
+$(error Unsupported ARCH $(ARCH))
 endif
 
 include ../../mk/spksrc.cross-install.mk
