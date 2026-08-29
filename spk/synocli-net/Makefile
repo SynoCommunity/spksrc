@@ -1,6 +1,6 @@
 SPK_NAME = synocli-net
 SPK_VERS = 10.0
-SPK_REV = 22
+SPK_REV = 23
 SPK_ICON = src/synocli-net.png
 
 DEPENDS  = cross/tmux
@@ -78,14 +78,7 @@ STARTABLE = no
 
 DOCS_URL = "\<a target=\"_blank\" href=\"https://docs.synocommunity.com/packages/synocli-net/\"\>SynoCli Network Tools\</a\>"
 
-CHANGELOG  = "1. Update bind v9.18.38 to v9.18.50 and v9.20.11 to v9.20.24. <br/>"
-CHANGELOG += "2. Update inetutils from v2.6 to v2.7. <br/>"
-CHANGELOG += "3. Update nmap from v7.97 to v7.99 (ARMv5 and qoriq are limited to v7.98). <br/>"
-CHANGELOG += "4. Update rsync from v3.4.1 to v3.4.4. <br/>"
-CHANGELOG += "5. Update ser2net from v4.6.5 to v4.6.6 and add gensio tools. <br/>"
-CHANGELOG += "6. Update socat from v1.8.0.3 to v1.8.1.1. <br/>"
-CHANGELOG += "7. Update sshfs3 from v3.7.3 to v3.7.6. <br/>"
-CHANGELOG += "8. Update tmux from v3.5a to v3.6b. <br/>"
+CHANGELOG  = "1. Fix sshd, which could not start: install the sshd-session and sshd-auth helpers that OpenSSH has required since v9.8. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 
@@ -105,6 +98,7 @@ SPK_COMMANDS += bin/xxh128sum bin/xxh32sum bin/xxh64sum bin/xxhsum
 SPK_COMMANDS += bin/autossh
 SPK_COMMANDS += bin/scp bin/sftp bin/slogin bin/ssh bin/ssh-add bin/ssh-agent bin/ssh-keygen bin/ssh-keyscan
 SPK_COMMANDS += libexec/sftp-server libexec/ssh-keysign libexec/ssh-pkcs11-helper libexec/ssh-sk-helper
+SPK_COMMANDS += libexec/sshd-auth libexec/sshd-session
 SPK_COMMANDS += sbin/sshd
 SPK_COMMANDS += sbin/ser2net bin/gensiot bin/gsh bin/gtlssh bin/gtlssh-keygen
 SPK_COMMANDS += sbin/mtr sbin/mtr-packet
