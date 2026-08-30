@@ -1,5 +1,4 @@
 lib:lib/vector.so
-rsc:share/extension/vector.control
 rsc:share/extension/vector--0.1.0--0.1.1.sql
 rsc:share/extension/vector--0.1.1--0.1.3.sql
 rsc:share/extension/vector--0.1.3--0.1.4.sql
@@ -39,4 +38,7 @@ rsc:share/extension/vector--0.8.1--0.8.2.sql
 rsc:share/extension/vector--0.8.2--0.8.3.sql
 rsc:share/extension/vector--0.8.3--0.8.4.sql
 rsc:share/extension/vector--0.8.4--0.8.5.sql
-rsc:share/extension/vector--0.8.5.sql
+rsc:share/extension/vector--0.8.5--0.8.6.sql
+rsc:share/extension/vector--0.8.6.sql
+rsc:share/extension/vector.control
+rsc:share/extension/vector.sql
