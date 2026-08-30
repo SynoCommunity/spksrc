@@ -72,14 +72,14 @@ enable_extensions()
 {
     # Enable contrib extensions in template1 (inherited by all new databases)
     for ext in unaccent cube earthdistance pg_trgm "uuid-ossp" vector; do
-        if "${SYNOPKG_PKGDEST}/bin/psql" -h "${SYNOPKG_PKGVAR}" -p "${SERVICE_PORT}" -d postgres -c "SELECT 1 FROM pg_available_extensions WHERE name = '${ext}'" -t > /dev/null 2>&1; then
+        if run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c \"SELECT 1 FROM pg_available_extensions WHERE name = '${ext}'\" -t" > /dev/null 2>&1; then
             run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d template1 -c 'CREATE EXTENSION IF NOT EXISTS \"${ext}\";'"
             run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c 'CREATE EXTENSION IF NOT EXISTS \"${ext}\";'"
         fi
     done
 
     # Enable PostGIS extension if available (requires GCC 5+ toolchain build)
-    if "${SYNOPKG_PKGDEST}/bin/psql" -h "${SYNOPKG_PKGVAR}" -p "${SERVICE_PORT}" -d postgres -c "SELECT 1 FROM pg_available_extensions WHERE name = 'postgis' AND default_version IS NOT NULL" -t 2>/dev/null | grep -q 1; then
+    if run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c \"SELECT 1 FROM pg_available_extensions WHERE name = 'postgis' AND default_version IS NOT NULL\" -t 2>/dev/null" | grep -q 1; then
         run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d template1 -c 'CREATE EXTENSION IF NOT EXISTS postgis;'"
         run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c 'CREATE EXTENSION IF NOT EXISTS postgis;'"
     fi
@@ -148,9 +148,9 @@ service_postupgrade()
 
     # Update PostGIS and pgvector extensions in all databases including template1
     # (so newly created databases inherit the updated versions)
-    for database in $("${SYNOPKG_PKGDEST}/bin/psql" -h "${SYNOPKG_PKGVAR}" -p "${SERVICE_PORT}" -A -t -d postgres -c 'SELECT datname FROM pg_database WHERE datallowconn = true'); do
+    for database in $(run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -A -t -d postgres -c 'SELECT datname FROM pg_database WHERE datallowconn = true'" 2>/dev/null); do
         for ext in postgis vector; do
-            if "${SYNOPKG_PKGDEST}/bin/psql" -h "${SYNOPKG_PKGVAR}" -p "${SERVICE_PORT}" -d "${database}" -c "SELECT 1 FROM pg_extension WHERE extname = '${ext}'" -t 2>/dev/null | grep -q 1; then
+            if run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d ${database} -c \"SELECT 1 FROM pg_extension WHERE extname = '${ext}'\" -t 2>/dev/null" | grep -q 1; then
                 EXT_SQL="SELECT CASE
                     WHEN (SELECT extversion FROM pg_extension WHERE extname = '${ext}') =
                          (SELECT default_version FROM pg_available_extensions WHERE name = '${ext}') THEN 'current'
@@ -159,7 +159,7 @@ service_postupgrade()
                                    AND (target = 'ANY' OR target = (SELECT default_version FROM pg_available_extensions WHERE name = '${ext}'))) THEN 'path'
                     ELSE 'nopath'
                 END"
-                EXT_STATUS=$("${SYNOPKG_PKGDEST}/bin/psql" -h "${SYNOPKG_PKGVAR}" -p "${SERVICE_PORT}" -d "${database}" -A -t -c "${EXT_SQL}" 2>/dev/null | tr -d '[:space:]')
+                EXT_STATUS=$(run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d ${database} -A -t -c \"${EXT_SQL}\" 2>/dev/null" | tr -d '[:space:]')
                 case "${EXT_STATUS}" in
                     path)
                         run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d ${database} -c \"ALTER EXTENSION ${ext} UPDATE;\""
