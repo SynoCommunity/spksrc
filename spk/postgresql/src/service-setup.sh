@@ -68,7 +68,7 @@ validate_preuninst()
     fi
 }
 
-enable_extensions()
+enable_contrib_extensions()
 {
     # Enable contrib extensions in template1 (inherited by all new databases)
     for ext in unaccent cube earthdistance pg_trgm "uuid-ossp" vector; do
@@ -77,6 +77,11 @@ enable_extensions()
             run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c 'CREATE EXTENSION IF NOT EXISTS \"${ext}\";'"
         fi
     done
+}
+
+enable_extensions()
+{
+    enable_contrib_extensions
 
     # Enable PostGIS extension if available (requires GCC 5+ toolchain build)
     if run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c \"SELECT 1 FROM pg_available_extensions WHERE name = 'postgis' AND default_version IS NOT NULL\" -t 2>/dev/null" | grep -q 1; then
@@ -145,6 +150,10 @@ service_postupgrade()
 {
     # Update extensions in existing databases (server is stopped during upgrade)
     run_as_user "${SYNOPKG_PKGDEST}/bin/pg_ctl -D ${DATABASE_DIR} -l ${LOG_FILE} start" >/dev/null
+
+    # Ensure the base contrib extensions are present (fixes upgrades from installs
+    # where they were missing, e.g. earlier versions without the availability check)
+    enable_contrib_extensions
 
     # Update PostGIS and pgvector extensions in all databases including template1
     # (so newly created databases inherit the updated versions)
