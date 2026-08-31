@@ -1,11 +1,17 @@
 PKG_NAME = postgresql
+# WARNING: ensure this version is used as PG_VERSION in cross/postgis
 PKG_VERS = 17.11
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://ftp.postgresql.org/pub/source/v$(PKG_VERS)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/zlib cross/openssl3 cross/libxml2 cross/libxslt cross/readline cross/libicu cross/ossp-uuid
+DEPENDS = cross/openssl3
+DEPENDS += cross/libxml2
+DEPENDS += cross/libxslt
+DEPENDS += cross/readline
+DEPENDS += cross/libicu
+DEPENDS += cross/libuuid
 
 HOMEPAGE = https://www.postgresql.org
 COMMENT  = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance
@@ -16,7 +22,8 @@ GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --with-template=linux 
 CONFIGURE_ARGS += --with-openssl
 CONFIGURE_ARGS += --without-python
-CONFIGURE_ARGS += --with-uuid=ossp
+# for uuid-ossp extension (required by immich package)
+CONFIGURE_ARGS += --with-uuid=e2fs
 
 # PostgreSQL includes its own time zone database, which it requires for date and time operations. 
 # This time zone database is in fact compatible with the IANA time zone database provided by many 

@@ -30,9 +30,9 @@ include ../../mk/spksrc.common.mk
 # loading issues observed on DSM ARMv7 systems.
 export LIBICU_DATA_PACKAGING_MODE=archive
 
-# PostGIS requires GCC 5+ (GEOS 3.12.3 needs C++14)
-# Only include postgis if toolchain GCC >= 5.0
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+# PostGIS requires gcc 8+ (libgeos 3.14.1 and libroj 9.8.1 demand C++17)
+# Only include postgis if toolchain supports required gcc
+ifeq ($(call version_ge, $(TC_GCC), 8),1)
 DEPENDS += cross/postgis
 DEPENDS += cross/pgvector
 endif
