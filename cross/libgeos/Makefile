@@ -1,12 +1,17 @@
 PKG_NAME = libgeos
-PKG_VERS = 3.12.3
+PKG_VERS = 3.14.1
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = geos-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.osgeo.org/geos
 PKG_DIR = geos-$(PKG_VERS)
 
+DEPENDS =
+
+# CXX17 required
+MIN_GCC_VERSION = 8
+
 HOMEPAGE = https://libgeos.org/
-COMMENT = GEOS (Geometry Engine - Open Source) is a C/C++ library for computational geometry
+COMMENT = GEOS (Geometry Engine - Open Source) is a C/C++ library for computational geometry.
 LICENSE = LGPL-2.1
 
 # Disable tests to avoid cross-compilation issues and speed up build

@@ -1,8 +1,19 @@
 SPK_NAME = postgresql
-SPK_VERS = 17.10
-SPK_REV = 5
+SPK_VERS = 17.11
+SPK_REV = 6
 SPK_ICON = src/postgresql.png
 
+# TODO:
+# due the update of postgis (and geos, proj) the pg extensions must be adjusted
+# after this update
+# 1. Update extensions with
+#    "ALTER EXTENSION postgis UPDATE;"
+# 2. Validate updated postgis with "SELECT postgis_full_version();"
+#    the following versions must be shown
+#    - PostGIS 3.6.4
+#    - GEOS=3.14.1
+#    - PROJ=9.8.1
+#
 DEPENDS = cross/postgresql
 OPTIONAL_DEPENDS = cross/postgis cross/pgvector
 
@@ -11,7 +22,7 @@ UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
 
 MAINTAINER = DigitalBox98
 DESCRIPTION = PostgreSQL is a powerful, open source object-relational database system with over 30 years of active development. This package includes PostGIS and pgvector extensions for DSM 7+.
-CHANGELOG = "1. Update PostgreSQL to 17.10. <br/>2. Add pgvector extension. <br/>3. Fix uuid-ossp on kernel 3.10."
+CHANGELOG = "1. Update PostgreSQL to v17.11. <br/>2. use libuuid for uuid-ossp extension. <br/>3. Update PostGis to v3.6.4 (with GEOS v3.14.1, PROJ v9.8.1)."
 DISPLAY_NAME = PostgreSQL
 STARTABLE = yes
 
@@ -30,9 +41,9 @@ include ../../mk/spksrc.common.mk
 # loading issues observed on DSM ARMv7 systems.
 export LIBICU_DATA_PACKAGING_MODE=archive
 
-# PostGIS requires GCC 5+ (GEOS 3.12.3 needs C++14)
-# Only include postgis if toolchain GCC >= 5.0
-ifeq ($(call version_ge, $(TC_GCC), 5.0),1)
+# PostGIS requires gcc 8+ (libgeos 3.14.1 and libroj 9.8.1 demand C++17)
+# Only include postgis if toolchain supports required gcc
+ifeq ($(call version_ge, $(TC_GCC), 8),1)
 DEPENDS += cross/postgis
 DEPENDS += cross/pgvector
 endif
