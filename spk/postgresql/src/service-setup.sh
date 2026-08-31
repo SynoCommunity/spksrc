@@ -72,7 +72,7 @@ enable_extensions()
 {
     # Enable contrib extensions in template1 (inherited by all new databases)
     for ext in unaccent cube earthdistance pg_trgm "uuid-ossp" vector; do
-        if run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c \"SELECT 1 FROM pg_available_extensions WHERE name = '${ext}'\" -t" > /dev/null 2>&1; then
+        if run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c \"SELECT 1 FROM pg_available_extensions WHERE name = '${ext}'\" -t 2>/dev/null" | grep -q 1; then
             run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d template1 -c 'CREATE EXTENSION IF NOT EXISTS \"${ext}\";'"
             run_as_user "${SYNOPKG_PKGDEST}/bin/psql -h ${SYNOPKG_PKGVAR} -p ${SERVICE_PORT} -d postgres -c 'CREATE EXTENSION IF NOT EXISTS \"${ext}\";'"
         fi
