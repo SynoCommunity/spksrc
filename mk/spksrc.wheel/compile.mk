@@ -120,6 +120,7 @@ cross-compile-wheel-%:
 	      cp -f "$${_cross_npymath}" "$${_build_npymath}"; \
 	   fi ; \
 	   extra_args=""; \
+	$(MESON_PYTHON_CROSS_FILE_CMD) ; \
 	_pip_args="$(PIP_WHEEL_ARGS_CROSSENV)"; \
 	case "$(WHEEL_NAME)" in \
 	   numpy|scipy|scikit_learn|lap|pandas|numba|llvmlite|msgpack) \
