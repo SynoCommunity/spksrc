@@ -18,7 +18,7 @@ LICENSE  = GPLv3
 # ffmpeg needs C11 -- gcc 4.9 or newer
 MIN_GCC_VERSION = 4.9
 
-OPTIONAL_DEPENDS += cross/ffmpeg7
+OPTIONAL_DEPENDS += cross/ffmpeg8
 OPTIONAL_DEPENDS += cross/fdk-aac
 OPTIONAL_DEPENDS += cross/fontconfig
 OPTIONAL_DEPENDS += cross/opus
@@ -87,7 +87,7 @@ endif
 
 # If libraries through FFMPEG_PACKAGE shared libraries unavailable
 ifeq ($(wildcard $(FFMPEG_PACKAGE_WORK_DIR)),)
-DEPENDS += cross/ffmpeg7
+DEPENDS += cross/ffmpeg8
 DEPENDS += cross/fdk-aac
 DEPENDS += cross/fontconfig
 DEPENDS += cross/opus
