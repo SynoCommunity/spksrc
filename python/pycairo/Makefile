@@ -21,4 +21,4 @@ include ../../mk/spksrc.python-wheel-meson.mk
 
 pycairo_post_configure:
 	@echo "[properties]" > $(WORK_DIR)/$(PKG_DIR)/pycairo.meson
-	@echo "needs_exe_wrapper = false" >> $(WORK_DIR)/$(PKG_DIR)/pycairo.meson
+	@echo "needs_exe_wrapper = true" >> $(WORK_DIR)/$(PKG_DIR)/pycairo.meson
