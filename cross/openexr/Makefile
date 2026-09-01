@@ -11,9 +11,10 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-# Toolchains lacking c++11 compiler ar not supported  
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
-UNSUPPORTED_ARCHS_TCVERSION = x86-5.2
+# Toolchains lacking a c++11 compiler are not supported. One floor replaces both the arch
+# list and the x86-5.2 exception: that arch runs gcc 4.7.3, which fails the same C++11
+# check as the ARMv5 and old PowerPC ones.
+MIN_GCC_VERSION = 4.8
 
 HOMEPAGE = https://www.openexr.com/
 COMMENT  = OpenEXR provides the specification and reference implementation of the EXR file format, the professional-grade image storage format of the motion picture industry.

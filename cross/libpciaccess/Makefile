@@ -14,9 +14,11 @@ LICENSE  = https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/blob/master/CO
 
 ADDITIONAL_CFLAGS = -O
 
-include ../../mk/spksrc.cross-meson.mk
+include ../../mk/spksrc.common.mk
 
 # 0.19 uses a C99 for-loop init; pin gnu99 (gcc 4.x defaults to gnu89).
-ifeq ($(call version_ge,$(TC_GCC),4.9),1)
+ifeq ($(call version_lt,$(TC_GCC),5),1)
 CONFIGURE_ARGS += -Dc_std=gnu99
 endif
+
+include ../../mk/spksrc.cross-meson.mk
