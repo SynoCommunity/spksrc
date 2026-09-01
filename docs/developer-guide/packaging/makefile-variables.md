@@ -47,11 +47,11 @@ them without any declaration on your part:
 
 | If the URL is hosted on | Fallbacks are taken from |
 |-------------------------|--------------------------|
-| GNU (`ftp.gnu.org`, `ftpmirror.gnu.org`) | `GNU_MIRRORS` |
-| SourceForge (`downloads.sourceforge.net`) | `SOURCEFORGE_MIRRORS` |
-| GNOME (`download.gnome.org`) | `GNOME_MIRRORS` |
-| X.Org (`www.x.org`) | `XORG_MIRRORS` |
-| kernel.org (`cdn.kernel.org`) | `KERNEL_MIRRORS` |
+| GNU (`ftp.gnu.org`, `ftpmirror.gnu.org`) | `MIRROR_GNU` |
+| SourceForge (`downloads.sourceforge.net`) | `MIRROR_SOURCEFORGE` |
+| GNOME (`download.gnome.org`) | `MIRROR_GNOME` |
+| kernel.org (`cdn.kernel.org`) | `MIRROR_KERNEL` |
+| Savannah (`download.savannah.gnu.org`) | `MIRROR_SAVANNAH` |
 
 A candidate is built by replacing everything up to and including the family's
 tree-root marker (`/gnu/`, `/project/`, `/sources/`, ...) with the mirror base,

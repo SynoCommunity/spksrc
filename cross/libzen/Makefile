@@ -8,8 +8,8 @@ PKG_DIR = ZenLib-$(PKG_VERS)/Project/GNU/Library
 
 DEPENDS =
 
-# compiler lacking support for -std=c++11
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# needs -std=c++11
+MIN_GCC_VERSION = 4.7
 
 HOMEPAGE = https://github.com/MediaArea/ZenLib
 COMMENT  = Small C++ derivate classes to have an easier life.

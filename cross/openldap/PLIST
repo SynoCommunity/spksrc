@@ -1,4 +1,4 @@
-bin:bin/ldapadd
+lnk:bin/ldapadd
 bin:bin/ldapcompare
 bin:bin/ldapdelete
 bin:bin/ldapexop

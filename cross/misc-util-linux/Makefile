@@ -1,6 +1,6 @@
 PKG_NAME = misc-util-linux
 PKG_REAL_NAME = util-linux
-PKG_VERS = 2.41.4
+PKG_VERS = 2.42.2
 PKG_EXT = tar.xz
 PKG_DIST_NAME = $(PKG_REAL_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.kernel.org/pub/linux/utils/util-linux/v$(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
@@ -11,11 +11,12 @@ EXTRACT_PATH = $(WORK_DIR)/$(PKG_NAME)
 DEPENDS = cross/ncursesw
 
 HOMEPAGE = https://github.com/karelzak/util-linux
-COMMENT  = Random collection of Linux utilities. We use this only to build ... out of util-linux.
+COMMENT  = Random collection of Linux utilities. We use this only to build some dedictated tools out of util-linux.
 LICENSE  = GPLv2
 
 GNU_CONFIGURE = 1
 
+PRE_CONFIGURE_TARGET = misc-util-linux_pre_configure
 POST_INSTALL_TARGET = misc-util-linux_post_install
 
 ADDITIONAL_CFLAGS = -Wno-unused-parameter
@@ -91,6 +92,11 @@ endif
 COMPILE_ARGS = NCURSES_LIBS="-lncursesw"
 
 include ../../mk/spksrc.cross-cc.mk
+
+.PHONY: misc-util-linux_pre_configure
+misc-util-linux_pre_configure:
+	@$(MSG) Run autogen to apply pached configure.ac
+	@$(RUN) ./autogen.sh
 
 .PHONY: misc-util-linux_post_install
 misc-util-linux_post_install:

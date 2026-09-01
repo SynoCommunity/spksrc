@@ -12,7 +12,7 @@ STARTABLE = no
 CHANGELOG = "Initial package release."
 
 HOMEPAGE = https://github.com/google/google-authenticator-libpam
-SUPPORTURL = https://github.com/SynoCommunity/spksrc/wiki/Google-Authenticator-PAM
+SUPPORTURL = https://docs.synocommunity.com/packages/google-authenticator/
 LICENSE = Apache-2.0
 LICENSE_FILE = $(WORK_DIR)/$(SPK_NAME)-$(SPK_VERS)/LICENSE
 

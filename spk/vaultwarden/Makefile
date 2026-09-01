@@ -1,16 +1,19 @@
 SPK_NAME = vaultwarden
-SPK_VERS = 1.37.0
-SPK_REV = 4
+SPK_VERS = 1.37.2
+SPK_REV = 5
 SPK_ICON = src/vaultwarden.png
 
 DEPENDS = cross/vaultwarden cross/vaultwarden_web
 
-UNSUPPORTED_ARCHS = $(PPC_ARCHS) $(ARMv5_ARCHS) $(ARMv7L_ARCHS)
+# rust edition 2024 required (see rust-version in vaultwarden Cargo.toml)
+MIN_RUSTC_VERSION = 1.95
+# issue with dependent component "libmimalloc-sys" (stdatomic.h missing)
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
 
 MAINTAINER = Hylen
 DESCRIPTION = Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients*, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
 DISPLAY_NAME = Vaultwarden
-CHANGELOG = "Update to v1.37.0 with web vault v2026.6.4."
+CHANGELOG = "1. Update Vaultwarden to v1.37.2. <br/>2. Fixes the invite issue and compatibility with the latest Bitwarden clients."
 
 HOMEPAGE = https://github.com/dani-garcia/vaultwarden
 LICENSE  = GPLv3

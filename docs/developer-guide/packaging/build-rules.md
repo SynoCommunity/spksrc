@@ -54,7 +54,7 @@ Run from `native/<package>/` directory (host tools built once, then reused via
 |--------|-------------|
 | `all` | Build everything (default): download → … → install, then `archive` |
 | `download` `checksum` `extract` `patch` `configure` `compile` `install` | Individual build lifecycle steps, in order |
-| `build-archive` / `print-archive-name` | Create the reusable archive on demand / print its filename (opt-in via `ARCHIVE_NAME`, see `spksrc.native/archive.mk`) |
+| `build-archive` / `print-archive-name` | Create the reusable archive on demand / print its filename (opt-in via `ARCHIVE_NAME`, see `spksrc.build/archive.mk`) |
 | `nativeclean` | Drop **this** package's build cookies so every step re-runs next `make`, keeping the work dir (source, install, archive). The native counterpart of `spkclean`; leaves dependencies' cookies alone |
 | `clean` / `smart-clean` | Remove all work directories / this package's source and cookies |
 

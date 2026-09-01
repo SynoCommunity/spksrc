@@ -137,3 +137,33 @@ Use interactive mode and select correct release:
 ```bash
 beet import /path/to/album
 ```
+
+## Plugin Support
+
+| Plugin | Status | Notes |
+|--------|--------|-------|
+| embedart | ✅ Yes | |
+| lastgenre | ✅ Yes | |
+| lastimport | ✅ Yes | |
+| metasync | ✅ Yes | |
+| replaygain | ✅ Yes | |
+| scrub | ✅ Yes | |
+| sonosupdate | ✅ Yes | |
+| beatport | ⚠️ Partial | Requires user authentication code to access API |
+| chroma | ⚠️ Partial | Requires the Chromaprint package |
+| discogs | ⚠️ Partial | Requires user authentication code to access API |
+| embyupdate | ⚠️ Partial | Requires Emby password or apikey |
+| fetchart | ⚠️ Partial | Art source disabled if no key is configured |
+| kodiupdate | ⚠️ Partial | Requires configuration of your Kodi host |
+| lyrics | ⚠️ Partial | Google source disabled if no API key is configured |
+| plexupdate | ⚠️ Partial | Requires configuration of your Plex server |
+| absubmit | ❌ No | Deprecated; requires external essentia extractor |
+| aura | ❌ No | Requires Flask web server |
+| autobpm | ❌ No | Excluded due to build complexity |
+| bpd | ❌ No | Requires persistent MPD server |
+| docs | ❌ No | Likely deprecated |
+| import | ❌ No | Likely deprecated |
+| mpdstats | ❌ No | Requires persistent runtime |
+| reflink | ❌ No | Likely deprecated |
+| thumbnails | ❌ No | Desktop integration only (Nautilus/Thunar) |
+| web | ❌ No | Requires persistent Flask server |

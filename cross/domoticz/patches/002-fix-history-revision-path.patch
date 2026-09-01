@@ -1,0 +1,26 @@
+--- getgit.cmake.orig	2026-08-07 15:08:01.051399607 +0000
++++ getgit.cmake	2026-08-07 15:08:01.055399537 +0000
+@@ -8,19 +8,19 @@
+ endif()
+ 
+ MACRO(History_GET_REVISION variable)
+-  IF(EXISTS ${CMAKE_SOURCE_DIR}/History.txt)
++  IF(EXISTS ${SOURCE_DIR}/History.txt)
+     MESSAGE(STATUS "Read ProjectRevision from History.txt")
+     CMAKE_POLICY(SET CMP0007 NEW)
+-    FILE(STRINGS ${CMAKE_SOURCE_DIR}/History.txt AppVersionContent)
++    FILE(STRINGS ${SOURCE_DIR}/History.txt AppVersionContent)
+     LIST(GET AppVersionContent 0 AppVersionContent)
+     STRING(REPLACE " " ";" AppVersionContent ${AppVersionContent})
+     LIST(GET AppVersionContent 1 AppVersionContent)
+     STRING(REPLACE "." ";" AppVersionContent ${AppVersionContent})
+     LIST(GET AppVersionContent 1 ${variable})
+-  ELSE(EXISTS ${CMAKE_SOURCE_DIR}/History.txt)
++  ELSE(EXISTS ${SOURCE_DIR}/History.txt)
+     MESSAGE(STATUS "Failed to get ProjectRevision from History.txt, set it to 0")
+     set (${variable} 0)
+-  ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/History.txt)
++  ENDIF(EXISTS ${SOURCE_DIR}/History.txt)
+ ENDMACRO(History_GET_REVISION)
+ 
+ MACRO(Gitversion_GET_REVISION dir variable)

@@ -1,5 +1,5 @@
 PKG_NAME = seerr
-PKG_VERS = 3.3.0
+PKG_VERS = 3.4.1
 PKG_EXT  = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/seerr-team/seerr/archive/refs/tags

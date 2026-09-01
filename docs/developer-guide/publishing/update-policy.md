@@ -30,7 +30,9 @@ Before publishing, verify:
 
 - [ ] Service starts from Package Center
 - [ ] Service stops from Package Center
-- [ ] Log files exist in `/var/packages/{package}/var/`
+- [ ] Log files exist in the package data directory
+      (`/var/packages/{package}/var/` on DSM < 7, `/volume1/@appdata/{package}/`
+      on DSM 7)
 - [ ] DSM shortcut opens the interface
 
 ### Command Line Tools

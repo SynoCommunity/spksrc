@@ -69,10 +69,10 @@ OPTIONAL_DESC := $(OPTIONAL_DESC)", fuse"
 SPK_COMMANDS += bin/fusermount bin/ulockmgr_server
 endif
 
-HOMEPAGE = https://github.com/SynoCommunity/spksrc/wiki/FAQ-SynoCliDisk
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-disk/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
-WIKI_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>FAQ SynoCliDisk\</a\>"
+DOCS_URL = "\<a target=\"_blank\" href=\"$(HOMEPAGE)\"\>SynoCli Disk Tools\</a\>"
 
 # Remarks: html in DESCRIPTION is not supported
 DESCRIPTION = "SynoCli Disk Tools provides a number of small command-line utilities: e2fsprogs, ntfs-3g/ntfsprogs, testdisk, ncdu, davfs2, lsscsi, ddrescure$(OPTIONAL_DESC)."
@@ -82,7 +82,7 @@ CHANGELOG += "2. Update davfs2 from v1.7.1 to v1.7.2. <br/>"
 CHANGELOG += "3. Update dua from v2.31.0 to v2.32.0 (except for ARMv5 and qoriq). <br/>"
 CHANGELOG += "4. Update duf from v0.8.1 to v0.9.1. <br/>"
 CHANGELOG += "5. Update s3backer from v2.1.5 to v2.1.6. <br/>"
-CHANGELOG += "<br/>For package details and specific licences see $(WIKI_URL)".
+CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 
 SPK_COMMANDS += bin/chattr bin/compile_et bin/lsattr bin/mk_cmds

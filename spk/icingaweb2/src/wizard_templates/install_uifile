@@ -1,0 +1,59 @@
+[{
+    "step_title": "{{{ICINGAWEB2_DB_STEP_TITLE}}}",
+    "invalid_next_disabled_v2": true,
+    "items": [{
+        "desc": "{{{ICINGAWEB2_DB_STEP_DESC}}}"
+    }, {
+        "type": "password",
+        "subitems": [{
+            "key": "wizard_mysql_password_root",
+            "desc": "{{{ICINGAWEB2_DB_ROOT_PASS_DESC}}}",
+            "defaultValue": "",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "subitems": [{
+            "key": "wizard_db_pass",
+            "desc": "{{{ICINGAWEB2_DB_PASS_DESC}}}",
+            "defaultValue": "",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 10,
+                "regex": {
+                    "expr": "/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{10,}$/",
+                    "errorText": "Password must be 10+ characters with uppercase, lowercase, number, and special character"
+                }
+            }
+        }]
+    }]
+}, {
+    "step_title": "{{{ICINGAWEB2_ADMIN_STEP_TITLE}}}",
+    "invalid_next_disabled_v2": true,
+    "items": [{
+        "desc": "{{{ICINGAWEB2_ADMIN_STEP_DESC}}}"
+    }, {
+        "type": "textfield",
+        "subitems": [{
+            "key": "wizard_admin_user",
+            "desc": "{{{ICINGAWEB2_ADMIN_USER_DESC}}}",
+            "defaultValue": "admin",
+            "validator": {
+                "allowBlank": false
+            }
+        }]
+    }, {
+        "type": "password",
+        "subitems": [{
+            "key": "wizard_admin_pass",
+            "desc": "{{{ICINGAWEB2_ADMIN_PASS_DESC}}}",
+            "defaultValue": "",
+            "validator": {
+                "allowBlank": false,
+                "minLength": 8
+            }
+        }]
+    }]
+}]

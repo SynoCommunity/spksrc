@@ -1,0 +1,67 @@
+[
+    {
+        "step_title": "Connect to Icinga Master",
+        "invalid_next_disabled": true,
+        "items": [
+            {
+                "desc": "Enter the details of your Icinga 2 master server. This is the server where you installed the icinga2 and icingaweb2 packages."
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_master_host",
+                        "desc": "Master Server IP or Hostname",
+                        "validator": {
+                            "allowBlank": false
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_master_port",
+                        "desc": "Port",
+                        "defaultValue": "5665"
+                    }
+                ]
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_agent_name",
+                        "desc": "Agent Name (optional)",
+                        "emptyText": "This device's hostname"
+                    }
+                ]
+            },
+            {
+                "desc": "<b>Note:</b> If you are re-installing this agent, please ensure that its host is first removed from Icinga Director on the master server."
+            }
+        ]
+    },
+    {
+        "step_title": "Auto-Registration",
+        "invalid_next_disabled": true,
+        "items": [
+            {
+                "desc": "To automatically register this agent and receive a signed certificate, enter the Self-Service API key from your Icinga master."
+            },
+            {
+                "desc": "On the master server, you can find this key at: <code style=\"user-select: all\">/volume1/@appdata/icingaweb2/etc/icingaweb2/self-service-api.key</code>"
+            },
+            {
+                "type": "textfield",
+                "subitems": [
+                    {
+                        "key": "wizard_api_key",
+                        "desc": "Self-Service API Key"
+                    }
+                ]
+            }
+        ]
+    }
+]

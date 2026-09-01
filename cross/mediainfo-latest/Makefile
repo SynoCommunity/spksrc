@@ -1,5 +1,5 @@
 PKG_NAME = mediainfo
-PKG_VERS = 26.01
+PKG_VERS = 26.05
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/MediaArea/MediaInfo/archive
@@ -8,7 +8,8 @@ PKG_DIR = MediaInfo-$(PKG_VERS)/Project/GNU/CLI
 
 DEPENDS = cross/libmediainfo-latest
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# 26.x requires GCC >= 5 (selected by cross/mediainfo)
+MIN_GCC_VERSION = 5
 
 HOMEPAGE = https://mediaarea.net/en/MediaInfo
 COMMENT  = MediaInfo is a convenient unified display of the most relevant technical and tag data for video and audio files.

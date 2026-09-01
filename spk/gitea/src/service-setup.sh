@@ -8,7 +8,7 @@ fi
 
 ENV="PATH=${PATH} HOME=${SYNOPKG_PKGHOME}"
 
-SERVICE_COMMAND="env ${ENV} ${GITEA} web --port ${SERVICE_PORT} --pid ${PID_FILE}"
+SERVICE_COMMAND="env ${ENV} ${GITEA} web --port ${SERVICE_PORT} --config ${CFG_FILE} --pid ${PID_FILE}"
 SVC_BACKGROUND=y
 
 service_postinst ()

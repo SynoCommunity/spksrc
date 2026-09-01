@@ -46,6 +46,7 @@ Tools built for the build host:
 - **[PLIST Files](plist.md)** - Defining package contents
 - **[Service Scripts](service-scripts.md)** - Daemons and services
 - **[Wizards](wizards.md)** - Installation wizards
+- **[Help Pages](help-pages.md)** - In-DSM help pages
 - **[Resource Files](resource-files.md)** - DSM 7 resource configuration
 
 ## Quick Start: Creating a Package

@@ -1,9 +1,9 @@
 SPK_NAME = homeassistant
-SPK_VERS = 2025.11.3
-SPK_REV = 25
+SPK_VERS = 2026.7.4
+SPK_REV = 26
 SPK_ICON = src/homeassistant.png
 
-PYTHON_PACKAGE = python313
+PYTHON_PACKAGE = python314
 
 # unsupported wheels: av, numpy; require glibc >= 2.28 (av), >= 2.27 (numpy)
 REQUIRED_MIN_DSM = 7.2
@@ -19,7 +19,7 @@ UNSUPPORTED_ARCHS = $(ARMv7_ARCHS)
 MAINTAINER = hgy59
 DESCRIPTION = Open source home automation that puts local control and privacy first. Powered by a worldwide community of tinkerers and DIY enthusiasts. 
 DISPLAY_NAME = Home Assistant Core
-CHANGELOG = "1. Update homeassistant to 2025.11.3 and depend on Python 3.13. <br/><br/>REMARKS: A minimal set of cross compiled wheels is included in this package. All other wheels and HACS are downloaded at installation time. <br/>This is the last release that is officially supported. Home Assistand Core installation is deprecated since version 2025.12."
+CHANGELOG = "Update homeassistant to 2026.7.4 and depend on Python 3.14. <br/><br/>REMARKS: A minimal set of cross compiled wheels is included in this package. All other wheels and HACS are downloaded at installation time. <br/>Home Assistant Core installation is deprecated since version 2025.12, you should consider migrating to a container installation."
 STARTABLE = yes
 
 HOMEPAGE = https://www.home-assistant.io/

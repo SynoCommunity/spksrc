@@ -1,0 +1,365 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cooperspencer/gickup/refs/heads/main/gickup_spec.json
+
+source:
+  github:
+    - token: some-token
+    # alternatively, specify token in a file, relative to current working directory when executed.
+      # token_file: token.txt
+      user: some-user # the user you want to clone the repositories from.
+      # if you want to get everything from your user, leave out the user parameter and just use the token.
+      # for the clone process, either use:
+      # - username + password
+      # - sshkey
+      # - token
+      username: your-user # user is used to clone the repo with
+      password: your-password
+      ssh: true # can be true or false
+      sshkey: /path/to/key # if empty, it uses your home directories' .ssh/id_rsa
+      exclude: # this excludes the repos "foo" and "bar"
+        - foo
+        - bar
+      include: # this includes the repo "foobar"
+        - foobar
+      excludeorgs: # this excludes repos from the organizations "foo" and "bar"
+        - foo
+        - bar
+      includeorgs: # this includes repos from the organizations "foo1" and "bar1"
+        - foo1
+        - bar1
+      wiki: true # includes wiki too
+      issues: true # back up issues, works only locally
+      starred: true # includes the user's starred repositories too
+      contributed: true # includes repositories the user contributed to
+      filter:
+        stars: 100 # only clone repos with 100 stars
+        lastactivity: 1y # only clone repos which had activity during the last year
+        excludearchived: true 
+        languages: # only clone repositories with the following languages
+          - go
+          - java
+        excludeforks: true # exclude forked repositories
+      gists: true # clone gists too
+    # alternatively, authenticate with a GitHub App:
+    # - app_id: 123456                              # GitHub App ID (numeric)
+    #   app_installation_id: 78901234               # Installation ID of the App on the target account
+    #   app_private_key_file: /path/to/private.pem  # path to the App's RSA private key PEM file
+    #   user: some-user                             # user or org whose repos to back up (optional if App is self-installed)
+    #   organization: some-org                      # alternatively back up an organization's repos
+    #   ssh: false                                  # note: 'contributed' is not supported with App auth
+  gitea:
+    - token: some-token
+      # token_file: token.txt # alternatively, specify token in a file
+      user: some-user # the user you want to clone the repositories from.
+      url: http(s)://url-to-gitea # if empty, it uses https://gitea.com
+      # if you want to get everything from your user, leave out the user parameter and just use the token.
+      # for the clone process, either use:
+      # - username + password
+      # - sshkey
+      # - token
+      username: your-user # user is used to clone the repo with
+      password: your-password
+      ssh: true # can be true or false
+      sshkey: /path/to/key # if empty, it uses your home directories' .ssh/id_rsa
+      exclude: # this excludes the repos "foo" and "bar"
+        - foo
+        - bar
+      include: # this includes the repo "foobar"
+        - foobar
+      excludeorgs: # this excludes repos from the organizations "foo" and "bar"
+        - foo
+        - bar
+      includeorgs: # this includes repos from the organizations "foo1" and "bar1"
+        - foo1
+        - bar1
+      wiki: true # includes wiki too
+      issues: true # back up issues, works only locally
+      starred: true # includes the user's starred repositories too
+      filter:
+        stars: 100 # only clone repos with 100 stars
+        lastactivity: 1y # only clone repos which had activity during the last year
+        excludearchived: true 
+        languages: # only clone repositories with the following languages
+          - go
+          - java
+        excludeforks: true # exclude forked repositories
+  gogs:
+    - token: some-token
+      # token_file: token.txt # alternatively, specify token in a file
+      user: some-user # the user you want to clone the repositories from.
+      url: http(s)://url-to-gogs # no default value
+      # if you want to get everything from your user, leave out the user parameter and just use the token.
+      # for the clone process, either use:
+      # - username + password
+      # - sshkey
+      # - token
+      username: your-user # user is used to clone the repo with
+      password: your-password
+      ssh: true # can be true or false
+      sshkey: /path/to/key # if empty, it uses your home directories' .ssh/id_rsa
+      exclude: # this excludes the repos "foo" and "bar"
+        - foo
+        - bar
+      include: # this includes the repo "foobar"
+        - foobar
+      excludeorgs: # this excludes repos from the organizations "foo" and "bar"
+        - foo
+        - bar
+      includeorgs: # this includes repos from the organizations "foo1" and "bar1"
+        - foo1
+        - bar1
+      wiki: true # includes wiki too
+      issues: true # back up issues, works only locally
+      filter:
+        stars: 100 # only clone repos with 100 stars
+        lastactivity: 1y # only clone repos which had activity during the last year
+        excludeforks: true # exclude forked repositories
+  gitlab:
+    - token: some-token
+      # token_file: token.txt # alternatively, specify token in a file
+      user: some-user # the user you want to clone the repositories from.
+      url: http(s)://url-to-gitlab # if empty, it uses https://gitlab.com
+      # if you want to get everything from your user, leave out the user parameter and just use the token.
+      # for the clone process, either use:
+      # - username + password
+      # - sshkey
+      # - token
+      username: your-user # user is used to clone the repo with
+      password: your-password
+      ssh: true # can be true or false
+      sshkey: /path/to/key # if empty, it uses your home directories' .ssh/id_rsa
+      exclude: # this excludes the repos "foo" and "bar"
+        - foo
+        - bar
+      include: # this includes the repo "foobar"
+        - foobar
+      excludeorgs: # this excludes repos from the organizations "foo" and "bar"
+        - foo
+        - bar
+      includeorgs: # this includes repos from the organizations "foo1" and "bar1"
+        - foo1
+        - bar1
+      wiki: true # includes wiki too
+      issues: true # back up issues, works only locally
+      starred: true # includes the user's starred repositories too
+      filter:
+        stars: 100 # only clone repos with 100 stars
+        lastactivity: 1y # only clone repos which had activity during the last year
+        excludearchived: true 
+        languages: # only clone repositories with the following languages
+          - go
+          - java
+        excludeforks: true # exclude forked repositories
+  bitbucket:
+    - user: some-user # the user you want to clone the repositories from.
+      token: some-token
+      # token_file: token.txt # alternatively, specify token in a file
+      url: http(s)://url-to-bitbucket # if empty, it uses https://bitbucket.org
+      organization: some-workspace # workspace to list repositories from
+      email: your-email@example.com # email is used for Bitbucket API basic auth
+      username: your-user # user is used to clone the repo with
+      password: your-password
+      ssh: true # can be true or false
+      sshkey: /path/to/key # if empty, it uses your home directories' .ssh/id_rsa
+      exclude: # this excludes the repos foo and bar
+        - foo
+        - bar
+      include: # this includes the repo "foobar"
+        - foobar
+      excludeorgs: # this excludes repos from the workpaces "foo" and "bar"
+        - foo
+        - bar
+      includeorgs: # this includes repos from the workspaces "foo1" and "bar1"
+        - foo1
+        - bar1
+      filter:
+        lastactivity: 1y # only clone repos which had activity during the last year
+  onedev:
+    - user: some-user # the user you want to clone the repositories from.
+      url: http(s)://url-to-onedev # if empty, it uses https://bitbucket.org
+      username: your-user # user is used to clone the repo with
+      password: your-password
+      ssh: true # can be true or false
+      sshkey: /path/to/key # if empty, it uses your home directories' .ssh/id_rsa
+      exclude: # this excludes the repos foo and bar
+        - foo
+        - bar
+      include:
+        - foobar
+      filter:
+        lastactivity: 1y # only clone repos which had activity during the last year
+        excludeforks: true # exclude forked repositories
+      issues: true # back up issues, works only locally
+  sourcehut:
+    - token: some-token # sourcehut OAuth token (sent as Bearer token)
+      # token_file: token.txt # alternatively, specify token in a file
+      user: some-user # the user you want to clone the repositories from.
+      url: http(s)://url-to-sourcehut # if empty, it uses https://git.sr.ht
+      # if you want to get everything from your user, leave out the user parameter and just use the token.
+      # for the clone process, either use:
+      # - username + password
+      # - sshkey
+      # - token
+      username: your-user # user is used to clone the repo with
+      password: your-password
+      ssh: true # can be true or false
+      sshkey: /path/to/key # if empty, it uses your home directories' .ssh/id_rsa
+      exclude: # this excludes the repos "foo" and "bar"
+        - foo
+        - bar
+      include: # this includes the repo "foobar"
+        - foobar
+      wiki: true # includes wiki too
+      filter:
+        lastactivity: 1y # only clone repos which had activity during the last year
+  any:
+    - url: url-to-any-repo # can be https, http or ssh
+      user: your-preferred-user # the user to want to associate with this repo, default: git
+      username: your-user # user is used to clone the repo with
+      password: your-password
+      ssh: true # can be true or false
+      sshkey: /path/to/key # if empty, it uses your home directories' .ssh/id_rsa
+    - url: can-also-be-a-local-path-to-a-bare-repo
+destination:
+  gitea:
+    - token: some-token
+      # token_file: token.txt # alternatively, specify token in a file
+      user: some-name # can be a user or an organization, it must exist on the system
+      url: http(s)://url-to-gitea
+      createorg: true # creates an organization if it doesn't exist already, if no user is set it creates an organization with the name of the original author
+      mirrorinterval: 2h0m0s # interval to pull changes from source repo, will be removed in one of the next releases
+      lfs: false # trigger to enable lfs on gitea
+      mirror:
+        enabled: true # if set to true, gickup will clone the repository and push it to gitea itself
+        mirrorinterval: 2h0m0s # interval to pull changes from source repo
+      visibility:
+        repositories: private # private, public, default: private
+        organizations: private # private, limited, public, default: private
+  gogs:
+    - token: some-token
+      # token_file: token.txt # alternatively, specify token in a file
+      user: some-name # can be a user or an organization, it must exist on the system
+      url: http(s)://url-to-gogs
+      createorg: true # creates an organization if it doesn't exist already, if no user is set it creates an organization with the name of the original author
+      mirror:
+        enabled: true # if set to true, gickup will clone the repository and push it to gogs itself
+      visibility:
+        repositories: private # private, public, default: private
+  gitlab:
+    - token: some-token
+      # token_file: token.txt # alternatively, specify token in a file
+      url: http(s)://url-to-gitlab
+      user: some-name # can be a user or a group, it must exist on the system
+      visibility:
+        repositories: private # private, public, default: source repository visibility
+      force: false # force push to destination
+      mirror:
+        enabled: true # if set to true, gickup will clone the repository and push it to gitlab itself
+  github:
+    - token: some-token
+      # token_file: token.txt # alternatively, specify token in a file
+      organization: whatever # name of the organization to want to backup to
+      visibility:
+        repositories: private # private, public, default: private
+      force: false # force push to destination
+    # alternatively, authenticate with a GitHub App:
+    # - app_id: 123456                              # GitHub App ID (numeric)
+    #   app_installation_id: 78901234               # Installation ID of the App
+    #   app_private_key_file: /path/to/private.pem  # path to the App's RSA private key PEM file
+    #   organization: whatever                      # org to back up into (leave empty for personal account)
+    #   visibility:
+    #     repositories: private
+    #   force: false
+  onedev:
+    - token: some-token
+      # token_file: token.txt # alternatively, specify token in a file
+      url: http(s)://url-to-onedev
+      organization: whatever # name of the parent project you want to backup to
+      force: false # force push to destination
+  sourcehut:
+    - token: some-token # sourcehut OAuth token (sent as Bearer token)
+      # token_file: token.txt # alternatively, specify token in a file
+      user: some-name # can be a user or an organization, it must exist on the system
+      sshkey: /path/to/key # if empty, it uses your home directories' .ssh/id_rsa, sourcehut needs ssh to push to the repository
+      url: http(s)://url-to-sourcehut # if empty, it uses https://git.sr.ht
+      visibility:
+        repositories: private # public, unlisted, private, default: public
+      force: false # force push to destination
+  local:
+    # Export this path from Docker with a volume to make it accessible and more permanent.
+    - path: /some/path/gickup
+      structured: true # checks repos out like hostersite/user|organization/repo
+      zip: true # zips the repository after cloned and removes the repository afterwards
+      keep: 5 # only keeps x backups
+      bare: true # clone the repositories as bare
+      mirror: true # create mirror clones
+      lfs: true # clone lfs repos, !! ATTENTION !! git and git-lfs must be installed on the system!
+  s3:
+   - endpoint: somewhere:9000 # whatever your s3 endpoint is
+     structured: true # checks repos out like hostersite/user|organization/repo
+     bucket: your-bucket-name
+     use_static_creds: true # if true, use static credentials (accesskey/secretkey/token); if false, use IAM instance credentials (e.g. for AWS EC2/ECS)
+     accesskey: your-access-key # can be an environment variable, just don't add a $ in front of it
+     secretkey: your-secret-key # can be an environment variable, just don't add a $ in front of it
+     token: your-token # can be an environment variable, just don't add a $ in front of it
+     region: your-region # S3 region, for example us-east-1
+     zip: false # if true, will zip the entire git repo into a single zip file and upload that instead
+     usessl: true # wheter to use ssl or not
+     storageclass: "" # storage class for all repos to be uploaded to this S3 bucket. E.g. for AWS: STANDARD, STANDARD_IA, GLACIER, etc.
+     src_repo_url_tag_key: "" # if set, tag each uploaded object with this key and the source repo URL as value. Leave unset to disable tagging.
+     datecreatedir: false # if true, gickup will create a directory for backup with the creation date
+  azureblob:
+    - url: https://yourstorageaccount.blob.core.windows.net # blob storage endpoint for your storage account, can be a SAS url
+      container: name of your blob container
+      useclicredential: false # if true, uses Azure CLI credentials to authenticate
+      tenantid: your-tenant-id # required if using clientId and clientSecret to authenticate
+      clientid: your-client-id # clientId of your app registration if you want to authenticate that way
+      clientsecret: your-client-secret # client secret of your app registration
+      structured: true # checks repos out like hostersite/user|organization/repo
+      zip: false # if true, will zip the entire git repo into a single zip file and upload that instead
+      datecreatedir: false # if true, gickup will create a directory for backup with the creation date
+cron: 0 22 * * * # optional - when cron is not provided, the program runs once and exits.
+# Otherwise, it runs according to the cron schedule.
+# See timezone commentary in docker-compose.yml for making sure this container runs
+# in the timezone you want.
+# For more information on crontab or testing: https://crontab.guru/
+
+log: # optional
+  timeformat: 2006-01-02 15:04:05 # you can use a custom time format, use https://yourbasic.org/golang/format-parse-string-time-date-example/ to check how date formats work in go
+                                  # or set it as environment variable GICKUP_TIME_FORMAT
+  file-logging: # optional
+    dir: log # directory to log into
+    file: gickup.log # file to log into
+    maxage: 7 # keep logs for 7 days
+
+metrics:
+  prometheus: # optional, needs to be provided in the first config
+    endpoint: /metrics
+    listen_addr: ":6178" # default listens on port 6178 on all IPs.
+  heartbeat: # optional - upon successful backup, makes a GET http request to one or more URLs. This is useful for use with monitoring services such as healthchecks.io or deadmanssnitch.com
+    urls:
+      - http(s)://url-to-make-request-to
+      - http(s)://another-url-to-make-request-to
+  push:
+    ntfy:
+    - url: http(s)://url-to-ntfy/your-topic
+      token: your-token 
+      user: your-user
+      password: your-password
+      email: your-email@example.com # optional - passed as the Email header for ntfy mail delivery
+    gotify:
+    - url: http(s)://url-to-gotify
+      token: your-token
+    apprise:
+    - url: http(s)://url-to-apprise
+      config: whatever-your-config-id-is
+      notification_urls:
+        - urls-to-notify(https://github.com/caronc/apprise/wiki)
+      tags:
+        - your-tag
+---
+
+# you can define separate source and destination pairs,
+# like "mirror all repos from github to gitea but keep gitlab repos up-to-date in ~/backup"
+# if cron is defined in the first config, this cron interval will be used for all the other confgurations, except it has one of its own.
+# if cron is not enabled for the first config, cron will not run for any other configuration
+# metrics configuration is always used from the first configuration

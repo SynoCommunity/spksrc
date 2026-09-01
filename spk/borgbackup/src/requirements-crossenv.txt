@@ -1,7 +1,9 @@
 # Cross-compiled requirements for borgbackup (Python 3.14)
+# Generated on 2026-07-30
+# Command: borgbackup[llfuse]==1.4.5 borgmatic==2.1.6 emborg
 
-borgbackup==1.4.4
-charset_normalizer==3.4.7
+borgbackup==1.4.5
+charset_normalizer==3.4.9
 llfuse==1.5.2
-msgpack==1.1.2
-#rpds_py==0.30.0                ==> supported version depends on rust version
+msgpack==1.2.1
+#rpds_py==0.30.0                        ==> supported version depends on rust version

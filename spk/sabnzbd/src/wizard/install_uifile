@@ -24,7 +24,7 @@
       }, {
         "desc": ""
       }, {
-        "desc": "This package utilizes the internal service user <b>'sc-sabnzbd'</b> in DSM. The shared folder mentioned is set up during installation to be accessible specifically by this user. For more detailed information, please consult the <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> guide."
+        "desc": "This package utilizes the internal service user <b>'sc-sabnzbd'</b> in DSM. The shared folder mentioned is set up during installation to be accessible specifically by this user. For more detailed information, please consult the <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> guide."
       }
     ]
   }

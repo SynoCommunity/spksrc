@@ -30,15 +30,21 @@ Install netdata from Package Center. The web dashboard is available at `http://y
 
 ## Post-Install
 
-### Enable Process Monitoring (Optional)
+### Enable Elevated-Privilege Features (Optional)
 
-Per-process disk I/O monitoring requires `apps.plugin` to run with elevated privileges. DSM 7 blocks setuid binaries from unsigned packages, so this must be applied manually after install:
+Per-process monitoring, system log browsing, the network connections view, and automatic service discovery require elevated privileges. DSM 7 blocks setuid binaries from unsigned packages, so this must be applied manually after install:
 
 ```bash
 netdata-fix
 ```
 
-This prompts for your DSM password, applies the fix, and tells you to restart the package. It only needs to be run once per install or upgrade.
+This prompts for your DSM password when needed, grants root privileges to the underlying plugins, and restarts the package. It only needs to be run once per install or upgrade.
+
+After running it, per-process monitoring appears under **Metrics**, system journal logs are browsable under **Logs**, the network connections view is available, and services (e.g. databases, web servers) are monitored automatically via service discovery.
+
+### Service Discovery on Synology
+
+Service discovery auto-starts collectors for services it finds listening. On DSM, some discovered services may show as failed: DSM's nginx does not expose the `stub_status` endpoint the collector requires, and DSM's PostgreSQL requires credentials the auto-generated job does not have. Such jobs can be disabled or reconfigured from **Collectors → go.d** in the web UI.
 
 ### Verify It's Running
 
@@ -80,6 +86,18 @@ Netdata ships with a complete stock configuration at `/var/packages/netdata/targ
 
 ### Disk I/O not showing per process
 
-Run `netdata-fix` from SSH, then restart the package.
+Run `netdata-fix` from SSH. It grants the needed root privileges and restarts the package for you.
+
+### System logs not appearing
+
+Run `netdata-fix` from SSH. The `systemd-journal.plugin` needs root privileges (via setuid) to read the journal files, which DSM blocks for unsigned packages until the fix is applied.
+
+### Network connections view not showing
+
+Run `netdata-fix` from SSH. The `network-viewer.plugin` needs root privileges (via setuid) to enumerate all sockets and attribute them to processes, which DSM blocks for unsigned packages until the fix is applied.
+
+### Service discovery / go.d collectors not starting
+
+Run `netdata-fix` from SSH. The `ndsudo` helper needs root privileges (via setuid) for the go.d collectors and the listening-socket-based service discovery, which DSM blocks for unsigned packages until the fix is applied.
 
 

@@ -7,8 +7,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/ncursesw
 
-# toolchains lacking c++11
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+# Toolchains lacking c++11
+MIN_GCC_VERSION = 4.8.1
 
 HOMEPAGE = https://github.com/majorkingleo/xstow#readme
 COMMENT  = XStow is a replacement of GNU Stow written in C++. It supports all features of Stow with some extensions.

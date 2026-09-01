@@ -1,15 +1,20 @@
 PKG_NAME = libproj
-PKG_VERS = 8.2.1
+PKG_VERS = 9.8.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = proj-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://download.osgeo.org/proj
 PKG_DIR = proj-$(PKG_VERS)
 
-DEPENDS = cross/sqlite cross/libtiff cross/curl
 BUILD_DEPENDS = native/sqlite
+DEPENDS = cross/sqlite
+DEPENDS += cross/libtiff
+DEPENDS += cross/curl
+
+# CXX17 required
+MIN_GCC_VERSION = 8
 
 HOMEPAGE = https://proj.org/
-COMMENT = PROJ is a generic coordinate transformation software
+COMMENT = PROJ is a Cartographic Projections and Coordinate Transformations Library.
 LICENSE = MIT
 
 # PROJ uses CMake

@@ -1,6 +1,6 @@
 SPK_NAME = bazarr
-SPK_VERS = 1.5.6
-SPK_REV = 20
+SPK_VERS = 1.6.0
+SPK_REV = 21
 SPK_ICON = src/bazarr.png
 
 PYTHON_PACKAGE = python312
@@ -14,14 +14,12 @@ DEPENDS += cross/unrar
 MAINTAINER = smaarn
 DESCRIPTION = "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movies and Bazarr takes care of everything for you."
 DISPLAY_NAME = Bazarr
-CHANGELOG = 'Update bazarr to 1.5.6 See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.5.6">1.5.6</a> for more details'
+CHANGELOG = 'Update bazarr to 1.6.0 See changelogs of <a href="https://github.com/morpheus65535/bazarr/releases/tag/v1.6.0">1.6.0</a> for more details'
 
 HOMEPAGE  = https://www.bazarr.media/
 LICENSE   = GPLv3
 STARTABLE = yes
 
-# [numpy]
-# Requires gcc>=8.4 to build succesfully
 REQUIRED_MIN_DSM = 7.1
 UNSUPPORTED_ARCHS = comcerto2k
 REQUIRED_MIN_SRM = 1.3
@@ -48,11 +46,7 @@ WHEELS_CFLAGS += [lxml] -std=c11
 endif
 
 # [numpy]
-# gcc-8.4 is the minimal version to build numpy
-# gcc-8.5 hapens to be the default version for DSM-7.1
-ifeq ($(call version_gt, $(TC_GCC), 8.4),1)
 DEPENDS += python/numpy
-endif
 
 # [Pillow]
 DEPENDS += python/pillow

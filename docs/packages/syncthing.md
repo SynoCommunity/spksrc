@@ -18,7 +18,7 @@ Syncthing is a continuous file synchronization program that syncs files between 
 | Package Name | syncthing |
 | Upstream | [syncthing.net](https://syncthing.net/) |
 | License | MPL-2.0 |
-| Default Port | 8384 (Web UI), 22000 (Sync) |
+| Default Port | 8384 (Web UI), 21027 (Discovery), 22000 (Sync) |
 
 ## Features
 
@@ -64,8 +64,13 @@ Enable file versioning in folder settings:
 
 ## Data Locations
 
-- Configuration: `/var/packages/syncthing/var/config/`
-- Index database: `/var/packages/syncthing/var/index/`
+- Configuration: `/var/packages/syncthing/var/config.xml`
+- Certificates: `/var/packages/syncthing/var/cert.pem` and `key.pem`
+- Index database: `/var/packages/syncthing/var/index-v2/`
+
+## Self-updates
+
+Syncthing automatically checks for and installs updates (every 12 hours). Because of this, the installed binary may be newer than the version shown in Package Center. The package preserves a newer self-updated binary on package upgrades, so updating the package will never downgrade Syncthing.
 
 ## Troubleshooting
 

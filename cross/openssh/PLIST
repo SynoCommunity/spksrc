@@ -10,4 +10,6 @@ bin:libexec/sftp-server
 bin:libexec/ssh-keysign
 bin:libexec/ssh-pkcs11-helper
 bin:libexec/ssh-sk-helper
+bin:libexec/sshd-auth
+bin:libexec/sshd-session
 bin:sbin/sshd

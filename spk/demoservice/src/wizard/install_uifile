@@ -25,7 +25,7 @@
       }, {
         "desc": ""
       }, {
-        "desc": "This package runs as internal service user <b>'sc-demoservice'</b> in DSM. The shared folder above is configured at installation time to be accessible by this user.<p>Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "This package runs as internal service user <b>'sc-demoservice'</b> in DSM. The shared folder above is configured at installation time to be accessible by this user.<p>Please read <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> for details."
       }
     ]
   }

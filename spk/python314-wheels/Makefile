@@ -4,8 +4,8 @@ SPK_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(SPK_VERS))).$(word 2,$(subst ., ,$
 SPK_REV = 1
 SPK_ICON = src/python3-pip.png
 
-# Compiler must support std=c++11
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# Python 3.14 needs C11 <stdatomic.h> (and C++11); gcc ships stdatomic.h >= 4.8
+MIN_GCC_VERSION = 4.8
 
 PYTHON_PACKAGE = python314
 
@@ -31,6 +31,7 @@ WHEELS += src/requirements-crossenv.txt
 WHEELS += src/requirements-pure.txt
 
 SERVICE_SETUP = src/service-setup.sh
+POST_SERVICE_TARGET = $(SPK_NAME)_extra_install
 
 OPTIONAL_DEPENDS += python/numpy_1.26
 OPTIONAL_DEPENDS += python/numpy
@@ -119,11 +120,8 @@ DEPENDS += python/pandas
 endif
 
 # [Pendulum]
-# Needs atomic to build
-# Serves as maturin type python-wheel.mk example
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+# Serves as maturin build type example
 DEPENDS += python/pendulum
-endif
 
 # [Pillow]
 DEPENDS += python/pillow
@@ -191,3 +189,8 @@ DEPENDS += python/scipy
 endif
 
 include ../../mk/spksrc.spk-meta.mk
+
+.PHONY: $(SPK_NAME)_extra_install
+$(SPK_NAME)_extra_install:
+	@$(MSG) Substituting PYTHON_PACKAGE in service-setup
+	@sed -i 's|@@PYTHON_PACKAGE@@|$(PYTHON_PACKAGE)|g' $(WORK_DIR)/scripts/service-setup

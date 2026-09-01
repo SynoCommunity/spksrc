@@ -25,7 +25,7 @@
       }, {
         "desc": ""
       }, {
-         "desc": "Ce package s'exécute en tant qu'utilisateur de service interne <b>'sc-demoservice'</b> dans DSM. Le dossier partagé ci-dessus est configuré au moment de l'installation pour être accessible par cet utilisateur.<p>Veuillez lire <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> pour plus de détails."
+         "desc": "Ce package s'exécute en tant qu'utilisateur de service interne <b>'sc-demoservice'</b> dans DSM. Le dossier partagé ci-dessus est configuré au moment de l'installation pour être accessible par cet utilisateur.<p>Veuillez lire <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> pour plus de détails."
       }
     ]
   }

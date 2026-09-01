@@ -1,0 +1,3 @@
+bin:bin/mkclass
+bin:bin/mkembedconfig
+bin:bin/mkunity

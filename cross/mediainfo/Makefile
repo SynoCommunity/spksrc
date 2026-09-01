@@ -3,7 +3,8 @@ PKG_NAME = mediainfo-virtual
 OPTIONAL_DEPENDS  = cross/mediainfo-latest
 OPTIONAL_DEPENDS += cross/mediainfo-25.04
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# 25.04 fallback needs -std=c++11
+MIN_GCC_VERSION = 4.7
 
 include ../../mk/spksrc.common.mk
 

@@ -1,0 +1,46 @@
+--- src/muxer/muxer_libav.c.orig
++++ src/muxer/muxer_libav.c
+@@ -148,18 +148,39 @@
+     break;
+   }
+ 
++  /* A track that needs a codec configuration but has no global header ends up
++   * with empty extradata. For MP4 that is fatal for the whole file, not just
++   * this track: the single moov cannot be written, so even the audio never
++   * ships -- and nothing said so. Report both ways it can happen. */
++  if(!ssc->ssc_gh && (ssc->es_type == SCT_H264 || ssc->es_type == SCT_HEVC))
++    tvherror(LS_LIBAV, "%s: no global header available; the track will have "
++                       "no codec configuration",
++             streaming_component_type2txt(ssc->es_type));
++
+   if(ssc->ssc_gh) {
+     if ((has_avcc_hvcc(lm->m_config.m_type)) &&
+       (ssc->es_type == SCT_H264 || ssc->es_type == SCT_HEVC)) {
+       sbuf_t hdr;
++      int r;
+       sbuf_init(&hdr);
+       if (ssc->es_type == SCT_H264) {
+-          isom_write_avcc(&hdr, pktbuf_ptr(ssc->ssc_gh),
+-                          pktbuf_len(ssc->ssc_gh));
++          r = isom_write_avcc(&hdr, pktbuf_ptr(ssc->ssc_gh),
++                              pktbuf_len(ssc->ssc_gh));
+       } else {
+-          isom_write_hvcc(&hdr, pktbuf_ptr(ssc->ssc_gh),
+-                          pktbuf_len(ssc->ssc_gh));
++          r = isom_write_hvcc(&hdr, pktbuf_ptr(ssc->ssc_gh),
++                              pktbuf_len(ssc->ssc_gh));
+       }
++      if (r < 0 || hdr.sb_ptr <= 0)
++        tvherror(LS_LIBAV, "%s: cannot build %s from the %zu byte global "
++                           "header; the track will have no codec configuration",
++                 streaming_component_type2txt(ssc->es_type),
++                 ssc->es_type == SCT_H264 ? "avcC" : "hvcC",
++                 pktbuf_len(ssc->ssc_gh));
++      else
++        tvhtrace(LS_LIBAV, "%s: %s built: %zu byte global header -> %d bytes",
++                 streaming_component_type2txt(ssc->es_type),
++                 ssc->es_type == SCT_H264 ? "avcC" : "hvcC",
++                 pktbuf_len(ssc->ssc_gh), hdr.sb_ptr);
+       c->extradata_size = hdr.sb_ptr;
+       c->extradata = av_malloc(hdr.sb_ptr);
+       memcpy(c->extradata, hdr.sb_data, hdr.sb_ptr);

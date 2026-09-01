@@ -1,6 +1,6 @@
 SPK_NAME = nextcloud
-SPK_VERS = 33.0.3
-SPK_REV = 4
+SPK_VERS = 34.0.2
+SPK_REV = 5
 SPK_ICON = src/nextcloud.png
 
 DEPENDS =
@@ -17,7 +17,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = Nextcloud is a self-hosted productivity platform giving you control over your data with web, desktop and mobile access.
 DISPLAY_NAME = Nextcloud
-CHANGELOG = "Update to v33.0.3."
+CHANGELOG = "Update to v34.0.2."
 HOMEPAGE = https://nextcloud.com/
 
 LICENSE = AGPLv3

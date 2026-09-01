@@ -1,0 +1,24 @@
+[{
+	"step_title": "{{{ICINGAWEB2_UNINSTALL_STEP_TITLE}}}",
+	"invalid_next_disabled_v2": true,
+	"items": [{
+		"desc": "{{{ICINGAWEB2_UNINSTALL_ATTENTION}}}"
+	}, {
+		"type": "password",
+		"desc": "{{{ICINGAWEB2_UNINSTALL_ROOT_PASS_DESC}}}",
+		"subitems": [{
+			"key": "wizard_mysql_password_root",
+			"desc": "{{{ICINGAWEB2_UNINSTALL_ROOT_PASS_FIELD}}}",
+			"validator": {
+				"allowBlank": false
+			}
+		}]
+	}, {
+		"type": "multiselect",
+		"subitems": [{
+			"key": "wizard_delete_data",
+			"hidden": true,
+			"defaultValue": true
+		}]
+	}]
+}]

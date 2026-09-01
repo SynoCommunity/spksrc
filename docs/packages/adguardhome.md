@@ -38,7 +38,17 @@ If you are too late with running the command, the update should roll back or sto
 You can automate running these commands using DSM Task Scheduler:
 
 1. Open **Control Panel** > **Task Scheduler**
+
+   ![Task Scheduler overview](../assets/images/adguard-task-scheduler.png)
+
 2. Create a new **Triggered Task** > **User-defined script**
+
+   ![Creating a new task](../assets/images/adguard-task-scheduler-create.png)
+
 3. Set the task to run as **root**
 4. Add your chosen command in the script section
 5. Configure the trigger (e.g., on boot or after package update)
+
+![Update error notification](../assets/images/adguard-update-error.png)
+
+![Update error detail](../assets/images/adguard-update-error-msg.png)

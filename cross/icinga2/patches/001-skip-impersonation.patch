@@ -1,0 +1,20 @@
+Skip user/group impersonation when ICINGA2_SKIP_IMPERSONATION is defined.
+This allows running icinga2 under DSM's service manager which handles process identity.
+--- icinga-app/icinga.cpp.orig
++++ icinga-app/icinga.cpp
+@@ -567,6 +567,7 @@ void Main()
+ 	} else if (command) {
+ 		Logger::DisableTimestamp();
+ #ifndef _WIN32
++#ifndef ICINGA2_SKIP_IMPERSONATION
+ 		if (command->GetImpersonationLevel() == ImpersonateRoot) {
+ 			if (getuid() != 0) {
+ 				Log(LogCritical, "cli", "This command must be run as root.");
+@@ -654,6 +655,7 @@ void Main()
+ 				}
+ 			}
+ 		}
++#endif /* ICINGA2_SKIP_IMPERSONATION */
+ #endif /* _WIN32 */
+ 
+ 		std::vector<std::string> args;

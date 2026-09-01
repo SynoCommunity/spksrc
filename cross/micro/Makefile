@@ -1,5 +1,5 @@
 PKG_NAME = micro
-PKG_VERS = 2.0.14
+PKG_VERS = 2.0.15
 PKG_EXT = tar.gz
 # make sure the hash matches this release, as it is shown with 'micro --version'
 GIT_HASH = 04c5770

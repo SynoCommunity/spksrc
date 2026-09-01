@@ -3,12 +3,13 @@ PKG_NAME = ripgrep-virtual
 OPTIONAL_DEPENDS  = cross/ripgrep-latest
 OPTIONAL_DEPENDS += cross/ripgrep-14
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# mirrors ripgrep-14, the fallback: refuse before routing to a leaf that would
+MIN_GCC_VERSION = 4.6
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(PPC_ARCHS)),$(ARCH))
-# rustc >= 1.85 required
+ifneq ($(call version_ge,$(TC_RUSTC),1.85),1)
+# ripgrep >= 15 requires edition2024
 DEPENDS += cross/ripgrep-14
 else ifeq ($(findstring $(ARCH),$(i686_ARCHS)),$(ARCH))
 ifeq ($(call version_le, $(TC_GCC), 5.0),1)

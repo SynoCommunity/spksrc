@@ -1,5 +1,5 @@
 PKG_NAME = syncstorage-rs
-PKG_VERS = 0.23.0
+PKG_VERS = 0.23.3
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/mozilla-services/$(PKG_NAME)/archive/${PKG_VERS}
@@ -10,8 +10,11 @@ DEPENDS = cross/openssl3
 # for mysqlclient-sys
 DEPENDS += cross/mariadb-connector-c
 
-# powerpc archs are not supported
-UNSUPPORTED_ARCHS += $(PPC_ARCHS)
+# openssl-sys: to find libssl/libcrypto
+ENV += OPENSSL_DIR=$(STAGING_INSTALL_PREFIX)
+
+# rust edition 2024 required (see rust-version in Cargo.toml)
+MIN_RUSTC_VERSION = 1.91
 
 HOMEPAGE = https://github.com/mozilla-services/syncstorage-rs/
 COMMENT  = Mozilla Sync Storage built with Rust.
@@ -30,8 +33,6 @@ export MYSQL_DB_SOCKET=/run/mysqld/mysqld10.sock
 
 # mysqlclient-sys: to find libmysqlclient
 ENV += MYSQLCLIENT_LIB_DIR=$(STAGING_INSTALL_PREFIX)/lib
-# to find dependencies of libmysqlclient (libz)
-ENV += RUSTFLAGS="-Clink-arg=-Wl,--rpath,$(INSTALL_PREFIX)/lib -Clink-arg=-Wl,--rpath-link,$(STAGING_INSTALL_PREFIX)/lib"
 
 POST_INSTALL_TARGET = syncstorage-rs_post_install
 

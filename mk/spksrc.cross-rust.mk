@@ -70,15 +70,23 @@ endif
 # Rust specific targets
 .PHONY: rust_install_target
 
-# Default build with rust and install with cargo
-# The cargo call uses tc_vars.mk RUSTUP_TOOLCHAIN variable
-# overriding definition using +stable or +$(RUSTUP_TOOLCHAIN)
-# https://rust-lang.github.io/rustup/environment-variables.html 
+# Default build with rust and install with cargo.
+#
+# Toolchain selection is driven by the RUSTUP_TOOLCHAIN env var tc_vars.rust.mk exports, so a
+# package never names a toolchain itself and cannot drift from the one the overlay installed.
+# https://rust-lang.github.io/rustup/environment-variables.html
 rust_install_target:
-	@echo "  ==> Cargo install rust package $(PKG_NAME) (rustc +$(TC_RUSTUP_TOOLCHAIN) -vV)"
-	@$(RUN) rustc +$(TC_RUSTUP_TOOLCHAIN) -vV
-	@$(RUN) echo cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
-	$(RUN) cargo +$(TC_RUSTUP_TOOLCHAIN) install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
+ifneq ($(strip $(if $(OVERLAY_RUSTC_ON),$(filter RUSTFLAGS=%,$(ENV)))),)
+	@$(MSG) "*********************************************************************"
+	@$(MSG) "*** $(PKG_NAME) sets a global RUSTFLAGS, which overrides the toolchain's"
+	@$(MSG) "*** CARGO_TARGET_$(RUST_TARGET_UENV)_RUSTFLAGS -- the overlay link flags"
+	@$(MSG) "*** (-latomic, the overlay ld) are being dropped. Use ADDITIONAL_RUSTFLAGS."
+	@$(MSG) "*********************************************************************"
+endif
+	@echo "  ==> Cargo install rust package $(PKG_NAME) (RUSTUP_TOOLCHAIN selects the toolchain)"
+	@$(RUN) rustc -vV
+	@$(RUN) echo cargo install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
+	$(RUN) cargo install $(CARGO_INSTALL_ARGS) --target $(RUST_TARGET)
 
 ###
 

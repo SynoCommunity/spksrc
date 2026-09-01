@@ -1,0 +1,56 @@
+--- data/conf/transcoder/profiles.orig
++++ data/conf/transcoder/profiles
+@@ -34,7 +34,7 @@
+         "container": 1,
+         "pro_vcodec": "webtv-h264-qsv",
+         "pro_acodec": "webtv-aac",
+-        "name": "webtv-h264-qsv-aac-matroska",
++        "name": "webtv-h264-qsv-aac-mkv",
+         "enabled": false
+     },
+     {
+@@ -42,7 +42,7 @@
+         "container": 1,
+         "pro_vcodec": "webtv-h264-vaapi",
+         "pro_acodec": "webtv-aac",
+-        "name": "webtv-h264-vaapi-aac-matroska",
++        "name": "webtv-h264-vaapi-aac-mkv",
+         "enabled": false
+     },
+     {
+@@ -50,7 +50,7 @@
+         "container": 1,
+         "pro_vcodec": "webtv-h264",
+         "pro_acodec": "webtv-aac",
+-        "name": "webtv-h264-software-aac-matroska"
++        "name": "webtv-h264-software-aac-mkv"
+     },
+     {
+         "comment": "WEBTV profile H264 QSV/AAC/MP4",
+@@ -80,7 +80,7 @@
+         "container": 1,
+         "pro_vcodec": "webtv-hevc-qsv",
+         "pro_acodec": "webtv-aac",
+-        "name": "webtv-hevc-qsv-aac-matroska",
++        "name": "webtv-hevc-qsv-aac-mkv",
+         "enabled": false
+     },
+     {
+@@ -88,7 +88,7 @@
+         "container": 1,
+         "pro_vcodec": "webtv-hevc-vaapi",
+         "pro_acodec": "webtv-aac",
+-        "name": "webtv-hevc-vaapi-aac-matroska",
++        "name": "webtv-hevc-vaapi-aac-mkv",
+         "enabled": false
+     },
+     {
+@@ -96,7 +96,7 @@
+         "container": 1,
+         "pro_vcodec": "webtv-hevc",
+         "pro_acodec": "webtv-aac",
+-        "name": "webtv-hevc-software-aac-matroska"
++        "name": "webtv-hevc-software-aac-mkv"
+     },
+     {
+         "comment": "WEBTV profile HEVC QSV/AAC/MP4",

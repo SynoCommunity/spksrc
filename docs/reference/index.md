@@ -4,8 +4,11 @@ This section provides reference documentation for spksrc development.
 
 ## In This Section
 
-- **[Architectures](architectures.md)** - CPU architectures and model mappings
+- **[Architectures](architectures.md)** - CPU architecture families, groups, and toolchains
+- **[Model ↔ Architecture](model-architecture.md)** - Searchable model-to-platform mapping
 - **[System Ports](system-ports.md)** - Port allocations for Synology and SynoCommunity packages
+- **[Package Ports](package-ports.md)** - Port allocations per package
+- **[Macros](macros.md)** - Available Makefile macros
 - **[Makefile Reference](makefile-reference.md)** - Complete variable and target reference
 - **[Permissions](permissions.md)** - Service accounts, ACLs, and access control
 - **[DSM APIs](dsm-apis.md)** - Synology documentation and external resources

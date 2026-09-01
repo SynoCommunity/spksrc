@@ -11,7 +11,7 @@ DISPLAY_NAME  = SynoCli Kernel Tools
 STARTABLE     = no
 CHANGELOG     = "1. Publish for newer x25 models<br/>2. Updates to libusb 1.0.29 and usbutils 019"
 
-HOMEPAGE = https://synocommunity.com/
+HOMEPAGE = https://docs.synocommunity.com/packages/synocli-kernel/
 LICENSE  = Each tool is licensed under it\'s respective license.
 
 SPK_LINKS     = /usr/local/bin/synocli-kernelmodule:bin/synocli-kernelmodule.sh

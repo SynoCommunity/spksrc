@@ -4,7 +4,7 @@ SPK_REV = 1
 
 DEPENDS = cross/xstow
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(OLD_PPC_ARCHS)
+MIN_GCC_VERSION = 4.8.1
 
 MAINTAINER = SynoCommunity
 DESCRIPTION = XStow is a replacement of GNU Stow written in C++. It supports all features of Stow with some extensions.

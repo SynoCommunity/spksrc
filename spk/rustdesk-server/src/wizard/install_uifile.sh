@@ -29,7 +29,7 @@ PAGE_CLIENT=$(/bin/cat<<EOF
 {
     "step_title": "Client Configuration",
     "items": [{
-        "desc": "After installation, configure your RustDesk clients with:<br><br><b>ID Server:</b> ${INTERNAL_IP}:21116<br><b>Relay Server:</b> ${INTERNAL_IP}:21117<br><b>Key:</b> Found in package data folder after first start<br><br>The public key file (id_ed25519.pub) will be created when the service first starts.<br>You can view it via SSH at: <code>/var/packages/rustdesk-server/var/id_ed25519.pub</code>"
+        "desc": "After installation, configure your RustDesk clients with:<br><br><b>ID Server:</b> ${INTERNAL_IP}:21116<br><b>Relay Server:</b> ${INTERNAL_IP}:21117<br><b>Key:</b> Found in package data folder after first start<br><br>The public key file (id_ed25519.pub) will be created when the service first starts.<br>You can view it via SSH at: <code style=\"user-select: all\">/var/packages/rustdesk-server/var/id_ed25519.pub</code>"
     }]
 }
 EOF

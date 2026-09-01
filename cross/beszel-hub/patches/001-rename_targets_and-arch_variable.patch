@@ -1,0 +1,40 @@
+# rename ARCH variable to _ARCH to avoid conflicts with spksrc framework
+# avoid OS and _ARCH in target names
+#
+--- Makefile.orig	2026-04-05 20:14:39.000000000 +0000
++++ Makefile	2026-04-12 10:45:45.828021891 +0000
+@@ -1,6 +1,6 @@
+ # Default OS/ARCH values
+ OS ?= $(shell go env GOOS)
+-ARCH ?= $(shell go env GOARCH)
++_ARCH ?= $(shell go env GOARCH)
+ # Skip building the web UI if true
+ SKIP_WEB ?= false
+ # Controls NVML/glibc agent build tag behavior:
+@@ -11,7 +11,7 @@
+ 
+ # Detect glibc host for local linux/amd64 builds.
+ HOST_GLIBC := $(shell \
+-	if [ "$(OS)" = "linux" ] && [ "$(ARCH)" = "amd64" ]; then \
++	if [ "$(OS)" = "linux" ] && [ "$(_ARCH)" = "amd64" ]; then \
+ 		for p in /lib64/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/ld-linux-x86-64.so.2; do \
+ 			[ -e "$$p" ] && { echo true; exit 0; }; \
+ 		done; \
+@@ -87,14 +87,14 @@
+ 
+ # Update build-agent to include conditional .NET build
+ build-agent: tidy build-dotnet-conditional fetch-smartctl-conditional
+-	GOOS=$(OS) GOARCH=$(ARCH) go build $(AGENT_GO_TAGS) -o ./build/beszel-agent_$(OS)_$(ARCH)$(EXE_EXT) -ldflags "-w -s" ./internal/cmd/agent
++	GOOS=$(OS) GOARCH=$(_ARCH) go build $(AGENT_GO_TAGS) -buildvcs=false -o ./build/beszel-agent -ldflags "-w -s" ./internal/cmd/agent
+ 
+ build-hub: tidy $(if $(filter false,$(SKIP_WEB)),build-web-ui)
+-	GOOS=$(OS) GOARCH=$(ARCH) go build -o ./build/beszel_$(OS)_$(ARCH)$(EXE_EXT) -ldflags "-w -s" ./internal/cmd/hub
++	GOOS=$(OS) GOARCH=$(_ARCH) go build -buildvcs=false -o ./build/beszel -ldflags "-w -s" ./internal/cmd/hub
+ 
+ build-hub-dev: tidy
+ 	mkdir -p ./internal/site/dist && touch ./internal/site/dist/index.html
+-	GOOS=$(OS) GOARCH=$(ARCH) go build -tags development -o ./build/beszel-dev_$(OS)_$(ARCH)$(EXE_EXT) -ldflags "-w -s" ./internal/cmd/hub
++	GOOS=$(OS) GOARCH=$(_ARCH) go build -tags development -buildvcs=false -o ./build/beszel-dev -ldflags "-w -s" ./internal/cmd/hub
+ 
+ build: build-agent build-hub
+ 

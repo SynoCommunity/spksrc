@@ -171,7 +171,7 @@ build_crossenv_target: pre_crossenv_target
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
 	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
-	                        --sysroot $(TC_SYSROOT) \
+	                        --sysroot $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
 	                        --machine $(TC_TARGET) \
 	                        "$(CROSSENV_PATH)" ; \
@@ -179,7 +179,7 @@ build_crossenv_target: pre_crossenv_target
 	                        --cc $(TC_PATH)$(TC_PREFIX)gcc \
 	                        --cxx $(TC_PATH)$(TC_PREFIX)c++ \
 	                        --ar $(TC_PATH)$(TC_PREFIX)ar \
-	                        --sysroot $(TC_SYSROOT) \
+	                        --sysroot $(TC_WORK_DIR)/$(TC_TARGET)/$(TC_SYSROOT) \
 	                        --env LIBRARY_PATH= \
 	                        --machine $(TC_TARGET) \
 	                        "$(CROSSENV_PATH)" ; \

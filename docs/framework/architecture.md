@@ -64,26 +64,17 @@ Stage 2 builds the actual package using the cross-compilation environment:
 
 The same three-stage model drives both `cross/` and `spk/` builds (mirrors the diagrams in `mk/spksrc.cross-cc.mk` and `mk/spksrc.spk.mk`):
 
-```text
-┌─ stage 0 ── parse time (mk/spksrc.common/stage0.mk) ───────────────┐
-│  bootstrap the toolchain in its own work dir, load its tc_vars.mk  │
-│  → TC_GCC known, so version_ge($(TC_GCC),...) DEPENDS parse right  │
-│  cookie: .stage0-bootstrap_done   (does NOT write package tc_vars) │
-└────────────────────────────────────────────────────────────────────┘
-                              │  (recipes run after parse)
-┌─ stage 1 ── recipe time (cross-cc.mk / spk.mk) ────────────────────┐
-│  make -C toolchain/<TC> toolchain    (MANDATORY)                   │
-│  make -C toolchain/<TC> toolkit      (OPTIONAL, REQUIRE_TOOLKIT)   │
-│  generate the package work-dir tc_vars* (needs INSTALL_PREFIX)     │
-│  [spk only] spk-meta-source: build the meta sources                │
-│  cookies: .stage1-tcvars_done / .stage1-tkvars_done   (idempotent) │
-└────────────────────────────────────────────────────────────────────┘
-                              │
-┌─ stage 2 ── recipe time ───────────────────────────────────────────┐
-│  cross: download → extract → patch → configure → compile →         │
-│         install → plist                                            │
-│  spk:   depend → copy → strip → icon → wizards → package           │
-└────────────────────────────────────────────────────────────────────┘
+```mermaid
+block
+  columns 1
+  s0["Stage 0 — parse time (mk/spksrc.common/stage0.mk)<br>Bootstrap the toolchain in its own work dir, load its tc_vars.mk<br>→ TC_GCC known, so version_ge($(TC_GCC),...) DEPENDS parse right<br>cookie: .stage0-bootstrap_done &nbsp; (does NOT write package tc_vars)"]
+  space
+  s1["Stage 1 — recipe time (recipes run after parse; cross-cc.mk / spk.mk)<br>make -C toolchain/&lt;TC&gt; toolchain &nbsp; (MANDATORY)<br>make -C toolchain/&lt;TC&gt; toolkit &nbsp; (OPTIONAL, REQUIRE_TOOLKIT)<br>generate the package work-dir tc_vars* (needs INSTALL_PREFIX)<br>[spk only] spk-meta-source: build the meta sources<br>cookies: .stage1-tcvars_done / .stage1-tkvars_done &nbsp; (idempotent)"]
+  space
+  s2["Stage 2 — recipe time<br>cross: see Build Pipeline Overview<br>spk: see SPK Package Assembly"]
+
+  s0 --> s1
+  s1 --> s2
 ```
 
 ## SPK Package Assembly

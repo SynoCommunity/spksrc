@@ -13,7 +13,7 @@ DEPENDS += cross/nnn-latest
 else ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
 DEPENDS += cross/nnn-4.8
 else
-# 32-bit archs for DSM<7
+# 32-bit archs with glibc < 2.23
 DEPENDS += cross/nnn-4.0
 endif
 

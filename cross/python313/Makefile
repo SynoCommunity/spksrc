@@ -1,18 +1,18 @@
 PKG_NAME = python313
-PKG_VERS = 3.13.12
+PKG_VERS = 3.13.14
 PKG_VERS_MAJOR_MINOR = $(word 1,$(subst ., ,$(PKG_VERS))).$(word 2,$(subst ., ,$(PKG_VERS)))
 PKG_EXT = tar.xz
 PKG_DIST_NAME = Python-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://www.python.org/ftp/python/$(PKG_VERS)
 PKG_DIR = Python-$(PKG_VERS)
 
-# Compiler must support std=c++11
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS) $(ARMv5_ARCHS)
+# Python 3.13 needs C11 <stdatomic.h> (and C++11); gcc ships stdatomic.h >= 4.8
+MIN_GCC_VERSION = 4.8
 
-BUILD_DEPENDS = native/python313
+BUILD_DEPENDS = native/$(PKG_NAME)
 
 DEPENDS  = cross/zlib cross/sqlite cross/readline cross/ncursesw cross/bzip2 cross/xz
-# required for Sleepycat^WOracle Berkeley DB interface
+# required for Sleepycat Oracle Berkeley DB interface
 DEPENDS += cross/berkeleydb
 # required for uuid module
 DEPENDS += cross/libuuid
@@ -67,22 +67,22 @@ DEPENDS += cross/libffi
 
 ADDITIONAL_CFLAGS = -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -L $(STAGING_INSTALL_PREFIX)/lib -I $(STAGING_INSTALL_PREFIX)/include
 
-POST_PATCH_TARGET    = python313_post_patch
-PRE_CONFIGURE_TARGET = python313_pre_configure
-COMPILE_TARGET       = python313_compile
-INSTALL_TARGET       = python313_install
+POST_PATCH_TARGET    = $(PKG_NAME)_post_patch
+PRE_CONFIGURE_TARGET = $(PKG_NAME)_pre_configure
+COMPILE_TARGET       = $(PKG_NAME)_compile
+INSTALL_TARGET       = $(PKG_NAME)_install
 
 include ../../mk/spksrc.cross-cc.mk
 
 PYTHON_NATIVE = $(abspath $(WORK_DIR)/../../../native/$(PKG_NAME)/work-native/install/usr/local/bin/python$(PKG_VERS_MAJOR_MINOR))
 HOSTPYTHON = $(WORK_DIR)/$(PKG_DIR)/hostpython
 
-.PHONY: python313_post_patch
-python313_post_patch:
+.PHONY: $(PKG_NAME)_post_patch
+$(PKG_NAME)_post_patch:
 	$(RUN) sed -e 's#@INSTALL_PREFIX@#$(INSTALL_PREFIX)#' -i Lib/mimetypes.py
 
-.PHONY: python313_pre_configure
-python313_pre_configure:
+.PHONY: $(PKG_NAME)_pre_configure
+$(PKG_NAME)_pre_configure:
 	cp $(PYTHON_NATIVE) $(HOSTPYTHON)
 	$(RUN) autoreconf -ivf -Werror
 	# create phantom header and library to succeed add_dir_to_list in setup.py
@@ -93,12 +93,12 @@ python313_pre_configure:
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h || ln -fs $(STAGING_INSTALL_PREFIX)/include/sqlite3.h $(WORK_DIR)/Python-$(PKG_VERS)/Include/sqlite3.h
 	test -h $(WORK_DIR)/Python-$(PKG_VERS)/lib/libsqlite3.so || ln -fs $(STAGING_INSTALL_PREFIX)/lib/libsqlite3.so $(WORK_DIR)/Python-$(PKG_VERS)/lib/
 
-.PHONY: python313_compile
-python313_compile:
+.PHONY: $(PKG_NAME)_compile
+$(PKG_NAME)_compile:
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) -j $(NCPUS)
 
-.PHONY: python313_install
-python313_install:
+.PHONY: $(PKG_NAME)_install
+$(PKG_NAME)_install:
 	@install -m 755 -d $(STAGING_INSTALL_PREFIX)/etc
 	@install -m 644 src/mime.types $(STAGING_INSTALL_PREFIX)/etc/
 	$(RUN) _PYTHON_HOST_PLATFORM=$(TC_TARGET) $(MAKE) install prefix=$(STAGING_INSTALL_PREFIX)

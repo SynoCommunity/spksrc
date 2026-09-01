@@ -1,9 +1,10 @@
 PKG_NAME = mesa
 PKG_VERS = 23.3.6
-PKG_EXT = tar.xz
-PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
-PKG_DIST_SITE = https://archive.mesa3d.org
-PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
+PKG_EXT = tar.bz2
+PKG_DIST_NAME = $(PKG_NAME)-$(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
+PKG_DIST_SITE = https://gitlab.freedesktop.org/mesa/mesa/-/archive/$(PKG_NAME)-$(PKG_VERS)
+PKG_DIR = $(PKG_NAME)-$(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS  = cross/libdrm
 DEPENDS += cross/libexpat

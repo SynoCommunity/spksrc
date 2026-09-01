@@ -1,6 +1,6 @@
 SPK_NAME = ffsync
-SPK_VERS = 0.23.0
-SPK_REV = 12
+SPK_VERS = 0.23.3
+SPK_REV = 13
 SPK_ICON = src/ffsync.png
 
 DEPENDS = cross/syncstorage-rs cross/diesel
@@ -8,9 +8,13 @@ DEPENDS = cross/syncstorage-rs cross/diesel
 PYTHON_PACKAGE = python314
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS) $(ARMv7L_ARCHS)
-# aarch64-6.2.4 excluded: aws-lc-sys (used by rustls in syncstorage-rs 0.22.x) requires ARMv8.2+ crypto
-# instructions not available on older Synology ARM CPUs (e.g., Alpine.4x, Alpine.4xL, RT1900acv1, etc.)
+# rust edition 2024 required (see rust-version in syncstorage-rs Cargo.toml)
+MIN_RUSTC_VERSION = 1.91
+# ARMv7L (hi3535) excluded: aws-lc-sys (rustls) ARMv8 crypto assembly does not
+# assemble on the ARMv7 (Cortex-A9) toolchain
+UNSUPPORTED_ARCHS = $(ARMv7L_ARCHS)
+# aarch64-6.2.4 excluded: aws-lc-sys (rustls) requires ARMv8.2+ crypto instructions not
+# available on older Synology ARM CPUs (e.g., Alpine.4x, Alpine.4xL, RT1900acv1, etc.)
 UNSUPPORTED_ARCHS_TCVERSION = aarch64-6.2.4
 
 REQUIRED_MIN_DSM = 6.0
@@ -21,7 +25,7 @@ REQUIRED_MIN_SRM = 3.0
 MAINTAINER = SynoCommunity
 DESCRIPTION = An implementation of the Mozilla Sync-1.5 Server protocol used by the sync service in Firefox 29 and later. You can use Mozilla Sync Server to exchange browser data \(bookmarks, history, open tabs, passwords, add-ons, and the like\) between \'clients\' in a manner that respects a user\'s security and privacy. The service runs on port 8132.
 DISPLAY_NAME = Mozilla Sync Server
-CHANGELOG = "1. Update Mozilla Sync Server package to v0.23.0. <br/>2. Migrate to Python 3.14."
+CHANGELOG = "1. Update Mozilla Sync Server package to v0.23.3."
 
 HOMEPAGE = https://mozilla-services.readthedocs.io/en/latest/howtos/run-sync-1.5.html
 LICENSE = MPL 2.0

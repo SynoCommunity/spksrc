@@ -57,7 +57,7 @@
         "desc": "If the specified share does not exist, it will be created. You can use an existing share by specifying the name of the folder."
       },
       {
-        "desc": "Package user and group will not appear on most UI settings. Please read <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Permission Management</a> for details."
+        "desc": "Package user and group will not appear on most UI settings. Please read <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Permission Management</a> for details."
       }
     ]
   }

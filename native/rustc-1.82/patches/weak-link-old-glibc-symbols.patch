@@ -1,0 +1,76 @@
+# Weak-link glibc symbols that libstd 1.82 references unconditionally but which
+# are absent from the old glibc of legacy DSM toolchains, so std links there:
+#   getauxval          (glibc 2.16)  ppc853x 2.8, 88f6281 2.15
+#   pthread_setname_np (glibc 2.12)  ppc853x 2.8
+#   pipe2              (glibc 2.9)   ppc853x 2.8
+# On ELF the weak! macro emits an extern_weak reference that resolves to NULL at
+# runtime when the symbol is missing; each call site already checks .get() and
+# falls back (getauxval -> 0 "not found"; pthread name -> skip; pipe2 -> pipe +
+# manual CLOEXEC). Harmless on newer glibc (the symbol is simply present).
+--- library/std/src/sys/pal/unix/stack_overflow.rs
++++ library/std/src/sys/pal/unix/stack_overflow.rs
+@@ -267,7 +267,14 @@
+     fn sigstack_size() -> usize {
+         // FIXME: reuse const from libc when available?
+         const AT_MINSIGSTKSZ: crate::ffi::c_ulong = 51;
+-        let dynamic_sigstksz = unsafe { libc::getauxval(AT_MINSIGSTKSZ) };
++        // getauxval() was added in glibc 2.16; weak-link it so std still links on
++        // older glibc (legacy DSM toolchains). Absent -> 0, the same value getauxval
++        // returns when the entry is not found.
++        crate::sys::weak::weak! { fn getauxval(crate::ffi::c_ulong) -> crate::ffi::c_ulong }
++        let dynamic_sigstksz = match getauxval.get() {
++            Some(f) => unsafe { f(AT_MINSIGSTKSZ) },
++            None => 0,
++        };
+         // If getauxval couldn't find the entry, it returns 0,
+         // so take the higher of the "constant" and auxval.
+         // This transparently supports older kernels which don't provide AT_MINSIGSTKSZ
+--- library/std/src/sys/pal/unix/thread.rs
++++ library/std/src/sys/pal/unix/thread.rs
+@@ -131,12 +131,17 @@
+     pub fn set_name(name: &CStr) {
+         const TASK_COMM_LEN: usize = 16;
+ 
++        // Available since glibc 2.12, musl 1.1.16, and uClibc 1.0.20; weak-link so
++        // std links on older glibc (legacy DSM toolchains). Thread naming is
++        // best-effort, so skip silently when the symbol is absent.
++        crate::sys::weak::weak! { fn pthread_setname_np(libc::pthread_t, *const libc::c_char) -> libc::c_int }
+         unsafe {
+-            // Available since glibc 2.12, musl 1.1.16, and uClibc 1.0.20.
+             let name = truncate_cstr::<{ TASK_COMM_LEN }>(name);
+-            let res = libc::pthread_setname_np(libc::pthread_self(), name.as_ptr());
+-            // We have no good way of propagating errors here, but in debug-builds let's check that this actually worked.
+-            debug_assert_eq!(res, 0);
++            if let Some(f) = pthread_setname_np.get() {
++                let res = f(libc::pthread_self(), name.as_ptr());
++                // We have no good way of propagating errors here, but in debug-builds let's check that this actually worked.
++                debug_assert_eq!(res, 0);
++            }
+         }
+     }
+ 
+--- library/std/src/sys/pal/unix/pipe.rs
++++ library/std/src/sys/pal/unix/pipe.rs
+@@ -29,8 +29,20 @@
+             target_os = "redox"
+         ))] {
+             unsafe {
+-                cvt(libc::pipe2(fds.as_mut_ptr(), libc::O_CLOEXEC))?;
+-                Ok((AnonPipe(FileDesc::from_raw_fd(fds[0])), AnonPipe(FileDesc::from_raw_fd(fds[1]))))
++                // pipe2() was added in glibc 2.9; weak-link it and fall back to
++                // pipe() + manual CLOEXEC on older glibc (legacy DSM toolchains).
++                crate::sys::weak::weak! { fn pipe2(*mut libc::c_int, libc::c_int) -> libc::c_int }
++                if let Some(pipe2) = pipe2.get() {
++                    cvt(pipe2(fds.as_mut_ptr(), libc::O_CLOEXEC))?;
++                    Ok((AnonPipe(FileDesc::from_raw_fd(fds[0])), AnonPipe(FileDesc::from_raw_fd(fds[1]))))
++                } else {
++                    cvt(libc::pipe(fds.as_mut_ptr()))?;
++                    let fd0 = FileDesc::from_raw_fd(fds[0]);
++                    let fd1 = FileDesc::from_raw_fd(fds[1]);
++                    fd0.set_cloexec()?;
++                    fd1.set_cloexec()?;
++                    Ok((AnonPipe(fd0), AnonPipe(fd1)))
++                }
+             }
+         } else {
+             unsafe {

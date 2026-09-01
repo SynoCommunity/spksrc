@@ -43,7 +43,7 @@ make setup              # Basic setup with default toolchains
 make setup-synocommunity  # Setup with SynoCommunity defaults (publish URL, distributor info)
 ```
 
-For detailed Docker setup and LXC/LXD alternatives, see the [Developers HOW-TO](https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO).
+For detailed Docker setup and LXC/LXD alternatives, see the [Developer Guide](https://docs.synocommunity.com/developer-guide/).
 
 > **Note:** Native Linux builds are not officially supported. Use Docker or LXC/LXD with Debian to match the build environment.
 
@@ -484,8 +484,8 @@ grep -r "cross/openssl" spk/*/Makefile
 
 ## References
 
-- [SynoCommunity Wiki](https://github.com/SynoCommunity/spksrc/wiki)
-- [Developers HOW-TO](https://github.com/SynoCommunity/spksrc/wiki/Developers-HOW-TO)
-- [Using Python Wheels](https://github.com/SynoCommunity/spksrc/wiki/Using-wheels-to-distribute-Python-packages)
-- [Architecture Reference](https://github.com/SynoCommunity/spksrc/wiki/Architecture-per-Synology-model)
-- [FAQ](https://github.com/SynoCommunity/spksrc/wiki/Frequently-Asked-Questions)
+- [SynoCommunity Docs](https://docs.synocommunity.com)
+- [Developer Guide](https://docs.synocommunity.com/developer-guide/)
+- [Python Packages](https://docs.synocommunity.com/developer-guide/package-types/python/)
+- [Architectures](https://docs.synocommunity.com/reference/architectures/)
+- [Troubleshooting](https://docs.synocommunity.com/user-guide/troubleshooting/)

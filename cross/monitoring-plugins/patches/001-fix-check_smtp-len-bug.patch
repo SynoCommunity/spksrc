@@ -1,0 +1,18 @@
+--- plugins/check_smtp.c.orig
++++ plugins/check_smtp.c
+@@ -70,7 +70,7 @@
+ 	}
+ 	return (int)read(socket_descriptor, buf, (size_t)num);
+ #else /* ifndef HAVE_SSL */
+-	return read(socket_descriptor, buf, len)
++	return read(socket_descriptor, buf, num);
+ #endif
+ }
+ 
+@@ -83,7 +83,7 @@
+ 	return (int)send(socket_descriptor, buf, (size_t)num, 0);
+ #else /* ifndef HAVE_SSL */
+-	return send(socket_descriptor, buf, len, 0);
++	return send(socket_descriptor, buf, num, 0);
+ #endif
+ }

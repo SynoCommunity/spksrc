@@ -1,0 +1,13 @@
+--- data/conf/transcoder/codecs.orig
++++ data/conf/transcoder/codecs
+@@ -70,8 +70,8 @@
+         "name": "webtv-hevc",
+         "codec_name": "libx265",
+         "height": 384,
+-        "preset": "faster",
+-        "tune": "zerolatency"
++        "preset": "ultrafast",
++        "tune": "fastdecode"
+     },
+     {
+         "description": "WEBTV codec HEVC QSV",

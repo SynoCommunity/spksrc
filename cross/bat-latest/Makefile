@@ -8,8 +8,8 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 DEPENDS = cross/zlib
 
-# bat >= 0.26.1 requires rustc >= 1.87
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(PPC_ARCHS)
+# bat >= 0.26.1 declares MSRV 1.87, and locks etcetera 0.11.0 (edition2024)
+MIN_RUSTC_VERSION = 1.87
 
 HOMEPAGE = https://github.com/sharkdp/bat
 COMMENT = A cat(1) clone with wings.

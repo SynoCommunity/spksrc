@@ -1,0 +1,9 @@
+ICINGAWEB2_DB_STEP_TITLE: "Icinga Web 2 Database Configuration"
+ICINGAWEB2_DB_STEP_DESC: "Icinga Web 2 requires a MariaDB database to store configuration and user data. A MariaDB database and user will be created automatically."
+ICINGAWEB2_DB_ROOT_PASS_DESC: "MariaDB 'root' password"
+ICINGAWEB2_DB_PASS_DESC: "Database password"
+
+ICINGAWEB2_ADMIN_STEP_TITLE: "Administrator Account"
+ICINGAWEB2_ADMIN_STEP_DESC: "Create the Icinga Web 2 administrator account."
+ICINGAWEB2_ADMIN_USER_DESC: "Administrator username"
+ICINGAWEB2_ADMIN_PASS_DESC: "Administrator password (min. 8 characters)"

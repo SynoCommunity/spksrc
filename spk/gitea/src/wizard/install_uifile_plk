@@ -24,7 +24,7 @@
                 }, {
                     "desc": ""
                 }, {
-                    "desc": "Ten pakiet uruchamia się jako użytkownik usługi wewnętrznej <b>'sc-gitea'</b> w DSM. Powyższy folder współdzielony jest skonfigurowany podczas instalacji tak, aby był dostępny dla tego użytkownika. Przeczytaj <a target=\"_blank\" href=\"https://github.com/SynoCommunity/spksrc/wiki/Permission-Management\">Zarządzanie uprawnieniami</a>, aby uzyskać szczegółowe informacje."
+                    "desc": "Ten pakiet uruchamia się jako użytkownik usługi wewnętrznej <b>'sc-gitea'</b> w DSM. Powyższy folder współdzielony jest skonfigurowany podczas instalacji tak, aby był dostępny dla tego użytkownika. Przeczytaj <a target=\"_blank\" href=\"https://docs.synocommunity.com/user-guide/permissions/\">Zarządzanie uprawnieniami</a>, aby uzyskać szczegółowe informacje."
                 }
         ]
     }

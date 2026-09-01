@@ -1,5 +1,5 @@
 PKG_NAME = umurmur
-PKG_VERS = 0.3.1
+PKG_VERS = 0.4.1
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/umurmur/umurmur/archive
@@ -24,4 +24,4 @@ include ../../mk/spksrc.cross-cmake.mk
 .PHONY: umurmur_install
 umurmur_install:
 	install -d -m 755 $(STAGING_INSTALL_PREFIX)/bin
-	install -m 755 $(BUILD_DIR)/bin/umurmurd $(STAGING_INSTALL_PREFIX)/bin
+	install -m 755 $(BUILD_DIR)/src/umurmurd $(STAGING_INSTALL_PREFIX)/bin

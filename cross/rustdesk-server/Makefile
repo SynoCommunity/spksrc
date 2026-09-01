@@ -1,5 +1,5 @@
 PKG_NAME = rustdesk-server
-PKG_VERS = 1.1.15
+PKG_VERS = 1.1.16
 PKG_EXT = zip
 PKG_DIST_NAME = rustdesk-server-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/rustdesk/rustdesk-server/releases/download/$(PKG_VERS)
@@ -12,6 +12,9 @@ COMMENT  = RustDesk Server - Self-hosted relay and rendezvous server for RustDes
 LICENSE  = AGPL-3.0
 
 INSTALL_TARGET = rustdesk-server_install
+
+# use digests with multiple files
+PKG_DIST_ARCH_LIST = amd64 arm64v8 armv7 i386
 
 include ../../mk/spksrc.common.mk
 
