@@ -5,7 +5,7 @@ PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/pycairo
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/cairo
+DEPENDS = cross/cairo cross/libxcb
 
 HOMEPAGE = https://pycairo.readthedocs.io/en/latest/
 COMMENT  = Pycairo is a Python module providing bindings for the cairo graphics library.
