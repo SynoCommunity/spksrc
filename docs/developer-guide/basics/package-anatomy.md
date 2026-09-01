@@ -40,7 +40,7 @@ cross/curl/
 ├── Makefile         # Build configuration
 ├── digests          # Checksums for source files
 ├── PLIST            # List of installed files (optional)
-└── patches/         # Source code patches (optional)
+└── patches/         # Source code patches (optional, see [Patches](../packaging/patches.md))
     └── 001-fix-something.patch
 ```
 

@@ -110,6 +110,8 @@ This is a comprehensive reference for all Makefile variables and targets in spks
 | `PRE_COMPILE_TARGET` | Target to run before compile |
 | `POST_COMPILE_TARGET` | Target to run after compile |
 | `DISABLE_PARALLEL_MAKE` | Set to 1 to disable parallel build |
+| `PATCHES` | Additional patch files to apply (in addition to the auto-discovered `patches/` ones) |
+| `PATCHES_LEVEL` | Patch level for `patch -p<level>` (default `0`; see [Patches](../developer-guide/packaging/patches.md)) |
 
 ### Installation
 

@@ -43,6 +43,7 @@ Tools built for the build host:
 
 - **[Makefile Variables](makefile-variables.md)** - Common variables and their meanings
 - **[Build Rules](build-rules.md)** - Build targets and customization
+- **[Patches](patches.md)** - When and how to create source patches
 - **[PLIST Files](plist.md)** - Defining package contents
 - **[Service Scripts](service-scripts.md)** - Daemons and services
 - **[Wizards](wizards.md)** - Installation wizards
@@ -140,7 +141,9 @@ cross/mypackage/
     └── 002-add-feature.patch
 ```
 
-Patches are applied in alphabetical order.
+Patches are applied in alphabetical order, so use numeric prefixes to fix the
+order. See **[Patches](patches.md)** for when to use a patch, naming
+conventions, and how to create one.
 
 ### Custom Build Steps
 
