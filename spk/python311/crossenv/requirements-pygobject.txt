@@ -4,5 +4,5 @@ wheel==0.45.1
 #
 build:meson-python==0.17.1
 #
-wheelhouse:pycairo==1.28.0
+wheelhouse:pycairo==1.29.0                # Must match python/pycairo version
 cross:build==1.2.2
