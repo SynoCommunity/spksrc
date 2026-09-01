@@ -1,0 +1,38 @@
+# Avoid compiler error with Synology Toolchains:
+# error: ambiguous overload for ‘operator<<’ (operand types are ‘std::stringstream’ {aka ‘std::__cxx11::basic_stringstream<char>’} and ‘std::nullptr_t’)
+# 
+# add an explicit "operator<<" for nullptr_t
+# 
+--- include/zim/tools.h.orig	2026-07-11 13:50:37.000000000 +0000
++++ include/zim/tools.h	2026-07-28 13:06:01.566410216 +0000
+@@ -22,6 +22,8 @@
+ 
+ #include "zim.h"
+ #include <sstream>
++#include <cstddef>
++
+ namespace zim {
+ #if defined(LIBZIM_WITH_XAPIAN)
+ 
+@@ -54,6 +56,13 @@
+       return *this;
+     }
+ 
++
++    Formatter& operator<<(std::nullptr_t value)
++    {
++      stream_ << "nullptr";
++      return *this;
++    }
++
+     /* Operator for function templates like std::endl */
+     Formatter &operator<<(std::ostream& (* __pf)(std::ostream&))
+     {
+@@ -78,6 +87,7 @@
+     /* Simple composition with std::stringstream */
+     std::stringstream stream_;
+   };
++
+ }
+ 
+ #endif // ZIM_TOOLS_H
