@@ -92,6 +92,10 @@ build_meson_python_wheel:
 	   echo "ERROR: crossenv not found!" ; \
 	   exit 2 ; \
 	fi ; \
+	$(MSG) "Injecting meson cross-files into pyproject config" ; \
+	python3 $(BASEDIR)/mk/spksrc.python/meson-inject-cross-args.py \
+	   $(MESON_BASE_DIR)/pyproject.toml \
+	   $(filter --cross-file=%,$(CONFIGURE_ARGS)) ; \
 	$(MSG) \
 	   _PYTHON_HOST_PLATFORM=\"$(TC_TARGET)\" \
 	   PATH=$${PATH} \
