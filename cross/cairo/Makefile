@@ -5,10 +5,10 @@ OPTIONAL_DEPENDS += cross/cairo-1.16
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(OLD_PPC_ARCHS) $(ARMv5_ARCHS)),$(ARCH))
-DEPENDS = cross/cairo-1.16
-else
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
 DEPENDS = cross/cairo-latest
+else
+DEPENDS = cross/cairo-1.16
 endif
 
 include ../../mk/spksrc.cross-virtual.mk

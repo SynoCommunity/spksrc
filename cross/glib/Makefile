@@ -10,7 +10,7 @@ include ../../mk/spksrc.common.mk
 ifeq ($(call version_ge, $(TC_KERNEL), 3.2)$(call version_ge, $(TC_GCC), 7.5),11)
 DEPENDS = cross/glib-latest
 else
-ifneq ($(findstring $(ARCH),$(OLD_PPC_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TC_GCC), 4.6),1)
 DEPENDS = cross/glib-2.66
 else
 # old compilers do not support glib with meson build
