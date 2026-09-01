@@ -1,5 +1,5 @@
 PKG_NAME = pcre2
-PKG_VERS = 10.46
+PKG_VERS = 10.48
 PKG_EXT = tar.bz2
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://github.com/PhilipHazel/pcre2/releases/download/$(PKG_NAME)-$(PKG_VERS)
@@ -37,9 +37,9 @@ else
 PLIST_TRANSFORM = sed -e '/:lib\/libpcre2-16/d'
 endif
 
-HOMEPAGE = https://www.pcre.org
-COMMENT  = The PCRE library is a set of functions that implement regular expression pattern matching using the same syntax and semantics as Perl 5. PCRE has its own native API, as well as a set of wrapper functions that correspond to the POSIX regular expression API.
-LICENSE  = BSD
+HOMEPAGE = https://pcre2project.github.io/pcre2/
+COMMENT = The PCRE2 library is a set of C functions that implement regular expression pattern matching.
+LICENSE = BSD
 
 GNU_CONFIGURE = 1
 
