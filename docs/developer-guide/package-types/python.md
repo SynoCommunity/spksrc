@@ -17,9 +17,9 @@ third-party modules the application needs. Those modules are distributed as
   time and bundled into the SPK's `share/wheelhouse`.
 
 Most packages describe their wheels with plain `requirements-*.txt` files. The
-few wheels that the default `pip` build cannot handle (they need meson, patches,
-or other cross packages) live as standalone packages under `python/` and are
-pulled in with `DEPENDS += python/<module>`.
+few wheels that the default `pip` build cannot handle (they need meson,
+[patches](../packaging/patches.md), or other cross packages) live as standalone
+packages under `python/` and are pulled in with `DEPENDS += python/<module>`.
 
 ## Wheel types
 
@@ -43,7 +43,8 @@ limited API (`--py-limited-api`), producing a single wheel usable across Python
 
 **Exception wheels** are the hard cases the default `pip` build does not handle
 well — a wheel that must be built with **meson**, one that depends on other
-cross packages at build time, or one that needs patches. These live under
+cross packages at build time, or one that needs [patches](../packaging/patches.md).
+These live under
 `python/` (see [The `python/` tree](#the-python-tree-exception-wheels)); you
 never edit `requirements-cross.txt` by hand — the framework writes each
 `python/<module>` into it automatically.
