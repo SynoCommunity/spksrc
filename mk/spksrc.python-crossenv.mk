@@ -237,6 +237,7 @@ crossenv-install-%:
 	fi ; \
 	_meson_cross_args=""; \
 	_extra_pip=""; \
+	$(MESON_PYTHON_CROSS_FILE_CMD) ; \
 	case "$(WHEEL_NAME)" in \
 	   numpy|scipy|scikit_learn|lap|pandas|numba|llvmlite|msgpack) \
 	      if [ -f "$(WORK_DIR)/tc_vars.meson-cross" ]; then \
@@ -244,6 +245,9 @@ crossenv-install-%:
 	      fi ; \
 	      if [ -f "$(WORK_DIR)/tc_vars.meson-properties" ]; then \
 	         _meson_cross_args="$${_meson_cross_args} --config-settings=setup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-properties"; \
+	      fi ; \
+	      if [ -f "$(MESON_PYTHON_CROSS_FILE)" ]; then \
+	         _meson_cross_args="$${_meson_cross_args} --config-settings=setup-args=--cross-file=$(MESON_PYTHON_CROSS_FILE)"; \
 	      fi ;; \
 	   soxr) \
 	      _extra_pip="--config-settings=cmake.args=-DCMAKE_SYSTEM_NAME=Linux;-DCMAKE_CROSSCOMPILING=TRUE"; ;; \
@@ -267,6 +271,9 @@ crossenv-install-%:
 	      fi ; \
 	      if [ -f "$(WORK_DIR)/tc_vars.meson-properties" ]; then \
 	         _meson_cross_args="$${_meson_cross_args} --config-settings=setup-args=--cross-file=$(WORK_DIR)/tc_vars.meson-properties"; \
+	      fi ; \
+	      if [ -f "$(MESON_PYTHON_CROSS_FILE)" ]; then \
+	         _meson_cross_args="$${_meson_cross_args} --config-settings=setup-args=--cross-file=$(MESON_PYTHON_CROSS_FILE)"; \
 	      fi ;; \
 	   soxr) \
 	      _extra_pip="--config-settings=cmake.args=-DCMAKE_SYSTEM_NAME=Linux;-DCMAKE_CROSSCOMPILING=TRUE"; ;; \
