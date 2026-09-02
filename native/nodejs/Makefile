@@ -3,7 +3,7 @@ PKG_NAME = nodejs
 # v20 is Maintenance Version "Iron" since 2024-10-22 with EOL at 2026-04-30
 # v22 is Maintenance Version "Jod" since 2025-10-21 with EOL at 2027-04-30
 # v24 is LTS Version "Krypton" from 2025-10-28 to 2026-10-20 with EOL at 2028-04-30
-PKG_VERS = 24.11.1
+PKG_VERS = 24.20.0
 PKG_EXT = tar.xz
 PKG_DIST_NAME = node-v$(PKG_VERS)-linux-x64.$(PKG_EXT)
 PKG_DIST_SITE = https://nodejs.org/dist/v$(PKG_VERS)
