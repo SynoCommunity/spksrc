@@ -16,7 +16,7 @@ CONFIGURE_ARGS += -Denable_examples=false
 CONFIGURE_ARGS += -Dbdj_jar=disabled
 
 # For ppc853x-5.2, define GNU_SOURCE
-ifeq ($(findstring $(ARCH)-$(TCVERSION), ppc853x-5.2 qoriq-5.2),$(ARCH)-$(TCVERSION))
+ifeq ($(findstring $(ARCH)-$(TCVERSION), ppc853x-5.2),$(ARCH)-$(TCVERSION))
 ADDITIONAL_CFLAGS = -D_GNU_SOURCE
 endif
 

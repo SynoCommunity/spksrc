@@ -118,7 +118,7 @@ release and point `PKG_DIST_MIRRORS` at it.
 
 ```makefile
 # Include these in the SPK
-DEPENDS = cross/curl cross/openssl
+DEPENDS = cross/curl cross/openssl3
 
 # Only needed during build
 BUILD_DEPENDS = native/cmake
