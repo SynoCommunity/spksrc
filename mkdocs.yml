@@ -125,6 +125,7 @@ nav:
       - developer-guide/packaging/index.md
       - Makefile Variables: developer-guide/packaging/makefile-variables.md
       - Build Rules: developer-guide/packaging/build-rules.md
+      - Patches: developer-guide/packaging/patches.md
       - PLIST Files: developer-guide/packaging/plist.md
       - Service Scripts: developer-guide/packaging/service-scripts.md
       - Wizards: developer-guide/packaging/wizards.md

@@ -368,7 +368,7 @@ UNSUPPORTED_ARCHS_TCVERSION = armv7-6.2.4
 
 ```makefile
 # Required dependencies (always built)
-DEPENDS = cross/openssl cross/zlib
+DEPENDS = cross/openssl3 cross/zlib
 
 # Optional dependencies (conditionally included)
 OPTIONAL_DEPENDS = cross/feature-lib
@@ -479,7 +479,7 @@ make
 ls cross/*/Makefile | xargs grep -l "PKG_NAME = openssl"
 
 # Find SPKs using a dependency
-grep -r "cross/openssl" spk/*/Makefile
+grep -r "cross/openssl3" spk/*/Makefile
 ```
 
 ## References

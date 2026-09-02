@@ -35,7 +35,7 @@ CONFIGURE_ARGS = --host=$(TC_TARGET) --prefix=$(INSTALL_PREFIX)
 ## Library Dependencies
 
 ```makefile
-DEPENDS = cross/openssl cross/zlib
+DEPENDS = cross/openssl3 cross/zlib
 ADDITIONAL_CFLAGS = -I$(STAGING_INSTALL_PREFIX)/include
 ADDITIONAL_LDFLAGS = -L$(STAGING_INSTALL_PREFIX)/lib
 ```

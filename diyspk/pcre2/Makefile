@@ -1,15 +1,15 @@
 SPK_NAME = pcre2
-SPK_VERS = 10.46
+SPK_VERS = 10.48
 SPK_REV = 1
 
 DEPENDS = cross/pcre2
 
 MAINTAINER = SynoCommunity
-DESCRIPTION = The PCRE library is a set of functions that implement regular expression pattern matching using the same syntax and semantics as Perl 5. PCRE has its own native API, as well as a set of wrapper functions that correspond to the POSIX regular expression API.
+DESCRIPTION = The PCRE2 library is a set of C functions that implement regular expression pattern matching.
 DISPLAY_NAME = PCRE2
 STARTABLE = no
 
-HOMEPAGE = https://www.pcre.org
+HOMEPAGE = https://pcre2project.github.io/pcre2/
 LICENSE = BSD
 
 # activate additional features for pcre2grep and pcre2test
