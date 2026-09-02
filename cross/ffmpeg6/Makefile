@@ -242,7 +242,10 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+# Every PowerPC toolchain in the tree is e500v2: ppc853x and qoriq share the
+# -mcpu=8548 the toolchains declare, and on DSM 5.2 they are the same toolchain
+# (powerpc-none-linux-gnuspe, gcc 4.3.7). Only qoriq was ever listed.
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
@@ -255,11 +258,17 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-vaapi
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
+
+# libdrm, libva, Intel MediaSDK, and the OpenCL/Vulkan set below all come from the
+# videodriver meta (VIDEODRV_DEPENDS). Asking for any of them where the meta does not
+# exist cannot work -- configure stops at "libmfx not found" -- so the whole section
+# is gated, not just its first lines.
+ifeq ($(call version_ge, $(TCVERSION), 6),1)
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-vaapi
 
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
@@ -281,6 +290,7 @@ DEPENDS += cross/libplacebo
 CONFIGURE_ARGS += --enable-libplacebo
 endif
 
+endif # ifeq TCVERSION >= 6
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk
