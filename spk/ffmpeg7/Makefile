@@ -1,9 +1,10 @@
 SPK_NAME = ffmpeg7
 SPK_VERS = 7.1.5
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 10
+SPK_REV = 11
 SPK_ICON = src/ffmpeg7.png
-CHANGELOG = "1. Restore the SYNO-videostation patches"
+CHANGELOG  = "1. Restore the SYNO-videostation patches<br/>"
+CHANGELOG += "2. Internal build options now follow toolchain capabilities"
 
 DEPENDS = cross/ffmpeg7
 VIDEODRV_PACKAGE = synocli-videodriver
