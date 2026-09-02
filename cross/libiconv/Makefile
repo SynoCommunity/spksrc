@@ -25,7 +25,7 @@ include ../../mk/spksrc.cross-cc.mk
 # libiconv does not install a pkg-config file
 # Required for packages that depend on cross/libarchive, e.g. pixz
 $(ICONV_PC):
-	@$(MSG) - Creating $@
+	@$(MSG) - Creating pkgconfig $(notdir $@)
 	@install -d $(dir $@)
 	@printf 'prefix=$(INSTALL_PREFIX)\n' > $@
 	@printf 'exec_prefix=$${prefix}\n' >> $@

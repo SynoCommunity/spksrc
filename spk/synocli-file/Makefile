@@ -1,6 +1,6 @@
 SPK_NAME = synocli-file
 SPK_VERS = 4.0.3
-SPK_REV = 31
+SPK_REV = 32
 SPK_ICON = src/synocli-file.png
 
 # cross/libblkid must be built before cross/e2fsprogs or cross/libext2fs
@@ -121,25 +121,8 @@ DESCRIPTION = "SynoCli File Tools provide a set of small command-line utilities:
     patch$(OPTIONAL_DESC)."
 STARTABLE = no
 
-CHANGELOG  = "1. Add Microsoft Edit v2.0.0. <br/>"
-CHANGELOG += "2. Update dos2unix from v7.5.3 to v7.5.6. <br/>"
-CHANGELOG += "3. Update eza from v1.23.4 to v1.23.5. <br/>"
-CHANGELOG += "4. Update fd from v10.3.0 to v10.4.2 (except qoriq arch). <br/>"
-CHANGELOG += "5. Update file from v5.46 to v5.48 (fixes ppc archs). <br/>"
-CHANGELOG += "6. Update fzf from v0.67.0 to v0.74.2. <br/>"
-CHANGELOG += "7. Update jdupes from v1.30.0 to v1.31.1. <br/>"
-CHANGELOG += "8. Update less from v685 to v704. <br/>"
-CHANGELOG += "9. Update lzip from 1.25 to v1.26 and plzip from v1.12 to v1.13. <br/>"
-CHANGELOG += "10. Update micro from v2.0.14 to v2.0.15. <br/>"
-CHANGELOG += "11. Update mg from v3.7 to v4.0. <br/>"
-CHANGELOG += "12. Update nano from v8.7 to v9.2. <br/>"
-CHANGELOG += "13. Update nnn from v5.1 to v5.3 (DSM 7+). <br/>"
-CHANGELOG += "14. Update ripgrep from v15.1.0 to v15.2.0. <br/>"
-CHANGELOG += "15. Update sd from v1.0.0 to v1.1.0 (except ARMv5 archs). <br/>"
-CHANGELOG += "16. Update tree from v2.2.1 to v2.3.2. <br/>"
-CHANGELOG += "17. Update iconv from version provided in toolchain to v1.19. <br/>"
-CHANGELOG += "18. Fix RHash tools and include openssl crypto hashes. <br/>"
-CHANGELOG += "19. Add some rust tools for older models (fd for ARMv5, eza, lsd and sd for ppc853x) and fixes for qoriq (fd, lsd, ripgrep, sd). <br/>"
+CHANGELOG  = "1. Add extra encodings to iconv. <br/>"
+CHANGELOG += "2. Update pcre2 from 10.46 to v10.48. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
