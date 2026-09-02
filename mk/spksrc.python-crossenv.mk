@@ -234,7 +234,7 @@ crossenv-install-%:
 	fi ; \
 	_meson_cross_args=""; \
 	_extra_pip=""; \
-	$(MESON_PYTHON_CROSS_FILE_CMD) ; \
+	printf "[binaries]\npython = '$(abspath $(WORK_DIR)/crossenv-$*)/cross/bin/python3'\n" > $(MESON_PYTHON_CROSS_FILE) ; \
 	case "$(WHEEL_NAME)" in \
 	   numpy|scipy|scikit_learn|lap|pandas|numba|llvmlite|msgpack) \
 	      if [ -f "$(WORK_DIR)/tc_vars.meson-cross" ]; then \
