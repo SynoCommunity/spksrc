@@ -5,6 +5,10 @@ SPK_ICON = src/shairport-sync.png
 
 DEPENDS = cross/shairport-sync
 
+# DSM 5.2 is out: it is reached through cross/ffmpeg6-audio, the last CI run
+# failed on ppc853x, and this package is not intended to be supported there.
+REQUIRED_MIN_DSM = 6
+
 # Require AudioStation for USB audio driver support on DSM 6
 SPK_DEPENDS = "AudioStation"
 
