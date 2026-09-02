@@ -307,11 +307,16 @@ endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
-CONFIGURE_ARGS += --cpu=e500v2
+# Every PowerPC toolchain in the tree is e500v2: ppc853x and qoriq both declare
+# -mcpu=8548, and on DSM 5.2 they are literally the same toolchain
+# (powerpc-none-linux-gnuspe, gcc 4.3.7). The e500 branch was standing in for
+# "not qoriq" -- an era split, not a core one -- and under-specified ppc853x.
+# Neither core has AltiVec.
+CONFIGURE_ARGS += --cpu=e500v2 --disable-altivec
+# libatomic arrived with gcc 4.8, so ppc853x's 4.3.7 ships none and asking for it
+# there fails the link outright. Ask the compiler version, not the arch name.
+ifeq ($(call version_ge,$(TC_GCC),4.8),1)
 CONFIGURE_ARGS += --extra-libs=-latomic
-else
-CONFIGURE_ARGS += --cpu=e500 --disable-altivec
 endif
 endif
 
