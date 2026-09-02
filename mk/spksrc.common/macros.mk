@@ -63,6 +63,15 @@ tc = $(strip \
     $(or $(TC_OVERLAY_BINUTILS_PATH),$(TC_PATH))$(TC_PREFIX)$(1),\
     $(TC_PATH)$(TC_PREFIX)$(1))))
 
+# Macro: locate a host tool -- the native counterpart of tc above
+#
+#   $(call native,gcc)   $(call native,ar)
+#
+# Absolute path of a tool on the BUILD host, or the bare name when it is absent, so a
+# missing tool fails by its own name instead of as an empty command. command -v, not
+# which: the former is a POSIX shell builtin, the latter an external binary.
+native = $(or $(shell command -v $(1) 2>/dev/null),$(1))
+
 # Remove duplicate words within string while preserving order
 define uniq
 $(strip \

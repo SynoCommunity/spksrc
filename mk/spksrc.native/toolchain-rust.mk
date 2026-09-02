@@ -145,11 +145,11 @@ debuginfo-level = 0
 download-ci-llvm = false
 
 [target.$(RUST_BUILD_HOST)]
-cc = "$(shell which gcc)"
-cxx = "$(shell which g++)"
-ar = "$(shell which ar)"
-ranlib = "$(shell which ranlib)"
-linker = "$(shell which gcc)"
+cc = "$(call native,gcc)"
+cxx = "$(call native,g++)"
+ar = "$(call native,ar)"
+ranlib = "$(call native,ranlib)"
+linker = "$(call native,gcc)"
 
 [target.$(RUST_TARGET)]
 cc = "$(RUST_CC)"

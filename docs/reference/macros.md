@@ -66,6 +66,20 @@ COMPILE_ARGS = CC=$(call tc,gcc) AR=$(call tc,ar)
     environment, overlay-aware. Reach for `$(call tc,...)` only where a build system
     ignores that and takes a tool path of its own.
 
+### Host tools
+
+`$(call native,<tool>)` is the same idea for the **build host** — the other half of the
+`cross/` against `native/` split — and is what `native/` packages get in their environment:
+
+```makefile
+$(call tc,gcc)      # …/syno-x64-7.2/…/x86_64-pc-linux-gnu-gcc
+$(call native,gcc)  # /usr/bin/gcc
+```
+
+It falls back to the bare name when the tool is absent, so a missing one fails by its own
+name rather than as an empty command, and it uses `command -v` rather than `which`: the
+former is a POSIX shell builtin, the latter an external binary a minimal image may not ship.
+
 ## List helpers
 
 | Macro | Purpose |
