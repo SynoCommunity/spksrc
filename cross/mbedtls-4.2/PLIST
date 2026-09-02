@@ -1,0 +1,12 @@
+lnk:lib/libmbedcrypto.so
+lnk:lib/libmbedcrypto.so.18
+lib:lib/libmbedcrypto.so.4.2.0
+lnk:lib/libmbedtls.so
+lnk:lib/libmbedtls.so.23
+lib:lib/libmbedtls.so.4.2.0
+lnk:lib/libmbedx509.so
+lnk:lib/libmbedx509.so.9
+lib:lib/libmbedx509.so.4.2.0
+lnk:lib/libtfpsacrypto.so
+lnk:lib/libtfpsacrypto.so.2
+lib:lib/libtfpsacrypto.so.1.2.0

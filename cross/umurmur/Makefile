@@ -6,7 +6,7 @@ PKG_DIST_SITE = https://github.com/umurmur/umurmur/archive
 PKG_DIST_FILE = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/libconfig cross/protobuf-c cross/mbedtls
+DEPENDS = cross/libconfig cross/protobuf-c cross/mbedtls-4.2
 
 HOMEPAGE = https://github.com/umurmur/umurmur
 COMMENT  = uMurmur is a minimalistic Mumble server.
