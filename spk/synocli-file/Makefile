@@ -73,11 +73,8 @@ ifeq ($(call version_ge,$(TC_GLIBC),2.9),1)
 DEPENDS += cross/bat
 OPTIONAL_DESC := $(OPTIONAL_DESC)", bat"
 
-# fd is not supported anymore on ARMv7L
-ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
 DEPENDS += cross/fd
 OPTIONAL_DESC := $(OPTIONAL_DESC)", fd (fd-find)"
-endif
 endif
 
 # ripgrep 14 is the PPC fallback and its pcre2 wants -std=c11/c99
@@ -123,6 +120,7 @@ STARTABLE = no
 
 CHANGELOG  = "1. Add extra encodings to iconv. <br/>"
 CHANGELOG += "2. Update pcre2 from 10.46 to v10.48. <br/>"
+CHANGELOG += "3. Update fd from v10.4.2 to v10.5.0; brings fd back to NVR and VS models (ARMv7L). <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
