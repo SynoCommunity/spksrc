@@ -281,7 +281,9 @@ jobs:
           add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
-          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
+          # TEMP (revert before merge): DSM 5.2 carries ppc853x-5.2 and 88f6281-5.2,
+          # the toolchains below glibc 2.17 that this PR's -lrt correction is tested on.
+          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'true' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
