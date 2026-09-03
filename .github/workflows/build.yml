@@ -281,7 +281,9 @@ jobs:
           add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
-          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
+          # TEMP (revert before merge): activate DSM 5.2 so the archs whose behaviour
+          # changes here -- the ffmpeg6 x64 pairs -- are actually exercised in CI.
+          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'true' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
