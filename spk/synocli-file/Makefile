@@ -121,7 +121,8 @@ STARTABLE = no
 CHANGELOG  = "1. Add extra encodings to iconv. <br/>"
 CHANGELOG += "2. Update pcre2 from v10.46 to v10.48. <br/>"
 CHANGELOG += "3. Update fd from v10.4.2 to v10.5.0; brings fd back to NVR and VS models (ARMv7L). <br/>"
-CHANGELOG += "4. Update jdupes from v1.31.1 to v1.31.2. <br/>"
+CHANGELOG += "4. Update fzf from v0.74.2 to v0.74.3. <br/>"
+CHANGELOG += "5. Update jdupes from v1.31.1 to v1.31.2. <br/>"
 CHANGELOG += "<br/>For package details and specific licences see $(DOCS_URL)".
 
 SERVICE_SETUP = src/service-setup.sh
