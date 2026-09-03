@@ -1,0 +1,40 @@
+101-transcode-hwaccel-decode-fallback.patch      (ported from PR #2133)
+
+Everything else that used to live in this series (102-109, 112, 113) has been
+taken upstream by uknunknown into PR #2117 and is now carried by
+100-transcoding-2117.patch. Only 101 is still carried separately.
+
+  Fixes: "webm | vp9 | vorbis | vaapi -> video: Unsupported, audio also lost"
+
+  hwaccels_decode_get_format() returns a software pixel format when no
+  hardware format can be set up (a VAAPI device with no VP9 decode entrypoint
+  is the common case), but leaves ctx->iavhwdevtype at AV_HWDEVICE_TYPE_VAAPI.
+  The filter graph is then still built for hardware frames, graph
+  configuration fails, and the whole subscription dies instead of degrading
+  to audio only.  Clear the hardware intent at that point.
+
+  Still needed as of a97e57917 (2026-09-01).  The current PR head added a
+  second early-return software fallback of its own:
+
+      if ((avctx->width <= 0 || avctx->height <= 0) && ...) {
+          // Pick first non-hwaccel format as a safe SW fallback for now.
+          for (i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++) {
+              ...
+              return pix_fmts[i];
+          }
+          return pix_fmts[0]; // last-resort
+      }
+
+  which returns a software format without clearing iavhwdevtype either, so
+  the same failure mode is reachable by one more route than before.
+
+  NOT the fix for the VP9/VAAPI encoder failure -- that one is at
+  OPEN_ENCODER, not in the decoder.  This patch is about not losing the audio
+  stream when the video side gives up.
+
+Verify before building:
+  HASH=$(sed -n 's/^PKG_GIT_HASH = //p' ../Makefile)
+  tar xzf ../../../distrib/tvheadend-git${HASH}.tar.gz -C /tmp/check
+  cd /tmp/check/tvheadend-${HASH}
+  patch -p0 < .../100-transcoding-2117.patch
+  patch -p0 --dry-run < .../101-transcode-hwaccel-decode-fallback.patch
