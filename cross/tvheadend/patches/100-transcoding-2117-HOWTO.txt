@@ -10,7 +10,7 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
-Current base: a97e57917, a single commit on top of master 45cbe4adb (Jul 31st 2026).
+Current base: a97e57917, a single commit on top of master 45cbe4adb (Aug 22nd 2026).
 uknunknown rewrote the branch on 2026-09-01 to drop two merge commits and a
 duplicated commit; regenerating against the new head is what this revision does.
 
