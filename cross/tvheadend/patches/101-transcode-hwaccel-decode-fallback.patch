@@ -1,3 +1,35 @@
+Clear the hardware intent when the decoder falls back to software.
+
+Ported from PR #2133.  Fixes the row "webm | vp9 | vorbis | vaapi" of the
+2026-08-09 test table: "video: Unsupported, audio also lost".
+
+hwaccels_decode_get_format() ends by returning a software pixel format when
+no hardware format could be set up -- a VAAPI device with no VP9 decode
+entrypoint is the common case -- but leaves ctx->iavhwdevtype at
+AV_HWDEVICE_TYPE_VAAPI.  The filter graph is then still built for hardware
+frames, graph configuration fails, and the whole subscription dies instead of
+degrading to audio only.  Clear the intent at that point.
+
+Scope note: this deliberately touches only the tail of the function, the
+point where format selection has genuinely given up.  It must NOT be extended
+to the early return added by PR #2117 at the top:
+
+    // Guard: delay HW frames context init until dimensions known.
+    // MPEG2 (and others) can call get_format() before sequence header
+    if ((avctx->width <= 0 || avctx->height <= 0) && ...)
+        return pix_fmts[i];          /* first non-hwaccel format */
+
+That path also hands back a software format, but as a deferral, not a
+surrender: get_format() is called again once the sequence header gives the
+dimensions, and hwaccels_decode_setup_context() is written to be re-entered
+("clean up required if you call decode twice" -- vaapi.c, qsv.c).  Clearing
+iavhwdevtype there would permanently disable hardware decoding for every
+codec that probes the format early.
+
+This is NOT the fix for the VP9/VAAPI encoder failure -- that one is at
+OPEN_ENCODER, not in the decoder.  This patch is about not losing the audio
+stream when the video side gives up.
+
 diff --git src/transcoding/transcode/hwaccels/hwaccels.c src/transcoding/transcode/hwaccels/hwaccels.c
 index 51bb6c749..dc1da077b 100644
 --- src/transcoding/transcode/hwaccels/hwaccels.c
