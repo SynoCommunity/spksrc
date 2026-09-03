@@ -281,10 +281,14 @@ jobs:
           add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
-          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
+          # TEMP (revert before merge): 5.2 carries ppc853x, 88f6281 and x86, where the
+          # pre-check refusals and the old-toolchain wheels path are exercised.
+          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'true' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
-          add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
+          # TEMP (revert before merge): exercises arch-noarch-% / build-noarch-%, which
+          # this PR rewires the same way as the arch path.
+          add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'true' }}
           add_noarch_dsm72_builds=${{ github.event.inputs.add_noarch_dsm72_builds || 'false' }}
           add_noarch_dsm73_builds=${{ github.event.inputs.add_noarch_dsm73_builds || 'false' }}
           has_arch_packages=${{ needs.prepare.outputs.has_arch_packages || 'false' }}

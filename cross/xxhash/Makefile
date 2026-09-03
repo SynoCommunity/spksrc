@@ -14,4 +14,11 @@ LICENSE  = 2-Clause BSD
 
 CONFIGURE_TARGET = nop
 
+# TEMP (revert before merge): force a mid-build failure on one arch to prove the CI
+# captures it -- the log should carry the compiler's error, build_errors.txt the package,
+# and the job should go red. Scoped to comcerto2k so every other arch reports normally.
+ifeq ($(ARCH),comcerto2k)
+ADDITIONAL_CFLAGS += -this-flag-does-not-exist
+endif
+
 include ../../mk/spksrc.cross-cc.mk
