@@ -58,7 +58,7 @@ _all: install archive
 
 all:
 	@mkdir -p $(WORK_DIR)
-	$(call LOG_WRAPPED,_all)
+	$(call RUNLOG,_all)
 
 ####
 

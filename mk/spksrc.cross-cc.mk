@@ -34,7 +34,7 @@
 # Notes:
 #   - This file is the canonical entry point for cross builds.
 #   - cross-env.mk consumes tc_vars* generated during Stage1.
-#   - Logging is centralized via LOG_WRAPPED for consistent output.
+#   - Logging is centralized via RUNLOG for consistent output.
 #
 ###############################################################################
 # Cross-compilation orchestration overview
@@ -169,8 +169,8 @@ cross-stage2: install plist
 .PHONY: all
 all:
 	@mkdir -p $(WORK_DIR)
-	$(call LOG_WRAPPED,cross-stage1)
-	$(call LOG_WRAPPED,cross-stage2)
+	$(call RUNLOG,cross-stage1)
+	$(call RUNLOG,cross-stage2)
 
 ####
 

@@ -19,7 +19,7 @@
 #  dedup-files : removes duplicate files while preserving order (via md5sum)
 #  merge       : merges environment variable values from input
 #
-# LOG_WRAPPED  : generic macro to call recipe execution using logging
+# RUNLOG  : generic macro to call recipe execution using logging
 #
 # Notes:
 #  - Version comparisons rely on GNU sort (-V)
@@ -102,12 +102,12 @@ merge = $(shell /bin/bash -c '\
 
 # Generic macro to call recipe execution using logging
 # Run $(1) under script(1) and tee everything into $(2), as a SHELL FRAGMENT usable
-# inside a larger recipe line -- unlike LOG_WRAPPED it neither prefixes @ nor exits on
+# inside a larger recipe line -- unlike RUNLOG it neither prefixes @ nor exits on
 # failure, so the caller keeps its own status handling.
 #
 # script gives the command a pty, so its stdout AND stderr are teed: that is what puts a
 # parse-time $(error), and make's own "*** ... Stop.", in the log. Setting LOGGING_ENABLED
-# for the child makes this the only teeing level, so the inner LOG_WRAPPED stages take
+# for the child makes this the only teeing level, so the inner RUNLOG stages take
 # their pass-through branch and nothing is written twice.
 define _runlog
 if [ -z "$$LOGGING_ENABLED" ]; then \
@@ -121,7 +121,7 @@ endef
 # The goal-shaped facade over _runlog: builds the make command itself, writes to
 # DEFAULT_LOG, and reports the failure. bash -o pipefail rather than `set -o pipefail`
 # because these call sites keep the default /bin/sh -e as their SHELL.
-define LOG_WRAPPED
+define RUNLOG
 @bash -o pipefail -c '$(call _runlog,$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1),$(DEFAULT_LOG))' || { \
     $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" \
         "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(1)") \

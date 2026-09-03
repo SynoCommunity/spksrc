@@ -48,7 +48,7 @@
 #
 # Notes:
 #  - The toolchain target is idempotent: if the cookie exists, it is skipped.
-#  - Logging is centralized via LOG_WRAPPED and applied to the full build.
+#  - Logging is centralized via RUNLOG and applied to the full build.
 #  - This makefile orchestrates modular logic implemented under
 #    mk/spksrc.toolchain/.
 #
@@ -225,7 +225,7 @@ _all: status rustup-rustc depend tcvars
 # toolchain_target wraps _all with logging
 .PHONY: toolchain_target
 toolchain_target: $(PRE_TOOLCHAIN_TARGET)
-	$(call LOG_WRAPPED,_all)
+	$(call RUNLOG,_all)
 
 post_toolchain_target: $(TOOLCHAIN_TARGET)
 

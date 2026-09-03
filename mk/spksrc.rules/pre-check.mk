@@ -28,7 +28,7 @@ SPK_FOLDER = $(notdir $(CURDIR))
 # collected list of unsupported packages.
 #
 # The build log needs saying explicitly. $(error) fires at PARSE time, so no recipe ever
-# runs, and LOG_WRAPPED does its teeing from inside one: the log was left holding the
+# runs, and RUNLOG does its teeing from inside one: the log was left holding the
 # single "BUILDING package" line that build-arch-% writes before descending (#7393).
 #
 # The timestamp is $$(date), escaped, so the SHELL expands it. Written as $(date ...) it
