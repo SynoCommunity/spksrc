@@ -101,6 +101,23 @@ merge = $(shell /bin/bash -c '\
 ')
 
 # Generic macro to call recipe execution using logging
+# Run $(1) under script(1) and tee everything into $(2), as a SHELL FRAGMENT usable
+# inside a larger recipe line -- unlike LOG_WRAPPED it neither prefixes @ nor exits on
+# failure, so the caller keeps its own status handling.
+#
+# script gives the command a pty, so its stdout AND stderr are teed: that is what puts a
+# parse-time $(error), and make's own "*** ... Stop.", in the log. Setting LOGGING_ENABLED
+# for the child makes this the only teeing level, so the inner LOG_WRAPPED stages take
+# their pass-through branch and nothing is written twice.
+define run_logged
+if [ -z "$$LOGGING_ENABLED" ]; then \
+    LOGGING_ENABLED=1 script -q -e -c '$(1)' /dev/null \
+        | tee >(sed -r "s/\x1B\[[0-9;]*[mK]//g; s/\r//g" >> "$(2)") ; \
+else \
+    $(1) ; \
+fi
+endef
+
 define LOG_WRAPPED
 @bash -o pipefail -c '\
     if [ -z "$$LOGGING_ENABLED" ]; then \

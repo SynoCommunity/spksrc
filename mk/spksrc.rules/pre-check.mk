@@ -33,8 +33,12 @@ SPK_FOLDER = $(notdir $(CURDIR))
 #
 # The timestamp is $$(date), escaped, so the SHELL expands it. Written as $(date ...) it
 # was make expanding an undefined variable, and every collected line began with " - ".
+# Only when nobody above is teeing: through arch-% the real make error, line number and
+# all, already reaches the log. Synthesised in make's own shape rather than the "===>"
+# house style so the two are not confused -- minus the ":<line>", which make does not
+# expose to a makefile.
 define precheck_fatal
-$(shell echo "===>  $(1)" >> $(DEFAULT_LOG))
+$(if $(LOGGING_ENABLED),,$(shell echo "$(lastword $(MAKEFILE_LIST)): *** $(1).  Stop." >> $(DEFAULT_LOG)))
 $(if $(BUILD_UNSUPPORTED_FILE),$(shell echo "$$(date +'%Y.%m.%d %H:%M:%S') - $(SPK_FOLDER): $(1)" >> $(BUILD_UNSUPPORTED_FILE)))
 $(error $(1))
 endef
