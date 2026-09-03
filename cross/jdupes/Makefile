@@ -1,5 +1,5 @@
 PKG_NAME = jdupes
-PKG_VERS = 1.31.1
+PKG_VERS = 1.31.2
 PKG_EXT = tar.gz
 PKG_DIST_NAME = v$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://codeberg.org/jbruchon/jdupes/archive
