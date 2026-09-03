@@ -1,15 +1,16 @@
 SPK_NAME = ffmpeg6
 SPK_VERS = 6.1.6
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 9
+SPK_REV = 10
 SPK_ICON = src/ffmpeg6.png
-CHANGELOG = "1. Restore the SYNO-videostation patches"
+CHANGELOG  = "1. Restore the SYNO-videostation patches<br/>"
+CHANGELOG += "2. Internal build options now follow toolchain capabilities"
 
 DEPENDS = cross/ffmpeg6
 VIDEODRV_PACKAGE = synocli-videodriver
 
-# requires c11 and proper atomic using gcc-4.9+ support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Needs C11 and working atomics -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://docs.synocommunity.com/packages/ffmpeg/

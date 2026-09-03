@@ -14,7 +14,9 @@ LICENSE  = MPLv2.0 License
 
 include ../../mk/spksrc.common.mk
 
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
+# srt builds no applications without C++11 (ENABLE_CXX11 is OFF for GNU below 4.7); only
+# srt-ffplay, a shell script, survives -- drop the other two from the static PLIST.
+ifeq ($(call version_lt,$(TC_GCC),4.7),1)
 PLIST_TRANSFORM = sed -e '/bin\/srt-file-transmit/d' -e '/bin\/srt-tunnel/d'
 endif
 

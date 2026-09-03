@@ -1,15 +1,19 @@
 SPK_NAME = ffmpeg5
 SPK_VERS = 5.1.10
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 7
+SPK_REV = 8
 SPK_ICON = src/ffmpeg5.png
-CHANGELOG = "1. Update to version 5.1.10<br/>2. Update to jellyfin-ffmpeg v5.1.4-3 patchset<br/>3. Now using new synocli-videodriver package<br/>4. Align package with ffmpeg7/ffmpeg8"
+CHANGELOG  = "1. Update to version 5.1.10<br/>"
+CHANGELOG += "2. Update to jellyfin-ffmpeg v5.1.4-3 patchset<br/>"
+CHANGELOG += "3. Now using new synocli-videodriver package<br/>"
+CHANGELOG += "4. Align package with ffmpeg7/ffmpeg8<br/>"
+CHANGELOG += "5. Internal build options now follow toolchain capabilities"
 
 DEPENDS = cross/ffmpeg5
 VIDEODRV_PACKAGE = synocli-videodriver
 
-# requires c11 and proper atomic using gcc-4.9+ support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Needs C11 and working atomics -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://docs.synocommunity.com/packages/ffmpeg/

@@ -15,6 +15,10 @@ LICENSE  = SPDX short identifier: BSD-2-Clause-Patent
 # SVT-HEVC is only supported on x86_64 Intel platforms
 UNSUPPORTED_ARCHS = $(ARM_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
+# 64-bit only (its configure refuses 32-bit) and needs gcc >= 4.9
+REQUIRE_64BIT = 1
+MIN_GCC_VERSION = 4.9
+
 CMAKE_USE_NASM = 1
 
 include ../../mk/spksrc.cross-cmake.mk

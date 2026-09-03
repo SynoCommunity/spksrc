@@ -27,12 +27,24 @@ else
   CONFIGURE_ARGS += --extra-cflags=-O3
   CONFIGURE_ARGS += --disable-debug
   ifneq ($(findstring $(ARCH), $(ARMv5_ARCHS) $(i686_ARCHS)),$(ARCH))
-    CONFIGURE_ARGS += --enable-lto
+    ifeq ($(call version_ge,$(TC_GCC),4.9),1)
+      CONFIGURE_ARGS += --enable-lto
+    endif
   endif
 endif
 
 # Must match $(SPK_REV) from spk/ffmpeg$(PKG_MINOR_VERS)/Makefile
 CONFIGURE_ARGS += --extra-version=$(shell sed -n 's/^SPK_REV = \(.*\)/\1/p' $(WORK_DIR)/../../../spk/ffmpeg$(PKG_MINOR_VERS)/Makefile)
+
+# libavformat/fifo.c holds the tree's only 64-bit atomic. Without C11 <stdatomic.h>
+# (gcc < 4.9) ffmpeg maps it onto __sync_*_8, which 32-bit PowerPC has no instruction for
+# and no library to fall back on -- "undefined reference to `__sync_fetch_and_add_8'".
+# Dropping the two fifo muxers costs those archs nothing else.
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+ifeq ($(call version_lt,$(TC_GCC),4.9),1)
+CONFIGURE_ARGS += --disable-muxer=fifo --disable-muxer=fifo_test
+endif
+endif
 
 # Enable the Synology VideoStation compatibility code added by the
 # SYNO-* patch series (hls_seek_time, smooth streaming, srt tags, ...)
@@ -52,6 +64,7 @@ OPTIONAL_DEPENDS += cross/librabbitmq
 OPTIONAL_DEPENDS += cross/librist
 OPTIONAL_DEPENDS += cross/libvmaf_1.5
 OPTIONAL_DEPENDS += cross/libvmaf_2.3
+OPTIONAL_DEPENDS += cross/libvpx
 OPTIONAL_DEPENDS += cross/libzimg
 OPTIONAL_DEPENDS += cross/openh264
 OPTIONAL_DEPENDS += cross/rubberband
@@ -59,6 +72,8 @@ OPTIONAL_DEPENDS += cross/shine
 OPTIONAL_DEPENDS += cross/snappy
 OPTIONAL_DEPENDS += cross/svt-av1
 OPTIONAL_DEPENDS += cross/svt-hevc
+OPTIONAL_DEPENDS += cross/x264
+OPTIONAL_DEPENDS += cross/x265
 
 # Define x86asm
 ifeq ($(findstring $(ARCH),$(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
@@ -165,6 +180,11 @@ CONFIGURE_ARGS += --enable-libspeex
 
 DEPENDS += cross/libsrt
 CONFIGURE_ARGS += --enable-libsrt
+# clock_gettime is in librt until glibc 2.17 and libsrt.so does not declare it; the -lrt
+# from TC_EXTRA_LDFLAGS sits inside --as-needed, too early for ld to keep it.
+ifeq ($(call version_lt,$(TC_GLIBC),2.17),1)
+CONFIGURE_ARGS += --extra-ldflags="-lrt"
+endif
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
@@ -184,17 +204,23 @@ endif
 DEPENDS += cross/libvorbis
 CONFIGURE_ARGS += --enable-libvorbis
 
+ifeq ($(call version_ge, $(TC_GCC), 4.6),1)
 DEPENDS += cross/libvpx
 CONFIGURE_ARGS += --enable-libvpx
+endif
 
 DEPENDS += cross/libwebp
 CONFIGURE_ARGS += --enable-libwebp
 
+ifeq ($(call version_ge, $(TC_GCC), 4.6),1)
 DEPENDS += cross/x264
 CONFIGURE_ARGS += --enable-libx264
+endif
 
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
 DEPENDS += cross/x265
 CONFIGURE_ARGS += --enable-libx265
+endif
 
 DEPENDS += cross/libxml2
 CONFIGURE_ARGS += --enable-libxml2 --enable-demuxer=dash
@@ -231,7 +257,7 @@ CONFIGURE_ARGS += --enable-libopenh264
 endif
 
 # Add libaom to supported ARCH
-ifeq ($(findstring $(ARCH),alpine comcerto2k monaco $(ARMv8_ARCHS) $(i686_ARCHS) $(x64_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TC_GCC), 4.8),1)
 DEPENDS += cross/libaom
 CONFIGURE_ARGS += --enable-libaom
 endif
@@ -240,23 +266,25 @@ endif
 # REQUIRE_64BIT, so pulling it on a 32-bit arch (the old list named comcerto2k,
 # alpine and monaco, all ARMv7) fails the whole build. Gate it on the 64-bit archs.
 ifeq ($(findstring $(ARCH),$(64bit_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 DEPENDS += cross/svt-av1
 CONFIGURE_ARGS += --enable-libsvtav1
+endif
 endif
 
 # Add SVT-HEVC codec to x64
 # Patch for support from:
 # https://github.com/OpenVisualCloud/SVT-HEVC/tree/master/ffmpeg_plugin
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
+ifeq ($(call version_ge, $(TC_GCC), 4.9),1)
 DEPENDS += cross/svt-hevc
 CONFIGURE_ARGS += --enable-libsvthevc
+endif
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --disable-neon
-# Needed for libsrt
-CONFIGURE_ARGS += --extra-ldflags="-lrt"
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
@@ -282,11 +310,13 @@ endif
 
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
-CONFIGURE_ARGS += --cpu=e500v2
+# Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548,
+# and neither core has AltiVec. The e500 branch stood for "not qoriq", an era not a core.
+CONFIGURE_ARGS += --cpu=e500v2 --disable-altivec
+# libatomic arrived with gcc 4.8; ppc853x's 4.3.7 ships none, and asking for it there
+# fails the link outright.
+ifeq ($(call version_ge,$(TC_GCC),4.8),1)
 CONFIGURE_ARGS += --extra-libs=-latomic
-else
-CONFIGURE_ARGS += --cpu=e500 --disable-altivec
 endif
 endif
 
@@ -297,6 +327,7 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
+ifeq ($(call version_ge, $(TCVERSION), 6),1)
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-vaapi
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
@@ -316,6 +347,7 @@ CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
 
+endif # ifeq TCVERSION >= 6
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk

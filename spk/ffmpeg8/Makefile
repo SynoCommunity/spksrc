@@ -1,9 +1,10 @@
 SPK_NAME = ffmpeg8
 SPK_VERS = 8.1.2
 SKG_MINOR_VERS = $(firstword $(subst ., ,$(SPK_VERS)))
-SPK_REV = 3
+SPK_REV = 4
 SPK_ICON = src/ffmpeg8.png
-CHANGELOG = "1. Restore the SYNO-videostation patches"
+CHANGELOG  = "1. Restore the SYNO-videostation patches<br/>"
+CHANGELOG += "2. Internal build options now follow toolchain capabilities"
 
 DEPENDS = cross/ffmpeg8
 VIDEODRV_PACKAGE = synocli-videodriver
