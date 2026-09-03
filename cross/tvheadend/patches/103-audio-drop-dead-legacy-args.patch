@@ -1,0 +1,90 @@
+Do not build the legacy abuffer arguments on the libavcodec > 59 path.
+
+tvh_audio_context_open_filters() computes source_args, layout, filters and
+resample unconditionally, but only the "#else" branch -- libavcodec <= 59,
+which calls tvh_context_open_filters() -- ever reads them.  On the version
+this PR actually targets (ffmpeg 8), tvh_context_open_filters2() takes the
+filter string alone and every one of those locals is discarded:
+
+    char source_args[128];      built, never read
+    char layout[32];            built, never read
+    char filters[16];           built, never read
+    int  resample;              computed, never read
+    char ch_layout[64];         filled by av_channel_layout_describe(),
+                                never read at all, on either path
+
+Two str_snprintf() calls and an av_channel_layout_describe() run per filter
+setup for nothing, and both of those calls can "return -1", so a formatting
+failure in a string nobody consumes can still abort the whole audio setup.
+
+Move the block inside the "#else" arm and delete ch_layout.  The <= 59 path
+is unchanged: the two "#if" fences that only existed to keep the shared code
+compiling on both sides are dropped with it, since inside "#else" the legacy
+av_get_channel_layout_string() is the only spelling that applies and
+filters2 does not exist to be cleared.
+
+Reported upstream against PR #2117.
+
+--- src/transcoding/transcode/audio.c.orig
++++ src/transcoding/transcode/audio.c
+@@ -427,7 +427,14 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+     }
+     
+     tvhinfo(LS_TRANSCODE, "filters: audio: '%s'", filters2);
+-#endif
++
++    int ret = tvh_context_open_filters2(self,
++        "abuffer",                                             // source
++        (filters2 && filters2[0] != '\0') ? filters2 : "anull",// filters
++        "abuffersink"                                          // sink
++    );
++    str_clear(filters2);
++#else
+     char source_args[128];
+     char filters[16];
+     char layout[32];
+@@ -435,11 +442,7 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+ 
+     // source args
+     memset(source_args, 0, sizeof(source_args));
+-#if LIBAVCODEC_VERSION_MAJOR > 59
+-    av_channel_layout_describe(&self->iavctx->ch_layout, layout, sizeof(layout));
+-#else
+     av_get_channel_layout_string(layout, sizeof(layout), self->iavctx->channels, self->iavctx->channel_layout);
+-#endif
+     if (str_snprintf(source_args, sizeof(source_args),
+             "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
+             self->iavctx->time_base.num,
+@@ -447,9 +450,6 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+             self->iavctx->sample_rate,
+             av_get_sample_fmt_name(self->iavctx->sample_fmt),
+             layout)) {
+-#if LIBAVCODEC_VERSION_MAJOR > 59
+-        str_clear(filters2);
+-#endif
+         return -1;
+     }
+ 
+@@ -461,22 +461,9 @@ tvh_audio_context_open_filters(TVHContext *self, AVDictionary **opts)
+     memset(filters, 0, sizeof(filters));
+     if (str_snprintf(filters, sizeof(filters), "%s",
+                      (resample) ? "aresample" : "anull")) {
+-#if LIBAVCODEC_VERSION_MAJOR > 59
+-        str_clear(filters2);
+-#endif
+         return -1;
+     }
+ 
+-#if LIBAVCODEC_VERSION_MAJOR > 59
+-    char ch_layout[64];
+-    av_channel_layout_describe(&self->oavctx->ch_layout, ch_layout, sizeof(ch_layout));
+-    int ret = tvh_context_open_filters2(self,
+-        "abuffer",                                             // source
+-        (filters2 && filters2[0] != '\0') ? filters2 : "anull",// filters
+-        "abuffersink"                                          // sink
+-    );
+-    str_clear(filters2);
+-#else
+     int ret = tvh_context_open_filters(self,
+         "abuffer", source_args,                           // source
+         filters,                                          // filters
