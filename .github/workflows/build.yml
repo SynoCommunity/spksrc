@@ -281,10 +281,7 @@ jobs:
           add_dsm70_builds=${{ github.event.inputs.add_dsm70_builds || 'false' }}
           add_dsm62_builds=${{ github.event.inputs.add_dsm62_builds || 'false' }}
           add_dsm61_builds=${{ github.event.inputs.add_dsm61_builds || 'false' }}
-          # TEMP (revert before merge): activate DSM 5.2 so the archs these floors newly
-          # exclude are actually exercised. Every arch whose behaviour changes here is a
-          # 5.2 one; DSM 6.x and 7.x are untouched by this PR.
-          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'true' }}
+          add_dsm52_builds=${{ github.event.inputs.add_dsm52_builds || 'false' }}
           add_srm13_builds=${{ github.event.inputs.add_srm13_builds || 'false' }}
           add_srm12_builds=${{ github.event.inputs.add_srm12_builds || 'false' }}
           add_noarch_builds=${{ github.event.inputs.add_noarch_builds || 'false' }}
