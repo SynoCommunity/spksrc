@@ -17,10 +17,8 @@ include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
 
-# The v4l2 input device uses the multiplanar API (struct v4l2_plane), which Linux grew
-# in 3.2; the 2.6.32 toolchains ship no such header. This was disabled for qoriq by
-# name -- the kernel version is what actually decides it, and it also covers 88f6281
-# and ppc853x.
+# The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
+# toolchains ship no such header. Was disabled for qoriq by name.
 ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
 CONFIGURE_ARGS += --disable-indev=v4l2
 endif
@@ -267,9 +265,8 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-# Every PowerPC toolchain in the tree is e500v2: ppc853x and qoriq share the
-# -mcpu=8548 the toolchains declare, and on DSM 5.2 they are the same toolchain
-# (powerpc-none-linux-gnuspe, gcc 4.3.7). Only qoriq was ever listed.
+# Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548 --
+# and only qoriq was ever listed.
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
@@ -287,10 +284,8 @@ ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-# libdrm, libva, Intel MediaSDK, and the OpenCL/Vulkan set below all come from the
-# videodriver meta (VIDEODRV_DEPENDS). Asking for any of them where the meta does not
-# exist cannot work -- configure stops at "libmfx not found" -- so the whole section
-# is gated, not just its first lines.
+# libdrm, libva, MediaSDK and the OpenCL/Vulkan set below all come from the videodriver
+# meta; asking for them where it does not exist stops configure at "libmfx not found".
 ifeq ($(call version_ge, $(TCVERSION), 6),1)
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-vaapi

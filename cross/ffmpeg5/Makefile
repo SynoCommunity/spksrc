@@ -250,9 +250,8 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-# Every PowerPC toolchain in the tree is e500v2 -- ppc853x and qoriq both declare
-# -mcpu=8548 -- and only qoriq was ever listed. Inert here today: ffmpeg5 needs
-# gcc 4.9, which ppc853x's 4.3.7 does not meet.
+# Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548 --
+# and only qoriq was listed. Inert today: ffmpeg5 needs gcc 4.9, ppc853x has 4.3.7.
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
@@ -270,10 +269,8 @@ ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-# libdrm, libva, Intel MediaSDK, and the OpenCL/Vulkan set below all come from the
-# videodriver meta (VIDEODRV_DEPENDS). Asking for any of them where the meta does not
-# exist cannot work -- configure stops at "libmfx not found" -- so the whole section
-# is gated, not just its first lines.
+# libdrm, libva, MediaSDK and the OpenCL/Vulkan set below all come from the videodriver
+# meta; asking for them where it does not exist stops configure at "libmfx not found".
 ifeq ($(call version_ge, $(TCVERSION), 6),1)
 CONFIGURE_ARGS += --enable-libdrm
 CONFIGURE_ARGS += --enable-vaapi
