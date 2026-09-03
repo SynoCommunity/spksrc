@@ -11,7 +11,7 @@ STARTABLE = no
 HOMEPAGE = https://github.com/intel/compute-runtime
 LICENSE  = MIT license
 
-REQUIRED_MIN_DSM = 6.2.4
+REQUIRED_MIN_DSM = 6
 UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7_ARCHS) $(ARMv7L_ARCHS) $(PPC_ARCHS) $(i686_ARCHS)
 
 SERVICE_USER = auto

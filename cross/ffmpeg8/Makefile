@@ -16,6 +16,14 @@ MIN_GCC_VERSION = 4.9
 include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
+
+# The v4l2 input device uses the multiplanar API (struct v4l2_plane), which Linux grew
+# in 3.2; the 2.6.32 toolchains ship no such header. This was disabled for qoriq by
+# name -- the kernel version is what actually decides it, and it also covers 88f6281
+# and ppc853x.
+ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)
+CONFIGURE_ARGS += --disable-indev=v4l2
+endif
 CONFIGURE_ARGS += --pkg-config=/usr/bin/pkg-config
 CONFIGURE_ARGS += --ranlib=$(RANLIB)
 CONFIGURE_ARGS += --enable-cross-compile --enable-rpath --enable-pic
@@ -157,6 +165,11 @@ CONFIGURE_ARGS += --enable-libspeex
 
 DEPENDS += cross/libsrt
 CONFIGURE_ARGS += --enable-libsrt
+# clock_gettime is in librt until glibc 2.17 and libsrt.so does not declare it; the -lrt
+# from TC_EXTRA_LDFLAGS sits inside --as-needed, too early for ld to keep it.
+ifeq ($(call version_lt,$(TC_GLIBC),2.17),1)
+CONFIGURE_ARGS += --extra-ldflags="-lrt"
+endif
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
@@ -254,12 +267,13 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+# Every PowerPC toolchain in the tree is e500v2: ppc853x and qoriq share the
+# -mcpu=8548 the toolchains declare, and on DSM 5.2 they are the same toolchain
+# (powerpc-none-linux-gnuspe, gcc 4.3.7). Only qoriq was ever listed.
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
-# ffmpeg-7.1 video4linux2 is no longer compatible
-CONFIGURE_ARGS += --disable-indev=v4l2
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
@@ -269,11 +283,17 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-vaapi
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
+
+# libdrm, libva, Intel MediaSDK, and the OpenCL/Vulkan set below all come from the
+# videodriver meta (VIDEODRV_DEPENDS). Asking for any of them where the meta does not
+# exist cannot work -- configure stops at "libmfx not found" -- so the whole section
+# is gated, not just its first lines.
+ifeq ($(call version_ge, $(TCVERSION), 6),1)
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-vaapi
 
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
@@ -295,6 +315,7 @@ DEPENDS += cross/libplacebo
 CONFIGURE_ARGS += --enable-libplacebo
 endif
 
+endif # ifeq TCVERSION >= 6
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk

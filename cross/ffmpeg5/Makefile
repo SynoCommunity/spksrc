@@ -10,8 +10,8 @@ HOMEPAGE = https://www.ffmpeg.org/
 COMMENT  = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library
 LICENSE  = GPLv2
 
-# requires c11 and proper atomic using gcc-4.9+ support
-UNSUPPORTED_ARCHS = $(ARMv5_ARCHS) $(ARMv7L_ARCHS) $(OLD_PPC_ARCHS)
+# Needs C11 and working atomics -- gcc 4.9 or newer
+MIN_GCC_VERSION = 4.9
 
 include ../../mk/spksrc.common.mk
 
@@ -144,6 +144,11 @@ CONFIGURE_ARGS += --enable-libspeex
 
 DEPENDS += cross/libsrt
 CONFIGURE_ARGS += --enable-libsrt
+# clock_gettime is in librt until glibc 2.17 and libsrt.so does not declare it; the -lrt
+# from TC_EXTRA_LDFLAGS sits inside --as-needed, too early for ld to keep it.
+ifeq ($(call version_lt,$(TC_GLIBC),2.17),1)
+CONFIGURE_ARGS += --extra-ldflags="-lrt"
+endif
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
