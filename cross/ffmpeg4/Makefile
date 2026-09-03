@@ -180,6 +180,11 @@ CONFIGURE_ARGS += --enable-libspeex
 
 DEPENDS += cross/libsrt
 CONFIGURE_ARGS += --enable-libsrt
+# clock_gettime is in librt until glibc 2.17 and libsrt.so does not declare it; the -lrt
+# from TC_EXTRA_LDFLAGS sits inside --as-needed, too early for ld to keep it.
+ifeq ($(call version_lt,$(TC_GLIBC),2.17),1)
+CONFIGURE_ARGS += --extra-ldflags="-lrt"
+endif
 
 DEPENDS += cross/flac
 DEPENDS += cross/libtheora
@@ -280,8 +285,6 @@ endif
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=arm
 CONFIGURE_ARGS += --disable-neon
-# Needed for libsrt
-CONFIGURE_ARGS += --extra-ldflags="-lrt"
 endif
 
 ifeq ($(findstring $(ARCH),$(ARMv7_ARCHS) $(ARMv7L_ARCHS)),$(ARCH))
