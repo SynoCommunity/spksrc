@@ -13,10 +13,15 @@ LICENSE  = Apache-2.0
 
 GNU_CONFIGURE = 1
 
-# define missing MAP_ANONYMOUS for older gcc (for test functions in libtap only)
-ifneq ($(findstring $(ARCH), 88f6281 ppc853x),)
+include ../../mk/spksrc.common.mk
+
+# The bundled libtap uses MAP_ANONYMOUS, which the glibc headers shipped with the
+# pre-4.8 toolchains only expose under _DEFAULT_SOURCE -- and libmaxminddb builds
+# with -std=c99, which turns that off. Keyed on the compiler rather than an arch
+# list so x86-5.2 and x64-5.2 (gcc 4.7.3) are covered too; they failed the same
+# way on "MAP_ANONYMOUS undeclared" and were simply never built.
+ifeq ($(call version_lt,$(TC_GCC),4.8),1)
 ADDITIONAL_CFLAGS = -DMAP_ANONYMOUS=0x20
 endif
-
 
 include ../../mk/spksrc.cross-cc.mk

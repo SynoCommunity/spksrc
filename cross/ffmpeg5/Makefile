@@ -250,7 +250,9 @@ CONFIGURE_ARGS += --enable-thumb
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
-ifeq ($(findstring $(ARCH),qoriq),$(ARCH))
+# Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548 --
+# and only qoriq was listed. Inert today: ffmpeg5 needs gcc 4.9, ppc853x has 4.3.7.
+ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
 CONFIGURE_ARGS += --extra-libs=-latomic
@@ -263,11 +265,15 @@ endif
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=x86_64
-CONFIGURE_ARGS += --enable-libdrm
-CONFIGURE_ARGS += --enable-vaapi
 ifeq ($(call version_gt, $(TC_GCC), 5),1)
 CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
+
+# libdrm, libva, MediaSDK and the OpenCL/Vulkan set below all come from the videodriver
+# meta; asking for them where it does not exist stops configure at "libmfx not found".
+ifeq ($(call version_ge, $(TCVERSION), 6),1)
+CONFIGURE_ARGS += --enable-libdrm
+CONFIGURE_ARGS += --enable-vaapi
 
 # libmfx and libvpl cannot be enabled together:
 #   - libmfx (Intel MediaSDK) → Gen6 to Gen11, legacy, maintenance only
@@ -283,6 +289,7 @@ CONFIGURE_ARGS += --enable-opencl
 CONFIGURE_ARGS += --enable-vulkan
 endif
 
+endif # ifeq TCVERSION >= 6
 endif # ifeq x64_ARCHS
 
 include ../../mk/spksrc.cross-cc.mk

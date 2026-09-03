@@ -1,0 +1,32 @@
+Guard the in-function diagnostic pragmas with the right gcc version.
+
+format.c wraps its xasprintf calls in `#pragma GCC diagnostic push/ignored/pop`
+to silence -Wformat-nonliteral, guarded by _GL_GNUC_PREREQ (4, 3). gcc accepted
+`#pragma GCC diagnostic` at file scope from 4.2, but only gained push/pop and
+in-function placement in 4.6, so 4.3 to 4.5 reject it outright:
+
+  format.c:355: error: #pragma GCC diagnostic not allowed inside functions
+
+Raise the guard to 4.6. On ppc853x-5.2 (gcc 4.3.7) the pragmas are then skipped
+along with the warning they suppress; every other toolchain is unaffected.
+
+--- src/format.c
++++ src/format.c
+@@ -351,7 +351,7 @@
+       *p = '\0';
+ 
+       /* Our constructed format string in fstart is safe.  */
+-#if _GL_GNUC_PREREQ (4, 3) || defined __clang__
++#if _GL_GNUC_PREREQ (4, 6) || defined __clang__
+ # pragma GCC diagnostic push
+ # pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ #endif
+@@ -381,7 +381,7 @@
+         default:
+           abort ();
+         }
+-#if _GL_GNUC_PREREQ (4, 3) || defined __clang__
++#if _GL_GNUC_PREREQ (4, 6) || defined __clang__
+ # pragma GCC diagnostic pop
+ #endif
+ 

@@ -12,6 +12,14 @@ HOMEPAGE = https://zeromq.org/
 COMMENT  = ZeroMQ (also known as ØMQ, 0MQ, or zmq) looks like an embeddable networking library but acts like a concurrency framework. It gives you sockets that carry atomic messages across various transports like in-process, inter-process, TCP, and multicast. 
 LICENSE  = GPLv3
 
+include ../../mk/spksrc.common.mk
+
+# CMakeLists.txt adds -std=c++11 once the compiler merely ACCEPTS the flag: gcc 4.7 does,
+# without implicit noexcept on destructors. Pin it instead -- 4.6 and older already build.
+ifeq ($(call version_lt,$(TC_GCC),4.8),1)
+ADDITIONAL_CXXFLAGS += -std=gnu++98
+endif
+
 include ../../mk/spksrc.cross-cmake.mk
 
 # Flags to be added to CMake toolchain file
