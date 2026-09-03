@@ -1,0 +1,37 @@
+Drop a doc comment that contradicts the code it documents.
+
+The block comment on _audio_filters_get_filters() says of the aresample
+segment:
+
+    (in this source the condition is written as never taken; adjust if you
+     re-enable rate mismatch handling here)
+
+The condition is taken.  It reads
+
+    if ((self->iavctx->sample_rate != self->oavctx->sample_rate) &&
+        str_snprintf(sample_rate, sizeof(sample_rate), "aresample=%d",
+                     self->oavctx->sample_rate))
+        return -1;
+
+so "aresample=<rate>" is emitted whenever the input and output sample rates
+differ -- which is the normal case for any profile that resamples.  The note
+presumably survived an earlier revision where the segment was stubbed out.
+
+Documentation only; no generated filter string changes.
+
+Reported upstream against PR #2117.
+
+--- src/transcoding/transcode/audio.c.orig
++++ src/transcoding/transcode/audio.c
+@@ -160,9 +160,8 @@ _audio_requires_asetpts(TVHContext *self)
+  *
+  * Pieces (in join order):
+  * - @c asetpts=N/SR/TB — normalizes PTS on the audio link (sample rate / time base).
+- * - Optional @c aresample=@<output_sample_rate@> when input and output sample rates
+- *   differ (in this source the condition is written as never taken; adjust if you
+- *   re-enable rate mismatch handling here).
++ * - Optional @c aresample=@<output_sample_rate@> when input and output sample
++ *   rates differ.
+  * - Optional @c aformat=… when input and output differ in @c sample_fmt and/or
+  *   channel count: adds @c sample_fmts=… and/or @c channel_layouts=… as required
+  *   by the @c aformat filter.
