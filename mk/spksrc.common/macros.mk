@@ -109,25 +109,20 @@ merge = $(shell /bin/bash -c '\
 # parse-time $(error), and make's own "*** ... Stop.", in the log. Setting LOGGING_ENABLED
 # for the child makes this the only teeing level, so the inner LOG_WRAPPED stages take
 # their pass-through branch and nothing is written twice.
-define run_logged
+define _runlog
 if [ -z "$$LOGGING_ENABLED" ]; then \
-    LOGGING_ENABLED=1 script -q -e -c '$(1)' /dev/null \
+    LOGGING_ENABLED=1 script -q -e -c "$(1)" /dev/null \
         | tee >(sed -r "s/\x1B\[[0-9;]*[mK]//g; s/\r//g" >> "$(2)") ; \
 else \
     $(1) ; \
 fi
 endef
 
+# The goal-shaped facade over _runlog: builds the make command itself, writes to
+# DEFAULT_LOG, and reports the failure. bash -o pipefail rather than `set -o pipefail`
+# because these call sites keep the default /bin/sh -e as their SHELL.
 define LOG_WRAPPED
-@bash -o pipefail -c '\
-    if [ -z "$$LOGGING_ENABLED" ]; then \
-        export LOGGING_ENABLED=1 ; \
-        script -q -e -c "$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1)" /dev/null \
-            | tee >(sed -r "s/\x1B\[[0-9;]*[mK]//g; s/\\r//g" >> "$(DEFAULT_LOG)") ; \
-    else \
-        $(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1) ; \
-    fi \
-' || { \
+@bash -o pipefail -c '$(call _runlog,$(MAKE) -f $(firstword $(MAKEFILE_LIST)) $(1),$(DEFAULT_LOG))' || { \
     $(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s - FAILED\n" \
         "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$(ARCH)-$(TCVERSION)" "$(1)") \
         | tee --append $(STATUS_LOG) ; \
