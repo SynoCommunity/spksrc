@@ -38,6 +38,23 @@ frame, so no QSV frame reaches this point with pts unset (0 firings of the
 guard across the QSV run). The substitution is therefore correct on every path
 that can actually trigger it, but it is a latent hazard if that ever changes.
 
+Confirmed on the reporting hardware across all three paths. The substituted
+value is exact every time -- one frame at 30000/1001 is 3003 ticks at 90 kHz:
+
+    sub    profile           first pkt   using dts   next frame pts
+    0008   hevc-vaapi        I           106264      109267
+    0009   hevc (software)   B            33720       36723
+
+and no "Invalid pts" fired anywhere. QSV never triggered the substitution on
+any of its attempts, so the time-base hazard above stayed unreachable in
+practice.
+
+The defect is intermittent rather than per-path: it depends on whether an
+untimed frame actually surfaces from the decoder at the moment the subscription
+joins the stream. A VAAPI run that joined on a P frame produced no untimed
+frame at all -- the decoder had no reference and discarded everything until the
+next key frame, by which point timestamps were sound again.
+
 Not introduced by PR #2117: the guard is identical in master (45cbe4adb).
 
 Left alone deliberately: self->pts is seeded to 0 by the calloc of TVHContext,
