@@ -1,0 +1,94 @@
+Keep discarding leading audio until a picture has actually been delivered.
+
+Extends 107. Applies on top of it, and the two are meant to be measured
+separately: 107 alone closes the hold-queue window, 107 + this one closes both.
+
+107 filters the hold queue at release time, which turned out to cover only part
+of the problem. Four recordings per profile, offset between the first audio
+packet and the first picture:
+
+    profile      before 107       with 107 (4 runs)        median
+    software        534 ms        18, 91, 169, 226 ms      130 ms
+    vaapi          1391 ms        269, 283, 430, 1052 ms   356 ms
+    qsv            1368 ms        78, 78, 92, 110 ms        85 ms
+
+QSV is consistent and software is much improved, but one VAAPI run came back at
+1052 ms -- essentially the pre-patch figure. The cause is the release itself:
+gh_passthru is armed as soon as the hold queue drains, and from then on every
+packet is forwarded unfiltered. The audio encoder is still running ahead of the
+video one, so whatever audio arrives between the release and the first picture
+slips out in front of it and re-opens the gap 107 had just closed. How much
+depends on how those two moments happen to line up, which is why the spread is
+widest on VAAPI, the slowest path to a first frame.
+
+So gh_passthru does not mean "a picture has been delivered". This patch adds
+that as a separate condition: leading audio keeps being discarded until a video
+packet has actually gone out, in the hold queue or after it. The flag resets on
+SMT_START so a re-started stream is treated afresh.
+
+A note on the alternative. Holding the audio instead of discarding it does not
+work: holding does not alter timestamps, so releasing it later still hands the
+client audio stamped earlier than the first picture and the player still shows
+a blank frame. Making it work would mean shifting the audio timestamps forward,
+which desynchronises sound from picture. Discarding is the only variant that
+closes the gap without touching synchronisation -- at the cost of the leading
+audio, which is what makes this a design decision rather than an obvious fix.
+
+Untested at runtime. The measurement to make is the same one: record with curl
+and compare the first audio and first video timestamps.
+
+Not introduced by PR #2117: globalheaders.c is untouched by it.
+--- src/plumbing/globalheaders.c.orig
++++ src/plumbing/globalheaders.c
+@@ -27,6 +27,7 @@
+   struct th_pktref_queue gh_holdq;
+   streaming_start_t *gh_ss;
+   int gh_passthru;
++  int gh_video_seen;   /* a picture has reached the output */
+ } globalheaders_t;
+ 
+ // note: there up to 2.5 sec diffs in some sources!
+@@ -480,6 +481,10 @@
+           if (skip) {
+             pkt_trace(LS_GLOBALHEADERS, pkt, "drop, precedes first picture");
+           } else {
++            ssc = streaming_start_component_find_by_index(gh->gh_ss,
++                                            pkt->pkt_componentindex);
++            if (ssc && SCT_ISVIDEO(ssc->es_type))
++              gh->gh_video_seen = 1;
+             sm = streaming_msg_create_pkt(pkt);
+             streaming_target_deliver2(gh->gh_output, sm);
+           }
+@@ -529,6 +534,7 @@
+   case SMT_START:
+     /* stop */
+     gh->gh_passthru = 0;
++    gh->gh_video_seen = 0;
+     gh_flush(gh);
+     /* restart */
+     gh_start(gh, sm);
+@@ -553,6 +559,24 @@
+     break;
+   case SMT_PACKET:
+     pkt = sm->sm_data;
++    /* Extends the hold-queue filter past the release. Arming gh_passthru does
++       not mean a picture has been delivered: on a transcoded stream the audio
++       encoder keeps running ahead while the video side is still producing its
++       first frame, so audio that arrives in this window would slip out in
++       front of it and re-open the very gap the release-time filter closed.
++       Keep discarding it until a picture has actually gone out. */
++    if (!gh->gh_video_seen && pkt->pkt_payload) {
++      streaming_start_component_t *vssc =
++        streaming_start_component_find_by_index(gh->gh_ss,
++                                                pkt->pkt_componentindex);
++      if (vssc && SCT_ISVIDEO(vssc->es_type)) {
++        gh->gh_video_seen = 1;
++      } else if (vssc) {
++        pkt_trace(LS_GLOBALHEADERS, pkt, "drop, no picture delivered yet");
++        streaming_msg_free(sm);
++        break;
++      }
++    }
+     if (pkt->pkt_payload || pkt->pkt_err)
+       streaming_target_deliver2(gh->gh_output, sm);
+     else
