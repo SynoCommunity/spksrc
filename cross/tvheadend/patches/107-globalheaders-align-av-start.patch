@@ -1,0 +1,117 @@
+Start the audio and video tracks together on a transcoded stream.
+
+DEMONSTRATION PATCH -- the mechanism is measured, the remedy is one of two
+possible ones and is offered for discussion rather than as a settled fix. See
+the trade-off at the end.
+
+Recording the output of three profiles with curl and reading the Matroska
+blocks directly shows the audio track beginning well before the first picture:
+
+    profile      video starts   audio starts   offset
+    software        534 ms          0 ms       + 534 ms
+    vaapi          1391 ms          0 ms       +1391 ms
+    qsv            1368 ms          0 ms       +1368 ms
+
+After that the streams are clean: zero gaps above 50 ms across all three
+recordings, frame spacing a steady 33-34 ms. The only anomaly is the start.
+
+The delay is not in the transcoder. Timing the logs from the moment the codec
+profile is picked:
+
+    profile      filter graph    first frame   dimension errors
+    software        +509 ms        +538 ms           0
+    vaapi          +1193 ms       +1216 ms          27
+    qsv            +1244 ms       +1331 ms           0
+
+Only 23 to 87 ms separate the filter graph being configured from the first
+frame coming out of it. Everything before that is the MPEG-2 decoder waiting
+for a sequence header from the source, which is where the width and height come
+from; until it arrives the decoder rejects every picture it is handed
+("AVCodecContext: Invalid frame dimensions 0x0" -- mpeg12dec.c, emitted on the
+VAAPI run only, but the same wait happens silently on the others).
+
+Meanwhile the audio encoder is producing packets from the first moment, so
+globalheaders releases its hold queue with several hundred milliseconds of
+audio ahead of the first picture. The client plays sound over a blank or frozen
+frame until video catches up.
+
+This patch drops the audio that precedes the first picture when the queue is
+released. Nothing is delayed, no video is touched, and an audio-only
+subscription (no video in the queue at all) is released unchanged.
+
+The trade-off, and why this is a demonstration. Discarding leading audio means
+the stream starts at the first picture and loses up to ~1.4 s of sound that the
+source did provide. The alternative is to hold the audio instead of dropping
+it, so nothing is lost but start-up latency grows by the same amount. Which is
+right depends on whether a live stream should favour immediacy or completeness
+-- a judgement for the transcoding design rather than for packaging.
+
+A third option addresses the cause rather than the symptom: do not build the
+transcode chain until elementary_info_t carries the geometry, or hold packets
+back from the decoder until the first sequence header. That would not shorten
+the wait, which comes from the source, but it would stop 27 doomed packets
+being pushed through the decoder first.
+
+Not introduced by PR #2117: globalheaders.c is untouched by it.
+
+--- src/plumbing/globalheaders.c.orig
++++ src/plumbing/globalheaders.c
+@@ -440,13 +440,52 @@ gh_hold(globalheaders_t *gh, streaming_message_t *sm)
+ 				   streaming_start_copy(gh->gh_ss));
+     streaming_target_deliver2(gh->gh_output, sm);
+ 
+-    // Send all pending packets
+-    while((pkt = pktref_get_first(&gh->gh_holdq)) != NULL) {
+-      if (pkt->pkt_payload) {
+-        sm = streaming_msg_create_pkt(pkt);
+-        streaming_target_deliver2(gh->gh_output, sm);
++    /* The hold queue usually starts with audio: on a transcoded stream the
++       audio encoder produces its first packet while the video side is still
++       waiting for the source to deliver a sequence header, so video only joins
++       0.5 to 1.5 s later. Releasing the queue as-is hands the client a stream
++       whose audio begins well before its first picture -- measured on one
++       source: audio at 0 ms against video at 534 ms (software), 1391 ms
++       (VAAPI), 1368 ms (QSV).
++
++       Drop the audio that precedes the first picture so both tracks start
++       together. Nothing is delayed and no video is touched; only leading audio
++       with nothing to show alongside it is discarded. If the queue holds no
++       video at all -- an audio-only subscription -- everything is released
++       unchanged. */
++    {
++      th_pktref_t *pr;
++      int64_t first_video_pts = PTS_UNSET;
++
++      TAILQ_FOREACH(pr, &gh->gh_holdq, pr_link) {
++        ssc = streaming_start_component_find_by_index(gh->gh_ss,
++                                        pr->pr_pkt->pkt_componentindex);
++        if (ssc && SCT_ISVIDEO(ssc->es_type)) {
++          first_video_pts = pr->pr_pkt->pkt_pts;
++          break;
++        }
++      }
++
++      // Send all pending packets
++      while((pkt = pktref_get_first(&gh->gh_holdq)) != NULL) {
++        if (pkt->pkt_payload) {
++          int skip = 0;
++          if (first_video_pts != PTS_UNSET) {
++            ssc = streaming_start_component_find_by_index(gh->gh_ss,
++                                            pkt->pkt_componentindex);
++            skip = ssc && !SCT_ISVIDEO(ssc->es_type) &&
++                   pkt->pkt_pts != PTS_UNSET &&
++                   pkt->pkt_pts < first_video_pts;
++          }
++          if (skip) {
++            pkt_trace(LS_GLOBALHEADERS, pkt, "drop, precedes first picture");
++          } else {
++            sm = streaming_msg_create_pkt(pkt);
++            streaming_target_deliver2(gh->gh_output, sm);
++          }
++        }
++        pkt_ref_dec(pkt);
+       }
+-      pkt_ref_dec(pkt);
+     }
+     gh->gh_passthru = 1;
+     break;
