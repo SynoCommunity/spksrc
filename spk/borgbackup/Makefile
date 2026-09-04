@@ -6,10 +6,9 @@ SPK_ICON = src/borgbackup.png
 # Include common.mk first to get ARCH definitions
 include ../../mk/spksrc.common.mk
 
-# Build for ARMv5 and ARMv7L using Python 3.11; all others use Python 3.14
-# This must be set BEFORE including spksrc.spk-meta.mk to avoid adding
-# ARMv5 to UNSUPPORTED_ARCHS when using python314
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),)
+# python314 needs gcc >= 4.8 (its MIN_GCC_VERSION); older toolchains use 3.11.
+# Must be set before spksrc.spk-meta.mk, which would otherwise gate the arch out.
+ifeq ($(call version_lt,$(TC_GCC),4.8),1)
 PYTHON_PACKAGE = python311
 else
 PYTHON_PACKAGE = python314
