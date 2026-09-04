@@ -1,0 +1,68 @@
+=============================================================================
+ Audio/video start alignment -- 106, 107 and 108 together
+=============================================================================
+
+Symptom: a transcoded stream begins with sound over a blank or frozen picture,
+half a second to a second and a half of it, on every encoder path.
+
+Cause, measured rather than assumed. The video decoder cannot produce anything
+until the source delivers an MPEG-2 sequence header, which is where width and
+height come from; timing the logs, only 23 to 87 ms separate the filter graph
+being configured from the first frame leaving it, so essentially the whole wait
+is that. The audio encoder meanwhile runs from the first moment. Two things
+then let its output reach the client ahead of any picture:
+
+  - globalheaders releases its hold queue as soon as headers are complete, and
+    that queue holds several hundred ms of audio with no picture beside it;
+  - after the release gh_passthru forwards everything unfiltered, and the audio
+    encoder lags the video one on the delivery clock while stamping its output
+    with the original stream times -- so audio arrives *after* the first picture
+    carrying a pts *before* it.
+
+Each patch closes one part, and none of them substitutes for another:
+
+  106  video.c        recovers the first frame's timestamp from its dts so the
+                      monotonicity guard stops discarding it. Without it the
+                      first picture is one frame later, which is 3003 ticks
+                      more audio for 107 and 108 to discard.
+  107  globalheaders  drops audio stamped before the first picture when the
+                      hold queue is released.
+  108  globalheaders  keeps that same timestamp test running past the release,
+                      so late-arriving early-stamped audio is caught too.
+
+Offset between the first audio packet and the first picture, measured by
+recording the stream with curl and reading the Matroska blocks. Negative means
+the picture comes first, which is what a viewer wants:
+
+    step                  SOFTWARE        VAAPI          QSV
+                          med / worst     med / worst    med / worst
+    none                   534 / 534      1391 / 1391    1368 / 1368
+    107 alone              130 / 226       356 / 1052       85 / 110
+    107 + 108 (flag)       280 / 295       304 /  385       53 /  93
+    107 + 108 (pts)        -11 /   -5       -9 /    0      -18 /   -2
+
+Five runs per encoder in the final row, fifteen measurements, every one of them
+at or below zero -- no run left with audio ahead of the picture.
+
+The middle row is kept because it is instructive. That version of 108 gated on
+"have we delivered a picture yet" instead of comparing timestamps. It removed
+the VAAPI worst case, 1052 down to 385 ms, and did nothing at all for software,
+because a flag is set by the first picture and then lets through the audio that
+arrives behind it stamped earlier. Reading one software recording in file write
+order shows it plainly:
+
+    VIDEO  pts  572 ms     <- delivered first
+    audio  pts  277 ms
+    audio  pts  298 ms      ... six of them, all stamped ahead of that picture
+
+The timestamp comparison is the whole point, and 107 already had it right.
+
+Cost: the leading audio is discarded, up to about 1.4 s of sound the source did
+provide. Holding it instead does not work -- holding does not alter timestamps,
+so a later release still stamps it ahead of the first picture and the player
+still shows a blank frame. Making that work would mean shifting audio
+timestamps forward, which desynchronises sound from picture. Discarding is the
+only variant that closes the gap without touching synchronisation.
+
+None of this is introduced by PR #2117: video.c's guard and globalheaders.c are
+both identical in master (45cbe4adb).
