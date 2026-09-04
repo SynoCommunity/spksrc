@@ -135,6 +135,15 @@ If you only read one thing, read this. The details are in the dated log below.
       the rule `SPK_FOLDER` already states in `spksrc.rules/pre-check.mk`. The
       hand-maintained fixup list in `prepare.sh` (`nzbdrone -> sonarr3`,
       `python -> python2`, both stale) is removed with it.
+    - **Confirmed:** with DSM 5.2 switched on for the run, `cross/ffmpeg4` -- the only
+      package in the tree with no `MIN_GCC_VERSION`, and so the only one that reaches
+      a pre-2.17 toolchain -- built on both, with its workaround removed:
+
+        ```
+        ffmpeg4: (ppc853x-5.2) DONE      glibc 2.8, gcc 4.3.7
+        ffmpeg4: (88f6281-5.2) DONE      glibc 2.15, gcc 4.6.4
+        ```
+
     - Documented in
       [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
     - Pull request: [#7433](https://github.com/SynoCommunity/spksrc/pull/7433)
