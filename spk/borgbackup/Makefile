@@ -43,7 +43,6 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # # with Python 3.14. Use the pure and cross requirement files as the base for your PR.
 
 # Wheels: Python requirements vary by architecture
-# ARMv5 uses rpds_py pinned to 0.21.0 for Cargo.lock v3 compatibility with Rust 1.77.2
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += src/requirements-pure-armv5.txt src/requirements-crossenv-armv5.txt
 else
@@ -104,18 +103,15 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=gnu99
 endif
 
-# [rpds-py] — capped by Rust toolchain version per architecture.
-# jsonschema >= 4.26 requires rpds-py >= 0.25 — pinned to match.
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS += rpds_py==0.21.0
-WHEELS += jsonschema==4.25.1
-else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+# rpds-py >= 0.25 pulls Rust edition 2024 crates (rustc >= 1.85), and jsonschema
+# >= 4.26 requires rpds-py >= 0.25; below that floor both pin back one release.
+ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
+WHEELS += rpds_py==0.30.0
+WHEELS += jsonschema==4.26.0
+else
 export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
 WHEELS += rpds_py==0.24.0
 WHEELS += jsonschema==4.25.1
-else
-WHEELS += rpds_py==0.30.0
-WHEELS += jsonschema==4.26.0
 endif
 
 include ../../mk/spksrc.spk-meta.mk
