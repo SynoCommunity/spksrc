@@ -55,6 +55,12 @@ joins the stream. A VAAPI run that joined on a P frame produced no untimed
 frame at all -- the decoder had no reference and discarded everything until the
 next key frame, by which point timestamps were sound again.
 
+Still worth carrying alongside 107 and 108, which close the audio/video
+start-up gap downstream in globalheaders.c. They do not overlap: this one acts
+on a frame entering the encoder, they act on packets leaving for the client.
+Without it the first picture lands one frame later, so 107 and 108 discard
+3003 ticks more audio than they need to. See 106-108-av-start-HOWTO.txt.
+
 Not introduced by PR #2117: the guard is identical in master (45cbe4adb).
 
 Left alone deliberately: self->pts is seeded to 0 by the calloc of TVHContext,
