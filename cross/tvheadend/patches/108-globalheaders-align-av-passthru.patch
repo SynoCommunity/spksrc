@@ -41,9 +41,18 @@ gh_first_video_pts is seeded to PTS_UNSET at creation -- calloc would leave it
 at 0, a legitimate timestamp -- and reset in gh_flush(), which is the one place
 every stop and restart path goes through.
 
-Untested at runtime. Same measurement as before: record with curl, compare the
-first audio and first video timestamps, several runs per profile since the
-spread between runs is wide.
+Final measurement, five runs per encoder, offset between the first audio packet
+and the first picture (negative = picture first, which is what a viewer wants):
+
+    step                  SOFTWARE        VAAPI          QSV
+                          med / worst     med / worst    med / worst
+    none                   534 / 534      1391 / 1391    1368 / 1368
+    107 alone              130 / 226       356 / 1052       85 / 110
+    107 + 108 (flag)       280 / 295       304 /  385       53 /  93
+    107 + 108 (pts)        -11 /   -5       -9 /    0      -18 /   -2
+
+Fifteen measurements in the final row, every one at or below zero. See
+106-108-av-start-HOWTO.txt for how the three patches divide the problem.
 
 Not introduced by PR #2117: globalheaders.c is untouched by it.
 
