@@ -1,0 +1,73 @@
+Recover the first frame's timestamp instead of dropping the frame.
+
+Every software and VAAPI subscription discards exactly one frame at start-up:
+
+    01:H264: [mpeg2video => libx264]: Invalid pts (-9223372036854775808) <= last (0), dropping frame
+    01:H264: [mpeg2video => libx264]: encode error 1/50
+
+-9223372036854775808 is INT64_MIN, i.e. AV_NOPTS_VALUE. Across a full test run
+every one of the 14 firings of that guard was an untimed frame; not one was a
+genuine ordering violation.
+
+Root cause, from trace-level logs. av_parser_parse2() emits the first frame of
+a stream with no timestamps at all, even though the packet fed to it carried
+both:
+
+    before av_parser_parse2  pkt->pkt_dts 68709      pkt->pkt_pts 77718
+    after  av_parser_parse2  out_pkt->pkt_dts <unset>  out_pkt->pkt_pts <unset>
+
+Every later packet passes through intact (71712 -> 71712). The decoder then
+produces a frame whose pts is AV_NOPTS_VALUE but whose dts still holds a usable
+value, and the monotonicity guard in tvh_video_context_encode() reads INT64_MIN
+as "older than everything" and throws the frame away:
+
+    Decoded frame: pts=-9223372036854775808, dts=77718, duration=0
+    Decoded frame: pts=80721,                dts=80721, duration=0
+    Decoded frame: pts=83724,                dts=83724, duration=0
+
+The recovered dts is not an approximation: 77718 + 3003 = 80721 exactly, 3003
+being one frame at 30000/1001 in 90 kHz units. So fill the missing pts from the
+dts before the guard runs.
+
+Caveat, and the reason this is worth testing before trusting. On the QSV path
+the same frame carries pts and dts in *different* time bases -- vpp_qsv outputs
+in 1001/30000 while dts stays in 1/90000, giving pts=13 alongside dts=51580.
+Copying dts into pts there would be wrong. It is currently unreachable: the
+mpeg2_qsv hardware decoder has pipeline latency and absorbs the untimed first
+frame, so no QSV frame reaches this point with pts unset (0 firings of the
+guard across the QSV run). The substitution is therefore correct on every path
+that can actually trigger it, but it is a latent hazard if that ever changes.
+
+Not introduced by PR #2117: the guard is identical in master (45cbe4adb).
+
+Left alone deliberately: self->pts is seeded to 0 by the calloc of TVHContext,
+and 0 is a legitimate timestamp, so a stream whose first frame genuinely starts
+there would also be discarded. Fixing that means seeding with AV_NOPTS_VALUE,
+which is not safe here -- tvh_audio_context_decode() shares the field and
+computes "drift = new_pts - prev_pts", which would overflow from INT64_MIN. It
+needs a video-only "first frame seen" flag instead, which is a wider change
+than this.
+
+--- src/transcoding/transcode/video.c.orig
++++ src/transcoding/transcode/video.c
+@@ -598,6 +598,20 @@ tvh_video_context_encode(TVHContext *self, AVFrame *avframe)
+             avframe->pts, avframe->pkt_dts, *frame_duration);
+     }
+ 
++    /* av_parser_parse2() emits the first frame of a stream with no timestamps
++       at all -- both pts and dts come back unset even though the packet fed to
++       it carried them -- so the decoder hands us a frame whose pts is
++       AV_NOPTS_VALUE while its dts still holds the right value. Since
++       AV_NOPTS_VALUE is INT64_MIN, the monotonicity test below reads such a
++       frame as older than everything and discards it. Take the dts instead:
++       measured on a 30000/1001 source the recovered value was 77718 and the
++       next frame arrived at 80721, exactly one frame later. */
++    if (avframe->pts == AV_NOPTS_VALUE && avframe->pkt_dts != AV_NOPTS_VALUE) {
++        tvh_context_log(self, LOG_DEBUG,
++                        "frame has no pts, using dts (%"PRId64")", avframe->pkt_dts);
++        avframe->pts = avframe->pkt_dts;
++    }
++
+     if (avframe->pts <= self->pts) {
+         tvh_context_log(self, LOG_WARNING,
+                         "Invalid pts (%"PRId64") <= last (%"PRId64"), dropping frame",
