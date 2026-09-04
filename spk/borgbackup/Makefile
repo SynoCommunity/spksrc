@@ -14,7 +14,9 @@ else
 PYTHON_PACKAGE = python314
 endif
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# borg's setup.py hardcodes -Wno-unreachable-code-fallthrough; gcc ignores an
+# unknown -Wno- option only from 4.6 on, and errors out in cc1 before that.
+MIN_GCC_VERSION = 4.6
 
 DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 cross/xxhash cross/zstd
 
