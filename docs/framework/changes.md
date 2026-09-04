@@ -59,8 +59,10 @@ If you only read one thing, read this. The details are in the dated log below.
   once in **`TC_EXTRA_BUILD_FLAGS`**; the framework folds it into every
   `TC_EXTRA_<LANG>FLAGS` and the link, so C, C++, Fortran and the linker all
   agree on the ABI. Link-time libraries (`-lrt`, `-latomic`) live in
-  **`TC_EXTRA_LDFLAGS`**, `-latomic` auto-dropped where the gcc lacks it and both
-  linked `--as-needed` so a binary depends on them only when it truly uses them.
+  **`TC_EXTRA_LDFLAGS`** and are passed plainly, with `-latomic` auto-dropped
+  where the gcc lacks it. They are *not* wrapped in `--as-needed`: `LDFLAGS`
+  precedes the objects, so a front-placed library there resolves nothing yet and
+  the wrap discarded it outright.
   See [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
 
 - **Build a host tool once, host it, reuse it.** A native package hosts its build
@@ -80,6 +82,71 @@ If you only read one thing, read this. The details are in the dated log below.
   shows which are active for your arch.
 
 ---
+
+??? note "September 4th 2026 — Link librt and libatomic instead of discarding them (#7433)"
+    - **What:** `TC_EXTRA_LDFLAGS` no longer wraps `-lrt` / `-latomic` in
+      `-Wl,--as-needed ... -Wl,--no-as-needed`:
+
+        ```makefile
+        TC_EXTRA_LDFLAGS = $(TC_EXTRA_BUILD_FLAGS) $(_tc_ld_syslibs)
+        ```
+
+    - **Why:** `--as-needed` keeps a library only if it resolves a symbol that is
+      *already* undefined when the linker reaches it. `LDFLAGS` is placed **before**
+      the objects and libraries being linked, so nothing is undefined yet and the
+      bracketed `-lrt` was dropped every time. The declaration introduced by #7314
+      was therefore inert — measurably identical to declaring nothing:
+
+        ```
+        -Wl,--as-needed -lrt -Wl,--no-as-needed ... -lsrt
+            -> undefined reference to `clock_gettime'
+        (nothing declared at all)              ... -lsrt
+            -> undefined reference to `clock_gettime'
+        -lrt                                   ... -lsrt
+            -> links, DT_NEEDED librt
+        ```
+
+    - **How it surfaced:** on glibc &lt; 2.17 toolchains (`ppc853x-5.2`,
+      `88f6281-5.2`, `88f6281-6.1`), `libsrt.so` calls `clock_gettime` without
+      declaring it. ffmpeg reported the resulting link failure as
+      `ERROR: srt >= 1.3.0 not found using pkg-config`, which reads as a missing
+      dependency rather than a missing library.
+    - **Package-facing:** the five per-package workarounds it forced are gone —
+      `cross/ffmpeg4` through `cross/ffmpeg8` each carried
+
+        ```makefile
+        ifeq ($(call version_lt,$(TC_GLIBC),2.17),1)
+        CONFIGURE_ARGS += --extra-ldflags="-lrt"
+        endif
+        ```
+
+      to put back what the toolchain had already declared. A package should not have
+      to re-declare a toolchain library; if you have such a workaround, drop it.
+    - **Cost:** one `DT_NEEDED` entry on binaries that never call into `librt` or
+      `libatomic`. Both are part of the toolchain's own runtime and present on every
+      target that ships them.
+    - **Also in this PR:** `dependency-list` now keys its output on the package
+      **folder** instead of `$(NAME)`. Three packages set `SPK_NAME` to something
+      else — `spk/ffmpeg4` (`ffmpeg`), `spk/mkvtoolnix_22` (`mkvtoolnix`),
+      `spk/mono_58` (`mono`) — while every consumer of the list already looked the
+      key up as a directory (`.github/actions/prepare.sh`, `spk-meta/base.mk`). The
+      three silently fell out of the CI build matrix, and the latter two collided
+      with the `mkvtoolnix` / `mono` folders that still exist beside them. This is
+      the rule `SPK_FOLDER` already states in `spksrc.rules/pre-check.mk`. The
+      hand-maintained fixup list in `prepare.sh` (`nzbdrone -> sonarr3`,
+      `python -> python2`, both stale) is removed with it.
+    - **Confirmed:** with DSM 5.2 switched on for the run, `cross/ffmpeg4` -- the only
+      package in the tree with no `MIN_GCC_VERSION`, and so the only one that reaches
+      a pre-2.17 toolchain -- built on both, with its workaround removed:
+
+        ```
+        ffmpeg4: (ppc853x-5.2) DONE      glibc 2.8, gcc 4.3.7
+        ffmpeg4: (88f6281-5.2) DONE      glibc 2.15, gcc 4.6.4
+        ```
+
+    - Documented in
+      [Extra flags a toolchain can declare](../framework/toolchain.md#extra-flags-a-toolchain-can-declare).
+    - Pull request: [#7433](https://github.com/SynoCommunity/spksrc/pull/7433)
 
 ??? note "August 17th 2026 — Custom from-source Rust toolchains, and the overlay family (#7353)"
     - **What:** the archs `rustup` ships no usable prebuilt `rust-std` for now build
@@ -213,7 +280,9 @@ If you only read one thing, read this. The details are in the dated log below.
       `gcc -print-file-name=libatomic.so`. Both are wrapped in
       `-Wl,--as-needed ... -Wl,--no-as-needed` so, now that they are declared
       toolchain-wide, a binary records a `librt` / `libatomic` dependency only when
-      it truly references one.
+      it truly references one. **The wrap was removed in #7433** — see the
+      September 4th 2026 entry: it discarded both libraries instead of pruning
+      them.
     - **Why:** passing the ABI only through `CFLAGS` silently built C++ / Fortran
       objects with a different ABI than the C they link against, and the rt/atomic
       arch lists had to be rechecked by hand each time a toolchain moved.

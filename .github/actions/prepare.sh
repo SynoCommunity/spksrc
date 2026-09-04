@@ -165,14 +165,6 @@ for package in ${GH_DEPENDENCY_FOLDERS}; do
     SPK_TO_BUILD+=" ${found}"
 done
 
-# Fix for packages with different names
-if [ "$(echo "${SPK_TO_BUILD}" | grep -o ' nzbdrone ')" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "^nzbdrone$" | tr '\n' ' ')" sonarr3"
-fi
-if [ "$(echo "${SPK_TO_BUILD}" | grep -o ' python ')" != "" ]; then
-    SPK_TO_BUILD=$(echo "${SPK_TO_BUILD}" | tr ' ' '\n' | grep -v "^python$" | tr '\n' ' ')" python2"
-fi
-
 # Remove duplicate packages
 packages=$(printf '%s' "${SPK_TO_BUILD}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 

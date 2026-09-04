@@ -95,13 +95,21 @@ instead, and so never needs the library — and handing `-latomic` to such a gcc
 fatal *"cannot find -latomic"*. A toolchain lists `-latomic` in its
 `TC_EXTRA_LDFLAGS`; the framework drops it where it would not resolve.
 
-Because these libraries are declared toolchain-wide, they reach every link even
-though most binaries call neither `clock_gettime` nor an atomic builtin. The
-framework therefore wraps them in `-Wl,--as-needed ... -Wl,--no-as-needed`, so the
-linker records a `librt` / `libatomic` dependency only where the objects actually
-reference a symbol it provides. The wrap is scoped to just these two libraries —
-it restores the default immediately after — so it never drops a package library
-that is present only for its side effects.
+These libraries are declared toolchain-wide, so they reach every link even though
+most binaries call neither `clock_gettime` nor an atomic builtin. They are
+nonetheless passed **plainly**, not wrapped in `-Wl,--as-needed`.
+
+`--as-needed` keeps a library only if, *at the point the linker sees it*, it
+resolves an already-undefined symbol. `LDFLAGS` is placed **before** the objects
+and libraries being linked, so at that point nothing is undefined yet: a
+front-placed `-lrt` inside an `--as-needed` bracket is always discarded, and a
+later `-lsrt` that needs `clock_gettime` then fails with *undefined reference*.
+The wrap was therefore not a refinement of the declaration but a silent deletion
+of it — exactly equivalent to declaring nothing at all.
+
+Linking them plainly costs one `DT_NEEDED` entry on binaries that do not call
+into them. That is the correct trade: `librt` and `libatomic` are part of the
+toolchain's own runtime and are present on every target that has them.
 
 ## tc_vars Files
 
