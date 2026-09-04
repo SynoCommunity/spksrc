@@ -39,6 +39,21 @@ This patch drops the audio that precedes the first picture when the queue is
 released. Nothing is delayed, no video is touched, and an audio-only
 subscription (no video in the queue at all) is released unchanged.
 
+Measured, four recordings per profile. Offset between the first audio packet
+and the first picture:
+
+    profile      before        after (4 runs)             median
+    software     534 ms        18, 91, 169, 226 ms        130 ms
+    vaapi       1391 ms        269, 283, 430, 1052 ms     356 ms
+    qsv         1368 ms        78, 78, 92, 110 ms          85 ms
+
+QSV is consistent, software much improved. One VAAPI run came back at 1052 ms,
+essentially the pre-patch figure: this patch filters the hold queue only, and
+gh_passthru is armed the moment that queue drains, so audio arriving between
+the release and the first picture still slips out ahead of it. Patch 108
+extends the same filter past the release and closes that second window; the two
+are meant to be measured separately.
+
 The trade-off, and why this is a demonstration. Discarding leading audio means
 the stream starts at the first picture and loses up to ~1.4 s of sound that the
 source did provide. The alternative is to hold the audio instead of dropping
