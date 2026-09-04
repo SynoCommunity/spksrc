@@ -83,6 +83,68 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 4th 2026 — Build logs keep what the console showed (#7396)"
+    - **What was lost:** a package refused by a pre-check left a build log holding a
+      single line. `$(error)` fires at **parse** time, so no recipe of the inner make
+      ever runs -- and the teeing lived inside a recipe. The reason for the refusal,
+      make's own `*** ... Stop.` and the `Error 1` cascade all went to the console
+      alone, and the `[BEGIN]`/`[END]` markers only ever reached `status-build.log`.
+
+        ```
+        before                                  after
+        BUILDING package for arch x86-5.2 ...   BUILDING package for arch x86-5.2 ...
+                                                ... [BEGIN]
+                                                ../../mk/spksrc.rules/pre-check.mk:65: ***
+                                                  Arch 'x86-5.2' is not supported by
+                                                  python314: gcc 4.7.3 < 4.8.  Stop.
+                                                ... [END]
+        ```
+
+    - **Teeing moved one level up.** It now happens in `arch-%`, *above* the make that
+      fails, so that make's output and its exit cascade both pass through the pipe.
+      A parse-time `$(error)` produces no recipe to tee from, which is why writing the
+      message by hand was not enough on its own.
+    - **`precheck_fatal`** replaces nine copies of the same `ifneq`/`shell`/`error`
+      block and sends one message to all three readers: the console, the package's
+      build log, and the CI's collected unsupported list. It also fixes a timestamp
+      in that list -- written `$(date --date=now ...)` it was *make* expanding an
+      undefined variable, so every line began with a bare `" - "`; escaped to
+      `$$(date ...)` the shell runs it.
+    - **One logging mechanism instead of two.** `LOG_WRAPPED` and the new helper
+      carried the same body -- `script(1)` for a pty so **stderr** is captured too,
+      `sed` to strip ANSI on the way to the file, and a `LOGGING_ENABLED` guard so
+      exactly one level tees and nothing is written twice. They are now `_runlog`
+      (the shell fragment, underscored because it needs `pipefail` and bash from its
+      caller) and **`RUNLOG`** (the facade: builds the make command from a goal,
+      writes to `DEFAULT_LOG`, reports failure to `STATUS_LOG`). `LOG_WRAPPED` is
+      gone; nine call sites renamed, no behaviour change.
+    - **Toolchain lines name their directory.** A status line for an overlay consumer
+      logged an empty arch and called itself `toolchain`, because the branch meant for
+      it was guarded on `$(TC_NAME)$(TC_VERS)` and a consumer sets `TC_VERS` but no
+      `TC_NAME`. Both branches now use the directory name minus its `syno-` prefix, so
+      every overlay is visible:
+
+        ```
+        ARCH: qoriq-6.2.4                            NAME: toolchain
+        ARCH: qoriq-6.2.4_rust-1.82_gcc-4.9.3        NAME: toolchain
+        ARCH: 88f6281-5.2_binutils-2.30              NAME: toolchain
+        ```
+
+      Neither `TC_NAME` nor `TC_ARCH` can do this alone: a consumer sets no `TC_NAME`,
+      and on the generic toolchains `TC_ARCH` holds the reference model, so
+      `syno-aarch64-6.2.4` would have logged `rtd1296` and `syno-x64-7.1` `apollolake`.
+    - **`TIME_CMD`:** GNU `time(1)` is now resolved by path. The recipes that pipe need
+      bash for `pipefail`, and under bash `time` is a keyword that rejects `-o`, so
+      `PSTAT_TIME` broke as soon as the teeing recipe switched shells. Empty if absent,
+      which simply disables `PSTAT`.
+    - **Known limit:** an error can only be captured one level above the make that
+      fails, so the outermost `make: *** [arch-x64-7.1] Error 2` is structurally
+      unreachable -- there is no outer make to tee it.
+    - **Package-facing:** nothing changes for a successful build -- one `[BEGIN]`, one
+      `[END]`, no duplicated output. A package that calls the old `LOG_WRAPPED` should
+      use `RUNLOG`.
+    - Pull request: [#7396](https://github.com/SynoCommunity/spksrc/pull/7396)
+
 ??? note "September 4th 2026 — Link librt and libatomic instead of discarding them (#7433)"
     - **What:** `TC_EXTRA_LDFLAGS` no longer wraps `-lrt` / `-latomic` in
       `-Wl,--as-needed ... -Wl,--no-as-needed`:
