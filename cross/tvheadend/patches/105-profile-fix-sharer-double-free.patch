@@ -50,7 +50,20 @@ still points at it.  The second close reads that dangling pointer, passes the
 free()s prsh again -- heap corruption, then the crash in libc.
 
 Clearing the two pointers before free(prsh) makes the second close the no-op
-it was meant to be.  The assignment inside the queue_run block is left alone:
+it was meant to be.
+
+Confirmed on the reporting hardware: the same VP9/VAAPI request that produced
+the core now fails cleanly, and the teardown completes with no crash.
+
+    transcode: 0007: failed to find codec profile: 'webtv-vp9-vaapi'
+    http: 192.168.80.88: HTTP/1.1 GET (1) /stream/channel -- 503
+    subscription: 0069: "HTTP" unsubscribing from "TVA", client="VLC/3.0.23"
+    mpegts: ... - close PID 0030 (48) ... - stopping mux
+
+Note the failure is total, not a degradation: the codec profile is missing, so
+transcoder_create() dies before any elementary stream is set up and the client
+gets a 503 rather than an audio-only stream. That is the pre-existing upstream
+policy for a missing codec profile, not something this patch changes.  The assignment inside the queue_run block is left alone:
 it happens under prsh_queue_mutex and before pthread_join(), where the ordering
 matters.
 
