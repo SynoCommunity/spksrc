@@ -21,10 +21,10 @@ If you only read one thing, read this. The details are in the dated log below.
 
 - **Declare what a package needs, not where it fails.** Instead of
   hand-maintaining an `UNSUPPORTED_ARCHS` list, state the capability floor:
-  **`MIN_GCC_VERSION`**, **`MIN_GLIBC_VERSION`**, **`REQUIRE_64BIT`**. The
-  framework refuses exactly the architectures whose toolchain cannot meet it,
-  with a human-readable reason, and the gate stays correct on its own as
-  toolchains move. See
+  **`MIN_GCC_VERSION`**, **`MIN_GLIBC_VERSION`**, **`MIN_RUSTC_VERSION`**,
+  **`REQUIRE_64BIT`**. The framework refuses exactly the architectures whose
+  toolchain cannot meet it, with a human-readable reason, and the gate stays
+  correct on its own as toolchains move. See
   [Architecture Support](../developer-guide/packaging/makefile-variables.md#architecture-support).
 
 - **Every build system uses the same variable names now.** CMake no longer has
@@ -468,23 +468,48 @@ If you only read one thing, read this. The details are in the dated log below.
 
     Pull request: [#7256](https://github.com/SynoCommunity/spksrc/pull/7256)
 
-??? note "July 1st 2026 — Generic, bounded mirror fallback for downloads (#7254)"
+??? note "July 1st – August 24th 2026 — Bounded mirror fallback for downloads (4 PRs)"
     A download used to be a single request to `PKG_DIST_SITE`: if that host was
     down, or its TLS certificate had just expired, the build failed.
 
-    - **What:** the download logic was split into per-method macros, and a
-      download now walks a list of candidate URLs, stopping at the first success.
-      Mirrors of the big source hosts (GNU, SourceForge, GNOME, X.Org,
-      kernel.org) are tried automatically, and `PKG_DIST_MIRRORS` lets a package
-      name its own fallback base URLs.
+    - **What (#7254):** the download logic was split into per-method macros
+      (`DOWNLOAD_GIT` / `SVN` / `HG` / `HTTP`, dispatched on
+      `PKG_DOWNLOAD_METHOD`), and a plain download now walks a list of candidate
+      URLs, stopping at the first success. Mirrors of the big source hosts are
+      tried automatically, and `PKG_DIST_MIRRORS` lets a package name its own
+      fallback base URLs. Mirroring applies to `http` only — the VCS methods
+      fetch a revision from one place and tar it themselves.
     - **Why bounded:** the candidate list is finite (primary URL + family mirrors
       + `PKG_DIST_MIRRORS`, de-duplicated) and each is retried `DOWNLOAD_TRIES`
       times, so a download that cannot succeed fails rather than looping.
     - **Why it is safe:** every candidate is checked against `digests`, so a
       mirror serving different bytes fails the build instead of poisoning it.
+    - **The families since (#7349, #7384, #7401):** the variables were renamed
+      `<FAMILY>_MIRRORS` → **`MIRROR_<FAMILY>`**, and the table grew to seven:
+
+        ```
+        MIRROR_GNU  MIRROR_SOURCEFORGE  MIRROR_GNOME  MIRROR_KERNEL
+        MIRROR_SAVANNAH (#7349)  MIRROR_GNUPG (#7384)  MIRROR_FREEDESKTOP (#7401)
+        ```
+
+      `MIRROR_FREEDESKTOP` is the one that does not preserve the path: its
+      mirrors flatten the layout, so only the file name is appended to each base
+      and the bases embed `$(PKG_NAME)`. Every base is `?=`, so `local.mk` can
+      override any of them.
+    - **X.org was dropped in #7349**, deliberately: no working mirror was found.
+      Its base pointed at `mirror.csclub.uwaterloo.ca/x.org/releases`, which
+      404s, and it matched only `www.x.org/releases/` while every X.org package
+      in the tree downloads from `www.x.org/archive/individual/...`. A family
+      with no reachable mirror and no matching URL only adds candidates that
+      fail. Those packages have no automatic fallback as a result; `libX11`
+      moved to `xorg.freedesktop.org` and is covered by `MIRROR_FREEDESKTOP`.
+      The durable answer for the rest is the `sources` release, as below.
     - Documented in
       [Source downloads and mirrors](../developer-guide/packaging/makefile-variables.md#source-downloads-and-mirrors).
-    - Pull request: [#7254](https://github.com/SynoCommunity/spksrc/pull/7254)
+    - Pull requests: [#7254](https://github.com/SynoCommunity/spksrc/pull/7254),
+      [#7349](https://github.com/SynoCommunity/spksrc/pull/7349),
+      [#7384](https://github.com/SynoCommunity/spksrc/pull/7384),
+      [#7401](https://github.com/SynoCommunity/spksrc/pull/7401)
 
 ??? note "January 29th – July 1st 2026 — Reorganize `mk/` into functional submodules (8 PRs)"
     `mk/` was a flat pile of `spksrc.*.mk` files. Over six months it was
