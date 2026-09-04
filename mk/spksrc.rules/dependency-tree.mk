@@ -353,11 +353,14 @@ dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
 # by DEPENDS_TYPE. Delegates to dependency-flat for traversal and filtering.
 # ARCH and TCVERSION are forwarded so the correct dependency graph is used.
 # Output format:
-#     $(NAME): cross/foo cross/bar native/baz ...
+#     <folder>: cross/foo cross/bar native/baz ...
+# The key is the directory name, not $(NAME): CI keys its build matrix on
+# folders (see SPK_FOLDER in spksrc.rules/pre-check.mk), and a handful of
+# packages set SPK_NAME to something else -- spk/ffmpeg4 is SPK_NAME=ffmpeg.
 # -------------------------------------------------------------------
 .PHONY: dependency-list
 dependency-list:
-	@echo -n "$(NAME): "
+	@echo -n "$(notdir $(CURDIR)): "
 	@$(MAKE) -s \
 	    $(if $(ARCH),ARCH=$(ARCH)) \
 	    $(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
