@@ -13,26 +13,27 @@ LICENSE  = GNU GPLv3
 
 GNU_CONFIGURE = 1
 CONFIGURE_ARGS = --disable-static
+# include support for extra encodings
+CONFIGURE_ARGS += --enable-extra-encodings
 ADDITIONAL_CFLAGS = -O
 
-POST_INSTALL_TARGET = libiconv_pc
+ICONV_PC = $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/iconv.pc
+POST_INSTALL_TARGET = $(ICONV_PC)
 
 include ../../mk/spksrc.cross-cc.mk
 
 # libiconv does not install a pkg-config file
 # Required for packages that depend on cross/libarchive, e.g. pixz
-PHONY: libiconv_pc
-libiconv_pc:
-	@mkdir -p $(STAGING_INSTALL_PREFIX)/lib/pkgconfig
-	@( \
-		echo "prefix=$(INSTALL_PREFIX)"; \
-		echo "exec_prefix=\$${prefix}"; \
-		echo "libdir=\$${exec_prefix}/lib"; \
-		echo "includedir=\$${prefix}/include"; \
-		echo ""; \
-		echo "Name: iconv"; \
-		echo "Description: character set conversion library"; \
-		echo "Version: $(PKG_VERS)"; \
-		echo "Cflags: -I\$${includedir}"; \
-		echo "Libs: -L\$${libdir} -liconv"; \
-	) > $(STAGING_INSTALL_PREFIX)/lib/pkgconfig/iconv.pc
+$(ICONV_PC):
+	@$(MSG) - Creating pkgconfig $(notdir $@)
+	@install -d $(dir $@)
+	@printf 'prefix=$(INSTALL_PREFIX)\n' > $@
+	@printf 'exec_prefix=$${prefix}\n' >> $@
+	@printf 'libdir=$${exec_prefix}/lib\n' >> $@
+	@printf 'includedir=$${prefix}/include\n' >> $@
+	@printf '\n' >> $@
+	@printf 'Name: iconv\n' >> $@
+	@printf 'Description: character set conversion library\n' >> $@
+	@printf 'Version: $(PKG_VERS)\n' >> $@
+	@printf 'Cflags: -I$${includedir}\n' >> $@
+	@printf 'Libs: -L$${libdir} -liconv\n' >> $@

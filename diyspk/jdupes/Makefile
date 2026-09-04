@@ -1,5 +1,5 @@
 SPK_NAME = jdupes
-SPK_VERS = 1.31.1
+SPK_VERS = 1.31.2
 SPK_REV = 1
 SPK_ICON = src/jdupes.png
 
