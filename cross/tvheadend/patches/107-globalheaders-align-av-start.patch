@@ -1,9 +1,5 @@
 Start the audio and video tracks together on a transcoded stream.
 
-DEMONSTRATION PATCH -- the mechanism is measured, the remedy is one of two
-possible ones and is offered for discussion rather than as a settled fix. See
-the trade-off at the end.
-
 Recording the output of three profiles with curl and reading the Matroska
 blocks directly shows the audio track beginning well before the first picture:
 
@@ -54,7 +50,20 @@ the release and the first picture still slips out ahead of it. Patch 108
 extends the same filter past the release and closes that second window; the two
 are meant to be measured separately.
 
-The trade-off, and why this is a demonstration. Discarding leading audio means
+Final measurement, five runs per encoder, offset between the first audio packet
+and the first picture (negative = picture first, which is what a viewer wants):
+
+    step                  SOFTWARE        VAAPI          QSV
+                          med / worst     med / worst    med / worst
+    none                   534 / 534      1391 / 1391    1368 / 1368
+    107 alone              130 / 226       356 / 1052       85 / 110
+    107 + 108 (flag)       280 / 295       304 /  385       53 /  93
+    107 + 108 (pts)        -11 /   -5       -9 /    0      -18 /   -2
+
+Fifteen measurements in the final row, every one at or below zero. See
+106-108-av-start-HOWTO.txt for how the three patches divide the problem.
+
+The trade-off. Discarding leading audio means
 the stream starts at the first picture and loses up to ~1.4 s of sound that the
 source did provide. The alternative is to hold the audio instead of dropping
 it, so nothing is lost but start-up latency grows by the same amount. Which is
