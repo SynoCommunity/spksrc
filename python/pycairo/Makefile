@@ -1,11 +1,11 @@
 PKG_NAME = pycairo
-PKG_VERS = 1.28.0
+PKG_VERS = 1.29.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/pycairo
 PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
-DEPENDS = cross/cairo
+DEPENDS = cross/cairo cross/libxcb
 
 HOMEPAGE = https://pycairo.readthedocs.io/en/latest/
 COMMENT  = Pycairo is a Python module providing bindings for the cairo graphics library.
@@ -21,4 +21,4 @@ include ../../mk/spksrc.python-wheel-meson.mk
 
 pycairo_post_configure:
 	@echo "[properties]" > $(WORK_DIR)/$(PKG_DIR)/pycairo.meson
-	@echo "needs_exe_wrapper = false" >> $(WORK_DIR)/$(PKG_DIR)/pycairo.meson
+	@echo "needs_exe_wrapper = true" >> $(WORK_DIR)/$(PKG_DIR)/pycairo.meson
