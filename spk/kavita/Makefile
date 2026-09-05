@@ -10,6 +10,7 @@ DOTNET_CORE_ARCHS = 1
 
 # Kavita bundles .NET 10, which requires glibc 2.27 or newer (not available in DSM 7.1 or SRM 1.2)
 MIN_GLIBC_VERSION = 2.27
+REQUIRED_MIN_DSM = 7.2
 
 MAINTAINER = SynoCommunity
 MAINTAINER_URL = https://synocommunity.com/
