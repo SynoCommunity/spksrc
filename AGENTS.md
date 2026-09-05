@@ -1,5 +1,11 @@
 # AI Agent Instructions for spksrc
 
+> **Using an assistant on spksrc? Start here.** This file is the short form: conventions,
+> framework specifics and the mistakes that are easy to make in this repository. The `docs/`
+> tree is the primary reference and is linked throughout. If your assistant does not read a
+> root `AGENTS.md` on its own, tell it to. See
+> [Working with an AI Assistant](https://docs.synocommunity.com/contributing/development-process/#working-with-an-ai-assistant).
+
 This file provides guidance for AI coding assistants working with the spksrc repository.
 
 ## Overview
