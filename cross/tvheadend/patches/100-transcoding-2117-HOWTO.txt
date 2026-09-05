@@ -10,6 +10,24 @@ Continuation of upstream PRs:
 This is now maintained as a single consolidated patch (100-transcoding-2117.patch)
 generated from the local working branch rather than from the upstream PR .patch files.
 
+Current base: a97e57917, a single commit on top of master 45cbe4adb (Aug 22nd 2026).
+uknunknown rewrote the branch on 2026-09-01 to drop two merge commits and a
+duplicated commit; regenerating against the new head is what this revision does.
+
+What that head already carries, so it is no longer patched separately here:
+  102 apply-stream-params      (with his own V4L2 adjustment)
+  103 rename-matroska-to-mkv
+  104 restore-mpegts-profile
+  105 fix-webui-tv-profiles
+  106 hevc-software-preset
+  107 muxer report avcC/hvcC failure
+  108 muxer fix false reconfigure
+  109 muxer avio buffer size (MUX_BUF_SIZE 32768)
+  112 vainfo no vaTerminate() on failed init
+  113 config vainfo own group
+
+Only 101 is still carried on top -- see 101-transcode-HOWTO.txt.
+
 # Regenerate the patch from the working tree. The base MUST equal the
 # cross/tvheadend Makefile PKG_GIT_HASH (the distrib tarball the patch applies to),
 # otherwise upstream commits between the old base and the new base leak into the

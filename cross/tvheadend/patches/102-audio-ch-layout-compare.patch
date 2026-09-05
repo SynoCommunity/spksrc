@@ -1,0 +1,45 @@
+Compare channel layouts with av_channel_layout_compare().
+
+_audio_ch_layout_differs() compares AVChannelLayout.u.mask directly.  That
+union member only holds the channel bitmask when .order is
+AV_CHANNEL_ORDER_NATIVE or AV_CHANNEL_ORDER_AMBISONIC; for
+AV_CHANNEL_ORDER_CUSTOM the very same bytes are the
+
+    AVChannelCustom *map
+
+pointer (libavutil/channel_layout.h: union { uint64_t mask; AVChannelCustom
+*map; } u).  On a custom-ordered layout the test therefore compares two heap
+addresses as if they were masks -- it is not a crash, the union read is
+defined, but the verdict is meaningless.
+
+The result decides whether "channel_layouts=" is added to the aformat filter
+and whether asetpts is inserted at all (_audio_requires_asetpts), so a wrong
+verdict silently drops a needed conversion or adds a pointless one.
+
+av_channel_layout_compare() dispatches on .order and handles every case,
+including comparing a custom layout against an equivalent native one.
+
+Reported upstream against PR #2117.
+
+--- src/transcoding/transcode/audio.c.orig
++++ src/transcoding/transcode/audio.c
+@@ -104,12 +104,13 @@ _audio_encoder_frame_size(TVHContext *self)
+ static int
+ _audio_ch_layout_differs(TVHContext *self)
+ {
+-    if (self->iavctx->ch_layout.nb_channels != self->oavctx->ch_layout.nb_channels)
+-        return 1;
+-    if (self->iavctx->ch_layout.nb_channels &&
+-        self->iavctx->ch_layout.u.mask != self->oavctx->ch_layout.u.mask)
+-        return 1;
+-    return 0;
++    /* u.mask is only the channel bitmask for AV_CHANNEL_ORDER_NATIVE and
++       AV_CHANNEL_ORDER_AMBISONIC.  For AV_CHANNEL_ORDER_CUSTOM the same union
++       member is the AVChannelCustom *map pointer, so comparing u.mask there
++       compares two pointer values as if they were masks.  Let libavutil decide
++       instead: av_channel_layout_compare() dispatches on the order. */
++    return av_channel_layout_compare(&self->iavctx->ch_layout,
++                                     &self->oavctx->ch_layout) != 0;
+ }
+ 
+ static int

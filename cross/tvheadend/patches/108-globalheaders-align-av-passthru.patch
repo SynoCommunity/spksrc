@@ -1,0 +1,124 @@
+Keep the timestamp test running past the hold-queue release.
+
+Extends 107, and applies on top of it so the two windows can be measured
+separately. Replaces an earlier version of this patch that used a "have we
+delivered a picture yet" flag; that version was wrong, and the measurements
+below are why.
+
+107 filters the hold queue at release time. Four recordings per profile,
+offset between the first audio packet and the first picture:
+
+    profile      before 107       with 107 (median / worst)
+    software        534 ms            130 / 226 ms
+    vaapi          1391 ms            356 / 1052 ms
+    qsv            1368 ms             85 / 110 ms
+
+The VAAPI worst case is essentially the pre-patch figure, because gh_passthru
+is armed as soon as the hold queue drains and every packet after that is
+forwarded unfiltered.
+
+The flag-based attempt removed that worst case (VAAPI worst 1052 -> 385 ms) but
+left software untouched, and reading the block order in the recordings shows
+why. Arrival order is not presentation order. The audio encoder lags the video
+one on the delivery clock while still stamping its output with the original
+stream times, so audio arrives *after* the first picture carrying a pts *before*
+it. One software run, in file write order:
+
+    VIDEO  pts  572 ms     <- delivered first
+    audio  pts  277 ms
+    audio  pts  298 ms
+    audio  pts  320 ms       ... six of them, all stamped ahead of the picture
+    VIDEO  pts  672 ms
+
+A flag is set by that first picture and lets every one of those through, and the
+player still has a third of a second of sound before it has anything to show.
+The test has to stay on the timestamps, which is what 107 does and what this
+patch now carries into passthru: the pts of the first picture is remembered at
+release time, and any later audio stamped before it is dropped whatever moment
+it arrives. Audio resumes on its own as soon as its pts passes that mark.
+
+gh_first_video_pts is seeded to PTS_UNSET at creation -- calloc would leave it
+at 0, a legitimate timestamp -- and reset in gh_flush(), which is the one place
+every stop and restart path goes through.
+
+Final measurement, five runs per encoder, offset between the first audio packet
+and the first picture (negative = picture first, which is what a viewer wants):
+
+    step                  SOFTWARE        VAAPI          QSV
+                          med / worst     med / worst    med / worst
+    none                   534 / 534      1391 / 1391    1368 / 1368
+    107 alone              130 / 226       356 / 1052       85 / 110
+    107 + 108 (flag)       280 / 295       304 /  385       53 /  93
+    107 + 108 (pts)        -11 /   -5       -9 /    0      -18 /   -2
+
+Fifteen measurements in the final row, every one at or below zero. See
+106-108-av-start-HOWTO.txt for how the three patches divide the problem.
+
+Not introduced by PR #2117: globalheaders.c is untouched by it.
+
+--- src/plumbing/globalheaders.c.orig
++++ src/plumbing/globalheaders.c
+@@ -27,6 +27,7 @@
+   struct th_pktref_queue gh_holdq;
+   streaming_start_t *gh_ss;
+   int gh_passthru;
++  int64_t gh_first_video_pts;  /* pts of the first picture sent downstream */
+ } globalheaders_t;
+ 
+ // note: there up to 2.5 sec diffs in some sources!
+@@ -70,6 +71,7 @@
+   }
+ 
+   pktref_clear_queue(&gh->gh_holdq);
++  gh->gh_first_video_pts = PTS_UNSET;
+ }
+ 
+ 
+@@ -465,6 +467,8 @@
+           break;
+         }
+       }
++      /* carried into passthru so the same test keeps applying */
++      gh->gh_first_video_pts = first_video_pts;
+ 
+       // Send all pending packets
+       while((pkt = pktref_get_first(&gh->gh_holdq)) != NULL) {
+@@ -553,6 +557,29 @@
+     break;
+   case SMT_PACKET:
+     pkt = sm->sm_data;
++    /* Extends the hold-queue filter past the release, on the same test: a
++       packet is dropped when its pts precedes the first picture, whatever the
++       moment it arrives.
++
++       Arrival order is not presentation order here. The audio encoder lags the
++       video one on the delivery clock while still stamping its output with the
++       original stream times, so audio reaches this point *after* the first
++       picture yet carries a pts *before* it -- and would be presented ahead of
++       any image. Measured on one software run: the first picture was written
++       first at pts 572 ms, immediately followed by audio stamped 277 to 384 ms.
++       A "have we seen a picture yet" flag lets exactly that case through, which
++       is why the comparison has to stay on the timestamps. */
++    if (gh->gh_first_video_pts != PTS_UNSET && pkt->pkt_payload &&
++        pkt->pkt_pts != PTS_UNSET && pkt->pkt_pts < gh->gh_first_video_pts) {
++      streaming_start_component_t *vssc =
++        streaming_start_component_find_by_index(gh->gh_ss,
++                                                pkt->pkt_componentindex);
++      if (vssc && !SCT_ISVIDEO(vssc->es_type)) {
++        pkt_trace(LS_GLOBALHEADERS, pkt, "drop, precedes first picture");
++        streaming_msg_free(sm);
++        break;
++      }
++    }
+     if (pkt->pkt_payload || pkt->pkt_err)
+       streaming_target_deliver2(gh->gh_output, sm);
+     else
+@@ -601,6 +628,8 @@
+ 
+   TAILQ_INIT(&gh->gh_holdq);
+ 
++  /* calloc leaves this at 0, which is a valid timestamp */
++  gh->gh_first_video_pts = PTS_UNSET;
+   gh->gh_output = output;
+   streaming_target_init(&gh->gh_input, &globalheaders_input_ops, gh, 0);
+   return &gh->gh_input;
