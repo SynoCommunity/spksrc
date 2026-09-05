@@ -1,6 +1,6 @@
 SPK_NAME = nzbget
 SPK_VERS = $(shell date +%Y%m%d)
-SPK_REV = 30
+SPK_REV = 31
 SPK_ICON = src/nzbget.png
 
 MAINTAINER = SynoCommunity
@@ -9,7 +9,7 @@ DESCRIPTION_FRE = NZBGet est un récupérateur de news en ligne de commande écr
 DESCRIPTION_SPN = NZBGet es una aplicación de linea de comandos escrita en C++ para descargar binarios, desde servidores de noticias, utilizando archivos nzb. Soporta modo cliente y servidor, verificación y descompresión automática y una interfaz web. NZBGet utiliza pocos recursos de sistema.
 STARTABLE = yes
 DISPLAY_NAME = NZBGet
-CHANGELOG = "Switch package to nzbgetcom (https://nzbget.com) version"
+CHANGELOG = "Update the package to correctly install and update NZBGet on older kernels (< 3.2)."
 
 HOMEPAGE = https://nzbget.com
 LICENSE  = GPLv2
