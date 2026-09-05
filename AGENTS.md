@@ -67,6 +67,15 @@ compatibility, and migration requirements.
 - `SPK_REV` starts at 1, increments for packaging changes.
 - Never reset `SPK_REV` - always increment, even when `SPK_VERS` changes.
 - Never decrement version numbers.
+- Bump against the **published** revision at <https://synocommunity.com/packages>, not
+  against whatever is in the tree.
+- `CHANGELOG` is recapitulative since the last release, not a log of one PR. With more than
+  one item, number them so it stays readable: `CHANGELOG += "1. ...<br/>"`.
+- When `SPK_VERS` is unchanged, **add to** the existing entries; replace them only on a real
+  upstream version change.
+- Omit dependency updates unless they are significant to the user; describe behaviour, not
+  internals ("Internal build options now follow toolchain capabilities" rather than a
+  variable name).
 
 ## Key Learnings
 
@@ -76,13 +85,25 @@ When the saved filename differs from the remote one, set `PKG_DIST_FILE` (local 
 which the digests reference) distinct from `PKG_DIST_NAME` (remote filename) - useful when a
 source (e.g. a GitLab/GitHub archive) serves a generic or awkward filename.
 
-### Source Mirrors
+### Source Downloads and Mirrors
+`PKG_DOWNLOAD_METHOD` selects how the source is fetched: unset (plain HTTP, the default and
+what nearly every package wants), or `git` / `svn` / `hg`, which build the tarball locally
+from `PKG_GIT_HASH` / `PKG_SVN_REV` / `PKG_HG_REV`. **Mirroring applies to HTTP only.**
+
 `mk/spksrc.build/download.mk` provides built-in mirror fallback for well-known hosts via
-`MIRROR_<FAMILY>` tables (`MIRROR_GNU`, `MIRROR_SAVANNAH`, `MIRROR_SOURCEFORGE`,
-`MIRROR_GNOME`, `MIRROR_KERNEL`): when a `PKG_DIST_SITE` matches such a host, the framework
-automatically tries the mirrors. For per-package fallbacks, set `PKG_DIST_MIRRORS` to a list
-of base URLs. Prefer a reliable primary source (upstream release/tag archives) over fragile
-ad-hoc hosts. See `docs/developer-guide/packaging/makefile-variables.md` (Source downloads and mirrors).
+seven `MIRROR_<FAMILY>` tables - `MIRROR_GNU`, `MIRROR_SOURCEFORGE`, `MIRROR_GNOME`,
+`MIRROR_KERNEL`, `MIRROR_SAVANNAH`, `MIRROR_GNUPG`, `MIRROR_FREEDESKTOP` - each `?=`, so
+`local.mk` can override any of them. When `PKG_DIST_SITE` matches such a host the mirrors
+are tried automatically. Six are path-preserving (the family's tree-root marker is replaced);
+`MIRROR_FREEDESKTOP` is the exception, appending only the file name, which is why its bases
+embed `$(PKG_NAME)`.
+
+For per-package fallbacks, set `PKG_DIST_MIRRORS` to a list of base URLs; `PKG_DIST_NAME` is
+appended to each, so the mirror must serve that exact file name. Every candidate is still
+checked against `digests`. Prefer a reliable primary source (upstream release/tag archives)
+over fragile ad-hoc hosts; when no mirror serves the right name, upload to the SynoCommunity
+`sources` release and point `PKG_DIST_MIRRORS` there. See
+`docs/developer-guide/packaging/makefile-variables.md` (Source downloads and mirrors).
 
 ### PLIST Regeneration
 For complex packages (Erlang-based, large dependency trees), PLIST may need regeneration
@@ -105,6 +126,53 @@ Practical consequences:
 - Atomic support varies by architecture (some require libatomic linking).
 - When a flag works across all toolchains, use it universally rather than complex conditionals.
 - Use arch-specific patches in `patches/archname/` for toolchain-specific source fixes.
+
+### An Arch List Standing In For a Capability Will Drift
+This is the most common recurring defect in package Makefiles. A list written to mean
+"the archs whose gcc is too old" is correct the day it is written and silently wrong
+afterwards, because it names *where* a package fails rather than *why*. It cannot express
+the condition, so an arch that meets it is missed for good.
+
+Three examples from one file, `spk/borgbackup`, each missing `x86-5.2` for the same reason:
+
+```makefile
+-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),)   # meant: gcc < 4.8
++ifeq ($(call version_lt,$(TC_GCC),4.8),1)
+
+-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))             # meant: rustc < 1.85
++ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
+
+-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)                            # meant: gcc < 4.6
++MIN_GCC_VERSION = 4.6
+```
+
+When you find such a list, work out the real threshold and *measure* it rather than
+guessing: the toolchains are in tree and can be asked directly.
+
+### Toolchain-Wide Link Libraries
+`TC_EXTRA_LDFLAGS` already carries `-lrt` (glibc < 2.17, `clock_gettime`) and `-latomic`
+(targets without native 64-bit atomics), the latter dropped where the gcc does not ship it.
+**A package must not re-declare them.** They are passed plainly, not wrapped in
+`-Wl,--as-needed`: `LDFLAGS` precedes the objects on every link line, and `--as-needed`
+keeps a library only if it resolves a symbol that is *already* undefined at that point, so
+a bracketed library there is always discarded. If you see a per-package
+`--extra-ldflags="-lrt"` or equivalent, it is a workaround for that and can go.
+
+### Package Folder vs `SPK_NAME`
+CI keys its build matrix on the **directory name**, not `SPK_NAME` (`SPK_FOLDER` in
+`mk/spksrc.rules/pre-check.mk`). A few packages differ - `spk/ffmpeg4` is `SPK_NAME = ffmpeg`,
+`spk/mkvtoolnix_22` is `mkvtoolnix`, `spk/mono_58` is `mono` - and `SPK_NAME` is the DSM
+package identity written into `INFO`, so it cannot be renamed without breaking upgrades.
+Refer to a package by its folder in anything CI-facing.
+
+### Build Logs
+`RUNLOG` (the facade) and `_runlog` (the shell fragment it is built on) in
+`mk/spksrc.common/macros.mk` do the teeing; `LOG_WRAPPED` no longer exists. Teeing happens
+in `arch-%`, one level *above* the make that fails, so a pre-check refusal, make's own
+`*** ... Stop.` and the exit cascade all reach `build-<arch>.log`. An error can only be
+captured one level above the make that fails, so the outermost `make: *** [arch-...] Error 2`
+is structurally unreachable. Per-package logs stay per package: an `spk/` dependency built
+through `spk-meta` writes to its own `LOG_DIR`, by design.
 
 ### Build Arguments
 Separate arguments by build phase rather than overloading one variable:
@@ -156,8 +224,15 @@ Defined in `mk/spksrc.common/archs.mk` (authoritative). Commonly used:
 - `32bit_ARCHS` / `64bit_ARCHS` - width-based groups
 - `SUPPORTED_ARCHS` / `LATEST_ARCHS` - policy groups
 
-Prefer a capability floor (`MIN_GCC_VERSION`, `REQUIRE_...`) over listing archs by hand;
-use `UNSUPPORTED_ARCHS` only to exclude specific archs/families explicitly.
+Prefer a capability floor over listing archs by hand; use `UNSUPPORTED_ARCHS` only to
+exclude specific archs/families for a reason that is not a capability. The floors are
+`MIN_GCC_VERSION`, `MIN_GLIBC_VERSION`, `MIN_RUSTC_VERSION` and `REQUIRE_64BIT`
+(`mk/spksrc.common/tc-capability.mk` is authoritative). A floor may be set after
+`include ../../mk/spksrc.common.mk`; pre-check reads it later.
+
+`MIN_RUSTC_VERSION` compares against `TC_RUSTC`, which is *derived* rather than declared:
+an arch whose Rust overlay is active reports the version that overlay pins, every other arch
+reports `stable`, which sorts above any number and clears any floor.
 
 ## Git Workflow
 
@@ -186,10 +261,26 @@ use `UNSUPPORTED_ARCHS` only to exclude specific archs/families explicitly.
 - **Remove redundant code** - don't leave dead code paths.
 - **Check existing patterns first** - look at how similar packages solve the same problem before inventing new approaches.
 - **Question necessity** - before making framework changes, verify they're truly required by comparing working vs failing cases.
-- **Keep comments short** - one line where one line suffices.
+- **Keep comments short** - one or two lines; explain *why*, not what the code already says.
+- **Verify a probe before trusting it.** A throwaway makefile that sets a variable *after*
+  `include ../../mk/spksrc.common.mk` is too late for anything `tc-capability.mk` computes
+  at include time, and testing `$(if $(PLIST_TRANSFORM),...)` is always true because the
+  default is `cat`. Prefer running the real target in the real directory.
+- **Ask the toolchain rather than tabulate.** Compiler behaviour is testable: the toolchains
+  are in tree, and `toolchain/syno-<arch>-<dsm>/work/*/bin/*-gcc` can be invoked directly to
+  settle "which version accepts this flag" in seconds.
 
 ## CI/Build Failures
 
+- **A green run proves nothing about a package that was not in it.** CI derives the package
+  list from the changed files; read the `arch_packages` output of the prepare job
+  (`ARCH_PACKAGES` in the build step) before concluding anything, because a package can be
+  absent entirely and the run still be green.
+- **DSM 5.2 is opt-in.** `.github/workflows/build.yml` adds `x86-5.2`, `88f6281-5.2` and
+  `ppc853x-5.2` to the matrix only when the `add_dsm52_builds` input is true, which defaults
+  to false. A change that only matters on the oldest toolchains is therefore not exercised
+  by default. Turning it on for one run is legitimate; revert it with a *commit* rather than
+  by rewriting history, so the run stays attached to the PR.
 - Analyze CI logs carefully rather than guessing at fixes.
 - Compare working vs failing builds to isolate differences (a green build before a change proves the change is the cause).
 - Check if the issue is arch-specific (toolchain version, available libraries, C standard).
