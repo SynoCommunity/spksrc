@@ -536,8 +536,8 @@ endif
 spk-stage2: package
 
 all:
-	$(call LOG_WRAPPED,spk-stage1)
-	$(call LOG_WRAPPED,spk-stage2)
+	$(call RUNLOG,spk-stage1)
+	$(call RUNLOG,spk-stage2)
 
 
 ### spk-specific clean rules

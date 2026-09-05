@@ -6,16 +6,17 @@ SPK_ICON = src/borgbackup.png
 # Include common.mk first to get ARCH definitions
 include ../../mk/spksrc.common.mk
 
-# Build for ARMv5 and ARMv7L using Python 3.11; all others use Python 3.14
-# This must be set BEFORE including spksrc.spk-meta.mk to avoid adding
-# ARMv5 to UNSUPPORTED_ARCHS when using python314
-ifneq ($(findstring $(ARCH),$(ARMv5_ARCHS) $(ARMv7L_ARCHS)),)
+# python314 needs gcc >= 4.8 (its MIN_GCC_VERSION); older toolchains use 3.11.
+# Must be set before spksrc.spk-meta.mk, which would otherwise gate the arch out.
+ifeq ($(call version_lt,$(TC_GCC),4.8),1)
 PYTHON_PACKAGE = python311
 else
 PYTHON_PACKAGE = python314
 endif
 
-UNSUPPORTED_ARCHS = $(OLD_PPC_ARCHS)
+# borg's setup.py hardcodes -Wno-unreachable-code-fallthrough; gcc ignores an
+# unknown -Wno- option only from 4.6 on, and errors out in cc1 before that.
+MIN_GCC_VERSION = 4.6
 
 DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 cross/xxhash cross/zstd
 
@@ -44,7 +45,6 @@ DEPENDS = cross/acl cross/attr cross/fuse cross/libb2 cross/lz4 cross/openssl3 c
 # # with Python 3.14. Use the pure and cross requirement files as the base for your PR.
 
 # Wheels: Python requirements vary by architecture
-# ARMv5 uses rpds_py pinned to 0.21.0 for Cargo.lock v3 compatibility with Rust 1.77.2
 ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
 WHEELS += src/requirements-pure-armv5.txt src/requirements-crossenv-armv5.txt
 else
@@ -105,18 +105,15 @@ ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [msgpack] -std=gnu99
 endif
 
-# [rpds-py] — capped by Rust toolchain version per architecture.
-# jsonschema >= 4.26 requires rpds-py >= 0.25 — pinned to match.
-ifeq ($(findstring $(ARCH),$(ARMv5_ARCHS)),$(ARCH))
-WHEELS += rpds_py==0.21.0
-WHEELS += jsonschema==4.25.1
-else ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
+# rpds-py >= 0.25 pulls Rust edition 2024 crates (rustc >= 1.85), and jsonschema
+# >= 4.26 requires rpds-py >= 0.25; below that floor both pin back one release.
+ifeq ($(call version_ge,$(TC_RUSTC),1.85),1)
+WHEELS += rpds_py==0.30.0
+WHEELS += jsonschema==4.26.0
+else
 export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
 WHEELS += rpds_py==0.24.0
 WHEELS += jsonschema==4.25.1
-else
-WHEELS += rpds_py==0.30.0
-WHEELS += jsonschema==4.26.0
 endif
 
 include ../../mk/spksrc.spk-meta.mk

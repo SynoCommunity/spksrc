@@ -48,5 +48,8 @@ STATUS_LOG   = $(LOG_DIR)/status-build.log
 
 # Enable stats over parallel build mode
 ifneq ($(filter 1 on ON,$(PSTAT)),)
-PSTAT_TIME = time -o $(STATUS_LOG) --append --quiet
+# GNU time(1) by path, not by name: under bash "time" is a keyword that rejects -o, and
+# the recipes that pipe need bash for pipefail. Empty if absent, which disables PSTAT.
+TIME_CMD := $(shell command -v time 2>/dev/null)
+PSTAT_TIME = $(TIME_CMD) -o $(STATUS_LOG) --append --quiet
 endif

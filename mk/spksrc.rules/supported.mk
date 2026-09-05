@@ -63,38 +63,49 @@ pre-build-native:
 $(TARGET_TYPE)-arch-% &: pre-build-native
 	-@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) arch-$*
 
+# Teed here rather than in build-arch-%: one level up also catches make's own
+# "*** [build-arch-...] Error 1" cascade, which is emitted after that recipe exits.
+# _runlog's LOGGING_ENABLED guard makes this the only teeing level.
+arch-%: SHELL:=/bin/bash
 arch-%:
-	@$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*))
+	@set -o pipefail ; \
+	$(call _runlog,$(PSTAT_TIME) $(MAKE) $(addprefix build-arch-, $(or $(filter $(addprefix %, $(DEFAULT_TC)), $(filter %$(word 2,$(subst -, ,$*)), $(filter $(firstword $(subst -, ,$*))%, $(AVAILABLE_TOOLCHAINS)))),$*)),build-$*.log)
 
+arch-noarch-%: SHELL:=/bin/bash
 arch-noarch-%:
-	@$(PSTAT_TIME) $(MAKE) $(addprefix build-noarch-, $(filter $*, $(AVAILABLE_TCVERSIONS) 3.1))
+	@set -o pipefail ; \
+	$(call _runlog,$(PSTAT_TIME) $(MAKE) $(addprefix build-noarch-, $(filter $*, $(AVAILABLE_TCVERSIONS) 3.1)),build-noarch-$*.log)
 
 ####
 
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: 
-	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain | tee --append build-$*.log
+	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain 
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [BEGIN]\n" \
 	        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
 	        | tee --append $(STATUS_LOG)
-	@MAKEFLAGS= GCC_DEBUG_INFO="$(GCC_DEBUG_INFO)" $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)) 2>&1 ; \
-	status=$${PIPESTATUS[0]} ; \
+	@# pipefail: _runlog ends in a pipeline, so without it $$? would be tee's, and a
+	@# failed build would be reported as a success.
+	@set -o pipefail ; \
+	$(call _runlog,MAKEFLAGS= GCC_DEBUG_INFO=$(GCC_DEBUG_INFO) $(MAKE) ARCH=$(firstword $(subst -, ,$*)) TCVERSION=$(lastword $(subst -, ,$*)),build-$*.log) ; \
+	status=$$? ; \
 	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [END]\n" \
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
 	       | tee --append $(STATUS_LOG) ; \
-	[ $${status[0]} -eq 0 ] || false
+	[ $$status -eq 0 ] || false
 
 build-noarch-%: SHELL:=/bin/bash
 build-noarch-%: 
-	@$(MSG) BUILDING noarch package for TCVERSION $* | tee --append build-noarch-$*.log
+	@$(MSG) BUILDING noarch package for TCVERSION $* 
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, TCVERSION: %s, NAME: %s [BEGIN]\n" \
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
 	       | tee --append $(STATUS_LOG)
-	@MAKEFLAGS= $(MAKE) TCVERSION=$* ARCH=noarch 2>&1 ; \
-	status=$${PIPESTATUS[0]} ; \
+	@set -o pipefail ; \
+	$(call _runlog,MAKEFLAGS= $(MAKE) TCVERSION=$* ARCH=noarch,build-noarch-$*.log) ; \
+	status=$$? ; \
 	$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, TCVERSION: %s, NAME: %s [END]\n" \
 	       "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
 	       | tee --append $(STATUS_LOG) ; \
-	[ $${status[0]} -eq 0 ] || false
+	[ $$status -eq 0 ] || false
 
 ####

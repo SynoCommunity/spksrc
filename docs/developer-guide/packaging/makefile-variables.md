@@ -35,6 +35,21 @@ PKG_DIR = $(PKG_NAME)-$(PKG_VERS)
 
 ### Source downloads and mirrors
 
+**Where the source comes from.** `PKG_DOWNLOAD_METHOD` selects how
+`PKG_DIST_SITE` is fetched; it defaults to a plain HTTP download, which is what
+almost every package wants.
+
+| `PKG_DOWNLOAD_METHOD` | Fetches | Revision variable |
+|-----------------------|---------|-------------------|
+| unset / anything else | the tarball at `PKG_DIST_SITE/PKG_DIST_NAME` | — |
+| `git` | a clone, archived to a tarball | `PKG_GIT_HASH` |
+| `svn` | an export, archived to a tarball | `PKG_SVN_REV` (or `HEAD`) |
+| `hg` | a clone, archived to a tarball | `PKG_HG_REV` (or `tip`) |
+
+The VCS methods build the tarball locally from one repository, so **everything
+below applies to HTTP downloads only** — there is nothing to mirror when the
+source is a revision in a named repository.
+
 A download is never a single request. The framework builds a list of candidate
 URLs, tries each in turn, and stops at the first success. The list is finite --
 the primary URL, plus the mirrors described below, de-duplicated -- and each
@@ -45,19 +60,32 @@ cannot succeed fails instead of looping.
 of the big source hosts, the framework already knows its mirrors and will try
 them without any declaration on your part:
 
-| If the URL is hosted on | Fallbacks are taken from |
-|-------------------------|--------------------------|
-| GNU (`ftp.gnu.org`, `ftpmirror.gnu.org`) | `MIRROR_GNU` |
-| SourceForge (`downloads.sourceforge.net`) | `MIRROR_SOURCEFORGE` |
-| GNOME (`download.gnome.org`) | `MIRROR_GNOME` |
-| kernel.org (`cdn.kernel.org`) | `MIRROR_KERNEL` |
-| Savannah (`download.savannah.gnu.org`) | `MIRROR_SAVANNAH` |
+| If the URL is hosted on | Fallbacks are taken from | Tree root |
+|-------------------------|--------------------------|-----------|
+| GNU (`ftp.gnu.org`, `ftpmirror.gnu.org`) | `MIRROR_GNU` | `/gnu/` |
+| SourceForge (`downloads.sourceforge.net`) | `MIRROR_SOURCEFORGE` | `/project/` |
+| GNOME (`download.gnome.org`) | `MIRROR_GNOME` | `/sources/` |
+| kernel.org (`cdn.kernel.org`, `www.kernel.org`) | `MIRROR_KERNEL` | `/pub/` |
+| Savannah (`download.savannah.gnu.org`) | `MIRROR_SAVANNAH` | `/releases/` |
+| GnuPG (`gnupg.org`, `www.gnupg.org`) | `MIRROR_GNUPG` | `/gcrypt/` |
+| freedesktop.org (any `*.freedesktop.org`) | `MIRROR_FREEDESKTOP` | *by file name* |
 
-A candidate is built by replacing everything up to and including the family's
-tree-root marker (`/gnu/`, `/project/`, `/sources/`, ...) with the mirror base,
-so mirrors that host the tree under a different prefix still resolve correctly.
+Most families are **path-preserving**: a candidate is built by replacing
+everything up to and including the family's tree-root marker with the mirror
+base, so a mirror hosting the tree under a different prefix still resolves.
+
+freedesktop.org is the exception. Its mirrors are archives that flatten the
+layout, so only the **file name** is appended to each base -- the same rule
+`PKG_DIST_MIRRORS` follows. The bases embed `$(PKG_NAME)` for that reason:
+
+```makefile
+MIRROR_FREEDESKTOP ?= https://ftp.osuosl.org/pub/blfs/conglomeration/$(PKG_NAME) \
+                      https://distfiles.macports.org/$(PKG_NAME)
+```
+
 Any other URL -- GitHub, a project's own server -- simply has no family, and the
-primary URL is used on its own.
+primary URL is used on its own. Every base is overridable from `local.mk`, since
+each is declared with `?=`.
 
 **`PKG_DIST_MIRRORS` covers everything else.** It takes a space-separated list of
 *base URLs*; `PKG_DIST_NAME` is appended to each. Use it when upstream is the
@@ -253,19 +281,23 @@ SPK_COMMANDS = bin/mycommand bin/myother
 When a package cannot build on some architectures because of what the
 **toolchain** provides — its compiler, its C library, or the target being
 32-bit — declare that floor instead of listing the architectures by hand. The
-framework checks each floor against the toolchain's own `TC_GCC` / `TC_GLIBC`
-and refuses exactly the architectures that cannot meet it, with a
+framework checks each floor against the toolchain's own `TC_GCC` / `TC_GLIBC` /
+`TC_RUSTC` and refuses exactly the architectures that cannot meet it, with a
 human-readable reason.
 
 | Variable | Description |
 |----------|-------------|
 | `MIN_GCC_VERSION` | Needs at least this gcc (e.g. `8`, `4.9`) |
 | `MIN_GLIBC_VERSION` | Needs at least this glibc — a runtime floor no toolchain can lift |
+| `MIN_RUSTC_VERSION` | Needs at least this rustc (e.g. `1.85`) |
 | `REQUIRE_64BIT` | Set to `1` when the package needs a 64-bit target |
 
 ```makefile
 # Needs C++17 → gcc 8 or newer
 MIN_GCC_VERSION = 8
+
+# Needs Rust edition 2024 → rustc 1.85 or newer
+MIN_RUSTC_VERSION = 1.85
 
 # Needs a 64-bit target (e.g. SVT-AV1)
 REQUIRE_64BIT = 1
@@ -280,6 +312,13 @@ misses more than one is told about all of them.
 The toolchain values these check against — `TC_GCC`, `TC_GLIBC` and `TC_KERNEL`
 — are declared in each toolchain's Makefile and read statically, so a package
 can gate on them before anything is extracted.
+
+`TC_RUSTC` is the exception: it is *derived*, not declared. An arch whose Rust
+overlay is active reports the version that overlay pins; every other arch reports
+`stable`, which sorts above any number and therefore clears any `MIN_RUSTC_VERSION`
+without a network query. So a rustc floor refuses only the archs pinned to an old
+from-source Rust — see [Toolchain: custom from-source
+Rust](../../framework/toolchain.md#custom-from-source-rust-toolchains).
 
 **Keep the floor consistent between `spk/` and `cross/`.** A floor on an `spk/`
 package belongs on its matching `cross/` package too, so a build is refused at its

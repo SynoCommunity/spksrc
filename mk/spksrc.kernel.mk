@@ -82,7 +82,7 @@
 #
 # Notes:
 #  - The kernel build is idempotent when guarded by cookies.
-#  - Logging is centralized via LOG_WRAPPED.
+#  - Logging is centralized via RUNLOG.
 #  - cross-env.mk consumes tc_vars* generated during Stage1.
 #  - Kernel source relocation is handled by kernel_post_extract_target.
 #
@@ -242,8 +242,8 @@ kernel-stage2: install plist
 .PHONY: all
 all:
 	@mkdir -p $(WORK_DIR)
-	$(call LOG_WRAPPED,kernel-stage1)
-	$(call LOG_WRAPPED,kernel-stage2)
+	$(call RUNLOG,kernel-stage1)
+	$(call RUNLOG,kernel-stage2)
 
 ####
 
