@@ -114,7 +114,30 @@ _inject_one() {
 }
 
 # ---------------------------------------------------------------------------
-# Collect packages that declare REQUIRED_MIN_DSM = <version>,
+# Map a MIN_GLIBC_VERSION floor to the minimum DSM version whose toolchains
+# ship at least that glibc. Packages using MIN_GLIBC_VERSION instead of
+# REQUIRED_MIN_DSM (e.g. kavita, dotnet10-runtime) are otherwise invisible to
+# the restricted-build classification and never built for the DSM they need.
+#
+# DSM 7.1 toolchains ship glibc 2.26; DSM 7.2+ ship 2.36. MIN_GLIBC_VERSION
+# cannot distinguish 7.2 from 7.3 (they share glibc 2.36), so any floor above
+# 2.26 is classified as min DSM 7.2.
+#
+# Usage: min_dsm_for_glibc <glibc version>
+# Prints the minimum DSM version, or nothing if the floor is below the
+# default builds (7.1 / 6.2.4).
+# ---------------------------------------------------------------------------
+min_dsm_for_glibc() {
+    local glibc="$1"
+    if [ -n "${glibc}" ] && [ "${glibc}" != "2.26" ] && \
+       [ "$(printf '%s\n%s\n' "2.26" "${glibc}" | sort -V | tail -1)" = "${glibc}" ]; then
+        echo "7.2"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# Collect packages that declare REQUIRED_MIN_DSM = <version> or a
+# MIN_GLIBC_VERSION floor that implies <version>,
 # preserving the build order already established in $packages.
 # Injects required meta-packages by resolving all qualifying packages
 # in a single inject_meta_packages call to avoid cross-iteration state issues.
@@ -128,6 +151,8 @@ collect_min_dsm_packages() {
     for package in ${packages}; do
         if [ -f "./spk/${package}/Makefile" ]; then
             if [ "$(grep REQUIRED_MIN_DSM "./spk/${package}/Makefile" | cut -d= -f2 | xargs)" = "${version}" ]; then
+                result+="${package} "
+            elif [ "$(min_dsm_for_glibc "$(grep MIN_GLIBC_VERSION "./spk/${package}/Makefile" | cut -d= -f2 | xargs)")" = "${version}" ]; then
                 result+="${package} "
             fi
         fi
