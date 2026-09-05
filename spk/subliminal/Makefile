@@ -3,7 +3,7 @@ SPK_VERS = 2.6.0
 SPK_REV = 13
 SPK_ICON = src/subliminal.png
 
-PYTHON_PACKAGE = python312
+PYTHON_PACKAGE = python314
 
 WHEELS = src/requirements-crossenv.txt src/requirements-pure.txt
 
