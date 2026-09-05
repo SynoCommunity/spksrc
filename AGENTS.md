@@ -246,7 +246,21 @@ reports `stable`, which sorts above any number and clears any floor.
 - **One working directory per PR** keeps concurrent branches isolated and identifiable.
 - Branch naming: `packagename-version` or `fix-issue-description` (no `/` in branch names).
 - **Never push without explicit approval** - always ask first (each push = one CI run); batch related edits into one commit rather than many.
-- **Open every new PR as a draft** - create with `gh pr create --draft`; mark it ready for review only once it is validated (e.g. green CI).
+- **Work through a PR opened upstream, and keep it a draft until it is green.** Create with
+  `gh pr create --draft`, then `gh pr ready <N>` once every job passes and it is fit for
+  review. This is not etiquette, it is what the CI is wired for
+  (`.github/workflows/build.yml`):
+    - **Draft cancels its own superseded runs.** A draft PR shares one concurrency group
+      (`build-<workflow>-<ref>`) with `cancel-in-progress: true`, so each push kills the
+      build the previous one started. A non-draft PR gets a unique per-run group with
+      `cancel-in-progress: false`: nothing is cancelled, and iterative pushes pile up and
+      queue behind each other.
+    - **Draft avoids the duplicate fork build.** A push to your own fork normally starts its
+      own narrower build; that one is skipped while the branch has an open *draft* PR
+      upstream, because the authoritative build already runs on the PR. Not a draft, and you
+      pay for both.
+    - Marking it ready is therefore the last step, not the first — and if you must push
+      afterwards, expect to cancel superseded runs by hand (`gh run cancel <id>`).
 - **Rebase, then force-push your own PR branch** - a rebased branch requires `--force-with-lease`; only rewrite history on branches you own.
 - **Always rebase against master before merging** - keep branch history clean.
 - `git rebase -i` can be driven non-interactively by agents with `GIT_SEQUENCE_EDITOR=true`/`GIT_EDITOR=true`;
