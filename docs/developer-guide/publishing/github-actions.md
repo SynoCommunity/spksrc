@@ -36,7 +36,7 @@ The CI determines which packages to build by:
 
 ### Main Build Workflow
 
-Located at `.github/workflows/build.yml`. By default, packages build for DSM 7.1 and DSM 6.2. DSM 7.2 builds are opt-in and require setting `TCVERSION=7.2` as a minimum in the package Makefile.
+Located at `.github/workflows/build.yml`. By default, packages build for DSM 7.1 and DSM 6.2. DSM 7.2 builds are opt-in: a package opts in by declaring `REQUIRED_MIN_DSM = 7.2`, or a capability floor (`MIN_GLIBC_VERSION` / `MIN_GCC_VERSION`) that implies DSM 7.2.
 
 ### Build Matrix
 
