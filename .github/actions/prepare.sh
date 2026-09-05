@@ -136,8 +136,26 @@ min_dsm_for_glibc() {
 }
 
 # ---------------------------------------------------------------------------
+# Map a MIN_GCC_VERSION floor to the minimum DSM version whose toolchains
+# ship at least that gcc. DSM 7.1 toolchains top out at gcc 8.5.0; DSM 7.2+
+# ship gcc 12.2, so any floor above 8.5.0 is classified as min DSM 7.2
+# (7.2 and 7.3 share gcc 12.2, so these land in the 7.2 bucket).
+#
+# Usage: min_dsm_for_gcc <gcc version>
+# Prints the minimum DSM version, or nothing if the floor is below the
+# default builds (7.1 / 6.2.4).
+# ---------------------------------------------------------------------------
+min_dsm_for_gcc() {
+    local gcc="$1"
+    if [ -n "${gcc}" ] && [ "${gcc}" != "8.5.0" ] && \
+       [ "$(printf '%s\n%s\n' "8.5.0" "${gcc}" | sort -V | tail -1)" = "${gcc}" ]; then
+        echo "7.2"
+    fi
+}
+
+# ---------------------------------------------------------------------------
 # Collect packages that declare REQUIRED_MIN_DSM = <version> or a
-# MIN_GLIBC_VERSION floor that implies <version>,
+# MIN_GLIBC_VERSION / MIN_GCC_VERSION floor that implies <version>,
 # preserving the build order already established in $packages.
 # Injects required meta-packages by resolving all qualifying packages
 # in a single inject_meta_packages call to avoid cross-iteration state issues.
@@ -153,6 +171,8 @@ collect_min_dsm_packages() {
             if [ "$(grep REQUIRED_MIN_DSM "./spk/${package}/Makefile" | cut -d= -f2 | xargs)" = "${version}" ]; then
                 result+="${package} "
             elif [ "$(min_dsm_for_glibc "$(grep MIN_GLIBC_VERSION "./spk/${package}/Makefile" | cut -d= -f2 | xargs)")" = "${version}" ]; then
+                result+="${package} "
+            elif [ "$(min_dsm_for_gcc "$(grep MIN_GCC_VERSION "./spk/${package}/Makefile" | cut -d= -f2 | xargs)")" = "${version}" ]; then
                 result+="${package} "
             fi
         fi
