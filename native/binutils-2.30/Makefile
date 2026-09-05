@@ -49,3 +49,26 @@ arch-%:
 	@$(MSG) "===== binutils-$(PKG_VERS): $* ====="
 	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) all
 	@$(MAKE) --no-print-directory TC_ARCH=$(firstword $(subst -, ,$*)) TC_VERS=$(lastword $(subst -, ,$*)) build-archive
+
+##############################################################################
+# Build (and archive) binutils for EVERY toolchain of a given DSM version.
+#
+#   make all-6.2.4                 one arch at a time
+#   make BINUTILS_JOBS=5 all-6.2.4     5 archs at a time (each still max threads)
+#
+# The consumers ARE the arch list -- one consumer, one archive, so there is no table
+# here and no virtual/canonical special case.
+#
+# Concurrency via xargs -P, deliberately NOT make's -j: -j goes into MAKEFLAGS and
+# propagates into every sub-make, parallelising toolchain targets not written for it.
+##############################################################################
+BINUTILS_ARCHS = $(shell ls -d ../../toolchain/syno-*-$(1)_binutils-2.30 2>/dev/null | \
+                    sed 's|.*/syno-||; s|-$(1)_binutils-2.30$$||')
+BINUTILS_JOBS ?= 1
+
+.PHONY: all-%
+all-%:
+	@$(MSG) "===== binutils-$(PKG_VERS): all-$* -- $(words $(call BINUTILS_ARCHS,$*)) archs, $(BINUTILS_JOBS) at a time ====="
+	@echo "$(sort $(call BINUTILS_ARCHS,$*))" | tr ' ' '\n' | \
+	   xargs -P $(BINUTILS_JOBS) -I@ $(MAKE) --no-print-directory arch-@-$*
+	@$(MSG) "===== binutils-$(PKG_VERS): all-$* complete ====="

@@ -97,7 +97,7 @@ endif
 	@set -e; \
 	for depend in $(filter-out native/% spk/%,$(BUILD_DEPENDS) $(DEPENDS)); \
 	do \
-	  env $(ENV) $(MAKE) -C ../../$$depend ; \
+	  env $(ENV) $(MAKE) $(OVERLAY_SELECTORS) -C ../../$$depend ; \
 	done
 	
 post_depend_target: $(DEPEND_TARGET)
