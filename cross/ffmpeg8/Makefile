@@ -26,8 +26,8 @@ CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --pref
 # overlay it would pick the vendor ones: configure dies on "Compiler lacks C11 support",
 # or falls back to compat/atomics and leaves __sync_*_8 undefined at the link. TC_GCC_BIN
 # and TC_GCC_SUFFIX name whichever compiler the toolchain resolved, overlay or not.
-CONFIGURE_ARGS += --cc=$(TC_GCC_BIN)/$(TC_PREFIX)gcc$(TC_GCC_SUFFIX)
-CONFIGURE_ARGS += --cxx=$(TC_GCC_BIN)/$(TC_PREFIX)g++$(TC_GCC_SUFFIX)
+CONFIGURE_ARGS += --cc=$(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)gcc$(TC_GCC_SUFFIX)
+CONFIGURE_ARGS += --cxx=$(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)g++$(TC_GCC_SUFFIX)
 
 # ffmpeg 8 wants C11 static assertions. static_assert is not a runtime feature, just a
 # macro glibc added to assert.h in 2.16; the keyword comes from the compiler, so define it

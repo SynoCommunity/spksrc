@@ -382,12 +382,16 @@ tc_flags:
 # same names mean AVAILABLE; nothing on the package side reads them back.) Binutils counts as
 # active only for the GLOBAL overlay: the narrow rust-link use downloads the same archive but
 # touches nothing else, and shows up as a -Clink-arg=-B<shim> in the Rust link flags.
-# TC_GCC_BIN is the bin dir the gcc family actually lives in, overlay or not. Published
-# because a package cannot work it out for itself: OVERLAY_GCC_ON and OVERLAY_GCC_BIN are
-# toolchain-side, and the two layouts differ -- <work>/<target>/bin for the vendor
-# toolchain, <consumer>/work/install/usr/local/bin for an overlay. A build system that
-# ignores CC from the environment (ffmpeg takes its compilers from --cross-prefix) has to
-# be handed the path, and this is what to build it from, with TC_PREFIX and TC_GCC_SUFFIX.
+# TC_OVERLAY_<c>_PATH is the bin dir of an ACTIVE overlay, empty otherwise -- so a package
+# writes the fallback itself and reads as the pair it is:
+#
+#   $(or $(TC_OVERLAY_GCC_PATH),$(TC_PATH))$(TC_PREFIX)gcc$(TC_GCC_SUFFIX)
+#
+# Published because a package cannot work it out: OVERLAY_<c>_ON and OVERLAY_<c>_BIN are
+# toolchain-side, and the layouts differ -- <work>/<target>/bin for the vendor toolchain,
+# <consumer>/work/install/usr/local/bin for an overlay. Needed by any build system that
+# ignores CC/AR from the environment; ffmpeg takes its compilers from --cross-prefix, and
+# a handful of packages pass CC=/AR= explicitly. Trailing slash, like TC_PATH.
 #
 # The OVERLAY_<c> switches are deliberately NOT emitted: a package includes this file, so it
 # would inherit the previous run's choice and the switch would go sticky.
@@ -417,7 +421,8 @@ tc_vars:
 	echo TC_OVERLAY_BINUTILS := $(if $(OVERLAY_BINUTILS_ON),$(TC_OVERLAY_BINUTILS)) ; \
 	echo TC_OVERLAY_GCC := $(if $(OVERLAY_GCC_ON),$(TC_OVERLAY_GCC)) ; \
 	echo TC_GCC_SUFFIX := $(OVERLAY_GCC_SUFFIX) ; \
-	echo TC_GCC_BIN := $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN),$(TC_WORK_DIR)/$(TC_TARGET)/bin)
+	echo TC_OVERLAY_GCC_PATH := $(if $(OVERLAY_GCC_ON),$(OVERLAY_GCC_BIN)/) ; \
+	echo TC_OVERLAY_BINUTILS_PATH := $(if $(OVERLAY_BINUTILS_ON),$(OVERLAY_BINUTILS_BIN)/)
 # TC_KERNEL is emitted just below, with the ">= 4.4" EXTRAVERSION "+" handling.
 # Add "+" to EXTRAVERSION for kernels version >= 4.4
 ifeq ($(call version_ge, ${TC_KERNEL}, 4.4),1)
