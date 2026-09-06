@@ -250,11 +250,17 @@ CONFIGURE_ARGS += --enable-v4l2-m2m
 endif
 
 # Every PowerPC toolchain here is e500v2 -- ppc853x and qoriq both declare -mcpu=8548 --
-# and only qoriq was listed. Inert today: ffmpeg5 needs gcc 4.9, ppc853x has 4.3.7.
+# and only qoriq was listed. ppc853x is reachable too now that the gcc 8.5 overlay
+# provides the compiler its own 4.3.7 could not.
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
+# Both, and not one or the other: --extra-libs reaches the program link only, so
+# libavformat.so comes out with __sync_fetch_and_{add,sub}_8 undefined -- allowed in a
+# shared object -- and ffmpeg_g then cannot resolve them. --extra-ldflags reaches every
+# link, the libraries included.
 CONFIGURE_ARGS += --extra-libs=-latomic
+CONFIGURE_ARGS += --extra-ldflags=-latomic
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))

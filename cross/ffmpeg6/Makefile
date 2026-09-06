@@ -251,7 +251,12 @@ endif
 ifeq ($(findstring $(ARCH),$(PPC_ARCHS)),$(ARCH))
 CONFIGURE_ARGS += --arch=ppc
 CONFIGURE_ARGS += --cpu=e500v2
+# Both, and not one or the other: --extra-libs reaches the program link only, so
+# libavformat.so comes out with __sync_fetch_and_{add,sub}_8 undefined -- allowed in a
+# shared object -- and ffmpeg_g then cannot resolve them. --extra-ldflags reaches every
+# link, the libraries included.
 CONFIGURE_ARGS += --extra-libs=-latomic
+CONFIGURE_ARGS += --extra-ldflags=-latomic
 endif
 
 ifeq ($(findstring $(ARCH),evansport),$(ARCH))
