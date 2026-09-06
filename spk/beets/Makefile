@@ -1,5 +1,5 @@
 SPK_NAME = beets
-SPK_VERS = 2.11.0
+SPK_VERS = 2.13.1
 SPK_REV = 13
 SPK_ICON = src/beets.png
 
@@ -16,7 +16,7 @@ DESCRIPTION = Beets is the media library management system for obsessive music g
 
 DISPLAY_NAME = beets
 STARTABLE = no
-CHANGELOG = "1. Update beets to 2.11.0. <br/>2. Migrate to Python 3.14. <br/>3. Add autobpm plugin support (requires DSM 7.2+)."
+CHANGELOG = "1. Update beets to 2.13.1. <br/>2. Migrate to Python 3.14. <br/>3. Add autobpm plugin support (requires DSM 7.2+)."
 
 HOMEPAGE = https://beets.io/
 LICENSE  = MIT
@@ -61,7 +61,7 @@ DEPENDS += cross/mp3gain
 DEPENDS += cross/libyaml
 
 # [llvmlite] - requires LLVM
-DEPENDS += cross/llvm-20.0
+DEPENDS += cross/llvm-22.0
 
 # [scipy] - built via requirements-crossenv.txt, needs OpenBLAS
 DEPENDS += cross/openblas
