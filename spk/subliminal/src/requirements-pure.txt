@@ -1,4 +1,4 @@
-# Pure python wheels. Resolved from "subliminal==2.6.0".
+# Pure python wheels. Resolved from "subliminal==2.7.1".
 babelfish==0.6.1
 beautifulsoup4==4.15.0
 #certifi==2026.7.22           ==> Managed from py314

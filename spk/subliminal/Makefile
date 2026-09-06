@@ -1,5 +1,5 @@
 SPK_NAME = subliminal
-SPK_VERS = 2.6.0
+SPK_VERS = 2.7.1
 SPK_REV = 13
 SPK_ICON = src/subliminal.png
 
@@ -15,7 +15,7 @@ DESCRIPTION = Subliminal searches and downloads the best matching subtitles for 
 DESCRIPTION_FRE = Subliminal recherche et télécharge les sous-titres correspondant le mieux à vos films et séries. Ce paquet fournit l\'outil en ligne de commande subliminal.
 DISPLAY_NAME = Subliminal
 STARTABLE = no
-CHANGELOG = "1. Update to Subliminal 2.6.0, a full rewrite of the upstream project.<br/>2. The package is now a Python 3 command line tool; the former DSM user interface is gone."
+CHANGELOG = "1. Update to Subliminal 2.7.1, a full rewrite of the upstream project.<br/>2. The package is now a Python 3 command line tool; the former DSM user interface is gone."
 
 HOMEPAGE = https://github.com/Diaoul/subliminal
 LICENSE  = MIT
