@@ -21,6 +21,13 @@ include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
 
+# ffmpeg derives its compilers from --cross-prefix and ignores CC/CXX, so under a gcc
+# overlay it would pick the vendor ones: configure dies on "Compiler lacks C11 support",
+# or falls back to compat/atomics and leaves __sync_*_8 undefined at the link. TC_GCC_BIN
+# and TC_GCC_SUFFIX name whichever compiler the toolchain resolved, overlay or not.
+CONFIGURE_ARGS += --cc=$(TC_GCC_BIN)/$(TC_PREFIX)gcc$(TC_GCC_SUFFIX)
+CONFIGURE_ARGS += --cxx=$(TC_GCC_BIN)/$(TC_PREFIX)g++$(TC_GCC_SUFFIX)
+
 # The v4l2 input device needs the multiplanar API, which Linux grew in 3.2; the 2.6.32
 # toolchains ship no such header. Was disabled for qoriq by name.
 ifeq ($(call version_lt,$(TC_KERNEL),3.2),1)

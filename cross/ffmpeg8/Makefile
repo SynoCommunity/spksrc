@@ -22,13 +22,12 @@ include ../../mk/spksrc.common.mk
 
 CONFIGURE_ARGS  = --target-os=linux --cross-prefix=$(TC_PATH)$(TC_PREFIX) --prefix=$(INSTALL_PREFIX)
 
-# ffmpeg derives its compilers from --cross-prefix and ignores CC/CXX, so it would pick
-# the stock ones under a gcc overlay: configure dies on --cc, and --cxx only shows up at
-# the final LDXX. Take what tc_vars RECORDED for this work dir -- it already resolved
-# overlay vs stock, and knows where each lives.
-_ffmpeg_tcvar = $(shell sed -n 's|^TC_ENV += $(1)="\(.*\)"$$|\1|p' $(WORK_DIR)/tc_vars.autotools.mk 2>/dev/null)
-CONFIGURE_ARGS += --cc=$(or $(call _ffmpeg_tcvar,CC),$(TC_PATH)$(TC_PREFIX)gcc)
-CONFIGURE_ARGS += --cxx=$(or $(call _ffmpeg_tcvar,CXX),$(TC_PATH)$(TC_PREFIX)g++)
+# ffmpeg derives its compilers from --cross-prefix and ignores CC/CXX, so under a gcc
+# overlay it would pick the vendor ones: configure dies on "Compiler lacks C11 support",
+# or falls back to compat/atomics and leaves __sync_*_8 undefined at the link. TC_GCC_BIN
+# and TC_GCC_SUFFIX name whichever compiler the toolchain resolved, overlay or not.
+CONFIGURE_ARGS += --cc=$(TC_GCC_BIN)/$(TC_PREFIX)gcc$(TC_GCC_SUFFIX)
+CONFIGURE_ARGS += --cxx=$(TC_GCC_BIN)/$(TC_PREFIX)g++$(TC_GCC_SUFFIX)
 
 # ffmpeg 8 wants C11 static assertions. static_assert is not a runtime feature, just a
 # macro glibc added to assert.h in 2.16; the keyword comes from the compiler, so define it
