@@ -33,6 +33,11 @@ version_ge = $(shell if printf '%s\n' "$(1)" "$(2)" | sort -VCr ; then echo 1; f
 version_lt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VC ; then echo 1; fi)
 version_gt = $(shell if [ "$(1)" != "$(2)" ] && printf "%s\n" "$(1)" "$(2)" | sort -VCr ; then echo 1; fi)
 
+# Separator for UNSUPPORTED_ARCHS_REASON, so several contributors read as a list rather
+# than running together. Same shape as _tc_cap_join in spksrc.common/tc-capability.mk.
+_ur_comma := ,
+unsupported_reason_join = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)),$(_ur_comma) )
+
 # Remove duplicate words within string while preserving order
 define uniq
 $(strip \

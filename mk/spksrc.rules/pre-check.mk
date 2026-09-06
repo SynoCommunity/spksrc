@@ -65,10 +65,18 @@ ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED)),)
   $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME): $(TC_CAPABILITY_UNSUPPORTED))
 endif
 
-# Check whether package supports ARCH
+# Check whether package supports ARCH.
+#
+# UNSUPPORTED_ARCHS says WHERE a package fails, never why, and the archs are often added
+# by an include rather than by the package -- so the message names a package that has no
+# such list in its own Makefile. Whoever adds the archs can add UNSUPPORTED_ARCHS_REASON
+# alongside, and it is carried here in parentheses. A capability floor is still the better
+# answer where one fits; this is for the exclusions that are not capability checks.
+_unsupported_why = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON))))
+
 ifneq ($(UNSUPPORTED_ARCHS),)
   ifneq (,$(findstring $(ARCH),$(UNSUPPORTED_ARCHS)))
-    $(call precheck_fatal,Arch '$(ARCH)' is not a supported architecture)
+    $(call precheck_fatal,Arch '$(ARCH)' is not a supported architecture$(_unsupported_why))
   endif
 endif
 
@@ -76,7 +84,7 @@ ifneq ($(TCVERSION),)
 
 ifneq ($(UNSUPPORTED_ARCHS_TCVERSION),)
   ifneq (,$(findstring $(ARCH)-$(TCVERSION),$(UNSUPPORTED_ARCHS_TCVERSION)))
-    $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not a supported architecture)
+    $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not a supported architecture$(_unsupported_why))
   endif
 endif
 
