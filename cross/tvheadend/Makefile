@@ -18,9 +18,9 @@ LICENSE  = GPLv3
 # floor is ffmpeg's, and the meta below picks the version an arch can build.
 MIN_GCC_VERSION = 4.6
 
-# Follow ffmpeg8 onto the gcc 8.5 overlay, same condition: linking an overlay-built
-# ffmpeg8 with the vendor gcc fails on the std::__cxx11 symbols its libstdc++ never had.
-OVERLAY_GCC = $(if $(call version_lt,$(TC_GCC),$(MIN_GCC_VERSION)),1)
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
+OVERLAY_GCC = 1
 
 include ../../mk/spksrc.common.mk
 

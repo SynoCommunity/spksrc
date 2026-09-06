@@ -26,6 +26,10 @@ VIDEODRV_PACKAGE = synocli-videodriver
 CHANGELOG  = "1. Initial release: diagnostic and monitoring tools split out of synocli-videodriver.<br/>"
 CHANGELOG += "2. Provide vainfo down to DSM 6.2.4 (VA-API); OpenCL/Vulkan/igt tools remain DSM 7.1+."
 
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
+OVERLAY_GCC = 1
+
 include ../../mk/spksrc.common.mk
 
 ifeq ($(findstring $(ARCH),$(x64_ARCHS)),$(ARCH))
