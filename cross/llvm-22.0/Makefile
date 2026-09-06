@@ -1,5 +1,5 @@
-PKG_NAME = llvm-20.0
-PKG_LLVM_MAJ = 20
+PKG_NAME = llvm-22.0
+PKG_LLVM_MAJ = 22
 PKG_VERS = $(PKG_LLVM_MAJ).1.8
 PKG_EXT = tar.xz
 PKG_DIST_NAME = llvm-project-$(PKG_VERS).src.$(PKG_EXT)
@@ -7,7 +7,7 @@ PKG_DIST_SITE = https://github.com/llvm/llvm-project/releases/download/llvmorg-$
 PKG_DIR = llvm-project-$(PKG_VERS).src
 
 HOMEPAGE = https://llvm.org/
-COMMENT = Minimal LLVM 20 build for llvmlite
+COMMENT = Minimal LLVM 22 build for llvmlite
 LICENSE = Apache v2.0 with LLVM Exceptions
 
 REQUIRED_MIN_DSM = 7.1
