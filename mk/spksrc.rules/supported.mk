@@ -81,6 +81,13 @@ arch-noarch-%:
 build-arch-%: SHELL:=/bin/bash
 build-arch-%: 
 	@$(MSG) BUILDING package for arch $* with SynoCommunity toolchain 
+	@# The other half of stage0's toolchainclean, and not a duplicate: stage0 only runs
+	@# where ARCH and TCVERSION are already set, which `make arch-<arch>-<vers>` does not
+	@# do at this level -- it derives them from the goal and passes them to the make below,
+	@# which is then excluded as a forwarded child. So the goal path has to clean here.
+	@# Both are once per build, never per dependency, and the inner make skips its own
+	@# clean because the selectors reach it with _OVERLAY_FORWARDED set.
+	@$(MAKE) --no-print-directory -C $(BASEDIR)/toolchain/syno-$(firstword $(subst -, ,$*))-$(lastword $(subst -, ,$*)) toolchainclean >/dev/null 2>&1 || true
 	@$(MSG) $$(printf "%s MAKELEVEL: %02d, PARALLEL_MAKE: %s, ARCH: %s, NAME: %s [BEGIN]\n" \
 	        "$$(date +%Y%m%d-%H%M%S)" $(MAKELEVEL) "$(PARALLEL_MAKE)" "$*" "$(NAME)") \
 	        | tee --append $(STATUS_LOG)
