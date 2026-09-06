@@ -1,5 +1,5 @@
 PKG_NAME = pygobject
-PKG_VERS = 3.56.1
+PKG_VERS = 3.58.0
 PKG_EXT = tar.gz
 PKG_DIST_NAME = $(PKG_NAME)-$(PKG_VERS).$(PKG_EXT)
 PKG_DIST_SITE = https://files.pythonhosted.org/packages/source/p/pygobject
