@@ -33,6 +33,10 @@ CHANGELOG += "12. libva 2.23.0 for DSM 6 (was 2.17.0), the same as DSM 7; the DS
 # DSM 5.2's 3.2 kernel predates the render-node interface libva needs.
 MIN_KERNEL_VERSION = 3.10
 
+# The ffmpeg8 chain builds through the gcc 8.5 overlay end to end -- one compiler, one
+# libstdc++ ABI. Set before spksrc.common.mk, so overlay.mk's `?=` sees it.
+OVERLAY_GCC = 1
+
 include ../../mk/spksrc.common.mk
 
 # Library dependency list shared with the consumer-side meta integration
