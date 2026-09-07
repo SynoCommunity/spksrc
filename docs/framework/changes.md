@@ -83,6 +83,34 @@ If you only read one thing, read this. The details are in the dated log below.
 
 ---
 
+??? note "September 7th 2026 — An arch exclusion can say why (#7439)"
+    - **What was missing:** `UNSUPPORTED_ARCHS` states *where* a package fails and never
+      *why*, and the archs are often added by an include rather than by the package -- so
+      the message named a package with no such list in its own Makefile.
+      **`UNSUPPORTED_ARCHS_REASON`** is now carried into the refusal in parentheses:
+
+        ```
+        Arch 'ppc853x' is not a supported architecture (go has no 32-bit PowerPC target)
+        ```
+
+        `spksrc.cross/env-go.mk` and `env-dotnet.mk` say theirs. A capability floor is
+        still the better answer where one fits; this is for exclusions that are not
+        capability checks.
+    - **One accumulator instead of two.** `_tc_cap_join` accumulated
+      `TC_CAPABILITY_UNSUPPORTED` and `unsupported_reason_join` accumulated
+      `UNSUPPORTED_ARCHS_REASON` -- the same operation under two names, and the second was
+      not a macro at all (no argument, just a lazy read of a global). Both are now
+      **`$(call comma_append,<list>,<item>)`**.
+    - **A `$(,)` that expanded to nothing.** `spksrc.common.mk` defined `empty` / `space` /
+      `$(,)` *below* every `spksrc.common/` include, so an included file expanding `$(,)`
+      in a `:=` assignment got the empty string -- which is why `tc-capability.mk` carried
+      a private comma variable. The utility block moved above the includes.
+    - **`spksrc.cross/env-dotnet.mk`** lost 26 tab-indented lines sitting outside any
+      recipe, and its `$(error)` became a `$(warning)`: an unsupported arch should be
+      reported by the pre-check, not by a parse abort in an env file.
+    - **Package-facing:** nothing to change. Add `UNSUPPORTED_ARCHS_REASON` alongside an
+      `UNSUPPORTED_ARCHS` you introduce, and the refusal will carry it.
+
 ??? note "September 4th 2026 — Build logs keep what the console showed (#7396)"
     - **What was lost:** a package refused by a pre-check left a build log holding a
       single line. `$(error)` fires at **parse** time, so no recipe of the inner make

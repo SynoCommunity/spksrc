@@ -67,11 +67,8 @@ endif
 
 # Check whether package supports ARCH.
 #
-# UNSUPPORTED_ARCHS says WHERE a package fails, never why, and the archs are often added
-# by an include rather than by the package -- so the message names a package that has no
-# such list in its own Makefile. Whoever adds the archs can add UNSUPPORTED_ARCHS_REASON
-# alongside, and it is carried here in parentheses. A capability floor is still the better
-# answer where one fits; this is for the exclusions that are not capability checks.
+# UNSUPPORTED_ARCHS says WHERE a package fails, never why, and is often added by an include
+# rather than by the package -- so whoever adds the archs adds UNSUPPORTED_ARCHS_REASON too.
 _unsupported_why = $(if $(strip $(UNSUPPORTED_ARCHS_REASON)), ($(strip $(UNSUPPORTED_ARCHS_REASON))))
 
 ifneq ($(UNSUPPORTED_ARCHS),)

@@ -7,7 +7,7 @@
 
 # Go has no upstream toolchain for 32-bit PowerPC: GOARCH covers ppc64 and ppc64le only.
 UNSUPPORTED_ARCHS += $(PPC_ARCHS)
-UNSUPPORTED_ARCHS_REASON := $(UNSUPPORTED_ARCHS_REASON)$(unsupported_reason_join)go has no 32-bit PowerPC target
+UNSUPPORTED_ARCHS_REASON := $(call comma_append,$(UNSUPPORTED_ARCHS_REASON),go has no 32-bit PowerPC target)
 
 GOOS = linux
 ifeq ($(strip $(CGO_ENABLED)),)
