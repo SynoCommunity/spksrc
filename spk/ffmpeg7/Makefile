@@ -10,7 +10,6 @@ DEPENDS = cross/ffmpeg7
 VIDEODRV_PACKAGE = synocli-videodriver
 
 # Needs C11 and working atomics -- gcc 4.9 or newer
-MIN_GCC_VERSION = 4.9
 
 MAINTAINER = th0ma7
 DESCRIPTION = FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video. It includes libavcodec - the leading audio/video codec library.  More information from SynoCommunity FFmpeg package available at https://docs.synocommunity.com/packages/ffmpeg/
