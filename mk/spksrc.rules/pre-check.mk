@@ -68,6 +68,7 @@ endif
 # $(shell) folds newlines into spaces, so each line's own spaces travel as ~ and are put
 # back one $(info) at a time. No reason or package path contains one.
 ifneq ($(strip $(ARCH))$(strip $(TCVERSION)),)
+# Required gates only: an optional dependency that refuses must not refuse the build.
 _TREE_GATES := $(shell DEPENDENCY_WALK=1 $(MAKE) -s --no-print-directory dependency-unsupported \
                    ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null | sed 's/ /~/g')
 endif
@@ -75,8 +76,8 @@ endif
 # Refuse an arch whose toolchain cannot meet a declared floor (spksrc.common/tc-capability.mk),
 # naming every gate rather than the first, so one run tells the whole story.
 ifneq ($(strip $(TC_CAPABILITY_UNSUPPORTED))$(strip $(_TREE_GATES)),)
-  $(foreach _g,$(_TREE_GATES),$(info ===>  gate: $(subst ~, ,$(_g))))
-  $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME)$(if $(strip $(TC_CAPABILITY_UNSUPPORTED)),: $(TC_CAPABILITY_UNSUPPORTED))$(if $(strip $(_TREE_GATES)), ($(words $(_TREE_GATES)) gate(s) in the tree$())))
+  $(foreach _g,$(_TREE_GATES),$(info ===>  check: $(subst ~, ,$(_g))))
+  $(call precheck_fatal,Arch '$(ARCH)-$(TCVERSION)' is not supported by $(SPK_NAME)$(PKG_NAME)$(if $(strip $(TC_CAPABILITY_UNSUPPORTED)),: $(TC_CAPABILITY_UNSUPPORTED))$(if $(strip $(_TREE_GATES)), ($(words $(_TREE_GATES)) failed check(s) in the tree$())))
 endif
 
 # Check whether package supports ARCH.

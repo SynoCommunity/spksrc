@@ -165,10 +165,15 @@ DEPENDS_TYPE ?= $(_DEFAULT_DEPENDS_TYPE)
 # are first evaluated (i.e. when dependency-flat-mk resolves its prerequisites).
 # -------------------------------------------------------------------
 ALL_DEPENDS         = $(sort $(NATIVE_DEPENDS) $(BUILD_DEPENDS) $(DEPENDS) $(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
+# An arch context normally drops OPTIONAL_DEPENDS: they are not built, so they do not belong
+# in a dependency list. DEP_FLAT_WITH_OPTIONAL walks them anyway, to REPORT what an optional
+# branch would demand. What actually gets built is unchanged either way.
+_dep_flat_optional = $(if $(DEP_FLAT_WITH_OPTIONAL),$(OPTIONAL_DEPENDS),$(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))
+
 DEP_FLAT_TARGETS_MK = $(strip \
   $(addprefix dep-flat-mk-DEPENDS__,          $(subst /,__,$(DEPENDS))) \
   $(addprefix dep-flat-mk-BUILD_DEPENDS__,    $(subst /,__,$(BUILD_DEPENDS))) \
-  $(addprefix dep-flat-mk-OPTIONAL_DEPENDS__, $(subst /,__,$(if $(and $(ARCH),$(TCVERSION)),,$(OPTIONAL_DEPENDS)))) \
+  $(addprefix dep-flat-mk-OPTIONAL_DEPENDS__, $(subst /,__,$(_dep_flat_optional))) \
   $(addprefix dep-flat-mk-NATIVE_DEPENDS__,   $(subst /,__,$(NATIVE_DEPENDS))))
 
 # -------------------------------------------------------------------
@@ -349,6 +354,7 @@ dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
 	$(MAKE) -s --output-sync=target \
 		-C ../../$$dep \
 		$(if $(DEP_FLAT_VERDICT),DEP_FLAT_VERDICT=1) \
+		$(if $(DEP_FLAT_WITH_OPTIONAL),DEP_FLAT_WITH_OPTIONAL=1) \
 		$(if $(ARCH),ARCH=$(ARCH)) \
 		$(if $(TCVERSION),TCVERSION=$(TCVERSION)) \
 		dependency-flat-mk
@@ -356,7 +362,9 @@ dep-flat-mk-%: | $(DEP_FLAT_STAMP_DIR)
 # -------------------------------------------------------------------
 # dependency-unsupported
 # Every package in the tree that refuses this arch, one per line, as
-#     <package> <reason>[, <reason>...]
+#     required|optional <package> <reason>[, <reason>...]
+# Required gates only, OPTIONAL_DEPENDS being out of the walk once an arch is set. The sed
+# drops anything that is not a verdict -- stage0's bootstrap notice shares this stdout.
 # Empty output means the whole tree accepts the arch. The same stamped walk as
 # dependency-flat, so a diamond is visited once, and OPTIONAL_DEPENDS drop out on
 # their own once ARCH and TCVERSION are both set.

@@ -66,18 +66,27 @@ $(TARGET_TYPE)-arch-% &: pre-build-native
 # Teed here rather than in build-arch-%: one level up also catches make's own
 # "*** [build-arch-...] Error 1" cascade, which is emitted after that recipe exits.
 # _runlog's LOGGING_ENABLED guard makes this the only teeing level.
+# Required gates come from the walk an arch context already defines; the optional ones are
+# what a second walk adds when OPTIONAL_DEPENDS are followed too. A set difference, not a
+# label carried down: a package under both a required and an optional parent is required.
+_gate_walk = DEPENDENCY_WALK=1 $(MAKE) --no-print-directory -s dependency-unsupported \
+                 ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null
+_gate_fmt  = awk '{ p = $$1 ; $$1 = "" ; printf "         %-26s %s\n", p, substr($$0, 2) }'
+
 # Every capability gate in the dependency tree that this arch fails, or nothing when it
 # builds. Pure diagnostic: reads the declared floors across the tree, extracts no toolchain.
 .PHONY: check
 check: SHELL:=/bin/bash
 check:  ## Report the capability gates ARCH/TCVERSION fails (see also check-<arch>-<vers>)
-	@out=$$(DEPENDENCY_WALK=1 $(MAKE) --no-print-directory -s dependency-unsupported \
-	          ARCH=$(ARCH) TCVERSION=$(TCVERSION) 2>/dev/null) ; \
-	if [ -z "$$out" ] ; then \
-	   $(MSG) "$(NAME): every gate met for $(ARCH)-$(TCVERSION)" ; \
+	@req=$$($(_gate_walk)) ; \
+	all=$$(DEP_FLAT_WITH_OPTIONAL=1 $(_gate_walk)) ; \
+	opt=$$(comm -13 <(echo "$$req") <(echo "$$all")) ; \
+	if [ -z "$$req$$opt" ] ; then \
+	   $(MSG) "$(NAME): $(ARCH)-$(TCVERSION) check: OK" ; \
 	else \
-	   $(MSG) "$(NAME): $$(echo "$$out" | wc -l) gate(s) not met for $(ARCH)-$(TCVERSION)" ; \
-	   echo "$$out" | awk '{ p = $$1 ; $$1 = "" ; printf "         %-26s %s\n", p, substr($$0, 2) }' ; \
+	   $(MSG) "$(NAME): $(ARCH)-$(TCVERSION) check: $$(echo "$$req" | grep -c .) failed$$([ -n "$$opt" ] && echo ", $$(echo "$$opt" | grep -c .) more behind an optional dependency")" ; \
+	   [ -z "$$req" ] || { echo "       required" ; echo "$$req" | $(_gate_fmt) ; } ; \
+	   [ -z "$$opt" ] || { echo "       optional" ; echo "$$opt" | $(_gate_fmt) ; } ; \
 	fi
 
 # The goal-shaped form, for symmetry with arch-<arch>-<vers>. Carries the pair in the goal
